@@ -1,215 +1,408 @@
-Return-Path: <kvm+bounces-55329-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-55330-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id B28FEB3013A
-	for <lists+kvm@lfdr.de>; Thu, 21 Aug 2025 19:38:19 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id D5D10B301AA
+	for <lists+kvm@lfdr.de>; Thu, 21 Aug 2025 20:03:23 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id DA3771CC4C25
-	for <lists+kvm@lfdr.de>; Thu, 21 Aug 2025 17:38:38 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1FC4217C2D4
+	for <lists+kvm@lfdr.de>; Thu, 21 Aug 2025 18:01:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7164A33A002;
-	Thu, 21 Aug 2025 17:38:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EA650343216;
+	Thu, 21 Aug 2025 18:01:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="IWJNxzjU"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="VfecmwHs"
 X-Original-To: kvm@vger.kernel.org
-Received: from casper.infradead.org (casper.infradead.org [90.155.50.34])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CE87B2E1F17;
-	Thu, 21 Aug 2025 17:38:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=90.155.50.34
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DCE601EB5C2
+	for <kvm@vger.kernel.org>; Thu, 21 Aug 2025 18:01:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755797883; cv=none; b=eB+H+oQMzAC+L212qeZY+9blcx5nyC8JqFZg5Q809wXWMykG1C2yT2GJmvEjqg3Cp0cUfGXIzibIhO1pCjK9dvK/CbKCZMuWc6Zvf4VKg6mIzoTqpvof3TWabvCTWFXja187MQpl8xNOhCfs8u6WuudEBMgG6Z12jDr2mGIlZds=
+	t=1755799283; cv=none; b=kcG41S0YZh5PeJ5Jzg3iSlw+ozPT8JE7G0VAxps3NIfTQLq+U+Y7d/GsgXPIssONfL6K5ncXeULUI8aIfwmzGJohoX+HPQiORBSML1TVsIioNI/wF98NgReEf6+8rax0XWehgCVZOE1Y2ZatBC8d5MJUv46ez7c+Dk03rKzpQ7U=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755797883; c=relaxed/simple;
-	bh=47VF7f9gAqbtGW8OYxEpUEGP0ZeGpLuFdmf6qLEf24M=;
-	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=DYUgcgqVsCqQA+DFKqNzivMunTdZT8irJsTKhJUzjxjoTtShgC/wOeLcF/MFj78KqLnFaY12FAfQcCc3tc7klkv+QlxrvhHmzm8hmcG4na/W+jHrAKwSh5D8OUDddZXHtqqZ14jXMMl81totUwaP0MLL5emN8lT7v4/rrGRa4Fo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=casper.srs.infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=IWJNxzjU; arc=none smtp.client-ip=90.155.50.34
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=casper.srs.infradead.org
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=infradead.org; s=casper.20170209; h=MIME-Version:Content-Type:References:
-	In-Reply-To:Date:Cc:To:From:Subject:Message-ID:Sender:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description;
-	bh=VDPsV0HVK5ArG8HtDfSzQu2II94dgcjqAlwULC8l3i0=; b=IWJNxzjU5NDib/18Ya76HTHD/J
-	8KRICxNYUEtljwHNo7S8tZY4l1WB+K1u4rU6lwfJCWJGMCrgfUZsL9rSbPDthEm87ZML8ANaf+ce6
-	ny3pRXhAewCZOvhfD9BpUq2FrgcFeGIcHF+gAvXrX5+OZt4qBlIiV9SCkhsyz9e/YpyIrBqf3pcIL
-	DBOvPVl6qbNYL/gFCkv6nIUZkONpfRBguLmDSpYDmTT5XSuc52ecyR85yc8dfu6wJeipA/ZAE0Wcd
-	9tss7o8bjMO7UkgSY8wi5CWZaVDOmXFa9bfvOIbRAK1H0SFDpbAtbFZRxxMEb3XIvbwpVAyaZpDuT
-	Xx7zr9yA==;
-Received: from 54-240-197-225.amazon.com ([54.240.197.225] helo=freeip.amazon.com)
-	by casper.infradead.org with esmtpsa (Exim 4.98.2 #2 (Red Hat Linux))
-	id 1up9EP-0000000B1MS-4A6O;
-	Thu, 21 Aug 2025 17:37:46 +0000
-Message-ID: <933dc95ead067cf1b362f7b8c3ce9a72e31658d2.camel@infradead.org>
-Subject: Re: [PATCH v2 0/3] Support "generic" CPUID timing leaf as KVM guest
- and host
-From: David Woodhouse <dwmw2@infradead.org>
-To: Sean Christopherson <seanjc@google.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, Thomas Gleixner
- <tglx@linutronix.de>,  Ingo Molnar <mingo@redhat.com>, Borislav Petkov
- <bp@alien8.de>, Dave Hansen <dave.hansen@linux.intel.com>,  x86@kernel.org,
- "H. Peter Anvin" <hpa@zytor.com>, Vitaly Kuznetsov <vkuznets@redhat.com>,
- kvm@vger.kernel.org, linux-kernel@vger.kernel.org,  graf@amazon.de, Ajay
- Kaher <ajay.kaher@broadcom.com>, Alexey Makhalov
- <alexey.makhalov@broadcom.com>, Colin Percival <cperciva@tarsnap.com>
-Date: Thu, 21 Aug 2025 18:37:45 +0100
-In-Reply-To: <aKdIvHOKCQ14JlbM@google.com>
-References: <20250816101308.2594298-1-dwmw2@infradead.org>
-	 <aKdIvHOKCQ14JlbM@google.com>
-Content-Type: multipart/signed; micalg="sha-256"; protocol="application/pkcs7-signature";
-	boundary="=-dyRQpVNzCM2WspTNZkKJ"
-User-Agent: Evolution 3.52.3-0ubuntu1 
+	s=arc-20240116; t=1755799283; c=relaxed/simple;
+	bh=rwrZ1MK9qMs6TAwoTdtGZ/Fp86rXufY46UnJ0SYOrhc=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=l/JOAioLivUl8qPDSDibsnvCKE2VrndMLjypBvYIiPAnsztYSl/KK62ZKXNDj3nJ1QaTSSWMCIdu16k32wEngtlRiDqM0XEPJjrvzMvp6bnQ8d5PhBvvkl/IOqftfk4HoAXMCvZjb9JUpGeVmO6Ff3SDpli1njJ1KrU1mZ6Px9M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=VfecmwHs; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1755799279;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=jf3vORzvfVQScDyhKM9vvrzvYH2efDDECf9Y/ePn7L0=;
+	b=VfecmwHsj+iILRLpIoV87aJqSx4qTeHWEqSUNl8B0QLYC92BlL4FlWQvDZm6bbH8UKY1Py
+	SaUAsBaTi9WBCQRV3nvXDgq7y3xyxJm8+Wvu4OLc1Z8vdlvd6mpKVfqrbNvN3hnyWMTsCg
+	3vlEwS/GZxWZIUFLrCSIwVqN0RJ5uCY=
+Received: from mail-io1-f69.google.com (mail-io1-f69.google.com
+ [209.85.166.69]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-582-mEW4k8UUPN-QokDHXHGLeA-1; Thu, 21 Aug 2025 14:01:17 -0400
+X-MC-Unique: mEW4k8UUPN-QokDHXHGLeA-1
+X-Mimecast-MFC-AGG-ID: mEW4k8UUPN-QokDHXHGLeA_1755799277
+Received: by mail-io1-f69.google.com with SMTP id ca18e2360f4ac-88432e28631so26335439f.2
+        for <kvm@vger.kernel.org>; Thu, 21 Aug 2025 11:01:17 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1755799277; x=1756404077;
+        h=content-transfer-encoding:mime-version:organization:references
+         :in-reply-to:message-id:subject:cc:to:from:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=jf3vORzvfVQScDyhKM9vvrzvYH2efDDECf9Y/ePn7L0=;
+        b=oR5APIwsyZrL2xeOyqlxI3h9nBf+QQ4ZGSP9jM0JYUWK/gXbbb/VUGzZYKEPzHBOBa
+         rsDxk0LxMc9CzkEfGhQCxsPn+Nro+pfBoYMtMfyZXCh7lh5DfN4eo18o6xyyGl3Mecnl
+         Ar9vIQImLpqDP5tpmpCVutYjV7JY0ahFrxyL8dLaZG2bPBZiDZFU1/prr/F8bbV6K6js
+         tNPy5OPcC4+cxnMI9hVoLxZUCXds5pt0FRXMUM+pMfBrnGMmlH03UKRStFQ9cdE+47Kx
+         uqLocYl2Iq2dLd7ENp5Ew0EOcB9BcN1ebEuI8dl07r1TNNtyckHkZWeV7er3wCtMeRI2
+         erEg==
+X-Forwarded-Encrypted: i=1; AJvYcCXBeW6iZEFaCX2jHafIcQF9xf9L77pSnKyM+QUJw2S6VdLvseAU90RxFo0YXlj8D+kAWzY=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyqwC2OVfBtIfc0/QCynJFzozVoxniSMzP3gfTZc68ekThX6yO9
+	YwL9g0GpDcM1crZYhSJmLqT6DIpm1DbPo+pexyhhq/VMKcvwYtgo4gkqk6bGPo1UyyXaCTANIfo
+	+tQgVuVBVqxe8JvfJkzZKaUerBXQvTYUEAwJUXpDhHevTgfiOOZmj2Q==
+X-Gm-Gg: ASbGncsAV1t51mgS4OI8O0w2iWoEWgjbqjRfUrLnfX0pVDokHEROdkVGSlPxp50Ghk7
+	7rOj0ExM48SfRRfIPWpEIqKJQV7mbgVI+ZYKVAOndeJ3UccM3uIPrLYi7QfxgN8S/H3aNwdhV+y
+	7YjSwNRuD7VOfMSGLTHQrQ2Dw1qcYnDdb7C8HqoQmDqq9UcYWiyCSEmZcRpiwIKImXF82o/yJi2
+	7SuQEhdiwR96sc4P9igRV7w+aPHlIcXVE1yxCMors15XFou1u+Y27XUiRLZfTQ8nPWHuEVGmN8S
+	PDQWS5thZ3WXTCrKG8zgpuKzqtEmodMXn72DdgQmx9s=
+X-Received: by 2002:a05:6e02:1a86:b0:3e5:2e10:4e07 with SMTP id e9e14a558f8ab-3e92176fa72mr1500975ab.3.1755799276551;
+        Thu, 21 Aug 2025 11:01:16 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IE8F5O26fAnrp/jKcWunWcBNxGZ7+GOKiYxjnN0rb54zQsK18lwYCVRiP0aLnKckHTRavK7+w==
+X-Received: by 2002:a05:6e02:1a86:b0:3e5:2e10:4e07 with SMTP id e9e14a558f8ab-3e92176fa72mr1500825ab.3.1755799275910;
+        Thu, 21 Aug 2025 11:01:15 -0700 (PDT)
+Received: from redhat.com ([38.15.36.11])
+        by smtp.gmail.com with ESMTPSA id e9e14a558f8ab-3e57e6a6c23sm76294035ab.42.2025.08.21.11.01.14
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 21 Aug 2025 11:01:14 -0700 (PDT)
+Date: Thu, 21 Aug 2025 12:01:12 -0600
+From: Alex Williamson <alex.williamson@redhat.com>
+To: Longfang Liu <liulongfang@huawei.com>
+Cc: <jgg@nvidia.com>, <shameerkolothum@gmail.com>,
+ <jonathan.cameron@huawei.com>, <kvm@vger.kernel.org>,
+ <linux-kernel@vger.kernel.org>, <linuxarm@openeuler.org>
+Subject: Re: [PATCH v8 3/3] hisi_acc_vfio_pci: adapt to new migration
+ configuration
+Message-ID: <20250821120112.3e9599a4.alex.williamson@redhat.com>
+In-Reply-To: <20250820072435.2854502-4-liulongfang@huawei.com>
+References: <20250820072435.2854502-1-liulongfang@huawei.com>
+	<20250820072435.2854502-4-liulongfang@huawei.com>
+Organization: Red Hat
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-SRS-Rewrite: SMTP reverse-path rewritten from <dwmw2@infradead.org> by casper.infradead.org. See http://www.infradead.org/rpr.html
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
+On Wed, 20 Aug 2025 15:24:35 +0800
+Longfang Liu <liulongfang@huawei.com> wrote:
 
---=-dyRQpVNzCM2WspTNZkKJ
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+> On new platforms greater than QM_HW_V3, the migration region has been
+> relocated from the VF to the PF. The driver must also be modified
+> accordingly to adapt to the new hardware device.
+> 
+> On the older hardware platform QM_HW_V3, the live migration configuration
+> region is placed in the latter 32K portion of the VF's BAR2 configuration
+> space. On the new hardware platform QM_HW_V4, the live migration
+> configuration region also exists in the same 32K area immediately following
+> the VF's BAR2, just like on QM_HW_V3.
+> 
+> However, access to this region is now controlled by hardware. Additionally,
+> a copy of the live migration configuration region is present in the PF's
+> BAR2 configuration space. On the new hardware platform QM_HW_V4, when an
+> older version of the driver is loaded, it behaves like QM_HW_V3 and uses
+> the configuration region in the VF, ensuring that the live migration
+> function continues to work normally. When the new version of the driver is
+> loaded, it directly uses the configuration region in the PF. Meanwhile,
+> hardware configuration disables the live migration configuration region
+> in the VF's BAR2: reads return all 0xF values, and writes are silently
+> ignored.
+> 
+> Signed-off-by: Longfang Liu <liulongfang@huawei.com>
+> Reviewed-by: Shameer Kolothum <shameerkolothum@gmail.com>
+> ---
+>  .../vfio/pci/hisilicon/hisi_acc_vfio_pci.c    | 169 ++++++++++++------
+>  .../vfio/pci/hisilicon/hisi_acc_vfio_pci.h    |  13 ++
+>  2 files changed, 130 insertions(+), 52 deletions(-)
+> 
+> diff --git a/drivers/vfio/pci/hisilicon/hisi_acc_vfio_pci.c b/drivers/vfio/pci/hisilicon/hisi_acc_vfio_pci.c
+> index ddb3fd4df5aa..09893d143a68 100644
+> --- a/drivers/vfio/pci/hisilicon/hisi_acc_vfio_pci.c
+> +++ b/drivers/vfio/pci/hisilicon/hisi_acc_vfio_pci.c
+> @@ -125,6 +125,72 @@ static int qm_get_cqc(struct hisi_qm *qm, u64 *addr)
+>  	return 0;
+>  }
+>  
+> +static int qm_get_xqc_regs(struct hisi_acc_vf_core_device *hisi_acc_vdev,
+> +			   struct acc_vf_data *vf_data)
+> +{
+> +	struct hisi_qm *qm = &hisi_acc_vdev->vf_qm;
+> +	struct device *dev = &qm->pdev->dev;
+> +	u32 eqc_addr, aeqc_addr;
+> +	int ret;
+> +
+> +	if (hisi_acc_vdev->drv_mode == HW_V3_COMPAT) {
+> +		eqc_addr = QM_EQC_DW0;
+> +		aeqc_addr = QM_AEQC_DW0;
+> +	} else {
+> +		eqc_addr = QM_EQC_PF_DW0;
+> +		aeqc_addr = QM_AEQC_PF_DW0;
+> +	}
+> +
+> +	/* QM_EQC_DW has 7 regs */
+> +	ret = qm_read_regs(qm, eqc_addr, vf_data->qm_eqc_dw, 7);
+> +	if (ret) {
+> +		dev_err(dev, "failed to read QM_EQC_DW\n");
+> +		return ret;
+> +	}
+> +
+> +	/* QM_AEQC_DW has 7 regs */
+> +	ret = qm_read_regs(qm, aeqc_addr, vf_data->qm_aeqc_dw, 7);
+> +	if (ret) {
+> +		dev_err(dev, "failed to read QM_AEQC_DW\n");
+> +		return ret;
+> +	}
+> +
+> +	return 0;
+> +}
+> +
+> +static int qm_set_xqc_regs(struct hisi_acc_vf_core_device *hisi_acc_vdev,
+> +			   struct acc_vf_data *vf_data)
+> +{
+> +	struct hisi_qm *qm = &hisi_acc_vdev->vf_qm;
+> +	struct device *dev = &qm->pdev->dev;
+> +	u32 eqc_addr, aeqc_addr;
+> +	int ret;
+> +
+> +	if (hisi_acc_vdev->drv_mode == HW_V3_COMPAT) {
+> +		eqc_addr = QM_EQC_DW0;
+> +		aeqc_addr = QM_AEQC_DW0;
+> +	} else {
+> +		eqc_addr = QM_EQC_PF_DW0;
+> +		aeqc_addr = QM_AEQC_PF_DW0;
+> +	}
+> +
+> +	/* QM_EQC_DW has 7 regs */
+> +	ret = qm_write_regs(qm, eqc_addr, vf_data->qm_eqc_dw, 7);
+> +	if (ret) {
+> +		dev_err(dev, "failed to write QM_EQC_DW\n");
+> +		return ret;
+> +	}
+> +
+> +	/* QM_AEQC_DW has 7 regs */
+> +	ret = qm_write_regs(qm, aeqc_addr, vf_data->qm_aeqc_dw, 7);
+> +	if (ret) {
+> +		dev_err(dev, "failed to write QM_AEQC_DW\n");
+> +		return ret;
+> +	}
+> +
+> +	return 0;
+> +}
+> +
+>  static int qm_get_regs(struct hisi_qm *qm, struct acc_vf_data *vf_data)
+>  {
+>  	struct device *dev = &qm->pdev->dev;
+> @@ -167,20 +233,6 @@ static int qm_get_regs(struct hisi_qm *qm, struct acc_vf_data *vf_data)
+>  		return ret;
+>  	}
+>  
+> -	/* QM_EQC_DW has 7 regs */
+> -	ret = qm_read_regs(qm, QM_EQC_DW0, vf_data->qm_eqc_dw, 7);
+> -	if (ret) {
+> -		dev_err(dev, "failed to read QM_EQC_DW\n");
+> -		return ret;
+> -	}
+> -
+> -	/* QM_AEQC_DW has 7 regs */
+> -	ret = qm_read_regs(qm, QM_AEQC_DW0, vf_data->qm_aeqc_dw, 7);
+> -	if (ret) {
+> -		dev_err(dev, "failed to read QM_AEQC_DW\n");
+> -		return ret;
+> -	}
+> -
+>  	return 0;
+>  }
+>  
+> @@ -239,20 +291,6 @@ static int qm_set_regs(struct hisi_qm *qm, struct acc_vf_data *vf_data)
+>  		return ret;
+>  	}
+>  
+> -	/* QM_EQC_DW has 7 regs */
+> -	ret = qm_write_regs(qm, QM_EQC_DW0, vf_data->qm_eqc_dw, 7);
+> -	if (ret) {
+> -		dev_err(dev, "failed to write QM_EQC_DW\n");
+> -		return ret;
+> -	}
+> -
+> -	/* QM_AEQC_DW has 7 regs */
+> -	ret = qm_write_regs(qm, QM_AEQC_DW0, vf_data->qm_aeqc_dw, 7);
+> -	if (ret) {
+> -		dev_err(dev, "failed to write QM_AEQC_DW\n");
+> -		return ret;
+> -	}
+> -
+>  	return 0;
+>  }
+>  
+> @@ -522,6 +560,10 @@ static int vf_qm_load_data(struct hisi_acc_vf_core_device *hisi_acc_vdev,
+>  		return ret;
+>  	}
+>  
+> +	ret = qm_set_xqc_regs(hisi_acc_vdev, vf_data);
+> +	if (ret)
+> +		return ret;
+> +
+>  	ret = hisi_qm_mb(qm, QM_MB_CMD_SQC_BT, qm->sqc_dma, 0, 0);
+>  	if (ret) {
+>  		dev_err(dev, "set sqc failed\n");
+> @@ -589,6 +631,10 @@ static int vf_qm_state_save(struct hisi_acc_vf_core_device *hisi_acc_vdev,
+>  	vf_data->vf_qm_state = QM_READY;
+>  	hisi_acc_vdev->vf_qm_state = vf_data->vf_qm_state;
+>  
+> +	ret = qm_get_xqc_regs(hisi_acc_vdev, vf_data);
+> +	if (ret)
+> +		return ret;
+> +
+>  	ret = vf_qm_read_data(vf_qm, vf_data);
+>  	if (ret)
+>  		return ret;
+> @@ -1186,34 +1232,52 @@ static int hisi_acc_vf_qm_init(struct hisi_acc_vf_core_device *hisi_acc_vdev)
+>  {
+>  	struct vfio_pci_core_device *vdev = &hisi_acc_vdev->core_device;
+>  	struct hisi_qm *vf_qm = &hisi_acc_vdev->vf_qm;
+> +	struct hisi_qm *pf_qm = hisi_acc_vdev->pf_qm;
+>  	struct pci_dev *vf_dev = vdev->pdev;
+> +	u32 val;
+>  
+> -	/*
+> -	 * ACC VF dev BAR2 region consists of both functional register space
+> -	 * and migration control register space. For migration to work, we
+> -	 * need access to both. Hence, we map the entire BAR2 region here.
+> -	 * But unnecessarily exposing the migration BAR region to the Guest
+> -	 * has the potential to prevent/corrupt the Guest migration. Hence,
+> -	 * we restrict access to the migration control space from
+> -	 * Guest(Please see mmap/ioctl/read/write override functions).
+> -	 *
+> -	 * Please note that it is OK to expose the entire VF BAR if migration
+> -	 * is not supported or required as this cannot affect the ACC PF
+> -	 * configurations.
+> -	 *
+> -	 * Also the HiSilicon ACC VF devices supported by this driver on
+> -	 * HiSilicon hardware platforms are integrated end point devices
+> -	 * and the platform lacks the capability to perform any PCIe P2P
+> -	 * between these devices.
+> -	 */
+> +	val = readl(pf_qm->io_base + QM_MIG_REGION_SEL);
+> +	if (pf_qm->ver > QM_HW_V3 && (val & QM_MIG_REGION_EN))
+> +		hisi_acc_vdev->drv_mode = HW_V4_NEW;
+> +	else
+> +		hisi_acc_vdev->drv_mode = HW_V3_COMPAT;
+>  
+> -	vf_qm->io_base =
+> -		ioremap(pci_resource_start(vf_dev, VFIO_PCI_BAR2_REGION_INDEX),
+> -			pci_resource_len(vf_dev, VFIO_PCI_BAR2_REGION_INDEX));
+> -	if (!vf_qm->io_base)
+> -		return -EIO;
+> +	if (hisi_acc_vdev->drv_mode == HW_V4_NEW) {
+> +		/*
+> +		 * On hardware platforms greater than QM_HW_V3, the migration function
+> +		 * register is placed in the BAR2 configuration region of the PF,
+> +		 * and each VF device occupies 8KB of configuration space.
+> +		 */
+> +		vf_qm->io_base = pf_qm->io_base + QM_MIG_REGION_OFFSET +
+> +				 hisi_acc_vdev->vf_id * QM_MIG_REGION_SIZE;
+> +	} else {
+> +		/*
+> +		 * ACC VF dev BAR2 region consists of both functional register space
+> +		 * and migration control register space. For migration to work, we
+> +		 * need access to both. Hence, we map the entire BAR2 region here.
+> +		 * But unnecessarily exposing the migration BAR region to the Guest
+> +		 * has the potential to prevent/corrupt the Guest migration. Hence,
+> +		 * we restrict access to the migration control space from
+> +		 * Guest(Please see mmap/ioctl/read/write override functions).
+> +		 *
+> +		 * Please note that it is OK to expose the entire VF BAR if migration
+> +		 * is not supported or required as this cannot affect the ACC PF
+> +		 * configurations.
+> +		 *
+> +		 * Also the HiSilicon ACC VF devices supported by this driver on
+> +		 * HiSilicon hardware platforms are integrated end point devices
+> +		 * and the platform lacks the capability to perform any PCIe P2P
+> +		 * between these devices.
+> +		 */
+>  
+> +		vf_qm->io_base =
+> +			ioremap(pci_resource_start(vf_dev, VFIO_PCI_BAR2_REGION_INDEX),
+> +				pci_resource_len(vf_dev, VFIO_PCI_BAR2_REGION_INDEX));
+> +		if (!vf_qm->io_base)
+> +			return -EIO;
+> +	}
+>  	vf_qm->fun_type = QM_HW_VF;
+> +	vf_qm->ver = pf_qm->ver;
+>  	vf_qm->pdev = vf_dev;
+>  	mutex_init(&vf_qm->mailbox_lock);
+>  
+> @@ -1539,7 +1603,8 @@ static void hisi_acc_vfio_pci_close_device(struct vfio_device *core_vdev)
+>  	hisi_acc_vf_disable_fds(hisi_acc_vdev);
+>  	mutex_lock(&hisi_acc_vdev->open_mutex);
+>  	hisi_acc_vdev->dev_opened = false;
+> -	iounmap(vf_qm->io_base);
+> +	if (hisi_acc_vdev->drv_mode == HW_V3_COMPAT)
+> +		iounmap(vf_qm->io_base);
+>  	mutex_unlock(&hisi_acc_vdev->open_mutex);
+>  	vfio_pci_core_close_device(core_vdev);
+>  }
+> diff --git a/drivers/vfio/pci/hisilicon/hisi_acc_vfio_pci.h b/drivers/vfio/pci/hisilicon/hisi_acc_vfio_pci.h
+> index 91002ceeebc1..e7650f5ff0f7 100644
+> --- a/drivers/vfio/pci/hisilicon/hisi_acc_vfio_pci.h
+> +++ b/drivers/vfio/pci/hisilicon/hisi_acc_vfio_pci.h
+> @@ -59,6 +59,18 @@
+>  #define ACC_DEV_MAGIC_V1	0XCDCDCDCDFEEDAACC
+>  #define ACC_DEV_MAGIC_V2	0xAACCFEEDDECADEDE
+>  
+> +#define QM_MIG_REGION_OFFSET		0x180000
+> +#define QM_MIG_REGION_SIZE		0x2000
+> +
+> +#define QM_SUB_VERSION_ID		0x100210
+> +#define QM_EQC_PF_DW0			0x1c00
+> +#define QM_AEQC_PF_DW0			0x1c20
+> +
+> +enum hw_drv_mode {
+> +	HW_V3_COMPAT = 0,
+> +	HW_V4_NEW,
+> +};
 
-On Thu, 2025-08-21 at 09:26 -0700, Sean Christopherson wrote:
-> On Sat, Aug 16, 2025, David Woodhouse wrote:
-> > In https://lkml.org/lkml/2008/10/1/246=C2=A0VMware proposed a generic s=
-tandard
-> > for harmonising CPUID between hypervisors. It was mostly shot down in
-> > flames, but the generic timing leaf at 0x4000_0010 didn't quite die.
-> >=20
-> > Mostly the hypervisor leaves at 0x4000_0xxx are very hypervisor-specifi=
-c,
-> > but XNU and FreeBSD as guests will look for 0x4000_0010 unconditionally=
-,
-> > under any hypervisor. The EC2 Nitro hypervisor has also exposed TSC
-> > frequency information in this leaf, since 2020.
-> >=20
-> > As things stand, KVM guests have to reverse-calculate the TSC frequency
-> > from the mul/shift information given to them in the KVM clock to conver=
-t
-> > ticks into nanoseconds, with a corresponding loss of precision.
->=20
-> I would rather have the VMM use the Intel-define CPUID.0x15 to enumerate =
-the
-> TSC frequency.=C2=A0
+You might consider whether these names are going to make sense in the
+future if there a V5 and beyond, and why V3 hardware is going to use a
+"compat" name when that's it's native operating mode.
 
-The problem with that is that it's been quite unreliable. The kernel
-doesn't trust it even on chips as recent (hah) as Skylake. I'd be
-happier to trust what the hypervisor explicitly gives us. But yes, it
-should be *one* of the sources of information before we reverse-
-calculate it from the pvclock.=20
+But also, patch 1/ is deciding whether to expose the full BAR based on
+the hardware version and here we choose whether to use the VF or PF
+control registers based on the hardware version and whether the new
+hardware feature is enabled.  Doesn't that leave V4 hardware exposing
+the full BAR regardless of whether the PF driver has disabled the
+migration registers within the BAR?  Thanks,
 
->  I would also love, love, love reviews on that series.
->=20
-> https://lore.kernel.org/all/20250227021855.3257188-36-seanjc@google.com
+Alex
 
-The carousel has come back round to me frowning at clocks, and
-hopefully I can spend some time looking over that, and bringing in some
-of the other fixes I had which are still needed, quite soon...=20
+> +
+>  struct acc_vf_data {
+>  #define QM_MATCH_SIZE offsetofend(struct acc_vf_data, qm_rsv_state)
+>  	/* QM match information */
+> @@ -125,6 +137,7 @@ struct hisi_acc_vf_core_device {
+>  	struct pci_dev *vf_dev;
+>  	struct hisi_qm *pf_qm;
+>  	struct hisi_qm vf_qm;
+> +	int drv_mode;
+>  	/*
+>  	 * vf_qm_state represents the QM_VF_STATE register value.
+>  	 * It is set by Guest driver for the ACC VF dev indicating
 
-
---=-dyRQpVNzCM2WspTNZkKJ
-Content-Type: application/pkcs7-signature; name="smime.p7s"
-Content-Disposition: attachment; filename="smime.p7s"
-Content-Transfer-Encoding: base64
-
-MIAGCSqGSIb3DQEHAqCAMIACAQExDzANBglghkgBZQMEAgEFADCABgkqhkiG9w0BBwEAAKCCD9Aw
-ggSOMIIDdqADAgECAhAOmiw0ECVD4cWj5DqVrT9PMA0GCSqGSIb3DQEBCwUAMGUxCzAJBgNVBAYT
-AlVTMRUwEwYDVQQKEwxEaWdpQ2VydCBJbmMxGTAXBgNVBAsTEHd3dy5kaWdpY2VydC5jb20xJDAi
-BgNVBAMTG0RpZ2lDZXJ0IEFzc3VyZWQgSUQgUm9vdCBDQTAeFw0yNDAxMzAwMDAwMDBaFw0zMTEx
-MDkyMzU5NTlaMEExCzAJBgNVBAYTAkFVMRAwDgYDVQQKEwdWZXJva2V5MSAwHgYDVQQDExdWZXJv
-a2V5IFNlY3VyZSBFbWFpbCBHMjCCASIwDQYJKoZIhvcNAQEBBQADggEPADCCAQoCggEBAMjvgLKj
-jfhCFqxYyRiW8g3cNFAvltDbK5AzcOaR7yVzVGadr4YcCVxjKrEJOgi7WEOH8rUgCNB5cTD8N/Et
-GfZI+LGqSv0YtNa54T9D1AWJy08ZKkWvfGGIXN9UFAPMJ6OLLH/UUEgFa+7KlrEvMUupDFGnnR06
-aDJAwtycb8yXtILj+TvfhLFhafxroXrflspavejQkEiHjNjtHnwbZ+o43g0/yxjwnarGI3kgcak7
-nnI9/8Lqpq79tLHYwLajotwLiGTB71AGN5xK+tzB+D4eN9lXayrjcszgbOv2ZCgzExQUAIt98mre
-8EggKs9mwtEuKAhYBIP/0K6WsoMnQCcCAwEAAaOCAVwwggFYMBIGA1UdEwEB/wQIMAYBAf8CAQAw
-HQYDVR0OBBYEFIlICOogTndrhuWByNfhjWSEf/xwMB8GA1UdIwQYMBaAFEXroq/0ksuCMS1Ri6en
-IZ3zbcgPMA4GA1UdDwEB/wQEAwIBhjAdBgNVHSUEFjAUBggrBgEFBQcDBAYIKwYBBQUHAwIweQYI
-KwYBBQUHAQEEbTBrMCQGCCsGAQUFBzABhhhodHRwOi8vb2NzcC5kaWdpY2VydC5jb20wQwYIKwYB
-BQUHMAKGN2h0dHA6Ly9jYWNlcnRzLmRpZ2ljZXJ0LmNvbS9EaWdpQ2VydEFzc3VyZWRJRFJvb3RD
-QS5jcnQwRQYDVR0fBD4wPDA6oDigNoY0aHR0cDovL2NybDMuZGlnaWNlcnQuY29tL0RpZ2lDZXJ0
-QXNzdXJlZElEUm9vdENBLmNybDARBgNVHSAECjAIMAYGBFUdIAAwDQYJKoZIhvcNAQELBQADggEB
-ACiagCqvNVxOfSd0uYfJMiZsOEBXAKIR/kpqRp2YCfrP4Tz7fJogYN4fxNAw7iy/bPZcvpVCfe/H
-/CCcp3alXL0I8M/rnEnRlv8ItY4MEF+2T/MkdXI3u1vHy3ua8SxBM8eT9LBQokHZxGUX51cE0kwa
-uEOZ+PonVIOnMjuLp29kcNOVnzf8DGKiek+cT51FvGRjV6LbaxXOm2P47/aiaXrDD5O0RF5SiPo6
-xD1/ClkCETyyEAE5LRJlXtx288R598koyFcwCSXijeVcRvBB1cNOLEbg7RMSw1AGq14fNe2cH1HG
-W7xyduY/ydQt6gv5r21mDOQ5SaZSWC/ZRfLDuEYwggWbMIIEg6ADAgECAhAH5JEPagNRXYDiRPdl
-c1vgMA0GCSqGSIb3DQEBCwUAMEExCzAJBgNVBAYTAkFVMRAwDgYDVQQKEwdWZXJva2V5MSAwHgYD
-VQQDExdWZXJva2V5IFNlY3VyZSBFbWFpbCBHMjAeFw0yNDEyMzAwMDAwMDBaFw0yODAxMDQyMzU5
-NTlaMB4xHDAaBgNVBAMME2R3bXcyQGluZnJhZGVhZC5vcmcwggIiMA0GCSqGSIb3DQEBAQUAA4IC
-DwAwggIKAoICAQDali7HveR1thexYXx/W7oMk/3Wpyppl62zJ8+RmTQH4yZeYAS/SRV6zmfXlXaZ
-sNOE6emg8WXLRS6BA70liot+u0O0oPnIvnx+CsMH0PD4tCKSCsdp+XphIJ2zkC9S7/yHDYnqegqt
-w4smkqUqf0WX/ggH1Dckh0vHlpoS1OoxqUg+ocU6WCsnuz5q5rzFsHxhD1qGpgFdZEk2/c//ZvUN
-i12vPWipk8TcJwHw9zoZ/ZrVNybpMCC0THsJ/UEVyuyszPtNYeYZAhOJ41vav1RhZJzYan4a1gU0
-kKBPQklcpQEhq48woEu15isvwWh9/+5jjh0L+YNaN0I//nHSp6U9COUG9Z0cvnO8FM6PTqsnSbcc
-0j+GchwOHRC7aP2t5v2stVx3KbptaYEzi4MQHxm/0+HQpMEVLLUiizJqS4PWPU6zfQTOMZ9uLQRR
-ci+c5xhtMEBszlQDOvEQcyEG+hc++fH47K+MmZz21bFNfoBxLP6bjR6xtPXtREF5lLXxp+CJ6KKS
-blPKeVRg/UtyJHeFKAZXO8Zeco7TZUMVHmK0ZZ1EpnZbnAhKE19Z+FJrQPQrlR0gO3lBzuyPPArV
-hvWxjlO7S4DmaEhLzarWi/ze7EGwWSuI2eEa/8zU0INUsGI4ywe7vepQz7IqaAovAX0d+f1YjbmC
-VsAwjhLmveFjNwIDAQABo4IBsDCCAawwHwYDVR0jBBgwFoAUiUgI6iBOd2uG5YHI1+GNZIR//HAw
-HQYDVR0OBBYEFFxiGptwbOfWOtMk5loHw7uqWUOnMDAGA1UdEQQpMCeBE2R3bXcyQGluZnJhZGVh
-ZC5vcmeBEGRhdmlkQHdvb2Rob3Uuc2UwFAYDVR0gBA0wCzAJBgdngQwBBQEBMA4GA1UdDwEB/wQE
-AwIF4DAdBgNVHSUEFjAUBggrBgEFBQcDAgYIKwYBBQUHAwQwewYDVR0fBHQwcjA3oDWgM4YxaHR0
-cDovL2NybDMuZGlnaWNlcnQuY29tL1Zlcm9rZXlTZWN1cmVFbWFpbEcyLmNybDA3oDWgM4YxaHR0
-cDovL2NybDQuZGlnaWNlcnQuY29tL1Zlcm9rZXlTZWN1cmVFbWFpbEcyLmNybDB2BggrBgEFBQcB
-AQRqMGgwJAYIKwYBBQUHMAGGGGh0dHA6Ly9vY3NwLmRpZ2ljZXJ0LmNvbTBABggrBgEFBQcwAoY0
-aHR0cDovL2NhY2VydHMuZGlnaWNlcnQuY29tL1Zlcm9rZXlTZWN1cmVFbWFpbEcyLmNydDANBgkq
-hkiG9w0BAQsFAAOCAQEAQXc4FPiPLRnTDvmOABEzkIumojfZAe5SlnuQoeFUfi+LsWCKiB8Uextv
-iBAvboKhLuN6eG/NC6WOzOCppn4mkQxRkOdLNThwMHW0d19jrZFEKtEG/epZ/hw/DdScTuZ2m7im
-8ppItAT6GXD3aPhXkXnJpC/zTs85uNSQR64cEcBFjjoQDuSsTeJ5DAWf8EMyhMuD8pcbqx5kRvyt
-JPsWBQzv1Dsdv2LDPLNd/JUKhHSgr7nbUr4+aAP2PHTXGcEBh8lTeYea9p4d5k969pe0OHYMV5aL
-xERqTagmSetuIwolkAuBCzA9vulg8Y49Nz2zrpUGfKGOD0FMqenYxdJHgDCCBZswggSDoAMCAQIC
-EAfkkQ9qA1FdgOJE92VzW+AwDQYJKoZIhvcNAQELBQAwQTELMAkGA1UEBhMCQVUxEDAOBgNVBAoT
-B1Zlcm9rZXkxIDAeBgNVBAMTF1Zlcm9rZXkgU2VjdXJlIEVtYWlsIEcyMB4XDTI0MTIzMDAwMDAw
-MFoXDTI4MDEwNDIzNTk1OVowHjEcMBoGA1UEAwwTZHdtdzJAaW5mcmFkZWFkLm9yZzCCAiIwDQYJ
-KoZIhvcNAQEBBQADggIPADCCAgoCggIBANqWLse95HW2F7FhfH9bugyT/danKmmXrbMnz5GZNAfj
-Jl5gBL9JFXrOZ9eVdpmw04Tp6aDxZctFLoEDvSWKi367Q7Sg+ci+fH4KwwfQ8Pi0IpIKx2n5emEg
-nbOQL1Lv/IcNiep6Cq3DiyaSpSp/RZf+CAfUNySHS8eWmhLU6jGpSD6hxTpYKye7PmrmvMWwfGEP
-WoamAV1kSTb9z/9m9Q2LXa89aKmTxNwnAfD3Ohn9mtU3JukwILRMewn9QRXK7KzM+01h5hkCE4nj
-W9q/VGFknNhqfhrWBTSQoE9CSVylASGrjzCgS7XmKy/BaH3/7mOOHQv5g1o3Qj/+cdKnpT0I5Qb1
-nRy+c7wUzo9OqydJtxzSP4ZyHA4dELto/a3m/ay1XHcpum1pgTOLgxAfGb/T4dCkwRUstSKLMmpL
-g9Y9TrN9BM4xn24tBFFyL5znGG0wQGzOVAM68RBzIQb6Fz758fjsr4yZnPbVsU1+gHEs/puNHrG0
-9e1EQXmUtfGn4InoopJuU8p5VGD9S3Ikd4UoBlc7xl5yjtNlQxUeYrRlnUSmdlucCEoTX1n4UmtA
-9CuVHSA7eUHO7I88CtWG9bGOU7tLgOZoSEvNqtaL/N7sQbBZK4jZ4Rr/zNTQg1SwYjjLB7u96lDP
-sipoCi8BfR35/ViNuYJWwDCOEua94WM3AgMBAAGjggGwMIIBrDAfBgNVHSMEGDAWgBSJSAjqIE53
-a4blgcjX4Y1khH/8cDAdBgNVHQ4EFgQUXGIam3Bs59Y60yTmWgfDu6pZQ6cwMAYDVR0RBCkwJ4ET
-ZHdtdzJAaW5mcmFkZWFkLm9yZ4EQZGF2aWRAd29vZGhvdS5zZTAUBgNVHSAEDTALMAkGB2eBDAEF
-AQEwDgYDVR0PAQH/BAQDAgXgMB0GA1UdJQQWMBQGCCsGAQUFBwMCBggrBgEFBQcDBDB7BgNVHR8E
-dDByMDegNaAzhjFodHRwOi8vY3JsMy5kaWdpY2VydC5jb20vVmVyb2tleVNlY3VyZUVtYWlsRzIu
-Y3JsMDegNaAzhjFodHRwOi8vY3JsNC5kaWdpY2VydC5jb20vVmVyb2tleVNlY3VyZUVtYWlsRzIu
-Y3JsMHYGCCsGAQUFBwEBBGowaDAkBggrBgEFBQcwAYYYaHR0cDovL29jc3AuZGlnaWNlcnQuY29t
-MEAGCCsGAQUFBzAChjRodHRwOi8vY2FjZXJ0cy5kaWdpY2VydC5jb20vVmVyb2tleVNlY3VyZUVt
-YWlsRzIuY3J0MA0GCSqGSIb3DQEBCwUAA4IBAQBBdzgU+I8tGdMO+Y4AETOQi6aiN9kB7lKWe5Ch
-4VR+L4uxYIqIHxR7G2+IEC9ugqEu43p4b80LpY7M4KmmfiaRDFGQ50s1OHAwdbR3X2OtkUQq0Qb9
-6ln+HD8N1JxO5nabuKbymki0BPoZcPdo+FeRecmkL/NOzzm41JBHrhwRwEWOOhAO5KxN4nkMBZ/w
-QzKEy4PylxurHmRG/K0k+xYFDO/UOx2/YsM8s138lQqEdKCvudtSvj5oA/Y8dNcZwQGHyVN5h5r2
-nh3mT3r2l7Q4dgxXlovERGpNqCZJ624jCiWQC4ELMD2+6WDxjj03PbOulQZ8oY4PQUyp6djF0keA
-MYIDuzCCA7cCAQEwVTBBMQswCQYDVQQGEwJBVTEQMA4GA1UEChMHVmVyb2tleTEgMB4GA1UEAxMX
-VmVyb2tleSBTZWN1cmUgRW1haWwgRzICEAfkkQ9qA1FdgOJE92VzW+AwDQYJYIZIAWUDBAIBBQCg
-ggE3MBgGCSqGSIb3DQEJAzELBgkqhkiG9w0BBwEwHAYJKoZIhvcNAQkFMQ8XDTI1MDgyMTE3Mzc0
-NVowLwYJKoZIhvcNAQkEMSIEIE1/o1aVcbIfxtj5wVx4mFXbkRm8TGf2hiV3iAM2FZCFMGQGCSsG
-AQQBgjcQBDFXMFUwQTELMAkGA1UEBhMCQVUxEDAOBgNVBAoTB1Zlcm9rZXkxIDAeBgNVBAMTF1Zl
-cm9rZXkgU2VjdXJlIEVtYWlsIEcyAhAH5JEPagNRXYDiRPdlc1vgMGYGCyqGSIb3DQEJEAILMVeg
-VTBBMQswCQYDVQQGEwJBVTEQMA4GA1UEChMHVmVyb2tleTEgMB4GA1UEAxMXVmVyb2tleSBTZWN1
-cmUgRW1haWwgRzICEAfkkQ9qA1FdgOJE92VzW+AwDQYJKoZIhvcNAQEBBQAEggIA2mv4iKHc7QHC
-rpgmUpanWz4b8vKMDDqyBM3CnHM9ZVulsdMPh7KTZ77S57nmuslgoITH/MTkA0lpHzvXt2V+sr5w
-LxHLrTVlyMIxPhGOk63pe7EDURCSPhPPaCYtPf0CFEEH7K3QqeDY2Zpxsd61U/UmlcJmf5PRkHda
-eBXN3AtJtiaMnLTPr++jPQ2/cUyMEuGRdUw/z3wuAkGDK2cFDhnkTaLxuQbxS4wY5xcle1uKJyxA
-XYPaxPSLShRmx7H7XRo/aF8fSHHY6f326fVtuvvlkfPb17V73fnKbfF3WSjs95GCf4cZy+5HjFpI
-8wBGot3xgH5ya1JCFofqZiPll0iDXownZRlizdTukjmAnbsV76JKs+2E+3/9C7KW6wnPmnOkLgSO
-YrNfmBmx7YTSv1bia+DPZnJhQg/ldm1pE+vExH2biyRq/wovnouGzNZ3jydsEYf/JPzen/4EtO9Y
-5mrV6UJ/pSdkBdUlNAiGX/zQP5k6KNUY0gnVCuQ37z/Oa7OA0MCmzFkVONAXuMa0j3nnWt2pCeYC
-IQA07BZXGsHX0iTXWvFo+pc3KKUIbJXjYKewk09McAW7WGbwRvBDN2IgZuQVFHajlyRmhxzJzJDG
-CSW98yIT3QnWgNavTboIUrVmzENdurq7uQkgKzR6hsKvmL+QWxrEbhEe1lvCXcUAAAAAAAA=
-
-
---=-dyRQpVNzCM2WspTNZkKJ--
 
