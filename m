@@ -1,133 +1,156 @@
-Return-Path: <kvm+bounces-55403-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-55404-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id E170EB3081F
-	for <lists+kvm@lfdr.de>; Thu, 21 Aug 2025 23:16:20 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 777EFB3085B
+	for <lists+kvm@lfdr.de>; Thu, 21 Aug 2025 23:31:15 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 2B9EA1882CE0
-	for <lists+kvm@lfdr.de>; Thu, 21 Aug 2025 21:11:49 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 105CB7A5463
+	for <lists+kvm@lfdr.de>; Thu, 21 Aug 2025 21:29:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AF28726F2BF;
-	Thu, 21 Aug 2025 21:11:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0E9B42D63EE;
+	Thu, 21 Aug 2025 21:30:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="wtUK/Gpi"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="h9B1gb/R"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pj1-f74.google.com (mail-pj1-f74.google.com [209.85.216.74])
+Received: from mail-pl1-f201.google.com (mail-pl1-f201.google.com [209.85.214.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 775DE1BFE00
-	for <kvm@vger.kernel.org>; Thu, 21 Aug 2025 21:11:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.74
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 99A32393DD8
+	for <kvm@vger.kernel.org>; Thu, 21 Aug 2025 21:30:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755810676; cv=none; b=ivi1w4C5xUA3l7YDJS67nZ/DUL7i+uqVMUrtE9GhXgpbw/DZbfb6hQb8mr1mO7CttRqACMM7x+cGBlals+MnXO/2Zt+4P16/HGHoGnd7tkqFQsDjZ2KtI98AKFXUHawnqpxZXoRXxjLOd6wuFXExaVjQDKywLjbXzQWCbB+swck=
+	t=1755811857; cv=none; b=ILWzOHuUqLIalAL4hNe6Pnj/q1M+wD7GX4vnRfFakOPHc0DyyQWH7i6ayIZ7CbU0TvznOoGED3/7KjPBed3XYnnff3VREnUf4Twpu/Opsop5rIyRn1g56LmbcaWX+wUIUjKLT+dXYqQPdrCuirTRqCgkesLDBDdDzkKg/Q10Eqs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755810676; c=relaxed/simple;
-	bh=yAe6WKMNOAPLqG6uE3wI/PcBPJRugF3nwDNw2Cck6gE=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=VUJ7W0MzWsXv0iH7B2UuPtZFxV+LvC1cJJlvo1/Go38L9XIK7hWHsn11UFB6ffcLj0bSh6Lslauhdzh0yhMPut7wTsochjJMhMRkMk5ON/2AB0e1DNgzsUEU9ff/JUZC19dkjGcAb/OeC0T0wGRQIed9i38spEfDc/UtkkPHlis=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=wtUK/Gpi; arc=none smtp.client-ip=209.85.216.74
+	s=arc-20240116; t=1755811857; c=relaxed/simple;
+	bh=l7JTVyDBrwzdzqWLgh5q55rpbseIAgVg8/axsZmM+FE=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=bwhUHwKEXr6AMqPSKUyFiiaNK4cRyZe0FEmAEHdhXmUCsaSvnPeY+1aXrRh5vcUhkdghincKEFLHf4e3cN1pyVAyDeMCLTWexD4WFbJ47JxoFxq0c/ruc+SFEl8GYjV35BEtiPLxcyp6XglXgHbgchAujxNL5sr0L03dcoaEgSY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=h9B1gb/R; arc=none smtp.client-ip=209.85.214.201
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pj1-f74.google.com with SMTP id 98e67ed59e1d1-324e6a1a414so2233122a91.1
-        for <kvm@vger.kernel.org>; Thu, 21 Aug 2025 14:11:15 -0700 (PDT)
+Received: by mail-pl1-f201.google.com with SMTP id d9443c01a7336-2445806b18aso17874465ad.1
+        for <kvm@vger.kernel.org>; Thu, 21 Aug 2025 14:30:55 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1755810675; x=1756415475; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=2kTOmJET5CY2YmXsSJN5Ri4cRLSNJeepYuftRiHpt+w=;
-        b=wtUK/GpiGdmY32K4hrojzioJ+ZFZofdUWaKzsxmXySizhGyQjJgnqYWz4Dr1K73x29
-         rqCS3Yo3SeNwmqJjvkGHDl2CC8m3FOsU6ZVEPVtdNM6oTRpKY7vk7oPolY3EtEvZw0cY
-         ZkmdqBcYTcwV6a8hqSO6HXzUg0LVPZDccKRbQpbq9/gN5ptRUGr+hKdPfsjKIcRtsBUv
-         S7A4ynqAg9TycyEtoURg3Q5K3c8pJP+Wq14A0xUqx+8uCvJsEUuW3qQ/2kOXdHZzeEqV
-         gvj692HdhzaCnXx3SMz/bA8TaVb+nYBeJbUJucB+kqZjvMBL92GdFp6UcsfBtqdG6Bu7
-         OiHg==
+        d=google.com; s=20230601; t=1755811855; x=1756416655; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:mime-version:date:reply-to:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=4UshrE7OOl7JjfXKttbRRCQ1Mj74LXDuZR7lXZXts9I=;
+        b=h9B1gb/RvusNBKlEwDjwOIvdrbrxs2yA/FSOV3L7NNt7wz0grTETg7aU3o8T/YV4Py
+         AbS8H9NaMeIRczk/iF6UbVhZdTlnyq0SRDvNCNIfHZjBCJhpBSmYVPjY4z2A0UU2w8o+
+         yvq8LrNb5+4kUbZXvQy6yFEp7J9aGt3JOq1KvQUaToF6VTIgiiu9BvnUY7XmynJNzdTk
+         Vb6dSYsExv+D29QHidTZb4Nu7+DS+khgZ047pETipK53xgYlkdkDSIQtufGtzQBbdKnR
+         2wMI7xH2W8tezta/HWfJVxPzdiw9dx7oyjVkC1f8m1xqFoFaFhwjPwgS9w7cuPdDqmQo
+         yoSA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1755810675; x=1756415475;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=2kTOmJET5CY2YmXsSJN5Ri4cRLSNJeepYuftRiHpt+w=;
-        b=flxTTBCPnds6EPDGjhv92Z7f8nZYLyBroKajJcD/y1UFbtSKwHqeNyFzxZhPpfKal4
-         kalVRmjqXPxfpGi/NiCkokN/9Lgg+4VD51zV6My6Raxc7d9Tbkhp8OIM0A4iNaakmok7
-         sWhxqkzzlJBRE6lHCIaOPom31k1EqiqEhlbAp7a6XkOMLYOXT+TZrAD0DNgbYRZzOgZY
-         gXeWWkJxoevT+PLW0CRdxzp6k+iX7QnlG5KmA05IE81ydc42HDIQp4fmj0j/hNAWNuze
-         I+xcTAhqsexUIyh/mhksxpgNV8GiSpYfMBHRUzhW3/gBtvLsyMuDJki4tiydB7uHQfR/
-         ufHA==
-X-Forwarded-Encrypted: i=1; AJvYcCWPUjpKuPvahZQVZOQ2TZZ6wAeMfwGjjtKuyRBFh5LcmP2W2ZSpOIFB1laOkcTTMjhY0oY=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yy9sSHP8XpLYoDopW+7oaGPmY2bmoCYd4TWKCDKQtlb0eea8Zo2
-	1/xheT5FBJJALHb75VAtrZpcbUgDXW04Bm/f2bJvVp/woBt/pTZd5zZ2cMjScKXnxlLYlig7oLo
-	gFWsVRg==
-X-Google-Smtp-Source: AGHT+IHEBA3GX5sk2NVlCt/kXBe2DuoCt3ExblCPGoicFR+vSF6LiicZfWBUHCZym6cU7+QlSR845MMN0V4=
-X-Received: from pjbmf6.prod.google.com ([2002:a17:90b:1846:b0:321:a6cc:51c3])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90a:d406:b0:311:be43:f09a
- with SMTP id 98e67ed59e1d1-3251d543a09mr684667a91.9.1755810674699; Thu, 21
- Aug 2025 14:11:14 -0700 (PDT)
-Date: Thu, 21 Aug 2025 14:11:13 -0700
-In-Reply-To: <1f63036c-a72a-47bf-a75f-23ca7fd3b7cf@oracle.com>
+        d=1e100.net; s=20230601; t=1755811855; x=1756416655;
+        h=cc:to:from:subject:message-id:mime-version:date:reply-to
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=4UshrE7OOl7JjfXKttbRRCQ1Mj74LXDuZR7lXZXts9I=;
+        b=uZ5uLuz3lCU6prgV8Speyb3/98t6E0RMYzH/zOfKj2Jovd/zDxsIggVP6zh17T5S5d
+         Z3Q0jdupz4ksE2pIRKbnpKVOojnzktq5q9bJ7TYZjEftblJmXshvMTC4RZAsR6o58M+t
+         KWAWbKJw/F5I3JZZSwTDvj+eREhtncTUflv/Oygh+PnPx7PYRLRdO1bQ6cl+MShwo8Oq
+         wNuuJKFijdcsNZwUWhBxTBhiOKEFhu35MkTSUgafA4ZzaFb9Rp7VAi+R1NaJLVxNNjW1
+         e6iOr8HUA99WQPBmGlPEPixQDLPpJ+ZD/W2rqy+/WEhZ70XZBdPuq2vmU8nHnAx90qBe
+         UPJA==
+X-Gm-Message-State: AOJu0Yy1i04t6pfebjk0/0/SzCq3evGs+q5UPBDLEVVBzQHamhwIR1oJ
+	lvjQnjimbHYbZavyvshF7bzBXOKnJphXmr4/Y+C5KhXUKw4DcQbtBwjvPaJMA3LodA88U8NbHw5
+	Zz5SKVA==
+X-Google-Smtp-Source: AGHT+IH9/+s14JjolRiI8pQgplitlbopysM6BqPdLF/bJGELfeS3x0vhBgc0qhEDQ4A+J2ImucEeDwEN7JU=
+X-Received: from plbjy8.prod.google.com ([2002:a17:903:42c8:b0:240:3c5f:99d8])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:902:d505:b0:242:a4f4:6b7d
+ with SMTP id d9443c01a7336-2462ef20675mr9150355ad.28.1755811854925; Thu, 21
+ Aug 2025 14:30:54 -0700 (PDT)
+Reply-To: Sean Christopherson <seanjc@google.com>
+Date: Thu, 21 Aug 2025 14:30:51 -0700
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
-References: <cover.1755609446.git.maciej.szmigiero@oracle.com>
- <zeavh4vqorbuq23664til6hww6yafm4lniu4dm32ii33hyszvq@5byejwk3bom3>
- <275b4fa3-9675-4953-8766-c6cd4e5f0d57@maciej.szmigiero.name> <1f63036c-a72a-47bf-a75f-23ca7fd3b7cf@oracle.com>
-Message-ID: <aKeLcU5SoCt41RFY@google.com>
-Subject: Re: [PATCH 0/2] KVM: SVM: Fix missing LAPIC TPR sync into VMCB::V_TPR
- with AVIC on
+X-Mailer: git-send-email 2.51.0.261.g7ce5a0a67e-goog
+Message-ID: <20250821213051.3459190-1-seanjc@google.com>
+Subject: [GIT PULL] KVM: x86: Two KVM fixes and a selftest fix
 From: Sean Christopherson <seanjc@google.com>
-To: Alejandro Jimenez <alejandro.j.jimenez@oracle.com>
-Cc: "Maciej S. Szmigiero" <mail@maciej.szmigiero.name>, Naveen N Rao <naveen@kernel.org>, 
-	Paolo Bonzini <pbonzini@redhat.com>, Maxim Levitsky <mlevitsk@redhat.com>, 
-	Suravee Suthikulpanit <Suravee.Suthikulpanit@amd.com>, kvm@vger.kernel.org, 
-	linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="us-ascii"
+To: Paolo Bonzini <pbonzini@redhat.com>
+Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	Sean Christopherson <seanjc@google.com>
+Content-Type: text/plain; charset="UTF-8"
 
-On Thu, Aug 21, 2025, Alejandro Jimenez wrote:
-> On 8/21/25 7:42 AM, Maciej S. Szmigiero wrote:
-> > On 21.08.2025 10:18, Naveen N Rao wrote:
-> > > > Yes, this breaks real guests when AVIC is enabled.
-> > > > Specifically, the one OS that sometimes needs different handling and its
-> > > > name begins with letter 'W'.
-> > > 
-> > > Indeed, Linux does not use TPR AFAIK.
-> 
-> I believe it does, 
+Please pull a few small KVM x86 fixes, along with a rather ugly selftest
+fix to resolve a collision with linux/overflow.h.  Sadly, my attempt at a
+less ugly fix fell flat, as trying to share linux/overflow.h's definition
+doesn't work since not all selftests add tools/include to their include path.
 
-Heh, yes, Linux technically "uses" the TPR in that it does a one-time write to
-it.  But what Naveen really meant is that Linux doesn't actively use TPR to
-manage what IRQs are masked/allowed, whereas Windows heavily uses TPR to do
-exactly that.  Specifically, what matters is that Linux doesn't use TPR to _mask_
-IRQs, and so clobbering it to '0' on migration is largely benign.
+Unrelated to this pull request, shameless plug for the guest_memfd mmap()
+series[1].  We'd like to get it merged sooner than later as there's a bit of a
+logjam of guest_memfd code piling up.  And I've promised others I'll yolo it
+into kvm-x86 at the end of next week if necessary :-)
 
-> during the local APIC initialization. When Maciej
-> determined the root cause of this issue, I was wondering why we have not
-> seen it earlier in Linux. I found that Linux takes a defensive approach and
-> drains all pending interrupts during lapic initialization. Essentially, for
-> each CPU, Linux will:
-> - temporarily disable the Local APIC (via Spurious Int Vector Reg)
-> - set the TPR to accept all "regular" interrupts i.e. tpr=0x10
-> - drain all pending interrupts in ISR and/or IRR
-> - attempt the above draining step a max of 512 times
-> - then re-enable APIC and continue initialization
-> 
-> The relevant code is in setup_local_APIC()
-> https://elixir.bootlin.com/linux/v6.16/source/arch/x86/kernel/apic/apic.c#L1533-L1545
-> 
-> So without Maciej's proposed change, other OSs that are not as resilient
-> could also be affected by this issue.
-> 
-> Alejandro
-> 
-> > > - Naveen
-> > > 
-> > 
-> > Thanks,
-> > Maciej
-> > 
-> > 
-> 
+Thanks!
+
+P.S. the guest_memfd mmap() series needs one minor fixup in patch 23[2]:
+
+diff --git a/tools/testing/selftests/kvm/guest_memfd_test.c b/tools/testing/selftests/kvm/guest_memfd_test.c
+index b86bf89a71e0..b3ca6737f304 100644
+--- a/tools/testing/selftests/kvm/guest_memfd_test.c
++++ b/tools/testing/selftests/kvm/guest_memfd_test.c
+@@ -372,7 +372,7 @@ int main(int argc, char *argv[])
+         */
+        vm_types = kvm_check_cap(KVM_CAP_VM_TYPES);
+        if (!vm_types)
+-               vm_types = VM_TYPE_DEFAULT;
++               vm_types = BIT(VM_TYPE_DEFAULT);
+ 
+        for_each_set_bit(vm_type, &vm_types, BITS_PER_TYPE(vm_types))
+                test_guest_memfd(vm_type);
+
+[1] https://lore.kernel.org/all/20250729225455.670324-1-seanjc@google.com
+[2] https://lore.kernel.org/all/aIoWosN3UiPe2qQK@google.com
+
+
+The following changes since commit 8f5ae30d69d7543eee0d70083daf4de8fe15d585:
+
+  Linux 6.17-rc1 (2025-08-10 19:41:16 +0300)
+
+are available in the Git repository at:
+
+  https://github.com/kvm-x86/linux.git tags/kvm-x86-fixes-6.17-rc7
+
+for you to fetch changes up to dce1b33ed7430c7189b8cc1567498f9e6bf12731:
+
+  selftests: harness: Rename is_signed_type() to avoid collision with overflow.h (2025-08-20 08:04:09 -0700)
+
+----------------------------------------------------------------
+KVM x86 fixes and a selftest fix for 6.17-rcN
+
+ - Use array_index_nospec() to sanitize the target vCPU ID when handling PV
+   IPIs and yields as the ID is guest-controlled.
+
+ - Drop a superfluous cpumask_empty() check when reclaiming SEV memory, as
+   the common case, by far, is that at least one CPU will have entered the
+   VM, and wbnoinvd_on_cpus_mask() will naturally handle the rare case where
+   the set of have_run_cpus is empty.
+
+ - Rename the is_signed_type() macro in kselftest_harness.h to is_signed_var()
+   to fix a collision with linux/overflow.h.  The collision generates compiler
+   warnings due to the two macros having different implementations.
+
+----------------------------------------------------------------
+Sean Christopherson (1):
+      selftests: harness: Rename is_signed_type() to avoid collision with overflow.h
+
+Thijs Raymakers (1):
+      KVM: x86: use array_index_nospec with indices that come from guest
+
+Yury Norov (1):
+      KVM: SEV: don't check have_run_cpus in sev_writeback_caches()
+
+ arch/x86/kvm/lapic.c                        |  2 ++
+ arch/x86/kvm/svm/sev.c                      | 10 +++-------
+ arch/x86/kvm/x86.c                          |  7 +++++--
+ tools/testing/selftests/kselftest_harness.h |  4 ++--
+ 4 files changed, 12 insertions(+), 11 deletions(-)
 
