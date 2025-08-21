@@ -1,146 +1,102 @@
-Return-Path: <kvm+bounces-55313-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-55314-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id A27D4B2FBF5
-	for <lists+kvm@lfdr.de>; Thu, 21 Aug 2025 16:11:10 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8E629B2FC4D
+	for <lists+kvm@lfdr.de>; Thu, 21 Aug 2025 16:23:13 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 13857AE7CC7
-	for <lists+kvm@lfdr.de>; Thu, 21 Aug 2025 14:04:20 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 889AA170873
+	for <lists+kvm@lfdr.de>; Thu, 21 Aug 2025 14:17:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6A32C2FB61D;
-	Thu, 21 Aug 2025 14:02:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5E0CD268688;
+	Thu, 21 Aug 2025 14:16:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="hX8XqX8c"
 X-Original-To: kvm@vger.kernel.org
-Received: from cstnet.cn (smtp81.cstnet.cn [159.226.251.81])
-	(using TLSv1.2 with cipher DHE-RSA-AES256-SHA (256/256 bits))
+Received: from mail-pj1-f73.google.com (mail-pj1-f73.google.com [209.85.216.73])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 515A62F619B;
-	Thu, 21 Aug 2025 14:02:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=159.226.251.81
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0485623BCFD
+	for <kvm@vger.kernel.org>; Thu, 21 Aug 2025 14:16:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.73
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755784932; cv=none; b=DLjsP9My8BV58XddVllsu14HwDKcV18uppO90myojZz0esTNbTF0LaFIfvjFobdzQGiylrI90kH3QGZiMlGswjxnesASJeWDD0xdWN4jOibJRO2lDkJhHpADumCk+sliUaso92rj7wo9Mx7GC0TEA/Wltm89ubKsQe36sFsG09M=
+	t=1755785800; cv=none; b=Xw7h21OZ4NirxBgftXIOO+MhGqtLcyYsM6nGNd2sC6v7veA1I5kcFzYTGh0HvEr+EAKNHNdcHB637fO/ICXxKmCYXW6n+0Vi16CwBQZrHfnTRYp3v2XyupzBhIxHRIe/l5TRS59KQJHlmkz/ZA/woBKBIljnIjsRppS722aVp18=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755784932; c=relaxed/simple;
-	bh=j+dnGsQvvMyv+gqHvh4MX/eBm+f7ZHWkpmRE/R7IECM=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=qGoTeGXkptHgN19j+xPPB5ACUTgT2RqNnRv5raU4jffgNo6VrERhdjZMl9r4IS6dyRgPVW0Q4zYmcF2rOkbw2/PxwrcsWSHz/F9B2+7OLad5hIIv96pkZjKMd7ft0LK3FKhX04fDbfqTR8++dbW2BBBSqYB0nA034vkUstrBvV4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=isrc.iscas.ac.cn; spf=pass smtp.mailfrom=isrc.iscas.ac.cn; arc=none smtp.client-ip=159.226.251.81
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=isrc.iscas.ac.cn
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=isrc.iscas.ac.cn
-Received: from ROG.lan (unknown [118.251.176.166])
-	by APP-03 (Coremail) with SMTP id rQCowABn+Xq+JqdoP8MTDg--.22469S7;
-	Thu, 21 Aug 2025 22:01:50 +0800 (CST)
-From: Pincheng Wang <pincheng.plct@isrc.iscas.ac.cn>
-To: paul.walmsley@sifive.com,
-	palmer@dabbelt.com,
-	aou@eecs.berkeley.edu,
-	alex@ghiti.fr,
-	robh@kernel.org,
-	krzk+dt@kernel.org,
-	conor+dt@kernel.org,
-	anup@brainfault.org,
-	pbonzini@redhat.com,
-	shuah@kernel.org,
-	cyan.yang@sifive.com,
-	cleger@rivosinc.com,
-	charlie@rivosinc.com,
-	cuiyunhui@bytedance.com,
-	samuel.holland@sifive.com,
-	namcao@linutronix.de,
-	jesse@rivosinc.com,
-	inochiama@gmail.com,
-	yongxuan.wang@sifive.com,
-	ajones@ventanamicro.com,
-	parri.andrea@gmail.com,
-	mikisabate@gmail.com,
-	yikming2222@gmail.com,
-	thomas.weissschuh@linutronix.de
-Cc: linux-riscv@lists.infradead.org,
-	linux-kernel@vger.kernel.org,
-	linux-doc@vger.kernel.org,
-	devicetree@vger.kernel.org,
-	kvm@vger.kernel.org,
-	kvm-riscv@lists.infradead.org,
-	linux-kselftest@vger.kernel.org,
-	pincheng.plct@isrc.iscas.ac.cn
-Subject: [PATCH v1 RESEND 5/5] KVM: riscv: selftests: add Zilsd and Zclsd extension to get-reg-list test
-Date: Thu, 21 Aug 2025 22:01:31 +0800
-Message-Id: <20250821140131.225756-6-pincheng.plct@isrc.iscas.ac.cn>
-X-Mailer: git-send-email 2.39.5
-In-Reply-To: <20250821140131.225756-1-pincheng.plct@isrc.iscas.ac.cn>
-References: <20250821140131.225756-1-pincheng.plct@isrc.iscas.ac.cn>
+	s=arc-20240116; t=1755785800; c=relaxed/simple;
+	bh=6GrnujQLloiv85HLdi3xqRilZz8RU14igxohRDRKuAo=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=HCp27+KEzRWo5147lF2MXxhtVbFUBg/mI6/yqCHbTCiEmJcH1WgR4ffGsLm0sEBNptSQwqw95GYIE95jIglTLtfSIiMkmotw9HlHFx9bOyoHppOG82DmCfq3gU8lNhSrXHGKWhse8kk11F9k31LiEJqnOD5Xn+B2zD8FQl9/7QQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=hX8XqX8c; arc=none smtp.client-ip=209.85.216.73
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+Received: by mail-pj1-f73.google.com with SMTP id 98e67ed59e1d1-32326e21dd6so1987060a91.2
+        for <kvm@vger.kernel.org>; Thu, 21 Aug 2025 07:16:38 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1755785798; x=1756390598; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=6GrnujQLloiv85HLdi3xqRilZz8RU14igxohRDRKuAo=;
+        b=hX8XqX8cjQDXWvg02mW3eUUWhp56Z6MWmhDfkjLy44MiJdKsdUzytwKp91A3e2McYj
+         NA+USpdumAlM8HIyNR37BvOIzpyAIvOoN3YXNWRdxEvvxmA800ICfRLP6GyAzukbKsme
+         eQaQ1TFT6Vphnvx5FxSf9fXg0Oec4C/r6w3vjO+DY7sw5FjKPWEsQSw2CJBLYFuKGDmY
+         HF4vLSwAnPqskKRUux+Wrtw2goQZTyPM2JQ7ng/BDV1BWX0H5efvUcnm747TzFl1jVUq
+         Oe/ogn9XyIumXeZEWj5HPQ9kEVu5vb4j5QLg6agfQ4hCFpNrglMlAmzhgJc98r0xYYf+
+         DZow==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1755785798; x=1756390598;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=6GrnujQLloiv85HLdi3xqRilZz8RU14igxohRDRKuAo=;
+        b=DP7F8EtkKXU4HiNyUBKCndkk09Y7Fes1TsyrdY6m0hzx4rbiM+1BevhB44NQ3Ld363
+         wb6aNIeG7z2UZDcQjdzipW90CDIA3HGe4PZNgbX/2WtrKIh49iy32oS7SA1Y/UQDLH4X
+         EaLuc9StMe4U+cC4EuroA/lQoeKdWSY72b4iXNhQng2KJ4oCnxyIgegNb4FgpIB3bN6N
+         3G6qll/lTdalwUPmU1/6YEaidxtj58IyWQaVqvX6VqpFxd56VKMcESV7yG2PhozzG6f4
+         HLLNb/EOR34NGQ1yVhoPREBx9NYhYRfiKP0vXp/Es75tFuJ4LUqwXzRUMoifmE1e7Q6c
+         An2A==
+X-Forwarded-Encrypted: i=1; AJvYcCWryTEsWrXpx6W15dBDN+F8ascgCiWOsFFKtXDJ3QL06TyPvcANaYLqI4wxnbz4Lg8g2xo=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yz960hJc7qfTzNAn5Be+BoJwkiKBAVZHT8yw6yP2BLT1OpvSc9e
+	HkZlrmxRB7PRdom2V3nDifzvsYRqihJAkDR/If7lK68k2ZHS5kMJfBhtP/jxerEJ1u0iawXiRvS
+	mG+7T4A==
+X-Google-Smtp-Source: AGHT+IFwgalIbtRABlLOHlpKify6KGBP/os4lTVekK7e7XeW4den+TP+VDgQAETfScMeohffbl/PKvnkxB0=
+X-Received: from pjs15.prod.google.com ([2002:a17:90a:c0f:b0:325:2de:8b77])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:2248:b0:31f:22f:a221
+ with SMTP id 98e67ed59e1d1-324ed1c0298mr3587232a91.29.1755785798238; Thu, 21
+ Aug 2025 07:16:38 -0700 (PDT)
+Date: Thu, 21 Aug 2025 07:16:36 -0700
+In-Reply-To: <20250821042915.3712925-2-sagis@google.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:rQCowABn+Xq+JqdoP8MTDg--.22469S7
-X-Coremail-Antispam: 1UD129KBjvJXoW7Cw47Ar47Jw4fZr4kXryUAwb_yoW8ZF15pr
-	1rA39Ikr4kJ34fA392y3s8Ww18Xws8Jws5Cw43ur4fAryjyryxtFnrA3W3Jr1DJa4Fqr1S
-	yF1fWr12vw40yrUanT9S1TB71UUUUUDqnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-	9KBjDU0xBIdaVrnRJUUUml14x267AKxVWrJVCq3wAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
-	rVWUWVWUuwAFIxvE14AKwVWUJVWUGwA2048vs2IY020E87I2jVAFwI0_JF0E3s1l82xGYI
-	kIc2x26xkF7I0E14v26ryj6s0DM28lY4IEw2IIxxk0rwA2F7IY1VAKz4vEj48ve4kI8wA2
-	z4x0Y4vE2Ix0cI8IcVAFwI0_Gr0_Xr1l84ACjcxK6xIIjxv20xvEc7CjxVAFwI0_Gr1j6F
-	4UJwA2z4x0Y4vEx4A2jsIE14v26r4j6F4UM28EF7xvwVC2z280aVCY1x0267AKxVW8Jr0_
-	Cr1UM2AIxVAIcxkEcVAq07x20xvEncxIr21l5I8CrVACY4xI64kE6c02F40Ex7xfMcIj6x
-	IIjxv20xvE14v26r1Y6r17McIj6I8E87Iv67AKxVWxJVW8Jr1lOx8S6xCaFVCjc4AY6r1j
-	6r4UM4x0Y48IcxkI7VAKI48JM4x0x7Aq67IIx4CEVc8vx2IErcIFxwACI402YVCY1x0262
-	8vn2kIc2xKxwCY1x0262kKe7AKxVWrXVW3AwCF04k20xvY0x0EwIxGrwCFx2IqxVCFs4IE
-	7xkEbVWUJVW8JwC20s026c02F40E14v26r1j6r18MI8I3I0E7480Y4vE14v26r106r1rMI
-	8E67AF67kF1VAFwI0_Wrv_Gr1UMIIYrxkI7VAKI48JMIIF0xvE2Ix0cI8IcVAFwI0_Gr0_
-	Xr1lIxAIcVC0I7IYx2IY6xkF7I0E14v26r4UJVWxJr1lIxAIcVCF04k26cxKx2IYs7xG6r
-	1j6r1xMIIF0xvEx4A2jsIE14v26r4j6F4UMIIF0xvEx4A2jsIEc7CjxVAFwI0_Gr1j6F4U
-	JbIYCTnIWIevJa73UjIFyTuYvjTRZGYpUUUUU
-X-CM-SenderInfo: pslquxhhqjh1xofwqxxvufhxpvfd2hldfou0/
+Mime-Version: 1.0
+References: <20250821042915.3712925-1-sagis@google.com> <20250821042915.3712925-2-sagis@google.com>
+Message-ID: <aKcqRFWuGZQQ3v3y@google.com>
+Subject: Re: [PATCH v9 01/19] KVM: selftests: Include overflow.h instead of
+ redefining is_signed_type()
+From: Sean Christopherson <seanjc@google.com>
+To: Sagi Shahar <sagis@google.com>
+Cc: linux-kselftest@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>, 
+	Shuah Khan <shuah@kernel.org>, Ackerley Tng <ackerleytng@google.com>, 
+	Ryan Afranji <afranji@google.com>, Andrew Jones <ajones@ventanamicro.com>, 
+	Isaku Yamahata <isaku.yamahata@intel.com>, Erdem Aktas <erdemaktas@google.com>, 
+	Rick Edgecombe <rick.p.edgecombe@intel.com>, Roger Wang <runanwang@google.com>, 
+	Binbin Wu <binbin.wu@linux.intel.com>, Oliver Upton <oliver.upton@linux.dev>, 
+	"Pratik R. Sampat" <pratikrajesh.sampat@amd.com>, Reinette Chatre <reinette.chatre@intel.com>, 
+	Ira Weiny <ira.weiny@intel.com>, Chao Gao <chao.gao@intel.com>, 
+	Chenyi Qiang <chenyi.qiang@intel.com>, linux-kernel@vger.kernel.org, kvm@vger.kernel.org
+Content-Type: text/plain; charset="us-ascii"
 
-The KVM RISC-V allows Zilsd and Zclsd extensions for Guest/VM so add
-this extension to get-reg-list test.
+On Wed, Aug 20, 2025, Sagi Shahar wrote:
+> Redefinition of is_signed_type() causes compilation warning for tests
+> which use kselftest_harness. Replace the definition with linux/overflow.h
 
-Signed-off-by: Pincheng Wang <pincheng.plct@isrc.iscas.ac.cn>
----
- tools/testing/selftests/kvm/riscv/get-reg-list.c | 6 ++++++
- 1 file changed, 6 insertions(+)
+Heh, tried that:
 
-diff --git a/tools/testing/selftests/kvm/riscv/get-reg-list.c b/tools/testing/selftests/kvm/riscv/get-reg-list.c
-index a0b7dabb5040..477bd386265f 100644
---- a/tools/testing/selftests/kvm/riscv/get-reg-list.c
-+++ b/tools/testing/selftests/kvm/riscv/get-reg-list.c
-@@ -78,7 +78,9 @@ bool filter_reg(__u64 reg)
- 	case KVM_REG_RISCV_ISA_EXT | KVM_REG_RISCV_ISA_SINGLE | KVM_RISCV_ISA_EXT_ZCB:
- 	case KVM_REG_RISCV_ISA_EXT | KVM_REG_RISCV_ISA_SINGLE | KVM_RISCV_ISA_EXT_ZCD:
- 	case KVM_REG_RISCV_ISA_EXT | KVM_REG_RISCV_ISA_SINGLE | KVM_RISCV_ISA_EXT_ZCF:
-+	case KVM_REG_RISCV_ISA_EXT | KVM_REG_RISCV_ISA_SINGLE | KVM_RISCV_ISA_EXT_ZCLSD:
- 	case KVM_REG_RISCV_ISA_EXT | KVM_REG_RISCV_ISA_SINGLE | KVM_RISCV_ISA_EXT_ZCMOP:
-+	case KVM_REG_RISCV_ISA_EXT | KVM_REG_RISCV_ISA_SINGLE | KVM_RISCV_ISA_EXT_ZILSD:
- 	case KVM_REG_RISCV_ISA_EXT | KVM_REG_RISCV_ISA_SINGLE | KVM_RISCV_ISA_EXT_ZFA:
- 	case KVM_REG_RISCV_ISA_EXT | KVM_REG_RISCV_ISA_SINGLE | KVM_RISCV_ISA_EXT_ZFH:
- 	case KVM_REG_RISCV_ISA_EXT | KVM_REG_RISCV_ISA_SINGLE | KVM_RISCV_ISA_EXT_ZFHMIN:
-@@ -530,7 +532,9 @@ static const char *isa_ext_single_id_to_str(__u64 reg_off)
- 		KVM_ISA_EXT_ARR(ZCB),
- 		KVM_ISA_EXT_ARR(ZCD),
- 		KVM_ISA_EXT_ARR(ZCF),
-+		KVM_ISA_EXT_ARR(ZCLSD),
- 		KVM_ISA_EXT_ARR(ZCMOP),
-+		KVM_ISA_EXT_ARR(ZILSD),
- 		KVM_ISA_EXT_ARR(ZFA),
- 		KVM_ISA_EXT_ARR(ZFH),
- 		KVM_ISA_EXT_ARR(ZFHMIN),
-@@ -1199,7 +1203,9 @@ struct vcpu_reg_list *vcpu_configs[] = {
- 	&config_zcb,
- 	&config_zcd,
- 	&config_zcf,
-+	&config_zclsd,
- 	&config_zcmop,
-+	&config_zilsd,
- 	&config_zfa,
- 	&config_zfh,
- 	&config_zfhmin,
--- 
-2.39.5
+https://lore.kernel.org/all/18f2ea68-0f7c-465e-917e-e079335995c1@sirena.org.uk
 
+There's now a fix in kvm-x86/fixes and thus kvm-x86/next, so if you base something
+off kvm-x86/next, the warnings should be gone.
 
