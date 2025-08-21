@@ -1,321 +1,396 @@
-Return-Path: <kvm+bounces-55268-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-55269-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 40EE0B2F6CF
-	for <lists+kvm@lfdr.de>; Thu, 21 Aug 2025 13:35:07 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id E7BC1B2F6AD
+	for <lists+kvm@lfdr.de>; Thu, 21 Aug 2025 13:30:46 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id EAC78AC5E95
-	for <lists+kvm@lfdr.de>; Thu, 21 Aug 2025 11:29:25 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 623ECB637A7
+	for <lists+kvm@lfdr.de>; Thu, 21 Aug 2025 11:28:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7D10030E853;
-	Thu, 21 Aug 2025 11:29:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="dugO9JyM"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3675B30C340;
+	Thu, 21 Aug 2025 11:29:50 +0000 (UTC)
 X-Original-To: kvm@vger.kernel.org
-Received: from NAM10-DM6-obe.outbound.protection.outlook.com (mail-dm6nam10on2059.outbound.protection.outlook.com [40.107.93.59])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F05611DF756;
-	Thu, 21 Aug 2025 11:29:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.93.59
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755775757; cv=fail; b=cHketTIcla//oONiQRoJoWW3hYWSRsRqwj2ZSp+MPJRqtNNTL6vjP6fRovUR06mpzRYkbUEmPdjxwwhsd8Jpg0heMBI8FIriwMwxL1tng0EfU00M6aIahn2ELQXlLGEF1N66+tTIZK0BJk15qK+h/w37d6f1v/3HMe7TP3QLAr0=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755775757; c=relaxed/simple;
-	bh=/5BtKMgCvbTBQleNIeOgj98i4IzjhXz6LtmeOZrVePA=;
-	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
-	 Content-Type:MIME-Version; b=RA7Cxt0dwsPRVGvqK2chpjljN7br4SMId3ZO00RRc396rGmVFDKC+73gOCaxba6LMz5fIxVjIOHnLIp12Tmd/d3hVF9GvojhDWMTs9WyDGuDNRmAhQI5dhlOrfRMxhRXilChW/dRzPneoO8fy6kPqi1Ge9vyLd4Lnlqo2RjKK6s=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=dugO9JyM; arc=fail smtp.client-ip=40.107.93.59
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=YApnSGFTp6ilokHnFo4B89GgpEeIA1busEid5tzKx0a8Utb8KKYbOs6gvtoU/j7PYLaDksBLWVxIlPlsH6eUBexnn2lI+7dzcpSrYaGG9ooBRX1AP2OAnvt8ceCvaDWDpEfFsQjCQT1B3qhp0GWMEmVe8KpwL0CWpMsD3kEGEWYCocC+7w1LIvA94zYPshVpM6zDf5NQEbQeK6x7Z+tUBm+zHYx/as6n91bT3igffKD6mNDRzCxtu8JFC+qIj37JGwlCXurPBtethJecv4iYC8COLrJZYIdQOw2GoxhI2lnn5vCCvq/ejK5g1/qpm9yzbsYHP7FGo5akQ9m9BxySjQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=6ZzaXxrbyruf1J54w2UBobuMDLswmschzJFabjbjkDY=;
- b=ADn/LaYG1wZYpkFnfmCCcmUVxUEd9CzACPDgHvJZPQ17IktFzCtHlbyKSt2SNoh7eN7TsZaGHo+dEMGrUL8c0lBv4GVkW4vYxrZmayt+Rs5/UIZ1l8jRadgkp+ogQCiZ8cSW73c2CAn/Q+s4Xc6XzV7sfKjaQ2a/9O7CNmyjqQWheaH91vIrx9yGG6UdGBOdZvcjrZkdIg4jUsSxT2g+BkgKmfd/2ne9tON3JVc3tiX6JcXCAvS6a4wubNSx+cH7RnuWfFBoHOAvnDg9bjdievVZUGAOAPdKBFDF1qHK93yBGekZXJSr6DGxKhyUOcrW4KM/nmJVa4Zu334f4MxKIw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
- header.d=amd.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=6ZzaXxrbyruf1J54w2UBobuMDLswmschzJFabjbjkDY=;
- b=dugO9JyMs/k5TfRIBvW+vsQWm55I9knXKwxdOYhd8ce761P6/qoSP4rLSf7ZsacRBLCYUoSz3nu6ZS19NG7HWIxw35fRgrkL2gzykfdo7ZUK/XhmGDcpgY1UxD+LSalibVl+dPIBsJORfaoqKdRLyoSgNVAB5rbhEXB4OrJNEgg=
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=amd.com;
-Received: from DS7PR12MB6048.namprd12.prod.outlook.com (2603:10b6:8:9f::5) by
- DS7PR12MB9502.namprd12.prod.outlook.com (2603:10b6:8:250::19) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.9052.14; Thu, 21 Aug 2025 11:29:11 +0000
-Received: from DS7PR12MB6048.namprd12.prod.outlook.com
- ([fe80::6318:26e5:357a:74a5]) by DS7PR12MB6048.namprd12.prod.outlook.com
- ([fe80::6318:26e5:357a:74a5%4]) with mapi id 15.20.9052.013; Thu, 21 Aug 2025
- 11:29:11 +0000
-Message-ID: <8613b5a8-aef5-4457-a1ca-646443da8d5b@amd.com>
-Date: Thu, 21 Aug 2025 16:59:01 +0530
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v5 1/4] iommu/amd: Add support to remap/unmap IOMMU
- buffers for kdump
-To: Ashish Kalra <Ashish.Kalra@amd.com>, joro@8bytes.org,
- suravee.suthikulpanit@amd.com, thomas.lendacky@amd.com,
- Sairaj.ArunKodilkar@amd.com, herbert@gondor.apana.org.au
-Cc: seanjc@google.com, pbonzini@redhat.com, will@kernel.org,
- robin.murphy@arm.com, john.allen@amd.com, davem@davemloft.net,
- michael.roth@amd.com, iommu@lists.linux.dev, linux-kernel@vger.kernel.org,
- linux-crypto@vger.kernel.org, kvm@vger.kernel.org
-References: <cover.1753911773.git.ashish.kalra@amd.com>
- <d1285938266d753b9d215e7c649126d261208143.1753911773.git.ashish.kalra@amd.com>
-Content-Language: en-US
-From: Vasant Hegde <vasant.hegde@amd.com>
-In-Reply-To: <d1285938266d753b9d215e7c649126d261208143.1753911773.git.ashish.kalra@amd.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-X-ClientProxiedBy: PN3PR01CA0002.INDPRD01.PROD.OUTLOOK.COM
- (2603:1096:c01:95::22) To DS7PR12MB6048.namprd12.prod.outlook.com
- (2603:10b6:8:9f::5)
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 69CE52D375D
+	for <kvm@vger.kernel.org>; Thu, 21 Aug 2025 11:29:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1755775789; cv=none; b=n0MMazDtGqI96f7pnmXqjvbqgoFHO+FOXt4X1BJJsf8HYqxdM4MiUyOIpnKTVFhRRiJzAhbx2sZam4GfLZfAs+5TamVmBXyw/BaYsZ0pc/4lg3/eJu0n25BUVM3LLx8dDAIaqt3LBAvKxYfiPGYuf51Bec7TVldj/79ySFeiDfo=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1755775789; c=relaxed/simple;
+	bh=JI/MpSX4dyHaJFGIoS5eAQWZBphXVcvUkH4kTW3XBio=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=ZiTDOJW+35Guew2z6GJxu8A6PjHpx/sltQM44Q8fUz91sDGw0sF9+BliB7v1pCuh314u8PnI+lOhottro0Dz42XvghuOP650v5vB6ft8yfTI8Ty3D6cKtYowwskQyCYFaqmJd5GLG0Hr2iF7OI950MzqT3N/MnddbbUM1yxchvM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 780B7152B;
+	Thu, 21 Aug 2025 04:29:38 -0700 (PDT)
+Received: from [10.1.196.46] (e134344.arm.com [10.1.196.46])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 0E7603F58B;
+	Thu, 21 Aug 2025 04:29:44 -0700 (PDT)
+Message-ID: <fb782326-06d6-4e3d-9614-6f5798dafee4@arm.com>
+Date: Thu, 21 Aug 2025 12:29:43 +0100
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: DS7PR12MB6048:EE_|DS7PR12MB9502:EE_
-X-MS-Office365-Filtering-Correlation-Id: 4b538a90-5d68-414a-3be4-08dde0a5f335
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230040|366016|1800799024|7416014|376014;
-X-Microsoft-Antispam-Message-Info:
-	=?utf-8?B?SXJsYlFrOTEzSWpmc09GWERrOEVPZnJKcWwrUkE5Yjd0WmNJblRCVGRxTTgr?=
- =?utf-8?B?cmNySmRvZVh2TmxxRWhkeGtOTWhEMFdseFB4N01QZnFTSG1PYWNob2xBdG52?=
- =?utf-8?B?YU5WdzF3UUM5ak5MRDdYdjhBN1RVcnkwZ1l2RHlxR28yRFpHb3AwdTBBeWZW?=
- =?utf-8?B?S2FkQm5nQXVyUFREd0NaREtScEJVRHdROUJ1QWdvalZiU3VTMHNEWEcyaGZo?=
- =?utf-8?B?QkhncXA5NVdLc2xhTHpsMlN2QjJNeHZydElJRFJGODMyY0QvVGRlV00xRkVv?=
- =?utf-8?B?ek50dkl4dUExOVYwdGcwQzRDWGE4WlZSTzZJd09aa1JXcGtTbmVNYWVFak9O?=
- =?utf-8?B?b2hpVjdYSU90NUhOZ2tka29ObnBHWDl1eXREQjZLYlY3eXJDaTdoWlE1V005?=
- =?utf-8?B?U0o2WTN2ZFZDUFFmWFJNL0dwV1g5M1A1N0oyWERMQ0dWVnFvNDk0OFhtSmY1?=
- =?utf-8?B?R3JaVTlZeFR5MDdIazRkYjBRdWFsOUtXZi9mNXV1R0xHYmtPQ2d3a2Z1VTZ0?=
- =?utf-8?B?RHk0UGR2Nkt4amtSaUdEeEJEOENxS1Fmd3pYM21yNENjSnhtMGdmVE9pYmJt?=
- =?utf-8?B?V3hmdDZxcEMyTG9waGhLQWFTcllMZnpGUWpiRXYyeEh0a2tteEhtVXBGL0cy?=
- =?utf-8?B?Smp4YkhxTkpwM254V0lTa3pWUDVpSk9nY293RmNMM1NlOHVlcnVIZ1FpSFRV?=
- =?utf-8?B?N3VzQnorbjlWZjRxZldiNTkwSC9pQTBJbEhQOUJMRld6UHVuQ2J0citnR2I4?=
- =?utf-8?B?TjNjZHM5MVc0SFBtVkFNRnhUM0twaS9UWU9YVmUvblA1aUE4b0E1dEZGWW81?=
- =?utf-8?B?T3ZkUUQwQjYra2JNMmNNaEFZbFB6UGJZb1F5VlNWOExWcVZqSmpSenNHWnBQ?=
- =?utf-8?B?MWNEWXVvZU1XRzFEUjArdFdnK2ZzOXVTc055V2ZEall6ZnhXdjI0Rk1FUGln?=
- =?utf-8?B?bXVFMXdNb0VFRVRkWm5hdUJZcDI5bFV3dkh2VDd6SjIwNEZHSVJMWTU0eVVU?=
- =?utf-8?B?U0tXd09jSXJ4UDlONW93SXFXYi9ndWVKWlFJd0NFbkErQ1ltNkVsS3RmdUVC?=
- =?utf-8?B?Uk5mcjVNd3M5c1VFcHJoY0tON3p3dUdjaVJQS0czMUljOEp5N2o0Q3dPMngv?=
- =?utf-8?B?bmtQQ0VNVHAwUklOTDdTeVRYYkR1eTJnYXp6STFNUjY1bk55OEszajBlWTAx?=
- =?utf-8?B?Y0ovVHJSOUpFMFU4U2dyRGxJY29YUUYrdFhYWW5PS2ViWlo4N2dQK051VEQy?=
- =?utf-8?B?WktKNklJaGRFbUc1WnZ0eG5yMUN2T1FBNlo2aU1ONy9STTNZOGVKcmFPbEhn?=
- =?utf-8?B?L0JhZVdzdnlXQUF4b3V1dStMQTl3cFVpeXJ2cDNIbm42ci9mdWliQmVSd0hw?=
- =?utf-8?B?MXJGbEdodWtVYmRXL3pEWXlrQlpKWG8yWlFtaFA3aEFaRGhJaGd0NGVwTmI5?=
- =?utf-8?B?WHE0RTlpcCtqYUJHaVNxUlhKMHFFdEpsejg2S05tcURXa2JpSklyTUdTYVFZ?=
- =?utf-8?B?Q0pBMVpXa3cwOWU4Y1J2VmIxdERzV1V6VGc1VUFJUmh0YWUvZG8rS3JTSGFi?=
- =?utf-8?B?T0xsZjlId3IxU1cvN3MyKzVKaThkK3Fnc0diUWNJdFo3WFdia1dXK0kzeUwy?=
- =?utf-8?B?bE5VSXd5QVRwT3d0RXgvclNTckNWL2wrU1NOTm9xWTdCTHR1a3ArcFMrK25N?=
- =?utf-8?B?L1dDTW1HNHcyOTdsU2VLS3NLTFRJSzI3OEVsSWRRRjdsemxuVVRPaEliZERj?=
- =?utf-8?B?SnJHWG5tdzFuSmltMGFCOG9JK0xEZ0dLeis2Sk1zWWo4R3h2M09ibkNEd2tU?=
- =?utf-8?B?NmVCWGhxQS9kdmlpU3Y5RnM4VGxiSnBKc1FXRHNobFBXdDd1REdvVDhxV1A0?=
- =?utf-8?B?TjdBeWRCeHY0am8zZktZQk90WVpJUTZVOWdHb2YrcExJNWN0U0NKcjFOOWdZ?=
- =?utf-8?Q?pbW/yimxsK0=3D?=
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DS7PR12MB6048.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(1800799024)(7416014)(376014);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?utf-8?B?MzhYaHdIZGVXenBvbEIvZmZQZFgxaGY4d0ZtcHI3cm9INHBPWkNxREcxMzA5?=
- =?utf-8?B?VS9SMHo4bm43VVhBVzFwbTExTEtxaFF5a2dXQ2JRQnErWDRXMWZaMFpsL2tq?=
- =?utf-8?B?dEJ6bDQ5dTZuTGU4ck11NDVOcncrNEZOMVVxUVBLVGVRZ2xTcyswbEkzcVA4?=
- =?utf-8?B?NFREUmEvVTA2SXNOVkdCNllRaGNoYUg2OTloeFFWZnZMYUlmZVFuT05xVlRV?=
- =?utf-8?B?cjZaRWxFbnozNVdDNks3QWgzeU50Tk1PR1BUeXRENENvaE5RZnEyaUZmL1Zq?=
- =?utf-8?B?dmFqcjIwN3ZBN1dLNGxPVmhSbjZ5T3RsWGdJTjZxejhYSkJzZGZqSjljK1Qz?=
- =?utf-8?B?aEdCQjVFZ1VvazJzV09TNnRGbTJ4S2RsY1R5R3F2UlZsZUJaeTBPN3pXYk9H?=
- =?utf-8?B?SmhuekcxOUV4UE9uWERtclEyTXVBYjNVYkhRZmU5dkhWQmlQSERUVWVIc1M2?=
- =?utf-8?B?aVF2ZnJCM0cvZ01qbUVHallDVFpkcWZIQzlLZjc5ODNVdDl0aUl1TW5uOVpZ?=
- =?utf-8?B?RlorRDArTTVDNnJNczVHVkQyaUtJZWxhaW9GM1VsVW1CeDhpeFlORGNlcXpm?=
- =?utf-8?B?MUJacEpiclhacStQZGx2SUU4OXU0cWRUQzRKZ3BWcEZiSW1Kc0tnblpTNE1l?=
- =?utf-8?B?MGJNUWN3ZU03YjEzZzBEcWZGTEQyTDVXOTlGMEltT0xobTRwYUhOaitGbEZt?=
- =?utf-8?B?QjkxMG1zNFNrclJ5V1RQWTkvSHYwR1kyVDlXNDVPWjAyem5lenBvcUVRV3Jn?=
- =?utf-8?B?Y0dNVGo5aUwvNVNOb1RUalp2UGJkbmt1WXlGRDNkMVdDVFNFbXdrMW5aWTZi?=
- =?utf-8?B?ZERWazZMaTNBOWRTZUJMNFhld2RYNFd4cUgrek0xY2lHZFhIZFZ6Q1hyQ1hj?=
- =?utf-8?B?UU1BblNabjlURjRlQkhpMUdTQmxMc0k2dHlXTW1FS0lJc1h5UlJPUkxPTFlt?=
- =?utf-8?B?Q1hOUkRJNGVOVDBWaTJmTk52UEEveTdJeG5KbHBMZXhpYWM0Tm4xWU1GamFl?=
- =?utf-8?B?TDROcERPVkFUNi96OTZJaTVCUExSUW8yc1B4clRGSmF0RHFwTWhtNmVMR3BV?=
- =?utf-8?B?ZGFscWZCL2dZbEw1ZWhPTXBvWGZLekJjUjd2Uks0QkhsUjVlbzZBT3hWalUy?=
- =?utf-8?B?VHFPem9aLzRWMGo1S0hBT2hNdEQvNHRubTU2cVRVRGZvUTVxaVBiWVRXTVhv?=
- =?utf-8?B?YUIvaThmejhrV20va0J0VUxFbVF2MFpvbHJkbTV2YzlNeTNpY3FqZXgyVXhk?=
- =?utf-8?B?aFlaNDFxK1hUcGZ6dFZtdUNlOTVnVlBtTU5oNHNVSjkvdWtiTTFlY3N6RHhP?=
- =?utf-8?B?V2JySUFQWDlaVjlSS2hIMVpBdS81S3JzM3MrTHN2UnVZY0hlYWk2eElLcWFO?=
- =?utf-8?B?VEtyWTdkOXlidDhpYXh5NU9LUG5sclBDdzJJQlk3WWVoS2NZU3o4b3BDejBq?=
- =?utf-8?B?OVdJLzV5S2pRZkhpYnN1MHAxZEZKWmtBQ0haaHhOaGhhVklaZm9VQlMrR2p6?=
- =?utf-8?B?dm5BZU42MERZbkNITUJYVnVWYlkwQkhtNUlOVDBVWERKemxpQmNZTzFFYTZz?=
- =?utf-8?B?QVJ3TUxIWWRtWlRUb1UzVy9GdXowRW03WHVDclZYb2s0cWdJL1kxUHdMVmUy?=
- =?utf-8?B?cGM3U2NhcTlDQ1prT3gveG5mOEZWMmtoSW5sQ0JvaHdhelhJdGFUblRZMXVx?=
- =?utf-8?B?OGxqbDR6eEtmcjFjMzlsVC9xQ1paYTEySThiclFBVEtReWVsMUdhdEdHZFV5?=
- =?utf-8?B?TUtZMjkwMUs2QTZIYmVWMVdJalgrSW1BZDFncG03Z0xDUEEyVUNlUGwxMUky?=
- =?utf-8?B?UXZVMFRWRHZPYzBuVDIzRlBtWFFLUGw1MytFaTlUYk1WRjg2aHh5ckxuMERp?=
- =?utf-8?B?K1NJc1J3Q0paU0FhWW5DdTNUdS9Pajd5QUlTTDNVeG9YeTdmSU04enFoZXRy?=
- =?utf-8?B?YnNtMm5HcUdzUVM3ZjVyd2VWMUJrWkFiTjkvcUgvL2xTa3FDdzZ6aU5jZU8v?=
- =?utf-8?B?aTdvbVNibk5EOXVGQWFVNGw2ODhnVC9LcTFQWEZ0WGQzWTRDTjFaRC9OMjFM?=
- =?utf-8?B?NTRZWDRySzZ2cFpjV1FIcHJrRkhObE9kazltdUMvTHAycklGTVQ0c0k1QytF?=
- =?utf-8?Q?R+vRZ9DuS7VBolE8+On1Q/v2N?=
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 4b538a90-5d68-414a-3be4-08dde0a5f335
-X-MS-Exchange-CrossTenant-AuthSource: DS7PR12MB6048.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 21 Aug 2025 11:29:11.4264
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: jh7Qh9rslMjAV/81IOXfMRizIkvlX+Qzpa7zxFIP9/ZjMlNJko7tLaHN+M0GD96dPffgJdz15dHYgmbbuYt0wA==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DS7PR12MB9502
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v3 6/6] KVM: arm64: Get rid of ARM64_FEATURE_MASK()
+To: Marc Zyngier <maz@kernel.org>, kvmarm@lists.linux.dev,
+ linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org
+Cc: Joey Gouly <joey.gouly@arm.com>, Suzuki K Poulose
+ <suzuki.poulose@arm.com>, Oliver Upton <oliver.upton@linux.dev>,
+ Zenghui Yu <yuzenghui@huawei.com>, Will Deacon <will@kernel.org>,
+ Catalin Marinas <catalin.marinas@arm.com>, Cornelia Huck <cohuck@redhat.com>
+References: <20250817202158.395078-1-maz@kernel.org>
+ <20250817202158.395078-7-maz@kernel.org>
+Content-Language: en-US
+From: Ben Horgan <ben.horgan@arm.com>
+In-Reply-To: <20250817202158.395078-7-maz@kernel.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-Hi Ashish,
+Hi Marc,
 
-
-On 7/31/2025 3:25 AM, Ashish Kalra wrote:
-> From: Ashish Kalra <ashish.kalra@amd.com>
+On 8/17/25 21:21, Marc Zyngier wrote:
+> The ARM64_FEATURE_MASK() macro was a hack introduce whilst the
+> automatic generation of sysreg encoding was introduced, and was
+> too unreliable to be entirely trusted.
 > 
-> After a panic if SNP is enabled in the previous kernel then the kdump
-> kernel boots with IOMMU SNP enforcement still enabled.
+> We are in a better place now, and we could really do without this
+> macro. Get rid of it altogether.
 > 
-> IOMMU completion wait buffers (CWBs), command buffers and event buffer
-> registers remain locked and exclusive to the previous kernel. Attempts
-> to allocate and use new buffers in the kdump kernel fail, as hardware
-> ignores writes to the locked MMIO registers as per AMD IOMMU spec
-> Section 2.12.2.1.
-> 
-> This results in repeated "Completion-Wait loop timed out" errors and a
-> second kernel panic: "Kernel panic - not syncing: timer doesn't work
-> through Interrupt-remapped IO-APIC"
-> 
-> The list of MMIO registers locked and which ignore writes after failed
-> SNP shutdown are mentioned in the AMD IOMMU specifications below:
-> 
-> Section 2.12.2.1.
-> https://docs.amd.com/v/u/en-US/48882_3.10_PUB
-> 
-> Reuse the pages of the previous kernel for completion wait buffers,
-> command buffers, event buffers and memremap them during kdump boot
-> and essentially work with an already enabled IOMMU configuration and
-> re-using the previous kernel’s data structures.
-> 
-> Reusing of command buffers and event buffers is now done for kdump boot
-> irrespective of SNP being enabled during kdump.
-> 
-> Re-use of completion wait buffers is only done when SNP is enabled as
-> the exclusion base register is used for the completion wait buffer
-> (CWB) address only when SNP is enabled.
-> 
-> Tested-by: Sairaj Kodilkar <sarunkod@amd.com>
-> Signed-off-by: Ashish Kalra <ashish.kalra@amd.com>
-
-I'd still think introducing ops for various callback makes more sense than
-having explicit is_kdump_kernel check everywhere. I am fine with having follow
-up patch to fix that. With that and few minor nits below :
-
-Reviewed-by: Vasant Hegde <vasant.hegde@amd.com>
-
-
+> Signed-off-by: Marc Zyngier <maz@kernel.org>
 > ---
->  drivers/iommu/amd/amd_iommu_types.h |   5 +
->  drivers/iommu/amd/init.c            | 164 ++++++++++++++++++++++++++--
->  drivers/iommu/amd/iommu.c           |   2 +-
->  3 files changed, 158 insertions(+), 13 deletions(-)
+>   arch/arm64/include/asm/sysreg.h               |  3 --
+>   arch/arm64/kvm/arm.c                          |  8 ++--
+>   arch/arm64/kvm/sys_regs.c                     | 40 +++++++++----------
+>   tools/arch/arm64/include/asm/sysreg.h         |  3 --
+>   .../selftests/kvm/arm64/aarch32_id_regs.c     |  2 +-
+>   .../selftests/kvm/arm64/debug-exceptions.c    | 12 +++---
+>   .../testing/selftests/kvm/arm64/no-vgic-v3.c  |  4 +-
+>   .../selftests/kvm/arm64/page_fault_test.c     |  6 +--
+>   .../testing/selftests/kvm/arm64/set_id_regs.c |  8 ++--
+>   .../selftests/kvm/arm64/vpmu_counter_access.c |  2 +-
+>   .../selftests/kvm/lib/arm64/processor.c       |  6 +--
+>   11 files changed, 44 insertions(+), 50 deletions(-)
 > 
-> diff --git a/drivers/iommu/amd/amd_iommu_types.h b/drivers/iommu/amd/amd_iommu_types.h
-> index 5219d7ddfdaa..8a863cae99db 100644
-> --- a/drivers/iommu/amd/amd_iommu_types.h
-> +++ b/drivers/iommu/amd/amd_iommu_types.h
-> @@ -791,6 +791,11 @@ struct amd_iommu {
->  	u32 flags;
->  	volatile u64 *cmd_sem;
->  	atomic64_t cmd_sem_val;
-> +	/*
-> +	 * Track physical address to directly use it in build_completion_wait()
-> +	 * and avoid adding any special checks and handling for kdump.
-> +	 */
-> +	u64 cmd_sem_paddr;
->  
->  #ifdef CONFIG_AMD_IOMMU_DEBUGFS
->  	/* DebugFS Info */
-> diff --git a/drivers/iommu/amd/init.c b/drivers/iommu/amd/init.c
-> index 7b5af6176de9..aae1aa7723a5 100644
-> --- a/drivers/iommu/amd/init.c
-> +++ b/drivers/iommu/amd/init.c
-> @@ -710,6 +710,26 @@ static void __init free_alias_table(struct amd_iommu_pci_seg *pci_seg)
->  	pci_seg->alias_table = NULL;
->  }
->  
-> +static inline void *iommu_memremap(unsigned long paddr, size_t size)
-> +{
-> +	phys_addr_t phys;
+> diff --git a/arch/arm64/include/asm/sysreg.h b/arch/arm64/include/asm/sysreg.h
+> index d5b5f2ae1afaa..6604fd6f33f45 100644
+> --- a/arch/arm64/include/asm/sysreg.h
+> +++ b/arch/arm64/include/asm/sysreg.h
+> @@ -1142,9 +1142,6 @@
+>   
+>   #define ARM64_FEATURE_FIELD_BITS	4
+While you're at it, consider getting rid of ARM64_FEATURE_FIELD_BITS 
+too. This is only used in the set_id_regs.c selftest.
+>   
+> -/* Defined for compatibility only, do not add new users. */
+> -#define ARM64_FEATURE_MASK(x)	(x##_MASK)
+> -
+>   #ifdef __ASSEMBLY__
+>   
+>   	.macro	mrs_s, rt, sreg
+> diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
+> index 888f7c7abf547..5bf101c869c9a 100644
+> --- a/arch/arm64/kvm/arm.c
+> +++ b/arch/arm64/kvm/arm.c
+> @@ -2408,12 +2408,12 @@ static u64 get_hyp_id_aa64pfr0_el1(void)
+>   	 */
+>   	u64 val = read_sanitised_ftr_reg(SYS_ID_AA64PFR0_EL1);
+>   
+> -	val &= ~(ARM64_FEATURE_MASK(ID_AA64PFR0_EL1_CSV2) |
+> -		 ARM64_FEATURE_MASK(ID_AA64PFR0_EL1_CSV3));
+> +	val &= ~(ID_AA64PFR0_EL1_CSV2 |
+> +		 ID_AA64PFR0_EL1_CSV3);
+>   
+> -	val |= FIELD_PREP(ARM64_FEATURE_MASK(ID_AA64PFR0_EL1_CSV2),
+> +	val |= FIELD_PREP(ID_AA64PFR0_EL1_CSV2,
+>   			  arm64_get_spectre_v2_state() == SPECTRE_UNAFFECTED);
+> -	val |= FIELD_PREP(ARM64_FEATURE_MASK(ID_AA64PFR0_EL1_CSV3),
+> +	val |= FIELD_PREP(ID_AA64PFR0_EL1_CSV3,
+>   			  arm64_get_meltdown_state() == SPECTRE_UNAFFECTED);
+>   
+>   	return val;
+> diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
+> index e149786f8bde0..00a485180c4eb 100644
+> --- a/arch/arm64/kvm/sys_regs.c
+> +++ b/arch/arm64/kvm/sys_regs.c
+> @@ -1617,18 +1617,18 @@ static u64 __kvm_read_sanitised_id_reg(const struct kvm_vcpu *vcpu,
+>   		break;
+>   	case SYS_ID_AA64ISAR1_EL1:
+>   		if (!vcpu_has_ptrauth(vcpu))
+> -			val &= ~(ARM64_FEATURE_MASK(ID_AA64ISAR1_EL1_APA) |
+> -				 ARM64_FEATURE_MASK(ID_AA64ISAR1_EL1_API) |
+> -				 ARM64_FEATURE_MASK(ID_AA64ISAR1_EL1_GPA) |
+> -				 ARM64_FEATURE_MASK(ID_AA64ISAR1_EL1_GPI));
+> +			val &= ~(ID_AA64ISAR1_EL1_APA |
+> +				 ID_AA64ISAR1_EL1_API |
+> +				 ID_AA64ISAR1_EL1_GPA |
+> +				 ID_AA64ISAR1_EL1_GPI);
+>   		break;
+>   	case SYS_ID_AA64ISAR2_EL1:
+>   		if (!vcpu_has_ptrauth(vcpu))
+> -			val &= ~(ARM64_FEATURE_MASK(ID_AA64ISAR2_EL1_APA3) |
+> -				 ARM64_FEATURE_MASK(ID_AA64ISAR2_EL1_GPA3));
+> +			val &= ~(ID_AA64ISAR2_EL1_APA3 |
+> +				 ID_AA64ISAR2_EL1_GPA3);
+>   		if (!cpus_have_final_cap(ARM64_HAS_WFXT) ||
+>   		    has_broken_cntvoff())
+> -			val &= ~ARM64_FEATURE_MASK(ID_AA64ISAR2_EL1_WFxT);
+> +			val &= ~ID_AA64ISAR2_EL1_WFxT;
+>   		break;
+>   	case SYS_ID_AA64ISAR3_EL1:
+>   		val &= ID_AA64ISAR3_EL1_FPRCVT | ID_AA64ISAR3_EL1_FAMINMAX;
+> @@ -1644,7 +1644,7 @@ static u64 __kvm_read_sanitised_id_reg(const struct kvm_vcpu *vcpu,
+>   		       ID_AA64MMFR3_EL1_S1PIE;
+>   		break;
+>   	case SYS_ID_MMFR4_EL1:
+> -		val &= ~ARM64_FEATURE_MASK(ID_MMFR4_EL1_CCIDX);
+> +		val &= ~ID_MMFR4_EL1_CCIDX;
+>   		break;
+>   	}
+>   
+> @@ -1830,22 +1830,22 @@ static u64 sanitise_id_aa64pfr1_el1(const struct kvm_vcpu *vcpu, u64 val)
+>   	u64 pfr0 = read_sanitised_ftr_reg(SYS_ID_AA64PFR0_EL1);
+>   
+>   	if (!kvm_has_mte(vcpu->kvm)) {
+> -		val &= ~ARM64_FEATURE_MASK(ID_AA64PFR1_EL1_MTE);
+> -		val &= ~ARM64_FEATURE_MASK(ID_AA64PFR1_EL1_MTE_frac);
+> +		val &= ~ID_AA64PFR1_EL1_MTE;
+> +		val &= ~ID_AA64PFR1_EL1_MTE_frac;
+>   	}
+>   
+>   	if (!(cpus_have_final_cap(ARM64_HAS_RASV1P1_EXTN) &&
+>   	      SYS_FIELD_GET(ID_AA64PFR0_EL1, RAS, pfr0) == ID_AA64PFR0_EL1_RAS_IMP))
+> -		val &= ~ARM64_FEATURE_MASK(ID_AA64PFR1_EL1_RAS_frac);
+> -
+> -	val &= ~ARM64_FEATURE_MASK(ID_AA64PFR1_EL1_SME);
+> -	val &= ~ARM64_FEATURE_MASK(ID_AA64PFR1_EL1_RNDR_trap);
+> -	val &= ~ARM64_FEATURE_MASK(ID_AA64PFR1_EL1_NMI);
+> -	val &= ~ARM64_FEATURE_MASK(ID_AA64PFR1_EL1_GCS);
+> -	val &= ~ARM64_FEATURE_MASK(ID_AA64PFR1_EL1_THE);
+> -	val &= ~ARM64_FEATURE_MASK(ID_AA64PFR1_EL1_MTEX);
+> -	val &= ~ARM64_FEATURE_MASK(ID_AA64PFR1_EL1_PFAR);
+> -	val &= ~ARM64_FEATURE_MASK(ID_AA64PFR1_EL1_MPAM_frac);
+> +		val &= ~ID_AA64PFR1_EL1_RAS_frac;
 > +
-> +	if (!paddr)
-> +		return NULL;
-> +
-> +	/*
-> +	 * Obtain true physical address in kdump kernel when SME is enabled.
-> +	 * Currently, previous kernel with SME enabled and kdump kernel
-> +	 * with SME support disabled is not supported.
-> +	 */> +	phys = __sme_clr(paddr);
-> +
-> +	if (cc_platform_has(CC_ATTR_HOST_MEM_ENCRYPT))
-> +		return (__force void *)ioremap_encrypted(phys, size);
-> +	else
-> +		return memremap(phys, size, MEMREMAP_WB);
-> +}
-> +
->  /*
->   * Allocates the command buffer. This buffer is per AMD IOMMU. We can
->   * write commands to that buffer later and the IOMMU will execute them
-> @@ -942,8 +962,103 @@ static int iommu_init_ga_log(struct amd_iommu *iommu)
->  static int __init alloc_cwwb_sem(struct amd_iommu *iommu)
->  {
->  	iommu->cmd_sem = iommu_alloc_4k_pages(iommu, GFP_KERNEL, 1);
-> +	if (!iommu->cmd_sem)
-> +		return -ENOMEM;
-> +	iommu->cmd_sem_paddr = iommu_virt_to_phys((void *)iommu->cmd_sem);
-> +	return 0;
-> +}
-> +
-> +static int __init remap_event_buffer(struct amd_iommu *iommu)
-> +{
-> +	u64 paddr;
-> +
-> +	pr_info_once("Re-using event buffer from the previous kernel\n");
-> +	/*
-> +	 * Read-back the event log base address register and apply
-> +	 * PM_ADDR_MASK to obtain the event log base address.
+> +	val &= ~ID_AA64PFR1_EL1_SME;
+> +	val &= ~ID_AA64PFR1_EL1_RNDR_trap;
+> +	val &= ~ID_AA64PFR1_EL1_NMI;
+> +	val &= ~ID_AA64PFR1_EL1_GCS;
+> +	val &= ~ID_AA64PFR1_EL1_THE;
+> +	val &= ~ID_AA64PFR1_EL1_MTEX;
+> +	val &= ~ID_AA64PFR1_EL1_PFAR;
+> +	val &= ~ID_AA64PFR1_EL1_MPAM_frac;
+>   
+>   	return val;
+>   }
+> diff --git a/tools/arch/arm64/include/asm/sysreg.h b/tools/arch/arm64/include/asm/sysreg.h
+> index 690b6ebd118f4..65f2759ea27a3 100644
+> --- a/tools/arch/arm64/include/asm/sysreg.h
+> +++ b/tools/arch/arm64/include/asm/sysreg.h
+> @@ -1080,9 +1080,6 @@
+>   
+>   #define ARM64_FEATURE_FIELD_BITS	4
+>   
+> -/* Defined for compatibility only, do not add new users. */
+> -#define ARM64_FEATURE_MASK(x)	(x##_MASK)
+> -
+>   #ifdef __ASSEMBLY__
+>   
+>   	.macro	mrs_s, rt, sreg
+> diff --git a/tools/testing/selftests/kvm/arm64/aarch32_id_regs.c b/tools/testing/selftests/kvm/arm64/aarch32_id_regs.c
+> index cef8f7323ceb8..713005b6f508e 100644
+> --- a/tools/testing/selftests/kvm/arm64/aarch32_id_regs.c
+> +++ b/tools/testing/selftests/kvm/arm64/aarch32_id_regs.c
+> @@ -146,7 +146,7 @@ static bool vcpu_aarch64_only(struct kvm_vcpu *vcpu)
+>   
+>   	val = vcpu_get_reg(vcpu, KVM_ARM64_SYS_REG(SYS_ID_AA64PFR0_EL1));
+>   
+> -	el0 = FIELD_GET(ARM64_FEATURE_MASK(ID_AA64PFR0_EL1_EL0), val);
+> +	el0 = FIELD_GET(ID_AA64PFR0_EL1_EL0, val);
+>   	return el0 == ID_AA64PFR0_EL1_EL0_IMP;
+>   }
+>   
+> diff --git a/tools/testing/selftests/kvm/arm64/debug-exceptions.c b/tools/testing/selftests/kvm/arm64/debug-exceptions.c
+> index e34963956fbc9..1d431de8729c5 100644
+> --- a/tools/testing/selftests/kvm/arm64/debug-exceptions.c
+> +++ b/tools/testing/selftests/kvm/arm64/debug-exceptions.c
+> @@ -116,12 +116,12 @@ static void reset_debug_state(void)
+>   
+>   	/* Reset all bcr/bvr/wcr/wvr registers */
+>   	dfr0 = read_sysreg(id_aa64dfr0_el1);
+> -	brps = FIELD_GET(ARM64_FEATURE_MASK(ID_AA64DFR0_EL1_BRPs), dfr0);
+> +	brps = FIELD_GET(ID_AA64DFR0_EL1_BRPs, dfr0);
+>   	for (i = 0; i <= brps; i++) {
+>   		write_dbgbcr(i, 0);
+>   		write_dbgbvr(i, 0);
+>   	}
+> -	wrps = FIELD_GET(ARM64_FEATURE_MASK(ID_AA64DFR0_EL1_WRPs), dfr0);
+> +	wrps = FIELD_GET(ID_AA64DFR0_EL1_WRPs, dfr0);
+>   	for (i = 0; i <= wrps; i++) {
+>   		write_dbgwcr(i, 0);
+>   		write_dbgwvr(i, 0);
+> @@ -418,7 +418,7 @@ static void guest_code_ss(int test_cnt)
+>   
+>   static int debug_version(uint64_t id_aa64dfr0)
+>   {
+> -	return FIELD_GET(ARM64_FEATURE_MASK(ID_AA64DFR0_EL1_DebugVer), id_aa64dfr0);
+> +	return FIELD_GET(ID_AA64DFR0_EL1_DebugVer, id_aa64dfr0);
+>   }
+>   
+>   static void test_guest_debug_exceptions(uint8_t bpn, uint8_t wpn, uint8_t ctx_bpn)
+> @@ -539,14 +539,14 @@ void test_guest_debug_exceptions_all(uint64_t aa64dfr0)
+>   	int b, w, c;
+>   
+>   	/* Number of breakpoints */
+> -	brp_num = FIELD_GET(ARM64_FEATURE_MASK(ID_AA64DFR0_EL1_BRPs), aa64dfr0) + 1;
+> +	brp_num = FIELD_GET(ID_AA64DFR0_EL1_BRPs, aa64dfr0) + 1;
+>   	__TEST_REQUIRE(brp_num >= 2, "At least two breakpoints are required");
+>   
+>   	/* Number of watchpoints */
+> -	wrp_num = FIELD_GET(ARM64_FEATURE_MASK(ID_AA64DFR0_EL1_WRPs), aa64dfr0) + 1;
+> +	wrp_num = FIELD_GET(ID_AA64DFR0_EL1_WRPs, aa64dfr0) + 1;
+>   
+>   	/* Number of context aware breakpoints */
+> -	ctx_brp_num = FIELD_GET(ARM64_FEATURE_MASK(ID_AA64DFR0_EL1_CTX_CMPs), aa64dfr0) + 1;
+> +	ctx_brp_num = FIELD_GET(ID_AA64DFR0_EL1_CTX_CMPs, aa64dfr0) + 1;
+>   
+>   	pr_debug("%s brp_num:%d, wrp_num:%d, ctx_brp_num:%d\n", __func__,
+>   		 brp_num, wrp_num, ctx_brp_num);
+> diff --git a/tools/testing/selftests/kvm/arm64/no-vgic-v3.c b/tools/testing/selftests/kvm/arm64/no-vgic-v3.c
+> index ebd70430c89de..f222538e60841 100644
+> --- a/tools/testing/selftests/kvm/arm64/no-vgic-v3.c
+> +++ b/tools/testing/selftests/kvm/arm64/no-vgic-v3.c
+> @@ -54,7 +54,7 @@ static void guest_code(void)
+>   	 * Check that we advertise that ID_AA64PFR0_EL1.GIC == 0, having
+>   	 * hidden the feature at runtime without any other userspace action.
+>   	 */
+> -	__GUEST_ASSERT(FIELD_GET(ARM64_FEATURE_MASK(ID_AA64PFR0_EL1_GIC),
+> +	__GUEST_ASSERT(FIELD_GET(ID_AA64PFR0_EL1_GIC,
+>   				 read_sysreg(id_aa64pfr0_el1)) == 0,
+>   		       "GICv3 wrongly advertised");
+>   
+> @@ -165,7 +165,7 @@ int main(int argc, char *argv[])
+>   
+>   	vm = vm_create_with_one_vcpu(&vcpu, NULL);
+>   	pfr0 = vcpu_get_reg(vcpu, KVM_ARM64_SYS_REG(SYS_ID_AA64PFR0_EL1));
+> -	__TEST_REQUIRE(FIELD_GET(ARM64_FEATURE_MASK(ID_AA64PFR0_EL1_GIC), pfr0),
+> +	__TEST_REQUIRE(FIELD_GET(ID_AA64PFR0_EL1_GIC, pfr0),
+>   		       "GICv3 not supported.");
+>   	kvm_vm_free(vm);
+>   
+> diff --git a/tools/testing/selftests/kvm/arm64/page_fault_test.c b/tools/testing/selftests/kvm/arm64/page_fault_test.c
+> index dc6559dad9d86..4ccbd389d1336 100644
+> --- a/tools/testing/selftests/kvm/arm64/page_fault_test.c
+> +++ b/tools/testing/selftests/kvm/arm64/page_fault_test.c
+> @@ -95,14 +95,14 @@ static bool guest_check_lse(void)
+>   	uint64_t isar0 = read_sysreg(id_aa64isar0_el1);
+>   	uint64_t atomic;
+>   
+> -	atomic = FIELD_GET(ARM64_FEATURE_MASK(ID_AA64ISAR0_EL1_ATOMIC), isar0);
+> +	atomic = FIELD_GET(ID_AA64ISAR0_EL1_ATOMIC, isar0);
+>   	return atomic >= 2;
+>   }
+>   
+>   static bool guest_check_dc_zva(void)
+>   {
+>   	uint64_t dczid = read_sysreg(dczid_el0);
+> -	uint64_t dzp = FIELD_GET(ARM64_FEATURE_MASK(DCZID_EL0_DZP), dczid);
+> +	uint64_t dzp = FIELD_GET(DCZID_EL0_DZP, dczid);
+>   
+>   	return dzp == 0;
+>   }
+> @@ -195,7 +195,7 @@ static bool guest_set_ha(void)
+>   	uint64_t hadbs, tcr;
+>   
+>   	/* Skip if HA is not supported. */
+> -	hadbs = FIELD_GET(ARM64_FEATURE_MASK(ID_AA64MMFR1_EL1_HAFDBS), mmfr1);
+> +	hadbs = FIELD_GET(ID_AA64MMFR1_EL1_HAFDBS, mmfr1);
+>   	if (hadbs == 0)
+>   		return false;
+>   
+> diff --git a/tools/testing/selftests/kvm/arm64/set_id_regs.c b/tools/testing/selftests/kvm/arm64/set_id_regs.c
+> index d3bf9204409c3..36d40c267b994 100644
+> --- a/tools/testing/selftests/kvm/arm64/set_id_regs.c
+> +++ b/tools/testing/selftests/kvm/arm64/set_id_regs.c
+> @@ -594,8 +594,8 @@ static void test_user_set_mte_reg(struct kvm_vcpu *vcpu)
+>   	 */
+>   	val = vcpu_get_reg(vcpu, KVM_ARM64_SYS_REG(SYS_ID_AA64PFR1_EL1));
+>   
+> -	mte = FIELD_GET(ARM64_FEATURE_MASK(ID_AA64PFR1_EL1_MTE), val);
+> -	mte_frac = FIELD_GET(ARM64_FEATURE_MASK(ID_AA64PFR1_EL1_MTE_frac), val);
+> +	mte = FIELD_GET(ID_AA64PFR1_EL1_MTE, val);
+> +	mte_frac = FIELD_GET(ID_AA64PFR1_EL1_MTE_frac, val);
+>   	if (mte != ID_AA64PFR1_EL1_MTE_MTE2 ||
+>   	    mte_frac != ID_AA64PFR1_EL1_MTE_frac_NI) {
+>   		ksft_test_result_skip("MTE_ASYNC or MTE_ASYMM are supported, nothing to test\n");
+> @@ -612,7 +612,7 @@ static void test_user_set_mte_reg(struct kvm_vcpu *vcpu)
+>   	}
+>   
+>   	val = vcpu_get_reg(vcpu, KVM_ARM64_SYS_REG(SYS_ID_AA64PFR1_EL1));
+> -	mte_frac = FIELD_GET(ARM64_FEATURE_MASK(ID_AA64PFR1_EL1_MTE_frac), val);
+> +	mte_frac = FIELD_GET(ID_AA64PFR1_EL1_MTE_frac, val);
+>   	if (mte_frac == ID_AA64PFR1_EL1_MTE_frac_NI)
+>   		ksft_test_result_pass("ID_AA64PFR1_EL1.MTE_frac=0 accepted and still 0xF\n");
+>   	else
+> @@ -774,7 +774,7 @@ int main(void)
+>   
+>   	/* Check for AARCH64 only system */
+>   	val = vcpu_get_reg(vcpu, KVM_ARM64_SYS_REG(SYS_ID_AA64PFR0_EL1));
+> -	el0 = FIELD_GET(ARM64_FEATURE_MASK(ID_AA64PFR0_EL1_EL0), val);
+> +	el0 = FIELD_GET(ID_AA64PFR0_EL1_EL0, val);
+>   	aarch64_only = (el0 == ID_AA64PFR0_EL1_EL0_IMP);
+>   
+>   	ksft_print_header();
+> diff --git a/tools/testing/selftests/kvm/arm64/vpmu_counter_access.c b/tools/testing/selftests/kvm/arm64/vpmu_counter_access.c
+> index f16b3b27e32ed..a0c4ab8391559 100644
+> --- a/tools/testing/selftests/kvm/arm64/vpmu_counter_access.c
+> +++ b/tools/testing/selftests/kvm/arm64/vpmu_counter_access.c
+> @@ -441,7 +441,7 @@ static void create_vpmu_vm(void *guest_code)
+>   
+>   	/* Make sure that PMUv3 support is indicated in the ID register */
+>   	dfr0 = vcpu_get_reg(vpmu_vm.vcpu, KVM_ARM64_SYS_REG(SYS_ID_AA64DFR0_EL1));
+> -	pmuver = FIELD_GET(ARM64_FEATURE_MASK(ID_AA64DFR0_EL1_PMUVer), dfr0);
+> +	pmuver = FIELD_GET(ID_AA64DFR0_EL1_PMUVer, dfr0);
+>   	TEST_ASSERT(pmuver != ID_AA64DFR0_EL1_PMUVer_IMP_DEF &&
+>   		    pmuver >= ID_AA64DFR0_EL1_PMUVer_IMP,
+>   		    "Unexpected PMUVER (0x%x) on the vCPU with PMUv3", pmuver);
+> diff --git a/tools/testing/selftests/kvm/lib/arm64/processor.c b/tools/testing/selftests/kvm/lib/arm64/processor.c
+> index 9d69904cb6084..eb115123d7411 100644
+> --- a/tools/testing/selftests/kvm/lib/arm64/processor.c
+> +++ b/tools/testing/selftests/kvm/lib/arm64/processor.c
+> @@ -573,15 +573,15 @@ void aarch64_get_supported_page_sizes(uint32_t ipa, uint32_t *ipa4k,
+>   	err = ioctl(vcpu_fd, KVM_GET_ONE_REG, &reg);
+>   	TEST_ASSERT(err == 0, KVM_IOCTL_ERROR(KVM_GET_ONE_REG, vcpu_fd));
+>   
+> -	gran = FIELD_GET(ARM64_FEATURE_MASK(ID_AA64MMFR0_EL1_TGRAN4), val);
+> +	gran = FIELD_GET(ID_AA64MMFR0_EL1_TGRAN4, val);
+>   	*ipa4k = max_ipa_for_page_size(ipa, gran, ID_AA64MMFR0_EL1_TGRAN4_NI,
+>   					ID_AA64MMFR0_EL1_TGRAN4_52_BIT);
+>   
+> -	gran = FIELD_GET(ARM64_FEATURE_MASK(ID_AA64MMFR0_EL1_TGRAN64), val);
+> +	gran = FIELD_GET(ID_AA64MMFR0_EL1_TGRAN64, val);
+>   	*ipa64k = max_ipa_for_page_size(ipa, gran, ID_AA64MMFR0_EL1_TGRAN64_NI,
+>   					ID_AA64MMFR0_EL1_TGRAN64_IMP);
+>   
+> -	gran = FIELD_GET(ARM64_FEATURE_MASK(ID_AA64MMFR0_EL1_TGRAN16), val);
+> +	gran = FIELD_GET(ID_AA64MMFR0_EL1_TGRAN16, val);
+>   	*ipa16k = max_ipa_for_page_size(ipa, gran, ID_AA64MMFR0_EL1_TGRAN16_NI,
+>   					ID_AA64MMFR0_EL1_TGRAN16_52_BIT);
+>   
 
-IMO this comment is redundant. Its implicit that we have to apply the addr_mask
-to get the actual address.
+-- 
+Thanks,
 
-> +	 */
-> +	paddr = readq(iommu->mmio_base + MMIO_EVT_BUF_OFFSET) & PM_ADDR_MASK;
-> +	iommu->evt_buf = iommu_memremap(paddr, EVT_BUFFER_SIZE);
->  
-> -	return iommu->cmd_sem ? 0 : -ENOMEM;
-> +	return iommu->evt_buf ? 0 : -ENOMEM;
-> +}
-> +
-> +static int __init remap_command_buffer(struct amd_iommu *iommu)
-> +{
-> +	u64 paddr;
-> +
-> +	pr_info_once("Re-using command buffer from the previous kernel\n");
-> +	/*
-> +	 * Read-back the command buffer base address register and apply
-> +	 * PM_ADDR_MASK to obtain the command buffer base address.
-
-ditto.
-
-
--Vasant
+Ben
 
 
