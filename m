@@ -1,72 +1,70 @@
-Return-Path: <kvm+bounces-55244-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-55245-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id E2162B2ECDB
-	for <lists+kvm@lfdr.de>; Thu, 21 Aug 2025 06:33:04 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 64177B2ECDD
+	for <lists+kvm@lfdr.de>; Thu, 21 Aug 2025 06:33:25 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 645983B2B62
-	for <lists+kvm@lfdr.de>; Thu, 21 Aug 2025 04:32:20 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E41413B8824
+	for <lists+kvm@lfdr.de>; Thu, 21 Aug 2025 04:32:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E11A72E972B;
-	Thu, 21 Aug 2025 04:29:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A60B22E8DFD;
+	Thu, 21 Aug 2025 04:29:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="4Auc1pgo"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="ALNRhTeW"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pf1-f201.google.com (mail-pf1-f201.google.com [209.85.210.201])
+Received: from mail-pj1-f74.google.com (mail-pj1-f74.google.com [209.85.216.74])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C38082E8DFD
-	for <kvm@vger.kernel.org>; Thu, 21 Aug 2025 04:29:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 188C42E9EB9
+	for <kvm@vger.kernel.org>; Thu, 21 Aug 2025 04:29:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.74
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755750578; cv=none; b=oLgt1PEYvrnE9vHnqUaeHI3+XQIfc3UCgizUvZ35E0GrRgHDpFL4wxqwnV7bQxd/BdSuJ84oKW9Iv6BgJKjPZzJNQR/FDKtBAe1fBGjFgDdAp8kwpW6OyjhRIISF1PIXOpNFCZHVPmQ1QUTTDZ0dhqZx0TPRtVtniMNSh8QLIUE=
+	t=1755750579; cv=none; b=Sjf7Tbk/WaIA/ZDvbvd9sGKJP6OZSRJpg9Oy9L2/9j+XDE7qc9WIi5ueyROqLuiy3MXrhhQ+jlQlOVq2Ec1r//vCIxIUNePEPGn/HX2tZcadb5mNu37v6iP882u742TK7xV8j6rxVhYfxdZi1zeCJ9E2kgneXnEJiUYoDMad9mQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755750578; c=relaxed/simple;
-	bh=ZVougY0dY2ceOBEi33N2vgqPtFJB9JaguczwRJ00Jt0=;
+	s=arc-20240116; t=1755750579; c=relaxed/simple;
+	bh=WYSCahPc97Dp7a3hSBhRkaF2q4QSaC9BvZop9GqIJq0=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=rSyUImRBbz9Kga5YSmcQQphJHIdBYqs/Mea6oN95QtDnN+AHqIEbILRfv9Tm6Kq169+x5m4QGZbXODX3d7UMbcFrHmW6otn/aqEbDNdYyXe+ElS3/H1D+PV2+TINotA3GarjnEEftf9b2om+AqSb6DNRUuljIAowlT/Fq+kKqdk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--sagis.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=4Auc1pgo; arc=none smtp.client-ip=209.85.210.201
+	 To:Cc:Content-Type; b=uHxeeB5kusTVLT8PMdzgohLVdI+KoHNlKzKT1gRGzrDVHOxm+qojr/HcxtAq0plw4lGjVMs+rabzwplusE3ZyJ3k88tHgHQhe6lqGEZ9+93rvl7eLNLS1+SQT48x6q6k9WV33L3gwojRbRzkSI6PPJTTOYHAHxHZJvtqq84AblQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--sagis.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=ALNRhTeW; arc=none smtp.client-ip=209.85.216.74
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--sagis.bounces.google.com
-Received: by mail-pf1-f201.google.com with SMTP id d2e1a72fcca58-76e2e8e28e1so1849205b3a.1
-        for <kvm@vger.kernel.org>; Wed, 20 Aug 2025 21:29:36 -0700 (PDT)
+Received: by mail-pj1-f74.google.com with SMTP id 98e67ed59e1d1-323266dca73so634018a91.0
+        for <kvm@vger.kernel.org>; Wed, 20 Aug 2025 21:29:38 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1755750576; x=1756355376; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:from:subject:message-id:references
-         :mime-version:in-reply-to:date:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=qxaWAzbRUzLCtzcho8oC+x5AUN01HLmIiDUYO6cqfgU=;
-        b=4Auc1pgo2ImEG6nvhTX6Gw5N/JP3kZd3qsWtWLGXe8Q7F4se6mQ6YES/6iMvE4Fovo
-         21CPmWBFNDdczswRCLWWW56rKtrOG1Bza/PYLII+An5GbQhetICFgN5o5s2Tozt3mdNK
-         z8aAOb6Xca4vYbyHgRSKzHY4+4TURfbR8JjicV7dLMeij8ArP2UvL4WPlRqTL7t44M2I
-         vbq7fxXPVqLA59ogOXMG7kK6WpimBsvRz72zsMx/pWGNi6vYJwtU/MeEgxhhuzU5TGYX
-         w/vEP4I9Kk+vCROPyW9dGIx/WhCbM9jljC6tDjntPdE7iKrr+A5F/Cg8I+VWHkoM6qLF
-         +TtQ==
+        d=google.com; s=20230601; t=1755750577; x=1756355377; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=BuALvT5ZGfbYX3094HPDKOt5yW9fOwijgOQDunJFIKs=;
+        b=ALNRhTeWIFz36ge7zoevUo40OoFy4wSdKP81Q+abYvV+k9QTHT9fmKlX4yqTlS+6wF
+         UQnKYN3oTtHM3a4GMmC9KIsQjgvOqDX43R/goRksT47BwXO6mBB9VCdXBAll5in7SMuf
+         ai3WtxLd9fMwT/ZtrIU+vgKLmVUDxMT8978auHnquT+HV9V6Ujhnj+0MYAA1m2DWavf5
+         FH/x9strnn/uGkpBwro5Gnf8X6Kz3c1y2GQsIrWMQVgg/tV9o2BI0I25OE6LIRb0l4tw
+         Gp+CitOdT4N7FSV2cI3dO4qTt25Rg2Cm50ERxiewNukiEVdhBv6Ja+cpsM+b9FE0Lmry
+         2ZYg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1755750576; x=1756355376;
-        h=content-transfer-encoding:cc:to:from:subject:message-id:references
-         :mime-version:in-reply-to:date:x-gm-message-state:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=qxaWAzbRUzLCtzcho8oC+x5AUN01HLmIiDUYO6cqfgU=;
-        b=n30A5VJ7EjEwaUH+dUbEl+dVunHXA+PSYbhlDALcT1QFSw9quJnvrssXf2xKtpBgIB
-         /Q46loEOoY4S4gawoLpO3G//50Yae9xdVjNpKFdr/l9epGjVGL2QVkf9a4wNLi+t4kbG
-         ywI2qBQ9bW3KGPpnBQsmBzB2hQp5aMMzPD7Stg13kdJjkvUj/fGLBfoZyqN474c9EJLI
-         OcyUhMWBTS89XJTLKRhzVsRvLRyrJNV95ZT/tf9DiO+Wpi4HJCcwu3BW6BfasFbKsaas
-         0r0Win1ekSRNZxWGd3fUuVMW6NdeWpFB78rPdR7QmyJ07GLgTFMhkon7nwoUpsti9i7J
-         /Ljw==
-X-Forwarded-Encrypted: i=1; AJvYcCW2W8zK9+wHNWrFv+76El7CGUj89Ep0QHk32eSMP1Yc8kVPPYO563QNTMhbkpj0CXt1TCE=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yz7dpgsHzXe0+zO3Be5ubtProQrRrXRhJHf1MFOujKB0yBik+Lq
-	1l+/vYjHok4QD6cvstt/vb+WuZPsqVRTafSqp+iqy40w4b0dCkF97HKmplBsdj5Tfh9/LPko8BW
-	Vzw==
-X-Google-Smtp-Source: AGHT+IHnjpFoTbfwDN7Mg8/PDSYsq+ZuUsM1vByP70khuw6E+rVAxKF66kUKvJSM3bENe4ub1NMjckWTzQ==
-X-Received: from pfuv10.prod.google.com ([2002:a05:6a00:148a:b0:76e:2713:9ad0])
- (user=sagis job=prod-delivery.src-stubby-dispatcher) by 2002:a05:6a00:238c:b0:749:b41:2976
- with SMTP id d2e1a72fcca58-76ea30efd03mr1081092b3a.3.1755750575792; Wed, 20
- Aug 2025 21:29:35 -0700 (PDT)
-Date: Wed, 20 Aug 2025 21:29:01 -0700
+        d=1e100.net; s=20230601; t=1755750577; x=1756355377;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=BuALvT5ZGfbYX3094HPDKOt5yW9fOwijgOQDunJFIKs=;
+        b=qRwO9lSD2fe2Lr/mom9mSNH73ak/jROH3Fhxji08hB/jUK47TWyywanmkSIStjavRI
+         NOCN0eXl5W5/K9XBu/ONjt0cnkvnM+jqlvbGlQUCKQ67DVHK6H62PAUo5/4r1TLgSVed
+         2DnLgtHhO35XZaPQLlCrJ3mmHhSX+BCw6DbjuQg5McUGj7BoJUpisV9RdW9EzpdAib7C
+         TC+wmDWUhYWx9qfpQTQoeshMFyNHYL7tWj8i1hve21gNBIfWCM7ZrrShUov1+PfVDYTC
+         OPWyi4Z72XXyQtQrzOHH0R32YJ/fucUSTvaRm598sOXbJnN74+P2STaCSpz3sICRIMvV
+         MPFg==
+X-Forwarded-Encrypted: i=1; AJvYcCWIZUuHNkOH7zejRrHJURQueOfY+oS/PAd1d9crUW3+tUTt4Eo/BYe0pTmxP2+r5Dgrm74=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyQ2FGCM0lonUoAKGjUVjaHZ4nYiu7N3aCKkHc1jSARq51U9hov
+	A0yG9Bj4WwFTMrYdXUZtA8ZAxPKsp/KnwZSWcMQHKW6jBRAIcfZ0I8sEsQN/WovKNuFsJTQFQAW
+	N0Q==
+X-Google-Smtp-Source: AGHT+IFZTl3845re2w3FRi4UAPbxQNxCvZuTkjGFe41nQW/+9ddI/TXSY0XRR/XmOyMduRY3I8tioIhDfA==
+X-Received: from pjbsd6.prod.google.com ([2002:a17:90b:5146:b0:321:c475:716e])
+ (user=sagis job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:4c0a:b0:321:b953:85ad
+ with SMTP id 98e67ed59e1d1-324ed12de31mr1451034a91.30.1755750577515; Wed, 20
+ Aug 2025 21:29:37 -0700 (PDT)
+Date: Wed, 20 Aug 2025 21:29:02 -0700
 In-Reply-To: <20250821042915.3712925-1-sagis@google.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
@@ -76,9 +74,8 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
 References: <20250821042915.3712925-1-sagis@google.com>
 X-Mailer: git-send-email 2.51.0.rc1.193.gad69d77794-goog
-Message-ID: <20250821042915.3712925-9-sagis@google.com>
-Subject: [PATCH v9 08/19] KVM: selftests: Define structs to pass parameters to
- TDX boot code
+Message-ID: <20250821042915.3712925-10-sagis@google.com>
+Subject: [PATCH v9 09/19] KVM: selftests: Add TDX boot code
 From: Sagi Shahar <sagis@google.com>
 To: linux-kselftest@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>, 
 	Shuah Khan <shuah@kernel.org>, Sean Christopherson <seanjc@google.com>, 
@@ -92,230 +89,151 @@ To: linux-kselftest@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
 	Chenyi Qiang <chenyi.qiang@intel.com>
 Cc: linux-kernel@vger.kernel.org, kvm@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
 
-TDX registers are inaccesible to KVM. Therefore we need a different
-mechanism to load boot parameters for TDX code. TDX boot code will read
-the registers values from memory and set the registers manually.
+From: Erdem Aktas <erdemaktas@google.com>
 
-This patch defines the data structures used to communicate between c
-code and the TDX assembly boot code which will be added in a later
-patch.
+Add code to boot a TDX test VM. Since TDX registers are inaccesible to
+KVM, the boot code loads the relevant values from memory into the
+registers before jumping to the guest code.
 
-Use kbuild.h to expose the offsets into the structs from c code to
-assembly code.
-
+Signed-off-by: Erdem Aktas <erdemaktas@google.com>
 Co-developed-by: Ackerley Tng <ackerleytng@google.com>
 Signed-off-by: Ackerley Tng <ackerleytng@google.com>
+Co-developed-by: Sagi Shahar <sagis@google.com>
 Signed-off-by: Sagi Shahar <sagis@google.com>
 ---
- tools/testing/selftests/kvm/Makefile.kvm      | 18 +++++
- .../selftests/kvm/include/x86/tdx/td_boot.h   | 76 +++++++++++++++++++
- .../kvm/lib/x86/tdx/td_boot_offsets.c         | 21 +++++
- 3 files changed, 115 insertions(+)
- create mode 100644 tools/testing/selftests/kvm/include/x86/tdx/td_boot.h
- create mode 100644 tools/testing/selftests/kvm/lib/x86/tdx/td_boot_offsets=
-.c
+ tools/testing/selftests/kvm/Makefile.kvm      |  3 +
+ .../selftests/kvm/include/x86/tdx/td_boot.h   |  5 ++
+ .../kvm/include/x86/tdx/td_boot_asm.h         | 16 +++++
+ .../selftests/kvm/lib/x86/tdx/td_boot.S       | 60 +++++++++++++++++++
+ 4 files changed, 84 insertions(+)
+ create mode 100644 tools/testing/selftests/kvm/include/x86/tdx/td_boot_asm.h
+ create mode 100644 tools/testing/selftests/kvm/lib/x86/tdx/td_boot.S
 
-diff --git a/tools/testing/selftests/kvm/Makefile.kvm b/tools/testing/selft=
-ests/kvm/Makefile.kvm
-index f6fe7a07a0a2..f4686445c197 100644
+diff --git a/tools/testing/selftests/kvm/Makefile.kvm b/tools/testing/selftests/kvm/Makefile.kvm
+index f4686445c197..03754ce2e983 100644
 --- a/tools/testing/selftests/kvm/Makefile.kvm
 +++ b/tools/testing/selftests/kvm/Makefile.kvm
-@@ -19,6 +19,8 @@ LIBKVM +=3D lib/userfaultfd_util.c
-=20
- LIBKVM_STRING +=3D lib/string_override.c
-=20
-+LIBKVM_ASM_DEFS +=3D lib/x86/tdx/td_boot_offsets.c
-+
- LIBKVM_x86 +=3D lib/x86/apic.c
- LIBKVM_x86 +=3D lib/x86/handlers.S
- LIBKVM_x86 +=3D lib/x86/hyperv.c
-@@ -229,6 +231,10 @@ OVERRIDE_TARGETS =3D 1
- include ../lib.mk
- include ../cgroup/lib/libcgroup.mk
-=20
-+# Enable Kbuild tools.
-+include $(top_srcdir)/scripts/Kbuild.include
-+include $(top_srcdir)/scripts/Makefile.lib
-+
- INSTALL_HDR_PATH =3D $(top_srcdir)/usr
- LINUX_HDR_PATH =3D $(INSTALL_HDR_PATH)/include/
- LINUX_TOOL_INCLUDE =3D $(top_srcdir)/tools/include
-@@ -281,6 +287,7 @@ LIBKVM_S :=3D $(filter %.S,$(LIBKVM))
- LIBKVM_C_OBJ :=3D $(patsubst %.c, $(OUTPUT)/%.o, $(LIBKVM_C))
- LIBKVM_S_OBJ :=3D $(patsubst %.S, $(OUTPUT)/%.o, $(LIBKVM_S))
- LIBKVM_STRING_OBJ :=3D $(patsubst %.c, $(OUTPUT)/%.o, $(LIBKVM_STRING))
-+LIBKVM_ASM_DEFS_OBJ +=3D $(patsubst %.c, $(OUTPUT)/%.s, $(LIBKVM_ASM_DEFS)=
-)
- LIBKVM_OBJS =3D $(LIBKVM_C_OBJ) $(LIBKVM_S_OBJ) $(LIBKVM_STRING_OBJ) $(LIB=
-CGROUP_O)
- SPLIT_TEST_GEN_PROGS :=3D $(patsubst %, $(OUTPUT)/%, $(SPLIT_TESTS))
- SPLIT_TEST_GEN_OBJ :=3D $(patsubst %, $(OUTPUT)/$(ARCH)/%.o, $(SPLIT_TESTS=
-))
-@@ -307,6 +314,7 @@ $(SPLIT_TEST_GEN_OBJ): $(OUTPUT)/$(ARCH)/%.o: $(ARCH)/%=
-.c
-=20
- EXTRA_CLEAN +=3D $(GEN_HDRS) \
- 	       $(LIBKVM_OBJS) \
-+	       $(LIBKVM_ASM_DEFS_OBJ) \
- 	       $(SPLIT_TEST_GEN_OBJ) \
- 	       $(TEST_DEP_FILES) \
- 	       $(TEST_GEN_OBJ) \
-@@ -318,18 +326,28 @@ $(LIBKVM_C_OBJ): $(OUTPUT)/%.o: %.c $(GEN_HDRS)
- $(LIBKVM_S_OBJ): $(OUTPUT)/%.o: %.S $(GEN_HDRS)
- 	$(CC) $(CFLAGS) $(CPPFLAGS) $(TARGET_ARCH) -c $< -o $@
-=20
-+$(LIBKVM_ASM_DEFS_OBJ): $(OUTPUT)/%.s: %.c FORCE
-+	$(CC) $(CFLAGS) $(CPPFLAGS) $(TARGET_ARCH) -S $< -o $@
-+
- # Compile the string overrides as freestanding to prevent the compiler fro=
-m
- # generating self-referential code, e.g. without "freestanding" the compil=
-er may
- # "optimize" memcmp() by invoking memcmp(), thus causing infinite recursio=
-n.
+@@ -31,6 +31,7 @@ LIBKVM_x86 += lib/x86/sev.c
+ LIBKVM_x86 += lib/x86/svm.c
+ LIBKVM_x86 += lib/x86/ucall.c
+ LIBKVM_x86 += lib/x86/vmx.c
++LIBKVM_x86 += lib/x86/tdx/td_boot.S
+ 
+ LIBKVM_arm64 += lib/arm64/gic.c
+ LIBKVM_arm64 += lib/arm64/gic_v3.c
+@@ -335,6 +336,8 @@ $(LIBKVM_ASM_DEFS_OBJ): $(OUTPUT)/%.s: %.c FORCE
  $(LIBKVM_STRING_OBJ): $(OUTPUT)/%.o: %.c
  	$(CC) $(CFLAGS) $(CPPFLAGS) $(TARGET_ARCH) -c -ffreestanding $< -o $@
-=20
-+$(OUTPUT)/include/x86/tdx/td_boot_offsets.h: $(OUTPUT)/lib/x86/tdx/td_boot=
-_offsets.s FORCE
-+	$(call filechk,offsets,__TDX_BOOT_OFFSETS_H__)
+ 
++$(OUTPUT)/lib/x86/tdx/td_boot.o: $(OUTPUT)/include/x86/tdx/td_boot_offsets.h
 +
-+EXTRA_CLEAN +=3D $(OUTPUT)/include/x86/tdx/td_boot_offsets.h
-+
- $(shell mkdir -p $(sort $(dir $(TEST_GEN_PROGS))))
- $(SPLIT_TEST_GEN_OBJ): $(GEN_HDRS)
- $(TEST_GEN_PROGS): $(LIBKVM_OBJS)
- $(TEST_GEN_PROGS_EXTENDED): $(LIBKVM_OBJS)
- $(TEST_GEN_OBJ): $(GEN_HDRS)
-=20
-+FORCE:
-+
- cscope: include_paths =3D $(LINUX_TOOL_INCLUDE) $(LINUX_HDR_PATH) include =
-lib ..
- cscope:
- 	$(RM) cscope.*
-diff --git a/tools/testing/selftests/kvm/include/x86/tdx/td_boot.h b/tools/=
-testing/selftests/kvm/include/x86/tdx/td_boot.h
-new file mode 100644
-index 000000000000..5cce671586e9
---- /dev/null
+ $(OUTPUT)/include/x86/tdx/td_boot_offsets.h: $(OUTPUT)/lib/x86/tdx/td_boot_offsets.s FORCE
+ 	$(call filechk,offsets,__TDX_BOOT_OFFSETS_H__)
+ 
+diff --git a/tools/testing/selftests/kvm/include/x86/tdx/td_boot.h b/tools/testing/selftests/kvm/include/x86/tdx/td_boot.h
+index 5cce671586e9..65ccc65efaeb 100644
+--- a/tools/testing/selftests/kvm/include/x86/tdx/td_boot.h
 +++ b/tools/testing/selftests/kvm/include/x86/tdx/td_boot.h
-@@ -0,0 +1,76 @@
-+/* SPDX-License-Identifier: GPL-2.0-only */
-+#ifndef SELFTEST_TDX_TD_BOOT_H
-+#define SELFTEST_TDX_TD_BOOT_H
+@@ -73,4 +73,9 @@ struct td_boot_parameters {
+ 	struct td_per_vcpu_parameters per_vcpu[];
+ };
+ 
++void td_boot(void);
++void td_boot_code_end(void);
 +
-+#include <stdint.h>
++#define TD_BOOT_CODE_SIZE (td_boot_code_end - td_boot)
 +
-+#include <linux/compiler.h>
-+#include <linux/sizes.h>
-+
-+/*
-+ * Layout for boot section (not to scale)
-+ *
-+ *                                   GPA
-+ * _________________________________ 0x1_0000_0000 (4GB)
-+ * |   Boot code trampoline    |
-+ * |___________________________|____ 0x0_ffff_fff0: Reset vector (16B belo=
-w 4GB)
-+ * |   Boot code               |
-+ * |___________________________|____ td_boot will be copied here, so that =
-the
-+ * |                           |     jmp to td_boot is exactly at the rese=
-t vector
-+ * |   Empty space             |
-+ * |                           |
-+ * |=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=
-=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=
-=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=
-=94=80=E2=94=80=E2=94=80|
-+ * |                           |
-+ * |                           |
-+ * |   Boot parameters         |
-+ * |                           |
-+ * |                           |
-+ * |___________________________|____ 0x0_ffff_0000: TD_BOOT_PARAMETERS_GPA
-+ */
-+#define FOUR_GIGABYTES_GPA (SZ_4G)
-+
-+/*
-+ * The exact memory layout for LGDT or LIDT instructions.
-+ */
-+struct __packed td_boot_parameters_dtr {
-+	uint16_t limit;
-+	uint32_t base;
-+};
-+
-+/*
-+ * Allows each vCPU to be initialized with different eip and esp.
-+ *
-+ * __packed is used since the offsets are hardcoded in td_boot.S
-+ *
-+ * TODO: Replace hardcoded offsets with OFFSET(). This requires getting th=
-e
-+ * neccesry Kbuild scripts working in KVM selftests.
-+ */
-+struct td_per_vcpu_parameters {
-+	uint32_t esp_gva;
-+	uint64_t guest_code;
-+};
-+
-+/*
-+ * Boot parameters for the TD.
-+ *
-+ * Unlike a regular VM, KVM cannot set registers such as esp, eip, etc
-+ * before boot, so to run selftests, these registers' values have to be
-+ * initialized by the TD.
-+ *
-+ * This struct is loaded in TD private memory at TD_BOOT_PARAMETERS_GPA.
-+ *
-+ * The TD boot code will read off parameters from this struct and set up t=
-he
-+ * vCPU for executing selftests.
-+ *
-+ * __packed is used since the offsets are hardcoded in td_boot.S
-+ */
-+struct td_boot_parameters {
-+	uint32_t cr0;
-+	uint32_t cr3;
-+	uint32_t cr4;
-+	struct td_boot_parameters_dtr gdtr;
-+	struct td_boot_parameters_dtr idtr;
-+	struct td_per_vcpu_parameters per_vcpu[];
-+};
-+
-+#endif /* SELFTEST_TDX_TD_BOOT_H */
-diff --git a/tools/testing/selftests/kvm/lib/x86/tdx/td_boot_offsets.c b/to=
-ols/testing/selftests/kvm/lib/x86/tdx/td_boot_offsets.c
+ #endif /* SELFTEST_TDX_TD_BOOT_H */
+diff --git a/tools/testing/selftests/kvm/include/x86/tdx/td_boot_asm.h b/tools/testing/selftests/kvm/include/x86/tdx/td_boot_asm.h
 new file mode 100644
-index 000000000000..7f76a3585b99
+index 000000000000..10b4b527595c
 --- /dev/null
-+++ b/tools/testing/selftests/kvm/lib/x86/tdx/td_boot_offsets.c
-@@ -0,0 +1,21 @@
-+// SPDX-License-Identifier: GPL-2.0
-+#define COMPILE_OFFSETS
++++ b/tools/testing/selftests/kvm/include/x86/tdx/td_boot_asm.h
+@@ -0,0 +1,16 @@
++/* SPDX-License-Identifier: GPL-2.0-only */
++#ifndef SELFTEST_TDX_TD_BOOT_ASM_H
++#define SELFTEST_TDX_TD_BOOT_ASM_H
 +
-+#include <linux/kbuild.h>
++/*
++ * GPA where TD boot parameters will be loaded.
++ *
++ * TD_BOOT_PARAMETERS_GPA is arbitrarily chosen to
++ *
++ * + be within the 4GB address space
++ * + provide enough contiguous memory for the struct td_boot_parameters such
++ *   that there is one struct td_per_vcpu_parameters for KVM_MAX_VCPUS
++ */
++#define TD_BOOT_PARAMETERS_GPA 0xffff0000
 +
-+#include "tdx/td_boot.h"
++#endif  // SELFTEST_TDX_TD_BOOT_ASM_H
+diff --git a/tools/testing/selftests/kvm/lib/x86/tdx/td_boot.S b/tools/testing/selftests/kvm/lib/x86/tdx/td_boot.S
+new file mode 100644
+index 000000000000..7aa33caa9a78
+--- /dev/null
++++ b/tools/testing/selftests/kvm/lib/x86/tdx/td_boot.S
+@@ -0,0 +1,60 @@
++/* SPDX-License-Identifier: GPL-2.0-only */
 +
-+static void __attribute__((used)) common(void)
-+{
-+	OFFSET(TD_BOOT_PARAMETERS_CR0, td_boot_parameters, cr0);
-+	OFFSET(TD_BOOT_PARAMETERS_CR3, td_boot_parameters, cr3);
-+	OFFSET(TD_BOOT_PARAMETERS_CR4, td_boot_parameters, cr4);
-+	OFFSET(TD_BOOT_PARAMETERS_GDT, td_boot_parameters, gdtr);
-+	OFFSET(TD_BOOT_PARAMETERS_IDT, td_boot_parameters, idtr);
-+	OFFSET(TD_BOOT_PARAMETERS_PER_VCPU, td_boot_parameters, per_vcpu);
-+	OFFSET(TD_PER_VCPU_PARAMETERS_ESP_GVA, td_per_vcpu_parameters, esp_gva);
-+	OFFSET(TD_PER_VCPU_PARAMETERS_GUEST_CODE, td_per_vcpu_parameters,
-+	       guest_code);
-+	DEFINE(SIZEOF_TD_PER_VCPU_PARAMETERS,
-+	       sizeof(struct td_per_vcpu_parameters));
-+}
---=20
++#include "tdx/td_boot_asm.h"
++#include "tdx/td_boot_offsets.h"
++#include "processor_asm.h"
++
++.code32
++
++.globl td_boot
++td_boot:
++	/* In this procedure, edi is used as a temporary register. */
++	cli
++
++	/* Paging is off. */
++
++	movl $TD_BOOT_PARAMETERS_GPA, %ebx
++
++	/*
++	 * Find the address of struct td_per_vcpu_parameters for this
++	 * vCPU based on esi (TDX spec: initialized with vCPU id). Put
++	 * struct address into register for indirect addressing.
++	 */
++	movl $SIZEOF_TD_PER_VCPU_PARAMETERS, %eax
++	mul %esi
++	leal TD_BOOT_PARAMETERS_PER_VCPU(%ebx), %edi
++	addl %edi, %eax
++
++	/* Setup stack. */
++	movl TD_PER_VCPU_PARAMETERS_ESP_GVA(%eax), %esp
++
++	/* Setup GDT. */
++	leal TD_BOOT_PARAMETERS_GDT(%ebx), %edi
++	lgdt (%edi)
++
++	/* Setup IDT. */
++	leal TD_BOOT_PARAMETERS_IDT(%ebx), %edi
++	lidt (%edi)
++
++	/*
++	 * Set up control registers (There are no instructions to mov from
++	 * memory to control registers, hence use edi as a scratch register).
++	 */
++	movl TD_BOOT_PARAMETERS_CR4(%ebx), %edi
++	movl %edi, %cr4
++	movl TD_BOOT_PARAMETERS_CR3(%ebx), %edi
++	movl %edi, %cr3
++	movl TD_BOOT_PARAMETERS_CR0(%ebx), %edi
++	movl %edi, %cr0
++
++	/* Switching to 64bit mode after ljmp and then jump to guest code */
++	ljmp $(KERNEL_CS),$1f
++1:
++	jmp *TD_PER_VCPU_PARAMETERS_GUEST_CODE(%eax)
++
++/* Leave marker so size of td_boot code can be computed. */
++.globl td_boot_code_end
++td_boot_code_end:
++
++/* Disable executable stack. */
++.section .note.GNU-stack,"",%progbits
+-- 
 2.51.0.rc1.193.gad69d77794-goog
 
 
