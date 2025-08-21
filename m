@@ -1,287 +1,335 @@
-Return-Path: <kvm+bounces-55257-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-55258-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 972F4B2ED96
-	for <lists+kvm@lfdr.de>; Thu, 21 Aug 2025 07:29:53 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id B9BAAB2EDE3
+	for <lists+kvm@lfdr.de>; Thu, 21 Aug 2025 08:03:00 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 107143BB3A7
-	for <lists+kvm@lfdr.de>; Thu, 21 Aug 2025 05:27:50 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4FD775E23C4
+	for <lists+kvm@lfdr.de>; Thu, 21 Aug 2025 06:02:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6F37D2C08AD;
-	Thu, 21 Aug 2025 05:27:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6FB8B28642E;
+	Thu, 21 Aug 2025 06:02:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="S1jeA721"
+	dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b="G2Pm+G6M"
 X-Original-To: kvm@vger.kernel.org
-Received: from NAM10-BN7-obe.outbound.protection.outlook.com (mail-bn7nam10on2079.outbound.protection.outlook.com [40.107.92.79])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ej1-f48.google.com (mail-ej1-f48.google.com [209.85.218.48])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 060A8288C0E;
-	Thu, 21 Aug 2025 05:27:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.92.79
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755754061; cv=fail; b=k2eSqUjZOVyUk9eAFOakRYBKqZi7qzSpeUg5TZoT8/St1V2L81usT7uoyswXz0CmnPAw5HvCs7YWI+gruACySamxXS9y1xBr/mx9dHZrU7KpcB7PJZbVZhjoiTBLNrETFUMgKa7udSfdIlpf3TjZfnTeNMVLYWNs+STaw1eyuc4=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755754061; c=relaxed/simple;
-	bh=QEA87s9dqv5J+6RYYdJGCFFX5rpYvzf8KVvTfrg4Lx8=;
-	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
-	 Content-Type:MIME-Version; b=QJT7Z1p59KvtM1XvveTLOafcCDC5jaexADeVnfF3aR4UD0KCk0UQjMX2w4O126AwedyaqRX6Rt+S2IRSNdbcnXtFGdDDPOFyjh29I2up6ybjlkzbPbAX1yJV5j4QAuIjDyMUMBsg9thUnNP0OHrN81nVWDfxBTgsBaHcAHEjPyI=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=S1jeA721; arc=fail smtp.client-ip=40.107.92.79
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=Sx0y2tzDVwrTrTykoM/7JqHk8OjU60H1KGtvBuXMGyOqmQjkVgbaRda2oe3q/pVSAh5j+OpxjZG8kH4WcJQUPrZAGQu7yfzT5Vk6o/PPJjjUvE1NM6gJs0e7vN31BksJMF5GZJFL225pyz+0y4ldrQVktv/ovmcI94UMXGNvODoV/E0Wl9cSAM5B9NBuSxbo1Z0/07iGeL9OmmKpYwyuaX82Jkoow69Ta3lU9dqj8pfQweP8RxVHdRJPicG7qxdyOpJh2aFxN46yySRnz2zrXdQIgAooGOruicYLV5DkDbvDdCr7IoFBIDYYkAepqv6gFiebJGRzk9rwj/DbgMrGJg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=roZ6h4coD3UPKwBlKkeRHBvoS6P9RqzmR4co8dWTsDA=;
- b=YnzuXM9k31OGVJBzfRh//geidMzgVvnu/yoqP5gpUWSN0jrbsF2r5EmaU1SvuyzUkJQHUIEdXO2AnK3XaAs3cr1ZxbCq/Nj1C2Io7k/F031md/yjqwuznS/Q2ToTe8h6VDZonrmQq8zxV+fo8yu31WcAw1cVzJGVvcuACwyk5N93CqDMhE+8TW8v/Rrb5RYr7sc/rusBs8SW6nHUIrtvij7s1J4v5BWf6D5IkeI4BE8/uovS9sc7Axfp4wJ5dydJ63gYpHKg03uq7YR0sbfGBGZ1Cqe7FhLLaPRfAO5eWxwakwO51J9tx5WmHUqvRDhbBdQN35SL3uhwb9iY67o0PA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
- header.d=amd.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=roZ6h4coD3UPKwBlKkeRHBvoS6P9RqzmR4co8dWTsDA=;
- b=S1jeA721nbiPzO2e4s1h195JXtY5hlLf9nCxeizGnzXV8qEWzdA78mtygRTbrMOAcqN4EImyfEh3UZ+kaAMynmhw/Dq6euODVx7B8cLtf3p3PbQeWTx2SlZYtW0x9e+D5lJ0HiVqeRjPGA2l82DnPXMIWZrwNBrJIO9G+Uh6ioM=
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=amd.com;
-Received: from DS0PR12MB6608.namprd12.prod.outlook.com (2603:10b6:8:d0::10) by
- CY3PR12MB9680.namprd12.prod.outlook.com (2603:10b6:930:100::10) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9052.14; Thu, 21 Aug
- 2025 05:27:35 +0000
-Received: from DS0PR12MB6608.namprd12.prod.outlook.com
- ([fe80::b71d:8902:9ab3:f627]) by DS0PR12MB6608.namprd12.prod.outlook.com
- ([fe80::b71d:8902:9ab3:f627%5]) with mapi id 15.20.9052.013; Thu, 21 Aug 2025
- 05:27:35 +0000
-Message-ID: <29dd4494-01a8-45bf-9f88-1d99d6ff6ac0@amd.com>
-Date: Thu, 21 Aug 2025 10:57:24 +0530
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v9 07/18] x86/apic: Add support to send IPI for Secure
- AVIC
-To: Borislav Petkov <bp@alien8.de>
-Cc: linux-kernel@vger.kernel.org, tglx@linutronix.de, mingo@redhat.com,
- dave.hansen@linux.intel.com, Thomas.Lendacky@amd.com, nikunj@amd.com,
- Santosh.Shukla@amd.com, Vasant.Hegde@amd.com, Suravee.Suthikulpanit@amd.com,
- David.Kaplan@amd.com, x86@kernel.org, hpa@zytor.com, peterz@infradead.org,
- seanjc@google.com, pbonzini@redhat.com, kvm@vger.kernel.org,
- kirill.shutemov@linux.intel.com, huibo.wang@amd.com, naveen.rao@amd.com,
- francescolavra.fl@gmail.com, tiala@microsoft.com
-References: <20250811094444.203161-1-Neeraj.Upadhyay@amd.com>
- <20250811094444.203161-8-Neeraj.Upadhyay@amd.com>
- <20250820154638.GOaKXt3vTcSd2320tm@fat_crate.local>
-Content-Language: en-US
-From: "Upadhyay, Neeraj" <neeraj.upadhyay@amd.com>
-In-Reply-To: <20250820154638.GOaKXt3vTcSd2320tm@fat_crate.local>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: PN3PR01CA0089.INDPRD01.PROD.OUTLOOK.COM
- (2603:1096:c01:9a::7) To DS0PR12MB6608.namprd12.prod.outlook.com
- (2603:10b6:8:d0::10)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6440721C9ED
+	for <kvm@vger.kernel.org>; Thu, 21 Aug 2025 06:02:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.48
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1755756168; cv=none; b=aBz0Xo+X1oegleWQ0Vpr+gn3/q+aCv40TH1rlhpbAoRCFlXMdqWPo3lVZ/gHgt9ApUbmfgXRD4IBInp6XcjVgVhzjA84ienYBfbxjl1ZpXlkwiHVxzmjXcfdLCLJ5iN1hwPItJEKUxKEKFsxagEICCt1wqwUf3yd1pMeYgzP9ek=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1755756168; c=relaxed/simple;
+	bh=fdECNDsiGebUu74L4g2NDdlaQYjWw7SdZ06FIM0bnGI=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=giqx7fbomn3DyYTfpRRraWRanF6e9Kkutlw54NTKWBsAAesL5JKTEbS+KMmorfH3aCQm9kwcECOjtJNx/aGPQuRDe/CiDkfmjS0ntEhmaoK5Y/7hceVMQj2XU0uBDxxuYJutUVFMl40W88OthPO2YFnKJmvTPnAHSdZd+vjFRIs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com; spf=pass smtp.mailfrom=suse.com; dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b=G2Pm+G6M; arc=none smtp.client-ip=209.85.218.48
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.com
+Received: by mail-ej1-f48.google.com with SMTP id a640c23a62f3a-afcb7a16441so89611066b.2
+        for <kvm@vger.kernel.org>; Wed, 20 Aug 2025 23:02:46 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=suse.com; s=google; t=1755756165; x=1756360965; darn=vger.kernel.org;
+        h=in-reply-to:autocrypt:from:content-language:references:cc:to
+         :subject:user-agent:mime-version:date:message-id:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=fdECNDsiGebUu74L4g2NDdlaQYjWw7SdZ06FIM0bnGI=;
+        b=G2Pm+G6MPJoHcW2gAB8XB4ZJrcCxyE2Ejsz3fGQV+R8zlcOXQdPcjEbG1dNSm+llff
+         5ZBofsUI3cXBthQvgRIv2+HcAMLyslYoIaDMBe8G2E6MUX9qwpjH6sXFhpV4UexAmbs2
+         HToiGIG0fagYDH9pI49JDZmz9ynLX48e1jiAm5+5tvOmxb/zDDEEqTTqBhSM8oBX4cBJ
+         57rV2o4Fjao0MEUPKZ3oHfoAMR99ScGAiuMFIsSEg0fofmTf02InbN6slE2dtQwNVElO
+         aFX/oxi5Phk7A0jITPtflcvaQGxmy9Vb9jAWwBfm/sML2wVFeGANvKzDJyKu0bhizzqZ
+         CaVg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1755756165; x=1756360965;
+        h=in-reply-to:autocrypt:from:content-language:references:cc:to
+         :subject:user-agent:mime-version:date:message-id:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=fdECNDsiGebUu74L4g2NDdlaQYjWw7SdZ06FIM0bnGI=;
+        b=UO6387en0NcHxgaRSoGDnkwL1rzviXkxsVIQo8O31hT////DROVbT5AlY8+VZoyigX
+         RyCl003h2RJthxHrJcOc8lw86TEtFCkTeRm5VGflXM1xw857isjSDOomNdZB3PsmHA6o
+         XIRDYD0sa4PUnJwuVAnmEt+xAwaP76i7+tpRoci5gunCiqCxVTJ+jtXaPEpQgPz3ylK6
+         iK+xCztBL9ILYrTYSBz8mGbgYc5kFai1kNbllENlIMI/dtq0VjkFNGzuIz8+Qp3NZa/B
+         a/9IiwrzaKP+Xtuyj+tepNoJ/FuohlHWGvygsQ1XljeT3hCz7IXOE3L8iPDckV0hFyiL
+         Lg0g==
+X-Forwarded-Encrypted: i=1; AJvYcCWnL+APYFSD5yFMYqLEgFRU/2UVQeP7I92x/twrGDkhUR2fUkOmBi1ycLIpS1N4pQxuank=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyjWUwwzm9LWpITNzsH3kKzzwTcxKCTQxSC5IB3RDol4g2iAcX6
+	ZUvb9UQgUkwb4CBMSjt7t0dOoJKF3DIlVdr57+sYiqZSmhYzP7CISnIlKOz6Laxd2KY=
+X-Gm-Gg: ASbGnctTK2QNI5fwuOGMpvb3YKQxcieax6OBN+pruCz5I4WbN6sHEFAiy0wnuroLlDq
+	q4jKA8liaLNjnq8nHiNJMblWaA1DlbflopP9fTYy/rQxCS67WqZ6RPiIg4wDfSHAfmKKWU43ORS
+	goYQBQKF+bJpYSzoTuxVSV8VJ+d7xs4ytwOioqVFh3dtyVbKi9EL04CgDNvmD9VfN/hgiNJfY4A
+	VcDVrfGBpQNCx5OR9BojE1f9fSnWb8vL8LSu8hjI9jzDJX5Dl0PsQs6RJhxKKW7wxAoXSS167xs
+	YROhH9a82zcSCHArv+/GkXHgrSOFlDCKq167jQ8vVC4QiiVliOLshnwQPZRtk4U2v1Bewbp+w2K
+	2QCn5Mmyu+56LNwf7tcmfBO8ixfNWbdVP5vey4PhTbEqQ6BEobGBryndvR1v9CbXWpWBd0EIFJp
+	ezmCSoD4YD6aZ7JKqMrHEz/wdVscTY1miJReKnPzmqhd9B0rlbRF+Y7gfYcz7KuRHmNJBV
+X-Google-Smtp-Source: AGHT+IHsosajA2d/NGUSIiN45qGoTaNkQgpbCLCE9sSySHOaLSCcdYvsMspda9L/rhn6DCB8r5zF+g==
+X-Received: by 2002:a17:907:1b09:b0:af2:7ccd:3429 with SMTP id a640c23a62f3a-afe0787b726mr110416266b.9.1755756164417;
+        Wed, 20 Aug 2025 23:02:44 -0700 (PDT)
+Received: from ?IPV6:2003:e5:872d:6400:8c05:37ee:9cf6:6840? (p200300e5872d64008c0537ee9cf66840.dip0.t-ipconnect.de. [2003:e5:872d:6400:8c05:37ee:9cf6:6840])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-afded2bad79sm323826266b.9.2025.08.20.23.02.43
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 20 Aug 2025 23:02:43 -0700 (PDT)
+Message-ID: <218c4e93-4da6-4286-bb17-dd68c9d6db66@suse.com>
+Date: Thu, 21 Aug 2025 08:02:42 +0200
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: DS0PR12MB6608:EE_|CY3PR12MB9680:EE_
-X-MS-Office365-Filtering-Correlation-Id: d10ce46d-39a7-4106-8688-08dde0736f1d
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230040|366016|376014|7416014|1800799024;
-X-Microsoft-Antispam-Message-Info:
-	=?utf-8?B?UTRFOVZXTUxGZ1dOQkk1S0RFWnJsZmM0VGRoaWMweWNkVDEzNERScm02cGRU?=
- =?utf-8?B?T2R1N3htaWFLNXhqQmQwVnB0aDBhUy81NXgrNmNUR3pLU0ppSkIwZHhxOWRW?=
- =?utf-8?B?YUlVK1V1dFgybkd4UzZJajRjWTNXandxdXVWbnFLTERXNkJpM1lZQTZlUUFo?=
- =?utf-8?B?S0VNMlNOUk1SWlpNMWVITG16ZHh6NTU3SFRGa3g5NHM2NGUweFJUVlQxbXQ3?=
- =?utf-8?B?ZVNVSE0rQXYwSDVlS3FjZDJ1MW1GbHh4QTJiUUQ2eDlGaXlZMVBNb294Z2hU?=
- =?utf-8?B?UTJBc1hxcFNjSVNBOWwrQXJkdkVtZ0ZyMitHWGtqeVNxVkZXQU9OZFA4YWJh?=
- =?utf-8?B?UzNQbWt3MEhkVy9Kd2MxQlorZGUwb0MyOXhFUlN5UWJPZEd1aUxPY09iOC9I?=
- =?utf-8?B?RTR4b0JJSjZSY2tYVnhlZU5EQ3BvUEtXUC9URUI2TTF6ZEcwQkFacTZBN1FY?=
- =?utf-8?B?cUdreVh6blFOTGJ0Yk9rdEYzMzhMREcvRmNZaHJXUy8ydm5zd01CaEh4TTBI?=
- =?utf-8?B?NWgxaitrTlNURmRKcUdYWjFHOVBpSy9YanByaUtXUUxaTW4wTnViV1I3blpq?=
- =?utf-8?B?WUVQYkgvNWdIY2Uzc1NrOS9HdkljYVUzZEpGdktGd0ozVjFRQ2plbSthTVly?=
- =?utf-8?B?RG9lTG9aa29UWU5WU1hpTnBtMFhzV2hNS1pLdnpLL29QUHNTRmUzTVYvSmRo?=
- =?utf-8?B?Um9QbXpGcS9CRkdmcENqYktad2R2TFRNZkFodFJaMUNwOVg0cjUrWFBOb0tp?=
- =?utf-8?B?clpGdDFTY1VILzdnN0FHSnFTem9TSnFvT0ttVzJnRUlBSVMwTzJjUnBhK1Rw?=
- =?utf-8?B?Y0hmUDg4anhGMnFjOXpNZGpXT3JvL0dWWEYzNzh3blZaMy9xbnc1bEZHdGpt?=
- =?utf-8?B?bXVDTERNdSszV0RiL3FvaE9uWkdHMVVidnJTUVJOSUEvMU9QNDFzZnJTdndU?=
- =?utf-8?B?UkdsOVdOcjJoTFR3R05jT0xPQnVFeDhLUEpPYytUUW9kQ1Z4cUR5ZHoxc2tk?=
- =?utf-8?B?ejlMQ1FMQm1Qb1k0c0gvOGp6VkdqWUR4M0NVbjZpNDZ5cHM4b2NVcG1aWnhl?=
- =?utf-8?B?dmVOSnJqbEFMWkxYZTBHck9jRis5QkFZdjVEcXhQSS9XcWRPdlJlZVNlSzlM?=
- =?utf-8?B?aGtnUmhGdDN3V21oU3MrOFFzdTU3c3RMNUhoYThIbWVLMFlHSlBOYVE5TVdS?=
- =?utf-8?B?NVMyMmIrK05PVlB1a0pUQ2ZSL29WOGhlV1NkWEFyQlhJdGI5dk5nS0VIckJp?=
- =?utf-8?B?cnhGY2xnMHgvdm1ud2JWejdmVDNKa3YxWkhJb2s3dnNMT0MzWHZHNTU1SnYy?=
- =?utf-8?B?V043R3FFUEhKd2I2N25MeUZCUWxJSi9RdnlCakdRcVR6d3lFSGVCQkpGYVQx?=
- =?utf-8?B?KzJYQ0ROZm12ellCdEdScWVZRHVKdFRyL2Y0Wnd6dFpvOTdVUWNnamw3LzVF?=
- =?utf-8?B?NXpYdk4vYlhhZndkeThIWlRTeFJTV3dtSjUzS3MyUExteEQvL2s3d3hlVmNU?=
- =?utf-8?B?aHRRY0J4NXBHOGJTdS9IT1pyMlFDa3Z6NEZIaTY0WExnUG1BVDlQZFpuYlVC?=
- =?utf-8?B?bnhFbktyMVJsc0svZkZzVTRRRnNOajVNQVZvbHFERzZzVExMUkp5Q1l5QUVX?=
- =?utf-8?B?RlU3aTZySGJ3VG9jMk5oVzhPdGlsNUhEUklCM29uc3J0NTVPNUdPV0tlcitY?=
- =?utf-8?B?ZmZBRmc3V1JDbjY1WFZxL0JvaFUzZE1uOUlER05JT1NBdFdRYXoyYWQ4UzJJ?=
- =?utf-8?B?SEVxdUVYd1NHNEorWGRLbnFnTnN1ZWxmTDByMmdGNGdGMzNvOXdsU0YvNHlU?=
- =?utf-8?B?WlBKYTJKT1JudkJYSUY2cWJpQnpyYmVDMlYvUldINERtVUt3dGIyZlNBOWR3?=
- =?utf-8?B?amQ3QmhSV1FsWmtNaHdlMDNVOGdQZHJVL1M0YTdFYVpmNE94djZLNWNIUmgr?=
- =?utf-8?Q?qh2cRNq7NTQ=3D?=
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DS0PR12MB6608.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(376014)(7416014)(1800799024);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?utf-8?B?N3FJQVlKcnY0bXhxdzNRemt4ZTQ5eXZqMlViaUV1ZnY1R2VXTXM5bWFHemcr?=
- =?utf-8?B?dFVXZER5TzVFWEdCd21DVXI3eG5aNDIwWXVUc0R6emJaVFJ1akVMT3BLUFJa?=
- =?utf-8?B?RlJmK3k5RDVJRU5DRFNtYlpmMmlZWEZuaXFzRXBOTkkrVHkxbmJVYlE0dmtL?=
- =?utf-8?B?V3NXajJZakxoeTR4WG4xUUlPejh2MEFKcUU2SWpqVCtmSXNENXhXQVpCYUEz?=
- =?utf-8?B?eWszNWN4TUd3OXFqTitHUDZkVDVpR0tCMzhzK3czQU9VY1Vidkw0RHk5Y3Jl?=
- =?utf-8?B?UUVsWm5GVUcyY21NWm5GRmxmZm4vYVI5OWZqWnJ3dUdQNDIxT0hURC9sQUFi?=
- =?utf-8?B?ZFB5SGVRYnZCNmU1SUduZ0ZaV1o3N28rV3RHdk9ocHJmNEFxRUNJaDlMNGY3?=
- =?utf-8?B?UnVKK0VCdklZaUxqcWRqd0xjUnZhdTVTYTBIR1dFSFJIWloxWFlNRXhvcGlK?=
- =?utf-8?B?eTN1dzN3eXB5REllV20ydzRBZ0RtTFNmRFp2ODBwTlhMRk1SOUxFa0l0QjhH?=
- =?utf-8?B?dEtZdzc2bjJDdm9pbjFXOTVXT3BwcjZCWXg4cjAwUFZqRURjZlhxVndQZnNr?=
- =?utf-8?B?K3grQm1xR2JXcUkxNzBGMldvK2NLcnZjMXgyVWd1U0RGbmhsTFowaW9qVTda?=
- =?utf-8?B?VDJLL01rTC9kamlRWnJjUHpUWS84akppVk9ITHllQ2VXVlhzdTNEQ211NC9I?=
- =?utf-8?B?R01NMW1kN0REaVQ1c2tPMzNGN1NJT28wWEgzcWd3OWRWZ2xxdzlNWHo1aWJm?=
- =?utf-8?B?bHNPNjdDUFYwUE9DNEZqYTJEK3dHcVZONjRDMXoxY3luWU9Gd0RCQWZCQXBI?=
- =?utf-8?B?WitVQ2ZVOTJyVE4rTS9NaE5samJoc1JwSEZsM1ViOUY2MHBlWWFZYm1CNDFi?=
- =?utf-8?B?b0JzVHF5ZVdRbUVZNlc4QjQxRHNFOHVEOVpaZk5BdFl3WENreGE4YjVlSGV0?=
- =?utf-8?B?Q3k3NXFSVnFPTnBYTU5Cc1RidzZiZSt2bmluVWRocjRkMy9UUU9vYm9ZSTJB?=
- =?utf-8?B?Uk5yKzl6Tms4Z1JDa1FKTXdtNFAzK0xSMXFyelVoL1pwWWNHNjN4RXc5RTh3?=
- =?utf-8?B?REVHWFNyaitaTVZXRndtc0Ntc0Fka0ZxK0dZWWQ4cDFZODBJcEVxWjlob1gr?=
- =?utf-8?B?dzFjMFhCOXBERkkybjAwTVpvUklPQ3FzMjRDZFB2Ky9UUU1IRkNMWGdwM1d4?=
- =?utf-8?B?TXBCQk1la25uOXFLYjZNT0ZvRHh3YjZMUVdOWDdKVGNUb1NRN3JTeDJpbmFt?=
- =?utf-8?B?eG1qY3R4cGQrbktQRXl0VkxTdkxBVHNmR0crNmgzWWVlcm0wSjltT040OGwz?=
- =?utf-8?B?eUdBeUFyNHFsU09HZnhrRTFPVHVncHlmMUVxamQ0R0M4WFRwN3p5RXVhMm5J?=
- =?utf-8?B?cWNmSmFKLzBZbUZpeU9HMUx5c2JyVVRYaDNLbjkrYlhaaWYxNlhCT1plRGUz?=
- =?utf-8?B?QWNqTkgvN3NtejQ1UGswQ3pubkJncDY0OE5IbEVRYU43TG50bzNmY3lZeFFE?=
- =?utf-8?B?KytFc1k3bG9hUi9kcHBtWHgwZ005ZGhxQ0E2Ly9ZVnQvNzgweEhBNWVhWlJ4?=
- =?utf-8?B?ZWtOd25DQUN5SG9NeUpmNTFFM1llT1RhK3JnZWVSY1N5aEZ5L0cxbmVkL252?=
- =?utf-8?B?TlFWaHJxenFpS1RsTTVOVEpRRG5NWVZxTjNNa3pnVThZejFGM0YyQ3lDUmZy?=
- =?utf-8?B?WVR1T0ZOa2o3WnBIT3VKYzVuUk8vUDlVU3BiMHhtdmNNMFdMQnlJdFZpOCt6?=
- =?utf-8?B?S2p5aWRtaVNYTzl4YTFCM0tkMi9JTFd4a082UzNVL28zb2xUcXJwc1VheGgr?=
- =?utf-8?B?NlAwdXVSOUJrdjh1OEhhdDRycGR5SFVsV2ZPc0haMytwcGxrNHV3NXlCWWFq?=
- =?utf-8?B?RXBCSTUwSzhqR2lYWUFWc3BnZThoUmZCV1BVRlQzUFdnU3IrcFlHR3RNdGFz?=
- =?utf-8?B?R2U4VXFwUnI4R2VCMW1aaTM2eU9pTXZxMlZtdjJEQnpiMlRRbU5mam1HckJU?=
- =?utf-8?B?TXVNdkRTVHFoeGt1VHRRSmQ3b3YzSUtpZy83MTJOSldKN09GR1cvdEsrRkp3?=
- =?utf-8?B?R0pvNUNlcVRXSXU2SVBFY3J2b2tISlNNcFNvU1VzK3lVaUw1Wk9UM050clA3?=
- =?utf-8?Q?YTOEajoYBnfK6JO8smzvxAfSg?=
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: d10ce46d-39a7-4106-8688-08dde0736f1d
-X-MS-Exchange-CrossTenant-AuthSource: DS0PR12MB6608.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 21 Aug 2025 05:27:35.1553
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: yTsFZuV8hi8NVkoevpz5/lYH1Pv1mma1ACb5oteCBQrV4rlgg+yv8sjWyn4c/ufnFdTmYIBTfurhQZUJ9LdPQg==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: CY3PR12MB9680
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 0/2] x86/kvm: Force legacy PCI hole as WB under SNP/TDX
+To: Binbin Wu <binbin.wu@linux.intel.com>,
+ Sean Christopherson <seanjc@google.com>,
+ Vishal Annapurve <vannapurve@google.com>
+Cc: Nikolay Borisov <nik.borisov@suse.com>, Jianxiong Gao <jxgao@google.com>,
+ "Borislav Petkov (AMD)" <bp@alien8.de>,
+ Dave Hansen <dave.hansen@linux.intel.com>,
+ Dionna Glaze <dionnaglaze@google.com>, "H. Peter Anvin" <hpa@zytor.com>,
+ "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>, kvm@vger.kernel.org,
+ linux-kernel@vger.kernel.org, Ingo Molnar <mingo@redhat.com>,
+ pbonzini@redhat.com, Peter Gonda <pgonda@google.com>,
+ Thomas Gleixner <tglx@linutronix.de>, Tom Lendacky
+ <thomas.lendacky@amd.com>, Vitaly Kuznetsov <vkuznets@redhat.com>,
+ x86@kernel.org, Rick Edgecombe <rick.p.edgecombe@intel.com>,
+ jiewen.yao@intel.com
+References: <CAMGD6P1Q9tK89AjaPXAVvVNKtD77-zkDr0Kmrm29+e=i+R+33w@mail.gmail.com>
+ <0dc2b8d2-6e1d-4530-898b-3cb4220b5d42@linux.intel.com>
+ <4acfa729-e0ad-4dc7-8958-ececfae8ab80@suse.com> <aIDzBOmjzveLjhmk@google.com>
+ <550a730d-07db-46d7-ac1a-b5b7a09042a6@linux.intel.com>
+ <aIeX0GQh1Q_4N597@google.com>
+ <ad616489-1546-4f6a-9242-a719952e19b6@linux.intel.com>
+ <CAGtprH9EL0=Cxu7f8tD6rEvnpC7uLAw6jKijHdFUQYvbyJgkzA@mail.gmail.com>
+ <20641696-242d-4fb6-a3c1-1a8e7cf83b18@linux.intel.com>
+ <697aa804-b321-4dba-9060-7ac17e0a489f@linux.intel.com>
+ <aKYMQP5AEC2RkOvi@google.com>
+ <d84b792e-8d26-49c2-9e7c-04093f554f8a@linux.intel.com>
+ <f1ec8527-322d-4bdb-9a38-145fd9f28e4b@linux.intel.com>
+Content-Language: en-US
+From: =?UTF-8?B?SsO8cmdlbiBHcm/Dnw==?= <jgross@suse.com>
+Autocrypt: addr=jgross@suse.com; keydata=
+ xsBNBFOMcBYBCACgGjqjoGvbEouQZw/ToiBg9W98AlM2QHV+iNHsEs7kxWhKMjrioyspZKOB
+ ycWxw3ie3j9uvg9EOB3aN4xiTv4qbnGiTr3oJhkB1gsb6ToJQZ8uxGq2kaV2KL9650I1SJve
+ dYm8Of8Zd621lSmoKOwlNClALZNew72NjJLEzTalU1OdT7/i1TXkH09XSSI8mEQ/ouNcMvIJ
+ NwQpd369y9bfIhWUiVXEK7MlRgUG6MvIj6Y3Am/BBLUVbDa4+gmzDC9ezlZkTZG2t14zWPvx
+ XP3FAp2pkW0xqG7/377qptDmrk42GlSKN4z76ELnLxussxc7I2hx18NUcbP8+uty4bMxABEB
+ AAHNH0p1ZXJnZW4gR3Jvc3MgPGpncm9zc0BzdXNlLmNvbT7CwHkEEwECACMFAlOMcK8CGwMH
+ CwkIBwMCAQYVCAIJCgsEFgIDAQIeAQIXgAAKCRCw3p3WKL8TL8eZB/9G0juS/kDY9LhEXseh
+ mE9U+iA1VsLhgDqVbsOtZ/S14LRFHczNd/Lqkn7souCSoyWsBs3/wO+OjPvxf7m+Ef+sMtr0
+ G5lCWEWa9wa0IXx5HRPW/ScL+e4AVUbL7rurYMfwCzco+7TfjhMEOkC+va5gzi1KrErgNRHH
+ kg3PhlnRY0Udyqx++UYkAsN4TQuEhNN32MvN0Np3WlBJOgKcuXpIElmMM5f1BBzJSKBkW0Jc
+ Wy3h2Wy912vHKpPV/Xv7ZwVJ27v7KcuZcErtptDevAljxJtE7aJG6WiBzm+v9EswyWxwMCIO
+ RoVBYuiocc51872tRGywc03xaQydB+9R7BHPzsBNBFOMcBYBCADLMfoA44MwGOB9YT1V4KCy
+ vAfd7E0BTfaAurbG+Olacciz3yd09QOmejFZC6AnoykydyvTFLAWYcSCdISMr88COmmCbJzn
+ sHAogjexXiif6ANUUlHpjxlHCCcELmZUzomNDnEOTxZFeWMTFF9Rf2k2F0Tl4E5kmsNGgtSa
+ aMO0rNZoOEiD/7UfPP3dfh8JCQ1VtUUsQtT1sxos8Eb/HmriJhnaTZ7Hp3jtgTVkV0ybpgFg
+ w6WMaRkrBh17mV0z2ajjmabB7SJxcouSkR0hcpNl4oM74d2/VqoW4BxxxOD1FcNCObCELfIS
+ auZx+XT6s+CE7Qi/c44ibBMR7hyjdzWbABEBAAHCwF8EGAECAAkFAlOMcBYCGwwACgkQsN6d
+ 1ii/Ey9D+Af/WFr3q+bg/8v5tCknCtn92d5lyYTBNt7xgWzDZX8G6/pngzKyWfedArllp0Pn
+ fgIXtMNV+3t8Li1Tg843EXkP7+2+CQ98MB8XvvPLYAfW8nNDV85TyVgWlldNcgdv7nn1Sq8g
+ HwB2BHdIAkYce3hEoDQXt/mKlgEGsLpzJcnLKimtPXQQy9TxUaLBe9PInPd+Ohix0XOlY+Uk
+ QFEx50Ki3rSDl2Zt2tnkNYKUCvTJq7jvOlaPd6d/W0tZqpyy7KVay+K4aMobDsodB3dvEAs6
+ ScCnh03dDAFgIq5nsB11j3KPKdVoPlfucX2c7kGNH+LUMbzqV6beIENfNexkOfxHfw==
+In-Reply-To: <f1ec8527-322d-4bdb-9a38-145fd9f28e4b@linux.intel.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature";
+ boundary="------------2MfuXcvxug2VLYSoSv3dz04Q"
 
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--------------2MfuXcvxug2VLYSoSv3dz04Q
+Content-Type: multipart/mixed; boundary="------------iSNfml08aoXAkYOslibcpctk";
+ protected-headers="v1"
+From: =?UTF-8?B?SsO8cmdlbiBHcm/Dnw==?= <jgross@suse.com>
+To: Binbin Wu <binbin.wu@linux.intel.com>,
+ Sean Christopherson <seanjc@google.com>,
+ Vishal Annapurve <vannapurve@google.com>
+Cc: Nikolay Borisov <nik.borisov@suse.com>, Jianxiong Gao <jxgao@google.com>,
+ "Borislav Petkov (AMD)" <bp@alien8.de>,
+ Dave Hansen <dave.hansen@linux.intel.com>,
+ Dionna Glaze <dionnaglaze@google.com>, "H. Peter Anvin" <hpa@zytor.com>,
+ "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>, kvm@vger.kernel.org,
+ linux-kernel@vger.kernel.org, Ingo Molnar <mingo@redhat.com>,
+ pbonzini@redhat.com, Peter Gonda <pgonda@google.com>,
+ Thomas Gleixner <tglx@linutronix.de>, Tom Lendacky
+ <thomas.lendacky@amd.com>, Vitaly Kuznetsov <vkuznets@redhat.com>,
+ x86@kernel.org, Rick Edgecombe <rick.p.edgecombe@intel.com>,
+ jiewen.yao@intel.com
+Message-ID: <218c4e93-4da6-4286-bb17-dd68c9d6db66@suse.com>
+Subject: Re: [PATCH 0/2] x86/kvm: Force legacy PCI hole as WB under SNP/TDX
+References: <CAMGD6P1Q9tK89AjaPXAVvVNKtD77-zkDr0Kmrm29+e=i+R+33w@mail.gmail.com>
+ <0dc2b8d2-6e1d-4530-898b-3cb4220b5d42@linux.intel.com>
+ <4acfa729-e0ad-4dc7-8958-ececfae8ab80@suse.com> <aIDzBOmjzveLjhmk@google.com>
+ <550a730d-07db-46d7-ac1a-b5b7a09042a6@linux.intel.com>
+ <aIeX0GQh1Q_4N597@google.com>
+ <ad616489-1546-4f6a-9242-a719952e19b6@linux.intel.com>
+ <CAGtprH9EL0=Cxu7f8tD6rEvnpC7uLAw6jKijHdFUQYvbyJgkzA@mail.gmail.com>
+ <20641696-242d-4fb6-a3c1-1a8e7cf83b18@linux.intel.com>
+ <697aa804-b321-4dba-9060-7ac17e0a489f@linux.intel.com>
+ <aKYMQP5AEC2RkOvi@google.com>
+ <d84b792e-8d26-49c2-9e7c-04093f554f8a@linux.intel.com>
+ <f1ec8527-322d-4bdb-9a38-145fd9f28e4b@linux.intel.com>
+In-Reply-To: <f1ec8527-322d-4bdb-9a38-145fd9f28e4b@linux.intel.com>
 
+--------------iSNfml08aoXAkYOslibcpctk
+Content-Type: multipart/mixed; boundary="------------sbCUedizuOSyjThHNHVuczye"
 
-On 8/20/2025 9:16 PM, Borislav Petkov wrote:
-> On Mon, Aug 11, 2025 at 03:14:33PM +0530, Neeraj Upadhyay wrote:
->> With Secure AVIC only Self-IPI is accelerated. To handle all the
->> other IPIs, add new callbacks for sending IPI. These callbacks write
->> to the IRR of the target guest vCPU's APIC backing page and issue
->> GHCB protocol MSR write event for the hypervisor to notify the
->> target vCPU about the new interrupt request.
->>
->> For Secure AVIC GHCB APIC MSR writes, reuse GHCB msr handling code in
-> 	     ^^^^^^^^^^^^^^^^^^
-> 
-> say what now?!
-> 
+--------------sbCUedizuOSyjThHNHVuczye
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: base64
 
-Is below better?
+T24gMjEuMDguMjUgMDc6MjMsIEJpbmJpbiBXdSB3cm90ZToNCj4gDQo+IA0KPiBPbiA4LzIx
+LzIwMjUgMTE6MzAgQU0sIEJpbmJpbiBXdSB3cm90ZToNCj4+DQo+Pg0KPj4gT24gOC8yMS8y
+MDI1IDE6NTYgQU0sIFNlYW4gQ2hyaXN0b3BoZXJzb24gd3JvdGU6DQo+Pj4gT24gV2VkLCBB
+dWcgMjAsIDIwMjUsIEJpbmJpbiBXdSB3cm90ZToNCj4gWy4uLl0NCj4+Pj4gSGkgU2VhbiwN
+Cj4+Pj4NCj4+Pj4gU2luY2UgZ3Vlc3RfZm9yY2VfbXRycl9zdGF0ZSgpIGFsc28gc3VwcG9y
+dHMgdG8gZm9yY2UgTVRSUiB2YXJpYWJsZSByYW5nZXMsDQo+Pj4+IEkgYW0gd29uZGVyaW5n
+IGlmIHdlIGNvdWxkIHVzZSBndWVzdF9mb3JjZV9tdHJyX3N0YXRlKCkgdG8gc2V0IHRoZSBs
+ZWdhY3kgUENJDQo+Pj4+IGhvbGUgcmFuZ2UgYXMgVUM/DQo+Pj4+DQo+Pj4+IElzIGl0IGxl
+c3MgaGFja3k/DQo+Pj4gT2ghwqAgVGhhdCdzIGEgd2F5IGJldHRlciBpZGVhIHRoYW4gbXkg
+aGFjay7CoCBJIG1pc3NlZCB0aGF0IHRoZSBrZXJuZWwgd291bGQgDQo+Pj4gc3RpbGwNCj4+
+PiBjb25zdWx0IE1UUlJzLg0KPj4+DQo+Pj4gQ29tcGlsZSB0ZXN0ZWQgb25seSwgYnV0IHNv
+bWV0aGluZyBsaWtlIHRoaXM/DQo+Pj4NCj4+PiBkaWZmIC0tZ2l0IGEvYXJjaC94ODYva2Vy
+bmVsL2t2bS5jIGIvYXJjaC94ODYva2VybmVsL2t2bS5jDQo+Pj4gaW5kZXggOGFlNzUwY2Rl
+MGM2Li40NWM4ODcxY2RkYTEgMTAwNjQ0DQo+Pj4gLS0tIGEvYXJjaC94ODYva2VybmVsL2t2
+bS5jDQo+Pj4gKysrIGIvYXJjaC94ODYva2VybmVsL2t2bS5jDQo+Pj4gQEAgLTkzMyw2ICs5
+MzMsMTMgQEAgc3RhdGljIHZvaWQga3ZtX3Nldl9oY19wYWdlX2VuY19zdGF0dXModW5zaWdu
+ZWQgbG9uZyANCj4+PiBwZm4sIGludCBucGFnZXMsIGJvb2wgZW5jKQ0KPj4+IMKgIMKgIHN0
+YXRpYyB2b2lkIF9faW5pdCBrdm1faW5pdF9wbGF0Zm9ybSh2b2lkKQ0KPj4+IMKgIHsNCj4+
+PiArwqDCoMKgwqDCoMKgIHU2NCB0b2x1ZCA9IGU4MjBfX2VuZF9vZl9sb3dfcmFtX3Bmbigp
+IDw8IFBBR0VfU0hJRlQ7DQo+Pj4gK8KgwqDCoMKgwqDCoCBzdHJ1Y3QgbXRycl92YXJfcmFu
+Z2UgcGNpX2hvbGUgPSB7DQo+Pj4gK8KgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqAgLmJh
+c2VfbG8gPSB0b2x1ZCB8IFg4Nl9NRU1UWVBFX1VDLA0KPj4+ICvCoMKgwqDCoMKgwqDCoMKg
+wqDCoMKgwqDCoMKgIC5tYXNrX2xvID0gKHUzMikofihTWl80RyAtIHRvbHVkIC0gMSkpIHwg
+QklUKDExKSwNCj4+PiArwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoCAubWFza19oaSA9
+IChCSVRfVUxMKGJvb3RfY3B1X2RhdGEueDg2X3BoeXNfYml0cykgLSAxKSA+PiAzMiwNCj4+
+PiArwqDCoMKgwqDCoMKgIH07DQo+Pj4gKw0KPj4NCj4+IFRoaXMgdmFsdWUgb2YgdG9sdWTC
+oCBtYXkgbm90IG1lZXQgdGhlIHJhbmdlIHNpemUgYW5kIGFsaWdubWVudCByZXF1aXJlbWVu
+dCBmb3INCj4+IHZhcmlhYmxlIE1UUlIuDQo+Pg0KPj4gVmFyaWFibGUgTVRSUiBoYXMgcmVx
+dWlyZW1lbnQgZm9yIHJhbmdlIHNpemUgYW5kIGFsaWdubWVudDoNCj4+IEZvciByYW5nZXMg
+Z3JlYXRlciB0aGFuIDQgS0J5dGVzLCBlYWNoIHJhbmdlIG11c3QgYmUgb2YgbGVuZ3RoIDJe
+biBhbmQgaXRzIGJhc2UNCj4+IGFkZHJlc3MgbXVzdCBiZSBhbGlnbmVkIG9uIGEgMl5uIGJv
+dW5kYXJ5LCB3aGVyZSBuIGlzIGEgdmFsdWUgZXF1YWwgdG8gb3INCj4+IGdyZWF0ZXIgdGhh
+biAxMi4gVGhlIGJhc2UtYWRkcmVzcyBhbGlnbm1lbnQgdmFsdWUgY2Fubm90IGJlIGxlc3Mg
+dGhhbiBpdHMgbGVuZ3RoLg0KPiANCj4gV2FpdCwgTGludXgga2VybmVsIGNvbnZlcnRzIE1U
+UlIgcmVnaXN0ZXIgdmFsdWVzIHRvIE1UUlIgc3RhdGUgKGJhc2UgYW5kIHNpemUpIGFuZA0K
+PiBjYWNoZSBpdCBmb3IgbGF0ZXIgbG9va3VwcyAocmVmZXIgdG8gbWFwX2FkZF92YXIoKSku
+IEkuZS4sIGluIExpbnV4IGtlcm5lbCwNCj4gb25seSB0aGUgY2FjaGVkIHN0YXRlIHdpbGwg
+YmUgdXNlZC4NCj4gDQo+IFRoZXNlIE1UUlIgcmVnaXN0ZXIgdmFsdWVzIGFyZSBuZXZlciBw
+cm9ncmFtbWVkIHdoZW4gdXNpbmcNCj4gZ3Vlc3RfZm9yY2VfbXRycl9zdGF0ZSgpICwgc28g
+ZXZlbiB0aGUgdmFsdWVzIGRvZXNuJ3QgbWVldCB0aGUNCj4gcmVxdWlyZW1lbnQgZnJvbSBo
+YXJkd2FyZSBwZXJzcGVjdGl2ZSwgTGludXgga2VybmVsIGNhbiBzdGlsbCBnZXQgdGhlIHJp
+Z2h0IGJhc2UgDQo+IGFuZCBzaXplLg0KPiANCj4gTm8gYm90aGVyaW5nIHRvIGZvcmNlIHRo
+ZSBiYXNlIGFuZCBzaXplIGFsaWdubWVudC4NCj4gQnV0IGEgY29tbWVudCB3b3VsZCBiZSBo
+ZWxwZnVsLg0KPiBBbHNvLCBCSVQoMTEpIGNvdWxkIGJlIHJlcGxhY2VkIGJ5IE1UUlJfUEhZ
+U01BU0tfVi4NCj4gDQo+IEhvdyBhYm91dDoNCj4gZGlmZiAtLWdpdCBhL2FyY2gveDg2L2tl
+cm5lbC9rdm0uYyBiL2FyY2gveDg2L2tlcm5lbC9rdm0uYw0KPiBpbmRleCA5MDA5N2RmNGVh
+ZmQuLmE5NTgyZmZjMzA4OCAxMDA2NDQNCj4gLS0tIGEvYXJjaC94ODYva2VybmVsL2t2bS5j
+DQo+ICsrKyBiL2FyY2gveDg2L2tlcm5lbC9rdm0uYw0KPiBAQCAtOTM0LDkgKzkzNCwxNSBA
+QCBzdGF0aWMgdm9pZCBrdm1fc2V2X2hjX3BhZ2VfZW5jX3N0YXR1cyh1bnNpZ25lZCBsb25n
+IHBmbiwgDQo+IGludCBucGFnZXMsIGJvb2wgZW5jKQ0KPiAgwqBzdGF0aWMgdm9pZCBfX2lu
+aXQga3ZtX2luaXRfcGxhdGZvcm0odm9pZCkNCj4gIMKgew0KPiAgwqAgwqAgwqAgwqAgdTY0
+IHRvbHVkID0gZTgyMF9fZW5kX29mX2xvd19yYW1fcGZuKCkgPDwgUEFHRV9TSElGVDsNCg0K
+SSdkIHByZWZlciB0byBhdm9pZCBvcGVuIGNvZGluZyBQRk5fUEhZUygpIGhlcmUuDQoNCj4g
+K8KgIMKgIMKgIMKgLyoNCj4gK8KgIMKgIMKgIMKgICogVGhlIHJhbmdlJ3MgYmFzZSBhZGRy
+ZXNzIGFuZCBzaXplIG1heSBub3QgbWVldCB0aGUgYWxpZ25tZW50DQo+ICvCoCDCoCDCoCDC
+oCAqIHJlcXVpcmVtZW50IGZvciB2YXJpYWJsZSBNVFJSLiBIb3dldmVyLCBMaW51eCBndWVz
+dCBuZXZlcg0KPiArwqAgwqAgwqAgwqAgKiBwcm9ncmFtcyBNVFJScyB3aGVuIGZvcmNpbmcg
+Z3Vlc3QgTVRSUiBzdGF0ZSwgbm8gYm90aGVyaW5nIHRvDQo+ICvCoCDCoCDCoCDCoCAqIGVu
+Zm9yY2UgdGhlIGJhc2UgYW5kIHJhbmdlIHNpemUgYWxpZ25tZW50Lg0KPiArwqAgwqAgwqAg
+wqAgKi8NCg0KTWF5YmUgYSByZWxhdGVkIGNvbW1lbnQgc2hvdWxkIGJlIGFkZGVkIHRvIGd1
+ZXN0X2ZvcmNlX210cnJfc3RhdGUoKSBpbg0Kb3JkZXIgdG8gYXZvaWQgYnJlYWtpbmcgdGhp
+cyB3b3JrYXJvdW5kIGFnYWluLg0KDQoNCkp1ZXJnZW4NCg==
+--------------sbCUedizuOSyjThHNHVuczye
+Content-Type: application/pgp-keys; name="OpenPGP_0xB0DE9DD628BF132F.asc"
+Content-Disposition: attachment; filename="OpenPGP_0xB0DE9DD628BF132F.asc"
+Content-Description: OpenPGP public key
+Content-Transfer-Encoding: quoted-printable
 
-x86/apic: Add support to send IPI for Secure AVIC
+-----BEGIN PGP PUBLIC KEY BLOCK-----
 
-Secure AVIC hardware only accelerates Self-IPI, i.e. on WRMSR to
-APIC_SELF_IPI and APIC_ICR (with destination shorthand equal to Self)
-registers, hardware takes care of updating the APIC_IRR in the APIC
-backing page of the vCPU. For other IPI types (cross-vCPU, broadcast 
-IPIs), software needs to take care of updating the APIC_IRR state of the 
-target CPUs and to ensure that the target vCPUs notice the new pending 
-interrupt.
+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
+kt+z4drzFUyEjLM1vVvIMjkUoJs=3D
+=3DeeAB
+-----END PGP PUBLIC KEY BLOCK-----
 
-Add new callbacks in the Secure AVIC driver for sending IPI requests. 
-These callbacks update the IRR in the target guest vCPU's APIC backing 
-page. To ensure that the remote vCPU notices the new pending interrupt, 
-reuse the GHCB MSR handling code in vc_handle_msr() to issue APIC_ICR 
-MSR-write GHCB protocol event to the hypervisor. For Secure AVIC guests, 
-on APIC_ICR write MSR exits, the hypervisor notifies the target vCPU by 
-either sending an AVIC doorbell (if target vCPU is running) or by waking 
-up the non-running target vCPU.
+--------------sbCUedizuOSyjThHNHVuczye--
 
->> +void savic_ghcb_msr_write(u32 reg, u64 value)
-> 
-> I guess this belongs into x2apic_savic.c.
-> 
+--------------iSNfml08aoXAkYOslibcpctk--
 
-Ok moving it to x2apic_savic.c requires below 4 sev-internal 
-declarations to be moved to arch/x86/include/asm/sev.h
+--------------2MfuXcvxug2VLYSoSv3dz04Q
+Content-Type: application/pgp-signature; name="OpenPGP_signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="OpenPGP_signature.asc"
 
-struct ghcb_state;
-struct ghcb *__sev_get_ghcb(struct ghcb_state *state);
-void __sev_put_ghcb(struct ghcb_state *state);
-enum es_result sev_es_ghcb_handle_msr(...);
+-----BEGIN PGP SIGNATURE-----
 
->> +{
->> +	u64 msr = APIC_BASE_MSR + (reg >> 4);
->> +	struct pt_regs regs = {
->> +		.cx = msr,
->> +		.ax = lower_32_bits(value),
->> +		.dx = upper_32_bits(value)
->> +	};
->> +	struct es_em_ctxt ctxt = { .regs = &regs };
->> +	struct ghcb_state state;
->> +	enum es_result res;
->> +	struct ghcb *ghcb;
->> +
->> +	guard(irqsave)();
->> +
->> +	ghcb = __sev_get_ghcb(&state);
->> +	vc_ghcb_invalidate(ghcb);
->> +
->> +	res = sev_es_ghcb_handle_msr(ghcb, &ctxt, true);
->> +	if (res != ES_OK) {
->> +		pr_err("Secure AVIC msr (0x%llx) write returned error (%d)\n", msr, res);
->> +		/* MSR writes should never fail. Any failure is fatal error for SNP guest */
->> +		snp_abort();
->> +	}
->> +
->> +	__sev_put_ghcb(&state);
->> +}
-> 
-> ...
-> 
->> +static inline void self_ipi_reg_write(unsigned int vector)
->> +{
->> +	/*
->> +	 * Secure AVIC hardware accelerates guest's MSR write to SELF_IPI
->> +	 * register. It updates the IRR in the APIC backing page, evaluates
->> +	 * the new IRR for interrupt injection and continues with guest
->> +	 * code execution.
->> +	 */
-> 
-> Why is that comment here? It is above a WRMSR write. What acceleration is it
-> talking about?
-> 
+wsB5BAABCAAjFiEEhRJncuj2BJSl0Jf3sN6d1ii/Ey8FAmimtoIFAwAAAAAACgkQsN6d1ii/Ey8T
+wQf5Aa1NxQFM2TeeWP+YhltUXd/7WFcYeUNgtTu80Hwi+Dqe+vZIOXj1islE3G7X8VLtJzsIbZ5I
+cVaIFbpVkI+FFKvjcLU6FQbVXr+zSmH0N4zECghsBXIS+ce/DyiWPJXrhgAXbG0OLhP4mWDW6eWc
+5DI6kDwzxvbmC6LoFW/Ek6HtEbFtWeqNaUI+YKT7rDvPMRsShU6TEYVHZlolXObNEbInfBW52DYe
+KOCSa3+vC3RwOoeVAiAOb5yDzwHUYeNjCV2jzCOTuld5jg40qcJyGzBZ4l7mC9F1PGfjpim5D6mb
+00yQjcYId1AmEDGRMOMdh7+r8qtJdME+fNmoR1e/NQ==
+=B0NK
+-----END PGP SIGNATURE-----
 
-This comment explains why WRMSR is sufficient for sending SELF_IPI. On
-WRMSR by vCPU, Secure AVIC hardware takes care of updating APIC_IRR in
-backing page. Hardware also ensures that new APIC_IRR state is evaluated
-for new pending interrupts. So, WRMSR is hardware-accelerated.
-
-For non-self-IPI case, software need to do APIC_IRR update and sending 
-of wakeup-request/doorbell to the target vCPU.
-
-
-- Neeraj
-
->> +	native_apic_msr_write(APIC_SELF_IPI, vector);
->> +}
-> 
+--------------2MfuXcvxug2VLYSoSv3dz04Q--
 
