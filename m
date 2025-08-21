@@ -1,209 +1,239 @@
-Return-Path: <kvm+bounces-55255-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-55256-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 41DCAB2ED01
-	for <lists+kvm@lfdr.de>; Thu, 21 Aug 2025 06:37:34 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id CBD87B2ED8C
+	for <lists+kvm@lfdr.de>; Thu, 21 Aug 2025 07:24:15 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 10E625C003E
-	for <lists+kvm@lfdr.de>; Thu, 21 Aug 2025 04:35:20 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 1E6371C8458A
+	for <lists+kvm@lfdr.de>; Thu, 21 Aug 2025 05:24:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A651D2EBB86;
-	Thu, 21 Aug 2025 04:29:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EADD62BEC28;
+	Thu, 21 Aug 2025 05:24:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="xuET/TSC"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="OC3rk993"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pg1-f201.google.com (mail-pg1-f201.google.com [209.85.215.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.18])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 45DFE2EBBB1
-	for <kvm@vger.kernel.org>; Thu, 21 Aug 2025 04:29:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6A11D49620;
+	Thu, 21 Aug 2025 05:24:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755750594; cv=none; b=gx5mlj3wWdh8Gtk/Q9KOCRd3IpnLLsJxYJy4ZwzZ9Iw7YfzqgHmohbZCvnu0+i6Ui0s0LOB4IDoTPsrL7sM8nnxw6bJsbybGCFJ06x00YDaCTlCRwCpL2LUITFVIHBCfHGReRnA90i3UT+UmtWsXkZPD/CEp+5HDEcVx2P+Jkoc=
+	t=1755753845; cv=none; b=Af8fjuzi0kFk1JL+XsDLST8tgyAUXOM09D+Hu/p5GIHL1m1cHJDkHqNRw4PgRgjURN2sRucuC0bBdCKrIQYDRkMMOp2nS5VYVyhbn4CdyltR32GS5NcvYwNJ7H0EDwtYeGQqDRn/DcpJ4+U8LvpUm8pGMKOsnon0IIiZgM4FFKA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755750594; c=relaxed/simple;
-	bh=SCj5vpqbGdcyeL9WchYjYHXxlh3Syca50DvMtgJYdEE=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=jxPfBsPkSB1TukR4/20pP4O8pY25V6d6WMFQ0BSvtwrdeUT4brQkOcAF8Lwz7Unk0gwRa3wcaD3xPzaeAawxzq30tLxdel3FeCo+uZUMd9FP2V2csJRo80JS7xKFeJnOrxUQ6y/zd4c/FrFHPeSOwoXWvzVeHVsY07OnQayO/7I=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--sagis.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=xuET/TSC; arc=none smtp.client-ip=209.85.215.201
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--sagis.bounces.google.com
-Received: by mail-pg1-f201.google.com with SMTP id 41be03b00d2f7-b471757d82fso463109a12.3
-        for <kvm@vger.kernel.org>; Wed, 20 Aug 2025 21:29:53 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1755750592; x=1756355392; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=3ni6/1QBXYyjIXVNXrHE6sKBQ7BBSjz5QhIiIQ0TLw0=;
-        b=xuET/TSCt6PFuCOdPi5Z5y/dEg4sD+i1qImMcL8xRCpzIteliZY7RHdmsP2bqQU+lc
-         u21EwRPxhc+sztMv88mB1xQ4UjxULkCX3tAxGel/FGYMfbauo6W+875bYXLNLnfSPbdx
-         rc0P+CBxcDFrMmlhjoTSYv5UmoIN+nQCyXTI8NdQ9BD1+dfLcm8yLvtVEGuxiaSYnTLZ
-         vmPPJiHQ6DywPtdHHhbRvnYjst/RafYe+SzK3hzPWLkjw2cRpfzsaxz0FfkWs3/A3nXN
-         T6M4XgPm1IONtDJJy61IRzQwlSoKpauwlkK3ceTf3ANG148w/IyzXpeqg1z7dI1R+9j1
-         vB+Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1755750592; x=1756355392;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=3ni6/1QBXYyjIXVNXrHE6sKBQ7BBSjz5QhIiIQ0TLw0=;
-        b=DXUvDL6vy3YOGjYJtnjV1SCQMnoZze7uFY4CqLIiOM6vQmWislkhAyShk57Nin+Xzt
-         H6lpGXpnZJ+VcIbYUGkZAKq5D8R2KGqk2YKaQecOOv9jcIgazELeYbz6kUUybBH4upKj
-         gv4SJLEkZK3wd1yl2IjHmt161jwpMjbi2dUEOzAFXY10dnHTjbkasfXBuNL1p/mwMrMu
-         g0YO0cKwrqnLTivkHTFQJqPXIRzoc2dDf53dQVsYYZ+tUmB/VEQRcuLZSAVVF4CD+J4S
-         oPxWxiWmjAgKMl5g/IfI1KktTqQAG1noQhi6AZ1KR/3EHXqmPiB3Fv04QAIxyQ5+gYLf
-         BWWg==
-X-Forwarded-Encrypted: i=1; AJvYcCUJ9a1FbH5oUoFUQ5NMODXDrLCrRIH/Z4s6kUa/ujA8lvCXW09lgXZvWONPcLcFGWmaUgw=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yw/fE0tfbJ3b3CQkYfhaa2m009R35ZaXKS+FcDCEcZnFK3US9lS
-	kReam5bdIdjG8xK6qSFHDN5IhFjVVCwMNmfaN2qVWBg02dIGifcz6YIqfnlQGdWMd36YA9hfeff
-	C8g==
-X-Google-Smtp-Source: AGHT+IF47pIKGfWNf380vL880YXdNEf+FWPdQExp1mJvaZsLgHJ8I4ZDENH3hqy/aqETue6DuLS1LEQ09w==
-X-Received: from pgbdp6.prod.google.com ([2002:a05:6a02:f06:b0:b47:61f6:dd10])
- (user=sagis job=prod-delivery.src-stubby-dispatcher) by 2002:a05:6a20:734a:b0:240:30c:276a
- with SMTP id adf61e73a8af0-24330aa5c52mr1472690637.39.1755750592600; Wed, 20
- Aug 2025 21:29:52 -0700 (PDT)
-Date: Wed, 20 Aug 2025 21:29:12 -0700
-In-Reply-To: <20250821042915.3712925-1-sagis@google.com>
+	s=arc-20240116; t=1755753845; c=relaxed/simple;
+	bh=aRxjhvMv7K3+zEEb1KjJOi47ZdXTCG7tkrSzxnqsbB0=;
+	h=Message-ID:Date:MIME-Version:Subject:From:To:Cc:References:
+	 In-Reply-To:Content-Type; b=j+HALP17yzBMpj4cbFMVUO4jSEoCjNZmx3zlqAQfW+5V3uyu3nikNcVG/OXouq1gWsE39VENryieyslgrVmbRgN4AEU9irP5jt2i343z+CERJ1pbyJHVzx2iV+7esNArMfkyoiq9WcdtNrYCB6fmEYw9LKzlOWDmFa4QISRKKHQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=OC3rk993; arc=none smtp.client-ip=198.175.65.18
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1755753844; x=1787289844;
+  h=message-id:date:mime-version:subject:from:to:cc:
+   references:in-reply-to:content-transfer-encoding;
+  bh=aRxjhvMv7K3+zEEb1KjJOi47ZdXTCG7tkrSzxnqsbB0=;
+  b=OC3rk993Jw+NfWUKtXKmhMevXmaDK5aAYsFkLojJ4uAjvUPaDA5CSBxH
+   xCBvXEveLW/ybTivWByvK96L0cVruJyTUGxnXOEqdAYVmSi25anQ3v9Oj
+   0TBqrgV0SuURw/Vr1VhVEEYuRdTwbOGN8VA6h1CXSzb+Wdo0JlXvcFAxQ
+   GTJdknzM8W4LyDZVZl8yrRbvmxzw1au/vJJ7dRE6Dq+VcyTYKTGfj3nMR
+   3gOkP7o4NtPaMsia7AkFELNZJPRy7w8tQrO/lcf9/zbBMRo31w4ERcIQs
+   zx8SKm3VHjx7O1Nn7c2h43IJ7bszfi1ssvYQk5dJTQlfMecbJmSh91jR1
+   Q==;
+X-CSE-ConnectionGUID: zuNrf0PgSkWtZGkkhd0+5w==
+X-CSE-MsgGUID: B/jPkF+bRT6hCx3XzPEerQ==
+X-IronPort-AV: E=McAfee;i="6800,10657,11527"; a="58101254"
+X-IronPort-AV: E=Sophos;i="6.17,306,1747724400"; 
+   d="scan'208";a="58101254"
+Received: from orviesa008.jf.intel.com ([10.64.159.148])
+  by orvoesa110.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 20 Aug 2025 22:24:03 -0700
+X-CSE-ConnectionGUID: dSauImomRY+Qa3SbBJGH+A==
+X-CSE-MsgGUID: Q86G0S2DTVKRycJnMGuFEw==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.17,306,1747724400"; 
+   d="scan'208";a="168572953"
+Received: from unknown (HELO [10.238.0.107]) ([10.238.0.107])
+  by orviesa008-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 20 Aug 2025 22:23:58 -0700
+Message-ID: <f1ec8527-322d-4bdb-9a38-145fd9f28e4b@linux.intel.com>
+Date: Thu, 21 Aug 2025 13:23:55 +0800
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20250821042915.3712925-1-sagis@google.com>
-X-Mailer: git-send-email 2.51.0.rc1.193.gad69d77794-goog
-Message-ID: <20250821042915.3712925-20-sagis@google.com>
-Subject: [PATCH v9 19/19] KVM: selftests: Add TDX lifecycle test
-From: Sagi Shahar <sagis@google.com>
-To: linux-kselftest@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>, 
-	Shuah Khan <shuah@kernel.org>, Sean Christopherson <seanjc@google.com>, 
-	Ackerley Tng <ackerleytng@google.com>, Ryan Afranji <afranji@google.com>, 
-	Andrew Jones <ajones@ventanamicro.com>, Isaku Yamahata <isaku.yamahata@intel.com>, 
-	Erdem Aktas <erdemaktas@google.com>, Rick Edgecombe <rick.p.edgecombe@intel.com>, 
-	Sagi Shahar <sagis@google.com>, Roger Wang <runanwang@google.com>, 
-	Binbin Wu <binbin.wu@linux.intel.com>, Oliver Upton <oliver.upton@linux.dev>, 
-	"Pratik R. Sampat" <pratikrajesh.sampat@amd.com>, Reinette Chatre <reinette.chatre@intel.com>, 
-	Ira Weiny <ira.weiny@intel.com>, Chao Gao <chao.gao@intel.com>, 
-	Chenyi Qiang <chenyi.qiang@intel.com>
-Cc: linux-kernel@vger.kernel.org, kvm@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 0/2] x86/kvm: Force legacy PCI hole as WB under SNP/TDX
+From: Binbin Wu <binbin.wu@linux.intel.com>
+To: Sean Christopherson <seanjc@google.com>,
+ Vishal Annapurve <vannapurve@google.com>
+Cc: Nikolay Borisov <nik.borisov@suse.com>, Jianxiong Gao <jxgao@google.com>,
+ "Borislav Petkov (AMD)" <bp@alien8.de>,
+ Dave Hansen <dave.hansen@linux.intel.com>,
+ Dionna Glaze <dionnaglaze@google.com>, "H. Peter Anvin" <hpa@zytor.com>,
+ jgross@suse.com, "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>,
+ kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+ Ingo Molnar <mingo@redhat.com>, pbonzini@redhat.com,
+ Peter Gonda <pgonda@google.com>, Thomas Gleixner <tglx@linutronix.de>,
+ Tom Lendacky <thomas.lendacky@amd.com>,
+ Vitaly Kuznetsov <vkuznets@redhat.com>, x86@kernel.org,
+ Rick Edgecombe <rick.p.edgecombe@intel.com>, jiewen.yao@intel.com
+References: <CAMGD6P1Q9tK89AjaPXAVvVNKtD77-zkDr0Kmrm29+e=i+R+33w@mail.gmail.com>
+ <0dc2b8d2-6e1d-4530-898b-3cb4220b5d42@linux.intel.com>
+ <4acfa729-e0ad-4dc7-8958-ececfae8ab80@suse.com> <aIDzBOmjzveLjhmk@google.com>
+ <550a730d-07db-46d7-ac1a-b5b7a09042a6@linux.intel.com>
+ <aIeX0GQh1Q_4N597@google.com>
+ <ad616489-1546-4f6a-9242-a719952e19b6@linux.intel.com>
+ <CAGtprH9EL0=Cxu7f8tD6rEvnpC7uLAw6jKijHdFUQYvbyJgkzA@mail.gmail.com>
+ <20641696-242d-4fb6-a3c1-1a8e7cf83b18@linux.intel.com>
+ <697aa804-b321-4dba-9060-7ac17e0a489f@linux.intel.com>
+ <aKYMQP5AEC2RkOvi@google.com>
+ <d84b792e-8d26-49c2-9e7c-04093f554f8a@linux.intel.com>
+Content-Language: en-US
+In-Reply-To: <d84b792e-8d26-49c2-9e7c-04093f554f8a@linux.intel.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 
-Adding a test to verify TDX lifecycle by creating a simple TD.
 
-Signed-off-by: Sagi Shahar <sagis@google.com>
----
- tools/testing/selftests/kvm/Makefile.kvm      |  1 +
- .../selftests/kvm/include/x86/tdx/tdx_util.h  | 10 ++++++
- .../selftests/kvm/lib/x86/tdx/tdx_util.c      | 18 +++++++++++
- tools/testing/selftests/kvm/x86/tdx_vm_test.c | 31 +++++++++++++++++++
- 4 files changed, 60 insertions(+)
- create mode 100644 tools/testing/selftests/kvm/x86/tdx_vm_test.c
 
-diff --git a/tools/testing/selftests/kvm/Makefile.kvm b/tools/testing/selftests/kvm/Makefile.kvm
-index 8d1aaebd746e..86c101fbe1a0 100644
---- a/tools/testing/selftests/kvm/Makefile.kvm
-+++ b/tools/testing/selftests/kvm/Makefile.kvm
-@@ -155,6 +155,7 @@ TEST_GEN_PROGS_x86 += rseq_test
- TEST_GEN_PROGS_x86 += steal_time
- TEST_GEN_PROGS_x86 += system_counter_offset_test
- TEST_GEN_PROGS_x86 += pre_fault_memory_test
-+TEST_GEN_PROGS_x86 += x86/tdx_vm_test
- 
- # Compiled outputs used by test targets
- TEST_GEN_PROGS_EXTENDED_x86 += x86/nx_huge_pages_test
-diff --git a/tools/testing/selftests/kvm/include/x86/tdx/tdx_util.h b/tools/testing/selftests/kvm/include/x86/tdx/tdx_util.h
-index 2467b6c35557..775ca249f74d 100644
---- a/tools/testing/selftests/kvm/include/x86/tdx/tdx_util.h
-+++ b/tools/testing/selftests/kvm/include/x86/tdx/tdx_util.h
-@@ -11,6 +11,14 @@ static inline bool is_tdx_vm(struct kvm_vm *vm)
- 	return vm->type == KVM_X86_TDX_VM;
- }
- 
-+/*
-+ * Verify that TDX is supported by KVM.
-+ */
-+static inline bool is_tdx_enabled(void)
-+{
-+	return !!(kvm_check_cap(KVM_CAP_VM_TYPES) & BIT(KVM_X86_TDX_VM));
-+}
-+
- /*
-  * TDX ioctls
-  */
-@@ -72,5 +80,7 @@ void vm_tdx_load_vcpu_boot_parameters(struct kvm_vm *vm, struct kvm_vcpu *vcpu);
- void vm_tdx_set_vcpu_entry_point(struct kvm_vcpu *vcpu, void *guest_code);
- 
- void vm_tdx_finalize(struct kvm_vm *vm);
-+struct kvm_vm *vm_tdx_create_with_one_vcpu(void *guest_code,
-+					   struct kvm_vcpu **vcpu);
- 
- #endif // SELFTESTS_TDX_TDX_UTIL_H
-diff --git a/tools/testing/selftests/kvm/lib/x86/tdx/tdx_util.c b/tools/testing/selftests/kvm/lib/x86/tdx/tdx_util.c
-index 4024587ed3c2..8b18f1a8da62 100644
---- a/tools/testing/selftests/kvm/lib/x86/tdx/tdx_util.c
-+++ b/tools/testing/selftests/kvm/lib/x86/tdx/tdx_util.c
-@@ -371,3 +371,21 @@ void vm_tdx_finalize(struct kvm_vm *vm)
- 	load_td_private_memory(vm);
- 	vm_tdx_vm_ioctl(vm, KVM_TDX_FINALIZE_VM, 0, NULL);
- }
-+
-+struct kvm_vm *vm_tdx_create_with_one_vcpu(void *guest_code,
-+					   struct kvm_vcpu **vcpu)
-+{
-+	struct vm_shape shape = {
-+		.mode = VM_MODE_DEFAULT,
-+		.type = KVM_X86_TDX_VM,
-+	};
-+	struct kvm_vm *vm;
-+	struct kvm_vcpu *vcpus[1];
-+
-+	vm = __vm_create_with_vcpus(shape, 1, 0, guest_code, vcpus);
-+	*vcpu = vcpus[0];
-+
-+	vm_tdx_finalize(vm);
-+
-+	return vm;
-+}
-diff --git a/tools/testing/selftests/kvm/x86/tdx_vm_test.c b/tools/testing/selftests/kvm/x86/tdx_vm_test.c
-new file mode 100644
-index 000000000000..a9ee489eea1a
---- /dev/null
-+++ b/tools/testing/selftests/kvm/x86/tdx_vm_test.c
-@@ -0,0 +1,31 @@
-+// SPDX-License-Identifier: GPL-2.0-only
-+
-+#include "kvm_util.h"
-+#include "tdx/tdx_util.h"
-+#include "ucall_common.h"
-+#include "kselftest_harness.h"
-+
-+static void guest_code_lifecycle(void)
-+{
-+	GUEST_DONE();
-+}
-+
-+TEST(verify_td_lifecycle)
-+{
-+	struct kvm_vcpu *vcpu;
-+	struct kvm_vm *vm;
-+	struct ucall uc;
-+
-+	vm = vm_tdx_create_with_one_vcpu(guest_code_lifecycle, &vcpu);
-+
-+	vcpu_run(vcpu);
-+	TEST_ASSERT_EQ(get_ucall(vcpu, &uc), UCALL_DONE);
-+
-+	kvm_vm_free(vm);
-+}
-+
-+int main(int argc, char **argv)
-+{
-+	TEST_REQUIRE(is_tdx_enabled());
-+	return test_harness_run(argc, argv);
-+}
--- 
-2.51.0.rc1.193.gad69d77794-goog
+On 8/21/2025 11:30 AM, Binbin Wu wrote:
+>
+>
+> On 8/21/2025 1:56 AM, Sean Christopherson wrote:
+>> On Wed, Aug 20, 2025, Binbin Wu wrote:
+[...]
+>>> Hi Sean,
+>>>
+>>> Since guest_force_mtrr_state() also supports to force MTRR variable ranges,
+>>> I am wondering if we could use guest_force_mtrr_state() to set the legacy PCI
+>>> hole range as UC?
+>>>
+>>> Is it less hacky?
+>> Oh!  That's a way better idea than my hack.  I missed that the kernel would still
+>> consult MTRRs.
+>>
+>> Compile tested only, but something like this?
+>>
+>> diff --git a/arch/x86/kernel/kvm.c b/arch/x86/kernel/kvm.c
+>> index 8ae750cde0c6..45c8871cdda1 100644
+>> --- a/arch/x86/kernel/kvm.c
+>> +++ b/arch/x86/kernel/kvm.c
+>> @@ -933,6 +933,13 @@ static void kvm_sev_hc_page_enc_status(unsigned long pfn, int npages, bool enc)
+>>     static void __init kvm_init_platform(void)
+>>   {
+>> +       u64 tolud = e820__end_of_low_ram_pfn() << PAGE_SHIFT;
+>> +       struct mtrr_var_range pci_hole = {
+>> +               .base_lo = tolud | X86_MEMTYPE_UC,
+>> +               .mask_lo = (u32)(~(SZ_4G - tolud - 1)) | BIT(11),
+>> +               .mask_hi = (BIT_ULL(boot_cpu_data.x86_phys_bits) - 1) >> 32,
+>> +       };
+>> +
+>
+> This value of tolud  may not meet the range size and alignment requirement for
+> variable MTRR.
+>
+> Variable MTRR has requirement for range size and alignment:
+> For ranges greater than 4 KBytes, each range must be of length 2^n and its base
+> address must be aligned on a 2^n boundary, where n is a value equal to or
+> greater than 12. The base-address alignment value cannot be less than its length.
+
+Wait, Linux kernel converts MTRR register values to MTRR state (base and size) and
+cache it for later lookups (refer to map_add_var()). I.e., in Linux kernel,
+only the cached state will be used.
+
+These MTRR register values are never programmed when using
+guest_force_mtrr_state() , so even the values doesn't meet the
+requirement from hardware perspective, Linux kernel can still get the right base and size.
+
+No bothering to force the base and size alignment.
+But a comment would be helpful.
+Also, BIT(11) could be replaced by MTRR_PHYSMASK_V.
+
+How about:
+diff --git a/arch/x86/kernel/kvm.c b/arch/x86/kernel/kvm.c
+index 90097df4eafd..a9582ffc3088 100644
+--- a/arch/x86/kernel/kvm.c
++++ b/arch/x86/kernel/kvm.c
+@@ -934,9 +934,15 @@ static void kvm_sev_hc_page_enc_status(unsigned long pfn, int npages, bool enc)
+  static void __init kvm_init_platform(void)
+  {
+         u64 tolud = e820__end_of_low_ram_pfn() << PAGE_SHIFT;
++       /*
++        * The range's base address and size may not meet the alignment
++        * requirement for variable MTRR. However, Linux guest never
++        * programs MTRRs when forcing guest MTRR state, no bothering to
++        * enforce the base and range size alignment.
++        */
+         struct mtrr_var_range pci_hole = {
+                 .base_lo = tolud | X86_MEMTYPE_UC,
+-               .mask_lo = (u32)(~(SZ_4G - tolud - 1)) | BIT(11),
++               .mask_lo = (u32)(~(SZ_4G - tolud - 1)) | MTRR_PHYSMASK_V,
+                 .mask_hi = (BIT_ULL(boot_cpu_data.x86_phys_bits) - 1) >> 32,
+         };
+
+
+I tested it in my setup, it can fix the issue of TPM driver failure with the
+modified ACPI table for TPM in QEMU.
+
+
+Hi Vishal,
+Could you test it with google's VMM?
+
+
+>
+> In my setup, the value of tolud is 0x7FF7C000, it requires 3 variable MTRRs to
+> meet the requirement, i.e.,
+> - 7FF7 C000  ~   7FF8 0000
+> - 7FF8 0000  ~   8000 0000
+> - 8000 0000  ~ 1 0000 0000
+>
+> I checks the implementation in EDK2, in order to fit the legacy PCI hole into
+> one variable MTRR, it has some assumption to truncate the size and round up the
+> base address in PlatformQemuUc32BaseInitialization():
+>     ...
+>     ASSERT (
+>       PlatformInfoHob->HostBridgeDevId == INTEL_Q35_MCH_DEVICE_ID ||
+>       PlatformInfoHob->HostBridgeDevId == INTEL_82441_DEVICE_ID
+>       );
+>     ...
+>     //
+>     // Start with the [LowerMemorySize, 4GB) range. Make sure one
+>     // variable MTRR suffices by truncating the size to a whole power of two,
+>     // while keeping the end affixed to 4GB. This will round the base up.
+>     //
+>     PlatformInfoHob->Uc32Size = GetPowerOfTwo32 ((UINT32)(SIZE_4GB - PlatformInfoHob->LowMemory));
+>     PlatformInfoHob->Uc32Base = (UINT32)(SIZE_4GB - PlatformInfoHob->Uc32Size);
+>     //
+>     // Assuming that LowerMemorySize is at least 1 byte, Uc32Size is at most 2GB.
+>     // Therefore Uc32Base is at least 2GB.
+>     //
+>     ASSERT (PlatformInfoHob->Uc32Base >= BASE_2GB);
+>
+> I am not sure if KVM can do such assumption.
+> Otherwise, KVM needs to calculate the ranges to meet the requirement. :(
+>
+>
+>>          if (cc_platform_has(CC_ATTR_GUEST_MEM_ENCRYPT) &&
+>> kvm_para_has_feature(KVM_FEATURE_MIGRATION_CONTROL)) {
+>>                  unsigned long nr_pages;
+>> @@ -982,8 +989,12 @@ static void __init kvm_init_platform(void)
+>>          kvmclock_init();
+>>          x86_platform.apic_post_init = kvm_apic_init;
+>>   -       /* Set WB as the default cache mode for SEV-SNP and TDX */
+>> -       guest_force_mtrr_state(NULL, 0, MTRR_TYPE_WRBACK);
+>> +       /*
+>> +        * Set WB as the default cache mode for SEV-SNP and TDX, with a single
+>> +        * UC range for the legacy PCI hole, e.g. so that devices that expect
+>> +        * to get UC/WC mappings don't get surprised with WB.
+>> +        */
+>> +       guest_force_mtrr_state(&pci_hole, 1, MTRR_TYPE_WRBACK);
+>>   }
+>>     #if defined(CONFIG_AMD_MEM_ENCRYPT)
+>
+>
 
 
