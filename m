@@ -1,174 +1,200 @@
-Return-Path: <kvm+bounces-55411-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-55412-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id A0FD1B3088D
-	for <lists+kvm@lfdr.de>; Thu, 21 Aug 2025 23:43:04 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id CB7BDB30897
+	for <lists+kvm@lfdr.de>; Thu, 21 Aug 2025 23:45:52 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 804B95882E3
-	for <lists+kvm@lfdr.de>; Thu, 21 Aug 2025 21:43:04 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9DB82624091
+	for <lists+kvm@lfdr.de>; Thu, 21 Aug 2025 21:45:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 072F92EA478;
-	Thu, 21 Aug 2025 21:42:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 464A82EAB84;
+	Thu, 21 Aug 2025 21:45:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="06Tufx1W"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="dRqQIkhv"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pl1-f202.google.com (mail-pl1-f202.google.com [209.85.214.202])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BAF662E92AB
-	for <kvm@vger.kernel.org>; Thu, 21 Aug 2025 21:42:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B94002EA16C
+	for <kvm@vger.kernel.org>; Thu, 21 Aug 2025 21:45:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755812540; cv=none; b=fQp3HkQFUXKI7Nj1xjq/6zzD90JgZUmflYSbt7R2KWFRN1TiOP3MyNFRWSVF2iRrR+4AIAN5o+OUMiMJNmwvc8CcNhWvq7ITBQPmYQT9/oc6pEqb/NaFQnZTPckrOWPN+cIjCCIf/IfiGNlZ6Rhvfi28hLQjhzk/aqJ4UsVRpME=
+	t=1755812728; cv=none; b=Zx98Ew6PXBGTfBJhYjEWPO84P22aL01hrNEBP8K4czJEOnqSfCK1dBKk0fI4WS3gZWkWoY9Xu9JGk5sLU+RJReDPo7O5hjbs+4SacAssJmbHyVjLeTRioMX8VVdUUWcfckEoTZ77vV5wcQvYE2TwrV0H2Y+8QwNX4U779Qrr/9I=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755812540; c=relaxed/simple;
-	bh=jO/gj25JzhDalfYTefJGdFK+irEJClGBRvjVRqOnfsk=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=u9+K5RV9NOcyIe6AgCmb3pyJg0FZy3hjewqTTZZHTKBQfTToO+XoDiTmo8w7k8qctwpBfDCQbL7NJazlesLW84Ry96ohOPQvcBXDfImn67VF1IfNOoNRm7pRaETtGpQXrv/HFD5eWsC5CZacITDUPdBppl4ZbtR/i3Z1cFBgnHk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=06Tufx1W; arc=none smtp.client-ip=209.85.214.202
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pl1-f202.google.com with SMTP id d9443c01a7336-2445806eab4so16977525ad.1
-        for <kvm@vger.kernel.org>; Thu, 21 Aug 2025 14:42:17 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1755812537; x=1756417337; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:reply-to:from:to:cc:subject:date:message-id:reply-to;
-        bh=e8pkHcdgPqI0ISkr0EzZdXVU8MYoR6lkGEb75P/NGP4=;
-        b=06Tufx1WuMNaTrR661jIZWG5iTeBq6DmlLsWZccwUdqBAxCPtMD4VbklqCE0qEsEMz
-         hcV7sb3dadXFg0cjkWijsvNore2DrVAEoj1hN2La7XS3WDszAtKQpH949aKgAlNaGKm2
-         0ZsTuwoKpStjSr668nf1Os1TzzUeTs7jMzY++uP8wTyuYvTnvbiY2yaHdZjKhss5K5lt
-         jlHgoynlK0EpshLmIaCeJGcfgWvlEaE3rgIMMyFUNfbTaGnHmXPOk3ukYpKJanUcYonZ
-         CpxMhO2d2XKWQKTUgs5coTy+wLglDsArvymPI/35GApyq5cD4RuDbd8qAHJ6XwxG4kEe
-         c5/Q==
+	s=arc-20240116; t=1755812728; c=relaxed/simple;
+	bh=fUaBHZHAJdUQk9eKwml7s0QHGPPoV73wuBZAYASLp2c=;
+	h=Message-ID:Date:MIME-Version:Subject:From:To:Cc:References:
+	 In-Reply-To:Content-Type; b=mitMLYQB2KEJA4MmMRpjDH/1HIX2QOwFi6MLXt2fVNIGQnHsQ9NQcZ7Q7mhqwC3k4Auwy00Sj8pK7i7S2UGAskwiAllrg3BW8Rm9kRnhLjnmkgFGRn43eCXhSN8Sz++JhBjJ1bGds1viiE8uwelb201Feo8y6isjLLoDcNM0Md4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=dRqQIkhv; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1755812724;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+	bh=xgU+Z5k4KPqEraeKDWCOzJcpc8HGVmW4oZxLQRmx6Ws=;
+	b=dRqQIkhvznsxHhME/+IsWavrsBXHmsqA0USw2cVx2/8Cna6y7TDXT7A4V4YY0RH+Vyq445
+	cqT9YJffSaWiz53FMiq5lWOj7T5uEy3nhzvy3Lhlxxc+eG9yvep4UwD5yR53gAaUEx77Qt
+	8YtGULrUxS3zsblyXIHRYH0/wkdNEZw=
+Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
+ [209.85.221.69]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-670-F6IZ39YgOEm2W4C1akJXXw-1; Thu, 21 Aug 2025 17:45:23 -0400
+X-MC-Unique: F6IZ39YgOEm2W4C1akJXXw-1
+X-Mimecast-MFC-AGG-ID: F6IZ39YgOEm2W4C1akJXXw_1755812722
+Received: by mail-wr1-f69.google.com with SMTP id ffacd0b85a97d-3b9e4117542so652277f8f.2
+        for <kvm@vger.kernel.org>; Thu, 21 Aug 2025 14:45:23 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1755812537; x=1756417337;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:reply-to:x-gm-message-state:from:to:cc:subject:date:message-id
+        d=1e100.net; s=20230601; t=1755812722; x=1756417522;
+        h=content-transfer-encoding:in-reply-to:autocrypt:content-language
+         :references:cc:to:from:subject:user-agent:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=e8pkHcdgPqI0ISkr0EzZdXVU8MYoR6lkGEb75P/NGP4=;
-        b=vxLppEPSXbw31lereS4/qsXYUCktuf82vO+BYiSof9fVJJZzNcrJwxeKLcOZMeKukX
-         KP5J8xTxbkP9zP57Bhie5lIa2adJUSpJORRO9DqkAflXM9f1DuKGrwFRoSXoTg0HUY2S
-         4kGNLrc0sRb3ZVsC9Lcd8PNmmWxd4DbRzfD8K7ZHmrFBTrAsLqzZDU90PJdzsbwLLs5X
-         F32ir3O1Z345tG55ygDE3QTFK8ilcHJ1Ux8bve9+tek++TELhzt8iIJ5fyzodiwKFCci
-         4eu/5bOTB0kNLlxSwPfVng4jL8wCdJFsb5WDzakA6xOuC74Xx9qPlcKO0uGqhT5w1Ae2
-         cUqg==
-X-Gm-Message-State: AOJu0Yxkhd3y1rGAH4CVI9ruxFh8MlwdDAGIAtiPV1WilNg7NNeGvvMN
-	AFnzjv9ndkl0BGRe48Ovs1IzhyDEwhE83Lmm+XjzrSW5Zb1/6J2/9PPEcR+AAbZaMgPh85HosDs
-	Tq0cVwQ==
-X-Google-Smtp-Source: AGHT+IFT6Sn/6lo/x/nO8mYo4e+XE4zjzpgAf9RzlJKpSlQeT3lTnfh3y0Zb8gxOWD92wxfJvI93w2u+hBs=
-X-Received: from pjbsi8.prod.google.com ([2002:a17:90b:5288:b0:320:e3b2:68de])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:903:2a8b:b0:246:3964:63dc
- with SMTP id d9443c01a7336-2463964650fmr4102925ad.47.1755812537064; Thu, 21
- Aug 2025 14:42:17 -0700 (PDT)
-Reply-To: Sean Christopherson <seanjc@google.com>
-Date: Thu, 21 Aug 2025 14:42:09 -0700
-In-Reply-To: <20250821214209.3463350-1-seanjc@google.com>
+        bh=xgU+Z5k4KPqEraeKDWCOzJcpc8HGVmW4oZxLQRmx6Ws=;
+        b=jikcMUZ+QbtSx8mXrwNV1QkTIJr02rGaoPxUqkbo01L9bxWsOqBKlIhaLr0bkujLVv
+         vStfpix+z1FakvivIijuR/Xy3FKrYC3NwwizAP2JmXD6YTyZRvkNA8A9Ku62OkkWpjst
+         Y9QDWr3sF7OTh5nepfY3asgl42adoyTpM55xyd7JTDRjvh/2him9k74yDXpsbj/VyPSa
+         poevpZGJj+VOGq+2PNkpz13cDp4aMkFWsjDuS8i1sZTbrN4E1jB1h4JKZ0HUc6M15wbq
+         ZohyYKK5Fi6fjL+1mEYXxER+vKZHpgxNmkylRPx6eyDoSvgahry3bC/CatTkdmgtamqD
+         6aSw==
+X-Forwarded-Encrypted: i=1; AJvYcCXYVp6ZIOSxqziL3wHj1vDR6A5Pe8ZpkhU6sknMCXT9h5mgsvyRxFf8y9pfUP1TX8/W0vg=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxRuUKrmROxxHyE8K4HEwXw1+XBITMCOS2KXB6sSHhDYr3yfoH+
+	20ZHSVSR2rbxMC4rGO2hFTpupFQIpmPNaQrpU69iW5tBnL9XsiqCn45o50nVC24vEvLzFjAkfF1
+	f/kB0zXu+xLSu5XQJbV0bCcfdwBNJyDqaZAJRY9wn9Afvsq9OmN2AFQ==
+X-Gm-Gg: ASbGncsODsn3YMvmOtd7/3NJ5hNM5Drg9fCWXtPUItOh1S4uAN+u6dSAWVy5Qj3iul0
+	1msLDHy/wwe4zdgaGTxJHDbG6Ha9kq9MzmZ379DVCH9QYWxv5dDNftljOk4yFutbhU+ob9qktfu
+	kEM0PIsexfKWX3OZl65YKe+9fk3QNL3QEXajJAxKrz14Sk1oT/OOkREWQN6bg4zmIjR+b6jVP3Y
+	WYhp8WKfZ+tc6fLDSwTXrVIZEDZaPlYIeJWHdiWThCtv+8mxOuCgmXTu0ADR8/cixDsZ6lRJQRW
+	S5g2+N5ULKUof/zyHC1SrjZls7GhlguRtTHX+ufin2OrcOEJ5lTKN2HuADpDyWe+rjhngBELOE5
+	dG7b26Q5k/gIVwSvB+NGOcswJBSWVUioEGkg/Sq5/sRUnAI7Dg354qAjlLohs7w==
+X-Received: by 2002:a05:6000:2902:b0:3b8:f925:8d4 with SMTP id ffacd0b85a97d-3c5db2da00amr300053f8f.26.1755812721872;
+        Thu, 21 Aug 2025 14:45:21 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IEfnhl0R8ZwVLuxUZYmGD7nMrbthuKRx51tD/iqNpCQL5sxy24UygUdE3xc6j7fC/B+t7+yTQ==
+X-Received: by 2002:a05:6000:2902:b0:3b8:f925:8d4 with SMTP id ffacd0b85a97d-3c5db2da00amr300045f8f.26.1755812721421;
+        Thu, 21 Aug 2025 14:45:21 -0700 (PDT)
+Received: from ?IPV6:2003:d8:2f26:ba00:803:6ec5:9918:6fd? (p200300d82f26ba0008036ec5991806fd.dip0.t-ipconnect.de. [2003:d8:2f26:ba00:803:6ec5:9918:6fd])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-45b4e25da97sm22067085e9.1.2025.08.21.14.45.19
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 21 Aug 2025 14:45:20 -0700 (PDT)
+Message-ID: <b09b7ef4-5b06-4bb8-9be3-1194e3904c92@redhat.com>
+Date: Thu, 21 Aug 2025 23:45:18 +0200
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20250821214209.3463350-1-seanjc@google.com>
-X-Mailer: git-send-email 2.51.0.261.g7ce5a0a67e-goog
-Message-ID: <20250821214209.3463350-4-seanjc@google.com>
-Subject: [PATCH 3/3] KVM: x86: Move vector_hashing into lapic.c
-From: Sean Christopherson <seanjc@google.com>
-To: Sean Christopherson <seanjc@google.com>, Paolo Bonzini <pbonzini@redhat.com>
-Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH RFC 33/35] kfence: drop nth_page() usage
+From: David Hildenbrand <david@redhat.com>
+To: linux-kernel@vger.kernel.org
+Cc: Alexander Potapenko <glider@google.com>, Marco Elver <elver@google.com>,
+ Dmitry Vyukov <dvyukov@google.com>, Andrew Morton
+ <akpm@linux-foundation.org>, Brendan Jackman <jackmanb@google.com>,
+ Christoph Lameter <cl@gentwo.org>, Dennis Zhou <dennis@kernel.org>,
+ dri-devel@lists.freedesktop.org, intel-gfx@lists.freedesktop.org,
+ iommu@lists.linux.dev, io-uring@vger.kernel.org,
+ Jason Gunthorpe <jgg@nvidia.com>, Jens Axboe <axboe@kernel.dk>,
+ Johannes Weiner <hannes@cmpxchg.org>, John Hubbard <jhubbard@nvidia.com>,
+ kasan-dev@googlegroups.com, kvm@vger.kernel.org,
+ "Liam R. Howlett" <Liam.Howlett@oracle.com>,
+ Linus Torvalds <torvalds@linux-foundation.org>, linux-arm-kernel@axis.com,
+ linux-arm-kernel@lists.infradead.org, linux-crypto@vger.kernel.org,
+ linux-ide@vger.kernel.org, linux-kselftest@vger.kernel.org,
+ linux-mips@vger.kernel.org, linux-mmc@vger.kernel.org, linux-mm@kvack.org,
+ linux-riscv@lists.infradead.org, linux-s390@vger.kernel.org,
+ linux-scsi@vger.kernel.org, Lorenzo Stoakes <lorenzo.stoakes@oracle.com>,
+ Marek Szyprowski <m.szyprowski@samsung.com>, Michal Hocko <mhocko@suse.com>,
+ Mike Rapoport <rppt@kernel.org>, Muchun Song <muchun.song@linux.dev>,
+ netdev@vger.kernel.org, Oscar Salvador <osalvador@suse.de>,
+ Peter Xu <peterx@redhat.com>, Robin Murphy <robin.murphy@arm.com>,
+ Suren Baghdasaryan <surenb@google.com>, Tejun Heo <tj@kernel.org>,
+ virtualization@lists.linux.dev, Vlastimil Babka <vbabka@suse.cz>,
+ wireguard@lists.zx2c4.com, x86@kernel.org, Zi Yan <ziy@nvidia.com>
+References: <20250821200701.1329277-1-david@redhat.com>
+ <20250821200701.1329277-34-david@redhat.com>
+ <1a13a5cb-4312-4c01-827b-fa8a029df0f1@redhat.com>
+Content-Language: en-US
+Autocrypt: addr=david@redhat.com; keydata=
+ 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
+ qIws/H2t
+In-Reply-To: <1a13a5cb-4312-4c01-827b-fa8a029df0f1@redhat.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-Move the vector_hashing module param into lapic.c now that all usage is
-contained within the local APIC emulation code.
+On 21.08.25 22:32, David Hildenbrand wrote:
+> On 21.08.25 22:06, David Hildenbrand wrote:
+>> We want to get rid of nth_page(), and kfence init code is the last user.
+>>
+>> Unfortunately, we might actually walk a PFN range where the pages are
+>> not contiguous, because we might be allocating an area from memblock
+>> that could span memory sections in problematic kernel configs (SPARSEMEM
+>> without SPARSEMEM_VMEMMAP).
+>>
+>> We could check whether the page range is contiguous
+>> using page_range_contiguous() and failing kfence init, or making kfence
+>> incompatible these problemtic kernel configs.
+>>
+>> Let's keep it simple and simply use pfn_to_page() by iterating PFNs.
+>>
+> 
+> Fortunately this series is RFC due to lack of detailed testing :P
+> 
+> Something gives me a NULL-pointer pointer here (maybe the virt_to_phys()).
+> 
+> Will look into that tomorrow.
 
-Opportunistically drop the accessor and append "_enabled" to the variable
-to help capture that it's a boolean module param.
+Okay, easy: relying on i but not updating it /me facepalm
 
-No functional change intended.
-
-Signed-off-by: Sean Christopherson <seanjc@google.com>
----
- arch/x86/kvm/lapic.c | 8 ++++++--
- arch/x86/kvm/x86.c   | 8 --------
- arch/x86/kvm/x86.h   | 1 -
- 3 files changed, 6 insertions(+), 11 deletions(-)
-
-diff --git a/arch/x86/kvm/lapic.c b/arch/x86/kvm/lapic.c
-index 1a8bc81973e3..6fac6fb86c19 100644
---- a/arch/x86/kvm/lapic.c
-+++ b/arch/x86/kvm/lapic.c
-@@ -74,6 +74,10 @@ module_param(lapic_timer_advance, bool, 0444);
- #define LAPIC_TIMER_ADVANCE_NS_MAX     5000
- /* step-by-step approximation to mitigate fluctuation */
- #define LAPIC_TIMER_ADVANCE_ADJUST_STEP 8
-+
-+static bool __read_mostly vector_hashing_enabled = true;
-+module_param_named(vector_hashing, vector_hashing_enabled, bool, 0444);
-+
- static int kvm_lapic_msr_read(struct kvm_lapic *apic, u32 reg, u64 *data);
- static int kvm_lapic_msr_write(struct kvm_lapic *apic, u32 reg, u64 data);
- 
-@@ -1152,7 +1156,7 @@ static inline bool kvm_apic_map_get_dest_lapic(struct kvm *kvm,
- 	if (!kvm_lowest_prio_delivery(irq))
- 		return true;
- 
--	if (!kvm_vector_hashing_enabled()) {
-+	if (!vector_hashing_enabled) {
- 		lowest = -1;
- 		for_each_set_bit(i, bitmap, 16) {
- 			if (!(*dst)[i])
-@@ -1293,7 +1297,7 @@ int kvm_irq_delivery_to_apic(struct kvm *kvm, struct kvm_lapic *src,
- 				r = 0;
- 			r += kvm_apic_set_irq(vcpu, irq, dest_map);
- 		} else if (kvm_apic_sw_enabled(vcpu->arch.apic)) {
--			if (!kvm_vector_hashing_enabled()) {
-+			if (!vector_hashing_enabled) {
- 				if (!lowest)
- 					lowest = vcpu;
- 				else if (kvm_apic_compare_prio(vcpu, lowest) < 0)
-diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-index 7ba2cdfdac44..554b36de700c 100644
---- a/arch/x86/kvm/x86.c
-+++ b/arch/x86/kvm/x86.c
-@@ -164,9 +164,6 @@ module_param(kvmclock_periodic_sync, bool, 0444);
- static u32 __read_mostly tsc_tolerance_ppm = 250;
- module_param(tsc_tolerance_ppm, uint, 0644);
- 
--static bool __read_mostly vector_hashing = true;
--module_param(vector_hashing, bool, 0444);
--
- bool __read_mostly enable_vmware_backdoor = false;
- module_param(enable_vmware_backdoor, bool, 0444);
- EXPORT_SYMBOL_GPL(enable_vmware_backdoor);
-@@ -13552,11 +13549,6 @@ bool kvm_arch_has_noncoherent_dma(struct kvm *kvm)
- }
- EXPORT_SYMBOL_GPL(kvm_arch_has_noncoherent_dma);
- 
--bool kvm_vector_hashing_enabled(void)
--{
--	return vector_hashing;
--}
--
- bool kvm_arch_no_poll(struct kvm_vcpu *vcpu)
- {
- 	return (vcpu->arch.msr_kvm_poll_control & 1) == 0;
-diff --git a/arch/x86/kvm/x86.h b/arch/x86/kvm/x86.h
-index eb3088684e8a..786e36fcd0fb 100644
---- a/arch/x86/kvm/x86.h
-+++ b/arch/x86/kvm/x86.h
-@@ -431,7 +431,6 @@ void kvm_deliver_exception_payload(struct kvm_vcpu *vcpu,
- 
- int kvm_mtrr_set_msr(struct kvm_vcpu *vcpu, u32 msr, u64 data);
- int kvm_mtrr_get_msr(struct kvm_vcpu *vcpu, u32 msr, u64 *pdata);
--bool kvm_vector_hashing_enabled(void);
- void kvm_fixup_and_inject_pf_error(struct kvm_vcpu *vcpu, gva_t gva, u16 error_code);
- int x86_decode_emulated_instruction(struct kvm_vcpu *vcpu, int emulation_type,
- 				    void *insn, int insn_len);
 -- 
-2.51.0.261.g7ce5a0a67e-goog
+Cheers
+
+David / dhildenb
 
 
