@@ -1,239 +1,287 @@
-Return-Path: <kvm+bounces-55256-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-55257-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id CBD87B2ED8C
-	for <lists+kvm@lfdr.de>; Thu, 21 Aug 2025 07:24:15 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 972F4B2ED96
+	for <lists+kvm@lfdr.de>; Thu, 21 Aug 2025 07:29:53 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 1E6371C8458A
-	for <lists+kvm@lfdr.de>; Thu, 21 Aug 2025 05:24:35 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 107143BB3A7
+	for <lists+kvm@lfdr.de>; Thu, 21 Aug 2025 05:27:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EADD62BEC28;
-	Thu, 21 Aug 2025 05:24:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6F37D2C08AD;
+	Thu, 21 Aug 2025 05:27:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="OC3rk993"
+	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="S1jeA721"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.18])
+Received: from NAM10-BN7-obe.outbound.protection.outlook.com (mail-bn7nam10on2079.outbound.protection.outlook.com [40.107.92.79])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6A11D49620;
-	Thu, 21 Aug 2025 05:24:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.18
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755753845; cv=none; b=Af8fjuzi0kFk1JL+XsDLST8tgyAUXOM09D+Hu/p5GIHL1m1cHJDkHqNRw4PgRgjURN2sRucuC0bBdCKrIQYDRkMMOp2nS5VYVyhbn4CdyltR32GS5NcvYwNJ7H0EDwtYeGQqDRn/DcpJ4+U8LvpUm8pGMKOsnon0IIiZgM4FFKA=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755753845; c=relaxed/simple;
-	bh=aRxjhvMv7K3+zEEb1KjJOi47ZdXTCG7tkrSzxnqsbB0=;
-	h=Message-ID:Date:MIME-Version:Subject:From:To:Cc:References:
-	 In-Reply-To:Content-Type; b=j+HALP17yzBMpj4cbFMVUO4jSEoCjNZmx3zlqAQfW+5V3uyu3nikNcVG/OXouq1gWsE39VENryieyslgrVmbRgN4AEU9irP5jt2i343z+CERJ1pbyJHVzx2iV+7esNArMfkyoiq9WcdtNrYCB6fmEYw9LKzlOWDmFa4QISRKKHQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=OC3rk993; arc=none smtp.client-ip=198.175.65.18
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1755753844; x=1787289844;
-  h=message-id:date:mime-version:subject:from:to:cc:
-   references:in-reply-to:content-transfer-encoding;
-  bh=aRxjhvMv7K3+zEEb1KjJOi47ZdXTCG7tkrSzxnqsbB0=;
-  b=OC3rk993Jw+NfWUKtXKmhMevXmaDK5aAYsFkLojJ4uAjvUPaDA5CSBxH
-   xCBvXEveLW/ybTivWByvK96L0cVruJyTUGxnXOEqdAYVmSi25anQ3v9Oj
-   0TBqrgV0SuURw/Vr1VhVEEYuRdTwbOGN8VA6h1CXSzb+Wdo0JlXvcFAxQ
-   GTJdknzM8W4LyDZVZl8yrRbvmxzw1au/vJJ7dRE6Dq+VcyTYKTGfj3nMR
-   3gOkP7o4NtPaMsia7AkFELNZJPRy7w8tQrO/lcf9/zbBMRo31w4ERcIQs
-   zx8SKm3VHjx7O1Nn7c2h43IJ7bszfi1ssvYQk5dJTQlfMecbJmSh91jR1
-   Q==;
-X-CSE-ConnectionGUID: zuNrf0PgSkWtZGkkhd0+5w==
-X-CSE-MsgGUID: B/jPkF+bRT6hCx3XzPEerQ==
-X-IronPort-AV: E=McAfee;i="6800,10657,11527"; a="58101254"
-X-IronPort-AV: E=Sophos;i="6.17,306,1747724400"; 
-   d="scan'208";a="58101254"
-Received: from orviesa008.jf.intel.com ([10.64.159.148])
-  by orvoesa110.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 20 Aug 2025 22:24:03 -0700
-X-CSE-ConnectionGUID: dSauImomRY+Qa3SbBJGH+A==
-X-CSE-MsgGUID: Q86G0S2DTVKRycJnMGuFEw==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.17,306,1747724400"; 
-   d="scan'208";a="168572953"
-Received: from unknown (HELO [10.238.0.107]) ([10.238.0.107])
-  by orviesa008-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 20 Aug 2025 22:23:58 -0700
-Message-ID: <f1ec8527-322d-4bdb-9a38-145fd9f28e4b@linux.intel.com>
-Date: Thu, 21 Aug 2025 13:23:55 +0800
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 060A8288C0E;
+	Thu, 21 Aug 2025 05:27:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.92.79
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1755754061; cv=fail; b=k2eSqUjZOVyUk9eAFOakRYBKqZi7qzSpeUg5TZoT8/St1V2L81usT7uoyswXz0CmnPAw5HvCs7YWI+gruACySamxXS9y1xBr/mx9dHZrU7KpcB7PJZbVZhjoiTBLNrETFUMgKa7udSfdIlpf3TjZfnTeNMVLYWNs+STaw1eyuc4=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1755754061; c=relaxed/simple;
+	bh=QEA87s9dqv5J+6RYYdJGCFFX5rpYvzf8KVvTfrg4Lx8=;
+	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
+	 Content-Type:MIME-Version; b=QJT7Z1p59KvtM1XvveTLOafcCDC5jaexADeVnfF3aR4UD0KCk0UQjMX2w4O126AwedyaqRX6Rt+S2IRSNdbcnXtFGdDDPOFyjh29I2up6ybjlkzbPbAX1yJV5j4QAuIjDyMUMBsg9thUnNP0OHrN81nVWDfxBTgsBaHcAHEjPyI=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=S1jeA721; arc=fail smtp.client-ip=40.107.92.79
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=Sx0y2tzDVwrTrTykoM/7JqHk8OjU60H1KGtvBuXMGyOqmQjkVgbaRda2oe3q/pVSAh5j+OpxjZG8kH4WcJQUPrZAGQu7yfzT5Vk6o/PPJjjUvE1NM6gJs0e7vN31BksJMF5GZJFL225pyz+0y4ldrQVktv/ovmcI94UMXGNvODoV/E0Wl9cSAM5B9NBuSxbo1Z0/07iGeL9OmmKpYwyuaX82Jkoow69Ta3lU9dqj8pfQweP8RxVHdRJPicG7qxdyOpJh2aFxN46yySRnz2zrXdQIgAooGOruicYLV5DkDbvDdCr7IoFBIDYYkAepqv6gFiebJGRzk9rwj/DbgMrGJg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=roZ6h4coD3UPKwBlKkeRHBvoS6P9RqzmR4co8dWTsDA=;
+ b=YnzuXM9k31OGVJBzfRh//geidMzgVvnu/yoqP5gpUWSN0jrbsF2r5EmaU1SvuyzUkJQHUIEdXO2AnK3XaAs3cr1ZxbCq/Nj1C2Io7k/F031md/yjqwuznS/Q2ToTe8h6VDZonrmQq8zxV+fo8yu31WcAw1cVzJGVvcuACwyk5N93CqDMhE+8TW8v/Rrb5RYr7sc/rusBs8SW6nHUIrtvij7s1J4v5BWf6D5IkeI4BE8/uovS9sc7Axfp4wJ5dydJ63gYpHKg03uq7YR0sbfGBGZ1Cqe7FhLLaPRfAO5eWxwakwO51J9tx5WmHUqvRDhbBdQN35SL3uhwb9iY67o0PA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
+ header.d=amd.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=roZ6h4coD3UPKwBlKkeRHBvoS6P9RqzmR4co8dWTsDA=;
+ b=S1jeA721nbiPzO2e4s1h195JXtY5hlLf9nCxeizGnzXV8qEWzdA78mtygRTbrMOAcqN4EImyfEh3UZ+kaAMynmhw/Dq6euODVx7B8cLtf3p3PbQeWTx2SlZYtW0x9e+D5lJ0HiVqeRjPGA2l82DnPXMIWZrwNBrJIO9G+Uh6ioM=
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=amd.com;
+Received: from DS0PR12MB6608.namprd12.prod.outlook.com (2603:10b6:8:d0::10) by
+ CY3PR12MB9680.namprd12.prod.outlook.com (2603:10b6:930:100::10) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9052.14; Thu, 21 Aug
+ 2025 05:27:35 +0000
+Received: from DS0PR12MB6608.namprd12.prod.outlook.com
+ ([fe80::b71d:8902:9ab3:f627]) by DS0PR12MB6608.namprd12.prod.outlook.com
+ ([fe80::b71d:8902:9ab3:f627%5]) with mapi id 15.20.9052.013; Thu, 21 Aug 2025
+ 05:27:35 +0000
+Message-ID: <29dd4494-01a8-45bf-9f88-1d99d6ff6ac0@amd.com>
+Date: Thu, 21 Aug 2025 10:57:24 +0530
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v9 07/18] x86/apic: Add support to send IPI for Secure
+ AVIC
+To: Borislav Petkov <bp@alien8.de>
+Cc: linux-kernel@vger.kernel.org, tglx@linutronix.de, mingo@redhat.com,
+ dave.hansen@linux.intel.com, Thomas.Lendacky@amd.com, nikunj@amd.com,
+ Santosh.Shukla@amd.com, Vasant.Hegde@amd.com, Suravee.Suthikulpanit@amd.com,
+ David.Kaplan@amd.com, x86@kernel.org, hpa@zytor.com, peterz@infradead.org,
+ seanjc@google.com, pbonzini@redhat.com, kvm@vger.kernel.org,
+ kirill.shutemov@linux.intel.com, huibo.wang@amd.com, naveen.rao@amd.com,
+ francescolavra.fl@gmail.com, tiala@microsoft.com
+References: <20250811094444.203161-1-Neeraj.Upadhyay@amd.com>
+ <20250811094444.203161-8-Neeraj.Upadhyay@amd.com>
+ <20250820154638.GOaKXt3vTcSd2320tm@fat_crate.local>
+Content-Language: en-US
+From: "Upadhyay, Neeraj" <neeraj.upadhyay@amd.com>
+In-Reply-To: <20250820154638.GOaKXt3vTcSd2320tm@fat_crate.local>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: PN3PR01CA0089.INDPRD01.PROD.OUTLOOK.COM
+ (2603:1096:c01:9a::7) To DS0PR12MB6608.namprd12.prod.outlook.com
+ (2603:10b6:8:d0::10)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 0/2] x86/kvm: Force legacy PCI hole as WB under SNP/TDX
-From: Binbin Wu <binbin.wu@linux.intel.com>
-To: Sean Christopherson <seanjc@google.com>,
- Vishal Annapurve <vannapurve@google.com>
-Cc: Nikolay Borisov <nik.borisov@suse.com>, Jianxiong Gao <jxgao@google.com>,
- "Borislav Petkov (AMD)" <bp@alien8.de>,
- Dave Hansen <dave.hansen@linux.intel.com>,
- Dionna Glaze <dionnaglaze@google.com>, "H. Peter Anvin" <hpa@zytor.com>,
- jgross@suse.com, "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>,
- kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
- Ingo Molnar <mingo@redhat.com>, pbonzini@redhat.com,
- Peter Gonda <pgonda@google.com>, Thomas Gleixner <tglx@linutronix.de>,
- Tom Lendacky <thomas.lendacky@amd.com>,
- Vitaly Kuznetsov <vkuznets@redhat.com>, x86@kernel.org,
- Rick Edgecombe <rick.p.edgecombe@intel.com>, jiewen.yao@intel.com
-References: <CAMGD6P1Q9tK89AjaPXAVvVNKtD77-zkDr0Kmrm29+e=i+R+33w@mail.gmail.com>
- <0dc2b8d2-6e1d-4530-898b-3cb4220b5d42@linux.intel.com>
- <4acfa729-e0ad-4dc7-8958-ececfae8ab80@suse.com> <aIDzBOmjzveLjhmk@google.com>
- <550a730d-07db-46d7-ac1a-b5b7a09042a6@linux.intel.com>
- <aIeX0GQh1Q_4N597@google.com>
- <ad616489-1546-4f6a-9242-a719952e19b6@linux.intel.com>
- <CAGtprH9EL0=Cxu7f8tD6rEvnpC7uLAw6jKijHdFUQYvbyJgkzA@mail.gmail.com>
- <20641696-242d-4fb6-a3c1-1a8e7cf83b18@linux.intel.com>
- <697aa804-b321-4dba-9060-7ac17e0a489f@linux.intel.com>
- <aKYMQP5AEC2RkOvi@google.com>
- <d84b792e-8d26-49c2-9e7c-04093f554f8a@linux.intel.com>
-Content-Language: en-US
-In-Reply-To: <d84b792e-8d26-49c2-9e7c-04093f554f8a@linux.intel.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: DS0PR12MB6608:EE_|CY3PR12MB9680:EE_
+X-MS-Office365-Filtering-Correlation-Id: d10ce46d-39a7-4106-8688-08dde0736f1d
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;ARA:13230040|366016|376014|7416014|1800799024;
+X-Microsoft-Antispam-Message-Info:
+	=?utf-8?B?UTRFOVZXTUxGZ1dOQkk1S0RFWnJsZmM0VGRoaWMweWNkVDEzNERScm02cGRU?=
+ =?utf-8?B?T2R1N3htaWFLNXhqQmQwVnB0aDBhUy81NXgrNmNUR3pLU0ppSkIwZHhxOWRW?=
+ =?utf-8?B?YUlVK1V1dFgybkd4UzZJajRjWTNXandxdXVWbnFLTERXNkJpM1lZQTZlUUFo?=
+ =?utf-8?B?S0VNMlNOUk1SWlpNMWVITG16ZHh6NTU3SFRGa3g5NHM2NGUweFJUVlQxbXQ3?=
+ =?utf-8?B?ZVNVSE0rQXYwSDVlS3FjZDJ1MW1GbHh4QTJiUUQ2eDlGaXlZMVBNb294Z2hU?=
+ =?utf-8?B?UTJBc1hxcFNjSVNBOWwrQXJkdkVtZ0ZyMitHWGtqeVNxVkZXQU9OZFA4YWJh?=
+ =?utf-8?B?UzNQbWt3MEhkVy9Kd2MxQlorZGUwb0MyOXhFUlN5UWJPZEd1aUxPY09iOC9I?=
+ =?utf-8?B?RTR4b0JJSjZSY2tYVnhlZU5EQ3BvUEtXUC9URUI2TTF6ZEcwQkFacTZBN1FY?=
+ =?utf-8?B?cUdreVh6blFOTGJ0Yk9rdEYzMzhMREcvRmNZaHJXUy8ydm5zd01CaEh4TTBI?=
+ =?utf-8?B?NWgxaitrTlNURmRKcUdYWjFHOVBpSy9YanByaUtXUUxaTW4wTnViV1I3blpq?=
+ =?utf-8?B?WUVQYkgvNWdIY2Uzc1NrOS9HdkljYVUzZEpGdktGd0ozVjFRQ2plbSthTVly?=
+ =?utf-8?B?RG9lTG9aa29UWU5WU1hpTnBtMFhzV2hNS1pLdnpLL29QUHNTRmUzTVYvSmRo?=
+ =?utf-8?B?Um9QbXpGcS9CRkdmcENqYktad2R2TFRNZkFodFJaMUNwOVg0cjUrWFBOb0tp?=
+ =?utf-8?B?clpGdDFTY1VILzdnN0FHSnFTem9TSnFvT0ttVzJnRUlBSVMwTzJjUnBhK1Rw?=
+ =?utf-8?B?Y0hmUDg4anhGMnFjOXpNZGpXT3JvL0dWWEYzNzh3blZaMy9xbnc1bEZHdGpt?=
+ =?utf-8?B?bXVDTERNdSszV0RiL3FvaE9uWkdHMVVidnJTUVJOSUEvMU9QNDFzZnJTdndU?=
+ =?utf-8?B?UkdsOVdOcjJoTFR3R05jT0xPQnVFeDhLUEpPYytUUW9kQ1Z4cUR5ZHoxc2tk?=
+ =?utf-8?B?ejlMQ1FMQm1Qb1k0c0gvOGp6VkdqWUR4M0NVbjZpNDZ5cHM4b2NVcG1aWnhl?=
+ =?utf-8?B?dmVOSnJqbEFMWkxYZTBHck9jRis5QkFZdjVEcXhQSS9XcWRPdlJlZVNlSzlM?=
+ =?utf-8?B?aGtnUmhGdDN3V21oU3MrOFFzdTU3c3RMNUhoYThIbWVLMFlHSlBOYVE5TVdS?=
+ =?utf-8?B?NVMyMmIrK05PVlB1a0pUQ2ZSL29WOGhlV1NkWEFyQlhJdGI5dk5nS0VIckJp?=
+ =?utf-8?B?cnhGY2xnMHgvdm1ud2JWejdmVDNKa3YxWkhJb2s3dnNMT0MzWHZHNTU1SnYy?=
+ =?utf-8?B?V043R3FFUEhKd2I2N25MeUZCUWxJSi9RdnlCakdRcVR6d3lFSGVCQkpGYVQx?=
+ =?utf-8?B?KzJYQ0ROZm12ellCdEdScWVZRHVKdFRyL2Y0Wnd6dFpvOTdVUWNnamw3LzVF?=
+ =?utf-8?B?NXpYdk4vYlhhZndkeThIWlRTeFJTV3dtSjUzS3MyUExteEQvL2s3d3hlVmNU?=
+ =?utf-8?B?aHRRY0J4NXBHOGJTdS9IT1pyMlFDa3Z6NEZIaTY0WExnUG1BVDlQZFpuYlVC?=
+ =?utf-8?B?bnhFbktyMVJsc0svZkZzVTRRRnNOajVNQVZvbHFERzZzVExMUkp5Q1l5QUVX?=
+ =?utf-8?B?RlU3aTZySGJ3VG9jMk5oVzhPdGlsNUhEUklCM29uc3J0NTVPNUdPV0tlcitY?=
+ =?utf-8?B?ZmZBRmc3V1JDbjY1WFZxL0JvaFUzZE1uOUlER05JT1NBdFdRYXoyYWQ4UzJJ?=
+ =?utf-8?B?SEVxdUVYd1NHNEorWGRLbnFnTnN1ZWxmTDByMmdGNGdGMzNvOXdsU0YvNHlU?=
+ =?utf-8?B?WlBKYTJKT1JudkJYSUY2cWJpQnpyYmVDMlYvUldINERtVUt3dGIyZlNBOWR3?=
+ =?utf-8?B?amQ3QmhSV1FsWmtNaHdlMDNVOGdQZHJVL1M0YTdFYVpmNE94djZLNWNIUmgr?=
+ =?utf-8?Q?qh2cRNq7NTQ=3D?=
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DS0PR12MB6608.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(376014)(7416014)(1800799024);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?utf-8?B?N3FJQVlKcnY0bXhxdzNRemt4ZTQ5eXZqMlViaUV1ZnY1R2VXTXM5bWFHemcr?=
+ =?utf-8?B?dFVXZER5TzVFWEdCd21DVXI3eG5aNDIwWXVUc0R6emJaVFJ1akVMT3BLUFJa?=
+ =?utf-8?B?RlJmK3k5RDVJRU5DRFNtYlpmMmlZWEZuaXFzRXBOTkkrVHkxbmJVYlE0dmtL?=
+ =?utf-8?B?V3NXajJZakxoeTR4WG4xUUlPejh2MEFKcUU2SWpqVCtmSXNENXhXQVpCYUEz?=
+ =?utf-8?B?eWszNWN4TUd3OXFqTitHUDZkVDVpR0tCMzhzK3czQU9VY1Vidkw0RHk5Y3Jl?=
+ =?utf-8?B?UUVsWm5GVUcyY21NWm5GRmxmZm4vYVI5OWZqWnJ3dUdQNDIxT0hURC9sQUFi?=
+ =?utf-8?B?ZFB5SGVRYnZCNmU1SUduZ0ZaV1o3N28rV3RHdk9ocHJmNEFxRUNJaDlMNGY3?=
+ =?utf-8?B?UnVKK0VCdklZaUxqcWRqd0xjUnZhdTVTYTBIR1dFSFJIWloxWFlNRXhvcGlK?=
+ =?utf-8?B?eTN1dzN3eXB5REllV20ydzRBZ0RtTFNmRFp2ODBwTlhMRk1SOUxFa0l0QjhH?=
+ =?utf-8?B?dEtZdzc2bjJDdm9pbjFXOTVXT3BwcjZCWXg4cjAwUFZqRURjZlhxVndQZnNr?=
+ =?utf-8?B?K3grQm1xR2JXcUkxNzBGMldvK2NLcnZjMXgyVWd1U0RGbmhsTFowaW9qVTda?=
+ =?utf-8?B?VDJLL01rTC9kamlRWnJjUHpUWS84akppVk9ITHllQ2VXVlhzdTNEQ211NC9I?=
+ =?utf-8?B?R01NMW1kN0REaVQ1c2tPMzNGN1NJT28wWEgzcWd3OWRWZ2xxdzlNWHo1aWJm?=
+ =?utf-8?B?bHNPNjdDUFYwUE9DNEZqYTJEK3dHcVZONjRDMXoxY3luWU9Gd0RCQWZCQXBI?=
+ =?utf-8?B?WitVQ2ZVOTJyVE4rTS9NaE5samJoc1JwSEZsM1ViOUY2MHBlWWFZYm1CNDFi?=
+ =?utf-8?B?b0JzVHF5ZVdRbUVZNlc4QjQxRHNFOHVEOVpaZk5BdFl3WENreGE4YjVlSGV0?=
+ =?utf-8?B?Q3k3NXFSVnFPTnBYTU5Cc1RidzZiZSt2bmluVWRocjRkMy9UUU9vYm9ZSTJB?=
+ =?utf-8?B?Uk5yKzl6Tms4Z1JDa1FKTXdtNFAzK0xSMXFyelVoL1pwWWNHNjN4RXc5RTh3?=
+ =?utf-8?B?REVHWFNyaitaTVZXRndtc0Ntc0Fka0ZxK0dZWWQ4cDFZODBJcEVxWjlob1gr?=
+ =?utf-8?B?dzFjMFhCOXBERkkybjAwTVpvUklPQ3FzMjRDZFB2Ky9UUU1IRkNMWGdwM1d4?=
+ =?utf-8?B?TXBCQk1la25uOXFLYjZNT0ZvRHh3YjZMUVdOWDdKVGNUb1NRN3JTeDJpbmFt?=
+ =?utf-8?B?eG1qY3R4cGQrbktQRXl0VkxTdkxBVHNmR0crNmgzWWVlcm0wSjltT040OGwz?=
+ =?utf-8?B?eUdBeUFyNHFsU09HZnhrRTFPVHVncHlmMUVxamQ0R0M4WFRwN3p5RXVhMm5J?=
+ =?utf-8?B?cWNmSmFKLzBZbUZpeU9HMUx5c2JyVVRYaDNLbjkrYlhaaWYxNlhCT1plRGUz?=
+ =?utf-8?B?QWNqTkgvN3NtejQ1UGswQ3pubkJncDY0OE5IbEVRYU43TG50bzNmY3lZeFFE?=
+ =?utf-8?B?KytFc1k3bG9hUi9kcHBtWHgwZ005ZGhxQ0E2Ly9ZVnQvNzgweEhBNWVhWlJ4?=
+ =?utf-8?B?ZWtOd25DQUN5SG9NeUpmNTFFM1llT1RhK3JnZWVSY1N5aEZ5L0cxbmVkL252?=
+ =?utf-8?B?TlFWaHJxenFpS1RsTTVOVEpRRG5NWVZxTjNNa3pnVThZejFGM0YyQ3lDUmZy?=
+ =?utf-8?B?WVR1T0ZOa2o3WnBIT3VKYzVuUk8vUDlVU3BiMHhtdmNNMFdMQnlJdFZpOCt6?=
+ =?utf-8?B?S2p5aWRtaVNYTzl4YTFCM0tkMi9JTFd4a082UzNVL28zb2xUcXJwc1VheGgr?=
+ =?utf-8?B?NlAwdXVSOUJrdjh1OEhhdDRycGR5SFVsV2ZPc0haMytwcGxrNHV3NXlCWWFq?=
+ =?utf-8?B?RXBCSTUwSzhqR2lYWUFWc3BnZThoUmZCV1BVRlQzUFdnU3IrcFlHR3RNdGFz?=
+ =?utf-8?B?R2U4VXFwUnI4R2VCMW1aaTM2eU9pTXZxMlZtdjJEQnpiMlRRbU5mam1HckJU?=
+ =?utf-8?B?TXVNdkRTVHFoeGt1VHRRSmQ3b3YzSUtpZy83MTJOSldKN09GR1cvdEsrRkp3?=
+ =?utf-8?B?R0pvNUNlcVRXSXU2SVBFY3J2b2tISlNNcFNvU1VzK3lVaUw1Wk9UM050clA3?=
+ =?utf-8?Q?YTOEajoYBnfK6JO8smzvxAfSg?=
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: d10ce46d-39a7-4106-8688-08dde0736f1d
+X-MS-Exchange-CrossTenant-AuthSource: DS0PR12MB6608.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 21 Aug 2025 05:27:35.1553
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: yTsFZuV8hi8NVkoevpz5/lYH1Pv1mma1ACb5oteCBQrV4rlgg+yv8sjWyn4c/ufnFdTmYIBTfurhQZUJ9LdPQg==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: CY3PR12MB9680
 
 
 
-On 8/21/2025 11:30 AM, Binbin Wu wrote:
->
->
-> On 8/21/2025 1:56 AM, Sean Christopherson wrote:
->> On Wed, Aug 20, 2025, Binbin Wu wrote:
-[...]
->>> Hi Sean,
->>>
->>> Since guest_force_mtrr_state() also supports to force MTRR variable ranges,
->>> I am wondering if we could use guest_force_mtrr_state() to set the legacy PCI
->>> hole range as UC?
->>>
->>> Is it less hacky?
->> Oh!  That's a way better idea than my hack.  I missed that the kernel would still
->> consult MTRRs.
+On 8/20/2025 9:16 PM, Borislav Petkov wrote:
+> On Mon, Aug 11, 2025 at 03:14:33PM +0530, Neeraj Upadhyay wrote:
+>> With Secure AVIC only Self-IPI is accelerated. To handle all the
+>> other IPIs, add new callbacks for sending IPI. These callbacks write
+>> to the IRR of the target guest vCPU's APIC backing page and issue
+>> GHCB protocol MSR write event for the hypervisor to notify the
+>> target vCPU about the new interrupt request.
 >>
->> Compile tested only, but something like this?
->>
->> diff --git a/arch/x86/kernel/kvm.c b/arch/x86/kernel/kvm.c
->> index 8ae750cde0c6..45c8871cdda1 100644
->> --- a/arch/x86/kernel/kvm.c
->> +++ b/arch/x86/kernel/kvm.c
->> @@ -933,6 +933,13 @@ static void kvm_sev_hc_page_enc_status(unsigned long pfn, int npages, bool enc)
->>     static void __init kvm_init_platform(void)
->>   {
->> +       u64 tolud = e820__end_of_low_ram_pfn() << PAGE_SHIFT;
->> +       struct mtrr_var_range pci_hole = {
->> +               .base_lo = tolud | X86_MEMTYPE_UC,
->> +               .mask_lo = (u32)(~(SZ_4G - tolud - 1)) | BIT(11),
->> +               .mask_hi = (BIT_ULL(boot_cpu_data.x86_phys_bits) - 1) >> 32,
->> +       };
+>> For Secure AVIC GHCB APIC MSR writes, reuse GHCB msr handling code in
+> 	     ^^^^^^^^^^^^^^^^^^
+> 
+> say what now?!
+> 
+
+Is below better?
+
+x86/apic: Add support to send IPI for Secure AVIC
+
+Secure AVIC hardware only accelerates Self-IPI, i.e. on WRMSR to
+APIC_SELF_IPI and APIC_ICR (with destination shorthand equal to Self)
+registers, hardware takes care of updating the APIC_IRR in the APIC
+backing page of the vCPU. For other IPI types (cross-vCPU, broadcast 
+IPIs), software needs to take care of updating the APIC_IRR state of the 
+target CPUs and to ensure that the target vCPUs notice the new pending 
+interrupt.
+
+Add new callbacks in the Secure AVIC driver for sending IPI requests. 
+These callbacks update the IRR in the target guest vCPU's APIC backing 
+page. To ensure that the remote vCPU notices the new pending interrupt, 
+reuse the GHCB MSR handling code in vc_handle_msr() to issue APIC_ICR 
+MSR-write GHCB protocol event to the hypervisor. For Secure AVIC guests, 
+on APIC_ICR write MSR exits, the hypervisor notifies the target vCPU by 
+either sending an AVIC doorbell (if target vCPU is running) or by waking 
+up the non-running target vCPU.
+
+>> +void savic_ghcb_msr_write(u32 reg, u64 value)
+> 
+> I guess this belongs into x2apic_savic.c.
+> 
+
+Ok moving it to x2apic_savic.c requires below 4 sev-internal 
+declarations to be moved to arch/x86/include/asm/sev.h
+
+struct ghcb_state;
+struct ghcb *__sev_get_ghcb(struct ghcb_state *state);
+void __sev_put_ghcb(struct ghcb_state *state);
+enum es_result sev_es_ghcb_handle_msr(...);
+
+>> +{
+>> +	u64 msr = APIC_BASE_MSR + (reg >> 4);
+>> +	struct pt_regs regs = {
+>> +		.cx = msr,
+>> +		.ax = lower_32_bits(value),
+>> +		.dx = upper_32_bits(value)
+>> +	};
+>> +	struct es_em_ctxt ctxt = { .regs = &regs };
+>> +	struct ghcb_state state;
+>> +	enum es_result res;
+>> +	struct ghcb *ghcb;
 >> +
->
-> This value of tolud  may not meet the range size and alignment requirement for
-> variable MTRR.
->
-> Variable MTRR has requirement for range size and alignment:
-> For ranges greater than 4 KBytes, each range must be of length 2^n and its base
-> address must be aligned on a 2^n boundary, where n is a value equal to or
-> greater than 12. The base-address alignment value cannot be less than its length.
+>> +	guard(irqsave)();
+>> +
+>> +	ghcb = __sev_get_ghcb(&state);
+>> +	vc_ghcb_invalidate(ghcb);
+>> +
+>> +	res = sev_es_ghcb_handle_msr(ghcb, &ctxt, true);
+>> +	if (res != ES_OK) {
+>> +		pr_err("Secure AVIC msr (0x%llx) write returned error (%d)\n", msr, res);
+>> +		/* MSR writes should never fail. Any failure is fatal error for SNP guest */
+>> +		snp_abort();
+>> +	}
+>> +
+>> +	__sev_put_ghcb(&state);
+>> +}
+> 
+> ...
+> 
+>> +static inline void self_ipi_reg_write(unsigned int vector)
+>> +{
+>> +	/*
+>> +	 * Secure AVIC hardware accelerates guest's MSR write to SELF_IPI
+>> +	 * register. It updates the IRR in the APIC backing page, evaluates
+>> +	 * the new IRR for interrupt injection and continues with guest
+>> +	 * code execution.
+>> +	 */
+> 
+> Why is that comment here? It is above a WRMSR write. What acceleration is it
+> talking about?
+> 
 
-Wait, Linux kernel converts MTRR register values to MTRR state (base and size) and
-cache it for later lookups (refer to map_add_var()). I.e., in Linux kernel,
-only the cached state will be used.
+This comment explains why WRMSR is sufficient for sending SELF_IPI. On
+WRMSR by vCPU, Secure AVIC hardware takes care of updating APIC_IRR in
+backing page. Hardware also ensures that new APIC_IRR state is evaluated
+for new pending interrupts. So, WRMSR is hardware-accelerated.
 
-These MTRR register values are never programmed when using
-guest_force_mtrr_state() , so even the values doesn't meet the
-requirement from hardware perspective, Linux kernel can still get the right base and size.
-
-No bothering to force the base and size alignment.
-But a comment would be helpful.
-Also, BIT(11) could be replaced by MTRR_PHYSMASK_V.
-
-How about:
-diff --git a/arch/x86/kernel/kvm.c b/arch/x86/kernel/kvm.c
-index 90097df4eafd..a9582ffc3088 100644
---- a/arch/x86/kernel/kvm.c
-+++ b/arch/x86/kernel/kvm.c
-@@ -934,9 +934,15 @@ static void kvm_sev_hc_page_enc_status(unsigned long pfn, int npages, bool enc)
-  static void __init kvm_init_platform(void)
-  {
-         u64 tolud = e820__end_of_low_ram_pfn() << PAGE_SHIFT;
-+       /*
-+        * The range's base address and size may not meet the alignment
-+        * requirement for variable MTRR. However, Linux guest never
-+        * programs MTRRs when forcing guest MTRR state, no bothering to
-+        * enforce the base and range size alignment.
-+        */
-         struct mtrr_var_range pci_hole = {
-                 .base_lo = tolud | X86_MEMTYPE_UC,
--               .mask_lo = (u32)(~(SZ_4G - tolud - 1)) | BIT(11),
-+               .mask_lo = (u32)(~(SZ_4G - tolud - 1)) | MTRR_PHYSMASK_V,
-                 .mask_hi = (BIT_ULL(boot_cpu_data.x86_phys_bits) - 1) >> 32,
-         };
+For non-self-IPI case, software need to do APIC_IRR update and sending 
+of wakeup-request/doorbell to the target vCPU.
 
 
-I tested it in my setup, it can fix the issue of TPM driver failure with the
-modified ACPI table for TPM in QEMU.
+- Neeraj
 
-
-Hi Vishal,
-Could you test it with google's VMM?
-
-
->
-> In my setup, the value of tolud is 0x7FF7C000, it requires 3 variable MTRRs to
-> meet the requirement, i.e.,
-> - 7FF7 C000  ~   7FF8 0000
-> - 7FF8 0000  ~   8000 0000
-> - 8000 0000  ~ 1 0000 0000
->
-> I checks the implementation in EDK2, in order to fit the legacy PCI hole into
-> one variable MTRR, it has some assumption to truncate the size and round up the
-> base address in PlatformQemuUc32BaseInitialization():
->     ...
->     ASSERT (
->       PlatformInfoHob->HostBridgeDevId == INTEL_Q35_MCH_DEVICE_ID ||
->       PlatformInfoHob->HostBridgeDevId == INTEL_82441_DEVICE_ID
->       );
->     ...
->     //
->     // Start with the [LowerMemorySize, 4GB) range. Make sure one
->     // variable MTRR suffices by truncating the size to a whole power of two,
->     // while keeping the end affixed to 4GB. This will round the base up.
->     //
->     PlatformInfoHob->Uc32Size = GetPowerOfTwo32 ((UINT32)(SIZE_4GB - PlatformInfoHob->LowMemory));
->     PlatformInfoHob->Uc32Base = (UINT32)(SIZE_4GB - PlatformInfoHob->Uc32Size);
->     //
->     // Assuming that LowerMemorySize is at least 1 byte, Uc32Size is at most 2GB.
->     // Therefore Uc32Base is at least 2GB.
->     //
->     ASSERT (PlatformInfoHob->Uc32Base >= BASE_2GB);
->
-> I am not sure if KVM can do such assumption.
-> Otherwise, KVM needs to calculate the ranges to meet the requirement. :(
->
->
->>          if (cc_platform_has(CC_ATTR_GUEST_MEM_ENCRYPT) &&
->> kvm_para_has_feature(KVM_FEATURE_MIGRATION_CONTROL)) {
->>                  unsigned long nr_pages;
->> @@ -982,8 +989,12 @@ static void __init kvm_init_platform(void)
->>          kvmclock_init();
->>          x86_platform.apic_post_init = kvm_apic_init;
->>   -       /* Set WB as the default cache mode for SEV-SNP and TDX */
->> -       guest_force_mtrr_state(NULL, 0, MTRR_TYPE_WRBACK);
->> +       /*
->> +        * Set WB as the default cache mode for SEV-SNP and TDX, with a single
->> +        * UC range for the legacy PCI hole, e.g. so that devices that expect
->> +        * to get UC/WC mappings don't get surprised with WB.
->> +        */
->> +       guest_force_mtrr_state(&pci_hole, 1, MTRR_TYPE_WRBACK);
->>   }
->>     #if defined(CONFIG_AMD_MEM_ENCRYPT)
->
->
-
+>> +	native_apic_msr_write(APIC_SELF_IPI, vector);
+>> +}
+> 
 
