@@ -1,121 +1,152 @@
-Return-Path: <kvm+bounces-55301-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-55302-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id E67E4B2FB21
-	for <lists+kvm@lfdr.de>; Thu, 21 Aug 2025 15:49:33 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 2AAFCB2FB89
+	for <lists+kvm@lfdr.de>; Thu, 21 Aug 2025 15:59:41 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id D6EC2B63FDB
-	for <lists+kvm@lfdr.de>; Thu, 21 Aug 2025 13:47:58 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id CD50AB65E23
+	for <lists+kvm@lfdr.de>; Thu, 21 Aug 2025 13:55:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7A0122F616E;
-	Thu, 21 Aug 2025 13:44:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F0A2824DCFD;
+	Thu, 21 Aug 2025 13:56:16 +0000 (UTC)
 X-Original-To: kvm@vger.kernel.org
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B33F72F6166
-	for <kvm@vger.kernel.org>; Thu, 21 Aug 2025 13:44:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
+Received: from cstnet.cn (smtp81.cstnet.cn [159.226.251.81])
+	(using TLSv1.2 with cipher DHE-RSA-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9DA4D2EC55D;
+	Thu, 21 Aug 2025 13:56:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=159.226.251.81
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755783871; cv=none; b=Ypme/pWuBzerzCsZyoW9sEfJLZbiwQyYsZeowto10jh8e2Ya+Tv50H56WlT/HhXoGgIOxyDxxUYrauhzKCWc9oZrMFncN8EfA/8UyFGVLw3tkDE8a4P110jXHdbWm7Vw36BhGHDjGoUfN6Kd+0+jJ9L80PXX3cbboTGSzyGDRhs=
+	t=1755784576; cv=none; b=Gp69b4lQA4T1djo4Pk9XAtGuFLENz3oW3br9pn6QS2rliN0KnlXugqg21eW16KW2SjmXwn82+KVMdfuHX6MGTSiC/opsS6JSfmgd55ednGIBpWJkT92JQ2fW1ws570hWR83MgJddpvOmDkrc+w/E4i3rHD7ISKJ6ve9DoL1LSzA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755783871; c=relaxed/simple;
-	bh=dJoM8OOMt6arEJ9uw1r81fXCakiPDHhaniul2hBPWEA=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=gUYcbeJc9QaYpYEYQSJerTOyELiKPFZsdXe70qFmMTBcWtlQdNdzwRE/GkhV1w61Z65FLAKR6p+q+LcP/QfeUPllAJgDX3nWL5K2ziqGe/z318guGd2MSpiobIU9LTfZs+FDqc6+J5Z+qv2UqU9/Z41sKMK0pVz7xJHnOryJdjk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id E77CD152B;
-	Thu, 21 Aug 2025 06:44:19 -0700 (PDT)
-Received: from [10.1.196.46] (e134344.arm.com [10.1.196.46])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 8FB583F59E;
-	Thu, 21 Aug 2025 06:44:26 -0700 (PDT)
-Message-ID: <56e049d4-dc15-40e0-a3ba-62d45678780d@arm.com>
-Date: Thu, 21 Aug 2025 14:44:25 +0100
+	s=arc-20240116; t=1755784576; c=relaxed/simple;
+	bh=3oc/IJQWBfYXXDjTK4ag+YVXoDkcvRedFhQypw2sN3w=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=Sq8+OPY4kr1WRr173DzmhSolzfCb2gaxlCVahdGVaWengbl9nIt0cy4s6g4LXEBbZXcM6LP+/XtaNx5xC9dI7/hE1WLQua193Plvcr/oGRQ0bgvNDudXoIUj5pvIWZBogH63imQKEmLqTTG3BcIfsX/Y9Pe/EGQ7pl7xb8peGLg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=isrc.iscas.ac.cn; spf=pass smtp.mailfrom=isrc.iscas.ac.cn; arc=none smtp.client-ip=159.226.251.81
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=isrc.iscas.ac.cn
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=isrc.iscas.ac.cn
+Received: from ROG.lan (unknown [118.251.176.166])
+	by APP-03 (Coremail) with SMTP id rQCowAAngIFZJadoCYkTDg--.22571S2;
+	Thu, 21 Aug 2025 21:55:39 +0800 (CST)
+From: Pincheng Wang <pincheng.plct@isrc.iscas.ac.cn>
+To: paul.walmsley@sifive.com,
+	palmer@dabbelt.com,
+	aou@eecs.berkeley.edu,
+	alex@ghiti.fr,
+	robh@kernel.org,
+	krzk+dt@kernel.org,
+	conor+dt@kernel.org,
+	anup@brainfault.org,
+	pbonzini@redhat.com,
+	shuah@kernel.org,
+	cyan.yang@sifive.com,
+	cleger@rivosinc.com,
+	charlie@rivosinc.com,
+	cuiyunhui@bytedance.com,
+	samuel.holland@sifive.com,
+	namcao@linutronix.de,
+	jesse@rivosinc.com,
+	inochiama@gmail.com,
+	yongxuan.wang@sifive.com,
+	ajones@ventanamicro.com,
+	parri.andrea@gmail.com,
+	mikisabate@gmail.com,
+	yikming2222@gmail.com,
+	thomas.weissschuh@linutronix.de
+Cc: linux-riscv@list.infradead.org,
+	linux-kernel@vger.kernel.org,
+	linux-doc@vger.kernel.org,
+	devicetree@vger.kernel.org,
+	kvm@vger.kernel.org,
+	kvm-riscv@lists.infradead.org,
+	linux-kselftest@vger.kernel.org,
+	pincheng.plct@isrc.iscas.ac.cn
+Subject: [PATCH 0/5] RISC-V: Add Zilsd/Zclsd support in hwprobe and KVM
+Date: Thu, 21 Aug 2025 21:55:22 +0800
+Message-Id: <20250821135527.224044-1-pincheng.plct@isrc.iscas.ac.cn>
+X-Mailer: git-send-email 2.39.5
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v3 2/6] KVM: arm64: Handle RASv1p1 registers
-To: Marc Zyngier <maz@kernel.org>
-Cc: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
- kvm@vger.kernel.org, Joey Gouly <joey.gouly@arm.com>,
- Suzuki K Poulose <suzuki.poulose@arm.com>,
- Oliver Upton <oliver.upton@linux.dev>, Zenghui Yu <yuzenghui@huawei.com>,
- Will Deacon <will@kernel.org>, Catalin Marinas <catalin.marinas@arm.com>,
- Cornelia Huck <cohuck@redhat.com>
-References: <20250817202158.395078-1-maz@kernel.org>
- <20250817202158.395078-3-maz@kernel.org>
- <95819606-ef3b-46e1-8201-1abf0219659f@arm.com> <87ect4kd7a.wl-maz@kernel.org>
-From: Ben Horgan <ben.horgan@arm.com>
-Content-Language: en-US
-In-Reply-To: <87ect4kd7a.wl-maz@kernel.org>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+X-CM-TRANSID:rQCowAAngIFZJadoCYkTDg--.22571S2
+X-Coremail-Antispam: 1UD129KBjvJXoW7ur1kJF1xGr15GFy8Gw1xXwb_yoW8trW5pa
+	n5Cw15KF1kXFy7C34fAr48ur1rKF4ru393Jrn3t348WFW3Cr95Jr9ak3ZxZF18ArZ29ry0
+	93WrKw1I93Z7AaDanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+	9KBjDU0xBIdaVrnRJUUU9F14x267AKxVWrJVCq3wAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
+	rVWUWVWUuwAFIxvE14AKwVWUJVWUGwA2ocxC64kIII0Yj41l84x0c7CEw4AK67xGY2AK02
+	1l84ACjcxK6xIIjxv20xvE14v26r1j6r1xM28EF7xvwVC0I7IYx2IY6xkF7I0E14v26r4j
+	6F4UM28EF7xvwVC2z280aVAFwI0_Jr0_Gr1l84ACjcxK6I8E87Iv6xkF7I0E14v26r4j6r
+	4UJwAS0I0E0xvYzxvE52x082IY62kv0487Mc02F40EFcxC0VAKzVAqx4xG6I80ewAv7VC0
+	I7IYx2IY67AKxVWUJVWUGwAv7VC2z280aVAFwI0_Cr0_Gr1UMcvjeVCFs4IE7xkEbVWUJV
+	W8JwACjcxG0xvY0x0EwIxGrwACjI8F5VA0II8E6IAqYI8I648v4I1lFIxGxcIEc7CjxVA2
+	Y2ka0xkIwI1lc7CjxVAaw2AFwI0_GFv_Wryl42xK82IYc2Ij64vIr41l4I8I3I0E4IkC6x
+	0Yz7v_Jr0_Gr1lx2IqxVAqx4xG67AKxVWUJVWUGwC20s026x8GjcxK67AKxVWUGVWUWwC2
+	zVAF1VAY17CE14v26rWY6r4UJwCIc40Y0x0EwIxGrwCI42IY6xIIjxv20xvE14v26r1j6r
+	1xMIIF0xvE2Ix0cI8IcVCY1x0267AKxVW8JVWxJwCI42IY6xAIw20EY4v20xvaj40_Jr0_
+	JF4lIxAIcVC2z280aVAFwI0_Jr0_Gr1lIxAIcVC2z280aVCY1x0267AKxVW8JVW8JrUvcS
+	sGvfC2KfnxnUUI43ZEXa7VUU0JmUUUUUU==
+X-CM-SenderInfo: pslquxhhqjh1xofwqxxvufhxpvfd2hldfou0/
 
-Hi Marc,
+Hi all,
 
-On 8/21/25 14:37, Marc Zyngier wrote:
-> On Thu, 21 Aug 2025 14:13:52 +0100,
-> Ben Horgan <ben.horgan@arm.com> wrote:
->>
->>> diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
->>> index 82ffb3b3b3cf7..feb1a7a708e25 100644
->>> --- a/arch/arm64/kvm/sys_regs.c
->>> +++ b/arch/arm64/kvm/sys_regs.c
->>> @@ -2697,6 +2697,18 @@ static bool access_ras(struct kvm_vcpu *vcpu,
->>>   	struct kvm *kvm = vcpu->kvm;
->>>     	switch(reg_to_encoding(r)) {
->>> +	case SYS_ERXPFGCDN_EL1:
->>> +	case SYS_ERXPFGCTL_EL1:
->>> +	case SYS_ERXPFGF_EL1:
->>> +	case SYS_ERXMISC2_EL1:
->>> +	case SYS_ERXMISC3_EL1:
->>> +		if (!(kvm_has_feat(kvm, ID_AA64PFR0_EL1, RAS, V1P1) ||
->>> +		      (kvm_has_feat_enum(kvm, ID_AA64PFR0_EL1, RAS, IMP) &&
->>> +		       kvm_has_feat(kvm, ID_AA64PFR1_EL1, RAS_frac, RASv1p1)))) {
->>> +			kvm_inject_undefined(vcpu);
->>> +			return false;
->>> +		}
->>> +		break;
->>>   	default:
->>>   		if (!kvm_has_feat(kvm, ID_AA64PFR0_EL1, RAS, IMP)) {
->>>   			kvm_inject_undefined(vcpu);
->> The default condition needs updating for the case when
->> ID_AA64PFR0_EL1.RAS = b10 otherwise access to the non-v1 specific RAS
->> registers will result in an UNDEF being injected.
-> 
-> I don't think so. The RAS field is described as such:
-> 
-> 	UnsignedEnum    31:28   RAS
-> 	        0b0000  NI
->         	0b0001  IMP
-> 	        0b0010  V1P1
-> 	        0b0011  V2
-> 	EndEnum
-> 
-> Since this is an unsigned enum, this checks for a value < IMP. Only
-> RAS not being implemented is this condition satisfied, and an UNDEF
-> injected.
-> 
-> Or am I missing something obvious here (I wouldn't be surprised...)?
+This patch series adds support for the recently ratified Zilsd
+(Load/Store pair instructions) and Zclsd (Compressed Load/Store pair
+instructions) extensions to the RISC-V Linux kernel. It covers device tree
+binding,ISA string parsing, hwprobe exposure, KVM guest handling and selftests.
 
-No, you are indeed correct. I missed the difference between
-kvm_has_feat_enum() and kvm_has_feat(). Sorry for the noise.
+Zilsd and Zclsd allow more efficient memory access sequences on RV32. My
+goal is to enable glibc and other user-space libraries to detect these
+extensions via hwprobe and make use of them for optimized
+implementations of common routines. To achieve this, the Linux kernel
+needs to recognize and expose the availability of these extensions
+through the device tree bindings, ISA string parsing and hwprobe
+interfaces. KVM support is also required to correctly virtualize these
+features for guest environments.
 
-> 
-> 	M.
-> 
+The series is structured as follows:
+- Patch 1: Add device tree bindings documentation for Zilsd and Zclsd
+- Patch 2: Extend RISC-V ISA extension string parsing to recognize them.
+- Patch 3: Export Zilsd and Zclsd via riscv_hwprobe
+- Patch 4: Allow KVM guests to use them.
+- Patch 5: Add KVM selftests.
+
+This series of patches is a preparatory step toward enabling user-space
+optimizations in glibc that leverage Zilsd and Zclsd, by providing the
+necessary kernel-side support.
+
+Please review, and let me know if any adjustments are needed.
+
+Thanks,
+Pincheng Wang
+
+
+Pincheng Wang (5):
+  dt-bidings: riscv: add Zilsd and Zclsd extension descriptions
+  riscv: add ISA extension parsing for Zilsd and Zclsd
+  riscv: hwprobe: export Zilsd and Zclsd ISA extensions
+  riscv: KVM: allow Zilsd and Zclsd extensions for Guest/VM
+  KVM: riscv: selftests: add Zilsd and Zclsd extension to get-reg-list
+    test
+
+ Documentation/arch/riscv/hwprobe.rst          |  8 ++++
+ .../devicetree/bindings/riscv/extensions.yaml | 39 +++++++++++++++++++
+ arch/riscv/include/asm/hwcap.h                |  2 +
+ arch/riscv/include/uapi/asm/hwprobe.h         |  2 +
+ arch/riscv/include/uapi/asm/kvm.h             |  2 +
+ arch/riscv/kernel/cpufeature.c                | 24 ++++++++++++
+ arch/riscv/kernel/sys_hwprobe.c               |  2 +
+ arch/riscv/kvm/vcpu_onereg.c                  |  2 +
+ .../selftests/kvm/riscv/get-reg-list.c        |  6 +++
+ 9 files changed, 87 insertions(+)
 
 -- 
-Thanks,
-
-Ben
+2.39.5
 
 
