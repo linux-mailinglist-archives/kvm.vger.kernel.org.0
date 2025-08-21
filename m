@@ -1,232 +1,239 @@
-Return-Path: <kvm+bounces-55383-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-55384-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5F1D5B30596
-	for <lists+kvm@lfdr.de>; Thu, 21 Aug 2025 22:32:24 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2DB33B306A3
+	for <lists+kvm@lfdr.de>; Thu, 21 Aug 2025 22:49:02 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 344BF3BF68E
-	for <lists+kvm@lfdr.de>; Thu, 21 Aug 2025 20:27:25 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id CC92F1D210F2
+	for <lists+kvm@lfdr.de>; Thu, 21 Aug 2025 20:44:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AEFF52C0272;
-	Thu, 21 Aug 2025 20:11:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 147DC38F1A8;
+	Thu, 21 Aug 2025 20:21:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="WloXl5Al"
+	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="SjduOVIm"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from NAM11-CO1-obe.outbound.protection.outlook.com (mail-co1nam11on2068.outbound.protection.outlook.com [40.107.220.68])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3D5D62C0262
-	for <kvm@vger.kernel.org>; Thu, 21 Aug 2025 20:10:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755807059; cv=none; b=Xut+HC6w+6+zsT4ueZnX0wWKFjKG7o6RBlIQ/SD0Wh1892jZtbql9PiQGZP2WI/jWRc7HtCPk87obnyXZCzbz0oJzTzIFEfEqJifLuRGq/EZNjIU8h5kiEUGZ8tvOj67t8y1s6UoLSHFzPBnCsgY2AsCJ24FvUccBSYa1S/YbA4=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755807059; c=relaxed/simple;
-	bh=R0ZyW/lP53DUpD5XCfGL8s/RHhsGuoWDmk/SVEPPWc8=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=mhIaINFvhniVhyyF1sojs6uDhXEXlqrB729tgGi/VwPuSaEthYafcae8SkB8WvWkdM0xF+r62W4uIw5zs60PfEf/CnvvP55s9k7PdpAfSemUYfvKpi2F5nOHp0EbZDwEJ1mG3ov9KCzHuFHVDdiIq7UaSefPpy2fZQ6/OqIWH9Q=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=WloXl5Al; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1755807057;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=An+3TCbux96ebWXl79jkDvpeTXFUup6Liv8QO7JiiR4=;
-	b=WloXl5AlJmqcY6isKKXSorqfTao4xnrfxRX4pRiy2v5H3fCiuaDNJI/EhVlbA7ci7WIGCo
-	57JIzgwd137b+oEBKxw1Yo6Vm7QXwCmj8OCstBCYd0UiJPykQk5TTMJ2CQGUMWHAnecodN
-	dwRinHYUlwi9/rhUCjwsyc/L5APDkd8=
-Received: from mail-il1-f197.google.com (mail-il1-f197.google.com
- [209.85.166.197]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-578-x4knwsppMdCyanQ5C4moKQ-1; Thu, 21 Aug 2025 16:10:55 -0400
-X-MC-Unique: x4knwsppMdCyanQ5C4moKQ-1
-X-Mimecast-MFC-AGG-ID: x4knwsppMdCyanQ5C4moKQ_1755807055
-Received: by mail-il1-f197.google.com with SMTP id e9e14a558f8ab-3e58433459bso3551795ab.2
-        for <kvm@vger.kernel.org>; Thu, 21 Aug 2025 13:10:55 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1755807055; x=1756411855;
-        h=content-transfer-encoding:mime-version:organization:references
-         :in-reply-to:message-id:subject:cc:to:from:date:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=An+3TCbux96ebWXl79jkDvpeTXFUup6Liv8QO7JiiR4=;
-        b=irGCZlzpzaOvcQjacsUm5U0jL7mgi0hfi8F/jlPLtg7fCoqAHUFZyUMvmkyC1Mc6VR
-         d/+Ge6sRt+218gzvzHDIygzkYljQaLtA8rJ/C69bqx7nv3kkKzxjQF+FccekBI0+HE+P
-         1Q+6vhRsRCH4F5JvyjX1Fp9jZ0eon7B9TqqqHwG7mVro3mJJODt7qxMe0aHDQRClFOCs
-         irV4Z0Vn+cy6B7cW7G1yE+onqCC3Z/R2JPrc7/SaHplb5Q1F9UOiBCg2BwXlMVQrnqEg
-         e6AOxCkcmPujs+VMPJir5jFp5I69ga23Y44t29cO++J2lQbZyU8BnIgeGPurtSuvd3Em
-         yQ4A==
-X-Forwarded-Encrypted: i=1; AJvYcCXGi2xShSye+H8vMUhg3MH9aZTnJSr/8YW1iqqy6O6cuQENfqTZMU90zIj2iFjwDrdCjXY=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwYtbPIccAdH4KI27gBFS/KE7rP+b0gAJlBZSVvDZ+plOqPejHv
-	woWjlJJyNZccJDAZcjZP/rVYcRqMJ9o0XqetwtNMQ223aFFfYRCj1kUYNP/AZbNCWCp7Nn14PNe
-	UZBGMT8LJc/DMgY/EHwLXkdbDtUF5XI9SHe4K56uotexew8p/wySuJA==
-X-Gm-Gg: ASbGncu2oxkSh3iNhud0yYVaf7YSJ/SzUqGqXR7cxeNWoO9mR03+gmtHAUPZ7X8ExcV
-	WEWVBbRVqU4MThyYzidUQyxXFY6Q0Hdhm/lU/biMZRBamaM6fscYghAP4o15ShnHvKm4q8CPImD
-	qTrsBJrM/o0Y8M4SdlWy983ekn3Ulo1P7oEUhiIFFND/QEFIy0rfzj7dBpTFn2aLKL+iqVQCeCn
-	eqvzxFDoOgG7Xcn809otzdlHClaR0NIVaUalvbJTgtS88V7NV5pvweP8p3L5xvC92Lqsxo0ggRa
-	FgYw/pAwjClq72916+yQTOIlNQE+OoRudY3CXvs0vUM=
-X-Received: by 2002:a05:6602:6407:b0:881:982b:9946 with SMTP id ca18e2360f4ac-886bd0f1ad1mr31881839f.1.1755807054505;
-        Thu, 21 Aug 2025 13:10:54 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IH7UyEEHnmghSQL6lcVlKCttefDYrWN/3zEcgegYm6NRgpa88y8amc0JBLXw47xKtjo5rcPAA==
-X-Received: by 2002:a05:6602:6407:b0:881:982b:9946 with SMTP id ca18e2360f4ac-886bd0f1ad1mr31879039f.1.1755807053992;
-        Thu, 21 Aug 2025 13:10:53 -0700 (PDT)
-Received: from redhat.com ([38.15.36.11])
-        by smtp.gmail.com with ESMTPSA id ca18e2360f4ac-8843f9c3329sm702744239f.19.2025.08.21.13.10.50
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 21 Aug 2025 13:10:53 -0700 (PDT)
-Date: Thu, 21 Aug 2025 14:10:48 -0600
-From: Alex Williamson <alex.williamson@redhat.com>
-To: David Matlack <dmatlack@google.com>
-Cc: Jason Gunthorpe <jgg@nvidia.com>, Aaron Lewis <aaronlewis@google.com>,
- Adhemerval Zanella <adhemerval.zanella@linaro.org>, Adithya Jayachandran
- <ajayachandra@nvidia.com>, Andrew Jones <ajones@ventanamicro.com>, Ard
- Biesheuvel <ardb@kernel.org>, Arnaldo Carvalho de Melo <acme@redhat.com>,
- Bibo Mao <maobibo@loongson.cn>, Claudio Imbrenda <imbrenda@linux.ibm.com>,
- Dan Williams <dan.j.williams@intel.com>, Dave Jiang <dave.jiang@intel.com>,
- dmaengine@vger.kernel.org, Huacai Chen <chenhuacai@kernel.org>, James
- Houghton <jthoughton@google.com>, Joel Granados <joel.granados@kernel.org>,
- Josh Hilke <jrhilke@google.com>, Kevin Tian <kevin.tian@intel.com>,
- kvm@vger.kernel.org, linux-kselftest@vger.kernel.org, "Mike Rapoport
- (Microsoft)" <rppt@kernel.org>, Paolo Bonzini <pbonzini@redhat.com>, Pasha
- Tatashin <pasha.tatashin@soleen.com>, "Pratik R. Sampat"
- <prsampat@amd.com>, Saeed Mahameed <saeedm@nvidia.com>, Sean Christopherson
- <seanjc@google.com>, Shuah Khan <shuah@kernel.org>, Vinicius Costa Gomes
- <vinicius.gomes@intel.com>, Vipin Sharma <vipinsh@google.com>, Wei Yang
- <richard.weiyang@gmail.com>, "Yury Norov [NVIDIA]" <yury.norov@gmail.com>
-Subject: Re: [PATCH 00/33] vfio: Introduce selftests for VFIO
-Message-ID: <20250821141048.6e16e546.alex.williamson@redhat.com>
-In-Reply-To: <CALzav=eOz+Gf8XawvaSSBHj=8gQg3O9T9dJcN6q4eqh7_MEPDw@mail.gmail.com>
-References: <20250620232031.2705638-1-dmatlack@google.com>
-	<CALzav=dVYqS8oQNbygVjgA69EQMBBP4CyzydyUoAjnN2mb_yUQ@mail.gmail.com>
-	<20250728102737.5b51e9da.alex.williamson@redhat.com>
-	<20250729222635.GU36037@nvidia.com>
-	<CALzav=d0vPMw26f-vzCJnjRFL+Uc6sObihqJ0jnJRpi-SxtSSw@mail.gmail.com>
-	<CALzav=fdT+NJDO+jWyty+tKqxqum4RVkHZmUocz4MDQkPgG4Bg@mail.gmail.com>
-	<20250818133721.32b660e3.alex.williamson@redhat.com>
-	<CALzav=eOz+Gf8XawvaSSBHj=8gQg3O9T9dJcN6q4eqh7_MEPDw@mail.gmail.com>
-Organization: Red Hat
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A64123728BA;
+	Thu, 21 Aug 2025 20:20:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.220.68
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1755807659; cv=fail; b=QVr6Ihc6kMznRrGoGn8LgzO2X/QQBJQtK2ugWsTTCIYZoHJfYZIUSAjWcHTNUR9nCmSU/2A7dhELOgwPpbzVSwub+c4CM6HHd0kZH2oWTNY5o5ExYwJTqNTDhquX8lx1kntc6PYQ5zdRMr8q8HdZo9hE3xv3H1bzSL03W9Q8Xvk=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1755807659; c=relaxed/simple;
+	bh=j5irm5WDNbR0Tr9l8uf6DbANiFALdBCaIfAmEa3bHeY=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=EA8hG0dP1NGf8jpaNhgIPo4na4NOal+Xf1xZO4dBIL/VKmlIGHhBYI57f4gBx3y+pkrFkbpjVUc5lPeyafQi163ZdfAmHJey27Im6zxcTYJH3XfbVJ2DTVTsgMX1rUCGOKGNTJ4PYEYF08VXG/2XfsBkI5HfOaz59fxbxsulJ50=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=SjduOVIm; arc=fail smtp.client-ip=40.107.220.68
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=wl26AXQUltoo7OVE436mwjXQ4iSO7o9p3JNyEkXZsqSICr/QRthpazH+m9Lri6brjXYXswoTde+qIbF68H0LR1EL22WPkqn9+SlFFwCXKY0/dm+ChSgYkGh5966wLJq3HYi3lnuWt825dbL+drcUt8fGn/pU7OE8lgI73z88zXWVxM720PFpt8zcZ7q0wyv+Z0WCfjHE2EMYfGO4fJu/CqdhOOEQ5gtyEGgB1gxpMhxh5kLlYSUenjO/o0aXMCnk3+MI3s1cRyGVwra7HsXCe4DP0FmZKLtjsfEfNcJhQnHcIn1sdB0p7XlLYqcefVGhZu7xORYpwZxPDpJVZDMcrQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=5LsCWXH2/2V1Mf+JKRuFmpoWPyhjz6TsTO+1Eky5ij0=;
+ b=p16SuRHBUAq8MzcNVc31bD3W/X0n0bk6Y0gwASDJApQsnwfXEtIw09Nc5CWCnHgf0XXnn6wraLN7tWz0AG09urGq/I9KqWS5x8O5I83NbYmGLzVbLuuNuqltEXL732abQ1QAdYDEPamVTFO7Q0afDUnJLAg5YgkfyzNLiyNBZ12Y4Rk6J7ucruJtvmrVoq16fJvIjuJvW2208pEY1OWJw+5aJvJrBCkhvcT69DdxWXWthBgU90oy0QYFgRITbvjx8hGtJR97Nc1+KDtmpbVnLRiFlbguh5F9y5KVCE/F4BlWvRCNIslk3gSGW6sw1g8LgGzKnB5IcHZoKJmtxbqxEA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
+ dkim=pass header.d=nvidia.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=5LsCWXH2/2V1Mf+JKRuFmpoWPyhjz6TsTO+1Eky5ij0=;
+ b=SjduOVImrScv0d9IB5sktsTu6zcET1TOgnkQMWpveM0GU3hqIhW16m52oZDyQwsK3/evBCy3UeRcLyaM7NtrLQ8lOrngJrzWL9CPb833s6WpLSF66YTu7zxTD61M17H7uZ2gOKPAP9JJNWYHjv7nZ3JjCwbZICM8j3EeNMCL/ReFDvw2BaoLJx6QH6gUJsDscVBZatyOAMd7qOwxIdZvYHFbxRGCw8s088m92cI7LlaPq9pVX1fag5PRVcZsH9rDsKCr+8g+/8957j7bwomNe9X9o7vN1TTP/UPGvc5EcBcW3iyIEauqwpXvTrxwaij6Nk+X7RFirL3CA/bbESIRig==
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nvidia.com;
+Received: from DS7PR12MB9473.namprd12.prod.outlook.com (2603:10b6:8:252::5) by
+ MN0PR12MB6002.namprd12.prod.outlook.com (2603:10b6:208:37e::10) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9031.24; Thu, 21 Aug
+ 2025 20:20:54 +0000
+Received: from DS7PR12MB9473.namprd12.prod.outlook.com
+ ([fe80::5189:ecec:d84a:133a]) by DS7PR12MB9473.namprd12.prod.outlook.com
+ ([fe80::5189:ecec:d84a:133a%6]) with mapi id 15.20.9052.013; Thu, 21 Aug 2025
+ 20:20:54 +0000
+From: Zi Yan <ziy@nvidia.com>
+To: David Hildenbrand <david@redhat.com>
+Cc: linux-kernel@vger.kernel.org, Huacai Chen <chenhuacai@kernel.org>,
+ WANG Xuerui <kernel@xen0n.name>, Madhavan Srinivasan <maddy@linux.ibm.com>,
+ Michael Ellerman <mpe@ellerman.id.au>, Nicholas Piggin <npiggin@gmail.com>,
+ Christophe Leroy <christophe.leroy@csgroup.eu>,
+ Paul Walmsley <paul.walmsley@sifive.com>,
+ Palmer Dabbelt <palmer@dabbelt.com>, Albert Ou <aou@eecs.berkeley.edu>,
+ Alexandre Ghiti <alex@ghiti.fr>, "David S. Miller" <davem@davemloft.net>,
+ Andreas Larsson <andreas@gaisler.com>,
+ Alexander Potapenko <glider@google.com>,
+ Andrew Morton <akpm@linux-foundation.org>,
+ Brendan Jackman <jackmanb@google.com>, Christoph Lameter <cl@gentwo.org>,
+ Dennis Zhou <dennis@kernel.org>, Dmitry Vyukov <dvyukov@google.com>,
+ dri-devel@lists.freedesktop.org, intel-gfx@lists.freedesktop.org,
+ iommu@lists.linux.dev, io-uring@vger.kernel.org,
+ Jason Gunthorpe <jgg@nvidia.com>, Jens Axboe <axboe@kernel.dk>,
+ Johannes Weiner <hannes@cmpxchg.org>, John Hubbard <jhubbard@nvidia.com>,
+ kasan-dev@googlegroups.com, kvm@vger.kernel.org,
+ "Liam R. Howlett" <Liam.Howlett@oracle.com>,
+ Linus Torvalds <torvalds@linux-foundation.org>, linux-arm-kernel@axis.com,
+ linux-arm-kernel@lists.infradead.org, linux-crypto@vger.kernel.org,
+ linux-ide@vger.kernel.org, linux-kselftest@vger.kernel.org,
+ linux-mips@vger.kernel.org, linux-mmc@vger.kernel.org, linux-mm@kvack.org,
+ linux-riscv@lists.infradead.org, linux-s390@vger.kernel.org,
+ linux-scsi@vger.kernel.org, Lorenzo Stoakes <lorenzo.stoakes@oracle.com>,
+ Marco Elver <elver@google.com>, Marek Szyprowski <m.szyprowski@samsung.com>,
+ Michal Hocko <mhocko@suse.com>, Mike Rapoport <rppt@kernel.org>,
+ Muchun Song <muchun.song@linux.dev>, netdev@vger.kernel.org,
+ Oscar Salvador <osalvador@suse.de>, Peter Xu <peterx@redhat.com>,
+ Robin Murphy <robin.murphy@arm.com>, Suren Baghdasaryan <surenb@google.com>,
+ Tejun Heo <tj@kernel.org>, virtualization@lists.linux.dev,
+ Vlastimil Babka <vbabka@suse.cz>, wireguard@lists.zx2c4.com, x86@kernel.org
+Subject: Re: [PATCH RFC 01/35] mm: stop making SPARSEMEM_VMEMMAP
+ user-selectable
+Date: Thu, 21 Aug 2025 16:20:48 -0400
+X-Mailer: MailMate (2.0r6272)
+Message-ID: <7169DDE5-A347-44F9-A6A1-707BF9A314F0@nvidia.com>
+In-Reply-To: <20250821200701.1329277-2-david@redhat.com>
+References: <20250821200701.1329277-1-david@redhat.com>
+ <20250821200701.1329277-2-david@redhat.com>
+Content-Type: text/plain
+X-ClientProxiedBy: MN2PR15CA0031.namprd15.prod.outlook.com
+ (2603:10b6:208:1b4::44) To DS7PR12MB9473.namprd12.prod.outlook.com
+ (2603:10b6:8:252::5)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: DS7PR12MB9473:EE_|MN0PR12MB6002:EE_
+X-MS-Office365-Filtering-Correlation-Id: f619df36-2515-4ba2-b3f1-08dde0f03b24
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|376014|7416014|1800799024|366016|7053199007;
+X-Microsoft-Antispam-Message-Info:
+	=?us-ascii?Q?94SELf5U2sNfP7OiFIZT+KX54w6OibGahhp+ocWf82oNd0GpqeivdqHRHVGK?=
+ =?us-ascii?Q?uItD8QqcuT95QIQ8nQs3LOvvq51TiyXWNTIs9hd5knXWbrX1lRxEa7+GmA92?=
+ =?us-ascii?Q?1ipcg4zSZG4jBfNSBa1H+/kEbIU6A/x0oXpqxPczCeOmxXxQDOprVy5gdZI2?=
+ =?us-ascii?Q?ddD1NgoIwpIZ9UWsApYlA8HsuVwQ7h5KxzFdjAic6JmUxZlUKVtHgsTRxuJY?=
+ =?us-ascii?Q?v4hpse9scVINpz8kHOPICZ4VGfdmDZrrsIn76KaD9FusH/zg2IHsTh3P3HjN?=
+ =?us-ascii?Q?TWjYNgm5mpyeX4Wc8AQuwZ0+kU1hzk3YDRhc6fgAySiruetFFidd/Cn0sv2F?=
+ =?us-ascii?Q?FQmo9Hk1O0b2AuuiM66Blg/FaTEHqR4022QS5wBcG5PLiYJd0oY4wlKy1hGU?=
+ =?us-ascii?Q?EORGiOHqpDTrjQpgt05PNPGlkQ/Q7I0WrfZv58CuvIN8vPhi/dTOkLPzJgyD?=
+ =?us-ascii?Q?YpOqBGTKYiBpR/i5uiuhFLcb6ffFUueXaBZpCfPzoBT985L0iWzeS3yjyNIH?=
+ =?us-ascii?Q?9p2GIZsZ+OlFDkYYfLj0E2/fhOJkr1Rwb4h1Ksq9T7Zpdkmi12C4nRm8JBGL?=
+ =?us-ascii?Q?McQnP47RlGckCSZl77ebgjK+1LnkMadQkeYcS0Jrq6xMS+Koom8gELpNCr2c?=
+ =?us-ascii?Q?nX8xBhVF4h4xrgtr34Lhk4XElDVzpQ+h7VsNCSoZGaDYmOOaToImZKNeOZvh?=
+ =?us-ascii?Q?vXg45A2gSWjh/iiyvNPKa28BoDsGdE5VGpJ19J19KSh3FXZpcKL951imRV+c?=
+ =?us-ascii?Q?jEKY6JqzC1xCy9fT6Et7Ly2U+LV64vFumxCZWMiPy33feabaBgoQBzXIwPwU?=
+ =?us-ascii?Q?rGUwEmyHsBx684GxKeSdR53uy3Me7wNXnDthX1p41Edken/gvgD+o4q33AaK?=
+ =?us-ascii?Q?qrL+RffI/XZIEPBnIG6X5FaFYjPFV1TS6GzAniixEiHPRwf9WKf4wAMLY/Nl?=
+ =?us-ascii?Q?szOMeGh3+9Xgw8RP4CktSa7MYSc6ppqrakT7Rrw0cO6Sh04SLMWIaVqiBQbA?=
+ =?us-ascii?Q?3/AZzMPxzfsuB7Fg88Z+l5MG9mjDUWwgv9Eh/4ZAtgAhLt+uKXVnsQvZ7MYm?=
+ =?us-ascii?Q?jHBJDTzjWMZ1T9ZupZj1yLmfCtFvJ9XZIXBIn2esFx8TnELqLPhobtUzXJZo?=
+ =?us-ascii?Q?48uW6TK51KbDwz5FN2RTHEKKc2wkHQ9axmEFUVBcSErHPUEJQyzmtgQTB5Vl?=
+ =?us-ascii?Q?TDuajQxbSp/bZySk0+8tuvIpMu5rKsY+ho2wVNvTa7g8u9Ne2NK8dfwjEOCQ?=
+ =?us-ascii?Q?tCQBBGSK6d2HVZs84wW+npsv0rnY9To+p6PkYc/XBV6EleZWB1PQTqEykojm?=
+ =?us-ascii?Q?Cqk3E9Nr/dwS2IPg7TR2LNWYPZM756maQsARAt1wJf5lHOG0PVV0L1hfxpWW?=
+ =?us-ascii?Q?za0rYCAaXWW+YlS1NAR+VD+DRgz2F5VKdbsnp6ZwV3/VsPA8wocKtOHL+zQi?=
+ =?us-ascii?Q?Xt3+uNWpX9U=3D?=
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DS7PR12MB9473.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(376014)(7416014)(1800799024)(366016)(7053199007);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?us-ascii?Q?6jIehKUcneFDG1zDKFaFkuxUaQsVIZNcI+dmwYK7640S4s/tY+bvSg/50FWw?=
+ =?us-ascii?Q?OgOAFNtX/CO4VGRdqqM5SOGtww2SFOQnFadF0GQ8vYTR6GIDlkK2xsaAJ8UV?=
+ =?us-ascii?Q?qqsTR3ZYkW3s3iDMKCoCg0pkKZjiv7CI08Havf8z6S6wJbVbpilWN0RWhb0m?=
+ =?us-ascii?Q?5pLmS5dB4cPaUP8Grpw4mT+9lxsDLHgQNmoEwEMbd901MtyYtH7XDmjb0yD5?=
+ =?us-ascii?Q?GDdQwAbaULjHOICOrUV9EeM12JusWXEi/HRjWpt+IxG4w8i3Xu8YbKTITsXT?=
+ =?us-ascii?Q?PtRGepn/eIp10wfbvWHVxP6QoHo2mq/sEGSTlUAmgCdYw+rvnyiMhA3qqGKd?=
+ =?us-ascii?Q?EKNoi5aMGlL6fCbyIKLgZNL+wbiX/JPPccTJALw6n+VrUZVTJjemlNStqS5a?=
+ =?us-ascii?Q?CRvp8MxLNDo5uwfbVxapMtxV9hWeTDOHon5xg4sQVduz6B/Yk9LpPosWSVUT?=
+ =?us-ascii?Q?9qnTRhKEqyzu++t+K1c9Vezr8xJ5AljQuIE8A+YlupfuNm0Pe3c/56N48cOb?=
+ =?us-ascii?Q?QoLSqAPtMVw76SSpKpUONG6zkxl+VYhtUrj9ZXgMRDlclsjdHbLutYzXwJfY?=
+ =?us-ascii?Q?SfDIlVyypRuwY7L1seLlXfG2oGZNC/sSy5hFbyJuX5Oo7TiQ135PIBZMBF/0?=
+ =?us-ascii?Q?Ip1EWpglfVCpCXSHIjMbhVcWNaAL5GWjccIzRX2Qp1QkWNl9TA6rGlDRJD+2?=
+ =?us-ascii?Q?7x3madmh5FPIDh48tKLvFnhIUklPbr0O+bzFF8YikclBb0prePGMfZoVzXBF?=
+ =?us-ascii?Q?z2ZoRJSPV+Ju8ji1WeA0xpJ96GTlVhSzvHiZHOUbCN/uMHcsoCiilIvgChGc?=
+ =?us-ascii?Q?PZVvy6oNLbemQARoWfkhXLspee6IGZ0lx9Z5ncKcdRV3/UgMU4jXpDCBJdjG?=
+ =?us-ascii?Q?0hpfyb/+wmnuDkccKhw0MGNJTGoengp4vbh8JEnG0Ju/CrrBsapVu8aSrcDv?=
+ =?us-ascii?Q?3FkkCgIExLy6ElmTqDU8IRUpB4UY7OpWWZ077kZHDkoEPewPUloyWQKHKj8i?=
+ =?us-ascii?Q?tIRD/pL9SiYm6TBSJh6sEfGWRGwm7LBxbVWtPJrf/pflW7oAnPpanP/GyZ20?=
+ =?us-ascii?Q?YbvT1cKBrwnaqpGqTorzD31Lrvk4a3X38O4FH60iqH6/XHoaBUB/svd6oMGw?=
+ =?us-ascii?Q?D7dnSY0BXwJnaKMI2pt+DeIdaT68q3C91IrrYdY4BSyzHJj720eGaw2UKctA?=
+ =?us-ascii?Q?vz26eYXhL6d1RLp/jMrQ4eN64i0NdxQlKKf1mxyjLVoH1mkfJXLU2FEGcj+E?=
+ =?us-ascii?Q?TaWJtFDjj45GM9qD5hkhWDx4s8mVG9FBhIQ1E/4gG/evJ57msPCdTBC0sB/p?=
+ =?us-ascii?Q?MbRWFpV6Rwprx1Yd0z9ev1St3bm+QnfvxtKWPOc+12Sy5sy3luOZxmo6jlI7?=
+ =?us-ascii?Q?JNvHDKN85NpAHTb4qbbJQakoi50tDtkIqyT3Vqc4lIqZ6jH6QqMbQrCjalaO?=
+ =?us-ascii?Q?6ATbrAQ+tas+oHjRzp9E/SDBEdGh9JRbA/czc3RXoDnQcYnFnUmh20GFX6Bk?=
+ =?us-ascii?Q?2xqPE6EnubM2CFTxpHIA0C1jGJKUqnHaI0uuBa/HKvGl00pxD/jQJJqucIch?=
+ =?us-ascii?Q?IpC7ht5mX7OwBmcPVkKPUwJX4yB6SorOGno3bLPp?=
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: f619df36-2515-4ba2-b3f1-08dde0f03b24
+X-MS-Exchange-CrossTenant-AuthSource: DS7PR12MB9473.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 21 Aug 2025 20:20:54.7076
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: y9Fke4yeWvHxDD3HPGMFf43Uf0a/h+ZaKyS5tFV4TnJDPSmOfCjHaQFDFZiDBtKA
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: MN0PR12MB6002
 
-On Mon, 18 Aug 2025 13:33:52 -0700
-David Matlack <dmatlack@google.com> wrote:
+On 21 Aug 2025, at 16:06, David Hildenbrand wrote:
 
-> On Mon, Aug 18, 2025 at 12:37=E2=80=AFPM Alex Williamson
-> <alex.williamson@redhat.com> wrote:
-> >
-> > On Mon, 18 Aug 2025 11:59:39 -0700
-> > David Matlack <dmatlack@google.com> wrote:
-> > =20
-> > > On Thu, Jul 31, 2025 at 1:55=E2=80=AFPM David Matlack <dmatlack@googl=
-e.com> wrote: =20
-> > > >
-> > > > On Tue, Jul 29, 2025 at 3:26=E2=80=AFPM Jason Gunthorpe <jgg@nvidia=
-.com> wrote: =20
-> > > > >
-> > > > > On Mon, Jul 28, 2025 at 10:27:37AM -0600, Alex Williamson wrote: =
-=20
-> > > > > > On Fri, 25 Jul 2025 09:47:48 -0700
-> > > > > > David Matlack <dmatlack@google.com> wrote: =20
-> > > > > > > I also was curious about your thoughts on maintenance of VFIO
-> > > > > > > selftests, since I don't think we discussed that in the RFC. =
-I am
-> > > > > > > happy to help maintain VFIO selftests in whatever way makes t=
-he most
-> > > > > > > sense. For now I added tools/testing/selftests/vfio under the
-> > > > > > > top-level VFIO section in MAINTAINERS (so you would be the ma=
-intainer)
-> > > > > > > and then also added a separate section for VFIO selftests wit=
-h myself
-> > > > > > > as a Reviewer (see PATCH 01). Reviewer felt like a better cho=
-ice than
-> > > > > > > Maintainer for myself since I am new to VFIO upstream (I've p=
-rimarily
-> > > > > > > worked on KVM in the past). =20
-> > > > > >
-> > > > > > Hi David,
-> > > > > >
-> > > > > > There's a lot of potential here and I'd like to see it proceed.=
- =20
-> > > > >
-> > > > > +1 too, I really lack time at the moment to do much with this but=
- I'm
-> > > > > half inclined to suggest Alex should say it should be merged in 6
-> > > > > weeks (to motivate any reviewing) and we can continue to work on =
-it
-> > > > > in-tree.
-> > > > >
-> > > > > As they are self tests I think there is alot more value in having=
- the
-> > > > > tests than having perfect tests. =20
-> > > >
-> > > > They have been quite useful already within Google. Internally we ha=
-ve
-> > > > something almost identical to the RFC and have been using that for
-> > > > testing our 6.6-based kernel continuously since March. Already they
-> > > > have caught one (self-inflicted) regression where 1GiB HugeTLB pages
-> > > > started getting mapped with 2MiB mappings in the IOMMU, and have be=
-en
-> > > > very helpful with new development (e.g. Aaron's work, and Live Upda=
-te
-> > > > support).
-> > > >
-> > > > So I agree, it's probably net positive to merge early and then iter=
-ate
-> > > > in-tree. Especially since these are only tests and not e.g.
-> > > > load-bearing kernel code (although I still want to hold a high bar =
-for
-> > > > the selftests code).
-> > > >
-> > > > The only patches to hold off merging would be 31-33, since those
-> > > > should probably go through the KVM tree? And of course we need Acks
-> > > > for the drivers/dma/{ioat,idxd} changes, but the changes there are
-> > > > pretty minor. =20
-> > >
-> > > Alex, how would you like to proceed? =20
-> >
-> > I think we need an ack from Shuah for the overall inclusion in
-> > tools/testing/selftests/
-> >
-> > AFAICT the tools include files don't seem to have any central
-> > authority, so maybe we just need to chase those ioat/idxd acks, along
-> > with Shuah's and we can get this rolling and follow-up with the latter
-> > KVM patches once the base is merged.  Thanks, =20
->=20
-> Sounds good.
->=20
-> And yeah, I also don't see any maintainers listed for tools/include/
-> or tools/arch/x86/include/. Jason left some comments on the RFC that
-> reduced the delta in v1, but that's the only feedback I've gotten so
-> far there.
->=20
-> I will try emailing Shuah and the ioat/idxd maintainers directly as a
-> next step, since it has been about 2 months since I posted this series
-> and we haven't heard anything yet.
->=20
-> Thanks for the help.
+> In an ideal world, we wouldn't have to deal with SPARSEMEM without
+> SPARSEMEM_VMEMMAP, but in particular for 32bit SPARSEMEM_VMEMMAP is
+> considered too costly and consequently not supported.
+>
+> However, if an architecture does support SPARSEMEM with
+> SPARSEMEM_VMEMMAP, let's forbid the user to disable VMEMMAP: just
+> like we already do for arm64, s390 and x86.
+>
+> So if SPARSEMEM_VMEMMAP is supported, don't allow to use SPARSEMEM without
+> SPARSEMEM_VMEMMAP.
+>
+> This implies that the option to not use SPARSEMEM_VMEMMAP will now be
+> gone for loongarch, powerpc, riscv and sparc. All architectures only
+> enable SPARSEMEM_VMEMMAP with 64bit support, so there should not really
+> be a big downside to using the VMEMMAP (quite the contrary).
+>
+> This is a preparation for not supporting
+>
+> (1) folio sizes that exceed a single memory section
+> (2) CMA allocations of non-contiguous page ranges
+>
+> in SPARSEMEM without SPARSEMEM_VMEMMAP configs, whereby we
+> want to limit possible impact as much as possible (e.g., gigantic hugetlb
+> page allocations suddenly fails).
 
-I think we have all the required acks now and reviews just suggest some
-minor patch shuffling, right?.  You were also going to switch from
-reviewer to maintainer of the selftests in MAINTAINERS ;)
+Sounds like a good idea.
 
-Are you planning to collect those acks, add the minor changes, drop the
-trailing KVM changes to come in through the existing kvm selftests and
-repost?
+>
+> Cc: Huacai Chen <chenhuacai@kernel.org>
+> Cc: WANG Xuerui <kernel@xen0n.name>
+> Cc: Madhavan Srinivasan <maddy@linux.ibm.com>
+> Cc: Michael Ellerman <mpe@ellerman.id.au>
+> Cc: Nicholas Piggin <npiggin@gmail.com>
+> Cc: Christophe Leroy <christophe.leroy@csgroup.eu>
+> Cc: Paul Walmsley <paul.walmsley@sifive.com>
+> Cc: Palmer Dabbelt <palmer@dabbelt.com>
+> Cc: Albert Ou <aou@eecs.berkeley.edu>
+> Cc: Alexandre Ghiti <alex@ghiti.fr>
+> Cc: "David S. Miller" <davem@davemloft.net>
+> Cc: Andreas Larsson <andreas@gaisler.com>
+> Signed-off-by: David Hildenbrand <david@redhat.com>
+> ---
+>  mm/Kconfig | 3 +--
+>  1 file changed, 1 insertion(+), 2 deletions(-)
+>
 
-With KVM Forum coming up, I'd like to try to get this squared away and
-into the vfio next branch by next week.  Thanks,
+Acked-by: Zi Yan <ziy@nvidia.com>
 
-Alex
-
+Best Regards,
+Yan, Zi
 
