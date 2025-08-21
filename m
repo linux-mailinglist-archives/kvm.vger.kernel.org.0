@@ -1,162 +1,214 @@
-Return-Path: <kvm+bounces-55391-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-55392-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id F05C5B30762
-	for <lists+kvm@lfdr.de>; Thu, 21 Aug 2025 22:57:26 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 126C6B30782
+	for <lists+kvm@lfdr.de>; Thu, 21 Aug 2025 22:59:13 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 23611B07192
-	for <lists+kvm@lfdr.de>; Thu, 21 Aug 2025 20:54:06 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 63D1A1D03561
+	for <lists+kvm@lfdr.de>; Thu, 21 Aug 2025 20:55:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CE9B234DCD4;
-	Thu, 21 Aug 2025 20:37:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C7DE235690E;
+	Thu, 21 Aug 2025 20:38:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="J4HMOKiV"
 X-Original-To: kvm@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pg1-f202.google.com (mail-pg1-f202.google.com [209.85.215.202])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ECB552E975A;
-	Thu, 21 Aug 2025 20:37:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5391F3568F4
+	for <kvm@vger.kernel.org>; Thu, 21 Aug 2025 20:38:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755808662; cv=none; b=pCc+J54RQsKpxAolMrfGfRqqHEkB8Re605or+HLyHOZnOk2K30QU8VkyX4UqzlGFYX7tzLH2tK5fQaj+Dof7CkhETXE6Dvs/snZ7AKMrCUrGuH5lLStdBVtU8r3rv9DDaVG8fitAIW27OA6LeBUYeJLMpGOVHKjaih1l+i/YEjk=
+	t=1755808701; cv=none; b=Bd2ExM4xOr0dhWfVNJbSIcfa7bULbblS2rlub1/3sQIX5ZzTrLaxk1kZpduuWCVpgGPxbHci4sF4pAOG0xZw0IhC5GuNivJqEpiYp0T+SIUq+/qzTHkEzgbzDj/b7KhbLF92fjN5zfTiuXwythnKgaezOmrhGqr9MIbbcr0Vjnc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755808662; c=relaxed/simple;
-	bh=blUXud23fopvmY+ZqIGGdUcwI8bLC8Fc6/BXyHTyURY=;
-	h=Message-ID:Date:MIME-Version:Subject:From:To:Cc:References:
-	 In-Reply-To:Content-Type; b=RL0rubprIw2LpLMHs1E0BDc8Qnp2Flacl839qTc9OjcPkOIkg2B8MQUbgLnynzPPUiwsV7PX77NDfSdeY0sXyoJD48RmBmgz43N+w7ZJXrvESEG0bCrTPcVcQpN5a7OO3wXb4IMaSou24ADr/wnLwqeQ4dDn5skg+GidSZ3wxyg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 29F65C4CEEB;
-	Thu, 21 Aug 2025 20:37:28 +0000 (UTC)
-Message-ID: <0dc9936f-c977-4ff4-98f3-7941b2eba9d3@redhat.com>
-Date: Thu, 21 Aug 2025 22:37:26 +0200
+	s=arc-20240116; t=1755808701; c=relaxed/simple;
+	bh=CCWyrizXqh6azDRIlEbtuLy92d9UOttaWpx8GvlyZH8=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=pUR65+DXWk1mzMb9WfayzZDATAjAaLcxNzVidb0VaK65s5IYvUHe2O1EJr3whkjb18ewuV5mme2Kctr+dWLrUlah2divaZBoiKRF+X/ldZG4FTchDWqTbRdMEooP7j6MMpN9M7gqTVKhZjgZaCCyDSku6RK1uykdznyH1LZwjv0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=J4HMOKiV; arc=none smtp.client-ip=209.85.215.202
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+Received: by mail-pg1-f202.google.com with SMTP id 41be03b00d2f7-b471757d82fso1125411a12.3
+        for <kvm@vger.kernel.org>; Thu, 21 Aug 2025 13:38:19 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1755808698; x=1756413498; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=0DT+LN0N/uSj+iDQVx56WV7qQae5b12UpmwE1JIpSnE=;
+        b=J4HMOKiVZn3062sSZbrT8a+iPMy+jnFWemauDYir0wUCXKDus6hvt19X/z4B4t+/xK
+         x6gLGKLNHKoUS4xBSElC5+pAPe9iNOqPysazjz4Fv9h/oJ2iv/nR+Gak6UtMi7KRhzcL
+         5tvPrFYecqMFPHoi3rwg3z7Bics+l4ePNh2eabQu4gskK9+hP3hldauUU/tLrJDrxVkg
+         6E/8pneEaptECBjkTAiTdVkKVBi8w9JH0kKAIjukL5TYAEIaMdKo1l/oMCCFEuPoi8nN
+         GWWj/kADinM859KHGqsFKsvfGnQKPblprpt90LSJ8t28HXObdM4H/7BVtLlOnLObjxri
+         D4SQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1755808698; x=1756413498;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=0DT+LN0N/uSj+iDQVx56WV7qQae5b12UpmwE1JIpSnE=;
+        b=a23iwfkkYADXXUunJujAcp5R+FowKGFANB5Ch2VsQlZvgd/QOAygo2Kt0QUsypomF5
+         sYIk1WhsLZzA5Ovgbq/5s1JSvJnyscUo2zWppwSMCgQbLXTsVIF2iSgxdiWoGEC3CUC8
+         YahgEr03O3GEw05u1IjCcEeLrmwc+a/WLxviFih1GNOdYliED9rng49I/VaF4S0pIa0d
+         sfLt9eMQ6YFC4Hs6nwvvtsNMHBwWdZYIEIcnjtQUj4DnGn3vIbwQV4Xqg0CsG8/RbsUU
+         WF4VxMhnI2uL36AomARDKvC4jt7lDr8PuKSCe08qnf/PAsVSUexh8Q9HcqNCJKUl4szC
+         XgOg==
+X-Forwarded-Encrypted: i=1; AJvYcCW1mjusha4pK+df0b2KQ2h948oZnuuxGP8oRMkz4VIWW5IThumoJCStQFzcAWtfA6CzHIY=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yw0uYPSlKLmvtM3iTqZIPyox6J9HWRKLawBw06Rn7ldOJSa8ea+
+	PJTxMGJEtokvTMjqigq82ZZ1mHqVQ2lqoFhBmPlnO152s4fMfgmgDq723WYzPAu0pqpFBnjdHPL
+	9iU1NHg==
+X-Google-Smtp-Source: AGHT+IHLMb0Ev4JwGytUG/z778wSGXRQCiWY994aVKEonVuNvxifDjuhuy4KGJVbjfnt1w2f94VzQ8w6u2s=
+X-Received: from pjbnb7.prod.google.com ([2002:a17:90b:35c7:b0:321:c9cf:de39])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:3805:b0:31c:c661:e4e
+ with SMTP id 98e67ed59e1d1-32518997f87mr991073a91.33.1755808698460; Thu, 21
+ Aug 2025 13:38:18 -0700 (PDT)
+Date: Thu, 21 Aug 2025 13:38:17 -0700
+In-Reply-To: <2b2cfff9a2bd6bcc97b97fee7f3a3e1186c9b03c.1755609446.git.maciej.szmigiero@oracle.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH RFC 31/35] crypto: remove nth_page() usage within SG entry
-From: David Hildenbrand <david@redhat.com>
-To: Linus Torvalds <torvalds@linux-foundation.org>
-Cc: linux-kernel@vger.kernel.org, Herbert Xu <herbert@gondor.apana.org.au>,
- "David S. Miller" <davem@davemloft.net>,
- Alexander Potapenko <glider@google.com>,
- Andrew Morton <akpm@linux-foundation.org>,
- Brendan Jackman <jackmanb@google.com>, Christoph Lameter <cl@gentwo.org>,
- Dennis Zhou <dennis@kernel.org>, Dmitry Vyukov <dvyukov@google.com>,
- dri-devel@lists.freedesktop.org, intel-gfx@lists.freedesktop.org,
- iommu@lists.linux.dev, io-uring@vger.kernel.org,
- Jason Gunthorpe <jgg@nvidia.com>, Jens Axboe <axboe@kernel.dk>,
- Johannes Weiner <hannes@cmpxchg.org>, John Hubbard <jhubbard@nvidia.com>,
- kasan-dev@googlegroups.com, kvm@vger.kernel.org,
- "Liam R. Howlett" <Liam.Howlett@oracle.com>, linux-arm-kernel@axis.com,
- linux-arm-kernel@lists.infradead.org, linux-crypto@vger.kernel.org,
- linux-ide@vger.kernel.org, linux-kselftest@vger.kernel.org,
- linux-mips@vger.kernel.org, linux-mmc@vger.kernel.org, linux-mm@kvack.org,
- linux-riscv@lists.infradead.org, linux-s390@vger.kernel.org,
- linux-scsi@vger.kernel.org, Lorenzo Stoakes <lorenzo.stoakes@oracle.com>,
- Marco Elver <elver@google.com>, Marek Szyprowski <m.szyprowski@samsung.com>,
- Michal Hocko <mhocko@suse.com>, Mike Rapoport <rppt@kernel.org>,
- Muchun Song <muchun.song@linux.dev>, netdev@vger.kernel.org,
- Oscar Salvador <osalvador@suse.de>, Peter Xu <peterx@redhat.com>,
- Robin Murphy <robin.murphy@arm.com>, Suren Baghdasaryan <surenb@google.com>,
- Tejun Heo <tj@kernel.org>, virtualization@lists.linux.dev,
- Vlastimil Babka <vbabka@suse.cz>, wireguard@lists.zx2c4.com, x86@kernel.org,
- Zi Yan <ziy@nvidia.com>
-References: <20250821200701.1329277-1-david@redhat.com>
- <20250821200701.1329277-32-david@redhat.com>
- <CAHk-=wjGzyGPgqKDNXM6_2Puf7OJ+DQAXMg5NgtSASN8De1roQ@mail.gmail.com>
- <2926d7d9-b44e-40c0-b05d-8c42e99c511d@redhat.com>
-Content-Language: en-US
-Autocrypt: addr=david@redhat.com; keydata=
- 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
- qIws/H2t
-In-Reply-To: <2926d7d9-b44e-40c0-b05d-8c42e99c511d@redhat.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Mime-Version: 1.0
+References: <cover.1755609446.git.maciej.szmigiero@oracle.com> <2b2cfff9a2bd6bcc97b97fee7f3a3e1186c9b03c.1755609446.git.maciej.szmigiero@oracle.com>
+Message-ID: <aKeDuaW5Df7PgA38@google.com>
+Subject: Re: [PATCH 1/2] KVM: SVM: Sync TPR from LAPIC into VMCB::V_TPR when
+ setting LAPIC regs
+From: Sean Christopherson <seanjc@google.com>
+To: "Maciej S. Szmigiero" <mail@maciej.szmigiero.name>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, Maxim Levitsky <mlevitsk@redhat.com>, 
+	Suravee Suthikulpanit <Suravee.Suthikulpanit@amd.com>, 
+	Alejandro Jimenez <alejandro.j.jimenez@oracle.com>, kvm@vger.kernel.org, 
+	linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="us-ascii"
 
-On 21.08.25 22:29, David Hildenbrand wrote:
-> On 21.08.25 22:24, Linus Torvalds wrote:
->> On Thu, 21 Aug 2025 at 16:08, David Hildenbrand <david@redhat.com> wrote:
->>>
->>> -       page = nth_page(page, offset >> PAGE_SHIFT);
->>> +       page += offset / PAGE_SIZE;
->>
->> Please keep the " >> PAGE_SHIFT" form.
+On Tue, Aug 19, 2025, Maciej S. Szmigiero wrote:
+> From: "Maciej S. Szmigiero" <maciej.szmigiero@oracle.com>
 > 
-> No strong opinion.
+> When AVIC is enabled the normal pre-VMRUN sync in sync_lapic_to_cr8() is
+> inhibited so any changed TPR in the LAPIC state would not get copied into
+> the V_TPR field of VMCB.
 > 
-> I was primarily doing it to get rid of (in other cases) the parentheses.
+> AVIC does sync between these two fields, however it does so only on
+> explicit guest writes to one of these fields, not on a bare VMRUN.
 > 
-> Like in patch #29
+> This is especially true when it is the userspace setting LAPIC state via
+> KVM_SET_LAPIC ioctl() since userspace does not have access to the guest
+> VMCB.
 > 
-> -	/* Assumption: contiguous pages can be accessed as "page + i" */
-> -	page = nth_page(sg_page(sg), (*offset >> PAGE_SHIFT));
-> +	page = sg_page(sg) + *offset / PAGE_SIZE;
+> Practice shows that it is the V_TPR that is actually used by the AVIC to
+> decide whether to issue pending interrupts to the CPU (not TPR in TASKPRI),
+> so any leftover value in V_TPR will cause serious interrupt delivery issues
+> in the guest when AVIC is enabled.
 > 
->>
->> Is "offset" unsigned? Yes it is, But I had to look at the source code
->> to make sure, because it wasn't locally obvious from the patch. And
->> I'd rather we keep a pattern that is "safe", in that it doesn't
->> generate strange code if the value might be a 's64' (eg loff_t) on
->> 32-bit architectures.
->>
->> Because doing a 64-bit shift on x86-32 is like three cycles. Doing a
->> 64-bit signed division by a simple constant is something like ten
->> strange instructions even if the end result is only 32-bit.
+> Fix this issue by explicitly copying LAPIC TPR to VMCB::V_TPR in
+> avic_apicv_post_state_restore(), which gets called from KVM_SET_LAPIC and
+> similar code paths when AVIC is enabled.
 > 
-> I would have thought that the compiler is smart enough to optimize that?
-> PAGE_SIZE is a constant.
+> Fixes: 3bbf3565f48c ("svm: Do not intercept CR8 when enable AVIC")
+> Signed-off-by: Maciej S. Szmigiero <maciej.szmigiero@oracle.com>
+> ---
+>  arch/x86/kvm/svm/avic.c | 23 +++++++++++++++++++++++
+>  1 file changed, 23 insertions(+)
+> 
+> diff --git a/arch/x86/kvm/svm/avic.c b/arch/x86/kvm/svm/avic.c
+> index a34c5c3b164e..877bc3db2c6e 100644
+> --- a/arch/x86/kvm/svm/avic.c
+> +++ b/arch/x86/kvm/svm/avic.c
+> @@ -725,8 +725,31 @@ int avic_init_vcpu(struct vcpu_svm *svm)
+>  
+>  void avic_apicv_post_state_restore(struct kvm_vcpu *vcpu)
+>  {
+> +	struct vcpu_svm *svm = to_svm(vcpu);
+> +	u64 cr8;
+> +
+>  	avic_handle_dfr_update(vcpu);
+>  	avic_handle_ldr_update(vcpu);
+> +
+> +	/* Running nested should have inhibited AVIC. */
+> +	if (WARN_ON_ONCE(nested_svm_virtualize_tpr(vcpu)))
+> +		return;
 
-It's late, I get your point: if the compiler can't optimize if it's a 
-signed value ...
 
--- 
-Cheers
+> +
+> +	/*
+> +	 * Sync TPR from LAPIC TASKPRI into V_TPR field of the VMCB.
+> +	 *
+> +	 * When AVIC is enabled the normal pre-VMRUN sync in sync_lapic_to_cr8()
+> +	 * is inhibited so any set TPR LAPIC state would not get reflected
+> +	 * in V_TPR.
 
-David / dhildenb
+Hmm, I think that code is straight up wrong.  There's no justification, just a
+claim:
+
+  commit 3bbf3565f48ce3999b5a12cde946f81bd4475312
+  Author:     Suravee Suthikulpanit <Suravee.Suthikulpanit@amd.com>
+  AuthorDate: Wed May 4 14:09:51 2016 -0500
+  Commit:     Paolo Bonzini <pbonzini@redhat.com>
+  CommitDate: Wed May 18 18:04:31 2016 +0200
+
+    svm: Do not intercept CR8 when enable AVIC
+    
+    When enable AVIC:
+        * Do not intercept CR8 since this should be handled by AVIC HW.
+        * Also, we don't need to sync cr8/V_TPR and APIC backing page.   <======
+    
+    Signed-off-by: Suravee Suthikulpanit <suravee.suthikulpanit@amd.com>
+    [Rename svm_in_nested_interrupt_shadow to svm_nested_virtualize_tpr. - Paolo]
+    Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+
+That claim assumes APIC[TPR] will _never_ be modified by anything other than
+hardware.  That's obviously false for state restore from userspace, and it's also
+technically false at steady state, e.g. if KVM managed to trigger emulation of a
+store to the APIC page, then KVM would bypass the automatic harware sync.
+
+There's also the comically ancient KVM_SET_VAPIC_ADDR, which AFAICT appears to
+be largely dead code with respect to vTPR (nothing sets KVM_APIC_CHECK_VAPIC
+except for the initial ioctl), but could again set APIC[TPR] without updating
+V_TPR.
+
+So, rather than manually do the update during state restore, my vote is to restore
+the sync logic.  And if we want to optimize that code (seems unnecessary), then
+we should hook all TPR writes.
+
+diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
+index d9931c6c4bc6..1bfebe40854f 100644
+--- a/arch/x86/kvm/svm/svm.c
++++ b/arch/x86/kvm/svm/svm.c
+@@ -4046,8 +4046,7 @@ static inline void sync_lapic_to_cr8(struct kvm_vcpu *vcpu)
+        struct vcpu_svm *svm = to_svm(vcpu);
+        u64 cr8;
+ 
+-       if (nested_svm_virtualize_tpr(vcpu) ||
+-           kvm_vcpu_apicv_active(vcpu))
++       if (nested_svm_virtualize_tpr(vcpu))
+                return;
+ 
+        cr8 = kvm_get_cr8(vcpu);
+
+
+> +	 *
+> +	 * Practice shows that it is the V_TPR that is actually used by the
+> +	 * AVIC to decide whether to issue pending interrupts to the CPU, not
+> +	 * TPR in TASKPRI.
+
+FWIW, the APM kinda sorta alludes to this:
+
+  Enabling AVIC also affects CR8 behavior independent of V_INTR_MASKING enable
+  (bit 24): writes to CR8 affect the V_TPR and update the backing page and reads
+  from CR8 return V_TPR.
+
+
+> +	 */
+> +	cr8 = kvm_get_cr8(vcpu);
+> +	svm->vmcb->control.int_ctl &= ~V_TPR_MASK;
+> +	svm->vmcb->control.int_ctl |= cr8 & V_TPR_MASK;
+> +	WARN_ON_ONCE(!vmcb_is_dirty(svm->vmcb, VMCB_INTR));
+
+
+>  }
+>  
+>  static void svm_ir_list_del(struct kvm_kernel_irqfd *irqfd)
 
