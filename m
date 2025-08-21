@@ -1,222 +1,203 @@
-Return-Path: <kvm+bounces-55219-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-55220-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id 014C1B2E89C
-	for <lists+kvm@lfdr.de>; Thu, 21 Aug 2025 01:23:56 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0697AB2E964
+	for <lists+kvm@lfdr.de>; Thu, 21 Aug 2025 02:25:00 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id B6E6B4E2D1D
-	for <lists+kvm@lfdr.de>; Wed, 20 Aug 2025 23:23:54 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 83AA13AD9EA
+	for <lists+kvm@lfdr.de>; Thu, 21 Aug 2025 00:24:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 582772DE70C;
-	Wed, 20 Aug 2025 23:23:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7A66E1BD035;
+	Thu, 21 Aug 2025 00:24:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="B3dbXVhS"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="ETWmkSM3"
 X-Original-To: kvm@vger.kernel.org
-Received: from NAM04-BN8-obe.outbound.protection.outlook.com (mail-bn8nam04on2060.outbound.protection.outlook.com [40.107.100.60])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pg1-f202.google.com (mail-pg1-f202.google.com [209.85.215.202])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B1B1A25BEF2;
-	Wed, 20 Aug 2025 23:23:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.100.60
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755732225; cv=fail; b=lhRVrzGvO55uUUwg/TS0cS3glypu7YFNMequvZreZkmp7Y3Xe/52xXlKO28qIi1e4cwTgXM30hKamOjhfBr+KwDyMW3phukLrimhJJGNZj64KpqVJmhxISXKsI90fOjcCQv4IZOdtYI1jJfxpUXyex2ijx+SnetQmfmIQ4u9LUI=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755732225; c=relaxed/simple;
-	bh=UwXwTmAk9D0ISJRDcvnexr9IbiN7wGRVpOixGrNfdLs=;
-	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
-	 Content-Type:MIME-Version; b=qCeDOpTruCqxsGpMIIZJ1YlepLCjs56jFOJpJCndb4SzV4cHF3hf/wSky6v5gNH3BHkY/3yTDdgEVKqqQnC+Zr2o6HP8oUExXL/Zrub+1VHmt2d3pOUd2nKn7FuE9e9Hzwb+ahryb0LQZDt5ZUROGu3u+i0uClc9c2dwjNsVnlo=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=B3dbXVhS; arc=fail smtp.client-ip=40.107.100.60
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=nfQhkRiRw0VHgcFYbkzNcx/1XnOWffTnz7SXenBBwxUYe8QV/CYA8YyNF0Xdv1fgYhHiCf/kY0fP8+wAXcP6775+0xAUE9g3CK3Ui6MXpj4SkB8wwy3EIC57SW8UbLPD8H0D5S6zgPTnkKJ9ElitQiL+APwx6cqAZCj0JBnhWLWMK9UXSlxDiPVoZPkFKHJzkpclkKBccW2XVkSFZSSY/fIg5mfSm1pYKzvwu822c3SQUhPX4WOZiB8dgWBF5m/+kBNOdj5rA/uH9sYaoAxMytS+UPHBMliOViZKeA5HoAOhSsPQ6mgtPXkYXD0GYcx+tfXP19MkGWJhYBbA3aMNoQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=eGuJfyN+/wCBvOeXKFA4JbmmNdF2d8Ez0VCZ79bW0C0=;
- b=D+yb1vKm98Yy8JNWja5u5RxLQLPRZ3hBgAHLBcIYhelQ9kNDWP1ymomqfAHPlo5IvoTPHOZf0FVuVUZ/Y1rCl+c1LLKSAkk0qU+CQpKWktyV4u85BX9dHQHLHj+2TANrCI2SX6UlXzpQdVgQP00KCAjknz2t0qgRVdlpUA/uDnYWy6FjVugXNm7CwlmbBOKmCcQhzG4GCY60CiI2Cj5y2vZW+hXCi+5NptYtMdw/ffiqWW1pGCJKdFTM/B7hvj/KAbgzbQxmacC5U+iUfFMBl98wDr6tWNG6kWFOGcELL+gsX3h4xNoFfKeKtzwPo3MIrLHDXl6rADe71BSd5aXSiQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
- header.d=amd.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=eGuJfyN+/wCBvOeXKFA4JbmmNdF2d8Ez0VCZ79bW0C0=;
- b=B3dbXVhS9tRKxrDMXbl9hA1HyVJ+vyaJkKHcq1r3OwbSS9xZ9uji1PqbuqOKXxgb7LT9znFoW4TV79MjyoWZcuP06XEQDpVllPHxTlpEtro+yqqcD9ClHnXa5ubpGDqtLgZYgYrrSVk38KHnNLq2V6RFLFvr1YAFul1rDxnGBsw=
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=amd.com;
-Received: from BL3PR12MB9049.namprd12.prod.outlook.com (2603:10b6:208:3b8::21)
- by SN7PR12MB6983.namprd12.prod.outlook.com (2603:10b6:806:261::20) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9031.24; Wed, 20 Aug
- 2025 23:23:40 +0000
-Received: from BL3PR12MB9049.namprd12.prod.outlook.com
- ([fe80::ae6a:9bdd:af5b:e9ad]) by BL3PR12MB9049.namprd12.prod.outlook.com
- ([fe80::ae6a:9bdd:af5b:e9ad%6]) with mapi id 15.20.8989.018; Wed, 20 Aug 2025
- 23:23:39 +0000
-Message-ID: <7eed1970-4e7d-4b3a-a3c1-198b0a6521d5@amd.com>
-Date: Wed, 20 Aug 2025 18:23:35 -0500
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v9 2/2] KVM: SEV: Add SEV-SNP CipherTextHiding support
-To: Randy Dunlap <rdunlap@infradead.org>, corbet@lwn.net, seanjc@google.com,
- pbonzini@redhat.com, tglx@linutronix.de, mingo@redhat.com, bp@alien8.de,
- dave.hansen@linux.intel.com, x86@kernel.org, hpa@zytor.com,
- thomas.lendacky@amd.com, herbert@gondor.apana.org
-Cc: akpm@linux-foundation.org, rostedt@goodmis.org, paulmck@kernel.org,
- michael.roth@amd.com, linux-doc@vger.kernel.org,
- linux-kernel@vger.kernel.org, kvm@vger.kernel.org
-References: <cover.1755721927.git.ashish.kalra@amd.com>
- <95abc49edfde36d4fb791570ea2a4be6ad95fd0d.1755721927.git.ashish.kalra@amd.com>
- <5dff05c1-474e-4fff-a19b-7c17b4db6173@infradead.org>
-Content-Language: en-US
-From: "Kalra, Ashish" <ashish.kalra@amd.com>
-In-Reply-To: <5dff05c1-474e-4fff-a19b-7c17b4db6173@infradead.org>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: SN7PR04CA0039.namprd04.prod.outlook.com
- (2603:10b6:806:120::14) To BL3PR12MB9049.namprd12.prod.outlook.com
- (2603:10b6:208:3b8::21)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 224A94430
+	for <kvm@vger.kernel.org>; Thu, 21 Aug 2025 00:24:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.202
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1755735890; cv=none; b=F8u+ni+2WSSWI7+yzZN95vXpEHwjmu60NLZt6/B98ILsVuNRimvb+NPXI+Lic1AlQ1odsXQ5fh1kQMSvrX6ClwEEyZQbG3UDn2YxDX01I5XSpwsNTI1TmcVGUvSij4OUoSIOv8cpG2mM6zKdID6qzvKDumctDhHy0IMKnrD/m5Q=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1755735890; c=relaxed/simple;
+	bh=ouPE6xmkeY4aYQfvv2K7TkBNeEwsezMGqf/BRWSZoPs=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=H8ai0krr3wSxlOlM9tDs2TI12t4UF7JCNPvx7R7lcBs5tuA7x6g0fasI5fTpCATO8z6+YzLVUYyXagdtLh0357v1pMdFhL2ZCfQ83NOqcip3lRJkBvIxNgndiBGirXrCkENN/hNWNR1V0c7nJjh6Q1sJQ/2OZqRN83PaM5cGvzE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=ETWmkSM3; arc=none smtp.client-ip=209.85.215.202
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+Received: by mail-pg1-f202.google.com with SMTP id 41be03b00d2f7-b47173a00e8so287672a12.1
+        for <kvm@vger.kernel.org>; Wed, 20 Aug 2025 17:24:48 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1755735888; x=1756340688; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=jZzV/mlBPnS2GvNCCcjdoQhPKlsDEhZV19xDyokbadQ=;
+        b=ETWmkSM3knew4jCVH5G/fPdTKIBoZPqAKOp1jVsLLTS0e2/BZ4V5YLnRpgRcEGC3An
+         P1gUy79f15N77K7IKol4EnaGluQdn8tJ0e+Rif0Hx8+iReWYWWECl22VzBVXACg/vB7f
+         bcC8Q2b2aL+NN6KfS87k5IxuHc6L24yf9Al3W6jMZQAsn04+rwdoJurIjqMwoqrxkirT
+         XQn9VebrZ9vOdeINiczPltkmuMjQHDmaHXxudDnffiehMoDq3ZiIIL9dKKOgkbgAYa7F
+         mg5NwwA+BY1n97BgL6SQ59xEFtiCcHT/FyASMo8qn+gMFOX6pDJtO+LIAGxvlShIKYko
+         E7Cg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1755735888; x=1756340688;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=jZzV/mlBPnS2GvNCCcjdoQhPKlsDEhZV19xDyokbadQ=;
+        b=o64WfSEfhoZv5rii93urOZbZvs/4ar+Tu1cJJvqyQaJQvqdgaedcbPlKmMTFag2pKs
+         ohy8scycIm2k/gLypMuEGFIdxXhaNdOhQLZ6fLZIbXJiiu+EfXZFidDMQJWpCe61dsUb
+         goRZPvKBhSm7SG/6ltScwzbqqAnu7NBA7VjxrQ8YBsGRpTqE9c6DhbtxRJKHkG019EVZ
+         5pDgPzlUrjz0BT6vXua/ZzqSvwjdxoTq2Yku0gPkRPVIWhTCfs+O6J9yQNBRaFnRp/11
+         U/ilD+Oz6AyHiU16sCR+omADtxm9UppQP5OROvlTDTQxIw84Ff1TAS/1NLo+aQiYDuQ/
+         WI3g==
+X-Forwarded-Encrypted: i=1; AJvYcCXC+UyZ2uqThd7Can2eCgZ3Ei5RYJJMrp8bRBYbB64OxXW2Atafnew+L1aG8RjZ4jZFfQk=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yzz2kvwXAT5NGT6PbMJW5C2k2ymgsjQVwKvBft/3vUjzSirB/e1
+	Syws74uRpZ02RIX6aaPr5juvr8pVki1mcxnsydpgLt5RhRWc0Uy5pUouds1PNWWZEKcM4P15XeP
+	yWt9Zyg==
+X-Google-Smtp-Source: AGHT+IGbcGjNVYeJAsxCM13+2V27BLrczzbABDW//9tJzxcoTaUWncDgkTlsyuUrUapckiQp+ahpmhndqtk=
+X-Received: from pfbfd5.prod.google.com ([2002:a05:6a00:2e85:b0:76e:313a:6f90])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a05:6a20:2591:b0:243:78a:827b
+ with SMTP id adf61e73a8af0-24330b47cd1mr462519637.51.1755735888381; Wed, 20
+ Aug 2025 17:24:48 -0700 (PDT)
+Date: Wed, 20 Aug 2025 17:24:47 -0700
+In-Reply-To: <20250722055030.3126772-2-suleiman@google.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: BL3PR12MB9049:EE_|SN7PR12MB6983:EE_
-X-MS-Office365-Filtering-Correlation-Id: b74fcb09-acd1-4f88-ca0f-08dde0409811
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|1800799024|7416014|376014|366016|921020;
-X-Microsoft-Antispam-Message-Info:
-	=?utf-8?B?RlBpQU9MNlU0KzBkbktFSWo1N3NkUmR1cU81V1RMbDBnUm9nczAxSVFPVklw?=
- =?utf-8?B?V0ZBMXNtYjAwY3NicmRjMG1HL3V0YkJNL3lZckhSWXJJY004TFJ2WDYzV1J6?=
- =?utf-8?B?RlRpQVN2UHNpYkRaMjlYNDQ1VWZhMHBrS2FzSTJkK01SRUlaNnBpTjhXQ3ky?=
- =?utf-8?B?cUd3dk1yWjFTUUdtdWh1UVE3KytyaUQzTVdzU3p5UytZWTlOSW4rNjNZa28z?=
- =?utf-8?B?NzVCS1ZNUUp0UUJ1dEdFdHhxWWRxYWlLN2xZZ3d2NHg1QkZPOHNPMkNCWENG?=
- =?utf-8?B?WGdTOFB3MXJvZS9XN1hSRDJzRGovc3BxdkViMG5SR0c2ektKY1RFVnJxV2VQ?=
- =?utf-8?B?elgraU5qMnJHdEUxYTRjWElwUUpOUmJEK1NEZWUxaWZ5RDc1LzRvd1RpM3lK?=
- =?utf-8?B?RGtxczRUbzZ2elNNR3lOZis4UVhFMzlFRzZlb29VaXhZbkd0a3hnc2RIWlhp?=
- =?utf-8?B?azNDQ0hFSW5XVVpoN3dqWkJlblQrV2NsRkpFYllXeEF4dU9yam1oS2M1T3lO?=
- =?utf-8?B?U1BjQ1dPU2JWb2ZYbm8xR2R5dnEraUI5SjlUcHFyYlp3b1JKNDkwOHpPVVdV?=
- =?utf-8?B?ZktYM0tRVDA1WjVZb05FODRua3dNUk40dmNqNG03TnA2YkpPNFpVVnFhQVQw?=
- =?utf-8?B?UUxSMEU3akNyWUZ2ZnJ6QUYwb2pzMk4xc1QveWlGSFVUSkFOODRVTmozSlJC?=
- =?utf-8?B?MTdQRWJlMVhGZHVCZW5qQ1ZCZEtNM29tVnpVTWRpdFpLbTRnYnFXWjJlc2w1?=
- =?utf-8?B?Q2ZwSkcwSWlyeVVsVmNMOTFYa3BTMXNVZWYzSmdxVmV3NHJtTFFKbGZ0cit6?=
- =?utf-8?B?YmNVcXN6cFRtTno3eVcybDNiemM1cllNNmc3azNpalo4U1lsTnFqTlVVWS9s?=
- =?utf-8?B?NzlMYzRRb0dUQ04zaXRjYlBBTlNKMEtJS3FrRjZLcncvME43ZmIzM2NnYSs1?=
- =?utf-8?B?WmkwVWFUekFPNEI5YUVmWmE4eDA1OGlFT3c4aEZENm1CSk9UcjZmYlV6cnVs?=
- =?utf-8?B?NTh3dEpHdHhmUXVBS2pPSVlmeDdlTHRaUWUwMDdXMzFvMlZDc0pUbWp6VVFF?=
- =?utf-8?B?bTZCMWM0T1ZxSTQyMWFvOUtyNklxdTBlY3Yyb1dtTHVYcDJWNlBpNkJkVFBj?=
- =?utf-8?B?dkN5YmdVYStteS8xNkh3a3VMelV3R1dkL21QT05qZ1NKajMwcEYzbzdJNmRD?=
- =?utf-8?B?Nm13YkJSaEE3Q2xxcDU3MWlRblBHUXBKOVZybFNyUFpyZVdkTnRsbWM3NUFp?=
- =?utf-8?B?NDY4L2liK3VuS25ubHhBNzNCSTRGWjdOcityOXB1L0FFU0NvWUhZaG9UaCsw?=
- =?utf-8?B?a2VEWDVhM2lWVEt1SlpVSXlEMWJuQ0t6ajIwcjZOZU12QW0ydXkyeHVGTFhy?=
- =?utf-8?B?LzE0a1JqckxKMzBKN1BSZ2VRYVpKSjY2dkFNRm94SnBVNHorS3cyWVNNK0J3?=
- =?utf-8?B?YThVV2JzL1NFUjEyMWRFckRpUWVINnVRTU5IL1NBZW92R0JwdDArMDZOL3VS?=
- =?utf-8?B?M1EwUE1XNEdBV1JWWFhaMFU3SVd4RTRwWDd2TUwvK0xYRklWVW1KNi9rbUVI?=
- =?utf-8?B?cVpQamRUdFRBVDU3bmFUamE1c2ZUNzZPN2lKdnhzOENRYi9hdHJoemlSNS9M?=
- =?utf-8?B?ZlMzWm5hdDltTCsweXFyVlIycjhldXVhSUlONlduQk5pWldkNHRBUTJ3d0Vj?=
- =?utf-8?B?RlRvTlRYTHVvY1NxM2JYVks3SzVUNGJGZkhVZFl1Nkg1K1ZyeURJaWhSWGcr?=
- =?utf-8?B?M0lIdlRvc1hMc0JRQUJpK1lScXVXRyt4anA5aG5VYmVYZDdGazVObUIrNVNJ?=
- =?utf-8?B?VUc3bWo4YWFpWVM2b1JxbWRjcTdnaTFSTHg3MzBReUsyOG9VTEYvTlZZdkdi?=
- =?utf-8?B?Q01zOVpjQVNqN1hOWjMzRDdIbUJPYXdSMWE3cEpqMWpraE54MmZiNEZMSUlp?=
- =?utf-8?B?UTJnb25VbXZjaEFmV0R3S1didmpjalJybTJLSjRpV05wTVlKMjZGcTI4eDVO?=
- =?utf-8?B?aFlNQ2JEWUxnPT0=?=
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BL3PR12MB9049.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(7416014)(376014)(366016)(921020);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?utf-8?B?ZmUzZXVRdWpNR3B2WW5ITzRlL2EzVlhNTVBMZERLSjltUExpTGd2TkxrMmtn?=
- =?utf-8?B?eEZwZVFTTWt2YW1iV0p6S2l4TUI4WThWY3ZlSEliQkhGay9Ud1dBdDNZRXUv?=
- =?utf-8?B?SlpvbElmZVd4eVBKZEk4c3I4azVheUluU0RtN05ENEJ1MEJuTlBsSXV3dmFJ?=
- =?utf-8?B?L0xHa3lRNUs5NVhYUFp2bmlzUFlEVWJteEE3SVU2M2FCMlBDdXNqcXcrbUF5?=
- =?utf-8?B?NWpRclZZeVhlV1FmMklHNW5COWdoS0oyRlpPeFljTUlNa2tMNFY5OExYWUo4?=
- =?utf-8?B?cmNGcUd5MnJBUTlXaWNPNTdMb2wrVnZrdWt6dkIxNENkeEZOQnNxTlJRcTMz?=
- =?utf-8?B?eDgzTm12bTFtZnBBTWZMTjVMc2srTFJWSkQ4WndwUUEvanBOY2l6U3l6MURG?=
- =?utf-8?B?MXhmK2ZEd3VFWExZMTk3YnNvcVFzU1N6OXlDcnN0ZDBnUmwrVDVEdW9ZT3NW?=
- =?utf-8?B?eEthdkZjYm8wNStVdVpKenBtNlhSdnNkTExsSlBkckpVeW03OG5yQ0M2NUZa?=
- =?utf-8?B?WDd1dnpWcDVXbStlaWJMdWx2UmlEVXk4TTRZbGlCMkNJQm9JVy9ZZk9FR1ZI?=
- =?utf-8?B?amVXMElyci9DUkk2NkVHUHRaVC9NMFBLZmgxVkh3V01hOTRiMlRWVmlhQ25S?=
- =?utf-8?B?VDFnbUhjWjlJZ1BtcU9ZMldhZ1BHZjN5MjA3M2NxdFFSbXArYk1GMnR6cUtV?=
- =?utf-8?B?Z1pVT25rZjQ3SlEzS3NkdSsvQk90SGtNZkZ2RGR3azI2eldpQkF1cmxMWWpU?=
- =?utf-8?B?SkhiU2d0aytKWnVVaHBwVHViamJVNnRtalhPcEFVWGhzTHZZUzNTcTRDV1NZ?=
- =?utf-8?B?YitXRW94anBVVEVqKzVOMjNReENLZ2RpREdITDgxMXo0bnR6Q2NwTXZJQm15?=
- =?utf-8?B?RFhMdlJSaG5EeklyMmp5YytsTGtnMHAraEFxZmlvUzJEc1k5aEJFZFY1L1pn?=
- =?utf-8?B?N2RlM3ZhdVV5QmhYSXlZWEdZT2prcUNkcWtjcHZiaDJ0SU1IdzdNS2pJUlN0?=
- =?utf-8?B?eU5jempCYUJaeDRGeDdlanRvdysvUUlrdEVuQ0V4Uk1HRGpUTkVMNEtjamNV?=
- =?utf-8?B?aFArSmlneSt3bVBaY2VIYjd2bmppRi9tQW5zMWVyblJhK3FFSG4zaE1saVhB?=
- =?utf-8?B?TDc0RDZ2STd5VkRwK0tqMVVBTXZLUCs4RXNjeFREMk9nUWRMZWNTZXRRTGxW?=
- =?utf-8?B?OHNCd04vRmdSWjZOL0NoUnhWWTdPNU9uQ1IvZ1NTTlZQZnpqejRyWjJFa0Zv?=
- =?utf-8?B?NTBvWE1tc1FNWElFeWxZRkdIR2ovc2NGL3p2alZPd3pxL2FYWHVhOVdoWCtl?=
- =?utf-8?B?THNSaUZiQW8zTGk3bUJ1NDFQM1lJYlFRb3JFOVFwK3p5am8xN3hobFhiNHhB?=
- =?utf-8?B?RFo3dXFGZWVQOFVraGFHc0IvcVU2OGRMMTZiU05iQzViSUhFTnhxd0FuV0Fk?=
- =?utf-8?B?QXIwczhqdzgyTXUzYm5UY3Rtb0JCK1o4QkRqMXhlNU4rZFJXV2RiR0lHU3l2?=
- =?utf-8?B?alA1elJiVkgxNkFSOXJuYXdpa0dZUU9zR0k4cTJFSHdkSjA4OEtvOG5aSjRV?=
- =?utf-8?B?cXlrUnRKM0FYOXliRnFqMytsTDRyNnE2Nmd6RHFzcFNwSmpqS3oxaXAzNUhB?=
- =?utf-8?B?SUpLZ0Z2eVRjNWxBdy83c2NNRk9JZTVVZjRINkYvalRVazduTUJzamJ2REc1?=
- =?utf-8?B?a2ZGVDVvRTNmV2luT0h3dmhKMHRVandZUmZUMGZ2NWdCZ2wxcGhTbzc2M1A0?=
- =?utf-8?B?UFk2RXQzMHhDZ3o5USt0NFBjL2FDZWFTYktHK2N6TUhTZHNkVURjKzh6UzYw?=
- =?utf-8?B?MVZhb3k4a29zeTNzeFB1Rk9KVVhDbENCTWZuZ1hyd3ErYm80TFJUR3hKWW1H?=
- =?utf-8?B?bnZILzdyK0xqblJ6L3BDdWpQdWF5OW1rbDdNcFFwZ1pBa3ZhQkpZMldraWNI?=
- =?utf-8?B?RjdvWVZuR1ROME1jTXpFSUdydjR1dGJqaW05cDU2L2MxSFpIRUxFbHlwQUpJ?=
- =?utf-8?B?OXMxcjU4dW9Na0RzaTZJREpNUEpHUnlwRm1HallwWHRnNFhYOWZWK0hOV2RZ?=
- =?utf-8?B?RUcrb0ZLWkswWFd5UUh5SGFHT0Y3MFhFSW5yc1pQRmtLN3plQ2JLUW9ScXc4?=
- =?utf-8?Q?M0PIbUvnxU3g+d9mhD8fUgpKf?=
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: b74fcb09-acd1-4f88-ca0f-08dde0409811
-X-MS-Exchange-CrossTenant-AuthSource: BL3PR12MB9049.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 20 Aug 2025 23:23:39.2872
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: 1BgaY+TCz0ZpO87hq/oTcMDUfAPT/ZHNTRKm2U5mnZK551AH0wMO/7o27BFz5d2dFa5ajhSztHSEtk2/ZhSRvA==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SN7PR12MB6983
+Mime-Version: 1.0
+References: <20250722055030.3126772-1-suleiman@google.com> <20250722055030.3126772-2-suleiman@google.com>
+Message-ID: <aKZnT_57aPWfrfia@google.com>
+Subject: Re: [PATCH v8 1/3] KVM: x86: Advance guest TSC after deep suspend.
+From: Sean Christopherson <seanjc@google.com>
+To: Suleiman Souhlal <suleiman@google.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, Thomas Gleixner <tglx@linutronix.de>, 
+	Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>, 
+	Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org, 
+	"H. Peter Anvin" <hpa@zytor.com>, Chao Gao <chao.gao@intel.com>, 
+	David Woodhouse <dwmw2@infradead.org>, Sergey Senozhatsky <senozhatsky@chromium.org>, 
+	Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>, Tzung-Bi Shih <tzungbi@kernel.org>, 
+	John Stultz <jstultz@google.com>, kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	ssouhlal@freebsd.org
+Content-Type: text/plain; charset="us-ascii"
 
-
-
-On 8/20/2025 5:45 PM, Randy Dunlap wrote:
+On Tue, Jul 22, 2025, Suleiman Souhlal wrote:
+> Try to advance guest TSC to current time after suspend when the host
+> TSCs went backwards.
 > 
-> 
-> On 8/20/25 1:50 PM, Ashish Kalra wrote:
->> @@ -3064,10 +3070,32 @@ void __init sev_hardware_setup(void)
->>  out:
->>  	if (sev_enabled) {
->>  		init_args.probe = true;
->> +
->> +		if (sev_is_snp_ciphertext_hiding_supported())
->> +			init_args.max_snp_asid = min(nr_ciphertext_hiding_asids,
->> +						     min_sev_asid - 1);
->> +
->>  		if (sev_platform_init(&init_args))
->>  			sev_supported = sev_es_supported = sev_snp_supported = false;
->>  		else if (sev_snp_supported)
->>  			sev_snp_supported = is_sev_snp_initialized();
->> +
->> +		if (sev_snp_supported)
->> +			nr_ciphertext_hiding_asids = init_args.max_snp_asid;
->> +
->> +		/*
->> +		 * If ciphertext hiding is enabled, the joint SEV-ES/SEV-SNP
->> +		 * ASID range is partitioned into separate SEV-ES and SEV-SNP
->> +		 * ASID ranges, with the SEV-SNP range being [1..max_snp_asid]
->> +		 * and the SEV-ES range being [max_snp_asid..max_sev_es_asid].
-> 
-> 		                              [max_snp_asid + 1..max_sev_es_asid]
-> ?
+> This makes the behavior consistent between suspends where host TSC
+> resets and suspends where it doesn't, such as suspend-to-idle, where
+> in the former case if the host TSC resets, the guests' would
+> previously be "frozen" due to KVM's backwards TSC prevention, while
+> in the latter case they would advance.
 
-Yes.
+Before you waste too much time reading through the various pieces of feedback...
 
-Thanks,
-Ashish
+I'm leaning towards scrapping this patch.  I still like the idea, but making it
+do the right thing given all the edge cases and caveats with TSC management in
+KVM seems practically impossible.  E.g. as you called out in an earlier version,
+fast-forwarding to "now" is probably undesirable if a vCPU's TSC was completel
+disassociated from "now" and/or arch.kvmclock_offset.
 
+We could probably figure out ways to cobble together a solution that works for
+most situations, but given that no one is clamoring for KVM to operate this way,
+I doubt it'd be worth the effort and complexity.  And it certainly isn't worth
+taking on the risk of breaking an existing setup/user.
+
+For the suspend steal time angle, a PV feature bit means both the host and the
+guest need to opt-in.  A host opt-in means we can punt to documentation, e.g.
+we can document that there are caveats with running VMs across deep suspend, and
+the user should consider whether or not they care before enable suspend steal time.
+
+And then if someone really wants KVM to fast-forward time (or comes up with a
+simple solution), they can have honor of figuring out how to do so correctly for
+all of the crazy TSC flows.
+
+> Suggested-by: Sean Christopherson <seanjc@google.com>
+> Signed-off-by: Suleiman Souhlal <suleiman@google.com>
+> ---
+>  arch/x86/include/asm/kvm_host.h |  3 ++
+>  arch/x86/kvm/x86.c              | 49 ++++++++++++++++++++++++++++++++-
+>  2 files changed, 51 insertions(+), 1 deletion(-)
 > 
->> +		 * Note, SEV-ES may effectively be disabled if all ASIDs from
->> +		 * the joint range are assigned to SEV-SNP.
->> +		 */
+> diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
+> index fb01e456b624..e57d51e9f2be 100644
+> --- a/arch/x86/include/asm/kvm_host.h
+> +++ b/arch/x86/include/asm/kvm_host.h
+> @@ -1415,6 +1415,9 @@ struct kvm_arch {
+>  	u64 cur_tsc_offset;
+>  	u64 cur_tsc_generation;
+>  	int nr_vcpus_matched_tsc;
+> +#ifdef CONFIG_X86_64
+> +	bool host_was_suspended;
+
+Adding an #idfef to save a single bool isn't worth it, especially since it
+necessitates a wrapper (or more #ifdefs).  For something like this, I'd just
+set it unconditionally, and then esentially ignore it for 32-bit, along with a
+comment explaining why we can't do anything useful for 32-bit.
+
+> +#endif
+>  
+>  	u32 default_tsc_khz;
+>  	bool user_set_tsc;
+> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+> index a9d992d5652f..422c7fcc5d83 100644
+> --- a/arch/x86/kvm/x86.c
+> +++ b/arch/x86/kvm/x86.c
+> @@ -2779,7 +2779,7 @@ static inline void adjust_tsc_offset_guest(struct kvm_vcpu *vcpu,
+>  	kvm_vcpu_write_tsc_offset(vcpu, tsc_offset + adjustment);
+>  }
+>  
+> -static inline void adjust_tsc_offset_host(struct kvm_vcpu *vcpu, s64 adjustment)
+> +static inline void __adjust_tsc_offset_host(struct kvm_vcpu *vcpu, s64 adjustment)
+>  {
+>  	if (vcpu->arch.l1_tsc_scaling_ratio != kvm_caps.default_tsc_scaling_ratio)
+>  		WARN_ON(adjustment < 0);
+> @@ -4995,6 +4995,52 @@ static bool need_emulate_wbinvd(struct kvm_vcpu *vcpu)
+>  
+>  static DEFINE_PER_CPU(struct kvm_vcpu *, last_vcpu);
+>  
+> +#ifdef CONFIG_X86_64
+> +static void kvm_set_host_was_suspended(struct kvm *kvm)
+> +{
+> +	kvm->arch.host_was_suspended = true;
+> +}
+> +
+> +static void adjust_tsc_offset_host(struct kvm_vcpu *vcpu, u64 adj)
+> +{
+> +	unsigned long flags;
+> +	struct kvm *kvm;
+> +	bool advance;
+> +	u64 kernel_ns, l1_tsc, offset, tsc_now;
+> +
+> +	kvm = vcpu->kvm;
+> +	advance = kvm_get_time_and_clockread(&kernel_ns, &tsc_now);
+> +	raw_spin_lock_irqsave(&kvm->arch.tsc_write_lock, flags);
+> +	/*
+> +	 * Advance the guest's TSC to current time instead of only preventing
+> +	 * it from going backwards, while making sure all the vCPUs use the
+> +	 * same offset.
+> +	 */
+> +	if (kvm->arch.host_was_suspended && advance) {
+> +		l1_tsc = nsec_to_cycles(vcpu,
+> +					kvm->arch.kvmclock_offset + kernel_ns);
+> +		offset = kvm_compute_l1_tsc_offset(vcpu, l1_tsc);
+
+This is where my idea really falls apart.  For this to be correct, KVM would need
+to know the relationship between a vCPU's TSC offset and kvmclock_offset.  The
+simplest thing would likely be to do something like force an update if and only
+if TSCs are matched across all vCPUs, but trying to reason about how that would
+work when vCPUs account for the suspend time at different and arbitrary times
+makes my head hurt.
+
+One idea I might fiddle with is to snapshot get_kvmclock_base_ns() on suspend
+and then grab it again on resume, and use _that_ delta for tsc_offset_adjustment.
+But that's something that can be pursued separately (if at all; I don't see any
+reason to gate suspend steal time on it.
 
