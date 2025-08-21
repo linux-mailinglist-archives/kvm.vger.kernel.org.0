@@ -1,88 +1,89 @@
-Return-Path: <kvm+bounces-55362-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-55364-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 81F40B30480
-	for <lists+kvm@lfdr.de>; Thu, 21 Aug 2025 22:17:36 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id D8EF9B304BC
+	for <lists+kvm@lfdr.de>; Thu, 21 Aug 2025 22:20:53 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id C5F45B6552F
-	for <lists+kvm@lfdr.de>; Thu, 21 Aug 2025 20:15:16 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 462121792D3
+	for <lists+kvm@lfdr.de>; Thu, 21 Aug 2025 20:17:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3F5F4362076;
-	Thu, 21 Aug 2025 20:08:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B21BA368089;
+	Thu, 21 Aug 2025 20:08:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="aF4HxFg5"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="g80CNirM"
 X-Original-To: kvm@vger.kernel.org
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B9CAE35E4DC
-	for <kvm@vger.kernel.org>; Thu, 21 Aug 2025 20:07:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3E355362072
+	for <kvm@vger.kernel.org>; Thu, 21 Aug 2025 20:08:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755806879; cv=none; b=nhkASsc9ORtwISHaWlt5BQheHIe20APH4gufibJLO3zNyR3n10x3cqrF9C+iePPYk7Veh4pUTeHWavAIW5vQeO5ugTKWk/ZB2VGLBMGvHKpYRgzubbRikU69SpGT+fNvyOLikmk+kPVcfXqcK2YEFuemya5KygJfiZZusvkzTSA=
+	t=1755806883; cv=none; b=aMGYZ79en/nnWlzuzZYkTQT/FfZgARRmk5gwEDwRCzWJW3r/sR/2gg6J1KZ0nPcBfPr3UnzvuJseu9ddqhDQlJ4XW440ND0BZ8DDo46E8idnpMHuP1X8P2ZTEjG8SN/iG5r1UrkWPLfqD7NZrq1vqLoUnmovAy1XxtKW2sJT1Ys=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755806879; c=relaxed/simple;
-	bh=jeuBd6AEd//7dLky0U/9/K8CcfgAIF74DmeLEQ7xh6M=;
+	s=arc-20240116; t=1755806883; c=relaxed/simple;
+	bh=zuH5Mfr3MXrb3Q6KuIuEbIGzhyvXbwh1EOpbXVleP4E=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=qScPUmjXt/aV47f8Czz+gtbMMdYeDO1xsSKMge24N7FJ29CzCAK2vF/r7Kigu3Ng0V1aimw24ywbjoAwx7QH4NISvKl7fj8jPFgljbQ7+M9dywa6btfaWM976Owez+oxRh4qcw+L9y4OLfaeBqBYd+Q70tY07beYmXemSIxV4pY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=aF4HxFg5; arc=none smtp.client-ip=170.10.129.124
+	 MIME-Version; b=S+7er0DGLaYdQyoqQi6gZJqTXjrCNL8EWymheMcRwmalt2tV1aX2UrpPGYS+yG0frCla2LteoCY0HSQdWQNwS28Fzvh7zjfpH7oWlI6lZyjVeHxaE2AAkVgap8bnzDWCx4z0Yt4x7EdUFDrJ2p0Y/q/uiDUSTRvccXAyaafV15c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=g80CNirM; arc=none smtp.client-ip=170.10.129.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1755806876;
+	s=mimecast20190719; t=1755806880;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=NPs2EdTZ9fd3MpWdb0ATDCa6nUqfGtFMv2uyZP7L+uU=;
-	b=aF4HxFg5JpXNVeLFIw/OyHbb2D9mmnfx5a8LqUFhXI/7ebtYoPoJwpgfA7mJDYQhTXCXmU
-	DYgYfvUFxxAKS6LcrbfmGHWzYOb248B7yUp7f5ejrYXDWfNsNabMRylz1fmQOpYvDl8/nE
-	13Q5MXPSHqaRtyiK5AfLCwk1fLYn9a0=
-Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
- [209.85.128.71]) by relay.mimecast.com with ESMTP with STARTTLS
+	bh=hICKs+PYshPEfoclHwqOXtWPheskj6p8LyRcJkrFnX4=;
+	b=g80CNirM+XKtd5lCB8seBW95EVoOYwWRh+oRieBSB+hTQ/OAFnTZ2QRD+MpCwkJonxsPha
+	kHGbgxKNI1xHQKQq5qxt9CVy68m43ZgBoAcGd8m+ySiDKu3fZ1ccqafrKvwqNgIYuqt05Z
+	r8dkKgBNIu324SVLDqQAgUCFZsRSEHI=
+Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
+ [209.85.221.70]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-683-kjX7-v-xMVqGAogtm7D5hg-1; Thu, 21 Aug 2025 16:07:55 -0400
-X-MC-Unique: kjX7-v-xMVqGAogtm7D5hg-1
-X-Mimecast-MFC-AGG-ID: kjX7-v-xMVqGAogtm7D5hg_1755806874
-Received: by mail-wm1-f71.google.com with SMTP id 5b1f17b1804b1-45a1b00352eso7028835e9.0
-        for <kvm@vger.kernel.org>; Thu, 21 Aug 2025 13:07:55 -0700 (PDT)
+ us-mta-345-DncR5EHNP9yJ-QUa0J7D_g-1; Thu, 21 Aug 2025 16:07:58 -0400
+X-MC-Unique: DncR5EHNP9yJ-QUa0J7D_g-1
+X-Mimecast-MFC-AGG-ID: DncR5EHNP9yJ-QUa0J7D_g_1755806877
+Received: by mail-wr1-f70.google.com with SMTP id ffacd0b85a97d-3b9e41475edso915365f8f.2
+        for <kvm@vger.kernel.org>; Thu, 21 Aug 2025 13:07:58 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1755806874; x=1756411674;
+        d=1e100.net; s=20230601; t=1755806877; x=1756411677;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=NPs2EdTZ9fd3MpWdb0ATDCa6nUqfGtFMv2uyZP7L+uU=;
-        b=G5gqxZfQ6hMB3gUJSJpMHpBQJpF+xvdRpVS9yeU9GRw1LosftrpSoyE319J8BFeKkC
-         /I2Z9wz4OG4dX2gyFwpATlbL1ImueHt8HfbWLS6imjxi+ffTbhMshBNJuDLonYhvIW87
-         WklBhYYuZ4FXA4tGZGAAewgaDcWY0sWChEDgvLY4uNhHAVLKdZcjP57lgJ4/S1p9cB8X
-         E8YTtcD4SR4A5YXNo9dulFPqoErBGOh/7iQQYQvIzzaN6Tu6JgTE5plH67qkOEMZyoJ2
-         8Z73+ote+gzW3UB5GOKkr+uK3FJJBDSQnDt7PjTPGNCN9oTgDGR376c8V7ZYDefmjdND
-         jOcQ==
-X-Forwarded-Encrypted: i=1; AJvYcCWrx787lVMumtIR5a21Dcl7oYzxZ8/fbdtGSJZEl/9qMLH7ZuCWQfe51R0N8o3rFtUeQIU=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxrRs+Ua/MYzhjTtKjZf6GLTbJLpP7Kon8P45EPjR/tSB4m/rSv
-	4jmu3VIZ9NbUsww5a9XbAOb755ZDtcOVpA2LMlFhj5liLicBoZtpAjOkmX/sl+VNYoEUUMPnDcO
-	J5cupVMTM51gxZS56VS0ni5cpCi1enPoTLgO0oZbgD/yMtYxGvaqRmA==
-X-Gm-Gg: ASbGncuXpQ+J9l8ccK9hbZHdc28zOuirJM0G4Cf9tr08DSvHw7OktYibVZgPyHfN2nZ
-	mlBD4l8VW0PTZa7sdnT8fiY8DFVtPVh3jrG3goeQ+uWZr9x7RuG+xSMigU1F76RkSdnxUSvRfQd
-	Q5fn8KfLGPxL/3fdomsVVIZqGrLn9VVsk87pdY6El5oXXQHSdRCjpXQAvgK6Q3V8OKk6IPETuHE
-	HUKgJsvvpcna1cCG5RLL2h3A3bE8yqYAnnXIQpX4X3NFAddbs8Mw6jAqZN1lksOJhqFOM2Gm1Y1
-	W4KDKGuWce0niBSpnl9A+ln63AM7nSkYE78nKhF4TqHlu8ljGEYNTi59wvdCacL8UF6qArs+nAq
-	h0wrvNnluRJ3f/kGnI2O16w==
-X-Received: by 2002:a05:600c:1388:b0:459:d451:3364 with SMTP id 5b1f17b1804b1-45b517d40f2mr2554415e9.24.1755806874323;
-        Thu, 21 Aug 2025 13:07:54 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IFo8ikhW4DoWVw60oDeAXqMRvn4UERlcVawLCjGel2pacwRc1R1ONhYVQm5EzuW0YIJQT4FDg==
-X-Received: by 2002:a05:600c:1388:b0:459:d451:3364 with SMTP id 5b1f17b1804b1-45b517d40f2mr2553905e9.24.1755806873856;
-        Thu, 21 Aug 2025 13:07:53 -0700 (PDT)
+        bh=hICKs+PYshPEfoclHwqOXtWPheskj6p8LyRcJkrFnX4=;
+        b=L3K6dODF8mCN2C1f5QNF+yh6/BPK4Vxn+Y6sTpRLU5JTZzVcu7ecgPdMBlAJzP6uj7
+         uYukSl1cP3YM+4rtVpw4usgIxKLsxqRXImLvhNREiW3LsZKy+xsjci4By8PQ763Lld42
+         qoU/65RTXejJ43kjIlsBmhTH3eD4HCSq8Mg4mnZ0FLiCk2dlS8CvgpSo1FCpeX6bvlhk
+         MwFjeyAtYMKf+SdpcvpXu90Ocwwe26PBeD7J7MplNm6UCEEZUDWZR7JBbbq1rZSCwFkG
+         43ZU6cPTZQ43fOi0u7Pmi1DkTpyN9XOYh0HAmzfGEBgTbwS93cyG49X1z6TGaUMnCzn/
+         OjDA==
+X-Forwarded-Encrypted: i=1; AJvYcCWh41M7mHHsJN5sA+/D7s52kkME85/e/xqSSaujUB2tNAdTH2/gp0QkbfbbJidMEkx1Tns=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yy4rrpNqgGUC39/O9pTijH9LQkm3rYmqYgLb4sQV2fntBqwo3Dr
+	S3XZavA5+iA+d202wxQB4O6GAnCWoGx2m6ToTL3veSXsvxXR+cCwTbDuhrZwDwL3WoQYW8RSv2M
+	wnH/UDWHr+JIGE8vq+JGWj8/djrWH8T8oVsa6PYeuLqR1mI6L6e7oMA==
+X-Gm-Gg: ASbGncvzB25ndXePvyXfnXZKDMFNvnwntigsF2+bQ2lyYuT2/HovyWFzk6Yq5YDsAt4
+	LlqTmZaq92lJXD607ZvAP/E7iaNMHgau2pmOgO85uLNQw5gqtFdsrKzZKFOcm/4Ty62Z2oSkWAv
+	Gx27Q6Q52+l/Wd1iGFE7pU2I60/vxP3lJPzEjKVAsPvg+O2qvrT14aQ/78EFUAJU734WfQwOcP3
+	4wTGHRRqBZcDilSmuBqJ8fo4nc2kDsw7QhBONhpYtZ7teVW8yTwDiFABB3+J9nJm2TmS1pbFe48
+	Qc0nKKwXrP+LhiC/x4A3dXy4j1ktJ6IA4or0JRH57osfttAeJYZtXJzF1aqRrtKMAaQyRdPJRtv
+	RkAoLG6BCMTaaqcCIWn72hQ==
+X-Received: by 2002:a05:6000:1789:b0:3b4:9721:2b2b with SMTP id ffacd0b85a97d-3c5dac17062mr195853f8f.12.1755806877274;
+        Thu, 21 Aug 2025 13:07:57 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IHgVLjhFaRrDh3LOBLGV7UmH7wFAxvy1IR++ErfO8cOP/XFU/ikMyZpM3bVU7Jjqctj1mhmFQ==
+X-Received: by 2002:a05:6000:1789:b0:3b4:9721:2b2b with SMTP id ffacd0b85a97d-3c5dac17062mr195797f8f.12.1755806876810;
+        Thu, 21 Aug 2025 13:07:56 -0700 (PDT)
 Received: from localhost (p200300d82f26ba0008036ec5991806fd.dip0.t-ipconnect.de. [2003:d8:2f26:ba00:803:6ec5:9918:6fd])
-        by smtp.gmail.com with UTF8SMTPSA id ffacd0b85a97d-3c07487a009sm12690403f8f.11.2025.08.21.13.07.51
+        by smtp.gmail.com with UTF8SMTPSA id ffacd0b85a97d-3c4f77e968esm2903478f8f.21.2025.08.21.13.07.54
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 21 Aug 2025 13:07:53 -0700 (PDT)
+        Thu, 21 Aug 2025 13:07:56 -0700 (PDT)
 From: David Hildenbrand <david@redhat.com>
 To: linux-kernel@vger.kernel.org
 Cc: David Hildenbrand <david@redhat.com>,
+	Jens Axboe <axboe@kernel.dk>,
 	Alexander Potapenko <glider@google.com>,
 	Andrew Morton <akpm@linux-foundation.org>,
 	Brendan Jackman <jackmanb@google.com>,
@@ -94,7 +95,6 @@ Cc: David Hildenbrand <david@redhat.com>,
 	iommu@lists.linux.dev,
 	io-uring@vger.kernel.org,
 	Jason Gunthorpe <jgg@nvidia.com>,
-	Jens Axboe <axboe@kernel.dk>,
 	Johannes Weiner <hannes@cmpxchg.org>,
 	John Hubbard <jhubbard@nvidia.com>,
 	kasan-dev@googlegroups.com,
@@ -129,9 +129,9 @@ Cc: David Hildenbrand <david@redhat.com>,
 	wireguard@lists.zx2c4.com,
 	x86@kernel.org,
 	Zi Yan <ziy@nvidia.com>
-Subject: [PATCH RFC 17/35] mm/gup: drop nth_page() usage within folio when recording subpages
-Date: Thu, 21 Aug 2025 22:06:43 +0200
-Message-ID: <20250821200701.1329277-18-david@redhat.com>
+Subject: [PATCH RFC 18/35] io_uring/zcrx: remove "struct io_copy_cache" and one nth_page() usage
+Date: Thu, 21 Aug 2025 22:06:44 +0200
+Message-ID: <20250821200701.1329277-19-david@redhat.com>
 X-Mailer: git-send-email 2.50.1
 In-Reply-To: <20250821200701.1329277-1-david@redhat.com>
 References: <20250821200701.1329277-1-david@redhat.com>
@@ -143,39 +143,95 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-nth_page() is no longer required when iterating over pages within a
-single folio, so let's just drop it when recording subpages.
+We always provide a single dst page, it's unclear why the io_copy_cache
+complexity is required.
 
+So let's simplify and get rid of "struct io_copy_cache", simply working on
+the single page.
+
+... which immediately allows us for dropping one "nth_page" usage,
+because it's really just a single page.
+
+Cc: Jens Axboe <axboe@kernel.dk>
 Signed-off-by: David Hildenbrand <david@redhat.com>
 ---
- mm/gup.c | 6 +++---
- 1 file changed, 3 insertions(+), 3 deletions(-)
+ io_uring/zcrx.c | 32 +++++++-------------------------
+ 1 file changed, 7 insertions(+), 25 deletions(-)
 
-diff --git a/mm/gup.c b/mm/gup.c
-index b2a78f0291273..f017ff6d7d61a 100644
---- a/mm/gup.c
-+++ b/mm/gup.c
-@@ -491,9 +491,9 @@ static int record_subpages(struct page *page, unsigned long sz,
- 	struct page *start_page;
- 	int nr;
- 
--	start_page = nth_page(page, (addr & (sz - 1)) >> PAGE_SHIFT);
-+	start_page = page + ((addr & (sz - 1)) >> PAGE_SHIFT);
- 	for (nr = 0; addr != end; nr++, addr += PAGE_SIZE)
--		pages[nr] = nth_page(start_page, nr);
-+		pages[nr] = start_page + nr;
- 
- 	return nr;
+diff --git a/io_uring/zcrx.c b/io_uring/zcrx.c
+index e5ff49f3425e0..f29b2a4867516 100644
+--- a/io_uring/zcrx.c
++++ b/io_uring/zcrx.c
+@@ -954,29 +954,18 @@ static struct net_iov *io_zcrx_alloc_fallback(struct io_zcrx_area *area)
+ 	return niov;
  }
-@@ -1512,7 +1512,7 @@ static long __get_user_pages(struct mm_struct *mm,
- 			}
  
- 			for (j = 0; j < page_increm; j++) {
--				subpage = nth_page(page, j);
-+				subpage = page + j;
- 				pages[i + j] = subpage;
- 				flush_anon_page(vma, subpage, start + j * PAGE_SIZE);
- 				flush_dcache_page(subpage);
+-struct io_copy_cache {
+-	struct page		*page;
+-	unsigned long		offset;
+-	size_t			size;
+-};
+-
+-static ssize_t io_copy_page(struct io_copy_cache *cc, struct page *src_page,
++static ssize_t io_copy_page(struct page *dst_page, struct page *src_page,
+ 			    unsigned int src_offset, size_t len)
+ {
+-	size_t copied = 0;
++	size_t dst_offset = 0;
+ 
+-	len = min(len, cc->size);
++	len = min(len, PAGE_SIZE);
+ 
+ 	while (len) {
+ 		void *src_addr, *dst_addr;
+-		struct page *dst_page = cc->page;
+-		unsigned dst_offset = cc->offset;
+ 		size_t n = len;
+ 
+-		if (folio_test_partial_kmap(page_folio(dst_page)) ||
+-		    folio_test_partial_kmap(page_folio(src_page))) {
+-			dst_page = nth_page(dst_page, dst_offset / PAGE_SIZE);
+-			dst_offset = offset_in_page(dst_offset);
++		if (folio_test_partial_kmap(page_folio(src_page))) {
+ 			src_page = nth_page(src_page, src_offset / PAGE_SIZE);
+ 			src_offset = offset_in_page(src_offset);
+ 			n = min(PAGE_SIZE - src_offset, PAGE_SIZE - dst_offset);
+@@ -991,12 +980,10 @@ static ssize_t io_copy_page(struct io_copy_cache *cc, struct page *src_page,
+ 		kunmap_local(src_addr);
+ 		kunmap_local(dst_addr);
+ 
+-		cc->size -= n;
+-		cc->offset += n;
++		dst_offset += n;
+ 		len -= n;
+-		copied += n;
+ 	}
+-	return copied;
++	return dst_offset;
+ }
+ 
+ static ssize_t io_zcrx_copy_chunk(struct io_kiocb *req, struct io_zcrx_ifq *ifq,
+@@ -1011,7 +998,6 @@ static ssize_t io_zcrx_copy_chunk(struct io_kiocb *req, struct io_zcrx_ifq *ifq,
+ 		return -EFAULT;
+ 
+ 	while (len) {
+-		struct io_copy_cache cc;
+ 		struct net_iov *niov;
+ 		size_t n;
+ 
+@@ -1021,11 +1007,7 @@ static ssize_t io_zcrx_copy_chunk(struct io_kiocb *req, struct io_zcrx_ifq *ifq,
+ 			break;
+ 		}
+ 
+-		cc.page = io_zcrx_iov_page(niov);
+-		cc.offset = 0;
+-		cc.size = PAGE_SIZE;
+-
+-		n = io_copy_page(&cc, src_page, src_offset, len);
++		n = io_copy_page(io_zcrx_iov_page(niov), src_page, src_offset, len);
+ 
+ 		if (!io_zcrx_queue_cqe(req, niov, ifq, 0, n)) {
+ 			io_zcrx_return_niov(niov);
 -- 
 2.50.1
 
