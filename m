@@ -1,63 +1,97 @@
-Return-Path: <kvm+bounces-55399-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-55401-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6B749B307E1
-	for <lists+kvm@lfdr.de>; Thu, 21 Aug 2025 23:05:42 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id E96ACB30816
+	for <lists+kvm@lfdr.de>; Thu, 21 Aug 2025 23:12:14 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id BF32F1D21D81
-	for <lists+kvm@lfdr.de>; Thu, 21 Aug 2025 21:01:44 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 25476B21509
+	for <lists+kvm@lfdr.de>; Thu, 21 Aug 2025 21:07:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 765492F3634;
-	Thu, 21 Aug 2025 20:56:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C7937393DF3;
+	Thu, 21 Aug 2025 21:07:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="ZRAMTS8I"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="I5XHebeL"
 X-Original-To: kvm@vger.kernel.org
-Received: from NAM12-MW2-obe.outbound.protection.outlook.com (mail-mw2nam12on2072.outbound.protection.outlook.com [40.107.244.72])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 86FAB2D7DFC;
-	Thu, 21 Aug 2025 20:55:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.244.72
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755809762; cv=fail; b=ozJa17PFi1PKlfmfSCMU5Vmkm/ENTFAU2yrknlt9fuI5Ezm7A6cmAApCXqU/i5xZO+QsLvIChFgu26Tf1mILEVJ/P5J5v4V2zkJ9F8B+2BRLfxm74GvGZ4pCNUEiS/mqfma48XIPxlIOKAKY85C7vFKqXdSkj3ryU+jBRis63ZI=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755809762; c=relaxed/simple;
-	bh=xDAtmMZjC7n433YkNuIvyMJaf0FV+tB385V+pb5tmqg=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=e1SWUUi+FY14z9eS/hTlaTTDV8EtNa4iNINqLUP9nJkJatJ/UKNz9tcOG16iDolYIiGVRnmYU81VKutGYqczriHAIdH1nji2k7j4y2XGv0CNuX7ala7pPkyOQtu/fjPe1WqhHl8XoOk5bgeu4dZGiPFTQ7e38Q8c7Rhfb9q6pyg=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=ZRAMTS8I; arc=fail smtp.client-ip=40.107.244.72
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=BGtO701Wpp3SQ+JSkp12FhJBwkI2qSfgJktct3ITnhgZBnN0rsZyHsVHVxvjiLDPOEPrNXM1FygvVPiZEqoQPWVo0M8gYBbbkQDuRfQbS5KBJ7TLweeoGkvYJm+Bd8LAROewGgjaork/dkQUpTOEbPYAMWYzguxuuxAX0RqpL5vF88gROU301kXFUx8CHSCdST25Tqc8QQFMLRH7Czsl15KM1izzNpJ15LXoYlOnGDJDwWTTDjKMdmI9I/zp7fLyCw3JFtv2ClUtAaI+FN2S+uwfqHznJnBZRnWE2RwPe3ZV+n4DnJaB22LRV/xpaj35dbxxhgBxDM7qKdumfO6EuQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=uD6U2yYEcuK6Q08U/iYV3O62S0ShleTOpomGqDgXsYI=;
- b=PleA2I5UJoDSA2Bvc+l8O3eT6+0DyyMoq1gnYvzJdedWt0Kbaqo31PGHgN7+9tgXTkUC7uPPMJGibIDUazLnaC4oZsCvtA1y7sErGwgw3/tnhwYXmyja8Zuca6OQoAfYRuIMfySwrpU1J6mQKi7AwtlQI9SMLbXCEUkNHSCw0WQEHL9HlgrFDFrHXDn2bz2mJDrT7WmyiuEGSEIRBLPHv4TtgR33lkUE95ef0Je6OtL9FgR3l8QyxtYgK62vTPYPJ5e5DVyG9JVYfJDnM5gwbgezuALaMRycuDlX5kyQHghh+sJGC3z39pnRUceFeXQXJhVRrUPcwapomRxmu2YHcA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
- dkim=pass header.d=nvidia.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=uD6U2yYEcuK6Q08U/iYV3O62S0ShleTOpomGqDgXsYI=;
- b=ZRAMTS8IO1yvquvWwj1YPQ595GciHz04wjKHRcsg9grLd7zAPPKn1iLIS64o1ivjeA4xfuM6AEsjAWlD+gKgN4GKecIQsidbTm/C9peywSn4pTSo3+Y0nDgmzlFnc7vJG+L45Sq98AncL9N7uLz3mRvI7tbSQKYcz40fYwYjL0hQ1Qi7hT8aqf1YrUjXlXLe14/HEbU5tsaM3qW6jDVS3ca2s9gEHd4uJHxaJOuNWdHSHT4rnbgiTkGKLy8P6opCQO/jlik5b66u8AODXMwbImBsUVNdl8GN6FukYZpjtbZUjKBVFIRsB1/lBKLvhvlr8hUttuqdYx40v1+0MTwVPQ==
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nvidia.com;
-Received: from DS7PR12MB9473.namprd12.prod.outlook.com (2603:10b6:8:252::5) by
- DM3PR12MB9435.namprd12.prod.outlook.com (2603:10b6:0:40::6) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.9031.24; Thu, 21 Aug 2025 20:55:57 +0000
-Received: from DS7PR12MB9473.namprd12.prod.outlook.com
- ([fe80::5189:ecec:d84a:133a]) by DS7PR12MB9473.namprd12.prod.outlook.com
- ([fe80::5189:ecec:d84a:133a%6]) with mapi id 15.20.9052.013; Thu, 21 Aug 2025
- 20:55:57 +0000
-From: Zi Yan <ziy@nvidia.com>
-To: David Hildenbrand <david@redhat.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 68E84393DC5
+	for <kvm@vger.kernel.org>; Thu, 21 Aug 2025 21:07:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1755810444; cv=none; b=pbRhgaSrvvwQmPX1M/Apg4bDiEjd5gMgRntDTm467IClj8x2s1GutVy/uQktO9/IjyWRc2a2IxbR61Rs/FWyAJgFOZdFQRD9Vb7hUzNdl/gwhzSN+vIVH6ZY6vieTr54iy6Y1vBT0lS0sER+bQE/lvKclIKqCLqxthiOZ/o9Mww=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1755810444; c=relaxed/simple;
+	bh=YHqdaFs44MkX9xejnDLPb5jqQiahm5Uq2LcWXm1xRfQ=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=h9EMjrFtJxiO0De9V3hEbehyBqziWsGW1wJ9eBi/xI1D3/AOYF4HxbqymOR7+6NiA8P1iKQMpo5h/IcwwaPmfZ4mzrqGUUso7Hg4k+EJ9nQkXXTizJrY+ZKBPMJkZVMVb7qOCorrXrv96+SCo33BohOS7kJQH/Wjs8LvovVXqW0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=I5XHebeL; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1755810441;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+	bh=Cp1mFCWwcTWQzzsUUmh88+YFkDBcq7Y5lQlba0VlHo0=;
+	b=I5XHebeL4HMY1kEyBzzWGBx4qzWJa+Tpw2AMkpnML9hOkntDkEfAyqsBEScbmqaSIwpcSN
+	9OG4FNqKoj7EYuC0+EgDPdZtVuWmhcIsm8n+PpfSiOYuMFOF0H8da8jJP4r23LDEDib1KJ
+	jylFJBj+LDqx3rF9Yeas90w7J20w6kY=
+Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
+ [209.85.221.71]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-645-x1xcgIZHP72UNfFyml8zvw-1; Thu, 21 Aug 2025 17:00:42 -0400
+X-MC-Unique: x1xcgIZHP72UNfFyml8zvw-1
+X-Mimecast-MFC-AGG-ID: x1xcgIZHP72UNfFyml8zvw_1755810041
+Received: by mail-wr1-f71.google.com with SMTP id ffacd0b85a97d-3b9dc5c2ba0so686701f8f.1
+        for <kvm@vger.kernel.org>; Thu, 21 Aug 2025 14:00:42 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1755810041; x=1756414841;
+        h=content-transfer-encoding:in-reply-to:autocrypt:content-language
+         :from:references:cc:to:subject:user-agent:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=Cp1mFCWwcTWQzzsUUmh88+YFkDBcq7Y5lQlba0VlHo0=;
+        b=o4+4hrMlgM4LwY4ptlE5yvbmWPMp19P8GTrWLFXIU3/kxFB7EVhjLKY+lo2dW4NPXb
+         cSb6CG2Kflg4bsJIQzzq+UodmTTKG/lNwbyfilVbO+vVuNB6/7Agg8jMRuDe3vWBO8pa
+         ftJqoaycXbj3Y2tLrCkUK0ScrKjcn2uWjfXvpcXCOm0QubcKzY3anWNn7AYHbIee10Qt
+         ztnzv2kgWi5WaPlhUkX8JoGxV9q3bweNAa2mriAcRXQ8hIBd3JRWujr8bYBK8Wby3j/Y
+         dRV1lQDIAoWv72TFtt9cRgNYCPw0IFLmLgjOg8Lapgz8Oh6ywgBCtPIy8MdK5UMCFN4T
+         T0EA==
+X-Forwarded-Encrypted: i=1; AJvYcCWD88d6o7YC3AyFfuh7/No7EJMQBi2fl+WPl2EvfopJg3yeyunQ35LK9UBtoWsKzLPPlTs=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yyh68gRGK8P9PgxsD8y8Lk/0YkfEh8xCb4n4jBBnC/RefjuEol+
+	MCKgDBRxwYonfq+lsBKUKwXeQnhPR+zMAd7pvvQhIxlHq9nlNx7hIAxGmRH8hUOkYbtPEm0dfVv
+	4QE/HfQMGcbjZ6ajarAQL4u/cR9+9iWDeFT6x/hVWaIxocWjx1dA7DA==
+X-Gm-Gg: ASbGnctUcoCUuHqWhV1jwdi+7Ux3M69GzR+OdkjljE9dzK8m39DSnCRHBQVveVXh6Vt
+	bVuLKt7c3fsJOMTh/tEW47mlKEjJK5EvUgOEU+CF8vvSbzXaKs8bN3WubwDkkoqxU/dD6H8Noz6
+	RjhCowOvCqpMmivu3Bm29Np55G9bdePpRG40tu9knA1cDNc1uJ9oMVQ0H1GpVLGwVtyUQnWBom0
+	Y5DYYtn6czhSLEyb2iwrYBxQPzQRrWVr+A/ign5tZpCLVmahdmRsCfSrR10RUAFMZH4SeVbbhM+
+	HA3vsZNm4hRY1k0vJoATUlHO3sOkd4gE7YCFT978CMYvSSzeW27lxAwoGu89coF3yNhnETlzO7w
+	lpf2nIO5KVicOXAK2L2kgr5LS8Q+1cdmynHKxdEI/T/KRgtPVNEva8lhOlpBDdQ==
+X-Received: by 2002:a05:6000:200d:b0:3a5:2465:c0c8 with SMTP id ffacd0b85a97d-3c5daa27e6amr265220f8f.7.1755810041320;
+        Thu, 21 Aug 2025 14:00:41 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IF7vpqV63aDfbj4LuprqMLqq42InG6u1nR+Dt/+ZPeyx1uRJcEanVY8H02OCG3yOg5OQPh6rw==
+X-Received: by 2002:a05:6000:200d:b0:3a5:2465:c0c8 with SMTP id ffacd0b85a97d-3c5daa27e6amr265173f8f.7.1755810040805;
+        Thu, 21 Aug 2025 14:00:40 -0700 (PDT)
+Received: from ?IPV6:2003:d8:2f26:ba00:803:6ec5:9918:6fd? (p200300d82f26ba0008036ec5991806fd.dip0.t-ipconnect.de. [2003:d8:2f26:ba00:803:6ec5:9918:6fd])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3c4ccbf04fasm3476159f8f.7.2025.08.21.14.00.38
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 21 Aug 2025 14:00:40 -0700 (PDT)
+Message-ID: <23c6e511-19b2-4662-acfc-18692c899a6c@redhat.com>
+Date: Thu, 21 Aug 2025 23:00:37 +0200
+Precedence: bulk
+X-Mailing-List: kvm@vger.kernel.org
+List-Id: <kvm.vger.kernel.org>
+List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
+List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
+MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH RFC 13/35] mm: simplify folio_page() and folio_page_idx()
+To: Zi Yan <ziy@nvidia.com>
 Cc: linux-kernel@vger.kernel.org, Alexander Potapenko <glider@google.com>,
  Andrew Morton <akpm@linux-foundation.org>,
  Brendan Jackman <jackmanb@google.com>, Christoph Lameter <cl@gentwo.org>,
@@ -81,194 +115,139 @@ Cc: linux-kernel@vger.kernel.org, Alexander Potapenko <glider@google.com>,
  Robin Murphy <robin.murphy@arm.com>, Suren Baghdasaryan <surenb@google.com>,
  Tejun Heo <tj@kernel.org>, virtualization@lists.linux.dev,
  Vlastimil Babka <vbabka@suse.cz>, wireguard@lists.zx2c4.com, x86@kernel.org
-Subject: Re: [PATCH RFC 13/35] mm: simplify folio_page() and folio_page_idx()
-Date: Thu, 21 Aug 2025 16:55:52 -0400
-X-Mailer: MailMate (2.0r6272)
-Message-ID: <E1AA1AC8-06E4-4896-B62B-F3EA0AE3E09C@nvidia.com>
-In-Reply-To: <20250821200701.1329277-14-david@redhat.com>
 References: <20250821200701.1329277-1-david@redhat.com>
  <20250821200701.1329277-14-david@redhat.com>
-Content-Type: text/plain
-Content-Transfer-Encoding: quoted-printable
-X-ClientProxiedBy: MN0PR05CA0013.namprd05.prod.outlook.com
- (2603:10b6:208:52c::7) To DS7PR12MB9473.namprd12.prod.outlook.com
- (2603:10b6:8:252::5)
-Precedence: bulk
-X-Mailing-List: kvm@vger.kernel.org
-List-Id: <kvm.vger.kernel.org>
-List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
-List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: DS7PR12MB9473:EE_|DM3PR12MB9435:EE_
-X-MS-Office365-Filtering-Correlation-Id: 53f644a2-a6e9-425e-f5ac-08dde0f52088
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|7416014|366016|1800799024|376014|7053199007;
-X-Microsoft-Antispam-Message-Info:
-	=?us-ascii?Q?SLASAnWO5dsLJrJaGcvQK8asVFX5uUU6DChGG8O74SKblEWes73GHfSEq5cy?=
- =?us-ascii?Q?5Jsbz0OMROVpE9y8CEHztDg9Vz9/3Q9eakouNUIaZnxCuAUGA1b8rOopJI2G?=
- =?us-ascii?Q?QqjMZ5JvUQ3ui/vYkjjwylsH4eAhfKQjR7oBD7+yjs7bXFu1hw/SAXMes/uK?=
- =?us-ascii?Q?mnUsSpTbOMD/oMLKkQT0J6/7WyMa3zF/mIo8RjMYcskl96e/hpdVONJOYeQR?=
- =?us-ascii?Q?oCwpWnGlrqZ/mwF2Sqyc7+tZV6qSbIOPGfV3L6sogjJbNImuV1jVr43JJMVX?=
- =?us-ascii?Q?8kOrN/vYfGQV7wwX5C0RlDJyrzsdekkt+xTrArBx7IVRA/xrImmyLtV8+PEI?=
- =?us-ascii?Q?FfUj+TFTWkXufCfGS8c950TIFJPnH1Dxt3OF3Ar3V7HS1RZul7ph3y7FcOrQ?=
- =?us-ascii?Q?ngUOH7uGjJV1/xjw3bPFYEtxcYOGcMwuYsQii5bU3g4oDOX61/EKKVF50YlG?=
- =?us-ascii?Q?raeCrN2i6KYXwHqRfDHZtTT9D6JGRRdcG1Xf7xbqWg7+bGPCLh+TsWvbkTy4?=
- =?us-ascii?Q?WHiOwVrr90S/zev7FmHbk1aRKkEE9bmsr5EVenGj7jUdX/w0og9VhvE8T//B?=
- =?us-ascii?Q?Zl/Xzb4DqvzlNlDSijTxplTQaSVGsyjQzYJlPsAiuM5kGC4L2Ssph6/sE6jc?=
- =?us-ascii?Q?+JgIyDYqfABy1McMPqEMGRm+Rql2vyVpr9vk+a/DRHdcqYuZrFSi6qsA0c7C?=
- =?us-ascii?Q?WKQt78MmjQmozUkCoTFaK8UfDroi1fu6PzYebdu6/FkcgjVKwS9Hx0ypLn0o?=
- =?us-ascii?Q?2dCb99incVd00aTYigJE/C2Um8YDQSEhd0GbXMf5mdpmiO51eTaH4POmvrey?=
- =?us-ascii?Q?pLrwz4VG8AwiOtHXOsGkwOq4yKhMUjyCZBRnpOhLt9nXwM/hPjhb4ZqiyVN1?=
- =?us-ascii?Q?TUTW7VFsA98GcuJ2RZfFtZKIll8BJ01lMikki5R8ybxikLkq6XtMUbkvqNMX?=
- =?us-ascii?Q?O2HhX9W2HaLsCnmVGNVeMrW9PNBNREZke58yQNg6/hlUMyzCo7+p2NSWUsZS?=
- =?us-ascii?Q?DJthMMa9qbnk2fHL5t4QnBOGtVXfqeQeqlLVXmt+6JV+Q2rZx6DPw04B8v7a?=
- =?us-ascii?Q?6mvjy0LE+LWRG10EaUk93JNqsRkuAA+vOpF6SC2qljzQ5XdC441g03scFcoi?=
- =?us-ascii?Q?P3jjwFaIZJeCoSHkBGiIarnL2nrtDi6u6bD34WtJzRCukFxhSF+PX9zJn6lJ?=
- =?us-ascii?Q?ZAVFD7DmL0c4lhpAyAUtrdHTP2k9LkFjbXxCZHPSzAn2O/C+Et8g56oBXUzz?=
- =?us-ascii?Q?3nFGxQWArrbHzzhw95y6cGMrjzZthlczlAsJhMAE5JXS/lb/1kRCPKWvQGMu?=
- =?us-ascii?Q?7yvxHYdFAOzvhZdRjDMQUC4+msaBw1PeUr8/Icqxq0ozboCK4FABZhppSFJI?=
- =?us-ascii?Q?Sg6H7OA2a+SpVufQ33b1aDFdmcyzvXzDcFIieiwYsICuwdrCebdlYSR63JqR?=
- =?us-ascii?Q?F4Q0HFqgous=3D?=
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DS7PR12MB9473.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(7416014)(366016)(1800799024)(376014)(7053199007);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?us-ascii?Q?GCW3TSWvDDZgtPRu0mapa8vVSPYB0lARyPKCbDeWnthBZKcVQvKVJDBEuDgT?=
- =?us-ascii?Q?OH9lwPa67imtbAZpYy+vp4DVuPjsF0rZaO72T8QRQjn6+CYzHTzMqEbT0tqk?=
- =?us-ascii?Q?9ViWOdSuFUtXntkPdm47L+HxhOLAuXVTR4nTEmx3MpDi4hqLDxhbA/61fnBs?=
- =?us-ascii?Q?hhN4i7ESnS54wzxChkLwiTl1R6SHKdCF5kUucT9XJ7YvIFe5KXFfzenits3J?=
- =?us-ascii?Q?TbeTCmZY+DX6g8MCi5dhLwZeVwXpxPZpwuHDTJegZ+E9OwBsLYKUwKZEEFys?=
- =?us-ascii?Q?UL+RFy2sArsjRv5F+vs8ZMjuy8WIQQssYiyf8AdHXmRfO8LvYvy6knWqUqtK?=
- =?us-ascii?Q?084R8z1rKGvw9kR70ZpYqasX/R86HMkK1aBp4uZO61CJjtGI0X6ndAw1TD2c?=
- =?us-ascii?Q?ZBg6p5cESNvDK0riuIMTmfUjbxi7zmaLbJpO/Z9zycx6vikb14CM/MJSemOY?=
- =?us-ascii?Q?ncNDBbAXw4tJoI/hSCkcTaVSUTaRsTnY/Gwr/NPou7YJAjuksXi8nuVviUu6?=
- =?us-ascii?Q?kj3al/GAeElizyH6e8XxRzcPRKL/6ZRkWL5haduotRyR4+Y51LuuOHfm8UkZ?=
- =?us-ascii?Q?nHsXhH0Mz7FT1LNUuEX3rk0VG0bDPS26oH2FPLPJjNCAfbjI04Fxt0Lem2I9?=
- =?us-ascii?Q?IbLwTDQFoZNCxijpHYeVmztjLxHY+sNXQTqwrE19WQgsOZzc6cylv0TOmSmi?=
- =?us-ascii?Q?KkJHT4q0oA8V7w1eoZl4r0vn1Ug0EqZ3X4FrUfpVu5R8tYfst0DAoHmRvSBy?=
- =?us-ascii?Q?x10cHiEzDLPP11Nx4+o3EkABxq/IsMQRLoVBPIL4V1DqBTn488DX2Yo7Cvv+?=
- =?us-ascii?Q?0T//OE6bTA5vG8c5qEgpAin/J3SYcUCn+/g8As009rDrZu5l3UjWbzboRBYK?=
- =?us-ascii?Q?SFnoLevLyh8N+5KigM7Q0IkyTVNVC6ELt7VswA2FMAWVxY3AVgV/8svceINs?=
- =?us-ascii?Q?pMDtHDeomlH2ZrZcQmR9+Uid0dQL5JkRnN7g/lgzh++4f9hR5mDIUOmev/o9?=
- =?us-ascii?Q?E5V6rC6h3FKsF7GSOFVkoNr0UaVnVWUCvc+jFDLnAsObwxzq2AW5rzvrIFm7?=
- =?us-ascii?Q?AFXxc1LNuTXYjKDL3NkO7d4vwnm5GaN6Nuj1mV8MMoUn4pHyh6iodeH1IlQL?=
- =?us-ascii?Q?IVPvevRSZXw7FH/nBMbi4RnCfGJCBgYy2KvmJdBNCzun1o02laQrqZDigbLa?=
- =?us-ascii?Q?zuWFPQQB1Ky9GxS+c/uj8rBdD3sIeyy+Lq5oht8bPLy9MX3YaUkB+u3/0HJr?=
- =?us-ascii?Q?CbVlAcRsTCIAHGDXlefu2u+y5He9/s9YB9vNRiKMN8W+bVg9FORSWy1jsJqh?=
- =?us-ascii?Q?cXF99coGunlp16CeSjPuOfXXoizrD69nwrb7m3XE3XiYbU+RXVR1QDlGBRqz?=
- =?us-ascii?Q?ad79/45mmr3x/7c74ailpgNZoag/C2hzTkfNsQWkzAcSXZSojRYB8pSpYMLE?=
- =?us-ascii?Q?Ci4i/fET8pFEtYTlhp70B+rdXmXT6sVvCAx5Z0pKz7/56YeRfqf7jfs/f8tN?=
- =?us-ascii?Q?pyP0zzE6EZ4PJgwJV79mwyghO681WwuqqCN5B0hIBV9laUYEWlwHFXWRnaRu?=
- =?us-ascii?Q?9wqyvmGu2ju7TcU4mKnUrDeFknZdseYHpIYYwFdE?=
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 53f644a2-a6e9-425e-f5ac-08dde0f52088
-X-MS-Exchange-CrossTenant-AuthSource: DS7PR12MB9473.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 21 Aug 2025 20:55:57.5860
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: l98mhjCEPP2PIcqstFN7T4wAHLpAWbpLGr/OMjiznshiERwmm281INsYH3GPRneT
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM3PR12MB9435
+ <E1AA1AC8-06E4-4896-B62B-F3EA0AE3E09C@nvidia.com>
+From: David Hildenbrand <david@redhat.com>
+Content-Language: en-US
+Autocrypt: addr=david@redhat.com; keydata=
+ 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
+ qIws/H2t
+In-Reply-To: <E1AA1AC8-06E4-4896-B62B-F3EA0AE3E09C@nvidia.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-On 21 Aug 2025, at 16:06, David Hildenbrand wrote:
+On 21.08.25 22:55, Zi Yan wrote:
+> On 21 Aug 2025, at 16:06, David Hildenbrand wrote:
+> 
+>> Now that a single folio/compound page can no longer span memory sections
+>> in problematic kernel configurations, we can stop using nth_page().
+>>
+>> While at it, turn both macros into static inline functions and add
+>> kernel doc for folio_page_idx().
+>>
+>> Signed-off-by: David Hildenbrand <david@redhat.com>
+>> ---
+>>   include/linux/mm.h         | 16 ++++++++++++++--
+>>   include/linux/page-flags.h |  5 ++++-
+>>   2 files changed, 18 insertions(+), 3 deletions(-)
+>>
+>> diff --git a/include/linux/mm.h b/include/linux/mm.h
+>> index 48a985e17ef4e..ef360b72cb05c 100644
+>> --- a/include/linux/mm.h
+>> +++ b/include/linux/mm.h
+>> @@ -210,10 +210,8 @@ extern unsigned long sysctl_admin_reserve_kbytes;
+>>
+>>   #if defined(CONFIG_SPARSEMEM) && !defined(CONFIG_SPARSEMEM_VMEMMAP)
+>>   #define nth_page(page,n) pfn_to_page(page_to_pfn((page)) + (n))
+>> -#define folio_page_idx(folio, p)	(page_to_pfn(p) - folio_pfn(folio))
+>>   #else
+>>   #define nth_page(page,n) ((page) + (n))
+>> -#define folio_page_idx(folio, p)	((p) - &(folio)->page)
+>>   #endif
+>>
+>>   /* to align the pointer to the (next) page boundary */
+>> @@ -225,6 +223,20 @@ extern unsigned long sysctl_admin_reserve_kbytes;
+>>   /* test whether an address (unsigned long or pointer) is aligned to PAGE_SIZE */
+>>   #define PAGE_ALIGNED(addr)	IS_ALIGNED((unsigned long)(addr), PAGE_SIZE)
+>>
+>> +/**
+>> + * folio_page_idx - Return the number of a page in a folio.
+>> + * @folio: The folio.
+>> + * @page: The folio page.
+>> + *
+>> + * This function expects that the page is actually part of the folio.
+>> + * The returned number is relative to the start of the folio.
+>> + */
+>> +static inline unsigned long folio_page_idx(const struct folio *folio,
+>> +		const struct page *page)
+>> +{
+>> +	return page - &folio->page;
+>> +}
+>> +
+>>   static inline struct folio *lru_to_folio(struct list_head *head)
+>>   {
+>>   	return list_entry((head)->prev, struct folio, lru);
+>> diff --git a/include/linux/page-flags.h b/include/linux/page-flags.h
+>> index d53a86e68c89b..080ad10c0defc 100644
+>> --- a/include/linux/page-flags.h
+>> +++ b/include/linux/page-flags.h
+>> @@ -316,7 +316,10 @@ static __always_inline unsigned long _compound_head(const struct page *page)
+>>    * check that the page number lies within @folio; the caller is presumed
+>>    * to have a reference to the page.
+>>    */
+>> -#define folio_page(folio, n)	nth_page(&(folio)->page, n)
+>> +static inline struct page *folio_page(struct folio *folio, unsigned long nr)
+>> +{
+>> +	return &folio->page + nr;
+>> +}
+> 
+> Maybe s/nr/n/ or s/nr/nth/, since it returns the nth page within a folio.
 
-> Now that a single folio/compound page can no longer span memory section=
-s
-> in problematic kernel configurations, we can stop using nth_page().
->
-> While at it, turn both macros into static inline functions and add
-> kernel doc for folio_page_idx().
->
-> Signed-off-by: David Hildenbrand <david@redhat.com>
-> ---
->  include/linux/mm.h         | 16 ++++++++++++++--
->  include/linux/page-flags.h |  5 ++++-
->  2 files changed, 18 insertions(+), 3 deletions(-)
->
-> diff --git a/include/linux/mm.h b/include/linux/mm.h
-> index 48a985e17ef4e..ef360b72cb05c 100644
-> --- a/include/linux/mm.h
-> +++ b/include/linux/mm.h
-> @@ -210,10 +210,8 @@ extern unsigned long sysctl_admin_reserve_kbytes;
->
->  #if defined(CONFIG_SPARSEMEM) && !defined(CONFIG_SPARSEMEM_VMEMMAP)
->  #define nth_page(page,n) pfn_to_page(page_to_pfn((page)) + (n))
-> -#define folio_page_idx(folio, p)	(page_to_pfn(p) - folio_pfn(folio))
->  #else
->  #define nth_page(page,n) ((page) + (n))
-> -#define folio_page_idx(folio, p)	((p) - &(folio)->page)
->  #endif
->
->  /* to align the pointer to the (next) page boundary */
-> @@ -225,6 +223,20 @@ extern unsigned long sysctl_admin_reserve_kbytes;
->  /* test whether an address (unsigned long or pointer) is aligned to PA=
-GE_SIZE */
->  #define PAGE_ALIGNED(addr)	IS_ALIGNED((unsigned long)(addr), PAGE_SIZE=
-)
->
-> +/**
-> + * folio_page_idx - Return the number of a page in a folio.
-> + * @folio: The folio.
-> + * @page: The folio page.
-> + *
-> + * This function expects that the page is actually part of the folio.
-> + * The returned number is relative to the start of the folio.
-> + */
-> +static inline unsigned long folio_page_idx(const struct folio *folio,
-> +		const struct page *page)
-> +{
-> +	return page - &folio->page;
-> +}
-> +
->  static inline struct folio *lru_to_folio(struct list_head *head)
->  {
->  	return list_entry((head)->prev, struct folio, lru);
-> diff --git a/include/linux/page-flags.h b/include/linux/page-flags.h
-> index d53a86e68c89b..080ad10c0defc 100644
-> --- a/include/linux/page-flags.h
-> +++ b/include/linux/page-flags.h
-> @@ -316,7 +316,10 @@ static __always_inline unsigned long _compound_hea=
-d(const struct page *page)
->   * check that the page number lies within @folio; the caller is presum=
-ed
->   * to have a reference to the page.
->   */
-> -#define folio_page(folio, n)	nth_page(&(folio)->page, n)
-> +static inline struct page *folio_page(struct folio *folio, unsigned lo=
-ng nr)
-> +{
-> +	return &folio->page + nr;
-> +}
+Yeah, it's even called "n" in the kernel docs ...
 
-Maybe s/nr/n/ or s/nr/nth/, since it returns the nth page within a folio.=
+> 
+> Since you have added kernel doc for folio_page_idx(), it does not hurt
+> to have something similar for folio_page(). :)
 
+... which we already have! (see above the macro) :)
 
-Since you have added kernel doc for folio_page_idx(), it does not hurt
-to have something similar for folio_page(). :)
+Thanks!
 
-+/**
-+ * folio_page - Return the nth page in a folio.
-+ * @folio: The folio.
-+ * @n: Page index within the folio.
-+ *
-+ * This function expects that n does not exceed folio_nr_pages(folio).
-+ * The returned page is relative to the first page of the folio.
-+ */
+-- 
+Cheers
 
->
->  static __always_inline int PageTail(const struct page *page)
->  {
-> -- =
+David / dhildenb
 
-> 2.50.1
-
-Otherwise, Reviewed-by: Zi Yan <ziy@nvidia.com>
-
-Best Regards,
-Yan, Zi
 
