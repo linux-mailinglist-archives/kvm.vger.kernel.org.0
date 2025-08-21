@@ -1,63 +1,63 @@
-Return-Path: <kvm+bounces-55283-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-55288-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2760DB2FABA
-	for <lists+kvm@lfdr.de>; Thu, 21 Aug 2025 15:40:27 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 54DF7B2FAC2
+	for <lists+kvm@lfdr.de>; Thu, 21 Aug 2025 15:41:18 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 391B3586DE6
-	for <lists+kvm@lfdr.de>; Thu, 21 Aug 2025 13:35:01 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id E73C41CE441B
+	for <lists+kvm@lfdr.de>; Thu, 21 Aug 2025 13:36:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0C70B343218;
-	Thu, 21 Aug 2025 13:32:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A5DEA34F49B;
+	Thu, 21 Aug 2025 13:32:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="ZH44rJtL"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="MnoMuMhC"
 X-Original-To: kvm@vger.kernel.org
 Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.10])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4FDDB33EAE7;
-	Thu, 21 Aug 2025 13:32:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DF7E034AAEC;
+	Thu, 21 Aug 2025 13:32:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.10
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755783126; cv=none; b=rWb11KBrHwE/BQ0RXfooFqZ40qnxhXQplqXfCBBbzTtBduqh8aoiX59LLzhIRecB8QpSHGsi0QUCUOVZ2T5pwOWf06Y8JVqMUEGzGebnuWukvVVTjv145vLmY4bi1HDIhOAR3+E5KInE2rNZibHOQ6fhnxZ3+yOM1lgtPdm5lJY=
+	t=1755783129; cv=none; b=AVLGyEHfY+UZOJIQeuzOQ1Fg+R80F/n8MTl4Kw0BiTbde0RaJI5TeTXr4z1sHO6ZT0atbnq6rwyZv5v9/vvvyrncZr40dHLIzhYBpLdwW4/N7VHx6tWeJfpSryaetdWZ9H3Nb6OgnlSLIGPMNYgovuFn6HrUyY6/cwg389oKMSA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755783126; c=relaxed/simple;
-	bh=UWTsMIFUKKfKqXofgj1KcWxsPN3Qqsk4w0IGNVwekTA=;
+	s=arc-20240116; t=1755783129; c=relaxed/simple;
+	bh=CKTAR2clkFwYFpvFmyMSOch/X88zLnViNPj0Kl9uqXs=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=j1WqRh7UCEuhS63audTToh359vQZaaoBGojgRzDWJsApuOQwMZAojrnwdqj3/1X6JkN3u76MwE0q/744oUQpOadfcUghqUOzrK5+iq5qAxU7uJNx/zsHsneLn7bMlLv+AFOljpndM1onnLgIRgGesdlABp0C+h4drmn4Nx0/7GA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=ZH44rJtL; arc=none smtp.client-ip=192.198.163.10
+	 MIME-Version; b=j3tBmKU1ydiKHdgXabfe+at85l2GkVkXyz5qnA3AezuZR9YlsYec5nrCAMTi9X4cx8ckK3QBVNgk0HETaQMglFcv0sYqNqz3ONIPyYM2oBe7fsb5hirUFrCGuCeYyVvO9zA24S3rBXj/zHPY57GJNX+iGWgym/0co+b53AXPnig=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=MnoMuMhC; arc=none smtp.client-ip=192.198.163.10
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1755783124; x=1787319124;
+  t=1755783128; x=1787319128;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=UWTsMIFUKKfKqXofgj1KcWxsPN3Qqsk4w0IGNVwekTA=;
-  b=ZH44rJtLg0XeVFi2p+6rh+1EjC4qryUMZsSQscqF7XFOBUIGTcctIRln
-   g52bg8oDSqlyapBPMtdBsWQ1WgVJQFnWOX+L76d5RKIY53/ohAtmiLijk
-   0n3M8is+2MfctxfZb4swxrNUxaylKE1Ytf8XotgEk8RLbB0DdwxK05JTM
-   aOURi4o22NLB6/utpuShGUd98W6MknVKCZH1coNZa9LJxBhqB0AMuDnqu
-   yFTXfYYs8aUP5SXeOCq1N62+JUQnvcT0PNg0priSc5PT8hBLKRFtUWcZU
-   3d3IIx0Tr1f9JUxeKzHGHSYd7VMlDRdjoixBDmHjm62y5TpUxF+A8nSJv
-   g==;
-X-CSE-ConnectionGUID: 4x4zJ2ufSFO8IGShOZWl2A==
-X-CSE-MsgGUID: vORgF/jrQYW/m89toW0kfw==
-X-IronPort-AV: E=McAfee;i="6800,10657,11529"; a="69446095"
+  bh=CKTAR2clkFwYFpvFmyMSOch/X88zLnViNPj0Kl9uqXs=;
+  b=MnoMuMhCKMwSdQvBzspwE7sFTVFjdEwCWwjjcYYljPsbZ0jw8tqhiog0
+   s1lP78VLTaF1xu/wUt0i4gU1t2fUbFrXl+8puae5lakiVQugqeJ8Rb2Qo
+   z7q4sGEKy4Sue56liuz7qdCnmYfu2M20/uOhK24q0fIeaNIacHvKg8uFj
+   HWpxoHPPA2qVJjKfUVh+gsw8aiM6ublDlauYuzm+eojhzrD+JJ23RY+v2
+   LM20Vrj9Q/JVgK8e4yVu1B0yeYjguV6quhFTzVBapvQ1kX6ypBzo/sO6T
+   oXUnHfVoOh3Tos/I61WpaiKwUdPW++Gy21QEPEqnh5xrY4cUXVLST8lOy
+   Q==;
+X-CSE-ConnectionGUID: A013Nkz2RHSJzaNv1Kh+QA==
+X-CSE-MsgGUID: lcVv3SVkQEC2caHQkrJMkQ==
+X-IronPort-AV: E=McAfee;i="6800,10657,11529"; a="69446169"
 X-IronPort-AV: E=Sophos;i="6.17,306,1747724400"; 
-   d="scan'208";a="69446095"
+   d="scan'208";a="69446169"
 Received: from fmviesa001.fm.intel.com ([10.60.135.141])
-  by fmvoesa104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 21 Aug 2025 06:32:00 -0700
-X-CSE-ConnectionGUID: GErc9IwoS5GN23U8c7WejQ==
-X-CSE-MsgGUID: 2ixS5ZyGQCidoS2ikKjWUQ==
+  by fmvoesa104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 21 Aug 2025 06:32:01 -0700
+X-CSE-ConnectionGUID: Zm6qfaw7QUaRGKEmexhFiQ==
+X-CSE-MsgGUID: +m+rUBxHTIukiZUooWFr9w==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.17,306,1747724400"; 
-   d="scan'208";a="199285399"
+   d="scan'208";a="199285402"
 Received: from 984fee019967.jf.intel.com ([10.165.54.94])
-  by smtpauth.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 21 Aug 2025 06:31:43 -0700
+  by smtpauth.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 21 Aug 2025 06:31:44 -0700
 From: Chao Gao <chao.gao@intel.com>
 To: kvm@vger.kernel.org,
 	linux-kernel@vger.kernel.org
@@ -76,9 +76,9 @@ Cc: chao.gao@intel.com,
 	weijiang.yang@intel.com,
 	x86@kernel.org,
 	xin@zytor.com
-Subject: [PATCH v13 06/21] KVM: x86: Add fault checks for guest CR4.CET setting
-Date: Thu, 21 Aug 2025 06:30:40 -0700
-Message-ID: <20250821133132.72322-7-chao.gao@intel.com>
+Subject: [PATCH v13 07/21] KVM: x86: Report KVM supported CET MSRs as to-be-saved
+Date: Thu, 21 Aug 2025 06:30:41 -0700
+Message-ID: <20250821133132.72322-8-chao.gao@intel.com>
 X-Mailer: git-send-email 2.47.3
 In-Reply-To: <20250821133132.72322-1-chao.gao@intel.com>
 References: <20250821133132.72322-1-chao.gao@intel.com>
@@ -92,47 +92,55 @@ Content-Transfer-Encoding: 8bit
 
 From: Yang Weijiang <weijiang.yang@intel.com>
 
-Check potential faults for CR4.CET setting per Intel SDM requirements.
-CET can be enabled if and only if CR0.WP == 1, i.e. setting CR4.CET ==
-1 faults if CR0.WP == 0 and setting CR0.WP == 0 fails if CR4.CET == 1.
+Add CET MSRs to the list of MSRs reported to userspace if the feature,
+i.e. IBT or SHSTK, associated with the MSRs is supported by KVM.
 
-Co-developed-by: Sean Christopherson <seanjc@google.com>
-Signed-off-by: Sean Christopherson <seanjc@google.com>
+Suggested-by: Chao Gao <chao.gao@intel.com>
 Signed-off-by: Yang Weijiang <weijiang.yang@intel.com>
-Reviewed-by: Chao Gao <chao.gao@intel.com>
-Reviewed-by: Maxim Levitsky <mlevitsk@redhat.com>
 Tested-by: Mathias Krause <minipli@grsecurity.net>
 Tested-by: John Allen <john.allen@amd.com>
 Tested-by: Rick Edgecombe <rick.p.edgecombe@intel.com>
 Signed-off-by: Chao Gao <chao.gao@intel.com>
 ---
- arch/x86/kvm/x86.c | 6 ++++++
- 1 file changed, 6 insertions(+)
+ arch/x86/kvm/x86.c | 18 ++++++++++++++++++
+ 1 file changed, 18 insertions(+)
 
 diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-index 799ac76679c9..c363f7df279f 100644
+index c363f7df279f..61e008be172d 100644
 --- a/arch/x86/kvm/x86.c
 +++ b/arch/x86/kvm/x86.c
-@@ -1173,6 +1173,9 @@ int kvm_set_cr0(struct kvm_vcpu *vcpu, unsigned long cr0)
- 	    (is_64_bit_mode(vcpu) || kvm_is_cr4_bit_set(vcpu, X86_CR4_PCIDE)))
- 		return 1;
+@@ -341,6 +341,10 @@ static const u32 msrs_to_save_base[] = {
+ 	MSR_IA32_UMWAIT_CONTROL,
  
-+	if (!(cr0 & X86_CR0_WP) && kvm_is_cr4_bit_set(vcpu, X86_CR4_CET))
-+		return 1;
+ 	MSR_IA32_XFD, MSR_IA32_XFD_ERR, MSR_IA32_XSS,
 +
- 	kvm_x86_call(set_cr0)(vcpu, cr0);
++	MSR_IA32_U_CET, MSR_IA32_S_CET,
++	MSR_IA32_PL0_SSP, MSR_IA32_PL1_SSP, MSR_IA32_PL2_SSP,
++	MSR_IA32_PL3_SSP, MSR_IA32_INT_SSP_TAB,
+ };
  
- 	kvm_post_set_cr0(vcpu, old_cr0, cr0);
-@@ -1372,6 +1375,9 @@ int kvm_set_cr4(struct kvm_vcpu *vcpu, unsigned long cr4)
- 			return 1;
+ static const u32 msrs_to_save_pmu[] = {
+@@ -7520,6 +7524,20 @@ static void kvm_probe_msr_to_save(u32 msr_index)
+ 		if (!kvm_caps.supported_xss)
+ 			return;
+ 		break;
++	case MSR_IA32_U_CET:
++	case MSR_IA32_S_CET:
++		if (!kvm_cpu_cap_has(X86_FEATURE_SHSTK) &&
++		    !kvm_cpu_cap_has(X86_FEATURE_IBT))
++			return;
++		break;
++	case MSR_IA32_INT_SSP_TAB:
++		if (!kvm_cpu_cap_has(X86_FEATURE_LM))
++			return;
++		fallthrough;
++	case MSR_IA32_PL0_SSP ... MSR_IA32_PL3_SSP:
++		if (!kvm_cpu_cap_has(X86_FEATURE_SHSTK))
++			return;
++		break;
+ 	default:
+ 		break;
  	}
- 
-+	if ((cr4 & X86_CR4_CET) && !kvm_is_cr0_bit_set(vcpu, X86_CR0_WP))
-+		return 1;
-+
- 	kvm_x86_call(set_cr4)(vcpu, cr4);
- 
- 	kvm_post_set_cr4(vcpu, old_cr4, cr4);
 -- 
 2.47.3
 
