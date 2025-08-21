@@ -1,235 +1,315 @@
-Return-Path: <kvm+bounces-55337-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-55339-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id AAFD8B301F5
-	for <lists+kvm@lfdr.de>; Thu, 21 Aug 2025 20:24:39 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id DC86EB302CF
+	for <lists+kvm@lfdr.de>; Thu, 21 Aug 2025 21:22:15 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 429325684DE
-	for <lists+kvm@lfdr.de>; Thu, 21 Aug 2025 18:24:39 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 7DCDC1BC6889
+	for <lists+kvm@lfdr.de>; Thu, 21 Aug 2025 19:22:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3B0E73451CE;
-	Thu, 21 Aug 2025 18:23:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C902F34AB14;
+	Thu, 21 Aug 2025 19:22:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="runX6P2n"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="qaB5aa6/"
 X-Original-To: kvm@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qt1-f171.google.com (mail-qt1-f171.google.com [209.85.160.171])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4D217343D66;
-	Thu, 21 Aug 2025 18:23:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E57D77FBAC
+	for <kvm@vger.kernel.org>; Thu, 21 Aug 2025 19:22:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.171
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755800611; cv=none; b=Uw8nf2LChtl/dvf4qEKf1u51NAeRpqyws5Gcj/PI4ZDOt8c+muRMUZ9da05uO6Tewx7VAk+UL44ko60wOyAGP9FmiXOljzDGXBZ0ReUMuO7P7HIgF0JSeO17adC1HgIao7mTmODr+aStdz5T7wzDLeeLHPlEKxQug+PSNy9/8jg=
+	t=1755804124; cv=none; b=LH+SN+wppUIdgjZUQ1X+ZDlUNR1Rlj2IOrAEHYzw2PwonJzAQ5PJyluwqWPEuUpBfugwQnJa6IgLfevlphYtJtzWbfBBB5DDaxsbz39M/JEYdvpY4ssdN+pj7UfeLTndY0pakKm9RUfC9ZrRqHTo5rJiVUW4Wj33s6sAOWlGlYA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755800611; c=relaxed/simple;
-	bh=Jz4K02/DkA+KjN4qPfqmXopJA34UvBEt2w0g5HHD59M=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=ltZsvObR7nw3kmmyUx2ahgLF0gBUsywGpVolSoG8eeO80mxN8XhgAaFbCFlScfHH54bTFGbfceMi9VeF7b6FJzDZ72b3ZEsXNYOug6uRp+F9mA0TpA9rNKQCuleIsdqvED2n30bXu7JYrEmznjQQAdr9CgoFB6sBL2DUzTKblak=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=runX6P2n; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 38409C4CEEB;
-	Thu, 21 Aug 2025 18:23:29 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1755800610;
-	bh=Jz4K02/DkA+KjN4qPfqmXopJA34UvBEt2w0g5HHD59M=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=runX6P2nYn1iaWZr7MetT29pQAO4T3bAw3MRE0DrClqKqZ5JBxOAjTacU5OymOi09
-	 bnV38F604/eGIaNC9fS71cjAaSTpFM0ok4M2CzmzTXHOw2A97JQQP7LLEV7EUGCvY+
-	 TMEViUqd6MWrw8w2MRYa168g1mg1wVvUVZh6lw/5kyouoRzn8O/BqraeYyoaIwKMBA
-	 TqpWqkdQxTi1oIsmOVSm7CrVG/PX4B+wOu4ONEi9mxRTClyXz2m+9WxxakkaEvvm1c
-	 YUNydNiYEw3t+XgsHzWSuC7/3GngxnwMxD2GnkaRZK1+rTvvW8nqoPuwSbzc92OcWy
-	 hyYfYfXiL1IVg==
-From: "Naveen N Rao (AMD)" <naveen@kernel.org>
-To: Sean Christopherson <seanjc@google.com>,
-	Paolo Bonzini <pbonzini@redhat.com>
-Cc: <kvm@vger.kernel.org>,
-	<linux-kernel@vger.kernel.org>,
-	Suravee Suthikulpanit <suravee.suthikulpanit@amd.com>,
-	Vasant Hegde <vasant.hegde@amd.com>,
-	Pankaj Gupta <pankaj.gupta@amd.com>,
-	Alejandro Jimenez <alejandro.j.jimenez@oracle.com>,
-	Joao Martins <joao.m.martins@oracle.com>,
-	Nikunj A Dadhania <nikunj@amd.com>
-Subject: [PATCH v4 7/7] KVM: SVM: Add AVIC support for 4k vCPUs in x2AVIC mode
-Date: Thu, 21 Aug 2025 23:48:38 +0530
-Message-ID: <69a5a2958b6aa111d36881a1d58d56bb20c43cac.1755797611.git.naveen@kernel.org>
-X-Mailer: git-send-email 2.50.1
-In-Reply-To: <cover.1755797611.git.naveen@kernel.org>
-References: <cover.1755797611.git.naveen@kernel.org>
+	s=arc-20240116; t=1755804124; c=relaxed/simple;
+	bh=hKjV3Bdfa+3lPnicmtByd+iT0qEQfKA6FCL7/PvnH14=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=R+x17sZOysgH8sDqwHgI5IStmgM2AVaGRFh9qyeotIqEEMuElQZRkr86ypJ/oRzs3lbeQEFpA8xNaLGYGaQXhz8GGGuyxIo9ZcbTSpOy6K5rrJb6XzpLBHWa5IEIBSBed01ZcgytaOzIOOklvKqrghEKIAA245yFLpnZI5z4gtU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=qaB5aa6/; arc=none smtp.client-ip=209.85.160.171
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-qt1-f171.google.com with SMTP id d75a77b69052e-4b0bd88ab8fso72241cf.0
+        for <kvm@vger.kernel.org>; Thu, 21 Aug 2025 12:22:00 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1755804120; x=1756408920; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=Ilc50mPVGrwfo+k7PZHzZeT1zp8dvAwV807vh9LnQD8=;
+        b=qaB5aa6/4joBtFbkUpSpQZKdKcPDpXCi5OoHBWIQAMytX+qrMyEjBxXj0Yh1FKBkBJ
+         sjjgLeZilZdvwfOiyhHpK9wcEOsKjXekN2tMPY8slEsp6LApTiB9lTHrekqHFydRhb0E
+         nRBIlIfwhRCezb52IIBN3z3wulWtx+ADB3DxWwduLAUGSII84VZthseZ7WNaTRDiL2mo
+         5KnUAIUk1rtxToqsUZWUG0phwK6WS5IgpvratzX7/m3FJpX5PaPX2hUvy3Pt/mO4AJZM
+         tKt17RtC9p0W4BR3tipB2MQm6++Y4bgrIHwbH8ssYH7Q5sP4VVLdu1QloiPqd/krpvy8
+         jG4w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1755804120; x=1756408920;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=Ilc50mPVGrwfo+k7PZHzZeT1zp8dvAwV807vh9LnQD8=;
+        b=aUoaMykraxCrxzNfjgaisfKdZ7QlY2A8blD8OCo2sH8L+DkGrAiNVFszcS1BfeO6MF
+         4KMpIA0R5Svtx67V2IKiZQUx2wZ3RsrYZw9i7OJHSq7ejzJ6x/RYr+UOBrZPammIeb6c
+         6Pvdt7kCsYho+6s+OWdixPwivTsWnoOK6mERzFwGleERa25vPi7ajORu5xWk5ZARxksw
+         TghTlM/b/NMw3X55kSEBBPuUMYRE0fHJkveRcQGBd3P922/hEAg06t+uQjvjrqo/Rjgj
+         QgVkIWTzRp3zqUlbwsyKPa70RWoRxK7ialHnTqH/LuVnwxCDyUW6PtzjxPAFEgT+9+eO
+         msqg==
+X-Forwarded-Encrypted: i=1; AJvYcCUFUsVmiBhzCy4/hVWQ6RMX73jvR76DU421kufDUxObb5TRmpt37Ih/hYG0/NMg7bepWx8=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwDr+8Ga0gryHuXadnasV5xShBTDMhsGSY/75xxtge4YsT6BoGW
+	3MSoWO0xp10jg/1EKLNBYD2ZsdF9ZyCU3rk/Mq5tQVteC4tgTgYtHPm8bb87GHKWh6WhfLnVXQz
+	eyXx+e6aS37DKhgRzcVu7ttYSUWFyQr7vfWlRCJFq
+X-Gm-Gg: ASbGnctqVXiOiNwMSHhsThMg0q0Grhz4Mx9kYSPNG7xqDOuye1dydPGkARYUdrN5y6l
+	zmN4gby1XP7+zNUCxaJl9KvUff1j1bmX2gwBRrycNW5U72rVe0V8E9GPkDejz7JVvGG3rq9MCTO
+	ZwgbUziNMQGWSBCQwaJeiAGgqyw+ngibFxGZnNhi1yDa9G2Q8AMPL0bi+A40X+bOPgjeFSs6CgX
+	VJkFoOpsQmy2HR96TkgXG+F0HVSX4GbAuhYvSGkM1i4zf0MCcK4vizuzw==
+X-Google-Smtp-Source: AGHT+IEfSQSRZKTmvco6JeYeQU6/BI51GtHOl5P8UiOFcRQ1UL7CTs/n9GMqAQJ/KofHvStmBAuUDbtTK0h93IsHqY4=
+X-Received: by 2002:a05:622a:860c:b0:4ab:3a34:317a with SMTP id
+ d75a77b69052e-4b2aaff5aecmr374371cf.17.1755804119341; Thu, 21 Aug 2025
+ 12:21:59 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <20250609191340.2051741-1-kirill.shutemov@linux.intel.com> <20250609191340.2051741-9-kirill.shutemov@linux.intel.com>
+In-Reply-To: <20250609191340.2051741-9-kirill.shutemov@linux.intel.com>
+From: Sagi Shahar <sagis@google.com>
+Date: Thu, 21 Aug 2025 14:21:47 -0500
+X-Gm-Features: Ac12FXyTJoAPd-OPdCjI8iU_xiRJBgChDEsznpBOvEolzcRHN3gqj2WyAmgSbJ4
+Message-ID: <CAAhR5DGGWss4jovHETYmBeK1gze04LR9c8Dcd2oMpCC3SnMDgQ@mail.gmail.com>
+Subject: Re: [PATCHv2 08/12] KVM: TDX: Handle PAMT allocation in fault path
+To: "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>
+Cc: pbonzini@redhat.com, seanjc@google.com, dave.hansen@linux.intel.com, 
+	rick.p.edgecombe@intel.com, isaku.yamahata@intel.com, kai.huang@intel.com, 
+	yan.y.zhao@intel.com, chao.gao@intel.com, tglx@linutronix.de, 
+	mingo@redhat.com, bp@alien8.de, kvm@vger.kernel.org, x86@kernel.org, 
+	linux-coco@lists.linux.dev, linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-With AVIC support for 4k vCPUs, the maximum supported physical ID in
-x2AVIC mode is 4095. Since this is no longer fixed, introduce a variable
-(x2avic_max_physical_id) to capture the maximum supported physical ID on
-the current platform and use that in place of the existing macro
-(X2AVIC_MAX_PHYSICAL_ID).
+On Mon, Jun 9, 2025 at 2:16=E2=80=AFPM Kirill A. Shutemov
+<kirill.shutemov@linux.intel.com> wrote:
+>
+> There are two distinct cases when the kernel needs to allocate PAMT
+> memory in the fault path: for SEPT page tables in tdx_sept_link_private_s=
+pt()
+> and for leaf pages in tdx_sept_set_private_spte().
+>
+> These code paths run in atomic context. Use a pre-allocated per-VCPU
+> pool for memory allocations.
+>
+> Signed-off-by: Kirill A. Shutemov <kirill.shutemov@linux.intel.com>
+> ---
+>  arch/x86/include/asm/tdx.h  |  4 ++++
+>  arch/x86/kvm/vmx/tdx.c      | 40 ++++++++++++++++++++++++++++++++-----
+>  arch/x86/virt/vmx/tdx/tdx.c | 21 +++++++++++++------
+>  virt/kvm/kvm_main.c         |  1 +
+>  4 files changed, 55 insertions(+), 11 deletions(-)
+>
+> diff --git a/arch/x86/include/asm/tdx.h b/arch/x86/include/asm/tdx.h
+> index 47092eb13eb3..39f8dd7e0f06 100644
+> --- a/arch/x86/include/asm/tdx.h
+> +++ b/arch/x86/include/asm/tdx.h
+> @@ -116,6 +116,10 @@ u32 tdx_get_nr_guest_keyids(void);
+>  void tdx_guest_keyid_free(unsigned int keyid);
+>
+>  int tdx_nr_pamt_pages(void);
+> +int tdx_pamt_get(struct page *page, enum pg_level level,
+> +                struct page *(alloc)(void *data), void *data);
+> +void tdx_pamt_put(struct page *page, enum pg_level level);
+> +
+>  struct page *tdx_alloc_page(void);
+>  void tdx_free_page(struct page *page);
+>
+> diff --git a/arch/x86/kvm/vmx/tdx.c b/arch/x86/kvm/vmx/tdx.c
+> index 36c3c9f8a62c..bc9bc393f866 100644
+> --- a/arch/x86/kvm/vmx/tdx.c
+> +++ b/arch/x86/kvm/vmx/tdx.c
+> @@ -1537,11 +1537,26 @@ static int tdx_mem_page_record_premap_cnt(struct =
+kvm *kvm, gfn_t gfn,
+>         return 0;
+>  }
+>
+> +static struct page *tdx_alloc_pamt_page_atomic(void *data)
+> +{
+> +       struct kvm_vcpu *vcpu =3D data;
+> +       void *p;
+> +
+> +       p =3D kvm_mmu_memory_cache_alloc(&vcpu->arch.pamt_page_cache);
+> +       return virt_to_page(p);
+> +}
+> +
+>  int tdx_sept_set_private_spte(struct kvm *kvm, gfn_t gfn,
+>                               enum pg_level level, kvm_pfn_t pfn)
+>  {
+> +       struct kvm_vcpu *vcpu =3D kvm_get_running_vcpu();
+>         struct kvm_tdx *kvm_tdx =3D to_kvm_tdx(kvm);
+>         struct page *page =3D pfn_to_page(pfn);
+> +       int ret;
+> +
+> +       ret =3D tdx_pamt_get(page, level, tdx_alloc_pamt_page_atomic, vcp=
+u);
+> +       if (ret)
+> +               return ret;
 
-With AVIC support for 4k vCPUs, the AVIC Physical ID table is no
-longer a single page and can occupy up to 8 contiguous 4k pages. Since
-AVIC hardware accesses of the physical ID table are limited by the
-physical max index programmed in the VMCB, it is sufficient to allocate
-only as many pages as are required to have a physical table entry for
-the max guest APIC ID. Since the guest APIC mode is not available at
-this point, provision for the maximum possible x2AVIC ID. For this
-purpose, add a variant of avic_get_max_physical_id() that works with a
-NULL vCPU pointer and returns the max x2AVIC ID. Wrap this in a new
-helper for obtaining the allocation order.
+tdx_pamt_get() can return non-zero value in case of success e.g.
+returning 1 in case tdx_pamt_add() lost the race. Shouldn't we check
+for (ret < 0) here and below cases?
 
-To make it easy to identify support for 4k vCPUs in x2AVIC mode, update
-the message printed to the kernel log to print the maximum number of
-vCPUs supported. Do this on all platforms supporting x2AVIC since it is
-useful to know what is supported on a specific platform.
-
-Co-developed-by: Suravee Suthikulpanit <suravee.suthikulpanit@amd.com>
-Signed-off-by: Suravee Suthikulpanit <suravee.suthikulpanit@amd.com>
-Signed-off-by: Naveen N Rao (AMD) <naveen@kernel.org>
----
- arch/x86/include/asm/svm.h |  3 +++
- arch/x86/kvm/svm/avic.c    | 43 ++++++++++++++++++++++++++++----------
- 2 files changed, 35 insertions(+), 11 deletions(-)
-
-diff --git a/arch/x86/include/asm/svm.h b/arch/x86/include/asm/svm.h
-index 58c10991521c..16d71752606b 100644
---- a/arch/x86/include/asm/svm.h
-+++ b/arch/x86/include/asm/svm.h
-@@ -289,11 +289,14 @@ enum avic_ipi_failure_cause {
- 
- /*
-  * For x2AVIC, the max index allowed for physical APIC ID table is 0x1ff (511).
-+ * With X86_FEATURE_X2AVIC_EXT, the max index is increased to 0xfff (4095).
-  */
- #define X2AVIC_MAX_PHYSICAL_ID		0x1FFUL
-+#define X2AVIC_4K_MAX_PHYSICAL_ID	0xFFFUL
- 
- static_assert((AVIC_MAX_PHYSICAL_ID & AVIC_PHYSICAL_MAX_INDEX_MASK) == AVIC_MAX_PHYSICAL_ID);
- static_assert((X2AVIC_MAX_PHYSICAL_ID & AVIC_PHYSICAL_MAX_INDEX_MASK) == X2AVIC_MAX_PHYSICAL_ID);
-+static_assert((X2AVIC_4K_MAX_PHYSICAL_ID & AVIC_PHYSICAL_MAX_INDEX_MASK) == X2AVIC_4K_MAX_PHYSICAL_ID);
- 
- #define SVM_SEV_FEAT_SNP_ACTIVE				BIT(0)
- #define SVM_SEV_FEAT_RESTRICTED_INJECTION		BIT(3)
-diff --git a/arch/x86/kvm/svm/avic.c b/arch/x86/kvm/svm/avic.c
-index b5a397b7c684..1dda90d29f4e 100644
---- a/arch/x86/kvm/svm/avic.c
-+++ b/arch/x86/kvm/svm/avic.c
-@@ -78,13 +78,14 @@ static u32 next_vm_id = 0;
- static bool next_vm_id_wrapped = 0;
- static DEFINE_SPINLOCK(svm_vm_data_hash_lock);
- bool x2avic_enabled;
-+static u64 x2avic_max_physical_id;
- 
--static u32 avic_get_max_physical_id(struct kvm_vcpu *vcpu)
-+static u32 __avic_get_max_physical_id(struct kvm *kvm, struct kvm_vcpu *vcpu)
- {
- 	u32 arch_max;
- 
--	if (x2avic_enabled && apic_x2apic_mode(vcpu->arch.apic))
--		arch_max = X2AVIC_MAX_PHYSICAL_ID;
-+	if (x2avic_enabled && (!vcpu || apic_x2apic_mode(vcpu->arch.apic)))
-+		arch_max = x2avic_max_physical_id;
- 	else
- 		arch_max = AVIC_MAX_PHYSICAL_ID;
- 
-@@ -92,7 +93,12 @@ static u32 avic_get_max_physical_id(struct kvm_vcpu *vcpu)
- 	 * Despite its name, KVM_CAP_MAX_VCPU_ID represents the maximum APIC ID plus one,
- 	 * so the max possible APIC ID is one less than that.
- 	 */
--	return min(vcpu->kvm->arch.max_vcpu_ids - 1, arch_max);
-+	return min(kvm->arch.max_vcpu_ids - 1, arch_max);
-+}
-+
-+static u32 avic_get_max_physical_id(struct kvm_vcpu *vcpu)
-+{
-+	return __avic_get_max_physical_id(vcpu->kvm, vcpu);
- }
- 
- static void avic_activate_vmcb(struct vcpu_svm *svm)
-@@ -185,6 +191,12 @@ int avic_ga_log_notifier(u32 ga_tag)
- 	return 0;
- }
- 
-+static int avic_get_physical_id_table_order(struct kvm *kvm)
-+{
-+	/* Provision for the maximum physical ID supported in x2avic mode */
-+	return get_order((__avic_get_max_physical_id(kvm, NULL) + 1) * sizeof(u64));
-+}
-+
- int avic_alloc_physical_id_table(struct kvm *kvm)
- {
- 	struct kvm_svm *kvm_svm = to_kvm_svm(kvm);
-@@ -192,7 +204,8 @@ int avic_alloc_physical_id_table(struct kvm *kvm)
- 	if (kvm_svm->avic_physical_id_table || !enable_apicv || !irqchip_in_kernel(kvm))
- 		return 0;
- 
--	kvm_svm->avic_physical_id_table = (void *)get_zeroed_page(GFP_KERNEL_ACCOUNT);
-+	kvm_svm->avic_physical_id_table = (void *)__get_free_pages(GFP_KERNEL_ACCOUNT | __GFP_ZERO,
-+								   avic_get_physical_id_table_order(kvm));
- 	if (!kvm_svm->avic_physical_id_table)
- 		return -ENOMEM;
- 
-@@ -208,7 +221,8 @@ void avic_vm_destroy(struct kvm *kvm)
- 		return;
- 
- 	free_page((unsigned long)kvm_svm->avic_logical_id_table);
--	free_page((unsigned long)kvm_svm->avic_physical_id_table);
-+	free_pages((unsigned long)kvm_svm->avic_physical_id_table,
-+		   avic_get_physical_id_table_order(kvm));
- 
- 	spin_lock_irqsave(&svm_vm_data_hash_lock, flags);
- 	hash_del(&kvm_svm->hnode);
-@@ -290,7 +304,7 @@ static int avic_init_backing_page(struct kvm_vcpu *vcpu)
- 	 * fully initialized AVIC.
- 	 */
- 	if ((!x2avic_enabled && id > AVIC_MAX_PHYSICAL_ID) ||
--	    (id > X2AVIC_MAX_PHYSICAL_ID)) {
-+	    (id > x2avic_max_physical_id)) {
- 		kvm_set_apicv_inhibit(vcpu->kvm, APICV_INHIBIT_REASON_PHYSICAL_ID_TOO_BIG);
- 		vcpu->arch.apic->apicv_active = false;
- 		return 0;
-@@ -910,7 +924,8 @@ static void __avic_vcpu_load(struct kvm_vcpu *vcpu, int cpu,
- 	if (WARN_ON(h_physical_id & ~AVIC_PHYSICAL_ID_ENTRY_HOST_PHYSICAL_ID_MASK))
- 		return;
- 
--	if (WARN_ON_ONCE(vcpu->vcpu_id * sizeof(entry) >= PAGE_SIZE))
-+	if (WARN_ON_ONCE(vcpu->vcpu_id * sizeof(entry) >=
-+			 PAGE_SIZE << avic_get_physical_id_table_order(vcpu->kvm)))
- 		return;
- 
- 	/*
-@@ -972,7 +987,8 @@ static void __avic_vcpu_put(struct kvm_vcpu *vcpu, enum avic_vcpu_action action)
- 
- 	lockdep_assert_preemption_disabled();
- 
--	if (WARN_ON_ONCE(vcpu->vcpu_id * sizeof(entry) >= PAGE_SIZE))
-+	if (WARN_ON_ONCE(vcpu->vcpu_id * sizeof(entry) >=
-+			 PAGE_SIZE << avic_get_physical_id_table_order(vcpu->kvm)))
- 		return;
- 
- 	/*
-@@ -1156,8 +1172,13 @@ bool avic_hardware_setup(void)
- 
- 	/* AVIC is a prerequisite for x2AVIC. */
- 	x2avic_enabled = boot_cpu_has(X86_FEATURE_X2AVIC);
--	if (x2avic_enabled)
--		pr_info("x2AVIC enabled\n");
-+	if (x2avic_enabled) {
-+		if (cpu_feature_enabled(X86_FEATURE_X2AVIC_EXT))
-+			x2avic_max_physical_id = X2AVIC_4K_MAX_PHYSICAL_ID;
-+		else
-+			x2avic_max_physical_id = X2AVIC_MAX_PHYSICAL_ID;
-+		pr_info("x2AVIC enabled (max %lld vCPUs)\n", x2avic_max_physical_id + 1);
-+	}
- 
- 	/*
- 	 * Disable IPI virtualization for AMD Family 17h CPUs (Zen1 and Zen2)
--- 
-2.50.1
-
+>
+>         /* TODO: handle large pages. */
+>         if (KVM_BUG_ON(level !=3D PG_LEVEL_4K, kvm))
+> @@ -1562,10 +1577,16 @@ int tdx_sept_set_private_spte(struct kvm *kvm, gf=
+n_t gfn,
+>          * barrier in tdx_td_finalize().
+>          */
+>         smp_rmb();
+> -       if (likely(kvm_tdx->state =3D=3D TD_STATE_RUNNABLE))
+> -               return tdx_mem_page_aug(kvm, gfn, level, page);
+>
+> -       return tdx_mem_page_record_premap_cnt(kvm, gfn, level, pfn);
+> +       if (likely(kvm_tdx->state =3D=3D TD_STATE_RUNNABLE))
+> +               ret =3D tdx_mem_page_aug(kvm, gfn, level, page);
+> +       else
+> +               ret =3D tdx_mem_page_record_premap_cnt(kvm, gfn, level, p=
+fn);
+> +
+> +       if (ret)
+> +               tdx_pamt_put(page, level);
+> +
+> +       return ret;
+>  }
+>
+>  static int tdx_sept_drop_private_spte(struct kvm *kvm, gfn_t gfn,
+> @@ -1622,17 +1643,26 @@ int tdx_sept_link_private_spt(struct kvm *kvm, gf=
+n_t gfn,
+>                               enum pg_level level, void *private_spt)
+>  {
+>         int tdx_level =3D pg_level_to_tdx_sept_level(level);
+> -       gpa_t gpa =3D gfn_to_gpa(gfn);
+> +       struct kvm_vcpu *vcpu =3D kvm_get_running_vcpu();
+>         struct page *page =3D virt_to_page(private_spt);
+> +       gpa_t gpa =3D gfn_to_gpa(gfn);
+>         u64 err, entry, level_state;
+> +       int ret;
+> +
+> +       ret =3D tdx_pamt_get(page, PG_LEVEL_4K, tdx_alloc_pamt_page_atomi=
+c, vcpu);
+> +       if (ret)
+> +               return ret;
+>
+>         err =3D tdh_mem_sept_add(&to_kvm_tdx(kvm)->td, gpa, tdx_level, pa=
+ge, &entry,
+>                                &level_state);
+> -       if (unlikely(tdx_operand_busy(err)))
+> +       if (unlikely(tdx_operand_busy(err))) {
+> +               tdx_pamt_put(page, PG_LEVEL_4K);
+>                 return -EBUSY;
+> +       }
+>
+>         if (KVM_BUG_ON(err, kvm)) {
+>                 pr_tdx_error_2(TDH_MEM_SEPT_ADD, err, entry, level_state)=
+;
+> +               tdx_pamt_put(page, PG_LEVEL_4K);
+>                 return -EIO;
+>         }
+>
+> diff --git a/arch/x86/virt/vmx/tdx/tdx.c b/arch/x86/virt/vmx/tdx/tdx.c
+> index 4f9eaba4af4a..d4b50b6428fa 100644
+> --- a/arch/x86/virt/vmx/tdx/tdx.c
+> +++ b/arch/x86/virt/vmx/tdx/tdx.c
+> @@ -2067,10 +2067,16 @@ static void tdx_free_pamt_pages(struct list_head =
+*pamt_pages)
+>         }
+>  }
+>
+> -static int tdx_alloc_pamt_pages(struct list_head *pamt_pages)
+> +static int tdx_alloc_pamt_pages(struct list_head *pamt_pages,
+> +                                struct page *(alloc)(void *data), void *=
+data)
+>  {
+>         for (int i =3D 0; i < tdx_nr_pamt_pages(); i++) {
+> -               struct page *page =3D alloc_page(GFP_KERNEL);
+> +               struct page *page;
+> +
+> +               if (alloc)
+> +                       page =3D alloc(data);
+> +               else
+> +                       page =3D alloc_page(GFP_KERNEL);
+>                 if (!page)
+>                         goto fail;
+>                 list_add(&page->lru, pamt_pages);
+> @@ -2115,7 +2121,8 @@ static int tdx_pamt_add(atomic_t *pamt_refcount, un=
+signed long hpa,
+>         return 0;
+>  }
+>
+> -static int tdx_pamt_get(struct page *page, enum pg_level level)
+> +int tdx_pamt_get(struct page *page, enum pg_level level,
+> +                struct page *(alloc)(void *data), void *data)
+>  {
+>         unsigned long hpa =3D page_to_phys(page);
+>         atomic_t *pamt_refcount;
+> @@ -2134,7 +2141,7 @@ static int tdx_pamt_get(struct page *page, enum pg_=
+level level)
+>         if (atomic_inc_not_zero(pamt_refcount))
+>                 return 0;
+>
+> -       if (tdx_alloc_pamt_pages(&pamt_pages))
+> +       if (tdx_alloc_pamt_pages(&pamt_pages, alloc, data))
+>                 return -ENOMEM;
+>
+>         ret =3D tdx_pamt_add(pamt_refcount, hpa, &pamt_pages);
+> @@ -2143,8 +2150,9 @@ static int tdx_pamt_get(struct page *page, enum pg_=
+level level)
+>
+>         return ret >=3D 0 ? 0 : ret;
+>  }
+> +EXPORT_SYMBOL_GPL(tdx_pamt_get);
+>
+> -static void tdx_pamt_put(struct page *page, enum pg_level level)
+> +void tdx_pamt_put(struct page *page, enum pg_level level)
+>  {
+>         unsigned long hpa =3D page_to_phys(page);
+>         atomic_t *pamt_refcount;
+> @@ -2179,6 +2187,7 @@ static void tdx_pamt_put(struct page *page, enum pg=
+_level level)
+>
+>         tdx_free_pamt_pages(&pamt_pages);
+>  }
+> +EXPORT_SYMBOL_GPL(tdx_pamt_put);
+>
+>  struct page *tdx_alloc_page(void)
+>  {
+> @@ -2188,7 +2197,7 @@ struct page *tdx_alloc_page(void)
+>         if (!page)
+>                 return NULL;
+>
+> -       if (tdx_pamt_get(page, PG_LEVEL_4K)) {
+> +       if (tdx_pamt_get(page, PG_LEVEL_4K, NULL, NULL)) {
+>                 __free_page(page);
+>                 return NULL;
+>         }
+> diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
+> index eec82775c5bf..6add012532a0 100644
+> --- a/virt/kvm/kvm_main.c
+> +++ b/virt/kvm/kvm_main.c
+> @@ -436,6 +436,7 @@ void *kvm_mmu_memory_cache_alloc(struct kvm_mmu_memor=
+y_cache *mc)
+>         BUG_ON(!p);
+>         return p;
+>  }
+> +EXPORT_SYMBOL_GPL(kvm_mmu_memory_cache_alloc);
+>  #endif
+>
+>  static void kvm_vcpu_init(struct kvm_vcpu *vcpu, struct kvm *kvm, unsign=
+ed id)
+> --
+> 2.47.2
+>
+>
 
