@@ -1,146 +1,246 @@
-Return-Path: <kvm+bounces-55231-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-55232-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id C7CEEB2EBD5
-	for <lists+kvm@lfdr.de>; Thu, 21 Aug 2025 05:18:48 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1332FB2EBF2
+	for <lists+kvm@lfdr.de>; Thu, 21 Aug 2025 05:31:07 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 798705E2372
-	for <lists+kvm@lfdr.de>; Thu, 21 Aug 2025 03:18:48 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 2438D1BC7345
+	for <lists+kvm@lfdr.de>; Thu, 21 Aug 2025 03:31:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D6FF32E4242;
-	Thu, 21 Aug 2025 03:18:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5BB662E6126;
+	Thu, 21 Aug 2025 03:30:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="jOooZLj+";
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=lists.infradead.org header.i=@lists.infradead.org header.b="2ZxzVYUV";
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="koOuzd7g";
-	dkim=neutral (0-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="Bw06UKcc"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="EolSgQFA"
 X-Original-To: kvm@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.14])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D666E2E0927;
-	Thu, 21 Aug 2025 03:17:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 96E922E5B03;
+	Thu, 21 Aug 2025 03:30:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.14
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755746279; cv=none; b=ECKf6mneXKgXFwQI9Mme941Fp1gRskmd86NNO7r74h9OXuEeIWKal5QVA3b0j3ZVBXbjoPxspk8MjDlnlLbUA4skB5CaCTezc1J5P4a/njoWsnSKXfK5A6tAJ+cs8tHw4MX18At70Wg9iBN6go2bDsaYQztMsOhKKDVjvHK3mzQ=
+	t=1755747036; cv=none; b=u9C4WYoM/GX4hS1BLOXz+CIoc2oxugBiv4rnu58QIs84kXgvMVZU4Lrcj+ZpLCEk8rad/8BSqw0JlYvqASKZg0FVAizEmuCSIUqFFKVX8RbTzSJfsNAY+i+NejX+c8jwd+0GSYB4FPR3bSNvmHb8V1RAt2jupSQm+bxejfmVe68=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755746279; c=relaxed/simple;
-	bh=pIZZGYlHJcwUGIEu2mrA8wTduJ6lRtlRg1MiSy3SH4k=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=sfYWa6EQnfoqGbzQ7UjiwiIHEr3/trWB8x3gYonbFFgQpK4iJZQaDgLhE/qDiZCdQY1lYNV+WgEVKhbMUCwgQj+QzOpTEYVXSFaNBOqrtpvAnsYER1CDlp575IHGC+5VEfc2zHV0PizY6PnRtwKvkRm5Sa8QFTyKQXLDnXvwnms=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=jOooZLj+; dkim=fail (2048-bit key) header.d=lists.infradead.org header.i=@lists.infradead.org header.b=2ZxzVYUV reason="signature verification failed"; dkim=fail (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=koOuzd7g reason="signature verification failed"; dkim=neutral (0-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=Bw06UKcc; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B005CC113D0;
-	Thu, 21 Aug 2025 03:17:54 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1755746278;
-	bh=pIZZGYlHJcwUGIEu2mrA8wTduJ6lRtlRg1MiSy3SH4k=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:List-Id:
-	 List-Unsubscribe:List-Archive:List-Post:List-Help:List-Subscribe:
-	 From;
-	b=jOooZLj+YY+aMj55dFok5m9llv1ugcrpy1AnF3OnHvsDm2gTVE352eR81/Z+EGf9q
-	 Cf2KY06W8UScjXMHJjJnNHU9TVGBFVI6AGPxfpeV6aeY+97FBlKcP+gxupn+L7PuQa
-	 r7gmWcgUNxb9JEtxRKEhnQwI/IglV/Nus7Q0208bSS+ArdxHHFxwMxoOG1VKjHstlI
-	 0y28zXaPFNSQYyRf8HoncVQj+stLzg3iryXzJ4hRDZdJxXubJs9dPgUlJMJR7yhw60
-	 Oe4SOqsA0CauzfF+3rp2Aae75vydTlh2G8BanL6PzBVH87nf9qE+jOalab4bSJRYBY
-	 Vif1tHQMLP+MQ==
-From: guoren@kernel.org
-To: guoren@kernel.org,
-	troy.mitchell@linux.dev,
-	anup@brainfault.org,
-	atish.patra@linux.dev,
-	paul.walmsley@sifive.com,
-	palmer@dabbelt.com,
-	aou@eecs.berkeley.edu,
-	alex@ghiti.fr
-Cc: fangyu.yu@linux.alibaba.com,
-	guoren@linux.alibaba.com,
-	kvm-riscv@lists.infradead.org,
-	kvm@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	linux-riscv@lists.infradead.org
-Subject: [PATCH V2] RISC-V: KVM: Write hgatp register with valid mode bits
-Date: Wed, 20 Aug 2025 23:17:19 -0400
-Message-Id: <20250818054207.21532-1-fangyu.yu@linux.alibaba.com>
-X-Mailer: git-send-email 2.40.1
-In-Reply-To: <20250821031719.2366017-1-guoren@kernel.org>
-References: <CAJF2gTQFWJzHhRoQ-oASO9nn1kC0dv+NuK-DD=JgfeHE90RWqw@mail.gmail.com>
- <20250821031719.2366017-1-guoren@kernel.org>
-Received: from bombadil.infradead.org (bombadil.infradead.org [198.137.202.133]) (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits)) (No client certificate requested) by smtp.lore.kernel.org (Postfix) with ESMTPS id 99F14CA0EE4 for <linux-riscv@archiver.kernel.org>; Mon, 18 Aug 2025 05:42:47 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lists.infradead.org; s=bombadil.20210309; h=Sender: Content-Transfer-Encoding:Content-Type:List-Subscribe:List-Help:List-Post: List-Archive:List-Unsubscribe:List-Id:MIME-Version:Message-Id:Date:Subject:Cc :To:From:Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From: Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:In-Reply-To:References: List-Owner; bh=V/Xvw3Ej+7ZPNCPsGP++tgMpKMekL0hhuM8UIwiPd5Y=; b=2ZxzVYUVFi37Yt jF7MIm78837f27APbAPlvfpkdaMJWzjexabx9AD8ZAonS3zJuWlOE1V1KdFXv3NzCW/4OxKLK28My iBQo2YXcFrVn6B/W32Cx4kULqj/3bJln7lIkBy6xx8a9cBT1CHrkRRDltDg4mkITpUX3M+GvdY4OT NXjbntvEwuq7DQ2RABwvL6nSsyhqxNI3pOsLK4Cm8a/bLWkv+BJzhoLHexWlkmaW+GG66u4AAQnYu E5QoEymQ1zI/yNPiGl3c2X1zlMfvfaUG+FqQDR8ZjghL9oKWgSYZoFIWHcuxd68JDhj+DKZsVdAtf dpa7pkCixetHi2UQ91xw==;
-Received: from localhost ([::1] helo=bombadil.infradead.org) by bombadil.infradead.org with esmtp (Exim 4.98.2 #2 (Red Hat Linux)) id 1unsdj-00000006ZQx-2OO3; Mon, 18 Aug 2025 05:42:39 +0000
-Received: from desiato.infradead.org ([2001:8b0:10b:1:d65d:64ff:fe57:4e05]) by bombadil.infradead.org with esmtps (Exim 4.98.2 #2 (Red Hat Linux)) id 1unsdh-00000006ZQR-2Mit; Mon, 18 Aug 2025 05:42:37 +0000
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=infradead.org; s=desiato.20200630; h=Content-Transfer-Encoding:MIME-Version :Message-Id:Date:Subject:Cc:To:From:Sender:Reply-To:Content-Type:Content-ID: Content-Description:In-Reply-To:References; bh=W4lHP3UjuHeCBUcDEIF9ZeVamIkRm6NrjeDmREzHBUM=; b=koOuzd7gtEiuvbX6QWUdEEfxep wAoSpz+VU+Pvg8z5YcgXjpCuSUBt9vOfCZYlk2EHiOJdkxBoA0L97jRRXlMA08bhZvQREefopKM45 7fUXMPpddLtAY3wEzin8HeCmpDUj80aphi2Cq7MjsUt7sNP+ouV2apWc+n6iQPf+1Zr/njiwynjsA 9XaYUFDot8JKd7WB3rjbi0qN8uYGTArj+/9GuOkTUvtEvRFOmEgpo6PNgVMZmMXSuv6PWx/ptlUt0 9gJ+ZmGYWq7GiufiH/bvt9BgskruRB3jP+/R+3wcjclP+NpdaEVNvDxLSq+y0KUgNpXOEwzAQCi9W UE/CQv4A==;
-Received: from out30-131.freemail.mail.aliyun.com ([115.124.30.131]) by desiato.infradead.org with esmtps (Exim 4.98.2 #2 (Red Hat Linux)) id 1unsdd-0000000HGDo-03SR; Mon, 18 Aug 2025 05:42:35 +0000
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.alibaba.com; s=default; t=1755495738; h=From:To:Subject:Date:Message-Id:MIME-Version; bh=W4lHP3UjuHeCBUcDEIF9ZeVamIkRm6NrjeDmREzHBUM=; b=Bw06UKccpjeqr3QGXKendqsuoZ4upfWC07EDlSUZNyTv+ry0pLXfAM2oL4nyomAVBWM74WLkZRF0F0c5dctIJ454Neh1G659OADELFbLykfqQXtkwgyK9Dq3g76FZ1LI+amflRyfHSNziddWLTU/Qqp8JmdV1lxO4C99atObuJw=
-Received: from localhost.localdomain(mailfrom:fangyu.yu@linux.alibaba.com fp:SMTPD_---0Wlvjb0u_1755495732 cluster:ay36) by smtp.aliyun-inc.com; Mon, 18 Aug 2025 13:42:14 +0800
-X-Mailer: git-send-email 2.39.3 (Apple Git-146)
+	s=arc-20240116; t=1755747036; c=relaxed/simple;
+	bh=hGZnT5MfWeTZd2SOXfqoQAwccyPDnsuXk0ZwAoQRF5c=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=YhxPuALF/qFPENXwJhnTCRW6baeLcDnPAOZqNURiJxe87NJRwuMFsbCJT8eOiwBGu+QcNmiiV9Gb58W5B1fjajGVOeSoCj/Fn+rPmjkO1fraH659SvwJbGuohFL0h8UxSaBhDM3QUXDLBPodYLt4O0MbA1voZmBnoB2k4PdEXTU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=EolSgQFA; arc=none smtp.client-ip=198.175.65.14
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1755747035; x=1787283035;
+  h=message-id:date:mime-version:subject:to:cc:references:
+   from:in-reply-to:content-transfer-encoding;
+  bh=hGZnT5MfWeTZd2SOXfqoQAwccyPDnsuXk0ZwAoQRF5c=;
+  b=EolSgQFAViq1murkZ7iKgLAvrKyi7WanJgCPODQstOMuMHU8p94uCJL/
+   uFhLjeeV9tdhAdgKnOlVTip4LVZO51JDPYesOQnuVNmrJV+2emLPHWXT8
+   1+GNXj8nVjfcfK77+iiAmdSxanPTjPHDpyV3Na9KSqKnXj2mIqr/cJuuq
+   wVKsz4uoQ4cA91aKfjqSSGguRAOvQuk02F7Ral/SXeC81QCMz7XygLJyL
+   JtWd1pmXZ3qA3H5erqEFuQqPECxssnLemNl8tOC5hfgJZiUmd0XSYggqE
+   L9k8eHS41GFRFoBMrydjW7w+VPB/y4mv3QOpdbl6w5SgbNh67al67OxYe
+   Q==;
+X-CSE-ConnectionGUID: TyPb6Gx2TwShSA0LRbBh/g==
+X-CSE-MsgGUID: Dvr5pBsrRfWSQTGK7eormQ==
+X-IronPort-AV: E=McAfee;i="6800,10657,11527"; a="61854988"
+X-IronPort-AV: E=Sophos;i="6.17,306,1747724400"; 
+   d="scan'208";a="61854988"
+Received: from fmviesa007.fm.intel.com ([10.60.135.147])
+  by orvoesa106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 20 Aug 2025 20:30:34 -0700
+X-CSE-ConnectionGUID: BjYSIxRBS9S7SxhZiPa1Gg==
+X-CSE-MsgGUID: Q4gvv4UxT6mmQBCIdPa+0A==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.17,306,1747724400"; 
+   d="scan'208";a="167806701"
+Received: from unknown (HELO [10.238.0.107]) ([10.238.0.107])
+  by fmviesa007-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 20 Aug 2025 20:30:29 -0700
+Message-ID: <d84b792e-8d26-49c2-9e7c-04093f554f8a@linux.intel.com>
+Date: Thu, 21 Aug 2025 11:30:27 +0800
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-BeenThere: linux-riscv@lists.infradead.org
-X-Mailman-Version: 2.1.34
-Precedence: list
-List-Archive: <http://lists.infradead.org/pipermail/linux-riscv/>
-List-Post: <mailto:linux-riscv@lists.infradead.org>
-List-Help: <mailto:linux-riscv-request@lists.infradead.org?subject=help>
-Content-Type: text/plain; charset="us-ascii"
-Sender: "linux-riscv" <linux-riscv-bounces@lists.infradead.org>
-Errors-To: linux-riscv-bounces+linux-riscv=archiver.kernel.org@lists.infradead.org
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 0/2] x86/kvm: Force legacy PCI hole as WB under SNP/TDX
+To: Sean Christopherson <seanjc@google.com>
+Cc: Vishal Annapurve <vannapurve@google.com>,
+ Nikolay Borisov <nik.borisov@suse.com>, Jianxiong Gao <jxgao@google.com>,
+ "Borislav Petkov (AMD)" <bp@alien8.de>,
+ Dave Hansen <dave.hansen@linux.intel.com>,
+ Dionna Glaze <dionnaglaze@google.com>, "H. Peter Anvin" <hpa@zytor.com>,
+ jgross@suse.com, "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>,
+ kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+ Ingo Molnar <mingo@redhat.com>, pbonzini@redhat.com,
+ Peter Gonda <pgonda@google.com>, Thomas Gleixner <tglx@linutronix.de>,
+ Tom Lendacky <thomas.lendacky@amd.com>,
+ Vitaly Kuznetsov <vkuznets@redhat.com>, x86@kernel.org,
+ Rick Edgecombe <rick.p.edgecombe@intel.com>, jiewen.yao@intel.com
+References: <CAMGD6P1Q9tK89AjaPXAVvVNKtD77-zkDr0Kmrm29+e=i+R+33w@mail.gmail.com>
+ <0dc2b8d2-6e1d-4530-898b-3cb4220b5d42@linux.intel.com>
+ <4acfa729-e0ad-4dc7-8958-ececfae8ab80@suse.com> <aIDzBOmjzveLjhmk@google.com>
+ <550a730d-07db-46d7-ac1a-b5b7a09042a6@linux.intel.com>
+ <aIeX0GQh1Q_4N597@google.com>
+ <ad616489-1546-4f6a-9242-a719952e19b6@linux.intel.com>
+ <CAGtprH9EL0=Cxu7f8tD6rEvnpC7uLAw6jKijHdFUQYvbyJgkzA@mail.gmail.com>
+ <20641696-242d-4fb6-a3c1-1a8e7cf83b18@linux.intel.com>
+ <697aa804-b321-4dba-9060-7ac17e0a489f@linux.intel.com>
+ <aKYMQP5AEC2RkOvi@google.com>
+Content-Language: en-US
+From: Binbin Wu <binbin.wu@linux.intel.com>
+In-Reply-To: <aKYMQP5AEC2RkOvi@google.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
 
-From: fangyu.yu@linux.alibaba.com
-
-From: Fangyu Yu <fangyu.yu@linux.alibaba.com>
-
-According to the RISC-V Privileged Architecture Spec, when MODE=Bare
-is selected,software must write zero to the remaining fields of hgatp.
-
-We have detected the valid mode supported by the HW before, So using a
-valid mode to detect how many vmid bits are supported.
-
-Signed-off-by: Fangyu Yu <fangyu.yu@linux.alibaba.com>
-
----
-Changes in v2:
-- Fixed build error since kvm_riscv_gstage_mode() has been modified.
----
- arch/riscv/kvm/vmid.c | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
-
-diff --git a/arch/riscv/kvm/vmid.c b/arch/riscv/kvm/vmid.c
-index 3b426c800480..5f33625f4070 100644
---- a/arch/riscv/kvm/vmid.c
-+++ b/arch/riscv/kvm/vmid.c
-@@ -14,6 +14,7 @@
- #include <linux/smp.h>
- #include <linux/kvm_host.h>
- #include <asm/csr.h>
-+#include <asm/kvm_mmu.h>
- #include <asm/kvm_tlb.h>
- #include <asm/kvm_vmid.h>
- 
-@@ -28,7 +29,7 @@ void __init kvm_riscv_gstage_vmid_detect(void)
- 
- 	/* Figure-out number of VMID bits in HW */
- 	old = csr_read(CSR_HGATP);
--	csr_write(CSR_HGATP, old | HGATP_VMID);
-+	csr_write(CSR_HGATP, (kvm_riscv_gstage_mode << HGATP_MODE_SHIFT) | HGATP_VMID);
- 	vmid_bits = csr_read(CSR_HGATP);
- 	vmid_bits = (vmid_bits & HGATP_VMID) >> HGATP_VMID_SHIFT;
- 	vmid_bits = fls_long(vmid_bits);
--- 
-2.49.0
 
 
-_______________________________________________
-linux-riscv mailing list
-linux-riscv@lists.infradead.org
-http://lists.infradead.org/mailman/listinfo/linux-riscv
+On 8/21/2025 1:56 AM, Sean Christopherson wrote:
+> On Wed, Aug 20, 2025, Binbin Wu wrote:
+>> On 8/20/2025 6:03 PM, Binbin Wu wrote:
+>>>>>> Presumably this an EDK2 bug?  If it's not an EDK2 bug, then how is the kernel's
+>>>>>> ACPI driver supposed to know that some ranges of SystemMemory must be mapped UC?
+>>> Checked with Jiewen offline.
+>>>
+>>> He didn't think there was an existing interface to tell the OS to map a
+>>> OperationRegion of SystemMemory as UC via the ACPI table. He thought the
+>>> OS/ACPI driver still needed to rely on MTRRs for the hint before there was an
+>>> alternative way.
+>>>
+>>>>> According to the ACPI spec 6.6, an operation region of SystemMemory has no
+>>>>> interface to specify the cacheable attribute.
+>>>>>
+>>>>> One solution could be using MTRRs to communicate the memory attribute of legacy
+>>>>> PCI hole to the kernel.
+> So IIUC, there are no bugs anywhere, just a gap in specs that has been hidden
+> until now :-(
+>
+>>>>> But during the PUCK meeting last week, Sean mentioned
+>>>>> that "long-term, firmware should not be using MTRRs to communicate anything to
+>>>>> the kernel." So this solution is not preferred.
+>>>>>
+>>>>> If not MTRRs, there should be an alternative way to do the job.
+>>>>> 1. ACPI table
+>>>>>       According to the ACPI spec, neither operation region nor 32-Bit Fixed Memory
+>>>>>       Range Descriptor can specify the cacheable attribute.
+>>>>>       "Address Space Resource Descriptors" could be used to describe a memory range
+>>>>>       and the they can specify the cacheable attribute via "Type Specific Flags".
+>>>>>       One of the Address Space Resource Descriptors could be added to the ACPI
+>>>>>       table as a hint when the kernel do the mapping for operation region.
+>>>>>       (There is "System Physical Address (SPA) Range Structure", which also can
+>>>>>       specify the cacheable attribute. But it's should be used for NVDIMMs.)
+>>>>> 2. EFI memory map descriptor
+>>>>>       EFI memory descriptor can specify the cacheable attribute. Firmware can add
+>>>>>       a EFI memory descriptor for the TPM TIS device as a hint when the kernel do
+>>>>>       the mapping for operation region.
+>>>>>
+>>>>> Operation region of SystemMemory is still needed if a "Control Method" of APCI
+>>>>> needs to access a field, e.g., the method _STA. Checking another descriptor for
+>>>>> cacheable attribute, either "Address Space Resource Descriptor" or "EFI memory
+>>>>> map descriptor" during the ACPI code doing the mapping for operation region
+>>>>> makes the code complicated.
+>>>>>
+>>>>> Another thing is if long-term firmware should not be using MTRRs to to
+>>>>> communicate anything to the kernel. It seems it's safer to use ioremap() instead
+>>>>> of ioremap_cache() for MMIO resource when the kernel do the mapping for the
+>>>>> operation region access?
+>>>>>
+>>>> Would it work if instead of doubling down on declaring the low memory
+>>>> above TOLUD as WB, guest kernel reserves the range as uncacheable by
+>>>> default i.e. effectively simulating a ioremap before ACPI tries to map
+>>>> the memory as WB?
+>>> It seems as hacky as this patch set?
+>>>
+>>>
+>> Hi Sean,
+>>
+>> Since guest_force_mtrr_state() also supports to force MTRR variable ranges,
+>> I am wondering if we could use guest_force_mtrr_state() to set the legacy PCI
+>> hole range as UC?
+>>
+>> Is it less hacky?
+> Oh!  That's a way better idea than my hack.  I missed that the kernel would still
+> consult MTRRs.
+>
+> Compile tested only, but something like this?
+>
+> diff --git a/arch/x86/kernel/kvm.c b/arch/x86/kernel/kvm.c
+> index 8ae750cde0c6..45c8871cdda1 100644
+> --- a/arch/x86/kernel/kvm.c
+> +++ b/arch/x86/kernel/kvm.c
+> @@ -933,6 +933,13 @@ static void kvm_sev_hc_page_enc_status(unsigned long pfn, int npages, bool enc)
+>   
+>   static void __init kvm_init_platform(void)
+>   {
+> +       u64 tolud = e820__end_of_low_ram_pfn() << PAGE_SHIFT;
+> +       struct mtrr_var_range pci_hole = {
+> +               .base_lo = tolud | X86_MEMTYPE_UC,
+> +               .mask_lo = (u32)(~(SZ_4G - tolud - 1)) | BIT(11),
+> +               .mask_hi = (BIT_ULL(boot_cpu_data.x86_phys_bits) - 1) >> 32,
+> +       };
+> +
+
+This value of tolud  may not meet the range size and alignment requirement for
+variable MTRR.
+
+Variable MTRR has requirement for range size and alignment:
+For ranges greater than 4 KBytes, each range must be of length 2^n and its base
+address must be aligned on a 2^n boundary, where n is a value equal to or
+greater than 12. The base-address alignment value cannot be less than its length.
+
+In my setup, the value of tolud is 0x7FF7C000, it requires 3 variable MTRRs to
+meet the requirement, i.e.,
+- 7FF7 C000  ~   7FF8 0000
+- 7FF8 0000  ~   8000 0000
+- 8000 0000  ~ 1 0000 0000
+
+I checks the implementation in EDK2, in order to fit the legacy PCI hole into
+one variable MTRR, it has some assumption to truncate the size and round up the
+base address in PlatformQemuUc32BaseInitialization():
+     ...
+     ASSERT (
+       PlatformInfoHob->HostBridgeDevId == INTEL_Q35_MCH_DEVICE_ID ||
+       PlatformInfoHob->HostBridgeDevId == INTEL_82441_DEVICE_ID
+       );
+     ...
+     //
+     // Start with the [LowerMemorySize, 4GB) range. Make sure one
+     // variable MTRR suffices by truncating the size to a whole power of two,
+     // while keeping the end affixed to 4GB. This will round the base up.
+     //
+     PlatformInfoHob->Uc32Size = GetPowerOfTwo32 ((UINT32)(SIZE_4GB - PlatformInfoHob->LowMemory));
+     PlatformInfoHob->Uc32Base = (UINT32)(SIZE_4GB - PlatformInfoHob->Uc32Size);
+     //
+     // Assuming that LowerMemorySize is at least 1 byte, Uc32Size is at most 2GB.
+     // Therefore Uc32Base is at least 2GB.
+     //
+     ASSERT (PlatformInfoHob->Uc32Base >= BASE_2GB);
+
+I am not sure if KVM can do such assumption.
+Otherwise, KVM needs to calculate the ranges to meet the requirement. :(
+
+
+>          if (cc_platform_has(CC_ATTR_GUEST_MEM_ENCRYPT) &&
+>              kvm_para_has_feature(KVM_FEATURE_MIGRATION_CONTROL)) {
+>                  unsigned long nr_pages;
+> @@ -982,8 +989,12 @@ static void __init kvm_init_platform(void)
+>          kvmclock_init();
+>          x86_platform.apic_post_init = kvm_apic_init;
+>   
+> -       /* Set WB as the default cache mode for SEV-SNP and TDX */
+> -       guest_force_mtrr_state(NULL, 0, MTRR_TYPE_WRBACK);
+> +       /*
+> +        * Set WB as the default cache mode for SEV-SNP and TDX, with a single
+> +        * UC range for the legacy PCI hole, e.g. so that devices that expect
+> +        * to get UC/WC mappings don't get surprised with WB.
+> +        */
+> +       guest_force_mtrr_state(&pci_hole, 1, MTRR_TYPE_WRBACK);
+>   }
+>   
+>   #if defined(CONFIG_AMD_MEM_ENCRYPT)
 
 
