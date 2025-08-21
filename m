@@ -1,202 +1,164 @@
-Return-Path: <kvm+bounces-55270-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-55271-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id AD849B2F6BE
-	for <lists+kvm@lfdr.de>; Thu, 21 Aug 2025 13:33:03 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id C2AA9B2F6FA
+	for <lists+kvm@lfdr.de>; Thu, 21 Aug 2025 13:45:59 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id ADA4D7A8F7C
-	for <lists+kvm@lfdr.de>; Thu, 21 Aug 2025 11:31:23 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id CF0BD721194
+	for <lists+kvm@lfdr.de>; Thu, 21 Aug 2025 11:43:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0FD5D30F7E8;
-	Thu, 21 Aug 2025 11:32:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="LfDOn47v"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3214230F7E4;
+	Thu, 21 Aug 2025 11:43:16 +0000 (UTC)
 X-Original-To: kvm@vger.kernel.org
-Received: from NAM10-MW2-obe.outbound.protection.outlook.com (mail-mw2nam10on2067.outbound.protection.outlook.com [40.107.94.67])
+Received: from vps-ovh.mhejs.net (vps-ovh.mhejs.net [145.239.82.108])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D88BA1FBEA6;
-	Thu, 21 Aug 2025 11:32:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.94.67
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755775963; cv=fail; b=putD4gKCXdHIpYRsByLsdcybIL3eR68RYT6cNpUmvu01Xl4/2OI1gQggVYmcFBLqRgj01H8MeqHkqEpRrWMVhPUNNSDhYU++avRRwfjLwKAoNg2G8uURRp7TaQ3urrSAdIO1tDR+LgXCHxl1IcI9wQFcaTPnPHgmtZ1CbWqSKQM=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755775963; c=relaxed/simple;
-	bh=IoBCMq8iDYrRvH8NRn5VoeCu3/TpIh5HiNXbWPO23Nc=;
-	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
-	 Content-Type:MIME-Version; b=CdKRVmkFivrHDrj6og3v8Jj41WIJCo4lIPJ9oqmdkck/l7/9JxzvWdWlcUAPEIbpNq5jQydQmoelRxBfdZVy0CIK2AvSTQoAFqt2sVYjVqxuRVHakQV0Psr72xZYaAet27IIpr/7ehTde8GChp2iW59atqRI4p6airwxUqHG56U=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=LfDOn47v; arc=fail smtp.client-ip=40.107.94.67
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=v2K7Euv1vOfDhdI4lZX5LGmUQvbsda+ht3kYa1cr9deePt9DmvEt5fnzb1WjRXUXrK/67toGq1ECwidxxBWzvBV9HwJRVF2fait37bTzao1+1CBeGQKZSk7KIKO43A1S4XNTQGYVlWVXY3X1F2f4T6pRsaMpHeX9fMHNdxTqEwFcWRZON4syNnEpgtBweUpgSb1PjHQYGnWyo+SbaPOS1fJx0BIl6ziglXiNdDadYO5QwFuBqYPtZUobvUbnBPRaEYLlr+fjgcRdV/2maXm0nK+4tTgIGS0xIaZMQ7+pzKzgkCi6jvusz4M17qa/Ms0OZF+Sn9mf6/PAtjcKMnC+cg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=xCsb+OQv9K8+hYO1CvmgTEgvssWe9pqBzBSIhi28Abw=;
- b=jcDC+NVieJjLzqPthmrS/yBXwCOw66eoHyoCx5qnu1TigTwHTAqW3kKxeBB/lgznvdpZ7uZQ609MnGRNEsusNooaJMI1pT9QYAum9AQOyUQt9gT/GNffmWjSZZOHayNj2uIMQ5onYDCfJpbMe+5tSDHpbej8pCzxpmYT6OEGq/yBE3omb1ILuxLHVN8ltjDXXk5LryY98aKoec5dDy2hx/NIb6R5jVonfsDe3u7Rqo6dfypBn55eeUMolrbpvYueYOkdPLwOKcnn3qFJXi7ZcIrP0epgRxxECwhsdBljOETVfE+EIpKQTE++TfHUZ2liFCXrd0NNCAjtRqN+o1/jVw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
- header.d=amd.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=xCsb+OQv9K8+hYO1CvmgTEgvssWe9pqBzBSIhi28Abw=;
- b=LfDOn47vpOSKsyv+os7sH2rRDMa7pEewFgaDhIVg5/YjQgY9iQ7104TSN3OlyhoofpuHpm51hHUH9rcGWdOIMRkmIB2/k4/AS1S94WwZGFw1yWL9zE5SgD545NDanWbQ2WJajMuDWagc0ZAS9UZXEuJgQZEDYROr8rUZKBSC7yE=
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=amd.com;
-Received: from DS7PR12MB6048.namprd12.prod.outlook.com (2603:10b6:8:9f::5) by
- DS7PR12MB9502.namprd12.prod.outlook.com (2603:10b6:8:250::19) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.9052.14; Thu, 21 Aug 2025 11:32:36 +0000
-Received: from DS7PR12MB6048.namprd12.prod.outlook.com
- ([fe80::6318:26e5:357a:74a5]) by DS7PR12MB6048.namprd12.prod.outlook.com
- ([fe80::6318:26e5:357a:74a5%4]) with mapi id 15.20.9052.013; Thu, 21 Aug 2025
- 11:32:36 +0000
-Message-ID: <7deb2d90-8a42-480b-b4e2-f784927160f8@amd.com>
-Date: Thu, 21 Aug 2025 17:02:17 +0530
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v5 4/4] iommu/amd: Skip enabling command/event buffers for
- kdump
-To: Ashish Kalra <Ashish.Kalra@amd.com>, joro@8bytes.org,
- suravee.suthikulpanit@amd.com, thomas.lendacky@amd.com,
- Sairaj.ArunKodilkar@amd.com, herbert@gondor.apana.org.au
-Cc: seanjc@google.com, pbonzini@redhat.com, will@kernel.org,
- robin.murphy@arm.com, john.allen@amd.com, davem@davemloft.net,
- michael.roth@amd.com, iommu@lists.linux.dev, linux-kernel@vger.kernel.org,
- linux-crypto@vger.kernel.org, kvm@vger.kernel.org
-References: <cover.1753911773.git.ashish.kalra@amd.com>
- <e66b75e126fa245e126fe81ed73baffdf603369a.1753911773.git.ashish.kalra@amd.com>
-Content-Language: en-US
-From: Vasant Hegde <vasant.hegde@amd.com>
-In-Reply-To: <e66b75e126fa245e126fe81ed73baffdf603369a.1753911773.git.ashish.kalra@amd.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: PN4P287CA0119.INDP287.PROD.OUTLOOK.COM
- (2603:1096:c01:2b0::9) To DS7PR12MB6048.namprd12.prod.outlook.com
- (2603:10b6:8:9f::5)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0DFCA1E0DE2;
+	Thu, 21 Aug 2025 11:43:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=145.239.82.108
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1755776595; cv=none; b=MJoua7H7zeulW6D/0Zwd+UK5rGY3/gfUGpZ/ozdRNtiQaZ19MDOb0supPn8QU78FE2Mrw4+zb1wMrNQgV4P4QP2onFee9diOTeAKCMS4yooSu5mdrOefnHyIuxkMviBNMqvnSQhkWWxx5pueLDEvHkI6xZCbR28/DrEPX7oSF3I=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1755776595; c=relaxed/simple;
+	bh=kigwzDqGiFMTOjr6SiAyL7IDOr3EuOxW4UwjrfMANdA=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=i+P1jF+xxFAcOig8orD9mz2hFb5x0pwnNEu2BlJlFFx9K1J8tEhG/zHIBR6vt0sph+n60JF0K/L1/64YDud10MbYSvARubE4UtJToAxSNswVOzoZxA6eFw+YyV/tY9xt50FLnxH5eXRKcaHC/nD47QGuoDNOLlZ1OxMRUbf9blE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=maciej.szmigiero.name; spf=pass smtp.mailfrom=vps-ovh.mhejs.net; arc=none smtp.client-ip=145.239.82.108
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=maciej.szmigiero.name
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=vps-ovh.mhejs.net
+Received: from MUA
+	by vps-ovh.mhejs.net with esmtpsa  (TLS1.3) tls TLS_AES_128_GCM_SHA256
+	(Exim 4.98.2)
+	(envelope-from <mhej@vps-ovh.mhejs.net>)
+	id 1up3h5-00000001YQd-2COI;
+	Thu, 21 Aug 2025 13:42:59 +0200
+Message-ID: <275b4fa3-9675-4953-8766-c6cd4e5f0d57@maciej.szmigiero.name>
+Date: Thu, 21 Aug 2025 13:42:54 +0200
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: DS7PR12MB6048:EE_|DS7PR12MB9502:EE_
-X-MS-Office365-Filtering-Correlation-Id: 5f0e4ee6-2ef1-47a5-2638-08dde0a66c74
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230040|366016|1800799024|7416014|376014;
-X-Microsoft-Antispam-Message-Info:
-	=?utf-8?B?c1JiYllvbnpTaFlpYzk1MkZSMzUwc2Y1WHFveDVkbHgzWFlQNGVTZWlpWnhn?=
- =?utf-8?B?Z1VkVGRuRHFmZE53cjB1WXVaTWZZMHJFUVVCNkhhWit5TFRrcUhNcm9WZ0J0?=
- =?utf-8?B?S1FDZ2xvakVjdlFSS00wYm82SUM0Ny9BcWVGSVBFbzRiRVE0elNRdkdZOUhK?=
- =?utf-8?B?RHdVeUNJMWM3aHZ1TURmSWFGMkJTbWV5eFczZWlhbUxWMlAzcVhGdjRqSjYz?=
- =?utf-8?B?ekFMcDJuWlhqMmFjWGJKQ09WOTJ4ZHZFUVVhSUFLR1ZmNjBLaGp6czI4TWlZ?=
- =?utf-8?B?ZHpvRWF2R2IvTytSNHdGVWk3Znh1UlNldGxVUmpzMlp2RGdGNW04amRGdThx?=
- =?utf-8?B?U0VJMmNwSVRIZU1MdCtSN0NSUDJEL1B1SHI5TU5UL3hHdUlVY2svc2dWUFZj?=
- =?utf-8?B?TGx0SHRLSWJZQWdRWHBZMVp3VlFhd1R4QmREMEUreVludXhFTWhpN1ZpQWd2?=
- =?utf-8?B?MjdoWVcvWmNMMjBBRVRkUjhIaHZseXlMZXBWd1pPcFI2bzZPYVdyRlZaRGhT?=
- =?utf-8?B?MFpUaE1PQmFyeDZrcTlRWDNYQ2xmN0VUK0plQzlSeUFuVzlFSFlzSURDNU56?=
- =?utf-8?B?L2dMOU1JNlVreXhpUzVLMHVKTHBDRFJZaHJpbkxaYnRrbENtTDA5YWhHazZu?=
- =?utf-8?B?Rm5JSkl3c3FYd1h0MlEzU3hLTmJFb0gwNGJCY08xcm5IaWhiYVpIMUlmTmRo?=
- =?utf-8?B?MHc0OHdaMUlSVk5xTXZ0VjMzNllHWHc0UTNEcGc5OTVsamJ6dnh0L3lnWWFt?=
- =?utf-8?B?Z2JmOUVtWDY4ZGtlWTFiNjBzU2NEOWJhU0ZQSmxQZ0RjNENNUjlzSTlHckJQ?=
- =?utf-8?B?N0VKQXowTHkzL0YrWnc5Ym43NjhMSTJsenFQMU56WDVzOTNmTFJYalJlUGw1?=
- =?utf-8?B?VTlXcEdnMnpSZTJRS08yYUxQd1FsaFlEdzdEQ09sQTNuZ3lDSUZVYVUvZ3Zl?=
- =?utf-8?B?TEhJRkF6dkdlUDJINFY4V1pYbmxoZlY2RDRFRFprTnhJeVVmcGRGOWlUWjls?=
- =?utf-8?B?YWJhTnVOaCsrbHhJTDJOKzdoMk82SlcxNGt2eWdFckxDNmZzbDBjWFJERWMx?=
- =?utf-8?B?K2Q0eDNZWUhnZm1ZcnJwS21zVWd0SVAzOUZPL2MxZlZ3YlN4SjdGVlNNQXpq?=
- =?utf-8?B?NGVQWUtCRzFjR1hGZDY4eW9ob00rMmFudFcrVi9yS0FsaWI3RFV2NC9udXdq?=
- =?utf-8?B?VnRvc0ZyYlR1TlNLZU5NODlqMlBmNVA2NmVsZDBtZithNTFpQ0l2MEZEaXV3?=
- =?utf-8?B?U09wTURsWHNTQzRQYWJlSTRQcEt3VnBROFJNM3RkRGk5R01sUVZxWXdTV3A2?=
- =?utf-8?B?Qk9ORFh0ckhWdmdVSzc1cnBWV3V6Q2JSdmdULzJKMm5OeEoxK3poZkx3R0I4?=
- =?utf-8?B?Y2ZhbnoyVjZ5eGkxOG5WTkZQMDBHc3lCQW9zTGhRYWpxbGJ4QmlodzFEaFJG?=
- =?utf-8?B?Y002REpKZGxQUzFYeGRHcjA4VG80U3ZaTzdvclBiNTFQZzJFUXlqbWE5UDhy?=
- =?utf-8?B?bWxQYnR2d0pMbmFJZCsrbUpwRGQrbEZ5TDZSSEVZU1JHU3hHRWZ2Lzc0RzFo?=
- =?utf-8?B?V0I1Nmk5aldia2FCSnY1ejVNSWdRZWpvQXZNVG5hcVo0aGV1RjhWRnJaTnFQ?=
- =?utf-8?B?Wkh2T3pvZzBiWGNnc2I4Vk5HNHlSU3FhbjlzODBWaVBsYzFveE01Z2QzRUxY?=
- =?utf-8?B?TmxFOFhhbWc1TTI3VE1OWktMaTg2ZElsOXlkcXdMblZMc3pOZTFSTHBpVXNz?=
- =?utf-8?B?eUVXKzd0ZXZFWGtQQ3hqT2hyZ1FBZzh5cVovdzhUWnJMUGMwMUR3MkFFWUp0?=
- =?utf-8?B?L0hOT0N3QytXQlphSnpQQ2dIYk1Lb0ZvRTlqcUwyeDBhSU5xK1A2Q1Jpd3M4?=
- =?utf-8?B?djNjSGdHN3lVcXB2VXQ5c3FYaGN2NFJ1R3hHOE84N3pHQTBBV051bWNTdjd4?=
- =?utf-8?Q?8uVNc8/vdBU=3D?=
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DS7PR12MB6048.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(1800799024)(7416014)(376014);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?utf-8?B?eTJtd09RUGZOUEdKR1RibTRVVzFSenZOWUxnRGdLNFNTNEZyNzlSMklzWDFX?=
- =?utf-8?B?NTl0enUyNWdWRUtjaUcrM29rSWtLWndQZXNndmNHd2tCQVRPVmJqdDRvM1FO?=
- =?utf-8?B?UjZnTXlLQXdLVzczcDRIUS9Nbk5zalVFNldEU2pWZFBhTmNDZXZueVdkakF1?=
- =?utf-8?B?eHdvOE1jQTN6MjlERVVsRWpNcUZTSmN2N1I5TlBaRUx2b2tDNERXSFQ1dVpo?=
- =?utf-8?B?cmFnSExTTmdoMG1idmZXb1NGU1g3ZWNRT0MwUVh4Vy9pOU9nYnBrSkVzbmI4?=
- =?utf-8?B?MnpSN29qU1JMTkJYTE1lc2tjVHJIQmR0Q3NNOGlNZHNSQjZRUjdIQnRLWmVO?=
- =?utf-8?B?Vm9HclZ0dy8rOHk4ZWdIRE9hdTcxb3BkMVdlTFA0UDlSM01PWHVFWnhkblFE?=
- =?utf-8?B?V1hUMEJWYkU0UXc0ZEFLdlA2RlJhTHV0d29OWHlva01pdmZyQzdvWEVQM0Rq?=
- =?utf-8?B?WU5RdDZIVWpMMkNGTkpGdkFQYUpuak5zZFRHSXdGQmVmVExIVU5SMTVML2RJ?=
- =?utf-8?B?d2Q1eTlEejBWNW1oNWZha1ZCdk9MVm1HWUZ0L2MzYzZyVGtrK3hJYTRBMHJB?=
- =?utf-8?B?akFBTDJDVVp1MXNOM1d0YjFFZExOY0RqK0RjVkxFUXRYeHV2bWJrak9pbzY0?=
- =?utf-8?B?YnNWaG8raGVJWWN3NWZuRkQzYkxYYk80anNoSFZ5eE9sZ0xubThLbVh2QWcw?=
- =?utf-8?B?elh4b2daUkd1WG5vdEFGMWRxNmY2Yk1MRk5STTF3MUdFTHpWcjEyRHNHYmUz?=
- =?utf-8?B?MWNiY1cvOHZVUGtlL1ZsaWR6cVhtVVZSOVpjY1lKZ05McWcrV2p4a2k0Z1Nl?=
- =?utf-8?B?bU9rZ3FmRk9qc0o3emNYUDlsSHUvUVNMUmRwMm1oR1ZZL3N2aUxvK3lNT1ZW?=
- =?utf-8?B?c21RN1lHVGIvSkxhb3JjTzdJMlp4aDFYdHZUV3JhbnBQcTM1UENCRSt4aUhJ?=
- =?utf-8?B?eDRoUTcxeGpIbytzbi9rRHBDMTNvcXBjL3VJNVc1MVdtWU1FQVl1YlFtR1Z5?=
- =?utf-8?B?aEpZN1lhR2l6SnF6NGpCa2wxUEhHdWR3N3VwQnZxcEF3K3dKRTM0dDYveWVF?=
- =?utf-8?B?aWtvUzFGMTZYOFBJL1JHeEIzbkd4RnVTdDZTZGMzUXZNd2ZJUE1Hdk5nTjNr?=
- =?utf-8?B?b2ZpdlpoeGxjTk9IMU5qUVNHRjQ0NzdTNFVtNUc1cnJsZVNWbk02aXNIR1Vk?=
- =?utf-8?B?UG04Q052SVl6MlZYdVFqcElFK1hKdmYwVHhKNTNYUjlnbElsUDFvV3prM3Q1?=
- =?utf-8?B?anQ5M01pSXRwNHc4TXI5YnBXVFB6WlYydE41dTNVMElsOWZLYUJmMUVqT2p5?=
- =?utf-8?B?UC9UR0llczRKOFo0a0JyMWtCR2JCUXlTMWMxLzFZNldLbVpyc0VjY002V1d5?=
- =?utf-8?B?d2hHSnNUQ0s1TkNvV3RKSk1GM2lPTmhkS2Q3eDRIVnNkS0hRZWhrMGthSHkw?=
- =?utf-8?B?allPZERXZG55dy96Wk9EQW9wRFNHT1JSVmROODlra0QxZjNTSVkyQTFvcTcv?=
- =?utf-8?B?dktIS0xrRGEyYlpaWk9WSXRNSUhDTWNFV3dQVHBtYlByQk1WY3lhWkhGa0dl?=
- =?utf-8?B?K1dURkdZNkNXdnFSc2ZocW8weXlMTnZtMWR0QVVvVVAwR2VnTFRiTkJjVThl?=
- =?utf-8?B?TnF5dkhPVWVXSkNLa3dhUmJBYXhNZVhLVmJ4bSt6S1BWVVVrWTRwQ0NrUzcy?=
- =?utf-8?B?U0wzM2lxUzJ4ejVrcUNGZXlyWVpTMktmbzBkc1RLaEdwM1o0QzFVVSs1TjdD?=
- =?utf-8?B?NGZlVnNlL0ZoWGJ1UEw3VmtqSHkrSmZ4bkZTZytsdTV2d1FHWGJSS2Y0dUcz?=
- =?utf-8?B?Smk5Q21mMFJTVnZ6QjJxalB5SWFBYXBMNXQwQURERkVUbEJ4RitlRnZLRTF3?=
- =?utf-8?B?QTZMLzkwdlVnREdzTGN1QWhzbk40YlI0TWd5TmFXb2ZTSUdZd0x2RitZOVZO?=
- =?utf-8?B?RVJiY1BkN2YvOWR5ays1Qm02TkIrTUxUVU5hSjZEVmgxaHd6TXl1dm93bXpa?=
- =?utf-8?B?NVY5dHJuM3RoVlZkZVVUdmRUYzBWaWc2QXljR0xIRnhOdldyQ2l3V0laWC9J?=
- =?utf-8?B?cjdOYXROMU9jWmI0SmQ1ZnJlSnd1N0t1V2JoNXNxSFBWQmxhRHFwUXRxY0ta?=
- =?utf-8?Q?ypENsNxFmzdBnp4YoLIUpLAQT?=
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 5f0e4ee6-2ef1-47a5-2638-08dde0a66c74
-X-MS-Exchange-CrossTenant-AuthSource: DS7PR12MB6048.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 21 Aug 2025 11:32:35.2294
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: oLc406Fv0kLvJRBLLsUwaI32xLz62yk1LkJWDdQXUsmHTYPr8V3+w/MuZBaU3DkuKqm75ylGDqT3hEbTutLe8A==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DS7PR12MB9502
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 0/2] KVM: SVM: Fix missing LAPIC TPR sync into VMCB::V_TPR
+ with AVIC on
+To: Naveen N Rao <naveen@kernel.org>
+Cc: Paolo Bonzini <pbonzini@redhat.com>,
+ Sean Christopherson <seanjc@google.com>, Maxim Levitsky
+ <mlevitsk@redhat.com>, Suravee Suthikulpanit
+ <Suravee.Suthikulpanit@amd.com>,
+ Alejandro Jimenez <alejandro.j.jimenez@oracle.com>, kvm@vger.kernel.org,
+ linux-kernel@vger.kernel.org
+References: <cover.1755609446.git.maciej.szmigiero@oracle.com>
+ <zeavh4vqorbuq23664til6hww6yafm4lniu4dm32ii33hyszvq@5byejwk3bom3>
+Content-Language: en-US, pl-PL
+From: "Maciej S. Szmigiero" <mail@maciej.szmigiero.name>
+Autocrypt: addr=mail@maciej.szmigiero.name; keydata=
+ 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
+Disposition-Notification-To: "Maciej S. Szmigiero"
+ <mail@maciej.szmigiero.name>
+In-Reply-To: <zeavh4vqorbuq23664til6hww6yafm4lniu4dm32ii33hyszvq@5byejwk3bom3>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+Sender: mhej@vps-ovh.mhejs.net
 
-
-
-On 7/31/2025 3:26 AM, Ashish Kalra wrote:
-> From: Ashish Kalra <ashish.kalra@amd.com>
+On 21.08.2025 10:18, Naveen N Rao wrote:
+> On Tue, Aug 19, 2025 at 03:32:13PM +0200, Maciej S. Szmigiero wrote:
+>> From: "Maciej S. Szmigiero" <maciej.szmigiero@oracle.com>
+>>
+>> When AVIC is enabled the normal pre-VMRUN LAPIC TPR to VMCB::V_TPR sync in
+>> sync_lapic_to_cr8() is inhibited so any changed TPR in the LAPIC state would
+>> *not* get copied into the V_TPR field of VMCB.
+>>
+>> AVIC does sync between these two fields, however it does so only on
+>> explicit guest writes to one of these fields, not on a bare VMRUN.
+>>
+>> This is especially true when it is the userspace setting LAPIC state via
+>> KVM_SET_LAPIC ioctl() since userspace does not have access to the guest
+>> VMCB.
 > 
-> After a panic if SNP is enabled in the previous kernel then the kdump
-> kernel boots with IOMMU SNP enforcement still enabled.
-> 
-> IOMMU command buffers and event buffer registers remain locked and
-> exclusive to the previous kernel. Attempts to enable command and event
-> buffers in the kdump kernel will fail, as hardware ignores writes to
-> the locked MMIO registers as per AMD IOMMU spec Section 2.12.2.1.
-> 
-> Skip enabling command buffers and event buffers for kdump boot as they
-> are already enabled in the previous kernel.
-> 
-> Tested-by: Sairaj Kodilkar <sarunkod@amd.com>
-> Signed-off-by: Ashish Kalra <ashish.kalra@amd.com>
+> Dumb question: why is the VMM updating TPR? Is this related to live
+> migration or such?
 
-Reviewed-by: Vasant Hegde <vasant.hegde@amd.com>
+In this case, VMM is resetting LAPIC state on machine reset.
 
+> I think I do see the problem described here, but when AVIC is
+> temporarily inhibited. So, trying to understand if there are other flows
+> involving the VMM where TPR could be updated outside of the guest.
+> 
+>>
+>> Practice shows that it is the V_TPR that is actually used by the AVIC to
+>> decide whether to issue pending interrupts to the CPU (not TPR in TASKPRI),
+>> so any leftover value in V_TPR will cause serious interrupt delivery issues
+>> in the guest when AVIC is enabled.
+>>
+>> Fix this issue by explicitly copying LAPIC TPR to VMCB::V_TPR in
+>> avic_apicv_post_state_restore(), which gets called from KVM_SET_LAPIC and
+>> similar code paths when AVIC is enabled.
+>>
+>> Add also a relevant set of tests to xapic_state_test so hopefully
+>> we'll be protected against getting such regressions in the future.
+> 
+> Do the new tests reproduce this issue?
 
--Vasant
+Yes, and also check quite a bit more of TPR-related functionality.
+
+>>
+>>
+>> Yes, this breaks real guests when AVIC is enabled.
+>> Specifically, the one OS that sometimes needs different handling and its
+>> name begins with letter 'W'.
+> 
+> Indeed, Linux does not use TPR AFAIK.
+> 
+> 
+> - Naveen
+> 
+
+Thanks,
+Maciej
 
 
