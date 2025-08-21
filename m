@@ -1,246 +1,1411 @@
-Return-Path: <kvm+bounces-55232-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-55233-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1332FB2EBF2
-	for <lists+kvm@lfdr.de>; Thu, 21 Aug 2025 05:31:07 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 830A0B2ECA3
+	for <lists+kvm@lfdr.de>; Thu, 21 Aug 2025 06:10:14 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 2438D1BC7345
-	for <lists+kvm@lfdr.de>; Thu, 21 Aug 2025 03:31:04 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 158B2681525
+	for <lists+kvm@lfdr.de>; Thu, 21 Aug 2025 04:08:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5BB662E6126;
-	Thu, 21 Aug 2025 03:30:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 264432475C7;
+	Thu, 21 Aug 2025 04:08:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="EolSgQFA"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="GcuD9aGg"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.14])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qt1-f171.google.com (mail-qt1-f171.google.com [209.85.160.171])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 96E922E5B03;
-	Thu, 21 Aug 2025 03:30:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.14
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7B62124469B
+	for <kvm@vger.kernel.org>; Thu, 21 Aug 2025 04:08:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.171
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755747036; cv=none; b=u9C4WYoM/GX4hS1BLOXz+CIoc2oxugBiv4rnu58QIs84kXgvMVZU4Lrcj+ZpLCEk8rad/8BSqw0JlYvqASKZg0FVAizEmuCSIUqFFKVX8RbTzSJfsNAY+i+NejX+c8jwd+0GSYB4FPR3bSNvmHb8V1RAt2jupSQm+bxejfmVe68=
+	t=1755749313; cv=none; b=P+6s367r3zqWG78HYn0ZeuSlkPRKDoIofFISqIn/JiGqKdUen5XrT3FdtUj86vqmr/qOy/EVGeMihw1itS4p/WFdoQg2sRX0r6CGVnItIFiOnzNYN0X1abZfjW3r7kkGQWTSzRJE3w+u8Znh/mdWvz84Rf7/t3TZ2R5ns7nJsa8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755747036; c=relaxed/simple;
-	bh=hGZnT5MfWeTZd2SOXfqoQAwccyPDnsuXk0ZwAoQRF5c=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=YhxPuALF/qFPENXwJhnTCRW6baeLcDnPAOZqNURiJxe87NJRwuMFsbCJT8eOiwBGu+QcNmiiV9Gb58W5B1fjajGVOeSoCj/Fn+rPmjkO1fraH659SvwJbGuohFL0h8UxSaBhDM3QUXDLBPodYLt4O0MbA1voZmBnoB2k4PdEXTU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=EolSgQFA; arc=none smtp.client-ip=198.175.65.14
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1755747035; x=1787283035;
-  h=message-id:date:mime-version:subject:to:cc:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=hGZnT5MfWeTZd2SOXfqoQAwccyPDnsuXk0ZwAoQRF5c=;
-  b=EolSgQFAViq1murkZ7iKgLAvrKyi7WanJgCPODQstOMuMHU8p94uCJL/
-   uFhLjeeV9tdhAdgKnOlVTip4LVZO51JDPYesOQnuVNmrJV+2emLPHWXT8
-   1+GNXj8nVjfcfK77+iiAmdSxanPTjPHDpyV3Na9KSqKnXj2mIqr/cJuuq
-   wVKsz4uoQ4cA91aKfjqSSGguRAOvQuk02F7Ral/SXeC81QCMz7XygLJyL
-   JtWd1pmXZ3qA3H5erqEFuQqPECxssnLemNl8tOC5hfgJZiUmd0XSYggqE
-   L9k8eHS41GFRFoBMrydjW7w+VPB/y4mv3QOpdbl6w5SgbNh67al67OxYe
-   Q==;
-X-CSE-ConnectionGUID: TyPb6Gx2TwShSA0LRbBh/g==
-X-CSE-MsgGUID: Dvr5pBsrRfWSQTGK7eormQ==
-X-IronPort-AV: E=McAfee;i="6800,10657,11527"; a="61854988"
-X-IronPort-AV: E=Sophos;i="6.17,306,1747724400"; 
-   d="scan'208";a="61854988"
-Received: from fmviesa007.fm.intel.com ([10.60.135.147])
-  by orvoesa106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 20 Aug 2025 20:30:34 -0700
-X-CSE-ConnectionGUID: BjYSIxRBS9S7SxhZiPa1Gg==
-X-CSE-MsgGUID: Q4gvv4UxT6mmQBCIdPa+0A==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.17,306,1747724400"; 
-   d="scan'208";a="167806701"
-Received: from unknown (HELO [10.238.0.107]) ([10.238.0.107])
-  by fmviesa007-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 20 Aug 2025 20:30:29 -0700
-Message-ID: <d84b792e-8d26-49c2-9e7c-04093f554f8a@linux.intel.com>
-Date: Thu, 21 Aug 2025 11:30:27 +0800
+	s=arc-20240116; t=1755749313; c=relaxed/simple;
+	bh=0E/eTDJMhNwxqfltZDcNYh5tDlqFFBNGENecqxp9M9E=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=VusNuH9uq5dzKfpcinT4E0b73DK6kEqeVeh5T0G9wW0m6p2el15o4r/iShgC/TYKCsvX5hyLz5MA+F4w4nBsw1y0p5PnRuGdXZZq1AR5RGOMFQsrhlP52rZ53Polk6CI2vZn19xq+tIDq6f0V+Xufi5jcWPNLmTF9vixU4L86jM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=GcuD9aGg; arc=none smtp.client-ip=209.85.160.171
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-qt1-f171.google.com with SMTP id d75a77b69052e-4b12b123e48so187871cf.0
+        for <kvm@vger.kernel.org>; Wed, 20 Aug 2025 21:08:30 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1755749309; x=1756354109; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=TAVOvLohTo1vZNhsZDR5IuXjsVqySinFeeofNuG/Cwk=;
+        b=GcuD9aGg3ka1pyIzG58d77Y/4eXzgDk8purEk48IPBljV5rur5G3AW3PZ7C+fkwIAd
+         UZ7ytOP0OTe6KTpkVEWzXD8sD4GGbDGtTmR5zVhhZTYfX2/iNfZ2ZyPHKdzioH7KTtOV
+         1OS2KYic8DZw2PXtCjFWXZ0GvXtNH3y+9tjg1EwsvXSXO0FFZbHEFrYGQsS2EOFQBaQK
+         6hNEODOM/GHOmkYUycKgga5tFELX8VCOtg2D2dwm5djWEtfn7bXmLZqTOYVrSykvAEKT
+         GSsDg59abC5HJgTUaxkEco8Bfl7EUIotlnwhBy22jxqvdoT4XpHw7cPk9T81Z0eM4+3Y
+         0olw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1755749309; x=1756354109;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=TAVOvLohTo1vZNhsZDR5IuXjsVqySinFeeofNuG/Cwk=;
+        b=vgypiGWstCK4TrfpkvtYLiMi8Q+wEiDM5ZOi4OvIzp2ZRcPs556XQcDuWn80d6Brvt
+         FKGqi6T6S3WSmK8CJLl4oAK88BTQCQp+9R8MbRscnU+YFXVmecQuGxprwranHz40ZY1f
+         J4CEQ/lYtxBpd3Ox8yJfGuFFdlOePj2+qoStpxUgG97oiNg0W/gw5nwGLUdWqz09XNkj
+         lFFrxz0bkn06IgSNZ2afsqY+mXMtxdJgiKMizysVl7+TvPvBVKnVocjzgUBW6N9u7tiT
+         pGUffTuYdS+2PceMASfTZtEqF/ejviy1qThhASlOyNjJMcszNhY7l3QA+qEZhMiB67VC
+         56Lg==
+X-Forwarded-Encrypted: i=1; AJvYcCUWZw645dUMqOVHweucvpk8hgu8SUku4A9uzOklpEcSxxBSTomgALYtM/gH6cXzEjb+Mpk=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzCfC7l4rxfa4gdw2QMYEV5XvdZf7CRZwzjCF/ZmbLpMEpafohM
+	k7RkmdA99mACvkr+u9Fi8HgnLxDXk+hyeCY6YmTuNPDyQsocs9deZe5pkkFsyqdIPxpO5H7FlZt
+	JrzU6HtLQ38X/LSD/2qvex7MEuNIw28djQL3D1EvI
+X-Gm-Gg: ASbGncsN9oPiBEU/DLzptocdiWNSckbOIto2ktK5xJLo1M48Txaf1CczQKa2cN+QzG4
+	rLhX53xXHBmqVndNYr0oo4fsJGq4JfIUX85PPEuyOZ5iMQD+bvSZs/fFzqc8Lkq1gMQzJ9swtXJ
+	dcGUYGu2OdJTFjWFLnxxfVO4OBRoVnF8jwGWqEq3m/hRWBZcEHu5PM3RtFxwmcqgxV4bMwvZnLN
+	viogbzemF7+T2qlhCQd93XIEV++KGlFbAdXp7kxzglg/qE=
+X-Google-Smtp-Source: AGHT+IEqo295PD/CziqQG2auqFtblwXroX6cyiWd28598PIjzTXUyCJX/+UI5W/9FV6kMahXVRdCTZtwHTLZGl1iad8=
+X-Received: by 2002:ac8:5dd4:0:b0:48d:8f6e:ece7 with SMTP id
+ d75a77b69052e-4b29f9af407mr2103501cf.3.1755749308314; Wed, 20 Aug 2025
+ 21:08:28 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 0/2] x86/kvm: Force legacy PCI hole as WB under SNP/TDX
+References: <20250807201628.1185915-1-sagis@google.com> <20250807201628.1185915-7-sagis@google.com>
+ <aJpO_zN3buvaQoAW@google.com>
+In-Reply-To: <aJpO_zN3buvaQoAW@google.com>
+From: Sagi Shahar <sagis@google.com>
+Date: Wed, 20 Aug 2025 23:08:17 -0500
+X-Gm-Features: Ac12FXwSwWUiSj2dkrih8GY0GIOFt97YFrrO7mCJzXLufM1BE-an-fOb-YZeGoM
+Message-ID: <CAAhR5DEbb=E3wKdzR7AuhoWgFtWOMaVict8hv2U7KSjYgwWunw@mail.gmail.com>
+Subject: Re: [PATCH v8 06/30] KVM: selftests: Add helper functions to create
+ TDX VMs
 To: Sean Christopherson <seanjc@google.com>
-Cc: Vishal Annapurve <vannapurve@google.com>,
- Nikolay Borisov <nik.borisov@suse.com>, Jianxiong Gao <jxgao@google.com>,
- "Borislav Petkov (AMD)" <bp@alien8.de>,
- Dave Hansen <dave.hansen@linux.intel.com>,
- Dionna Glaze <dionnaglaze@google.com>, "H. Peter Anvin" <hpa@zytor.com>,
- jgross@suse.com, "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>,
- kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
- Ingo Molnar <mingo@redhat.com>, pbonzini@redhat.com,
- Peter Gonda <pgonda@google.com>, Thomas Gleixner <tglx@linutronix.de>,
- Tom Lendacky <thomas.lendacky@amd.com>,
- Vitaly Kuznetsov <vkuznets@redhat.com>, x86@kernel.org,
- Rick Edgecombe <rick.p.edgecombe@intel.com>, jiewen.yao@intel.com
-References: <CAMGD6P1Q9tK89AjaPXAVvVNKtD77-zkDr0Kmrm29+e=i+R+33w@mail.gmail.com>
- <0dc2b8d2-6e1d-4530-898b-3cb4220b5d42@linux.intel.com>
- <4acfa729-e0ad-4dc7-8958-ececfae8ab80@suse.com> <aIDzBOmjzveLjhmk@google.com>
- <550a730d-07db-46d7-ac1a-b5b7a09042a6@linux.intel.com>
- <aIeX0GQh1Q_4N597@google.com>
- <ad616489-1546-4f6a-9242-a719952e19b6@linux.intel.com>
- <CAGtprH9EL0=Cxu7f8tD6rEvnpC7uLAw6jKijHdFUQYvbyJgkzA@mail.gmail.com>
- <20641696-242d-4fb6-a3c1-1a8e7cf83b18@linux.intel.com>
- <697aa804-b321-4dba-9060-7ac17e0a489f@linux.intel.com>
- <aKYMQP5AEC2RkOvi@google.com>
-Content-Language: en-US
-From: Binbin Wu <binbin.wu@linux.intel.com>
-In-Reply-To: <aKYMQP5AEC2RkOvi@google.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+Cc: linux-kselftest@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>, 
+	Shuah Khan <shuah@kernel.org>, Ackerley Tng <ackerleytng@google.com>, 
+	Ryan Afranji <afranji@google.com>, Andrew Jones <ajones@ventanamicro.com>, 
+	Isaku Yamahata <isaku.yamahata@intel.com>, Erdem Aktas <erdemaktas@google.com>, 
+	Rick Edgecombe <rick.p.edgecombe@intel.com>, Roger Wang <runanwang@google.com>, 
+	Binbin Wu <binbin.wu@linux.intel.com>, Oliver Upton <oliver.upton@linux.dev>, 
+	"Pratik R. Sampat" <pratikrajesh.sampat@amd.com>, Reinette Chatre <reinette.chatre@intel.com>, 
+	Ira Weiny <ira.weiny@intel.com>, linux-kernel@vger.kernel.org, kvm@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-
-
-On 8/21/2025 1:56 AM, Sean Christopherson wrote:
-> On Wed, Aug 20, 2025, Binbin Wu wrote:
->> On 8/20/2025 6:03 PM, Binbin Wu wrote:
->>>>>> Presumably this an EDK2 bug?  If it's not an EDK2 bug, then how is the kernel's
->>>>>> ACPI driver supposed to know that some ranges of SystemMemory must be mapped UC?
->>> Checked with Jiewen offline.
->>>
->>> He didn't think there was an existing interface to tell the OS to map a
->>> OperationRegion of SystemMemory as UC via the ACPI table. He thought the
->>> OS/ACPI driver still needed to rely on MTRRs for the hint before there was an
->>> alternative way.
->>>
->>>>> According to the ACPI spec 6.6, an operation region of SystemMemory has no
->>>>> interface to specify the cacheable attribute.
->>>>>
->>>>> One solution could be using MTRRs to communicate the memory attribute of legacy
->>>>> PCI hole to the kernel.
-> So IIUC, there are no bugs anywhere, just a gap in specs that has been hidden
-> until now :-(
+On Mon, Aug 11, 2025 at 3:13=E2=80=AFPM Sean Christopherson <seanjc@google.=
+com> wrote:
 >
->>>>> But during the PUCK meeting last week, Sean mentioned
->>>>> that "long-term, firmware should not be using MTRRs to communicate anything to
->>>>> the kernel." So this solution is not preferred.
->>>>>
->>>>> If not MTRRs, there should be an alternative way to do the job.
->>>>> 1. ACPI table
->>>>>       According to the ACPI spec, neither operation region nor 32-Bit Fixed Memory
->>>>>       Range Descriptor can specify the cacheable attribute.
->>>>>       "Address Space Resource Descriptors" could be used to describe a memory range
->>>>>       and the they can specify the cacheable attribute via "Type Specific Flags".
->>>>>       One of the Address Space Resource Descriptors could be added to the ACPI
->>>>>       table as a hint when the kernel do the mapping for operation region.
->>>>>       (There is "System Physical Address (SPA) Range Structure", which also can
->>>>>       specify the cacheable attribute. But it's should be used for NVDIMMs.)
->>>>> 2. EFI memory map descriptor
->>>>>       EFI memory descriptor can specify the cacheable attribute. Firmware can add
->>>>>       a EFI memory descriptor for the TPM TIS device as a hint when the kernel do
->>>>>       the mapping for operation region.
->>>>>
->>>>> Operation region of SystemMemory is still needed if a "Control Method" of APCI
->>>>> needs to access a field, e.g., the method _STA. Checking another descriptor for
->>>>> cacheable attribute, either "Address Space Resource Descriptor" or "EFI memory
->>>>> map descriptor" during the ACPI code doing the mapping for operation region
->>>>> makes the code complicated.
->>>>>
->>>>> Another thing is if long-term firmware should not be using MTRRs to to
->>>>> communicate anything to the kernel. It seems it's safer to use ioremap() instead
->>>>> of ioremap_cache() for MMIO resource when the kernel do the mapping for the
->>>>> operation region access?
->>>>>
->>>> Would it work if instead of doubling down on declaring the low memory
->>>> above TOLUD as WB, guest kernel reserves the range as uncacheable by
->>>> default i.e. effectively simulating a ioremap before ACPI tries to map
->>>> the memory as WB?
->>> It seems as hacky as this patch set?
->>>
->>>
->> Hi Sean,
->>
->> Since guest_force_mtrr_state() also supports to force MTRR variable ranges,
->> I am wondering if we could use guest_force_mtrr_state() to set the legacy PCI
->> hole range as UC?
->>
->> Is it less hacky?
-> Oh!  That's a way better idea than my hack.  I missed that the kernel would still
-> consult MTRRs.
+> On Thu, Aug 07, 2025, Sagi Shahar wrote:
+> > From: Erdem Aktas <erdemaktas@google.com>
+> >
+> > TDX requires additional IOCTLs to initialize VM and vCPUs to add
+> > private memory and to finalize the VM memory. Also additional utility
+> > functions are provided to manipulate a TD, similar to those that
+> > manipulate a VM in the current selftest framework.
+> >
+> > A TD's initial register state cannot be manipulated directly by
+> > setting the VM's memory, hence boot code is provided at the TD's reset
+> > vector. This boot code takes boot parameters loaded in the TD's memory
+> > and sets up the TD for the selftest.
+> >
+> > Userspace needs to ensure consistency between KVM's CPUID and the
+> > TDX Module's view. Obtain the CPUID supported by KVM and make
+> > adjustments to reflect features of interest and the limited
+> > KVM PV features supported for TD guest. This involves masking the
+> > feature bits from CPUID entries and filtering CPUID entries of
+> > features not supported by TDX before initializing the TD.
+> >
+> > Suggested-by: Isaku Yamahata <isaku.yamahata@intel.com>
+> > Co-developed-by: Sagi Shahar <sagis@google.com>
+> > Signed-off-by: Sagi Shahar <sagis@google.com>
+> > Co-developed-by: Ackerley Tng <ackerleytng@google.com>
+> > Signed-off-by: Ackerley Tng <ackerleytng@google.com>
+> > Co-developed-by: Isaku Yamahata <isaku.yamahata@intel.com>
+> > Signed-off-by: Isaku Yamahata <isaku.yamahata@intel.com>
+> > Co-developed-by: Rick Edgecombe <rick.p.edgecombe@intel.com>
+> > Signed-off-by: Rick Edgecombe <rick.p.edgecombe@intel.com>
+> > Signed-off-by: Erdem Aktas <erdemaktas@google.com>
+> > Signed-off-by: Sagi Shahar <sagis@google.com>
+> > ---
+> >  tools/testing/selftests/kvm/Makefile.kvm      |   2 +
+> >  .../testing/selftests/kvm/include/kvm_util.h  |   6 +
+> >  .../selftests/kvm/include/x86/kvm_util_arch.h |   1 +
+> >  .../selftests/kvm/include/x86/tdx/td_boot.h   |  83 +++
+> >  .../kvm/include/x86/tdx/td_boot_asm.h         |  16 +
+> >  .../selftests/kvm/include/x86/tdx/tdx_util.h  |  19 +
+> >  tools/testing/selftests/kvm/lib/kvm_util.c    |   6 +-
+> >  .../testing/selftests/kvm/lib/x86/processor.c |  19 +-
+> >  .../selftests/kvm/lib/x86/tdx/td_boot.S       | 100 ++++
+> >  .../selftests/kvm/lib/x86/tdx/tdx_util.c      | 566 ++++++++++++++++++
 >
-> Compile tested only, but something like this?
+> Split this up.  At a *very* rough glance, this probably needs to be 5+ pa=
+tches.
+> At the very least, any large TDX-specific patch needs to touch *only* TDX=
+ code.
+> Add empty placeholers/stubs if you have to, e.g. to plumb calls from x86 =
+code
+> into TDX-specific code.
+
+I split this one up for v9 by creating the utility functions for TDX
+in separate patches and hooking them up into __vm_create and
+vm_vcpu_add() in a later patch.
+
 >
-> diff --git a/arch/x86/kernel/kvm.c b/arch/x86/kernel/kvm.c
-> index 8ae750cde0c6..45c8871cdda1 100644
-> --- a/arch/x86/kernel/kvm.c
-> +++ b/arch/x86/kernel/kvm.c
-> @@ -933,6 +933,13 @@ static void kvm_sev_hc_page_enc_status(unsigned long pfn, int npages, bool enc)
->   
->   static void __init kvm_init_platform(void)
->   {
-> +       u64 tolud = e820__end_of_low_ram_pfn() << PAGE_SHIFT;
-> +       struct mtrr_var_range pci_hole = {
-> +               .base_lo = tolud | X86_MEMTYPE_UC,
-> +               .mask_lo = (u32)(~(SZ_4G - tolud - 1)) | BIT(11),
-> +               .mask_hi = (BIT_ULL(boot_cpu_data.x86_phys_bits) - 1) >> 32,
-> +       };
-> +
+> >  10 files changed, 807 insertions(+), 11 deletions(-)
+> >  create mode 100644 tools/testing/selftests/kvm/include/x86/tdx/td_boot=
+.h
+> >  create mode 100644 tools/testing/selftests/kvm/include/x86/tdx/td_boot=
+_asm.h
+> >  create mode 100644 tools/testing/selftests/kvm/include/x86/tdx/tdx_uti=
+l.h
+> >  create mode 100644 tools/testing/selftests/kvm/lib/x86/tdx/td_boot.S
+> >  create mode 100644 tools/testing/selftests/kvm/lib/x86/tdx/tdx_util.c
+> >
+> > diff --git a/tools/testing/selftests/kvm/Makefile.kvm b/tools/testing/s=
+elftests/kvm/Makefile.kvm
+> > index 38b95998e1e6..b429c92e07d8 100644
+> > --- a/tools/testing/selftests/kvm/Makefile.kvm
+> > +++ b/tools/testing/selftests/kvm/Makefile.kvm
+> > @@ -29,6 +29,8 @@ LIBKVM_x86 +=3D lib/x86/sev.c
+> >  LIBKVM_x86 +=3D lib/x86/svm.c
+> >  LIBKVM_x86 +=3D lib/x86/ucall.c
+> >  LIBKVM_x86 +=3D lib/x86/vmx.c
+> > +LIBKVM_x86 +=3D lib/x86/tdx/tdx_util.c
+> > +LIBKVM_x86 +=3D lib/x86/tdx/td_boot.S
+> >
+> >  LIBKVM_arm64 +=3D lib/arm64/gic.c
+> >  LIBKVM_arm64 +=3D lib/arm64/gic_v3.c
+> > diff --git a/tools/testing/selftests/kvm/include/kvm_util.h b/tools/tes=
+ting/selftests/kvm/include/kvm_util.h
+> > index 5c4ca25803ac..0d1f24c9f7c7 100644
+> > --- a/tools/testing/selftests/kvm/include/kvm_util.h
+> > +++ b/tools/testing/selftests/kvm/include/kvm_util.h
+> > @@ -79,6 +79,7 @@ enum kvm_mem_region_type {
+> >       MEM_REGION_DATA,
+> >       MEM_REGION_PT,
+> >       MEM_REGION_TEST_DATA,
+> > +     MEM_REGION_TDX_BOOT_PARAMS,
+>
+> NAK, there's zero reason to bleed these details into common code.  As men=
+tioned
+> earlier, just use virt_map().  Providing an entire MEM_REGION for a chunk=
+ of
+> memory that has exactly _one_ user and is at a hardcoded address is ridic=
+ulous.
 
-This value of tolud  may not meet the range size and alignment requirement for
-variable MTRR.
+I removed MEM_REGION_TDX_BOOT_PARAMS definition since it's not used
+outside of TDX code but I still think that using a separate MEM_REGION
+simplify things. The problem is that while the address is hardcoded,
+the size depends on the number of vcpus. And the mapping should be 1:1
+since the boot parameters are accessed while paging is still disabled.
+Putting this in the separate MEM_REGION saves some memory (14 pages
+for a small VM) and simplifies the code.
 
-Variable MTRR has requirement for range size and alignment:
-For ranges greater than 4 KBytes, each range must be of length 2^n and its base
-address must be aligned on a 2^n boundary, where n is a value equal to or
-greater than 12. The base-address alignment value cannot be less than its length.
+The alternative is to hardcode the size of the boot region to 16 bytes
+to account for the memory from TD_BOOT_PARAMETERS_GPA (0xFFFF0000) to
+the end of the reset vector but that feels a bit fragile if we need to
+increase the size of the boot parameters in the future.
 
-In my setup, the value of tolud is 0x7FF7C000, it requires 3 variable MTRRs to
-meet the requirement, i.e.,
-- 7FF7 C000  ~   7FF8 0000
-- 7FF8 0000  ~   8000 0000
-- 8000 0000  ~ 1 0000 0000
+>
+> > diff --git a/tools/testing/selftests/kvm/include/x86/kvm_util_arch.h b/=
+tools/testing/selftests/kvm/include/x86/kvm_util_arch.h
+> > index 972bb1c4ab4c..80db1e4c38ba 100644
+> > --- a/tools/testing/selftests/kvm/include/x86/kvm_util_arch.h
+> > +++ b/tools/testing/selftests/kvm/include/x86/kvm_util_arch.h
+> > @@ -19,6 +19,7 @@ struct kvm_vm_arch {
+> >       uint64_t s_bit;
+> >       int sev_fd;
+> >       bool is_pt_protected;
+> > +     bool has_protected_regs;
+>
+> This should either be unnecessary, or should be a function so that it can=
+ do the
+> right thing for SEV-ES+ VMs, which have protected register state, but onl=
+y after
+> the VM is "launched".
+>
 
-I checks the implementation in EDK2, in order to fit the legacy PCI hole into
-one variable MTRR, it has some assumption to truncate the size and round up the
-base address in PlatformQemuUc32BaseInitialization():
-     ...
-     ASSERT (
-       PlatformInfoHob->HostBridgeDevId == INTEL_Q35_MCH_DEVICE_ID ||
-       PlatformInfoHob->HostBridgeDevId == INTEL_82441_DEVICE_ID
-       );
-     ...
-     //
-     // Start with the [LowerMemorySize, 4GB) range. Make sure one
-     // variable MTRR suffices by truncating the size to a whole power of two,
-     // while keeping the end affixed to 4GB. This will round the base up.
-     //
-     PlatformInfoHob->Uc32Size = GetPowerOfTwo32 ((UINT32)(SIZE_4GB - PlatformInfoHob->LowMemory));
-     PlatformInfoHob->Uc32Base = (UINT32)(SIZE_4GB - PlatformInfoHob->Uc32Size);
-     //
-     // Assuming that LowerMemorySize is at least 1 byte, Uc32Size is at most 2GB.
-     // Therefore Uc32Base is at least 2GB.
-     //
-     ASSERT (PlatformInfoHob->Uc32Base >= BASE_2GB);
+Removed this one in next patch.
 
-I am not sure if KVM can do such assumption.
-Otherwise, KVM needs to calculate the ranges to meet the requirement. :(
+> >  };
+> >
+> >  static inline bool __vm_arch_has_protected_memory(struct kvm_vm_arch *=
+arch)
+> > diff --git a/tools/testing/selftests/kvm/include/x86/tdx/td_boot.h b/to=
+ols/testing/selftests/kvm/include/x86/tdx/td_boot.h
+> > new file mode 100644
+> > index 000000000000..94a50295f953
+> > --- /dev/null
+> > +++ b/tools/testing/selftests/kvm/include/x86/tdx/td_boot.h
+> > @@ -0,0 +1,83 @@
+> > +/* SPDX-License-Identifier: GPL-2.0-only */
+> > +#ifndef SELFTEST_TDX_TD_BOOT_H
+> > +#define SELFTEST_TDX_TD_BOOT_H
+> > +
+> > +#include <stdint.h>
+> > +
+> > +#include "tdx/td_boot_asm.h"
+> > +
+> > +/*
+> > + * Layout for boot section (not to scale)
+> > + *
+> > + *                                   GPA
+> > + * _________________________________ 0x1_0000_0000 (4GB)
+> > + * |   Boot code trampoline    |
+> > + * |___________________________|____ 0x0_ffff_fff0: Reset vector (16B =
+below 4GB)
+> > + * |   Boot code               |
+> > + * |___________________________|____ td_boot will be copied here, so t=
+hat the
+> > + * |                           |     jmp to td_boot is exactly at the =
+reset vector
+> > + * |   Empty space             |
+> > + * |                           |
+> > + * |=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=
+=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=
+=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=
+=E2=94=80=E2=94=80=E2=94=80|
+> > + * |                           |
+> > + * |                           |
+> > + * |   Boot parameters         |
+> > + * |                           |
+> > + * |                           |
+> > + * |___________________________|____ 0x0_ffff_0000: TD_BOOT_PARAMETERS=
+_GPA
+> > + */
+> > +#define FOUR_GIGABYTES_GPA (4ULL << 30)
+>
+> SZ_1G.
 
+I'm assuming you meant SZ_4G?
 
->          if (cc_platform_has(CC_ATTR_GUEST_MEM_ENCRYPT) &&
->              kvm_para_has_feature(KVM_FEATURE_MIGRATION_CONTROL)) {
->                  unsigned long nr_pages;
-> @@ -982,8 +989,12 @@ static void __init kvm_init_platform(void)
->          kvmclock_init();
->          x86_platform.apic_post_init = kvm_apic_init;
->   
-> -       /* Set WB as the default cache mode for SEV-SNP and TDX */
-> -       guest_force_mtrr_state(NULL, 0, MTRR_TYPE_WRBACK);
-> +       /*
-> +        * Set WB as the default cache mode for SEV-SNP and TDX, with a single
-> +        * UC range for the legacy PCI hole, e.g. so that devices that expect
-> +        * to get UC/WC mappings don't get surprised with WB.
-> +        */
-> +       guest_force_mtrr_state(&pci_hole, 1, MTRR_TYPE_WRBACK);
->   }
->   
->   #if defined(CONFIG_AMD_MEM_ENCRYPT)
+>
+> > +
+> > +/*
+> > + * The exact memory layout for LGDT or LIDT instructions.
+> > + */
+> > +struct __packed td_boot_parameters_dtr {
+> > +     uint16_t limit;
+> > +     uint32_t base;
+> > +};
+> > +
+> > +/*
+> > + * The exact layout in memory required for a ljmp, including the selec=
+tor for
+> > + * changing code segment.
+> > + */
+> > +struct __packed td_boot_parameters_ljmp_target {
+> > +     uint32_t eip_gva;
+> > +     uint16_t code64_sel;
+> > +};
+> > +
+> > +/*
+> > + * Allows each vCPU to be initialized with different eip and esp.
+> > + */
+> > +struct __packed td_per_vcpu_parameters {
+> > +     uint32_t esp_gva;
+> > +     struct td_boot_parameters_ljmp_target ljmp_target;
+> > +};
+> > +
+> > +/*
+> > + * Boot parameters for the TD.
+> > + *
+> > + * Unlike a regular VM, KVM cannot set registers such as esp, eip, etc
+> > + * before boot, so to run selftests, these registers' values have to b=
+e
+> > + * initialized by the TD.
+> > + *
+> > + * This struct is loaded in TD private memory at TD_BOOT_PARAMETERS_GP=
+A.
+> > + *
+> > + * The TD boot code will read off parameters from this struct and set =
+up the
+> > + * vCPU for executing selftests.
+> > + */
+> > +struct __packed td_boot_parameters {
+>
+> None of these comments explain why these structures are __packed, and I s=
+uspect
+> _that_ is the most interesting/relevant information for unfamiliar reader=
+s.
+>
 
+Removed the __packed attribute and replaced with OFFSET() as suggested.
+
+> > +     uint32_t cr0;
+> > +     uint32_t cr3;
+> > +     uint32_t cr4;
+> > +     struct td_boot_parameters_dtr gdtr;
+> > +     struct td_boot_parameters_dtr idtr;
+> > +     struct td_per_vcpu_parameters per_vcpu[];
+> > +};
+> > +
+> > +void td_boot(void);
+> > +void reset_vector(void);
+> > +void td_boot_code_end(void);
+> > +
+> > +#define TD_BOOT_CODE_SIZE (td_boot_code_end - td_boot)
+> > +
+> > +#endif /* SELFTEST_TDX_TD_BOOT_H */
+> > diff --git a/tools/testing/selftests/kvm/include/x86/tdx/td_boot_asm.h =
+b/tools/testing/selftests/kvm/include/x86/tdx/td_boot_asm.h
+> > new file mode 100644
+> > index 000000000000..10b4b527595c
+> > --- /dev/null
+> > +++ b/tools/testing/selftests/kvm/include/x86/tdx/td_boot_asm.h
+> > @@ -0,0 +1,16 @@
+> > +/* SPDX-License-Identifier: GPL-2.0-only */
+> > +#ifndef SELFTEST_TDX_TD_BOOT_ASM_H
+> > +#define SELFTEST_TDX_TD_BOOT_ASM_H
+> > +
+> > +/*
+> > + * GPA where TD boot parameters will be loaded.
+> > + *
+> > + * TD_BOOT_PARAMETERS_GPA is arbitrarily chosen to
+> > + *
+> > + * + be within the 4GB address space
+>
+> Bad wrap.
+>
+
+Not sure what you mean. This is not a wrap, those are bullets.
+
+> > + * + provide enough contiguous memory for the struct td_boot_parameter=
+s such
+> > + *   that there is one struct td_per_vcpu_parameters for KVM_MAX_VCPUS
+> > + */
+> > +#define TD_BOOT_PARAMETERS_GPA 0xffff0000
+>
+> Huh, not what I was expecting.  Now I genuinely have no idea why structur=
+es are
+> __packed, or what any of this is doing.  I'm sure I could figure it out, =
+but I
+> shouldn't have to.  The comments should
+>
+> > diff --git a/tools/testing/selftests/kvm/lib/x86/processor.c b/tools/te=
+sting/selftests/kvm/lib/x86/processor.c
+> > index 5718b5911b0a..3977719c7893 100644
+> > --- a/tools/testing/selftests/kvm/lib/x86/processor.c
+> > +++ b/tools/testing/selftests/kvm/lib/x86/processor.c
+> > @@ -590,7 +590,7 @@ void sync_exception_handlers_to_guest(struct kvm_vm=
+ *vm)
+> >       *(vm_vaddr_t *)addr_gva2hva(vm, (vm_vaddr_t)(&exception_handlers)=
+) =3D vm->handlers;
+> >  }
+> >
+> > -static void vm_init_descriptor_tables(struct kvm_vm *vm)
+> > +void vm_init_descriptor_tables(struct kvm_vm *vm)
+> >  {
+> >       extern void *idt_handlers;
+> >       struct kvm_segment seg;
+> > @@ -696,16 +696,19 @@ struct kvm_vcpu *vm_arch_vcpu_add(struct kvm_vm *=
+vm, uint32_t vcpu_id)
+> >
+> >       vcpu =3D __vm_vcpu_add(vm, vcpu_id);
+> >       vcpu_init_cpuid(vcpu, kvm_get_supported_cpuid());
+> > -     vcpu_init_sregs(vm, vcpu);
+> > -     vcpu_init_xcrs(vm, vcpu);
+> >
+> >       vcpu->initial_stack_addr =3D stack_vaddr;
+>
+> I would much, much prefer we do something like:
+>
+>         if (is_tdx_vm(vm)) {
+>                 vm_tdx_vcpu_add(vcpu, stack_vaddr, ???);
+>         } else {
+>                 vcpu_init_sregs(vm, vcpu);
+>                 vcpu_init_xcrs(vm, vcpu);
+>
+>                 /* Setup guest general purpose registers */
+>                 vcpu_regs_get(vcpu, &regs);
+>                 regs.rflags =3D regs.rflags | 0x2;
+>                 regs.rsp =3D stack_vaddr;
+>                 vcpu_regs_set(vcpu, &regs);
+>         }
+>
+> so that the common VM/vCPU creation APIs can be used with TDX.  The rules=
+ aren't
+> the same as KVM proper, e.g. see the existing usage of is_sev_vm().  Or r=
+ather,
+> they're the same, they just look different.  E.g. this the above is no di=
+fferent
+> than having a kvm_x86_call(init_vm) with only TDX implementing the hook. =
+ In other
+> words, we still want to isolate things like SEV and TDX as much as possib=
+le, but
+> having obvious and maintable code is just as important.
+>
+
+Updated in next version as suggested.
+
+> >
+> > -     /* Setup guest general purpose registers */
+> > -     vcpu_regs_get(vcpu, &regs);
+> > -     regs.rflags =3D regs.rflags | 0x2;
+> > -     regs.rsp =3D stack_vaddr;
+> > -     vcpu_regs_set(vcpu, &regs);
+> > +     if (!vm->arch.has_protected_regs) {
+> > +             vcpu_init_sregs(vm, vcpu);
+> > +             vcpu_init_xcrs(vm, vcpu);
+> > +
+> > +             /* Setup guest general purpose registers */
+> > +             vcpu_regs_get(vcpu, &regs);
+> > +             regs.rflags =3D regs.rflags | 0x2;
+> > +             regs.rsp =3D stack_vaddr;
+> > +             vcpu_regs_set(vcpu, &regs);
+> > +     }
+> >
+> >       /* Setup the MP state */
+> >       mp_state.mp_state =3D 0;
+> > diff --git a/tools/testing/selftests/kvm/lib/x86/tdx/td_boot.S b/tools/=
+testing/selftests/kvm/lib/x86/tdx/td_boot.S
+> > new file mode 100644
+> > index 000000000000..c8cbe214bba9
+> > --- /dev/null
+> > +++ b/tools/testing/selftests/kvm/lib/x86/tdx/td_boot.S
+> > @@ -0,0 +1,100 @@
+> > +/* SPDX-License-Identifier: GPL-2.0-only */
+> > +
+> > +#include "tdx/td_boot_asm.h"
+> > +
+> > +/* Offsets for reading struct td_boot_parameters. */
+> > +#define TD_BOOT_PARAMETERS_CR0         0
+> > +#define TD_BOOT_PARAMETERS_CR3         4
+> > +#define TD_BOOT_PARAMETERS_CR4         8
+> > +#define TD_BOOT_PARAMETERS_GDT         12
+> > +#define TD_BOOT_PARAMETERS_IDT         18
+> > +#define TD_BOOT_PARAMETERS_PER_VCPU    24
+> > +
+> > +/* Offsets for reading struct td_per_vcpu_parameters. */
+> > +#define TD_PER_VCPU_PARAMETERS_ESP_GVA     0
+> > +#define TD_PER_VCPU_PARAMETERS_LJMP_TARGET 4
+> > +
+> > +#define SIZEOF_TD_PER_VCPU_PARAMETERS      10
+>
+> Please figure out how to replicate the functionality of the kernel's OFFS=
+ET()
+> macro from  include/linux/kbuild.h, I have zero desire to maintain open c=
+oded
+> offset values.
+>
+> > +.code32
+> > +
+> > +.globl td_boot
+> > +td_boot:
+> > +     /* In this procedure, edi is used as a temporary register. */
+> > +     cli
+> > +
+> > +     /* Paging is off. */
+> > +
+> > +     movl $TD_BOOT_PARAMETERS_GPA, %ebx
+> > +
+> > +     /*
+> > +      * Find the address of struct td_per_vcpu_parameters for this
+> > +      * vCPU based on esi (TDX spec: initialized with vCPU id). Put
+> > +      * struct address into register for indirect addressing.
+> > +      */
+> > +     movl $SIZEOF_TD_PER_VCPU_PARAMETERS, %eax
+> > +     mul %esi
+> > +     leal TD_BOOT_PARAMETERS_PER_VCPU(%ebx), %edi
+> > +     addl %edi, %eax
+> > +
+> > +     /* Setup stack. */
+> > +     movl TD_PER_VCPU_PARAMETERS_ESP_GVA(%eax), %esp
+> > +
+> > +     /* Setup GDT. */
+> > +     leal TD_BOOT_PARAMETERS_GDT(%ebx), %edi
+> > +     lgdt (%edi)
+> > +
+> > +     /* Setup IDT. */
+> > +     leal TD_BOOT_PARAMETERS_IDT(%ebx), %edi
+> > +     lidt (%edi)
+> > +
+> > +     /*
+> > +      * Set up control registers (There are no instructions to mov fro=
+m
+> > +      * memory to control registers, hence use ebx as a scratch regist=
+er).
+>
+> EDI is used as the scratch register, not EBX.
+>
+
+Thanks, updated the comment.
+
+> > +      */
+> > +     movl TD_BOOT_PARAMETERS_CR4(%ebx), %edi
+> > +     movl %edi, %cr4
+> > +     movl TD_BOOT_PARAMETERS_CR3(%ebx), %edi
+> > +     movl %edi, %cr3
+> > +     movl TD_BOOT_PARAMETERS_CR0(%ebx), %edi
+> > +     movl %edi, %cr0
+> > +
+> > +     /* Paging is on after setting the most significant bit on cr0. */
+>
+> This comment is hilariously useless.  Anyone that's familiar enough with =
+x86 to
+> know that CR0.PG is the "most significant bit" will know that setting CR0=
+.PG enables
+> paging.  To everyone else, this just reads like "magic happened!".
+>
+> The other thing that absolutely needs to be called out is that this trans=
+itions
+> the vCPU to 64-bit mode.
+>
+>
+
+Updated the comment in next version.
+
+> > +
+> > +     /*
+> > +      * Jump to selftest guest code. Far jumps read <segment
+> > +      * selector:new eip> from <addr+4:addr>. This location has
+> > +      * already been set up in boot parameters, and boot parameters ca=
+n
+> > +      * be read because boot code and boot parameters are loaded so
+> > +      * that GVA and GPA are mapped 1:1.
+> > +      */
+> > +     ljmp *TD_PER_VCPU_PARAMETERS_LJMP_TARGET(%eax)
+>
+> Why jump straight to C code?  AFAICT, that unnecessarily restricts the RI=
+P of
+> guest_code to 32-bit addresses.   Why not FAR JMP to a "local" address an=
+d then
+> trampoline to guest_code after getting into 64-bit mode?
+>
+Thanks, updated as sugested.
+> > +
+> > +.globl reset_vector
+> > +reset_vector:
+> > +     jmp td_boot
+> > +     /*
+> > +      * Pad reset_vector to its full size of 16 bytes so that this
+> > +      * can be loaded with the end of reset_vector aligned to GPA=3D4G=
+.
+> > +      */
+>
+> .fill, so that I don't have to count the number of int3 instructions on m=
+y
+> fingers.  Actually, doing this in assembly is absurd.  This code clearly =
+relies
+> on the assembler to generate an *exact* instruction.  And that in turn re=
+lies on
+> the "td boot code" to be no more than 256 bytes away from the RESET vecto=
+r,
+> otherwise the compiler would need to emit JMP rel16 (or rel32), and then =
+all of
+> this gets sad, in the most convoluted way.  More below.
+>
+
+Removed and replaced with the handcoded reset vector as suggested below.
+
+> > +     int3
+> > +     int3
+> > +     int3
+> > +     int3
+> > +     int3
+> > +     int3
+> > +     int3
+> > +     int3
+> > +     int3
+> > +     int3
+> > +     int3
+> > +     int3
+> > +     int3
+> > +     int3
+> > +
+> > +/* Leave marker so size of td_boot code can be computed. */
+> > +.globl td_boot_code_end
+> > +td_boot_code_end:
+> > +
+> > +/* Disable executable stack. */
+> > +.section .note.GNU-stack,"",%progbits
+> > diff --git a/tools/testing/selftests/kvm/lib/x86/tdx/tdx_util.c b/tools=
+/testing/selftests/kvm/lib/x86/tdx/tdx_util.c
+> > new file mode 100644
+> > index 000000000000..392d6272d17e
+> > --- /dev/null
+> > +++ b/tools/testing/selftests/kvm/lib/x86/tdx/tdx_util.c
+> > @@ -0,0 +1,566 @@
+> > +// SPDX-License-Identifier: GPL-2.0-only
+> > +
+> > +#include <asm/kvm.h>
+> > +#include <errno.h>
+> > +#include <linux/kvm.h>
+> > +#include <stdint.h>
+> > +#include <sys/ioctl.h>
+> > +
+> > +#include "kvm_util.h"
+> > +#include "processor.h"
+> > +#include "tdx/td_boot.h"
+> > +#include "test_util.h"
+> > +
+> > +uint64_t tdx_s_bit;
+>
+> Put this in a separate patch, with an explanation of what it does and why=
+ it's
+> needed.
+>
+
+Removed this one. I believe it was used by a specific test. We can add
+it later if necessary but I'm assuming we can find a better way to
+handle this.
+
+> > +/*
+> > + * TDX ioctls
+> > + */
+> > +
+> > +static char *tdx_cmd_str[] =3D {
+> > +     "KVM_TDX_CAPABILITIES",
+> > +     "KVM_TDX_INIT_VM",
+> > +     "KVM_TDX_INIT_VCPU",
+> > +     "KVM_TDX_INIT_MEM_REGION",
+> > +     "KVM_TDX_FINALIZE_VM",
+> > +     "KVM_TDX_GET_CPUID"
+> > +};
+> > +
+> > +#define TDX_MAX_CMD_STR (ARRAY_SIZE(tdx_cmd_str))
+>
+> *sigh*
+>
+> See KVM_IOCTL_ERROR() for an example of how to generate strings from macr=
+os.
+>
+
+Thanks, I replaced all the ioctl definitions with something similar to
+vm_sev_ioctl()
+
+> > +static int _tdx_ioctl(int fd, int ioctl_no, uint32_t flags, void *data=
+)
+> > +{
+> > +     struct kvm_tdx_cmd tdx_cmd;
+> > +
+> > +     TEST_ASSERT(ioctl_no < TDX_MAX_CMD_STR, "Unknown TDX CMD : %d\n",
+> > +                 ioctl_no);
+> > +
+> > +     memset(&tdx_cmd, 0x0, sizeof(tdx_cmd));
+> > +     tdx_cmd.id =3D ioctl_no;
+> > +     tdx_cmd.flags =3D flags;
+> > +     tdx_cmd.data =3D (uint64_t)data;
+> > +
+> > +     return ioctl(fd, KVM_MEMORY_ENCRYPT_OP, &tdx_cmd);
+> > +}
+> > +
+> > +static void tdx_ioctl(int fd, int ioctl_no, uint32_t flags, void *data=
+)
+> > +{
+> > +     int r;
+> > +
+> > +     r =3D _tdx_ioctl(fd, ioctl_no, flags, data);
+> > +     TEST_ASSERT(r =3D=3D 0, "%s failed: %d  %d", tdx_cmd_str[ioctl_no=
+], r,
+> > +                 errno);
+> > +}
+>
+> Don't bury these in tdx_util.c.  These should probably look a lot like
+> vm_sev_ioctl()...
+>
+> > +static struct kvm_tdx_capabilities *tdx_read_capabilities(struct kvm_v=
+m *vm)
+> > +{
+> > +     struct kvm_tdx_capabilities *tdx_cap =3D NULL;
+> > +     int nr_cpuid_configs =3D 4;
+> > +     int rc =3D -1;
+> > +     int i;
+> > +
+> > +     do {
+> > +             nr_cpuid_configs *=3D 2;
+> > +
+> > +             tdx_cap =3D realloc(tdx_cap, sizeof(*tdx_cap) +
+> > +                                        sizeof(tdx_cap->cpuid) +
+> > +                                        (sizeof(struct kvm_cpuid_entry=
+2) * nr_cpuid_configs));
+> > +             TEST_ASSERT(tdx_cap,
+> > +                         "Could not allocate memory for tdx capability=
+ nr_cpuid_configs %d\n",
+> > +                         nr_cpuid_configs);
+> > +
+> > +             tdx_cap->cpuid.nent =3D nr_cpuid_configs;
+> > +             rc =3D _tdx_ioctl(vm->fd, KVM_TDX_CAPABILITIES, 0, tdx_ca=
+p);
+> > +     } while (rc < 0 && errno =3D=3D E2BIG);
+> > +
+> > +     TEST_ASSERT(rc =3D=3D 0, "KVM_TDX_CAPABILITIES failed: %d %d",
+> > +                 rc, errno);
+> > +
+> > +     pr_debug("tdx_cap: supported_attrs: 0x%016llx\n"
+> > +              "tdx_cap: supported_xfam 0x%016llx\n",
+> > +              tdx_cap->supported_attrs, tdx_cap->supported_xfam);
+> > +
+> > +     for (i =3D 0; i < tdx_cap->cpuid.nent; i++) {
+> > +             const struct kvm_cpuid_entry2 *config =3D &tdx_cap->cpuid=
+.entries[i];
+> > +
+> > +             pr_debug("cpuid config[%d]: leaf 0x%x sub_leaf 0x%x eax 0=
+x%08x ebx 0x%08x ecx 0x%08x edx 0x%08x\n",
+> > +                      i, config->function, config->index,
+> > +                      config->eax, config->ebx, config->ecx, config->e=
+dx);
+> > +     }
+> > +
+> > +     return tdx_cap;
+> > +}
+> > +
+> > +static struct kvm_cpuid_entry2 *tdx_find_cpuid_config(struct kvm_tdx_c=
+apabilities *cap,
+> > +                                                   uint32_t leaf, uint=
+32_t sub_leaf)
+> > +{
+> > +     struct kvm_cpuid_entry2 *config;
+> > +     uint32_t i;
+> > +
+> > +     for (i =3D 0; i < cap->cpuid.nent; i++) {
+> > +             config =3D &cap->cpuid.entries[i];
+> > +
+> > +             if (config->function =3D=3D leaf && config->index =3D=3D =
+sub_leaf)
+> > +                     return config;
+> > +     }
+> > +
+> > +     return NULL;
+> > +}
+> > +
+> > +#define XFEATURE_MASK_CET (XFEATURE_MASK_CET_USER | XFEATURE_MASK_CET_=
+KERNEL)
+>
+> One guess on what my feedback would be.
+
+I ended up removing tdx_apply_cpuid_restrictions() and
+__tdx_mask_cpuid_features() since tdx_filter_cpuid() is sufficient and
+uses information returned by KVM and the TDX module instead of
+hardcoded values.
+
+>
+> > +static void tdx_apply_cpuid_restrictions(struct kvm_cpuid2 *cpuid_data=
+)
+> > +{
+> > +     for (int i =3D 0; i < cpuid_data->nent; i++) {
+> > +             struct kvm_cpuid_entry2 *e =3D &cpuid_data->entries[i];
+> > +
+> > +             if (e->function =3D=3D 0xd && e->index =3D=3D 0) {
+> > +                     /*
+> > +                      * TDX module requires both XTILE_{CFG, DATA} to =
+be set.
+> > +                      * Both bits are required for AMX to be functiona=
+l.
+> > +                      */
+> > +                     if ((e->eax & XFEATURE_MASK_XTILE) !=3D
+> > +                         XFEATURE_MASK_XTILE) {
+> > +                             e->eax &=3D ~XFEATURE_MASK_XTILE;
+> > +                     }
+> > +             }
+> > +             if (e->function =3D=3D 0xd && e->index =3D=3D 1) {
+> > +                     /*
+> > +                      * TDX doesn't support LBR yet.
+> > +                      * Disable bits from the XCR0 register.
+> > +                      */
+> > +                     e->ecx &=3D ~XFEATURE_MASK_LBR;
+> > +                     /*
+> > +                      * TDX modules requires both CET_{U, S} to be set=
+ even
+> > +                      * if only one is supported.
+> > +                      */
+> > +                     if (e->ecx & XFEATURE_MASK_CET)
+> > +                             e->ecx |=3D XFEATURE_MASK_CET;
+> > +             }
+> > +     }
+> > +}
+> > +
+> > +#define KVM_MAX_CPUID_ENTRIES 256
+> > +
+> > +#define CPUID_EXT_VMX                        BIT(5)
+> > +#define CPUID_EXT_SMX                        BIT(6)
+> > +#define CPUID_PSE36                  BIT(17)
+> > +#define CPUID_7_0_EBX_TSC_ADJUST     BIT(1)
+> > +#define CPUID_7_0_EBX_SGX            BIT(2)
+> > +#define CPUID_7_0_EBX_INTEL_PT               BIT(25)
+> > +#define CPUID_7_0_ECX_SGX_LC         BIT(30)
+> > +#define CPUID_APM_INVTSC             BIT(8)
+> > +#define CPUID_8000_0008_EBX_WBNOINVD BIT(9)
+> > +#define CPUID_EXT_PDCM                       BIT(15)
+>
+>
+> X86_FEATURE_xxx and all of the infrastructure they come with.
+>
+>
+> > +#define TDX_SUPPORTED_KVM_FEATURES  ((1U << KVM_FEATURE_NOP_IO_DELAY) =
+| \
+> > +                                  (1U << KVM_FEATURE_PV_UNHALT) |    \
+> > +                                  (1U << KVM_FEATURE_PV_TLB_FLUSH) | \
+> > +                                  (1U << KVM_FEATURE_PV_SEND_IPI) |  \
+> > +                                  (1U << KVM_FEATURE_POLL_CONTROL) | \
+> > +                                  (1U << KVM_FEATURE_PV_SCHED_YIELD) |=
+ \
+> > +                                  (1U << KVM_FEATURE_MSI_EXT_DEST_ID))
+>
+> X86_FEATURE_KVM_xxx
+>
+> > +void __tdx_mask_cpuid_features(struct kvm_cpuid_entry2 *entry)
+> > +{
+> > +     /*
+> > +      * Only entries with sub-leaf zero need to be masked, but some of=
+ these
+> > +      * leaves have other sub-leaves defined. Bail on any non-zero sub=
+-leaf,
+> > +      * so they don't get unintentionally modified.
+> > +      */
+> > +     if (entry->index)
+> > +             return;
+> > +
+> > +     switch (entry->function) {
+> > +     case 0x1:
+> > +             entry->ecx &=3D ~(CPUID_EXT_VMX | CPUID_EXT_SMX);
+> > +             entry->edx &=3D ~CPUID_PSE36;
+>
+> vcpu_clear_cpuid_feature()
+>
+> > +             break;
+> > +     case 0x7:
+> > +             entry->ebx &=3D ~(CPUID_7_0_EBX_TSC_ADJUST | CPUID_7_0_EB=
+X_SGX);
+> > +             entry->ebx &=3D ~CPUID_7_0_EBX_INTEL_PT;
+> > +             entry->ecx &=3D ~CPUID_7_0_ECX_SGX_LC;
+> > +             break;
+> > +     case 0x40000001:
+> > +             entry->eax &=3D TDX_SUPPORTED_KVM_FEATURES;
+> > +             break;
+> > +     case 0x80000007:
+> > +             entry->edx |=3D CPUID_APM_INVTSC;
+>
+> Quite obviously isn't "masking" anything".
+>
+> > +             break;
+> > +     case 0x80000008:
+> > +             entry->ebx &=3D CPUID_8000_0008_EBX_WBNOINVD;
+>
+> And what happens when a feature in 8000_0008 comes along that TDX does su=
+pport?
+>
+
+Now that we only use tdx_filter_cpuid, that feature should be reported
+as supported by KVM_TDX_CAPABILITIES.
+
+>
+> > +             break;
+> > +     default:
+> > +             break;
+> > +     }
+> > +}
+> > +
+> > +static void tdx_mask_cpuid_features(struct kvm_cpuid2 *cpuid_data)
+> > +{
+> > +     for (int i =3D 0; i < cpuid_data->nent; i++)
+> > +             __tdx_mask_cpuid_features(&cpuid_data->entries[i]);
+> > +}
+> > +
+> > +void tdx_filter_cpuid(struct kvm_vm *vm, struct kvm_cpuid2 *cpuid_data=
+)
+> > +{
+> > +     struct kvm_tdx_capabilities *tdx_cap;
+> > +     struct kvm_cpuid_entry2 *config;
+> > +     struct kvm_cpuid_entry2 *e;
+> > +     int i;
+> > +
+> > +     tdx_cap =3D tdx_read_capabilities(vm);
+> > +
+> > +     i =3D 0;
+> > +     while (i < cpuid_data->nent) {
+> > +             e =3D cpuid_data->entries + i;
+> > +             config =3D tdx_find_cpuid_config(tdx_cap, e->function, e-=
+>index);
+> > +
+> > +             if (!config) {
+> > +                     int left =3D cpuid_data->nent - i - 1;
+> > +
+> > +                     if (left > 0)
+> > +                             memmove(cpuid_data->entries + i,
+> > +                                     cpuid_data->entries + i + 1,
+> > +                                     sizeof(*cpuid_data->entries) * le=
+ft);
+> > +                     cpuid_data->nent--;
+> > +                     continue;
+> > +             }
+> > +
+> > +             e->eax &=3D config->eax;
+> > +             e->ebx &=3D config->ebx;
+> > +             e->ecx &=3D config->ecx;
+> > +             e->edx &=3D config->edx;
+> > +
+> > +             i++;
+> > +     }
+> > +
+> > +     free(tdx_cap);
+>
+> Please add a comment explaining what and why.
+>
+
+Added a function level comment.
+
+> > +}
+> > +
+> > +static void tdx_td_init(struct kvm_vm *vm, uint64_t attributes)
+> > +{
+> > +     struct kvm_tdx_init_vm *init_vm;
+> > +     const struct kvm_cpuid2 *tmp;
+> > +     struct kvm_cpuid2 *cpuid;
+> > +
+> > +     tmp =3D kvm_get_supported_cpuid();
+> > +
+> > +     cpuid =3D allocate_kvm_cpuid2(KVM_MAX_CPUID_ENTRIES);
+> > +     memcpy(cpuid, tmp, kvm_cpuid2_size(tmp->nent));
+> > +     tdx_mask_cpuid_features(cpuid);
+> > +
+> > +     init_vm =3D calloc(1, sizeof(*init_vm) +
+> > +                      sizeof(init_vm->cpuid.entries[0]) * cpuid->nent)=
+;
+> > +     TEST_ASSERT(init_vm, "vm allocation failed");
+> > +
+> > +     memcpy(&init_vm->cpuid, cpuid, kvm_cpuid2_size(cpuid->nent));
+> > +     free(cpuid);
+> > +
+> > +     init_vm->attributes =3D attributes;
+> > +
+> > +     tdx_apply_cpuid_restrictions(&init_vm->cpuid);
+> > +     tdx_filter_cpuid(vm, &init_vm->cpuid);
+> > +
+> > +     tdx_ioctl(vm->fd, KVM_TDX_INIT_VM, 0, init_vm);
+> > +     free(init_vm);
+> > +}
+> > +
+> > +static void tdx_td_vcpu_init(struct kvm_vcpu *vcpu)
+> > +{
+> > +     struct kvm_cpuid2 *cpuid;
+> > +
+> > +     cpuid =3D allocate_kvm_cpuid2(KVM_MAX_CPUID_ENTRIES);
+> > +     tdx_ioctl(vcpu->fd, KVM_TDX_GET_CPUID, 0, cpuid);
+> > +     vcpu_init_cpuid(vcpu, cpuid);
+> > +     free(cpuid);
+> > +     tdx_ioctl(vcpu->fd, KVM_TDX_INIT_VCPU, 0, NULL);
+> > +     /*
+> > +      * Refresh CPUID to get KVM's "runtime" updates which are done by
+> > +      * KVM_TDX_INIT_VCPU.
+> > +      */
+> > +     vcpu_get_cpuid(vcpu);
+> > +}
+> > +
+> > +static void tdx_init_mem_region(struct kvm_vm *vm, void *source_pages,
+> > +                             uint64_t gpa, uint64_t size)
+> > +{
+> > +     uint32_t metadata =3D KVM_TDX_MEASURE_MEMORY_REGION;
+> > +     struct kvm_tdx_init_mem_region mem_region =3D {
+> > +             .source_addr =3D (uint64_t)source_pages,
+> > +             .gpa =3D gpa,
+> > +             .nr_pages =3D size / PAGE_SIZE,
+> > +     };
+> > +     struct kvm_vcpu *vcpu;
+> > +
+> > +     vcpu =3D list_first_entry_or_null(&vm->vcpus, struct kvm_vcpu, li=
+st);
+> > +
+> > +     TEST_ASSERT((mem_region.nr_pages > 0) &&
+> > +                 ((mem_region.nr_pages * PAGE_SIZE) =3D=3D size),
+> > +                 "Cannot add partial pages to the guest memory.\n");
+> > +     TEST_ASSERT(((uint64_t)source_pages & (PAGE_SIZE - 1)) =3D=3D 0,
+> > +                 "Source memory buffer is not page aligned\n");
+> > +     tdx_ioctl(vcpu->fd, KVM_TDX_INIT_MEM_REGION, metadata, &mem_regio=
+n);
+>
+> Provide proper VM vs. vCPU macro infrastructure, don't open code derefere=
+ncing
+> the file descriptor in each API.
+>
+> > +}
+> > +
+> > +static void tdx_td_finalize_mr(struct kvm_vm *vm)
+> > +{
+> > +     tdx_ioctl(vm->fd, KVM_TDX_FINALIZE_VM, 0, NULL);
+> > +}
+> > +
+> > +/*
+> > + * TD creation/setup/finalization
+> > + */
+> > +
+> > +static void tdx_enable_capabilities(struct kvm_vm *vm)
+>
+> Too. Many. Helpers.  Maybe google3 loves forcing readers to click 50000 l=
+inks
+> to read 10 lines of actual code, but I hate it.  The name is also wildly
+> misleading.  I expected this helper to enable ***TDX*** capabilities.  In=
+stead
+> it's enabling KVM capabilities that aren't directly related to TDX.
+>
+
+Added is_split_irqchip_required() and hooked it into general
+vm_create_irqchip() as suggested below so removing this function
+entirely.
+
+> > +{
+> > +     int rc;
+> > +
+> > +     rc =3D kvm_check_cap(KVM_CAP_X2APIC_API);
+> > +     TEST_ASSERT(rc, "TDX: KVM_CAP_X2APIC_API is not supported!");
+>
+> If someone really things we need these:
+>
+>         TEST_ASSERT(kvm_check_cap(KVM_CAP_X2APIC_API),
+>                     "KVM must support x2APIC to advertise TDX support");
+>         TEST_ASSERT(kvm_check_cap(KVM_CAP_SPLIT_IRQCHIP),
+>                     "KVM must support split IRQCHIP to advertise TDX supp=
+ort");
+>
+> But honestly, just let vm_enable_cap() fail.
+>
+> > +     rc =3D kvm_check_cap(KVM_CAP_SPLIT_IRQCHIP);
+> > +     TEST_ASSERT(rc, "TDX: KVM_CAP_SPLIT_IRQCHIP is not supported!");
+> > +
+> > +     vm_enable_cap(vm, KVM_CAP_X2APIC_API,
+> > +                   KVM_X2APIC_API_USE_32BIT_IDS |
+> > +                           KVM_X2APIC_API_DISABLE_BROADCAST_QUIRK);
+> > +     vm_enable_cap(vm, KVM_CAP_SPLIT_IRQCHIP, 24);
+>
+> I would rather add a callback/hook to communicate that the VM *needs* a s=
+plit
+> IRQ chip, and use that in vm_create_irqchip().
+>
+> > +}
+> > +
+> > +static void tdx_apply_cr4_restrictions(struct kvm_sregs *sregs)
+> > +{
+> > +     /* TDX spec 11.6.2: CR4 bit MCE is fixed to 1 */
+> > +     sregs->cr4 |=3D X86_CR4_MCE;
+> > +
+> > +     /* Set this because UEFI also sets this up, to handle XMM excepti=
+ons */
+> > +     sregs->cr4 |=3D X86_CR4_OSXMMEXCPT;
+> > +
+> > +     /* TDX spec 11.6.2: CR4 bit VMXE and SMXE are fixed to 0 */
+> > +     sregs->cr4 &=3D ~(X86_CR4_VMXE | X86_CR4_SMXE);
+> > +}
+> > +
+> > +static void load_td_boot_code(struct kvm_vm *vm)
+> > +{
+> > +     void *boot_code_hva =3D addr_gpa2hva(vm, FOUR_GIGABYTES_GPA - TD_=
+BOOT_CODE_SIZE);
+>
+> I would rather express this relative to the reset vector, because *that's=
+* what
+> really matters.  That also works well with coding the JMP rel8 trampoline=
+ directly.
+>
+> Is it ugly and full of gory details?  Absolutely.  But if it breaks, e.g.=
+ because
+> the TD boot code pushes past 256 bytes (which practically speaking will n=
+ever
+> happen), then it should break in a very obvious and easy to debug way.
+>
+> And for readers that aren't intimately familiar with ancient x86 boot beh=
+avior
+> *and* TDX lovely extension of that crustiness, this at least provides a f=
+ew clues
+> as to what magic is going on.
+>
+
+Thanks for the reference. I updated this in the next version.
+
+> #define X86_RESET_VECTOR        0xfffffff0ul
+>
+> static void td_setup_boot_code(struct kvm_vm *vm)
+> {
+>         size_t nr_bytes =3D td_boot_code_end - td_boot_code;
+>         vm_paddr_t gpa =3D X86_RESET_VECTOR - nr_bytes;
+>         uint8_t *hva;
+>
+>         <map into guest>
+>
+>         <comment goes here>
+>         hva =3D addr_gpa2hva(vm, gpa);
+>         memcpy(hva, td_boot_code, nr_bytes);
+>
+>         hva +=3D nr_bytes;
+>         TEST_ASSERT(hva =3D=3D addr_gpa2hva(vm, X86_RESET_VECTOR),
+>                     "Expected RESET vector at hva 0x%lx, got %lx",
+>                     (unsigned long)addr_gpa2hva(vm, X86_RESET_VECTOR), (u=
+nsigned long)hva);
+>
+>         /*
+>          * Handcode "JMP rel8" at the RESET vector to jump back to the TD=
+ boot
+>          * code, as there are only 16 bytes at the RESET vector before RI=
+P will
+>          * wrap back to zero.  Insert a trailing int3 so that the vCPU cr=
+ashes
+>          * in case the JMP somehow falls through.  Note!  The target addr=
+ess is
+>          * relative to the end of the instruction!
+>          */
+>         TEST_ASSERT(nr_bytes < 256,
+>                     "TD boot code not addressable by 'JMP rel8'");
+>         hva[0] =3D 0xeb;
+>         hva[1] =3D 256 - 2 - nr_bytes;
+>         hva[2] =3D 0xcc;
+> }
+>
+> > +
+> > +     TEST_ASSERT(td_boot_code_end - reset_vector =3D=3D 16,
+> > +                 "The reset vector must be 16 bytes in size.");
+> > +     memcpy(boot_code_hva, td_boot, TD_BOOT_CODE_SIZE);
+> > +}
+> > +
+> > +static void load_td_per_vcpu_parameters(struct td_boot_parameters *par=
+ams,
+> > +                                     struct kvm_sregs *sregs,
+> > +                                     struct kvm_vcpu *vcpu,
+> > +                                     void *guest_code)
+> > +{
+> > +     struct td_per_vcpu_parameters *vcpu_params =3D &params->per_vcpu[=
+vcpu->id];
+> > +
+> > +     TEST_ASSERT(vcpu->initial_stack_addr !=3D 0,
+> > +                 "initial stack address should not be 0");
+> > +     TEST_ASSERT(vcpu->initial_stack_addr <=3D 0xffffffff,
+> > +                 "initial stack address must fit in 32 bits");
+> > +     TEST_ASSERT((uint64_t)guest_code <=3D 0xffffffff,
+> > +                 "guest_code must fit in 32 bits");
+> > +     TEST_ASSERT(sregs->cs.selector !=3D 0, "cs.selector should not be=
+ 0");
+> > +
+> > +     vcpu_params->esp_gva =3D (uint32_t)(uint64_t)vcpu->initial_stack_=
+addr;
+> > +     vcpu_params->ljmp_target.eip_gva =3D (uint32_t)(uint64_t)guest_co=
+de;
+> > +     vcpu_params->ljmp_target.code64_sel =3D sregs->cs.selector;
+> > +}
+> > +
+> > +static void load_td_common_parameters(struct td_boot_parameters *param=
+s,
+> > +                                   struct kvm_sregs *sregs)
+> > +{
+> > +     /* Set parameters! */
+> > +     params->cr0 =3D sregs->cr0;
+> > +     params->cr3 =3D sregs->cr3;
+> > +     params->cr4 =3D sregs->cr4;
+> > +     params->gdtr.limit =3D sregs->gdt.limit;
+> > +     params->gdtr.base =3D sregs->gdt.base;
+> > +     params->idtr.limit =3D sregs->idt.limit;
+> > +     params->idtr.base =3D sregs->idt.base;
+> > +
+> > +     TEST_ASSERT(params->cr0 !=3D 0, "cr0 should not be 0");
+> > +     TEST_ASSERT(params->cr3 !=3D 0, "cr3 should not be 0");
+> > +     TEST_ASSERT(params->cr4 !=3D 0, "cr4 should not be 0");
+> > +     TEST_ASSERT(params->gdtr.base !=3D 0, "gdt base address should no=
+t be 0");
+> > +     TEST_ASSERT(params->idtr.base !=3D 0, "idt base address should no=
+t be 0");
+> > +}
+> > +
+> > +static void load_td_boot_parameters(struct td_boot_parameters *params,
+> > +                                 struct kvm_vcpu *vcpu, void *guest_co=
+de)
+> > +{
+> > +     struct kvm_sregs sregs;
+> > +
+> > +     /* Assemble parameters in sregs */
+> > +     memset(&sregs, 0, sizeof(struct kvm_sregs));
+> > +     vcpu_setup_mode_sregs(vcpu->vm, &sregs);
+> > +     tdx_apply_cr4_restrictions(&sregs);
+> > +
+> > +     if (!params->cr0)
+> > +             load_td_common_parameters(params, &sregs);
+>
+> This 100% belongs in VM initialization code, not in vCPU code using '0' a=
+s a
+> magic canary.  Find a way to make that happen.
+>
+
+Moved this part to kvm_arch_vm_post_create() since it requires the
+descriptors tables to be set up.
+
+> > +     load_td_per_vcpu_parameters(params, &sregs, vcpu, guest_code);
+> > +}
+> > +
+> > +/*
+> > + * Adds a vCPU to a TD (Trusted Domain) with minimum defaults. It will=
+ not set
+> > + * up any general purpose registers as they will be initialized by the=
+ TDX. In
+> > + * TDX, vCPUs RIP is set to 0xFFFFFFF0. See Intel TDX EAS Section "Ini=
+tial State
+> > + * of Guest GPRs" for more information on vCPUs initial register value=
+s when
+> > + * entering the TD first time.
+> > + *
+> > + * Input Args:
+> > + *   vm - Virtual Machine
+> > + *   vcpuid - The id of the vCPU to add to the VM.
+> > + */
+> > +struct kvm_vcpu *td_vcpu_add(struct kvm_vm *vm, uint32_t vcpu_id, void=
+ *guest_code)
+> > +{
+> > +     struct kvm_vcpu *vcpu;
+> > +
+> > +     vm->arch.has_protected_regs =3D true;
+> > +     vcpu =3D vm_arch_vcpu_add(vm, vcpu_id);
+> > +
+> > +     tdx_td_vcpu_init(vcpu);
+> > +
+> > +     load_td_boot_parameters(addr_gpa2hva(vm, TD_BOOT_PARAMETERS_GPA),
+> > +                             vcpu, guest_code);
+>
+> As mentioned in a previous patch, call this from vm_arch_vcpu_add(), and =
+pass
+> in the stack pointer and whatever else is needed and isn't already availa=
+ble.
+>
+> > +     return vcpu;
+> > +}
+> > +
+> > +static void load_td_memory_region(struct kvm_vm *vm,
+> > +                               struct userspace_mem_region *region)
+> > +{
+> > +     const struct sparsebit *pages =3D region->protected_phy_pages;
+> > +     const vm_paddr_t gpa_base =3D region->region.guest_phys_addr;
+> > +     const uint64_t hva_base =3D region->region.userspace_addr;
+> > +     const sparsebit_idx_t lowest_page_in_region =3D gpa_base >> vm->p=
+age_shift;
+> > +
+> > +     sparsebit_idx_t i;
+> > +     sparsebit_idx_t j;
+> > +
+> > +     if (!sparsebit_any_set(pages))
+> > +             return;
+> > +
+> > +     sparsebit_for_each_set_range(pages, i, j) {
+> > +             const uint64_t size_to_load =3D (j - i + 1) * vm->page_si=
+ze;
+> > +             const uint64_t offset =3D
+> > +                     (i - lowest_page_in_region) * vm->page_size;
+> > +             const uint64_t hva =3D hva_base + offset;
+> > +             const uint64_t gpa =3D gpa_base + offset;
+> > +             void *source_addr;
+> > +
+> > +             /*
+> > +              * KVM_TDX_INIT_MEM_REGION ioctl cannot encrypt memory in=
+ place.
+>
+> We should really fix that.
+>
+> > +              * Make a copy if there's only one backing memory source.
+> > +              */
+>
+> Comment says "if", code does not.
+>
+
+I merged this code change and the one adding support for guest_memfd
+together and updated the comments.
+
+> > +             source_addr =3D mmap(NULL, size_to_load, PROT_READ | PROT=
+_WRITE,
+> > +                                MAP_ANONYMOUS | MAP_PRIVATE, -1, 0);
+>
+> mmap()ing and munmap()ing (mostly) unbounded ranges seems like it would b=
+e slower
+> and more like to fail than allocating a single scratch page and copying+i=
+nitializing
+> pages one-by-one.
+>
+> > +             TEST_ASSERT(source_addr,
+> > +                         "Could not allocate memory for loading memory=
+ region");
+> > +
+> > +             memcpy(source_addr, (void *)hva, size_to_load);
+> > +
+> > +             tdx_init_mem_region(vm, source_addr, gpa, size_to_load);
+> > +
+> > +             munmap(source_addr, size_to_load);
+> > +     }
+> > +}
+> > +
+> > +static void load_td_private_memory(struct kvm_vm *vm)
+>
+> This helper probably doesn't need to exist.
+>
+
+Removed the helper. The only purpose of the helper was to avoid too
+many levels of loop nesting.
+
+> > +{
+> > +     struct userspace_mem_region *region;
+> > +     int ctr;
+> > +
+> > +     hash_for_each(vm->regions.slot_hash, ctr, region, slot_node) {
+> > +             load_td_memory_region(vm, region);
+> > +     }
+> > +}
+> > +
+> > +struct kvm_vm *td_create(void)
+> > +{
+> > +     const struct vm_shape shape =3D {
+> > +             .mode =3D VM_MODE_DEFAULT,
+> > +             .type =3D KVM_X86_TDX_VM,
+> > +     };
+> > +
+> > +     return ____vm_create(shape);
+> > +}
+> > +
+> > +static void td_setup_boot_code(struct kvm_vm *vm, enum vm_mem_backing_=
+src_type src_type)
+> > +{
+> > +     size_t boot_code_allocation =3D round_up(TD_BOOT_CODE_SIZE, PAGE_=
+SIZE);
+> > +     vm_paddr_t boot_code_base_gpa =3D FOUR_GIGABYTES_GPA - boot_code_=
+allocation;
+> > +     size_t npages =3D DIV_ROUND_UP(boot_code_allocation, PAGE_SIZE);
+> > +     vm_vaddr_t addr;
+> > +
+> > +     vm_userspace_mem_region_add(vm, src_type, boot_code_base_gpa, 1, =
+npages,
+> > +                                 KVM_MEM_GUEST_MEMFD);
+> > +     vm->memslots[MEM_REGION_CODE] =3D 1;
+>
+> Uh, this plays nice with kvm_vm_elf_load() how?
+>
+
+kvm_vm_elf_load is called before the VM protected memory is encrypted.
+
+> > +     addr =3D vm_vaddr_identity_alloc(vm, boot_code_allocation,
+> > +                                    boot_code_base_gpa, MEM_REGION_COD=
+E);
+> > +     TEST_ASSERT_EQ(addr, boot_code_base_gpa);
+> > +
+> > +     load_td_boot_code(vm);
+> > +}
+> > +
+> > +static size_t td_boot_parameters_size(void)
+> > +{
+> > +     int max_vcpus =3D kvm_check_cap(KVM_CAP_MAX_VCPUS);
+>
+> Allocating memory for the max *possible* number of vCPUs screams "bad API=
+s".
+> It should be entirely doable to wire things up so that this is called fro=
+m
+> __vm_create() and gets passed @nr_runnable_vcpus.
+>
+
+Updated in next version.
+
+> > +     size_t total_per_vcpu_parameters_size =3D
+>
+> The name is almost longer than the code...
+>
+
+Flattened it and removed the td_boot_parameters_size helper.
+
+> > +             max_vcpus * sizeof(struct td_per_vcpu_parameters);
+> > +
+> > +     return sizeof(struct td_boot_parameters) + total_per_vcpu_paramet=
+ers_size;
+> > +}
 
