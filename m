@@ -1,52 +1,52 @@
-Return-Path: <kvm+bounces-55433-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-55424-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 71A76B30977
-	for <lists+kvm@lfdr.de>; Fri, 22 Aug 2025 00:44:15 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 149FBB30963
+	for <lists+kvm@lfdr.de>; Fri, 22 Aug 2025 00:41:26 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 8EC5B1CE50CF
-	for <lists+kvm@lfdr.de>; Thu, 21 Aug 2025 22:41:26 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 74B2E1CE0B44
+	for <lists+kvm@lfdr.de>; Thu, 21 Aug 2025 22:39:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 668CC3128A9;
-	Thu, 21 Aug 2025 22:38:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8522D2F39C5;
+	Thu, 21 Aug 2025 22:38:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=zytor.com header.i=@zytor.com header.b="TISyPjtl"
+	dkim=pass (2048-bit key) header.d=zytor.com header.i=@zytor.com header.b="jD/zGROb"
 X-Original-To: kvm@vger.kernel.org
 Received: from mail.zytor.com (terminus.zytor.com [198.137.202.136])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B20AB2EA755;
-	Thu, 21 Aug 2025 22:37:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EB1B42EA754;
+	Thu, 21 Aug 2025 22:37:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.136
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755815883; cv=none; b=S4iDKXxMFE/qXRZHwGBeiOCTZY6UyjLi0wuvDYMFGxu6vrGFWk8zvXOeDcl2GqUBl8GP6YimW2FcLuV26aA3nTRZdzcuq/yJiO2nCkfUFJC3c9hgUbToClHjb4DXKlvI3Qebo/yTrdGIRb2x7y72YJDWJso2gb+D7KxanThhKZU=
+	t=1755815881; cv=none; b=bthatTldZpTdqYHZfWbwWmnbabgx7MCUeAMxwt8dzj/YqCjjSt/ZebrNR0OTPPgJMBI9Z9zZBtVw5DtQEGwrVKwz1PQxmjXDiC2qlqtxnRAiADqSUnVojOf1E9IiKe7pVV8Z49Er1aytYAn2mCsJrd52Ka2FpX5xXxqlqTNsA1Q=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755815883; c=relaxed/simple;
-	bh=sZ6RTt0wSOPylrUTjGFWzJhEP8sSj7ng279rDrMsHno=;
+	s=arc-20240116; t=1755815881; c=relaxed/simple;
+	bh=U4wg6bOm2m/HVDn3dgmX332I0PObfM6g46MMo75qTM0=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=okTzy1sgGma+MqP45n0pF78DYiZB7xA+0rSOZPDru84T4g5EpRQG7F5eoUixZOowssVFkCdwIm8dibN5SdgeNT4KpQGuE6+nqvtoAqBPohCxAbKXgnRF/Ir0hP32noOF5LH7hpFsNuZmpdo6A0QnGKoIDGit6cF8QEcAXn+gM8U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=zytor.com; spf=pass smtp.mailfrom=zytor.com; dkim=pass (2048-bit key) header.d=zytor.com header.i=@zytor.com header.b=TISyPjtl; arc=none smtp.client-ip=198.137.202.136
+	 MIME-Version; b=PV8BacTiyFx8NnUMOppj/XOEM4Aigbze2NFqIr4YETw6kMEohqaFGpvMhqOohWyNltOqbWi+XYvE9xfxMht/jTjYpC3oBdQ9YoH556ElQA0ubjjb+AIVc6Qk1eG/fTv3iss4l/Td0rJkCvg4G16/z+5wDdqkWh8ZtQ+JlFW26F0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=zytor.com; spf=pass smtp.mailfrom=zytor.com; dkim=pass (2048-bit key) header.d=zytor.com header.i=@zytor.com header.b=jD/zGROb; arc=none smtp.client-ip=198.137.202.136
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=zytor.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=zytor.com
 Received: from terminus.zytor.com (terminus.zytor.com [IPv6:2607:7c80:54:3:0:0:0:136])
 	(authenticated bits=0)
-	by mail.zytor.com (8.18.1/8.17.1) with ESMTPSA id 57LMaUOa984441
+	by mail.zytor.com (8.18.1/8.17.1) with ESMTPSA id 57LMaUOb984441
 	(version=TLSv1.3 cipher=TLS_AES_256_GCM_SHA384 bits=256 verify=NO);
-	Thu, 21 Aug 2025 15:36:52 -0700
-DKIM-Filter: OpenDKIM Filter v2.11.0 mail.zytor.com 57LMaUOa984441
+	Thu, 21 Aug 2025 15:36:53 -0700
+DKIM-Filter: OpenDKIM Filter v2.11.0 mail.zytor.com 57LMaUOb984441
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=zytor.com;
-	s=2025072201; t=1755815813;
-	bh=V+FNm9J78AlgzbddQ1AfclYQnIWo5NKtIhcMQnHAn8Y=;
+	s=2025072201; t=1755815814;
+	bh=kXZsNCNQxnlS0l40K6SZBC5tiDx2L8eSoG9y6lUMtaA=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=TISyPjtlZfM7mDrvuw02OxnY570owVix2eDKL0evmnmxJGd9xXedrSplwibaYUQ6p
-	 1wHfOCD8Ec4OOrWLU1aFA2LcZU1sq4EvQ3LWxgiw7ZR79+zAmF+SSTv8cyS6wYZ21W
-	 wERGWL+AtrSrfHAykvrvDzHtrC4eQV1DXzZjtqO6frG85Rt3rVRYhFE9f0zHsudniD
-	 LKG3xUlsP7yotCMnXcHqojUiUFABZ0gz6OJdJDtUcL7DboArk16QjqQW2MU0nc349d
-	 MVlDX/poRPoGMMjIdc2YV/A3jxpQbgEEAtrIhAi7eypEx6JKh1Jn+jakLEy+ooLvUZ
-	 8uxyjPaJtpxJA==
+	b=jD/zGRObtbnU9ywo2xk67zwGb9lfJcqmP3+yuwY400Yr52FCYaIHiYlXTSUuMuz9t
+	 c17NY1+4DwczmcPpciWwX9ULNNpiBk0tnx1zMg4PH9jnR3K/v6ndjpLKWEetMsUnWy
+	 uUhFNN2h6I5xi/ThZVr7vGln6kromtHmlV5w26aqFDMr6UOSaGqsvm+gbPCwoljIfD
+	 qg6dqy2QaggK2d4c4lFG9pPZZRHT8mhnS/YtW+W38NCwuOLO3tNojQ2HNMlUbRpZat
+	 6EckIc5HMZ+3V9qhahGrI7X8/1msxDwGQDbrkdeASigG6EsZlPSQnqSy3wp59vh5yh
+	 Yoq8Dv/VL1Htw==
 From: "Xin Li (Intel)" <xin@zytor.com>
 To: linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
         linux-doc@vger.kernel.org
@@ -55,9 +55,9 @@ Cc: pbonzini@redhat.com, seanjc@google.com, corbet@lwn.net, tglx@linutronix.de,
         x86@kernel.org, hpa@zytor.com, xin@zytor.com, luto@kernel.org,
         peterz@infradead.org, andrew.cooper3@citrix.com, chao.gao@intel.com,
         hch@infradead.org
-Subject: [PATCH v6 12/20] KVM: x86: Save/restore the nested flag of an exception
-Date: Thu, 21 Aug 2025 15:36:21 -0700
-Message-ID: <20250821223630.984383-13-xin@zytor.com>
+Subject: [PATCH v6 13/20] KVM: x86: Mark CR4.FRED as not reserved
+Date: Thu, 21 Aug 2025 15:36:22 -0700
+Message-ID: <20250821223630.984383-14-xin@zytor.com>
 X-Mailer: git-send-email 2.50.1
 In-Reply-To: <20250821223630.984383-1-xin@zytor.com>
 References: <20250821223630.984383-1-xin@zytor.com>
@@ -69,11 +69,18 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Save/restore the nested flag of an exception during VM save/restore
-and live migration to ensure a correct event stack level is chosen
-when a nested exception is injected through FRED event delivery.
+From: Xin Li <xin3.li@intel.com>
 
+The CR4.FRED bit, i.e., CR4[32], is no longer a reserved bit when
+guest cpu cap has FRED, i.e.,
+  1) All of FRED KVM support is in place.
+  2) Guest enumerates FRED.
+
+Otherwise it is still a reserved bit.
+
+Signed-off-by: Xin Li <xin3.li@intel.com>
 Signed-off-by: Xin Li (Intel) <xin@zytor.com>
+Tested-by: Shan Kang <shan.kang@intel.com>
 Tested-by: Xuelian Guo <xuelian.guo@intel.com>
 ---
 
@@ -81,186 +88,42 @@ Change in v5:
 * Add TB from Xuelian Guo.
 
 Change in v4:
-* Add live migration support for exception nested flag (Chao Gao).
----
- Documentation/virt/kvm/api.rst  | 21 ++++++++++++++++++++-
- arch/x86/include/asm/kvm_host.h |  1 +
- arch/x86/include/uapi/asm/kvm.h |  4 +++-
- arch/x86/kvm/x86.c              | 19 ++++++++++++++++++-
- include/uapi/linux/kvm.h        |  1 +
- 5 files changed, 43 insertions(+), 3 deletions(-)
+* Rebase on top of "guest_cpu_cap".
 
-diff --git a/Documentation/virt/kvm/api.rst b/Documentation/virt/kvm/api.rst
-index 6aa40ee05a4a..c496b0883a7f 100644
---- a/Documentation/virt/kvm/api.rst
-+++ b/Documentation/virt/kvm/api.rst
-@@ -1184,6 +1184,10 @@ The following bits are defined in the flags field:
-   fields contain a valid state. This bit will be set whenever
-   KVM_CAP_EXCEPTION_PAYLOAD is enabled.
- 
-+- KVM_VCPUEVENT_VALID_NESTED_FLAG may be set to inform that the
-+  exception is a nested exception. This bit will be set whenever
-+  KVM_CAP_EXCEPTION_NESTED_FLAG is enabled.
-+
- - KVM_VCPUEVENT_VALID_TRIPLE_FAULT may be set to signal that the
-   triple_fault_pending field contains a valid state. This bit will
-   be set whenever KVM_CAP_X86_TRIPLE_FAULT_EVENT is enabled.
-@@ -1283,6 +1287,10 @@ can be set in the flags field to signal that the
- exception_has_payload, exception_payload, and exception.pending fields
- contain a valid state and shall be written into the VCPU.
- 
-+If KVM_CAP_EXCEPTION_NESTED_FLAG is enabled, KVM_VCPUEVENT_VALID_NESTED_FLAG
-+can be set in the flags field to inform that the exception is a nested
-+exception and exception_is_nested shall be written into the VCPU.
-+
- If KVM_CAP_X86_TRIPLE_FAULT_EVENT is enabled, KVM_VCPUEVENT_VALID_TRIPLE_FAULT
- can be set in flags field to signal that the triple_fault field contains
- a valid state and shall be written into the VCPU.
-@@ -8651,7 +8659,7 @@ given VM.
- When this capability is enabled, KVM resets the VCPU when setting
- MP_STATE_INIT_RECEIVED through IOCTL.  The original MP_STATE is preserved.
- 
--7.43 KVM_CAP_ARM_CACHEABLE_PFNMAP_SUPPORTED
-+7.44 KVM_CAP_ARM_CACHEABLE_PFNMAP_SUPPORTED
- -------------------------------------------
- 
- :Architectures: arm64
-@@ -8662,6 +8670,17 @@ This capability indicate to the userspace whether a PFNMAP memory region
- can be safely mapped as cacheable. This relies on the presence of
- force write back (FWB) feature support on the hardware.
- 
-+7.45 KVM_CAP_EXCEPTION_NESTED_FLAG
-+----------------------------------
-+
-+:Architectures: x86
-+:Parameters: args[0] whether feature should be enabled or not
-+
-+With this capability enabled, an exception is save/restored with the
-+additional information of whether it was nested or not. FRED event
-+delivery uses this information to ensure a correct event stack level
-+is chosen when a VM entry injects a nested exception.
-+
- 8. Other capabilities.
- ======================
- 
+Change in v3:
+* Don't allow CR4.FRED=1 before all of FRED KVM support is in place
+  (Sean Christopherson).
+---
+ arch/x86/include/asm/kvm_host.h | 2 +-
+ arch/x86/kvm/x86.h              | 2 ++
+ 2 files changed, 3 insertions(+), 1 deletion(-)
+
 diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
-index 6299c43dfbee..7549e5143249 100644
+index 7549e5143249..0b5857997b22 100644
 --- a/arch/x86/include/asm/kvm_host.h
 +++ b/arch/x86/include/asm/kvm_host.h
-@@ -1484,6 +1484,7 @@ struct kvm_arch {
- 	bool has_mapped_host_mmio;
- 	bool guest_can_read_msr_platform_info;
- 	bool exception_payload_enabled;
-+	bool exception_nested_flag_enabled;
+@@ -142,7 +142,7 @@
+ 			  | X86_CR4_OSXSAVE | X86_CR4_SMEP | X86_CR4_FSGSBASE \
+ 			  | X86_CR4_OSXMMEXCPT | X86_CR4_LA57 | X86_CR4_VMXE \
+ 			  | X86_CR4_SMAP | X86_CR4_PKE | X86_CR4_UMIP \
+-			  | X86_CR4_LAM_SUP | X86_CR4_CET))
++			  | X86_CR4_LAM_SUP | X86_CR4_CET | X86_CR4_FRED))
  
- 	bool triple_fault_event;
+ #define CR8_RESERVED_BITS (~(unsigned long)X86_CR8_TPR)
  
-diff --git a/arch/x86/include/uapi/asm/kvm.h b/arch/x86/include/uapi/asm/kvm.h
-index 478d9b63a9db..03ea8c46d8cf 100644
---- a/arch/x86/include/uapi/asm/kvm.h
-+++ b/arch/x86/include/uapi/asm/kvm.h
-@@ -326,6 +326,7 @@ struct kvm_reinject_control {
- #define KVM_VCPUEVENT_VALID_SMM		0x00000008
- #define KVM_VCPUEVENT_VALID_PAYLOAD	0x00000010
- #define KVM_VCPUEVENT_VALID_TRIPLE_FAULT	0x00000020
-+#define KVM_VCPUEVENT_VALID_NESTED_FLAG	0x00000040
+diff --git a/arch/x86/kvm/x86.h b/arch/x86/kvm/x86.h
+index 685eb710b1f2..c9f010862b2a 100644
+--- a/arch/x86/kvm/x86.h
++++ b/arch/x86/kvm/x86.h
+@@ -688,6 +688,8 @@ static inline bool __kvm_is_valid_cr4(struct kvm_vcpu *vcpu, unsigned long cr4)
+ 	if (!__cpu_has(__c, X86_FEATURE_SHSTK) &&       \
+ 	    !__cpu_has(__c, X86_FEATURE_IBT))           \
+ 		__reserved_bits |= X86_CR4_CET;         \
++	if (!__cpu_has(__c, X86_FEATURE_FRED))          \
++		__reserved_bits |= X86_CR4_FRED;        \
+ 	__reserved_bits;                                \
+ })
  
- /* Interrupt shadow states */
- #define KVM_X86_SHADOW_INT_MOV_SS	0x01
-@@ -363,7 +364,8 @@ struct kvm_vcpu_events {
- 	struct {
- 		__u8 pending;
- 	} triple_fault;
--	__u8 reserved[26];
-+	__u8 reserved[25];
-+	__u8 exception_is_nested;
- 	__u8 exception_has_payload;
- 	__u64 exception_payload;
- };
-diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-index fbbfa600e2c2..7103eedb13e8 100644
---- a/arch/x86/kvm/x86.c
-+++ b/arch/x86/kvm/x86.c
-@@ -4927,6 +4927,7 @@ int kvm_vm_ioctl_check_extension(struct kvm *kvm, long ext)
- 	case KVM_CAP_GET_MSR_FEATURES:
- 	case KVM_CAP_MSR_PLATFORM_INFO:
- 	case KVM_CAP_EXCEPTION_PAYLOAD:
-+	case KVM_CAP_EXCEPTION_NESTED_FLAG:
- 	case KVM_CAP_X86_TRIPLE_FAULT_EVENT:
- 	case KVM_CAP_SET_GUEST_DEBUG:
- 	case KVM_CAP_LAST_CPU:
-@@ -5672,6 +5673,7 @@ static void kvm_vcpu_ioctl_x86_get_vcpu_events(struct kvm_vcpu *vcpu,
- 	events->exception.error_code = ex->error_code;
- 	events->exception_has_payload = ex->has_payload;
- 	events->exception_payload = ex->payload;
-+	events->exception_is_nested = ex->nested;
- 
- 	events->interrupt.injected =
- 		vcpu->arch.interrupt.injected && !vcpu->arch.interrupt.soft;
-@@ -5697,6 +5699,8 @@ static void kvm_vcpu_ioctl_x86_get_vcpu_events(struct kvm_vcpu *vcpu,
- 			 | KVM_VCPUEVENT_VALID_SMM);
- 	if (vcpu->kvm->arch.exception_payload_enabled)
- 		events->flags |= KVM_VCPUEVENT_VALID_PAYLOAD;
-+	if (vcpu->kvm->arch.exception_nested_flag_enabled)
-+		events->flags |= KVM_VCPUEVENT_VALID_NESTED_FLAG;
- 	if (vcpu->kvm->arch.triple_fault_event) {
- 		events->triple_fault.pending = kvm_test_request(KVM_REQ_TRIPLE_FAULT, vcpu);
- 		events->flags |= KVM_VCPUEVENT_VALID_TRIPLE_FAULT;
-@@ -5711,7 +5715,8 @@ static int kvm_vcpu_ioctl_x86_set_vcpu_events(struct kvm_vcpu *vcpu,
- 			      | KVM_VCPUEVENT_VALID_SHADOW
- 			      | KVM_VCPUEVENT_VALID_SMM
- 			      | KVM_VCPUEVENT_VALID_PAYLOAD
--			      | KVM_VCPUEVENT_VALID_TRIPLE_FAULT))
-+			      | KVM_VCPUEVENT_VALID_TRIPLE_FAULT
-+			      | KVM_VCPUEVENT_VALID_NESTED_FLAG))
- 		return -EINVAL;
- 
- 	if (events->flags & KVM_VCPUEVENT_VALID_PAYLOAD) {
-@@ -5726,6 +5731,13 @@ static int kvm_vcpu_ioctl_x86_set_vcpu_events(struct kvm_vcpu *vcpu,
- 		events->exception_has_payload = 0;
- 	}
- 
-+	if (events->flags & KVM_VCPUEVENT_VALID_NESTED_FLAG) {
-+		if (!vcpu->kvm->arch.exception_nested_flag_enabled)
-+			return -EINVAL;
-+	} else {
-+		events->exception_is_nested = 0;
-+	}
-+
- 	if ((events->exception.injected || events->exception.pending) &&
- 	    (events->exception.nr > 31 || events->exception.nr == NMI_VECTOR))
- 		return -EINVAL;
-@@ -5751,6 +5763,7 @@ static int kvm_vcpu_ioctl_x86_set_vcpu_events(struct kvm_vcpu *vcpu,
- 	vcpu->arch.exception.error_code = events->exception.error_code;
- 	vcpu->arch.exception.has_payload = events->exception_has_payload;
- 	vcpu->arch.exception.payload = events->exception_payload;
-+	vcpu->arch.exception.nested = events->exception_is_nested;
- 
- 	vcpu->arch.interrupt.injected = events->interrupt.injected;
- 	vcpu->arch.interrupt.nr = events->interrupt.nr;
-@@ -6800,6 +6813,10 @@ int kvm_vm_ioctl_enable_cap(struct kvm *kvm,
- 		kvm->arch.exception_payload_enabled = cap->args[0];
- 		r = 0;
- 		break;
-+	case KVM_CAP_EXCEPTION_NESTED_FLAG:
-+		kvm->arch.exception_nested_flag_enabled = cap->args[0];
-+		r = 0;
-+		break;
- 	case KVM_CAP_X86_TRIPLE_FAULT_EVENT:
- 		kvm->arch.triple_fault_event = cap->args[0];
- 		r = 0;
-diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
-index f0f0d49d2544..fe4a822b3c09 100644
---- a/include/uapi/linux/kvm.h
-+++ b/include/uapi/linux/kvm.h
-@@ -962,6 +962,7 @@ struct kvm_enable_cap {
- #define KVM_CAP_ARM_EL2_E2H0 241
- #define KVM_CAP_RISCV_MP_STATE_RESET 242
- #define KVM_CAP_ARM_CACHEABLE_PFNMAP_SUPPORTED 243
-+#define KVM_CAP_EXCEPTION_NESTED_FLAG 244
- 
- struct kvm_irq_routing_irqchip {
- 	__u32 irqchip;
 -- 
 2.50.1
 
