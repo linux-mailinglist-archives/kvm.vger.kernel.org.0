@@ -1,158 +1,200 @@
-Return-Path: <kvm+bounces-55494-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-55495-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id C220AB31178
-	for <lists+kvm@lfdr.de>; Fri, 22 Aug 2025 10:18:26 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id E5346B314C6
+	for <lists+kvm@lfdr.de>; Fri, 22 Aug 2025 12:09:16 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 69D185C3EC0
-	for <lists+kvm@lfdr.de>; Fri, 22 Aug 2025 08:16:27 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 4082F7A3667
+	for <lists+kvm@lfdr.de>; Fri, 22 Aug 2025 10:07:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E9A562ECD07;
-	Fri, 22 Aug 2025 08:15:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E11F42D7DC2;
+	Fri, 22 Aug 2025 10:08:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b="e4dvoXQd"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="IPC/aLcR"
 X-Original-To: kvm@vger.kernel.org
-Received: from mailout1.w1.samsung.com (mailout1.w1.samsung.com [210.118.77.11])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6DCCD2EAB8E;
-	Fri, 22 Aug 2025 08:15:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=210.118.77.11
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D61442D3A97;
+	Fri, 22 Aug 2025 10:08:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755850524; cv=none; b=ozLI64b9GVkgPSCwtPCuert4I6ajVEbnwo5JDaG/kwfv67Vvr2lFsAsePrm3dyJk5ndnPtnehOczlDXuFYFGu7UY9EAhd3qR+KCng0lYVHtvjV1vP9nqcPkYMPTqEKhE8xuaeZrLjp4bTnRR8UwvJPEWWv2smbcRlaF6DLdihPk=
+	t=1755857330; cv=none; b=HqynsWIgsXHELjjUtPLOZnwXMc3dAfpxgoJGdMkmFQdqj/nXXCMgbd4PnwROnag2pUKTrQ6VEXnvp1NDqPNz22Y+HNZzH+L5BXfhOoCfmKqIkkrCzui4mblbJ5lWZqFMIJ5o8sQPdFFVVCjAEO72HoGVTrj+VDjAshAd0YmWWu8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755850524; c=relaxed/simple;
-	bh=kTBgh0y3vRHtAXTeRcbbIloycHJMI8lellSKLz/etxs=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:From:In-Reply-To:
-	 Content-Type:References; b=KyXfAKy0F6ybvStAwcrXAl3biBkLUUQ6DEZFSRmOfzmRYRgIG37lB7OaWyfJgYV8T9iF4iIytitS2ZQo+FvY+BvEeLQGgc3/hWgMYDQuNEmWbaqbO9kH927iWHN4aCUrICUaWEobQwpuar4If72hJzV66dkJG9o3P8TNiyk9L8k=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=samsung.com; spf=pass smtp.mailfrom=samsung.com; dkim=pass (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b=e4dvoXQd; arc=none smtp.client-ip=210.118.77.11
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=samsung.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=samsung.com
-Received: from eucas1p2.samsung.com (unknown [182.198.249.207])
-	by mailout1.w1.samsung.com (KnoxPortal) with ESMTP id 20250822081519euoutp01946853c37392c604dd0c3ef7d9f9864d~eCL6pnShX0804708047euoutp01V;
-	Fri, 22 Aug 2025 08:15:19 +0000 (GMT)
-DKIM-Filter: OpenDKIM Filter v2.11.0 mailout1.w1.samsung.com 20250822081519euoutp01946853c37392c604dd0c3ef7d9f9864d~eCL6pnShX0804708047euoutp01V
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=samsung.com;
-	s=mail20170921; t=1755850519;
-	bh=gSgM5v5QN4mf4R9UjO3p9g49c5fElcblzx9rfuNpgCM=;
-	h=Date:Subject:To:Cc:From:In-Reply-To:References:From;
-	b=e4dvoXQdSu6m2XApKflo9WPmqpXymYx8peucZKWnnidxwTqyyGT6vyRmLSZhDupfy
-	 UQS833Dv4xDvMpcINMnXzIPqm8717h4UDC2WHsJO8GSlXAIbIu/HM+EmSf5f03lk+1
-	 DvviTyYYSXyxJn74yEGOVwAsfz9e64KnZWqZgVcw=
-Received: from eusmtip1.samsung.com (unknown [203.254.199.221]) by
-	eucas1p1.samsung.com (KnoxPortal) with ESMTPA id
-	20250822081519eucas1p173966299ee7e4ed7e44e5668490c5bb1~eCL6VCjyQ0206902069eucas1p1F;
-	Fri, 22 Aug 2025 08:15:19 +0000 (GMT)
-Received: from [106.210.134.192] (unknown [106.210.134.192]) by
-	eusmtip1.samsung.com (KnoxPortal) with ESMTPA id
-	20250822081515eusmtip1e7bc345219f25d2646a53b4e40310c91~eCL2XTm3N1429714297eusmtip1U;
-	Fri, 22 Aug 2025 08:15:14 +0000 (GMT)
-Message-ID: <8c4b0068-92be-427b-8bfc-9926eea6aa09@samsung.com>
-Date: Fri, 22 Aug 2025 10:15:14 +0200
+	s=arc-20240116; t=1755857330; c=relaxed/simple;
+	bh=7pbp7b4MJQuhnZtl/iQt6X0PGAG53lDNYxERnubuCEk=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=KaUbAiHuSPwNTwP9+pM3O5U8kb1L50jN1WBJ2QgOHR/Ta45Qav9AGb/GY9cLqzzbfTz7q7XxiQW9aoP+i9HhUV+gND3OLNx09a5jIqodqEUzvMrZdOdWOwMadSHn4wUvBslYmu1RhTuqdtGIYdHXBuiLYnK6+jGP/Snyj+VB4LM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=IPC/aLcR; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 945BDC4CEF1;
+	Fri, 22 Aug 2025 10:08:49 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1755857330;
+	bh=7pbp7b4MJQuhnZtl/iQt6X0PGAG53lDNYxERnubuCEk=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=IPC/aLcR1VtD6z1nJN2YSAoZzdLo3MZsEee0m/eRJjRpHYtgxNfEinxYyfn3AUTna
+	 dM+sV0D5pAnbIrUmGFOBlNAw+xvVYhH77ngT2sLecoCU7072HZ7lEd4OEZ1agP0nlD
+	 QEXRPJkZb9hU/ZDyfzGu15XIuBkzuy70unHaoMWZCAUe9GGT/IG1WhdR7EIKktjAuK
+	 2LhV4yUY8qso6nmQCYD4CEBa8XEW/ew4N7P8N3ZS2sazAVz5LUzKYYHm5JdtsfYaNz
+	 ZF3++7JuKRRo5lQ+9ffuecWSIWnZdlUpc1NyRP4MTdTuFzGqhASLoGzGCZy9irZY8a
+	 3fLTp9Hj9yBuw==
+Date: Fri, 22 Aug 2025 14:34:08 +0530
+From: Naveen N Rao <naveen@kernel.org>
+To: Sean Christopherson <seanjc@google.com>
+Cc: "Maciej S. Szmigiero" <mail@maciej.szmigiero.name>, 
+	Paolo Bonzini <pbonzini@redhat.com>, Maxim Levitsky <mlevitsk@redhat.com>, 
+	Suravee Suthikulpanit <Suravee.Suthikulpanit@amd.com>, Alejandro Jimenez <alejandro.j.jimenez@oracle.com>, 
+	kvm@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH 1/2] KVM: SVM: Sync TPR from LAPIC into VMCB::V_TPR when
+ setting LAPIC regs
+Message-ID: <zx4aiu65mmk72mo2kooj52q4k3vsp43znlrdadajivsw6ns7ou@7xtzfms3de66>
+References: <cover.1755609446.git.maciej.szmigiero@oracle.com>
+ <2b2cfff9a2bd6bcc97b97fee7f3a3e1186c9b03c.1755609446.git.maciej.szmigiero@oracle.com>
+ <aKeDuaW5Df7PgA38@google.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Betterbird (Windows)
-Subject: Re: [PATCH RFC 23/35] scatterlist: disallow non-contigous page
- ranges in a single SG entry
-To: David Hildenbrand <david@redhat.com>, linux-kernel@vger.kernel.org
-Cc: Alexander Potapenko <glider@google.com>, Andrew Morton
-	<akpm@linux-foundation.org>, Brendan Jackman <jackmanb@google.com>,
-	Christoph Lameter <cl@gentwo.org>, Dennis Zhou <dennis@kernel.org>, Dmitry
-	Vyukov <dvyukov@google.com>, dri-devel@lists.freedesktop.org,
-	intel-gfx@lists.freedesktop.org, iommu@lists.linux.dev,
-	io-uring@vger.kernel.org, Jason Gunthorpe <jgg@nvidia.com>, Jens Axboe
-	<axboe@kernel.dk>, Johannes Weiner <hannes@cmpxchg.org>, John Hubbard
-	<jhubbard@nvidia.com>, kasan-dev@googlegroups.com, kvm@vger.kernel.org,
-	"Liam R. Howlett" <Liam.Howlett@oracle.com>, Linus Torvalds
-	<torvalds@linux-foundation.org>, linux-arm-kernel@axis.com,
-	linux-arm-kernel@lists.infradead.org, linux-crypto@vger.kernel.org,
-	linux-ide@vger.kernel.org, linux-kselftest@vger.kernel.org,
-	linux-mips@vger.kernel.org, linux-mmc@vger.kernel.org, linux-mm@kvack.org,
-	linux-riscv@lists.infradead.org, linux-s390@vger.kernel.org,
-	linux-scsi@vger.kernel.org, Lorenzo Stoakes <lorenzo.stoakes@oracle.com>,
-	Marco Elver <elver@google.com>, Michal Hocko <mhocko@suse.com>, Mike
-	Rapoport <rppt@kernel.org>, Muchun Song <muchun.song@linux.dev>,
-	netdev@vger.kernel.org, Oscar Salvador <osalvador@suse.de>, Peter Xu
-	<peterx@redhat.com>, Robin Murphy <robin.murphy@arm.com>, Suren Baghdasaryan
-	<surenb@google.com>, Tejun Heo <tj@kernel.org>,
-	virtualization@lists.linux.dev, Vlastimil Babka <vbabka@suse.cz>,
-	wireguard@lists.zx2c4.com, x86@kernel.org, Zi Yan <ziy@nvidia.com>
-Content-Language: en-US
-From: Marek Szyprowski <m.szyprowski@samsung.com>
-In-Reply-To: <20250821200701.1329277-24-david@redhat.com>
-Content-Transfer-Encoding: 7bit
-X-CMS-MailID: 20250822081519eucas1p173966299ee7e4ed7e44e5668490c5bb1
-X-Msg-Generator: CA
-Content-Type: text/plain; charset="utf-8"
-X-RootMTR: 20250821200818eucas1p2c3df1e12eeba86a68679743d2f5929a8
-X-EPHeader: CA
-X-CMS-RootMailID: 20250821200818eucas1p2c3df1e12eeba86a68679743d2f5929a8
-References: <20250821200701.1329277-1-david@redhat.com>
-	<CGME20250821200818eucas1p2c3df1e12eeba86a68679743d2f5929a8@eucas1p2.samsung.com>
-	<20250821200701.1329277-24-david@redhat.com>
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <aKeDuaW5Df7PgA38@google.com>
 
-On 21.08.2025 22:06, David Hildenbrand wrote:
-> The expectation is that there is currently no user that would pass in
-> non-contigous page ranges: no allocator, not even VMA, will hand these
-> out.
->
-> The only problematic part would be if someone would provide a range
-> obtained directly from memblock, or manually merge problematic ranges.
-> If we find such cases, we should fix them to create separate
-> SG entries.
->
-> Let's check in sg_set_page() that this is really the case. No need to
-> check in sg_set_folio(), as pages in a folio are guaranteed to be
-> contiguous.
->
-> We can now drop the nth_page() usage in sg_page_iter_page().
->
-> Signed-off-by: David Hildenbrand <david@redhat.com>
-Acked-by: Marek Szyprowski <m.szyprowski@samsung.com>
-> ---
->   include/linux/scatterlist.h | 4 +++-
->   1 file changed, 3 insertions(+), 1 deletion(-)
->
-> diff --git a/include/linux/scatterlist.h b/include/linux/scatterlist.h
-> index 6f8a4965f9b98..8196949dfc82c 100644
-> --- a/include/linux/scatterlist.h
-> +++ b/include/linux/scatterlist.h
-> @@ -6,6 +6,7 @@
->   #include <linux/types.h>
->   #include <linux/bug.h>
->   #include <linux/mm.h>
-> +#include <linux/mm_inline.h>
->   #include <asm/io.h>
->   
->   struct scatterlist {
-> @@ -158,6 +159,7 @@ static inline void sg_assign_page(struct scatterlist *sg, struct page *page)
->   static inline void sg_set_page(struct scatterlist *sg, struct page *page,
->   			       unsigned int len, unsigned int offset)
->   {
-> +	VM_WARN_ON_ONCE(!page_range_contiguous(page, ALIGN(len + offset, PAGE_SIZE) / PAGE_SIZE));
->   	sg_assign_page(sg, page);
->   	sg->offset = offset;
->   	sg->length = len;
-> @@ -600,7 +602,7 @@ void __sg_page_iter_start(struct sg_page_iter *piter,
->    */
->   static inline struct page *sg_page_iter_page(struct sg_page_iter *piter)
->   {
-> -	return nth_page(sg_page(piter->sg), piter->sg_pgoffset);
-> +	return sg_page(piter->sg) + piter->sg_pgoffset;
->   }
->   
->   /**
+On Thu, Aug 21, 2025 at 01:38:17PM -0700, Sean Christopherson wrote:
+> On Tue, Aug 19, 2025, Maciej S. Szmigiero wrote:
+> > From: "Maciej S. Szmigiero" <maciej.szmigiero@oracle.com>
+> > 
+> > When AVIC is enabled the normal pre-VMRUN sync in sync_lapic_to_cr8() is
+> > inhibited so any changed TPR in the LAPIC state would not get copied into
+> > the V_TPR field of VMCB.
+> > 
+> > AVIC does sync between these two fields, however it does so only on
+> > explicit guest writes to one of these fields, not on a bare VMRUN.
+> > 
+> > This is especially true when it is the userspace setting LAPIC state via
+> > KVM_SET_LAPIC ioctl() since userspace does not have access to the guest
+> > VMCB.
+> > 
+> > Practice shows that it is the V_TPR that is actually used by the AVIC to
+> > decide whether to issue pending interrupts to the CPU (not TPR in TASKPRI),
+> > so any leftover value in V_TPR will cause serious interrupt delivery issues
+> > in the guest when AVIC is enabled.
+> > 
+> > Fix this issue by explicitly copying LAPIC TPR to VMCB::V_TPR in
+> > avic_apicv_post_state_restore(), which gets called from KVM_SET_LAPIC and
+> > similar code paths when AVIC is enabled.
+> > 
+> > Fixes: 3bbf3565f48c ("svm: Do not intercept CR8 when enable AVIC")
+> > Signed-off-by: Maciej S. Szmigiero <maciej.szmigiero@oracle.com>
+> > ---
+> >  arch/x86/kvm/svm/avic.c | 23 +++++++++++++++++++++++
+> >  1 file changed, 23 insertions(+)
+> > 
+> > diff --git a/arch/x86/kvm/svm/avic.c b/arch/x86/kvm/svm/avic.c
+> > index a34c5c3b164e..877bc3db2c6e 100644
+> > --- a/arch/x86/kvm/svm/avic.c
+> > +++ b/arch/x86/kvm/svm/avic.c
+> > @@ -725,8 +725,31 @@ int avic_init_vcpu(struct vcpu_svm *svm)
+> >  
+> >  void avic_apicv_post_state_restore(struct kvm_vcpu *vcpu)
+> >  {
+> > +	struct vcpu_svm *svm = to_svm(vcpu);
+> > +	u64 cr8;
+> > +
+> >  	avic_handle_dfr_update(vcpu);
+> >  	avic_handle_ldr_update(vcpu);
+> > +
+> > +	/* Running nested should have inhibited AVIC. */
+> > +	if (WARN_ON_ONCE(nested_svm_virtualize_tpr(vcpu)))
+> > +		return;
+> 
+> 
+> > +
+> > +	/*
+> > +	 * Sync TPR from LAPIC TASKPRI into V_TPR field of the VMCB.
+> > +	 *
+> > +	 * When AVIC is enabled the normal pre-VMRUN sync in sync_lapic_to_cr8()
+> > +	 * is inhibited so any set TPR LAPIC state would not get reflected
+> > +	 * in V_TPR.
+> 
+> Hmm, I think that code is straight up wrong.  There's no justification, just a
+> claim:
+> 
+>   commit 3bbf3565f48ce3999b5a12cde946f81bd4475312
+>   Author:     Suravee Suthikulpanit <Suravee.Suthikulpanit@amd.com>
+>   AuthorDate: Wed May 4 14:09:51 2016 -0500
+>   Commit:     Paolo Bonzini <pbonzini@redhat.com>
+>   CommitDate: Wed May 18 18:04:31 2016 +0200
+> 
+>     svm: Do not intercept CR8 when enable AVIC
+>     
+>     When enable AVIC:
+>         * Do not intercept CR8 since this should be handled by AVIC HW.
+>         * Also, we don't need to sync cr8/V_TPR and APIC backing page.   <======
+>     
+>     Signed-off-by: Suravee Suthikulpanit <suravee.suthikulpanit@amd.com>
+>     [Rename svm_in_nested_interrupt_shadow to svm_nested_virtualize_tpr. - Paolo]
+>     Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+> 
+> That claim assumes APIC[TPR] will _never_ be modified by anything other than
+> hardware. 
 
-Best regards
--- 
-Marek Szyprowski, PhD
-Samsung R&D Institute Poland
+It also isn't clear to me why only sync_lapic_to_cr8() was gated when 
+AVIC was enabled, while sync_cr8_to_lapic() continues to copy V_TRP to 
+the backing page. If AVIC is enabled, then the AVIC hardware updates 
+both the backing page and V_TPR on a guest write to TPR.
+
+> That's obviously false for state restore from userspace, and it's also
+> technically false at steady state, e.g. if KVM managed to trigger emulation of a
+> store to the APIC page, then KVM would bypass the automatic harware sync.
+
+Do you mean emulation due to AVIC being inhibited? I initially thought 
+this could be a problem, but in this scenario, AVIC would be disabled on 
+the next VMRUN, so we will end up sync'ing TPR from the lapic to V_TPR.
+
+> 
+> There's also the comically ancient KVM_SET_VAPIC_ADDR, which AFAICT appears to
+> be largely dead code with respect to vTPR (nothing sets KVM_APIC_CHECK_VAPIC
+> except for the initial ioctl), but could again set APIC[TPR] without updating
+> V_TPR.
+>
+> So, rather than manually do the update during state restore, my vote 
+> is to restore the sync logic.  And if we want to optimize that code 
+> (seems unnecessary), then we should hook all TPR writes.
+
+I guess you mean apic_set_tpr()? We will need to hook into that in 
+addition to updating avic_apicv_post_state_restore() since KVM_SET_LAPIC 
+just does a memcpy of the register state.
+
+> 
+> diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
+> index d9931c6c4bc6..1bfebe40854f 100644
+> --- a/arch/x86/kvm/svm/svm.c
+> +++ b/arch/x86/kvm/svm/svm.c
+> @@ -4046,8 +4046,7 @@ static inline void sync_lapic_to_cr8(struct kvm_vcpu *vcpu)
+>         struct vcpu_svm *svm = to_svm(vcpu);
+>         u64 cr8;
+>  
+> -       if (nested_svm_virtualize_tpr(vcpu) ||
+> -           kvm_vcpu_apicv_active(vcpu))
+> +       if (nested_svm_virtualize_tpr(vcpu))
+>                 return;
+>  
+>         cr8 = kvm_get_cr8(vcpu);
+
+I agree that this is a simpler fix, so would be good to do for backport 
+ease.
+
+The code in sync_lapic_to_cr8 ends up being a function call to 
+kvm_get_cr8() and ~6 instructions, which isn't that much. But if we can 
+gate sync'ing V_TPR to the backing page in sync_cr8_to_lapic() as well, 
+then it might be good to do so.
+
+
+- Naveen
 
 
