@@ -1,63 +1,63 @@
-Return-Path: <kvm+bounces-55482-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-55483-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id BBCAEB30FFA
-	for <lists+kvm@lfdr.de>; Fri, 22 Aug 2025 09:09:10 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id C6968B30FE6
+	for <lists+kvm@lfdr.de>; Fri, 22 Aug 2025 09:07:35 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E1C0B173D64
-	for <lists+kvm@lfdr.de>; Fri, 22 Aug 2025 07:06:22 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 83ACFA26BDF
+	for <lists+kvm@lfdr.de>; Fri, 22 Aug 2025 07:06:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E443F2E7BC6;
-	Fri, 22 Aug 2025 07:06:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1C23F2E717B;
+	Fri, 22 Aug 2025 07:06:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="PiBVN39Z"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="gdV1tyce"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.19])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3EAE02E62B5;
-	Fri, 22 Aug 2025 07:06:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.19
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 985032253F9;
+	Fri, 22 Aug 2025 07:06:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755846368; cv=none; b=GPsbgo7sju+tb5D76Uv1umLxOZpFyH2onQQsmlcTvt166ZKBKOei28vcnwJdQlmyhuKbVcef+xjHcC6ymO4HWoAF0eMo7bwZExWjbVnH+Lq3cTrv7i7eqI5bfHNVybdb4dIsYidrszozRyQDAJoPZcsVG8ZyME8FEv7x3CvAWIM=
+	t=1755846398; cv=none; b=H+fDVKjl5Qe0rRvvEiPFKcxfpN5XrcyxyaRTMqxmvPy2HvvciMdaV4wzQjL5YPXepi5yn5u1TezlXC/p8PgzlYY9MSKfT3E1Z/ZwKnJ5SGhbZcPKZnAr5gtvNzMEYONay+U/SIy0Hv2LKksOlzF/q3Sslhyl8pqe2B41rT473ac=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755846368; c=relaxed/simple;
-	bh=0LFBzy/1ND4vvMfeYVthXvze9VjxghC/baD6CkbxVpg=;
+	s=arc-20240116; t=1755846398; c=relaxed/simple;
+	bh=vK1Fc9hq2tBF3cBCzzIiljNe8N3mobe9b1tyZxZ4buU=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=iYKBWcAM+YHPu7KVUtOXMVSHvLEaTplz6Z+CCgKsfDXoSrxkyxvhBgfZx4/iB98114foEuMmEGfnizMTE0oe56xPxvqGP+uJSbz4DtHDI2SYKa3xqxQ/+oFPYtcKBNCQ2vqdF6fGqq96ruCcLD5iKXaj95UGgIa5z6HHyVGROwg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=PiBVN39Z; arc=none smtp.client-ip=198.175.65.19
+	 MIME-Version; b=rTn2ZoefVl73aruxdfV3C6x6T6fXeAm0kgJTWJLDvbXDKGrcFRr5prPqqbJbmQQUDtnRkT5x9MzZ2dsj5s3gfFy8YykIkG+75qsrcjxeheKGgAMubsfxi8qy5qqAjzzfvDmFTGQjRgejFkuuOYs1wKCpNynZfKCNuc2M4LKse7c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=gdV1tyce; arc=none smtp.client-ip=198.175.65.18
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1755846366; x=1787382366;
+  t=1755846397; x=1787382397;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=0LFBzy/1ND4vvMfeYVthXvze9VjxghC/baD6CkbxVpg=;
-  b=PiBVN39ZFZGiSDS9hxw7QDG2kqM+xdtHnrVO44SSTZrioTnk/Cw+NBXo
-   maMIArXgBk+gJx5E4PcQ0TCfxO4/oP16AW5dVYTUT5ByITMbAfuMU3GIV
-   jN7hmWXBTVIKfMZdnS5pFPCmaeYEIGpKo7q8lkFXmaX6u8jqDUVBl4NY6
-   hhZcDLZN1dC4SrTGi7jfoFf1yBxZ8mP+iUpX8H2Y38uIvjE9tZzHHd5Wb
-   KH3TgvH+OJQCJAkcsOpWLhzEb0RpNpFLW6nvJlkmKapinBuNS7CJ2Vue+
-   xWe4EjGZKzIQWPxSjlD+RdHXi5frfZf87OdMlEIOzkuDEv7Fm2LUsrlxF
-   A==;
-X-CSE-ConnectionGUID: R2BNde0AR7iy5Ff7eF6HoA==
-X-CSE-MsgGUID: XDkBM5vRTI2eEj9li0V8Sg==
-X-IronPort-AV: E=McAfee;i="6800,10657,11529"; a="58012896"
+  bh=vK1Fc9hq2tBF3cBCzzIiljNe8N3mobe9b1tyZxZ4buU=;
+  b=gdV1tyceWLlO52sClX9gUdm/86iKswrVRVRmFCTznxgtoIwRHczlLDyy
+   rJnvppcevpYVSH4qjmCD8Q5v5feKEw4y7uwufVNlu1RW4dJqAWnhZHml/
+   TsXFte2A5ZWQzzYQLWSm6aIyCuFq0q1uPPQdAM5pYS8vRtneSEGnD8/Kg
+   MpIk7mmhfA37zhIQqkpu3wFSgkHVG1Y/6BcLqjvriwCXIPdIYn7PdDvf/
+   9DrgiFZbD035juDPbGY9CT6djBR00JHEXoT6tHAbcaaP4zIemkg2HcQvn
+   Rc3I994WKbPvXpwDSKuYHiXqUyzuJCRubQHYOq1qG9o3G80yUoDFFfjzg
+   Q==;
+X-CSE-ConnectionGUID: CkABdel/STCriOejPEsGlg==
+X-CSE-MsgGUID: N9f47Mz7S6qCujcg9JIqIA==
+X-IronPort-AV: E=McAfee;i="6800,10657,11529"; a="58216274"
 X-IronPort-AV: E=Sophos;i="6.17,309,1747724400"; 
-   d="scan'208";a="58012896"
-Received: from fmviesa007.fm.intel.com ([10.60.135.147])
-  by orvoesa111.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 22 Aug 2025 00:06:05 -0700
-X-CSE-ConnectionGUID: wg4jZzJKQ1yxQKl/rSFcww==
-X-CSE-MsgGUID: tdrdyDRTSsiLdv40MP81iQ==
+   d="scan'208";a="58216274"
+Received: from orviesa003.jf.intel.com ([10.64.159.143])
+  by orvoesa110.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 22 Aug 2025 00:06:36 -0700
+X-CSE-ConnectionGUID: gcF2yLkNSUSlOftyS9kDBw==
+X-CSE-MsgGUID: 1MzEeu0TSqiaScYbMY6pxw==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.17,309,1747724400"; 
-   d="scan'208";a="168143631"
+   d="scan'208";a="172829670"
 Received: from yzhao56-desk.sh.intel.com ([10.239.47.19])
-  by fmviesa007-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 22 Aug 2025 00:06:03 -0700
+  by ORVIESA003-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 22 Aug 2025 00:06:34 -0700
 From: Yan Zhao <yan.y.zhao@intel.com>
 To: pbonzini@redhat.com,
 	seanjc@google.com
@@ -66,9 +66,9 @@ Cc: reinette.chatre@intel.com,
 	linux-kernel@vger.kernel.org,
 	kvm@vger.kernel.org,
 	Yan Zhao <yan.y.zhao@intel.com>
-Subject: [PATCH v2 2/3] KVM: TDX: Do not retry locally when the retry is caused by invalid memslot
-Date: Fri, 22 Aug 2025 15:05:23 +0800
-Message-ID: <20250822070523.26495-1-yan.y.zhao@intel.com>
+Subject: [PATCH v2 3/3] KVM: selftests: Test prefault memory during concurrent memslot removal
+Date: Fri, 22 Aug 2025 15:05:54 +0800
+Message-ID: <20250822070554.26523-1-yan.y.zhao@intel.com>
 X-Mailer: git-send-email 2.43.2
 In-Reply-To: <20250822070305.26427-1-yan.y.zhao@intel.com>
 References: <20250822070305.26427-1-yan.y.zhao@intel.com>
@@ -80,77 +80,177 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-From: Sean Christopherson <seanjc@google.com>
+Test prefault memory during concurrent memslot removal.
 
-Avoid local retries within the TDX EPT violation handler if a retry is
-triggered by faulting in an invalid memslot, indicating that the memslot is
-undergoing a removal process.
+Add a new param "remove_slot" to pre_fault_memory() to indicate testing
+concurrent memslot removal. When "remove_slot" is set:
 
-This prevents the slot removal process from being blocked while waiting for
-the VMExit handler to release the SRCU lock.
+Create a remove_thread which deletes the test slot concurrently while the
+main thread is executing ioctl KVM_PRE_FAULT_MEMORY on the test slot memory
+range.
 
-Opportunistically, export symbol kvm_vcpu_gfn_to_memslot() to allow for
-per-vCPU acceleration of gfn_to_memslot translation.
+Introduce variables "delete_thread_ready" and "prefault_ready" to
+synchronize the slot removal and ioctl KVM_PRE_FAULT_MEMORY. When the
+concurrency is achieved, ioctl KVM_PRE_FAULT_MEMORY should return the error
+EAGAIN. Otherwise, the ioctl should succeed as in cases where remove_slot
+is not set.
 
-[Yan: Wrote patch log, comment, fixed a minor error, function export]
+Retry ioctl KVM_PRE_FAULT_MEMORY upon receiving EAGAIN. Since the memslot
+should have been successfully removed during the retry, EFAULT or ENOENT
+should be returned depending on whether the prefault is for private or
+shared memory.
 
-Reported-by: Reinette Chatre <reinette.chatre@intel.com>
-Closes: https://lore.kernel.org/all/20250519023737.30360-1-yan.y.zhao@intel.com
-Signed-off-by: Sean Christopherson <seanjc@google.com>
+Split the existing "gpa" parameter in pre_fault_memory() into "base_gpa"
+and "offset" to facilitate adding the test slot back to "base_gpa" after
+the test concludes, ensuring that subsequent tests are not affected.
+
 Signed-off-by: Yan Zhao <yan.y.zhao@intel.com>
 ---
- arch/x86/kvm/vmx/tdx.c | 11 +++++++++++
- virt/kvm/kvm_main.c    |  1 +
- 2 files changed, 12 insertions(+)
+ .../selftests/kvm/pre_fault_memory_test.c     | 94 +++++++++++++++----
+ 1 file changed, 78 insertions(+), 16 deletions(-)
 
-diff --git a/arch/x86/kvm/vmx/tdx.c b/arch/x86/kvm/vmx/tdx.c
-index 6784aaaced87..de2c4bb36069 100644
---- a/arch/x86/kvm/vmx/tdx.c
-+++ b/arch/x86/kvm/vmx/tdx.c
-@@ -1992,6 +1992,11 @@ static int tdx_handle_ept_violation(struct kvm_vcpu *vcpu)
- 	 * blocked by TDs, false positives are inevitable i.e., KVM may re-enter
- 	 * the guest even if the IRQ/NMI can't be delivered.
- 	 *
-+	 * Breaking out of the local retries if a retry is caused by faulting
-+	 * in an invalid memslot (indicating the slot is under removal), so that
-+	 * the slot removal will not be blocked due to waiting for releasing
-+	 * SRCU lock in the VMExit handler.
-+	 *
- 	 * Note: even without breaking out of local retries, zero-step
- 	 * mitigation may still occur due to
- 	 * - invoking of TDH.VP.ENTER after KVM_EXIT_MEMORY_FAULT,
-@@ -2002,6 +2007,8 @@ static int tdx_handle_ept_violation(struct kvm_vcpu *vcpu)
- 	 * handle retries locally in their EPT violation handlers.
- 	 */
- 	while (1) {
-+		struct kvm_memory_slot *slot;
+diff --git a/tools/testing/selftests/kvm/pre_fault_memory_test.c b/tools/testing/selftests/kvm/pre_fault_memory_test.c
+index 0350a8896a2f..56e65feb4c8c 100644
+--- a/tools/testing/selftests/kvm/pre_fault_memory_test.c
++++ b/tools/testing/selftests/kvm/pre_fault_memory_test.c
+@@ -10,12 +10,16 @@
+ #include <test_util.h>
+ #include <kvm_util.h>
+ #include <processor.h>
++#include <pthread.h>
+ 
+ /* Arbitrarily chosen values */
+ #define TEST_SIZE		(SZ_2M + PAGE_SIZE)
+ #define TEST_NPAGES		(TEST_SIZE / PAGE_SIZE)
+ #define TEST_SLOT		10
+ 
++static bool prefault_ready;
++static bool delete_thread_ready;
 +
- 		ret = __vmx_handle_ept_violation(vcpu, gpa, exit_qual);
- 
- 		if (ret != RET_PF_RETRY || !local_retry)
-@@ -2015,6 +2022,10 @@ static int tdx_handle_ept_violation(struct kvm_vcpu *vcpu)
- 			break;
- 		}
- 
-+		slot = kvm_vcpu_gfn_to_memslot(vcpu, gpa_to_gfn(gpa));
-+		if (slot && slot->flags & KVM_MEMSLOT_INVALID)
-+			break;
-+
- 		cond_resched();
- 	}
- 	return ret;
-diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
-index 6c07dd423458..f769d1dccc21 100644
---- a/virt/kvm/kvm_main.c
-+++ b/virt/kvm/kvm_main.c
-@@ -2661,6 +2661,7 @@ struct kvm_memory_slot *kvm_vcpu_gfn_to_memslot(struct kvm_vcpu *vcpu, gfn_t gfn
- 
- 	return NULL;
- }
-+EXPORT_SYMBOL_GPL(kvm_vcpu_gfn_to_memslot);
- 
- bool kvm_is_visible_gfn(struct kvm *kvm, gfn_t gfn)
+ static void guest_code(uint64_t base_gpa)
  {
+ 	volatile uint64_t val __used;
+@@ -30,17 +34,47 @@ static void guest_code(uint64_t base_gpa)
+ 	GUEST_DONE();
+ }
+ 
+-static void pre_fault_memory(struct kvm_vcpu *vcpu, u64 gpa, u64 size,
+-			     u64 left)
++static void *remove_slot_worker(void *data)
++{
++	struct kvm_vcpu *vcpu = (struct kvm_vcpu *)data;
++
++	WRITE_ONCE(delete_thread_ready, true);
++
++	while (!READ_ONCE(prefault_ready))
++		cpu_relax();
++
++	vm_mem_region_delete(vcpu->vm, TEST_SLOT);
++
++	WRITE_ONCE(delete_thread_ready, false);
++	return NULL;
++}
++
++static void pre_fault_memory(struct kvm_vcpu *vcpu, u64 base_gpa, u64 offset,
++			     u64 size, u64 left, bool private, bool remove_slot)
+ {
+ 	struct kvm_pre_fault_memory range = {
+-		.gpa = gpa,
++		.gpa = base_gpa + offset,
+ 		.size = size,
+ 		.flags = 0,
+ 	};
+-	u64 prev;
++	pthread_t remove_thread;
++	bool remove_hit = false;
+ 	int ret, save_errno;
++	u64 prev;
+ 
++	if (remove_slot) {
++		pthread_create(&remove_thread, NULL, remove_slot_worker, vcpu);
++
++		while (!READ_ONCE(delete_thread_ready))
++			cpu_relax();
++
++		WRITE_ONCE(prefault_ready, true);
++	}
++
++	/*
++	 * EAGAIN may be returned if slot removal is performed during
++	 * KVM_PRE_FAULT_MEMORY.
++	 */
+ 	do {
+ 		prev = range.size;
+ 		ret = __vcpu_ioctl(vcpu, KVM_PRE_FAULT_MEMORY, &range);
+@@ -49,18 +83,42 @@ static void pre_fault_memory(struct kvm_vcpu *vcpu, u64 gpa, u64 size,
+ 			    "%sexpecting range.size to change on %s",
+ 			    ret < 0 ? "not " : "",
+ 			    ret < 0 ? "failure" : "success");
+-	} while (ret >= 0 ? range.size : save_errno == EINTR);
+ 
+-	TEST_ASSERT(range.size == left,
+-		    "Completed with %lld bytes left, expected %" PRId64,
+-		    range.size, left);
++		if (remove_slot && ret < 0 && save_errno == EAGAIN)
++			remove_hit = true;
++
++	} while (ret >= 0 ? range.size : ((save_errno == EINTR) || (save_errno == EAGAIN)));
+ 
+-	if (left == 0)
+-		__TEST_ASSERT_VM_VCPU_IOCTL(!ret, "KVM_PRE_FAULT_MEMORY", ret, vcpu->vm);
+-	else
+-		/* No memory slot causes RET_PF_EMULATE. it results in -ENOENT. */
+-		__TEST_ASSERT_VM_VCPU_IOCTL(ret && save_errno == ENOENT,
++	if (remove_slot) {
++		pthread_join(remove_thread, NULL);
++		WRITE_ONCE(prefault_ready, false);
++
++		vm_userspace_mem_region_add(vcpu->vm, VM_MEM_SRC_ANONYMOUS,
++					    base_gpa, TEST_SLOT, TEST_NPAGES,
++					    private ? KVM_MEM_GUEST_MEMFD : 0);
++	}
++
++	if (remove_hit) {
++		/*
++		 * Prefault within a removed memory slot range returns
++		 * - EFAULT for private memory or
++		 * - ENOENT for shared memory (due to RET_PF_EMULATE).
++		 */
++		__TEST_ASSERT_VM_VCPU_IOCTL(ret && save_errno == (private ? EFAULT : ENOENT),
+ 					    "KVM_PRE_FAULT_MEMORY", ret, vcpu->vm);
++	} else {
++		TEST_ASSERT(range.size == left,
++			    "Completed with %lld bytes left, expected %" PRId64,
++			    range.size, left);
++
++		if (left == 0)
++			__TEST_ASSERT_VM_VCPU_IOCTL(!ret, "KVM_PRE_FAULT_MEMORY",
++						    ret, vcpu->vm);
++		else
++			/* No memory slot causes RET_PF_EMULATE. it results in -ENOENT. */
++			__TEST_ASSERT_VM_VCPU_IOCTL(ret && save_errno == ENOENT,
++						    "KVM_PRE_FAULT_MEMORY", ret, vcpu->vm);
++	}
+ }
+ 
+ static void __test_pre_fault_memory(unsigned long vm_type, bool private)
+@@ -97,9 +155,13 @@ static void __test_pre_fault_memory(unsigned long vm_type, bool private)
+ 
+ 	if (private)
+ 		vm_mem_set_private(vm, guest_test_phys_mem, TEST_SIZE);
+-	pre_fault_memory(vcpu, guest_test_phys_mem, SZ_2M, 0);
+-	pre_fault_memory(vcpu, guest_test_phys_mem + SZ_2M, PAGE_SIZE * 2, PAGE_SIZE);
+-	pre_fault_memory(vcpu, guest_test_phys_mem + TEST_SIZE, PAGE_SIZE, PAGE_SIZE);
++
++	pre_fault_memory(vcpu, guest_test_phys_mem, 0, SZ_2M, 0, private, true);
++	pre_fault_memory(vcpu, guest_test_phys_mem, 0, SZ_2M, 0, private, false);
++	pre_fault_memory(vcpu, guest_test_phys_mem, SZ_2M, PAGE_SIZE * 2, PAGE_SIZE,
++			 private, false);
++	pre_fault_memory(vcpu, guest_test_phys_mem, TEST_SIZE, PAGE_SIZE, PAGE_SIZE,
++			 private, false);
+ 
+ 	vcpu_args_set(vcpu, 1, guest_test_virt_mem);
+ 	vcpu_run(vcpu);
 -- 
 2.43.2
 
