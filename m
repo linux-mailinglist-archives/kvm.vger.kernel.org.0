@@ -1,130 +1,153 @@
-Return-Path: <kvm+bounces-55517-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-55518-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1F48AB32145
-	for <lists+kvm@lfdr.de>; Fri, 22 Aug 2025 19:12:41 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id ABA96B32157
+	for <lists+kvm@lfdr.de>; Fri, 22 Aug 2025 19:15:35 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A90B1B212EA
-	for <lists+kvm@lfdr.de>; Fri, 22 Aug 2025 17:10:16 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 56FAA1D62AB3
+	for <lists+kvm@lfdr.de>; Fri, 22 Aug 2025 17:15:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 28200320CD8;
-	Fri, 22 Aug 2025 17:09:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 14AF0235355;
+	Fri, 22 Aug 2025 17:15:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="DmWBU4Vz"
+	dkim=pass (4096-bit key) header.d=alien8.de header.i=@alien8.de header.b="b0WMiCwl"
 X-Original-To: kvm@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mail.alien8.de (mail.alien8.de [65.109.113.108])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F1184285C91;
-	Fri, 22 Aug 2025 17:09:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EDB181F418D;
+	Fri, 22 Aug 2025 17:15:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=65.109.113.108
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755882594; cv=none; b=bsanKgWmNcKU+nLuyLpnQSLETDHjtxuZRyKIldH0b1QGd9Rt7obZHytBU7Isfh+BOr/jn/lhAjKrRp2QIz2vR9lRiluwMY3UJ7BLb2DjJMg77RPblTvKhAP9ay4ewDZNE+g2To+ewQZefJ/0HwzwdhneF8QorC4q6vYmSV5CgUA=
+	t=1755882917; cv=none; b=f6nGbJ34xXIrXZmjcuc53dZgCeZiAYqdkIUswkqKuoqOJX2vz2K59upFU4zPdoftdSE57dzRgelxCTcjy+6bJOlvIPDTBDHlScpwIpaFdeLIEg4clouqf6VEGF0ZmBMj5NUIG/J5q/QYA4vrebLPwapFZTxUeIB1UYBA6ZoWAM4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755882594; c=relaxed/simple;
-	bh=NEyazjWgDDK3Y8sTMLiPKtOTS94IEzEQJlr1MXdW648=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=blb+KATW03u+cDSLyCvIVamBMaBM3BO9IYu6uEPnelZvBc5e6XXqITWaxySX8U+Sg/H4UtVUGY9FtKz1tW+zveJXW2KZxEDSP/3VmtBEMDCxbyB7vv1X4NQCOqNluDz7DXDQQdzDbtweKzPx9cvxomvBQKtfN9sR8zBuA5HNZVk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=DmWBU4Vz; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 506C3C4CEED;
-	Fri, 22 Aug 2025 17:09:53 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1755882593;
-	bh=NEyazjWgDDK3Y8sTMLiPKtOTS94IEzEQJlr1MXdW648=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=DmWBU4VzSCcAnl6Zdrhjx6ksjldQdRyRt8SGGJHoy1Xwe7M0wFFiAnOgc7AY/DT0q
-	 lyqL/1TbY9lw6Mk6ofMnsxQa0R5tG+ekC6WUSLcyfnxUCURU/dBA0VxXY7c6IJ9LBi
-	 dspILvQPKUlPvqhEvwNtu+fRhuKR7/IUmABwpf10OfXceruEb+htOjuVlClrNaqJfU
-	 QZNtMHJYtlsQdWeTBL2WlQglN7zceCD+RoTlZDKPvwA5Fz0NZs4QmCTFXTFDq7ZuUg
-	 eXWdY/p99/aQ44iT5rRcus/JttgHgvk0uE55mO5Gfzz0M9Zot8coHQnhPz2Tn/edlI
-	 y9z5UNwm6HZrw==
-From: SeongJae Park <sj@kernel.org>
-To: David Hildenbrand <david@redhat.com>
-Cc: SeongJae Park <sj@kernel.org>,
-	linux-kernel@vger.kernel.org,
-	Alexander Potapenko <glider@google.com>,
-	Andrew Morton <akpm@linux-foundation.org>,
-	Brendan Jackman <jackmanb@google.com>,
-	Christoph Lameter <cl@gentwo.org>,
-	Dennis Zhou <dennis@kernel.org>,
-	Dmitry Vyukov <dvyukov@google.com>,
-	dri-devel@lists.freedesktop.org,
-	intel-gfx@lists.freedesktop.org,
-	iommu@lists.linux.dev,
-	io-uring@vger.kernel.org,
-	Jason Gunthorpe <jgg@nvidia.com>,
-	Jens Axboe <axboe@kernel.dk>,
-	Johannes Weiner <hannes@cmpxchg.org>,
-	John Hubbard <jhubbard@nvidia.com>,
-	kasan-dev@googlegroups.com,
-	kvm@vger.kernel.org,
-	"Liam R. Howlett" <Liam.Howlett@oracle.com>,
-	Linus Torvalds <torvalds@linux-foundation.org>,
-	linux-arm-kernel@axis.com,
-	linux-arm-kernel@lists.infradead.org,
-	linux-crypto@vger.kernel.org,
-	linux-ide@vger.kernel.org,
-	linux-kselftest@vger.kernel.org,
-	linux-mips@vger.kernel.org,
-	linux-mmc@vger.kernel.org,
-	linux-mm@kvack.org,
-	linux-riscv@lists.infradead.org,
-	linux-s390@vger.kernel.org,
-	linux-scsi@vger.kernel.org,
-	Lorenzo Stoakes <lorenzo.stoakes@oracle.com>,
-	Marco Elver <elver@google.com>,
-	Marek Szyprowski <m.szyprowski@samsung.com>,
-	Michal Hocko <mhocko@suse.com>,
-	Mike Rapoport <rppt@kernel.org>,
-	Muchun Song <muchun.song@linux.dev>,
-	netdev@vger.kernel.org,
-	Oscar Salvador <osalvador@suse.de>,
-	Peter Xu <peterx@redhat.com>,
-	Robin Murphy <robin.murphy@arm.com>,
-	Suren Baghdasaryan <surenb@google.com>,
-	Tejun Heo <tj@kernel.org>,
-	virtualization@lists.linux.dev,
-	Vlastimil Babka <vbabka@suse.cz>,
-	wireguard@lists.zx2c4.com,
-	x86@kernel.org,
-	Zi Yan <ziy@nvidia.com>
-Subject: Re: [PATCH RFC 07/35] mm/memremap: reject unreasonable folio/compound page sizes in memremap_pages()
-Date: Fri, 22 Aug 2025 10:09:51 -0700
-Message-Id: <20250822170951.53418-1-sj@kernel.org>
-X-Mailer: git-send-email 2.39.5
-In-Reply-To: <20250821200701.1329277-8-david@redhat.com>
-References: 
+	s=arc-20240116; t=1755882917; c=relaxed/simple;
+	bh=hJfOC4Z3RwmjhaMabVWhQoSFn5WzZtfk5U3g6RgwDjY=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=XEJRpHjew1gl6ebkFI+btrpHMXRo6PCoAvRBnibVNPJhoGtDU52/C6+vdR094gwQ8dOVtc9t5CNHF+ePd07zZZ+2R8hNzWqqfHv36qtbwaooj3fYqXhyZhYw+qd74tQBhpc85/GOxKUrl0EwjSq21H2piFbsvn3/BbJkQviEE48=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=alien8.de; spf=pass smtp.mailfrom=alien8.de; dkim=pass (4096-bit key) header.d=alien8.de header.i=@alien8.de header.b=b0WMiCwl; arc=none smtp.client-ip=65.109.113.108
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=alien8.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=alien8.de
+Received: from localhost (localhost.localdomain [127.0.0.1])
+	by mail.alien8.de (SuperMail on ZX Spectrum 128k) with ESMTP id 9998840E016D;
+	Fri, 22 Aug 2025 17:15:13 +0000 (UTC)
+X-Virus-Scanned: Debian amavisd-new at mail.alien8.de
+Authentication-Results: mail.alien8.de (amavisd-new); dkim=pass (4096-bit key)
+	header.d=alien8.de
+Received: from mail.alien8.de ([127.0.0.1])
+	by localhost (mail.alien8.de [127.0.0.1]) (amavisd-new, port 10026)
+	with ESMTP id QKQhwCmkg3yj; Fri, 22 Aug 2025 17:15:10 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=alien8;
+	t=1755882910; bh=Imx6jlDCxT0P4Eh/gLuwdcYM/vVlBxkudaX4uj1O7DQ=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=b0WMiCwlCqJbgCVBSxegKL/FbRoEec86FCJKzmGljYhMopLM6aDTLoEdYN+DfMFt6
+	 K7No4P0f8z/fLc1HCgxbf3DmpopqtijFriZtSfiVfUo0Q3r4Ml4IbYXwEmwJPJ+M+J
+	 SW9HSRQsjVxHwzXgFePH+nITTYr/BWFh429vnN1a6zUXd92N2qReIS+TCPYpbt6x25
+	 5+lROjPj+2oMuyWJ/48tfpyIgtWurtnrQN81zDV2cbxgdf6siNcZuNSUEK/2wJm/3n
+	 SOc64E5xefIWSPLeKKSJoZwhVVZeE0x3qQkPoJ9ilgXTtT0s7nBGTYmLc6ODrLbcWt
+	 i1TwHMIjndwws2+X4CBGbF0mq4ADXiIbbgkmTpuMrEsBw9prTpblm06KzEpQr62/A1
+	 CTPxeA2MQQ0h8GR0zbStQPkpaE6mzhEWS6vIlSydx1o4BI2pDiHCN/Aux5BmGDf/vd
+	 fywfEniQisiE+FXryKusdbm3JGBjnRyM7UCUM4dJ5mSrDjicEM7d8mhkRUca+g3y/i
+	 dehNRBSb1s/h83Q3rXY4QpVnbx85Lu7ZsgLwLdNRitjQr5fineg72x26pRV6GokBCQ
+	 KIoDM7V93EnRsZs1deBWQI/EWAX2XdoJ440QYCUd/H7LPOQh2S0VWnijv8p+tl/1ww
+	 6hCzmGuoNnuZJCBOJlhOeZsg=
+Received: from zn.tnic (pd953092e.dip0.t-ipconnect.de [217.83.9.46])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange ECDHE (P-256) server-signature ECDSA (P-256) server-digest SHA256)
+	(No client certificate requested)
+	by mail.alien8.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id 9ED7A40E025A;
+	Fri, 22 Aug 2025 17:14:47 +0000 (UTC)
+Date: Fri, 22 Aug 2025 19:14:41 +0200
+From: Borislav Petkov <bp@alien8.de>
+To: "Upadhyay, Neeraj" <neeraj.upadhyay@amd.com>
+Cc: linux-kernel@vger.kernel.org, tglx@linutronix.de, mingo@redhat.com,
+	dave.hansen@linux.intel.com, Thomas.Lendacky@amd.com,
+	nikunj@amd.com, Santosh.Shukla@amd.com, Vasant.Hegde@amd.com,
+	Suravee.Suthikulpanit@amd.com, David.Kaplan@amd.com, x86@kernel.org,
+	hpa@zytor.com, peterz@infradead.org, seanjc@google.com,
+	pbonzini@redhat.com, kvm@vger.kernel.org,
+	kirill.shutemov@linux.intel.com, huibo.wang@amd.com,
+	naveen.rao@amd.com, francescolavra.fl@gmail.com,
+	tiala@microsoft.com
+Subject: Re: [PATCH v9 07/18] x86/apic: Add support to send IPI for Secure
+ AVIC
+Message-ID: <20250822171441.GRaKilgR4XCm_v-ow_@fat_crate.local>
+References: <20250811094444.203161-1-Neeraj.Upadhyay@amd.com>
+ <20250811094444.203161-8-Neeraj.Upadhyay@amd.com>
+ <20250820154638.GOaKXt3vTcSd2320tm@fat_crate.local>
+ <29dd4494-01a8-45bf-9f88-1d99d6ff6ac0@amd.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <29dd4494-01a8-45bf-9f88-1d99d6ff6ac0@amd.com>
 
-On Thu, 21 Aug 2025 22:06:33 +0200 David Hildenbrand <david@redhat.com> wrote:
+On Thu, Aug 21, 2025 at 10:57:24AM +0530, Upadhyay, Neeraj wrote:
+> Is below better?
 
-> Let's reject unreasonable folio sizes early, where we can still fail.
-> We'll add sanity checks to prepare_compound_head/prepare_compound_page
-> next.
+I was only reacting to that head-spinning, conglomerate of abbreviations "AVIC
+GHCB APIC MSR".
+
+> x86/apic: Add support to send IPI for Secure AVIC
 > 
-> Is there a way to configure a system such that unreasonable folio sizes
-> would be possible? It would already be rather questionable.
+> Secure AVIC hardware only accelerates Self-IPI, i.e. on WRMSR to
+> APIC_SELF_IPI and APIC_ICR (with destination shorthand equal to Self)
+> registers, hardware takes care of updating the APIC_IRR in the APIC
+> backing page of the vCPU. For other IPI types (cross-vCPU, broadcast IPIs),
+> software needs to take care of updating the APIC_IRR state of the target
+> CPUs and to ensure that the target vCPUs notice the new pending interrupt.
 > 
-> If so, we'd probably want to bail out earlier, where we can avoid a
-> WARN and just report a proper error message that indicates where
-> something went wrong such that we messed up.
+> Add new callbacks in the Secure AVIC driver for sending IPI requests. These
+> callbacks update the IRR in the target guest vCPU's APIC backing page. To
+> ensure that the remote vCPU notices the new pending interrupt, reuse the
+> GHCB MSR handling code in vc_handle_msr() to issue APIC_ICR MSR-write GHCB
+> protocol event to the hypervisor. For Secure AVIC guests, on APIC_ICR write
+> MSR exits, the hypervisor notifies the target vCPU by either sending an AVIC
+> doorbell (if target vCPU is running) or by waking up the non-running target
+> vCPU.
+
+But I'll take a definitely better commit message too! :-)
+
+> Ok moving it to x2apic_savic.c requires below 4 sev-internal declarations to
+> be moved to arch/x86/include/asm/sev.h
 > 
-> Signed-off-by: David Hildenbrand <david@redhat.com>
+> struct ghcb_state;
+> struct ghcb *__sev_get_ghcb(struct ghcb_state *state);
+> void __sev_put_ghcb(struct ghcb_state *state);
+> enum es_result sev_es_ghcb_handle_msr(...);
 
-Acked-by: SeongJae Park <sj@kernel.org>
+Well, do you anticipate needing any more sev* facilities for SAVIC?
 
+If so, you probably should carve them out into arch/x86/coco/sev/savic.c
 
-Thanks,
-SJ
+If only 4 functions, I guess they're probably still ok in .../sev/core.c
 
-[...]
+> This comment explains why WRMSR is sufficient for sending SELF_IPI. On
+> WRMSR by vCPU, Secure AVIC hardware takes care of updating APIC_IRR in
+> backing page. Hardware also ensures that new APIC_IRR state is evaluated
+> for new pending interrupts. So, WRMSR is hardware-accelerated.
+> 
+> For non-self-IPI case, software need to do APIC_IRR update and sending of
+> wakeup-request/doorbell to the target vCPU.
+
+Yeah, you need to rewrite it like the commit message above - it needs to say
+that upon the MSR write, hw does this and that and therefore accelerates this
+type of IPI.
+
+Then it is clear what you mean by "acceleration."
+
+Thx.
+
+-- 
+Regards/Gruss,
+    Boris.
+
+https://people.kernel.org/tglx/notes-about-netiquette
 
