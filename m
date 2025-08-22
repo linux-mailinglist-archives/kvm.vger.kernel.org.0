@@ -1,162 +1,243 @@
-Return-Path: <kvm+bounces-55562-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-55563-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id F3EB5B32515
-	for <lists+kvm@lfdr.de>; Sat, 23 Aug 2025 00:36:15 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0D8CCB32562
+	for <lists+kvm@lfdr.de>; Sat, 23 Aug 2025 01:22:14 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id E38CC7BDF97
-	for <lists+kvm@lfdr.de>; Fri, 22 Aug 2025 22:34:37 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id C311D1C28C38
+	for <lists+kvm@lfdr.de>; Fri, 22 Aug 2025 23:21:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5DA8F2D7DE8;
-	Fri, 22 Aug 2025 22:35:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="W4ltF1m+"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4F6DC2BE033;
+	Fri, 22 Aug 2025 23:20:50 +0000 (UTC)
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pf1-f181.google.com (mail-pf1-f181.google.com [209.85.210.181])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from vps-ovh.mhejs.net (vps-ovh.mhejs.net [145.239.82.108])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1B23F1E5705;
-	Fri, 22 Aug 2025 22:35:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.181
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 50BBB1BC4E;
+	Fri, 22 Aug 2025 23:20:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=145.239.82.108
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755902158; cv=none; b=SNKvk6FrNheK88RJPqbI3fIxlOh2GyTN4vVpUSI55ue7PwNHtx0mJOpCigfHnzn4PLJqoz1/Sh/2a4VjTyLOsM4LzFeVZ/nQxFkomHeBlKsw9HOla2LWQik9waV6QoO0rvpNiYIgd8wyOEjiDDFVzCjsNQsqkws6X8HLslPkCv4=
+	t=1755904849; cv=none; b=SclS422x+L7IahMZPFmqYrEJ7NNDP8dIQ5n0BhQD8T101APWAIoxoI7SSaUZ3Ebs3AH1udGSA1I2H4ZI69oE3vs3SvprbdQp1+ZQppKBwGjK1q5mlWW8x0KZ4bxRPYGD+nT1U7J8kBtvBhmiTjOmvufQUMJWu4dpGVM+HoYeNcE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755902158; c=relaxed/simple;
-	bh=Lhwv9UQUrS2xvVCkZM2LZ1wXZlHrl5i/oZNWX1nu4AY=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=VwvgJkFzpHfeFXpCgXzH/RAXEfwx6S06vlt0lrMzveUT2y5UVfEKyrMhrZktFujvrxawEn8xvgxmjwiNOmkv51pjqXqZzy6kUPbwb7SEB+YEazg1TSdXHJAIyTCU7MxPTGB+QVzDfzTUmC9eSkYTxDg5VuwS52O3Ysy4ehVZM24=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=W4ltF1m+; arc=none smtp.client-ip=209.85.210.181
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pf1-f181.google.com with SMTP id d2e1a72fcca58-76e2eb3726cso1906366b3a.3;
-        Fri, 22 Aug 2025 15:35:56 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1755902156; x=1756506956; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=0FwDTbQ/G9GOnQP/jL8VoYGNnb8b98LqDD6ErxzxZ3A=;
-        b=W4ltF1m+sbZLaUoCKO9JjIiUIqKuwfDwKijRR2u2N1DM/pHWPwUFFh0PiUWWzKYkrB
-         ktNq5zID08UUQWXv06yknV3BprkyWK/CBiUPDXYWLTQ0oDK9zbunk/tuUJGoqwSr/Rpj
-         9eO8c0nEoDZlXTvac45QjiKWTC9gpN26mWemUhA8Aeep6V2lExb0fdJnh96g71lDlBEa
-         f9xLiT248uzUbaItrExn+z/s1dQsW62DM4Eyp92FauTqyaBYvdnCX2Ba6SBA5vV2ZxXJ
-         ZJDRuVkJkaBhO4kitOi/CZdAHCcu+uGMltLZZrKfkK2UhaNNpqgEtrw4pk07UKlLrg07
-         mz9w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1755902156; x=1756506956;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=0FwDTbQ/G9GOnQP/jL8VoYGNnb8b98LqDD6ErxzxZ3A=;
-        b=t3sNa6UTVrX6dOB+/vk0I1ZcoRRXsogOyNSGhOyptzrlO35rkZRvxv5+5MN++ig8vl
-         9t2BS3TyXGMWHNy0ifw4L2EZ87+ojCizMbGP2VZoh5VZaTj5Y7M9F9KhMzMkHQlJUOJ9
-         n0YX+C7/i6aAtWNXj6Dl0CJ+OdCEVmvmLcnrjQ1FI07nvkJzkAkEJCuDenAVBu/6a4WK
-         1nv6qQ7y7C6qEC0ouX1b7GWJicLquozzWzK7gB82py0SKCjonrKR3C2bjgaVCM2DSxIN
-         4zz5hdY8uJM/uWDfNgl76i2BWiGH/8ak0FlppShHX4g2fnoKp9Tl5M+xRbI/Jg32wBmX
-         axCw==
-X-Forwarded-Encrypted: i=1; AJvYcCWLJrdxjDbHpPq5scKCp1CoND+PhSCjfclAtKxYgAk4unr1eqC2jdtH+nXEaYkHZoy69PL19c15pRoGnK8j@vger.kernel.org, AJvYcCWfpHMNIdGRQ/0lhh/O/Umv6ne4M19isb/0jhcwUZntryU9OjlKZOPc2k+e5pVsMeRSqV2P@vger.kernel.org, AJvYcCWtUJo/wEHkHBQy8kmWQY+6ZMWi0i0eYRhGLvnmy7wIv/cFKAabay0qepefHcOjP4T230OQ52ac8rC0@vger.kernel.org, AJvYcCX0WPQEx/X+rGPqiN9FYbzXRlTcHyl+3W7ZiT+LXpRMBEm0KI95pjv9IlYCDfzFj/UzK7fV6f4bvqCs@vger.kernel.org, AJvYcCXxPXVI7v/S+LLqoW1KQpI3qSdeSyhN1IQ+nf3CrADvMRasR5lrOt7ri90o9GolHTBds/eMhcNhBpnLb5jERFZJ@vger.kernel.org
-X-Gm-Message-State: AOJu0YwcnZ5w6apazYOAwCT1o3ich9Yy8GZr60GrIUVTUfq4JYuQG+Ms
-	Aytq0j7qjRmL1257gKZzzK2ZLVR0R1S25eR/5ywLVULfjdFUq+UCLjSG
-X-Gm-Gg: ASbGncskW30UaHVDRLT3Qve0c/crj91ZSRivsAstgNAoAedroGXns4mtir3I0QyDg/z
-	JCjQr4GRmn84cwKTDINgBS3520/2c9m+1GTA83rXKLWPQmo+q1R1WgpgYg4JlTieeS5umbAkGR2
-	VzJny8JbfiD0XCTi9KwwYvPmonxzfclnUnQ2OHhEbJhwRZqOTtxgDNQXcSajf7b9u8472tGYTkS
-	Z1dt6IHB3tJggHVIQj56SKezLGjvOxDI6FieGuUfS01zDMuRG0jjpQhw6cXupntWca8I1dqBBCB
-	KbXVYk5xTM5niqzwJFWfMGJTcnE+CDpiz68QxHkZ+RsUg9+Be8X11KMZqabnrkjbmYd7Ei1qXmt
-	bwhqZ1jwqJWaSiWXL+bW/lw==
-X-Google-Smtp-Source: AGHT+IEYCh8C0L6ZZn0L/gbp+7wJ7PcWlxjsVE+Dj4tzEhoWhx2t2CE2bxPom3RqYKmnOJkBIwjJZA==
-X-Received: by 2002:a05:6a21:32a8:b0:240:3c3:7ffa with SMTP id adf61e73a8af0-24340dc8405mr7563526637.43.1755902156183;
-        Fri, 22 Aug 2025 15:35:56 -0700 (PDT)
-Received: from localhost ([2001:19f0:ac00:4eb8:5400:5ff:fe30:7df3])
-        by smtp.gmail.com with UTF8SMTPSA id 98e67ed59e1d1-3254aa4f9e6sm802727a91.16.2025.08.22.15.35.55
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 22 Aug 2025 15:35:55 -0700 (PDT)
-Date: Sat, 23 Aug 2025 06:34:56 +0800
-From: Inochi Amaoto <inochiama@gmail.com>
-To: Pincheng Wang <pincheng.plct@isrc.iscas.ac.cn>, 
-	paul.walmsley@sifive.com, palmer@dabbelt.com, aou@eecs.berkeley.edu, alex@ghiti.fr, 
-	robh@kernel.org, krzk+dt@kernel.org, conor+dt@kernel.org, anup@brainfault.org, 
-	pbonzini@redhat.com, shuah@kernel.org, cyan.yang@sifive.com, cleger@rivosinc.com, 
-	charlie@rivosinc.com, cuiyunhui@bytedance.com, samuel.holland@sifive.com, 
-	namcao@linutronix.de, jesse@rivosinc.com, inochiama@gmail.com, 
-	yongxuan.wang@sifive.com, ajones@ventanamicro.com, parri.andrea@gmail.com, 
-	mikisabate@gmail.com, yikming2222@gmail.com, thomas.weissschuh@linutronix.de
-Cc: linux-riscv@lists.infradead.org, linux-kernel@vger.kernel.org, 
-	linux-doc@vger.kernel.org, devicetree@vger.kernel.org, kvm@vger.kernel.org, 
-	kvm-riscv@lists.infradead.org, linux-kselftest@vger.kernel.org
-Subject: Re: [PATCH v1 RESEND 1/5] dt-bidings: riscv: add Zilsd and Zclsd
- extension descriptions
-Message-ID: <znik7dcyeipf57xerlm5gwjszcaaeujoukr7g4a7wt7lsfu366@skany6k7agt4>
-References: <20250821140131.225756-1-pincheng.plct@isrc.iscas.ac.cn>
- <20250821140131.225756-2-pincheng.plct@isrc.iscas.ac.cn>
+	s=arc-20240116; t=1755904849; c=relaxed/simple;
+	bh=GC+REUV1O+hkHmoytxnK13s0Xdwj2oCSahJkToTPNBM=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=YnI7zQvcPqbbwfbsvImTxBgTYm4eML9DNktKM76VLWJv9tRg8Lqs/eNLYczjZEFaAm2QSwCd9bL/WsGwYxKZYQ/lP7af9Uv0kU3iRhcG0Y2NYbPntSbQFgYm6c/eFDv0MD8wXDA/MRTeK34clhyvITpXFhF3Pviagcf88XdmKhk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=maciej.szmigiero.name; spf=pass smtp.mailfrom=vps-ovh.mhejs.net; arc=none smtp.client-ip=145.239.82.108
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=maciej.szmigiero.name
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=vps-ovh.mhejs.net
+Received: from MUA
+	by vps-ovh.mhejs.net with esmtpsa  (TLS1.3) tls TLS_AES_128_GCM_SHA256
+	(Exim 4.98.2)
+	(envelope-from <mhej@vps-ovh.mhejs.net>)
+	id 1upb3h-00000001dx2-3vsQ;
+	Sat, 23 Aug 2025 01:20:33 +0200
+Message-ID: <90f4e95a-14ca-40aa-9233-389974734c3c@maciej.szmigiero.name>
+Date: Sat, 23 Aug 2025 01:20:28 +0200
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250821140131.225756-2-pincheng.plct@isrc.iscas.ac.cn>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 1/2] KVM: SVM: Sync TPR from LAPIC into VMCB::V_TPR when
+ setting LAPIC regs
+To: Sean Christopherson <seanjc@google.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, Maxim Levitsky
+ <mlevitsk@redhat.com>, Suravee Suthikulpanit
+ <Suravee.Suthikulpanit@amd.com>,
+ Alejandro Jimenez <alejandro.j.jimenez@oracle.com>, kvm@vger.kernel.org,
+ linux-kernel@vger.kernel.org, Naveen N Rao <naveen@kernel.org>,
+ =?UTF-8?B?UmFkaW0gS3LEjW3DocWZ?= <rkrcmar@redhat.com>
+References: <cover.1755609446.git.maciej.szmigiero@oracle.com>
+ <2b2cfff9a2bd6bcc97b97fee7f3a3e1186c9b03c.1755609446.git.maciej.szmigiero@oracle.com>
+ <aKeDuaW5Df7PgA38@google.com>
+Content-Language: en-US, pl-PL
+From: "Maciej S. Szmigiero" <mail@maciej.szmigiero.name>
+Autocrypt: addr=mail@maciej.szmigiero.name; keydata=
+ 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
+Disposition-Notification-To: "Maciej S. Szmigiero"
+ <mail@maciej.szmigiero.name>
+In-Reply-To: <aKeDuaW5Df7PgA38@google.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+Sender: mhej@vps-ovh.mhejs.net
 
-On Thu, Aug 21, 2025 at 10:01:27PM +0800, Pincheng Wang wrote:
-> Add descriptions for the Zilsd (Load/Store pair instructions) and
-> Zclsd (Compressed Load/Store pair instructions) ISA extensions
-> which were ratified in commit f88abf1 ("Integrating load/store
-> pair for RV32 with the main manual") of the riscv-isa-manual.
+On 21.08.2025 22:38, Sean Christopherson wrote:
+> On Tue, Aug 19, 2025, Maciej S. Szmigiero wrote:
+>> From: "Maciej S. Szmigiero" <maciej.szmigiero@oracle.com>
+>>
+>> When AVIC is enabled the normal pre-VMRUN sync in sync_lapic_to_cr8() is
+>> inhibited so any changed TPR in the LAPIC state would not get copied into
+>> the V_TPR field of VMCB.
+>>
+>> AVIC does sync between these two fields, however it does so only on
+>> explicit guest writes to one of these fields, not on a bare VMRUN.
+>>
+>> This is especially true when it is the userspace setting LAPIC state via
+>> KVM_SET_LAPIC ioctl() since userspace does not have access to the guest
+>> VMCB.
+>>
+>> Practice shows that it is the V_TPR that is actually used by the AVIC to
+>> decide whether to issue pending interrupts to the CPU (not TPR in TASKPRI),
+>> so any leftover value in V_TPR will cause serious interrupt delivery issues
+>> in the guest when AVIC is enabled.
+>>
+>> Fix this issue by explicitly copying LAPIC TPR to VMCB::V_TPR in
+>> avic_apicv_post_state_restore(), which gets called from KVM_SET_LAPIC and
+>> similar code paths when AVIC is enabled.
+>>
+>> Fixes: 3bbf3565f48c ("svm: Do not intercept CR8 when enable AVIC")
+>> Signed-off-by: Maciej S. Szmigiero <maciej.szmigiero@oracle.com>
+>> ---
+>>   arch/x86/kvm/svm/avic.c | 23 +++++++++++++++++++++++
+>>   1 file changed, 23 insertions(+)
+>>
+>> diff --git a/arch/x86/kvm/svm/avic.c b/arch/x86/kvm/svm/avic.c
+>> index a34c5c3b164e..877bc3db2c6e 100644
+>> --- a/arch/x86/kvm/svm/avic.c
+>> +++ b/arch/x86/kvm/svm/avic.c
+>> @@ -725,8 +725,31 @@ int avic_init_vcpu(struct vcpu_svm *svm)
+>>   
+>>   void avic_apicv_post_state_restore(struct kvm_vcpu *vcpu)
+>>   {
+>> +	struct vcpu_svm *svm = to_svm(vcpu);
+>> +	u64 cr8;
+>> +
+>>   	avic_handle_dfr_update(vcpu);
+>>   	avic_handle_ldr_update(vcpu);
+>> +
+>> +	/* Running nested should have inhibited AVIC. */
+>> +	if (WARN_ON_ONCE(nested_svm_virtualize_tpr(vcpu)))
+>> +		return;
 > 
-> Signed-off-by: Pincheng Wang <pincheng.plct@isrc.iscas.ac.cn>
-> ---
->  .../devicetree/bindings/riscv/extensions.yaml | 39 +++++++++++++++++++
->  1 file changed, 39 insertions(+)
 > 
-> diff --git a/Documentation/devicetree/bindings/riscv/extensions.yaml b/Documentation/devicetree/bindings/riscv/extensions.yaml
-> index ede6a58ccf53..d72ffe8f6fa7 100644
-> --- a/Documentation/devicetree/bindings/riscv/extensions.yaml
-> +++ b/Documentation/devicetree/bindings/riscv/extensions.yaml
-> @@ -366,6 +366,20 @@ properties:
->              guarantee on LR/SC sequences, as ratified in commit b1d806605f87
->              ("Updated to ratified state.") of the riscv profiles specification.
->  
-> +        - const: zilsd
-> +          description:
-> +            The standard Zilsd extension which provides support for aligned
-> +            register-pair load and store operations in 32-bit instruction
-> +            encodings, as ratified in commit f88abf1 ("Integrating
-> +            load/store pair for RV32 with the main manual") of riscv-isa-manual.
-> +
-> +        - const: zclsd
-> +          description:
-> +            The Zclsd extension implements the compressed (16-bit) version of the
-> +            Load/Store Pair for RV32. As with Zilsd, this extension was ratified
-> +            in commit f88abf1 ("Integrating load/store pair for RV32 with the
-> +            main manual") of riscv-isa-manual.
-> +
->          - const: zk
->            description:
->              The standard Zk Standard Scalar cryptography extension as ratified
-> @@ -847,6 +861,16 @@ properties:
->              anyOf:
->                - const: v
->                - const: zve32x
+>> +
+>> +	/*
+>> +	 * Sync TPR from LAPIC TASKPRI into V_TPR field of the VMCB.
+>> +	 *
+>> +	 * When AVIC is enabled the normal pre-VMRUN sync in sync_lapic_to_cr8()
+>> +	 * is inhibited so any set TPR LAPIC state would not get reflected
+>> +	 * in V_TPR.
+> 
+> Hmm, I think that code is straight up wrong.  There's no justification, just a
+> claim:
+> 
+>    commit 3bbf3565f48ce3999b5a12cde946f81bd4475312
+>    Author:     Suravee Suthikulpanit <Suravee.Suthikulpanit@amd.com>
+>    AuthorDate: Wed May 4 14:09:51 2016 -0500
+>    Commit:     Paolo Bonzini <pbonzini@redhat.com>
+>    CommitDate: Wed May 18 18:04:31 2016 +0200
+> 
+>      svm: Do not intercept CR8 when enable AVIC
+>      
+>      When enable AVIC:
+>          * Do not intercept CR8 since this should be handled by AVIC HW.
+>          * Also, we don't need to sync cr8/V_TPR and APIC backing page.   <======
+>      
+>      Signed-off-by: Suravee Suthikulpanit <suravee.suthikulpanit@amd.com>
+>      [Rename svm_in_nested_interrupt_shadow to svm_nested_virtualize_tpr. - Paolo]
+>      Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+> 
+> That claim assumes APIC[TPR] will _never_ be modified by anything other than
+> hardware.  That's obviously false for state restore from userspace, and it's also
+> technically false at steady state, e.g. if KVM managed to trigger emulation of a
+> store to the APIC page, then KVM would bypass the automatic harware sync.
+> 
+> There's also the comically ancient KVM_SET_VAPIC_ADDR, which AFAICT appears to
+> be largely dead code with respect to vTPR (nothing sets KVM_APIC_CHECK_VAPIC
+> except for the initial ioctl), but could again set APIC[TPR] without updating
+> V_TPR.
+> 
+> So, rather than manually do the update during state restore, my vote is to restore
+> the sync logic.  And if we want to optimize that code (seems unnecessary), then
+> we should hook all TPR writes.
+> 
+> diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
+> index d9931c6c4bc6..1bfebe40854f 100644
+> --- a/arch/x86/kvm/svm/svm.c
+> +++ b/arch/x86/kvm/svm/svm.c
+> @@ -4046,8 +4046,7 @@ static inline void sync_lapic_to_cr8(struct kvm_vcpu *vcpu)
+>          struct vcpu_svm *svm = to_svm(vcpu);
+>          u64 cr8;
+>   
+> -       if (nested_svm_virtualize_tpr(vcpu) ||
+> -           kvm_vcpu_apicv_active(vcpu))
+> +       if (nested_svm_virtualize_tpr(vcpu))
+>                  return;
+>   
+>          cr8 = kvm_get_cr8(vcpu);
+> 
+> 
 
-> +      # Zclsd depends on Zilsd and Zca
-> +      - if:
-> +          contains:
-> +            anyOf:
-> +              - const: zclsd
-> +        then:
-> +          contains:
-> +            anyOf:
-> +              - const: zilsd
-> +              - const: zca
->  
+So you want to just do an unconditional LAPIC -> V_TPR sync at each VMRUN
+and not try to patch every code flow where these possibly could get de-synced
+to do such sync only on demand, correct?
 
-Should be allOf? I see the comment says "Zclsd" requires both "Zilsd"
-and "Zca".
+By the way, the original Suravee's submission for the aforementioned patch
+did *not* inhibit that sync when AVIC is on [1].
 
-Regards,
-Inochi
+Something similar to this sync inhibit only showed in v4 [2],
+probably upon Radim's comment on v3 [3] that:
+> I think we can exit early with svm_vcpu_avic_enabled().
+
+But the initial sync inhibit condition in v4 was essentially
+nested_svm_virtualize_tpr() && svm_vcpu_avic_enabled(),
+which suggests there was some confusion what was exactly meant
+by the reviewer comment.
+
+The final sync inhibit condition only showed in v5 [4].
+No further discussion happened on that point.
+
+Thanks,
+Maciej
+
+[1]: https://lore.kernel.org/kvm/1455285574-27892-9-git-send-email-suravee.suthikulpanit@amd.com/
+[2]: https://lore.kernel.org/kvm/1460017232-17429-11-git-send-email-Suravee.Suthikulpanit@amd.com/
+[3]: https://lore.kernel.org/kvm/20160318211048.GB26119@potion.brq.redhat.com/
+[4]: https://lore.kernel.org/kvm/1462388992-25242-13-git-send-email-Suravee.Suthikulpanit@amd.com/
 
 
