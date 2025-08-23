@@ -1,163 +1,195 @@
-Return-Path: <kvm+bounces-55566-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-55567-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 57120B327E2
-	for <lists+kvm@lfdr.de>; Sat, 23 Aug 2025 11:03:07 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7C9C3B327F8
+	for <lists+kvm@lfdr.de>; Sat, 23 Aug 2025 11:49:29 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0D2463B4397
-	for <lists+kvm@lfdr.de>; Sat, 23 Aug 2025 09:00:25 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 097991B68542
+	for <lists+kvm@lfdr.de>; Sat, 23 Aug 2025 09:49:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9B9C0242938;
-	Sat, 23 Aug 2025 09:00:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 27BEE2222C0;
+	Sat, 23 Aug 2025 09:49:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="rOGkWtsU"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="DaUY7S6z"
 X-Original-To: kvm@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.16])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7E76D23D7DB;
-	Sat, 23 Aug 2025 09:00:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7DCB11DE89B
+	for <kvm@vger.kernel.org>; Sat, 23 Aug 2025 09:49:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.16
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755939608; cv=none; b=dXrcrm8x496Q3BhRjfrSmPxOp10jyaAinCDl3BOpaKl4l+/KIdn03FlNPqs4ilQwhpbkb1umSvHME8OQCqxgTBWu6J9I6ZNqPiOMmDX8eAlzyh0aihrJAqHvO4mdNnbvAhsTDi8I3jWTrPbOxPZH6geh1gylc1FrKylxVqK3u/M=
+	t=1755942561; cv=none; b=mN1JUXJH+tEOt9fFBv8o2OXGG0RaNwMaOyk5nQWirAIfWKoLW0sZyHjDgLkbz6yM8eLB3aJQX3vvw253v/wbXcW5Y1/tCkHc2G+lm5le8FNFakd8Y/9LHJ9eW0Z7zOzPKkY4PQs2FEf/k1yaVIM+iNGKXmeIvSOA8z4Yefour/k=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755939608; c=relaxed/simple;
-	bh=aU4s6rL8qphUf3ASSPtkvFhSbnF7KQL/5p/AkB6ZkD0=;
+	s=arc-20240116; t=1755942561; c=relaxed/simple;
+	bh=HASuy6wOSb6ZkYHRnHmYDpLtw776pHCOM/ht1RxioX0=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=eUiIZIYSWxXBZ5vRjGUYEEVuNZoE907Mj7xmlK0WI1X4JtxeY1DqQqbAdzGyW4/Z7FamBh1rsXSz4dWNDT3q2Kr3UKbvUHrj1Iy0hTwIUfXEXhZ3TQ/mFBTJvm62+sgrlBm20EoYf5Qy3vfRayfDYY7ra+nyEcnfmQZeCMVMYks=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=rOGkWtsU; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id F35E6C113D0;
-	Sat, 23 Aug 2025 08:59:53 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1755939608;
-	bh=aU4s6rL8qphUf3ASSPtkvFhSbnF7KQL/5p/AkB6ZkD0=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=rOGkWtsURQmqeVJWZZ8QU1TwZHK57H1RHXwc/i48rhECw+oAVRa4mF0zfqNM3aJ7b
-	 K4ufsfNlCAWHsLgknGRRJAM8fAg49ifByU7aHcJpd60KD5n2ftLsVEjekOSHSO2hKf
-	 TyNgVi/IP/sZ+Zv1HQC39pwpdaVXtYVat6Ea2uqdZXF6QBRAllDzvBMajMv+E6mXfL
-	 wV6BxOvsD2NYhNSk4hF0URYans98VMn0JY+kTDajsHLCy41MHKhsR0ynwpYDfvi23F
-	 uDIHwC7s5hdPOSqfKNvqn2djgrkhoLcYMLwZ0RX2xL3FelT1nsv2lD+CEaDl2f3oOX
-	 wFjm0sW7YW4bQ==
-Date: Sat, 23 Aug 2025 11:59:50 +0300
-From: Mike Rapoport <rppt@kernel.org>
-To: David Hildenbrand <david@redhat.com>
-Cc: Mika =?iso-8859-1?Q?Penttil=E4?= <mpenttil@redhat.com>,
-	linux-kernel@vger.kernel.org,
-	Alexander Potapenko <glider@google.com>,
-	Andrew Morton <akpm@linux-foundation.org>,
-	Brendan Jackman <jackmanb@google.com>,
-	Christoph Lameter <cl@gentwo.org>, Dennis Zhou <dennis@kernel.org>,
-	Dmitry Vyukov <dvyukov@google.com>, dri-devel@lists.freedesktop.org,
-	intel-gfx@lists.freedesktop.org, iommu@lists.linux.dev,
-	io-uring@vger.kernel.org, Jason Gunthorpe <jgg@nvidia.com>,
-	Jens Axboe <axboe@kernel.dk>, Johannes Weiner <hannes@cmpxchg.org>,
-	John Hubbard <jhubbard@nvidia.com>, kasan-dev@googlegroups.com,
-	kvm@vger.kernel.org, "Liam R. Howlett" <Liam.Howlett@oracle.com>,
-	Linus Torvalds <torvalds@linux-foundation.org>,
-	linux-arm-kernel@axis.com, linux-arm-kernel@lists.infradead.org,
-	linux-crypto@vger.kernel.org, linux-ide@vger.kernel.org,
-	linux-kselftest@vger.kernel.org, linux-mips@vger.kernel.org,
-	linux-mmc@vger.kernel.org, linux-mm@kvack.org,
-	linux-riscv@lists.infradead.org, linux-s390@vger.kernel.org,
-	linux-scsi@vger.kernel.org,
-	Lorenzo Stoakes <lorenzo.stoakes@oracle.com>,
-	Marco Elver <elver@google.com>,
-	Marek Szyprowski <m.szyprowski@samsung.com>,
-	Michal Hocko <mhocko@suse.com>, Muchun Song <muchun.song@linux.dev>,
-	netdev@vger.kernel.org, Oscar Salvador <osalvador@suse.de>,
-	Peter Xu <peterx@redhat.com>, Robin Murphy <robin.murphy@arm.com>,
-	Suren Baghdasaryan <surenb@google.com>, Tejun Heo <tj@kernel.org>,
-	virtualization@lists.linux.dev, Vlastimil Babka <vbabka@suse.cz>,
-	wireguard@lists.zx2c4.com, x86@kernel.org, Zi Yan <ziy@nvidia.com>
-Subject: Re: [PATCH RFC 10/35] mm/hugetlb: cleanup
- hugetlb_folio_init_tail_vmemmap()
-Message-ID: <aKmDBobyvEX7ZUWL@kernel.org>
-References: <20250821200701.1329277-1-david@redhat.com>
- <20250821200701.1329277-11-david@redhat.com>
- <9156d191-9ec4-4422-bae9-2e8ce66f9d5e@redhat.com>
- <7077e09f-6ce9-43ba-8f87-47a290680141@redhat.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=QgT3+ojLOkSYOnqIl+pN6JwOs4Ksx03mbysg7Qhavja5fSXHoh/cRdXV2zvO5+CZsYsTc6qrwx2tXos2vQCduHczON054VA+WqQ8zt1DGMZgS5Oclb8cZ3oNOELMaoaVlxc0NCq69H80iLTgOrzAgRuA/CVf+W1FuQh40vEXg0A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=DaUY7S6z; arc=none smtp.client-ip=192.198.163.16
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1755942559; x=1787478559;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=HASuy6wOSb6ZkYHRnHmYDpLtw776pHCOM/ht1RxioX0=;
+  b=DaUY7S6zUxSxJrJlX0QR/s/6bawPIly/d+z9ThPGi/Gg7vSDraQULHS+
+   2nB14skbMePvDC0+1+FhBPjoqdTqtm5HQpQotlOZ2imZRpoImFhN6JD/U
+   8iR/zAtoAzZRQAyAilUN1i0viwtuQbJkzraXflPLOn5kpS7AKfs4IQR4N
+   gtQxmeNw7EVRgyeIBiK510gQSLHxQBKMsQaWG0cVlRG87ytVN53NkjMfc
+   1F8s/SX61xF6NIdLiosozfMqd4MBxDHDffm+Sx53Ow/mN/2Yf/aMQBwxw
+   YxjwSDIEPxOwY/Q3SzVVte/PiVLu6z5++AQkYQm5Xtjgrc9lFTyZvJul9
+   Q==;
+X-CSE-ConnectionGUID: aRgvhNi5T2+ZRvh/Nhf9kQ==
+X-CSE-MsgGUID: 9xS6s7vUQFCcgS/xIVKlRQ==
+X-IronPort-AV: E=McAfee;i="6800,10657,11529"; a="45804846"
+X-IronPort-AV: E=Sophos;i="6.17,312,1747724400"; 
+   d="scan'208";a="45804846"
+Received: from fmviesa008.fm.intel.com ([10.60.135.148])
+  by fmvoesa110.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 23 Aug 2025 02:49:18 -0700
+X-CSE-ConnectionGUID: vxNUc4PkSJqDTZYbdpSzTQ==
+X-CSE-MsgGUID: 4rQMmBxETKCBUAibYLLZYw==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.17,312,1747724400"; 
+   d="scan'208";a="169248388"
+Received: from liuzhao-optiplex-7080.sh.intel.com (HELO localhost) ([10.239.160.39])
+  by fmviesa008.fm.intel.com with ESMTP; 23 Aug 2025 02:49:15 -0700
+Date: Sat, 23 Aug 2025 18:11:01 +0800
+From: Zhao Liu <zhao1.liu@intel.com>
+To: "Xin Li (Intel)" <xin@zytor.com>
+Cc: kvm@vger.kernel.org, qemu-devel@nongnu.org, mst@redhat.com,
+	cohuck@redhat.com, pbonzini@redhat.com, mtosatti@redhat.com,
+	seanjc@google.com, hpa@zytor.com, andrew.cooper3@citrix.com,
+	chao.gao@intel.com
+Subject: Re: [PATCH v1 1/1] target/i386: Save/restore the nested flag of an
+ exception
+Message-ID: <aKmTtaOlPewxllUZ@intel.com>
+References: <20250723182211.1299776-1-xin@zytor.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <7077e09f-6ce9-43ba-8f87-47a290680141@redhat.com>
+In-Reply-To: <20250723182211.1299776-1-xin@zytor.com>
 
-On Fri, Aug 22, 2025 at 08:24:31AM +0200, David Hildenbrand wrote:
-> On 22.08.25 06:09, Mika Penttilä wrote:
-> > 
-> > On 8/21/25 23:06, David Hildenbrand wrote:
-> > 
-> > > All pages were already initialized and set to PageReserved() with a
-> > > refcount of 1 by MM init code.
-> > 
-> > Just to be sure, how is this working with MEMBLOCK_RSRV_NOINIT, where MM is supposed not to
-> > initialize struct pages?
+On Wed, Jul 23, 2025 at 11:22:11AM -0700, Xin Li (Intel) wrote:
+> Date: Wed, 23 Jul 2025 11:22:11 -0700
+> From: "Xin Li (Intel)" <xin@zytor.com>
+> Subject: [PATCH v1 1/1] target/i386: Save/restore the nested flag of an
+>  exception
+> X-Mailer: git-send-email 2.50.1
 > 
-> Excellent point, I did not know about that one.
+> Save/restore the nested flag of an exception during VM save/restore
+> and live migration to ensure a correct event stack level is chosen
+> when a nested exception is injected through FRED event delivery.
 > 
-> Spotting that we don't do the same for the head page made me assume that
-> it's just a misuse of __init_single_page().
+> The event stack level used by FRED event delivery depends on whether
+> the event was a nested exception encountered during delivery of an
+> earlier event, because a nested exception is "regarded" as happening
+> on ring 0.  E.g., when #PF is configured to use stack level 1 in
+> IA32_FRED_STKLVLS MSR:
+>   - nested #PF will be delivered on the stack pointed by IA32_FRED_RSP1
+>     MSR when encountered in ring 3 and ring 0.
+>   - normal #PF will be delivered on the stack pointed by IA32_FRED_RSP0
+>     MSR when encountered in ring 3.
+>   - normal #PF will be delivered on the stack pointed by IA32_FRED_RSP1
+>     MSR when encountered in ring 0.
 > 
-> But the nasty thing is that we use memblock_reserved_mark_noinit() to only
-> mark the tail pages ...
+> As such Qemu needs to track if an event is a nested event during VM
+> context save/restore and live migration.
+> 
+> Signed-off-by: Xin Li (Intel) <xin@zytor.com>
+> ---
+>  linux-headers/asm-x86/kvm.h |  4 +++-
+>  linux-headers/linux/kvm.h   |  1 +
+>  target/i386/cpu.c           |  1 +
+>  target/i386/cpu.h           |  1 +
+>  target/i386/kvm/kvm.c       | 35 +++++++++++++++++++++++++++++++++++
+>  target/i386/kvm/kvm_i386.h  |  1 +
+>  target/i386/machine.c       |  1 +
+>  7 files changed, 43 insertions(+), 1 deletion(-)
 
-And even nastier thing is that when CONFIG_DEFERRED_STRUCT_PAGE_INIT is
-disabled struct pages are initialized regardless of
-memblock_reserved_mark_noinit().
+> diff --git a/target/i386/kvm/kvm_i386.h b/target/i386/kvm/kvm_i386.h
+> index 5f83e8850a..7e765b6833 100644
+> --- a/target/i386/kvm/kvm_i386.h
+> +++ b/target/i386/kvm/kvm_i386.h
+> @@ -54,6 +54,7 @@ typedef struct KvmCpuidInfo {
+>  bool kvm_is_vm_type_supported(int type);
+>  bool kvm_has_adjust_clock_stable(void);
+>  bool kvm_has_exception_payload(void);
+> +bool kvm_has_exception_nested_flag(void);
+>  void kvm_synchronize_all_tsc(void);
+>  
+>  void kvm_get_apic_state(DeviceState *d, struct kvm_lapic_state *kapic);
+> diff --git a/target/i386/machine.c b/target/i386/machine.c
+> index dd2dac1d44..a452d2c97e 100644
+> --- a/target/i386/machine.c
+> +++ b/target/i386/machine.c
+> @@ -458,6 +458,7 @@ static const VMStateDescription vmstate_exception_info = {
+>          VMSTATE_UINT8(env.exception_injected, X86CPU),
+>          VMSTATE_UINT8(env.exception_has_payload, X86CPU),
+>          VMSTATE_UINT64(env.exception_payload, X86CPU),
+> +        VMSTATE_UINT8(env.exception_is_nested, X86CPU),
 
-I think this patch should go in before your updates:
+A new field needs to bump up the version of vmstate_exception_info, but
+I'm afraid this will break backward-migration compatibility. So what
+about adding a subsction? For example,
 
-diff --git a/mm/hugetlb.c b/mm/hugetlb.c
-index 753f99b4c718..1c51788339a5 100644
---- a/mm/hugetlb.c
-+++ b/mm/hugetlb.c
-@@ -3230,6 +3230,22 @@ int __alloc_bootmem_huge_page(struct hstate *h, int nid)
- 	return 1;
+diff --git a/target/i386/machine.c b/target/i386/machine.c
+index a452d2c97e4c..6ce3cb8af6a6 100644
+--- a/target/i386/machine.c
++++ b/target/i386/machine.c
+@@ -433,6 +433,24 @@ static bool steal_time_msr_needed(void *opaque)
+     return cpu->env.steal_time_msr != 0;
  }
- 
-+/*
-+ * Tail pages in a huge folio allocated from memblock are marked as 'noinit',
-+ * which means that when CONFIG_DEFERRED_STRUCT_PAGE_INIT is enabled their
-+ * struct page won't be initialized
-+ */
-+#ifdef CONFIG_DEFERRED_STRUCT_PAGE_INIT
-+static void __init hugetlb_init_tail_page(struct page *page, unsigned long pfn,
-+					enum zone_type zone, int nid)
-+{
-+	__init_single_page(page, pfn, zone, nid);
-+}
-+#else
-+static inline void hugetlb_init_tail_page(struct page *page, unsigned long pfn,
-+					enum zone_type zone, int nid) {}
-+#endif
-+
- /* Initialize [start_page:end_page_number] tail struct pages of a hugepage */
- static void __init hugetlb_folio_init_tail_vmemmap(struct folio *folio,
- 					unsigned long start_page_number,
-@@ -3244,7 +3260,7 @@ static void __init hugetlb_folio_init_tail_vmemmap(struct folio *folio,
- 	for (pfn = head_pfn + start_page_number; pfn < end_pfn; pfn++) {
- 		struct page *page = pfn_to_page(pfn);
- 
--		__init_single_page(page, pfn, zone, nid);
-+		hugetlb_init_tail_page(page, pfn, zone, nid);
- 		prep_compound_tail((struct page *)folio, pfn - head_pfn);
- 		ret = page_ref_freeze(page, 1);
- 		VM_BUG_ON(!ret);
- 
-> Let me revert back to __init_single_page() and add a big fat comment why
-> this is required.
-> 
-> Thanks!
 
--- 
-Sincerely yours,
-Mike.
++static bool exception_nested_needed(void *opaque)
++{
++    X86CPU *cpu = opaque;
++
++    return cpu->env.exception_is_nested;
++}
++
++static const VMStateDescription vmstate_exceprtion_nested = {
++    .name = "cpu/exception_nested",
++    .version_id = 1,
++    .minimum_version_id = 1,
++    .needed = exception_nested_needed,
++    .fields = (const VMStateField[]) {
++        VMSTATE_UINT8(env.exception_is_nested, X86CPU),
++        VMSTATE_END_OF_LIST()
++    }
++};
++
+ static bool exception_info_needed(void *opaque)
+ {
+     X86CPU *cpu = opaque;
+@@ -458,8 +476,11 @@ static const VMStateDescription vmstate_exception_info = {
+         VMSTATE_UINT8(env.exception_injected, X86CPU),
+         VMSTATE_UINT8(env.exception_has_payload, X86CPU),
+         VMSTATE_UINT64(env.exception_payload, X86CPU),
+-        VMSTATE_UINT8(env.exception_is_nested, X86CPU),
+         VMSTATE_END_OF_LIST()
++    },
++    .subsections = (const VMStateDescription * const []) {
++        &vmstate_exceprtion_nested,
++        NULL,
+     }
+ };
+
+---
+In addition, I think it's better to update header files in a seperate
+patch.
+
+Thanks,
+Zhao
+
+
 
