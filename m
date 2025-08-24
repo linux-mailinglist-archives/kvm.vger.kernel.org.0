@@ -1,198 +1,156 @@
-Return-Path: <kvm+bounces-55575-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-55576-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id A1539B32E11
-	for <lists+kvm@lfdr.de>; Sun, 24 Aug 2025 09:55:51 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8FCB0B3301D
+	for <lists+kvm@lfdr.de>; Sun, 24 Aug 2025 15:25:01 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id BCE50482A30
-	for <lists+kvm@lfdr.de>; Sun, 24 Aug 2025 07:55:49 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 511C02028DE
+	for <lists+kvm@lfdr.de>; Sun, 24 Aug 2025 13:25:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 788082528EF;
-	Sun, 24 Aug 2025 07:55:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B22032DE6EF;
+	Sun, 24 Aug 2025 13:24:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="Wzr7G/H8"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="SquWihWK"
 X-Original-To: kvm@vger.kernel.org
-Received: from mx0a-00069f02.pphosted.com (mx0a-00069f02.pphosted.com [205.220.165.32])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 054EE246779;
-	Sun, 24 Aug 2025 07:55:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.165.32
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9C3D2393DE3;
+	Sun, 24 Aug 2025 13:24:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756022140; cv=none; b=dgRJvaT3K3C0P1YuC4T3/EoyJLaTS0RQoKLH7njHccGABGAJeREkBTjaggm51oVpsQk4ZI6zdewi/Xgpj/LyH7vPqs+qI/6vcTWPp5qFiLuw2ElaXwuOhBfEjxj8W9s5aaiD+Jmqt0uh+8IbRAKubgQs3aSN9k1XehowBQB9Sak=
+	t=1756041880; cv=none; b=VP4If5ozBuciAvANxGkykqsy5cYI2s6CmQASw/YAAqldG3NPH1K2d8y3nT03z1xK/Wn/MdvkrTaq9qUZlXEUCoD/40poqJi68er6jh1Yub3tFG09ifLIjjzfKO3xKSDjiNqtrp20Ba01qgIiuANRSB3rkS3y4AFOqGTT5lYPJG8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756022140; c=relaxed/simple;
-	bh=HkOwPrnpT35Y+SygLffQ1fNvcHF3cTPZvHTC0IEJSgY=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=Bq2+cAu4j1PQgqtbyFyIjpCnHHcMPOqbWwrvf1XJ9G/XbDXG2JMaC0X0TbT2vq4d4M/fbRKAiZ9Fmqzu7NlJJydsQSfPviapMS7m9+DKGlmWd2HsJpB6HQlw3lewvYCsJq3+LavbVXtQdOonwICg1NUYQY4d1wdDQksMcl3kjm8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oracle.com; spf=pass smtp.mailfrom=oracle.com; dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b=Wzr7G/H8; arc=none smtp.client-ip=205.220.165.32
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oracle.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oracle.com
-Received: from pps.filterd (m0246629.ppops.net [127.0.0.1])
-	by mx0b-00069f02.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 57O7SOGQ031274;
-	Sun, 24 Aug 2025 07:55:32 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=cc
-	:content-transfer-encoding:date:from:message-id:mime-version
-	:subject:to; s=corp-2025-04-25; bh=uYFiLZpnFBJ3JfM/i2bkB8bD0x2ex
-	s7tUASSBQUSHtg=; b=Wzr7G/H8ru62O7TJAniWTJAshR4YTqnSPx8OoPsouANOO
-	dCp0E6K9C4XgJfLxvpls2tmZZgBuICnDKAZFLalozWuw/cWaPFdCGKgGen6nDUIH
-	3sf2+0nbSbCVkn4ZTFYEc1aHTdNY1AEZw3XCyjS3uj7ntlw7UqrlkUZ5mmF4v92K
-	tlPFwAZCEK/xQWH60WOWBGsq0X43cLq072E1VkIc0nsHFcRtwXNOhufAZbQR8oI0
-	BSv760l1oOXLhPGfwMeEBrwR2a5SvrOaQ+wKMjZgOJGx4ckjBqCXRwgaLqhit9H2
-	45h5RXYBYDQ+QU8GDGCNo02hbv3Vm82lq4/hL98hQ==
-Received: from iadpaimrmta02.imrmtpd1.prodappiadaev1.oraclevcn.com (iadpaimrmta02.appoci.oracle.com [147.154.18.20])
-	by mx0b-00069f02.pphosted.com (PPS) with ESMTPS id 48qjv2ravr-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Sun, 24 Aug 2025 07:55:32 +0000 (GMT)
-Received: from pps.filterd (iadpaimrmta02.imrmtpd1.prodappiadaev1.oraclevcn.com [127.0.0.1])
-	by iadpaimrmta02.imrmtpd1.prodappiadaev1.oraclevcn.com (8.18.1.2/8.18.1.2) with ESMTP id 57O5AGS7014743;
-	Sun, 24 Aug 2025 07:55:31 GMT
-Received: from pps.reinject (localhost [127.0.0.1])
-	by iadpaimrmta02.imrmtpd1.prodappiadaev1.oraclevcn.com (PPS) with ESMTPS id 48q4373rrh-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Sun, 24 Aug 2025 07:55:30 +0000
-Received: from iadpaimrmta02.imrmtpd1.prodappiadaev1.oraclevcn.com (iadpaimrmta02.imrmtpd1.prodappiadaev1.oraclevcn.com [127.0.0.1])
-	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 57O7tUE5012602;
-	Sun, 24 Aug 2025 07:55:30 GMT
-Received: from ca-dev110.us.oracle.com (ca-dev110.us.oracle.com [10.129.136.45])
-	by iadpaimrmta02.imrmtpd1.prodappiadaev1.oraclevcn.com (PPS) with ESMTP id 48q4373rpb-1;
-	Sun, 24 Aug 2025 07:55:30 +0000
-From: Alok Tiwari <alok.a.tiwari@oracle.com>
-To: pbonzini@redhat.com, corbet@lwn.net, kvm@vger.kernel.org,
-        linux-doc@vger.kernel.org, rdunlap@infradead.org
-Cc: alok.a.tiwari@oracle.com, linux-kernel@vger.kernel.org
-Subject: [PATCH] Documentation: KVM: fix reference for kvm_ppc_resize_hpt and various typos
-Date: Sun, 24 Aug 2025 00:54:48 -0700
-Message-ID: <20250824075455.602185-1-alok.a.tiwari@oracle.com>
-X-Mailer: git-send-email 2.50.1
+	s=arc-20240116; t=1756041880; c=relaxed/simple;
+	bh=ULWSWvx5qOQocuXhhEVwmUdZJ/jQrpo8zzXV1kr+XYk=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=ull+/HlBVmEZZhKNv/0sF3Fn0DS7SlawRmd45WFjUcqhk6vXZn+ZJRH0gdfvL+szbq3qH/vrNmxBQiRIDrUmnj5odiEMPyrVd8IVLdTS1jYwx3VQgA/2P1BdSidVqMXbvEYDwQ5VAJulrtq5kSIboWrVEqZwW0XH9JdD3c5I0ZA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=SquWihWK; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B4638C4CEEB;
+	Sun, 24 Aug 2025 13:24:26 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1756041880;
+	bh=ULWSWvx5qOQocuXhhEVwmUdZJ/jQrpo8zzXV1kr+XYk=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=SquWihWK3f+VpRPVHREvb/KU1Ip2U18TP7N1MuJITOAx4rQrPZH3cvqtkOP5SvK7q
+	 i6NO1TPVUbZk8RWkAk3LTCsFqBTBZ14HIKev8nasvhFuIsLkIUiO3cKzio2Q51II/F
+	 wyed5FtAlddWEWPif7U0YGP0VU7Jz0WnTx8oiBRZXCVwF7SJXztCvl7h61L8oudm/m
+	 ZzJcPQiQ6a3vkdslZGaL+map5bzuxrOH69hNlp4a8gDkADVHKqlXnjP6H9fUKUPAle
+	 G5RP+5YSDJFPCZAOfsIK30ngRx5fl+uNMhMZuFtvohYRU68gjsyw/nUrRlnisE/5CR
+	 1GDLoGVBUCvXA==
+Date: Sun, 24 Aug 2025 16:24:23 +0300
+From: Mike Rapoport <rppt@kernel.org>
+To: David Hildenbrand <david@redhat.com>
+Cc: linux-kernel@vger.kernel.org, Alexander Potapenko <glider@google.com>,
+	Andrew Morton <akpm@linux-foundation.org>,
+	Brendan Jackman <jackmanb@google.com>,
+	Christoph Lameter <cl@gentwo.org>, Dennis Zhou <dennis@kernel.org>,
+	Dmitry Vyukov <dvyukov@google.com>, dri-devel@lists.freedesktop.org,
+	intel-gfx@lists.freedesktop.org, iommu@lists.linux.dev,
+	io-uring@vger.kernel.org, Jason Gunthorpe <jgg@nvidia.com>,
+	Jens Axboe <axboe@kernel.dk>, Johannes Weiner <hannes@cmpxchg.org>,
+	John Hubbard <jhubbard@nvidia.com>, kasan-dev@googlegroups.com,
+	kvm@vger.kernel.org, "Liam R. Howlett" <Liam.Howlett@oracle.com>,
+	Linus Torvalds <torvalds@linux-foundation.org>,
+	linux-arm-kernel@axis.com, linux-arm-kernel@lists.infradead.org,
+	linux-crypto@vger.kernel.org, linux-ide@vger.kernel.org,
+	linux-kselftest@vger.kernel.org, linux-mips@vger.kernel.org,
+	linux-mmc@vger.kernel.org, linux-mm@kvack.org,
+	linux-riscv@lists.infradead.org, linux-s390@vger.kernel.org,
+	linux-scsi@vger.kernel.org,
+	Lorenzo Stoakes <lorenzo.stoakes@oracle.com>,
+	Marco Elver <elver@google.com>,
+	Marek Szyprowski <m.szyprowski@samsung.com>,
+	Michal Hocko <mhocko@suse.com>, Muchun Song <muchun.song@linux.dev>,
+	netdev@vger.kernel.org, Oscar Salvador <osalvador@suse.de>,
+	Peter Xu <peterx@redhat.com>, Robin Murphy <robin.murphy@arm.com>,
+	Suren Baghdasaryan <surenb@google.com>, Tejun Heo <tj@kernel.org>,
+	virtualization@lists.linux.dev, Vlastimil Babka <vbabka@suse.cz>,
+	wireguard@lists.zx2c4.com, x86@kernel.org, Zi Yan <ziy@nvidia.com>
+Subject: Re: [PATCH RFC 12/35] mm: limit folio/compound page sizes in
+ problematic kernel configs
+Message-ID: <aKsSh0OEjf4GLmIG@kernel.org>
+References: <20250821200701.1329277-1-david@redhat.com>
+ <20250821200701.1329277-13-david@redhat.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1099,Hydra:6.1.9,FMLib:17.12.80.40
- definitions=2025-08-24_02,2025-08-20_03,2025-03-28_01
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=0 mlxlogscore=999
- mlxscore=0 bulkscore=0 phishscore=0 adultscore=0 spamscore=0
- malwarescore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2508110000 definitions=main-2508240075
-X-Authority-Analysis: v=2.4 cv=Rp/FLDmK c=1 sm=1 tr=0 ts=68aac574 b=1 cx=c_pps
- a=e1sVV491RgrpLwSTMOnk8w==:117 a=e1sVV491RgrpLwSTMOnk8w==:17
- a=2OwXVqhp2XgA:10 a=yPCof4ZbAAAA:8 a=oA-75tQ_D-ToXw_PklIA:9 cc=ntf
- awl=host:13600
-X-Proofpoint-ORIG-GUID: Q8packPhZK1We2etAZb4frkiMpQ2a53F
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUwODIzMDE4MiBTYWx0ZWRfXzBjy5tcMqmbw
- BaDdrW1gY7OXk67Xf1cmXyFklJvaR+1kgONfHrJf5w39bNHBS0mdi7oXkxRT1nvc0XmsGK37TzX
- gL9ds4ltfpjLPntVA7/L2mLElgtrbOx1qznlb6dsy2K62Gr9bX1S7Px7oZcFdsDHvuS891j3HSl
- FmJ30wFq/eDhQ9Z+g7zPgauNuq55bI6uk3N0Ywjs6uxoyw1IrsqYyGeFvI+J4BGixmEU0bOH7Ov
- tFHRamsof3cISVPP8Terc4SxCq3V520t01rLVJszUf6XiKu1n3xxwmAaSoO1931MNc1VPJrcYTO
- GZ6IxoYUT26yhD+ZBSV239VQm0G1MH6Y0ZwZpWlvNCtsumVzElE6vqRNkeD7PZ5B6J3NijQXdmx
- 6Q0/npNQMT7g5J0pIp/EfoCYrKfIBg==
-X-Proofpoint-GUID: Q8packPhZK1We2etAZb4frkiMpQ2a53F
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250821200701.1329277-13-david@redhat.com>
 
-Fix the incorrect reference to struct kvm_reinject_control and replace
-it with the correct struct kvm_ppc_resize_hpt in the documentation of
-the HPT resize ioctl.
+On Thu, Aug 21, 2025 at 10:06:38PM +0200, David Hildenbrand wrote:
+> Let's limit the maximum folio size in problematic kernel config where
+> the memmap is allocated per memory section (SPARSEMEM without
+> SPARSEMEM_VMEMMAP) to a single memory section.
+> 
+> Currently, only a single architectures supports ARCH_HAS_GIGANTIC_PAGE
+> but not SPARSEMEM_VMEMMAP: sh.
+> 
+> Fortunately, the biggest hugetlb size sh supports is 64 MiB
+> (HUGETLB_PAGE_SIZE_64MB) and the section size is at least 64 MiB
+> (SECTION_SIZE_BITS == 26), so their use case is not degraded.
+> 
+> As folios and memory sections are naturally aligned to their order-2 size
+> in memory, consequently a single folio can no longer span multiple memory
+> sections on these problematic kernel configs.
+> 
+> nth_page() is no longer required when operating within a single compound
+> page / folio.
+> 
+> Signed-off-by: David Hildenbrand <david@redhat.com>
 
-Additional cleanups:
-- Fix "change" -> "changes", "VPCU" -> "VCPU", "Serror" -> "SError"
-- Fix punctuation issues (missing brackets in CPUID leaf reference).
-- Remove duplicated words ("this is ioctl").
-- Correct structure names in error descriptions (kvm_reinject_control ->
-kvm_ppc_resize_hpt).
-- Fix grammar ("than" -> "then", "is there" -> "if there").
+Acked-by: Mike Rapoport (Microsoft) <rppt@kernel.org>
 
-These changes improve clarity and accuracy of the KVM API documentation.
+> ---
+>  include/linux/mm.h | 22 ++++++++++++++++++----
+>  1 file changed, 18 insertions(+), 4 deletions(-)
+> 
+> diff --git a/include/linux/mm.h b/include/linux/mm.h
+> index 77737cbf2216a..48a985e17ef4e 100644
+> --- a/include/linux/mm.h
+> +++ b/include/linux/mm.h
+> @@ -2053,11 +2053,25 @@ static inline long folio_nr_pages(const struct folio *folio)
+>  	return folio_large_nr_pages(folio);
+>  }
+>  
+> -/* Only hugetlbfs can allocate folios larger than MAX_ORDER */
+> -#ifdef CONFIG_ARCH_HAS_GIGANTIC_PAGE
+> -#define MAX_FOLIO_ORDER		PUD_ORDER
+> -#else
+> +#if !defined(CONFIG_ARCH_HAS_GIGANTIC_PAGE)
+> +/*
+> + * We don't expect any folios that exceed buddy sizes (and consequently
+> + * memory sections).
+> + */
+>  #define MAX_FOLIO_ORDER		MAX_PAGE_ORDER
+> +#elif defined(CONFIG_SPARSEMEM) && !defined(CONFIG_SPARSEMEM_VMEMMAP)
+> +/*
+> + * Only pages within a single memory section are guaranteed to be
+> + * contiguous. By limiting folios to a single memory section, all folio
+> + * pages are guaranteed to be contiguous.
+> + */
+> +#define MAX_FOLIO_ORDER		PFN_SECTION_SHIFT
+> +#else
+> +/*
+> + * There is no real limit on the folio size. We limit them to the maximum we
+> + * currently expect.
+> + */
+> +#define MAX_FOLIO_ORDER		PUD_ORDER
+>  #endif
+>  
+>  #define MAX_FOLIO_NR_PAGES	(1UL << MAX_FOLIO_ORDER)
+> -- 
+> 2.50.1
+> 
 
-Signed-off-by: Alok Tiwari <alok.a.tiwari@oracle.com>
----
- Documentation/virt/kvm/api.rst | 18 +++++++++---------
- 1 file changed, 9 insertions(+), 9 deletions(-)
-
-diff --git a/Documentation/virt/kvm/api.rst b/Documentation/virt/kvm/api.rst
-index 6aa40ee05a4ae..22542ceaf5718 100644
---- a/Documentation/virt/kvm/api.rst
-+++ b/Documentation/virt/kvm/api.rst
-@@ -88,7 +88,7 @@ the VM is shut down.
- =============
- 
- As of Linux 2.6.22, the KVM ABI has been stabilized: no backward
--incompatible change are allowed.  However, there is an extension
-+incompatible changes are allowed.  However, there is an extension
- facility that allows backward-compatible extensions to the API to be
- queried and used.
- 
-@@ -1198,7 +1198,7 @@ pending until the guest takes the exception by unmasking PSTATE.A.
- 
- Running the VCPU may cause it to take a pending SError, or make an access that
- causes an SError to become pending. The event's description is only valid while
--the VPCU is not running.
-+the VCPU is not running.
- 
- This API provides a way to read and write the pending 'event' state that is not
- visible to the guest. To save, restore or migrate a VCPU the struct representing
-@@ -1293,7 +1293,7 @@ ARM64:
- User space may need to inject several types of events to the guest.
- 
- Set the pending SError exception state for this VCPU. It is not possible to
--'cancel' an Serror that has been made pending.
-+'cancel' an SError that has been made pending.
- 
- If the guest performed an access to I/O memory which could not be handled by
- userspace, for example because of missing instruction syndrome decode
-@@ -1832,7 +1832,7 @@ emulate them efficiently. The fields in each entry are defined as follows:
-          the values returned by the cpuid instruction for
-          this function/index combination
- 
--x2APIC (CPUID leaf 1, ecx[21) and TSC deadline timer (CPUID leaf 1, ecx[24])
-+x2APIC (CPUID leaf 1, ecx[21]) and TSC deadline timer (CPUID leaf 1, ecx[24])
- may be returned as true, but they depend on KVM_CREATE_IRQCHIP for in-kernel
- emulation of the local APIC.  TSC deadline timer support is also reported via::
- 
-@@ -3222,8 +3222,8 @@ default-sized hash table (16 MB).
- 
- If this ioctl is called when a hash table has already been allocated,
- with a different order from the existing hash table, the existing hash
--table will be freed and a new one allocated.  If this is ioctl is
--called when a hash table has already been allocated of the same order
-+table will be freed and a new one allocated.  If this ioctl is called
-+when a hash table has already been allocated of the same order
- as specified, the kernel will clear out the existing hash table (zero
- all HPTEs).  In either case, if the guest is using the virtualized
- real-mode area (VRMA) facility, the kernel will re-create the VMRA
-@@ -4434,7 +4434,7 @@ base 2 of the page size in the bottom 6 bits.
- :Returns: 0 on successful completion,
- 	 >0 if a new HPT is being prepared, the value is an estimated
-          number of milliseconds until preparation is complete,
--         -EFAULT if struct kvm_reinject_control cannot be read,
-+         -EFAULT if struct kvm_ppc_resize_hpt cannot be read,
- 	 -EINVAL if the supplied shift or flags are invalid,
- 	 -ENOMEM if unable to allocate the new HPT,
- 
-@@ -4488,7 +4488,7 @@ ones will monitor preparation until it completes or fails.
- :Returns: 0 on successful completion,
-          -EFAULT if struct kvm_reinject_control cannot be read,
- 	 -EINVAL if the supplied shift or flags are invalid,
--	 -ENXIO is there is no pending HPT, or the pending HPT doesn't
-+	 -ENXIO if there is no pending HPT, or the pending HPT doesn't
-          have the requested size,
- 	 -EBUSY if the pending HPT is not fully prepared,
- 	 -ENOSPC if there was a hash collision when moving existing
-@@ -8925,7 +8925,7 @@ This capability indicates that KVM supports steal time accounting.
- When steal time accounting is supported it may be enabled with
- architecture-specific interfaces.  This capability and the architecture-
- specific interfaces must be consistent, i.e. if one says the feature
--is supported, than the other should as well and vice versa.  For arm64
-+is supported, then the other should as well and vice versa.  For arm64
- see Documentation/virt/kvm/devices/vcpu.rst "KVM_ARM_VCPU_PVTIME_CTRL".
- For x86 see Documentation/virt/kvm/x86/msr.rst "MSR_KVM_STEAL_TIME".
- 
 -- 
-2.50.1
-
+Sincerely yours,
+Mike.
 
