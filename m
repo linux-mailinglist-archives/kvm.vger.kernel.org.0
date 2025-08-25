@@ -1,138 +1,115 @@
-Return-Path: <kvm+bounces-55621-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-55622-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id BC925B34491
-	for <lists+kvm@lfdr.de>; Mon, 25 Aug 2025 16:51:40 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 24B9FB344B2
+	for <lists+kvm@lfdr.de>; Mon, 25 Aug 2025 16:55:06 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4DCCD3BFDC1
-	for <lists+kvm@lfdr.de>; Mon, 25 Aug 2025 14:51:36 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id EB018179C13
+	for <lists+kvm@lfdr.de>; Mon, 25 Aug 2025 14:55:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id ED4662FB983;
-	Mon, 25 Aug 2025 14:51:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A246F2857FA;
+	Mon, 25 Aug 2025 14:54:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="XrjoAd4w"
+	dkim=pass (4096-bit key) header.d=alien8.de header.i=@alien8.de header.b="B+y3ZhTg"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from mail.alien8.de (mail.alien8.de [65.109.113.108])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A34882222A0
-	for <kvm@vger.kernel.org>; Mon, 25 Aug 2025 14:51:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 907622FC873;
+	Mon, 25 Aug 2025 14:54:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=65.109.113.108
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756133482; cv=none; b=j5sRlUEk5cNB6zped+5/8rKhV3KYoEfCPCY8GRBpCO4lpLvta2bbpQr6z2r8CvzzhSCPwWjkvABNRefV8B7JqMOD75LNd094771aL7rdjLxmyn0i1H+3cRRFggFTrtkHfi2VAtljT5n6N7XwpnMidT5S+UepT7W75JzAA+87/D0=
+	t=1756133663; cv=none; b=otvkH3fvY103hpxao0csM1QndV7ASj7NPRpVTlGKMahOdYgSwL7iC3+Nla5M68n3iHbcwPF32iAb+/c0MdozCQhw+o+LmYiP4saq9BzxfcXx23Ey4SMA/aGVih0P7ovSbcn5LfBqbE8Wzv1pEeiqDe8vVXh2S8fm8IV9kcmWWHI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756133482; c=relaxed/simple;
-	bh=oOSJGLCaW8V7KVRsbfS3RhvJdm1vkbZf5LZ3nUtQzq8=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=IXMHYfi+5nXYf4tjbWu5CsmrnkLCAxwgrx+hKz/aBhz+Wf6fu++kIIF6YXZypB1PAEpMOzpFXTOYkWneuithW6UtMzeKWbn7MQzlUsGVa8nnsOY3Gv2WGaQfG4xnpSJ9BtdIDb4ozkNakGdKSlKd6ObNofWwmTZ7Rv56q2Airgg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=XrjoAd4w; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1756133479;
-	h=from:from:reply-to:reply-to:subject:subject:date:date:
-	 message-id:message-id:to:to:cc:cc:mime-version:mime-version:
-	 content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=4AkxrvBIB2UgDH4sPvjPCIhDWeQ8GQfYbkHQCnf6NMk=;
-	b=XrjoAd4wcjXwVzLUX9KHaywQGHTek4gYNISToPR4vrttnX03p//outsBw3OGXZCFsHW8wR
-	sDvRv8DWQRlMTbD49akEz4Yik7pVwjDKttbsmrWg552KIxQtyWXB5Rw5npuJUvc9pLTSqi
-	urlcGSNVNBxjFpFlkBDS0rxPOuxwvlM=
-Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
- [209.85.128.70]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-118-6_DaC4L6OByXryJphvV34g-1; Mon, 25 Aug 2025 10:51:16 -0400
-X-MC-Unique: 6_DaC4L6OByXryJphvV34g-1
-X-Mimecast-MFC-AGG-ID: 6_DaC4L6OByXryJphvV34g_1756133475
-Received: by mail-wm1-f70.google.com with SMTP id 5b1f17b1804b1-45a15f10f31so35507765e9.0
-        for <kvm@vger.kernel.org>; Mon, 25 Aug 2025 07:51:16 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1756133475; x=1756738275;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:reply-to:user-agent:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=4AkxrvBIB2UgDH4sPvjPCIhDWeQ8GQfYbkHQCnf6NMk=;
-        b=J34DBZAlxcEOM/Y9b6tvfib/cu1SoeNpENIfYlla0IRMNopbGHKLKt/SjZquZqkmJ7
-         aHiQkbePbDxoFJVZBaLNor+IU3A2MPp5YVphB5UHQkH0qT3SyeyQBfG2PRWpqpfECthi
-         9M5ZGl1wYjV0giwBWyuoV7WcXRXS03oyg8J2CG/A35CmSb3/LW/ypl2S7UuR1DGw84M8
-         NxyZfLhD2jZlvIaEX/M8e7LvJqwBmhUhbu7obMhPLdQ8v6UhTE6EW7N+Q7ikbzShXIzw
-         0bSTpj/WfJHHU+g3/26LpIk1vZblhsOJqKcdCsRDj2Ydezdmz1cZEJaRgHPCCgPoeRBO
-         zFcg==
-X-Forwarded-Encrypted: i=1; AJvYcCXhKbonR3vgZ3kthPSIs9IqHjWES+XLFQVWstYfH3vlCcAx+9LL/cEty5Yf2EWg65asHEE=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yzq0cUkGNIy9aP97wtVtTCMYQwkqDD4ULFxxwv/qI4mIRw4njjy
-	oecHCuA7kwAdStHwnhnBjWEsrMAPkDLi5+K1XHzLTty4qtbjI+R20/VyU/Kv6VSYDHiLLd+JGKg
-	RZJoO9lK7jxwqkcXHO04CR0U1ZIhLI5gh6o2+LCIXERGCKbk9htdF+Q==
-X-Gm-Gg: ASbGncvSpxjtXsXzLARqRTy3onvv5hK91p+weWAr7jibn47YVnQfhRwBKM6kWVQGxOo
-	iEnu4gv59/W+Ol3Hoaf2uC83Lqvs+YviuzefGhAkyZQrZNcSKVNI1otWTJX0JqSfkX33dZwcENE
-	jI32g0CupYSEd1ps8ZrC1GCK5Y7opRg461NbIkYGVWTdB3mxtItPSVMtNb9YV94f+JXwFcM9Ctd
-	qCRvwKWZ8Q95z9m533JjJIKbOqi5ip0hF/SS4zxjoLhjuc0flshzEbTzBzP/4aMOyCnJOfRqjAM
-	EoNOGf/86cD88hGxqO0YDQkBtTe7bTbZOj86gGk4r2oiCJoZPSZd/elc6gwb/kJu1ULScIP1yCA
-	bOzootgTuF6E=
-X-Received: by 2002:a05:600c:1c87:b0:456:942:b162 with SMTP id 5b1f17b1804b1-45b51792539mr113382545e9.11.1756133475233;
-        Mon, 25 Aug 2025 07:51:15 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IHk7BeSjA8U4Bh+P4ANTHgxAKR355HH2hRjmjNFnbu9lssUhx/ve8pHFzx43qF+/snZMSFyNg==
-X-Received: by 2002:a05:600c:1c87:b0:456:942:b162 with SMTP id 5b1f17b1804b1-45b51792539mr113382255e9.11.1756133474831;
-        Mon, 25 Aug 2025 07:51:14 -0700 (PDT)
-Received: from ?IPV6:2a01:e0a:f0e:9070:527b:9dff:feef:3874? ([2a01:e0a:f0e:9070:527b:9dff:feef:3874])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-45b5f4ef19dsm56584745e9.19.2025.08.25.07.51.13
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 25 Aug 2025 07:51:14 -0700 (PDT)
-Message-ID: <3cd48f85-ec6f-44b5-a35a-147e950baad6@redhat.com>
-Date: Mon, 25 Aug 2025 16:51:13 +0200
+	s=arc-20240116; t=1756133663; c=relaxed/simple;
+	bh=27lu/Fxra3OrCCTNVCgoKqZX1LjKOWf5Tbhd/BUiLAY=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Vu5HjsmImHEzLgmf2B7BhFdPURM9AZeXO2LGAtVXaY8sv9eEMema36lmTAgoLM5yoFwQP2PCFtJoHCIfKw1jhuFZXTXL1mxz414YOGQLEX5mcoMbxk5S+WePdbZMuylrkYajBurJU961SNooOo4+XeuqpmbPoDnJtA38XG1UbQw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=alien8.de; spf=pass smtp.mailfrom=alien8.de; dkim=pass (4096-bit key) header.d=alien8.de header.i=@alien8.de header.b=B+y3ZhTg; arc=none smtp.client-ip=65.109.113.108
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=alien8.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=alien8.de
+Received: from localhost (localhost.localdomain [127.0.0.1])
+	by mail.alien8.de (SuperMail on ZX Spectrum 128k) with ESMTP id 52F3C40E0286;
+	Mon, 25 Aug 2025 14:54:18 +0000 (UTC)
+X-Virus-Scanned: Debian amavisd-new at mail.alien8.de
+Authentication-Results: mail.alien8.de (amavisd-new); dkim=pass (4096-bit key)
+	header.d=alien8.de
+Received: from mail.alien8.de ([127.0.0.1])
+	by localhost (mail.alien8.de [127.0.0.1]) (amavisd-new, port 10026)
+	with ESMTP id 2WOTSlRdqRJD; Mon, 25 Aug 2025 14:54:15 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=alien8;
+	t=1756133654; bh=8VV4pEI7u0jKSm7odI+J0qCqX1OEfjTGpTffiSpKExQ=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=B+y3ZhTgSdfhkUGCZ8BE26pW/VKG0rdX9tkLjUb2SSq5rTm4+bBDdHx/+yhWbKXt5
+	 uEQrxexcf5HwDVfo3jQiv+Sk+U3d/PPjzqLRbN3lzRAVJ3POxYxtv2EsbAOVv4AYYa
+	 /nGDW4KVhUPt+BCQWAtwW3WgTzeV1KvqOlkMicsYmUDWaAZo6pCsWCMmFEnAmraH0l
+	 CHRodDCzoy87woQXjTgGTnWTRSs99rYI6lCclajP8NjV1oBmRBDfh5agafsXDscr/y
+	 eArKYmonLvgcWo8j1D+y5mzraqqD3SKq770viiths+nSKKGaDUXElRCUMaSFOGI/J3
+	 fS9qXqDLsdmmoP6dSQSv2q5SRCVYjAWG0GWQ/WRauoybwk+DixvnWiGlWHyQGecDGQ
+	 BYGWSMT3NCINJfGgvk5nJQp+MFvTJUQ783SwCOv5HgWO7K6ifEgHNhj+9Vm5tkxzck
+	 LiDhSzvUUk/Z6k1yRVKXwiJ8PUQ8YX6UvLp29hNydQ4LXTu1iwDrKy/eM7fTCTEERO
+	 uYz/yu061QsbN1ezGxJ+7hpJqLzjk4ZNtyTrws0+DfE6i49IYbwjkaUAYXZck/HxK+
+	 vevVz4FkbQR6NxDPGPJyR3DIpeLF34KVlGlIIYim9z+BpidF2Ha77PxWbEZDQWYZD8
+	 QKDmm2nNQaaYisWOhSU6Pki0=
+Received: from zn.tnic (pd953092e.dip0.t-ipconnect.de [217.83.9.46])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange ECDHE (P-256) server-signature ECDSA (P-256) server-digest SHA256)
+	(No client certificate requested)
+	by mail.alien8.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id 7DBC740E01A1;
+	Mon, 25 Aug 2025 14:53:52 +0000 (UTC)
+Date: Mon, 25 Aug 2025 16:53:51 +0200
+From: Borislav Petkov <bp@alien8.de>
+To: "Upadhyay, Neeraj" <neeraj.upadhyay@amd.com>
+Cc: linux-kernel@vger.kernel.org, tglx@linutronix.de, mingo@redhat.com,
+	dave.hansen@linux.intel.com, Thomas.Lendacky@amd.com,
+	nikunj@amd.com, Santosh.Shukla@amd.com, Vasant.Hegde@amd.com,
+	Suravee.Suthikulpanit@amd.com, David.Kaplan@amd.com, x86@kernel.org,
+	hpa@zytor.com, peterz@infradead.org, seanjc@google.com,
+	pbonzini@redhat.com, kvm@vger.kernel.org,
+	kirill.shutemov@linux.intel.com, huibo.wang@amd.com,
+	naveen.rao@amd.com, francescolavra.fl@gmail.com,
+	tiala@microsoft.com
+Subject: Re: [PATCH v9 09/18] x86/sev: Initialize VGIF for secondary VCPUs
+ for Secure AVIC
+Message-ID: <20250825145351.GWaKx4_48rQOqUYvZr@fat_crate.local>
+References: <20250811094444.203161-1-Neeraj.Upadhyay@amd.com>
+ <20250811094444.203161-10-Neeraj.Upadhyay@amd.com>
+ <20250822172820.GSaKiotPxNu-H9rYve@fat_crate.local>
+ <a91b5470-33a0-4a23-ac1a-a7f1d4559cc1@amd.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Reply-To: eric.auger@redhat.com
-Subject: Re: [PATCH] MAINTAINERS: Add myself as VFIO-platform reviewer
-Content-Language: en-US
-To: Mostafa Saleh <smostafa@google.com>, linux-kernel@vger.kernel.org,
- kvm@vger.kernel.org
-Cc: alex.williamson@redhat.com, clg@redhat.com
-References: <20250820203102.2034333-1-smostafa@google.com>
-From: Eric Auger <eric.auger@redhat.com>
-In-Reply-To: <20250820203102.2034333-1-smostafa@google.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <a91b5470-33a0-4a23-ac1a-a7f1d4559cc1@amd.com>
 
-Hi Mostafa,
+On Mon, Aug 25, 2025 at 11:55:44AM +0530, Upadhyay, Neeraj wrote:
+> Ok. Below is the updated description:
+> 
+> Virtual GIF (VGIF) providing masking capability for when virtual interrupts
+> (virtual maskable interrupts, virtual NMIs) can be taken by the guest vCPU.
+> Secure AVIC hardware reads VGIF state from the vCPU's VMSA. So, set VGIF for
+> secondary CPUs (the configuration for boot CPU is done by the hypervisor),
+> to unmask delivery of virtual interrupts  to the vCPU.
 
-On 8/20/25 10:31 PM, Mostafa Saleh wrote:
-> Based on discussion:
-> https://lore.kernel.org/kvm/20250806170314.3768750-3-alex.williamson@redhat.com/
->
-> I will start looking into adding support for modern HW and more
-> features to VFIO-platform.
->
-> Signed-off-by: Mostafa Saleh <smostafa@google.com>
-Reviewed-by: Eric Auger <eric.auger@redhat.com>
+Yap.
 
-Thanks
+> I also don't see an explicit mention. I will check on documenting it in the
+> APM. However, there are references to virtual interrupts (V_NMI, V_INTR)
+> (which requires VGIF support)
 
-Eric
-> ---
->  MAINTAINERS | 1 +
->  1 file changed, 1 insertion(+)
->
-> diff --git a/MAINTAINERS b/MAINTAINERS
-> index daf520a13bdf..840da132c835 100644
-> --- a/MAINTAINERS
-> +++ b/MAINTAINERS
-> @@ -26463,6 +26463,7 @@ F:	drivers/vfio/pci/pds/
->  
->  VFIO PLATFORM DRIVER
->  M:	Eric Auger <eric.auger@redhat.com>
-> +R:	Mostafa Saleh <smostafa@google.com>
->  L:	kvm@vger.kernel.org
->  S:	Maintained
->  F:	drivers/vfio/platform/
+Oh, I don't doubt that SAVIC requires VGIF - I just spotted a documentation
+hole here so let's start the process of documenting this internally.
 
+-- 
+Regards/Gruss,
+    Boris.
+
+https://people.kernel.org/tglx/notes-about-netiquette
 
