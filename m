@@ -1,130 +1,202 @@
-Return-Path: <kvm+bounces-55635-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-55636-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id D5C98B345AB
-	for <lists+kvm@lfdr.de>; Mon, 25 Aug 2025 17:25:47 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 1A032B345B6
+	for <lists+kvm@lfdr.de>; Mon, 25 Aug 2025 17:26:53 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 220633AF3B6
-	for <lists+kvm@lfdr.de>; Mon, 25 Aug 2025 15:25:46 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C50543AE33B
+	for <lists+kvm@lfdr.de>; Mon, 25 Aug 2025 15:26:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9C5362F99BC;
-	Mon, 25 Aug 2025 15:25:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (4096-bit key) header.d=alien8.de header.i=@alien8.de header.b="kksYH6eC"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 83A1E2FD1A3;
+	Mon, 25 Aug 2025 15:26:41 +0000 (UTC)
 X-Original-To: kvm@vger.kernel.org
-Received: from mail.alien8.de (mail.alien8.de [65.109.113.108])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from cstnet.cn (smtp84.cstnet.cn [159.226.251.84])
+	(using TLSv1.2 with cipher DHE-RSA-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 849921C862C
-	for <kvm@vger.kernel.org>; Mon, 25 Aug 2025 15:25:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=65.109.113.108
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 150482F3627;
+	Mon, 25 Aug 2025 15:26:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=159.226.251.84
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756135539; cv=none; b=WlLHcsPN7L1F9XfdGkK/4mlb0EZq2ZbwK9hPNfC1hAZ4ELr2b8T/SaEl+ya1g9w+h7xgQUbbM+oh2gNy1Mem49Y5pGQkV6ct4nsLihQfS7WfM9Vd08BHHbqyHOyLQpM2kQfSpfMMwsM6lDSJi8zYivW3Jxf3NxYF7twh0ihA2SU=
+	t=1756135601; cv=none; b=gABUvWdQlQYBOO2L1R66fCLNKwKrIPrOKg7rMSYmvTru/SVT1tWbRy7Pl3YQc7ocRQ8gUfkevlTsbNg+AzsQAmvJxANp4i1oko2fjhz43ZlrRvQUAI5N4ESc1KidQeq1kLroIUtD4mjWBGVXZaxoQwJW+rQ1JCeMV1fdxaFjj/8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756135539; c=relaxed/simple;
-	bh=A52FAwezOAKp1Qu5TWFTktoFPwXKVKbjCotxVYW0vis=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=EBGfDQeAXc0w45Jc1lKWGe3xINqpGxBJzvfkTl5eW0N7lGby4JjZirP0E0Z5usZ2ApsBnUhaysKHl43wSDhkwkuVnd+fMOwVMKq05K9ytufzRnwpaCEKTjhiQzPPlto6aU45yq4NPmy0dtD7TAbEjajcKvw3+aUqufeKdXbFQRw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=alien8.de; spf=pass smtp.mailfrom=alien8.de; dkim=pass (4096-bit key) header.d=alien8.de header.i=@alien8.de header.b=kksYH6eC; arc=none smtp.client-ip=65.109.113.108
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=alien8.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=alien8.de
-Received: from localhost (localhost.localdomain [127.0.0.1])
-	by mail.alien8.de (SuperMail on ZX Spectrum 128k) with ESMTP id 95BB140E0217;
-	Mon, 25 Aug 2025 15:25:33 +0000 (UTC)
-X-Virus-Scanned: Debian amavisd-new at mail.alien8.de
-Authentication-Results: mail.alien8.de (amavisd-new); dkim=pass (4096-bit key)
-	header.d=alien8.de
-Received: from mail.alien8.de ([127.0.0.1])
-	by localhost (mail.alien8.de [127.0.0.1]) (amavisd-new, port 10026)
-	with ESMTP id u3FQXnYdIgDT; Mon, 25 Aug 2025 15:25:30 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=alien8;
-	t=1756135529; bh=wDGac0TYgHwFdyangyB6LUxtI+D7GnL9tmax06sBl2E=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=kksYH6eClO7cCwGTfJpvPamUQ638dQxsIRz5RqdEsS2aTY0E/1Zx1VnOqyJiM+Fos
-	 8uVnP0zFvst7bC+/6K9jSXKbRqiX7aRoq604M3Gx/oXyzTSDPExIHFGfFxfo0E3AEA
-	 8+dOdl66Wwqmkk7Mw5ZExpoTSGU7VOd9qu3bHRvQYvc9qFNYOzZT5lvCUoTcm4RK51
-	 uo//HK5wwuElCDxqTHJdYVuE9vBt9D0B3eVN0Dxs+Q8TJGX2HA4+96KYZK2uMG+bwx
-	 WydgKEZJTT6M4zsbZjsFLj+s3YHnEWE+bsALrdl4NwIMMqfpR7LKhGMkzvbnhnKLCO
-	 jk4FTfF5e1hcZmOAdFNJFWT28uOf4T8FW8w1GNbdWSf4esB9cFDHaPPOTJLPYwLJ05
-	 qqjWGfX2AhkzY06WRz5kEMr53XLNU05hp+wfgmEtTAWmetPeRFlZdTkXBWLO7Dt8nJ
-	 21PX4cugc921ruUohbrxObe4q30A1pW7L4Qb8vRantacHRlgGnUehbbqJUGnANay52
-	 pg2K/IUlUgT6L6BwGFVK8t+F3Y4D5syqZa/W/oxFqPIyoQwP3rAMinLtqCSDFC4f/Z
-	 QdqJ/bA2/S0f2hm0zpwD3/26ZaMG7hwOp+qU8lviS5oQHs9e0wInn/rk8h8V8wk7Z9
-	 WCmee8KiPDnbUiWAE+dlK7fA=
-Received: from zn.tnic (pd953092e.dip0.t-ipconnect.de [217.83.9.46])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange ECDHE (P-256) server-signature ECDSA (P-256) server-digest SHA256)
-	(No client certificate requested)
-	by mail.alien8.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id 64D5840E0202;
-	Mon, 25 Aug 2025 15:25:22 +0000 (UTC)
-Date: Mon, 25 Aug 2025 17:25:21 +0200
-From: Borislav Petkov <bp@alien8.de>
-To: Nikunj A Dadhania <nikunj@amd.com>
-Cc: seanjc@google.com, pbonzini@redhat.com, kvm@vger.kernel.org,
-	thomas.lendacky@amd.com, santosh.shukla@amd.com,
-	joao.m.martins@oracle.com
-Subject: Re: [RFC PATCH 3/4] x86/cpufeatures: Add Page modification logging
-Message-ID: <20250825152521.GDaKyAYVSNCXyNjtSL@fat_crate.local>
-References: <20250825152009.3512-1-nikunj@amd.com>
- <20250825152009.3512-4-nikunj@amd.com>
+	s=arc-20240116; t=1756135601; c=relaxed/simple;
+	bh=KhMo0SpotGb/z4U7wZvB4jdhQVQqAkWRO5ZRQrh/7+0=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=AE63sXjL+pTNLsEl9snY2VQeqOQWIcZJ8Ld0d0Gg73ah1XE7CW3oqWJV7wR9m96FZByrxKQP2mKUH+RKy1LRJv/QW6hvuexTeQkN4uQwugfyI+Z0HcCdqhws/h+6rDRA6sEf0mD3/PwegmgLesQeyj4mG81UtglbxSe0WlTqBkE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=isrc.iscas.ac.cn; spf=pass smtp.mailfrom=isrc.iscas.ac.cn; arc=none smtp.client-ip=159.226.251.84
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=isrc.iscas.ac.cn
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=isrc.iscas.ac.cn
+Received: from [192.168.110.25] (unknown [118.251.178.216])
+	by APP-05 (Coremail) with SMTP id zQCowACXLF2WgKxok2QfDw--.14476S2;
+	Mon, 25 Aug 2025 23:26:15 +0800 (CST)
+Message-ID: <a2cc4cbe-82ca-4a89-b623-73721a1f3baf@isrc.iscas.ac.cn>
+Date: Mon, 25 Aug 2025 23:26:13 +0800
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20250825152009.3512-4-nikunj@amd.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v1 RESEND 1/5] dt-bidings: riscv: add Zilsd and Zclsd
+ extension descriptions
+To: Conor Dooley <conor@kernel.org>
+Cc: paul.walmsley@sifive.com, palmer@dabbelt.com, aou@eecs.berkeley.edu,
+ alex@ghiti.fr, robh@kernel.org, krzk+dt@kernel.org, conor+dt@kernel.org,
+ anup@brainfault.org, pbonzini@redhat.com, shuah@kernel.org,
+ cyan.yang@sifive.com, cleger@rivosinc.com, charlie@rivosinc.com,
+ cuiyunhui@bytedance.com, samuel.holland@sifive.com, namcao@linutronix.de,
+ jesse@rivosinc.com, inochiama@gmail.com, yongxuan.wang@sifive.com,
+ ajones@ventanamicro.com, parri.andrea@gmail.com, mikisabate@gmail.com,
+ yikming2222@gmail.com, thomas.weissschuh@linutronix.de,
+ linux-riscv@lists.infradead.org, linux-kernel@vger.kernel.org,
+ linux-doc@vger.kernel.org, devicetree@vger.kernel.org, kvm@vger.kernel.org,
+ kvm-riscv@lists.infradead.org, linux-kselftest@vger.kernel.org
+References: <20250821140131.225756-1-pincheng.plct@isrc.iscas.ac.cn>
+ <20250821140131.225756-2-pincheng.plct@isrc.iscas.ac.cn>
+ <20250822-purge-doubling-f38988284db1@spud>
+From: Pincheng Wang <pincheng.plct@isrc.iscas.ac.cn>
+In-Reply-To: <20250822-purge-doubling-f38988284db1@spud>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-CM-TRANSID:zQCowACXLF2WgKxok2QfDw--.14476S2
+X-Coremail-Antispam: 1UD129KBjvJXoWxCr47Ww18Kw47Xr4xKrW3Jrb_yoW5Kr43pF
+	Z3GF4kKa90qw13u3s2y3W0vw45AF4kKw13AFnrt34fKa98Zr10gF4ak3Z0qF1rCF48CF4j
+	vw4Ygr15ZrsrAaDanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+	9KBjDU0xBIdaVrnRJUUUvmb7Iv0xC_Kw4lb4IE77IF4wAFF20E14v26rWj6s0DM7CY07I2
+	0VC2zVCF04k26cxKx2IYs7xG6r1S6rWUM7CIcVAFz4kK6r1j6r18M28lY4IEw2IIxxk0rw
+	A2F7IY1VAKz4vEj48ve4kI8wA2z4x0Y4vE2Ix0cI8IcVAFwI0_Jr0_JF4l84ACjcxK6xII
+	jxv20xvEc7CjxVAFwI0_Gr0_Cr1l84ACjcxK6I8E87Iv67AKxVW8JVWxJwA2z4x0Y4vEx4
+	A2jsIEc7CjxVAFwI0_Gr0_Gr1UM2AIxVAIcxkEcVAq07x20xvEncxIr21l5I8CrVACY4xI
+	64kE6c02F40Ex7xfMcIj6xIIjxv20xvE14v26r106r15McIj6I8E87Iv67AKxVW8JVWxJw
+	Am72CE4IkC6x0Yz7v_Jr0_Gr1lF7xvr2IY64vIr41lFIxGxcIEc7CjxVA2Y2ka0xkIwI1l
+	c7CjxVAaw2AFwI0_GFv_Wryl42xK82IYc2Ij64vIr41l4I8I3I0E4IkC6x0Yz7v_Jr0_Gr
+	1lx2IqxVAqx4xG67AKxVWUJVWUGwC20s026x8GjcxK67AKxVWUGVWUWwC2zVAF1VAY17CE
+	14v26rWY6r4UJwCIc40Y0x0EwIxGrwCI42IY6xIIjxv20xvE14v26r1j6r1xMIIF0xvE2I
+	x0cI8IcVCY1x0267AKxVW8JVWxJwCI42IY6xAIw20EY4v20xvaj40_Jr0_JF4lIxAIcVC2
+	z280aVAFwI0_Jr0_Gr1lIxAIcVC2z280aVCY1x0267AKxVW8JVW8JrUvcSsGvfC2KfnxnU
+	UI43ZEXa7IUYsyCtUUUUU==
+X-CM-SenderInfo: pslquxhhqjh1xofwqxxvufhxpvfd2hldfou0/
 
-On Mon, Aug 25, 2025 at 03:20:08PM +0000, Nikunj A Dadhania wrote:
-> Page modification logging(PML) is a hardware feature designed to track
-> guest modified memory pages. PML enables the hypervisor to identify which
-> pages in a guest's memory have been changed since the last checkpoint or
-> during live migration.
+On 2025/8/23 0:33, Conor Dooley wrote:
+> On Thu, Aug 21, 2025 at 10:01:27PM +0800, Pincheng Wang wrote:
+>> Add descriptions for the Zilsd (Load/Store pair instructions) and
+>> Zclsd (Compressed Load/Store pair instructions) ISA extensions
+>> which were ratified in commit f88abf1 ("Integrating load/store
+>> pair for RV32 with the main manual") of the riscv-isa-manual.
+>>
+>> Signed-off-by: Pincheng Wang <pincheng.plct@isrc.iscas.ac.cn>
+>> ---
+>>   .../devicetree/bindings/riscv/extensions.yaml | 39 +++++++++++++++++++
+>>   1 file changed, 39 insertions(+)
+>>
+>> diff --git a/Documentation/devicetree/bindings/riscv/extensions.yaml b/Documentation/devicetree/bindings/riscv/extensions.yaml
+>> index ede6a58ccf53..d72ffe8f6fa7 100644
+>> --- a/Documentation/devicetree/bindings/riscv/extensions.yaml
+>> +++ b/Documentation/devicetree/bindings/riscv/extensions.yaml
+>> @@ -366,6 +366,20 @@ properties:
+>>               guarantee on LR/SC sequences, as ratified in commit b1d806605f87
+>>               ("Updated to ratified state.") of the riscv profiles specification.
+>>   
+>> +        - const: zilsd
+>> +          description:
+>> +            The standard Zilsd extension which provides support for aligned
+>> +            register-pair load and store operations in 32-bit instruction
+>> +            encodings, as ratified in commit f88abf1 ("Integrating
+>> +            load/store pair for RV32 with the main manual") of riscv-isa-manual.
+>> +
+>> +        - const: zclsd
+>> +          description:
+>> +            The Zclsd extension implements the compressed (16-bit) version of the
+>> +            Load/Store Pair for RV32. As with Zilsd, this extension was ratified
+>> +            in commit f88abf1 ("Integrating load/store pair for RV32 with the
+>> +            main manual") of riscv-isa-manual.
+>> +
+>>           - const: zk
+>>             description:
+>>               The standard Zk Standard Scalar cryptography extension as ratified
+>> @@ -847,6 +861,16 @@ properties:
+>>               anyOf:
+>>                 - const: v
+>>                 - const: zve32x
+>> +      # Zclsd depends on Zilsd and Zca
+>> +      - if:
+>> +          contains:
+>> +            anyOf:
+>> +              - const: zclsd
+>> +        then:
+>> +          contains:
+>> +            anyOf:
+>> +              - const: zilsd
+>> +              - const: zca
+>>   
+>>   allOf:
+>>     # Zcf extension does not exist on rv64
+>> @@ -864,6 +888,21 @@ allOf:
+>>             not:
+>>               contains:
+>>                 const: zcf
+>> +  # Zilsd extension does not exist on rv64
+>> +  - if:
+>> +      properties:
 > 
-> The PML feature is advertised via CPUID leaf 0x8000000A ECX[4] bit.
+>> +        riscv,isa-extensions:
+>> +          contains:
+>> +            const: zilsd
 > 
-> Signed-off-by: Nikunj A Dadhania <nikunj@amd.com>
-> ---
->  arch/x86/include/asm/cpufeatures.h | 1 +
->  arch/x86/kernel/cpu/scattered.c    | 1 +
->  2 files changed, 2 insertions(+)
+> This syntax is odd, it shouldn't be required to have zilsd in here and
+> in the then. Did you copy this from Zcf or come up with it yourself
+> because it didn't work otherwise?
 > 
-> diff --git a/arch/x86/include/asm/cpufeatures.h b/arch/x86/include/asm/cpufeatures.h
-> index 286d509f9363..069c0e17113a 100644
-> --- a/arch/x86/include/asm/cpufeatures.h
-> +++ b/arch/x86/include/asm/cpufeatures.h
-> @@ -227,6 +227,7 @@
->  #define X86_FEATURE_PVUNLOCK		( 8*32+20) /* PV unlock function */
->  #define X86_FEATURE_VCPUPREEMPT		( 8*32+21) /* PV vcpu_is_preempted function */
->  #define X86_FEATURE_TDX_GUEST		( 8*32+22) /* "tdx_guest" Intel Trust Domain Extensions Guest */
-> +#define X86_FEATURE_PML			( 8*32+23) /* AMD Page Modification logging */
->  
->  /* Intel-defined CPU features, CPUID level 0x00000007:0 (EBX), word 9 */
->  #define X86_FEATURE_FSGSBASE		( 9*32+ 0) /* "fsgsbase" RDFSBASE, WRFSBASE, RDGSBASE, WRGSBASE instructions*/
-> diff --git a/arch/x86/kernel/cpu/scattered.c b/arch/x86/kernel/cpu/scattered.c
-> index b4a1f6732a3a..02fc16b28bc9 100644
-> --- a/arch/x86/kernel/cpu/scattered.c
-> +++ b/arch/x86/kernel/cpu/scattered.c
-> @@ -48,6 +48,7 @@ static const struct cpuid_bit cpuid_bits[] = {
->  	{ X86_FEATURE_PROC_FEEDBACK,		CPUID_EDX, 11, 0x80000007, 0 },
->  	{ X86_FEATURE_AMD_FAST_CPPC,		CPUID_EDX, 15, 0x80000007, 0 },
->  	{ X86_FEATURE_MBA,			CPUID_EBX,  6, 0x80000008, 0 },
-> +	{ X86_FEATURE_PML,			CPUID_ECX,  4, 0x8000000A, 0 },
->  	{ X86_FEATURE_SMBA,			CPUID_EBX,  2, 0x80000020, 0 },
->  	{ X86_FEATURE_BMEC,			CPUID_EBX,  3, 0x80000020, 0 },
->  	{ X86_FEATURE_TSA_SQ_NO,		CPUID_ECX,  1, 0x80000021, 0 },
-> -- 
 
-Acked-by: Borislav Petkov (AMD) <bp@alien8.de>
+Yes, I did model this after the existing Zcf constraint in the same 
+file. The structure is nearly identical: cheking for presence of the 
+extension and rv64i, then forbidding it in the "then" branch.
 
--- 
-Regards/Gruss,
-    Boris.
+I've tested confirmed that removing the "contains: const: zilsd" from 
+the "if" condition still correctly enforces that zilsd must not appear 
+when rv64i is present. The "then" clause with "not: contains" is sufficient.
 
-https://people.kernel.org/tglx/notes-about-netiquette
+Given that the validation behavior is equivalent, but the logic is 
+cleaner and less redundant without the extra "contains", would you 
+recommend updating it to the simpler form:
+
+     - if:
+         properties:
+           riscv,isa-base:
+             contains:
+               const: rv64i
+       then:
+         properties:
+           riscv,isa-extensions:
+             not:
+               contains:
+                 const: zilsd
+
+If so, I'll update it in the next revision.
+
+Thanks for the review!
+
+Best regards,
+Pincheng Wang
+
+>> +        riscv,isa-base:
+>> +          contains:
+>> +            const: rv64i
+>> +    then:
+>> +      properties:
+>> +        riscv,isa-extensions:
+>> +          not:
+>> +            contains:
+>> +              const: zilsd
+>>   
+>>   additionalProperties: true
+>>   ...
+>> -- 
+>> 2.39.5
+>>
+
 
