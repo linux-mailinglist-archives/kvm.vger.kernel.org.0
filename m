@@ -1,142 +1,178 @@
-Return-Path: <kvm+bounces-55693-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-55695-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id B788AB34EBB
-	for <lists+kvm@lfdr.de>; Tue, 26 Aug 2025 00:01:44 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id C7F80B34ED3
+	for <lists+kvm@lfdr.de>; Tue, 26 Aug 2025 00:13:23 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id CB24418990CA
-	for <lists+kvm@lfdr.de>; Mon, 25 Aug 2025 22:01:45 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id A9E1E1A86E0E
+	for <lists+kvm@lfdr.de>; Mon, 25 Aug 2025 22:13:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6B1EE310785;
-	Mon, 25 Aug 2025 21:59:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9A22F2C0272;
+	Mon, 25 Aug 2025 22:13:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="UbiU5j0v"
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="YCq7dl3K"
 X-Original-To: kvm@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7B60630AAD4;
-	Mon, 25 Aug 2025 21:59:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4804129D26C;
+	Mon, 25 Aug 2025 22:13:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756159153; cv=none; b=u9Gg7hipZ2WBwi+VDNt+9d0KN15MMTVcT28FcQT5NLSBVZNU/3TqMTWKnORQqQduhEiOjWmd3RpF6iECN9lw9ckKmEYuYv1mz4WVxJ9x5/LhHfLC0gnI6LMCE/0j+9D6qV/QmEdIyw5TP4MmJHDhnNuNrLm9xNWBEaCd4X9gf+M=
+	t=1756159989; cv=none; b=WmUPyTlvLEwhcJIkZ9y4hBKeY314WGxlO77fgHDAa3CLVTqBZdrThPukGs7yphdC9NfBPi/hIYUZ303XtQI/VkkmS4GT4irMyFPd/h8iqqwDhgB7SJ4pg7oPGohMZ5FteBjNoZv189WpPgreI81mqT2TcKmRGm/45BI50iVJUfI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756159153; c=relaxed/simple;
-	bh=16EPmrHdMEr6M3sM1MYmbbFsavhSkZ1KC1VkNUsuyoI=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=X57k8sAib1H9li7vL3MZblVfamMVLxTB7693vbSuXmd878eDRaqS3ztuDpbEMUbjHJrHlq8Yr7SsIkDaWDGuWr+7g78/3lwCKAeM/HRGtJoVLp6ijrogAFuSn5Uges+eDXBIKjqZzqSCAdViltUsXUyg9HB7lPW63RsqbfRmv/U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=UbiU5j0v; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9C683C113D0;
-	Mon, 25 Aug 2025 21:59:12 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1756159153;
-	bh=16EPmrHdMEr6M3sM1MYmbbFsavhSkZ1KC1VkNUsuyoI=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=UbiU5j0vJ3AJEAOSTsxd2W6/CTIR+XIRNKEvOnBYNra7He8lRJIPJGqH4+KOX3Zh5
-	 ji9pQOfmCyT4xh+Son4fcpUEpOk6UIs3rtYLLYlcwxTiIxIcOxUFKw3UJMM9ZQ3P7z
-	 y6Vj/9SKq+/gQlsKlAU09j+YpYBYHGedhJzVcR3I7IviSExr/a8ojvOrHRwd2++2/6
-	 l7dhuPBkdVf/uS9PULid/UmpjflC/JBahaqKiu1I/I/IAH9ajkupkWmX6mZsyFux43
-	 rqFTTr5VT/o/gML6oin9loXLfBn3rpcqr6Iwp47Gx6JUjS8CbdFUyh9fxlPmkQw3ae
-	 Y5pYpV92nfWCQ==
-From: Namhyung Kim <namhyung@kernel.org>
-To: Arnaldo Carvalho de Melo <acme@kernel.org>
-Cc: Ian Rogers <irogers@google.com>,
-	Jiri Olsa <jolsa@kernel.org>,
-	Adrian Hunter <adrian.hunter@intel.com>,
-	Peter Zijlstra <peterz@infradead.org>,
-	Ingo Molnar <mingo@kernel.org>,
-	LKML <linux-kernel@vger.kernel.org>,
-	linux-perf-users@vger.kernel.org,
-	"Michael S. Tsirkin" <mst@redhat.com>,
-	Jason Wang <jasowang@redhat.com>,
-	kvm@vger.kernel.org,
-	virtualization@lists.linux.dev
-Subject: [PATCH 11/11] tools headers: Sync uapi/linux/vhost.h with the kernel source
-Date: Mon, 25 Aug 2025 14:59:03 -0700
-Message-ID: <20250825215904.2594216-12-namhyung@kernel.org>
-X-Mailer: git-send-email 2.51.0.261.g7ce5a0a67e-goog
-In-Reply-To: <20250825215904.2594216-1-namhyung@kernel.org>
-References: <20250825215904.2594216-1-namhyung@kernel.org>
+	s=arc-20240116; t=1756159989; c=relaxed/simple;
+	bh=nCgLZq+Bjog5ABi50odhp9MVlvPuOobFM7/lK0PDoe0=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=FA//lyaezClkF7hZIvWvP5SmDWWOQOVrTkM+1iGkU7stRgnwh7Ntc+v3Ad3vPnhd4yyZF6FyfSwN3jMVLqPLoSh8ALHbJSfwmh0vEvvmrE1o3YJwUmxa98icNJCuyYEJzGfv+YTt70VBl1Cy5MHGexRrJi3NhBDwdwIFiHFpgtw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=YCq7dl3K; arc=none smtp.client-ip=148.163.156.1
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
+Received: from pps.filterd (m0356517.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 57PBsU14016193;
+	Mon, 25 Aug 2025 22:13:03 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
+	:content-transfer-encoding:content-type:date:from:in-reply-to
+	:message-id:mime-version:references:subject:to; s=pp1; bh=DyDoJL
+	FXNMakEJaMTwqN45/jMb1VkpAiNUcp8C+rdyQ=; b=YCq7dl3KCHzzxXyv23LA19
+	EtikebqzIPjxxsJ3LHoEbFFRC2LD/fFdK8u302YbmI39Yb9Lrra3x/Ehzp9hu9pJ
+	fNZNAnyjHlE/af9+tUWaD+NKCySGGUVNS4M/XCO4JwZNyqhZLt4tctBa8FofCuVt
+	YOOC1wDlv4vux62rRzDPnx7CcLjx2BrsKLi7+n9qYbwm+JuoV0Y/GR2FMmpYBn+9
+	kmKAXeiENFG0Xnb+hDJXwV5hWuSRFGhw2/MhfhqRqqTEEnngydDGsfXlEQHMVemK
+	E/S4PF/5YEnICb+bX/bNk2vxPGEmM6V754UmC9YwBDtba/OefcnytSlGS0j5B+nw
+	==
+Received: from ppma12.dal12v.mail.ibm.com (dc.9e.1632.ip4.static.sl-reverse.com [50.22.158.220])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 48q9752rss-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Mon, 25 Aug 2025 22:13:03 +0000 (GMT)
+Received: from pps.filterd (ppma12.dal12v.mail.ibm.com [127.0.0.1])
+	by ppma12.dal12v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 57PL4Ouj007443;
+	Mon, 25 Aug 2025 22:13:02 GMT
+Received: from smtprelay06.wdc07v.mail.ibm.com ([172.16.1.73])
+	by ppma12.dal12v.mail.ibm.com (PPS) with ESMTPS id 48qqyu85pt-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Mon, 25 Aug 2025 22:13:02 +0000
+Received: from smtpav06.wdc07v.mail.ibm.com (smtpav06.wdc07v.mail.ibm.com [10.39.53.233])
+	by smtprelay06.wdc07v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 57PMD1nI17760858
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Mon, 25 Aug 2025 22:13:01 GMT
+Received: from smtpav06.wdc07v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 281DF58055;
+	Mon, 25 Aug 2025 22:13:01 +0000 (GMT)
+Received: from smtpav06.wdc07v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 653E458056;
+	Mon, 25 Aug 2025 22:13:00 +0000 (GMT)
+Received: from [9.61.255.253] (unknown [9.61.255.253])
+	by smtpav06.wdc07v.mail.ibm.com (Postfix) with ESMTP;
+	Mon, 25 Aug 2025 22:13:00 +0000 (GMT)
+Message-ID: <eb6d05d0-b448-4f4e-a734-50c56078dd9b@linux.ibm.com>
+Date: Mon, 25 Aug 2025 15:13:00 -0700
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v2 1/9] PCI: Avoid restoring error values in config space
+To: Alex Williamson <alex.williamson@redhat.com>
+Cc: linux-s390@vger.kernel.org, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org, helgaas@kernel.org,
+        schnelle@linux.ibm.com, mjrosato@linux.ibm.com
+References: <20250825171226.1602-1-alifm@linux.ibm.com>
+ <20250825171226.1602-2-alifm@linux.ibm.com>
+ <20250825153501.3a1d0f0c.alex.williamson@redhat.com>
+Content-Language: en-US
+From: Farhan Ali <alifm@linux.ibm.com>
+In-Reply-To: <20250825153501.3a1d0f0c.alex.williamson@redhat.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: OUWsI00jKyAjQRJNHTiR5T5oouzZqu1k
+X-Proofpoint-ORIG-GUID: OUWsI00jKyAjQRJNHTiR5T5oouzZqu1k
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUwODIzMDA3MSBTYWx0ZWRfX3iuVkrgpd4ji
+ BTljPbZ3Ij89GncidmkvL/4QkCwWtQdVdsCmbCxVy4M9T4AaEwEIVjTm5FN8TLUWb+ptm8MCGNQ
+ RC1lm+5K3eTQ0jRcPoTatx8GeUJ/5jln7K0m9q6txwe2k6UepjZ4lV1jxsTVLpCm40GPdpIJ9Sk
+ giHSKFjEnLf6UVWRjPV6McDGYQ2/3JkXIRce8hpnC/3IfSPBcby+bzF4LBXvg2oDp7FY+oNeyMd
+ fFIxHi3Yq8LcTRhP3OBbn3Xa7pnPRR9PDAVdXofCRzCBPAAnggcFn2479X7/IqE+h03RBudO4E0
+ XYckIt6iK/tZZHp2Vki6Ay0DGewEVkSCi8IjUu/fLA5tXfaKvwF/kSt3spB+SGiQaLGQKvby3As
+ qJjOVEwi
+X-Authority-Analysis: v=2.4 cv=RtDFLDmK c=1 sm=1 tr=0 ts=68acdfef cx=c_pps
+ a=bLidbwmWQ0KltjZqbj+ezA==:117 a=bLidbwmWQ0KltjZqbj+ezA==:17
+ a=IkcTkHD0fZMA:10 a=2OwXVqhp2XgA:10 a=VnNF1IyMAAAA:8 a=ZxKYActtXN1U2Ine1k4A:9
+ a=QEXdDO2ut3YA:10
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1099,Hydra:6.1.9,FMLib:17.12.80.40
+ definitions=2025-08-25_10,2025-08-20_03,2025-03-28_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ impostorscore=0 suspectscore=0 malwarescore=0 spamscore=0 priorityscore=1501
+ bulkscore=0 clxscore=1015 phishscore=0 adultscore=0 classifier=typeunknown
+ authscore=0 authtc= authcc= route=outbound adjust=0 reason=mlx scancount=1
+ engine=8.19.0-2507300000 definitions=main-2508230071
 
-To pick up the changes in this cset:
 
-  7d9896e9f6d02d8a vhost: Reintroduce kthread API and add mode selection
-  333c515d189657c9 vhost-net: allow configuring extended features
+On 8/25/2025 2:35 PM, Alex Williamson wrote:
+> On Mon, 25 Aug 2025 10:12:18 -0700
+> Farhan Ali <alifm@linux.ibm.com> wrote:
+>
+>> The current reset process saves the device's config space state before
+>> reset and restores it afterward. However, when a device is in an error
+>> state before reset, config space reads may return error values instead of
+>> valid data. This results in saving corrupted values that get written back
+>> to the device during state restoration. Add validation to prevent writing
+>> error values to the device when restoring the config space state after
+>> reset.
+>>
+>> Signed-off-by: Farhan Ali <alifm@linux.ibm.com>
+>> ---
+>>   drivers/pci/pci.c | 3 +++
+>>   1 file changed, 3 insertions(+)
+>>
+>> diff --git a/drivers/pci/pci.c b/drivers/pci/pci.c
+>> index b0f4d98036cd..0dd95d782022 100644
+>> --- a/drivers/pci/pci.c
+>> +++ b/drivers/pci/pci.c
+>> @@ -1825,6 +1825,9 @@ static void pci_restore_config_dword(struct pci_dev *pdev, int offset,
+>>   	if (!force && val == saved_val)
+>>   		return;
+>>   
+>> +	if (PCI_POSSIBLE_ERROR(saved_val))
+>> +		return;
+>> +
+>>   	for (;;) {
+>>   		pci_dbg(pdev, "restore config %#04x: %#010x -> %#010x\n",
+>>   			offset, val, saved_val);
+>
+> The commit log makes this sound like more than it is.  We're really
+> only error checking the first 64 bytes of config space before restore,
+> the capabilities are not checked.  I suppose skipping the BARs and
+> whatnot is no worse than writing -1 to them, but this is only a
+> complete solution in the narrow case where we're relying on vfio-pci to
+> come in and restore the pre-open device state.
+>
+> I had imagined that pci_save_state() might detect the error state of
+> the device, avoid setting state_saved, but we'd still perform the
+> restore callouts that only rely on internal kernel state, maybe adding a
+> fallback to restore the BARs from resource information.
 
-This addresses these perf build warnings:
+I initially started with pci_save_state(), and avoid saving the state 
+altogether. But that would mean we don't go restore the msix state and 
+for s390 don't call arch_restore_msi_irqs(). Do you prefer to avoid 
+saving the state at all? This change was small and sufficient enough to 
+avoid breaking the device in my testing.
 
-  Warning: Kernel ABI header differences:
-    diff -u tools/perf/trace/beauty/include/uapi/linux/vhost.h include/uapi/linux/vhost.h
+>
+> This implementation serves a purpose, but the commit log should
+> describe the specific, narrow scenario this solves, and probably also
+> add a comment in the code about why we're not consistently checking the
+> saved state for errors.  Thanks,
+>
+> Alex
+Yes, I can re-word the commit message.
 
-Please see tools/include/uapi/README for further details.
-
-Cc: "Michael S. Tsirkin" <mst@redhat.com>
-Cc: Jason Wang <jasowang@redhat.com>
-Cc: kvm@vger.kernel.org
-Cc: virtualization@lists.linux.dev
-Signed-off-by: Namhyung Kim <namhyung@kernel.org>
----
-* This is on top of the fix below:
-  https://lore.kernel.org/r/20250819063958.833770-1-namhyung@kernel.org
-
- .../trace/beauty/include/uapi/linux/vhost.h   | 35 +++++++++++++++++++
- 1 file changed, 35 insertions(+)
-
-diff --git a/tools/perf/trace/beauty/include/uapi/linux/vhost.h b/tools/perf/trace/beauty/include/uapi/linux/vhost.h
-index d4b3e2ae1314d1fc..c57674a6aa0dbbea 100644
---- a/tools/perf/trace/beauty/include/uapi/linux/vhost.h
-+++ b/tools/perf/trace/beauty/include/uapi/linux/vhost.h
-@@ -235,4 +235,39 @@
-  */
- #define VHOST_VDPA_GET_VRING_SIZE	_IOWR(VHOST_VIRTIO, 0x82,	\
- 					      struct vhost_vring_state)
-+
-+/* Extended features manipulation */
-+#define VHOST_GET_FEATURES_ARRAY _IOR(VHOST_VIRTIO, 0x83, \
-+				       struct vhost_features_array)
-+#define VHOST_SET_FEATURES_ARRAY _IOW(VHOST_VIRTIO, 0x83, \
-+				       struct vhost_features_array)
-+
-+/* fork_owner values for vhost */
-+#define VHOST_FORK_OWNER_KTHREAD 0
-+#define VHOST_FORK_OWNER_TASK 1
-+
-+/**
-+ * VHOST_SET_FORK_FROM_OWNER - Set the fork_owner flag for the vhost device,
-+ * This ioctl must called before VHOST_SET_OWNER.
-+ * Only available when CONFIG_VHOST_ENABLE_FORK_OWNER_CONTROL=y
-+ *
-+ * @param fork_owner: An 8-bit value that determines the vhost thread mode
-+ *
-+ * When fork_owner is set to VHOST_FORK_OWNER_TASK(default value):
-+ *   - Vhost will create vhost worker as tasks forked from the owner,
-+ *     inheriting all of the owner's attributes.
-+ *
-+ * When fork_owner is set to VHOST_FORK_OWNER_KTHREAD:
-+ *   - Vhost will create vhost workers as kernel threads.
-+ */
-+#define VHOST_SET_FORK_FROM_OWNER _IOW(VHOST_VIRTIO, 0x84, __u8)
-+
-+/**
-+ * VHOST_GET_FORK_OWNER - Get the current fork_owner flag for the vhost device.
-+ * Only available when CONFIG_VHOST_ENABLE_FORK_OWNER_CONTROL=y
-+ *
-+ * @return: An 8-bit value indicating the current thread mode.
-+ */
-+#define VHOST_GET_FORK_FROM_OWNER _IOR(VHOST_VIRTIO, 0x85, __u8)
-+
- #endif
--- 
-2.51.0.261.g7ce5a0a67e-goog
-
+Thanks
+Farhan
 
