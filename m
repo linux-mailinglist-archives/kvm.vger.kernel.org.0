@@ -1,217 +1,202 @@
-Return-Path: <kvm+bounces-55706-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-55707-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id B8DE5B34F78
-	for <lists+kvm@lfdr.de>; Tue, 26 Aug 2025 01:01:04 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id B2AB2B34F86
+	for <lists+kvm@lfdr.de>; Tue, 26 Aug 2025 01:08:34 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C29872A6BA2
-	for <lists+kvm@lfdr.de>; Mon, 25 Aug 2025 23:00:58 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id D0BA67A3064
+	for <lists+kvm@lfdr.de>; Mon, 25 Aug 2025 23:06:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7371D2D46AF;
-	Mon, 25 Aug 2025 22:59:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 516A42BEFE5;
+	Mon, 25 Aug 2025 23:08:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="jvXQ4Vta"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="07VBr36x"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.16])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pj1-f73.google.com (mail-pj1-f73.google.com [209.85.216.73])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0ECD52C0F78;
-	Mon, 25 Aug 2025 22:59:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.16
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0804323D7C3
+	for <kvm@vger.kernel.org>; Mon, 25 Aug 2025 23:08:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.73
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756162780; cv=none; b=nl7udKY4Z9K1+FlDiTOk4hBMoBcdGjZIZQaYBlqp8S1Dqef1aNNk0K5065rdF3Sne7DUlk3ZktMnpZ7Zq6blkOq5nZ6a65iYFerz6+WznmK754tA8ejaV8JJHaZPvR8y9zsIeYcvCN1N4vNpnVPygriOa6ZAsDvLtfh7G3P9juc=
+	t=1756163303; cv=none; b=u095oKyibaBXSAl1rQqF51+A9ApZb4+QynshHh1B46GQ2j/C9eeyNLAh1WeUaCc6AdcZ4a5Xi1mBackdghYkliEjIE6Mh9egON9QBT30B+zwCWFcyPuLtSY5LAo5+PAhyI9PJ4oje06XcCNS6AlqIvLeCb4KqctFBo25ra+Uq2M=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756162780; c=relaxed/simple;
-	bh=Vwviwn3ZG+UNUDH9BSmq4tg9aRmCxgkbakEMYRulqjA=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=oze427zz0q/e8zach4gISXb5WbAmOGonJ0RQrEWLXDFWJPTCQbmmyV43YmEhDCCLHOIWI5N+Cx4fqJL2zgGcw0BIu/K8r2td1ILGbrh0N1oLbynXcOcfDh4I48bm6MiYHoBon3v161p8LZ48tx5U/4Lp+veO59YORg7o6OEKdak=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=jvXQ4Vta; arc=none smtp.client-ip=198.175.65.16
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1756162779; x=1787698779;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=Vwviwn3ZG+UNUDH9BSmq4tg9aRmCxgkbakEMYRulqjA=;
-  b=jvXQ4VtaT+0ne2RVDLL8hsN8UzUeg7D9gCK9PYhZSD0XbzBW53A95Xv/
-   9sj23sFV11lv0M7WUy3awhruWK/j9lCM0FEWhWCeqmMesGriq5UAK85my
-   fnha/+CENnGUGwqlJNcvXGhQGWlD5JMxWUGhI2YGF17h3w8bsFP9q/v7g
-   iA9GJkW4/SJIz5BtOlD6X1so+ueRJBPqZ/8OK+R/XDwRd7PKsIrZmzEJa
-   WRf2Qkjugpid+9lCffGl8sZ7ukGal/KYfwSfOGQyHXTzu3AM9B0TP+wYh
-   iPMv9vTaeCyaS4XghekLOGMj9XWPkdiO9eUsEGGgI8JzhG4qCwvbmzTuf
-   w==;
-X-CSE-ConnectionGUID: DvK42V29TWOPrzSI6oAEAg==
-X-CSE-MsgGUID: dy+Zxq+FQTqJHpKRPgGdWQ==
-X-IronPort-AV: E=McAfee;i="6800,10657,11533"; a="58533433"
-X-IronPort-AV: E=Sophos;i="6.18,214,1751266800"; 
-   d="scan'208";a="58533433"
-Received: from fmviesa001.fm.intel.com ([10.60.135.141])
-  by orvoesa108.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 25 Aug 2025 15:59:39 -0700
-X-CSE-ConnectionGUID: nryLhhB5QIuUgmwqB+wK1A==
-X-CSE-MsgGUID: YkoJN9z3RyK2HD5aYfaF2A==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.18,214,1751266800"; 
-   d="scan'208";a="200308475"
-Received: from ldmartin-desk2.corp.intel.com (HELO khuang2-desk.gar.corp.intel.com) ([10.124.223.59])
-  by smtpauth.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 25 Aug 2025 15:59:32 -0700
-From: Kai Huang <kai.huang@intel.com>
-To: dave.hansen@intel.com,
-	bp@alien8.de,
-	tglx@linutronix.de,
-	peterz@infradead.org,
-	mingo@redhat.com,
-	hpa@zytor.com,
-	thomas.lendacky@amd.com
-Cc: x86@kernel.org,
-	kas@kernel.org,
-	rick.p.edgecombe@intel.com,
-	dwmw@amazon.co.uk,
-	linux-kernel@vger.kernel.org,
-	pbonzini@redhat.com,
-	seanjc@google.com,
-	kvm@vger.kernel.org,
-	reinette.chatre@intel.com,
-	isaku.yamahata@intel.com,
-	dan.j.williams@intel.com,
-	ashish.kalra@amd.com,
-	nik.borisov@suse.com,
-	chao.gao@intel.com,
-	sagis@google.com,
-	farrah.chen@intel.com,
-	Binbin Wu <binbin.wu@linux.intel.com>
-Subject: [PATCH v7 7/7] KVM: TDX: Explicitly do WBINVD when no more TDX SEAMCALLs
-Date: Tue, 26 Aug 2025 10:58:42 +1200
-Message-ID: <14f91fcb323fbd80158aadb4b9f240fad9f9487e.1756161460.git.kai.huang@intel.com>
-X-Mailer: git-send-email 2.50.1
-In-Reply-To: <cover.1756161460.git.kai.huang@intel.com>
-References: <cover.1756161460.git.kai.huang@intel.com>
+	s=arc-20240116; t=1756163303; c=relaxed/simple;
+	bh=JnpQNhUrspUsEG6Bk+5IiCAKB5CxWFoNLMNhiIbFz6Q=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=hPkL2Uyi32SPtYUYGBw64WdrAw/BXS8Mmpt6KobIJ9HyU5KyLJ+kpIzmPeT+fOQ4OLOXJOiyTyCKrdkqY/4MCMhKXsegCztOXF3c0Mftc9D/ygzaEUMrAD+uswwMVxLjECxjYKnc7kN5aKNjA7nE6B/TeSfw4gv1jg9o0+1xmuE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--ackerleytng.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=07VBr36x; arc=none smtp.client-ip=209.85.216.73
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--ackerleytng.bounces.google.com
+Received: by mail-pj1-f73.google.com with SMTP id 98e67ed59e1d1-324e4c3af5fso5068679a91.3
+        for <kvm@vger.kernel.org>; Mon, 25 Aug 2025 16:08:21 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1756163301; x=1756768101; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=6PJFrEMJOsfQGkwPQ/N5M5tBh51DW0OHIWOkD4RTR+M=;
+        b=07VBr36xewHbXVYao/wy2JKQtWS3mcXizRpT4epjl1fyqgnU5D450q6W156gEUoUdL
+         V67Rr+JjdHwpFTQ9hplR5x+NUhQzm7mCZuoDon8BQ9PiMw724cceKgE3uKXSZhfy3mMQ
+         NtjyFvZJ6XdSjO0S20h96qWzpPU+UkPh5xzlbB+7V3YlP8nn85otzIhdfi9UuJK2ysbM
+         4OUjU7ro6dO5QC6QrtrfJUYWzAQn5Qmjfrxfz9opvYiyjxKsdPFpfw5UE+DfnDi5H0/M
+         9DbsKjMIFqfSX4dvvyMnsRKi3PDiToRynavg/YP9DZs9V1xknQlUB7PlAZjVtjjmLqJV
+         7Ghw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1756163301; x=1756768101;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=6PJFrEMJOsfQGkwPQ/N5M5tBh51DW0OHIWOkD4RTR+M=;
+        b=Bz+c47KZeHJYB4DGCn2riwN6fu894flBghBmZuY8Un1LQIVQJCuF93SB+Lv/g/dp2N
+         FPlP8Ak1wkOl7CSm0EkOcsUu0WdNdTUCepNuoTUhukcSNSAQYVNQ/E1OBa+MQRMHQqDV
+         kP1XnT88h0DDmnda/aL/Vz20X3c5wLoJR7/p714TzaETEWXAmQiP1wV6v1i1mdaRuoFg
+         6l9g0X37ms5hBRa4teTTMZr+05hRgXdJj8iI7iRFpaazqDck4wr1V4i+U2j8Vbk74l/l
+         zf3vuwLWjJzEJPveZhdMXTPhkfma1y+nObJ7Ny0/Q6fzA9kf884nribASs4dhcXvwU+/
+         Phxw==
+X-Forwarded-Encrypted: i=1; AJvYcCXlnmYUMJVLL/LeRGEP4BJqJqbxJYB+3bDk4un+joqGC1+RfZGtA27tOcQ9Rj92cDKErHM=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwF9f02Rj1vrkGnpOgYxfDlJX9e0GyNYPG1XlGtiH07V1HXPEyB
+	jDbIQVLjnzd8lhx0+VpYk12018AAukaeWIeAfqtyUr5+3CJWSyeTL7vrNeH92ek1T3q0xnf1fVg
+	l3VYWL2y6sCpb2Kdj/MgwloeEBg==
+X-Google-Smtp-Source: AGHT+IGrq+HLRwUNYqwfx0diY7kjY6ycSz8/ZKkUZKHTSFbsyen18fZ+mR6CbkMqwPv1W2G7A6frXbr5O63R9MtgwQ==
+X-Received: from pjbpl15.prod.google.com ([2002:a17:90b:268f:b0:325:220a:dd41])
+ (user=ackerleytng job=prod-delivery.src-stubby-dispatcher) by
+ 2002:a17:90b:3f88:b0:31c:36f5:d95 with SMTP id 98e67ed59e1d1-32515e2b881mr14983372a91.2.1756163301311;
+ Mon, 25 Aug 2025 16:08:21 -0700 (PDT)
+Date: Mon, 25 Aug 2025 16:08:19 -0700
+In-Reply-To: <20250613005400.3694904-2-michael.roth@amd.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Mime-Version: 1.0
+References: <20250613005400.3694904-1-michael.roth@amd.com> <20250613005400.3694904-2-michael.roth@amd.com>
+Message-ID: <diqztt1vf198.fsf@google.com>
+Subject: Re: [PATCH RFC v1 1/5] KVM: guest_memfd: Remove preparation tracking
+From: Ackerley Tng <ackerleytng@google.com>
+To: Michael Roth <michael.roth@amd.com>, kvm@vger.kernel.org
+Cc: linux-coco@lists.linux.dev, linux-mm@kvack.org, 
+	linux-kernel@vger.kernel.org, david@redhat.com, tabba@google.com, 
+	vannapurve@google.com, ira.weiny@intel.com, thomas.lendacky@amd.com, 
+	pbonzini@redhat.com, seanjc@google.com, vbabka@suse.cz, joro@8bytes.org, 
+	pratikrajesh.sampat@amd.com, liam.merwick@oracle.com, yan.y.zhao@intel.com, 
+	aik@amd.com
+Content-Type: text/plain; charset="UTF-8"
 
-On TDX platforms, during kexec, the kernel needs to make sure there are
-no dirty cachelines of TDX private memory before booting to the new
-kernel to avoid silent memory corruption to the new kernel.
+Michael Roth <michael.roth@amd.com> writes:
 
-During kexec, the kexec-ing CPU firstly invokes native_stop_other_cpus()
-to stop all remote CPUs before booting to the new kernel.  The remote
-CPUs will then execute stop_this_cpu() to stop themselves.
+> guest_memfd currently uses the folio uptodate flag to track:
+>
+>   1) whether or not a page had been cleared before initial usage
+>   2) whether or not the architecture hooks have been issued to put the
+>      page in a private state as defined by the architecture
+>
+> In practice, 2) is only actually being tracked for SEV-SNP VMs, and
+> there do not seem to be any plans/reasons that would suggest this will
+> change in the future, so this additional tracking/complexity is not
+> really providing any general benefit to guest_memfd users. Future plans
+> around in-place conversion and hugepage support, where the per-folio
+> uptodate flag is planned to be used purely to track the initial clearing
+> of folios, whereas conversion operations could trigger multiple
+> transitions between 'prepared' and 'unprepared' and thus need separate
+> tracking, will make the burden of tracking this information within
+> guest_memfd even more complex, since preparation generally happens
+> during fault time, on the "read-side" of any global locks that might
+> protect state tracked by guest_memfd, and so may require more complex
+> locking schemes to allow for concurrent handling of page faults for
+> multiple vCPUs where the "preparedness" state tracked by guest_memfd
+> might need to be updated as part of handling the fault.
+>
+> Instead of keeping this current/future complexity within guest_memfd for
+> what is essentially just SEV-SNP, just drop the tracking for 2) and have
+> the arch-specific preparation hooks get triggered unconditionally on
+> every fault so the arch-specific hooks can check the preparation state
+> directly and decide whether or not a folio still needs additional
+> preparation. In the case of SEV-SNP, the preparation state is already
+> checked again via the preparation hooks to avoid double-preparation, so
+> nothing extra needs to be done to update the handling of things there.
+>
+> Signed-off-by: Michael Roth <michael.roth@amd.com>
+> ---
+>  virt/kvm/guest_memfd.c | 47 ++++++++++++++----------------------------
+>  1 file changed, 15 insertions(+), 32 deletions(-)
+>
+> diff --git a/virt/kvm/guest_memfd.c b/virt/kvm/guest_memfd.c
+> index 35f94a288e52..cc93c502b5d8 100644
+> --- a/virt/kvm/guest_memfd.c
+> +++ b/virt/kvm/guest_memfd.c
+> @@ -421,11 +421,6 @@ static int __kvm_gmem_prepare_folio(struct kvm *kvm, struct kvm_memory_slot *slo
+>  	return 0;
+>  }
+>  
+> -static inline void kvm_gmem_mark_prepared(struct folio *folio)
+> -{
+> -	folio_mark_uptodate(folio);
+> -}
+> -
+>  /*
+>   * Process @folio, which contains @gfn, so that the guest can use it.
+>   * The folio must be locked and the gfn must be contained in @slot.
+> @@ -435,13 +430,7 @@ static inline void kvm_gmem_mark_prepared(struct folio *folio)
+>  static int kvm_gmem_prepare_folio(struct kvm *kvm, struct kvm_memory_slot *slot,
+>  				  gfn_t gfn, struct folio *folio)
+>  {
+> -	unsigned long nr_pages, i;
+>  	pgoff_t index;
+> -	int r;
+> -
+> -	nr_pages = folio_nr_pages(folio);
+> -	for (i = 0; i < nr_pages; i++)
+> -		clear_highpage(folio_page(folio, i));
+>  
+>  	/*
+>  	 * Preparing huge folios should always be safe, since it should
+> @@ -459,11 +448,8 @@ static int kvm_gmem_prepare_folio(struct kvm *kvm, struct kvm_memory_slot *slot,
 
-The kernel has a percpu boolean to indicate whether the cache of a CPU
-may be in incoherent state.  In stop_this_cpu(), the kernel does WBINVD
-if that percpu boolean is true.
+While working on HugeTLB support for guest_memfd, I added a test that
+tries to map a non-huge-page-aligned gmem.pgoff to a huge-page aligned
+gfn.
 
-TDX turns on that percpu boolean on a CPU when the kernel does SEAMCALL.
-This makes sure the caches will be flushed during kexec.
+I understand that config would destroy the performance advantages of
+huge pages, but I think the test is necessary since Yan brought up the
+use case here [1].
 
-However, the native_stop_other_cpus() and stop_this_cpu() have a
-"race"[1] which is extremely rare to happen but could cause the system
-to hang.  Doing WBINVD in stop_this_cpu() could increase the chance of
-the race happening.
+The conclusion in that thread, I believe, was to allow binding of
+unaligned GFNs to offsets, but disallow large pages in that case. The
+next series for guest_memfd HugeTLB support will include a fix similar
+to this [2].
 
-Explicitly flush cache in tdx_disable_virtualization_cpu() after which
-no more TDX activity can happen on this cpu.  This moves the WBINVD to
-an earlier stage than stop_this_cpus(), avoiding a possibly lengthy
-operation at a time where it could cause this race.
+While testing, I hit this WARN_ON with a non-huge-page-aligned
+gmem.pgoff.
 
-Link: https://lore.kernel.org/kvm/b963fcd60abe26c7ec5dc20b42f1a2ebbcc72397.1750934177.git.kai.huang@intel.com/ [1]
-Signed-off-by: Kai Huang <kai.huang@intel.com>
-Acked-by: Paolo Bonzini <pbonzini@redhat.com>
-Tested-by: Farrah Chen <farrah.chen@intel.com>
-Reviewed-by: Binbin Wu <binbin.wu@linux.intel.com>
-Reviewed-by: Chao Gao <chao.gao@intel.com>
----
+>  	WARN_ON(!IS_ALIGNED(slot->gmem.pgoff, 1 << folio_order(folio)));
 
-v6 -> v7:
- - Remove the tdx_cpu_flush_cache() stub.  -- Sean
- - Rename tdx_cpu_flush_cache() to tdx_cpu_flush_cache_for_kexec(). -- Paolo
- - Trim down changelog a little bit. -- Sean.
+Do you all think this WARN_ON can be removed?
 
-v5 -> v6:
- - Add Chao's RB.
+Also, do you think kvm_gmem_prepare_folio()s interface should perhaps be
+changed to take pfn, gfn, nr_pages (PAGE_SIZE pages) and level?
 
-v4 -> v5:
- - No change
+I think taking a folio is kind of awkward since we're not really setting
+up the folio, we're setting up something mapping-related for the
+folio. Also, kvm_gmem_invalidate() doesn't take folios, which is more
+aligned with invalidating mappings rather than something folio-related.
 
-v3 -> v4:
- - Change doing wbinvd() from rebooting notifier to
-   tdx_disable_virtualization_cpu() to cover the case where more
-   SEAMCALL can be made after cache flush, i.e., doing kexec when
-   there's TD alive.  - Chao.
- - Add check to skip wbinvd if the boolean is false. -- Chao
- - Fix typo in the comment -- Binbin.
+[1] https://lore.kernel.org/all/aA7UXI0NB7oQQrL2@yzhao56-desk.sh.intel.com/
+[2] https://github.com/googleprodkernel/linux-cc/commit/371ed9281e0c9ba41cfdc20b48a6c5566f61a7df
 
-
----
- arch/x86/include/asm/tdx.h  |  1 +
- arch/x86/kvm/vmx/tdx.c      | 12 ++++++++++++
- arch/x86/virt/vmx/tdx/tdx.c | 12 ++++++++++++
- 3 files changed, 25 insertions(+)
-
-diff --git a/arch/x86/include/asm/tdx.h b/arch/x86/include/asm/tdx.h
-index c178360c1fb1..0b3555be1fa3 100644
---- a/arch/x86/include/asm/tdx.h
-+++ b/arch/x86/include/asm/tdx.h
-@@ -219,6 +219,7 @@ u64 tdh_mem_page_remove(struct tdx_td *td, u64 gpa, u64 level, u64 *ext_err1, u6
- u64 tdh_phymem_cache_wb(bool resume);
- u64 tdh_phymem_page_wbinvd_tdr(struct tdx_td *td);
- u64 tdh_phymem_page_wbinvd_hkid(u64 hkid, struct page *page);
-+void tdx_cpu_flush_cache_for_kexec(void);
- #else
- static inline void tdx_init(void) { }
- static inline int tdx_cpu_enable(void) { return -ENODEV; }
-diff --git a/arch/x86/kvm/vmx/tdx.c b/arch/x86/kvm/vmx/tdx.c
-index f457b2e578b2..e181e1e4b3cc 100644
---- a/arch/x86/kvm/vmx/tdx.c
-+++ b/arch/x86/kvm/vmx/tdx.c
-@@ -423,6 +423,18 @@ void tdx_disable_virtualization_cpu(void)
- 		tdx_flush_vp(&arg);
- 	}
- 	local_irq_restore(flags);
-+
-+	/*
-+	 * No more TDX activity on this CPU from here.  Flush cache to
-+	 * avoid having to do WBINVD in stop_this_cpu() during kexec.
-+	 *
-+	 * Kexec calls native_stop_other_cpus() to stop remote CPUs
-+	 * before booting to new kernel, but that code has a "race"
-+	 * when the normal REBOOT IPI times out and NMIs are sent to
-+	 * remote CPUs to stop them.  Doing WBINVD in stop_this_cpu()
-+	 * could potentially increase the possibility of the "race".
-+	 */
-+	tdx_cpu_flush_cache_for_kexec();
- }
- 
- #define TDX_SEAMCALL_RETRIES 10000
-diff --git a/arch/x86/virt/vmx/tdx/tdx.c b/arch/x86/virt/vmx/tdx/tdx.c
-index 2abf53ed59c8..f8f74e213f0d 100644
---- a/arch/x86/virt/vmx/tdx/tdx.c
-+++ b/arch/x86/virt/vmx/tdx/tdx.c
-@@ -1872,3 +1872,15 @@ u64 tdh_phymem_page_wbinvd_hkid(u64 hkid, struct page *page)
- 	return seamcall(TDH_PHYMEM_PAGE_WBINVD, &args);
- }
- EXPORT_SYMBOL_GPL(tdh_phymem_page_wbinvd_hkid);
-+
-+void tdx_cpu_flush_cache_for_kexec(void)
-+{
-+	lockdep_assert_preemption_disabled();
-+
-+	if (!this_cpu_read(cache_state_incoherent))
-+		return;
-+
-+	wbinvd();
-+	this_cpu_write(cache_state_incoherent, false);
-+}
-+EXPORT_SYMBOL_GPL(tdx_cpu_flush_cache_for_kexec);
--- 
-2.50.1
-
+>  	index = gfn - slot->base_gfn + slot->gmem.pgoff;
+>  	index = ALIGN_DOWN(index, 1 << folio_order(folio));
+> -	r = __kvm_gmem_prepare_folio(kvm, slot, index, folio);
+> -	if (!r)
+> -		kvm_gmem_mark_prepared(folio);
+>  
+> -	return r;
+> +	return __kvm_gmem_prepare_folio(kvm, slot, index, folio);
+>  }
+>  
+> 
+> [...snip...]
+> 
 
