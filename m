@@ -1,160 +1,130 @@
-Return-Path: <kvm+bounces-55643-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-55644-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id B7CC0B34708
-	for <lists+kvm@lfdr.de>; Mon, 25 Aug 2025 18:20:21 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 991FDB34727
+	for <lists+kvm@lfdr.de>; Mon, 25 Aug 2025 18:23:27 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 54FB73B5CCF
-	for <lists+kvm@lfdr.de>; Mon, 25 Aug 2025 16:20:17 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A818716AC27
+	for <lists+kvm@lfdr.de>; Mon, 25 Aug 2025 16:22:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2CBC82FF65E;
-	Mon, 25 Aug 2025 16:20:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9C2BE3002BE;
+	Mon, 25 Aug 2025 16:22:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=ventanamicro.com header.i=@ventanamicro.com header.b="E6yCiHZX"
 X-Original-To: kvm@vger.kernel.org
-Received: from cstnet.cn (smtp84.cstnet.cn [159.226.251.84])
-	(using TLSv1.2 with cipher DHE-RSA-AES256-SHA (256/256 bits))
+Received: from mail-il1-f169.google.com (mail-il1-f169.google.com [209.85.166.169])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6305C271A9D;
-	Mon, 25 Aug 2025 16:20:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=159.226.251.84
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1F49F11713
+	for <kvm@vger.kernel.org>; Mon, 25 Aug 2025 16:22:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.169
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756138807; cv=none; b=RjHMAMJJIUr0CXJyPGWpTI4DhMjQm44EFxAZ/gHTlvlGSmq7/LePUrA5NbUcg03VSFjMd93spW9Nu5L/yk4u/6O+cgRNG0GrTTL7Gc8niEhTS/uFIWKYo5Lm0PfS4yH+ZClUzZliE+z/+dzQuBUIrFhN8kaFJz1jSDBikQsGwZE=
+	t=1756138935; cv=none; b=HQ1Max9nhaHhmoU/BQFwP9lje5D6u/bBI/EosT1tNwbwQQsEhiZhvMvnAPSdzh9Xyo8rP1bFQBeERcPKOjGoFCgjaaVEwv2/6Y7nsYIRDxTjfIXYzuk8RM7LZ6//f6H4G/Co8wTHU7flfDROqC2TD+IrNjVeynyPuEbLS3NIiZ4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756138807; c=relaxed/simple;
-	bh=jvP/MoODPqxFznKN/LTG9V/r7b3ws9cfp65aCZZR0fg=;
-	h=Message-ID:Date:MIME-Version:To:Cc:References:Subject:From:
-	 In-Reply-To:Content-Type; b=Xi2kCqe20bFDWEvbLOm525B5gdUxnyljWgr0V67EWtEyN5ARYx24YE5u52nSvYU8aLU5ECeS5aF0jZWG43SWhEvHgrtdjO+cpJI206rlGrYHaEN14PNDRFL+aVAGwSu4evD6zvputSeQ5Pmpte04jtLJbCZl8N15UPQlDyr1OQA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=isrc.iscas.ac.cn; spf=pass smtp.mailfrom=isrc.iscas.ac.cn; arc=none smtp.client-ip=159.226.251.84
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=isrc.iscas.ac.cn
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=isrc.iscas.ac.cn
-Received: from [192.168.110.25] (unknown [118.251.178.216])
-	by APP-05 (Coremail) with SMTP id zQCowADXaVocjaxos6UhDw--.6581S2;
-	Tue, 26 Aug 2025 00:19:42 +0800 (CST)
-Message-ID: <b812bb46-6a26-456a-8210-d02138fb31a6@isrc.iscas.ac.cn>
-Date: Tue, 26 Aug 2025 00:19:40 +0800
+	s=arc-20240116; t=1756138935; c=relaxed/simple;
+	bh=JeuslXWF3RXWs7wR6we9lSHOWfjRXXLnSuu4MvbX5yw=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=eaxyuFKZAYnsMt/ZFu5/BRwNvbOHA+nqMQ1qPLA7ET3RqiWOZkl4I1940zHGe9CxzcS2nVM5c8M0PCMMs2w4prk5h/Ym4+k3sRoNMcwvsvzJVmdc1lzmZBiTFGRqmXvmUq/fJ0zlctCunAOtH12NJqSXoEacaqhbITI0x04ijcA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ventanamicro.com; spf=pass smtp.mailfrom=ventanamicro.com; dkim=pass (2048-bit key) header.d=ventanamicro.com header.i=@ventanamicro.com header.b=E6yCiHZX; arc=none smtp.client-ip=209.85.166.169
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ventanamicro.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ventanamicro.com
+Received: by mail-il1-f169.google.com with SMTP id e9e14a558f8ab-3eb71ce0510so22366275ab.0
+        for <kvm@vger.kernel.org>; Mon, 25 Aug 2025 09:22:13 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=ventanamicro.com; s=google; t=1756138933; x=1756743733; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=gN8JTVN3UqrYbcE7si46e+ibxM+XGryuvpF6NcC0BZ0=;
+        b=E6yCiHZXLXd/y1hXF2DqMCJ8m1O08w87Su9g5PH6mKTyrIK9QU0UQbRVJK/QSuxbLM
+         2gw/t2g2fkmizWPCUic2tCwvNRVKx9EE4iyMzHSzmgc2VdPcHElHO9kiuF02QVko+WUb
+         ehhJDWCQRJ06eMBbi4z49J983ttOZAfugUZUpvUZa0tCpKNCbkrBkanmrDh4dud6Ew2i
+         yuw2OSRVmJxxagEIOV6DaxkSTiDyVKONz5cwkufYwFvAz8Kv5vOMs8syI6Cnj3sxDITx
+         +aJSacFMUYu7SCxKosljIEtmK22+wgHGWjW6+q4iRYsUhNPxaevLJd/WANEH4M2/6V8c
+         Lu7Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1756138933; x=1756743733;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=gN8JTVN3UqrYbcE7si46e+ibxM+XGryuvpF6NcC0BZ0=;
+        b=VdJIj61J03JRWiEqL+DXWNR3+fxzq0PXLUU5G00otWKg7l434OIiA9xQTy1YmWhG8N
+         fj6E69B+OT87wbWrgQaGULTBNBFkSiYRTdCvwAntXRZfRFqaEfuEo0o2VikuqYM3BIUJ
+         cWfRj+xxHw1gtzEcYeccVrYyFZTfT8kefey+Hfrz/m2aMbBvx0BkTU70sau2u3Va46Ch
+         HiZJxMeEEoFrWiifXT/H1BrNm336gKevPFrG+FFgydygbNiqr+rIcD0E89JvYkueBL/7
+         iU7LW3Jqi7SO6+CCKOVIk/TUVluLqtXcB0vzQIniDqfCjl7t0hb0z/HM3DWeW830Cubh
+         RD4w==
+X-Forwarded-Encrypted: i=1; AJvYcCUsER94Hp6UQVXT4HRDww4fcjWBOis64YYC/toGCk6/H8Yn53dyWrsdSrdCtk1stP8O3UU=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yzig87ljolA1c4hxQMsf+h2MmwFviduHN6YTuUVFAmCJqHi4U22
+	PiWc2s1TZw5ePVbWLGnu9IZQUehwO//JNrAslYEdsv2qKfqZXJS6Gdco1rep+g2+bwQ=
+X-Gm-Gg: ASbGncsOzmbmQYmC0N+OCt7Sa+5JJAaA6PuSZuOTrN0Hx2PCXotsEOtI4BIKekyMdFh
+	Z+GEe9R0zSl8jII1957BjVwZLyvhPBzuTaASRNC6u/9eVm7Blr31qMu6bVw1eqBZE1lMe4l1Gha
+	ohqm64HPaWrxOxsHWqs/gUUO+2C46GWMP4maLeTfDQDlu1Wki8Bjn+nF7MIDoWMj0EW3vR1kPrY
+	HVgllaoiCTsUMs7m8Qgs9V4fwa3mUwgceNUxRhHRrfvtaUVeKyjyDbVALDD3krS1v4HxqrU9o0X
+	+F7V6FU6MLL1nWLg8rKqh0hO6NXu1bZMHexTck4SQlVMUwikgvtvCes/EqZvfYmBRVwdD+Ux0uR
+	gbqHj2IoZvriciW/8q1YfJWWg
+X-Google-Smtp-Source: AGHT+IHxDLcJHAYpyzsrbmn/aJb96iGEjJWm0YdiTY2GoeJB5NHC5Ix7Bwg5uxn0XGZ/yig4LtZaRw==
+X-Received: by 2002:a05:6e02:184c:b0:3ec:40cf:2d37 with SMTP id e9e14a558f8ab-3ec40cf2ed7mr61486495ab.31.1756138933068;
+        Mon, 25 Aug 2025 09:22:13 -0700 (PDT)
+Received: from localhost ([140.82.166.162])
+        by smtp.gmail.com with ESMTPSA id e9e14a558f8ab-3ea4c28624bsm49231365ab.18.2025.08.25.09.22.12
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 25 Aug 2025 09:22:12 -0700 (PDT)
+Date: Mon, 25 Aug 2025 11:22:11 -0500
+From: Andrew Jones <ajones@ventanamicro.com>
+To: Jinyu Tang <tjytimi@163.com>
+Cc: Anup Patel <anup@brainfault.org>, Atish Patra <atish.patra@linux.dev>, 
+	Conor Dooley <conor.dooley@microchip.com>, Yong-Xuan Wang <yongxuan.wang@sifive.com>, 
+	Paul Walmsley <paul.walmsley@sifive.com>, Nutty Liu <nutty.liu@hotmail.com>, kvm@vger.kernel.org, 
+	kvm-riscv@lists.infradead.org, linux-riscv@lists.infradead.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v3] riscv: skip csr restore if vcpu preempted reload
+Message-ID: <20250825-69a3c8b588e0bb1fbb5b7beb@orel>
+References: <20250825121411.86573-1-tjytimi@163.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-To: inochiama@gmail.com
-Cc: ajones@ventanamicro.com, alex@ghiti.fr, anup@brainfault.org,
- aou@eecs.berkeley.edu, charlie@rivosinc.com, cleger@rivosinc.com,
- conor+dt@kernel.org, cuiyunhui@bytedance.com, cyan.yang@sifive.com,
- devicetree@vger.kernel.org, jesse@rivosinc.com, krzk+dt@kernel.org,
- kvm-riscv@lists.infradead.org, kvm@vger.kernel.org,
- linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
- linux-kselftest@vger.kernel.org, linux-riscv@lists.infradead.org,
- mikisabate@gmail.com, namcao@linutronix.de, palmer@dabbelt.com,
- parri.andrea@gmail.com, paul.walmsley@sifive.com, pbonzini@redhat.com,
- pincheng.plct@isrc.iscas.ac.cn, robh@kernel.org, samuel.holland@sifive.com,
- shuah@kernel.org, thomas.weissschuh@linutronix.de, yikming2222@gmail.com,
- yongxuan.wang@sifive.com
-References: <znik7dcyeipf57xerlm5gwjszcaaeujoukr7g4a7wt7lsfu366@skany6k7agt4>
-Subject: Re: [PATCH v1 RESEND 1/5] dt-bidings: riscv: add Zilsd and Zclsd
- extension descriptions
-From: Pincheng Wang <pincheng.plct@isrc.iscas.ac.cn>
-In-Reply-To: <znik7dcyeipf57xerlm5gwjszcaaeujoukr7g4a7wt7lsfu366@skany6k7agt4>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-CM-TRANSID:zQCowADXaVocjaxos6UhDw--.6581S2
-X-Coremail-Antispam: 1UD129KBjvJXoW7CF4fKrWkurWxZr18AryUtrb_yoW8Kw4Upa
-	93CF18KFZ8Xw13u3s7tw18Xw45Jr4kKr15AF47t34xKay5Ar10qFWakw1YvF18GF4xCF4I
-	va1Ygw1fZ3ZrAFJanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-	9KBjDU0xBIdaVrnRJUUUvE14x267AKxVWrJVCq3wAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
-	rVWUuVWrJwAFIxvE14AKwVWUJVWUGwA2ocxC64kIII0Yj41l84x0c7CEw4AK67xGY2AK02
-	1l84ACjcxK6xIIjxv20xvE14v26r1j6r1xM28EF7xvwVC0I7IYx2IY6xkF7I0E14v26r4j
-	6F4UM28EF7xvwVC2z280aVAFwI0_Jr0_Gr1l84ACjcxK6I8E87Iv6xkF7I0E14v26r4j6r
-	4UJwAS0I0E0xvYzxvE52x082IY62kv0487Mc02F40EFcxC0VAKzVAqx4xG6I80ewAv7VC0
-	I7IYx2IY67AKxVWUJVWUGwAv7VC2z280aVAFwI0_Jr0_Gr1lOx8S6xCaFVCjc4AY6r1j6r
-	4UM4x0Y48IcVAKI48JM4x0x7Aq67IIx4CEVc8vx2IErcIFxwACI402YVCY1x02628vn2kI
-	c2xKxwCY1x0262kKe7AKxVW8ZVWrXwCF04k20xvY0x0EwIxGrwCFx2IqxVCFs4IE7xkEbV
-	WUJVW8JwC20s026c02F40E14v26r1j6r18MI8I3I0E7480Y4vE14v26r106r1rMI8E67AF
-	67kF1VAFwI0_Wrv_Gr1UMIIYrxkI7VAKI48JMIIF0xvE2Ix0cI8IcVAFwI0_Jr0_JF4lIx
-	AIcVC0I7IYx2IY6xkF7I0E14v26r4j6F4UMIIF0xvE42xK8VAvwI8IcIk0rVWUJVWUCwCI
-	42IY6I8E87Iv67AKxVWUJVW8JwCI42IY6I8E87Iv6xkF7I0E14v26r4j6r4UJbIYCTnIWI
-	evJa73UjIFyTuYvjTRM6wCDUUUU
-X-CM-SenderInfo: pslquxhhqjh1xofwqxxvufhxpvfd2hldfou0/
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250825121411.86573-1-tjytimi@163.com>
 
-On 2025/8/23 6:34, Inochi Amaoto wrote:
- > On Thu, Aug 21, 2025 at 10:01:27PM +0800, Pincheng Wang wrote:
- >> Add descriptions for the Zilsd (Load/Store pair instructions) and
- >> Zclsd (Compressed Load/Store pair instructions) ISA extensions
- >> which were ratified in commit f88abf1 ("Integrating load/store
- >> pair for RV32 with the main manual") of the riscv-isa-manual.
- >>
- >> Signed-off-by: Pincheng Wang <pincheng.plct@isrc.iscas.ac.cn>
- >> ---
- >>   .../devicetree/bindings/riscv/extensions.yaml | 39 +++++++++++++++++++
- >>   1 file changed, 39 insertions(+)
- >>
- >> diff --git a/Documentation/devicetree/bindings/riscv/extensions.yaml 
-b/Documentation/devicetree/bindings/riscv/extensions.yaml
- >> index ede6a58ccf53..d72ffe8f6fa7 100644
- >> --- a/Documentation/devicetree/bindings/riscv/extensions.yaml
- >> +++ b/Documentation/devicetree/bindings/riscv/extensions.yaml
- >> @@ -366,6 +366,20 @@ properties:
- >>               guarantee on LR/SC sequences, as ratified in commit 
-b1d806605f87
- >>               ("Updated to ratified state.") of the riscv profiles 
-specification.
- >>
- >> +        - const: zilsd
- >> +          description:
- >> +            The standard Zilsd extension which provides support for 
-aligned
- >> +            register-pair load and store operations in 32-bit 
-instruction
- >> +            encodings, as ratified in commit f88abf1 ("Integrating
- >> +            load/store pair for RV32 with the main manual") of 
-riscv-isa-manual.
- >> +
- >> +        - const: zclsd
- >> +          description:
- >> +            The Zclsd extension implements the compressed (16-bit) 
-version of the
- >> +            Load/Store Pair for RV32. As with Zilsd, this extension 
-was ratified
- >> +            in commit f88abf1 ("Integrating load/store pair for 
-RV32 with the
- >> +            main manual") of riscv-isa-manual.
- >> +
- >>           - const: zk
- >>             description:
- >>               The standard Zk Standard Scalar cryptography extension 
-as ratified
- >> @@ -847,6 +861,16 @@ properties:
- >>               anyOf:
- >>                 - const: v
- >>                 - const: zve32x
- >
- >> +      # Zclsd depends on Zilsd and Zca
- >> +      - if:
- >> +          contains:
- >> +            anyOf:
- >> +              - const: zclsd
- >> +        then:
- >> +          contains:
- >> +            anyOf:
- >> +              - const: zilsd
- >> +              - const: zca
- >>
- >
- > Should be allOf? I see the comment says "Zclsd" requires both "Zilsd"
- > and "Zca".
- >
- > Regards,
- > Inochi
+On Mon, Aug 25, 2025 at 08:14:11PM +0800, Jinyu Tang wrote:
+> The kvm_arch_vcpu_load() function is called in two cases for riscv:
+> 1. When entering KVM_RUN from userspace ioctl.
+> 2. When a preempted VCPU is scheduled back.
+> 
+> In the second case, if no other KVM VCPU has run on this CPU since the
+> current VCPU was preempted, the guest CSR (including AIA CSRS and HGTAP) 
+> values are still valid in the hardware and do not need to be restored.
+> 
+> This patch is to skip the CSR write path when:
+> 1. The VCPU was previously preempted
+> (vcpu->scheduled_out == 1).
+> 2. It is being reloaded on the same physical CPU
+> (vcpu->arch.last_exit_cpu == cpu).
+> 3. No other KVM VCPU has used this CPU in the meantime
+> (vcpu == __this_cpu_read(kvm_former_vcpu)).
+> 
+> This reduces many CSR writes with frequent preemption on the same CPU.
+> 
+> Signed-off-by: Jinyu Tang <tjytimi@163.com>
+> Reviewed-by: Nutty Liu <nutty.liu@hotmail.com>
+> ---
+>  v2 -> v3:
+>  v2 was missing a critical check because I generated the patch from my
+>  wrong (experimental) branch. This is fixed in v3. Sorry for my trouble.
+> 
+>  v1 -> v2:
+>  Apply the logic to aia csr load. Thanks for
+>  Andrew Jones's advice.
+> 
+>  arch/riscv/kvm/vcpu.c | 13 +++++++++++--
+>  1 file changed, 11 insertions(+), 2 deletions(-)
+>
 
-You're absolutely right, thank you for catching this. Since Zclsd 
-depends on both Zilsd and Zca, the condition should use allOf to 
-correctly enforce the conjunction. I'll fix this in next revision.
-
-Best regards,
-Pincheng Wang
-
+Reviewed-by: Andrew Jones <ajones@ventanamicro.com>
 
