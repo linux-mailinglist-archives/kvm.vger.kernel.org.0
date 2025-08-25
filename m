@@ -1,169 +1,271 @@
-Return-Path: <kvm+bounces-55587-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-55588-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id B850CB3341B
-	for <lists+kvm@lfdr.de>; Mon, 25 Aug 2025 04:52:43 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 69592B3341F
+	for <lists+kvm@lfdr.de>; Mon, 25 Aug 2025 04:55:36 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 55B254808E3
-	for <lists+kvm@lfdr.de>; Mon, 25 Aug 2025 02:52:42 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2F0E63B588A
+	for <lists+kvm@lfdr.de>; Mon, 25 Aug 2025 02:55:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A6872238178;
-	Mon, 25 Aug 2025 02:52:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D8B082367D6;
+	Mon, 25 Aug 2025 02:55:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=zytor.com header.i=@zytor.com header.b="bOJShy/v"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="msqXhlvH"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail.zytor.com (terminus.zytor.com [198.137.202.136])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.10])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 27D5A38DD8;
-	Mon, 25 Aug 2025 02:52:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.136
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756090353; cv=none; b=f7bKO1iToPOG665XFubOgjOqvVATZztDwoGrrtPqvl+htTQEJgFrpKnxuqR+VCscnuV2goCvrB1I8NSAqns2Q2Nd8xyG5fMkfXn4EFZfE2T1FP4H3JazY7h92KVanbeheQYyg2kraPND3sPxBDVMEbEC7dm7M2kHlDPCgAYvcPU=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756090353; c=relaxed/simple;
-	bh=aQ3klEdpmWWkq5V7/ZmW5O2BmjonN+3JsZEFIImTQM4=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=ZM838gkBgAX0CpZzzZV4yVQD3GZKaOITCjngXuaZMKZuTPpOeXuo7fUSBoah4m51K/sGQEdylvmCp9mn5AuqPHt2Z7shx7F8H6AVJG0meKjeltb6+YWkKpepSn0c/7JuLKzhLfeVq4edQlu4MSU5QIlvNWAIhtGCzLG+5x9j5kk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=zytor.com; spf=pass smtp.mailfrom=zytor.com; dkim=pass (2048-bit key) header.d=zytor.com header.i=@zytor.com header.b=bOJShy/v; arc=none smtp.client-ip=198.137.202.136
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=zytor.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=zytor.com
-Received: from [192.168.7.202] ([71.202.166.45])
-	(authenticated bits=0)
-	by mail.zytor.com (8.18.1/8.17.1) with ESMTPSA id 57P2pr1U255232
-	(version=TLSv1.3 cipher=TLS_AES_128_GCM_SHA256 bits=128 verify=NO);
-	Sun, 24 Aug 2025 19:51:54 -0700
-DKIM-Filter: OpenDKIM Filter v2.11.0 mail.zytor.com 57P2pr1U255232
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=zytor.com;
-	s=2025082201; t=1756090317;
-	bh=lq00javG2UiQIbEp3w2ZdKaPm7rq/LpukSV6LTAhyLE=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=bOJShy/vbvo57MT6KNFG9ImSdy5kd/fM2Ee6qzLo/m7GXK1473Rt7f1eXehONvy1b
-	 y4BXqcMcW7CSMa6K11jLfS5bGCAreFjQD+iS87wz6Qo7ktuK8iV3xVBpLycO/Rg1K8
-	 EahjGNR0UfqeQ4m6bQGJmaGDAvdv+9Ll8V+5ukF8AIQeQm7p4HirUkTE0/rRGCYQS6
-	 ODYUKUH/OX2V/GIawNcAq7KDy0hnbw5c1MFOAw/nmGvarqI/UjNpQt+0qX0+56kHmI
-	 o0U97z7Kn9uzfD1unT4Zx7nG261i9ePDX2aehtv6wno5o/uBhRLD2cVq0GFdrtdj/C
-	 IoIVDTgkj2g8g==
-Message-ID: <2dd8c323-7654-4a28-86f1-d743b70d10b1@zytor.com>
-Date: Sun, 24 Aug 2025 19:51:52 -0700
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6C1701C4A0A;
+	Mon, 25 Aug 2025 02:55:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=192.198.163.10
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1756090526; cv=fail; b=SjVGBDMrpMGVMxv2R/mEEv9x3SVajHEuuTjfszdtn4S+MpZZ/h/NLq9tIHfwhJSwL+GcYsjhkzojyNtoVJx91U1XCTRt6dLJi6IDwJGIbEE4qvrLdLpv0vG5Srzg+iwJhLLl/Nfy2rKkfmFwpEsvRZt4+Z+WRj2vb74zAQb3Jaw=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1756090526; c=relaxed/simple;
+	bh=+wefO3VebnTy114//B6jhmRHZlsYmoQdvdIqcasRAkM=;
+	h=Date:From:To:CC:Subject:Message-ID:References:Content-Type:
+	 Content-Disposition:In-Reply-To:MIME-Version; b=GiOIBoi7r6Y/C/472taKHWSioKnM2qaYiFDAzdePjm25eCug+nh8FHcMuLsftFMDn1jkj6VnrILiKd84QgiCm4rlmz6bgBUhgjZisDe6QJVw/uQ2WJYOTYqbYL33C5YWgFBnhMND55qBsGWY6Dn4rvypN+k3AnYI0o8Y+r1oW5I=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=msqXhlvH; arc=fail smtp.client-ip=192.198.163.10
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1756090525; x=1787626525;
+  h=date:from:to:cc:subject:message-id:references:
+   in-reply-to:mime-version;
+  bh=+wefO3VebnTy114//B6jhmRHZlsYmoQdvdIqcasRAkM=;
+  b=msqXhlvH1hfb0L2vPfcBLBpZl1iShtH1dg+1612/jg6D1SMa8l0r1DmB
+   z2GyFStm1CcS9gml2n+B/6QrbrzwJCmX7FWTb7cY9crMfCaPKB3+s6WIQ
+   M9MHlGYOccx8mwk0BJ2FyFXqm/BlldBJSqjKITvL7piwVHxaQ/dlT01es
+   rg1iB7e6HR6WzCiw7MkG4VH/b13o2JnRITNx4Op3RK7LbqRxUoBKeGQ1q
+   ZRPQ2d43bSbmlm9vlHNmwbIkT8QLClTJCdwUBVoNeDaIF8Lt8n5QN6AqG
+   BGRTB1F1IXZi5uKpexeqLYuiWmKeujW69WdMManJvvt1GVMVFLkP53rR5
+   w==;
+X-CSE-ConnectionGUID: YLENq559RU6w7mlLC2bB8A==
+X-CSE-MsgGUID: +qdrhDOJRFCg4irvYdD4PA==
+X-IronPort-AV: E=McAfee;i="6800,10657,11532"; a="69669331"
+X-IronPort-AV: E=Sophos;i="6.17,312,1747724400"; 
+   d="scan'208";a="69669331"
+Received: from orviesa005.jf.intel.com ([10.64.159.145])
+  by fmvoesa104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 24 Aug 2025 19:55:24 -0700
+X-CSE-ConnectionGUID: yMqLgbjYTFSzvyGXtrYmqA==
+X-CSE-MsgGUID: YZORLQsMSa6zF5X/YzmJlQ==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.17,312,1747724400"; 
+   d="scan'208";a="174482450"
+Received: from fmsmsx902.amr.corp.intel.com ([10.18.126.91])
+  by orviesa005.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 24 Aug 2025 19:55:24 -0700
+Received: from FMSMSX901.amr.corp.intel.com (10.18.126.90) by
+ fmsmsx902.amr.corp.intel.com (10.18.126.91) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.2562.17; Sun, 24 Aug 2025 19:55:22 -0700
+Received: from fmsedg901.ED.cps.intel.com (10.1.192.143) by
+ FMSMSX901.amr.corp.intel.com (10.18.126.90) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.2562.17 via Frontend Transport; Sun, 24 Aug 2025 19:55:22 -0700
+Received: from NAM11-DM6-obe.outbound.protection.outlook.com (40.107.223.51)
+ by edgegateway.intel.com (192.55.55.81) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.2562.17; Sun, 24 Aug 2025 19:55:22 -0700
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=WeyCtx2bfMP8nLEUXEbPgI+s/qlUUPsDt4VE7HCqFOcPJq8VyOZEehv8AQn8op/PkBM8Tyd2nPEUe8JWJ75ZoKBRu1vZ3Tj0IpStHFy2GV6OzbrzL0ck6t2qyI+OeQ8qDpcAVquqnA+VzcDHKBom223Hh4aANsgDULr5TweT0DHplbGF9Ck/IHJfPVtrjHzoY2YDsDlYZORaCqho2GOxJjWJOkkmJGwa+rnU0cV3rP0tDsGbNG19j3OAV4TLh2hsrdvKscjntYbXQZeXRYvuyKb/EFG3XNQdNezW6/qLFpO94/afhWSp3VF/AIOlghA/5Dtd3PT++06LIyhXV4LgJg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=PWWUnUnewjIR244zszSky1t8O71V03vb5yahvUeSf1o=;
+ b=zJTgi+Vyz3LsxA2stOgsZmaMBqfuwIbFQdsfFnyE+R7sTCIu0MwW3yQDp9V2VMfFTpoZuCr2ElyW8n43oJ39G1EB12BFRSi12f1JHTqN3jSoiAYeEoTq3Uf4XLeIiuSdCE/HbnSkLIaNsUym3K+UvCO4pyUVac7Fk4xT5HTIEoKGbTsQJWdJRhIX24ALj9/JQ9aolmc9FuorcBZHFCTnKJSZZcHCVzsMW7zHLeGF7OE7sSg+SR3NK9zd3hhqriADFP/cjMcL9iEZ5oCOs44C875L8Y7sCQTwLunjUXI7TgDXzTsKIpWnqCqjPn4U3xhww1uKhGbjrnDEeJpYjW5SOw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+Received: from CH3PR11MB8660.namprd11.prod.outlook.com (2603:10b6:610:1ce::13)
+ by MW3PR11MB4731.namprd11.prod.outlook.com (2603:10b6:303:2f::8) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9052.20; Mon, 25 Aug
+ 2025 02:55:20 +0000
+Received: from CH3PR11MB8660.namprd11.prod.outlook.com
+ ([fe80::cfad:add4:daad:fb9b]) by CH3PR11MB8660.namprd11.prod.outlook.com
+ ([fe80::cfad:add4:daad:fb9b%4]) with mapi id 15.20.9052.019; Mon, 25 Aug 2025
+ 02:55:20 +0000
+Date: Mon, 25 Aug 2025 10:55:09 +0800
+From: Chao Gao <chao.gao@intel.com>
+To: Xin Li <xin@zytor.com>
+CC: <kvm@vger.kernel.org>, <linux-kernel@vger.kernel.org>, <bp@alien8.de>,
+	<dave.hansen@linux.intel.com>, <hpa@zytor.com>, <john.allen@amd.com>,
+	<mingo@redhat.com>, <minipli@grsecurity.net>, <mlevitsk@redhat.com>,
+	<pbonzini@redhat.com>, <rick.p.edgecombe@intel.com>, <seanjc@google.com>,
+	<tglx@linutronix.de>, <weijiang.yang@intel.com>, <x86@kernel.org>
+Subject: Re: [PATCH v13 05/21] KVM: x86: Load guest FPU state when access
+ XSAVE-managed MSRs
+Message-ID: <aKvP2AHKYeQCPm0x@intel.com>
+References: <20250821133132.72322-1-chao.gao@intel.com>
+ <20250821133132.72322-6-chao.gao@intel.com>
+ <b61f8d7c-e8bf-476e-8d56-ce9660a13d02@zytor.com>
+Content-Type: text/plain; charset="us-ascii"
+Content-Disposition: inline
+In-Reply-To: <b61f8d7c-e8bf-476e-8d56-ce9660a13d02@zytor.com>
+X-ClientProxiedBy: SGAP274CA0023.SGPP274.PROD.OUTLOOK.COM (2603:1096:4:b6::35)
+ To CH3PR11MB8660.namprd11.prod.outlook.com (2603:10b6:610:1ce::13)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v6 06/20] KVM: VMX: Set FRED MSR intercepts
-To: linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        linux-doc@vger.kernel.org
-Cc: pbonzini@redhat.com, seanjc@google.com, corbet@lwn.net, tglx@linutronix.de,
-        mingo@redhat.com, bp@alien8.de, dave.hansen@linux.intel.com,
-        x86@kernel.org, hpa@zytor.com, luto@kernel.org, peterz@infradead.org,
-        andrew.cooper3@citrix.com, chao.gao@intel.com, hch@infradead.org
-References: <20250821223630.984383-1-xin@zytor.com>
- <20250821223630.984383-7-xin@zytor.com>
-Content-Language: en-US
-From: Xin Li <xin@zytor.com>
-Autocrypt: addr=xin@zytor.com; keydata=
- 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
- l75w1xInsg==
-In-Reply-To: <20250821223630.984383-7-xin@zytor.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: CH3PR11MB8660:EE_|MW3PR11MB4731:EE_
+X-MS-Office365-Filtering-Correlation-Id: 73476d27-0d37-4276-ea99-08dde382d44c
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;ARA:13230040|366016|1800799024|376014|7416014;
+X-Microsoft-Antispam-Message-Info: =?us-ascii?Q?ZqVD50DnsC2RySEIUvJmyyPC4q6x92pZdVZKhGCc9rG4208+qFSgpyHaBq8v?=
+ =?us-ascii?Q?QQjjvPBpj4RbPJRyf2/O6HQloy4jGn9PLLFDK3YITcvr3ZqXqNv1ZhrlmpQi?=
+ =?us-ascii?Q?QmCPP4xLPQgg4k7ZgogCV11xo+zelxgDWoVaIpC8tBxViJMLVW7Xwd2eBbHS?=
+ =?us-ascii?Q?L1V1NChp9WlMb/2M5CvtVua5fCBP6jykF/HsB+SAriM1OkDh7dwi8wXIhvnR?=
+ =?us-ascii?Q?R2HeO//92u9ls0OhXKNSav3nGGolW/RWF/Ot6GYNsAWQI6cJrkLgEZnJU9I8?=
+ =?us-ascii?Q?ps647t2mlqc1Gmsv8YqcNDtf6Bx9iJ5ixjNuKSb8WS7p3lEHm7M17z+yH0NE?=
+ =?us-ascii?Q?uJo8bVNQD7SSHP+Dr1oDSVoMNdVnenD2nPaBRN2n4aiCok71WQ3t2JqfalSU?=
+ =?us-ascii?Q?BDrpgYMBiySb39mm8Opyg8mNCC6sA+q/zIIrk5lEx/uSmiPjm2I+w5BIGIG3?=
+ =?us-ascii?Q?/K52yG+ETUOzGLcs5TZpmQjh7ejwyiBFa08kKnvGWV99x+fhICNRVVOogglg?=
+ =?us-ascii?Q?/V74FeqDaFmOgujLeWD0SoSvMKZR2Lp3ZOUp2D+9+3SRknIvZ2J8NnrKrra5?=
+ =?us-ascii?Q?2+xU20BBpWBR57kEAfXEHoKdcx/oKoNEmq5N6UjEZnvZBkHAH0F9V+Mg4sR/?=
+ =?us-ascii?Q?i4mnNz89GLkj/Wwup/S/yFGPAe5uZMLjZjZxW9izwT5bSsXfKMWgdGWH1k2m?=
+ =?us-ascii?Q?4QB+ve7U5a43Ml7YcebEIoZPkuGDUbJ4YU4NLjJchJhYB+xk6HK9Qh5iUei3?=
+ =?us-ascii?Q?Oofdq9GgYHRFvsNqzGQ+C75DEbZrMLzQ4t41v345LE1DNbfUEtjGRIGlwAAY?=
+ =?us-ascii?Q?ceF1ftPXyVcJvDw5v6AzpGjjW4e+1qOIbJqrIPxYw1RPTfvomy4qRU4h0rX2?=
+ =?us-ascii?Q?xOyQEps9kEYxS6UxM+I6AVt7fMU7bf2GDaH8BzGr4OyBeIr3gxVJLRidiaVH?=
+ =?us-ascii?Q?keQU3LXAk8wKwOL1lU2EMNP67PLHMNCdaBXyfqpSHRDJiN9F4HA7xL3s4cgR?=
+ =?us-ascii?Q?4wXuHIWkeApKUCganmitIrzC9LwJxS2CNY8sP9fn1ZnoIPXi0ZQ4aWoBEfIV?=
+ =?us-ascii?Q?6zRE/0nPElPJDR5vn8ksMT+HLkDLPcLWZOF2o68jav2KAw7/WM8pa7NJ/AW4?=
+ =?us-ascii?Q?N08WeJ1UPwl8TpPvuLEXEXp6A8VK1oX/ecZ4ejmGRI9+zpG/beeAxFmhFOOH?=
+ =?us-ascii?Q?YbXLrCg0fRnwNyA9+cY0jxSZHto4bKmx89I5oyXRVvWSPrZ/hfOl2/KbGs4W?=
+ =?us-ascii?Q?0iB3HhVRi522oQa1tez5h18pYJhleVzbNVRFdf5VX6ZAwrNfqPsS1Isi7Lw3?=
+ =?us-ascii?Q?5x7zzXSLkgooCR5czGbgnwoPaDL7yeKhhOVYjlZrnchXYIMnJM4GRt9c8xe2?=
+ =?us-ascii?Q?gcbJXZ2O9tCyhJsZLGweM67WynhZJUcL61xVpjHG6tedo0dA196tgqH9OKYa?=
+ =?us-ascii?Q?YqIUATXlJjs=3D?=
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CH3PR11MB8660.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(1800799024)(376014)(7416014);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?jqlImBa+cqzfxX3z2CIdMfOSUimbAMNZFPIXweKCpSyK/7PEEYwYgJFC8NS7?=
+ =?us-ascii?Q?z9f5wzwjjHVTku+kwqIzBHQyIBCaSC8tPmR5a7MuWgK6YKaU/6pyQrya2Oyx?=
+ =?us-ascii?Q?1JTJgswJP90j6tYnDiAKdOpSF/LWMWwJ4+cHm8HA0jl2B6InbslAG7BF996S?=
+ =?us-ascii?Q?CuZ3QVpMgwKlKH2vg426iepqGSWDi+6NmlDZdN4exDqdtdQytsK9KSedRPfk?=
+ =?us-ascii?Q?rAx33mDKDt453za2/bLj6A9l6odN0JbzIXAa9dlQ66qRWYvU3Pwd/HCCs3SK?=
+ =?us-ascii?Q?moqc5gxL1Zm96BuV7DyY2e1pgUsYLC4SlsVInZfJYPxBIuP0bA5GzdcCwnpj?=
+ =?us-ascii?Q?4V+zV0WHRY4I7voHR3MOcqDzfHsbWlv63vMKH7I1JL7I0hFZZZEEQtyCOJSd?=
+ =?us-ascii?Q?SgAm6nLu5r1hb3NxZ6Udm2wSwdeICQouwaEc4CEomz7Lvo0cZ118B1AKGTfI?=
+ =?us-ascii?Q?W21Tviz8pXDk9T8xZv1OUlkLQvCyMxWvs22/BffAEAT1b5gZEpRFhwQYDXcG?=
+ =?us-ascii?Q?cHI8W3MLc9jvv2AE8coNiuAjxuVuqutj1yzI+1u0pjYxg9q24JczHlVAxONg?=
+ =?us-ascii?Q?2q5E1qIRZMQw42/hQRFAkZbXBKqF7S18ajuE2tEqXSnJbOpy1a+1GFjkvdrM?=
+ =?us-ascii?Q?neJBrrxJecgkIMuHXA+i9MAmNBPl+JPODxceiy2AvIRnvngqbm3bHYcvaM7S?=
+ =?us-ascii?Q?akxjy2ZlCE+zm/VG6nf6SA521EPM5js/3w6D7ztzV3ZkraeA/WKCkbhbau6j?=
+ =?us-ascii?Q?13MqTsPQ2I3cF3yqH5C2yqMFw+KLUEuo39t2okP/2tPN9BZBzAMBrhDFjqRZ?=
+ =?us-ascii?Q?rgt7nSWfRC6Qrd/DKQGiEgKXReXhdt0bgr3E0X3ptg1wUOWLifDTVE2/WUQI?=
+ =?us-ascii?Q?3sTL9VF1hOrQFSzlUKvTy3ceOPB4a4jH/dRqxm9b3sJHfm/jWR1lObDv0RWX?=
+ =?us-ascii?Q?ehEH8ck880SCMC4Q8yxa8kKJIIN5QpdtuGyhomVQpkBCACkQONPuJsIPjXH5?=
+ =?us-ascii?Q?OSAJR6nd6VaR/WzpX8SMt1AC3Qox1TbYQeMZcFyg0JHJElu0pWo/NqYnIWmu?=
+ =?us-ascii?Q?FAfaHpNAN8QL5mp2q3PaEmEwr2DEJwsXQzu5Eu4yEakapvjQ+eboLMQkSAVF?=
+ =?us-ascii?Q?X/JUUAs59eiw4lB69xrOy/iJZo/lUjE6fHQ4ZjwagPEkw4blMrEeACziPOel?=
+ =?us-ascii?Q?S687iunG6kG6BNzPbeoWvDW2y9Fav9zdAlBe2TUyhDo3oUb/0CaFCcXhELEG?=
+ =?us-ascii?Q?jr3vjIRhHIoDOc/ZNrfTG+K7eTgAxcx2QM/BP+49RFhPxUEq6xWvmSzXav22?=
+ =?us-ascii?Q?71/dMOIo4sTAbDTLSj2/N+280N7fgPPtkoC/72RfQXIZc1fOH8qrwMFd5W/N?=
+ =?us-ascii?Q?DFkejlCV/VWSri+ayCaMyqlpAoxEbWqw5xCSaSFhm5jFtA0iCtPgYNjF8wHP?=
+ =?us-ascii?Q?FI8zZyXb03VhZuREcCQBZWgcOdWxbGXkrEI2aqpZ1MDSex65bLYrOYIn1NNm?=
+ =?us-ascii?Q?S1XCo5lhUwfB50Sq84u9IcpGxzGI+hVViYOkQuEx12qB278n6vVpY7vVjeQ/?=
+ =?us-ascii?Q?zMGENVp1QAMNzwxHyJIeZIO9WC+8PKaSrY3bJqXy?=
+X-MS-Exchange-CrossTenant-Network-Message-Id: 73476d27-0d37-4276-ea99-08dde382d44c
+X-MS-Exchange-CrossTenant-AuthSource: CH3PR11MB8660.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 25 Aug 2025 02:55:20.4984
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: BjjWaik6MWN5scbwY6ALj5CL+kq4mpH9tN8b48uMLpVwq5snXrci39GeQjJzrQPtbnc16mQzkfMET2k9r+wWbQ==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: MW3PR11MB4731
+X-OriginatorOrg: intel.com
 
-On 8/21/2025 3:36 PM, Xin Li (Intel) wrote:
-> +	/*
-> +	 * MSR_IA32_FRED_RSP0 and MSR_IA32_PL0_SSP (aka MSR_IA32_FRED_SSP0) are
-> +	 * designated for event delivery while executing in userspace.  Since
-> +	 * KVM operates exclusively in kernel mode (the CPL is always 0 after
-> +	 * any VM exit), KVM can safely retain and operate with the guest-defined
-> +	 * values for MSR_IA32_FRED_RSP0 and MSR_IA32_PL0_SSP.
-> +	 *
-> +	 * Therefore, interception of MSR_IA32_FRED_RSP0 and MSR_IA32_PL0_SSP
-> +	 * is not required.
-> +	 *
-> +	 * Note, save and restore of MSR_IA32_PL0_SSP belong to CET supervisor
-> +	 * context management.  However the FRED SSP MSRs, including
-> +	 * MSR_IA32_PL0_SSP, are supported by any processor that enumerates FRED.
-> +	 * If such a processor does not support CET, FRED transitions will not
-> +	 * use the MSRs, but the MSRs would still be accessible using MSR-access
-> +	 * instructions (e.g., RDMSR, WRMSR).
-> +	 */
-> +	vmx_set_intercept_for_msr(vcpu, MSR_IA32_FRED_RSP0, MSR_TYPE_RW, intercept);
-> +	vmx_set_intercept_for_msr(vcpu, MSR_IA32_PL0_SSP, MSR_TYPE_RW, intercept);
+On Sun, Aug 24, 2025 at 06:52:55PM -0700, Xin Li wrote:
+>> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+>> index 6b01c6e9330e..799ac76679c9 100644
+>> --- a/arch/x86/kvm/x86.c
+>> +++ b/arch/x86/kvm/x86.c
+>> @@ -4566,6 +4569,21 @@ int kvm_get_msr_common(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
+>>   }
+>>   EXPORT_SYMBOL_GPL(kvm_get_msr_common);
+>> +/*
+>> + *  Returns true if the MSR in question is managed via XSTATE, i.e. is context
+>> + *  switched with the rest of guest FPU state.
+>> + */
+>> +static bool is_xstate_managed_msr(u32 index)
+>> +{
+>> +	switch (index) {
+>> +	case MSR_IA32_U_CET:
+>
+>
+>Why MSR_IA32_S_CET is not included here?
 
-Hi Sean,
+Emm. I didn't think about this.
 
-I'd like to bring up an issue concerning MSR_IA32_PL0_SSP.
+MSR_IA32_S_CET is read from or written to a dedicated VMCS/B field, so KVM
+doesn't need to load the guest FPU to access MSR_IA32_S_CET. This pairs with
+the kvm_{get,set}_xstate_msr() in kvm_{get,set}_msr_common().
 
-The FRED spec claims:
+That said, userspace writes can indeed cause an inconsistency between the guest
+FPU and VMCS fields regarding MSR_IA32_S_CET. If migration occurs right after a
+userspace write (without a VM-entry, which would bring them in sync) and
+userspace just restores MSR_IA32_S_CET from the guest FPU, the write before
+migration could be lost.
 
-The FRED SSP MSRs are supported by any processor that enumerates
-CPUID.(EAX=7,ECX=1):EAX.FRED[bit 17] as 1. If such a processor does not
-support CET, FRED transitions will not use the MSRs (because shadow stacks
-are not enabled), but the MSRs would still be accessible using MSR-access
-instructions (e.g., RDMSR, WRMSR).
+If that migration issue is a practical problem, I think MSR_IA32_S_CET should
+be included here, and we need to perform a kvm_set_xstate_msr() after writing
+to the VMCS/B.
 
+>
+>
+>> +	case MSR_IA32_PL0_SSP ... MSR_IA32_PL3_SSP:
+>> +		return true;
+>> +	default:
+>> +		return false;
+>> +	}
+>> +}
+>
+>
+>Is it better to do?
+>
+>static bool is_xstate_managed_msr(u32 index)
+>{
+>         if (!kvm_caps.supported_xss)
+>                 return false;
+>
+>         switch (index) {
+>         case MSR_IA32_U_CET:
+>         case MSR_IA32_S_CET:
+>         case MSR_IA32_PL1_SSP ... MSR_IA32_PL3_SSP:
+>                 return kvm_caps.supported_xss & XFEATURE_MASK_CET_USER &&
+>                        kvm_caps.supported_xss & XFEATURE_MASK_CET_KERNEL;
+>         default:
+>                 return false;
 
-It means KVM needs to handle MSR_IA32_PL0_SSP even when FRED is supported
-but CET is not.  And this can be broken down into two subtasks:
+This will duplicate checks in other functions. I slightly prefer to keep this
+function super simple and do all capability checks in __kvm_{set,get}_msr()
+or kvm_emulate_msr_{write,read}.
 
-1) Allow such a guest to access MSR_IA32_PL0_SSP w/o triggering #GP.  And
-this behavior is already implemented in patch 8 of this series.
+>         }
+>}
+>
+>And it would be obvious how to add new MSRs related to other XFEATURE bits.
 
-2) Save and restore MSR_IA32_PL0_SSP in both KVM and Qemu for such a guest.
+Just return true for all those MSRs, regardless of host capabilities. If
+kvm_caps doesn't support them, those MSRs are not advertised to userspace
+either (see kvm_probe_msr_to_save()). Loading or putting the guest FPU when
+userspace attempts to read/write those unsupported MSRs shouldn't cause any
+performance issues, as userspace is unlikely to access them in hot paths.
 
-
-I have the patches for 2) but they are not included in this series, because
-
-1) how much do we care the value in MSR_IA32_PL0_SSP in such a guest?
-
-Yes, Chao told me that you are the one saying that MSRs can be used as
-clobber registers and KVM should preserve the value.  Does MSR_IA32_PL0_SSP
-in such a guest count?
-
-
-2) Saving/restoring MSR_IA32_PL0_SSP adds complexity, though it's seldom
-used.  Is it worth it?
-
-
-BTW I'm still working on a KVM unit test for it, using a L1 VMM that
-enumerates FRED but not CET.
-
-Thanks!
-     Xin
+>
+>Thanks!
+>    Xin
 
