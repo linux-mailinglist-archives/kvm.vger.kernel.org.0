@@ -1,87 +1,134 @@
-Return-Path: <kvm+bounces-55609-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-55610-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id B399DB33DCB
-	for <lists+kvm@lfdr.de>; Mon, 25 Aug 2025 13:18:04 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1F4EBB33E03
+	for <lists+kvm@lfdr.de>; Mon, 25 Aug 2025 13:30:44 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id C33851A82AD2
-	for <lists+kvm@lfdr.de>; Mon, 25 Aug 2025 11:18:24 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D06A83BC984
+	for <lists+kvm@lfdr.de>; Mon, 25 Aug 2025 11:30:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 92D3A2E5B15;
-	Mon, 25 Aug 2025 11:17:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 40DA02EA166;
+	Mon, 25 Aug 2025 11:30:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ventanamicro.com header.i=@ventanamicro.com header.b="XUY314L8"
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="WFeXTt5t"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-io1-f51.google.com (mail-io1-f51.google.com [209.85.166.51])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2CB982E5411
-	for <kvm@vger.kernel.org>; Mon, 25 Aug 2025 11:17:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.51
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5DEE42E9738;
+	Mon, 25 Aug 2025 11:30:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756120676; cv=none; b=ZxaBVw6atwu8gWV776NYbNPv++Chm2HDBekOraRDor3CQTefNltR0/REEHc2dHveoVTbs81rlSGO2s8TTDRJ61PnzwoyPvU+PzSDSeG9u7fZcMhkLQMfssvcwljfnIb9iAy+QCIojoOyptrC5OlXxqE8/9fmQbG/rxzTpuOZj1E=
+	t=1756121417; cv=none; b=GJABoiXEpz73ZY2KQpexAHoNol6cvzbTJhcwc/Yh73UQsb86JOQVXoF3kwQxbuOwWd/FmrCzuo6nGh9OMujj5v2iaQa6djKWu8TegGIVpXGGUlbEz8O+4N+fl+ojoDHmMxuWvxwKlaQSVTTEC5JFhOrR0T5sGaYuh8L6pYX44kQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756120676; c=relaxed/simple;
-	bh=4VifmTidYyjuCM78tKvZIBrBjFrUlRYU5vspOC2YjhM=;
+	s=arc-20240116; t=1756121417; c=relaxed/simple;
+	bh=G6t0vi9alebHFBK5rvhbgaNL3riXc5sqA04gp+fkOnA=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Oax3f47vRA4BfLPCmXunSrPhGPCQDxjHoRaK4vKSyUM9iWYThDg/RwQ94gzIfJAT2IfiOLYsbOxLVKD3WpvZVm3dmE/adgdgUVJFC7N+2klGBYTfPLpyNSQVCsrshwv//YT62vCHOPatdmqC+ShScMF0op0yFnI6c/2uzdqhr5E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ventanamicro.com; spf=pass smtp.mailfrom=ventanamicro.com; dkim=pass (2048-bit key) header.d=ventanamicro.com header.i=@ventanamicro.com header.b=XUY314L8; arc=none smtp.client-ip=209.85.166.51
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ventanamicro.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ventanamicro.com
-Received: by mail-io1-f51.google.com with SMTP id ca18e2360f4ac-8845da04587so58466439f.1
-        for <kvm@vger.kernel.org>; Mon, 25 Aug 2025 04:17:54 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=ventanamicro.com; s=google; t=1756120674; x=1756725474; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=i6Nj+duoF70RMGzdcYouFDD8VMssifTIE0BrLQHJWZQ=;
-        b=XUY314L84bZ2V95D0wlsLNjYCefPoKOUmlmqEmfF+egbtDmgxMO4g+/NahpnqgnQWv
-         OQRyHedJNKwQFEuX0rYmKLOGPxRRSbM1D74Tq0SajvKy5HMrD8D7ChbUiXmlp5vicF1G
-         FTL1y4plN7OLI/yzD4uLL7hUp5kBLfo8+ky/p/vjfTgnDXWbHr7OVo1wQ7ycK7RP7HKz
-         Mf5gQnD7Pb8RxQU9+6PzAcmWNvuorpzlAzSzmP8cjkdWHJ0XjbHnbyPP2fO4ygzz64M+
-         BKNhwNIRCQKxZP2uQylHAwqzXeOLhhE/U8BwRG6NKcTduuASEnsXyEEQM++e4+v0y5PB
-         NgMg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1756120674; x=1756725474;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=i6Nj+duoF70RMGzdcYouFDD8VMssifTIE0BrLQHJWZQ=;
-        b=r+TUkF8tykZy5pZT8F0xbYLsUSzmOp1AkEsO6VbmBzmtUGybvCQADMN+Ir3cr2aF1S
-         9JuUGhZvS4BAd/QEN8RJZEqK3LSX7PaajJaKFPPA3D+Sj5Wn25GBdetyPmLtj7IEaZeB
-         lWoTKGKOoMejMElajcb4n+eAqyx6fQngE8fsZbMuoY+ZPeWZ1S+zP2JkQtGQ5hahjN3h
-         bc+HhdMosY0BI/pTRj/usykQph4zljdGItpNFqdq3JD/Dan/Ly0HRuwqfc1ZiTs1cR1A
-         hhFZRiK/tE/2oGYQyATqUKIsG/t7t4a9wM6nSpn3WNdFbVTXXN7Ljea2oKD27E077NjX
-         PqPw==
-X-Forwarded-Encrypted: i=1; AJvYcCXz81py9R4V0DNAC0vu9W2v+Kh1Pvks4qU39NiBv0FvRAvQauZXxUF4yOu+9sKQGOQr1SA=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwaMcrmEzDPkS3Zcj+wiX8ophAGLo8luumJ7ZZXHsEfnbI+4EKM
-	LAR2t6nAs89epLSgJyUm+dB1mzPIjOasBa7K6tiW2I+L9SEvMJxCvT5JPKkjaySt4q8=
-X-Gm-Gg: ASbGncsrpD6HJ0EWEBtRrvkNz7/An+ryW36GE6ol22qYTOnNIcrsGMhijDCSlpMzdxs
-	OqpmlV9osEKdA8+ByWVAFPDZvvyevrmxujnjVFbT5YX/lFIPFwFu5ZbDuKUTaTgU8w6BjF71sIe
-	AJTWeNo79L7/uKud9PpYvVTMgvwsVQ+NlPb6UdfzkZNTPFIiDNyLpVUG+8eAeEnHp59jn4Nxvom
-	HGY6051kljUiuF+9ENmM81aZOhYIxjJ+HTJE1SCqYcu4lsGR7epLkTq40+a0aaUCnJffVZZkHw1
-	dP4P/saZBq7X5exoE6/9aaDmIM9TCvsgmPIl19h5umDiVNSlEGu7HuG+9FWIqpoy8oZwdqDiyeI
-	qfc13p6H1ocvJfIlQnNAvMd6E0WNi9inA/aok
-X-Google-Smtp-Source: AGHT+IEigjCbL6EPOUxTZc6hVZl568KpQrRQoMmE5YONwYCGYB+k64Dw2FcHbKRMyeeSPlD17oBMJw==
-X-Received: by 2002:a05:6602:13d0:b0:881:8a58:3bc2 with SMTP id ca18e2360f4ac-886bd12e5e5mr1736254339f.6.1756120674148;
-        Mon, 25 Aug 2025 04:17:54 -0700 (PDT)
-Received: from localhost ([138.199.100.237])
-        by smtp.gmail.com with ESMTPSA id ca18e2360f4ac-886c8f0a83esm464303639f.10.2025.08.25.04.17.53
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 25 Aug 2025 04:17:53 -0700 (PDT)
-Date: Mon, 25 Aug 2025 06:17:51 -0500
-From: Andrew Jones <ajones@ventanamicro.com>
-To: Jinyu Tang <tjytimi@163.com>
-Cc: Anup Patel <anup@brainfault.org>, Atish Patra <atish.patra@linux.dev>, 
-	Conor Dooley <conor.dooley@microchip.com>, Yong-Xuan Wang <yongxuan.wang@sifive.com>, 
-	Paul Walmsley <paul.walmsley@sifive.com>, Nutty Liu <nutty.liu@hotmail.com>, kvm@vger.kernel.org, 
-	kvm-riscv@lists.infradead.org, linux-riscv@lists.infradead.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v2] riscv: skip csr restore if vcpu preempted reload
-Message-ID: <20250825-a30edf6b9d0301b5fdbcfffa@orel>
-References: <20250825110708.75474-1-tjytimi@163.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=T8aGpn1hnaRpNNxqkM66zPZBHQ+FtgyrmCULUCKHRGmAEpGEvCRVdcjTpGqLN44CAiXPXbgwAYdScVyOByonjCwk2vS1LFPhdIJ1jjvpG49fqmpBM4F0WJR6ZOh9kGzi+zKimWDfchibR8IodgZU0jJm+X+qgW2bsb9cdRVI888=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=WFeXTt5t; arc=none smtp.client-ip=148.163.156.1
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
+Received: from pps.filterd (m0353729.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 57PAuFQ1016927;
+	Mon, 25 Aug 2025 11:29:08 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
+	:content-type:date:from:in-reply-to:message-id:mime-version
+	:references:subject:to; s=pp1; bh=pZVH01D2Gd/ZuxBDWHvMdhmbI57qiN
+	XppeatopYJClM=; b=WFeXTt5tlq7bvmFwDwurN2gxIAJS4Sbtzub9xJRMuUUCWG
+	dnN+VgZwrU+C7OAoBOS7dQLtS9avFToeFD88Xjc+lW70Zit8RLPH2JZHPbK7MHxb
+	v0D+pVyzXtrwYQl3kI+QLZ7QQLNBqOFnM1k0uGpSZ1+CyNFOS702oVm2UXUhr26g
+	QqYmWP5K4me05w/KlbcV8jlyClHMpN0GwiL9exsIxxhhvb59HKuryvQ6LoqGJJOX
+	azP5+JccDMK8pigXUHrrcngDK4tPx7KmxBkljdhf7EI3Ims4+KAlu4PkVvsOtnHJ
+	SJYiHaa74A1UrHZh5hhabVWUJ/85+yELHuGX+z6g==
+Received: from pps.reinject (localhost [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 48q5av8jkr-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Mon, 25 Aug 2025 11:29:07 +0000 (GMT)
+Received: from m0353729.ppops.net (m0353729.ppops.net [127.0.0.1])
+	by pps.reinject (8.18.1.12/8.18.0.8) with ESMTP id 57PBJCuS013823;
+	Mon, 25 Aug 2025 11:29:06 GMT
+Received: from ppma13.dal12v.mail.ibm.com (dd.9e.1632.ip4.static.sl-reverse.com [50.22.158.221])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 48q5av8jkq-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Mon, 25 Aug 2025 11:29:06 +0000 (GMT)
+Received: from pps.filterd (ppma13.dal12v.mail.ibm.com [127.0.0.1])
+	by ppma13.dal12v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 57PB3VZR002512;
+	Mon, 25 Aug 2025 11:29:05 GMT
+Received: from smtprelay01.fra02v.mail.ibm.com ([9.218.2.227])
+	by ppma13.dal12v.mail.ibm.com (PPS) with ESMTPS id 48qt6m5am6-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Mon, 25 Aug 2025 11:29:05 +0000
+Received: from smtpav05.fra02v.mail.ibm.com (smtpav05.fra02v.mail.ibm.com [10.20.54.104])
+	by smtprelay01.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 57PBT3gH52166968
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Mon, 25 Aug 2025 11:29:03 GMT
+Received: from smtpav05.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 971AE20043;
+	Mon, 25 Aug 2025 11:29:03 +0000 (GMT)
+Received: from smtpav05.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id C97EF20040;
+	Mon, 25 Aug 2025 11:28:50 +0000 (GMT)
+Received: from li-c6426e4c-27cf-11b2-a85c-95d65bc0de0e.ibm.com (unknown [9.98.110.17])
+	by smtpav05.fra02v.mail.ibm.com (Postfix) with ESMTPS;
+	Mon, 25 Aug 2025 11:28:50 +0000 (GMT)
+Date: Mon, 25 Aug 2025 16:58:48 +0530
+From: Gautam Menghani <gautam@linux.ibm.com>
+To: Zihuan Zhang <zhangzihuan@kylinos.cn>
+Cc: "Rafael J . wysocki" <rafael@kernel.org>,
+        Viresh Kumar <viresh.kumar@linaro.org>,
+        Catalin Marinas <catalin.marinas@arm.com>,
+        Will Deacon <will@kernel.org>, Sean Christopherson <seanjc@google.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>,
+        Borislav Petkov <bp@alien8.de>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        Markus Mayer <mmayer@broadcom.com>,
+        Florian Fainelli <florian.fainelli@broadcom.com>,
+        Srinivas Pandruvada <srinivas.pandruvada@linux.intel.com>,
+        Madhavan Srinivasan <maddy@linux.ibm.com>,
+        Michael Ellerman <mpe@ellerman.id.au>,
+        Krzysztof Kozlowski <krzk@kernel.org>,
+        Alim Akhtar <alim.akhtar@samsung.com>,
+        Thierry Reding <thierry.reding@gmail.com>,
+        Jonathan Hunter <jonathanh@nvidia.com>,
+        MyungJoo Ham <myungjoo.ham@samsung.com>,
+        Kyungmin Park <kyungmin.park@samsung.com>,
+        Chanwoo Choi <cw00.choi@samsung.com>,
+        Jani Nikula <jani.nikula@linux.intel.com>,
+        Joonas Lahtinen <joonas.lahtinen@linux.intel.com>,
+        Rodrigo Vivi <rodrigo.vivi@intel.com>,
+        Tvrtko Ursulin <tursulin@ursulin.net>,
+        David Airlie <airlied@gmail.com>, Simona Vetter <simona@ffwll.ch>,
+        Daniel Lezcano <daniel.lezcano@kernel.org>,
+        Sascha Hauer <s.hauer@pengutronix.de>, Shawn Guo <shawnguo@kernel.org>,
+        Eduardo Valentin <edubezval@gmail.com>, Keerthy <j-keerthy@ti.com>,
+        Matthias Brugger <matthias.bgg@gmail.com>,
+        AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
+        zhenglifeng <zhenglifeng1@huawei.com>,
+        "H . Peter Anvin" <hpa@zytor.com>, Zhang Rui <rui.zhang@intel.com>,
+        Len Brown <lenb@kernel.org>, Nicholas Piggin <npiggin@gmail.com>,
+        Christophe Leroy <christophe.leroy@csgroup.eu>,
+        Lukasz Luba <lukasz.luba@arm.com>,
+        Pengutronix Kernel Team <kernel@pengutronix.de>,
+        Beata Michalska <beata.michalska@arm.com>,
+        Fabio Estevam <festevam@gmail.com>, Pavel Machek <pavel@kernel.org>,
+        Sumit Gupta <sumitg@nvidia.com>,
+        Prasanna Kumar T S M <ptsm@linux.microsoft.com>,
+        Sudeep Holla <sudeep.holla@arm.com>,
+        Yicong Yang <yangyicong@hisilicon.com>, linux-pm@vger.kernel.org,
+        x86@kernel.org, kvm@vger.kernel.org, linux-acpi@vger.kernel.org,
+        linuxppc-dev@lists.ozlabs.org, linux-samsung-soc@vger.kernel.org,
+        linux-arm-kernel@lists.infradead.org, linux-tegra@vger.kernel.org,
+        intel-gfx@lists.freedesktop.org, dri-devel@lists.freedesktop.org,
+        imx@lists.linux.dev, linux-omap@vger.kernel.org,
+        linux-mediatek@lists.infradead.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v1] cpufreq: use __free() for all cpufreq_cpu_get()
+ references
+Message-ID: <aKxI8D5mgLRyydb3@li-c6426e4c-27cf-11b2-a85c-95d65bc0de0e.ibm.com>
+References: <20250825092833.42441-1-zhangzihuan@kylinos.cn>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -90,97 +137,292 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20250825110708.75474-1-tjytimi@163.com>
+In-Reply-To: <20250825092833.42441-1-zhangzihuan@kylinos.cn>
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: 0HsQaFGcKHYEMjGxfTSlUJWF6XneJCL9
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUwODIzMDAyMSBTYWx0ZWRfX/4+yCBHiZkyj
+ BezOHO0JD1p7OO2PV8xmQ1v5shFYKr21Uw1c2F4fW4uXyPCsxOE6ILKOy08exTWUNA73a36dDQc
+ c4y6wbPoU5LvDYQlXlcAhPLqk3LFWCLZ3dICMLqR2WHDlet2Ldgi5be5Hduqsg6kr8/WbswzYXj
+ eL+wfLc/Jeqecx6jg74QDQFlvafBQN6LUG8LrX8tqwzhzd9GgzIeu7kk/N0P/CWyJHwlrc5PIUz
+ Z4q/fYjm6PpSFTkG5SI7ARvGOK+wODTfBZnnKDnPI4C3Bn1Qhf3Y6EvQDrYoSo6dxKELAUhByqt
+ uCcp7lr/HsMOwiulBYsJ81MWSKnZa8+YC9DKTxtqevYNdz87q6XWFXB9AUbfcQ36nGSAmLoiq7W
+ P4ME2Djp
+X-Proofpoint-ORIG-GUID: gtLwqruV6tGzAQkR_fGqnCUDyXx-v5l-
+X-Authority-Analysis: v=2.4 cv=SNNCVPvH c=1 sm=1 tr=0 ts=68ac4903 cx=c_pps
+ a=AfN7/Ok6k8XGzOShvHwTGQ==:117 a=AfN7/Ok6k8XGzOShvHwTGQ==:17
+ a=kj9zAlcOel0A:10 a=2OwXVqhp2XgA:10 a=I94fdbTdu9Vpa8W20_wA:9
+ a=CjuIK1q_8ugA:10
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1099,Hydra:6.1.9,FMLib:17.12.80.40
+ definitions=2025-08-25_05,2025-08-20_03,2025-03-28_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ spamscore=0 adultscore=0 bulkscore=0 phishscore=0 clxscore=1011
+ impostorscore=0 malwarescore=0 suspectscore=0 priorityscore=1501
+ classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
+ reason=mlx scancount=1 engine=8.19.0-2507300000 definitions=main-2508230021
 
-On Mon, Aug 25, 2025 at 07:07:08PM +0800, Jinyu Tang wrote:
-> The kvm_arch_vcpu_load() function is called in two cases for riscv:
-> 1. When entering KVM_RUN from userspace ioctl.
-> 2. When a preempted VCPU is scheduled back.
+On Mon, Aug 25, 2025 at 05:28:33PM +0800, Zihuan Zhang wrote:
+> This patch replaces all remaining uses of cpufreq_cpu_get() with
+> the __free(cpufreq_cpu_put) annotation.
 > 
-> In the second case, if no other KVM VCPU has run on this CPU since the
-> current VCPU was preempted, the guest CSR (including AIA CSRS) values 
-> are still valid in the hardware and do not need to be restored.
+> Motivation:
+> - Ensures automatic cleanup of policy references when they go out of scope,
+>   reducing the risk of forgetting to call cpufreq_cpu_put() on early return
+>   or error paths.
+> - Brings the code in line with the latest kernel coding style and best
+>   practices for managing reference-counted objects.
+> - No functional changes are introduced; behavior remains the same,
+>   but reference counting is now safer and easier to maintain.
 > 
-> This patch is to skip the CSR write path when:
-> 1. The VCPU was previously preempted
-> (vcpu->scheduled_out == 1).
-> 2. It is being reloaded on the same physical CPU
-> (vcpu->arch.last_exit_cpu == cpu).
-> 3. No other KVM VCPU has used this CPU in the meantime
-> (vcpu == __this_cpu_read(kvm_former_vcpu)).
-> 
-> This reduces many CSR writes with frequent preemption on the same CPU.
-> 
-> Signed-off-by: Jinyu Tang <tjytimi@163.com>
-> Reviewed-by: Nutty Liu <nutty.liu@hotmail.com>
+> Signed-off-by: Zihuan Zhang <zhangzihuan@kylinos.cn>
 > ---
->  v1 -> v2:
->  Apply the logic to aia csr load. Thanks for
->  Andrew Jones's advice.
+>  arch/arm64/kernel/topology.c                  |  9 +++----
+>  arch/x86/kvm/x86.c                            | 10 ++++----
+>  drivers/acpi/processor_thermal.c              | 13 ++++------
+>  drivers/cpufreq/brcmstb-avs-cpufreq.c         |  4 +---
+>  drivers/cpufreq/cppc_cpufreq.c                |  4 +---
+>  drivers/cpufreq/intel_pstate.c                |  3 +--
+>  drivers/cpufreq/longhaul.c                    |  3 +--
+>  drivers/cpufreq/mediatek-cpufreq.c            |  6 ++---
+>  drivers/cpufreq/powernv-cpufreq.c             |  6 ++---
+>  drivers/cpufreq/s5pv210-cpufreq.c             |  3 +--
+>  drivers/cpufreq/tegra186-cpufreq.c            |  3 +--
+>  drivers/devfreq/governor_passive.c            | 19 ++++-----------
+>  drivers/gpu/drm/i915/gt/intel_llc.c           |  3 +--
+>  drivers/macintosh/windfarm_cpufreq_clamp.c    |  4 +---
+>  drivers/powercap/dtpm_cpu.c                   | 24 ++++++-------------
+>  drivers/thermal/imx_thermal.c                 |  7 ++----
+>  .../ti-soc-thermal/ti-thermal-common.c        |  5 +---
+>  kernel/power/energy_model.c                   |  7 ++----
+>  18 files changed, 40 insertions(+), 93 deletions(-)
 > 
->  arch/riscv/kvm/vcpu.c | 13 +++++++++++--
->  1 file changed, 11 insertions(+), 2 deletions(-)
-> 
-> diff --git a/arch/riscv/kvm/vcpu.c b/arch/riscv/kvm/vcpu.c
-> index f001e5640..e50d1f76c 100644
-> --- a/arch/riscv/kvm/vcpu.c
-> +++ b/arch/riscv/kvm/vcpu.c
-> @@ -25,6 +25,8 @@
->  #define CREATE_TRACE_POINTS
->  #include "trace.h"
+> diff --git a/arch/arm64/kernel/topology.c b/arch/arm64/kernel/topology.c
+> index 5d07ee85bdae..e3cb6d54f35b 100644
+> --- a/arch/arm64/kernel/topology.c
+> +++ b/arch/arm64/kernel/topology.c
+> @@ -307,17 +307,16 @@ int arch_freq_get_on_cpu(int cpu)
+>  		 */
+>  		if (!housekeeping_cpu(cpu, HK_TYPE_TICK) ||
+>  		    time_is_before_jiffies(last_update + msecs_to_jiffies(AMU_SAMPLE_EXP_MS))) {
+> -			struct cpufreq_policy *policy = cpufreq_cpu_get(cpu);
+> +			struct cpufreq_policy *policy __free(put_cpufreq_policy);
+>  			int ref_cpu;
 >  
-> +static DEFINE_PER_CPU(struct kvm_vcpu *, kvm_former_vcpu);
+> +			policy = cpufreq_cpu_get(cpu);
+>  			if (!policy)
+>  				return -EINVAL;
+>  
+>  			if (!cpumask_intersects(policy->related_cpus,
+> -						housekeeping_cpumask(HK_TYPE_TICK))) {
+> -				cpufreq_cpu_put(policy);
+> +						housekeeping_cpumask(HK_TYPE_TICK)))
+>  				return -EOPNOTSUPP;
+> -			}
+>  
+>  			for_each_cpu_wrap(ref_cpu, policy->cpus, cpu + 1) {
+>  				if (ref_cpu == start_cpu) {
+> @@ -329,8 +328,6 @@ int arch_freq_get_on_cpu(int cpu)
+>  					break;
+>  			}
+>  
+> -			cpufreq_cpu_put(policy);
+> -
+>  			if (ref_cpu >= nr_cpu_ids)
+>  				/* No alternative to pull info from */
+>  				return -EAGAIN;
+> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+> index a1c49bc681c4..2a825f4ec701 100644
+> --- a/arch/x86/kvm/x86.c
+> +++ b/arch/x86/kvm/x86.c
+> @@ -9492,16 +9492,14 @@ static void kvm_timer_init(void)
+>  		max_tsc_khz = tsc_khz;
+>  
+>  		if (IS_ENABLED(CONFIG_CPU_FREQ)) {
+> -			struct cpufreq_policy *policy;
+> +			struct cpufreq_policy *policy __free(put_cpufreq_policy);
+>  			int cpu;
+>  
+>  			cpu = get_cpu();
+>  			policy = cpufreq_cpu_get(cpu);
+> -			if (policy) {
+> -				if (policy->cpuinfo.max_freq)
+> -					max_tsc_khz = policy->cpuinfo.max_freq;
+> -				cpufreq_cpu_put(policy);
+> -			}
+> +			if (policy && policy->cpuinfo.max_freq)
+> +				max_tsc_khz = policy->cpuinfo.max_freq;
 > +
->  const struct _kvm_stats_desc kvm_vcpu_stats_desc[] = {
->  	KVM_GENERIC_VCPU_STATS(),
->  	STATS_DESC_COUNTER(VCPU, ecall_exit_stat),
-> @@ -581,6 +583,10 @@ void kvm_arch_vcpu_load(struct kvm_vcpu *vcpu, int cpu)
->  	struct kvm_vcpu_csr *csr = &vcpu->arch.guest_csr;
->  	struct kvm_vcpu_config *cfg = &vcpu->arch.cfg;
+>  			put_cpu();
+>  		}
+>  		cpufreq_register_notifier(&kvmclock_cpufreq_notifier_block,
+> diff --git a/drivers/acpi/processor_thermal.c b/drivers/acpi/processor_thermal.c
+> index 1219adb11ab9..8367a81c4842 100644
+> --- a/drivers/acpi/processor_thermal.c
+> +++ b/drivers/acpi/processor_thermal.c
+> @@ -64,17 +64,14 @@ static int phys_package_first_cpu(int cpu)
 >  
-> +	if  (vcpu == __this_cpu_read(kvm_former_vcpu) &&
-> +		vcpu->arch.last_exit_cpu == cpu)
+>  static int cpu_has_cpufreq(unsigned int cpu)
+>  {
+> -	struct cpufreq_policy *policy;
+> +	struct cpufreq_policy *policy __free(put_cpufreq_policy);
+>  
+>  	if (!acpi_processor_cpufreq_init)
+>  		return 0;
+>  
+>  	policy = cpufreq_cpu_get(cpu);
+> -	if (policy) {
+> -		cpufreq_cpu_put(policy);
+> -		return 1;
+> -	}
+> -	return 0;
+> +
+> +	return !!policy;
+>  }
+>  
+>  static int cpufreq_get_max_state(unsigned int cpu)
+> @@ -95,7 +92,7 @@ static int cpufreq_get_cur_state(unsigned int cpu)
+>  
+>  static int cpufreq_set_cur_state(unsigned int cpu, int state)
+>  {
+> -	struct cpufreq_policy *policy;
+> +	struct cpufreq_policy *policy __free(put_cpufreq_policy);
+>  	struct acpi_processor *pr;
+>  	unsigned long max_freq;
+>  	int i, ret;
+> @@ -127,8 +124,6 @@ static int cpufreq_set_cur_state(unsigned int cpu, int state)
+>  		max_freq = (policy->cpuinfo.max_freq *
+>  			    (100 - reduction_step(i) * cpufreq_thermal_reduction_pctg)) / 100;
+>  
+> -		cpufreq_cpu_put(policy);
+> -
+>  		ret = freq_qos_update_request(&pr->thermal_req, max_freq);
+>  		if (ret < 0) {
+>  			pr_warn("Failed to update thermal freq constraint: CPU%d (%d)\n",
+> diff --git a/drivers/cpufreq/brcmstb-avs-cpufreq.c b/drivers/cpufreq/brcmstb-avs-cpufreq.c
+> index 5940d262374f..71450cca8e9f 100644
+> --- a/drivers/cpufreq/brcmstb-avs-cpufreq.c
+> +++ b/drivers/cpufreq/brcmstb-avs-cpufreq.c
+> @@ -480,7 +480,7 @@ static bool brcm_avs_is_firmware_loaded(struct private_data *priv)
+>  
+>  static unsigned int brcm_avs_cpufreq_get(unsigned int cpu)
+>  {
+> -	struct cpufreq_policy *policy = cpufreq_cpu_get(cpu);
+> +	struct cpufreq_policy *policy __free(put_cpufreq_policy) = cpufreq_cpu_get(cpu);
+>  	struct private_data *priv;
+>  
+>  	if (!policy)
+> @@ -488,8 +488,6 @@ static unsigned int brcm_avs_cpufreq_get(unsigned int cpu)
+>  
+>  	priv = policy->driver_data;
+>  
+> -	cpufreq_cpu_put(policy);
+> -
+>  	return brcm_avs_get_frequency(priv->base);
+>  }
+>  
+> diff --git a/drivers/cpufreq/cppc_cpufreq.c b/drivers/cpufreq/cppc_cpufreq.c
+> index 4a17162a392d..7183754b1f31 100644
+> --- a/drivers/cpufreq/cppc_cpufreq.c
+> +++ b/drivers/cpufreq/cppc_cpufreq.c
+> @@ -726,7 +726,7 @@ static int cppc_get_perf_ctrs_sample(int cpu,
+>  static unsigned int cppc_cpufreq_get_rate(unsigned int cpu)
+>  {
+>  	struct cppc_perf_fb_ctrs fb_ctrs_t0 = {0}, fb_ctrs_t1 = {0};
+> -	struct cpufreq_policy *policy = cpufreq_cpu_get(cpu);
+> +	struct cpufreq_policy *policy __free(put_cpufreq_policy) = cpufreq_cpu_get(cpu);
+>  	struct cppc_cpudata *cpu_data;
+>  	u64 delivered_perf;
+>  	int ret;
+> @@ -736,8 +736,6 @@ static unsigned int cppc_cpufreq_get_rate(unsigned int cpu)
+>  
+>  	cpu_data = policy->driver_data;
+>  
+> -	cpufreq_cpu_put(policy);
+> -
+>  	ret = cppc_get_perf_ctrs_sample(cpu, &fb_ctrs_t0, &fb_ctrs_t1);
+>  	if (ret) {
+>  		if (ret == -EFAULT)
+> diff --git a/drivers/cpufreq/intel_pstate.c b/drivers/cpufreq/intel_pstate.c
+> index f366d35c5840..fb962140af56 100644
+> --- a/drivers/cpufreq/intel_pstate.c
+> +++ b/drivers/cpufreq/intel_pstate.c
+> @@ -1698,7 +1698,7 @@ static ssize_t store_no_turbo(struct kobject *a, struct kobj_attribute *b,
+>  static void update_qos_request(enum freq_qos_req_type type)
+>  {
+>  	struct freq_qos_request *req;
+> -	struct cpufreq_policy *policy;
+> +	struct cpufreq_policy *policy __free(put_cpufreq_policy);
+>  	int i;
+>  
+>  	for_each_possible_cpu(i) {
+> @@ -1710,7 +1710,6 @@ static void update_qos_request(enum freq_qos_req_type type)
+>  			continue;
+>  
+>  		req = policy->driver_data;
+> -		cpufreq_cpu_put(policy);
+>  
+>  		if (!req)
+>  			continue;
+> diff --git a/drivers/cpufreq/longhaul.c b/drivers/cpufreq/longhaul.c
+> index ba0e08c8486a..ae5596919671 100644
+> --- a/drivers/cpufreq/longhaul.c
+> +++ b/drivers/cpufreq/longhaul.c
+> @@ -950,7 +950,7 @@ static int __init longhaul_init(void)
+>  
+>  static void __exit longhaul_exit(void)
+>  {
+> -	struct cpufreq_policy *policy = cpufreq_cpu_get(0);
+> +	struct cpufreq_policy *policy __free(put_cpufreq_policy) = cpufreq_cpu_get(0);
+>  	int i;
+>  
+>  	for (i = 0; i < numscales; i++) {
+> @@ -968,7 +968,6 @@ static void __exit longhaul_exit(void)
+>  		}
+>  	}
+>  
+> -	cpufreq_cpu_put(policy);
+>  	cpufreq_unregister_driver(&longhaul_driver);
+>  	kfree(longhaul_table);
+>  }
+> diff --git a/drivers/cpufreq/mediatek-cpufreq.c b/drivers/cpufreq/mediatek-cpufreq.c
+> index f3f02c4b6888..1fae060e16d9 100644
+> --- a/drivers/cpufreq/mediatek-cpufreq.c
+> +++ b/drivers/cpufreq/mediatek-cpufreq.c
+> @@ -320,7 +320,7 @@ static int mtk_cpufreq_opp_notifier(struct notifier_block *nb,
+>  	struct dev_pm_opp *new_opp;
+>  	struct mtk_cpu_dvfs_info *info;
+>  	unsigned long freq, volt;
+> -	struct cpufreq_policy *policy;
+> +	struct cpufreq_policy *policy __free(put_cpufreq_policy);
+>  	int ret = 0;
+>  
+>  	info = container_of(nb, struct mtk_cpu_dvfs_info, opp_nb);
+> @@ -354,11 +354,9 @@ static int mtk_cpufreq_opp_notifier(struct notifier_block *nb,
+>  
+>  			dev_pm_opp_put(new_opp);
+>  			policy = cpufreq_cpu_get(info->opp_cpu);
+> -			if (policy) {
+> +			if (policy)
+>  				cpufreq_driver_target(policy, freq / 1000,
+>  						      CPUFREQ_RELATION_L);
+> -				cpufreq_cpu_put(policy);
+> -			}
+>  		}
+>  	}
+>  
+> diff --git a/drivers/cpufreq/powernv-cpufreq.c b/drivers/cpufreq/powernv-cpufreq.c
+> index 7d9a5f656de8..ea9d78bbeb38 100644
+> --- a/drivers/cpufreq/powernv-cpufreq.c
+> +++ b/drivers/cpufreq/powernv-cpufreq.c
+> @@ -892,7 +892,7 @@ static int powernv_cpufreq_reboot_notifier(struct notifier_block *nb,
+>  				unsigned long action, void *unused)
+>  {
+>  	int cpu;
+> -	struct cpufreq_policy *cpu_policy;
+> +	struct cpufreq_policy *policy __free(put_cpufreq_policy);
 
-Why was the vcpu->scheduled_out check dropped? The changelog doesn't
-mention that and the commit message still states that it is checked.
+There's a typo here. I got a compile error because of wrong variable name.
 
 Thanks,
-drew
-
-> +		goto csr_restore_done;
-> +
->  	if (kvm_riscv_nacl_sync_csr_available()) {
->  		nsh = nacl_shmem();
->  		nacl_csr_write(nsh, CSR_VSSTATUS, csr->vsstatus);
-> @@ -624,6 +630,9 @@ void kvm_arch_vcpu_load(struct kvm_vcpu *vcpu, int cpu)
->  
->  	kvm_riscv_mmu_update_hgatp(vcpu);
->  
-> +	kvm_riscv_vcpu_aia_load(vcpu, cpu);
-> +
-> +csr_restore_done:
->  	kvm_riscv_vcpu_timer_restore(vcpu);
->  
->  	kvm_riscv_vcpu_host_fp_save(&vcpu->arch.host_context);
-> @@ -633,8 +642,6 @@ void kvm_arch_vcpu_load(struct kvm_vcpu *vcpu, int cpu)
->  	kvm_riscv_vcpu_guest_vector_restore(&vcpu->arch.guest_context,
->  					    vcpu->arch.isa);
->  
-> -	kvm_riscv_vcpu_aia_load(vcpu, cpu);
-> -
->  	kvm_make_request(KVM_REQ_STEAL_UPDATE, vcpu);
->  
->  	vcpu->cpu = cpu;
-> @@ -645,6 +652,8 @@ void kvm_arch_vcpu_put(struct kvm_vcpu *vcpu)
->  	void *nsh;
->  	struct kvm_vcpu_csr *csr = &vcpu->arch.guest_csr;
->  
-> +	__this_cpu_write(kvm_former_vcpu, vcpu);
-> +
->  	vcpu->cpu = -1;
->  
->  	kvm_riscv_vcpu_aia_put(vcpu);
-> -- 
-> 2.43.0
-> 
+Gautam
 
