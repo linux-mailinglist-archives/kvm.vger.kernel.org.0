@@ -1,202 +1,144 @@
-Return-Path: <kvm+bounces-55707-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-55708-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id B2AB2B34F86
-	for <lists+kvm@lfdr.de>; Tue, 26 Aug 2025 01:08:34 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id D4510B34F89
+	for <lists+kvm@lfdr.de>; Tue, 26 Aug 2025 01:09:12 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id D0BA67A3064
-	for <lists+kvm@lfdr.de>; Mon, 25 Aug 2025 23:06:58 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7F4752A67DC
+	for <lists+kvm@lfdr.de>; Mon, 25 Aug 2025 23:09:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 516A42BEFE5;
-	Mon, 25 Aug 2025 23:08:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CFC392C033C;
+	Mon, 25 Aug 2025 23:09:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="07VBr36x"
+	dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b="GTT5fOzU"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pj1-f73.google.com (mail-pj1-f73.google.com [209.85.216.73])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0804323D7C3
-	for <kvm@vger.kernel.org>; Mon, 25 Aug 2025 23:08:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.73
+Received: from linux.microsoft.com (linux.microsoft.com [13.77.154.182])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 95EA723D7C3;
+	Mon, 25 Aug 2025 23:09:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=13.77.154.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756163303; cv=none; b=u095oKyibaBXSAl1rQqF51+A9ApZb4+QynshHh1B46GQ2j/C9eeyNLAh1WeUaCc6AdcZ4a5Xi1mBackdghYkliEjIE6Mh9egON9QBT30B+zwCWFcyPuLtSY5LAo5+PAhyI9PJ4oje06XcCNS6AlqIvLeCb4KqctFBo25ra+Uq2M=
+	t=1756163342; cv=none; b=kn5irwqVbgONcPwayA2oknlYpS0427wJMCJg1pF/wg5VZ1oATBGz3YNCg9ybFJGsncGGQkwViKO6Zd+oxbbUtzj8OikyCYvQ/m+ursH2PWSMYlhnO7dRB32e8vftUEO6oVg/RnHFmITyB1Mb/AdXCPterrC0xCEInUAiKmbc+AY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756163303; c=relaxed/simple;
-	bh=JnpQNhUrspUsEG6Bk+5IiCAKB5CxWFoNLMNhiIbFz6Q=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=hPkL2Uyi32SPtYUYGBw64WdrAw/BXS8Mmpt6KobIJ9HyU5KyLJ+kpIzmPeT+fOQ4OLOXJOiyTyCKrdkqY/4MCMhKXsegCztOXF3c0Mftc9D/ygzaEUMrAD+uswwMVxLjECxjYKnc7kN5aKNjA7nE6B/TeSfw4gv1jg9o0+1xmuE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--ackerleytng.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=07VBr36x; arc=none smtp.client-ip=209.85.216.73
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--ackerleytng.bounces.google.com
-Received: by mail-pj1-f73.google.com with SMTP id 98e67ed59e1d1-324e4c3af5fso5068679a91.3
-        for <kvm@vger.kernel.org>; Mon, 25 Aug 2025 16:08:21 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1756163301; x=1756768101; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=6PJFrEMJOsfQGkwPQ/N5M5tBh51DW0OHIWOkD4RTR+M=;
-        b=07VBr36xewHbXVYao/wy2JKQtWS3mcXizRpT4epjl1fyqgnU5D450q6W156gEUoUdL
-         V67Rr+JjdHwpFTQ9hplR5x+NUhQzm7mCZuoDon8BQ9PiMw724cceKgE3uKXSZhfy3mMQ
-         NtjyFvZJ6XdSjO0S20h96qWzpPU+UkPh5xzlbB+7V3YlP8nn85otzIhdfi9UuJK2ysbM
-         4OUjU7ro6dO5QC6QrtrfJUYWzAQn5Qmjfrxfz9opvYiyjxKsdPFpfw5UE+DfnDi5H0/M
-         9DbsKjMIFqfSX4dvvyMnsRKi3PDiToRynavg/YP9DZs9V1xknQlUB7PlAZjVtjjmLqJV
-         7Ghw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1756163301; x=1756768101;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=6PJFrEMJOsfQGkwPQ/N5M5tBh51DW0OHIWOkD4RTR+M=;
-        b=Bz+c47KZeHJYB4DGCn2riwN6fu894flBghBmZuY8Un1LQIVQJCuF93SB+Lv/g/dp2N
-         FPlP8Ak1wkOl7CSm0EkOcsUu0WdNdTUCepNuoTUhukcSNSAQYVNQ/E1OBa+MQRMHQqDV
-         kP1XnT88h0DDmnda/aL/Vz20X3c5wLoJR7/p714TzaETEWXAmQiP1wV6v1i1mdaRuoFg
-         6l9g0X37ms5hBRa4teTTMZr+05hRgXdJj8iI7iRFpaazqDck4wr1V4i+U2j8Vbk74l/l
-         zf3vuwLWjJzEJPveZhdMXTPhkfma1y+nObJ7Ny0/Q6fzA9kf884nribASs4dhcXvwU+/
-         Phxw==
-X-Forwarded-Encrypted: i=1; AJvYcCXlnmYUMJVLL/LeRGEP4BJqJqbxJYB+3bDk4un+joqGC1+RfZGtA27tOcQ9Rj92cDKErHM=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwF9f02Rj1vrkGnpOgYxfDlJX9e0GyNYPG1XlGtiH07V1HXPEyB
-	jDbIQVLjnzd8lhx0+VpYk12018AAukaeWIeAfqtyUr5+3CJWSyeTL7vrNeH92ek1T3q0xnf1fVg
-	l3VYWL2y6sCpb2Kdj/MgwloeEBg==
-X-Google-Smtp-Source: AGHT+IGrq+HLRwUNYqwfx0diY7kjY6ycSz8/ZKkUZKHTSFbsyen18fZ+mR6CbkMqwPv1W2G7A6frXbr5O63R9MtgwQ==
-X-Received: from pjbpl15.prod.google.com ([2002:a17:90b:268f:b0:325:220a:dd41])
- (user=ackerleytng job=prod-delivery.src-stubby-dispatcher) by
- 2002:a17:90b:3f88:b0:31c:36f5:d95 with SMTP id 98e67ed59e1d1-32515e2b881mr14983372a91.2.1756163301311;
- Mon, 25 Aug 2025 16:08:21 -0700 (PDT)
-Date: Mon, 25 Aug 2025 16:08:19 -0700
-In-Reply-To: <20250613005400.3694904-2-michael.roth@amd.com>
+	s=arc-20240116; t=1756163342; c=relaxed/simple;
+	bh=Fz172bfnT2fDc0B5BW9KQC8VQwSCH+A00nsF+R3Nznk=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=hz+aKgpJdS3JUod7kXUBD2/nkVJSpiysPW4oa4ySdYm3lpsEga2G1EqOQKu94HiY+ebSQtbFESFb6CiU8vrPHVEbe8eJSQWcuk4JbRcb1SlJ3du8gHgWHCDemEaKkRsqSQJDHZH2uLBS++ih/zQWEhX1jmSwA7teJ9QtS01DZSY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com; spf=pass smtp.mailfrom=linux.microsoft.com; dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b=GTT5fOzU; arc=none smtp.client-ip=13.77.154.182
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.microsoft.com
+Received: from [100.64.0.200] (unknown [20.29.225.195])
+	by linux.microsoft.com (Postfix) with ESMTPSA id 1E032211829D;
+	Mon, 25 Aug 2025 16:08:59 -0700 (PDT)
+DKIM-Filter: OpenDKIM Filter v2.11.0 linux.microsoft.com 1E032211829D
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.microsoft.com;
+	s=default; t=1756163339;
+	bh=yjj+T4F6X5Rb2NiUbWNootXcw5MYUgeaYi89zI0rqQM=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=GTT5fOzUX6bjgmJRyTtl5Nlh5JACcr0YCsgajA504/VguHTsD2kG9KDvDG5alk+gF
+	 AlqgkFhhFVQMT3abN68Y5Bm44usX4MzHqG7q2W8uP1gfSybPvK8eBGyTYKXvPevQWI
+	 Yg63eHOsilGGsMx/M0Y6URyOnRsPjGUV5RxxijdQ=
+Message-ID: <3188ca61-2591-4576-9777-1671689b7235@linux.microsoft.com>
+Date: Mon, 25 Aug 2025 16:08:45 -0700
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20250613005400.3694904-1-michael.roth@amd.com> <20250613005400.3694904-2-michael.roth@amd.com>
-Message-ID: <diqztt1vf198.fsf@google.com>
-Subject: Re: [PATCH RFC v1 1/5] KVM: guest_memfd: Remove preparation tracking
-From: Ackerley Tng <ackerleytng@google.com>
-To: Michael Roth <michael.roth@amd.com>, kvm@vger.kernel.org
-Cc: linux-coco@lists.linux.dev, linux-mm@kvack.org, 
-	linux-kernel@vger.kernel.org, david@redhat.com, tabba@google.com, 
-	vannapurve@google.com, ira.weiny@intel.com, thomas.lendacky@amd.com, 
-	pbonzini@redhat.com, seanjc@google.com, vbabka@suse.cz, joro@8bytes.org, 
-	pratikrajesh.sampat@amd.com, liam.merwick@oracle.com, yan.y.zhao@intel.com, 
-	aik@amd.com
-Content-Type: text/plain; charset="UTF-8"
+MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 0/5] Drivers: hv: Fix NEED_RESCHED_LAZY and use common
+ APIs
+To: Sean Christopherson <seanjc@google.com>, Marc Zyngier <maz@kernel.org>,
+ Oliver Upton <oliver.upton@linux.dev>,
+ Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>,
+ Tianrui Zhao <zhaotianrui@loongson.cn>, Bibo Mao <maobibo@loongson.cn>,
+ Huacai Chen <chenhuacai@kernel.org>, Anup Patel <anup@brainfault.org>,
+ Paul Walmsley <paul.walmsley@sifive.com>, Palmer Dabbelt
+ <palmer@dabbelt.com>, Albert Ou <aou@eecs.berkeley.edu>,
+ Paolo Bonzini <pbonzini@redhat.com>, Thomas Gleixner <tglx@linutronix.de>,
+ Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+ Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org,
+ "K. Y. Srinivasan" <kys@microsoft.com>,
+ Haiyang Zhang <haiyangz@microsoft.com>, Wei Liu <wei.liu@kernel.org>,
+ Dexuan Cui <decui@microsoft.com>, Peter Zijlstra <peterz@infradead.org>,
+ Andy Lutomirski <luto@kernel.org>, "Paul E. McKenney" <paulmck@kernel.org>,
+ Frederic Weisbecker <frederic@kernel.org>,
+ Neeraj Upadhyay <neeraj.upadhyay@kernel.org>,
+ Joel Fernandes <joelagnelf@nvidia.com>, Josh Triplett
+ <josh@joshtriplett.org>, Boqun Feng <boqun.feng@gmail.com>,
+ Uladzislau Rezki <urezki@gmail.com>
+Cc: linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+ kvmarm@lists.linux.dev, kvm@vger.kernel.org, loongarch@lists.linux.dev,
+ kvm-riscv@lists.infradead.org, linux-riscv@lists.infradead.org,
+ linux-hyperv@vger.kernel.org, rcu@vger.kernel.org
+References: <20250825200622.3759571-1-seanjc@google.com>
+Content-Language: en-US
+From: Nuno Das Neves <nunodasneves@linux.microsoft.com>
+In-Reply-To: <20250825200622.3759571-1-seanjc@google.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-Michael Roth <michael.roth@amd.com> writes:
-
-> guest_memfd currently uses the folio uptodate flag to track:
->
->   1) whether or not a page had been cleared before initial usage
->   2) whether or not the architecture hooks have been issued to put the
->      page in a private state as defined by the architecture
->
-> In practice, 2) is only actually being tracked for SEV-SNP VMs, and
-> there do not seem to be any plans/reasons that would suggest this will
-> change in the future, so this additional tracking/complexity is not
-> really providing any general benefit to guest_memfd users. Future plans
-> around in-place conversion and hugepage support, where the per-folio
-> uptodate flag is planned to be used purely to track the initial clearing
-> of folios, whereas conversion operations could trigger multiple
-> transitions between 'prepared' and 'unprepared' and thus need separate
-> tracking, will make the burden of tracking this information within
-> guest_memfd even more complex, since preparation generally happens
-> during fault time, on the "read-side" of any global locks that might
-> protect state tracked by guest_memfd, and so may require more complex
-> locking schemes to allow for concurrent handling of page faults for
-> multiple vCPUs where the "preparedness" state tracked by guest_memfd
-> might need to be updated as part of handling the fault.
->
-> Instead of keeping this current/future complexity within guest_memfd for
-> what is essentially just SEV-SNP, just drop the tracking for 2) and have
-> the arch-specific preparation hooks get triggered unconditionally on
-> every fault so the arch-specific hooks can check the preparation state
-> directly and decide whether or not a folio still needs additional
-> preparation. In the case of SEV-SNP, the preparation state is already
-> checked again via the preparation hooks to avoid double-preparation, so
-> nothing extra needs to be done to update the handling of things there.
->
-> Signed-off-by: Michael Roth <michael.roth@amd.com>
-> ---
->  virt/kvm/guest_memfd.c | 47 ++++++++++++++----------------------------
->  1 file changed, 15 insertions(+), 32 deletions(-)
->
-> diff --git a/virt/kvm/guest_memfd.c b/virt/kvm/guest_memfd.c
-> index 35f94a288e52..cc93c502b5d8 100644
-> --- a/virt/kvm/guest_memfd.c
-> +++ b/virt/kvm/guest_memfd.c
-> @@ -421,11 +421,6 @@ static int __kvm_gmem_prepare_folio(struct kvm *kvm, struct kvm_memory_slot *slo
->  	return 0;
->  }
->  
-> -static inline void kvm_gmem_mark_prepared(struct folio *folio)
-> -{
-> -	folio_mark_uptodate(folio);
-> -}
-> -
->  /*
->   * Process @folio, which contains @gfn, so that the guest can use it.
->   * The folio must be locked and the gfn must be contained in @slot.
-> @@ -435,13 +430,7 @@ static inline void kvm_gmem_mark_prepared(struct folio *folio)
->  static int kvm_gmem_prepare_folio(struct kvm *kvm, struct kvm_memory_slot *slot,
->  				  gfn_t gfn, struct folio *folio)
->  {
-> -	unsigned long nr_pages, i;
->  	pgoff_t index;
-> -	int r;
-> -
-> -	nr_pages = folio_nr_pages(folio);
-> -	for (i = 0; i < nr_pages; i++)
-> -		clear_highpage(folio_page(folio, i));
->  
->  	/*
->  	 * Preparing huge folios should always be safe, since it should
-> @@ -459,11 +448,8 @@ static int kvm_gmem_prepare_folio(struct kvm *kvm, struct kvm_memory_slot *slot,
-
-While working on HugeTLB support for guest_memfd, I added a test that
-tries to map a non-huge-page-aligned gmem.pgoff to a huge-page aligned
-gfn.
-
-I understand that config would destroy the performance advantages of
-huge pages, but I think the test is necessary since Yan brought up the
-use case here [1].
-
-The conclusion in that thread, I believe, was to allow binding of
-unaligned GFNs to offsets, but disallow large pages in that case. The
-next series for guest_memfd HugeTLB support will include a fix similar
-to this [2].
-
-While testing, I hit this WARN_ON with a non-huge-page-aligned
-gmem.pgoff.
-
->  	WARN_ON(!IS_ALIGNED(slot->gmem.pgoff, 1 << folio_order(folio)));
-
-Do you all think this WARN_ON can be removed?
-
-Also, do you think kvm_gmem_prepare_folio()s interface should perhaps be
-changed to take pfn, gfn, nr_pages (PAGE_SIZE pages) and level?
-
-I think taking a folio is kind of awkward since we're not really setting
-up the folio, we're setting up something mapping-related for the
-folio. Also, kvm_gmem_invalidate() doesn't take folios, which is more
-aligned with invalidating mappings rather than something folio-related.
-
-[1] https://lore.kernel.org/all/aA7UXI0NB7oQQrL2@yzhao56-desk.sh.intel.com/
-[2] https://github.com/googleprodkernel/linux-cc/commit/371ed9281e0c9ba41cfdc20b48a6c5566f61a7df
-
->  	index = gfn - slot->base_gfn + slot->gmem.pgoff;
->  	index = ALIGN_DOWN(index, 1 << folio_order(folio));
-> -	r = __kvm_gmem_prepare_folio(kvm, slot, index, folio);
-> -	if (!r)
-> -		kvm_gmem_mark_prepared(folio);
->  
-> -	return r;
-> +	return __kvm_gmem_prepare_folio(kvm, slot, index, folio);
->  }
->  
+On 8/25/2025 1:06 PM, Sean Christopherson wrote:
+> Fix a bug where MSHV root partitions don't honor NEED_RESCHED_LAZY, and then
+> deduplicate the TIF related MSHV code by turning the "kvm" entry APIs into
+> more generic "virt" APIs (which ideally would have been done when MSHV root
+> support was added).
 > 
-> [...snip...]
+> Assuming all is well, maybe this could go through the tip tree?
 > 
+> The Hyper-V stuff and non-x86 architectures are compile-tested only.
+> 
+
+Thanks Sean, I can test the root partition changes.
+
+A similar change will be needed in mshv_vtl_main.c since it also calls
+mshv_do_pre_guest_mode_work() (hence the "common" in mshv_common.c).
+
+Also, is it possible to make all the mshv driver changes in a single patch?
+It seems like it would be cleaner than refactoring it in patches 1 & 2 and
+then deleting all the refactored code in patch 5.
+
+Thanks
+Nuno
+
+> Sean Christopherson (5):
+>   Drivers: hv: Move TIF pre-guest work handling fully into mshv_common.c
+>   Drivers: hv: Handle NEED_RESCHED_LAZY before transferring to guest
+>   entry/kvm: KVM: Move KVM details related to signal/-EINTR into KVM
+>     proper
+>   entry: Rename "kvm" entry code assets to "virt" to genericize APIs
+>   Drivers: hv: Use common "entry virt" APIs to do work before running
+>     guest
+> 
+>  MAINTAINERS                                 |  2 +-
+>  arch/arm64/kvm/Kconfig                      |  2 +-
+>  arch/arm64/kvm/arm.c                        |  3 +-
+>  arch/loongarch/kvm/Kconfig                  |  2 +-
+>  arch/loongarch/kvm/vcpu.c                   |  3 +-
+>  arch/riscv/kvm/Kconfig                      |  2 +-
+>  arch/riscv/kvm/vcpu.c                       |  3 +-
+>  arch/x86/kvm/Kconfig                        |  2 +-
+>  arch/x86/kvm/vmx/vmx.c                      |  1 -
+>  arch/x86/kvm/x86.c                          |  3 +-
+>  drivers/hv/Kconfig                          |  1 +
+>  drivers/hv/mshv.h                           |  2 --
+>  drivers/hv/mshv_common.c                    | 22 ---------------
+>  drivers/hv/mshv_root_main.c                 | 31 ++++-----------------
+>  include/linux/{entry-kvm.h => entry-virt.h} | 19 +++++--------
+>  include/linux/kvm_host.h                    | 17 +++++++++--
+>  include/linux/rcupdate.h                    |  2 +-
+>  kernel/entry/Makefile                       |  2 +-
+>  kernel/entry/{kvm.c => virt.c}              | 15 ++++------
+>  kernel/rcu/tree.c                           |  6 ++--
+>  virt/kvm/Kconfig                            |  2 +-
+>  21 files changed, 49 insertions(+), 93 deletions(-)
+>  rename include/linux/{entry-kvm.h => entry-virt.h} (83%)
+>  rename kernel/entry/{kvm.c => virt.c} (66%)
+> 
+> 
+> base-commit: 1b237f190eb3d36f52dffe07a40b5eb210280e00
+
 
