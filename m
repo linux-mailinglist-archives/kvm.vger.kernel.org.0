@@ -1,60 +1,61 @@
-Return-Path: <kvm+bounces-55596-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-55597-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 715B1B33851
-	for <lists+kvm@lfdr.de>; Mon, 25 Aug 2025 09:58:12 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id AB18FB33855
+	for <lists+kvm@lfdr.de>; Mon, 25 Aug 2025 09:58:40 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 59B491896361
-	for <lists+kvm@lfdr.de>; Mon, 25 Aug 2025 07:58:32 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 760ED177D8F
+	for <lists+kvm@lfdr.de>; Mon, 25 Aug 2025 07:58:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 287E2299A94;
-	Mon, 25 Aug 2025 07:58:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A8E63299A94;
+	Mon, 25 Aug 2025 07:58:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="e6NZaX0d"
+	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="tSzE352A"
 X-Original-To: kvm@vger.kernel.org
-Received: from NAM10-MW2-obe.outbound.protection.outlook.com (mail-mw2nam10on2057.outbound.protection.outlook.com [40.107.94.57])
+Received: from NAM11-DM6-obe.outbound.protection.outlook.com (mail-dm6nam11on2071.outbound.protection.outlook.com [40.107.223.71])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7997C28850B;
-	Mon, 25 Aug 2025 07:58:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.94.57
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0F59B28A73A;
+	Mon, 25 Aug 2025 07:58:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.223.71
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756108682; cv=fail; b=Fu3PhX8ViCJu3to7maM3Q2dx8icgFDdJYkgJRYFENzLILiQkrNpAkG+MULURvm5FNzxonqi9TEdj8nfRHyD+NIhNhyRGUW51a1yzVMC77D4AUNZi+dyl/tNxlbkJ8sHRsd78VSjkxwz15NWpAcNFSMidxCo+APFtoMcZC/sVViY=
+	t=1756108706; cv=fail; b=Yxfvi0BhPevr9GAoHIEU7YINqYbh4hAKAHqcdU1U/r0zXvOLZdFPFBa0199EOjYcLquob0DJzmNHbKoAYaM7RfXmn6lHT2IFnjJwWCWdo/af954P4LUGAgMLmhQK3fWgTSGmeH1/CJlLHfA7PY+DakvbUSe8WCF7lePhb8Ged4Q=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756108682; c=relaxed/simple;
-	bh=7QrPpJ0CjhiSyex3aiBE9B/wgiX1cuKyWQE+Gzf5muc=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=uibt7mCHYEudm7cOn/oNYhUet/mhAGXNk4bzQKZWh5rzFYeU44pzkZIwfAMEUBPLKM1z/ljM/yxiE9UFQtPRwaoTM9Et44RVSJy58zc+e0RoisL3u4iFNGzzUhxCbFG76N1xMeEhZfSxv5jT49UT6xGIZksDnKReRC8cWlOehuw=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=e6NZaX0d; arc=fail smtp.client-ip=40.107.94.57
+	s=arc-20240116; t=1756108706; c=relaxed/simple;
+	bh=5YTQdeMaI9DurD1t8EX0y49ivXTMTfkw5pJyIfQTRsc=;
+	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=UV9o26sfYzuI9+kIhXnSL6maaTI0vy6spMCqls/vDX2dnA6I1meKC1mxHoHyGAxcVKgrstNvpw7y3iYlV44GOVNJjNqFnSIZpnrr/VISXuujmk4xJZJkwJ9g41XMEmUmfvje8RVKJAjykf511Lszc6GKpTRq7QfcHTKLm2rgvCE=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=tSzE352A; arc=fail smtp.client-ip=40.107.223.71
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
 Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=nN4OzJPnTlbQpcF1O24LsTP94g04B98RaD0UpjpA4KXh4o1Yb0Ehn6TWWjE3pj+R7jBZfzXNU5zB4uWHCjDIFnisTfq33DRsd8vDYJZwV78jMQmv+J+TZfhUO9BlVu/57gHd6QD3Yeu83u4Q9ch1YIb/3UatncGXQdnIIDUC8f7wUOK6qk0vwkngiLJj46KTcncqYi60Tx7v43SSPNFho9UTrtf48ff3FTiC2JqqOkog2x4x7Zk3rNGKbdiIZOkICvLQ5t9oCxXX9cjP31qr/QY8ZaAV5rCP//gp8L32tJPYpxShBMlvfsl7+MmDB3VqUc7xPF1CgJ0UqjZGimYdRA==
+ b=KwCDo6GdIBqD/LGgSt/Qj7F2Wpxck19f8lonH9gnx77U5n3OrMPbDgYFWQAfL7c0Hg4IN8U/EdqyEJiAfWUq3X/E8ztLuQ+e3uahtfb1LVG3KIU4S3A5AM93fOecrNLaINBHfCt4h8mVq8c7UublECxNBIDJHQP0NvMSRhBslTZz8CPNSfmGOCNf8hFOv1Y6qZ+yrK9AQtkMMgFMnqdUdC/FDKKnYgrIAPce88B/RzxZagqwk5EZs8dwp9Cx8zp82jkBZG49wfBGRHIN6oY6rmg5N0pwThnXHEOEy7pCnq+L6pAzt/iwHeFosclqh7rNT8OOVXUMVVnx8m8zz4pILg==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector10001;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=7iR/WBGh6HNCQGtUl0Nud70qsfeRAJ86W9sbK+z1V+0=;
- b=dViniQQXUO8ouUJflTYuD9RbUldvkZB3XfxH7jxayAhmR22SFFchJt+opYPSjqQv7mUy0o4mVQKzhrDKCyqWwrQ1Alk6mlJfIhs2ZMqoedmtQ7aaTj5YJby2yDYq4zH6urk8KKZepChSLNV7XgeWEwk48kVLy3x749LamZM8JxkOLuhhZGydR6SquRUMggV8IedVstwqdhNEJfPatxWk1oOmCmhr55NBDxFhU2amDMtARs0LusGoyc1g1YgNyDrGGJA/stKrTGN5ULWnvBWvkc5Hz9P1Zu8AzIjyH9W4S6PJ97gvOS4m1z5KY3e5b8J8SSY3PAEjinp9EUUOeOkI+g==
+ bh=iueddIUyFu8PVbO61lHKpSv9sxbUhllSHgn51tlLGRE=;
+ b=Pcg3BW8eIKKjGbk9Mg/mQtMrY6q+vL7kom+48SljU822d5FkW93oUi3tDDvdnAdNfP0AkVlI9MtkqTzJJBYFIcnHGDN0gqcw5vtitoTrV0AaD5CB7VkskN7FYwXHpcRvaCLh/R7Qb4i93nhP4pD4oauXBX0UMcngsui6PrdO0yBLeouY6PTtV/jUyRX+LKC0vayHzaeLK6PpzT2WshfFx2ey6xz5FDTlEwgnvPPEJQXBL+6c4P4gRFqwK8GwZZ9AeQONYg4sKOaM9YYZA/w8A4uIFMS7eTZ+r1z+P+DL4oSDsug1fF40gcucYWVRbVXc/dU0yRqV0mCiCIp9o3Ss5g==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
  165.204.84.17) smtp.rcpttodomain=linutronix.de smtp.mailfrom=amd.com;
  dmarc=pass (p=quarantine sp=quarantine pct=100) action=none
  header.from=amd.com; dkim=none (message not signed); arc=none (0)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=7iR/WBGh6HNCQGtUl0Nud70qsfeRAJ86W9sbK+z1V+0=;
- b=e6NZaX0dquJXf/eIOsLF1DIPvfYWzaSxwWd/tlYNeGTNxh40exDJhRviwiTj+p2Wmk1ItTv7r2ZMhyGe0kRNqTP4dcaURasKhWYy/dC6DtyXhhnY1NBd5boBw+aATX22BpNLzrxJ1gVErkr/DmUv0G9yNXyzp9++HzwLlexpaj0=
-Received: from SA1P222CA0108.NAMP222.PROD.OUTLOOK.COM (2603:10b6:806:3c5::29)
- by CH1PR12MB9621.namprd12.prod.outlook.com (2603:10b6:610:2b2::5) with
+ bh=iueddIUyFu8PVbO61lHKpSv9sxbUhllSHgn51tlLGRE=;
+ b=tSzE352AMT4AV0gM3Y25VobidHKIrnQkkGnICDACAJeSDjI0Wbdo9TFKP/hgyrSlyvM3tmtPJUXgisYfk815/eg0vKmaVo6xqf+T3itgvsWTaA/FaYv7TAdgxcmHXLDdpJnxp+QyRHBDiiDSAEudOccVPgiqQXfM+6dSe6oIiX8=
+Received: from SA1P222CA0074.NAMP222.PROD.OUTLOOK.COM (2603:10b6:806:2c1::20)
+ by MW4PR12MB7333.namprd12.prod.outlook.com (2603:10b6:303:21b::11) with
  Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9052.20; Mon, 25 Aug
- 2025 07:57:56 +0000
-Received: from SA2PEPF00003AE6.namprd02.prod.outlook.com
- (2603:10b6:806:3c5:cafe::a4) by SA1P222CA0108.outlook.office365.com
- (2603:10b6:806:3c5::29) with Microsoft SMTP Server (version=TLS1_3,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9009.16; Mon, 25 Aug
+ 2025 07:58:20 +0000
+Received: from SA2PEPF00003AE7.namprd02.prod.outlook.com
+ (2603:10b6:806:2c1:cafe::c9) by SA1P222CA0074.outlook.office365.com
+ (2603:10b6:806:2c1::20) with Microsoft SMTP Server (version=TLS1_3,
  cipher=TLS_AES_256_GCM_SHA384) id 15.20.9052.22 via Frontend Transport; Mon,
- 25 Aug 2025 07:57:55 +0000
+ 25 Aug 2025 07:58:20 +0000
 X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
  smtp.mailfrom=amd.com; dkim=none (message not signed)
  header.d=none;dmarc=pass action=none header.from=amd.com;
@@ -62,13 +63,13 @@ Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
  165.204.84.17 as permitted sender) receiver=protection.outlook.com;
  client-ip=165.204.84.17; helo=SATLEXMB04.amd.com; pr=C
 Received: from SATLEXMB04.amd.com (165.204.84.17) by
- SA2PEPF00003AE6.mail.protection.outlook.com (10.167.248.6) with Microsoft
+ SA2PEPF00003AE7.mail.protection.outlook.com (10.167.248.7) with Microsoft
  SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.20.9052.8 via Frontend Transport; Mon, 25 Aug 2025 07:57:55 +0000
+ 15.20.9052.8 via Frontend Transport; Mon, 25 Aug 2025 07:58:20 +0000
 Received: from BLRKPRNAYAK.amd.com (10.180.168.240) by SATLEXMB04.amd.com
  (10.181.40.145) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.39; Mon, 25 Aug
- 2025 02:57:47 -0500
+ 2025 02:58:12 -0500
 From: K Prateek Nayak <kprateek.nayak@amd.com>
 To: Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>,
 	Borislav Petkov <bp@alien8.de>, Dave Hansen <dave.hansen@linux.intel.com>,
@@ -82,11 +83,13 @@ CC: Naveen rao <naveen.rao@amd.com>, Sairaj Kodilkar <sarunkod@amd.com>, "H.
 	<mario.limonciello@amd.com>, "Gautham R. Shenoy" <gautham.shenoy@amd.com>,
 	Babu Moger <babu.moger@amd.com>, Suravee Suthikulpanit
 	<suravee.suthikulpanit@amd.com>, K Prateek Nayak <kprateek.nayak@amd.com>,
-	Naveen N Rao <naveen@kernel.org>
-Subject: [PATCH v4 0/4] x86/cpu/topology: Fix the preferred order of initial APIC ID parsing on AMD/Hygon
-Date: Mon, 25 Aug 2025 07:57:28 +0000
-Message-ID: <20250825075732.10694-1-kprateek.nayak@amd.com>
+	Naveen N Rao <naveen@kernel.org>, <stable@vger.kernel.org>
+Subject: [PATCH v4 1/4] x86/cpu/topology: Use initial APIC ID from XTOPOLOGY leaf on AMD/HYGON
+Date: Mon, 25 Aug 2025 07:57:29 +0000
+Message-ID: <20250825075732.10694-2-kprateek.nayak@amd.com>
 X-Mailer: git-send-email 2.43.0
+In-Reply-To: <20250825075732.10694-1-kprateek.nayak@amd.com>
+References: <20250825075732.10694-1-kprateek.nayak@amd.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -99,210 +102,164 @@ X-ClientProxiedBy: SATLEXMB04.amd.com (10.181.40.145) To SATLEXMB04.amd.com
  (10.181.40.145)
 X-EOPAttributedMessage: 0
 X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: SA2PEPF00003AE6:EE_|CH1PR12MB9621:EE_
-X-MS-Office365-Filtering-Correlation-Id: d901b8a2-2839-4eee-932e-08dde3ad19bc
+X-MS-TrafficTypeDiagnostic: SA2PEPF00003AE7:EE_|MW4PR12MB7333:EE_
+X-MS-Office365-Filtering-Correlation-Id: 7b305f79-04f4-469b-66c0-08dde3ad2861
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|1800799024|36860700013|82310400026|7416014|376014|13003099007;
+	BCL:0;ARA:13230040|36860700013|1800799024|82310400026|7416014|376014|13003099007;
 X-Microsoft-Antispam-Message-Info:
-	=?us-ascii?Q?bPeFSCROWpO/vT80+qLExP7YjmIr4g/cfuoWnoHXIjAY8nECzC+TRvMSE+nl?=
- =?us-ascii?Q?6vGdaBW9eR1sVo54E7EIEJfjC2fROJyfbgbukCQvX0Yd2ValNfc8RqJXIA8O?=
- =?us-ascii?Q?lk9dGliDBrO0HWVTlFODVmOSCiwXj4t/L2hUr2cMyPHBQ+u4IrMbBSBq8x+S?=
- =?us-ascii?Q?29RNKnoBN9CIv5sBpG3Vt3yMEOnjzeMILIe2NK7RQfIHEjlfTNRhH7vCqEkW?=
- =?us-ascii?Q?wKWVRcvS2KnFwNHCSvy5TJZGA7GhkaMcb0b85V+ihTqiMXesIjOxDyyPn3UZ?=
- =?us-ascii?Q?eyl8Knl64RkXlwoNsizhMgEu24XnPwdyCD8bU4YDIE9zpCw8f1Q1xzazOWc8?=
- =?us-ascii?Q?WqyqKb3WLmfcGF4oy0TJw65ewou0rG5dD7Ph4n1CpetNvh+InXV81MJ1k/gJ?=
- =?us-ascii?Q?APWnS0Ub2CluVJW9z+d5j35xKYaf4H7cXG/O24zYcqjEdzLnnB7RPqj4BmOR?=
- =?us-ascii?Q?E/c8etwqxLjC8MVoZdMZKsPJ/NhSfLbcPYfh7wEAz5VdM39jOXN7OnQ7pzRN?=
- =?us-ascii?Q?OD9tQ0QzZiz50+khl81eGWcULjfbfK2MLo5270z3bqOd95c1/p1OvFuHGNtl?=
- =?us-ascii?Q?fuW8MfUUoi9e+mNUXf2/YiaTmOc+kLgpo03PhIwFqOy8Aoe2m2lMOKb06vbU?=
- =?us-ascii?Q?JlXPsK2E25U740KwSI3QSdwZkhX+OeQ0ChjHQzIEip90f8mB0H/vXw8mB76k?=
- =?us-ascii?Q?igYE5fTsvgcyHJMU28uKD6pXegFfFc9swsHjNJLman4Kj/UI4hnDzybGvG4l?=
- =?us-ascii?Q?RImh6Q3dIBsfuo1TJNwXc9qGk7+rSrumRScacEIML+EOnkpWNUPIcnqqi54D?=
- =?us-ascii?Q?1PzihN3dUWleFOuNi0v3XRdMmw+akcha3/7Uh19tw/ebk2dOYu51fTED9d8w?=
- =?us-ascii?Q?CKG0j/vwhjG2IyFCE1+WR6vRoKqfnWGYX4J9xCd9vP09oaNfsTsyO0OgDrwA?=
- =?us-ascii?Q?apCRVczuQjvQsBQbwHQJcVa9VMjcZUcjF/MRBpjCDGDKXeB/ArLL4LdyJtl0?=
- =?us-ascii?Q?ioB3+it31zcQTmHR/xzuUK0FtR34hekjZJhvaFk1rzU/2Dtt9eL4M9tbPVhL?=
- =?us-ascii?Q?wJ6I6DIK9SxI1lnT++UkkXoFSSESgYweBoOPs2fnsULNmU3lVPNm6oH8vVW2?=
- =?us-ascii?Q?0BhkWsA08b0H/9ogWFo+ydU1SFxQsDBjb8G4U+fQah9fuFproeK2aA13jhGl?=
- =?us-ascii?Q?LmM5imLifIc6hvwpPpAgheoKGXXl6xK9OFwPhah1YzTrMSvK0TqGv8M+7awS?=
- =?us-ascii?Q?NFs7RzpXm6rxeJJ7/sVijwWOc9DxZD0gLWOq9tgOEXidqU5GT2a/Ybv781dP?=
- =?us-ascii?Q?6gR7UAg+5EsM/3u6K2TN3bf9hQYgkXAv4PXoo+rRaveKz0WCN1QXz+qtOBDi?=
- =?us-ascii?Q?08HqdYxMwKrQmCz2Y7aTQstu4ZJVdW2Yk/WTWoAjkSD2OTvA3atj/IgGOo4Q?=
- =?us-ascii?Q?O8uWSFPZmD4H9MavuQNg5ZVXlQgyIQ7hpSlgcOY3ZrBNGgp1vJ9R3F3KNhnp?=
- =?us-ascii?Q?7BjcILoI2B5mXAgIU7hwlXmxYUCmGD58fxyDxaQ/gI2M4gJ0U1LPqeBBlQ?=
+	=?us-ascii?Q?Vn42lhETOt2eEFi57SbaTi024fClt2YdxNvAtlXldqjpQrQ42hJFbhJABph4?=
+ =?us-ascii?Q?8+GNf/0W30C7mB7db+fRgu6sNXA5W2DTDCVjJcOTYceHlHw6eRX0uLAruwvG?=
+ =?us-ascii?Q?6Pkaf0N9/Yftmh9kF54LskCedUTodPW/fzdu1eCAisv6SbiQdmIk96N8fJg7?=
+ =?us-ascii?Q?c+Vrx5WwschbA/JmXBvtGA4GunfC1XO7gYUtYOjTU5Y1fDguizXeTP3SooVe?=
+ =?us-ascii?Q?U/t/txz3S7GxLXmhCBaZYU7F6w7aM+O+PfXLlxGMsQqpS3lDLQzqMZbaUTna?=
+ =?us-ascii?Q?Jexdhc4nEiy5bwCeJIGJqn73frWechr+vFTPBIdE4xJy9qRNsbGK+4WArART?=
+ =?us-ascii?Q?vG+F3+AknpUrIXrPQei4iArd8r0lTKAGOaQbVautDTN+OrXlZcqeCjoJn7Kf?=
+ =?us-ascii?Q?o2c9RWAqPLU8++Ul4RR9mKypzFU1yJb56yXl2WLU1fKz6M6ERwxs13SddM1J?=
+ =?us-ascii?Q?5VkRGKzHcqX7yhv040ZEP531fCeRsWg7fZw9kJddm0rL2IBhvFybBAmM1XF+?=
+ =?us-ascii?Q?dNSBkh5bOJgSSuzVhya+HCu5yYA3Jzwy8q3pijdsBFKqt6LsUvYsC0nhGZNp?=
+ =?us-ascii?Q?Nrk0E2uKgTGHRP5cv0W52ZgEGp82zwQQHIrKAY1yDezh4VhR2wYGVMIv6a2W?=
+ =?us-ascii?Q?Xi0wZZr+M6Nlz/UyyI4Xo4IlwauLH0yBg7d+dEuww03cgwZpndoIZjVi779i?=
+ =?us-ascii?Q?xx7hDOTDtls8S5v2uZfkGRRpswxOxzidXRFGcjPSUsE133BM9mWSvuROZEZs?=
+ =?us-ascii?Q?8LNC1oUDuLi4T1IVAHMx8O+9MozDAMXgQR0jNWd5pGFb08Jd/s6fOw9xqT+a?=
+ =?us-ascii?Q?iG+z1V+uKx2tqi4McfQnafUk2x6SQfbyWCBH16pKCW9Qn9Ok/c7J8CwBaMtv?=
+ =?us-ascii?Q?egH1ITX8qcl3qd8TcnjhcIU0OFjBqRcx2wm8/DMYQotXY4zZuvDhAH6M8eTU?=
+ =?us-ascii?Q?EH+2dwR34cJJYhrUrGbkBoHQhC/LL3E4hPYIMhaHcyepJVLkNiIhJMtt/UXW?=
+ =?us-ascii?Q?qLXG9k/d8U3iHBy+/NCba7MaN3UlO3v/mZmo0dmBWCeWC75po8IcNnU8z2vI?=
+ =?us-ascii?Q?tos9nJPYUYxHfCLA3cfLEBKCcu2MLYHLrnMg3oJMx9rHbP7DHSazhaFWoYsr?=
+ =?us-ascii?Q?d0e2UrkVttpA/um2Z93IDTes/NLTM77CoBiSaSfESw1LbOXGLockmqcMD/k0?=
+ =?us-ascii?Q?7K9YGsueIIcxGyWpyOGIpNj38opWuj8tnIjot8JN8TgfwwgPiAJENW4kWy1z?=
+ =?us-ascii?Q?5J9mCBe1Jm4WyZ3vewFYTE39+zi/8kn+5HRTFfkgvkpYiThedftEqN7RMKkm?=
+ =?us-ascii?Q?9oLaECuflgF9njImXjluODiCUqyJ8+SWVSWfPM/W7jXROmFAARludmWrvvHh?=
+ =?us-ascii?Q?A5D4V2Sj0ipsunl4clfWFNo44LeCyTlOid/+t0mkdNPef2zcxkVJjpzcnt7h?=
+ =?us-ascii?Q?7EPwjdE5iqX5Bqi+qHUy9rYj4W0gpqxNqbFkGHQw4CGt63gAXH7LPkcx7X83?=
+ =?us-ascii?Q?3MP++0BN10DRpLLZMrV+oCDm/wqlwdN7TI/08DM2Iktn2K8TPa8bN8nDWQ?=
  =?us-ascii?Q?=3D=3D?=
 X-Forefront-Antispam-Report:
-	CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB04.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230040)(1800799024)(36860700013)(82310400026)(7416014)(376014)(13003099007);DIR:OUT;SFP:1101;
+	CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB04.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230040)(36860700013)(1800799024)(82310400026)(7416014)(376014)(13003099007);DIR:OUT;SFP:1101;
 X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 25 Aug 2025 07:57:55.6451
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 25 Aug 2025 07:58:20.2144
  (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: d901b8a2-2839-4eee-932e-08dde3ad19bc
+X-MS-Exchange-CrossTenant-Network-Message-Id: 7b305f79-04f4-469b-66c0-08dde3ad2861
 X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
 X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[SATLEXMB04.amd.com]
 X-MS-Exchange-CrossTenant-AuthSource:
-	SA2PEPF00003AE6.namprd02.prod.outlook.com
+	SA2PEPF00003AE7.namprd02.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Anonymous
 X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: CH1PR12MB9621
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: MW4PR12MB7333
 
-When running an AMD guest on QEMU with > 255 cores, the following FW_BUG
-was noticed with recent kernels:
+Prior to the topology parsing rewrite and the switchover to the new
+parsing logic for AMD processors in commit c749ce393b8f ("x86/cpu: Use
+common topology code for AMD"), the "initial_apicid" on these platforms
+was:
+
+- First initialized to the LocalApicId from CPUID leaf 0x1 EBX[31:24].
+
+- Then overwritten by the ExtendedLocalApicId in CPUID leaf 0xb
+  EDX[31:0] on processors that supported topoext.
+
+With the new parsing flow introduced in commit f7fb3b2dd92c ("x86/cpu:
+Provide an AMD/HYGON specific topology parser"), parse_8000_001e() now
+unconditionally overwrites the "initial_apicid" already parsed during
+cpu_parse_topology_ext().
+
+Although this has not been a problem on baremetal platforms, on
+virtualized AMD guests that feature more than 255 cores, QEMU 0's out
+the CPUID leaf 0x8000001e on CPUs with "CoreID" > 255 to prevent
+collision of these IDs in EBX[7:0] which can only represent a maximum of
+255 cores [1].
+
+This results in the following FW_BUG being logged when booting a guest
+with more than 255 cores:
 
     [Firmware Bug]: CPU 512: APIC ID mismatch. CPUID: 0x0000 APIC: 0x0200
 
-Naveen, Sairaj debugged the cause to commit c749ce393b8f ("x86/cpu: Use
-common topology code for AMD") where, after the rework, the initial
-APICID was set using the CPUID leaf 0x8000001e EAX[31:0] as opposed to
-the value from CPUID leaf 0xb EDX[31:0] previously.
+AMD64 Architecture Programmer's Manual Volume 2: System Programming Pub.
+24593 Rev. 3.42 [2] Section 16.12 "x2APIC_ID" mentions the Extended
+Enumeration leaf 0x8000001e (which was later superseded by the extended
+leaf 0x80000026) provides the full x2APIC ID under all circumstances
+unlike the one reported by CPUID leaf 0x8000001e EAX which depends on
+the mode in which APIC is configured.
 
-This led us down a rabbit hole of XTOPOLOGY vs TOPOEXT support, preferred
-order of their parsing, and QEMU nuances like [1] where QEMU 0's out the
-CPUID leaf 0x8000001e on CPUs where Core ID crosses 255 fearing a
-Core ID collision in the 8 bit field which leads to the reported FW_BUG.
+Rely on the APIC ID parsed during cpu_parse_topology_ext() from CPUID
+leaf 0x80000026 or 0xb and only use the APIC ID from leaf 0x8000001e if
+cpu_parse_topology_ext() failed (has_topoext is false).
 
-Following were major observations during the debug which the two
-patches address respectively:
+On platforms that support the 0xb leaf (Zen2 or later, AMD guests on
+QEMU) or the extended leaf 0x80000026 (Zen4 or later), the
+"initial_apicid" is now set to the value parsed from EDX[31:0].
 
-1. The support for CPUID leaf 0xb is independent of the TOPOEXT feature
-   and is rather linked to the x2APIC enablement. In an effort to keep
-   all the topology bits together during x2APIC enablement on AMD, the
-   parsing ox the extended topology leaf 0xb was incorrectly put behind
-   a X86_FEATURE_TOPOEXT check.
+On older AMD/Hygon platforms that does not support the 0xb leaf but
+supports the TOPOEXT extension (Fam 0x15, 0x16, 0x17[Zen1], and Hygon),
+the current behavior is retained where "initial_apicid" is set using
+the 0x8000001e leaf.
 
-   On baremetal, this has not been a problem since TOPOEXT support
-   (Fam 0x15 and above) predates the support for CPUID leaf 0xb
-   (Fam 0x17[Zen2] and above) however, in virtualized environment, the
-   support for x2APIC can be enabled independent of topoext where QEMU
-   expects the guest to parse the topology and the APICID from CPUID
-   leaf 0xb.
-
-   Boris asked why QEMU doesn't force enable TOPOEXT feature with x2APIC
-   [2] and Naveen discovered there were historic reasons to not enable
-   TOPOEXT by default when using "-cpu host" on AMD systems [3]. The
-   same behavior continues unless an EPYC cpu model is explicitly passed
-   to QEMU.
-
-2. Since CPUID leaf 0x8000001e cannot represent Core ID without
-   collision for guests with > 255 cores, and QEMU 0's out the entire
-   leaf when Core ID crosses 255.
-
-   Prefer initial APIC read from the XTOPOLOGY leaf (0x80000026 / 0xb)
-   which can represent up to 2^16 cores, before falling back to the APIC
-   ID from 0x8000001e which is still better than 8-bit APICID from leaf
-   0x1 EBX[31:24].
-
-More details are enclosed in the commit logs.
-
-Ideally, these changes should not affect baremetal AMD/Hygon platforms
-as they have supported TOPOEXT long before the support for CPUID leaf
-0xb and the extended CPUID leaf 0x80000026 (famous last words).
-
-Patch 3 and 4 is yak shaving to explicitly define a raw MSR value used
-in the topology parsing bits and simplify the flow around "has_topoext"
-when the same can be discovered using X86_FEATURE_XTOPOLOGY.
-
-Previous version of this series has been tested on baremetal Zen1
-(contains topoext but not 0xb leaf), Zen3 (contains both topoext and 0xb
-leaf), and Zen4 (contains topoext, 0xb leaf, and 0x80000026 leaf)
-servers with no changes observed in "/sys/kernel/debug/x86/topo/"
-directory.
-
-The series was also tested on 255 and 512 vCPU (each vCPU is an
-individual core from QEMU topology being passed) EPYC-Genoa guest with
-and without x2apic and topoext enabled and this series solves the FW_BUG
-seen on guest with > 255 VCPUs. No changes observed in
-"/sys/kernel/debug/x86/topo/" for all other cases without warning.
-0xb leaf is provided unconditionally on these guests (with or without
-topoext, even with x2apic disabled on guests with <= 255 vCPU).
-
-In all the cases initial_apicid matched the apicid in
-"/sys/kernel/debug/x86/topo/" after applying this series.
-
-Relevant bits of QEMU cmdline used during testing are as follows:
-
-    qemu-system-x86_64 \
-    -enable-kvm -m 32G -smp cpus=512,cores=512 \
-    -cpu EPYC-Genoa,x2apic=on,kvm-msi-ext-dest-id=on,+kvm-pv-unhalt,kvm-pv-tlb-flush,kvm-pv-ipi,kvm-pv-sched-yield,[-topoext]  \
-    -machine q35,kernel_irqchip=split \
-    -global kvm-pit.lost_tick_policy=discard
-    ...
-
-References:
-
-[1] https://github.com/qemu/qemu/commit/35ac5dfbcaa4b
-[2] https://lore.kernel.org/lkml/20250819113447.GJaKRhVx6lBPUc6NMz@fat_crate.local/
-[3] https://lore.kernel.org/qemu-devel/20180809221852.15285-1-ehabkost@redhat.com/
-
-Series is based on tip:master at commit 7182bf4176f9 ("Merge branch into
-tip/master: 'x86/tdx'") and applies cleanly on top of tip:x86/cpu at
-commit f3285344a5a3 ("x86/cpu/cacheinfo: Simplify
-cacheinfo_amd_init_llc_id() using _cpuid4_info")
-
+Cc: stable@vger.kernel.org
+Link: https://github.com/qemu/qemu/commit/35ac5dfbcaa4b [1]
+Link: https://bugzilla.kernel.org/show_bug.cgi?id=206537 [2]
+Debugged-by: Naveen N Rao (AMD) <naveen@kernel.org>
+Debugged-by: Sairaj Kodilkar <sarunkod@amd.com>
+Fixes: c749ce393b8f ("x86/cpu: Use common topology code for AMD")
+Suggested-by: Thomas Gleixner <tglx@linutronix.de>
+Tested-by: Naveen N Rao (AMD) <naveen@kernel.org>
+Signed-off-by: K Prateek Nayak <kprateek.nayak@amd.com>
 ---
 Changelog v3..v4:
 
-o Renamed the series title to better capture the purpose. Based on the
-  readout of the APM and PPR, this problem was only exposed by QEMU
-  and QEMU is not doing anything wrong considering the spec.
+o Refreshed the diff based on Thomas' suggestion. The tags have been
+  retained since there are no functional changes - only comments around
+  the code has changed.
 
-o Fixed references to X86_FEATURE_XTOPOLOGY (XTOPOLOGY) which was
-  mistakenly referred to as XTOPOEXT. (Boris)
+o Quoted relevant section of APM justifying the changes.
 
-o Reordered the patches to have the fixes before cleanups. (Thomas)
+o Moved this patch up ahead.
 
-o Refreshed the diff of Patch 1 with the one Thomas suggested in
-  https://lore.kernel.org/lkml/87ms7o3kn6.ffs@tglx/. (Thomas)
-
-o Quoted the relevant sections of the APM and the PPR to support the
-  changes. (Mentioned on v3 by Naveen and Boris)
-
-Note: The debate on "CoreId" from CPUID 0x8000001e EBX has not been
-addressed yet. I'll check internally and follow up on the QEMU bits once
-H/W folks confirm what their strategy is with the 8-bit field in future
-processors.
-
-The updates in this series ensures the usage of the topology information
-from the XTOPOLOGY leaves (0x80000026 / 0xb)  when they are present and
-systems that support more than 256 CPUs need x2APIC enabled to address
-all the CPUs present thus removing the dependency on CPUID leaf
-0x8000001e for Core ID.
-
-v3: https://lore.kernel.org/lkml/20250818060435.2452-1-kprateek.nayak@amd.com/
-
-Changelog v2..v3:
-
-o Patch 1 was added to the series.
-o Use cpu_feature_enabled() in Patch 3.
-o Rebased on top of tip:x86/cpu.
-
-v2: https://lore.kernel.org/lkml/20250725110622.59743-1-kprateek.nayak@amd.com/
-
-Changelog v1..v2:
-
-o Collected tags from Naveen. (Thank you for testing!)
-o Rebased the series on tip:x86/cpu.
-o Swapped Patch 1 and Patch 2 from v1.
-o Merged the body of two if blocks in Patch 1 to allow for cleanup in
-  Patch 3.
-
-v1: https://lore.kernel.org/lkml/20250612072921.15107-1-kprateek.nayak@amd.com/
-
+o Cc'd stable.
 ---
-K Prateek Nayak (4):
-  x86/cpu/topology: Use initial APIC ID from XTOPOLOGY leaf on AMD/HYGON
-  x86/cpu/topology: Always try cpu_parse_topology_ext() on AMD/Hygon
-  x86/cpu/topology: Check for X86_FEATURE_XTOPOLOGY instead of passing
-    has_topoext
-  x86/msr-index: Define AMD64_CPUID_FN_EXT MSR
+ arch/x86/kernel/cpu/topology_amd.c | 23 ++++++++++++++---------
+ 1 file changed, 14 insertions(+), 9 deletions(-)
 
- arch/x86/include/asm/msr-index.h   |  5 ++++
- arch/x86/kernel/cpu/topology_amd.c | 48 +++++++++++++++---------------
- 2 files changed, 29 insertions(+), 24 deletions(-)
-
-
-base-commit: 7182bf4176f93be42225d2ef983894febfa4a1b1
+diff --git a/arch/x86/kernel/cpu/topology_amd.c b/arch/x86/kernel/cpu/topology_amd.c
+index 843b1655ab45..827dd0dbb6e9 100644
+--- a/arch/x86/kernel/cpu/topology_amd.c
++++ b/arch/x86/kernel/cpu/topology_amd.c
+@@ -81,20 +81,25 @@ static bool parse_8000_001e(struct topo_scan *tscan, bool has_topoext)
+ 
+ 	cpuid_leaf(0x8000001e, &leaf);
+ 
+-	tscan->c->topo.initial_apicid = leaf.ext_apic_id;
+-
+ 	/*
+-	 * If leaf 0xb is available, then the domain shifts are set
+-	 * already and nothing to do here. Only valid for family >= 0x17.
++	 * If leaf 0xb/0x26 is available, then the APIC ID and the domain
++	 * shifts are set already.
+ 	 */
+-	if (!has_topoext && tscan->c->x86 >= 0x17) {
++	if (!has_topoext) {
++		tscan->c->topo.initial_apicid = leaf.ext_apic_id;
++
+ 		/*
+-		 * Leaf 0x80000008 set the CORE domain shift already.
+-		 * Update the SMT domain, but do not propagate it.
++		 * Leaf 0x8000008 sets the CORE domain shift but not the
++		 * SMT domain shift. On CPUs with family >= 0x17, there
++		 * might be hyperthreads.
+ 		 */
+-		unsigned int nthreads = leaf.core_nthreads + 1;
++		if (tscan->c->x86 >= 0x17) {
++			/* Update the SMT domain, but do not propagate it. */
++			unsigned int nthreads = leaf.core_nthreads + 1;
+ 
+-		topology_update_dom(tscan, TOPO_SMT_DOMAIN, get_count_order(nthreads), nthreads);
++			topology_update_dom(tscan, TOPO_SMT_DOMAIN,
++					    get_count_order(nthreads), nthreads);
++		}
+ 	}
+ 
+ 	store_node(tscan, leaf.nnodes_per_socket + 1, leaf.node_id);
 -- 
 2.34.1
 
