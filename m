@@ -1,173 +1,102 @@
-Return-Path: <kvm+bounces-55638-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-55639-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 414CFB34653
-	for <lists+kvm@lfdr.de>; Mon, 25 Aug 2025 17:52:33 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5580BB34664
+	for <lists+kvm@lfdr.de>; Mon, 25 Aug 2025 17:55:38 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 466B71B20138
-	for <lists+kvm@lfdr.de>; Mon, 25 Aug 2025 15:52:53 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 366ED3AA265
+	for <lists+kvm@lfdr.de>; Mon, 25 Aug 2025 15:55:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 038A62FF648;
-	Mon, 25 Aug 2025 15:52:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2E0DA2FE571;
+	Mon, 25 Aug 2025 15:55:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="YnDMoCvu"
+	dkim=pass (4096-bit key) header.d=alien8.de header.i=@alien8.de header.b="g/4Zs9GO"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from mail.alien8.de (mail.alien8.de [65.109.113.108])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 901082FC008
-	for <kvm@vger.kernel.org>; Mon, 25 Aug 2025 15:52:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5F4B22FCBF4;
+	Mon, 25 Aug 2025 15:55:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=65.109.113.108
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756137139; cv=none; b=OX9KiHuh9dLndgae8r+NuEzc5IRalQe0o/M7tduIqw4pbgOk0ulD9pKJ1MQ6RRfs/2+zXaq4+fmFPGR8+miWp4w5opPm8zaLutF1pUW7Yqwr4Uqlz7wRZe+La1G1DpoinRlV4BeaTTjT8jYdunRM4WgWW9XNE/S/741CoX7jkco=
+	t=1756137307; cv=none; b=KAbfYGjNM5Y89NTygluFuR2IGK7m3vBvsOfBkVPGwZRb4igljgwXLnDIW23omx/ySLuFZW7S9HvgdjPY3fnNZXaU6qwiVmYHsC4aylqHLXcU+0SBO2qnlUwfC5bcldU6n74rMO2QSGju/dgoPvaOkA3eGl92UaKIir4EdGj12+8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756137139; c=relaxed/simple;
-	bh=KZkhA/kQOmp5Oy93QMxfpEXKqa6Fo2q74cwH7XYOoXk=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=IC/PT/dLZkoOGDAm4cMT+WU7xi8W5JBHl+E8FspuE4KitO3kiCKJsR2zw/YT7UfE9EXQ6mNJpUPQaaaWZibr1n/SteyhZJhTRkdPles3JyBlV+N5w+pTfrEIHJg/8XIUjeKFmO9HirQrIcCaoXjV+lSnPp1sSIWmTD+5/HoL2U0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=YnDMoCvu; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1756137136;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=Ed6qfTFHMUqyUn8kqjL4nj7yM5M0u0oh4hNGYHbww5c=;
-	b=YnDMoCvuILYchjRL0TVy/32QIWH3sjEw5ouKYqMDnP+Av5398MXllS5RuvkOXCSV9EdbnS
-	RHbWbhTfGt4btRa48vxFEejYXjheVGaGrWfQRlTnKqAKIqxiayTP6d0sJ2qS4zBfatLlRQ
-	FZTFz46nBHc8fpXVZtblAJIdzymox0A=
-Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
- [209.85.221.71]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-61-UADAU9WrMZepFJBhB0iojQ-1; Mon, 25 Aug 2025 11:52:11 -0400
-X-MC-Unique: UADAU9WrMZepFJBhB0iojQ-1
-X-Mimecast-MFC-AGG-ID: UADAU9WrMZepFJBhB0iojQ_1756137129
-Received: by mail-wr1-f71.google.com with SMTP id ffacd0b85a97d-3c79f0a57ddso1103458f8f.1
-        for <kvm@vger.kernel.org>; Mon, 25 Aug 2025 08:52:10 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1756137129; x=1756741929;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=Ed6qfTFHMUqyUn8kqjL4nj7yM5M0u0oh4hNGYHbww5c=;
-        b=v9kXHvS2xckumNU3IVszQbiZx3eYzqOyWd65OXbX2DaknemyogLpuS6UdcKUN3Sk0/
-         ARD7RLkoxrQPBh26HPortLadnXIr7HmNOIzUfZWN9V3bQs543Zja/Y5tknFE5pOYtT8v
-         h3wJT1yjK4KbwN2wUF+tQGmvByenpq/ekGcwccWrm4ANizuhVsXeaWFBdFGm/IYKzT7z
-         PX5bsiaJLIPgle7OxJi0P4gjURuQylvyzaKv27I9YZqib6PiUX18qeq+MhzOIGxuDcyn
-         phIbkHXq/Pua0Mp/Jcc0TQLIV156JHACMJOgb7mVxLncjuuTAA3KoIbw7k5E8e9F/5sZ
-         sI/Q==
-X-Gm-Message-State: AOJu0YzKnVuUvjku/y7JD6ooofvmPrtE/Y2K1mL2WDa7583YHfUlP6d5
-	rrwnIAx6bOMmSC9eDLlhvMvGUwi/Y7ZO2i6RG3IalJylngxu2PJBHpj4RkXc39y1VS09RFWODd6
-	ZIBlNWFiF6GVMGtPGi8lHm8yo6jDqn4z0iLJHyU3boiydF7kqOlJcfw==
-X-Gm-Gg: ASbGncuku0pl9eEvEjyEzlYV+IWljf63jJriUgC9vptrxq3YSzs3a0tlOOxwja5Cb80
-	50zOCtaJw/paSimNUHmPqOsopaINBu8jPKD8yM8GzNcsQcDvOpzsUcHyb19sloaG3zaG7c8+3fW
-	P6DL+DeYhp551Whlmd9+djNxgczh5RZq5EPKkWSJQWTKh+8yzDBySpeGY13igOmGciDef00iyTW
-	jnnXFHICbSNBAUW8xTXVWCWyMsU8pzOD2W0yAp28odXyacnbuaYEg6nZU6cHzhhfLMwPNqrF28A
-	x/D3ARhf4Uyv/lJjfUKYJ7bJ4audbP/QUmmfXD9NWKcXDTezsHMDqn0g3YNgB4R4+JOWtM75oyN
-	dZ6n/YS5UKGNJ+xjposq6InkkXAc=
-X-Received: by 2002:a05:6000:2404:b0:3b8:d30c:885f with SMTP id ffacd0b85a97d-3c5dcefe32fmr10599037f8f.53.1756137128980;
-        Mon, 25 Aug 2025 08:52:08 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IFXEz5g23IvWuo/ydVi6QeOhq8AK8ymIKqhjfE0JE8EYTvGus+zqYsHwn1w6Z++sXaw7/PNcA==
-X-Received: by 2002:a05:6000:2404:b0:3b8:d30c:885f with SMTP id ffacd0b85a97d-3c5dcefe32fmr10599010f8f.53.1756137128539;
-        Mon, 25 Aug 2025 08:52:08 -0700 (PDT)
-Received: from rh.redhat.com (p200300f6af131a0027bd20bfc18c447d.dip0.t-ipconnect.de. [2003:f6:af13:1a00:27bd:20bf:c18c:447d])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3c70f237fefsm12155436f8f.30.2025.08.25.08.52.07
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 25 Aug 2025 08:52:08 -0700 (PDT)
-From: Sebastian Ott <sebott@redhat.com>
-To: Paolo Bonzini <pbonzini@redhat.com>,
-	Shuah Khan <shuah@kernel.org>,
-	Sean Christopherson <seanjc@google.com>,
-	Marc Zyngier <maz@kernel.org>,
-	Oliver Upton <oliver.upton@linux.dev>
-Cc: kvm@vger.kernel.org,
-	kvmarm@lists.linux.dev,
-	linux-kselftest@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Sebastian Ott <sebott@redhat.com>
-Subject: [PATCH] KVM: selftests: fix irqfd_test on arm64
-Date: Mon, 25 Aug 2025 17:52:03 +0200
-Message-ID: <20250825155203.71989-1-sebott@redhat.com>
-X-Mailer: git-send-email 2.51.0
+	s=arc-20240116; t=1756137307; c=relaxed/simple;
+	bh=4j5cPccNoo1GvUX/Bio206S/2RoD4+EFZU6pa0pdd4A=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=DiiIFqzAbKAX4TbFZKxIqH3Kz/PnNFT4PKS8mrIYpU89axgs5Lho7u/742tWEb37zv0uSkDn3rtxZF7pl49j2VNJUZEv2dgZzMeVaspRAaTPZGLJZG5VROrwUlVERYPgHK1VL6PtmRc89zj82wlqvdBXRCXGyjVGdwCSP68cPec=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=alien8.de; spf=pass smtp.mailfrom=alien8.de; dkim=pass (4096-bit key) header.d=alien8.de header.i=@alien8.de header.b=g/4Zs9GO; arc=none smtp.client-ip=65.109.113.108
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=alien8.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=alien8.de
+Received: from localhost (localhost.localdomain [127.0.0.1])
+	by mail.alien8.de (SuperMail on ZX Spectrum 128k) with ESMTP id 140C440E016C;
+	Mon, 25 Aug 2025 15:55:02 +0000 (UTC)
+X-Virus-Scanned: Debian amavisd-new at mail.alien8.de
+Authentication-Results: mail.alien8.de (amavisd-new); dkim=pass (4096-bit key)
+	header.d=alien8.de
+Received: from mail.alien8.de ([127.0.0.1])
+	by localhost (mail.alien8.de [127.0.0.1]) (amavisd-new, port 10026)
+	with ESMTP id p5z28Zn20_wF; Mon, 25 Aug 2025 15:54:59 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=alien8;
+	t=1756137298; bh=zmk6X8NNKl7QU6B3Y7nFOLjJmQptP/tyBeLMXSCuEGA=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=g/4Zs9GOc24CPDwyfDTvyeTn/abKlvSVJE2bwzHW8UUc2/pNACZkwogND71PmS1uI
+	 4upmfV830oFaxEj/2ZXTG+F1leVIciDxVjJIEFLobiMIQUbWGqhz5fWLTwn4QDxc40
+	 E3PLSSXfOCX8sGJtJU28TligiiHYC2686mMQXptwOG7Az7kaXqNli+t506ZFneP3Zf
+	 0NUKe7TYN62kI6yUCTE+yO4zxXOaF9Ju9tFpBFuQqEeyC3nZeBtNavtQP0qbzjsxY2
+	 EW3WztQtnMZiQE/hyU4ltbjgJhXY7tBcONZGMBsF2wt+juczi/sldde4+ftSvv+Eyw
+	 3hW0tNMx/OnfrmZGN9H6/jJvLA4w8USgXoN6HltuHekZEIVtbQnio8hyg5PYyR5wZq
+	 sZCGSvXxGoBXzekdv53eokMCo8PEHWqQtW2O0JzwcgYPs575Yesq0acRBYa8yv3Zrs
+	 SKizvLlg/98aD57C41p2c5/adZHY9+r3qws/LDrfmiT9bJeeFlYFbvwLirdGGX5nyt
+	 l6prJLizis5OaeZbAOR00iNTQeZTyS9Bq2XP0NF2ZKBwFExQrIDe8BdNgKsMWQ2L7e
+	 w74V7HwUoHWEFN/8UrgpvNEcilm4t0HdxsfCO2a1Fg4/eGx+LMYzDUho40kfJYoGiy
+	 szENSV/idrkrQagP7+Pk6ntw=
+Received: from zn.tnic (pd953092e.dip0.t-ipconnect.de [217.83.9.46])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange ECDHE (P-256) server-signature ECDSA (P-256) server-digest SHA256)
+	(No client certificate requested)
+	by mail.alien8.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id 9093A40E0217;
+	Mon, 25 Aug 2025 15:54:37 +0000 (UTC)
+Date: Mon, 25 Aug 2025 17:54:30 +0200
+From: Borislav Petkov <bp@alien8.de>
+To: Neeraj Upadhyay <Neeraj.Upadhyay@amd.com>
+Cc: linux-kernel@vger.kernel.org, tglx@linutronix.de, mingo@redhat.com,
+	dave.hansen@linux.intel.com, Thomas.Lendacky@amd.com,
+	nikunj@amd.com, Santosh.Shukla@amd.com, Vasant.Hegde@amd.com,
+	Suravee.Suthikulpanit@amd.com, David.Kaplan@amd.com, x86@kernel.org,
+	hpa@zytor.com, peterz@infradead.org, seanjc@google.com,
+	pbonzini@redhat.com, kvm@vger.kernel.org, huibo.wang@amd.com,
+	naveen.rao@amd.com, francescolavra.fl@gmail.com,
+	tiala@microsoft.com
+Subject: Re: [PATCH v9 16/18] x86/apic: Enable Secure AVIC in Control MSR
+Message-ID: <20250825155420.GBaKyHLA70ShAp_s8d@fat_crate.local>
+References: <20250811094444.203161-1-Neeraj.Upadhyay@amd.com>
+ <20250811094444.203161-17-Neeraj.Upadhyay@amd.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20250811094444.203161-17-Neeraj.Upadhyay@amd.com>
 
-irqfd_test on arm triggers the following assertion:
-==== Test Assertion Failure ====
-  include/kvm_util.h:527: !ret
-  pid=3643 tid=3643 errno=11 - Resource temporarily unavailable
-     1  0x00000000004026d7: kvm_irqfd at kvm_util.h:527
-     2  0x0000000000402083: main at irqfd_test.c:100
-     3  0x0000ffffa5aab587: ?? ??:0
-     4  0x0000ffffa5aab65f: ?? ??:0
-     5  0x000000000040236f: _start at ??:?
-  KVM_IRQFD failed, rc: -1 errno: 11 (Resource temporarily unavailable)
+On Mon, Aug 11, 2025 at 03:14:42PM +0530, Neeraj Upadhyay wrote:
+>  #define MSR_AMD64_SNP_RESV_BIT		19
+>  #define MSR_AMD64_SNP_RESERVED_MASK	GENMASK_ULL(63, MSR_AMD64_SNP_RESV_BIT)
+>  #define MSR_AMD64_SECURE_AVIC_CONTROL	0xc0010138
+> +#define MSR_AMD64_SECURE_AVIC_EN_BIT	0
+> +#define MSR_AMD64_SECURE_AVIC_EN	BIT_ULL(MSR_AMD64_SECURE_AVIC_EN_BIT)
 
-Fix this by setting up a vgic for the vm.
+..._SAVIC_...
 
-Signed-off-by: Sebastian Ott <sebott@redhat.com>
----
- tools/testing/selftests/kvm/irqfd_test.c | 24 ++++++++++++++++++++++--
- 1 file changed, 22 insertions(+), 2 deletions(-)
-
-diff --git a/tools/testing/selftests/kvm/irqfd_test.c b/tools/testing/selftests/kvm/irqfd_test.c
-index 7c301b4c7005..f7b8766e9d42 100644
---- a/tools/testing/selftests/kvm/irqfd_test.c
-+++ b/tools/testing/selftests/kvm/irqfd_test.c
-@@ -8,7 +8,11 @@
- #include <stdint.h>
- #include <sys/sysinfo.h>
- 
-+#include "processor.h"
- #include "kvm_util.h"
-+#ifdef __aarch64__
-+#include "vgic.h"
-+#endif
- 
- static struct kvm_vm *vm1;
- static struct kvm_vm *vm2;
-@@ -86,14 +90,30 @@ static void juggle_eventfd_primary(struct kvm_vm *vm, int eventfd)
- 	kvm_irqfd(vm, GSI_BASE_PRIMARY + 1, eventfd, KVM_IRQFD_FLAG_DEASSIGN);
- }
- 
-+static struct kvm_vm *test_vm_create(void)
-+{
-+#ifdef __aarch64__
-+	struct kvm_vm *vm;
-+	struct kvm_vcpu *vcpu;
-+	int gic_fd;
-+
-+	vm = vm_create_with_one_vcpu(&vcpu, NULL);
-+	gic_fd = vgic_v3_setup(vm, 1, 64);
-+	__TEST_REQUIRE(gic_fd >= 0, "Failed to create vgic-v3");
-+
-+	return vm;
-+#endif
-+	return vm_create(1);
-+}
-+
- int main(int argc, char *argv[])
- {
- 	pthread_t racing_thread;
- 	int r, i;
- 
- 	/* Create "full" VMs, as KVM_IRQFD requires an in-kernel IRQ chip. */
--	vm1 = vm_create(1);
--	vm2 = vm_create(1);
-+	vm1 = test_vm_create();
-+	vm2 = test_vm_create();
- 
- 	WRITE_ONCE(__eventfd, kvm_new_eventfd());
- 
 -- 
-2.51.0
+Regards/Gruss,
+    Boris.
 
+https://people.kernel.org/tglx/notes-about-netiquette
 
