@@ -1,54 +1,54 @@
-Return-Path: <kvm+bounces-55586-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-55587-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0F384B333B1
-	for <lists+kvm@lfdr.de>; Mon, 25 Aug 2025 03:54:13 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id B850CB3341B
+	for <lists+kvm@lfdr.de>; Mon, 25 Aug 2025 04:52:43 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C19C3442066
-	for <lists+kvm@lfdr.de>; Mon, 25 Aug 2025 01:54:11 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 55B254808E3
+	for <lists+kvm@lfdr.de>; Mon, 25 Aug 2025 02:52:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9516A22C32D;
-	Mon, 25 Aug 2025 01:54:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A6872238178;
+	Mon, 25 Aug 2025 02:52:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=zytor.com header.i=@zytor.com header.b="aORlH73L"
+	dkim=pass (2048-bit key) header.d=zytor.com header.i=@zytor.com header.b="bOJShy/v"
 X-Original-To: kvm@vger.kernel.org
 Received: from mail.zytor.com (terminus.zytor.com [198.137.202.136])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CA1D31F4CA4;
-	Mon, 25 Aug 2025 01:54:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 27D5A38DD8;
+	Mon, 25 Aug 2025 02:52:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.136
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756086843; cv=none; b=lnZ+aQDvoywpikfSksLOl0R63czF25pIVyL0jwJsNnYmH5zECtgUx+Jx3AWURtvm/9U8Qv5wsjRjzqjMUwSXVmSxiEtY55reRcXOgmSCetVERqYoxRUv2tLbLjIA5WeENOnAj3XhVg6E5tGVXdB3KBPHRPMpQgT15OeVrT3Fdhs=
+	t=1756090353; cv=none; b=f7bKO1iToPOG665XFubOgjOqvVATZztDwoGrrtPqvl+htTQEJgFrpKnxuqR+VCscnuV2goCvrB1I8NSAqns2Q2Nd8xyG5fMkfXn4EFZfE2T1FP4H3JazY7h92KVanbeheQYyg2kraPND3sPxBDVMEbEC7dm7M2kHlDPCgAYvcPU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756086843; c=relaxed/simple;
-	bh=q2NRu60D+e5X8votf4lAC2BBZ7dibcQeSlMHAF4cpO4=;
-	h=Message-ID:Date:MIME-Version:From:Subject:To:Cc:References:
-	 In-Reply-To:Content-Type; b=U2+B3lU2BrhAHRJYIFJLWGJKnceGyUJasux+nmIeW6L2y7F9XdOQsXaRyjhMq9axlC3zQys/e5V10UgP9Z/yS1hynjRS4Tqahe8x3Gg7irmvMzkhjpgbTf82vRVuTprjwM8UkFOosIV0GLQra8mP+irqVUhjxRfWNLvt/j1eKCU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=zytor.com; spf=pass smtp.mailfrom=zytor.com; dkim=pass (2048-bit key) header.d=zytor.com header.i=@zytor.com header.b=aORlH73L; arc=none smtp.client-ip=198.137.202.136
+	s=arc-20240116; t=1756090353; c=relaxed/simple;
+	bh=aQ3klEdpmWWkq5V7/ZmW5O2BmjonN+3JsZEFIImTQM4=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=ZM838gkBgAX0CpZzzZV4yVQD3GZKaOITCjngXuaZMKZuTPpOeXuo7fUSBoah4m51K/sGQEdylvmCp9mn5AuqPHt2Z7shx7F8H6AVJG0meKjeltb6+YWkKpepSn0c/7JuLKzhLfeVq4edQlu4MSU5QIlvNWAIhtGCzLG+5x9j5kk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=zytor.com; spf=pass smtp.mailfrom=zytor.com; dkim=pass (2048-bit key) header.d=zytor.com header.i=@zytor.com header.b=bOJShy/v; arc=none smtp.client-ip=198.137.202.136
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=zytor.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=zytor.com
 Received: from [192.168.7.202] ([71.202.166.45])
 	(authenticated bits=0)
-	by mail.zytor.com (8.18.1/8.17.1) with ESMTPSA id 57P1quU6226866
+	by mail.zytor.com (8.18.1/8.17.1) with ESMTPSA id 57P2pr1U255232
 	(version=TLSv1.3 cipher=TLS_AES_128_GCM_SHA256 bits=128 verify=NO);
-	Sun, 24 Aug 2025 18:52:56 -0700
-DKIM-Filter: OpenDKIM Filter v2.11.0 mail.zytor.com 57P1quU6226866
+	Sun, 24 Aug 2025 19:51:54 -0700
+DKIM-Filter: OpenDKIM Filter v2.11.0 mail.zytor.com 57P2pr1U255232
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=zytor.com;
-	s=2025082201; t=1756086777;
-	bh=T1iGU+6e3kBh5j7YDqBPqdOByA2wTCG62lZCRAK2x9g=;
-	h=Date:From:Subject:To:Cc:References:In-Reply-To:From;
-	b=aORlH73LdDZ7yZLR48yIz9lmJxl3Fwh9YnXtniRfcAg5PqtTAazxWbQEoAyzzK5kG
-	 UMaIfjICq63GRLXcUSTqYbwjeBequWS1hXJEBn3M+Q1yZBNBwu/J+eN8oCmO0jfuW7
-	 sponO/JREfkSoQaiFTcItyUuSiKuczIUjURE7isrPClJf7wfvt1iEajX6wb6Yz/c6n
-	 QsDohieDNG89DmOjBHstU9nh+PGHVlDpu3TQFUgt9hEEYOo3meFVptlYgLpdyG+M2i
-	 QzCWxqKJj1gjynatrrZqxFS0DDmDw6Ec3H8Bz3tZAIN5pW5heDIMRPakt055+M5ICG
-	 0A05RoiXuPWZA==
-Message-ID: <b61f8d7c-e8bf-476e-8d56-ce9660a13d02@zytor.com>
-Date: Sun, 24 Aug 2025 18:52:55 -0700
+	s=2025082201; t=1756090317;
+	bh=lq00javG2UiQIbEp3w2ZdKaPm7rq/LpukSV6LTAhyLE=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=bOJShy/vbvo57MT6KNFG9ImSdy5kd/fM2Ee6qzLo/m7GXK1473Rt7f1eXehONvy1b
+	 y4BXqcMcW7CSMa6K11jLfS5bGCAreFjQD+iS87wz6Qo7ktuK8iV3xVBpLycO/Rg1K8
+	 EahjGNR0UfqeQ4m6bQGJmaGDAvdv+9Ll8V+5ukF8AIQeQm7p4HirUkTE0/rRGCYQS6
+	 ODYUKUH/OX2V/GIawNcAq7KDy0hnbw5c1MFOAw/nmGvarqI/UjNpQt+0qX0+56kHmI
+	 o0U97z7Kn9uzfD1unT4Zx7nG261i9ePDX2aehtv6wno5o/uBhRLD2cVq0GFdrtdj/C
+	 IoIVDTgkj2g8g==
+Message-ID: <2dd8c323-7654-4a28-86f1-d743b70d10b1@zytor.com>
+Date: Sun, 24 Aug 2025 19:51:52 -0700
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -56,19 +56,17 @@ List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-From: Xin Li <xin@zytor.com>
-Subject: Re: [PATCH v13 05/21] KVM: x86: Load guest FPU state when access
- XSAVE-managed MSRs
-To: Chao Gao <chao.gao@intel.com>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Cc: bp@alien8.de, dave.hansen@linux.intel.com, hpa@zytor.com,
-        john.allen@amd.com, mingo@redhat.com, minipli@grsecurity.net,
-        mlevitsk@redhat.com, pbonzini@redhat.com, rick.p.edgecombe@intel.com,
-        seanjc@google.com, tglx@linutronix.de, weijiang.yang@intel.com,
-        x86@kernel.org
-References: <20250821133132.72322-1-chao.gao@intel.com>
- <20250821133132.72322-6-chao.gao@intel.com>
+Subject: Re: [PATCH v6 06/20] KVM: VMX: Set FRED MSR intercepts
+To: linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        linux-doc@vger.kernel.org
+Cc: pbonzini@redhat.com, seanjc@google.com, corbet@lwn.net, tglx@linutronix.de,
+        mingo@redhat.com, bp@alien8.de, dave.hansen@linux.intel.com,
+        x86@kernel.org, hpa@zytor.com, luto@kernel.org, peterz@infradead.org,
+        andrew.cooper3@citrix.com, chao.gao@intel.com, hch@infradead.org
+References: <20250821223630.984383-1-xin@zytor.com>
+ <20250821223630.984383-7-xin@zytor.com>
 Content-Language: en-US
+From: Xin Li <xin@zytor.com>
 Autocrypt: addr=xin@zytor.com; keydata=
  xsDNBGUPz1cBDACS/9yOJGojBFPxFt0OfTWuMl0uSgpwk37uRrFPTTLw4BaxhlFL0bjs6q+0
  2OfG34R+a0ZCuj5c9vggUMoOLdDyA7yPVAJU0OX6lqpg6z/kyQg3t4jvajG6aCgwSDx5Kzg5
@@ -103,58 +101,68 @@ Autocrypt: addr=xin@zytor.com; keydata=
  PYbAkjBbm+tuJ/Sm+5Yp5T/BnKz21FoCS8uvTiziHj2H7Cuekn6F8EYhegONm+RVg3vikOpn
  gao85i4HwQTK9/D1wgJIQkdwWXVMZ6q/OALaBp82vQ2U9sjTyFXgDjglgh00VRAHP7u1Rcu4
  l75w1xInsg==
-In-Reply-To: <20250821133132.72322-6-chao.gao@intel.com>
+In-Reply-To: <20250821223630.984383-7-xin@zytor.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 
-> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-> index 6b01c6e9330e..799ac76679c9 100644
-> --- a/arch/x86/kvm/x86.c
-> +++ b/arch/x86/kvm/x86.c
-> @@ -4566,6 +4569,21 @@ int kvm_get_msr_common(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
->   }
->   EXPORT_SYMBOL_GPL(kvm_get_msr_common);
->   
-> +/*
-> + *  Returns true if the MSR in question is managed via XSTATE, i.e. is context
-> + *  switched with the rest of guest FPU state.
-> + */
-> +static bool is_xstate_managed_msr(u32 index)
-> +{
-> +	switch (index) {
-> +	case MSR_IA32_U_CET:
+On 8/21/2025 3:36 PM, Xin Li (Intel) wrote:
+> +	/*
+> +	 * MSR_IA32_FRED_RSP0 and MSR_IA32_PL0_SSP (aka MSR_IA32_FRED_SSP0) are
+> +	 * designated for event delivery while executing in userspace.  Since
+> +	 * KVM operates exclusively in kernel mode (the CPL is always 0 after
+> +	 * any VM exit), KVM can safely retain and operate with the guest-defined
+> +	 * values for MSR_IA32_FRED_RSP0 and MSR_IA32_PL0_SSP.
+> +	 *
+> +	 * Therefore, interception of MSR_IA32_FRED_RSP0 and MSR_IA32_PL0_SSP
+> +	 * is not required.
+> +	 *
+> +	 * Note, save and restore of MSR_IA32_PL0_SSP belong to CET supervisor
+> +	 * context management.  However the FRED SSP MSRs, including
+> +	 * MSR_IA32_PL0_SSP, are supported by any processor that enumerates FRED.
+> +	 * If such a processor does not support CET, FRED transitions will not
+> +	 * use the MSRs, but the MSRs would still be accessible using MSR-access
+> +	 * instructions (e.g., RDMSR, WRMSR).
+> +	 */
+> +	vmx_set_intercept_for_msr(vcpu, MSR_IA32_FRED_RSP0, MSR_TYPE_RW, intercept);
+> +	vmx_set_intercept_for_msr(vcpu, MSR_IA32_PL0_SSP, MSR_TYPE_RW, intercept);
+
+Hi Sean,
+
+I'd like to bring up an issue concerning MSR_IA32_PL0_SSP.
+
+The FRED spec claims:
+
+The FRED SSP MSRs are supported by any processor that enumerates
+CPUID.(EAX=7,ECX=1):EAX.FRED[bit 17] as 1. If such a processor does not
+support CET, FRED transitions will not use the MSRs (because shadow stacks
+are not enabled), but the MSRs would still be accessible using MSR-access
+instructions (e.g., RDMSR, WRMSR).
 
 
-Why MSR_IA32_S_CET is not included here?
+It means KVM needs to handle MSR_IA32_PL0_SSP even when FRED is supported
+but CET is not.  And this can be broken down into two subtasks:
+
+1) Allow such a guest to access MSR_IA32_PL0_SSP w/o triggering #GP.  And
+this behavior is already implemented in patch 8 of this series.
+
+2) Save and restore MSR_IA32_PL0_SSP in both KVM and Qemu for such a guest.
 
 
-> +	case MSR_IA32_PL0_SSP ... MSR_IA32_PL3_SSP:
-> +		return true;
-> +	default:
-> +		return false;
-> +	}
-> +}
+I have the patches for 2) but they are not included in this series, because
+
+1) how much do we care the value in MSR_IA32_PL0_SSP in such a guest?
+
+Yes, Chao told me that you are the one saying that MSRs can be used as
+clobber registers and KVM should preserve the value.  Does MSR_IA32_PL0_SSP
+in such a guest count?
 
 
-Is it better to do?
+2) Saving/restoring MSR_IA32_PL0_SSP adds complexity, though it's seldom
+used.  Is it worth it?
 
-static bool is_xstate_managed_msr(u32 index)
-{
-          if (!kvm_caps.supported_xss)
-                  return false;
 
-          switch (index) {
-          case MSR_IA32_U_CET:
-          case MSR_IA32_S_CET:
-          case MSR_IA32_PL1_SSP ... MSR_IA32_PL3_SSP:
-                  return kvm_caps.supported_xss & XFEATURE_MASK_CET_USER &&
-                         kvm_caps.supported_xss & XFEATURE_MASK_CET_KERNEL;
-          default:
-                  return false;
-          }
-}
-
-And it would be obvious how to add new MSRs related to other XFEATURE bits.
+BTW I'm still working on a KVM unit test for it, using a L1 VMM that
+enumerates FRED but not CET.
 
 Thanks!
      Xin
