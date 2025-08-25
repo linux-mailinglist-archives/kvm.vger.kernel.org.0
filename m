@@ -1,207 +1,219 @@
-Return-Path: <kvm+bounces-55601-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-55599-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 74AE8B33861
-	for <lists+kvm@lfdr.de>; Mon, 25 Aug 2025 10:00:10 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 33B7EB3385D
+	for <lists+kvm@lfdr.de>; Mon, 25 Aug 2025 09:59:24 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 66E6D3A9219
-	for <lists+kvm@lfdr.de>; Mon, 25 Aug 2025 07:59:59 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 070F3189615B
+	for <lists+kvm@lfdr.de>; Mon, 25 Aug 2025 07:59:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DE21229A9E9;
-	Mon, 25 Aug 2025 07:59:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D1D6B29AB03;
+	Mon, 25 Aug 2025 07:59:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="TmeEKIKR"
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="MDak/p70"
 X-Original-To: kvm@vger.kernel.org
-Received: from NAM12-MW2-obe.outbound.protection.outlook.com (mail-mw2nam12on2040.outbound.protection.outlook.com [40.107.244.40])
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AA2EB2882CC;
-	Mon, 25 Aug 2025 07:59:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.244.40
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756108776; cv=fail; b=IWwhVEuxtdqLex/vFx7NLtg/zwOpACremFiipgpiYi0vCmH9RRJmWg4aj4ZXujsasB7jmY2WsImbyjuzBqfYijRNQRRRoYBWG0BgxHktpDnT9F+R0d1uRJKPL5gOqzD3ncHTgesRb/WiL09FxdWRDoniuYnXJycDizSpebOTkVA=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756108776; c=relaxed/simple;
-	bh=oCSOd0UZMCeZx9UYiHXNUmCohaHZEkEMRYpnvpKNziU=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=ePpD0LRmWOu2MLXRaNZ1DJgUB11fQaJ6WQE4NN41cURDJNEOJdE/8O2GBP+hjmlauJENdSxurmfgpoI8fA2DA4SFe0hidfQB6//c12P7LrYZ9qPSvTM2xFXtD1IqaJjcrhAUVgU6xmxDSysRzZHn+MIJiv4rpfJSFGTf/qbXs7M=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=TmeEKIKR; arc=fail smtp.client-ip=40.107.244.40
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=QE6R6fIzm6eFYD+rg1BHB8G01RCkGSdxJo9qaou2jb2nNWfW1PkmOyOrd9Gqx59P0W/dJJheHHOdPInE4MdKgvDO8x/wzxcBRRxqqtntNQcU7wgHGm7vR1IrzThsLbz8WOeHRGkBhkg4JphURcWby5qN0Xm5RZ/9Y8/1XzCCiQ5qP6tjiK6tbgKwRg+su+CHBKoKl/lTz8gpUz4wgg6eJK5rozYen65YN/QI4eawnOqlkW0/zX+OYJ7pKL4+z4As6cA/pmSx7kF+Ki7c0sCtNhqvpKiin1mRt7X8kb0HPqOfKjMWCgnzN3sncCFTfzoM8oXytKuayvQDt26IAlz+sw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=/lRbghsKVs0lpJg1ARh1Iadc/dB60vONZAJDJ73+hVw=;
- b=nncOYM/zaWsUggctFubMYOvPUtqZNaLKfVe/4atUcAjt1hX3Oq+CSXmbN/0+Mab5fj2Pj6TBIbNVULThI+XqCc0VfOy6ABvNVvHGv5OsoZXx6ozxpEqPQX55MPurL3Qs9foasZNCEbt8WjZa857kZPyowzSCLqdA3z3rqniAz43H1tspzE+OH2yw6pJp2o8wsrknMFQdDL6ByrtWXBEHGghfq+cIb4jfUw3R1MXM2A58KGNAEIubeHi6WdMk+jFadiQeRFl1sye9Yr7wesd2P4vlndZc2/GgSouD8a2pGVJ9kYejJ0lABG687o1mUQIdMZC6u3ji1LJlYV9juCCl5A==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 165.204.84.17) smtp.rcpttodomain=linutronix.de smtp.mailfrom=amd.com;
- dmarc=pass (p=quarantine sp=quarantine pct=100) action=none
- header.from=amd.com; dkim=none (message not signed); arc=none (0)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=/lRbghsKVs0lpJg1ARh1Iadc/dB60vONZAJDJ73+hVw=;
- b=TmeEKIKRVNhJcxvu0QqliDxr2AnUWcFhxkDAduN2nrfpeI5d8e6xs7vcDof2v5ENXkxQMWbR8ZMMPsXy4hMoo33rgGpaexr1QJ0EOn1oyLOlLnOjIukj26dBB2TRibcnmFNErlU32A+GA3gAT/RK/IpUb2KooEEwd6RNHUaaw88=
-Received: from SA9PR13CA0009.namprd13.prod.outlook.com (2603:10b6:806:21::14)
- by CY1PR12MB9699.namprd12.prod.outlook.com (2603:10b6:930:108::5) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9052.20; Mon, 25 Aug
- 2025 07:59:30 +0000
-Received: from SA2PEPF00003AE8.namprd02.prod.outlook.com
- (2603:10b6:806:21:cafe::4b) by SA9PR13CA0009.outlook.office365.com
- (2603:10b6:806:21::14) with Microsoft SMTP Server (version=TLS1_3,
- cipher=TLS_AES_256_GCM_SHA384) id 15.20.9073.13 via Frontend Transport; Mon,
- 25 Aug 2025 07:59:30 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
- smtp.mailfrom=amd.com; dkim=none (message not signed)
- header.d=none;dmarc=pass action=none header.from=amd.com;
-Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
- 165.204.84.17 as permitted sender) receiver=protection.outlook.com;
- client-ip=165.204.84.17; helo=SATLEXMB04.amd.com; pr=C
-Received: from SATLEXMB04.amd.com (165.204.84.17) by
- SA2PEPF00003AE8.mail.protection.outlook.com (10.167.248.8) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.20.9052.8 via Frontend Transport; Mon, 25 Aug 2025 07:59:30 +0000
-Received: from BLRKPRNAYAK.amd.com (10.180.168.240) by SATLEXMB04.amd.com
- (10.181.40.145) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.39; Mon, 25 Aug
- 2025 02:59:22 -0500
-From: K Prateek Nayak <kprateek.nayak@amd.com>
-To: Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>,
-	Borislav Petkov <bp@alien8.de>, Dave Hansen <dave.hansen@linux.intel.com>,
-	Sean Christopherson <seanjc@google.com>, Paolo Bonzini <pbonzini@redhat.com>,
-	<x86@kernel.org>
-CC: Naveen rao <naveen.rao@amd.com>, Sairaj Kodilkar <sarunkod@amd.com>, "H.
- Peter Anvin" <hpa@zytor.com>, "Peter Zijlstra (Intel)"
-	<peterz@infradead.org>, "Xin Li (Intel)" <xin@zytor.com>, Pawan Gupta
-	<pawan.kumar.gupta@linux.intel.com>, Tom Lendacky <thomas.lendacky@amd.com>,
-	<linux-kernel@vger.kernel.org>, <kvm@vger.kernel.org>, Mario Limonciello
-	<mario.limonciello@amd.com>, "Gautham R. Shenoy" <gautham.shenoy@amd.com>,
-	Babu Moger <babu.moger@amd.com>, Suravee Suthikulpanit
-	<suravee.suthikulpanit@amd.com>, K Prateek Nayak <kprateek.nayak@amd.com>,
-	Naveen N Rao <naveen@kernel.org>
-Subject: [PATCH v4 4/4] x86/msr-index: Define AMD64_CPUID_FN_EXT MSR
-Date: Mon, 25 Aug 2025 07:57:32 +0000
-Message-ID: <20250825075732.10694-5-kprateek.nayak@amd.com>
-X-Mailer: git-send-email 2.43.0
-In-Reply-To: <20250825075732.10694-1-kprateek.nayak@amd.com>
-References: <20250825075732.10694-1-kprateek.nayak@amd.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2A461299943;
+	Mon, 25 Aug 2025 07:59:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1756108747; cv=none; b=sQ+5eEOEmV7APQ2TXCqRjp0J99/5ej8NbeJd0y1/JAIKNDVYcqdnE7Ki7NhJcr+BGHTHBUK+7xY5eOuh1y0F9+XuMPXxK8sV2rYGzh9pxZT8tK6GcBFgd/y/ZCeiJVt32XvlJLsV6Ankz7XDTLxFTiP5A3SqN7NFCWbQfjIwwnE=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1756108747; c=relaxed/simple;
+	bh=7LCQFks4hMexpSXOFIoo+iH2Rh4kkXuCoo92zMiwUj0=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=ZmVbNV4C4e8avWQ/oaJh8O1i1MoeQw2UNvWqh2FEdc2/y5rD4C7hg+soDvNiyIDoRM+NOU0sJcvC8ly/AVMPaWdWPkHNcB6fgracQb+LRoA0wQ/musSyad4bCdV9kqcGKuTrRr0vcTRdrNaeV+v/PCpn4FpaEPeIght/PQotUCU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=MDak/p70; arc=none smtp.client-ip=148.163.156.1
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
+Received: from pps.filterd (m0353729.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 57P3uq6I025621;
+	Mon, 25 Aug 2025 07:59:03 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
+	:content-transfer-encoding:content-type:date:from:in-reply-to
+	:message-id:mime-version:references:subject:to; s=pp1; bh=Zf6dsK
+	CvZqImi5w4uJYMKsuJntcugfcozvUzZHtxbZI=; b=MDak/p70L3VYD6S31i9eiu
+	WIZIqy/qWwz7zyKG7/V6axE5oK96HO3eY+feDBpxyfjz5iqND1f3BH8MvyBW6N/S
+	vjMOvNG/JuOOL0sszPuJiXxfcVJ5rLFtVsZzn1qVD67QFztMXsiCeJPcvifBSDcI
+	er8vDHDaHqqRq4sU52AtZ9OGmUF0c5kwR1KXjkMWHRVmPHZ6lMCKMdUsqPe5Lwz6
+	wrsMiOxCnxwWoTxlOBkXNBG68lEmc5oepYfN/eTImV8jcsWD/C7OsUEy6Vsv3rxW
+	yiWQCRhIxsWevdZaHyOEjfSvQRQ2wh7gTAyCA+BxfosoKoh/OSTbDfWT5KJsLDPw
+	==
+Received: from ppma21.wdc07v.mail.ibm.com (5b.69.3da9.ip4.static.sl-reverse.com [169.61.105.91])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 48q5av7pqu-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Mon, 25 Aug 2025 07:59:02 +0000 (GMT)
+Received: from pps.filterd (ppma21.wdc07v.mail.ibm.com [127.0.0.1])
+	by ppma21.wdc07v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 57P5YFHF002520;
+	Mon, 25 Aug 2025 07:59:01 GMT
+Received: from smtprelay02.fra02v.mail.ibm.com ([9.218.2.226])
+	by ppma21.wdc07v.mail.ibm.com (PPS) with ESMTPS id 48qrypctwc-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Mon, 25 Aug 2025 07:59:01 +0000
+Received: from smtpav07.fra02v.mail.ibm.com (smtpav07.fra02v.mail.ibm.com [10.20.54.106])
+	by smtprelay02.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 57P7wvhX52494728
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Mon, 25 Aug 2025 07:58:57 GMT
+Received: from smtpav07.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 65C4C20043;
+	Mon, 25 Aug 2025 07:58:57 +0000 (GMT)
+Received: from smtpav07.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id F0F8620040;
+	Mon, 25 Aug 2025 07:58:56 +0000 (GMT)
+Received: from [9.111.41.71] (unknown [9.111.41.71])
+	by smtpav07.fra02v.mail.ibm.com (Postfix) with ESMTP;
+	Mon, 25 Aug 2025 07:58:56 +0000 (GMT)
+Message-ID: <b172da07-692c-4462-bbd0-ef61073326a4@linux.ibm.com>
+Date: Mon, 25 Aug 2025 09:58:56 +0200
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: SATLEXMB04.amd.com (10.181.40.145) To SATLEXMB04.amd.com
- (10.181.40.145)
-X-EOPAttributedMessage: 0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: SA2PEPF00003AE8:EE_|CY1PR12MB9699:EE_
-X-MS-Office365-Filtering-Correlation-Id: f9e534c2-de57-45f0-5a50-08dde3ad5248
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|82310400026|1800799024|36860700013|7416014|376014;
-X-Microsoft-Antispam-Message-Info:
-	=?us-ascii?Q?d1V4cRtTZRS2nDBSf4z+5Mql97o+1fOpWd4ARWsAccYDrG64VwH65mXJlm0+?=
- =?us-ascii?Q?cBVxSj+MXmw0kJrRmlowNI0mQwezeTH55gyWJbYSBAgOKg0UNNnf8kViFLN5?=
- =?us-ascii?Q?YaULu4atDUA9CqflA8V27cmi7dcokvm8qE0h0aOTeew3vRg9/ux7knfDG4Yk?=
- =?us-ascii?Q?NqOkURz6yh+8H9Fp+Df0V+nJa6sP9CA9ooNX9xp/JhOgRgX670qgDI+/5Qei?=
- =?us-ascii?Q?yPYicp9VAXDaabKmbQyFzaJ/Uzq4QmCdokokerPaIcIOATcO6wqs5w/G+3Xh?=
- =?us-ascii?Q?E12ssIAi1MawWZbSpO24fgk7QG4eyIQDrg6ibb5QmzWxdjKNBFXJYCSziE8B?=
- =?us-ascii?Q?PfDkFD8yokr4Fo5kUb6TORydz6JsNvyYUaYz8UM/4TpWRCB02Ed9Mey2Ijzu?=
- =?us-ascii?Q?/5PnOT3GWnosJmCREKjcOz2zew3epYTwd1bw6Tb1DcE0aUxSPwJgxaIqnLlS?=
- =?us-ascii?Q?wFPYFSke26e5QkULY+8i6RD197gbpkF4nwkBT0H/anAgdoiHeRsFDs8S5h7K?=
- =?us-ascii?Q?QVr5Tw88kHKm9/19kaWNlJ4DJVL7shc3s0ocyUYN888wB4nOtCdVt3PS/gHj?=
- =?us-ascii?Q?bbVs1ph9ElDDrqb+yhdysXUL06ejqVo7vEPFd5HllPzOe40KUC5oVfIq61s4?=
- =?us-ascii?Q?ozo6IP7I/W6erg/h42lr/SLNxqWs6GQfA/FWeIVwZnJtIJNEqpKtkH83fMRJ?=
- =?us-ascii?Q?gJtPCVATATakV/QjJkcVtJhj7uQj7+aXcvmeZQ9AInzoP1+7wqrEzOMa19YC?=
- =?us-ascii?Q?XKGCS+qsAxKId4JCw3JzEzEuhuVTwgb3qIUgBYwwOkYo6OmKKs+/GaD9OySf?=
- =?us-ascii?Q?gu4pfjpi8dGeFzZYj/MI0HgGqifMUNVkhVdvAylDpY1j8Y2ytja63RdP7CbJ?=
- =?us-ascii?Q?RM9dTCc/cK0RsjZxPPKF//48sFPzQo5+AXTt8W0/6IrDD7xrNquwz7xSSN9Y?=
- =?us-ascii?Q?duj4e1RBWaM0rtfq6Ju2XpbApDOPA6Hp5LF6gYGQYDbzYnRLJ3WNSXCk9/0F?=
- =?us-ascii?Q?mxQIq7D4HN+eCGuwO27WxZsoYTGmiYzS3XJnJTfGnBuRGq9ge0C9uhJQa7lO?=
- =?us-ascii?Q?qFivrCj5yIMHtns31KwqIQyPL7AijqRQWcbCCD2Np04M/JdjVrd3+WqRnPUn?=
- =?us-ascii?Q?TyN8ZZ6bHCUmgrAyiv9L22PyLYeM9WjM2S9+jv9btAE2n1Jqt8M8SgODF8aP?=
- =?us-ascii?Q?a3IKF/VbtSk45pH9MctMWiXqy0QlE7VyhqaQzG5Ih22qe/C8q46T3fBv+PxB?=
- =?us-ascii?Q?PWZ7udLXBfFNgp39M/tpLn358QnAM4+hdA1QRX61pL+XgQcZmsmtchckw/Mh?=
- =?us-ascii?Q?1tqyoYVZemNSPkZeFaOtspvDyeswZQjwPXvF5ujm1s/nmqHYPt/Xl5LHZtCK?=
- =?us-ascii?Q?vyVvzEEdFAsAAetsSxaK79BCPCA4m/G9VRToGwdLfBIShLKrVIbfMOdbfmQr?=
- =?us-ascii?Q?1dFWOfm0WHjlUYtcOYArWyE85IBajPAtCs4XCdsN7uc3l2YniqAfwu1rU980?=
- =?us-ascii?Q?HEZQkkC69/HbtfOFQekgOBRYHbhJe34cc7UA?=
-X-Forefront-Antispam-Report:
-	CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB04.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230040)(82310400026)(1800799024)(36860700013)(7416014)(376014);DIR:OUT;SFP:1101;
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 25 Aug 2025 07:59:30.5098
- (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: f9e534c2-de57-45f0-5a50-08dde3ad5248
-X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[SATLEXMB04.amd.com]
-X-MS-Exchange-CrossTenant-AuthSource:
-	SA2PEPF00003AE8.namprd02.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: CY1PR12MB9699
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH] KVM: s390: Fix access to unavailable adapter indicator
+ pages during postcopy
+To: Thomas Huth <thuth@redhat.com>, Claudio Imbrenda
+ <imbrenda@linux.ibm.com>,
+        kvm@vger.kernel.org
+Cc: Peter Xu <peterx@redhat.com>,
+        Christian Borntraeger <borntraeger@linux.ibm.com>,
+        David Hildenbrand <david@redhat.com>,
+        Heiko Carstens <hca@linux.ibm.com>, Vasily Gorbik <gor@linux.ibm.com>,
+        Alexander Gordeev
+ <agordeev@linux.ibm.com>,
+        Sven Schnelle <svens@linux.ibm.com>, linux-s390@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+References: <20250821152309.847187-1-thuth@redhat.com>
+Content-Language: en-US
+From: Janosch Frank <frankja@linux.ibm.com>
+Autocrypt: addr=frankja@linux.ibm.com; keydata=
+ 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
+In-Reply-To: <20250821152309.847187-1-thuth@redhat.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: d3_Sz99F3zTh9VJAhpUpbZjJiwTa6YWR
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUwODIzMDAyMSBTYWx0ZWRfX3urjkaXzKH/a
+ ijwfMZtgEm+EVN/Om7jBPITedQ1syhFS79QSzIdvaaLtZS9eanJwtMT/vh7+1H/QvY+gIeIa0ij
+ pptOBu4XiEsYAfAnfmWWfF/vzoNyMKRoJxh7zqo9wG75Fz7rFvJ5H1vULXTg+Up7qLLn4Na2cSn
+ ZPHxSllZWPWYjRN5MClj+pyXK5oK0KcTmKSKQo1JuVmG+U1OWEfAowcr3DHZwnQreYXsXhhIrAu
+ PuldRpeYYSB/d/3uK+gNfHjS1jWMKMX42RMwk3WmnyCDUGyZGznLPscreAhpbZTNvTuSD4lnevm
+ caLbHGH7BpvSlTZdS8AjStgTX9yb1S1ESCtiroU3+ZxlmnW/CqVUDt8o345iCLEZdxRwPp6Nt+u
+ wEwJZWO7
+X-Proofpoint-ORIG-GUID: d3_Sz99F3zTh9VJAhpUpbZjJiwTa6YWR
+X-Authority-Analysis: v=2.4 cv=SNNCVPvH c=1 sm=1 tr=0 ts=68ac17c6 cx=c_pps
+ a=GFwsV6G8L6GxiO2Y/PsHdQ==:117 a=GFwsV6G8L6GxiO2Y/PsHdQ==:17
+ a=IkcTkHD0fZMA:10 a=2OwXVqhp2XgA:10 a=20KFwNOVAAAA:8 a=VnNF1IyMAAAA:8
+ a=btW-XHHgg9hxShBi8oQA:9 a=QEXdDO2ut3YA:10
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1099,Hydra:6.1.9,FMLib:17.12.80.40
+ definitions=2025-08-25_03,2025-08-20_03,2025-03-28_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ spamscore=0 adultscore=0 bulkscore=0 phishscore=0 clxscore=1015
+ impostorscore=0 malwarescore=0 suspectscore=0 priorityscore=1501
+ classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
+ reason=mlx scancount=1 engine=8.19.0-2507300000 definitions=main-2508230021
 
-Explicitly define the AMD64_CPUID_FN_EXT MSR used to toggle the extended
-features. Also define and use the bits necessary for an old TOPOEXT
-fixup on AMD Family 0x15 processors.
+On 8/21/25 5:23 PM, Thomas Huth wrote:
+> From: Thomas Huth <thuth@redhat.com>
+> 
+> When you run a KVM guest with vhost-net and migrate that guest to
+> another host, and you immediately enable postcopy after starting the
+> migration, there is a big chance that the network connection of the
+> guest won't work anymore on the destination side after the migration.
+> 
+> With a debug kernel v6.16.0, there is also a call trace that looks
+> like this:
+> 
+>   FAULT_FLAG_ALLOW_RETRY missing 881
+>   CPU: 6 UID: 0 PID: 549 Comm: kworker/6:2 Kdump: loaded Not tainted 6.16.0 #56 NONE
+>   Hardware name: IBM 3931 LA1 400 (LPAR)
+>   Workqueue: events irqfd_inject [kvm]
+>   Call Trace:
+>    [<00003173cbecc634>] dump_stack_lvl+0x104/0x168
+>    [<00003173cca69588>] handle_userfault+0xde8/0x1310
+>    [<00003173cc756f0c>] handle_pte_fault+0x4fc/0x760
+>    [<00003173cc759212>] __handle_mm_fault+0x452/0xa00
+>    [<00003173cc7599ba>] handle_mm_fault+0x1fa/0x6a0
+>    [<00003173cc73409a>] __get_user_pages+0x4aa/0xba0
+>    [<00003173cc7349e8>] get_user_pages_remote+0x258/0x770
+>    [<000031734be6f052>] get_map_page+0xe2/0x190 [kvm]
+>    [<000031734be6f910>] adapter_indicators_set+0x50/0x4a0 [kvm]
+>    [<000031734be7f674>] set_adapter_int+0xc4/0x170 [kvm]
+>    [<000031734be2f268>] kvm_set_irq+0x228/0x3f0 [kvm]
+>    [<000031734be27000>] irqfd_inject+0xd0/0x150 [kvm]
+>    [<00003173cc00c9ec>] process_one_work+0x87c/0x1490
+>    [<00003173cc00dda6>] worker_thread+0x7a6/0x1010
+>    [<00003173cc02dc36>] kthread+0x3b6/0x710
+>    [<00003173cbed2f0c>] __ret_from_fork+0xdc/0x7f0
+>    [<00003173cdd737ca>] ret_from_fork+0xa/0x30
+>   3 locks held by kworker/6:2/549:
+>    #0: 00000000800bc958 ((wq_completion)events){+.+.}-{0:0}, at: process_one_work+0x7ee/0x1490
+>    #1: 000030f3d527fbd0 ((work_completion)(&irqfd->inject)){+.+.}-{0:0}, at: process_one_work+0x81c/0x1490
+>    #2: 00000000f99862b0 (&mm->mmap_lock){++++}-{3:3}, at: get_map_page+0xa8/0x190 [kvm]
+> 
+> The "FAULT_FLAG_ALLOW_RETRY missing" indicates that handle_userfaultfd()
+> saw a page fault request without ALLOW_RETRY flag set, hence userfaultfd
+> cannot remotely resolve it (because the caller was asking for an immediate
+> resolution, aka, FAULT_FLAG_NOWAIT, while remote faults can take time).
+> With that, get_map_page() failed and the irq was lost.
+> 
+> We should not be strictly in an atomic environment here and the worker
+> should be sleepable (the call is done during an ioctl from userspace),
+> so we can allow adapter_indicators_set() to just sleep waiting for the
+> remote fault instead.
+> 
+> Link: https://issues.redhat.com/browse/RHEL-42486
+> Signed-off-by: Peter Xu <peterx@redhat.com>
+> [thuth: Assembled patch description and fixed some cosmetical issues]
+> Signed-off-by: Thomas Huth <thuth@redhat.com>
 
-No functional changes intended.
-
-Signed-off-by: K Prateek Nayak <kprateek.nayak@amd.com>
----
-Changelog v3..v4:
-
-o Moved this to Patch 4. No changes to diff.
----
- arch/x86/include/asm/msr-index.h   | 5 +++++
- arch/x86/kernel/cpu/topology_amd.c | 7 ++++---
- 2 files changed, 9 insertions(+), 3 deletions(-)
-
-diff --git a/arch/x86/include/asm/msr-index.h b/arch/x86/include/asm/msr-index.h
-index b65c3ba5fa14..e194287177db 100644
---- a/arch/x86/include/asm/msr-index.h
-+++ b/arch/x86/include/asm/msr-index.h
-@@ -631,6 +631,11 @@
- #define MSR_AMD_PPIN			0xc00102f1
- #define MSR_AMD64_CPUID_FN_7		0xc0011002
- #define MSR_AMD64_CPUID_FN_1		0xc0011004
-+
-+#define MSR_AMD64_CPUID_FN_EXT				0xc0011005
-+#define MSR_AMD64_CPUID_FN_EXT_TOPOEXT_ENABLED_BIT	54
-+#define MSR_AMD64_CPUID_FN_EXT_TOPOEXT_ENABLED		BIT_ULL(MSR_AMD64_CPUID_FN_EXT_TOPOEXT_ENABLED_BIT)
-+
- #define MSR_AMD64_LS_CFG		0xc0011020
- #define MSR_AMD64_DC_CFG		0xc0011022
- #define MSR_AMD64_TW_CFG		0xc0011023
-diff --git a/arch/x86/kernel/cpu/topology_amd.c b/arch/x86/kernel/cpu/topology_amd.c
-index 12ece07b407b..6e8186f05cde 100644
---- a/arch/x86/kernel/cpu/topology_amd.c
-+++ b/arch/x86/kernel/cpu/topology_amd.c
-@@ -163,11 +163,12 @@ static void topoext_fixup(struct topo_scan *tscan)
- 	    c->x86 != 0x15 || c->x86_model < 0x10 || c->x86_model > 0x6f)
- 		return;
- 
--	if (msr_set_bit(0xc0011005, 54) <= 0)
-+	if (msr_set_bit(MSR_AMD64_CPUID_FN_EXT,
-+			MSR_AMD64_CPUID_FN_EXT_TOPOEXT_ENABLED_BIT) <= 0)
- 		return;
- 
--	rdmsrq(0xc0011005, msrval);
--	if (msrval & BIT_64(54)) {
-+	rdmsrq(MSR_AMD64_CPUID_FN_EXT, msrval);
-+	if (msrval & MSR_AMD64_CPUID_FN_EXT_TOPOEXT_ENABLED) {
- 		set_cpu_cap(c, X86_FEATURE_TOPOEXT);
- 		pr_info_once(FW_INFO "CPU: Re-enabling disabled Topology Extensions Support.\n");
- 	}
--- 
-2.34.1
-
+Acked-by: Janosch Frank <frankja@linux.ibm.com>
 
