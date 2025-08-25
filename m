@@ -1,245 +1,309 @@
-Return-Path: <kvm+bounces-55595-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-55596-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3232EB3365E
-	for <lists+kvm@lfdr.de>; Mon, 25 Aug 2025 08:26:09 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 715B1B33851
+	for <lists+kvm@lfdr.de>; Mon, 25 Aug 2025 09:58:12 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 8CE597A4D16
-	for <lists+kvm@lfdr.de>; Mon, 25 Aug 2025 06:24:33 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 59B491896361
+	for <lists+kvm@lfdr.de>; Mon, 25 Aug 2025 07:58:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A9F8227FD48;
-	Mon, 25 Aug 2025 06:26:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 287E2299A94;
+	Mon, 25 Aug 2025 07:58:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="WmpdnK5t"
+	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="e6NZaX0d"
 X-Original-To: kvm@vger.kernel.org
-Received: from NAM11-CO1-obe.outbound.protection.outlook.com (mail-co1nam11on2080.outbound.protection.outlook.com [40.107.220.80])
+Received: from NAM10-MW2-obe.outbound.protection.outlook.com (mail-mw2nam10on2057.outbound.protection.outlook.com [40.107.94.57])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 599DA1F1518;
-	Mon, 25 Aug 2025 06:25:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.220.80
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7997C28850B;
+	Mon, 25 Aug 2025 07:58:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.94.57
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756103159; cv=fail; b=omgEZXXXb2QuEeC/NWPpy388VlqaBq3xMpUzzCKdlBKjAfLces1tIwdqmg+DTZQSfb1dfFPzSaT3SlE8vn+ChgNQWeioyicWWDWM/aHEaFmfeogMqK76V2dyKO1wWC8/jEIKSYi9SaywkhJqX3VKo5/gd/LPIMifPwyM3vRcHkY=
+	t=1756108682; cv=fail; b=Fu3PhX8ViCJu3to7maM3Q2dx8icgFDdJYkgJRYFENzLILiQkrNpAkG+MULURvm5FNzxonqi9TEdj8nfRHyD+NIhNhyRGUW51a1yzVMC77D4AUNZi+dyl/tNxlbkJ8sHRsd78VSjkxwz15NWpAcNFSMidxCo+APFtoMcZC/sVViY=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756103159; c=relaxed/simple;
-	bh=6jOI4MWNPOfX9NzcQzl2CFPc0vk26wNLfYJ0hp03QyI=;
-	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
-	 Content-Type:MIME-Version; b=g0WBbGKbSpZBxbqiH3ghwoL1Tv1m9nqTSGH6paGcCiAGYpL9dMIaAlQk14esptiSnCijueRuD5ujS58JliETZdmzfO9UtEnZttFORE4XqcMvH7Zlfv/AGaQGGE8zLGEx61ptElDrSrsbvD3bc+etyGzRxN/M51ERoSyh9CWGMxw=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=WmpdnK5t; arc=fail smtp.client-ip=40.107.220.80
+	s=arc-20240116; t=1756108682; c=relaxed/simple;
+	bh=7QrPpJ0CjhiSyex3aiBE9B/wgiX1cuKyWQE+Gzf5muc=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=uibt7mCHYEudm7cOn/oNYhUet/mhAGXNk4bzQKZWh5rzFYeU44pzkZIwfAMEUBPLKM1z/ljM/yxiE9UFQtPRwaoTM9Et44RVSJy58zc+e0RoisL3u4iFNGzzUhxCbFG76N1xMeEhZfSxv5jT49UT6xGIZksDnKReRC8cWlOehuw=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=e6NZaX0d; arc=fail smtp.client-ip=40.107.94.57
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
 Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=LVCEjrq//NziteQ20XjSYyxfOuLlOYm8pNgBgZ0vYxPp0Modaf2klLtLKeSn371qTpFj8xFEmUxZZPdCK02r1kbAx5dhfnUEV2vVuhCoewyINrSHig1ZgWKctTN+SLtz85lCHdjVtWBh4twUU9vU2nxMIkPEoi8lohaF2o8abd2pj7p9v2GcW7zXfUMVfghueC9zivVfb1pIHiC8VMZTKjPG2BIjUgGk0SVT0BXxiKkARqMgWWVxbmDJFLkzs9m1PSvUfkRfcAdpHjMlJl90AEC4rDUtY9+tecpQ5iKHcTcGZklSTVo7Rk6UtyF2BbeHmleVASgzkEWuCHr966MZTA==
+ b=nN4OzJPnTlbQpcF1O24LsTP94g04B98RaD0UpjpA4KXh4o1Yb0Ehn6TWWjE3pj+R7jBZfzXNU5zB4uWHCjDIFnisTfq33DRsd8vDYJZwV78jMQmv+J+TZfhUO9BlVu/57gHd6QD3Yeu83u4Q9ch1YIb/3UatncGXQdnIIDUC8f7wUOK6qk0vwkngiLJj46KTcncqYi60Tx7v43SSPNFho9UTrtf48ff3FTiC2JqqOkog2x4x7Zk3rNGKbdiIZOkICvLQ5t9oCxXX9cjP31qr/QY8ZaAV5rCP//gp8L32tJPYpxShBMlvfsl7+MmDB3VqUc7xPF1CgJ0UqjZGimYdRA==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector10001;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=D0SsX4SJKAcUkguRtRdto2zl+o1zICswxqoSXWQQnP8=;
- b=HrLEwsO4pbDwSS4lUxJfXRwqaKVd5eC/7KuclDiLXc8MHLfknlxFlVr+Xhu8eIe3oSzNxJO/IIlEsZdXLUJI9ZUzDJXcj6wv6N5iPzDgT4VJIfknk5CgvQctaHwPIZBB7fltEnxw6EUZ9h9XycZ6F8NE2t+K0goMiayQ2kbkcUw2QKaRqmvdOP2xFyk2ZzL8xQIRBgUSLD3nzA8wWK1Jh07Ulr4ZKs8SMbYG8Ff7I9wxvCXrLFFFvG130zldz4x0KtmRihtK4l41carP1InJc0kck5W2jr8ygmel1r6kAY0i4T9AqWwdO4SPP0Rbz9NN9m8Z6H/vZOoOQ03fE+LFDA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
- header.d=amd.com; arc=none
+ bh=7iR/WBGh6HNCQGtUl0Nud70qsfeRAJ86W9sbK+z1V+0=;
+ b=dViniQQXUO8ouUJflTYuD9RbUldvkZB3XfxH7jxayAhmR22SFFchJt+opYPSjqQv7mUy0o4mVQKzhrDKCyqWwrQ1Alk6mlJfIhs2ZMqoedmtQ7aaTj5YJby2yDYq4zH6urk8KKZepChSLNV7XgeWEwk48kVLy3x749LamZM8JxkOLuhhZGydR6SquRUMggV8IedVstwqdhNEJfPatxWk1oOmCmhr55NBDxFhU2amDMtARs0LusGoyc1g1YgNyDrGGJA/stKrTGN5ULWnvBWvkc5Hz9P1Zu8AzIjyH9W4S6PJ97gvOS4m1z5KY3e5b8J8SSY3PAEjinp9EUUOeOkI+g==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 165.204.84.17) smtp.rcpttodomain=linutronix.de smtp.mailfrom=amd.com;
+ dmarc=pass (p=quarantine sp=quarantine pct=100) action=none
+ header.from=amd.com; dkim=none (message not signed); arc=none (0)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=D0SsX4SJKAcUkguRtRdto2zl+o1zICswxqoSXWQQnP8=;
- b=WmpdnK5tlmfVkc/SZHwS326vhnwtCJzRWqIepDeLiU0ZWOQ4CtzLhPGAEmXgUSqpslA2X98EZ578m2vJ4uWX9G6fas3JyjHafmfAp5CLVQyB6BgKDtjay1b2xy2c9jZi8SZFWUxovYUUYXNS0qMzNRs2U8Gm48G45qjq7iy0kWI=
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=amd.com;
-Received: from DS0PR12MB6608.namprd12.prod.outlook.com (2603:10b6:8:d0::10) by
- PH7PR12MB5654.namprd12.prod.outlook.com (2603:10b6:510:137::21) with
+ bh=7iR/WBGh6HNCQGtUl0Nud70qsfeRAJ86W9sbK+z1V+0=;
+ b=e6NZaX0dquJXf/eIOsLF1DIPvfYWzaSxwWd/tlYNeGTNxh40exDJhRviwiTj+p2Wmk1ItTv7r2ZMhyGe0kRNqTP4dcaURasKhWYy/dC6DtyXhhnY1NBd5boBw+aATX22BpNLzrxJ1gVErkr/DmUv0G9yNXyzp9++HzwLlexpaj0=
+Received: from SA1P222CA0108.NAMP222.PROD.OUTLOOK.COM (2603:10b6:806:3c5::29)
+ by CH1PR12MB9621.namprd12.prod.outlook.com (2603:10b6:610:2b2::5) with
  Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9052.20; Mon, 25 Aug
- 2025 06:25:54 +0000
-Received: from DS0PR12MB6608.namprd12.prod.outlook.com
- ([fe80::b71d:8902:9ab3:f627]) by DS0PR12MB6608.namprd12.prod.outlook.com
- ([fe80::b71d:8902:9ab3:f627%5]) with mapi id 15.20.9052.019; Mon, 25 Aug 2025
- 06:25:54 +0000
-Message-ID: <a91b5470-33a0-4a23-ac1a-a7f1d4559cc1@amd.com>
-Date: Mon, 25 Aug 2025 11:55:44 +0530
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v9 09/18] x86/sev: Initialize VGIF for secondary VCPUs for
- Secure AVIC
-To: Borislav Petkov <bp@alien8.de>
-Cc: linux-kernel@vger.kernel.org, tglx@linutronix.de, mingo@redhat.com,
- dave.hansen@linux.intel.com, Thomas.Lendacky@amd.com, nikunj@amd.com,
- Santosh.Shukla@amd.com, Vasant.Hegde@amd.com, Suravee.Suthikulpanit@amd.com,
- David.Kaplan@amd.com, x86@kernel.org, hpa@zytor.com, peterz@infradead.org,
- seanjc@google.com, pbonzini@redhat.com, kvm@vger.kernel.org,
- kirill.shutemov@linux.intel.com, huibo.wang@amd.com, naveen.rao@amd.com,
- francescolavra.fl@gmail.com, tiala@microsoft.com
-References: <20250811094444.203161-1-Neeraj.Upadhyay@amd.com>
- <20250811094444.203161-10-Neeraj.Upadhyay@amd.com>
- <20250822172820.GSaKiotPxNu-H9rYve@fat_crate.local>
-Content-Language: en-US
-From: "Upadhyay, Neeraj" <neeraj.upadhyay@amd.com>
-In-Reply-To: <20250822172820.GSaKiotPxNu-H9rYve@fat_crate.local>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: PN3PR01CA0149.INDPRD01.PROD.OUTLOOK.COM
- (2603:1096:c01:c8::22) To DS0PR12MB6608.namprd12.prod.outlook.com
- (2603:10b6:8:d0::10)
+ 2025 07:57:56 +0000
+Received: from SA2PEPF00003AE6.namprd02.prod.outlook.com
+ (2603:10b6:806:3c5:cafe::a4) by SA1P222CA0108.outlook.office365.com
+ (2603:10b6:806:3c5::29) with Microsoft SMTP Server (version=TLS1_3,
+ cipher=TLS_AES_256_GCM_SHA384) id 15.20.9052.22 via Frontend Transport; Mon,
+ 25 Aug 2025 07:57:55 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
+ smtp.mailfrom=amd.com; dkim=none (message not signed)
+ header.d=none;dmarc=pass action=none header.from=amd.com;
+Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
+ 165.204.84.17 as permitted sender) receiver=protection.outlook.com;
+ client-ip=165.204.84.17; helo=SATLEXMB04.amd.com; pr=C
+Received: from SATLEXMB04.amd.com (165.204.84.17) by
+ SA2PEPF00003AE6.mail.protection.outlook.com (10.167.248.6) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.20.9052.8 via Frontend Transport; Mon, 25 Aug 2025 07:57:55 +0000
+Received: from BLRKPRNAYAK.amd.com (10.180.168.240) by SATLEXMB04.amd.com
+ (10.181.40.145) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.39; Mon, 25 Aug
+ 2025 02:57:47 -0500
+From: K Prateek Nayak <kprateek.nayak@amd.com>
+To: Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>,
+	Borislav Petkov <bp@alien8.de>, Dave Hansen <dave.hansen@linux.intel.com>,
+	Sean Christopherson <seanjc@google.com>, Paolo Bonzini <pbonzini@redhat.com>,
+	<x86@kernel.org>
+CC: Naveen rao <naveen.rao@amd.com>, Sairaj Kodilkar <sarunkod@amd.com>, "H.
+ Peter Anvin" <hpa@zytor.com>, "Peter Zijlstra (Intel)"
+	<peterz@infradead.org>, "Xin Li (Intel)" <xin@zytor.com>, Pawan Gupta
+	<pawan.kumar.gupta@linux.intel.com>, Tom Lendacky <thomas.lendacky@amd.com>,
+	<linux-kernel@vger.kernel.org>, <kvm@vger.kernel.org>, Mario Limonciello
+	<mario.limonciello@amd.com>, "Gautham R. Shenoy" <gautham.shenoy@amd.com>,
+	Babu Moger <babu.moger@amd.com>, Suravee Suthikulpanit
+	<suravee.suthikulpanit@amd.com>, K Prateek Nayak <kprateek.nayak@amd.com>,
+	Naveen N Rao <naveen@kernel.org>
+Subject: [PATCH v4 0/4] x86/cpu/topology: Fix the preferred order of initial APIC ID parsing on AMD/Hygon
+Date: Mon, 25 Aug 2025 07:57:28 +0000
+Message-ID: <20250825075732.10694-1-kprateek.nayak@amd.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: SATLEXMB04.amd.com (10.181.40.145) To SATLEXMB04.amd.com
+ (10.181.40.145)
+X-EOPAttributedMessage: 0
 X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: DS0PR12MB6608:EE_|PH7PR12MB5654:EE_
-X-MS-Office365-Filtering-Correlation-Id: ff5d38b8-37c5-4fc6-bdea-08dde3a03ea9
+X-MS-TrafficTypeDiagnostic: SA2PEPF00003AE6:EE_|CH1PR12MB9621:EE_
+X-MS-Office365-Filtering-Correlation-Id: d901b8a2-2839-4eee-932e-08dde3ad19bc
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230040|376014|7416014|366016|1800799024;
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|1800799024|36860700013|82310400026|7416014|376014|13003099007;
 X-Microsoft-Antispam-Message-Info:
-	=?utf-8?B?cjhGVXIxU0srS040NjRYeUVmeUF5MzFEak9VQlhiUU0veTJ0Sm1ZWXBYZnJP?=
- =?utf-8?B?NzdpUFY2R1pPbUY1RnVKVW12b05veEptS2tkN3N2dThBb2dTVCtrTllweUhG?=
- =?utf-8?B?elRmeVZiOEVVc21WTUlyREV3aEJqZEtmeUNWK1N3SFJEQVJ5ZFpBZDJvb04r?=
- =?utf-8?B?clpJQmc2MHEySHdvTDJQenY5MlNpTm1jRFNlcFEya1VabHZlTkpFRk1pR1E2?=
- =?utf-8?B?c1hlUmk4dSs3RStlVHRVUHgvKzRiQ1pBTDNtbGhKUkhNTDg3V2ZZQ3dZOEsv?=
- =?utf-8?B?NkpxV1UvSUI4ckdjK2RBVVNBcmRsdFFOaGs2RGZpWUczdFhxdEJORjZhLzh2?=
- =?utf-8?B?M1pvQzRJMDZjcUJmZzFmVkFodVRrZmNVZllKM1NMODE4azZZdDB6b1Q3MnMw?=
- =?utf-8?B?ODhnb1htL1luZW5qbDU4Z1FQamFwNCtucGxWVnNwZVBESnk5SzQwb2Q3aUtm?=
- =?utf-8?B?N3V5Q2xodi9Jb3dUQ3dyK3BUOE1RV09qUjgrdklGUEdnaGdONE1UOE5QMDkv?=
- =?utf-8?B?WTZ3T2VHeUpPdi9iVlpaV3lVMVZXcVNlcGxEREo3WkNpSlloaDZqT2lTeHJr?=
- =?utf-8?B?S3AxOGJOWjIvbGJDM0xWOS90MVYvRmQ2U01CTVZhY2NaSFNtVDNNcC9hbFl1?=
- =?utf-8?B?OWszSlM4MHpJY2ZLSWRSdW1hK0F6MUthNGJ6Q0Qwbm9xaVZaWmVmWlhWL3NG?=
- =?utf-8?B?QWU1NFhpWVVQam1iU3UwbWJpY2JMWENQTVBKYVovamFoVzRRTkI3QldPdnJO?=
- =?utf-8?B?L0xGNjFZbzdsczh4ajJVOVlpenYxaG5ZRG5DMWt5b2tHYmdVVk5XYk5TZXVX?=
- =?utf-8?B?eXYzc0x2N0NTclNIdHNadEd0VmZpNisvNzRMODdYZlJ2dU80KzgyYlhxVWpV?=
- =?utf-8?B?R2NPNVkxb1FDWHk2N1ArclhWVHZvT0ZtcUNlWUJXdkZ4WVROWFA4TkRxRkRs?=
- =?utf-8?B?UmM0a0RpK0lNTGtuVVR1R3FTb3E1Um1nVU1taG11WTYvWUJPZnZsRGg5Tm92?=
- =?utf-8?B?djlLeW12b3hqcFJINUVXcXBiVjJydjZvTDRBNzV5ZjFBbnA0ZjdzTVNwa0pK?=
- =?utf-8?B?YjdqVGc5R3Nibk5vTWlGYlRVUGV6VTdVSXdEaVpHRmdEYUl5NnNyMURqWU5D?=
- =?utf-8?B?R3g3T0FuK0cvNmE3WUEwNXFnZnRId1hpOUxHSlE0bi9vdmh0ZmEwNHY5M3NF?=
- =?utf-8?B?VFgxcVZENzNzcXhKT1czb09UWExMdDVKZjBUR0JNY2x3TUdMbjhRR2pCL0Iz?=
- =?utf-8?B?T3pGeEJ0WWQ0bmpPNWNtSkIxUThOdE9pYjAyd3NldW1WY293a2ZiS2VmZEhn?=
- =?utf-8?B?aUhvVkp5dFFhU1ZHSE92OURvdFhmWlhZSXlVdDJrRHFpTk5XSjYydEZqejhQ?=
- =?utf-8?B?K09xWE1pVWhmQUUvWjNRQUJPYnU0cXZHSmtuNWdmQkU3b0Zacnp1V3BYaE5x?=
- =?utf-8?B?R0sxYi84NmJSWjF5dyt5NXlNVUVMK3ZYcTVkLzg0QkNtWlJrQkJyOG9DOUMv?=
- =?utf-8?B?Zy9zUjRmdlkzaTJsTDU1RUZlTFYrOUlzUmllTm9PRHJ3WlBhcjBEWG5BQzV1?=
- =?utf-8?B?Nk1pZ1RZUVFSUHFuSFpFaUVpT0FHSFEwb21tdU1PeExlTWdlSHhVcVE5NmVF?=
- =?utf-8?B?QmRaaS9UdmxXL01BWDlxQ3BLWE1ZaFdyTEM1OE1DK0pnR2xodDd5ZHZtSmRN?=
- =?utf-8?B?RFJmVFkvSWw1L3Y4cVMyaDNaWGlsL1diUXIxZVQwYTlROXhKQXU2MGIwRXkx?=
- =?utf-8?B?TmZybjNYaGltWENNcUdWWTIvUlZ1Wjc4QTY4WFZaRWk1UHY5eGJEVlB0TTNo?=
- =?utf-8?B?RmJNQXFJeXhWeGhjYzM0cnNZK3ZOL3RnUUdPcjdTNDdRN0pSQ0l4c3JoSUNI?=
- =?utf-8?B?bHgwKzdvdHR5bk9tQjBOQm9YMCticTA0V0greUVtMG9jdm9VL0VMZG5PMy9k?=
- =?utf-8?Q?yUVRayrEb5I=3D?=
+	=?us-ascii?Q?bPeFSCROWpO/vT80+qLExP7YjmIr4g/cfuoWnoHXIjAY8nECzC+TRvMSE+nl?=
+ =?us-ascii?Q?6vGdaBW9eR1sVo54E7EIEJfjC2fROJyfbgbukCQvX0Yd2ValNfc8RqJXIA8O?=
+ =?us-ascii?Q?lk9dGliDBrO0HWVTlFODVmOSCiwXj4t/L2hUr2cMyPHBQ+u4IrMbBSBq8x+S?=
+ =?us-ascii?Q?29RNKnoBN9CIv5sBpG3Vt3yMEOnjzeMILIe2NK7RQfIHEjlfTNRhH7vCqEkW?=
+ =?us-ascii?Q?wKWVRcvS2KnFwNHCSvy5TJZGA7GhkaMcb0b85V+ihTqiMXesIjOxDyyPn3UZ?=
+ =?us-ascii?Q?eyl8Knl64RkXlwoNsizhMgEu24XnPwdyCD8bU4YDIE9zpCw8f1Q1xzazOWc8?=
+ =?us-ascii?Q?WqyqKb3WLmfcGF4oy0TJw65ewou0rG5dD7Ph4n1CpetNvh+InXV81MJ1k/gJ?=
+ =?us-ascii?Q?APWnS0Ub2CluVJW9z+d5j35xKYaf4H7cXG/O24zYcqjEdzLnnB7RPqj4BmOR?=
+ =?us-ascii?Q?E/c8etwqxLjC8MVoZdMZKsPJ/NhSfLbcPYfh7wEAz5VdM39jOXN7OnQ7pzRN?=
+ =?us-ascii?Q?OD9tQ0QzZiz50+khl81eGWcULjfbfK2MLo5270z3bqOd95c1/p1OvFuHGNtl?=
+ =?us-ascii?Q?fuW8MfUUoi9e+mNUXf2/YiaTmOc+kLgpo03PhIwFqOy8Aoe2m2lMOKb06vbU?=
+ =?us-ascii?Q?JlXPsK2E25U740KwSI3QSdwZkhX+OeQ0ChjHQzIEip90f8mB0H/vXw8mB76k?=
+ =?us-ascii?Q?igYE5fTsvgcyHJMU28uKD6pXegFfFc9swsHjNJLman4Kj/UI4hnDzybGvG4l?=
+ =?us-ascii?Q?RImh6Q3dIBsfuo1TJNwXc9qGk7+rSrumRScacEIML+EOnkpWNUPIcnqqi54D?=
+ =?us-ascii?Q?1PzihN3dUWleFOuNi0v3XRdMmw+akcha3/7Uh19tw/ebk2dOYu51fTED9d8w?=
+ =?us-ascii?Q?CKG0j/vwhjG2IyFCE1+WR6vRoKqfnWGYX4J9xCd9vP09oaNfsTsyO0OgDrwA?=
+ =?us-ascii?Q?apCRVczuQjvQsBQbwHQJcVa9VMjcZUcjF/MRBpjCDGDKXeB/ArLL4LdyJtl0?=
+ =?us-ascii?Q?ioB3+it31zcQTmHR/xzuUK0FtR34hekjZJhvaFk1rzU/2Dtt9eL4M9tbPVhL?=
+ =?us-ascii?Q?wJ6I6DIK9SxI1lnT++UkkXoFSSESgYweBoOPs2fnsULNmU3lVPNm6oH8vVW2?=
+ =?us-ascii?Q?0BhkWsA08b0H/9ogWFo+ydU1SFxQsDBjb8G4U+fQah9fuFproeK2aA13jhGl?=
+ =?us-ascii?Q?LmM5imLifIc6hvwpPpAgheoKGXXl6xK9OFwPhah1YzTrMSvK0TqGv8M+7awS?=
+ =?us-ascii?Q?NFs7RzpXm6rxeJJ7/sVijwWOc9DxZD0gLWOq9tgOEXidqU5GT2a/Ybv781dP?=
+ =?us-ascii?Q?6gR7UAg+5EsM/3u6K2TN3bf9hQYgkXAv4PXoo+rRaveKz0WCN1QXz+qtOBDi?=
+ =?us-ascii?Q?08HqdYxMwKrQmCz2Y7aTQstu4ZJVdW2Yk/WTWoAjkSD2OTvA3atj/IgGOo4Q?=
+ =?us-ascii?Q?O8uWSFPZmD4H9MavuQNg5ZVXlQgyIQ7hpSlgcOY3ZrBNGgp1vJ9R3F3KNhnp?=
+ =?us-ascii?Q?7BjcILoI2B5mXAgIU7hwlXmxYUCmGD58fxyDxaQ/gI2M4gJ0U1LPqeBBlQ?=
+ =?us-ascii?Q?=3D=3D?=
 X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DS0PR12MB6608.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(376014)(7416014)(366016)(1800799024);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?utf-8?B?bHRIMnV0NDRiWHpMRHYxMXVRTWZPMGxMSUhZa1lvU25sMm5aOFNWZ3FJejVt?=
- =?utf-8?B?d0owN3NKbTJlZzMzQ1V2OERvdmkwSGIrVEV1RUUxd25ZU2JrcEFFOG9INURS?=
- =?utf-8?B?N3hrNG9TVWZ6RmsvVEQ1Vk9ObGt0aVhXVjFCU1BYMmJoazBHNmsrL21nYjU3?=
- =?utf-8?B?eVRLQW5xQnptYUNOa3BSbW5mcXR0ZGZOcjdFc0VZNG14cUlCeGZHUzBMZ0d1?=
- =?utf-8?B?NDRRSWNRTjhEVVFrWVpTR0psK25aazJ5VHI5YWZNclo4TWhLNWFGWTVTMUNw?=
- =?utf-8?B?RUdvOUhlQWJOTWdVM3BlVVFkaWNUbHJ5Q091NTFqcTVMckFzZGVTSW9IYWxV?=
- =?utf-8?B?N3RKaEIrdjVWRHRWRmVqS2hIa0Y1eUxOWTkxSWtXRnB3WUNienBwRllKRXNa?=
- =?utf-8?B?K2EzdjRoVm44cnJlL05XMkNIcC9BcytEV3J0SkNzek5PVW9OTzlPN0NxTzEy?=
- =?utf-8?B?ZUJKbGhMQ2xXR2RBU1UzaytFTFhtSVR2RWNPUzJjbzhDOGFUcmM0UXhXNmlU?=
- =?utf-8?B?NVpadVRsZGtjZC81emptK3ZMU2tGcmt0ZUlUN253N1hVazI1ekVML0xUM0Yr?=
- =?utf-8?B?aXJrbFF4ZUNjZUJUN3hDcVN2dEJ5NTlXcFNQdTIzcFZJRUZBbTN5Z081UHZ4?=
- =?utf-8?B?T0ZhYnFOSzY1ZnJ1SUhwRzlFQ1FxU0hpdXFiamxRYWhHMHJSL3EwbG4zTUl2?=
- =?utf-8?B?blRnV0RQS2xEZjdGM3ptMXBWa05ieWwwOVAyempzVnZ3aExKWDEzV1lXTmM4?=
- =?utf-8?B?Y1FpRjZYZzZWTlZwSkpRVUM2SVJjTGQ2YWUvSXBJQUxwcERJRjBZTDBtVENN?=
- =?utf-8?B?bHVuZkduWGRrcDVyN0wydUkxdEVGNEhrT09QeFVmT1ZmMit0RGVZVHpJTUw0?=
- =?utf-8?B?RUM0QVExVTRWbStlYVhvczRLY2dDanZDTHB5L21qL3JCclo1dlQ2L3NwcGdS?=
- =?utf-8?B?bUhkNUsrdm44RFA1Zk9jOGhheTg5bWMxRS9pWktsR2JzcVBha0JNTEhlRWlG?=
- =?utf-8?B?MmlaaHpFQ1Robm1XcEhzWnR6SERyKzRkSWZ1OTF0VDEzOVNpN0RVY1Z5bnJj?=
- =?utf-8?B?QzBQcHFKc2JYelJYVEZ3Zyt0WkozN0lUU212Vmk5OGQ1bWJ2VHJDMVdYcGVO?=
- =?utf-8?B?RDRMM2dtYWNzTk5iQklCZUVEZEdLMkhqMnp0L2JJVzlIejVGeGs1c2Z5cnps?=
- =?utf-8?B?UWUvZDZrZ1pNanV5enN2NHZqNWRtNVdlSTFLd0VCTXRaaUFUcHlFVzRzelFQ?=
- =?utf-8?B?K1lkNmhSV3FvYVdWSkJCUzFxZGlxN2x3dm1MTlFtUWpRbWs2My91eTk2dnMr?=
- =?utf-8?B?QTRDWVhod1dEZlg5RWlXNnpXUVNPSzNEMXBOVlVtbG9VMVE5TUFVZmM1aVNI?=
- =?utf-8?B?VFZvTGFQVWE4Q2Fsd05qMm5QNTVxaGN5bjJJczZSSXRNbW5qYktnbkpZRTVU?=
- =?utf-8?B?ZzFVMDJvQVkvKzFDZ25jSzkxM1l0ZjhKUmhTUUVaeENzZ216ZnBrYktBYTZI?=
- =?utf-8?B?c2hzeVB6V2FVdDAzdGlCTlFwTEdvL0lCU1NWWG9JTUl4VXZDNlMwdVFDbVk0?=
- =?utf-8?B?MktZTjFFZFN6RU9FYlUzQTRxWmNoRmdQWnlYUlR4V3E4amtkYUtwNXRJWDRY?=
- =?utf-8?B?WUZhSWoyQmxEZEJ6NStmRVY4RjVXTkRxcjA3NTZxcll4VjArMEl0ZTdUc1Ns?=
- =?utf-8?B?WEdNRnVXZkJaRldTdjFoTzJ3VnNMN1JvWmRsUHZMMXN1dTBEZ3F6NzJsQ09D?=
- =?utf-8?B?VWV4R2Y2eUxCZysvcWU2bGNMYk0wZVlsakV2TkZ4bkZORlVqUW4rT29xNm1m?=
- =?utf-8?B?cllZMUlLdzRlOEs0WUhibDFJTmxzdmFvcjlKTjAvN3J5UHl4TEkyQVU3QzFj?=
- =?utf-8?B?UDZqNml2bWZUcEtKZm5BNnI4U3BuV200VGxBS3hZVXMyRkxJaGhUeVYraGN2?=
- =?utf-8?B?K1EvaDRLUDE2Rk0xaExFVVNFQWZZM1YwK05qcko3ZzlackprSWdWSWxxeVFm?=
- =?utf-8?B?TncrWlkvTDZIdHhadjcwMTJyZlZlamVkVVF1RmNwTWNzL3pZZjV0bVZvdlh4?=
- =?utf-8?B?eFNWVWo0c0d5NGNjNW5uNVhvanlNYjd1SXowVmZkbkh1YTZMN2RpSVZDN2Ru?=
- =?utf-8?Q?uOt8uIz0Ly6sTIzetBCe0JB0F?=
+	CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB04.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230040)(1800799024)(36860700013)(82310400026)(7416014)(376014)(13003099007);DIR:OUT;SFP:1101;
 X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: ff5d38b8-37c5-4fc6-bdea-08dde3a03ea9
-X-MS-Exchange-CrossTenant-AuthSource: DS0PR12MB6608.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 25 Aug 2025 06:25:54.5960
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 25 Aug 2025 07:57:55.6451
  (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Network-Message-Id: d901b8a2-2839-4eee-932e-08dde3ad19bc
 X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: MXsA4S+g0OMkAeVUVrENxbqAch+s3kYSXZsy46SnqxrGaxaM7g+q9rS3imkIsklm+eCJzTJRkILztuUHd1dF7A==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH7PR12MB5654
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[SATLEXMB04.amd.com]
+X-MS-Exchange-CrossTenant-AuthSource:
+	SA2PEPF00003AE6.namprd02.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: CH1PR12MB9621
+
+When running an AMD guest on QEMU with > 255 cores, the following FW_BUG
+was noticed with recent kernels:
+
+    [Firmware Bug]: CPU 512: APIC ID mismatch. CPUID: 0x0000 APIC: 0x0200
+
+Naveen, Sairaj debugged the cause to commit c749ce393b8f ("x86/cpu: Use
+common topology code for AMD") where, after the rework, the initial
+APICID was set using the CPUID leaf 0x8000001e EAX[31:0] as opposed to
+the value from CPUID leaf 0xb EDX[31:0] previously.
+
+This led us down a rabbit hole of XTOPOLOGY vs TOPOEXT support, preferred
+order of their parsing, and QEMU nuances like [1] where QEMU 0's out the
+CPUID leaf 0x8000001e on CPUs where Core ID crosses 255 fearing a
+Core ID collision in the 8 bit field which leads to the reported FW_BUG.
+
+Following were major observations during the debug which the two
+patches address respectively:
+
+1. The support for CPUID leaf 0xb is independent of the TOPOEXT feature
+   and is rather linked to the x2APIC enablement. In an effort to keep
+   all the topology bits together during x2APIC enablement on AMD, the
+   parsing ox the extended topology leaf 0xb was incorrectly put behind
+   a X86_FEATURE_TOPOEXT check.
+
+   On baremetal, this has not been a problem since TOPOEXT support
+   (Fam 0x15 and above) predates the support for CPUID leaf 0xb
+   (Fam 0x17[Zen2] and above) however, in virtualized environment, the
+   support for x2APIC can be enabled independent of topoext where QEMU
+   expects the guest to parse the topology and the APICID from CPUID
+   leaf 0xb.
+
+   Boris asked why QEMU doesn't force enable TOPOEXT feature with x2APIC
+   [2] and Naveen discovered there were historic reasons to not enable
+   TOPOEXT by default when using "-cpu host" on AMD systems [3]. The
+   same behavior continues unless an EPYC cpu model is explicitly passed
+   to QEMU.
+
+2. Since CPUID leaf 0x8000001e cannot represent Core ID without
+   collision for guests with > 255 cores, and QEMU 0's out the entire
+   leaf when Core ID crosses 255.
+
+   Prefer initial APIC read from the XTOPOLOGY leaf (0x80000026 / 0xb)
+   which can represent up to 2^16 cores, before falling back to the APIC
+   ID from 0x8000001e which is still better than 8-bit APICID from leaf
+   0x1 EBX[31:24].
+
+More details are enclosed in the commit logs.
+
+Ideally, these changes should not affect baremetal AMD/Hygon platforms
+as they have supported TOPOEXT long before the support for CPUID leaf
+0xb and the extended CPUID leaf 0x80000026 (famous last words).
+
+Patch 3 and 4 is yak shaving to explicitly define a raw MSR value used
+in the topology parsing bits and simplify the flow around "has_topoext"
+when the same can be discovered using X86_FEATURE_XTOPOLOGY.
+
+Previous version of this series has been tested on baremetal Zen1
+(contains topoext but not 0xb leaf), Zen3 (contains both topoext and 0xb
+leaf), and Zen4 (contains topoext, 0xb leaf, and 0x80000026 leaf)
+servers with no changes observed in "/sys/kernel/debug/x86/topo/"
+directory.
+
+The series was also tested on 255 and 512 vCPU (each vCPU is an
+individual core from QEMU topology being passed) EPYC-Genoa guest with
+and without x2apic and topoext enabled and this series solves the FW_BUG
+seen on guest with > 255 VCPUs. No changes observed in
+"/sys/kernel/debug/x86/topo/" for all other cases without warning.
+0xb leaf is provided unconditionally on these guests (with or without
+topoext, even with x2apic disabled on guests with <= 255 vCPU).
+
+In all the cases initial_apicid matched the apicid in
+"/sys/kernel/debug/x86/topo/" after applying this series.
+
+Relevant bits of QEMU cmdline used during testing are as follows:
+
+    qemu-system-x86_64 \
+    -enable-kvm -m 32G -smp cpus=512,cores=512 \
+    -cpu EPYC-Genoa,x2apic=on,kvm-msi-ext-dest-id=on,+kvm-pv-unhalt,kvm-pv-tlb-flush,kvm-pv-ipi,kvm-pv-sched-yield,[-topoext]  \
+    -machine q35,kernel_irqchip=split \
+    -global kvm-pit.lost_tick_policy=discard
+    ...
+
+References:
+
+[1] https://github.com/qemu/qemu/commit/35ac5dfbcaa4b
+[2] https://lore.kernel.org/lkml/20250819113447.GJaKRhVx6lBPUc6NMz@fat_crate.local/
+[3] https://lore.kernel.org/qemu-devel/20180809221852.15285-1-ehabkost@redhat.com/
+
+Series is based on tip:master at commit 7182bf4176f9 ("Merge branch into
+tip/master: 'x86/tdx'") and applies cleanly on top of tip:x86/cpu at
+commit f3285344a5a3 ("x86/cpu/cacheinfo: Simplify
+cacheinfo_amd_init_llc_id() using _cpuid4_info")
+
+---
+Changelog v3..v4:
+
+o Renamed the series title to better capture the purpose. Based on the
+  readout of the APM and PPR, this problem was only exposed by QEMU
+  and QEMU is not doing anything wrong considering the spec.
+
+o Fixed references to X86_FEATURE_XTOPOLOGY (XTOPOLOGY) which was
+  mistakenly referred to as XTOPOEXT. (Boris)
+
+o Reordered the patches to have the fixes before cleanups. (Thomas)
+
+o Refreshed the diff of Patch 1 with the one Thomas suggested in
+  https://lore.kernel.org/lkml/87ms7o3kn6.ffs@tglx/. (Thomas)
+
+o Quoted the relevant sections of the APM and the PPR to support the
+  changes. (Mentioned on v3 by Naveen and Boris)
+
+Note: The debate on "CoreId" from CPUID 0x8000001e EBX has not been
+addressed yet. I'll check internally and follow up on the QEMU bits once
+H/W folks confirm what their strategy is with the 8-bit field in future
+processors.
+
+The updates in this series ensures the usage of the topology information
+from the XTOPOLOGY leaves (0x80000026 / 0xb)  when they are present and
+systems that support more than 256 CPUs need x2APIC enabled to address
+all the CPUs present thus removing the dependency on CPUID leaf
+0x8000001e for Core ID.
+
+v3: https://lore.kernel.org/lkml/20250818060435.2452-1-kprateek.nayak@amd.com/
+
+Changelog v2..v3:
+
+o Patch 1 was added to the series.
+o Use cpu_feature_enabled() in Patch 3.
+o Rebased on top of tip:x86/cpu.
+
+v2: https://lore.kernel.org/lkml/20250725110622.59743-1-kprateek.nayak@amd.com/
+
+Changelog v1..v2:
+
+o Collected tags from Naveen. (Thank you for testing!)
+o Rebased the series on tip:x86/cpu.
+o Swapped Patch 1 and Patch 2 from v1.
+o Merged the body of two if blocks in Patch 1 to allow for cleanup in
+  Patch 3.
+
+v1: https://lore.kernel.org/lkml/20250612072921.15107-1-kprateek.nayak@amd.com/
+
+---
+K Prateek Nayak (4):
+  x86/cpu/topology: Use initial APIC ID from XTOPOLOGY leaf on AMD/HYGON
+  x86/cpu/topology: Always try cpu_parse_topology_ext() on AMD/Hygon
+  x86/cpu/topology: Check for X86_FEATURE_XTOPOLOGY instead of passing
+    has_topoext
+  x86/msr-index: Define AMD64_CPUID_FN_EXT MSR
+
+ arch/x86/include/asm/msr-index.h   |  5 ++++
+ arch/x86/kernel/cpu/topology_amd.c | 48 +++++++++++++++---------------
+ 2 files changed, 29 insertions(+), 24 deletions(-)
 
 
+base-commit: 7182bf4176f93be42225d2ef983894febfa4a1b1
+-- 
+2.34.1
 
-On 8/22/2025 10:58 PM, Borislav Petkov wrote:
-> On Mon, Aug 11, 2025 at 03:14:35PM +0530, Neeraj Upadhyay wrote:
->> Subject: Re: [PATCH v9 09/18] x86/sev: Initialize VGIF for secondary VCPUs for Secure AVIC
-> 
-> "vCPU"
-> 
-
-Ok
-
->> From: Kishon Vijay Abraham I <kvijayab@amd.com>
->>
->> Secure AVIC requires VGIF to be configured in VMSA. Configure
-> 
-> Please explain in one sentence here for the unenlightened among us what VGIF
-> is.
-> 
-
-Ok. Below is the updated description:
-
-Virtual GIF (VGIF) providing masking capability for when virtual 
-interrupts (virtual maskable interrupts, virtual NMIs) can be taken by 
-the guest vCPU. Secure AVIC hardware reads VGIF state from the vCPU's 
-VMSA. So, set VGIF for secondary CPUs (the configuration for boot CPU is 
-done by the hypervisor), to unmask delivery of virtual interrupts  to 
-the vCPU.
-
-> Also, I can't find anyhwere in the APM the requirement that SAVIC requires
-> VGIF. Do we need to document it?
-> 
-
-I also don't see an explicit mention. I will check on documenting it in 
-the APM. However, there are references to virtual interrupts (V_NMI, 
-V_INTR) (which requires VGIF support) and VGIF in terms of functional 
-usage in below sections of volume 2. In addition, as event injection is 
-not supported (EventInjCtlr field in the VMCB is ignored), virtual NMI 
-is required for NMI injection from host to guest.
-
-"15.36.21.2 VMRUN and #VMEXIT
-
-...
-
-The interrupt control information loaded from the VMCB and VMSA for 
-Secure AVIC mode operation is the same as the information loaded in 
-Alternate Injection mode. "
-
-Alternate injection section talks about the interrupt controls:
-
-"15.36.16 Interrupt Injection Restrictions
-
-When Alternate Injection is enabled, the EventInjCtlr field in the VMCB 
-(offset A8h) is ignored on VMRUN. The VIntrCtrl field in the VMCB 
-(offset 60h) is processed, but only the V_INTR_MASKING, Virtual GIF 
-Mode, and AVIC Enable bits are used.
-
-...
-
-The remaining fields of VIntrCtrl (V_TPR, V_IRQ, VGIF, V_INTR_PRIO, 
-V_IGN_TPR, V_INTR_VECTOR, V_NMI, V_NMI_MASK, V_NMI_EN) are read from the 
-VMSA."
-
-
-- Neeraj
 
