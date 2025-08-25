@@ -1,111 +1,59 @@
-Return-Path: <kvm+bounces-55682-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-55683-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 33C4DB34E2A
-	for <lists+kvm@lfdr.de>; Mon, 25 Aug 2025 23:37:27 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7FD26B34E30
+	for <lists+kvm@lfdr.de>; Mon, 25 Aug 2025 23:39:11 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 492981A87C3C
-	for <lists+kvm@lfdr.de>; Mon, 25 Aug 2025 21:37:47 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5018E208493
+	for <lists+kvm@lfdr.de>; Mon, 25 Aug 2025 21:39:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C66CA29B78D;
-	Mon, 25 Aug 2025 21:37:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D415629B8CE;
+	Mon, 25 Aug 2025 21:38:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="cHK0J2XK"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="dKKl258e"
 X-Original-To: kvm@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from out-177.mta0.migadu.com (out-177.mta0.migadu.com [91.218.175.177])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C6A4C27A917;
-	Mon, 25 Aug 2025 21:37:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 17BC6281372
+	for <kvm@vger.kernel.org>; Mon, 25 Aug 2025 21:38:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.177
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756157832; cv=none; b=q3OMa9klER5kcD5hfQzcH5gEW7TqnE/VhFRTneqUwrlw9Ruy4lQnon4v6dAnVBJVeyxj47K7EVeVDBtSpzNjA3D0XmVWwws2RJuLrKb1iZuZqoyYDzXpZh+InipMXWpFSo/36P6fq4/tqnZ9SPk1Di+jP/zgFVDtia5yEbTg33M=
+	t=1756157938; cv=none; b=Ptp8Myf4h0Wa4RVY1Kw1o52vfzUL7Ijws7edY0Y4Rw+1KSvdUf4WiwM9hNOiu2UOy4oo4PaavOdR9laRLJD6sPFnaztvpqVVg3avUNJbQxvcHlz96/7GN68m+tPumTqBpiawQ30MKTgUdaKqkcnHxXgEwjGsshgV3QkEPMRfOLI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756157832; c=relaxed/simple;
-	bh=R44bcAauESCYgLUnJio9oy6n01PzJ9gIprVhrTrJHrw=;
+	s=arc-20240116; t=1756157938; c=relaxed/simple;
+	bh=nDzVpC+t1U+7sHNaEIwZiniHiB4Gcj9beJV5ErzYl1w=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=jysYVL6zkgDrCW3NlDdD4AKsp+HbcYV1IbcdhXRmL27yEHvsChfnOoa0Eh/Sq0iLbiQTuWFctTWTUn1oA5Ht2e0dBAdZcuP7w+a0W00fpZ8DJEaQfG8LtOvNTZ4Em1HCnXspuWpMbk/plehaBPNhO5YXS/jHcvh/teyxa9FO+2Q=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=cHK0J2XK; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 49A2DC4CEED;
-	Mon, 25 Aug 2025 21:37:12 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1756157832;
-	bh=R44bcAauESCYgLUnJio9oy6n01PzJ9gIprVhrTrJHrw=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=cHK0J2XKD7O53HrO4WZ8mbIIVXn1J5qjjnP+8NSiRBKE3qlSqot7fO4LiyDmh3qgE
-	 994EaQi3GxaYUTiVcTdNq2CGuy4qPwf/BZ6vvOP7yQ30A6KQwyOxLpJ4d9L/7pKqbH
-	 63qLEryMSPxlPH2YhbRhXt0pRoKURT7ELLjHiKpyDkSL4+J1AcoW5Sk8qXCImM2+ak
-	 p+lYv9xx85LoSuSqFv4ayEsXAVqjvuHqIqMi44uUedVEGuxxRKPPODQHHSRnAgIdh6
-	 6clMMLqdhTofD9UT8HCFqf2Jy7NMLg5RmykPuzN+FoKKgILHRb4q6/nyDxdavQQRRP
-	 2Gu14gyBVu0BQ==
-Date: Mon, 25 Aug 2025 14:37:11 -0700
-From: Kees Cook <kees@kernel.org>
-To: Uladzislau Rezki <urezki@gmail.com>
-Cc: Mike Rapoport <rppt@kernel.org>,
-	Lorenzo Stoakes <lorenzo.stoakes@oracle.com>,
-	Harry Yoo <harry.yoo@oracle.com>,
-	Andrew Morton <akpm@linux-foundation.org>,
-	Russell King <linux@armlinux.org.uk>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Will Deacon <will@kernel.org>,
-	Madhavan Srinivasan <maddy@linux.ibm.com>,
-	Michael Ellerman <mpe@ellerman.id.au>,
-	Nicholas Piggin <npiggin@gmail.com>,
-	Christophe Leroy <christophe.leroy@csgroup.eu>,
-	"David S . Miller" <davem@davemloft.net>,
-	Andreas Larsson <andreas@gaisler.com>,
-	Jarkko Sakkinen <jarkko@kernel.org>,
-	Dave Hansen <dave.hansen@linux.intel.com>,
-	Thomas Gleixner <tglx@linutronix.de>,
-	Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-	"H . Peter Anvin" <hpa@zytor.com>,
-	Andy Lutomirski <luto@kernel.org>,
-	Peter Zijlstra <peterz@infradead.org>,
-	Alexander Viro <viro@zeniv.linux.org.uk>,
-	Christian Brauner <brauner@kernel.org>, Jan Kara <jack@suse.cz>,
-	Peter Xu <peterx@redhat.com>, David Hildenbrand <david@redhat.com>,
-	Zi Yan <ziy@nvidia.com>,
-	Baolin Wang <baolin.wang@linux.alibaba.com>,
-	"Liam R . Howlett" <Liam.Howlett@oracle.com>,
-	Nico Pache <npache@redhat.com>, Ryan Roberts <ryan.roberts@arm.com>,
-	Dev Jain <dev.jain@arm.com>, Barry Song <baohua@kernel.org>,
-	Xu Xin <xu.xin16@zte.com.cn>,
-	Chengming Zhou <chengming.zhou@linux.dev>,
-	Hugh Dickins <hughd@google.com>, Vlastimil Babka <vbabka@suse.cz>,
-	Suren Baghdasaryan <surenb@google.com>,
-	Michal Hocko <mhocko@suse.com>, Rik van Riel <riel@surriel.com>,
-	Dan Williams <dan.j.williams@intel.com>,
-	Matthew Wilcox <willy@infradead.org>,
-	Steven Rostedt <rostedt@goodmis.org>,
-	Masami Hiramatsu <mhiramat@kernel.org>,
-	Mathieu Desnoyers <mathieu.desnoyers@efficios.com>,
-	Jason Gunthorpe <jgg@ziepe.ca>, John Hubbard <jhubbard@nvidia.com>,
-	Muchun Song <muchun.song@linux.dev>,
-	Oscar Salvador <osalvador@suse.de>, Jann Horn <jannh@google.com>,
-	Pedro Falcato <pfalcato@suse.de>,
-	Johannes Weiner <hannes@cmpxchg.org>,
-	Qi Zheng <zhengqi.arch@bytedance.com>,
-	Shakeel Butt <shakeel.butt@linux.dev>,
-	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
-	linuxppc-dev@lists.ozlabs.org, kvm@vger.kernel.org,
-	sparclinux@vger.kernel.org, linux-sgx@vger.kernel.org,
-	linux-fsdevel@vger.kernel.org, linux-mm@kvack.org,
-	nvdimm@lists.linux.dev, linux-trace-kernel@vger.kernel.org
-Subject: Re: [PATCH 2/3] mm: update core kernel code to use vm_flags_t
- consistently
-Message-ID: <202508251436.762035B@keescook>
-References: <cover.1750274467.git.lorenzo.stoakes@oracle.com>
- <d1588e7bb96d1ea3fe7b9df2c699d5b4592d901d.1750274467.git.lorenzo.stoakes@oracle.com>
- <aIgSpAnU8EaIcqd9@hyeyoo>
- <73764aaa-2186-4c8e-8523-55705018d842@lucifer.local>
- <aIkVRTouPqhcxOes@pc636>
- <69860c97-8a76-4ce5-b1d6-9d7c8370d9cd@lucifer.local>
- <aJCRXVP-ZFEPtl1Y@pc636>
- <aJHQ9XCLtibFjt93@kernel.org>
- <aJItxJNfn8B2JBbn@pc636>
+	 Content-Type:Content-Disposition:In-Reply-To; b=MZeCFLpp0rjGYYAqu20HWz+vVK6Mg6Q0VOBvUyO8/wWUS11XAXJLgHfv6i6o2t8bZ0o7mvulbdrOs1pdBdv/P5JBe9kWzaPMgv7HxKTMkPq2fvizAexxZAuZG2WGOd0TwgvBNmi4hxtIRv3IElbqoA83TLNyKm6Mtka1WUQLB8g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=dKKl258e; arc=none smtp.client-ip=91.218.175.177
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+Date: Mon, 25 Aug 2025 14:38:31 -0700
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1756157923;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=Svt/1wXouXBpITE7xnGEFoLKgtvLf25+nxzKUnLuc7E=;
+	b=dKKl258ebLK0JjJ6bmMPG+Q9KnsfJP84OX4Vb2wogABy/Psyhw6QcqPnO3eDUhaDPxbQbm
+	n+2GkQ1imRGLIht5eNvDOSaEso+pt4GQihzHD00PJUSCxKfbQLM/3rGk6MNZQ4rw9yzjpy
+	jnjs6mBksPP1oNFazsyPiV16vKR/L2c=
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Oliver Upton <oliver.upton@linux.dev>
+To: Sean Christopherson <seanjc@google.com>
+Cc: Marc Zyngier <maz@kernel.org>, Sebastian Ott <sebott@redhat.com>,
+	Paolo Bonzini <pbonzini@redhat.com>, Shuah Khan <shuah@kernel.org>,
+	kvm@vger.kernel.org, kvmarm@lists.linux.dev,
+	linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] KVM: selftests: fix irqfd_test on arm64
+Message-ID: <aKzX152737nAo479@linux.dev>
+References: <20250825155203.71989-1-sebott@redhat.com>
+ <aKy-9eby1OS38uqM@google.com>
+ <87zfbnyvk9.wl-maz@kernel.org>
+ <aKzRgp58vU6h02n6@google.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -114,34 +62,34 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <aJItxJNfn8B2JBbn@pc636>
+In-Reply-To: <aKzRgp58vU6h02n6@google.com>
+X-Migadu-Flow: FLOW_OUT
 
-On Tue, Aug 05, 2025 at 06:13:56PM +0200, Uladzislau Rezki wrote:
-> I agree. Also it can be even moved under vmalloc.c. There is only one
-> user which needs it globally, it is usercopy.c. It uses find_vmap_area()
-> which is wrong. See:
+On Mon, Aug 25, 2025 at 02:11:30PM -0700, Sean Christopherson wrote:
+> On Mon, Aug 25, 2025, Marc Zyngier wrote:
+> > On Mon, 25 Aug 2025 20:52:21 +0100,
+> > Sean Christopherson <seanjc@google.com> wrote:
+> > > Is there a sane way to handle vGIC creation in kvm_arch_vm_post_create()?  E.g.
+> > > could we create a v3 GIC when possible, and fall back to v2?  And then provide a
+> > > way for tests to express a hard v3 GIC dependency?
+> > 
+> > You can ask KVM what's available. Like an actual VMM does. There is no
+> > shortage of examples in the current code base.
 > 
-> <snip>
-> 	if (is_vmalloc_addr(ptr) && !pagefault_disabled()) {
-> 		struct vmap_area *area = find_vmap_area(addr);
+> Right, by "sane" I meant: is there a way to instantiate a supported GIC without
+> making it hard/painful to write tests, and without having to plumb in arm64
+> specific requirements to common APIs?
 > 
-> 		if (!area)
-> 			usercopy_abort("vmalloc", "no area", to_user, 0, n);
-> 
-> 		if (n > area->va_end - addr) {
-> 			offset = addr - area->va_start;
-> 			usercopy_abort("vmalloc", NULL, to_user, offset, n);
-> 		}
-> 		return;
-> 	}
-> <snip>
-> 
-> we can add a function which just assign va_start, va_end as input
-> parameters and use them in the usercopy.c. 
+> E.g. are there tests that use the common vm_create() APIs and rely on NOT having
+> a GIC?
 
-Yes please! I'd must rather use some exported validation routine than
-having it hand-coded in usercopy.c. :)
+Instead of stuffing a GIC in behind vm_create(), I'd rather we have a
+specific helper for creating a VM with an irqchip. There's tests in
+arm64 that rely on all this generic infrastructure and also need to
+select / dimension a GIC appropriately for the test.
 
--- 
-Kees Cook
+The majority of selftests don't even need an irqchip anyway.
+
+Thanks,
+Oliver
 
