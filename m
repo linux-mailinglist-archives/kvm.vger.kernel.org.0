@@ -1,215 +1,247 @@
-Return-Path: <kvm+bounces-55689-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-55690-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id A431CB34E56
-	for <lists+kvm@lfdr.de>; Mon, 25 Aug 2025 23:47:28 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5AE95B34E61
+	for <lists+kvm@lfdr.de>; Mon, 25 Aug 2025 23:49:53 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 9110A1A87445
-	for <lists+kvm@lfdr.de>; Mon, 25 Aug 2025 21:47:48 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0F5433A02F2
+	for <lists+kvm@lfdr.de>; Mon, 25 Aug 2025 21:49:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CD8F329BDB4;
-	Mon, 25 Aug 2025 21:47:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1C71929BDB4;
+	Mon, 25 Aug 2025 21:49:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="DuCKwCRG"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="qTb8ec3m"
 X-Original-To: kvm@vger.kernel.org
-Received: from NAM12-BN8-obe.outbound.protection.outlook.com (mail-bn8nam12on2041.outbound.protection.outlook.com [40.107.237.41])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ed1-f54.google.com (mail-ed1-f54.google.com [209.85.208.54])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BFAB01DAC95;
-	Mon, 25 Aug 2025 21:47:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.237.41
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756158432; cv=fail; b=SyriHHufSN+jPL3zJ3YemlFAkUXQh/EEZ9FsyidEtfa70gQC4ZrKTXRKDhwp5OwIZ+6JLnvwkaSiGzZUOjJjR54ihlcgrvhtpoNVswykUdTOHeoIAmMq411UCw2kAOujOe5VZbZ0H9uNAn4wF6D/oUVkIugQ0II84thyLw+Rsew=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756158432; c=relaxed/simple;
-	bh=jU6ilVy6u8K8SUIYY7ppKZLxuoTh1NpfKfa6E5gkpMw=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=Rf/Q94QlRgbM1kPxuIja340rTnog5oFg+c3l60CQyDxnqV2YGNZduawiEA9uvtACVKIt0Zi1abrSGPbuKElQqmZV9YW0O+h9a+GmoatC3nzcqp/BN8FdKiS+oVRPUY34bR1S7u/n7B2/Fr1S7SxI5H6rNY4DsV+Pfx4D8xm4k/k=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=DuCKwCRG; arc=fail smtp.client-ip=40.107.237.41
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=tApWvmzkYY/+6QYANS4rzR59GuqSGmQiqdIRiEbMtlSUIibk9mRvfHGwpWQeswwJXNaFUs9ZTObPZaCMi3Uy3HKdxDA+iVm12H2Y0V8g9gF0RKgFNP33SUTdVxCYY9DICGVbh/7kaDGoX4ivoy7icIMT/tTW1sRw8zF8LN7r0olC7gwPOdUq6KJNEjwv9kx50Gq02/jDXV5cfKVkQQZwxnwY/eBZ/R88nYDwmJ787uYyDSL0Fw40BiO+RU8cnIu7FElPeXXB3+NXH0J0uBg0PsUe4ncn97sdJ+q+Av5zRzzSPg6YWMdUUhkYsdjx/NFXRVbcsTfgaITRmofd2W8MVA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=KKYujyeim6mX/Yjhu9jaa3uLsemTTTcDM1y/3XuCPX8=;
- b=prsI8cNU+taQ05DuoAy9U542YiZBgMGdOiECO+nfpd9QE6PSzVzajkS1nJS4XXk+DZoaeBE1cLFuwRHYxhXPeluEbO6mxRAusO2wYpKsEPloOUzmDykoeLQydMxs+LqqDkEPfteHBEaYS2Q8N4hkKMut2UBT9HbOFjNr74rbcLIl4RC6t+kBitBuPa5lP3/MvspfXW8fItr4MVMM59+zeaxK7c1n6uD6SE5qM+0oYakfK32PZZgH4uMufjoZ2zcqw5ESn52ib+PIEMUS9sH/itJprJuKXFB6alfywB8HOwsp0bUVd8bYFkPWsDAvmQ9BVh46wLZGZYYo0T5CCA2bRg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 165.204.84.17) smtp.rcpttodomain=8bytes.org smtp.mailfrom=amd.com; dmarc=pass
- (p=quarantine sp=quarantine pct=100) action=none header.from=amd.com;
- dkim=none (message not signed); arc=none (0)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=KKYujyeim6mX/Yjhu9jaa3uLsemTTTcDM1y/3XuCPX8=;
- b=DuCKwCRGZGVtxh6t0HuHsq8Yzhj1cZPdlIg+jhiMMkSefGihuQuCyd6+h/1nIHGIlCmLaWsOGegYvShjniayNdBFe3VnVjnQS7TOKa21Qb4b7DdDfIloSx7o6o9U52PvFMGG/s9zwqX05iHoFAb1X3GI0ooE8xk1Qa48bcGozmU=
-Received: from MN2PR05CA0063.namprd05.prod.outlook.com (2603:10b6:208:236::32)
- by DS7PR12MB5886.namprd12.prod.outlook.com (2603:10b6:8:79::8) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.9052.21; Mon, 25 Aug 2025 21:47:06 +0000
-Received: from BN3PEPF0000B370.namprd21.prod.outlook.com
- (2603:10b6:208:236:cafe::f5) by MN2PR05CA0063.outlook.office365.com
- (2603:10b6:208:236::32) with Microsoft SMTP Server (version=TLS1_3,
- cipher=TLS_AES_256_GCM_SHA384) id 15.20.9073.13 via Frontend Transport; Mon,
- 25 Aug 2025 21:47:06 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
- smtp.mailfrom=amd.com; dkim=none (message not signed)
- header.d=none;dmarc=pass action=none header.from=amd.com;
-Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
- 165.204.84.17 as permitted sender) receiver=protection.outlook.com;
- client-ip=165.204.84.17; helo=SATLEXMB04.amd.com; pr=C
-Received: from SATLEXMB04.amd.com (165.204.84.17) by
- BN3PEPF0000B370.mail.protection.outlook.com (10.167.243.167) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.20.9094.0 via Frontend Transport; Mon, 25 Aug 2025 21:47:06 +0000
-Received: from ethanolx7e2ehost.amd.com (10.180.168.240) by SATLEXMB04.amd.com
- (10.181.40.145) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.39; Mon, 25 Aug
- 2025 16:47:03 -0500
-From: Ashish Kalra <Ashish.Kalra@amd.com>
-To: <joro@8bytes.org>, <suravee.suthikulpanit@amd.com>,
-	<thomas.lendacky@amd.com>, <Sairaj.ArunKodilkar@amd.com>,
-	<Vasant.Hegde@amd.com>, <herbert@gondor.apana.org.au>
-CC: <seanjc@google.com>, <pbonzini@redhat.com>, <will@kernel.org>,
-	<robin.murphy@arm.com>, <john.allen@amd.com>, <davem@davemloft.net>,
-	<michael.roth@amd.com>, <iommu@lists.linux.dev>,
-	<linux-kernel@vger.kernel.org>, <linux-crypto@vger.kernel.org>,
-	<kvm@vger.kernel.org>
-Subject: [PATCH v6 4/4] iommu/amd: Skip enabling command/event buffers for kdump
-Date: Mon, 25 Aug 2025 21:46:53 +0000
-Message-ID: <576445eb4f168b467b0fc789079b650ca7c5b037.1756157913.git.ashish.kalra@amd.com>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <cover.1756157913.git.ashish.kalra@amd.com>
-References: <cover.1756157913.git.ashish.kalra@amd.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 684B52989B5
+	for <kvm@vger.kernel.org>; Mon, 25 Aug 2025 21:49:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.54
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1756158586; cv=none; b=APQSs5bqpPbLK/nweAeqoXISj7Hmr/mw/VJCwLNfOidmPzTN9JVGTyc0qhgeDJAmF/sYdKDNUbfdq/hp6cdZuDyughTM7CjtzNXFPxHHnpwZSxEuIL/VltxRhIx++1LssG6UJTinWZVkoewzbeYLfSO8ZutQ+a3vkSjIaQlKing=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1756158586; c=relaxed/simple;
+	bh=fy5g75Gjohffo41G8H4Phppfp0vfa7SAV3gyjp44gCw=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=W4QdX6drENiDy+ek1a2XhhlyZlmLJ7HtQRwA1fmJRyloQ5XsAX/z2FP2gWp6dNgYLo2B1q50nkYXLFk6gUVljw4TpZk1bNjLnIBP5DaqMNW/RyB3wfk8QlHbD9ON6ij/qw6ezkPMJVfV7hydc9qfDCIMJzr6cVYn1gLhpkYry0I=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=qTb8ec3m; arc=none smtp.client-ip=209.85.208.54
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-ed1-f54.google.com with SMTP id 4fb4d7f45d1cf-61c869b4623so2256a12.1
+        for <kvm@vger.kernel.org>; Mon, 25 Aug 2025 14:49:44 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1756158583; x=1756763383; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=fVzEeVBNofY6j9rdW6DpWj8LIZF2ix04ZA4TyYLiqsw=;
+        b=qTb8ec3mLIipsyLXX1YSjBwW1vGdABKt1mWfyGwnRg9EMcspmDGkKRhLW2TKaONCL2
+         QSIP/8s9Sz1GVe5iXtYY8NpiaU5WZ2EXtFUra1pOXM/Iwty7PYw+yvzRyQHBnrvO8zwy
+         yDzmAtiDxj352H5ax4bK0wp0Qq3rJcoyGGzXwbhBoudg+r9S2LftVkTa7Suumlc8RH6s
+         rbWzMblA4XTGfBEMItXKlNB17zZMgWcpxRNeL7thSM4dqTWdjbmdjEBpa2ftxn/+KwYi
+         vMx57AVanngvdTNs4wBSJRnuAk58gK80T85iO7EwxLjFpMishXeFY4brgSSkp+9ehwkX
+         1lTg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1756158583; x=1756763383;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=fVzEeVBNofY6j9rdW6DpWj8LIZF2ix04ZA4TyYLiqsw=;
+        b=acbnlEGEHdUj6U+xb/W/vTd4RYBfrvtlteI+sCg7Dwn2mwmsti/VBAuTx9/gr+d7WP
+         cDBA7EYRs+QpUyx7kYUGw/j0TkYBpkq1VJBMfP9LyZX8AesB0dlPfe5VtZyMbYgBZZOW
+         rDNM+0xfx+GemBiMVzbNt61Ixj1U7UgdItaFSRn/FUpTA275J5u9IcVg7SokAW72G4vb
+         lCHRZ6BdNymk47p+W/lKh/N/iljaRMx3omRz6Pimhuzdp0rpAzbU8jFVXR7aPp9uJwpN
+         RgNPQrnjX4aWGGD3mvXsnez0roUW260PF4hKUbO7WtWNswbC/MgyEGVcgiaBsfjaE+CV
+         au7w==
+X-Forwarded-Encrypted: i=1; AJvYcCVwn0loYf1B74lRBr4HdH6bhIhQivizkTZufuprSPmiOwe9bTJFQ5cNOBpBKuFTZJq6U8Q=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxEnRltLmqBY8AhcjWHG8xpHjxM87xKuuzvDoWE/kBk4fJFKpRw
+	a0ww6PLTDnZ9uD42y8o4/wfAAeaxYrrvna3a0QLP/gUMXWzMR5d2hP7HszW3bPS2obwzN25GBnM
+	4odGjzZYDw50XRXEWqkI0uo/3WO+WKzWxKTVFuJRA
+X-Gm-Gg: ASbGnctG2+5IzdKSP3ur22lcjVlVHpCpjgJYeS9lTmCbw7UjQb02DrVx1z2cG9j71UF
+	mgoLUlUKEAa92qIxshX7Ql8J6lllgAD4kHEUDFLdJDxH2CY7Bdrw2dkw5y/gX2h0Y7Nb9rEQ+kb
+	BD/1ohhWGIboxQKnSgVik1nkml79cP5r/Fl2ZQlJJyuEvjbaRaNe2lEiuFncLWofwQuh0Mm8WZJ
+	y/sbUMoJxDIyjNdDO4o34LTOQok5UpdplTIeMlObWdobI9g1QJciE3Gaw==
+X-Google-Smtp-Source: AGHT+IF0Yf6BBGBBQQxS6rCnf3SLYNEuh7Oe6c3cDDlNpW01oaPLKk2o6DVmM9OCf3qcfLyanFbRWdfk6+bZxBP+570=
+X-Received: by 2002:a50:ab54:0:b0:61c:6c9e:58dd with SMTP id
+ 4fb4d7f45d1cf-61c8f0289c4mr21949a12.2.1756158582423; Mon, 25 Aug 2025
+ 14:49:42 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: SATLEXMB04.amd.com (10.181.40.145) To SATLEXMB04.amd.com
- (10.181.40.145)
-X-EOPAttributedMessage: 0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: BN3PEPF0000B370:EE_|DS7PR12MB5886:EE_
-X-MS-Office365-Filtering-Correlation-Id: 86d8131e-90a7-43d0-ec8f-08dde420ef90
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|376014|7416014|1800799024|36860700013|82310400026;
-X-Microsoft-Antispam-Message-Info:
-	=?us-ascii?Q?sZKjWWJUncN0GeBQ8tH3ugFzvtzfy4Dm8kDjO+Ie5Omdd8GL4aStLhyBeeXY?=
- =?us-ascii?Q?yTLSsz6afBtUhiePmTTF5j0oMnTWEZGP1rAgdx8lQdOiNYJrIUz/SBsML9pv?=
- =?us-ascii?Q?AsnfJ+MoK51GpNjXDBsuJwFAbyFFm6b73bMKN2bGwgfvg8JpHQvtt5IGSJ5A?=
- =?us-ascii?Q?fzdFy8UMYdA+ed+UvLECl7ZxrMp2+0LRRTLSpXs0IcA0puevcEEZ43Q3IxUl?=
- =?us-ascii?Q?wclO/KWwDReqHaTTJeYcWCJfLRh322Fi6QI5ew5ZQpxgaxbsyg0SrxI9pLJL?=
- =?us-ascii?Q?4y+OgVbir+ubmmxHuDCMmphasNQdM7O2VjnccqymqJkuus9k45aS7FRSllvt?=
- =?us-ascii?Q?bYATobIld6yXqkIbMYUT8I0wBrwhfkIdVePmoiD3FKdd3iedaC89WCY6ze9F?=
- =?us-ascii?Q?+ZHe5F0t8tmoFSZBMSfGCpK1E3Nk+csgtPkh3qScJkUjmW1Vka1vmA6MMweQ?=
- =?us-ascii?Q?rsoQ5OBMyYFBDlzzGici0tqFAZ0DkmRVgDZtu6E+pmRJZZX43nxg7v3wW88Y?=
- =?us-ascii?Q?LdRfQ35R6xOOSLcf5hYZ+On2/aoBO9A8GNWNVHnF83DCA+fPMB5KheD1LxqR?=
- =?us-ascii?Q?yG67T8yRodZraqQr31kbEGNVTkc03PjRy8+skvy0YmkWKovqWrrlbrFOxaAU?=
- =?us-ascii?Q?V9Zw2Nd9+1zzjdnKUtHvsPNGGZWgfKHzTDTHCqLdRCiHGWRWqKvdcqwa11BX?=
- =?us-ascii?Q?tLraEPWV+qqb4sLqLEBWrDAXev3cjt9zLul+D6qyTMeIEZQPISw3MSwp8qrS?=
- =?us-ascii?Q?BnCvcRVZ6suEwO/HQdtevcbXIy7f3Ajc7G/I5Ej5LjKykNzG79j9Nv/mb0V9?=
- =?us-ascii?Q?68GwYWGbOow4V3amO2LnH+2KPfTpYZ08rAHfeWeeYUjkA22CbUt0/ymFugNu?=
- =?us-ascii?Q?nTFw6VeewOUrJ9GucHXxdWO23wr+6yR+R87+WiQZH20xKajqe+ziSPQ4GWsH?=
- =?us-ascii?Q?4TCiiDj6Mo9VL4iu1M96Q9iiNsGZMGj7A/mJMWydFkPUHheqQOws3z69uVOI?=
- =?us-ascii?Q?OsoVUzCKPzrIX1VVFfaypGWE7agqh8bBRmCIq5pQm03oUpFaqAILl+kOucqf?=
- =?us-ascii?Q?SpBSFB+as/xn4oNnQLLWh/Qx2jIjXVoCu14QxEooixf82LzHGq31xC7FSJJ2?=
- =?us-ascii?Q?AvHnvV/xDiuJN2ajjkQoXfcCqybGDce8P3YAvkCteGn5eMtdflqyzycbnuDt?=
- =?us-ascii?Q?tmWHtj4FdV5upQjD/I2R9Ad4qvmd7PWhvLj7ZHvMojPl0THGupv5mv3KdGCR?=
- =?us-ascii?Q?iksTo7x3WQb35WRiWuwMDGoUVVXnctUYyNXguNjh2agS54msuT+30qCLXCZJ?=
- =?us-ascii?Q?pkNkyYdbMRahdLr4f6pLB5u8cj6d19Nzl04xe7D3NYjFjFS6BEftnxsz9Omo?=
- =?us-ascii?Q?/axYjgHNmBm8FM70YJipLsRwUEqbAAw2/CUcFd7aO5hsQItYJjcnbpDMizIt?=
- =?us-ascii?Q?MLafc0RkJwwnf1ZkfuYVBDqtr3UhzjuiE+THeAIPFU/TU9Ipz/Yj9gNl50mS?=
- =?us-ascii?Q?/GfboX+NPUjWRg874WNWU0Y/36Rn7/LrjA1X?=
-X-Forefront-Antispam-Report:
-	CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB04.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230040)(376014)(7416014)(1800799024)(36860700013)(82310400026);DIR:OUT;SFP:1101;
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 25 Aug 2025 21:47:06.5387
- (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 86d8131e-90a7-43d0-ec8f-08dde420ef90
-X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[SATLEXMB04.amd.com]
-X-MS-Exchange-CrossTenant-AuthSource:
-	BN3PEPF0000B370.namprd21.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DS7PR12MB5886
+References: <20250807201628.1185915-1-sagis@google.com> <20250807201628.1185915-11-sagis@google.com>
+ <ef499c6e-d62c-450e-982b-82c53054ea53@linux.intel.com> <c359e0d3-b840-4e98-b06d-94b4e3f7f792@linux.intel.com>
+In-Reply-To: <c359e0d3-b840-4e98-b06d-94b4e3f7f792@linux.intel.com>
+From: Sagi Shahar <sagis@google.com>
+Date: Mon, 25 Aug 2025 16:49:29 -0500
+X-Gm-Features: Ac12FXzWjUF5suI-kS5JLM-EDsLDh7zS9tyA6cW5QgEtLL7-maNy7Z9dfx-jyiM
+Message-ID: <CAAhR5DE8BMUm68Cx70aukCi-6SJbNToknZU7ea5YJM4UijbHnw@mail.gmail.com>
+Subject: Re: [PATCH v8 10/30] KVM: selftests: TDX: Add report_fatal_error test
+To: Binbin Wu <binbin.wu@linux.intel.com>
+Cc: linux-kselftest@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>, 
+	Shuah Khan <shuah@kernel.org>, Sean Christopherson <seanjc@google.com>, 
+	Ackerley Tng <ackerleytng@google.com>, Ryan Afranji <afranji@google.com>, 
+	Andrew Jones <ajones@ventanamicro.com>, Isaku Yamahata <isaku.yamahata@intel.com>, 
+	Erdem Aktas <erdemaktas@google.com>, Rick Edgecombe <rick.p.edgecombe@intel.com>, 
+	Roger Wang <runanwang@google.com>, Oliver Upton <oliver.upton@linux.dev>, 
+	"Pratik R. Sampat" <pratikrajesh.sampat@amd.com>, Reinette Chatre <reinette.chatre@intel.com>, 
+	Ira Weiny <ira.weiny@intel.com>, linux-kernel@vger.kernel.org, kvm@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-From: Ashish Kalra <ashish.kalra@amd.com>
+On Thu, Aug 14, 2025 at 2:05=E2=80=AFAM Binbin Wu <binbin.wu@linux.intel.co=
+m> wrote:
+>
+>
+>
+> On 8/13/2025 6:58 PM, Binbin Wu wrote:
+> >
+> >
+> > On 8/8/2025 4:16 AM, Sagi Shahar wrote:
+> >> The test checks report_fatal_error functionality.
+> >>
+> >> TD guest can use TDG.VP.VMCALL<ReportFatalError> to report the fatal e=
+rror
+> >> it has experienced. TD guest is requesting a termination with the erro=
+r
+> >> information that include 16 general-purpose registers.
+> >
+> > I think it's worth to mention that KVM converts TDG.VP.VMCALL<ReportFat=
+alError>
+> > to KVM_EXIT_SYSTEM_EVENT with the type KVM_SYSTEM_EVENT_TDX_FATAL.
+> >
+> >>
+> >> Co-developed-by: Binbin Wu <binbin.wu@linux.intel.com>
+> >> Signed-off-by: Binbin Wu <binbin.wu@linux.intel.com>
+> >> Signed-off-by: Sagi Shahar <sagis@google.com>
+> >> ---
+> >>   .../selftests/kvm/include/x86/tdx/tdx.h       |  6 ++-
+> >>   .../selftests/kvm/include/x86/tdx/tdx_util.h  |  1 +
+> >>   .../selftests/kvm/include/x86/tdx/test_util.h | 19 +++++++
+> >>   tools/testing/selftests/kvm/lib/x86/tdx/tdx.c | 18 +++++++
+> >>   .../selftests/kvm/lib/x86/tdx/tdx_util.c      |  6 +++
+> >>   .../selftests/kvm/lib/x86/tdx/test_util.c     | 10 ++++
+> >>   tools/testing/selftests/kvm/x86/tdx_vm_test.c | 51 +++++++++++++++++=
++-
+> >>   7 files changed, 108 insertions(+), 3 deletions(-)
+> >>
+> >> diff --git a/tools/testing/selftests/kvm/include/x86/tdx/tdx.h b/tools=
+/testing/selftests/kvm/include/x86/tdx/tdx.h
+> >> index a7161efe4ee2..2acccc9dccf9 100644
+> >> --- a/tools/testing/selftests/kvm/include/x86/tdx/tdx.h
+> >> +++ b/tools/testing/selftests/kvm/include/x86/tdx/tdx.h
+> >> @@ -4,9 +4,13 @@
+> >>     #include <stdint.h>
+> >>   +#include "kvm_util.h"
+> >> +
+> >> +#define TDG_VP_VMCALL_REPORT_FATAL_ERROR 0x10003
+> >> +
+> >>   #define TDG_VP_VMCALL_INSTRUCTION_IO 30
+> >>     uint64_t tdg_vp_vmcall_instruction_io(uint64_t port, uint64_t size=
+,
+> >>                         uint64_t write, uint64_t *data);
+> >> -
+> >> +void tdg_vp_vmcall_report_fatal_error(uint64_t error_code, uint64_t d=
+ata_gpa);
+> >>   #endif // SELFTEST_TDX_TDX_H
+> >> diff --git a/tools/testing/selftests/kvm/include/x86/tdx/tdx_util.h b/=
+tools/testing/selftests/kvm/include/x86/tdx/tdx_util.h
+> >> index 57a2f5893ffe..d66cf17f03ea 100644
+> >> --- a/tools/testing/selftests/kvm/include/x86/tdx/tdx_util.h
+> >> +++ b/tools/testing/selftests/kvm/include/x86/tdx/tdx_util.h
+> >> @@ -15,5 +15,6 @@ struct kvm_vm *td_create(void);
+> >>   void td_initialize(struct kvm_vm *vm, enum vm_mem_backing_src_type s=
+rc_type,
+> >>              uint64_t attributes);
+> >>   void td_finalize(struct kvm_vm *vm);
+> >> +void td_vcpu_run(struct kvm_vcpu *vcpu);
+> >>     #endif // SELFTESTS_TDX_KVM_UTIL_H
+> >> diff --git a/tools/testing/selftests/kvm/include/x86/tdx/test_util.h b=
+/tools/testing/selftests/kvm/include/x86/tdx/test_util.h
+> >> index 07d63bf1ffe1..dafeee9af1dc 100644
+> >> --- a/tools/testing/selftests/kvm/include/x86/tdx/test_util.h
+> >> +++ b/tools/testing/selftests/kvm/include/x86/tdx/test_util.h
+> >> @@ -38,4 +38,23 @@ bool is_tdx_enabled(void);
+> >>   void tdx_test_success(void);
+> >>   void tdx_test_assert_success(struct kvm_vcpu *vcpu);
+> >>   +/*
+> >> + * Report an error with @error_code to userspace.
+> >> + *
+> >> + * Return value from tdg_vp_vmcall_report_fatal_error() is ignored si=
+nce
+> >> + * execution is not expected to continue beyond this point.
+> >> + */
+> >> +void tdx_test_fatal(uint64_t error_code);
+>
+> Another thing to mention is that tdx_test_fatal() and tdx_test_fatal_with=
+_data()
+> use R12 to pass the input error_code, which is functionally workable, sin=
+ce both
+> guest and userspace code are in KVM selftest test code.
+>
+> But TDX GHCI spec has its own format for R12:
+> - 31:0
+>    TD-specific error code
+>    * Panic =E2=80=93 0x0.
+>    * Values =E2=80=93 0x1 to 0xFFFFFFFF reserved.
+> - 62:32
+>    TD-specific extended error code.
+>    TD software defined.
+> - 63
+>    Set if the TD specified additional information in the GPA parameter (R=
+13).
+> So, this patch series doesn't follow the format.
+>
+> Also, tdx_test_fatal_with_data() set bit 63 of R12, so, the value reporte=
+d to
+> userspace will be different in R12 from the original parameter passed by =
+the
+> guest, and setting bit 63 could collide with the error code defined by gu=
+est.
+>
+> IMHO, it's better to follow the GHCI spec.
+> But if TDX KVM selftest code doesn't want to follow it, then it should no=
+t set
+> bit 63 for tdx_test_fatal_with_data() in R12.
+>
 
-After a panic if SNP is enabled in the previous kernel then the kdump
-kernel boots with IOMMU SNP enforcement still enabled.
+Other than the fact that the address pointed to by data_gpa is a fake
+address, the rest of the implementation should follow the spec. And
+even on a normal system, TDX doesn't guarantee that the address
+provided by the guest is valid, it will simply send it to userspace as
+is.
 
-IOMMU command buffers and event buffer registers remain locked and
-exclusive to the previous kernel. Attempts to enable command and event
-buffers in the kdump kernel will fail, as hardware ignores writes to
-the locked MMIO registers as per AMD IOMMU spec Section 2.12.2.1.
+I can replace the setting of bit 63 with a GUEST_ASSERT to verify it
+is set if data_gpa is provided by the guest.
 
-Skip enabling command buffers and event buffers for kdump boot as they
-are already enabled in the previous kernel.
-
-Reviewed-by: Vasant Hegde <vasant.hegde@amd.com>
-Tested-by: Sairaj Kodilkar <sarunkod@amd.com>
-Signed-off-by: Ashish Kalra <ashish.kalra@amd.com>
----
- drivers/iommu/amd/init.c | 28 +++++++++++++++++++---------
- 1 file changed, 19 insertions(+), 9 deletions(-)
-
-diff --git a/drivers/iommu/amd/init.c b/drivers/iommu/amd/init.c
-index dac6282675da..d179344ad598 100644
---- a/drivers/iommu/amd/init.c
-+++ b/drivers/iommu/amd/init.c
-@@ -821,11 +821,16 @@ static void iommu_enable_command_buffer(struct amd_iommu *iommu)
- 
- 	BUG_ON(iommu->cmd_buf == NULL);
- 
--	entry = iommu_virt_to_phys(iommu->cmd_buf);
--	entry |= MMIO_CMD_SIZE_512;
--
--	memcpy_toio(iommu->mmio_base + MMIO_CMD_BUF_OFFSET,
--		    &entry, sizeof(entry));
-+	if (!is_kdump_kernel()) {
-+		/*
-+		 * Command buffer is re-used for kdump kernel and setting
-+		 * of MMIO register is not required.
-+		 */
-+		entry = iommu_virt_to_phys(iommu->cmd_buf);
-+		entry |= MMIO_CMD_SIZE_512;
-+		memcpy_toio(iommu->mmio_base + MMIO_CMD_BUF_OFFSET,
-+			    &entry, sizeof(entry));
-+	}
- 
- 	amd_iommu_reset_cmd_buffer(iommu);
- }
-@@ -876,10 +881,15 @@ static void iommu_enable_event_buffer(struct amd_iommu *iommu)
- 
- 	BUG_ON(iommu->evt_buf == NULL);
- 
--	entry = iommu_virt_to_phys(iommu->evt_buf) | EVT_LEN_MASK;
--
--	memcpy_toio(iommu->mmio_base + MMIO_EVT_BUF_OFFSET,
--		    &entry, sizeof(entry));
-+	if (!is_kdump_kernel()) {
-+		/*
-+		 * Event buffer is re-used for kdump kernel and setting
-+		 * of MMIO register is not required.
-+		 */
-+		entry = iommu_virt_to_phys(iommu->evt_buf) | EVT_LEN_MASK;
-+		memcpy_toio(iommu->mmio_base + MMIO_EVT_BUF_OFFSET,
-+			    &entry, sizeof(entry));
-+	}
- 
- 	/* set head and tail to zero manually */
- 	writel(0x00, iommu->mmio_base + MMIO_EVT_HEAD_OFFSET);
--- 
-2.34.1
-
+> >>
+> >> +
+> >> +/*
+> >> + * Report an error with @error_code to userspace.
+> >> + *
+> >> + * @data_gpa may point to an optional shared guest memory holding the=
+ error
+> >> + * string.
+> >
+> > A according to the GHCI spec, this is the optional GPA pointing to a sh=
+ared guest memory, but in these TDX KVM selftest cases, it may not used tha=
+t way. It may need some clarification about it. And based on the usage in t=
+his patch series, the name data_gpa may be misleading.
+> >
+> >
+> >> + *
+> >> + * Return value from tdg_vp_vmcall_report_fatal_error() is ignored si=
+nce
+> >> + * execution is not expected to continue beyond this point.
+> >> + */
+> >> +void tdx_test_fatal_with_data(uint64_t error_code, uint64_t data_gpa)=
+;
+> >> +
+> [...]
 
