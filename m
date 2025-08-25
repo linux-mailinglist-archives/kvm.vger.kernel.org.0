@@ -1,167 +1,247 @@
-Return-Path: <kvm+bounces-55665-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-55666-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id BE3B4B34978
-	for <lists+kvm@lfdr.de>; Mon, 25 Aug 2025 19:58:56 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5B2D1B34A6C
+	for <lists+kvm@lfdr.de>; Mon, 25 Aug 2025 20:32:57 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 2A2D6188B43F
-	for <lists+kvm@lfdr.de>; Mon, 25 Aug 2025 17:59:16 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2B1E11790DD
+	for <lists+kvm@lfdr.de>; Mon, 25 Aug 2025 18:32:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 119DD309DD8;
-	Mon, 25 Aug 2025 17:58:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1971330EF92;
+	Mon, 25 Aug 2025 18:32:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="eFCmlNSQ"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="QaLwgUM6"
 X-Original-To: kvm@vger.kernel.org
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8F7893093A5
-	for <kvm@vger.kernel.org>; Mon, 25 Aug 2025 17:58:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9A3833019CB
+	for <kvm@vger.kernel.org>; Mon, 25 Aug 2025 18:32:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756144705; cv=none; b=XXohYR2+vjTeOQ7aKjxK/VZ2Zlm18xIT8SjopwzA4dJtvcE5NxWyY4TzqysihZeizLAXjBM7rGQPIwqDu2Vv1wIhGAYMMz6X2xlRjc2igJLgGF3tCMfpHNIlYHajLMC2e8Aq3+m4FHLGwQ0okfzJDny2RB+2w4zArAwRaVZoNW8=
+	t=1756146759; cv=none; b=Z0oEsirKJwCnnzEbCxeKaYKGoVbp/4UbVhAaap9SP6RCCSrg9i7dq1+DGak7gjC5cJ5pM7EjiNwSmP90Kc0uUK7fWMRju91IorcwqGW1CmHvZVTl6uIWpCkTQqcjBpkn+0+PBnxnM7Xxr/lvab6RRMqyeCdHrjXhmCKqKhVajyg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756144705; c=relaxed/simple;
-	bh=9tQhpKFrcKVl8eNWr9WDsA9HaILG0i5qT4KrmJKG/os=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=WzmKkCQ7O/XdCupyDh9r+l8WrWftfyYsbF891+Y+rqIP/de933ddPksOee3MSzcqmTT+Uag6FiXoWfx8flZKcOe0FbbK+ZNMyN913Gajl5FPEBctpc05SxaL2IIvkNHe0C9GgH1taoYXCVGXSX26nZuedV6cY1Aa4QbfqNiTIck=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=eFCmlNSQ; arc=none smtp.client-ip=170.10.133.124
+	s=arc-20240116; t=1756146759; c=relaxed/simple;
+	bh=5gSbG4LawMNJ/PWjEAWfSVGPawomJWAQkNEyrTBhXtk=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=MU33Po6Ny0tNeAMCJdJ8IuRyZL6nqdoiTSmID7fcRhVAQPsn8nljHPzndUhDcO93YFdyBTiFz1r68yATL57iuNniZqXghYtqH+/dDB4Z11YTZLu+j95ARDQa9vt/kSHoB2UOMSdw1Ky9VpxVuCfSIDIZBA0HaQzScvnMCFRYUiE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=QaLwgUM6; arc=none smtp.client-ip=170.10.133.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1756144702;
+	s=mimecast20190719; t=1756146756;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=6nCXbyTRhRumkJuo6IKUQ8YReJ5IEnvwLFxxcUye5V4=;
-	b=eFCmlNSQNFau2TNqcOyOOf4wvWUKhHMiEb/tT4Rd1KZLDVBIab+jbDR30xmua2U1NQSYRE
-	IbLCZ1Gz+EA2Nb16HDDGv9LqM0BJbCVOLJlYjDMTyVqBtROr4R8Tq9c1Foz00ORfvHhvcp
-	hjxKWjczzsMWO/ciYxmAH8mw/Hsthpo=
-Received: from mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-344-M8Ck-cJbPOWkThjfbaCXDA-1; Mon,
- 25 Aug 2025 13:58:19 -0400
-X-MC-Unique: M8Ck-cJbPOWkThjfbaCXDA-1
-X-Mimecast-MFC-AGG-ID: M8Ck-cJbPOWkThjfbaCXDA_1756144698
-Received: from mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.111])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 0AEAA180028C;
-	Mon, 25 Aug 2025 17:58:18 +0000 (UTC)
-Received: from omen.home.shazbot.org (unknown [10.22.64.176])
-	by mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 9BEF8180028A;
-	Mon, 25 Aug 2025 17:58:16 +0000 (UTC)
-From: Alex Williamson <alex.williamson@redhat.com>
-To: alex.williamson@redhat.com,
-	kvm@vger.kernel.org
-Cc: linux-kernel@vger.kernel.org,
-	eric.auger@redhat.com,
-	smostafa@google.com,
-	praan@google.com
-Subject: [PATCH 2/2] vfio/platform: Mark reset drivers for removal
-Date: Mon, 25 Aug 2025 11:58:01 -0600
-Message-ID: <20250825175807.3264083-3-alex.williamson@redhat.com>
-In-Reply-To: <20250825175807.3264083-1-alex.williamson@redhat.com>
-References: <20250825175807.3264083-1-alex.williamson@redhat.com>
+	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+	bh=bluti57k39MttADONVHVsAxBvXyqb5R7ZWo2ok70EgM=;
+	b=QaLwgUM67P0pBnaSlF9vPnbSSsU1jQ5fdcdb836XP332LaK56RqlzQ0LdHEXkMzIiwfdmA
+	J20fW4Qj+4j2DKlTPDDhqd7SFkzXCCD7UPwrTttYN6gmDuEcZnTOuHoK/5kiPSiEgxCRlz
+	ayUbNNmjYi6wd8c2NXkTC3Op0q2JugM=
+Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
+ [209.85.128.71]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-544-5JO-WD5RN2-h7epPOwwP6A-1; Mon, 25 Aug 2025 14:32:33 -0400
+X-MC-Unique: 5JO-WD5RN2-h7epPOwwP6A-1
+X-Mimecast-MFC-AGG-ID: 5JO-WD5RN2-h7epPOwwP6A_1756146752
+Received: by mail-wm1-f71.google.com with SMTP id 5b1f17b1804b1-45a1b0ccb6cso23633555e9.3
+        for <kvm@vger.kernel.org>; Mon, 25 Aug 2025 11:32:33 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1756146752; x=1756751552;
+        h=content-transfer-encoding:in-reply-to:autocrypt:content-language
+         :from:references:cc:to:subject:user-agent:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=bluti57k39MttADONVHVsAxBvXyqb5R7ZWo2ok70EgM=;
+        b=Ilfpf3NVGF0XEVAnDQWKyDA31nq0BrH74tqw1EAbHSWDg2GT1gYAoCfiEwAVfbO9cY
+         QcX9LaCHgBhnusKSvCLwEDQBeFeBz6RSgcYCdSVlsme0shRoHPbNfQzutOqtji25n4Kx
+         QtmdmF5h2xwVvq9dH7v5dVeLd26wlLA426fxt5A+0MB9Jm5Pt9J5AAvepz8SsWQF1+Jo
+         fVL8JCvTuiRMq1JoN6Td7qj9k+RnrJhaHpidlVhMag5ZRpSETs+BIXyB5yLN9uZZNT8j
+         PTlY0VMZ9puFvuJ7V8vJkSMf3rPGN5pInYJnKtwO5vbX9laxCNbmF7SBHjkYAyN+nPOA
+         kmSw==
+X-Forwarded-Encrypted: i=1; AJvYcCWGNsv9td2q9+/y1h1Ek7yv7Bje7KxKgxkpCVV1iT44cC68zihHFb1TYKUu43GfJvgCA2s=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yy7pBbMPFwtEZ0sB6EVOsIBkNfxqCuXjf4k/0BHRFypl1e9Af5n
+	647y1q4YzRbjGnUEtZE1HZmio1r0GtpqHLRAhPZLkOoOTqPteJsAmQgvRSJJVeHKSBmmW6IS7a6
+	dFwfMkjv9xaedLNBIkkAi8bIkgqYvy394/QnVZI6Mz7W2t/34KBKZTA==
+X-Gm-Gg: ASbGncut2u1h8g3scCEOtVJUhKtOA8YxGIVLVMsvNKhuD6xPYkPGbkEAy7sZXGn59qs
+	HA+BwKKcRNJRCrm2+0bGALeAqv9bd56fjp7tsx5CuKhdsGbYWQCPqRNZeuGuUsDO4nN6SncKfsF
+	xly7qnQDxK16rCNRKpywEc5uI1w2Up/rZAMRvXN38I8IGTRNbgeQfiIJBGDkq7qXq/Hhz+O7qpv
+	tXdfKeQX8Ck58nuxDJmWNq4j9Sp8fCRbenPJKNs/dQANIf7iSBnAM4bZws/RtldP0GBVgnrUDfW
+	rncFHICfU5oQxjpKSejwdF4cMJlqzUJDtI7PLn2tuTpOl9gsq2Dd/CgMPjjqSPsmr+vZRAx3lvL
+	XLVkdtwENm0ZukHPFMAcHb4Z+MjXEUKyyiwmjRLOJ6BVHithB+T6BSgWb7bkHEMCuThs=
+X-Received: by 2002:a05:600c:4e90:b0:458:a559:a693 with SMTP id 5b1f17b1804b1-45b517b957emr126710725e9.18.1756146752236;
+        Mon, 25 Aug 2025 11:32:32 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IFxuQzAylX90vNEmmjxyPSaWFpv8tCbOTWCm8WazHqaDOnMAPM4HK8CKvM3oYkR/BEIZaOMIA==
+X-Received: by 2002:a05:600c:4e90:b0:458:a559:a693 with SMTP id 5b1f17b1804b1-45b517b957emr126710235e9.18.1756146751795;
+        Mon, 25 Aug 2025 11:32:31 -0700 (PDT)
+Received: from ?IPV6:2003:d8:2f4f:1300:42f1:98e5:ddf8:3a76? (p200300d82f4f130042f198e5ddf83a76.dip0.t-ipconnect.de. [2003:d8:2f4f:1300:42f1:98e5:ddf8:3a76])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3c7119c4200sm12481975f8f.53.2025.08.25.11.32.28
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 25 Aug 2025 11:32:31 -0700 (PDT)
+Message-ID: <7ffd0abd-27a1-40a8-b538-9a01e21abb29@redhat.com>
+Date: Mon, 25 Aug 2025 20:32:27 +0200
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.111
+User-Agent: Mozilla Thunderbird
+Subject: Re: update kernel-doc for MEMBLOCK_RSRV_NOINIT
+To: Mike Rapoport <rppt@kernel.org>
+Cc: =?UTF-8?Q?Mika_Penttil=C3=A4?= <mpenttil@redhat.com>,
+ linux-kernel@vger.kernel.org, Alexander Potapenko <glider@google.com>,
+ Andrew Morton <akpm@linux-foundation.org>,
+ Brendan Jackman <jackmanb@google.com>, Christoph Lameter <cl@gentwo.org>,
+ Dennis Zhou <dennis@kernel.org>, Dmitry Vyukov <dvyukov@google.com>,
+ dri-devel@lists.freedesktop.org, intel-gfx@lists.freedesktop.org,
+ iommu@lists.linux.dev, io-uring@vger.kernel.org,
+ Jason Gunthorpe <jgg@nvidia.com>, Jens Axboe <axboe@kernel.dk>,
+ Johannes Weiner <hannes@cmpxchg.org>, John Hubbard <jhubbard@nvidia.com>,
+ kasan-dev@googlegroups.com, kvm@vger.kernel.org,
+ "Liam R. Howlett" <Liam.Howlett@oracle.com>,
+ Linus Torvalds <torvalds@linux-foundation.org>, linux-arm-kernel@axis.com,
+ linux-arm-kernel@lists.infradead.org, linux-crypto@vger.kernel.org,
+ linux-ide@vger.kernel.org, linux-kselftest@vger.kernel.org,
+ linux-mips@vger.kernel.org, linux-mmc@vger.kernel.org, linux-mm@kvack.org,
+ linux-riscv@lists.infradead.org, linux-s390@vger.kernel.org,
+ linux-scsi@vger.kernel.org, Lorenzo Stoakes <lorenzo.stoakes@oracle.com>,
+ Marco Elver <elver@google.com>, Marek Szyprowski <m.szyprowski@samsung.com>,
+ Michal Hocko <mhocko@suse.com>, Muchun Song <muchun.song@linux.dev>,
+ netdev@vger.kernel.org, Oscar Salvador <osalvador@suse.de>,
+ Peter Xu <peterx@redhat.com>, Robin Murphy <robin.murphy@arm.com>,
+ Suren Baghdasaryan <surenb@google.com>, Tejun Heo <tj@kernel.org>,
+ virtualization@lists.linux.dev, Vlastimil Babka <vbabka@suse.cz>,
+ wireguard@lists.zx2c4.com, x86@kernel.org, Zi Yan <ziy@nvidia.com>
+References: <9156d191-9ec4-4422-bae9-2e8ce66f9d5e@redhat.com>
+ <7077e09f-6ce9-43ba-8f87-47a290680141@redhat.com>
+ <aKmDBobyvEX7ZUWL@kernel.org>
+ <a90cf9a3-d662-4239-ad54-7ea917c802a5@redhat.com>
+ <aKxz9HLQTflFNYEu@kernel.org>
+ <a72080b4-5156-4add-ac7c-1160b44e0dfe@redhat.com>
+ <aKx6SlYrj_hiPXBB@kernel.org>
+ <f8140a17-c4ec-489b-b314-d45abe48bf36@redhat.com>
+ <aKyMfvWe8JetkbRL@kernel.org>
+ <dbd2ec55-0e7f-407a-a8bd-e1ac83ac2a0a@redhat.com>
+ <aKyWIriZ1bmnIrBW@kernel.org>
+From: David Hildenbrand <david@redhat.com>
+Content-Language: en-US
+Autocrypt: addr=david@redhat.com; keydata=
+ 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
+ qIws/H2t
+In-Reply-To: <aKyWIriZ1bmnIrBW@kernel.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-While vfio-platform itself is on a reprieve from being removed[1],
-these reset drivers don't support any current hardware, are not being
-tested, and suggest a level of support that doesn't really exist.
-Mark them for removal to surface any remaining user such that we can
-potentially drop them and simplify the code if none appear.
+On 25.08.25 18:58, Mike Rapoport wrote:
+> On Mon, Aug 25, 2025 at 06:23:48PM +0200, David Hildenbrand wrote:
+>>
+>> I don't quite understand the interaction with PG_Reserved and why anybody
+>> using this function should care.
+>>
+>> So maybe you can rephrase in a way that is easier to digest, and rather
+>> focuses on what callers of this function are supposed to do vs. have the
+>> liberty of not doing?
+> 
+> How about
+>   
+> diff --git a/include/linux/memblock.h b/include/linux/memblock.h
+> index b96746376e17..fcda8481de9a 100644
+> --- a/include/linux/memblock.h
+> +++ b/include/linux/memblock.h
+> @@ -40,8 +40,9 @@ extern unsigned long long max_possible_pfn;
+>    * via a driver, and never indicated in the firmware-provided memory map as
+>    * system RAM. This corresponds to IORESOURCE_SYSRAM_DRIVER_MANAGED in the
+>    * kernel resource tree.
+> - * @MEMBLOCK_RSRV_NOINIT: memory region for which struct pages are
+> - * not initialized (only for reserved regions).
+> + * @MEMBLOCK_RSRV_NOINIT: reserved memory region for which struct pages are not
+> + * fully initialized. Users of this flag are responsible to properly initialize
+> + * struct pages of this region
+>    * @MEMBLOCK_RSRV_KERN: memory region that is reserved for kernel use,
+>    * either explictitly with memblock_reserve_kern() or via memblock
+>    * allocation APIs. All memblock allocations set this flag.
+> diff --git a/mm/memblock.c b/mm/memblock.c
+> index 154f1d73b61f..46b411fb3630 100644
+> --- a/mm/memblock.c
+> +++ b/mm/memblock.c
+> @@ -1091,13 +1091,20 @@ int __init_memblock memblock_clear_nomap(phys_addr_t base, phys_addr_t size)
+>   
+>   /**
+>    * memblock_reserved_mark_noinit - Mark a reserved memory region with flag
+> - * MEMBLOCK_RSRV_NOINIT which results in the struct pages not being initialized
+> - * for this region.
+> + * MEMBLOCK_RSRV_NOINIT
+> + *
+>    * @base: the base phys addr of the region
+>    * @size: the size of the region
+>    *
+> - * struct pages will not be initialized for reserved memory regions marked with
+> - * %MEMBLOCK_RSRV_NOINIT.
+> + * The struct pages for the reserved regions marked %MEMBLOCK_RSRV_NOINIT will
+> + * not be fully initialized to allow the caller optimize their initialization.
+> + *
+> + * When %CONFIG_DEFERRED_STRUCT_PAGE_INIT is enabled, setting this flag
+> + * completely bypasses the initialization of struct pages for such region.
+> + *
+> + * When %CONFIG_DEFERRED_STRUCT_PAGE_INIT is disabled, struct pages in this
+> + * region will be initialized with default values but won't be marked as
+> + * reserved.
 
-Link: https://lore.kernel.org/all/20250806170314.3768750-3-alex.williamson@redhat.com [1]
-Signed-off-by: Alex Williamson <alex.williamson@redhat.com>
----
- drivers/vfio/platform/reset/Kconfig                      | 6 +++---
- drivers/vfio/platform/reset/vfio_platform_amdxgbe.c      | 2 ++
- drivers/vfio/platform/reset/vfio_platform_bcmflexrm.c    | 2 ++
- drivers/vfio/platform/reset/vfio_platform_calxedaxgmac.c | 2 ++
- 4 files changed, 9 insertions(+), 3 deletions(-)
+Sounds good.
 
-diff --git a/drivers/vfio/platform/reset/Kconfig b/drivers/vfio/platform/reset/Kconfig
-index dcc08dc145a5..70af0dbe293b 100644
---- a/drivers/vfio/platform/reset/Kconfig
-+++ b/drivers/vfio/platform/reset/Kconfig
-@@ -1,21 +1,21 @@
- # SPDX-License-Identifier: GPL-2.0-only
- if VFIO_PLATFORM
- config VFIO_PLATFORM_CALXEDAXGMAC_RESET
--	tristate "VFIO support for calxeda xgmac reset"
-+	tristate "VFIO support for calxeda xgmac reset (DEPRECATED)"
- 	help
- 	  Enables the VFIO platform driver to handle reset for Calxeda xgmac
- 
- 	  If you don't know what to do here, say N.
- 
- config VFIO_PLATFORM_AMDXGBE_RESET
--	tristate "VFIO support for AMD XGBE reset"
-+	tristate "VFIO support for AMD XGBE reset (DEPRECATED)"
- 	help
- 	  Enables the VFIO platform driver to handle reset for AMD XGBE
- 
- 	  If you don't know what to do here, say N.
- 
- config VFIO_PLATFORM_BCMFLEXRM_RESET
--	tristate "VFIO support for Broadcom FlexRM reset"
-+	tristate "VFIO support for Broadcom FlexRM reset (DEPRECATED)"
- 	depends on ARCH_BCM_IPROC || COMPILE_TEST
- 	default ARCH_BCM_IPROC
- 	help
-diff --git a/drivers/vfio/platform/reset/vfio_platform_amdxgbe.c b/drivers/vfio/platform/reset/vfio_platform_amdxgbe.c
-index abdca900802d..45f386a042a9 100644
---- a/drivers/vfio/platform/reset/vfio_platform_amdxgbe.c
-+++ b/drivers/vfio/platform/reset/vfio_platform_amdxgbe.c
-@@ -52,6 +52,8 @@ static int vfio_platform_amdxgbe_reset(struct vfio_platform_device *vdev)
- 	u32 dma_mr_value, pcs_value, value;
- 	unsigned int count;
- 
-+	dev_err_once(vdev->device, "DEPRECATION: VFIO AMD XGBE platform reset is deprecated and will be removed in a future kernel release\n");
-+
- 	if (!xgmac_regs->ioaddr) {
- 		xgmac_regs->ioaddr =
- 			ioremap(xgmac_regs->addr, xgmac_regs->size);
-diff --git a/drivers/vfio/platform/reset/vfio_platform_bcmflexrm.c b/drivers/vfio/platform/reset/vfio_platform_bcmflexrm.c
-index 1131ebe4837d..51c9d156f307 100644
---- a/drivers/vfio/platform/reset/vfio_platform_bcmflexrm.c
-+++ b/drivers/vfio/platform/reset/vfio_platform_bcmflexrm.c
-@@ -72,6 +72,8 @@ static int vfio_platform_bcmflexrm_reset(struct vfio_platform_device *vdev)
- 	int rc = 0, ret = 0, ring_num = 0;
- 	struct vfio_platform_region *reg = &vdev->regions[0];
- 
-+	dev_err_once(vdev->device, "DEPRECATION: VFIO Broadcom FlexRM platform reset is deprecated and will be removed in a future kernel release\n");
-+
- 	/* Map FlexRM ring registers if not mapped */
- 	if (!reg->ioaddr) {
- 		reg->ioaddr = ioremap(reg->addr, reg->size);
-diff --git a/drivers/vfio/platform/reset/vfio_platform_calxedaxgmac.c b/drivers/vfio/platform/reset/vfio_platform_calxedaxgmac.c
-index 63cc7f0b2e4a..a298045a8e19 100644
---- a/drivers/vfio/platform/reset/vfio_platform_calxedaxgmac.c
-+++ b/drivers/vfio/platform/reset/vfio_platform_calxedaxgmac.c
-@@ -50,6 +50,8 @@ static int vfio_platform_calxedaxgmac_reset(struct vfio_platform_device *vdev)
- {
- 	struct vfio_platform_region *reg = &vdev->regions[0];
- 
-+	dev_err_once(vdev->device, "DEPRECATION: VFIO Calxeda xgmac platform reset is deprecated and will be removed in a future kernel release\n");
-+
- 	if (!reg->ioaddr) {
- 		reg->ioaddr =
- 			ioremap(reg->addr, reg->size);
+I am surprised regarding "reserved", but I guess that's because we don't 
+end up calling "reserve_bootmem_region()" on these regions in 
+memmap_init_reserved_pages().
+
+
 -- 
-2.50.1
+Cheers
+
+David / dhildenb
 
 
