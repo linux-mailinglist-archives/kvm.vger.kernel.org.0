@@ -1,148 +1,144 @@
-Return-Path: <kvm+bounces-55616-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-55617-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 78940B342ED
-	for <lists+kvm@lfdr.de>; Mon, 25 Aug 2025 16:15:54 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id CEC2CB3443F
+	for <lists+kvm@lfdr.de>; Mon, 25 Aug 2025 16:41:21 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3A24F3A9CE3
-	for <lists+kvm@lfdr.de>; Mon, 25 Aug 2025 14:13:55 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B76C0163208
+	for <lists+kvm@lfdr.de>; Mon, 25 Aug 2025 14:35:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9A5142F39C2;
-	Mon, 25 Aug 2025 14:13:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 47EDC2FF655;
+	Mon, 25 Aug 2025 14:32:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="e4fvRADW"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="n7YZsnMU"
 X-Original-To: kvm@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 86D5C2F0C67;
-	Mon, 25 Aug 2025 14:13:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C05212FE581;
+	Mon, 25 Aug 2025 14:32:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756131220; cv=none; b=ZJHZNU55OmRkiypag930Biy1oYcKfytF8IGYyDO4LYU212KKoYuCIGQg27Lv2xpBR3fM81AERGvm6eD6EjX9vBfad76VF3aY1pEhxJ7GjUtCKIGrA+QY1tXNNVfzv+1tppCQCqINLU/GEfFpbVrwBC7L5LmPdrlzRYdszV7PKXQ=
+	t=1756132362; cv=none; b=rvaKFmxPUXNMBH2MAesz5Qlpp/xkFerUU/SKfTXcIoOtlqi/YtFO9qUgSjde1sEIck4M0f9LjgFbLzGFxb5rEvRBuXjB6DUdWyWUBhPQ8m85JpvwgUQojiBmfA/49tA3flosM8W6RLpXW2O3I2NrUXZNy4Z0HyIncL44H02QLBY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756131220; c=relaxed/simple;
-	bh=3RLeKCKpDIk2eBgGx5sPwZfoBKyVmeEo49RWhYh8Kh8=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=dTsyf0mcbEDs6eEmvARn0HrN2tLlZjh9PzZDzXTaqRBjnI0InWwCJJXgJPBXA2P3r/OlxyoIPM1bI0cYp8wbsIqyvxNJpjKq9tw4HjP8FQq3NsdxKXw5iXLZd0PbCyuSLCR3adVZ1+IskrIuMfGwwDgdLPfJuTP7bg6zr70SguU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=e4fvRADW; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0460DC19425;
-	Mon, 25 Aug 2025 14:13:40 +0000 (UTC)
+	s=arc-20240116; t=1756132362; c=relaxed/simple;
+	bh=DU+1S4Dtf6BzIA9TMfJpqm5TRVwGVofXB+Dj9RHsm1g=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=h5U2W8teEHwEHSAEReWUSuboArGJz/KcccWbLgRYbbEqsTqBX7LtXHdcNag1oRJzbwFhEryM52hhe0TnA5ZWLQyqFZVJgJ3hsiVibG+jzAkGTNAQkhNYKhjeeNexmu3cbMcSiMUUWrzRocKGYTpXeRxqMADeLqRxW5OjwxAsRf8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=n7YZsnMU; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 28395C4CEED;
+	Mon, 25 Aug 2025 14:32:23 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1756131220;
-	bh=3RLeKCKpDIk2eBgGx5sPwZfoBKyVmeEo49RWhYh8Kh8=;
-	h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
-	b=e4fvRADWc2SiGyvairwMKdDw1zm1wGOXThGQeER0f4MYqsGYBRhD4UrfH+q2kimaE
-	 978Vxb2gnRrcxwK29zKxBr5sDuyaM7DyuM68nemBfDcJoWAJvdefCrMf4ky3tm3mTR
-	 ZEf5XaC0Deu8RHdTatQRuIX1UHKAPHYmvItTm0G3jHrBoDa0LYl7qMs/ZPY2JpgApc
-	 lQtDHIn1yKhsLsiU+tvHyxR+ZutYlrHGoRZcd4IzOHtkeInzrDGgR65atrSWLdNsYt
-	 TaeLwZDvBl70cfWDcKc3Px3Inhk2GTRE0IlvBDIzWF32uT29HeibPtjI2oz6UM54HE
-	 cW6lqbzTmXm7Q==
-Received: by mail-ot1-f41.google.com with SMTP id 46e09a7af769-74381fbd6f3so973401a34.2;
-        Mon, 25 Aug 2025 07:13:39 -0700 (PDT)
-X-Forwarded-Encrypted: i=1; AJvYcCU+ZKTcs2H+vLrKgIvFTXZBL0dsN6xLsr3ZC9I78D2Wu2hIH+8jkMSP41/cYIq51kdSw6CDRP2SZCw=@vger.kernel.org, AJvYcCU31NAMHGLiJSL7vGtItCLJY5s0jUAdR3sMwyRfm+qSikp7Liz6sk6nvOeef71BgF2oQIt9P6brS/8mrIw=@vger.kernel.org, AJvYcCUCIsGROdz8+qKvGy/zMPWBArUZIwHjHyOukJZdmFLSv86OWtmW3hFzobmb6viQiH0ilrE=@vger.kernel.org, AJvYcCUpaEvqIJcfrfK/wGmf+4jCmiLaEteujEieTnq78FTPn1snhOrfTBWVsHAv6ePGCQEuWAMpTJvzytkTyvkk@vger.kernel.org, AJvYcCUzdfnb7kLofKFxb1y3Q8fvI/X+T///5bVgsI6rwx9y8iWqk6NoPms12ttCNos9Xf7fqKEzLlNyfHhrxA==@vger.kernel.org, AJvYcCWemMcSx2OIbdB0hnJpGaiFoi/MxP4jomzuwUQvthWat4O+8GcCqlc1YdHzSj0oF7WTTGj6DdZm2XMPyRWKbydObT8=@vger.kernel.org, AJvYcCXp15T8q27ZRMIj8oIT/97J40RVT4aNPUenkJy+iThwifFJDUB5CFSBBCaBLD6cA1+r3iF1rDUaIZd5mw==@vger.kernel.org
-X-Gm-Message-State: AOJu0YxizDsgkRU4NZXkaOR4avUd7h7nVnM7GAnn9L7xwup6WzHwBdcv
-	Rjx5F+sL5x8blwTQWJ1bqnHyBpClUw0UjVYI0AfuyuKPqEnAiay1xGidaI/Oc3xy417ymzb6MGM
-	95pXfpIwqw40MPnlC79galVaEPEDKB0k=
-X-Google-Smtp-Source: AGHT+IGEnV+1YshDCmjAscdFjkSNQru4o/XG/DWYuObgbMiwP57k9JdqOZlPe3YdSW0fnLXsvsMiCF3QToEZVDUm+Q8=
-X-Received: by 2002:a05:6830:d18:b0:742:fd7f:e105 with SMTP id
- 46e09a7af769-74500aafdb9mr6734918a34.19.1756131219164; Mon, 25 Aug 2025
- 07:13:39 -0700 (PDT)
+	s=k20201202; t=1756132360;
+	bh=DU+1S4Dtf6BzIA9TMfJpqm5TRVwGVofXB+Dj9RHsm1g=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=n7YZsnMUaPKieR6Aen8NXplrqXq649ng2cWds08Paw0ZE1V9/s04MYuzfMJunBPPM
+	 e9q5l/4IYbHR+zLW6tZ3Ain+SM/EPsptEidQNiwcBG+gIXbD0MDb3NpuMIodH9q/bK
+	 gfUkw7ZqtLUllteesZei9c9/9Nob4tERnp37xBWgOfA8ssretvfGAj7ddnS1nJ/eSw
+	 gYK9m1P9+EEv6DvwLeTd0I1ynl3rIVfEsEIPpMbPhXNcaQgQQCdndA/xeV7DIotpxx
+	 J60e7ZU1ZivKd3L40DdBa/CHbHS/SOS0E/lE/sJu2Rz1DevUCKw6IvTf/zpKfAvZXV
+	 BIxp/l6R3haNQ==
+Date: Mon, 25 Aug 2025 17:32:20 +0300
+From: Mike Rapoport <rppt@kernel.org>
+To: David Hildenbrand <david@redhat.com>
+Cc: Mika =?iso-8859-1?Q?Penttil=E4?= <mpenttil@redhat.com>,
+	linux-kernel@vger.kernel.org,
+	Alexander Potapenko <glider@google.com>,
+	Andrew Morton <akpm@linux-foundation.org>,
+	Brendan Jackman <jackmanb@google.com>,
+	Christoph Lameter <cl@gentwo.org>, Dennis Zhou <dennis@kernel.org>,
+	Dmitry Vyukov <dvyukov@google.com>, dri-devel@lists.freedesktop.org,
+	intel-gfx@lists.freedesktop.org, iommu@lists.linux.dev,
+	io-uring@vger.kernel.org, Jason Gunthorpe <jgg@nvidia.com>,
+	Jens Axboe <axboe@kernel.dk>, Johannes Weiner <hannes@cmpxchg.org>,
+	John Hubbard <jhubbard@nvidia.com>, kasan-dev@googlegroups.com,
+	kvm@vger.kernel.org, "Liam R. Howlett" <Liam.Howlett@oracle.com>,
+	Linus Torvalds <torvalds@linux-foundation.org>,
+	linux-arm-kernel@axis.com, linux-arm-kernel@lists.infradead.org,
+	linux-crypto@vger.kernel.org, linux-ide@vger.kernel.org,
+	linux-kselftest@vger.kernel.org, linux-mips@vger.kernel.org,
+	linux-mmc@vger.kernel.org, linux-mm@kvack.org,
+	linux-riscv@lists.infradead.org, linux-s390@vger.kernel.org,
+	linux-scsi@vger.kernel.org,
+	Lorenzo Stoakes <lorenzo.stoakes@oracle.com>,
+	Marco Elver <elver@google.com>,
+	Marek Szyprowski <m.szyprowski@samsung.com>,
+	Michal Hocko <mhocko@suse.com>, Muchun Song <muchun.song@linux.dev>,
+	netdev@vger.kernel.org, Oscar Salvador <osalvador@suse.de>,
+	Peter Xu <peterx@redhat.com>, Robin Murphy <robin.murphy@arm.com>,
+	Suren Baghdasaryan <surenb@google.com>, Tejun Heo <tj@kernel.org>,
+	virtualization@lists.linux.dev, Vlastimil Babka <vbabka@suse.cz>,
+	wireguard@lists.zx2c4.com, x86@kernel.org, Zi Yan <ziy@nvidia.com>
+Subject: Re: [PATCH RFC 10/35] mm/hugetlb: cleanup
+ hugetlb_folio_init_tail_vmemmap()
+Message-ID: <aKxz9HLQTflFNYEu@kernel.org>
+References: <20250821200701.1329277-1-david@redhat.com>
+ <20250821200701.1329277-11-david@redhat.com>
+ <9156d191-9ec4-4422-bae9-2e8ce66f9d5e@redhat.com>
+ <7077e09f-6ce9-43ba-8f87-47a290680141@redhat.com>
+ <aKmDBobyvEX7ZUWL@kernel.org>
+ <a90cf9a3-d662-4239-ad54-7ea917c802a5@redhat.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250825092833.42441-1-zhangzihuan@kylinos.cn>
-In-Reply-To: <20250825092833.42441-1-zhangzihuan@kylinos.cn>
-From: "Rafael J. Wysocki" <rafael@kernel.org>
-Date: Mon, 25 Aug 2025 16:13:27 +0200
-X-Gmail-Original-Message-ID: <CAJZ5v0g7rJn=z5p4DuJJoPpZrR5ismYftpDWp5X=z74DqaGYBQ@mail.gmail.com>
-X-Gm-Features: Ac12FXwCyvYKc8Ipwt4NeaLRZNsWY9t1kMBiUFhDRbkfLg-XPnoGM5Pxq1PIQzg
-Message-ID: <CAJZ5v0g7rJn=z5p4DuJJoPpZrR5ismYftpDWp5X=z74DqaGYBQ@mail.gmail.com>
-Subject: Re: [PATCH v1] cpufreq: use __free() for all cpufreq_cpu_get() references
-To: Zihuan Zhang <zhangzihuan@kylinos.cn>
-Cc: "Rafael J . wysocki" <rafael@kernel.org>, Viresh Kumar <viresh.kumar@linaro.org>, 
-	Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>, 
-	Sean Christopherson <seanjc@google.com>, Paolo Bonzini <pbonzini@redhat.com>, 
-	Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>, 
-	Dave Hansen <dave.hansen@linux.intel.com>, Markus Mayer <mmayer@broadcom.com>, 
-	Florian Fainelli <florian.fainelli@broadcom.com>, 
-	Srinivas Pandruvada <srinivas.pandruvada@linux.intel.com>, 
-	Madhavan Srinivasan <maddy@linux.ibm.com>, Michael Ellerman <mpe@ellerman.id.au>, 
-	Krzysztof Kozlowski <krzk@kernel.org>, Alim Akhtar <alim.akhtar@samsung.com>, 
-	Thierry Reding <thierry.reding@gmail.com>, Jonathan Hunter <jonathanh@nvidia.com>, 
-	MyungJoo Ham <myungjoo.ham@samsung.com>, Kyungmin Park <kyungmin.park@samsung.com>, 
-	Chanwoo Choi <cw00.choi@samsung.com>, Jani Nikula <jani.nikula@linux.intel.com>, 
-	Joonas Lahtinen <joonas.lahtinen@linux.intel.com>, Rodrigo Vivi <rodrigo.vivi@intel.com>, 
-	Tvrtko Ursulin <tursulin@ursulin.net>, David Airlie <airlied@gmail.com>, 
-	Simona Vetter <simona@ffwll.ch>, Daniel Lezcano <daniel.lezcano@kernel.org>, 
-	Sascha Hauer <s.hauer@pengutronix.de>, Shawn Guo <shawnguo@kernel.org>, 
-	Eduardo Valentin <edubezval@gmail.com>, Keerthy <j-keerthy@ti.com>, 
-	Matthias Brugger <matthias.bgg@gmail.com>, 
-	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>, 
-	zhenglifeng <zhenglifeng1@huawei.com>, "H . Peter Anvin" <hpa@zytor.com>, Zhang Rui <rui.zhang@intel.com>, 
-	Len Brown <lenb@kernel.org>, Nicholas Piggin <npiggin@gmail.com>, 
-	Christophe Leroy <christophe.leroy@csgroup.eu>, Lukasz Luba <lukasz.luba@arm.com>, 
-	Pengutronix Kernel Team <kernel@pengutronix.de>, Beata Michalska <beata.michalska@arm.com>, 
-	Fabio Estevam <festevam@gmail.com>, Pavel Machek <pavel@kernel.org>, Sumit Gupta <sumitg@nvidia.com>, 
-	Prasanna Kumar T S M <ptsm@linux.microsoft.com>, Sudeep Holla <sudeep.holla@arm.com>, 
-	Yicong Yang <yangyicong@hisilicon.com>, linux-pm@vger.kernel.org, x86@kernel.org, 
-	kvm@vger.kernel.org, linux-acpi@vger.kernel.org, 
-	linuxppc-dev@lists.ozlabs.org, linux-samsung-soc@vger.kernel.org, 
-	linux-arm-kernel@lists.infradead.org, linux-tegra@vger.kernel.org, 
-	intel-gfx@lists.freedesktop.org, dri-devel@lists.freedesktop.org, 
-	imx@lists.linux.dev, linux-omap@vger.kernel.org, 
-	linux-mediatek@lists.infradead.org, linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <a90cf9a3-d662-4239-ad54-7ea917c802a5@redhat.com>
 
-On Mon, Aug 25, 2025 at 11:29=E2=80=AFAM Zihuan Zhang <zhangzihuan@kylinos.=
-cn> wrote:
->
-> This patch replaces all remaining uses of cpufreq_cpu_get() with
-> the __free(cpufreq_cpu_put) annotation.
->
-> Motivation:
-> - Ensures automatic cleanup of policy references when they go out of scop=
-e,
->   reducing the risk of forgetting to call cpufreq_cpu_put() on early retu=
-rn
->   or error paths.
-> - Brings the code in line with the latest kernel coding style and best
->   practices for managing reference-counted objects.
-> - No functional changes are introduced; behavior remains the same,
->   but reference counting is now safer and easier to maintain.
->
-> Signed-off-by: Zihuan Zhang <zhangzihuan@kylinos.cn>
-> ---
->  arch/arm64/kernel/topology.c                  |  9 +++----
->  arch/x86/kvm/x86.c                            | 10 ++++----
->  drivers/acpi/processor_thermal.c              | 13 ++++------
->  drivers/cpufreq/brcmstb-avs-cpufreq.c         |  4 +---
->  drivers/cpufreq/cppc_cpufreq.c                |  4 +---
->  drivers/cpufreq/intel_pstate.c                |  3 +--
->  drivers/cpufreq/longhaul.c                    |  3 +--
->  drivers/cpufreq/mediatek-cpufreq.c            |  6 ++---
->  drivers/cpufreq/powernv-cpufreq.c             |  6 ++---
->  drivers/cpufreq/s5pv210-cpufreq.c             |  3 +--
->  drivers/cpufreq/tegra186-cpufreq.c            |  3 +--
->  drivers/devfreq/governor_passive.c            | 19 ++++-----------
->  drivers/gpu/drm/i915/gt/intel_llc.c           |  3 +--
->  drivers/macintosh/windfarm_cpufreq_clamp.c    |  4 +---
->  drivers/powercap/dtpm_cpu.c                   | 24 ++++++-------------
->  drivers/thermal/imx_thermal.c                 |  7 ++----
->  .../ti-soc-thermal/ti-thermal-common.c        |  5 +---
->  kernel/power/energy_model.c                   |  7 ++----
->  18 files changed, 40 insertions(+), 93 deletions(-)
+On Mon, Aug 25, 2025 at 02:48:58PM +0200, David Hildenbrand wrote:
+> On 23.08.25 10:59, Mike Rapoport wrote:
+> > On Fri, Aug 22, 2025 at 08:24:31AM +0200, David Hildenbrand wrote:
+> > > On 22.08.25 06:09, Mika Penttilä wrote:
+> > > > 
+> > > > On 8/21/25 23:06, David Hildenbrand wrote:
+> > > > 
+> > > > > All pages were already initialized and set to PageReserved() with a
+> > > > > refcount of 1 by MM init code.
+> > > > 
+> > > > Just to be sure, how is this working with MEMBLOCK_RSRV_NOINIT, where MM is supposed not to
+> > > > initialize struct pages?
+> > > 
+> > > Excellent point, I did not know about that one.
+> > > 
+> > > Spotting that we don't do the same for the head page made me assume that
+> > > it's just a misuse of __init_single_page().
+> > > 
+> > > But the nasty thing is that we use memblock_reserved_mark_noinit() to only
+> > > mark the tail pages ...
+> > 
+> > And even nastier thing is that when CONFIG_DEFERRED_STRUCT_PAGE_INIT is
+> > disabled struct pages are initialized regardless of
+> > memblock_reserved_mark_noinit().
+> > 
+> > I think this patch should go in before your updates:
+> 
+> Shouldn't we fix this in memblock code?
+> 
+> Hacking around that in the memblock_reserved_mark_noinit() user sound wrong
+> -- and nothing in the doc of memblock_reserved_mark_noinit() spells that
+> behavior out.
 
-This changes different pieces of code maintained by different people
-and the changes are not interdependent AFAICS, so better send it as a
-series of separate patches.
+We can surely update the docs, but unfortunately I don't see how to avoid
+hacking around it in hugetlb. 
+Since it's used to optimise HVO even further to the point hugetlb open
+codes memmap initialization, I think it's fair that it should deal with all
+possible configurations.
+ 
+> -- 
+> Cheers
+> 
+> David / dhildenb
+> 
+> 
 
-Thanks!
+-- 
+Sincerely yours,
+Mike.
 
