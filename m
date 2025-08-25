@@ -1,130 +1,80 @@
-Return-Path: <kvm+bounces-55647-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-55648-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2DFFCB34752
-	for <lists+kvm@lfdr.de>; Mon, 25 Aug 2025 18:29:16 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 42278B347DD
+	for <lists+kvm@lfdr.de>; Mon, 25 Aug 2025 18:45:08 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 291EE7AA19D
-	for <lists+kvm@lfdr.de>; Mon, 25 Aug 2025 16:27:39 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id CAB663B6171
+	for <lists+kvm@lfdr.de>; Mon, 25 Aug 2025 16:44:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2DFEE3009E6;
-	Mon, 25 Aug 2025 16:29:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (4096-bit key) header.d=alien8.de header.i=@alien8.de header.b="EgP85DD6"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B67AF2FE059;
+	Mon, 25 Aug 2025 16:44:51 +0000 (UTC)
 X-Original-To: kvm@vger.kernel.org
-Received: from mail.alien8.de (mail.alien8.de [65.109.113.108])
+Received: from vps-ovh.mhejs.net (vps-ovh.mhejs.net [145.239.82.108])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 72E702EDD64;
-	Mon, 25 Aug 2025 16:29:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=65.109.113.108
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8EEA419CD1D;
+	Mon, 25 Aug 2025 16:44:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=145.239.82.108
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756139343; cv=none; b=Yq45tL5I7jqxDXYX3yinKw/H7ZaWDQMGSqfR4g+ZrJVXr4UOknf67hGkXgMJQEMKADLLX6wvb9AZ1Y7TbZbNciS29r8fOD+p43HFlXnlmrD2SBK5lrLK8unCMtKc2W+nrFiGGyOQNqRJbLuAnDpGwsmZRzhzLUGpE/byac1QlTE=
+	t=1756140291; cv=none; b=GUWVuNc/+3eXlttYDqutG+o8iy4kv3vMq6Jvdge27+am1xwSgKYMim4ov16iLHEL6nVjttd16Hg2oa/vXCDpaIVV5u8EU2CY1vyslBktfKaDOuTTyia9+FgLj8yv9SBtGj76R45iWCFQDdbJe4dT835tKjWfsFTRU/W99nvvELU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756139343; c=relaxed/simple;
-	bh=QPg1eQm7+d3FwWtNq14oUCU6BZDeNGKCjsgcPb8E4m0=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=ElQTvoOxmnJ/Hc2Oi9KCoOut1MbiXXi0c1iGutTXZyx3zMfxHIHUiSoY+Q10JBG8XhMD/12j+BihcwIPbWG0SGH5GJObRgLDouy5Yid9kH9xQiuPAMt1/9X9GTa1kVvCcqhicmuIKEA/J5A6FDuSg1OQo5+EjuyVtiaCX7fuX6M=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=alien8.de; spf=pass smtp.mailfrom=alien8.de; dkim=pass (4096-bit key) header.d=alien8.de header.i=@alien8.de header.b=EgP85DD6; arc=none smtp.client-ip=65.109.113.108
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=alien8.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=alien8.de
-Received: from localhost (localhost.localdomain [127.0.0.1])
-	by mail.alien8.de (SuperMail on ZX Spectrum 128k) with ESMTP id DB7E240E016C;
-	Mon, 25 Aug 2025 16:28:58 +0000 (UTC)
-X-Virus-Scanned: Debian amavisd-new at mail.alien8.de
-Authentication-Results: mail.alien8.de (amavisd-new); dkim=pass (4096-bit key)
-	header.d=alien8.de
-Received: from mail.alien8.de ([127.0.0.1])
-	by localhost (mail.alien8.de [127.0.0.1]) (amavisd-new, port 10026)
-	with ESMTP id nab_Xuzv7lIN; Mon, 25 Aug 2025 16:28:51 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=alien8;
-	t=1756139329; bh=FBgYgjhAvEXhzB7paQSxZ9R4hBpErOpDYpNpZuJo2Bc=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=EgP85DD6rC1uZsZ4mUPdgBnR5UBeSA/sO/olRVdG2nc5OHWMbSKj0rFAPkcW9J9kP
-	 G0vQge08P6XfYjHTYtwAxta2oWqyT+YK8N3UrOAN0uwIGJ9Sv8/D/m20mzoAxe/Kvi
-	 c//fFLOsjIsXoECQaSJfOCuxbT8S7N2QPBY6QVI1s2+szpmnRpspYWwYMMdr+kL4l5
-	 rzBVYIhsxwMSAUs9Q4oLBQj5f/STt7+n98mrmPJVOqGjRc1Gi7oNsIRKow+uk7xoYD
-	 NnGz8uAbALutRWy64T8/XRHAdjDgw24Kc+39wYdFv3c0WGW9QIbI7pDzJAbnD2Jcko
-	 LwDys1E+kXtv4ui0DNb0CHOXg8hHF12oGi5e7RH3g7Sh94I4WBMoym5N0cc3k9NFFk
-	 Dto6PlMY9QmtNRQm5VTK9ygKEWym1z+U8Ty2NuxUv+iUOQSsixAfbEgfbsH7UN/XXu
-	 kvYxFRAjPlF27NXskHPMA/pzWOKa0lanwnCerBY1nj72Q+9pgzdRnIbIHswW0/xIA8
-	 rjc3CQg0YTQBoYjDkaS8dfRB9nMHaPiGiynFQNI5bsW3EuaHkxbHNZ63IhOzRnw9Hw
-	 weM37hcNgjb0tr2o1Plm2xJrhR+vGpgEW+noTzt9NCO7duNx8vxzd+ChcaEhFlOIqD
-	 TH4GHDWVW7/hvA1VWU4QlWOM=
-Received: from zn.tnic (pd953092e.dip0.t-ipconnect.de [217.83.9.46])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange ECDHE (P-256) server-signature ECDSA (P-256) server-digest SHA256)
-	(No client certificate requested)
-	by mail.alien8.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id 3077240E01A1;
-	Mon, 25 Aug 2025 16:28:28 +0000 (UTC)
-Date: Mon, 25 Aug 2025 18:28:20 +0200
-From: Borislav Petkov <bp@alien8.de>
-To: Neeraj Upadhyay <Neeraj.Upadhyay@amd.com>, seanjc@google.com
-Cc: linux-kernel@vger.kernel.org, tglx@linutronix.de, mingo@redhat.com,
-	dave.hansen@linux.intel.com, Thomas.Lendacky@amd.com,
-	nikunj@amd.com, Santosh.Shukla@amd.com, Vasant.Hegde@amd.com,
-	Suravee.Suthikulpanit@amd.com, David.Kaplan@amd.com, x86@kernel.org,
-	hpa@zytor.com, peterz@infradead.org, pbonzini@redhat.com,
-	kvm@vger.kernel.org, huibo.wang@amd.com, naveen.rao@amd.com,
-	francescolavra.fl@gmail.com, tiala@microsoft.com
-Subject: Re: [PATCH v9 17/18] x86/sev: Prevent SECURE_AVIC_CONTROL MSR
- interception for Secure AVIC guests
-Message-ID: <20250825162820.GDaKyPJLxPD-sZ8YWP@fat_crate.local>
-References: <20250811094444.203161-1-Neeraj.Upadhyay@amd.com>
- <20250811094444.203161-18-Neeraj.Upadhyay@amd.com>
+	s=arc-20240116; t=1756140291; c=relaxed/simple;
+	bh=Y3xkisiSVIBWNyBSvA6GThK5rhkafC+aHeo8KML5ig0=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=eyuKBULPbzUsYsqsoCfDXbfc7gMMjibCC5LNpbsXZe85IkEIhhvgtbWD29Vx/a9EhD9vtz7Wi5RqdnUPT3pymVkeDnC+A5L6kBV8nBOmhLe9culypmR06nLC/Egtz6ytTWlg4BJk/WYDQkb63RTMjhuam0hXrZAhdGkGAWRCh3E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=maciej.szmigiero.name; spf=pass smtp.mailfrom=vps-ovh.mhejs.net; arc=none smtp.client-ip=145.239.82.108
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=maciej.szmigiero.name
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=vps-ovh.mhejs.net
+Received: from MUA
+	by vps-ovh.mhejs.net with esmtpsa  (TLS1.3) tls TLS_AES_256_GCM_SHA384
+	(Exim 4.98.2)
+	(envelope-from <mhej@vps-ovh.mhejs.net>)
+	id 1uqaJ9-00000001lNk-1pTP;
+	Mon, 25 Aug 2025 18:44:35 +0200
+From: "Maciej S. Szmigiero" <mail@maciej.szmigiero.name>
+To: Paolo Bonzini <pbonzini@redhat.com>,
+	Sean Christopherson <seanjc@google.com>
+Cc: Maxim Levitsky <mlevitsk@redhat.com>,
+	Suravee Suthikulpanit <Suravee.Suthikulpanit@amd.com>,
+	Naveen N Rao <naveen@kernel.org>,
+	Alejandro Jimenez <alejandro.j.jimenez@oracle.com>,
+	kvm@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH v2 0/2] KVM: SVM: Fix missing LAPIC TPR sync into VMCB::V_TPR with AVIC on
+Date: Mon, 25 Aug 2025 18:44:27 +0200
+Message-ID: <cover.1756139678.git.maciej.szmigiero@oracle.com>
+X-Mailer: git-send-email 2.50.1
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20250811094444.203161-18-Neeraj.Upadhyay@amd.com>
+Content-Transfer-Encoding: 8bit
+Sender: mhej@vps-ovh.mhejs.net
 
-On Mon, Aug 11, 2025 at 03:14:43PM +0530, Neeraj Upadhyay wrote:
-> The SECURE_AVIC_CONTROL MSR holds the GPA of the guest APIC backing
-> page and bitfields to control enablement of Secure AVIC and NMI by
-> guest vCPUs. This MSR is populated by the guest and the hypervisor
-> should not intercept it. A #VC exception will be generated otherwise.
-> If this occurs and Secure AVIC is enabled, terminate guest execution.
-> 
-> Reviewed-by: Tianyu Lan <tiala@microsoft.com>
-> Signed-off-by: Neeraj Upadhyay <Neeraj.Upadhyay@amd.com>
-> ---
-> Changes since v8:
->  - No change.
-> 
->  arch/x86/coco/sev/vc-handle.c | 9 +++++++++
->  1 file changed, 9 insertions(+)
-> 
-> diff --git a/arch/x86/coco/sev/vc-handle.c b/arch/x86/coco/sev/vc-handle.c
-> index fc770cc9117d..e856a5e18670 100644
-> --- a/arch/x86/coco/sev/vc-handle.c
-> +++ b/arch/x86/coco/sev/vc-handle.c
-> @@ -414,6 +414,15 @@ enum es_result sev_es_ghcb_handle_msr(struct ghcb *ghcb, struct es_em_ctxt *ctxt
->  		if (sev_status & MSR_AMD64_SNP_SECURE_TSC)
->  			return __vc_handle_secure_tsc_msrs(regs, write);
->  		break;
-> +	case MSR_AMD64_SECURE_AVIC_CONTROL:
-> +		/*
-> +		 * AMD64_SECURE_AVIC_CONTROL should not be intercepted when
-> +		 * Secure AVIC is enabled. Terminate the Secure AVIC guest
-> +		 * if the interception is enabled.
-> +		 */
-> +		if (cc_platform_has(CC_ATTR_SNP_SECURE_AVIC))
-> +			return ES_VMM_ERROR;
-> +		break;
+From: "Maciej S. Szmigiero" <maciej.szmigiero@oracle.com>
 
-In light of the recent secure TSC MSR discussions, let's see if Sean really
-wants to do two different things for reads and writes here too...
+This is an updated v2 patch series of the v1 series located at:
+https://lore.kernel.org/kvm/cover.1755609446.git.maciej.szmigiero@oracle.com/
 
--- 
-Regards/Gruss,
-    Boris.
 
-https://people.kernel.org/tglx/notes-about-netiquette
+Changes from v1:
+Fix this issue by doing unconditional LAPIC -> V_TPR sync at each VMRUN
+rather than by just patching the KVM_SET_LAPIC ioctl() code path
+(and similar ones).
+
+
+Maciej S. Szmigiero (2):
+  KVM: SVM: Sync TPR from LAPIC into VMCB::V_TPR even if AVIC is active
+  KVM: selftests: Test TPR / CR8 sync and interrupt masking
+
+ arch/x86/kvm/svm/svm.c                        |   3 +-
+ .../testing/selftests/kvm/include/x86/apic.h  |   5 +
+ .../selftests/kvm/x86/xapic_state_test.c      | 265 +++++++++++++++++-
+ 3 files changed, 268 insertions(+), 5 deletions(-)
+
 
