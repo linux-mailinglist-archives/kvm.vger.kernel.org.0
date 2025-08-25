@@ -1,155 +1,147 @@
-Return-Path: <kvm+bounces-55681-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-55682-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id E3A82B34E1C
-	for <lists+kvm@lfdr.de>; Mon, 25 Aug 2025 23:35:22 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 33C4DB34E2A
+	for <lists+kvm@lfdr.de>; Mon, 25 Aug 2025 23:37:27 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id AC3D62433B0
-	for <lists+kvm@lfdr.de>; Mon, 25 Aug 2025 21:35:22 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 492981A87C3C
+	for <lists+kvm@lfdr.de>; Mon, 25 Aug 2025 21:37:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1AF3F29A310;
-	Mon, 25 Aug 2025 21:35:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C66CA29B78D;
+	Mon, 25 Aug 2025 21:37:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="AVBij65p"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="cHK0J2XK"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 65F6F13C695
-	for <kvm@vger.kernel.org>; Mon, 25 Aug 2025 21:35:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C6A4C27A917;
+	Mon, 25 Aug 2025 21:37:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756157713; cv=none; b=dlCfsVor3J7ZHC5h2/MyR4E22TjLqg2IxtARk1wb5GHJWptOMqSZ4weMCrJUt6eaKqyAe3y+bhT/AScRpzwKHSW2UvZkVMRteg7E0nOYjtYWDUstyNd/6UeNKmeU+7sZkm99TP4Qnll4I0+cch9DrnH1dz6ro7/jSqjnrm+4dFI=
+	t=1756157832; cv=none; b=q3OMa9klER5kcD5hfQzcH5gEW7TqnE/VhFRTneqUwrlw9Ruy4lQnon4v6dAnVBJVeyxj47K7EVeVDBtSpzNjA3D0XmVWwws2RJuLrKb1iZuZqoyYDzXpZh+InipMXWpFSo/36P6fq4/tqnZ9SPk1Di+jP/zgFVDtia5yEbTg33M=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756157713; c=relaxed/simple;
-	bh=Q9CPbQpH2d/T5EyyLjYG2kTFNAop20As96U/hmdEPUY=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=A0n6CVi7Vi6hUU5CZAR7BQTY9/+TH5W+J8Xja6tAWzWpkJN+cKNCy7a6VCihm/Xme7KSpUPhgf7zC4pjYaFAv3rUkNmmYRkKzBkbGiZxxZ1QxsUunfnpx3S7zaH5lfvsrEsJkB6CdKHqi8EVCSyeZQNsTUZ3RADwaWQExav5K7E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=AVBij65p; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1756157709;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=TuacPQu0sUaEe98IXzV5lAzTlLH7oY2OXfsQpZup1+Q=;
-	b=AVBij65pmNfwJOXWbJPtok+69RkZPzIoKvWYOZAb0DfGsr70fG4c4gIuJIgFt3Ppnc/Vn7
-	8ucfpZWlMWxnGqSxPeeRfHlpMCpZljGWGTAd4R1L20fjJ+UGa23XfjGcYzvTh0OKHO6uGh
-	SPiZCkVGhtNFVtsId74ZjaO5CG1dLAg=
-Received: from mail-il1-f200.google.com (mail-il1-f200.google.com
- [209.85.166.200]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-354-7zNGVF68NBOqfx6SdKcWKg-1; Mon, 25 Aug 2025 17:35:08 -0400
-X-MC-Unique: 7zNGVF68NBOqfx6SdKcWKg-1
-X-Mimecast-MFC-AGG-ID: 7zNGVF68NBOqfx6SdKcWKg_1756157707
-Received: by mail-il1-f200.google.com with SMTP id e9e14a558f8ab-3eb35f7f147so5771925ab.2
-        for <kvm@vger.kernel.org>; Mon, 25 Aug 2025 14:35:07 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1756157707; x=1756762507;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=TuacPQu0sUaEe98IXzV5lAzTlLH7oY2OXfsQpZup1+Q=;
-        b=kYVrFKuQ23/UTYkqau5jVd+VvYgW2SHqLzUWcZZo6kEpxSyh0vqx9/mmCi0L1iH1eb
-         wGfhy70X7owDxEUwtD2XayEXMURr0m2VRA3E+ZVw8+vYJTO7cM+LjchaX6efv0eHu5it
-         14do+sgu/yHi/RF881oWMt4hE2Xi2SJ7OxutRYAwSWo85T/mCzTCDO99jHjeVCndKPLl
-         evn3od9yq17LycFfXHy2+IEWhptbo7Clva1j36i9m4Y/g7gdjroItEQchw9PshKW3qWI
-         9P3SP3gqQhvSz9170updAmmJlCyo+ld5OVmcp7k4bBkQ3OOvqyol5l72KhN7mhIExd0/
-         QVtA==
-X-Forwarded-Encrypted: i=1; AJvYcCXOCxxUNxK4BUug5tjc6tWeYJAxCNWNJZ2gzwhRIPNtnOmlpRAVfrXPgphSsaR51jD4j4A=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzJsHXOQfE0CHi0JVIJtkceiyVheGJ+U9PTKFDJJaxKPAHqhLKS
-	C6UKEMLkZfartrFw0s5qyCVBOy+wxJ36JGKeEypBjGyUrAlne1TaV2key/8sVELYTN6BXmRYae2
-	oOfAb8Rdkwp43/2kMrfgLyH9nH0mZTVW9RKOTl9Y6CGmE4KgSHJRodQ==
-X-Gm-Gg: ASbGncvcKFw3JPXMG11pcEu95AAilz9aWQYbBm7TBJ27+J0Da7uhW+vO2ZqwQ3x7qxJ
-	P66GxcYVxDR5myqflyDFlrEu68nhTqYraqmyGLstNiI4i7e65ftQD7AkYycf/9+gAZmVF3rPeTQ
-	rKHbbuuItuGjHUTREhBZa1O/Kzn+3sw0oCiW7UskgASx8CH7JIowpfpGvSxjHk/VIDYZSisoaiJ
-	f8ZH0nuk3RoYVgv3XXQugQVVc+WLYgKnIX+FrLW4PllkWidqusOdTAH0mC9u3T7H0iM8UVkCp5A
-	PIw1uPAGs7jA2u5QesGLE8IF5Py8Ky72p9Ynv4q0bFk=
-X-Received: by 2002:a05:6e02:4414:10b0:3e9:9070:b0bd with SMTP id e9e14a558f8ab-3e99070b2a6mr42182205ab.2.1756157707166;
-        Mon, 25 Aug 2025 14:35:07 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IFjadVuAgSDvfABUcZMm01Kysw1HDncV59yUGSUyp2hVa5KPH4rom30lUjRmGeYrcRiA010pQ==
-X-Received: by 2002:a05:6e02:4414:10b0:3e9:9070:b0bd with SMTP id e9e14a558f8ab-3e99070b2a6mr42182075ab.2.1756157706803;
-        Mon, 25 Aug 2025 14:35:06 -0700 (PDT)
-Received: from redhat.com ([38.15.36.11])
-        by smtp.gmail.com with ESMTPSA id e9e14a558f8ab-3ea4c761718sm56163575ab.23.2025.08.25.14.35.05
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 25 Aug 2025 14:35:05 -0700 (PDT)
-Date: Mon, 25 Aug 2025 15:35:01 -0600
-From: Alex Williamson <alex.williamson@redhat.com>
-To: Farhan Ali <alifm@linux.ibm.com>
-Cc: linux-s390@vger.kernel.org, kvm@vger.kernel.org,
- linux-kernel@vger.kernel.org, helgaas@kernel.org, schnelle@linux.ibm.com,
- mjrosato@linux.ibm.com
-Subject: Re: [PATCH v2 1/9] PCI: Avoid restoring error values in config
- space
-Message-ID: <20250825153501.3a1d0f0c.alex.williamson@redhat.com>
-In-Reply-To: <20250825171226.1602-2-alifm@linux.ibm.com>
-References: <20250825171226.1602-1-alifm@linux.ibm.com>
-	<20250825171226.1602-2-alifm@linux.ibm.com>
-X-Mailer: Claws Mail 4.3.1 (GTK 3.24.43; x86_64-redhat-linux-gnu)
+	s=arc-20240116; t=1756157832; c=relaxed/simple;
+	bh=R44bcAauESCYgLUnJio9oy6n01PzJ9gIprVhrTrJHrw=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=jysYVL6zkgDrCW3NlDdD4AKsp+HbcYV1IbcdhXRmL27yEHvsChfnOoa0Eh/Sq0iLbiQTuWFctTWTUn1oA5Ht2e0dBAdZcuP7w+a0W00fpZ8DJEaQfG8LtOvNTZ4Em1HCnXspuWpMbk/plehaBPNhO5YXS/jHcvh/teyxa9FO+2Q=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=cHK0J2XK; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 49A2DC4CEED;
+	Mon, 25 Aug 2025 21:37:12 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1756157832;
+	bh=R44bcAauESCYgLUnJio9oy6n01PzJ9gIprVhrTrJHrw=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=cHK0J2XKD7O53HrO4WZ8mbIIVXn1J5qjjnP+8NSiRBKE3qlSqot7fO4LiyDmh3qgE
+	 994EaQi3GxaYUTiVcTdNq2CGuy4qPwf/BZ6vvOP7yQ30A6KQwyOxLpJ4d9L/7pKqbH
+	 63qLEryMSPxlPH2YhbRhXt0pRoKURT7ELLjHiKpyDkSL4+J1AcoW5Sk8qXCImM2+ak
+	 p+lYv9xx85LoSuSqFv4ayEsXAVqjvuHqIqMi44uUedVEGuxxRKPPODQHHSRnAgIdh6
+	 6clMMLqdhTofD9UT8HCFqf2Jy7NMLg5RmykPuzN+FoKKgILHRb4q6/nyDxdavQQRRP
+	 2Gu14gyBVu0BQ==
+Date: Mon, 25 Aug 2025 14:37:11 -0700
+From: Kees Cook <kees@kernel.org>
+To: Uladzislau Rezki <urezki@gmail.com>
+Cc: Mike Rapoport <rppt@kernel.org>,
+	Lorenzo Stoakes <lorenzo.stoakes@oracle.com>,
+	Harry Yoo <harry.yoo@oracle.com>,
+	Andrew Morton <akpm@linux-foundation.org>,
+	Russell King <linux@armlinux.org.uk>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Will Deacon <will@kernel.org>,
+	Madhavan Srinivasan <maddy@linux.ibm.com>,
+	Michael Ellerman <mpe@ellerman.id.au>,
+	Nicholas Piggin <npiggin@gmail.com>,
+	Christophe Leroy <christophe.leroy@csgroup.eu>,
+	"David S . Miller" <davem@davemloft.net>,
+	Andreas Larsson <andreas@gaisler.com>,
+	Jarkko Sakkinen <jarkko@kernel.org>,
+	Dave Hansen <dave.hansen@linux.intel.com>,
+	Thomas Gleixner <tglx@linutronix.de>,
+	Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+	"H . Peter Anvin" <hpa@zytor.com>,
+	Andy Lutomirski <luto@kernel.org>,
+	Peter Zijlstra <peterz@infradead.org>,
+	Alexander Viro <viro@zeniv.linux.org.uk>,
+	Christian Brauner <brauner@kernel.org>, Jan Kara <jack@suse.cz>,
+	Peter Xu <peterx@redhat.com>, David Hildenbrand <david@redhat.com>,
+	Zi Yan <ziy@nvidia.com>,
+	Baolin Wang <baolin.wang@linux.alibaba.com>,
+	"Liam R . Howlett" <Liam.Howlett@oracle.com>,
+	Nico Pache <npache@redhat.com>, Ryan Roberts <ryan.roberts@arm.com>,
+	Dev Jain <dev.jain@arm.com>, Barry Song <baohua@kernel.org>,
+	Xu Xin <xu.xin16@zte.com.cn>,
+	Chengming Zhou <chengming.zhou@linux.dev>,
+	Hugh Dickins <hughd@google.com>, Vlastimil Babka <vbabka@suse.cz>,
+	Suren Baghdasaryan <surenb@google.com>,
+	Michal Hocko <mhocko@suse.com>, Rik van Riel <riel@surriel.com>,
+	Dan Williams <dan.j.williams@intel.com>,
+	Matthew Wilcox <willy@infradead.org>,
+	Steven Rostedt <rostedt@goodmis.org>,
+	Masami Hiramatsu <mhiramat@kernel.org>,
+	Mathieu Desnoyers <mathieu.desnoyers@efficios.com>,
+	Jason Gunthorpe <jgg@ziepe.ca>, John Hubbard <jhubbard@nvidia.com>,
+	Muchun Song <muchun.song@linux.dev>,
+	Oscar Salvador <osalvador@suse.de>, Jann Horn <jannh@google.com>,
+	Pedro Falcato <pfalcato@suse.de>,
+	Johannes Weiner <hannes@cmpxchg.org>,
+	Qi Zheng <zhengqi.arch@bytedance.com>,
+	Shakeel Butt <shakeel.butt@linux.dev>,
+	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+	linuxppc-dev@lists.ozlabs.org, kvm@vger.kernel.org,
+	sparclinux@vger.kernel.org, linux-sgx@vger.kernel.org,
+	linux-fsdevel@vger.kernel.org, linux-mm@kvack.org,
+	nvdimm@lists.linux.dev, linux-trace-kernel@vger.kernel.org
+Subject: Re: [PATCH 2/3] mm: update core kernel code to use vm_flags_t
+ consistently
+Message-ID: <202508251436.762035B@keescook>
+References: <cover.1750274467.git.lorenzo.stoakes@oracle.com>
+ <d1588e7bb96d1ea3fe7b9df2c699d5b4592d901d.1750274467.git.lorenzo.stoakes@oracle.com>
+ <aIgSpAnU8EaIcqd9@hyeyoo>
+ <73764aaa-2186-4c8e-8523-55705018d842@lucifer.local>
+ <aIkVRTouPqhcxOes@pc636>
+ <69860c97-8a76-4ce5-b1d6-9d7c8370d9cd@lucifer.local>
+ <aJCRXVP-ZFEPtl1Y@pc636>
+ <aJHQ9XCLtibFjt93@kernel.org>
+ <aJItxJNfn8B2JBbn@pc636>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <aJItxJNfn8B2JBbn@pc636>
 
-On Mon, 25 Aug 2025 10:12:18 -0700
-Farhan Ali <alifm@linux.ibm.com> wrote:
-
-> The current reset process saves the device's config space state before
-> reset and restores it afterward. However, when a device is in an error
-> state before reset, config space reads may return error values instead of
-> valid data. This results in saving corrupted values that get written back
-> to the device during state restoration. Add validation to prevent writing
-> error values to the device when restoring the config space state after
-> reset.
+On Tue, Aug 05, 2025 at 06:13:56PM +0200, Uladzislau Rezki wrote:
+> I agree. Also it can be even moved under vmalloc.c. There is only one
+> user which needs it globally, it is usercopy.c. It uses find_vmap_area()
+> which is wrong. See:
 > 
-> Signed-off-by: Farhan Ali <alifm@linux.ibm.com>
-> ---
->  drivers/pci/pci.c | 3 +++
->  1 file changed, 3 insertions(+)
+> <snip>
+> 	if (is_vmalloc_addr(ptr) && !pagefault_disabled()) {
+> 		struct vmap_area *area = find_vmap_area(addr);
 > 
-> diff --git a/drivers/pci/pci.c b/drivers/pci/pci.c
-> index b0f4d98036cd..0dd95d782022 100644
-> --- a/drivers/pci/pci.c
-> +++ b/drivers/pci/pci.c
-> @@ -1825,6 +1825,9 @@ static void pci_restore_config_dword(struct pci_dev *pdev, int offset,
->  	if (!force && val == saved_val)
->  		return;
->  
-> +	if (PCI_POSSIBLE_ERROR(saved_val))
-> +		return;
-> +
->  	for (;;) {
->  		pci_dbg(pdev, "restore config %#04x: %#010x -> %#010x\n",
->  			offset, val, saved_val);
+> 		if (!area)
+> 			usercopy_abort("vmalloc", "no area", to_user, 0, n);
+> 
+> 		if (n > area->va_end - addr) {
+> 			offset = addr - area->va_start;
+> 			usercopy_abort("vmalloc", NULL, to_user, offset, n);
+> 		}
+> 		return;
+> 	}
+> <snip>
+> 
+> we can add a function which just assign va_start, va_end as input
+> parameters and use them in the usercopy.c. 
 
+Yes please! I'd must rather use some exported validation routine than
+having it hand-coded in usercopy.c. :)
 
-The commit log makes this sound like more than it is.  We're really
-only error checking the first 64 bytes of config space before restore,
-the capabilities are not checked.  I suppose skipping the BARs and
-whatnot is no worse than writing -1 to them, but this is only a
-complete solution in the narrow case where we're relying on vfio-pci to
-come in and restore the pre-open device state.
-
-I had imagined that pci_save_state() might detect the error state of
-the device, avoid setting state_saved, but we'd still perform the
-restore callouts that only rely on internal kernel state, maybe adding a
-fallback to restore the BARs from resource information.
-
-This implementation serves a purpose, but the commit log should
-describe the specific, narrow scenario this solves, and probably also
-add a comment in the code about why we're not consistently checking the
-saved state for errors.  Thanks,
-
-Alex
-
+-- 
+Kees Cook
 
