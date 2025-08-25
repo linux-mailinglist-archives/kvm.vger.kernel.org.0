@@ -1,265 +1,206 @@
-Return-Path: <kvm+bounces-55614-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-55615-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 56462B3425A
-	for <lists+kvm@lfdr.de>; Mon, 25 Aug 2025 15:58:44 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 16ED4B342B2
+	for <lists+kvm@lfdr.de>; Mon, 25 Aug 2025 16:08:10 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 166343AA88C
-	for <lists+kvm@lfdr.de>; Mon, 25 Aug 2025 13:56:11 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3FCFB206673
+	for <lists+kvm@lfdr.de>; Mon, 25 Aug 2025 14:03:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C3EE62F1FD9;
-	Mon, 25 Aug 2025 13:49:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 923402ED159;
+	Mon, 25 Aug 2025 13:59:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="xI18C57R"
+	dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b="Dmk8SWHu";
+	dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b="1n/tRlzM";
+	dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b="Dmk8SWHu";
+	dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b="1n/tRlzM"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pl1-f169.google.com (mail-pl1-f169.google.com [209.85.214.169])
+Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.223.131])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 00BC12F28F4
-	for <kvm@vger.kernel.org>; Mon, 25 Aug 2025 13:49:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.169
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BBF152F28EC
+	for <kvm@vger.kernel.org>; Mon, 25 Aug 2025 13:59:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756129747; cv=none; b=a+xGoOBE3eTPMfJVOrJRvdq7s6CDc2Mobv/9wnAqiMhZE+CZykq7BIpGCxOkgcg+6YjetHaSJeIWN7cuSMhQvLUv06PhjTaJV92JyngaxeOwUwOMp2eNBrWz7PvQl9jVCamDf/5gPqbKoXqWKgO7uo7ttB7pBsbhcvVEsnR0eB4=
+	t=1756130377; cv=none; b=hvbEdNgOGfBcNUiuy8/vNw3ADwMNOfskINh1rbsHxzY2/jPWlxlkbplgDiuAlhYXyRBqy53JwKoni7gIeXOfMLCnKnDTiei5yBHy+86Y66pZ1EkhDiT/hRID0NxzdvjPuspeLdAK1wv3ocDBCxHOylmSs+d0c9eRYXVFwKMr0jY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756129747; c=relaxed/simple;
-	bh=M+3aLG5O1Iyt0A5EfM0+G7YSFPkj1Z+V9I8upPF+K+8=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=jDJpOsrImdCzYo2VgPkghYNw15Bu3T/dEtvRhS+OFKJ9hnoz93N6xPOcb4Q9KXcWcgkyOV4yrHK7gkfIR9wz8fXzxwAIxEYu1XP8eoo/R72e1Lc3H19XwHR46TjBNmuXzTCRxGM52p8Gq/yCRh2/yOtORV41nfW4WS+gc34JHwM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=xI18C57R; arc=none smtp.client-ip=209.85.214.169
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-pl1-f169.google.com with SMTP id d9443c01a7336-246257e49c8so316315ad.0
-        for <kvm@vger.kernel.org>; Mon, 25 Aug 2025 06:49:05 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1756129745; x=1756734545; darn=vger.kernel.org;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=EPr98kGx2moAT0RVFoQtEyPZgoeJKLmMTUQO/3/PhCw=;
-        b=xI18C57RcBFTc4MuHQ1rdQJnQdUNbUGzYSPoxgNvg1SfeSaVfRvi5nLI/kSLfP4QZL
-         nYVXIeRVz/lPftPx5jGGSZCuYkJbfTTnDO1GDgb2ZLSZ03atI39YLI49SR4ZFI85ozq3
-         086oGoA4IaP+nznNrEcE/l1Mjl4zRJ3p3oiki0W2+2HCPSO/oDB/H8gUzOSEgmrz6GjL
-         3xtvipBIM/WL1/hN6AwO9EqZ7dIhkjzvnolvuJLlZDR3LR0fbicObWRCT/QYynhGJGLZ
-         sez80JZGB+POaxfdKK597AoYKR0HjQ9vatgTczfrutaF9Al1oBGK5vzLF6zwmKk/XRQg
-         m1Yw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1756129745; x=1756734545;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=EPr98kGx2moAT0RVFoQtEyPZgoeJKLmMTUQO/3/PhCw=;
-        b=r8MzMCggVfHCOtWwLISz0RKH4Vjx2HA7ZUWauLxs0HKERlP9xjnb/L5ZPf4d5RQiHc
-         cDOWn6ueu62TsBiVwWwoX7A7hGEzpp5ChMv9X9pTC6dB/hga2LuQK5PhiZ+8dMt3fAAX
-         2sPQWTXywDQCR6PAqjAMM34E32LB2DHl/6asToThUs59CwOZAWNu0bqQS1ZhY9ki40Oc
-         FWkK3jiZdHfbLLMVf2DqN12dQy2loO4WaB11UM5DsCoydDLT0OZk/kXLjzjPFkZmyQF/
-         hOwIEjFZkGDcxjObcp0wxSTrYUpXDw8T491Ujfannoxo0FRASk9gLVAvqoCRP+c67igC
-         9ssw==
-X-Forwarded-Encrypted: i=1; AJvYcCU4HXj7F1d8Asez20F+YMN4PltNjUYyphcpUPFZUS7NwLZAgJWTjKWFoOgY+kAVK91CLxQ=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yzbt7SnZ6fMWRj3PhAHgz4DeMW9pySMXxWqfx6L1TegFjfDF7nB
-	C9g6P5sHI0mNTMJvQfKLqsR7bB/aggWPNEffJk/yXJP3KGaoFDhL74Lsrx5TZbjKboKQo1hg7Vk
-	iweuKYQ==
-X-Gm-Gg: ASbGnctaCqfY7uQr1ayi6EhIIgNqgIGUV5aFS5fa0k7OMuhweRWzzVvemlYuD933Jm+
-	OV92cB3Kpjfx6teGJXhqg7mF4shQAKWxEP3uwq9AtQDIrBHwKmvt9HgADl+zaj8B4FEE9S7Ff41
-	/v3P2G0AcBw94C3FAeFQ6xGb2uSzhAwJJpt8lcTY0i7s1kFQldGorFk7Deg1sJu5hzJxqYf4YsF
-	onwAyhrAnBGTKB6R0nmMfA0lWDTm+AQhF8FN1j+CzylXDbp75mnvWDsZ75wEdMVbo7ua6+D1H9Z
-	MhyEXSEU0h8EkCGMY7awk0nd/W7MSoyKQEwERXCYY7d4b+8d1IkuWPAA+wVRTvkL6sHHVWExiBz
-	CTTkI5joUwney6vhP5ZJUC14QwUXj5fvW6vsCl7CAVyW9X8/y27RUkeu4PLsdDtl6uKViosP/LH
-	y2
-X-Google-Smtp-Source: AGHT+IFztbDXKXjAyRb5SxPdh+Iq/NxAzHcFUzomLyrk9sUfwujvvdLN8bMYYRRWXraeewthphphRw==
-X-Received: by 2002:a17:902:e5c4:b0:246:1f3e:4973 with SMTP id d9443c01a7336-2466f9ec151mr6423705ad.6.1756129744951;
-        Mon, 25 Aug 2025 06:49:04 -0700 (PDT)
-Received: from google.com (169.224.198.35.bc.googleusercontent.com. [35.198.224.169])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-771ecfd76f3sm1397728b3a.63.2025.08.25.06.49.02
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 25 Aug 2025 06:49:04 -0700 (PDT)
-Date: Mon, 25 Aug 2025 13:48:59 +0000
-From: Pranjal Shrivastava <praan@google.com>
-To: Mostafa Saleh <smostafa@google.com>
-Cc: Eric Auger <eric.auger@redhat.com>,
-	Alex Williamson <alex.williamson@redhat.com>, kvm@vger.kernel.org,
-	linux-kernel@vger.kernel.org, clg@redhat.com
-Subject: Re: [PATCH 2/2] vfio/platform: Mark for removal
-Message-ID: <aKxpyyKvYcd84Ayi@google.com>
-References: <20250806170314.3768750-1-alex.williamson@redhat.com>
- <20250806170314.3768750-3-alex.williamson@redhat.com>
- <aJ9neYocl8sSjpOG@google.com>
- <20250818105242.4e6b96ed.alex.williamson@redhat.com>
- <aKNj4EUgHYCZ9Q4f@google.com>
- <00001486-b43d-4c2b-a41c-35ab5e823f21@redhat.com>
- <aKXnzqmz-_eR_bHF@google.com>
- <43f198b5-60f8-40f5-a2cd-ff21b31a91d4@redhat.com>
- <aKYvS3qgV_dW1woo@google.com>
+	s=arc-20240116; t=1756130377; c=relaxed/simple;
+	bh=iKeLqmJlX7IFGW8KFDsUf3kfbkdQxRY+eQtPXdLNf3I=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=Q8eqVngDg3LCJo9obNubNCkMMVf2hmWO5wQNgmmD7kSWVdVRCn8T4UoQOfKlhHJng9l8zi87pR4gUdW6AAAZ/+doP/HXKuEm/wp4s1jBJRMm8erwvb4l1NJtvOo675mD1p/cprZiNZovyj6sMGv4qerV35PSdWka/xPjcHpBtOY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=suse.cz; spf=pass smtp.mailfrom=suse.cz; dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b=Dmk8SWHu; dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b=1n/tRlzM; dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b=Dmk8SWHu; dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b=1n/tRlzM; arc=none smtp.client-ip=195.135.223.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=suse.cz
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.cz
+Received: from imap1.dmz-prg2.suse.org (unknown [10.150.64.97])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by smtp-out2.suse.de (Postfix) with ESMTPS id 0784E1F78C;
+	Mon, 25 Aug 2025 13:59:34 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
+	t=1756130374; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+	bh=rnmyAeC3uw6SwWB64abdw7mh5BWIFemtPdKIjCP8QD0=;
+	b=Dmk8SWHufW0/ThrkDQWH8E29p9eCuf66Tu5Nzlf/zmUVG7z32+s8sKC6RlTWa/MwYK1n9D
+	3K4ni/kVYk89Xzho2+jjvGLx+Lx2s/hIuagUc632vb9EIn7k9YVdoyAN9ChIBfpqylL59C
+	XVGWCVs3rWJy6lS77qGtrqEhAaySYGY=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
+	s=susede2_ed25519; t=1756130374;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+	bh=rnmyAeC3uw6SwWB64abdw7mh5BWIFemtPdKIjCP8QD0=;
+	b=1n/tRlzMuBcwEoZuvkwRM7jKqbCBFCkjWIyBEd4O5yW07vB8RT5vdrZ78npVSjxWrI2JdU
+	mhyDYWFZqieTHKAQ==
+Authentication-Results: smtp-out2.suse.de;
+	none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
+	t=1756130374; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+	bh=rnmyAeC3uw6SwWB64abdw7mh5BWIFemtPdKIjCP8QD0=;
+	b=Dmk8SWHufW0/ThrkDQWH8E29p9eCuf66Tu5Nzlf/zmUVG7z32+s8sKC6RlTWa/MwYK1n9D
+	3K4ni/kVYk89Xzho2+jjvGLx+Lx2s/hIuagUc632vb9EIn7k9YVdoyAN9ChIBfpqylL59C
+	XVGWCVs3rWJy6lS77qGtrqEhAaySYGY=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
+	s=susede2_ed25519; t=1756130374;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+	bh=rnmyAeC3uw6SwWB64abdw7mh5BWIFemtPdKIjCP8QD0=;
+	b=1n/tRlzMuBcwEoZuvkwRM7jKqbCBFCkjWIyBEd4O5yW07vB8RT5vdrZ78npVSjxWrI2JdU
+	mhyDYWFZqieTHKAQ==
+Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id C5E571368F;
+	Mon, 25 Aug 2025 13:59:33 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
+	by imap1.dmz-prg2.suse.org with ESMTPSA
+	id hR78L0VsrGjoLQAAD6G6ig
+	(envelope-from <vbabka@suse.cz>); Mon, 25 Aug 2025 13:59:33 +0000
+Message-ID: <1afec70b-0424-4477-97d2-34bc2615e4b5@suse.cz>
+Date: Mon, 25 Aug 2025 15:59:33 +0200
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <aKYvS3qgV_dW1woo@google.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 0/6] KVM: Export KVM-internal symbols for sub-modules only
+Content-Language: en-US
+To: Sean Christopherson <seanjc@google.com>,
+ Madhavan Srinivasan <maddy@linux.ibm.com>,
+ Christian Borntraeger <borntraeger@linux.ibm.com>,
+ Janosch Frank <frankja@linux.ibm.com>,
+ Claudio Imbrenda <imbrenda@linux.ibm.com>, Andy Lutomirski
+ <luto@kernel.org>, Xin Li <xin@zytor.com>, "H. Peter Anvin" <hpa@zytor.com>,
+ Peter Zijlstra <peterz@infradead.org>, Ingo Molnar <mingo@redhat.com>,
+ Arnaldo Carvalho de Melo <acme@kernel.org>,
+ Namhyung Kim <namhyung@kernel.org>, Paolo Bonzini <pbonzini@redhat.com>,
+ Thomas Gleixner <tglx@linutronix.de>, Borislav Petkov <bp@alien8.de>,
+ Josh Poimboeuf <jpoimboe@kernel.org>, Jarkko Sakkinen <jarkko@kernel.org>,
+ Vitaly Kuznetsov <vkuznets@redhat.com>,
+ Dave Hansen <dave.hansen@linux.intel.com>,
+ "Kirill A. Shutemov" <kas@kernel.org>, Tony Krowiak
+ <akrowiak@linux.ibm.com>, Halil Pasic <pasic@linux.ibm.com>,
+ Jason Herne <jjherne@linux.ibm.com>,
+ Harald Freudenberger <freude@linux.ibm.com>,
+ Holger Dengler <dengler@linux.ibm.com>
+Cc: linuxppc-dev@lists.ozlabs.org, kvm@vger.kernel.org,
+ linux-kernel@vger.kernel.org, linux-perf-users@vger.kernel.org,
+ linux-sgx@vger.kernel.org, x86@kernel.org, linux-coco@lists.linux.dev,
+ linux-s390@vger.kernel.org
+References: <20250729174238.593070-1-seanjc@google.com>
+From: Vlastimil Babka <vbabka@suse.cz>
+Autocrypt: addr=vbabka@suse.cz; keydata=
+ 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
+ m6M14QORSWTLRg==
+In-Reply-To: <20250729174238.593070-1-seanjc@google.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-Spamd-Result: default: False [-4.30 / 50.00];
+	BAYES_HAM(-3.00)[99.99%];
+	NEURAL_HAM_LONG(-1.00)[-1.000];
+	NEURAL_HAM_SHORT(-0.20)[-0.997];
+	MIME_GOOD(-0.10)[text/plain];
+	ARC_NA(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	RCVD_TLS_ALL(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[33];
+	MIME_TRACE(0.00)[0:+];
+	TO_DN_SOME(0.00)[];
+	FUZZY_RATELIMITED(0.00)[rspamd.com];
+	MID_RHS_MATCH_FROM(0.00)[];
+	DKIM_SIGNED(0.00)[suse.cz:s=susede2_rsa,suse.cz:s=susede2_ed25519];
+	FROM_HAS_DN(0.00)[];
+	R_RATELIMIT(0.00)[to_ip_from(RL81e5qggtdx371s8ik49ru6xr)];
+	FROM_EQ_ENVFROM(0.00)[];
+	TO_MATCH_ENVRCPT_ALL(0.00)[];
+	RCVD_COUNT_TWO(0.00)[2];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[imap1.dmz-prg2.suse.org:helo,suse.cz:mid]
+X-Spam-Flag: NO
+X-Spam-Level: 
+X-Spam-Score: -4.30
 
-On Wed, Aug 20, 2025 at 08:25:47PM +0000, Mostafa Saleh wrote:
-> Hi Eric,
-> 
-> On Wed, Aug 20, 2025 at 06:29:27PM +0200, Eric Auger wrote:
-> > Hi Mostafa,
-> > 
-> > On 8/20/25 5:20 PM, Mostafa Saleh wrote:
-> > > Hi Eric,
-> > >
-> > > On Tue, Aug 19, 2025 at 11:58:32AM +0200, Eric Auger wrote:
-> > >> Hi Mostafa,
-> > >>
-> > >> On 8/18/25 7:33 PM, Mostafa Saleh wrote:
-> > >>> On Mon, Aug 18, 2025 at 10:52:42AM -0600, Alex Williamson wrote:
-> > >>>> On Fri, 15 Aug 2025 16:59:37 +0000
-> > >>>> Mostafa Saleh <smostafa@google.com> wrote:
-> > >>>>
-> > >>>>> Hi Alex,
-> > >>>>>
-> > >>>>> On Wed, Aug 06, 2025 at 11:03:12AM -0600, Alex Williamson wrote:
-> > >>>>>> vfio-platform hasn't had a meaningful contribution in years.  In-tree
-> > >>>>>> hardware support is predominantly only for devices which are long since
-> > >>>>>> e-waste.  QEMU support for platform devices is slated for removal in
-> > >>>>>> QEMU-10.2.  Eric Auger presented on the future of the vfio-platform
-> > >>>>>> driver and difficulties supporting new devices at KVM Forum 2024,
-> > >>>>>> gaining some support for removal, some disagreement, but garnering no
-> > >>>>>> new hardware support, leaving the driver in a state where it cannot
-> > >>>>>> be tested.
-> > >>>>>>
-> > >>>>>> Mark as obsolete and subject to removal.  
-> > >>>>> Recently(this year) in Android, we enabled VFIO-platform for protected KVM,
-> > >>>>> and it’s supported in our VMM (CrosVM) [1].
-> > >>>>> CrosVM support is different from Qemu, as it doesn't require any device
-> > >>>>> specific logic in the VMM, however, it relies on loading a device tree
-> > >>>>> template in runtime (with “compatiable” string...) and it will just
-> > >>>>> override regs, irqs.. So it doesn’t need device knowledge (at least for now)
-> > >>>>> Similarly, the kernel doesn’t need reset drivers as the hypervisor handles that.
-> > >>>> I think what we attempt to achieve in vfio is repeatability and data
-> > >>>> integrity independent of the hypervisor.  IOW, if we 'kill -9' the
-> > >>>> hypervisor process, the kernel can bring the device back to a default
-> > >>>> state where the device isn't wedged or leaking information through the
-> > >>>> device to the next use case.  If the hypervisor wants to support
-> > >>>> enhanced resets on top of that, that's great, but I think it becomes
-> > >>>> difficult to argue that vfio-platform itself holds up its end of the
-> > >>>> bargain if we're really trusting the hypervisor to handle these aspects.
-> > >>> Sorry I was not clear, we only use that in Android for ARM64 and pKVM,
-> > >>> where the hypervisor in this context means the code running in EL2 which
-> > >>> is more privileged than the kernel, so it should be trusted.
-> > >>> However, as I mentioned that code is not upstream yet, so it's a valid
-> > >>> concern that the kernel still needs a reset driver.
-> > >>>
-> > >>>>> Unfortunately, there is no upstream support at the moment, we are making
-> > >>>>> some -slow- progress on that [2][3]
-> > >>>>>
-> > >>>>> If it helps, I have access to HW that can run that and I can review/test
-> > >>>>> changes, until upstream support lands; if you are open to keeping VFIO-platform.
-> > >>>>> Or I can look into adding support for existing upstream HW(with platforms I am
-> > >>>>> familiar with as Pixel-6)
-> > >>>> Ultimately I'll lean on Eric to make the call.  I know he's concerned
-> > >>>> about testing, but he raised that and various other concerns whether
-> > >>>> platform device really have a future with vfio nearly a year ago and
-> > >>>> nothing has changed.  Currently it requires a module option opt-in to
-> > >>>> enable devices that the kernel doesn't know how to reset.  Is that
-> > >>>> sufficient or should use of such a device taint the kernel?  If any
-> > >>>> device beyond the few e-waste devices that we know how to reset taint
-> > >>>> the kernel, should this support really even be in the kernel?  Thanks,
-> > >>> I think with the way it’s supported at the moment we need the kernel
-> > >>> to ensure that reset happens.
-> > >> Effectively my main concern is I cannot test vfio-platform anymore. We
-> > >> had some CVEs also impacting the vfio platform code base and it is a
-> > >> major issue not being able to test. That's why I was obliged, last year,
-> > >> to resume the integration of a new device (the tegra234 mgbe), nobody
-> > >> seemed to be really interested in and this work could not be upstreamed
-> > >> due to lack of traction and its hacky nature.
-> > >>
-> > >> You did not really comment on which kind of devices were currently
-> > >> integrated. Are they within the original scope of vfio (with DMA
-> > >> capabilities and protected by an IOMMU)? Last discussion we had in
-> > >> https://lore.kernel.org/all/ZvvLpLUZnj-Z_tEs@google.com/ led to the
-> > >> conclusion that maybe VFIO was not the best suited framework.
-> > > At the moment, Android device assignement only supports DMA capable
-> > > devices which are behind an IOMMU, and we use VFIO-platform for that,
-> > > most of our use cases are accelerators.
-> > >
-> > > In that thread, I was looking into adding support for simpler devices
-> > > (such as sensors) but as discussed that won’t be done through
-> > > VFIO-platform.
-> > >
-> > > Ignoring Android, as I mentioned, I can work on adding support for
-> > > existing upstream platforms (preferably ARM64, that I can get access to)
-> > > such as Pixel-6, which should make it easier to test.
-> > >
-> > > Also, we have some interest on adding new features such as run-time
-> > > power management.
-> > 
-> > OK fair enough. If Alex agrees then we can wait for those efforts. Also
-> > I think it would make sense to formalize the way you reset the devices
-> > (I understand the hyp does that under the hood).
-> 
-> I think currently - with some help from the platform bus- we can rely on
-> the existing shutdown method, instead of specific hooks.
-> As the hypervisor logic will only be for ARM64 (at least for now), I can
-> look more into this.
-> 
-> But I think the top priority would be to establish a decent platform to
-> test with, I will start looking into Pixel-6 (although that would need
-> to land IOMMU support for it upstream first). I also have a morello
-> board with SMMUv3, but I think it's all PCI.
-> 
-> > >
-> > >> In case we keep the driver in, I think we need to get a garantee that
-> > >> you or someone else at Google commits to review and test potential
-> > >> changes with a perspective to take over its maintenance.
-> > > I can’t make guarantees on behalf of Google, but I can contribute in
-> > > reviewing/testing/maintenance of the driver as far as I am able to.
-> > > If you want, you can add me as reviewer to the driver.
-> > 
-> > I understand. I think the usual way then is for you to send a patch to
-> > update the Maintainers file.
-> 
-> I see, I will send one shortly.
-> 
+On 7/29/25 19:42, Sean Christopherson wrote:
+> Use the newfangled EXPORT_SYMBOL_GPL_FOR_MODULES() along with some macro
+> shenanigans to export KVM-internal symbols if and only if KVM has one or
 
-I could contribute time to help with the maintenance effort here, if
-needed. Please let me know if you'd like that.
-
-> Thanks,
-> Mostafa
-> 
+Note it was renamed to EXPORT_SYMBOL_FOR_MODULES() only in 6.17-rc3 so this
+series will need rebasing to that and adjustment. Probably best to rename
+also EXPORT_SYMBOL_GPL_FOR_KVM_INTERNAL for consistency?
 
 Thanks,
-Praan
+Vlastimil
 
-> > 
-> > Thanks
-> > 
-> > Eric
-> > >
-> > > Thanks,
-> > > Mostafa
-> > >
-> > >
-> > >> Thanks
-> > >>
-> > >> Eric
-> > >>
-> > >>> But maybe instead of having that specific reset handler for VFIO, we
-> > >>> can rely on the “shutdown” method already existing in "platform_driver"?
-> > >>> I believe that should put the device in a state where it can be re-probed
-> > >>> safely. Although not all devices implement that but it seems more generic
-> > >>> and scalable.
-> > >>>
-> > >>> Thanks,
-> > >>> Mostafa
-> > >>>
-> > >>>> Alex
-> > >>>>
-> > 
+> more sub-modules, and only for those sub-modules, e.g. x86's kvm-amd.ko
+> and/or kvm-intel.ko.
 > 
 
