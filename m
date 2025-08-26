@@ -1,65 +1,89 @@
-Return-Path: <kvm+bounces-55725-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-55726-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id ACEECB35393
-	for <lists+kvm@lfdr.de>; Tue, 26 Aug 2025 07:51:55 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 851BAB3539E
+	for <lists+kvm@lfdr.de>; Tue, 26 Aug 2025 07:56:31 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id B63DF1B63006
-	for <lists+kvm@lfdr.de>; Tue, 26 Aug 2025 05:52:15 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B2865683E2C
+	for <lists+kvm@lfdr.de>; Tue, 26 Aug 2025 05:56:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CAF4A2F39DB;
-	Tue, 26 Aug 2025 05:51:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 127502F3C07;
+	Tue, 26 Aug 2025 05:56:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="ihfwBdc3"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="IklL/jbp"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.11])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 614102F0688;
-	Tue, 26 Aug 2025 05:51:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.11
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C44FF1514E4
+	for <kvm@vger.kernel.org>; Tue, 26 Aug 2025 05:56:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756187506; cv=none; b=iPpeoFyMZgtw9pjxrJMvB74A/CuhiMZcitrY6eDpXLZe0iPw9sFh9x6S7hD4IIhpYN9+/SNNdqNxTdaOmJplG0xoYfsxV2bOYGG7cbXPEr/CDZVkrHHBgZWSoQuIkiD0kRpvBY64xE4RU1gGpSHnNePX3VlyWqDoK4hSl+Ca+8o=
+	t=1756187781; cv=none; b=XtV+XqEPkZTvs95123/rqD6nqJ9LePqTxl7Q9Yz2nTP/Jr1ufzjsRr/zkOU5bZVKLHH4Tvjnns2aDMXB6kp0Dbo03pVQ9cH4QV1ajfusSDmIwNN3DZbGEh/9dHa9eJ4r8xNz4wFu1v9s3aNIon5v6nLG0Yr+zjbFqVGrjn0C+9I=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756187506; c=relaxed/simple;
-	bh=S8YR0Rk1hMRnRkLxiltLd6vcjaOaMt81cEXJbL0+Kco=;
+	s=arc-20240116; t=1756187781; c=relaxed/simple;
+	bh=3IMFVPR4H+std93tHS/o8EsubyOXoGEm20YC7XCEDYg=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=hzib50mQI4CXQ+NzfnyKAwsEikyBjorb5nMI5MUh62FpVrGSW+VB0nciAft//Au/q+lpszUHbNQ+AavhtvcvojzAs69RChB96LEv59C5cTkPG/FJrP1yLxSgMnDc311uOiua4JkCPiES6tbbdlK6fyysfmXdI5a2lWa31HQTKRU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=ihfwBdc3; arc=none smtp.client-ip=198.175.65.11
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1756187505; x=1787723505;
-  h=message-id:date:mime-version:subject:to:cc:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=S8YR0Rk1hMRnRkLxiltLd6vcjaOaMt81cEXJbL0+Kco=;
-  b=ihfwBdc3R6J4AHReXNRv9S2FlTNMumtwVetsU83FsSicmH2JmMyZG0zY
-   0bHytuEBji+eslypOPkCuelxu4PWCUkTBtmAyjx6RMcxSuNFu+SvFTXcM
-   vqJ8+lsVSpnUUAiRFzUEjyajcn+gj7iuyLVQth7HTLCfwj18b6tGDvc3b
-   vvM+Yf3/A2jplzcGTMQTkpa4OLfyxkvxZplGhwjo5e0uxr8P9Jzc7xEiP
-   bGrkHOOoCWsfRoXLHuOg2+MNL0f8GfCmNXplJPDtB7JohqfKSNdzal1pL
-   emsNxD9VVQtIvz5LZRonpr2FNj+pYtliL0sG9lMZFHnf6sDqxiI8VZz42
-   w==;
-X-CSE-ConnectionGUID: ahaMHbbISZeLWg8/xGZOJw==
-X-CSE-MsgGUID: sYUNtaq0RwSV4lLqIpxMzg==
-X-IronPort-AV: E=McAfee;i="6800,10657,11533"; a="68682888"
-X-IronPort-AV: E=Sophos;i="6.18,214,1751266800"; 
-   d="scan'208";a="68682888"
-Received: from fmviesa010.fm.intel.com ([10.60.135.150])
-  by orvoesa103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 25 Aug 2025 22:51:44 -0700
-X-CSE-ConnectionGUID: Wf7+/qZTRg+fabfNexeY9A==
-X-CSE-MsgGUID: AD1qFAIuTnOnYpqmer9K4w==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.18,214,1751266800"; 
-   d="scan'208";a="170312763"
-Received: from unknown (HELO [10.238.0.107]) ([10.238.0.107])
-  by fmviesa010-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 25 Aug 2025 22:51:39 -0700
-Message-ID: <176247c7-6801-4e06-860e-4a6b8e77ba20@linux.intel.com>
-Date: Tue, 26 Aug 2025 13:51:36 +0800
+	 In-Reply-To:Content-Type; b=fWpoHvdctjtZpMuXxa2mD3MDgnXsToyV8S6UafxGfU/rCqsNfRI0wtiAEZ0DGWL+y+tq+FyyoXXfWjKyUBt1sRwPiilp2tAyDTBwvMT4Kn4INudvTKAMRs05uA52zIXlIsQwIxtZpdOf+aF/pfj+fEXiaeB7Y/UEJQxHPhplSbU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=IklL/jbp; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1756187778;
+	h=from:from:reply-to:reply-to:subject:subject:date:date:
+	 message-id:message-id:to:to:cc:cc:mime-version:mime-version:
+	 content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=e1i3XQYd2gaMEvx3nNt7fx+dB6uOCMF18PNuwF1Ri60=;
+	b=IklL/jbpRlFsKmAWtRJNPU691G8l0GRT87vlm0jl/z9jr5AQFPTu77aRXNhpcRKlUvykog
+	0grWattpB28W8ia50SVf94Y2eaGy6vCKQCRrU7XRxf8FoGJlKDrdrenr9UIKGoN2a0OAeW
+	VMamdS0zISGrGR6s+iD3tPULaTdO0Sc=
+Received: from mail-qk1-f200.google.com (mail-qk1-f200.google.com
+ [209.85.222.200]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-541-WZdNWe_pO2Sgska9045JWw-1; Tue, 26 Aug 2025 01:56:16 -0400
+X-MC-Unique: WZdNWe_pO2Sgska9045JWw-1
+X-Mimecast-MFC-AGG-ID: WZdNWe_pO2Sgska9045JWw_1756187776
+Received: by mail-qk1-f200.google.com with SMTP id af79cd13be357-7e8704d540cso560277085a.1
+        for <kvm@vger.kernel.org>; Mon, 25 Aug 2025 22:56:16 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1756187775; x=1756792575;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:reply-to:user-agent:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=e1i3XQYd2gaMEvx3nNt7fx+dB6uOCMF18PNuwF1Ri60=;
+        b=ZpJ1s+oE41oAly5zheK7jsS86TOpyejoAt+2ZHyLjpZEl750z3B5ZlvDfbD78E4n5A
+         vaPuWLJhBc9g+aivp8RgnnWlF3BjizWwAWD7BMCb8fWwbsV9iqMls26kuFi8EHBo6m56
+         iVsaOvZE1YxvNoIVUJtm3oMYUtnZDIJAdLlSHPLExClkVJ8uBNBdsZ6J0//S6tFZwwmP
+         H+GBgLr4HhblyWXWiIyiAes13Ay/DYXD7i9O5G6N7CkihZlULnMpS5gerVqHD/vFQ1A5
+         VXEXcMw75vPy+8l1zYU8oekKy7Y1QDCWLz94y3+FvDp41OeaKxegaDUT9/3NSVQ1sPu5
+         X9oQ==
+X-Forwarded-Encrypted: i=1; AJvYcCUDf6PJ73N7M1xGjvd4txOfx7kMuc+I/3wqq7VUEBUF3EP21/LUQuKklaAqDvpeW5UZdXM=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxlLNhSaK6VLVhZvMkfXzKf1SVeLRqMBW8HkG91zKy1BexZZ8Fk
+	XvY3JCmAtXk8rkawCE8KtoPKvqxbOutHnKIT7p2e83gZz0l3okeNIxmsvj9sg350v2j5f6rA785
+	oMReYFnwmnyGwXlN6g5F9FgFg0/ISwmgH/lawUSdz4vAxhRuRYK2SAQrgypQqYya+
+X-Gm-Gg: ASbGnctmrPNyXZxpzyLR+zX5cvMxSjrO1DO++Y+9PP4ANB0gx40tcWOZuIbn8nxv0dF
+	htij5VD8IAMDCfhlbJzTJqRnSXatqdYQ6EuiVApkfcxtjDyXNbvb1EB5f+gquUC3KNfMqBzFarz
+	jjfvDaeHTAlZw6TxWGLHvz8nXwGMSFCeEYWwgHqrrzJyyJloVZzVhomkQnIhfu0FYEOMfo57BHp
+	xb6mb1O4Xf6+qFA+W4OIfp7yQh/MtNCzNGblfMMZXTggqFfRi0c64QTyyEj7OpIwdzLgfWI82Ru
+	ZGkz9odb/HZQbdBp/nqc5ume7xMPRWFVHToBQvWmH0N/qr327+xWwoRf4MlYBcpp8NPBaYpieU9
+	csm72DvDNQA0=
+X-Received: by 2002:a05:620a:450f:b0:7e6:6028:6180 with SMTP id af79cd13be357-7ea10faa10dmr1447143585a.30.1756187775446;
+        Mon, 25 Aug 2025 22:56:15 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IGrPzH7YqkXBUFd+3t9I9zVVXOx3cBGPtcyqkUaCBB838vbSl8ehUgL3NJQsYtaPpyveh/ohA==
+X-Received: by 2002:a05:620a:450f:b0:7e6:6028:6180 with SMTP id af79cd13be357-7ea10faa10dmr1447142185a.30.1756187775044;
+        Mon, 25 Aug 2025 22:56:15 -0700 (PDT)
+Received: from ?IPV6:2a01:e0a:f0e:9070:527b:9dff:feef:3874? ([2a01:e0a:f0e:9070:527b:9dff:feef:3874])
+        by smtp.gmail.com with ESMTPSA id af79cd13be357-7ebed79a712sm619918585a.17.2025.08.25.22.56.12
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 25 Aug 2025 22:56:13 -0700 (PDT)
+Message-ID: <3a1c41be-ce5d-4713-b7ef-9bdab3a05816@redhat.com>
+Date: Tue, 26 Aug 2025 07:56:11 +0200
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -67,113 +91,47 @@ List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v9 05/19] KVM: selftests: Update
- kvm_init_vm_address_properties() for TDX
-To: Sagi Shahar <sagis@google.com>
-Cc: linux-kselftest@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
- Shuah Khan <shuah@kernel.org>, Sean Christopherson <seanjc@google.com>,
- Ackerley Tng <ackerleytng@google.com>, Ryan Afranji <afranji@google.com>,
- Andrew Jones <ajones@ventanamicro.com>,
- Isaku Yamahata <isaku.yamahata@intel.com>,
- Erdem Aktas <erdemaktas@google.com>,
- Rick Edgecombe <rick.p.edgecombe@intel.com>,
- Roger Wang <runanwang@google.com>, Oliver Upton <oliver.upton@linux.dev>,
- "Pratik R. Sampat" <pratikrajesh.sampat@amd.com>,
- Reinette Chatre <reinette.chatre@intel.com>, Ira Weiny
- <ira.weiny@intel.com>, Chao Gao <chao.gao@intel.com>,
- Chenyi Qiang <chenyi.qiang@intel.com>, linux-kernel@vger.kernel.org,
- kvm@vger.kernel.org, Adrian Hunter <adrian.hunter@intel.com>
-References: <20250821042915.3712925-1-sagis@google.com>
- <20250821042915.3712925-6-sagis@google.com>
+Reply-To: eric.auger@redhat.com
+Subject: Re: [PATCH 0/2] vfio/platform: Deprecate vfio-amba and reset drivers
 Content-Language: en-US
-From: Binbin Wu <binbin.wu@linux.intel.com>
-In-Reply-To: <20250821042915.3712925-6-sagis@google.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+To: Alex Williamson <alex.williamson@redhat.com>, kvm@vger.kernel.org
+Cc: linux-kernel@vger.kernel.org, smostafa@google.com, praan@google.com
+References: <20250825175807.3264083-1-alex.williamson@redhat.com>
+From: Eric Auger <eric.auger@redhat.com>
+In-Reply-To: <20250825175807.3264083-1-alex.williamson@redhat.com>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 
 
 
-On 8/21/2025 12:28 PM, Sagi Shahar wrote:
-> From: Isaku Yamahata <isaku.yamahata@intel.com>
+On 8/25/25 7:57 PM, Alex Williamson wrote:
+> Based on discussion[1] there's still interest in keeping vfio-platform
+> itself, but the use case doesn't involve any of the current reset
+> drivers and doesn't include vfio-amba.  To give any users a chance to
+> speak up, let's mark these as deprecated and generate logs if they're
+> used.
 >
-> Let kvm_init_vm_address_properties() initialize vm->arch.{s_bit, tag_mask}
-> similar to SEV.
+> I intend to pull the vfio/fsl-mc removal from the previous series given
+> there were no objections.  Thanks,
 >
-> TDX sets the shared bit based on the guest physical address width and
-> currently supports 48 and 52 widths.
+> Alex
 >
-> Co-developed-by: Adrian Hunter <adrian.hunter@intel.com>
-> Signed-off-by: Adrian Hunter <adrian.hunter@intel.com>
-> Signed-off-by: Isaku Yamahata <isaku.yamahata@intel.com>
-> Co-developed-by: Sagi Shahar <sagis@google.com>
-> Signed-off-by: Sagi Shahar <sagis@google.com>
-> ---
->   .../selftests/kvm/include/x86/tdx/tdx_util.h       | 14 ++++++++++++++
->   tools/testing/selftests/kvm/lib/x86/processor.c    | 12 ++++++++++--
->   2 files changed, 24 insertions(+), 2 deletions(-)
->   create mode 100644 tools/testing/selftests/kvm/include/x86/tdx/tdx_util.h
+> [1] https://lore.kernel.org/all/20250806170314.3768750-1-alex.williamson@redhat.com/
+for the series:
+Reviewed-by: Eric Auger <eric.auger@redhat.com>
+Eric
 >
-> diff --git a/tools/testing/selftests/kvm/include/x86/tdx/tdx_util.h b/tools/testing/selftests/kvm/include/x86/tdx/tdx_util.h
-> new file mode 100644
-> index 000000000000..286d5e3c24b1
-> --- /dev/null
-> +++ b/tools/testing/selftests/kvm/include/x86/tdx/tdx_util.h
-> @@ -0,0 +1,14 @@
-> +/* SPDX-License-Identifier: GPL-2.0-only */
-> +#ifndef SELFTESTS_TDX_TDX_UTIL_H
-> +#define SELFTESTS_TDX_TDX_UTIL_H
-> +
-> +#include <stdbool.h>
-> +
-> +#include "kvm_util.h"
-> +
-> +static inline bool is_tdx_vm(struct kvm_vm *vm)
-> +{
-> +	return vm->type == KVM_X86_TDX_VM;
-> +}
-
-If the branch "vm->type != KVM_X86_TDX_VM" in patch 04/19
-is still needed, this helper could be added earlier and used instead of
-open code.
-
-> +
-> +#endif // SELFTESTS_TDX_TDX_UTIL_H
-> diff --git a/tools/testing/selftests/kvm/lib/x86/processor.c b/tools/testing/selftests/kvm/lib/x86/processor.c
-> index 1eae92957456..6dbf40cbbc2a 100644
-> --- a/tools/testing/selftests/kvm/lib/x86/processor.c
-> +++ b/tools/testing/selftests/kvm/lib/x86/processor.c
-> @@ -8,6 +8,7 @@
->   #include "kvm_util.h"
->   #include "processor.h"
->   #include "sev.h"
-> +#include "tdx/tdx_util.h"
->   
->   #ifndef NUM_INTERRUPTS
->   #define NUM_INTERRUPTS 256
-> @@ -1190,12 +1191,19 @@ void kvm_get_cpu_address_width(unsigned int *pa_bits, unsigned int *va_bits)
->   
->   void kvm_init_vm_address_properties(struct kvm_vm *vm)
->   {
-> +	uint32_t gpa_bits = kvm_cpu_property(X86_PROPERTY_GUEST_MAX_PHY_ADDR);
-> +
-> +	vm->arch.sev_fd = -1;
-> +
->   	if (is_sev_vm(vm)) {
->   		vm->arch.sev_fd = open_sev_dev_path_or_exit();
->   		vm->arch.c_bit = BIT_ULL(this_cpu_property(X86_PROPERTY_SEV_C_BIT));
->   		vm->gpa_tag_mask = vm->arch.c_bit;
-> -	} else {
-> -		vm->arch.sev_fd = -1;
-> +	} else if (is_tdx_vm(vm)) {
-> +		TEST_ASSERT(gpa_bits == 48 || gpa_bits == 52,
-> +			    "TDX: bad X86_PROPERTY_GUEST_MAX_PHY_ADDR value: %u", gpa_bits);
-> +		vm->arch.s_bit = 1ULL << (gpa_bits - 1);
-
-Nit: Use BIT_ULL().
-
-> +		vm->gpa_tag_mask = vm->arch.s_bit;
->   	}
->   }
->   
+> Alex Williamson (2):
+>   vfio/amba: Mark for removal
+>   vfio/platform: Mark reset drivers for removal
+>
+>  drivers/vfio/platform/Kconfig                            | 5 ++++-
+>  drivers/vfio/platform/reset/Kconfig                      | 6 +++---
+>  drivers/vfio/platform/reset/vfio_platform_amdxgbe.c      | 2 ++
+>  drivers/vfio/platform/reset/vfio_platform_bcmflexrm.c    | 2 ++
+>  drivers/vfio/platform/reset/vfio_platform_calxedaxgmac.c | 2 ++
+>  drivers/vfio/platform/vfio_amba.c                        | 2 ++
+>  6 files changed, 15 insertions(+), 4 deletions(-)
+>
 
 
