@@ -1,129 +1,102 @@
-Return-Path: <kvm+bounces-55753-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-55751-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 43100B36C1B
-	for <lists+kvm@lfdr.de>; Tue, 26 Aug 2025 16:52:53 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 25F42B3691C
+	for <lists+kvm@lfdr.de>; Tue, 26 Aug 2025 16:22:55 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 928161C45C67
-	for <lists+kvm@lfdr.de>; Tue, 26 Aug 2025 14:34:54 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 3F3E11C83756
+	for <lists+kvm@lfdr.de>; Tue, 26 Aug 2025 14:16:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 16B3E35A2B2;
-	Tue, 26 Aug 2025 14:31:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 43083352FFF;
+	Tue, 26 Aug 2025 14:13:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="hY5gv1km"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="nAPUFENF"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pf1-f174.google.com (mail-pf1-f174.google.com [209.85.210.174])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.11])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CBE702135B8;
-	Tue, 26 Aug 2025 14:31:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.174
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 98013343D63
+	for <kvm@vger.kernel.org>; Tue, 26 Aug 2025 14:13:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.11
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756218706; cv=none; b=O6LJedk38soCBgYXi8mIkdPxSJOepbzec1GtNY0u7GwU9I0meujFBWO6TcyOO+WW/5t5ceQu7J4OU71UOFIZc56gUCoq0NKNfYLdN2YRNvLwYMcGFtmMy9nhQ6YGQfT5sunspkSAa9bbkhdaXBv2L11W0zAqx3/eYRzG+UX2IKI=
+	t=1756217628; cv=none; b=aDB9OA32ZTekeh9nxsWSwfT9eQSPKvJpRQEwBhuZP9AWobMS00q2LaJk05ToeCj0VBYVPxnImPzs4WkT4aK9z8gMCLL7OaHnK5YYtXwYFqlX02ZlaCm6T9ufH82QOqo9p8cL2CtfHIgasF5i9AiueyjzOMU5FFWvlVjsNksqDxE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756218706; c=relaxed/simple;
-	bh=/2HsZ/XIzddkUHUH0J5f1YF3GAgt4K2I1EuGaK5+mTM=;
+	s=arc-20240116; t=1756217628; c=relaxed/simple;
+	bh=XUMwyANYoN9LqU5IRvdqCPCHLe1EThn+0cki44O6i8E=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=HaqvgIebC6l09C2UyYbMZvwDWKZFyrjqrHbS+h8VrqWLZAmmTgysAtgifyrItTLNoaPFS2Pa55YGb8/pVWTACPkZrxZLQLa7/hdDP9UH5M10hqFnIWoa1dEF9RtzGd9rcYQmZZeUJN4F0E8aIK+jRlO+ih0atxL0xTbtc0NRbVU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=hY5gv1km; arc=none smtp.client-ip=209.85.210.174
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pf1-f174.google.com with SMTP id d2e1a72fcca58-76e39ec6f30so5480500b3a.2;
-        Tue, 26 Aug 2025 07:31:44 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1756218704; x=1756823504; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=/2HsZ/XIzddkUHUH0J5f1YF3GAgt4K2I1EuGaK5+mTM=;
-        b=hY5gv1kmjgdKTxlYLJn4A03RAEl8yDBA8AopKwMkPGDcC8G9LRLSHfh7mBotg3st0P
-         hzVhY5t/fRp3ErzbsRaSYbUsY2/ctBZrYhxPYjhPn/VS/M6Rkc9v9ATLJPwZsiDLpJdo
-         Vmg1k6TZJby7gRiO5hRC/ztKEBkxjxUIyKofVSZgn2kRhn/59diMfRYmdDVfI0HsLwLe
-         Te28cQHJrrhGOLItohGQJVbogJlZ/BhQiRjXEGunXB3nkc/MavIvvHneP0k59TF3B0me
-         io5c45nQd3Ju7K1GXYoML9nZEo/+zY/xV3e5xYUm8hBXBV/f86mbnxyRQDSeD6OJy/6g
-         5mdw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1756218704; x=1756823504;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=/2HsZ/XIzddkUHUH0J5f1YF3GAgt4K2I1EuGaK5+mTM=;
-        b=iy2cCDbHff0qswa30YDe9GogA12P3hCz7n6XTfuK1INIfbkpZqZlMbrgMksTRg4akK
-         5lSEgCG0dVeDtinkw2ZXsj3TstFBQLbdzo1vq+hXj1cUiAi3eS51gw3v/tnHUbzNcfbq
-         qBC153foau/olTnqTI9CRFYh/wFdkyXOHDdpRWsctSfx6XwNbT7cexDrwTs9Y4ycmd2D
-         xL/mcl63++KzkgPAyyrPkOMgqgXzaKa1T5UlTPnnUmF4hD9oYKwg9l2x1c7fCq/5cV1x
-         67GqyIWMTPGX3QweYG6BGf+hVsHGXEK3J1ZLEBkbUMNeT8/ON9/Wafw7zDEgC7FXI28E
-         Md1Q==
-X-Forwarded-Encrypted: i=1; AJvYcCU6MOtpGE2wf91ApxxJqdU4WYBRQc7Ze6f+M1NEbUEf8TpnXu9ZGEdZICQF4T1CShH0THE=@vger.kernel.org, AJvYcCXVzkX8PQMsviUdRwkRMI+2+xwwtaOQEwUHUUfDyzEW8XyTInII6kQH4X8TU88fhTAfVt9VUiTg0IH4@vger.kernel.org
-X-Gm-Message-State: AOJu0YxsC9ehBqiYj2SX7ls5pXUT8w7cTjnRsXYchNnqOfpdWhLHP7il
-	9CVS2IpcRv+MkeVgYqkkAKd2hKB9OGfvC4oFcgN8K9nnQ2Apj36ku1ue
-X-Gm-Gg: ASbGncuM3WS9xkbxikZuSJKofq+8GpXGZTIMqHyhbKw/HH8S9X/a3FVNaP1mj5BWxnD
-	xO8wC/MNjYzLcgItYo6DnSi7vvxucyqjozjWMK+7IDqSyTOnihfSRpkNjBm2jD0ATHym8mq3nGp
-	mqcexieqvtVpkKNlFC/Qqn5GXpnwrI/Y0x4H19eCsFjMbqQXbwvpM7jp1WeYX/cBlYWttqXBffF
-	s4Bp97vLY/hoCKd1OFYPLb67aG4TgMhH0MZwWklBlAiww5qslX249NPNax3ES0ztx+QX0/peI28
-	lNyun3vqRArFIoU/NlqI+MKRP8CAbXsO+0dw5SBK9M1cGem23JoiLbib2kkrpPDTxVupReq2I3V
-	YxPGt4OaVg8objkiBZzqU2A==
-X-Google-Smtp-Source: AGHT+IFm+XrOlSim9C8ckicCEIkpgvafeXXcgdVuWrC98u30twNdBGpbSt44emTPsPlVfiBYYAcZ0w==
-X-Received: by 2002:a17:903:2f4e:b0:246:b463:cabf with SMTP id d9443c01a7336-246b463dcdemr91050425ad.8.1756218703821;
-        Tue, 26 Aug 2025 07:31:43 -0700 (PDT)
-Received: from archie.me ([103.124.138.155])
-        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-b49cbb9ce58sm9278046a12.40.2025.08.26.07.31.42
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 26 Aug 2025 07:31:42 -0700 (PDT)
-Received: by archie.me (Postfix, from userid 1000)
-	id AB512420BAAE; Tue, 26 Aug 2025 21:31:38 +0700 (WIB)
-Date: Tue, 26 Aug 2025 21:31:38 +0700
-From: Bagas Sanjaya <bagasdotme@gmail.com>
-To: Alok Tiwari <alok.a.tiwari@oracle.com>, pbonzini@redhat.com,
-	corbet@lwn.net, kvm@vger.kernel.org, linux-doc@vger.kernel.org,
-	rdunlap@infradead.org
-Cc: linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] Documentation: KVM: fix reference for kvm_ppc_resize_hpt
- and various typos
-Message-ID: <aK3FSpONL01-Dexa@archie.me>
-References: <20250824075455.602185-1-alok.a.tiwari@oracle.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=LRHvlruEVMEF2dq1QO5j1Rc+ECboT/bhYQCmo2F6QZR2xNM+6XzTZ6zSU6qO2PA5SXQwjyV6oBKjqtk9zEKaWZeY7Z5oAX7e4900wgfxj2TFrIHcQuOIua2ChrTTV8iW358vVND2Y5ZGh6m1THlg2G2AZXfhSkwMHjopUPwppUE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=nAPUFENF; arc=none smtp.client-ip=198.175.65.11
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1756217627; x=1787753627;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=XUMwyANYoN9LqU5IRvdqCPCHLe1EThn+0cki44O6i8E=;
+  b=nAPUFENFi5wQbdA6MZkkQUb1r4K6zk/h47KcuAd5nD4TLbmrKoppa3l2
+   o0wfRZM9MJ0gwlYtl+qVfe0wlo1QFZ4nmamHsX9O+v9B/daU5zBFfYoBL
+   ljt6ZFnMxTpKyYmX37vnuxqrlPT9JZAbWLJqn+Mc5RHQfmuanGBJ1vEcp
+   5zmpDImF0/qdcFWOmTeUIup6Sqy0GoK7NeT39zf4jP4GFCbro7RhjVzms
+   kbPJK4oYRZpcUPN0vPl1uvxGWIp48VjZ8bTGnuhrq/vQUzYVUzNJDxqkc
+   N7F54e4qH+6gH1PbesBFgEqqfS57mXzYOv6nZ1haQnQmVEgK63IWZBoiy
+   Q==;
+X-CSE-ConnectionGUID: tRVcgkSDTLaf1Vhh9lMi/w==
+X-CSE-MsgGUID: clAHoCvRRUGzqoysU+KH0A==
+X-IronPort-AV: E=McAfee;i="6800,10657,11534"; a="68725305"
+X-IronPort-AV: E=Sophos;i="6.18,214,1751266800"; 
+   d="scan'208";a="68725305"
+Received: from orviesa003.jf.intel.com ([10.64.159.143])
+  by orvoesa103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 26 Aug 2025 07:13:18 -0700
+X-CSE-ConnectionGUID: fkmkoWmdQxWzwXBvKrPNZw==
+X-CSE-MsgGUID: TdnUtjC3Qo2ip6ZvO42CCg==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.18,214,1751266800"; 
+   d="scan'208";a="173753410"
+Received: from liuzhao-optiplex-7080.sh.intel.com (HELO localhost) ([10.239.160.39])
+  by orviesa003.jf.intel.com with ESMTP; 26 Aug 2025 07:13:16 -0700
+Date: Tue, 26 Aug 2025 22:35:02 +0800
+From: Zhao Liu <zhao1.liu@intel.com>
+To: Ani Sinha <anisinha@redhat.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, richard.henderson@linaro.org,
+	kvm@vger.kernel.org, qemu-devel@nongnu.org
+Subject: Re: [PATCH v2] kvm/kvm-all: make kvm_park/unpark_vcpu local to
+ kvm-all.c
+Message-ID: <aK3GFpAxCuTWfjEn@intel.com>
+References: <20250815065445.8978-1-anisinha@redhat.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="DLPwMqCHcj94pYC/"
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20250824075455.602185-1-alok.a.tiwari@oracle.com>
+In-Reply-To: <20250815065445.8978-1-anisinha@redhat.com>
 
+On Fri, Aug 15, 2025 at 12:24:45PM +0530, Ani Sinha wrote:
+> Date: Fri, 15 Aug 2025 12:24:45 +0530
+> From: Ani Sinha <anisinha@redhat.com>
+> Subject: [PATCH v2] kvm/kvm-all: make kvm_park/unpark_vcpu local to
+>  kvm-all.c
+> X-Mailer: git-send-email 2.50.1
+> 
+> kvm_park_vcpu() and kvm_unpark_vcpu() is only used in kvm-all.c. Declare it
+> static, remove it from common header file and make it local to kvm-all.c
+> 
+> Signed-off-by: Ani Sinha <anisinha@redhat.com>
+> ---
+>  accel/kvm/kvm-all.c  |  4 ++--
+>  include/system/kvm.h | 17 -----------------
+>  2 files changed, 2 insertions(+), 19 deletions(-)
+> 
+> changelog:
+> unexport  kvm_unpark_vcpu() as well and remove unnecessary forward
+> declarations.
 
---DLPwMqCHcj94pYC/
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+Reviewed-by: Zhao Liu <zhao1.liu@intel.com>
 
-On Sun, Aug 24, 2025 at 12:54:48AM -0700, Alok Tiwari wrote:
-> Fix the incorrect reference to struct kvm_reinject_control and replace
-> it with the correct struct kvm_ppc_resize_hpt in the documentation of
-> the HPT resize ioctl.
->=20
-
-LGTM, thanks!
-
-Reviewed-by: Bagas Sanjaya <bagasdotme@gmail.com>
-
---=20
-An old man doll... just what I always wanted! - Clara
-
---DLPwMqCHcj94pYC/
-Content-Type: application/pgp-signature; name=signature.asc
-
------BEGIN PGP SIGNATURE-----
-
-iHUEABYKAB0WIQSSYQ6Cy7oyFNCHrUH2uYlJVVFOowUCaK3FQAAKCRD2uYlJVVFO
-o1lkAQDMiJWsc4VcsMe3oMv646Tp9Hd4gu42IXlJNeyvZAmzywD8C5IOiJx3Vzuw
-R3bu3JNtZyydzXM6eTuqyYiGqy/RoAs=
-=jthh
------END PGP SIGNATURE-----
-
---DLPwMqCHcj94pYC/--
 
