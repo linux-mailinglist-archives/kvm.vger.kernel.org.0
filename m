@@ -1,276 +1,247 @@
-Return-Path: <kvm+bounces-55732-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-55733-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id A761AB35620
-	for <lists+kvm@lfdr.de>; Tue, 26 Aug 2025 09:53:30 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 89E11B356D7
+	for <lists+kvm@lfdr.de>; Tue, 26 Aug 2025 10:28:54 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 41D071627A9
-	for <lists+kvm@lfdr.de>; Tue, 26 Aug 2025 07:53:30 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5042816937C
+	for <lists+kvm@lfdr.de>; Tue, 26 Aug 2025 08:28:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D053B2F659C;
-	Tue, 26 Aug 2025 07:53:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 57C1F2F99A3;
+	Tue, 26 Aug 2025 08:28:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="OEu9AwVg"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="F/QQ3Sz3"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.9])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4FB5B2D3A85
-	for <kvm@vger.kernel.org>; Tue, 26 Aug 2025 07:53:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756194793; cv=none; b=fUhj9TU4XLA+huW2QxXwnulQN8zVFMCr3l+jEG4bkkL3DWExFASbjJaqApUJSWMQOGslf1OP/eorVHXzFVuJZ10xJRObIkMqtEvdEiOXxnGekBvew2KiklRl0t/Y8h0eQdKzVIbVbkGzjZmwvkgHDoMDT8A53fUGLVKDrWPUBY8=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756194793; c=relaxed/simple;
-	bh=dX+JPSw1HIhEjyyyMZ4WgA8Kp7gGa/+lE1IIRyJ7GNw=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=BG08N5l2V4j4nJA0ImIEhEyjwJxqS+HdGmt7N16GCpY/dHK47VOxoTk4m4O5aX08sy/wLorseHKgOCMla6RoITMgYo/42SDR8cBPalmc45anbQox/SRhYLoCj8LoTgxWzdIRdKN97FhYjMmzPr0LjaffEnvD9mliPPRMW2Zzkqs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=OEu9AwVg; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1756194790;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=LoG/oMiDA0PShlYbHntrvwEM5QdNxw6NlWrg87rRvc0=;
-	b=OEu9AwVg2OjDKzoLV3k3j57QM/mSZnBnCpgTsp6IJfRAhuD9EJioCVzzBQOUd3MxDvunvl
-	/IU5s/tK5MgkB0Csymtx54UPl9yfBhTmQRsLZfC1jPsq8uMRilpcAf980GV6dTtt59LDln
-	Zt5y9e+HJxAoKkpcKyMnI95bfwVcL6A=
-Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
- [209.85.221.69]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-680-eoK2teDoP3q1kTnrP7vM-A-1; Tue, 26 Aug 2025 03:53:07 -0400
-X-MC-Unique: eoK2teDoP3q1kTnrP7vM-A-1
-X-Mimecast-MFC-AGG-ID: eoK2teDoP3q1kTnrP7vM-A_1756194786
-Received: by mail-wr1-f69.google.com with SMTP id ffacd0b85a97d-3c75de76cacso2063470f8f.3
-        for <kvm@vger.kernel.org>; Tue, 26 Aug 2025 00:53:07 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1756194785; x=1756799585;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=LoG/oMiDA0PShlYbHntrvwEM5QdNxw6NlWrg87rRvc0=;
-        b=t5l3MmzWR6z2R0JSJd8edu9YmpgWoX25ARpaCtd5LGrydbX66sAa7k0Rt4A2ypuXov
-         hBcgH3j5pp5cqhEw3fimf+aa9WLJP41jKOHcH0O6Dugp7w9xFiZjsvzwTzsOMFi0991U
-         DesWoiiivWgcKiJ/kz2IT9Cw6ZJPViJ+JK+yd2+9tCiQB+oM85XCmaoW2piBeUSGGScM
-         PHHa0tbhpaseWEsPVmHnMlZ59ma/jSLuLpH21+x0W9KrRWkrdNbkiRg0Jodwfr6rbs3y
-         J4f1O09lghHKuRZDuptVAAVCASTUum42R+ukP00NlzA5JS2ga9mGO7KmYLSz67+iakVy
-         pUYg==
-X-Forwarded-Encrypted: i=1; AJvYcCVmffxgRn0ujvI62peGB8x7m2j/R52X/oTGP9jioIQ+E0X4mn0h5R3hkD+hw/s9jYFmlsI=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyHkY+rxAMyrCakLOBbLjoHIFaMuEW8J3b+D0D6ixlbaI228fXw
-	KfmVXiD95xR5MYL49cpT1iMuXeYdBM/mfWefiMeCcf3VCSqioBrdckrLocHIpU7kZ7aBcYZy8wV
-	CUG7VNy0vaOVpxiSWK4ss0nvbPP8bW8libcA82WmWbaxH/tyBuO1BYFsvpjw2bg==
-X-Gm-Gg: ASbGnctl7jAoBAoFiSH3MH085p7ZbVP2dnB9NrFxpHAMMMBwF07J3zm6ZehLHuIDoUS
-	ej7kKNZVnbJIumL1va3mFpt8BlcntLix2WyXB9kpws1pKOPSVJBr3O2CRA6GrpnD7l7+VCjqb0o
-	Sx9on333OFPxVdrgeNYXUfiy7FjGcbEX8SvLh1JGExpPhr/JZgGGe78NQAhRC6has6zXp8lJqyK
-	dxbVWjt56lMzAT3YDBP9nfzf7yqVWchNIE38T4rGIozSm/AwWwSZ8/9h+lnlel4kN0z1HSBwbgF
-	GJUjf+XIokXJ0P6puOAIon8e7VG9sPQ=
-X-Received: by 2002:a05:6000:4211:b0:3c7:95cb:baae with SMTP id ffacd0b85a97d-3c795cbc786mr7797584f8f.36.1756194784910;
-        Tue, 26 Aug 2025 00:53:04 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IEqVz0b+NfcNpGcCbXovaqiNDlqX9kOt6jyKlVBDTJ5Jc9+aLhIKRxVtdKSdE6hyWoOT2t9Kw==
-X-Received: by 2002:a05:6000:4211:b0:3c7:95cb:baae with SMTP id ffacd0b85a97d-3c795cbc786mr7797560f8f.36.1756194784423;
-        Tue, 26 Aug 2025 00:53:04 -0700 (PDT)
-Received: from redhat.com ([185.128.27.233])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3c70ef566dcsm14823742f8f.24.2025.08.26.00.53.01
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 26 Aug 2025 00:53:03 -0700 (PDT)
-Date: Tue, 26 Aug 2025 03:52:59 -0400
-From: "Michael S. Tsirkin" <mst@redhat.com>
-To: Sean Christopherson <seanjc@google.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, Jason Wang <jasowang@redhat.com>,
-	kvm@vger.kernel.org, virtualization@lists.linux.dev,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-	Sebastian Andrzej Siewior <bigeasy@linutronix.de>
-Subject: Re: [PATCH 1/3] vhost_task: KVM: Don't wake KVM x86's recovery
- thread if vhost task was killed
-Message-ID: <20250826034937-mutt-send-email-mst@kernel.org>
-References: <20250826004012.3835150-1-seanjc@google.com>
- <20250826004012.3835150-2-seanjc@google.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0268B14A8B;
+	Tue, 26 Aug 2025 08:28:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=198.175.65.9
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1756196925; cv=fail; b=dJnOfPR8PuxoMLScOLcHwna8ktPiAHzq7ySjna8Ms+MUVs7eTWldM0PZCxFq1iKhniVYkt/tLF71dMv6K/1FFfkWCZyjkTwDYAXOTHHyHJPbRgY5Nf893FDH0uk1iy5Mu9OY0waSfGoKfjs8pVgSPbdwaxa6nEbEnm8krWHgync=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1756196925; c=relaxed/simple;
+	bh=WRj9Z2SqWWvj/LNDFNjDmUmi9R3ZLi9UoguuQWi826c=;
+	h=Message-ID:Date:Subject:To:CC:References:From:In-Reply-To:
+	 Content-Type:MIME-Version; b=OWkeIgw1oPqfeCc7SHduFQ/KXTOYzk374O+ocbx26Tj1PSeESdVJ2pi+0LnxNzirPZkuLRYNokjepTbxsHmaascfR6xLngXfDtHrEZBxHCtow4j2CI38o5ZtF8VKHpF5b4NuMDpdJ4XdRE+56IIHpk8QfmpkbgYYKsSGD6Jqkvg=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=F/QQ3Sz3; arc=fail smtp.client-ip=198.175.65.9
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1756196924; x=1787732924;
+  h=message-id:date:subject:to:cc:references:from:
+   in-reply-to:content-transfer-encoding:mime-version;
+  bh=WRj9Z2SqWWvj/LNDFNjDmUmi9R3ZLi9UoguuQWi826c=;
+  b=F/QQ3Sz3EJyKMu9dHUb0BNGlcGqlzTpKtMeI9P7GQAvqTdW3zHr3937d
+   1HV8fPwPe39jkZYmcsut+WjmPlpeuNEpQElm9Jf+LvxRv5j6EErLjERS3
+   KU7xlhmslQan/+9reuIv0FuMpG3c2wj2CEuXIBkzgqndJ2AxOrTHN7klU
+   KNWIn14n32qNCX06HT1dqbXtyhVGR56SqQ01XnrtTh+6FkQ5aMTw30gRJ
+   mrmUf0UzaBCWgEESmmmJ0PxYCAOSO9sQ4Amf126M5t7kKH6rxkEeQ0R5T
+   8gfFF+YRazREKDGlbtS2wFwTWwEED485mrbGILtznFcl0nhWt3UsEgyRM
+   g==;
+X-CSE-ConnectionGUID: nUUrqW8HTNOmizxqMCH0Cg==
+X-CSE-MsgGUID: UyXiTwbfTuWbZ3sRrlBsPA==
+X-IronPort-AV: E=McAfee;i="6800,10657,11531"; a="81018759"
+X-IronPort-AV: E=Sophos;i="6.17,312,1747724400"; 
+   d="scan'208";a="81018759"
+Received: from fmviesa006.fm.intel.com ([10.60.135.146])
+  by orvoesa101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 26 Aug 2025 01:28:43 -0700
+X-CSE-ConnectionGUID: wk4Eej4KQK+ZVWWoCB4ZrQ==
+X-CSE-MsgGUID: 1xyVIzcYSzOwyewYcA7Ahg==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.18,214,1751266800"; 
+   d="scan'208";a="169448488"
+Received: from orsmsx902.amr.corp.intel.com ([10.22.229.24])
+  by fmviesa006.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 26 Aug 2025 01:28:43 -0700
+Received: from ORSMSX901.amr.corp.intel.com (10.22.229.23) by
+ ORSMSX902.amr.corp.intel.com (10.22.229.24) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.2562.17; Tue, 26 Aug 2025 01:28:42 -0700
+Received: from ORSEDG901.ED.cps.intel.com (10.7.248.11) by
+ ORSMSX901.amr.corp.intel.com (10.22.229.23) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.2562.17 via Frontend Transport; Tue, 26 Aug 2025 01:28:42 -0700
+Received: from NAM10-MW2-obe.outbound.protection.outlook.com (40.107.94.89) by
+ edgegateway.intel.com (134.134.137.111) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.2562.17; Tue, 26 Aug 2025 01:28:40 -0700
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=LkYMT6uFr/VPyL5RPdAtj/xaVjnvDZbJJChoP+pcfpMRmUN6cx5UpJsEGb6QOvHyl3p6yXFAOAgVm+REdwoFSyv3ubzn8fV7a6gDtRlopCgpt5eMfWkzOOUC1BujtUvLlHy9LCO5spaR/kTMkYjKavcZOZeLRDyUhCKE6eo9ZPJEnuZ8S4g/LeQbhBq/LXA0NM9OSNhM5BmEZzwGj0QRvt+sjsGlNwAe42KLt7iM3769fFk5YByI+OI/IZc+QxXsXfPILkspSSUbzNrxnn2VUC89ojdxTPjlZ8nGSb263v0OvIMIrrX0INNwsUPD0brZ/ZWJi9EJUxU2cHiSmLeJaw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=li88JAf1YvdjfMcHao/+AcrfGv5/IpZNRe5RhWIRt2E=;
+ b=A8JiuEn9UY47e3/kjsDt/RGcDDOafKqvbC0IAivFmX4NBOnBjDsJLr3sHIoFAjLsEHfw3R053cg+NpguntUTgEwORZcRFceCIAx/8GJlwWqjssP58r+sk4AgmhEr8/lVBz/SOT3vX83zgrkdM0NjESO6VYAUY4AlhwBuZa4N+cnLrQ4lilIIZ6+cMzjjdlxPxxkx92lRPx75jf0QqN67KhXhwqqbm30sOpC13qEwrFDszaswPZapPU9E/eT5399+6W3fwdN3mNr1BCVSnA6rrwgYdfFev5OeO5intf+1AZRXZkG2m2cXn722X0plLMrUDqCN2/9snfSbCfCpWxmimA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+Received: from DM3PR11MB8735.namprd11.prod.outlook.com (2603:10b6:0:4b::20) by
+ SJ0PR11MB4893.namprd11.prod.outlook.com (2603:10b6:a03:2ac::17) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9052.21; Tue, 26 Aug
+ 2025 08:28:36 +0000
+Received: from DM3PR11MB8735.namprd11.prod.outlook.com
+ ([fe80::3225:d39b:ca64:ab95]) by DM3PR11MB8735.namprd11.prod.outlook.com
+ ([fe80::3225:d39b:ca64:ab95%4]) with mapi id 15.20.9052.019; Tue, 26 Aug 2025
+ 08:28:34 +0000
+Message-ID: <94f1eeb5-35c2-4edf-ace7-6917b06bb4bc@intel.com>
+Date: Tue, 26 Aug 2025 16:28:23 +0800
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v9 15/19] KVM: selftests: Hook TDX support to vm and vcpu
+ creation
+To: Sagi Shahar <sagis@google.com>, <linux-kselftest@vger.kernel.org>, "Paolo
+ Bonzini" <pbonzini@redhat.com>, Shuah Khan <shuah@kernel.org>, "Sean
+ Christopherson" <seanjc@google.com>, Ackerley Tng <ackerleytng@google.com>,
+	Ryan Afranji <afranji@google.com>, Andrew Jones <ajones@ventanamicro.com>,
+	Isaku Yamahata <isaku.yamahata@intel.com>, Erdem Aktas
+	<erdemaktas@google.com>, Rick Edgecombe <rick.p.edgecombe@intel.com>, "Roger
+ Wang" <runanwang@google.com>, Binbin Wu <binbin.wu@linux.intel.com>, "Oliver
+ Upton" <oliver.upton@linux.dev>, "Pratik R. Sampat"
+	<pratikrajesh.sampat@amd.com>, Reinette Chatre <reinette.chatre@intel.com>,
+	Ira Weiny <ira.weiny@intel.com>, Chao Gao <chao.gao@intel.com>
+CC: <linux-kernel@vger.kernel.org>, <kvm@vger.kernel.org>
+References: <20250821042915.3712925-1-sagis@google.com>
+ <20250821042915.3712925-16-sagis@google.com>
+Content-Language: en-US
+From: Chenyi Qiang <chenyi.qiang@intel.com>
+In-Reply-To: <20250821042915.3712925-16-sagis@google.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: SI2PR01CA0032.apcprd01.prod.exchangelabs.com
+ (2603:1096:4:192::18) To DM3PR11MB8735.namprd11.prod.outlook.com
+ (2603:10b6:0:4b::20)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250826004012.3835150-2-seanjc@google.com>
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: DM3PR11MB8735:EE_|SJ0PR11MB4893:EE_
+X-MS-Office365-Filtering-Correlation-Id: 6c323c64-c9ac-4295-5ac9-08dde47a8c1a
+X-LD-Processed: 46c98d88-e344-4ed4-8496-4ed7712e255d,ExtAddr
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;ARA:13230040|1800799024|7416014|376014|366016|921020|7053199007;
+X-Microsoft-Antispam-Message-Info: =?utf-8?B?R0VLZUJ6TTdkelZXQkNTWEhQKzN2VWFacm8zNnFuWFdhSDdtalp4dEFoaFdi?=
+ =?utf-8?B?NnBaN1VHQkpMT2Mvd0dLYVBtVUc5bnhvdzFCZzJ0V29VcmF5bFlvNlpDdTdX?=
+ =?utf-8?B?akZhNTV3bDRCTzJ4TVhFc2twRGtFNDVBejliVjRieVZPb1NrbnRndmJlNENG?=
+ =?utf-8?B?UEMrYnV1QjVCQjMzYVE3VWFkdnAwTzc1RWJ5anBGUHZ0M2JQR1ZpT3ErT3A1?=
+ =?utf-8?B?Z0ovb00yTWs4SGZTOXg3Ujdac1dta0t5TGhiZ2FLUjNyQzBCUFZCRHNhbmhi?=
+ =?utf-8?B?UlRPOElGVUJCaGFBelhxN20ycHRkNzljLzRtNzRKKzExK0xndVdvS3Jwd05a?=
+ =?utf-8?B?MS9zOGRzbG5MUHdldjB0MEE2c0dEdUw4aU90aVE1TDJ5VWU4ZG9lcVdseGJO?=
+ =?utf-8?B?cHhpQmFCTmV5NHIwQWZ4M21RT0xVY3hwekFoTFltL1k3dWttcEtmRDlvZmtL?=
+ =?utf-8?B?Qk9PNXdqdWxZZFVhQjZQYzlDT1Q4RzZBayt1VWpVMEczUCt5M0dKRCtqYk5T?=
+ =?utf-8?B?aUxJdVhPTkRrY1ErUXZNY3NLcDdHaUZHY2pPVnRLZ0VoSjJHaEpHWFQ0eldM?=
+ =?utf-8?B?c2VDRnJWd2hFVFQzcGVuOFdsOWkzVDJyNzVTblh1K0hSOU9OcXBGdzNRczFC?=
+ =?utf-8?B?Z0dCVVZVeVl4ZEtMRTlKcjlhcTkvcVJOaUp3VTMvZEhMZjRWckRhR1pHR2NQ?=
+ =?utf-8?B?bkVybEdQNzNBQ3dlV3BuYWlLTkxZb01ULytLQStWbTk0MnJJTUd3SGZnQUs0?=
+ =?utf-8?B?SG1aSE1SZXVOWTRXZjk3Ti81UGR6eFdjZ3hyczJBemZNbHRQNmRaWnowYTI0?=
+ =?utf-8?B?L2FhS3NRR0ZIdmd2T2dLcXFram10WklVRkZmLzU0L2RPZGtmcitUaUZzY1Yx?=
+ =?utf-8?B?dm9LVk9Jakx0UnJPb1hOLzExTGt6eGR1WEsvOTZnMTBLa2JoNW9HMEhLcW5y?=
+ =?utf-8?B?cm41OXlTb1dUbnVKMENEWTBKTUtaanlRYXhmOGxNTUY1RTZaU1l0Y2NRaWh4?=
+ =?utf-8?B?ditRVnU4eElYUmgydGN0bUlmdlRXYllIN2FsWTJjb3dIR05wYXNNUDVKclFP?=
+ =?utf-8?B?aEg3MGg2aGU4enA3aGI2a014SEdESGZtd2N1YXBiamxRd2FRMlNWcGF0Q0tU?=
+ =?utf-8?B?eG5WQk1RWVp1UVZvUUx0aFRFbWlsQ3VqR0VPMVMya2dsTVJJbnBtQlpvM0lD?=
+ =?utf-8?B?T2ZwblV0c0JTaGhjeFF3U2tvWWQ5WG53eHJsWEFWRDUrYk9XV0xKUW5sWkVi?=
+ =?utf-8?B?bllEUjVlZzk5VWdxblplU3BMTWxHN3BZR0VLQ1BRQ1VhMWdhUG8vUDNqNmF3?=
+ =?utf-8?B?TllqMktDbHJaZ1Z3OHJ5aVJSTkd0MCtoUStBYlBqaEFYeEtkQ0V0aVo4K29V?=
+ =?utf-8?B?WmZxY3o5L3hGL0M3RVlSU09MUTdpYkRHUGtLMk5EWSs5MW8rakJPZk9OQ0tL?=
+ =?utf-8?B?NzN1NWRIVzRCUDhrTUJCelJJaFpHVlAvamtsaGtpWERXbDBxUzlrRDhrMkJF?=
+ =?utf-8?B?NUtlb2lCNEJ4UHh6S1g1YVhBenh6QzFUM0x4dm9KejBiVFVmenQ5cXNWWXlu?=
+ =?utf-8?B?amFFejBILzlXTC9YdFpwdjBuVGpCWnRtK2VuVEtCcjFjdHp4aDcxZFJGdnpi?=
+ =?utf-8?B?VkhvRkEwaFFqTSt6WHp5TGVYNHRlRkRqd2xOc3ZaRlpzL2NFbkpwcVFyYlMx?=
+ =?utf-8?B?SUYyb2NyUWgwaUlsOXFuRnY1dzJFb3pXeGNkWkNkNDU1eDl0TWlVQjFCdC93?=
+ =?utf-8?B?N2dNK251MXZkMjY5a3hMKzg3S1ZHZStMa3k4bDV1a2JYM04vaG03L21IMjlh?=
+ =?utf-8?B?NE51eCtSYnFFT01OM0hJZTNwdHhqYzRNRVFhS2ppaGJ0TnFaQ1poVlRCYVds?=
+ =?utf-8?B?QTYwdkNTVmIyVFRMeTMySU1nd2dadWdIRm85bFM5b3c5eUZpK01sWmdJMzZU?=
+ =?utf-8?B?NkhVTjJnNFpaaHB0ZkNaQVZMdHRGT3lxM2d3YlRSdGI3bXMwTlFMOGtsR0V4?=
+ =?utf-8?B?NXJCSU5kU3p3PT0=?=
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM3PR11MB8735.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(7416014)(376014)(366016)(921020)(7053199007);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?SHppUlpOTzhGdnVjbGJxTmtNc1BySk43VWhHL3BWblk2cVl5eVBrTzhNMWVZ?=
+ =?utf-8?B?TktzNWhObkgyWjZaS3lIeHFsbFNGK0o2eDVZbVFyYXFIN1hhNkk2TnI1TnFs?=
+ =?utf-8?B?Zmt1SE9KejV1eFJuYytOVzJvcTc2aEErWUQvOHJZTFdaamp5YU9wL2prb1hx?=
+ =?utf-8?B?RjJoU0N0dlA0VHJaUkZRd1JFVzZOTUYrMTVJeUFzaG5sMXJIWEJFQkpKMGMy?=
+ =?utf-8?B?d3diQ015cWd1eWFFd0FHRjZ5TStFYUhUb3dWMTUzaldtV00yUFFvTnpNa0s5?=
+ =?utf-8?B?Z3h2QUNpVDFHT2pIUnZJTHVzZjVXTGV1WVBPbDluY04xUTc1dFlXVGNrKzdi?=
+ =?utf-8?B?dUoxc2dLVlloUnc1R1VaQkp1eng0NkJhMFhncXg0anlvSk9KYnR0akc4Z0dm?=
+ =?utf-8?B?c1U0SHRvT1hyeEkrMkJuRWZtRWcyUVVFRHdjYkNhY0NzWUk4Q0p1TmZ5VGdl?=
+ =?utf-8?B?K1VmOWJWQkJPSEhuQTN3WUJtT0Z5MklhZDBrdW41Q3R5Z3owTGRvdTZwMDFV?=
+ =?utf-8?B?TFBsVUZQaW4zSlJWK2w2ejRzL1NHREFrRUFMYXpON05CSjhGM3VvY2Y1V3Ew?=
+ =?utf-8?B?ckhGenR3ZzczaGlLQTltTkNwU0FmMjZOR01ZZlR4ZzcrQk9DNmFGRWpPRURt?=
+ =?utf-8?B?eCtKSWJjeVA5OExYbHFOYzVtVlNkdmZ5OXNMZVVvQW42ck93T25KS3lMa3JJ?=
+ =?utf-8?B?ZGtRY3Zad01qZkdoVGVoaklxRE1PL1NlckxCeVp6ODdWK1hBVmMreUxXbFFw?=
+ =?utf-8?B?TU9QNWpudUxkK1l1RE0xaDF6V1FHNkd1bXZaU0w4QnJSVHpkYnJqOGtYRDJI?=
+ =?utf-8?B?dmtlZExXRGZvNVVNK0NIdlVsMkR2QXVxLzZseEl1QzdQcFdaUmo5T3doVDVl?=
+ =?utf-8?B?NGZMVHlTeW5HK1drZWhqaGhxclRWZTZ5V2RhbS9hNitMbndNWFRqelNYelUx?=
+ =?utf-8?B?dkJSZ0hTck1vQkpHaERrR25wdjJuK3ExR2xrK1RVWlNqSlYwOFRqdU9CN3FU?=
+ =?utf-8?B?KzI1VTc1b2ZtZFRac09TMFpYZXI0eWhIRmxYMzc3bDVOY2FWcnF3L3A3azNL?=
+ =?utf-8?B?eDdTYnBzM3F0djRHQTF0dkp6QUMvVTVIMWZxZndpNlFQOWhnd2VNY1VkQzZp?=
+ =?utf-8?B?Ym5wNlFoNHFmMUhEZXc5aUtEN2R2RTh5cnl4RnhlMG5JVVZTQjhqLzM5MzZy?=
+ =?utf-8?B?cWp1MWZQUVdtd05oejJFczVXN1dDQXpLWnlud3BBTDkyZ2plL200T0dUMER5?=
+ =?utf-8?B?aE9YTk5aMUlMeFRhRzNPcmdtdENZbE1XTlcwa01sRmhXZTFabXdZditwSmVV?=
+ =?utf-8?B?R28yWFFkTm1LcGQ4R3pBZzF2RmVzSmpJRVovdUwrVjQrMmczWTFtczZUY3Zz?=
+ =?utf-8?B?aW9OVENLUVo1bmU5WVNacU1PU0w2eDh3V3JXR1IvUGdxeWpiMGtGZWZKV0s5?=
+ =?utf-8?B?RkdoVEF4OERIb0U1Mlg5WkllSXBNK25rdXpPTE1wVUt5VmEyU215U3JaTkZ6?=
+ =?utf-8?B?aXpzQ3dZRjBERGVwWGdWZkEwaFludjhkZXlnd1c3bEpTSVpiemdxQk9SRnZu?=
+ =?utf-8?B?eFhVM2hZMDlxMWtKdnl2ZjJCbmVwRGlYbHZISWtIYlE4ZmxWL3lDNVZIVE1m?=
+ =?utf-8?B?cHRrejVubG5kTGdxc2F2WGxZZ2hpeWNwcFBPYWJPamRQUHZDd25BeW1uOUo3?=
+ =?utf-8?B?eXhyL1Yra2F5M1NtV0l1bG9BcEE1V0JWeHRKcTliNnpJS0ZYNTc1czY1VHQv?=
+ =?utf-8?B?TFRQMnpqREF2OTZaQkdQVnpoNjZpZjV1a01vbDNIeU1lQVNuMXZuSkVnWnN1?=
+ =?utf-8?B?TXdORUtpRkdwMGl6YUxZdHppR0hDYjhHa29hWXlPUVEzMGNocWVuLzlBaFNw?=
+ =?utf-8?B?R0c5Y0p6QUs4SlhuRW56ZUJmQjNib2NBelVrK2ZzaS84NFoyWE5TTHM2YnBT?=
+ =?utf-8?B?VDVxOWNoOVZHNS8rWFBMN0dXbktxRS9vaC9DajVzb0xpcFFucGZxSkdSeVJY?=
+ =?utf-8?B?UW8yRm5xOG9nLy9tVXp3azZSRDBsVnpDZjBqeGg2emtxZ3pUMVRhb3BpaHU4?=
+ =?utf-8?B?TE8rUHpjNFVwbkVzNUlqMk9teitYR3NwN0xWajJadG52SkcrV1BHWVNiT3oy?=
+ =?utf-8?B?NXl6SFR4TWVPeGRMdnRoalk1d0hQY1RVL3MwU1NGSy9QSWhwWlgvbXI0MHVB?=
+ =?utf-8?B?QkE9PQ==?=
+X-MS-Exchange-CrossTenant-Network-Message-Id: 6c323c64-c9ac-4295-5ac9-08dde47a8c1a
+X-MS-Exchange-CrossTenant-AuthSource: DM3PR11MB8735.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 26 Aug 2025 08:28:34.7905
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: TKhIC5VShx/Xo/6y2n6XpoZifRWYLXPRYw3goVbzFexucNhqsuY5zVbdxyum6Ovhuqz4BuGGGobMyBNpuk7NXg==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SJ0PR11MB4893
+X-OriginatorOrg: intel.com
 
-On Mon, Aug 25, 2025 at 05:40:09PM -0700, Sean Christopherson wrote:
-> Add a vhost_task_wake_safe() variant to handle the case where a vhost task
-> has exited due to a signal, i.e. before being explicitly stopped by the
-> owner of the task, and use the "safe" API in KVM when waking NX hugepage
-> recovery tasks.  This fixes a bug where KVM will attempt to wake a task
-> that has exited, which ultimately results in all manner of badness, e.g.
+
+
+On 8/21/2025 12:29 PM, Sagi Shahar wrote:
+> TDX require special handling for VM and VCPU initialization for various
+
+s/require/requires
+
+> reasons:
+> - Special ioctlss for creating VM and VCPU.
+
+s/ioctlss/ioctls
+
+> - TDX registers are inaccessible to KVM.
+> - TDX require special boot code trampoline for loading parameters.
+
+s/require/requires
+
+> - TDX only supports KVM_CAP_SPLIT_IRQCHIP.
 > 
->   Oops: general protection fault, probably for non-canonical address 0xff0e899fa1566052: 0000 [#1] SMP
->   CPU: 51 UID: 0 PID: 53807 Comm: tee Tainted: G S         O        6.17.0-smp--38183c31756a-next #826 NONE
->   Tainted: [S]=CPU_OUT_OF_SPEC, [O]=OOT_MODULE
->   Hardware name: Google LLC Indus/Indus_QC_03, BIOS 30.110.0 09/13/2024
->   RIP: 0010:queued_spin_lock_slowpath+0x123/0x250
->   Code: ... <48> 89 8c 02 c0 da 47 a2 83 79 08 00 75 08 f3 90 83 79 08 00 74 f8
->   RSP: 0018:ffffbf55cffe7cf8 EFLAGS: 00010006
->   RAX: ff0e899fff0e8562 RBX: 0000000000d00000 RCX: ffffa39b40aefac0
->   RDX: 0000000000000030 RSI: fffffffffffffff8 RDI: ffffa39d0592e68c
->   RBP: 0000000000d00000 R08: 00000000ffffff80 R09: 0000000400000000
->   R10: ffffa36cce4fe401 R11: 0000000000000800 R12: 0000000000000003
->   R13: 0000000000000000 R14: ffffa39d0592e68c R15: ffffa39b9e672000
->   FS:  00007f233b2e9740(0000) GS:ffffa39b9e672000(0000) knlGS:0000000000000000
->   CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
->   CR2: 00007f233b39fda0 CR3: 00000004d031f002 CR4: 00000000007726f0
->   PKRU: 55555554
->   Call Trace:
->    <TASK>
->    _raw_spin_lock_irqsave+0x50/0x60
->    try_to_wake_up+0x4f/0x5d0
->    set_nx_huge_pages+0xe4/0x1c0 [kvm]
->    param_attr_store+0x89/0xf0
->    module_attr_store+0x1e/0x30
->    kernfs_fop_write_iter+0xe4/0x160
->    vfs_write+0x2cb/0x420
->    ksys_write+0x7f/0xf0
->    do_syscall_64+0x6f/0x1f0
->    entry_SYSCALL_64_after_hwframe+0x4b/0x53
->   RIP: 0033:0x7f233b4178b3
->   R13: 0000000000000002 R14: 00000000226ff3d0 R15: 0000000000000002
->    </TASK>
+> Hook this special handling into __vm_create() and vm_arch_vcpu_add()
+> using the utility functions added in previous patches.
 > 
-> Provide an API in vhost task instead of forcing KVM to solve the problem,
-> as KVM would literally just add an equivalent to VHOST_TASK_FLAGS_KILLED,
-> along with a new lock to protect said flag.  In general, forcing simple
-> usage of vhost task to care about signals _and_ take non-trivial action to
-> do the right thing isn't developer friendly, and is likely to lead to
-> similar bugs in the future.
-> 
-> Debugged-by: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
-> Link: https://lore.kernel.org/all/aKkLEtoDXKxAAWju@google.com
-> Link: https://lore.kernel.org/all/aJ_vEP2EHj6l0xRT@google.com
-> Suggested-by: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
-> Fixes: d96c77bd4eeb ("KVM: x86: switch hugepage recovery thread to vhost_task")
-> Cc: stable@vger.kernel.org
-> Signed-off-by: Sean Christopherson <seanjc@google.com>
-
-OK but I dislike the API.
-
-Default APIs should be safe. So vhost_task_wake_safe should be
-vhost_task_wake
-
-This also reduces the changes to kvm.
-
-
-It does not look like we need the "unsafe" variant, so pls drop it.
-If we do need it, it should be called __vhost_task_wake.
-
-
-
-
-
-
+> Signed-off-by: Sagi Shahar <sagis@google.com>
 > ---
->  arch/x86/kvm/mmu/mmu.c           |  2 +-
->  include/linux/sched/vhost_task.h |  1 +
->  kernel/vhost_task.c              | 42 +++++++++++++++++++++++++++++---
->  3 files changed, 41 insertions(+), 4 deletions(-)
+>  tools/testing/selftests/kvm/lib/kvm_util.c    | 24 ++++++++-
+>  .../testing/selftests/kvm/lib/x86/processor.c | 49 ++++++++++++++-----
+>  2 files changed, 61 insertions(+), 12 deletions(-)
 > 
-> diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
-> index 6e838cb6c9e1..d11730467fd4 100644
-> --- a/arch/x86/kvm/mmu/mmu.c
-> +++ b/arch/x86/kvm/mmu/mmu.c
-> @@ -7376,7 +7376,7 @@ static void kvm_wake_nx_recovery_thread(struct kvm *kvm)
->  	struct vhost_task *nx_thread = READ_ONCE(kvm->arch.nx_huge_page_recovery_thread);
->  
->  	if (nx_thread)
-> -		vhost_task_wake(nx_thread);
-> +		vhost_task_wake_safe(nx_thread);
->  }
->  
->  static int get_nx_huge_pages(char *buffer, const struct kernel_param *kp)
-> diff --git a/include/linux/sched/vhost_task.h b/include/linux/sched/vhost_task.h
-> index 25446c5d3508..5d5c187088f7 100644
-> --- a/include/linux/sched/vhost_task.h
-> +++ b/include/linux/sched/vhost_task.h
-> @@ -10,5 +10,6 @@ struct vhost_task *vhost_task_create(bool (*fn)(void *),
->  void vhost_task_start(struct vhost_task *vtsk);
->  void vhost_task_stop(struct vhost_task *vtsk);
->  void vhost_task_wake(struct vhost_task *vtsk);
-> +void vhost_task_wake_safe(struct vhost_task *vtsk);
->  
->  #endif /* _LINUX_SCHED_VHOST_TASK_H */
-> diff --git a/kernel/vhost_task.c b/kernel/vhost_task.c
-> index bc738fa90c1d..5aa8ddf88d01 100644
-> --- a/kernel/vhost_task.c
-> +++ b/kernel/vhost_task.c
-> @@ -67,18 +67,54 @@ static int vhost_task_fn(void *data)
->  	do_exit(0);
->  }
->  
-> +static void __vhost_task_wake(struct vhost_task *vtsk)
-> +{
-> +	wake_up_process(vtsk->task);
-> +}
-> +
->  /**
->   * vhost_task_wake - wakeup the vhost_task
->   * @vtsk: vhost_task to wake
->   *
-> - * wake up the vhost_task worker thread
-> + * Wake up the vhost_task worker thread.  The caller is responsible for ensuring
-> + * that the task hasn't exited.
->   */
->  void vhost_task_wake(struct vhost_task *vtsk)
->  {
-> -	wake_up_process(vtsk->task);
-> +	/*
-> +	 * Checking VHOST_TASK_FLAGS_KILLED can race with signal delivery, but
-> +	 * a race can only result in false negatives and this is just a sanity
-> +	 * check, i.e. if KILLED is set, the caller is buggy no matter what.
-> +	 */
-> +	if (WARN_ON_ONCE(test_bit(VHOST_TASK_FLAGS_KILLED, &vtsk->flags)))
-> +		return;
-> +
-> +	__vhost_task_wake(vtsk);
->  }
->  EXPORT_SYMBOL_GPL(vhost_task_wake);
->  
-> +/**
-> + * vhost_task_wake_safe - wakeup the vhost_task if it hasn't been killed
-> + * @vtsk: vhost_task to wake
-> + *
-> + * Wake up the vhost_task worker thread if the task hasn't exited, e.g. due to
-> + * a signal.
-> + */
-> +void vhost_task_wake_safe(struct vhost_task *vtsk)
-> +{
-> +	guard(mutex)(&vtsk->exit_mutex);
-> +
-> +	/* Attempting to wake a task that has been explicitly stopped is a bug. */
-> +	if (WARN_ON_ONCE(test_bit(VHOST_TASK_FLAGS_STOP, &vtsk->flags)))
-> +		return;
-> +
-> +	if (test_bit(VHOST_TASK_FLAGS_KILLED, &vtsk->flags))
-> +		return;
-> +
-> +	__vhost_task_wake(vtsk);
-> +}
-> +EXPORT_SYMBOL_GPL(vhost_task_wake_safe);
-> +
->  /**
->   * vhost_task_stop - stop a vhost_task
->   * @vtsk: vhost_task to stop
-> @@ -91,7 +127,7 @@ void vhost_task_stop(struct vhost_task *vtsk)
->  	mutex_lock(&vtsk->exit_mutex);
->  	if (!test_bit(VHOST_TASK_FLAGS_KILLED, &vtsk->flags)) {
->  		set_bit(VHOST_TASK_FLAGS_STOP, &vtsk->flags);
-> -		vhost_task_wake(vtsk);
-> +		__vhost_task_wake(vtsk);
->  	}
->  	mutex_unlock(&vtsk->exit_mutex);
->  
-> -- 
-> 2.51.0.261.g7ce5a0a67e-goog
 
 
