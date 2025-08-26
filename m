@@ -1,117 +1,182 @@
-Return-Path: <kvm+bounces-55748-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-55749-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id B4AA1B363E5
-	for <lists+kvm@lfdr.de>; Tue, 26 Aug 2025 15:34:04 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id A7D6BB3682D
+	for <lists+kvm@lfdr.de>; Tue, 26 Aug 2025 16:13:41 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E0C7E8A7DFB
-	for <lists+kvm@lfdr.de>; Tue, 26 Aug 2025 13:27:07 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 2E4C21BC649B
+	for <lists+kvm@lfdr.de>; Tue, 26 Aug 2025 14:05:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4A5C033CEBC;
-	Tue, 26 Aug 2025 13:26:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0653B352FD0;
+	Tue, 26 Aug 2025 14:03:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (4096-bit key) header.d=alien8.de header.i=@alien8.de header.b="XDghpPg6"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="dYpDFYMj"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail.alien8.de (mail.alien8.de [65.109.113.108])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f201.google.com (mail-pl1-f201.google.com [209.85.214.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 25FCE299AAB;
-	Tue, 26 Aug 2025 13:26:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=65.109.113.108
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A15DA352FC2
+	for <kvm@vger.kernel.org>; Tue, 26 Aug 2025 14:03:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756214765; cv=none; b=oQJUfwb9Ph0qaMY2JHhj9dxf6G5+JwSJPmR0uWAEHRwj0yn9GMTzBq54/P5zVicNd7rSIYGWNZCeVk9GAqA7Nevkq2nilVFlGGPo6nNj6edDrrW48ubESihD7PNLcX97pWAtLqvAutWc5+8hTwlRa0O2Rkyrwwru2SjTv4rummk=
+	t=1756217018; cv=none; b=UUUYZUAQyjg494X1i6kG0g+mZIUvnaJ1CsQlbEbrhSVn53OsLUGJNAJgiq64/GF8+CUUHeOzunXGAZvDdlBX0XZtCk6Kb9tdTi/in6BlNASSpBOWOYP9DCu9OrEjBLjIeCIoul54FtlnQFbqnO95mktP5b9kLkMdE4YezkpSSzo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756214765; c=relaxed/simple;
-	bh=1k5c/M/i2Yfu95IdR3Upie4zGu8fS2Q/phiESDFvzXc=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=qUpQb7g0x8r46Zd42UdagOl+thjWPN29BdZPUH+gNWramCzeH3jW80LDDzf4nh6zsSQ6YH1a+djZBTHdN7+Jde2eS3PYbtPC3jrbs+oqcjHrsYPS7kCzN5yk3lO96YrlKMA1JanSun7Nzoam3uO0RsuJbaG+a1luoAccoO16JTc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=alien8.de; spf=pass smtp.mailfrom=alien8.de; dkim=pass (4096-bit key) header.d=alien8.de header.i=@alien8.de header.b=XDghpPg6; arc=none smtp.client-ip=65.109.113.108
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=alien8.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=alien8.de
-Received: from localhost (localhost.localdomain [127.0.0.1])
-	by mail.alien8.de (SuperMail on ZX Spectrum 128k) with ESMTP id 1592440E02A2;
-	Tue, 26 Aug 2025 13:25:59 +0000 (UTC)
-X-Virus-Scanned: Debian amavisd-new at mail.alien8.de
-Authentication-Results: mail.alien8.de (amavisd-new); dkim=pass (4096-bit key)
-	header.d=alien8.de
-Received: from mail.alien8.de ([127.0.0.1])
-	by localhost (mail.alien8.de [127.0.0.1]) (amavisd-new, port 10026)
-	with ESMTP id 0xr7g7-msv9G; Tue, 26 Aug 2025 13:25:56 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=alien8;
-	t=1756214755; bh=QYodkVHQWRILKGiAD29E79aU/fibF8xosvTbdEgk3Dk=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=XDghpPg6BrNJNXiexULylkUKZL9c+0dMhMikq4MxQF7eZ4+d+6J864JLMwLvF7f9y
-	 +8yiIf/Vm12WI/awXdkqmj6U4lTXikjGiH2eTbZZ8A9Au9q57yRVkmhpsoS5IcPvlx
-	 a6mZBlzodubtbDp8HU1Y/vWv9pMhG3q1K9AiVDuXzaT9prT5uazAaRUMkebknWyaBN
-	 QGqPTCS/MMFaaD0G9hQpAt0rBe8Pu60eUFCl8fWEj8MojB4iZJZNOXPnE+1CR2hmsi
-	 aeOSV5CIpfW4ciQks8l68WC7g0oWR85maWmAeamoN2YmJ+ZLClxbZOGbMoEbEHUh2D
-	 QaZQzrne16PDRFIEE6KTwAEolDO/ZGlefz+/0cu46ayLeVPCSfXent12Ph6rTGF1vg
-	 Cj1r2J9Rrkvg2kZaYNZSzx1gDFM8NnPIgUQQ5mzGgkGzmSHIs8aphzDq+6vwGKCSqh
-	 4Dg1Gjvw61Y5TPPKVVCFmE+M7yBOf9uz1wlRgCCZbdVeK3c77fPLqYjWAhcLDRRy0W
-	 iz2Srpg21djx5hqVYM+ttSHPTxm4OioNF+jGjMPw/26dDr8ZdYsNnrMqWYshCRx8sk
-	 Xw6Zx9+n63mNxQTU5oAc8Q4edMPrcGJ+yiANbWAKnhMAwOUd/vX1jplzV/qN3afMNu
-	 PhkLYFBU6DVI56aYsCEUCsno=
-Received: from zn.tnic (pd953092e.dip0.t-ipconnect.de [217.83.9.46])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange ECDHE (P-256) server-signature ECDSA (P-256) server-digest SHA256)
-	(No client certificate requested)
-	by mail.alien8.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id 6635E40E02A1;
-	Tue, 26 Aug 2025 13:25:33 +0000 (UTC)
-Date: Tue, 26 Aug 2025 15:25:27 +0200
-From: Borislav Petkov <bp@alien8.de>
-To: "Upadhyay, Neeraj" <neeraj.upadhyay@amd.com>
-Cc: linux-kernel@vger.kernel.org, tglx@linutronix.de, mingo@redhat.com,
-	dave.hansen@linux.intel.com, Thomas.Lendacky@amd.com,
-	nikunj@amd.com, Santosh.Shukla@amd.com, Vasant.Hegde@amd.com,
-	Suravee.Suthikulpanit@amd.com, David.Kaplan@amd.com, x86@kernel.org,
-	hpa@zytor.com, peterz@infradead.org, seanjc@google.com,
-	pbonzini@redhat.com, kvm@vger.kernel.org,
-	kirill.shutemov@linux.intel.com, huibo.wang@amd.com,
-	naveen.rao@amd.com, francescolavra.fl@gmail.com,
-	tiala@microsoft.com
-Subject: Re: [PATCH v9 05/18] x86/apic: Add update_vector() callback for apic
- drivers
-Message-ID: <20250826132527.GFaK21x6tEHv6Ti3ot@fat_crate.local>
-References: <20250811094444.203161-1-Neeraj.Upadhyay@amd.com>
- <20250811094444.203161-6-Neeraj.Upadhyay@amd.com>
- <20250819215906.GNaKTzqvk5u0x7O3jw@fat_crate.local>
- <c079f927-483c-46c4-a98e-6ad393cb23ef@amd.com>
- <20250825144926.GVaKx39npwZZ18htgX@fat_crate.local>
- <74234b63-d9c3-4429-848d-0953fa684d5c@amd.com>
+	s=arc-20240116; t=1756217018; c=relaxed/simple;
+	bh=rjO0Dgpa+MvkB9kGuQaPMB5g0ekLMqstP2ZTtpD2Nsk=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=IPrgCrl4AVs9a1nQjt/Vu2wHki3N9TFS0dUQMyJEGm/0NrucEJ6iJx9cuNBnhIUf63gWYDtvPEkBltUROR8tyNOL3j+EofNPPQxjZcUAwBcSRGwjV4Dw4bvdlQPKe2zlyfLdQTZ5R5zqHySj1fOdLdMdxa/0rDwltIZcJGk7kQQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=dYpDFYMj; arc=none smtp.client-ip=209.85.214.201
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+Received: by mail-pl1-f201.google.com with SMTP id d9443c01a7336-246bcd0a112so19734955ad.1
+        for <kvm@vger.kernel.org>; Tue, 26 Aug 2025 07:03:36 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1756217016; x=1756821816; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=aY0FrXGLxgZ/wGxfA4ovaT2GypQmDVl6QRK8fd0deSc=;
+        b=dYpDFYMjq5A4M7IdLrWxOslxljdScIseJH/KmQM2oMg8jfL2soS10kjHsbQpy9NdBS
+         pvl/BX9yfZBfv3tJrQER2yhJsx4mG0B8/vacsDgMCmZdIgoIriJPIl7sD98+CQYP+U7u
+         TzpMXJhnuvNbOotiHzIaZb9yhA6Lq6bvhlou0PwsW8uxT74El1ZKxyi6xvDPnTyNCCyc
+         09WBVrr3BkT2C2sQ99hS9UfbFhYmh6hBhrCTS5HlBv0S+efTDZZHOraer2XkYCXnVG/9
+         d38KZ+ujwROvZV/0Js9rPueHfzfWmz1Hv9IEA4/TCIv6/TQUlaL3iB29hz37LmbccjYJ
+         89PA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1756217016; x=1756821816;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=aY0FrXGLxgZ/wGxfA4ovaT2GypQmDVl6QRK8fd0deSc=;
+        b=aYcPClE/xG/N8gLv5qDcSOHz4nZRyfX/XjOoA27RVhzsAeQ45BWi8uy0SJg2e6ttin
+         8IQY4mzO4tar7xwCkTFwM5nx7tEjNEbJVVt4V0EKKQRmYpYC/pF+4lnYouSR/gJCOg6M
+         qMT7YfQDTHzfD6JCBClK/QwG0TXbGDIqPdbBx3gdUwpCNZFHXTQbrGWPbgu0SvSLhGxd
+         N/TAfp7UsZcOjC2Rr7xL29ZUx1PDDgzEcz1otJDjdZRdMAkrxiDMBKOQGYeu0Cg+AP6f
+         uJc4DqHhghuigI3nYKcPM6cqY+0kmP8iAZtaWOdUgb+dGKRUFHil+n9sFXloX8JsXE9h
+         0+HA==
+X-Forwarded-Encrypted: i=1; AJvYcCUji/Cctc2yC17UB6GY1IjR6ylokc/YrG/k8uwU55e9PgbhlOlTOQ2c5396o/0lnxhKIG8=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyfBFlIuLDwJwSzFtAZsf+NukSr9m06xhXcJcNnlnqHZmPn3cbC
+	qnyB83sMAWZYq7yddJD6HRidv9oOyY5xM6bSXYVIw0euxp5GJnB5aGE5rfyEBA8Fqvd952+naif
+	FI1RqDw==
+X-Google-Smtp-Source: AGHT+IGVJFRNMksQGpAlkIJ4vRSKOikAD8qcNdNTZurK//e/TKsMdmUxA10VRE8eqTCLKXiBB2hNPFQ1m8o=
+X-Received: from pjbso3.prod.google.com ([2002:a17:90b:1f83:b0:320:e3e2:6877])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:902:db0c:b0:240:10dc:b7c9
+ with SMTP id d9443c01a7336-2462ee2ba4dmr144692975ad.9.1756217015845; Tue, 26
+ Aug 2025 07:03:35 -0700 (PDT)
+Date: Tue, 26 Aug 2025 07:03:33 -0700
+In-Reply-To: <20250826034937-mutt-send-email-mst@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <74234b63-d9c3-4429-848d-0953fa684d5c@amd.com>
+Mime-Version: 1.0
+References: <20250826004012.3835150-1-seanjc@google.com> <20250826004012.3835150-2-seanjc@google.com>
+ <20250826034937-mutt-send-email-mst@kernel.org>
+Message-ID: <aK2-tQLL-WN7Mqpb@google.com>
+Subject: Re: [PATCH 1/3] vhost_task: KVM: Don't wake KVM x86's recovery thread
+ if vhost task was killed
+From: Sean Christopherson <seanjc@google.com>
+To: "Michael S. Tsirkin" <mst@redhat.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, Jason Wang <jasowang@redhat.com>, kvm@vger.kernel.org, 
+	virtualization@lists.linux.dev, netdev@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, 
+	Sebastian Andrzej Siewior <bigeasy@linutronix.de>
+Content-Type: text/plain; charset="us-ascii"
 
-On Tue, Aug 26, 2025 at 09:36:56AM +0530, Upadhyay, Neeraj wrote:
-> or chip_data_update_vector() as the updates are specific for a new vector
-> assignment?
+On Tue, Aug 26, 2025, Michael S. Tsirkin wrote:
+> On Mon, Aug 25, 2025 at 05:40:09PM -0700, Sean Christopherson wrote:
+> > Provide an API in vhost task instead of forcing KVM to solve the problem,
+> > as KVM would literally just add an equivalent to VHOST_TASK_FLAGS_KILLED,
+> > along with a new lock to protect said flag.  In general, forcing simple
+> > usage of vhost task to care about signals _and_ take non-trivial action to
+> > do the right thing isn't developer friendly, and is likely to lead to
+> > similar bugs in the future.
+> > 
+> > Debugged-by: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
+> > Link: https://lore.kernel.org/all/aKkLEtoDXKxAAWju@google.com
+> > Link: https://lore.kernel.org/all/aJ_vEP2EHj6l0xRT@google.com
+> > Suggested-by: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
+> > Fixes: d96c77bd4eeb ("KVM: x86: switch hugepage recovery thread to vhost_task")
+> > Cc: stable@vger.kernel.org
+> > Signed-off-by: Sean Christopherson <seanjc@google.com>
+> 
+> OK but I dislike the API.
 
-This function assigns a bunch of things to struct apic_chip_data - not only
-vector.
+FWIW, I don't love it either.
 
-If we had to be precise perhaps update_vector_chip_data() or so. Or
-chip_data_update_for_vector(). To better describe what the function does.
+> Default APIs should be safe. So vhost_task_wake_safe should be
+> vhost_task_wake
+> 
+> This also reduces the changes to kvm.
+> 
+> 
+> It does not look like we need the "unsafe" variant, so pls drop it.
 
-> Got it. However, I see other static functions in this file using "apic_"
-> prefix (in some cases, maybe to differentiate "apic_chip_data" from a
-> generic "chip_data" in common kernel/irq/ subys?).
+vhost_vq_work_queue() calls
 
-Looks like this file would need cleaning up wrt naming but that's not that
-important at the moment I'd say. There are other functions which don't have
-the apic_ prefix so it is kinda arbitrary.
+  vhost_worker_queue()
+  |
+  -> worker->ops->wakeup(worker)
+     |
+     -> vhost_task_wakeup()
+        |
+        -> vhost_task_wake()
 
--- 
-Regards/Gruss,
-    Boris.
+while holding RCU and so can't sleep.
 
-https://people.kernel.org/tglx/notes-about-netiquette
+	rcu_read_lock();
+	worker = rcu_dereference(vq->worker);
+	if (worker) {
+		queued = true;
+		vhost_worker_queue(worker, work);
+	}
+	rcu_read_unlock();
+
+And the call from __vhost_worker_flush() is done while holding a vhost_worker.mutex.
+That's probably ok?  But there are many paths that lead to __vhost_worker_flush(),
+which makes it difficult to audit all flows.  So even if there is an easy change
+for the RCU conflict, I wouldn't be comfortable adding a mutex_lock() to so many
+flows in a patch that needs to go to stable@.
+
+> If we do need it, it should be called __vhost_task_wake.
+
+I initially had that, but didn't like that vhost_task_wake() wouldn't call
+__vhost_task_wake(), i.e. wouldn't follow the semi-standard pattern of the
+no-underscores function being a wrapper for the double-underscores function.
+
+I'm definitely not opposed to that though (or any other naming options).  Sans
+comments, this was my other idea for names:
+
+
+static void ____vhost_task_wake(struct vhost_task *vtsk)
+{
+	wake_up_process(vtsk->task);
+}
+
+void __vhost_task_wake(struct vhost_task *vtsk)
+{
+	WARN_ON_ONCE(!vtsk->handle_sigkill);
+
+	if (WARN_ON_ONCE(test_bit(VHOST_TASK_FLAGS_KILLED, &vtsk->flags)))
+		return;
+
+	____vhost_task_wake(vtsk);
+}
+EXPORT_SYMBOL_GPL(__vhost_task_wake);
+
+void vhost_task_wake(struct vhost_task *vtsk)
+{
+	guard(mutex)(&vtsk->exit_mutex);
+
+	if (WARN_ON_ONCE(test_bit(VHOST_TASK_FLAGS_STOP, &vtsk->flags)))
+		return;
+
+	if (test_bit(VHOST_TASK_FLAGS_KILLED, &vtsk->flags))
+		return;
+
+	____vhost_task_wake(vtsk);
+}
+EXPORT_SYMBOL_GPL(vhost_task_wake);
 
