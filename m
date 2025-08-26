@@ -1,169 +1,183 @@
-Return-Path: <kvm+bounces-55730-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-55731-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id E2635B354D9
-	for <lists+kvm@lfdr.de>; Tue, 26 Aug 2025 08:56:03 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 88879B355C1
+	for <lists+kvm@lfdr.de>; Tue, 26 Aug 2025 09:39:22 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A640F244A91
-	for <lists+kvm@lfdr.de>; Tue, 26 Aug 2025 06:56:03 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 723161B65B29
+	for <lists+kvm@lfdr.de>; Tue, 26 Aug 2025 07:39:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 691E22F6160;
-	Tue, 26 Aug 2025 06:55:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EFAFE2E7F32;
+	Tue, 26 Aug 2025 07:39:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=zytor.com header.i=@zytor.com header.b="TXu8NwlR"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="QEh5DK/Y"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail.zytor.com (terminus.zytor.com [198.137.202.136])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8B1A8502BE;
-	Tue, 26 Aug 2025 06:55:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.136
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A6BEE2E1727
+	for <kvm@vger.kernel.org>; Tue, 26 Aug 2025 07:38:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756191354; cv=none; b=GsDpASFkNhQOAKXWSpi1LRPBhkc/xT0CSryhE6P7JmJxnmZTCd5AFBqZdMt7V24Tcj+ezavVQ3sm5Go835uCyZsb4KPbXQXFiy+JU6lduqo/LESaTByaK88PCJk9lWAl7tJ1EgIOLLWx38xU/M12e7diJ7auo3cRuDlSdAc10ng=
+	t=1756193940; cv=none; b=PK9mXIr24z1XPq41GL9ClRklnSsloTVAqrdT+5aNmtUSfUqIkQ+KVmeu+yS567/dwUJ2A8rVMJo7NCfPJdv1wz44IOMNeVwIV5DaxaZsuCRl0IvSDg0POuiGPo0pv5nMWkmjWCBrlzmObqyewFW+Ia4vd0325ofgKMifaQG6zdw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756191354; c=relaxed/simple;
-	bh=AbFQ84Opa8P2yoCJhAEc+dOQF1w2tEkJ3FXtdJJOOQc=;
-	h=Message-ID:Date:MIME-Version:From:Subject:To:Cc:References:
-	 In-Reply-To:Content-Type; b=RK5xlBJvOTEBwdmhQlDU68V+e/6Q+D4J4adE+4D2rC5CsA+JMuk/6fh0IrL/WRAd8wd6r8m639BfxOu41qL3IOkpb90mujPNTHdpvgSFJLyiuRKGswwWSYpsebI92AXTemOVaeZCX6wzfMahGVnhvS+Butf0XiKhYM8gFeQYfnI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=zytor.com; spf=pass smtp.mailfrom=zytor.com; dkim=pass (2048-bit key) header.d=zytor.com header.i=@zytor.com header.b=TXu8NwlR; arc=none smtp.client-ip=198.137.202.136
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=zytor.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=zytor.com
-Received: from [192.168.7.202] ([71.202.166.45])
-	(authenticated bits=0)
-	by mail.zytor.com (8.18.1/8.17.1) with ESMTPSA id 57Q6slRZ947466
-	(version=TLSv1.3 cipher=TLS_AES_128_GCM_SHA256 bits=128 verify=NO);
-	Mon, 25 Aug 2025 23:54:48 -0700
-DKIM-Filter: OpenDKIM Filter v2.11.0 mail.zytor.com 57Q6slRZ947466
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=zytor.com;
-	s=2025082201; t=1756191292;
-	bh=31hcUTjsqXzWZTOGdQDWB0hfth61bxathytRbPMfT9o=;
-	h=Date:From:Subject:To:Cc:References:In-Reply-To:From;
-	b=TXu8NwlRDu8fDbPcGjqill3BNsHgX0GvUITPYr9IBoHH3GCjfMG7577uDy1GKqRSz
-	 CS/PEXGldgwejkYOy9WWW9FY4RN3+rytjnTMM2BCv+n6fI/vT6jtINChJ9cYv9FZ1U
-	 rTYgdNC2504ShZyWQsoFCIzuAmI7iD+I33HtIroxOjnUymFIKUGH4n22PbuJmS6X2A
-	 PVW3daX2eaqMaVJWJ0mLbTJgOU7UQMuL0LZCQ+FOgorfCgtucKKINyDe38/Ji8Ji4D
-	 5UJLjnqKnHzX0ueHBkY7xkagO426UpcGYNzrYHxqA8aiHBVasEmblnP4Km78MlXOOM
-	 rKLBIPycWoqEA==
-Message-ID: <2ed04dff-e778-46c6-bd5f-51295763af06@zytor.com>
-Date: Mon, 25 Aug 2025 23:54:46 -0700
+	s=arc-20240116; t=1756193940; c=relaxed/simple;
+	bh=uP5dMqsHSqXNlw+qX5Xqd1i4XVlTxybaVEVYi61d/5w=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=q/Q15mLTgWVmTW4fLxCu8szaNxCmUDcedWcwMyiRdDWTAWNVtVuj0epQEfezBIolAIET8q6HjJU26zqhbU37GEpyKA8s/P5sEaW4CO/+KIyWpIUBzp7TItZwdABVllsvtfWd5yze1Ge8CFtQGzPReYbczI/LIwyWiYW0DGsejXA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=QEh5DK/Y; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1756193937;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=/d6oLABXMDTE73AAJmn9nTIS3+npYIzihKgU/wI/Iwk=;
+	b=QEh5DK/YDwMy2tOVAV6/5NboS7c7jZPGl/GZzadZGmJ6CIWPMXdAGM6m9ksToTnzF6x0G+
+	a6UDA7hYGTeLWCPplfct8zNXWeu4uWGh3/hUHY3OmwubwUk2nHec3efpTNgZNiy44W8fQ5
+	vIrFKjP7VVI/KRiQ+KKU60OGLweFB4I=
+Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
+ [209.85.128.69]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-326-EmqwdXw2N72UPgSL2IcqQg-1; Tue, 26 Aug 2025 03:38:54 -0400
+X-MC-Unique: EmqwdXw2N72UPgSL2IcqQg-1
+X-Mimecast-MFC-AGG-ID: EmqwdXw2N72UPgSL2IcqQg_1756193932
+Received: by mail-wm1-f69.google.com with SMTP id 5b1f17b1804b1-45b612dbc28so11347065e9.0
+        for <kvm@vger.kernel.org>; Tue, 26 Aug 2025 00:38:52 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1756193932; x=1756798732;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=/d6oLABXMDTE73AAJmn9nTIS3+npYIzihKgU/wI/Iwk=;
+        b=RxaZd7tdf/ul90PVv1zB8v6TQEJrpQ2BRmR+PF0XBOYkx5rC/ixSJdz6F8o7bZ6P41
+         /KqUOocp+jiU1tk/m3nuzy+x+v4h48dWnz0fOjCYjvSAQjv4D9b3IiwY8H+JwcZ7ThN3
+         Zr8Av/4gJiWuGEshDdx7l27nEKvArmvJ+U0K2tJ0Cg0/2LL1yehlHr1d4LYDSmWhxOOk
+         Bh13jp763cgjYuZRSeeBS8iKVfjnyUgXXpF00912BB94cEkoymV/xTEHSr+Q/TzJlrrv
+         6C8ljCmSJlZC6M1iF1DDZyqYc7p2Id/pZJuQnq0D1CIMPjnatW4QSPTcxPRHVTx/k6KK
+         92qg==
+X-Forwarded-Encrypted: i=1; AJvYcCXjC2tT34OfJDSGSe0oskttZE363Onpe067KTGlLV9eCkz+NqXbF1ey4+XFZOeLbDTJV24=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyPVFHQexRuR1FUXFK5/JJJtnTcZ78hs/xb121P+wrao8t6Oq/1
+	9ZagvL8Arcwhwjm7sYeium5dMmLJCM5Q1cvH0YUIO0lZMStVWSSymAwr65ClJJtEtlpHLQCJHL4
+	Bl2txtcjpOgr+g4mZzbR1GQSpxLm4HDzBbuNW2kqGayTI9tBC7TgWFA==
+X-Gm-Gg: ASbGncuMBbWkabQkA1bclAZEj5VBJ5vaEmzEvX6S+x1NUiKTke+vwKXJCRCokOUg3Ol
+	UY0XVWHucyXbqqk59cB99j+MYH2UUaR7BbVFP9qXoBJ7fgbO1i2lzRXPvPl/ygJS0Z6ttj9e3vr
+	/fLePt7kvVwKMSWnYE7A/mGnmv/MZ+q4s35lFgc3w9ia0rea9+YH8mqVTf+CPE48HVUWqU7nU2K
+	N8H2GfQ2TNSPCyZ+pUNNVKljSrmbiR+UdfgbBi8QJNPefum7wXvDutgpZV5ul3gylAEzuPzY10e
+	Uqy3MGstzC+dI4HuSwnTOKOxW8bomwE=
+X-Received: by 2002:a5d:5d81:0:b0:3b8:893f:a185 with SMTP id ffacd0b85a97d-3c5dce05cc8mr11272231f8f.53.1756193931860;
+        Tue, 26 Aug 2025 00:38:51 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IFHe+NtzZIdZcDMX+QmPMWtx5hDKS6iQR+ufYxm1cVDTFyfIzaA+q1XTB2lol3XvRHtPrWxGw==
+X-Received: by 2002:a5d:5d81:0:b0:3b8:893f:a185 with SMTP id ffacd0b85a97d-3c5dce05cc8mr11272202f8f.53.1756193931395;
+        Tue, 26 Aug 2025 00:38:51 -0700 (PDT)
+Received: from redhat.com ([185.128.27.233])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-45b6133d9f1sm66813785e9.14.2025.08.26.00.38.47
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 26 Aug 2025 00:38:50 -0700 (PDT)
+Date: Tue, 26 Aug 2025 03:38:44 -0400
+From: "Michael S. Tsirkin" <mst@redhat.com>
+To: Namhyung Kim <namhyung@kernel.org>
+Cc: Arnaldo Carvalho de Melo <acme@kernel.org>,
+	Ian Rogers <irogers@google.com>, Jiri Olsa <jolsa@kernel.org>,
+	Adrian Hunter <adrian.hunter@intel.com>,
+	Peter Zijlstra <peterz@infradead.org>,
+	Ingo Molnar <mingo@kernel.org>, LKML <linux-kernel@vger.kernel.org>,
+	linux-perf-users@vger.kernel.org, Jason Wang <jasowang@redhat.com>,
+	kvm@vger.kernel.org, virtualization@lists.linux.dev
+Subject: Re: [PATCH 11/11] tools headers: Sync uapi/linux/vhost.h with the
+ kernel source
+Message-ID: <20250826033710-mutt-send-email-mst@kernel.org>
+References: <20250825215904.2594216-1-namhyung@kernel.org>
+ <20250825215904.2594216-12-namhyung@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-From: Xin Li <xin@zytor.com>
-Subject: Re: [PATCH v13 05/21] KVM: x86: Load guest FPU state when access
- XSAVE-managed MSRs
-To: Chao Gao <chao.gao@intel.com>
-Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org, bp@alien8.de,
-        dave.hansen@linux.intel.com, hpa@zytor.com, john.allen@amd.com,
-        mingo@redhat.com, minipli@grsecurity.net, mlevitsk@redhat.com,
-        pbonzini@redhat.com, rick.p.edgecombe@intel.com, seanjc@google.com,
-        tglx@linutronix.de, weijiang.yang@intel.com, x86@kernel.org
-References: <20250821133132.72322-1-chao.gao@intel.com>
- <20250821133132.72322-6-chao.gao@intel.com>
- <b61f8d7c-e8bf-476e-8d56-ce9660a13d02@zytor.com> <aKvP2AHKYeQCPm0x@intel.com>
-Content-Language: en-US
-Autocrypt: addr=xin@zytor.com; keydata=
- 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
- l75w1xInsg==
-In-Reply-To: <aKvP2AHKYeQCPm0x@intel.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250825215904.2594216-12-namhyung@kernel.org>
 
-On 8/24/2025 7:55 PM, Chao Gao wrote:
->> static bool is_xstate_managed_msr(u32 index)
->> {
->>          if (!kvm_caps.supported_xss)
->>                  return false;
->>
->>          switch (index) {
->>          case MSR_IA32_U_CET:
->>          case MSR_IA32_S_CET:
->>          case MSR_IA32_PL1_SSP ... MSR_IA32_PL3_SSP:
->>                  return kvm_caps.supported_xss & XFEATURE_MASK_CET_USER &&
->>                         kvm_caps.supported_xss & XFEATURE_MASK_CET_KERNEL;
->>          default:
->>                  return false;
-> This will duplicate checks in other functions. I slightly prefer to keep this
-> function super simple and do all capability checks in __kvm_{set,get}_msr()
-> or kvm_emulate_msr_{write,read}.
+On Mon, Aug 25, 2025 at 02:59:03PM -0700, Namhyung Kim wrote:
+> To pick up the changes in this cset:
 > 
->>          }
->> }
->>
->> And it would be obvious how to add new MSRs related to other XFEATURE bits.
-> Just return true for all those MSRs, regardless of host capabilities. If
-> kvm_caps doesn't support them, those MSRs are not advertised to userspace
-> either (see kvm_probe_msr_to_save()). Loading or putting the guest FPU when
-> userspace attempts to read/write those unsupported MSRs shouldn't cause any
-> performance issues, as userspace is unlikely to access them in hot paths.
+>   7d9896e9f6d02d8a vhost: Reintroduce kthread API and add mode selection
+>   333c515d189657c9 vhost-net: allow configuring extended features
+> 
+> This addresses these perf build warnings:
+> 
+>   Warning: Kernel ABI header differences:
+>     diff -u tools/perf/trace/beauty/include/uapi/linux/vhost.h include/uapi/linux/vhost.h
+> 
+> Please see tools/include/uapi/README for further details.
+> 
+> Cc: "Michael S. Tsirkin" <mst@redhat.com>
+> Cc: Jason Wang <jasowang@redhat.com>
+> Cc: kvm@vger.kernel.org
+> Cc: virtualization@lists.linux.dev
+> Signed-off-by: Namhyung Kim <namhyung@kernel.org>
 
-There is no problem as of now, because there are only two CET related bits
-set in KVM_SUPPORTED_XSS.  So if !CET, the two bits are cleared thus
-kvm_caps.supported_xss is 0, and kvm_load_guest_fpu() is never executed in
-__msr_io().
+Acked-by: Michael S. Tsirkin <mst@redhat.com>
 
-However after any new bit is added to KVM_SUPPORTED_XSS in future, if !CET,
-kvm_caps.supported_xss could be non-zero.  There should still be no problem
-because we don't expect any access to CET MSRs.
+Should I queue it?
 
-The trouble comes with MSR_IA32_PL0_SSP when FRED and !CET, because it will
-be accessed even !CET.  And we need to have to do the following:
-
-static bool is_xstate_managed_msr(u32 index)
-{
-	switch (index) {
-	case MSR_IA32_U_CET:
-	case MSR_IA32_PL1_SSP ... MSR_IA32_PL3_SSP:
-		return true;
-	case MSR_IA32_PL0_SSP:
-		return kvm_caps.supported_xss & XFEATURE_MASK_CET_USER &&
-		       kvm_caps.supported_xss & XFEATURE_MASK_CET_KERNEL;
-	default:
-		return false;
-	}
-}
-
-Then it makes more sense to handle all CET MSRs consistently.
-
-Thanks!
-      Xin
+> ---
+> * This is on top of the fix below:
+>   https://lore.kernel.org/r/20250819063958.833770-1-namhyung@kernel.org
+> 
+>  .../trace/beauty/include/uapi/linux/vhost.h   | 35 +++++++++++++++++++
+>  1 file changed, 35 insertions(+)
+> 
+> diff --git a/tools/perf/trace/beauty/include/uapi/linux/vhost.h b/tools/perf/trace/beauty/include/uapi/linux/vhost.h
+> index d4b3e2ae1314d1fc..c57674a6aa0dbbea 100644
+> --- a/tools/perf/trace/beauty/include/uapi/linux/vhost.h
+> +++ b/tools/perf/trace/beauty/include/uapi/linux/vhost.h
+> @@ -235,4 +235,39 @@
+>   */
+>  #define VHOST_VDPA_GET_VRING_SIZE	_IOWR(VHOST_VIRTIO, 0x82,	\
+>  					      struct vhost_vring_state)
+> +
+> +/* Extended features manipulation */
+> +#define VHOST_GET_FEATURES_ARRAY _IOR(VHOST_VIRTIO, 0x83, \
+> +				       struct vhost_features_array)
+> +#define VHOST_SET_FEATURES_ARRAY _IOW(VHOST_VIRTIO, 0x83, \
+> +				       struct vhost_features_array)
+> +
+> +/* fork_owner values for vhost */
+> +#define VHOST_FORK_OWNER_KTHREAD 0
+> +#define VHOST_FORK_OWNER_TASK 1
+> +
+> +/**
+> + * VHOST_SET_FORK_FROM_OWNER - Set the fork_owner flag for the vhost device,
+> + * This ioctl must called before VHOST_SET_OWNER.
+> + * Only available when CONFIG_VHOST_ENABLE_FORK_OWNER_CONTROL=y
+> + *
+> + * @param fork_owner: An 8-bit value that determines the vhost thread mode
+> + *
+> + * When fork_owner is set to VHOST_FORK_OWNER_TASK(default value):
+> + *   - Vhost will create vhost worker as tasks forked from the owner,
+> + *     inheriting all of the owner's attributes.
+> + *
+> + * When fork_owner is set to VHOST_FORK_OWNER_KTHREAD:
+> + *   - Vhost will create vhost workers as kernel threads.
+> + */
+> +#define VHOST_SET_FORK_FROM_OWNER _IOW(VHOST_VIRTIO, 0x84, __u8)
+> +
+> +/**
+> + * VHOST_GET_FORK_OWNER - Get the current fork_owner flag for the vhost device.
+> + * Only available when CONFIG_VHOST_ENABLE_FORK_OWNER_CONTROL=y
+> + *
+> + * @return: An 8-bit value indicating the current thread mode.
+> + */
+> +#define VHOST_GET_FORK_FROM_OWNER _IOR(VHOST_VIRTIO, 0x85, __u8)
+> +
+>  #endif
+> -- 
+> 2.51.0.261.g7ce5a0a67e-goog
 
 
