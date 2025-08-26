@@ -1,199 +1,150 @@
-Return-Path: <kvm+bounces-55776-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-55777-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2C269B3710D
-	for <lists+kvm@lfdr.de>; Tue, 26 Aug 2025 19:16:35 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 21822B37111
+	for <lists+kvm@lfdr.de>; Tue, 26 Aug 2025 19:18:33 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C4F928E3CF0
-	for <lists+kvm@lfdr.de>; Tue, 26 Aug 2025 17:16:33 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 877A68E3F51
+	for <lists+kvm@lfdr.de>; Tue, 26 Aug 2025 17:18:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 819262DC331;
-	Tue, 26 Aug 2025 17:16:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CB7382E3365;
+	Tue, 26 Aug 2025 17:18:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="wj9xKgd9"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="WhU5Bqvf"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pf1-f201.google.com (mail-pf1-f201.google.com [209.85.210.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.10])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1A1DF2D6621
-	for <kvm@vger.kernel.org>; Tue, 26 Aug 2025 17:16:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8ED8E2D9EC9;
+	Tue, 26 Aug 2025 17:18:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.10
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756228585; cv=none; b=jgRpO6Jxhwa/vEtQpIh3iCMGvrhKjzc6ZAIErSvX49p0RDE7xxBoZAFddXRjxIuiQ5SyBWlzs5fzZGBpkjY82GlLu3/9uUdgphtjoE6qHIpfEwPus6CCcgeTGXtSNgF1ybto3rQLhTAdWvLtc8WBeTKzyBxK/bJbIfTHOBZdctU=
+	t=1756228702; cv=none; b=g+pyF9xRDvNF1zvk7V5gUAUTeoqppfHAw4xeRyaqtmtyZnn6xnE/fvbCwLM9K3h1Y0fA7VMSL251keOtpj5qGPfMpSCe7JWJ+EDpNKH7eUCx98BlJ6cFV3KHRrgnBwZpsGN4YJc4RKp8buauaXua6jicuSdVm8wSwpFXlxGVk4o=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756228585; c=relaxed/simple;
-	bh=fvjdVvqrVjKr0a5LTdg9nBk5vfBdc56Vo1TvHP111NU=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=dFOugoHzGqaBTp7T1m3WsR9G4wRsyCAg8hQQAOQzI2Zlz2NZl/tOfI8aNyHjyCNYiqgDQz0vWFcVa6xlfgz4TkW8UMaZ0cCqeVrio2geou1DHSpTC05xrJcyH/JGIjycZYkPw7/kTXYhQ4tIv5o2UZQOLVbFGCZ/YfZFQTsBqBs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=wj9xKgd9; arc=none smtp.client-ip=209.85.210.201
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pf1-f201.google.com with SMTP id d2e1a72fcca58-7704769dbb0so3092586b3a.2
-        for <kvm@vger.kernel.org>; Tue, 26 Aug 2025 10:16:23 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1756228583; x=1756833383; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=EPQkp4eLa51rgoZQsO5XmXkzCVyl1vzwf6yi1FF+7Hs=;
-        b=wj9xKgd9fBgxYmukIeSSBdnF9nqOpbWHWj3J/y72rpcEOv2u9DPGjECgnmU+3oGsju
-         IaqgSYBFkxIa0Ni9POfGW3nWEbKJqPzVpBc3O0UMpnCHDQHKqaEorG0Tr3WA77PKwR4J
-         xI9Pb+GvWPBqjyvbswMKO3prqcUnR2wb1oHCcsfLJRoabpdalJN3yc9l+qI/UZwDHtmw
-         zC8znhZTkKxpQGebunvOc7zh6Y0iv3ZbYNukvkC8AHcpwMU7u8rkdrn8oVglClq9Wu8u
-         8qMGs9oGLxPRJHcChfVQSCsiSadGsSckobwpJThnKcWra3LY7M6dSs4UAiO/2HI2bd3k
-         KxMA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1756228583; x=1756833383;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=EPQkp4eLa51rgoZQsO5XmXkzCVyl1vzwf6yi1FF+7Hs=;
-        b=fNhibXBvAc6kfoZ8rwavzEhIb1NKiQI4tpNtdubXGvm9yqILdyg7HOn5+MNkJ8Wal8
-         Xl4SHR0Ib4hJrCj84urbQNylr90NN/ElESSEhdMwfdkWxxLYnTQrFxCJIhCJ6Mgpf2Xx
-         EIOYzLrVFzln2y3l8x7W730ikMXRTpZxCsfWNKLBkjPPC+4zi6/ZJr4GZ/ld0mooRRpM
-         GgtZe9em3s+vmaKLcPIqHGVwjjaaXySfX/ZrNVtmekcY2heoo/VhCSMjHAYrBwLHFtyd
-         giybqgAlr1XWeIry0HSQGcokpWWUC3I/kdyaNDJRdxkjVogdO6l8HkzyaEk0cxujUZAF
-         /DVA==
-X-Forwarded-Encrypted: i=1; AJvYcCUTFtBasZ980XknNSXMGZhsBHf5bPbeCwZxEOXKHsJVGZpxdK1ud8hdLDtLHFTRp/HXtmI=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwAwcimrYs00spk6yp8G3c8PcuXnNakEXY8A1YamuR0VKWi7oFK
-	4JlAdYDTbilbpxaWgsd+s+KUkj5uWGWJy5sVadwH6esFNceRVv+1ltt2nhT+l7+rndYtprhOU29
-	xuggYZw==
-X-Google-Smtp-Source: AGHT+IGegMNQmVeWNpCzLcs4Xi46pfblu1Kifftbl1fWL6g5w/8bftTv67TFe6za5csVE4uK+DTIuwgIIwA=
-X-Received: from pfva1.prod.google.com ([2002:a05:6a00:c81:b0:771:3e92:f3aa])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:aa7:8251:0:b0:76e:8535:53d9
- with SMTP id d2e1a72fcca58-7702faac358mr17851538b3a.18.1756228583195; Tue, 26
- Aug 2025 10:16:23 -0700 (PDT)
-Date: Tue, 26 Aug 2025 10:16:21 -0700
-In-Reply-To: <9ef0d1f4-3257-4821-8241-aedae0957c6a@linux.intel.com>
+	s=arc-20240116; t=1756228702; c=relaxed/simple;
+	bh=6VbRdo/j5vKqO0M+nXW6ef1zgY50TFQFXYvJ0tGda6E=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=q5e6n49EWvu8fsMzMgzcckN4g2jthYDdzXxKoIjStVIW6XWxiuzZmnrrYIwdS1tULfozmasUQmDSJLIOy/5pvhpZywso4YS/W0QNDoe0RCyNefVtWSTycK/4vIrPgLGsgx4Wj95VS6NWLh29Nl8ZgF98jAADYpVUDa5EedOCj74=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=WhU5Bqvf; arc=none smtp.client-ip=192.198.163.10
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1756228700; x=1787764700;
+  h=message-id:date:mime-version:subject:to:cc:references:
+   from:in-reply-to:content-transfer-encoding;
+  bh=6VbRdo/j5vKqO0M+nXW6ef1zgY50TFQFXYvJ0tGda6E=;
+  b=WhU5BqvfoWdkj70krHIqbXMYBJkhffVgkLwzPVSLUXEMThIBGNXO7bgm
+   oI6Cka1gRCrn7RSvitru3UDeQJ/oXJHoj2oyJTw9DhnT/m5QzojnkWwKq
+   9Zs2ez9cZjF76xgtPRdD+I1CbbBKOodIdIS0cuaVsSIbW49ApcbT+Uj79
+   d0OyTNc2zy7OcMjTGn3y+rZGIGwKM3mwtr0mPY4IAZ+7Ix1/eyg6er2m3
+   +P6yutTZbVIE26JR8ScbbE/2C88ppxiny1ahdhJixkYHp8W+aTA1kiVfW
+   NiPHQ1ZMqQT98kCr/tvzAnO2bBfDuNq3lH71fsfVVTi8/VIc6k7uzi+Qy
+   w==;
+X-CSE-ConnectionGUID: 2L0wW0CvTjOCcxr42V+N0Q==
+X-CSE-MsgGUID: LFINUHJgTxy8tGr6KxRcrA==
+X-IronPort-AV: E=McAfee;i="6800,10657,11534"; a="69842172"
+X-IronPort-AV: E=Sophos;i="6.18,214,1751266800"; 
+   d="scan'208";a="69842172"
+Received: from fmviesa004.fm.intel.com ([10.60.135.144])
+  by fmvoesa104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 26 Aug 2025 10:18:19 -0700
+X-CSE-ConnectionGUID: LsC3meB5S9GzKL/n5a1Vsw==
+X-CSE-MsgGUID: ffZ0OPcHTzOfqkLqutztJQ==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.18,214,1751266800"; 
+   d="scan'208";a="174888807"
+Received: from ldmartin-desk2.corp.intel.com (HELO [10.125.109.16]) ([10.125.109.16])
+  by fmviesa004-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 26 Aug 2025 10:18:18 -0700
+Message-ID: <a578e3b5-9fd3-4f69-943f-9415f4047e19@intel.com>
+Date: Tue, 26 Aug 2025 10:18:17 -0700
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20250821042915.3712925-1-sagis@google.com> <20250821042915.3712925-5-sagis@google.com>
- <9ef0d1f4-3257-4821-8241-aedae0957c6a@linux.intel.com>
-Message-ID: <aK3r5cjLvF3vmJCi@google.com>
-Subject: Re: [PATCH v9 04/19] KVM: selftests: Expose function to allocate
- guest vCPU stack
-From: Sean Christopherson <seanjc@google.com>
-To: Binbin Wu <binbin.wu@linux.intel.com>
-Cc: Sagi Shahar <sagis@google.com>, linux-kselftest@vger.kernel.org, 
-	Paolo Bonzini <pbonzini@redhat.com>, Shuah Khan <shuah@kernel.org>, 
-	Ackerley Tng <ackerleytng@google.com>, Ryan Afranji <afranji@google.com>, 
-	Andrew Jones <ajones@ventanamicro.com>, Isaku Yamahata <isaku.yamahata@intel.com>, 
-	Erdem Aktas <erdemaktas@google.com>, Rick Edgecombe <rick.p.edgecombe@intel.com>, 
-	Roger Wang <runanwang@google.com>, Oliver Upton <oliver.upton@linux.dev>, 
-	"Pratik R. Sampat" <pratikrajesh.sampat@amd.com>, Reinette Chatre <reinette.chatre@intel.com>, 
-	Ira Weiny <ira.weiny@intel.com>, Chao Gao <chao.gao@intel.com>, 
-	Chenyi Qiang <chenyi.qiang@intel.com>, linux-kernel@vger.kernel.org, kvm@vger.kernel.org
-Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v7 7/7] KVM: TDX: Explicitly do WBINVD when no more TDX
+ SEAMCALLs
+To: Sean Christopherson <seanjc@google.com>, Kai Huang <kai.huang@intel.com>
+Cc: bp@alien8.de, tglx@linutronix.de, peterz@infradead.org, mingo@redhat.com,
+ hpa@zytor.com, thomas.lendacky@amd.com, x86@kernel.org, kas@kernel.org,
+ rick.p.edgecombe@intel.com, dwmw@amazon.co.uk, linux-kernel@vger.kernel.org,
+ pbonzini@redhat.com, kvm@vger.kernel.org, reinette.chatre@intel.com,
+ isaku.yamahata@intel.com, dan.j.williams@intel.com, ashish.kalra@amd.com,
+ nik.borisov@suse.com, chao.gao@intel.com, sagis@google.com,
+ farrah.chen@intel.com, Binbin Wu <binbin.wu@linux.intel.com>
+References: <cover.1756161460.git.kai.huang@intel.com>
+ <14f91fcb323fbd80158aadb4b9f240fad9f9487e.1756161460.git.kai.huang@intel.com>
+ <aK3qfbvkCOaCxWC_@google.com>
+From: Dave Hansen <dave.hansen@intel.com>
+Content-Language: en-US
+Autocrypt: addr=dave.hansen@intel.com; keydata=
+ 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
+In-Reply-To: <aK3qfbvkCOaCxWC_@google.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 
-On Tue, Aug 26, 2025, Binbin Wu wrote:
-> 
-> 
-> On 8/21/2025 12:28 PM, Sagi Shahar wrote:
-> > TDX guests' registers cannot be initialized directly using
-> > vcpu_regs_set(), hence the stack pointer needs to be initialized by
-> > the guest itself, running boot code beginning at the reset vector.
-> > 
-> > Expose the function to allocate the guest stack so that TDX
-> > initialization code can allocate it itself and skip the allocation in
-> > vm_arch_vcpu_add() in that case.
-> > 
-> > Signed-off-by: Sagi Shahar <sagis@google.com>
-> > ---
-> >   .../selftests/kvm/include/x86/processor.h       |  2 ++
-> >   tools/testing/selftests/kvm/lib/x86/processor.c | 17 ++++++++++++-----
-> >   2 files changed, 14 insertions(+), 5 deletions(-)
-> > 
-> > diff --git a/tools/testing/selftests/kvm/include/x86/processor.h b/tools/testing/selftests/kvm/include/x86/processor.h
-> > index 5c16507f9b2d..8fcc5118683e 100644
-> > --- a/tools/testing/selftests/kvm/include/x86/processor.h
-> > +++ b/tools/testing/selftests/kvm/include/x86/processor.h
-> > @@ -1111,6 +1111,8 @@ static inline void vcpu_clear_cpuid_feature(struct kvm_vcpu *vcpu,
-> >   	vcpu_set_or_clear_cpuid_feature(vcpu, feature, false);
-> >   }
-> > +vm_vaddr_t kvm_allocate_vcpu_stack(struct kvm_vm *vm);
-> > +
-> >   uint64_t vcpu_get_msr(struct kvm_vcpu *vcpu, uint64_t msr_index);
-> >   int _vcpu_set_msr(struct kvm_vcpu *vcpu, uint64_t msr_index, uint64_t msr_value);
-> > diff --git a/tools/testing/selftests/kvm/lib/x86/processor.c b/tools/testing/selftests/kvm/lib/x86/processor.c
-> > index b2a4b11ac8c0..1eae92957456 100644
-> > --- a/tools/testing/selftests/kvm/lib/x86/processor.c
-> > +++ b/tools/testing/selftests/kvm/lib/x86/processor.c
-> > @@ -687,12 +687,9 @@ void vcpu_arch_set_entry_point(struct kvm_vcpu *vcpu, void *guest_code)
-> >   	vcpu_regs_set(vcpu, &regs);
-> >   }
-> > -struct kvm_vcpu *vm_arch_vcpu_add(struct kvm_vm *vm, uint32_t vcpu_id)
-> > +vm_vaddr_t kvm_allocate_vcpu_stack(struct kvm_vm *vm)
-> >   {
-> > -	struct kvm_mp_state mp_state;
-> > -	struct kvm_regs regs;
-> >   	vm_vaddr_t stack_vaddr;
-> > -	struct kvm_vcpu *vcpu;
-> >   	stack_vaddr = __vm_vaddr_alloc(vm, DEFAULT_STACK_PGS * getpagesize(),
-> >   				       DEFAULT_GUEST_STACK_VADDR_MIN,
-> > @@ -713,6 +710,15 @@ struct kvm_vcpu *vm_arch_vcpu_add(struct kvm_vm *vm, uint32_t vcpu_id)
-> >   		    "__vm_vaddr_alloc() did not provide a page-aligned address");
-> >   	stack_vaddr -= 8;
-> > +	return stack_vaddr;
-> > +}
-> > +
-> > +struct kvm_vcpu *vm_arch_vcpu_add(struct kvm_vm *vm, uint32_t vcpu_id)
-> > +{
-> > +	struct kvm_mp_state mp_state;
-> > +	struct kvm_regs regs;
-> > +	struct kvm_vcpu *vcpu;
-> > +
-> >   	vcpu = __vm_vcpu_add(vm, vcpu_id);
-> >   	vcpu_init_cpuid(vcpu, kvm_get_supported_cpuid());
-> >   	vcpu_init_sregs(vm, vcpu);
-> > @@ -721,7 +727,8 @@ struct kvm_vcpu *vm_arch_vcpu_add(struct kvm_vm *vm, uint32_t vcpu_id)
-> >   	/* Setup guest general purpose registers */
-> >   	vcpu_regs_get(vcpu, &regs);
-> >   	regs.rflags = regs.rflags | 0x2;
-> > -	regs.rsp = stack_vaddr;
-> > +	if (vm->type != KVM_X86_TDX_VM)
-> > +		regs.rsp = kvm_allocate_vcpu_stack(vm);
-> 
-> I am wondering if this could be more generic.
-> I.e, make vcpu_regs_get() return the error code.
+On 8/26/25 10:10, Sean Christopherson wrote:
+>> +void tdx_cpu_flush_cache_for_kexec(void)
+>> +{
+>> +	lockdep_assert_preemption_disabled();
+>> +
+>> +	if (!this_cpu_read(cache_state_incoherent))
+>> +		return;
+>> +
+> Can you add a comment here to explain why this is done even if the kernel doesn't
+> support kexec?  I've no objection to the superfluous flushing, but I've spent far
+> too much time deciphering old commits where the changelog says one thing and the
+> code does something else with no explanation.  I don't want to be party to such
+> crimes 🙂
 
-It would need to be a double-underscores variant, i.e. __vcpu_regs_get().  But
-even then, I don't think it's worth getting that clever, because then to ensure
-selftests aren't hitting KVM bugs, we'd want to assert that failure only occurs
-for a TDX VM, i.e. we'd end up with:
+You mean as opposed to #ifdef'ing it out?
 
-	if (__vcpu_regs_get(vcpu, &regs)) {
-		TEST_ASERT(is_tdx_vm(vm), "blah blah blah"
-	} else {
-
-	}
-
-which doesn't really "save" anything relative to Sagi's proposed version of:
-
-	if (is_tdx_vm(vm)) {
-        	vm_tdx_vcpu_add(vm, vcpu);
-	} else {
-        	vcpu_init_cpuid(vcpu, kvm_get_supported_cpuid());
-
-	        vcpu_init_sregs(vm, vcpu);
-	        vcpu_init_xcrs(vm, vcpu);
-
-        	/* Setup guest general purpose registers */
-	        vcpu_regs_get(vcpu, &regs);
-	        regs.rflags = regs.rflags | 0x2;
-	        regs.rsp = kvm_allocate_vcpu_stack(vm);
-	        vcpu_regs_set(vcpu, &regs);
-	}
-
-> If vcpu_regs_get() failed (for TDX, since it's guest state is protected, the
-> ioctl will return -EINVAL), the vcpu_regs_set(), including the allocation for
-> the vcpu stack, could be skipped.
-> 
-> >   	vcpu_regs_set(vcpu, &regs);
-> >   	/* Setup the MP state */
-> 
+Looking at the code again, I completely agree in concept. The connection
+between TDX, kexec and 'cache_state_incoherent' is totally opaque.
 
