@@ -1,150 +1,132 @@
-Return-Path: <kvm+bounces-55777-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-55778-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 21822B37111
-	for <lists+kvm@lfdr.de>; Tue, 26 Aug 2025 19:18:33 +0200 (CEST)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
+	by mail.lfdr.de (Postfix) with ESMTPS id C757CB3713D
+	for <lists+kvm@lfdr.de>; Tue, 26 Aug 2025 19:21:21 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 877A68E3F51
-	for <lists+kvm@lfdr.de>; Tue, 26 Aug 2025 17:18:31 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id AC5664E1D1B
+	for <lists+kvm@lfdr.de>; Tue, 26 Aug 2025 17:21:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CB7382E3365;
-	Tue, 26 Aug 2025 17:18:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BD8302E7645;
+	Tue, 26 Aug 2025 17:21:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="WhU5Bqvf"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="eqfI5FOU"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.10])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8ED8E2D9EC9;
-	Tue, 26 Aug 2025 17:18:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.10
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6A3C32E371F
+	for <kvm@vger.kernel.org>; Tue, 26 Aug 2025 17:21:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756228702; cv=none; b=g+pyF9xRDvNF1zvk7V5gUAUTeoqppfHAw4xeRyaqtmtyZnn6xnE/fvbCwLM9K3h1Y0fA7VMSL251keOtpj5qGPfMpSCe7JWJ+EDpNKH7eUCx98BlJ6cFV3KHRrgnBwZpsGN4YJc4RKp8buauaXua6jicuSdVm8wSwpFXlxGVk4o=
+	t=1756228871; cv=none; b=hMI3UKLHxVKDYoAqdNrN/p7jqcOYNCvlQMTcVnmvVlnUEKOWdV7wc0ocwDR7MCt7ob5zJJOsBuRSvwXK42Rg5KZqq5NN6PVsUiY23x2DQkTHf62cyqwDixLLAikLYzbrICyIzc0FK+giFLAjiOBwk1HsjgIo5mgH+1/vLotIF04=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756228702; c=relaxed/simple;
-	bh=6VbRdo/j5vKqO0M+nXW6ef1zgY50TFQFXYvJ0tGda6E=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=q5e6n49EWvu8fsMzMgzcckN4g2jthYDdzXxKoIjStVIW6XWxiuzZmnrrYIwdS1tULfozmasUQmDSJLIOy/5pvhpZywso4YS/W0QNDoe0RCyNefVtWSTycK/4vIrPgLGsgx4Wj95VS6NWLh29Nl8ZgF98jAADYpVUDa5EedOCj74=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=WhU5Bqvf; arc=none smtp.client-ip=192.198.163.10
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1756228700; x=1787764700;
-  h=message-id:date:mime-version:subject:to:cc:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=6VbRdo/j5vKqO0M+nXW6ef1zgY50TFQFXYvJ0tGda6E=;
-  b=WhU5BqvfoWdkj70krHIqbXMYBJkhffVgkLwzPVSLUXEMThIBGNXO7bgm
-   oI6Cka1gRCrn7RSvitru3UDeQJ/oXJHoj2oyJTw9DhnT/m5QzojnkWwKq
-   9Zs2ez9cZjF76xgtPRdD+I1CbbBKOodIdIS0cuaVsSIbW49ApcbT+Uj79
-   d0OyTNc2zy7OcMjTGn3y+rZGIGwKM3mwtr0mPY4IAZ+7Ix1/eyg6er2m3
-   +P6yutTZbVIE26JR8ScbbE/2C88ppxiny1ahdhJixkYHp8W+aTA1kiVfW
-   NiPHQ1ZMqQT98kCr/tvzAnO2bBfDuNq3lH71fsfVVTi8/VIc6k7uzi+Qy
-   w==;
-X-CSE-ConnectionGUID: 2L0wW0CvTjOCcxr42V+N0Q==
-X-CSE-MsgGUID: LFINUHJgTxy8tGr6KxRcrA==
-X-IronPort-AV: E=McAfee;i="6800,10657,11534"; a="69842172"
-X-IronPort-AV: E=Sophos;i="6.18,214,1751266800"; 
-   d="scan'208";a="69842172"
-Received: from fmviesa004.fm.intel.com ([10.60.135.144])
-  by fmvoesa104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 26 Aug 2025 10:18:19 -0700
-X-CSE-ConnectionGUID: LsC3meB5S9GzKL/n5a1Vsw==
-X-CSE-MsgGUID: ffZ0OPcHTzOfqkLqutztJQ==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.18,214,1751266800"; 
-   d="scan'208";a="174888807"
-Received: from ldmartin-desk2.corp.intel.com (HELO [10.125.109.16]) ([10.125.109.16])
-  by fmviesa004-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 26 Aug 2025 10:18:18 -0700
-Message-ID: <a578e3b5-9fd3-4f69-943f-9415f4047e19@intel.com>
-Date: Tue, 26 Aug 2025 10:18:17 -0700
+	s=arc-20240116; t=1756228871; c=relaxed/simple;
+	bh=ObpM4zfxjeNqLpjh6zKTISSq/zqH9nAe3Gg+D1X5idY=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=hE6XcwwLAf+KcwwgtkvUtjRAycqNJcac7t5EVkbV38D1RXbzOq7mXpgxwARodLk/bSTRxNpyleG9+xvrIGNImWWU3tfr40Sq9OxPbcDZS5wMrHYZB8CBebpVf1bhx3zenJ9hzQ4J0UUP2jjWsmWhqZ3penRduoiP+IWcHk5f3YU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=eqfI5FOU; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1756228869;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=Fixj3Stcqv3YSb/G1fSDEpAaxUmrXH3yvg6FMQ45Vtc=;
+	b=eqfI5FOUowe1supvsPw6bcwnwrqeU+AixjavXyuvsYa6tTlsU+oFV72ad2wChIrHGOCI/j
+	pfpX8JU/sSANLk/m4KzRuglua5JgtyVHpXUAOK5WQcp1eu3n4qcPDUGffRr0WDPiQJxggd
+	Nzo+8jgF9iWB9sMlICe3ss7AEAP/59I=
+Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
+ [209.85.128.70]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-597-ImggtzeUMoKv9WsLEltNIQ-1; Tue, 26 Aug 2025 13:21:08 -0400
+X-MC-Unique: ImggtzeUMoKv9WsLEltNIQ-1
+X-Mimecast-MFC-AGG-ID: ImggtzeUMoKv9WsLEltNIQ_1756228867
+Received: by mail-wm1-f70.google.com with SMTP id 5b1f17b1804b1-45a1b0514a5so26205595e9.1
+        for <kvm@vger.kernel.org>; Tue, 26 Aug 2025 10:21:07 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1756228867; x=1756833667;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=Fixj3Stcqv3YSb/G1fSDEpAaxUmrXH3yvg6FMQ45Vtc=;
+        b=ByEtd+Y+pIg/cdUXV78DRTnnGGPARtVu4aeTC3KiH0xUONsXy1MKcV/51q1nt5NgPi
+         SF6DTdGSV6+bsxsCLzTfcDoDUb2U4DC9qxAtLDfB3VRFtw5UufSIlTMTU7yr1/SIKjif
+         FbfV3EeHHKTxLXCewza2zzlQhhV0hSo4FQHRaSqdrxh4lH9vVjaRsjORAkPlT4qx1z4Y
+         zhkwKipyg6y0j+OZrdEIzTdxkLcGfrUxvEQJ5xiWeUA8jdCs43p5ElM5NTAtvgo2mw1B
+         6CO9I4WBthfRR6+g7EA+oGbAW+Dr5QhzAtWNtTagAWghV4/ELvTpOFe3QiO2YEDU4GYk
+         OtyA==
+X-Forwarded-Encrypted: i=1; AJvYcCWheTS3xqSaXE8aGTRS3knumdRaDyA9SBET8VoJdq2ByI5ZT7aijeVQBmtZBpsecv3byRA=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzynRWXDdqblLbHCu0b3T1jDZwqBi+zUSo1BAMzr5FXuQxLURf2
+	6gwoCNjvNbASRn5qbn2k9tbhpBJQDj0vfEyIn7ugThsa0NseloIdbveT3t4fK6rFGGH4216cgsj
+	FNTCmfKryjFYftl7l3Yjf/jJ8ZUPVo95MxdZA76fmrzWz0qsdqxVqhOJDW56pgXyzJYx/T1swKp
+	+7lwEgTLpHov44lAly6sE4C0uVIP5T
+X-Gm-Gg: ASbGncs/PhYJHMQ2G5nqfPu6+GFGDWDnCh5Fq+R3h1gPRiqJ7PxO31l6JnmbQ7V8b2J
+	Mik2dBnTSyz97pjol7Nb37o7ABsB5MLspjIrvauKsfDgZdUpyBzc3zWSv8g27DsdYEAW5F5IRRT
+	1K7HgyW3Y0dtVdd2KwDS8t7Ytabp9MUcNRk8hnPN2h0cFsVpNK7REkBOUOdN2flwQuAehmmRESN
+	rjGjgmo8+yoDLWx7YsKh5tG
+X-Received: by 2002:a05:600c:5494:b0:459:94a7:220f with SMTP id 5b1f17b1804b1-45b517dd998mr127408405e9.26.1756228866806;
+        Tue, 26 Aug 2025 10:21:06 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IGQK+UMrmTalA/0yt5zGTuiTwqwEKe+V5z92y/ayCCHYPF/64dT/Zz/jRg3RjoAUNG5Qs7uJdCqXDZ8Y/3DTtM=
+X-Received: by 2002:a05:600c:5494:b0:459:94a7:220f with SMTP id
+ 5b1f17b1804b1-45b517dd998mr127408025e9.26.1756228866380; Tue, 26 Aug 2025
+ 10:21:06 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v7 7/7] KVM: TDX: Explicitly do WBINVD when no more TDX
- SEAMCALLs
-To: Sean Christopherson <seanjc@google.com>, Kai Huang <kai.huang@intel.com>
-Cc: bp@alien8.de, tglx@linutronix.de, peterz@infradead.org, mingo@redhat.com,
- hpa@zytor.com, thomas.lendacky@amd.com, x86@kernel.org, kas@kernel.org,
- rick.p.edgecombe@intel.com, dwmw@amazon.co.uk, linux-kernel@vger.kernel.org,
- pbonzini@redhat.com, kvm@vger.kernel.org, reinette.chatre@intel.com,
- isaku.yamahata@intel.com, dan.j.williams@intel.com, ashish.kalra@amd.com,
- nik.borisov@suse.com, chao.gao@intel.com, sagis@google.com,
- farrah.chen@intel.com, Binbin Wu <binbin.wu@linux.intel.com>
-References: <cover.1756161460.git.kai.huang@intel.com>
- <14f91fcb323fbd80158aadb4b9f240fad9f9487e.1756161460.git.kai.huang@intel.com>
+References: <cover.1756161460.git.kai.huang@intel.com> <14f91fcb323fbd80158aadb4b9f240fad9f9487e.1756161460.git.kai.huang@intel.com>
  <aK3qfbvkCOaCxWC_@google.com>
-From: Dave Hansen <dave.hansen@intel.com>
-Content-Language: en-US
-Autocrypt: addr=dave.hansen@intel.com; keydata=
- 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
 In-Reply-To: <aK3qfbvkCOaCxWC_@google.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+From: Paolo Bonzini <pbonzini@redhat.com>
+Date: Tue, 26 Aug 2025 19:20:54 +0200
+X-Gm-Features: Ac12FXyzQ1leHRicGbaeNR93onBSfmUg8YaGLjd2_nEWUKqlyFd7oqoW-3jonEA
+Message-ID: <CABgObfaZjcDvFVWO7rsr2e_M=F6r=sEq+GHjtEp04uhj29=MuA@mail.gmail.com>
+Subject: Re: [PATCH v7 7/7] KVM: TDX: Explicitly do WBINVD when no more TDX SEAMCALLs
+To: Sean Christopherson <seanjc@google.com>
+Cc: Kai Huang <kai.huang@intel.com>, dave.hansen@intel.com, bp@alien8.de, 
+	tglx@linutronix.de, peterz@infradead.org, mingo@redhat.com, hpa@zytor.com, 
+	thomas.lendacky@amd.com, x86@kernel.org, kas@kernel.org, 
+	rick.p.edgecombe@intel.com, dwmw@amazon.co.uk, linux-kernel@vger.kernel.org, 
+	kvm@vger.kernel.org, reinette.chatre@intel.com, isaku.yamahata@intel.com, 
+	dan.j.williams@intel.com, ashish.kalra@amd.com, nik.borisov@suse.com, 
+	chao.gao@intel.com, sagis@google.com, farrah.chen@intel.com, 
+	Binbin Wu <binbin.wu@linux.intel.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On 8/26/25 10:10, Sean Christopherson wrote:
->> +void tdx_cpu_flush_cache_for_kexec(void)
->> +{
->> +	lockdep_assert_preemption_disabled();
->> +
->> +	if (!this_cpu_read(cache_state_incoherent))
->> +		return;
->> +
-> Can you add a comment here to explain why this is done even if the kernel doesn't
-> support kexec?  I've no objection to the superfluous flushing, but I've spent far
-> too much time deciphering old commits where the changelog says one thing and the
-> code does something else with no explanation.  I don't want to be party to such
-> crimes 🙂
+On Tue, Aug 26, 2025 at 7:10=E2=80=AFPM Sean Christopherson <seanjc@google.=
+com> wrote:
+> Can you add a comment here to explain why this is done even if the kernel=
+ doesn't
+> support kexec?  I've no objection to the superfluous flushing, but I've s=
+pent far
+> too much time deciphering old commits where the changelog says one thing =
+and the
+> code does something else with no explanation.  I don't want to be party t=
+o such
+> crimes :-)
 
-You mean as opposed to #ifdef'ing it out?
+I asked on the review for v6 to make this conditional on CONFIG_KEXEC_CORE
+with a stub; Kai said he'd rather not and I acquiesced, but now it looks
+like we're going to need a v8 just for this comment or to follow that
+suggestion of mine, which I still prefer to a comment.
 
-Looking at the code again, I completely agree in concept. The connection
-between TDX, kexec and 'cache_state_incoherent' is totally opaque.
+To be honest I've never felt so frustrated in ~10 years of participating
+to Linux, and this is not even *my* code.  Not your fault though.
+
+Kai, if you're also frustrated I can handle the v8.  As you prefer.
+
+Paolo
+
+
+Paolo
+
 
