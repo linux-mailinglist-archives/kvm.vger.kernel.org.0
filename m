@@ -1,93 +1,129 @@
-Return-Path: <kvm+bounces-55752-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-55753-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6271AB369F9
-	for <lists+kvm@lfdr.de>; Tue, 26 Aug 2025 16:33:04 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 43100B36C1B
+	for <lists+kvm@lfdr.de>; Tue, 26 Aug 2025 16:52:53 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id CFDC91C41691
-	for <lists+kvm@lfdr.de>; Tue, 26 Aug 2025 14:18:02 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 928161C45C67
+	for <lists+kvm@lfdr.de>; Tue, 26 Aug 2025 14:34:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F2B6035A2AC;
-	Tue, 26 Aug 2025 14:15:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 16B3E35A2B2;
+	Tue, 26 Aug 2025 14:31:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="LwzQTsWT";
-	dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="A6j3O2ty"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="hY5gv1km"
 X-Original-To: kvm@vger.kernel.org
-Received: from galois.linutronix.de (Galois.linutronix.de [193.142.43.55])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pf1-f174.google.com (mail-pf1-f174.google.com [209.85.210.174])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 778D535083D;
-	Tue, 26 Aug 2025 14:15:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.142.43.55
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CBE702135B8;
+	Tue, 26 Aug 2025 14:31:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.174
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756217722; cv=none; b=o1ZnJSOgsaQjcvzEPUVSMITNW1zkFVs5r5yXdkPnoWgjIshBfWuslF/rpIEpJ534ftMXmxXRJznYTj5KNxD1xgsO3AbHdjAyCcHGrGJkaxt7FFj60fdCn63Evx6DU7rFLVQR8s442smQ+KX29Q5PwW6IMbA21HkHXUrCP2lWfQQ=
+	t=1756218706; cv=none; b=O6LJedk38soCBgYXi8mIkdPxSJOepbzec1GtNY0u7GwU9I0meujFBWO6TcyOO+WW/5t5ceQu7J4OU71UOFIZc56gUCoq0NKNfYLdN2YRNvLwYMcGFtmMy9nhQ6YGQfT5sunspkSAa9bbkhdaXBv2L11W0zAqx3/eYRzG+UX2IKI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756217722; c=relaxed/simple;
-	bh=EOBColXHYti+tdwPYRTPX55zWbuLqPbuLsls/+AgNT4=;
+	s=arc-20240116; t=1756218706; c=relaxed/simple;
+	bh=/2HsZ/XIzddkUHUH0J5f1YF3GAgt4K2I1EuGaK5+mTM=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=DFEBJNx4aeoBtWl9oFBHVgjtvc5vwMYONKVyaQFUABsaug6tUBV24eHPNxJi6+k5KYl8D40kazfgw1EVRURWm+4e5r+1ekE/z7bSmWqqYvrJ5m70vKDLbXz3lB2Czq7+Wj6zSb07zf0BfbkZPc3fIJOLlh+fE38P4gPCXD2KyuY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de; spf=pass smtp.mailfrom=linutronix.de; dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=LwzQTsWT; dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=A6j3O2ty; arc=none smtp.client-ip=193.142.43.55
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linutronix.de
-Date: Tue, 26 Aug 2025 16:15:16 +0200
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
-	s=2020; t=1756217718;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=JD9Mbivfzta1IsMjGhVlMntp+L8qXG49mI8iNfMcMUs=;
-	b=LwzQTsWTBoWDx37sRi3tb0PU3Ajs+jz/IKfgLiKgj3SNBo81PY9cpOHKLYzAL7M7X9vCRs
-	FZGI/1VLSRkZcuHln0iZ5qfz+SM1eDSijuB/Vi9uZjAVk0Y33yZKTr4FE/s74aZGZmT4h/
-	O8TAdexVcIbJJkCKyG75v1S+xn56WRN7XgJP0e8vXbA5qQEJ3ucKNNv6VZFFd5o9Oo9v/o
-	XWmC0xk9Js+MZ8isbL1alwMkXPg0W1s3qGoXJrBsrCiu8+nevAS+W5Bu69sGuokDrvlDCp
-	xgZQVQkjEkXrLyta5s3CeLOfEagrmQej97s3+K1uhaWYNuITz22ijE4mbjqPmg==
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
-	s=2020e; t=1756217718;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=JD9Mbivfzta1IsMjGhVlMntp+L8qXG49mI8iNfMcMUs=;
-	b=A6j3O2tyCWBZzBRinhAyFlVtysNem2GxcBdeDD2YKoHgxzqgkyMt4mGki+3QnNz32c7ZgL
-	BbCCPDifu1NpmFBg==
-From: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
-To: Sean Christopherson <seanjc@google.com>
-Cc: "Michael S. Tsirkin" <mst@redhat.com>,
-	Paolo Bonzini <pbonzini@redhat.com>,
-	Jason Wang <jasowang@redhat.com>, kvm@vger.kernel.org,
-	virtualization@lists.linux.dev, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH 1/3] vhost_task: KVM: Don't wake KVM x86's recovery
- thread if vhost task was killed
-Message-ID: <20250826141516.f_jWThaV@linutronix.de>
-References: <20250826004012.3835150-1-seanjc@google.com>
- <20250826004012.3835150-2-seanjc@google.com>
- <20250826034937-mutt-send-email-mst@kernel.org>
- <aK2-tQLL-WN7Mqpb@google.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=HaqvgIebC6l09C2UyYbMZvwDWKZFyrjqrHbS+h8VrqWLZAmmTgysAtgifyrItTLNoaPFS2Pa55YGb8/pVWTACPkZrxZLQLa7/hdDP9UH5M10hqFnIWoa1dEF9RtzGd9rcYQmZZeUJN4F0E8aIK+jRlO+ih0atxL0xTbtc0NRbVU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=hY5gv1km; arc=none smtp.client-ip=209.85.210.174
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pf1-f174.google.com with SMTP id d2e1a72fcca58-76e39ec6f30so5480500b3a.2;
+        Tue, 26 Aug 2025 07:31:44 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1756218704; x=1756823504; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=/2HsZ/XIzddkUHUH0J5f1YF3GAgt4K2I1EuGaK5+mTM=;
+        b=hY5gv1kmjgdKTxlYLJn4A03RAEl8yDBA8AopKwMkPGDcC8G9LRLSHfh7mBotg3st0P
+         hzVhY5t/fRp3ErzbsRaSYbUsY2/ctBZrYhxPYjhPn/VS/M6Rkc9v9ATLJPwZsiDLpJdo
+         Vmg1k6TZJby7gRiO5hRC/ztKEBkxjxUIyKofVSZgn2kRhn/59diMfRYmdDVfI0HsLwLe
+         Te28cQHJrrhGOLItohGQJVbogJlZ/BhQiRjXEGunXB3nkc/MavIvvHneP0k59TF3B0me
+         io5c45nQd3Ju7K1GXYoML9nZEo/+zY/xV3e5xYUm8hBXBV/f86mbnxyRQDSeD6OJy/6g
+         5mdw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1756218704; x=1756823504;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=/2HsZ/XIzddkUHUH0J5f1YF3GAgt4K2I1EuGaK5+mTM=;
+        b=iy2cCDbHff0qswa30YDe9GogA12P3hCz7n6XTfuK1INIfbkpZqZlMbrgMksTRg4akK
+         5lSEgCG0dVeDtinkw2ZXsj3TstFBQLbdzo1vq+hXj1cUiAi3eS51gw3v/tnHUbzNcfbq
+         qBC153foau/olTnqTI9CRFYh/wFdkyXOHDdpRWsctSfx6XwNbT7cexDrwTs9Y4ycmd2D
+         xL/mcl63++KzkgPAyyrPkOMgqgXzaKa1T5UlTPnnUmF4hD9oYKwg9l2x1c7fCq/5cV1x
+         67GqyIWMTPGX3QweYG6BGf+hVsHGXEK3J1ZLEBkbUMNeT8/ON9/Wafw7zDEgC7FXI28E
+         Md1Q==
+X-Forwarded-Encrypted: i=1; AJvYcCU6MOtpGE2wf91ApxxJqdU4WYBRQc7Ze6f+M1NEbUEf8TpnXu9ZGEdZICQF4T1CShH0THE=@vger.kernel.org, AJvYcCXVzkX8PQMsviUdRwkRMI+2+xwwtaOQEwUHUUfDyzEW8XyTInII6kQH4X8TU88fhTAfVt9VUiTg0IH4@vger.kernel.org
+X-Gm-Message-State: AOJu0YxsC9ehBqiYj2SX7ls5pXUT8w7cTjnRsXYchNnqOfpdWhLHP7il
+	9CVS2IpcRv+MkeVgYqkkAKd2hKB9OGfvC4oFcgN8K9nnQ2Apj36ku1ue
+X-Gm-Gg: ASbGncuM3WS9xkbxikZuSJKofq+8GpXGZTIMqHyhbKw/HH8S9X/a3FVNaP1mj5BWxnD
+	xO8wC/MNjYzLcgItYo6DnSi7vvxucyqjozjWMK+7IDqSyTOnihfSRpkNjBm2jD0ATHym8mq3nGp
+	mqcexieqvtVpkKNlFC/Qqn5GXpnwrI/Y0x4H19eCsFjMbqQXbwvpM7jp1WeYX/cBlYWttqXBffF
+	s4Bp97vLY/hoCKd1OFYPLb67aG4TgMhH0MZwWklBlAiww5qslX249NPNax3ES0ztx+QX0/peI28
+	lNyun3vqRArFIoU/NlqI+MKRP8CAbXsO+0dw5SBK9M1cGem23JoiLbib2kkrpPDTxVupReq2I3V
+	YxPGt4OaVg8objkiBZzqU2A==
+X-Google-Smtp-Source: AGHT+IFm+XrOlSim9C8ckicCEIkpgvafeXXcgdVuWrC98u30twNdBGpbSt44emTPsPlVfiBYYAcZ0w==
+X-Received: by 2002:a17:903:2f4e:b0:246:b463:cabf with SMTP id d9443c01a7336-246b463dcdemr91050425ad.8.1756218703821;
+        Tue, 26 Aug 2025 07:31:43 -0700 (PDT)
+Received: from archie.me ([103.124.138.155])
+        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-b49cbb9ce58sm9278046a12.40.2025.08.26.07.31.42
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 26 Aug 2025 07:31:42 -0700 (PDT)
+Received: by archie.me (Postfix, from userid 1000)
+	id AB512420BAAE; Tue, 26 Aug 2025 21:31:38 +0700 (WIB)
+Date: Tue, 26 Aug 2025 21:31:38 +0700
+From: Bagas Sanjaya <bagasdotme@gmail.com>
+To: Alok Tiwari <alok.a.tiwari@oracle.com>, pbonzini@redhat.com,
+	corbet@lwn.net, kvm@vger.kernel.org, linux-doc@vger.kernel.org,
+	rdunlap@infradead.org
+Cc: linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] Documentation: KVM: fix reference for kvm_ppc_resize_hpt
+ and various typos
+Message-ID: <aK3FSpONL01-Dexa@archie.me>
+References: <20250824075455.602185-1-alok.a.tiwari@oracle.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="DLPwMqCHcj94pYC/"
+Content-Disposition: inline
+In-Reply-To: <20250824075455.602185-1-alok.a.tiwari@oracle.com>
+
+
+--DLPwMqCHcj94pYC/
 Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <aK2-tQLL-WN7Mqpb@google.com>
+Content-Transfer-Encoding: quoted-printable
 
-On 2025-08-26 07:03:33 [-0700], Sean Christopherson wrote:
-> And the call from __vhost_worker_flush() is done while holding a vhost_worker.mutex.
-> That's probably ok?  But there are many paths that lead to __vhost_worker_flush(),
-> which makes it difficult to audit all flows.  So even if there is an easy change
-> for the RCU conflict, I wouldn't be comfortable adding a mutex_lock() to so many
-> flows in a patch that needs to go to stable@.
+On Sun, Aug 24, 2025 at 12:54:48AM -0700, Alok Tiwari wrote:
+> Fix the incorrect reference to struct kvm_reinject_control and replace
+> it with the correct struct kvm_ppc_resize_hpt in the documentation of
+> the HPT resize ioctl.
+>=20
 
-If I may throw something else into the mix: If you do "early"
-get_task_struct() on the thread (within the thread), then you could wake
-it even after its do_exit() since the task_struct would remain valid.
-Once you remove it from all structs where it can be found, you would do
-the final put_task_struct().
+LGTM, thanks!
 
-Sebastian
+Reviewed-by: Bagas Sanjaya <bagasdotme@gmail.com>
+
+--=20
+An old man doll... just what I always wanted! - Clara
+
+--DLPwMqCHcj94pYC/
+Content-Type: application/pgp-signature; name=signature.asc
+
+-----BEGIN PGP SIGNATURE-----
+
+iHUEABYKAB0WIQSSYQ6Cy7oyFNCHrUH2uYlJVVFOowUCaK3FQAAKCRD2uYlJVVFO
+o1lkAQDMiJWsc4VcsMe3oMv646Tp9Hd4gu42IXlJNeyvZAmzywD8C5IOiJx3Vzuw
+R3bu3JNtZyydzXM6eTuqyYiGqy/RoAs=
+=jthh
+-----END PGP SIGNATURE-----
+
+--DLPwMqCHcj94pYC/--
 
