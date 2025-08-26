@@ -1,120 +1,93 @@
-Return-Path: <kvm+bounces-55750-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-55752-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 26221B36791
-	for <lists+kvm@lfdr.de>; Tue, 26 Aug 2025 16:08:19 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6271AB369F9
+	for <lists+kvm@lfdr.de>; Tue, 26 Aug 2025 16:33:04 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id BF7C3B62446
-	for <lists+kvm@lfdr.de>; Tue, 26 Aug 2025 14:05:30 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id CFDC91C41691
+	for <lists+kvm@lfdr.de>; Tue, 26 Aug 2025 14:18:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 458BB350D5D;
-	Tue, 26 Aug 2025 14:05:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F2B6035A2AC;
+	Tue, 26 Aug 2025 14:15:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="Tdsfn3ZI"
+	dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="LwzQTsWT";
+	dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="A6j3O2ty"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pl1-f202.google.com (mail-pl1-f202.google.com [209.85.214.202])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from galois.linutronix.de (Galois.linutronix.de [193.142.43.55])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F28D023DE
-	for <kvm@vger.kernel.org>; Tue, 26 Aug 2025 14:05:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 778D535083D;
+	Tue, 26 Aug 2025 14:15:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.142.43.55
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756217117; cv=none; b=ABY/+7irok4GI81y5Fh8emDLCQuVeItevTp06ZS79egkE0YCCPHQhcBSpSAF9nVh4SsPBxXjYxf3z9HiJSKlN9qvsytlcNLqn3WIHuhdxW69kqEnPEo5I5xLxZsei2XRPiUrthZq4aWLxTgFGja/m0klaNrloGX8buQ+Gb68APc=
+	t=1756217722; cv=none; b=o1ZnJSOgsaQjcvzEPUVSMITNW1zkFVs5r5yXdkPnoWgjIshBfWuslF/rpIEpJ534ftMXmxXRJznYTj5KNxD1xgsO3AbHdjAyCcHGrGJkaxt7FFj60fdCn63Evx6DU7rFLVQR8s442smQ+KX29Q5PwW6IMbA21HkHXUrCP2lWfQQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756217117; c=relaxed/simple;
-	bh=E47bQJ0fSKLMTa4+BbXXtJ7X4w0mQUaOEOsTXbSBPvs=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=nN9dl5EQNuTh1PidYIOXuyX+/H/MOzolfaK0N/2z8DEcnQpXepcv9iUGKe7GBqoS9fPRmqi60TNaCHCRuj2CJR4zJ+myt5mJB0WNAY3lYL3wTWFPCNEunLJH1va+FBRe4kYxM+BRpAVhxKZRRLYtLvFAh+igj5cTXgpsn8/PsBo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=Tdsfn3ZI; arc=none smtp.client-ip=209.85.214.202
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pl1-f202.google.com with SMTP id d9443c01a7336-2464dc09769so90500545ad.0
-        for <kvm@vger.kernel.org>; Tue, 26 Aug 2025 07:05:15 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1756217115; x=1756821915; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=M8sjcZwofKG6BnJQmAymrI3Jle93znSmRx0EtubpPtg=;
-        b=Tdsfn3ZILUtiBA0AQQ6P1e1sIjHJYzUeNBEm/wf838nYk2Ng3p/onkIu/vSx7DcRr8
-         F2s8I6lJlMQuK6TnMRogZgpqr2ffnB8Mc2v36qjmk6lCEM4mfP7RfoxVfFxfaRYx8FDZ
-         r9a8Os9nhuad8+HZX2n8DfPrQlKSueh0s0owNwgAPO5CDwmLvBN0SIA/IbZBuvtzVSwK
-         M1hlpwC6ul9h2oiyP+HUf7MjKucb0zoVnLLhYpHFOlbSxBZrahssld5wG8W4Js/rHLbs
-         4blIQAVFEhHz8g5X3eNY5/WzfP5GddN/pvDNk52y3Sa5T91VLUQD60VZtcmMMPn1XI2B
-         kZDA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1756217115; x=1756821915;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=M8sjcZwofKG6BnJQmAymrI3Jle93znSmRx0EtubpPtg=;
-        b=rihK11ZM/xHeaVLVO3eFjhd1z2n96InkEuNQEjYisyQ0Qucbz6WnOzw4MQ0q71fqRY
-         A2lo3ogzwcPfd8cl9Dwylp3Jb/9xttzDcxX5o24b9wZMzBdfLolgY7JqvrJoiqmwMGzK
-         hE6TEXYh7vn13AuLHSh+7PffgVkc6qJXUZG/pSWZhabPLM2Gi9td9CoFJC55RRHypzLW
-         vgVJzwuBnUpOk1j5vwEqxTE9NeUzvGwDQrhlo+ZJHPEbVirnF8O3dOUEfZs9nUjYN6N3
-         S+zx59jJyf+QfQfRI9XazFGDT3W+IbzaqgxuPEdbRIAAEZunPZVmuGBew1bWMqNvUMWi
-         B6bA==
-X-Forwarded-Encrypted: i=1; AJvYcCWkePV/A195XaWcf2Fv8ji138NtTPTlXRQuVkWT3p8gJjrNkzeAoRXfGlEBpf0CX5C08sM=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yw2rVlLtQ/uIrD2NSSBsuXHsBNEZhQ9UYvE3Z4BYu6z8Lw9sTrL
-	UkCANTMkmy2/V3V55rX3VN7+nmtPWu3An9tsILaOmeC4vqewvh0ZZ18gaeBgcvB15aGvjGf8ryQ
-	peTAABQ==
-X-Google-Smtp-Source: AGHT+IGb7UTw93XDTXoLc3UC3K1e508fQEqN/Z8f7EWKzjedshJnEFb0jKrFZrSKXsmYFuidjgvX5MOYCtw=
-X-Received: from pjzz12.prod.google.com ([2002:a17:90b:58ec:b0:324:eb0d:70e8])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:903:3d0c:b0:240:9f9:46b1
- with SMTP id d9443c01a7336-2462ef3e955mr197406155ad.37.1756217115314; Tue, 26
- Aug 2025 07:05:15 -0700 (PDT)
-Date: Tue, 26 Aug 2025 07:05:12 -0700
-In-Reply-To: <e04d31a3-3243-4141-88d2-1f0ade6d648a@linux.intel.com>
+	s=arc-20240116; t=1756217722; c=relaxed/simple;
+	bh=EOBColXHYti+tdwPYRTPX55zWbuLqPbuLsls/+AgNT4=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=DFEBJNx4aeoBtWl9oFBHVgjtvc5vwMYONKVyaQFUABsaug6tUBV24eHPNxJi6+k5KYl8D40kazfgw1EVRURWm+4e5r+1ekE/z7bSmWqqYvrJ5m70vKDLbXz3lB2Czq7+Wj6zSb07zf0BfbkZPc3fIJOLlh+fE38P4gPCXD2KyuY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de; spf=pass smtp.mailfrom=linutronix.de; dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=LwzQTsWT; dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=A6j3O2ty; arc=none smtp.client-ip=193.142.43.55
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linutronix.de
+Date: Tue, 26 Aug 2025 16:15:16 +0200
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
+	s=2020; t=1756217718;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=JD9Mbivfzta1IsMjGhVlMntp+L8qXG49mI8iNfMcMUs=;
+	b=LwzQTsWTBoWDx37sRi3tb0PU3Ajs+jz/IKfgLiKgj3SNBo81PY9cpOHKLYzAL7M7X9vCRs
+	FZGI/1VLSRkZcuHln0iZ5qfz+SM1eDSijuB/Vi9uZjAVk0Y33yZKTr4FE/s74aZGZmT4h/
+	O8TAdexVcIbJJkCKyG75v1S+xn56WRN7XgJP0e8vXbA5qQEJ3ucKNNv6VZFFd5o9Oo9v/o
+	XWmC0xk9Js+MZ8isbL1alwMkXPg0W1s3qGoXJrBsrCiu8+nevAS+W5Bu69sGuokDrvlDCp
+	xgZQVQkjEkXrLyta5s3CeLOfEagrmQej97s3+K1uhaWYNuITz22ijE4mbjqPmg==
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
+	s=2020e; t=1756217718;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=JD9Mbivfzta1IsMjGhVlMntp+L8qXG49mI8iNfMcMUs=;
+	b=A6j3O2tyCWBZzBRinhAyFlVtysNem2GxcBdeDD2YKoHgxzqgkyMt4mGki+3QnNz32c7ZgL
+	BbCCPDifu1NpmFBg==
+From: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
+To: Sean Christopherson <seanjc@google.com>
+Cc: "Michael S. Tsirkin" <mst@redhat.com>,
+	Paolo Bonzini <pbonzini@redhat.com>,
+	Jason Wang <jasowang@redhat.com>, kvm@vger.kernel.org,
+	virtualization@lists.linux.dev, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH 1/3] vhost_task: KVM: Don't wake KVM x86's recovery
+ thread if vhost task was killed
+Message-ID: <20250826141516.f_jWThaV@linutronix.de>
+References: <20250826004012.3835150-1-seanjc@google.com>
+ <20250826004012.3835150-2-seanjc@google.com>
+ <20250826034937-mutt-send-email-mst@kernel.org>
+ <aK2-tQLL-WN7Mqpb@google.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20250821042915.3712925-1-sagis@google.com> <20250821042915.3712925-4-sagis@google.com>
- <e04d31a3-3243-4141-88d2-1f0ade6d648a@linux.intel.com>
-Message-ID: <aK2_GMSYuPCXe1A6@google.com>
-Subject: Re: [PATCH v9 03/19] KVM: selftests: Expose functions to get default
- sregs values
-From: Sean Christopherson <seanjc@google.com>
-To: Binbin Wu <binbin.wu@linux.intel.com>
-Cc: Sagi Shahar <sagis@google.com>, linux-kselftest@vger.kernel.org, 
-	Paolo Bonzini <pbonzini@redhat.com>, Shuah Khan <shuah@kernel.org>, 
-	Ackerley Tng <ackerleytng@google.com>, Ryan Afranji <afranji@google.com>, 
-	Andrew Jones <ajones@ventanamicro.com>, Isaku Yamahata <isaku.yamahata@intel.com>, 
-	Erdem Aktas <erdemaktas@google.com>, Rick Edgecombe <rick.p.edgecombe@intel.com>, 
-	Roger Wang <runanwang@google.com>, Oliver Upton <oliver.upton@linux.dev>, 
-	"Pratik R. Sampat" <pratikrajesh.sampat@amd.com>, Reinette Chatre <reinette.chatre@intel.com>, 
-	Ira Weiny <ira.weiny@intel.com>, Chao Gao <chao.gao@intel.com>, 
-	Chenyi Qiang <chenyi.qiang@intel.com>, linux-kernel@vger.kernel.org, kvm@vger.kernel.org
-Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <aK2-tQLL-WN7Mqpb@google.com>
 
-On Tue, Aug 26, 2025, Binbin Wu wrote:
-> On 8/21/2025 12:28 PM, Sagi Shahar wrote:
-> > TDX can't set sregs values directly using KVM_SET_SREGS. Expose the
-> > default values of certain sregs used by TDX VMs so they can be set
-> > manually.
-> > 
-> > Signed-off-by: Sagi Shahar <sagis@google.com>
-> > ---
-> >   .../selftests/kvm/include/x86/processor.h     |  6 +++
-> >   .../testing/selftests/kvm/lib/x86/processor.c | 41 +++++++++++++++----
-> >   2 files changed, 40 insertions(+), 7 deletions(-)
-> > 
-> > diff --git a/tools/testing/selftests/kvm/include/x86/processor.h b/tools/testing/selftests/kvm/include/x86/processor.h
-> > index 2efb05c2f2fb..5c16507f9b2d 100644
-> > --- a/tools/testing/selftests/kvm/include/x86/processor.h
-> > +++ b/tools/testing/selftests/kvm/include/x86/processor.h
-> > @@ -1026,6 +1026,12 @@ static inline struct kvm_cpuid2 *allocate_kvm_cpuid2(int nr_entries)
-> >   void vcpu_init_cpuid(struct kvm_vcpu *vcpu, const struct kvm_cpuid2 *cpuid);
-> > +uint16_t kvm_get_default_idt_limit(void);
-> > +uint16_t kvm_get_default_gdt_limit(void);
-> > +uint64_t kvm_get_default_cr0(void);
-> > +uint64_t kvm_get_default_cr4(void);
-> > +uint64_t kvm_get_default_efer(void);
-> Can these be defined in the header file as static inline?
+On 2025-08-26 07:03:33 [-0700], Sean Christopherson wrote:
+> And the call from __vhost_worker_flush() is done while holding a vhost_worker.mutex.
+> That's probably ok?  But there are many paths that lead to __vhost_worker_flush(),
+> which makes it difficult to audit all flows.  So even if there is an easy change
+> for the RCU conflict, I wouldn't be comfortable adding a mutex_lock() to so many
+> flows in a patch that needs to go to stable@.
 
-Yes please.  Performance isn't a concern, but as a developer, it's nice to not
-have to bounce to a definition to find such simple information.
+If I may throw something else into the mix: If you do "early"
+get_task_struct() on the thread (within the thread), then you could wake
+it even after its do_exit() since the task_struct would remain valid.
+Once you remove it from all structs where it can be found, you would do
+the final put_task_struct().
+
+Sebastian
 
