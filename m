@@ -1,171 +1,114 @@
-Return-Path: <kvm+bounces-55744-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-55745-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 87E28B35EFA
-	for <lists+kvm@lfdr.de>; Tue, 26 Aug 2025 14:17:05 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id C5E7BB36128
+	for <lists+kvm@lfdr.de>; Tue, 26 Aug 2025 15:07:14 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 1F12C7B200D
-	for <lists+kvm@lfdr.de>; Tue, 26 Aug 2025 12:15:17 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 899C42A32B8
+	for <lists+kvm@lfdr.de>; Tue, 26 Aug 2025 13:03:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 29A19318146;
-	Tue, 26 Aug 2025 12:16:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="TgUPSRj3"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0BC8123BD1A;
+	Tue, 26 Aug 2025 13:03:30 +0000 (UTC)
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DED2A393DF2
-	for <kvm@vger.kernel.org>; Tue, 26 Aug 2025 12:16:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 338221FBE9B;
+	Tue, 26 Aug 2025 13:03:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756210599; cv=none; b=bMgc63YLbd9ZDtm+6zgm9V4JPIpHoGLVkRCHo9cPhf5wFyKhzq87uNl2atJuU9mlcW7kSo/bQVr7ohJ3NFdmy0Ub1qRwR0P1YeRExOZ0oJ/CeWMCIBA2u1Ml5udqTriTffRV+ojrEk1at6VsOMNsQOku8EknlSE16gVTTwDBUpM=
+	t=1756213409; cv=none; b=YYKLJLgtX0P9ZjVxnyH1jr/DA9TrgfmLqLlgKF5LQ2rN/gLduE9IYFP4OradlZQpgn5kXXpxUp1aqDTnoYlvMXes78XIapXm7WU4ej4p9fh4ybcIlTYvtAGlLtzZwwqRLSIf39rfmTd+d6n21knZcBq3ZAT3un2F2JFGOlvuE8s=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756210599; c=relaxed/simple;
-	bh=/kBnjHicWLRIMWZ5D1z8Ghfc30Q8BGyIoEzgG5YmKrw=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=uj22BQgsiGZLMSFfiHrK5KbC13L9XzLZQRARZcQjlKDexw+xYUM9sL49bnUjHpfmDBHjG1k63ovyGdAY3SZvDpBW1TZzeBEw6NawptvHQVbgplCbHJXTSs/cTeSvsV4HgE5CBRuDbzzMoKlEjEJULkCUcuLzmC5AI1SfVZuvkXw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=TgUPSRj3; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1756210596;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-	bh=diVEa1Cfz6ig0T6TvL360ugfmN6YpEKzRLn9DgHizSM=;
-	b=TgUPSRj3Mn3qrkr+jYz1C+joq5vreRSIHtW1dbhpLDka7I81jm2OXw5RSOYA896lcKtkmA
-	StFYvWSs4Nf6MuTyEsBIcUsCQOUvz5wa8McdBm8yADi9mn216GAOs76qvvBFZsHs/ijSQx
-	K0FJgRbawY6y7AQpkjQj77XRI4wR2Pk=
-Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
- [209.85.128.69]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-687-cifNCBXGOiihRt-3ENHIkg-1; Tue, 26 Aug 2025 08:16:35 -0400
-X-MC-Unique: cifNCBXGOiihRt-3ENHIkg-1
-X-Mimecast-MFC-AGG-ID: cifNCBXGOiihRt-3ENHIkg_1756210594
-Received: by mail-wm1-f69.google.com with SMTP id 5b1f17b1804b1-45a1b0511b3so32804045e9.1
-        for <kvm@vger.kernel.org>; Tue, 26 Aug 2025 05:16:35 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1756210594; x=1756815394;
-        h=content-transfer-encoding:in-reply-to:autocrypt:content-language
-         :from:references:cc:to:subject:user-agent:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=diVEa1Cfz6ig0T6TvL360ugfmN6YpEKzRLn9DgHizSM=;
-        b=kez+UmqxgKF2jTh32Jz30t/DcIsNit9AEXC/wp4AR1kjOhBvUDcnwhhUla54+MFwHu
-         L/U5u9SIwpnTVmfWvAd+E8H3uE/TqgW9/lEeXwtYw+r+euTdsLTuHuZzJF28iDroXYIH
-         Wnx6c4s5HYMN95p8wc/LmkMxbPA8ZjFO+g25bUom2YqOuiJpdR3A7YEpaV2mU7LAcvuU
-         ZzyIgujTs9i9vtyOyhwDc4akHIXHuN2Di60sEhYBPy9m7cgghT0IhBoyPFGrmKFrQC1G
-         aioNPSr53otJO4u2MfFQsCQ/ORdl3W3BY5IcNfylJp2o/5dI5NOCXoABzu+urXKsrSGe
-         rVlQ==
-X-Forwarded-Encrypted: i=1; AJvYcCU7lHnD2DVwMsyMhrU8WzDgFlzLfV3WlEXmomN6LRf/iwWYJOlhLlmAqDBJOmoeVw4H72E=@vger.kernel.org
-X-Gm-Message-State: AOJu0YykxMfBJF8UlxlbOtkijftddYWyX3xi5IG1RJ+c5KM0jkzFhKlh
-	MTw/DWbLr7pqwlVHCQAk9z8ONXbIbvZOm4ToB8NpaVHFfAWqsS2gAiOJCJhu49LWPN2uSD0VEXC
-	k2ue+Uj7h6w9dUp8/R3MdzUBk+t85A7q54F292E1Ep90RmwsNEzg88WkyNrLJ0g==
-X-Gm-Gg: ASbGncvD9m94ix/Kfy5RsZMJi08eHN32ZnFSArVXZADu3zWnvVntfCk0yJKIHIzYac+
-	Pt9j2I232YgWoyRrCkjvcBaFmrbk5LX5WzfP8Rlk4smg2teowodgjtPVVNeUAwUSEEbh6kgKt81
-	GA3Ihfi/z8F7E8ZNW9rGDTJIcmBdAzzVlbB3zWgxoLZzm23IhHt5IcHyWsplVEY6QiuHl3jrNhD
-	SSDaZktV2fAjMDTeHgp0ktHYtrEbMvWgl1zEkG9PunLu97E1aENmCow2B9kqTNAWrS17enEzEbI
-	A/BMKQ+obGkoUQyQtTf38tkWdfauDr2CIlvmW+smzDItBe4x2XMY9P/j6X2ArqNOHgtFhg7PPaO
-	E+iYz
-X-Received: by 2002:a05:6000:24c2:b0:3ca:43ce:8a60 with SMTP id ffacd0b85a97d-3ca43ce8debmr4253725f8f.56.1756210594116;
-        Tue, 26 Aug 2025 05:16:34 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IF1vwwLGJx7vZzx6yCM2iOBpq2l97oe5wYAIVyLlq0crxa3xO3y2zxEx14ezkHOG7wMX3UUCg==
-X-Received: by 2002:a05:6000:24c2:b0:3ca:43ce:8a60 with SMTP id ffacd0b85a97d-3ca43ce8debmr4253693f8f.56.1756210593333;
-        Tue, 26 Aug 2025 05:16:33 -0700 (PDT)
-Received: from [192.168.0.6] (ltea-047-064-113-247.pools.arcor-ip.net. [47.64.113.247])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3c711d9f3a8sm15987904f8f.62.2025.08.26.05.16.32
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 26 Aug 2025 05:16:32 -0700 (PDT)
-Message-ID: <c9fe5d6e-c280-4480-a522-a99fa5ce7cb2@redhat.com>
-Date: Tue, 26 Aug 2025 14:16:31 +0200
+	s=arc-20240116; t=1756213409; c=relaxed/simple;
+	bh=T9Gkxrj+Jbh4BEF2Xoy+VopdtFjdz7eGQjhjbYkar1Q=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=qtWmARSB3t93ksPeigFaw03FdIV/swq5lerGJxmziRLiCNXa0zyBPkEaQWZ3t1w1Mocd65b8S6Sc2Nd2zoqZbMjQ5Ob/pZ/nqcbk9y/jNbYv53T+nMo1uBRbzckOyruxf53xPKi457Iy+G41tDbMn+Rrp2YFKqoKUBSqPUqQ6i8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 025E02C23;
+	Tue, 26 Aug 2025 06:03:18 -0700 (PDT)
+Received: from raptor (usa-sjc-mx-foss1.foss.arm.com [172.31.20.19])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id A5B423F63F;
+	Tue, 26 Aug 2025 06:03:19 -0700 (PDT)
+Date: Tue, 26 Aug 2025 14:03:16 +0100
+From: Alexandru Elisei <alexandru.elisei@arm.com>
+To: David Hildenbrand <david@redhat.com>
+Cc: linux-kernel@vger.kernel.org, Alexander Potapenko <glider@google.com>,
+	Andrew Morton <akpm@linux-foundation.org>,
+	Brendan Jackman <jackmanb@google.com>,
+	Christoph Lameter <cl@gentwo.org>, Dennis Zhou <dennis@kernel.org>,
+	Dmitry Vyukov <dvyukov@google.com>, dri-devel@lists.freedesktop.org,
+	intel-gfx@lists.freedesktop.org, iommu@lists.linux.dev,
+	io-uring@vger.kernel.org, Jason Gunthorpe <jgg@nvidia.com>,
+	Jens Axboe <axboe@kernel.dk>, Johannes Weiner <hannes@cmpxchg.org>,
+	John Hubbard <jhubbard@nvidia.com>, kasan-dev@googlegroups.com,
+	kvm@vger.kernel.org, "Liam R. Howlett" <Liam.Howlett@oracle.com>,
+	Linus Torvalds <torvalds@linux-foundation.org>,
+	linux-arm-kernel@axis.com, linux-arm-kernel@lists.infradead.org,
+	linux-crypto@vger.kernel.org, linux-ide@vger.kernel.org,
+	linux-kselftest@vger.kernel.org, linux-mips@vger.kernel.org,
+	linux-mmc@vger.kernel.org, linux-mm@kvack.org,
+	linux-riscv@lists.infradead.org, linux-s390@vger.kernel.org,
+	linux-scsi@vger.kernel.org,
+	Lorenzo Stoakes <lorenzo.stoakes@oracle.com>,
+	Marco Elver <elver@google.com>,
+	Marek Szyprowski <m.szyprowski@samsung.com>,
+	Michal Hocko <mhocko@suse.com>, Mike Rapoport <rppt@kernel.org>,
+	Muchun Song <muchun.song@linux.dev>, netdev@vger.kernel.org,
+	Oscar Salvador <osalvador@suse.de>, Peter Xu <peterx@redhat.com>,
+	Robin Murphy <robin.murphy@arm.com>,
+	Suren Baghdasaryan <surenb@google.com>, Tejun Heo <tj@kernel.org>,
+	virtualization@lists.linux.dev, Vlastimil Babka <vbabka@suse.cz>,
+	wireguard@lists.zx2c4.com, x86@kernel.org, Zi Yan <ziy@nvidia.com>
+Subject: Re: [PATCH RFC 21/35] mm/cma: refuse handing out non-contiguous page
+ ranges
+Message-ID: <aK2wlGYvCaFQXzBm@raptor>
+References: <20250821200701.1329277-1-david@redhat.com>
+ <20250821200701.1329277-22-david@redhat.com>
+ <aK2QZnzS1ErHK5tP@raptor>
+ <ad521f4f-47aa-4728-916f-3704bf01f770@redhat.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] KVM: s390: Fix access to unavailable adapter indicator
- pages during postcopy
-To: Janosch Frank <frankja@linux.ibm.com>,
- Claudio Imbrenda <imbrenda@linux.ibm.com>, kvm@vger.kernel.org
-Cc: Peter Xu <peterx@redhat.com>,
- Christian Borntraeger <borntraeger@linux.ibm.com>,
- David Hildenbrand <david@redhat.com>, Heiko Carstens <hca@linux.ibm.com>,
- Vasily Gorbik <gor@linux.ibm.com>, Alexander Gordeev
- <agordeev@linux.ibm.com>, Sven Schnelle <svens@linux.ibm.com>,
- linux-s390@vger.kernel.org, linux-kernel@vger.kernel.org
-References: <20250821152309.847187-1-thuth@redhat.com>
- <d91ed0a4-16b2-417d-9b44-6e0d629f65d0@linux.ibm.com>
-From: Thomas Huth <thuth@redhat.com>
-Content-Language: en-US
-Autocrypt: addr=thuth@redhat.com; keydata=
- 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
-In-Reply-To: <d91ed0a4-16b2-417d-9b44-6e0d629f65d0@linux.ibm.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <ad521f4f-47aa-4728-916f-3704bf01f770@redhat.com>
 
-On 26/08/2025 13.43, Janosch Frank wrote:
-> On 8/21/25 5:23 PM, Thomas Huth wrote:
->> From: Thomas Huth <thuth@redhat.com>
->>
->> When you run a KVM guest with vhost-net and migrate that guest to
->> another host, and you immediately enable postcopy after starting the
->> migration, there is a big chance that the network connection of the
->> guest won't work anymore on the destination side after the migration.
+Hi David,
+
+On Tue, Aug 26, 2025 at 01:04:33PM +0200, David Hildenbrand wrote:
+..
+> > Just so I can better understand the problem being fixed, I guess you can have
+> > two consecutive pfns with non-consecutive associated struct page if you have two
+> > adjacent memory sections spanning the same physical memory region, is that
+> > correct?
 > 
-> Do we want to add this?
+> Exactly. Essentially on SPARSEMEM without SPARSEMEM_VMEMMAP it is not
+> guaranteed that
 > 
-> Fixes: f65470661f36 ("KVM: s390/interrupt: do not pin adapter interrupt pages")
+> 	pfn_to_page(pfn + 1) == pfn_to_page(pfn) + 1
+> 
+> when we cross memory section boundaries.
+> 
+> It can be the case for early boot memory if we allocated consecutive areas
+> from memblock when allocating the memmap (struct pages) per memory section,
+> but it's not guaranteed.
 
-Yes, that sounds like a good idea, please add it when picking up the patch!
+Thank you for the explanation, but I'm a bit confused by the last paragraph. I
+think what you're saying is that we can also have the reverse problem, where
+consecutive struct page * represent non-consecutive pfns, because memmap
+allocations happened to return consecutive virtual addresses, is that right?
 
-  Thanks,
-   Thomas
+If that's correct, I don't think that's the case for CMA, which deals out
+contiguous physical memory. Or were you just trying to explain the other side of
+the problem, and I'm just overthinking it?
 
+Thanks,
+Alex
 
