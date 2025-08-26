@@ -1,171 +1,220 @@
-Return-Path: <kvm+bounces-55760-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-55761-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 388ACB36F09
-	for <lists+kvm@lfdr.de>; Tue, 26 Aug 2025 17:57:04 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 49E4FB36F2D
+	for <lists+kvm@lfdr.de>; Tue, 26 Aug 2025 18:00:49 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id EB7FB981A5D
-	for <lists+kvm@lfdr.de>; Tue, 26 Aug 2025 15:51:53 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id B29577AA960
+	for <lists+kvm@lfdr.de>; Tue, 26 Aug 2025 15:59:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9AC2536CC6C;
-	Tue, 26 Aug 2025 15:48:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B2EB13148BC;
+	Tue, 26 Aug 2025 16:00:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="FoTyejyk"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="urGAJ8vo"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qt1-f176.google.com (mail-qt1-f176.google.com [209.85.160.176])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E514D34F464
-	for <kvm@vger.kernel.org>; Tue, 26 Aug 2025 15:48:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2AA843148D1
+	for <kvm@vger.kernel.org>; Tue, 26 Aug 2025 16:00:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.176
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756223334; cv=none; b=Mqejw7ymJz5TKbV1DLnVZQyGUKu7EemqqX5WV/+crcvaY+A1KHAnOAVQQiPwG13IpCQuf54keMPFqFuTSh8oQtBpJmBSen/m0a8yu/vAek2pLJ4WSQIeVFWUxCNA/C41m0V5KgH46PuBBgjlHs1hlJppOhUc5pc8Ovhe18g1CgU=
+	t=1756224034; cv=none; b=L1KFwrTCveTjlxwdobcask9ryiCOzMfikKbrvOQzj54B4ACl6ip5PX2/h1FvAhhltAr8We6zdbeyMiTAE0SeQz2tXCzJtUN/M8aleGXoTTSeJlb2PWDBxhaCepSswWOVQAn4Q1thrl+Pt8dfeo3A1UW9NfImqC6qpuoogv6yrc0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756223334; c=relaxed/simple;
-	bh=Y0eks1YaOqbzuug07KZLAOR4Y6H+hh0TiHWBe8OcU2k=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=AHw/+u5/WfiJN18KlyWi7BErOlxO9k6ytrK+mpMFy3lL9Y/5b80iE+QwQJS8n5CDWTjvfhjTil5MlsVCyrE8Lqhctkf77PHICJl8jKIrgg7B1GqOdaGHIIk42MGGhDqd5Hqeza9/rFtQD9vr7tJWG+zjetKX0lMjTbKBnlHgddU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=FoTyejyk; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1756223331;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=BHNXd9VyNqrFX2UZhtEPC0je8otxXnW6I6u8evl0zzQ=;
-	b=FoTyejykliqyIqZIaV0XHfj+Ua60Iq6SBKYCJOkQIvnlpC3NX6xIgbx4WHnpDq/nCGyWjI
-	DbfiST88pOQMuk9MVdV95HzwF2qGbxl63pnm2+QIYidIOna63PeaoPxggvtHymQvGXV9VD
-	+3NJUr26qf9mTodnjvqOI0Ahx3airXA=
-Received: from mail-il1-f197.google.com (mail-il1-f197.google.com
- [209.85.166.197]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-397-xqr5HkU_NoGmKfxbF4iVWw-1; Tue, 26 Aug 2025 11:48:50 -0400
-X-MC-Unique: xqr5HkU_NoGmKfxbF4iVWw-1
-X-Mimecast-MFC-AGG-ID: xqr5HkU_NoGmKfxbF4iVWw_1756223329
-Received: by mail-il1-f197.google.com with SMTP id e9e14a558f8ab-3ec9adc1255so5866295ab.3
-        for <kvm@vger.kernel.org>; Tue, 26 Aug 2025 08:48:50 -0700 (PDT)
+	s=arc-20240116; t=1756224034; c=relaxed/simple;
+	bh=5n9iNVjakjoJqt2gYftBUpMg4XD/CmiSEh3983ISjDA=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=s7ksMJHPleI6TVamHYVrLGp985LmPCGMkqrX/hD6cObxV5/PZoKL5nYA1eZ5M0neXksw/4aatCZBzBfty5u7Uxw0aZy+fNQpZbSOxG/op6GOIyFHY1/qJ5N7K2nfxdrdgfMfQSyxzQt3ZTED9Pn58uZnxvi0O0bVCqR9qgi+cdQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=urGAJ8vo; arc=none smtp.client-ip=209.85.160.176
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-qt1-f176.google.com with SMTP id d75a77b69052e-4b2dc20aebbso524341cf.0
+        for <kvm@vger.kernel.org>; Tue, 26 Aug 2025 09:00:31 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1756224031; x=1756828831; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=8wtM7DRL0HexzXSRpXdyswW9NJxzA03GjvZK/WV7kco=;
+        b=urGAJ8voOcjB+V8Jb738eDsl/Z9l6DQEyyL6hPE57Qi3ufhpDDvv405XoFU7B/td0U
+         bXUr5Vlx1z2diORjYpNpc+hGwwXdIQNaBUZbd/ackI/V2vW24rSLuBr7khTFVRBMrTJm
+         SwKrtrNkgXV1FBNsU+Mv1LTGTBAT/xhM3KBRxyAI++8guxSSkHJLd7IyqY0FJrvnE4OK
+         EOBxP3nUWrpzaustySo9ANY382x5v7xBAfIcu4+u0jFI5OW95bPQPCr8ixy8FFZCZGjl
+         G4mjRK7o65NWJA+8MZKj8qP39Rjo9SMZzU+xLh0WenA3LD8cSkd5zZ5apZ+i2rcB2SOf
+         6PRQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1756223329; x=1756828129;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
+        d=1e100.net; s=20230601; t=1756224031; x=1756828831;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=BHNXd9VyNqrFX2UZhtEPC0je8otxXnW6I6u8evl0zzQ=;
-        b=SMxSyoyAUv38EbLk2DmV5ty4p+RNONfBSwTYHtPX/HwDuzyVeM+zwUSTZ4MDorAoPG
-         n9pzkLWWCSrM0riWoJRe8Axl54/oQb10KFDY9YUlYCX/GFvQnP6WWTBYlKax/J30lrOk
-         vmanu3ameudra/zF5CmXYynUFW9XK+N7v9VeYadHnkUe8p2b+jFObQyO7kgNlEoUMvwg
-         Y74vNuJ+IH5CecYVMMsXUvreIVN3Cgc9OVlUAPpi/10LnL9f95EdM0vuauqasrhtOfGG
-         1p9rcrNIDVevk5oLDf/xWZeT3s/Is4nRERzDhduGCHG5PM6TTIdZKRh0grlxklFk/oZ2
-         kopg==
-X-Forwarded-Encrypted: i=1; AJvYcCXSYajNZKRQaRsPb7qokLxpbWbpqNORMaI/KKKOX9yGnr6R/gZlxNw+oOuJ+oPE2Y69vyI=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxK+N/8E7napKm2Ew2ECUaHp+7JF4L0aFjY+4rO4tXTQ9vs+3KY
-	Ch0OBt4t2f6JuuXmXIF/e10jpspFI7T5x1QyP1oHy/ChxiG/gobIhNeCo/NRuQqT7upTaeXsI+T
-	zD+UE/UXuKyrtwOHDSKrl9lNsJCnonH0odp+yyLqGOQsRTavvr+V3SQ==
-X-Gm-Gg: ASbGncvbAU19B1xflNwY6Mf9wv6Rp7AV6AaqdDCg6DUfK7dQ54leCngMoy6jlJ96jaH
-	Poc1xj6fr3Mdae8HkLLYMaMOaastXRawnNzymawJ0c7ciArq81lnvkTactUt5SGHKgUA9mMP8OE
-	58r6DkxEX/X4u+ff5W6L3amYtsfznxgagOaOGCeAySzfc+A7nyZmXm0hHCGVL8509dA4dmzp1A/
-	cbBhVvjwQRHZyeCW0qAGAtZf1BRJaDZlgjfvckTJx7hQjWy664eiV9d7i++sdBFij8UVUvAWZT+
-	IFsqmTjtD7kE5JuMtiVwq5SOPlHux2VUNcWBXrDfz9U=
-X-Received: by 2002:a05:6e02:1a48:b0:3e6:67f9:2061 with SMTP id e9e14a558f8ab-3e91cfae117mr88824255ab.0.1756223329385;
-        Tue, 26 Aug 2025 08:48:49 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IE41ooOBFFuOfcZRxU06TfSGWwzTnjM8fsjevvJOvWhDhebSC+xJEVzKrEMkNTbsTkk0XUw5w==
-X-Received: by 2002:a05:6e02:1a48:b0:3e6:67f9:2061 with SMTP id e9e14a558f8ab-3e91cfae117mr88824085ab.0.1756223328938;
-        Tue, 26 Aug 2025 08:48:48 -0700 (PDT)
-Received: from redhat.com ([38.15.36.11])
-        by smtp.gmail.com with ESMTPSA id e9e14a558f8ab-3ea4ec1f6d0sm68656065ab.40.2025.08.26.08.48.47
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 26 Aug 2025 08:48:47 -0700 (PDT)
-Date: Tue, 26 Aug 2025 09:48:45 -0600
-From: Alex Williamson <alex.williamson@redhat.com>
-To: Farhan Ali <alifm@linux.ibm.com>
-Cc: linux-s390@vger.kernel.org, kvm@vger.kernel.org,
- linux-kernel@vger.kernel.org, helgaas@kernel.org, schnelle@linux.ibm.com,
- mjrosato@linux.ibm.com
-Subject: Re: [PATCH v2 1/9] PCI: Avoid restoring error values in config
- space
-Message-ID: <20250826094845.517e0fa7.alex.williamson@redhat.com>
-In-Reply-To: <eb6d05d0-b448-4f4e-a734-50c56078dd9b@linux.ibm.com>
-References: <20250825171226.1602-1-alifm@linux.ibm.com>
-	<20250825171226.1602-2-alifm@linux.ibm.com>
-	<20250825153501.3a1d0f0c.alex.williamson@redhat.com>
-	<eb6d05d0-b448-4f4e-a734-50c56078dd9b@linux.ibm.com>
-X-Mailer: Claws Mail 4.3.1 (GTK 3.24.43; x86_64-redhat-linux-gnu)
+        bh=8wtM7DRL0HexzXSRpXdyswW9NJxzA03GjvZK/WV7kco=;
+        b=EfulLULijKfTAwnk7uQvFktVLM5PnLjIfl0ZgXJuuZ7Rk1yvvwGqf4xRSkTBhYneOn
+         wDRMCgtAWnPFnDTyCymqiPmlQhOWR3n7i2IbBskc+MN0dz4Mbmo8VeNUvNR+4EdDMuFE
+         gxziPvtnT1L6UXBx5M2J1Cxg0cFQAUEJxWqHOaGQBbRHFaaxBf/rQzbGKsb35PFsxdd4
+         44TC2sCVgZSQHkIixk9hIOyhMKaXWVAdsleZLKXZ7rHmoE/B28kAnNSJ0OYgiVrm7Z8k
+         RekLXZRszq1jbNFXxXYLVTw4tHU8TU3a09nKJjZIVMZAWb7Q2+YWTlCItCI/9uCOpedx
+         dBAA==
+X-Forwarded-Encrypted: i=1; AJvYcCX2ELtTG3eoQ8Ol1OtIuY4KbJBUwZuzEo1QsdDQb/g1ixfnH9wy40j8M5BxfNmuBbUOdjI=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxVQHbDVFJtiDEgZ/cxRsMVhDMruxYLuGRXSDLosbc2xCtDa4nU
+	rWWbQNBISYuuV2Kf2XpXYP3RPJCj4IWJCEJjHSy+bJKTZnjPB2lDufCmlAywGSx7P7LHPSOPry8
+	up7NQJfXe2rtuG3+gPlY9Wm1R/QcdknL8NE2NP2B+
+X-Gm-Gg: ASbGncto19YbeTDOzQ46MeS2HsMHf9Yi5EA3zMqG80Re8397T+vYelf+TSnqkAeBYhb
+	pWUgtfguKSldvICGMutO2lwQWLQLjSOyJikepqKM8eHeO+tMGngPUWyRFvtNkbevUtPoI8xYO5+
+	Cy34oxLecWhjlm6s64bc4PGrholKdYT5otgHH7ig+CObW0y8HidmnXdJr6jx3cGs9OVUWUglB5s
+	v8rsiorgORhcQc1H5M8waE2aPJc6pcks6A4x/wpzpuTNgyilIHQW+WB
+X-Google-Smtp-Source: AGHT+IFeiDU2Yx1zX1pIKcd7rsJ5GF5GQL74GdLUz16527dkwe2MqDmHOj4uVoOAk2edU90WczcIgsoTzbpig7ivJ6g=
+X-Received: by 2002:a05:622a:311:b0:4a7:1743:106b with SMTP id
+ d75a77b69052e-4b2e1c96dbcmr6023551cf.6.1756224030274; Tue, 26 Aug 2025
+ 09:00:30 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+References: <20250821042915.3712925-1-sagis@google.com> <20250821042915.3712925-5-sagis@google.com>
+ <9ef0d1f4-3257-4821-8241-aedae0957c6a@linux.intel.com>
+In-Reply-To: <9ef0d1f4-3257-4821-8241-aedae0957c6a@linux.intel.com>
+From: Sagi Shahar <sagis@google.com>
+Date: Tue, 26 Aug 2025 11:00:19 -0500
+X-Gm-Features: Ac12FXwQGfxwaB2ml-48qLvGsftNie172WLdVXPodk6Eig8wP3GzganRX92BXkY
+Message-ID: <CAAhR5DG8EFds6GrMkv3YL0M8J1BuyzoXF9ZZn1YHFJ8arhyYLA@mail.gmail.com>
+Subject: Re: [PATCH v9 04/19] KVM: selftests: Expose function to allocate
+ guest vCPU stack
+To: Binbin Wu <binbin.wu@linux.intel.com>
+Cc: linux-kselftest@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>, 
+	Shuah Khan <shuah@kernel.org>, Sean Christopherson <seanjc@google.com>, 
+	Ackerley Tng <ackerleytng@google.com>, Ryan Afranji <afranji@google.com>, 
+	Andrew Jones <ajones@ventanamicro.com>, Isaku Yamahata <isaku.yamahata@intel.com>, 
+	Erdem Aktas <erdemaktas@google.com>, Rick Edgecombe <rick.p.edgecombe@intel.com>, 
+	Roger Wang <runanwang@google.com>, Oliver Upton <oliver.upton@linux.dev>, 
+	"Pratik R. Sampat" <pratikrajesh.sampat@amd.com>, Reinette Chatre <reinette.chatre@intel.com>, 
+	Ira Weiny <ira.weiny@intel.com>, Chao Gao <chao.gao@intel.com>, 
+	Chenyi Qiang <chenyi.qiang@intel.com>, linux-kernel@vger.kernel.org, kvm@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Mon, 25 Aug 2025 15:13:00 -0700
-Farhan Ali <alifm@linux.ibm.com> wrote:
-
-> On 8/25/2025 2:35 PM, Alex Williamson wrote:
-> > On Mon, 25 Aug 2025 10:12:18 -0700
-> > Farhan Ali <alifm@linux.ibm.com> wrote:
-> >  
-> >> The current reset process saves the device's config space state before
-> >> reset and restores it afterward. However, when a device is in an error
-> >> state before reset, config space reads may return error values instead of
-> >> valid data. This results in saving corrupted values that get written back
-> >> to the device during state restoration. Add validation to prevent writing
-> >> error values to the device when restoring the config space state after
-> >> reset.
-> >>
-> >> Signed-off-by: Farhan Ali <alifm@linux.ibm.com>
-> >> ---
-> >>   drivers/pci/pci.c | 3 +++
-> >>   1 file changed, 3 insertions(+)
-> >>
-> >> diff --git a/drivers/pci/pci.c b/drivers/pci/pci.c
-> >> index b0f4d98036cd..0dd95d782022 100644
-> >> --- a/drivers/pci/pci.c
-> >> +++ b/drivers/pci/pci.c
-> >> @@ -1825,6 +1825,9 @@ static void pci_restore_config_dword(struct pci_dev *pdev, int offset,
-> >>   	if (!force && val == saved_val)
-> >>   		return;
-> >>   
-> >> +	if (PCI_POSSIBLE_ERROR(saved_val))
-> >> +		return;
-> >> +
-> >>   	for (;;) {
-> >>   		pci_dbg(pdev, "restore config %#04x: %#010x -> %#010x\n",
-> >>   			offset, val, saved_val);  
+On Tue, Aug 26, 2025 at 12:39=E2=80=AFAM Binbin Wu <binbin.wu@linux.intel.c=
+om> wrote:
+>
+>
+>
+> On 8/21/2025 12:28 PM, Sagi Shahar wrote:
+> > TDX guests' registers cannot be initialized directly using
+> > vcpu_regs_set(), hence the stack pointer needs to be initialized by
+> > the guest itself, running boot code beginning at the reset vector.
 > >
-> > The commit log makes this sound like more than it is.  We're really
-> > only error checking the first 64 bytes of config space before restore,
-> > the capabilities are not checked.  I suppose skipping the BARs and
-> > whatnot is no worse than writing -1 to them, but this is only a
-> > complete solution in the narrow case where we're relying on vfio-pci to
-> > come in and restore the pre-open device state.
+> > Expose the function to allocate the guest stack so that TDX
+> > initialization code can allocate it itself and skip the allocation in
+> > vm_arch_vcpu_add() in that case.
 > >
-> > I had imagined that pci_save_state() might detect the error state of
-> > the device, avoid setting state_saved, but we'd still perform the
-> > restore callouts that only rely on internal kernel state, maybe adding a
-> > fallback to restore the BARs from resource information.  
-> 
-> I initially started with pci_save_state(), and avoid saving the state 
-> altogether. But that would mean we don't go restore the msix state and 
-> for s390 don't call arch_restore_msi_irqs(). Do you prefer to avoid 
-> saving the state at all? This change was small and sufficient enough to 
-> avoid breaking the device in my testing.
+> > Signed-off-by: Sagi Shahar <sagis@google.com>
+> > ---
+> >   .../selftests/kvm/include/x86/processor.h       |  2 ++
+> >   tools/testing/selftests/kvm/lib/x86/processor.c | 17 ++++++++++++----=
+-
+> >   2 files changed, 14 insertions(+), 5 deletions(-)
+> >
+> > diff --git a/tools/testing/selftests/kvm/include/x86/processor.h b/tool=
+s/testing/selftests/kvm/include/x86/processor.h
+> > index 5c16507f9b2d..8fcc5118683e 100644
+> > --- a/tools/testing/selftests/kvm/include/x86/processor.h
+> > +++ b/tools/testing/selftests/kvm/include/x86/processor.h
+> > @@ -1111,6 +1111,8 @@ static inline void vcpu_clear_cpuid_feature(struc=
+t kvm_vcpu *vcpu,
+> >       vcpu_set_or_clear_cpuid_feature(vcpu, feature, false);
+> >   }
+> >
+> > +vm_vaddr_t kvm_allocate_vcpu_stack(struct kvm_vm *vm);
+> > +
+> >   uint64_t vcpu_get_msr(struct kvm_vcpu *vcpu, uint64_t msr_index);
+> >   int _vcpu_set_msr(struct kvm_vcpu *vcpu, uint64_t msr_index, uint64_t=
+ msr_value);
+> >
+> > diff --git a/tools/testing/selftests/kvm/lib/x86/processor.c b/tools/te=
+sting/selftests/kvm/lib/x86/processor.c
+> > index b2a4b11ac8c0..1eae92957456 100644
+> > --- a/tools/testing/selftests/kvm/lib/x86/processor.c
+> > +++ b/tools/testing/selftests/kvm/lib/x86/processor.c
+> > @@ -687,12 +687,9 @@ void vcpu_arch_set_entry_point(struct kvm_vcpu *vc=
+pu, void *guest_code)
+> >       vcpu_regs_set(vcpu, &regs);
+> >   }
+> >
+> > -struct kvm_vcpu *vm_arch_vcpu_add(struct kvm_vm *vm, uint32_t vcpu_id)
+> > +vm_vaddr_t kvm_allocate_vcpu_stack(struct kvm_vm *vm)
+> >   {
+> > -     struct kvm_mp_state mp_state;
+> > -     struct kvm_regs regs;
+> >       vm_vaddr_t stack_vaddr;
+> > -     struct kvm_vcpu *vcpu;
+> >
+> >       stack_vaddr =3D __vm_vaddr_alloc(vm, DEFAULT_STACK_PGS * getpages=
+ize(),
+> >                                      DEFAULT_GUEST_STACK_VADDR_MIN,
+> > @@ -713,6 +710,15 @@ struct kvm_vcpu *vm_arch_vcpu_add(struct kvm_vm *v=
+m, uint32_t vcpu_id)
+> >                   "__vm_vaddr_alloc() did not provide a page-aligned ad=
+dress");
+> >       stack_vaddr -=3D 8;
+> >
+> > +     return stack_vaddr;
+> > +}
+> > +
+> > +struct kvm_vcpu *vm_arch_vcpu_add(struct kvm_vm *vm, uint32_t vcpu_id)
+> > +{
+> > +     struct kvm_mp_state mp_state;
+> > +     struct kvm_regs regs;
+> > +     struct kvm_vcpu *vcpu;
+> > +
+> >       vcpu =3D __vm_vcpu_add(vm, vcpu_id);
+> >       vcpu_init_cpuid(vcpu, kvm_get_supported_cpuid());
+> >       vcpu_init_sregs(vm, vcpu);
+> > @@ -721,7 +727,8 @@ struct kvm_vcpu *vm_arch_vcpu_add(struct kvm_vm *vm=
+, uint32_t vcpu_id)
+> >       /* Setup guest general purpose registers */
+> >       vcpu_regs_get(vcpu, &regs);
+> >       regs.rflags =3D regs.rflags | 0x2;
+> > -     regs.rsp =3D stack_vaddr;
+> > +     if (vm->type !=3D KVM_X86_TDX_VM)
+> > +             regs.rsp =3D kvm_allocate_vcpu_stack(vm);
+>
+> I am wondering if this could be more generic.
+> I.e, make vcpu_regs_get() return the error code.
+> If vcpu_regs_get() failed (for TDX, since it's guest state is protected, =
+the
+> ioctl will return -EINVAL), the vcpu_regs_set(), including the allocation=
+ for
+> the vcpu stack, could be skipped.
+>
 
-If we're only reading -1 from the device anyway, I'm not sure what
-value we're adding to continue to save bogus data from the device.
-There are also various restore sub-functions that don't need that saved
-state, ex. PASID, PRI, ATS, REBAR, AER, MSI, MSIX, ACS, VF REBAR,
-SRIOV.  We could push the state_saved check down into the functions
-that do need the prior device state, add warnings and let the remaining
-function proceed.  We really need to at least pull BAR values from
-resources information for there to be a chance of a functional device
-without relying on vfio-pci to restore that though.  Thanks,
+I'm dropping this check and only keeping the check from "KVM:
+selftests: Hook TDX support to vm and vcpu creation" which looks like
+this:
 
-Alex
+if (is_tdx_vm(vm)) {
+        vm_tdx_vcpu_add(vm, vcpu);
+} else {
+        vcpu_init_cpuid(vcpu, kvm_get_supported_cpuid());
 
+        vcpu_init_sregs(vm, vcpu);
+        vcpu_init_xcrs(vm, vcpu);
+
+        /* Setup guest general purpose registers */
+        vcpu_regs_get(vcpu, &regs);
+        regs.rflags =3D regs.rflags | 0x2;
+        regs.rsp =3D kvm_allocate_vcpu_stack(vm);
+        vcpu_regs_set(vcpu, &regs);
+}
+
+Since there are other differences specific to TDX I think this is
+cleaner than trying to handle kvm_allocate_vcpu_stack() individually.
+
+> >       vcpu_regs_set(vcpu, &regs);
+> >
+> >       /* Setup the MP state */
+>
 
