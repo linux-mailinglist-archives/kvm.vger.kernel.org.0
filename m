@@ -1,272 +1,170 @@
-Return-Path: <kvm+bounces-55791-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-55792-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id CCDEBB373DE
-	for <lists+kvm@lfdr.de>; Tue, 26 Aug 2025 22:30:49 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8CD08B373F6
+	for <lists+kvm@lfdr.de>; Tue, 26 Aug 2025 22:41:49 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id C92591BA4495
-	for <lists+kvm@lfdr.de>; Tue, 26 Aug 2025 20:31:09 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 487167C648C
+	for <lists+kvm@lfdr.de>; Tue, 26 Aug 2025 20:41:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 861B72F5329;
-	Tue, 26 Aug 2025 20:30:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EA02D338F40;
+	Tue, 26 Aug 2025 20:41:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="Tq9Mp4jX"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="paPjtZTY"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-qt1-f172.google.com (mail-qt1-f172.google.com [209.85.160.172])
+Received: from mail-pl1-f202.google.com (mail-pl1-f202.google.com [209.85.214.202])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DB6A2285C97
-	for <kvm@vger.kernel.org>; Tue, 26 Aug 2025 20:30:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.172
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8E7C630CD81
+	for <kvm@vger.kernel.org>; Tue, 26 Aug 2025 20:41:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756240241; cv=none; b=ju7/QX9Oolp6eCvCco+Vvq2dKaO9p3W5EbSm/jXlz5zpIiwm9bK4l55Wdodk84/teWnHXT0sEdLqUFkWFaGm8gDpDLtBJ5wymlWuqX1Gwdedka9TcSouBv9Ee2o5ApRGd4/eNjVXYVFsfNsFZuB5zp85NKKQpP93vTnCZClnzeY=
+	t=1756240900; cv=none; b=iha59GKh2uF1m6LFaJzECvOB7iByL4etsyJuoqVKecXky/Mr79Upyl2aQRzTyoTTTjmVQqVMHpIuPydNSbSEPov3wGHKQ3Qb7jqwpUWW+LDMT9VyJu8El455KkcQoM8EzD323Jd2gIlII7LCy5yl+3D3iyEzvK5rql/up4enbSo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756240241; c=relaxed/simple;
-	bh=dWpaw+5IK+faLL3HzEwBYWrdV1DKLv9aeK98Eb/3Bcg=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=i//O2rieTKSW2486YG+9ypwZ1DXP5upJOpO5yNvT7OC68YjdsRV6O3fiKJR0Eyb3MGC+yz9ZIwIqCExg32erPxe0oM+WHyxzD6Ah8K/97BCui9GPPyaMM4QdKc9Oxw5tIn3NjV6uDSpxRbgPRc24/cjvLgKX3myux7N4TgSM3sA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=Tq9Mp4jX; arc=none smtp.client-ip=209.85.160.172
+	s=arc-20240116; t=1756240900; c=relaxed/simple;
+	bh=T+a/BbQYUpxBjBCMc7qHsSqNFjpz2fZdg6cp2+uqwiQ=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=NEZEzyInIhGdI5wc8Laqw2K/RebbKyDRwRJzxUNJiUUJJTn4OJbJEJGkdFZd6d8rpFesV2ufnmmpi4glTskUNSAu4ry0Dk2VV5AWVDUQ5jb2fELZrImbD1pFnF9wR7kqnJ6jXgJ8J2loa0UIPUEyZoaNyweqA/WHznlF4vb15Ps=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=paPjtZTY; arc=none smtp.client-ip=209.85.214.202
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-qt1-f172.google.com with SMTP id d75a77b69052e-4b2dc20aebbso124561cf.0
-        for <kvm@vger.kernel.org>; Tue, 26 Aug 2025 13:30:39 -0700 (PDT)
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+Received: by mail-pl1-f202.google.com with SMTP id d9443c01a7336-2465bc6da05so55638745ad.0
+        for <kvm@vger.kernel.org>; Tue, 26 Aug 2025 13:41:38 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1756240239; x=1756845039; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=1NivCtX5VVCQOwctlprydiQ2y64E7oPKjSGk2dbkglQ=;
-        b=Tq9Mp4jXZkGffOrZZJxfggfM1SBX2EtierahX67SbSeT3Yc8chGMPV7ZkZSQiFgv3j
-         pAH+hWZ6A7w3qyNGfyicavXbtrJmVp1E2s7eAhTgHhaCarrjvhvOuXXsn+Hc2ugQKK4m
-         EBEaelsnylLTD/d2Ps+2JRyHttuXZLOsEH+aKEX2QTOO2loKgFPg7DP2lRWuOF4UCVTM
-         XDiFvrIN37DLnu221Ye/EYmBHTKSzBHEU8vFT+XlnuOXHzAONyJsKIje5DdfoAdm2dQf
-         oj+BQxsk/MlHqxecFXsHmYWooAJf2n9dWF0kQCxA3BhIz+OnTyT2cQvljcKZ6BKjuq/B
-         N4mQ==
+        d=google.com; s=20230601; t=1756240898; x=1756845698; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=jxHPfEnTfM31bordW/xAmN05KZGENuYbEfdQSBjX92E=;
+        b=paPjtZTYOgecFcS8X3E7o8w7uLiAnnyTu35DcM0rYh0FboUFv17XUcGEx+2E9PwTMn
+         XEDHaRNSchdyLQEJaqREA3H1Py2vUeoVwNkZtfk6PwUg7i0ZeVtMob//YlTb45JDQ/VT
+         BimVZkQvrBm890B2Uh8DNLQQ92wBLf4kkP+3EBMbR1k4xuHc7HDGDDt7f0iGEwkkcrgg
+         C6vprEru/Bezbaf8n+ZLB0ehv+S3jzo0s+IDQxlNuPCH/w1R+iSqccYiRtoBovxj0Uim
+         ZhXshik+mIvy+qTISSa3B+d7yYu8QQ6jhPgA0ulr5brOCwnSD3276s3kHDm9O9x7wFDC
+         GMZQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1756240239; x=1756845039;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=1NivCtX5VVCQOwctlprydiQ2y64E7oPKjSGk2dbkglQ=;
-        b=L6tGh9LH53aMW63Z5tmbA+6vdUnmKlfTrU3TL5RPt+xIZo/lP87+W+k7U2dSzCTK44
-         QHn+LZOAANH93MZDdktxrD8Z4qGEO2yiNhvCCJorBspRMzc6H8jfGK8J7ITOJOksusGi
-         XyypteALMY0qP3yqlxZRzYdx3eF3SZNjegc0HdUPqYprxtM1B2s2hegW9awB2bdMsGtB
-         8x1FLnFFXJJd7fazGWzyXKBsztIfV9jRCqmdd+O3+J7nLSgKGqxIBNAA/SXvdathP0i0
-         CbbtGRDuu249PdX9V4VacW/zTrAXts+8qZnvx9ZUV/MufeFuDCQ0uPwmXkyawn6oeOAX
-         qT8A==
-X-Forwarded-Encrypted: i=1; AJvYcCXiJZ698udPTVgdOpRwM6hsZe8bKXTSubjb3/d9Da1XlK2HhxvZBuh96+Rjko1gH3dW2Y4=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yx59e6jLCSYhTgqZWrl2ncqEBvlmWmK3k3IfGDrPVVzh8eEhVmU
-	DbSFbtfmcdTTcnREp65cUS2eSz9NnvTrxzIqYyc2Rym6Mef0ncZW/YqkeA6+ylf/vmXodrEQwZr
-	GPilhUhrnxA4rFkxjzNtDLu4LC/ZhyulXPDRoejoM
-X-Gm-Gg: ASbGncshaQ6UyefAGbY409mdZkubsv4mtd677SUFOhrXclt6XkH7bWpABAAQM72Czpm
-	LbxsyP5iobH+u7Fzd16trWFbaAYm6IVyiv6g92mCm/DaL069jwbnUUZj1eaZRDqwnkH3bbc0r9E
-	/08MwKO0VFrEzlcqNyjuq0EISlqndsvNwdRHqJV/IlllMB44FTU6guUl2KltOwbP3BdCAIbwbYJ
-	EUuPIezfqi7OkY47V4iOztTzSjOQ1iWgD3NOsnZrtg1VSHwhiP2d0h2PQ==
-X-Google-Smtp-Source: AGHT+IEL45FJ6C194aidsP5pgQHqoHHDUuhtRlEDTjKfdI4ez+CYTV0dWOx7Th8KWxoUAD969ZMn2roqrW1KFRyGIUE=
-X-Received: by 2002:a05:622a:1116:b0:4b0:8318:a95 with SMTP id
- d75a77b69052e-4b2e1d2850cmr8109911cf.8.1756240238481; Tue, 26 Aug 2025
- 13:30:38 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1756240898; x=1756845698;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=jxHPfEnTfM31bordW/xAmN05KZGENuYbEfdQSBjX92E=;
+        b=ZmPqY0EcnHxuxaHrivnKMGvL0T7jDuubWJDDpXI69TBbCO8JGCQ/0n9xkdyx1a0DNz
+         Tn2KlWPSzSxOqxSORFjTVudjPUw0WKqyrWUd1OC5+iPT0rGTN9PY2R5le5+1q3uFro00
+         DiVYWQ2gYa9fgb+IGsNzs2IQ4jntk+jAdv7UFI8nZihLn5IwH8LhZQnUnECvajl2/N2S
+         oivp+ayjapHSSsK5u2J9Ig5TcfS2kGbAsYMOUILw/FcEkg5XimYLYJGfG2GEonHoJLT1
+         Hw1YGAK3umNPRrpoJ6DvLLIUQ6JjU1nVEJtKcYknMFs3115NPmS946Yxag41K+pa5U5y
+         2oXQ==
+X-Forwarded-Encrypted: i=1; AJvYcCXOwbOV6HCPih2BOjEM092xKZDM+pbHNPqvi/YNPz6dkRbt8dTFcDa4WmaxQPhr/RIEj9w=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yx+3mzSOWVKpIdGvxMkjhC2/xpu6OuCXXRZf86q7+qZFoYkCeXJ
+	60fIQSPJli0Zlay4Z0JHKaz3xdMquryWXcxgltlvr8YwPzNF5zROSAZNUOXEpJu27iDSg6OeEL5
+	6s8Tleg==
+X-Google-Smtp-Source: AGHT+IEGhZVQdVOygMYUI+v0tbctNCqb/0OYTa/y1v5d+8e0x9RnEZH1nApMHZtssGIweK5cKyTUcocTcSY=
+X-Received: from plez4.prod.google.com ([2002:a17:902:ccc4:b0:246:1ef:f07c])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:903:38c4:b0:240:5bde:532d
+ with SMTP id d9443c01a7336-2462ef4c8eemr216737005ad.38.1756240897935; Tue, 26
+ Aug 2025 13:41:37 -0700 (PDT)
+Date: Tue, 26 Aug 2025 13:41:36 -0700
+In-Reply-To: <aK4J5EA10ufKJZsU@linux.dev>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-References: <20250821042915.3712925-1-sagis@google.com> <20250821042915.3712925-16-sagis@google.com>
- <aK3vZ5HuKKeFuuM4@google.com> <68ae1604a387c_300e8f2947e@iweiny-mobl.notmuch> <CAAhR5DHPMPOb2XCJodyNMf2RTQfTZpAaCGMg6WeWxSWPLtkO4Q@mail.gmail.com>
-In-Reply-To: <CAAhR5DHPMPOb2XCJodyNMf2RTQfTZpAaCGMg6WeWxSWPLtkO4Q@mail.gmail.com>
-From: Sagi Shahar <sagis@google.com>
-Date: Tue, 26 Aug 2025 15:30:27 -0500
-X-Gm-Features: Ac12FXwbbMM7pQh_4Keas2PDt_6Fce4xe48eDBxubuYMDZnlgdFtNq-3iaBrnyg
-Message-ID: <CAAhR5DGeTQ4G-w2o5YCvNWkZZWFcXe=6rro+RcfhR18-4sT+PQ@mail.gmail.com>
-Subject: Re: [PATCH v9 15/19] KVM: selftests: Hook TDX support to vm and vcpu creation
-To: Ira Weiny <ira.weiny@intel.com>
-Cc: Sean Christopherson <seanjc@google.com>, linux-kselftest@vger.kernel.org, 
-	Paolo Bonzini <pbonzini@redhat.com>, Shuah Khan <shuah@kernel.org>, 
-	Ackerley Tng <ackerleytng@google.com>, Ryan Afranji <afranji@google.com>, 
-	Andrew Jones <ajones@ventanamicro.com>, Isaku Yamahata <isaku.yamahata@intel.com>, 
-	Erdem Aktas <erdemaktas@google.com>, Rick Edgecombe <rick.p.edgecombe@intel.com>, 
-	Roger Wang <runanwang@google.com>, Binbin Wu <binbin.wu@linux.intel.com>, 
-	Oliver Upton <oliver.upton@linux.dev>, "Pratik R. Sampat" <pratikrajesh.sampat@amd.com>, 
-	Reinette Chatre <reinette.chatre@intel.com>, Chao Gao <chao.gao@intel.com>, 
-	Chenyi Qiang <chenyi.qiang@intel.com>, linux-kernel@vger.kernel.org, kvm@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Mime-Version: 1.0
+References: <20250825155203.71989-1-sebott@redhat.com> <aKy-9eby1OS38uqM@google.com>
+ <87zfbnyvk9.wl-maz@kernel.org> <aKzRgp58vU6h02n6@google.com>
+ <aKzX152737nAo479@linux.dev> <aK4CJnNxB6omPufp@google.com> <aK4J5EA10ufKJZsU@linux.dev>
+Message-ID: <aK4cAPeGgy0kXY98@google.com>
+Subject: Re: [PATCH] KVM: selftests: fix irqfd_test on arm64
+From: Sean Christopherson <seanjc@google.com>
+To: Oliver Upton <oliver.upton@linux.dev>
+Cc: Marc Zyngier <maz@kernel.org>, Sebastian Ott <sebott@redhat.com>, 
+	Paolo Bonzini <pbonzini@redhat.com>, Shuah Khan <shuah@kernel.org>, kvm@vger.kernel.org, 
+	kvmarm@lists.linux.dev, linux-kselftest@vger.kernel.org, 
+	linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="us-ascii"
 
-On Tue, Aug 26, 2025 at 3:29=E2=80=AFPM Sagi Shahar <sagis@google.com> wrot=
-e:
->
-> On Tue, Aug 26, 2025 at 3:14=E2=80=AFPM Ira Weiny <ira.weiny@intel.com> w=
-rote:
-> >
-> > Sean Christopherson wrote:
-> > > On Wed, Aug 20, 2025, Sagi Shahar wrote:
-> > > > TDX require special handling for VM and VCPU initialization for var=
-ious
-> > > > reasons:
-> > > > - Special ioctlss for creating VM and VCPU.
-> > > > - TDX registers are inaccessible to KVM.
-> > > > - TDX require special boot code trampoline for loading parameters.
-> > > > - TDX only supports KVM_CAP_SPLIT_IRQCHIP.
-> > >
-> > > Please split this up and elaborate at least a little bit on why each =
-flow needs
-> > > special handling for TDX.  Even for someone like me who is fairly fam=
-iliar with
-> > > TDX, there's too much "Trust me bro" and not enough explanation of wh=
-y selftests
-> > > really need all of these special paths for TDX.
-> > >
-> > > At least four patches, one for each of your bullet points.  Probably =
-5 or 6, as
-> > > I think the CPUID handling warrants its own patch.
-> > >
-> > > > Hook this special handling into __vm_create() and vm_arch_vcpu_add(=
-)
-> > > > using the utility functions added in previous patches.
-> > > >
-> > > > Signed-off-by: Sagi Shahar <sagis@google.com>
-> > > > ---
-> > > >  tools/testing/selftests/kvm/lib/kvm_util.c    | 24 ++++++++-
-> > > >  .../testing/selftests/kvm/lib/x86/processor.c | 49 ++++++++++++++-=
-----
-> > > >  2 files changed, 61 insertions(+), 12 deletions(-)
-> > > >
-> > > > diff --git a/tools/testing/selftests/kvm/lib/kvm_util.c b/tools/tes=
-ting/selftests/kvm/lib/kvm_util.c
-> > > > index b4c8702ba4bd..d9f0ff97770d 100644
-> > > > --- a/tools/testing/selftests/kvm/lib/kvm_util.c
-> > > > +++ b/tools/testing/selftests/kvm/lib/kvm_util.c
-> > > > @@ -4,6 +4,7 @@
-> > > >   *
-> > > >   * Copyright (C) 2018, Google LLC.
-> > > >   */
-> > > > +#include "tdx/tdx_util.h"
-> > > >  #include "test_util.h"
-> > > >  #include "kvm_util.h"
-> > > >  #include "processor.h"
-> > > > @@ -465,7 +466,7 @@ void kvm_set_files_rlimit(uint32_t nr_vcpus)
-> > > >  static bool is_guest_memfd_required(struct vm_shape shape)
-> > > >  {
-> > > >  #ifdef __x86_64__
-> > > > -   return shape.type =3D=3D KVM_X86_SNP_VM;
-> > > > +   return (shape.type =3D=3D KVM_X86_SNP_VM || shape.type =3D=3D K=
-VM_X86_TDX_VM);
-> > > >  #else
-> > > >     return false;
-> > > >  #endif
-> > > > @@ -499,6 +500,12 @@ struct kvm_vm *__vm_create(struct vm_shape sha=
-pe, uint32_t nr_runnable_vcpus,
-> > > >     for (i =3D 0; i < NR_MEM_REGIONS; i++)
-> > > >             vm->memslots[i] =3D 0;
-> > > >
-> > > > +   if (is_tdx_vm(vm)) {
-> > > > +           /* Setup additional mem regions for TDX. */
-> > > > +           vm_tdx_setup_boot_code_region(vm);
-> > > > +           vm_tdx_setup_boot_parameters_region(vm, nr_runnable_vcp=
-us);
-> > > > +   }
-> > > > +
-> > > >     kvm_vm_elf_load(vm, program_invocation_name);
-> > > >
-> > > >     /*
-> > > > @@ -1728,11 +1735,26 @@ void *addr_gpa2alias(struct kvm_vm *vm, vm_=
-paddr_t gpa)
-> > > >     return (void *) ((uintptr_t) region->host_alias + offset);
-> > > >  }
-> > > >
-> > > > +static bool is_split_irqchip_required(struct kvm_vm *vm)
-> > > > +{
-> > > > +#ifdef __x86_64__
-> > > > +   return is_tdx_vm(vm);
-> > > > +#else
-> > > > +   return false;
-> > > > +#endif
-> > > > +}
-> > > > +
-> > > >  /* Create an interrupt controller chip for the specified VM. */
-> > > >  void vm_create_irqchip(struct kvm_vm *vm)
-> > > >  {
-> > > >     int r;
-> > > >
-> > > > +   if (is_split_irqchip_required(vm)) {
-> > > > +           vm_enable_cap(vm, KVM_CAP_SPLIT_IRQCHIP, 24);
-> > > > +           vm->has_irqchip =3D true;
-> > > > +           return;
-> > > > +   }
-> > >
-> > > Ugh.  IMO, this is a KVM bug.  Allowing KVM_CREATE_IRQCHIP for a TDX =
-VM is simply
-> > > wrong.  It _can't_ work.  Waiting until KVM_CREATE_VCPU to fail setup=
- is terrible
-> > > ABI.
-> > >
-> > > If we stretch the meaning of ENOTTY a bit and return that when trying=
- to create
-> > > a fully in-kernel IRQCHIP for a TDX VM, then the selftests code Just =
-Works thanks
-> > > to the code below, which handles the scenario where KVM was be built =
-without
-> >          ^^^^^^^^^^
-> >
-> > I'm not following.  Was there supposed to be a patch attached?
-> >
->
-> I think Sean refers to the original implementation which was out of
-> the scope for the git diff so it was left out of the patch:
->
-> /*
->  * Allocate a fully in-kernel IRQ chip by default, but fall back to a
->  * split model (x86 only) if that fails (KVM x86 allows compiling out
->  * support for KVM_CREATE_IRQCHIP).
->  */
-> r =3D __vm_ioctl(vm, KVM_CREATE_IRQCHIP, NULL);
-> if (r && errno =3D=3D ENOTTY && kvm_has_cap(KVM_CAP_SPLIT_IRQCHIP))
->         vm_enable_cap(vm, KVM_CAP_SPLIT_IRQCHIP, 24);
-> else
->         TEST_ASSERT_VM_VCPU_IOCTL(!r, KVM_CREATE_IRQCHIP, r, vm);
->
-> /*
->  * Allocate a fully in-kernel IRQ chip by default, but fall back to a
->  * split model (x86 only) if that fails (KVM x86 allows compiling out
->  * support for KVM_CREATE_IRQCHIP).
->  */
-> r =3D __vm_ioctl(vm, KVM_CREATE_IRQCHIP, NULL);
-> if (r && errno =3D=3D ENOTTY && kvm_has_cap(KVM_CAP_SPLIT_IRQCHIP))
-> vm_enable_cap(vm, KVM_CAP_SPLIT_IRQCHIP, 24);
-> else
-> TEST_ASSERT_VM_VCPU_IOCTL(!r, KVM_CREATE_IRQCHIP, r, vm);
-> /*
-> * Allocate a fully in-kernel IRQ chip by default, but fall back to a
-> * split model (x86 only) if that fails (KVM x86 allows compiling out
-> * support for KVM_CREATE_IRQCHIP).
-> */
-> r =3D __vm_ioctl(vm, KVM_CREATE_IRQCHIP, NULL);
-> if (r && errno =3D=3D ENOTTY && kvm_has_cap(KVM_CAP_SPLIT_IRQCHIP))
-> vm_enable_cap(vm, KVM_CAP_SPLIT_IRQCHIP, 24);
-> else
-> TEST_ASSERT_VM_VCPU_IOCTL(!r, KVM_CREATE_IRQCHIP, r, vm);
->
+On Tue, Aug 26, 2025, Oliver Upton wrote:
+> On Tue, Aug 26, 2025 at 11:51:18AM -0700, Sean Christopherson wrote:
+> > On Mon, Aug 25, 2025, Oliver Upton wrote:
+> > > The majority of selftests don't even need an irqchip anyway.
+> > 
+> > But it's really, really nice for developers if they can assume a certain level of
+> > configuration is done by the infrastructure, i.e. don't have worry about doing
+> > what is effectively "basic" VM setup.
+> 
+> The more we pile behind what a "basic" VM configuration is the less
+> expressive the tests become. Being able to immediately grok the *intent*
+> of a test from reading it first pass is a very good thing. Otherwise I
+> need to go figure out what the definition of "basic" means when I need
+> to write a test and decide if that is compatible with what I'm trying to
+> do.
 
-Sorry, I messed up the paste somehow:
+Eh, I don't buy that argument, not as a blanket statement.
 
-/*
- * Allocate a fully in-kernel IRQ chip by default, but fall back to a
- * split model (x86 only) if that fails (KVM x86 allows compiling out
- * support for KVM_CREATE_IRQCHIP).
- */
-r =3D __vm_ioctl(vm, KVM_CREATE_IRQCHIP, NULL);
-if (r && errno =3D=3D ENOTTY && kvm_has_cap(KVM_CAP_SPLIT_IRQCHIP))
-        vm_enable_cap(vm, KVM_CAP_SPLIT_IRQCHIP, 24);
-else
-        TEST_ASSERT_VM_VCPU_IOCTL(!r, KVM_CREATE_IRQCHIP, r, vm);
+The existence of code doesn't always communicate intent, e.g. the _only_ instance
+I can think of where doing more setup by default caused problems was a few crusty
+x86 tests that relied on an int3 to cause SHUTDOWN due to lack of an IDT.  OMG was
+I increduluous when I figured out what those tests were doing.
 
-> > Ira
-> >
-> > > support for in-kernel I/O APIC (and PIC and PIT).
-> >
-> >
+And in that case, _not_ doing the "basic" setup hid the intent of the test.  Aside
+from the fact that deliberately triggering SHUTDOWN was completely unnecessary in
+those tests, IMO forcing such a test to use vm_create_barebones() would better
+capture that the test is doing something odd, i.e. has unusual intent.
+
+And explicitly doing something doesn't necessarily communicate the intent of the
+test.  E.g. the intent of the irqfd_test is to verify that KVM_IRQFD assign and
+deassign behaves as expected.  The test never generates IRQs, i.e. doesn't actually
+need an IRQCHIP beyond satisfying KVM's requirements for KVM_IRQFD.
+
+There are undoubtedly other tests that have similar "intent".  E.g. the in-progress
+mediated PMU support for x86 requires an in-kernel local APIC, and so tests like
+pmu_counters_test.c, pmu_event_filter_test.c, and vmx_pmu_caps_test.c will need
+to instantiate an IRQCHIP.  None of those tests actually touch the local APIC in
+any way, e.g. don't generate PMU interrupts, so creating an IRQCHIP is once again
+nothing more than a means to an end, and not indicative of the test's main intent.
+
+I think the use of vgic_v3_setup() in dirty_log_perf_test.c is also a case where
+the existence of code fails to communicate intent.  Without the comment in
+arch_setup_vm() to explain that having GICv3 somehow reduces the number of exits,
+I would be very confused as to why the test cares about GICv3.
+
+I agree there's a balance to be had in terms of doing too much.  Unfortunately in
+this case, it sounds like the fundamental problem is that the balance is simply
+different for x86 versus arm64.  Having an in-kernel local APIC is tables stakes
+for x86, to the point where I'm looking for any excuse to have KVM create a local
+APIC by default.  But for arm64, there's tremendous value in having tests do the
+lifting.
+
+> vm_create_with_irqchip() is delightfully unambiguous.
+>
+> > E.g. x86 selftests creates an IRQCHIP, sets up descriptor tables and exception
+> > handlers, and a handful of other "basic" things, and that has eliminated soooo
+> > much boilerplate code and the associated friction with having to know/discover
+> > that e.g. sending IRQs in a test requires additional setup beyond the obvious
+> > steps like wiring up a handler.
+> 
+> That simply isn't going to happen on arm64. On top of the fact that the
+> irqchip configuration depends on the intent of the test (e.g. wired IRQs
+> v. MSIs), there's a bunch of guest-side initialization that needs to
+> happen too.
+> 
+> We can add an extremely barebones GIC when asked for (although guest
+> init isn't addressed) but batteries are not included on this architecture
+> and I'd rather not attempt to abstract that.
+
+What about providing an API to do exactly that, instantiate and initialize a
+barebones GIC?  E.g.
+
+	void kvm_arch_init_barebones_irqchip(struct kvm_vm *vm)
+
+Hmm, then we'd also need
+
+	void kvm_arch_vm_free(struct kvm_vm *vm)
+
+to gracefully free the GIC, as done by dirty_log_perf_test.c.  Blech.  Though
+maybe we'll end up with that hook sooner or later?
+
+All in all, I have no strong preference at this point.
 
