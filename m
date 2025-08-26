@@ -1,134 +1,156 @@
-Return-Path: <kvm+bounces-55766-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-55767-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 88EEAB37023
-	for <lists+kvm@lfdr.de>; Tue, 26 Aug 2025 18:24:40 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 352A1B3704D
+	for <lists+kvm@lfdr.de>; Tue, 26 Aug 2025 18:30:57 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id C9C0B7A377C
-	for <lists+kvm@lfdr.de>; Tue, 26 Aug 2025 16:23:00 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 587637ABDDB
+	for <lists+kvm@lfdr.de>; Tue, 26 Aug 2025 16:29:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1B08830FC19;
-	Tue, 26 Aug 2025 16:24:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="aznqJwO3"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EC2CA314A98;
+	Tue, 26 Aug 2025 16:30:36 +0000 (UTC)
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from cstnet.cn (smtp81.cstnet.cn [159.226.251.81])
+	(using TLSv1.2 with cipher DHE-RSA-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B40D517C211
-	for <kvm@vger.kernel.org>; Tue, 26 Aug 2025 16:24:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BB49B2B9A7;
+	Tue, 26 Aug 2025 16:30:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=159.226.251.81
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756225465; cv=none; b=fZEF3/82Ay6NlYMRKeA+Xb6PG5fChiKp4ZC+IgVQqUzcCUhZMSAYnArVCKDYVP04tM7jHsCy2Dp09qdxbMSDfSE5I+U1ZZnPS1SCrn6rQzWDqprr6maHf+ZDt+H+8QQ224TMywlVGzS+eaA/7/0Pi8C6qD3a6xJKUDSP9+BUIrs=
+	t=1756225836; cv=none; b=M3L7Obo1s6+OrSxldYxleDXI0VJX9Oe1oA7N8iZixLP3dn+kYrfgKq+vabJMItjYEAuXKBIk/w0lT4JjUgTkzaRfaWIpQGhiH+KTlAtGV90lLO1OYiOnceVQmoQyz19dGBCquKk8eNqlw8IKnfpulPFmEFqo6IjLrzu0R5FS6Aw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756225465; c=relaxed/simple;
-	bh=pk1+KDkyoaqAtnIkFzZI+W1at4fbDeoEIRnzxJiguA4=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=gwsn06QgtC1h4T5f5xvGePP8r8WsnzVzu7relbEYUmsMfcFeRR1heoZBi1Lu8ZSbOKG1fmspU7SegzG6KpK0M2ZgG4rV4oDBOsuvH+6je1WD6j5usvjqG1XC3fhrfQlAugIRZ4iWu7DyRbJsrL98/jtajby5Bdvt/r2ddOjLREk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=aznqJwO3; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1756225462;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=3DRvj9SHcb313RxmMOQKtcYFfPDoXScIlFzVPwHabrg=;
-	b=aznqJwO3p9XokqBjUWCYi1jso8WGFsUbVwBrei/COOU2CQWh/+cBgt9sXIskh1BxyGe5N8
-	sMaIwxmz0jwuz86c+ombhMydoIXDXymhrNJVrylcUNjTp/6bzWNj/k/HO+ZSFYL8qZCgQs
-	F55IxLLCqodYG84aCel3A/3tJ/Oml7c=
-Received: from mail-il1-f200.google.com (mail-il1-f200.google.com
- [209.85.166.200]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-569-x39jRuLeNQavUpR1bo6kDg-1; Tue, 26 Aug 2025 12:24:21 -0400
-X-MC-Unique: x39jRuLeNQavUpR1bo6kDg-1
-X-Mimecast-MFC-AGG-ID: x39jRuLeNQavUpR1bo6kDg_1756225461
-Received: by mail-il1-f200.google.com with SMTP id e9e14a558f8ab-3ebd3ca6902so5415305ab.3
-        for <kvm@vger.kernel.org>; Tue, 26 Aug 2025 09:24:21 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1756225460; x=1756830260;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=3DRvj9SHcb313RxmMOQKtcYFfPDoXScIlFzVPwHabrg=;
-        b=REH9jFiTx4bxKeAAIPxXZetB2D8Im/JTfjs4fh3vLwPopGuw4tMOaDu5COpHD0fC5+
-         3KvT05DIdKze6oFnToPSs+5HV+YwOznVT+6AhPDCVa1jpUMEXOv4WCTt4k38vakYqZ8U
-         XUE4dWlSbJDoGu1HYXLLp4pEXtYYESk3XF1NNe3m6lVrleYY+galnWdvqP7FoldXgoKw
-         tMokKzp+FWEs1ax/PZKOKytquXvJNqnea49Vk4J+tO7WdhA/7XU/JzXRf0mfgttkru1D
-         kAuoYDFBOKOLDBhHgiqqk2OcvVFsjGMAU9KD2Rq6pvp6QBgz/3Ow7e3jociEV1Gmi1pM
-         6/5Q==
-X-Forwarded-Encrypted: i=1; AJvYcCX4R9Nx5Pi/qXEfnMwYIAP8TSChDdYJxPU85WliM9ckVrG3PZMOuvnEKdPAUy1FxS44898=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyOMigHgOKvTVMSwZ8j2oNEfa99UjQwpwWYQEARrt09K2A1PSnZ
-	dUXoXT1Lqy3b+IMgAsRyZspT+jMEB26WtpRrZtP1bd2a6CkbCV3esli/LLmZLmrIhuB3LcDCXEC
-	FpdMuIxEriT/M48aQe8we2SFAqQY+vLaFWTp8wCG3q+CNxxsRIFRudQ==
-X-Gm-Gg: ASbGncvMZ3tp8gmlUmU2Ntedys7XkC3cBSnFFbXJGcSDXlNRcXjm1mJYIj+Z+P6EQ6Y
-	4PrLLTjuqXVr/QZRN2ao+ggGXOKe4jweR+fBMeNC/I6LJWNBTxlU8vNCyzQRws9kB2UOepg8K1b
-	sxQRPJ7CvvyqR/Wpy2XrLVDAHOzaJ8iccPr3AeRWfLytnHzpOvVX/f8KXaUC3nkSM2j1VT5WAFz
-	e7ONEriwrd/qY2QE8t8Yg7WBVprJvEZNoFqzADbGy4oa3tilyAA95vNsuN7mTlsHj+imBrCE08Q
-	XVvXZryLH7+B6H/UvbUoge6e4jCMYRYOwIAEmQJ1ABU=
-X-Received: by 2002:a05:6e02:ca3:b0:3eb:9359:d896 with SMTP id e9e14a558f8ab-3eb9359db7bmr40662665ab.3.1756225460631;
-        Tue, 26 Aug 2025 09:24:20 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IEmin04GaruynHXLV3EmAB3AOv0MHqsYH/MYaIx/IC/y7jDBa3d4BpatCwcs6IsDHllI5zy1Q==
-X-Received: by 2002:a05:6e02:ca3:b0:3eb:9359:d896 with SMTP id e9e14a558f8ab-3eb9359db7bmr40662465ab.3.1756225460200;
-        Tue, 26 Aug 2025 09:24:20 -0700 (PDT)
-Received: from redhat.com ([38.15.36.11])
-        by smtp.gmail.com with ESMTPSA id e9e14a558f8ab-3ec79dabe36sm42903925ab.29.2025.08.26.09.24.17
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 26 Aug 2025 09:24:19 -0700 (PDT)
-Date: Tue, 26 Aug 2025 10:24:16 -0600
-From: Alex Williamson <alex.williamson@redhat.com>
-To: Nipun Gupta <nipun.gupta@amd.com>
-Cc: <arnd@arndb.de>, <gregkh@linuxfoundation.org>, <nikhil.agarwal@amd.com>,
- <kvm@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
- <llvm@lists.linux.dev>, <oe-kbuild-all@lists.linux.dev>,
- <robin.murphy@arm.com>, <krzk@kernel.org>, <tglx@linutronix.de>,
- <maz@kernel.org>, <linux@weissschuh.net>, <chenqiuji666@gmail.com>,
- <peterz@infradead.org>, <robh@kernel.org>, <abhijit.gangurde@amd.com>,
- <nathan@kernel.org>, kernel test robot <lkp@intel.com>
-Subject: Re: [PATCH v4 2/2] vfio/cdx: update driver to build without
- CONFIG_GENERIC_MSI_IRQ
-Message-ID: <20250826102416.68ed8fc6.alex.williamson@redhat.com>
-In-Reply-To: <20250826043852.2206008-2-nipun.gupta@amd.com>
-References: <20250826043852.2206008-1-nipun.gupta@amd.com>
-	<20250826043852.2206008-2-nipun.gupta@amd.com>
-X-Mailer: Claws Mail 4.3.1 (GTK 3.24.43; x86_64-redhat-linux-gnu)
+	s=arc-20240116; t=1756225836; c=relaxed/simple;
+	bh=yMwNl4e0l3TtPcySpAL6rbOFnmB2yIOLSJ7vpcZI0ws=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version:Content-Type; b=aOTLb0W4XnqeGlDddDdO4JnLsspso6vH4CAZlsvsCbZ5Zd1ztCFwPnt/RlKcie4hLxYoiBtEI1w287ocIlDrjEe2FS4EPCkdgRRkg6oguMOZTEChKf4PZMa1ZGOAkFHIqM6hSiBbLrz/Tz+CVoVGulZnnF63ZEkyii2yE4GDt+8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=isrc.iscas.ac.cn; spf=pass smtp.mailfrom=isrc.iscas.ac.cn; arc=none smtp.client-ip=159.226.251.81
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=isrc.iscas.ac.cn
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=isrc.iscas.ac.cn
+Received: from ROG.lan (unknown [118.251.176.199])
+	by APP-03 (Coremail) with SMTP id rQCowAD3jX8L4a1oBKJmDw--.6398S2;
+	Wed, 27 Aug 2025 00:30:05 +0800 (CST)
+From: Pincheng Wang <pincheng.plct@isrc.iscas.ac.cn>
+To: paul.walmsley@sifive.com,
+	palmer@dabbelt.com,
+	aou@eecs.berkeley.edu,
+	alex@ghiti.fr,
+	robh@kernel.org,
+	krzk+dt@kernel.org,
+	conor+dt@kernel.org,
+	anup@brainfault.org,
+	pbonzini@redhat.com,
+	shuah@kernel.org,
+	cyan.yang@sifive.com,
+	cleger@rivosinc.com,
+	charlie@rivosinc.com,
+	cuiyunhui@bytedance.com,
+	samuel.holland@sifive.com,
+	namcao@linutronix.de,
+	jesse@rivosinc.com,
+	inochiama@gmail.com,
+	yongxuan.wang@sifive.com,
+	ajones@ventanamicro.com,
+	parri.andrea@gmail.com,
+	mikisabate@gmail.com,
+	yikming2222@gmail.com,
+	thomas.weissschuh@linutronix.de
+Cc: linux-riscv@lists.infradead.org,
+	linux-kernel@vger.kernel.org,
+	linux-doc@vger.kernel.org,
+	devicetree@vger.kernel.org,
+	kvm@vger.kernel.org,
+	kvm-riscv@lists.infradead.org,
+	linux-kselftest@vger.kernel.org,
+	pincheng.plct@isrc.iscas.ac.cn
+Subject: [PATCH v2 0/5] Add Zilsd/Zclsd support in hwprobe and KVM
+Date: Wed, 27 Aug 2025 00:29:34 +0800
+Message-Id: <20250826162939.1494021-1-pincheng.plct@isrc.iscas.ac.cn>
+X-Mailer: git-send-email 2.39.5
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-CM-TRANSID:rQCowAD3jX8L4a1oBKJmDw--.6398S2
+X-Coremail-Antispam: 1UD129KBjvJXoW7tFyftr1UXr48Cr1DJrW5Jrb_yoW8KrW5pF
+	s5GwnI9r1kJw13CF1fAr48ur1rKan5uws3tF9xtw18WayayFyrZr10k3ZxZF1kAFZ29FyD
+	Z3WrWryI9wnrAaDanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+	9KBjDU0xBIdaVrnRJUUU9Y14x267AKxVWrJVCq3wAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
+	rVWUuVWrJwAFIxvE14AKwVWUJVWUGwA2ocxC64kIII0Yj41l84x0c7CEw4AK67xGY2AK02
+	1l84ACjcxK6xIIjxv20xvE14v26r1j6r1xM28EF7xvwVC0I7IYx2IY6xkF7I0E14v26r4j
+	6F4UM28EF7xvwVC2z280aVAFwI0_Jr0_Gr1l84ACjcxK6I8E87Iv6xkF7I0E14v26r4j6r
+	4UJwAS0I0E0xvYzxvE52x082IY62kv0487Mc02F40EFcxC0VAKzVAqx4xG6I80ewAv7VC0
+	I7IYx2IY67AKxVWUJVWUGwAv7VC2z280aVAFwI0_Jr0_Gr1lOx8S6xCaFVCjc4AY6r1j6r
+	4UM4x0Y48IcxkI7VAKI48JM4x0x7Aq67IIx4CEVc8vx2IErcIFxwACI402YVCY1x02628v
+	n2kIc2xKxwCY1x0262kKe7AKxVW8ZVWrXwCF04k20xvY0x0EwIxGrwCFx2IqxVCFs4IE7x
+	kEbVWUJVW8JwC20s026c02F40E14v26r1j6r18MI8I3I0E7480Y4vE14v26r106r1rMI8E
+	67AF67kF1VAFwI0_Wrv_Gr1UMIIYrxkI7VAKI48JMIIF0xvE2Ix0cI8IcVAFwI0_Jr0_JF
+	4lIxAIcVC0I7IYx2IY6xkF7I0E14v26r4j6F4UMIIF0xvE42xK8VAvwI8IcIk0rVWUJVWU
+	CwCI42IY6I8E87Iv67AKxVWUJVW8JwCI42IY6I8E87Iv6xkF7I0E14v26r4j6r4UJbIYCT
+	nIWIevJa73UjIFyTuYvjTRM6wCDUUUU
+X-CM-SenderInfo: pslquxhhqjh1xofwqxxvufhxpvfd2hldfou0/
 
-On Tue, 26 Aug 2025 10:08:52 +0530
-Nipun Gupta <nipun.gupta@amd.com> wrote:
+Hi all,
 
-> Define dummy MSI related APIs in VFIO CDX driver to build the
-> driver without enabling CONFIG_GENERIC_MSI_IRQ flag.
-> 
-> Reported-by: kernel test robot <lkp@intel.com>
-> Closes: https://lore.kernel.org/oe-kbuild-all/202508070308.opy5dIFX-lkp@intel.com/
-> Reviewed-by: Nikhil Agarwal <nikhil.agarwal@amd.com>
-> Reviewed-by: Alex Williamson <alex.williamson@redhat.com>
-> Signed-off-by: Nipun Gupta <nipun.gupta@amd.com>
-> ---
-> 
-> Changes v1->v2:
-> - fix linking intr.c file in Makefile
-> Changes v2->v3:
-> - return error from vfio_cdx_set_irqs_ioctl() when CONFIG_GENERIC_MSI_IRQ
->   is disabled
-> Changes v3->v4:
-> - changed the return value to -EINVAL from -ENODEV
+This is v2 of a short series that adds kernel support for the ratified
+Zilsd (Load/Store pair) and Zclsd (Compressed Load/Store pair) RISC-V
+ISA extensions. The series enables kernel-side exposure so user-space
+(for example glibc) can detect and use these extensions via hwprobe and
+runtime checks.
 
-What are your intentions for merging this series, char-misc or vfio?
+Patches:
+- Patch 1：Add device tree bindings documentation for Zilsd and Zclsd.
+- Patch 2: Extend RISC-V ISA extension string parsing to recognize them.
+- Patch 3: Export Zilsd and Zclsd via riscv_hwprobe.
+- Patch 4: Allow KVM guests to use them.
+- Patch 5: Add KVM selftests.
+
+Changes in v2:
+- Device-tree schema: simplified the rv64 validation for Zilsd by
+  removing a redundant `contais: const: zilsd` in the `if` clause; the
+  simpler `if (riscv, isa-base contains rv64i) then (riscv,
+  isa-extension not contains zilsd)` form is used instead. Behaviour is
+  unchanged, and the logic is cleaner.
+- Device-tree schema: corrected Zclsd dependency to require both Zilsd
+  and Zca (previous `anyOf` was incorrect; now both are enforced).
+- Commit message typo fixed: "dt-bidings" -> "dt-bindings" in the Patch
+  1 commit subject.
+
+The v2 changes are documentation/schema corrections in extensions.yaml.
+No functional changes were made to ISA parsing, hwprobe syscall, KVM
+guest support or the selftests beyond ensuring the binding correctly
+documents and validates the extension relationships.
+
+Please review v2 and advise if futher changes are needed.
+
 Thanks,
+Pincheng Wang 
 
-Alex
+Pincheng Wang (5):
+  dt-bindings: riscv: add Zilsd and Zclsd extension descriptions
+  riscv: add ISA extension parsing for Zilsd and Zclsd
+  riscv: hwprobe: export Zilsd and Zclsd ISA extensions
+  riscv: KVM: allow Zilsd and Zclsd extensions for Guest/VM
+  KVM: riscv: selftests: add Zilsd and Zclsd extension to get-reg-list
+    test
+
+ Documentation/arch/riscv/hwprobe.rst          |  8 +++++
+ .../devicetree/bindings/riscv/extensions.yaml | 36 +++++++++++++++++++
+ arch/riscv/include/asm/hwcap.h                |  2 ++
+ arch/riscv/include/uapi/asm/hwprobe.h         |  2 ++
+ arch/riscv/include/uapi/asm/kvm.h             |  2 ++
+ arch/riscv/kernel/cpufeature.c                | 24 +++++++++++++
+ arch/riscv/kernel/sys_hwprobe.c               |  2 ++
+ arch/riscv/kvm/vcpu_onereg.c                  |  2 ++
+ .../selftests/kvm/riscv/get-reg-list.c        |  6 ++++
+ 9 files changed, 84 insertions(+)
+
+-- 
+2.39.5
 
 
