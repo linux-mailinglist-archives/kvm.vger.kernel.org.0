@@ -1,155 +1,121 @@
-Return-Path: <kvm+bounces-55774-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-55775-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id A3B06B370C8
-	for <lists+kvm@lfdr.de>; Tue, 26 Aug 2025 18:58:15 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id B26CFB37100
+	for <lists+kvm@lfdr.de>; Tue, 26 Aug 2025 19:10:35 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 56872366189
-	for <lists+kvm@lfdr.de>; Tue, 26 Aug 2025 16:58:15 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 032918E4760
+	for <lists+kvm@lfdr.de>; Tue, 26 Aug 2025 17:10:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C33802D8DDD;
-	Tue, 26 Aug 2025 16:58:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8A0F12E2DF1;
+	Tue, 26 Aug 2025 17:10:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="fuvpJ+uR"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="0CrZSKZf"
 X-Original-To: kvm@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f202.google.com (mail-pl1-f202.google.com [209.85.214.202])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CCB8A2D837C;
-	Tue, 26 Aug 2025 16:58:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5F5B7234973
+	for <kvm@vger.kernel.org>; Tue, 26 Aug 2025 17:10:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756227483; cv=none; b=XXhQxg+Z2zJ7Ls0Vfm5yhmEdAzyN7lyg7Rupp/xJ+CY/Qx7MtmI/+Iu7LJ6mJm5ZjpwOMx96WOEevVEQbTbbD63uChgix+YzdBTA201exvr4Z+D2QxGvwQ3oOxUnDtNL7jt8uNGyXA164c1FZ3zKYKVupuYV0ttdg3pYxdFmQJ0=
+	t=1756228225; cv=none; b=jCrN7dI5EkHePzz0zH2wsWVuUf54P+6HxF3foa8PRTGHRdaXXKhTRO4b3o8bLz4GfXopyujyw8XkEJnlbUJwugyg/QtC4EOeoc9inhzz+hc1LT81oTxvcWwfyCWQuYTM0iLYgdqB0jwqJ5xaV3EkITRPmMtlj4X4dXRsC2gJg8E=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756227483; c=relaxed/simple;
-	bh=fnUtXDAxJfdbxKoWIvjZ0YEMsdquajfs3Wt0vqohrgU=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=ubMmnoo2oZu9s6x/EePqUAL6yDQNyPSEn9QLVcp1fDTzFKhnPHdwNItf1KrVl76vYqHNUSo0T4xLsZrxMtzfPtxsYoeWBgZVL2BFKsLWS+Gn86AlRsHZVg5MsrA92wClIOcSii+yml4tMhTKqDDFw9xeLeS1jATQ2bfM51G8L/o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=fuvpJ+uR; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id C82A7C4CEF1;
-	Tue, 26 Aug 2025 16:58:01 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1756227482;
-	bh=fnUtXDAxJfdbxKoWIvjZ0YEMsdquajfs3Wt0vqohrgU=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=fuvpJ+uRtRM9fzHvRv14jD9ZQo0Z+Ik1UILyoPgPF2jz8dNyPROaEFVvlvQAaXz4X
-	 ttXYaAtJGkub4HtTxq/BEINhmPDYT0kc4MO9Pt7hSTntGG0uTTAcFEzDYKdGxtFeT2
-	 qkjkQ9Njb/UFnPIIvb1+17UQA9vp2juzNUYGm3uywq3v8NTkaS1OlNFYQ09AI39lpx
-	 YQaZvSP4SUfRf4YlPPa54Y1tNy/wsF7ZVJVKqynCB7t8JfsAtW1Xvl7gh2NjEvVbqY
-	 byeS9jwZXrmVRhx6StAaC2vlVi6HX3Ox4JExT2RQEj9zwDNL3tioAysr1mHqOoXhAg
-	 8DUjtPx04KNjg==
-Date: Tue, 26 Aug 2025 16:58:00 +0000
-From: Wei Liu <wei.liu@kernel.org>
-To: Sean Christopherson <seanjc@google.com>
-Cc: Nuno Das Neves <nunodasneves@linux.microsoft.com>,
-	Marc Zyngier <maz@kernel.org>,
-	Oliver Upton <oliver.upton@linux.dev>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Will Deacon <will@kernel.org>,
-	Tianrui Zhao <zhaotianrui@loongson.cn>,
-	Bibo Mao <maobibo@loongson.cn>, Huacai Chen <chenhuacai@kernel.org>,
-	Anup Patel <anup@brainfault.org>,
-	Paul Walmsley <paul.walmsley@sifive.com>,
-	Palmer Dabbelt <palmer@dabbelt.com>,
-	Albert Ou <aou@eecs.berkeley.edu>,
-	Paolo Bonzini <pbonzini@redhat.com>,
-	Thomas Gleixner <tglx@linutronix.de>,
-	Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-	Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org,
-	"K. Y. Srinivasan" <kys@microsoft.com>,
-	Haiyang Zhang <haiyangz@microsoft.com>,
-	Wei Liu <wei.liu@kernel.org>, Dexuan Cui <decui@microsoft.com>,
-	Peter Zijlstra <peterz@infradead.org>,
-	Andy Lutomirski <luto@kernel.org>,
-	"Paul E. McKenney" <paulmck@kernel.org>,
-	Frederic Weisbecker <frederic@kernel.org>,
-	Neeraj Upadhyay <neeraj.upadhyay@kernel.org>,
-	Joel Fernandes <joelagnelf@nvidia.com>,
-	Josh Triplett <josh@joshtriplett.org>,
-	Boqun Feng <boqun.feng@gmail.com>,
-	Uladzislau Rezki <urezki@gmail.com>, linux-kernel@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
-	kvm@vger.kernel.org, loongarch@lists.linux.dev,
-	kvm-riscv@lists.infradead.org, linux-riscv@lists.infradead.org,
-	linux-hyperv@vger.kernel.org, rcu@vger.kernel.org
-Subject: Re: [PATCH 0/5] Drivers: hv: Fix NEED_RESCHED_LAZY and use common
- APIs
-Message-ID: <aK3nmOgVl4INJpjG@liuwe-devbox-ubuntu-v2.tail21d00.ts.net>
-References: <20250825200622.3759571-1-seanjc@google.com>
- <3188ca61-2591-4576-9777-1671689b7235@linux.microsoft.com>
- <aKz_ZMvvF0e9nwSn@google.com>
+	s=arc-20240116; t=1756228225; c=relaxed/simple;
+	bh=QUO+kvmsY5YH63Em44lRGDPBilShneN9/HrqfZ7Q1LM=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=UENVFHevyoXygW7jPcl4kv9F+MTBVN/NANQrn18AlH7Laf6KcgysgwhWDwh5yKmFdMw4oBEIbsXtvq0ta0sVu3wXDBr6C5HyyiCWMUzXE04EIW7/fPfw2vJ6rzb75E9o9GDZHfdERCfiC5esNvb5tyEWtExVKTzdQveHR3Zhti8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=0CrZSKZf; arc=none smtp.client-ip=209.85.214.202
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+Received: by mail-pl1-f202.google.com with SMTP id d9443c01a7336-244582bc5e4so72280145ad.2
+        for <kvm@vger.kernel.org>; Tue, 26 Aug 2025 10:10:24 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1756228224; x=1756833024; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=EownB3vAsU2c89zF95l+GmdPluihHYmNBg7xdEmdumo=;
+        b=0CrZSKZfX5062CRGl/XWqBzOjICRnB+M4dd9PmPfJ5kP4YGjueNcaBqfQXwN8j4wjT
+         S7SQ53mjnB2dIWowJdoY7hpVliIUxrA5/zKUgae0lPG0i1t2WTRfRvlY22Wev4tRu0TU
+         PQi6v7jKwgBG0BR4elp06OA71ZAQh21uGVdmAirHLFyXYT0W1wbWav5E8bJBQhU+HizI
+         Rv5nLtilMoQ7dvupAHqQTVi8VZWjnXISYbKSMKCwe7Plf8Uxw0bfN6XpsD9YEx7zki7B
+         wgh2SYrHomeIPJyepEQ5GnJAH5Em5u4kHv6zvuMij9kAHXqjsffwjzNmMSkLEEqK3Z1O
+         xZNg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1756228224; x=1756833024;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=EownB3vAsU2c89zF95l+GmdPluihHYmNBg7xdEmdumo=;
+        b=m0fQW25k7/UcOXmdFZoDhtjXHJeC6/S3F1Kdtmqdp8RzE/3rhg91N2/iPJqfzJA0A1
+         CvW4Fg54N8/05FPlvo8+mET04tzEuamA2SRYibkkbRdv1ofMnV1LDmph5FodrGmVNDgv
+         UlJXIfGlIG169A1Iqfmk41YTtEtq/J3qOPqyrsxLS2dqAt/7TyPNshZycF+iuKFYMXsg
+         UiY6tmN+pWcjUtImMkta+STpRi8P24k6v5EE8d/B6V7sWZINVXpOnTpCobeVWeCTHbFF
+         ypfV8hytFQCLt8mFxMJdB7YyOYVrODroBNkN9SqYN+kjk7w8IIV+MX+IJSTItvVSiDbc
+         9EEg==
+X-Forwarded-Encrypted: i=1; AJvYcCWR/DkrxF6fcCleKf7xHbWeqUC0VtPYC2WqMDGnqheeJwHfOW033cHzjaZocswoSwTgruo=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyXqGiYi8WnxVxiqgNB2RKR45LehekyASbH9+fayCzNgrt1Idg5
+	qRGCIV66Qz0vSgsvLF4amPREIc8qph0XmG82QxqtIIFBRT2Gu5ggPnDqQPwPX5qoQcpY4XbBD5I
+	fGdyijw==
+X-Google-Smtp-Source: AGHT+IHRLlt3zeA2aVRArIy2R/qVnR7QPU7LMcHxv8NGLB1glHB3fzv5nkgHNu6rY2W/ZqoC9EkHt79E7rQ=
+X-Received: from plox5.prod.google.com ([2002:a17:902:8ec5:b0:246:9673:3625])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:903:234e:b0:248:6d1a:42e0
+ with SMTP id d9443c01a7336-2486d1a4610mr32584015ad.14.1756228223537; Tue, 26
+ Aug 2025 10:10:23 -0700 (PDT)
+Date: Tue, 26 Aug 2025 10:10:21 -0700
+In-Reply-To: <14f91fcb323fbd80158aadb4b9f240fad9f9487e.1756161460.git.kai.huang@intel.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <aKz_ZMvvF0e9nwSn@google.com>
+Mime-Version: 1.0
+References: <cover.1756161460.git.kai.huang@intel.com> <14f91fcb323fbd80158aadb4b9f240fad9f9487e.1756161460.git.kai.huang@intel.com>
+Message-ID: <aK3qfbvkCOaCxWC_@google.com>
+Subject: Re: [PATCH v7 7/7] KVM: TDX: Explicitly do WBINVD when no more TDX SEAMCALLs
+From: Sean Christopherson <seanjc@google.com>
+To: Kai Huang <kai.huang@intel.com>
+Cc: dave.hansen@intel.com, bp@alien8.de, tglx@linutronix.de, 
+	peterz@infradead.org, mingo@redhat.com, hpa@zytor.com, 
+	thomas.lendacky@amd.com, x86@kernel.org, kas@kernel.org, 
+	rick.p.edgecombe@intel.com, dwmw@amazon.co.uk, linux-kernel@vger.kernel.org, 
+	pbonzini@redhat.com, kvm@vger.kernel.org, reinette.chatre@intel.com, 
+	isaku.yamahata@intel.com, dan.j.williams@intel.com, ashish.kalra@amd.com, 
+	nik.borisov@suse.com, chao.gao@intel.com, sagis@google.com, 
+	farrah.chen@intel.com, Binbin Wu <binbin.wu@linux.intel.com>
+Content-Type: text/plain; charset="us-ascii"
 
-On Mon, Aug 25, 2025 at 05:27:16PM -0700, Sean Christopherson wrote:
-> On Mon, Aug 25, 2025, Nuno Das Neves wrote:
-> > On 8/25/2025 1:06 PM, Sean Christopherson wrote:
-> > > Fix a bug where MSHV root partitions don't honor NEED_RESCHED_LAZY, and then
-> > > deduplicate the TIF related MSHV code by turning the "kvm" entry APIs into
-> > > more generic "virt" APIs (which ideally would have been done when MSHV root
-> > > support was added).
-> > > 
-> > > Assuming all is well, maybe this could go through the tip tree?
-> > > 
-> > > The Hyper-V stuff and non-x86 architectures are compile-tested only.
-> > > 
-> > 
-> > Thanks Sean, I can test the root partition changes.
-> > 
-> > A similar change will be needed in mshv_vtl_main.c since it also calls
-> > mshv_do_pre_guest_mode_work() (hence the "common" in mshv_common.c).
-> 
-> Oof, more dependencies.  I suppose the easiest thing would be to send a series
-> against
-> 
->   git://git.kernel.org/pub/scm/linux/kernel/git/hyperv/linux.git queue
-> 
-> and then route everything through there?
+On Tue, Aug 26, 2025, Kai Huang wrote:
+> diff --git a/arch/x86/virt/vmx/tdx/tdx.c b/arch/x86/virt/vmx/tdx/tdx.c
+> index 2abf53ed59c8..f8f74e213f0d 100644
+> --- a/arch/x86/virt/vmx/tdx/tdx.c
+> +++ b/arch/x86/virt/vmx/tdx/tdx.c
+> @@ -1872,3 +1872,15 @@ u64 tdh_phymem_page_wbinvd_hkid(u64 hkid, struct page *page)
+>  	return seamcall(TDH_PHYMEM_PAGE_WBINVD, &args);
+>  }
+>  EXPORT_SYMBOL_GPL(tdh_phymem_page_wbinvd_hkid);
+> +
+> +void tdx_cpu_flush_cache_for_kexec(void)
+> +{
+> +	lockdep_assert_preemption_disabled();
+> +
+> +	if (!this_cpu_read(cache_state_incoherent))
+> +		return;
+> +
 
-Our fixes branch is on 6.17-rc1. You can use it as a base if you want
-to.
+Can you add a comment here to explain why this is done even if the kernel doesn't
+support kexec?  I've no objection to the superfluous flushing, but I've spent far
+too much time deciphering old commits where the changelog says one thing and the
+code does something else with no explanation.  I don't want to be party to such
+crimes :-)
 
+> +	wbinvd();
+> +	this_cpu_write(cache_state_incoherent, false);
+> +}
+> +EXPORT_SYMBOL_GPL(tdx_cpu_flush_cache_for_kexec);
+> -- 
+> 2.50.1
 > 
-> Alternatively, frontload the MSHV fixes (which I'll do regardless) and take those
-> through hyperv and the rest through the tip tree?  That seems like an absurd
-> amount of juggling though, especially if we want to get the cleanups into 6.18.
-> And if none of these lands, it's MSHV that'll suffer the most, so betting it all
-> on the hyperv tree doesn't seem terrible.
-> 
-
-I'm happy to do it however the community sees fit.
-
-> > Also, is it possible to make all the mshv driver changes in a single patch?
-> 
-> It's certainly possible, but I'd prefer not do to that.
-> 
-> > It seems like it would be cleaner than refactoring it in patches 1 & 2 and
-> > then deleting all the refactored code in patch 5.
-> 
-> Only if you don't care about backporting fixes, bisection, or maintaining code.
-> 
-> E.g. if checking NEED_RESCHED_LAZY somehow causes issues, it would be really nice
-> for that to bisect to exactly that patch, not a patch that also switches to a
-> completely different set of APIs.
-> 
-> And if someone is wants the fixes in a pre-6.18 kernel, they don't need to
-> backport all of the KVM and entry code changes just to get the fix.
-
-+1 on this.
-
-Thanks,
-Wei
-
-> 
-> As for the maintenance headache, see above.
 
