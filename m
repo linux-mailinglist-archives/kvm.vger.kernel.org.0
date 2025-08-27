@@ -1,54 +1,54 @@
-Return-Path: <kvm+bounces-55971-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-55972-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id E483FB38E3E
-	for <lists+kvm@lfdr.de>; Thu, 28 Aug 2025 00:23:18 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id F2094B38E65
+	for <lists+kvm@lfdr.de>; Thu, 28 Aug 2025 00:26:12 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9E8662058A0
-	for <lists+kvm@lfdr.de>; Wed, 27 Aug 2025 22:23:18 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id C271E1888E70
+	for <lists+kvm@lfdr.de>; Wed, 27 Aug 2025 22:26:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0930E311954;
-	Wed, 27 Aug 2025 22:20:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 68EE42F9C38;
+	Wed, 27 Aug 2025 22:25:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=zytor.com header.i=@zytor.com header.b="mEoOQB3z"
+	dkim=pass (2048-bit key) header.d=zytor.com header.i=@zytor.com header.b="iwRY6+IQ"
 X-Original-To: kvm@vger.kernel.org
 Received: from mail.zytor.com (terminus.zytor.com [198.137.202.136])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9BCC427935C;
-	Wed, 27 Aug 2025 22:19:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D501E1E0DE3;
+	Wed, 27 Aug 2025 22:25:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.136
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756333201; cv=none; b=tP3ylBzC1Z6LAQ39pJl+bf0cWhfDRM5IdXjPQ28Lj+ippdjkt0o5v3LzBgBeNCMtuTf9pUprtvslQRaqp9LuZpupt23GX42SQEGSiMynLCeLxgDoynItKWASVTIDVlN/Xp+05EAt/mjLUFfoaHXM/I8GyDSLLofd1x5/oLehS0Q=
+	t=1756333530; cv=none; b=O7faNNZQ1IsrDU+TAAnrwdIADDw6aNA49T9PQm9x4sBZVQeh6ZF2Rjqa+7Ma3MFWVDDIi9EhYpLp6hYqLjsyDqhS+PwjWGGIZnZx673bKe1Kn8xq0GtCwpoOBLU6B2mOZK21MJPEI5gxhmWshFnEt9vfT3NZA5Nt/nnd3XDa36Y=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756333201; c=relaxed/simple;
-	bh=r/pGZK7kffhvJQpxrfEZVXYRwUpDhgaWXvg34gCGFB8=;
+	s=arc-20240116; t=1756333530; c=relaxed/simple;
+	bh=IGBw6f+5B1xf5/QSzv1Q2fzVlERKjwE628Jmp2awf6U=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=HuFfCoR1v1nCvdhcOSwj92KmWjsVJdw7/BpVHAxo36feGW/dSLy5yWjhZGu8LPenOtHmZ4cdhLpHjXiWjj4milWDsOysgHF5yFZUxml/A2tukzLLcQhQ3DbKnTG1Nh/AuuV+NYpPdAgL4fYH4xZ6gjj+4HkuZE4tnqm07ciz3yc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=zytor.com; spf=pass smtp.mailfrom=zytor.com; dkim=pass (2048-bit key) header.d=zytor.com header.i=@zytor.com header.b=mEoOQB3z; arc=none smtp.client-ip=198.137.202.136
+	 In-Reply-To:Content-Type; b=R6NlpFtpz5+KPLyw0zN7yg9lNc1Dl3FAMGGxByb3biS48jBM7ppQR9R3Qq7J5g6Phd2N9VC7QvpnM38JFBKTU86TtIMNVWohroLD19E58lN1aUEdOHdOdBvQhc5M5cZUg19QZi4IqcIbjzW9e6bXDPeNn92X30wUVLhnbwT2Kok=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=zytor.com; spf=pass smtp.mailfrom=zytor.com; dkim=pass (2048-bit key) header.d=zytor.com header.i=@zytor.com header.b=iwRY6+IQ; arc=none smtp.client-ip=198.137.202.136
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=zytor.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=zytor.com
 Received: from [192.168.7.202] ([71.202.166.45])
 	(authenticated bits=0)
-	by mail.zytor.com (8.18.1/8.17.1) with ESMTPSA id 57RMIq9C1905948
+	by mail.zytor.com (8.18.1/8.17.1) with ESMTPSA id 57RMOwIS1910154
 	(version=TLSv1.3 cipher=TLS_AES_128_GCM_SHA256 bits=128 verify=NO);
-	Wed, 27 Aug 2025 15:18:52 -0700
-DKIM-Filter: OpenDKIM Filter v2.11.0 mail.zytor.com 57RMIq9C1905948
+	Wed, 27 Aug 2025 15:24:59 -0700
+DKIM-Filter: OpenDKIM Filter v2.11.0 mail.zytor.com 57RMOwIS1910154
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=zytor.com;
-	s=2025082201; t=1756333135;
-	bh=2cYP731y2qYaZDQ8pdiBsKtWhtEf1GRHZ29xPrOv/bQ=;
+	s=2025082201; t=1756333500;
+	bh=gmZZLvLa8thUkPawWrdlspY4iU3XSjkjEaMKcMsMj80=;
 	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=mEoOQB3z2Cjz5W5eDNyuS4wLtk1nqxV63zfySIBg/3Z7FOM3f8nG5b/+dU/GwFS4s
-	 zyWKFPv9eZ8g9zrxAuZLj3NH0+JaLwwTsOpMS4+jYzFkILsPqcnkP8121zWpeUIWxt
-	 tgh5a8JXOAV7vJd7PpUdf2twy806pL621/RYnQj0Q/IKqyJacDtr7LPRNd6bSCyzfh
-	 C0htM9pIjIVuMRNeffl4IO9FjTVMt4jStmvuMya1PznQHhf7kp0rgoOZLnDNvfX51V
-	 6Re9UIchwfxmiLxY/XpiXFiMzDpFAcufTnwoKvigmrphZ6FvyRcmSk1F099QJ0Bh7K
-	 5zmxh6HcA1YaA==
-Message-ID: <2cdc163a-12fc-49e1-ab87-bba6df0ae345@zytor.com>
-Date: Wed, 27 Aug 2025 15:18:51 -0700
+	b=iwRY6+IQknkmxIGzjshRQyqwReL7Oey4/IT9D4bJZ0iltSz73/AeiqNCQEAAosp/Q
+	 CeZGQJ+U5vpFcmUSYfJ/uxzjufWt1YEBSBhXhy4G0uz5ZQIiX7PMJBtw6QPsU/TitC
+	 jGJufOgg/hSXI0DAKGoiV/N79HNbyueOCcuExDotJx1mH47VUd+1IqYguNNPTLSiz9
+	 RnssYuwodPSMTSFsrMxgYVv/aikUwc+4WF21s1iwk0wcyMGtMxRgMLNJcL4gLArtZL
+	 6U2732hl6f940l6bvVbIMMp/mfUiCLdmtNcR7FjT/0SknbhiSzL6dVDoWvbNrlW0fJ
+	 hXo63sf6R9dNw==
+Message-ID: <5b1c5f80-bbe1-4294-8ede-5e097e8feda1@zytor.com>
+Date: Wed, 27 Aug 2025 15:24:58 -0700
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -56,17 +56,20 @@ List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v6 04/20] x86/cea: Export an API to get per CPU exception
- stacks for KVM to use
-To: Dave Hansen <dave.hansen@intel.com>, linux-kernel@vger.kernel.org,
-        kvm@vger.kernel.org, linux-doc@vger.kernel.org
-Cc: pbonzini@redhat.com, seanjc@google.com, corbet@lwn.net, tglx@linutronix.de,
-        mingo@redhat.com, bp@alien8.de, dave.hansen@linux.intel.com,
-        x86@kernel.org, hpa@zytor.com, luto@kernel.org, peterz@infradead.org,
-        andrew.cooper3@citrix.com, chao.gao@intel.com, hch@infradead.org
+Subject: Re: [PATCH v6 06/20] KVM: VMX: Set FRED MSR intercepts
+To: Sean Christopherson <seanjc@google.com>
+Cc: linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        linux-doc@vger.kernel.org, pbonzini@redhat.com, corbet@lwn.net,
+        tglx@linutronix.de, mingo@redhat.com, bp@alien8.de,
+        dave.hansen@linux.intel.com, x86@kernel.org, hpa@zytor.com,
+        luto@kernel.org, peterz@infradead.org, andrew.cooper3@citrix.com,
+        chao.gao@intel.com, hch@infradead.org
 References: <20250821223630.984383-1-xin@zytor.com>
- <20250821223630.984383-5-xin@zytor.com>
- <720bc7ac-7e81-4ad9-8cc5-29ac540be283@intel.com>
+ <20250821223630.984383-7-xin@zytor.com>
+ <2dd8c323-7654-4a28-86f1-d743b70d10b1@zytor.com>
+ <aK340-6yIE_qujUm@google.com>
+ <c45a7c91-e393-4f71-8b22-aef6486aaa9e@zytor.com>
+ <aK4yXT9y5YHeEWkb@google.com>
 Content-Language: en-US
 From: Xin Li <xin@zytor.com>
 Autocrypt: addr=xin@zytor.com; keydata=
@@ -103,171 +106,46 @@ Autocrypt: addr=xin@zytor.com; keydata=
  PYbAkjBbm+tuJ/Sm+5Yp5T/BnKz21FoCS8uvTiziHj2H7Cuekn6F8EYhegONm+RVg3vikOpn
  gao85i4HwQTK9/D1wgJIQkdwWXVMZ6q/OALaBp82vQ2U9sjTyFXgDjglgh00VRAHP7u1Rcu4
  l75w1xInsg==
-In-Reply-To: <720bc7ac-7e81-4ad9-8cc5-29ac540be283@intel.com>
+In-Reply-To: <aK4yXT9y5YHeEWkb@google.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 
->> Suggested-by: Christoph Hellwig <hch@infradead.org>
->> Suggested-by: Dave Hansen <dave.hansen@intel.com>
-> 
-> Nit: I wouldn't use Suggested-by unless the person basically asked for
-> the *entire* patch. Christoph and I were asking for specific bits of
-> this, but neither of us asked for this patch as a whole.
+On 8/26/2025 3:17 PM, Sean Christopherson wrote:
+>> +		if (!kvm_cpu_cap_has(X86_FEATURE_SHSTK))
+>> +			wrmsrns(MSR_IA32_FRED_SSP0, vmx->msr_guest_fred_ssp0);
+> FWIW, if we can't get an SDM change, don't bother with RDMSR/WRMSRNS, just
+> configure KVM to intercept accesses.  Then in kvm_set_msr_common(), pivot on
+> X86_FEATURE_SHSTK, e.g.
 
-I did it because the patch is almost rewritten to export accessors instead
-of raw data, IOW, the way of doing it is completely changed.
 
-But I will remove Suggested-by.
+Intercepting is a solid approach: it ensures the guest value is fully
+virtual and does not affect the hardware FRED SSP0 MSR.  Of course the code
+is also simplified.
 
-> 
->> diff --git a/arch/x86/coco/sev/sev-nmi.c b/arch/x86/coco/sev/sev-nmi.c
->> index d8dfaddfb367..73e34ad7a1a9 100644
->> --- a/arch/x86/coco/sev/sev-nmi.c
->> +++ b/arch/x86/coco/sev/sev-nmi.c
->> @@ -30,7 +30,7 @@ static __always_inline bool on_vc_stack(struct pt_regs *regs)
->>   	if (ip_within_syscall_gap(regs))
->>   		return false;
->>   
->> -	return ((sp >= __this_cpu_ist_bottom_va(VC)) && (sp < __this_cpu_ist_top_va(VC)));
->> +	return ((sp >= __this_cpu_ist_bottom_va(ESTACK_VC)) && (sp < __this_cpu_ist_top_va(ESTACK_VC)));
->>   }
-> 
-> This rename is one of those things that had me scratching my head for a
-> minute. It wasn't obvious at _all_ why the VC=>ESTACK_VC "rename" is
-> necessary.
-> 
-> This needs to have been mentioned in the changelog.
-> 
-> Better yet would have been to do this in a separate patch because a big
-> chunk of this patch is just rename noise.
-
-Sure, will do.
-
->> diff --git a/arch/x86/include/asm/cpu_entry_area.h b/arch/x86/include/asm/cpu_entry_area.h
->> index 462fc34f1317..8e17f0ca74e6 100644
->> --- a/arch/x86/include/asm/cpu_entry_area.h
->> +++ b/arch/x86/include/asm/cpu_entry_area.h
->> @@ -46,7 +46,7 @@ struct cea_exception_stacks {
->>    * The exception stack ordering in [cea_]exception_stacks
->>    */
->>   enum exception_stack_ordering {
->> -	ESTACK_DF,
->> +	ESTACK_DF = 0,
->>   	ESTACK_NMI,
->>   	ESTACK_DB,
->>   	ESTACK_MCE,
-> 
-> Is this really required? I thought the first enum was always 0? Is this
-> just trying to ensure that ESTACKS_MEMBERS() defines a matching number
-> of N_EXCEPTION_STACKS stacks?
-> 
-> If that's the case, shouldn't this be represented with a BUILD_BUG_ON()?
-
-Will do BUILD_BUG_ON().
 
 > 
->> @@ -58,18 +58,15 @@ enum exception_stack_ordering {
->>   #define CEA_ESTACK_SIZE(st)					\
->>   	sizeof(((struct cea_exception_stacks *)0)->st## _stack)
->>   
->> -#define CEA_ESTACK_BOT(ceastp, st)				\
->> -	((unsigned long)&(ceastp)->st## _stack)
->> -
->> -#define CEA_ESTACK_TOP(ceastp, st)				\
->> -	(CEA_ESTACK_BOT(ceastp, st) + CEA_ESTACK_SIZE(st))
->> -
->>   #define CEA_ESTACK_OFFS(st)					\
->>   	offsetof(struct cea_exception_stacks, st## _stack)
->>   
->>   #define CEA_ESTACK_PAGES					\
->>   	(sizeof(struct cea_exception_stacks) / PAGE_SIZE)
->>   
->> +extern unsigned long __this_cpu_ist_top_va(enum exception_stack_ordering stack);
->> +extern unsigned long __this_cpu_ist_bottom_va(enum exception_stack_ordering stack);
->> +
->>   #endif
->>   
->>   #ifdef CONFIG_X86_32
->> @@ -144,10 +141,4 @@ static __always_inline struct entry_stack *cpu_entry_stack(int cpu)
->>   	return &get_cpu_entry_area(cpu)->entry_stack_page.stack;
->>   }
->>   
->> -#define __this_cpu_ist_top_va(name)					\
->> -	CEA_ESTACK_TOP(__this_cpu_read(cea_exception_stacks), name)
->> -
->> -#define __this_cpu_ist_bottom_va(name)					\
->> -	CEA_ESTACK_BOT(__this_cpu_read(cea_exception_stacks), name)
->> -
->>   #endif
->> diff --git a/arch/x86/kernel/cpu/common.c b/arch/x86/kernel/cpu/common.c
->> index 34a054181c4d..cb14919f92da 100644
->> --- a/arch/x86/kernel/cpu/common.c
->> +++ b/arch/x86/kernel/cpu/common.c
->> @@ -2307,12 +2307,12 @@ static inline void setup_getcpu(int cpu)
->>   static inline void tss_setup_ist(struct tss_struct *tss)
->>   {
->>   	/* Set up the per-CPU TSS IST stacks */
->> -	tss->x86_tss.ist[IST_INDEX_DF] = __this_cpu_ist_top_va(DF);
->> -	tss->x86_tss.ist[IST_INDEX_NMI] = __this_cpu_ist_top_va(NMI);
->> -	tss->x86_tss.ist[IST_INDEX_DB] = __this_cpu_ist_top_va(DB);
->> -	tss->x86_tss.ist[IST_INDEX_MCE] = __this_cpu_ist_top_va(MCE);
->> +	tss->x86_tss.ist[IST_INDEX_DF] = __this_cpu_ist_top_va(ESTACK_DF);
->> +	tss->x86_tss.ist[IST_INDEX_NMI] = __this_cpu_ist_top_va(ESTACK_NMI);
->> +	tss->x86_tss.ist[IST_INDEX_DB] = __this_cpu_ist_top_va(ESTACK_DB);
->> +	tss->x86_tss.ist[IST_INDEX_MCE] = __this_cpu_ist_top_va(ESTACK_MCE);
+> 	case MSR_IA32_U_CET:
+> 	case MSR_IA32_PL0_SSP ... MSR_IA32_PL3_SSP:
+> 		if (!kvm_cpu_cap_has(X86_FEATURE_SHSTK)) {
+> 			WARN_ON_ONCE(msr != MSR_IA32_FRED_SSP0);
+> 			vcpu->arch.fred_rsp0_fallback = data;
+> 			break;
+> 		}
 > 
-> If you respin this, please vertically align these.
+> 		kvm_set_xstate_msr(vcpu, msr_info);
+> 		break;
+> 
+> and
+> 
+> 	case MSR_IA32_U_CET:
+> 	case MSR_IA32_PL0_SSP ... MSR_IA32_PL3_SSP:
+> 		if (!kvm_cpu_cap_has(X86_FEATURE_SHSTK)) {
+> 			WARN_ON_ONCE(msr_info->index != MSR_IA32_FRED_SSP0);
+> 			vcpu->arch.fred_rsp0_fallback = msr_info->data;
+> 			break;
+> 		}
+> 
+> 		kvm_get_xstate_msr(vcpu, msr_info);
+> 		break;
 
-NP.
-
-> 
->> +/*
->> + * FRED introduced new fields in the host-state area of the VMCS for
->> + * stack levels 1->3 (HOST_IA32_FRED_RSP[123]), each respectively
->> + * corresponding to per CPU stacks for #DB, NMI and #DF.  KVM must
->> + * populate these each time a vCPU is loaded onto a CPU.
->> + *
->> + * Called from entry code, so must be noinstr.
->> + */
->> +noinstr unsigned long __this_cpu_ist_top_va(enum exception_stack_ordering stack)
->> +{
->> +	unsigned long base = (unsigned long)&(__this_cpu_read(cea_exception_stacks)->DF_stack);
->> +	return base + EXCEPTION_STKSZ + stack * (EXCEPTION_STKSZ + PAGE_SIZE);
->> +}
->> +EXPORT_SYMBOL(__this_cpu_ist_top_va);
->> +
->> +noinstr unsigned long __this_cpu_ist_bottom_va(enum exception_stack_ordering stack)
->> +{
->> +	unsigned long base = (unsigned long)&(__this_cpu_read(cea_exception_stacks)->DF_stack);
->> +	return base + stack * (EXCEPTION_STKSZ + PAGE_SIZE);
->> +}
-> 
-> These are basically treating 'struct exception_stacks' like an array.
-> There's no type safety or anything here. It's just an open-coded array
-> access.
-> 
-> Also, starting with ->DF_stack is a bit goofy looking. It's not obvious
-> (or enforced) that it is stack #0 or at the beginning of the structure.
-> 
-> Shouldn't we be _trying_ to make this look like:
-> 
-> 	struct cea_exception_stacks *s;
-> 	s = __this_cpu_read(cea_exception_stacks);
-> 
-> 	return &s[stack_nr].stack;
-> 
-> ?
-> 
-> Where 'cea_exception_stacks' is an actual array:
-> 
-> 	struct cea_exception_stacks[N_EXCEPTION_STACKS];
-> 
-> which might need to be embedded in a larger structure to get the
-> 'IST_top_guard' without wasting allocating space for an extra full stack.
-> 
-
-Good suggestion!
-
-Thanks!
-     Xin
 
