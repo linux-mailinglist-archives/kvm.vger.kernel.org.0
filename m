@@ -1,104 +1,199 @@
-Return-Path: <kvm+bounces-55822-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-55823-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5DFECB377C6
-	for <lists+kvm@lfdr.de>; Wed, 27 Aug 2025 04:32:01 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 70D4DB377CE
+	for <lists+kvm@lfdr.de>; Wed, 27 Aug 2025 04:32:56 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 03F3F7C09AA
-	for <lists+kvm@lfdr.de>; Wed, 27 Aug 2025 02:32:00 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 59E647C143E
+	for <lists+kvm@lfdr.de>; Wed, 27 Aug 2025 02:32:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 022F7274B27;
-	Wed, 27 Aug 2025 02:31:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="k3UcQ+RI"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 851B8274FEA;
+	Wed, 27 Aug 2025 02:32:43 +0000 (UTC)
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-ej1-f54.google.com (mail-ej1-f54.google.com [209.85.218.54])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mailgw.kylinos.cn (mailgw.kylinos.cn [124.126.103.232])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 883E02741B6;
-	Wed, 27 Aug 2025 02:31:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.54
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7DDE713C9C4;
+	Wed, 27 Aug 2025 02:32:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=124.126.103.232
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756261910; cv=none; b=VSV5e5AxZQmkHxJDeJudgJjUrS3uID1lCpwrIYcuHi8IfzGRpx1uTuYpwu+9nKnavA+BPe7F9WQ1sQEehPnG6JGaU+dDgGKCf3G3uirrUPXM3PwDQ8eMuNOIkRGyGHHDVpX5UL/V5/cmPsdGisPYZzXpj7iarNcZiHAY9rDAr+c=
+	t=1756261963; cv=none; b=IRnsdX5xmS+Ll5m3fiwosLEAAhSgZSASbj2V+S4vJ9gputxcwZEbMuG2vqeiIdghOezbjrSogXLolhdFgE7yZueoJ94cYxrnl/kfSLooGlJcfBDZwOAqugDtCdSLkin8YF8sJxkYigAhbFhoUHnIKDiFh331SBjFlJSoOzbb4Xg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756261910; c=relaxed/simple;
-	bh=3Tox78mtmLbV4ZIp0EyBj34pqSOH2j8gIMnB7+StZxM=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=ZaRAPPMNq8/ihoaD/9u8/b7x6ty2JdFEciG6KMJetBNcpU+NjpUMIjT8kZjL6wbveRKuAtPBq97wqXojdWYtuQYozHcxoe8FEEO3805N/2cmlosZimdNfgFD8YTf0Z1jVWD6mZMyIACueIyUMxmLG1QIJJxYGr9JbJxa9z9RueA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=k3UcQ+RI; arc=none smtp.client-ip=209.85.218.54
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ej1-f54.google.com with SMTP id a640c23a62f3a-afcb7acfde3so931078066b.3;
-        Tue, 26 Aug 2025 19:31:48 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1756261907; x=1756866707; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=3Tox78mtmLbV4ZIp0EyBj34pqSOH2j8gIMnB7+StZxM=;
-        b=k3UcQ+RIj3uvaLYxeZUSffKdEM8JFjCsfi7cZwxkRK4Rb9lYa7h0etAPRkSjaRBk86
-         ovoEP69nIyJrZx1ZugyJKTuxbfD5C+/i0VrLaAjFEoEo8y6Hh9sxeUnHvlXMCkcrIU/S
-         ip8NCfIayahwm80IvHZjeUt4XqlSUjc4YcMr6ec8HjNF595zEEpK9Jf4eIv3TccV/9uG
-         Wvc+iC5X00lfJwRKr6nbsJE5ThaJ9BYcBIwYcPf7DjhcAselj3OgfC6ZlbboMPrMdA9D
-         2hbdD9en/m8y4C5w/af4/a4SOOMcCzjHufw1KJpmrRVLQyzxzuI6SrvEZxwRC0VwrshL
-         c2Tw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1756261907; x=1756866707;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=3Tox78mtmLbV4ZIp0EyBj34pqSOH2j8gIMnB7+StZxM=;
-        b=EE87sUX9mj4/rwS6bxoPT1rI9Q2HtKngP2jU1O3h0f5/gsBwa4rDaHemuDS+8IO2X+
-         ac/XWa7tUbOTcCERnnKOdSSCRad9eCBgALYkzpPDYp6173s5+ynpl2axmCLlrS8jNR1x
-         4PduMRioonVkwsacs6h6Yfeb9eHwd4mg63r8eTq10pT9sY5C4W72U3gfDBBQYDhjDOpX
-         1DwZMm5PHI1+HyjUs+WGzAVkQu5h0OrT++j7uh+FWGjwYEAUBWarlF7jRoioFhxqM1pJ
-         6zLJPbjkwk1fNtRYytGvm+OijwEocXsVwB0xo4naf040U4QcBh8cogxULy88WDQ1H2cb
-         EtHw==
-X-Forwarded-Encrypted: i=1; AJvYcCUYNHLqL9StO6QzN336FNLD6FIpirIjOBNaST8Bd/JCp983YM8nRc2Xwgr4Lt3UKE9gyxsV+LEP+c6TXD0=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzY/2gSedvmPxfZwXYOIYy55+z2o31zGRmmzwK9McNP/4BnKRDh
-	6ssELnPCM4pXwyJJ80NfXax7nEkQUBTDfloO1GUy/JA1XHaNmtsMIG7Rlbid9QV2HVEDBXa5ZZw
-	C6cC0par5L/sieCtkVrqGoK5LBoTbkko=
-X-Gm-Gg: ASbGncs19xereLmIYoDSJO07KfYaqGAFLaiqsFXwWt/pQkkz9NkCAaD3WdF0wbV01Bs
-	Yq3AaimHMwedvYjcx0UtctZIEsIByslM6Cmp7PK889tyOawIxB1N51xjONObWr7/cBhzakzQ1lB
-	QLOJ5FidPb5wPYn/2v2kamZlED3JLnmTW6M6NNj+Qoc8/+QgYPQC4L+ClI5VQJaZkpGyHH3cEyQ
-	BfiUKc9
-X-Google-Smtp-Source: AGHT+IF/cBA2dPjn5YWfGm4NB8Dtpf09/BH19PA8AhsgdZqR9MmpCCy8AgCTCnIw+WE2sOhS7LboK3LUldgBf+Lfnb4=
-X-Received: by 2002:a17:907:86ab:b0:afd:eb93:f809 with SMTP id
- a640c23a62f3a-afe28ff9036mr1744018666b.27.1756261905930; Tue, 26 Aug 2025
- 19:31:45 -0700 (PDT)
+	s=arc-20240116; t=1756261963; c=relaxed/simple;
+	bh=tM4NryZJs6GQGYE6ScL3QFX0jBO6MscpaIpuSf538RA=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=D7N6smpYpwNoZ04RHXdlOkWfdACTn6TL4MsVTBrMLv/Y/3At4nuOWhxWY0e/EegLN0biEgwCujT6x2Zs0r9lzkIoCj0+mwNvAMbDsui1bFlesyfzTdeTW5ZBfavZszPP5+6QPQgIM35TNjMQYxYaIdoksDn5kHPvbf9UOhxN2zM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kylinos.cn; spf=pass smtp.mailfrom=kylinos.cn; arc=none smtp.client-ip=124.126.103.232
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kylinos.cn
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kylinos.cn
+X-UUID: 1690209e82ee11f0b29709d653e92f7d-20250827
+X-CID-P-RULE: Release_Ham
+X-CID-O-INFO: VERSION:1.1.45,REQID:47738ced-a2cf-4a9c-b6ce-8380b7cf3455,IP:0,U
+	RL:0,TC:0,Content:30,EDM:0,RT:0,SF:0,FILE:0,BULK:0,RULE:Release_Ham,ACTION
+	:release,TS:30
+X-CID-META: VersionHash:6493067,CLOUDID:46aa175651b4578b186727c6037c583c,BulkI
+	D:nil,BulkQuantity:0,Recheck:0,SF:102|850,TC:nil,Content:4|50,EDM:-3,IP:ni
+	l,URL:0,File:nil,RT:nil,Bulk:nil,QS:nil,BEC:nil,COL:0,OSI:0,OSA:0,AV:0,LES
+	:1,SPR:NO,DKR:0,DKP:0,BRR:0,BRE:0,ARC:0
+X-CID-BVR: 0
+X-CID-BAS: 0,_,0,_
+X-CID-FACTOR: TF_CID_SPAM_SNR
+X-UUID: 1690209e82ee11f0b29709d653e92f7d-20250827
+Received: from mail.kylinos.cn [(10.44.16.175)] by mailgw.kylinos.cn
+	(envelope-from <zhangzihuan@kylinos.cn>)
+	(Generic MTA)
+	with ESMTP id 1728057702; Wed, 27 Aug 2025 10:32:34 +0800
+Received: from mail.kylinos.cn (localhost [127.0.0.1])
+	by mail.kylinos.cn (NSMail) with SMTP id 56943E008FAA;
+	Wed, 27 Aug 2025 10:32:33 +0800 (CST)
+X-ns-mid: postfix-68AE6E40-207889202
+Received: from localhost.localdomain (unknown [172.25.120.24])
+	by mail.kylinos.cn (NSMail) with ESMTPA id C0D71E008FAA;
+	Wed, 27 Aug 2025 10:32:14 +0800 (CST)
+From: Zihuan Zhang <zhangzihuan@kylinos.cn>
+To: "Rafael J . wysocki" <rafael@kernel.org>,
+	Viresh Kumar <viresh.kumar@linaro.org>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Will Deacon <will@kernel.org>,
+	Sean Christopherson <seanjc@google.com>,
+	Paolo Bonzini <pbonzini@redhat.com>,
+	Thomas Gleixner <tglx@linutronix.de>,
+	Ingo Molnar <mingo@redhat.com>,
+	Borislav Petkov <bp@alien8.de>,
+	Dave Hansen <dave.hansen@linux.intel.com>,
+	Markus Mayer <mmayer@broadcom.com>,
+	Florian Fainelli <florian.fainelli@broadcom.com>,
+	Srinivas Pandruvada <srinivas.pandruvada@linux.intel.com>,
+	Madhavan Srinivasan <maddy@linux.ibm.com>,
+	Michael Ellerman <mpe@ellerman.id.au>,
+	Krzysztof Kozlowski <krzk@kernel.org>,
+	Alim Akhtar <alim.akhtar@samsung.com>,
+	Thierry Reding <thierry.reding@gmail.com>,
+	Jonathan Hunter <jonathanh@nvidia.com>,
+	MyungJoo Ham <myungjoo.ham@samsung.com>,
+	Kyungmin Park <kyungmin.park@samsung.com>,
+	Chanwoo Choi <cw00.choi@samsung.com>,
+	Jani Nikula <jani.nikula@linux.intel.com>,
+	Joonas Lahtinen <joonas.lahtinen@linux.intel.com>,
+	Rodrigo Vivi <rodrigo.vivi@intel.com>,
+	Tvrtko Ursulin <tursulin@ursulin.net>,
+	David Airlie <airlied@gmail.com>,
+	Simona Vetter <simona@ffwll.ch>,
+	Daniel Lezcano <daniel.lezcano@kernel.org>,
+	Sascha Hauer <s.hauer@pengutronix.de>,
+	Shawn Guo <shawnguo@kernel.org>,
+	Eduardo Valentin <edubezval@gmail.com>,
+	Keerthy <j-keerthy@ti.com>,
+	Matthias Brugger <matthias.bgg@gmail.com>,
+	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>
+Cc: zhenglifeng <zhenglifeng1@huawei.com>,
+	"H . Peter Anvin" <hpa@zytor.com>,
+	Zhang Rui <rui.zhang@intel.com>,
+	Len Brown <lenb@kernel.org>,
+	Nicholas Piggin <npiggin@gmail.com>,
+	Christophe Leroy <christophe.leroy@csgroup.eu>,
+	Lukasz Luba <lukasz.luba@arm.com>,
+	Pengutronix Kernel Team <kernel@pengutronix.de>,
+	Beata Michalska <beata.michalska@arm.com>,
+	Fabio Estevam <festevam@gmail.com>,
+	Pavel Machek <pavel@kernel.org>,
+	Sumit Gupta <sumitg@nvidia.com>,
+	Prasanna Kumar T S M <ptsm@linux.microsoft.com>,
+	Sudeep Holla <sudeep.holla@arm.com>,
+	Yicong Yang <yangyicong@hisilicon.com>,
+	linux-pm@vger.kernel.org,
+	x86@kernel.org,
+	kvm@vger.kernel.org,
+	linux-acpi@vger.kernel.org,
+	linuxppc-dev@lists.ozlabs.org,
+	linux-samsung-soc@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org,
+	linux-tegra@vger.kernel.org,
+	intel-gfx@lists.freedesktop.org,
+	dri-devel@lists.freedesktop.org,
+	imx@lists.linux.dev,
+	linux-omap@vger.kernel.org,
+	linux-mediatek@lists.infradead.org,
+	linux-kernel@vger.kernel.org,
+	Zihuan Zhang <zhangzihuan@kylinos.cn>
+Subject: [PATCH v2 00/18] cpufreq: use __free() for all cpufreq_cpu_get() references
+Date: Wed, 27 Aug 2025 10:31:44 +0800
+Message-Id: <20250827023202.10310-1-zhangzihuan@kylinos.cn>
+X-Mailer: git-send-email 2.25.1
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <CANypQFbEySjKOFLqtFFf2vrEe=NBr7XJfbkjQhqXuZGg7Rpoxw@mail.gmail.com>
- <aK3z92uBZNcVQGf7@google.com>
-In-Reply-To: <aK3z92uBZNcVQGf7@google.com>
-From: Jiaming Zhang <r772577952@gmail.com>
-Date: Wed, 27 Aug 2025 10:31:05 +0800
-X-Gm-Features: Ac12FXyj_UMmVg7isRdshSVjB90FO-vOrAzFKlr8-K_BZH_EANWkLmSCqzZYyDY
-Message-ID: <CANypQFZKnwafAFm2v5S_kbgr=p0UBBsmcSVsE2r65cayObaoiA@mail.gmail.com>
-Subject: Re: [Discussion] Undocumented behavior of KVM_SET_PIT2 with count=0
-To: Sean Christopherson <seanjc@google.com>
-Cc: kvm@vger.kernel.org, pbonzini@redhat.com, linux-kernel@vger.kernel.org, 
-	syzkaller@googlegroups.com
-Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Hi Sean,
+This patchset converts all remaining cpufreq users to rely on the
+__free(put_cpufreq_policy) annotation for policy references, instead of
+calling cpufreq_cpu_put() manually.
 
-Thank you for the reply!
+Motivation:
+- Reduce the chance of reference counting mistakes
+- Make the code more consistent with the latest kernel style
+- behavior remains the same, but reference counting is now safer=20
+  and easier to maintain.
 
-I will prepare the documentation patch and plan to submit it in the
-next few days.
+The changes are split into 18 patches as they touch different subsystems
+and are maintained by different people. There is no functional change.
 
-And thank you for the additional context on KVM_SET_LAPIC and
-KVM_GET_LAPIC; it's very helpful to understand that other GET/SET
-pairs might have similar fixups. I'll keep that in mind.
+V2:
+ - Fix compile error in powernv-cpufreq.c
+ - Split patch to separate logical changes
 
-Thanks again,
+Zihuan Zhang (18):
+  arm64: topology: Use __free(put_cpufreq_policy) for policy reference
+  KVM: x86: Use __free(put_cpufreq_policy) for policy reference
+  ACPI: processor: thermal: Use __free(put_cpufreq_policy) for policy
+    reference
+  cpufreq: brcmstb-avs-cpufreq: Use __free(put_cpufreq_policy) for
+    policy reference
+  cpufreq: CPPC: Use __free(put_cpufreq_policy) for policy reference
+  cpufreq: intel_pstate: Use __free(put_cpufreq_policy) for policy
+    reference
+  cpufreq: longhaul: Use __free(put_cpufreq_policy) for policy reference
+  cpufreq: mediatek: Use __free(put_cpufreq_policy) for policy reference
+  cpufreq: powernv: Use __free(put_cpufreq_policy) for policy reference
+  cpufreq: s5pv210: Use __free(put_cpufreq_policy) for policy reference
+  cpufreq: tegra186: Use __free(put_cpufreq_policy) for policy reference
+  PM / devfreq: Use __free(put_cpufreq_policy) for policy reference
+  drm/i915: Use __free(put_cpufreq_policy) for policy reference
+  cpufreq: powerpc: macintosh: Use __free(put_cpufreq_policy) for policy
+    reference
+  powercap: dtpm_cpu: Use __free(put_cpufreq_policy) for policy
+    reference
+  thermal: imx: Use __free(put_cpufreq_policy) for policy reference
+  thermal/drivers/ti-soc-thermal:  Use __free(put_cpufreq_policy) for
+    policy reference
+  PM: EM: Use __free(put_cpufreq_policy) for policy reference
 
-Jiaming Zhang
+ arch/arm64/kernel/topology.c                  |  9 +++----
+ arch/x86/kvm/x86.c                            | 10 ++++----
+ drivers/acpi/processor_thermal.c              | 12 +++-------
+ drivers/cpufreq/brcmstb-avs-cpufreq.c         |  4 +---
+ drivers/cpufreq/cppc_cpufreq.c                |  4 +---
+ drivers/cpufreq/intel_pstate.c                |  3 +--
+ drivers/cpufreq/longhaul.c                    |  3 +--
+ drivers/cpufreq/mediatek-cpufreq.c            |  6 ++---
+ drivers/cpufreq/powernv-cpufreq.c             |  7 +++---
+ drivers/cpufreq/s5pv210-cpufreq.c             |  3 +--
+ drivers/cpufreq/tegra186-cpufreq.c            |  3 +--
+ drivers/devfreq/governor_passive.c            | 19 ++++-----------
+ drivers/gpu/drm/i915/gt/intel_llc.c           |  3 +--
+ drivers/macintosh/windfarm_cpufreq_clamp.c    |  4 +---
+ drivers/powercap/dtpm_cpu.c                   | 24 ++++++-------------
+ drivers/thermal/imx_thermal.c                 | 13 ++++------
+ .../ti-soc-thermal/ti-thermal-common.c        | 12 ++++------
+ kernel/power/energy_model.c                   |  7 ++----
+ 18 files changed, 46 insertions(+), 100 deletions(-)
+
+--=20
+2.25.1
+
 
