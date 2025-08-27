@@ -1,58 +1,58 @@
-Return-Path: <kvm+bounces-55829-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-55830-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 141A9B377F8
-	for <lists+kvm@lfdr.de>; Wed, 27 Aug 2025 04:35:09 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 3B3B8B377FF
+	for <lists+kvm@lfdr.de>; Wed, 27 Aug 2025 04:35:28 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 555FD1BA2925
-	for <lists+kvm@lfdr.de>; Wed, 27 Aug 2025 02:35:24 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id DDC601BA2E58
+	for <lists+kvm@lfdr.de>; Wed, 27 Aug 2025 02:35:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D6AF327F013;
-	Wed, 27 Aug 2025 02:34:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 19A8B28642F;
+	Wed, 27 Aug 2025 02:34:11 +0000 (UTC)
 X-Original-To: kvm@vger.kernel.org
 Received: from mailgw.kylinos.cn (mailgw.kylinos.cn [124.126.103.232])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BFD682765C7;
-	Wed, 27 Aug 2025 02:34:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C31D52773E0;
+	Wed, 27 Aug 2025 02:34:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=124.126.103.232
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756262047; cv=none; b=e1gpEzzRzp68q2ryabr/mLZ+ugQuyLNho8GqPBZOPp5Ykwj18pvhrKwZn005eAq7dw5vnySpygAUJMC7VcKyuAr5VdhYMwp4EQu1Y1ZJTl/DuudkTFie8JXu6gGBoKGlcY2O3fj+9J4yoYjs0RfW76iONEHo2BwpW5pmrVm4caw=
+	t=1756262050; cv=none; b=Iaox5ViJORq1R64Xl9zNBzJZnrZ8Ar3zL7muWYWykeZcfRQ03kSVE/BL2tF8v6dPnkOprQ2sikj40xsTi59C4WWrT4HGD3TQglb2UVekHatyHPTQ0GCY+3a07YVPfKm2vwb5e2OYHeY8hmrjmlHBowNdBJyAW6MlbSL/Er3Qnuw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756262047; c=relaxed/simple;
-	bh=1ccEEFVTMD5bQVYXET0LUOjFkFKErdy7JufDPxZOcsw=;
+	s=arc-20240116; t=1756262050; c=relaxed/simple;
+	bh=rkwb4IeMY1GAAMkcKNNGOUfz988DBM38McQun8BvQ2w=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=NMPmCnTEEqCno7Rob6g1gYmM1yo2/0MUhbD+5NMxbPm5K3uVYi8nRpa2geQoGIs9cwu4FGUzOPzAUai6FINHSeM5yj9LsiKsSEcZcI0nxNd9DEcNuxlsiZ4Ik23lwLWl1tPRWM0h46CwiP3MtWtmo6xAtA1Rnr+6tDCzNPzX8x8=
+	 MIME-Version; b=kJRRSY6+1GF7LZj/qOdf9yoZDw3TNIt7QlocqUMuXljOiPtXcORlbFpzi4geXz8Kd73a9CMWiFkYrOcw0niXxX0PwJVNnanbSuJSqEAr2NTA1tilRwGXPq0eizLAL/4B1KM7uuDqHZAzw1NiaZEwpffDEJKVE2kZ85aEla0lUwI=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kylinos.cn; spf=pass smtp.mailfrom=kylinos.cn; arc=none smtp.client-ip=124.126.103.232
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kylinos.cn
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kylinos.cn
-X-UUID: 4761eea082ee11f0b29709d653e92f7d-20250827
+X-UUID: 491fce4c82ee11f0b29709d653e92f7d-20250827
 X-CID-P-RULE: Release_Ham
-X-CID-O-INFO: VERSION:1.1.45,REQID:251e3759-9259-4617-9049-60d96fd5d3a9,IP:0,U
-	RL:0,TC:0,Content:0,EDM:0,RT:0,SF:0,FILE:0,BULK:0,RULE:Release_Ham,ACTION:
-	release,TS:0
-X-CID-META: VersionHash:6493067,CLOUDID:c58015e2d3ed3de85363bc835c7272f6,BulkI
-	D:nil,BulkQuantity:0,Recheck:0,SF:81|82|102|850,TC:nil,Content:0|50,EDM:-3
+X-CID-O-INFO: VERSION:1.1.45,REQID:127d0195-46b5-41ae-87e2-a49f4d2bb859,IP:0,U
+	RL:0,TC:0,Content:26,EDM:0,RT:0,SF:0,FILE:0,BULK:0,RULE:Release_Ham,ACTION
+	:release,TS:26
+X-CID-META: VersionHash:6493067,CLOUDID:75de0d3453df4922818232808e2aa09c,BulkI
+	D:nil,BulkQuantity:0,Recheck:0,SF:81|82|102|850,TC:nil,Content:4|50,EDM:-3
 	,IP:nil,URL:0,File:nil,RT:nil,Bulk:nil,QS:nil,BEC:nil,COL:0,OSI:0,OSA:0,AV
 	:0,LES:1,SPR:NO,DKR:0,DKP:0,BRR:0,BRE:0,ARC:0
 X-CID-BVR: 0
 X-CID-BAS: 0,_,0,_
 X-CID-FACTOR: TF_CID_SPAM_SNR
-X-UUID: 4761eea082ee11f0b29709d653e92f7d-20250827
+X-UUID: 491fce4c82ee11f0b29709d653e92f7d-20250827
 Received: from mail.kylinos.cn [(10.44.16.175)] by mailgw.kylinos.cn
 	(envelope-from <zhangzihuan@kylinos.cn>)
 	(Generic MTA)
-	with ESMTP id 1639701763; Wed, 27 Aug 2025 10:33:55 +0800
+	with ESMTP id 461494435; Wed, 27 Aug 2025 10:33:58 +0800
 Received: from mail.kylinos.cn (localhost [127.0.0.1])
-	by mail.kylinos.cn (NSMail) with SMTP id AF259E008FAA;
-	Wed, 27 Aug 2025 10:33:52 +0800 (CST)
-X-ns-mid: postfix-68AE6E90-537935210
+	by mail.kylinos.cn (NSMail) with SMTP id AA9A2E008FAA;
+	Wed, 27 Aug 2025 10:33:58 +0800 (CST)
+X-ns-mid: postfix-68AE6E96-41491213
 Received: from localhost.localdomain (unknown [172.25.120.24])
-	by mail.kylinos.cn (NSMail) with ESMTPA id 4A0FFE008FAF;
-	Wed, 27 Aug 2025 10:33:47 +0800 (CST)
+	by mail.kylinos.cn (NSMail) with ESMTPA id C4296E008FAC;
+	Wed, 27 Aug 2025 10:33:52 +0800 (CST)
 From: Zihuan Zhang <zhangzihuan@kylinos.cn>
 To: "Rafael J . wysocki" <rafael@kernel.org>,
 	Viresh Kumar <viresh.kumar@linaro.org>,
@@ -119,9 +119,9 @@ Cc: zhenglifeng <zhenglifeng1@huawei.com>,
 	linux-mediatek@lists.infradead.org,
 	linux-kernel@vger.kernel.org,
 	Zihuan Zhang <zhangzihuan@kylinos.cn>
-Subject: [PATCH v2 06/18] cpufreq: intel_pstate: Use __free(put_cpufreq_policy) for policy reference
-Date: Wed, 27 Aug 2025 10:31:50 +0800
-Message-Id: <20250827023202.10310-7-zhangzihuan@kylinos.cn>
+Subject: [PATCH v2 07/18] cpufreq: longhaul: Use __free(put_cpufreq_policy) for policy reference
+Date: Wed, 27 Aug 2025 10:31:51 +0800
+Message-Id: <20250827023202.10310-8-zhangzihuan@kylinos.cn>
 X-Mailer: git-send-email 2.25.1
 In-Reply-To: <20250827023202.10310-1-zhangzihuan@kylinos.cn>
 References: <20250827023202.10310-1-zhangzihuan@kylinos.cn>
@@ -141,36 +141,31 @@ No functional change intended.
 
 Signed-off-by: Zihuan Zhang <zhangzihuan@kylinos.cn>
 ---
- drivers/cpufreq/intel_pstate.c | 3 +--
+ drivers/cpufreq/longhaul.c | 3 +--
  1 file changed, 1 insertion(+), 2 deletions(-)
 
-diff --git a/drivers/cpufreq/intel_pstate.c b/drivers/cpufreq/intel_pstat=
-e.c
-index f366d35c5840..4e7e2990e9a6 100644
---- a/drivers/cpufreq/intel_pstate.c
-+++ b/drivers/cpufreq/intel_pstate.c
-@@ -1698,19 +1698,18 @@ static ssize_t store_no_turbo(struct kobject *a, =
-struct kobj_attribute *b,
- static void update_qos_request(enum freq_qos_req_type type)
+diff --git a/drivers/cpufreq/longhaul.c b/drivers/cpufreq/longhaul.c
+index ba0e08c8486a..ae5596919671 100644
+--- a/drivers/cpufreq/longhaul.c
++++ b/drivers/cpufreq/longhaul.c
+@@ -950,7 +950,7 @@ static int __init longhaul_init(void)
+=20
+ static void __exit longhaul_exit(void)
  {
- 	struct freq_qos_request *req;
--	struct cpufreq_policy *policy;
+-	struct cpufreq_policy *policy =3D cpufreq_cpu_get(0);
++	struct cpufreq_policy *policy __free(put_cpufreq_policy) =3D cpufreq_cp=
+u_get(0);
  	int i;
 =20
- 	for_each_possible_cpu(i) {
- 		struct cpudata *cpu =3D all_cpu_data[i];
- 		unsigned int freq, perf_pct;
-+		struct cpufreq_policy *policy __free(put_cpufreq_policy);
+ 	for (i =3D 0; i < numscales; i++) {
+@@ -968,7 +968,6 @@ static void __exit longhaul_exit(void)
+ 		}
+ 	}
 =20
- 		policy =3D cpufreq_cpu_get(i);
- 		if (!policy)
- 			continue;
-=20
- 		req =3D policy->driver_data;
--		cpufreq_cpu_put(policy);
-=20
- 		if (!req)
- 			continue;
+-	cpufreq_cpu_put(policy);
+ 	cpufreq_unregister_driver(&longhaul_driver);
+ 	kfree(longhaul_table);
+ }
 --=20
 2.25.1
 
