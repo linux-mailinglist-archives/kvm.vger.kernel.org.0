@@ -1,60 +1,65 @@
-Return-Path: <kvm+bounces-55846-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-55847-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2853BB379BC
-	for <lists+kvm@lfdr.de>; Wed, 27 Aug 2025 07:22:09 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 64A3AB37A40
+	for <lists+kvm@lfdr.de>; Wed, 27 Aug 2025 08:22:25 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D7E1E6884F0
-	for <lists+kvm@lfdr.de>; Wed, 27 Aug 2025 05:22:07 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id E32951B6727D
+	for <lists+kvm@lfdr.de>; Wed, 27 Aug 2025 06:22:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 51BB530F946;
-	Wed, 27 Aug 2025 05:21:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DCA092DFA3A;
+	Wed, 27 Aug 2025 06:22:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="gXDA9Nil"
 X-Original-To: kvm@vger.kernel.org
-Received: from mailgw.kylinos.cn (mailgw.kylinos.cn [124.126.103.232])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.15])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6A8841C8606;
-	Wed, 27 Aug 2025 05:21:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=124.126.103.232
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8279A2BE027;
+	Wed, 27 Aug 2025 06:22:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.15
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756272112; cv=none; b=Qh5bVGCaSM0yB3q3ybZ2GQ7x5zEyX5EHjSn8h44pQJ/uTpox5vmf0eYACypqhomUBkOp4Cc2T9SRzgtWVCNXSYo8wRdLQBqRocTr4gnqsWnYA9RnIiWRu2WRdoCvSZ8EIOQjiUX6WhqXNFg276Gf/Nm/sGyV3mdVUQ9WhenH5X8=
+	t=1756275736; cv=none; b=BmjQv/aPE83aKq34XrJRIZFl5Z1vgENmIyU+1519z/Huob8QuOPaIdCkz849Ya3U3G85D0eaqE5ENaAne+s9OYOUv8w/sKS9JjpSuDrMBFFUaWZJl6hAwRwliyI526I6JXr+YrG1RUEEZjkYfukD3FyWbi2APObsdNd8Q5dsrJA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756272112; c=relaxed/simple;
-	bh=VRExz2y98Y4Bks79KG62576slKCC55TnEApk2y1mwr8=;
+	s=arc-20240116; t=1756275736; c=relaxed/simple;
+	bh=ghqyHuxRn2YZ182BMZRUnoAXRhnwuthZ2gQmVN6HRL8=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=tIoi6M2AwxybqbpN8FbmxuGC8FwZbC5JgWsOgZWrB8e8vfYxXFTwuiHDmkkFwttWXtkfWP8gepo3QdJi5IY5Unve19ebj+zWwmSmTatCwoRRULQwx/c9OlupSCObHyzzFDDtuCYY87g9e319J89rKCOISGuepNfMZ3ICqdJgTz4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kylinos.cn; spf=pass smtp.mailfrom=kylinos.cn; arc=none smtp.client-ip=124.126.103.232
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kylinos.cn
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kylinos.cn
-X-UUID: b68a31cc830511f0b29709d653e92f7d-20250827
-X-CID-P-RULE: Release_Ham
-X-CID-O-INFO: VERSION:1.1.45,REQID:34726253-5bea-4e9b-b07f-349fa0556763,IP:0,U
-	RL:0,TC:0,Content:0,EDM:0,RT:0,SF:0,FILE:0,BULK:0,RULE:Release_Ham,ACTION:
-	release,TS:0
-X-CID-META: VersionHash:6493067,CLOUDID:f8fed63546234af68ef13bd91ef320cf,BulkI
-	D:nil,BulkQuantity:0,Recheck:0,SF:80|81|82|83|102,TC:nil,Content:0|52,EDM:
-	-3,IP:nil,URL:0,File:nil,RT:nil,Bulk:nil,QS:nil,BEC:nil,COL:0,OSI:0,OSA:0,
-	AV:0,LES:1,SPR:NO,DKR:0,DKP:0,BRR:0,BRE:0,ARC:0
-X-CID-BVR: 0,NGT
-X-CID-BAS: 0,NGT,0,_
-X-CID-FACTOR: TF_CID_SPAM_SNR
-X-UUID: b68a31cc830511f0b29709d653e92f7d-20250827
-Received: from mail.kylinos.cn [(10.44.16.175)] by mailgw.kylinos.cn
-	(envelope-from <zhangzihuan@kylinos.cn>)
-	(Generic MTA)
-	with ESMTP id 1509111154; Wed, 27 Aug 2025 13:21:40 +0800
-Received: from mail.kylinos.cn (localhost [127.0.0.1])
-	by mail.kylinos.cn (NSMail) with SMTP id A2851E008FAA;
-	Wed, 27 Aug 2025 13:21:40 +0800 (CST)
-X-ns-mid: postfix-68AE95E4-5407809
-Received: from [172.25.120.24] (unknown [172.25.120.24])
-	by mail.kylinos.cn (NSMail) with ESMTPA id 0D64DE008FA3;
-	Wed, 27 Aug 2025 13:21:25 +0800 (CST)
-Message-ID: <773da273-4ab7-4672-b4d7-f9c560f3fccc@kylinos.cn>
-Date: Wed, 27 Aug 2025 13:21:25 +0800
+	 In-Reply-To:Content-Type; b=jHbPKEgrytBIkMjQxTfVvq9vn+lgnswjC3oVb4awIHb2gMgyPC2RICoZV49HG4smBNNchKMlRfS4qrBR+WuUqhtqFzX8r03GrLjrIfdbOmKbIiedHmqrFfhLs+b9SHI7Fp7KN820/y8P4vB6Zl9BWvqw3FYWkVdJm5ce4dw3BMU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=gXDA9Nil; arc=none smtp.client-ip=198.175.65.15
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1756275735; x=1787811735;
+  h=message-id:date:mime-version:subject:to:cc:references:
+   from:in-reply-to:content-transfer-encoding;
+  bh=ghqyHuxRn2YZ182BMZRUnoAXRhnwuthZ2gQmVN6HRL8=;
+  b=gXDA9NilouEZJlf/QPHqsP00Ty4TVn5YuhCnBF6PsPIqyJW8AT6Jn5pg
+   s3ERZJjMzUttPGkndsz8qGA+Ah2UZptOOxrO+LaLCUGjwAL6M1Uw1Yzon
+   CBnbUOs2mwwq3XevUhCDMgv9j4zGWeja5/YlI9PIcgxSJNnYLuxldhjxY
+   e2F0mc9zqmoE9uKJ/PWN/APtON62BKkIC82xVHUYK5IyuS0Slly5cXUMo
+   Dnapr7tFQSlFObF43S4rS6COzgHskoisHVEWfdsc3/hV9gjMGurj79HJO
+   I+kRjjOaxuUcHJU0Fq5uQcEKoQrBFNfkddfdPXkJsmjyfzO1HYbGbCHiU
+   w==;
+X-CSE-ConnectionGUID: wLsczntMRZeiRMyDnmWmxQ==
+X-CSE-MsgGUID: e3+WSjyeQ36nx4HIwjQ15Q==
+X-IronPort-AV: E=McAfee;i="6800,10657,11534"; a="62167177"
+X-IronPort-AV: E=Sophos;i="6.18,214,1751266800"; 
+   d="scan'208";a="62167177"
+Received: from orviesa008.jf.intel.com ([10.64.159.148])
+  by orvoesa107.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 26 Aug 2025 23:22:13 -0700
+X-CSE-ConnectionGUID: gRB1mM8XS+GLSYvJNO1mxw==
+X-CSE-MsgGUID: b5KA2KaPRzStWr4+UE8efw==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.18,214,1751266800"; 
+   d="scan'208";a="169942757"
+Received: from xiaoyaol-hp-g830.ccr.corp.intel.com (HELO [10.124.238.14]) ([10.124.238.14])
+  by orviesa008-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 26 Aug 2025 23:22:07 -0700
+Message-ID: <6fe55bc3-dd79-4f7d-9927-7d4f40f7b246@intel.com>
+Date: Wed, 27 Aug 2025 14:22:03 +0800
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -62,148 +67,101 @@ List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2 15/18] powercap: dtpm_cpu: Use
- __free(put_cpufreq_policy) for policy reference
-To: "Rafael J . wysocki" <rafael@kernel.org>,
- Viresh Kumar <viresh.kumar@linaro.org>,
- Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>,
- Sean Christopherson <seanjc@google.com>, Paolo Bonzini
- <pbonzini@redhat.com>, Thomas Gleixner <tglx@linutronix.de>,
+Subject: Re: [PATCH v2] KVM: TDX: Force split irqchip for TDX at irqchip
+ creation time
+To: Sagi Shahar <sagis@google.com>, Sean Christopherson <seanjc@google.com>,
+ Paolo Bonzini <pbonzini@redhat.com>, Thomas Gleixner <tglx@linutronix.de>,
  Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
- Dave Hansen <dave.hansen@linux.intel.com>, Markus Mayer
- <mmayer@broadcom.com>, Florian Fainelli <florian.fainelli@broadcom.com>,
- Srinivas Pandruvada <srinivas.pandruvada@linux.intel.com>,
- Madhavan Srinivasan <maddy@linux.ibm.com>,
- Michael Ellerman <mpe@ellerman.id.au>, Krzysztof Kozlowski
- <krzk@kernel.org>, Alim Akhtar <alim.akhtar@samsung.com>,
- Thierry Reding <thierry.reding@gmail.com>,
- Jonathan Hunter <jonathanh@nvidia.com>,
- MyungJoo Ham <myungjoo.ham@samsung.com>,
- Kyungmin Park <kyungmin.park@samsung.com>,
- Chanwoo Choi <cw00.choi@samsung.com>,
- Jani Nikula <jani.nikula@linux.intel.com>,
- Joonas Lahtinen <joonas.lahtinen@linux.intel.com>,
- Rodrigo Vivi <rodrigo.vivi@intel.com>, Tvrtko Ursulin
- <tursulin@ursulin.net>, David Airlie <airlied@gmail.com>,
- Simona Vetter <simona@ffwll.ch>, Daniel Lezcano <daniel.lezcano@kernel.org>,
- Sascha Hauer <s.hauer@pengutronix.de>, Shawn Guo <shawnguo@kernel.org>,
- Eduardo Valentin <edubezval@gmail.com>, Keerthy <j-keerthy@ti.com>,
- Matthias Brugger <matthias.bgg@gmail.com>,
- AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>
-Cc: zhenglifeng <zhenglifeng1@huawei.com>, "H . Peter Anvin" <hpa@zytor.com>,
- Zhang Rui <rui.zhang@intel.com>, Len Brown <lenb@kernel.org>,
- Nicholas Piggin <npiggin@gmail.com>,
- Christophe Leroy <christophe.leroy@csgroup.eu>,
- Lukasz Luba <lukasz.luba@arm.com>,
- Pengutronix Kernel Team <kernel@pengutronix.de>,
- Beata Michalska <beata.michalska@arm.com>, Fabio Estevam
- <festevam@gmail.com>, Pavel Machek <pavel@kernel.org>,
- Sumit Gupta <sumitg@nvidia.com>,
- Prasanna Kumar T S M <ptsm@linux.microsoft.com>,
- Sudeep Holla <sudeep.holla@arm.com>, Yicong Yang <yangyicong@hisilicon.com>,
- linux-pm@vger.kernel.org, x86@kernel.org, kvm@vger.kernel.org,
- linux-acpi@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
- linux-samsung-soc@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
- linux-tegra@vger.kernel.org, intel-gfx@lists.freedesktop.org,
- dri-devel@lists.freedesktop.org, imx@lists.linux.dev,
- linux-omap@vger.kernel.org, linux-mediatek@lists.infradead.org,
- linux-kernel@vger.kernel.org
-References: <20250827023202.10310-1-zhangzihuan@kylinos.cn>
- <20250827035056.353772-1-zhangzihuan@kylinos.cn>
-From: Zihuan Zhang <zhangzihuan@kylinos.cn>
-In-Reply-To: <20250827035056.353772-1-zhangzihuan@kylinos.cn>
+ Dave Hansen <dave.hansen@linux.intel.com>,
+ Binbin Wu <binbin.wu@linux.intel.com>, Ira Weiny <ira.weiny@intel.com>,
+ "H. Peter Anvin" <hpa@zytor.com>
+Cc: linux-kernel@vger.kernel.org, kvm@vger.kernel.org, x86@kernel.org
+References: <20250827011726.2451115-1-sagis@google.com>
+Content-Language: en-US
+From: Xiaoyao Li <xiaoyao.li@intel.com>
+In-Reply-To: <20250827011726.2451115-1-sagis@google.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 7bit
 
-=E5=9C=A8 2025/8/27 11:50, Zihuan Zhang =E5=86=99=E9=81=93:
-
-> Replace the manual cpufreq_cpu_put() with __free(put_cpufreq_policy)
-> annotation for policy references. This reduces the risk of reference
-> counting mistakes and aligns the code with the latest kernel style.
->
-> No functional change intended.
->
-> Signed-off-by: Zihuan Zhang <zhangzihuan@kylinos.cn>
+On 8/27/2025 9:17 AM, Sagi Shahar wrote:
+> TDX module protects the EOI-bitmap which prevents the use of in-kernel
+> I/O APIC. See more details in the original patch [1]
+> 
+> The current implementation already enforces the use of split irqchip for
+> TDX but it does so at the vCPU creation time which is generally to late
+> to fallback to split irqchip.
+> 
+> This patch follows Sean's recomendation from [2] and move the check if
+> I/O APIC is supported for the VM at irqchip creation time.
+> 
+> [1] https://lore.kernel.org/lkml/20250222014757.897978-11-binbin.wu@linux.intel.com/
+> [2] https://lore.kernel.org/lkml/aK3vZ5HuKKeFuuM4@google.com/
+> 
+> Suggested-by: Sean Christopherson <seanjc@google.com>
+> Signed-off-by: Sagi Shahar <sagis@google.com>
 > ---
->   drivers/powercap/dtpm_cpu.c | 24 +++++++-----------------
->   1 file changed, 7 insertions(+), 17 deletions(-)
->
-> diff --git a/drivers/powercap/dtpm_cpu.c b/drivers/powercap/dtpm_cpu.c
-> index 99390ec1481f..65117569d0f3 100644
-> --- a/drivers/powercap/dtpm_cpu.c
-> +++ b/drivers/powercap/dtpm_cpu.c
-> @@ -144,19 +144,16 @@ static int update_pd_power_uw(struct dtpm *dtpm)
->   static void pd_release(struct dtpm *dtpm)
->   {
->   	struct dtpm_cpu *dtpm_cpu =3D to_dtpm_cpu(dtpm);
-> -	struct cpufreq_policy *policy;
-> +	struct cpufreq_policy *policy __free(put_cpufreq_policy);
->  =20
->   	if (freq_qos_request_active(&dtpm_cpu->qos_req))
->   		freq_qos_remove_request(&dtpm_cpu->qos_req);
->  =20
->   	policy =3D cpufreq_cpu_get(dtpm_cpu->cpu);
-> -	if (policy) {
-> +	if (policy)
->   		for_each_cpu(dtpm_cpu->cpu, policy->related_cpus)
->   			per_cpu(dtpm_per_cpu, dtpm_cpu->cpu) =3D NULL;
->  =20
-> -		cpufreq_cpu_put(policy);
-> -	}
-> -
->   	kfree(dtpm_cpu);
->   }
->  =20
-> @@ -192,7 +189,7 @@ static int cpuhp_dtpm_cpu_online(unsigned int cpu)
->   static int __dtpm_cpu_setup(int cpu, struct dtpm *parent)
->   {
->   	struct dtpm_cpu *dtpm_cpu;
-> -	struct cpufreq_policy *policy;
-> +	struct cpufreq_policy *policy __free(put_cpufreq_policy);
->   	struct em_perf_state *table;
->   	struct em_perf_domain *pd;
->   	char name[CPUFREQ_NAME_LEN];
-> @@ -207,16 +204,12 @@ static int __dtpm_cpu_setup(int cpu, struct dtpm =
-*parent)
->   		return 0;
->  =20
->   	pd =3D em_cpu_get(cpu);
-> -	if (!pd || em_is_artificial(pd)) {
-> -		ret =3D -EINVAL;
-> -		goto release_policy;
-> -	}
-> +	if (!pd || em_is_artificial(pd))
-> +		return -EINVAL;
->  =20
->   	dtpm_cpu =3D kzalloc(sizeof(*dtpm_cpu), GFP_KERNEL);
-> -	if (!dtpm_cpu) {
-> -		ret =3D -ENOMEM;
-> -		goto release_policy;
-> -	}
-> +	if (!dtpm_cpu)
-> +		return -ENOMEM;
->  =20
->   	dtpm_init(&dtpm_cpu->dtpm, &dtpm_ops);
->   	dtpm_cpu->cpu =3D cpu;
-> @@ -239,7 +232,6 @@ static int __dtpm_cpu_setup(int cpu, struct dtpm *p=
-arent)
->   	if (ret < 0)
->   		goto out_dtpm_unregister;
->  =20
-> -	cpufreq_cpu_put(policy);
+>   arch/x86/include/asm/kvm_host.h | 1 +
+>   arch/x86/kvm/vmx/tdx.c          | 6 ++++++
+>   arch/x86/kvm/x86.c              | 9 +++++++++
+>   3 files changed, 16 insertions(+)
+> 
+> diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
+> index f19a76d3ca0e..6a4019d3a184 100644
+> --- a/arch/x86/include/asm/kvm_host.h
+> +++ b/arch/x86/include/asm/kvm_host.h
+> @@ -1357,6 +1357,7 @@ struct kvm_arch {
+>   	u8 vm_type;
+>   	bool has_private_mem;
+>   	bool has_protected_state;
+> +	bool has_protected_eoi;
+>   	bool pre_fault_allowed;
+>   	struct hlist_head *mmu_page_hash;
+>   	struct list_head active_mmu_pages;
+> diff --git a/arch/x86/kvm/vmx/tdx.c b/arch/x86/kvm/vmx/tdx.c
+> index 66744f5768c8..9637d9da1af1 100644
+> --- a/arch/x86/kvm/vmx/tdx.c
+> +++ b/arch/x86/kvm/vmx/tdx.c
+> @@ -658,6 +658,12 @@ int tdx_vm_init(struct kvm *kvm)
+>   	 */
+>   	kvm->max_vcpus = min_t(int, kvm->max_vcpus, num_present_cpus());
+>   
+> +	/*
+> +	 * TDX Module doesn't allow the hypervisor to modify the EOI-bitmap,
+> +	 * i.e. all EOIs are accelerated and never trigger exits.
+> +	 */
+> +	kvm->arch.has_protected_eoi = true;
+
+I prefer putting it along with the lines
+
+	kvm->arch.has_protected_state = true;
+	kvm->arch.has_private_mem = true;
+
+Otherwise,
+
+Reviewed-by: Xiaoyao Li <xiaoyao.li@intel.com>
+
+>   	kvm_tdx->state = TD_STATE_UNINITIALIZED;
+>   
 >   	return 0;
->  =20
->   out_dtpm_unregister:
-> @@ -251,8 +243,6 @@ static int __dtpm_cpu_setup(int cpu, struct dtpm *p=
-arent)
->   		per_cpu(dtpm_per_cpu, cpu) =3D NULL;
->   	kfree(dtpm_cpu);
->  =20
-> -release_policy:
-> -	cpufreq_cpu_put(policy);
->   	return ret;
->   }
->  =20
-I accidentally sent a duplicate patch in the series.
-Please ignore the extra one, sorry for the noise.
+> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+> index a1c49bc681c4..57b4d5ba2568 100644
+> --- a/arch/x86/kvm/x86.c
+> +++ b/arch/x86/kvm/x86.c
+> @@ -6966,6 +6966,15 @@ int kvm_arch_vm_ioctl(struct file *filp, unsigned int ioctl, unsigned long arg)
+>   		if (irqchip_in_kernel(kvm))
+>   			goto create_irqchip_unlock;
+>   
+> +		/*
+> +		 * Disallow an in-kernel I/O APIC if the VM has protected EOIs,
+> +		 * i.e. if KVM can't intercept EOIs and thus can't properly
+> +		 * emulate level-triggered interrupts.
+> +		 */
+> +		r = -ENOTTY;
+> +		if (kvm->arch.has_protected_eoi)
+> +			goto create_irqchip_unlock;
+> +
+>   		r = -EINVAL;
+>   		if (kvm->created_vcpus)
+>   			goto create_irqchip_unlock;
+
 
