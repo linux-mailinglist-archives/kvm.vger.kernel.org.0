@@ -1,163 +1,133 @@
-Return-Path: <kvm+bounces-55927-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-55928-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id B4895B38A0D
-	for <lists+kvm@lfdr.de>; Wed, 27 Aug 2025 21:08:42 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id A923EB38A56
+	for <lists+kvm@lfdr.de>; Wed, 27 Aug 2025 21:41:27 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 78AA9462E99
-	for <lists+kvm@lfdr.de>; Wed, 27 Aug 2025 19:08:42 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id ED79B178B09
+	for <lists+kvm@lfdr.de>; Wed, 27 Aug 2025 19:41:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DFDDF2D97BF;
-	Wed, 27 Aug 2025 19:08:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E2F642EE61C;
+	Wed, 27 Aug 2025 19:41:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="q7IXFfMq"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="AuF7t/qO"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pl1-f202.google.com (mail-pl1-f202.google.com [209.85.214.202])
+Received: from mail-pf1-f201.google.com (mail-pf1-f201.google.com [209.85.210.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 84DCE1FCFEF
-	for <kvm@vger.kernel.org>; Wed, 27 Aug 2025 19:08:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9D2B62E1EF8
+	for <kvm@vger.kernel.org>; Wed, 27 Aug 2025 19:41:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756321712; cv=none; b=MHebA0CUVErNn47TKgdqb3DpFRfMhD6Iualb9zZLeFzDZnOalO4NdGm/b+MZszgpCiEpi39Bu8bUYPhNHUqPGZfFOogp8bvXvdEKO7GyroLhcimMTZivGg58TgaM/0gDEWtBAuKYKVLEriAv9pQnSwRZb4uvopzpx8uJEbh+fv8=
+	t=1756323675; cv=none; b=DY0NVf/HqNnFlMwPFIFPhDBOWNc6jGmjOkdXmt4lcCMc6A8Ebdf1ygu2VkCVGU/wsOOnwNE5ukTPJ4bUvSIWvyGdBWREZOCNM/NLiijynUgJXcS2r6rwIEINh6j88dcarxAgUd7PYVr0iLB9vRR0FwwUHXqWdaCYAaFNx/CMcio=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756321712; c=relaxed/simple;
-	bh=+k4VXeI8suH6W9b8aCrYCg9/tr59Qoyt9aULAPVos2Y=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=Fj69KTXfJEYbP1tx1wQF3adagR6w2u6LgYZDwsIcvFP6Dj93NYZjL99uO6O+RG+NUFbAi8VFJ2+1cAXZI7zdz712AlfMCz4N8wB/OR2QYBcGDwsZ9QYPh3yZFWXNpwBwzmC+kPaNuO9Djr8xNe3EtGOHxqDyhZnLKPr4vCt+OVo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=q7IXFfMq; arc=none smtp.client-ip=209.85.214.202
+	s=arc-20240116; t=1756323675; c=relaxed/simple;
+	bh=x/i6BRd0cWtRfp3CxZsaVLLtvufEWdcUwwghTxEVFpA=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=Of7dqMe6SEPgehdbaYrZ8sm2PYOv2QgAJbWidlhBy+c6wfTAMQT3RRTAQX88vAqPvIa+Pw+S4eGGYiERqKcqn58/4CML8hV05l2C8wsmMcF351RcFrY+7QT2Dq4Vdijq9OpCIIS+ziBs6vzB0x0Fw35jZnA+aNmrOHa2zxV7GL0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=AuF7t/qO; arc=none smtp.client-ip=209.85.210.201
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pl1-f202.google.com with SMTP id d9443c01a7336-248981c02cfso1404235ad.1
-        for <kvm@vger.kernel.org>; Wed, 27 Aug 2025 12:08:29 -0700 (PDT)
+Received: by mail-pf1-f201.google.com with SMTP id d2e1a72fcca58-771e4a8b533so171252b3a.3
+        for <kvm@vger.kernel.org>; Wed, 27 Aug 2025 12:41:13 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1756321709; x=1756926509; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=xcAuR7T4RT9zVVlNI8n4izXJVHOx6F3XBKP4ipgVkd0=;
-        b=q7IXFfMqfZUEwAvBS2MBd7wdExUgqn0Omh3h0hhBA1IRECufM7SWLQxlbYYKivQDsA
-         6sW/2MHIB+N4rfeoxR8kkwrp866Be5g5MAmvzNZJEzKclKG57i1sgm9b16eUzD0jEnlC
-         Ry643j/uFNFbtqC4ed1iSKptE+fyvA6JVopqjZ8806ip1vS/TPggGwha9YWEe0ShYW36
-         MvYSU8+uQegXc+sULnwdLL2J/exaEdumkmOgj3geoxjN7nvqyKBe+XrgZGZHNYdBaAqy
-         n5rOU6s8PBFGhg6Fo2vtDSwys2VJawgeFNii3Q92KNQbHJ3OVDyUWN5si3pGWzaHEEAe
-         6bGA==
+        d=google.com; s=20230601; t=1756323673; x=1756928473; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:mime-version:date:reply-to:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=vWAmWKV0YCAe3PkG8+/flyHk3YjgRL//qGGe4nfIRiE=;
+        b=AuF7t/qOQm6qKXSPMaMLuRN6BsIljh2hAs2n96cSqDebchzPlBSsE6uIbP/MOkevzZ
+         ET95rIxOvWEA61A0wwiarEBik76TxH8frvDqebgaviaGRVpaxr3WrY3HdhqNYyJdiMhL
+         cUqloxI/T+NMiPzmfIM/MCpn+L6MD5XISHL2mrNO+emqa+a1ZYov+P1ely7+yn4CMGxo
+         JntqgxWSRawdSoglQ5yaW7YZsdo7WcM4nrhm2I8mQyDt/bxa4Ye62pU2HfIIObJ53mfU
+         BFtWGHkw1NGsjAkal3Mxu3HVIPfNIhpXYXouQ7Qn2rdISurIq1hO639HnfLw+gpc6l00
+         /9Xg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1756321709; x=1756926509;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=xcAuR7T4RT9zVVlNI8n4izXJVHOx6F3XBKP4ipgVkd0=;
-        b=Zdjpl9XS6A6p25/DT7sHHNOPWfHYQ/KLnaqAf+k3/1RZQj+B8Iyv7kjlJv7t45JGMg
-         NRzG0zwnSWaDc1HgGdIFCWsNiSseop06hFF0MNFPRIoyxVwaTOFQmKzU71QWAst43b7M
-         kPq2TNDEV3vPXGaKvZCyMhGQu7+EdTPyWKlO6vu6wB111CXx68Akm5xj3K7OEtPO2euo
-         lpaFDUadBfk8TU5I+9Ib6ICoCZEfq9SUjUgz1zKVqvlh43mtJNdd14RrMkHk9TFi2hHq
-         ccCZXigoqRBLrFD0lSlCyu6N1EYfLiEA0APGkBiO/p0z7YlM7+PmBu48ozexgF5ukBmN
-         cBqw==
-X-Forwarded-Encrypted: i=1; AJvYcCVEOwmvlEZp8+hRwwsLBxHZeq89wYfsN2tos8DIGCSaI/jTiXlcm6logmZbSkrznZRtCpI=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxZ0a/uc98ebr+Aw5CvzyR1Cm7YfFgwilxnimSbFfpewu5r7ve3
-	z2CiWX6/nk5xG6CV2RpBRrcBgjBuFoGbDIhu81KrfAdQL8m3sC2n5zIU0oR2xQfE0TTsSinyDKp
-	qn1gBaQ==
-X-Google-Smtp-Source: AGHT+IEhMKtArTIDLxa8v26TStyUxDN5gA5Xm0VZUdjAbdj2048YQG+Bwtxlg063uyONmGMwUmly8Ow2VrA=
-X-Received: from plgn18.prod.google.com ([2002:a17:902:f612:b0:248:b2cc:8b2])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:902:cf08:b0:248:a4e2:e6d6
- with SMTP id d9443c01a7336-248a4f2333bmr41703845ad.39.1756321709348; Wed, 27
- Aug 2025 12:08:29 -0700 (PDT)
-Date: Wed, 27 Aug 2025 12:08:27 -0700
-In-Reply-To: <aK7Ji3kAoDaEYn3h@yzhao56-desk.sh.intel.com>
+        d=1e100.net; s=20230601; t=1756323673; x=1756928473;
+        h=cc:to:from:subject:message-id:mime-version:date:reply-to
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=vWAmWKV0YCAe3PkG8+/flyHk3YjgRL//qGGe4nfIRiE=;
+        b=HdGdd4ElfsiQkR2nnlsTbQ6rU97oiFurZ5wIUwn84Z1kIw3gqNd9GU+RxmMpF38q0I
+         XHPcs5Mw/DmX64jQe5gvlmQROi1xaWVaUNuVr7uIzRqEB93dmrZzX1oq0HOzWkBOTYvV
+         PfvfMo9szvCbtDH1JFq3PrFyszvM50ubQxOx1t7qy4oS/r1SFVaX3nak2whEiFDqztmb
+         sFfw8FUjfP3P3OuJiE1ZDWA329q8jnxMFmvG2PmWjyhWJ3Nhyb3cRNvEcsQ+qz7FESuT
+         gt2POwiBu5m16XI93e9aaubcQiMY7eE8ZZOEqjKCNKlgbwTG+tJ71PlDfbOerRPZUyk8
+         arQw==
+X-Gm-Message-State: AOJu0YzpptE21pblerjtXwMC0/zc8JHkPd0X/qiRSICCz7FlGcVb5BpV
+	PLiLXn4JBupCLPo99EAnAAQcLZ52EWnnyAmCmCz9vxjz75jrzVGwVUN1gw4CIRE58lwze8va07y
+	knEzmBg==
+X-Google-Smtp-Source: AGHT+IF3kgndwMxobuC1w46DvzTQVQ+70Io5X5LupzuJERdtYH2UT2HutkGftTPmJvqTvDvQz3iwKQFDQfQ=
+X-Received: from pfjf14.prod.google.com ([2002:a05:6a00:22ce:b0:772:49a:524f])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a05:6a00:b45:b0:770:556d:32e8
+ with SMTP id d2e1a72fcca58-770556d5e86mr17407883b3a.24.1756323672784; Wed, 27
+ Aug 2025 12:41:12 -0700 (PDT)
+Reply-To: Sean Christopherson <seanjc@google.com>
+Date: Wed, 27 Aug 2025 12:41:04 -0700
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
-References: <20250827000522.4022426-1-seanjc@google.com> <20250827000522.4022426-10-seanjc@google.com>
- <aK7Ji3kAoDaEYn3h@yzhao56-desk.sh.intel.com>
-Message-ID: <aK9Xqy0W1ghonWUL@google.com>
-Subject: Re: [RFC PATCH 09/12] KVM: TDX: Fold tdx_mem_page_record_premap_cnt()
- into its sole caller
+X-Mailer: git-send-email 2.51.0.268.g9569e192d0-goog
+Message-ID: <20250827194107.4142164-1-seanjc@google.com>
+Subject: [PATCH v2 0/3] vhost_task: Fix a bug where KVM wakes an exited task
 From: Sean Christopherson <seanjc@google.com>
-To: Yan Zhao <yan.y.zhao@intel.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	Michael Roth <michael.roth@amd.com>, Ira Weiny <ira.weiny@intel.com>, 
-	Vishal Annapurve <vannapurve@google.com>, Rick Edgecombe <rick.p.edgecombe@intel.com>
-Content-Type: text/plain; charset="us-ascii"
+To: Sean Christopherson <seanjc@google.com>, Paolo Bonzini <pbonzini@redhat.com>, 
+	"Michael S. Tsirkin" <mst@redhat.com>, Jason Wang <jasowang@redhat.com>
+Cc: kvm@vger.kernel.org, virtualization@lists.linux.dev, 
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	Sebastian Andrzej Siewior <bigeasy@linutronix.de>
+Content-Type: text/plain; charset="UTF-8"
 
-On Wed, Aug 27, 2025, Yan Zhao wrote:
-> On Tue, Aug 26, 2025 at 05:05:19PM -0700, Sean Christopherson wrote:
-> > @@ -1641,14 +1618,30 @@ static int tdx_sept_set_private_spte(struct kvm *kvm, gfn_t gfn,
-> >  		return -EIO;
-> >  
-> >  	/*
-> > -	 * Read 'pre_fault_allowed' before 'kvm_tdx->state'; see matching
-> > -	 * barrier in tdx_td_finalize().
-> > +	 * Ensure pre_fault_allowed is read by kvm_arch_vcpu_pre_fault_memory()
-> > +	 * before kvm_tdx->state.  Userspace must not be allowed to pre-fault
-> > +	 * arbitrary memory until the initial memory image is finalized.  Pairs
-> > +	 * with the smp_wmb() in tdx_td_finalize().
-> >  	 */
-> >  	smp_rmb();
-> > -	if (likely(kvm_tdx->state == TD_STATE_RUNNABLE))
-> > -		return tdx_mem_page_aug(kvm, gfn, level, pfn);
-> >  
-> > -	return tdx_mem_page_record_premap_cnt(kvm, gfn, level, pfn);
-> > +	/*
-> > +	 * If the TD isn't finalized/runnable, then userspace is initializing
-> > +	 * the VM image via KVM_TDX_INIT_MEM_REGION.  Increment the number of
-> > +	 * pages that need to be initialized via TDH.MEM.PAGE.ADD (PAGE.ADD
-> > +	 * requires a pre-existing S-EPT mapping).  KVM_TDX_FINALIZE_VM checks
-> > +	 * the counter to ensure all mapped pages have been added to the image,
-> > +	 * to prevent running the TD with uninitialized memory.
-> To prevent the mismatch between mirror EPT and the S-EPT?
+Michael,
 
-No?  Because KVM bumps the count when installing the S-EPT and decrements it
-on AUG, so I don't see how nr_premapped guards against M-EPT vs. S-EPT issues?
+Do you want to take this through the vhost tree?  It technically fixes a KVM
+bug, but this obviously touches far more vhost code than KVM code, and the
+patch that needs to go into 6.17 doesn't touch KVM at all.
 
-> e.g., Before KVM_TDX_FINALIZE_VM, if userspace performs a zap after the
-> TDH.MEM.PAGE.ADD, the page will be removed from the S-EPT. The count of
-> nr_premapped will not change after the successful TDH.MEM.RANGE.BLOCK and
-> TDH.MEM.PAGE.REMOVE.
 
-Eww.  It would be nice to close that hole, but I suppose it's futile, e.g. the
-underlying problem is unexpectedly removing pages from the initial, whether the
-VMM is doing stupid things before vs. after FINALIZE doesn't really matter.
+Fix a bug where KVM attempts to wake a vhost task that has already exited in
+response to a fatal signal, and tack on a few cleanups to harden against
+introducing similar bugs in the future.
 
-> As a result, the TD will still run with uninitialized memory.
+The issue is firmly a KVM problem, but I opted to fix the bug by making
+vhost_task_wake() safe against an exited task as doing so is far simpler and
+cleaner than implementing the same functionality in KVM, and I suspect that
+if there are other users of vhost_tasks in the future, then there's a good
+chance they will want/expect vhost_task to handle that detail.
 
-No?  Because BLOCK+REMOVE means there are no valid S-EPT mappings.  There's a
-"hole" that the guest might not expect, but that hole will trigger an EPT
-violation and only get "filled" if the guest explicitly accepts an AUG'd page.
+Note, this only started causing problems when commit 56180dd20c19 ("futex:
+Use RCU-based per-CPU reference counting instead of rcuref_t") landed, so
+the explosions are "new" in 6.17, but the bug has existed since KVM switched
+to vhost_task back in 6.13.
 
-Side topic, why does KVM tolerate tdh_mem_page_add() failure?  IIUC, playing
-nice with tdh_mem_page_add() failure necessitates both the
-tdx_is_sept_zap_err_due_to_premap() craziness and the check in tdx_td_finalize()
-that all pending pages have been consumed.
+v2:
+ - Drop the "safe" postfix variant and make the "default" vhost_task_wake()
+   safe. [Michael].
+ - Use vhost_task_wake() and __vhost_task_wake() for the public APIs, and
+   vhost_task_wake_up_process() for the local helper. [Michael]
+ - Drag the signalas back from their Spanish holiday. [Sebastian]
 
-What reasonable use case is there for gracefully handling tdh_mem_page_add() failure?
+v1: https://lore.kernel.org/all/20250826004012.3835150-1-seanjc@google.com
 
-If there is a need to handle failure, I gotta imagine it's only for the -EBUSY
-case.  And if it's only for -EBUSY, why can't that be handled by retrying in
-tdx_vcpu_init_mem_region()?  If tdx_vcpu_init_mem_region() guarantees that all
-pages mapped into the S-EPT are ADDed, then it can assert that there are no
-pending pages when it completes (even if it "fails"), and similarly
-tdx_td_finalize() can KVM_BUG_ON/WARN_ON the number of pending pages being
-non-zero.
+Sean Christopherson (3):
+  vhost_task: Don't wake KVM x86's recovery thread if vhost task was
+    killed
+  vhost_task: Allow caller to omit handle_sigkill() callback
+  KVM: x86/mmu: Don't register a sigkill callback for NX hugepage
+    recovery tasks
 
-> > +	 */
-> > +	if (unlikely(kvm_tdx->state != TD_STATE_RUNNABLE)) {
-> > +		if (KVM_BUG_ON(kvm->arch.pre_fault_allowed, kvm))
-> > +			return -EIO;
-> > +
-> > +		atomic64_inc(&kvm_tdx->nr_premapped);
-> > +		return 0;
-> > +	}
-> > +
-> > +	return tdx_mem_page_aug(kvm, gfn, level, pfn);
-> >  }
-> >  
-> >  static int tdx_sept_drop_private_spte(struct kvm *kvm, gfn_t gfn,
-> > -- 
-> > 2.51.0.268.g9569e192d0-goog
-> > 
+ arch/x86/kvm/mmu/mmu.c           |  7 +---
+ drivers/vhost/vhost.c            |  2 +-
+ include/linux/sched/vhost_task.h |  1 +
+ kernel/vhost_task.c              | 62 +++++++++++++++++++++++++++-----
+ 4 files changed, 56 insertions(+), 16 deletions(-)
+
+
+base-commit: 1b237f190eb3d36f52dffe07a40b5eb210280e00
+-- 
+2.51.0.268.g9569e192d0-goog
+
 
