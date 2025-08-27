@@ -1,66 +1,66 @@
-Return-Path: <kvm+bounces-55943-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-55944-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0317CB38C98
-	for <lists+kvm@lfdr.de>; Thu, 28 Aug 2025 00:07:53 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id D3302B38CB0
+	for <lists+kvm@lfdr.de>; Thu, 28 Aug 2025 00:08:30 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 50193362100
-	for <lists+kvm@lfdr.de>; Wed, 27 Aug 2025 22:07:21 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1C2563BBA89
+	for <lists+kvm@lfdr.de>; Wed, 27 Aug 2025 22:07:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9D22A3126CC;
-	Wed, 27 Aug 2025 22:05:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A924C312819;
+	Wed, 27 Aug 2025 22:05:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="daSXWLim"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="gWDYrHQ7"
 X-Original-To: kvm@vger.kernel.org
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 449A12D9ECD
-	for <kvm@vger.kernel.org>; Wed, 27 Aug 2025 22:05:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 315B22DEA90
+	for <kvm@vger.kernel.org>; Wed, 27 Aug 2025 22:05:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756332303; cv=none; b=RqlMz+hoKJWFrTya/gqyrJvCJUI+G5y0ynHrVdMjBumltX56aubUgitYj0u+f+Imm9mZiR63NZHD/Bjjum6Glf169ybmToKJhUWjbPkg1eO9ihHPkg2udlyZo57/9EO6UpG9q3Zta2oC0f7dNYABPaEgHfrVopfW7qA/tUaNLkc=
+	t=1756332320; cv=none; b=FRIIacgqHWLj+Arh3bxHM3qbXbfT41pJA7XGRILzDzxoW4a7HnURWno0rA9qQHeeDhDoo5RDptezVFnagLy9SXiwz+R8zKjIqCC3XAE2AaWQvOTStBAg9VDpKVenIjL5tAhli5t0E52yiI8s9ahfy6CnSJWQARKjpRq2iGMGKqY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756332303; c=relaxed/simple;
-	bh=D2u5/+G1xeXtF2zeLldC795zgkCN5Lto6ZcYMqZjZMQ=;
+	s=arc-20240116; t=1756332320; c=relaxed/simple;
+	bh=WvWB4CAiWB7AQTYVN+JD1sK8B6mRbJLSGgHycU5+K0Y=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=lBx5t040POyL3sLCL5MGRau4YYby0YwneueDJ8LrtOCr/rYGiX7Tesgx9BN/IbFgW87nA0fQhjdiCyOPZIXn5IGVPW41S9iaxcr6lv7rTl077gedFa9e6KizEyb1KYIXa+MVeYyd75Ijfssz06bF/2L8iGGkO5g03205p5GPfaU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=daSXWLim; arc=none smtp.client-ip=170.10.129.124
+	 MIME-Version; b=bxpP5g3OfQr8GuPeTs0rfNtDrCMuJY4MKsiVIw6hlnEukjX+pUvPO3KO54UV/MUhdvZZkYCCH8KZg++1zQlFv+Xeh1Wm9O/YDxOOfOn1yC6SHI2axZuW6Ok4gwHIsmvzJ8I2mm3cp95y8nyZ2yXtwVjOw7V4LDbNOHGWohl+/ks=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=gWDYrHQ7; arc=none smtp.client-ip=170.10.129.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1756332301;
+	s=mimecast20190719; t=1756332318;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=sdduxfP9sOW11CIIetzrq/g2aOdRCb5eN+kQk0XudUI=;
-	b=daSXWLimxecGFUnuanprVvVh1AUYLDySvRRbiXbgej4sHRVk/lELP8U9OHKtD7M9MdzPI6
-	0TtfCFqdY0vRlUdvzLJcvG+YlDzU84wE2+0mLP8ASHayMMouXCUKaYb7VLkFIa8w79MZPs
-	xl1umgySDFzP/Pe/bR7Geise5X2Qk/Y=
-Received: from mx-prod-mc-03.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
+	bh=D/EwzdzyNFR+ewVEEFqEze2ovwyb82bK+Rce3/V3U0s=;
+	b=gWDYrHQ75ObeH3C/F4Sip45SMhCe/ECpS/Dh4FNAxo61507ZNU3inZH6yzW441wb0cb7Rc
+	rmwkMmiMdqiH50JDSylpL06xLjw3lLdjpIyoNAibqv7OdMVRY+MKz9gc4H8sC8wNwgIhvr
+	Ky7T+PE8QXvJydzQfLmZQou5t3pgNDI=
+Received: from mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
  relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-417-EpEDj_iqOtyJ7pKJWv6ETA-1; Wed,
- 27 Aug 2025 18:04:58 -0400
-X-MC-Unique: EpEDj_iqOtyJ7pKJWv6ETA-1
-X-Mimecast-MFC-AGG-ID: EpEDj_iqOtyJ7pKJWv6ETA_1756332292
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-319-rAeDOcrbOYu2jFZVlj4BxA-1; Wed,
+ 27 Aug 2025 18:05:15 -0400
+X-MC-Unique: rAeDOcrbOYu2jFZVlj4BxA-1
+X-Mimecast-MFC-AGG-ID: rAeDOcrbOYu2jFZVlj4BxA_1756332310
 Received: from mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.4])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
 	(No client certificate requested)
-	by mx-prod-mc-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 995B919541AC;
-	Wed, 27 Aug 2025 22:04:52 +0000 (UTC)
+	by mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id E3F20180028D;
+	Wed, 27 Aug 2025 22:05:09 +0000 (UTC)
 Received: from t14s.redhat.com (unknown [10.22.80.195])
-	by mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id CAF5B30001A1;
-	Wed, 27 Aug 2025 22:04:36 +0000 (UTC)
+	by mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id CB62530001A1;
+	Wed, 27 Aug 2025 22:04:53 +0000 (UTC)
 From: David Hildenbrand <david@redhat.com>
 To: linux-kernel@vger.kernel.org
 Cc: David Hildenbrand <david@redhat.com>,
-	"Mike Rapoport (Microsoft)" <rppt@kernel.org>,
+	Zi Yan <ziy@nvidia.com>,
 	Alexander Potapenko <glider@google.com>,
 	Andrew Morton <akpm@linux-foundation.org>,
 	Brendan Jackman <jackmanb@google.com>,
@@ -94,6 +94,7 @@ Cc: David Hildenbrand <david@redhat.com>,
 	Marco Elver <elver@google.com>,
 	Marek Szyprowski <m.szyprowski@samsung.com>,
 	Michal Hocko <mhocko@suse.com>,
+	Mike Rapoport <rppt@kernel.org>,
 	Muchun Song <muchun.song@linux.dev>,
 	netdev@vger.kernel.org,
 	Oscar Salvador <osalvador@suse.de>,
@@ -104,11 +105,10 @@ Cc: David Hildenbrand <david@redhat.com>,
 	virtualization@lists.linux.dev,
 	Vlastimil Babka <vbabka@suse.cz>,
 	wireguard@lists.zx2c4.com,
-	x86@kernel.org,
-	Zi Yan <ziy@nvidia.com>
-Subject: [PATCH v1 09/36] mm/mm_init: make memmap_init_compound() look more like prep_compound_page()
-Date: Thu, 28 Aug 2025 00:01:13 +0200
-Message-ID: <20250827220141.262669-10-david@redhat.com>
+	x86@kernel.org
+Subject: [PATCH v1 10/36] mm: sanity-check maximum folio size in folio_set_order()
+Date: Thu, 28 Aug 2025 00:01:14 +0200
+Message-ID: <20250827220141.262669-11-david@redhat.com>
 In-Reply-To: <20250827220141.262669-1-david@redhat.com>
 References: <20250827220141.262669-1-david@redhat.com>
 Precedence: bulk
@@ -120,59 +120,30 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.4
 
-Grepping for "prep_compound_page" leaves on clueless how devdax gets its
-compound pages initialized.
+Let's sanity-check in folio_set_order() whether we would be trying to
+create a folio with an order that would make it exceed MAX_FOLIO_ORDER.
 
-Let's add a comment that might help finding this open-coded
-prep_compound_page() initialization more easily.
+This will enable the check whenever a folio/compound page is initialized
+through prepare_compound_head() / prepare_compound_page().
 
-Further, let's be less smart about the ordering of initialization and just
-perform the prep_compound_head() call after all tail pages were
-initialized: just like prep_compound_page() does.
-
-No need for a comment to describe the initialization order: again,
-just like prep_compound_page().
-
-Reviewed-by: Mike Rapoport (Microsoft) <rppt@kernel.org>
+Reviewed-by: Zi Yan <ziy@nvidia.com>
 Signed-off-by: David Hildenbrand <david@redhat.com>
 ---
- mm/mm_init.c | 15 +++++++--------
- 1 file changed, 7 insertions(+), 8 deletions(-)
+ mm/internal.h | 1 +
+ 1 file changed, 1 insertion(+)
 
-diff --git a/mm/mm_init.c b/mm/mm_init.c
-index 5c21b3af216b2..df614556741a4 100644
---- a/mm/mm_init.c
-+++ b/mm/mm_init.c
-@@ -1091,6 +1091,12 @@ static void __ref memmap_init_compound(struct page *head,
- 	unsigned long pfn, end_pfn = head_pfn + nr_pages;
- 	unsigned int order = pgmap->vmemmap_shift;
+diff --git a/mm/internal.h b/mm/internal.h
+index 45da9ff5694f6..9b0129531d004 100644
+--- a/mm/internal.h
++++ b/mm/internal.h
+@@ -755,6 +755,7 @@ static inline void folio_set_order(struct folio *folio, unsigned int order)
+ {
+ 	if (WARN_ON_ONCE(!order || !folio_test_large(folio)))
+ 		return;
++	VM_WARN_ON_ONCE(order > MAX_FOLIO_ORDER);
  
-+	/*
-+	 * We have to initialize the pages, including setting up page links.
-+	 * prep_compound_page() does not take care of that, so instead we
-+	 * open-code prep_compound_page() so we can take care of initializing
-+	 * the pages in the same go.
-+	 */
- 	__SetPageHead(head);
- 	for (pfn = head_pfn + 1; pfn < end_pfn; pfn++) {
- 		struct page *page = pfn_to_page(pfn);
-@@ -1098,15 +1104,8 @@ static void __ref memmap_init_compound(struct page *head,
- 		__init_zone_device_page(page, pfn, zone_idx, nid, pgmap);
- 		prep_compound_tail(head, pfn - head_pfn);
- 		set_page_count(page, 0);
--
--		/*
--		 * The first tail page stores important compound page info.
--		 * Call prep_compound_head() after the first tail page has
--		 * been initialized, to not have the data overwritten.
--		 */
--		if (pfn == head_pfn + 1)
--			prep_compound_head(head, order);
- 	}
-+	prep_compound_head(head, order);
- }
- 
- void __ref memmap_init_zone_device(struct zone *zone,
+ 	folio->_flags_1 = (folio->_flags_1 & ~0xffUL) | order;
+ #ifdef NR_PAGES_IN_LARGE_FOLIO
 -- 
 2.50.1
 
