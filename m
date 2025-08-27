@@ -1,323 +1,480 @@
-Return-Path: <kvm+bounces-55910-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-55911-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8F71AB388B4
-	for <lists+kvm@lfdr.de>; Wed, 27 Aug 2025 19:33:33 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 96399B388CC
+	for <lists+kvm@lfdr.de>; Wed, 27 Aug 2025 19:45:46 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 6C1737A261D
-	for <lists+kvm@lfdr.de>; Wed, 27 Aug 2025 17:31:57 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E2E186831DD
+	for <lists+kvm@lfdr.de>; Wed, 27 Aug 2025 17:45:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5DFB42BD5AD;
-	Wed, 27 Aug 2025 17:33:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E08E42C3252;
+	Wed, 27 Aug 2025 17:45:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="oKUMPvsp"
+	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="Oq7LN3cW"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.9])
+Received: from NAM12-BN8-obe.outbound.protection.outlook.com (mail-bn8nam12on2080.outbound.protection.outlook.com [40.107.237.80])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E03A921FF55;
-	Wed, 27 Aug 2025 17:33:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.9
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756316000; cv=none; b=stuYgQxy8TZf61vB3K2uixpOgCJsA3G3gKf/0XNXUOWP9XrLl5svN08LBY13Mfuy56ZedK8Au7QiIBWa5P7rRhq3G+Hyq9X0UHaSUvM5LhBSxSm3HsprRq7AlKe5dgb9Isb7wEtLCzC66nhWA2fv7AQ4djPExrzXLBvwHW38Iac=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756316000; c=relaxed/simple;
-	bh=g+/6ZtHJDmZfMFxft7oCojR4vCKnCFZ5ArCa316JrNs=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=a247sDs5KrTpa7Xpna4ewFbmdEY5C4WKXWygSN23crNsoWWaoid954km7wjwFAA8naTVe71FZWTONfvp+Wz16thunjlMun0hdp3huHHqe124R+N79x8065VDVtmMquoxt6q8kOXIguZM6OyAlxHlVrwpQsy72WvujpK/mSIBY18=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=oKUMPvsp; arc=none smtp.client-ip=198.175.65.9
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1756315999; x=1787851999;
-  h=message-id:date:mime-version:subject:to:cc:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=g+/6ZtHJDmZfMFxft7oCojR4vCKnCFZ5ArCa316JrNs=;
-  b=oKUMPvspD5OJNI1IgKSdHkfuV+7piXBDo2+BYpsS+1v9y4qg74bEvL4S
-   khLoVm93Hfsy9AB7x5fnopxaEoBIYbnEC/Qqa0nT84g/Kl6WKECFgi9rP
-   EhS4CIWxIMWp7jjdvhOiN+YF6tu7dr4t4OVM+Qa30kCr0vIKVhCxHTNuW
-   967Wm2XYF6040/epYLK0DLAPmqEuUM4pkfZTlsg1lduTBBV1zlaa3Tg8F
-   bsqXJr3KQtbHoiZOG3GE0hwItI0nsaDNMn2ShykDNvlo+WBCnAo4lrmsO
-   aamR3JdazObUCPMB0YDjvGRWoXkbHESXB1rOCA/mTUMxqvUIqnRb/3F34
-   A==;
-X-CSE-ConnectionGUID: rQTNLiKKRE2YbzNgQXoGLA==
-X-CSE-MsgGUID: AyJ2I5EPTmOxEOCEdnzMCA==
-X-IronPort-AV: E=McAfee;i="6800,10657,11531"; a="81168032"
-X-IronPort-AV: E=Sophos;i="6.17,312,1747724400"; 
-   d="scan'208";a="81168032"
-Received: from orviesa009.jf.intel.com ([10.64.159.149])
-  by orvoesa101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 27 Aug 2025 10:33:18 -0700
-X-CSE-ConnectionGUID: v3iCVrRRTluWWd8DLiAShw==
-X-CSE-MsgGUID: 0pnn7pMCRCG7wXus0/AtSA==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.18,217,1751266800"; 
-   d="scan'208";a="169493995"
-Received: from dwesterg-mobl1.amr.corp.intel.com (HELO [10.125.109.56]) ([10.125.109.56])
-  by orviesa009-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 27 Aug 2025 10:33:17 -0700
-Message-ID: <720bc7ac-7e81-4ad9-8cc5-29ac540be283@intel.com>
-Date: Wed, 27 Aug 2025 10:33:15 -0700
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 49F1D4086A;
+	Wed, 27 Aug 2025 17:45:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.237.80
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1756316733; cv=fail; b=PdEv30iKUe0nXMPcLDmJI/79lBvKYN0W5uDbK1ZAi9y9T3BdxaQUU4JnkhKMZH7Jrt2RTjJ6sS+BrgOoUFaMtSVUhrZ5gzkAN/JGfihWuOyDTQvUoAJJaYr3Ei5Gz+j98FbhyL+0Af+1rh8/o/t5YXYvnArdQ+rfMwVBsv0ta0E=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1756316733; c=relaxed/simple;
+	bh=X/0l17+SJl1Wed4R9NJMGsecJeSIbjN1Ih63pKOuybQ=;
+	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=YP87IENEG3TRiI/Wu5u/PLFv6KeKC1x6KjoQUXrJVs6f9/0mtxed3ddJYXhcJoxFZMyo3iUDsyWGqWyrxWgwURTqEM4yzHE+uTdc2Jiyu1ly2cB1Ie3Ip0Gb0ybkRdJBHnB+1bji37EDVtbHAOV0qXXoyNWLie6qgluuXJnjpd0=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=Oq7LN3cW; arc=fail smtp.client-ip=40.107.237.80
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=lz22UURlY4PJ/rISeRfRcd4j8NmdQ6UIwzxnWX0AidDsDS0hRHoYlW5Nnl0QvwDLMoHbiIU7Yajkx80oZPC31HztFF1FOJtcytJDy2zEGpu/qTMLed6R9Pvebze4+1zKHmvYso0AUGb2G3r2tYLNotLIgmq08h2IuTXtVOndhdlDl+n+AXlwUiFSNBi6xL7vxZqofIYhxwZdk3eUFCb09bkWVbAVxHDmJCWPv8k3uvdGxmOAbMcbeNDL6f7LD4rXzRbm8hTSkg/1s0FkwQ8IO/pB6tEvL6yobWVtMnm6CzbWU67WBSBofDxxc5YqLuBwOO2PMb1e2nga/Oe2eX74Aw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=7pVAeOETua0RdosS6xMVD28ufxJ3GGFoTCRJbn77DFI=;
+ b=BpT+SS3mgXIR63akRkteKswFmQIiYFUuLCDTiIa00cwIvXj2UxQT4naSRUrRtOcI+qUfnDXomOno9QytHLzAx/Zj9TrdBbysTlxEA8OAZtsGbZ7r8ImTdxg5Bab9RSII/o4m3h6G8ZFW45gfHKOy9ABxyeHLu6zSARmnV9Bi7p6iZErKRvvf5JnV8B/vLUQ+L6C5glWXuUoac8gvBk3NQYaTkM72dS5+2p+hX7yw/Ue5jlzxveoF11zMX+WXFmBxn4iTZVWunWxTxQCAl68xffFXLcBMphCXaY+NC9EcziLSACcrr4BKPIJ9ViXRX4lxfZoNlJVAGwRks2mXbGBocQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
+ dkim=pass header.d=nvidia.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=7pVAeOETua0RdosS6xMVD28ufxJ3GGFoTCRJbn77DFI=;
+ b=Oq7LN3cW8BLadmctgLQ/EHLk/Ygr7M4DhR/OYmt3C676+GjvuXvnSQg2ez+DuU6NwhUk1RVA+Vdj7KeasED6cEFlv3BvKWVajwz3mX+kF4Klbh6tUjiQlF7RbzpcBTAyVL7UEVyynAZc3Lp5cRalke61j9MOcTCBxv5ZzQm29WCNRx709TKGZ9YNgl6Wa1DmaaEpMtXL7oqo/WPbCzfuv9rVTOiPXqSQSKmxsEzK6Su6zBOFUgBnXN2t8oRNgp9lPf9CF7kI8MCy4iLYwnuklGS9yll6Zz4LqFn0yATQ4sXosYVWIun2SJdOApsnt7pIiFufPH8Vj8AF2hkK2A2djg==
+Received: from BL1PR12MB5094.namprd12.prod.outlook.com (2603:10b6:208:312::18)
+ by SJ2PR12MB8927.namprd12.prod.outlook.com (2603:10b6:a03:547::9) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9052.20; Wed, 27 Aug
+ 2025 17:45:27 +0000
+Received: from BL1PR12MB5094.namprd12.prod.outlook.com
+ ([fe80::d9c:75e0:f129:1eb]) by BL1PR12MB5094.namprd12.prod.outlook.com
+ ([fe80::d9c:75e0:f129:1eb%6]) with mapi id 15.20.9073.010; Wed, 27 Aug 2025
+ 17:45:27 +0000
+From: Jim Harris <jiharris@nvidia.com>
+To: Miklos Szeredi <miklos@szeredi.hu>
+CC: "linux-fsdevel@vger.kernel.org" <linux-fsdevel@vger.kernel.org>,
+	"virtualization@lists.linux.dev" <virtualization@lists.linux.dev>,
+	"kvm@vger.kernel.org" <kvm@vger.kernel.org>, "stefanha@redhat.com"
+	<stefanha@redhat.com>, Max Gurtovoy <mgurtovoy@nvidia.com>, Idan Zach
+	<izach@nvidia.com>, Roman Spiegelman <rspiegelman@nvidia.com>, Ben Walker
+	<benwalker@nvidia.com>, Oren Duer <oren@nvidia.com>
+Subject: Re: Questions about FUSE_NOTIFY_INVAL_ENTRY
+Thread-Topic: Questions about FUSE_NOTIFY_INVAL_ENTRY
+Thread-Index: AQHcEWHgWIwFHGDQ0EazMQvH1t6jpLRrPYMAgADFeYCACoDMAIAAThmA
+Date: Wed, 27 Aug 2025 17:45:27 +0000
+Message-ID: <584586F6-09E0-4186-96F7-A76E4CBE1471@nvidia.com>
+References: <D5420EF2-6BA6-4789-A06A-D1105A3C33D4@nvidia.com>
+ <CAJfpegvmhpyab2-kaud3VG47Tbjh0qG_o7G-3o6pV78M8O++tQ@mail.gmail.com>
+ <1E1F125C-8D8C-4F82-B6A9-973CDF64EC3D@nvidia.com>
+ <CAJfpegtmakX4Ery3o5CwKf8GbCeqxsR9GAAgdmnnor0eDYHgXA@mail.gmail.com>
+In-Reply-To:
+ <CAJfpegtmakX4Ery3o5CwKf8GbCeqxsR9GAAgdmnnor0eDYHgXA@mail.gmail.com>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach: yes
+X-MS-TNEF-Correlator:
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nvidia.com;
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: BL1PR12MB5094:EE_|SJ2PR12MB8927:EE_
+x-ms-office365-filtering-correlation-id: 4dab19c7-a1f0-4eb9-bc5b-08dde5918269
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam:
+ BCL:0;ARA:13230040|376014|366016|1800799024|38070700018|8096899003|4013099003|4053099003|7053199007;
+x-microsoft-antispam-message-info:
+ =?utf-8?B?VHlpL3loWDQyV1gvY1VJR2xSZjQ3WitrL0lFeFFHUVR0WTlOMnZ5YlNjK1A4?=
+ =?utf-8?B?NXVESkF3OSttRVBtMDdHeVlRbkx0cTZlcTd5SFpLMVJLM0JiU0lNd0ZZV0dq?=
+ =?utf-8?B?UUtaRkVwY2M3S283KzlTMFNxVStHc1Q3Szh1bU5IZGN3YTE4TlVPcndFT2Jz?=
+ =?utf-8?B?c1ZQcXkreG5ZQ1J2R2dsV3pUbnV5anpObjRBWEVsTXo4TEhubWxONUpNRkJn?=
+ =?utf-8?B?WkF0WkpkUmdoMWY3clN3dWRWK2p2eFJDY0FGTXBzV0xzelo5NTIxVjQrY3J4?=
+ =?utf-8?B?REFsR1YwbFFJVU8wckJBVTdVV0pSTVhIRmlsbXJtWFBTMU9uYVM1S1Y4UWNp?=
+ =?utf-8?B?TVAvT2libEczWmhsZUJDTUVVWWFsaWVodk5oQzVqSW54YkJsSjAzelBOZ3J4?=
+ =?utf-8?B?M2liYTUvTG5kYk9ma2lOaUg2ZFpOMlNzUWljNlZLZkNweXNFcmlQQ3VPRnJn?=
+ =?utf-8?B?MFlYM3BXMkpTeWJqQUdkcXZCYWh0VjNOV3dmbDB3b0NmL3ZzMzdBQjhkYURB?=
+ =?utf-8?B?WEpRRmhOQmo2RXBlbjRXK1lGOW5ud0xGMnhRSkZxQlF0NGs4UFVxc1Fha0Zz?=
+ =?utf-8?B?d1VsSERqNTJoUTlNZ1lDUXE2Z3VZQW5hNFJXSFNUTk9iaFF6azFhTVBrQm0r?=
+ =?utf-8?B?M0p6dlg5cTdEQ0k2NTJEQU9NRldJb1Vxb0xBVS94TTVoNGdHUTh2SUNaOWNF?=
+ =?utf-8?B?UTJlai9ZRTZQVkRzRFpZdWdSYmh5OFcvNjRvYUlDQzJHTWpnTzJVemg4VGxS?=
+ =?utf-8?B?eWtxVnUwUkF0TG5UTGFob29ha2NRN2FKU0UwaytnbDVMM3pSQ0F6dzM2b2Q3?=
+ =?utf-8?B?V2JtbTR6RktibnJQeWMwSWdXWWxRVDYwdjBYYlhnVnVZQTNaMjIvTjNMYkc0?=
+ =?utf-8?B?WEk3VkoyZ3dicHU0YjRyWDZ5YUtBK0N4a2Jrb0RuWktSUXNJQStwUk13Ykpp?=
+ =?utf-8?B?bzVDUGtqa3ZEUHVNVzhYSHFRUVVjS1pDYm5BaUpRdFYwZ2xCYTJQMC82M0w1?=
+ =?utf-8?B?U0Yzb1JaVkN2V2VqNGxheS96ajBKbWNOc1RWUTBrVDRzaWJpVkVOQXc3R0RG?=
+ =?utf-8?B?clpIUmFJT0c5cTA4eUVDM3A5MGN0R1l2ZEJCUGVzS3Q0c2liZDdwVnVjOS9K?=
+ =?utf-8?B?SktDVUFHYi80bkY2MG5UR1VpL0JSZE9KSTRhMUJWN1N4SnpFaUNsbzFaUFcr?=
+ =?utf-8?B?cW9JSGJyT2sxbGNZV0MrYTc1ck5XN0tFVWxCSnRBekMrRTB6OWtkd1NadWJY?=
+ =?utf-8?B?OStrd0lJT0dRTE8vL0x4YWM2NmpKaWdjbTV2TGVXYlhuUTg5cEZGY1Q0dmlS?=
+ =?utf-8?B?eEVmOTdxeHNKOEZTaGZVUk1pMWtVZk8vOExqcEs4Nm9ZZzZFRWMzb0V6Zmhu?=
+ =?utf-8?B?M09nT0llSlp3Y1doUDN4NDh0b2o1Mm9Xck0yNEJFbVBDdjZDeCtETStqOXFo?=
+ =?utf-8?B?UUYxSFJhWm1pRGtFeUJYZFc2MDhNS1hoUTJaaWViL3FoRUs1MVhxbEc1eE5H?=
+ =?utf-8?B?ZTVBNTEySE0rRnhYVURNUGFWMWdtTm9PR0srOHEwdktWL21OUy85NnFTSldQ?=
+ =?utf-8?B?aFRYcjJ0S2daeHBzQ0ZmNkJEdDhZRDQwOWl5eDJkbGxlako4cFpXdkIzY3g5?=
+ =?utf-8?B?cWhvT0Ezd21HdjJDUGx0OVpzZU5kWmhiQTlSMkd0QTRxMnltOHhKTkV1YjRC?=
+ =?utf-8?B?TEpPMWpGSldCY3dWWDJPVTFvN2ZJVzczUW9nOCs1cGIrNWhyUHJHaU5ocWV5?=
+ =?utf-8?B?SzJTNGJKS0Z3WDFpRE1zU29OZzJycEhWeU9xWlg2QWkzdG91YzNkV3FjNVds?=
+ =?utf-8?B?MGlqeVI3a2l0ajh5U0lPOWZOcFU5NmZKQklEdUsybUtnUjNFMlE4cUlER3Vl?=
+ =?utf-8?B?TXJsdGllZkh6dHcxN1RVQTNHOU1MZmpwcSt1djhHQTlPNWRiUEVyZkRxOFNT?=
+ =?utf-8?B?c1IzTjBsanU1Um11ZkxxOU1iaTVIeEJhbFNiKzRBcHpQTERkM09NMDN1QTVT?=
+ =?utf-8?B?M0tRUEsyMWhBPT0=?=
+x-forefront-antispam-report:
+ CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BL1PR12MB5094.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(376014)(366016)(1800799024)(38070700018)(8096899003)(4013099003)(4053099003)(7053199007);DIR:OUT;SFP:1101;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0:
+ =?utf-8?B?cWFuNVVEaWM5T2JiYTdNSnFXZlhMM1ZZL3Vob2RDUHVOdGUzcGFYUjhrbHBE?=
+ =?utf-8?B?QWYzTFBJb1pwWDRKMkV0eWt3eW80Q0lvU0tDOEVVU0NxQTB5eXhBZ1V5V0Ex?=
+ =?utf-8?B?WDJ2YzY4U3lhblc4RzRKZlQ2Z2Y1TnlSMSs5cHV6YlU5cFlwb0VLSGIwTElN?=
+ =?utf-8?B?bGVnQllZSXVFZURlbEdLMnBYV1Axc0dJOEs5S2NDM000ZFd0WFJhR0dvU014?=
+ =?utf-8?B?aklEdW5QSTBxWEx5UTd2U2tQTGxIbUc5MjJmWkx4SUZmZHVhbTBnSVU1NXUz?=
+ =?utf-8?B?cFQyV25PaHc0bkRVVjgzeXZlQ2pXNldZQld4elZhdmlidS8waVJEcmprN3NJ?=
+ =?utf-8?B?cFlQeGdwV2lCRkk2ZkhUMUp2cTJMOTJpdmZhU3U3SE1aRHFBR2ZkM0lQVmpK?=
+ =?utf-8?B?ODM0QmQ2TldkaDdJTC9YakczQmtFTU4wMDRaYW9NT0pXZ0VnbUZyL0NhckdI?=
+ =?utf-8?B?MXFZdWlOeWEwdmw4elB3WWNRZ0E4SFFZOFJkZFhuTUtOdmhneTdUY0pnMUo2?=
+ =?utf-8?B?aXNRa3o1ZVI5eE1KMXFjRDNwaDRwR2thL2tjUkxIemg5Y0JzbEUzclh6ZHRB?=
+ =?utf-8?B?bVYrWHc2T1BYVG9KdStja0VsSjNCSk53Y1JRNnlIZSt6VDBjenlHZUFGc1c5?=
+ =?utf-8?B?VmVSaU5SM0pZZ1ZvMjcvVlVOL1Zjc0swYUZ5WWRMdEsyckZKK05CRkNYZzU1?=
+ =?utf-8?B?djNGMzZrdUM4eS9CbHdsVlkySFBHaXJvdHdLRUhNZUl4R0ZtaENpUmVaS1dB?=
+ =?utf-8?B?SnNxdE5NTWVMK3I4Z2dBaEhMSDA3SE1KUi91VFJ2aGZnL2Q2c2hwaVBnSHhj?=
+ =?utf-8?B?T1VGajhTUXlEU0VqaFNZNzBldDQ1Z1FLVXdoajJFSk43anVMMm0wYlpaRFpX?=
+ =?utf-8?B?SS95ci91UEFxWGJjK0RoZ0gyOGdRa2VyWFAxblRTVUgwSFYvR2tHMlNlSWNW?=
+ =?utf-8?B?a3dCSHV2QmhkTzFKVHFRd0ZUdEU3RitCc2pPOWU5QUlKRnU0T0NycGhZTGpO?=
+ =?utf-8?B?dVU4QllSdFE4ZHpwcWJ5aTg1dzdjNnUxQ083MGtpMEc1ZzNpeFppS2ZyNUF5?=
+ =?utf-8?B?OGo5WFZwNkhFMjlUT2VYMEtyZ0lZcE1UWjNNSTlnTmQ0Zk1jYzF6THdHZVRm?=
+ =?utf-8?B?dVNkb1hWU2Qyenc4bWlBZzlSRmo0cmdueUd0dlk4WmdGMU9vOGIxR1JMZ01a?=
+ =?utf-8?B?NUluazdZUFVBRVZLWS9RTEpDWkRlYURxVDNCc3FGMVFLZUZmeXdpekhjRFBX?=
+ =?utf-8?B?TWJUc0FncTkzRE0wT1pDQ01pVVhhZWtlcmlnTENteVlhRHRrZ0dvOHVqbGh6?=
+ =?utf-8?B?dDZHeTgrK09DY3p5ZWZiTnp0Y3dmNE5USHpncnBPLytuZmVPUmN4bmJIK0RH?=
+ =?utf-8?B?THZkQnFKU1Y3Zis5NEZGZ2hESUxGWkZ4aDhmV2k2bGNyQUJ4UmJ0UjZReHJV?=
+ =?utf-8?B?TjlnZnh6Z01rQzNkSU5sSHNxOGxTRjN3YXM4ZU5HOWdFTkpzZi8vYVdNMi9M?=
+ =?utf-8?B?SnRCVG1LVk90UjV1T3hXRDJPUUtxcjJRWWZPajl5TnQ5TGdXRGNKREhSNjFk?=
+ =?utf-8?B?bG1ldlpqT1AwTytrNDZrZjVyU0t5WG8zR3d5SmIrbVRPb0tPcUJTTVNwVk5I?=
+ =?utf-8?B?RlZ5WVFjYWtlYTByL2tCNjJYUDJYbGNrZUxGNXcwY0xGZHM5VFQvb1BBZ2Rh?=
+ =?utf-8?B?RzltRFY2OXM4MGtlczJGTHgwS2NqclNxcWdwNW51cDg4YVJCb1J0MjZCM3Zn?=
+ =?utf-8?B?dnNDNE80V1htUVM1R1FyTEVlVjE2TENXUzJ0aUJmaEJjbnVHck9hMmpmZTFa?=
+ =?utf-8?B?RlJOVThjZWFoTFlTYlNNd2NBODIvNFg5ZGUwZmMwaFpSbEFJTU5ra09YRGJT?=
+ =?utf-8?B?cGZ1NklXZVF6TzBycGZjekwyNlRSczFadk9Pckk1aDI2QU1yZEN0c3pzMHNn?=
+ =?utf-8?B?V0p3Q1UxRXJzUzh2TGF1NXY4emhOdi83TkhGeXRtbzBKNDEyd2ZuaVlNQ0wr?=
+ =?utf-8?B?bnA5TVdnTHZhQ3g3ZTdtdEJnWnpLSVlZdkllU20yU1J1UmlkMC8wVkJabWJk?=
+ =?utf-8?B?U2Y4VGQzWk1CejJSSFE4bUNlcDIxNGxyYnZEMEY3NWFocHhtWktQdEJaS2Rj?=
+ =?utf-8?Q?QzymrrDh4xblY2PjYvUFrOBEY?=
+Content-Type: multipart/signed;
+	boundary="Apple-Mail=_4A3B4A60-B083-456F-BEA2-57CEE80CB75A";
+	protocol="application/pkcs7-signature"; micalg=sha-256
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v6 04/20] x86/cea: Export an API to get per CPU exception
- stacks for KVM to use
-To: "Xin Li (Intel)" <xin@zytor.com>, linux-kernel@vger.kernel.org,
- kvm@vger.kernel.org, linux-doc@vger.kernel.org
-Cc: pbonzini@redhat.com, seanjc@google.com, corbet@lwn.net,
- tglx@linutronix.de, mingo@redhat.com, bp@alien8.de,
- dave.hansen@linux.intel.com, x86@kernel.org, hpa@zytor.com, luto@kernel.org,
- peterz@infradead.org, andrew.cooper3@citrix.com, chao.gao@intel.com,
- hch@infradead.org
-References: <20250821223630.984383-1-xin@zytor.com>
- <20250821223630.984383-5-xin@zytor.com>
-From: Dave Hansen <dave.hansen@intel.com>
-Content-Language: en-US
-Autocrypt: addr=dave.hansen@intel.com; keydata=
- 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
-In-Reply-To: <20250821223630.984383-5-xin@zytor.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: BL1PR12MB5094.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 4dab19c7-a1f0-4eb9-bc5b-08dde5918269
+X-MS-Exchange-CrossTenant-originalarrivaltime: 27 Aug 2025 17:45:27.7319
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: iM+I5nj9wy5l3nqgHr9e+2mOiJ1LYvJkYx2xpJSMCRuPi9B9NgVGY0T4gtNdWEIP9/X4s4JWnhn6yEAWxk/bnw==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SJ2PR12MB8927
 
-On 8/21/25 15:36, Xin Li (Intel) wrote:
-> FRED introduced new fields in the host-state area of the VMCS for
-> stack levels 1->3 (HOST_IA32_FRED_RSP[123]), each respectively
-> corresponding to per CPU exception stacks for #DB, NMI and #DF.
-> KVM must populate these each time a vCPU is loaded onto a CPU.
-> 
-> Convert the __this_cpu_ist_{top,bottom}_va() macros into real
-> functions and export __this_cpu_ist_top_va().
-> 
-> Suggested-by: Christoph Hellwig <hch@infradead.org>
-> Suggested-by: Dave Hansen <dave.hansen@intel.com>
+--Apple-Mail=_4A3B4A60-B083-456F-BEA2-57CEE80CB75A
+Content-Type: multipart/alternative;
+	boundary="Apple-Mail=_D1948399-B7DB-472F-B4D4-BCEF9C09266C"
 
-Nit: I wouldn't use Suggested-by unless the person basically asked for
-the *entire* patch. Christoph and I were asking for specific bits of
-this, but neither of us asked for this patch as a whole.
 
-> diff --git a/arch/x86/coco/sev/sev-nmi.c b/arch/x86/coco/sev/sev-nmi.c
-> index d8dfaddfb367..73e34ad7a1a9 100644
-> --- a/arch/x86/coco/sev/sev-nmi.c
-> +++ b/arch/x86/coco/sev/sev-nmi.c
-> @@ -30,7 +30,7 @@ static __always_inline bool on_vc_stack(struct pt_regs *regs)
->  	if (ip_within_syscall_gap(regs))
->  		return false;
->  
-> -	return ((sp >= __this_cpu_ist_bottom_va(VC)) && (sp < __this_cpu_ist_top_va(VC)));
-> +	return ((sp >= __this_cpu_ist_bottom_va(ESTACK_VC)) && (sp < __this_cpu_ist_top_va(ESTACK_VC)));
->  }
+--Apple-Mail=_D1948399-B7DB-472F-B4D4-BCEF9C09266C
+Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain;
+	charset=utf-8
 
-This rename is one of those things that had me scratching my head for a
-minute. It wasn't obvious at _all_ why the VC=>ESTACK_VC "rename" is
-necessary.
 
-This needs to have been mentioned in the changelog.
 
-Better yet would have been to do this in a separate patch because a big
-chunk of this patch is just rename noise.
+> On Aug 27, 2025, at 6:05=E2=80=AFAM, Miklos Szeredi =
+<miklos@szeredi.hu> wrote:
+>=20
+> External email: Use caution opening links or attachments
+>=20
+>=20
+> On Wed, 20 Aug 2025 at 22:42, Jim Harris <jiharris@nvidia.com =
+<mailto:jiharris@nvidia.com>> wrote:
+>>=20
+>>=20
+>>=20
+>>> On Aug 20, 2025, at 1:55=E2=80=AFAM, Miklos Szeredi =
+<miklos@szeredi.hu> wrote:
+>=20
 
->  /*
-> @@ -82,7 +82,7 @@ void noinstr __sev_es_ist_exit(void)
->  	/* Read IST entry */
->  	ist = __this_cpu_read(cpu_tss_rw.x86_tss.ist[IST_INDEX_VC]);
->  
-> -	if (WARN_ON(ist == __this_cpu_ist_top_va(VC)))
-> +	if (WARN_ON(ist == __this_cpu_ist_top_va(ESTACK_VC)))
->  		return;
->  
->  	/* Read back old IST entry and write it to the TSS */
-> diff --git a/arch/x86/coco/sev/vc-handle.c b/arch/x86/coco/sev/vc-handle.c
-> index c3b4acbde0d8..88b6bc518a5a 100644
-> --- a/arch/x86/coco/sev/vc-handle.c
-> +++ b/arch/x86/coco/sev/vc-handle.c
-> @@ -859,7 +859,7 @@ static enum es_result vc_handle_exitcode(struct es_em_ctxt *ctxt,
->  
->  static __always_inline bool is_vc2_stack(unsigned long sp)
->  {
-> -	return (sp >= __this_cpu_ist_bottom_va(VC2) && sp < __this_cpu_ist_top_va(VC2));
-> +	return (sp >= __this_cpu_ist_bottom_va(ESTACK_VC2) && sp < __this_cpu_ist_top_va(ESTACK_VC2));
->  }
->  
->  static __always_inline bool vc_from_invalid_context(struct pt_regs *regs)
-> diff --git a/arch/x86/include/asm/cpu_entry_area.h b/arch/x86/include/asm/cpu_entry_area.h
-> index 462fc34f1317..8e17f0ca74e6 100644
-> --- a/arch/x86/include/asm/cpu_entry_area.h
-> +++ b/arch/x86/include/asm/cpu_entry_area.h
-> @@ -46,7 +46,7 @@ struct cea_exception_stacks {
->   * The exception stack ordering in [cea_]exception_stacks
->   */
->  enum exception_stack_ordering {
-> -	ESTACK_DF,
-> +	ESTACK_DF = 0,
->  	ESTACK_NMI,
->  	ESTACK_DB,
->  	ESTACK_MCE,
+<snip>
 
-Is this really required? I thought the first enum was always 0? Is this
-just trying to ensure that ESTACKS_MEMBERS() defines a matching number
-of N_EXCEPTION_STACKS stacks?
+>>> The other question is whether something more efficient should be
+>>> added. E.g. FUSE_NOTIFY_SHRINK_LOOKUP_CACHE with a num_drop argument
+>>> that tells fuse to try to drop this many unused entries?
+>>=20
+>> Absolutely something like this would be more efficient. Using =
+FUSE_NOTIFY_INVAL_ENTRY requires saving filenames which isn=E2=80=99t =
+ideal.
+>=20
+> Okay, I suspect an interface that supplies an array of nodeid's would
+> be best, as it would give control to the filesystem which inodes it
+> wants to give up, but would allow batching the operation and would not
+> require supplying the name.
 
-If that's the case, shouldn't this be represented with a BUILD_BUG_ON()?
+I agree, this would be the perfect interface. Better to let the =
+filesystem decide which inodes it wants to give up.
 
-> @@ -58,18 +58,15 @@ enum exception_stack_ordering {
->  #define CEA_ESTACK_SIZE(st)					\
->  	sizeof(((struct cea_exception_stacks *)0)->st## _stack)
->  
-> -#define CEA_ESTACK_BOT(ceastp, st)				\
-> -	((unsigned long)&(ceastp)->st## _stack)
-> -
-> -#define CEA_ESTACK_TOP(ceastp, st)				\
-> -	(CEA_ESTACK_BOT(ceastp, st) + CEA_ESTACK_SIZE(st))
-> -
->  #define CEA_ESTACK_OFFS(st)					\
->  	offsetof(struct cea_exception_stacks, st## _stack)
->  
->  #define CEA_ESTACK_PAGES					\
->  	(sizeof(struct cea_exception_stacks) / PAGE_SIZE)
->  
-> +extern unsigned long __this_cpu_ist_top_va(enum exception_stack_ordering stack);
-> +extern unsigned long __this_cpu_ist_bottom_va(enum exception_stack_ordering stack);
-> +
->  #endif
->  
->  #ifdef CONFIG_X86_32
-> @@ -144,10 +141,4 @@ static __always_inline struct entry_stack *cpu_entry_stack(int cpu)
->  	return &get_cpu_entry_area(cpu)->entry_stack_page.stack;
->  }
->  
-> -#define __this_cpu_ist_top_va(name)					\
-> -	CEA_ESTACK_TOP(__this_cpu_read(cea_exception_stacks), name)
-> -
-> -#define __this_cpu_ist_bottom_va(name)					\
-> -	CEA_ESTACK_BOT(__this_cpu_read(cea_exception_stacks), name)
-> -
->  #endif
-> diff --git a/arch/x86/kernel/cpu/common.c b/arch/x86/kernel/cpu/common.c
-> index 34a054181c4d..cb14919f92da 100644
-> --- a/arch/x86/kernel/cpu/common.c
-> +++ b/arch/x86/kernel/cpu/common.c
-> @@ -2307,12 +2307,12 @@ static inline void setup_getcpu(int cpu)
->  static inline void tss_setup_ist(struct tss_struct *tss)
->  {
->  	/* Set up the per-CPU TSS IST stacks */
-> -	tss->x86_tss.ist[IST_INDEX_DF] = __this_cpu_ist_top_va(DF);
-> -	tss->x86_tss.ist[IST_INDEX_NMI] = __this_cpu_ist_top_va(NMI);
-> -	tss->x86_tss.ist[IST_INDEX_DB] = __this_cpu_ist_top_va(DB);
-> -	tss->x86_tss.ist[IST_INDEX_MCE] = __this_cpu_ist_top_va(MCE);
-> +	tss->x86_tss.ist[IST_INDEX_DF] = __this_cpu_ist_top_va(ESTACK_DF);
-> +	tss->x86_tss.ist[IST_INDEX_NMI] = __this_cpu_ist_top_va(ESTACK_NMI);
-> +	tss->x86_tss.ist[IST_INDEX_DB] = __this_cpu_ist_top_va(ESTACK_DB);
-> +	tss->x86_tss.ist[IST_INDEX_MCE] = __this_cpu_ist_top_va(ESTACK_MCE);
+>=20
+> Will work on this.
 
-If you respin this, please vertically align these.
+Thanks!
 
-> +/*
-> + * FRED introduced new fields in the host-state area of the VMCS for
-> + * stack levels 1->3 (HOST_IA32_FRED_RSP[123]), each respectively
-> + * corresponding to per CPU stacks for #DB, NMI and #DF.  KVM must
-> + * populate these each time a vCPU is loaded onto a CPU.
-> + *
-> + * Called from entry code, so must be noinstr.
-> + */
-> +noinstr unsigned long __this_cpu_ist_top_va(enum exception_stack_ordering stack)
-> +{
-> +	unsigned long base = (unsigned long)&(__this_cpu_read(cea_exception_stacks)->DF_stack);
-> +	return base + EXCEPTION_STKSZ + stack * (EXCEPTION_STKSZ + PAGE_SIZE);
-> +}
-> +EXPORT_SYMBOL(__this_cpu_ist_top_va);
-> +
-> +noinstr unsigned long __this_cpu_ist_bottom_va(enum exception_stack_ordering stack)
-> +{
-> +	unsigned long base = (unsigned long)&(__this_cpu_read(cea_exception_stacks)->DF_stack);
-> +	return base + stack * (EXCEPTION_STKSZ + PAGE_SIZE);
-> +}
+-Jim
 
-These are basically treating 'struct exception_stacks' like an array.
-There's no type safety or anything here. It's just an open-coded array
-access.
 
-Also, starting with ->DF_stack is a bit goofy looking. It's not obvious
-(or enforced) that it is stack #0 or at the beginning of the structure.
+--Apple-Mail=_D1948399-B7DB-472F-B4D4-BCEF9C09266C
+Content-Transfer-Encoding: quoted-printable
+Content-Type: text/html;
+	charset=utf-8
 
-Shouldn't we be _trying_ to make this look like:
+<html><head><meta http-equiv=3D"content-type" content=3D"text/html; =
+charset=3Dutf-8"></head><body style=3D"overflow-wrap: break-word; =
+-webkit-nbsp-mode: space; line-break: after-white-space;"><div =
+style=3D"overflow-wrap: break-word; -webkit-nbsp-mode: space; =
+line-break: after-white-space;"><br =
+id=3D"lineBreakAtBeginningOfMessage"><div><br><blockquote =
+type=3D"cite"><div>On Aug 27, 2025, at 6:05=E2=80=AFAM, Miklos Szeredi =
+&lt;miklos@szeredi.hu&gt; wrote:</div><br =
+class=3D"Apple-interchange-newline"><div><meta charset=3D"UTF-8"><span =
+style=3D"caret-color: rgb(0, 0, 0); font-family: Helvetica; font-size: =
+12px; font-style: normal; font-variant-caps: normal; font-weight: 400; =
+letter-spacing: normal; text-align: start; text-indent: 0px; =
+text-transform: none; white-space: normal; word-spacing: 0px; =
+-webkit-text-stroke-width: 0px; text-decoration: none; float: none; =
+display: inline !important;">External email: Use caution opening links =
+or attachments</span><br style=3D"caret-color: rgb(0, 0, 0); =
+font-family: Helvetica; font-size: 12px; font-style: normal; =
+font-variant-caps: normal; font-weight: 400; letter-spacing: normal; =
+text-align: start; text-indent: 0px; text-transform: none; white-space: =
+normal; word-spacing: 0px; -webkit-text-stroke-width: 0px; =
+text-decoration: none;"><br style=3D"caret-color: rgb(0, 0, 0); =
+font-family: Helvetica; font-size: 12px; font-style: normal; =
+font-variant-caps: normal; font-weight: 400; letter-spacing: normal; =
+text-align: start; text-indent: 0px; text-transform: none; white-space: =
+normal; word-spacing: 0px; -webkit-text-stroke-width: 0px; =
+text-decoration: none;"><br style=3D"caret-color: rgb(0, 0, 0); =
+font-family: Helvetica; font-size: 12px; font-style: normal; =
+font-variant-caps: normal; font-weight: 400; letter-spacing: normal; =
+text-align: start; text-indent: 0px; text-transform: none; white-space: =
+normal; word-spacing: 0px; -webkit-text-stroke-width: 0px; =
+text-decoration: none;"><span style=3D"caret-color: rgb(0, 0, 0); =
+font-family: Helvetica; font-size: 12px; font-style: normal; =
+font-variant-caps: normal; font-weight: 400; letter-spacing: normal; =
+text-align: start; text-indent: 0px; text-transform: none; white-space: =
+normal; word-spacing: 0px; -webkit-text-stroke-width: 0px; =
+text-decoration: none; float: none; display: inline !important;">On Wed, =
+20 Aug 2025 at 22:42, Jim Harris &lt;</span><a =
+href=3D"mailto:jiharris@nvidia.com" style=3D"font-family: Helvetica; =
+font-size: 12px; font-style: normal; font-variant-caps: normal; =
+font-weight: 400; letter-spacing: normal; orphans: auto; text-align: =
+start; text-indent: 0px; text-transform: none; white-space: normal; =
+widows: auto; word-spacing: 0px; -webkit-text-stroke-width: =
+0px;">jiharris@nvidia.com</a><span style=3D"caret-color: rgb(0, 0, 0); =
+font-family: Helvetica; font-size: 12px; font-style: normal; =
+font-variant-caps: normal; font-weight: 400; letter-spacing: normal; =
+text-align: start; text-indent: 0px; text-transform: none; white-space: =
+normal; word-spacing: 0px; -webkit-text-stroke-width: 0px; =
+text-decoration: none; float: none; display: inline !important;">&gt; =
+wrote:</span><br style=3D"caret-color: rgb(0, 0, 0); font-family: =
+Helvetica; font-size: 12px; font-style: normal; font-variant-caps: =
+normal; font-weight: 400; letter-spacing: normal; text-align: start; =
+text-indent: 0px; text-transform: none; white-space: normal; =
+word-spacing: 0px; -webkit-text-stroke-width: 0px; text-decoration: =
+none;"><blockquote type=3D"cite" style=3D"font-family: Helvetica; =
+font-size: 12px; font-style: normal; font-variant-caps: normal; =
+font-weight: 400; letter-spacing: normal; orphans: auto; text-align: =
+start; text-indent: 0px; text-transform: none; white-space: normal; =
+widows: auto; word-spacing: 0px; -webkit-text-stroke-width: 0px; =
+text-decoration: none;"><br><br><br><blockquote type=3D"cite">On Aug 20, =
+2025, at 1:55=E2=80=AFAM, Miklos Szeredi &lt;miklos@szeredi.hu&gt; =
+wrote:<br></blockquote></blockquote><br style=3D"caret-color: rgb(0, 0, =
+0); font-family: Helvetica; font-size: 12px; font-style: normal; =
+font-variant-caps: normal; font-weight: 400; letter-spacing: normal; =
+text-align: start; text-indent: 0px; text-transform: none; white-space: =
+normal; word-spacing: 0px; -webkit-text-stroke-width: 0px; =
+text-decoration: =
+none;"></div></blockquote><br><div>&lt;snip&gt;</div><br><blockquote =
+type=3D"cite"><div><blockquote type=3D"cite" style=3D"font-family: =
+Helvetica; font-size: 12px; font-style: normal; font-variant-caps: =
+normal; font-weight: 400; letter-spacing: normal; orphans: auto; =
+text-align: start; text-indent: 0px; text-transform: none; white-space: =
+normal; widows: auto; word-spacing: 0px; -webkit-text-stroke-width: 0px; =
+text-decoration: none;"><blockquote type=3D"cite">The other question is =
+whether something more efficient should be<br>added. E.g. =
+FUSE_NOTIFY_SHRINK_LOOKUP_CACHE with a num_drop argument<br>that tells =
+fuse to try to drop this many unused =
+entries?<br></blockquote><br>Absolutely something like this would be =
+more efficient. Using FUSE_NOTIFY_INVAL_ENTRY requires saving filenames =
+which isn=E2=80=99t ideal.<br></blockquote><br style=3D"caret-color: =
+rgb(0, 0, 0); font-family: Helvetica; font-size: 12px; font-style: =
+normal; font-variant-caps: normal; font-weight: 400; letter-spacing: =
+normal; text-align: start; text-indent: 0px; text-transform: none; =
+white-space: normal; word-spacing: 0px; -webkit-text-stroke-width: 0px; =
+text-decoration: none;"><span style=3D"caret-color: rgb(0, 0, 0); =
+font-family: Helvetica; font-size: 12px; font-style: normal; =
+font-variant-caps: normal; font-weight: 400; letter-spacing: normal; =
+text-align: start; text-indent: 0px; text-transform: none; white-space: =
+normal; word-spacing: 0px; -webkit-text-stroke-width: 0px; =
+text-decoration: none; float: none; display: inline !important;">Okay, I =
+suspect an interface that supplies an array of nodeid's would</span><br =
+style=3D"caret-color: rgb(0, 0, 0); font-family: Helvetica; font-size: =
+12px; font-style: normal; font-variant-caps: normal; font-weight: 400; =
+letter-spacing: normal; text-align: start; text-indent: 0px; =
+text-transform: none; white-space: normal; word-spacing: 0px; =
+-webkit-text-stroke-width: 0px; text-decoration: none;"><span =
+style=3D"caret-color: rgb(0, 0, 0); font-family: Helvetica; font-size: =
+12px; font-style: normal; font-variant-caps: normal; font-weight: 400; =
+letter-spacing: normal; text-align: start; text-indent: 0px; =
+text-transform: none; white-space: normal; word-spacing: 0px; =
+-webkit-text-stroke-width: 0px; text-decoration: none; float: none; =
+display: inline !important;">be best, as it would give control to the =
+filesystem which inodes it</span><br style=3D"caret-color: rgb(0, 0, 0); =
+font-family: Helvetica; font-size: 12px; font-style: normal; =
+font-variant-caps: normal; font-weight: 400; letter-spacing: normal; =
+text-align: start; text-indent: 0px; text-transform: none; white-space: =
+normal; word-spacing: 0px; -webkit-text-stroke-width: 0px; =
+text-decoration: none;"><span style=3D"caret-color: rgb(0, 0, 0); =
+font-family: Helvetica; font-size: 12px; font-style: normal; =
+font-variant-caps: normal; font-weight: 400; letter-spacing: normal; =
+text-align: start; text-indent: 0px; text-transform: none; white-space: =
+normal; word-spacing: 0px; -webkit-text-stroke-width: 0px; =
+text-decoration: none; float: none; display: inline !important;">wants =
+to give up, but would allow batching the operation and would =
+not</span><br style=3D"caret-color: rgb(0, 0, 0); font-family: =
+Helvetica; font-size: 12px; font-style: normal; font-variant-caps: =
+normal; font-weight: 400; letter-spacing: normal; text-align: start; =
+text-indent: 0px; text-transform: none; white-space: normal; =
+word-spacing: 0px; -webkit-text-stroke-width: 0px; text-decoration: =
+none;"><span style=3D"caret-color: rgb(0, 0, 0); font-family: Helvetica; =
+font-size: 12px; font-style: normal; font-variant-caps: normal; =
+font-weight: 400; letter-spacing: normal; text-align: start; =
+text-indent: 0px; text-transform: none; white-space: normal; =
+word-spacing: 0px; -webkit-text-stroke-width: 0px; text-decoration: =
+none; float: none; display: inline !important;">require supplying the =
+name.</span><br style=3D"caret-color: rgb(0, 0, 0); font-family: =
+Helvetica; font-size: 12px; font-style: normal; font-variant-caps: =
+normal; font-weight: 400; letter-spacing: normal; text-align: start; =
+text-indent: 0px; text-transform: none; white-space: normal; =
+word-spacing: 0px; -webkit-text-stroke-width: 0px; text-decoration: =
+none;"></div></blockquote><div><br></div><div>I agree, this would be the =
+perfect interface. Better to let the filesystem decide which inodes it =
+wants to give up.</div><br><blockquote type=3D"cite"><div><br =
+style=3D"caret-color: rgb(0, 0, 0); font-family: Helvetica; font-size: =
+12px; font-style: normal; font-variant-caps: normal; font-weight: 400; =
+letter-spacing: normal; text-align: start; text-indent: 0px; =
+text-transform: none; white-space: normal; word-spacing: 0px; =
+-webkit-text-stroke-width: 0px; text-decoration: none;"><span =
+style=3D"caret-color: rgb(0, 0, 0); font-family: Helvetica; font-size: =
+12px; font-style: normal; font-variant-caps: normal; font-weight: 400; =
+letter-spacing: normal; text-align: start; text-indent: 0px; =
+text-transform: none; white-space: normal; word-spacing: 0px; =
+-webkit-text-stroke-width: 0px; text-decoration: none; float: none; =
+display: inline !important;">Will work on this.</span><br =
+style=3D"caret-color: rgb(0, 0, 0); font-family: Helvetica; font-size: =
+12px; font-style: normal; font-variant-caps: normal; font-weight: 400; =
+letter-spacing: normal; text-align: start; text-indent: 0px; =
+text-transform: none; white-space: normal; word-spacing: 0px; =
+-webkit-text-stroke-width: 0px; text-decoration: =
+none;"></div></blockquote><div><br></div>Thanks!</div><div><br></div><div>=
+-Jim</div><div><br></div></div></body></html>=
 
-	struct cea_exception_stacks *s;
-	s = __this_cpu_read(cea_exception_stacks);
+--Apple-Mail=_D1948399-B7DB-472F-B4D4-BCEF9C09266C--
 
-	return &s[stack_nr].stack;
+--Apple-Mail=_4A3B4A60-B083-456F-BEA2-57CEE80CB75A
+Content-Disposition: attachment; filename="smime.p7s"
+Content-Type: application/pkcs7-signature; name="smime.p7s"
+Content-Transfer-Encoding: base64
 
-?
+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
+LTIwMjMwNTMxMTYwNAYDVQQDEy1qaWhhcnJpcyA2MzZFQkM4OC0yNThCLTQ2QkYtQkU2RS1ERTgz
+Mjk3NEVFMkYwggEiMA0GCSqGSIb3DQEBAQUAA4IBDwAwggEKAoIBAQDsK5flcFLKT/1ktmlekKTA
+8JwI64E20ekPEvj4KcEynk2b/aaS1Vol+gDoCmp8Q2YKca4RO3IPmWYGMEKWyOwh3R/X+NDC3kEn
+xR9FRyPKixPVaVIJOBvpLgTHlTGo6sBECGARmWLNcq/VP/IOEfynt+o0ycfhfMmVCLNeTpVnTDfr
+2+gA+EzrG3y7hFlf741+Iu27ml7F2Sb+OuD8LaaIvbUH+47Ha9c7PNbS8gGCOqJ+JqpFbz6nyiVN
+KzcxsvQph1p1IlvctilnvGOLNCSQY24IPabPY4mh2jOOELalk8gKhIgeZ4v4XnuDGKzG3OQXjvNW
+ki++zsKA+Vb5MH1HAgMBAAGjggNiMIIDXjAOBgNVHQ8BAf8EBAMCBaAwHgYDVR0RBBcwFYETamlo
+YXJyaXNAbnZpZGlhLmNvbTAdBgNVHQ4EFgQUXogZtTPa9kRDpzx+baYj2ZB5hNUwHwYDVR0jBBgw
+FoAUlatDA/vUWLsb/j02/mvLeNitl7MwggEGBgNVHR8Egf4wgfswgfiggfWggfKGgbhsZGFwOi8v
+L0NOPUhRTlZDQTEyMi1DQSgxMCksQ049aHFudmNhMTIyLENOPUNEUCxDTj1QdWJsaWMlMjBLZXkl
+MjBTZXJ2aWNlcyxDTj1TZXJ2aWNlcyxDTj1Db25maWd1cmF0aW9uLERDPW52aWRpYSxEQz1jb20/
+Y2VydGlmaWNhdGVSZXZvY2F0aW9uTGlzdD9iYXNlP29iamVjdENsYXNzPWNSTERpc3RyaWJ1dGlv
+blBvaW50hjVodHRwOi8vcGtpLm52aWRpYS5jb20vQ2VydEVucm9sbC9IUU5WQ0ExMjItQ0EoMTAp
+LmNybDCCAUAGCCsGAQUFBwEBBIIBMjCCAS4wgaoGCCsGAQUFBzAChoGdbGRhcDovLy9DTj1IUU5W
+Q0ExMjItQ0EsQ049QUlBLENOPVB1YmxpYyUyMEtleSUyMFNlcnZpY2VzLENOPVNlcnZpY2VzLENO
+PUNvbmZpZ3VyYXRpb24sREM9bnZpZGlhLERDPWNvbT9jQUNlcnRpZmljYXRlP2Jhc2U/b2JqZWN0
+Q2xhc3M9Y2VydGlmaWNhdGlvbkF1dGhvcml0eTBWBggrBgEFBQcwAoZKaHR0cDovL3BraS5udmlk
+aWEuY29tL0NlcnRFbnJvbGwvaHFudmNhMTIyLm52aWRpYS5jb21fSFFOVkNBMTIyLUNBKDExKS5j
+cnQwJwYIKwYBBQUHMAGGG2h0dHA6Ly9vY3NwLm52aWRpYS5jb20vb2NzcDA8BgkrBgEEAYI3FQcE
+LzAtBiUrBgEEAYI3FQiEt/Bxh8iPbIfRhSGG6Z5lg6ejJWKC/7BT5/cMAgFlAgEkMCkGA1UdJQQi
+MCAGCisGAQQBgjcKAwQGCCsGAQUFBwMEBggrBgEFBQcDAjA1BgkrBgEEAYI3FQoEKDAmMAwGCisG
+AQQBgjcKAwQwCgYIKwYBBQUHAwQwCgYIKwYBBQUHAwIwDQYJKoZIhvcNAQELBQADggIBABaxnmlH
+ePMLNtYtyCN1iDp5l7pbi5wxLNXCULGo252QLCXJwKTosiYCLTT6gOZ+Uhf0QzvbJkGhgu0e3pz3
+/SbVwnLZdFMZIsgOR5k85d7cAzE/sRbwVurWZdp125ufyG2DHuoYWE1G9c2rNfgwjKNL1i3JBbG5
+Dr2dfUMQyHJB1KwxwfUpNWIC2ClDIxnluV01zPenYIkAqEJGwHWcuhDstCm+TzRMWzueEvJDKYrI
+zO5J7SMn0OcGGxmEt4oqYNOULHAsiCd1ULsaHgr3FiIyj1UIUDyPd/VK5a/E4VPhj3xtJtLQjRbn
+d+bupdZmIkhAuQLzGdckoxfV3gEhtIlnot0On97zdBbGB+E1f+hF4ogYO/61KnFlaM2CAFPk/LuD
+iqTYYB3ysoTOVaSXb/W8mvjx+VY1aWgNfjBJRMCD6BMbBi8XzSB02porHuQpxcT3soUa2jnbM/oR
+XS2win7fcEf57lwNPw8cZPPeiIx/na47xrsxRVCmcBoWtVU62ywa/0+XSj602p2sYuVck1cgPoLz
+GdBYwNQHSGgUbVspeFQcMfl51EEXrDe3pgnY82qt3kCOSzdBSW3sJfOjN0hcfI76eG3CnabiGnVG
+ukDrLIwmyWQp6aS9KxbJr4tq4DfDEnoejOYWc1AeLTDaydw7iBNAR/uMrCqfi5m4GjnqMYICzTCC
+AskCAQEwWzBEMRMwEQYKCZImiZPyLGQBGRYDY29tMRYwFAYKCZImiZPyLGQBGRYGbnZpZGlhMRUw
+EwYDVQQDEwxIUU5WQ0ExMjItQ0ECE3gBwfkxPjNrfUD9c50ACwHB+TEwDQYJYIZIAWUDBAIBBQCg
+ggFDMBgGCSqGSIb3DQEJAzELBgkqhkiG9w0BBwEwHAYJKoZIhvcNAQkFMQ8XDTI1MDgyNzE3NDUw
+NVowLwYJKoZIhvcNAQkEMSIEIMCipF6AUaoSHYqLkenD5tcblRRyu3X5PKSvy6QzUaFVMGoGCSsG
+AQQBgjcQBDFdMFswRDETMBEGCgmSJomT8ixkARkWA2NvbTEWMBQGCgmSJomT8ixkARkWBm52aWRp
+YTEVMBMGA1UEAxMMSFFOVkNBMTIyLUNBAhN4AcH5MT4za31A/XOdAAsBwfkxMGwGCyqGSIb3DQEJ
+EAILMV2gWzBEMRMwEQYKCZImiZPyLGQBGRYDY29tMRYwFAYKCZImiZPyLGQBGRYGbnZpZGlhMRUw
+EwYDVQQDEwxIUU5WQ0ExMjItQ0ECE3gBwfkxPjNrfUD9c50ACwHB+TEwDQYJKoZIhvcNAQELBQAE
+ggEAx/EnTg8vWj55HXwl9lMBbninh5ATbTjO/Uko12MBDzRkKFSWfU7nan2Dfvhqrw45SF0+h/3V
+Q6+bDyouKFI+ah/VW5ZjgfXC0+nhX+G8Q2rbDImYM1lAniJn+rgKLvPQpP2O5AKTUl19urvz095W
+2KMDDNxnPhioTQj8Roh2Z6ZwD8kCHjoJec5J23Mm+kNftqy7BYE2K6Bw5oGoAgv2nExaRv4b6AUK
+dms7Zw2sxPnVIR3lwOKY2GXnB6zCxrCne1lizBdgQM2pVZt5dl2LLOJYg53Akd7PlzuXnM6YksW5
+aaq7CrBr/oxL1ezOiJFJES09rJ7zda9cKr+veOaGCwAAAAAAAA==
 
-Where 'cea_exception_stacks' is an actual array:
-
-	struct cea_exception_stacks[N_EXCEPTION_STACKS];
-
-which might need to be embedded in a larger structure to get the
-'IST_top_guard' without wasting allocating space for an extra full stack.
-
->  static DEFINE_PER_CPU_READ_MOSTLY(unsigned long, _cea_offset);
->  
->  static __always_inline unsigned int cea_offset(unsigned int cpu)
-> diff --git a/arch/x86/mm/fault.c b/arch/x86/mm/fault.c
-> index 998bd807fc7b..1804eb86cc14 100644
-> --- a/arch/x86/mm/fault.c
-> +++ b/arch/x86/mm/fault.c
-> @@ -671,7 +671,7 @@ page_fault_oops(struct pt_regs *regs, unsigned long error_code,
->  		 * and then double-fault, though, because we're likely to
->  		 * break the console driver and lose most of the stack dump.
->  		 */
-> -		call_on_stack(__this_cpu_ist_top_va(DF) - sizeof(void*),
-> +		call_on_stack(__this_cpu_ist_top_va(ESTACK_DF) - sizeof(void*),
->  			      handle_stack_overflow,
->  			      ASM_CALL_ARG3,
->  			      , [arg1] "r" (regs), [arg2] "r" (address), [arg3] "r" (&info));
-
+--Apple-Mail=_4A3B4A60-B083-456F-BEA2-57CEE80CB75A--
 
