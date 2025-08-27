@@ -1,129 +1,132 @@
-Return-Path: <kvm+bounces-55877-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-55878-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0560CB3831D
-	for <lists+kvm@lfdr.de>; Wed, 27 Aug 2025 14:58:41 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0E72FB38351
+	for <lists+kvm@lfdr.de>; Wed, 27 Aug 2025 15:06:09 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id AA17646244E
-	for <lists+kvm@lfdr.de>; Wed, 27 Aug 2025 12:58:40 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 088E11BA24B9
+	for <lists+kvm@lfdr.de>; Wed, 27 Aug 2025 13:06:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 31FD13568E1;
-	Wed, 27 Aug 2025 12:57:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D1DDD35207F;
+	Wed, 27 Aug 2025 13:05:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="4Kkj4ISX"
+	dkim=pass (1024-bit key) header.d=szeredi.hu header.i=@szeredi.hu header.b="iMI+q5oa"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pl1-f201.google.com (mail-pl1-f201.google.com [209.85.214.201])
+Received: from mail-qt1-f174.google.com (mail-qt1-f174.google.com [209.85.160.174])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DEB8435334B
-	for <kvm@vger.kernel.org>; Wed, 27 Aug 2025 12:57:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 595B631E112
+	for <kvm@vger.kernel.org>; Wed, 27 Aug 2025 13:05:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.174
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756299467; cv=none; b=LcO/OfTWeBl29ryUumOW8DzWv7EhyXH/2e1vN7fZmF/5mvW8xYbU0zJrA0ETSwY0r+tQf1+QYV/1sI4kfKx2s4TrIOemqbSTMcfGTrUu57cBprWYjjOaNoVipUZ7nIDSYRLP0+kQuKZHEUWtK0fCWX5nlD/yd/0ksMFoNt6FdUY=
+	t=1756299950; cv=none; b=uah9vLInk6Gmm0/ip5nRr6nv6/rTKceTKwK/Tj/gtrZxj74D9/DejKAOy/l1vgdz5bwBTiCMBJGjaM0sMBqeabP/1Gbp9eQCm/W3mZZJ6q4wZ2k/nUKHXEJIPxDT9uIPAwch6yqqqg1fdbuHIxh0cofYJqAQN4ec0IGDFvJOBbE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756299467; c=relaxed/simple;
-	bh=w3nOGUy17xC76CjSfrnPpR5S63ym37zVcNGqJFaVJTc=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=qNyf3lL913BwQGQEttA0SRFx7SOMDJYnuMWMbGS2rbzBTcU8BQXyRs8BRgA7O2JNhCr5KEVDRSxxuiEAxxk+AK+k0d00AeE45yrYqI3sfRvmFiVaNMUCV8WhekLFvuui8EiVBue/PWabcl8W5oGpvwKUnzVBGlyoFt1yLfq6Tx4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=4Kkj4ISX; arc=none smtp.client-ip=209.85.214.201
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pl1-f201.google.com with SMTP id d9443c01a7336-248abeb9242so2925615ad.1
-        for <kvm@vger.kernel.org>; Wed, 27 Aug 2025 05:57:45 -0700 (PDT)
+	s=arc-20240116; t=1756299950; c=relaxed/simple;
+	bh=Lg5YJJaXpBc/s0JfoRj0Jz/sHkqXKEkjrx56oNdh6UA=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=KzC+A9LsJdXQf8GMPXiF6+JKE/+Kock+rKF75XtS8zNq4Ro+6i6+E8/hNP3aHfCmwFEp9mIqtc98DoZiF/lkkty3ZMUHrUbelMeFJ3mP06cs6aENz3BrZtSfXQlLekGyOEPCORveuJ4vlTFFOEpYdnCXOYPL44Kw9Z4IK0bgni0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=szeredi.hu; spf=pass smtp.mailfrom=szeredi.hu; dkim=pass (1024-bit key) header.d=szeredi.hu header.i=@szeredi.hu header.b=iMI+q5oa; arc=none smtp.client-ip=209.85.160.174
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=szeredi.hu
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=szeredi.hu
+Received: by mail-qt1-f174.google.com with SMTP id d75a77b69052e-4b109c59dc9so88396711cf.3
+        for <kvm@vger.kernel.org>; Wed, 27 Aug 2025 06:05:47 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1756299465; x=1756904265; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=tBqCOEucd2EHQAImfHa6bYvYMgk6Ar5j1i6s5MVGeY8=;
-        b=4Kkj4ISXmTplKT7hbTfEnVHF05Bc8Qc1jGvNKAnD3TFEOG9WeKhmDvu6aCN4BMO1Ql
-         apDTqA3aQ5nsEf7ikytHhgEj9upS6G5nRRNW1xWNZKOy95kWIhhoiap0DcosQAmoxAUs
-         56LlYpVKw7Ch0ORmphb6bq2YpBVWDN4/hvlNL8twxlNgQWpFFoacQdkAgilsRFktjYNk
-         lpBhlAoCNTHWGdmU9ZiwBtkadPRQ3BX21o2R4eGO87R9/JWXajR/w4DryTc3KYxJn7g2
-         53kK/2l7SeI3fI7q2CSbv483HOIi8u1YtzbqbPeB+ZWhw3gDLP8lacBAlJK8uk3OCjID
-         j4fg==
+        d=szeredi.hu; s=google; t=1756299946; x=1756904746; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=IS9A1xArxW2DbHOyp5U7gUvufvKTYOF7Z8twNaozFaA=;
+        b=iMI+q5oa4hKi016w+wiT6+ebiebiA6MW71fGyRmaONWPqmnhli1IgPAeJZNMJiq3Ra
+         I5YNXHcaoaYIgNHMZieVcY13r+t9DUZrfH1fnbO+WHOG4ziU1UMidX73oiaDqaPMktDH
+         Qfll2mqaGFkkgYlDOmZmqouUb9j2W/qnQn9ds=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1756299465; x=1756904265;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=tBqCOEucd2EHQAImfHa6bYvYMgk6Ar5j1i6s5MVGeY8=;
-        b=KWwbAY1fLZOVjx31KTkLVnxhedHLo3/59Qm/cuqD2QYmYKtah0ZnetqufFTijUPEQu
-         aSyRCeuArA2b1XasQ9MZVBq3pZdSWVj0C9oOP10w4N6E6Gp76IzsZfFT0DHPOMir9xhR
-         ZvPycwiDjELuDrM77rX+N8VDMi5LtKvudNrftyCwrlVJsfHKzkNmtjXWdE+3xI1mJ5uv
-         TB/30PyJJM4EvVlX1zdEJJ6jWVeHn8L5brUEgIB9cilSd7BRV18g4BgXNkMcbrPw6JG5
-         RtvcNY2oXjXfVUBVegNjfqdtJI+y4cV6B5/vR3V/YMfunIuTrN9VG0VupzEafdahBQwb
-         Kgwg==
-X-Forwarded-Encrypted: i=1; AJvYcCX19beH+/PxKrdZSsQ1LcGFDFo83dC2sbRt2MhxuDcMVhnexf18t8SDoxzWYJq/1bbmwI4=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxNvEZKivq+I9JF+PDGHiSYNajdOuPL/56FqjsmNFzQ6hWsu+tc
-	vPAZdoiBSBVLQeiIwYaPBYjwGsA+BVSoCd8Gqx3HV5M9njZ48GFGJEi5HslfEBgFhEy7RRn46iK
-	g5yoD8g==
-X-Google-Smtp-Source: AGHT+IGjYzo/cbnGJG6xrvxcdKkBIhOc9WrrVofRF0UoN4jq9615eiNnHnaTmYmPl4ZeSe1Rkx8Oa2x6F14=
-X-Received: from plbmq12.prod.google.com ([2002:a17:902:fd4c:b0:248:8f78:7ff4])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:902:db0e:b0:246:edc9:3a80
- with SMTP id d9443c01a7336-246edc93d95mr136614825ad.5.1756299465291; Wed, 27
- Aug 2025 05:57:45 -0700 (PDT)
-Date: Wed, 27 Aug 2025 05:57:43 -0700
-In-Reply-To: <87b10d94-dca2-4ecb-a86f-b38c5c90e0cf@redhat.com>
+        d=1e100.net; s=20230601; t=1756299946; x=1756904746;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=IS9A1xArxW2DbHOyp5U7gUvufvKTYOF7Z8twNaozFaA=;
+        b=RdTpka2sKbal2RfOfDxPOKgX9kf35RAsxYpfsMeRVUM2O33JabgW0ADRf9WdsGi2iJ
+         GyNmVW7kRIxRbpMcXHHXkkwZiN/t+hAGmT+DPKZ87OYBn/pyM2lebBHUjsRqltQogSrf
+         rhVIw3mGFwfluuukD3M9HRY+BQTa4z2ktdpQIRVWJOV1I66vcMgDl78/z5xn2yrmODWf
+         LVuRs00Yk9mhjrJ1FUfgysEYQyLHlqCdFKEOwnB9KMjY2Qba6xzlx+rtUVozJrNKUC4e
+         iUVxV62vZdIQXEAt57+c4SmNjUj/Nh1NYKAxkidT8rLScV5vCHDlnFsQ2keGQVUiQaj3
+         ZJoQ==
+X-Forwarded-Encrypted: i=1; AJvYcCVl08/9m/1qzxbSmaHtfohrXu4akcUWJzV573zrknTkEPAcoZLcNlx0ufaSJ0uARNcCc+E=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyC8I6LPMY0Vh3DugyyJzAPqn2X8qwz8JiBWRkt5oDJ4raqrkoj
+	MRPRfgIJS7IHdG0VypeMwg7kTa3+yqLpvdi5KE/5vHaT9/rsqj231WD/PG9E7OLsC3dvGchWPFa
+	TObM8NDzwNA9qfd3N8/Rt3AxhcIGE92ihLZan529NMw==
+X-Gm-Gg: ASbGncvkz6XU6VT/UzLoLhbvwdZC4T6fmHzdkHFLQm0VZniLm/eCu5b+NXaWan8n9xE
+	+L+nKPsKIibea2CzN30sg+cw/5U1u58Hnm53WLatmRcj6mcB1AQG6yJQBMd7h+9Xn95+Q9XxNeY
+	wT4799/2peKXn0h/t5oQFf3LGpoECJef41OH/s4lMR+td1HR4F7M8zE9cB+NMVTUb4v8USnrpJz
+	PUmZXlLtEWSnvzBgTRS
+X-Google-Smtp-Source: AGHT+IGLeocHq+w8KKF32Jz+bx2Tk/02BB9NqaabL//OB62XP1A63lXRphuALAt/uyjA7/9UrZ1B5iZzrud5rKizpFo=
+X-Received: by 2002:ac8:7d50:0:b0:4b1:1fc6:863a with SMTP id
+ d75a77b69052e-4b2aab0cfa2mr202698391cf.63.1756299946002; Wed, 27 Aug 2025
+ 06:05:46 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20250729225455.670324-1-seanjc@google.com> <87b10d94-dca2-4ecb-a86f-b38c5c90e0cf@redhat.com>
-Message-ID: <aK8Ax2EchXMuX642@google.com>
-Subject: Re: [PATCH v17 00/24] KVM: Enable mmap() for guest_memfd
-From: Sean Christopherson <seanjc@google.com>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: Marc Zyngier <maz@kernel.org>, Oliver Upton <oliver.upton@linux.dev>, kvm@vger.kernel.org, 
-	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, 
-	linux-kernel@vger.kernel.org, Ira Weiny <ira.weiny@intel.com>, 
-	Gavin Shan <gshan@redhat.com>, Shivank Garg <shivankg@amd.com>, Vlastimil Babka <vbabka@suse.cz>, 
-	Xiaoyao Li <xiaoyao.li@intel.com>, David Hildenbrand <david@redhat.com>, Fuad Tabba <tabba@google.com>, 
-	Ackerley Tng <ackerleytng@google.com>, Tao Chan <chentao@kylinos.cn>, 
-	James Houghton <jthoughton@google.com>
-Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+References: <D5420EF2-6BA6-4789-A06A-D1105A3C33D4@nvidia.com>
+ <CAJfpegvmhpyab2-kaud3VG47Tbjh0qG_o7G-3o6pV78M8O++tQ@mail.gmail.com> <1E1F125C-8D8C-4F82-B6A9-973CDF64EC3D@nvidia.com>
+In-Reply-To: <1E1F125C-8D8C-4F82-B6A9-973CDF64EC3D@nvidia.com>
+From: Miklos Szeredi <miklos@szeredi.hu>
+Date: Wed, 27 Aug 2025 15:05:34 +0200
+X-Gm-Features: Ac12FXzh4c9-bhOGpJCxyjBS2F9uSLYJUbMNbime6Sd-tJCzwd6Aonr7-j-nBrI
+Message-ID: <CAJfpegtmakX4Ery3o5CwKf8GbCeqxsR9GAAgdmnnor0eDYHgXA@mail.gmail.com>
+Subject: Re: Questions about FUSE_NOTIFY_INVAL_ENTRY
+To: Jim Harris <jiharris@nvidia.com>
+Cc: "linux-fsdevel@vger.kernel.org" <linux-fsdevel@vger.kernel.org>, 
+	"virtualization@lists.linux.dev" <virtualization@lists.linux.dev>, 
+	"kvm@vger.kernel.org" <kvm@vger.kernel.org>, "stefanha@redhat.com" <stefanha@redhat.com>, 
+	Max Gurtovoy <mgurtovoy@nvidia.com>, Idan Zach <izach@nvidia.com>, 
+	Roman Spiegelman <rspiegelman@nvidia.com>, Ben Walker <benwalker@nvidia.com>, 
+	Oren Duer <oren@nvidia.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Wed, Aug 27, 2025, Paolo Bonzini wrote:
-> On 7/30/25 00:54, Sean Christopherson wrote:
-> > Paolo,
-> > 
-> > The arm64 patches have been Reviewed-by Marc, and AFAICT the x86 side of
-> > things is a go.  Barring a screwup on my end, this just needs your approval.
-> > 
-> > Assuming everything looks good, it'd be helpful to get this into kvm/next
-> > shortly after rc1.  The x86 Kconfig changes in particular create semantic
-> > conflicts with in-flight series.
-> > 
-> > 
-> > Add support for host userspace mapping of guest_memfd-backed memory for VM
-> > types that do NOT use support KVM_MEMORY_ATTRIBUTE_PRIVATE (which isn't
-> > precisely the same thing as CoCo VMs, since x86's SEV-MEM and SEV-ES have
-> > no way to detect private vs. shared).
-> > 
-> > mmap() support paves the way for several evolving KVM use cases:
-> > 
-> >   * Allows VMMs like Firecracker to run guests entirely backed by
-> >     guest_memfd [1]. This provides a unified memory management model for
-> >     both confidential and non-confidential guests, simplifying VMM design.
-> > 
-> >   * Enhanced Security via direct map removal: When combined with Patrick's
-> >     series for direct map removal [2], this provides additional hardening
-> >     against Spectre-like transient execution attacks by eliminating the
-> >     need for host kernel direct maps of guest memory.
-> > 
-> >   * Lays the groundwork for *restricted* mmap() support for guest_memfd-backed
-> >     memory on CoCo platforms [3] that permit in-place
-> >     sharing of guest memory with the host.
-> > 
-> > Based on kvm/queue.
-> 
-> Applied to kvm/next, thanks!
+On Wed, 20 Aug 2025 at 22:42, Jim Harris <jiharris@nvidia.com> wrote:
+>
+>
+>
+> > On Aug 20, 2025, at 1:55=E2=80=AFAM, Miklos Szeredi <miklos@szeredi.hu>=
+ wrote:
 
-Thank you!
+> > FUSE_NOTIFY_INVAL_ENTRY with FUSE_EXPIRE_ONLY will do something like
+> > your desired FUSE_NOTIFY_DROP_ENTRY operation, at least on virtiofs
+> > (fc->delete_stale is on).  I notice there's a fuse_dir_changed() call
+> > regardless of FUSE_EXPIRE_ONLY, which is not appropriate for the drop
+> > case, this can probably be moved inside the !FUSE_EXPIRE_ONLY branch.
+>
+> Thanks for the clarification.
+>
+> For that extra fuse_dir_changed() call - is this a required fix for corre=
+ctness or just an optimization to avoid unnecessarily invalidating the pare=
+nt directory=E2=80=99s attributes?
 
-FWIW, I did separate run of the patches and came up with the same resolutions
-for the arm64 changes, so I'm sure they're perfect ;-)
+You see it correctly, it would be an optimization.
+
+
+
+> > The other question is whether something more efficient should be
+> > added. E.g. FUSE_NOTIFY_SHRINK_LOOKUP_CACHE with a num_drop argument
+> > that tells fuse to try to drop this many unused entries?
+>
+> Absolutely something like this would be more efficient. Using FUSE_NOTIFY=
+_INVAL_ENTRY requires saving filenames which isn=E2=80=99t ideal.
+
+Okay, I suspect an interface that supplies an array of nodeid's would
+be best, as it would give control to the filesystem which inodes it
+wants to give up, but would allow batching the operation and would not
+require supplying the name.
+
+Will work on this.
+
+Thanks,
+Miklos
 
