@@ -1,353 +1,219 @@
-Return-Path: <kvm+bounces-55919-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-55920-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id E9408B3892E
-	for <lists+kvm@lfdr.de>; Wed, 27 Aug 2025 20:00:53 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 52D11B38951
+	for <lists+kvm@lfdr.de>; Wed, 27 Aug 2025 20:11:15 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 8BC157A7457
-	for <lists+kvm@lfdr.de>; Wed, 27 Aug 2025 17:58:05 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0CAF5687284
+	for <lists+kvm@lfdr.de>; Wed, 27 Aug 2025 18:11:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9A4BA2F49EF;
-	Wed, 27 Aug 2025 17:57:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E18CC2D0C7B;
+	Wed, 27 Aug 2025 18:11:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="EPdAfT6V"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="XkUNDuYH"
 X-Original-To: kvm@vger.kernel.org
-Received: from NAM12-BN8-obe.outbound.protection.outlook.com (mail-bn8nam12on2067.outbound.protection.outlook.com [40.107.237.67])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DF2FF2D5A14;
-	Wed, 27 Aug 2025 17:57:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.237.67
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756317473; cv=fail; b=l42wq4WIxitUJynQXIZnfXbnKscaWjk51BskYnoKN35l36rpiyjVHHYP6QMSwSn2vw0mXeF7iJlXn8W5QyrMR7UyKIEQFGKjvEgFOuyEhjw+bWnqU5nBVHl00FOqe+Y9sm6QhjAvlAVI4prpL5tqloD8pbycW5J0du1EUoMPKqE=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756317473; c=relaxed/simple;
-	bh=1ZVDNN5Gc1EgXTy+d5hOM/uYquIqt1bOAfjFcH0Uuiw=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=APEJCo43pAPxcJmjg05c8iQI2CzXOLaA2nI9w6B/nhls6Qf5KzD1x9rpvPFhpTH8COXJ2INS5FwhSNS6GX0gPJeDjnPVN7qkZaK03Q/5FJkwHi3tFs6i402m7wJn9gHbpcDcan78N1Lnt9cPQeEbXh8Jvu3CG+8lzSIkHa1wtcI=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=EPdAfT6V; arc=fail smtp.client-ip=40.107.237.67
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=k689SCoUbpPzIpZRJ5wePmfPtGqMgYEO2nqLoCEX/L8aj4mYsiNznsjvB2e6hoWQdeFQJ74RH++wJ/XhX20zsg/FD2Arj0UoQjcPptmIDhWwhuX0WBxetoXYSA5UvRPQIKsfZaTo/YGywsD6PnCsTt+BiODXZCnEeWtYEWkyjnDSFy6c35BjmUTx3HEBNXEs4oxWRV4CzMywzofKCl6jY9xIJUsG/U9S71gW0SzK7KkbaBumjpKQrYPcqYu4iPYulYwgACpY0+MCMPpQvaoylv1wvywooqld3JjMOxomT7KaPB0lGiy5FJSg7wDvSo8h0MtQuBtRNrvUFbbT8ysUeg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=c7P8rS/FN7tYHE5zC07t5Nohp3J7vjlgyJvv+rX2yD4=;
- b=iJsjFHg33gsfIH2devlm06AV+ll3M4DR7//BEevrDS0/YG+ptIGkfX4+tB4x8MvtZgFuTsmTAiYXe1eMP2Afrts4NRttk535pn5ad1LWnsj9SXDzybAr9P+RYH0wBO/7CQ6GI4Nj+9BMeJeIZ4Ez+QJ1mmGB64ZAwaxQ+aH2399Jx11YTQMlO0Xss7YjFO6cyZo+GX7WtGCQaRPbUtReCZ03qEHTjyA3XjD8iFFqxsgkL3NMwrK4x6HvEhUnFKUcrzbiDfiS5YBpRRrs2XaoyoS8AHtdFbDOTk8j8OFeLKJGWpBg0nS0WYPdKwWTSLhhRLhRBZcyNccg2G//FuI6OQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 165.204.84.17) smtp.rcpttodomain=infradead.org smtp.mailfrom=amd.com;
- dmarc=pass (p=quarantine sp=quarantine pct=100) action=none
- header.from=amd.com; dkim=none (message not signed); arc=none (0)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=c7P8rS/FN7tYHE5zC07t5Nohp3J7vjlgyJvv+rX2yD4=;
- b=EPdAfT6Vam34gw45FYIQbCxvaXOdqzpBK4CJkUBceL2onRdqF9NAlGjJaO5AWkMoqz2vxWm+r03lhGegmmGFUSAbEJl/sRLHCPHGO72mtaAFLy2tKjHf9HbXeY1FLVnZBYTZ6opu3IQD1ZNv9wiG0NnvCn97ABvmA1z6DS20pXA=
-Received: from SJ2PR07CA0003.namprd07.prod.outlook.com (2603:10b6:a03:505::26)
- by CH3PR12MB9454.namprd12.prod.outlook.com (2603:10b6:610:1c7::16) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9052.21; Wed, 27 Aug
- 2025 17:57:48 +0000
-Received: from SJ1PEPF000023CE.namprd02.prod.outlook.com
- (2603:10b6:a03:505:cafe::28) by SJ2PR07CA0003.outlook.office365.com
- (2603:10b6:a03:505::26) with Microsoft SMTP Server (version=TLS1_3,
- cipher=TLS_AES_256_GCM_SHA384) id 15.20.9073.16 via Frontend Transport; Wed,
- 27 Aug 2025 17:57:47 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
- smtp.mailfrom=amd.com; dkim=none (message not signed)
- header.d=none;dmarc=pass action=none header.from=amd.com;
-Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
- 165.204.84.17 as permitted sender) receiver=protection.outlook.com;
- client-ip=165.204.84.17; helo=SATLEXMB04.amd.com; pr=C
-Received: from SATLEXMB04.amd.com (165.204.84.17) by
- SJ1PEPF000023CE.mail.protection.outlook.com (10.167.244.10) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.20.9052.8 via Frontend Transport; Wed, 27 Aug 2025 17:57:47 +0000
-Received: from kaveri.amd.com (10.180.168.240) by SATLEXMB04.amd.com
- (10.181.40.145) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.39; Wed, 27 Aug
- 2025 12:57:28 -0500
-From: Shivank Garg <shivankg@amd.com>
-To: <willy@infradead.org>, <akpm@linux-foundation.org>, <david@redhat.com>,
-	<pbonzini@redhat.com>, <shuah@kernel.org>, <seanjc@google.com>,
-	<vbabka@suse.cz>
-CC: <brauner@kernel.org>, <viro@zeniv.linux.org.uk>, <dsterba@suse.com>,
-	<xiang@kernel.org>, <chao@kernel.org>, <jaegeuk@kernel.org>, <clm@fb.com>,
-	<josef@toxicpanda.com>, <kent.overstreet@linux.dev>, <zbestahu@gmail.com>,
-	<jefflexu@linux.alibaba.com>, <dhavale@google.com>, <lihongbo22@huawei.com>,
-	<lorenzo.stoakes@oracle.com>, <Liam.Howlett@oracle.com>, <rppt@kernel.org>,
-	<surenb@google.com>, <mhocko@suse.com>, <ziy@nvidia.com>,
-	<matthew.brost@intel.com>, <joshua.hahnjy@gmail.com>, <rakie.kim@sk.com>,
-	<byungchul@sk.com>, <gourry@gourry.net>, <ying.huang@linux.alibaba.com>,
-	<apopple@nvidia.com>, <tabba@google.com>, <ackerleytng@google.com>,
-	<shivankg@amd.com>, <paul@paul-moore.com>, <jmorris@namei.org>,
-	<serge@hallyn.com>, <pvorel@suse.cz>, <bfoster@redhat.com>,
-	<vannapurve@google.com>, <chao.gao@intel.com>, <bharata@amd.com>,
-	<nikunj@amd.com>, <michael.day@amd.com>, <shdhiman@amd.com>,
-	<yan.y.zhao@intel.com>, <Neeraj.Upadhyay@amd.com>, <thomas.lendacky@amd.com>,
-	<michael.roth@amd.com>, <aik@amd.com>, <jgg@nvidia.com>,
-	<kalyazin@amazon.com>, <peterx@redhat.com>, <jack@suse.cz>,
-	<hch@infradead.org>, <cgzones@googlemail.com>, <ira.weiny@intel.com>,
-	<rientjes@google.com>, <roypat@amazon.co.uk>, <chao.p.peng@intel.com>,
-	<amit@infradead.org>, <ddutile@redhat.com>, <dan.j.williams@intel.com>,
-	<ashish.kalra@amd.com>, <gshan@redhat.com>, <jgowans@amazon.com>,
-	<pankaj.gupta@amd.com>, <papaluri@amd.com>, <yuzhao@google.com>,
-	<suzuki.poulose@arm.com>, <quic_eberman@quicinc.com>,
-	<linux-bcachefs@vger.kernel.org>, <linux-btrfs@vger.kernel.org>,
-	<linux-erofs@lists.ozlabs.org>, <linux-f2fs-devel@lists.sourceforge.net>,
-	<linux-fsdevel@vger.kernel.org>, <linux-mm@kvack.org>,
-	<linux-kernel@vger.kernel.org>, <linux-security-module@vger.kernel.org>,
-	<kvm@vger.kernel.org>, <linux-kselftest@vger.kernel.org>,
-	<linux-coco@lists.linux.dev>
-Subject: [PATCH kvm-next V11 7/7] KVM: guest_memfd: selftests: Add tests for mmap and NUMA policy support
-Date: Wed, 27 Aug 2025 17:52:49 +0000
-Message-ID: <20250827175247.83322-10-shivankg@amd.com>
-X-Mailer: git-send-email 2.43.0
-In-Reply-To: <20250827175247.83322-2-shivankg@amd.com>
-References: <20250827175247.83322-2-shivankg@amd.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2911430CDA0
+	for <kvm@vger.kernel.org>; Wed, 27 Aug 2025 18:11:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1756318269; cv=none; b=oBoDZ32gdCb9WoeOZ+jcKKCFDkiujZjY65YXkmPXnVDEuMDJx+SVtp9VACIn0ZMFiQfi/wXU6BaXZkGCx5t0MB2EZ5PoRG+5hYZBVEcvhCcWgCx1TdiPPni+KXTwAI61CgqSbmr+5OKffYzomsgXJCtQ2dHZ8uM9IDjb94QR+80=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1756318269; c=relaxed/simple;
+	bh=QvHXw5e5o5cbwzJpFsfoHZeFliiUGmQkPA/eepMJwcU=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=lfoimUJXselTPXlnrtTJOyRh8aJcMCAQXbeKfmYr1+sLcrmFT723ralb2HGDKcGpxSLgmHu8PKGKkIWYDITKniqCTtnl3mLr5vrho7p2NV7dZ2WT8Z7iukexynE1LvuAUbdp7+9F2qlPwHI1xUurwLuiMGGS5ozP/VKtg2YU/RA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=XkUNDuYH; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1756318264;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=Xd7UFS7CawmPe9GaZmY0KVeI3w3v5+q2sGdZeCqVHOg=;
+	b=XkUNDuYHrM5URXb0zAZgF3+o4AvMQbzkxXzaPz9ttfAzJ0YJHhQfXU8ueXUp6WdndaqRIh
+	GnrB6UFBxs/pF/GsVUswDWSndpdmGtDvgydy7ejKplaxEdg0+50ToROJW0qvpWvFK9UPHg
+	EcluQGwKfqlXxPRLsBOLVgzyxHKzApo=
+Received: from mail-il1-f200.google.com (mail-il1-f200.google.com
+ [209.85.166.200]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-474-Ro_wXkTeMGWF_PK67horMA-1; Wed, 27 Aug 2025 14:10:59 -0400
+X-MC-Unique: Ro_wXkTeMGWF_PK67horMA-1
+X-Mimecast-MFC-AGG-ID: Ro_wXkTeMGWF_PK67horMA_1756318259
+Received: by mail-il1-f200.google.com with SMTP id e9e14a558f8ab-3f08c081ba7so282505ab.0
+        for <kvm@vger.kernel.org>; Wed, 27 Aug 2025 11:10:59 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1756318259; x=1756923059;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=Xd7UFS7CawmPe9GaZmY0KVeI3w3v5+q2sGdZeCqVHOg=;
+        b=e8bbLFpmEeA6OYUwMYrrwE5gGDbf+uL98JSrQ8FSlBitc46ZTtX9UWuBcTpe5W/cRG
+         02DbIrVfVQwA1OSdCPjvFYeAB5zEL8r6+kudKE9l85SF+MzmCf+A9xT9xsRE9Gcw5ZWs
+         Ns3EBKa2GJngNyKgenYeqnJ52vZyDarhy2mxfbakwGbMc5OLfllCqNEO657qyX9KbtXv
+         MSJVRYP6nnHO6+l3mAtE4te9hSBgqvHrDZg8iTOfUIEehCpgw9vQh0kbqz01ne0tWUXY
+         /aKdr90zh0Mt5H8neLxgxlGJgR4zdzPu0nccM/8EycHKHHUWdD+SXmcpv4P8j1sFcYY0
+         +exw==
+X-Forwarded-Encrypted: i=1; AJvYcCWCFlAJgHqdV7x7ZtkiBSyTn0cIUlCeYE0E0SqGt4TzJkoM047CSuMtsrxvXzk53ZEXphM=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yx8Glb5OIeRmCfg4T8qGjgMYXB7hs6kg4TG6g8akWQU8fyJfp1u
+	04wxp77HFlhIvXPAunpeaBn2oUY+K6xjHEt3ZKvjHitHNutWqUGcbFkEFrRxDJLyBlTpjhcKqRc
+	pjSOq+crPH43X7/T4n3qqiMB3qvPFao+sQqHxn7iO8dDaumGMHYdDPw==
+X-Gm-Gg: ASbGncuOP4e5calL6pUrX4sxqvDRjcEuvd1OL6IFUB5KOhCKa09jvH42YjnWOLsrqWd
+	yOiichesD6xeO1+oEZ8tOhJD6C84zuk6pdcvcrB/Q+jnQPuvGne/MYJMtRogSmLeOfLcY4dhTi+
+	AyS56GcP3r65yssGifh4v/vTg7JnugSUw4ei0z8PqFYgZXmD5bRGsYC0l2WYPeV9xu+COPtPWQA
+	1R9COXdmSR+nyaAcDiPb024h9rV9jA8QUFmcWmNZBp5LTj+lM2H15c2JYBqnF+S2aUx2acau7Hi
+	87hGkPfnZwcf58ttGQ04We4vYXYDZUx1k/RsiyHBqOk=
+X-Received: by 2002:a05:6602:2c81:b0:881:87de:a336 with SMTP id ca18e2360f4ac-886bd25af01mr900981639f.5.1756318259021;
+        Wed, 27 Aug 2025 11:10:59 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IHTlE648ZK5gyCMDjdHdH6z4PdCJTq6ON80zAHo/j9xVmBTNqJqZ6LVO/BK3pOeKZu3YTgUBQ==
+X-Received: by 2002:a05:6602:2c81:b0:881:87de:a336 with SMTP id ca18e2360f4ac-886bd25af01mr900979439f.5.1756318258537;
+        Wed, 27 Aug 2025 11:10:58 -0700 (PDT)
+Received: from redhat.com ([38.15.36.11])
+        by smtp.gmail.com with ESMTPSA id ca18e2360f4ac-886c8fc6d7fsm862725139f.21.2025.08.27.11.10.56
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 27 Aug 2025 11:10:57 -0700 (PDT)
+Date: Wed, 27 Aug 2025 12:10:55 -0600
+From: Alex Williamson <alex.williamson@redhat.com>
+To: lizhe.67@bytedance.com
+Cc: david@redhat.com, jgg@nvidia.com, torvalds@linux-foundation.org,
+ kvm@vger.kernel.org, linux-mm@kvack.org, farman@linux.ibm.com, Jason
+ Gunthorpe <jgg@ziepe.ca>, "Matthew Wilcox (Oracle)" <willy@infradead.org>,
+ Andrew Morton <akpm@linux-foundation.org>
+Subject: Re: [PATCH v5 1/5] mm: introduce num_pages_contiguous()
+Message-ID: <20250827121055.548e1584.alex.williamson@redhat.com>
+In-Reply-To: <20250814064714.56485-2-lizhe.67@bytedance.com>
+References: <20250814064714.56485-1-lizhe.67@bytedance.com>
+	<20250814064714.56485-2-lizhe.67@bytedance.com>
+X-Mailer: Claws Mail 4.3.1 (GTK 3.24.43; x86_64-redhat-linux-gnu)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: SATLEXMB03.amd.com (10.181.40.144) To SATLEXMB04.amd.com
- (10.181.40.145)
-X-EOPAttributedMessage: 0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: SJ1PEPF000023CE:EE_|CH3PR12MB9454:EE_
-X-MS-Office365-Filtering-Correlation-Id: 83c57367-5670-4b97-8940-08dde5933b79
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|376014|1800799024|36860700013|7416014|82310400026;
-X-Microsoft-Antispam-Message-Info:
-	=?us-ascii?Q?b1UaZtivtjyZ5kE/DAGrUBSUaJ9cWi4e6Na1KN1Sz4JLOG4i1GNQqEX41fF+?=
- =?us-ascii?Q?v1WoZn6FfKAI1Rzmtq0O39ADdQfjjhkhnFe8fCwDGaZzS8dgFO+eLjfKZGBP?=
- =?us-ascii?Q?nMBh3mgVYQcbisQB4ZDH2m2aJQOIUch7LNxCb4qxPeFmtspovltZslnv3B0T?=
- =?us-ascii?Q?DYhYvKzVpfbRUApB32wgsAV7uRo2TIk8ItmfI6zwomx7kfRcqVs9fSB+gBCr?=
- =?us-ascii?Q?PDSys4BXiVApMOpFijKE8f2sIaHA/R34bjmUJXVyCeu3Dol/4Z3shBu6Tdj3?=
- =?us-ascii?Q?hvgmEkKYkx8EnLf6zs2KOQB3RUrx1k25a0TSBpXS2UEaoYYrbaoIpeeZ0SHG?=
- =?us-ascii?Q?8xYc3/+g+CdjYSka8pWZhYgH/qEd34tbXMPpauMfzsFD8K7GZmV5XNf/VjBW?=
- =?us-ascii?Q?Pt2SeELhh0c7J9o+x/IEmLJBTLvOO8FWnNzdvex6KmPK6zbFr3COLi1IIyBF?=
- =?us-ascii?Q?tboZ26M6+Hb3TgPRuLM3pOu2Lo2FVi/1SQIEoOi4DgyFBe69zBUpGkIuUctw?=
- =?us-ascii?Q?vQ0tFdJXe+vzMcn1tpLiAMCuBLtp44RclYXI8yet+cBdyEnDwjfIkjsZMnZO?=
- =?us-ascii?Q?Wer+RG8e6/G/GQwwcH2kuRf5m65pyywDXLr3+OKQLM+a9BsWKWfEdQm4W0Dg?=
- =?us-ascii?Q?AehsShni0OUihzGe44wWchFqSJVae5ssY6vudRa1Chug1IVRTICZIME+SK6L?=
- =?us-ascii?Q?nyXx3SpqS9kjc7dfE+Umlw2NTM4OzXXVopcxHJCPijQ3bp/lJbTgKlSl7cbM?=
- =?us-ascii?Q?4tJnoRNuB5dNhfzYYm+w0KH+yvbICTvCmIa8dTTEUCs4ATHHWh0V0JBNtzcb?=
- =?us-ascii?Q?G3cjrWkaNGeoQZKlj5T96aGAg2xM/MNEQNM7V08Ao6BWXt6NEZOj5os91eU+?=
- =?us-ascii?Q?lB/tLJmJGfjHOheknMETAL28poRglc9JLnFZ3B1YRKMgZggn9dvkOqA/Ds96?=
- =?us-ascii?Q?dImvSxXYuyxpGDmxeSAnmDOFpJutoPMC0GyHcjEu9AUQXUW9d08os3vtyY0m?=
- =?us-ascii?Q?1QHdHqiRC4JkwibmTXD7ZiXdyHkyK9k/yMexkiwCT+DRggFaL/qLDJR0JosC?=
- =?us-ascii?Q?h8V4ukQL/31Hz1yupdSvQRsPAG+Yu6SAEFTI/CkWv2kgEoCyx2TvDLJjIevT?=
- =?us-ascii?Q?0GPO9URH+6sYGy/BaUF5vQ3U/PdPbwlTIlGZkylETFxsg8syvZU7HaaubJRv?=
- =?us-ascii?Q?oGE3tXo5q5P4N0a+dRH2S3kxIy2E0FB3uAQ+EdqDug6jyOQG4+Kd+UU8rSkB?=
- =?us-ascii?Q?q1O5+VO3aipjC7X2QHrDD9jFcxfSLg8i6+5Glm64FK7bEUBeOQEoMbCTW+N8?=
- =?us-ascii?Q?XESYdhvjbmfbOEgqm/ULUd+/I94fkVjGJUx7DzLcJgWh/Z4eErhKg+zAkpdk?=
- =?us-ascii?Q?nRqqug132HEEPUOEsJVQiGp0msPnXjeHlO0wrmdqMHHSzeqVrYXurnhdcgcU?=
- =?us-ascii?Q?ejIBAkhFm9eX2oiST6ptBZ3PzMLbZIwunfonqEScgu7UCH68LYBu8lN7rs2X?=
- =?us-ascii?Q?Nb40rUuWHHK4ClsGoBMApHyTPVDrKlppCosS?=
-X-Forefront-Antispam-Report:
-	CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB04.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230040)(376014)(1800799024)(36860700013)(7416014)(82310400026);DIR:OUT;SFP:1101;
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 27 Aug 2025 17:57:47.5904
- (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 83c57367-5670-4b97-8940-08dde5933b79
-X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[SATLEXMB04.amd.com]
-X-MS-Exchange-CrossTenant-AuthSource:
-	SJ1PEPF000023CE.namprd02.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: CH3PR12MB9454
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-Add tests for NUMA memory policy binding and NUMA aware allocation in
-guest_memfd. This extends the existing selftests by adding proper
-validation for:
-- KVM GMEM set_policy and get_policy() vm_ops functionality using
-  mbind() and get_mempolicy()
-- NUMA policy application before and after memory allocation
+On Thu, 14 Aug 2025 14:47:10 +0800
+lizhe.67@bytedance.com wrote:
 
-These tests help ensure NUMA support for guest_memfd works correctly.
+> From: Li Zhe <lizhe.67@bytedance.com>
+> 
+> Let's add a simple helper for determining the number of contiguous pages
+> that represent contiguous PFNs.
+> 
+> In an ideal world, this helper would be simpler or not even required.
+> Unfortunately, on some configs we still have to maintain (SPARSEMEM
+> without VMEMMAP), the memmap is allocated per memory section, and we might
+> run into weird corner cases of false positives when blindly testing for
+> contiguous pages only.
+> 
+> One example of such false positives would be a memory section-sized hole
+> that does not have a memmap. The surrounding memory sections might get
+> "struct pages" that are contiguous, but the PFNs are actually not.
+> 
+> This helper will, for example, be useful for determining contiguous PFNs
+> in a GUP result, to batch further operations across returned "struct
+> page"s. VFIO will utilize this interface to accelerate the VFIO DMA map
+> process.
+> 
+> Implementation based on Linus' suggestions to avoid new usage of
+> nth_page() where avoidable.
+> 
+> Suggested-by: Linus Torvalds <torvalds@linux-foundation.org>
+> Suggested-by: Jason Gunthorpe <jgg@ziepe.ca>
+> Signed-off-by: Li Zhe <lizhe.67@bytedance.com>
+> Co-developed-by: David Hildenbrand <david@redhat.com>
+> Signed-off-by: David Hildenbrand <david@redhat.com>
+> ---
+>  include/linux/mm.h        |  7 ++++++-
+>  include/linux/mm_inline.h | 35 +++++++++++++++++++++++++++++++++++
+>  2 files changed, 41 insertions(+), 1 deletion(-)
 
-Signed-off-by: Shivank Garg <shivankg@amd.com>
----
- tools/testing/selftests/kvm/Makefile.kvm      |   1 +
- .../testing/selftests/kvm/guest_memfd_test.c  | 121 ++++++++++++++++++
- 2 files changed, 122 insertions(+)
 
-diff --git a/tools/testing/selftests/kvm/Makefile.kvm b/tools/testing/selftests/kvm/Makefile.kvm
-index 90f03f00cb04..c46cef2a7cd7 100644
---- a/tools/testing/selftests/kvm/Makefile.kvm
-+++ b/tools/testing/selftests/kvm/Makefile.kvm
-@@ -275,6 +275,7 @@ pgste-option = $(call try-run, echo 'int main(void) { return 0; }' | \
- 	$(CC) -Werror -Wl$(comma)--s390-pgste -x c - -o "$$TMP",-Wl$(comma)--s390-pgste)
- 
- LDLIBS += -ldl
-+LDLIBS += -lnuma
- LDFLAGS += -pthread $(no-pie-option) $(pgste-option)
- 
- LIBKVM_C := $(filter %.c,$(LIBKVM))
-diff --git a/tools/testing/selftests/kvm/guest_memfd_test.c b/tools/testing/selftests/kvm/guest_memfd_test.c
-index b3ca6737f304..9640d04ec293 100644
---- a/tools/testing/selftests/kvm/guest_memfd_test.c
-+++ b/tools/testing/selftests/kvm/guest_memfd_test.c
-@@ -7,6 +7,8 @@
- #include <stdlib.h>
- #include <string.h>
- #include <unistd.h>
-+#include <numa.h>
-+#include <numaif.h>
- #include <errno.h>
- #include <stdio.h>
- #include <fcntl.h>
-@@ -19,6 +21,7 @@
- #include <sys/mman.h>
- #include <sys/types.h>
- #include <sys/stat.h>
-+#include <sys/syscall.h>
- 
- #include "kvm_util.h"
- #include "test_util.h"
-@@ -72,6 +75,122 @@ static void test_mmap_supported(int fd, size_t page_size, size_t total_size)
- 	TEST_ASSERT(!ret, "munmap() should succeed.");
- }
- 
-+#define TEST_REQUIRE_NUMA_MULTIPLE_NODES()	\
-+	TEST_REQUIRE(numa_available() != -1 && numa_max_node() >= 1)
-+
-+static void test_mbind(int fd, size_t page_size, size_t total_size)
-+{
-+	unsigned long nodemask = 1; /* nid: 0 */
-+	unsigned long maxnode = 8;
-+	unsigned long get_nodemask;
-+	int get_policy;
-+	char *mem;
-+	int ret;
-+
-+	TEST_REQUIRE_NUMA_MULTIPLE_NODES();
-+
-+	mem = mmap(NULL, total_size, PROT_READ | PROT_WRITE, MAP_SHARED, fd, 0);
-+	TEST_ASSERT(mem != MAP_FAILED, "mmap for mbind test should succeed");
-+
-+	/* Test MPOL_INTERLEAVE policy */
-+	ret = syscall(__NR_mbind, mem, page_size * 2, MPOL_INTERLEAVE,
-+		      &nodemask, maxnode, 0);
-+	TEST_ASSERT(!ret, "mbind with INTERLEAVE to node 0 should succeed");
-+	ret = syscall(__NR_get_mempolicy, &get_policy, &get_nodemask,
-+		      maxnode, mem, MPOL_F_ADDR);
-+	TEST_ASSERT(!ret && get_policy == MPOL_INTERLEAVE && get_nodemask == nodemask,
-+		    "Policy should be MPOL_INTERLEAVE and nodes match");
-+
-+	/* Test basic MPOL_BIND policy */
-+	ret = syscall(__NR_mbind, mem + page_size * 2, page_size * 2, MPOL_BIND,
-+		      &nodemask, maxnode, 0);
-+	TEST_ASSERT(!ret, "mbind with MPOL_BIND to node 0 should succeed");
-+	ret = syscall(__NR_get_mempolicy, &get_policy, &get_nodemask,
-+		      maxnode, mem + page_size * 2, MPOL_F_ADDR);
-+	TEST_ASSERT(!ret && get_policy == MPOL_BIND && get_nodemask == nodemask,
-+		    "Policy should be MPOL_BIND and nodes match");
-+
-+	/* Test MPOL_DEFAULT policy */
-+	ret = syscall(__NR_mbind, mem, total_size, MPOL_DEFAULT, NULL, 0, 0);
-+	TEST_ASSERT(!ret, "mbind with MPOL_DEFAULT should succeed");
-+	ret = syscall(__NR_get_mempolicy, &get_policy, &get_nodemask,
-+		      maxnode, mem, MPOL_F_ADDR);
-+	TEST_ASSERT(!ret && get_policy == MPOL_DEFAULT && get_nodemask == 0,
-+		    "Policy should be MPOL_DEFAULT and nodes zero");
-+
-+	/* Test with invalid policy */
-+	ret = syscall(__NR_mbind, mem, page_size, 999, &nodemask, maxnode, 0);
-+	TEST_ASSERT(ret == -1 && errno == EINVAL,
-+		    "mbind with invalid policy should fail with EINVAL");
-+
-+	TEST_ASSERT(munmap(mem, total_size) == 0, "munmap should succeed");
-+}
-+
-+static void test_numa_allocation(int fd, size_t page_size, size_t total_size)
-+{
-+	unsigned long node0_mask = 1;  /* Node 0 */
-+	unsigned long node1_mask = 2;  /* Node 1 */
-+	unsigned long maxnode = 8;
-+	void *pages[4];
-+	int status[4];
-+	char *mem;
-+	int ret, i;
-+
-+	TEST_REQUIRE_NUMA_MULTIPLE_NODES();
-+
-+	/* Clean slate: deallocate all file space, if any */
-+	ret = fallocate(fd, FALLOC_FL_PUNCH_HOLE | FALLOC_FL_KEEP_SIZE, 0, total_size);
-+	TEST_ASSERT(!ret, "fallocate(PUNCH_HOLE) should succeed");
-+
-+	mem = mmap(NULL, total_size, PROT_READ | PROT_WRITE, MAP_SHARED, fd, 0);
-+	TEST_ASSERT(mem != MAP_FAILED, "mmap should succeed");
-+
-+	for (i = 0; i < 4; i++)
-+		pages[i] = (char *)mem + page_size * i;
-+
-+	/* Set NUMA policy after allocation */
-+	memset(mem, 0xaa, page_size);
-+	ret = syscall(__NR_mbind, pages[0], page_size, MPOL_BIND, &node0_mask, maxnode, 0);
-+	TEST_ASSERT(!ret, "mbind after allocation page 0 to node 0 should succeed");
-+	ret = fallocate(fd, FALLOC_FL_PUNCH_HOLE | FALLOC_FL_KEEP_SIZE, 0, page_size);
-+	TEST_ASSERT(!ret, "fallocate(PUNCH_HOLE) should succeed");
-+
-+	/* Set NUMA policy before allocation */
-+	ret = syscall(__NR_mbind, pages[0], page_size * 2, MPOL_BIND, &node1_mask, maxnode, 0);
-+	TEST_ASSERT(!ret, "mbind page 0, 1 to node 1 should succeed");
-+	ret = syscall(__NR_mbind, pages[2], page_size * 2, MPOL_BIND, &node0_mask, maxnode, 0);
-+	TEST_ASSERT(!ret, "mbind page 2, 3 to node 0 should succeed");
-+	memset(mem, 0xaa, total_size);
-+
-+	/* Validate if pages are allocated on specified NUMA nodes */
-+	ret = syscall(__NR_move_pages, 0, 4, pages, NULL, status, 0);
-+	TEST_ASSERT(ret >= 0, "move_pages should succeed for status check");
-+	TEST_ASSERT(status[0] == 1, "Page 0 should be allocated on node 1");
-+	TEST_ASSERT(status[1] == 1, "Page 1 should be allocated on node 1");
-+	TEST_ASSERT(status[2] == 0, "Page 2 should be allocated on node 0");
-+	TEST_ASSERT(status[3] == 0, "Page 3 should be allocated on node 0");
-+
-+	/* Punch hole for all pages */
-+	ret = fallocate(fd, FALLOC_FL_PUNCH_HOLE | FALLOC_FL_KEEP_SIZE, 0, total_size);
-+	TEST_ASSERT(!ret, "fallocate(PUNCH_HOLE) should succeed");
-+
-+	/* Change NUMA policy nodes and reallocate */
-+	ret = syscall(__NR_mbind, pages[0], page_size * 2, MPOL_BIND, &node0_mask, maxnode, 0);
-+	TEST_ASSERT(!ret, "mbind page 0, 1 to node 0 should succeed");
-+	ret = syscall(__NR_mbind, pages[2], page_size * 2, MPOL_BIND, &node1_mask, maxnode, 0);
-+	TEST_ASSERT(!ret, "mbind page 2, 3 to node 1 should succeed");
-+	memset(mem, 0xaa, total_size);
-+
-+	ret = syscall(__NR_move_pages, 0, 4, pages, NULL, status, 0);
-+	TEST_ASSERT(ret >= 0, "move_pages should succeed after reallocation");
-+	TEST_ASSERT(status[0] == 0, "Page 0 should be allocated on node 0");
-+	TEST_ASSERT(status[1] == 0, "Page 1 should be allocated on node 0");
-+	TEST_ASSERT(status[2] == 1, "Page 2 should be allocated on node 1");
-+	TEST_ASSERT(status[3] == 1, "Page 3 should be allocated on node 1");
-+
-+	TEST_ASSERT(munmap(mem, total_size) == 0, "munmap should succeed");
-+}
-+
- static sigjmp_buf jmpbuf;
- void fault_sigbus_handler(int signum)
- {
-@@ -286,6 +405,8 @@ static void test_guest_memfd(unsigned long vm_type)
- 	if (flags & GUEST_MEMFD_FLAG_MMAP) {
- 		test_mmap_supported(fd, page_size, total_size);
- 		test_fault_overflow(fd, page_size, total_size);
-+		test_mbind(fd, page_size, total_size);
-+		test_numa_allocation(fd, page_size, total_size);
- 	} else {
- 		test_mmap_not_supported(fd, page_size, total_size);
- 	}
--- 
-2.43.0
+Does this need any re-evaluation after Willy's series?[1]  Patch 2/
+changes page_to_section() to memdesc_section() which takes a new
+memdesc_flags_t, ie. page->flags.  The conversion appears trivial, but
+mm has many subtleties.
+
+Ideally we could also avoid merge-time fixups for linux-next and
+mainline.
+
+Andrew, are you open to topic branch for Willy's series that I could
+merge into vfio/next when it's considered stable?  Thanks,
+
+Alex
+
+[1]https://lore.kernel.org/all/20250805172307.1302730-3-willy@infradead.org/T/#u
+
+> diff --git a/include/linux/mm.h b/include/linux/mm.h
+> index 1ae97a0b8ec7..ead6724972cf 100644
+> --- a/include/linux/mm.h
+> +++ b/include/linux/mm.h
+> @@ -1763,7 +1763,12 @@ static inline unsigned long page_to_section(const struct page *page)
+>  {
+>  	return (page->flags >> SECTIONS_PGSHIFT) & SECTIONS_MASK;
+>  }
+> -#endif
+> +#else /* !SECTION_IN_PAGE_FLAGS */
+> +static inline unsigned long page_to_section(const struct page *page)
+> +{
+> +	return 0;
+> +}
+> +#endif /* SECTION_IN_PAGE_FLAGS */
+>  
+>  /**
+>   * folio_pfn - Return the Page Frame Number of a folio.
+> diff --git a/include/linux/mm_inline.h b/include/linux/mm_inline.h
+> index 89b518ff097e..5ea23891fe4c 100644
+> --- a/include/linux/mm_inline.h
+> +++ b/include/linux/mm_inline.h
+> @@ -616,4 +616,39 @@ static inline bool vma_has_recency(struct vm_area_struct *vma)
+>  	return true;
+>  }
+>  
+> +/**
+> + * num_pages_contiguous() - determine the number of contiguous pages
+> + *			    that represent contiguous PFNs
+> + * @pages: an array of page pointers
+> + * @nr_pages: length of the array, at least 1
+> + *
+> + * Determine the number of contiguous pages that represent contiguous PFNs
+> + * in @pages, starting from the first page.
+> + *
+> + * In kernel configs where contiguous pages might not imply contiguous PFNs
+> + * over memory section boundaries, this function will stop at the memory
+> + * section boundary.
+> + *
+> + * Returns the number of contiguous pages.
+> + */
+> +static inline size_t num_pages_contiguous(struct page **pages, size_t nr_pages)
+> +{
+> +	struct page *cur_page = pages[0];
+> +	unsigned long section = page_to_section(cur_page);
+> +	size_t i;
+> +
+> +	for (i = 1; i < nr_pages; i++) {
+> +		if (++cur_page != pages[i])
+> +			break;
+> +		/*
+> +		 * In unproblematic kernel configs, page_to_section() == 0 and
+> +		 * the whole check will get optimized out.
+> +		 */
+> +		if (page_to_section(cur_page) != section)
+> +			break;
+> +	}
+> +
+> +	return i;
+> +}
+> +
+>  #endif
 
 
