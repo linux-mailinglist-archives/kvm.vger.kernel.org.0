@@ -1,98 +1,64 @@
-Return-Path: <kvm+bounces-55866-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-55865-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 152A3B37E9F
-	for <lists+kvm@lfdr.de>; Wed, 27 Aug 2025 11:18:47 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1C06DB37E90
+	for <lists+kvm@lfdr.de>; Wed, 27 Aug 2025 11:17:38 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 3A97F1B66A67
-	for <lists+kvm@lfdr.de>; Wed, 27 Aug 2025 09:19:07 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id CD8A1203579
+	for <lists+kvm@lfdr.de>; Wed, 27 Aug 2025 09:17:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0BA9D34575E;
-	Wed, 27 Aug 2025 09:17:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B786A341652;
+	Wed, 27 Aug 2025 09:17:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Asr76mip"
 X-Original-To: kvm@vger.kernel.org
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id ADD21287252;
-	Wed, 27 Aug 2025 09:17:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D1B912773C3;
+	Wed, 27 Aug 2025 09:17:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756286278; cv=none; b=n2d+cg45hAZiFojIwdqlVHknhNW8NFKheAF1AJEmRuVT1zyCyfX/je+bN6z3QbFxgGYofuDCjErIk4Z44UUE4Cd0SHYae2DJy7eGPGqtuT2dxVWNgp2QuhF7DCsnqnPX8LSBEZu0rqyR5UQFwyQw1E6Xuh17TFPPS0pf0HASxhw=
+	t=1756286245; cv=none; b=aFOLnfHqdSCh2bxitUpnUFZN1zoYrs7+1toiPAkZd7RV7G5BMD/dwyn6z1YyjoVgKjIA66VD/U0d4veHRIxfui/FJ++wAzn7iWeHiBQu08PRRm1oC7R4CFTe/oQAiyn3EusF/9ciFgNZiLYOwzuBt28IgNDbM9FHvTITRDp7vog=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756286278; c=relaxed/simple;
-	bh=D6tI8dFPhQO9vi/pFTz+Fl4xZHDFVpijJJzgtBdp4kY=;
+	s=arc-20240116; t=1756286245; c=relaxed/simple;
+	bh=TYyx1Z0CNHtXF1OQjZhKtuBTijXSsUPz57zuUcrMcvA=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=hhqTDRSFlSB5NtvohbFtanbo9B675qZNiNwpPajoRqQnS9inEjyMJHJeFIYFvrVL409DevK+w4aO2HnbPmH+VRqZGcIUZ1ETsBvzEppbPGmMh9UrwpHLtzxAsmd+G71IichAOxtNrv6OldgUVoJkHDYbJfULhL6IAlci9A5js2w=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=arm.com; spf=none smtp.mailfrom=foss.arm.com; arc=none smtp.client-ip=217.140.110.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=foss.arm.com
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id A7AA01655;
-	Wed, 27 Aug 2025 02:17:46 -0700 (PDT)
-Received: from bogus (unknown [10.57.57.52])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 588C63F738;
-	Wed, 27 Aug 2025 02:17:41 -0700 (PDT)
-Date: Wed, 27 Aug 2025 10:17:18 +0100
-From: Sudeep Holla <sudeep.holla@arm.com>
-To: Ben Horgan <ben.horgan@arm.com>
-Cc: Zihuan Zhang <zhangzihuan@kylinos.cn>,
-	Sudeep Holla <sudeep.holla@arm.com>,
-	"Rafael J . wysocki" <rafael@kernel.org>,
-	Viresh Kumar <viresh.kumar@linaro.org>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Will Deacon <will@kernel.org>,
-	Sean Christopherson <seanjc@google.com>,
-	Paolo Bonzini <pbonzini@redhat.com>,
-	Thomas Gleixner <tglx@linutronix.de>,
-	Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-	Dave Hansen <dave.hansen@linux.intel.com>,
-	Markus Mayer <mmayer@broadcom.com>,
-	Florian Fainelli <florian.fainelli@broadcom.com>,
-	Srinivas Pandruvada <srinivas.pandruvada@linux.intel.com>,
-	Madhavan Srinivasan <maddy@linux.ibm.com>,
-	Michael Ellerman <mpe@ellerman.id.au>,
-	Krzysztof Kozlowski <krzk@kernel.org>,
-	Alim Akhtar <alim.akhtar@samsung.com>,
-	Thierry Reding <thierry.reding@gmail.com>,
-	Jonathan Hunter <jonathanh@nvidia.com>,
-	MyungJoo Ham <myungjoo.ham@samsung.com>,
-	Kyungmin Park <kyungmin.park@samsung.com>,
-	Chanwoo Choi <cw00.choi@samsung.com>,
-	Jani Nikula <jani.nikula@linux.intel.com>,
-	Joonas Lahtinen <joonas.lahtinen@linux.intel.com>,
-	Rodrigo Vivi <rodrigo.vivi@intel.com>,
-	Tvrtko Ursulin <tursulin@ursulin.net>,
-	David Airlie <airlied@gmail.com>, Simona Vetter <simona@ffwll.ch>,
-	Daniel Lezcano <daniel.lezcano@kernel.org>,
-	Sascha Hauer <s.hauer@pengutronix.de>,
-	Shawn Guo <shawnguo@kernel.org>,
-	Eduardo Valentin <edubezval@gmail.com>, Keerthy <j-keerthy@ti.com>,
-	Matthias Brugger <matthias.bgg@gmail.com>,
-	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
-	zhenglifeng <zhenglifeng1@huawei.com>,
-	"H . Peter Anvin" <hpa@zytor.com>, Zhang Rui <rui.zhang@intel.com>,
-	Len Brown <lenb@kernel.org>, Nicholas Piggin <npiggin@gmail.com>,
-	Christophe Leroy <christophe.leroy@csgroup.eu>,
-	Lukasz Luba <lukasz.luba@arm.com>,
-	Pengutronix Kernel Team <kernel@pengutronix.de>,
-	Beata Michalska <beata.michalska@arm.com>,
-	Fabio Estevam <festevam@gmail.com>, Pavel Machek <pavel@kernel.org>,
-	Sumit Gupta <sumitg@nvidia.com>,
-	Prasanna Kumar T S M <ptsm@linux.microsoft.com>,
-	Yicong Yang <yangyicong@hisilicon.com>, linux-pm@vger.kernel.org,
-	x86@kernel.org, kvm@vger.kernel.org, linux-acpi@vger.kernel.org,
-	linuxppc-dev@lists.ozlabs.org, linux-samsung-soc@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org, linux-tegra@vger.kernel.org,
-	intel-gfx@lists.freedesktop.org, dri-devel@lists.freedesktop.org,
-	imx@lists.linux.dev, linux-omap@vger.kernel.org,
-	linux-mediatek@lists.infradead.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v2 01/18] arm64: topology: Use __free(put_cpufreq_policy)
- for policy reference
-Message-ID: <20250827-vegan-blond-marmot-eabf13@sudeepholla>
-References: <20250827023202.10310-1-zhangzihuan@kylinos.cn>
- <20250827023202.10310-2-zhangzihuan@kylinos.cn>
- <70f4c2ce-1dbd-4596-af78-bca1cdbbb581@arm.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=ENgBGOkmcO0o0kjC0UZsmZOQqEimMJsAhnOvg9mt2Fd8cQstDz5BlzwzBrr6Ozfr3MbO/0Fxd3yGESus0vlmhkeP8SkYklGalYYvSRNtvSTxl/P6nm2KDhi2C32rN/DQNUkujkXM0EMfoPs70Ns8PhO98CR0vEzUi74ficW6/1w=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Asr76mip; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id BDF9CC113CF;
+	Wed, 27 Aug 2025 09:17:24 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1756286245;
+	bh=TYyx1Z0CNHtXF1OQjZhKtuBTijXSsUPz57zuUcrMcvA=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=Asr76mipEwGUVqlmQiWISvswLcwClR12ZwT7goxVWatoDn6RaUI2EvuUir5jc4ZOi
+	 pVDBodH6b4RdBDcKYhF67601faqJKFIAxT67Cxr3XoilZRyOGuzwSiJCliOImN6FsS
+	 rzgVonSjgUP8MpttBxXseKia9cgXo1F9rahoREOdV+aOuz5ErDQ6UrSbm2vu+DW/ec
+	 HQILjuNSczallNk3E/hbN4yRaikm3kKbSfg9TdZ0x3bd+sgT74seFE3ZlhaO2+1a7m
+	 IzWg9Fq72BffVaWAWAojuDMDfWxejd/55/E1KCU3yz6FoR7zjEielbez8xD/voiFAv
+	 hWN5o7P5m8lQQ==
+Date: Wed, 27 Aug 2025 11:17:22 +0200
+From: Amit Shah <amit@kernel.org>
+To: Sean Christopherson <seanjc@google.com>
+Cc: linux-kernel@vger.kernel.org, kvm@vger.kernel.org, x86@kernel.org,
+	linux-doc@vger.kernel.org, amit.shah@amd.com,
+	thomas.lendacky@amd.com, bp@alien8.de, tglx@linutronix.de,
+	peterz@infradead.org, jpoimboe@kernel.org,
+	pawan.kumar.gupta@linux.intel.com, corbet@lwn.net, mingo@redhat.com,
+	dave.hansen@linux.intel.com, hpa@zytor.com, pbonzini@redhat.com,
+	daniel.sneddon@linux.intel.com, kai.huang@intel.com,
+	sandipan.das@amd.com, boris.ostrovsky@oracle.com,
+	Babu.Moger@amd.com, david.kaplan@amd.com, dwmw@amazon.co.uk,
+	andrew.cooper3@citrix.com
+Subject: Re: [PATCH v5 1/1] x86: kvm: svm: set up ERAPS support for guests
+Message-ID: <aK7NIk1ArgQaDPHp@mun-amitshah-l>
+References: <20250515152621.50648-1-amit@kernel.org>
+ <20250515152621.50648-2-amit@kernel.org>
+ <aKYBeIokyVC8AKHe@google.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -101,46 +67,149 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <70f4c2ce-1dbd-4596-af78-bca1cdbbb581@arm.com>
+In-Reply-To: <aKYBeIokyVC8AKHe@google.com>
 
-On Wed, Aug 27, 2025 at 09:30:13AM +0100, Ben Horgan wrote:
-> Hi Zihuan,
-> 
-> On 8/27/25 03:31, Zihuan Zhang wrote:
-> > Replace the manual cpufreq_cpu_put() with __free(put_cpufreq_policy)
-> > annotation for policy references. This reduces the risk of reference
-> > counting mistakes and aligns the code with the latest kernel style.
-> > 
-> > No functional change intended.
-> > 
-> > Signed-off-by: Zihuan Zhang <zhangzihuan@kylinos.cn>
-> > ---
-> >  arch/arm64/kernel/topology.c | 9 +++------
-> >  1 file changed, 3 insertions(+), 6 deletions(-)
-> > 
-> > diff --git a/arch/arm64/kernel/topology.c b/arch/arm64/kernel/topology.c
-> > index 5d07ee85bdae..e3cb6d54f35b 100644
-> > --- a/arch/arm64/kernel/topology.c
-> > +++ b/arch/arm64/kernel/topology.c
-> > @@ -307,17 +307,16 @@ int arch_freq_get_on_cpu(int cpu)
-> >  		 */
-> >  		if (!housekeeping_cpu(cpu, HK_TYPE_TICK) ||
-> >  		    time_is_before_jiffies(last_update + msecs_to_jiffies(AMU_SAMPLE_EXP_MS))) {
-> > -			struct cpufreq_policy *policy = cpufreq_cpu_get(cpu);
-> > +			struct cpufreq_policy *policy __free(put_cpufreq_policy);
-> Based on the guidance, in include/linux/cleanup.h, I would expect the
-> assignment to be done on this line.
-> 
-> "...the recommendation is to always define and assign variables in one
->  * statement and not group variable definitions at the top of the
->  * function when __free() is used."
-> 
+On (Wed) 20 Aug 2025 [10:10:16], Sean Christopherson wrote:
+> On Thu, May 15, 2025, Amit Shah wrote:
 
-Agreed. I did something similar recently and there was a code path where
-variable wasn't initialised and ended up with freeing unassigned pointer.
-So it is more than just a recommendation sometimes.
+[...]
 
--- 
-Regards,
-Sudeep
+> > For guests to observe and use this feature, 
+> 
+> Guests don't necessarily "use" this feature.  It's something that's enabled by
+> KVM and affects harware behavior regardless of whether or not the guest is even
+> aware ERAPS is a thing.
+
+OK wording it is tricky.  "use" in the sense of for the entire RSB to be
+utilized within guest context.  Not "use" as in guest needs enablement or
+needs to do anything special.
+
+"For the extended size to also be utilized when the CPU is in guest context,
+the hypervisor needs to..." ?
+
+> > the hypervisor needs to expose the CPUID bit, and also set a VMCB bit.
+> > Without one or both of those, 
+> 
+> No?  If there's no enabling for bare metal usage, I don't see how emulation of
+> CPUID can possibly impact usage of RAP size.  The only thing that matters is the
+> VMCB bit.  And nothing in this patch queries guest CPUID.
+
+True.
+
+> Observing ERAPS _might_ cause the guest to forego certain mitigations, but KVM
+> has zero visibility into whether or not such mitigations exist, if the guest will
+> care about ERAPS, etc.
+
+Sure, there's nothing guest-specific about this; any OS, when it detects
+ERAPS, may or may not want to adapt to its existence.  (As it turns out, for
+Linux, no adaptation is necessary.)
+
+> > guests continue to use the older default RSB size and behaviour for backwards
+> > compatibility.  This means the hardware RSB size is limited to 32 entries for
+> > guests that do not have this feature exposed to them.
+
+[...]
+
+> > 2. Hosts that disable NPT: the ERAPS feature also flushes the RSB
+> >    entries when the CR3 is updated.  When using shadow paging, CR3
+> >    updates within the guest do not update the CPU's CR3 register.
+> 
+> Yes they do, just indirectly.  KVM changes the effective CR3 in reaction to the
+> guest's new CR3.  If hardware doesn't flush in that situation, then it's trivially
+> easy to set ERAP_CONTROL_FLUSH_RAP on writes to CR3.
+
+Yea, that's right - since it doesn't happen in-guest (i.e. there's an exit
+instead), it needs KVM to set that bit.
+
+[...]
+
+> > @@ -3482,6 +3485,7 @@ static void dump_vmcb(struct kvm_vcpu *vcpu)
+> >  	pr_err("%-20s%016llx\n", "tsc_offset:", control->tsc_offset);
+> >  	pr_err("%-20s%d\n", "asid:", control->asid);
+> >  	pr_err("%-20s%d\n", "tlb_ctl:", control->tlb_ctl);
+> > +	pr_err("%-20s%d\n", "erap_ctl:", control->erap_ctl);
+> >  	pr_err("%-20s%08x\n", "int_ctl:", control->int_ctl);
+> >  	pr_err("%-20s%08x\n", "int_vector:", control->int_vector);
+> >  	pr_err("%-20s%08x\n", "int_state:", control->int_state);
+> > @@ -3663,6 +3667,11 @@ static int svm_handle_exit(struct kvm_vcpu *vcpu, fastpath_t exit_fastpath)
+> >  
+> >  		trace_kvm_nested_vmexit(vcpu, KVM_ISA_SVM);
+> >  
+> > +		if (vmcb_is_extended_rap(svm->vmcb01.ptr)) {
+> > +			vmcb_set_flush_guest_rap(svm->vmcb01.ptr);
+> > +			vmcb_clr_flush_guest_rap(svm->nested.vmcb02.ptr);
+> > +		}
+> > +
+> >  		vmexit = nested_svm_exit_special(svm);
+> >  
+> >  		if (vmexit == NESTED_EXIT_CONTINUE)
+> > @@ -3670,6 +3679,11 @@ static int svm_handle_exit(struct kvm_vcpu *vcpu, fastpath_t exit_fastpath)
+> >  
+> >  		if (vmexit == NESTED_EXIT_DONE)
+> >  			return 1;
+> > +	} else {
+> > +		if (vmcb_is_extended_rap(svm->vmcb01.ptr) && svm->nested.initialized) {
+> > +			vmcb_set_flush_guest_rap(svm->nested.vmcb02.ptr);
+> > +			vmcb_clr_flush_guest_rap(svm->vmcb01.ptr);
+> > +		}
+> 
+> Handling this in the common exit path is confusing, inefficient, and lacking.
+
+Heh, I agree.  I toyed with doing this just before VMRUN.  But I can't recall
+why I disliked that more.
+
+> Assuming hardware doesn't automatically clear ERAP_CONTROL_FLUSH_RAP, then KVM
+
+That's right - it doesn't.
+
+> should clear the flag after _any_ exit, not just exits that reach this point,
+> e.g. if KVM stays in the fast path.
+
+(or just before VMRUN).  Right.
+
+> And IIUC, ERAP_CONTROL_FLUSH_RAP needs to be done on _every_ nested transition,
+> not just those that occur in direct response to a hardware #VMEXIT. So, hook
+> nested_vmcb02_prepare_control() for nested VMRUN and nested_svm_vmexit() for
+> nested #VMEXIT.
+
+Does sound better.  I think the case I wanted to preserve in this complex
+logic was if we have a L2->exit->L2 transition, I didn't want to set the FLUSH
+bit.
+
+> Side topic, the changelog should call out that KVM deliberately ignores guest
+> CPUID, and instead unconditionally enables the full size RAP when ERAPS is
+> supported.  I.e. KVM _could_ check guest_cpu_cap_has() instead of kvm_cpu_cap_has()
+> in all locations, to avoid having to flush the RAP on nested transitions when
+> ERAPS isn't enumerated to the guest, but presumably using the full size RAP is
+> better for overall performance.
+
+Yea.
+
+> The changelog should also call out that if the full size RAP is enabled, then
+> it's KVM's responsibility to flush the RAP on nested transitions irrespective
+> of whether or not ERAPS is advertised to the guest.  Because if ERAPS isn't
+> advertised, the the guest's mitigations will likely be insufficient.
+
+You mean the L2 guest?  ACK on the update.
+
+> With the caveat that I'm taking a wild guess on the !npt behavior, something
+> like this?
+
+[...]
+
+> +#define ERAP_CONTROL_FULL_SIZE_RAP BIT(0)
+> +#define ERAP_CONTROL_FLUSH_RAP BIT(1)
+
+Oh I def prefer to keep the APM-specified names.
+
+[...]
+
+Patch looks good!
+
+I'll test it a bit and repost.
+
+Thanks,
+
+		Amit
+
 
