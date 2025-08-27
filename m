@@ -1,122 +1,117 @@
-Return-Path: <kvm+bounces-55880-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-55881-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 78028B3836E
-	for <lists+kvm@lfdr.de>; Wed, 27 Aug 2025 15:11:51 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 01D0DB38384
+	for <lists+kvm@lfdr.de>; Wed, 27 Aug 2025 15:14:52 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 97B8D1BA6A56
-	for <lists+kvm@lfdr.de>; Wed, 27 Aug 2025 13:12:10 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 48FA51B6215F
+	for <lists+kvm@lfdr.de>; Wed, 27 Aug 2025 13:15:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3F584352085;
-	Wed, 27 Aug 2025 13:11:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7D369352080;
+	Wed, 27 Aug 2025 13:14:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="KsgBNfjf"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="o2IyALzM"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9EF8934AB17
-	for <kvm@vger.kernel.org>; Wed, 27 Aug 2025 13:11:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 977941A23AF;
+	Wed, 27 Aug 2025 13:14:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756300302; cv=none; b=ct/+7To8VO7kmBnx5VE/rNtsd0VC9G9/S8Yw/qmohX3DiyhTxU1hhuAFNbDDJiFka7+DzYwjA6Hbb0YTxWHOviSMwqeuXs170gac3tdnh2yjK6YqPJ4krc4J8INY7HAQoBVOvE023N5JsP4k88h7RNwayKHCTTSdPxEp+2aYCNo=
+	t=1756300475; cv=none; b=PNoqctxhxp4okXwDj3GYtBDV1OQfuqMGJqby2I1F0tlrZIsBzuyxFktEXJH/fydpgABd1iA1vgWVuhLHyLLOSQB/ZGdckk9JV5R0ABg+D+QnbAp/eRai4VEUWqvfFs1NbIFuebHPhgbxKGJ0Ylsl9J1ptQVrjHL9iLc2tu8kvEs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756300302; c=relaxed/simple;
-	bh=YdlTsQZNNrmq7u3Z5M5rk595Ss//u8ZKePXJNnxhb1o=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=uLNEUO/6nGXV3HpXH5pm5/Pmrr7740jJ0V9bSzAny+hus/E88/Y8zYlp2CQrhosM3AvVpLU4+pslsLBKceE1hp2o4sKT1MlPOUKQQ1gTtPydd0qfB2OTtQwZJXrPfJLgjTQW1cwTTZRf2DzkW6fJVCFofF7NL92zm5Zvis64ab8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=KsgBNfjf; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1756300299;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=YdlTsQZNNrmq7u3Z5M5rk595Ss//u8ZKePXJNnxhb1o=;
-	b=KsgBNfjf/C56wKrrAjdzI5LbfhlMU38iWjWx6KYJORwj0yBnRxCOE0jvg8f+rcn27VTf/A
-	W/svys0LiBziZxYu7G8/kmoOGvjhUq38x6PF6ha8rCyQpTq9Lr727w95QjhmARW0LXR9oo
-	RCTe3og5vBfajyT6VycaACforChRojU=
-Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
- [209.85.221.70]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-266-LB17raQtPz6sX-oLvM75YQ-1; Wed, 27 Aug 2025 09:11:37 -0400
-X-MC-Unique: LB17raQtPz6sX-oLvM75YQ-1
-X-Mimecast-MFC-AGG-ID: LB17raQtPz6sX-oLvM75YQ_1756300297
-Received: by mail-wr1-f70.google.com with SMTP id ffacd0b85a97d-3b9dc5c2ba0so2574516f8f.1
-        for <kvm@vger.kernel.org>; Wed, 27 Aug 2025 06:11:37 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1756300296; x=1756905096;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=YdlTsQZNNrmq7u3Z5M5rk595Ss//u8ZKePXJNnxhb1o=;
-        b=GR0zDEsPy364oU/C545dfWy49BtOzlKWMJyTLyEgW58SGk02ZJ58I3+ftPTEnNHZb5
-         7ROKLjA75OKrGrOlF5EJuubKZaqMfL83wzQsLvV3AWJXgPRXKFrGqwX9hA4Gos/msmLr
-         GO/Pe0KW3Z4nHETgirFDclLEul2d3XuX/eJSKJZjOJ0AB9dooMLGQp7GLQ4qjvKC49By
-         26n+q188D5idX2JPXtiull0CoqSzhyIg8mdp5TTNN8nOYkdOFceZIF0lpbNl3k9yvXkK
-         i03IPHkmG/5sEBnf/2AF3dmh3TPBv/r+Qm9bwT/DcqXQtXr6ViAxGJ5b40bOzWMm8EnM
-         8fYA==
-X-Forwarded-Encrypted: i=1; AJvYcCVZJQ8O7+liELNGgGH+tWkRMZX41vaYDYmYnsEZ243aXQaHK1zRbfFVkjH5SlH+oVUqYV8=@vger.kernel.org
-X-Gm-Message-State: AOJu0YygpzA7kgSS8xLVxIt1I0ZIfoghBQnh1c833nL07UJs6wQcaIqd
-	J3MkvNZCU7uasUl90Wtjhaa2Q2C1wT0JkAays/7mxIfCOR3iof7WI8P6hgpnn9M34RGDLsQ0Sd7
-	qRjvXIDpQYZ80MfaHpq7jtmGMyzaMdZovgKRVNH4uTCy6IhsmzPySQN+ftuxEBkDcnGrCIFp5SB
-	P3+deyYPpuk4z80RGPUVbJgZpvocWx
-X-Gm-Gg: ASbGncsDn4pMZu0wbWaoSjhSs5of8QGQSXtTzT7SGczNZ6Y5oZKml4I3QA60biaZZo6
-	eZMhmQKwhxDiycT0X8wfq1Y+nUKAhsZ4ZE3iKjDTiicIaSyWvxeUIaAE4JnXEUm6+Ra9lrC8PS8
-	QrZT4RDhS6OOrvb96TAUU6Q5vV91pwe2Jph9d5Q3tw5D6RdxuYy4vMs/In35PDPaSdVdEEkDym5
-	UGP/GD5aLLc754eRq2Cl4Iw
-X-Received: by 2002:a05:6000:144f:b0:3c8:6b76:2ee9 with SMTP id ffacd0b85a97d-3c86b7633cbmr9046549f8f.19.1756300296514;
-        Wed, 27 Aug 2025 06:11:36 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IEIu95W78Kd2FcqoAMBmRWc50Pfjv6n3rRZIWnWs3jErMyKSztWJGNEOWQHM3H1SLdXfBJS+ZjUc6qHuPBUxAQ=
-X-Received: by 2002:a05:6000:144f:b0:3c8:6b76:2ee9 with SMTP id
- ffacd0b85a97d-3c86b7633cbmr9046516f8f.19.1756300295999; Wed, 27 Aug 2025
- 06:11:35 -0700 (PDT)
+	s=arc-20240116; t=1756300475; c=relaxed/simple;
+	bh=BHEGK0fjVDQ6cDX+4RlPfEiA5ObgqNeGUDDWhUIpej0=;
+	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=TEHDMa9ec3Jdq39r2gRrZDIe82FedoRLlzSeVSC0rrPhJzGkXeM6hZ8SrZ+jlA3riLT4Mb8VW5xiW+Fzc/wBuoEKb/IedVv3UktadnoZ4f1pdEe2tLAzV8phLzaw0Zp1kJW2OCbFeZ5dEk/ETzWe+y37MJbMZ+4Zvo3uVidnruM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=o2IyALzM; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2B56FC4CEF4;
+	Wed, 27 Aug 2025 13:14:35 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1756300475;
+	bh=BHEGK0fjVDQ6cDX+4RlPfEiA5ObgqNeGUDDWhUIpej0=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=o2IyALzMaZe28pUewT2u98hAlAgAi8OG1UFonYL2PVwNhwLFRPjz4ZgJWEmd+2rPZ
+	 4qwg3KdcpZmXOHV2K4VYd9LiC8VZatPXt0Z4g8aXLv20PP/jnTN1y6jrKIY0t4oF8K
+	 REJ7Uwba+MfFbQQuG7rCO1aC3C4GPuB5Ig5LxaMcY1d0qDFb4+D2BcmjW4tekwzITX
+	 njvcJiDibURZ9YuuffsO94mK1EhpIusfUJWmU5MT3tEA3vwFAHnDv8zFP6BW+H70S/
+	 ZvR9lIgZSHrKyQuGFyj1kcO8f6AuqhatMd9LoZKrYxjaMqTDK0mAowmiKHlXL/Xo45
+	 E1yKzpQrSVEWA==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.98.2)
+	(envelope-from <maz@kernel.org>)
+	id 1urFyy-00000000vKi-3IYO;
+	Wed, 27 Aug 2025 13:14:32 +0000
+Date: Wed, 27 Aug 2025 14:14:31 +0100
+Message-ID: <86ecswewjs.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Paolo Bonzini <pbonzini@redhat.com>
+Cc: Sean Christopherson <seanjc@google.com>,
+	Oliver Upton <oliver.upton@linux.dev>,
+	kvm@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org,
+	kvmarm@lists.linux.dev,
+	linux-kernel@vger.kernel.org,
+	Ira Weiny <ira.weiny@intel.com>,
+	Gavin Shan <gshan@redhat.com>,
+	Shivank Garg <shivankg@amd.com>,
+	Vlastimil Babka <vbabka@suse.cz>,
+	Xiaoyao Li <xiaoyao.li@intel.com>,
+	David Hildenbrand <david@redhat.com>,
+	Fuad Tabba <tabba@google.com>,
+	Ackerley Tng <ackerleytng@google.com>,
+	Tao Chan <chentao@kylinos.cn>,
+	James Houghton <jthoughton@google.com>
+Subject: Re: [PATCH v17 00/24] KVM: Enable mmap() for guest_memfd
+In-Reply-To: <CABgObfb21UEZf4aQVv_-v3uFCp08G3SWhoTbpmSFz7qL0Xm63w@mail.gmail.com>
+References: <20250729225455.670324-1-seanjc@google.com>
+	<87b10d94-dca2-4ecb-a86f-b38c5c90e0cf@redhat.com>
+	<86frdcewue.wl-maz@kernel.org>
+	<CABgObfb21UEZf4aQVv_-v3uFCp08G3SWhoTbpmSFz7qL0Xm63w@mail.gmail.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-References: <20250729225455.670324-1-seanjc@google.com> <87b10d94-dca2-4ecb-a86f-b38c5c90e0cf@redhat.com>
- <86frdcewue.wl-maz@kernel.org>
-In-Reply-To: <86frdcewue.wl-maz@kernel.org>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Date: Wed, 27 Aug 2025 15:11:22 +0200
-X-Gm-Features: Ac12FXyek3cfAXJUDvWryX-P1WU7M6mjVSZlZC6o5IXedOpceLYmHnNxWJaWG74
-Message-ID: <CABgObfb21UEZf4aQVv_-v3uFCp08G3SWhoTbpmSFz7qL0Xm63w@mail.gmail.com>
-Subject: Re: [PATCH v17 00/24] KVM: Enable mmap() for guest_memfd
-To: Marc Zyngier <maz@kernel.org>
-Cc: Sean Christopherson <seanjc@google.com>, Oliver Upton <oliver.upton@linux.dev>, kvm@vger.kernel.org, 
-	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, 
-	linux-kernel@vger.kernel.org, Ira Weiny <ira.weiny@intel.com>, 
-	Gavin Shan <gshan@redhat.com>, Shivank Garg <shivankg@amd.com>, Vlastimil Babka <vbabka@suse.cz>, 
-	Xiaoyao Li <xiaoyao.li@intel.com>, David Hildenbrand <david@redhat.com>, Fuad Tabba <tabba@google.com>, 
-	Ackerley Tng <ackerleytng@google.com>, Tao Chan <chentao@kylinos.cn>, 
-	James Houghton <jthoughton@google.com>
-Content-Type: text/plain; charset="UTF-8"
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: pbonzini@redhat.com, seanjc@google.com, oliver.upton@linux.dev, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, linux-kernel@vger.kernel.org, ira.weiny@intel.com, gshan@redhat.com, shivankg@amd.com, vbabka@suse.cz, xiaoyao.li@intel.com, david@redhat.com, tabba@google.com, ackerleytng@google.com, chentao@kylinos.cn, jthoughton@google.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-Yo can
+On Wed, 27 Aug 2025 14:11:22 +0100,
+Paolo Bonzini <pbonzini@redhat.com> wrote:
+>=20
+> Yo can
+>=20
+> On Wed, Aug 27, 2025 at 3:08=E2=80=AFPM Marc Zyngier <maz@kernel.org> wro=
+te:
+> >
+> > On Wed, 27 Aug 2025 09:43:54 +0100,
+> > Paolo Bonzini <pbonzini@redhat.com> wrote:
+> > > Applied to kvm/next, thanks!
+> >
+> > Can you please create a stable branch for these patches? It is quite
+> > likely that whatever I queue for 6.18 will conflict with that, and I'd
+> > like to be able to resolve the conflicts myself.
+>=20
+> You can just base kvm-arm/next on kvm/next, but if you prefer I pushed
+> guest-memfd-mmap at https://git.kernel.org/pub/scm/virt/kvm/kvm.git/.
 
-On Wed, Aug 27, 2025 at 3:08=E2=80=AFPM Marc Zyngier <maz@kernel.org> wrote=
-:
->
-> On Wed, 27 Aug 2025 09:43:54 +0100,
-> Paolo Bonzini <pbonzini@redhat.com> wrote:
-> > Applied to kvm/next, thanks!
->
-> Can you please create a stable branch for these patches? It is quite
-> likely that whatever I queue for 6.18 will conflict with that, and I'd
-> like to be able to resolve the conflicts myself.
+Pulled, thanks.
 
-You can just base kvm-arm/next on kvm/next, but if you prefer I pushed
-guest-memfd-mmap at https://git.kernel.org/pub/scm/virt/kvm/kvm.git/.
+	M.
 
-Paolo
-
+--=20
+Without deviation from the norm, progress is not possible.
 
