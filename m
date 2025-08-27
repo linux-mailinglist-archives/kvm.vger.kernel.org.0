@@ -1,71 +1,71 @@
-Return-Path: <kvm+bounces-55929-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-55931-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7BE47B38A5C
-	for <lists+kvm@lfdr.de>; Wed, 27 Aug 2025 21:42:01 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2C55EB38A64
+	for <lists+kvm@lfdr.de>; Wed, 27 Aug 2025 21:42:42 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E402D175FDB
-	for <lists+kvm@lfdr.de>; Wed, 27 Aug 2025 19:41:50 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 000033AE4FF
+	for <lists+kvm@lfdr.de>; Wed, 27 Aug 2025 19:42:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C322D2F39AF;
-	Wed, 27 Aug 2025 19:41:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BF6D12FC011;
+	Wed, 27 Aug 2025 19:41:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="sY4w8gJu"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="XSvNYN3N"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pj1-f73.google.com (mail-pj1-f73.google.com [209.85.216.73])
+Received: from mail-pf1-f202.google.com (mail-pf1-f202.google.com [209.85.210.202])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 322DE2F0C49
-	for <kvm@vger.kernel.org>; Wed, 27 Aug 2025 19:41:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.73
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5A9512ECE8C
+	for <kvm@vger.kernel.org>; Wed, 27 Aug 2025 19:41:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756323679; cv=none; b=NkFYAk9TCwsbN/9ODETJbB4AOIm0q05bk/u/lmT+TrHxWnFQIhfYSBYik3asgf4KBYFtoyse7bDdgKMWuse9rn/e4L02loeF5F5vOMt0JW93IFYeWXvTOU0MG66T5r6g4jQl9z49bhmrWrl1Y6J6beEQI8GtudoZwt5PoNeTRjo=
+	t=1756323681; cv=none; b=aYiiyYyAnZSMxsyUaXdDV2/82LoPxiEcVhenExNao/OK5XEqtYCpVlVUs8oOoZWI3+0HF81rW5qJTRopKfXOIQ4i8nZaFjWubtM6N6jxz0Kag0a9K+6Ls+wmV55OO/xf7S0o2gscg1su7dlE39BX5xUuqAf5PfNNU/glKAgvemk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756323679; c=relaxed/simple;
-	bh=lOFYn5tzMu+BIyj/3iv2zb29eZrNyF3mgyqQKezrkec=;
+	s=arc-20240116; t=1756323681; c=relaxed/simple;
+	bh=lTJBUXa731wmAEkf8x8Aq275GNYxHtJHPWm/QJRsZcc=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=hkKmWeFaR8xHWBGdxwWVGjfdP0WborWF9KV1OhuP+KJXmaPRo5Umj/bcXRGs+kE4YT8MbJLpvLdnCmOjTTis1n9bv6NXPil1mZCDFZK6HEF3fXn+coTPzEkGzfOhcnSKNGwVqq09kYYKhQsvOm3zxwkM/gK2x5RE7oHXNK9H+Ck=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=sY4w8gJu; arc=none smtp.client-ip=209.85.216.73
+	 To:Cc:Content-Type; b=jjiJQYKoINz9Qzj377o2DfjEr+MnCiJs1AAQ4DxcgNnC7FbdKyPDDMaBMs93g3OpVTNfkbwzKOYcgyKX2N8jhNF+VUssWGCfq/2Xm6CtO1neCuZUhXWpsUcpZthQPgigKh/o8gC6TjqrMjtTQ97+o9Ri6K8+8TtZfqhOz4zwUy8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=XSvNYN3N; arc=none smtp.client-ip=209.85.210.202
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pj1-f73.google.com with SMTP id 98e67ed59e1d1-3275636daa1so215675a91.0
-        for <kvm@vger.kernel.org>; Wed, 27 Aug 2025 12:41:18 -0700 (PDT)
+Received: by mail-pf1-f202.google.com with SMTP id d2e1a72fcca58-771f28ed113so179158b3a.0
+        for <kvm@vger.kernel.org>; Wed, 27 Aug 2025 12:41:19 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1756323677; x=1756928477; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1756323679; x=1756928479; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:reply-to:from:to:cc:subject:date:message-id:reply-to;
-        bh=BKdkhp8v27Li0GOsmRqKq40Y7Pxs7HR00OYnU2c0jjU=;
-        b=sY4w8gJuo5Y59YmV/4QW4Ysfi/2U5cRw/Tp47qbJ363iDCQL+0V9+M0nQ8bsoFFUs3
-         iV/ZZDLPT+gh1gwQ2aX2WG2J+Fij2Wc92+fBNfjRlc9KiwEM5RiZLk1YKXfmyE26hAHs
-         3hGACwOWDPuUqX2VlNsVorZkl2xEd4sFKDd0H8mSdeLWBdj/E00IrpjKnWorxdHAXlUZ
-         +oarvHpOTBwrL9iqg+AiHwNyvXBM8L/tPyFJbJvnxzpUZU+6HoTW4z9wIUBX873TrejZ
-         1A1yceiJtm3SY7pfM8caoX2FxEn86WjHGnOwsYOAO590cQuDqXWLarDH0x0+jHiiGTmk
-         l+FA==
+        bh=CAjH9n8kkSU88PuzJQYl+lvrDTSiqH/ka8e0rLGYB4Y=;
+        b=XSvNYN3NiHj7sEVZF3XAAW0ZkXOrTD9c+GLnwNP4+LOAp7J1KZDqNfegtCsNb5xY2v
+         ERt8u0/Yet6Au4WQs1H/LiIZLDwYtI5+1dQ6ZzgNT4qFuNqCo9oHX91Tp95Us4HXejMR
+         DhjHr1hVNc6KiUNC5p3GA3tmGgzZv8bQNrGt3LRoc5vzbaEYLxGLfsNIuYYYzT/cNa+2
+         4BeKfoAruzWVEyIcLW8VLpkHp3DXVkRx23v27AKV+FALcvd3bpXrIcSsXqaYRFi/KdNY
+         R+eOMYe+PgYeZI4Pzwl7VQwHRa7SsmukCI2o0qn9ED8j75g4ExuM0JpWo+faw+uwQK12
+         SahA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1756323677; x=1756928477;
+        d=1e100.net; s=20230601; t=1756323679; x=1756928479;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:reply-to:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=BKdkhp8v27Li0GOsmRqKq40Y7Pxs7HR00OYnU2c0jjU=;
-        b=FGVXiWV02SoMNgvsXskffs7g90t3nIIYUWaWuXyWYQ8Dd4FspUg0yXrPqlBACfSOMb
-         djqr12Ojscp5byGHW15HWKtwXYvdn7K3IYIQNNe0Tw+RJ2yS7FJR7QUvjaFe4V3usRFK
-         sCAwazUV/Rx2JqxMLjdSZeLFTD+vpSAqIVIBSRebIkOWxwuQA0mgLGKY+yoigqxK9wsj
-         NS53b33Hnp954SFfVPZR026IcdcTClP2vG/q5vf5Ct7G4/BsNd8ObfVrbU4IPqUykeln
-         VEFoAuWf7MPFCLo2+j9nu8kkAwfX4I7SNcf9ICSdXZcufVit42anwPoKQyz6fbekKve3
-         /J2g==
-X-Gm-Message-State: AOJu0Yy5rxPTtVfpLlJT/ySxETVQVnUXq3TyoGQykDAPA4I1y/pyuisY
-	M5uCZRStykZCYf9fOgvuUn7nOQLD71GQXcVJDelBlz2c2uhnADyYZUgm6n9JAQK2YWss1ouT/t6
-	+YeuuJQ==
-X-Google-Smtp-Source: AGHT+IFkp3cSkHK/LCzu7rsgKn502PeqGnc81s3u1mjxkvPKl0aSkQfYxtfmuXztKttrbNAZ69OCb7JCKaU=
-X-Received: from pjbqd16.prod.google.com ([2002:a17:90b:3cd0:b0:31c:160d:e3be])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:1d4f:b0:324:eb2d:7537
- with SMTP id 98e67ed59e1d1-32515ea1b2dmr27081009a91.20.1756323677599; Wed, 27
- Aug 2025 12:41:17 -0700 (PDT)
+        bh=CAjH9n8kkSU88PuzJQYl+lvrDTSiqH/ka8e0rLGYB4Y=;
+        b=XaN7aiT42GzY3G9wtCNbiqHIS5L267wLHXVFk48Rm4m2BAHfldLVfbfZ8mQm4t52o1
+         /8PqxbuRzFcAc983DYgUjU2KIAE+pWkW94luW427BnHxfN9Pxp6/qB+CQRwiWp4fXeWl
+         AeUic8uKA51WmGlCy6QdxaRIclBE8+3FgQM507UYFE6ZZ6PNGqRVgDWfid1kYdRRVQ3S
+         S282X5Njh1e0RzblT0EK2gtbv9pDFIvFkpA2PvMZSrZFdgwbyv4AzbXEGWn1DIFlkqxW
+         S2tHQsTBDqvRKosWu9YCofRTj1W5fassVJ5RC0/CZ54y8QKemZFnywyJ3nk1ZX3qnare
+         ZJfg==
+X-Gm-Message-State: AOJu0YxuJ4xE9+94WLY6Nk6hgD2GNiXTfAQUjaHQ8hkl/CNN9siRLDOp
+	2gQ8p3V1Xio/DajJZv0nP29BgG1B/nM+14snPdUxUZMOtOb3TPbJbzVBpI2MAfseLxxVwCpISg8
+	rvL6KKA==
+X-Google-Smtp-Source: AGHT+IGn5ya0kUr/fIdsXYaCYO+ay+bA4LFPlBe/3Tzu+o9LmKU3qy0T5mYaH3gAWJMuIZiqZ0SiVacudbw=
+X-Received: from pfbk11.prod.google.com ([2002:a05:6a00:b00b:b0:772:77e:bc4d])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a05:6a00:1399:b0:770:5544:dc0c
+ with SMTP id d2e1a72fcca58-77055544aabmr20236423b3a.32.1756323679372; Wed, 27
+ Aug 2025 12:41:19 -0700 (PDT)
 Reply-To: Sean Christopherson <seanjc@google.com>
-Date: Wed, 27 Aug 2025 12:41:06 -0700
+Date: Wed, 27 Aug 2025 12:41:07 -0700
 In-Reply-To: <20250827194107.4142164-1-seanjc@google.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
@@ -75,8 +75,9 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
 References: <20250827194107.4142164-1-seanjc@google.com>
 X-Mailer: git-send-email 2.51.0.268.g9569e192d0-goog
-Message-ID: <20250827194107.4142164-3-seanjc@google.com>
-Subject: [PATCH v2 2/3] vhost_task: Allow caller to omit handle_sigkill() callback
+Message-ID: <20250827194107.4142164-4-seanjc@google.com>
+Subject: [PATCH v2 3/3] KVM: x86/mmu: Don't register a sigkill callback for NX
+ hugepage recovery tasks
 From: Sean Christopherson <seanjc@google.com>
 To: Sean Christopherson <seanjc@google.com>, Paolo Bonzini <pbonzini@redhat.com>, 
 	"Michael S. Tsirkin" <mst@redhat.com>, Jason Wang <jasowang@redhat.com>
@@ -85,47 +86,41 @@ Cc: kvm@vger.kernel.org, virtualization@lists.linux.dev,
 	Sebastian Andrzej Siewior <bigeasy@linutronix.de>
 Content-Type: text/plain; charset="UTF-8"
 
-Now that vhost_task provides an API to safely wake a task without relying
-on the caller to react to signals, make handle_sigkill() optional and
-WARN if the "unsafe" __vhost_task_wake() is used without hooking sigkill.
-Requiring the user to react to sigkill adds no meaningful value, e.g. it
-didn't help KVM do the right thing with respect to signals, and adding a
-sanity check in __vhost_task_wake() gives developers a hint as to what
-needs to be done in response to sigkill.
+Don't register a sigkill callback with vhost_task when creating NX hugepage
+recovery threads now that said callback is optional.  In addition to
+removing what is effectively dead code, not registering a sigkill "handler"
+also guards against improper use of __vhost_task_wake().
 
 Signed-off-by: Sean Christopherson <seanjc@google.com>
 ---
- kernel/vhost_task.c | 10 +++++++++-
- 1 file changed, 9 insertions(+), 1 deletion(-)
+ arch/x86/kvm/mmu/mmu.c | 7 +------
+ 1 file changed, 1 insertion(+), 6 deletions(-)
 
-diff --git a/kernel/vhost_task.c b/kernel/vhost_task.c
-index bd213d0b6da3..01bf7b0e2c5b 100644
---- a/kernel/vhost_task.c
-+++ b/kernel/vhost_task.c
-@@ -59,7 +59,8 @@ static int vhost_task_fn(void *data)
- 	 */
- 	if (!test_bit(VHOST_TASK_FLAGS_STOP, &vtsk->flags)) {
- 		set_bit(VHOST_TASK_FLAGS_KILLED, &vtsk->flags);
--		vtsk->handle_sigkill(vtsk->data);
-+		if (vtsk->handle_sigkill)
-+			vtsk->handle_sigkill(vtsk->data);
- 	}
- 	mutex_unlock(&vtsk->exit_mutex);
- 	complete(&vtsk->exited);
-@@ -81,6 +82,13 @@ static void vhost_task_wake_up_process(struct vhost_task *vtsk)
-  */
- void __vhost_task_wake(struct vhost_task *vtsk)
+diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
+index 6e838cb6c9e1..ace302137533 100644
+--- a/arch/x86/kvm/mmu/mmu.c
++++ b/arch/x86/kvm/mmu/mmu.c
+@@ -7677,10 +7677,6 @@ static void kvm_recover_nx_huge_pages(struct kvm *kvm)
+ 	srcu_read_unlock(&kvm->srcu, rcu_idx);
+ }
+ 
+-static void kvm_nx_huge_page_recovery_worker_kill(void *data)
+-{
+-}
+-
+ static bool kvm_nx_huge_page_recovery_worker(void *data)
  {
-+	/*
-+	 * Waking the task without taking exit_mutex is safe if and only if the
-+	 * implementation hooks sigkill, as that's the only way the caller can
-+	 * know if the task has exited prematurely due to a signal.
-+	 */
-+	WARN_ON_ONCE(!vtsk->handle_sigkill);
-+
- 	/*
- 	 * Checking VHOST_TASK_FLAGS_KILLED can race with signal delivery, but
- 	 * a race can only result in false negatives and this is just a sanity
+ 	struct kvm *kvm = data;
+@@ -7713,8 +7709,7 @@ static int kvm_mmu_start_lpage_recovery(struct once *once)
+ 	struct vhost_task *nx_thread;
+ 
+ 	kvm->arch.nx_huge_page_last = get_jiffies_64();
+-	nx_thread = vhost_task_create(kvm_nx_huge_page_recovery_worker,
+-				      kvm_nx_huge_page_recovery_worker_kill,
++	nx_thread = vhost_task_create(kvm_nx_huge_page_recovery_worker, NULL,
+ 				      kvm, "kvm-nx-lpage-recovery");
+ 
+ 	if (IS_ERR(nx_thread))
 -- 
 2.51.0.268.g9569e192d0-goog
 
