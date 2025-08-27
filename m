@@ -1,143 +1,416 @@
-Return-Path: <kvm+bounces-55974-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-55973-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id DD922B38E9C
-	for <lists+kvm@lfdr.de>; Thu, 28 Aug 2025 00:43:58 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id C4B6CB38E94
+	for <lists+kvm@lfdr.de>; Thu, 28 Aug 2025 00:43:44 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A63593654C3
-	for <lists+kvm@lfdr.de>; Wed, 27 Aug 2025 22:43:58 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id CAEAA3652FC
+	for <lists+kvm@lfdr.de>; Wed, 27 Aug 2025 22:43:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E04C03112A1;
-	Wed, 27 Aug 2025 22:43:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 16C4E30FC1F;
+	Wed, 27 Aug 2025 22:43:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=zytor.com header.i=@zytor.com header.b="MREP9Mkt"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="vod2eeVa"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail.zytor.com (terminus.zytor.com [198.137.202.136])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pg1-f201.google.com (mail-pg1-f201.google.com [209.85.215.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 733B32BEC4A;
-	Wed, 27 Aug 2025 22:43:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.136
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 276C730F928
+	for <kvm@vger.kernel.org>; Wed, 27 Aug 2025 22:43:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756334613; cv=none; b=hrXxvq/C9fbxFznw8A71fdAga1lVrCs9ZLcaXQ6p3hwgCehlFP1M9mtrs7WDzkjliQh+T1rHYjmpC+hk56CVsWH6TRTLCwbVwS84XNemD8JoybnzD7p/Tr439iblrr4bkRb+/zHrgGTfxkrcQz/3TIkYYuzdzG84MzuJUaF8piU=
+	t=1756334605; cv=none; b=boWzLttd0vYnNToKhSkMp0feJ3hDFLPLyEvC6BkJcmB8dHMTA05t3Dc3bNtfKc4+dJmvHFTAj5iAIWvT5IY45MuYe+N5vJ2xJoXwfV/m1Vvg59EcSoLpk2j5MIEyWrT7sBowyK5BBlbtgWIzH4Xj3oQOZ7afJf4KG/Nfw60IB+w=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756334613; c=relaxed/simple;
-	bh=M5wBJ5H/Lnxt0nRISLvUE9r5Wrj+wr3mKLmfL7JYRsw=;
-	h=Message-ID:Date:MIME-Version:Subject:From:To:Cc:References:
-	 In-Reply-To:Content-Type; b=iYqEIYYI8PYfuShaO5VzZB8ZNcnuffdHJG/iK1l0t/LbcvQgkyxVlOKRnyJbr2jO7nWzcX96Xlp58I0We6TvJmmk9JVFXdTnJFaRgiKxLgzl6TUAmM9F+tCH2ygE6bZlK0jc7ybYFmRLtlP6eScbHN6Gm03H9T0DpKn8X6iiX3M=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=zytor.com; spf=pass smtp.mailfrom=zytor.com; dkim=pass (2048-bit key) header.d=zytor.com header.i=@zytor.com header.b=MREP9Mkt; arc=none smtp.client-ip=198.137.202.136
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=zytor.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=zytor.com
-Received: from [192.168.7.202] ([71.202.166.45])
-	(authenticated bits=0)
-	by mail.zytor.com (8.18.1/8.17.1) with ESMTPSA id 57RMh0x81916010
-	(version=TLSv1.3 cipher=TLS_AES_128_GCM_SHA256 bits=128 verify=NO);
-	Wed, 27 Aug 2025 15:43:01 -0700
-DKIM-Filter: OpenDKIM Filter v2.11.0 mail.zytor.com 57RMh0x81916010
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=zytor.com;
-	s=2025082201; t=1756334582;
-	bh=GlD3nUD4hvTwMTAZekHH9XvHUFOJHjy73HK/6D0khgk=;
-	h=Date:Subject:From:To:Cc:References:In-Reply-To:From;
-	b=MREP9MktjbZSfaJ2jbw6MizbnXzyx0wEHKk7LXZuQKT6t4asZDmO/RizqmXZtqDBa
-	 QvMoAI1/em3pzOzRchmEu9OF3+eQHRz3v/mtUr3yjYQ4919wzBC1/lJLLKAVBq1wGe
-	 DO+b56aJeH54/G7a/AaSp7lpR/uj3JJg/nxxxRC1AU75AkjVhpeQd+CKi2q03sjFK1
-	 HZiBUmFQTVIosZTP2y1+ZlH4oPyRRTrlPCno+HmYMpTLiJT1ugtxWdWhqKxN53H1Eh
-	 w2aNTL9CQksujqdIXXXoFgF2vrthxelUBu+leY9CZ5CjY0F9uDa3nJ7U676N5ZXudR
-	 +wbMZf2Rujlnw==
-Message-ID: <77076b24-c503-40e8-9459-ede808074f0f@zytor.com>
-Date: Wed, 27 Aug 2025 15:43:00 -0700
+	s=arc-20240116; t=1756334605; c=relaxed/simple;
+	bh=UV40lWEU1CK8wkwXXYA9M+vhaPbr7DhrqOxUAeNCRJo=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=lOJs8dDrRgMc9MSICZTgX/B88Y6dxMPNLao/OXWs6DaSxvrTH7b/9ZFXBE1gkVN0SOy3b03jd9+aq9Yf8DWrRnf/9CA9BtX9uMmbbDL3wlsXLdad2X/On6vN4eaKP5i/kxH134cEbzBhd522ocpTbz6ZAEztyz/tusrfKLeEpqE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--ackerleytng.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=vod2eeVa; arc=none smtp.client-ip=209.85.215.201
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--ackerleytng.bounces.google.com
+Received: by mail-pg1-f201.google.com with SMTP id 41be03b00d2f7-b4c32f731e7so232331a12.0
+        for <kvm@vger.kernel.org>; Wed, 27 Aug 2025 15:43:23 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1756334602; x=1756939402; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=LKcxlPw0uQjBkw7eQMnE+gmOL2ekj9P4WG4v5yuEZSw=;
+        b=vod2eeVaG9wM5K3kMJQUXDUIs0qUQmbSpjatH1C0VQtHAZNudlYjdOSs4Mz3L+Wsr0
+         Xf8NkhtoHLdlMbHtLhepBZgxwsIzZCgToO6bYPJlE+M2X75B5pdPdZpqRjNHvlP/Kwju
+         CPEWmXknSGiP7munSagw5dkuKQM+bpqBAiPbx0sIi5aB2cUsdrbunHwqBQSTIDRiKbP+
+         1ftpgfg9xI1258b1WKxVHLiPL9Lf6jZIGIzZnQxvt9qpdQaaV/NwHkaTrjYVcC2DvB/6
+         oUsFg5x9cJv8FQcWAXTmA9bsCLDd5etuqmFhEDkdsS/UbG3V70dTig0MIYladc63PzsY
+         iVEg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1756334602; x=1756939402;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=LKcxlPw0uQjBkw7eQMnE+gmOL2ekj9P4WG4v5yuEZSw=;
+        b=wkkDP8K2rjR9o2qpxgVskDyn7PWMpcVNUOKRMP86EcWc/KkgzyjENy7LLQthusXQRa
+         I1XRboC9mp+GB8BlWAxEqvXATz8Mir14R7RiasV68XVv9S9e8C8ZZUUBfLS3TTYW1UqH
+         HJGdfUtHEeg2nOYNqiLBNnN7jsRPngrCXsdV60nuio9e7RCE4umKFDd8eJfQnq6fH0BV
+         KVIH/mFE55KfbWF2k6leYM+7hcdiSn1l1HgzC/Dnf4XlfUHQf1kpKIqqKmS/4ZAuIOMn
+         JALbnmgnjVKtYYoXHj6gdtx5IJNSwYV/qkr1bMa6rtf8Gqi376LVxmgr/TEg/bEiMtcC
+         KaUQ==
+X-Forwarded-Encrypted: i=1; AJvYcCU7TckFbCjvSdpL3w1cA0k9JFhmjaeKtN5DZawRhXk2swuEQAmn76KlqSQmUg/aL6e5J+k=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzUMpQJXP4ZSvGxawx+6j3RS57iExV6Y3ar4TKFWolMxxfocc7w
+	O3QqRjGQ0scc9D4TbbuHWu99ftsv5Uir13L0+IZT8itR7PYDaqXPB1NVoSwwEe2+7h5i+ainOyY
+	g/eHdj8+7ICQAOyG5tKRjoeRsqw==
+X-Google-Smtp-Source: AGHT+IGNhCki+zRNFnf7AupQOwuzR8TBEtFWXAfIyU7yRpBo61MiAC41fjzXQhOiSXx1TrtlLAFGHZ8M3ImJd0zqNQ==
+X-Received: from pjl11.prod.google.com ([2002:a17:90b:2f8b:b0:325:7fbe:1c64])
+ (user=ackerleytng job=prod-delivery.src-stubby-dispatcher) by
+ 2002:a17:90a:da8c:b0:327:7c8e:8725 with SMTP id 98e67ed59e1d1-3277c8eb5a6mr3670514a91.10.1756334602319;
+ Wed, 27 Aug 2025 15:43:22 -0700 (PDT)
+Date: Wed, 27 Aug 2025 15:43:20 -0700
+In-Reply-To: <20250827175247.83322-7-shivankg@amd.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v6 06/20] KVM: VMX: Set FRED MSR intercepts
-From: Xin Li <xin@zytor.com>
-To: Sean Christopherson <seanjc@google.com>
-Cc: linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        linux-doc@vger.kernel.org, pbonzini@redhat.com, corbet@lwn.net,
-        tglx@linutronix.de, mingo@redhat.com, bp@alien8.de,
-        dave.hansen@linux.intel.com, x86@kernel.org, hpa@zytor.com,
-        luto@kernel.org, peterz@infradead.org, andrew.cooper3@citrix.com,
-        chao.gao@intel.com, hch@infradead.org
-References: <20250821223630.984383-1-xin@zytor.com>
- <20250821223630.984383-7-xin@zytor.com>
- <2dd8c323-7654-4a28-86f1-d743b70d10b1@zytor.com>
- <aK340-6yIE_qujUm@google.com>
- <c45a7c91-e393-4f71-8b22-aef6486aaa9e@zytor.com>
- <aK4yXT9y5YHeEWkb@google.com>
- <5b1c5f80-bbe1-4294-8ede-5e097e8feda1@zytor.com>
-Content-Language: en-US
-Autocrypt: addr=xin@zytor.com; keydata=
- xsDNBGUPz1cBDACS/9yOJGojBFPxFt0OfTWuMl0uSgpwk37uRrFPTTLw4BaxhlFL0bjs6q+0
- 2OfG34R+a0ZCuj5c9vggUMoOLdDyA7yPVAJU0OX6lqpg6z/kyQg3t4jvajG6aCgwSDx5Kzg5
- Rj3AXl8k2wb0jdqRB4RvaOPFiHNGgXCs5Pkux/qr0laeFIpzMKMootGa4kfURgPhRzUaM1vy
- bsMsL8vpJtGUmitrSqe5dVNBH00whLtPFM7IbzKURPUOkRRiusFAsw0a1ztCgoFczq6VfAVu
- raTye0L/VXwZd+aGi401V2tLsAHxxckRi9p3mc0jExPc60joK+aZPy6amwSCy5kAJ/AboYtY
- VmKIGKx1yx8POy6m+1lZ8C0q9b8eJ8kWPAR78PgT37FQWKYS1uAroG2wLdK7FiIEpPhCD+zH
- wlslo2ETbdKjrLIPNehQCOWrT32k8vFNEMLP5G/mmjfNj5sEf3IOKgMTMVl9AFjsINLHcxEQ
- 6T8nGbX/n3msP6A36FDfdSEAEQEAAc0WWGluIExpIDx4aW5Aenl0b3IuY29tPsLBDQQTAQgA
- NxYhBIUq/WFSDTiOvUIqv2u9DlcdrjdRBQJlD89XBQkFo5qAAhsDBAsJCAcFFQgJCgsFFgID
- AQAACgkQa70OVx2uN1HUpgv/cM2fsFCQodLArMTX5nt9yqAWgA5t1srri6EgS8W3F+3Kitge
- tYTBKu6j5BXuXaX3vyfCm+zajDJN77JHuYnpcKKr13VcZi1Swv6Jx1u0II8DOmoDYLb1Q2ZW
- v83W55fOWJ2g72x/UjVJBQ0sVjAngazU3ckc0TeNQlkcpSVGa/qBIHLfZraWtdrNAQT4A1fa
- sWGuJrChBFhtKbYXbUCu9AoYmmbQnsx2EWoJy3h7OjtfFapJbPZql+no5AJ3Mk9eE5oWyLH+
- QWqtOeJM7kKvn/dBudokFSNhDUw06e7EoVPSJyUIMbYtUO7g2+Atu44G/EPP0yV0J4lRO6EA
- wYRXff7+I1jIWEHpj5EFVYO6SmBg7zF2illHEW31JAPtdDLDHYcZDfS41caEKOQIPsdzQkaQ
- oW2hchcjcMPAfyhhRzUpVHLPxLCetP8vrVhTvnaZUo0xaVYb3+wjP+D5j/3+hwblu2agPsaE
- vgVbZ8Fx3TUxUPCAdr/p73DGg57oHjgezsDNBGUPz1gBDAD4Mg7hMFRQqlzotcNSxatlAQNL
- MadLfUTFz8wUUa21LPLrHBkUwm8RujehJrzcVbPYwPXIO0uyL/F///CogMNx7Iwo6by43KOy
- g89wVFhyy237EY76j1lVfLzcMYmjBoTH95fJC/lVb5Whxil6KjSN/R/y3jfG1dPXfwAuZ/4N
- cMoOslWkfZKJeEut5aZTRepKKF54T5r49H9F7OFLyxrC/uI9UDttWqMxcWyCkHh0v1Di8176
- jjYRNTrGEfYfGxSp+3jYL3PoNceIMkqM9haXjjGl0W1B4BidK1LVYBNov0rTEzyr0a1riUrp
- Qk+6z/LHxCM9lFFXnqH7KWeToTOPQebD2B/Ah5CZlft41i8L6LOF/LCuDBuYlu/fI2nuCc8d
- m4wwtkou1Y/kIwbEsE/6RQwRXUZhzO6llfoN96Fczr/RwvPIK5SVMixqWq4QGFAyK0m/1ap4
- bhIRrdCLVQcgU4glo17vqfEaRcTW5SgX+pGs4KIPPBE5J/ABD6pBnUUAEQEAAcLA/AQYAQgA
- JhYhBIUq/WFSDTiOvUIqv2u9DlcdrjdRBQJlD89ZBQkFo5qAAhsMAAoJEGu9DlcdrjdR4C0L
- /RcjolEjoZW8VsyxWtXazQPnaRvzZ4vhmGOsCPr2BPtMlSwDzTlri8BBG1/3t/DNK4JLuwEj
- OAIE3fkkm+UG4Kjud6aNeraDI52DRVCSx6xff3bjmJsJJMb12mWglN6LjdF6K+PE+OTJUh2F
- dOhslN5C2kgl0dvUuevwMgQF3IljLmi/6APKYJHjkJpu1E6luZec/lRbetHuNFtbh3xgFIJx
- 2RpgVDP4xB3f8r0I+y6ua+p7fgOjDLyoFjubRGed0Be45JJQEn7A3CSb6Xu7NYobnxfkwAGZ
- Q81a2XtvNS7Aj6NWVoOQB5KbM4yosO5+Me1V1SkX2jlnn26JPEvbV3KRFcwV5RnDxm4OQTSk
- PYbAkjBbm+tuJ/Sm+5Yp5T/BnKz21FoCS8uvTiziHj2H7Cuekn6F8EYhegONm+RVg3vikOpn
- gao85i4HwQTK9/D1wgJIQkdwWXVMZ6q/OALaBp82vQ2U9sjTyFXgDjglgh00VRAHP7u1Rcu4
- l75w1xInsg==
-In-Reply-To: <5b1c5f80-bbe1-4294-8ede-5e097e8feda1@zytor.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+Mime-Version: 1.0
+References: <20250827175247.83322-2-shivankg@amd.com> <20250827175247.83322-7-shivankg@amd.com>
+Message-ID: <diqztt1sbd2v.fsf@google.com>
+Subject: Re: [PATCH kvm-next V11 4/7] KVM: guest_memfd: Use guest mem inodes
+ instead of anonymous inodes
+From: Ackerley Tng <ackerleytng@google.com>
+To: Shivank Garg <shivankg@amd.com>, willy@infradead.org, akpm@linux-foundation.org, 
+	david@redhat.com, pbonzini@redhat.com, shuah@kernel.org, seanjc@google.com, 
+	vbabka@suse.cz
+Cc: brauner@kernel.org, viro@zeniv.linux.org.uk, dsterba@suse.com, 
+	xiang@kernel.org, chao@kernel.org, jaegeuk@kernel.org, clm@fb.com, 
+	josef@toxicpanda.com, kent.overstreet@linux.dev, zbestahu@gmail.com, 
+	jefflexu@linux.alibaba.com, dhavale@google.com, lihongbo22@huawei.com, 
+	lorenzo.stoakes@oracle.com, Liam.Howlett@oracle.com, rppt@kernel.org, 
+	surenb@google.com, mhocko@suse.com, ziy@nvidia.com, matthew.brost@intel.com, 
+	joshua.hahnjy@gmail.com, rakie.kim@sk.com, byungchul@sk.com, 
+	gourry@gourry.net, ying.huang@linux.alibaba.com, apopple@nvidia.com, 
+	tabba@google.com, shivankg@amd.com, paul@paul-moore.com, jmorris@namei.org, 
+	serge@hallyn.com, pvorel@suse.cz, bfoster@redhat.com, vannapurve@google.com, 
+	chao.gao@intel.com, bharata@amd.com, nikunj@amd.com, michael.day@amd.com, 
+	shdhiman@amd.com, yan.y.zhao@intel.com, Neeraj.Upadhyay@amd.com, 
+	thomas.lendacky@amd.com, michael.roth@amd.com, aik@amd.com, jgg@nvidia.com, 
+	kalyazin@amazon.com, peterx@redhat.com, jack@suse.cz, hch@infradead.org, 
+	cgzones@googlemail.com, ira.weiny@intel.com, rientjes@google.com, 
+	roypat@amazon.co.uk, chao.p.peng@intel.com, amit@infradead.org, 
+	ddutile@redhat.com, dan.j.williams@intel.com, ashish.kalra@amd.com, 
+	gshan@redhat.com, jgowans@amazon.com, pankaj.gupta@amd.com, papaluri@amd.com, 
+	yuzhao@google.com, suzuki.poulose@arm.com, quic_eberman@quicinc.com, 
+	linux-bcachefs@vger.kernel.org, linux-btrfs@vger.kernel.org, 
+	linux-erofs@lists.ozlabs.org, linux-f2fs-devel@lists.sourceforge.net, 
+	linux-fsdevel@vger.kernel.org, linux-mm@kvack.org, 
+	linux-kernel@vger.kernel.org, linux-security-module@vger.kernel.org, 
+	kvm@vger.kernel.org, linux-kselftest@vger.kernel.org, 
+	linux-coco@lists.linux.dev
+Content-Type: text/plain; charset="UTF-8"
 
-On 8/27/2025 3:24 PM, Xin Li wrote:
-> On 8/26/2025 3:17 PM, Sean Christopherson wrote:
->>> +        if (!kvm_cpu_cap_has(X86_FEATURE_SHSTK))
->>> +            wrmsrns(MSR_IA32_FRED_SSP0, vmx->msr_guest_fred_ssp0);
->> FWIW, if we can't get an SDM change, don't bother with RDMSR/WRMSRNS, just
->> configure KVM to intercept accesses.  Then in kvm_set_msr_common(), pivot on
->> X86_FEATURE_SHSTK, e.g.
-> 
-> 
-> Intercepting is a solid approach: it ensures the guest value is fully
-> virtual and does not affect the hardware FRED SSP0 MSR.  Of course the code
-> is also simplified.
-> 
-> 
->>
->>     case MSR_IA32_U_CET:
->>     case MSR_IA32_PL0_SSP ... MSR_IA32_PL3_SSP:
->>         if (!kvm_cpu_cap_has(X86_FEATURE_SHSTK)) {
->>             WARN_ON_ONCE(msr != MSR_IA32_FRED_SSP0);
->>             vcpu->arch.fred_rsp0_fallback = data;
+Shivank Garg <shivankg@amd.com> writes:
 
-Putting fred_rsp0_fallback in struct kvm_vcpu_arch reminds me one thing:
+> 
+> [...snip...]
+> 
 
-We know AMD will do FRED and follow the FRED spec for bare metal, but
-regarding virtualization of FRED, I have no idea how it will be done on
-AMD, so I keep the KVM FRED code in VMX files, e.g., msr_guest_fred_rsp0 is
-defined in struct vcpu_vmx, and saved/restored in vmx.c.
+I meant to send this to you before this version went out but you were
+too quick!
 
-It is a future task to make common KVM FRED code for Intel and AMD.
+Here's a new version, Fuad and I reviewed this again internally. The
+changes are:
+
++ Sort linux/pseudo_fs.h after linux/pagemap.h (alphabetical)
++ Don't set MNT_NOEXEC on the mount, since SB_I_NOEXEC was already set
+  on the superblock
++ Rename kvm_gmem_inode_make_secure_inode() to kvm_gmem_inode_create()
+    + Emphasizes that there is a creation in this function
+    + Remove "secure" from the function name to remove confusion that
+      there may be a "non-secure" version
++ In kvm_gmem_inode_create_getfile()'s error path, return ERR_PTR(err)
+  directly instead of having a goto
+
+
+From ada9814b216eac129ed44dffd3acf76fce2cc08a Mon Sep 17 00:00:00 2001
+From: Ackerley Tng <ackerleytng@google.com>
+Date: Sun, 13 Jul 2025 17:43:35 +0000
+Subject: [PATCH] KVM: guest_memfd: Use guest mem inodes instead of anonymous
+ inodes
+
+guest_memfd's inode represents memory the guest_memfd is
+providing. guest_memfd's file represents a struct kvm's view of that
+memory.
+
+Using a custom inode allows customization of the inode teardown
+process via callbacks. For example, ->evict_inode() allows
+customization of the truncation process on file close, and
+->destroy_inode() and ->free_inode() allow customization of the inode
+freeing process.
+
+Customizing the truncation process allows flexibility in management of
+guest_memfd memory and customization of the inode freeing process
+allows proper cleanup of memory metadata stored on the inode.
+
+Memory metadata is more appropriately stored on the inode (as opposed
+to the file), since the metadata is for the memory and is not unique
+to a specific binding and struct kvm.
+
+Co-developed-by: Fuad Tabba <tabba@google.com>
+Signed-off-by: Fuad Tabba <tabba@google.com>
+Signed-off-by: Shivank Garg <shivankg@amd.com>
+Signed-off-by: Ackerley Tng <ackerleytng@google.com>
+---
+ include/uapi/linux/magic.h |   1 +
+ virt/kvm/guest_memfd.c     | 126 ++++++++++++++++++++++++++++++-------
+ virt/kvm/kvm_main.c        |   7 ++-
+ virt/kvm/kvm_mm.h          |   9 +--
+ 4 files changed, 116 insertions(+), 27 deletions(-)
+
+diff --git a/include/uapi/linux/magic.h b/include/uapi/linux/magic.h
+index bb575f3ab45e5..638ca21b7a909 100644
+--- a/include/uapi/linux/magic.h
++++ b/include/uapi/linux/magic.h
+@@ -103,5 +103,6 @@
+ #define DEVMEM_MAGIC		0x454d444d	/* "DMEM" */
+ #define SECRETMEM_MAGIC		0x5345434d	/* "SECM" */
+ #define PID_FS_MAGIC		0x50494446	/* "PIDF" */
++#define GUEST_MEMFD_MAGIC	0x474d454d	/* "GMEM" */
+
+ #endif /* __LINUX_MAGIC_H__ */
+diff --git a/virt/kvm/guest_memfd.c b/virt/kvm/guest_memfd.c
+index 08a6bc7d25b60..234e51fd69ff6 100644
+--- a/virt/kvm/guest_memfd.c
++++ b/virt/kvm/guest_memfd.c
+@@ -1,12 +1,16 @@
+ // SPDX-License-Identifier: GPL-2.0
++#include <linux/anon_inodes.h>
+ #include <linux/backing-dev.h>
+ #include <linux/falloc.h>
++#include <linux/fs.h>
+ #include <linux/kvm_host.h>
+ #include <linux/pagemap.h>
+-#include <linux/anon_inodes.h>
++#include <linux/pseudo_fs.h>
+
+ #include "kvm_mm.h"
+
++static struct vfsmount *kvm_gmem_mnt;
++
+ struct kvm_gmem {
+ 	struct kvm *kvm;
+ 	struct xarray bindings;
+@@ -385,9 +389,44 @@ static struct file_operations kvm_gmem_fops = {
+ 	.fallocate	= kvm_gmem_fallocate,
+ };
+
+-void kvm_gmem_init(struct module *module)
++static int kvm_gmem_init_fs_context(struct fs_context *fc)
++{
++	if (!init_pseudo(fc, GUEST_MEMFD_MAGIC))
++		return -ENOMEM;
++
++	fc->s_iflags |= SB_I_NOEXEC;
++	fc->s_iflags |= SB_I_NODEV;
++
++	return 0;
++}
++
++static struct file_system_type kvm_gmem_fs = {
++	.name		 = "guest_memfd",
++	.init_fs_context = kvm_gmem_init_fs_context,
++	.kill_sb	 = kill_anon_super,
++};
++
++static int kvm_gmem_init_mount(void)
++{
++	kvm_gmem_mnt = kern_mount(&kvm_gmem_fs);
++
++	if (IS_ERR(kvm_gmem_mnt))
++		return PTR_ERR(kvm_gmem_mnt);
++
++	return 0;
++}
++
++int kvm_gmem_init(struct module *module)
+ {
+ 	kvm_gmem_fops.owner = module;
++
++	return kvm_gmem_init_mount();
++}
++
++void kvm_gmem_exit(void)
++{
++	kern_unmount(kvm_gmem_mnt);
++	kvm_gmem_mnt = NULL;
+ }
+
+ static int kvm_gmem_migrate_folio(struct address_space *mapping,
+@@ -463,11 +502,70 @@ bool __weak kvm_arch_supports_gmem_mmap(struct kvm *kvm)
+ 	return true;
+ }
+
++static struct inode *kvm_gmem_inode_create(const char *name, loff_t size,
++					   u64 flags)
++{
++	struct inode *inode;
++
++	inode = anon_inode_make_secure_inode(kvm_gmem_mnt->mnt_sb, name, NULL);
++	if (IS_ERR(inode))
++		return inode;
++
++	inode->i_private = (void *)(unsigned long)flags;
++	inode->i_op = &kvm_gmem_iops;
++	inode->i_mapping->a_ops = &kvm_gmem_aops;
++	inode->i_mode |= S_IFREG;
++	inode->i_size = size;
++	mapping_set_gfp_mask(inode->i_mapping, GFP_HIGHUSER);
++	mapping_set_inaccessible(inode->i_mapping);
++	/* Unmovable mappings are supposed to be marked unevictable as well. */
++	WARN_ON_ONCE(!mapping_unevictable(inode->i_mapping));
++
++	return inode;
++}
++
++static struct file *kvm_gmem_inode_create_getfile(void *priv, loff_t size,
++						  u64 flags)
++{
++	static const char *name = "[kvm-gmem]";
++	struct inode *inode;
++	struct file *file;
++	int err;
++
++	err = -ENOENT;
++	/* __fput() will take care of fops_put(). */
++	if (!fops_get(&kvm_gmem_fops))
++		goto err;
++
++	inode = kvm_gmem_inode_create(name, size, flags);
++	if (IS_ERR(inode)) {
++		err = PTR_ERR(inode);
++		goto err_fops_put;
++	}
++
++	file = alloc_file_pseudo(inode, kvm_gmem_mnt, name, O_RDWR,
++				 &kvm_gmem_fops);
++	if (IS_ERR(file)) {
++		err = PTR_ERR(file);
++		goto err_put_inode;
++	}
++
++	file->f_flags |= O_LARGEFILE;
++	file->private_data = priv;
++
++	return file;
++
++err_put_inode:
++	iput(inode);
++err_fops_put:
++	fops_put(&kvm_gmem_fops);
++err:
++	return ERR_PTR(err);
++}
++
+ static int __kvm_gmem_create(struct kvm *kvm, loff_t size, u64 flags)
+ {
+-	const char *anon_name = "[kvm-gmem]";
+ 	struct kvm_gmem *gmem;
+-	struct inode *inode;
+ 	struct file *file;
+ 	int fd, err;
+
+@@ -481,32 +579,16 @@ static int __kvm_gmem_create(struct kvm *kvm, loff_t size, u64 flags)
+ 		goto err_fd;
+ 	}
+
+-	file = anon_inode_create_getfile(anon_name, &kvm_gmem_fops, gmem,
+-					 O_RDWR, NULL);
++	file = kvm_gmem_inode_create_getfile(gmem, size, flags);
+ 	if (IS_ERR(file)) {
+ 		err = PTR_ERR(file);
+ 		goto err_gmem;
+ 	}
+
+-	file->f_flags |= O_LARGEFILE;
+-
+-	inode = file->f_inode;
+-	WARN_ON(file->f_mapping != inode->i_mapping);
+-
+-	inode->i_private = (void *)(unsigned long)flags;
+-	inode->i_op = &kvm_gmem_iops;
+-	inode->i_mapping->a_ops = &kvm_gmem_aops;
+-	inode->i_mode |= S_IFREG;
+-	inode->i_size = size;
+-	mapping_set_gfp_mask(inode->i_mapping, GFP_HIGHUSER);
+-	mapping_set_inaccessible(inode->i_mapping);
+-	/* Unmovable mappings are supposed to be marked unevictable as well. */
+-	WARN_ON_ONCE(!mapping_unevictable(inode->i_mapping));
+-
+ 	kvm_get_kvm(kvm);
+ 	gmem->kvm = kvm;
+ 	xa_init(&gmem->bindings);
+-	list_add(&gmem->entry, &inode->i_mapping->i_private_list);
++	list_add(&gmem->entry, &file_inode(file)->i_mapping->i_private_list);
+
+ 	fd_install(fd, file);
+ 	return fd;
+diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
+index 18f29ef935437..301d48d6e00d0 100644
+--- a/virt/kvm/kvm_main.c
++++ b/virt/kvm/kvm_main.c
+@@ -6489,7 +6489,9 @@ int kvm_init(unsigned vcpu_size, unsigned vcpu_align, struct module *module)
+ 	if (WARN_ON_ONCE(r))
+ 		goto err_vfio;
+
+-	kvm_gmem_init(module);
++	r = kvm_gmem_init(module);
++	if (r)
++		goto err_gmem;
+
+ 	r = kvm_init_virtualization();
+ 	if (r)
+@@ -6510,6 +6512,8 @@ int kvm_init(unsigned vcpu_size, unsigned vcpu_align, struct module *module)
+ err_register:
+ 	kvm_uninit_virtualization();
+ err_virt:
++	kvm_gmem_exit();
++err_gmem:
+ 	kvm_vfio_ops_exit();
+ err_vfio:
+ 	kvm_async_pf_deinit();
+@@ -6541,6 +6545,7 @@ void kvm_exit(void)
+ 	for_each_possible_cpu(cpu)
+ 		free_cpumask_var(per_cpu(cpu_kick_mask, cpu));
+ 	kmem_cache_destroy(kvm_vcpu_cache);
++	kvm_gmem_exit();
+ 	kvm_vfio_ops_exit();
+ 	kvm_async_pf_deinit();
+ 	kvm_irqfd_exit();
+diff --git a/virt/kvm/kvm_mm.h b/virt/kvm/kvm_mm.h
+index 31defb08ccbab..9fcc5d5b7f8d0 100644
+--- a/virt/kvm/kvm_mm.h
++++ b/virt/kvm/kvm_mm.h
+@@ -68,17 +68,18 @@ static inline void gfn_to_pfn_cache_invalidate_start(struct kvm *kvm,
+ #endif /* HAVE_KVM_PFNCACHE */
+
+ #ifdef CONFIG_KVM_GUEST_MEMFD
+-void kvm_gmem_init(struct module *module);
++int kvm_gmem_init(struct module *module);
++void kvm_gmem_exit(void);
+ int kvm_gmem_create(struct kvm *kvm, struct kvm_create_guest_memfd *args);
+ int kvm_gmem_bind(struct kvm *kvm, struct kvm_memory_slot *slot,
+ 		  unsigned int fd, loff_t offset);
+ void kvm_gmem_unbind(struct kvm_memory_slot *slot);
+ #else
+-static inline void kvm_gmem_init(struct module *module)
++static inline int kvm_gmem_init(struct module *module)
+ {
+-
++	return 0;
+ }
+-
++static inline void kvm_gmem_exit(void) {};
+ static inline int kvm_gmem_bind(struct kvm *kvm,
+ 					 struct kvm_memory_slot *slot,
+ 					 unsigned int fd, loff_t offset)
+--
+2.51.0.268.g9569e192d0-goog
 
