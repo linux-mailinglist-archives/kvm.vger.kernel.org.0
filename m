@@ -1,123 +1,159 @@
-Return-Path: <kvm+bounces-55855-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-55856-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id E4D39B37DDB
-	for <lists+kvm@lfdr.de>; Wed, 27 Aug 2025 10:30:20 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 07E85B37DE2
+	for <lists+kvm@lfdr.de>; Wed, 27 Aug 2025 10:30:42 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 05800460DB6
-	for <lists+kvm@lfdr.de>; Wed, 27 Aug 2025 08:30:20 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id EDC26683E58
+	for <lists+kvm@lfdr.de>; Wed, 27 Aug 2025 08:30:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E66AD280A3B;
-	Wed, 27 Aug 2025 08:30:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (4096-bit key) header.d=alien8.de header.i=@alien8.de header.b="Evxx4xCW"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8D11C33CE9F;
+	Wed, 27 Aug 2025 08:30:27 +0000 (UTC)
 X-Original-To: kvm@vger.kernel.org
-Received: from mail.alien8.de (mail.alien8.de [65.109.113.108])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9E0732F5488;
-	Wed, 27 Aug 2025 08:30:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=65.109.113.108
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 512DD2F28F4;
+	Wed, 27 Aug 2025 08:30:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756283411; cv=none; b=juv9uAPp058yiZMLbathNpKDo54/gzRkOk9AZVn9Q7yz3O6eTWdhdkGk1B8+c5T74TuChkmbXtJ50lTcq1m6TcSLdlUN9DacYSkvdBQCggAaC5mRmZrH3HbR/YS2Hc8xcla1xWHs81xeiOfyJMdFJrC2FGr0PsPLIPkfUv3oapg=
+	t=1756283427; cv=none; b=VuZiU6GnS/sTUmv3jhnH3O6thdzMVy4uYOJhnVRwk/71MITCGY0zX58zYX6kW64WoT2Fn/vA3T9/vKxZrSE/nU0LcNpnWE7sdFi/jSqTgXZv8NXSo+xR4CjYaedV7QheOABYlnd6zyEFY+r0bUzfzBUnogfJTBwjVqQRrJEhQek=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756283411; c=relaxed/simple;
-	bh=ug3wSCgAifIcIx9UtNYJHfScn3iJIoThJ91pQxKRDOM=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=RHJKSoS7PienCUi+mbwAVf9fmh7M9Sx9av9lxTGEnCzGjSh6P07A/vPAmk6IDQH2QhJU23CZ0vJMeX4dj2Abul4Q5InN4DqbsI17R0PWtnELYMHZmCmhJU8TE0XrApPtnOZhNfYKqmhvBSFWAn7WDn+EZ5EMUzzwcniLpJ3sE4g=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=alien8.de; spf=pass smtp.mailfrom=alien8.de; dkim=pass (4096-bit key) header.d=alien8.de header.i=@alien8.de header.b=Evxx4xCW; arc=none smtp.client-ip=65.109.113.108
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=alien8.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=alien8.de
-Received: from localhost (localhost.localdomain [127.0.0.1])
-	by mail.alien8.de (SuperMail on ZX Spectrum 128k) with ESMTP id C073D40E00DA;
-	Wed, 27 Aug 2025 08:30:05 +0000 (UTC)
-X-Virus-Scanned: Debian amavisd-new at mail.alien8.de
-Authentication-Results: mail.alien8.de (amavisd-new); dkim=pass (4096-bit key)
-	header.d=alien8.de
-Received: from mail.alien8.de ([127.0.0.1])
-	by localhost (mail.alien8.de [127.0.0.1]) (amavisd-new, port 10026)
-	with ESMTP id Uu35_fYwftNZ; Wed, 27 Aug 2025 08:30:02 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=alien8;
-	t=1756283402; bh=sbwN2qrGT6GexdljPB+Nyh9XLHsVDJbgKYHS+rIwOVM=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=Evxx4xCWEHmpRd2SkA7cyYaxuQ49hedSonLXtSPCmoaLQIzByX6Z8t3ThisQwEDAI
-	 xKXvd565rW3pVAzT0JhPoIUK1dbPEybqdLobFlVkEZ5LT43vjGWGUoxL7AC1Ug+6l2
-	 3rMuR4sTVnplGJgzi6yE+0RnS7kmkedOEQDK54+exvgRr4Qfj3hgc2IFpSRXc4V5Ja
-	 jPcakOU9mgJ1lVvnhVjEo2PkwMKv2n4N4ApDN+3WNx21du7xGbJP7gET+7ypd4gTHT
-	 0a/5D4Ac9V6VqDpTqvNuiw2zfF7uNE0TKgf9UX58CNJQycWPrL0Ok7MxnNJzINCMgy
-	 a6yHhiIdvNFgfPo87XDcUiW3PtVGI/PBmL/thZxUd2zDRiVSE46O3Vfo4jHgG659XD
-	 Ewtm6f4Rm1QuJI5fb91yTgOWfDCRlGv6htqdCNKZZD7k+Nt+PkGlhewGmMh2tNE8Q4
-	 f90u5zOC81NOkKrENfR9xIymPrEXeaY/LkNoygSNtF/0pNDmbQb3hWZAQJ4LUO7QxN
-	 IBPWwOHvZv2Bw9JQ+GXT6MD6jUc5BJbWqa9TpUMvJPlzUbbrutsJ0+/81EvUoQax+c
-	 bvdCjVfzXwLscWkGipMi7cwd4rE+Vv2dR8gzV4fkMJVZBDb4XIiDIqly4h4vcpL10m
-	 py87qX5tsnsxxe0co6O6uUA4=
-Received: from zn.tnic (pd953092e.dip0.t-ipconnect.de [217.83.9.46])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange ECDHE (P-256) server-signature ECDSA (P-256) server-digest SHA256)
-	(No client certificate requested)
-	by mail.alien8.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id 152BF40E0185;
-	Wed, 27 Aug 2025 08:29:37 +0000 (UTC)
-Date: Wed, 27 Aug 2025 10:29:32 +0200
-From: Borislav Petkov <bp@alien8.de>
-To: Adrian Hunter <adrian.hunter@intel.com>
-Cc: Dave Hansen <dave.hansen@linux.intel.com>,
-	Tony Luck <tony.luck@intel.com>, pbonzini@redhat.com,
-	seanjc@google.com, vannapurve@google.com,
-	Thomas Gleixner <tglx@linutronix.de>,
-	Ingo Molnar <mingo@redhat.com>, x86@kernel.org,
-	H Peter Anvin <hpa@zytor.com>, linux-edac@vger.kernel.org,
-	linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-	rick.p.edgecombe@intel.com, kai.huang@intel.com,
-	reinette.chatre@intel.com, xiaoyao.li@intel.com,
-	tony.lindgren@linux.intel.com, binbin.wu@linux.intel.com,
-	ira.weiny@intel.com, isaku.yamahata@intel.com,
-	Fan Du <fan.du@intel.com>, Yazen Ghannam <yazen.ghannam@amd.com>,
-	yan.y.zhao@intel.com, chao.gao@intel.com
-Subject: Re: [PATCH RESEND V2 1/2] x86/mce: Fix missing address mask in
- recovery for errors in TDX/SEAM non-root mode
-Message-ID: <20250827082932.GBaK7B7CdT1gd68C8T@fat_crate.local>
-References: <20250819162436.137625-1-adrian.hunter@intel.com>
- <20250819162436.137625-2-adrian.hunter@intel.com>
- <20250819213247.GJaKTtf1er-Ced_mzP@fat_crate.local>
- <7c5ae62f-c4c7-41d8-af00-7a517e3ed309@intel.com>
+	s=arc-20240116; t=1756283427; c=relaxed/simple;
+	bh=Hk1XVBq87Wloo/8yCfniyVuXNqm9lv0mufttpAK51xA=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=dpuAkaZXloYtH7G9BwO2wzd6Cpcwf4zwD5GmddNF03SQmLevsER5LO2jxINpVLqqeyM2BApwTT0aWfJ+3GgbFF1yyma7t0wo+iNd4bwILue6BkFWXPoTP0jMGUi5pUfGn36RYW7u27PQA/uMIvq/SwpSsuAYLRlQgpw+pIuRtgI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 228811691;
+	Wed, 27 Aug 2025 01:30:16 -0700 (PDT)
+Received: from [10.1.196.46] (e134344.arm.com [10.1.196.46])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 31FA33F694;
+	Wed, 27 Aug 2025 01:30:15 -0700 (PDT)
+Message-ID: <70f4c2ce-1dbd-4596-af78-bca1cdbbb581@arm.com>
+Date: Wed, 27 Aug 2025 09:30:13 +0100
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <7c5ae62f-c4c7-41d8-af00-7a517e3ed309@intel.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v2 01/18] arm64: topology: Use __free(put_cpufreq_policy)
+ for policy reference
+To: Zihuan Zhang <zhangzihuan@kylinos.cn>,
+ "Rafael J . wysocki" <rafael@kernel.org>,
+ Viresh Kumar <viresh.kumar@linaro.org>,
+ Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>,
+ Sean Christopherson <seanjc@google.com>, Paolo Bonzini
+ <pbonzini@redhat.com>, Thomas Gleixner <tglx@linutronix.de>,
+ Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+ Dave Hansen <dave.hansen@linux.intel.com>, Markus Mayer
+ <mmayer@broadcom.com>, Florian Fainelli <florian.fainelli@broadcom.com>,
+ Srinivas Pandruvada <srinivas.pandruvada@linux.intel.com>,
+ Madhavan Srinivasan <maddy@linux.ibm.com>,
+ Michael Ellerman <mpe@ellerman.id.au>, Krzysztof Kozlowski
+ <krzk@kernel.org>, Alim Akhtar <alim.akhtar@samsung.com>,
+ Thierry Reding <thierry.reding@gmail.com>,
+ Jonathan Hunter <jonathanh@nvidia.com>,
+ MyungJoo Ham <myungjoo.ham@samsung.com>,
+ Kyungmin Park <kyungmin.park@samsung.com>,
+ Chanwoo Choi <cw00.choi@samsung.com>,
+ Jani Nikula <jani.nikula@linux.intel.com>,
+ Joonas Lahtinen <joonas.lahtinen@linux.intel.com>,
+ Rodrigo Vivi <rodrigo.vivi@intel.com>, Tvrtko Ursulin
+ <tursulin@ursulin.net>, David Airlie <airlied@gmail.com>,
+ Simona Vetter <simona@ffwll.ch>, Daniel Lezcano <daniel.lezcano@kernel.org>,
+ Sascha Hauer <s.hauer@pengutronix.de>, Shawn Guo <shawnguo@kernel.org>,
+ Eduardo Valentin <edubezval@gmail.com>, Keerthy <j-keerthy@ti.com>,
+ Matthias Brugger <matthias.bgg@gmail.com>,
+ AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>
+Cc: zhenglifeng <zhenglifeng1@huawei.com>, "H . Peter Anvin" <hpa@zytor.com>,
+ Zhang Rui <rui.zhang@intel.com>, Len Brown <lenb@kernel.org>,
+ Nicholas Piggin <npiggin@gmail.com>,
+ Christophe Leroy <christophe.leroy@csgroup.eu>,
+ Lukasz Luba <lukasz.luba@arm.com>,
+ Pengutronix Kernel Team <kernel@pengutronix.de>,
+ Beata Michalska <beata.michalska@arm.com>, Fabio Estevam
+ <festevam@gmail.com>, Pavel Machek <pavel@kernel.org>,
+ Sumit Gupta <sumitg@nvidia.com>,
+ Prasanna Kumar T S M <ptsm@linux.microsoft.com>,
+ Sudeep Holla <sudeep.holla@arm.com>, Yicong Yang <yangyicong@hisilicon.com>,
+ linux-pm@vger.kernel.org, x86@kernel.org, kvm@vger.kernel.org,
+ linux-acpi@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
+ linux-samsung-soc@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+ linux-tegra@vger.kernel.org, intel-gfx@lists.freedesktop.org,
+ dri-devel@lists.freedesktop.org, imx@lists.linux.dev,
+ linux-omap@vger.kernel.org, linux-mediatek@lists.infradead.org,
+ linux-kernel@vger.kernel.org
+References: <20250827023202.10310-1-zhangzihuan@kylinos.cn>
+ <20250827023202.10310-2-zhangzihuan@kylinos.cn>
+From: Ben Horgan <ben.horgan@arm.com>
+Content-Language: en-US
+In-Reply-To: <20250827023202.10310-2-zhangzihuan@kylinos.cn>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-On Wed, Aug 27, 2025 at 11:22:07AM +0300, Adrian Hunter wrote:
-> +#ifdef CONFIG_X86_MCE_INTEL
-> +static __always_inline void tdx_extract_err_addr(struct mce *m)
-> +{
-> +	if (boot_cpu_has(X86_FEATURE_TDX_HOST_PLATFORM))
-> +		m->addr &= GENMASK_ULL(boot_cpu_data.x86_phys_bits - 1, 0);
+Hi Zihuan,
 
-Right, you can stick that thing straight into mce_read_aux() since it is
-simple enough and drop the ifdeffery and use cpu_feature_enabled():
+On 8/27/25 03:31, Zihuan Zhang wrote:
+> Replace the manual cpufreq_cpu_put() with __free(put_cpufreq_policy)
+> annotation for policy references. This reduces the risk of reference
+> counting mistakes and aligns the code with the latest kernel style.
+> 
+> No functional change intended.
+> 
+> Signed-off-by: Zihuan Zhang <zhangzihuan@kylinos.cn>
+> ---
+>  arch/arm64/kernel/topology.c | 9 +++------
+>  1 file changed, 3 insertions(+), 6 deletions(-)
+> 
+> diff --git a/arch/arm64/kernel/topology.c b/arch/arm64/kernel/topology.c
+> index 5d07ee85bdae..e3cb6d54f35b 100644
+> --- a/arch/arm64/kernel/topology.c
+> +++ b/arch/arm64/kernel/topology.c
+> @@ -307,17 +307,16 @@ int arch_freq_get_on_cpu(int cpu)
+>  		 */
+>  		if (!housekeeping_cpu(cpu, HK_TYPE_TICK) ||
+>  		    time_is_before_jiffies(last_update + msecs_to_jiffies(AMU_SAMPLE_EXP_MS))) {
+> -			struct cpufreq_policy *policy = cpufreq_cpu_get(cpu);
+> +			struct cpufreq_policy *policy __free(put_cpufreq_policy);
+Based on the guidance, in include/linux/cleanup.h, I would expect the
+assignment to be done on this line.
 
-mce_read_aux:
+"...the recommendation is to always define and assign variables in one
+ * statement and not group variable definitions at the top of the
+ * function when __free() is used."
+>  			int ref_cpu;
+>  
+> +			policy = cpufreq_cpu_get(cpu);
+>  			if (!policy)
+>  				return -EINVAL;
+>  
+>  			if (!cpumask_intersects(policy->related_cpus,
+> -						housekeeping_cpumask(HK_TYPE_TICK))) {
+> -				cpufreq_cpu_put(policy);
+> +						housekeeping_cpumask(HK_TYPE_TICK)))
+>  				return -EOPNOTSUPP;
+> -			}
+>  
+>  			for_each_cpu_wrap(ref_cpu, policy->cpus, cpu + 1) {
+>  				if (ref_cpu == start_cpu) {
+> @@ -329,8 +328,6 @@ int arch_freq_get_on_cpu(int cpu)
+>  					break;
+>  			}
+>  
+> -			cpufreq_cpu_put(policy);
+> -
+>  			if (ref_cpu >= nr_cpu_ids)
+>  				/* No alternative to pull info from */
+>  				return -EAGAIN;
 
-	...
+Thanks,
 
-	/* Remove TDX KeyID from the address */
-	if (cpu_feature_enabled(X86_FEATURE_TDX_HOST_PLATFORM))
-		m->addr &= GENMASK_ULL(boot_cpu_data.x86_phys_bits - 1, 0);
+Ben
 
-Something like that...
-
-Thx.
-
--- 
-Regards/Gruss,
-    Boris.
-
-https://people.kernel.org/tglx/notes-about-netiquette
 
