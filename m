@@ -1,52 +1,52 @@
-Return-Path: <kvm+bounces-55897-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-55898-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id C2C26B3877E
-	for <lists+kvm@lfdr.de>; Wed, 27 Aug 2025 18:11:52 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id C0211B38781
+	for <lists+kvm@lfdr.de>; Wed, 27 Aug 2025 18:11:54 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2644F5E2128
-	for <lists+kvm@lfdr.de>; Wed, 27 Aug 2025 16:11:41 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 581C75E24CC
+	for <lists+kvm@lfdr.de>; Wed, 27 Aug 2025 16:11:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4135435A299;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5279535A2A1;
 	Wed, 27 Aug 2025 16:10:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="bIMx1wfH"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="LxjaFNfO"
 X-Original-To: kvm@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5562A350857;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6BF15350D75;
 	Wed, 27 Aug 2025 16:10:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756311050; cv=none; b=d2FLOKv5/qjLlJDz/fhyCF5ETDzjG5lp3plaJRrAtaoVcYPbmMUiZ9GVgoqPqVXKJIF+tY/xpdckcj0Q3CYq4UTIzGhZ0thJGt9e1QY5ObvST9itEso5HT3So/YEZCWUYTGyvD8NHP5WclT/ed+PZEy7Pz/tQ08iSjdm/FJkIhQ=
+	t=1756311050; cv=none; b=MEVIOL7YteG5PKNd40DmT8VhZ9Ji/D8mn81tEg0ogZNDJWEqDPW+8zuZFlfz+TXz515YeFPtlYK5pOE3t90xGawRWwOw/BBq6gU78foZoQMKYt1y56zchHPG8KHUAU9V3pQTVE39Ean5o9QsDQLmvkhI2GFbU3ByJlgJNNoF9+0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1756311050; c=relaxed/simple;
-	bh=gHppliEY0y6/P8OeBVVGz1thwVeXvKiBpmZt9uamRz0=;
+	bh=lgdNfr9Ctbja/+iOstmhMjxKvrUxzqnUDnlTgWFyWRw=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=SILCGZkrgVYLS+VNJGV+PTuwLAkDgWrHq5PZ6ClPs/L1dWYIArABjNXOw6cPy9XKqpPw/szAzC7fi7WmMuL7oscDDSNjd5OjCVhHZx7mJe+c6LldIhbcn9c6+oplp5Lp6KlBc13Rvf7w5fQT7WKM8U/8m7748x6VjKlUvlhNoaY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=bIMx1wfH; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id E57CDC4CEEB;
-	Wed, 27 Aug 2025 16:10:49 +0000 (UTC)
+	 MIME-Version; b=KHra5FzfaNkQbCw9Jkym9QtRCDgR1LqPqY1XrQp4W9M1kZNDzaw8/S5A0fZ2od6dIN0Q+E3Wae0JeqBWJv4e4T86YeiAwWgealIjJcx/Ekz+Fqct+epoRZ1AZVvngutkSMs9gzRHo9Mw9Ki2h63Il8tIJrwL11Hbp/EURsZMCMg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=LxjaFNfO; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 01AFFC4CEF6;
+	Wed, 27 Aug 2025 16:10:50 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1756311049;
-	bh=gHppliEY0y6/P8OeBVVGz1thwVeXvKiBpmZt9uamRz0=;
+	s=k20201202; t=1756311050;
+	bh=lgdNfr9Ctbja/+iOstmhMjxKvrUxzqnUDnlTgWFyWRw=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=bIMx1wfH16+5WGE10JGaZXuJEj6afjd6aWOlULnrRciZOfwOB+bpe7tscNBG7+TL5
-	 IpX4fXqVozziGe9bwY8q5VD72Pi9JdmJaHzl2I/6oDXC/GhP68zEsPd3YVDW4KkYy4
-	 sZHsMajrHLIq5q/40waKOc9RtIIfCN0ly6t8ukOo4D7f5UiiAn8q/HfRay7bY5AlNY
-	 42c4TivCfleSQj4nj0pJ5/PbNxsDOpuTxAKj82aFcfNbChtNzcuWCpBO2zrHVe2ff4
-	 kZk8sphI2RmIBCqe3nS8Kot7NlosdiWQEYMUWHCZJ+VOCbmcxs3hDRqmk52JzajtiD
-	 nLxT+2MaO5f9g==
+	b=LxjaFNfOyfmwNuoVx2quiKdqClhQKFNqr6ZdAQtPl1313bNOaC2fB/e+a1m6e2qm8
+	 LqQNLbh2QqnKZlg1/WLYk9Em5rz/y0C7Mr/YWDekEXEzUkIUntLQ31ZRdVNRwPc915
+	 DHVn2L+j1Km4JpTmdjVIhyaDGiK+AeKzmOYn+hAf6UmeZ9brohtcFKI70N9l1Vg7oM
+	 ADd6Jc5BvuCB9dj/6cgyYxHpftj7q5wzmICrb/RkcuHMDaHHdH3LAZOYa1MDSDYTQm
+	 ImStEJrsGztKM03ESCMEJNbYtDMQwRI6A/vELFZH/giEON8lN1TIRbL4pqxjOnyaMF
+	 1EzI2vW67rMEA==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.98.2)
 	(envelope-from <maz@kernel.org>)
-	id 1urIjX-00000000yGc-3ox6;
-	Wed, 27 Aug 2025 16:10:47 +0000
+	id 1urIjY-00000000yGc-0QiW;
+	Wed, 27 Aug 2025 16:10:48 +0000
 From: Marc Zyngier <maz@kernel.org>
 To: kvmarm@lists.linux.dev,
 	linux-arm-kernel@lists.infradead.org,
@@ -55,9 +55,9 @@ Cc: Joey Gouly <joey.gouly@arm.com>,
 	Suzuki K Poulose <suzuki.poulose@arm.com>,
 	Oliver Upton <oliver.upton@linux.dev>,
 	Zenghui Yu <yuzenghui@huawei.com>
-Subject: [PATCH 07/16] KVM: arm64: Populate PAR_EL1 with 52bit addresses
-Date: Wed, 27 Aug 2025 17:10:29 +0100
-Message-Id: <20250827161039.938958-8-maz@kernel.org>
+Subject: [PATCH 08/16] KVM: arm64: Expand valid block mappings to FEAT_LPA/LPA2 support
+Date: Wed, 27 Aug 2025 17:10:30 +0100
+Message-Id: <20250827161039.938958-9-maz@kernel.org>
 X-Mailer: git-send-email 2.39.2
 In-Reply-To: <20250827161039.938958-1-maz@kernel.org>
 References: <20250827161039.938958-1-maz@kernel.org>
@@ -73,7 +73,10 @@ X-SA-Exim-Rcpt-To: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-Expand the output address populated in PAR_EL1 to 52bit addresses.
+With 52bit PAs, block mappings can exist at different levels (such
+as level 0 for 4kB pages, or level 1 for 16kB and 64kB pages).
+
+Account for this in walk_s1().
 
 Signed-off-by: Marc Zyngier <maz@kernel.org>
 ---
@@ -81,27 +84,23 @@ Signed-off-by: Marc Zyngier <maz@kernel.org>
  1 file changed, 2 insertions(+), 2 deletions(-)
 
 diff --git a/arch/arm64/kvm/at.c b/arch/arm64/kvm/at.c
-index c684325b954d3..4d97a734e0f50 100644
+index 4d97a734e0f50..f58dfbb4df891 100644
 --- a/arch/arm64/kvm/at.c
 +++ b/arch/arm64/kvm/at.c
-@@ -844,7 +844,7 @@ static u64 compute_par_s1(struct kvm_vcpu *vcpu, struct s1_walk_info *wi,
- 	} else if (wr->level == S1_MMU_DISABLED) {
- 		/* MMU off or HCR_EL2.DC == 1 */
- 		par  = SYS_PAR_EL1_NSE;
--		par |= wr->pa & GENMASK_ULL(47, 12);
-+		par |= wr->pa & GENMASK_ULL(52, 12);
+@@ -448,11 +448,11 @@ static int walk_s1(struct kvm_vcpu *vcpu, struct s1_walk_info *wi,
  
- 		if (wi->regime == TR_EL10 &&
- 		    (__vcpu_sys_reg(vcpu, HCR_EL2) & HCR_DC)) {
-@@ -877,7 +877,7 @@ static u64 compute_par_s1(struct kvm_vcpu *vcpu, struct s1_walk_info *wi,
- 			mair = MEMATTR(NC, NC);
+ 		switch (BIT(wi->pgshift)) {
+ 		case SZ_4K:
+-			valid_block = level == 1 || level == 2;
++			valid_block = level == 1 || level == 2 || (wi->pa52bit && level == 0);
+ 			break;
+ 		case SZ_16K:
+ 		case SZ_64K:
+-			valid_block = level == 2;
++			valid_block = level == 2 || (wi->pa52bit && level == 1);
+ 			break;
+ 		}
  
- 		par |= FIELD_PREP(SYS_PAR_EL1_ATTR, mair);
--		par |= wr->pa & GENMASK_ULL(47, 12);
-+		par |= wr->pa & GENMASK_ULL(52, 12);
- 
- 		sh = compute_s1_sh(wi, wr, mair);
- 		par |= FIELD_PREP(SYS_PAR_EL1_SH, sh);
 -- 
 2.39.2
 
