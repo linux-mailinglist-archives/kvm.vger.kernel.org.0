@@ -1,183 +1,185 @@
-Return-Path: <kvm+bounces-56177-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-56178-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id BF5C6B3AB31
-	for <lists+kvm@lfdr.de>; Thu, 28 Aug 2025 22:00:39 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id D1BB7B3AB39
+	for <lists+kvm@lfdr.de>; Thu, 28 Aug 2025 22:02:18 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id D19581C23D52
-	for <lists+kvm@lfdr.de>; Thu, 28 Aug 2025 20:00:59 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 87E13A00BD0
+	for <lists+kvm@lfdr.de>; Thu, 28 Aug 2025 20:02:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 65ADC27054A;
-	Thu, 28 Aug 2025 20:00:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DDC0A27934E;
+	Thu, 28 Aug 2025 20:02:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="RxURjS2G"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="IR/4/nDL"
 X-Original-To: kvm@vger.kernel.org
-Received: from out-182.mta0.migadu.com (out-182.mta0.migadu.com [91.218.175.182])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5393A41C63
-	for <kvm@vger.kernel.org>; Thu, 28 Aug 2025 20:00:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.182
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 653AE11187
+	for <kvm@vger.kernel.org>; Thu, 28 Aug 2025 20:02:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756411232; cv=none; b=JTLYtImS7YnB9dPZsy1rQZXPRAOahqObbvRNIkfhwXrTinBauT2ZU1yA3crmg89LTVs0fDNdvmIMYjKszMXqjoOw792L5vzodmdW0wbSo9oUYE8ijRLQB4gPPUcXfprl5hVQ4859gjU+kl7l2/4skLqs47XRrW8ZzyZFV1Z5bQQ=
+	t=1756411329; cv=none; b=j4o5uT740YsaJmcjRU2QC0beQLY4qOWhH58/F2MQ9cYoikQDc64AxaXEHSwFgq6wl8EPmyGzaLwYJXvEc15Diw5kS1gJeDt6YC21zpIfWEGcDv2BdWLSwaX9pWfRcyb7BZ5MgbGIRMkmEWAXYMuFng/xJwEatqpvl7mDUnZIQQ4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756411232; c=relaxed/simple;
-	bh=tKsfb2YuEZ0dz9MbqmMbKjHXrXdz8Mo6Od335EQZ1HI=;
-	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
-	 Content-Disposition; b=s64guLvS0fSTxGUEwZwCwW530jetvrD0YRleelXzToucZ7u02p/L7wM7k1qI0UWyu+QZTx9qkPejulNUBRdNiHktOEtYDM41zeemUWbnvuRxzcfTMKBARxpqUgEK6iYwVjaMm9W+yefUJQP+udnXcQxS9VmWKyeg7XVBjGXhvus=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=RxURjS2G; arc=none smtp.client-ip=91.218.175.182
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Date: Thu, 28 Aug 2025 13:00:10 -0700
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1756411217;
+	s=arc-20240116; t=1756411329; c=relaxed/simple;
+	bh=2KpL/YbmEXnHuFTvSMBKGQC8nuR4dgX0UfBNcS0nW2A=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=HHxq97H9xQWZtHGrwMFRUeYpXo7L32Em+Jr8LwUjES3CsszF084pqSla0C2XY6e3xgkAJMwT5Mck+VNqDqlAhD90nmoMTHieET1nN5ZKEOI50Rh1NExxpCH4nOZglisuoBMzSgfqzQj8+Li70KM6Fp3SaPSevnGySutnw0Hqxl0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=IR/4/nDL; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1756411326;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type;
-	bh=hxquV2sC6Kv6B0G5Tw0QgybL4q781zKIOmwgcT1utY8=;
-	b=RxURjS2GQMPTpmEEhpZN807bfF0kQrTq94UM5b4+TwftaUxvH3TCMOl6qUn8tPVo5FhO+L
-	JM9bC5Hg+mazdSKsgDT6I/PHCeP/gX49MhRhe2hY5PYc0gwFNwBQIfC4T9QIWxTktl0Zw6
-	ShcLvzWDF78Mg3aQn+ynFnfDygQLmso=
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Oliver Upton <oliver.upton@linux.dev>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: Marc Zyngier <maz@kernel.org>, kvm@vger.kernel.org,
-	kvmarm@lists.linux.dev
-Subject: [GIT PULL] KVM/arm64 changes for 6.17, take #2
-Message-ID: <aLC1Su7FEo7XtI0K@linux.dev>
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+	bh=kHCGitpqD+5wH/FOTflpYSjcwP5kCCQ1zm861x/hElE=;
+	b=IR/4/nDLZRjRnOPaqnPgKt5Hei85CNKICXX75cdvOtiKEazkzFs11XTOfHhl7a3FImej9u
+	NOH3odZmk8gUoQB6wCnMQHjT37990hVeMRog4s3pLsE4HCdPJ3FrIaUu1YWcxx0w72/yeG
+	Zm3witYdHq6EVgmW4fZ+pzc4vSfE4Z4=
+Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
+ [209.85.221.69]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-644-sQPyD2YWMvS_nQV-9Ze2BA-1; Thu, 28 Aug 2025 16:02:04 -0400
+X-MC-Unique: sQPyD2YWMvS_nQV-9Ze2BA-1
+X-Mimecast-MFC-AGG-ID: sQPyD2YWMvS_nQV-9Ze2BA_1756411321
+Received: by mail-wr1-f69.google.com with SMTP id ffacd0b85a97d-3c6abcfd303so167550f8f.3
+        for <kvm@vger.kernel.org>; Thu, 28 Aug 2025 13:02:01 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1756411321; x=1757016121;
+        h=content-transfer-encoding:in-reply-to:autocrypt:content-language
+         :from:references:cc:to:subject:user-agent:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=kHCGitpqD+5wH/FOTflpYSjcwP5kCCQ1zm861x/hElE=;
+        b=FAAOtbLtXO2QMMzfhb3GmR8u6NspqBLBcwsGMygATzAde5rs2Kb5A/YvaFRYpVYs1l
+         mCUd/vjVh/U8+LKK29o2f5APc0oSKkYMHIOKZiRynCiKnBRYQ+C56jqvML4TMr6oB+uE
+         Zax3tJULZDXeyiry5z4swuHmPzN3VWbdph3kpqdzKyTLHe0mgzJpiCNH39r/88EEc0E+
+         CFnpTxz1H9ggk9nfiXopoiwbX+GCR6fsAwgxDCJ1rT+r2iL6zfKpyMYQq7YtElJynPOx
+         bxz6ZBev9mSo+NlxrjoT/lwJ+c6kX4RmOxjIlqqdg3Ezno/GLzKzh38Ng/IXbx1Hb9vn
+         6D6w==
+X-Gm-Message-State: AOJu0YzvnSuyG9ewIN3XijSeYuJ9LrZEvSULe2s2au2Tijxe5YlVtVvE
+	lEcOxc8RwUic5rkRjpqaQw59knFHg/kD3LMkyENP8Mdv+Ct42VjGNPds582Iyae+KC7eNBfN8IF
+	55o6b+ZE2rE5vNYEiV2l5Xqf01KtGa4XK72bzK12p1R36Xh0m5uWiVw==
+X-Gm-Gg: ASbGnctl0daPgzRDPVq4IgwjQeqfgWcEOoOChXECStpidR/wb50y5zJDT2BbQnXtpVs
+	1Nq58Mhvgw/MxqYKfRkHVvZ29ojndgomEfoU3wLH83a91wXsPI/2UzSIAJ0NqO/a+adcsMZF0/a
+	NaomBZRd5XYVd7Vhof5NqujRBDn0A/jmTLEY/ocjeVrwu+ywuc9uDjewRCQ96Ujm0a+A2koAknY
+	EEI3IwJpnqzQPjOeEdPbrwTRtzLpbP4IjZmPRU3jPKz90G3fyvX6MqEhmvHPdpDgh+3818eWq6a
+	Tiqr9jWhVKSxvzc53vfkgctbRmZjtnRAPzvzjW/Ke86u8H/Y41hOXpy6vXLsH++Lxv/9FQy0nEq
+	piFTTLlmsyn1qQMCBBoDLvyjx/VDfIjVz2zE+kel6JelKWYZJZHxx7mNSoOoYhFE21dw=
+X-Received: by 2002:a05:6000:2203:b0:3c9:9b3b:53c9 with SMTP id ffacd0b85a97d-3c99b3b586fmr13112442f8f.44.1756411320640;
+        Thu, 28 Aug 2025 13:02:00 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IFJfxknfutCFzm6P/qKfs5UtdmvpY/7sBFiB6PROkHg4xXnNZaYtYUH5wqWfppKoahFU7sb6A==
+X-Received: by 2002:a05:6000:2203:b0:3c9:9b3b:53c9 with SMTP id ffacd0b85a97d-3c99b3b586fmr13112421f8f.44.1756411320141;
+        Thu, 28 Aug 2025 13:02:00 -0700 (PDT)
+Received: from ?IPV6:2003:d8:2f28:c100:2225:10aa:f247:7b85? (p200300d82f28c100222510aaf2477b85.dip0.t-ipconnect.de. [2003:d8:2f28:c100:2225:10aa:f247:7b85])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-45b73cf86f4sm67580865e9.6.2025.08.28.13.01.59
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 28 Aug 2025 13:01:59 -0700 (PDT)
+Message-ID: <d58425d4-8e4f-4b70-915f-322658e9878e@redhat.com>
+Date: Thu, 28 Aug 2025 22:01:58 +0200
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-X-Migadu-Flow: FLOW_OUT
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v4 1/2] KVM: guest_memfd: add generic population via write
+To: "Kalyazin, Nikita" <kalyazin@amazon.co.uk>,
+ "pbonzini@redhat.com" <pbonzini@redhat.com>,
+ "shuah@kernel.org" <shuah@kernel.org>
+Cc: "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+ "linux-kselftest@vger.kernel.org" <linux-kselftest@vger.kernel.org>,
+ "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+ "michael.day@amd.com" <michael.day@amd.com>,
+ "jthoughton@google.com" <jthoughton@google.com>,
+ "Roy, Patrick" <roypat@amazon.co.uk>, "Thomson, Jack"
+ <jackabt@amazon.co.uk>, "Manwaring, Derek" <derekmn@amazon.com>,
+ "Cali, Marco" <xmarcalx@amazon.co.uk>
+References: <20250828153049.3922-1-kalyazin@amazon.com>
+ <20250828153049.3922-2-kalyazin@amazon.com>
+From: David Hildenbrand <david@redhat.com>
+Content-Language: en-US
+Autocrypt: addr=david@redhat.com; keydata=
+ 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
+ qIws/H2t
+In-Reply-To: <20250828153049.3922-2-kalyazin@amazon.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-Hi Paolo,
+On 28.08.25 17:31, Kalyazin, Nikita wrote:
+> write syscall populates guest_memfd with user-supplied data in a generic
+> way, ie no vendor-specific preparation is performed.  This is supposed
+> to be used in non-CoCo setups where guest memory is not
+> hardware-encrypted.
+> 
+> The following behaviour is implemented:
+>   - only page-aligned count and offset are allowed
+>   - if the memory is already allocated, the call will successfully
+>     populate it
+>   - if the memory is not allocated, the call will both allocate and
+>     populate
+>   - if the memory is already populated, the call will not repopulate it
+> 
+> Signed-off-by: Nikita Kalyazin <kalyazin@amazon.com>
+> ---
 
-Unfortunately work had me sidelined for an extended period of time, so
-after much delay here is a pile of fixes for 6.17. This is a bit larger
-than I would like, but the handling of on-CPU sysregs has had multiple ugly
-bugs and a localized fix would just be unnecessary churn.
+Just nothing that checkpatch complains about
 
-Details in the tag; please pull.
+a) Usage of "unsigned" instead of "unsigned int"
 
-Thanks,
-Oliver
+b) The From doesn't completely match the SOB: "Kalyazin, Nikita" vs 
+"Nikita Kalyazin"
 
-The following changes since commit 18ec25dd0e97653cdb576bb1750c31acf2513ea7:
+-- 
+Cheers
 
-  KVM: arm64: selftests: Add FEAT_RAS EL2 registers to get-reg-list (2025-07-28 08:28:05 -0700)
+David / dhildenb
 
-are available in the Git repository at:
-
-  https://git.kernel.org/pub/scm/linux/kernel/git/kvmarm/kvmarm.git/ tags/kvmarm-fixes-6.17-1
-
-for you to fetch changes up to ee372e645178802be7cb35263de941db7b2c5354:
-
-  KVM: arm64: nv: Fix ATS12 handling of single-stage translation (2025-08-28 12:44:42 -0700)
-
-----------------------------------------------------------------
-KVM/arm64 changes for 6.17, take #2
-
- - Correctly handle 'invariant' system registers for protected VMs
-
- - Improved handling of VNCR data aborts, including external aborts
-
- - Fixes for handling of FEAT_RAS for NV guests, providing a sane
-   fault context during SEA injection and preventing the use of
-   RASv1p1 fault injection hardware
-
- - Ensure that page table destruction when a VM is destroyed gives an
-   opportunity to reschedule
-
- - Large fix to KVM's infrastructure for managing guest context loaded
-   on the CPU, addressing issues where the output of AT emulation
-   doesn't get reflected to the guest
-
- - Fix AT S12 emulation to actually perform stage-2 translation when
-   necessary
-
- - Avoid attempting vLPI irqbypass when GICv4 has been explicitly
-   disabled for a VM
-
- - Minor KVM + selftest fixes
-
-----------------------------------------------------------------
-Arnd Bergmann (1):
-      kvm: arm64: use BUG() instead of BUG_ON(1)
-
-Fuad Tabba (3):
-      KVM: arm64: Handle AIDR_EL1 and REVIDR_EL1 in host for protected VMs
-      KVM: arm64: Sync protected guest VBAR_EL1 on injecting an undef exception
-      arm64: vgic-v2: Fix guest endianness check in hVHE mode
-
-Marc Zyngier (14):
-      KVM: arm64: nv: Properly check ESR_EL2.VNCR on taking a VNCR_EL2 related fault
-      KVM: arm64: selftest: Add standalone test checking for KVM's own UUID
-      KVM: arm64: Correctly populate FAR_EL2 on nested SEA injection
-      arm64: Add capability denoting FEAT_RASv1p1
-      KVM: arm64: Handle RASv1p1 registers
-      KVM: arm64: Ignore HCR_EL2.FIEN set by L1 guest's EL2
-      KVM: arm64: Make ID_AA64PFR0_EL1.RAS writable
-      KVM: arm64: Make ID_AA64PFR1_EL1.RAS_frac writable
-      KVM: arm64: Get rid of ARM64_FEATURE_MASK()
-      KVM: arm64: Check for SYSREGS_ON_CPU before accessing the 32bit state
-      KVM: arm64: Simplify sysreg access on exception delivery
-      KVM: arm64: Fix vcpu_{read,write}_sys_reg() accessors
-      KVM: arm64: Remove __vcpu_{read,write}_sys_reg_{from,to}_cpu()
-      KVM: arm64: nv: Fix ATS12 handling of single-stage translation
-
-Mark Brown (1):
-      KVM: arm64: selftests: Sync ID_AA64MMFR3_EL1 in set_id_regs
-
-Oliver Upton (1):
-      KVM: arm64: nv: Handle SEAs due to VNCR redirection
-
-Raghavendra Rao Ananta (3):
-      KVM: arm64: Don't attempt vLPI mappings when vPE allocation is disabled
-      KVM: arm64: Split kvm_pgtable_stage2_destroy()
-      KVM: arm64: Reschedule as needed when destroying the stage-2 page-tables
-
- arch/arm64/include/asm/kvm_host.h                  | 111 +-----
- arch/arm64/include/asm/kvm_mmu.h                   |   1 +
- arch/arm64/include/asm/kvm_pgtable.h               |  30 ++
- arch/arm64/include/asm/kvm_pkvm.h                  |   4 +-
- arch/arm64/include/asm/kvm_ras.h                   |  25 --
- arch/arm64/include/asm/sysreg.h                    |   3 -
- arch/arm64/kernel/cpufeature.c                     |  24 ++
- arch/arm64/kvm/arm.c                               |   8 +-
- arch/arm64/kvm/at.c                                |   6 +-
- arch/arm64/kvm/emulate-nested.c                    |   2 +-
- arch/arm64/kvm/hyp/exception.c                     |  20 +-
- arch/arm64/kvm/hyp/nvhe/list_debug.c               |   2 +-
- arch/arm64/kvm/hyp/nvhe/sys_regs.c                 |   5 +
- arch/arm64/kvm/hyp/pgtable.c                       |  25 +-
- arch/arm64/kvm/hyp/vgic-v2-cpuif-proxy.c           |   2 +-
- arch/arm64/kvm/hyp/vhe/switch.c                    |   5 +-
- arch/arm64/kvm/mmu.c                               |  65 +++-
- arch/arm64/kvm/nested.c                            |   5 +-
- arch/arm64/kvm/pkvm.c                              |  11 +-
- arch/arm64/kvm/sys_regs.c                          | 419 ++++++++++++++-------
- arch/arm64/kvm/vgic/vgic-mmio-v3.c                 |   8 +
- arch/arm64/kvm/vgic/vgic-mmio.c                    |   2 +-
- arch/arm64/kvm/vgic/vgic.h                         |  10 +-
- arch/arm64/tools/cpucaps                           |   1 +
- tools/arch/arm64/include/asm/sysreg.h              |   3 -
- tools/testing/selftests/kvm/Makefile.kvm           |   1 +
- .../testing/selftests/kvm/arm64/aarch32_id_regs.c  |   2 +-
- .../testing/selftests/kvm/arm64/debug-exceptions.c |  12 +-
- tools/testing/selftests/kvm/arm64/kvm-uuid.c       |  70 ++++
- tools/testing/selftests/kvm/arm64/no-vgic-v3.c     |   4 +-
- .../testing/selftests/kvm/arm64/page_fault_test.c  |   6 +-
- tools/testing/selftests/kvm/arm64/set_id_regs.c    |   9 +-
- .../selftests/kvm/arm64/vpmu_counter_access.c      |   2 +-
- tools/testing/selftests/kvm/lib/arm64/processor.c  |   6 +-
- 34 files changed, 560 insertions(+), 349 deletions(-)
- delete mode 100644 arch/arm64/include/asm/kvm_ras.h
- create mode 100644 tools/testing/selftests/kvm/arm64/kvm-uuid.c
 
