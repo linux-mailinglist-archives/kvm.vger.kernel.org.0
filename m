@@ -1,186 +1,190 @@
-Return-Path: <kvm+bounces-56073-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-56074-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0D553B3991B
-	for <lists+kvm@lfdr.de>; Thu, 28 Aug 2025 12:07:59 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id B4408B39941
+	for <lists+kvm@lfdr.de>; Thu, 28 Aug 2025 12:12:26 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 1A60D1C26C68
-	for <lists+kvm@lfdr.de>; Thu, 28 Aug 2025 10:08:19 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 238B21C2831F
+	for <lists+kvm@lfdr.de>; Thu, 28 Aug 2025 10:12:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D8AA23081C7;
-	Thu, 28 Aug 2025 10:07:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0CCB53081D6;
+	Thu, 28 Aug 2025 10:11:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="xDiCvMBu"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="WPxHq3lO"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-qt1-f171.google.com (mail-qt1-f171.google.com [209.85.160.171])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.13])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 66A7026E140
-	for <kvm@vger.kernel.org>; Thu, 28 Aug 2025 10:07:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.171
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 965153081B6;
+	Thu, 28 Aug 2025 10:11:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.13
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756375671; cv=none; b=MQyKuwvxGOIhbwcUfF5OqWyxdnSTT1iAT9vKDesfAxmJHEvTVcJ17OhcwUoWWprInA3+63CMN7IQCiYlRRZfS80ChKrEv1sN3GCyyWkefwJj1MfM0fGEqMSXYe/pAIo8euHyjVVGz4ZRPO5FZXbhGtcdVrtk0fSjoFdOXiq+BlE=
+	t=1756375913; cv=none; b=k/e6ZH/czfpyveMng8fmry2JDk1EIsYzdeGo/ZxnuNnH2cu+EDjmAEsSplzAW5rVrwCkbT7v7wa2eTRouBhi3P70PEzMb3gYtW806bZvEE4ZFpJsa4jWm7v/FmRfYgQoynqbXYE4at6nftqrKKrSHrDGbrbxVC71EM0/OzTiFl0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756375671; c=relaxed/simple;
-	bh=TJWOQ9Y/D8amR26SYM4qj8T+TSWFnuMR5SCM6u632Hg=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=hnrTGbB7/ePdRUS81w/qSMl30Lr+Tr+JTL6kPb+uvHCPR/V6k0pQnMqa8QhwbIEY0rbVdMn5xgYLF9xDj4Hbmq/xSeUxjlYo9o4MIm50oYOoVT7pVY4dH3enK7+h2uuFtZlZHll5bfCgNwH2SdHM7J+Dwisr70VgTETBMGBWz70=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=xDiCvMBu; arc=none smtp.client-ip=209.85.160.171
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-qt1-f171.google.com with SMTP id d75a77b69052e-4b12b123e48so321991cf.0
-        for <kvm@vger.kernel.org>; Thu, 28 Aug 2025 03:07:49 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1756375668; x=1756980468; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=9E9CQIEDOr2UcYitZQ4gvIXZ41Noi3g2Rn0AmT7jQqk=;
-        b=xDiCvMBukmDrwQWP9NfcVu92/hmzjPNT73QlcFd/GE9MoqlBdckobXLgM0ORwMD2nz
-         hWS9XgjR1PB5tVLKDf/ZZ4/WKKW1P+vkbqYdqp8eI79pyEVq98Bhklkn921iVvPE7b3G
-         42COmKXbQd/u+M9X1YDC5mB2YEdTTotTo5JLVyDglwNmGGZg9qknv8YmHx6kF9t5hd5X
-         8/Qms1AOMABxeLj3HKtnjgI7GQuUAj+pWYpZCfChvItilsayrSLOCSqyztu6VIlvmKPY
-         50ZW1OU/Xhxwr5s/qbVoN8h9M7rFWhit0/EwMepevEfOE/nNmoUVDw7X+IpWpTKscMe1
-         38oA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1756375668; x=1756980468;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=9E9CQIEDOr2UcYitZQ4gvIXZ41Noi3g2Rn0AmT7jQqk=;
-        b=B7oBPrHtsPDs1vC4EjMPOwQnCfcUu4wvNU57k2ITDi9Ia7WTwTT/+8lN9qGtuhmoTT
-         9Pe47qZnvZwAB1hd4cgxE1ghH/7rni1tEPMG1YhyleqVIGIN6FegFa39jni5/dahZcIy
-         DqzOYKhP/e1RSLTX21uSfa+grxetay+VfnbXCsGKMiiIlOa4ovLFKaHfunvnXqA+ZSwL
-         zg4/nLfoZxmsZcqPfvotUIqXNpTlgoHDzCLV8q9lZGDC/jWS3+dZykRrWnBvD3BC51oA
-         p4BLfsrm5+ucjVh/TxuJOm/ACeIwSES8BSViMusSWbLmhDp9CqRV5NNdLNvkvbaJQnUE
-         AkCA==
-X-Forwarded-Encrypted: i=1; AJvYcCUWuQ2JXjd/f8IKIBLzj9trNCYkXv5xOvkxAy56yAmLVa1Gwkxvl87mQmK+viyyCCv9Md4=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwtTrROZNaL10XxNmdtG/E1cMaJXp4v7dPAnn+k+GcgzRHRkwl2
-	iYwq9gE8i+Op8Iel0Iuud8kTRPke/Ly7oMdsUnZ3MpHkURM1oFqPXGBWOh+7rzUf1EZ+78MnuJk
-	XYz0dqr5wWlOTL4v35tf3fy09ik5NpP+XnCqz6mQk
-X-Gm-Gg: ASbGncs5MVFpGUSokV0wC17qUviBSJZznORzoBoTjkiEKClvwyM1x6/hE1rKDWaKoea
-	9jpcW7MwAgLITv7idYGVjppbuzFJcC1eYOD5AO/M2p4Xnmkhsq8A4QU7VvuJFVpDLzW+n8u+FQO
-	u82xEbmwcBv05UALBQkntz8HaBIsQ/ZKaPV24/bvjQ9t4Ep6aC+fK3q7O4bZsxcDkbMBDrjHpe6
-	/eKVa4Iz03Obgg=
-X-Google-Smtp-Source: AGHT+IFRjTT6s+Lga012dxByxsEc3lbr9K1CdoyVsw5ZK+adWd1hKzUTB9FTJRCdYTn8BAJBAZ04Flo9bNZpApNjkqk=
-X-Received: by 2002:a05:622a:1816:b0:4a9:e17a:6288 with SMTP id
- d75a77b69052e-4b2e2c55f8amr18542401cf.13.1756375667872; Thu, 28 Aug 2025
- 03:07:47 -0700 (PDT)
+	s=arc-20240116; t=1756375913; c=relaxed/simple;
+	bh=Nyv56jdJyPYMI8gKpIokw2JpojiScUeg14lmkOgrgHI=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=OjaGY1JClWQzkvZ+mVV0E3cJ6JPHWyU/A67dap7Ext02t2wg4RQIilMGdnRi3Fn4uWs79idfShd/eoimn7YOmCrYP9z7PVdXeLaGAOq8h7ASh2Mr7eLHu+4K9gjpLkQcgYNDenX49mVMvgLPh1hIcoM7Uc2mHTm4MIXpLg0XV0g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=WPxHq3lO; arc=none smtp.client-ip=192.198.163.13
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1756375912; x=1787911912;
+  h=message-id:date:mime-version:subject:to:cc:references:
+   from:in-reply-to:content-transfer-encoding;
+  bh=Nyv56jdJyPYMI8gKpIokw2JpojiScUeg14lmkOgrgHI=;
+  b=WPxHq3lOHEuANW+eC1oC4Y9UqHqAwVUFHMX78QMpAsu5HFd9AIXD7WgH
+   0Hlkt1/GrNSIAWAxjR4F4iN+FzyowEyVE+f91CysBdoSagGnHzJTAGbmI
+   N/MrXv+nE5NUsCFCAKHfGpbzu7l2lwvEwOHKTDrdBbOYbfKPRPOD09Etb
+   HZIBbs7wZ2u2iIWWP0Lgc+q7qPSwAz4WC2LHzq8wBYq5RNxLcMWzR4gkW
+   ZKK+QtF5VVSKTbEo86VpsZurmLj5qKN3Yq+qUBYCxwFGLh3YW5/pvMm6a
+   4Uqegby065LXK2Ip6IpryHOcuSlJJrVQNwtd06GrJXzL25mI9FXb7A4Y5
+   A==;
+X-CSE-ConnectionGUID: YusEYHcgT3WURsZheeasoQ==
+X-CSE-MsgGUID: OJUK091KQnOYBo4v74VTrg==
+X-IronPort-AV: E=McAfee;i="6800,10657,11535"; a="61275051"
+X-IronPort-AV: E=Sophos;i="6.18,217,1751266800"; 
+   d="scan'208";a="61275051"
+Received: from orviesa007.jf.intel.com ([10.64.159.147])
+  by fmvoesa107.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 28 Aug 2025 03:11:51 -0700
+X-CSE-ConnectionGUID: IksLcVIuSKiOiKUjLE5WDg==
+X-CSE-MsgGUID: D/cWZQBsQ5Sy8Z83dA780Q==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.18,217,1751266800"; 
+   d="scan'208";a="169972658"
+Received: from unknown (HELO [10.238.11.127]) ([10.238.11.127])
+  by orviesa007-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 28 Aug 2025 03:11:47 -0700
+Message-ID: <6b1ec845-4e24-4aa9-b262-49b2fc57553f@linux.intel.com>
+Date: Thu, 28 Aug 2025 18:11:44 +0800
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250828093902.2719-1-roypat@amazon.co.uk> <20250828093902.2719-3-roypat@amazon.co.uk>
-In-Reply-To: <20250828093902.2719-3-roypat@amazon.co.uk>
-From: Fuad Tabba <tabba@google.com>
-Date: Thu, 28 Aug 2025 11:07:11 +0100
-X-Gm-Features: Ac12FXyRDhAk_TvQ6RybLCFXLNR5ZeiLskg-xMwpbNc02N3Vn5Fv4ySMEuemdfk
-Message-ID: <CA+EHjTwDZ-FRV2KfC5ZG9SJYeeMRVUHQ8rVtb9dx2AQwCriPQw@mail.gmail.com>
-Subject: Re: [PATCH v5 02/12] arch: export set_direct_map_valid_noflush to KVM module
-To: "Roy, Patrick" <roypat@amazon.co.uk>
-Cc: "david@redhat.com" <david@redhat.com>, "seanjc@google.com" <seanjc@google.com>, 
-	"ackerleytng@google.com" <ackerleytng@google.com>, "pbonzini@redhat.com" <pbonzini@redhat.com>, 
-	"kvm@vger.kernel.org" <kvm@vger.kernel.org>, 
-	"linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>, 
-	"kvmarm@lists.linux.dev" <kvmarm@lists.linux.dev>, 
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, "linux-mm@kvack.org" <linux-mm@kvack.org>, 
-	"rppt@kernel.org" <rppt@kernel.org>, "will@kernel.org" <will@kernel.org>, "vbabka@suse.cz" <vbabka@suse.cz>, 
-	"Cali, Marco" <xmarcalx@amazon.co.uk>, "Kalyazin, Nikita" <kalyazin@amazon.co.uk>, 
-	"Thomson, Jack" <jackabt@amazon.co.uk>, "Manwaring, Derek" <derekmn@amazon.com>
-Content-Type: text/plain; charset="UTF-8"
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH RFC 1/2] KVM: TDX: Disable general support for MWAIT in
+ guest
+To: "Edgecombe, Rick P" <rick.p.edgecombe@intel.com>,
+ "Hunter, Adrian" <adrian.hunter@intel.com>,
+ "seanjc@google.com" <seanjc@google.com>
+Cc: "Gao, Chao" <chao.gao@intel.com>, "Huang, Kai" <kai.huang@intel.com>,
+ "Li, Xiaoyao" <xiaoyao.li@intel.com>,
+ "Chatre, Reinette" <reinette.chatre@intel.com>,
+ "kirill.shutemov@linux.intel.com" <kirill.shutemov@linux.intel.com>,
+ "tony.lindgren@linux.intel.com" <tony.lindgren@linux.intel.com>,
+ "pbonzini@redhat.com" <pbonzini@redhat.com>,
+ "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+ "Yamahata, Isaku" <isaku.yamahata@intel.com>,
+ "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+ "Zhao, Yan Y" <yan.y.zhao@intel.com>, "Weiny, Ira" <ira.weiny@intel.com>
+References: <20250816144436.83718-1-adrian.hunter@intel.com>
+ <20250816144436.83718-2-adrian.hunter@intel.com>
+ <aKMzEYR4t4Btd7kC@google.com>
+ <136ab62e9f403ad50a7c2cb4f9196153a0a2ef7c.camel@intel.com>
+ <97d3090d-38c5-40df-bab0-c81fc152321d@linux.intel.com>
+ <b7ee32f9e343a10094b21bed455262fecd2e071e.camel@intel.com>
+Content-Language: en-US
+From: Binbin Wu <binbin.wu@linux.intel.com>
+In-Reply-To: <b7ee32f9e343a10094b21bed455262fecd2e071e.camel@intel.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 
-Hi Patrick,
 
-On Thu, 28 Aug 2025 at 10:39, Roy, Patrick <roypat@amazon.co.uk> wrote:
->
-> Use the new per-module export functionality to allow KVM (and only KVM)
-> access to set_direct_map_valid_noflush(). This allows guest_memfd to
-> remove its memory from the direct map, even if KVM is built as a module.
->
-> Direct map removal gives guest_memfd the same protection that
-> memfd_secret enjoys, such as hardening against Spectre-like attacks
-> through in-kernel gadgets.
->
-> Signed-off-by: Patrick Roy <roypat@amazon.co.uk>
-> ---
->  arch/arm64/mm/pageattr.c     | 1 +
->  arch/loongarch/mm/pageattr.c | 1 +
->  arch/riscv/mm/pageattr.c     | 1 +
->  arch/s390/mm/pageattr.c      | 1 +
->  arch/x86/mm/pat/set_memory.c | 1 +
->  5 files changed, 5 insertions(+)
->
-> diff --git a/arch/arm64/mm/pageattr.c b/arch/arm64/mm/pageattr.c
-> index 04d4a8f676db..4f3cddfab9b0 100644
-> --- a/arch/arm64/mm/pageattr.c
-> +++ b/arch/arm64/mm/pageattr.c
-> @@ -291,6 +291,7 @@ int set_direct_map_valid_noflush(struct page *page, unsigned nr, bool valid)
->
->         return set_memory_valid(addr, nr, valid);
->  }
-> +EXPORT_SYMBOL_FOR_MODULES(set_direct_map_valid_noflush, "kvm");
->
->  #ifdef CONFIG_DEBUG_PAGEALLOC
->  /*
-> diff --git a/arch/loongarch/mm/pageattr.c b/arch/loongarch/mm/pageattr.c
-> index f5e910b68229..d076bfd3fcbf 100644
-> --- a/arch/loongarch/mm/pageattr.c
-> +++ b/arch/loongarch/mm/pageattr.c
-> @@ -217,6 +217,7 @@ int set_direct_map_invalid_noflush(struct page *page)
->
->         return __set_memory(addr, 1, __pgprot(0), __pgprot(_PAGE_PRESENT | _PAGE_VALID));
->  }
-> +EXPORT_SYMBOL_FOR_MODULES(set_direct_map_valid_noflush, "kvm");
 
-This should be after 'set_direct_map_valid_noflush', not 'invalid'.
+On 8/19/2025 11:59 PM, Edgecombe, Rick P wrote:
+> On Tue, 2025-08-19 at 13:40 +0800, Binbin Wu wrote:
+>> Currently, KVM TDX code filters out TSX (HLE or RTM) and WAITPKG using
+>> tdx_clear_unsupported_cpuid(), which is sort of blacklist.
+>>
+>> I am wondering if we could add another array, e.g., tdx_cpu_caps[], which is the
+>> TDX version of kvm_cpu_caps[].
+>>
+>> Using tdx_cpu_caps[] is a whitelist way.
+> We had something like this in some of the earlier revisions of the TDX CPUID
+> configuration.
+>
+>> For a new feature
+>> - If the developer doesn't know anything about TDX, the bit just be added to
+>>     kvm_cpu_caps[].
+>> - If the developer knows that the feature supported by both non-TDX VMs and TDs
+>>     (either the feature doesn't require any additional virtualization support or
+>>     the virtualization support is added for TDX), extend the macros to set the bit
+>>     both in kvm_cpu_caps[] and tdx_cpu_caps[].
+>> - If there is a feature not supported by non-TDX VMs, but supported by TDs,
+>>     extend the macros to set the bit only in tdx_cpu_caps[].
+>> So, tdx_cpu_caps[] could be used as the filter of configurable bits reported
+>> to userspace.
+> In some ways this is the simplest, but having to maintain a big list in KVM was
+> not ideal.
+Agree.
 
-With that fixed:
+> The original solution started with KVM_GET_SUPPORTED_CPUID and then
+> massaged the results to fit, so maybe just encoding the whole thing separately
+> is enough to reconsider it.
+>
+> But what I was thinking is that we could most of that hardcoded list into the
+> TDX module, and only keep a list of non-trivial features (i.e. not simple
+> instruction CPUID bits) in KVM. The list of simple features (definition TBD)
+> could be provided by the TDX module.
+It sounds like a good idea.
 
-Reviewed-by: Fuad Tabba <tabba@google.com>
+Either a list of simple features, or the opposite version is OK.
+TDX module already provided the interface to get directly configurable bits.
+VMM can get the other part by masking.
+But providing a list of non-trivial features may be more direct.
 
->  int set_direct_map_valid_noflush(struct page *page, unsigned nr, bool valid)
->  {
-> diff --git a/arch/riscv/mm/pageattr.c b/arch/riscv/mm/pageattr.c
-> index 3f76db3d2769..6db31040cd66 100644
-> --- a/arch/riscv/mm/pageattr.c
-> +++ b/arch/riscv/mm/pageattr.c
-> @@ -400,6 +400,7 @@ int set_direct_map_valid_noflush(struct page *page, unsigned nr, bool valid)
+I think non-trivial features should cover both cases:
+- a feature clobbers host state
+- a feature that requires additional para-virtualization support in VMM. E.g,
+   the feature related MSR(s) should be virtualized by VMM. Without proper
+   para-virtualization support in VMM, the guest will experience functionality
+   issue when using the feature
+
+
+> So KVM could do the full filtering but only
+> keep a list that today would just look like TSX and WAITPKG that we already
+> have. So basically the same as what you are proposing, but just shrinks the size
+> of list KVM has to keep.
 >
->         return __set_memory((unsigned long)page_address(page), nr, set, clear);
->  }
-> +EXPORT_SYMBOL_FOR_MODULES(set_direct_map_valid_noflush, "kvm");
+>> Comparing to blacklist (i.e., tdx_clear_unsupported_cpuid()), there is no risk
+>> that a feature not supported by TDX is forgotten to be added to the blacklist.
+>> Also, tdx_cpu_caps[] could support a feature that not supported for non-TDX VMs.
+> We definitely can't have TDX module adding any host affecting features that we
+> would automatically allow. And having a separate opt-in interface that doesn't
+> "speak" cpuid bits is going to just complicate the already complicated logic
+> that is in QEMU.
+With the list of non-trivial features, VMM can prevent userspace from setting
+any bit in the list not supported by VMM.
+So can KVM only enforce the consistency for non-trivial feature bits? After all,
+these bits are really matters from KVM's view.
+
+If letting userspace, KVM and TDX module have a consistent view of CPUIDs for a
+TD is still a target. When a new fixed1 bit is added in a new TDX spec, it still
+requires an opt-in interface to allow userspace to get the full picture. Also,
+userspace doesn't know which opt-in options are available unless TDX module
+provide another interface to report them... yeah, very complicated :(
+
+Ideally, if TDX module never adds new fixed1 bit (including new defined and
+converted from other types), or convert a fixed1 bit to fixed0 bit, then
+userspace can calculate the right fixed1 bits based on the base spec and the
+directly configurable bits without separate opt-in interface.
+
 >
->  #ifdef CONFIG_DEBUG_PAGEALLOC
->  static int debug_pagealloc_set_page(pte_t *pte, unsigned long addr, void *data)
-> diff --git a/arch/s390/mm/pageattr.c b/arch/s390/mm/pageattr.c
-> index 348e759840e7..8ffd9ef09bc6 100644
-> --- a/arch/s390/mm/pageattr.c
-> +++ b/arch/s390/mm/pageattr.c
-> @@ -413,6 +413,7 @@ int set_direct_map_valid_noflush(struct page *page, unsigned nr, bool valid)
+>> Then we don't need a host opt-in for these directly configurable bits not
+>> clobbering host states.
+>>
+>> Of course, to prevent userspace from setting feature bit that would clobber host
+>> state, but not included in tdx_cpu_caps[], I think a new feature that would
+>> clobber host state should requires a host opt-in to TDX module.
+> Yes, but if have some way to get the host clobbering type info programatically
+> we could keep the host opt-in as part of the main CPUID bit configuration. What
+> I think will be bad is if we grow a separate protocol of opt-ins. KVM and QEMU
+> manage everything with CPUID, so it will be easier if we stick to that.
 >
->         return __set_memory((unsigned long)page_to_virt(page), nr, flags);
->  }
-> +EXPORT_SYMBOL_FOR_MODULES(set_direct_map_valid_noflush, "kvm");
->
->  bool kernel_page_present(struct page *page)
->  {
-> diff --git a/arch/x86/mm/pat/set_memory.c b/arch/x86/mm/pat/set_memory.c
-> index 8834c76f91c9..87e9c7d2dcdc 100644
-> --- a/arch/x86/mm/pat/set_memory.c
-> +++ b/arch/x86/mm/pat/set_memory.c
-> @@ -2661,6 +2661,7 @@ int set_direct_map_valid_noflush(struct page *page, unsigned nr, bool valid)
->
->         return __set_pages_np(page, nr);
->  }
-> +EXPORT_SYMBOL_FOR_MODULES(set_direct_map_valid_noflush, "kvm");
->
->  #ifdef CONFIG_DEBUG_PAGEALLOC
->  void __kernel_map_pages(struct page *page, int numpages, int enable)
-> --
-> 2.50.1
->
+Agree.
 
