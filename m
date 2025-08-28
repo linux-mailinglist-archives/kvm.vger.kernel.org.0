@@ -1,133 +1,155 @@
-Return-Path: <kvm+bounces-55986-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-55987-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5D1BAB38FAA
-	for <lists+kvm@lfdr.de>; Thu, 28 Aug 2025 02:16:49 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6926AB38FC9
+	for <lists+kvm@lfdr.de>; Thu, 28 Aug 2025 02:30:31 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 094FB7C1768
-	for <lists+kvm@lfdr.de>; Thu, 28 Aug 2025 00:16:46 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3F369461B21
+	for <lists+kvm@lfdr.de>; Thu, 28 Aug 2025 00:30:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8EF4F15667D;
-	Thu, 28 Aug 2025 00:16:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D5B781AF0B6;
+	Thu, 28 Aug 2025 00:30:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="xGKBFOaE"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="1L5Baxdr"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pl1-f202.google.com (mail-pl1-f202.google.com [209.85.214.202])
+Received: from mail-pj1-f74.google.com (mail-pj1-f74.google.com [209.85.216.74])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5E63A35979
-	for <kvm@vger.kernel.org>; Thu, 28 Aug 2025 00:16:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9DE6D52F99
+	for <kvm@vger.kernel.org>; Thu, 28 Aug 2025 00:30:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.74
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756340198; cv=none; b=mxEAx+5QD8RusKsnj2D51n4szUR+OTdPldwKmP5KvOjaTSq0FQSUW0xLsbkGyx0pCoGE/jPzpQbi2PFnIKSn9qAmmxpsIYH5STSujszdllzKmHZtvmQlngSKGBZ6Il+DVbqdOC1Bbce4xe3x32rT3DQIjhq4j+ElDQZxw37SVKM=
+	t=1756341012; cv=none; b=otIQmlQLCon8y8FYVwKwtU7wyBacpB95RKLvx9iT+0v6zdH1FhEEclb42hlHeBZjf0oFhuXr5sIPBPrGKbS+An990Orftdd3pWxGTh7u/bAIGrmI2gOUCwmytyziqR/8xCftxVQX9WY9auqDCxuEbaC0ebTT8CmLrtNwcS13G8o=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756340198; c=relaxed/simple;
-	bh=DRQULrR+FB4VYruNOuA3H9WZd2yskdckg89UGJxtXNI=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=YYvVlvlw7VqVmaJXTdluH7Qw9h0RNAcdpyftTGAsaxtwGHo2ip6ECYuBwTBSDg/7aGwmKmXj3tpOhUjh8NldKJRClDLwMgeC+vJ/iywPHmuFCAxeTx3vOGe9m3H7TrQkg/K5LwfiYMssHTqiIQmC4Ga2pwwYFBvFUJTSpE/cbiU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=xGKBFOaE; arc=none smtp.client-ip=209.85.214.202
+	s=arc-20240116; t=1756341012; c=relaxed/simple;
+	bh=eXOBXpkZ02+fsWzn0bIQcLlUn2dEHSjQIN6wZt8ejTs=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=RxjvrsHSRRcCjO7lMEcT3rWqBfXRVVBIu/SHaYhLzWdhz4ESnovAlCatzHXxGnHe19FcHbPmks2aQ6MFSNzUGnBi5nAjbnLlRV5P+dhlBrn7UJwa7G9tDHhuTbd1V1ggyItfVBYAbyHjozAMhrN2ZqYZsKIsNK+0Z/iGUiL090U=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--sagis.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=1L5Baxdr; arc=none smtp.client-ip=209.85.216.74
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pl1-f202.google.com with SMTP id d9443c01a7336-2461c537540so4778095ad.0
-        for <kvm@vger.kernel.org>; Wed, 27 Aug 2025 17:16:37 -0700 (PDT)
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--sagis.bounces.google.com
+Received: by mail-pj1-f74.google.com with SMTP id 98e67ed59e1d1-32775b74143so644492a91.2
+        for <kvm@vger.kernel.org>; Wed, 27 Aug 2025 17:30:10 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1756340197; x=1756944997; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:from:subject:message-id:references
-         :mime-version:in-reply-to:date:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=gN/JTBUQGojSDyUMvLZLw43SnOlQ5Fr1I8L6kd4ekdw=;
-        b=xGKBFOaErHGPI+jd+8sUXO1g/7PTjCoW7j/fS9gLGoC+YZZdPCq9apo7Fv9m+v1DAT
-         z8p+6OOqXY5mpiEjO0neHwD4vWQiKKxDIt3omaj4wF0NA493KLmDYKJJDDid/69m7CxH
-         e4gwk6vm6PrZG0T7cp40skGw9ah9KIhQrPLKeb51jX4o3r/R/WbDO4L6rzhVMNN17p/H
-         1ERDLGiprqX6k9FmWJKM6x81CGdo7WuBsDEip4OAkDqeXH2UrihYUV0WVxLyD0yH1Y9X
-         LaIb5AJAQtw33HyxbBIoJdXwmPFTUnxw72MrEsijSlsAwq8oCioLRUi4UITAOsMP2f1E
-         EuSQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1756340197; x=1756944997;
-        h=content-transfer-encoding:cc:to:from:subject:message-id:references
-         :mime-version:in-reply-to:date:x-gm-message-state:from:to:cc:subject
+        d=google.com; s=20230601; t=1756341010; x=1756945810; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
          :date:message-id:reply-to;
-        bh=gN/JTBUQGojSDyUMvLZLw43SnOlQ5Fr1I8L6kd4ekdw=;
-        b=SCQG2cIAJYloSKXr3l05DfmYWBeatAe1/CSMXarB0T9gKnd19+iFAN4bjUwWSjEC+g
-         zoXgQAFR9bTXAuSolQNJ+irK8DArGQ8iEPf5BQkRfRS4NPPsgvc/hzLd+dGJirVglk21
-         OKwNLqHW1fuTlbGQ6FcYKWAJDznlUOwd/EmZRzTLNXXpy03Ap/Hkz1ZtBWLGuwwnv2HE
-         FsKADe0nwIcShfqTFZFaLBijteaYOoKSY1XeMmkvB7PtC+QKuW5zPZgm3hbDwJurdCuW
-         S5JIMRs3643cSUiwGaxSZMUNtsKSS8U0CRL1XDTOwQELRahfAZSZOmevCQZo4jErISE/
-         fVAA==
-X-Forwarded-Encrypted: i=1; AJvYcCUrJzMFyEYKDCXDMZWqo2BZqOwhfwhEWwNj86yRpCBiYgInsQd2SWqdxIfUp1KShlzxCV0=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yxe9QfUBfjqZpzgm6xv/TNpc7FHu1zqUEEQ/If+XriypNSxwZ3q
-	FnTVOjhEzr2X7RaRfqCv4Xh3rwNXn5Q1mh93tpP8ac+pQ/5fL7n4MtDR932+khrONoau8b+jbqD
-	y9LFEFw==
-X-Google-Smtp-Source: AGHT+IEeaZ+vZ1azz2+/JevayRHNowIgRsI1vZgWUZcfRT1k7jmZ4DcsJTv92NsfT4neFY+yGzMEa3j4/Ro=
-X-Received: from pjxx6.prod.google.com ([2002:a17:90b:58c6:b0:324:ed49:6c92])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:903:94e:b0:246:ae6e:e5db
- with SMTP id d9443c01a7336-246ae6ee847mr198532435ad.42.1756340196775; Wed, 27
- Aug 2025 17:16:36 -0700 (PDT)
-Date: Wed, 27 Aug 2025 17:16:35 -0700
-In-Reply-To: <20250827201059.EmmdDFB_@linutronix.de>
+        bh=JQQriFihIdlgv6YMIws6gyaIkwUMDRppRrS82dBz+Zw=;
+        b=1L5BaxdrMV1oSDcbl8iut2OLp2Zv0zQ4x2L0w1cI1+2XlHEku+KHhkW10OaMYTSc2W
+         DZIqZpWihnSkU/77eCnQcBibH73tA+jdKz2K/Jtkxo8znqAQy0pyd1E4IxLdUXHhMRcf
+         6p+nNBZYv0lRjX5Z+EFVe1juhgEbmSyp7cEsmyI5v6EG4kVwi9wD98CrEgakZegi42YI
+         gzrYtH/0HRWoAK+5WYfwmVV1NpYrNp5gS6mnJHTwS2JRIEI214mVmHyI7yi1rd53q+W4
+         3FqOAqM6imY4ONbFq2RhhcV0gQdRgW2GbF82RjfFbHI6zp1x2NgcTEs9MFweu0f9/1Ii
+         aUdA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1756341010; x=1756945810;
+        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=JQQriFihIdlgv6YMIws6gyaIkwUMDRppRrS82dBz+Zw=;
+        b=URJDNkYv3LZKCXYFfUH6DtRQw2MpFYomlid1fqj2tArZ2aYm1sINXxul+6zJLbOJDp
+         cD7XpFwylRfqTKV5I81BQd82DWB3jI4FNXoc/cvM0ThW1b4PDClsovsjLpo77oW9fr0S
+         X6/ThMeEUQm6giFxPfL9GEl3Bb8ObKHiLIOOs6BTSYECFRO8/d1wLf9zBo5yN1rSCL+g
+         VHqRLLujoQGHwYkwwk9q97ph3R5rMDos3sEGu7LRNOQo34WdjCtKx3qQ5pGc6gxMQHKA
+         VJNRYQFJPghKGVb8xU0oZR7sItYnkG1TZwC4DOrSO8zNoBqW0OSyT1oeLaBJdRB/UXtZ
+         PRmg==
+X-Forwarded-Encrypted: i=1; AJvYcCXum7YBS9XDGZpnL2IZnjk66omOVbdqHEzDh3H7ALHTr1dG7mVgjasdMBc95Ovu2ROgVss=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yz+zKw+DDyg7cTWLYS+aPD1T6RZRwOvV375jMbxK/8F7a2Msj4E
+	hMyLZbOniA0YVKblabxUgoBbhRR+njcwrKl32sBpW4A+HuAPSsfrvg/0DclxVbjdeuM97fawpan
+	aiA==
+X-Google-Smtp-Source: AGHT+IFB42iFf2X16dB5SpgPtPk8Ckez+NS6FJ8J1tyo8xQjf3Jv1HlXEL4rw9Bc9NB7vz3ZZqmTTwZ/CQ==
+X-Received: from pjbok3.prod.google.com ([2002:a17:90b:1d43:b0:321:abeb:1d8a])
+ (user=sagis job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:1642:b0:31f:104f:e4b1
+ with SMTP id 98e67ed59e1d1-32515e3c8f4mr27001654a91.7.1756341009888; Wed, 27
+ Aug 2025 17:30:09 -0700 (PDT)
+Date: Wed, 27 Aug 2025 17:30:06 -0700
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
-References: <20250827194107.4142164-1-seanjc@google.com> <20250827201059.EmmdDFB_@linutronix.de>
-Message-ID: <aK-f45qszH2VEzV7@google.com>
-Subject: Re: [PATCH v2 0/3] vhost_task: Fix a bug where KVM wakes an exited task
-From: Sean Christopherson <seanjc@google.com>
-To: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, 
-	Jason Wang <jasowang@redhat.com>, kvm@vger.kernel.org, virtualization@lists.linux.dev, 
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
+X-Mailer: git-send-email 2.51.0.268.g9569e192d0-goog
+Message-ID: <20250828003006.2764883-1-sagis@google.com>
+Subject: [PATCH v3] KVM: TDX: Force split irqchip for TDX at irqchip creation time
+From: Sagi Shahar <sagis@google.com>
+To: Sean Christopherson <seanjc@google.com>, Paolo Bonzini <pbonzini@redhat.com>, 
+	Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>, 
+	Dave Hansen <dave.hansen@linux.intel.com>, Binbin Wu <binbin.wu@linux.intel.com>, 
+	Ira Weiny <ira.weiny@intel.com>, "H. Peter Anvin" <hpa@zytor.com>
+Cc: linux-kernel@vger.kernel.org, kvm@vger.kernel.org, x86@kernel.org, 
+	Sagi Shahar <sagis@google.com>, Xiaoyao Li <xiaoyao.li@intel.com>
+Content-Type: text/plain; charset="UTF-8"
 
-On Wed, Aug 27, 2025, Sebastian Andrzej Siewior wrote:
-> On 2025-08-27 12:41:04 [-0700], Sean Christopherson wrote:
-> > Michael,
->=20
-> Sean,
->=20
-> would the bellow work by chance? It is a quick shot but it looks
-> symmetrical=E2=80=A6
+TDX module protects the EOI-bitmap which prevents the use of in-kernel
+I/O APIC. See more details in the original patch [1]
 
-Gah, sorry, I flagged your earlier mail and then forgot to circle back to i=
-t
-(for whatever reason, I didn't entirely grok what you were suggesting).
+The current implementation already enforces the use of split irqchip for
+TDX but it does so at the vCPU creation time which is generally to late
+to fallback to split irqchip.
 
-> diff --git a/kernel/vhost_task.c b/kernel/vhost_task.c
-> index bc738fa90c1d6..27107dcc1cbfe 100644
-> --- a/kernel/vhost_task.c
-> +++ b/kernel/vhost_task.c
-> @@ -100,6 +100,7 @@ void vhost_task_stop(struct vhost_task *vtsk)
->  	 * freeing it below.
->  	 */
->  	wait_for_completion(&vtsk->exited);
-> +	put_task_struct(vtsk->task);
->  	kfree(vtsk);
->  }
->  EXPORT_SYMBOL_GPL(vhost_task_stop);
-> @@ -148,7 +149,7 @@ struct vhost_task *vhost_task_create(bool (*fn)(void =
-*),
->  		return ERR_CAST(tsk);
->  	}
-> =20
-> -	vtsk->task =3D tsk;
-> +	vtsk->task =3D get_task_struct(tsk);
->  	return vtsk;
->  }
->  EXPORT_SYMBOL_GPL(vhost_task_create);
+This patch follows Sean's recommendation from [2] and adds a check if
+I/O APIC is supported for the VM at irqchip creation time.
 
-Nice!  This fixes things too.  Either solution works for me.  Or maybe do b=
-oth?
-Attempting to wake a task that vhost_task knows has exited (is exiting?) is=
- a
-bit gross, but even with that hardening, guarding against UAF is very nice =
-to
-have too.
+[1] https://lore.kernel.org/lkml/20250222014757.897978-11-binbin.wu@linux.intel.com/
+[2] https://lore.kernel.org/lkml/aK3vZ5HuKKeFuuM4@google.com/
 
-Tested-by: Sean Christopherson <seanjc@google.com>
+Suggested-by: Sean Christopherson <seanjc@google.com>
+Reviewed-by: Binbin Wu <binbin.wu@linux.intel.com>
+Reviewed-by: Xiaoyao Li <xiaoyao.li@intel.com>
+Signed-off-by: Sagi Shahar <sagis@google.com>
+---
+ arch/x86/include/asm/kvm_host.h | 1 +
+ arch/x86/kvm/vmx/tdx.c          | 1 +
+ arch/x86/kvm/x86.c              | 9 +++++++++
+ 3 files changed, 11 insertions(+)
+
+diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
+index f19a76d3ca0e..6a4019d3a184 100644
+--- a/arch/x86/include/asm/kvm_host.h
++++ b/arch/x86/include/asm/kvm_host.h
+@@ -1357,6 +1357,7 @@ struct kvm_arch {
+ 	u8 vm_type;
+ 	bool has_private_mem;
+ 	bool has_protected_state;
++	bool has_protected_eoi;
+ 	bool pre_fault_allowed;
+ 	struct hlist_head *mmu_page_hash;
+ 	struct list_head active_mmu_pages;
+diff --git a/arch/x86/kvm/vmx/tdx.c b/arch/x86/kvm/vmx/tdx.c
+index 66744f5768c8..6daa45dcbfb0 100644
+--- a/arch/x86/kvm/vmx/tdx.c
++++ b/arch/x86/kvm/vmx/tdx.c
+@@ -630,6 +630,7 @@ int tdx_vm_init(struct kvm *kvm)
+ 
+ 	kvm->arch.has_protected_state = true;
+ 	kvm->arch.has_private_mem = true;
++	kvm->arch.has_protected_eoi = true;
+ 	kvm->arch.disabled_quirks |= KVM_X86_QUIRK_IGNORE_GUEST_PAT;
+ 
+ 	/*
+diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+index a1c49bc681c4..57b4d5ba2568 100644
+--- a/arch/x86/kvm/x86.c
++++ b/arch/x86/kvm/x86.c
+@@ -6966,6 +6966,15 @@ int kvm_arch_vm_ioctl(struct file *filp, unsigned int ioctl, unsigned long arg)
+ 		if (irqchip_in_kernel(kvm))
+ 			goto create_irqchip_unlock;
+ 
++		/*
++		 * Disallow an in-kernel I/O APIC if the VM has protected EOIs,
++		 * i.e. if KVM can't intercept EOIs and thus can't properly
++		 * emulate level-triggered interrupts.
++		 */
++		r = -ENOTTY;
++		if (kvm->arch.has_protected_eoi)
++			goto create_irqchip_unlock;
++
+ 		r = -EINVAL;
+ 		if (kvm->created_vcpus)
+ 			goto create_irqchip_unlock;
+-- 
+2.51.0.268.g9569e192d0-goog
+
 
