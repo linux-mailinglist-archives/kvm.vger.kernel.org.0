@@ -1,299 +1,227 @@
-Return-Path: <kvm+bounces-56011-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-56012-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id D6123B39148
-	for <lists+kvm@lfdr.de>; Thu, 28 Aug 2025 03:53:57 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id EBDDAB3915E
+	for <lists+kvm@lfdr.de>; Thu, 28 Aug 2025 04:01:40 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9129F980F1B
-	for <lists+kvm@lfdr.de>; Thu, 28 Aug 2025 01:53:56 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3A81B7C80ED
+	for <lists+kvm@lfdr.de>; Thu, 28 Aug 2025 02:01:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0C54A23B615;
-	Thu, 28 Aug 2025 01:53:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 89DED24678E;
+	Thu, 28 Aug 2025 02:01:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="R/1chyoU"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="hsRuzWta"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.19])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.8])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2D950214A64;
-	Thu, 28 Aug 2025 01:53:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.19
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756346025; cv=none; b=GNhbeNTD958/IRN+UIT12rbTeD+q9O72wbsfveTwPgxdwCIMhWX1P+zx0XnXJISdpRajW+0gEX3GPoBSFrYidmWx6zfAyteQHU6XM4snt/F7EX9M+8DwjHmfy+FA/zqZX9b8IWyNB8vACWqmGvs8RUlRLDEMmf7ayd8V7zgrbPY=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756346025; c=relaxed/simple;
-	bh=h45WNg3OjA791DZDe+W4K9Q0bEvUnsWre9J8pgZjcMY=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=kw7ba0OyERF9Kd0jY89g+YZjNxHjwqwFDiS7fDqv3lOOM6AfJYUIQ+9VrxNMHyCVkdd4o5/lasXUxtf+AO8ofQotMdP3IHqmnTc5bVPxx4baj5V2BzYqxlgAHRY4wqQPsX85QHVaG9s6JhH9vQ735hXIS+LtVzHD072CXUL0Ifk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=R/1chyoU; arc=none smtp.client-ip=198.175.65.19
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0C0006FC5;
+	Thu, 28 Aug 2025 02:01:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=192.198.163.8
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1756346488; cv=fail; b=h+tl3v6TPzH/vtry49l+99ZjI1EtHjVfouHljLXZFL2eUXMk5WNu76gSaWYRryVB2KdzCRhTOZg17d0+X4HxRNcBsh+pz98nT7S56hhiu6XmQpuUZuPm/jN+IoOP80by4RVJdSkweXrL/Wv5YytJdeTTw0K8VtVq3DMG6pSlBzE=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1756346488; c=relaxed/simple;
+	bh=TShJRqnWts8BYoAz/LGTdVgTV6gURkNjRqkCzzOmTEw=;
+	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=kH+uuEn3m3dBKyGk2adyRc37bCSxk1MYukUEk5WkNvU2ErlY/rIVsYrfA1k49AMo6pUhfMEQENQ/50AG8d1yrh/Zxms5PSaYoC1LdxRB3sEc2PtsAdic26YOwtXHoG0MQWM3QMeT6MqnlpangOiZBMv8d4PZyfnnCsXqjbgfaaw=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=hsRuzWta; arc=fail smtp.client-ip=192.198.163.8
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1756346023; x=1787882023;
-  h=message-id:date:mime-version:subject:to:cc:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=h45WNg3OjA791DZDe+W4K9Q0bEvUnsWre9J8pgZjcMY=;
-  b=R/1chyoUZYhh5HQ2lng7XRBz7Nm7ovWiZa/r03jHIe1EVOYw87aIgu+Q
-   krz0ZRNRowK7mpz2eND4ACKFSuxgQQlOyOuPNlQwQ4hxWTtCbBOHgvSgx
-   acDm2Fv8rA2tfxZjuPUjihevZIIXLDqmbl2kHX8RJC2qz4u/SKHJ+JdrS
-   kDqTgMv2i+p0lhWT12/mDlBsDRGmS6W6mD4iXM7hmwGNzMKq3g+J0uyKr
-   M4wf+S52pdD9YkNgPZ0WbP9qWB9f5aOdbm0wqbWxi+u1IXapCgIduxPkB
-   mkQn5yBh6J7HxXnjtF4yIN5FSqWoO+ltKGwwWxtAxTkoVQdVqOv/zoOxb
-   g==;
-X-CSE-ConnectionGUID: 5a8F5/SHRo+dkkuIm41LSw==
-X-CSE-MsgGUID: hGMcZMgETfyO3AEXfCaS7g==
-X-IronPort-AV: E=McAfee;i="6800,10657,11535"; a="58457422"
+  t=1756346487; x=1787882487;
+  h=from:to:cc:subject:date:message-id:references:
+   in-reply-to:content-id:content-transfer-encoding:
+   mime-version;
+  bh=TShJRqnWts8BYoAz/LGTdVgTV6gURkNjRqkCzzOmTEw=;
+  b=hsRuzWtad0dzbBatss5+23w+4Z5o+3Jz0PEDXo4JuRd7nXYx/acUwULM
+   vitAi7SHYV0IQ/j7RTgrpki9tgC3Gvvh0MYhLjPsVPag8YD+J7OoKswi+
+   6rNiIf3R741feR0qPaxOdWPb6oPkYB8wrFiUFbk9AHHWbDOW2JelSOSBc
+   OVMdI6x5CLZO0MMgUz7E2df3jq102d+pAylgxK7ldGyljaESnM4OYNsVU
+   qZGteHgytrrxfqg6JcvVKxG7KwKpX2vJ3OZjc8Yfpom1Xh8wgC4+pe8Bg
+   Xxgk9o4dwOQ/VGWgoWoVkW+bbDXx1KnSrILwKO7zqUW3JhJzqIKL9R2ZP
+   Q==;
+X-CSE-ConnectionGUID: uAqukNipR2K2M2VKNz76vA==
+X-CSE-MsgGUID: zcuyZANrTau07WFacZ6W5Q==
+X-IronPort-AV: E=McAfee;i="6800,10657,11535"; a="76206064"
 X-IronPort-AV: E=Sophos;i="6.18,217,1751266800"; 
-   d="scan'208";a="58457422"
-Received: from orviesa007.jf.intel.com ([10.64.159.147])
-  by orvoesa111.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 27 Aug 2025 18:53:42 -0700
-X-CSE-ConnectionGUID: 56e0gSQyQL+yUiCLGs1GCQ==
-X-CSE-MsgGUID: MPo5xU5+Tf6vOkmZyBZtKQ==
+   d="scan'208";a="76206064"
+Received: from orviesa003.jf.intel.com ([10.64.159.143])
+  by fmvoesa102.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 27 Aug 2025 19:01:26 -0700
+X-CSE-ConnectionGUID: zRVM6T7YQB2cupCtdq4SAA==
+X-CSE-MsgGUID: Z0ed8ostTHiy00aAfSymIg==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.18,217,1751266800"; 
-   d="scan'208";a="169889714"
-Received: from unknown (HELO [10.238.11.127]) ([10.238.11.127])
-  by orviesa007-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 27 Aug 2025 18:53:39 -0700
-Message-ID: <28d5fb22-5b0c-4bf9-85c7-1986d9cc005b@linux.intel.com>
-Date: Thu, 28 Aug 2025 09:53:37 +0800
+   d="scan'208";a="174154227"
+Received: from orsmsx901.amr.corp.intel.com ([10.22.229.23])
+  by orviesa003.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 27 Aug 2025 19:01:25 -0700
+Received: from ORSMSX902.amr.corp.intel.com (10.22.229.24) by
+ ORSMSX901.amr.corp.intel.com (10.22.229.23) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.2562.17; Wed, 27 Aug 2025 19:01:25 -0700
+Received: from ORSEDG901.ED.cps.intel.com (10.7.248.11) by
+ ORSMSX902.amr.corp.intel.com (10.22.229.24) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.2562.17 via Frontend Transport; Wed, 27 Aug 2025 19:01:25 -0700
+Received: from NAM02-BN1-obe.outbound.protection.outlook.com (40.107.212.41)
+ by edgegateway.intel.com (134.134.137.111) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.2562.17; Wed, 27 Aug 2025 19:01:24 -0700
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=xPsjv8+S0+gEhcrRcZpKRpadMQvYt4vGXw0eWUBTJ0fcOjwWCJFqQ2WL9JuUPE6XA4ttEGOJ7GiVcEqZExgmiMjqljrnLllhRtTnexyYH9+/9gQcpmcUYbNrAkTj198AnCJjl7YpyHevE6/EDH/vBMOtqxVlhIfxVSeW/sO+mLsfALubipatcqOKOciRW/DaYGq9yWKwHgVXIwOT5NDQkFyJqN478JhHliMGlHS0KzSEwJVptHbzdzY+5DA3Qa7B6WfiVgIISLyn9Hqrhe1aXz5ORFybBNd2BJlTp1pAlgHgS9yHUoLMqO1PKYAmsabFRVXA9pTLnzd0eed+LHT9RQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=TShJRqnWts8BYoAz/LGTdVgTV6gURkNjRqkCzzOmTEw=;
+ b=ao0F4qdGlBKPADC8aqmjvcBwHgXPrzUqhT4npDLxki6199yp5K1d3JR6ya1RyZF2gydOPa+TRqn3Ks5j4MWgjJOnr64Q7GuzovRX6djRr9jlup2+8fGQEsNG47asNyuVlPbdyAQmAF/FcDTa0+SMvhu3rcE/ocupTm4cjVHC0EhHEfOhhkDji9CUbFfLbjQZT/S5gBTr3HEcAvXFlpkwBi66v0fCrov07bW5PbyM6KsYOVrGs4wDyxZ1tI8o7+2fIwkBT9ONS2eFY4ByOFfQCNxGo3uCsiQxUr+xaVsQQQeFZ+R4OPix61+/W5BILEnlthofHD4duOlFo3X0x5hP/w==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Received: from MN0PR11MB5963.namprd11.prod.outlook.com (2603:10b6:208:372::10)
+ by DS0PR11MB9477.namprd11.prod.outlook.com (2603:10b6:8:290::18) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9052.14; Thu, 28 Aug
+ 2025 02:01:13 +0000
+Received: from MN0PR11MB5963.namprd11.prod.outlook.com
+ ([fe80::edb2:a242:e0b8:5ac9]) by MN0PR11MB5963.namprd11.prod.outlook.com
+ ([fe80::edb2:a242:e0b8:5ac9%5]) with mapi id 15.20.9052.014; Thu, 28 Aug 2025
+ 02:01:13 +0000
+From: "Edgecombe, Rick P" <rick.p.edgecombe@intel.com>
+To: "pbonzini@redhat.com" <pbonzini@redhat.com>, "seanjc@google.com"
+	<seanjc@google.com>
+CC: "kvm@vger.kernel.org" <kvm@vger.kernel.org>, "Annapurve, Vishal"
+	<vannapurve@google.com>, "linux-kernel@vger.kernel.org"
+	<linux-kernel@vger.kernel.org>, "Zhao, Yan Y" <yan.y.zhao@intel.com>,
+	"michael.roth@amd.com" <michael.roth@amd.com>, "Weiny, Ira"
+	<ira.weiny@intel.com>
+Subject: Re: [RFC PATCH 04/12] KVM: x86/mmu: Rename kvm_tdp_map_page() to
+ kvm_tdp_prefault_page()
+Thread-Topic: [RFC PATCH 04/12] KVM: x86/mmu: Rename kvm_tdp_map_page() to
+ kvm_tdp_prefault_page()
+Thread-Index: AQHcFuZU9Hm9RGRGQkatSrLl2rbm6bR3UXUA
+Date: Thu, 28 Aug 2025 02:01:13 +0000
+Message-ID: <953ac19b2ff434a3abb3787720fefeef5ceda129.camel@intel.com>
+References: <20250827000522.4022426-1-seanjc@google.com>
+	 <20250827000522.4022426-5-seanjc@google.com>
+In-Reply-To: <20250827000522.4022426-5-seanjc@google.com>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+user-agent: Evolution 3.44.4-0ubuntu2 
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: MN0PR11MB5963:EE_|DS0PR11MB9477:EE_
+x-ms-office365-filtering-correlation-id: a3ca0e35-7f21-4ef2-49ec-08dde5d6c454
+x-ld-processed: 46c98d88-e344-4ed4-8496-4ed7712e255d,ExtAddr
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam: BCL:0;ARA:13230040|376014|366016|1800799024|38070700018;
+x-microsoft-antispam-message-info: =?utf-8?B?VnhwMXlLaCtvczc3TlR2S0JUTSt3TlFhdU0wM2tUb1dTUlgxdkJXTEw1Y3ND?=
+ =?utf-8?B?a3kyTE1vakZqbjgxS29jTkdTaklzN2pXZzZnaDcwZVBEVUlRMGNwMlE0eVQv?=
+ =?utf-8?B?RVRFd3V4NEszNCtwWHh0MWlkSGxsaHpLcFY5L2l1YkVITlBFVTArSm92M0NU?=
+ =?utf-8?B?SlBkQ1RmWHZxTnlOdFc3Q0ttdnE1NzBwVWRjdjVZeEpqOHpkU1dVMVlsQnlD?=
+ =?utf-8?B?NVZZVlZERUM5dC9EMStNUlgrdTNEcU1xU2FYZWN3eTM2T0dQcmZJd0hJVDln?=
+ =?utf-8?B?RHltdzRxV0NGaHlZRVNJWjM1dVptNmdyNWhITzdyekVZUGNwZEhDWGNPZlow?=
+ =?utf-8?B?dzMwZ3dTWUFNeEZBeTBibitrTjk1cFovcFRHY0xSOFVCQllQQm1UT3hmb2w2?=
+ =?utf-8?B?WWFZN3Z5MjRBcU5XOHlLOTIwd09rV3dIMnN2SFRETkN1UDhBQ0dia3d3QXk5?=
+ =?utf-8?B?MWY5cmZqeGl0aUo0YTlZQ0czd0pNZXN4ZUliZWJvdEtrMHJPcGdGOEd2TmMw?=
+ =?utf-8?B?T1ZyVXFURE43SlptcjVhTS9oU3VwVmh6eWF3cGFycmhzN2p6c0I1N1V0WmZK?=
+ =?utf-8?B?WE10S1NGVzY0TmZzOVlYSHRxbFBqUnYySGxXNE1KQWtwZ1RZa1YwTWw2UGVF?=
+ =?utf-8?B?amJ4QzQ0SHg4UTlJSktTejdmVnFYdS85YVdRd3o0K29aajVqOHVBbUZJS1Ax?=
+ =?utf-8?B?N0Jadm5NdWllV1JDTDhSN0ExYlZLc2hGeFVMSUplalpOdE1XTENuUXYxWndO?=
+ =?utf-8?B?amc2dXdiYzFHaytEaFUzekJkeGFnZzBhQjRzcmI4VStod3kzbDkwdFM3ZUVT?=
+ =?utf-8?B?N20xQWl6MWh1NE9TOWFQaFVadWg2Wno1NFFXbkdReWxGQTNraEFDRkVPVE8r?=
+ =?utf-8?B?bW9ERXdFcE5vanVoSDR2YlI0Wk9HNnNycGJSMjM4eURYbFN4dmcySWNDRFVW?=
+ =?utf-8?B?NHBFU0ljVmM0M0RaVzdRdDlQTHJ4WWlIbXI2aEE5SFFISkZNVGZRZEUyVE15?=
+ =?utf-8?B?OGx1Nnk4Q3p6Yng5S1J3WGhUUGNBMWowcVFwMm10Y2J0RVJzSXR4ZFoxQUw4?=
+ =?utf-8?B?ZDBCVmoyaUtDZXBST04xL0g3eEVQcjM2MExsU3hJQ2xLd0Q0ZkQ2Y1B0R3I2?=
+ =?utf-8?B?WVd6MDdzNVJpNkkzNlpOQ2N6QXRpZDR1c1NKdHVWQko2Z0s3OFpjeHNPL0ZQ?=
+ =?utf-8?B?dUgzYzdpb2tKSi9vaFRaVjFsUjJ3bzMzeHdYTTljUC84MWJ4Y29xZXlTaDF4?=
+ =?utf-8?B?UUdpcjlMNkhIQitFR1BLckN0SWZ1Wkdmemhsb1REdmxoRHhTMHIyS0N1dWhL?=
+ =?utf-8?B?OXVDbEt1S0J0ZmhvRi9nK1V2dkRzdEZDb0hORVBQTDlTL2RsQU9oOXNJOENN?=
+ =?utf-8?B?U2tyNzhybWV1eDZocGptRFc1dkp0dTg2TEN6U2tlREMzazNqcVM4bDU4R1VR?=
+ =?utf-8?B?Wm9FTVB0ZlRLNTFMYlRkbTdEdmpKaGZseDVlbm9JdHg5M0JEaTJvZzkzS05Y?=
+ =?utf-8?B?ZUtWUFBudmVpbHRzK1lPWFozYkcyT0hZQ3JVbmphTHI0ZW9RWlVZU2Y0enMx?=
+ =?utf-8?B?NEJ5aDNFUXdWR0IvVW9SYlg1bzBWeDJGWnEvcUs5NDR5by9COXJGeEtzVm9M?=
+ =?utf-8?B?MVhYY2E1eTkveVJBSzAycm5haUIrZTF1YnNqYm5vZE12anQvSFBscENYUWxV?=
+ =?utf-8?B?NFJvUGllaGJqeEhrdTBUb2NXUTJmRVhwQnp5dTBLck9XNnQ5UzV0WDk1NjBS?=
+ =?utf-8?B?dEh1QzFJRUFsUlBzeXhZaEowdldmUmVVTFdXQ2FaUzNlcnpsUFRzTFY1THY1?=
+ =?utf-8?B?TVZwMXRQYXB2TklFUVpVK1Q3WGxVeU9HVnlYc01IVW12NktiU1VMcUl3M3dL?=
+ =?utf-8?B?SHhOYXE4MVZRWHV4UEQvTGEva0orUUNpVEorRnNDaWxOVUhRZ202K0lBVHhN?=
+ =?utf-8?B?a1JhMGtJUTd6aTI4VkFVbFBZNm4rRXBYMkdYSmlwa3ZJd09OazJId21XQjdp?=
+ =?utf-8?Q?1JnVRQGbZJWhZbLjyPrgBbCuRQFDsI=3D?=
+x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:MN0PR11MB5963.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(376014)(366016)(1800799024)(38070700018);DIR:OUT;SFP:1101;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0: =?utf-8?B?M2lxYzVpelNjanppRmpKQVFkb0ZoRExJRU1STEIwdlA0MWh2NW9jS0lPN1hH?=
+ =?utf-8?B?bVQ0OWtlcUpiNittNlExSTE1WTlQZS9pZmxlUG15bmpXMlRkMGpZL2wxRnd0?=
+ =?utf-8?B?WmY1NkJ5aUsxUUxqbzJiOUVzS0JzcmNVMmtsL3BXOUNXR1k5V3VPMGR0NVg2?=
+ =?utf-8?B?NnBxQkt2a09seFBLSy9PZi9VK1VZeWRpLzhTNG90WURnalMvSGxHR2gydG1s?=
+ =?utf-8?B?WGVEQll6a1BycmI3TUZDaDVnUWdNN2o2UzRoSUhRRGtlNVJxejhmY2dUaUhm?=
+ =?utf-8?B?Uk92eXRScStWYVFlZzg1WklBVHB0bHowTFdKSzV6Tkl1TGpNTExtNSsycDZ5?=
+ =?utf-8?B?cXVRQVBPRDdKK0cxeWpiSWFzU0l0dUw4RE1DN1JmZ3Uybk9acEtDdEhlb25V?=
+ =?utf-8?B?VytURVE2YmJiOEE4UGFYalBvSCs0Mk1naThDbTNjNlA5b3YwZUF6SmQ3RGlk?=
+ =?utf-8?B?NjczWnFFUHhmY2FHWWpZWDZuTktqZy80WDFCTlg5UHcvM3hIVU5ZMHZUOHNI?=
+ =?utf-8?B?N2hJNVd3NDhWUDg2a1dwcTRoaERpZlFuNkdsUzBjMXFYendVcVpZeUlYOTdr?=
+ =?utf-8?B?SStYd0tBUUJ3Y2dJTHAxdisvdlJUSSt6VFZ4cW1GU0lyOXN2ZXQxaUFDWlE4?=
+ =?utf-8?B?MFlXWEtDckpjRTZILzlwOEJPcUpwNTJ3d3pWdG1vQnRYTVdrM3R0eDNzQ3Rx?=
+ =?utf-8?B?OEpzdjdEbzc3OXh0Vkx2ZXJBcno3SWdVU2FlOEJGYktHcE56L054ZmUxMHh6?=
+ =?utf-8?B?L3JrQnpjWVdkb1Vka2pscGxGc3NjME9qYVpueXExcjZ4eXVCZ21BUW43eFlh?=
+ =?utf-8?B?d1lGU0V4MTFLQnE0QUhSVWZLdGJUYUp4NlJXczIrQ2VQcld4VWhJQmdPa3FD?=
+ =?utf-8?B?dU9BNkt3czBpajBoZldwOXRoL3E5NkFVYjBzcUVIeDlVL2RLdEYyZUhYMlpF?=
+ =?utf-8?B?RXRHclc0Wk9yTTR2YXVHREt5RFFUb0N1ajlNb2JqblJOSUhHeWdvRG15M0JU?=
+ =?utf-8?B?bzFjbEdtSGJ1cUJrL1lCWkF3STlQTDBLKzN5c0YrTmxKWC83cVUrc2w4WjBh?=
+ =?utf-8?B?ZDRLUFNyamJFc0VOZXJXd3JaYldBQlFjaUdUK1RqdExoc0prZWdyZkxSLzBz?=
+ =?utf-8?B?Z1lnYWZyaHgvZFNVS2pyWjZZelFKQjcxYkJ3YjgydG1LUFdjeHYrU05XVzBz?=
+ =?utf-8?B?ZitmMU5MNmRuZjl5R213MnBJNXM5Ykk3L1ljcUFlQ05NV2tZUi9FTWtHREg2?=
+ =?utf-8?B?S1p2djFKaTA3VWZTMUkzZ2hIbUw0aFJUQWlXYUFnYlhYeWFZVWZxbTcwNWRn?=
+ =?utf-8?B?d2lLbUFFQ2VNbTV5OGRSMmxmQzk2OHpEaVl4NGthU29GUHBaSDRVYVkwNnFI?=
+ =?utf-8?B?UTVBTVNCTC9ybVdSOWZlU3BzSTZaaHZNWTNqMW1uWVJSUVErSG5icDAvTHJH?=
+ =?utf-8?B?U05PcnpsVDNjeU4wYmZJTVFGM21XUlhJT0lJVm5nTkV6OXl3dmJJb1VWL29H?=
+ =?utf-8?B?TDRHOUd2dVdTWXRSSjJRYmY5YXZwcnd6aURtbGp0MUQ1VGNmOThMelRjekFI?=
+ =?utf-8?B?THBkMHlJM2FFd043ZDg5VVEyNS9aM1RZK3hDalJYSDE0V3Fydld2MWNBbTVk?=
+ =?utf-8?B?Vk9ZbWNMTGRzdkU5akh3cGtKNCsyb0NrbVdFZW9GTU5NbFdqWmJSK1diUTdH?=
+ =?utf-8?B?Z2FqZHhVQW54eWprYUgvNndlZnNPTG1rYVM2NFRyRHFxbUg4V1lyU2hzWXYw?=
+ =?utf-8?B?NnE1OTdZazVQM0hZSUVjNVVrUHpDQTdmcjlpSHhqTkJyZ3plVStYRndhSlBQ?=
+ =?utf-8?B?QzU5UWZXMkNxMHBGaXhnU0Q5bkZCYWtMS2p2cXVZY3JvOUszOUxiMGVFN3Uw?=
+ =?utf-8?B?bEJoUG1pS2kyc2hIejlORlJQUkYwOGh1UXBJODZKWElaNXpzSTNVdC9oem5O?=
+ =?utf-8?B?Nk9sM3BRdWE5cjFkR3h5OUhNNEdSSUwvMGx2VFlWOG04N2NzR3RPSHlrclNM?=
+ =?utf-8?B?T2wvbW9GU0J4eXp0dVRMUWVoNVQvZnd0U3pYT3FVdGpvYXBLUktsV1Z3Wklu?=
+ =?utf-8?B?WE9jWHdqUHFuZmNnVXhQc1ZHYzlhT0VqS0JSdVpaUlNXSHZmSzNSM0dCaDQ4?=
+ =?utf-8?B?cWxxckMyN2RhUTl0SWV3YjFnS2xaU3gwbUNjSW05b0N2akI2M3JUUmtBMUtM?=
+ =?utf-8?B?Z2c9PQ==?=
+Content-Type: text/plain; charset="utf-8"
+Content-ID: <B644E5E468AB074DAB48650D51D29C50@namprd11.prod.outlook.com>
+Content-Transfer-Encoding: base64
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2] x86/kvm: Force legacy PCI hole to UC when overriding
- MTRRs for TDX/SNP
-To: Sean Christopherson <seanjc@google.com>,
- Paolo Bonzini <pbonzini@redhat.com>
-Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
- Peter Gonda <pgonda@google.com>, Vitaly Kuznetsov <vkuznets@redhat.com>,
- Tom Lendacky <thomas.lendacky@amd.com>, =?UTF-8?B?SsO8cmdlbiBHcm/Dnw==?=
- <jgross@suse.com>, Korakit Seemakhupt <korakit@google.com>,
- Jianxiong Gao <jxgao@google.com>, Nikolay Borisov <nik.borisov@suse.com>
-References: <20250828005249.39339-1-seanjc@google.com>
-Content-Language: en-US
-From: Binbin Wu <binbin.wu@linux.intel.com>
-In-Reply-To: <20250828005249.39339-1-seanjc@google.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: MN0PR11MB5963.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: a3ca0e35-7f21-4ef2-49ec-08dde5d6c454
+X-MS-Exchange-CrossTenant-originalarrivaltime: 28 Aug 2025 02:01:13.5498
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: DLNupKfABQ9prUjUf6njHEUzQRhu1nTCMm6+UTLzG6yq5flEaocNTmIRYn6N4bO8O1WKluFBTwUwObj6bPouf/1LEp7/QbJ4Jl9zc/Rod/I=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DS0PR11MB9477
+X-OriginatorOrg: intel.com
 
-
-
-On 8/28/2025 8:52 AM, Sean Christopherson wrote:
-> When running as an SNP or TDX guest under KVM, force the legacy PCI hole,
-> i.e. memory between Top of Lower Usable DRAM and 4GiB, to be mapped as UC
-> via a forced variable MTRR range.
->
-> In most KVM-based setups, legacy devices such as the HPET and TPM are
-> enumerated via ACPI.  ACPI enumeration includes a Memory32Fixed entry, and
-> optionally a SystemMemory descriptor for an OperationRegion, e.g. if the
-> device needs to be accessed via a Control Method.
->
-> If a SystemMemory entry is present, then the kernel's ACPI driver will
-> auto-ioremap the region so that it can be accessed at will.  However, the
-> ACPI spec doesn't provide a way to enumerate the memory type of
-> SystemMemory regions, i.e. there's no way to tell software that a region
-> must be mapped as UC vs. WB, etc.  As a result, Linux's ACPI driver always
-> maps SystemMemory regions using ioremap_cache(), i.e. as WB on x86.
->
-> The dedicated device drivers however, e.g. the HPET driver and TPM driver,
-> want to map their associated memory as UC or WC, as accessing PCI devices
-> using WB is unsupported.
->
-> On bare metal and non-CoCO, the conflicting requirements "work" as firmware
-> configures the PCI hole (and other device memory) to be UC in the MTRRs.
-> So even though the ACPI mappings request WB, they are forced to UC due to
-
-Linux kernel forces the type as UC- in this case.
-
-> the kernel properly handling the MTRR overrides, and thus are compatible
-> with the drivers' requested WC/UC-.
->
-> With force WB MTRRs on SNP and TDX guests, the ACPI mappings get their
-> requested WB if the ACPI mappings are established before the dedicated
-> driver code attempts to initialize the device.  E.g. if acpi_init()
-> runs before the corresponding device driver is probed, ACPI's WB mapping
-> will "win", and result in the driver's ioremap() failing because the
-> existing WB mapping isn't compatible with the requested WC/UC-.
->
-> E.g. when a TPM is emulated by the hypervisor (ignoring the security
-> implications of relying on what is allegedly an untrusted entity to store
-> measurements), the TPM driver will request UC and fail:
->
->    [  1.730459] ioremap error for 0xfed40000-0xfed45000, requested 0x2, got 0x0
->    [  1.732780] tpm_tis MSFT0101:00: probe with driver tpm_tis failed with error -12
->
-> Note, the '0x2' and '0x0' values refer to "enum page_cache_mode", not x86's
-> memtypes (which frustratingly are an almost pure inversion; 2 == WB, 0 == UC).
-> E.g. tracing mapping requests for TPM TIS yields:
->
->   Mapping TPM TIS with req_type = 0
->   WARNING: CPU: 22 PID: 1 at arch/x86/mm/pat/memtype.c:530 memtype_reserve+0x2ab/0x460
->   Modules linked in:
->   CPU: 22 UID: 0 PID: 1 Comm: swapper/0 Tainted: G        W           6.16.0-rc7+ #2 VOLUNTARY
->   Tainted: [W]=WARN
->   Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 05/29/2025
->   RIP: 0010:memtype_reserve+0x2ab/0x460
->    __ioremap_caller+0x16d/0x3d0
->    ioremap_cache+0x17/0x30
->    x86_acpi_os_ioremap+0xe/0x20
->    acpi_os_map_iomem+0x1f3/0x240
->    acpi_os_map_memory+0xe/0x20
->    acpi_ex_system_memory_space_handler+0x273/0x440
->    acpi_ev_address_space_dispatch+0x176/0x4c0
->    acpi_ex_access_region+0x2ad/0x530
->    acpi_ex_field_datum_io+0xa2/0x4f0
->    acpi_ex_extract_from_field+0x296/0x3e0
->    acpi_ex_read_data_from_field+0xd1/0x460
->    acpi_ex_resolve_node_to_value+0x2ee/0x530
->    acpi_ex_resolve_to_value+0x1f2/0x540
->    acpi_ds_evaluate_name_path+0x11b/0x190
->    acpi_ds_exec_end_op+0x456/0x960
->    acpi_ps_parse_loop+0x27a/0xa50
->    acpi_ps_parse_aml+0x226/0x600
->    acpi_ps_execute_method+0x172/0x3e0
->    acpi_ns_evaluate+0x175/0x5f0
->    acpi_evaluate_object+0x213/0x490
->    acpi_evaluate_integer+0x6d/0x140
->    acpi_bus_get_status+0x93/0x150
->    acpi_add_single_object+0x43a/0x7c0
->    acpi_bus_check_add+0x149/0x3a0
->    acpi_bus_check_add_1+0x16/0x30
->    acpi_ns_walk_namespace+0x22c/0x360
->    acpi_walk_namespace+0x15c/0x170
->    acpi_bus_scan+0x1dd/0x200
->    acpi_scan_init+0xe5/0x2b0
->    acpi_init+0x264/0x5b0
->    do_one_initcall+0x5a/0x310
->    kernel_init_freeable+0x34f/0x4f0
->    kernel_init+0x1b/0x200
->    ret_from_fork+0x186/0x1b0
->    ret_from_fork_asm+0x1a/0x30
->    </TASK>
->
-> The above traces are from a Google-VMM based VM, but the same behavior
-> happens with a QEMU based VM that is modified to add a SystemMemory range
-> for the TPM TIS address space.
->
-> The only reason this doesn't cause problems for HPET, which appears to
-> require a SystemMemory region, is because HPET gets special treatment via
-> x86_init.timers.timer_init(), and so gets a chance to create its UC-
-> mapping before acpi_init() clobbers things.  Disabling the early call to
-> hpet_time_init() yields the same behavior for HPET:
->
->    [  0.318264] ioremap error for 0xfed00000-0xfed01000, requested 0x2, got 0x0
->
-> Hack around the ACPI gap by forcing the legacy PCI hole to UC when
-> overriding the (virtual) MTRRs for CoCo guest, so that ioremap handling
-> of MTRRs naturally kicks in and forces the ACPI mappings to be UC.
->
-> Note, the requested/mapped memtype doesn't actually matter in terms of
-> accessing the device.  In practically every setup, legacy PCI devices are
-> emulated by the hypervisor, and accesses are intercepted and handled as
-> emulated MMIO, i.e. never access physical memory and thus don't have an
-> effective memtype.
->
-> Even in a theoretical setup where such devices are passed through by the
-> host, i.e. point at real MMIO memory, it is KVM's (as the hypervisor)
-> responsibility to force the memory to be WC/UC, e.g. via EPT memtype
-> under TDX or real hardware MTRRs under SNP.  Not doing so cannot work,
-> and the hypervisor is highly motivated to do the right thing as letting
-> the guest access hardware MMIO with WB would likely result in a variety
-> of fatal #MCs.
->
-> In other words, forcing the range to be UC is all about coercing the
-> kernel's tracking into thinking that it has established UC mappings, so
-> that the ioremap code doesn't reject mappings from e.g. the TPM driver and
-> thus prevent the driver from loading and the device from functioning.
->
-> Note #2, relying on guest firmware to handle this scenario, e.g. by setting
-> virtual MTRRs and then consuming them in Linux, is not a viable option, as
-> the virtual MTRR state is managed by the untrusted hypervisor, and because
-> OVMF at least has stopped programming virtual MTRRs when running as a TDX
-> guest.
-
-Not sure if it needs to mention that with this option, Linux kernel will set
-CR0.CD=1 when programming MTRRs, which will trigger unexpected #VE in TDX guest.
-
->
-> Link: https://lore.kernel.org/all/8137d98e-8825-415b-9282-1d2a115bb51a@linux.intel.com
-> Fixes: 8e690b817e38 ("x86/kvm: Override default caching mode for SEV-SNP and TDX")
-> Cc: stable@vger.kernel.org
-> Cc: Peter Gonda <pgonda@google.com>
-> Cc: Vitaly Kuznetsov <vkuznets@redhat.com>
-> Cc: Tom Lendacky <thomas.lendacky@amd.com>
-> Cc: Jürgen Groß <jgross@suse.com>
-> Cc: Korakit Seemakhupt <korakit@google.com>
-> Cc: Jianxiong Gao <jxgao@google.com>
-> Cc: Nikolay Borisov <nik.borisov@suse.com>
-> Suggested-by: Binbin Wu <binbin.wu@linux.intel.com>
-> Signed-off-by: Sean Christopherson <seanjc@google.com>
-
-Two nits above.
-
-Otherwise,
-
-Reviewed-by: Binbin Wu <binbin.wu@linux.intel.com>
-
-> ---
->
-> v2: Force the PCI hole to be UC via synthetic variable MTRR range instead
->      of hijacking is_untracked_pat_range() (which was horrific and apparently
->      didn't work). [Binbin]
->
-> v1:
->   - https://lore.kernel.org/all/20250201005048.657470-1-seanjc@google.com
->   - https://lore.kernel.org/all/CAMGD6P1Q9tK89AjaPXAVvVNKtD77-zkDr0Kmrm29+e=i+R+33w@mail.gmail.com
->
->   arch/x86/kernel/kvm.c | 21 +++++++++++++++++++--
->   1 file changed, 19 insertions(+), 2 deletions(-)
->
-> diff --git a/arch/x86/kernel/kvm.c b/arch/x86/kernel/kvm.c
-> index 8ae750cde0c6..57379698015e 100644
-> --- a/arch/x86/kernel/kvm.c
-> +++ b/arch/x86/kernel/kvm.c
-> @@ -933,6 +933,19 @@ static void kvm_sev_hc_page_enc_status(unsigned long pfn, int npages, bool enc)
->   
->   static void __init kvm_init_platform(void)
->   {
-> +	u64 tolud = PFN_PHYS(e820__end_of_low_ram_pfn());
-> +	/*
-> +	 * Note, hardware requires variable MTRR ranges to be power-of-2 sized
-> +	 * and naturally aligned.  But when forcing guest MTRR state, Linux
-> +	 * doesn't program the forced ranges into hardware.  Don't bother doing
-> +	 * the math to generate a technically-legal range.
-> +	 */
-> +	struct mtrr_var_range pci_hole = {
-> +		.base_lo = tolud | X86_MEMTYPE_UC,
-> +		.mask_lo = (u32)(~(SZ_4G - tolud - 1)) | MTRR_PHYSMASK_V,
-> +		.mask_hi = (BIT_ULL(boot_cpu_data.x86_phys_bits) - 1) >> 32,
-> +	};
-> +
->   	if (cc_platform_has(CC_ATTR_GUEST_MEM_ENCRYPT) &&
->   	    kvm_para_has_feature(KVM_FEATURE_MIGRATION_CONTROL)) {
->   		unsigned long nr_pages;
-> @@ -982,8 +995,12 @@ static void __init kvm_init_platform(void)
->   	kvmclock_init();
->   	x86_platform.apic_post_init = kvm_apic_init;
->   
-> -	/* Set WB as the default cache mode for SEV-SNP and TDX */
-> -	guest_force_mtrr_state(NULL, 0, MTRR_TYPE_WRBACK);
-> +	/*
-> +	 * Set WB as the default cache mode for SEV-SNP and TDX, with a single
-> +	 * UC range for the legacy PCI hole, e.g. so that devices that expect
-> +	 * to get UC/WC mappings don't get surprised with WB.
-> +	 */
-> +	guest_force_mtrr_state(&pci_hole, 1, MTRR_TYPE_WRBACK);
->   }
->   
->   #if defined(CONFIG_AMD_MEM_ENCRYPT)
->
-> base-commit: 1b237f190eb3d36f52dffe07a40b5eb210280e00
-
+T24gVHVlLCAyMDI1LTA4LTI2IGF0IDE3OjA1IC0wNzAwLCBTZWFuIENocmlzdG9waGVyc29uIHdy
+b3RlOg0KPiBSZW5hbWUga3ZtX3RkcF9tYXBfcGFnZSgpIHRvIGt2bV90ZHBfcHJlZmF1bHRfcGFn
+ZSgpIG5vdyB0aGF0IGl0J3MgdXNlZA0KPiBvbmx5IGJ5IGt2bV9hcmNoX3ZjcHVfcHJlX2ZhdWx0
+X21lbW9yeSgpLg0KPiANCj4gTm8gZnVuY3Rpb25hbCBjaGFuZ2UgaW50ZW5kZWQuDQoNCkkgcmVh
+bGl6ZSB5b3UgYXJlIGp1c3QgdHJ5aW5nIHRvIGRvIG1hcC0+cHJlZmF1bHQgaGVyZSwgYnV0ICJw
+YWdlIiBzZWVtcw0KcmVkdW5kYW50IG9uY2UgeW91IGhhdmUgInByZWZhdWx0IiBpbiB0aGUgbmFt
+ZS4gV2h5IHBhZ2UgaGVyZSB2cyBhbGwgdGhlIG90aGVyDQpmYXVsdCBoYW5kbGVyIGZ1bmN0aW9u
+cyB3aXRob3V0IGl0Pw0K
 
