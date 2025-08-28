@@ -1,155 +1,125 @@
-Return-Path: <kvm+bounces-56143-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-56144-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7E9E4B3A6BA
-	for <lists+kvm@lfdr.de>; Thu, 28 Aug 2025 18:44:03 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4D560B3A6C1
+	for <lists+kvm@lfdr.de>; Thu, 28 Aug 2025 18:45:14 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 448C317256D
-	for <lists+kvm@lfdr.de>; Thu, 28 Aug 2025 16:44:03 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id CDA443AB43C
+	for <lists+kvm@lfdr.de>; Thu, 28 Aug 2025 16:44:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 05730326D50;
-	Thu, 28 Aug 2025 16:43:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 015D332C316;
+	Thu, 28 Aug 2025 16:44:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="3OqgxH/p"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="OsoqgrGZ"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pf1-f179.google.com (mail-pf1-f179.google.com [209.85.210.179])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C9045322C89
-	for <kvm@vger.kernel.org>; Thu, 28 Aug 2025 16:43:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.179
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A6AFA322DBF
+	for <kvm@vger.kernel.org>; Thu, 28 Aug 2025 16:44:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756399437; cv=none; b=H7zq3cb9ApFJ6YnwrYzsqwE6NFNROcLQrMzutS+EGMSYkR4IPCHsQwuHrDJCWURkZrpOfwwPgvkMQEhgtBvriZCS/JyURwsOWQApWruvcrOYJzO0Oi5tMWnOiRE4Xj1AsTtdEtgjF81X1E9hk62lIrJe4Gw7vGnBNxtApk82E4w=
+	t=1756399478; cv=none; b=ZwQWvF8gqByYqRvTsg6eHuM7ipqO1gqXHTQah0GlvddeYA2E0QNVJKp0astZ25CXvx1rqeaUujzycpZDoKuxqbEwnvGeB3fs11ojweXqFrduKuC4I1FY6TX3qXuFFeci/KFQZER24U6kYPro/SD/mc0SmfNsMFdPPIyntOhWjak=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756399437; c=relaxed/simple;
-	bh=6Cdpiq+Zzg2lIGGkSRD5WELvl2nCdU/wD6GSA161iwA=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=qIDJcJrszedUvPXRTJ1ztKHpCI/cgbh2OzmoYO1bRVe/3ErSJhQTvyIUhj6T7WxZqTdoS0xTh412GuufCU5WFm5ZSooFekHMrYzdY7DfwF6qMrFGJ0kABAtRqSx8/h5y4UhNk8+DNxV1O/4DwqEm/S6mVUu/kW5JpTU9OKOnmyA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=3OqgxH/p; arc=none smtp.client-ip=209.85.210.179
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-pf1-f179.google.com with SMTP id d2e1a72fcca58-771f69fd6feso1431656b3a.1
-        for <kvm@vger.kernel.org>; Thu, 28 Aug 2025 09:43:55 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1756399435; x=1757004235; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=8blEVa85dDyW3Z+dNJYIvBsar0sKOxqyFeme/7/E2N8=;
-        b=3OqgxH/p2MzgnY18PSwphDFbRw6d6d8bEy4K7zAIqLoc6YYRceBwp/cnm6aF4KZ3eW
-         X9P1F49y4/8PT8Ueymb01YZNyYtFNwLbueJAZcAG6eX6b2q0SxIQOlwC5X1Xiv0VsC1M
-         mWOHj63rMzKch3tqWAVHUeFMTy5N+IcxI9zIdjCkXiocHNsre6jYjZ0qYNZ5vmpQjxmP
-         AIqvN3Zr+r0Qsxrvssvr7KK7GtBgXXCsWHnULomo0HJP9+Uhs1AkSMqsKUnzS8w5LTeI
-         +Pbm9kfeVBYpZUsoQGphY/tMlb8II6aSn6mETtX9//DtfjCJdyQhyadkqYQHzScaei5s
-         CqYg==
+	s=arc-20240116; t=1756399478; c=relaxed/simple;
+	bh=16g9F5woniiXrhsLLuxG1053++5xXv7LjCWoyLqXmvA=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=aTT7DJ78Tz5kYlTIy4vpktG4Qb2oZxJMHi0FvG4I7xQrzUqZJgb/ZvpNn1eHhnclPq8OU2EMN/VWxeJbmq7FKlhrdnS0Y1wXDmjCWOkSWzue3f6LEIWuqDjeqOpUPqLZCwqvtwBg8N1NVgcrX9afuEXTX+8tRzJ1p5y4sTJKIlA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=OsoqgrGZ; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1756399475;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=16g9F5woniiXrhsLLuxG1053++5xXv7LjCWoyLqXmvA=;
+	b=OsoqgrGZwaNCtFRa338uIQspNjNXuEGVsFP9ks/yxrQHh/5MjCuRreSGSeeNNiVAZ1vQnI
+	rDVRRbMvks6VHehP1DtVHSEi+XHqmLnRqaIK8xVVwfDDisu4My8t1dCkOXXc/ms6QmvytL
+	G/82M7brFNASpVxff/t/9FiT67RBMKg=
+Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
+ [209.85.128.71]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-295-EFG2u_AgME-9DtT0qnVxsg-1; Thu, 28 Aug 2025 12:44:32 -0400
+X-MC-Unique: EFG2u_AgME-9DtT0qnVxsg-1
+X-Mimecast-MFC-AGG-ID: EFG2u_AgME-9DtT0qnVxsg_1756399471
+Received: by mail-wm1-f71.google.com with SMTP id 5b1f17b1804b1-45b7a0d1a71so7118615e9.2
+        for <kvm@vger.kernel.org>; Thu, 28 Aug 2025 09:44:31 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1756399435; x=1757004235;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=8blEVa85dDyW3Z+dNJYIvBsar0sKOxqyFeme/7/E2N8=;
-        b=p/AzKJuwEzKU3YzH2jOtKcW8Jyaxe1EYkJjx9gK9M6CCc1aOX5fPGj3olnGND0/X3F
-         a9aJ+5DP6w5SxiE0uFIieEqBzAhYA9/3hGyzkizkjrghBSJkSzmaDuwC2zPS79A1GFT6
-         OvTpAiYLgw0c0GFKrb89zN9zYrBqodosUkUAv+DbVZ6oRv6ome94htBwRFy2cY1Llxul
-         m8v9NvTPqTTz2O/cscEZgpLnudc5PLfvLHBQn7gebswzd/NAVcbfxyAk/6TtIyC2rgCd
-         gXKqglOvidTiF/uEkFS0DoN3XQitg4mPu2QcO9nAccDt14zLpF1aULLZOIEGcv54YClW
-         5aWA==
-X-Forwarded-Encrypted: i=1; AJvYcCWiwJPehVEOxqcXD8FggY8UD0nkquqjqnMMu871slTSAraD2bIAbvEFE1fVDnQKB0Fm7PE=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yy+m2H+DfPDupmCTZ5MHEHOd/pR4ybDs3/xKnBMVvjFZadv65l4
-	BEkjUc3ooQb3jGB/RfhSWKeGD9l7F1A1uMYtSUL5ptMuI6EIDfzlNy2a0ECrndlq7ZMl8xKR+Z4
-	VUiVgNA==
-X-Gm-Gg: ASbGncubGZhrnaTvxX4fnCfSBkfCdxfjctun9s7RauM6BbJSAcV+yiDWG499b7/dBLr
-	Iot3pEQnlFMOZP3I0pasBWlyfUZUr/lqoj5zVj3qXOfS/lhhOeoUBCFOUzWTqkMNScBxg7SQHuH
-	vtvcHG7jCHraVVD7k97m5N9rpuEKhKRo06TtwIC4UfehAIpTnA9ToUQzqngVF07WZz+Nb1Y55em
-	8GM/o0KRBAwAJXi00jo0i5Q4qtEM8tB87+Ma/uIpBBzmyIlBHLoKennwzheaFk1eRIroj1m3Ypq
-	YrlZ89b0+Eg069tGMOMWz0ZgDkrXg1gtzslriByCRcuqwX9dJpVYac6vTsKeboJ303DEUnosabm
-	GAj5Ky80ekTam9mNDPZaChjN4fC/D56rG7j5iFW9c2Kdkw4nVAlvIEuQJLpNq5dtTADvv9WVMkq
-	nNfdMDzYg9ta+0SGbjY0f9
-X-Google-Smtp-Source: AGHT+IFMy7ShxWIeqlyJjwrda2ndy0stFzll0/vMdsdQ1HiUhQJpb1uUs9R19cFwupqaIiTdJVYSvw==
-X-Received: by 2002:a05:6a00:391a:b0:748:fcfa:8be2 with SMTP id d2e1a72fcca58-7702fa09c17mr33404597b3a.2.1756399434797;
-        Thu, 28 Aug 2025 09:43:54 -0700 (PDT)
-Received: from google.com (13.42.168.34.bc.googleusercontent.com. [34.168.42.13])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-77040021393sm16523940b3a.49.2025.08.28.09.43.53
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 28 Aug 2025 09:43:53 -0700 (PDT)
-Date: Thu, 28 Aug 2025 16:43:48 +0000
-From: David Matlack <dmatlack@google.com>
-To: kernel test robot <lkp@intel.com>
-Cc: oe-kbuild-all@lists.linux.dev, kvm@vger.kernel.org,
-	Alex Williamson <alex.williamson@redhat.com>
-Subject: Re: [awilliam-vfio:next 5/37]
- tools/testing/selftests/vfio/.gitignore: warning: ignored by one of the
- .gitignore files
-Message-ID: <aLCHRCKsPTFQfTOD@google.com>
-References: <202508280918.rFRyiLEU-lkp@intel.com>
+        d=1e100.net; s=20230601; t=1756399470; x=1757004270;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=16g9F5woniiXrhsLLuxG1053++5xXv7LjCWoyLqXmvA=;
+        b=UB1TlSs0TqFXmTGWj8xJjYNoEB/aslAUWv9fPVYyCrFASrHifE0bHwQY+q+hx5mVAA
+         4nK13Hj5AA2EtLlSTiF6QsLX+O2Crm4nOihKjw9kP8cdnhHNLgKo7AGZHewMSKnQvVCC
+         x5YU99/3Oa36Lx/ipB6H1TnhgxJa7tZQDrTPYgGvet18EltbAxN0FPNPkLPQWNROb/pU
+         6LgLIuGqs2kPS4xhO4E92HZyYDcVFf8SCs7ByE2A3Im1l6AFCXkKaE+rqlTIl3amDf4I
+         9GQXPown/S7brOag5p6iNs/gPV2ugUQm2h4V9Cq+mfhQ/RCkqg7XpyanzONR8CHPr3MD
+         UAfg==
+X-Forwarded-Encrypted: i=1; AJvYcCUr/Rv8R1FIpKMGwCG4BWKDrwN3i8jwHMhi+PH0k84rt+m5GSa6rJM8ujCV9cb/QV2wg64=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyjSysrQ5W65uHHOaGCBBLi7tEiFL50r6tNpUK//S+wpnis5Xdg
+	ooEo39rMht95wM4yN0oOpgngOHcNcmWR2Zqpo561zl58/hDF8Hcukgn97fQGpZjog4d9X3HsGlP
+	QoywuxW9SeS7RsPDIVSrJ/ZmNjXCwReTmfV6s0qoXwa3ciXVTJm5No9uLNTJZxjLMkSHm2bxc5U
+	Sl/wqXFO9xvnVT6Ni2mbMNlG9SyHXf
+X-Gm-Gg: ASbGncuyJ/MR8O91sTewdbHAjQXQzyC1ddR+vVnkCEshZGpcYSq1gAvRRFYkbwg4yh8
+	ndNBLcBkhYsA7paWhAbWoSYeII52kCuoVcNNl3XVC1+sHcgeZimV7K403ODW/kBeJ5L5fIGiQT4
+	Vp9Q/FB/L3Xcdz/xI8dclTGPrT0LJYEgdWF/ANkq463DlKLJAc7pGlYhqZ78vXQHPfABPCS5uDr
+	lLxCAHEKllSek2vduvY4LVQ
+X-Received: by 2002:a05:600c:4715:b0:456:302:6dc3 with SMTP id 5b1f17b1804b1-45b517d4c47mr197984325e9.26.1756399470544;
+        Thu, 28 Aug 2025 09:44:30 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IFOQ697WbVXyU99n0waspLzqYpTQQBImj5MyrGfz7lwIURmhpghnGB5Sbe7cWt+MuicJOIRjj3b26keLzpmBNo=
+X-Received: by 2002:a05:600c:4715:b0:456:302:6dc3 with SMTP id
+ 5b1f17b1804b1-45b517d4c47mr197983995e9.26.1756399470139; Thu, 28 Aug 2025
+ 09:44:30 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <202508280918.rFRyiLEU-lkp@intel.com>
+References: <20250827152754.12481-1-lifei.shirley@bytedance.com>
+ <aK8r11trXDjBnRON@google.com> <CABgObfYqVTK3uB00pAyZAdX=Vx1Xx_M0MOwUzm+D1C04mrVfig@mail.gmail.com>
+ <f904b674-98ba-4e13-a64c-fd30b6ac4a2e@bytedance.com>
+In-Reply-To: <f904b674-98ba-4e13-a64c-fd30b6ac4a2e@bytedance.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Date: Thu, 28 Aug 2025 18:44:18 +0200
+X-Gm-Features: Ac12FXxy8RFR1sySn2cIpHgzn1YV9jdcFkuTVaa1o9x9iu2acXvfPgiJQStuG6A
+Message-ID: <CABgObfb4ocYcaZixoPD_VZL5Z_SieTGJW3GBCFB-_LuOH5Ut2g@mail.gmail.com>
+Subject: Re: [External] Re: [PATCH] KVM: x86: Latch INITs only in specific CPU
+ states in KVM_SET_VCPU_EVENTS
+To: Fei Li <lifei.shirley@bytedance.com>
+Cc: Sean Christopherson <seanjc@google.com>, tglx@linutronix.de, mingo@redhat.com, bp@alien8.de, 
+	dave.hansen@linux.intel.com, liran.alon@oracle.com, hpa@zytor.com, 
+	wanpeng.li@hotmail.com, kvm@vger.kernel.org, x86@kernel.org, 
+	linux-kernel@vger.kernel.org, stable@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On 2025-08-28 09:18 AM, kernel test robot wrote:
-> tree:   https://github.com/awilliam/linux-vfio.git next
-> head:   9f3acb3d9a1872e2fa36af068ca2e93a8a864089
-> commit: 292e9ee22b0adad49c9a6f63708988e32c007da6 [5/37] selftests: Create tools/testing/selftests/vfio
-> config: i386-buildonly-randconfig-001-20250828 (https://download.01.org/0day-ci/archive/20250828/202508280918.rFRyiLEU-lkp@intel.com/config)
-> compiler: gcc-12 (Debian 12.2.0-14+deb12u1) 12.2.0
-> reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20250828/202508280918.rFRyiLEU-lkp@intel.com/reproduce)
-> 
-> If you fix the issue in a separate patch/commit (i.e. not just a new version of
-> the same patch/commit), kindly add following tags
-> | Reported-by: kernel test robot <lkp@intel.com>
-> | Closes: https://lore.kernel.org/oe-kbuild-all/202508280918.rFRyiLEU-lkp@intel.com/
-> 
-> All warnings (new ones prefixed by >>):
-> 
-> >> tools/testing/selftests/vfio/.gitignore: warning: ignored by one of the .gitignore files
-> >> tools/testing/selftests/vfio/Makefile: warning: ignored by one of the .gitignore files
+On Thu, Aug 28, 2025 at 5:13=E2=80=AFPM Fei Li <lifei.shirley@bytedance.com=
+> wrote:
+> Actually this is a bug triggered by one monitor tool in our production
+> environment. This monitor executes 'info registers -a' hmp at a fixed
+> frequency, even during VM startup process, which makes some AP stay in
+> KVM_MP_STATE_UNINITIALIZED forever. But this race only occurs with
+> extremely low probability, about 1~2 VM hangs per week.
+>
+> Considering other emulators, like cloud-hypervisor and firecracker maybe
+> also have similar potential race issues, I think KVM had better do some
+> handling. But anyway, I will check Qemu code to avoid such race. Thanks
+> for both of your comments. =F0=9F=99=82
 
-The warning is that tools/testing/selftests/vfio/.gitignore and
-tools/testing/selftests/vfio/Makefile are both ignored by an existing
-.gitignore file. That .gitignore file is
-tools/testing/selftests/vfio/.gitignore:
+If you can check whether other emulators invoke KVM_SET_VCPU_EVENTS in
+similar cases, that of course would help understanding the situation
+better.
 
-  $ cat tools/testing/selftests/vfio/.gitignore
-  # SPDX-License-Identifier: GPL-2.0-only
-  *
-  !/**/
-  !*.c
-  !*.h
-  !*.S
-  !*.sh
+In QEMU, it is possible to delay KVM_GET_VCPU_EVENTS until after all
+vCPUs have halted.
 
-This .gitignore is designed to ignore everything but directories, .c,
-.h. .S, and .sh files. One-off files can be added with git add --force
-and then git will track any changes to those files automatically going
-forward (even though they technically match the .gitignore file).
+Paolo
 
-I stole this approach from the KVM selftests but it looks like they hit
-the same warning and decided to add their one-off files to their
-.gitignore file to squash the warnings [1].
-
-I will send a similar patch to fix squash this warning for VFIO selftests.
-
-e.g.
-
-diff --git a/tools/testing/selftests/vfio/.gitignore b/tools/testing/selftests/vfio/.gitignore
-index 6d9381d60172..7fadc19d3bca 100644
---- a/tools/testing/selftests/vfio/.gitignore
-+++ b/tools/testing/selftests/vfio/.gitignore
-@@ -5,3 +5,6 @@
- !*.h
- !*.S
- !*.sh
-+!*.mk
-+!.gitignore
-+!Makefile
-
-[1] https://lore.kernel.org/kvm/20240828215800.737042-1-seanjc@google.com/
 
