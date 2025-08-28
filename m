@@ -1,73 +1,73 @@
-Return-Path: <kvm+bounces-56175-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-56176-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6A501B3AB09
-	for <lists+kvm@lfdr.de>; Thu, 28 Aug 2025 21:40:33 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 741B2B3AB22
+	for <lists+kvm@lfdr.de>; Thu, 28 Aug 2025 21:58:10 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 5DBA44E2B10
-	for <lists+kvm@lfdr.de>; Thu, 28 Aug 2025 19:40:32 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id B150A1BA6EC0
+	for <lists+kvm@lfdr.de>; Thu, 28 Aug 2025 19:58:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 03CF4271450;
-	Thu, 28 Aug 2025 19:40:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6CC4827E079;
+	Thu, 28 Aug 2025 19:58:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="t6CpH4J3"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="V1yc7p31"
 X-Original-To: kvm@vger.kernel.org
 Received: from mail-pg1-f201.google.com (mail-pg1-f201.google.com [209.85.215.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C1E9926AA93
-	for <kvm@vger.kernel.org>; Thu, 28 Aug 2025 19:40:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 373D427C84F
+	for <kvm@vger.kernel.org>; Thu, 28 Aug 2025 19:57:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756410024; cv=none; b=DqkChoUWmX90GsBfd8GMvrzYjh+1f565kdA2HqHL7IekZ029RjgyZbgkl6V2yygp8QIyNk161ecd00k59OlOVo/DPoQ89SWxnukv8M8qEHwH2hNeNRHlS6U2dOVdfQE2n57oKywB6I5uzF5ZXZLZrL5RRE6vvPH/mfTAsD7c2rU=
+	t=1756411080; cv=none; b=VY0zLegf8TfWEB62AG8FrLzj8/cd41UEn58Z012f//FmYR5aRjHBLg+IEZHNWjBGJ0xmEp++To9elXgfQjw6AKYyYjMKe1bSWYpuQw5PQkc2s6K8txvyYcuaL2BABzoXB0+9n9ZN6h1PvGvqMBuPHsDDUqWOvz4V4KtWohW+qZo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756410024; c=relaxed/simple;
-	bh=sOweL7MC1afeJEVQ1CAY29hh8rwCDAUVRUF14Il1LA4=;
+	s=arc-20240116; t=1756411080; c=relaxed/simple;
+	bh=BOwWcteBhzF9ZCxYgLAjaBaGgaN302B3hQ8FoYKBVlQ=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=piSXpxvJR5NOhnVl8uxzN5WSjjqUMWnrOb3hEvH3xtfD5ZfeFcEA0GIQ0vXwqpkGSbf0NgTll686XSXZmAWosIEnmy7GCQr9XmPaXHxRD94WB6tZQtv1FfDo8FVRHFemrzCqcm5jl2hP0vU3VovlzazJ/RCGL2Cc4ILdZ57h5TY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=t6CpH4J3; arc=none smtp.client-ip=209.85.215.201
+	 To:Cc:Content-Type; b=F1lG51fKM0ZVQAchcoFG/zNH9HM1XJxOtCWb6HeEK/2iUcQO+90f81bQ59+XuVXZUaEZcfxNFcFhyamk4TdqhS7BhCNWmagEDjaXLUprC2YS/bNA8nxvG61ukmDmN+qJf/KGUlC6xh+XkCTMm4ujhXk7gQv/vSfyEGrTKAYXEVE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=V1yc7p31; arc=none smtp.client-ip=209.85.215.201
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pg1-f201.google.com with SMTP id 41be03b00d2f7-b4c746c020cso396573a12.1
-        for <kvm@vger.kernel.org>; Thu, 28 Aug 2025 12:40:22 -0700 (PDT)
+Received: by mail-pg1-f201.google.com with SMTP id 41be03b00d2f7-b4c32f731e7so1040204a12.0
+        for <kvm@vger.kernel.org>; Thu, 28 Aug 2025 12:57:59 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1756410022; x=1757014822; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1756411078; x=1757015878; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:from:subject:message-id:references
          :mime-version:in-reply-to:date:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=fq5jKUl0c1/qCP5zM9srpRStKM40NBvkFf/O/1jAlyY=;
-        b=t6CpH4J3sj6zwJ7oH5fy9ATEgMymQrTG+k71c9VG/xiF+hGCEezGpWOvi851q6mIrB
-         xmcnB2MidZcoJpFEBYW8oEbcxFNy/vUNpaATOqCEGKwy2U5gBEWtjbOv44+SgjbzKVka
-         Cnhg97dsU74fZ1c+AVebuqdOlTSI4xdiUwsfxdgE1BCKavIRV65SwyIYOMlk3+Qy8M+y
-         z24bds+r44+iBnOX9puxUTn85TkKVFacS/Nag7FeyjlN80Ehe6ZP23rdSJV6h7H2XViC
-         NIWMtPuQSmUindJO1wfAOZ2gsw/uaXSxj/CJz4tBE0jLimkjjDNrYxYJOhTsbvFJt6/o
-         0XlA==
+        bh=Bdq+7JGy4B21T0bnG9OjLe0/o1KSwsdC1PjNFByJcs4=;
+        b=V1yc7p31L4hwKWKKiNaiOh1Wp+NGMkpM8OGMCD79BqN2XuN+cIUmnRK/XAcDrF9VTc
+         S3Nq5eMLobbE97gyJvwIG3W+DOnjzcynNBPXEptzqHJl7wMu2IZiIVgguMvCGT1FeT6f
+         azAPvv8bv7h7DFBFX0nS4yfCNpwEbL4hmCxplwOP4bA7E0Qm6UetTGpRPE9ev18cE+yQ
+         lhJgwQh9nKQrNlHsPKrf1viUsf6qYD08JHz4+HLhZQiPq/Zz1kPk0bR1SmFEwkNtYGiQ
+         tD5s8ityRJwBuJBhoqsxbxY+7xJoILDI98dGLTIAxa6Bd3fBwmxqpoTv30IT8AJn3/77
+         ZQpA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1756410022; x=1757014822;
+        d=1e100.net; s=20230601; t=1756411078; x=1757015878;
         h=content-transfer-encoding:cc:to:from:subject:message-id:references
          :mime-version:in-reply-to:date:x-gm-message-state:from:to:cc:subject
          :date:message-id:reply-to;
-        bh=fq5jKUl0c1/qCP5zM9srpRStKM40NBvkFf/O/1jAlyY=;
-        b=d7rtEM950GSbw6Xng825atsPd9bCrxqlcqGWNXvA7fVCGQpis6xbXq1PBv0drfWHmz
-         6oQ0ZMVtePoHiv0qtCNc2FIOguiuCk11OTlZKfeM6/5GUY2ao9oyPDHWCtUncnlOhOrq
-         hoavy4J6UMb98q4SSv8iZwEg+ArCSZsxPYAGSrau64Q77Bh06UU2Vd7MVOrf0WdlGBM9
-         11ObmjwUFeuW2DQt24iUBfT5hK4TZ2gvft0e8EEO6rpifamJlvWTWMGvSpjVpNSL7x+G
-         eAye/lvGsyZ9RlLrPBkqDO8gxRC33ymjnfivgnvBGd85t3KA5biFlOTohapxFMD9Zcms
-         g65g==
-X-Forwarded-Encrypted: i=1; AJvYcCWBnyTEyKk9R+rrJgi2Tehx4e9fJqHTeTGIMpKVj1d2+ygK9WAbHupDAJoTaftC/R+vWUw=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxN9IB719eHPzt3f+7Z303TJaT8Wn8ESq0AOKLR3HaEugugDhVw
-	9CeqYaBpRbRBth4Tu8i5OLqLZ1zZh8dY7TSir6++5Pf9w0d81qr/TBd8aq5D3iMma0jahgHwmnN
-	Yve5jCg==
-X-Google-Smtp-Source: AGHT+IGgX7CXXMdV/d7Hx1tAtW4pSPXY7GO3K/pyEZYQikr1kxkeTskIwgkgfd0X3N4nMikwbaNNINqN5pg=
-X-Received: from pgnm20.prod.google.com ([2002:a63:7d54:0:b0:b4c:1c02:2564])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a05:6a20:3947:b0:220:4750:133a
- with SMTP id adf61e73a8af0-24340bc7f40mr36103172637.25.1756410022083; Thu, 28
- Aug 2025 12:40:22 -0700 (PDT)
-Date: Thu, 28 Aug 2025 12:40:20 -0700
-In-Reply-To: <aK/1+Al99CoTKzKH@yzhao56-desk.sh.intel.com>
+        bh=Bdq+7JGy4B21T0bnG9OjLe0/o1KSwsdC1PjNFByJcs4=;
+        b=Se8JfP8NPBlqRhVArq0Ld3iJlpYUKpT8UFHTsC9RSOTZtgBZ2eKbvz1HnigPbyyBsQ
+         mcNE+8MV9PC20IxyYGd084afu7P1kfQv1JRtinDeT1HfihkCJTgfyScMW7iRZDiDiu9V
+         TVh+i6MTP6RjhIt4oYiLqT/4AQn9/yuPC1NtrxWhzzDbCRu/GnS1kndN981GlE68HB9v
+         WuBv2E3BzwxtDDnDkoJbaV2/riD5vU8ybb61zDp7sMptiKIgXiNe4+58ejlSM7Vrxd7b
+         uRpe4rUh3XpykS7fL7IbQPFXkJX7W2bZ+ADoEN1irdoIWWS3qQutaGoz1tr0W8Fa5fUw
+         FQaA==
+X-Forwarded-Encrypted: i=1; AJvYcCVXmmmCOfaXt3vKSBx/NmbuCuPDxQ9if6rTXTw2YsMiPlNDkPHuTwkqTtSOz2F17+kH9yI=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyRbKEHvS++8iQgiYm/ZUmqiflYrzq9kbbc8ZEBCndBULBWKkX8
+	HCm+vl9D3ux0MM+pxBDIB3+bwYjcizZOcRDrFWT9KwJsEHaXepxLJqlatpL0WvrTwU1XiAo6mor
+	MTcK2Kg==
+X-Google-Smtp-Source: AGHT+IE+EdWii51V3hZfb32YWtUaceJAIxnvvKKaBCSr3RCVdHe9uAWLpbmgwOb0D9OP9OVPp15a0q2Tu00=
+X-Received: from plbm11.prod.google.com ([2002:a17:902:d18b:b0:249:329:c51c])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:902:ec88:b0:242:9bbc:3644
+ with SMTP id d9443c01a7336-2462efacca1mr370061045ad.54.1756411078545; Thu, 28
+ Aug 2025 12:57:58 -0700 (PDT)
+Date: Thu, 28 Aug 2025 12:57:57 -0700
+In-Reply-To: <a0f42c955d4b86229b9cc200b37963ac24458f76.camel@intel.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -75,71 +75,40 @@ List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
 References: <20250827000522.4022426-1-seanjc@google.com> <20250827000522.4022426-3-seanjc@google.com>
- <aK7BBen/EGnSY1ub@yzhao56-desk.sh.intel.com> <4c292519bf58d503c561063d4c139ab918ed3304.camel@intel.com>
- <6bb76ce318651fcae796be57b77e10857eb73879.camel@intel.com> <aK/1+Al99CoTKzKH@yzhao56-desk.sh.intel.com>
-Message-ID: <aLCwpNygeC64Bkra@google.com>
+ <68afa57959dd8_315529471@iweiny-mobl.notmuch> <a0f42c955d4b86229b9cc200b37963ac24458f76.camel@intel.com>
+Message-ID: <aLC0xXVLq1olR5qQ@google.com>
 Subject: Re: [RFC PATCH 02/12] KVM: x86/mmu: Add dedicated API to map
  guest_memfd pfn into TDP MMU
 From: Sean Christopherson <seanjc@google.com>
-To: Yan Zhao <yan.y.zhao@intel.com>
-Cc: Rick P Edgecombe <rick.p.edgecombe@intel.com>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>, 
-	"pbonzini@redhat.com" <pbonzini@redhat.com>, Vishal Annapurve <vannapurve@google.com>, 
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, 
-	"michael.roth@amd.com" <michael.roth@amd.com>, Ira Weiny <ira.weiny@intel.com>
+To: Rick P Edgecombe <rick.p.edgecombe@intel.com>
+Cc: "pbonzini@redhat.com" <pbonzini@redhat.com>, Ira Weiny <ira.weiny@intel.com>, 
+	"kvm@vger.kernel.org" <kvm@vger.kernel.org>, Vishal Annapurve <vannapurve@google.com>, 
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, Yan Y Zhao <yan.y.zhao@intel.com>, 
+	"michael.roth@amd.com" <michael.roth@amd.com>
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Thu, Aug 28, 2025, Yan Zhao wrote:
-> On Thu, Aug 28, 2025 at 09:26:50AM +0800, Edgecombe, Rick P wrote:
-> > On Wed, 2025-08-27 at 17:54 -0700, Rick Edgecombe wrote:
-> > > >=20
-> > > > Then, what about setting
-> > > > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0 .max_level =3D PG_LEVEL_4K,
-> > > > directly?
-> > > >=20
-> > > > Otherwise, the "(KVM_BUG_ON(level !=3D PG_LEVEL_4K, kvm)" would be =
-triggered
-> > > > in
-> > > > tdx_sept_set_private_spte().
-> > >=20
-> > > Yes this fails to boot a TD. With max_level =3D PG_LEVEL_4K it passes=
- the full
-> > > tests. I don't think it's ideal to encode PAGE.ADD details here thoug=
-h.
-> > >=20
-> > > But I'm not immediately clear what is going wrong. The old struct
-> > > kvm_page_fault
-> > > looks pretty similar. Did you root cause it?
-> >
-> > Oh, duh. Because we are passing in the PFN now so it can't know the siz=
-e.=C2=A0So
-> > it's not about PAGE.ADD actually.
-> Right, it's because the previous kvm_tdp_map_page() updates fault->max_le=
-vel in
-> kvm_mmu_faultin_pfn_private() by checking the private_max_mapping_level h=
-ook.
+On Thu, Aug 28, 2025, Rick P Edgecombe wrote:
+> On Wed, 2025-08-27 at 19:40 -0500, Ira Weiny wrote:
+> > > +		.map_writable =3D true,
+> >=20
+> > Why is map_writable set?=C2=A0 Doesn't this get translated into host_wr=
+itable?
 >=20
-> However, private_max_mapping_level() skips the faultin step and goes stra=
-ight
-> to kvm_tdp_mmu_map().
->=20
-> > Sill, how about calling the function kvm_tdp_mmu_map_private_pfn_4k(), =
-or
-> > passing in the level?
-> Looks [1] can also address this issue. Not sure which one Sean prefers.
->=20
-> [1] https://lore.kernel.org/all/20250729225455.670324-15-seanjc@google.co=
-m
+> I guess it's normally set only if it's a !KVM_MEM_READONLY slot for priva=
+te
+> faults memory.=20
 
-That won't fix this issue though, becuase @fault will be valid and so max_l=
-evel
-will still be KVM_MAX_HUGEPAGE_LEVEL.  Which is by design, the intent in th=
-at
-flow is that KVM should have gotten the level when getting the pfn from gme=
-m.
+map_writable can also be %false on read faults and the host userspace mappi=
+ng
+isn't writable.=20
 
-IIUC, this particular flow _must_ map at 4KiB, so I think forcing PG_LEVEL_=
-4k is
-the right solution.
+> But that flag is invalid for gmem. So we should only have
+> map_writable=3Dtrue cases for tdx.
+
+Yep.  And not TDX specific, map_writable _must_ be true for write faults.  =
+The
+reason there's two separate flags is so that KVM can opportunistically crea=
+te a
+writable mapping on read faults.
 
