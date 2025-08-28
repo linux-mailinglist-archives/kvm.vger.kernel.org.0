@@ -1,139 +1,203 @@
-Return-Path: <kvm+bounces-56079-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-56081-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id A6D52B39A61
-	for <lists+kvm@lfdr.de>; Thu, 28 Aug 2025 12:40:24 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id C7E91B39A8D
+	for <lists+kvm@lfdr.de>; Thu, 28 Aug 2025 12:44:21 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id BA14A1890DB4
-	for <lists+kvm@lfdr.de>; Thu, 28 Aug 2025 10:38:51 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id D59981883A2F
+	for <lists+kvm@lfdr.de>; Thu, 28 Aug 2025 10:44:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 831D330EF69;
-	Thu, 28 Aug 2025 10:36:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8C3CD30DEB1;
+	Thu, 28 Aug 2025 10:43:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="EI7KTp8P"
+	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="kGsCyYsW"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.12])
+Received: from NAM11-BN8-obe.outbound.protection.outlook.com (mail-bn8nam11on2080.outbound.protection.outlook.com [40.107.236.80])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CAC4830C624;
-	Thu, 28 Aug 2025 10:36:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.12
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756377376; cv=none; b=GYthD3XFuJQmHG7EBQ1zGTpB2M5osfNprwX1EsE16wwlemr6pkZpir74O+MpHIanTiPVgk4kYpdo+A8bGST7wGFVTZZkYJamp+32esO8KP2F9S6qFwERI5cSJ3Kfd58CK1pFjBw98ftdk9o8CR6YvYH3bnGlLx9TALCLWnak8lc=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756377376; c=relaxed/simple;
-	bh=Q++vDmJGmmqheRrUrP0W8dSS7fcanjr4UJG7gMXFg6o=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=E7DDjoJPCp8LD1C60kAwgxpCgiay8rN3pnCh2v47+bHZ+M129APzGpuKgIoUrei4PQLe+fYhYxjdjZAuuQ9MNNasBCUTMoX7HMRtSy7JLRc4UZNBrEehT3jmT+sSDBm5hLm2VMEcyGht5odhEWAD+BfmCJx4383Vl6PZoodAGCI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=EI7KTp8P; arc=none smtp.client-ip=192.198.163.12
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1756377375; x=1787913375;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=Q++vDmJGmmqheRrUrP0W8dSS7fcanjr4UJG7gMXFg6o=;
-  b=EI7KTp8Pkv/KuGNq6iMaeNGcX7oZqe/zW0XobJEVyWN6WEk4vnqBfXxZ
-   iR20JrwF36o2mPO7G/MpIAHjbxliRSqsbdufmH34IGVbtRN7ZNnmQnMrH
-   Bmc1hq9BtGcCgdqArDgwKAfiUyPDLb0ZTKSiCLbeDRcTk7G4QYTpOK4cB
-   5PhY8Y2wsjCNyzZ3FO0PHyELe5DM2RFeVNLhA3pwoxKpsAnwAgxiByMF0
-   6Lm1GGW2hF502wVVSTkez5qADgmkrdekkt+yKjbcZb6+gTdCnJlIXWVwZ
-   TtAKFU5P4QyV3V68l4Su9p5PYjQh9DfLDyQd0/eI3Xv0qMiUivx0vYr5i
-   g==;
-X-CSE-ConnectionGUID: J+9phYcOT5ihtlS0WasbOg==
-X-CSE-MsgGUID: 8TSymqXeTmC3pFCMFRhIJg==
-X-IronPort-AV: E=McAfee;i="6800,10657,11535"; a="62465683"
-X-IronPort-AV: E=Sophos;i="6.18,217,1751266800"; 
-   d="scan'208";a="62465683"
-Received: from fmviesa001.fm.intel.com ([10.60.135.141])
-  by fmvoesa106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 28 Aug 2025 03:36:14 -0700
-X-CSE-ConnectionGUID: 0KXzwk6SSTqEhED/Xo7AIg==
-X-CSE-MsgGUID: uo1IoHNKR1Gi41sgQk9IWg==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.18,217,1751266800"; 
-   d="scan'208";a="200992693"
-Received: from lkp-server02.sh.intel.com (HELO 4ea60e6ab079) ([10.239.97.151])
-  by fmviesa001.fm.intel.com with ESMTP; 28 Aug 2025 03:36:08 -0700
-Received: from kbuild by 4ea60e6ab079 with local (Exim 4.96)
-	(envelope-from <lkp@intel.com>)
-	id 1urZzC-000TeJ-18;
-	Thu, 28 Aug 2025 10:36:06 +0000
-Date: Thu, 28 Aug 2025 18:35:21 +0800
-From: kernel test robot <lkp@intel.com>
-To: Bobby Eshleman <bobbyeshleman@gmail.com>,
-	Stefano Garzarella <sgarzare@redhat.com>,
-	Shuah Khan <skhan@linuxfoundation.org>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>,
-	Stefan Hajnoczi <stefanha@redhat.com>,
-	"Michael S. Tsirkin" <mst@redhat.com>,
-	Jason Wang <jasowang@redhat.com>,
-	Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
-	Eugenio =?iso-8859-1?Q?P=E9rez?= <eperezma@redhat.com>,
-	"K. Y. Srinivasan" <kys@microsoft.com>,
-	Haiyang Zhang <haiyangz@microsoft.com>,
-	Wei Liu <wei.liu@kernel.org>, Dexuan Cui <decui@microsoft.com>,
-	Bryan Tan <bryan-bt.tan@broadcom.com>,
-	Vishnu Dasa <vishnu.dasa@broadcom.com>,
-	Broadcom internal kernel review list <bcm-kernel-feedback-list@broadcom.com>
-Cc: oe-kbuild-all@lists.linux.dev, netdev@vger.kernel.org,
-	virtualization@lists.linux.dev, linux-kselftest@vger.kernel.org,
-	linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-	linux-hyperv@vger.kernel.org,
-	Bobby Eshleman <bobbyeshleman@gmail.com>, berrange@redhat.com
-Subject: Re: [PATCH net-next v5 4/9] vsock/loopback: add netns support
-Message-ID: <202508281824.3XZiIgxs-lkp@intel.com>
-References: <20250827-vsock-vmtest-v5-4-0ba580bede5b@meta.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C71AF30DD14
+	for <kvm@vger.kernel.org>; Thu, 28 Aug 2025 10:43:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.236.80
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1756377829; cv=fail; b=UzsirvlxhalF+nWmNWxeG/XNHQcAy/qGwG0AGBsEO7Y+Pjlb+B9fnLuloBtJMyMVJclwmAwfzrJsrKRzUjHA23nBaGMPg0EigbjfDkZjTpp2M/fTAQTIa8C4VUAQuuAy0GeGYwkj+exqrNDMpWa4/RMnSItVAycmNEy8pFBjo7M=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1756377829; c=relaxed/simple;
+	bh=v5j7I6q+wyFZoIpChlmyEw/tSnmIW+/yz5fNb4iuGdk=;
+	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
+	 In-Reply-To:Content-Type; b=eWIguI8aOsAD0BZhvObM/saf3OEFSLKw8z5vSgU7TRasJ0L+4yRH9l0FSbRSf0PDoN6nrXVSMDbXeknLea/RGpEPh36+xZ2gZdKOsKkMRgyQ0PpBusWuoVeUdOlbjfqHw/6fcSWk4eHaseAOK2tVqVAtRtO1ZSlnloWeGqr8+b4=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=kGsCyYsW; arc=fail smtp.client-ip=40.107.236.80
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=fZKoUYw9N6IGtLGnBgWkIvjf7wP/gQx73cbBhHZr7FteIAFBvGH4vMKVaROPShuqE6+wq3AIHp1eL3GZg7Fi/uCneN4LIAT4LIvPy9icrC7YJCgF0pSDmo6A/u1GP2S0EqLhDhtMJJkfQuVXHvl7wdXSg8NvUowZ5v2gGf8kLD7Ap8xH08+W0sYmpj1QyPpF4Nxl4/4JFAKS61t2mq08yEfNCrbv1FtEI5bHNTJlihuTsqf+13NkmwM4YUer9BacuGMEJSqP4lZr872oj0tZ+7RVfpDq7aOZ3oCo4epotfK8umeyTjYAB8x1MZWIXvdlYhWW743qVqpL6FKCdufZNw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=J7hyTj7Y0DWW/Se9QEONraBANi0J3xJ8eI9LOJy9xGk=;
+ b=VaX4jeSs478RHeWcqhp7xOPHEaWNTX3kT8u3HCaXGuY2g5Bigg4x315EHhSrwGvt0/VHVx+c3nJ2FVLOyP3VEmxw5ph4lLSgRM+T+qSIC9Dd9sjRCU1vE/2JHbGIFyiThoYH5MFiuZR2Q5dMdBvoIgVHNTrSF3/D0H4HeIVh86VGghNhqqBkEpNh/RX6laOBNsKpckawFT+NS1H5SIXkQHXXxxjX9x1aBdtRq/CgZAr3KjmY6mzf/yvSI3EAfde4UnShI7cDKB+RPSnE/DdIZu5n+9AbLfJ7PGfxfN27jmUl7xptjs+cUukhYqY4dMxaMtiuiS2FB7HqRd88EF6FMA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 165.204.84.17) smtp.rcpttodomain=intel.com smtp.mailfrom=amd.com; dmarc=pass
+ (p=quarantine sp=quarantine pct=100) action=none header.from=amd.com;
+ dkim=none (message not signed); arc=none (0)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=J7hyTj7Y0DWW/Se9QEONraBANi0J3xJ8eI9LOJy9xGk=;
+ b=kGsCyYsWwfkq77SfvgxNyzUPgDKSwEUk1yWVXQ2yKuexO5qJOSG/TaQCndz5zdmyeFNy3Gs/DDJl4tiJg5JA++/4xLhjM4McQw5utHUBBoK5oN0qUtNGGtynDZsgIqx5bYpxgtJQT0kWImJ1QC138r/FzYhFdSG2Kn8YQT1LjcE=
+Received: from SJ0PR13CA0115.namprd13.prod.outlook.com (2603:10b6:a03:2c5::30)
+ by SN7PR12MB6816.namprd12.prod.outlook.com (2603:10b6:806:264::10) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9052.21; Thu, 28 Aug
+ 2025 10:43:40 +0000
+Received: from SJ5PEPF000001EA.namprd05.prod.outlook.com
+ (2603:10b6:a03:2c5:cafe::3b) by SJ0PR13CA0115.outlook.office365.com
+ (2603:10b6:a03:2c5::30) with Microsoft SMTP Server (version=TLS1_3,
+ cipher=TLS_AES_256_GCM_SHA384) id 15.20.9073.13 via Frontend Transport; Thu,
+ 28 Aug 2025 10:43:39 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
+ smtp.mailfrom=amd.com; dkim=none (message not signed)
+ header.d=none;dmarc=pass action=none header.from=amd.com;
+Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
+ 165.204.84.17 as permitted sender) receiver=protection.outlook.com;
+ client-ip=165.204.84.17; helo=SATLEXMB04.amd.com; pr=C
+Received: from SATLEXMB04.amd.com (165.204.84.17) by
+ SJ5PEPF000001EA.mail.protection.outlook.com (10.167.242.198) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.20.9073.11 via Frontend Transport; Thu, 28 Aug 2025 10:43:39 +0000
+Received: from SATLEXMB04.amd.com (10.181.40.145) by SATLEXMB04.amd.com
+ (10.181.40.145) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.39; Thu, 28 Aug
+ 2025 05:43:38 -0500
+Received: from [10.252.207.152] (10.180.168.240) by SATLEXMB04.amd.com
+ (10.181.40.145) with Microsoft SMTP Server id 15.1.2507.39 via Frontend
+ Transport; Thu, 28 Aug 2025 05:43:36 -0500
+Message-ID: <fd1b557e-8b19-4e71-8e60-3b35864d63cb@amd.com>
+Date: Thu, 28 Aug 2025 16:13:35 +0530
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250827-vsock-vmtest-v5-4-0ba580bede5b@meta.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [RFC PATCH 4/4] KVM: SVM: Add Page modification logging support
+To: "Huang, Kai" <kai.huang@intel.com>, "thomas.lendacky@amd.com"
+	<thomas.lendacky@amd.com>
+CC: "kvm@vger.kernel.org" <kvm@vger.kernel.org>, "joao.m.martins@oracle.com"
+	<joao.m.martins@oracle.com>, "pbonzini@redhat.com" <pbonzini@redhat.com>,
+	"seanjc@google.com" <seanjc@google.com>, "santosh.shukla@amd.com"
+	<santosh.shukla@amd.com>, "bp@alien8.de" <bp@alien8.de>
+References: <20250825152009.3512-1-nikunj@amd.com>
+ <20250825152009.3512-5-nikunj@amd.com>
+ <fb9f2dcb176b9a930557cabc24186b70522d945d.camel@intel.com>
+ <86c883c4-c9a6-4ec8-b5f3-eb90b0b7918d@amd.com>
+ <9e214c34f68ac985530020cef61f480f2c5922c9.camel@intel.com>
+Content-Language: en-US
+From: "Nikunj A. Dadhania" <nikunj@amd.com>
+In-Reply-To: <9e214c34f68ac985530020cef61f480f2c5922c9.camel@intel.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 7bit
+Received-SPF: None (SATLEXMB04.amd.com: nikunj@amd.com does not designate
+ permitted sender hosts)
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: SJ5PEPF000001EA:EE_|SN7PR12MB6816:EE_
+X-MS-Office365-Filtering-Correlation-Id: 949b5d55-4ea5-40c7-e482-08dde61fc022
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|82310400026|1800799024|376014|36860700013;
+X-Microsoft-Antispam-Message-Info:
+	=?utf-8?B?ZXAxZXFXQ1pnQ255R2o5RWQxSmJoL05nSGp1QzBuaEFkTFhwcGNIS3Z5aXhB?=
+ =?utf-8?B?dEZZWHVicUhicEJ4T29qaXJmcUE1aWZiaE5vQkkvbDJNSTRCbkdLMk8vbWVJ?=
+ =?utf-8?B?cVVvU2Fjc0NnWFJDa2RIQjMyUHpBUjd4bmNJdiswS0RubTNXc3ZGNXdaekky?=
+ =?utf-8?B?ekJKc1l0czJLNGR1RnVpNy9kRmhxVzNLVm5WODcrVFptTTVvNWhzQk1jWExa?=
+ =?utf-8?B?YkRxcTlibk5XaE5OUU54R2xOVTJXeDNoZFcxVXNqU3QwNVJxT2tST2RCK3VR?=
+ =?utf-8?B?OGl4bXpjYkxjWTMySHlRV0hzZll2di9ldjdhcTJuTmFvYzRIUmVXMXphYnhy?=
+ =?utf-8?B?dDkybVJKUWVRZ0loZlN6OFdiandoaXFYeEtDV1VCRXpaUGx6aWRGQUFlSFBM?=
+ =?utf-8?B?ZGVZNG9QeGFKQzhPeGtlWmlTYmN5MXc2RzJieHB3Y0xGUE1YSTBHVUsvT2VL?=
+ =?utf-8?B?TWtwOHNkRVBheEZOcEJOY1RWU3NWVVFud3F5V2FhdTc3OVBpRktCZ1JETXps?=
+ =?utf-8?B?b1FNbnN4dkFlTXZtdGRuRFVBM2RRZ2pnSDhvTmVZY3lHTWk0RWpINmhDZ21v?=
+ =?utf-8?B?bWdneS9RbVkzMk4yUGRUSVkxSFM2emVXSlN6NTNTTTMwQXQzQlZhbURlSUtE?=
+ =?utf-8?B?V0ttWERuc3Rad1lPeEc0a3l3OHIzbHpGTDA3VmlRUUh1eEZ6cGJaUS81QmJh?=
+ =?utf-8?B?MFJFSnlYVVVNcDI4WDFYTmE2bXRIUGVsN2ZVZWJqZDdmSVpWMTh4OWZvSUpn?=
+ =?utf-8?B?OUN6QkVJWkJCVjFXaGRoSWE4eXVta3NIcG1TVlZNQUFkeFZmV3h0ekdJSEQz?=
+ =?utf-8?B?RDcyVVlhR2MwMnZIVU5zWlppM0FVV0hVUnZEQVZPTmU3Rzh4bTJPQkZXbUgr?=
+ =?utf-8?B?aGlaVHFOb0tsbDVpa3NsWXM5cVBpajlCWGUrNW5iT2R4dE9lVFMzMXI3QnY0?=
+ =?utf-8?B?VTBZUmUyY1VWT1h0bGpDbklzbHRCeVQrYm4zTU1xOXpQWXRrMVJYSFZnSVRv?=
+ =?utf-8?B?Uk16MjlUclBjMkxyVDdKZ3JkOWtmZWFOT2VJVVd1QXVXRXB4N3UzOGZiZi9B?=
+ =?utf-8?B?UU80NjZhc3V0b2xWbkg3dzdKazNwTWZSWHVoL3FCeDA3ZGs1SGlRSkVpa2R1?=
+ =?utf-8?B?WURvZlVISWpZQmd3YitYMnhHKzBpQ0ZZTk05bTJmWEZxcEtVL2JmUkFJMlRL?=
+ =?utf-8?B?NXBqb1FQcXhMSmRScWg2RnV1bytib1NqTVAyMmlrdjJRcnZWTmlzbS9GMVFl?=
+ =?utf-8?B?QlE5MXpTUXFGamR2dUM1bnBRK1BjeDd3VnVLLzBPdlRiNjNBa2xBcHpQbTlv?=
+ =?utf-8?B?UWRQeDB3c2hMVzJDUmJvN0FHWFlycUIyNU5ILzNaSVhFQnM5YmRTNzhVMjVP?=
+ =?utf-8?B?d1U3aTdHSXgzQU1vT3FyMDJwQ2lENnNSTHF1YThNNmdBMGtnWUNWL1ZRaVcw?=
+ =?utf-8?B?WHdLbit6Q00zTVRQakZtNzdYTThqVHo2K1lldXRQL1ZNTjhPRG1PWk5PNllh?=
+ =?utf-8?B?RlltM094MG4rOWVoM2E5RlpBeTd4UTRjbm1qYzh2YXRHekVtSVdsYm5zT3BF?=
+ =?utf-8?B?QlJLdG9lU1BtVHZHdk1Ob2RtQVp3djBMMDZONmdlU3dCRFFseGpXeHEyd1lM?=
+ =?utf-8?B?SmlVL2JBTWdFMXV6a0RkZnlMeGlOMVVhWWJyMTR3S2xhKzhaNUtDN05BdGZW?=
+ =?utf-8?B?Y1ptMEpkR2pzWDhUbjdYeS9KOGszd1EyaThvRGR0eHpLdkJKd2ZCQW1SZE9s?=
+ =?utf-8?B?eVZuQ2s2emxmdVM2aE5GSkZvU2FHVkJTeHFjY0YveWlSd3RJS2ZmYTdDRnNC?=
+ =?utf-8?B?KzdUNHZ1NkFuTTNBNC82eUhVa1JiSGs0YkR0NENRaDJIYVprREJqNithbW8x?=
+ =?utf-8?B?L1hkemlMQXJhVU81NGtLMWpOM2FaTnBrYk1JTWtoZERpWlFnR2FWYkRqUzhK?=
+ =?utf-8?B?K0x0eUM5MWYyajlueWx3Z09nMFhFNldCRXRNaWczMFhBSlRXMm9TbUtjd2Zq?=
+ =?utf-8?B?S0FXcEJOYk1UOXRxTEU0RkFXOWlhOGZVcWVwRjFIMmtEZ3BBbGNqNVBGd2hn?=
+ =?utf-8?Q?0MJEAN?=
+X-Forefront-Antispam-Report:
+	CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB04.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230040)(82310400026)(1800799024)(376014)(36860700013);DIR:OUT;SFP:1101;
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 28 Aug 2025 10:43:39.7036
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: 949b5d55-4ea5-40c7-e482-08dde61fc022
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[SATLEXMB04.amd.com]
+X-MS-Exchange-CrossTenant-AuthSource:
+	SJ5PEPF000001EA.namprd05.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SN7PR12MB6816
 
-Hi Bobby,
-
-kernel test robot noticed the following build warnings:
-
-[auto build test WARNING on 242041164339594ca019481d54b4f68a7aaff64e]
-
-url:    https://github.com/intel-lab-lkp/linux/commits/Bobby-Eshleman/vsock-a-per-net-vsock-NS-mode-state/20250828-083629
-base:   242041164339594ca019481d54b4f68a7aaff64e
-patch link:    https://lore.kernel.org/r/20250827-vsock-vmtest-v5-4-0ba580bede5b%40meta.com
-patch subject: [PATCH net-next v5 4/9] vsock/loopback: add netns support
-config: nios2-randconfig-001-20250828 (https://download.01.org/0day-ci/archive/20250828/202508281824.3XZiIgxs-lkp@intel.com/config)
-compiler: nios2-linux-gcc (GCC) 8.5.0
-reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20250828/202508281824.3XZiIgxs-lkp@intel.com/reproduce)
-
-If you fix the issue in a separate patch/commit (i.e. not just a new version of
-the same patch/commit), kindly add following tags
-| Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202508281824.3XZiIgxs-lkp@intel.com/
-
-All warnings (new ones prefixed by >>):
-
->> net/vmw_vsock/af_vsock.c:137:35: warning: 'vsock_net_callbacks' defined but not used [-Wunused-variable]
-    static struct vsock_net_callbacks vsock_net_callbacks;
-                                      ^~~~~~~~~~~~~~~~~~~
 
 
-vim +/vsock_net_callbacks +137 net/vmw_vsock/af_vsock.c
+On 8/28/2025 4:03 PM, Huang, Kai wrote:
+> On Thu, 2025-08-28 at 12:07 +0530, Nikunj A. Dadhania wrote:
+>>
+>> On 8/28/2025 5:14 AM, Huang, Kai wrote:
+>>> On Mon, 2025-08-25 at 15:20 +0000, Nikunj A Dadhania wrote:
+>>>> +	if (pml) {
+>>>> +		svm->pml_page = snp_safe_alloc_page();
+>>>> +		if (!svm->pml_page)
+>>>> +			goto error_free_vmsa_page;
+>>>> +	}
+>>>
+>>> I didn't see this yesterday.  Is it mandatory for AMD PML to use
+>>> snp_safe_alloc_page() to allocate the PML buffer, or we can also use
+>>> normal page allocation API?
+>>
+>> As it is dependent on HvInUseWrAllowed, I need to use snp_safe_alloc_page().
+> 
+> So the patch 2 is actually a dependent for PML?
 
-   136	
- > 137	static struct vsock_net_callbacks vsock_net_callbacks;
-   138	static DEFINE_MUTEX(vsock_net_callbacks_lock);
-   139	
+Not really, if the patch 2 is not there, the 2MB alignment workaround will be
+applied to PML page allocation.
 
--- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
+> 
+>>
+>> Tom?
+>>
+>>> VMX PML just uses alloc_pages().  I was thinking the page allocation/free
+>>> code could be moved to x86 common as shared code too.
+>> Got that, because of the above requirement, I was going to share the variable
+>> (pml_page) but do the allocation in the vmx/svm code.
+>>
+> 
+> If AMD and VMX PML cannot share PML buffer allocation/free code, my desire
+> to share 'pml_pg' is becoming less, but I guess I kinda still think it's
+> better to share the buffer pointer. :-)
+Sure, will add in my next revision.
+
+Regards
+Nikunj
 
