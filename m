@@ -1,188 +1,157 @@
-Return-Path: <kvm+bounces-56202-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-56203-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6FB43B3AE7C
-	for <lists+kvm@lfdr.de>; Fri, 29 Aug 2025 01:40:26 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id E3D95B3AEB5
+	for <lists+kvm@lfdr.de>; Fri, 29 Aug 2025 01:56:44 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 353B7568551
-	for <lists+kvm@lfdr.de>; Thu, 28 Aug 2025 23:40:26 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3FEC5582C1C
+	for <lists+kvm@lfdr.de>; Thu, 28 Aug 2025 23:56:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5D2152D8789;
-	Thu, 28 Aug 2025 23:40:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B6F112DE70D;
+	Thu, 28 Aug 2025 23:56:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="3U4OX3Be"
+	dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b="FCmBOZww"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pf1-f202.google.com (mail-pf1-f202.google.com [209.85.210.202])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1F09D3FC7
-	for <kvm@vger.kernel.org>; Thu, 28 Aug 2025 23:40:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.202
+Received: from linux.microsoft.com (linux.microsoft.com [13.77.154.182])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6E482262FC0;
+	Thu, 28 Aug 2025 23:56:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=13.77.154.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756424416; cv=none; b=tNyvxOree1mEJfvWxbeia84KsA8vt4fCVhcnbv1Ykbnm6A8MFc0dobt4RJ4mDMpjsO2gPFz2ECzNWTWQpKLKOPs3k+9m5Wrcfzg1nFHVH7zqUe2GY+3C5agcsCzYj9/SENHMqyw8GV6NJ/DJcK9KvPYztxlPLa/DpT7QEE2+F4Y=
+	t=1756425394; cv=none; b=nYUdm8BP+4m9vOMx1CHCYk0fu+gdbHb8dGYOiTMDAiYrgIWNvH15XYFwb15eOb71fspXQw40JrwqB3QXyACrDUB2M2KO1YbVjRISEVPxXZCj+DEiM56N5Ci8iMQH4WiSFZSES2JRKvlVH0j7ZV9ywIWVwPpcAypBLcAcjKkPWK4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756424416; c=relaxed/simple;
-	bh=KsAyKzibOsjor0ReCDD55lr3rxs8WRdOFSK6ndQtHgg=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=BkZjIdivl+fsMMGlLbA9QDHwIueJETwmEbBSlw2rofQ+Emm0r/twgOEeBJ2yHkCU+UGKlBE2UZxcCkoaTiNb2zPgwECXOgvONSHuPavlMOeOjQYsyctnQPLAclTiuw6Eu3rqcF1VWnoTJfK1u8xOUoKZaHlz9edPvnGzb3fWijM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=3U4OX3Be; arc=none smtp.client-ip=209.85.210.202
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pf1-f202.google.com with SMTP id d2e1a72fcca58-77057266d0bso2122177b3a.1
-        for <kvm@vger.kernel.org>; Thu, 28 Aug 2025 16:40:14 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1756424414; x=1757029214; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:from:subject:message-id:references
-         :mime-version:in-reply-to:date:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=PEeUvBboOkLSk46g+vBgkfY4ImguJzhTUEdxhRNUWyM=;
-        b=3U4OX3BeVj28ZD9+u+R0EnMjBpOmz+8yAt7lH+bOe4rL19Go7HmhrB2Ito3fQyJ6i+
-         2yG7XPvGkoLvhUQW45tryt5XAWhPikdSJD8ab8eMr+sG/u8Xy8jwIIoI61e0NEEEyRm0
-         qIQyCJ9PdRmojlFb6B73/zSAtHtvDHPc06HVLk9vYDkXOtv6KG/w0CVowQUDFXZOUv+e
-         WdP/NWBzF7eICgU69Cy3+okFvk6W+urOPRRizIxYtf9RnBAtesI72LdEEUAgabExdOq3
-         023Zb7CoQgqF/pbvPnxq5fvzysyGcCQtmT5P3gspJqqIAZYT1CNV9oYStHdAzKVoxk3+
-         FMUw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1756424414; x=1757029214;
-        h=content-transfer-encoding:cc:to:from:subject:message-id:references
-         :mime-version:in-reply-to:date:x-gm-message-state:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=PEeUvBboOkLSk46g+vBgkfY4ImguJzhTUEdxhRNUWyM=;
-        b=dVbgSRDZYijZO1E6E2mmI7cLRDYFAZPxVa2NVrjbcVohmuKV0k9OoSB3tddn1h0rjS
-         mA9S74fJ6jXNYGL9RCuRCeOitydquE9xLZO9eaKUY4f5qYBZV61wU3/prMQrT4lwdXRk
-         bzaJJFTUhO3Cd0cJbqNVsF7jp4/KscLYKXnmZuHxsh0BPPytcn1OOetr26hpdtIoC+mb
-         Y/YnazVNzWl7/Jbu9o/iznKad8FeQu8h7HLybF0doCNzQ1NgX9S5+69KdwNyzjTmf4xK
-         VEqa/UCgMriCH66mrW49z4vtCXH01pbYPl7PltzrcYUVIk5Pr20PGleBDGsHKyyeUAAl
-         HRrw==
-X-Forwarded-Encrypted: i=1; AJvYcCXN1LRkfJYqCWZqWI864Nq/GlRI3FE+VzVNIt7MbWqcaDinfG4Ocd8tH+ayS0piIiuUJ08=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyL3efb+q0NB2apsTDWNKNLP7LxEOakmGStKkNDPz+walp8gGsm
-	VMa+LNMlFDsBETro2OypYxFxTI+2GmIQYwnYA8DrirnlN5vl4JfkqFKaKrTNfkEoPn3CA18DmDJ
-	kU79lBQ==
-X-Google-Smtp-Source: AGHT+IHeJ88uApWJkJqXMHHSqLFiYmbSu+jf3zcvClugfQxnEbc0FP+VGJbRiLFQM0fXQ2K58Whmq3fXey8=
-X-Received: from pfbde5.prod.google.com ([2002:a05:6a00:4685:b0:771:e00d:cee])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a05:6a00:9291:b0:771:e451:4edf
- with SMTP id d2e1a72fcca58-771e451567dmr20877658b3a.0.1756424414244; Thu, 28
- Aug 2025 16:40:14 -0700 (PDT)
-Date: Thu, 28 Aug 2025 16:40:12 -0700
-In-Reply-To: <e6dd6de527d2eb92f4a2b4df0be593e2cf7a44d3.camel@infradead.org>
+	s=arc-20240116; t=1756425394; c=relaxed/simple;
+	bh=jqOpLgavgnkRBITOWBnwEBLwXK1rh8ql4OGzOkGqwIY=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=fccigkxiXMu26HzCCHk/C74nKVTeDf/XmNOon8iFQGuq1pjFt+LSKhvd0XF2/vxvFQk0ok2dh/anJrpg6pHhl5rR0kPuFn3+SfGqCM8mK9Ld+BpcwE160SJj3SdvDs8SqacvjymOel8I/Coy3T++u2hVv6gNsF+6OFKuW64ngF8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com; spf=pass smtp.mailfrom=linux.microsoft.com; dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b=FCmBOZww; arc=none smtp.client-ip=13.77.154.182
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.microsoft.com
+Received: from [100.65.128.219] (unknown [20.236.11.69])
+	by linux.microsoft.com (Postfix) with ESMTPSA id 6157F2110814;
+	Thu, 28 Aug 2025 16:56:31 -0700 (PDT)
+DKIM-Filter: OpenDKIM Filter v2.11.0 linux.microsoft.com 6157F2110814
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.microsoft.com;
+	s=default; t=1756425392;
+	bh=pCexqDkoW83y7LpImpFx62Xw3cNxneYeXhAEgKffuKE=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=FCmBOZwwR8w+zLgYvdYsQndKdjVa/Zic9g+xriRNGxIyvlCW/6jpNTSZnJfm6AeYV
+	 w2ojPM1lFjNBJBy+LYvZF2V3PzDSbQwMQWAu7ekzKLIlFXUd3JJs7xNFRWV7yBhSjO
+	 k2ChjjpZ1AKeJCgw2XX5B7Ss1Fvkq4e5nLRu23ks=
+Message-ID: <0b4eb0cc-657f-4cdb-8255-e3b8f6b14077@linux.microsoft.com>
+Date: Thu, 28 Aug 2025 16:56:20 -0700
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20250816101308.2594298-1-dwmw2@infradead.org> <aKdIvHOKCQ14JlbM@google.com>
- <933dc95ead067cf1b362f7b8c3ce9a72e31658d2.camel@infradead.org>
- <aKdzH2b8ShTVeWhx@google.com> <6783241f1bfadad8429f66c82a2f8810a74285a0.camel@infradead.org>
- <aKeGBkv6ZjwM6V9T@google.com> <fdcc635f13ddf5c6c2ce3d5376965c81ce4c1b70.camel@infradead.org>
- <01000198cf7ec03e-dfc78632-42ee-480b-8b51-3446fbb555d1-000000@email.amazonses.com>
- <aK4LamiDBhKb-Nm_@google.com> <e6dd6de527d2eb92f4a2b4df0be593e2cf7a44d3.camel@infradead.org>
-Message-ID: <aLDo3F3KKW0MzlcH@google.com>
-Subject: Re: [PATCH v2 0/3] Support "generic" CPUID timing leaf as KVM guest
- and host
-From: Sean Christopherson <seanjc@google.com>
-To: David Woodhouse <dwmw2@infradead.org>
-Cc: Colin Percival <cperciva@tarsnap.com>, Paolo Bonzini <pbonzini@redhat.com>, 
-	Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>, 
-	Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org, 
-	"H. Peter Anvin" <hpa@zytor.com>, Vitaly Kuznetsov <vkuznets@redhat.com>, kvm@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, graf@amazon.de, 
-	Ajay Kaher <ajay.kaher@broadcom.com>, Alexey Makhalov <alexey.makhalov@broadcom.com>
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
+MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v2 1/7] Drivers: hv: Handle NEED_RESCHED_LAZY before
+ transferring to guest
+To: Sean Christopherson <seanjc@google.com>, Marc Zyngier <maz@kernel.org>,
+ Oliver Upton <oliver.upton@linux.dev>,
+ Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>,
+ Tianrui Zhao <zhaotianrui@loongson.cn>, Bibo Mao <maobibo@loongson.cn>,
+ Huacai Chen <chenhuacai@kernel.org>, Anup Patel <anup@brainfault.org>,
+ Paul Walmsley <paul.walmsley@sifive.com>, Palmer Dabbelt
+ <palmer@dabbelt.com>, Albert Ou <aou@eecs.berkeley.edu>,
+ Paolo Bonzini <pbonzini@redhat.com>, Thomas Gleixner <tglx@linutronix.de>,
+ Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+ Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org,
+ "K. Y. Srinivasan" <kys@microsoft.com>,
+ Haiyang Zhang <haiyangz@microsoft.com>, Wei Liu <wei.liu@kernel.org>,
+ Dexuan Cui <decui@microsoft.com>, Peter Zijlstra <peterz@infradead.org>,
+ Andy Lutomirski <luto@kernel.org>, "Paul E. McKenney" <paulmck@kernel.org>,
+ Frederic Weisbecker <frederic@kernel.org>,
+ Neeraj Upadhyay <neeraj.upadhyay@kernel.org>,
+ Joel Fernandes <joelagnelf@nvidia.com>, Josh Triplett
+ <josh@joshtriplett.org>, Boqun Feng <boqun.feng@gmail.com>,
+ Uladzislau Rezki <urezki@gmail.com>
+Cc: linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+ kvmarm@lists.linux.dev, kvm@vger.kernel.org, loongarch@lists.linux.dev,
+ kvm-riscv@lists.infradead.org, linux-riscv@lists.infradead.org,
+ linux-hyperv@vger.kernel.org, rcu@vger.kernel.org,
+ Mukesh R <mrathor@linux.microsoft.com>
+References: <20250828000156.23389-1-seanjc@google.com>
+ <20250828000156.23389-2-seanjc@google.com>
+Content-Language: en-US
+From: Nuno Das Neves <nunodasneves@linux.microsoft.com>
+In-Reply-To: <20250828000156.23389-2-seanjc@google.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-On Wed, Aug 27, 2025, David Woodhouse wrote:
-> On Tue, 2025-08-26 at 12:30 -0700, Sean Christopherson wrote:
-> > On Fri, Aug 22, 2025, Colin Percival wrote:
-> > > On 8/21/25 14:10, David Woodhouse wrote:
-> > > > On Thu, 2025-08-21 at 13:48 -0700, Sean Christopherson wrote:
-> > > > > > I think I'm a lot happier with the explicit CPUID leaf exposed =
-by the
-> > > > > > hypervisor.
-> > > > >=20
-> > > > > Why?=C2=A0 If the hypervisor is ultimately the one defining the s=
-tate, why does it
-> > > > > matter which CPUID leaf its in?
-> > > > [...]
-> > > >=20
-> > > > If you tell me that 0x15 is *never* wrong when seen by a KVM guest,=
- and
-> > > > that it's OK to extend the hardware CPUID support up to 0x15 even o=
-n
-> > > > older CPUs and there'll never be any adverse consequences from weir=
-d
-> > > > assumptions in guest operating systems if we do the latter... well,=
- for
-> > > > a start, I won't believe you. And even if I do, I won't think it's
-> > > > worth the risk. Just use a hypervisor leaf :)
-> >=20
-> > But for CoCo VMs (TDX in particular), using a hypervisor leaf is object=
-ively worse,
-> > because the hypervisor leaf is emulated by the untrusted world, whereas=
- CPUID.0x15
-> > is emulated by the trusted world (TDX-Module).
-> >=20
-> > If the issue is one of trust, what if we carve out a KVM_FEATURE_xxx bi=
-t that
-> > userspace can set to pinky swear it isn't broken?
-> >=20
-> > > FreeBSD developer here.=C2=A0 I'm with David on this, we'll consult t=
-he 0x15/0x16
-> > > CPUID leaves if we don't have anything better, but I'm not going to t=
-rust
-> > > those nearly as much as the 0x40000010 leaf.
-> > >=20
-> > > Also, the 0x40000010 leaf provides the lapic frequency, which AFAIK i=
-s not
-> > > exposed in any other way.
-> >=20
-> > On Intel CPUs, CPUID.0x15 defines the APIC timer frequency:
-> >=20
-> > =C2=A0 The APIC timer frequency will be the processor=E2=80=99s bus clo=
-ck or core crystal clock
-> > =C2=A0 frequency (when TSC/core crystal clock ratio is enumerated in CP=
-UID leaf 0x15)
-> > =C2=A0 divided by the value specified in the divide configuration regis=
-ter.
-> >=20
-> > Thanks to TDX (again), that is also now KVM's ABI.
->=20
-> And AMD's Secure TSC provides it in a GUEST_TSC_FREQ MSR, I believe.
->=20
-> For the non-CoCo cases, I do think we'd need at least that 'I pinky
-> swear that CPUID 0x15 is telling the truth' bit =E2=80=94 because right n=
-ow, on
-> today's hypervisors, I believe it might not be correct. So a guest
-> can't trust it without that bit.
->=20
-> But I'm also concerned about the side-effects of advertising to guests
-> that everything up to 0x15 is present, on older and AMD CPUs.=20
+On 8/27/2025 5:01 PM, Sean Christopherson wrote:
+> Check for NEED_RESCHED_LAZY, not just NEED_RESCHED, prior to transferring
+> control to a guest.  Failure to check for lazy resched can unnecessarily
+> delay rescheduling until the next tick when using a lazy preemption model.
+> 
+> Note, ideally both the checking and processing of TIF bits would be handled
+> in common code, to avoid having to keep three separate paths synchronized,
+> but defer such cleanups to the future to keep the fix as standalone as
+> possible.
+> 
+> Cc: Nuno Das Neves <nunodasneves@linux.microsoft.com>
+> Cc: Mukesh R <mrathor@linux.microsoft.com>
+> Fixes: 621191d709b1 ("Drivers: hv: Introduce mshv_root module to expose /dev/mshv to VMMs")
+> Fixes: 64503b4f4468 ("Drivers: hv: Introduce mshv_vtl driver")
+> Signed-off-by: Sean Christopherson <seanjc@google.com>
+> ---
+>  drivers/hv/mshv_common.c    | 2 +-
+>  drivers/hv/mshv_root_main.c | 3 ++-
+>  drivers/hv/mshv_vtl_main.c  | 3 ++-
+>  3 files changed, 5 insertions(+), 3 deletions(-)
+> 
+> diff --git a/drivers/hv/mshv_common.c b/drivers/hv/mshv_common.c
+> index 6f227a8a5af7..eb3df3e296bb 100644
+> --- a/drivers/hv/mshv_common.c
+> +++ b/drivers/hv/mshv_common.c
+> @@ -151,7 +151,7 @@ int mshv_do_pre_guest_mode_work(ulong th_flags)
+>  	if (th_flags & (_TIF_SIGPENDING | _TIF_NOTIFY_SIGNAL))
+>  		return -EINTR;
+>  
+> -	if (th_flags & _TIF_NEED_RESCHED)
+> +	if (th_flags & (_TIF_NEED_RESCHED | _TIF_NEED_RESCHED_LAZY))
+>  		schedule();
+>  
+>  	if (th_flags & _TIF_NOTIFY_RESUME)
+> diff --git a/drivers/hv/mshv_root_main.c b/drivers/hv/mshv_root_main.c
+> index 932932cb91ea..0d849f09160a 100644
+> --- a/drivers/hv/mshv_root_main.c
+> +++ b/drivers/hv/mshv_root_main.c
+> @@ -484,7 +484,8 @@ mshv_vp_wait_for_hv_kick(struct mshv_vp *vp)
+>  static int mshv_pre_guest_mode_work(struct mshv_vp *vp)
+>  {
+>  	const ulong work_flags = _TIF_NOTIFY_SIGNAL | _TIF_SIGPENDING |
+> -				 _TIF_NEED_RESCHED  | _TIF_NOTIFY_RESUME;
+> +				 _TIF_NEED_RESCHED  | _TIF_NEED_RESCHED_LAZY |
+> +				 _TIF_NOTIFY_RESUME;
+>  	ulong th_flags;
+>  
+>  	th_flags = read_thread_flags();
+> diff --git a/drivers/hv/mshv_vtl_main.c b/drivers/hv/mshv_vtl_main.c
+> index dc6594ae03ad..12f5e77b7095 100644
+> --- a/drivers/hv/mshv_vtl_main.c
+> +++ b/drivers/hv/mshv_vtl_main.c
+> @@ -728,7 +728,8 @@ static int mshv_vtl_ioctl_return_to_lower_vtl(void)
+>  	preempt_disable();
+>  	for (;;) {
+>  		const unsigned long VTL0_WORK = _TIF_SIGPENDING | _TIF_NEED_RESCHED |
+> -						_TIF_NOTIFY_RESUME | _TIF_NOTIFY_SIGNAL;
+> +						_TIF_NOTIFY_RESUME | _TIF_NOTIFY_SIGNAL |
+> +						_TIF_NEED_RESCHED_LAZY;
+>  		unsigned long ti_work;
+>  		u32 cancel;
+>  		unsigned long irq_flags;
 
-Ah, you want to bolt this onto older vCPU models.  That makes sene.
+Tested by compiling with CONFIG_PREEMPT_LAZY=y and booting a guest. For
+the test I added a check to confirm _TIF_NEED_RESCHED_LAZY was set and
+honored.
 
-> And I just don't see the point in that 'pinky swear' bit,
+Looks good, thanks.
 
-Yeah, I can see poorly written guest software freaking out over CPUID.0x15 =
-being
-unexpectedly valid, e.g. on AMD hardware, in which case pinky swearing it's=
- ok
-won't help.
-
-> when there's an *existing* hypervisor leaf which just gives the informati=
-on
-> directly, which is implemented in QEMU and EC2, as well as various guests=
-.
-
-Can we just have the VMM do the work then?  I.e. carve out the bit and the
-leaf in KVM's ABI, but leave it to the VMM to fill in?  I'd strongly prefer=
- not
-to hook kvm_cpuid(), as I don't like overriding userspace's CPUID entries, =
-and
-I especially don't like that hooking kvm_cpuid() means the value can change
-throughout the lifetime of the VM, at least in theory, but in practice will=
- only
-ever be checked by the guest during early boot.
+Tested-by: Nuno Das Neves <nunodasneves@linux.microsoft.com>
+Reviewed-by: Nuno Das Neves <nunodasneves@linux.microsoft.com>
 
