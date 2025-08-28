@@ -1,300 +1,240 @@
-Return-Path: <kvm+bounces-56001-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-56002-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 35296B3903E
-	for <lists+kvm@lfdr.de>; Thu, 28 Aug 2025 02:53:06 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 369F3B39046
+	for <lists+kvm@lfdr.de>; Thu, 28 Aug 2025 02:55:04 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E4B672054B4
-	for <lists+kvm@lfdr.de>; Thu, 28 Aug 2025 00:53:05 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 1550A1C2156F
+	for <lists+kvm@lfdr.de>; Thu, 28 Aug 2025 00:55:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E354319DFAB;
-	Thu, 28 Aug 2025 00:52:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9B1B91A23B1;
+	Thu, 28 Aug 2025 00:54:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="AxwgS449"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="S+9cU1yh"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pj1-f73.google.com (mail-pj1-f73.google.com [209.85.216.73])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.19])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5E0BD72626
-	for <kvm@vger.kernel.org>; Thu, 28 Aug 2025 00:52:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.73
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756342379; cv=none; b=YA8A5PaHyQlW/pPqhnmjLNJOwJm2jrhKembxlL4lw+4GF9mD60u6/Ig80Ghdh6UxXAvQMbcxz9eXxRoCTzp9hIBRPbNr9a6vW2kAPCcprJaUtPqyMoDEC+2BFBQNnUaDug2dmu6hNatdOmLp42tWbu1u0Pn+nzGrUeOJCjRVjoU=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756342379; c=relaxed/simple;
-	bh=hP9AtsgfQq95XL8KbbOQiBOjpvpmewmOKS0x/w8n5QE=;
-	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=mm+U2Zbf8gWmysfwOsysJBBEFZaWbboRvx+dYLXTi+h7vdbsRgBAXJLQV+eLuFJhrhi39NyVIAp0d+ZV8vlPBoeGUEP0cgn9B2QxtWYIerMJhSRnCtDUQoAC6PpEUHl959GSK8W05il1fJBQ3Xs8vKSsQXorjliiVu6rpSVQsoQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=AxwgS449; arc=none smtp.client-ip=209.85.216.73
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pj1-f73.google.com with SMTP id 98e67ed59e1d1-325b2959306so724327a91.0
-        for <kvm@vger.kernel.org>; Wed, 27 Aug 2025 17:52:57 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1756342377; x=1756947177; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:from:subject:message-id
-         :mime-version:date:reply-to:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=irNn6RHlqL0J00QTOKsI47MRlXNhAxvQVf7HLq/M30Q=;
-        b=AxwgS449n6TUv3o0Qb08VPGKeq7S8z8YjoIsQ9sGPYY1i56Ka01KiTpe+G1tSgP46B
-         RtoqFe/K9YFswrLksQ/wxdRI4mguA3M5xxb+5bU3IVlNJ1ia0AFbZKTPg9EcH+ZE8Dx8
-         9t1yL0CV0iY8ZEelZyDIvAoyO8viHPX91LL7CSd2jX+aQMW1c9LlFhjR62uGctuLpdjv
-         1XzzNkSHRe6jfEgoWeXH4QHnFCLXxf9W9lA16np1XWxY9ZPCF3Cidc0ktxPJgcxwX6Rl
-         gNDFaP1Q8BSgJdZxUSskrmHrTKnr+3Dky9/8ILo1vgXoXphp5CFZPXFZJ8g4Xm5AMFV4
-         UUnQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1756342377; x=1756947177;
-        h=content-transfer-encoding:cc:to:from:subject:message-id
-         :mime-version:date:reply-to:x-gm-message-state:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=irNn6RHlqL0J00QTOKsI47MRlXNhAxvQVf7HLq/M30Q=;
-        b=fqAOfcnuVh6GSXu7yVbKmZULwl2BhI6LH9yDaOsKpLSKk6pVvox49swn6qEHGv3b7+
-         w7JKTUTpexUQwEMqRjVMag+CK3bg64q0dPaCXQxwtar8aGLo+AmTaJ4VJc6L5Yl0LK5e
-         QoHhGTHNrYmFrWJy7jBN5mNh2811jCDlO5Rz9SIgQUjTqTAZa++pAjwCkmoAHqWe1PsP
-         S3pQzD5dAP0rVlsBNJo1O41dC75EQFndrPy4rfBZKkKUIkf00Ae34uVnnSQqGju2vGkb
-         bCmja1r4xH07OmtaqCJwuZqqumimMQChviOBdMO1D6bjg6O8RTp6eUjIqPrPmNnCu58S
-         B+Ow==
-X-Gm-Message-State: AOJu0YxtKIum47eTyAe4gJUr3Mex+fsc37CmxRfAQig2GmZ6JUWbr5eP
-	kX5HiVO8MFFLWAA/IEcG2ncWvNYKN/MjSY0ZBc3XZdRQHNQBbXH7hK6nbnDPRp9zIbmh+ChSlgU
-	pXsdzdA==
-X-Google-Smtp-Source: AGHT+IHt7P0JRuIxkyuhMtcRuoYgVEa/bjXE8XDrfVMIIpj6JBOODrH9g1XtpZ/DNC/LKBu7QAscZ/Ixosk=
-X-Received: from pjbsw12.prod.google.com ([2002:a17:90b:2c8c:b0:323:25d2:22db])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:3948:b0:325:46f4:4f6e
- with SMTP id 98e67ed59e1d1-32546f450b5mr22920425a91.32.1756342376735; Wed, 27
- Aug 2025 17:52:56 -0700 (PDT)
-Reply-To: Sean Christopherson <seanjc@google.com>
-Date: Wed, 27 Aug 2025 17:52:49 -0700
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 050263FC2;
+	Thu, 28 Aug 2025 00:54:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=192.198.163.19
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1756342494; cv=fail; b=eh132YUC15pixY6X15+IAWrwcPxT4xbcjbH0ETsvbq82El75a4zJRzzkkXdukpd0ot2q6UacHk79ZISxd7I2n5N7TlgN1tur9ZFyrOMgoLdnP05XdBR3ZihmlNabLy9lcnLztnit2asIjrRHwOT+Dtcjdjvo31djSZ2+IyTYJDs=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1756342494; c=relaxed/simple;
+	bh=E2rsr6StffTQvDnkr70LxkysfUuhuadbDHMsoTRz8G4=;
+	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=PAqI6wGnPfhgKfJ+J+KiRzwJHng9d7YF9FyuD/hhPeDHWzLOu2lrHwX8XhX3GhYA3VK3BPHigWypYFDOqAnvH9nv7fDhNWu6UVd0gmLcmxVh5y+rPJN+gdO3BMoNB8uW0eA8FUXoP5rpavHS1IY/uh3ncntJDZkhA/30sgSn3H4=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=S+9cU1yh; arc=fail smtp.client-ip=192.198.163.19
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1756342493; x=1787878493;
+  h=from:to:cc:subject:date:message-id:references:
+   in-reply-to:content-id:content-transfer-encoding:
+   mime-version;
+  bh=E2rsr6StffTQvDnkr70LxkysfUuhuadbDHMsoTRz8G4=;
+  b=S+9cU1yhgrWlPNzwOhar/PbYuXiaG7BKD5qe0Plv6zsCHXPqScdZ0rlb
+   ZtZoKnhnyzuSYz+eeiHTZycVCyVSA5hIfdWE02YN95QYlCuKz3UHExeMa
+   TKer04NguLqZvUI/3M+6ty6n3BbXJJiB+ZJ/gAU7DAe5Viwqit6O/mvry
+   NoxwBmu5FRQrEkRrYEjCvox1zmELCPhImCRlwBx1K05CaLjgkJVbKUSV6
+   C0TTm6oqwrMSPPTijyOjCSBygvb6fiMigBI6BR4/FfBK8QXKCg7ah4DxP
+   MxFQARilvTAO9PSp2PUCP5BKTikcQcmjI+A0IGBq7pk1AK1jw2AxB0L33
+   w==;
+X-CSE-ConnectionGUID: JHQJE6D7QkqoQ6urhf3bzg==
+X-CSE-MsgGUID: VVlM28ybRIO4PC/Le04UuA==
+X-IronPort-AV: E=McAfee;i="6800,10657,11535"; a="57629495"
+X-IronPort-AV: E=Sophos;i="6.18,217,1751266800"; 
+   d="scan'208";a="57629495"
+Received: from fmviesa006.fm.intel.com ([10.60.135.146])
+  by fmvoesa113.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 27 Aug 2025 17:54:52 -0700
+X-CSE-ConnectionGUID: f5zNZjikSl+6koXMS+N2jA==
+X-CSE-MsgGUID: +f2jx4oSSCyawpcMdDlIew==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.18,217,1751266800"; 
+   d="scan'208";a="169904505"
+Received: from fmsmsx903.amr.corp.intel.com ([10.18.126.92])
+  by fmviesa006.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 27 Aug 2025 17:54:52 -0700
+Received: from FMSMSX903.amr.corp.intel.com (10.18.126.92) by
+ fmsmsx903.amr.corp.intel.com (10.18.126.92) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.2562.17; Wed, 27 Aug 2025 17:54:51 -0700
+Received: from fmsedg902.ED.cps.intel.com (10.1.192.144) by
+ FMSMSX903.amr.corp.intel.com (10.18.126.92) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.2562.17 via Frontend Transport; Wed, 27 Aug 2025 17:54:51 -0700
+Received: from NAM11-CO1-obe.outbound.protection.outlook.com (40.107.220.49)
+ by edgegateway.intel.com (192.55.55.82) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.2562.17; Wed, 27 Aug 2025 17:54:51 -0700
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=hgGXprT+u+XJQHn8cEuEK9gu31SspmWwcr5uMUnRIUMLpfK7EXwImjigtkzPD0OnhotNy9xDel3pp0Z2/FzIq/TRBqbr2lWchOtcJg0+0m5i25HUnIZ2FydrLH3PRlRumB4jSR0iPHDPvDohqnZ5pSR/K2Rgz6rui443hJf+drmRLPc93lQLhX2CAZAZpEV/7gPDvYCgmJyWeMyf5ain5Wz+ny61ZZgtHvy9NMgtIgdP4eL23vHGyAFbYaNCxS8fZExlQPKqNah/ZCGNTE3ug4CoM6Zac9BeJjrhwI2J6IPjDK3cypk1rQB5/yolgrmfFzj9TBfNU308DkUhXQQDZg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=E2rsr6StffTQvDnkr70LxkysfUuhuadbDHMsoTRz8G4=;
+ b=msAZBE1PbID+f+eCm0f+6L3L6/10jx/16rt8M6HWC66OpspklhXkbQxh+mARXq/jZ+8+YQMenERorNMjfjN/ASd6oIUH8MSpKCu7QcNzyuvQ/fX9E6wna5RDBs8F8uo5EZTLp5ZCNv+rA7aG0A/phaR69X8NFcDuLQO6YmB3SaHD9HdFBijBBG71YASE4Cj2Swp0w9EMNYUT97jIoht+ypQfeOKY78R1RJzk89kObAyKu4egqG/6vLbVBmzIyg470JlWGWLawdg2ORMfUibhhmcylGI9STFH6+5KWD+1G0TWxYahYDM85pU7aTLB4O40Sy92QALX6zxwOK0kC/wyLg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Received: from MN0PR11MB5963.namprd11.prod.outlook.com (2603:10b6:208:372::10)
+ by DS7PR11MB6174.namprd11.prod.outlook.com (2603:10b6:8:9a::13) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9052.24; Thu, 28 Aug
+ 2025 00:54:48 +0000
+Received: from MN0PR11MB5963.namprd11.prod.outlook.com
+ ([fe80::edb2:a242:e0b8:5ac9]) by MN0PR11MB5963.namprd11.prod.outlook.com
+ ([fe80::edb2:a242:e0b8:5ac9%5]) with mapi id 15.20.9052.014; Thu, 28 Aug 2025
+ 00:54:48 +0000
+From: "Edgecombe, Rick P" <rick.p.edgecombe@intel.com>
+To: "seanjc@google.com" <seanjc@google.com>, "Zhao, Yan Y"
+	<yan.y.zhao@intel.com>
+CC: "kvm@vger.kernel.org" <kvm@vger.kernel.org>, "pbonzini@redhat.com"
+	<pbonzini@redhat.com>, "Annapurve, Vishal" <vannapurve@google.com>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+	"michael.roth@amd.com" <michael.roth@amd.com>, "Weiny, Ira"
+	<ira.weiny@intel.com>
+Subject: Re: [RFC PATCH 02/12] KVM: x86/mmu: Add dedicated API to map
+ guest_memfd pfn into TDP MMU
+Thread-Topic: [RFC PATCH 02/12] KVM: x86/mmu: Add dedicated API to map
+ guest_memfd pfn into TDP MMU
+Thread-Index: AQHcFuZRH7A9gjtzDkWLIdW2XN4AQ7R2KoyAgAEUWoA=
+Date: Thu, 28 Aug 2025 00:54:48 +0000
+Message-ID: <4c292519bf58d503c561063d4c139ab918ed3304.camel@intel.com>
+References: <20250827000522.4022426-1-seanjc@google.com>
+	 <20250827000522.4022426-3-seanjc@google.com>
+	 <aK7BBen/EGnSY1ub@yzhao56-desk.sh.intel.com>
+In-Reply-To: <aK7BBen/EGnSY1ub@yzhao56-desk.sh.intel.com>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+user-agent: Evolution 3.44.4-0ubuntu2 
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: MN0PR11MB5963:EE_|DS7PR11MB6174:EE_
+x-ms-office365-filtering-correlation-id: ea3f46f2-c24c-4395-5169-08dde5cd7cd0
+x-ld-processed: 46c98d88-e344-4ed4-8496-4ed7712e255d,ExtAddr
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam: BCL:0;ARA:13230040|366016|1800799024|376014|38070700018;
+x-microsoft-antispam-message-info: =?utf-8?B?SDQ3L2xBMENHbjJWUVRHdjRMVzVpVy85ZVJhdDBnY1A5YU8ySVpBRnQvYW1q?=
+ =?utf-8?B?eFVoRkp5SFJjVVdwRlE2SUNGVEhuc3ZGSzN0cWdLUVJ0N1BOMzUzcHZVcERE?=
+ =?utf-8?B?TE40WitXRW40SEo5NVlPRjR1NUU5VDdpSWM0Q0VBeFR6MXd0TmwwWjN1VU5r?=
+ =?utf-8?B?UWlDeno2VzVFdUs1ZFoyWFJnaCtlTWplVTNEQlhENHFxZW5SQ0hkWURMOFdZ?=
+ =?utf-8?B?WW9WZWZBVVdpMThpNU9hZE9wVXAvSVp1WXJOajR5cWpuczBvNVdDOTg1Z01F?=
+ =?utf-8?B?MDc0cFZQbUdobE9WWUVOdW9XYXNzdnV2cFdDajdiN3VzbDQ2Z0JReTZ6Sngr?=
+ =?utf-8?B?SnRUZms5VjgrNDM0MXdGY3lib0sxNW1VeXdUcWdlSDhHblZpVm9uek1lQ01l?=
+ =?utf-8?B?SGVaZ0ZUQk9qY0RkcU1zTGNCb3dBU3JEYktDc2lwbVNsaDV4TEZjYnhIbzdP?=
+ =?utf-8?B?Wld2bzdvVGlDRTBsNzY5WW5QYzZEblFyaTFkRHI0bHY2VjBtQjl6MnY2d2ZX?=
+ =?utf-8?B?dDRCYThURGNTMnRnMjNQaWZLb1YzZ2kvTVNHaVpBaEh5NzRBb1RQOUJWN2Za?=
+ =?utf-8?B?eW9DaDlqRDRjd0NaTGU1M3lldlRibVZ0NHhsdlN2YndGSWRYT21QR3lScXdx?=
+ =?utf-8?B?UDRqR2RZa0xubi8xSU9hUnFXazk5cld3cE5qdG0rZThDMm5oV3Nhc2VrV1VV?=
+ =?utf-8?B?bEtzb214UXI4dWZ4TEFtV2kzVDlOQURCWkJrMnZoT0ZBMWlaWmx3WjVYSDlO?=
+ =?utf-8?B?Z1MwakE0RzROMXpnVWRSb1NMd29UaUtqRjgyNmVoMmwrM1EwQXN5V2VsSlV2?=
+ =?utf-8?B?bDZHLzRSRlcrYXord3JXRnZEdnR1NGhCUURRWkJzWFJJRXVkL1A2QjE4cytM?=
+ =?utf-8?B?SGVwQllyVStEak9pNEhUKythY0Ntc3VTSkUzemo2NmwxR05NMEFPOG96VGQ2?=
+ =?utf-8?B?R3k0TnNxQUhvOGxCejV0cG14Q0cxejh4ckpDSnltR2JBRG1RNVFzM2wxSGhh?=
+ =?utf-8?B?SnBrTitpVzNOdTExcGFPTHhaRENORTZHWGpJdlp0a1pkbjI4aVkyWVBTVnNV?=
+ =?utf-8?B?MUJjdzBHZWFCTW9VczlRY1RoN2FpQUo2VFpOaXNEVk5GMEFwTXhHWEpkVGZ2?=
+ =?utf-8?B?RGtMcVVUeWVaeEw5OGxjdHM5V0VTbVViWmJmMnJIaG1xaUFBaVRwL21aNXpp?=
+ =?utf-8?B?ZHZ1YTBMWlU3dFp0M2R0Y3AyaXBmQXBGL3llQ3hmMmxVSFlVakhLVFc1MFZO?=
+ =?utf-8?B?TXJaOUd4Ujh3cEJScm9IWVB6Vi9Lc1JoVGhPNDI1d01aMy9TTU9xNjNaL3VQ?=
+ =?utf-8?B?T3lxYWhmNEpxMGpVaER0YVV2eGdFTWl4VFB1N0YvdklKTEd2NnJLOVk4ZkZk?=
+ =?utf-8?B?SlBZS3g0bnBGNGdvdUpJRmM5cnVvOXE3T2NxdTl0VC92ckVsUDBWdy9wRjA0?=
+ =?utf-8?B?ZnRadVpXejU1QTdqb05xRlFEcHpaSE5TdlV2VVN3amk3dHNzSlZuUFQvQ0tZ?=
+ =?utf-8?B?QTJXei9zV1NEMVhEQjBndC9MY0NEQWNxakZUSDZJSTRVOGdCVy9hMkZMV0Jy?=
+ =?utf-8?B?OC9aMnpYb2haVHQ3aWVRd21uK0oxNGxXb1JRWEIzVmR4bThhTjVpZGxDaXQ0?=
+ =?utf-8?B?MUJ3NlFMQ1ZxaVR2NGNBSE5NQmkrNDRDUHpxTy9HaW5CRk0zd2c4Q1Q3RGcv?=
+ =?utf-8?B?eHloRW16OWdpSWNiay8vZklNR2lneHV0SDZ5TzhQcHB5bDMvTm1YNS9sdml3?=
+ =?utf-8?B?Ykw2OElHSDJweGVxS3M1eFdFbWw2ZnZJcjlLWnVSb1hCQXhLSm5taW9wSWIx?=
+ =?utf-8?B?OEhwV0JqbXdvSnV6TmR3WWdEOFEyTTd3Wld0NjBZQzlVRzh1RUxGMWhnZXMr?=
+ =?utf-8?B?d0xsS0NnMU8xS0JFaDJCdXRXei9GWG1hZGpQYlIzQUkyclU1NFJPWmlqS0Jv?=
+ =?utf-8?B?VUR4YlRCRkVqb3A0OTJnMysyWW9uK0ZmRVY2bXdraXpTOHl5RUxTb2ExekFS?=
+ =?utf-8?B?MjZGK2cwekxRPT0=?=
+x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:MN0PR11MB5963.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(1800799024)(376014)(38070700018);DIR:OUT;SFP:1101;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0: =?utf-8?B?YzJLdHVwUWdXbzFJK1psbzNWT0p3eG5NcGl0eWJOS3VrdFJhaXBncWY0dk9u?=
+ =?utf-8?B?eVphalo4emhFeUZJTFZzcjVKalVuLzZuU1B4RHcwRWV3d3EvMUpXM3J1OUdn?=
+ =?utf-8?B?YnlwVWR0Sm1rSHlRYkxoakY3cXFNSXhJN0R6U1FMK2tjYjl6RTBjVTk2UHVV?=
+ =?utf-8?B?N2ErMEcyN1drNHFvS0RMSGZFOUxoaU1qYXpzUTdpRzhpd1VaeGs3eWpEZFpp?=
+ =?utf-8?B?NkFxWjhPaWdtN2JIdFpSbkZwWWtzanNUMGRsL2hsMU95UFFoTnRKdzhleTNQ?=
+ =?utf-8?B?SWZRUWJrRDVsZk1GSmkvcGV2dHpDeEFwTzNZQXZwUHBwK3RUbmllRVgwcmdi?=
+ =?utf-8?B?dGo1cmd2VU51bDVpSit2eTBiYmtHVVFLSXZjUFJlVm1JQWhQZk1aUGZhVFFh?=
+ =?utf-8?B?OThLOGxWUjlLNmpEbTR4RlR4TCtGb1Y0UzJoNFpsbTJEZ2hIY1J2bEVRTmk2?=
+ =?utf-8?B?Qng2YVdQYU5KTEFra21lSjFIejBSblZYZy9NTUl5cCsxa1NLUFpZckV3eEdp?=
+ =?utf-8?B?Z0h3MGd0cXkvN1J2YnV4QXZMTUNRdk5oL0UxSStQQ3Q5TTBldU1aV0VuTlc5?=
+ =?utf-8?B?ZEFocWNjZ0w5WUVrZzQxeGZLdm4ybWVINDYrUkRhQnRUSWhxYjVMbll2alk3?=
+ =?utf-8?B?bTlpdFJlSVJONVN5SmxhaUI0bTV4eXMrM3ZoL2Z5a1pET1VJZTRlZ0hybmxT?=
+ =?utf-8?B?elZhWTYwaHlxaDR3bXE4WWVQM0pnYVFINUtuVlRvZEtYVlBTcDJoMlErdCto?=
+ =?utf-8?B?U3lacE1YTjllZ0oreERxU3laWFBpc1RDNllUNktZajIydk9CdFNWVDlNdE4x?=
+ =?utf-8?B?VEVUNXJwOFhBZXk4ZVR6dFJUNnBubHpFL3ByNFkxb1lqL09kM3JnTHg5aTZa?=
+ =?utf-8?B?aVRYcDhYbHVyZk5NMnlURXQ3TU9yLzdoT3NLNVk2Slloc3l3N25oNDBIN1Q1?=
+ =?utf-8?B?cXhZdFVLd1BKMFdVeit0Q0s1UDg1M2oxQXoyRHJnZ3lqa09LUG5ZTlBmeDBF?=
+ =?utf-8?B?VlcyczBMQTUveXdtQ0Z6aHpNZ3lOWXdhNDE0SHc3d3loYlZmV0xVTHpNUUUw?=
+ =?utf-8?B?UmduaDJQSnFFSStVWnNjMkFtNFNzNlpiVjRhbE1pamo3dFM1bXJUYS9aUEZU?=
+ =?utf-8?B?d0pPMGRlbnU1STJJLzBlVmh5WTV5a3padytXcU90bHk0dTh4YjVKaGFYenNQ?=
+ =?utf-8?B?akMzNXc5aGdqTURmM01nenJsMEVBY0h6STdhK2NQdnJmWXk5dlBmS09sZ1Jh?=
+ =?utf-8?B?bjRDcEtGWUxtcFQ1TTRTa1M4WXFDVyt4ZTc4WmxmMk12UEc5RmhkbFRLUk9m?=
+ =?utf-8?B?WjVYVFpTQWNVZHJqYWFjOWExdWJkUUxCaHQyL3JCUERSanlFL1h1Um5aYlY0?=
+ =?utf-8?B?VlpVZ1JWKzRUdThEVkhUZVJtZUtKUmN4dVZvUk1PQWNRY1FaNzg2NTA3S0Zq?=
+ =?utf-8?B?K3lKenhmZzNXTWFEN0x6SXZRaGN5VnhOcitjUzM3NW5UMSt6MElxYklJMllD?=
+ =?utf-8?B?OFFUdFBiNVUwTUF1KzlVZDVEQWxWakE1WkcwS3hjalpLc1N1TnJweTU5c3pK?=
+ =?utf-8?B?V1Nvc2ZXRjV2NkRKRkNaNHpQQzJBTStncmFYbXJkSjM3cWxlcVM3SXVBeDVL?=
+ =?utf-8?B?UVJZVG9PRWF4dDZ4cldXdzc0anNrWTlQWkJxSzJWWjNiNm1CZkcxZytNa2NE?=
+ =?utf-8?B?c05XTWk0Yk1SOTZDc1pkZWVRY0MzU3ZNOGlURThQOUkrTkppMks0Y05ENkVF?=
+ =?utf-8?B?SjR6UFZvS25kMEpDUjZvNm1Mcm4vcmZmb2NuNFZFUWhzUWlwY3YzTWwxczNt?=
+ =?utf-8?B?UnNOaThBNWdtZ1kwYlVsUUdXcU9IYnVLc0tiZVhXc2ZpODZDcVNjLzkzdzcw?=
+ =?utf-8?B?czZmSGJ3ZGcxSW1JQVZVSXdaOWloY1NqWU9RdENzc1JMbzY4dzZIOHllMDFH?=
+ =?utf-8?B?V3hxRG9xU21zeEc1SUJ0L1B4NjNtR2dPMnpWSTlveFZJaG9MLy9xYmRCZ2xX?=
+ =?utf-8?B?NXh0aVk5a1Y2QWVHOWJ4SUtHNWgyUVd4dGZuVWZOb3RyL2dqWE9qS2tXaVNN?=
+ =?utf-8?B?c3M0SHBsL0ZBNVo4Qi9zZmdkSmd1QVZhaWd6RERIOHZTNDRQQWhnbEgwVXR1?=
+ =?utf-8?B?RWhhTnVKYURldm9CVE1WUk5NajFaVWt1TVFGejU4SWE3a3hyQ2RGM1VtQ1Ir?=
+ =?utf-8?B?UVE9PQ==?=
+Content-Type: text/plain; charset="utf-8"
+Content-ID: <A382B1031BFCD543968A858EF0925E07@namprd11.prod.outlook.com>
+Content-Transfer-Encoding: base64
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-X-Mailer: git-send-email 2.51.0.268.g9569e192d0-goog
-Message-ID: <20250828005249.39339-1-seanjc@google.com>
-Subject: [PATCH v2] x86/kvm: Force legacy PCI hole to UC when overriding MTRRs
- for TDX/SNP
-From: Sean Christopherson <seanjc@google.com>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	Peter Gonda <pgonda@google.com>, Vitaly Kuznetsov <vkuznets@redhat.com>, 
-	Tom Lendacky <thomas.lendacky@amd.com>, 
-	"=?UTF-8?q?J=C3=BCrgen=20Gro=C3=9F?=" <jgross@suse.com>, Korakit Seemakhupt <korakit@google.com>, Jianxiong Gao <jxgao@google.com>, 
-	Nikolay Borisov <nik.borisov@suse.com>, Binbin Wu <binbin.wu@linux.intel.com>, 
-	Sean Christopherson <seanjc@google.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+MIME-Version: 1.0
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: MN0PR11MB5963.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: ea3f46f2-c24c-4395-5169-08dde5cd7cd0
+X-MS-Exchange-CrossTenant-originalarrivaltime: 28 Aug 2025 00:54:48.1274
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: EK7XCIB1fxPeYRYTYTago3l3Yk5Z7PVlR73tvRiyG6DwrYMR7AFgWXGLeasD4d5887hORZzsQKRnQibQZ5pjtf1no/UB5CMS44HmRoIOd3A=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DS7PR11MB6174
+X-OriginatorOrg: intel.com
 
-When running as an SNP or TDX guest under KVM, force the legacy PCI hole,
-i.e. memory between Top of Lower Usable DRAM and 4GiB, to be mapped as UC
-via a forced variable MTRR range.
-
-In most KVM-based setups, legacy devices such as the HPET and TPM are
-enumerated via ACPI.  ACPI enumeration includes a Memory32Fixed entry, and
-optionally a SystemMemory descriptor for an OperationRegion, e.g. if the
-device needs to be accessed via a Control Method.
-
-If a SystemMemory entry is present, then the kernel's ACPI driver will
-auto-ioremap the region so that it can be accessed at will.  However, the
-ACPI spec doesn't provide a way to enumerate the memory type of
-SystemMemory regions, i.e. there's no way to tell software that a region
-must be mapped as UC vs. WB, etc.  As a result, Linux's ACPI driver always
-maps SystemMemory regions using ioremap_cache(), i.e. as WB on x86.
-
-The dedicated device drivers however, e.g. the HPET driver and TPM driver,
-want to map their associated memory as UC or WC, as accessing PCI devices
-using WB is unsupported.
-
-On bare metal and non-CoCO, the conflicting requirements "work" as firmware
-configures the PCI hole (and other device memory) to be UC in the MTRRs.
-So even though the ACPI mappings request WB, they are forced to UC due to
-the kernel properly handling the MTRR overrides, and thus are compatible
-with the drivers' requested WC/UC-.
-
-With force WB MTRRs on SNP and TDX guests, the ACPI mappings get their
-requested WB if the ACPI mappings are established before the dedicated
-driver code attempts to initialize the device.  E.g. if acpi_init()
-runs before the corresponding device driver is probed, ACPI's WB mapping
-will "win", and result in the driver's ioremap() failing because the
-existing WB mapping isn't compatible with the requested WC/UC-.
-
-E.g. when a TPM is emulated by the hypervisor (ignoring the security
-implications of relying on what is allegedly an untrusted entity to store
-measurements), the TPM driver will request UC and fail:
-
-  [  1.730459] ioremap error for 0xfed40000-0xfed45000, requested 0x2, got =
-0x0
-  [  1.732780] tpm_tis MSFT0101:00: probe with driver tpm_tis failed with e=
-rror -12
-
-Note, the '0x2' and '0x0' values refer to "enum page_cache_mode", not x86's
-memtypes (which frustratingly are an almost pure inversion; 2 =3D=3D WB, 0 =
-=3D=3D UC).
-E.g. tracing mapping requests for TPM TIS yields:
-
- Mapping TPM TIS with req_type =3D 0
- WARNING: CPU: 22 PID: 1 at arch/x86/mm/pat/memtype.c:530 memtype_reserve+0=
-x2ab/0x460
- Modules linked in:
- CPU: 22 UID: 0 PID: 1 Comm: swapper/0 Tainted: G        W           6.16.0=
--rc7+ #2 VOLUNTARY
- Tainted: [W]=3DWARN
- Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Go=
-ogle 05/29/2025
- RIP: 0010:memtype_reserve+0x2ab/0x460
-  __ioremap_caller+0x16d/0x3d0
-  ioremap_cache+0x17/0x30
-  x86_acpi_os_ioremap+0xe/0x20
-  acpi_os_map_iomem+0x1f3/0x240
-  acpi_os_map_memory+0xe/0x20
-  acpi_ex_system_memory_space_handler+0x273/0x440
-  acpi_ev_address_space_dispatch+0x176/0x4c0
-  acpi_ex_access_region+0x2ad/0x530
-  acpi_ex_field_datum_io+0xa2/0x4f0
-  acpi_ex_extract_from_field+0x296/0x3e0
-  acpi_ex_read_data_from_field+0xd1/0x460
-  acpi_ex_resolve_node_to_value+0x2ee/0x530
-  acpi_ex_resolve_to_value+0x1f2/0x540
-  acpi_ds_evaluate_name_path+0x11b/0x190
-  acpi_ds_exec_end_op+0x456/0x960
-  acpi_ps_parse_loop+0x27a/0xa50
-  acpi_ps_parse_aml+0x226/0x600
-  acpi_ps_execute_method+0x172/0x3e0
-  acpi_ns_evaluate+0x175/0x5f0
-  acpi_evaluate_object+0x213/0x490
-  acpi_evaluate_integer+0x6d/0x140
-  acpi_bus_get_status+0x93/0x150
-  acpi_add_single_object+0x43a/0x7c0
-  acpi_bus_check_add+0x149/0x3a0
-  acpi_bus_check_add_1+0x16/0x30
-  acpi_ns_walk_namespace+0x22c/0x360
-  acpi_walk_namespace+0x15c/0x170
-  acpi_bus_scan+0x1dd/0x200
-  acpi_scan_init+0xe5/0x2b0
-  acpi_init+0x264/0x5b0
-  do_one_initcall+0x5a/0x310
-  kernel_init_freeable+0x34f/0x4f0
-  kernel_init+0x1b/0x200
-  ret_from_fork+0x186/0x1b0
-  ret_from_fork_asm+0x1a/0x30
-  </TASK>
-
-The above traces are from a Google-VMM based VM, but the same behavior
-happens with a QEMU based VM that is modified to add a SystemMemory range
-for the TPM TIS address space.
-
-The only reason this doesn't cause problems for HPET, which appears to
-require a SystemMemory region, is because HPET gets special treatment via
-x86_init.timers.timer_init(), and so gets a chance to create its UC-
-mapping before acpi_init() clobbers things.  Disabling the early call to
-hpet_time_init() yields the same behavior for HPET:
-
-  [  0.318264] ioremap error for 0xfed00000-0xfed01000, requested 0x2, got =
-0x0
-
-Hack around the ACPI gap by forcing the legacy PCI hole to UC when
-overriding the (virtual) MTRRs for CoCo guest, so that ioremap handling
-of MTRRs naturally kicks in and forces the ACPI mappings to be UC.
-
-Note, the requested/mapped memtype doesn't actually matter in terms of
-accessing the device.  In practically every setup, legacy PCI devices are
-emulated by the hypervisor, and accesses are intercepted and handled as
-emulated MMIO, i.e. never access physical memory and thus don't have an
-effective memtype.
-
-Even in a theoretical setup where such devices are passed through by the
-host, i.e. point at real MMIO memory, it is KVM's (as the hypervisor)
-responsibility to force the memory to be WC/UC, e.g. via EPT memtype
-under TDX or real hardware MTRRs under SNP.  Not doing so cannot work,
-and the hypervisor is highly motivated to do the right thing as letting
-the guest access hardware MMIO with WB would likely result in a variety
-of fatal #MCs.
-
-In other words, forcing the range to be UC is all about coercing the
-kernel's tracking into thinking that it has established UC mappings, so
-that the ioremap code doesn't reject mappings from e.g. the TPM driver and
-thus prevent the driver from loading and the device from functioning.
-
-Note #2, relying on guest firmware to handle this scenario, e.g. by setting
-virtual MTRRs and then consuming them in Linux, is not a viable option, as
-the virtual MTRR state is managed by the untrusted hypervisor, and because
-OVMF at least has stopped programming virtual MTRRs when running as a TDX
-guest.
-
-Link: https://lore.kernel.org/all/8137d98e-8825-415b-9282-1d2a115bb51a@linu=
-x.intel.com
-Fixes: 8e690b817e38 ("x86/kvm: Override default caching mode for SEV-SNP an=
-d TDX")
-Cc: stable@vger.kernel.org
-Cc: Peter Gonda <pgonda@google.com>
-Cc: Vitaly Kuznetsov <vkuznets@redhat.com>
-Cc: Tom Lendacky <thomas.lendacky@amd.com>
-Cc: J=C3=BCrgen Gro=C3=9F <jgross@suse.com>
-Cc: Korakit Seemakhupt <korakit@google.com>
-Cc: Jianxiong Gao <jxgao@google.com>
-Cc: Nikolay Borisov <nik.borisov@suse.com>
-Suggested-by: Binbin Wu <binbin.wu@linux.intel.com>
-Signed-off-by: Sean Christopherson <seanjc@google.com>
----
-
-v2: Force the PCI hole to be UC via synthetic variable MTRR range instead
-    of hijacking is_untracked_pat_range() (which was horrific and apparentl=
-y
-    didn't work). [Binbin]
-
-v1:
- - https://lore.kernel.org/all/20250201005048.657470-1-seanjc@google.com
- - https://lore.kernel.org/all/CAMGD6P1Q9tK89AjaPXAVvVNKtD77-zkDr0Kmrm29+e=
-=3Di+R+33w@mail.gmail.com
-
- arch/x86/kernel/kvm.c | 21 +++++++++++++++++++--
- 1 file changed, 19 insertions(+), 2 deletions(-)
-
-diff --git a/arch/x86/kernel/kvm.c b/arch/x86/kernel/kvm.c
-index 8ae750cde0c6..57379698015e 100644
---- a/arch/x86/kernel/kvm.c
-+++ b/arch/x86/kernel/kvm.c
-@@ -933,6 +933,19 @@ static void kvm_sev_hc_page_enc_status(unsigned long p=
-fn, int npages, bool enc)
-=20
- static void __init kvm_init_platform(void)
- {
-+	u64 tolud =3D PFN_PHYS(e820__end_of_low_ram_pfn());
-+	/*
-+	 * Note, hardware requires variable MTRR ranges to be power-of-2 sized
-+	 * and naturally aligned.  But when forcing guest MTRR state, Linux
-+	 * doesn't program the forced ranges into hardware.  Don't bother doing
-+	 * the math to generate a technically-legal range.
-+	 */
-+	struct mtrr_var_range pci_hole =3D {
-+		.base_lo =3D tolud | X86_MEMTYPE_UC,
-+		.mask_lo =3D (u32)(~(SZ_4G - tolud - 1)) | MTRR_PHYSMASK_V,
-+		.mask_hi =3D (BIT_ULL(boot_cpu_data.x86_phys_bits) - 1) >> 32,
-+	};
-+
- 	if (cc_platform_has(CC_ATTR_GUEST_MEM_ENCRYPT) &&
- 	    kvm_para_has_feature(KVM_FEATURE_MIGRATION_CONTROL)) {
- 		unsigned long nr_pages;
-@@ -982,8 +995,12 @@ static void __init kvm_init_platform(void)
- 	kvmclock_init();
- 	x86_platform.apic_post_init =3D kvm_apic_init;
-=20
--	/* Set WB as the default cache mode for SEV-SNP and TDX */
--	guest_force_mtrr_state(NULL, 0, MTRR_TYPE_WRBACK);
-+	/*
-+	 * Set WB as the default cache mode for SEV-SNP and TDX, with a single
-+	 * UC range for the legacy PCI hole, e.g. so that devices that expect
-+	 * to get UC/WC mappings don't get surprised with WB.
-+	 */
-+	guest_force_mtrr_state(&pci_hole, 1, MTRR_TYPE_WRBACK);
- }
-=20
- #if defined(CONFIG_AMD_MEM_ENCRYPT)
-
-base-commit: 1b237f190eb3d36f52dffe07a40b5eb210280e00
---=20
-2.51.0.268.g9569e192d0-goog
-
+T24gV2VkLCAyMDI1LTA4LTI3IGF0IDE2OjI1ICswODAwLCBZYW4gWmhhbyB3cm90ZToNCj4gPiAr
+ew0KPiA+ICsJc3RydWN0IGt2bV9wYWdlX2ZhdWx0IGZhdWx0ID0gew0KPiA+ICsJCS5hZGRyID0g
+Z2ZuX3RvX2dwYShnZm4pLA0KPiA+ICsJCS5lcnJvcl9jb2RlID0gUEZFUlJfR1VFU1RfRklOQUxf
+TUFTSyB8DQo+ID4gUEZFUlJfUFJJVkFURV9BQ0NFU1MsDQo+ID4gKwkJLnByZWZldGNoID0gdHJ1
+ZSwNCj4gPiArCQkuaXNfdGRwID0gdHJ1ZSwNCj4gPiArCQkubnhfaHVnZV9wYWdlX3dvcmthcm91
+bmRfZW5hYmxlZCA9DQo+ID4gaXNfbnhfaHVnZV9wYWdlX2VuYWJsZWQodmNwdS0+a3ZtKSwNCj4g
+PiArDQo+ID4gKwkJLm1heF9sZXZlbCA9IEtWTV9NQVhfSFVHRVBBR0VfTEVWRUwsDQo+IExvb2tz
+IHRoZSBrdm1fdGRwX21tdV9tYXBfcHJpdmF0ZV9wZm4oKSBpcyBvbmx5IGZvciBpbml0aWFsIG1l
+bW9yeSBtYXBwaW5nLA0KPiBnaXZlbiB0aGF0ICIucHJlZmV0Y2ggPSB0cnVlIiBhbmQgUkVUX1BG
+X1NQVVJJT1VTIGlzIG5vdCBhIHZhbGlkIHJldHVybiB2YWx1ZS4NCg0KSG1tLCB3aGF0IGFyZSB5
+b3UgcmVmZXJyaW5nIHRvIHJlZ2FyZGluZyBSRVRfUEZfU1BVUklPVVM/DQoNCj4gDQo+IFRoZW4s
+IHdoYXQgYWJvdXQgc2V0dGluZw0KPiDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqAgLm1h
+eF9sZXZlbCA9IFBHX0xFVkVMXzRLLA0KPiBkaXJlY3RseT8NCj4gDQo+IE90aGVyd2lzZSwgdGhl
+ICIoS1ZNX0JVR19PTihsZXZlbCAhPSBQR19MRVZFTF80Sywga3ZtKSIgd291bGQgYmUgdHJpZ2dl
+cmVkIGluDQo+IHRkeF9zZXB0X3NldF9wcml2YXRlX3NwdGUoKS4NCg0KWWVzIHRoaXMgZmFpbHMg
+dG8gYm9vdCBhIFRELiBXaXRoIG1heF9sZXZlbCA9IFBHX0xFVkVMXzRLIGl0IHBhc3NlcyB0aGUg
+ZnVsbA0KdGVzdHMuIEkgZG9uJ3QgdGhpbmsgaXQncyBpZGVhbCB0byBlbmNvZGUgUEFHRS5BREQg
+ZGV0YWlscyBoZXJlIHRob3VnaC4NCg0KQnV0IEknbSBub3QgaW1tZWRpYXRlbHkgY2xlYXIgd2hh
+dCBpcyBnb2luZyB3cm9uZy4gVGhlIG9sZCBzdHJ1Y3Qga3ZtX3BhZ2VfZmF1bHQNCmxvb2tzIHBy
+ZXR0eSBzaW1pbGFyLiBEaWQgeW91IHJvb3QgY2F1c2UgaXQ/DQoNCg0K
 
