@@ -1,194 +1,184 @@
-Return-Path: <kvm+bounces-56063-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-56069-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id D2CB4B39887
-	for <lists+kvm@lfdr.de>; Thu, 28 Aug 2025 11:41:19 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id D7947B398A0
+	for <lists+kvm@lfdr.de>; Thu, 28 Aug 2025 11:43:58 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E2B477C4995
-	for <lists+kvm@lfdr.de>; Thu, 28 Aug 2025 09:41:16 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 8A14D1C822F3
+	for <lists+kvm@lfdr.de>; Thu, 28 Aug 2025 09:43:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CF60A2F49F6;
-	Thu, 28 Aug 2025 09:39:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C5AC22D877F;
+	Thu, 28 Aug 2025 09:40:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=amazon.co.uk header.i=@amazon.co.uk header.b="bcfpHcTb"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="JJ89yqsM"
 X-Original-To: kvm@vger.kernel.org
-Received: from fra-out-008.esa.eu-central-1.outbound.mail-perimeter.amazon.com (fra-out-008.esa.eu-central-1.outbound.mail-perimeter.amazon.com [35.158.23.94])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 829532F0680;
-	Thu, 28 Aug 2025 09:39:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=35.158.23.94
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B4DA82EB84B;
+	Thu, 28 Aug 2025 09:40:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756373977; cv=none; b=Mjaub70LsM3odgptEqNRXIPm/3oUALimeyWg2GkxZOqrv4iYTT9ZlYT0C3qzWIvJG7MXoWdBDsqmbslB81Rst+YjqWH8qAXEAzv2xnzsxK8kS3VKWCMLl+G8xffd4Fk24fDZu/tKKFILeaiIhCy98EdEMfqqsYQMb2vgS6u+5uc=
+	t=1756374016; cv=none; b=iwEIK4KeeaGfMHdEU8Lj1tFeodlS6BEiMM6yWI5BUC5hf3TC8n8Tz+HBx1lItXruWPZ7llX7sbdAN1cyJ9VBpvM9Mk2/zQkV+4nCoQ++x/J4zLblpTYfFImS6ZY93C3NIZ0m+Bu3sCzchPtgNDiybSFOhtS6mSHDpFqzLq/MVrw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756373977; c=relaxed/simple;
-	bh=AQ7ryES0rxz3cGanwiiCgDNyUNIYhiR0LUKgkDqky7Q=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=b+9KW1nJKvyDrwXEa6cK0EMEunRmnv9K6sa0RwE6ISxWA6G4zc5dqtRyTNtL8xqyWYPfyk4lW07yj5SWzQz0SxaGkLg6kyg2weAi1tdSDllF7G/+kz1vImgnWDGe6OJwxhtlW5DYUNuxXhY3ZzAb6xydL81wMFgTQvEL7Vq3t5c=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.co.uk; spf=pass smtp.mailfrom=amazon.co.uk; dkim=pass (2048-bit key) header.d=amazon.co.uk header.i=@amazon.co.uk header.b=bcfpHcTb; arc=none smtp.client-ip=35.158.23.94
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.co.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.uk
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.co.uk; i=@amazon.co.uk; q=dns/txt;
-  s=amazoncorp2; t=1756373975; x=1787909975;
-  h=from:to:cc:subject:date:message-id:references:
-   in-reply-to:content-transfer-encoding:mime-version;
-  bh=Ojtm9hG3uDHHN9CPzAzA1kwd7CoLxip6b5f2qHGneMU=;
-  b=bcfpHcTbH/o7Y55s8ijUDFX9hEjXA/xOaK5TabXeZne1ua2p1hm+162h
-   Skd+wKtzO+1IeeaUn9cDa+1oDqfzjEQp0Mx3Oc9cJ6SkHXsQTdnyjKRy4
-   kc/Q465ZVynuey6Q/Xg4slorAc7iztxm6onxbfPpjfEz/ywU2MkIH397G
-   EEATyb/jgktSg1j4vmtrmzZtkKmHcLvuDL+gBpfaEaXepuPQ0UB+jvelG
-   T9HxWA9wN7GYvzTUy7Z0gtflrvGHGOxCr1aU5+873B1y6u5oFPJfLnrqn
-   e2+2yPudPf7YUkcLbe6m9PiiWtucc0qImOlTZWqvHJyDwR5n6zMs+Iekh
-   Q==;
-X-CSE-ConnectionGUID: RbFhNUEdT4GAw4sjaHWgJA==
-X-CSE-MsgGUID: rBTTxvnjRyaNUzDadwvW4A==
-X-IronPort-AV: E=Sophos;i="6.18,214,1751241600"; 
-   d="scan'208";a="1303847"
-Received: from ip-10-6-3-216.eu-central-1.compute.internal (HELO smtpout.naws.eu-central-1.prod.farcaster.email.amazon.dev) ([10.6.3.216])
-  by internal-fra-out-008.esa.eu-central-1.outbound.mail-perimeter.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 28 Aug 2025 09:39:34 +0000
-Received: from EX19MTAEUB001.ant.amazon.com [54.240.197.234:21352]
- by smtpin.naws.eu-central-1.prod.farcaster.email.amazon.dev [10.0.11.1:2525] with esmtp (Farcaster)
- id 7011dc75-05c8-4dc5-9da1-0763e3fb5b81; Thu, 28 Aug 2025 09:39:33 +0000 (UTC)
-X-Farcaster-Flow-ID: 7011dc75-05c8-4dc5-9da1-0763e3fb5b81
-Received: from EX19D015EUB002.ant.amazon.com (10.252.51.123) by
- EX19MTAEUB001.ant.amazon.com (10.252.51.28) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.2562.17;
- Thu, 28 Aug 2025 09:39:33 +0000
-Received: from EX19D015EUB004.ant.amazon.com (10.252.51.13) by
- EX19D015EUB002.ant.amazon.com (10.252.51.123) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.2562.17;
- Thu, 28 Aug 2025 09:39:32 +0000
-Received: from EX19D015EUB004.ant.amazon.com ([fe80::2dc9:7aa9:9cd3:fc8a]) by
- EX19D015EUB004.ant.amazon.com ([fe80::2dc9:7aa9:9cd3:fc8a%3]) with mapi id
- 15.02.2562.017; Thu, 28 Aug 2025 09:39:32 +0000
-From: "Roy, Patrick" <roypat@amazon.co.uk>
-To: "david@redhat.com" <david@redhat.com>, "seanjc@google.com"
-	<seanjc@google.com>
-CC: "Roy, Patrick" <roypat@amazon.co.uk>, "tabba@google.com"
-	<tabba@google.com>, "ackerleytng@google.com" <ackerleytng@google.com>,
-	"pbonzini@redhat.com" <pbonzini@redhat.com>, "kvm@vger.kernel.org"
-	<kvm@vger.kernel.org>, "linux-arm-kernel@lists.infradead.org"
-	<linux-arm-kernel@lists.infradead.org>, "kvmarm@lists.linux.dev"
-	<kvmarm@lists.linux.dev>, "linux-kernel@vger.kernel.org"
-	<linux-kernel@vger.kernel.org>, "linux-mm@kvack.org" <linux-mm@kvack.org>,
-	"rppt@kernel.org" <rppt@kernel.org>, "will@kernel.org" <will@kernel.org>,
-	"vbabka@suse.cz" <vbabka@suse.cz>, "Cali, Marco" <xmarcalx@amazon.co.uk>,
-	"Kalyazin, Nikita" <kalyazin@amazon.co.uk>, "Thomson, Jack"
-	<jackabt@amazon.co.uk>, "Manwaring, Derek" <derekmn@amazon.com>
-Subject: [PATCH v5 12/12] KVM: selftests: Test guest execution from direct map
- removed gmem
-Thread-Topic: [PATCH v5 12/12] KVM: selftests: Test guest execution from
- direct map removed gmem
-Thread-Index: AQHcF/+ov3wHy4Cyx0u9xmPfJ46Qpw==
-Date: Thu, 28 Aug 2025 09:39:32 +0000
-Message-ID: <20250828093902.2719-13-roypat@amazon.co.uk>
-References: <20250828093902.2719-1-roypat@amazon.co.uk>
-In-Reply-To: <20250828093902.2719-1-roypat@amazon.co.uk>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-Content-Type: text/plain; charset="iso-8859-1"
-Content-Transfer-Encoding: quoted-printable
+	s=arc-20240116; t=1756374016; c=relaxed/simple;
+	bh=Cl0m1kDKpWeagimjoCyJC2nNVcFJOKHXK8N9AWWvIRE=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=PWjtMwHik0IV1dxaOdgqBsNcnTrTTzRXi0xgmGTD70kRkbs85J1F6ZZl0+Qt+6t8HMN0NpxvqxK1HGg0ONZmXhDIPAE+X64uh+FnnERGPWPFsphMPWTReCE+VzzXEOoU2OLQnTao2V0WJuIVE7KflxadzHBZr67z9z3IPUyUOpg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=JJ89yqsM; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4004EC4CEFC;
+	Thu, 28 Aug 2025 09:40:16 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1756374016;
+	bh=Cl0m1kDKpWeagimjoCyJC2nNVcFJOKHXK8N9AWWvIRE=;
+	h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
+	b=JJ89yqsM/siAb1VR6ZJU3bEFaUkNGoy0qdWneQKwaNTbKw9v5mNgvGxJA28E63mh8
+	 Upq25haYXC1EwPZL5mZ2pA6J2O7jYs80WZygAwabYpOC504atc6SOmn/XDviZLtv/u
+	 Dkhv5fJWuapG9S8NjjHS5krDPTFQktzMc6uGIyrrf1CtjntEwSY+BeVohNBKzjYck9
+	 vc8aBvirQTUlJJbQyNuCJvdcB69O+ndDUle/uzIu+YrtfNIQ654vov6hDZekcrOcRL
+	 5uf6Pz1m20Ccro9eZRk6B2A29o17/4zQC0wXfU4vOxKUBk+cvk6B8LwZnfbzjU2bLw
+	 ryOgMyPpw3vEg==
+Received: by mail-oa1-f49.google.com with SMTP id 586e51a60fabf-30cceb3be82so715373fac.2;
+        Thu, 28 Aug 2025 02:40:16 -0700 (PDT)
+X-Forwarded-Encrypted: i=1; AJvYcCUiFB/UFu1N0ZnTKqAR7jDshLPTAg829ij5rlYHMqEp0u+M0AexWFNC6Z0A9xtUVlB/4C/t5aWw7p4=@vger.kernel.org, AJvYcCUkdycEW+9kHgwCMXHAfsTYsQg7+nVyxfoFXzHpuCA+6wOzZEwyqCsaVnYfeP5Futxnp8PQ6yp3HMNYu4FfKrA40zo=@vger.kernel.org, AJvYcCUonPOnRlFo0mcqL06BWkPneOaJaoFtYJ/3pQN0UaQa5GX5CuGhNTkeor21j6cm+pnvKn4sX+9bjW6FmA==@vger.kernel.org, AJvYcCVg0FZ36TSQTocwz39aZnj+tMLerFOnWM3RSBcdmaywU++sUxnJfshcvJgh6ban6qTKwTY=@vger.kernel.org, AJvYcCVrAlxbM0F2b08GxzUuVtkTqrn/qpsDWwFWiyYTQCIewtyl8sQJHizLCHbKu0B66FT6nZIHLFGG7vta7Ks=@vger.kernel.org, AJvYcCWAbMVIHu07tKcHSJf7ms/QsimIqVEov6fjquvTp0vh00re5kqmzTR0L1XlpvcvTc2U22108FxeAThheWon@vger.kernel.org, AJvYcCWWvyVqMAfLAIERec1CbZopIXgz3939IyGJrvhnG3XBoclOzEZ0BCOI0IdGIAtQDt1iu+kKGsopsAJ5Xg==@vger.kernel.org
+X-Gm-Message-State: AOJu0YzcYOLKt6QaZkOk/lPYhKCw6defQgFSYtvm2N5RzBzJ07O9zzjl
+	5pYX8kCJtJOVz0HeV+mYwNTVRO9VgoOrFcR79jcXMGiKKD/9Il3lGjNBfgjyzybS6RGjje//IpG
+	HpxPet1FnS7beFeV5beoUZ6unk9N4U0g=
+X-Google-Smtp-Source: AGHT+IGV4ScW5OAU3iglUFz6GOl/SaxSbnlEKhbCLP2wFA8xAwCena16hSLRSa/lAp17g1juuguW4VQdAzFwj9/LUxc=
+X-Received: by 2002:a05:6870:9710:b0:310:b613:5fdb with SMTP id
+ 586e51a60fabf-314dcb575e6mr9287838fac.7.1756374014938; Thu, 28 Aug 2025
+ 02:40:14 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+References: <20250827023202.10310-1-zhangzihuan@kylinos.cn> <20250827023202.10310-4-zhangzihuan@kylinos.cn>
+In-Reply-To: <20250827023202.10310-4-zhangzihuan@kylinos.cn>
+From: "Rafael J. Wysocki" <rafael@kernel.org>
+Date: Thu, 28 Aug 2025 11:40:03 +0200
+X-Gmail-Original-Message-ID: <CAJZ5v0jA7HjNc6VQWdjuwLnmd751kV01NXC4v8Pyn8h-r70BzQ@mail.gmail.com>
+X-Gm-Features: Ac12FXyk8AzMIpXHgrT8Z1UHGDrWUNjtTLP9mZxojpyASBCiNu69qRn54WdH-2Y
+Message-ID: <CAJZ5v0jA7HjNc6VQWdjuwLnmd751kV01NXC4v8Pyn8h-r70BzQ@mail.gmail.com>
+Subject: Re: [PATCH v2 03/18] ACPI: processor: thermal: Use
+ __free(put_cpufreq_policy) for policy reference
+To: Zihuan Zhang <zhangzihuan@kylinos.cn>
+Cc: "Rafael J . wysocki" <rafael@kernel.org>, Viresh Kumar <viresh.kumar@linaro.org>, 
+	Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>, 
+	Sean Christopherson <seanjc@google.com>, Paolo Bonzini <pbonzini@redhat.com>, 
+	Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>, 
+	Dave Hansen <dave.hansen@linux.intel.com>, Markus Mayer <mmayer@broadcom.com>, 
+	Florian Fainelli <florian.fainelli@broadcom.com>, 
+	Srinivas Pandruvada <srinivas.pandruvada@linux.intel.com>, 
+	Madhavan Srinivasan <maddy@linux.ibm.com>, Michael Ellerman <mpe@ellerman.id.au>, 
+	Krzysztof Kozlowski <krzk@kernel.org>, Alim Akhtar <alim.akhtar@samsung.com>, 
+	Thierry Reding <thierry.reding@gmail.com>, Jonathan Hunter <jonathanh@nvidia.com>, 
+	MyungJoo Ham <myungjoo.ham@samsung.com>, Kyungmin Park <kyungmin.park@samsung.com>, 
+	Chanwoo Choi <cw00.choi@samsung.com>, Jani Nikula <jani.nikula@linux.intel.com>, 
+	Joonas Lahtinen <joonas.lahtinen@linux.intel.com>, Rodrigo Vivi <rodrigo.vivi@intel.com>, 
+	Tvrtko Ursulin <tursulin@ursulin.net>, David Airlie <airlied@gmail.com>, 
+	Simona Vetter <simona@ffwll.ch>, Daniel Lezcano <daniel.lezcano@kernel.org>, 
+	Sascha Hauer <s.hauer@pengutronix.de>, Shawn Guo <shawnguo@kernel.org>, 
+	Eduardo Valentin <edubezval@gmail.com>, Keerthy <j-keerthy@ti.com>, 
+	Matthias Brugger <matthias.bgg@gmail.com>, 
+	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>, 
+	zhenglifeng <zhenglifeng1@huawei.com>, "H . Peter Anvin" <hpa@zytor.com>, Zhang Rui <rui.zhang@intel.com>, 
+	Len Brown <lenb@kernel.org>, Nicholas Piggin <npiggin@gmail.com>, 
+	Christophe Leroy <christophe.leroy@csgroup.eu>, Lukasz Luba <lukasz.luba@arm.com>, 
+	Pengutronix Kernel Team <kernel@pengutronix.de>, Beata Michalska <beata.michalska@arm.com>, 
+	Fabio Estevam <festevam@gmail.com>, Pavel Machek <pavel@kernel.org>, Sumit Gupta <sumitg@nvidia.com>, 
+	Prasanna Kumar T S M <ptsm@linux.microsoft.com>, Sudeep Holla <sudeep.holla@arm.com>, 
+	Yicong Yang <yangyicong@hisilicon.com>, linux-pm@vger.kernel.org, x86@kernel.org, 
+	kvm@vger.kernel.org, linux-acpi@vger.kernel.org, 
+	linuxppc-dev@lists.ozlabs.org, linux-samsung-soc@vger.kernel.org, 
+	linux-arm-kernel@lists.infradead.org, linux-tegra@vger.kernel.org, 
+	intel-gfx@lists.freedesktop.org, dri-devel@lists.freedesktop.org, 
+	imx@lists.linux.dev, linux-omap@vger.kernel.org, 
+	linux-mediatek@lists.infradead.org, linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Add a selftest that loads itself into guest_memfd (via=0A=
-GUEST_MEMFD_FLAG_MMAP) and triggers an MMIO exit when executed. This=0A=
-exercises x86 MMIO emulation code inside KVM for guest_memfd-backed=0A=
-memslots where the guest_memfd folios are direct map removed.=0A=
-Particularly, it validates that x86 MMIO emulation code (guest page=0A=
-table walks + instruction fetch) correctly accesses gmem through the VMA=0A=
-that's been reflected into the memslot's userspace_addr field (instead=0A=
-of trying to do direct map accesses).=0A=
-=0A=
-Signed-off-by: Patrick Roy <roypat@amazon.co.uk>=0A=
----=0A=
- .../selftests/kvm/set_memory_region_test.c    | 50 +++++++++++++++++--=0A=
- 1 file changed, 46 insertions(+), 4 deletions(-)=0A=
-=0A=
-diff --git a/tools/testing/selftests/kvm/set_memory_region_test.c b/tools/t=
-esting/selftests/kvm/set_memory_region_test.c=0A=
-index ce3ac0fd6dfb..cb3bc642d376 100644=0A=
---- a/tools/testing/selftests/kvm/set_memory_region_test.c=0A=
-+++ b/tools/testing/selftests/kvm/set_memory_region_test.c=0A=
-@@ -603,6 +603,41 @@ static void test_mmio_during_vectoring(void)=0A=
- =0A=
- 	kvm_vm_free(vm);=0A=
- }=0A=
-+=0A=
-+static void guest_code_trigger_mmio(void)=0A=
-+{=0A=
-+	/*=0A=
-+	 * Read some GPA that is not backed by a memslot. KVM consider this=0A=
-+	 * as MMIO and tell userspace to emulate the read.=0A=
-+	 */=0A=
-+	READ_ONCE(*((uint64_t *)MEM_REGION_GPA));=0A=
-+=0A=
-+	GUEST_DONE();=0A=
-+}=0A=
-+=0A=
-+static void test_guest_memfd_mmio(void)=0A=
-+{=0A=
-+	struct kvm_vm *vm;=0A=
-+	struct kvm_vcpu *vcpu;=0A=
-+	struct vm_shape shape =3D {=0A=
-+		.mode =3D VM_MODE_DEFAULT,=0A=
-+		.src_type =3D VM_MEM_SRC_GUEST_MEMFD_NO_DIRECT_MAP,=0A=
-+	};=0A=
-+	pthread_t vcpu_thread;=0A=
-+=0A=
-+	pr_info("Testing MMIO emulation for instructions in gmem\n");=0A=
-+=0A=
-+	vm =3D __vm_create_shape_with_one_vcpu(shape, &vcpu, 0, guest_code_trigge=
-r_mmio);=0A=
-+=0A=
-+	virt_map(vm, MEM_REGION_GPA, MEM_REGION_GPA, 1);=0A=
-+=0A=
-+	pthread_create(&vcpu_thread, NULL, vcpu_worker, vcpu);=0A=
-+=0A=
-+	/* If the MMIO read was successfully emulated, the vcpu thread will exit =
-*/=0A=
-+	pthread_join(vcpu_thread, NULL);=0A=
-+=0A=
-+	kvm_vm_free(vm);=0A=
-+}=0A=
- #endif=0A=
- =0A=
- int main(int argc, char *argv[])=0A=
-@@ -626,10 +661,17 @@ int main(int argc, char *argv[])=0A=
- 	test_add_max_memory_regions();=0A=
- =0A=
- #ifdef __x86_64__=0A=
--	if (kvm_has_cap(KVM_CAP_GUEST_MEMFD) &&=0A=
--	    (kvm_check_cap(KVM_CAP_VM_TYPES) & BIT(KVM_X86_SW_PROTECTED_VM))) {=
-=0A=
--		test_add_private_memory_region();=0A=
--		test_add_overlapping_private_memory_regions();=0A=
-+	if (kvm_has_cap(KVM_CAP_GUEST_MEMFD)) {=0A=
-+		if (kvm_check_cap(KVM_CAP_VM_TYPES) & BIT(KVM_X86_SW_PROTECTED_VM)) {=0A=
-+			test_add_private_memory_region();=0A=
-+			test_add_overlapping_private_memory_regions();=0A=
-+		}=0A=
-+=0A=
-+		if (kvm_has_cap(KVM_CAP_GUEST_MEMFD_MMAP) &&=0A=
-+			kvm_has_cap(KVM_CAP_GUEST_MEMFD_NO_DIRECT_MAP))=0A=
-+			test_guest_memfd_mmio();=0A=
-+		else=0A=
-+			pr_info("Skipping tests requiring KVM_CAP_GUEST_MEMFD_MMAP | KVM_CAP_GU=
-EST_MEMFD_NO_DIRECT_MAP");=0A=
- 	} else {=0A=
- 		pr_info("Skipping tests for KVM_MEM_GUEST_MEMFD memory regions\n");=0A=
- 	}=0A=
--- =0A=
-2.50.1=0A=
-=0A=
+On Wed, Aug 27, 2025 at 4:33=E2=80=AFAM Zihuan Zhang <zhangzihuan@kylinos.c=
+n> wrote:
+>
+> Replace the manual cpufreq_cpu_put() with __free(put_cpufreq_policy)
+> annotation for policy references. This reduces the risk of reference
+> counting mistakes and aligns the code with the latest kernel style.
+>
+> No functional change intended.
+>
+> Signed-off-by: Zihuan Zhang <zhangzihuan@kylinos.cn>
+> ---
+>  drivers/acpi/processor_thermal.c | 12 +++---------
+>  1 file changed, 3 insertions(+), 9 deletions(-)
+>
+> diff --git a/drivers/acpi/processor_thermal.c b/drivers/acpi/processor_th=
+ermal.c
+> index 1219adb11ab9..f99ed0812934 100644
+> --- a/drivers/acpi/processor_thermal.c
+> +++ b/drivers/acpi/processor_thermal.c
+> @@ -64,17 +64,13 @@ static int phys_package_first_cpu(int cpu)
+>
+>  static int cpu_has_cpufreq(unsigned int cpu)
+>  {
+> -       struct cpufreq_policy *policy;
+> +       struct cpufreq_policy *policy __free(put_cpufreq_policy);
+>
+>         if (!acpi_processor_cpufreq_init)
+>                 return 0;
+>
+>         policy =3D cpufreq_cpu_get(cpu);
+> -       if (policy) {
+> -               cpufreq_cpu_put(policy);
+> -               return 1;
+> -       }
+> -       return 0;
+> +       return !!policy;
+
+If you want to make this change, please also change the return type of
+the function to bool.
+
+>  }
+>
+>  static int cpufreq_get_max_state(unsigned int cpu)
+> @@ -95,7 +91,7 @@ static int cpufreq_get_cur_state(unsigned int cpu)
+>
+>  static int cpufreq_set_cur_state(unsigned int cpu, int state)
+>  {
+> -       struct cpufreq_policy *policy;
+> +       struct cpufreq_policy *policy __free(put_cpufreq_policy);
+
+This isn't correct AFAICS at least formally because the scope of the
+variable is the whole function, so it won't get out of scope at the
+point where you want cpufreq_cpu_put() to be called.
+
+The policy variable should be defined in the block following the "for"
+loop (and actually all of the local variables except for "i" can be
+defined there).
+
+Or better still, please move that block to a separate function
+containing all of the requisite local variable definitions and call
+that function for each online CPU.
+
+>         struct acpi_processor *pr;
+>         unsigned long max_freq;
+>         int i, ret;
+> @@ -127,8 +123,6 @@ static int cpufreq_set_cur_state(unsigned int cpu, in=
+t state)
+>                 max_freq =3D (policy->cpuinfo.max_freq *
+>                             (100 - reduction_step(i) * cpufreq_thermal_re=
+duction_pctg)) / 100;
+>
+> -               cpufreq_cpu_put(policy);
+> -
+>                 ret =3D freq_qos_update_request(&pr->thermal_req, max_fre=
+q);
+>                 if (ret < 0) {
+>                         pr_warn("Failed to update thermal freq constraint=
+: CPU%d (%d)\n",
+> --
 
