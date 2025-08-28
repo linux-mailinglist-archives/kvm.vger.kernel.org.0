@@ -1,211 +1,182 @@
-Return-Path: <kvm+bounces-55984-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-55985-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1595AB38F8F
-	for <lists+kvm@lfdr.de>; Thu, 28 Aug 2025 02:04:09 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 11414B38F98
+	for <lists+kvm@lfdr.de>; Thu, 28 Aug 2025 02:07:25 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id B3F7E1C2407A
-	for <lists+kvm@lfdr.de>; Thu, 28 Aug 2025 00:04:28 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9DE6D7C3451
+	for <lists+kvm@lfdr.de>; Thu, 28 Aug 2025 00:07:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DB84D25A328;
-	Thu, 28 Aug 2025 00:02:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 273111CA81;
+	Thu, 28 Aug 2025 00:07:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="P3ILK07k"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="pEOrfLvE"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pj1-f74.google.com (mail-pj1-f74.google.com [209.85.216.74])
+Received: from mail-pf1-f201.google.com (mail-pf1-f201.google.com [209.85.210.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 57C6823AE95
-	for <kvm@vger.kernel.org>; Thu, 28 Aug 2025 00:02:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.74
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ED2E12F32
+	for <kvm@vger.kernel.org>; Thu, 28 Aug 2025 00:07:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756339337; cv=none; b=Eu5DqjaqRt0KekIJw7DxFtSd+Emxdc6AdLpAX8lg5fpLvOIHJhxKo+7KTy4PCC9g8AzvQ+W+DpghNQNWud5i3nOn4S4jUcJXKqlrI9a8WLAHV/yK+LR/nw8OOPTPdxKiKJdoc5ll5usGD3l9faO23wdKrctvBAJxP+o5VrIqYhE=
+	t=1756339635; cv=none; b=lyixj8mfxTa87DjTh5/TGt/4oc7IhC6WcRB+RcvRzQuqzHp1TKNz005KBZFny6uWF+mr1QlSW7SYaDgr9UXFYTKcM4Z9ZgOKmMv04QFV3QxohfXxKjuAvg+p9qzYlp2kEqLEKbNomFeFXpmTQRcQX3CFFnGOfGR1FkOwe8pAZaw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756339337; c=relaxed/simple;
-	bh=5KZra7rrb6EshYnRt06iajnZTBGSSVrTrCSYe32dt9s=;
+	s=arc-20240116; t=1756339635; c=relaxed/simple;
+	bh=EKG1cKzLKUKkjt9t7eG2R6R8dZd2IX10aS64SIZ7J1s=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=e9hu+Vcy9GFKXKXK/4UevXBk068oHE5IEQD4REE4ipTPFIkkBRtN5mVdFd/zmjm75z9aUFShj5AWDwo48+h0yYUJb+nSKcOcgRqbNsulM77+rS6eLQ30WkjXgkBnYUIYhwub5yW/cSGIcQ7NEZxEHimucgfFwqZqyWZWmTq2BjM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=P3ILK07k; arc=none smtp.client-ip=209.85.216.74
+	 To:Cc:Content-Type; b=PU2RNfviLHlGMNQp9QVd+Wyvmv458u4ZZqYTTViXL73sqmyqhVpk6b3WfNElRCvgGUFsX68TIOeN9QLfuP8iMU0b4AcObDS6CpBxoCGQccY+YLulbU8UGaM4WI0HIyjl0HWMAQQ+tyh7K73hlcMrPF83CDE49OzC8+CaynOl0Lo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=pEOrfLvE; arc=none smtp.client-ip=209.85.210.201
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pj1-f74.google.com with SMTP id 98e67ed59e1d1-324e4c3af5fso368375a91.3
-        for <kvm@vger.kernel.org>; Wed, 27 Aug 2025 17:02:15 -0700 (PDT)
+Received: by mail-pf1-f201.google.com with SMTP id d2e1a72fcca58-771e43782aaso329244b3a.1
+        for <kvm@vger.kernel.org>; Wed, 27 Aug 2025 17:07:13 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1756339335; x=1756944135; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:reply-to:from:to:cc:subject:date:message-id:reply-to;
-        bh=qS5zxATrMXESBFPKwTqytXa2jxoDaW3HrytCSPyurss=;
-        b=P3ILK07kHqpUGuivkSLsoI+MFv54KeHD0qtH79NPU/KqIIn8aXu3po2ImTA6Zbi1rb
-         E5fBA7B2UekDDNvUsAKexzToVzRJc7Mw5dg7uHLZwb62LaaH+ax04wKyjta2qvvu3S+h
-         kTOk1iAlOQBWuwZhpmkRB+iXKBRmnXgrckSG/m3GzzzExftf50JP43JiZxW6f235Lo7V
-         fFCHf9fbjIGrlALSh3sn42twHZWzxgWNcnuQqOMarurbLQfJXVDcqoaiP3Wyv10FIbtY
-         4WAE16o5571YGlB8Lz65SnxkmdGx0ApLw47O36szCXI96jYaIvBsgiiEaF4hhKpQRkP3
-         /LPQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1756339335; x=1756944135;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:reply-to:x-gm-message-state:from:to:cc:subject:date:message-id
+        d=google.com; s=20230601; t=1756339633; x=1756944433; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:from:subject:message-id:references
+         :mime-version:in-reply-to:date:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=qS5zxATrMXESBFPKwTqytXa2jxoDaW3HrytCSPyurss=;
-        b=ZmVTF3sNkUjzF6sqTAPjcVB0eSxBTVmIVwgU9RjrUbqFAIiKshTtkWAT3bDd+MBnyZ
-         Tzcq45vGJflspKRUvit5x+M4x6T2NGChcAGrSdarm8qJ6wz9rDify9t4fwhdPddHNNF6
-         JQnwvQc11OCEAi28ZajWhkdw6UKt9G5SezQm4F7HgK0TwnqM72S2a7UDCC6HnQHTsN4n
-         DJOBmCYjeLQ/0tAY2jfSIoewOA+ShVovCpzuXkjs2PE/lv5LUzYGuYbDk/pHkoPm0oFe
-         c3Gmua3DM6+lbLpafsDsAsKQRB89oUeykfdhGE1IoJv4yCHGV6YqzHyzycb0MmnhgUJu
-         EeKw==
-X-Forwarded-Encrypted: i=1; AJvYcCVfvT1PLxy5+9XLbmseF5xhZtZTZK5hv/Ik/Vnj4rjp9HQfxz4h/f9QCHgQCgoEYkQXGwk=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yz9A9YC8niiKRxAltaKDn6kUA/opWIvT6kT5BnlgQ/6UXygQbX8
-	XGHJi1IC5XN2ttHnxXhkxnM61Tqr0VPE1cyXe63uiPG/vaOz2hCZA5PZb6FUBYelf2Ookk0GO+P
-	wYhAb1Q==
-X-Google-Smtp-Source: AGHT+IHTwHRJ1LtJUNLrZJovplfjTJdtHnbpa9Rw0OlaHYLIVyGS/gJ8LisaniBrYJHJcn/KzpZqw55zABU=
-X-Received: from pjbsc11.prod.google.com ([2002:a17:90b:510b:b0:321:c36d:1b8a])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:3941:b0:327:b01c:4fd4
- with SMTP id 98e67ed59e1d1-327b01c52bcmr306189a91.2.1756339334767; Wed, 27
- Aug 2025 17:02:14 -0700 (PDT)
-Reply-To: Sean Christopherson <seanjc@google.com>
-Date: Wed, 27 Aug 2025 17:01:56 -0700
-In-Reply-To: <20250828000156.23389-1-seanjc@google.com>
+        bh=t579SF/wnMrFK0E/9c31FaYDCwaoHad3snclUWLCz6M=;
+        b=pEOrfLvEG+tA9aBtoX3JCX4cTyDzZ4jRCFcoCv0UmE6J50Me+QuqdqsL3rvq6H87Fd
+         at/ct0mVLB+xuM9LkQQJUy5Kg4FDBqsjfU9rIzv/oSmTRt7oa9/u5k7XlYMG+kbZCtFE
+         4nu7AP8zB4/GgEwH0gZzVBni+NgiU6crkVvF/f25+QOVfgAb7hFL0CQiHFd9AJouzhL5
+         zG0XhSd5A2GtGhWva52o7vnwN+Pvxl5bz8WpW0utAnGue9zB1oz8obDlI/VeVBkpVkxN
+         YGtywCWOMC22SO56GVboqe17O7gtlBafbRA8g7K9qKZHGlgjVJ6kblItR1MSBw7KIDw5
+         r9fQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1756339633; x=1756944433;
+        h=content-transfer-encoding:cc:to:from:subject:message-id:references
+         :mime-version:in-reply-to:date:x-gm-message-state:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=t579SF/wnMrFK0E/9c31FaYDCwaoHad3snclUWLCz6M=;
+        b=XqoxdVu2N9BRyH6GSsBpBs9qlfPgmHgIxGrAYVo6QpOeXcfp+VYZqR46QliAAgX3lG
+         y4wnXAFMLNWTvT5W0Nu6sSiDhfKNj3zgGek0Mv+cWziXkIyI37ljxeNZcc65XRaokUbv
+         Qd7LF5dH+ixiEofFudCMyYK5IsrFx/pbY8ZheZN1TGtySg1pDoMNsVEWr5ImrkpmxZdM
+         17m5kOQxGg4CNjPOxlruWGIyIsG3zh6ntMNariscgPD8rk1Z6ufQzUl4+iHhK2ndlY/c
+         MpkOQEs7Q6pfIKb2T05JTji9OBaKBKpUQiAYRRgjDw/CSUQ7yoOvRs8FuN2M4p5wmEe3
+         1lPA==
+X-Forwarded-Encrypted: i=1; AJvYcCXu1dGn6VckfZ6xSLkYRalk8u+5nNT8P8Px6l2pqg+NWeoEgWhfyMcVE+FD8UBoKQyQxkU=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxAmxc9fRLGOSdu8h8FHevygAQWBZoxQEOoR6NTlmO2Hcfwm4vO
+	MgSzxmUq9c6tdA7gjgZfKsciVcz2Pj4ZHUNrahhteYoq0YWnjAw1ijjypa+OOpef416B4CimsVm
+	ao8Vpuw==
+X-Google-Smtp-Source: AGHT+IETLC27C6TI91VObBy0J9hrR5myKvHDcaHo0xSKLRonIs5n9tEC5WogkS6LO7SOJpU1fDydbpJ3DGk=
+X-Received: from pgdo2.prod.google.com ([2002:a63:9202:0:b0:b4c:40fc:9518])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a05:6a20:7286:b0:243:ae10:2433
+ with SMTP id adf61e73a8af0-243ae1026c0mr944532637.40.1756339633137; Wed, 27
+ Aug 2025 17:07:13 -0700 (PDT)
+Date: Wed, 27 Aug 2025 17:07:11 -0700
+In-Reply-To: <aKc61y0_tvGLmieC@google.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
-References: <20250828000156.23389-1-seanjc@google.com>
-X-Mailer: git-send-email 2.51.0.268.g9569e192d0-goog
-Message-ID: <20250828000156.23389-8-seanjc@google.com>
-Subject: [PATCH v2 7/7] Drivers: hv: Use "entry virt" APIs to do work before
- returning to lower VTL
+References: <550a730d-07db-46d7-ac1a-b5b7a09042a6@linux.intel.com>
+ <aIeX0GQh1Q_4N597@google.com> <ad616489-1546-4f6a-9242-a719952e19b6@linux.intel.com>
+ <CAGtprH9EL0=Cxu7f8tD6rEvnpC7uLAw6jKijHdFUQYvbyJgkzA@mail.gmail.com>
+ <20641696-242d-4fb6-a3c1-1a8e7cf83b18@linux.intel.com> <697aa804-b321-4dba-9060-7ac17e0a489f@linux.intel.com>
+ <aKYMQP5AEC2RkOvi@google.com> <d84b792e-8d26-49c2-9e7c-04093f554f8a@linux.intel.com>
+ <f1ec8527-322d-4bdb-9a38-145fd9f28e4b@linux.intel.com> <aKc61y0_tvGLmieC@google.com>
+Message-ID: <aK-dr2W7UoA65jM2@google.com>
+Subject: Re: [PATCH 0/2] x86/kvm: Force legacy PCI hole as WB under SNP/TDX
 From: Sean Christopherson <seanjc@google.com>
-To: Marc Zyngier <maz@kernel.org>, Oliver Upton <oliver.upton@linux.dev>, 
-	Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>, 
-	Tianrui Zhao <zhaotianrui@loongson.cn>, Bibo Mao <maobibo@loongson.cn>, 
-	Huacai Chen <chenhuacai@kernel.org>, Anup Patel <anup@brainfault.org>, 
-	Paul Walmsley <paul.walmsley@sifive.com>, Palmer Dabbelt <palmer@dabbelt.com>, 
-	Albert Ou <aou@eecs.berkeley.edu>, Sean Christopherson <seanjc@google.com>, 
-	Paolo Bonzini <pbonzini@redhat.com>, Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>, 
-	Borislav Petkov <bp@alien8.de>, Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org, 
-	"K. Y. Srinivasan" <kys@microsoft.com>, Haiyang Zhang <haiyangz@microsoft.com>, Wei Liu <wei.liu@kernel.org>, 
-	Dexuan Cui <decui@microsoft.com>, Peter Zijlstra <peterz@infradead.org>, 
-	Andy Lutomirski <luto@kernel.org>, "Paul E. McKenney" <paulmck@kernel.org>, 
-	Frederic Weisbecker <frederic@kernel.org>, Neeraj Upadhyay <neeraj.upadhyay@kernel.org>, 
-	Joel Fernandes <joelagnelf@nvidia.com>, Josh Triplett <josh@joshtriplett.org>, 
-	Boqun Feng <boqun.feng@gmail.com>, Uladzislau Rezki <urezki@gmail.com>
-Cc: linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org, 
-	kvmarm@lists.linux.dev, kvm@vger.kernel.org, loongarch@lists.linux.dev, 
-	kvm-riscv@lists.infradead.org, linux-riscv@lists.infradead.org, 
-	linux-hyperv@vger.kernel.org, rcu@vger.kernel.org, 
-	Nuno Das Neves <nunodasneves@linux.microsoft.com>, Mukesh R <mrathor@linux.microsoft.com>
-Content-Type: text/plain; charset="UTF-8"
+To: Binbin Wu <binbin.wu@linux.intel.com>
+Cc: Vishal Annapurve <vannapurve@google.com>, Nikolay Borisov <nik.borisov@suse.com>, 
+	Jianxiong Gao <jxgao@google.com>, "Borislav Petkov (AMD)" <bp@alien8.de>, 
+	Dave Hansen <dave.hansen@linux.intel.com>, Dionna Glaze <dionnaglaze@google.com>, 
+	"H. Peter Anvin" <hpa@zytor.com>, jgross@suse.com, 
+	"Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>, kvm@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, Ingo Molnar <mingo@redhat.com>, pbonzini@redhat.com, 
+	Peter Gonda <pgonda@google.com>, Thomas Gleixner <tglx@linutronix.de>, 
+	Tom Lendacky <thomas.lendacky@amd.com>, Vitaly Kuznetsov <vkuznets@redhat.com>, x86@kernel.org, 
+	Rick Edgecombe <rick.p.edgecombe@intel.com>, jiewen.yao@intel.com
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
 
-Use the kernel's common "entry virt" APIs to handle pending work prior to
-returning to a lower VTL.  Drop the now-defunct common MSHV helper for
-doing work as the VTL driver was the last user.
+On Thu, Aug 21, 2025, Sean Christopherson wrote:
+> On Thu, Aug 21, 2025, Binbin Wu wrote:
+> > On 8/21/2025 11:30 AM, Binbin Wu wrote:
+> > > Variable MTRR has requirement for range size and alignment:
+> > > For ranges greater than 4 KBytes, each range must be of length 2^n an=
+d its base
+> > > address must be aligned on a 2^n boundary, where n is a value equal t=
+o or
+> > > greater than 12. The base-address alignment value cannot be less than=
+ its length.
+> >=20
+> > Wait, Linux kernel converts MTRR register values to MTRR state (base an=
+d size) and
+> > cache it for later lookups (refer to map_add_var()). I.e., in Linux ker=
+nel,
+> > only the cached state will be used.
+> >=20
+> > These MTRR register values are never programmed when using
+> > guest_force_mtrr_state() , so even the values doesn't meet the requirem=
+ent
+> > from hardware perspective, Linux kernel can still get the right base an=
+d
+> > size.
+>=20
+> Yeah.  I forget what happens if the ranges don't meet the power-of-2 requ=
+irements,
+> but the mask+match logic should work jus tfine.
+>=20
+> > No bothering to force the base and size alignment.
+> > But a comment would be helpful.
+> > Also, BIT(11) could be replaced by MTRR_PHYSMASK_V.
+>=20
+> Ha!  I spent a good 5 minutes looking for a #define couldn't find one.  W=
+hat a
+> bizarre name...
+>=20
+> > How about:
+> > diff --git a/arch/x86/kernel/kvm.c b/arch/x86/kernel/kvm.c
+> > index 90097df4eafd..a9582ffc3088 100644
+> > --- a/arch/x86/kernel/kvm.c
+> > +++ b/arch/x86/kernel/kvm.c
+> > @@ -934,9 +934,15 @@ static void kvm_sev_hc_page_enc_status(unsigned lo=
+ng pfn, int npages, bool enc)
+> > =C2=A0static void __init kvm_init_platform(void)
+> > =C2=A0{
+> > =C2=A0 =C2=A0 =C2=A0 =C2=A0 u64 tolud =3D e820__end_of_low_ram_pfn() <<=
+ PAGE_SHIFT;
+> > +=C2=A0 =C2=A0 =C2=A0 =C2=A0/*
+> > +=C2=A0 =C2=A0 =C2=A0 =C2=A0 * The range's base address and size may no=
+t meet the alignment
+> > +=C2=A0 =C2=A0 =C2=A0 =C2=A0 * requirement for variable MTRR. However, =
+Linux guest never
+> > +=C2=A0 =C2=A0 =C2=A0 =C2=A0 * programs MTRRs when forcing guest MTRR s=
+tate, no bothering to
+> > +=C2=A0 =C2=A0 =C2=A0 =C2=A0 * enforce the base and range size alignmen=
+t.
+> > +=C2=A0 =C2=A0 =C2=A0 =C2=A0 */
+> > =C2=A0 =C2=A0 =C2=A0 =C2=A0 struct mtrr_var_range pci_hole =3D {
+> > =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 .base_lo =3D to=
+lud | X86_MEMTYPE_UC,
+> > -=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0.mask_lo =3D (u=
+32)(~(SZ_4G - tolud - 1)) | BIT(11),
+> > +=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0.mask_lo =3D (u=
+32)(~(SZ_4G - tolud - 1)) | MTRR_PHYSMASK_V,
+> > =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 .mask_hi =3D (B=
+IT_ULL(boot_cpu_data.x86_phys_bits) - 1) >> 32,
+> > =C2=A0 =C2=A0 =C2=A0 =C2=A0 };
+> >=20
+> >=20
+> > I tested it in my setup, it can fix the issue of TPM driver failure wit=
+h the
+> > modified ACPI table for TPM in QEMU.
+> >=20
+> >=20
+> > Hi Vishal,
+> > Could you test it with google's VMM?
+>=20
+> Vishal is OOO for a few days.  I pinged our internal bug tracker, I'll fi=
+nd
+> someone to test.
 
-No functional change intended.
-
-Signed-off-by: Sean Christopherson <seanjc@google.com>
----
- drivers/hv/Kconfig         |  1 +
- drivers/hv/mshv.h          |  2 --
- drivers/hv/mshv_common.c   | 22 ----------------------
- drivers/hv/mshv_vtl_main.c | 11 +++--------
- 4 files changed, 4 insertions(+), 32 deletions(-)
-
-diff --git a/drivers/hv/Kconfig b/drivers/hv/Kconfig
-index 894037afcbf9..b00b2b3fe3db 100644
---- a/drivers/hv/Kconfig
-+++ b/drivers/hv/Kconfig
-@@ -85,6 +85,7 @@ config MSHV_VTL
- 	# Therefore, do not attempt to access or modify MTRRs here.
- 	depends on !MTRR
- 	select CPUMASK_OFFSTACK
-+	select VIRT_XFER_TO_GUEST_WORK
- 	default n
- 	help
- 	  Select this option to enable Hyper-V VTL driver support.
-diff --git a/drivers/hv/mshv.h b/drivers/hv/mshv.h
-index 0340a67acd0a..d4813df92b9c 100644
---- a/drivers/hv/mshv.h
-+++ b/drivers/hv/mshv.h
-@@ -25,6 +25,4 @@ int hv_call_set_vp_registers(u32 vp_index, u64 partition_id, u16 count,
- int hv_call_get_partition_property(u64 partition_id, u64 property_code,
- 				   u64 *property_value);
- 
--int mshv_do_pre_guest_mode_work(ulong th_flags);
--
- #endif /* _MSHV_H */
-diff --git a/drivers/hv/mshv_common.c b/drivers/hv/mshv_common.c
-index eb3df3e296bb..aa2be51979fd 100644
---- a/drivers/hv/mshv_common.c
-+++ b/drivers/hv/mshv_common.c
-@@ -138,25 +138,3 @@ int hv_call_get_partition_property(u64 partition_id,
- 	return 0;
- }
- EXPORT_SYMBOL_GPL(hv_call_get_partition_property);
--
--/*
-- * Handle any pre-processing before going into the guest mode on this cpu, most
-- * notably call schedule(). Must be invoked with both preemption and
-- * interrupts enabled.
-- *
-- * Returns: 0 on success, -errno on error.
-- */
--int mshv_do_pre_guest_mode_work(ulong th_flags)
--{
--	if (th_flags & (_TIF_SIGPENDING | _TIF_NOTIFY_SIGNAL))
--		return -EINTR;
--
--	if (th_flags & (_TIF_NEED_RESCHED | _TIF_NEED_RESCHED_LAZY))
--		schedule();
--
--	if (th_flags & _TIF_NOTIFY_RESUME)
--		resume_user_mode_work(NULL);
--
--	return 0;
--}
--EXPORT_SYMBOL_GPL(mshv_do_pre_guest_mode_work);
-diff --git a/drivers/hv/mshv_vtl_main.c b/drivers/hv/mshv_vtl_main.c
-index 4ca13c54c0a0..1eabed16aab9 100644
---- a/drivers/hv/mshv_vtl_main.c
-+++ b/drivers/hv/mshv_vtl_main.c
-@@ -8,6 +8,7 @@
-  *   Naman Jain <namjain@linux.microsoft.com>
-  */
- 
-+#include <linux/entry-virt.h>
- #include <linux/kernel.h>
- #include <linux/module.h>
- #include <linux/miscdevice.h>
-@@ -727,22 +728,16 @@ static int mshv_vtl_ioctl_return_to_lower_vtl(void)
- {
- 	preempt_disable();
- 	for (;;) {
--		const unsigned long VTL0_WORK = _TIF_SIGPENDING | _TIF_NEED_RESCHED |
--						_TIF_NOTIFY_RESUME | _TIF_NOTIFY_SIGNAL |
--						_TIF_NEED_RESCHED_LAZY;
--		unsigned long ti_work;
- 		unsigned long irq_flags;
- 		struct hv_vp_assist_page *hvp;
- 		int ret;
- 
--		ti_work = READ_ONCE(current_thread_info()->flags);
--		if (unlikely(ti_work & VTL0_WORK)) {
-+		if (__xfer_to_guest_mode_work_pending()) {
- 			preempt_enable();
--			ret = mshv_do_pre_guest_mode_work(ti_work);
-+			ret = xfer_to_guest_mode_handle_work();
- 			if (ret)
- 				return ret;
- 			preempt_disable();
--			continue;
- 		}
- 
- 		local_irq_save(irq_flags);
--- 
-2.51.0.268.g9569e192d0-goog
-
+Got confirmation this fixes the vTPM woes with Google's VMM.  v2 incoming..=
+.
 
