@@ -1,88 +1,65 @@
-Return-Path: <kvm+bounces-56108-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-56109-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 93A54B39DC1
-	for <lists+kvm@lfdr.de>; Thu, 28 Aug 2025 14:51:01 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 388BEB39DEB
+	for <lists+kvm@lfdr.de>; Thu, 28 Aug 2025 14:58:28 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3BF2F7C32BC
-	for <lists+kvm@lfdr.de>; Thu, 28 Aug 2025 12:50:38 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E569B16E006
+	for <lists+kvm@lfdr.de>; Thu, 28 Aug 2025 12:58:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7421B30FF37;
-	Thu, 28 Aug 2025 12:50:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E6D5A30FF13;
+	Thu, 28 Aug 2025 12:58:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="aruokTaf"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="Mimfz4vH"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.9])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 16B1230FC33
-	for <kvm@vger.kernel.org>; Thu, 28 Aug 2025 12:50:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4C0242D46C0;
+	Thu, 28 Aug 2025 12:58:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.9
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756385419; cv=none; b=YFQ93EXUibyL5Z8UFV00Iu+Ok7Gz/zYOj3sFC0L69jL8rcoUBoNT4Ai8i4al4+WSn1ddpYFKRAUeEr/6MwQu/4NhqiuUMIzmyAUAyc3WnTfrCqKb8QHZUSfzm/ZNYrMpE+BniNYegrOuArnsyps/eyAN6UUFog4FL2wg/VKy1J0=
+	t=1756385900; cv=none; b=LlperH5O5i5c5Xh0ZxJ0kEJiruMxrWvvrmI/KUtWHGEFLOhysT7PwCc2TeL9Un7WuN6hq8KNQmCdiPEuMg21wLHqlZhwv1GidOk1cAi/RgEKM3YsT+RmlFZo07o+Iy7VaOZMtvwGSmFUodwMWLTittK9gYoTUI7CvTIujmNegGU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756385419; c=relaxed/simple;
-	bh=F9B87foFu5ArbaO6Wj5uzuuQ1mnMFqS0rUW4rnQy1/E=;
+	s=arc-20240116; t=1756385900; c=relaxed/simple;
+	bh=Z3OvKAB1+2yNUXUobtDoYmPJCLCwq9048JEZk/NmtFs=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=t/JUu77PPLdUgEfT7uRDTjl77Q6HjV3aWT3QwFmGAja7Aj7kM8COa+dw1R6IVvKvbyuU3bMLZgWhlq8UAE9V+QG/UVNsaYAxAW5tw1GIcY7DXHipso+XA/JEvJAw/uxXa6ongq8S8DdgokULJ0uFauawMS/ca82tgmhaj5NAyVg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=aruokTaf; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1756385416;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-	bh=C6iCBik3cJC1ZHjD5Ysxv05sd4NeodNwL7TaQOabYOc=;
-	b=aruokTafr2v2Fmm28ssyUu4JSW0VmA+uSAdALjQWsmiFZNWfVsD0x7qljaFpYUpDXS9aJ0
-	LgBKdZ7+K13lQJq9xkbheGH5D7TMmyh5XqzOZ69s9bfKSI6wSsksfkFIIAJTbq4DOiM5OQ
-	KGPuAU8pi1WitLjHlOH+jcK0xMFU0jo=
-Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
- [209.85.221.70]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-433-HNrxxn1RPPmCNRtwHGhXDg-1; Thu, 28 Aug 2025 08:50:15 -0400
-X-MC-Unique: HNrxxn1RPPmCNRtwHGhXDg-1
-X-Mimecast-MFC-AGG-ID: HNrxxn1RPPmCNRtwHGhXDg_1756385414
-Received: by mail-wr1-f70.google.com with SMTP id ffacd0b85a97d-3ccfd9063a0so318120f8f.0
-        for <kvm@vger.kernel.org>; Thu, 28 Aug 2025 05:50:15 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1756385414; x=1756990214;
-        h=content-transfer-encoding:in-reply-to:autocrypt:content-language
-         :from:references:cc:to:subject:user-agent:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=C6iCBik3cJC1ZHjD5Ysxv05sd4NeodNwL7TaQOabYOc=;
-        b=KAxtwWcINccIwSp+GBr6GQviSv4xQgaMOw1ScN3tedZNN1Vol9drUTnHIDiRwiDZyB
-         F3dpb1jdxSKj7lSMq6kTxLs59mpS3yOHm45a3qVkb2KVm09bQwxVcm6KTZEwgRTper6e
-         P58YI4YP9p79HjEVqhbCQ6Rz30YGVsRwmU/ZdEqLHwORG0E550wXdjkOXSZGOmpDmAgm
-         YRBeXq9d5RO6XF3LoOC8oR+FHGzCQ27AxD33ARhAzkVn06EGLg/OEeElFYbvnQ4EuZri
-         X2PK6KFOU+QvuypKW2hCdzioF25ZmdRAtgk0n3C+FfaHgrU9wmFCuCdlDilTeMj9K5Vx
-         SYQw==
-X-Forwarded-Encrypted: i=1; AJvYcCUs7cbuXqdURliLUkynKU1+oAjlXmNO4bZYkcG9hmbaai2+9+NyvGCjFwg8PNE3DaH/aQQ=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxsoAcqZ+Vqz7PCdoTojjfSalT/lh2PbDNz5R6EgzCgYDdMT1Kg
-	/ixqG0YoBwpw3EdPbUVtJhWYrNeiy6HVBDfdkgIINf0gSikxt6EKs7V9dycRq5Cog8ZIZUu5bKU
-	kOY9SpnuU/w1grUOTxk4kqVjuOTJLZTIEn6LhdEjjpus0Y4+qRxEzJAvSf05/M1kv5BM=
-X-Gm-Gg: ASbGnctZfzQIL//goIq64HEgj0rDLOc6zPDYLqfz2aA72ODd/VyiG2ePbb57SNT/w9Q
-	3qBDlKhQy+z0ozPltrGm6eZ+7iMYfphaGgHIk7J47eS0i0Yx6tD4zv0qZtrXo4rVGHBAbPJjJsg
-	Qe1VtBmFdbCs2lW/euR5S7MgTGdwmfCqXWTfI6RCq2M4gTQC0seuN1Jvl+px2XMlOTtp1xtBxZm
-	hP7w57buL9MZ0aDRpNgRiLyV8Haw7ohl1HlDAYE3xnIf5DXZ0c46HprD0moyn+jzLS/xHlr/ITx
-	2BDQyGAWlVggWs40FvOnjjhFFQTW9xGpJi35SoXmEovEWWSKx8bugQ94ytV8fcjZlfIJse8oBlU
-	ChZpYR2f+IE7ZWdd2Vjsu4O/GDGCZxnto/hFgrPKeUWsoe9cLFNUJyYiJMfbbFz9HG8U=
-X-Received: by 2002:a5d:5d01:0:b0:3c7:36f3:c358 with SMTP id ffacd0b85a97d-3c736f3c59cmr13147585f8f.32.1756385414247;
-        Thu, 28 Aug 2025 05:50:14 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IH2soHNJz3uNCh9kCpxwV5zoV5iezSYMFN+6bV3UPfCImuAc7IMpQupU9NYnIVeAMq/TCo6Vg==
-X-Received: by 2002:a5d:5d01:0:b0:3c7:36f3:c358 with SMTP id ffacd0b85a97d-3c736f3c59cmr13147562f8f.32.1756385413775;
-        Thu, 28 Aug 2025 05:50:13 -0700 (PDT)
-Received: from ?IPV6:2003:d8:2f28:c100:2225:10aa:f247:7b85? (p200300d82f28c100222510aaf2477b85.dip0.t-ipconnect.de. [2003:d8:2f28:c100:2225:10aa:f247:7b85])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3c70e4ba44fsm24519526f8f.5.2025.08.28.05.50.12
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 28 Aug 2025 05:50:13 -0700 (PDT)
-Message-ID: <a777f88b-ea12-4aad-88da-2e7011e151b8@redhat.com>
-Date: Thu, 28 Aug 2025 14:50:12 +0200
+	 In-Reply-To:Content-Type; b=p5wOvmYTNjY3cN/mmpQGMOeisDlZxmE9TRmmYCnWHFPvZK5lY74vIr7TPHod2ehq1aWb9U3G4yDfDqSrnvrsJ+iEX4ZEwxGljLJqU/aLUd/2b6tWOeQryceMPffvd7fdEJEUCgU7iX5Z43kBLAnYlm0JixdvP1/tQ21o0s7Nk+Q=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=Mimfz4vH; arc=none smtp.client-ip=198.175.65.9
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1756385899; x=1787921899;
+  h=message-id:date:mime-version:subject:to:cc:references:
+   from:in-reply-to:content-transfer-encoding;
+  bh=Z3OvKAB1+2yNUXUobtDoYmPJCLCwq9048JEZk/NmtFs=;
+  b=Mimfz4vHN3dA5EEvzDq34nQzhT2NFBS8tD2FSOP5YEi+ACSozgxhAp1L
+   4E6/4AzEU5CaEcq0gEqVhzECoeA52N11qJ48lv3Iqz4I0JsPKD/p9hJ4X
+   Cr/Z667kZOpPdUf40eyIGN2VLwyRlfHnHb5bbj4HzS2IaNc8Ec/MIl74K
+   UetiYmsQ/H8Avy4jN5basjtquZgCafwgonl5FAIbyJPfW4nMv1EGySlPM
+   OWZQwkI9di9cnSAMCq+StLRwB7XsEUwyR+CDm0JZAq91UrG279SClIOCV
+   D2S4Z6ni+oh068+WelHHX9t/H30VT+fqITu4JOi7Ivw7vI3e35oTHLJlB
+   A==;
+X-CSE-ConnectionGUID: 5Gvv9rLNS1m6p2E6893N5Q==
+X-CSE-MsgGUID: nWX/t08aTr2XWnksmyuatg==
+X-IronPort-AV: E=McAfee;i="6800,10657,11531"; a="81247057"
+X-IronPort-AV: E=Sophos;i="6.17,312,1747724400"; 
+   d="scan'208";a="81247057"
+Received: from orviesa009.jf.intel.com ([10.64.159.149])
+  by orvoesa101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 28 Aug 2025 05:58:18 -0700
+X-CSE-ConnectionGUID: woa8vA/jRSCVAqi0SO5slQ==
+X-CSE-MsgGUID: t+v9EyQESdq7nFIJY34v2w==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.18,217,1751266800"; 
+   d="scan'208";a="169697571"
+Received: from xiaoyaol-hp-g830.ccr.corp.intel.com (HELO [10.124.238.14]) ([10.124.238.14])
+  by orviesa009-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 28 Aug 2025 05:58:11 -0700
+Message-ID: <402d79e7-f229-4caa-8150-6061e363da4f@intel.com>
+Date: Thu, 28 Aug 2025 20:58:07 +0800
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -90,105 +67,223 @@ List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v5 00/12] Direct Map Removal Support for guest_memfd
-To: "Roy, Patrick" <roypat@amazon.co.uk>,
- "seanjc@google.com" <seanjc@google.com>
-Cc: "tabba@google.com" <tabba@google.com>,
- "ackerleytng@google.com" <ackerleytng@google.com>,
- "pbonzini@redhat.com" <pbonzini@redhat.com>,
- "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
- "linux-arm-kernel@lists.infradead.org"
- <linux-arm-kernel@lists.infradead.org>,
- "kvmarm@lists.linux.dev" <kvmarm@lists.linux.dev>,
- "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
- "linux-mm@kvack.org" <linux-mm@kvack.org>, "rppt@kernel.org"
- <rppt@kernel.org>, "will@kernel.org" <will@kernel.org>,
- "vbabka@suse.cz" <vbabka@suse.cz>, "Cali, Marco" <xmarcalx@amazon.co.uk>,
- "Kalyazin, Nikita" <kalyazin@amazon.co.uk>,
- "Thomson, Jack" <jackabt@amazon.co.uk>, "Manwaring, Derek"
- <derekmn@amazon.com>
-References: <20250828093902.2719-1-roypat@amazon.co.uk>
-From: David Hildenbrand <david@redhat.com>
+Subject: Re: [PATCH v13 01/21] KVM: x86: Introduce KVM_{G,S}ET_ONE_REG uAPIs
+ support
+To: Chao Gao <chao.gao@intel.com>, kvm@vger.kernel.org,
+ linux-kernel@vger.kernel.org
+Cc: bp@alien8.de, dave.hansen@linux.intel.com, hpa@zytor.com,
+ john.allen@amd.com, mingo@redhat.com, minipli@grsecurity.net,
+ mlevitsk@redhat.com, pbonzini@redhat.com, rick.p.edgecombe@intel.com,
+ seanjc@google.com, tglx@linutronix.de, weijiang.yang@intel.com,
+ x86@kernel.org, xin@zytor.com
+References: <20250821133132.72322-1-chao.gao@intel.com>
+ <20250821133132.72322-2-chao.gao@intel.com>
 Content-Language: en-US
-Autocrypt: addr=david@redhat.com; keydata=
- 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
- qIws/H2t
-In-Reply-To: <20250828093902.2719-1-roypat@amazon.co.uk>
+From: Xiaoyao Li <xiaoyao.li@intel.com>
+In-Reply-To: <20250821133132.72322-2-chao.gao@intel.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 
-On 28.08.25 11:39, Roy, Patrick wrote:
-> [ based on kvm/next ]
+On 8/21/2025 9:30 PM, Chao Gao wrote:
+> From: Yang Weijiang <weijiang.yang@intel.com>
 > 
-> Unmapping virtual machine guest memory from the host kernel's direct map is a
-> successful mitigation against Spectre-style transient execution issues: If the
-> kernel page tables do not contain entries pointing to guest memory, then any
-> attempted speculative read through the direct map will necessarily be blocked
-> by the MMU before any observable microarchitectural side-effects happen. This
-> means that Spectre-gadgets and similar cannot be used to target virtual machine
-> memory. Roughly 60% of speculative execution issues fall into this category [1,
-> Table 1].
+> Enable KVM_{G,S}ET_ONE_REG uAPIs so that userspace can access HW MSR or
+> KVM synthetic MSR through it.
 > 
+> In CET KVM series [1], KVM "steals" an MSR from PV MSR space and access
+> it via KVM_{G,S}ET_MSRs uAPIs, but the approach pollutes PV MSR space
+> and hides the difference of synthetic MSRs and normal HW defined MSRs.
+> 
+> Now carve out a separate room in KVM-customized MSR address space for
+> synthetic MSRs. The synthetic MSRs are not exposed to userspace via
+> KVM_GET_MSR_INDEX_LIST, instead userspace complies with KVM's setup and
+> composes the uAPI params. KVM synthetic MSR indices start from 0 and
+> increase linearly. Userspace caller should tag MSR type correctly in
+> order to access intended HW or synthetic MSR.
 
-As discussed, I'll be maintaining a guestmemfd-preview branch where I 
-just pile patch sets to see how it will all look together.
+The old feedback[*] was to introduce support for SYNTHETIC registers 
+instead of limiting it to MSR.
 
-It's currently based on kvm/next where "stage 1" resides, and has "Add 
-NUMA mempolicy support for KVM guest-memfdAdd NUMA mempolicy support for 
-KVM guest-memfd" [1] applied.
+As in patch 09, it changes to name guest SSP as
 
-There are some minor conflicts with [1] in the "KVM: guest_memfd: Add 
-flag to remove from direct map" patch, I tried to resolve them, let's 
-see if I messed up.
+   #define KVM_SYNTHETIC_GUEST_SSP 0
 
-https://git.kernel.org/pub/scm/linux/kernel/git/david/linux.git/log/?h=guestmemfd-preview
+Nothing about MSR.
 
-[1] https://lkml.kernel.org/r/20250827175247.83322-2-shivankg@amd.com
+[*] https://lore.kernel.org/all/ZmelpPm5YfGifhIj@google.com/
 
--- 
-Cheers
+> Suggested-by: Sean Christopherson <seanjc@google.com>
+> Signed-off-by: Yang Weijiang <weijiang.yang@intel.com>
+> Link: https://lore.kernel.org/all/20240219074733.122080-18-weijiang.yang@intel.com/ [1]
+> Tested-by: Mathias Krause <minipli@grsecurity.net>
+> Tested-by: John Allen <john.allen@amd.com>
+> Tested-by: Rick Edgecombe <rick.p.edgecombe@intel.com>
+> Signed-off-by: Chao Gao <chao.gao@intel.com>
+> 
+> ---
+> v13:
+>   - Add vendor and size fields to the register ID to align with other
+>     architectures. (Sean)
+>   - Avoid exposing the struct overlay of the register ID to in uAPI
+>     headers (Sean)
+>   - Advertise KVM_CAP_ONE_REG
+> ---
+>   arch/x86/include/uapi/asm/kvm.h | 21 +++++++++
+>   arch/x86/kvm/x86.c              | 82 +++++++++++++++++++++++++++++++++
+>   2 files changed, 103 insertions(+)
+> 
+> diff --git a/arch/x86/include/uapi/asm/kvm.h b/arch/x86/include/uapi/asm/kvm.h
+> index 0f15d683817d..969a63e73190 100644
+> --- a/arch/x86/include/uapi/asm/kvm.h
+> +++ b/arch/x86/include/uapi/asm/kvm.h
+> @@ -411,6 +411,27 @@ struct kvm_xcrs {
+>   	__u64 padding[16];
+>   };
+>   
+> +#define KVM_X86_REG_TYPE_MSR		2
+> +#define KVM_X86_REG_TYPE_SYNTHETIC_MSR	3
+> +
+> +#define KVM_X86_REG_TYPE_SIZE(type)						\
+> +({										\
+> +	__u64 type_size = (__u64)type << 32;					\
+> +										\
+> +	type_size |= type == KVM_X86_REG_TYPE_MSR ? KVM_REG_SIZE_U64 :		\
+> +		     type == KVM_X86_REG_TYPE_SYNTHETIC_MSR ? KVM_REG_SIZE_U64 :\
+> +		     0;								\
+> +	type_size;								\
+> +})
+> +
+> +#define KVM_X86_REG_ENCODE(type, index)				\
+> +	(KVM_REG_X86 | KVM_X86_REG_TYPE_SIZE(type) | index)
+> +
+> +#define KVM_X86_REG_MSR(index)					\
+> +	KVM_X86_REG_ENCODE(KVM_X86_REG_TYPE_MSR, index)
+> +#define KVM_X86_REG_SYNTHETIC_MSR(index)			\
+> +	KVM_X86_REG_ENCODE(KVM_X86_REG_TYPE_SYNTHETIC_MSR, index)
 
-David / dhildenb
+BTW, do we need to add some doc of the IDs, e.g., to
+
+4.68 KVM_SET_ONE_REG in Documentation/virt/kvm/api.rst ?
+
+>   #define KVM_SYNC_X86_REGS      (1UL << 0)
+>   #define KVM_SYNC_X86_SREGS     (1UL << 1)
+>   #define KVM_SYNC_X86_EVENTS    (1UL << 2)
+> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+> index 7ba2cdfdac44..31a7e7ad310a 100644
+> --- a/arch/x86/kvm/x86.c
+> +++ b/arch/x86/kvm/x86.c
+> @@ -2254,6 +2254,31 @@ static int do_set_msr(struct kvm_vcpu *vcpu, unsigned index, u64 *data)
+>   	return kvm_set_msr_ignored_check(vcpu, index, *data, true);
+>   }
+>   
+> +static int kvm_get_one_msr(struct kvm_vcpu *vcpu, u32 msr, u64 __user *value)
+> +{
+> +	u64 val;
+> +	int r;
+> +
+> +	r = do_get_msr(vcpu, msr, &val);
+> +	if (r)
+> +		return r;
+> +
+> +	if (put_user(val, value))
+> +		return -EFAULT;
+> +
+> +	return 0;
+> +}
+> +
+> +static int kvm_set_one_msr(struct kvm_vcpu *vcpu, u32 msr, u64 __user *value)
+> +{
+> +	u64 val;
+> +
+> +	if (get_user(val, value))
+> +		return -EFAULT;
+> +
+> +	return do_set_msr(vcpu, msr, &val);
+> +}
+> +
+>   #ifdef CONFIG_X86_64
+>   struct pvclock_clock {
+>   	int vclock_mode;
+> @@ -4737,6 +4762,7 @@ int kvm_vm_ioctl_check_extension(struct kvm *kvm, long ext)
+>   	case KVM_CAP_IRQFD_RESAMPLE:
+>   	case KVM_CAP_MEMORY_FAULT_INFO:
+>   	case KVM_CAP_X86_GUEST_MODE:
+> +	case KVM_CAP_ONE_REG:
+>   		r = 1;
+>   		break;
+>   	case KVM_CAP_PRE_FAULT_MEMORY:
+> @@ -5915,6 +5941,20 @@ static int kvm_vcpu_ioctl_enable_cap(struct kvm_vcpu *vcpu,
+>   	}
+>   }
+>   
+> +struct kvm_x86_reg_id {
+> +	__u32 index;
+> +	__u8  type;
+> +	__u8  rsvd;
+> +	__u8  rsvd4:4;
+
+why naming it rsvd4? because it's 4-bit bit-field ?
+
+> +	__u8  size:4;
+> +	__u8  x86;
+> +};
+> +
+> +static int kvm_translate_synthetic_msr(struct kvm_x86_reg_id *reg)
+> +{
+> +	return -EINVAL;
+> +}
+> +
+>   long kvm_arch_vcpu_ioctl(struct file *filp,
+>   			 unsigned int ioctl, unsigned long arg)
+>   {
+> @@ -6031,6 +6071,48 @@ long kvm_arch_vcpu_ioctl(struct file *filp,
+>   		srcu_read_unlock(&vcpu->kvm->srcu, idx);
+>   		break;
+>   	}
+> +	case KVM_GET_ONE_REG:
+> +	case KVM_SET_ONE_REG: {
+> +		struct kvm_x86_reg_id *id;
+> +		struct kvm_one_reg reg;
+> +		u64 __user *value;
+> +
+> +		r = -EFAULT;
+> +		if (copy_from_user(&reg, argp, sizeof(reg)))
+> +			break;
+> +
+> +		r = -EINVAL;
+> +		if ((reg.id & KVM_REG_ARCH_MASK) != KVM_REG_X86)
+> +			break;
+> +
+> +		id = (struct kvm_x86_reg_id *)&reg.id;
+> +		if (id->rsvd || id->rsvd4)
+> +			break;
+> +
+> +		if (id->type != KVM_X86_REG_TYPE_MSR &&
+> +		    id->type != KVM_X86_REG_TYPE_SYNTHETIC_MSR)
+> +			break;
+> +
+> +		if ((reg.id & KVM_REG_SIZE_MASK) != KVM_REG_SIZE_U64)
+> +			break;
+> +
+> +		if (id->type == KVM_X86_REG_TYPE_SYNTHETIC_MSR) {
+> +			r = kvm_translate_synthetic_msr(id);
+> +			if (r)
+> +				break;
+> +		}
+> +
+> +		r = -EINVAL;
+> +		if (id->type != KVM_X86_REG_TYPE_MSR)
+> +			break;
+> +
+> +		value = u64_to_user_ptr(reg.addr);
+> +		if (ioctl == KVM_GET_ONE_REG)
+> +			r = kvm_get_one_msr(vcpu, id->index, value);
+> +		else
+> +			r = kvm_set_one_msr(vcpu, id->index, value);
+> +		break;
+> +	}
+>   	case KVM_TPR_ACCESS_REPORTING: {
+>   		struct kvm_tpr_access_ctl tac;
+>   
 
 
