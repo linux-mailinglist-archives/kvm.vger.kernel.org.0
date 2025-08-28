@@ -1,87 +1,87 @@
-Return-Path: <kvm+bounces-56178-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-56179-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id D1BB7B3AB39
-	for <lists+kvm@lfdr.de>; Thu, 28 Aug 2025 22:02:18 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9B275B3AB48
+	for <lists+kvm@lfdr.de>; Thu, 28 Aug 2025 22:07:50 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 87E13A00BD0
-	for <lists+kvm@lfdr.de>; Thu, 28 Aug 2025 20:02:17 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3C77836151C
+	for <lists+kvm@lfdr.de>; Thu, 28 Aug 2025 20:07:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DDC0A27934E;
-	Thu, 28 Aug 2025 20:02:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C413228151E;
+	Thu, 28 Aug 2025 20:07:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="IR/4/nDL"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="EhUyfVHV"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 653AE11187
-	for <kvm@vger.kernel.org>; Thu, 28 Aug 2025 20:02:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 81CF81862A
+	for <kvm@vger.kernel.org>; Thu, 28 Aug 2025 20:07:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756411329; cv=none; b=j4o5uT740YsaJmcjRU2QC0beQLY4qOWhH58/F2MQ9cYoikQDc64AxaXEHSwFgq6wl8EPmyGzaLwYJXvEc15Diw5kS1gJeDt6YC21zpIfWEGcDv2BdWLSwaX9pWfRcyb7BZ5MgbGIRMkmEWAXYMuFng/xJwEatqpvl7mDUnZIQQ4=
+	t=1756411663; cv=none; b=iQpxoYa9+kBgtuA1vBVffHwuYrV/yepK5rtyD1NISn3k1BQtau8kReH3NhS+NQmVYCjPqzgkXQwUXbRU4qCCR0vQM/1PhtAcW+ydCsXm3LnMOGwx0HhXwYFsvkDOgSCzeF8QvmWhxKe3WAf2hzbt49IqPfrsPjvY+fx4005mX8Q=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756411329; c=relaxed/simple;
-	bh=2KpL/YbmEXnHuFTvSMBKGQC8nuR4dgX0UfBNcS0nW2A=;
+	s=arc-20240116; t=1756411663; c=relaxed/simple;
+	bh=5E1O+UiyxQ/swOde4rFAB1dAEwfdQZ8cuvjTa+rD2Bo=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=HHxq97H9xQWZtHGrwMFRUeYpXo7L32Em+Jr8LwUjES3CsszF084pqSla0C2XY6e3xgkAJMwT5Mck+VNqDqlAhD90nmoMTHieET1nN5ZKEOI50Rh1NExxpCH4nOZglisuoBMzSgfqzQj8+Li70KM6Fp3SaPSevnGySutnw0Hqxl0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=IR/4/nDL; arc=none smtp.client-ip=170.10.133.124
+	 In-Reply-To:Content-Type; b=TG7ZEj9PSQKBwH1Nhdlp9QpU/fBDz/XXq5awAA3rSZ5KcVTuP7ND49U/KuB8QU9W6jgsD9sVdX93ueSQDEYmuYnllSe2hzrkHwRcMBvXYlNhHRPpu/t2ZJv+3cnJo/KLBffkGMby6y4FlR/a9D4c6Cnu0EFMw3tgZrmykUF1JiY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=EhUyfVHV; arc=none smtp.client-ip=170.10.129.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1756411326;
+	s=mimecast20190719; t=1756411660;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-	bh=kHCGitpqD+5wH/FOTflpYSjcwP5kCCQ1zm861x/hElE=;
-	b=IR/4/nDLZRjRnOPaqnPgKt5Hei85CNKICXX75cdvOtiKEazkzFs11XTOfHhl7a3FImej9u
-	NOH3odZmk8gUoQB6wCnMQHjT37990hVeMRog4s3pLsE4HCdPJ3FrIaUu1YWcxx0w72/yeG
-	Zm3witYdHq6EVgmW4fZ+pzc4vSfE4Z4=
+	bh=HfkgN5Na07CaAG4rz7Sn0/ahtXb5ykSorD4ldptE3LQ=;
+	b=EhUyfVHVQF0QXZbtrqgit9C/Ho+FOq9ZNmI6xlNtLIBDKW4MESquiuGnEk18TurgsJ8HRB
+	W0sadOoBCi5Gi8nnDknjLzQDBIIRz6kaXwjy9r31XjxtBvLCmaj3vjHWOXKrjnohcgrMgg
+	uolbA0iirHSA0Ri/wyKIda6ZDz7o8m4=
 Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
  [209.85.221.69]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-644-sQPyD2YWMvS_nQV-9Ze2BA-1; Thu, 28 Aug 2025 16:02:04 -0400
-X-MC-Unique: sQPyD2YWMvS_nQV-9Ze2BA-1
-X-Mimecast-MFC-AGG-ID: sQPyD2YWMvS_nQV-9Ze2BA_1756411321
-Received: by mail-wr1-f69.google.com with SMTP id ffacd0b85a97d-3c6abcfd303so167550f8f.3
-        for <kvm@vger.kernel.org>; Thu, 28 Aug 2025 13:02:01 -0700 (PDT)
+ us-mta-59-e8eTNLMePmSJobfLCvi2Gw-1; Thu, 28 Aug 2025 16:07:38 -0400
+X-MC-Unique: e8eTNLMePmSJobfLCvi2Gw-1
+X-Mimecast-MFC-AGG-ID: e8eTNLMePmSJobfLCvi2Gw_1756411657
+Received: by mail-wr1-f69.google.com with SMTP id ffacd0b85a97d-3cef6debe96so183690f8f.1
+        for <kvm@vger.kernel.org>; Thu, 28 Aug 2025 13:07:38 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1756411321; x=1757016121;
+        d=1e100.net; s=20230601; t=1756411657; x=1757016457;
         h=content-transfer-encoding:in-reply-to:autocrypt:content-language
          :from:references:cc:to:subject:user-agent:mime-version:date
          :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=kHCGitpqD+5wH/FOTflpYSjcwP5kCCQ1zm861x/hElE=;
-        b=FAAOtbLtXO2QMMzfhb3GmR8u6NspqBLBcwsGMygATzAde5rs2Kb5A/YvaFRYpVYs1l
-         mCUd/vjVh/U8+LKK29o2f5APc0oSKkYMHIOKZiRynCiKnBRYQ+C56jqvML4TMr6oB+uE
-         Zax3tJULZDXeyiry5z4swuHmPzN3VWbdph3kpqdzKyTLHe0mgzJpiCNH39r/88EEc0E+
-         CFnpTxz1H9ggk9nfiXopoiwbX+GCR6fsAwgxDCJ1rT+r2iL6zfKpyMYQq7YtElJynPOx
-         bxz6ZBev9mSo+NlxrjoT/lwJ+c6kX4RmOxjIlqqdg3Ezno/GLzKzh38Ng/IXbx1Hb9vn
-         6D6w==
-X-Gm-Message-State: AOJu0YzvnSuyG9ewIN3XijSeYuJ9LrZEvSULe2s2au2Tijxe5YlVtVvE
-	lEcOxc8RwUic5rkRjpqaQw59knFHg/kD3LMkyENP8Mdv+Ct42VjGNPds582Iyae+KC7eNBfN8IF
-	55o6b+ZE2rE5vNYEiV2l5Xqf01KtGa4XK72bzK12p1R36Xh0m5uWiVw==
-X-Gm-Gg: ASbGnctl0daPgzRDPVq4IgwjQeqfgWcEOoOChXECStpidR/wb50y5zJDT2BbQnXtpVs
-	1Nq58Mhvgw/MxqYKfRkHVvZ29ojndgomEfoU3wLH83a91wXsPI/2UzSIAJ0NqO/a+adcsMZF0/a
-	NaomBZRd5XYVd7Vhof5NqujRBDn0A/jmTLEY/ocjeVrwu+ywuc9uDjewRCQ96Ujm0a+A2koAknY
-	EEI3IwJpnqzQPjOeEdPbrwTRtzLpbP4IjZmPRU3jPKz90G3fyvX6MqEhmvHPdpDgh+3818eWq6a
-	Tiqr9jWhVKSxvzc53vfkgctbRmZjtnRAPzvzjW/Ke86u8H/Y41hOXpy6vXLsH++Lxv/9FQy0nEq
-	piFTTLlmsyn1qQMCBBoDLvyjx/VDfIjVz2zE+kel6JelKWYZJZHxx7mNSoOoYhFE21dw=
-X-Received: by 2002:a05:6000:2203:b0:3c9:9b3b:53c9 with SMTP id ffacd0b85a97d-3c99b3b586fmr13112442f8f.44.1756411320640;
-        Thu, 28 Aug 2025 13:02:00 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IFJfxknfutCFzm6P/qKfs5UtdmvpY/7sBFiB6PROkHg4xXnNZaYtYUH5wqWfppKoahFU7sb6A==
-X-Received: by 2002:a05:6000:2203:b0:3c9:9b3b:53c9 with SMTP id ffacd0b85a97d-3c99b3b586fmr13112421f8f.44.1756411320141;
-        Thu, 28 Aug 2025 13:02:00 -0700 (PDT)
+        bh=HfkgN5Na07CaAG4rz7Sn0/ahtXb5ykSorD4ldptE3LQ=;
+        b=pUDQQivZ+fCMvcLBUlrgPpOHQRw3LMA79Bdy/iv/+9Mv5VtDBmKago1v1vTZhWe0Q4
+         EPaJnylYqzsv7PkVJQbuv6GSuukuzGU0nBJaMCzTUVUFx3OlS/2EB8Hs4gMOvkHWKgEy
+         89/RdA8BA1RyK5BWJbmiWekVshFUneo3fKWcD1x/w0UKKkSnALG0/CpkOhSpcAM6bzfL
+         o75BcXjBT4cdw3z4pwZdFuU98MoBG9LfNX9MlsR/aAIQwQzgVRKRbR9AG6bAfRUYBxYh
+         yHOh773NoM+qJFBC34JSltPjy29i/4ZlwxFKVL5+zNjzlFiYsXJx0Ll00wIEJoLgtutJ
+         Cvig==
+X-Gm-Message-State: AOJu0Yy6tec8yqYztUGddjSS/4vjD6I4773Dpi+kTQQ90gmCJKi4XbUb
+	uQtutJ4FVzw3wMIddhJGS3gYw1qxqIhyDDWThGoX54iKhRaRYHNJVnKtuPTCqnON2trmLU/BMSP
+	W+SYKifDA4JvznaXdTx/bdFdkaajAk79AVXiXFwqJMBQn48oc4CAP2Q==
+X-Gm-Gg: ASbGncs4/oINtP86lTjKEnbWWObEXlY1KjNpiBr7mHdnsy9/mw+KSr2ajrshqC79cJr
+	xK3CEBJl4vPSlcjWxpaLBE52spqNCgFId1sPmCjGTVswJaNguQ6HsX6/eC7jBzWM1GIIltROMnn
+	Rci9B96blG1bkYguRp5eNDjpsw2gU3SVbhZ46YCIXZT5dm4RXBcXNPH5zXnvn3u1bDYKcDdqoqO
+	GcSDU9CVzY+7Xk50GaOHjHY/rOJAtObQht9QzbnrQY+32ORwU0VzA+pXCfHXGRjCl8ANL+pR+9K
+	t3CtXkSNnCsKeIyKHPTsBwZi1sGSIUBCwKZ2h+a1z454h+eXoKsnykN7UiRXW3NTKhc92UTgAqx
+	0v0tc1i1HmvA5C0rZtKbRGXIKhOC1cTdOpV/5xxQTj59lSvrGuT1kiXIsSTBorg+6fxQ=
+X-Received: by 2002:a5d:5d0a:0:b0:3b8:f358:e80d with SMTP id ffacd0b85a97d-3c5db8ab097mr20900792f8f.5.1756411657437;
+        Thu, 28 Aug 2025 13:07:37 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IEP13xjdaXPmMbhRXQ0NNNX783mn1a/GHXa2M1CskybuLFx4H09CyoqA4ByC/c5FlmnBNweJA==
+X-Received: by 2002:a5d:5d0a:0:b0:3b8:f358:e80d with SMTP id ffacd0b85a97d-3c5db8ab097mr20900775f8f.5.1756411656978;
+        Thu, 28 Aug 2025 13:07:36 -0700 (PDT)
 Received: from ?IPV6:2003:d8:2f28:c100:2225:10aa:f247:7b85? (p200300d82f28c100222510aaf2477b85.dip0.t-ipconnect.de. [2003:d8:2f28:c100:2225:10aa:f247:7b85])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-45b73cf86f4sm67580865e9.6.2025.08.28.13.01.59
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3cf270fc496sm561557f8f.1.2025.08.28.13.07.35
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 28 Aug 2025 13:01:59 -0700 (PDT)
-Message-ID: <d58425d4-8e4f-4b70-915f-322658e9878e@redhat.com>
-Date: Thu, 28 Aug 2025 22:01:58 +0200
+        Thu, 28 Aug 2025 13:07:36 -0700 (PDT)
+Message-ID: <ffe2f73a-6938-4079-b926-9d869f0642ca@redhat.com>
+Date: Thu, 28 Aug 2025 22:07:35 +0200
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -89,7 +89,7 @@ List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v4 1/2] KVM: guest_memfd: add generic population via write
+Subject: Re: [PATCH v4 0/2] KVM: guest_memfd: use write for population
 To: "Kalyazin, Nikita" <kalyazin@amazon.co.uk>,
  "pbonzini@redhat.com" <pbonzini@redhat.com>,
  "shuah@kernel.org" <shuah@kernel.org>
@@ -102,7 +102,6 @@ Cc: "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
  <jackabt@amazon.co.uk>, "Manwaring, Derek" <derekmn@amazon.com>,
  "Cali, Marco" <xmarcalx@amazon.co.uk>
 References: <20250828153049.3922-1-kalyazin@amazon.com>
- <20250828153049.3922-2-kalyazin@amazon.com>
 From: David Hildenbrand <david@redhat.com>
 Content-Language: en-US
 Autocrypt: addr=david@redhat.com; keydata=
@@ -149,33 +148,27 @@ Autocrypt: addr=david@redhat.com; keydata=
  3iyY2Nsd7JxfKu1PRhCGwXzRw5TlfEsoRI7V9A8isUCoqE2Dzh3FvYHVeX4Us+bRL/oqareJ
  CIFqgYMyvHj7Q06kTKmauOe4Nf0l0qEkIuIzfoLJ3qr5UyXc2hLtWyT9Ir+lYlX9efqh7mOY
  qIws/H2t
-In-Reply-To: <20250828153049.3922-2-kalyazin@amazon.com>
+In-Reply-To: <20250828153049.3922-1-kalyazin@amazon.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 
-On 28.08.25 17:31, Kalyazin, Nikita wrote:
-> write syscall populates guest_memfd with user-supplied data in a generic
-> way, ie no vendor-specific preparation is performed.  This is supposed
-> to be used in non-CoCo setups where guest memory is not
-> hardware-encrypted.
+On 28.08.25 17:30, Kalyazin, Nikita wrote:
+> [ based on kvm/next ]
 > 
-> The following behaviour is implemented:
->   - only page-aligned count and offset are allowed
->   - if the memory is already allocated, the call will successfully
->     populate it
->   - if the memory is not allocated, the call will both allocate and
->     populate
->   - if the memory is already populated, the call will not repopulate it
-> 
-> Signed-off-by: Nikita Kalyazin <kalyazin@amazon.com>
-> ---
+> Implement guest_memfd allocation and population via the write syscall.
+> This is useful in non-CoCo use cases where the host can access guest
+> memory.  Even though the same can also be achieved via userspace mapping
+> and memcpying from userspace, write provides a more performant option
+> because it does not need to set page tables and it does not cause a page
+> fault for every page like memcpy would.  Note that memcpy cannot be
+> accelerated via MADV_POPULATE_WRITE as it is not supported by
+> guest_memfd and relies on GUP.
 
-Just nothing that checkpatch complains about
+I also added this patch to the pile of guestmemfd preview patches located at
 
-a) Usage of "unsigned" instead of "unsigned int"
+https://git.kernel.org/pub/scm/linux/kernel/git/david/linux.git/log/?h=guestmemfd-preview
 
-b) The From doesn't completely match the SOB: "Kalyazin, Nikita" vs 
-"Nikita Kalyazin"
+There was only one minor conflict regarding setting file->f_mode.
 
 -- 
 Cheers
