@@ -1,126 +1,158 @@
-Return-Path: <kvm+bounces-56240-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-56241-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 92133B3B118
-	for <lists+kvm@lfdr.de>; Fri, 29 Aug 2025 04:43:04 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id E0001B3B2CD
+	for <lists+kvm@lfdr.de>; Fri, 29 Aug 2025 08:00:04 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 677E4582CD2
-	for <lists+kvm@lfdr.de>; Fri, 29 Aug 2025 02:43:02 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 66070582259
+	for <lists+kvm@lfdr.de>; Fri, 29 Aug 2025 06:00:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C730821FF3B;
-	Fri, 29 Aug 2025 02:42:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8D8CF225402;
+	Fri, 29 Aug 2025 05:59:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="MmWPmJ88"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="p514Sl+B"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.10])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pf1-f182.google.com (mail-pf1-f182.google.com [209.85.210.182])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C4B771E3769;
-	Fri, 29 Aug 2025 02:42:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.10
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DE14B21CFFA
+	for <kvm@vger.kernel.org>; Fri, 29 Aug 2025 05:59:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756435372; cv=none; b=Q7l2o08yJOCDfz7W4HWChf9FOkqyoOBDqMgzLzuDUOCguopw/lRzU8oTT1qnegs7VJbyJ0YPFD7gw+wP3qM4JMMyiuxDG8RGeUYT/jdG+bMVACaLtWx+ngj1zOEpyYdNEqHArRCp/ncpMjJzGABSBZHUxIMI/J7UjQ/KugjaZRs=
+	t=1756447190; cv=none; b=AesdRC6rd+St9uPuMtLrJMJHR2Ku9KJxmuwtMhRg+c1pwHKQdQWq/rltlY1VeT7PsM98e1kC9YiH9mKnt8xaJ+lwvlbQU1PJqgJXuFOYZbN+a0gTIyAyZBZmog9Adv1RqjVc5CWoG2lNGqJ7pnrhWL0Dcb/RkkT1Mk+I9SEf6ss=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756435372; c=relaxed/simple;
-	bh=VQnbS4/0Q9xrW5O9dpJn6/Yu/aUbWlvNwhMOn3XT+dU=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=sopVwT6XXJGYN07sNn1JclqAR/1Z+2QCXUsEa8mlcs0ZVZ1OmTz2B1uVldfBBNJT4+biQq8RdBCTeBV/CLIVFBeVdvz2MzhQBLmQpFxiEzceTCQFhGwJEkZ/4qmt6MfXenczAjZdAJIyDyFjLBtwXjvgJh8LAt4tGuLXqTFOOcw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=MmWPmJ88; arc=none smtp.client-ip=198.175.65.10
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1756435370; x=1787971370;
-  h=message-id:date:mime-version:subject:to:cc:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=VQnbS4/0Q9xrW5O9dpJn6/Yu/aUbWlvNwhMOn3XT+dU=;
-  b=MmWPmJ88UFWeAi2ln4vcu/DvtPNU+JO3/3XiwfbU+pmzopu2oh7/v/ZW
-   lqNjBDWcC69opt3ixp76+26jqWeZs4uJ0yCZQUYTxXBYopwk9P6BMiC+F
-   QYaCpqdHXbd2TgYu2cja42iOG20J33qoc09ppCNHNPhUgMsPmnAX60pPN
-   TvbuS/h70JoahhGv5EWTdCWQABiW1U7cE0qPimyl1DlSuouWaJJUIUEGL
-   rOqkELXjUJtpkr0lQok4fP2JoQfKTxnigZPIvMn0oJMBzQxVIt7qZCsPd
-   tXVy2H0f6uYR4yk7keAHnaiZq3S/UXiFKJWOtOrnsg6YpfX2vCIaiHbyC
-   A==;
-X-CSE-ConnectionGUID: pTYWSRviSX6qruYYsaXC5w==
-X-CSE-MsgGUID: gUljXIsWQ8aD6y0ZsmP/cA==
-X-IronPort-AV: E=McAfee;i="6800,10657,11536"; a="76170495"
-X-IronPort-AV: E=Sophos;i="6.18,221,1751266800"; 
-   d="scan'208";a="76170495"
-Received: from orviesa001.jf.intel.com ([10.64.159.141])
-  by orvoesa102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 28 Aug 2025 19:42:50 -0700
-X-CSE-ConnectionGUID: pxi3wMtTRgeCJHEM2IFA4w==
-X-CSE-MsgGUID: HMUrB66JSMGaVNPXlzPHlQ==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.18,221,1751266800"; 
-   d="scan'208";a="207411686"
-Received: from binbinwu-mobl.ccr.corp.intel.com (HELO [10.124.233.111]) ([10.124.233.111])
-  by smtpauth.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 28 Aug 2025 19:42:45 -0700
-Message-ID: <dd31f894-9f89-42da-bbcd-1be859ef1fcf@linux.intel.com>
-Date: Fri, 29 Aug 2025 10:42:44 +0800
+	s=arc-20240116; t=1756447190; c=relaxed/simple;
+	bh=3Us6gLaZK2VccDGA6IMnqvs0nFzgbS6I49Q/8l1+6ks=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=BjJj/y72cyuez4dkU/yWpJr3vnrGPyrdHROaN5mIRiGHUQDWV70qnvjusJRf73KRmxrtUsp9qQjQ7TvXdjetX6U8CAr6i4WCltu86ID7v2+nP7Q42YDO4fhFhDAKqyeQIWpFT7NaaeiDbmS/vt2u76IG8Mfu8s8mEPvQqheD5zo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=p514Sl+B; arc=none smtp.client-ip=209.85.210.182
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
+Received: by mail-pf1-f182.google.com with SMTP id d2e1a72fcca58-772301f8a4cso174765b3a.3
+        for <kvm@vger.kernel.org>; Thu, 28 Aug 2025 22:59:48 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google; t=1756447188; x=1757051988; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=Csp0y2UiuYBIoSGq3QglK9zewj1/hbg1F372AFvl94U=;
+        b=p514Sl+BuFb2jJ5R5DjvdPuZbJD/3N094aXwj3h0r/jhqjJ8E7yP+k817tMndGWuRR
+         FJyrpnjrOC1v44RKZW8+hYv/s/oQyyrlN51j6gPDRgosyonW7nobHk+dEVSc4NB36Yw4
+         PuqLoIM2bQWrSvT363c+fY0yOV3vZSKbC+7dp3aQmV8szSfmyrtVMuT0C6uReUSabLLQ
+         QNCTGNg39LLVhpXBLI27D+yN4JWIztFIMPiYxMxgFB1nTSvmERBka41rfpTaGJms0EBS
+         6QVx0xOpRrajJT7Gzpak3rJcIdO5m+Vx4yWFoMbU026CqovfiV44HAzTUMYSrkn9uYWg
+         J/Dg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1756447188; x=1757051988;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=Csp0y2UiuYBIoSGq3QglK9zewj1/hbg1F372AFvl94U=;
+        b=dqB+PpJcOZZOptJ/tfQ+VdbQSOsbjvqOSUwHfVdqsJAQ37mkBxA6k2Zr0kP6kknFti
+         e4ywovffksmUkfWtM1xe/2BT5ATIcrkkrhv6fuHdtC8VJA3qpkxWOhJ+ofqbmEaK4GXe
+         m4tg473eCVtvszx1xVzj3770057FrP1cl2iWMMrRX9HR0UZvz1gOACzEqkZ9CoIag8WY
+         XSCTNaeRUTegiDKyRdOm+utyvxkKGOixqs8MnmtxZlwDqfd2PTE1O0wwsUHtk3Mds1Pw
+         qChQz2hoO5eVkS2E/El3dEgXT89XlzL5mwakL+qKlWESpu9z+1McX9BeF9p1vKdrABom
+         skjA==
+X-Forwarded-Encrypted: i=1; AJvYcCVAL9blUFa7xJ3ZimHuVQdFYrtlp0/oYYYCkAWVUMvYDu6JMoowgzRbSD5f4MQt7Y6cw+E=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwGx14JSiIaaUq7C5emPwq8a6zKmzZGNi2zrjIuqFIUmEX2Rv8J
+	FreLjx27iHlFVoCiLmJW+5X+o2Vf14n1nWdWVnnw2HbYETt/2qUu2NMbfNApodjtqr8=
+X-Gm-Gg: ASbGnctL+EK/jzrJOMmx1Go/+3CFL9lNLlruFRTk/m5ern0o4f+z+xmA4XWTlBl7ROM
+	ppImdyjzqjdsTeNtuppPg9Bu0pT4V4J4MEhGjGVPJAOazZ3bBSh/XNMH0R3DgQXUn0kcSwBkWfX
+	fTAIfvBjCrJa8QxocDrElf70dOnyyatefNeHq0tqxIJ2OfRJxJGOtLHz4nB2Jl5KMYXBXSnaUXy
+	gniNbaf+NTIkSve4JTC/5x9b5Rdg6MGuZKbpvkQNXk7EJU+KuN2lhZxpahQ64L5OpyCdLwkdbd3
+	Q6FI1dDgDWsJ+C4jpn/T7W22qUSvoR0ZPOYKe1FphWXTtX7WuUJvDYlb6+zc9JJjl3GcpprqBQb
+	IhtGDdsYLwwzhlMD4OejW145BKvE4/grJdj8=
+X-Google-Smtp-Source: AGHT+IFsar3WOaSA9RKNM7TPFf9gG0iXTxdUF2CW8raU1SyelgEQswrlDbapLb2rA7PUFkb3M17NCQ==
+X-Received: by 2002:a05:6a00:10d5:b0:772:2850:783d with SMTP id d2e1a72fcca58-772285079c4mr3285667b3a.22.1756447188084;
+        Thu, 28 Aug 2025 22:59:48 -0700 (PDT)
+Received: from localhost ([122.172.87.165])
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-7722a2b14c1sm1263485b3a.31.2025.08.28.22.59.45
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 28 Aug 2025 22:59:47 -0700 (PDT)
+Date: Fri, 29 Aug 2025 11:29:44 +0530
+From: Viresh Kumar <viresh.kumar@linaro.org>
+To: Zihuan Zhang <zhangzihuan@kylinos.cn>
+Cc: "Rafael J . wysocki" <rafael@kernel.org>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Will Deacon <will@kernel.org>,
+	Sean Christopherson <seanjc@google.com>,
+	Paolo Bonzini <pbonzini@redhat.com>,
+	Thomas Gleixner <tglx@linutronix.de>,
+	Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+	Dave Hansen <dave.hansen@linux.intel.com>,
+	Markus Mayer <mmayer@broadcom.com>,
+	Florian Fainelli <florian.fainelli@broadcom.com>,
+	Srinivas Pandruvada <srinivas.pandruvada@linux.intel.com>,
+	Madhavan Srinivasan <maddy@linux.ibm.com>,
+	Michael Ellerman <mpe@ellerman.id.au>,
+	Krzysztof Kozlowski <krzk@kernel.org>,
+	Alim Akhtar <alim.akhtar@samsung.com>,
+	Thierry Reding <thierry.reding@gmail.com>,
+	Jonathan Hunter <jonathanh@nvidia.com>,
+	MyungJoo Ham <myungjoo.ham@samsung.com>,
+	Kyungmin Park <kyungmin.park@samsung.com>,
+	Chanwoo Choi <cw00.choi@samsung.com>,
+	Jani Nikula <jani.nikula@linux.intel.com>,
+	Joonas Lahtinen <joonas.lahtinen@linux.intel.com>,
+	Rodrigo Vivi <rodrigo.vivi@intel.com>,
+	Tvrtko Ursulin <tursulin@ursulin.net>,
+	David Airlie <airlied@gmail.com>, Simona Vetter <simona@ffwll.ch>,
+	Daniel Lezcano <daniel.lezcano@kernel.org>,
+	Sascha Hauer <s.hauer@pengutronix.de>,
+	Shawn Guo <shawnguo@kernel.org>,
+	Eduardo Valentin <edubezval@gmail.com>, Keerthy <j-keerthy@ti.com>,
+	Matthias Brugger <matthias.bgg@gmail.com>,
+	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
+	zhenglifeng <zhenglifeng1@huawei.com>,
+	"H . Peter Anvin" <hpa@zytor.com>, Zhang Rui <rui.zhang@intel.com>,
+	Len Brown <lenb@kernel.org>, Nicholas Piggin <npiggin@gmail.com>,
+	Christophe Leroy <christophe.leroy@csgroup.eu>,
+	Lukasz Luba <lukasz.luba@arm.com>,
+	Pengutronix Kernel Team <kernel@pengutronix.de>,
+	Beata Michalska <beata.michalska@arm.com>,
+	Fabio Estevam <festevam@gmail.com>, Pavel Machek <pavel@kernel.org>,
+	Sumit Gupta <sumitg@nvidia.com>,
+	Prasanna Kumar T S M <ptsm@linux.microsoft.com>,
+	Sudeep Holla <sudeep.holla@arm.com>,
+	Yicong Yang <yangyicong@hisilicon.com>, linux-pm@vger.kernel.org,
+	x86@kernel.org, kvm@vger.kernel.org, linux-acpi@vger.kernel.org,
+	linuxppc-dev@lists.ozlabs.org, linux-samsung-soc@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org, linux-tegra@vger.kernel.org,
+	intel-gfx@lists.freedesktop.org, dri-devel@lists.freedesktop.org,
+	imx@lists.linux.dev, linux-omap@vger.kernel.org,
+	linux-mediatek@lists.infradead.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v2 04/18] cpufreq: brcmstb-avs-cpufreq: Use
+ __free(put_cpufreq_policy) for policy reference
+Message-ID: <20250829055944.ragfnh62q2cuew3e@vireshk-i7>
+References: <20250827023202.10310-1-zhangzihuan@kylinos.cn>
+ <20250827023202.10310-5-zhangzihuan@kylinos.cn>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [RFC PATCH 09/12] KVM: TDX: Fold tdx_mem_page_record_premap_cnt()
- into its sole caller
-To: "Edgecombe, Rick P" <rick.p.edgecombe@intel.com>,
- "seanjc@google.com" <seanjc@google.com>, "Zhao, Yan Y" <yan.y.zhao@intel.com>
-Cc: "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
- "pbonzini@redhat.com" <pbonzini@redhat.com>,
- "Annapurve, Vishal" <vannapurve@google.com>,
- "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
- "michael.roth@amd.com" <michael.roth@amd.com>,
- "Weiny, Ira" <ira.weiny@intel.com>
-References: <20250827000522.4022426-1-seanjc@google.com>
- <20250827000522.4022426-10-seanjc@google.com>
- <aK7Ji3kAoDaEYn3h@yzhao56-desk.sh.intel.com> <aK9Xqy0W1ghonWUL@google.com>
- <aK/sdr2OQqYv9DBZ@yzhao56-desk.sh.intel.com> <aLCJ0UfuuvedxCcU@google.com>
- <fcfafa17b29cd24018c3f18f075a9f83b7f2f6e6.camel@intel.com>
-Content-Language: en-US
-From: Binbin Wu <binbin.wu@linux.intel.com>
-In-Reply-To: <fcfafa17b29cd24018c3f18f075a9f83b7f2f6e6.camel@intel.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250827023202.10310-5-zhangzihuan@kylinos.cn>
 
+On 27-08-25, 10:31, Zihuan Zhang wrote:
+> Replace the manual cpufreq_cpu_put() with __free(put_cpufreq_policy)
+> annotation for policy references. This reduces the risk of reference
+> counting mistakes and aligns the code with the latest kernel style.
+> 
+> No functional change intended.
+> 
+> Signed-off-by: Zihuan Zhang <zhangzihuan@kylinos.cn>
+> ---
+>  drivers/cpufreq/brcmstb-avs-cpufreq.c | 4 +---
+>  1 file changed, 1 insertion(+), 3 deletions(-)
 
+Applied. Thanks.
 
-On 8/29/2025 2:52 AM, Edgecombe, Rick P wrote:
-> On Thu, 2025-08-28 at 10:00 -0700, Sean Christopherson wrote:
->> On Thu, Aug 28, 2025, Yan Zhao wrote:
-[...]
->>>
->>> 3. Unexpected zaps (such as kvm_zap_gfn_range()).
->> Side topic related to kvm_zap_gfn_range(), the KVM_BUG_ON() in vt_refresh_apicv_exec_ctrl()
->> is flawed.  If kvm_recalculate_apic_map() fails to allocate an optimized map, KVM
->> will mark APICv as inhibited, i.e. the associated WARN_ON_ONCE() is effectively
->> user-triggerable.
->>
->> Easiest thing would be to mark the vCPU as dead (though we obviously need
->> "KVM: Never clear KVM_REQ_VM_DEAD from a vCPU's requests" for that to be robust).
->>
->>
->>
-> I'm going need to look up the related apic discussions from the base series and
-> circle back.
-There was an analysis about the inhibit reasons for TDX.
-https://lore.kernel.org/lkml/e3a2e8fa-b496-4010-9a8c-bfeb131bc43b@linux.intel.com/
-
-As Sean mentioned, if kvm_recalculate_apic_map() fails to allocate the memory
-for optimized map, it will trigger the KVM_BUG_ON() in
-vt_refresh_apicv_exec_ctrl(). And kvzalloc() failure should not be treated as
-KVM bug.
-
-As talking about user-triggerable, the kvzalloc() failure path could be
-triggered by KVM_CREATE_VCPU and KVM_TDX_INIT_VCPU for TD. After
-KVM_TDX_INIT_VCPU, the mapping is not allowed to be changed.
-
-Sean's suggested code change looks good to me.
-
-
+-- 
+viresh
 
