@@ -1,196 +1,225 @@
-Return-Path: <kvm+bounces-56318-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-56319-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5FD74B3BE33
-	for <lists+kvm@lfdr.de>; Fri, 29 Aug 2025 16:43:46 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id BB423B3BE38
+	for <lists+kvm@lfdr.de>; Fri, 29 Aug 2025 16:44:13 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 212F9687FD2
-	for <lists+kvm@lfdr.de>; Fri, 29 Aug 2025 14:43:45 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 77AB616A4AC
+	for <lists+kvm@lfdr.de>; Fri, 29 Aug 2025 14:44:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A35B3322C85;
-	Fri, 29 Aug 2025 14:41:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 131E232C32D;
+	Fri, 29 Aug 2025 14:41:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="DxlbUizh"
+	dkim=pass (2048-bit key) header.d=rivosinc.com header.i=@rivosinc.com header.b="EZKfemrC"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pf1-f175.google.com (mail-pf1-f175.google.com [209.85.210.175])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6A12B322A26
-	for <kvm@vger.kernel.org>; Fri, 29 Aug 2025 14:41:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 99CEB322DB4
+	for <kvm@vger.kernel.org>; Fri, 29 Aug 2025 14:41:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.175
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756478479; cv=none; b=ZEhYEHTWZ6LbcfY0c1LA9fsYzXygWKzlW0NqLwg/mhA1okdCrYagjWrCxLsLY3dqBvvKxyDxiVuC1CJ4GwE4RQEk16NErlnY5XrluP4GFiNuniNisVFgF6DaKWo24r1Zp76NvJlZzN70vPycZ+Yn7m630lt4rEh9gkjppHiy2Uw=
+	t=1756478481; cv=none; b=m0WM8MqIuGkrpAW2gPTPWFOLQX6gfRw9dfX0N+WHVBmqOSQmr5Zn9hVSElNbgVa/rpjp1yWGVnp8gFandcQHyI5/tuN5ixxlh79xDOzoRYjewdyexXxWvmRndHoPLRfyD4MpzfJZOQNDS28ErLhoFLRkbSWZL2XzbnRBWNsMejM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756478479; c=relaxed/simple;
-	bh=CSCcVpPj4C/hs50Ns7qlV+dnR+g1QDFkIRsUlEtqIlM=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=sFXziVzd7RYMxXGEgqYW/EbHk56RidNgtl6naVqAGmdEGlO6Rjz+X2I4us/4p0XjPAsRNbU8lvQg1Ow2B4ZvnbLiRv3wihWPe45JVNNatEyAcsdo6yEl5cF965r0SCcHF+qckTmVJlyIWnS/LLbESWspecMwySyxQw8PNpBmp/I=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=DxlbUizh; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1756478475;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-	bh=IaQHZcwb14XTWilYbwjP6AKy4Qvx/cjgmhYjWqgMQRs=;
-	b=DxlbUizhCB5BawKdtayUbZmKjwLNqyd5gybpB35feX3Y3ofc5PK006dkMcsh+WQJXlO3Ux
-	Qh+WZm9hXmA9ld0gTCQ4XL9p4n23gQlWBf9Z6SB0mPBB8zKmjiJZulijjd0b9j3pF6xR9y
-	zBv9r9VRUel4kLJcABjpOTMf5YsSlIA=
-Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
- [209.85.128.71]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-449-toE8xhKyOI208D8vSn9N2g-1; Fri, 29 Aug 2025 10:41:14 -0400
-X-MC-Unique: toE8xhKyOI208D8vSn9N2g-1
-X-Mimecast-MFC-AGG-ID: toE8xhKyOI208D8vSn9N2g_1756478473
-Received: by mail-wm1-f71.google.com with SMTP id 5b1f17b1804b1-45a1b05d8d0so15785565e9.1
-        for <kvm@vger.kernel.org>; Fri, 29 Aug 2025 07:41:13 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1756478473; x=1757083273;
-        h=content-transfer-encoding:in-reply-to:autocrypt:content-language
-         :from:references:cc:to:subject:user-agent:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
+	s=arc-20240116; t=1756478481; c=relaxed/simple;
+	bh=N6+h+tsIWnMjf3ceMOGaeiYo79VIo7jfDe4CcDtFJJU=;
+	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
+	 In-Reply-To:To:Cc; b=Ty8a+/iKkyaql/ShQep6/zYAe9hQ/BGbzr9aWTNCtdcXxZU0PteVp4eoWJ9lHwswSpmi4mQ2XOv1noii1IX4hNO2P5n+al424Xqg83kWOm+LJulWSHMLxPYXd1ursNok785+66UK0tsugrMDl5gjVBUpCNeOgn+gBf1Xcq6AYsc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=rivosinc.com; spf=pass smtp.mailfrom=rivosinc.com; dkim=pass (2048-bit key) header.d=rivosinc.com header.i=@rivosinc.com header.b=EZKfemrC; arc=none smtp.client-ip=209.85.210.175
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=rivosinc.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=rivosinc.com
+Received: by mail-pf1-f175.google.com with SMTP id d2e1a72fcca58-771ff6f117aso1952780b3a.2
+        for <kvm@vger.kernel.org>; Fri, 29 Aug 2025 07:41:19 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=rivosinc.com; s=google; t=1756478479; x=1757083279; darn=vger.kernel.org;
+        h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
+         :mime-version:subject:date:from:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=IaQHZcwb14XTWilYbwjP6AKy4Qvx/cjgmhYjWqgMQRs=;
-        b=nV1OOKCmdDjqXe7Y2QXRE8VwFRmUtEqyx0bG43fIzRgtSSygi3YZMEs1i/cgc8xtqn
-         5TD6MXMcH9g6ysockEqzcJz9OM2kpmAJf6NPsjuvFrSqHupf7QP1PF7Mzdot+W5YLgvM
-         OJ8g3VZ5mJsiAeFUUrQyANYT8p9lJ88CgLVOZoWgyGsoe1aEXa6PgdrfF6ep//lByOUV
-         uUUrYgVrIeT8pUIT1DT/2/NLXipT8ymUsU1aqr5ZWzXEjO1FJ0eYnGpKUWs3JFH8Eb5c
-         VbyVfV6kTmsfFz5uNb4YIoySI2B3tvFm3l1kauXCpxaoaP5VkD/4hboRCJCFA/N1cT1V
-         6a6Q==
-X-Forwarded-Encrypted: i=1; AJvYcCVN99YZ6Jrcv8fNV8B7VHiwcdEw3gvdGsDfynVNxIyD8tscxH+CvIAUJZKEkGEIlNyYQpA=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzD0K2BqRJ6+GcRv13hxmN8NAEEh1nT0IW52zzi2+sn6b/ncFRx
-	3/fV1AVWUHruIF63ETsrn0J+G/QYA+TJlTMT3SPE3h4Ivs7NbvxdGYJghM5sxqaeVKaKYx6uU/L
-	1GAlwztQKdANjvfHq/8UMb5Axuko3C9BRgBxor0nhr2CLrOXu+hXcbA==
-X-Gm-Gg: ASbGncv9ly38zP/5jwOyEt55AuKZKl0bFwBZTV/D9stdFILnmQSbbR5KCl90Tqq649d
-	grFG4BPsCf3Id/MnS6zmwg4xOI/Q5R1P6dnurZybimvtmoM3oQjgRTBQ4gaEqA+OpG71e3BXU3s
-	sOn6Iqp9Inz4CPy0prqYh2/z9L+2N42DtA9WY6hucloOAbpb4lu5zY2DQV8O95OptBRVACngenX
-	sDe695tuJg9jJMNL/ciWuIPTqxfF3sdN8dbdsNrMNdfeHJJGuVDTLWAy7iwrHKmLA/AMTUijLAr
-	lOv+YyxaicvrhEdmUl0jWu4U4OZAgzS4k1SMr3FWnsLjjpd9HJuO1IsBUwWv3D36KxltYGEXuBF
-	GkOyJor4RvfTB6QuCSN89ssp7OXYyxKoCgYYq+/FCwcEMoS/oqm6fqb9WVHNE32EW
-X-Received: by 2002:a05:600c:3b1d:b0:45b:80ff:58f7 with SMTP id 5b1f17b1804b1-45b80ff5a3emr17032545e9.36.1756478472592;
-        Fri, 29 Aug 2025 07:41:12 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IFxRGXosrm3vEArUqUEmQe7+Z1YlIMaqjbXRbohfYu21MGvBWlOrWQFqI2M9QmqW3L3NnKwrg==
-X-Received: by 2002:a05:600c:3b1d:b0:45b:80ff:58f7 with SMTP id 5b1f17b1804b1-45b80ff5a3emr17032245e9.36.1756478471858;
-        Fri, 29 Aug 2025 07:41:11 -0700 (PDT)
-Received: from ?IPV6:2003:d8:2f1d:100:4f8e:bb13:c3c7:f854? (p200300d82f1d01004f8ebb13c3c7f854.dip0.t-ipconnect.de. [2003:d8:2f1d:100:4f8e:bb13:c3c7:f854])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-45b74950639sm95314275e9.17.2025.08.29.07.41.09
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 29 Aug 2025 07:41:11 -0700 (PDT)
-Message-ID: <4b053602-7c80-4ea4-8617-0f5e526c02f6@redhat.com>
-Date: Fri, 29 Aug 2025 16:41:08 +0200
+        bh=8n6toQkVFfP8na+ISaaEJDAIrFZoZwC9O7ud2sWM9B0=;
+        b=EZKfemrCg3JJx0ABXxSUVRtXcQexwlRUrR0R7WCwYFk14RK5lwdIPAsgC8UrArssgf
+         CD25+kmX/w39dCz+FrWRSb8veQYAxL4XGV3xjWhGhJzH9qg8h7aVL6kdwVyYkBc5tpyW
+         ByqTWo1Xp3f3AiKQrvUVDyLm03cqWan70iQq1M1wrJF/Fekt5QxivRAQQdYYrOWcPME2
+         uClb36TjVfG0e1hoZcZ8XAsOO1fMgP8HaBs6L6FguwbgPA38TdJsjPto6iYZQ4flT5KG
+         z9VNtcuOgB+Z/okC21BpgbjP43+3Dc9tBKl1n0qppVyPhIGWLQEVsttOgbAp6I5qb5ve
+         /oug==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1756478479; x=1757083279;
+        h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
+         :mime-version:subject:date:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=8n6toQkVFfP8na+ISaaEJDAIrFZoZwC9O7ud2sWM9B0=;
+        b=eERKk9KB7DU3fwhUez4YY/s2oLGnrhb5/iJTgNV/BoOPHRV3hSD9QV9TQ5vLA+cQ4A
+         FuEN+TiuPEp2ZWOyDH200XMxxfMpE4lGLaPbA/iPcBDA0DxyQ7cQDxyU2N/t0T9Vajoo
+         kQX5XSQoqXeIb6j+xL/xgF8CrSnZXN/MWxCgF/oaT+jfVR4ir8tUkMrX7O7YalmhEsSI
+         K3gN4mLOIoIhFT499ikAzZv3iPjvL0FGt0TDfyrqJR3eC8jJgoFrPKYDuQh2gUQQIPRo
+         th/kQVwX/DH57/N7hexrShuov846mvhYymvmRZeP3yIcRLM1iizjVoOceRYm6PYnmqMn
+         ty5w==
+X-Forwarded-Encrypted: i=1; AJvYcCVkxb87rjCDIy9HfJhYG70VD5dfhFCnEu6M0lMgrsgNGUZh3HQkKY9MDpHObGrOCJYUacE=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzhoJs1OGnI+UBAC4W+C6HYUtYv4TxpOWMApK6a5GDoQWXK8oo6
+	HMf+hz0kAlRKLmFfkO0C3LnNarQBE+tjE+x7RTwegy9Gl4QXss0kj9O7ooHxSpz2X95FQKSfBmt
+	/hepZ
+X-Gm-Gg: ASbGnctHBZz1aoaqsswzMF0YkrpOAY+NKFMJQYOe0sqvyJPQhLXBnRCvjA1D1rXIV6G
+	b2ZX7dzSjxNqURrBp20eGFUM1puX8bXnNEPj7ySzhB0CebdVZDS2/GiTINYKlV4yQnrrUN6It4r
+	gw24VUhTmnpqfGSZJzzZ4Z4OwUJe06GRmQykIV5/BbsZjXKCglzcQJbLmDtwipOBVI2pY0hLJ3G
+	K6IR1H+prsDlR2vgAQkr5Oqk6lux+6RYzbfpIxG5SrMprSy27Y/y+v+MOf+u06cEvluedLPAeHM
+	hT+zJdtWW5ekCXZ6GQMDUd+dW/rQFCdPL0imgG9Y/nddRp7yGqaDvx6Fa6LnrH2mLAmfXzecdoF
+	EfFtmDH67X3QxrfsxhqcfKMgR//ddPTBIa50=
+X-Google-Smtp-Source: AGHT+IFbwzsbSElYu8KYbXCV/+je/6mE2S0/2liCEwQBNCHEuRYMQctOBLGbIAGZhqVBmpmbFujhhA==
+X-Received: by 2002:a05:6a00:929f:b0:772:306d:a1ed with SMTP id d2e1a72fcca58-772306dac16mr3197588b3a.32.1756478478747;
+        Fri, 29 Aug 2025 07:41:18 -0700 (PDT)
+Received: from atishp.ba.rivosinc.com ([64.71.180.162])
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-7722a4e1f86sm2560999b3a.72.2025.08.29.07.41.15
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 29 Aug 2025 07:41:16 -0700 (PDT)
+From: Atish Patra <atishp@rivosinc.com>
+Date: Fri, 29 Aug 2025 07:41:09 -0700
+Subject: [PATCH v5 8/9] RISC-V: KVM: Implement get event info function
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v1 33/36] mm/gup: drop nth_page() usage in
- unpin_user_page_range_dirty_lock()
-To: Lorenzo Stoakes <lorenzo.stoakes@oracle.com>
-Cc: linux-kernel@vger.kernel.org, Alexander Potapenko <glider@google.com>,
- Andrew Morton <akpm@linux-foundation.org>,
- Brendan Jackman <jackmanb@google.com>, Christoph Lameter <cl@gentwo.org>,
- Dennis Zhou <dennis@kernel.org>, Dmitry Vyukov <dvyukov@google.com>,
- dri-devel@lists.freedesktop.org, intel-gfx@lists.freedesktop.org,
- iommu@lists.linux.dev, io-uring@vger.kernel.org,
- Jason Gunthorpe <jgg@nvidia.com>, Jens Axboe <axboe@kernel.dk>,
- Johannes Weiner <hannes@cmpxchg.org>, John Hubbard <jhubbard@nvidia.com>,
- kasan-dev@googlegroups.com, kvm@vger.kernel.org,
- "Liam R. Howlett" <Liam.Howlett@oracle.com>,
- Linus Torvalds <torvalds@linux-foundation.org>, linux-arm-kernel@axis.com,
- linux-arm-kernel@lists.infradead.org, linux-crypto@vger.kernel.org,
- linux-ide@vger.kernel.org, linux-kselftest@vger.kernel.org,
- linux-mips@vger.kernel.org, linux-mmc@vger.kernel.org, linux-mm@kvack.org,
- linux-riscv@lists.infradead.org, linux-s390@vger.kernel.org,
- linux-scsi@vger.kernel.org, Marco Elver <elver@google.com>,
- Marek Szyprowski <m.szyprowski@samsung.com>, Michal Hocko <mhocko@suse.com>,
- Mike Rapoport <rppt@kernel.org>, Muchun Song <muchun.song@linux.dev>,
- netdev@vger.kernel.org, Oscar Salvador <osalvador@suse.de>,
- Peter Xu <peterx@redhat.com>, Robin Murphy <robin.murphy@arm.com>,
- Suren Baghdasaryan <surenb@google.com>, Tejun Heo <tj@kernel.org>,
- virtualization@lists.linux.dev, Vlastimil Babka <vbabka@suse.cz>,
- wireguard@lists.zx2c4.com, x86@kernel.org, Zi Yan <ziy@nvidia.com>
-References: <20250827220141.262669-1-david@redhat.com>
- <20250827220141.262669-34-david@redhat.com>
- <c9527014-9a29-48f4-8ca9-a6226f962c00@lucifer.local>
-From: David Hildenbrand <david@redhat.com>
-Content-Language: en-US
-Autocrypt: addr=david@redhat.com; keydata=
- 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
- qIws/H2t
-In-Reply-To: <c9527014-9a29-48f4-8ca9-a6226f962c00@lucifer.local>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
+Message-Id: <20250829-pmu_event_info-v5-8-9dca26139a33@rivosinc.com>
+References: <20250829-pmu_event_info-v5-0-9dca26139a33@rivosinc.com>
+In-Reply-To: <20250829-pmu_event_info-v5-0-9dca26139a33@rivosinc.com>
+To: Anup Patel <anup@brainfault.org>, Will Deacon <will@kernel.org>, 
+ Mark Rutland <mark.rutland@arm.com>, 
+ Paul Walmsley <paul.walmsley@sifive.com>, 
+ Palmer Dabbelt <palmer@dabbelt.com>, 
+ Mayuresh Chitale <mchitale@ventanamicro.com>
+Cc: linux-riscv@lists.infradead.org, linux-arm-kernel@lists.infradead.org, 
+ linux-kernel@vger.kernel.org, kvm@vger.kernel.org, 
+ kvm-riscv@lists.infradead.org, Atish Patra <atishp@rivosinc.com>
+X-Mailer: b4 0.15-dev-50721
 
-On 28.08.25 20:09, Lorenzo Stoakes wrote:
-> On Thu, Aug 28, 2025 at 12:01:37AM +0200, David Hildenbrand wrote:
->> There is the concern that unpin_user_page_range_dirty_lock() might do
->> some weird merging of PFN ranges -- either now or in the future -- such
->> that PFN range is contiguous but the page range might not be.
->>
->> Let's sanity-check for that and drop the nth_page() usage.
->>
->> Signed-off-by: David Hildenbrand <david@redhat.com>
-> 
-> Seems one user uses SG and the other is IOMMU and in each instance you'd
-> expect physical contiguity (maybe Jason G. or somebody else more familiar
-> with these uses can also chime in).
+The new get_event_info funciton allows the guest to query the presence
+of multiple events with single SBI call. Currently, the perf driver
+in linux guest invokes it for all the standard SBI PMU events. Support
+the SBI function implementation in KVM as well.
 
-Right, and I added the sanity-check so we can identify and fix any such 
-wrong merging of ranges.
+Reviewed-by: Anup Patel <anup@brainfault.org>
+Signed-off-by: Atish Patra <atishp@rivosinc.com>
+---
+ arch/riscv/include/asm/kvm_vcpu_pmu.h |  3 ++
+ arch/riscv/kvm/vcpu_pmu.c             | 68 +++++++++++++++++++++++++++++++++++
+ arch/riscv/kvm/vcpu_sbi_pmu.c         |  3 ++
+ 3 files changed, 74 insertions(+)
 
-Thanks!
+diff --git a/arch/riscv/include/asm/kvm_vcpu_pmu.h b/arch/riscv/include/asm/kvm_vcpu_pmu.h
+index 1d85b6617508..9a930afc8f57 100644
+--- a/arch/riscv/include/asm/kvm_vcpu_pmu.h
++++ b/arch/riscv/include/asm/kvm_vcpu_pmu.h
+@@ -98,6 +98,9 @@ void kvm_riscv_vcpu_pmu_init(struct kvm_vcpu *vcpu);
+ int kvm_riscv_vcpu_pmu_snapshot_set_shmem(struct kvm_vcpu *vcpu, unsigned long saddr_low,
+ 				      unsigned long saddr_high, unsigned long flags,
+ 				      struct kvm_vcpu_sbi_return *retdata);
++int kvm_riscv_vcpu_pmu_event_info(struct kvm_vcpu *vcpu, unsigned long saddr_low,
++				  unsigned long saddr_high, unsigned long num_events,
++				  unsigned long flags, struct kvm_vcpu_sbi_return *retdata);
+ void kvm_riscv_vcpu_pmu_deinit(struct kvm_vcpu *vcpu);
+ void kvm_riscv_vcpu_pmu_reset(struct kvm_vcpu *vcpu);
+ 
+diff --git a/arch/riscv/kvm/vcpu_pmu.c b/arch/riscv/kvm/vcpu_pmu.c
+index 851caa86cde2..bd93b0f2ed26 100644
+--- a/arch/riscv/kvm/vcpu_pmu.c
++++ b/arch/riscv/kvm/vcpu_pmu.c
+@@ -453,6 +453,74 @@ int kvm_riscv_vcpu_pmu_snapshot_set_shmem(struct kvm_vcpu *vcpu, unsigned long s
+ 	return 0;
+ }
+ 
++int kvm_riscv_vcpu_pmu_event_info(struct kvm_vcpu *vcpu, unsigned long saddr_low,
++				  unsigned long saddr_high, unsigned long num_events,
++				  unsigned long flags, struct kvm_vcpu_sbi_return *retdata)
++{
++	struct riscv_pmu_event_info *einfo = NULL;
++	int shmem_size = num_events * sizeof(*einfo);
++	gpa_t shmem, gpa, end_shmem;
++	u32 eidx, etype;
++	u64 econfig;
++	int ret;
++
++	if (flags != 0 || (saddr_low & (SZ_16 - 1) || num_events == 0)) {
++		ret = SBI_ERR_INVALID_PARAM;
++		goto out;
++	}
++
++	shmem = saddr_low;
++	if (saddr_high != 0) {
++		if (IS_ENABLED(CONFIG_32BIT)) {
++			shmem |= ((gpa_t)saddr_high << 32);
++		} else {
++			ret = SBI_ERR_INVALID_ADDRESS;
++			goto out;
++		}
++	}
++
++	end_shmem = (shmem + shmem_size + PAGE_SIZE - 1) & PAGE_MASK;
++
++	for (gpa = shmem; gpa < end_shmem; gpa += PAGE_SIZE) {
++		if (!kvm_is_gpa_in_writable_memslot(vcpu->kvm, gpa)) {
++			ret = SBI_ERR_INVALID_ADDRESS;
++			goto out;
++		}
++	}
++
++	einfo = kzalloc(shmem_size, GFP_KERNEL);
++	if (!einfo)
++		return -ENOMEM;
++
++	ret = kvm_vcpu_read_guest(vcpu, shmem, einfo, shmem_size);
++	if (ret) {
++		ret = SBI_ERR_FAILURE;
++		goto free_mem;
++	}
++
++	for (int i = 0; i < num_events; i++) {
++		eidx = einfo[i].event_idx;
++		etype = kvm_pmu_get_perf_event_type(eidx);
++		econfig = kvm_pmu_get_perf_event_config(eidx, einfo[i].event_data);
++		ret = riscv_pmu_get_event_info(etype, econfig, NULL);
++		einfo[i].output = (ret > 0) ? 1 : 0;
++	}
++
++	ret = kvm_vcpu_write_guest(vcpu, shmem, einfo, shmem_size);
++	if (ret) {
++		ret = SBI_ERR_FAILURE;
++		goto free_mem;
++	}
++
++	ret = 0;
++free_mem:
++	kfree(einfo);
++out:
++	retdata->err_val = ret;
++
++	return 0;
++}
++
+ int kvm_riscv_vcpu_pmu_num_ctrs(struct kvm_vcpu *vcpu,
+ 				struct kvm_vcpu_sbi_return *retdata)
+ {
+diff --git a/arch/riscv/kvm/vcpu_sbi_pmu.c b/arch/riscv/kvm/vcpu_sbi_pmu.c
+index e4be34e03e83..a020d979d179 100644
+--- a/arch/riscv/kvm/vcpu_sbi_pmu.c
++++ b/arch/riscv/kvm/vcpu_sbi_pmu.c
+@@ -73,6 +73,9 @@ static int kvm_sbi_ext_pmu_handler(struct kvm_vcpu *vcpu, struct kvm_run *run,
+ 	case SBI_EXT_PMU_SNAPSHOT_SET_SHMEM:
+ 		ret = kvm_riscv_vcpu_pmu_snapshot_set_shmem(vcpu, cp->a0, cp->a1, cp->a2, retdata);
+ 		break;
++	case SBI_EXT_PMU_EVENT_GET_INFO:
++		ret = kvm_riscv_vcpu_pmu_event_info(vcpu, cp->a0, cp->a1, cp->a2, cp->a3, retdata);
++		break;
+ 	default:
+ 		retdata->err_val = SBI_ERR_NOT_SUPPORTED;
+ 	}
 
 -- 
-Cheers
-
-David / dhildenb
+2.43.0
 
 
