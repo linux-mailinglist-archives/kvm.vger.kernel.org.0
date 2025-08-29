@@ -1,141 +1,174 @@
-Return-Path: <kvm+bounces-56299-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-56300-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id EB4F7B3BD58
-	for <lists+kvm@lfdr.de>; Fri, 29 Aug 2025 16:18:59 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 10793B3BD5D
+	for <lists+kvm@lfdr.de>; Fri, 29 Aug 2025 16:19:53 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id BCA974E2159
-	for <lists+kvm@lfdr.de>; Fri, 29 Aug 2025 14:18:58 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id E48431887B26
+	for <lists+kvm@lfdr.de>; Fri, 29 Aug 2025 14:20:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 885D731E11B;
-	Fri, 29 Aug 2025 14:18:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D33803203B6;
+	Fri, 29 Aug 2025 14:19:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="Wl63MsDQ"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="ymp+EyqE"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pg1-f201.google.com (mail-pg1-f201.google.com [209.85.215.201])
+Received: from mail-pj1-f73.google.com (mail-pj1-f73.google.com [209.85.216.73])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 30A453054FC
-	for <kvm@vger.kernel.org>; Fri, 29 Aug 2025 14:18:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A0A0E320393
+	for <kvm@vger.kernel.org>; Fri, 29 Aug 2025 14:19:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.73
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756477127; cv=none; b=iwBuIJqEzsUQ2TaW5pOfE8bPvxu1bINRVc7DABNrqJm8pYuk4AqH+yjhULHPoXYe5XV1ri7VGweXTmnBUiDaPsOEv1EXKw9SYJUmnlI5ij7x84wtZZ6kliz/3sGZoVxLadXX5Kk7kXhiR5dgwKSmjj6O6fmwnBUC+8tTvFmeQPQ=
+	t=1756477159; cv=none; b=AoYjXOCJBIHsfxRkzBMz6l1nqlSJAW22BuLzfh0Z8zG9JEQk5ATJzQcNcUZm/lltLuI1B9NGvPw5/aGlNuY5QoVlfilOG+o3PRfVpRHDL6vkeVwsc0g7LlnKZXdmBZ92JPCECutOUa3BrR6m9ISvFoO5AHLDLnunSH0WVZ5rc/c=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756477127; c=relaxed/simple;
-	bh=OUaXq0ZwybCaprhYvqFvKJfAAXGKmp7Rs3uofbIAD5g=;
+	s=arc-20240116; t=1756477159; c=relaxed/simple;
+	bh=1Pf4kWGF8Nl6Fz5LD6iSs09KK9VBlttvZCY110akIYY=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=Yw49D8DyiJSsmbJsl+vUR4B/g+TmID40xKkVHP1FJz3G6XIruzxJ1oMA/w5bAhVdH+i3hQ6/vlhKyHUG0rlPooPyUWSh0+d92/KZuaBXBaL7OnmCp8g5k/eRJcukHS6+uhLt2LSAoBrHb1dOmsjaVCi7zCxiON4ist53pTY/WQs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=Wl63MsDQ; arc=none smtp.client-ip=209.85.215.201
+	 To:Cc:Content-Type; b=rkgIYhsNL6MOCQ/iYtwJnbeVIoqonT73PqWSqMABICPpMkwGTwvKqG2ZgBuKZglOCY2NmHtFPuTEFezk+chGLXyDQUogDbg/cmgcGzk9TRPyYnLcwg9wYeJC5hQJE3XdLyruL0eFpjIItbE0wN5Y9kAdF/+jNFW4OHQecwdfloI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=ymp+EyqE; arc=none smtp.client-ip=209.85.216.73
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pg1-f201.google.com with SMTP id 41be03b00d2f7-b49de40e845so1593224a12.1
-        for <kvm@vger.kernel.org>; Fri, 29 Aug 2025 07:18:46 -0700 (PDT)
+Received: by mail-pj1-f73.google.com with SMTP id 98e67ed59e1d1-324e41e946eso3846512a91.0
+        for <kvm@vger.kernel.org>; Fri, 29 Aug 2025 07:19:16 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1756477125; x=1757081925; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=KjqIIm3z2SVAcCrSVbmMRE9jgzcz/VfUw69KcDhSM7g=;
-        b=Wl63MsDQYKP2/Q/3BQqAKBhWldjuhRELFjufqL4GIlQE6V7Jakz0ZpZxtG3JlbKgoL
-         Xm5IY8CCH4bjiKGqwagUf20lX5sMXbIt+yTFlEs37h193X91yOkajLXiQs/bKsBYCo/Q
-         bwQHVy543L8X6nJmga79JI3stAQKGyuK9yJTMgr9Jbqo4IX6CWqakwKaThsg9qCadFcL
-         u7799GWaIL4CoXL9TYf06osRSYuWnbmBBdAnvw1Q7m8YNwdWQj6ntrqeMdMqOSHTCeC1
-         uq2a40kwWwfSL1m5KMC4jpc92kRpw+QfcxJJQdiKslZQ75w0SQ3SqVkd3JTAbBpUfUEn
-         uzFg==
+        d=google.com; s=20230601; t=1756477156; x=1757081956; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:from:subject:message-id:references
+         :mime-version:in-reply-to:date:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=j21crHF1Yk5JFqIlz5UrZbt7K7r61xcnF+akUnmAGnM=;
+        b=ymp+EyqEmHqIcF7YhOUpYc2IfY207nJEUMzRRyLarixg7mWwWJDQW/2rD2fMkIkIhO
+         6dlw8KUhHCW2kMBYeXeJgTnyA7wn2ioE3XdLy9i1dGhpy+13N1N7+JdZtfkyV+VcDR1u
+         2ooZOiRUtK2lmyQW/CH4+w6mINng1mQS/sR09bPBFTx4dVTxP69k+cyKYOpoqxtw53l0
+         n2Skomv0mfDY24bTA6xI1Vwpnm2G9uvWtymQni/oUbQiu887+xoJJ6Ln+PuUqHoYNqMX
+         lZB6yEGWuvb4KxXPqWeycnojnWSe4ydPltB+askrntsH/QQ2t8VKuHVOksyZTpbf25Ne
+         6Hqg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1756477125; x=1757081925;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=KjqIIm3z2SVAcCrSVbmMRE9jgzcz/VfUw69KcDhSM7g=;
-        b=lCUNE7RpqtzyuqoPeGQYAV4EK1mJQFa74PkmJfTHQ3uJyuA+/kxhBQt8CHndeeVxPo
-         1wfllPTTlyod7GmHV1ISInmMMdtburAZS1vFc4xAGmStasuo5VXmnQFYnx3Fwq5+BukP
-         zQydkZjb8dqGwng5IE6wIgfBmO8PFGVaLSJOKLFOUQNxi/WYFQUDqS4kW0zyqfJcTKYV
-         6lfUbopuhhFesSjnotlDtqAXmWLXUeh8h+fPICo66KO3nVXaAYWEWoa5ze/XWQJ/lDZ2
-         coJbG48gQTByumBthtUHLlnypGJO6n7kRFxmWMPtu6D4k1tj6MvHMS9ZabGmFO0o33yi
-         q9sQ==
-X-Forwarded-Encrypted: i=1; AJvYcCUGpfd/bv4EJoR0gnK2e3cLM9mgshmnxLqYHcoV+M+3Qny9PNLU5PW8f5q5Mjds2tvu830=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxvFTf0gHNVtBxRJz8yCFaivSuTeb8/ZQJmsU0LCJtbivq5gmKv
-	4u+LtlKNIc1GaBb1hStsG991ISGo/Xf8atL2mIluJzDAYDlXgWW4rMYaaq2sKno4OPDPBFJ0U6r
-	RZwGZag==
-X-Google-Smtp-Source: AGHT+IGTX7uYgvOPHD7K4oPjsQ5WMOPGPblRnr11QBc8iEJZSDIjW6wR79PjFDP7p+FTqtE8LPgG7edmkaE=
-X-Received: from pfjc29.prod.google.com ([2002:a05:6a00:9d:b0:771:ebf9:d11c])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a05:6a20:7d9e:b0:240:1a3a:d7bc
- with SMTP id adf61e73a8af0-24340b8da6fmr37924832637.3.1756477125424; Fri, 29
- Aug 2025 07:18:45 -0700 (PDT)
-Date: Fri, 29 Aug 2025 07:18:43 -0700
-In-Reply-To: <20250829141233.58081-1-aqibaf@amazon.com>
+        d=1e100.net; s=20230601; t=1756477156; x=1757081956;
+        h=content-transfer-encoding:cc:to:from:subject:message-id:references
+         :mime-version:in-reply-to:date:x-gm-message-state:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=j21crHF1Yk5JFqIlz5UrZbt7K7r61xcnF+akUnmAGnM=;
+        b=V6xz/RrtXRMJwal3QIgqFYLREyNIYsm9hL65bh5/WbU+4dFwxjkx7pgZnQYp1n0m44
+         85L6Q8gQQblkFCpLHy+aJlIMn6y5shgWe5T2bYAxj4IkFmOK/Oh02FZTbuk0GPGuz0WK
+         aRQ4mRcUxZBsllPLccbtsAbcJVIPkSGPKFEAroZV925iL3k4CxCPWEu76eMMMMsy1aOU
+         +Ai+xfip6aEdP0YJIJMAxtpJaCk0CcrTW+02YEd/7URFN1LUZiDE5TTQOpBBNIAkTA1j
+         Xpmzzvh/3j+UCQmCm5FYzi8T2kveYElJs5rr7hKDtNSb3nlTSCMr0P46w6FVyAVpwtGJ
+         wAPQ==
+X-Forwarded-Encrypted: i=1; AJvYcCW/b1BOws/RzH2S7kvbLeHrppJmQrCGM333SmiYc8275+3/u111qLmrntnk8SFPb1jWImQ=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyiX1fVFI6amIqT7dLIvRtIdCabs/4/3It0G6Hi/NagTyMFwS6/
+	YhuhKvCtXxDJPN6kkZ5Tp/uWTS0IG4xrebd0O+M32n6iuH2tTbodLAM0EwM921xF/v4t+tycaqy
+	SyFNihg==
+X-Google-Smtp-Source: AGHT+IHQCGK1n8ucMTSWAAVaO3wbmZ1keEusOyRlTN9padDWnDkB4uZOVUdZ5WjrRzkzASPAQVQOPvuz1VQ=
+X-Received: from pjbqx12.prod.google.com ([2002:a17:90b:3e4c:b0:31f:6a10:6ea6])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:4fd0:b0:325:c92:4a89
+ with SMTP id 98e67ed59e1d1-32515e3cad8mr32112898a91.5.1756477155808; Fri, 29
+ Aug 2025 07:19:15 -0700 (PDT)
+Date: Fri, 29 Aug 2025 07:19:13 -0700
+In-Reply-To: <fcf19563-df65-4936-bd08-46f1a95359af@linux.intel.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
-References: <20250829141233.58081-1-aqibaf@amazon.com>
-Message-ID: <aLG2qpCCfjESLZFF@google.com>
-Subject: Re: [PATCH 1/1] KVM: selftests: Fix force_emulation_prefix parameter
- type mismatch
+References: <20250829000618.351013-1-seanjc@google.com> <20250829000618.351013-16-seanjc@google.com>
+ <fcf19563-df65-4936-bd08-46f1a95359af@linux.intel.com>
+Message-ID: <aLG24VoWbrB5e-K4@google.com>
+Subject: Re: [RFC PATCH v2 15/18] KVM: TDX: Combine KVM_BUG_ON +
+ pr_tdx_error() into TDX_BUG_ON()
 From: Sean Christopherson <seanjc@google.com>
-To: Aqib Faruqui <aqibaf@amazon.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, Shuah Khan <shuah@kernel.org>, kvm@vger.kernel.org, 
-	linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	nh-open-source@amazon.com
-Content-Type: text/plain; charset="us-ascii"
+To: Binbin Wu <binbin.wu@linux.intel.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	Ira Weiny <ira.weiny@intel.com>, Kai Huang <kai.huang@intel.com>, 
+	Michael Roth <michael.roth@amd.com>, Yan Zhao <yan.y.zhao@intel.com>, 
+	Vishal Annapurve <vannapurve@google.com>, Rick Edgecombe <rick.p.edgecombe@intel.com>, 
+	Ackerley Tng <ackerleytng@google.com>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Fri, Aug 29, 2025, Aqib Faruqui wrote:
-> Fix kvm_is_forced_enabled() to use get_kvm_param_bool() instead of
-> get_kvm_param_integer() when reading the "force_emulation_prefix" kernel
-> module parameter.
-> 
-> The force_emulation_prefix parameter is a boolean that accepts Y/N
-> values, but the function was incorrectly trying to parse it as an
-> integer using strtol().
+On Fri, Aug 29, 2025, Binbin Wu wrote:
+> On 8/29/2025 8:06 AM, Sean Christopherson wrote:
+> > Add TDX_BUG_ON() macros (with varying numbers of arguments) to deduplic=
+ate
+> > the myriad flows that do KVM_BUG_ON()/WARN_ON_ONCE() followed by a call=
+ to
+> > pr_tdx_error().  In addition to reducing boilerplate copy+paste code, t=
+his
+> > also helps ensure that KVM provides consistent handling of SEAMCALL err=
+ors.
+> >=20
+> > Opportunistically convert a handful of bare WARN_ON_ONCE() paths to the
+> > equivalent of KVM_BUG_ON(), i.e. have them terminate the VM.  If a SEAM=
+CALL
+> > error is fatal enough to WARN on, it's fatal enough to terminate the TD=
+.
+> >=20
+> > Signed-off-by: Sean Christopherson <seanjc@google.com>
+> > ---
+> >   arch/x86/kvm/vmx/tdx.c | 114 +++++++++++++++++-----------------------=
+-
+> >   1 file changed, 47 insertions(+), 67 deletions(-)
+> >=20
+> > diff --git a/arch/x86/kvm/vmx/tdx.c b/arch/x86/kvm/vmx/tdx.c
+> > index aa6d88629dae..df9b4496cd01 100644
+> > --- a/arch/x86/kvm/vmx/tdx.c
+> > +++ b/arch/x86/kvm/vmx/tdx.c
+> > @@ -24,20 +24,32 @@
+> >   #undef pr_fmt
+> >   #define pr_fmt(fmt) KBUILD_MODNAME ": " fmt
+> > -#define pr_tdx_error(__fn, __err)	\
+> > -	pr_err_ratelimited("SEAMCALL %s failed: 0x%llx\n", #__fn, __err)
+> > +#define __TDX_BUG_ON(__err, __f, __kvm, __fmt, __args...)			\
+> > +({										\
+> > +	struct kvm *_kvm =3D (__kvm);						\
+> > +	bool __ret =3D !!(__err);							\
+> > +										\
+> > +	if (WARN_ON_ONCE(__ret && (!_kvm || !_kvm->vm_bugged))) {		\
+> > +		if (_kvm)							\
+> > +			kvm_vm_bugged(_kvm);					\
+> > +		pr_err_ratelimited("SEAMCALL " __f " failed: 0x%llx" __fmt "\n",\
+> > +				   __err,  __args);				\
+> > +	}									\
+> > +	unlikely(__ret);							\
+> > +})
+> > -#define __pr_tdx_error_N(__fn_str, __err, __fmt, ...)		\
+> > -	pr_err_ratelimited("SEAMCALL " __fn_str " failed: 0x%llx, " __fmt,  _=
+_err,  __VA_ARGS__)
+> > +#define TDX_BUG_ON(__err, __fn, __kvm)				\
+> > +	__TDX_BUG_ON(__err, #__fn, __kvm, "%s", "")
+> > -#define pr_tdx_error_1(__fn, __err, __rcx)		\
+> > -	__pr_tdx_error_N(#__fn, __err, "rcx 0x%llx\n", __rcx)
+> > +#define TDX_BUG_ON_1(__err, __fn, __rcx, __kvm)			\
+> > +	__TDX_BUG_ON(__err, #__fn, __kvm, ", rcx 0x%llx", __rcx)
+> > -#define pr_tdx_error_2(__fn, __err, __rcx, __rdx)	\
+> > -	__pr_tdx_error_N(#__fn, __err, "rcx 0x%llx, rdx 0x%llx\n", __rcx, __r=
+dx)
+> > +#define TDX_BUG_ON_2(__err, __fn, __rcx, __rdx, __kvm)		\
+> > +	__TDX_BUG_ON(__err, #__fn, __kvm, ", rcx 0x%llx, rdx 0x%llx", __rcx, =
+__rdx)
+> > +
+> > +#define TDX_BUG_ON_3(__err, __fn, __rcx, __rdx, __r8, __kvm)	\
+> > +	__TDX_BUG_ON(__err, #__fn, __kvm, ", rcx 0x%llx, rdx 0x%llx, r8 0x%ll=
+x", __rcx, __rdx, __r8)
+> > -#define pr_tdx_error_3(__fn, __err, __rcx, __rdx, __r8)	\
+> > -	__pr_tdx_error_N(#__fn, __err, "rcx 0x%llx, rdx 0x%llx, r8 0x%llx\n",=
+ __rcx, __rdx, __r8)
+>=20
+> I thought you would use the format Rick proposed in
+> https://lore.kernel.org/all/9e55a0e767317d20fc45575c4ed6dafa863e1ca0.came=
+l@intel.com/
+> =C2=A0 =C2=A0 #define TDX_BUG_ON_2(__err, __fn, arg1, arg2, __kvm)=C2=A0 =
+=C2=A0 =C2=A0 =C2=A0 \
+> =C2=A0 =C2=A0 =C2=A0 =C2=A0 __TDX_BUG_ON(__err, #__fn, __kvm, ", " #arg1 =
+" 0x%llx, " #arg2 "
+> =C2=A0 =C2=A0 0x%llx", arg1, arg2)
+>=20
+> =C2=A0 =C2=A0 so you get: entry: 0x00 level:0xF00
+>=20
+> No?
 
-Nope, it's been an int since commit:
-
-commit d500e1ed3dc873818277e109ccf6407118669236
-Author:     Sean Christopherson <seanjc@google.com>
-AuthorDate: Tue Aug 30 23:15:51 2022 +0000
-Commit:     Paolo Bonzini <pbonzini@redhat.com>
-CommitDate: Mon Sep 26 12:03:04 2022 -0400
-
-    KVM: x86: Allow clearing RFLAGS.RF on forced emulation to test code #DBs
-    
-    Extend force_emulation_prefix to an 'int' and use bit 1 as a flag to
-    indicate that KVM should clear RFLAGS.RF before emulating, e.g. to allow
-    tests to force emulation of code breakpoints in conjunction with MOV/POP
-    SS blocking, which is impossible without KVM intervention as VMX
-    unconditionally sets RFLAGS.RF on intercepted #UD.
-    
-    Make the behavior controllable so that tests can also test RFLAGS.RF=1
-    (again in conjunction with code #DBs).
-    
-    Note, clearing RFLAGS.RF won't create an infinite #DB loop as the guest's
-    IRET from the #DB handler will return to the instruction and not the
-    prefix, i.e. the restart won't force emulation.
-    
-    Opportunistically convert the permissions to the preferred octal format.
-    
-    Signed-off-by: Sean Christopherson <seanjc@google.com>
-    Link: https://lore.kernel.org/r/20220830231614.3580124-5-seanjc@google.com
-    Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
-
-diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-index 418a069ab0d7..a7ae08e68582 100644
---- a/arch/x86/kvm/x86.c
-+++ b/arch/x86/kvm/x86.c
-@@ -173,8 +173,13 @@ bool __read_mostly enable_vmware_backdoor = false;
- module_param(enable_vmware_backdoor, bool, S_IRUGO);
- EXPORT_SYMBOL_GPL(enable_vmware_backdoor);
- 
--static bool __read_mostly force_emulation_prefix = false;
--module_param(force_emulation_prefix, bool, S_IRUGO);
-+/*
-+ * Flags to manipulate forced emulation behavior (any non-zero value will
-+ * enable forced emulation).
-+ */
-+#define KVM_FEP_CLEAR_RFLAGS_RF        BIT(1)
-+static int __read_mostly force_emulation_prefix;
-+module_param(force_emulation_prefix, int, 0444);
+Ya, see the next patch :-)
 
