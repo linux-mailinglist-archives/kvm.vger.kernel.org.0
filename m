@@ -1,88 +1,88 @@
-Return-Path: <kvm+bounces-56308-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-56309-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id B9482B3BDE8
-	for <lists+kvm@lfdr.de>; Fri, 29 Aug 2025 16:35:18 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id DE01AB3BE0D
+	for <lists+kvm@lfdr.de>; Fri, 29 Aug 2025 16:38:04 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7587616C69A
-	for <lists+kvm@lfdr.de>; Fri, 29 Aug 2025 14:35:18 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 189B93ABFBD
+	for <lists+kvm@lfdr.de>; Fri, 29 Aug 2025 14:37:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 39B183203AE;
-	Fri, 29 Aug 2025 14:35:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C8AB63203B0;
+	Fri, 29 Aug 2025 14:37:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Fk8yoWI4"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Tnbq9Qej"
 X-Original-To: kvm@vger.kernel.org
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DBB43213E74
-	for <kvm@vger.kernel.org>; Fri, 29 Aug 2025 14:35:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 654952EB85D
+	for <kvm@vger.kernel.org>; Fri, 29 Aug 2025 14:37:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756478104; cv=none; b=cm6uC8e4QNwzTNWUBUrrPQ6notaNzk9/jpk1h0RN1LFwCI0Zy0dEu4eV8suyFpmKcOfzCPR+B12z3n0F51AxTo76AFkvQWb2KFWXUWOgZP1WrG+gUaIx7QBq8SBHfFAM0JT9SY1LpjydglVh8IHFaoyZvDXXHUaajEdqJkZfVbQ=
+	t=1756478255; cv=none; b=nPVJv19rSNoUY60BzYV5w+oUZsy/co2Q0nsNEnbQxnWAtaqS6cyRUaQMlDrx8zGi614VdOuDbVTVzjLxIo74QCO3IXWxnbmXOazE6sPO5JwR7xhGmiEvtsLORCzRoaqMh/HLMa17ca8Ie3ekEVAidU7YlRFGCM8qH2UHgBmAhno=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756478104; c=relaxed/simple;
-	bh=Qw6o+YDxYfQUGawiZ67iMu/Akz8WnZhjHKVIVk27knU=;
+	s=arc-20240116; t=1756478255; c=relaxed/simple;
+	bh=ofm4InBTF9w6dgdMn/0Y8taX24CqTrMf+lLgsHms8II=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=Iru1PtoeBLiqoBAXow73qnh/Lqc4UO3GGOJGO1gg5EHduHphz5/WXPA2cITk42gYJal8LIW1RbkrAQ/h0gckSCBV1MNPTMFSFwu+fjizWiDfQ3QPPzdXv8gU0sb162K0+PDlcCg1VvHzSMQzJ1d+lo64iAa2G8Ddk9p3qAtQcA4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Fk8yoWI4; arc=none smtp.client-ip=170.10.133.124
+	 In-Reply-To:Content-Type; b=NM/R1U20slKe3ITqc48MbvgiR6C/zhjS+Z7lPTBs04Z+QaxAPKTj80lR8T30Zl7qIwV/TmZGRTIChL/Myvr01U1YWEWBL3DhNPiyY868DMDrEwOu3DXyTjx/Yxk+2omVi5uWcBpET3vIhMnjJIwIBX/Hp4WWxYOCjVBFs0x+tZI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Tnbq9Qej; arc=none smtp.client-ip=170.10.133.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1756478100;
+	s=mimecast20190719; t=1756478253;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-	bh=hfIlMYGAPM5qq+lZD1SPgFCFfaNMq7ewyyxdxPY6Oa8=;
-	b=Fk8yoWI45OzxQ4GK5uEcwMSPdnKnmp1A0QiPt9LZ4jR6Zye2CVnnwhAPmg0b15V4UJQ6NY
-	/hr+R2EToiafeI1PWxz/Fe+0g0ZF2J5BKaB0JlCR7X+CA43HvwD8xEFEyu1Xmegjd0NL60
-	2lEBqPJs865j8WThOaoOtxwBpLgwk+c=
-Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
- [209.85.128.72]) by relay.mimecast.com with ESMTP with STARTTLS
+	bh=FneLljPHDM9XgGJyT12mwKiq6vPBg0z8/AklpfNT7Sc=;
+	b=Tnbq9QejqdTEDe9IRKzqnGNfMK5t78g3Ib4zAIU4CerFR1ACWjRypXikuQuyOkjKQUozaJ
+	fngeu5t3il7/KM7YwB13n9i2PVlr/yfET1JvhjOoQpu1tY2QRhtIjlFinxsbbGfe1iXTYw
+	6IBMgQ4MdYcuxHTAGsLFOsliHP7XilI=
+Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
+ [209.85.221.71]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-112-DNoyZ3iRMt649KOmAiSm_A-1; Fri, 29 Aug 2025 10:34:59 -0400
-X-MC-Unique: DNoyZ3iRMt649KOmAiSm_A-1
-X-Mimecast-MFC-AGG-ID: DNoyZ3iRMt649KOmAiSm_A_1756478098
-Received: by mail-wm1-f72.google.com with SMTP id 5b1f17b1804b1-45b72ef3455so9501075e9.3
-        for <kvm@vger.kernel.org>; Fri, 29 Aug 2025 07:34:59 -0700 (PDT)
+ us-mta-686-XYIOYGc7MzKvddaMOc4tew-1; Fri, 29 Aug 2025 10:37:32 -0400
+X-MC-Unique: XYIOYGc7MzKvddaMOc4tew-1
+X-Mimecast-MFC-AGG-ID: XYIOYGc7MzKvddaMOc4tew_1756478250
+Received: by mail-wr1-f71.google.com with SMTP id ffacd0b85a97d-3cf48ec9e40so511734f8f.1
+        for <kvm@vger.kernel.org>; Fri, 29 Aug 2025 07:37:30 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1756478098; x=1757082898;
+        d=1e100.net; s=20230601; t=1756478250; x=1757083050;
         h=content-transfer-encoding:in-reply-to:autocrypt:content-language
          :from:references:cc:to:subject:user-agent:mime-version:date
          :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=hfIlMYGAPM5qq+lZD1SPgFCFfaNMq7ewyyxdxPY6Oa8=;
-        b=IL5nkGRkj0R3xNlgIIn/1QBBWIas/UD1p+V9XFakntsjq/svTXLUQIFOMsetVf9E/G
-         E4OPDJBFlqgzEghwPFadaeZdW8HHmMbXKZVVfLgAyGhe67++DQSxLUhKc8iPYTH1IKJz
-         Y9EFN/JZ5t3m/x6vMvNG3FucPaZVA9r591297lyOdreq0/HwFyn3sxcCNrFqPnOFcupJ
-         F2p+Lw4HEIDRcLT8mPm3dfXf3bhu15MsJo8tYpV5kr6JVCklcmaORZsLwI1W7JY3grxF
-         MKAEqqS9PD098AfILBmQWGjjFnPZ/BfTskLBp1APVv5H97lUT7oIlDiIDp8HmKiDd5KD
-         ugAA==
-X-Forwarded-Encrypted: i=1; AJvYcCWpupDfMXlPpqVuPVPa7lU3W3PGUCJ9C9eWOM9yuYRq/ZTlSzrOLNCjsTgXTCsPLV1TlVQ=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxbJhgZ8ToQkN5O6GjutD1AUrUDn5wIi0MlpnYaJqDtxNWmGWC8
-	jLzMnqoQSNqrgCIlIB9tWs1mu5pHz7eZIdFPhOqW85NiFIgWBzEHMVNk/b9G4dg6m6awODNeVlV
-	RCd/HX6QY+Znc8Li2Vg7k+otQC8amhH+PfWbpfACMO6wKNCwBIeky1A==
-X-Gm-Gg: ASbGnct/lMkeWk5Kr7YOv1QLBeQPsnM2kDkMry1lbMpABVrhqpQPrEAyiB+tKQucUor
-	KupVFXFHt7iPsr3cDzcQN2UBVO32xDVV07mR3bkma20X502s561jUpTngXJ8PWC02fztn9lZhiE
-	qydnjFKAIcwtEjJYWn/fx7D7Vr/aMiyqubnhdlHbab2KoODczfM9+lbZ4F817XcsBhiRUPuMNmb
-	CA0RpnReB3GTnL4V7+eVADR36evqP5ud5h7VQVQO1ZqakUBSD4EwtsdW8dm+K4GznPd9PGdfTlr
-	UpsIvG9PFTfnWP2fHlZS31s+C4RQlYPWj1HRK2XE+0BbDjnLjwthaCmPiLn3HYLNcDK7GqI44tt
-	Nj7zkdE7jLHO/PFIAhHFWh5nCJUMLA4DCc5hHsNEpiUKuNZ9wgHz2+B/NCp7Tokv4
-X-Received: by 2002:a05:600c:198f:b0:459:db7b:988e with SMTP id 5b1f17b1804b1-45b517a0878mr226233915e9.13.1756478097759;
-        Fri, 29 Aug 2025 07:34:57 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IG3hDIii8NDV0DOXAzXIiOEtkQMZGVVDdgA6IYT462PNDojHGD9AgX58jP+bTVewU8uKeROaQ==
-X-Received: by 2002:a05:600c:198f:b0:459:db7b:988e with SMTP id 5b1f17b1804b1-45b517a0878mr226233525e9.13.1756478097177;
-        Fri, 29 Aug 2025 07:34:57 -0700 (PDT)
+        bh=FneLljPHDM9XgGJyT12mwKiq6vPBg0z8/AklpfNT7Sc=;
+        b=UNsLf08wiWjsbpGIAIFjBiUI4qPaAaVkWHUeC+evJsYjE+J+Qn0RridS2f9Y6vQwYA
+         8n6Zo628aQMfcqLOIq+HFZZPHjVA+4HV5vlDM6lpwwZWozTYM46qoe2yLc3XaeqQbrLf
+         sfoibM6OWara17uo8U5BQhBtfsInH/W3iGNHSkOzhFa71VB7LPLVHZL+/Xfiu7bgcZVc
+         JoPiVbH7XafSdXphNIejcJ1i9YkazYsER88+nKBamOPnwDDhko7wm5Q7I4/WDri5Wkw4
+         Vql4DVAdne/Brt0SUCv7b615LbxFW8q2M/tD/5AyTXPugXYxQ1wHuVR9oOIWHUkf6Ai8
+         DTAg==
+X-Forwarded-Encrypted: i=1; AJvYcCWQYByMnFGbieB/2u8X9HJLO8rs0L/EfLvACAx+++/e684vMKJAKcd6HN82W30fmYfUMpI=@vger.kernel.org
+X-Gm-Message-State: AOJu0Ywm4lZk94RyIMVn5AGLDIkxp42aw3JWnYQgSjoaDewp3T9oQjsC
+	Rr+bjWqKyXLp+F4j1q6F7KEXc1g5EWWeY3TffDnz/vI9Sc2AfYNcglkGckf8i9J0bUp6iSF40d6
+	Km6+Jvhm+Xdc2GnVDBNz9S8tTjUDHemmnE9W+FXhIGZxiS/PkEBl7hQ==
+X-Gm-Gg: ASbGncu9YSH98eVHXagdO/g3uPFYEktmJ9jIF90xtm6JwxjNvug1LFFbBbmLmKGLfhc
+	44C8spwncjWhNRromD1D42wrU0QShaCKorxZC5yP4t+Q7b5T5sVkihYuPnsxtjNTOSqiWNVkiSN
+	0acvZ0fmeoGmyqzZMt6jZQFLzkkTnvzxUFdcqLsLpC3pbAXcC85qzDzR8tPmYTA0yXxstaQRyB9
+	blqbKOscE+f+p2uL0tr3oIVLWQScEMTryymFbVonHJtzInL1pfk+kSHalNLFQRly6WX9uj+PZ8P
+	noFUWIVmtQafDgpgVVMfdbMm41SdSmIXQ3AY5sGjecS1+9bI88RpfNG42j+uaWUD3GODSr3U4Tg
+	9Q+17LUzWQCCjXr/uhprT3Kp61Rcndk2/PfYbOo13h36o2w8iDNrgMJiA4gThchaS
+X-Received: by 2002:a05:6000:4181:b0:3c6:cb4:e07a with SMTP id ffacd0b85a97d-3c60cb4e5f4mr14776402f8f.30.1756478249736;
+        Fri, 29 Aug 2025 07:37:29 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IEHovUImNhvkO1lXs5k4xADHmBMPjxYhr00MTNQwak1+GGWTtZ4Tk7PPjO6gfl53i+oo7PyhA==
+X-Received: by 2002:a05:6000:4181:b0:3c6:cb4:e07a with SMTP id ffacd0b85a97d-3c60cb4e5f4mr14776347f8f.30.1756478249246;
+        Fri, 29 Aug 2025 07:37:29 -0700 (PDT)
 Received: from ?IPV6:2003:d8:2f1d:100:4f8e:bb13:c3c7:f854? (p200300d82f1d01004f8ebb13c3c7f854.dip0.t-ipconnect.de. [2003:d8:2f1d:100:4f8e:bb13:c3c7:f854])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-45b6f0d32a2sm134907275e9.9.2025.08.29.07.34.55
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3cf276cc915sm3557153f8f.21.2025.08.29.07.37.26
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 29 Aug 2025 07:34:56 -0700 (PDT)
-Message-ID: <62fad23f-e8dc-4fd5-a82f-6419376465b5@redhat.com>
-Date: Fri, 29 Aug 2025 16:34:54 +0200
+        Fri, 29 Aug 2025 07:37:28 -0700 (PDT)
+Message-ID: <07b11bc1-ea31-4d9d-b0be-0dd94a7b1c9c@redhat.com>
+Date: Fri, 29 Aug 2025 16:37:26 +0200
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -90,11 +90,12 @@ List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v1 21/36] mm/cma: refuse handing out non-contiguous page
- ranges
-To: Lorenzo Stoakes <lorenzo.stoakes@oracle.com>
-Cc: linux-kernel@vger.kernel.org, Alexandru Elisei
- <alexandru.elisei@arm.com>, Alexander Potapenko <glider@google.com>,
+Subject: Re: [PATCH v1 24/36] ata: libata-eh: drop nth_page() usage within SG
+ entry
+To: Damien Le Moal <dlemoal@kernel.org>,
+ Lorenzo Stoakes <lorenzo.stoakes@oracle.com>
+Cc: linux-kernel@vger.kernel.org, Niklas Cassel <cassel@kernel.org>,
+ Alexander Potapenko <glider@google.com>,
  Andrew Morton <akpm@linux-foundation.org>,
  Brendan Jackman <jackmanb@google.com>, Christoph Lameter <cl@gentwo.org>,
  Dennis Zhou <dennis@kernel.org>, Dmitry Vyukov <dvyukov@google.com>,
@@ -118,8 +119,9 @@ Cc: linux-kernel@vger.kernel.org, Alexandru Elisei
  virtualization@lists.linux.dev, Vlastimil Babka <vbabka@suse.cz>,
  wireguard@lists.zx2c4.com, x86@kernel.org, Zi Yan <ziy@nvidia.com>
 References: <20250827220141.262669-1-david@redhat.com>
- <20250827220141.262669-22-david@redhat.com>
- <b772a0c0-6e09-4fa4-a113-fe5adf9c7fe0@lucifer.local>
+ <20250827220141.262669-25-david@redhat.com>
+ <7612fdc2-97ff-4b89-a532-90c5de56acdc@lucifer.local>
+ <423566a0-5967-488d-a62a-4f825ae6f227@kernel.org>
 From: David Hildenbrand <david@redhat.com>
 Content-Language: en-US
 Autocrypt: addr=david@redhat.com; keydata=
@@ -166,284 +168,32 @@ Autocrypt: addr=david@redhat.com; keydata=
  3iyY2Nsd7JxfKu1PRhCGwXzRw5TlfEsoRI7V9A8isUCoqE2Dzh3FvYHVeX4Us+bRL/oqareJ
  CIFqgYMyvHj7Q06kTKmauOe4Nf0l0qEkIuIzfoLJ3qr5UyXc2hLtWyT9Ir+lYlX9efqh7mOY
  qIws/H2t
-In-Reply-To: <b772a0c0-6e09-4fa4-a113-fe5adf9c7fe0@lucifer.local>
+In-Reply-To: <423566a0-5967-488d-a62a-4f825ae6f227@kernel.org>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 
-On 28.08.25 19:28, Lorenzo Stoakes wrote:
-> On Thu, Aug 28, 2025 at 12:01:25AM +0200, David Hildenbrand wrote:
->> Let's disallow handing out PFN ranges with non-contiguous pages, so we
->> can remove the nth-page usage in __cma_alloc(), and so any callers don't
->> have to worry about that either when wanting to blindly iterate pages.
+On 29.08.25 02:22, Damien Le Moal wrote:
+> On 8/29/25 2:53 AM, Lorenzo Stoakes wrote:
+>> On Thu, Aug 28, 2025 at 12:01:28AM +0200, David Hildenbrand wrote:
+>>> It's no longer required to use nth_page() when iterating pages within a
+>>> single SG entry, so let's drop the nth_page() usage.
+>>>
+>>> Cc: Damien Le Moal <dlemoal@kernel.org>
+>>> Cc: Niklas Cassel <cassel@kernel.org>
+>>> Signed-off-by: David Hildenbrand <david@redhat.com>
 >>
->> This is really only a problem in configs with SPARSEMEM but without
->> SPARSEMEM_VMEMMAP, and only when we would cross memory sections in some
->> cases.
-> 
-> I'm guessing this is something that we don't need to worry about in
-> reality?
-
-That my theory yes.
-
-> 
+>> LGTM, so:
 >>
->> Will this cause harm? Probably not, because it's mostly 32bit that does
->> not support SPARSEMEM_VMEMMAP. If this ever becomes a problem we could
->> look into allocating the memmap for the memory sections spanned by a
->> single CMA region in one go from memblock.
->>
->> Reviewed-by: Alexandru Elisei <alexandru.elisei@arm.com>
->> Signed-off-by: David Hildenbrand <david@redhat.com>
+>> Reviewed-by: Lorenzo Stoakes <lorenzo.stoakes@oracle.com>
 > 
-> LGTM other than refactoring point below.
+> Just noticed this:
 > 
-> CMA stuff looks fine afaict after staring at it for a while, on proviso
-> that handing out ranges within the same section is always going to be the
-> case.
+> s/libata-eh/libata-sff
 > 
-> Anyway overall,
-> 
-> LGTM, so:
-> 
-> Reviewed-by: Lorenzo Stoakes <lorenzo.stoakes@oracle.com>
-> 
-> 
->> ---
->>   include/linux/mm.h |  6 ++++++
->>   mm/cma.c           | 39 ++++++++++++++++++++++++---------------
->>   mm/util.c          | 33 +++++++++++++++++++++++++++++++++
->>   3 files changed, 63 insertions(+), 15 deletions(-)
->>
->> diff --git a/include/linux/mm.h b/include/linux/mm.h
->> index f6880e3225c5c..2ca1eb2db63ec 100644
->> --- a/include/linux/mm.h
->> +++ b/include/linux/mm.h
->> @@ -209,9 +209,15 @@ extern unsigned long sysctl_user_reserve_kbytes;
->>   extern unsigned long sysctl_admin_reserve_kbytes;
->>
->>   #if defined(CONFIG_SPARSEMEM) && !defined(CONFIG_SPARSEMEM_VMEMMAP)
->> +bool page_range_contiguous(const struct page *page, unsigned long nr_pages);
->>   #define nth_page(page,n) pfn_to_page(page_to_pfn((page)) + (n))
->>   #else
->>   #define nth_page(page,n) ((page) + (n))
->> +static inline bool page_range_contiguous(const struct page *page,
->> +		unsigned long nr_pages)
->> +{
->> +	return true;
->> +}
->>   #endif
->>
->>   /* to align the pointer to the (next) page boundary */
->> diff --git a/mm/cma.c b/mm/cma.c
->> index e56ec64d0567e..813e6dc7b0954 100644
->> --- a/mm/cma.c
->> +++ b/mm/cma.c
->> @@ -780,10 +780,8 @@ static int cma_range_alloc(struct cma *cma, struct cma_memrange *cmr,
->>   				unsigned long count, unsigned int align,
->>   				struct page **pagep, gfp_t gfp)
->>   {
->> -	unsigned long mask, offset;
->> -	unsigned long pfn = -1;
->> -	unsigned long start = 0;
->>   	unsigned long bitmap_maxno, bitmap_no, bitmap_count;
->> +	unsigned long start, pfn, mask, offset;
->>   	int ret = -EBUSY;
->>   	struct page *page = NULL;
->>
->> @@ -795,7 +793,7 @@ static int cma_range_alloc(struct cma *cma, struct cma_memrange *cmr,
->>   	if (bitmap_count > bitmap_maxno)
->>   		goto out;
->>
->> -	for (;;) {
->> +	for (start = 0; ; start = bitmap_no + mask + 1) {
->>   		spin_lock_irq(&cma->lock);
->>   		/*
->>   		 * If the request is larger than the available number
->> @@ -812,6 +810,22 @@ static int cma_range_alloc(struct cma *cma, struct cma_memrange *cmr,
->>   			spin_unlock_irq(&cma->lock);
->>   			break;
->>   		}
->> +
->> +		pfn = cmr->base_pfn + (bitmap_no << cma->order_per_bit);
->> +		page = pfn_to_page(pfn);
->> +
->> +		/*
->> +		 * Do not hand out page ranges that are not contiguous, so
->> +		 * callers can just iterate the pages without having to worry
->> +		 * about these corner cases.
->> +		 */
->> +		if (!page_range_contiguous(page, count)) {
->> +			spin_unlock_irq(&cma->lock);
->> +			pr_warn_ratelimited("%s: %s: skipping incompatible area [0x%lx-0x%lx]",
->> +					    __func__, cma->name, pfn, pfn + count - 1);
->> +			continue;
->> +		}
->> +
->>   		bitmap_set(cmr->bitmap, bitmap_no, bitmap_count);
->>   		cma->available_count -= count;
->>   		/*
->> @@ -821,29 +835,24 @@ static int cma_range_alloc(struct cma *cma, struct cma_memrange *cmr,
->>   		 */
->>   		spin_unlock_irq(&cma->lock);
->>
->> -		pfn = cmr->base_pfn + (bitmap_no << cma->order_per_bit);
->>   		mutex_lock(&cma->alloc_mutex);
->>   		ret = alloc_contig_range(pfn, pfn + count, ACR_FLAGS_CMA, gfp);
->>   		mutex_unlock(&cma->alloc_mutex);
->> -		if (ret == 0) {
->> -			page = pfn_to_page(pfn);
->> +		if (!ret)
->>   			break;
->> -		}
->>
->>   		cma_clear_bitmap(cma, cmr, pfn, count);
->>   		if (ret != -EBUSY)
->>   			break;
->>
->>   		pr_debug("%s(): memory range at pfn 0x%lx %p is busy, retrying\n",
->> -			 __func__, pfn, pfn_to_page(pfn));
->> +			 __func__, pfn, page);
->>
->> -		trace_cma_alloc_busy_retry(cma->name, pfn, pfn_to_page(pfn),
->> -					   count, align);
->> -		/* try again with a bit different memory target */
->> -		start = bitmap_no + mask + 1;
->> +		trace_cma_alloc_busy_retry(cma->name, pfn, page, count, align);
->>   	}
->>   out:
->> -	*pagep = page;
->> +	if (!ret)
->> +		*pagep = page;
->>   	return ret;
->>   }
->>
->> @@ -882,7 +891,7 @@ static struct page *__cma_alloc(struct cma *cma, unsigned long count,
->>   	 */
->>   	if (page) {
->>   		for (i = 0; i < count; i++)
->> -			page_kasan_tag_reset(nth_page(page, i));
->> +			page_kasan_tag_reset(page + i);
->>   	}
->>
->>   	if (ret && !(gfp & __GFP_NOWARN)) {
->> diff --git a/mm/util.c b/mm/util.c
->> index d235b74f7aff7..0bf349b19b652 100644
->> --- a/mm/util.c
->> +++ b/mm/util.c
->> @@ -1280,4 +1280,37 @@ unsigned int folio_pte_batch(struct folio *folio, pte_t *ptep, pte_t pte,
->>   {
->>   	return folio_pte_batch_flags(folio, NULL, ptep, &pte, max_nr, 0);
->>   }
->> +
->> +#if defined(CONFIG_SPARSEMEM) && !defined(CONFIG_SPARSEMEM_VMEMMAP)
->> +/**
->> + * page_range_contiguous - test whether the page range is contiguous
->> + * @page: the start of the page range.
->> + * @nr_pages: the number of pages in the range.
->> + *
->> + * Test whether the page range is contiguous, such that they can be iterated
->> + * naively, corresponding to iterating a contiguous PFN range.
->> + *
->> + * This function should primarily only be used for debug checks, or when
->> + * working with page ranges that are not naturally contiguous (e.g., pages
->> + * within a folio are).
->> + *
->> + * Returns true if contiguous, otherwise false.
->> + */
->> +bool page_range_contiguous(const struct page *page, unsigned long nr_pages)
->> +{
->> +	const unsigned long start_pfn = page_to_pfn(page);
->> +	const unsigned long end_pfn = start_pfn + nr_pages;
->> +	unsigned long pfn;
->> +
->> +	/*
->> +	 * The memmap is allocated per memory section. We need to check
->> +	 * each involved memory section once.
->> +	 */
->> +	for (pfn = ALIGN(start_pfn, PAGES_PER_SECTION);
->> +	     pfn < end_pfn; pfn += PAGES_PER_SECTION)
->> +		if (unlikely(page + (pfn - start_pfn) != pfn_to_page(pfn)))
->> +			return false;
-> 
-> I find this pretty confusing, my test for this is how many times I have to read
-> the code to understand what it's doing :)
-> 
-> So we have something like:
-> 
->    (pfn of page)
->     start_pfn        pfn = align UP
->          |                 |
->          v                 v
->   |         section        |
->          <----------------->
->            pfn - start_pfn
-> 
-> Then check page + (pfn - start_pfn) == pfn_to_page(pfn)
-> 
-> And loop such that:
-> 
->    (pfn of page)
->     start_pfn                                      pfn
->          |                                          |
->          v                                          v
->   |         section        |         section        |
->          <------------------------------------------>
->                          pfn - start_pfn
-> 
-> Again check page + (pfn - start_pfn) == pfn_to_page(pfn)
-> 
-> And so on.
-> 
-> So the logic looks good, but it's just... that took me a hot second to
-> parse :)
-> 
-> I think a few simple fixups
-> 
-> bool page_range_contiguous(const struct page *page, unsigned long nr_pages)
-> {
-> 	const unsigned long start_pfn = page_to_pfn(page);
-> 	const unsigned long end_pfn = start_pfn + nr_pages;
-> 	/* The PFN of the start of the next section. */
-> 	unsigned long pfn = ALIGN(start_pfn, PAGES_PER_SECTION);
-> 	/* The page we'd expected to see if the range were contiguous. */
-> 	struct page *expected = page + (pfn - start_pfn);
-> 
-> 	/*
-> 	 * The memmap is allocated per memory section. We need to check
-> 	 * each involved memory section once.
-> 	 */
-> 	for (; pfn < end_pfn; pfn += PAGES_PER_SECTION, expected += PAGES_PER_SECTION)
-> 		if (unlikely(expected != pfn_to_page(pfn)))
-> 			return false;
-> 	return true;
-> }
+> in the commit title please.
 > 
 
-Hm, I prefer my variant, especially where the pfn is calculated in the for loop. Likely a
-matter of personal taste.
-
-But I can see why skipping the first section might be a surprise when not
-having the semantics of ALIGN() in the cache.
-
-So I'll add the following on top:
-
-diff --git a/mm/util.c b/mm/util.c
-index 0bf349b19b652..fbdb73aaf35fe 100644
---- a/mm/util.c
-+++ b/mm/util.c
-@@ -1303,8 +1303,10 @@ bool page_range_contiguous(const struct page *page, unsigned long nr_pages)
-         unsigned long pfn;
-  
-         /*
--        * The memmap is allocated per memory section. We need to check
--        * each involved memory section once.
-+        * The memmap is allocated per memory section, so no need to check
-+        * within the first section. However, we need to check each other
-+        * spanned memory section once, making sure the first page in a
-+        * section could similarly be reached by just iterating pages.
-          */
-         for (pfn = ALIGN(start_pfn, PAGES_PER_SECTION);
-              pfn < end_pfn; pfn += PAGES_PER_SECTION)
+Sure, I think some quick git-log search mislead me.
 
 Thanks!
 
