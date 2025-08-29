@@ -1,118 +1,145 @@
-Return-Path: <kvm+bounces-56368-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-56369-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 158B4B3C3DB
-	for <lists+kvm@lfdr.de>; Fri, 29 Aug 2025 22:38:25 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4542FB3C3E6
+	for <lists+kvm@lfdr.de>; Fri, 29 Aug 2025 22:47:37 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3ECC6175329
-	for <lists+kvm@lfdr.de>; Fri, 29 Aug 2025 20:38:23 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 9229E188C522
+	for <lists+kvm@lfdr.de>; Fri, 29 Aug 2025 20:47:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 17399345740;
-	Fri, 29 Aug 2025 20:38:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CC35B3469EE;
+	Fri, 29 Aug 2025 20:47:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="M9xPX+it"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="ToTXahfk"
 X-Original-To: kvm@vger.kernel.org
 Received: from mail-pj1-f74.google.com (mail-pj1-f74.google.com [209.85.216.74])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C0499343D7E
-	for <kvm@vger.kernel.org>; Fri, 29 Aug 2025 20:38:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 98FBA19D07A
+	for <kvm@vger.kernel.org>; Fri, 29 Aug 2025 20:47:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.74
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756499895; cv=none; b=dAw2A71/wPUlHb7afOgkZ3klOcVjEuSN0xXCwMgTndqhsQxMA6SJ3tR/zkYHeLCN6x1aKUrruo6alfSuGvAc+jd371jjv/2sD/4fZ78f5sXJwmttu0c2g94C3glgQ4q7JDN6My4pP0GSb2npaeaSnGrtfDIu1PsEemvpI5PCrrM=
+	t=1756500449; cv=none; b=kuho8r0JKytQi4CQjUKzQwsz0NCDN5cAzBnKZO3eDhgPxODp82hB7fWrcBIURZUb22lRbHpWMdiB182W3Vwjf3+eS2yEUHse/sVGx5TdbAx9nCxt6CnLkI4rUcDie3Gg3wlWj6meGgLAKVUcKApXZNg8c9vYvTL8rbCOzS304qk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756499895; c=relaxed/simple;
-	bh=TdNF0rfgV0VHRMX8IeG8YvWVl2OWePe9R39tCBmM5oQ=;
+	s=arc-20240116; t=1756500449; c=relaxed/simple;
+	bh=9/wSQP4TwiwA28VHXselfVMpk5vyfA21xkhCwpAOusE=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=cwLr3EueDK8ktDS066oj+ETs5sP6aOyYN7Y+aU/+7RDVBI+NsF2tlQmp44tlU9tk83X6wHDZ8EduBp6qLYBCBHmT3EzYbFiwygb3G6d2nxlZRHh5i0S+UQGBp9E0BcGO85pfAhrDYJx+FiFVNh008g1GX+5mEEUI6oez2TSvFJ4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=M9xPX+it; arc=none smtp.client-ip=209.85.216.74
+	 To:Cc:Content-Type; b=o6ycT2lEMCkDsQ8ZbKKK8SL6g3K9YkcHszJDdfXbxFstV20jtehq40VYIpwHdKeX0TiKGoNKSv1TzvHdAmCAbnzFR/mnrko3hRYeTX6AS5L96DN64/ZEwAZNslGPsbsGqjTJRbccPgpfmdoS8q0w1nZ0UjXFAC4l7vv5i7b6t6E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=ToTXahfk; arc=none smtp.client-ip=209.85.216.74
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pj1-f74.google.com with SMTP id 98e67ed59e1d1-324e41e946eso4337674a91.0
-        for <kvm@vger.kernel.org>; Fri, 29 Aug 2025 13:38:13 -0700 (PDT)
+Received: by mail-pj1-f74.google.com with SMTP id 98e67ed59e1d1-3235e45b815so2945190a91.0
+        for <kvm@vger.kernel.org>; Fri, 29 Aug 2025 13:47:27 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1756499893; x=1757104693; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1756500447; x=1757105247; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=Qd39rUGECk+rHT5205Jy1pAxAHPTjmOemrBZEd3ePt4=;
-        b=M9xPX+itjAX4pcjD1NhjP3RlSRpLs5F3945x47soaDOJe2Y6BFfNufZr0xNwPVV4eN
-         cGrRsJOT/nTHF44By61fVAg2+e1/3i8N6S39M+qY1dHalhxWa1CoczUfHa6vswkVTvOf
-         /uhUSnOvQfcYmvux5LDOtn8FBr9rMz1xjLbh7YzCvhuoMjJUJGt3+Xin7x83yFJyQSL3
-         ELXyS+jkTxHizH7KPixgm0WxMOIjZ/YMi5dM3gZTTzJ5AmfBNYLAlC6FHSfcElhANQUV
-         dP3k6NkVetxwKogHlzpR29NnSaPUZu4MFnwrOxNvi2Jd62JrCyz6+WJ2Y6t/T+sfrf48
-         bnkQ==
+        bh=AVbLrwfcaMKrZbEzaIUXHMFK+4ezBC1s3sCq6svjQiA=;
+        b=ToTXahfkCYPpuJQrCIJeiRR5rqJCIKh6WcDOebynZAu/Q0ehA7GR0Bznd2eRotavRe
+         AbLqSnKkMd0N3juuERwUg2VP5bdIAuckkWMHjkxgoEfyJL2Hrnx9gcVfEmidVcF7upx6
+         tFqJXbJ66veK7tk/GGy6w07rO6H0F8jlzpmKqG/Gl5slyefwPKAr4GN2HDndlrASvddd
+         XN0HkOUmj8z0DWMuiKXzFwfmLBUkqrO7NraAqPEA/yuzAf5y4REJVs7Z3hn+1ho9ACFR
+         NbbTb+dv2O5+xnF87FNxyvvHrYwn76gsV4OK2rH/QyloI2g4Yv+/abyzl6bbZwYj3syp
+         X0Dw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1756499893; x=1757104693;
+        d=1e100.net; s=20230601; t=1756500447; x=1757105247;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=Qd39rUGECk+rHT5205Jy1pAxAHPTjmOemrBZEd3ePt4=;
-        b=L8YCFGWA25xbKfEChyqMro4l23+XiBtquwLCtpSE6FkUw+yOPNjhkgZWf3KMYrkd9g
-         Pd8KmFci+5JK+1CJ2GrRwCMVuAhVrp7NT2ESX8mHiExEOirpBoA+3xT3SnMGfFx8GAnD
-         /gJsjp6YC0CSo6xPlXkK+8Na2/uufNX2uPWXlwQL2r0kNsKkFI6K1Dx508zxxgO9DHlu
-         a+W1FjvuqRHN7Pw1DadbhER8k209aJKGl/h/AXPBtkODxj7C3rMCpJBCFbOsURqCiUSH
-         JtB3ECOumzSqd4vBX8ubfjA687hfzKPePfkHA2x5CIKuf5tmqw5t8aol6xafSVfRzTG1
-         ro+w==
-X-Forwarded-Encrypted: i=1; AJvYcCWNyV4mFCVAgkb7aV68UODu/8/wQDE+jI8LRPUCSYwvrB6jFIv8R+cL8WyUtIyC+7glk0Q=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxIFIG9V22u4Jvk6/tDjQZj/felFTC8KAEumB+sgvfsfn4MFEby
-	cr2FT2q12KmQ1QAE1XrJtroJStUQ5e3g5PBSJbquhBFOaSq6ngqYVdt6a/U51loZb+i+nvmHovP
-	fnxsQ0g==
-X-Google-Smtp-Source: AGHT+IGbRKcpJtJXxkGfMF7qVHfw+rJ15N7Av9i4B9mmR8F5Rd6/k2vtLv3vdjeoQhg79ZK6pefzoikNRho=
-X-Received: from pjbpm11.prod.google.com ([2002:a17:90b:3c4b:b0:327:7035:d848])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:4cc6:b0:327:96dd:6294
- with SMTP id 98e67ed59e1d1-32796dd6549mr14897061a91.37.1756499893148; Fri, 29
- Aug 2025 13:38:13 -0700 (PDT)
-Date: Fri, 29 Aug 2025 13:38:11 -0700
-In-Reply-To: <20250829142556.72577-6-aqibaf@amazon.com>
+        bh=AVbLrwfcaMKrZbEzaIUXHMFK+4ezBC1s3sCq6svjQiA=;
+        b=MR8WNUlDD1sSUhULsTeEhbw7f833fN+5sTGXuAOpwHXjBvhXHSNS3etYDLl1WlEIcU
+         QETBcqyLnF8seM8lNzRA7RzMqGSm0rFIa9naYfFEldG6LTQL5Mb4+bHWdTdBrJ4rfNWL
+         wtQIKvLpCzeE4pE+8bf5+qEcXadOOCK6YBtFxF9mY8YeXu6/q98+V0FX1O9bbTA+hbtD
+         4AO1SRBGY2FnsoaBlpsGF1dMYA1Dv+2X6E7Gae/JuhDitZ3UcR1qSA/mkpzkLxT694bK
+         /6ITPOltKFg4VHNrQOntqXPoOGekW6ZC/g4nqWswEMAjjCRPMGIF4bDkMXHP4IPjxtZw
+         7sAw==
+X-Forwarded-Encrypted: i=1; AJvYcCWF8IkGqHMZfigecWeF9+GmrMP+w08mC+cSijsKkfRQZAdjabUDnwXd1RqYHJ6IsYqnKrk=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yxnxy6uFhrt4ol1Wy36sPt0/CxN4MNQaUdm2wRcHr1uhFEuXtPS
+	i7QQ2YHMwaUn9XZACWv5xganZH8DjUN93hiPAkgbEn4dlf3AKETs602qLri6zWqAQdI3ZROZfyM
+	QF8m8DQ==
+X-Google-Smtp-Source: AGHT+IEEqHXHhC1dOfepFQ4McJBotwArzkUulxIcLhYJ/fKtpfgV5WqeosCA+M558p3CNkr7r/wGr0do/qg=
+X-Received: from pjbli2.prod.google.com ([2002:a17:90b:48c2:b0:31f:2a78:943])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:3889:b0:327:b30d:9b7f
+ with SMTP id 98e67ed59e1d1-327b30d9cdbmr12852743a91.12.1756500446915; Fri, 29
+ Aug 2025 13:47:26 -0700 (PDT)
+Date: Fri, 29 Aug 2025 13:47:25 -0700
+In-Reply-To: <20250829-pmu_event_info-v5-6-9dca26139a33@rivosinc.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
-References: <20250829142556.72577-1-aqibaf@amazon.com> <20250829142556.72577-6-aqibaf@amazon.com>
-Message-ID: <aLIPs7eqA_i75Bgy@google.com>
-Subject: Re: [PATCH 5/9] KVM: selftests: Prevent PAGE_SIZE redefinition on x86
+References: <20250829-pmu_event_info-v5-0-9dca26139a33@rivosinc.com> <20250829-pmu_event_info-v5-6-9dca26139a33@rivosinc.com>
+Message-ID: <aLIR3deQPxVI2VrE@google.com>
+Subject: Re: [PATCH v5 6/9] KVM: Add a helper function to check if a gpa is in
+ writable memselot
 From: Sean Christopherson <seanjc@google.com>
-To: Aqib Faruqui <aqibaf@amazon.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, Shuah Khan <shuah@kernel.org>, kvm@vger.kernel.org, 
-	linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	nh-open-source@amazon.com
+To: Atish Patra <atishp@rivosinc.com>
+Cc: Anup Patel <anup@brainfault.org>, Will Deacon <will@kernel.org>, 
+	Mark Rutland <mark.rutland@arm.com>, Paul Walmsley <paul.walmsley@sifive.com>, 
+	Palmer Dabbelt <palmer@dabbelt.com>, Mayuresh Chitale <mchitale@ventanamicro.com>, 
+	linux-riscv@lists.infradead.org, linux-arm-kernel@lists.infradead.org, 
+	linux-kernel@vger.kernel.org, kvm@vger.kernel.org, 
+	kvm-riscv@lists.infradead.org
 Content-Type: text/plain; charset="us-ascii"
 
-On Fri, Aug 29, 2025, Aqib Faruqui wrote:
-> Prevent PAGE_SIZE redefinition warnings that can occur due to namespace
-> pollution from included headers.
+On Fri, Aug 29, 2025, Atish Patra wrote:
+> The arch specific code may need to know if a particular gpa is valid and
+> writable for the shared memory between the host and the guest. Currently,
+> there are few places where it is used in RISC-V implementation. Given the
+> nature of the function it may be used for other architectures.
+> Hence, a common helper function is added.
 > 
-> Add an #ifndef directive before defining PAGE_SIZE to avoid redefinition
-> conflicts.
-
-Please provide more details on what is causing the conflicts.  Blindly using a
-PAGE_SIZE without _knowing_ it's aligned with PAGE_SHIFT and PHYSICAL_PAGE_MASK
-is far from ideal.
-
-> Signed-off-by: Aqib Faruqui <aqibaf@amazon.com>
+> Suggested-by: Sean Christopherson <seanjc@google.com>
+> Signed-off-by: Atish Patra <atishp@rivosinc.com>
 > ---
->  tools/testing/selftests/kvm/include/x86/processor.h | 2 ++
->  1 file changed, 2 insertions(+)
+>  include/linux/kvm_host.h | 8 ++++++++
+>  1 file changed, 8 insertions(+)
 > 
-> diff --git a/tools/testing/selftests/kvm/include/x86/processor.h b/tools/testing/selftests/kvm/include/x86/processor.h
-> index 2efb05c2f..3f93d1b4f 100644
-> --- a/tools/testing/selftests/kvm/include/x86/processor.h
-> +++ b/tools/testing/selftests/kvm/include/x86/processor.h
-> @@ -368,7 +368,9 @@ static inline unsigned int x86_model(unsigned int eax)
->  #define PHYSICAL_PAGE_MASK      GENMASK_ULL(51, 12)
+> diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
+> index 15656b7fba6c..eec5cbbcb4b3 100644
+> --- a/include/linux/kvm_host.h
+> +++ b/include/linux/kvm_host.h
+> @@ -1892,6 +1892,14 @@ static inline bool kvm_is_gpa_in_memslot(struct kvm *kvm, gpa_t gpa)
+>  	return !kvm_is_error_hva(hva);
+>  }
 >  
->  #define PAGE_SHIFT		12
-> +#ifndef PAGE_SIZE
->  #define PAGE_SIZE		(1ULL << PAGE_SHIFT)
-> +#endif
->  #define PAGE_MASK		(~(PAGE_SIZE-1) & PHYSICAL_PAGE_MASK)
->  
->  #define HUGEPAGE_SHIFT(x)	(PAGE_SHIFT + (((x) - 1) * 9))
-> -- 
-> 2.47.3
-> 
+> +static inline bool kvm_is_gpa_in_writable_memslot(struct kvm *kvm, gpa_t gpa)
+> +{
+> +	bool writable;
+> +	unsigned long hva = gfn_to_hva_prot(kvm, gpa_to_gfn(gpa), &writable);
+> +
+> +	return !kvm_is_error_hva(hva) && writable;
+
+I don't hate this API, but I don't love it either.  Because knowing that the
+_memslot_ is writable doesn't mean all that much.  E.g. in this usage:
+
+	hva = kvm_vcpu_gfn_to_hva_prot(vcpu, shmem >> PAGE_SHIFT, &writable);
+	if (kvm_is_error_hva(hva) || !writable)
+		return SBI_ERR_INVALID_ADDRESS;
+
+	ret = kvm_vcpu_write_guest(vcpu, shmem, &zero_sta, sizeof(zero_sta));
+	if (ret)
+		return SBI_ERR_FAILURE;
+
+the error code returned to the guest will be different if the memslot is read-only
+versus if the VMA is read-only (or not even mapped!).  Unless every read-only
+memslot is explicitly communicated as such to the guest, I don't see how the guest
+can *know* that a memslot is read-only, so returning INVALID_ADDRESS in that case
+but not when the underlying VMA isn't writable seems odd.
+
+It's also entirely possible the memslot could be replaced with a read-only memslot
+after the check, or vice versa, i.e. become writable after being rejected.  Is it
+*really* a problem to return FAILURE if the guest attempts to setup steal-time in
+a read-only memslot?  I.e. why not do this and call it good?
+
+	if (!kvm_is_gpa_in_memslot(vcpu->kvm, shmem >> PAGE_SHIFT))
+		return SBI_ERR_INVALID_ADDRESS;
+
+	ret = kvm_vcpu_write_guest(vcpu, shmem, &zero_sta, sizeof(zero_sta));
+	if (ret)
+		return SBI_ERR_FAILURE;
 
