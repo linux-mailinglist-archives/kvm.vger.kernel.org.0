@@ -1,275 +1,236 @@
-Return-Path: <kvm+bounces-56235-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-56236-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4991FB3B003
-	for <lists+kvm@lfdr.de>; Fri, 29 Aug 2025 02:46:08 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id C36C5B3B045
+	for <lists+kvm@lfdr.de>; Fri, 29 Aug 2025 03:09:58 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 1F4907BD266
-	for <lists+kvm@lfdr.de>; Fri, 29 Aug 2025 00:44:09 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3D95E3A1395
+	for <lists+kvm@lfdr.de>; Fri, 29 Aug 2025 01:09:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6907F18BC3B;
-	Fri, 29 Aug 2025 00:44:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="GpxgOiyd"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 90B8D1E3769;
+	Fri, 29 Aug 2025 01:09:44 +0000 (UTC)
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.16])
+Received: from mailgw.kylinos.cn (mailgw.kylinos.cn [124.126.103.232])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3F7A61891A9;
-	Fri, 29 Aug 2025 00:44:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=198.175.65.16
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756428261; cv=fail; b=BCzUtqTlsFHpp+1PbEDq7zVtP3JGO4ogDTsnKQof50+lh0mzPwAqx4r0nZ8vix/qHAT5o4kpzq0udywnk2g67bfJL1fUgGqUliem3JRgKtxjC6NS/C5TqnIFis06D5u0Pmx277A4SJu+TuBc5JM2FxSvfyXOrm7NrI8vW0hSmNk=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756428261; c=relaxed/simple;
-	bh=9GOZQlsbGXkARVECj1SA3vlJHdKuHL6JyiVrLmGQVkI=;
-	h=Date:From:To:CC:Subject:Message-ID:References:Content-Type:
-	 Content-Disposition:In-Reply-To:MIME-Version; b=o56Ze3Ge2p3w7NxHdMgVYO7MT4jQkkLPFCdk+JobUh/XvyeOgQW5IL6i/4GMdYAavgVUXBT8BxJI2Smv2fnyIB5X8pKhgsoarH2P5b/I0OyaqH8xcheFK4luUpNXcherHka+k0ZnYzfR7qhz506mSb9ZeNdlsHYT6EIzsOPd+aU=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=GpxgOiyd; arc=fail smtp.client-ip=198.175.65.16
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1756428259; x=1787964259;
-  h=date:from:to:cc:subject:message-id:references:
-   in-reply-to:mime-version;
-  bh=9GOZQlsbGXkARVECj1SA3vlJHdKuHL6JyiVrLmGQVkI=;
-  b=GpxgOiydJ9yWykapwpjewubIG+oeHJQSoH2Zhi8VTcKZPL2x57G6XEjM
-   d45YynWxT0j11zoxTPLORHpQ9dCBlUJfWyyLuAnfgaZ82VIxtutYMOXpE
-   JUfl3D7fKHmBMoCLPI4a3XXFJ3utNB+JJ/5nHF0wyxswgzBhf34KsTYbj
-   0elcIxMx5vH8wePIlg95O8wlmdlhDI6BaGNN/d9TOGjV7a2AzkcOl7X13
-   qts8v/CWNBhYawwgXJLMnDW72d5Au6GyEZ5pLOjdozuxsuA9sKa4DGkJt
-   xuM0s+iA3A55oHGslfFN8/r2LCdHl5iDC9mmM8XUT11x0eLdxCE7zkfq1
-   w==;
-X-CSE-ConnectionGUID: eUYecKUyTUSn2v86avVdVQ==
-X-CSE-MsgGUID: WENxXUHzShizwWPT/TWImA==
-X-IronPort-AV: E=McAfee;i="6800,10657,11536"; a="58859147"
-X-IronPort-AV: E=Sophos;i="6.18,221,1751266800"; 
-   d="scan'208";a="58859147"
-Received: from orviesa010.jf.intel.com ([10.64.159.150])
-  by orvoesa108.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 28 Aug 2025 17:44:18 -0700
-X-CSE-ConnectionGUID: mHtmJ8WGSxer0W3jkBBqMQ==
-X-CSE-MsgGUID: OSqHSRfgSdK6hihR9PXNSQ==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.18,221,1751266800"; 
-   d="scan'208";a="169548543"
-Received: from orsmsx903.amr.corp.intel.com ([10.22.229.25])
-  by orviesa010.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 28 Aug 2025 17:44:19 -0700
-Received: from ORSMSX901.amr.corp.intel.com (10.22.229.23) by
- ORSMSX903.amr.corp.intel.com (10.22.229.25) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.17; Thu, 28 Aug 2025 17:44:17 -0700
-Received: from ORSEDG901.ED.cps.intel.com (10.7.248.11) by
- ORSMSX901.amr.corp.intel.com (10.22.229.23) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.17 via Frontend Transport; Thu, 28 Aug 2025 17:44:17 -0700
-Received: from NAM11-CO1-obe.outbound.protection.outlook.com (40.107.220.61)
- by edgegateway.intel.com (134.134.137.111) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.17; Thu, 28 Aug 2025 17:44:17 -0700
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=mRJOND9zaFxW92RGk6XC8LtkEN0y0FSzi8VymoLXw8IJLbcv4CUjh6xQeun/XhSqgLFPpM0w4+uq7tj0ZFQouVSVuuR9LF0jcIz2q3cC4glR2T4+Y7d/r8g4lp09oNkvdKuwyfnYSE6rbozeX6gQSHbprJYMSzVQ1uzUAFDDwtPwNq3b0Ol7k4WkJ6FaZy3ZdRML/wSLn4jJHC7DyW5ajytEfgR4JZuBTjPVoGhx3Q5fIImHSUyD+IHtmGclh0CLA078TstLP81qg5l+oKmRygAXOvCL1VRse+Q2o5y0lNB3A9yck4VawgpYd4UFqlJ+xVNRBG7Xp8OryiwgmQ/Vmg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=gdPvS4Cd1Jisbm/yL7wZzJd4tuAO6yx98t1GwrAcY+M=;
- b=UXSdg1xgy0QN1UgXF2qF0Nky7KUVTcAraoF5Y8hY945EIO7UVRtTQVyQ2XtTGP+VHmb2k/s1huX4OKuQPtUp5IojlIfAT5TIp9hHCx80xBM0L+YBmDhpfEOkNaR+HdLn+gn+aFtwdw/myGZP4MOf1F2Wdi6NF+1TPH60XI70lCF0os+ge6Uh2YVMUoQAc/EAlfu2n/S+6Bozf1gIdDOeaD8LYLiexdZve80ogbcX6C3AYVxlWFtze59ATFqSWlts4go0aSdI8R8t5B8ErL1kJdzkvduaCbvDyyhhEGXOUy38ZfWaQWAAwzuhBSa3+ZdvChFlx/wzIYJBaYwVd2Ia9w==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-Received: from CH3PR11MB8660.namprd11.prod.outlook.com (2603:10b6:610:1ce::13)
- by SJ0PR11MB4832.namprd11.prod.outlook.com (2603:10b6:a03:2dd::12) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9073.16; Fri, 29 Aug
- 2025 00:44:06 +0000
-Received: from CH3PR11MB8660.namprd11.prod.outlook.com
- ([fe80::cfad:add4:daad:fb9b]) by CH3PR11MB8660.namprd11.prod.outlook.com
- ([fe80::cfad:add4:daad:fb9b%4]) with mapi id 15.20.9073.016; Fri, 29 Aug 2025
- 00:44:06 +0000
-Date: Fri, 29 Aug 2025 08:43:53 +0800
-From: Chao Gao <chao.gao@intel.com>
-To: Xiaoyao Li <xiaoyao.li@intel.com>
-CC: <kvm@vger.kernel.org>, <linux-kernel@vger.kernel.org>, <bp@alien8.de>,
-	<dave.hansen@linux.intel.com>, <hpa@zytor.com>, <john.allen@amd.com>,
-	<mingo@redhat.com>, <minipli@grsecurity.net>, <mlevitsk@redhat.com>,
-	<pbonzini@redhat.com>, <rick.p.edgecombe@intel.com>, <seanjc@google.com>,
-	<tglx@linutronix.de>, <weijiang.yang@intel.com>, <x86@kernel.org>,
-	<xin@zytor.com>
-Subject: Re: [PATCH v13 01/21] KVM: x86: Introduce KVM_{G,S}ET_ONE_REG uAPIs
- support
-Message-ID: <aLD3yS6LQR7b55CR@intel.com>
-References: <20250821133132.72322-1-chao.gao@intel.com>
- <20250821133132.72322-2-chao.gao@intel.com>
- <402d79e7-f229-4caa-8150-6061e363da4f@intel.com>
-Content-Type: text/plain; charset="us-ascii"
-Content-Disposition: inline
-In-Reply-To: <402d79e7-f229-4caa-8150-6061e363da4f@intel.com>
-X-ClientProxiedBy: SI2P153CA0035.APCP153.PROD.OUTLOOK.COM
- (2603:1096:4:190::14) To CH3PR11MB8660.namprd11.prod.outlook.com
- (2603:10b6:610:1ce::13)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 272BC288A2;
+	Fri, 29 Aug 2025 01:09:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=124.126.103.232
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1756429784; cv=none; b=nlKME0fI8BMF69DdbmRg5OPNpl+dLKyQjah/2s6Mlhrgzfn1VU8zmacbwrYUtYc79qvWzesV1ENGzEb7aOgiz5xEFtrYR2TPrXuSf9swUTvq4N5O4QOUx3BwiF/RAQvzoHMp+BR0GAil7sOQtlhmVnsiqUFc6WQoFPPJ9f9rLcM=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1756429784; c=relaxed/simple;
+	bh=m00FXfC5AvlmbqZAyUgp1KXeas5N5BfdbJdDwYWe0jw=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=TmTVn00/p3YVUhUG3LYV+ecr14xyLN7KwlPfc0XeaWhVW/HfDsByQ5akOR7b2BqTE3t82WN28Use98gvb3Domsh5Hr5VKYTe7fWIonz1thHxhEj/cSIitEyJsLjqScXbK6fHAbXp9AeJ7cslbh9EmY/vv+lEpb61nqIeQGlHMd8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kylinos.cn; spf=pass smtp.mailfrom=kylinos.cn; arc=none smtp.client-ip=124.126.103.232
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kylinos.cn
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kylinos.cn
+X-UUID: d15de1d6847411f0b29709d653e92f7d-20250829
+X-CID-P-RULE: Release_Ham
+X-CID-O-INFO: VERSION:1.1.45,REQID:8dbc4808-f76e-4028-b1fe-ddd256e8a420,IP:0,U
+	RL:0,TC:0,Content:0,EDM:0,RT:0,SF:0,FILE:0,BULK:0,RULE:Release_Ham,ACTION:
+	release,TS:0
+X-CID-META: VersionHash:6493067,CLOUDID:9ffa5254c19a668fe3315a601f1f36b0,BulkI
+	D:nil,BulkQuantity:0,Recheck:0,SF:80|81|82|83|102,TC:nil,Content:0|52,EDM:
+	-3,IP:nil,URL:0,File:nil,RT:nil,Bulk:nil,QS:nil,BEC:nil,COL:0,OSI:0,OSA:0,
+	AV:0,LES:1,SPR:NO,DKR:0,DKP:0,BRR:0,BRE:0,ARC:0
+X-CID-BVR: 0,NGT
+X-CID-BAS: 0,NGT,0,_
+X-CID-FACTOR: TF_CID_SPAM_SNR
+X-UUID: d15de1d6847411f0b29709d653e92f7d-20250829
+Received: from mail.kylinos.cn [(10.44.16.175)] by mailgw.kylinos.cn
+	(envelope-from <zhangzihuan@kylinos.cn>)
+	(Generic MTA)
+	with ESMTP id 299742101; Fri, 29 Aug 2025 09:09:31 +0800
+Received: from mail.kylinos.cn (localhost [127.0.0.1])
+	by mail.kylinos.cn (NSMail) with SMTP id F0024E008FA3;
+	Fri, 29 Aug 2025 09:09:30 +0800 (CST)
+X-ns-mid: postfix-68B0FDCA-85694742
+Received: from [172.25.120.24] (unknown [172.25.120.24])
+	by mail.kylinos.cn (NSMail) with ESMTPA id 37FF9E008FA2;
+	Fri, 29 Aug 2025 09:09:19 +0800 (CST)
+Message-ID: <6174bcc8-30f5-479b-bac6-f42eb1232b4d@kylinos.cn>
+Date: Fri, 29 Aug 2025 09:09:18 +0800
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: CH3PR11MB8660:EE_|SJ0PR11MB4832:EE_
-X-MS-Office365-Filtering-Correlation-Id: f810e272-e6be-4893-b1b1-08dde69528a4
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230040|366016|7416014|376014|1800799024;
-X-Microsoft-Antispam-Message-Info: =?us-ascii?Q?tpSvsFaBDLdM/CsGQqElHvHOHJl/xRHW1kFU7BSFfVB3CUFhPRiXrI+RWrY9?=
- =?us-ascii?Q?+SQwM1ohLYKeveqiNo8SjXz/8q5HI2NtNxBKQYVFC58dmCT5vO6avVKP2vjq?=
- =?us-ascii?Q?wkhcHFauM8ilZnoR8hN8coJaCo7YqKr81x/uCwTNTNy/s2Ge/hMpt6uE2Tvy?=
- =?us-ascii?Q?mhxlV4BYiiw4rkmN1N+jye1ZepyekYKfZQImha4F1HczQjg+6Jdobsfabz59?=
- =?us-ascii?Q?TmaPPnB4RtavLsJovBsPqJa+OqvRnDVYPg/yTb7iGJBym2/0uJOVnVyunyIo?=
- =?us-ascii?Q?VfU9Sw7xymKUNIwgoIWm8eRO9Nt1dh1FRd9yM0NC2RVkhtVI3BstSwuMOTKV?=
- =?us-ascii?Q?gCaboIuc232N6reVr992zMxqbW9FcMbuxYvE7f1T6SEKe8wdepSnkrxfKx24?=
- =?us-ascii?Q?nh8godzD2jIQevm5vTLnZrgGj70Odr8Vl4ZK1VG4yIFKgH0Qj+oDW4hEGyIJ?=
- =?us-ascii?Q?4HbBn0knCP0r3jNNTKKbWyF676Ac+nAHvojHZMafNNtcSvRi/W4aP1CVIe9p?=
- =?us-ascii?Q?zGVEAD5cPBzyjMlBuEzB82vK+FFyR+rvEMiK2r+n+tdbYkqRAaYCsyMYum9Z?=
- =?us-ascii?Q?Og6oLLUpVVqZ0X8/duYnVw3vY8eYkZqtZfmK+yQjY6MD02OI2u5UaDrqUGZU?=
- =?us-ascii?Q?YRoGBMt8FcGIoQeaVDnwcBLkJ5u5GSqe/Csd0ksiGGaXEc0hPX/cDpGi6NuX?=
- =?us-ascii?Q?rdoP8hA1r5Kx/89642DkuN8J/mDVM6koFvzkhu82aTTElQRvWeFpYaRZGzFF?=
- =?us-ascii?Q?qf8rVeADGzYn/Bw0FsX2AF4e93U9iKgIwWb35JOXBBxNi7WqB0Xqhk4J79G+?=
- =?us-ascii?Q?pDcmic6L9yCEMQJc9LMnrFEQxlDffzNB5yhhjV413yqheNfJccOyhGNFuS3X?=
- =?us-ascii?Q?QOWfn1Q/7adui9gQFgKNP1j6J9U5YCbkiYhVnLpM2QiD6MWFoxrIdg1a2UcS?=
- =?us-ascii?Q?Gf9oX6GWYaWT2ijKGydaoQPXShojG2jUxD7TqD1oBxnQpI0CWQfzQZqm3hkY?=
- =?us-ascii?Q?skG2KBgP+rzH2qLH4B6E8Cy16zNt71hYI15XAx2J8Pejtf2N1AYFUQ0XE8u6?=
- =?us-ascii?Q?tLf7CqN2oZoOdqB549yF/9Rtm8vjblsflEiUnSdh04ZIqP4sEW/2SFDM7TzP?=
- =?us-ascii?Q?/XuaZ5NN11izx+brD7Z5wiikNuXjQjcmEEQ8mEXTG0QXXh2z4N7T5ODR3gFY?=
- =?us-ascii?Q?w5SXwrYKTgqmN33FX6H6ns9mjIxm8OoVMcmjX9Y7FphofXzoGuVl/GVmr9XV?=
- =?us-ascii?Q?wQO+W6L4AMtY5mGydnuJkQ215CfK+ZNGhA1Cl6I+oI5tIKv5RA82bKOFG5WB?=
- =?us-ascii?Q?TYGH6npoLhl+lXwIk7itL/X769+B4At8w7AK+A9C2CMNTG2diiPkkjeOLc+5?=
- =?us-ascii?Q?vfONe1pw4IMxdLSUxhQBhN3Kbmrt2U/z10kAx5/ThShiChvKsyvKlN7ezExG?=
- =?us-ascii?Q?lliNYn/fVsY=3D?=
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CH3PR11MB8660.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(7416014)(376014)(1800799024);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?F+IsizAzt/Tg2UG0R46dYHMosx1I/wY8hTKcUKQ9nBJZP3qPqecb5pi5Ufmr?=
- =?us-ascii?Q?gfE4D3Kta84BF/cHDGu3HD2z0Bh8qyl5SjAek5lRfT6c8SZ+O5IXr+mUfCgA?=
- =?us-ascii?Q?/51qrFPa2t2W3RwcnAzELxyFBzTEbuc+vhMvZgCtCHVtnO5UofFH8eb0qUv0?=
- =?us-ascii?Q?UViYCAekDM1dIxGCGjFhan8jiEzXThtaHDGUKjGG8DdKV7CYU8qt4ki31gpa?=
- =?us-ascii?Q?YSmBulQVAu2jIRdnNTLMcobVdvtk+swA0Pbh0MMkV0F8qMsppDsaXIQn/HJX?=
- =?us-ascii?Q?KYNJfzH0CYtEJXoZL3ZhQsecnnXFU65r8NFgCs8RNIklERL7hC6DklJajnFN?=
- =?us-ascii?Q?OJ4M47OelgG9qj66SSdFYmwZq9lAYMM/qeF5ybeNM8w0B70+x5NubKIpaVyF?=
- =?us-ascii?Q?jO/OdWRetokzLLfya+r71fw1/2tkeWHeLzcLnEAfh/y9FDLBA8bpUUZYCCDW?=
- =?us-ascii?Q?T6RFvIoll6ax3DxLdKJHv07CEB50RVZEMFPeJM9auPLJlYNekfTObAM8heBw?=
- =?us-ascii?Q?ME2rKRGP9gcDm/Pan6TEjlZpRd6m0MlE2W8pFCADESYlmhr8jEJnDIkuIilz?=
- =?us-ascii?Q?TiuiuI/fSYSaKr3T7yGCtk46g9uYAU/P5WSnVdH76PuGSBvhtLBdHWgMSRYo?=
- =?us-ascii?Q?COlyLbJRgrzxYbKEOTRk8eNWr+CjGx0NQkc98NbipTENuxNXPWkwXHZbStz8?=
- =?us-ascii?Q?eMMR8aTn4G8TmxqtLWVgSvjYLZAfyM0beqFRWU981k6wO8mbSzX00IKJabvC?=
- =?us-ascii?Q?NMJUt6LigCIANZHG961LZyTpzzxHJpYWeiMyhobAhTV33T5eVHgqazLAK8Tk?=
- =?us-ascii?Q?qFIBYzGlI3VA8RrAXsteVktJUvLhRFCBoqHpydKhklnL2l6KqQYvVSIjNnwo?=
- =?us-ascii?Q?W0HpFbylrrbPk8EmUT5dN5qOonhpCQMxc3WukLWMFGjSj6tmEiXvDtr5rVR9?=
- =?us-ascii?Q?4lFQ/GpmuclnJZf5VyjFjc42U/JZPNiASO66H0gLdTucnr4JriuLAWHG88ko?=
- =?us-ascii?Q?jTc2vv2xSryf7E7hhzjyKyHuK1h3IypPtCeSnCig59TIIoFKYyutEmAU2s9F?=
- =?us-ascii?Q?ZmRwlp36bDiw7NHf763ARdNvu63jJ6kPbxfhIcnbK3Mo3LAFipkSkudfmbFe?=
- =?us-ascii?Q?G/hhvANqEc5AkU4SOZc2OBxV7h9xmSWwSEZTe792gukpeXhE/tHdRjLdywNY?=
- =?us-ascii?Q?Hv3t/LCipcfDvV0vFHmbz9KmGTV1dz2k8MxkaSsxAhRGs0gTcd8JvV1OFAdO?=
- =?us-ascii?Q?j4MRb7x/o3ghM2cIe1d9VNTMmN/MKj0JQS4y7YCShhpKCSXxPChqKjVOtk4o?=
- =?us-ascii?Q?n5Y203adx1ZH7X8AWT8lVP4/ELGwytxh+g1KuRBKw1WKXZ9MgK8va7apgfDD?=
- =?us-ascii?Q?/GaL8RXHkf0oWBfgFTTHkteE3dYY4qSnh5YMPvCmacOVPVfBHID5QpeXz+pe?=
- =?us-ascii?Q?Bhs+Xe7u4rrl0iKhrzpSymyTzvtvwOpV89IrKcEIRbKbSmhowztqKQagGNIW?=
- =?us-ascii?Q?Y9RGUJ6LBNcQ+8b0r4Yb/pJ3jlHhFSfgNW+ZnT+Sg/TByzNbqsCh+ePMhrPJ?=
- =?us-ascii?Q?xfxHbZIeUuFLQk4keRw/M4dQybjA1BcgCGTS4G0k?=
-X-MS-Exchange-CrossTenant-Network-Message-Id: f810e272-e6be-4893-b1b1-08dde69528a4
-X-MS-Exchange-CrossTenant-AuthSource: CH3PR11MB8660.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 29 Aug 2025 00:44:06.5338
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: 1AmCqwqZoVhgKC3k0TZ3SPGGHpchWV/Ay0dhda7dsmpeDt5vfpfeMtxM6yhvq6DtwmoxdtYng2sRhd/RxLUYgw==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SJ0PR11MB4832
-X-OriginatorOrg: intel.com
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v2 03/18] ACPI: processor: thermal: Use
+ __free(put_cpufreq_policy) for policy reference
+To: "Rafael J. Wysocki" <rafael@kernel.org>
+Cc: Viresh Kumar <viresh.kumar@linaro.org>,
+ Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>,
+ Sean Christopherson <seanjc@google.com>, Paolo Bonzini
+ <pbonzini@redhat.com>, Thomas Gleixner <tglx@linutronix.de>,
+ Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+ Dave Hansen <dave.hansen@linux.intel.com>, Markus Mayer
+ <mmayer@broadcom.com>, Florian Fainelli <florian.fainelli@broadcom.com>,
+ Srinivas Pandruvada <srinivas.pandruvada@linux.intel.com>,
+ Madhavan Srinivasan <maddy@linux.ibm.com>,
+ Michael Ellerman <mpe@ellerman.id.au>, Krzysztof Kozlowski
+ <krzk@kernel.org>, Alim Akhtar <alim.akhtar@samsung.com>,
+ Thierry Reding <thierry.reding@gmail.com>,
+ Jonathan Hunter <jonathanh@nvidia.com>,
+ MyungJoo Ham <myungjoo.ham@samsung.com>,
+ Kyungmin Park <kyungmin.park@samsung.com>,
+ Chanwoo Choi <cw00.choi@samsung.com>,
+ Jani Nikula <jani.nikula@linux.intel.com>,
+ Joonas Lahtinen <joonas.lahtinen@linux.intel.com>,
+ Rodrigo Vivi <rodrigo.vivi@intel.com>, Tvrtko Ursulin
+ <tursulin@ursulin.net>, David Airlie <airlied@gmail.com>,
+ Simona Vetter <simona@ffwll.ch>, Daniel Lezcano <daniel.lezcano@kernel.org>,
+ Sascha Hauer <s.hauer@pengutronix.de>, Shawn Guo <shawnguo@kernel.org>,
+ Eduardo Valentin <edubezval@gmail.com>, Keerthy <j-keerthy@ti.com>,
+ Matthias Brugger <matthias.bgg@gmail.com>,
+ AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
+ zhenglifeng <zhenglifeng1@huawei.com>, "H . Peter Anvin" <hpa@zytor.com>,
+ Zhang Rui <rui.zhang@intel.com>, Len Brown <lenb@kernel.org>,
+ Nicholas Piggin <npiggin@gmail.com>,
+ Christophe Leroy <christophe.leroy@csgroup.eu>,
+ Lukasz Luba <lukasz.luba@arm.com>,
+ Pengutronix Kernel Team <kernel@pengutronix.de>,
+ Beata Michalska <beata.michalska@arm.com>, Fabio Estevam
+ <festevam@gmail.com>, Pavel Machek <pavel@kernel.org>,
+ Sumit Gupta <sumitg@nvidia.com>,
+ Prasanna Kumar T S M <ptsm@linux.microsoft.com>,
+ Sudeep Holla <sudeep.holla@arm.com>, Yicong Yang <yangyicong@hisilicon.com>,
+ linux-pm@vger.kernel.org, x86@kernel.org, kvm@vger.kernel.org,
+ linux-acpi@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
+ linux-samsung-soc@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+ linux-tegra@vger.kernel.org, intel-gfx@lists.freedesktop.org,
+ dri-devel@lists.freedesktop.org, imx@lists.linux.dev,
+ linux-omap@vger.kernel.org, linux-mediatek@lists.infradead.org,
+ linux-kernel@vger.kernel.org
+References: <20250827023202.10310-1-zhangzihuan@kylinos.cn>
+ <20250827023202.10310-4-zhangzihuan@kylinos.cn>
+ <CAJZ5v0jA7HjNc6VQWdjuwLnmd751kV01NXC4v8Pyn8h-r70BzQ@mail.gmail.com>
+From: Zihuan Zhang <zhangzihuan@kylinos.cn>
+In-Reply-To: <CAJZ5v0jA7HjNc6VQWdjuwLnmd751kV01NXC4v8Pyn8h-r70BzQ@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: quoted-printable
 
-On Thu, Aug 28, 2025 at 08:58:07PM +0800, Xiaoyao Li wrote:
->On 8/21/2025 9:30 PM, Chao Gao wrote:
->> From: Yang Weijiang <weijiang.yang@intel.com>
->> 
->> Enable KVM_{G,S}ET_ONE_REG uAPIs so that userspace can access HW MSR or
->> KVM synthetic MSR through it.
->> 
->> In CET KVM series [1], KVM "steals" an MSR from PV MSR space and access
->> it via KVM_{G,S}ET_MSRs uAPIs, but the approach pollutes PV MSR space
->> and hides the difference of synthetic MSRs and normal HW defined MSRs.
->> 
->> Now carve out a separate room in KVM-customized MSR address space for
->> synthetic MSRs. The synthetic MSRs are not exposed to userspace via
->> KVM_GET_MSR_INDEX_LIST, instead userspace complies with KVM's setup and
->> composes the uAPI params. KVM synthetic MSR indices start from 0 and
->> increase linearly. Userspace caller should tag MSR type correctly in
->> order to access intended HW or synthetic MSR.
+
+=E5=9C=A8 2025/8/28 17:40, Rafael J. Wysocki =E5=86=99=E9=81=93:
+> On Wed, Aug 27, 2025 at 4:33=E2=80=AFAM Zihuan Zhang <zhangzihuan@kylin=
+os.cn> wrote:
+>> Replace the manual cpufreq_cpu_put() with __free(put_cpufreq_policy)
+>> annotation for policy references. This reduces the risk of reference
+>> counting mistakes and aligns the code with the latest kernel style.
+>>
+>> No functional change intended.
+>>
+>> Signed-off-by: Zihuan Zhang <zhangzihuan@kylinos.cn>
+>> ---
+>>   drivers/acpi/processor_thermal.c | 12 +++---------
+>>   1 file changed, 3 insertions(+), 9 deletions(-)
+>>
+>> diff --git a/drivers/acpi/processor_thermal.c b/drivers/acpi/processor=
+_thermal.c
+>> index 1219adb11ab9..f99ed0812934 100644
+>> --- a/drivers/acpi/processor_thermal.c
+>> +++ b/drivers/acpi/processor_thermal.c
+>> @@ -64,17 +64,13 @@ static int phys_package_first_cpu(int cpu)
+>>
+>>   static int cpu_has_cpufreq(unsigned int cpu)
+>>   {
+>> -       struct cpufreq_policy *policy;
+>> +       struct cpufreq_policy *policy __free(put_cpufreq_policy);
+>>
+>>          if (!acpi_processor_cpufreq_init)
+>>                  return 0;
+>>
+>>          policy =3D cpufreq_cpu_get(cpu);
+>> -       if (policy) {
+>> -               cpufreq_cpu_put(policy);
+>> -               return 1;
+>> -       }
+>> -       return 0;
+>> +       return !!policy;
+> If you want to make this change, please also change the return type of
+> the function to bool.
+Thanks for pointing this out.
+>>   }
+>>
+>>   static int cpufreq_get_max_state(unsigned int cpu)
+>> @@ -95,7 +91,7 @@ static int cpufreq_get_cur_state(unsigned int cpu)
+>>
+>>   static int cpufreq_set_cur_state(unsigned int cpu, int state)
+>>   {
+>> -       struct cpufreq_policy *policy;
+>> +       struct cpufreq_policy *policy __free(put_cpufreq_policy);
+> This isn't correct AFAICS at least formally because the scope of the
+> variable is the whole function, so it won't get out of scope at the
+> point where you want cpufreq_cpu_put() to be called.
 >
->The old feedback[*] was to introduce support for SYNTHETIC registers instead
->of limiting it to MSR.
+> The policy variable should be defined in the block following the "for"
+> loop (and actually all of the local variables except for "i" can be
+> defined there).
 
-GUEST_SSP is a real register but not an MSR, so it's ok to treat it as a
-synthetic MSR. But, it's probably inappropriate/inaccurate to call it a
-synthetic register.
 
-I think we need a clear definition for "synthetic register" to determine what
-should be included in this category. "synthetic MSR" is clear - it refers to
-something that isn't an MSR in hardware but is handled by KVM as an MSR.
+Sorry for the mistake =E2=80=94 I did this correctly in other places, but=
+ forgot=20
+here.
 
-That said, I'm still fine with renaming all "synthetic MSR" to "synthetic
-register" in this series. :)
+> Or better still, please move that block to a separate function
+> containing all of the requisite local variable definitions and call
+> that function for each online CPU.
 
-Sean, which do you prefer with fresh eyes?
 
-If we make this change, I suppose KVM_x86_REG_TYPE_SIZE() should be dropped, as
-we can't guarantee that the size will remain constant for the "synthetic
-register" type, since it could be extended to include registers with different
-sizes in the future.
+ =C2=A0In fact, I have realized that we cannot always use __free for clea=
+nup=20
+directly.
 
->
->As in patch 09, it changes to name guest SSP as
->
->  #define KVM_SYNTHETIC_GUEST_SSP 0
->
->Nothing about MSR.
->
->[*] https://lore.kernel.org/all/ZmelpPm5YfGifhIj@google.com/
->
+The issue is that the release only happens at the end of the variable=E2=80=
+=99s=20
+lifetime, while in some cases we want to drop the reference immediately=20
+after use.
 
-<snip>
+To address this, I=E2=80=99m considering introducing a helper macro in=20
+include/linux/cpufreq.h that would make this more explicit and allow=20
+safe cleanup at the right point.
 
->> +
->> +#define KVM_X86_REG_MSR(index)					\
->> +	KVM_X86_REG_ENCODE(KVM_X86_REG_TYPE_MSR, index)
->> +#define KVM_X86_REG_SYNTHETIC_MSR(index)			\
->> +	KVM_X86_REG_ENCODE(KVM_X86_REG_TYPE_SYNTHETIC_MSR, index)
->
->BTW, do we need to add some doc of the IDs, e.g., to
->
->4.68 KVM_SET_ONE_REG in Documentation/virt/kvm/api.rst ?
 
-Yes. Will do.
+Before moving forward, I=E2=80=99d like to hear your opinion on this appr=
+oach:
 
-<snip>
->> +struct kvm_x86_reg_id {
->> +	__u32 index;
->> +	__u8  type;
->> +	__u8  rsvd;
->> +	__u8  rsvd4:4;
->
->why naming it rsvd4? because it's 4-bit bit-field ?
+#define WITH_CPUFREQ_POLICY(cpu) \
+for(struct cpufreq_policy *policy __free(put_cpufreq_policy) =3D \
+     cpufreq_cpu_get(cpu);;)
 
-I believe so. I copied this from here:
 
-https://lore.kernel.org/kvm/aKS2WKBbZn6U1uqx@google.com/
+Then we can use it for all code :
 
-I can rename rsvd and rsvd4 to rsvd1 and rsvd2 if that would be clearer.
+	WITH_CPUFREQ_POLICY(cpu) {
+			if(!policy)
+				return XXX; // error handing
+		=09
+			//code use policy here
+		} // equal origin 'cpufreq_cpu_put' here
+         ;;
+        //left code
 
->
->> +	__u8  size:4;
->> +	__u8  x86;
->> +};
+>>          struct acpi_processor *pr;
+>>          unsigned long max_freq;
+>>          int i, ret;
+>> @@ -127,8 +123,6 @@ static int cpufreq_set_cur_state(unsigned int cpu,=
+ int state)
+>>                  max_freq =3D (policy->cpuinfo.max_freq *
+>>                              (100 - reduction_step(i) * cpufreq_therma=
+l_reduction_pctg)) / 100;
+>>
+>> -               cpufreq_cpu_put(policy);
+>> -
+>>                  ret =3D freq_qos_update_request(&pr->thermal_req, max=
+_freq);
+>>                  if (ret < 0) {
+>>                          pr_warn("Failed to update thermal freq constr=
+aint: CPU%d (%d)\n",
+>> --
 
