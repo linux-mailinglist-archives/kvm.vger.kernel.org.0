@@ -1,82 +1,84 @@
-Return-Path: <kvm+bounces-56365-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-56366-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 29827B3C3B5
-	for <lists+kvm@lfdr.de>; Fri, 29 Aug 2025 22:19:32 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 17845B3C3C0
+	for <lists+kvm@lfdr.de>; Fri, 29 Aug 2025 22:27:28 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 63391A20324
-	for <lists+kvm@lfdr.de>; Fri, 29 Aug 2025 20:19:30 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 3A6741CC1B90
+	for <lists+kvm@lfdr.de>; Fri, 29 Aug 2025 20:27:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9824E31CA49;
-	Fri, 29 Aug 2025 20:19:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 84B1F33436D;
+	Fri, 29 Aug 2025 20:27:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="TEv5pGlL"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="UdYtPMGk"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pj1-f73.google.com (mail-pj1-f73.google.com [209.85.216.73])
+Received: from mail-pf1-f202.google.com (mail-pf1-f202.google.com [209.85.210.202])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3D0EA194A73
-	for <kvm@vger.kernel.org>; Fri, 29 Aug 2025 20:19:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.73
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4D3C84A11
+	for <kvm@vger.kernel.org>; Fri, 29 Aug 2025 20:27:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756498762; cv=none; b=ZoVrm12Q0Z+eceKoZuwkVDeGlhm6GtIjujDRyEjQPQuXrzCxapOziDt2sfTKfACGuF96C/RxH9V0aDlo1Yn85pOyS+kaDAsgdsuW9FYd/zZI8xAg+d1nO/d0sprMzcMUnKBhbq9e757rajGhon+SVcODF7s1rjC/TiTt8MKD8UI=
+	t=1756499237; cv=none; b=H12eI9pRpYtUg1PEfaeis7Z811BUBX/DYXM8EtPBegZN+QaYyN3dbZUP+dLZBrLrJSqUO9Aad2EJ8DrctrzY5CI1gXO6dyoInVWdfDtiIw8tqT/Tpol8l1C+by6IhW/bMjPNJE0yHMvXUm7G3XJkNYegz3vEKCXxpF37+PTR1wY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756498762; c=relaxed/simple;
-	bh=FEKhz3ECVP3t58lSzNu8Ew6KLlvtFqxpG5No8XGjzjM=;
+	s=arc-20240116; t=1756499237; c=relaxed/simple;
+	bh=HGrErruta9BLyAGXFyScIlRA1GZusgKiBzNwVvXwRRM=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=E9NQH414KHl0MJ6iH3/LLCo83KrDxp84PU/oQvF7JNBxkUwo9jMpLtulL3AAozeqUypif62AfvvQR/qIWFauF/0iftfnz42wDbJ//ZXSXsFUTTwB6AhtPRvhvcouhPmworVenQaRpEpvzibqIkI8sQqEiVh48tCQalukd9dEo6E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=TEv5pGlL; arc=none smtp.client-ip=209.85.216.73
+	 To:Cc:Content-Type; b=ZXUAmqsSQ26eUhV1Z9+Xwk7sFe6ZMoohJhgacC21EfX9ENK11jdIx/2gfDrP7SJEUZlszJGldcP7rBmtKhK46rnGg3nZVO9IpIcrARcVbkpdgKknARQadBAOuTVZj996uOyzoG6vuyLmzPe02QlmErBbVTRF3KJlUDPanMrUxbs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=UdYtPMGk; arc=none smtp.client-ip=209.85.210.202
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pj1-f73.google.com with SMTP id 98e67ed59e1d1-327709e00c1so2616903a91.3
-        for <kvm@vger.kernel.org>; Fri, 29 Aug 2025 13:19:20 -0700 (PDT)
+Received: by mail-pf1-f202.google.com with SMTP id d2e1a72fcca58-76e2ea9366aso2314070b3a.2
+        for <kvm@vger.kernel.org>; Fri, 29 Aug 2025 13:27:16 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1756498759; x=1757103559; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=jnp79aqzbIYGGf1SXSxq1GFs0tpvf1vdrgYVoIzkttM=;
-        b=TEv5pGlLFgbwvAhF8JNPaWDTudqBMxNVXkBpDZAfmbIBeJtI257hpIPkbjUJlm2DPA
-         HDAYxfGU/sxPLYdH63LSh/WtMdwJlXBZLviVab9FnARZ+ksoBSXXMUvex55Q0v3m/GmS
-         K7/7NHuW2uzcBzBd5DGDNLUymzHIe84Z+u4vB2EOZOOX5K45MR8pXldbAn4EimZUOEz8
-         ntDBdYe/Ub+57xmUMWep7PVh4SWepFBZpJWu80lM6vs5srQQJmQ3Y819nwQA7/Q8AdTV
-         hBMCbnRWJIGmyXrcMGr6hzMH/7GmaIkYVQpF2kG+ROpVOmh2ceNp9zPJ8885dsodH+EP
-         03rg==
+        d=google.com; s=20230601; t=1756499235; x=1757104035; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:from:subject:message-id:references
+         :mime-version:in-reply-to:date:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=OdBYPvREGDRz288uxZnpSHctaJ2tHLKHotng0Ydnk1E=;
+        b=UdYtPMGk/+wDjhmuKOQcccGMCLvjXRbR+OykvwWS7Kw3InVRoXjfLxJneu5Q0NKP3n
+         O9ERjYVL7O4tmjBsmXjSJwI+QOiBN5JH8H7PIlXRwJbnBVSXBa4DayP22nlBsloLbgrA
+         RVMB3oJ8HcVnzQBumLkWiBDUv5ifrPIJcEXrfUtRCRuIk0vQgTo0lKB4NzoGlsM4eKz7
+         6NP7m/5HYix7xpn8DxusMi8gFTo8DrrDZul2pA+Jrl2j8ZQZU7VBuK327/j4duXcv9C4
+         X6O4PePJwagMZjxtGinVvY1tISyBMXdTb8HQxxiSAe3aO2sFIGTJK6/KFqGSGj260Z3t
+         MtLw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1756498759; x=1757103559;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=jnp79aqzbIYGGf1SXSxq1GFs0tpvf1vdrgYVoIzkttM=;
-        b=LUNj1kT3j0xecaOMbDnvT2DqTtIk+HqE00XRkDGCK6c+KArwivdiOdy+gC3qInYaKk
-         TOge7IwJTT+kFPFIQyZMURF9u2eL4XoK3Vc9RsMYdkqXkimQURgB61LA49fNH7b7VLcI
-         tDawCcnZHkQkqvPb2kw6IkmQnZf7r7iebVj6MgU3fio8ZT4ZW/ryKhf2AEx+i7o9Hz8F
-         mr6ouV0xfcve8Rx6AVEG4wzH6sWyhqOufdTZg5oA57rdiLexxiuVJjOxAf2pq0DtT8m6
-         VpoYdiAUlhzwe7qrleg8/tfgyEMxaFk9nBFgHXhKe1lSgXVcYmsM3r8u5zJt2TUP72h/
-         5K0g==
-X-Forwarded-Encrypted: i=1; AJvYcCVmM9GBmm45+2qeuwMdRSoezmh+02QPj6chrsqIWJjLjM8hH8halE43tTvLEcaE3IFhQDI=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwKck6KP1DXUh+Z18JZHhysNXXhbfhS9NrtuWVhLBOPRPHVjNg+
-	gfRPQFe6u0jEcpKXEmHqc/XF9WB1YIL8f0D0GgCye/2ICL4s+cl7qlBFKVsUU325XBaHk1Y8stS
-	HIXBvRg==
-X-Google-Smtp-Source: AGHT+IHJmxUaulr8wCfRiTnOmBcHKcQFhF9RUASDG2WGqXOLSXBLpRmTBm5RPoY4I9DmIwCY7sXW+KdoBDU=
-X-Received: from pjbpm11.prod.google.com ([2002:a17:90b:3c4b:b0:327:7035:d848])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:2b43:b0:327:ced1:26da
- with SMTP id 98e67ed59e1d1-327ced12a92mr6776764a91.36.1756498759596; Fri, 29
- Aug 2025 13:19:19 -0700 (PDT)
-Date: Fri, 29 Aug 2025 13:19:18 -0700
-In-Reply-To: <49c337d247940e8bd3920e5723c2fa710cd0dd83.camel@intel.com>
+        d=1e100.net; s=20230601; t=1756499235; x=1757104035;
+        h=content-transfer-encoding:cc:to:from:subject:message-id:references
+         :mime-version:in-reply-to:date:x-gm-message-state:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=OdBYPvREGDRz288uxZnpSHctaJ2tHLKHotng0Ydnk1E=;
+        b=pooJJ1Ass6eER5E/Wuwe3y1wJO5c1u4GHqgOtINIRTpyza1H1XS4UMF9X5FO5iuwhN
+         lPjMq4Y4k2inDIkW7drEw6czIYziCOzW4F75Tqu9pqKX64/CpPi+3bAn4WtA0NLlr+/U
+         +BOlQgwQzYlFhI19TpD1AY0rUiTDS1tZJXVxVxBZ3hrpopqDhAYQNvmzzs0JAIimnf0X
+         rZesgXs7akhk8oamSawVeSbFxD3ZbgcSTFcusXHBSvoPfomEdChxQQm2M97Z/Nx6tVUE
+         f6mn+rAEqIQe5wlHgbUcPKkMDcabngJmTxACSLjOZgE2zplNMBbDWPZAYYn9JwrDTGcw
+         gRlA==
+X-Forwarded-Encrypted: i=1; AJvYcCWViMq+C//30KG0h3Vi770+jrdK1EH1N3xlf7za8fAZ6yokaggEDg6kpazpOtQjigKhODY=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxrM6ygJnh2nMgDekPVMBjzMDQtOPAKV37fMhExMBuVxYOtDeAy
+	BAwvuyVNQTmHQrY7/WQNesrXTtG1YdFLdYtjWA+8vrxZhohZbB5QGCHf5wF1N8il0NbZhRvWpLZ
+	f4csLrg==
+X-Google-Smtp-Source: AGHT+IFlZtv3eeJTHDBu/mtV0FvR6bp7Y6pEXqOev9UpEsvaOfKTzG2+LKa/ZpjcGapBpiZaxiKlaZQ/TX4=
+X-Received: from pfiu11.prod.google.com ([2002:a05:6a00:124b:b0:772:2981:e786])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a05:6a00:bd11:b0:771:ebf1:5e3b
+ with SMTP id d2e1a72fcca58-771ebf16591mr18594746b3a.23.1756499235413; Fri, 29
+ Aug 2025 13:27:15 -0700 (PDT)
+Date: Fri, 29 Aug 2025 13:27:14 -0700
+In-Reply-To: <0a7785b3e985ec98b7f94f149afabdb86efb08d5.camel@intel.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
-References: <20250829000618.351013-1-seanjc@google.com> <20250829000618.351013-6-seanjc@google.com>
- <49c337d247940e8bd3920e5723c2fa710cd0dd83.camel@intel.com>
-Message-ID: <aLILRk6252a3-iKJ@google.com>
-Subject: Re: [RFC PATCH v2 05/18] KVM: TDX: Drop superfluous page pinning in
- S-EPT management
+References: <20250829000618.351013-1-seanjc@google.com> <20250829000618.351013-3-seanjc@google.com>
+ <0a7785b3e985ec98b7f94f149afabdb86efb08d5.camel@intel.com>
+Message-ID: <aLINIpCx7uBPtOUa@google.com>
+Subject: Re: [RFC PATCH v2 02/18] KVM: x86/mmu: Add dedicated API to map
+ guest_memfd pfn into TDP MMU
 From: Sean Christopherson <seanjc@google.com>
 To: Rick P Edgecombe <rick.p.edgecombe@intel.com>
 Cc: "pbonzini@redhat.com" <pbonzini@redhat.com>, Kai Huang <kai.huang@intel.com>, 
@@ -84,75 +86,88 @@ Cc: "pbonzini@redhat.com" <pbonzini@redhat.com>, Kai Huang <kai.huang@intel.com>
 	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, Yan Y Zhao <yan.y.zhao@intel.com>, 
 	Ira Weiny <ira.weiny@intel.com>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>, 
 	"michael.roth@amd.com" <michael.roth@amd.com>
-Content-Type: text/plain; charset="us-ascii"
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
 
 On Fri, Aug 29, 2025, Rick P Edgecombe wrote:
 > On Thu, 2025-08-28 at 17:06 -0700, Sean Christopherson wrote:
-> > From: Yan Zhao <yan.y.zhao@intel.com>
-> > 
-> > Don't explicitly pin pages when mapping pages into the S-EPT, guest_memfd
-> > doesn't support page migration in any capacity, i.e. there are no migrate
-> > callbacks because guest_memfd pages *can't* be migrated.  See the WARN in
-> > kvm_gmem_migrate_folio().
-> > 
-> > Eliminating TDX's explicit pinning will also enable guest_memfd to support
-> > in-place conversion between shared and private memory[1][2].  Because KVM
-> > cannot distinguish between speculative/transient refcounts and the
-> > intentional refcount for TDX on private pages[3], failing to release
-> > private page refcount in TDX could cause guest_memfd to indefinitely wait
-> > on decreasing the refcount for the splitting.
-> > 
-> > Under normal conditions, not holding an extra page refcount in TDX is safe
-> > because guest_memfd ensures pages are retained until its invalidation
-> > notification to KVM MMU is completed. However, if there're bugs in KVM/TDX
-> > module, not holding an extra refcount when a page is mapped in S-EPT could
-> > result in a page being released from guest_memfd while still mapped in the
-> > S-EPT.  But, doing work to make a fatal error slightly less fatal is a net
-> > negative when that extra work adds complexity and confusion.
-> > 
-> > Several approaches were considered to address the refcount issue, including
-> >   - Attempting to modify the KVM unmap operation to return a failure,
-> >     which was deemed too complex and potentially incorrect[4].
-> >  - Increasing the folio reference count only upon S-EPT zapping failure[5].
-> >  - Use page flags or page_ext to indicate a page is still used by TDX[6],
-> >    which does not work for HVO (HugeTLB Vmemmap Optimization).
-> >   - Setting HWPOISON bit or leveraging folio_set_hugetlb_hwpoison()[7].
-> > 
-> > Due to the complexity or inappropriateness of these approaches, and the
-> > fact that S-EPT zapping failure is currently only possible when there are
-> > bugs in the KVM or TDX module, which is very rare in a production kernel,
-> > a straightforward approach of simply not holding the page reference count
-> > in TDX was chosen[8].
-> > 
-> > When S-EPT zapping errors occur, KVM_BUG_ON() is invoked to kick off all
-> > vCPUs and mark the VM as dead. Although there is a potential window that a
-> > private page mapped in the S-EPT could be reallocated and used outside the
-> > VM, the loud warning from KVM_BUG_ON() should provide sufficient debug
-> > information.
-> > 
-> 
-> Yea, in the case of a bug, there could be a use-after-free. This logic applies
-> to all code that has allocations including the entire KVM MMU. But in this case,
-> we can actually catch the use-after-free scenario under scrutiny and not have it
-> happen silently, which does not apply to all code. But the special case here is
-> that the use-after-free depends on TDX module logic which is not part of the
-> kernel.
-> 
-> Yan, can you clarify what you mean by "there could be a small window"? I'm
-> thinking this is a hypothetical window around vm_dead races? Or more concrete? I
-> *don't* want to re-open the debate on whether to go with this approach, but I
-> think this is a good teaching edge case to settle on how we want to treat
-> similar issues. So I just want to make sure we have the justification right.
+> > --- a/arch/x86/kvm/mmu/mmu.c
+> > +++ b/arch/x86/kvm/mmu/mmu.c
+> > @@ -4994,6 +4994,65 @@ long kvm_arch_vcpu_pre_fault_memory(struct kvm_v=
+cpu *vcpu,
+> > =C2=A0	return min(range->size, end - range->gpa);
+> > =C2=A0}
+> > =C2=A0
+> > +int kvm_tdp_mmu_map_private_pfn(struct kvm_vcpu *vcpu, gfn_t gfn, kvm_=
+pfn_t pfn)
+> > +{
+> > +	struct kvm_page_fault fault =3D {
+> > +		.addr =3D gfn_to_gpa(gfn),
+> > +		.error_code =3D PFERR_GUEST_FINAL_MASK | PFERR_PRIVATE_ACCESS,
+> > +		.prefetch =3D true,
+> > +		.is_tdp =3D true,
+> > +		.nx_huge_page_workaround_enabled =3D is_nx_huge_page_enabled(vcpu->k=
+vm),
+>=20
+> These fault's don't have fault->exec so nx_huge_page_workaround_enabled
+> shouldn't be a factor. Not a functional issue though. Maybe it is more ro=
+bust?
 
-The first paragraph is all the justification we need.  Seriously.  Bad things
-will happen if you have UAF bugs, news at 11!
+Whether or not the fault itself is EXEC is irrelevant, nx_huge_page_workaro=
+und_enabled
+is used to ensure KVM doesn't create hugepage overtop an exiting EXEC 4KiB =
+mapping.
+Of course, this fault is irrelevant on that front as well.  But I don't see=
+ any
+reason to get cute and let .nx_huge_page_workaround_enabled be stale.
 
-I'm all for defensive programming, but pinning pages goes too far, because that
-itself can be dangerous, e.g. see commit 2bcb52a3602b ("KVM: Pin (as in FOLL_PIN)
-pages during kvm_vcpu_map()") and the many messes KVM created with respect to
-struct page refcounts.
+> > +
+> > +		.max_level =3D PG_LEVEL_4K,
+> > +		.req_level =3D PG_LEVEL_4K,
+> > +		.goal_level =3D PG_LEVEL_4K,
+> > +		.is_private =3D true,
+> > +
+> > +		.gfn =3D gfn,
+> > +		.slot =3D kvm_vcpu_gfn_to_memslot(vcpu, gfn),
+> > +		.pfn =3D pfn,
+> > +		.map_writable =3D true,
+> > +	};
+> > +	struct kvm *kvm =3D vcpu->kvm;
+> > +	int r;
+> > +
+> > +	lockdep_assert_held(&kvm->slots_lock);
+> > +
+> > +	if (KVM_BUG_ON(!tdp_mmu_enabled, kvm))
+> > +		return -EIO;
+> > +
+> > +	if (kvm_gfn_is_write_tracked(kvm, fault.slot, fault.gfn))
+> > +		return -EPERM;
+>=20
+> If we care about this, why don't we care about the read only memslot flag=
+?
 
-I'm happy to include more context in the changelog, but I really don't want
-anyone to walk away from this thinking that pinning pages in random KVM code is
-at all encouraged.
+Because private memory fundamentally can't support read-only memslots.  If =
+we
+wanted to be paranoid, this code could assert that the memslot can be priva=
+te
+but for me that reaches a pointless level of paranoia.
+
+> TDX doesn't need this or the nx huge page part above. So this function is
+> more general.
+
+I don't see anything that makes nx_huge_page_workaround_enabled mutually ex=
+clusive
+with TDX though.
+
+> What about calling it __kvm_tdp_mmu_map_private_pfn() and making it a pow=
+erful
+> "map this pfn at this GFN and don't ask questions" function. Otherwise, I=
+'m not
+> sure where to draw the line.
+
+Eh, for me, the line is pretty clear.  This is obviously specific to privat=
+e memory,
+and so implies a guest_memfd source, a private pfn, and everything that com=
+es
+along with private gmem pfns.  Everything else should be accounted for.
 
