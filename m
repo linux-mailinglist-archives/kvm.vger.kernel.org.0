@@ -1,108 +1,72 @@
-Return-Path: <kvm+bounces-56520-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-56521-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1E932B3EE5A
-	for <lists+kvm@lfdr.de>; Mon,  1 Sep 2025 21:16:53 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8287EB3EF20
+	for <lists+kvm@lfdr.de>; Mon,  1 Sep 2025 22:03:50 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 304597AFE5B
-	for <lists+kvm@lfdr.de>; Mon,  1 Sep 2025 19:15:16 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D07414E0039
+	for <lists+kvm@lfdr.de>; Mon,  1 Sep 2025 20:03:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id ACEE3321F26;
-	Mon,  1 Sep 2025 19:16:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 44D3F246BD8;
+	Mon,  1 Sep 2025 20:03:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="SNxZcUlV"
+	dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b="D3ai8ibo"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pg1-f202.google.com (mail-pg1-f202.google.com [209.85.215.202])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 805F745C0B
-	for <kvm@vger.kernel.org>; Mon,  1 Sep 2025 19:16:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 58E9E32F753;
+	Mon,  1 Sep 2025 20:03:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756754202; cv=none; b=sf2hHlGvRa8+5ihZtVeuQOqKfYhSwQzofSs5QxiNJSdF8FHMc+eCMbPaur2aJ57MuJ3a6K7fNHLoTvHrSd4+PCR475Trzw6EpY9Yl32MxTvHzxfwhksYGOhWUNXz6qNCkFBi+v7Fhf+nqCLUMDor8TfydstPM7OSp2NLU2stgZQ=
+	t=1756757020; cv=none; b=vAvilyI/aKfo6sS160zo6mKaOviIwvRxMT06zlqGVp+RUsDP95DgCkl1/QbO3JZd2nacU/OKfhVXZ/AMKU8m3Atv2y0W3PPeGv9svMpljDgzMep3DCgeNlUryHw5TLi6Ly0olOSjwOXdJtDxk8IZSXaE8FBDEJCdwO0pCkrBKAo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756754202; c=relaxed/simple;
-	bh=emVQb/nP+lLVWaTB9qb8A8fdBisYAbLIpQk8DA/49xs=;
-	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=HducBho4zpK3TdHVtIKn1s+txkYXyNVe4Z0LYwPHqc2RTgY3oquW4UpXht9ztcCv+/EUJSvgxAQ/u1sofJRBIkjDezvX0fr7vkq2MXCAMbU5CbapFpfLy8Xj/Bf41JiOhbmbwgUAJ1VYtLlX190l6vZljSJbkSGSCl2fsldeciY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--praan.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=SNxZcUlV; arc=none smtp.client-ip=209.85.215.202
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--praan.bounces.google.com
-Received: by mail-pg1-f202.google.com with SMTP id 41be03b00d2f7-b4c72281674so2999933a12.3
-        for <kvm@vger.kernel.org>; Mon, 01 Sep 2025 12:16:41 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1756754201; x=1757359001; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=v/cDOfjJq1EkYmNa/Gbni2L6YrspyG8pFR//2Lc47Gk=;
-        b=SNxZcUlVfVCpRt4aGA65Vr6PKbvjvmT+2T+WLD6+LnZM8MCR6dxq3kwwKewLlHCOBF
-         CvlE3dOsURUzWqF/NtNl0nnlpQaaO0y2uikPMMX26f2kDky8g/Txh1ll30pOIEpKbEdq
-         OHlao30jwb3GUc3pYCL3e80xR/iWAky5dbOqNLmejkYrYKHLUQL0BZf5roLq4+OrX4+B
-         BxmfpOLaW293d1rFlo/GY4uT5AwIc0b1lYsm1cq1/I4J0Bq/OXGltwAwIkM2TXO5dghH
-         x31jjBItGn8rrnfEgN9Jh/tEmykJBbNnpGiCytpNkOeUfjrWAgAGeQD515+nnpFohLb/
-         n4RA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1756754201; x=1757359001;
-        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=v/cDOfjJq1EkYmNa/Gbni2L6YrspyG8pFR//2Lc47Gk=;
-        b=WXWKDkJgItZQWIye05QTz7wxkaOV6o/h9CMiIl9WrefuIQg7AmErvzB5uS9sW6HwKT
-         cNqa3OspqlM9KHNrcsUQiSNJfdTwr8YPL1uXRsKBVt22ehCLMkeHiIirxek8PUFnim2d
-         4XJICSXg2YUP9zBMTT5UGdHole+vZYluEFSqg1EunOIfxj11ZE/YihoTPGMEKS8ebMZ1
-         C+4NXiO0pPeXopyd0HeD5sgCcGswf/BPhSFQwmJQX67va99mL+5NJLl9nKVM4sG5tbfw
-         TmlqzBdhovFK2H4aiN01mB/Q7vNJAC8hTqkX6ztUDvyPfXhfeHzCu7X/B1Tkp2bMJL92
-         DNLw==
-X-Forwarded-Encrypted: i=1; AJvYcCW5ihYZzdLLbM5D0rszMFGXcaKR6HN5qC2S9xLjBisfGGZO8aEMFO5zT9qu+SpJg/JiaSk=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyBXh8gzOv/XQk1SoNrwf3Kmz2Rh2q2JZ5ECQdA2JtfayRkQ9JB
-	HXqpOecLppZmreqVq4w2Kf6yXEfaA+BJTnboTSeZEFEuuXJftmpmavyIOalIvzr0/coXfDGG9Uf
-	FfA==
-X-Google-Smtp-Source: AGHT+IFBehxccmY6P3WUNdAudSMYMDls3w+IAV/u6ENkFf1eu/6U3mKHoh4N54IqPGrSeQVbaHCKLSaL6A==
-X-Received: from pfbih20.prod.google.com ([2002:a05:6a00:8c14:b0:771:f406:9f46])
- (user=praan job=prod-delivery.src-stubby-dispatcher) by 2002:a05:6a21:6d97:b0:243:cc87:f290
- with SMTP id adf61e73a8af0-243d6fc0e1emr11733424637.60.1756754200767; Mon, 01
- Sep 2025 12:16:40 -0700 (PDT)
-Date: Mon,  1 Sep 2025 19:16:19 +0000
+	s=arc-20240116; t=1756757020; c=relaxed/simple;
+	bh=ABBbzPW/6UgCX/sfTGVcUskFfJx+VpJZGLG1GYiZcWw=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Ms5zytTpHUoTiKQC9LbLOl0OJk+N1Pl2/Ws+L8ieSdABNLje/R1PPrvPpwEEVkEIGjGNgiHbi9/Sst3qVNN6UryaKQXVtamDVqRWg2YvbD6FnNUaQYEZWogSodj/mpetF34SQ3++t6TDJx5Sm8SXCBZkpOI9QhLOzbV3Z9I5FhQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b=D3ai8ibo; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 15AA6C4CEF0;
+	Mon,  1 Sep 2025 20:03:39 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
+	s=korg; t=1756757019;
+	bh=ABBbzPW/6UgCX/sfTGVcUskFfJx+VpJZGLG1GYiZcWw=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=D3ai8iboGgoAXYygiCORD/fWBp/WDZ7yk+HF5r5FderXW/vUy6n8FT3LGOPyQ7umR
+	 1UYmXp9hMxp/95BxTO/K8AeIdyGHuYl2fe1eXDJffNj8uO+uJdu2Th4/9H/7iYcOId
+	 tPZrkSxXwNGTxuaHcLFz6FwRGDcmi5O8kzXv5eJ8=
+Date: Mon, 1 Sep 2025 22:03:36 +0200
+From: Greg KH <gregkh@linuxfoundation.org>
+To: Gyujeong Jin <wlsrbwjd7232@gmail.com>
+Cc: maz@kernel.org, oliver.upton@linux.dev, joey.gouly@arm.com,
+	suzuki.poulose@arm.com, yuzenghui@huawei.com,
+	catalin.marinas@arm.com, will@kernel.org, kvmarm@lists.linux.dev,
+	linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org,
+	linux-kernel@vger.kernel.org, gyutrange <wlsrbwjd643@naver.com>,
+	stable@vger.kernel.org, DongHa Lee <gap-dev@example.com>,
+	Daehyeon Ko <4ncient@example.com>, Geonha Lee <leegn4a@example.com>,
+	Hyungyu Oh <dqpc_lover@example.com>,
+	Jaewon Yang <r4mbb1@example.com>
+Subject: Re: [PATCH] KVM: arm64: nested: Fix VA sign extension in VNCR/TLBI
+ paths
+Message-ID: <2025090123-worst-acid-92c8@gregkh>
+References: <20250901141551.57981-1-wlsrbwjd7232@gmail.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-X-Mailer: git-send-email 2.51.0.318.gd7df087d1a-goog
-Message-ID: <20250901191619.183116-1-praan@google.com>
-Subject: [PATCH] MAINTAINERS: Add myself as VFIO-platform reviewer
-From: Pranjal Shrivastava <praan@google.com>
-To: linux-kernel@vger.kernel.org, kvm@vger.kernel.org
-Cc: Alex Williamson <alex.williamson@redhat.com>, Eric Auger <eric.auger@redhat.com>, clg@redhat.com, 
-	Mostafa Saleh <smostafa@google.com>, Pranjal Shrivastava <praan@google.com>
-Content-Type: text/plain; charset="UTF-8"
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250901141551.57981-1-wlsrbwjd7232@gmail.com>
 
-While my work at Google Cloud focuses on various areas of the kernel,
-my background in IOMMU and the VFIO subsystem motivates me to help with
-the maintenance effort for vfio-platform (based on the discussion [1])
-and ensure its continued health.
+On Mon, Sep 01, 2025 at 11:15:51PM +0900, Gyujeong Jin wrote:
+> From: gyutrange <wlsrbwjd643@naver.com>
 
-Link: https://lore.kernel.org/all/aKxpyyKvYcd84Ayi@google.com/ [1]
-Signed-off-by: Pranjal Shrivastava <praan@google.com>
----
- MAINTAINERS | 1 +
- 1 file changed, 1 insertion(+)
-
-diff --git a/MAINTAINERS b/MAINTAINERS
-index 840da132c835..eebda43caffa 100644
---- a/MAINTAINERS
-+++ b/MAINTAINERS
-@@ -26464,6 +26464,7 @@ F:	drivers/vfio/pci/pds/
- VFIO PLATFORM DRIVER
- M:	Eric Auger <eric.auger@redhat.com>
- R:	Mostafa Saleh <smostafa@google.com>
-+R:	Pranjal Shrivastava <praan@google.com>
- L:	kvm@vger.kernel.org
- S:	Maintained
- F:	drivers/vfio/platform/
--- 
-2.51.0.318.gd7df087d1a-goog
+Does not match your signed-off-by line :(
 
 
