@@ -1,65 +1,65 @@
-Return-Path: <kvm+bounces-56416-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-56417-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id D59D0B3DACA
-	for <lists+kvm@lfdr.de>; Mon,  1 Sep 2025 09:08:07 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2E762B3DAF4
+	for <lists+kvm@lfdr.de>; Mon,  1 Sep 2025 09:26:05 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5A3C73B39C1
-	for <lists+kvm@lfdr.de>; Mon,  1 Sep 2025 07:08:06 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 02FBC179C32
+	for <lists+kvm@lfdr.de>; Mon,  1 Sep 2025 07:26:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 198C6261B8F;
-	Mon,  1 Sep 2025 07:07:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0BD6126B942;
+	Mon,  1 Sep 2025 07:25:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="AFJre2SB"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="Rdy6yo+k"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.7])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.12])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9B2212135CE;
-	Mon,  1 Sep 2025 07:07:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.7
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6F8761E5219;
+	Mon,  1 Sep 2025 07:25:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.12
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756710478; cv=none; b=KDQV3YQmnjWrurKCW67QcLS7VIgvIxFKC5aItDq6xFyPyd213DSIZo2Bi+5qpaBLHRXtKmKwnvJ8rsGLncBlnvOALD14QhP82dSqs5Rz1wz7uDI/E3cIzTWcyJh83szE/tsfAHeORHjWMgonBSCN0gtdENcd0d1kL2aw9DRRch0=
+	t=1756711556; cv=none; b=SgHMVj9ME6YVlxHMW8yX+gmL3WQ08U6grrojyqHIJjMWZ2lEsnYWknrwBWVwaTB6rmx0Sc0wtVoT3SV/sLZXYjIy5SDUC1vSz6u9EYbagGJi/SWPWbywkTcl4TG0ptKbs+J267ZaES40sKrXJGBVliH5VSUrRPDq1YW1oJ+5ONE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756710478; c=relaxed/simple;
-	bh=lWE2uNAxmuMbTuzNnv0x0FIPI+3SSxSg/s6KZBB5Yeg=;
+	s=arc-20240116; t=1756711556; c=relaxed/simple;
+	bh=Dja798vbVuspbvR37CMf7VerA9fgpeJEgIVNNNoyGm4=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=mB+WDNUQlrTU3MojByYs9nevLZNdaG0mZHAIuvmk/h0Wngvf4Ef1TIYWP73GgKQ+hHc7dKwVht06Ztx4kic2fbmffCtrdfnLcmpdEWspAkLFNUyOpyoO/FjpeFUjgARF6kkemrTnuV0+JLV7lmIJWd/OgMKV/cisK9Jp52AEF0c=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=AFJre2SB; arc=none smtp.client-ip=192.198.163.7
+	 In-Reply-To:Content-Type; b=XUI4f1gvMohoSP2dQ1zmG/ehF1qxZkaIhFjAvCYk9kHqmuEk7cP1jnuBUiHkxAZALyL/yvW2yJxzdGTtCZPN7QcDJTqLlSAa7T5EK5BhNZlbq+4Us3Dm4G2hxpTKolfh2qFuezcxkmg9UpPKHDkxQ2XDh5aTZ4xrE/BcFORJWmY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=Rdy6yo+k; arc=none smtp.client-ip=192.198.163.12
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1756710476; x=1788246476;
+  t=1756711554; x=1788247554;
   h=message-id:date:mime-version:subject:to:cc:references:
    from:in-reply-to:content-transfer-encoding;
-  bh=lWE2uNAxmuMbTuzNnv0x0FIPI+3SSxSg/s6KZBB5Yeg=;
-  b=AFJre2SB7SYXOPHlg4qYa0XZFUXUkKF9+efyLr8kXXN1WgD7dA7EUYeU
-   9Pwqsxmomz1GFLhV04rwu1+rQVHFjq5JPsm8AJTeXYfi+59tPXqovfUHO
-   0ACoJ7Ddl3U8slDnwrv8+u0tIlT0n90lTgY2H8NTMutqP8Wxx+5JTTqOo
-   GNJfuLz/DKzjwjH5T4O8TIrudsVxHS8TIMQ1viVIIGqxHiwiv3XR+uNyK
-   3uMy3LYYEJR+vroBgl9MCFHtA/SxWYi6FdOix9VR3wRe8dVFeUr7iNbzd
-   rIFAgGX7N0an1AyS80uegsB0GfnJcEUUN+M39i3iGexMPC/+KBhs7aWqm
-   A==;
-X-CSE-ConnectionGUID: ChesgO8ER6ajWiMYGkttZA==
-X-CSE-MsgGUID: ywQ6aREcT/KUGItnBf1FEQ==
-X-IronPort-AV: E=McAfee;i="6800,10657,11539"; a="84313522"
+  bh=Dja798vbVuspbvR37CMf7VerA9fgpeJEgIVNNNoyGm4=;
+  b=Rdy6yo+kkdSeEMY5hrBxUTwPtbkjh++vUewgLWzDQZo/d/WLEP0HAGHs
+   OUYoWfuaqRNRQ/BfLNe/SyCZNMNcbsKzfvY+S8VYyfMB7IhZ8NArwSrHV
+   ZLJKLawuW40XzF9MDp97bxOHj8q1ebTMnI11xTSNqyP6iz7nWgHN4oBns
+   qC2/XTGTmVlrol6BWhp64CHh3lyahg3V2/C7JKtwb1PgeQD55YOZKE0ka
+   leMY66KTIaVbj9H6Sh3+DJdv7hIv2xHqGE5B52CMfswInPP/n6om+R+DS
+   QpBAP87efNQzUCYVEnwxW8bYkheb94oyeYm6efNxKIVMXMC+k2iAP0NtV
+   Q==;
+X-CSE-ConnectionGUID: uZGHV3lpSMaIJxLlbUeFOA==
+X-CSE-MsgGUID: 2Tw7lMdCQ6CMJflThReGaQ==
+X-IronPort-AV: E=McAfee;i="6800,10657,11539"; a="62729045"
 X-IronPort-AV: E=Sophos;i="6.18,225,1751266800"; 
-   d="scan'208";a="84313522"
-Received: from orviesa008.jf.intel.com ([10.64.159.148])
-  by fmvoesa101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 01 Sep 2025 00:07:55 -0700
-X-CSE-ConnectionGUID: VTOOgbQRS2ubljo/GTJiKQ==
-X-CSE-MsgGUID: VOzrSK26S5OrTeBqFfamzQ==
+   d="scan'208";a="62729045"
+Received: from fmviesa007.fm.intel.com ([10.60.135.147])
+  by fmvoesa106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 01 Sep 2025 00:22:49 -0700
+X-CSE-ConnectionGUID: u9ITx0L5QAuRhhvDx/T8Zw==
+X-CSE-MsgGUID: k+TY8wmlSwSWdbzoQjjxJw==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.18,225,1751266800"; 
-   d="scan'208";a="171077993"
+   d="scan'208";a="170438849"
 Received: from xiaoyaol-hp-g830.ccr.corp.intel.com (HELO [10.124.238.14]) ([10.124.238.14])
-  by orviesa008-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 01 Sep 2025 00:07:51 -0700
-Message-ID: <5a19db9d-3c76-4712-a308-d88c9ac23f71@intel.com>
-Date: Mon, 1 Sep 2025 15:07:47 +0800
+  by fmviesa007-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 01 Sep 2025 00:22:48 -0700
+Message-ID: <fbdcca61-e9c4-47fc-b629-7a46ad35cd24@intel.com>
+Date: Mon, 1 Sep 2025 15:22:45 +0800
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -67,54 +67,63 @@ List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v12 01/24] KVM: x86: Rename kvm_{g,s}et_msr()* to show
- that they emulate guest accesses
-To: Chao Gao <chao.gao@intel.com>, kvm@vger.kernel.org,
- linux-kernel@vger.kernel.org
-Cc: mlevitsk@redhat.com, rick.p.edgecombe@intel.com, weijiang.yang@intel.com,
- xin@zytor.com, Sean Christopherson <seanjc@google.com>,
- Mathias Krause <minipli@grsecurity.net>, John Allen <john.allen@amd.com>,
- Paolo Bonzini <pbonzini@redhat.com>, Thomas Gleixner <tglx@linutronix.de>,
- Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
- Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org,
- "H. Peter Anvin" <hpa@zytor.com>
-References: <20250812025606.74625-1-chao.gao@intel.com>
- <20250812025606.74625-2-chao.gao@intel.com>
+Subject: Re: [PATCH v3 4/6] KVM: x86: Add support for RDMSR/WRMSRNS w/
+ immediate on Intel
+To: Xin Li <xin@zytor.com>, Binbin Wu <binbin.wu@linux.intel.com>
+Cc: Sean Christopherson <seanjc@google.com>,
+ Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org,
+ linux-kernel@vger.kernel.org, Borislav Petkov <bp@alien8.de>
+References: <20250805202224.1475590-1-seanjc@google.com>
+ <20250805202224.1475590-5-seanjc@google.com>
+ <424e2aaa-04df-4c7e-a7f9-c95f554bd847@intel.com>
+ <849dd787-8821-41f1-8eef-26ede3032d90@linux.intel.com>
+ <c4bc61da-c42c-453d-b484-f970b99cb616@zytor.com>
 Content-Language: en-US
 From: Xiaoyao Li <xiaoyao.li@intel.com>
-In-Reply-To: <20250812025606.74625-2-chao.gao@intel.com>
+In-Reply-To: <c4bc61da-c42c-453d-b484-f970b99cb616@zytor.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 
-On 8/12/2025 10:55 AM, Chao Gao wrote:
+On 9/1/2025 3:04 PM, Xin Li wrote:
+> On 8/31/2025 11:34 PM, Binbin Wu wrote:
+>>> We need to inject #UD for !guest_cpu_has(X86_FEATURE_MSR_IMM)
+>>>
+>>
+>> Indeed.
+> 
+> Good catch!
+> 
+>>
+>> There is a virtualization hole of this feature for the accesses to the 
+>> MSRs not
+>> intercepted. IIUIC, there is no other control in VMX for this feature. 
+>> If the
+>> feature is supported in hardware, the guest will succeed when it 
+>> accesses to the
+>> MSRs not intercepted even when the feature is not exposed to the 
+>> guest, but the
+>> guest will get #UD when access to the MSRs intercepted if KVM injects 
+>> #UD.
+> 
+> hpa mentioned this when I just started the work.  But I managed to forget
+> it later... Sigh!
+> 
+>>
+>> But I guess this is the guest's fault by not following the CPUID, KVM 
+>> should
+>> still follow the spec?
+> 
+> I think we should still inject #UD when a MSR is intercepted by KVM.
+> 
 
-...
+For handle_wrmsr_imm(), it seems we need to check 
+guest_cpu_cap_has(X86_FEATURE_WRMSRNS) as well, since immediate form of 
+MSR write is only supported on WRMSRNS instruction.
 
-> diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
-> index f19a76d3ca0e..86e4d0b8469b 100644
-> --- a/arch/x86/include/asm/kvm_host.h
-> +++ b/arch/x86/include/asm/kvm_host.h
-> @@ -2149,11 +2149,11 @@ void kvm_prepare_event_vectoring_exit(struct kvm_vcpu *vcpu, gpa_t gpa);
->   
->   void kvm_enable_efer_bits(u64);
->   bool kvm_valid_efer(struct kvm_vcpu *vcpu, u64 efer);
-> -int kvm_get_msr_with_filter(struct kvm_vcpu *vcpu, u32 index, u64 *data);
-> -int kvm_set_msr_with_filter(struct kvm_vcpu *vcpu, u32 index, u64 data);
-> +int kvm_emulate_msr_read(struct kvm_vcpu *vcpu, u32 index, u64 *data);
-> +int kvm_emulate_msr_write(struct kvm_vcpu *vcpu, u32 index, u64 data);
-...
-> -int kvm_get_msr(struct kvm_vcpu *vcpu, u32 index, u64 *data);
-> -int kvm_set_msr(struct kvm_vcpu *vcpu, u32 index, u64 data);
-> +int __kvm_emulate_msr_read(struct kvm_vcpu *vcpu, u32 index, u64 *data);
-> +int __kvm_emulate_msr_write(struct kvm_vcpu *vcpu, u32 index, u64 data);
+It leads to another topic, do we need to bother checking the opcode of 
+the instruction on EXIT_REASON_MSR_WRITE and inject #UD when it is 
+WRMSRNS instuction and !guest_cpu_cap_has(X86_FEATURE_WRMSRNS)?
 
-I dislike the rename, it loses the information of filter.
-
-can we keep the filer information and make them as below?
-
-   kvm_get_msr_with_filter() -> kvm_emulate_msr_read_with_filter()
-   kvm_get_msr() -> kvm_emulate_msr_read()
-   kvm_set_msr_with_filter() -> kvm_emulate_msr_write_with_filter()
-   kvm_set_msr() -> kvm_emulate_msr_write()
-
+WRMSRNS has virtualization hole as well, but KVM at least can emulate 
+the architectural behavior when the write on MSRs are not pass through.
 
