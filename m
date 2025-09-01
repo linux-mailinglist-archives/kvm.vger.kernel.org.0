@@ -1,153 +1,320 @@
-Return-Path: <kvm+bounces-56457-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-56458-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 152F9B3E6D2
-	for <lists+kvm@lfdr.de>; Mon,  1 Sep 2025 16:16:31 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9C135B3E6E4
+	for <lists+kvm@lfdr.de>; Mon,  1 Sep 2025 16:22:36 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id EDB3C3BA86D
-	for <lists+kvm@lfdr.de>; Mon,  1 Sep 2025 14:16:27 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 035351894F81
+	for <lists+kvm@lfdr.de>; Mon,  1 Sep 2025 14:22:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 77F912EFDAB;
-	Mon,  1 Sep 2025 14:16:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 57CF6337697;
+	Mon,  1 Sep 2025 14:22:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="MS4lZk27"
+	dkim=pass (2048-bit key) header.d=amazon.co.uk header.i=@amazon.co.uk header.b="QLvSna8c"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pl1-f174.google.com (mail-pl1-f174.google.com [209.85.214.174])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from fra-out-005.esa.eu-central-1.outbound.mail-perimeter.amazon.com (fra-out-005.esa.eu-central-1.outbound.mail-perimeter.amazon.com [63.176.194.123])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4F3DF17B402;
-	Mon,  1 Sep 2025 14:16:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.174
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 235292EDD76;
+	Mon,  1 Sep 2025 14:22:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=63.176.194.123
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756736178; cv=none; b=YFvhXk18dSCV3n7DdPyBMVNYkEl8g4ENjzc0DgmZ768lUPOnHBiTuP1vREZ5SUec52sIOvD36FFpmULB+x7+YQ3mLHW2ZBxN+h7u7dInuQg88IxQp7EuOscvqRRnhnMt4JTPPJcwvtO4NNUAgxOoEBsTiOTnO6vNIhb6ybkUP5c=
+	t=1756736547; cv=none; b=SDeupm/r82AbCGMwsvD4YxrdMmIf4EI/E9utY2wTGGWK+txSDpCS3oUR1YMiqKEVDOlt4qvhKsuP+hx8MBv2CcFgcUoMpb7xeAi4Vu6olbhBmZeD3HC0BT4K3izd+pDj09c8eKeHA+tO1fWG7Iuqk14FQWY0hLjy9iRR/dNO9Bo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756736178; c=relaxed/simple;
-	bh=J6adxaMTbKmeAjhW+nOvDYWFj4xMGaf6efDHsjIWpX8=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=oiqeh5hPuvALmgzpvOf2a50UbP65CZ9IOX3tPU0Ve+jATvty6z8/a4D1zWG4Td11vBhpvfhigyyLRKgA/I4+Z3ix1m58SDjAERxFFR5qUeKY9/432OJjorj+8W6VUgORcn7nb0W5R394BmAIu0wBb/V7vhU8HVznQQ/oLjrHi8I=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=MS4lZk27; arc=none smtp.client-ip=209.85.214.174
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f174.google.com with SMTP id d9443c01a7336-2493798cd83so5333665ad.0;
-        Mon, 01 Sep 2025 07:16:17 -0700 (PDT)
+	s=arc-20240116; t=1756736547; c=relaxed/simple;
+	bh=wMkfF2t0dNP9/Poez+CLWMc02OD/Q4mBWn5bQTewYeM=;
+	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=b461bsmc0U+CunPNTCaHjUGqp0Ce6FSRvKA3/S143NX6CXvRXuUe0RTVPEhGmxuHyE2PbCoavjpCm217RWQBBUdYB2m8sRD3yb8VMVMijcTLCLi26cHs+bJiZeHcNFZRhM062hDoJVuDiZMmIzFcZCsGEDMNvLUGWPLjBoyXpqE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.co.uk; spf=pass smtp.mailfrom=amazon.co.uk; dkim=pass (2048-bit key) header.d=amazon.co.uk header.i=@amazon.co.uk header.b=QLvSna8c; arc=none smtp.client-ip=63.176.194.123
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.co.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.uk
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1756736176; x=1757340976; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=olATEhuJ7Rj0q51m0msTdMRcBctLQkkJ/hDbLCgUHPE=;
-        b=MS4lZk2771oiwZYLbVz2HlI+WmCk+dD+5+i/SReGFvnkhwWRIUu/5zSRooc9UdSg6S
-         One0Ixm6nnn7FqmZItrexbI/u8ZqSwQBw+kXe8HmL3RItSHRIl6Oj8mvJoEZv8zGt1uK
-         y/Y13qUvHVzuhIRD/hR5qG5O8Zbfw8gjfyLu/n8pT1cu1C+j/FQ1f0cYQaQk00CuMVF2
-         8n28/q6MATDyHAGIHtTM2mcvfDmDt4ulIMB/JYahIXnp5Sx7WscTyydOh+//8BCB0OOs
-         vZXtrkP1VqtD3gc5lzMd60lhGEItBoTRNIi3LrF7vCQY4AAphpK7oycCuHsrvRtE+Go9
-         wEmw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1756736176; x=1757340976;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=olATEhuJ7Rj0q51m0msTdMRcBctLQkkJ/hDbLCgUHPE=;
-        b=cmY1ju/AoQHcw6OA4vxucI9QAqtCq0osS9+2QXIxdcxxiJ0enxOPQpI9UzhW1qrCwY
-         8y8ua1ZO46eAg+YPIv2SG06ZH6XbtnGab3rz2dU+1cjzJsJ0NJwbLDY9+oSZJ/h+Ma0w
-         EhbpVFv6GPZlSwvVDrmWbvwK3Tx3Ises5jTKQUf5AhERZFiD3OUt9Cb3TL7YK+0BvStu
-         AnyOHlbQAMWipNDCxu9ZQjbKsqKczbAMYWeUtdwjAtyX1+G6UCNgL4VvLPglWeUo5g30
-         g1BfmTJKo3z5jBpFOfvgUS5FO9nroJcmJOFtuO0telTrhJypfPKpbmsylNCHMls4SUt/
-         9HUg==
-X-Forwarded-Encrypted: i=1; AJvYcCUlTRIO4zR+rnLF714mLC+YbHoutrRG1P5G4RknQPaNGe1OdN6X8PLI8waYogrYV/qL6LsxB3PN@vger.kernel.org, AJvYcCVBv1nu4CSjRQ9L8s3PBw1hp/OCJMwJUSMHDVjQkeHMo5/hHaoCZ1vdUeJgLOCHht2qIZ8=@vger.kernel.org, AJvYcCVMHQ0r5WMGIHnPHe9DwEHEDB2ka9vKo73pu3/KXjE0bhbTndr4fEjnOlYwxQzRzMsnUfG4Jat4eRcpv/qv@vger.kernel.org
-X-Gm-Message-State: AOJu0Yya90Xx3XMlV3+vO66ouLuz/8Fs7hMW+4AbjeayH2cHPfykF8gH
-	mos3VveKfVIYu2kPGYPX6t7vD8rcrMoiLXoLEHl8v/jbReHwTM/tvIhY
-X-Gm-Gg: ASbGncvhMdtpRyfgD2sF43cAFI6xe5Sdt810vAbOIaF+UmmoHjv+aoV9Q726wFgryG0
-	oQRFC+1S1qYlaHcPuIFNbsno/d35fjiiSQW8SXSv7k3PuyohiU0gcC/+cNSUG3soLxvSyqiDuQZ
-	K/uT88VNSUgc3HNOXimV8mlUSK++R7Jjz9+fSPnWDkicMfN3vvEDKsBhK0ZPWaE5xaH6T3/zLt6
-	WYxM/h1ZphC26MJVCbTXnDJLki5UQpAg6fuNAus4uz8MAZNcRTFDuK3ijTX3TkWNZRxDn+IQYYR
-	wPzPgpJbZfm5XmJ9TRyrJ+PXcbqun+JpDRQKfS83A0YDB4vmdgfk7Sk8uIKyos4nDgGB8TxacFR
-	a7JR/ql1ZG+DcanOLGhM+YRI=
-X-Google-Smtp-Source: AGHT+IHf7G+mUAagKO2yJzD5uM1O7o4u98GK3mA53rtvl6kubMMUObA8Y6uYeXML8+HaH3iMeRvPFQ==
-X-Received: by 2002:a17:902:e74f:b0:246:ed8f:c63e with SMTP id d9443c01a7336-2491be7d2a2mr85172585ad.0.1756736176486;
-        Mon, 01 Sep 2025 07:16:16 -0700 (PDT)
-Received: from localhost ([106.101.139.14])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-24905da1b35sm106729755ad.84.2025.09.01.07.16.10
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 01 Sep 2025 07:16:16 -0700 (PDT)
-From: Gyujeong Jin <wlsrbwjd7232@gmail.com>
-To: maz@kernel.org,
-	oliver.upton@linux.dev
-Cc: joey.gouly@arm.com,
-	suzuki.poulose@arm.com,
-	yuzenghui@huawei.com,
-	catalin.marinas@arm.com,
-	will@kernel.org,
-	kvmarm@lists.linux.dev,
-	linux-arm-kernel@lists.infradead.org,
-	kvm@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	wlsrbwjd7232@gmail.com,
-	gyutrange <wlsrbwjd643@naver.com>,
-	stable@vger.kernel.org,
-	DongHa Lee <gap-dev@example.com>,
-	Daehyeon Ko <4ncient@example.com>,
-	Geonha Lee <leegn4a@example.com>,
-	Hyungyu Oh <dqpc_lover@example.com>,
-	Jaewon Yang <r4mbb1@example.com>
-Subject: [PATCH] KVM: arm64: nested: Fix VA sign extension in VNCR/TLBI paths
-Date: Mon,  1 Sep 2025 23:15:51 +0900
-Message-ID: <20250901141551.57981-1-wlsrbwjd7232@gmail.com>
-X-Mailer: git-send-email 2.43.0
+  d=amazon.co.uk; i=@amazon.co.uk; q=dns/txt;
+  s=amazoncorp2; t=1756736545; x=1788272545;
+  h=from:to:cc:subject:date:message-id:references:
+   in-reply-to:content-transfer-encoding:mime-version;
+  bh=NexCRVeiTn8yKPd81BsG0VP8TjQq1oA2bxWGfc7HsT4=;
+  b=QLvSna8c5AseRpSbUAD406B7YSqPUUq7C2mDvQU6i1LFMtZbOWY5F1Hd
+   RWihydQ40o+DO2IO5t2ImfchoLuVb9gy/IF/3ejgA2RbcmYeFXowZRwJe
+   ws/F1eq+2VvbJqk42XwoI00iAwexehsup173zwzVYkPNkOnk6MQoFJcLd
+   6QS0n5Ulx1Mm4uzRYOZTgmgJ6jbuumKLKW9PXI2hQgrUN8VVts6kyAtDF
+   mpAjJvBU2ecJboHQJeHgNtytV1BT1u2Zam6aF+s00gLxE2g7eicCDviFx
+   g2pYSdYWuOJ3C3IEl1v4suwmg3IDT8GDWJ79O8vqnYN9/YcjxRGiFxL/G
+   g==;
+X-CSE-ConnectionGUID: qEKZaT7/TbumQlwD4xw4aw==
+X-CSE-MsgGUID: lOy7Z9IPRo66N0b8RO5ESg==
+X-IronPort-AV: E=Sophos;i="6.18,214,1751241600"; 
+   d="scan'208";a="1465584"
+Received: from ip-10-6-11-83.eu-central-1.compute.internal (HELO smtpout.naws.eu-central-1.prod.farcaster.email.amazon.dev) ([10.6.11.83])
+  by internal-fra-out-005.esa.eu-central-1.outbound.mail-perimeter.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 01 Sep 2025 14:22:23 +0000
+Received: from EX19MTAEUA001.ant.amazon.com [54.240.197.233:2933]
+ by smtpin.naws.eu-central-1.prod.farcaster.email.amazon.dev [10.0.3.140:2525] with esmtp (Farcaster)
+ id ce39f935-8ca3-4e3f-9b35-e9483f981017; Mon, 1 Sep 2025 14:22:23 +0000 (UTC)
+X-Farcaster-Flow-ID: ce39f935-8ca3-4e3f-9b35-e9483f981017
+Received: from EX19D015EUB004.ant.amazon.com (10.252.51.13) by
+ EX19MTAEUA001.ant.amazon.com (10.252.50.192) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.2562.17;
+ Mon, 1 Sep 2025 14:22:23 +0000
+Received: from EX19D015EUB004.ant.amazon.com (10.252.51.13) by
+ EX19D015EUB004.ant.amazon.com (10.252.51.13) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.2562.20;
+ Mon, 1 Sep 2025 14:22:22 +0000
+Received: from EX19D015EUB004.ant.amazon.com ([fe80::2dc9:7aa9:9cd3:fc8a]) by
+ EX19D015EUB004.ant.amazon.com ([fe80::2dc9:7aa9:9cd3:fc8a%3]) with mapi id
+ 15.02.2562.020; Mon, 1 Sep 2025 14:22:22 +0000
+From: "Roy, Patrick" <roypat@amazon.co.uk>
+To: "rppt@kernel.org" <rppt@kernel.org>
+CC: "ackerleytng@google.com" <ackerleytng@google.com>, "david@redhat.com"
+	<david@redhat.com>, "Manwaring, Derek" <derekmn@amazon.com>, "Thomson, Jack"
+	<jackabt@amazon.co.uk>, "Kalyazin, Nikita" <kalyazin@amazon.co.uk>,
+	"kvm@vger.kernel.org" <kvm@vger.kernel.org>, "kvmarm@lists.linux.dev"
+	<kvmarm@lists.linux.dev>, "linux-arm-kernel@lists.infradead.org"
+	<linux-arm-kernel@lists.infradead.org>, "linux-kernel@vger.kernel.org"
+	<linux-kernel@vger.kernel.org>, "linux-mm@kvack.org" <linux-mm@kvack.org>,
+	"pbonzini@redhat.com" <pbonzini@redhat.com>, "Roy, Patrick"
+	<roypat@amazon.co.uk>, "seanjc@google.com" <seanjc@google.com>,
+	"tabba@google.com" <tabba@google.com>, "vbabka@suse.cz" <vbabka@suse.cz>,
+	"will@kernel.org" <will@kernel.org>, "Cali, Marco" <xmarcalx@amazon.co.uk>
+Subject: Re: [PATCH v5 04/12] KVM: guest_memfd: Add flag to remove from direct
+ map
+Thread-Topic: [PATCH v5 04/12] KVM: guest_memfd: Add flag to remove from
+ direct map
+Thread-Index: AQHcG0vV41OK1VctH0adgeriedPTLg==
+Date: Mon, 1 Sep 2025 14:22:22 +0000
+Message-ID: <20250901142220.30610-1-roypat@amazon.co.uk>
+References: <aLBtwIhQpX6AR2Z6@kernel.org>
+In-Reply-To: <aLBtwIhQpX6AR2Z6@kernel.org>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+Content-Type: text/plain; charset="iso-8859-1"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
 
-From: gyutrange <wlsrbwjd643@naver.com>
-
-VNCR/TLBI VA reconstruction currently uses bit 48 as the sign bit,
-but for 48-bit virtual addresses the correct sign bit is bit 47.
-Using 48 can mis-canonicalize addresses in the negative half and may
-cause missed invalidations.
-
-Although VNCR_EL2 encodes other architectural fields (RESS, BADDR;
-see Arm ARM D24.2.206), sign_extend64() interprets its second argument
-as the index of the sign bit. Passing 48 prevents propagation of the
-canonical sign bit for 48-bit VAs.
-
-Impact:
-- Incorrect canonicalization of VAs with bit47=1
-- Potential stale VNCR pseudo-TLB entries after TLBI or MMU notifier
-- Possible incorrect translation/permissions or DoS when combined
-  with other issues
-
-Fixes: 667304740537 ("KVM: arm64: Mask out non-VA bits from TLBI VA* on VNCR invalidation")
-Cc: stable@vger.kernel.org
-Reported-by: DongHa Lee <gap-dev@example.com>
-Reported-by: Gyujeong Jin <wlsrbwjd7232@gmail.com>
-Reported-by: Daehyeon Ko <4ncient@example.com>
-Reported-by: Geonha Lee <leegn4a@example.com>
-Reported-by: Hyungyu Oh <dqpc_lover@example.com>
-Reported-by: Jaewon Yang <r4mbb1@example.com>
-Signed-off-by: Gyujeong Jin <wlsrbwjd7232@gmail.com>
----
- arch/arm64/kvm/nested.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
-
-diff --git a/arch/arm64/kvm/nested.c b/arch/arm64/kvm/nested.c
-index 77db81bae86f..eaa6dd9da086 100644
---- a/arch/arm64/kvm/nested.c
-+++ b/arch/arm64/kvm/nested.c
-@@ -1169,7 +1169,7 @@ int kvm_vcpu_allocate_vncr_tlb(struct kvm_vcpu *vcpu)
- 
- static u64 read_vncr_el2(struct kvm_vcpu *vcpu)
- {
--	return (u64)sign_extend64(__vcpu_sys_reg(vcpu, VNCR_EL2), 48);
-+	return (u64)sign_extend64(__vcpu_sys_reg(vcpu, VNCR_EL2), 47);
- }
- 
- static int kvm_translate_vncr(struct kvm_vcpu *vcpu)
--- 
-2.43.0
-
+On Thu, 2025-08-28 at 15:54 +0100, Mike Rapoport wrote:=0A=
+> On Thu, Aug 28, 2025 at 09:39:21AM +0000, Roy, Patrick wrote:=0A=
+>> Add GUEST_MEMFD_FLAG_NO_DIRECT_MAP flag for KVM_CREATE_GUEST_MEMFD()=0A=
+>> ioctl. When set, guest_memfd folios will be removed from the direct map=
+=0A=
+>> after preparation, with direct map entries only restored when the folios=
+=0A=
+>> are freed.=0A=
+>>=0A=
+>> To ensure these folios do not end up in places where the kernel cannot=
+=0A=
+>> deal with them, set AS_NO_DIRECT_MAP on the guest_memfd's struct=0A=
+>> address_space if GUEST_MEMFD_FLAG_NO_DIRECT_MAP is requested.=0A=
+>>=0A=
+>> Add KVM_CAP_GUEST_MEMFD_NO_DIRECT_MAP to let userspace discover whether=
+=0A=
+>> guest_memfd supports GUEST_MEMFD_FLAG_NO_DIRECT_MAP. Support depends on=
+=0A=
+>> guest_memfd itself being supported, but also on whether KVM can=0A=
+>> manipulate the direct map at page granularity at all (possible most of=
+=0A=
+>> the time, just arm64 is a notable outlier where its impossible if the=0A=
+>> direct map has been setup using hugepages, as arm64 cannot break these=
+=0A=
+>> apart due to break-before-make semantics).=0A=
+> =0A=
+> There's also powerpc that does not select ARCH_HAS_SET_DIRECT_MAP=0A=
+=0A=
+Ah, thanks! Although powerpc also doesnt support guest_memfd in the first=
+=0A=
+place, but will mention.=0A=
+=0A=
+>> Note that this flag causes removal of direct map entries for all=0A=
+>> guest_memfd folios independent of whether they are "shared" or "private"=
+=0A=
+>> (although current guest_memfd only supports either all folios in the=0A=
+>> "shared" state, or all folios in the "private" state if=0A=
+>> GUEST_MEMFD_FLAG_MMAP is not set). The usecase for removing direct map=
+=0A=
+>> entries of also the shared parts of guest_memfd are a special type of=0A=
+>> non-CoCo VM where, host userspace is trusted to have access to all of=0A=
+>> guest memory, but where Spectre-style transient execution attacks=0A=
+>> through the host kernel's direct map should still be mitigated.  In this=
+=0A=
+>> setup, KVM retains access to guest memory via userspace mappings of=0A=
+>> guest_memfd, which are reflected back into KVM's memslots via=0A=
+>> userspace_addr. This is needed for things like MMIO emulation on x86_64=
+=0A=
+>> to work.=0A=
+>>=0A=
+>> Do not perform TLB flushes after direct map manipulations. This is=0A=
+>> because TLB flushes resulted in a up to 40x elongation of page faults in=
+=0A=
+>> guest_memfd (scaling with the number of CPU cores), or a 5x elongation=
+=0A=
+>> of memory population. TLB flushes are not needed for functional=0A=
+>> correctness (the virt->phys mapping technically stays "correct",  the=0A=
+>> kernel should simply to not it for a while). On the other hand, it means=
+=0A=
+> =0A=
+>                           ^ not use it?=0A=
+=0A=
+Yup, thanks!=0A=
+=0A=
+>> that the desired protection from Spectre-style attacks is not perfect,=
+=0A=
+>> as an attacker could try to prevent a stale TLB entry from getting=0A=
+>> evicted, keeping it alive until the page it refers to is used by the=0A=
+>> guest for some sensitive data, and then targeting it using a=0A=
+>> spectre-gadget.=0A=
+>>=0A=
+>> Signed-off-by: Patrick Roy <roypat@amazon.co.uk>=0A=
+>> ---=0A=
+>>  arch/arm64/include/asm/kvm_host.h | 12 ++++++++++++=0A=
+>>  include/linux/kvm_host.h          |  7 +++++++=0A=
+>>  include/uapi/linux/kvm.h          |  2 ++=0A=
+>>  virt/kvm/guest_memfd.c            | 29 +++++++++++++++++++++++++----=0A=
+>>  virt/kvm/kvm_main.c               |  5 +++++=0A=
+>>  5 files changed, 51 insertions(+), 4 deletions(-)=0A=
+> =0A=
+> ...=0A=
+> =0A=
+>> diff --git a/virt/kvm/guest_memfd.c b/virt/kvm/guest_memfd.c=0A=
+>> index 9ec4c45e3cf2..e3696880405c 100644=0A=
+>> --- a/virt/kvm/guest_memfd.c=0A=
+>> +++ b/virt/kvm/guest_memfd.c=0A=
+>> @@ -4,6 +4,7 @@=0A=
+>>  #include <linux/kvm_host.h>=0A=
+>>  #include <linux/pagemap.h>=0A=
+>>  #include <linux/anon_inodes.h>=0A=
+>> +#include <linux/set_memory.h>=0A=
+>>=0A=
+>>  #include "kvm_mm.h"=0A=
+>>=0A=
+>> @@ -42,8 +43,18 @@ static int __kvm_gmem_prepare_folio(struct kvm *kvm, =
+struct kvm_memory_slot *slo=0A=
+>>       return 0;=0A=
+>>  }=0A=
+>>=0A=
+>> +static bool kvm_gmem_test_no_direct_map(struct inode *inode)=0A=
+>> +{=0A=
+>> +     return ((unsigned long) inode->i_private) & GUEST_MEMFD_FLAG_NO_DI=
+RECT_MAP;=0A=
+>> +}=0A=
+>> +=0A=
+>>  static inline void kvm_gmem_mark_prepared(struct folio *folio)=0A=
+>>  {=0A=
+>> +     struct inode *inode =3D folio_inode(folio);=0A=
+>> +=0A=
+>> +     if (kvm_gmem_test_no_direct_map(inode))=0A=
+>> +             set_direct_map_valid_noflush(folio_page(folio, 0), folio_n=
+r_pages(folio), false);=0A=
+> =0A=
+> This may fail to split large mapping in the direct map. Why not move this=
+=0A=
+> to kvm_gmem_prepare_folio() where you can handle returned error?=0A=
+=0A=
+Argh, yeah, got that the wrong way around. Will update the error handling.=
+=0A=
+=0A=
+> I think that using set_direct_map_invalid_noflush() here and=0A=
+> set_direct_map_default_noflush() in kvm_gmem_free_folio() better is=0A=
+> clearer and makes it more obvious that here the folio is removed from the=
+=0A=
+> direct map and when freed it's direct mapping is restored.=0A=
+> =0A=
+> This requires to export two symbols in patch 2, but I think it's worth it=
+.=0A=
+=0A=
+Mh, but set_direct_map_[default|invalid]_noflush() only take a single struc=
+t=0A=
+page * argument, so they'd either need to gain a npages argument, or we add=
+ yet=0A=
+more functions to set_memory.h.  Do you still think that's worth it? =0A=
+=0A=
+>>       folio_mark_uptodate(folio);=0A=
+>>  }=0A=
+>>=0A=
+>> @@ -429,25 +440,29 @@ static int kvm_gmem_error_folio(struct address_spa=
+ce *mapping, struct folio *fol=0A=
+>>       return MF_DELAYED;=0A=
+>>  }=0A=
+>>=0A=
+>> -#ifdef CONFIG_HAVE_KVM_ARCH_GMEM_INVALIDATE=0A=
+>>  static void kvm_gmem_free_folio(struct address_space *mapping,=0A=
+>>                               struct folio *folio)=0A=
+>>  {=0A=
+>>       struct page *page =3D folio_page(folio, 0);=0A=
+>> +=0A=
+>> +#ifdef CONFIG_HAVE_KVM_ARCH_GMEM_INVALIDATE=0A=
+>>       kvm_pfn_t pfn =3D page_to_pfn(page);=0A=
+>>       int order =3D folio_order(folio);=0A=
+>> +#endif=0A=
+>>=0A=
+>> +     if (kvm_gmem_test_no_direct_map(mapping->host))=0A=
+>> +             WARN_ON_ONCE(set_direct_map_valid_noflush(page, folio_nr_p=
+ages(folio), true));=0A=
+> =0A=
+> I don't think it can fail here. The direct map was split when you removed=
+=0A=
+> the folio so here it will merely update the prot bits.=0A=
+=0A=
+Yup, will drop this WARN_ON_ONCE.=0A=
+=0A=
+>> +#ifdef CONFIG_HAVE_KVM_ARCH_GMEM_INVALIDATE=0A=
+>>       kvm_arch_gmem_invalidate(pfn, pfn + (1ul << order));=0A=
+>> -}=0A=
+>>  #endif=0A=
+>> +}=0A=
+> =0A=
+> Instead of moving #ifdefs into kvm_gmem_free_folio() it's better to add, =
+say,=0A=
+> kvm_gmem_invalidate() and move ifdefery there or even better have a stati=
+c=0A=
+> inline stub for !CONFIG_HAVE_KVM_ARCH_GMEM_INVALIDATE case.=0A=
+=0A=
+Ack, will do the latter=0A=
+=0A=
+>> diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c=0A=
+>> index 18f29ef93543..0dbfd17e1191 100644=0A=
+>> --- a/virt/kvm/kvm_main.c=0A=
+>> +++ b/virt/kvm/kvm_main.c=0A=
+>> @@ -65,6 +65,7 @@=0A=
+>>  #include <trace/events/kvm.h>=0A=
+>>=0A=
+>>  #include <linux/kvm_dirty_ring.h>=0A=
+>> +#include <linux/set_memory.h>=0A=
+>>=0A=
+>>=0A=
+>>  /* Worst case buffer size needed for holding an integer. */=0A=
+>> @@ -4916,6 +4917,10 @@ static int kvm_vm_ioctl_check_extension_generic(s=
+truct kvm *kvm, long arg)=0A=
+>>               return kvm_supported_mem_attributes(kvm);=0A=
+>>  #endif=0A=
+>>  #ifdef CONFIG_KVM_GUEST_MEMFD=0A=
+>> +     case KVM_CAP_GUEST_MEMFD_NO_DIRECT_MAP:=0A=
+>> +             if (!can_set_direct_map())=0A=
+> =0A=
+> Shouldn't this check with kvm_arch_gmem_supports_no_direct_map()?=0A=
+=0A=
+Absolutely, thanks for catching!=0A=
+=0A=
+>> +                     return false;=0A=
+>> +             fallthrough;=0A=
+>>       case KVM_CAP_GUEST_MEMFD:=0A=
+>>               return 1;=0A=
+>>       case KVM_CAP_GUEST_MEMFD_MMAP:=0A=
+>> --=0A=
+>> 2.50.1=0A=
+>>=0A=
+> =0A=
+> --=0A=
+> Sincerely yours,=0A=
+> Mike.=0A=
+=0A=
+Best,=0A=
+Patrick=0A=
 
