@@ -1,70 +1,68 @@
-Return-Path: <kvm+bounces-56478-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-56479-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id BE890B3E94D
-	for <lists+kvm@lfdr.de>; Mon,  1 Sep 2025 17:16:52 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id F1730B3E95D
+	for <lists+kvm@lfdr.de>; Mon,  1 Sep 2025 17:18:02 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2C0BD3ABC93
-	for <lists+kvm@lfdr.de>; Mon,  1 Sep 2025 15:13:17 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8FD2B48279B
+	for <lists+kvm@lfdr.de>; Mon,  1 Sep 2025 15:14:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CEB83350833;
-	Mon,  1 Sep 2025 15:07:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id ECEB8350D5D;
+	Mon,  1 Sep 2025 15:07:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="W/MLcqUM"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ZQJpyQOb"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5A87534F474
-	for <kvm@vger.kernel.org>; Mon,  1 Sep 2025 15:07:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 82875350D55
+	for <kvm@vger.kernel.org>; Mon,  1 Sep 2025 15:07:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756739258; cv=none; b=U2dpqJ2fxdmV+nNVxwfXpzWeDUR2R5pultvUBgFBFmM8IzI30oT4kzKQancVuPih9BXvNTfOpcmfwFAsa4wLcXBoR6D/1Rh/IJzz9m3NGrhVdKNpwYf2QLXn82R/ClUJREoeUBkIBPtd4/eZYkFuvxhjNfavALPlztMfx8qGLd0=
+	t=1756739276; cv=none; b=kWMVkfU/Vm30F378Vj+4rBEarcOQzD8BuLYrvdIefX4A5zN6ygOfduiSwOkj82mxHHDdllz7/rdiZx2bQlnxsJ8ldGyxKr3+otF6BSH4emOEPaaNaQbLaRlAEa2SE71JFQBhfawVHKdYo+9sOSCr0mgAo68P8srIiBWhJlBUXqU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756739258; c=relaxed/simple;
-	bh=vpP0rsuJYmmzYFvUEq/GBYJyw49cOYdlW9eiVdEiwYw=;
+	s=arc-20240116; t=1756739276; c=relaxed/simple;
+	bh=yeD3DGERfhq/kCR48SzIjutyjqo6RHlVKTJ6oCdWcTw=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=pzcos4Ev+zcQltXHB3uUWI/hl0sneUuSwxvSnxZCK4DLEJGNSj9C4PmpYjnzhfGLdYVKrzO62FWv6jBI1eq2SUSSQxWEMHBqsB2rIWSUfgPFtW1ADSwjMpv0sn3p6X7b+moc5Xxq//6au4k5KsC4OsPxpaofcVLb2kYs1VaQqTY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=W/MLcqUM; arc=none smtp.client-ip=170.10.133.124
+	 MIME-Version; b=YmoiSUAvWHAM8R87o8j2K/BYMdPLCuT/TFo6R3PoVFoXLQgytqDTkvQMdy6hkVZCZnBFQI5gnjrF9PwfTj9Q2BIOAJypzqOgocH6XT4WUFG/BDcjWz1r3dtg3w3BdpkPm4+8+jJVGSeM5j1JuBxzgAFG+sYGKovcLkt97MuQUUk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=ZQJpyQOb; arc=none smtp.client-ip=170.10.129.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1756739256;
+	s=mimecast20190719; t=1756739273;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=1uoE6NXhltHN+7rLv53vXfhLviFP/GMqcI5NGlTVFxQ=;
-	b=W/MLcqUMiblsHtFtJzIyOOKmZ+Tk20hzh9Xm7l/2Qi/FHdZfj1XpkcV0LbfASES6CMbo+j
-	KSo13ZmvcGtJ9zPKUwKrQGgE0uZUxmG37qigReYTe3hb90eyQXGUdjXzmDN2b3VNeTdNMX
-	lCbTuiukPGWjARQkfjwMyiuUl6hX5aQ=
+	bh=1NuKSd2ef5HwYax7pwu6yf7kwVuEbI8vaAEgix6O8kQ=;
+	b=ZQJpyQObUJxaWjXo5fzeC3w0N+8D6/nsIxTjJ1w7t+5E4pgA2ufMn3gyf9YsgTjYQe8nz+
+	laddLrcwVi5jYbLqiX+9MyVogN+ZhmXYda2eRgkxXKaTnmH5/pYlF8AqEM3QbQPVOWC7RG
+	Hpxh/rKkLJGfrUFrhlSpMsCtggGOZ2M=
 Received: from mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com
  (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
  relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-458-Vu95gNDhN86FCvXuoQpXFg-1; Mon,
- 01 Sep 2025 11:07:34 -0400
-X-MC-Unique: Vu95gNDhN86FCvXuoQpXFg-1
-X-Mimecast-MFC-AGG-ID: Vu95gNDhN86FCvXuoQpXFg_1756739249
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-319-WXE1NSHDPjahq0Msave6uA-1; Mon,
+ 01 Sep 2025 11:07:49 -0400
+X-MC-Unique: WXE1NSHDPjahq0Msave6uA-1
+X-Mimecast-MFC-AGG-ID: WXE1NSHDPjahq0Msave6uA_1756739264
 Received: from mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.93])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
 	(No client certificate requested)
-	by mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 609CF195608B;
-	Mon,  1 Sep 2025 15:07:29 +0000 (UTC)
+	by mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 34D8B195609E;
+	Mon,  1 Sep 2025 15:07:44 +0000 (UTC)
 Received: from t14s.fritz.box (unknown [10.22.88.45])
-	by mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 9DFF318003FC;
-	Mon,  1 Sep 2025 15:07:15 +0000 (UTC)
+	by mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id D513D18003FC;
+	Mon,  1 Sep 2025 15:07:29 +0000 (UTC)
 From: David Hildenbrand <david@redhat.com>
 To: linux-kernel@vger.kernel.org
 Cc: David Hildenbrand <david@redhat.com>,
 	Zi Yan <ziy@nvidia.com>,
-	"Mike Rapoport (Microsoft)" <rppt@kernel.org>,
 	Wei Yang <richard.weiyang@gmail.com>,
 	Lorenzo Stoakes <lorenzo.stoakes@oracle.com>,
-	"Liam R. Howlett" <Liam.Howlett@oracle.com>,
 	Alexander Potapenko <glider@google.com>,
 	Andrew Morton <akpm@linux-foundation.org>,
 	Brendan Jackman <jackmanb@google.com>,
@@ -81,6 +79,7 @@ Cc: David Hildenbrand <david@redhat.com>,
 	John Hubbard <jhubbard@nvidia.com>,
 	kasan-dev@googlegroups.com,
 	kvm@vger.kernel.org,
+	"Liam R. Howlett" <Liam.Howlett@oracle.com>,
 	Linus Torvalds <torvalds@linux-foundation.org>,
 	linux-arm-kernel@axis.com,
 	linux-arm-kernel@lists.infradead.org,
@@ -96,6 +95,7 @@ Cc: David Hildenbrand <david@redhat.com>,
 	Marco Elver <elver@google.com>,
 	Marek Szyprowski <m.szyprowski@samsung.com>,
 	Michal Hocko <mhocko@suse.com>,
+	Mike Rapoport <rppt@kernel.org>,
 	Muchun Song <muchun.song@linux.dev>,
 	netdev@vger.kernel.org,
 	Oscar Salvador <osalvador@suse.de>,
@@ -107,9 +107,9 @@ Cc: David Hildenbrand <david@redhat.com>,
 	Vlastimil Babka <vbabka@suse.cz>,
 	wireguard@lists.zx2c4.com,
 	x86@kernel.org
-Subject: [PATCH v2 11/37] mm: limit folio/compound page sizes in problematic kernel configs
-Date: Mon,  1 Sep 2025 17:03:32 +0200
-Message-ID: <20250901150359.867252-12-david@redhat.com>
+Subject: [PATCH v2 12/37] mm: simplify folio_page() and folio_page_idx()
+Date: Mon,  1 Sep 2025 17:03:33 +0200
+Message-ID: <20250901150359.867252-13-david@redhat.com>
 In-Reply-To: <20250901150359.867252-1-david@redhat.com>
 References: <20250901150359.867252-1-david@redhat.com>
 Precedence: bulk
@@ -121,68 +121,74 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.93
 
-Let's limit the maximum folio size in problematic kernel config where
-the memmap is allocated per memory section (SPARSEMEM without
-SPARSEMEM_VMEMMAP) to a single memory section.
+Now that a single folio/compound page can no longer span memory sections
+in problematic kernel configurations, we can stop using nth_page() in
+folio_page() and folio_page_idx().
 
-Currently, only a single architectures supports ARCH_HAS_GIGANTIC_PAGE
-but not SPARSEMEM_VMEMMAP: sh.
-
-Fortunately, the biggest hugetlb size sh supports is 64 MiB
-(HUGETLB_PAGE_SIZE_64MB) and the section size is at least 64 MiB
-(SECTION_SIZE_BITS == 26), so their use case is not degraded.
-
-As folios and memory sections are naturally aligned to their order-2 size
-in memory, consequently a single folio can no longer span multiple memory
-sections on these problematic kernel configs.
-
-nth_page() is no longer required when operating within a single compound
-page / folio.
+While at it, turn both macros into static inline functions and add
+kernel doc for folio_page_idx().
 
 Reviewed-by: Zi Yan <ziy@nvidia.com>
-Acked-by: Mike Rapoport (Microsoft) <rppt@kernel.org>
 Reviewed-by: Wei Yang <richard.weiyang@gmail.com>
 Reviewed-by: Lorenzo Stoakes <lorenzo.stoakes@oracle.com>
-Reviewed-by: Liam R. Howlett <Liam.Howlett@oracle.com>
 Signed-off-by: David Hildenbrand <david@redhat.com>
 ---
- include/linux/mm.h | 22 ++++++++++++++++++----
- 1 file changed, 18 insertions(+), 4 deletions(-)
+ include/linux/mm.h         | 16 ++++++++++++++--
+ include/linux/page-flags.h |  5 ++++-
+ 2 files changed, 18 insertions(+), 3 deletions(-)
 
 diff --git a/include/linux/mm.h b/include/linux/mm.h
-index 77737cbf2216a..2dee79fa2efcf 100644
+index 2dee79fa2efcf..f6880e3225c5c 100644
 --- a/include/linux/mm.h
 +++ b/include/linux/mm.h
-@@ -2053,11 +2053,25 @@ static inline long folio_nr_pages(const struct folio *folio)
- 	return folio_large_nr_pages(folio);
- }
+@@ -210,10 +210,8 @@ extern unsigned long sysctl_admin_reserve_kbytes;
  
--/* Only hugetlbfs can allocate folios larger than MAX_ORDER */
--#ifdef CONFIG_ARCH_HAS_GIGANTIC_PAGE
--#define MAX_FOLIO_ORDER		PUD_ORDER
--#else
-+#if !defined(CONFIG_ARCH_HAS_GIGANTIC_PAGE)
-+/*
-+ * We don't expect any folios that exceed buddy sizes (and consequently
-+ * memory sections).
-+ */
- #define MAX_FOLIO_ORDER		MAX_PAGE_ORDER
-+#elif defined(CONFIG_SPARSEMEM) && !defined(CONFIG_SPARSEMEM_VMEMMAP)
-+/*
-+ * Only pages within a single memory section are guaranteed to be
-+ * contiguous. By limiting folios to a single memory section, all folio
-+ * pages are guaranteed to be contiguous.
-+ */
-+#define MAX_FOLIO_ORDER		PFN_SECTION_SHIFT
-+#else
-+/*
-+ * There is no real limit on the folio size. We limit them to the maximum we
-+ * currently expect (e.g., hugetlb, dax).
-+ */
-+#define MAX_FOLIO_ORDER		PUD_ORDER
+ #if defined(CONFIG_SPARSEMEM) && !defined(CONFIG_SPARSEMEM_VMEMMAP)
+ #define nth_page(page,n) pfn_to_page(page_to_pfn((page)) + (n))
+-#define folio_page_idx(folio, p)	(page_to_pfn(p) - folio_pfn(folio))
+ #else
+ #define nth_page(page,n) ((page) + (n))
+-#define folio_page_idx(folio, p)	((p) - &(folio)->page)
  #endif
  
- #define MAX_FOLIO_NR_PAGES	(1UL << MAX_FOLIO_ORDER)
+ /* to align the pointer to the (next) page boundary */
+@@ -225,6 +223,20 @@ extern unsigned long sysctl_admin_reserve_kbytes;
+ /* test whether an address (unsigned long or pointer) is aligned to PAGE_SIZE */
+ #define PAGE_ALIGNED(addr)	IS_ALIGNED((unsigned long)(addr), PAGE_SIZE)
+ 
++/**
++ * folio_page_idx - Return the number of a page in a folio.
++ * @folio: The folio.
++ * @page: The folio page.
++ *
++ * This function expects that the page is actually part of the folio.
++ * The returned number is relative to the start of the folio.
++ */
++static inline unsigned long folio_page_idx(const struct folio *folio,
++		const struct page *page)
++{
++	return page - &folio->page;
++}
++
+ static inline struct folio *lru_to_folio(struct list_head *head)
+ {
+ 	return list_entry((head)->prev, struct folio, lru);
+diff --git a/include/linux/page-flags.h b/include/linux/page-flags.h
+index 5ee6ffbdbf831..faf17ca211b4f 100644
+--- a/include/linux/page-flags.h
++++ b/include/linux/page-flags.h
+@@ -316,7 +316,10 @@ static __always_inline unsigned long _compound_head(const struct page *page)
+  * check that the page number lies within @folio; the caller is presumed
+  * to have a reference to the page.
+  */
+-#define folio_page(folio, n)	nth_page(&(folio)->page, n)
++static inline struct page *folio_page(struct folio *folio, unsigned long n)
++{
++	return &folio->page + n;
++}
+ 
+ static __always_inline int PageTail(const struct page *page)
+ {
 -- 
 2.50.1
 
