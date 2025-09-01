@@ -1,173 +1,426 @@
-Return-Path: <kvm+bounces-56466-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-56467-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7DF64B3E7FF
-	for <lists+kvm@lfdr.de>; Mon,  1 Sep 2025 16:57:10 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1F105B3E838
+	for <lists+kvm@lfdr.de>; Mon,  1 Sep 2025 17:05:31 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id AC7E51A84AC5
-	for <lists+kvm@lfdr.de>; Mon,  1 Sep 2025 14:57:28 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 3C839189A352
+	for <lists+kvm@lfdr.de>; Mon,  1 Sep 2025 15:05:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5E1E0342CAC;
-	Mon,  1 Sep 2025 14:56:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7CA7B26B95B;
+	Mon,  1 Sep 2025 15:04:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=amazon.co.uk header.i=@amazon.co.uk header.b="Zz/3rOz0"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="cwXtXggg"
 X-Original-To: kvm@vger.kernel.org
-Received: from fra-out-011.esa.eu-central-1.outbound.mail-perimeter.amazon.com (fra-out-011.esa.eu-central-1.outbound.mail-perimeter.amazon.com [52.28.197.132])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3B132341AB7;
-	Mon,  1 Sep 2025 14:56:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=52.28.197.132
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 41592341651
+	for <kvm@vger.kernel.org>; Mon,  1 Sep 2025 15:04:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756738606; cv=none; b=hQqHvREpQ2+YN+J/vHTrqh6KjM/r8WrMnqQv0QqSnODcghBaVrn800KTolz6vzkBdIbvumd+zbe1cB7wZoe0HoGtZaAUusPSMvJb4PCxTYdTrtvQOqFmo93OA7WPX6ZPYyrMmAQSoYpXyLePV3r2CVY482ks9c2QbngvPchifO0=
+	t=1756739089; cv=none; b=oLEn2ZfETzu/m1VFRZa7MLgK7RCT0e53mEdGoVKRnQdH+TtgN1qfT+hn6FypJ8o/Nu3J/ijWo3TU8SSUmlAT0Z1+C27rcqTSRAH1KKI5l1eIZvCxZ4uvhwYleDz6R+Fiy+ON3MlPqLOY6UBCYVsDzYJLpK0Nyl808clkuV8950c=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756738606; c=relaxed/simple;
-	bh=0r92TVxw7xStPkhxnOmkl8O336c+4U2sqZq5v2M5rfQ=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=ScokYEA2vvCQm31dBoAo9HBujDStd09RhZ6TfGC95shwawYybN/H1mQw0jlgX2fwmLr5jBAwNlZefws46ddGUb/M49vwK5ygHAK+gvNqXslESD+DKDvq5fNZ5/uQNLKFXW3PKnXCXtZnXrFjwH9CC0uHxqIGwyr6wwZ/lGebgC0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.co.uk; spf=pass smtp.mailfrom=amazon.co.uk; dkim=pass (2048-bit key) header.d=amazon.co.uk header.i=@amazon.co.uk header.b=Zz/3rOz0; arc=none smtp.client-ip=52.28.197.132
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.co.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.uk
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.co.uk; i=@amazon.co.uk; q=dns/txt;
-  s=amazoncorp2; t=1756738604; x=1788274604;
-  h=from:to:cc:subject:date:message-id:references:
-   in-reply-to:content-transfer-encoding:mime-version;
-  bh=DzdixQuy30cIOdtGPtZhymwxAjNsuo6l8KhPTQzil28=;
-  b=Zz/3rOz02k0CZijphqp9ZkI2uI+MNzRHVUtqSaZj0zco6n+GKXQecmxT
-   v0winJS3clIBs3DoevV7i21tnrZHvkBYMIzZc488ErWNdDvdPuLXFlic3
-   NuB7uWF4peU+w6IYuB5aimAFu4wNfAFqvXa/fFYQIGJnFRMcutOZpWs9f
-   oqYoFpzHYBbU3aJ4Z+RCn5ucKCSQzhGWMN10ISnPXJMlsJ+uYjPy45Lsu
-   ghCjiS03i/pxxXd1WGydNCWFW2Jf3/yYQg5NHwJNGCbTfwbYRonT8wMzR
-   T34wslWVo3fHlrDg31uws6b6a2gxBCVEp6Bz6wBNIukxyJOYNZmEjo2B4
-   A==;
-X-CSE-ConnectionGUID: TP9bWQ1xROib+ix+/ngIXQ==
-X-CSE-MsgGUID: YwAZ6XeoRvujHV/6Dg0jJQ==
-X-IronPort-AV: E=Sophos;i="6.17,290,1747699200"; 
-   d="scan'208";a="1364214"
-Received: from ip-10-6-3-216.eu-central-1.compute.internal (HELO smtpout.naws.eu-central-1.prod.farcaster.email.amazon.dev) ([10.6.3.216])
-  by internal-fra-out-011.esa.eu-central-1.outbound.mail-perimeter.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 01 Sep 2025 14:56:34 +0000
-Received: from EX19MTAEUB002.ant.amazon.com [54.240.197.232:28303]
- by smtpin.naws.eu-central-1.prod.farcaster.email.amazon.dev [10.0.36.37:2525] with esmtp (Farcaster)
- id 90fd1a2a-3fc2-46c8-b14d-04ef65bb514a; Mon, 1 Sep 2025 14:56:34 +0000 (UTC)
-X-Farcaster-Flow-ID: 90fd1a2a-3fc2-46c8-b14d-04ef65bb514a
-Received: from EX19D015EUB002.ant.amazon.com (10.252.51.123) by
- EX19MTAEUB002.ant.amazon.com (10.252.51.59) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.2562.17;
- Mon, 1 Sep 2025 14:56:33 +0000
-Received: from EX19D015EUB004.ant.amazon.com (10.252.51.13) by
- EX19D015EUB002.ant.amazon.com (10.252.51.123) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.2562.20;
- Mon, 1 Sep 2025 14:56:33 +0000
-Received: from EX19D015EUB004.ant.amazon.com ([fe80::2dc9:7aa9:9cd3:fc8a]) by
- EX19D015EUB004.ant.amazon.com ([fe80::2dc9:7aa9:9cd3:fc8a%3]) with mapi id
- 15.02.2562.020; Mon, 1 Sep 2025 14:56:33 +0000
-From: "Roy, Patrick" <roypat@amazon.co.uk>
-To: "Roy, Patrick" <roypat@amazon.co.uk>
-CC: "ackerleytng@google.com" <ackerleytng@google.com>, "david@redhat.com"
-	<david@redhat.com>, "Manwaring, Derek" <derekmn@amazon.com>, "Thomson, Jack"
-	<jackabt@amazon.co.uk>, "Kalyazin, Nikita" <kalyazin@amazon.co.uk>,
-	"kvm@vger.kernel.org" <kvm@vger.kernel.org>, "kvmarm@lists.linux.dev"
-	<kvmarm@lists.linux.dev>, "linux-arm-kernel@lists.infradead.org"
-	<linux-arm-kernel@lists.infradead.org>, "linux-kernel@vger.kernel.org"
-	<linux-kernel@vger.kernel.org>, "linux-mm@kvack.org" <linux-mm@kvack.org>,
-	"pbonzini@redhat.com" <pbonzini@redhat.com>, "rppt@kernel.org"
-	<rppt@kernel.org>, "seanjc@google.com" <seanjc@google.com>,
-	"tabba@google.com" <tabba@google.com>, "vbabka@suse.cz" <vbabka@suse.cz>,
-	"will@kernel.org" <will@kernel.org>, "Cali, Marco" <xmarcalx@amazon.co.uk>
-Subject: Re: [PATCH v5 03/12] mm: introduce AS_NO_DIRECT_MAP
-Thread-Topic: [PATCH v5 03/12] mm: introduce AS_NO_DIRECT_MAP
-Thread-Index: AQHcG0fkqK4jccjXtUKv/NLtaS3P1rR+aqUA
-Date: Mon, 1 Sep 2025 14:56:33 +0000
-Message-ID: <20250901145632.28172-1-roypat@amazon.co.uk>
-References: <20250901135408.5965-1-roypat@amazon.co.uk>
-In-Reply-To: <20250901135408.5965-1-roypat@amazon.co.uk>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-Content-Type: text/plain; charset="iso-8859-1"
-Content-Transfer-Encoding: quoted-printable
+	s=arc-20240116; t=1756739089; c=relaxed/simple;
+	bh=sFQdsLQ8ZJS2qvEL1G7uSHF5lvcL6iB8UypbnQwUmbw=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=rCbmhpGUtlRSJ065tfVtsPaAzG7vvO4OQ3LYR/nXINW658ng63fkT915v8MKn8WYh0LF/2C7RfMKVcrimkUWf5gQ0y6yW+hX7znUYWEjtd92ZoKgo2k6ZsLLCfT25r9ffikeFE4gUolAYw4F7yK4HnGblablmR7ZVyOKmz7fq50=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=cwXtXggg; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1756739085;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=SbnyxtTKWg5jwngdRmLUxKAOmyXBjry9r+xRsqsuR80=;
+	b=cwXtXgggZoxtu4kD0fTsq40RnaupAL5pPq5yFlxxQhQ8DtiZOgXMOrHoSk/6/KjusR1e3u
+	fw6EmnvSXUWcTafwERwwi0nQLPr1Ehvw8Vq3w2XeLtCGAp+P4SW+urgk3t4hy0u8KMWrZk
+	IxfoZ9U05Uaa7+WvFNdrquv8YM1F4kE=
+Received: from mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-368-unA3zFKCN2Gvpj1lbt3JzA-1; Mon,
+ 01 Sep 2025 11:04:42 -0400
+X-MC-Unique: unA3zFKCN2Gvpj1lbt3JzA-1
+X-Mimecast-MFC-AGG-ID: unA3zFKCN2Gvpj1lbt3JzA_1756739077
+Received: from mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.93])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 871361956096;
+	Mon,  1 Sep 2025 15:04:35 +0000 (UTC)
+Received: from t14s.fritz.box (unknown [10.22.88.45])
+	by mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id C99171800447;
+	Mon,  1 Sep 2025 15:04:00 +0000 (UTC)
+From: David Hildenbrand <david@redhat.com>
+To: linux-kernel@vger.kernel.org
+Cc: David Hildenbrand <david@redhat.com>,
+	Andrew Morton <akpm@linux-foundation.org>,
+	Linus Torvalds <torvalds@linux-foundation.org>,
+	Jason Gunthorpe <jgg@nvidia.com>,
+	Lorenzo Stoakes <lorenzo.stoakes@oracle.com>,
+	"Liam R. Howlett" <Liam.Howlett@oracle.com>,
+	Vlastimil Babka <vbabka@suse.cz>,
+	Mike Rapoport <rppt@kernel.org>,
+	Suren Baghdasaryan <surenb@google.com>,
+	Michal Hocko <mhocko@suse.com>,
+	Jens Axboe <axboe@kernel.dk>,
+	Marek Szyprowski <m.szyprowski@samsung.com>,
+	Robin Murphy <robin.murphy@arm.com>,
+	John Hubbard <jhubbard@nvidia.com>,
+	Peter Xu <peterx@redhat.com>,
+	Alexander Potapenko <glider@google.com>,
+	Marco Elver <elver@google.com>,
+	Dmitry Vyukov <dvyukov@google.com>,
+	Brendan Jackman <jackmanb@google.com>,
+	Johannes Weiner <hannes@cmpxchg.org>,
+	Zi Yan <ziy@nvidia.com>,
+	Dennis Zhou <dennis@kernel.org>,
+	Tejun Heo <tj@kernel.org>,
+	Christoph Lameter <cl@gentwo.org>,
+	Muchun Song <muchun.song@linux.dev>,
+	Oscar Salvador <osalvador@suse.de>,
+	x86@kernel.org,
+	linux-arm-kernel@lists.infradead.org,
+	linux-mips@vger.kernel.org,
+	linux-s390@vger.kernel.org,
+	linux-crypto@vger.kernel.org,
+	linux-ide@vger.kernel.org,
+	intel-gfx@lists.freedesktop.org,
+	dri-devel@lists.freedesktop.org,
+	linux-mmc@vger.kernel.org,
+	linux-arm-kernel@axis.com,
+	linux-scsi@vger.kernel.org,
+	kvm@vger.kernel.org,
+	virtualization@lists.linux.dev,
+	linux-mm@kvack.org,
+	io-uring@vger.kernel.org,
+	iommu@lists.linux.dev,
+	kasan-dev@googlegroups.com,
+	wireguard@lists.zx2c4.com,
+	netdev@vger.kernel.org,
+	linux-kselftest@vger.kernel.org,
+	linux-riscv@lists.infradead.org,
+	Albert Ou <aou@eecs.berkeley.edu>,
+	Alexander Gordeev <agordeev@linux.ibm.com>,
+	Alexandre Ghiti <alex@ghiti.fr>,
+	Alexandru Elisei <alexandru.elisei@arm.com>,
+	Alex Dubov <oakad@yahoo.com>,
+	Alex Williamson <alex.williamson@redhat.com>,
+	Andreas Larsson <andreas@gaisler.com>,
+	Bart Van Assche <bvanassche@acm.org>,
+	Borislav Petkov <bp@alien8.de>,
+	Brett Creeley <brett.creeley@amd.com>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Christian Borntraeger <borntraeger@linux.ibm.com>,
+	Christophe Leroy <christophe.leroy@csgroup.eu>,
+	Damien Le Moal <dlemoal@kernel.org>,
+	Dave Hansen <dave.hansen@linux.intel.com>,
+	David Airlie <airlied@gmail.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Doug Gilbert <dgilbert@interlog.com>,
+	Heiko Carstens <hca@linux.ibm.com>,
+	Herbert Xu <herbert@gondor.apana.org.au>,
+	Huacai Chen <chenhuacai@kernel.org>,
+	Ingo Molnar <mingo@redhat.com>,
+	"James E.J. Bottomley" <James.Bottomley@HansenPartnership.com>,
+	Jani Nikula <jani.nikula@linux.intel.com>,
+	"Jason A. Donenfeld" <Jason@zx2c4.com>,
+	Jason Gunthorpe <jgg@ziepe.ca>,
+	Jesper Nilsson <jesper.nilsson@axis.com>,
+	Joonas Lahtinen <joonas.lahtinen@linux.intel.com>,
+	Kevin Tian <kevin.tian@intel.com>,
+	Lars Persson <lars.persson@axis.com>,
+	Madhavan Srinivasan <maddy@linux.ibm.com>,
+	"Martin K. Petersen" <martin.petersen@oracle.com>,
+	Maxim Levitsky <maximlevitsky@gmail.com>,
+	Michael Ellerman <mpe@ellerman.id.au>,
+	Nicholas Piggin <npiggin@gmail.com>,
+	Niklas Cassel <cassel@kernel.org>,
+	Palmer Dabbelt <palmer@dabbelt.com>,
+	Paul Walmsley <paul.walmsley@sifive.com>,
+	Pavel Begunkov <asml.silence@gmail.com>,
+	Rodrigo Vivi <rodrigo.vivi@intel.com>,
+	SeongJae Park <sj@kernel.org>,
+	Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>,
+	Shuah Khan <shuah@kernel.org>,
+	Simona Vetter <simona@ffwll.ch>,
+	Sven Schnelle <svens@linux.ibm.com>,
+	Thomas Bogendoerfer <tsbogend@alpha.franken.de>,
+	Thomas Gleixner <tglx@linutronix.de>,
+	Tvrtko Ursulin <tursulin@ursulin.net>,
+	Ulf Hansson <ulf.hansson@linaro.org>,
+	Vasily Gorbik <gor@linux.ibm.com>,
+	WANG Xuerui <kernel@xen0n.name>,
+	Wei Yang <richard.weiyang@gmail.com>,
+	Will Deacon <will@kernel.org>,
+	Yishai Hadas <yishaih@nvidia.com>
+Subject: [PATCH v2 00/37] mm: remove nth_page()
+Date: Mon,  1 Sep 2025 17:03:21 +0200
+Message-ID: <20250901150359.867252-1-david@redhat.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.93
 
-On Mon, 2025-09-01 at 14:54 +0100, "Roy, Patrick" wrote:=0A=
-> =0A=
-> Hi Fuad!=0A=
-> =0A=
-> On Thu, 2025-08-28 at 11:21 +0100, Fuad Tabba wrote:=0A=
->> Hi Patrick,=0A=
->>=0A=
->> On Thu, 28 Aug 2025 at 10:39, Roy, Patrick <roypat@amazon.co.uk> wrote:=
-=0A=
->>> diff --git a/include/linux/pagemap.h b/include/linux/pagemap.h=0A=
->>> index 12a12dae727d..b52b28ae4636 100644=0A=
->>> --- a/include/linux/pagemap.h=0A=
->>> +++ b/include/linux/pagemap.h=0A=
->>> @@ -211,6 +211,7 @@ enum mapping_flags {=0A=
->>>                                    folio contents */=0A=
->>>         AS_INACCESSIBLE =3D 8,    /* Do not attempt direct R/W access t=
-o the mapping */=0A=
->>>         AS_WRITEBACK_MAY_DEADLOCK_ON_RECLAIM =3D 9,=0A=
->>> +       AS_NO_DIRECT_MAP =3D 10,  /* Folios in the mapping are not in t=
-he direct map */=0A=
->>>         /* Bits 16-25 are used for FOLIO_ORDER */=0A=
->>>         AS_FOLIO_ORDER_BITS =3D 5,=0A=
->>>         AS_FOLIO_ORDER_MIN =3D 16,=0A=
->>> @@ -346,6 +347,21 @@ static inline bool mapping_writeback_may_deadlock_=
-on_reclaim(struct address_spac=0A=
->>>         return test_bit(AS_WRITEBACK_MAY_DEADLOCK_ON_RECLAIM, &mapping-=
->flags);=0A=
->>>  }=0A=
->>>=0A=
->>> +static inline void mapping_set_no_direct_map(struct address_space *map=
-ping)=0A=
->>> +{=0A=
->>> +       set_bit(AS_NO_DIRECT_MAP, &mapping->flags);=0A=
->>> +}=0A=
->>> +=0A=
->>> +static inline bool mapping_no_direct_map(struct address_space *mapping=
-)=0A=
->>> +{=0A=
->>> +       return test_bit(AS_NO_DIRECT_MAP, &mapping->flags);=0A=
->>> +}=0A=
->>> +=0A=
->>> +static inline bool vma_is_no_direct_map(const struct vm_area_struct *v=
-ma)=0A=
->>> +{=0A=
->>> +       return vma->vm_file && mapping_no_direct_map(vma->vm_file->f_ma=
-pping);=0A=
->>> +}=0A=
->>> +=0A=
->> Any reason vma is const whereas mapping in the function that it calls=0A=
->> (defined above it) isn't?=0A=
-> =0A=
-> Ah, I cannot say that that was a conscious decision, but rather an artifa=
-ct of=0A=
-> the code that I looked at for reference when writing these two simply did=
- it=0A=
-> this way.  Are you saying both should be const, or neither (in my mind, b=
-oth=0A=
-> could be const, but the mapping_*() family of functions further up in thi=
-s file=0A=
-> dont take const arguments, so I'm a bit unsure now)?=0A=
-=0A=
-Hah, just saw=0A=
-https://lore.kernel.org/linux-mm/20250901123028.3383461-3-max.kellermann@io=
-nos.com/.=0A=
-Guess that means "both should be const" then :D=0A=
-=0A=
->> Cheers,=0A=
->> /fuad=0A=
-> =0A=
-> Best,=0A=
-> Patrick=0A=
-=0A=
+This is based on mm-unstable.
+
+I will only CC non-MM folks on the cover letter and the respective patch
+to not flood too many inboxes (the lists receive all patches).
+
+--
+
+As discussed recently with Linus, nth_page() is just nasty and we would
+like to remove it.
+
+To recap, the reason we currently need nth_page() within a folio is because
+on some kernel configs (SPARSEMEM without SPARSEMEM_VMEMMAP), the
+memmap is allocated per memory section.
+
+While buddy allocations cannot cross memory section boundaries, hugetlb
+and dax folios can.
+
+So crossing a memory section means that "page++" could do the wrong thing.
+Instead, nth_page() on these problematic configs always goes from
+page->pfn, to the go from (++pfn)->page, which is rather nasty.
+
+Likely, many people have no idea when nth_page() is required and when
+it might be dropped.
+
+We refer to such problematic PFN ranges and "non-contiguous pages".
+If we only deal with "contiguous pages", there is not need for nth_page().
+
+Besides that "obvious" folio case, we might end up using nth_page()
+within CMA allocations (again, could span memory sections), and in
+one corner case (kfence) when processing memblock allocations (again,
+could span memory sections).
+
+So let's handle all that, add sanity checks, and remove nth_page().
+
+Patch #1 -> #5   : stop making SPARSEMEM_VMEMMAP user-selectable + cleanups
+Patch #6 -> #13  : disallow folios to have non-contiguous pages
+Patch #14 -> #20 : remove nth_page() usage within folios
+Patch #22        : disallow CMA allocations of non-contiguous pages
+Patch #23 -> #33 : sanity+check + remove nth_page() usage within SG entry
+Patch #34        : sanity-check + remove nth_page() usage in
+                   unpin_user_page_range_dirty_lock()
+Patch #35        : remove nth_page() in kfence
+Patch #36        : adjust stale comment regarding nth_page
+Patch #37        : mm: remove nth_page()
+
+A lot of this is inspired from the discussion at [1] between Linus, Jason
+and me, so cudos to them.
+
+[1] https://lore.kernel.org/all/CAHk-=wiCYfNp4AJLBORU-c7ZyRBUp66W2-Et6cdQ4REx-GyQ_A@mail.gmail.com/T/#u
+
+v1 -> v2:
+* "fs: hugetlbfs: cleanup folio in adjust_range_hwpoison()"
+ -> Add comment for loop and remove comment of function regarding
+    copy_page_to_iter().
+* Various smaller patch description tweaks I am not going to list for my
+  sanity
+* "mips: mm: convert __flush_dcache_pages() to
+  __flush_dcache_folio_pages()"
+ -> Fix flush_dcache_page()
+ -> Drop "extern"
+* "mm/gup: remove record_subpages()"
+ -> Added
+* "mm/hugetlb: check for unreasonable folio sizes when registering hstate"
+ -> Refine comment
+* "mm/cma: refuse handing out non-contiguous page ranges"
+ -> Add comment above loop
+* "mm/page_alloc: reject unreasonable folio/compound page sizes in
+   alloc_contig_range_noprof()"
+ -> Added comment above check
+* "mm/gup: drop nth_page() usage in unpin_user_page_range_dirty_lock()"
+ -> Refined comment
+
+RFC -> v1:
+* "wireguard: selftests: remove CONFIG_SPARSEMEM_VMEMMAP=y from qemu kernel
+   config"
+ -> Mention that it was never really relevant for the test
+* "mm/mm_init: make memmap_init_compound() look more like
+   prep_compound_page()"
+ -> Mention the setup of page links
+* "mm: limit folio/compound page sizes in problematic kernel configs"
+ -> Improve comment for PUD handling, mentioning hugetlb and dax
+* "mm: simplify folio_page() and folio_page_idx()"
+ -> Call variable "n"
+* "mm/hugetlb: cleanup hugetlb_folio_init_tail_vmemmap()"
+ -> Keep __init_single_page() and refer to the usage of
+    memblock_reserved_mark_noinit()
+* "fs: hugetlbfs: cleanup folio in adjust_range_hwpoison()"
+* "fs: hugetlbfs: remove nth_page() usage within folio in
+   adjust_range_hwpoison()"
+ -> Separate nth_page() removal from cleanups
+ -> Further improve cleanups
+* "io_uring/zcrx: remove nth_page() usage within folio"
+ -> Keep the io_copy_cache for now and limit to nth_page() removal
+* "mm/gup: drop nth_page() usage within folio when recording subpages"
+ -> Cleanup record_subpages as bit
+* "mm/cma: refuse handing out non-contiguous page ranges"
+ -> Replace another instance of "pfn_to_page(pfn)" where we already have
+    the page
+* "scatterlist: disallow non-contigous page ranges in a single SG entry"
+ -> We have to EXPORT the symbol. I thought about moving it to mm_inline.h,
+    but I really don't want to include that in include/linux/scatterlist.h
+* "ata: libata-eh: drop nth_page() usage within SG entry"
+* "mspro_block: drop nth_page() usage within SG entry"
+* "memstick: drop nth_page() usage within SG entry"
+* "mmc: drop nth_page() usage within SG entry"
+ -> Keep PAGE_SHIFT
+* "scsi: scsi_lib: drop nth_page() usage within SG entry"
+* "scsi: sg: drop nth_page() usage within SG entry"
+ -> Split patches, Keep PAGE_SHIFT
+* "crypto: remove nth_page() usage within SG entry"
+ -> Keep PAGE_SHIFT
+* "kfence: drop nth_page() usage"
+ -> Keep modifying i and use "start_pfn" only instead
+
+Cc: Andrew Morton <akpm@linux-foundation.org>
+Cc: Linus Torvalds <torvalds@linux-foundation.org>
+Cc: Jason Gunthorpe <jgg@nvidia.com>
+Cc: Lorenzo Stoakes <lorenzo.stoakes@oracle.com>
+Cc: "Liam R. Howlett" <Liam.Howlett@oracle.com>
+Cc: Vlastimil Babka <vbabka@suse.cz>
+Cc: Mike Rapoport <rppt@kernel.org>
+Cc: Suren Baghdasaryan <surenb@google.com>
+Cc: Michal Hocko <mhocko@suse.com>
+Cc: Jens Axboe <axboe@kernel.dk>
+Cc: Marek Szyprowski <m.szyprowski@samsung.com>
+Cc: Robin Murphy <robin.murphy@arm.com>
+Cc: John Hubbard <jhubbard@nvidia.com>
+Cc: Peter Xu <peterx@redhat.com>
+Cc: Alexander Potapenko <glider@google.com>
+Cc: Marco Elver <elver@google.com>
+Cc: Dmitry Vyukov <dvyukov@google.com>
+Cc: Brendan Jackman <jackmanb@google.com>
+Cc: Johannes Weiner <hannes@cmpxchg.org>
+Cc: Zi Yan <ziy@nvidia.com>
+Cc: Dennis Zhou <dennis@kernel.org>
+Cc: Tejun Heo <tj@kernel.org>
+Cc: Christoph Lameter <cl@gentwo.org>
+Cc: Muchun Song <muchun.song@linux.dev>
+Cc: Oscar Salvador <osalvador@suse.de>
+Cc: x86@kernel.org
+Cc: linux-arm-kernel@lists.infradead.org
+Cc: linux-mips@vger.kernel.org
+Cc: linux-s390@vger.kernel.org
+Cc: linux-crypto@vger.kernel.org
+Cc: linux-ide@vger.kernel.org
+Cc: intel-gfx@lists.freedesktop.org
+Cc: dri-devel@lists.freedesktop.org
+Cc: linux-mmc@vger.kernel.org
+Cc: linux-arm-kernel@axis.com
+Cc: linux-scsi@vger.kernel.org
+Cc: kvm@vger.kernel.org
+Cc: virtualization@lists.linux.dev
+Cc: linux-mm@kvack.org
+Cc: io-uring@vger.kernel.org
+Cc: iommu@lists.linux.dev
+Cc: kasan-dev@googlegroups.com
+Cc: wireguard@lists.zx2c4.com
+Cc: netdev@vger.kernel.org
+Cc: linux-kselftest@vger.kernel.org
+Cc: linux-riscv@lists.infradead.org
+
+David Hildenbrand (37):
+  mm: stop making SPARSEMEM_VMEMMAP user-selectable
+  arm64: Kconfig: drop superfluous "select SPARSEMEM_VMEMMAP"
+  s390/Kconfig: drop superfluous "select SPARSEMEM_VMEMMAP"
+  x86/Kconfig: drop superfluous "select SPARSEMEM_VMEMMAP"
+  wireguard: selftests: remove CONFIG_SPARSEMEM_VMEMMAP=y from qemu
+    kernel config
+  mm/page_alloc: reject unreasonable folio/compound page sizes in
+    alloc_contig_range_noprof()
+  mm/memremap: reject unreasonable folio/compound page sizes in
+    memremap_pages()
+  mm/hugetlb: check for unreasonable folio sizes when registering hstate
+  mm/mm_init: make memmap_init_compound() look more like
+    prep_compound_page()
+  mm: sanity-check maximum folio size in folio_set_order()
+  mm: limit folio/compound page sizes in problematic kernel configs
+  mm: simplify folio_page() and folio_page_idx()
+  mm/hugetlb: cleanup hugetlb_folio_init_tail_vmemmap()
+  mm/mm/percpu-km: drop nth_page() usage within single allocation
+  fs: hugetlbfs: remove nth_page() usage within folio in
+    adjust_range_hwpoison()
+  fs: hugetlbfs: cleanup folio in adjust_range_hwpoison()
+  mm/pagewalk: drop nth_page() usage within folio in folio_walk_start()
+  mm/gup: drop nth_page() usage within folio when recording subpages
+  mm/gup: remove record_subpages()
+  io_uring/zcrx: remove nth_page() usage within folio
+  mips: mm: convert __flush_dcache_pages() to
+    __flush_dcache_folio_pages()
+  mm/cma: refuse handing out non-contiguous page ranges
+  dma-remap: drop nth_page() in dma_common_contiguous_remap()
+  scatterlist: disallow non-contigous page ranges in a single SG entry
+  ata: libata-sff: drop nth_page() usage within SG entry
+  drm/i915/gem: drop nth_page() usage within SG entry
+  mspro_block: drop nth_page() usage within SG entry
+  memstick: drop nth_page() usage within SG entry
+  mmc: drop nth_page() usage within SG entry
+  scsi: scsi_lib: drop nth_page() usage within SG entry
+  scsi: sg: drop nth_page() usage within SG entry
+  vfio/pci: drop nth_page() usage within SG entry
+  crypto: remove nth_page() usage within SG entry
+  mm/gup: drop nth_page() usage in unpin_user_page_range_dirty_lock()
+  kfence: drop nth_page() usage
+  block: update comment of "struct bio_vec" regarding nth_page()
+  mm: remove nth_page()
+
+ arch/arm64/Kconfig                            |  1 -
+ arch/mips/include/asm/cacheflush.h            | 11 +++--
+ arch/mips/mm/cache.c                          |  8 ++--
+ arch/s390/Kconfig                             |  1 -
+ arch/x86/Kconfig                              |  1 -
+ crypto/ahash.c                                |  4 +-
+ crypto/scompress.c                            |  8 ++--
+ drivers/ata/libata-sff.c                      |  6 +--
+ drivers/gpu/drm/i915/gem/i915_gem_pages.c     |  2 +-
+ drivers/memstick/core/mspro_block.c           |  3 +-
+ drivers/memstick/host/jmb38x_ms.c             |  3 +-
+ drivers/memstick/host/tifm_ms.c               |  3 +-
+ drivers/mmc/host/tifm_sd.c                    |  4 +-
+ drivers/mmc/host/usdhi6rol0.c                 |  4 +-
+ drivers/scsi/scsi_lib.c                       |  3 +-
+ drivers/scsi/sg.c                             |  3 +-
+ drivers/vfio/pci/pds/lm.c                     |  3 +-
+ drivers/vfio/pci/virtio/migrate.c             |  3 +-
+ fs/hugetlbfs/inode.c                          | 36 +++++---------
+ include/crypto/scatterwalk.h                  |  4 +-
+ include/linux/bvec.h                          |  7 +--
+ include/linux/mm.h                            | 48 +++++++++++++++----
+ include/linux/page-flags.h                    |  5 +-
+ include/linux/scatterlist.h                   |  3 +-
+ io_uring/zcrx.c                               |  4 +-
+ kernel/dma/remap.c                            |  2 +-
+ mm/Kconfig                                    |  3 +-
+ mm/cma.c                                      | 39 +++++++++------
+ mm/gup.c                                      | 36 +++++++-------
+ mm/hugetlb.c                                  | 22 +++++----
+ mm/internal.h                                 |  1 +
+ mm/kfence/core.c                              | 12 +++--
+ mm/memremap.c                                 |  3 ++
+ mm/mm_init.c                                  | 15 +++---
+ mm/page_alloc.c                               | 10 +++-
+ mm/pagewalk.c                                 |  2 +-
+ mm/percpu-km.c                                |  2 +-
+ mm/util.c                                     | 36 ++++++++++++++
+ tools/testing/scatterlist/linux/mm.h          |  1 -
+ .../selftests/wireguard/qemu/kernel.config    |  1 -
+ 40 files changed, 217 insertions(+), 146 deletions(-)
+
+
+base-commit: b73c6f2b5712809f5f386780ac46d1d78c31b2e6
+-- 
+2.50.1
+
 
