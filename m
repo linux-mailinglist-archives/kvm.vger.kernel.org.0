@@ -1,79 +1,79 @@
-Return-Path: <kvm+bounces-56516-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-56517-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 011DEB3ECE9
-	for <lists+kvm@lfdr.de>; Mon,  1 Sep 2025 19:05:41 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 89FEEB3ECEE
+	for <lists+kvm@lfdr.de>; Mon,  1 Sep 2025 19:06:07 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id E4BCC7AC4A9
-	for <lists+kvm@lfdr.de>; Mon,  1 Sep 2025 17:04:03 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0DB6016C985
+	for <lists+kvm@lfdr.de>; Mon,  1 Sep 2025 17:06:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CFEB5320A0E;
-	Mon,  1 Sep 2025 17:05:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 41A72320A1F;
+	Mon,  1 Sep 2025 17:05:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="Jl6ar1YI"
+	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="0dAOoHf0"
 X-Original-To: kvm@vger.kernel.org
-Received: from NAM12-MW2-obe.outbound.protection.outlook.com (mail-mw2nam12on2063.outbound.protection.outlook.com [40.107.244.63])
+Received: from NAM11-BN8-obe.outbound.protection.outlook.com (mail-bn8nam11on2075.outbound.protection.outlook.com [40.107.236.75])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 61B182EC093;
-	Mon,  1 Sep 2025 17:05:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.244.63
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E0574320A03;
+	Mon,  1 Sep 2025 17:05:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.236.75
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756746330; cv=fail; b=UTujHGL4OFmHv8XWfS+nnHKPQUjSYLJ7CIQ6UECgsamftVe81PXFUAaJFpfHIAYIxQzXC03TjCygFxCAz/IkViHhuM1ykFgVKAY/MIv/3TdNO1vfyqBv3XzrcRvwRFSboycnqLMAB1jKWd2QRlVHppeOlw5tX8V+Vvm7xRLbnJY=
+	t=1756746349; cv=fail; b=HJ1iI0eW81yyBrVJ9zqWM5r3W6NFMKhYJFQrp1UqacuAeVmfReFWSOOYtU4B4DwaiDl51oAf3cazi2QjY0Ny1XkIj09GmkxSVW+f1oNdBtfTG3v8U/ffAvOBHrrTjlTW2fQUJ3z8DK4P8B4ZZBwQYlMRNk48FWg/1WWJ0Yh9Ml8=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756746330; c=relaxed/simple;
-	bh=tCj3io+qFtqAw9nPIR4o18EbCofK0eHZTbckD2650tk=;
+	s=arc-20240116; t=1756746349; c=relaxed/simple;
+	bh=3szuD/gS97y7IfVn1WELhaVzpI2hoeA6UpbdpjtUU10=;
 	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=nf9pLifmYsDDf0esWYkK5n1bmeq1T6sYYR2OJ46iATUH2j6ADAyBr9i2tnm8fJjqfOxb8U4cMym1XzRfnxj3eJFKp+tBhPR8sknPxCXq9fypEojYGtb9ozfP7uwj3KKRwe+MV0klrRHgxCAi/ZWWew2UzIeYF3dZ0Hqcj4TxeP0=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=Jl6ar1YI; arc=fail smtp.client-ip=40.107.244.63
+	 MIME-Version:Content-Type; b=a/4Mh+6v9dz4Opxo2vChaDW0obKrn0aqDG86/Akm+aUZxupSHprYXML1HXVPGFMDUe4n+dEo3k6/Rd0TzB3hArlobSf15uQuKZgYaveWG0Q2siMbKRQq5sNfqD45iyPePkVQ2XAquvEbSHPrceO+iVYC9eFC2fBPtotkGezcCiI=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=0dAOoHf0; arc=fail smtp.client-ip=40.107.236.75
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
 Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=t2Xt2hxQiMsBqJ/ZGbZS/SXZzhT9Bjkk6lrjGc5D/LlvFeP2byMAUcakW91ApjFYr215X+xl7sSNQD8CrpwpSDJKgr98bLFT3boKk4OWjGrN4y3bpizga9RLXdTFE098FO2VVbWtxopN05BfftXJKyoIq3oGkMFAHfg2OfiSk6LOgLJ7RmaGjqbOiu+D7ynuLrvUhEmaxp2LsRoPQaVDWmy/CH4vTKpM1WiLMvgENBK4OKb9dSRmrD+9bItcVrQK6mHzKJBqskxftBxL2wyasnOZn3IVPGQ3q88w/FzjrJkYNTXjfhWeVAI6dhFcJ8B02LZdg89fNFc5F2R4zeH7Ag==
+ b=riPfWPnjYIRTkFpGCzGmDuX9STJXCnZX9CyKZ5sXmxeH3OFnUbVeyx6sKWup83EAWtB7SUGr83lWLxQUA3bscxZKGIUtHJGIxeqwKGkE0Ni7PIBlxuDwav9VPF/5mvS61IacwnjZxYC5Ur714INK3kjBB/M8/NVxoEudTnWwsMkGBzFjmsDV9Pq3N17W1ksYd1s7oKiembgEQft5wjPbwdIWhuARfi1geK9VY5tLIpu2dZ5AjlHJvzKpObdsPWTWDCsWWW74iSPXzRUotIJywY/9zEEZD7VtnzIZJjyR92KW+HlpKbhMUuvi92g0VD4Gp6x9nf9krV31BU5HiXhdGw==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector10001;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=g67+snDWidgrFUtRguvPu9bEEB3z9QFen2ZN+1WmWto=;
- b=JzrIFRObyQZ0aG1HSQ+IIE1C+ltY42P6MzHMM/hvgaL5yftQyBlosNq7psihrNs/umvcz0faSIj/GcpuMNR71uL172DpcDcngNVD9cmsz/bKUuNWJWUTLXXDQQDueCRjb6NwNQYm95JZbXMf7pqmSIWsL80tYngzMlvIPzPVJOh1oi7JztYCXSMl06VEglYVcLeVjGtsiKQnbUY3tFg7YkgeB24O70+B7G7caVsu3VQLd0eDRF1rQe+aqzYJzdIzmVKkP6gQRuqhTuhO9oqC5f1eyyJBMuMuVSoT6E+YxdB0X/AVLZud4NE42dfFQW+xkUkD+RWntUmHA+Q9NYed/w==
+ bh=JSqwalCyctqqPKzCX/flTjJxElQ5ia51rxPwOUwezmo=;
+ b=qzAF6KRGeCprp9r7xzpVOwzWIItZObMtECxyDc/kdTb0ItEroLpg6Cquv/IC0xwGg9zi6DPXjEZ9TK0b/+SnxYi4S0sL3uHnw9tJlR5StVhP1EVexzDQJr2Qw2Nb42wiAu1ssihVtMzedPrpojDx0SXb//443EoY/7HjjwBcjjgck3Lkr77w0qSVwr+KHkXbrX03b35RLIW9u1asDIxsnccQ9toKtk+BMS7oL38s/wyyoMJoQkFwCZAUcuTWkeW3RJA+IR3nfAtn3WzOC+dYVDLio6B/PjyNzRgrP1oTBUp7mPcaGyDsv8vIpp1oKXIu2J0BtHYObz4JwBvIQYcC6Q==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
  165.204.84.17) smtp.rcpttodomain=linutronix.de smtp.mailfrom=amd.com;
  dmarc=pass (p=quarantine sp=quarantine pct=100) action=none
  header.from=amd.com; dkim=none (message not signed); arc=none (0)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=g67+snDWidgrFUtRguvPu9bEEB3z9QFen2ZN+1WmWto=;
- b=Jl6ar1YITcxdHnqF1W2Fu1MkzP/HRIIlfX/NP6DhUmKERs2ZY9JiwQPeTG69bJEpfcijEhQ5CaXL88uyELmovIpEBTGAAZi5ipFVoyL5313IRp7rO97LydeEp+UYRcZ2y5il7ygKdSyc4iVxoxVqnaTVFxLw266KXGw0VR6yYQ8=
-Received: from BN9PR03CA0889.namprd03.prod.outlook.com (2603:10b6:408:13c::24)
- by CH3PR12MB9394.namprd12.prod.outlook.com (2603:10b6:610:1cf::11) with
+ bh=JSqwalCyctqqPKzCX/flTjJxElQ5ia51rxPwOUwezmo=;
+ b=0dAOoHf01CbwsSBNRaVMQCO/fjKVGZ6fZlGfMj+I5bz/uoKKdB1jPs2XrOTQ/jlFM+eXFtvG5GLCbGt1rAEX0Wxj1aHXji5WhsCfS5+6UAFPYiE7I9C5e3IOnAMbcjzhhhG3ADAG/ATtPFDThSCIQbY+Pu3QRtcnvNrF+gVEeTQ=
+Received: from BN9PR03CA0643.namprd03.prod.outlook.com (2603:10b6:408:13b::18)
+ by BY5PR12MB4068.namprd12.prod.outlook.com (2603:10b6:a03:203::12) with
  Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9073.27; Mon, 1 Sep
- 2025 17:05:22 +0000
-Received: from MN1PEPF0000ECD7.namprd02.prod.outlook.com
- (2603:10b6:408:13c:cafe::8c) by BN9PR03CA0889.outlook.office365.com
- (2603:10b6:408:13c::24) with Microsoft SMTP Server (version=TLS1_3,
+ 2025 17:05:44 +0000
+Received: from BL6PEPF0001AB77.namprd02.prod.outlook.com
+ (2603:10b6:408:13b:cafe::86) by BN9PR03CA0643.outlook.office365.com
+ (2603:10b6:408:13b::18) with Microsoft SMTP Server (version=TLS1_3,
  cipher=TLS_AES_256_GCM_SHA384) id 15.20.9073.27 via Frontend Transport; Mon,
- 1 Sep 2025 17:05:22 +0000
+ 1 Sep 2025 17:05:44 +0000
 X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
  smtp.mailfrom=amd.com; dkim=none (message not signed)
  header.d=none;dmarc=pass action=none header.from=amd.com;
 Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
  165.204.84.17 as permitted sender) receiver=protection.outlook.com;
- client-ip=165.204.84.17; helo=SATLEXMB03.amd.com; pr=C
-Received: from SATLEXMB03.amd.com (165.204.84.17) by
- MN1PEPF0000ECD7.mail.protection.outlook.com (10.167.242.136) with Microsoft
+ client-ip=165.204.84.17; helo=SATLEXMB04.amd.com; pr=C
+Received: from SATLEXMB04.amd.com (165.204.84.17) by
+ BL6PEPF0001AB77.mail.protection.outlook.com (10.167.242.170) with Microsoft
  SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.20.9094.14 via Frontend Transport; Mon, 1 Sep 2025 17:05:21 +0000
-Received: from Satlexmb09.amd.com (10.181.42.218) by SATLEXMB03.amd.com
- (10.181.40.144) with Microsoft SMTP Server (version=TLS1_2,
+ 15.20.9094.14 via Frontend Transport; Mon, 1 Sep 2025 17:05:44 +0000
+Received: from Satlexmb09.amd.com (10.181.42.218) by SATLEXMB04.amd.com
+ (10.181.40.145) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.39; Mon, 1 Sep
- 2025 12:05:21 -0500
+ 2025 12:05:43 -0500
 Received: from BLRKPRNAYAK.amd.com (10.180.168.240) by satlexmb09.amd.com
  (10.181.42.218) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.2.1748.10; Mon, 1 Sep
- 2025 10:05:07 -0700
+ 2025 10:05:35 -0700
 From: K Prateek Nayak <kprateek.nayak@amd.com>
 To: Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>,
 	Borislav Petkov <bp@alien8.de>, Dave Hansen <dave.hansen@linux.intel.com>,
@@ -86,11 +86,10 @@ CC: Naveen rao <naveen.rao@amd.com>, Sairaj Kodilkar <sarunkod@amd.com>, "H.
 	<kvm@vger.kernel.org>, Mario Limonciello <mario.limonciello@amd.com>,
 	"Gautham R. Shenoy" <gautham.shenoy@amd.com>, Babu Moger
 	<babu.moger@amd.com>, Suravee Suthikulpanit <suravee.suthikulpanit@amd.com>,
-	K Prateek Nayak <kprateek.nayak@amd.com>, <stable@vger.kernel.org>, "Naveen N
- Rao" <naveen@kernel.org>
-Subject: [PATCH v5 1/4] x86/cpu/topology: Always try cpu_parse_topology_ext() on AMD/Hygon
-Date: Mon, 1 Sep 2025 17:04:15 +0000
-Message-ID: <20250901170418.4314-2-kprateek.nayak@amd.com>
+	K Prateek Nayak <kprateek.nayak@amd.com>
+Subject: [PATCH v5 2/4] x86/cpu/topology: Check for X86_FEATURE_XTOPOLOGY instead of passing has_xtopology
+Date: Mon, 1 Sep 2025 17:04:16 +0000
+Message-ID: <20250901170418.4314-3-kprateek.nayak@amd.com>
 X-Mailer: git-send-email 2.43.0
 In-Reply-To: <20250901170418.4314-1-kprateek.nayak@amd.com>
 References: <20250901170418.4314-1-kprateek.nayak@amd.com>
@@ -106,156 +105,129 @@ X-ClientProxiedBy: SATLEXMB03.amd.com (10.181.40.144) To satlexmb09.amd.com
  (10.181.42.218)
 X-EOPAttributedMessage: 0
 X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: MN1PEPF0000ECD7:EE_|CH3PR12MB9394:EE_
-X-MS-Office365-Filtering-Correlation-Id: 73624e75-417e-474e-2497-08dde979bc88
+X-MS-TrafficTypeDiagnostic: BL6PEPF0001AB77:EE_|BY5PR12MB4068:EE_
+X-MS-Office365-Filtering-Correlation-Id: e1089548-6d61-446d-4c0a-08dde979c9ae
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|36860700013|82310400026|1800799024|376014|7416014|13003099007;
+	BCL:0;ARA:13230040|82310400026|376014|36860700013|1800799024|7416014;
 X-Microsoft-Antispam-Message-Info:
-	=?us-ascii?Q?Ng9vRDmxlz2f7rzqOm1AW+LxxuiTtgBD1g5moywXeiTneHA8anmMZRM3j2oQ?=
- =?us-ascii?Q?BisVnJ5ThYPnFpYYLHGU/0OKFqeDJMAegwcI49VJsvPLWPjAm3ueDe/wxl9p?=
- =?us-ascii?Q?R6g8Mo9wknkrPVVcblPFSD11JjkU3AgbC2KCgf3c2KyNCV2x1lJNf4kki1x1?=
- =?us-ascii?Q?x1NFF0cz5r+2StE6Pzt9hmbgjVDoxHEWfFaq/c/dyBN4TQOLf+YhU6fEUnXf?=
- =?us-ascii?Q?hdtTVW8dQxgyuFj0FhHSn3KqNfHxQq9WVcFc2l5DM0pFoueesvCvAtfBDGwa?=
- =?us-ascii?Q?g/bRp8ybPw+M2c04uK3gw5dp37MaoMtGZdARLPImY2eFRswCkyJbFoQ+PawY?=
- =?us-ascii?Q?X9pzY6rRXEl7uNHCQPdkdmIBhG6unRe4f++irLr+bQ04hCH5J2lN9YoTGwKg?=
- =?us-ascii?Q?7pcwDCZqpVT5ABWfo5LEK4Y5OZpOuuq3UiaESvXHC0vrfRJTTAty8M9sR2xE?=
- =?us-ascii?Q?VDifW1iH+34FFTWbmyjQRSAgOvTBsGbt5HJghiO22afbnvf51KoiX0mdp7RC?=
- =?us-ascii?Q?VVyj9SkgzDyTOzRgPzvPcBgwlXAv5eMduvGg1VVCAhRsqcZfNlhoWijyb5c2?=
- =?us-ascii?Q?dl1WAZqV48ryfyDJA6ZtphwDIKGErvHBrmKEaltV4lwPyElFh+Pi7RdBq1/7?=
- =?us-ascii?Q?PiHo6aQU0c3NQ1KtSHsT9eBq5+0lngC1QC9RD2H7foj/1UgmbI0+9pMhY0iz?=
- =?us-ascii?Q?eXh0zfwza0K+znAVJYBrJCnCZ0ISKNw/u+qMjA/mGj8Fc/FDawsYeuHFlIQv?=
- =?us-ascii?Q?N1dIvVGDKYy2odUmhO1RyEGkboUItfHCcH01FEzB+1vBYAxKLisFiY/B4gO0?=
- =?us-ascii?Q?9ggl93FyK6eRZT0MwJeaWbmHjjFjmjkLhg5Apw1l8QEJ99r6wLqgNBFwxGw+?=
- =?us-ascii?Q?qbXYBZIVzMGoFBLCx9iCUwTs3Xlq+1TSktDAPYioBA5WxI/u1/mdI0rmJytZ?=
- =?us-ascii?Q?lugA2a2WOwu7eeQ7tGAbuLM8y5QEFAGCVJ5W6F7cXpm9UXw/c0b0+F8zPe/W?=
- =?us-ascii?Q?DV6AqbT9oYOxm4WgK5ySIduqY72aB/brIEvf+to9k5uNTfsH2VYAYo92ooaZ?=
- =?us-ascii?Q?00QxzUXRa3LN8kvmkxrEyJyelXnpKmYf5UNNUFXMabCs1p61Tr9t2/DoJ3bs?=
- =?us-ascii?Q?xPAFYG3N4owAXFEZf1C91T3IqtTUV5Hh9VLJWS1duTVPA9gzEkvyyegcY7S4?=
- =?us-ascii?Q?miC22i/T293jYGc7SsWBmUI/HWuupUPnSq/lY5liVEzu3cUMNup68DiJsnRt?=
- =?us-ascii?Q?0THQoMTHj5mdtCuhG0elEQkqYVsJGAFcLp9fv5aE5B7D1zafmQOVSrUgAcEp?=
- =?us-ascii?Q?9vXU+vZnm/tLJlr6q7CD1pR+qWqc14gx8AP2WP8DzLG1Arxp0iY5ewP3Xk/X?=
- =?us-ascii?Q?r5bizRVRWiX8FxP3X26PTLfju3UlOV4cJb+80eK/E4OS1OalGYQs2lCV676E?=
- =?us-ascii?Q?bhIWuUaJpb8cWfaU+4zuZvKNJw9981gnh1h6hftmEegc1MgggCmaQ4N4nbDy?=
- =?us-ascii?Q?9idDBjV5iGQwa93WHdeYvR0V5vMKzDLMLqsbUK0wCgKc/vQpwhweFMIkgA?=
- =?us-ascii?Q?=3D=3D?=
+	=?us-ascii?Q?YvGyOp8thKuoY4UJQU6v+nalSNU4MO23kju03Y+vDzVxSSvUjFb/5TFGLqWR?=
+ =?us-ascii?Q?gAu8wX8A7If9eniM952UEP2FG7dsbFL3jv1qNHroK6VStAGun+P3go0eMMkI?=
+ =?us-ascii?Q?6z+RM7/UPeS9sSki95b1pR3283BJf6pn+9IAbwI5ZKMKsBMOA5LqhcDLSoTK?=
+ =?us-ascii?Q?oamaDADhAAhQdpcA1rNCieq7v3KnVAGv4u9DAk+nPO5HDQ43c0VpqCpTVSWK?=
+ =?us-ascii?Q?s2wmXn6j29KyYMZ3OBg7UbacxzGykPTW+UnfwYGhtTbAtBmXShi3m6gTd4Vs?=
+ =?us-ascii?Q?6OGc0caGloSHXCBZdS+sbFFHwCVtEWZ98FlxnqoRKrLadoWcVPMzW5L7TLjY?=
+ =?us-ascii?Q?1DUkFOoYfOmI5CvGyP+efUiochlGcKwppKGU0q8JkPp08f6RRrndaRoXFfyT?=
+ =?us-ascii?Q?+Tc8eJi8BrjxMsO5zH/isaVBN/iiYY0uA7aL/+ybjcnbiGkANErbtlxaEa6i?=
+ =?us-ascii?Q?5j1tgvm4tWhGGPA8AmTRUvFKgx2VeHNHw6185DR5RUObOK0WzfEIDwL8S1gH?=
+ =?us-ascii?Q?/P9BgnNHX3H2HBF1tmH0rX07Q9ly7HbRDIvfAzklIC796yNPhFTN8NO81F8Y?=
+ =?us-ascii?Q?R5Ld874CZlokZrVyJ91u1R+r229yS2KyiYtQwlSdw63nlF+AzW0Kyp/FZVgD?=
+ =?us-ascii?Q?0eeAfd0bEA8WE+nS/V3yWdj2wlWZt+QHXY4Z7Zrx5T2jv2+pWV3W/yQrciht?=
+ =?us-ascii?Q?zsFckVa6dbRRUSvIuDbdcknq2F8bEIpvY1lr3aRyVNcsXJz8eGLPKWXjcHVe?=
+ =?us-ascii?Q?k8+QzVb/eFnKdFMBxFnOuS00Y+NI+aCN/8sdFeqApGHxDWe5X6rbLWZMboOo?=
+ =?us-ascii?Q?WepbKqTcP1xK/6y8xMmmxXnP5kpGWk1nmrPCSXyVeY25BIVJZZpuYrP2GDCJ?=
+ =?us-ascii?Q?USYCRfCtBVEE8wt5TSM1HuUHVO2XlnuSgzNmg1JkB18C3k9KLtzkEfYrL4Mi?=
+ =?us-ascii?Q?IDdw3aU1lxDXc62LgA1iyQ2ZdO64t0PpJYLK3HbFEnGH12nTTq1L8VziPGXw?=
+ =?us-ascii?Q?ZykqmTYXu4hWAE3sQeGnGlIFe4ql+dfpDDxD3fuuBMJUANO8nlbzhH8oS2/k?=
+ =?us-ascii?Q?Ku4/SVo1kBeEvovz2keZ0Vm6QWnuJ759ZJYe+jCzom4uv4F7TdCEi8S+olyL?=
+ =?us-ascii?Q?mgGM0IQTUN9vBw7y/zL/M+ppSuzNrnF9VjNy+hxgBKBBRgfn9atDy45wA8Dy?=
+ =?us-ascii?Q?SoUTfaodw3TwyEKJ+QiwgYFmOoZ4yFh4FgCfK7YNRCzEA47QOqGY0Oj7/KXF?=
+ =?us-ascii?Q?b5iX4zVY/8T8yBLuOQA0YPxxwwGbdyST665TqRDgFG6QEWH76F7TzNWFVNtS?=
+ =?us-ascii?Q?cyyw7+EK56u/aG6ypYJ6HjpuwluHFH7WUKWaU+yDo5Mpcx83/44nLdzPqDyx?=
+ =?us-ascii?Q?/TPIqLiVqI1OD8pjbpAFt+SiA+aj5U82jr1wZgy9935VowFYd64JYIn7ddUH?=
+ =?us-ascii?Q?J7ZPiLxgiSuQGvmlUSoBWufDxL7wHa6TuYW1usR4SzLHh0V4oJTL8MF7SdEe?=
+ =?us-ascii?Q?NlIql4ejhmiCuhryfRlJe++TjrgHFT8d00zT?=
 X-Forefront-Antispam-Report:
-	CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB03.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230040)(36860700013)(82310400026)(1800799024)(376014)(7416014)(13003099007);DIR:OUT;SFP:1101;
+	CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB04.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230040)(82310400026)(376014)(36860700013)(1800799024)(7416014);DIR:OUT;SFP:1101;
 X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 01 Sep 2025 17:05:21.9369
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 01 Sep 2025 17:05:44.0004
  (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 73624e75-417e-474e-2497-08dde979bc88
+X-MS-Exchange-CrossTenant-Network-Message-Id: e1089548-6d61-446d-4c0a-08dde979c9ae
 X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[SATLEXMB03.amd.com]
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[SATLEXMB04.amd.com]
 X-MS-Exchange-CrossTenant-AuthSource:
-	MN1PEPF0000ECD7.namprd02.prod.outlook.com
+	BL6PEPF0001AB77.namprd02.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Anonymous
 X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: CH3PR12MB9394
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: BY5PR12MB4068
 
-Support for parsing the topology on AMD/Hygon processors using CPUID
-leaf 0xb was added in commit 3986a0a805e6 ("x86/CPU/AMD: Derive CPU
-topology from CPUID function 0xB when available"). In an effort to keep
-all the topology parsing bits in one place, this commit also introduced
-a pseudo dependency on the TOPOEXT feature to parse the CPUID leaf 0xb.
+cpu_parse_topology_ext() sets X86_FEATURE_XTOPOLOGY before returning
+true if any of the XTOPOLOGY leaf (0x80000026 / 0xb) could be parsed
+successfully.
 
-TOPOEXT feature (CPUID 0x80000001 ECX[22]) advertises the support for
-Cache Properties leaf 0x8000001d and the CPUID leaf 0x8000001e EAX for
-"Extended APIC ID" however support for 0xb was introduced alongside the
-x2APIC support not only on AMD [1], but also historically on x86 [2].
+Instead of storing and passing around this return value using
+"has_xtopology" in parse_topology_amd(), check for X86_FEATURE_XTOPOLOGY
+directly in parse_8000_001e() to simplify the flow.
 
-Similar to 0xb, the support for extended CPU topology leaf 0x80000026
-too does not depend on the TOPOEXT feature.
+No functional changes intended.
 
-The support for these leaves is expected to be confirmed by ensuring
-"leaf <= {extended_}cpuid_level" and then parsing the level 0 of the
-respective leaf to confirm EBX[15:0] (LogProcAtThisLevel) is non-zero as
-stated in the definition of "CPUID_Fn0000000B_EAX_x00 [Extended Topology
-Enumeration] (Core::X86::Cpuid::ExtTopEnumEax0)" in Processor
-Programming Reference (PPR) for AMD Family 19h Model 01h Rev B1 Vol1 [3]
-Sec. 2.1.15.1 "CPUID Instruction Functions".
-
-This has not been a problem on baremetal platforms since support for
-TOPOEXT (Fam 0x15 and later) predates the support for CPUID leaf 0xb
-(Fam 0x17[Zen2] and later), however, for AMD guests on QEMU, "x2apic"
-feature can be enabled independent of the "topoext" feature where QEMU
-expects topology and the initial APICID to be parsed using the CPUID
-leaf 0xb (especially when number of cores > 255) which is populated
-independent of the "topoext" feature flag.
-
-Unconditionally call cpu_parse_topology_ext() on AMD and Hygon
-processors to first parse the topology using the XTOPOLOGY leaves
-(0x80000026 / 0xb) before using the TOPOEXT leaf (0x8000001e).
-
-While at it, break down the single large comment in parse_topology_amd()
-to better highlight the purpose of each CPUID leaf.
-
-Cc: stable@vger.kernel.org # Only v6.9 and above; Depends on x86 topology rewrite
-Link: https://lore.kernel.org/lkml/1529686927-7665-1-git-send-email-suravee.suthikulpanit@amd.com/ [1]
-Link: https://lore.kernel.org/lkml/20080818181435.523309000@linux-os.sc.intel.com/ [2]
-Link: https://bugzilla.kernel.org/show_bug.cgi?id=206537 [3]
-Suggested-by: Naveen N Rao (AMD) <naveen@kernel.org>
-Fixes: 3986a0a805e6 ("x86/CPU/AMD: Derive CPU topology from CPUID function 0xB when available")
 Signed-off-by: K Prateek Nayak <kprateek.nayak@amd.com>
 ---
 Changelog v4..v5:
 
-o Made a note on only targeting versions >= v6.9 for stable backports
-  since the fix depends on the x86 topology rewrite. (Boris)
-
-o Renamed "has_topoext" to "has_xtopology". (Boris)
-
-o Broke down the large comment in parse_topology_amd() to better
-  highlight the purpose of each leaf and the overall parsing flow.
-  (Boris)
+o No functional changes. The diff is slightly altered as a result of
+  modifying the comment in parse_topology_amd() in Patch 1.
 ---
- arch/x86/kernel/cpu/topology_amd.c | 25 ++++++++++++++-----------
- 1 file changed, 14 insertions(+), 11 deletions(-)
+ arch/x86/kernel/cpu/topology_amd.c | 19 ++++++++-----------
+ 1 file changed, 8 insertions(+), 11 deletions(-)
 
 diff --git a/arch/x86/kernel/cpu/topology_amd.c b/arch/x86/kernel/cpu/topology_amd.c
-index 827dd0dbb6e9..c79ebbb639cb 100644
+index c79ebbb639cb..7ebd4a15c561 100644
 --- a/arch/x86/kernel/cpu/topology_amd.c
 +++ b/arch/x86/kernel/cpu/topology_amd.c
-@@ -175,27 +175,30 @@ static void topoext_fixup(struct topo_scan *tscan)
+@@ -59,7 +59,7 @@ static void store_node(struct topo_scan *tscan, u16 nr_nodes, u16 node_id)
+ 	tscan->amd_node_id = node_id;
+ }
+ 
+-static bool parse_8000_001e(struct topo_scan *tscan, bool has_topoext)
++static bool parse_8000_001e(struct topo_scan *tscan)
+ {
+ 	struct {
+ 		// eax
+@@ -85,7 +85,7 @@ static bool parse_8000_001e(struct topo_scan *tscan, bool has_topoext)
+ 	 * If leaf 0xb/0x26 is available, then the APIC ID and the domain
+ 	 * shifts are set already.
+ 	 */
+-	if (!has_topoext) {
++	if (!cpu_feature_enabled(X86_FEATURE_XTOPOLOGY)) {
+ 		tscan->c->topo.initial_apicid = leaf.ext_apic_id;
+ 
+ 		/*
+@@ -175,30 +175,27 @@ static void topoext_fixup(struct topo_scan *tscan)
  
  static void parse_topology_amd(struct topo_scan *tscan)
  {
--	bool has_topoext = false;
--
++	if (cpu_feature_enabled(X86_FEATURE_AMD_HTR_CORES))
++		tscan->c->topo.cpu_type = cpuid_ebx(0x80000026);
++
  	/*
--	 * If the extended topology leaf 0x8000_001e is available
--	 * try to get SMT, CORE, TILE, and DIE shifts from extended
-+	 * Try to get SMT, CORE, TILE, and DIE shifts from extended
+ 	 * Try to get SMT, CORE, TILE, and DIE shifts from extended
  	 * CPUID leaf 0x8000_0026 on supported processors first. If
  	 * extended CPUID leaf 0x8000_0026 is not supported, try to
--	 * get SMT and CORE shift from leaf 0xb first, then try to
--	 * get the CORE shift from leaf 0x8000_0008.
-+	 * get SMT and CORE shift from leaf 0xb. If either leaf is
-+	 * available, cpu_parse_topology_ext() will return true.
+ 	 * get SMT and CORE shift from leaf 0xb. If either leaf is
+ 	 * available, cpu_parse_topology_ext() will return true.
+-	 */
+-	bool has_xtopology = cpu_parse_topology_ext(tscan);
+-
+-	if (cpu_feature_enabled(X86_FEATURE_AMD_HTR_CORES))
+-		tscan->c->topo.cpu_type = cpuid_ebx(0x80000026);
+-
+-	/*
++	 *
+ 	 * If XTOPOLOGY leaves (0x26/0xb) are not available, try to
+ 	 * get the CORE shift from leaf 0x8000_0008 first.
  	 */
--	if (cpu_feature_enabled(X86_FEATURE_TOPOEXT))
--		has_topoext = cpu_parse_topology_ext(tscan);
-+	bool has_xtopology = cpu_parse_topology_ext(tscan);
- 
- 	if (cpu_feature_enabled(X86_FEATURE_AMD_HTR_CORES))
- 		tscan->c->topo.cpu_type = cpuid_ebx(0x80000026);
- 
--	if (!has_topoext && !parse_8000_0008(tscan))
-+	/*
-+	 * If XTOPOLOGY leaves (0x26/0xb) are not available, try to
-+	 * get the CORE shift from leaf 0x8000_0008 first.
-+	 */
-+	if (!has_xtopology && !parse_8000_0008(tscan))
+-	if (!has_xtopology && !parse_8000_0008(tscan))
++	if (!cpu_parse_topology_ext(tscan) && !parse_8000_0008(tscan))
  		return;
  
--	/* Prefer leaf 0x8000001e if available */
--	if (parse_8000_001e(tscan, has_topoext))
-+	/*
-+	 * Prefer leaf 0x8000001e if available to get the SMT shift and
-+	 * the initial APIC ID if XTOPOLOGY leaves are not available.
-+	 */
-+	if (parse_8000_001e(tscan, has_xtopology))
+ 	/*
+ 	 * Prefer leaf 0x8000001e if available to get the SMT shift and
+ 	 * the initial APIC ID if XTOPOLOGY leaves are not available.
+ 	 */
+-	if (parse_8000_001e(tscan, has_xtopology))
++	if (parse_8000_001e(tscan))
  		return;
  
  	/* Try the NODEID MSR */
