@@ -1,85 +1,85 @@
-Return-Path: <kvm+bounces-56510-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-56511-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 892FAB3EBEF
-	for <lists+kvm@lfdr.de>; Mon,  1 Sep 2025 18:10:43 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id A5C28B3EBF1
+	for <lists+kvm@lfdr.de>; Mon,  1 Sep 2025 18:11:19 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id CF6934402EF
-	for <lists+kvm@lfdr.de>; Mon,  1 Sep 2025 16:10:30 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id E44277ABF28
+	for <lists+kvm@lfdr.de>; Mon,  1 Sep 2025 16:09:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7A38630648E;
-	Mon,  1 Sep 2025 16:09:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 528423064B6;
+	Mon,  1 Sep 2025 16:09:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="gXTA5KjE"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="DjKJ9hEq"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 03FE52E6CD8
-	for <kvm@vger.kernel.org>; Mon,  1 Sep 2025 16:09:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C8FE13064A0
+	for <kvm@vger.kernel.org>; Mon,  1 Sep 2025 16:09:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756742993; cv=none; b=En6G1TlZWRTJaZWQO+jjW51F+LMdgpkpm6fHv25Z1cdEoUcoBUK+V5KfJVI8dGTTVvvDxicuCviN7TskNnZJz7iT4LM49+4RmfmoIZmfDVw44w4/MtG1qNq+OvxA38jYjbIFw4XrijhFAPi/XpehNIjw1KPFw1vPAwRGi3NtsK8=
+	t=1756742998; cv=none; b=Qf0z+TIBisYCzeNrB7EwtE2V5LiV+feGoPrlV2povLejdCh7fTVJwRdLJO3I1arYDONY5MnTmgCt3Ji5DTiX0RFEc9siZAf8mytDGtNhrig9dUInyOHOj2D47sttYVr2GJO37LhwyoFK4VmKxdj5DOcMAlXfDmUIoBMgMRK0evM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756742993; c=relaxed/simple;
-	bh=jOAHCUQOI95A6NhD1bdRc7Ks4QP6hIwvLd9f4ISXn+8=;
+	s=arc-20240116; t=1756742998; c=relaxed/simple;
+	bh=Q3PKDbHD38isJx3I8Ber0baejrO6TVXVWQsXQu3Gx6Q=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=nBYKuA9Rsc3Eo4zkNfnm8xO7TXK2Jia05R4jYZt1iLDMsNW1PDWKHRI+CoiT1qMjQFCyjz8J4ijapGcOcv4AM7lTMkoQqiJOBypJ1FWVWrQN7lwAqCuG/1NVIGkrbL1uEFPSrs+3G7YbNubL/imlu9dWCom2hz5wVsCW/iuy/6Y=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=gXTA5KjE; arc=none smtp.client-ip=170.10.129.124
+	 MIME-Version; b=ZNK4t14OFIG5K2UBqZMIP0qnlFjvDlwFnxEn5ZbPGVoh4RI095dYWWN9Evrc8rhVw3wCWlNz2SFgQ63s9gjXjw9TJ2e3ZMqYXTb1LyKBzYkvKkCD+MAd32Fuw/wFyRkrO11lN0I29kAx4aGBAkmMPBn4vmoXkX4gLvZveVclpKI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=DjKJ9hEq; arc=none smtp.client-ip=170.10.133.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1756742991;
+	s=mimecast20190719; t=1756742995;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=vlmYPrJMvaurL156kfyVvz/kxSmkc+/T+EJ8CZ+U2zk=;
-	b=gXTA5KjE5Jxy/vqnORcKy3qCGatsS9dlgWT1SBJUIf26Ctn+ctfFWv478ogJ/fUrAKYEr5
-	MpqkKIBQSmN9tmPxT5Ev5ohZvucvxbpvpUi/9ES+I0MqXTxk57V2qj9anvxizxCsVL5vfR
-	LSM/nHygS5wfNWa0CFOL4w2a7/Cw5xM=
-Received: from mail-qv1-f70.google.com (mail-qv1-f70.google.com
- [209.85.219.70]) by relay.mimecast.com with ESMTP with STARTTLS
+	bh=iUjmNo6Stszk1jMfX7esmLkjaDgZtcc668a9zyeu+wg=;
+	b=DjKJ9hEqqFfmMBgopEiKdgEeuORC7FNgNWmJGi3fClL3hiqYbO4Rx8dGbYLd2M5PBzIK6l
+	Hl9cR6wfLvbfIXINHAG6jDz7BxMxDaNCGt2p2brYI7CUplJyaC3Ts/JxOg/G5iGgDxt4cz
+	iq5YZoP9eeG6rZlhJOKWTGYTRJffNl4=
+Received: from mail-qt1-f200.google.com (mail-qt1-f200.google.com
+ [209.85.160.200]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-263-CYezVHYTON6-VSLA7AzNmQ-1; Mon, 01 Sep 2025 12:09:50 -0400
-X-MC-Unique: CYezVHYTON6-VSLA7AzNmQ-1
-X-Mimecast-MFC-AGG-ID: CYezVHYTON6-VSLA7AzNmQ_1756742989
-Received: by mail-qv1-f70.google.com with SMTP id 6a1803df08f44-70de1a3cec7so79518426d6.3
-        for <kvm@vger.kernel.org>; Mon, 01 Sep 2025 09:09:50 -0700 (PDT)
+ us-mta-596-f9kaKRk0NpSlUWbAsYMOTQ-1; Mon, 01 Sep 2025 12:09:54 -0400
+X-MC-Unique: f9kaKRk0NpSlUWbAsYMOTQ-1
+X-Mimecast-MFC-AGG-ID: f9kaKRk0NpSlUWbAsYMOTQ_1756742994
+Received: by mail-qt1-f200.google.com with SMTP id d75a77b69052e-4b30cb3c705so10246001cf.3
+        for <kvm@vger.kernel.org>; Mon, 01 Sep 2025 09:09:54 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1756742989; x=1757347789;
+        d=1e100.net; s=20230601; t=1756742994; x=1757347794;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=vlmYPrJMvaurL156kfyVvz/kxSmkc+/T+EJ8CZ+U2zk=;
-        b=BKUPqVHcCDh2xlVzgNlNW4/xzExm4Rf5jgm1rSSbFSZdAlp0k3sTcm40737I6cx1EB
-         UeG7oIYK+rw8s5rXQwP2+pxZ112VfQ+2ltkCH8853DwPD2dEQGnQvCztuld/FoUYBEU6
-         Uu7xWpPE9IDadpiJjG3Qje0py16mWTq70XNJhm5NLOyJMVHLYp9Ld0iZkonBsSk87bqs
-         j7EdYWn/xdBsCJKOXhmmuDhtEm3p/y5TUuh1FTQwK3AcbE1vJaiCEtBwVBeMW8/9vbVB
-         6Yn8Zn3OhDH8J3wCqyiiDPaxt8gWRNkW1sGQ7xat3v79KQOW6mmZvPURJLiB9HqbYczT
-         sk8w==
-X-Forwarded-Encrypted: i=1; AJvYcCUwWEHhA4aKm+OFFF0YgAUjU11KcSgL/9QlwhNlTuJotr46PHtc3KTQKEKZVPrWoeQCJlI=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwRjqCfXAXNlAdKJ9SHaA5AvczMLaAk1TD89Wa7XZcAKuiJFIpm
-	sM0jnnovSddkP73HDMvRAOjFw4mPXGX9oBzfiyipOG4A0gTmQdB2VT6CLTucJXEatpxQkCQQNm4
-	d6fEwljw47qmyz4G8n6DcEukQnpfunvtaJbFlW8j+Br46Xq8XbOshKw==
-X-Gm-Gg: ASbGncubEgI1f1BM2b6Pq0isTYzhpo1ukk1bNBtWcBak/GFSHtLvCKv+bpz46G1P8Wm
-	Vsg0+5QURTU5WA+pKo7X05V2ksTIrkaxBmA1wSG0P4WAgD3uhD0FM6YhAQj4IQjOSSLP/4A7nQb
-	0+DHjk0JqVc4ZSLWUIcgJIm865Hvw28niCaEGG+4hQSzIjFrJEHSYmlDe+8gXlAPz3Z1ZChQncR
-	oikB9kLNj4pUbC5fxTRmCMqEYihJu9jgOT7rzoBG/yWyfAEvxNbp39qLa2J87nDkZAozCHXwApP
-	6RkrqT1BiRMIPgJL2KjUoyEoKwdzBLCiIK/ZLjgLtcnlFkQtYQDTxFWp9TqQT+e7pEIs3UWN4re
-	uWOw8k5QwQYUnCbgzNv4riTa2dSOf8L10pqN0EXtOt4CzsYe7xJUqjOJpX4RqEKJZyr0+
-X-Received: by 2002:a05:6214:1c8e:b0:70d:9e0a:5ac0 with SMTP id 6a1803df08f44-70fac8dd487mr82340946d6.57.1756742989235;
-        Mon, 01 Sep 2025 09:09:49 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IE3atxEoR4Y3UwAcVItWfUxbMXJnqefXOjBiiJOc9QLCFCXra+INStGLPsCJ1tjig0u8r6LRA==
-X-Received: by 2002:a05:6214:1c8e:b0:70d:9e0a:5ac0 with SMTP id 6a1803df08f44-70fac8dd487mr82340626d6.57.1756742988809;
-        Mon, 01 Sep 2025 09:09:48 -0700 (PDT)
+        bh=iUjmNo6Stszk1jMfX7esmLkjaDgZtcc668a9zyeu+wg=;
+        b=fw4M/F9pv1/w8HuScz/BbjdN+cJdxFB9FlUSAwABB5ze20g7mSIs8Ba7qs1j4/WxgD
+         CUwpSo2Qdb7OYNAHGNU1ztUYsg7a+uEOtsubmf8t8MxDewgjaN8T9LUEEe8fFw0CyRed
+         ZD8VCNy3hjLSGvqnjR4L3+P9BKe9tQeVJZj0vuJzK1WWw/tofFGhe3SRMecSh+jNVUDV
+         TtErYc/pWSyPad+lYcOmPaFrvcioPkEt0tA34/TdYWS9B47QWCX18DJlczBj7rWMDiB4
+         zTkPskbg65z0mdGVTj8K5A2iXVMRm09aS9qnqG/fjkCjmDv3EqWyB6LM+qwdHKcuH3kk
+         Bo6g==
+X-Forwarded-Encrypted: i=1; AJvYcCXBWfVGExce0OL4QyH6oxC2SUXM10aYT7NGvCkFHP4uaMcHIZlg6IQbK4Qnx6ffDyJV6Xg=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxJP0sNsE8M6uwBBTPF83OFyNM0ufzOc8BQ0fDa6lguXEsl6yFB
+	Y6bb3bDkuIEUo1Smp83UC3pqEhMY42+iqrTQdfQEk0n0jWDnzjq3jKUGnr4ZHOf5/1suvK1VZ5Z
+	VYGCj4yrji/AjAvGYiQDYfXaZfsi9OxuHmS428G26hpzzenikgApLcA==
+X-Gm-Gg: ASbGncs7S0IsJ95NxyU15xlJxxF/I7iVCE/FTELtkSuDz1/gnkcYETWh+OoX+ZMSGPr
+	Oir8zkbFd4MNF6OEarNom0FuZPSNhCtN7+qq6eI7OZnvcQc4EE4qNXkmvhhi2yO23Y5Mii8RVah
+	sWv8hnewPdpjWmuyQI+v3KL8CwXE2fRn9OcuLwr1HZJ0tfBkhrhLEeDHjmFQbSqPzeago9cVPq9
+	3LogJkEXb2bqy7Pj0/UVWX9cFOmeOb/BhRN8nvFUw9FfjLDIjHkgmhspVnGW/QRVYBWbk8cJUY6
+	7sbdqXn6ZtJznjdxgYmcM2END5cgYUBbTcJKGTo/p67mFBtiXXPAbq/8o9sROzxxouGzhoLogIi
+	qSisGmnNtik6whwF2rO4UyDverUnPtx9czrJs7OiLyHsMx0fsbXIthJ9Sg4uW9rovE+0O
+X-Received: by 2002:a05:622a:2cb:b0:4b3:d28:c96 with SMTP id d75a77b69052e-4b31d7f062emr105567711cf.13.1756742994144;
+        Mon, 01 Sep 2025 09:09:54 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IF0H+Me2WNr8OP1G6r+ikLDYpI0KnL49DOiTcekuqb2wap6IvnGdRHVwSMHQzA8c3JlD+sHkA==
+X-Received: by 2002:a05:622a:2cb:b0:4b3:d28:c96 with SMTP id d75a77b69052e-4b31d7f062emr105567311cf.13.1756742993721;
+        Mon, 01 Sep 2025 09:09:53 -0700 (PDT)
 Received: from [10.201.49.111] (nat-pool-mxp-t.redhat.com. [149.6.153.186])
-        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-70fb260d977sm42473206d6.20.2025.09.01.09.09.45
+        by smtp.gmail.com with ESMTPSA id af79cd13be357-7fc1643ac5esm681629485a.68.2025.09.01.09.09.50
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 01 Sep 2025 09:09:48 -0700 (PDT)
+        Mon, 01 Sep 2025 09:09:53 -0700 (PDT)
 From: Paolo Bonzini <pbonzini@redhat.com>
 To: linux-kernel@vger.kernel.org,
 	kvm@vger.kernel.org
@@ -103,10 +103,11 @@ Cc: dave.hansen@intel.com,
 	nik.borisov@suse.com,
 	chao.gao@intel.com,
 	sagis@google.com,
-	farrah.chen@intel.com
-Subject: [PATCH 3/7] x86/virt/tdx: Mark memory cache state incoherent when making SEAMCALL
-Date: Mon,  1 Sep 2025 18:09:26 +0200
-Message-ID: <20250901160930.1785244-4-pbonzini@redhat.com>
+	farrah.chen@intel.com,
+	Binbin Wu <binbin.wu@linux.intel.com>
+Subject: [PATCH 4/7] x86/kexec: Disable kexec/kdump on platforms with TDX partial write erratum
+Date: Mon,  1 Sep 2025 18:09:27 +0200
+Message-ID: <20250901160930.1785244-5-pbonzini@redhat.com>
 X-Mailer: git-send-email 2.51.0
 In-Reply-To: <20250901160930.1785244-1-pbonzini@redhat.com>
 References: <20250901160930.1785244-1-pbonzini@redhat.com>
@@ -120,119 +121,78 @@ Content-Transfer-Encoding: 8bit
 
 From: Kai Huang <kai.huang@intel.com>
 
-On TDX platforms, dirty cacheline aliases with and without encryption
-bits can coexist, and the cpu can flush them back to memory in random
-order.  During kexec, the caches must be flushed before jumping to the
-new kernel otherwise the dirty cachelines could silently corrupt the
-memory used by the new kernel due to different encryption property.
+Some early TDX-capable platforms have an erratum: A kernel partial
+write (a write transaction of less than cacheline lands at memory
+controller) to TDX private memory poisons that memory, and a subsequent
+read triggers a machine check.
 
-A percpu boolean is used to mark whether the cache of a given CPU may be
-in an incoherent state, and the kexec performs WBINVD on the CPUs with
-that boolean turned on.
+On those platforms, the old kernel must reset TDX private memory before
+jumping to the new kernel, otherwise the new kernel may see unexpected
+machine check.  Currently the kernel doesn't track which page is a TDX
+private page.  For simplicity just fail kexec/kdump for those platforms.
 
-For TDX, only the TDX module or the TDX guests can generate dirty
-cachelines of TDX private memory, i.e., they are only generated when the
-kernel does a SEAMCALL.
+Leverage the existing machine_kexec_prepare() to fail kexec/kdump by
+adding the check of the presence of the TDX erratum (which is only
+checked for if the kernel is built with TDX host support).  This rejects
+kexec/kdump when the kernel is loading the kexec/kdump kernel image.
 
-Set that boolean when the kernel does SEAMCALL so that kexec can flush
-the cache correctly.
+The alternative is to reject kexec/kdump when the kernel is jumping to
+the new kernel.  But for kexec this requires adding a new check (e.g.,
+arch_kexec_allowed()) in the common code to fail kernel_kexec() at early
+stage.  Kdump (crash_kexec()) needs similar check, but it's hard to
+justify because crash_kexec() is not supposed to abort.
 
-The kernel provides both the __seamcall*() assembly functions and the
-seamcall*() wrapper ones which additionally handle running out of
-entropy error in a loop.  Most of the SEAMCALLs are called using the
-seamcall*(), except TDH.VP.ENTER and TDH.PHYMEM.PAGE.RDMD which are
-called using __seamcall*() variant directly.
+It's feasible to further relax this limitation, i.e., only fail kexec
+when TDX is actually enabled by the kernel.  But this is still a half
+measure compared to resetting TDX private memory so just do the simplest
+thing for now.
 
-To cover the two special cases, add a new __seamcall_dirty_cache()
-helper which only sets the percpu boolean and calls the __seamcall*(),
-and change the special cases to use the new helper.  To cover all other
-SEAMCALLs, change seamcall*() to call the new helper.
+The impact to userspace is the users will get an error when loading the
+kexec/kdump kernel image:
 
-For the SEAMCALLs invoked via seamcall*(), they can be made from both
-task context and IRQ disabled context.  Given SEAMCALL is just a lengthy
-instruction (e.g., thousands of cycles) from kernel's point of view and
-preempt_{disable|enable}() is cheap compared to it, just unconditionally
-disable preemption during setting the boolean and making SEAMCALL.
+  kexec_load failed: Operation not supported
+
+This might be confusing to the users, thus also print the reason in the
+dmesg:
+
+  [..] kexec: Not allowed on platform with tdx_pw_mce bug.
 
 Signed-off-by: Kai Huang <kai.huang@intel.com>
 Tested-by: Farrah Chen <farrah.chen@intel.com>
-Reviewed-by: Chao Gao <chao.gao@intel.com>
 Reviewed-by: Rick Edgecombe <rick.p.edgecombe@intel.com>
+Reviewed-by: Binbin Wu <binbin.wu@linux.intel.com>
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- arch/x86/include/asm/tdx.h  | 25 ++++++++++++++++++++++++-
- arch/x86/virt/vmx/tdx/tdx.c |  4 ++--
- 2 files changed, 26 insertions(+), 3 deletions(-)
+ arch/x86/kernel/machine_kexec_64.c | 16 ++++++++++++++++
+ 1 file changed, 16 insertions(+)
 
-diff --git a/arch/x86/include/asm/tdx.h b/arch/x86/include/asm/tdx.h
-index 57b46f05ff97..c178360c1fb1 100644
---- a/arch/x86/include/asm/tdx.h
-+++ b/arch/x86/include/asm/tdx.h
-@@ -102,10 +102,31 @@ u64 __seamcall_ret(u64 fn, struct tdx_module_args *args);
- u64 __seamcall_saved_ret(u64 fn, struct tdx_module_args *args);
- void tdx_init(void);
+diff --git a/arch/x86/kernel/machine_kexec_64.c b/arch/x86/kernel/machine_kexec_64.c
+index 34c303a92eaf..201137b98fb8 100644
+--- a/arch/x86/kernel/machine_kexec_64.c
++++ b/arch/x86/kernel/machine_kexec_64.c
+@@ -347,6 +347,22 @@ int machine_kexec_prepare(struct kimage *image)
+ 	unsigned long reloc_end = (unsigned long)__relocate_kernel_end;
+ 	int result;
  
-+#include <linux/preempt.h>
- #include <asm/archrandom.h>
-+#include <asm/processor.h>
- 
- typedef u64 (*sc_func_t)(u64 fn, struct tdx_module_args *args);
- 
-+static __always_inline u64 __seamcall_dirty_cache(sc_func_t func, u64 fn,
-+						  struct tdx_module_args *args)
-+{
-+	lockdep_assert_preemption_disabled();
-+
 +	/*
-+	 * SEAMCALLs are made to the TDX module and can generate dirty
-+	 * cachelines of TDX private memory.  Mark cache state incoherent
-+	 * so that the cache can be flushed during kexec.
++	 * Some early TDX-capable platforms have an erratum.  A kernel
++	 * partial write (a write transaction of less than cacheline
++	 * lands at memory controller) to TDX private memory poisons that
++	 * memory, and a subsequent read triggers a machine check.
 +	 *
-+	 * This needs to be done before actually making the SEAMCALL,
-+	 * because kexec-ing CPU could send NMI to stop remote CPUs,
-+	 * in which case even disabling IRQ won't help here.
++	 * On those platforms the old kernel must reset TDX private
++	 * memory before jumping to the new kernel otherwise the new
++	 * kernel may see unexpected machine check.  For simplicity
++	 * just fail kexec/kdump on those platforms.
 +	 */
-+	this_cpu_write(cache_state_incoherent, true);
++	if (boot_cpu_has_bug(X86_BUG_TDX_PW_MCE)) {
++		pr_info_once("Not allowed on platform with tdx_pw_mce bug\n");
++		return -EOPNOTSUPP;
++	}
 +
-+	return func(fn, args);
-+}
-+
- static __always_inline u64 sc_retry(sc_func_t func, u64 fn,
- 			   struct tdx_module_args *args)
- {
-@@ -113,7 +134,9 @@ static __always_inline u64 sc_retry(sc_func_t func, u64 fn,
- 	u64 ret;
- 
- 	do {
--		ret = func(fn, args);
-+		preempt_disable();
-+		ret = __seamcall_dirty_cache(func, fn, args);
-+		preempt_enable();
- 	} while (ret == TDX_RND_NO_ENTROPY && --retry);
- 
- 	return ret;
-diff --git a/arch/x86/virt/vmx/tdx/tdx.c b/arch/x86/virt/vmx/tdx/tdx.c
-index 823850399bb7..2abf53ed59c8 100644
---- a/arch/x86/virt/vmx/tdx/tdx.c
-+++ b/arch/x86/virt/vmx/tdx/tdx.c
-@@ -1268,7 +1268,7 @@ static bool paddr_is_tdx_private(unsigned long phys)
- 		return false;
- 
- 	/* Get page type from the TDX module */
--	sret = __seamcall_ret(TDH_PHYMEM_PAGE_RDMD, &args);
-+	sret = __seamcall_dirty_cache(__seamcall_ret, TDH_PHYMEM_PAGE_RDMD, &args);
- 
- 	/*
- 	 * The SEAMCALL will not return success unless there is a
-@@ -1524,7 +1524,7 @@ noinstr __flatten u64 tdh_vp_enter(struct tdx_vp *td, struct tdx_module_args *ar
- {
- 	args->rcx = tdx_tdvpr_pa(td);
- 
--	return __seamcall_saved_ret(TDH_VP_ENTER, args);
-+	return __seamcall_dirty_cache(__seamcall_saved_ret, TDH_VP_ENTER, args);
- }
- EXPORT_SYMBOL_GPL(tdh_vp_enter);
- 
+ 	/* Setup the identity mapped 64bit page table */
+ 	result = init_pgtable(image, __pa(control_page));
+ 	if (result)
 -- 
 2.51.0
 
