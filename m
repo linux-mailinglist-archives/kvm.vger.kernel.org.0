@@ -1,154 +1,130 @@
-Return-Path: <kvm+bounces-56454-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-56455-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id A1D49B3E69F
-	for <lists+kvm@lfdr.de>; Mon,  1 Sep 2025 16:06:00 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 34E9EB3E6A3
+	for <lists+kvm@lfdr.de>; Mon,  1 Sep 2025 16:06:30 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 879B8205B3F
-	for <lists+kvm@lfdr.de>; Mon,  1 Sep 2025 14:05:41 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 511EE3A8B11
+	for <lists+kvm@lfdr.de>; Mon,  1 Sep 2025 14:06:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 60046340DA2;
-	Mon,  1 Sep 2025 14:05:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3D31A335BB7;
+	Mon,  1 Sep 2025 14:06:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=amazon.co.uk header.i=@amazon.co.uk header.b="IeHKIisd"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="kPFZEmva"
 X-Original-To: kvm@vger.kernel.org
-Received: from fra-out-014.esa.eu-central-1.outbound.mail-perimeter.amazon.com (fra-out-014.esa.eu-central-1.outbound.mail-perimeter.amazon.com [18.199.210.3])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ej1-f42.google.com (mail-ej1-f42.google.com [209.85.218.42])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 551B3313E23;
-	Mon,  1 Sep 2025 14:05:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=18.199.210.3
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C879B1E3DCF
+	for <kvm@vger.kernel.org>; Mon,  1 Sep 2025 14:06:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.42
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756735529; cv=none; b=Lom2AAbhvCcaP5fLRJGI1HVU5iqr38vPDelz1RZkn99VMMKeUwaUHZ6GTwWFB+qqXTe5E5WOXbMYBa97fEyd8OxxUd4l9BfRcvyY+2EK0HHk7Z/0u3ndF1r3Rv2NpjmyQ9Lk7TThDVi4wKtGPnpMgaEaKhzVxv6vh3EGqlbgm3Q=
+	t=1756735565; cv=none; b=sM9fymjjDdZ0kyr7FJZQa1hCTbq6hY4G67Wwf/jF90htEW03kkT/AtESXiAHlA/VdgVtWE7SpBuj3jtJOmj2dG8XzJfsl4sbdssWWnhcKvALDm6G7FmXevyWrJJA/YWLTdPU57/SzAH+vNngx4wUE6RJAudKKlIdShVAdJBNeTU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756735529; c=relaxed/simple;
-	bh=ItZqN5Op7g9rIJ5RShixnsRk5gMblgw67xQPu8prjug=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=OYnPokyvvcm+u4OyU5xBezzE3pU9q7bA+B6i84FxKrmRkIoRxgsLkVyjE7nZa/BVSyKwQxEfsK39LuoOVyO+zAMY1f6JRwyXDPTer9xDe8DAYSn630h7pS1y3TmuEIM10hqqo5548PIIBILBLesmwFUBow86Hf4izUEJqrefklE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.co.uk; spf=pass smtp.mailfrom=amazon.co.uk; dkim=pass (2048-bit key) header.d=amazon.co.uk header.i=@amazon.co.uk header.b=IeHKIisd; arc=none smtp.client-ip=18.199.210.3
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.co.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.uk
+	s=arc-20240116; t=1756735565; c=relaxed/simple;
+	bh=Z8r51LzaCqdM7YaSOwlv1z4L0d3GGajpW6BE8+RXYOc=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=sDx+/v+RkZEHw5Fh7M2/rRu0g/81XB4eynU+YbcnLVXFiKSCaCIlOvjP86Ro1UktSQyHs/70Wo25pD6lGmvryW5D5RR9Xgwoc2ypWNvk/XkAAidvIkXOFyc6r1RXdTMXDEASCznq64HO/JGrCPMJzTzb9zXajkUs9h6f3gfL+q0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=kPFZEmva; arc=none smtp.client-ip=209.85.218.42
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
+Received: by mail-ej1-f42.google.com with SMTP id a640c23a62f3a-aff0365277aso452406766b.1
+        for <kvm@vger.kernel.org>; Mon, 01 Sep 2025 07:06:02 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.co.uk; i=@amazon.co.uk; q=dns/txt;
-  s=amazoncorp2; t=1756735527; x=1788271527;
-  h=from:to:cc:subject:date:message-id:references:
-   in-reply-to:content-transfer-encoding:mime-version;
-  bh=Kse27neqs7TZ5sTIdJhbs0CXmugDWDcv4gD+1oQQ4ac=;
-  b=IeHKIisdRCXoZ5+V441l9oXqa7nrbEkpfLyaC0umnYkFL/LbuVXeiFnj
-   BhgsLae20Tlq1w4DSiqC48YHBv+GVqku1yOGfD0fdk6/0lZGbRbuiGVWP
-   63r5/nUvd6FMLgpueoH8UgaLfdkjnUSJeOhhv3YaOBZo4m7adb83Tpa7G
-   lfEYZRYD4j3yDKoylKH9GKksATNVzCcNeDSd78BLXHlvXyVtH2rIYdW5r
-   V7xIJkNaGSvlKMF9+nKvGVtRSIK2LFwVGLqshvlOG5z/KI1SM1ErRbR2q
-   tT5PMXQRYJ+SO91KGf1UA/nn9gscfAZJhw0SoT80PRAyGPEepUT8AgZWr
-   Q==;
-X-CSE-ConnectionGUID: 6cHdMLo7TCuPNE/i2oSWAA==
-X-CSE-MsgGUID: 9a3n9BLESJaLUrTeRH3vhg==
-X-IronPort-AV: E=Sophos;i="6.17,290,1747699200"; 
-   d="scan'208";a="1361090"
-Received: from ip-10-6-6-97.eu-central-1.compute.internal (HELO smtpout.naws.eu-central-1.prod.farcaster.email.amazon.dev) ([10.6.6.97])
-  by internal-fra-out-014.esa.eu-central-1.outbound.mail-perimeter.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 01 Sep 2025 14:05:17 +0000
-Received: from EX19MTAEUB001.ant.amazon.com [54.240.197.234:5495]
- by smtpin.naws.eu-central-1.prod.farcaster.email.amazon.dev [10.0.18.194:2525] with esmtp (Farcaster)
- id b74a8fdc-df20-4ffe-a94c-ca7bfc8d3d2d; Mon, 1 Sep 2025 14:05:17 +0000 (UTC)
-X-Farcaster-Flow-ID: b74a8fdc-df20-4ffe-a94c-ca7bfc8d3d2d
-Received: from EX19D015EUB004.ant.amazon.com (10.252.51.13) by
- EX19MTAEUB001.ant.amazon.com (10.252.51.26) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.2562.17;
- Mon, 1 Sep 2025 14:05:17 +0000
-Received: from EX19D015EUB004.ant.amazon.com (10.252.51.13) by
- EX19D015EUB004.ant.amazon.com (10.252.51.13) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.2562.20;
- Mon, 1 Sep 2025 14:05:16 +0000
-Received: from EX19D015EUB004.ant.amazon.com ([fe80::2dc9:7aa9:9cd3:fc8a]) by
- EX19D015EUB004.ant.amazon.com ([fe80::2dc9:7aa9:9cd3:fc8a%3]) with mapi id
- 15.02.2562.020; Mon, 1 Sep 2025 14:05:16 +0000
-From: "Roy, Patrick" <roypat@amazon.co.uk>
-To: "lkp@intel.com" <lkp@intel.com>
-CC: "ackerleytng@google.com" <ackerleytng@google.com>, "david@redhat.com"
-	<david@redhat.com>, "Manwaring, Derek" <derekmn@amazon.com>, "Thomson, Jack"
-	<jackabt@amazon.co.uk>, "Kalyazin, Nikita" <kalyazin@amazon.co.uk>,
-	"kvm@vger.kernel.org" <kvm@vger.kernel.org>, "kvmarm@lists.linux.dev"
-	<kvmarm@lists.linux.dev>, "linux-arm-kernel@lists.infradead.org"
-	<linux-arm-kernel@lists.infradead.org>, "linux-kernel@vger.kernel.org"
-	<linux-kernel@vger.kernel.org>, "linux-mm@kvack.org" <linux-mm@kvack.org>,
-	"oe-kbuild-all@lists.linux.dev" <oe-kbuild-all@lists.linux.dev>,
-	"pbonzini@redhat.com" <pbonzini@redhat.com>, "Roy, Patrick"
-	<roypat@amazon.co.uk>, "rppt@kernel.org" <rppt@kernel.org>,
-	"seanjc@google.com" <seanjc@google.com>, "tabba@google.com"
-	<tabba@google.com>, "vbabka@suse.cz" <vbabka@suse.cz>, "will@kernel.org"
-	<will@kernel.org>, "Cali, Marco" <xmarcalx@amazon.co.uk>
-Subject: Re: [PATCH v5 03/12] mm: introduce AS_NO_DIRECT_MAP
-Thread-Topic: [PATCH v5 03/12] mm: introduce AS_NO_DIRECT_MAP
-Thread-Index: AQHcG0lxZt1T5YHk+UqqKLGu1cJJ3g==
-Date: Mon, 1 Sep 2025 14:05:16 +0000
-Message-ID: <20250901140515.15769-1-roypat@amazon.co.uk>
-References: <202508311805.yfcdeaFC-lkp@intel.com>
-In-Reply-To: <202508311805.yfcdeaFC-lkp@intel.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-Content-Type: text/plain; charset="iso-8859-1"
-Content-Transfer-Encoding: quoted-printable
+        d=linaro.org; s=google; t=1756735561; x=1757340361; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=5dVCqf8Omc57edO6ZGy5stUhcPri4shQMFyY5oMwnIg=;
+        b=kPFZEmvaQ/TnWrSvdhJmzVpJWG6O4pnn6FdS97zA506jFCtiXV58u1F2IbXaVxu6eT
+         HutJ7AKs2WM+dWPuT2ROlc2Ky5bpTHzvfVQINqDFtMemB8w4867QYIH858CRLVCPBKA0
+         Egne0N5vY36UtZBLLHeSToNLJ+0RLPF8gf2IzwmZpWR605PvvQDq3JJRkIubCNi1KJdB
+         2rIZBsHtnUsL9FjR+ePbQwNFCkSGRIfLoQuBVWxFih8KkBhcIEyY1gsVPX7cx8zttMdg
+         2Wj5v2uMIFjKa7/7S8jTQpPrWQXU4RH2l5MykbATUgywLbiRui9HJqUa3uGzYg1v2Mdk
+         Gr6g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1756735561; x=1757340361;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=5dVCqf8Omc57edO6ZGy5stUhcPri4shQMFyY5oMwnIg=;
+        b=QcF6Kkg1ae4Raq+XSFuSkNu0mMQlAoUdpYJQWzQ4shAZb1wJw0ZkU5OFt0zDjcHsze
+         0Zw98ofDIEJbF/nSmbGa4K0nD3MmNTz+xyxri1wBV6MxTGQVIc7ytKwCAHIaevM9Kq9v
+         Jlc5xeJ4v7od8QnMAhFh11/tXaP9qa9lbEMo+VKIQi8Xx5vaaYWw8N4DYAwh8+66v5Sh
+         UDq7j7daLJPvDud7AJ73DHyOsYl2BlGnPG9E6csBpAQBaq0LHQ1E90k9s62XPljL4UhW
+         8sXMuycxGiW3dVMlDJc9m8g++9jXAqFFYqYrSZ280W0AQkMGnLiJS/pQPodw2DPzBIv8
+         Rd7w==
+X-Forwarded-Encrypted: i=1; AJvYcCXt+EGoTSBLCo2Auajkt4zrzKCWOW/FXmHjH3O8gZPyc63wlaND4tDRa6Jvr1sbJnT2jFU=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yw5hZonHbxq9sitaQ3yIeTT8rl874GNzTSCa3FHmed2h7HczxsQ
+	CguAypIsBlGgJihjQzy2DBaOQJuVKNOaUMVsKohfeirIH30+plsuBCTFDUP5Ggf7Nzp/axnng1P
+	Nj9hfnre/nz3fYUE9xwyBb3BgUonrnLxGJoR8GzTVMQ==
+X-Gm-Gg: ASbGncs75ZsoyCzzbLNTsqcRzy3tA15FHEe8AvEiatAqm6Z98bELMsdClBxUHFf2zkV
+	h6HW0wJBZnnBj4DbHt+WsqOc2UwQdGqsriPuct7FtufSqaDFzXIWMrcFxjfon75OmFFEDFBvsCr
+	dvJIcrq3xNahTH8cDlPTk2YheQOgREQKf5utp8+KOThfO4ywN1trFacXjp2rM5n6kF2lCzwOYo6
+	8KGrtgMnG1p9eH7Rto=
+X-Google-Smtp-Source: AGHT+IGMeylbGJEekwN2ny17r3fJ+X/GcbBYAcRcZM87PGqLjW5l6AKwKuc5xgj8Pb9qGNIdZ245B42T8nqD2u5a9Cg=
+X-Received: by 2002:a17:907:1c9f:b0:afd:d62f:aa4a with SMTP id
+ a640c23a62f3a-b010817fdf5mr782036466b.9.1756735560902; Mon, 01 Sep 2025
+ 07:06:00 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+References: <20250901132626.28639-1-philmd@linaro.org> <20250901132626.28639-4-philmd@linaro.org>
+In-Reply-To: <20250901132626.28639-4-philmd@linaro.org>
+From: Manos Pitsidianakis <manos.pitsidianakis@linaro.org>
+Date: Mon, 1 Sep 2025 17:05:34 +0300
+X-Gm-Features: Ac12FXxpkS8-8lPh-jGklotJxuIKPXB7BvPFc2gMZW6beg-1Gs9p0zFbwrCtuCk
+Message-ID: <CAAjaMXbDSwXjTFb5nPrK7tWyjbDtxm3mgxOwUK7yMUOG61y6qQ@mail.gmail.com>
+Subject: Re: [PATCH v2 3/3] docs/devel/style: Mention alloca() family API is forbidden
+To: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@linaro.org>
+Cc: qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, qemu-ppc@nongnu.org, 
+	Peter Maydell <peter.maydell@linaro.org>, Harsh Prateek Bora <harshpb@linux.ibm.com>, 
+	Stefan Hajnoczi <stefanha@redhat.com>, Nicholas Piggin <npiggin@gmail.com>, 
+	Chinmay Rath <rathc@linux.ibm.com>, kvm@vger.kernel.org, 
+	Glenn Miles <milesg@linux.ibm.com>, Thomas Huth <thuth@redhat.com>, 
+	=?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>, 
+	=?UTF-8?Q?Daniel_P=2E_Berrang=C3=A9?= <berrange@redhat.com>, 
+	Markus Armbruster <armbru@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-=0A=
-On Sun, 2025-08-31 at 11:26 +0100, kernel test robot wrote:=0A=
-> Hi Patrick,=0A=
-> =0A=
-> kernel test robot noticed the following build warnings:=0A=
-> =0A=
-> [auto build test WARNING on a6ad54137af92535cfe32e19e5f3bc1bb7dbd383]=0A=
-> =0A=
-> url:    https://github.com/intel-lab-lkp/linux/commits/Roy-Patrick/filema=
-p-Pass-address_space-mapping-to-free_folio/20250828-174202=0A=
-> base:   a6ad54137af92535cfe32e19e5f3bc1bb7dbd383=0A=
-> patch link:    https://lore.kernel.org/r/20250828093902.2719-4-roypat%40a=
-mazon.co.uk=0A=
-> patch subject: [PATCH v5 03/12] mm: introduce AS_NO_DIRECT_MAP=0A=
-> config: loongarch-randconfig-r133-20250831 (https://download.01.org/0day-=
-ci/archive/20250831/202508311805.yfcdeaFC-lkp@intel.com/config)=0A=
-> compiler: loongarch64-linux-gcc (GCC) 14.3.0=0A=
-> reproduce: (https://download.01.org/0day-ci/archive/20250831/202508311805=
-.yfcdeaFC-lkp@intel.com/reproduce)=0A=
-> =0A=
-> If you fix the issue in a separate patch/commit (i.e. not just a new vers=
-ion of=0A=
-> the same patch/commit), kindly add following tags=0A=
-> | Reported-by: kernel test robot <lkp@intel.com>=0A=
-> | Closes: https://lore.kernel.org/oe-kbuild-all/202508311805.yfcdeaFC-lkp=
-@intel.com/=0A=
-> =0A=
-> sparse warnings: (new ones prefixed by >>)=0A=
->>> mm/secretmem.c:155:39: sparse: sparse: symbol 'secretmem_aops' was not =
-declared. Should it be static?=0A=
-> =0A=
-> vim +/secretmem_aops +155 mm/secretmem.c=0A=
-> =0A=
-> 1507f51255c9ff Mike Rapoport           2021-07-07  154=0A=
-> 1507f51255c9ff Mike Rapoport           2021-07-07 @155  const struct addr=
-ess_space_operations secretmem_aops =3D {=0A=
-> 46de8b979492e1 Matthew Wilcox (Oracle  2022-02-09  156)         .dirty_fo=
-lio    =3D noop_dirty_folio,=0A=
-> 6612ed24a24273 Matthew Wilcox (Oracle  2022-05-02  157)         .free_fol=
-io     =3D secretmem_free_folio,=0A=
-> 5409548df3876a Matthew Wilcox (Oracle  2022-06-06  158)         .migrate_=
-folio  =3D secretmem_migrate_folio,=0A=
-> 1507f51255c9ff Mike Rapoport           2021-07-07  159  };=0A=
-> 1507f51255c9ff Mike Rapoport           2021-07-07  160=0A=
-> =0A=
-> --=0A=
-> 0-DAY CI Kernel Test Service=0A=
-> https://github.com/intel/lkp-tests/wiki=0A=
-=0A=
-This is the same thing Mike already pointed out (making `secretmem_aops` st=
-atic)=0A=
+On Mon, Sep 1, 2025 at 4:27=E2=80=AFPM Philippe Mathieu-Daud=C3=A9 <philmd@=
+linaro.org> wrote:
+>
+> Suggested-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
+> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@linaro.org>
+> ---
+
+Reviewed-by: Manos Pitsidianakis <manos.pitsidianakis@linaro.org>
+
+>  docs/devel/style.rst | 4 ++--
+>  1 file changed, 2 insertions(+), 2 deletions(-)
+>
+> diff --git a/docs/devel/style.rst b/docs/devel/style.rst
+> index d025933808e..941fe14bfd4 100644
+> --- a/docs/devel/style.rst
+> +++ b/docs/devel/style.rst
+> @@ -446,8 +446,8 @@ Low level memory management
+>  =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D
+>
+>  Use of the ``malloc/free/realloc/calloc/valloc/memalign/posix_memalign``
+> -APIs is not allowed in the QEMU codebase. Instead of these routines,
+> -use the GLib memory allocation routines
+> +or ``alloca/g_alloca/g_newa/g_newa0`` APIs is not allowed in the QEMU co=
+debase.
+> +Instead of these routines, use the GLib memory allocation routines
+>  ``g_malloc/g_malloc0/g_new/g_new0/g_realloc/g_free``
+>  or QEMU's ``qemu_memalign/qemu_blockalign/qemu_vfree`` APIs.
+>
+> --
+
+If you wanna dust off your perl, you could also add this to checkpatch.pl :=
+)
 
