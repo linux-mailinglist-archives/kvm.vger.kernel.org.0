@@ -1,128 +1,110 @@
-Return-Path: <kvm+bounces-56459-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-56460-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 584A3B3E710
-	for <lists+kvm@lfdr.de>; Mon,  1 Sep 2025 16:27:29 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 42C9AB3E718
+	for <lists+kvm@lfdr.de>; Mon,  1 Sep 2025 16:28:52 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 05514163086
-	for <lists+kvm@lfdr.de>; Mon,  1 Sep 2025 14:26:29 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2FD7C1631E6
+	for <lists+kvm@lfdr.de>; Mon,  1 Sep 2025 14:28:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AB597341AA7;
-	Mon,  1 Sep 2025 14:26:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9ABBB34165A;
+	Mon,  1 Sep 2025 14:28:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="q4DAY7AB"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="YzAQYKzY"
 X-Original-To: kvm@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B02D8340DB9;
-	Mon,  1 Sep 2025 14:26:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B2B2D323E;
+	Mon,  1 Sep 2025 14:28:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756736769; cv=none; b=p+fX6QM6HxylPf7p2XTDPR81nfVFNa//bviUE7dNxyZ8qB020ISPTlYitMRa9Bt+m/Q7KFCuY1LpF0XVkeM1tjVLL/UslGLzMjJ5fM0d3m6lKT6JW5+f6a63zrdoIurirGVxQesHeM7tdhLNqbRXJBebfRdbk1S/GIxYJeYViig=
+	t=1756736883; cv=none; b=JJ1oKNw60z5OB6C0ANjhf6NMq0gqsilPFNzW9n7405D/7Y2HtKvVfIccGyoZw4RLAZEPkaYH8ieSgsyhwOwuSf60PBR/3atwKRtC1nycPaTzBhmCzK0FW4s4u6HzXBPHog8nLgm89vr4p8paUNCq9hpGk7jX5NoSF2VjnOgMVz8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756736769; c=relaxed/simple;
-	bh=0WO6REd4oQvsCY4rMsXYlUrit5wokYp9C49/smrjrtE=;
-	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=TovSVA/mPvDDxOobPEgRteJfV0KX1nd/UtpyXPkVRo6QNcX+bnu/IW2tKcgrGl3IvhwSZdpipwmuR4opQpwLYQkuFB060ZWsoIsl30Z0OkOKscDwhTg7+hoS8n+P6HiPHRCcgKgCH0PdT5hEOFMvxJbz51w7DXYV3dCNmYyV4dk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=q4DAY7AB; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3AB0CC4CEF0;
-	Mon,  1 Sep 2025 14:26:09 +0000 (UTC)
+	s=arc-20240116; t=1756736883; c=relaxed/simple;
+	bh=79YhD1biW7ZRAbWexbw6r9UIo8+R0Ehi9QzCMPNdDb0=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=l+67CZVVBuKTgMwKbyP3uD4iN/y7nzoPXqsrujBFjoqts9th7XzqL94l+5we92MjmVY8x7b9Fhs05pGiOKOfkw6bcTIs3UPRMfrSt7LwQhXaY8TiTfbrwFfNVHh84/hWI9qz0cMyzVio8iKYa7J5WzwKzTBULCib+h/N2WI13O4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=YzAQYKzY; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4AF62C4CEF0;
+	Mon,  1 Sep 2025 14:27:57 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1756736769;
-	bh=0WO6REd4oQvsCY4rMsXYlUrit5wokYp9C49/smrjrtE=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=q4DAY7ABYkSzdE831zYkR8TEHHcXStCW1kAf5cjAQADJD6wQFfX6pj4vyhO2smCS+
-	 UjNdQ6hRjwqaSAtQ4VM0yJmlpeNJHcu8bgOg8/k1PnQlTFbxqGGKSU6zyK7wxJPNsv
-	 XOkNkvF/vuJ2Q1ihQqpWo3NbOw+sMHcn4u9/v7AhkHBTJemR2HdWTJOV6qCtJBiroH
-	 IAf6YiPlifnl/9q6qSImEeiTpUfBzk5wzELx5t5dZtM6GAyFMssvhSqugYx0mWFYgl
-	 iXaUfp4fTcJA3lXwLozHZ6UoL6laDnmbu2GVgcrjkhSNpZ+Jt0t9/nvV+ScraR/EM7
-	 rV3R4xx28LUfg==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.98.2)
-	(envelope-from <maz@kernel.org>)
-	id 1ut5Ty-00000002HzM-3soH;
-	Mon, 01 Sep 2025 14:26:07 +0000
-Date: Mon, 01 Sep 2025 15:26:06 +0100
-Message-ID: <86wm6ickqp.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: Gyujeong Jin <wlsrbwjd7232@gmail.com>
-Cc: oliver.upton@linux.dev,
-	joey.gouly@arm.com,
-	suzuki.poulose@arm.com,
-	yuzenghui@huawei.com,
-	catalin.marinas@arm.com,
-	will@kernel.org,
-	kvmarm@lists.linux.dev,
-	linux-arm-kernel@lists.infradead.org,
-	kvm@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	gyutrange <wlsrbwjd643@naver.com>,
-	stable@vger.kernel.org,
-	DongHa Lee <gap-dev@example.com>,
-	Daehyeon Ko <4ncient@example.com>,
-	Geonha Lee <leegn4a@example.com>,
-	Hyungyu Oh <dqpc_lover@example.com>,
-	Jaewon Yang <r4mbb1@example.com>
-Subject: Re: [PATCH] KVM: arm64: nested: Fix VA sign extension in VNCR/TLBI paths
-In-Reply-To: <20250901141551.57981-1-wlsrbwjd7232@gmail.com>
-References: <20250901141551.57981-1-wlsrbwjd7232@gmail.com>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+	s=k20201202; t=1756736882;
+	bh=79YhD1biW7ZRAbWexbw6r9UIo8+R0Ehi9QzCMPNdDb0=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=YzAQYKzYOdJ3Q71t1i2a14NKnIRG3n/WMD3ZFyAehHTZcJusoFFuNtDI2+HYZCtj4
+	 wk4jXKHQxLBdQ/Wwob+BiDoE7bcA3zFC9B0eRyi7Kfl4+gmWXl8HuIHV2Af5e9fgwA
+	 k9kw3BDo2FcbU50hWaofq1m8IK+QrX0RmYGl2DNtGvaotpXICnparE35Y4MV2Fgiq5
+	 5DMOJp4CNBhGnYB20E8CWFZprn65hFKxKfRI0r2dTONJbvqIUGV2TGTOHgvLj0O5JQ
+	 t5EmUEtJBtKDLedgo9+7Jmh8ty/H6KSolSb9QH8nHkMnNj4dqhY7W8+tFatLVLqv3G
+	 4q+9NkXdezl/A==
+Date: Mon, 1 Sep 2025 17:27:53 +0300
+From: Mike Rapoport <rppt@kernel.org>
+To: "Roy, Patrick" <roypat@amazon.co.uk>
+Cc: "ackerleytng@google.com" <ackerleytng@google.com>,
+	"david@redhat.com" <david@redhat.com>,
+	"Manwaring, Derek" <derekmn@amazon.com>,
+	"Thomson, Jack" <jackabt@amazon.co.uk>,
+	"Kalyazin, Nikita" <kalyazin@amazon.co.uk>,
+	"kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+	"kvmarm@lists.linux.dev" <kvmarm@lists.linux.dev>,
+	"linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+	"linux-mm@kvack.org" <linux-mm@kvack.org>,
+	"pbonzini@redhat.com" <pbonzini@redhat.com>,
+	"seanjc@google.com" <seanjc@google.com>,
+	"tabba@google.com" <tabba@google.com>,
+	"vbabka@suse.cz" <vbabka@suse.cz>,
+	"will@kernel.org" <will@kernel.org>,
+	"Cali, Marco" <xmarcalx@amazon.co.uk>
+Subject: Re: [PATCH v5 04/12] KVM: guest_memfd: Add flag to remove from
+ direct map
+Message-ID: <aLWtaZYi65aLtTAP@kernel.org>
+References: <aLBtwIhQpX6AR2Z6@kernel.org>
+ <20250901142220.30610-1-roypat@amazon.co.uk>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: wlsrbwjd7232@gmail.com, oliver.upton@linux.dev, joey.gouly@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, catalin.marinas@arm.com, will@kernel.org, kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, linux-kernel@vger.kernel.org, wlsrbwjd643@naver.com, stable@vger.kernel.org, gap-dev@example.com, 4ncient@example.com, leegn4a@example.com, dqpc_lover@example.com, r4mbb1@example.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250901142220.30610-1-roypat@amazon.co.uk>
 
-On Mon, 01 Sep 2025 15:15:51 +0100,
-Gyujeong Jin <wlsrbwjd7232@gmail.com> wrote:
+On Mon, Sep 01, 2025 at 02:22:22PM +0000, Roy, Patrick wrote:
+> On Thu, 2025-08-28 at 15:54 +0100, Mike Rapoport wrote:
+> > On Thu, Aug 28, 2025 at 09:39:21AM +0000, Roy, Patrick wrote:
+> >
+> >>  static inline void kvm_gmem_mark_prepared(struct folio *folio)
+> >>  {
+> >> +     struct inode *inode = folio_inode(folio);
+> >> +
+> >> +     if (kvm_gmem_test_no_direct_map(inode))
+> >> +             set_direct_map_valid_noflush(folio_page(folio, 0), folio_nr_pages(folio), false);
+> > 
+> > This may fail to split large mapping in the direct map. Why not move this
+> > to kvm_gmem_prepare_folio() where you can handle returned error?
 > 
-> From: gyutrange <wlsrbwjd643@naver.com>
+> Argh, yeah, got that the wrong way around. Will update the error handling.
 > 
-> VNCR/TLBI VA reconstruction currently uses bit 48 as the sign bit,
-> but for 48-bit virtual addresses the correct sign bit is bit 47.
-
-No, that's not the case. Bit 55 is used at all times to determine
-which half of the address space a VA gets resolved from.
-
-> Using 48 can mis-canonicalize addresses in the negative half and may
-> cause missed invalidations.
+> > I think that using set_direct_map_invalid_noflush() here and
+> > set_direct_map_default_noflush() in kvm_gmem_free_folio() better is
+> > clearer and makes it more obvious that here the folio is removed from the
+> > direct map and when freed it's direct mapping is restored.
+> > 
+> > This requires to export two symbols in patch 2, but I think it's worth it.
 > 
-> Although VNCR_EL2 encodes other architectural fields (RESS, BADDR;
-> see Arm ARM D24.2.206), sign_extend64() interprets its second argument
-> as the index of the sign bit. Passing 48 prevents propagation of the
-> canonical sign bit for 48-bit VAs.
-> 
-> Impact:
-> - Incorrect canonicalization of VAs with bit47=1
+> Mh, but set_direct_map_[default|invalid]_noflush() only take a single struct
+> page * argument, so they'd either need to gain a npages argument, or we add yet
+> more functions to set_memory.h.  Do you still think that's worth it? 
 
-No. We are not trying to make the VA canonical.
-
-> - Potential stale VNCR pseudo-TLB entries after TLBI or MMU notifier
-
-No. The pseudo TLB is never created the first place.
-
-> - Possible incorrect translation/permissions or DoS when combined
->   with other issues
-
-Please explain, as "other issues" is not a valid argument.
-
-Thanks,
-
-	M.
-
+Ah, right, misremembered that. Let's keep set_direct_map_valid_noflush().
+ 
 -- 
-Without deviation from the norm, progress is not possible.
+Sincerely yours,
+Mike.
 
