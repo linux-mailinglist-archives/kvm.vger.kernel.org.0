@@ -1,190 +1,376 @@
-Return-Path: <kvm+bounces-56433-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-56434-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id C6A4DB3DFCA
-	for <lists+kvm@lfdr.de>; Mon,  1 Sep 2025 12:10:11 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id B93DDB3DFD2
+	for <lists+kvm@lfdr.de>; Mon,  1 Sep 2025 12:12:12 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 2785B7ACD4C
-	for <lists+kvm@lfdr.de>; Mon,  1 Sep 2025 10:08:22 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5C8EE175E4D
+	for <lists+kvm@lfdr.de>; Mon,  1 Sep 2025 10:12:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 88E7830EF9D;
-	Mon,  1 Sep 2025 10:09:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0535B30DD1A;
+	Mon,  1 Sep 2025 10:12:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="GBfFpsPw"
+	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="AembU8x8"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from NAM04-MW2-obe.outbound.protection.outlook.com (mail-mw2nam04on2057.outbound.protection.outlook.com [40.107.101.57])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 03EFD30EF9B
-	for <kvm@vger.kernel.org>; Mon,  1 Sep 2025 10:09:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756721372; cv=none; b=pallPf4nuusBVmEo0XtKyS0XflXr8UK0j8OUtR+zUrO3aEPKLbN2KEJQxD4YULXiHUEGu/CPRMWd/ltnaafs8Dk3CQApYdVM5G8V/e2Bldttcy7r2BLf+sME+FZHkCAo7lqDepWfqFZzZPfzI7Ob6xtJoP0VOsn86JcAUsy470Q=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756721372; c=relaxed/simple;
-	bh=LpM7Ymk89AHYw6ZHAsKiXms//9+nd5iDgs3bAU25bvY=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=bFyYgqoyGJVrqxD3+EBfxitA4hVfr3uF7wI8DF7FQQm9V1+UxK87tucze8m2zSqpu3jedebqNm1Ve56i+rqCx4Mm1DCHaJyhazCsqv6C9PR5xOCerTso0jMKY9bBkJJpg4mx/dqGneUmKOeu5nll5ImYedk03xjwDkVC02HO4Z8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=GBfFpsPw; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1756721370;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-	bh=1a6KZNWDPzVRW16sFIGAaj4FrFvj+zYs7figVijp77Y=;
-	b=GBfFpsPwCE2Qcw0/nr+AtXFxzapB5Unb9ljGSnfDhRSpyzcqmsH+DRMRnbbwj9oX1dkSAM
-	eavTZmrLdnsW3u3UJdfv9sAj+VzTkzrnd6w8HfuHdeEg7i15fTL45jcTXpj7EmRJ/X7BbV
-	VWQLRY3+vUDyQ0OciCEJEghrW8SoLoM=
-Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
- [209.85.221.70]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-504-qcmauat_Nyu-uNLn9RLW_A-1; Mon, 01 Sep 2025 06:09:28 -0400
-X-MC-Unique: qcmauat_Nyu-uNLn9RLW_A-1
-X-Mimecast-MFC-AGG-ID: qcmauat_Nyu-uNLn9RLW_A_1756721367
-Received: by mail-wr1-f70.google.com with SMTP id ffacd0b85a97d-3c456849a25so1191298f8f.1
-        for <kvm@vger.kernel.org>; Mon, 01 Sep 2025 03:09:28 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1756721367; x=1757326167;
-        h=content-transfer-encoding:in-reply-to:autocrypt:content-language
-         :from:references:cc:to:subject:user-agent:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=1a6KZNWDPzVRW16sFIGAaj4FrFvj+zYs7figVijp77Y=;
-        b=Srh16W2sI6UsouOMMGWh1cRGRRCN7//cFb0UdNFTm0LwuPn2tfoa6NbqKVau5SUHlz
-         BPlfgyoSl/9N+cMl5onwKMrTX/KFwpGGE+LcpR3+gd4hPf6bpPtq4CMpucGIvHeFME8Z
-         VKjHrAQ312I3Bg3Et2zY6HflLfoloy4sRSu2egyt3Vxrb2ZTnKEYZC0GIE86hbSokvyi
-         /x4NkKjRHGmQfGlOr25b7eFhQ9gW3mPUpWSpVzzhsrs2pV65DDkpDy25yu3MJ4efgOqT
-         GU5FphDbbJdycDohv4Qb1tvU6pEJiLizlhSNCj1wxlW+tDjqLJI8H+vT3NbNPm1Nzt6h
-         KRkg==
-X-Forwarded-Encrypted: i=1; AJvYcCWI8AvFuZ5THu6UktuBqGFbMWJd4PO1OXCQLXjYcryavvNeFt/FGaqC5mmWspP/Pe55h+4=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxV1UoTEYd5hhQvKkKqgtMF5+lRz4q/221mTb9Db0FeDwA3CKD+
-	hYejoTE3aWFKvgR0uYiQVmr+CzbfL1Nbt4vUKESBSOw0yx50SHKYiqHiht7PB3y7HDAYf9zBtF1
-	sE/0Hojjda2BI/WPBdjq9hkcd2dyZU2arXXcSvFOlOweHKEzcGoms5g==
-X-Gm-Gg: ASbGncsViA0Jp3R5kfbU+RIb6ZPRNDuV99golfOLhqudcmLcU7xhrDM9a1oQAP11Xh1
-	JMN8XRw9UNch6XU1i8i0zXO62/+d20BAk48IVaF2xQ3zwpH8VASdys5IinvbaW434N3g6EZ0oWU
-	YIn2qoF9r7OjE+V4cJjB7DJ0TnVByoFsM6h1R6+ygaWjMKcAZlhsAs4RtWKcbTtRC0Rbg8zUAXp
-	sVts4vrFUcMe9vL/Ev1N2EnYQESEeqxhFgpDLsjRNS4wTOAt0JVj/gJpVJtrPRbhSd2stb24aSJ
-	LEB5LWSbFyjRJVswOAOzApu3IG0NtAPlv+AdtDAEanqzD/hHW+T38hQ06ecbjlkyS59Yz4dNcGl
-	6xGdjv6mxVV9VoTpRfUdOrIV54QhVO2+LNWUfkCFol5Ozs3h1PFCMTWK9x0PV/S8CBK4=
-X-Received: by 2002:a05:6000:26d3:b0:3c8:2667:4e25 with SMTP id ffacd0b85a97d-3d1b26d6cd7mr6971323f8f.31.1756721367452;
-        Mon, 01 Sep 2025 03:09:27 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IHkb44LikxyvVuQ5sprIX+jH2JFruQqpYBFaArGkw79FbPVYkH+h0h6DbFI5dwMA1LDmu3bFw==
-X-Received: by 2002:a05:6000:26d3:b0:3c8:2667:4e25 with SMTP id ffacd0b85a97d-3d1b26d6cd7mr6971306f8f.31.1756721366996;
-        Mon, 01 Sep 2025 03:09:26 -0700 (PDT)
-Received: from ?IPV6:2003:d8:2f37:2b00:948c:dd9f:29c8:73f4? (p200300d82f372b00948cdd9f29c873f4.dip0.t-ipconnect.de. [2003:d8:2f37:2b00:948c:dd9f:29c8:73f4])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3d0b9402299sm13687409f8f.18.2025.09.01.03.09.25
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 01 Sep 2025 03:09:26 -0700 (PDT)
-Message-ID: <be511fb0-217e-43b2-9744-f9b001bff389@redhat.com>
-Date: Mon, 1 Sep 2025 12:09:24 +0200
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3CBDE2AE72;
+	Mon,  1 Sep 2025 10:12:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.101.57
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1756721524; cv=fail; b=W1UIjtVzLvGuovXA9m6UVxvR7fR1fQeOZPUVlV4HeNzohx38Evk1f1oXpGmQ7dGVF519pZa+8ORvGciRs5GMAmpkXIPTcsddlNFPInJTQq2qfy7Id2oAHYzqobvPlQnp4FWveRFPX36nvE2qQ9CrLBYXAfjXXdXBgTrsCjhqrAc=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1756721524; c=relaxed/simple;
+	bh=41cgz/fVIC0vO6SFEamh6mIrLQ1h8ci/N/RicvI+6cA=;
+	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=oLybKwf/UE6k72PeNzt8fI2RyOtVCpWb+h8zgkWkWt/cpzJnErBY6tEX/qmHrLWjOEUDAtYGakfUpF8SbB6UsMdqJsqpjuQ0Mzd0Xb5LfB/tAwL3eJRtk0j0tOjqJ7Kcv8DW4mOl8xP4u8dl0U7XBRty6oBg3+5BgqpeDbQBYGo=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=AembU8x8; arc=fail smtp.client-ip=40.107.101.57
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=lzcVOUOxwC6jciG+hNK35YNnA5Y6BlmgssrFjHSJd+UedxhqXMQf0J0dnoWqm6tjYWLWV6a7i1Sk06qiX+Jq4m43sA47Wlkuv2HgZtsXa4cmPCNNtH9iw3iRPJQzrRLWpSMyvsRT3/XRk+k5TqUe/7yOh5qeoxe2vh+Dyi4HZcvBD323nijDmtFcUmCPsbC270Aa6OIFIrDomj53aw54t0+DqY77iMGsJONiyuEa9weSoDvZ3nm/OukaVYy4N/EG1k8OUa0i5gbs13ovmd6AEYrT/Mjsp/ht1OMuRV5UFdwH5OPRbNoA1O17jT9V0ceeTmQCpYQfitcI3/o+uJGUug==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=A4XRs6K2nVAH81o/pump2x1agvKwSzvs3eZSCQeYLaw=;
+ b=l6B73MeqZkYWYvSWmIdIKl2IA0SyRjzaEl5S8NKIiw+YXt3Cs+t49vWwjrxqxJEpcfw41fV2cPmoIRfnWNy/8algKiYURmrYly2TBstmSAA554MLJMZcqFWlYW+ckiCZ8XjBDErzCScFT5u/74QVpXxZX3Ci6i4PvYfNLYBH19GKhf2CiqmjOPP+t4I6MObQiAyWbk3jAqY69Dsiz4ah+LOb3jXbCophD65EHWRRwUduiALFMAzIbjYd0MDR0R6ESw0Wja6Ql6oSK+KCTZ0qG+fWrWOq3j6rczBBULY6p5WMr89qXHlvKKyHlWBMqbnEKq7iB91uXjEaL8+6nCYsOw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 165.204.84.17) smtp.rcpttodomain=linutronix.de smtp.mailfrom=amd.com;
+ dmarc=pass (p=quarantine sp=quarantine pct=100) action=none
+ header.from=amd.com; dkim=none (message not signed); arc=none (0)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=A4XRs6K2nVAH81o/pump2x1agvKwSzvs3eZSCQeYLaw=;
+ b=AembU8x8Y4f09q2fn3KJ40uYW76bDc8V37oQXydkORMtb2DY527Q5t8qrB6dZ1Fdycmsqq16q+AfhAcC2jSaXL12oo1hgLxSDGLVpCJbcHrNNlti7dIP4u7rrmylGta5pYf7w/jJahksRHI95jZpzbwHDfPQG164VsmyyfMbNR8=
+Received: from DM6PR02CA0071.namprd02.prod.outlook.com (2603:10b6:5:177::48)
+ by SJ0PR12MB7036.namprd12.prod.outlook.com (2603:10b6:a03:483::20) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9052.21; Mon, 1 Sep
+ 2025 10:11:57 +0000
+Received: from DS2PEPF00003441.namprd04.prod.outlook.com
+ (2603:10b6:5:177:cafe::3d) by DM6PR02CA0071.outlook.office365.com
+ (2603:10b6:5:177::48) with Microsoft SMTP Server (version=TLS1_3,
+ cipher=TLS_AES_256_GCM_SHA384) id 15.20.9052.28 via Frontend Transport; Mon,
+ 1 Sep 2025 10:11:57 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
+ smtp.mailfrom=amd.com; dkim=none (message not signed)
+ header.d=none;dmarc=pass action=none header.from=amd.com;
+Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
+ 165.204.84.17 as permitted sender) receiver=protection.outlook.com;
+ client-ip=165.204.84.17; helo=SATLEXMB03.amd.com; pr=C
+Received: from SATLEXMB03.amd.com (165.204.84.17) by
+ DS2PEPF00003441.mail.protection.outlook.com (10.167.17.68) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.20.9094.14 via Frontend Transport; Mon, 1 Sep 2025 10:11:56 +0000
+Received: from Satlexmb09.amd.com (10.181.42.218) by SATLEXMB03.amd.com
+ (10.181.40.144) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.39; Mon, 1 Sep
+ 2025 05:11:56 -0500
+Received: from BLRKPRNAYAK.amd.com (10.180.168.240) by satlexmb09.amd.com
+ (10.181.42.218) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.2.1748.10; Mon, 1 Sep
+ 2025 03:11:50 -0700
+From: K Prateek Nayak <kprateek.nayak@amd.com>
+To: Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>,
+	Borislav Petkov <bp@alien8.de>, Dave Hansen <dave.hansen@linux.intel.com>,
+	Sean Christopherson <seanjc@google.com>, Paolo Bonzini <pbonzini@redhat.com>,
+	<x86@kernel.org>
+CC: Naveen rao <naveen.rao@amd.com>, Sairaj Kodilkar <sarunkod@amd.com>, "H.
+ Peter Anvin" <hpa@zytor.com>, "Peter Zijlstra (Intel)"
+	<peterz@infradead.org>, "Xin Li (Intel)" <xin@zytor.com>, Pawan Gupta
+	<pawan.kumar.gupta@linux.intel.com>, <linux-kernel@vger.kernel.org>,
+	<kvm@vger.kernel.org>, Mario Limonciello <mario.limonciello@amd.com>,
+	"Gautham R. Shenoy" <gautham.shenoy@amd.com>, Babu Moger
+	<babu.moger@amd.com>, Suravee Suthikulpanit <suravee.suthikulpanit@amd.com>,
+	Naveen N Rao <naveen@kernel.org>, K Prateek Nayak <kprateek.nayak@amd.com>
+Subject: [RFC PATCH v4 5/4] Documentation/x86/topology: Detail CPUID leaves used for topology enumeration
+Date: Mon, 1 Sep 2025 10:11:30 +0000
+Message-ID: <20250901101130.3661-1-kprateek.nayak@amd.com>
+X-Mailer: git-send-email 2.43.0
+In-Reply-To: <20250825075732.10694-1-kprateek.nayak@amd.com>
+References: <20250825075732.10694-1-kprateek.nayak@amd.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v4 1/2] KVM: guest_memfd: add generic population via write
-To: kernel test robot <lkp@intel.com>,
- "Kalyazin, Nikita" <kalyazin@amazon.co.uk>,
- "pbonzini@redhat.com" <pbonzini@redhat.com>,
- "shuah@kernel.org" <shuah@kernel.org>
-Cc: llvm@lists.linux.dev, oe-kbuild-all@lists.linux.dev,
- "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
- "linux-kselftest@vger.kernel.org" <linux-kselftest@vger.kernel.org>,
- "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
- "michael.day@amd.com" <michael.day@amd.com>,
- "jthoughton@google.com" <jthoughton@google.com>,
- "Roy, Patrick" <roypat@amazon.co.uk>, "Thomson, Jack"
- <jackabt@amazon.co.uk>, "Manwaring, Derek" <derekmn@amazon.com>,
- "Cali, Marco" <xmarcalx@amazon.co.uk>
-References: <20250828153049.3922-2-kalyazin@amazon.com>
- <202508310252.E5uFh1hx-lkp@intel.com>
-From: David Hildenbrand <david@redhat.com>
-Content-Language: en-US
-Autocrypt: addr=david@redhat.com; keydata=
- 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
- qIws/H2t
-In-Reply-To: <202508310252.E5uFh1hx-lkp@intel.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: SATLEXMB03.amd.com (10.181.40.144) To satlexmb09.amd.com
+ (10.181.42.218)
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: DS2PEPF00003441:EE_|SJ0PR12MB7036:EE_
+X-MS-Office365-Filtering-Correlation-Id: 40cca47c-fbb5-4c88-e85a-08dde93ffb96
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|1800799024|36860700013|7416014|376014|82310400026;
+X-Microsoft-Antispam-Message-Info:
+	=?us-ascii?Q?EFKBcY5l0vEkuzHE9Yn15z/gV3wh9m2CQWIDNCahH9lgWKEGKXqbhXdGTbn3?=
+ =?us-ascii?Q?hvgKzjo+Fva1hfTZhfaFfd7mgvUq03ouphZgsV8f4lhcarQeIt0r9xIeVFcT?=
+ =?us-ascii?Q?V2yfK4vNWZ3I5DGmV5kqR1xS2SXsffd09sKbXkAvfIlY9xwf6x6aOsOJfgBY?=
+ =?us-ascii?Q?8dBy3FpJiprm54uNT67CieWRcH58gQEwSoe1WTP+CJvUH8ug6bSBrJlPCCq1?=
+ =?us-ascii?Q?5Z4gki5yzVjpLXbX3/GM5HCFnmIM9So67ohfYXBQACn6GorMrcXQc4QuN16g?=
+ =?us-ascii?Q?YxTdZ8V2ge1CYQJwALuv+W44u12GY+b99gf/1VsDot3dplIqZ51DZZHKddi9?=
+ =?us-ascii?Q?Wah+c643oIC6AqX6jd4kVHFeh0dIKENFrRVX9wp01oJb5AYOuCtBqtmwmHLl?=
+ =?us-ascii?Q?m8XNJJypSOQ5kb4iuyg6JEOM308PizjzFUXtV2KnVTH5hdJ56cRMZJbgJxqZ?=
+ =?us-ascii?Q?EQ2G5hoeyVcZwdSvunfbm32tB255Vg4y1OjLptsQ0BrEjCg36vlAE0UyPljZ?=
+ =?us-ascii?Q?s4Xds0gMWEJfHVPubvHl2VURMXyh0lmpPvpCrJldbn1pPo+3tu1nI06AOzvc?=
+ =?us-ascii?Q?6Iz9nrm4b6hZtyNQwcg3WO45bPxWtm71cZSCXMtEQWjUuFsYeyepe4hHl1+e?=
+ =?us-ascii?Q?wD+v4XbTZhISFmPa78Lwu/vKnF5CibS0pzq9vNI6F+nBBocZ3eGZ5QMtWBpy?=
+ =?us-ascii?Q?g014fDmKelxssGwEzm7ZyCuDIm9HUdyr7bDSGsRNtY9b2kKxohhagbGhvXn5?=
+ =?us-ascii?Q?jjye09uthEIQW9Adb1pcRHXh/L2chO8Aq3hgTvOgbViIm4lDW2RaSjC7MmCk?=
+ =?us-ascii?Q?EfqiYSsLSwoYuO/HFyJ0E7MKaPRAVVLskJVb1HZUSo4pqS0p+5lPMoyrXE/b?=
+ =?us-ascii?Q?GWMlyV6gFKoB69vEBznje2XHTSNrw4mhtJwYUL+ZW5sKp7tkebr8PWaXbwSm?=
+ =?us-ascii?Q?F8RzUrzWt7y0DbhaZBKDIy9TiMC5gGRKI6ciY5jPRaVMAEem49hUeqa9N4Br?=
+ =?us-ascii?Q?6uvgT1fznRVy7bh+udHYbt3ogWygCH0GDwb/chaDWuBv7L1Hq0b/0ONv6k5N?=
+ =?us-ascii?Q?W+HYhGYFFXdcOjdsV5cWZxEU+P7uG1wxurHtAyJIIF3rdgjS/ltFEmXrtWWd?=
+ =?us-ascii?Q?nTBzhgLfs7jnwieBXHS5qhGqpzUvG94TAWKPVc+Et2wv3DecalMfyrPkEOh7?=
+ =?us-ascii?Q?GrJkESUStYyJtAC2WzXsL+ZZ7pSwhdx1YwH2kR4DtHxm1kjXo1aF4Vs87ZwH?=
+ =?us-ascii?Q?xJWKnZKY50B/segmw9mAuo1YfFkjNCNggrH1Bj0Hb+Q0BXBvJAiVwkeemkeh?=
+ =?us-ascii?Q?WOH6E2O+hO18zD7605tf+K94lWG3/pM8hRywnk00OedS+7cdHMTNwd49UKjH?=
+ =?us-ascii?Q?BW7Nd+wyNFXmQgWBG3e5o/OqOIDCL1CrUU5XloZh3E8Y+ppUMVkHQMOx0QEu?=
+ =?us-ascii?Q?d3tOYpD81g3UpEba53gC0g50bCxf+w8zq23H1iwBoRmx6YQoS1kCdxBWgBNJ?=
+ =?us-ascii?Q?a5gFFjBTu9Tx8L8yLFxegJ0QDPyvJ8FTAFhZ?=
+X-Forefront-Antispam-Report:
+	CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB03.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230040)(1800799024)(36860700013)(7416014)(376014)(82310400026);DIR:OUT;SFP:1101;
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 01 Sep 2025 10:11:56.8854
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: 40cca47c-fbb5-4c88-e85a-08dde93ffb96
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[SATLEXMB03.amd.com]
+X-MS-Exchange-CrossTenant-AuthSource:
+	DS2PEPF00003441.namprd04.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SJ0PR12MB7036
 
-On 30.08.25 20:56, kernel test robot wrote:
-> Hi Nikita,
-> 
-> kernel test robot noticed the following build errors:
-> 
-> [auto build test ERROR on a6ad54137af92535cfe32e19e5f3bc1bb7dbd383]
-> 
-> url:    https://github.com/intel-lab-lkp/linux/commits/Kalyazin-Nikita/KVM-guest_memfd-add-generic-population-via-write/20250828-233437
-> base:   a6ad54137af92535cfe32e19e5f3bc1bb7dbd383
-> patch link:    https://lore.kernel.org/r/20250828153049.3922-2-kalyazin%40amazon.com
-> patch subject: [PATCH v4 1/2] KVM: guest_memfd: add generic population via write
-> config: x86_64-randconfig-001-20250830 (https://download.01.org/0day-ci/archive/20250831/202508310252.E5uFh1hx-lkp@intel.com/config)
-> compiler: clang version 20.1.8 (https://github.com/llvm/llvm-project 87f0227cb60147a26a1eeb4fb06e3b505e9c7261)
-> reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20250831/202508310252.E5uFh1hx-lkp@intel.com/reproduce)
-> 
-> If you fix the issue in a separate patch/commit (i.e. not just a new version of
-> the same patch/commit), kindly add following tags
-> | Reported-by: kernel test robot <lkp@intel.com>
-> | Closes: https://lore.kernel.org/oe-kbuild-all/202508310252.E5uFh1hx-lkp@intel.com/
-> 
-> All errors (new ones prefixed by >>, old ones prefixed by <<):
-> 
->>> ERROR: modpost: "filemap_remove_folio" [arch/x86/kvm/kvm.ko] undefined!
+Add a new section describing the different CPUID leaves and fields used
+to parse topology on x86 systems.
 
-Right, that one is not exported.
+Suggested-by: Borislav Petkov <bp@alien8.de>
+Signed-off-by: K Prateek Nayak <kprateek.nayak@amd.com>
+---
+Sending this as an RFC patch first to squash out the amount of details
+required in topology.rst. Once clarified, I'll include this formally in
+v5.
+---
+ Documentation/arch/x86/topology.rst | 194 ++++++++++++++++++++++++++++
+ 1 file changed, 194 insertions(+)
 
+diff --git a/Documentation/arch/x86/topology.rst b/Documentation/arch/x86/topology.rst
+index c12837e61bda..fd9903aab6b5 100644
+--- a/Documentation/arch/x86/topology.rst
++++ b/Documentation/arch/x86/topology.rst
+@@ -141,6 +141,200 @@ Thread-related topology information in the kernel:
+ 
+ 
+ 
++System topology enumeration
++===========================
++The topology on x86 systems can be discovered using a combination of vendor
++specific CPUID leaves introduced specifically to enumerate the processor
++topology and the cache hierarchy.
++
++The CPUID leaves in their preferred order of parsing for each x86 vendor is as
++follows:
++
++1) AMD and Hygon
++
++   On AMD and Hygon platforms, the CPUID leaves that enumerate the processor
++   topology are as follows:
++
++   1) CPUID leaf 0x80000026 [Extended CPU Topology] (Core::X86::Cpuid::ExCpuTopology)
++
++      The extended CPUID leaf 0x80000026 is the extension of the CPUID leaf 0xB
++      and provides the topology information of Core, Complex, CCD(Die), and
++      Socket in each level.
++
++      The support for the leaf is expected to be discovered by checking if the
++      supported extended CPUID level is >= 0x80000026 and then checking if
++      `LogProcAtThisLevel` in `EBX[15:0]` at a particular level (starting from
++      0) is non-zero.
++
++      The `LevelType` in `ECX[15:8]` at the level provides the detail of the
++      topology domain that the level describes - Core, Complex, CCD(Die), or
++      the Socket.
++
++      The kernel uses the `CoreMaskWidth` from `EAX[4:0]` to discover the
++      number of bits that need to be right shifted from the
++      `ExtendedLocalApicId` in `EDX[31:0]` to get a unique Topology ID for
++      the topology level. CPUs with the same Topology ID share the resources
++      at that level.
++
++      CPUID leaf 0x80000026 also provides more information regarding the
++      power and efficiency rankings, and about the core type on AMD
++      processors with heterogeneous characteristics.
++
++      If CPUID leaf 0x80000026 is supported, further parsing is not required.
++
++
++   2) CPUID leaf 0x0000000B [Extended Topology Enumeration] (Core::X86::Cpuid::ExtTopEnum)
++
++      The extended CPUID leaf 0x0000000B is the predecessor on the extended
++      CPUID leaf 0x80000026 and only describes the core, and the socket domains
++      of the processor topology.
++
++      The support for the leaf is expected to be discovered by checking if the
++      supported CPUID level is >= 0xB and then checking if `EBX[31:0]` at a
++      particular level (starting from 0) is non-zero.
++
++      The `LevelType` in `ECX[15:8]` at the level provides the detail of the
++      topology domain that the level describes - Thread, or Processor (Socket).
++
++      The kernel uses the `CoreMaskWidth` from `EAX[4:0]` to discover the
++      number of bits that need to be right shifted from the
++      `ExtendedLocalApicId` in `EDX[31:0]` to get a unique Topology ID for
++      that topology level. CPUs sharing the Topology ID share the resources
++      at that level.
++
++      If CPUID leaf 0xB is supported, further parsing is not required.
++
++
++   3) CPUID leaf 0x80000008 ECX [Size Identifiers] (Core::X86::Cpuid::SizeId)
++
++      If neither the CPUID leaf 0x80000026 or CPUID leaf 0xB is supported, the
++      number of CPUs on the package is detected using the Size Identifier leaf
++      0x80000008 ECX.
++
++      The support for the leaf is expected to be discovered by checking if the
++      supported extended CPUID level is >= 0x80000008.
++
++      The shifts from the APIC ID for the Socket ID is calculated from the
++      `ApicIdSize` field in `ECX[15:12]` if it is non-zero.
++
++      If `ApicIdSize` is reported to be zero, the shift is calculated as the
++      order of the `number of threads` calculated from `NC` field in
++      `ECX[7:0]` which describes the `number of threads - 1` on the package.
++
++      Unless Extended APIC ID is supported, the APIC ID used to find the
++      Socket ID is from the `LocalApicId` field of CPUID leaf 0x00000001
++      `EBX[31:24]`.
++
++      The topology parsing continues to detect if Extended APIC ID is
++      supported or not.
++
++
++   4) CPUID leaf 0x8000001E [Extended APIC ID, Core Identifiers, Node Identifiers]
++      (Core::X86::Cpuid::{ExtApicId,CoreId,NodeId})
++
++      The support for Extended APIC ID can be detected by checking for the
++      presence of `TopologyExtensions` in `EXC[22]` of CPUID leaf 0x80000001
++      [Feature Identifiers] (Core::X86::Cpuid::FeatureExtIdEcx).
++
++      If Topology Extensions is supported, the APIC ID from `ExtendedApicId`
++      from CPUID leaf 0x8000001E `EAX[31:0]` should be preferred over that from
++      `LocalApicId` field of CPUID leaf 0x00000001 `EBX[31:24]` for topology
++      enumeration.
++
++      On processors of Family 0x17 and above that do not support CPUID leaf
++      0x80000026 or CPUID leaf 0xB, the shifts from the APIC ID for the Core
++      ID is calculated using the order of `number of threads per core`
++      calculated using the `ThreadsPerCore` field in `EBX[15:8]` which
++      describes `number of threads per core - 1`.
++
++      On Processors of Family 0x15, the Core ID from `EBX[7:0]` is used as the
++      `cu_id` (Compute Unit ID) to detect CPUs that share the compute units.
++
++
++   All AMD and Hygon processors that support the `TopologyExtensions` feature
++   stores the `NodeId` from the `ECX[7:0]` of CPUID leaf 0x8000001E
++   (Core::X86::Cpuid::NodeId) as the per-CPU `node_id`.
++
++
++2) Intel
++
++   On Intel platforms, the CPUID leaves that enumerate the processor
++   topology are as follows:
++
++   1) CPUID leaf 0x1F (V2 Extended Topology Enumeration Leaf)
++
++      The CPUID leaf 0x1F is the extension of the CPUID leaf 0xB and provides
++      the topology information of Core, Module, Tile, Die, DieGrp, and Socket
++      in each level.
++
++      The support for the leaf is expected to be discovered by checking if
++      the supported CPUID level is >= 0x1F and then `EBX[31:0]` at a
++      particular level (starting from 0) is non-zero.
++
++      The `Domain Type` in `ECX[15:8]` of the sub-leaf provides the detail of
++      the topology domain that the level describes - Core, Module, Tile, Die,
++      DieGrp, and Socket.
++
++      The kernel uses the value from `EAX[4:0]` to discover the number of
++      bits that need to be right shifted from the `x2APIC ID` in `EDX[31:0]`
++      to get a unique Topology ID for the topology level. CPUs with the same
++      Topology ID share the resources at that level.
++
++      If CPUID leaf 0x1F is supported, further parsing is not required.
++
++
++   2) CPUID leaf 0x0000000B (Extended Topology Enumeration Leaf)
++
++      The extended CPUID leaf 0x0000000B is the predecessor of the V2 Extended
++      Topology Enumeration Leaf 0x1F and only describes the core, and the
++      socket domains of the processor topology.
++
++      The support for the leaf is expected to be discovered by checking if the
++      supported CPUID level is >= 0xB and then checking if `EBX[31:0]` at a
++      particular level (starting from 0) is non-zero.
++
++      CPUID leaf 0x0000000B shares the same layout as CPUID leaf 0x1F and
++      should be enumerated in a similar manner.
++
++      If CPUID leaf 0xB is supported, further parsing is not required.
++
++
++   3) CPUID leaf 0x00000004 (Deterministic Cache Parameters Leaf)
++
++      On Intel processors that support neither CPUID leaf 0x1F, nor CPUID leaf
++      0xB, the shifts for the SMT domains is calculated using the number of
++      CPUs sharing the L1 cache.
++
++      Processors that feature Hyper-Threading is detected using `EDX[28]` of
++      CPUID leaf 0x1 (Basic CPUID Information).
++
++      The order of `Maximum number of addressable IDs for logical processors
++      sharing this cache` from `EAX[25:14]` of level-0 of CPUID 0x4 provides
++      the shifts from the APIC ID required to compute the Core ID.
++
++      The APIC ID and Package information is computed using the data from
++      CPUID leaf 0x1.
++
++
++   4) CPUID leaf 0x00000001 (Basic CPUID Information)
++
++      The mask and shifts to derive the Physical Package (socket) ID is
++      computed using the `Maximum number of addressable IDs for logical
++      processors in this physical package` from `EBX[23:16]` of CPUID leaf
++      0x1.
++
++     The APIC ID on the legacy platforms is derived from the `Initial APIC
++     ID` field from `EBX[31:24]` of CPUID leaf 0x1.
++
++
++3) Centaur and Zhaoxin
++
++   Similar to Intel, Centaur and Zhaoxin use a combination of CPUID leaf
++   0x00000004 (Deterministic Cache Parameters Leaf) and CPUID leaf 0x00000001
++   (Basic CPUID Information) to derive the topology information.
++
++
++
+ System topology examples
+ ========================
+ 
 -- 
-Cheers
-
-David / dhildenb
+2.34.1
 
 
