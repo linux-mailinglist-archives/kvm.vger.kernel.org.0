@@ -1,152 +1,129 @@
-Return-Path: <kvm+bounces-56448-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-56449-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5D7D7B3E575
-	for <lists+kvm@lfdr.de>; Mon,  1 Sep 2025 15:40:13 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 131B6B3E5EB
+	for <lists+kvm@lfdr.de>; Mon,  1 Sep 2025 15:47:25 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 3594918923B4
-	for <lists+kvm@lfdr.de>; Mon,  1 Sep 2025 13:40:15 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 235B116E575
+	for <lists+kvm@lfdr.de>; Mon,  1 Sep 2025 13:47:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 49F1D3376A1;
-	Mon,  1 Sep 2025 13:39:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A2F853375A3;
+	Mon,  1 Sep 2025 13:47:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=amazon.co.uk header.i=@amazon.co.uk header.b="Q9JC1tDG"
 X-Original-To: kvm@vger.kernel.org
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 36B6F1DFDAB
-	for <kvm@vger.kernel.org>; Mon,  1 Sep 2025 13:39:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
+Received: from fra-out-011.esa.eu-central-1.outbound.mail-perimeter.amazon.com (fra-out-011.esa.eu-central-1.outbound.mail-perimeter.amazon.com [52.28.197.132])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 974F91E2823;
+	Mon,  1 Sep 2025 13:47:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=52.28.197.132
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756733950; cv=none; b=lxtcrNJDMhJdLqwr0ueIoLa590Q9YKwXf9o3KLiXfGtR0p6ZfMqxexkjhSuEjpeqHgV9ja11Y2zCaqBVq4xYjOEE/I237Tg4+DNB7lxbcW3tLPwBHzX8zK0tyfy8VnKoNzXOnuMCpddmEzY7wiT0yz89gF/bGPUC5XhFlRYhLK4=
+	t=1756734434; cv=none; b=AILiwdEAaJAT5QIO5MamT9AHinn4Jmp01MjJ/2dN+RL33vc0KA56KZLdqKCh/4pTfXt+akVxIzRGKGti70/f1o6O2hvH1XohP5+7Sb6iL8SVD0T5bqt9f9ZgNJNOZPifv8GCMJFU4e8q79s2KOGnDSf0xci6ZaLhGmQaAIYGDIM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756733950; c=relaxed/simple;
-	bh=g1HIdy4oNHsrrEikUrjR1i8Ev3H2co/eBXYJjS2odJE=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=uu0A22ooN4Eqe6TL9EgZ28i5yo+Rbq6CEojk8i8IRtx/W6wam153sH/Dqny3Jwbdu3lc1IvodtkPmk7OzOVKg1/fjzTvWnG8DoxM7v39259l2HAJZNsZmYRNGdzYFT6SIT/i635s+B2C0DJ9SWOrc576viw+Z3wHIEp/T6IKAKA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 5A62716A3;
-	Mon,  1 Sep 2025 06:39:00 -0700 (PDT)
-Received: from [10.1.196.46] (e134344.arm.com [10.1.196.46])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 1097F3F694;
-	Mon,  1 Sep 2025 06:39:07 -0700 (PDT)
-Message-ID: <b227a304-9b2f-4e89-9ca5-41d836ae4bae@arm.com>
-Date: Mon, 1 Sep 2025 14:39:06 +0100
+	s=arc-20240116; t=1756734434; c=relaxed/simple;
+	bh=AfWNq8qOG43flzRWME3FN/9/nkz8zIUH0oyoL8ZMcCk=;
+	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=NPd7rmYNbUTQHMcf5OdudxVew2bwKSOSzHJlqpBihlOVZNQEJ6d3I9h3CTtOXk5YqrgQFFlt+cyPDWOta1KL/xrvxiAL2CulTDvUgWBh+Gl+L6Fb18SDjd+z54sWLwJkrlDVP6i1iTPgRbwpfH0GBW/eiUzCzqUriN35LbZ2RiI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.co.uk; spf=pass smtp.mailfrom=amazon.co.uk; dkim=pass (2048-bit key) header.d=amazon.co.uk header.i=@amazon.co.uk header.b=Q9JC1tDG; arc=none smtp.client-ip=52.28.197.132
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.co.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.uk
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+  d=amazon.co.uk; i=@amazon.co.uk; q=dns/txt;
+  s=amazoncorp2; t=1756734432; x=1788270432;
+  h=from:to:cc:subject:date:message-id:references:
+   in-reply-to:content-transfer-encoding:mime-version;
+  bh=+FO6rXzJ1OSaPqvoH5IT1CQYrfHskP0PMe12nrwxRLg=;
+  b=Q9JC1tDGGmQa8cbTlrJeUFILAHZVn9hv8HoPCtoYm5T2eHgQ9R8CBpvf
+   q/+ojK3nXCvA0HBRFselha6Bm9s3mslwgU4T+5bzYjZoHQMhggFc/JPuJ
+   PyudG0+YE9ShgQJ5WRgZCGiCq0/2AAKSRlPowtWabB0+iT19U5yHSTvJb
+   EC4ps/QZ0UdwkfHkkQ5YZTgQBEiOUXzgWoeY4eTP+iI7ARJAtPBh9aSm1
+   eVUdtP+lDPzuQMgY7EQ/2p+ku0wj5Y82sEoU3FEstufT0kiO9cMCvWR5f
+   ekeWAZ9AqFLki2cCdePAqoXSr81uZsfLm/7a25v0z3jHpJYvU0EFiN+jS
+   Q==;
+X-CSE-ConnectionGUID: m8ytizq0Q1qu8e8vIjnAEg==
+X-CSE-MsgGUID: iRZ+qBh2R/uOhlJ6+f0jsg==
+X-IronPort-AV: E=Sophos;i="6.17,290,1747699200"; 
+   d="scan'208";a="1359904"
+Received: from ip-10-6-6-97.eu-central-1.compute.internal (HELO smtpout.naws.eu-central-1.prod.farcaster.email.amazon.dev) ([10.6.6.97])
+  by internal-fra-out-011.esa.eu-central-1.outbound.mail-perimeter.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 01 Sep 2025 13:47:02 +0000
+Received: from EX19MTAEUB002.ant.amazon.com [54.240.197.232:16772]
+ by smtpin.naws.eu-central-1.prod.farcaster.email.amazon.dev [10.0.42.3:2525] with esmtp (Farcaster)
+ id ca3958c9-cdc5-4794-b45a-6e9b3384e54b; Mon, 1 Sep 2025 13:47:02 +0000 (UTC)
+X-Farcaster-Flow-ID: ca3958c9-cdc5-4794-b45a-6e9b3384e54b
+Received: from EX19D015EUB003.ant.amazon.com (10.252.51.113) by
+ EX19MTAEUB002.ant.amazon.com (10.252.51.59) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.2562.17;
+ Mon, 1 Sep 2025 13:47:01 +0000
+Received: from EX19D015EUB004.ant.amazon.com (10.252.51.13) by
+ EX19D015EUB003.ant.amazon.com (10.252.51.113) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.2562.20;
+ Mon, 1 Sep 2025 13:47:01 +0000
+Received: from EX19D015EUB004.ant.amazon.com ([fe80::2dc9:7aa9:9cd3:fc8a]) by
+ EX19D015EUB004.ant.amazon.com ([fe80::2dc9:7aa9:9cd3:fc8a%3]) with mapi id
+ 15.02.2562.020; Mon, 1 Sep 2025 13:47:01 +0000
+From: "Roy, Patrick" <roypat@amazon.co.uk>
+To: "tabba@google.com" <tabba@google.com>
+CC: "ackerleytng@google.com" <ackerleytng@google.com>, "david@redhat.com"
+	<david@redhat.com>, "Manwaring, Derek" <derekmn@amazon.com>, "Thomson, Jack"
+	<jackabt@amazon.co.uk>, "Kalyazin, Nikita" <kalyazin@amazon.co.uk>,
+	"kvm@vger.kernel.org" <kvm@vger.kernel.org>, "kvmarm@lists.linux.dev"
+	<kvmarm@lists.linux.dev>, "linux-arm-kernel@lists.infradead.org"
+	<linux-arm-kernel@lists.infradead.org>, "linux-kernel@vger.kernel.org"
+	<linux-kernel@vger.kernel.org>, "linux-mm@kvack.org" <linux-mm@kvack.org>,
+	"pbonzini@redhat.com" <pbonzini@redhat.com>, "Roy, Patrick"
+	<roypat@amazon.co.uk>, "rppt@kernel.org" <rppt@kernel.org>,
+	"seanjc@google.com" <seanjc@google.com>, "vbabka@suse.cz" <vbabka@suse.cz>,
+	"will@kernel.org" <will@kernel.org>, "Cali, Marco" <xmarcalx@amazon.co.uk>
+Subject: Re: [PATCH v5 02/12] arch: export set_direct_map_valid_noflush to KVM
+ module
+Thread-Topic: [PATCH v5 02/12] arch: export set_direct_map_valid_noflush to
+ KVM module
+Thread-Index: AQHcG0bk577bUdlDRkuvvFVSrUyVog==
+Date: Mon, 1 Sep 2025 13:47:00 +0000
+Message-ID: <20250901134659.32171-1-roypat@amazon.co.uk>
+References: <CA+EHjTwDZ-FRV2KfC5ZG9SJYeeMRVUHQ8rVtb9dx2AQwCriPQw@mail.gmail.com>
+In-Reply-To: <CA+EHjTwDZ-FRV2KfC5ZG9SJYeeMRVUHQ8rVtb9dx2AQwCriPQw@mail.gmail.com>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+Content-Type: text/plain; charset="iso-8859-1"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] KVM: Avoid debugfs warning caused by repeated vm fd
- number
-To: Ted Chen <znscnchen@gmail.com>, pbonzini@redhat.com
-Cc: kvm@vger.kernel.org, Dave Martin <Dave.Martin@arm.com>
-References: <20250901130336.112842-1-znscnchen@gmail.com>
-From: Ben Horgan <ben.horgan@arm.com>
-Content-Language: en-US
-In-Reply-To: <20250901130336.112842-1-znscnchen@gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
 
-Hi Ted,
-
-On 9/1/25 14:03, Ted Chen wrote:
-> Avoid debugfs warning like "KVM: debugfs: duplicate directory 59904-4"
-> caused by creating VMs with the same vm fd number in a single process.
-> 
-> As shown in the below test case, two test() are executed sequentially in a
-> single process, each creating a new VM.
-> 
-> Though the 2nd test() creates a new VM after the 1st test() closes the
-> vm_fd, KVM prints warnings like "KVM: debugfs: duplicate directory 59904-4"
-> on creating the 2nd VM.
-> 
-> This is due to the dup() of the vcpu_fd in test(). So, after closing the
-> 1st vm_fd, kvm->users_count of the 1st VM is still > 0 when creating the
-> 2nd VM. So, KVM has not yet invoked kvm_destroy_vm() and
-> kvm_destroy_vm_debugfs() for the 1st VM after closing the 1st vm_fd. The
-> 2nd test() thus will be able to create a different VM with the same vm fd
-> number as the 1st VM.
-> 
-> Therefore, besides having "pid" and "fdname" in the dir_name of the
-> debugfs, add a random number to differentiate different VMs to avoid
-> printing warning, also allowing the 2nd VM to have a functional debugfs.
-> 
-> Use get_random_u32() to avoid dir_name() taking up too much memory while
-> greatly reducing the chance of printing warning.
-> 
-> void test(void)
-> {
->         int kvm_fd, vm_fd, vcpu_fd;
-> 
->         kvm_fd = open("/dev/kvm", O_RDWR);
->         if (kvm_fd == -1)
->                 return;
-> 
->         vm_fd = ioctl(kvm_fd, KVM_CREATE_VM, 0);
->         if (vm_fd == -1)
->                 return;
->         vcpu_fd = ioctl(vm_fd, KVM_CREATE_VCPU, 0);
->         if (vcpu_fd == -1)
->                 return;
-> 
->         dup(vcpu_fd);
->         close(vcpu_fd);
->         close(vm_fd);
->         close(kvm_fd);
-> }
-> 
-> int main()
-> {
->         test();
->         test();
-> 
->         return 0;
-> }
-> 
-> Signed-off-by: Ted Chen <znscnchen@gmail.com>
-> ---
->  virt/kvm/kvm_main.c | 5 +++--
->  1 file changed, 3 insertions(+), 2 deletions(-)
-> 
-> diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
-> index 6c07dd423458..f92a60ed5de8 100644
-> --- a/virt/kvm/kvm_main.c
-> +++ b/virt/kvm/kvm_main.c
-> @@ -1017,7 +1017,7 @@ static int kvm_create_vm_debugfs(struct kvm *kvm, const char *fdname)
->  {
->  	static DEFINE_MUTEX(kvm_debugfs_lock);
->  	struct dentry *dent;
-> -	char dir_name[ITOA_MAX_LEN * 2];
-> +	char dir_name[ITOA_MAX_LEN * 3];
->  	struct kvm_stat_data *stat_data;
->  	const struct _kvm_stats_desc *pdesc;
->  	int i, ret = -ENOMEM;
-> @@ -1027,7 +1027,8 @@ static int kvm_create_vm_debugfs(struct kvm *kvm, const char *fdname)
->  	if (!debugfs_initialized())
->  		return 0;
->  
-> -	snprintf(dir_name, sizeof(dir_name), "%d-%s", task_pid_nr(current), fdname);
-> +	snprintf(dir_name, sizeof(dir_name), "%d-%s-%u", task_pid_nr(current),
-> +		 fdname, get_random_u32());
-
-This does make the directory names (very likely) to be unique but it's
-not helpful in distinguishing which directory maps to which vm. I wonder
-if there is some better id we could use here.
-
-Should the vm stats_id also be updated to be unique and use the same scheme?
-
->  	mutex_lock(&kvm_debugfs_lock);
->  	dent = debugfs_lookup(dir_name, kvm_debugfs_dir);
->  	if (dent) {
-
-Thanks,
-
-Ben
-
+Hi Fuad!=0A=
+=0A=
+On Thu, 2025-08-28 at 11:07 +0100, Fuad Tabba wrote:=0A=
+>> diff --git a/arch/loongarch/mm/pageattr.c b/arch/loongarch/mm/pageattr.c=
+=0A=
+>> index f5e910b68229..d076bfd3fcbf 100644=0A=
+>> --- a/arch/loongarch/mm/pageattr.c=0A=
+>> +++ b/arch/loongarch/mm/pageattr.c=0A=
+>> @@ -217,6 +217,7 @@ int set_direct_map_invalid_noflush(struct page *page=
+)=0A=
+>>=0A=
+>>         return __set_memory(addr, 1, __pgprot(0), __pgprot(_PAGE_PRESENT=
+ | _PAGE_VALID));=0A=
+>>  }=0A=
+>> +EXPORT_SYMBOL_FOR_MODULES(set_direct_map_valid_noflush, "kvm");=0A=
+> =0A=
+> This should be after 'set_direct_map_valid_noflush', not 'invalid'.=0A=
+> =0A=
+> With that fixed:=0A=
+> =0A=
+> Reviewed-by: Fuad Tabba <tabba@google.com>=0A=
+=0A=
+Ah, yes, good catch, thanks!=0A=
+=0A=
+Best,=0A=
+Patrick=0A=
 
