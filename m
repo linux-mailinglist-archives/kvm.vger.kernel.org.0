@@ -1,161 +1,221 @@
-Return-Path: <kvm+bounces-56396-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-56397-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id EB935B3D65C
-	for <lists+kvm@lfdr.de>; Mon,  1 Sep 2025 03:46:35 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1FF06B3D73B
+	for <lists+kvm@lfdr.de>; Mon,  1 Sep 2025 05:25:52 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 0FD2A7AB275
-	for <lists+kvm@lfdr.de>; Mon,  1 Sep 2025 01:44:59 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C6E313B492E
+	for <lists+kvm@lfdr.de>; Mon,  1 Sep 2025 03:25:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B4565201278;
-	Mon,  1 Sep 2025 01:46:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 165162192F5;
+	Mon,  1 Sep 2025 03:25:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="g6pmLv0i"
+	dkim=pass (2048-bit key) header.d=bytedance.com header.i=@bytedance.com header.b="T2bNxZ23"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.11])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f182.google.com (mail-pl1-f182.google.com [209.85.214.182])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DBE9B74C14;
-	Mon,  1 Sep 2025 01:46:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.11
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 659601482F2
+	for <kvm@vger.kernel.org>; Mon,  1 Sep 2025 03:25:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756691175; cv=none; b=QFp+FcL+Ey9ZBZQ4qqrqpS21dfQkpgkRwir5GyY7VcJuv4SKtv6MZgfuH9uB1Xutw5Ig/Y8N7gsb1VRzjl3zV0MuhrcyT4TOfK6Q/aOugfit45iRQ4/EcKwFtUZdpBd33GeUtptlG6bt4FzzwREYcEYzeH8yyEkn0PSEcEhk8pY=
+	t=1756697143; cv=none; b=cG+bdUehfP4l2Sjo3PiDF51tBO9GM2rgW4zvHqyKXtZq2YYnDQTC0IeZmRf72QAmQX3AsVnEDi65xIhibqrr0sxaN8XErVW6iLqYKI1HUcjuyg0+IBm1BM57RSUH2sRxqzsvCcTl5035Ply5FsevvCI/LQG6Cz7B1aPLkH2oFNE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756691175; c=relaxed/simple;
-	bh=RwPnLfR/CR62rui7rWGx8rgnlwqvfNsbiTVOztkvBWs=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=Et34Nuq/gUxnGoaQ0vLKVPFU1JjrmqCT3fRhVLGTIEJjKbRJDyZ02Yar5cw29Ley5WWKKyb+oZW37t+wr8ikeq7SS1IuWdK6iFmcSxVDkD4mWxx2unLbJpPVfB9DgRS+BFQ5AJ/vhdaPUiMvNtjE3jzO4eFEj9vJ56loClsxJEw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=g6pmLv0i; arc=none smtp.client-ip=192.198.163.11
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1756691174; x=1788227174;
-  h=message-id:date:mime-version:subject:to:cc:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=RwPnLfR/CR62rui7rWGx8rgnlwqvfNsbiTVOztkvBWs=;
-  b=g6pmLv0iEtGzd2Ez37C3ppNNmQD5xMi8mbVHeSSLTpLR57/+EM527iRq
-   8j2VTN/+g5pDrcOWc3JITKZFDAGdTDDzaL0htSfMDPA6N9UIbBRIojqka
-   agQyNZq09BAGOzjkPzhqsvK7/MICTI9viPmFE6LW0bTV78uSA5hgrIl+Z
-   KocwfUeJ6FYz2pt1rHY5ftKx8KPdN0mdqvJXmqDtCLt2i1S2xOd2fn33h
-   3Du2YAJsd88gXu3kCYYpERThr9+mPXzpY4nlNCHeJOBfFaY07CcaGub+i
-   ZtkfpsFWVsCzskW4cqJEXmPUWQGdat8syWb7e4oTiuplD/CnUYnIIWJ9H
-   g==;
-X-CSE-ConnectionGUID: 9QtiTutdThCTixbA3Zci3A==
-X-CSE-MsgGUID: ndV5aQjeRYG1KCmma4bpXg==
-X-IronPort-AV: E=McAfee;i="6800,10657,11539"; a="69480589"
-X-IronPort-AV: E=Sophos;i="6.18,225,1751266800"; 
-   d="scan'208";a="69480589"
-Received: from fmviesa008.fm.intel.com ([10.60.135.148])
-  by fmvoesa105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 31 Aug 2025 18:46:13 -0700
-X-CSE-ConnectionGUID: dgj/J4rNQRmTzgVTSjtY+w==
-X-CSE-MsgGUID: 7DuHPgXWQGOu2htpcfFHZA==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.18,225,1751266800"; 
-   d="scan'208";a="171228349"
-Received: from unknown (HELO [10.238.0.107]) ([10.238.0.107])
-  by fmviesa008-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 31 Aug 2025 18:46:10 -0700
-Message-ID: <6c7ee971-d2b1-461f-900e-d343678ec989@linux.intel.com>
-Date: Mon, 1 Sep 2025 09:46:08 +0800
+	s=arc-20240116; t=1756697143; c=relaxed/simple;
+	bh=4LafQ9HfxIGEpssb2jrANmLl6TK/eI3b5iH1GI4ZXtY=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=p4z78c+v/++Hxp6dlvm0qUbllE17K4i+Z3Hc/pEaX8t2qRQOjxUak4NsM8tJpko2dTghmiPqw9OlLbphcX0N60iD1fkisS7uZiqMN+oaou6/gRJa+vI3bjY0tY7vtOhRkCRFDLTO4WRbL0fQmKppnZO1nG25dvg9Z+B0LbbZdGo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=bytedance.com; spf=pass smtp.mailfrom=bytedance.com; dkim=pass (2048-bit key) header.d=bytedance.com header.i=@bytedance.com header.b=T2bNxZ23; arc=none smtp.client-ip=209.85.214.182
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=bytedance.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bytedance.com
+Received: by mail-pl1-f182.google.com with SMTP id d9443c01a7336-248dc002bbaso31980415ad.1
+        for <kvm@vger.kernel.org>; Sun, 31 Aug 2025 20:25:41 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=bytedance.com; s=google; t=1756697141; x=1757301941; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=UdbJEMSI35G/FS955a1XJ0xytM4aPwGPHfG0Feot3XM=;
+        b=T2bNxZ23IZpz+NYWLyMeiBom+T99AnwQ4n7tTW1+q9ijIGbph0QrYm8y+rXPBAHEal
+         Nm+Tb1uiFBCh01KjD5w80byj5+U8AP+D+sFToO1X5AIUsE544eHKa307gV5at4T2/AYs
+         SmKB69C163MeJCwUk5ucZKWxwCScVawy4HG7pNhG2Do27l5+HjA73MnVSCxq0FP4WoFL
+         WGWAXpOn9QakeB76iq0kXbzeboYs8ej8Xcoh0t/Z2gO19mbjKsxY+yXcGaD1aAUM328i
+         8+CWM63DAZ8XB0Yg5dbCYdrsxlVKD2qaE3TTLYyvqqERzGu1rBfaQjw/kqTGw05DJetO
+         nmkg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1756697141; x=1757301941;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=UdbJEMSI35G/FS955a1XJ0xytM4aPwGPHfG0Feot3XM=;
+        b=U5Pw0ayIY2xmJb72s+0Jj51HXKLtDzsxIrenaV7Z+HU3mAFxXN9/v5XWp1Ln7f6II/
+         6tKH+ePYSOmAHPsPBzjyQioX6oVuppCSyEB2rV4MA28nCbYgcBhOBoWAtvGsCiigHYwS
+         +jTYdEHWoz08Kb7zgc2+FuBVCmgZACQME6QvA8cxUUpRYgcQ1sCPbM4WKYTCq3WIdBap
+         1Y+1+6uzNOG+vMt7hTimXPoM+c6R3TXfZJ+OjQ7i8OeLbZpH596bLMHXZVuf2WgWhkNo
+         V5Hj5YCen/YUsK0Ruu6mRas+PohVsxgH0kKWaJeBv+cpvsuY+xLQ0lTZqoSDXZPzUg0m
+         qvVQ==
+X-Forwarded-Encrypted: i=1; AJvYcCX+FHVUKDe+pQeHP1mxRmWjdO/8dllr2qmidRs0KoYkkvgI0J+R0PUoCeEooVoRqjZ/LdM=@vger.kernel.org
+X-Gm-Message-State: AOJu0YySZ6V7AzuHPMlvRMKmz3ELhja3ss9PwOCeUNRtA17T9A1J2hrV
+	CtjmXfsbKmt9XZf0sqZcPD6Ixq7/uz6dJac/kepf5cs+xADGVkmOgIwO6GZwolQ+1LA=
+X-Gm-Gg: ASbGncuDhtovwnra8K//J08BUsJQLDpaTz2g1lWQSd0RPkL9gjXgsvQR0f/qbJbRa1L
+	8iF5o4K8eIOCG3n+GkUCOMOIjl3YiQFuH3zaAJhKa2nvozol8y+Wh2rOXhlp5WK3R+e85iaS18o
+	LM3HA59fUtg+q+fzTdbukM/MH8XLIJJghkovTC1NP69KnEZ/sATPdaudnlmXDEzFEZ9grWqvSTJ
+	1TRiZOxINqHLbCxVTw6zQvFVnEalYgnJ7Mv72I1H2oCEJHjAJzTCbwWgzaagXQ9IBRng/f+v/XK
+	Tcw1YVh09jBc1Kt+6/p88uI5R89uUsJEdh4J+zaRP0nMDbKRquA5/xA20/XX7PGXCCNphWLq+F6
+	sph9c6M/hD29pk7bZyQyETkrbEZxidTJvDhwbCwntB8UEZiEKsBevAzg=
+X-Google-Smtp-Source: AGHT+IGBhrAz87yzolI5FAkwrsomrC2UXs7e16pnJjcARJWPI5VwmAVxP6v/krxP2r2wuBusOxthhA==
+X-Received: by 2002:a17:903:32c3:b0:249:c76:76db with SMTP id d9443c01a7336-24944a64ae0mr87780325ad.21.1756697140498;
+        Sun, 31 Aug 2025 20:25:40 -0700 (PDT)
+Received: from localhost.localdomain ([203.208.189.5])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-24903702729sm89862055ad.25.2025.08.31.20.25.36
+        (version=TLS1_3 cipher=TLS_CHACHA20_POLY1305_SHA256 bits=256/256);
+        Sun, 31 Aug 2025 20:25:40 -0700 (PDT)
+From: lizhe.67@bytedance.com
+To: alex.williamson@redhat.com
+Cc: akpm@linux-foundation.org,
+	david@redhat.com,
+	farman@linux.ibm.com,
+	jgg@nvidia.com,
+	jgg@ziepe.ca,
+	kvm@vger.kernel.org,
+	linux-mm@kvack.org,
+	lizhe.67@bytedance.com,
+	torvalds@linux-foundation.org,
+	willy@infradead.org
+Subject: Re: [PATCH v5 1/5] mm: introduce num_pages_contiguous()
+Date: Mon,  1 Sep 2025 11:25:32 +0800
+Message-ID: <20250901032532.67154-1-lizhe.67@bytedance.com>
+X-Mailer: git-send-email 2.45.2
+In-Reply-To: <20250827121055.548e1584.alex.williamson@redhat.com>
+References: <20250827121055.548e1584.alex.williamson@redhat.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [RFC PATCH v2 15/18] KVM: TDX: Combine KVM_BUG_ON +
- pr_tdx_error() into TDX_BUG_ON()
-To: Sean Christopherson <seanjc@google.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org,
- linux-kernel@vger.kernel.org, Ira Weiny <ira.weiny@intel.com>,
- Kai Huang <kai.huang@intel.com>, Michael Roth <michael.roth@amd.com>,
- Yan Zhao <yan.y.zhao@intel.com>, Vishal Annapurve <vannapurve@google.com>,
- Rick Edgecombe <rick.p.edgecombe@intel.com>,
- Ackerley Tng <ackerleytng@google.com>
-References: <20250829000618.351013-1-seanjc@google.com>
- <20250829000618.351013-16-seanjc@google.com>
- <fcf19563-df65-4936-bd08-46f1a95359af@linux.intel.com>
- <aLG24VoWbrB5e-K4@google.com>
-Content-Language: en-US
-From: Binbin Wu <binbin.wu@linux.intel.com>
-In-Reply-To: <aLG24VoWbrB5e-K4@google.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
 
+On Wed, 27 Aug 2025 12:10:55 -0600, alex.williamson@redhat.com wrote:
 
+> On Thu, 14 Aug 2025 14:47:10 +0800
+> lizhe.67@bytedance.com wrote:
+> 
+> > From: Li Zhe <lizhe.67@bytedance.com>
+> > 
+> > Let's add a simple helper for determining the number of contiguous pages
+> > that represent contiguous PFNs.
+> > 
+> > In an ideal world, this helper would be simpler or not even required.
+> > Unfortunately, on some configs we still have to maintain (SPARSEMEM
+> > without VMEMMAP), the memmap is allocated per memory section, and we might
+> > run into weird corner cases of false positives when blindly testing for
+> > contiguous pages only.
+> > 
+> > One example of such false positives would be a memory section-sized hole
+> > that does not have a memmap. The surrounding memory sections might get
+> > "struct pages" that are contiguous, but the PFNs are actually not.
+> > 
+> > This helper will, for example, be useful for determining contiguous PFNs
+> > in a GUP result, to batch further operations across returned "struct
+> > page"s. VFIO will utilize this interface to accelerate the VFIO DMA map
+> > process.
+> > 
+> > Implementation based on Linus' suggestions to avoid new usage of
+> > nth_page() where avoidable.
+> > 
+> > Suggested-by: Linus Torvalds <torvalds@linux-foundation.org>
+> > Suggested-by: Jason Gunthorpe <jgg@ziepe.ca>
+> > Signed-off-by: Li Zhe <lizhe.67@bytedance.com>
+> > Co-developed-by: David Hildenbrand <david@redhat.com>
+> > Signed-off-by: David Hildenbrand <david@redhat.com>
+> > ---
+> >  include/linux/mm.h        |  7 ++++++-
+> >  include/linux/mm_inline.h | 35 +++++++++++++++++++++++++++++++++++
+> >  2 files changed, 41 insertions(+), 1 deletion(-)
+> 
+> 
+> Does this need any re-evaluation after Willy's series?[1]  Patch 2/
+> changes page_to_section() to memdesc_section() which takes a new
+> memdesc_flags_t, ie. page->flags.  The conversion appears trivial, but
+> mm has many subtleties.
+> 
+> Ideally we could also avoid merge-time fixups for linux-next and
+> mainline.
 
-On 8/29/2025 10:19 PM, Sean Christopherson wrote:
-> On Fri, Aug 29, 2025, Binbin Wu wrote:
->> On 8/29/2025 8:06 AM, Sean Christopherson wrote:
->>> Add TDX_BUG_ON() macros (with varying numbers of arguments) to deduplicate
->>> the myriad flows that do KVM_BUG_ON()/WARN_ON_ONCE() followed by a call to
->>> pr_tdx_error().  In addition to reducing boilerplate copy+paste code, this
->>> also helps ensure that KVM provides consistent handling of SEAMCALL errors.
->>>
->>> Opportunistically convert a handful of bare WARN_ON_ONCE() paths to the
->>> equivalent of KVM_BUG_ON(), i.e. have them terminate the VM.  If a SEAMCALL
->>> error is fatal enough to WARN on, it's fatal enough to terminate the TD.
->>>
->>> Signed-off-by: Sean Christopherson <seanjc@google.com>
->>> ---
->>>    arch/x86/kvm/vmx/tdx.c | 114 +++++++++++++++++------------------------
->>>    1 file changed, 47 insertions(+), 67 deletions(-)
->>>
->>> diff --git a/arch/x86/kvm/vmx/tdx.c b/arch/x86/kvm/vmx/tdx.c
->>> index aa6d88629dae..df9b4496cd01 100644
->>> --- a/arch/x86/kvm/vmx/tdx.c
->>> +++ b/arch/x86/kvm/vmx/tdx.c
->>> @@ -24,20 +24,32 @@
->>>    #undef pr_fmt
->>>    #define pr_fmt(fmt) KBUILD_MODNAME ": " fmt
->>> -#define pr_tdx_error(__fn, __err)	\
->>> -	pr_err_ratelimited("SEAMCALL %s failed: 0x%llx\n", #__fn, __err)
->>> +#define __TDX_BUG_ON(__err, __f, __kvm, __fmt, __args...)			\
->>> +({										\
->>> +	struct kvm *_kvm = (__kvm);						\
->>> +	bool __ret = !!(__err);							\
->>> +										\
->>> +	if (WARN_ON_ONCE(__ret && (!_kvm || !_kvm->vm_bugged))) {		\
->>> +		if (_kvm)							\
->>> +			kvm_vm_bugged(_kvm);					\
->>> +		pr_err_ratelimited("SEAMCALL " __f " failed: 0x%llx" __fmt "\n",\
->>> +				   __err,  __args);				\
->>> +	}									\
->>> +	unlikely(__ret);							\
->>> +})
->>> -#define __pr_tdx_error_N(__fn_str, __err, __fmt, ...)		\
->>> -	pr_err_ratelimited("SEAMCALL " __fn_str " failed: 0x%llx, " __fmt,  __err,  __VA_ARGS__)
->>> +#define TDX_BUG_ON(__err, __fn, __kvm)				\
->>> +	__TDX_BUG_ON(__err, #__fn, __kvm, "%s", "")
->>> -#define pr_tdx_error_1(__fn, __err, __rcx)		\
->>> -	__pr_tdx_error_N(#__fn, __err, "rcx 0x%llx\n", __rcx)
->>> +#define TDX_BUG_ON_1(__err, __fn, __rcx, __kvm)			\
->>> +	__TDX_BUG_ON(__err, #__fn, __kvm, ", rcx 0x%llx", __rcx)
->>> -#define pr_tdx_error_2(__fn, __err, __rcx, __rdx)	\
->>> -	__pr_tdx_error_N(#__fn, __err, "rcx 0x%llx, rdx 0x%llx\n", __rcx, __rdx)
->>> +#define TDX_BUG_ON_2(__err, __fn, __rcx, __rdx, __kvm)		\
->>> +	__TDX_BUG_ON(__err, #__fn, __kvm, ", rcx 0x%llx, rdx 0x%llx", __rcx, __rdx)
->>> +
->>> +#define TDX_BUG_ON_3(__err, __fn, __rcx, __rdx, __r8, __kvm)	\
->>> +	__TDX_BUG_ON(__err, #__fn, __kvm, ", rcx 0x%llx, rdx 0x%llx, r8 0x%llx", __rcx, __rdx, __r8)
->>> -#define pr_tdx_error_3(__fn, __err, __rcx, __rdx, __r8)	\
->>> -	__pr_tdx_error_N(#__fn, __err, "rcx 0x%llx, rdx 0x%llx, r8 0x%llx\n", __rcx, __rdx, __r8)
->> I thought you would use the format Rick proposed in
->> https://lore.kernel.org/all/9e55a0e767317d20fc45575c4ed6dafa863e1ca0.camel@intel.com/
->>      #define TDX_BUG_ON_2(__err, __fn, arg1, arg2, __kvm)        \
->>          __TDX_BUG_ON(__err, #__fn, __kvm, ", " #arg1 " 0x%llx, " #arg2 "
->>      0x%llx", arg1, arg2)
->>
->>      so you get: entry: 0x00 level:0xF00
->>
->> No?
-> Ya, see the next patch :-)
+Thank you for your reminder.
 
-Oh, sorry for the noise.
->
+In my view, if Willy's series is integrated, this patch will need to
+be revised as follows. Please correct me if I'm wrong.
 
+diff --git a/include/linux/mm.h b/include/linux/mm.h
+index ab4d979f4eec..bad0373099ad 100644
+--- a/include/linux/mm.h
++++ b/include/linux/mm.h
+@@ -1763,7 +1763,12 @@ static inline unsigned long memdesc_section(memdesc_flags_t mdf)
+ {
+ 	return (mdf.f >> SECTIONS_PGSHIFT) & SECTIONS_MASK;
+ }
+-#endif
++#else /* !SECTION_IN_PAGE_FLAGS */
++static inline unsigned long memdesc_section(memdesc_flags_t mdf)
++{
++	return 0;
++}
++#endif /* SECTION_IN_PAGE_FLAGS */
+ 
+ /**
+  * folio_pfn - Return the Page Frame Number of a folio.
+diff --git a/include/linux/mm_inline.h b/include/linux/mm_inline.h
+index 150302b4a905..bb23496d465b 100644
+--- a/include/linux/mm_inline.h
++++ b/include/linux/mm_inline.h
+@@ -616,4 +616,40 @@ static inline bool vma_has_recency(struct vm_area_struct *vma)
+ 	return true;
+ }
+ 
++/**
++ * num_pages_contiguous() - determine the number of contiguous pages
++ *			    that represent contiguous PFNs
++ * @pages: an array of page pointers
++ * @nr_pages: length of the array, at least 1
++ *
++ * Determine the number of contiguous pages that represent contiguous PFNs
++ * in @pages, starting from the first page.
++ *
++ * In some kernel configs contiguous PFNs will not have contiguous struct
++ * pages. In these configurations num_pages_contiguous() will return a num
++ * smaller than ideal number. The caller should continue to check for pfn
++ * contiguity after each call to num_pages_contiguous().
++ *
++ * Returns the number of contiguous pages.
++ */
++static inline size_t num_pages_contiguous(struct page **pages, size_t nr_pages)
++{
++	struct page *cur_page = pages[0];
++	unsigned long section = memdesc_section(cur_page->flags);
++	size_t i;
++
++	for (i = 1; i < nr_pages; i++) {
++		if (++cur_page != pages[i])
++			break;
++		/*
++		 * In unproblematic kernel configs, page_to_section() == 0 and
++		 * the whole check will get optimized out.
++		 */
++		if (memdesc_section(cur_page->flags) != section)
++			break;
++	}
++
++	return i;
++}
++
+ #endif
+---
+
+Thanks,
+Zhe
 
