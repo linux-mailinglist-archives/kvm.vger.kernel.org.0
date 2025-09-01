@@ -1,90 +1,92 @@
-Return-Path: <kvm+bounces-56423-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-56424-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8D1C2B3DB54
-	for <lists+kvm@lfdr.de>; Mon,  1 Sep 2025 09:43:33 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 33A80B3DC1F
+	for <lists+kvm@lfdr.de>; Mon,  1 Sep 2025 10:18:30 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4E08B3A4F32
-	for <lists+kvm@lfdr.de>; Mon,  1 Sep 2025 07:43:32 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C25CF17C0D2
+	for <lists+kvm@lfdr.de>; Mon,  1 Sep 2025 08:18:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 084292D7DD6;
-	Mon,  1 Sep 2025 07:43:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9222E23BCF8;
+	Mon,  1 Sep 2025 08:18:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="V/oSrnOL"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="eBp90KTV"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pf1-f194.google.com (mail-pf1-f194.google.com [209.85.210.194])
+Received: from mail-pf1-f178.google.com (mail-pf1-f178.google.com [209.85.210.178])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D258A2D73BE;
-	Mon,  1 Sep 2025 07:43:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.194
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 663BA2110E;
+	Mon,  1 Sep 2025 08:18:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.178
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756712604; cv=none; b=VW4lvhpguxvg8jx+iSr9HarnLDI5mgTSLSi4GfVtSrTFtgx+KtEUX2BHbwwScmxsiG9/M9You6Cq8Xo9JHs67T94hnmUMs8VhFgzPzTEz1EOZJ5lI3FNQgkPI9IWPrmOqva8eyz7MReK3mJOClORLZ9Kv+9MKb1SZwyNkNkcfvc=
+	t=1756714699; cv=none; b=FY8XDx8c3HJmpnaCZDlJYIBOxXwGF88VKQSsEqOplCC75o3d1z7fjQAkOVdFLYWKvJODeW0Bfoi/t0kAUt3hr9afNd/X6VWjHnw38yAN5aUWhyXPK4wz5y7wX57htX62RyKXmgcKsiFAs2dhjQQMwTV1bSVY4g6ddhsYKEHUTOw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756712604; c=relaxed/simple;
-	bh=knhv0d+2nVhqYKiOMqbzbUPmyrliXFTOCtmL5s3WYLM=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=CN3cJbdJ1vCMv2ctHHPe5ACj0fhZ5i9pYTI/ksrrUg/54B+1qPfKU77xQV4V4GVMWQzgYnmJnurkIp9mPLYh9VD3+9GZs4cM6cxcjf6xHGf8rDgdP/46a6TzWbKaExbjiyFPIoUrUPWAxZa0i3LU3TCHEVl7i4wXknr3rKDvcKg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=V/oSrnOL; arc=none smtp.client-ip=209.85.210.194
+	s=arc-20240116; t=1756714699; c=relaxed/simple;
+	bh=n2mChHJOpuovt3EkOwskBKLM9hbBlkGgtvGxWx7OgZM=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=F0/cfQLtis2fB06brZzZq8Okqkvm/BmAjrUvtQvSNpJUe2STRWQuRH1e+KNpvgol9upwob0CGRCL/CY5d5FwZTV7PLQt/QT7hu1ROqA505tuOKV41oNCRftXLhSdT/9+IHILPP4T2CGXuL6QmbOLodVGgnIsTfpSq92ec6+kN3Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=eBp90KTV; arc=none smtp.client-ip=209.85.210.178
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pf1-f194.google.com with SMTP id d2e1a72fcca58-7725de6b57dso575411b3a.0;
-        Mon, 01 Sep 2025 00:43:22 -0700 (PDT)
+Received: by mail-pf1-f178.google.com with SMTP id d2e1a72fcca58-770530175a6so2397909b3a.3;
+        Mon, 01 Sep 2025 01:18:18 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1756712602; x=1757317402; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1756714698; x=1757319498; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:message-id:date:subject:cc
          :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=FITNQkMOh5aUaxME66iKDkVB32cbdFQ2UW0lX+cQ0kQ=;
-        b=V/oSrnOLgIkE5A40jdgToo6jTyDkMrXgxq057huITRtMVuHBm764YtAlUfnxsUq3u8
-         lMbzC3CV7uYNEhqXYHrVK9B4gYU8njeY70igd5T9tapkortIpCgy2/+9YkkI2iFW9BsV
-         7n0/gWXlAU3qnjj6nQ+R/8OVlJM+k/bntB8G9Y6uDzal9WWzlSbOL70gebXTEbn18CUv
-         lyzPYxL3U4dFALiou3KRwhNqgK7K6JM/0JUgf/CbUIbLUNxQLAeuAcg7QakxuSMdae8N
-         ywVjojuQop5Kdu2VpHL/ssz5rWGtQ2w5xLm0EW6XZnhRYMJ1hTWZafy8yREjddlZUCHQ
-         yfGg==
+        bh=fhO72zhYOJiaCs0Sw3nOH7x/q+Nik5NH+Mprbd215KE=;
+        b=eBp90KTVNT+b7sJbhfHoOGzh/vlSVIurwwOMkwxwkZf1dSkB5f4ULB3bGwGHP4awXY
+         8GsjqUtSFp+HHaN/YNEMicpQkNu/R0kjA7urwzHrh5gubjkhGNOGlgABEVjbdtyM5b4q
+         5cmY8XLD3TtunFaOPxn5XOtjvFQ7emV0Ki1bgPwa9UrTpue6rOvFTx9hx531Xky/rkeW
+         u8peCNe884pOVe4R7c+6mNR9FZMosiw/gMlwEOrucYFQPl/mTDTTzLSEjQoeBqsGIF8Z
+         +pmm++8uxdGmVtjrxcR6ltsaIFfEcKOSil3Po+zkzrhf4ziWELpehX6we17K35sWjiMP
+         1Rzg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1756712602; x=1757317402;
+        d=1e100.net; s=20230601; t=1756714698; x=1757319498;
         h=content-transfer-encoding:mime-version:message-id:date:subject:cc
          :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=FITNQkMOh5aUaxME66iKDkVB32cbdFQ2UW0lX+cQ0kQ=;
-        b=mwaq8eafOQzZs++30X8a9sAFTDP5zrO1jND8T/zjpvltarPeO+EJch2wSjTQ6Vr8ys
-         Lm6ep0ldCHK4QaSaoYaB2ZaQe6BYE+hVz2nb0stwNvCNrNF7PrRpo1J2xsBm6HfXFAXS
-         w04bI1qRl7G69FqkWcDZEkGJw64Z1ux+yCDcj6+C2CHuyIyB7FsvoMNhblvua/3s6OGl
-         e9+Y5G3s9DTn/HWkUg3fgbClixXJ0N2jQD9jbTlZUM8Vhf11u4l/ts4QZXsPGcOPadXZ
-         x2rK6SU98/eGnnqXlzv/rk5eAW6ZG1WursFJrlosDxO2cnho9o9bCJ0issunZ4EJFO7C
-         hmew==
-X-Forwarded-Encrypted: i=1; AJvYcCVFv9PNhCJa2CsKDUMbx1l3KQirNEriehHF8cwQ7GGHkB0w5Gk9z7FQPF2WVf5VbG50gej5YssRZjxVq3tj+K7r@vger.kernel.org, AJvYcCXOsZJkLQe9Q9eSspSDIXmO1hERpFY+GhtVeAYK3IBPt6jDeJXZ6nAaH0liLR+cUF41sYk=@vger.kernel.org, AJvYcCXblQ1wr/KJzUJUKy9hwjxv+ruzFzRKT/pM2SXIs9kFkKfVR517ZNmSlrQ8Nt4wJmWIm6+GVuxORf7kdO/n@vger.kernel.org
-X-Gm-Message-State: AOJu0YwGA8OGwQrN6n09aWjR/TSTpI+KQs0dkhFlohevTnvXfymp0Jvb
-	DkBzB897P1nsjJ9++UNkJG5lUbT9PXrAKZgCrOA4J4fFvopx/CObIouzc5cLxkAjJ9zAcQ==
-X-Gm-Gg: ASbGnctUK5ZfeJbfYXhQ3KBRBrjjc4kWZ0x/XMWpP5+BZU8xAtvhkTkbtY1qprjR0qo
-	VGbW1tXPcaXytm8Dsn3i9CZVNKUlgyIPUbdp9huWSoa25V3yBaXnluYLRQEcQ6f+7fI4GpVCUNI
-	TUCAXjM0VSSAHQj/vbqNFFMP9ACPp4o79Bg2uTRrwYk9QAqUDAOhlkGsK3v160mN10x6m+Tu6at
-	cbx56Q07fATeq7L8l8iPIywtJT7R2tsJoOUxtJGgCsLSZMTZ2Qpu/TDlb/tAvz+xZBJbtYVHKQT
-	8Fx201N2qQiMfVzxq1uhPbbIVPnrp867xUZqyq1IxU1HtEfEufc/R8FTHFoS3EaJSOKC0xGRgGG
-	93vb0MzAf0tX9sXcuFjtc
-X-Google-Smtp-Source: AGHT+IEvPBS/MlwX1UKLk1MxaxKky+HaAyFLDpxPgy8YZicp0ghomwNxHvuMs2voGHJ7SGIms/vBxg==
-X-Received: by 2002:a05:6a00:39a0:b0:757:ca2b:48a3 with SMTP id d2e1a72fcca58-7723e259561mr7624017b3a.9.1756712602071;
-        Mon, 01 Sep 2025 00:43:22 -0700 (PDT)
-Received: from days-ASUSLaptop.lan ([2406:8dc0:6008:46::])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-7722a4e24e3sm9596489b3a.78.2025.09.01.00.43.18
+        bh=fhO72zhYOJiaCs0Sw3nOH7x/q+Nik5NH+Mprbd215KE=;
+        b=swBKuI96kwHq30qLnciIBBTibGDPPDH8JnuY188MNjy6WdEBn2T/3uJGshA5w4fOfP
+         OgOOEjuVbSZS3Ec7PBynCq8+9OpbBDE+JIo9l389Y8GhZDn5I0rpM9j6MDMtcOOSXIYr
+         i5ey0KSY4HoydetpEQd55lwxRXRT0RBgQYooGrNoEvTf/CXIKMClWstnF2o08sJq8mer
+         izecf5PU/gdgHFpPznP9/z7PvtcCS7bnoNdK+RoC3b8YVfsm3j2WuxTMWulQc1Yn46p/
+         nqMsOGDHAAebPoLLYzKhU5L9zZAD61vaH6c6Ggsy5bCCakDU/jGMzaeWjoZJR4oky0Sk
+         KIkQ==
+X-Forwarded-Encrypted: i=1; AJvYcCUqiFl/Q/UkFI55MstSUh9JKLkz2mcjtJf8UCNNT5LvxL3qqaaXnbDggWlhMdrsFzQx+SE=@vger.kernel.org, AJvYcCVKGNR5AxgwE/e21cfADU+jcBvmn8b1/LDX7eNwfvH4jwPNRFrq05k/Y1wv2PuneKM9cFASJ2olrddITQD2@vger.kernel.org, AJvYcCXuLc6lxHdBmog1vOlmFGfEVMoKatsWP2EjOpNbVQo5MfJGs8lxOZbJRTqJjk8avos7b+p9iRVS@vger.kernel.org
+X-Gm-Message-State: AOJu0Yyylr7NdzVEu1gRuhi9Saslbm1LxVKeQbXZU8ixRRGRC6wfCJUY
+	/VFC0q5v/3ONmUgWkab2lU8voOxiEzezDhOuqAF/NRr689xe2aIi0Q5B
+X-Gm-Gg: ASbGncu3XdhXlP3ue2GWshbN6vAIr+AYmWWRUqbm79890sdOCylMXffrDZsZ2DK9xoN
+	qyk50UzMxtHgv0s9Fyp0kYoVZczkDM/Vv23GvY6+vtpoFT9HF8URT8aIFSKAMvodt+fOBviFPmI
+	PBcpoWqg5AaOqhT5UEQjSUv471l6EiKks9nQUvBQaVhwgzXs++5FoypeCtRsvhlBo/e288JNFEP
+	DA94g0LILVpB6LPHKHnLQBbbPBq3tiqDo5LYIDJWAeoNRQJJOQDBnMlegtbW6cfRjR7UbvQ8+y5
+	URycY75JXyX4NWm+kXmV3fDtO07RoeIbNRLp8c8BypX4HJaEPO8cW9B8ttnoNMfsVAR7mwvjI9P
+	QSLQcPHvIX/KE/uYXRek14UKRAtZb5I/hliLTtVki3DvT+X4MNWt6xnnBa1BBQHOH2oi9XQrRtM
+	UfNjqi8RueWk3Bam6nP9kfwRdZVMFkjP0ctXGOMycL+wnU6w==
+X-Google-Smtp-Source: AGHT+IFlIp5XtLRMTgGoktobYhmw4UEb9uqheDBPPdgtLTkETP+vGDUp6jU8cTUi1l23ljJmw1JTGg==
+X-Received: by 2002:a05:6a20:6a1b:b0:243:a7f1:ffd3 with SMTP id adf61e73a8af0-243d6f3a6e1mr9609890637.48.1756714697622;
+        Mon, 01 Sep 2025 01:18:17 -0700 (PDT)
+Received: from vickymqlin-1vvu545oca.codev-2.svc.cluster.local ([14.116.239.35])
+        by smtp.googlemail.com with ESMTPSA id 41be03b00d2f7-b4f8a0a2851sm868312a12.37.2025.09.01.01.18.15
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 01 Sep 2025 00:43:21 -0700 (PDT)
-From: dayss1224@gmail.com
-To: pbonzini@redhat.com,
-	shuah@kernel.org
-Cc: maobibo@loongson.cn,
-	chenhuacai@kernel.org,
+        Mon, 01 Sep 2025 01:18:17 -0700 (PDT)
+From: Miaoqian Lin <linmq006@gmail.com>
+To: Longfang Liu <liulongfang@huawei.com>,
+	Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>,
+	Jason Gunthorpe <jgg@ziepe.ca>,
+	Yishai Hadas <yishaih@nvidia.com>,
+	Kevin Tian <kevin.tian@intel.com>,
+	Alex Williamson <alex.williamson@redhat.com>,
 	kvm@vger.kernel.org,
-	linux-kselftest@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Dong Yang <dayss1224@gmail.com>,
-	Quan Zhou <zhouquan@iscas.ac.cn>
-Subject: [PATCH v2] KVM: loongarch: selftests: Remove common tests built by TEST_GEN_PROGS_COMMON
-Date: Mon,  1 Sep 2025 15:43:13 +0800
-Message-Id: <33ce1d45589840824c64eeafab121501c8ae7b44.1756131957.git.dayss1224@gmail.com>
-X-Mailer: git-send-email 2.34.1
+	linux-kernel@vger.kernel.org
+Cc: linmq006@gmail.com,
+	stable@vger.kernel.org
+Subject: [PATCH] hisi_acc_vfio_pci: Fix reference leak in hisi_acc_vfio_debug_init
+Date: Mon,  1 Sep 2025 16:18:08 +0800
+Message-Id: <20250901081809.2286649-1-linmq006@gmail.com>
+X-Mailer: git-send-email 2.35.1
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -93,56 +95,42 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-From: Dong Yang <dayss1224@gmail.com>
+The debugfs_lookup() function returns a dentry with an increased reference
+count that must be released by calling dput().
 
-Remove the common KVM test cases already added to TEST_GEN_PROGS_COMMON
- as following:
-
-	demand_paging_test
-	dirty_log_test
-	guest_print_test
-	kvm_binary_stats_test
-	kvm_create_max_vcpus
-	kvm_page_table_test
-	set_memory_region_test
-
-Fixes: a867688c8cbb ("KVM: selftests: Add supported test cases for LoongArch")
-Signed-off-by: Quan Zhou <zhouquan@iscas.ac.cn>
-Signed-off-by: Dong Yang <dayss1224@gmail.com>
-
-Changes in v2:
-- Add "TEST_GEN_PROGS_loongarch = $(TEST_GEN_PROGS_COMMON)" to include common tests
+Fixes: b398f91779b8 ("hisi_acc_vfio_pci: register debugfs for hisilicon migration driver")
+Cc: stable@vger.kernel.org
+Signed-off-by: Miaoqian Lin <linmq006@gmail.com>
 ---
- tools/testing/selftests/kvm/Makefile.kvm | 8 +-------
- 1 file changed, 1 insertion(+), 7 deletions(-)
+ drivers/vfio/pci/hisilicon/hisi_acc_vfio_pci.c | 6 +++++-
+ 1 file changed, 5 insertions(+), 1 deletion(-)
 
-diff --git a/tools/testing/selftests/kvm/Makefile.kvm b/tools/testing/selftests/kvm/Makefile.kvm
-index 38b95998e1e6..3fd1c2ae68d0 100644
---- a/tools/testing/selftests/kvm/Makefile.kvm
-+++ b/tools/testing/selftests/kvm/Makefile.kvm
-@@ -198,18 +198,12 @@ TEST_GEN_PROGS_riscv += coalesced_io_test
- TEST_GEN_PROGS_riscv += get-reg-list
- TEST_GEN_PROGS_riscv += steal_time
+diff --git a/drivers/vfio/pci/hisilicon/hisi_acc_vfio_pci.c b/drivers/vfio/pci/hisilicon/hisi_acc_vfio_pci.c
+index 2149f49aeec7..1710485cbbec 100644
+--- a/drivers/vfio/pci/hisilicon/hisi_acc_vfio_pci.c
++++ b/drivers/vfio/pci/hisilicon/hisi_acc_vfio_pci.c
+@@ -1611,8 +1611,10 @@ static void hisi_acc_vfio_debug_init(struct hisi_acc_vf_core_device *hisi_acc_vd
+ 	}
  
-+TEST_GEN_PROGS_loongarch = $(TEST_GEN_PROGS_COMMON)
- TEST_GEN_PROGS_loongarch += coalesced_io_test
--TEST_GEN_PROGS_loongarch += demand_paging_test
- TEST_GEN_PROGS_loongarch += dirty_log_perf_test
--TEST_GEN_PROGS_loongarch += dirty_log_test
--TEST_GEN_PROGS_loongarch += guest_print_test
- TEST_GEN_PROGS_loongarch += hardware_disable_test
--TEST_GEN_PROGS_loongarch += kvm_binary_stats_test
--TEST_GEN_PROGS_loongarch += kvm_create_max_vcpus
--TEST_GEN_PROGS_loongarch += kvm_page_table_test
- TEST_GEN_PROGS_loongarch += memslot_modification_stress_test
- TEST_GEN_PROGS_loongarch += memslot_perf_test
--TEST_GEN_PROGS_loongarch += set_memory_region_test
+ 	migf = kzalloc(sizeof(*migf), GFP_KERNEL);
+-	if (!migf)
++	if (!migf) {
++		dput(vfio_dev_migration);
+ 		return;
++	}
+ 	hisi_acc_vdev->debug_migf = migf;
  
- SPLIT_TESTS += arch_timer
- SPLIT_TESTS += get-reg-list
-
-base-commit: b23ff7e52a79f4fe2382e3564719b97b718166d1
+ 	vfio_hisi_acc = debugfs_create_dir("hisi_acc", vfio_dev_migration);
+@@ -1622,6 +1624,8 @@ static void hisi_acc_vfio_debug_init(struct hisi_acc_vf_core_device *hisi_acc_vd
+ 				    hisi_acc_vf_migf_read);
+ 	debugfs_create_devm_seqfile(dev, "cmd_state", vfio_hisi_acc,
+ 				    hisi_acc_vf_debug_cmd);
++
++	dput(vfio_dev_migration);
+ }
+ 
+ static void hisi_acc_vf_debugfs_exit(struct hisi_acc_vf_core_device *hisi_acc_vdev)
 -- 
-2.34.1
+2.35.1
 
 
