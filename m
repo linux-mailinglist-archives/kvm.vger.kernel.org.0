@@ -1,70 +1,70 @@
-Return-Path: <kvm+bounces-56449-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-56450-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 131B6B3E5EB
-	for <lists+kvm@lfdr.de>; Mon,  1 Sep 2025 15:47:25 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1C577B3E62B
+	for <lists+kvm@lfdr.de>; Mon,  1 Sep 2025 15:54:51 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 235B116E575
-	for <lists+kvm@lfdr.de>; Mon,  1 Sep 2025 13:47:24 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id E5AA1188120D
+	for <lists+kvm@lfdr.de>; Mon,  1 Sep 2025 13:55:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A2F853375A3;
-	Mon,  1 Sep 2025 13:47:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AA56B33A033;
+	Mon,  1 Sep 2025 13:54:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=amazon.co.uk header.i=@amazon.co.uk header.b="Q9JC1tDG"
+	dkim=pass (2048-bit key) header.d=amazon.co.uk header.i=@amazon.co.uk header.b="aPtFqVe3"
 X-Original-To: kvm@vger.kernel.org
-Received: from fra-out-011.esa.eu-central-1.outbound.mail-perimeter.amazon.com (fra-out-011.esa.eu-central-1.outbound.mail-perimeter.amazon.com [52.28.197.132])
+Received: from fra-out-005.esa.eu-central-1.outbound.mail-perimeter.amazon.com (fra-out-005.esa.eu-central-1.outbound.mail-perimeter.amazon.com [63.176.194.123])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 974F91E2823;
-	Mon,  1 Sep 2025 13:47:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=52.28.197.132
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ABE6533A01C;
+	Mon,  1 Sep 2025 13:54:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=63.176.194.123
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756734434; cv=none; b=AILiwdEAaJAT5QIO5MamT9AHinn4Jmp01MjJ/2dN+RL33vc0KA56KZLdqKCh/4pTfXt+akVxIzRGKGti70/f1o6O2hvH1XohP5+7Sb6iL8SVD0T5bqt9f9ZgNJNOZPifv8GCMJFU4e8q79s2KOGnDSf0xci6ZaLhGmQaAIYGDIM=
+	t=1756734862; cv=none; b=dEEAGy32duP6hw2GnArRzuCcsN+LVChBB6lLmCLzvMDEdeK8bO556dgEjXSXwmTww5ZXtN1BUKUkjz6z/ZUTSTjjY7qsth3BJDt3o3UKDIxy4ex1VbRo+XyudZpTcvfBkcz/m3Q/tMUS2p1hG1UMaD4e/t+8GNecjd6NxPM4+6E=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756734434; c=relaxed/simple;
-	bh=AfWNq8qOG43flzRWME3FN/9/nkz8zIUH0oyoL8ZMcCk=;
+	s=arc-20240116; t=1756734862; c=relaxed/simple;
+	bh=6VorQX2phyRDqlOgHM/mTP8lllqO/aVw796zYul7Z28=;
 	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=NPd7rmYNbUTQHMcf5OdudxVew2bwKSOSzHJlqpBihlOVZNQEJ6d3I9h3CTtOXk5YqrgQFFlt+cyPDWOta1KL/xrvxiAL2CulTDvUgWBh+Gl+L6Fb18SDjd+z54sWLwJkrlDVP6i1iTPgRbwpfH0GBW/eiUzCzqUriN35LbZ2RiI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.co.uk; spf=pass smtp.mailfrom=amazon.co.uk; dkim=pass (2048-bit key) header.d=amazon.co.uk header.i=@amazon.co.uk header.b=Q9JC1tDG; arc=none smtp.client-ip=52.28.197.132
+	 Content-Type:MIME-Version; b=rcHsD5GIVZr6ZRgtdU8TiYEn07i1gBC+3UQNHikMwShEvonz+55blrRSBoD9FlMwysyHACdoh4m+ckqil1TZg2Z5dJ14/wbHi/pXw7uNDzzFrhxg/isSc9zshfNqJi96RSRvgo8wpSjoEonXNGPXUsjMIHXOrMyK3v+tO/E2DMo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.co.uk; spf=pass smtp.mailfrom=amazon.co.uk; dkim=pass (2048-bit key) header.d=amazon.co.uk header.i=@amazon.co.uk header.b=aPtFqVe3; arc=none smtp.client-ip=63.176.194.123
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.co.uk
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.uk
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
   d=amazon.co.uk; i=@amazon.co.uk; q=dns/txt;
-  s=amazoncorp2; t=1756734432; x=1788270432;
+  s=amazoncorp2; t=1756734861; x=1788270861;
   h=from:to:cc:subject:date:message-id:references:
    in-reply-to:content-transfer-encoding:mime-version;
-  bh=+FO6rXzJ1OSaPqvoH5IT1CQYrfHskP0PMe12nrwxRLg=;
-  b=Q9JC1tDGGmQa8cbTlrJeUFILAHZVn9hv8HoPCtoYm5T2eHgQ9R8CBpvf
-   q/+ojK3nXCvA0HBRFselha6Bm9s3mslwgU4T+5bzYjZoHQMhggFc/JPuJ
-   PyudG0+YE9ShgQJ5WRgZCGiCq0/2AAKSRlPowtWabB0+iT19U5yHSTvJb
-   EC4ps/QZ0UdwkfHkkQ5YZTgQBEiOUXzgWoeY4eTP+iI7ARJAtPBh9aSm1
-   eVUdtP+lDPzuQMgY7EQ/2p+ku0wj5Y82sEoU3FEstufT0kiO9cMCvWR5f
-   ekeWAZ9AqFLki2cCdePAqoXSr81uZsfLm/7a25v0z3jHpJYvU0EFiN+jS
-   Q==;
-X-CSE-ConnectionGUID: m8ytizq0Q1qu8e8vIjnAEg==
-X-CSE-MsgGUID: iRZ+qBh2R/uOhlJ6+f0jsg==
-X-IronPort-AV: E=Sophos;i="6.17,290,1747699200"; 
-   d="scan'208";a="1359904"
-Received: from ip-10-6-6-97.eu-central-1.compute.internal (HELO smtpout.naws.eu-central-1.prod.farcaster.email.amazon.dev) ([10.6.6.97])
-  by internal-fra-out-011.esa.eu-central-1.outbound.mail-perimeter.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 01 Sep 2025 13:47:02 +0000
-Received: from EX19MTAEUB002.ant.amazon.com [54.240.197.232:16772]
- by smtpin.naws.eu-central-1.prod.farcaster.email.amazon.dev [10.0.42.3:2525] with esmtp (Farcaster)
- id ca3958c9-cdc5-4794-b45a-6e9b3384e54b; Mon, 1 Sep 2025 13:47:02 +0000 (UTC)
-X-Farcaster-Flow-ID: ca3958c9-cdc5-4794-b45a-6e9b3384e54b
-Received: from EX19D015EUB003.ant.amazon.com (10.252.51.113) by
- EX19MTAEUB002.ant.amazon.com (10.252.51.59) with Microsoft SMTP Server
+  bh=8FXGRJshnSKv4swI9rc/O7cu1N6KjNCj8MEEMoNffZ4=;
+  b=aPtFqVe3ZfI0AMMFd/lueMLrwMtvtfGM95AzZ4FPPmtsKEPU0xOptOL3
+   A8smpg3jnooD8whjbXQDlfaGGiIDY/p8fAZuAha41NK8wXiehqigW8Dnx
+   +i5NFhsRNeD5fvazZaa/f1Te+Dr2sTqjJJkAfItdm2WKu70G0sqKokm/7
+   qtLNYz2g4gA0QRMP9RLCQaSHnVlyjFTawwI7SoHLdkldFwyOqjI6kdKnl
+   ClfqOJpmiRXMA+dgkBdsTVP6pSp96kpgRTfw52DI8Dz+cUHr+2Xim3x9K
+   Sqkg4CYQAOvYRmvJeqi71RX1kkdfz7LwFiKSxCVr+voPrGgaEyeKBycjW
+   g==;
+X-CSE-ConnectionGUID: gggXs4BvTVmSlkjjgWje9g==
+X-CSE-MsgGUID: ND6y5eCkQmyPHrPmUhHHJA==
+X-IronPort-AV: E=Sophos;i="6.18,214,1751241600"; 
+   d="scan'208";a="1463813"
+Received: from ip-10-6-11-83.eu-central-1.compute.internal (HELO smtpout.naws.eu-central-1.prod.farcaster.email.amazon.dev) ([10.6.11.83])
+  by internal-fra-out-005.esa.eu-central-1.outbound.mail-perimeter.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 01 Sep 2025 13:54:11 +0000
+Received: from EX19MTAEUA002.ant.amazon.com [54.240.197.232:18474]
+ by smtpin.naws.eu-central-1.prod.farcaster.email.amazon.dev [10.0.3.140:2525] with esmtp (Farcaster)
+ id 6c2ba49e-6c86-45f6-b459-405011a28a46; Mon, 1 Sep 2025 13:54:10 +0000 (UTC)
+X-Farcaster-Flow-ID: 6c2ba49e-6c86-45f6-b459-405011a28a46
+Received: from EX19D015EUB001.ant.amazon.com (10.252.51.114) by
+ EX19MTAEUA002.ant.amazon.com (10.252.50.124) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.2562.17;
- Mon, 1 Sep 2025 13:47:01 +0000
+ Mon, 1 Sep 2025 13:54:10 +0000
 Received: from EX19D015EUB004.ant.amazon.com (10.252.51.13) by
- EX19D015EUB003.ant.amazon.com (10.252.51.113) with Microsoft SMTP Server
+ EX19D015EUB001.ant.amazon.com (10.252.51.114) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.2562.20;
- Mon, 1 Sep 2025 13:47:01 +0000
+ Mon, 1 Sep 2025 13:54:10 +0000
 Received: from EX19D015EUB004.ant.amazon.com ([fe80::2dc9:7aa9:9cd3:fc8a]) by
  EX19D015EUB004.ant.amazon.com ([fe80::2dc9:7aa9:9cd3:fc8a%3]) with mapi id
- 15.02.2562.020; Mon, 1 Sep 2025 13:47:01 +0000
+ 15.02.2562.020; Mon, 1 Sep 2025 13:54:10 +0000
 From: "Roy, Patrick" <roypat@amazon.co.uk>
 To: "tabba@google.com" <tabba@google.com>
 CC: "ackerleytng@google.com" <ackerleytng@google.com>, "david@redhat.com"
@@ -78,15 +78,13 @@ CC: "ackerleytng@google.com" <ackerleytng@google.com>, "david@redhat.com"
 	<roypat@amazon.co.uk>, "rppt@kernel.org" <rppt@kernel.org>,
 	"seanjc@google.com" <seanjc@google.com>, "vbabka@suse.cz" <vbabka@suse.cz>,
 	"will@kernel.org" <will@kernel.org>, "Cali, Marco" <xmarcalx@amazon.co.uk>
-Subject: Re: [PATCH v5 02/12] arch: export set_direct_map_valid_noflush to KVM
- module
-Thread-Topic: [PATCH v5 02/12] arch: export set_direct_map_valid_noflush to
- KVM module
-Thread-Index: AQHcG0bk577bUdlDRkuvvFVSrUyVog==
-Date: Mon, 1 Sep 2025 13:47:00 +0000
-Message-ID: <20250901134659.32171-1-roypat@amazon.co.uk>
-References: <CA+EHjTwDZ-FRV2KfC5ZG9SJYeeMRVUHQ8rVtb9dx2AQwCriPQw@mail.gmail.com>
-In-Reply-To: <CA+EHjTwDZ-FRV2KfC5ZG9SJYeeMRVUHQ8rVtb9dx2AQwCriPQw@mail.gmail.com>
+Subject: Re: [PATCH v5 03/12] mm: introduce AS_NO_DIRECT_MAP
+Thread-Topic: [PATCH v5 03/12] mm: introduce AS_NO_DIRECT_MAP
+Thread-Index: AQHcG0fkqK4jccjXtUKv/NLtaS3P1g==
+Date: Mon, 1 Sep 2025 13:54:10 +0000
+Message-ID: <20250901135408.5965-1-roypat@amazon.co.uk>
+References: <CA+EHjTxOmDJkwjSvAUr2O4yqEkyqeQ=_p3E5Uj5yQrPW7Qz_HA@mail.gmail.com>
+In-Reply-To: <CA+EHjTxOmDJkwjSvAUr2O4yqEkyqeQ=_p3E5Uj5yQrPW7Qz_HA@mail.gmail.com>
 Accept-Language: en-US
 Content-Language: en-US
 X-MS-Has-Attach:
@@ -100,29 +98,68 @@ List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 
+=0A=
 Hi Fuad!=0A=
 =0A=
-On Thu, 2025-08-28 at 11:07 +0100, Fuad Tabba wrote:=0A=
->> diff --git a/arch/loongarch/mm/pageattr.c b/arch/loongarch/mm/pageattr.c=
+On Thu, 2025-08-28 at 11:21 +0100, Fuad Tabba wrote:=0A=
+> Hi Patrick,=0A=
+> =0A=
+> On Thu, 28 Aug 2025 at 10:39, Roy, Patrick <roypat@amazon.co.uk> wrote:=
 =0A=
->> index f5e910b68229..d076bfd3fcbf 100644=0A=
->> --- a/arch/loongarch/mm/pageattr.c=0A=
->> +++ b/arch/loongarch/mm/pageattr.c=0A=
->> @@ -217,6 +217,7 @@ int set_direct_map_invalid_noflush(struct page *page=
-)=0A=
->>=0A=
->>         return __set_memory(addr, 1, __pgprot(0), __pgprot(_PAGE_PRESENT=
- | _PAGE_VALID));=0A=
+>> diff --git a/include/linux/pagemap.h b/include/linux/pagemap.h=0A=
+>> index 12a12dae727d..b52b28ae4636 100644=0A=
+>> --- a/include/linux/pagemap.h=0A=
+>> +++ b/include/linux/pagemap.h=0A=
+>> @@ -211,6 +211,7 @@ enum mapping_flags {=0A=
+>>                                    folio contents */=0A=
+>>         AS_INACCESSIBLE =3D 8,    /* Do not attempt direct R/W access to=
+ the mapping */=0A=
+>>         AS_WRITEBACK_MAY_DEADLOCK_ON_RECLAIM =3D 9,=0A=
+>> +       AS_NO_DIRECT_MAP =3D 10,  /* Folios in the mapping are not in th=
+e direct map */=0A=
+>>         /* Bits 16-25 are used for FOLIO_ORDER */=0A=
+>>         AS_FOLIO_ORDER_BITS =3D 5,=0A=
+>>         AS_FOLIO_ORDER_MIN =3D 16,=0A=
+>> @@ -346,6 +347,21 @@ static inline bool mapping_writeback_may_deadlock_o=
+n_reclaim(struct address_spac=0A=
+>>         return test_bit(AS_WRITEBACK_MAY_DEADLOCK_ON_RECLAIM, &mapping->=
+flags);=0A=
 >>  }=0A=
->> +EXPORT_SYMBOL_FOR_MODULES(set_direct_map_valid_noflush, "kvm");=0A=
-> =0A=
-> This should be after 'set_direct_map_valid_noflush', not 'invalid'.=0A=
-> =0A=
-> With that fixed:=0A=
-> =0A=
-> Reviewed-by: Fuad Tabba <tabba@google.com>=0A=
+>>=0A=
+>> +static inline void mapping_set_no_direct_map(struct address_space *mapp=
+ing)=0A=
+>> +{=0A=
+>> +       set_bit(AS_NO_DIRECT_MAP, &mapping->flags);=0A=
+>> +}=0A=
+>> +=0A=
+>> +static inline bool mapping_no_direct_map(struct address_space *mapping)=
 =0A=
-Ah, yes, good catch, thanks!=0A=
+>> +{=0A=
+>> +       return test_bit(AS_NO_DIRECT_MAP, &mapping->flags);=0A=
+>> +}=0A=
+>> +=0A=
+>> +static inline bool vma_is_no_direct_map(const struct vm_area_struct *vm=
+a)=0A=
+>> +{=0A=
+>> +       return vma->vm_file && mapping_no_direct_map(vma->vm_file->f_map=
+ping);=0A=
+>> +}=0A=
+>> +=0A=
+> Any reason vma is const whereas mapping in the function that it calls=0A=
+> (defined above it) isn't?=0A=
+=0A=
+Ah, I cannot say that that was a conscious decision, but rather an artifact=
+ of=0A=
+the code that I looked at for reference when writing these two simply did i=
+t=0A=
+this way.  Are you saying both should be const, or neither (in my mind, bot=
+h=0A=
+could be const, but the mapping_*() family of functions further up in this =
+file=0A=
+dont take const arguments, so I'm a bit unsure now)?=0A=
+=0A=
+> Cheers,=0A=
+> /fuad=0A=
 =0A=
 Best,=0A=
 Patrick=0A=
