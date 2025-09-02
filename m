@@ -1,166 +1,148 @@
-Return-Path: <kvm+bounces-56558-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-56559-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id EFD0EB3FD52
-	for <lists+kvm@lfdr.de>; Tue,  2 Sep 2025 13:07:13 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id B6EB9B3FDA0
+	for <lists+kvm@lfdr.de>; Tue,  2 Sep 2025 13:20:17 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id AB7CC48849E
-	for <lists+kvm@lfdr.de>; Tue,  2 Sep 2025 11:07:12 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4D3412C314F
+	for <lists+kvm@lfdr.de>; Tue,  2 Sep 2025 11:20:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 934942F744F;
-	Tue,  2 Sep 2025 11:06:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CCEB42F744A;
+	Tue,  2 Sep 2025 11:20:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="luXQtemq"
+	dkim=pass (2048-bit key) header.d=amazon.co.uk header.i=@amazon.co.uk header.b="jgAFFVgc"
 X-Original-To: kvm@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from fra-out-004.esa.eu-central-1.outbound.mail-perimeter.amazon.com (fra-out-004.esa.eu-central-1.outbound.mail-perimeter.amazon.com [3.74.81.189])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 92BEB2E92C5;
-	Tue,  2 Sep 2025 11:06:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 758D6274FCB;
+	Tue,  2 Sep 2025 11:20:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=3.74.81.189
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756811217; cv=none; b=eDk0SJ9NglRtWAlWPjUwtEUFQqcupDCysSz+EyS3VbUDTWPjrL1+qkx7IIP35TZHwbs+7LWIUdqGFEznoNKS+TonOsiy5FADH96/LfuWtJLsw3FkOaxmJJPzLwTDpoVee9n8qKrb/1vqJQFrNKp4xUxeLH+hsUG9FE5+cqbnooM=
+	t=1756812006; cv=none; b=pDQoJhSYc6z57EXRsDfcSXEZXGzH+udhe47kgGI/0xzFwSQiqwu32BfiyG9AHkdwL9l2FvqmPiQvgHMl1OFrN6hiO6529P0/T04ZTU9eKFpvDzNvoTNLBpYyZqOJJ4Jai9BblJyr3J2swgeEOhfwYKU1BoYhrq338dqsX6HO8cc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756811217; c=relaxed/simple;
-	bh=hCa1C3d5MBR18h+mVpk4RAM474rjo1/g4TQSzEy0Gzo=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Extkj077px/uWP8AStzNqcoYDBdI4QigYu/2389Wp9czN2sOFY7gBxnV8gXCjD/1Zy7iqTcp1u02J/zbETj0bbRgLrQlS8Sbw2m/93EPtR4DYngxC9KrVDurGh8VyYDwDDC7NYHXEbub+wvOkidabjEOKzyqJAJGlTs5MllBlCM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=luXQtemq; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7D67BC4CEED;
-	Tue,  2 Sep 2025 11:06:56 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1756811217;
-	bh=hCa1C3d5MBR18h+mVpk4RAM474rjo1/g4TQSzEy0Gzo=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=luXQtemqwauDCW1OGofW7KOn0Ed3TXz+7wSyh4Rq/4C4pBNfrCav73O7nhlQqKsu9
-	 pJwS6fgD10XM5MWzc2V32cauwX2xcs5uKtg2Bn+xWgyC8SmOfVZ8jKdythn+ZO4vAa
-	 0h7EOGiI+UMeKypfX8GCyk9wrCAP4tCX2z8kMskVDMEaLSOSdX6db0uWHaJchKjybu
-	 MaLbWwVqK1itWBWz4FOiOlTEHChtIjiBEjBS0WHuFG4wArCchdxmDkRdChfk7RgGoF
-	 PbQcn5XJw0e6Ezn8C5XZTAc61l/+qt/LvKdGUrn6ovVC7JKrzqR3GHSc85H+bG5dhG
-	 nrqyYFGPfwuJg==
-Date: Tue, 2 Sep 2025 14:06:51 +0300
-From: Leon Romanovsky <leon@kernel.org>
-To: Alex Williamson <alex.williamson@redhat.com>
-Cc: Jason Gunthorpe <jgg@nvidia.com>,
-	Andrew Morton <akpm@linux-foundation.org>,
-	Bjorn Helgaas <bhelgaas@google.com>,
-	Christian =?iso-8859-1?Q?K=F6nig?= <christian.koenig@amd.com>,
-	Christoph Hellwig <hch@lst.de>, dri-devel@lists.freedesktop.org,
-	iommu@lists.linux.dev, Jens Axboe <axboe@kernel.dk>,
-	Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
-	linaro-mm-sig@lists.linaro.org, linux-block@vger.kernel.org,
-	linux-kernel@vger.kernel.org, linux-media@vger.kernel.org,
-	linux-mm@kvack.org, linux-pci@vger.kernel.org,
-	Logan Gunthorpe <logang@deltatee.com>,
-	Marek Szyprowski <m.szyprowski@samsung.com>,
-	Robin Murphy <robin.murphy@arm.com>,
-	Sumit Semwal <sumit.semwal@linaro.org>,
-	Vivek Kasireddy <vivek.kasireddy@intel.com>,
-	Will Deacon <will@kernel.org>
-Subject: Re: [PATCH v1 01/10] PCI/P2PDMA: Remove redundant bus_offset from
- map state
-Message-ID: <20250902110651.GF10073@unreal>
-References: <cover.1754311439.git.leon@kernel.org>
- <c9b6237964b9606418af400bb6bec5178fcffff2.1754311439.git.leon@kernel.org>
- <20250806145825.2654ee59.alex.williamson@redhat.com>
+	s=arc-20240116; t=1756812006; c=relaxed/simple;
+	bh=kLv4/OFnxMoWVNWSaozPg9yvYOEwHWxYW5FDLJoxEPI=;
+	h=From:To:CC:Subject:Date:Message-ID:Content-Type:MIME-Version; b=ruRuLm8M4SW+iStD1D0h/CKqeZQXSO2caqTIHX+AWWysfxugsztt7YpdKZa/k0+B26vwvyQeD5XJzie8hTGaMN0iJOJ9ZCNkyyf6047L1QWds8jBHq2cz7F7zjMv8XKPGrRdPuODULkw1UrdLZ//NpNFJngtVA+3erpIwz/j+ms=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.co.uk; spf=pass smtp.mailfrom=amazon.co.uk; dkim=pass (2048-bit key) header.d=amazon.co.uk header.i=@amazon.co.uk header.b=jgAFFVgc; arc=none smtp.client-ip=3.74.81.189
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.co.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.uk
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+  d=amazon.co.uk; i=@amazon.co.uk; q=dns/txt;
+  s=amazoncorp2; t=1756812005; x=1788348005;
+  h=from:to:cc:subject:date:message-id:
+   content-transfer-encoding:mime-version;
+  bh=T2FNUfhL52Aj3gYjfonLSUXy0y+SrmAkwUY44HuIAUI=;
+  b=jgAFFVgcpHolnRIUbaBSm+w8tezjs6RMdaerInZMFhLwHiOvOA+pHf0X
+   /dRAGu0OlrvOgTClDi29h6O7CIcbS3YtuAs3uKSEDv9prN1HpBU3F24fc
+   nbK07aYb88YvAEOci23KuqCtll0L0ZPhfQ0L/2AX0vYy1DArBshsUry+5
+   S43+egCV7E60qqLBH1T+dt3VxViPO7xyzhlOsfXO66MZNeIgEOw5LbEIC
+   6S9+usrtpgm1G04HyZEAJYW4OvY1fplad6TxMOZiH/s1kZnaxORwzUqmW
+   MvlPorYpk/CfirY2/0CH3+oEbaUFv6z3xTAKjlhEAED6uOE41ylKMiMYU
+   A==;
+X-CSE-ConnectionGUID: zdx8S7qKRge5hrOr7ylQ5Q==
+X-CSE-MsgGUID: Q5o+A52gTmuo3o5PMcPuwA==
+X-IronPort-AV: E=Sophos;i="6.18,214,1751241600"; 
+   d="scan'208";a="1514564"
+Received: from ip-10-6-6-97.eu-central-1.compute.internal (HELO smtpout.naws.eu-central-1.prod.farcaster.email.amazon.dev) ([10.6.6.97])
+  by internal-fra-out-004.esa.eu-central-1.outbound.mail-perimeter.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 02 Sep 2025 11:19:54 +0000
+Received: from EX19MTAEUB002.ant.amazon.com [54.240.197.224:27891]
+ by smtpin.naws.eu-central-1.prod.farcaster.email.amazon.dev [10.0.42.3:2525] with esmtp (Farcaster)
+ id e1a424b6-12be-486e-98a1-6ed3976288e5; Tue, 2 Sep 2025 11:19:53 +0000 (UTC)
+X-Farcaster-Flow-ID: e1a424b6-12be-486e-98a1-6ed3976288e5
+Received: from EX19D022EUC004.ant.amazon.com (10.252.51.159) by
+ EX19MTAEUB002.ant.amazon.com (10.252.51.79) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.2562.17;
+ Tue, 2 Sep 2025 11:19:53 +0000
+Received: from EX19D022EUC002.ant.amazon.com (10.252.51.137) by
+ EX19D022EUC004.ant.amazon.com (10.252.51.159) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.2562.20;
+ Tue, 2 Sep 2025 11:19:53 +0000
+Received: from EX19D022EUC002.ant.amazon.com ([fe80::bd:307b:4d3a:7d80]) by
+ EX19D022EUC002.ant.amazon.com ([fe80::bd:307b:4d3a:7d80%3]) with mapi id
+ 15.02.2562.020; Tue, 2 Sep 2025 11:19:53 +0000
+From: "Kalyazin, Nikita" <kalyazin@amazon.co.uk>
+To: "pbonzini@redhat.com" <pbonzini@redhat.com>, "shuah@kernel.org"
+	<shuah@kernel.org>
+CC: "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+	"linux-kselftest@vger.kernel.org" <linux-kselftest@vger.kernel.org>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+	"michael.day@amd.com" <michael.day@amd.com>, "david@redhat.com"
+	<david@redhat.com>, "jthoughton@google.com" <jthoughton@google.com>, "Roy,
+ Patrick" <roypat@amazon.co.uk>, "Thomson, Jack" <jackabt@amazon.co.uk>,
+	"Manwaring, Derek" <derekmn@amazon.com>, "Cali, Marco"
+	<xmarcalx@amazon.co.uk>, "Kalyazin, Nikita" <kalyazin@amazon.co.uk>
+Subject: [PATCH v5 0/2] KVM: guest_memfd: use write for population
+Thread-Topic: [PATCH v5 0/2] KVM: guest_memfd: use write for population
+Thread-Index: AQHcG/uAwYfJViZqa06rri0E+cpusg==
+Date: Tue, 2 Sep 2025 11:19:52 +0000
+Message-ID: <20250902111951.58315-1-kalyazin@amazon.com>
+Accept-Language: en-GB, en-US
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+Content-Type: text/plain; charset="iso-8859-1"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20250806145825.2654ee59.alex.williamson@redhat.com>
 
-On Wed, Aug 06, 2025 at 02:58:25PM -0600, Alex Williamson wrote:
-> On Mon,  4 Aug 2025 16:00:36 +0300
-> Leon Romanovsky <leon@kernel.org> wrote:
-> 
-> > From: Leon Romanovsky <leonro@nvidia.com>
-> > 
-> > Remove the bus_off field from pci_p2pdma_map_state since it duplicates
-> > information already available in the pgmap structure. The bus_offset
-> > is only used in one location (pci_p2pdma_bus_addr_map) and is always
-> > identical to pgmap->bus_offset.
-> > 
-> > Reviewed-by: Christoph Hellwig <hch@lst.de>
-> > Signed-off-by: Jason Gunthorpe <jgg@nvidia.com>
-> > Signed-off-by: Leon Romanovsky <leonro@nvidia.com>
-> > ---
-> >  drivers/pci/p2pdma.c       | 1 -
-> >  include/linux/pci-p2pdma.h | 3 +--
-> >  2 files changed, 1 insertion(+), 3 deletions(-)
-> > 
-> > diff --git a/drivers/pci/p2pdma.c b/drivers/pci/p2pdma.c
-> > index da5657a020074..274bb7bcc0bc5 100644
-> > --- a/drivers/pci/p2pdma.c
-> > +++ b/drivers/pci/p2pdma.c
-> > @@ -1009,7 +1009,6 @@ void __pci_p2pdma_update_state(struct pci_p2pdma_map_state *state,
-> >  {
-> >  	state->pgmap = page_pgmap(page);
-> >  	state->map = pci_p2pdma_map_type(state->pgmap, dev);
-> > -	state->bus_off = to_p2p_pgmap(state->pgmap)->bus_offset;
-> >  }
-> >  
-> >  /**
-> > diff --git a/include/linux/pci-p2pdma.h b/include/linux/pci-p2pdma.h
-> > index 075c20b161d98..b502fc8b49bf9 100644
-> > --- a/include/linux/pci-p2pdma.h
-> > +++ b/include/linux/pci-p2pdma.h
-> > @@ -146,7 +146,6 @@ enum pci_p2pdma_map_type {
-> >  struct pci_p2pdma_map_state {
-> >  	struct dev_pagemap *pgmap;
-> >  	enum pci_p2pdma_map_type map;
-> > -	u64 bus_off;
-> >  };
-> >  
-> >  /* helper for pci_p2pdma_state(), do not use directly */
-> > @@ -186,7 +185,7 @@ static inline dma_addr_t
-> >  pci_p2pdma_bus_addr_map(struct pci_p2pdma_map_state *state, phys_addr_t paddr)
-> >  {
-> >  	WARN_ON_ONCE(state->map != PCI_P2PDMA_MAP_BUS_ADDR);
-> > -	return paddr + state->bus_off;
-> > +	return paddr + to_p2p_pgmap(state->pgmap)->bus_offsetf;
-> >  }
-> >  
-> >  #endif /* _LINUX_PCI_P2P_H */
-
-Sorry for long time to reply, I waited to see what is going on with DMA
-phys_vec basic series and together with my summer vacation, it took a
-while.
-
-> 
-> Looks like you're relying on this bogus code getting resolved in the
-> next patch...
-> 
-> In file included from kernel/dma/direct.c:16:
-> ./include/linux/pci-p2pdma.h: In function ‘pci_p2pdma_bus_addr_map’:
-> ./include/linux/pci-p2pdma.h:188:24: error: implicit declaration of function ‘to_p2p_pgmap’ [-Wimplicit-function-declaration]
->   188 |         return paddr + to_p2p_pgmap(state->pgmap)->bus_offsetf;
->       |                        ^~~~~~~~~~~~
-> ./include/linux/pci-p2pdma.h:188:50: error: invalid type argument of ‘->’ (have ‘int’)
->   188 |         return paddr + to_p2p_pgmap(state->pgmap)->bus_offsetf;
->       |                                                  ^~
-> ./include/linux/pci-p2pdma.h:189:1: error: control reaches end of non-void function [-Werror=return-type]
->   189 | }
->       | ^
-> 
-> to_p2p_pgmap() is a static function and struct pci_p2pdma_pagemap
-> doesn't have a bus_offsetf member.  Thanks,
-
-You are right, probably the best way to fix the error is simply squash
-this change into the next patch.
-
-Thanks
-
-
-
-> 
-> Alex
-> 
+[ based on kvm/next ]=0A=
+=0A=
+Implement guest_memfd allocation and population via the write syscall.=0A=
+This is useful in non-CoCo use cases where the host can access guest=0A=
+memory.  Even though the same can also be achieved via userspace mapping=0A=
+and memcpying from userspace, write provides a more performant option=0A=
+because it does not need to set page tables and it does not cause a page=0A=
+fault for every page like memcpy would.  Note that memcpy cannot be=0A=
+accelerated via MADV_POPULATE_WRITE as it is  not supported by=0A=
+guest_memfd and relies on GUP.=0A=
+=0A=
+Populating 512MiB of guest_memfd on a x86 machine:=0A=
+ - via memcpy: 436 ms=0A=
+ - via write:  202 ms (-54%)=0A=
+=0A=
+v5:=0A=
+ - Replace the call to the unexported filemap_remove_folio with=0A=
+   zeroing the bytes that could not be copied=0A=
+ - Fix checkpatch findings=0A=
+=0A=
+v4:=0A=
+ - https://lore.kernel.org/kvm/20250828153049.3922-1-kalyazin@amazon.com=0A=
+ - Switch from implementing the write callback to write_iter=0A=
+ - Remove conditional compilation=0A=
+=0A=
+v3:=0A=
+ - https://lore.kernel.org/kvm/20250303130838.28812-1-kalyazin@amazon.com=
+=0A=
+ - David/Mike D: Only compile support for the write syscall if=0A=
+   CONFIG_KVM_GMEM_SHARED_MEM (now gone) is enabled.=0A=
+v2:=0A=
+ - https://lore.kernel.org/kvm/20241129123929.64790-1-kalyazin@amazon.com=
+=0A=
+ - Switch from an ioctl to the write syscall to implement population=0A=
+=0A=
+v1:=0A=
+ - https://lore.kernel.org/kvm/20241024095429.54052-1-kalyazin@amazon.com=
+=0A=
+=0A=
+Nikita Kalyazin (2):=0A=
+  KVM: guest_memfd: add generic population via write=0A=
+  KVM: selftests: update guest_memfd write tests=0A=
+=0A=
+ .../testing/selftests/kvm/guest_memfd_test.c  | 86 +++++++++++++++++--=0A=
+ virt/kvm/guest_memfd.c                        | 62 ++++++++++++-=0A=
+ 2 files changed, 141 insertions(+), 7 deletions(-)=0A=
+=0A=
+=0A=
+base-commit: a6ad54137af92535cfe32e19e5f3bc1bb7dbd383=0A=
+-- =0A=
+2.50.1=0A=
+=0A=
 
