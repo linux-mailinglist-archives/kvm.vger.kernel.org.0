@@ -1,218 +1,256 @@
-Return-Path: <kvm+bounces-56611-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-56612-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0FE52B409F9
-	for <lists+kvm@lfdr.de>; Tue,  2 Sep 2025 17:59:00 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 269E6B40B4E
+	for <lists+kvm@lfdr.de>; Tue,  2 Sep 2025 18:57:19 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D599B543A3E
-	for <lists+kvm@lfdr.de>; Tue,  2 Sep 2025 15:58:59 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E61074E3102
+	for <lists+kvm@lfdr.de>; Tue,  2 Sep 2025 16:57:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C89E8334361;
-	Tue,  2 Sep 2025 15:58:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 28174342C8E;
+	Tue,  2 Sep 2025 16:57:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="fefFOIMv"
 X-Original-To: kvm@vger.kernel.org
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id ACE0F32ED54
-	for <kvm@vger.kernel.org>; Tue,  2 Sep 2025 15:58:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756828726; cv=none; b=XlXQbHiPXXpTHPHSeMum/MiFrhsXLCd7BafNBdwX75/o7tx7k0gHVwq/U4ZeMkGdWbeJYJ9gJ75/2A3U33s89m2BA6CD9jJiXxomT99dSI9uifKF97IMmewtOcQi2ihwylX5ZO5HHgFefi7pz6/IlQ0gGZKuhuhqoHXIzs8CyyQ=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756828726; c=relaxed/simple;
-	bh=TH8J55jkMGRrCAa5Mkr1Y99DTRNxsh7OU3A1JPGeguE=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=bhoCXfzpp4C/z8HZmMpuIJ5FcwqjVY/HDY6LOuQFUGAnwvnNeIZwl7oXC3Fy/Sotn7p9CMcoBPXjMiI6oonBAz/AYqZDgP4Bxt9DpS7/+0VlKxGBjKW3bjj4oaCVqewF46+PrK+68JQ1wqDxjdoDPOQGRgsAz6J63BKj3j3mml0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id B1BEA1595;
-	Tue,  2 Sep 2025 08:58:34 -0700 (PDT)
-Received: from e133380.arm.com (e133380.arm.com [10.1.197.68])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 2DAA63F6A8;
-	Tue,  2 Sep 2025 08:58:42 -0700 (PDT)
-Date: Tue, 2 Sep 2025 16:58:18 +0100
-From: Dave Martin <Dave.Martin@arm.com>
-To: Ted Chen <znscnchen@gmail.com>
-Cc: Ben Horgan <ben.horgan@arm.com>, pbonzini@redhat.com,
-	kvm@vger.kernel.org
-Subject: Re: [PATCH] KVM: Avoid debugfs warning caused by repeated vm fd
- number
-Message-ID: <aLcUGm3HcU39q2gp@e133380.arm.com>
-References: <20250901130336.112842-1-znscnchen@gmail.com>
- <b227a304-9b2f-4e89-9ca5-41d836ae4bae@arm.com>
- <aLbnOUXUq7fbF6Mv@t-chicago-u-2404>
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.8])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6662C340D8A;
+	Tue,  2 Sep 2025 16:56:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=192.198.163.8
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1756832220; cv=fail; b=tWlu7/1TXgtB5JaDZMccAkdobf67emAvyibUEs7LKJgXJZtb9IzHSVOVLMK6TxHLIfT4tHipcaTLf22VEKJpvHgjQpfiZ1M3ynUzphxgtcj3CsPGkHBMuXHxxP3qyssY6n05LU9+x3BlCuJAbLnPrJ4hHlELSZEWvmB/sOrDUoQ=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1756832220; c=relaxed/simple;
+	bh=24PmH/SnC263RIBOytrdATv7gd/chkh6fnRAC48W1LY=;
+	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=QRPztpbpwOOEx5Td7APCHXmW3Wul7atdR4VslschjCh2umpQ+pNIA3e9ayYRo0PaqfEsRk6rMFFRlvaELDlEZCRGZ/RtOOyvXRHvfDMc9OTuu1WkQoZXTiANfcqLmO4yxA2RqAhwUnig9NQFYqbgDHa8SX3oo48iavXFbWm+fyY=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=fefFOIMv; arc=fail smtp.client-ip=192.198.163.8
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1756832218; x=1788368218;
+  h=from:to:cc:subject:date:message-id:references:
+   in-reply-to:content-id:content-transfer-encoding:
+   mime-version;
+  bh=24PmH/SnC263RIBOytrdATv7gd/chkh6fnRAC48W1LY=;
+  b=fefFOIMvZD82wKJdbRYmKfWYam/B+o3S3akmQQLUkq4SLeoGi3x6OIU/
+   UuhENFIe768GtT571TFfWphGvh+4bvVSk9DCfSdK6Q6mTnH1YWXiDuPJE
+   utTD2BiN5PXcPSeJRovLRNAkoM/mLI8ed9cNc2O4TmVe5Mj+w5zCM2Npb
+   3pzuB0nuIBt2OEW3WYzwb5O0Kir1wfQfBlEcYqvL6Dey3ZXTYf4cmIW9E
+   uiDLQ61rnWShv4GOPucEujgee3aYfuiNHUDXXl9g89TEkCr5GqkILrHbu
+   RxedA5+ISw8SgDFklxKQLM+CeVFp0brE+ZxuES/tXDZ3dBFEhRBEhIMYh
+   A==;
+X-CSE-ConnectionGUID: xKuSxKXnRNCN+qpSlgb2zA==
+X-CSE-MsgGUID: NJxXCEGcRoGoM5kJZVUH4Q==
+X-IronPort-AV: E=McAfee;i="6800,10657,11541"; a="76717397"
+X-IronPort-AV: E=Sophos;i="6.18,233,1751266800"; 
+   d="scan'208";a="76717397"
+Received: from fmviesa010.fm.intel.com ([10.60.135.150])
+  by fmvoesa102.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 02 Sep 2025 09:56:57 -0700
+X-CSE-ConnectionGUID: cMi9Y+maR/SK+8Ybz9f+QQ==
+X-CSE-MsgGUID: rA4IZLt9R6mE9NtYoLM1yg==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.18,233,1751266800"; 
+   d="scan'208";a="172165888"
+Received: from orsmsx901.amr.corp.intel.com ([10.22.229.23])
+  by fmviesa010.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 02 Sep 2025 09:56:57 -0700
+Received: from ORSMSX902.amr.corp.intel.com (10.22.229.24) by
+ ORSMSX901.amr.corp.intel.com (10.22.229.23) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.2562.17; Tue, 2 Sep 2025 09:56:56 -0700
+Received: from ORSEDG901.ED.cps.intel.com (10.7.248.11) by
+ ORSMSX902.amr.corp.intel.com (10.22.229.24) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.2562.17 via Frontend Transport; Tue, 2 Sep 2025 09:56:56 -0700
+Received: from NAM10-DM6-obe.outbound.protection.outlook.com (40.107.93.40) by
+ edgegateway.intel.com (134.134.137.111) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.2562.17; Tue, 2 Sep 2025 09:56:56 -0700
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=B583fNDz78gMpLAK9KT6g0TDxyUFLnDThm96PmCLKc/pOCbNBvjT9AUrYHYX68D6kqTQRyOEFx+T6CuaeBAdXy7A5Nw/WTuz3EO4ytTrtbyZUwXxMfoL3HrbyeqoT8r+LiFcZHq7ejtYjPnHs0LcF5FBTv5LnKzEJLhQ3giVWq+dLAreSU/UDgvlLfHLZy+rfBSDezZyAEwGVZFW47FfZQvPn4EsUt3XbcdTng7M5ywxLsnIIPgoOaT4yzDXCUmKnULIqEld+m4rrJsiz487K+cfcAzUeRdgjjMbchoNPE7UpLsV9B1ddV6mfQ1FxxMEW434QGRYrJ5Ggx7tqQmy+Q==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=24PmH/SnC263RIBOytrdATv7gd/chkh6fnRAC48W1LY=;
+ b=wa9SR6lpjCoGebIM1Zb7uKKs7y3sELUHYev2S/pckKqnMNC/MRIEejU52WzpPuFK1W82X5oewYKUUb11EnYQU+aoDwLfkDv9W1z5zmqwDA980j/jybRczJy7soan/QNIe3sTogipYl1BsCcOySrgCEJ0R9sv54gUQPWFLlMWljjd+JFHTjR6ndSS6mcJkaI/qZw4bo5LfPWBrdOrJ21mqooqJRwbK856DH4tl0SQrW4SFF7jweBs9DU0MdYI9puD9eB+OpLAuIzJm7aftfPs7cRWkFGnADgvnDZ+Sxm++VIBNUqSC2HPHcWcbrqbwQ6MT+FROeCYTswxnBc+QFEUiw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Received: from LV2PR11MB5976.namprd11.prod.outlook.com (2603:10b6:408:17c::13)
+ by SJ0PR11MB5168.namprd11.prod.outlook.com (2603:10b6:a03:2dc::7) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9073.27; Tue, 2 Sep
+ 2025 16:56:53 +0000
+Received: from LV2PR11MB5976.namprd11.prod.outlook.com
+ ([fe80::d099:e70d:142b:c07d]) by LV2PR11MB5976.namprd11.prod.outlook.com
+ ([fe80::d099:e70d:142b:c07d%4]) with mapi id 15.20.9052.017; Tue, 2 Sep 2025
+ 16:56:51 +0000
+From: "Edgecombe, Rick P" <rick.p.edgecombe@intel.com>
+To: "Zhao, Yan Y" <yan.y.zhao@intel.com>, "binbin.wu@linux.intel.com"
+	<binbin.wu@linux.intel.com>
+CC: "kvm@vger.kernel.org" <kvm@vger.kernel.org>, "quic_eberman@quicinc.com"
+	<quic_eberman@quicinc.com>, "Li, Xiaoyao" <xiaoyao.li@intel.com>, "Du, Fan"
+	<fan.du@intel.com>, "Hansen, Dave" <dave.hansen@intel.com>,
+	"david@redhat.com" <david@redhat.com>, "thomas.lendacky@amd.com"
+	<thomas.lendacky@amd.com>, "tabba@google.com" <tabba@google.com>,
+	"vbabka@suse.cz" <vbabka@suse.cz>, "michael.roth@amd.com"
+	<michael.roth@amd.com>, "seanjc@google.com" <seanjc@google.com>, "Weiny, Ira"
+	<ira.weiny@intel.com>, "kas@kernel.org" <kas@kernel.org>,
+	"pbonzini@redhat.com" <pbonzini@redhat.com>, "ackerleytng@google.com"
+	<ackerleytng@google.com>, "linux-kernel@vger.kernel.org"
+	<linux-kernel@vger.kernel.org>, "Yamahata, Isaku" <isaku.yamahata@intel.com>,
+	"Peng, Chao P" <chao.p.peng@intel.com>, "zhiquan1.li@intel.com"
+	<zhiquan1.li@intel.com>, "Annapurve, Vishal" <vannapurve@google.com>, "Miao,
+ Jun" <jun.miao@intel.com>, "x86@kernel.org" <x86@kernel.org>,
+	"pgonda@google.com" <pgonda@google.com>
+Subject: Re: [RFC PATCH v2 02/23] x86/virt/tdx: Add SEAMCALL wrapper
+ tdh_mem_page_demote()
+Thread-Topic: [RFC PATCH v2 02/23] x86/virt/tdx: Add SEAMCALL wrapper
+ tdh_mem_page_demote()
+Thread-Index: AQHcB3+cjpXnNi+6okqfIQv/bzXmILR+LVYAgAADmoCAAhU2gA==
+Date: Tue, 2 Sep 2025 16:56:50 +0000
+Message-ID: <87fe45aae8d0812bd3aec956e407c3cc88234b34.camel@intel.com>
+References: <20250807093950.4395-1-yan.y.zhao@intel.com>
+	 <20250807094149.4467-1-yan.y.zhao@intel.com>
+	 <281ae89b-9fc3-4a9b-87f6-26d2a96cde49@linux.intel.com>
+	 <aLVih+zi8gW5zrJY@yzhao56-desk.sh.intel.com>
+In-Reply-To: <aLVih+zi8gW5zrJY@yzhao56-desk.sh.intel.com>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+user-agent: Evolution 3.44.4-0ubuntu2 
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: LV2PR11MB5976:EE_|SJ0PR11MB5168:EE_
+x-ms-office365-filtering-correlation-id: 9881bbaf-9958-45a1-6717-08ddea41b657
+x-ld-processed: 46c98d88-e344-4ed4-8496-4ed7712e255d,ExtAddr
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam: BCL:0;ARA:13230040|7416014|376014|366016|1800799024|38070700018;
+x-microsoft-antispam-message-info: =?utf-8?B?dWpmL2xPdGRRRmxrWlVjSld2THYrWmNTWmVLdjhJMml0ZUhpOEp0MEF6ckZK?=
+ =?utf-8?B?TExBdi9Ca1g0ZHJWYlljeTJ4cTY4SHBsYWQ1c1ROamMzSStWOE53K00xUWMy?=
+ =?utf-8?B?RUo2ekQwMXVUdUxrdzVOVVozbmFqUnZPRGs1ZU1xU010SHEvV3o3R0Y0NFRt?=
+ =?utf-8?B?YWVLZGU5WXhxWC9ERFhjcFh5RHg0aml5dk5ORnh0cy9QU2N1Kys3b21UczNF?=
+ =?utf-8?B?VlFReE9QSWdiTHY2N05uNHAwL052M3lYZ25BdWxYYndzV3FscitlVW05RG1V?=
+ =?utf-8?B?OFptOXFMaXFrT05jQnVXNTZuQndXQjJPWmFTcGFaR2VMeWRwbksrRUg3a0Q5?=
+ =?utf-8?B?NG5nTkpnNkxqS0tsMW50M0pEclFIUmZ4VUh0bHlER1FQL01HdDM1bzRWS3Yy?=
+ =?utf-8?B?TkpxZ1ZNYVNSeDY2SitrbUphZTlkL3d4ZkxWUmU1Ly9xZFM5TUVnUGIwaTZx?=
+ =?utf-8?B?d1h0aXVDYXV6RUhLS21YM0ZFNnNiM1dBNTcydGxFYzAya21wbkJVaWt3Y01p?=
+ =?utf-8?B?SGRqM0VOVExPUzhQRmdKbzhjMXdCTUNLWUs5V1FETUp3cXFKak4rT21vN2Ni?=
+ =?utf-8?B?bS9VYXJoWUF3OUkxVVczSUZSQ0J0dDVTcXFVMjdFamprYlc4S0gyMzlpd0x0?=
+ =?utf-8?B?eU1lYkZzVkFobGIycFluT21tY0JRRjdaMmEvMFd3ZmY0R2RPSmx3Y2FYZVdY?=
+ =?utf-8?B?Z2IreldrdlNpS2RPZmNOV3J2VzlQMFYzck84RUMwaCtQekhiOUFxTVZRVzRX?=
+ =?utf-8?B?SG9iSzA2V0U2T1NSd0xWYmFaWkExZ0FZUCtIQVBEWFhHaFdpTG9VMG1pMXhC?=
+ =?utf-8?B?OG0yQnZWNVhmbjVVQXJqckhiQTkrMXR3UEUzYTVsSVNtTnltdWxwQUVjbXNF?=
+ =?utf-8?B?Z2NmVlNWWVJGWjN4TWM2bXMxUVhoTUJGRDNCcURkeUpvTFdSaUh2VnM4bGtN?=
+ =?utf-8?B?NEdOclFSK3R3d3pvZUhFQ2pjTFdSWnNrS0NNK2NBVzROZTR0K2Y0RHhiV0Fi?=
+ =?utf-8?B?clduZWxMUTRDZm4xUVhicFgySDhyYURISDFpRUwwMUwyL0VJN3ZLdWtZeDRO?=
+ =?utf-8?B?elU4S0l6d1FtZWF3OWcvc0hpczVPbW9UakVON3EzM1BqZXYyN2JLcyszNzg5?=
+ =?utf-8?B?cmpLbmxJUUFYUmhSYnI2eWpZUkdWY0Y0M3BQVDdVN0FwblJabUZDY0RybG9k?=
+ =?utf-8?B?c2orQUNzMmJpSW5QNkx3dlg4UjhoYnhXV1ZDbFV4T05JMVdhRWUyMUlwTDIy?=
+ =?utf-8?B?QkNmNFhwRzVYYjRtVnlvcGQ2c1JERnZJZGJRMmV6S0R4WXlLM290V3dsQzhq?=
+ =?utf-8?B?dDVISGR0VzRCMFphRmRXblpJWlluQzBEY1ltZFVET3p1Yi9RZEZ1R3g4NDdP?=
+ =?utf-8?B?TWlrZEkvcVdMNys4SWRzN2l4YXpMV1FIZDJHV3BRMVd4MWNodkFNSEg5OUdk?=
+ =?utf-8?B?Slc2WEZ2aFZ3amtERWtzM3gxczVRZFBQZUpEc3pCRXJndDdOc2xIS0VTcXVB?=
+ =?utf-8?B?ZW8zQkIwNFg0azd4VzF2bml6MnJoVFhRVkZPOGtwcFJSUnMvcTBMcXBWOEtW?=
+ =?utf-8?B?TUkzTW1kckFKQVU1bDFYeEFIKzZuYU1MVW1sS0ZWbG9FejNmd0lrb2srdnVJ?=
+ =?utf-8?B?RHB1cFAvejBROEpzdDlReHJ3aG1Nc2M0MVRCSG5DWVlabFdPdlNtQll6dlU4?=
+ =?utf-8?B?dXB0WFJwTjlLQzA5akxQUVVGWk5saEJvWlNKTisxOEFTaDF6ekNJTjlMeTVP?=
+ =?utf-8?B?dTVWdUQ3WHBGeWxnMmtiby9JVndab0xieDFSTzQzcEV1VGpHNDRldWJvNjR4?=
+ =?utf-8?B?eWc5WlRtT0JtSlQ5dVBPU0ZKVW5VMWRXczg5STRuekZPUENYNFFhTTBORE5J?=
+ =?utf-8?B?b0ZHdnc4TkxzbUtmTXRrUkFkZTVLeGhPUWxoOVVhNmZHU0ZmQjFXaVhDYWh1?=
+ =?utf-8?B?L2NUOUhWTVRndGhSRVpYcWFmSVhZUFJPcCt2djZMK0hpRkJyT25QKzlTaTZu?=
+ =?utf-8?B?ZTUvTjdENHJBPT0=?=
+x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:LV2PR11MB5976.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(7416014)(376014)(366016)(1800799024)(38070700018);DIR:OUT;SFP:1101;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0: =?utf-8?B?VWhNM0szMUxaVnYyZEQ0aXZyRjdsSW9zWEhSVlN3QUUycVpiU3V5QU53T0Zx?=
+ =?utf-8?B?NFBvNnhrVGZwc0ZsUUIxQUk4ZVF5RCtTNlp5L2Rhd09Jd3JWbUJZRXJGbTJM?=
+ =?utf-8?B?a0J6SXZUL1lPZVRiTmJ5Mit4NWZvT2xQbEpCQ09kdnYyem85QXVNYjdTZFZk?=
+ =?utf-8?B?dExkUlVuRCtLMFNhQUR2TWFvUzIyU3hoM3JBbnVVclFNbW5nRkNGZDFEcUk1?=
+ =?utf-8?B?cERsSTVWTjZITjBsaWp4VVp6VWZzVzZZcHQ3RzJlQ0g3KzN2TURkMWtUYzlT?=
+ =?utf-8?B?eWNvMlVJOEc4WG1Eb0hmT1RPSlFmdzBQcnhTeXJHN3htVkNVOE5DSU42d3kz?=
+ =?utf-8?B?UUVMQW40V1loSCthNm9nVEFNMjdMWlZabDJMQklDaVB3ZUFkMnpiUktsQ09Z?=
+ =?utf-8?B?dStXbmxpbm5ZRFpUZjU4U3hDY1hBYU9KYjlDaHJsRnYxMXlXb25XMGVhM1NY?=
+ =?utf-8?B?dDQwSHMreDFXY2VvQWxmakswN1gxRTY0NVBNa0VJeTczQVFxc2E0QjZJVEtx?=
+ =?utf-8?B?NFIrNmRhSVhBTThRTVNoVUFFZHk4bm5jcWNmTDVidW5MQ0FIR3RVRVdmemI0?=
+ =?utf-8?B?c2JWUk9uaVdRelNqbngxeW4zTUx4SHFyY0UxOTM5OUs0Z0pxeVVoMm14Y3Z4?=
+ =?utf-8?B?TlRCaEN2SmRIZnZUZWkva1Fkd1Y1WTVlRUlTaFBUcE1YcEI2eWx5a0N2WU9V?=
+ =?utf-8?B?Y1hZZWhDeXFsR04wdUJoaFd6NmdjWmtWM0prYURTb2F4REdRSDl6Y3hKZW1z?=
+ =?utf-8?B?ZWNzVy9UUTNDd3dLWFpIaHpraE5YSFB6YUs0cGc1Q3BXTWFiZVJDT1lwNmRS?=
+ =?utf-8?B?M29CdmcxVWJidTdRR2pZRHA3aWtOL1NadTlzaTJwVXZlVDJhS2puai9NV1NQ?=
+ =?utf-8?B?TE02TUpSNXZtdUNtK2xwMTQzcnVSTXl6SHd2blRwTlVEcjhWdUR1Ty9DUlZI?=
+ =?utf-8?B?WHdKQ1dQL3VhUDZmTzlSQ0xPL3lrSnpVT3psVmZ5OW1vd2ljdWxrVmhCTGVK?=
+ =?utf-8?B?M0lsTGQzTDREZXVmZ1gxZTc5YXJvVjhQSHd0V2s2dVM4R2l3Qmc4bUFjcjFJ?=
+ =?utf-8?B?cmlLaWdIOHhleVNPQUZxK3E4Y2YwWTRuQ2hWTnRXK2VEUUVhVHo1VlNUTmkr?=
+ =?utf-8?B?V2p2VENmZ3ZNVDZxUjlYVnMwNTlkVUFTUmVLcEQ1bjJWaVNXQWZ3MDJUYTds?=
+ =?utf-8?B?cDJIeTJVekdtNXhUVlpQcjU2cjdTdzc0MXRkN0lGekZjdGRDL3NwYzRUNUZR?=
+ =?utf-8?B?YTVFUVMyR1I0d0w1NXhNbSt5ZHhHUzUwUytnbUJXcDVxOHBkTktQQzM0Ky9L?=
+ =?utf-8?B?cS8wOTlyRG9iNHYzbk5iZ0lwb0NZUTFVdUtzTURMVGMrbkVodlJINVg4QUdu?=
+ =?utf-8?B?U1gzd2U4QWNqRmV4RUNuVUpJNFJlTTBNSVBlTTZkL2FXYVh4VlFLV3NwWmVN?=
+ =?utf-8?B?UndrRGc4dklBbmd4RW15ZDVrMDZkc08vWS9aQkJ4Z1h6dFBwT21pNGh2TUdj?=
+ =?utf-8?B?NC9xSG1DK0VVMGFrRDdxcDdnZ2JzNlpmVjBycldTTnNhZHR4UEhaNDFkTVlo?=
+ =?utf-8?B?MkVHaG9iZTVSLzZZcW54RndCaUtSY1ZHNGpNaWxIWFRQMDIxekR5bVdlZjNx?=
+ =?utf-8?B?OEc5cm0zQW1pZVBRcnJtWm0xbkMrV1QzOEJUd2lNRmtMalo2R2tDMHhhditC?=
+ =?utf-8?B?RDNmSzBXS1d5MUR3b2RrblJjQzJkbmVLdzZqMExoSlJlS0g4V2JvRXhHamNM?=
+ =?utf-8?B?U1BielRwVUZ2OWhDeHFMc1F2UnIvcXNZaCt3SVpaWjJUSnoxZkFreFNNMTNK?=
+ =?utf-8?B?SGdzcmdIQXZBNGZHWDVWUlk0NElHTjNjL2I1cElPbGxwamN3WklGNVkycCtP?=
+ =?utf-8?B?VG9lYTRxamN2TmhTOE85MjJEM1Z3K2VicDdFMFRSUjZsN1RLZ3FTdytTakUx?=
+ =?utf-8?B?QUdQbXFRWE9ZTU9NQjFORVZ6NkJRczlvTVh6UisyNDhCK2xaVTZyUndYY0Jh?=
+ =?utf-8?B?MXhrYnZLK1FZSzNlRTNURVhxeEhpYnhaQkNlSWM2VWFvdHFHaFJTZGo1Szhk?=
+ =?utf-8?B?bTdEeWtHdUJZUEtYYjJkbkZlT1JKY3U1cXloTWFVS2pqcDdwRGpXczZUQTlp?=
+ =?utf-8?B?bzlmM1BJbEhPL1hzMC9KejFOaTdFL3hkeG9pUkFhNjA4QXJQbG1KVjFaVnE1?=
+ =?utf-8?B?WVE9PQ==?=
+Content-Type: text/plain; charset="utf-8"
+Content-ID: <1E2FF44BC6221F4EB3C46A56B94A636F@namprd11.prod.outlook.com>
+Content-Transfer-Encoding: base64
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <aLbnOUXUq7fbF6Mv@t-chicago-u-2404>
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: LV2PR11MB5976.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 9881bbaf-9958-45a1-6717-08ddea41b657
+X-MS-Exchange-CrossTenant-originalarrivaltime: 02 Sep 2025 16:56:50.9313
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: Rf+o8eHbBk9UR6kNg0CC09397wW2ykcy3Ypc33IpzZintSdemudq4r0v5YBUOF59MsonChX3ur9Y5KyTvdqGvvIGUMAe01fNmY7pjkQXFkI=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SJ0PR11MB5168
+X-OriginatorOrg: intel.com
 
-Hi,
-
-On Tue, Sep 02, 2025 at 08:46:49PM +0800, Ted Chen wrote:
-> On Mon, Sep 01, 2025 at 02:39:06PM +0100, Ben Horgan wrote:
-> > Hi Ted,
-> > 
-> > On 9/1/25 14:03, Ted Chen wrote:
-> > > Avoid debugfs warning like "KVM: debugfs: duplicate directory 59904-4"
-> > > caused by creating VMs with the same vm fd number in a single process.
-> > > 
-> > > As shown in the below test case, two test() are executed sequentially in a
-> > > single process, each creating a new VM.
-> > > 
-> > > Though the 2nd test() creates a new VM after the 1st test() closes the
-> > > vm_fd, KVM prints warnings like "KVM: debugfs: duplicate directory 59904-4"
-> > > on creating the 2nd VM.
-> > > 
-> > > This is due to the dup() of the vcpu_fd in test(). So, after closing the
-> > > 1st vm_fd, kvm->users_count of the 1st VM is still > 0 when creating the
-> > > 2nd VM. So, KVM has not yet invoked kvm_destroy_vm() and
-> > > kvm_destroy_vm_debugfs() for the 1st VM after closing the 1st vm_fd. The
-> > > 2nd test() thus will be able to create a different VM with the same vm fd
-> > > number as the 1st VM.
-> > > 
-> > > Therefore, besides having "pid" and "fdname" in the dir_name of the
-> > > debugfs, add a random number to differentiate different VMs to avoid
-> > > printing warning, also allowing the 2nd VM to have a functional debugfs.
-> > > 
-> > > Use get_random_u32() to avoid dir_name() taking up too much memory while
-> > > greatly reducing the chance of printing warning.
-> > > 
-> > > void test(void)
-> > > {
-> > >         int kvm_fd, vm_fd, vcpu_fd;
-> > > 
-> > >         kvm_fd = open("/dev/kvm", O_RDWR);
-> > >         if (kvm_fd == -1)
-> > >                 return;
-> > > 
-> > >         vm_fd = ioctl(kvm_fd, KVM_CREATE_VM, 0);
-> > >         if (vm_fd == -1)
-> > >                 return;
-> > >         vcpu_fd = ioctl(vm_fd, KVM_CREATE_VCPU, 0);
-> > >         if (vcpu_fd == -1)
-> > >                 return;
-> > > 
-> > >         dup(vcpu_fd);
-> > >         close(vcpu_fd);
-> > >         close(vm_fd);
-> > >         close(kvm_fd);
-> > > }
-> > > 
-> > > int main()
-> > > {
-> > >         test();
-> > >         test();
-> > > 
-> > >         return 0;
-> > > }
-> > > 
-> > > Signed-off-by: Ted Chen <znscnchen@gmail.com>
-> > > ---
-> > >  virt/kvm/kvm_main.c | 5 +++--
-> > >  1 file changed, 3 insertions(+), 2 deletions(-)
-> > > 
-> > > diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
-> > > index 6c07dd423458..f92a60ed5de8 100644
-> > > --- a/virt/kvm/kvm_main.c
-> > > +++ b/virt/kvm/kvm_main.c
-> > > @@ -1017,7 +1017,7 @@ static int kvm_create_vm_debugfs(struct kvm *kvm, const char *fdname)
-> > >  {
-> > >  	static DEFINE_MUTEX(kvm_debugfs_lock);
-> > >  	struct dentry *dent;
-> > > -	char dir_name[ITOA_MAX_LEN * 2];
-> > > +	char dir_name[ITOA_MAX_LEN * 3];
-> > >  	struct kvm_stat_data *stat_data;
-> > >  	const struct _kvm_stats_desc *pdesc;
-> > >  	int i, ret = -ENOMEM;
-> > > @@ -1027,7 +1027,8 @@ static int kvm_create_vm_debugfs(struct kvm *kvm, const char *fdname)
-> > >  	if (!debugfs_initialized())
-> > >  		return 0;
-> > >  
-> > > -	snprintf(dir_name, sizeof(dir_name), "%d-%s", task_pid_nr(current), fdname);
-> > > +	snprintf(dir_name, sizeof(dir_name), "%d-%s-%u", task_pid_nr(current),
-> > > +		 fdname, get_random_u32());
-> > 
-> > This does make the directory names (very likely) to be unique but it's
-> > not helpful in distinguishing which directory maps to which vm. I wonder
-> > if there is some better id we could use here.
-> Good point. Maybe use timestamp instead?
-> So, we can know a bigger timestamp value corresponds to a VM created later.
-> Also since VMs are created in a single thread, they can't have the same
-
-Why must all VMs be created in a single thread?
-
-> timestamp value.
-> 
-> diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
-> index 6c07dd423458..c3b0880be79a 100644
-> --- a/virt/kvm/kvm_main.c
-> +++ b/virt/kvm/kvm_main.c
-> @@ -1017,7 +1017,7 @@ static int kvm_create_vm_debugfs(struct kvm *kvm, const char *fdname)
->  {
->         static DEFINE_MUTEX(kvm_debugfs_lock);
->         struct dentry *dent;
-> -       char dir_name[ITOA_MAX_LEN * 2];
-> +       char dir_name[ITOA_MAX_LEN * 4];
-
-Hmmm.
-
->         struct kvm_stat_data *stat_data;
->         const struct _kvm_stats_desc *pdesc;
->         int i, ret = -ENOMEM;
-> @@ -1027,7 +1027,8 @@ static int kvm_create_vm_debugfs(struct kvm *kvm, const char *fdname)
->         if (!debugfs_initialized())
->                 return 0;
-> 
-> -       snprintf(dir_name, sizeof(dir_name), "%d-%s", task_pid_nr(current), fdname);
-> +       snprintf(dir_name, sizeof(dir_name), "%d-%s-%llx", task_pid_nr(current),
-> +                fdname, ktime_get_ns());
->         mutex_lock(&kvm_debugfs_lock);
->         dent = debugfs_lookup(dir_name, kvm_debugfs_dir);
->         if (dent) {
-> 
-> 
-> > Should the vm stats_id also be updated to be unique and use the same scheme?
->
-> I don't think so. Unlike debugfs paths that will be accessed directly by
-> userspace, the stats_id is used by anonymous inode files openned with unique
-> fd numbers in a single process. So, duplicated names should be ok.
-
-Just sticking my oar in here, since I'm interested in how we identify
-VMs and vCPUs for use by other kernel subsystems:
-
-The two proposed approaches may not guarantee uniqueness.  The PID is
-not unique because a single process can create multiple VMs.  Possibly,
-VMs can outlive the PID of the creating process (if a KVM fd is passed
-to another process, and the original process terminates).  The fd is
-not unique because fds can be moved around with dup() and reallocated.
-Random numbers are not unique (only _probably_ unique.)
-
-If VMs are created from two threads simultaneously and if ownership of
-kvm_debugfs_lock can move fast enough, or there is enough skid or
-imprecision in the timestamp, then can ktime_get_ns() be non-unique too?
-
-_Maybe_ this is good enough for debugfs -- which is often treated in a
-best-effort way by kernel code.
- 
-
-However, if we really want a robust ID that can not only distinguish
-between VMs but can also tell us reliably (and usefully) which is which
-even when multiple VMs are created by a single process, I think KVM
-userspace needs to be able to set and/or retrieve the ID, or part of it.
-
-It might make sense to define a new kind of identifier for such
-purposes.
-
-I'm guessing that this is out of the scope for this patch, though.
-
-Cheers
----Dave
+T24gTW9uLCAyMDI1LTA5LTAxIGF0IDE3OjA4ICswODAwLCBZYW4gWmhhbyB3cm90ZToNCj4gPiBU
+aGUgY292ZXIgbGV0dGVyIG1lbnRpb25zIHRoYXQgdGhlcmUgaXMgYSBuZXcgVERYIG1vZHVsZSBp
+biBwbGFubmluZywgd2hpY2gNCj4gPiBkaXNhYmxlcyB0aGUgaW50ZXJydXB0IGNoZWNraW5nLiBJ
+IGd1ZXNzIFREWCBtb2R1bGUgd291bGQgbmVlZCB0byBoYXZlIGENCj4gPiBpbnRlcmZhY2UgdG8g
+cmVwb3J0IHRoZSBjaGFuZ2UsIEtWTSB0aGVuIGRlY2lkZXMgdG8gZW5hYmxlIGh1Z2UgcGFnZSBz
+dXBwb3J0DQo+ID4gb3Igbm90IGZvciBURHM/DQo+IFllcy4gQnV0IEkgZ3Vlc3MgZGV0ZWN0aW5n
+IFREWCBtb2R1bGUgdmVyc2lvbiBvciBpZiBpdCBzdXBwb3J0cyBjZXJ0YWluDQo+IGZlYXR1cmUg
+aXMgYSBnZW5lcmljIHByb2JsZW0uIGUuZy4sIGNlcnRhaW4gdmVyc2lvbnMgb2YgVERYIG1vZHVs
+ZSBoYXZlIGJ1Z3MNCj4gaW4gemVyby1zdGVwIG1pdGlnYXRpb24gYW5kIG1heSBibG9jayB2Q1BV
+IGVudGVyaW5nLg0KPiANCg0KV2UgaGFkIHRhbGtlZCBpbiB0aGUgcGFzdCBvZiBub3QgY2hlY2tp
+bmcgdmVyc2lvbnMgYmVjYXVzZSBpdCB3b3VsZCByZXF1aXJlIEtWTQ0KdG8ga2VlcCBsb2dpYyBv
+ZiB3aGljaCBmZWF0dXJlcyBpbiB3aGljaCBURFggbW9kdWxlLg0KDQpJZiB0aGVyZSBpcyBhIGZs
+YWcgd2UgY291bGQgY2hlY2sgaXQsIGJ1dCB3ZSBkaWQgbm90IGFzayBmb3Igb25lIGhlcmUuIFdl
+DQphbHJlYWR5IGhhdmUgYSBzaXR1YXRpb24gd2hlcmUgdGhlcmUgYXJlIGJ1ZyBmaXhlcyB0aGF0
+IEtWTSBkZXBlbmRzIG9uLCB3aXRoIG5vDQp3YXkgdG8gY2hlY2suDQoNCkkgZ3Vlc3MgdGhlIGRp
+ZmZlcmVuY2UgaGVyZSBpcyB0aGF0IGlmIHRoZSBiZWhhdmlvciBpcyBtaXNzaW5nLCBLVk0gaGFz
+IGFuDQpvcHRpb24gdG8gY29udGludWUgd2l0aCBqdXN0IHNtYWxsIHBhZ2VzLiBCdXQgYXQgdGhl
+IHNhbWUgdGltZSwgaHVnZSBwYWdlcyBpcw0KdmVyeSBsaWtlbHkgdG8gc3VjY2VlZCBpbiBlaXRo
+ZXIgY2FzZS4gVGhlICJmZWF0dXJlIiBpcyBjbG9zZXIgdG8gY2xvc2luZyBhDQp0aGVvcmV0aWNh
+bCByYWNlLiBTbyB2ZXJ5IG11Y2ggbGlrZSB0aGUgbWFueSBidWdzIHdlIGRvbid0IGNoZWNrIGZv
+ci4gSSdtDQpsZWFuaW5nIHRvd2FyZHMgbHVtcGluZyBpdCBpbnRvIHRoYXQgY2F0ZWdvcnkuIEFu
+ZCB3ZSBjYW4gYWRkICJob3cgZG8gd2Ugd2FudCB0bw0KY2hlY2sgZm9yIFREWCBtb2R1bGUgYnVn
+cyIgdG8gdGhlIGFyY2ggdG9kbyBsaXN0LiBCdXQgaXQncyBwcm9iYWJseSBkb3duIHRoZQ0KbGlz
+dCwgaWYgd2UgZXZlbiB3YW50IHRvIGRvIGFueXRoaW5nLg0KDQpXaGF0IGRvIHlvdSB0aGluaz8N
+Cg==
 
