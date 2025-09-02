@@ -1,110 +1,166 @@
-Return-Path: <kvm+bounces-56557-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-56558-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id C955CB3FC04
-	for <lists+kvm@lfdr.de>; Tue,  2 Sep 2025 12:17:32 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id EFD0EB3FD52
+	for <lists+kvm@lfdr.de>; Tue,  2 Sep 2025 13:07:13 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 0F3527A5227
-	for <lists+kvm@lfdr.de>; Tue,  2 Sep 2025 10:15:43 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id AB7CC48849E
+	for <lists+kvm@lfdr.de>; Tue,  2 Sep 2025 11:07:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F261B27F75C;
-	Tue,  2 Sep 2025 10:17:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 934942F744F;
+	Tue,  2 Sep 2025 11:06:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="qJTFascF"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="luXQtemq"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-wr1-f46.google.com (mail-wr1-f46.google.com [209.85.221.46])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 65B0D16F265
-	for <kvm@vger.kernel.org>; Tue,  2 Sep 2025 10:17:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.46
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 92BEB2E92C5;
+	Tue,  2 Sep 2025 11:06:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756808231; cv=none; b=FGDNDbAGhHCkoeHNrLzNuKiqznqI3qgh/JzoKl1N7c9DCJ1SyueH2R7cB7CuynARvHYy0vgtjuSraEtn8/gG5UJwRH+xaoivhO61mphlKSoRjKs8YS1ZOFb+x4cvQoTcp7sbVxTQfsw4pKKOBeyB5vPmzlkHrm4epW4HHreHK5U=
+	t=1756811217; cv=none; b=eDk0SJ9NglRtWAlWPjUwtEUFQqcupDCysSz+EyS3VbUDTWPjrL1+qkx7IIP35TZHwbs+7LWIUdqGFEznoNKS+TonOsiy5FADH96/LfuWtJLsw3FkOaxmJJPzLwTDpoVee9n8qKrb/1vqJQFrNKp4xUxeLH+hsUG9FE5+cqbnooM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756808231; c=relaxed/simple;
-	bh=YFVnxk/9cQCoq4PZNn3WwT1JlD495LFTXniEAf9xfGU=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=it2wZrPbyQET+axrDTXSuCdc7QyhHgt6fIwFnIQMLoTnAnUcqSdGjKo9l8ksQH/BRklspAUUDyVq5KdFLixOP5L7fOj2lYnk0Yk/ZusXFleNOs0XtxxbeNJHLUEFwdxUUYyXTOfR8HlsdffBGNJcqQdQsswNWRk2oh9j3T2sb/c=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=qJTFascF; arc=none smtp.client-ip=209.85.221.46
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
-Received: by mail-wr1-f46.google.com with SMTP id ffacd0b85a97d-3cdfb1ff7aeso2563875f8f.2
-        for <kvm@vger.kernel.org>; Tue, 02 Sep 2025 03:17:09 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1756808227; x=1757413027; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=rly+1aW0RM04C1ueHyEUX9nrFXkquj1rDqnBJ6wqqvo=;
-        b=qJTFascF9Ftl2Qu88YgqwXGnqZASpAbcsPdpTVcLVX9zzOSaA3JtIuGsLb70tHGNop
-         BF3bnSzqFPOg/pTSsTB2WuqYlu5twNTkaIo6JHueEFSqHQ2oG0wZz4D7rwo/Vl/b8TSD
-         IKK/KDxNvOyyqN1EdTRHYhVwuOy30u2JG888w3vblN0gE0Y4ymWuXuAwkyx8/VgrcM73
-         6E9bA+0XOC4WV0gXFBfCHPokq46dmziyB+gyx5pbo4i1YQ+vQdySWtcwA4abQZl04wH3
-         0i0aCu6bQMK5rhheGLeuH8PNC/Ca9tJKU8xv8h+st4xrNyK233dtTE2zlDQpi206MNfX
-         aC4Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1756808227; x=1757413027;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=rly+1aW0RM04C1ueHyEUX9nrFXkquj1rDqnBJ6wqqvo=;
-        b=fNvctdWrR30t6FMU0iwrE4eIeL2WaNR6YQN1TkVmzd3aFjbWuSiI9qd/+Vah7K2zhV
-         uj5nzQebUUq6IxxWMmF09a0TIUOT/8D3CbuysvxmqlRHGhX3ZHQIRyinNGZlJHhaPPaz
-         iwEHb21R8pgy87ldudzVpA/Hv4iyBp86W3D9+r35Cva8R+fwP4Xqwviil7QuDPVhDhQk
-         qUImCxthjchy2inpcCIGwJoh7Av/ELN9InmH+BBTz2KUMBdrCDLpTQQM4L2rmgFNKiuS
-         RK++dH6PPdSMAnKV8uEhKKC2a3zDPFnHgdimPv4zyq6DEFeqV57+BXs5BIYus0QkNAA3
-         iDWA==
-X-Forwarded-Encrypted: i=1; AJvYcCW8bjc60xZaY9J8RliB1AUjn4XLrbuCJjaAbOB8IabIJolL+YUzAWnsiNxSr/D1rTDl7qk=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyE3xYh0QYAg4qSI7QmvFZWNnkBlZfD3qdsK6HErhhJQme3S0bH
-	vx9HkBgScqWwctqSuqeDjgzfYZcI2Cs/3ddsQxSlnZ/OdhHSmDYJum0ZJwnFujgSeY8=
-X-Gm-Gg: ASbGncvamRHdF/6gzmefishK/GnQdDiAOmhlyP+wCgPsODLLHiKCsehm7NeQhnpVeLv
-	RpMpeOq/ozk7YMSjcdfH6ffRIrZ4ceMLfhZ+3RkgOfO83u5J0LDuLYcbfM0or4sBorzsE7W1qRc
-	XxUVTxSaFnJI6gcf7kZl32/3mR7UZDEQ9yKU1/M8Dgbsypncoehx9kMgpC5Yr0vEGfQLGGuDMev
-	LB86E46NOsSnzyP6c20kLJUlrIoH2q8hs9pWNRt4eJh92Au2ITH8KFCQsC8fl7QsvtQEcENwWOP
-	ZLV+CpwE1nSy+4ztT2ZPIDrbDo7RCQ38VfT94TSF7Wbys9HcKp0R8xrOk5Hvj3t6s5fa/h8eAJp
-	DXMp4hHihYpJTjILaTIJirb4CvQgGlKSFcOqI6wVEbxGXG62jgCWvafdl6m/67fMo/w==
-X-Google-Smtp-Source: AGHT+IG1SDxYeJTEFH/Uf3DiNgiTUn5lT8oKqC2DBWuRYMa6RC1Uot1Uv82h4RbRq0osnGIylno0WQ==
-X-Received: by 2002:a5d:5849:0:b0:3cb:3ca5:8717 with SMTP id ffacd0b85a97d-3d1de4b5ae8mr9336141f8f.23.1756808227560;
-        Tue, 02 Sep 2025 03:17:07 -0700 (PDT)
-Received: from [192.168.69.207] (88-187-86-199.subs.proxad.net. [88.187.86.199])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3d15f7b012csm15900909f8f.63.2025.09.02.03.17.06
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 02 Sep 2025 03:17:06 -0700 (PDT)
-Message-ID: <bcfea710-57d7-4588-a96c-a8f27bb4ddfc@linaro.org>
-Date: Tue, 2 Sep 2025 12:17:05 +0200
+	s=arc-20240116; t=1756811217; c=relaxed/simple;
+	bh=hCa1C3d5MBR18h+mVpk4RAM474rjo1/g4TQSzEy0Gzo=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Extkj077px/uWP8AStzNqcoYDBdI4QigYu/2389Wp9czN2sOFY7gBxnV8gXCjD/1Zy7iqTcp1u02J/zbETj0bbRgLrQlS8Sbw2m/93EPtR4DYngxC9KrVDurGh8VyYDwDDC7NYHXEbub+wvOkidabjEOKzyqJAJGlTs5MllBlCM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=luXQtemq; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7D67BC4CEED;
+	Tue,  2 Sep 2025 11:06:56 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1756811217;
+	bh=hCa1C3d5MBR18h+mVpk4RAM474rjo1/g4TQSzEy0Gzo=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=luXQtemqwauDCW1OGofW7KOn0Ed3TXz+7wSyh4Rq/4C4pBNfrCav73O7nhlQqKsu9
+	 pJwS6fgD10XM5MWzc2V32cauwX2xcs5uKtg2Bn+xWgyC8SmOfVZ8jKdythn+ZO4vAa
+	 0h7EOGiI+UMeKypfX8GCyk9wrCAP4tCX2z8kMskVDMEaLSOSdX6db0uWHaJchKjybu
+	 MaLbWwVqK1itWBWz4FOiOlTEHChtIjiBEjBS0WHuFG4wArCchdxmDkRdChfk7RgGoF
+	 PbQcn5XJw0e6Ezn8C5XZTAc61l/+qt/LvKdGUrn6ovVC7JKrzqR3GHSc85H+bG5dhG
+	 nrqyYFGPfwuJg==
+Date: Tue, 2 Sep 2025 14:06:51 +0300
+From: Leon Romanovsky <leon@kernel.org>
+To: Alex Williamson <alex.williamson@redhat.com>
+Cc: Jason Gunthorpe <jgg@nvidia.com>,
+	Andrew Morton <akpm@linux-foundation.org>,
+	Bjorn Helgaas <bhelgaas@google.com>,
+	Christian =?iso-8859-1?Q?K=F6nig?= <christian.koenig@amd.com>,
+	Christoph Hellwig <hch@lst.de>, dri-devel@lists.freedesktop.org,
+	iommu@lists.linux.dev, Jens Axboe <axboe@kernel.dk>,
+	Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
+	linaro-mm-sig@lists.linaro.org, linux-block@vger.kernel.org,
+	linux-kernel@vger.kernel.org, linux-media@vger.kernel.org,
+	linux-mm@kvack.org, linux-pci@vger.kernel.org,
+	Logan Gunthorpe <logang@deltatee.com>,
+	Marek Szyprowski <m.szyprowski@samsung.com>,
+	Robin Murphy <robin.murphy@arm.com>,
+	Sumit Semwal <sumit.semwal@linaro.org>,
+	Vivek Kasireddy <vivek.kasireddy@intel.com>,
+	Will Deacon <will@kernel.org>
+Subject: Re: [PATCH v1 01/10] PCI/P2PDMA: Remove redundant bus_offset from
+ map state
+Message-ID: <20250902110651.GF10073@unreal>
+References: <cover.1754311439.git.leon@kernel.org>
+ <c9b6237964b9606418af400bb6bec5178fcffff2.1754311439.git.leon@kernel.org>
+ <20250806145825.2654ee59.alex.williamson@redhat.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2 0/3] system: Forbid alloca()
-To: qemu-devel@nongnu.org
-Cc: Paolo Bonzini <pbonzini@redhat.com>, qemu-ppc@nongnu.org,
- Peter Maydell <peter.maydell@linaro.org>,
- Harsh Prateek Bora <harshpb@linux.ibm.com>,
- Stefan Hajnoczi <stefanha@redhat.com>, Nicholas Piggin <npiggin@gmail.com>,
- Chinmay Rath <rathc@linux.ibm.com>, kvm@vger.kernel.org,
- Glenn Miles <milesg@linux.ibm.com>, Thomas Huth <thuth@redhat.com>,
- =?UTF-8?Q?Alex_Benn=C3=A9e?= <alex.bennee@linaro.org>,
- =?UTF-8?Q?Daniel_P=2E_Berrang=C3=A9?= <berrange@redhat.com>
-References: <20250901132626.28639-1-philmd@linaro.org>
-Content-Language: en-US
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=C3=A9?= <philmd@linaro.org>
-In-Reply-To: <20250901132626.28639-1-philmd@linaro.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
+In-Reply-To: <20250806145825.2654ee59.alex.williamson@redhat.com>
 
-On 1/9/25 15:26, Philippe Mathieu-Daudé wrote:
+On Wed, Aug 06, 2025 at 02:58:25PM -0600, Alex Williamson wrote:
+> On Mon,  4 Aug 2025 16:00:36 +0300
+> Leon Romanovsky <leon@kernel.org> wrote:
+> 
+> > From: Leon Romanovsky <leonro@nvidia.com>
+> > 
+> > Remove the bus_off field from pci_p2pdma_map_state since it duplicates
+> > information already available in the pgmap structure. The bus_offset
+> > is only used in one location (pci_p2pdma_bus_addr_map) and is always
+> > identical to pgmap->bus_offset.
+> > 
+> > Reviewed-by: Christoph Hellwig <hch@lst.de>
+> > Signed-off-by: Jason Gunthorpe <jgg@nvidia.com>
+> > Signed-off-by: Leon Romanovsky <leonro@nvidia.com>
+> > ---
+> >  drivers/pci/p2pdma.c       | 1 -
+> >  include/linux/pci-p2pdma.h | 3 +--
+> >  2 files changed, 1 insertion(+), 3 deletions(-)
+> > 
+> > diff --git a/drivers/pci/p2pdma.c b/drivers/pci/p2pdma.c
+> > index da5657a020074..274bb7bcc0bc5 100644
+> > --- a/drivers/pci/p2pdma.c
+> > +++ b/drivers/pci/p2pdma.c
+> > @@ -1009,7 +1009,6 @@ void __pci_p2pdma_update_state(struct pci_p2pdma_map_state *state,
+> >  {
+> >  	state->pgmap = page_pgmap(page);
+> >  	state->map = pci_p2pdma_map_type(state->pgmap, dev);
+> > -	state->bus_off = to_p2p_pgmap(state->pgmap)->bus_offset;
+> >  }
+> >  
+> >  /**
+> > diff --git a/include/linux/pci-p2pdma.h b/include/linux/pci-p2pdma.h
+> > index 075c20b161d98..b502fc8b49bf9 100644
+> > --- a/include/linux/pci-p2pdma.h
+> > +++ b/include/linux/pci-p2pdma.h
+> > @@ -146,7 +146,6 @@ enum pci_p2pdma_map_type {
+> >  struct pci_p2pdma_map_state {
+> >  	struct dev_pagemap *pgmap;
+> >  	enum pci_p2pdma_map_type map;
+> > -	u64 bus_off;
+> >  };
+> >  
+> >  /* helper for pci_p2pdma_state(), do not use directly */
+> > @@ -186,7 +185,7 @@ static inline dma_addr_t
+> >  pci_p2pdma_bus_addr_map(struct pci_p2pdma_map_state *state, phys_addr_t paddr)
+> >  {
+> >  	WARN_ON_ONCE(state->map != PCI_P2PDMA_MAP_BUS_ADDR);
+> > -	return paddr + state->bus_off;
+> > +	return paddr + to_p2p_pgmap(state->pgmap)->bus_offsetf;
+> >  }
+> >  
+> >  #endif /* _LINUX_PCI_P2P_H */
 
-> Philippe Mathieu-Daudé (3):
->    target/ppc/kvm: Avoid using alloca()
+Sorry for long time to reply, I waited to see what is going on with DMA
+phys_vec basic series and together with my summer vacation, it took a
+while.
 
->    docs/devel/style: Mention alloca() family API is forbidden
+> 
+> Looks like you're relying on this bogus code getting resolved in the
+> next patch...
+> 
+> In file included from kernel/dma/direct.c:16:
+> ./include/linux/pci-p2pdma.h: In function ‘pci_p2pdma_bus_addr_map’:
+> ./include/linux/pci-p2pdma.h:188:24: error: implicit declaration of function ‘to_p2p_pgmap’ [-Wimplicit-function-declaration]
+>   188 |         return paddr + to_p2p_pgmap(state->pgmap)->bus_offsetf;
+>       |                        ^~~~~~~~~~~~
+> ./include/linux/pci-p2pdma.h:188:50: error: invalid type argument of ‘->’ (have ‘int’)
+>   188 |         return paddr + to_p2p_pgmap(state->pgmap)->bus_offsetf;
+>       |                                                  ^~
+> ./include/linux/pci-p2pdma.h:189:1: error: control reaches end of non-void function [-Werror=return-type]
+>   189 | }
+>       | ^
+> 
+> to_p2p_pgmap() is a static function and struct pci_p2pdma_pagemap
+> doesn't have a bus_offsetf member.  Thanks,
 
-Patches 1 & 3 queued, thanks.
+You are right, probably the best way to fix the error is simply squash
+this change into the next patch.
+
+Thanks
+
+
+
+> 
+> Alex
+> 
 
