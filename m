@@ -1,136 +1,131 @@
-Return-Path: <kvm+bounces-56620-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-56621-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id E15FDB40C25
-	for <lists+kvm@lfdr.de>; Tue,  2 Sep 2025 19:33:31 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id A4EAEB40C30
+	for <lists+kvm@lfdr.de>; Tue,  2 Sep 2025 19:37:40 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9CACF5E3DF9
-	for <lists+kvm@lfdr.de>; Tue,  2 Sep 2025 17:33:30 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 479211B65E24
+	for <lists+kvm@lfdr.de>; Tue,  2 Sep 2025 17:38:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5E9923469E0;
-	Tue,  2 Sep 2025 17:33:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9F0AD345737;
+	Tue,  2 Sep 2025 17:37:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="01HN6vCd"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="qRYtg7lZ"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pl1-f202.google.com (mail-pl1-f202.google.com [209.85.214.202])
+Received: from mail-pj1-f74.google.com (mail-pj1-f74.google.com [209.85.216.74])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1F398345721
-	for <kvm@vger.kernel.org>; Tue,  2 Sep 2025 17:33:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 70AC52D5C91
+	for <kvm@vger.kernel.org>; Tue,  2 Sep 2025 17:37:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.74
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756834394; cv=none; b=ZyQtTaW5Kqgh/OqLSJ7brNW/gI8DGi3yWVFU14eDPbbQMSNhJTFYA3EdhEA7n0u7S0vi3SzfXYgp9bHXnLmVhqX0J8z5Cfsw1QJmlBDaOcwUaYprb+y39xs6YZkulv8F0C7SY+neb1XLT7qmuKH+00LiDYT9nBftXBOyzA9tv9M=
+	t=1756834650; cv=none; b=G+CeT9L7VFmdmAyrxORm59FvgUJERGQd3RGlWp8rjpCz8ZJ2w8tCVs8v42y8Ex0jHYYzqrCxMCHymvAVBwEPOz8Z2RUqm1BmN8bjwWWk1QG8kJKlxnRUZLRxD7iDcR6pl1X1slehNTVkPLke3ugrkpNH+oKgAbFsNmNxBudcD1I=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756834394; c=relaxed/simple;
-	bh=zaN0nJKLPtyNMOdWW+MLmd9/wTkW0i0TyuL2AZDeT50=;
+	s=arc-20240116; t=1756834650; c=relaxed/simple;
+	bh=UonqYJLVNakVOY6o6lPFaWpzfXcM97G+FXJjHUjRXms=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=BHMoRApNT/66ek3M/FIO1c1cAi8Vs+Zj+q4kdaTbjtCndyTG9ofc4luBEZiPgb8qHnKN1h+/cTZ263Au/ucaGV3PVNP5lWAxOqmGqrBOTI8I9vyMuZpAKywyAkTdYM3KDqaqxf4YISYdml7AYLQRPGqXOdGz9bMi/I8PEebjMVQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=01HN6vCd; arc=none smtp.client-ip=209.85.214.202
+	 To:Cc:Content-Type; b=VbAAqNTcM9ZlipIOZBLBSOXN2LulBmuu8kRVeacAnTtFq3Jgk3/MUO5/y/1RupEmLeDmh/EpFk6+aI3m7jkLw9ELVhPLd9tWWNyfVWs5Motr0rl2Gz8N8a878UJ0IqiUb5jx9wIz4N8jDAgoNPALaQn7U+6cDYQa/8EvfJVoHyM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=qRYtg7lZ; arc=none smtp.client-ip=209.85.216.74
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pl1-f202.google.com with SMTP id d9443c01a7336-248d9301475so77323935ad.0
-        for <kvm@vger.kernel.org>; Tue, 02 Sep 2025 10:33:12 -0700 (PDT)
+Received: by mail-pj1-f74.google.com with SMTP id 98e67ed59e1d1-32b51b26802so288361a91.2
+        for <kvm@vger.kernel.org>; Tue, 02 Sep 2025 10:37:29 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1756834392; x=1757439192; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1756834649; x=1757439449; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=UBr0XXEc+3/ZwTSrGV21TfsCPRB8kmlFqQlQTsqg//g=;
-        b=01HN6vCdEWBckhALAsnX/QQ8S0Eh9Sg2BaCtjiaXxmYemDy7ftVQ9RfwviF4EP+FpR
-         6mFpMLUsaE1FGW/mVEO6k5418ZRLN+SwFMLnva8ntLdw1LnAUCGREyA3n6PPp5o2gmsq
-         M49ktdN3kJfajml6UMzvleoV3068oGpkip4/QencOz3U4NSOeHh/clE1UFE7uI/gmQWV
-         4UBgjjvRvHW4IZb9DHDKntGqaEk/OuOfZEnh3wGpkWxOfqihfOk4ac2mXSIpOHFv7nEY
-         dF1VYx7cBd+PRPnU5h2yN9L+2WAYfVpsk6A6pFREVb9RBk2s2ibIyqu/Qt2ZeqXmREXa
-         qmkw==
+        bh=z5SO6Rfnd2zRTNKmu49rD4GYcuQHp/i9kQ66dZ48xrs=;
+        b=qRYtg7lZpLGvANpctxiC0zLcVffLh+yU3D22JZpWgs283i6fygWBj2Y3XCYEB4v0v9
+         WHa7FvUDvnRqgKERZg8vAWMSLIXXAxysYjFcWcyfspCaWDdU+B6PWYY7ON8gAt7RnZ76
+         ugInlPtBsxI/9hdGBlazMYyKUXeTvjdFPQQiFo4n5H0DuvN3ibCJbB0/qNhmb/ZxWzai
+         tYVm5GtPuEe7adZb9D5SoQ/53lory0g5ETeqSVVO+qHcirgqGhXjPKrTjbKmg9HVQ92b
+         WmSeZce+osUpUvnFdfTKz8QxFr5PggA1yvo3S9tm5pnrKaPOpvZ+XwEJMk537/SSfl5P
+         KnqQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1756834392; x=1757439192;
+        d=1e100.net; s=20230601; t=1756834649; x=1757439449;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=UBr0XXEc+3/ZwTSrGV21TfsCPRB8kmlFqQlQTsqg//g=;
-        b=hh88gsmESUoW54gnY2Kz13AMuGVEHOYfqHsdlkh87JvkzCWehrPDul8PbtT+GUVobZ
-         KyiBhcX9NbqbNIWQXic2zKpHqj5wH9vaVTT7vcAMw55Xqswr520Tw5W0efuWtTEhT3Bp
-         cHibYKiycVYxddO38hTd8rrbYxCCd5Y/ZprS4kA+LzRpQhHpXtrQTu0yw3obSBwXfqJL
-         D/JHob4H92IkK22hAIVqL77TWX/8fEH3MCi2wAzfGFSZ5X3ddMAggiLVuKK/tpKfYPoY
-         LNP826JQ9HSkAXrNPJVt2t1Iu6CFMgJpSuDkc8wwPwJ3pTZAhJA97EIdgSamcZq3P9gl
-         JxpA==
-X-Forwarded-Encrypted: i=1; AJvYcCUHLc1PUZcMgOjWJLOMfpRJBCN8JnEhJ/jfIJAdlvlqwFPP4QAwwwIrXNy7YaGeJ1infC0=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwWrTR6k6ES9utjyTqXaDVoiIlUObF4FpAfnZmj+rJKctjxuoUo
-	cI1iQGIrqovunj648IF3G5refiXIL5UKb9eMTfImk2zVzlppl8XajU5zcpPhsNUAKqNpjrpdDKC
-	vQmhhEg==
-X-Google-Smtp-Source: AGHT+IHwmuitXxZ6YedCVurRjYCh4gXAu/7FhsnP6E8xId3vuL0zXJB3cs1IaJN+nRHn2/CNa8FpuWXxdS8=
-X-Received: from pjer22.prod.google.com ([2002:a17:90a:ad6:b0:329:815c:ea84])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:903:2cf:b0:248:9e56:e806
- with SMTP id d9443c01a7336-24944870a36mr187562355ad.12.1756834392295; Tue, 02
- Sep 2025 10:33:12 -0700 (PDT)
-Date: Tue, 2 Sep 2025 10:33:10 -0700
-In-Reply-To: <aLT2FwlMySKVYP1i@yzhao56-desk.sh.intel.com>
+        bh=z5SO6Rfnd2zRTNKmu49rD4GYcuQHp/i9kQ66dZ48xrs=;
+        b=BFzSp8Y+uUbqBWpSfytE6c1CI+4iIyjTUCf/oLF/7+AII6acMtx2aZ6v0IYcaINnXB
+         pFGq1nHsw4E8twrjozGtFjeV61ssiYDNGD9BXOVr9Mel6PDHte5CqIzXHIXUx+0Qje1t
+         yUm4kRYb4mtoZ0gcO3uDzyC6QINri+v8A+ltSk3fts9fvmKuVMTohQbZHMIqUTSrf/Ai
+         AsoqprpXEOt0S/Rqt4mPCSahoA8ebD+qPwObD+qxcOa8yuXdruPGoq483vMJfVyGiCew
+         gO7BmBV/YwQxNBapLtUIPh1KzQnj/LjdFut0pxPKo87bz/oHyhJKJUSsWx1l/De2WFar
+         VVIw==
+X-Forwarded-Encrypted: i=1; AJvYcCWDM1Qn/2iTOX84yamMjNldqgYXKYZDO5w5+7259PGPWMGULkLlPo2FT/3RNSoDHKbB4aI=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxDzwry8dAkOPWe0b09WaF0h2K77oVA7ukCxwKBJ8duQy+l6oue
+	uhLi9S8tizvHeUV78hBREyfQynEhcmHyP9xuU6cvYOaeajx4NVt5ulcBbvA2zzYdU2JoRuiWvD/
+	BY/mFkA==
+X-Google-Smtp-Source: AGHT+IEiqfPJUyct4fFBcu0bR/Eu7HWia2o0j4MX/eBkmoNoywellJvAZIebualblVHJhISyhTr8W0gnrwM=
+X-Received: from pjbsy12.prod.google.com ([2002:a17:90b:2d0c:b0:327:a21a:7e8d])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:1d45:b0:325:42f8:d73f
+ with SMTP id 98e67ed59e1d1-328156bb311mr19310229a91.17.1756834647846; Tue, 02
+ Sep 2025 10:37:27 -0700 (PDT)
+Date: Tue, 2 Sep 2025 10:37:26 -0700
+In-Reply-To: <87fe45aae8d0812bd3aec956e407c3cc88234b34.camel@intel.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
-References: <20250829000618.351013-1-seanjc@google.com> <20250829000618.351013-6-seanjc@google.com>
- <49c337d247940e8bd3920e5723c2fa710cd0dd83.camel@intel.com> <aLT2FwlMySKVYP1i@yzhao56-desk.sh.intel.com>
-Message-ID: <aLcqVtqxrKtzziK-@google.com>
-Subject: Re: [RFC PATCH v2 05/18] KVM: TDX: Drop superfluous page pinning in
- S-EPT management
+References: <20250807093950.4395-1-yan.y.zhao@intel.com> <20250807094149.4467-1-yan.y.zhao@intel.com>
+ <281ae89b-9fc3-4a9b-87f6-26d2a96cde49@linux.intel.com> <aLVih+zi8gW5zrJY@yzhao56-desk.sh.intel.com>
+ <87fe45aae8d0812bd3aec956e407c3cc88234b34.camel@intel.com>
+Message-ID: <aLcrVp6_9gNrp1Bn@google.com>
+Subject: Re: [RFC PATCH v2 02/23] x86/virt/tdx: Add SEAMCALL wrapper tdh_mem_page_demote()
 From: Sean Christopherson <seanjc@google.com>
-To: Yan Zhao <yan.y.zhao@intel.com>
-Cc: Rick P Edgecombe <rick.p.edgecombe@intel.com>, "pbonzini@redhat.com" <pbonzini@redhat.com>, 
-	Kai Huang <kai.huang@intel.com>, "ackerleytng@google.com" <ackerleytng@google.com>, 
-	Vishal Annapurve <vannapurve@google.com>, 
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, Ira Weiny <ira.weiny@intel.com>, 
-	"kvm@vger.kernel.org" <kvm@vger.kernel.org>, "michael.roth@amd.com" <michael.roth@amd.com>
+To: Rick P Edgecombe <rick.p.edgecombe@intel.com>
+Cc: Yan Y Zhao <yan.y.zhao@intel.com>, 
+	"binbin.wu@linux.intel.com" <binbin.wu@linux.intel.com>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>, 
+	"quic_eberman@quicinc.com" <quic_eberman@quicinc.com>, Xiaoyao Li <xiaoyao.li@intel.com>, 
+	Fan Du <fan.du@intel.com>, Dave Hansen <dave.hansen@intel.com>, 
+	"david@redhat.com" <david@redhat.com>, "thomas.lendacky@amd.com" <thomas.lendacky@amd.com>, 
+	"tabba@google.com" <tabba@google.com>, "vbabka@suse.cz" <vbabka@suse.cz>, 
+	"michael.roth@amd.com" <michael.roth@amd.com>, Ira Weiny <ira.weiny@intel.com>, 
+	"kas@kernel.org" <kas@kernel.org>, "pbonzini@redhat.com" <pbonzini@redhat.com>, 
+	"ackerleytng@google.com" <ackerleytng@google.com>, 
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, Isaku Yamahata <isaku.yamahata@intel.com>, 
+	Chao P Peng <chao.p.peng@intel.com>, "zhiquan1.li@intel.com" <zhiquan1.li@intel.com>, 
+	Vishal Annapurve <vannapurve@google.com>, Jun Miao <jun.miao@intel.com>, 
+	"x86@kernel.org" <x86@kernel.org>, "pgonda@google.com" <pgonda@google.com>
 Content-Type: text/plain; charset="us-ascii"
 
-On Mon, Sep 01, 2025, Yan Zhao wrote:
-> On Sat, Aug 30, 2025 at 03:53:24AM +0800, Edgecombe, Rick P wrote:
-> > On Thu, 2025-08-28 at 17:06 -0700, Sean Christopherson wrote:
-> > > From: Yan Zhao <yan.y.zhao@intel.com>
-> > > When S-EPT zapping errors occur, KVM_BUG_ON() is invoked to kick off all
-> > > vCPUs and mark the VM as dead. Although there is a potential window that a
-> > > private page mapped in the S-EPT could be reallocated and used outside the
-> > > VM, the loud warning from KVM_BUG_ON() should provide sufficient debug
-> > > information.
-> ... 
-> > Yan, can you clarify what you mean by "there could be a small window"? I'm
-> > thinking this is a hypothetical window around vm_dead races? Or more concrete? I
-> > *don't* want to re-open the debate on whether to go with this approach, but I
-> > think this is a good teaching edge case to settle on how we want to treat
-> > similar issues. So I just want to make sure we have the justification right.
-> I think this window isn't hypothetical.
+On Tue, Sep 02, 2025, Rick P Edgecombe wrote:
+> On Mon, 2025-09-01 at 17:08 +0800, Yan Zhao wrote:
+> > > The cover letter mentions that there is a new TDX module in planning, which
+> > > disables the interrupt checking. I guess TDX module would need to have a
+> > > interface to report the change, KVM then decides to enable huge page support
+> > > or not for TDs?
+> > Yes. But I guess detecting TDX module version or if it supports certain
+> > feature is a generic problem. e.g., certain versions of TDX module have bugs
+> > in zero-step mitigation and may block vCPU entering.
+> > 
 > 
-> 1. SEAMCALL failure in tdx_sept_remove_private_spte().
+> We had talked in the past of not checking versions because it would require KVM
+> to keep logic of which features in which TDX module.
 
-But tdx_sept_remove_private_spte() failing is already a hypothetical scenario.
+Checking for features is different from refusing to load broken modules.  I don't
+want KVM to rely on version numbers to query features, because that relies on
+"newer" module versions always being a superset relative to "older" versions.
 
->    KVM_BUG_ON() sets vm_dead and kicks off all vCPUs.
-> 2. guest_memfd invalidation completes. memory is freed.
-> 3. VM gets killed.
+> If there is a flag we could check it, but we did not ask for one here. We
+> already have a situation where there are bug fixes that KVM depends on, with no
+> way to check.
 > 
-> After 2, the page is still mapped in the S-EPT, but it could potentially be
-> reallocated and used outside the VM.
+> I guess the difference here is that if the behavior is missing, KVM has an
+> option to continue with just small pages. But at the same time, huge pages is
+> very likely to succeed in either case. The "feature" is closer to closing a
+> theoretical race. So very much like the many bugs we don't check for. I'm
+> leaning towards lumping it into that category. And we can add "how do we want to
+> check for TDX module bugs" to the arch todo list. But it's probably down the
+> list, if we even want to do anything.
 > 
-> >From the TDX module and hardware's perspective, the mapping in the S-EPT for
-> this page remains valid. So, I'm uncertain if the TDX module might do something
-> creative to access the guest page after 2.
-> 
-> Besides, a cache flush after 2 can essentially cause a memory write to the page.
-> Though we could invoke tdh_phymem_page_wbinvd_hkid() after the KVM_BUG_ON(), the
-> SEAMCALL itself can fail.
+> What do you think?
 
-I think this falls into the category of "don't screw up" flows.  Failure to remove
-a private SPTE is a near-catastrophic error.  Going out of our way to reduce the
-impact of such errors increases complexity without providing much in the way of
-value.
-
-E.g. if VMCLEAR fails, KVM WARNs but continues on and hopes for the best, even
-though there's a decent chance failure to purge the VMCS cache entry could be
-lead to UAF-like problems.  To me, this is largely the same.
-
-If anything, we should try to prevent #2, e.g. by marking the entire guest_memfd
-as broken or something, and then deliberately leaking _all_ pages.
+Could we taint the kernel and print a scary message if a known-buggy TDX module
+is loaded?
 
