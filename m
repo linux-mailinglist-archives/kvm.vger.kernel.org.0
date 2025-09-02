@@ -1,153 +1,191 @@
-Return-Path: <kvm+bounces-56596-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-56597-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 602CDB401E1
-	for <lists+kvm@lfdr.de>; Tue,  2 Sep 2025 15:04:47 +0200 (CEST)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
+	by mail.lfdr.de (Postfix) with ESMTPS id 42147B4032E
+	for <lists+kvm@lfdr.de>; Tue,  2 Sep 2025 15:29:47 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 06DB917A750
-	for <lists+kvm@lfdr.de>; Tue,  2 Sep 2025 13:00:33 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 2939B4E2461
+	for <lists+kvm@lfdr.de>; Tue,  2 Sep 2025 13:29:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 18BB5301030;
-	Tue,  2 Sep 2025 12:58:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B915A31CA78;
+	Tue,  2 Sep 2025 13:25:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Y03rLipQ"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="TZ3y6HcD"
 X-Original-To: kvm@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f52.google.com (mail-wm1-f52.google.com [209.85.128.52])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1D88828489B;
-	Tue,  2 Sep 2025 12:58:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 01B6730C340
+	for <kvm@vger.kernel.org>; Tue,  2 Sep 2025 13:25:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.52
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756817910; cv=none; b=qzloxYGUmMiiHaYeaJWNsu3ig1Ec05oigsIzgADFeb+jBUBKhQD/Zgf6mBhvXjmSpbHQeXp/h9VGru29rS+LbIHdurnftT1c3ihzcJuxOVASvvFckN53SFOzcmF7DyafjdP0Yb+nCNsxgLIMdX4UH9iPybw4M3aQeMHT16+Xgsk=
+	t=1756819507; cv=none; b=TCWfhyL75f9lw7ePsBXifo8OqKa2sdod40p+C1EEKPJ6okflvc4+YCqSyiGzuAyR/E1RyEv+yatSV464EBPgR/9Q8Pt9Q/genaichJcuIAB1mmz/7Bx1ZgV2RBR+llZjDrF6bt/+HNT0lCpChES0BwUqmqFTf1fUYiEq2FfuBtk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756817910; c=relaxed/simple;
-	bh=CM1gzdTND9tJKwW5aJTGTYza7PZbOeFeI+0kiHDsfk0=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=mcxhFpLkqdxbffnSe2+k6Rp/RjCmb7g6RBpsBnlaZPlQUvoNuHoeK7CdIxosVt6a1j+LF6mV/UWTJ6s4dQnfihXzBQmZwIPcWrST1Txq2wWSk9JR8gU8ZXtzMuY5NENTFxgyvSpyfER4Ieb3HPjKhQTY3wsBZjkMCOZ0xruwyJg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Y03rLipQ; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 08555C4CEED;
-	Tue,  2 Sep 2025 12:58:28 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1756817909;
-	bh=CM1gzdTND9tJKwW5aJTGTYza7PZbOeFeI+0kiHDsfk0=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=Y03rLipQ172HNCWdzae1SvWeUKEZCuyy4iT/sxqmRUG2Mk9XAm0JD2Cf43Q4ccXI4
-	 vJ3zCW+7bhV2I/8W3AQ/zj+cPA9rZhBtVccOf2Syvu2xP3GZZOcRUzTwD1l9Dszm61
-	 coTmrjtssASLghJ0YobZBbn3b5yvo1gmHUuMYKl3N+eOUDvW9dLkEd42uz6ExoscbL
-	 AN9nGwSWGJAg2aXnrk/T8mIOnh8SJFTLZoRnFwoAw9p/ZVbj1um54ETkG1UmVJ0yaX
-	 k1mi0ufFXvprbr0GmTrnZJZPMNtSonfXc/UWWvtDhkzWmzN/ZJ+J57M3aRwqpyvkrT
-	 ePb8jIU/SceyA==
-Date: Tue, 2 Sep 2025 15:58:24 +0300
-From: Leon Romanovsky <leon@kernel.org>
-To: Alex Williamson <alex.williamson@redhat.com>
-Cc: Jason Gunthorpe <jgg@nvidia.com>,
-	Andrew Morton <akpm@linux-foundation.org>,
-	Bjorn Helgaas <bhelgaas@google.com>,
-	Christian =?iso-8859-1?Q?K=F6nig?= <christian.koenig@amd.com>,
-	Christoph Hellwig <hch@lst.de>, dri-devel@lists.freedesktop.org,
-	iommu@lists.linux.dev, Jens Axboe <axboe@kernel.dk>,
-	Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
-	linaro-mm-sig@lists.linaro.org, linux-block@vger.kernel.org,
-	linux-kernel@vger.kernel.org, linux-media@vger.kernel.org,
-	linux-mm@kvack.org, linux-pci@vger.kernel.org,
-	Logan Gunthorpe <logang@deltatee.com>,
-	Marek Szyprowski <m.szyprowski@samsung.com>,
-	Robin Murphy <robin.murphy@arm.com>,
-	Sumit Semwal <sumit.semwal@linaro.org>,
-	Vivek Kasireddy <vivek.kasireddy@intel.com>,
-	Will Deacon <will@kernel.org>
-Subject: Re: [PATCH v1 08/10] vfio/pci: Enable peer-to-peer DMA transactions
- by default
-Message-ID: <20250902125824.GH10073@unreal>
-References: <cover.1754311439.git.leon@kernel.org>
- <edb2ec654fc27ba8f73695382ab0a029f18422b5.1754311439.git.leon@kernel.org>
- <20250806160201.2b72e7a0.alex.williamson@redhat.com>
+	s=arc-20240116; t=1756819507; c=relaxed/simple;
+	bh=XMFyFDijcDr/fe1dGSY8r8uFNeV6APyHh4DIt71qW9E=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=SZ6KGH1Sp2gROhPAdCHiImHIqtAUTRa3Bm14g6tNHTglLOrHmvrAPgcG5KPvy9IkkYD3IC3JVi2t0+NvZhsZguAydI0sftfCQpI1sJb5yEACkoqq6J0FuajgFkqNaol42tGLycQMKoUhAm1VmMLofIFKXG7vBCNTGbiWBSuni4o=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=TZ3y6HcD; arc=none smtp.client-ip=209.85.128.52
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
+Received: by mail-wm1-f52.google.com with SMTP id 5b1f17b1804b1-45b9814efbcso5581625e9.0
+        for <kvm@vger.kernel.org>; Tue, 02 Sep 2025 06:25:05 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google; t=1756819504; x=1757424304; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=rz/p6M0rklQHwfyQ6YvhjhFju5Y1e2Dz66wkkh69jUI=;
+        b=TZ3y6HcDLBQDTjLDcRTrkkJadG5sQC4i4C9zFp/d9MFZAl1e/28EES2/LLUtmzfC0P
+         eG5XMSc/Flcbifv8vhhhZQlOzi60ENtUhlr3Ir5hnWmB4kQvzJxz6vG8y//RRcHlB/CO
+         sei/Ind996YEo2NqbIG1Mi+qLDPErjZP3hEuXQ3GmR7hJnScgtvPlnET0lQfYBjwSOY6
+         FC5OCvyAev4Gan22/28mE15mmCT1hEsl5oGZgseAeI7mJuNdUogLr+RXsxaUC5qanHbS
+         5Cxmc+hV3oDe0m8UF9RFWiZrPfcmHV3wETMzMDaHbOrvuYNlxtqCHE6GD3WurFOYpUZG
+         A+qA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1756819504; x=1757424304;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=rz/p6M0rklQHwfyQ6YvhjhFju5Y1e2Dz66wkkh69jUI=;
+        b=u94PuLLJZCoxrpaDBfEnhefLb9cgaXBGC53/CxtmQ7Ba3/uV+JUB2byjpJZGDnAR8d
+         FsGjjEEXsVHXyN5LnzsfoIaFBJXa/+/JT8kLqjwRFMQPUuIVxxri1qquyFa90OHKqyne
+         ViHx0IZPDGP/Tu7Yq0yCR7kjHfHVtHfUYM5qQJFrI30qhC4OvfMtgfSaKdRnnGmWjEwE
+         ezVNCLX007gp9hO4oi6PUZkxw04upMXZzKy5eLSDiOsSLW7KdAQZ4AH4ZG0g+PHYAEJB
+         G8sD5o1zU1/qdXtAV8Vmx75SDIlPWzx3N30b54n/+5okH8e3Q2GV7TgH1nXVMuezyREq
+         YhZw==
+X-Forwarded-Encrypted: i=1; AJvYcCWqKz1+mJbab6jPb49BQDXIvGFfAxsjXdZ+Dkh52nK+gObqDGEEGsgjVZoJsCrOlyb/zE0=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yz8f1/d18gq9Qd6dehQDmxTZGsynwJ+MSgmUWhtOtT6PfzlUOjf
+	EZ9GImO4RAr3eBco8aETGGBptlbBxNy/HcgJquEunz4uf+ZzuJ15O6ROnko0EoDfVnA=
+X-Gm-Gg: ASbGncu6dN7PRUHNRt6Im1bfkYIeVEtThcnpBWLkjw6rT/Qu25zpe+UU1msMYUvadcu
+	sPou38IONzjkVnd2SAU6WfheW6TEgaP3OQ/0gwb1XyHoxiPLH56lWfMVXyDg+Th0+gUQ7x6J9dy
+	UF/H1ddrkzQJB/Y2bGYss6pAY11TJbfkysc8pCnIcFRpJXK6GjkzBvFqaidmucj/G/hYc7pzykm
+	lhYPEYO07eF9MyjRo4jAOLqSUPajhLJWXtLEVZtyEq/ubXQ4eo/qc4YhQyjCEKl6hOefteMKa2y
+	fo4+GS7eXv/lGRhOh9d5GGkKsbSCR4zJv8f68SRMxrNuwnTxzLeaYn9y+QNGdjs1fk1/NCPGiV8
+	s8mWImGAN9k+2vZiT8I3B8CCz5821BVM+exjhnjilfzqTjEFCAvUNEBxt6qUXLp7tBOv1YP/X+B
+	gQ
+X-Google-Smtp-Source: AGHT+IEYmruxNHSN7LVlQ+61cQOiuO9GUpOJdI4vg0itRWRn52yE5aUCbQ+D5IlmMUWkcOPQ5loTdw==
+X-Received: by 2002:a5d:5712:0:b0:3dc:db:89f3 with SMTP id ffacd0b85a97d-3dc00db8a77mr46469f8f.16.1756819504134;
+        Tue, 02 Sep 2025 06:25:04 -0700 (PDT)
+Received: from [192.168.69.207] (88-187-86-199.subs.proxad.net. [88.187.86.199])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3cf270fbd01sm20127940f8f.13.2025.09.02.06.25.01
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 02 Sep 2025 06:25:03 -0700 (PDT)
+Message-ID: <baa2f292-c29c-4045-8470-a9c7387cf98a@linaro.org>
+Date: Tue, 2 Sep 2025 15:25:01 +0200
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250806160201.2b72e7a0.alex.williamson@redhat.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [RFC PATCH 0/7] accel: Add per-accelerator vCPUs queue
+To: qemu-devel@nongnu.org, Pierrick Bouvier <pierrick.bouvier@linaro.org>
+Cc: Daniel Henrique Barboza <dbarboza@ventanamicro.com>,
+ =?UTF-8?B?RnLDqWTDqXJpYyBCYXJyYXQ=?= <fbarrat@linux.ibm.com>,
+ Stefano Stabellini <sstabellini@kernel.org>,
+ Ilya Leoshkevich <iii@linux.ibm.com>, Cameron Esfahani <dirty@apple.com>,
+ Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org,
+ Alexander Graf <agraf@csgraf.de>, Paul Durrant <paul@xen.org>,
+ David Hildenbrand <david@redhat.com>, Halil Pasic <pasic@linux.ibm.com>,
+ Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
+ xen-devel@lists.xenproject.org, qemu-arm@nongnu.org,
+ =?UTF-8?Q?C=C3=A9dric_Le_Goater?= <clg@redhat.com>,
+ Yanan Wang <wangyanan55@huawei.com>, Reinoud Zandijk <reinoud@netbsd.org>,
+ Peter Maydell <peter.maydell@linaro.org>, qemu-s390x@nongnu.org,
+ Riku Voipio <riku.voipio@iki.fi>, Anthony PERARD <anthony@xenproject.org>,
+ Alistair Francis <alistair.francis@wdc.com>,
+ Sunil Muthuswamy <sunilmut@microsoft.com>,
+ Christian Borntraeger <borntraeger@linux.ibm.com>,
+ Nicholas Piggin <npiggin@gmail.com>,
+ Richard Henderson <richard.henderson@linaro.org>,
+ Marcelo Tosatti <mtosatti@redhat.com>, Thomas Huth <thuth@redhat.com>,
+ Roman Bolshakov <rbolshakov@ddn.com>,
+ "Edgar E . Iglesias" <edgar.iglesias@amd.com>, Zhao Liu
+ <zhao1.liu@intel.com>, Phil Dennis-Jordan <phil@philjordan.eu>,
+ David Woodhouse <dwmw2@infradead.org>,
+ Harsh Prateek Bora <harshpb@linux.ibm.com>,
+ Nina Schoetterl-Glausch <nsg@linux.ibm.com>,
+ "Edgar E. Iglesias" <edgar.iglesias@gmail.com>,
+ Eduardo Habkost <eduardo@habkost.net>, qemu-ppc@nongnu.org,
+ Daniel Henrique Barboza <danielhb413@gmail.com>,
+ "Michael S. Tsirkin" <mst@redhat.com>, Anton Johansson <anjo@rev.ng>,
+ Salil Mehta <salil.mehta@huawei.com>
+References: <20250106200258.37008-1-philmd@linaro.org>
+Content-Language: en-US
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=C3=A9?= <philmd@linaro.org>
+In-Reply-To: <20250106200258.37008-1-philmd@linaro.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 
-On Wed, Aug 06, 2025 at 04:02:01PM -0600, Alex Williamson wrote:
-> On Mon,  4 Aug 2025 16:00:43 +0300
-> Leon Romanovsky <leon@kernel.org> wrote:
+Cc'ing Pierrick & Salil.
+
+On 6/1/25 21:02, Philippe Mathieu-Daudé wrote:
+> Hi,
 > 
-> > From: Leon Romanovsky <leonro@nvidia.com>
-> > 
-> > Make sure that all VFIO PCI devices have peer-to-peer capabilities
-> > enables, so we would be able to export their MMIO memory through DMABUF,
-> > 
-> > Signed-off-by: Leon Romanovsky <leonro@nvidia.com>
-> > ---
-> >  drivers/vfio/pci/vfio_pci_core.c | 4 ++++
-> >  include/linux/vfio_pci_core.h    | 1 +
-> >  2 files changed, 5 insertions(+)
-> > 
-> > diff --git a/drivers/vfio/pci/vfio_pci_core.c b/drivers/vfio/pci/vfio_pci_core.c
-> > index 31bdb9110cc0f..df9a32d3deac9 100644
-> > --- a/drivers/vfio/pci/vfio_pci_core.c
-> > +++ b/drivers/vfio/pci/vfio_pci_core.c
-> > @@ -28,6 +28,7 @@
-> >  #include <linux/nospec.h>
-> >  #include <linux/sched/mm.h>
-> >  #include <linux/iommufd.h>
-> > +#include <linux/pci-p2pdma.h>
-> >  #if IS_ENABLED(CONFIG_EEH)
-> >  #include <asm/eeh.h>
-> >  #endif
-> > @@ -2088,6 +2089,9 @@ int vfio_pci_core_init_dev(struct vfio_device *core_vdev)
-> >  	INIT_LIST_HEAD(&vdev->dummy_resources_list);
-> >  	INIT_LIST_HEAD(&vdev->ioeventfds_list);
-> >  	INIT_LIST_HEAD(&vdev->sriov_pfs_item);
-> > +	vdev->provider = pci_p2pdma_enable(vdev->pdev);
-> > +	if (IS_ERR(vdev->provider))
-> > +		return PTR_ERR(vdev->provider);
+> Currently we register all vCPUs to the global 'cpus_queue' queue,
+> however we can not discriminate per accelerator or per target
+> architecture (which might happen in a soon future).
 > 
-> I think this just made all vfio-pci drivers functionally dependent on
-> CONFIG_PCI_P2PDMA.  Seems at best exporting a dma-buf should be
-> restricted if this fails.  Thanks,
-
-It is temporary solution in next patch "vfio/pci: Add dma-buf export
-support for MMIO regions", the strict ifdef is added.
-
-  2107 #ifdef CONFIG_VFIO_PCI_DMABUF
-  2108         vdev->provider = pci_p2pdma_enable(vdev->pdev);
-  2109         if (IS_ERR(vdev->provider))
-  2110                 return PTR_ERR(vdev->provider);
-  2111
-  2112         INIT_LIST_HEAD(&vdev->dmabufs);
-  2113 #endif
-
-I will split "vfio/pci: Add dma-buf export ..." patch to introduce CONFIG_VFIO_PCI_DMABUF
-before this "vfio/pci: Enable peer-to-peer ..." patch.
-
-Thanks
-
+> This series tries to add an accelerator discriminator, so
+> accelerator specific code can iterate on its own vCPUs. This
+> is required to run a pair of HW + SW accelerators like the
+> (HVF, TCG) or (KVM, TCG) combinations. Otherwise, i.e. the
+> HVF core code could iterate on TCG vCPUs...
+> To keep it simple and not refactor heavily the code base,
+> we introduce the CPU_FOREACH_TCG/HVF/KVM() macros, only
+> defined for each accelerator.
 > 
-> Alex
+> This is just a RFC to get some thoughts whether this is
+> heading in the correct direction or not ;)
 > 
-> >  	init_rwsem(&vdev->memory_lock);
-> >  	xa_init(&vdev->ctx);
-> >  
-> > diff --git a/include/linux/vfio_pci_core.h b/include/linux/vfio_pci_core.h
-> > index fbb472dd99b36..b017fae251811 100644
-> > --- a/include/linux/vfio_pci_core.h
-> > +++ b/include/linux/vfio_pci_core.h
-> > @@ -94,6 +94,7 @@ struct vfio_pci_core_device {
-> >  	struct vfio_pci_core_device	*sriov_pf_core_dev;
-> >  	struct notifier_block	nb;
-> >  	struct rw_semaphore	memory_lock;
-> > +	struct p2pdma_provider  *provider;
-> >  };
-> >  
-> >  /* Will be exported for vfio pci drivers usage */
+> Regards,
 > 
+> Phil.
+> 
+> Philippe Mathieu-Daudé (7):
+>    cpus: Restrict CPU_FOREACH_SAFE() to user emulation
+>    cpus: Introduce AccelOpsClass::get_cpus_queue()
+>    accel/tcg: Implement tcg_get_cpus_queue()
+>    accel/tcg: Use CPU_FOREACH_TCG()
+>    accel/hw: Implement hw_accel_get_cpus_queue()
+>    accel/hvf: Use CPU_FOREACH_HVF()
+>    accel/kvm: Use CPU_FOREACH_KVM()
+> 
+>   accel/tcg/tcg-accel-ops.h         | 10 ++++++++++
+>   include/hw/core/cpu.h             | 11 +++++++++++
+>   include/system/accel-ops.h        |  6 ++++++
+>   include/system/hvf_int.h          |  4 ++++
+>   include/system/hw_accel.h         |  9 +++++++++
+>   include/system/kvm_int.h          |  3 +++
+>   accel/accel-system.c              |  8 ++++++++
+>   accel/hvf/hvf-accel-ops.c         |  9 +++++----
+>   accel/kvm/kvm-accel-ops.c         |  1 +
+>   accel/kvm/kvm-all.c               | 14 +++++++-------
+>   accel/tcg/cputlb.c                |  7 ++++---
+>   accel/tcg/monitor.c               |  3 ++-
+>   accel/tcg/tb-maint.c              |  7 ++++---
+>   accel/tcg/tcg-accel-ops-rr.c      | 10 +++++-----
+>   accel/tcg/tcg-accel-ops.c         | 16 ++++++++++++----
+>   accel/tcg/user-exec-stub.c        |  5 +++++
+>   accel/xen/xen-all.c               |  1 +
+>   cpu-common.c                      | 10 ++++++++++
+>   hw/i386/kvm/clock.c               |  3 ++-
+>   hw/intc/spapr_xive_kvm.c          |  5 +++--
+>   hw/intc/xics_kvm.c                |  5 +++--
+>   system/cpus.c                     |  5 +++++
+>   target/arm/hvf/hvf.c              |  4 ++--
+>   target/i386/kvm/kvm.c             |  4 ++--
+>   target/i386/kvm/xen-emu.c         |  2 +-
+>   target/i386/nvmm/nvmm-accel-ops.c |  1 +
+>   target/i386/whpx/whpx-accel-ops.c |  1 +
+>   target/s390x/kvm/kvm.c            |  2 +-
+>   target/s390x/kvm/stsi-topology.c  |  3 ++-
+>   29 files changed, 130 insertions(+), 39 deletions(-)
+> 
+
 
