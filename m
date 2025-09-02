@@ -1,111 +1,102 @@
-Return-Path: <kvm+bounces-56526-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-56527-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id E849CB3F239
-	for <lists+kvm@lfdr.de>; Tue,  2 Sep 2025 04:23:26 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 20B46B3F240
+	for <lists+kvm@lfdr.de>; Tue,  2 Sep 2025 04:25:58 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B1DFD16AF66
-	for <lists+kvm@lfdr.de>; Tue,  2 Sep 2025 02:23:26 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4CDD23A57B1
+	for <lists+kvm@lfdr.de>; Tue,  2 Sep 2025 02:25:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4C70C2BEFF6;
-	Tue,  2 Sep 2025 02:23:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 47DBC35948;
+	Tue,  2 Sep 2025 02:25:12 +0000 (UTC)
 X-Original-To: kvm@vger.kernel.org
-Received: from szxga01-in.huawei.com (szxga01-in.huawei.com [45.249.212.187])
+Received: from szxga02-in.huawei.com (szxga02-in.huawei.com [45.249.212.188])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EEEC64414;
-	Tue,  2 Sep 2025 02:23:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.187
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E071526E703;
+	Tue,  2 Sep 2025 02:25:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.188
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756779795; cv=none; b=LsdqOpvy/IkbUy5utIE3chJOtHaxmxVCCsIpG98V0PEUe08LhlYIAW1U8ShGkWXIdxb0qdEiUfwffW1hFeFwnVEB1tKRiCiTcWY+pbOKv0xwMS9ItfJuzhcCUFZZqjS3AebVw/p+Kda9S0ZQBG9oJMrqqAc6NY1bLncipHHW4Fc=
+	t=1756779911; cv=none; b=EQQzlKSPDlRELbubK1/49UbFIQgDhB8YBvg0zA2C4pQVnU+r36rXTWkK5GibEb5Ukao1Mn/1Ea8acK04KWXnnBVpegwVqzeCLp3M1QUff2pGovyfrgbkcVsGv8o2kf3Hh3RsqFswDUnjBV1eo5FXiytypCXksv25+fxcncKjbOA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756779795; c=relaxed/simple;
-	bh=vbp+xwAzKmTpo4AyNEDblh9m98+wpwZzDRDxxwY2tV0=;
-	h=Subject:To:CC:References:From:Message-ID:Date:MIME-Version:
-	 In-Reply-To:Content-Type; b=I11A00CLZFmcOwYmFhijNzSY1OeGCOnQD94f031mQncGegNr8fnc8M+MUY/mRFGIjEvb4lYMpoXURcQkxELzSDLzhZX8kV/00EheXnfCfU+F6r+/p0LGWI1zgq3nb92ynZvCXvuJU2EPVybgbc/u3npGJCHNICWXS084ssS3FLY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.187
+	s=arc-20240116; t=1756779911; c=relaxed/simple;
+	bh=h76a6riqzOeWCE+ZYBVdsPezrRbCFF88JDHA5tQP/gE=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=CVibsCrzDf1CrwdEc+nQCVCr2nqbdzcZosW3kq+UZl00Q6g4ulQw+hZIE+x3YIMzu+VZbxFk1Uf3NjsN5pMOye/q9Gg2OiMynTEEqSaMH/0h22RjZeVDlh8FJ/bNpj+u4p6F6Ao/DTfA9pvM66b6HafBuzSm9vhoeOh9gDty26c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.188
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-Received: from mail.maildlp.com (unknown [172.19.88.105])
-	by szxga01-in.huawei.com (SkyGuard) with ESMTP id 4cG8ZJ53scz13NSF;
-	Tue,  2 Sep 2025 10:19:20 +0800 (CST)
+Received: from mail.maildlp.com (unknown [172.19.162.254])
+	by szxga02-in.huawei.com (SkyGuard) with ESMTP id 4cG8gt4zJpztTN6;
+	Tue,  2 Sep 2025 10:24:10 +0800 (CST)
 Received: from dggpemf500015.china.huawei.com (unknown [7.185.36.143])
-	by mail.maildlp.com (Postfix) with ESMTPS id 618801402EA;
-	Tue,  2 Sep 2025 10:23:10 +0800 (CST)
-Received: from [10.67.121.110] (10.67.121.110) by
- dggpemf500015.china.huawei.com (7.185.36.143) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.11; Tue, 2 Sep 2025 10:23:09 +0800
-Subject: Re: [PATCH] hisi_acc_vfio_pci: Fix reference leak in
- hisi_acc_vfio_debug_init
-To: Miaoqian Lin <linmq006@gmail.com>, Shameer Kolothum
-	<shameerali.kolothum.thodi@huawei.com>, Jason Gunthorpe <jgg@ziepe.ca>,
-	Yishai Hadas <yishaih@nvidia.com>, Kevin Tian <kevin.tian@intel.com>, Alex
- Williamson <alex.williamson@redhat.com>, <kvm@vger.kernel.org>,
-	<linux-kernel@vger.kernel.org>
-CC: <stable@vger.kernel.org>
-References: <20250901081809.2286649-1-linmq006@gmail.com>
-From: liulongfang <liulongfang@huawei.com>
-Message-ID: <47e97b77-edfa-3a90-f74c-068b24afe917@huawei.com>
-Date: Tue, 2 Sep 2025 10:23:08 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
+	by mail.maildlp.com (Postfix) with ESMTPS id 39B02180495;
+	Tue,  2 Sep 2025 10:25:07 +0800 (CST)
+Received: from huawei.com (10.90.31.46) by dggpemf500015.china.huawei.com
+ (7.185.36.143) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.11; Tue, 2 Sep
+ 2025 10:25:06 +0800
+From: Longfang Liu <liulongfang@huawei.com>
+To: <alex.williamson@redhat.com>, <jgg@nvidia.com>,
+	<shameerkolothum@gmail.com>, <jonathan.cameron@huawei.com>
+CC: <kvm@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+	<linuxarm@openeuler.org>, <liulongfang@huawei.com>
+Subject: [PATCH v9 0/2] update live migration configuration region
+Date: Tue, 2 Sep 2025 10:25:03 +0800
+Message-ID: <20250902022505.2034408-1-liulongfang@huawei.com>
+X-Mailer: git-send-email 2.33.0
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <20250901081809.2286649-1-linmq006@gmail.com>
-Content-Type: text/plain; charset="gbk"
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: kwepems100002.china.huawei.com (7.221.188.206) To
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: kwepems200002.china.huawei.com (7.221.188.68) To
  dggpemf500015.china.huawei.com (7.185.36.143)
 
-On 2025/9/1 16:18, Miaoqian Lin wrote:
-> The debugfs_lookup() function returns a dentry with an increased reference
-> count that must be released by calling dput().
-> 
-> Fixes: b398f91779b8 ("hisi_acc_vfio_pci: register debugfs for hisilicon migration driver")
-> Cc: stable@vger.kernel.org
-> Signed-off-by: Miaoqian Lin <linmq006@gmail.com>
-> ---
->  drivers/vfio/pci/hisilicon/hisi_acc_vfio_pci.c | 6 +++++-
->  1 file changed, 5 insertions(+), 1 deletion(-)
-> 
-> diff --git a/drivers/vfio/pci/hisilicon/hisi_acc_vfio_pci.c b/drivers/vfio/pci/hisilicon/hisi_acc_vfio_pci.c
-> index 2149f49aeec7..1710485cbbec 100644
-> --- a/drivers/vfio/pci/hisilicon/hisi_acc_vfio_pci.c
-> +++ b/drivers/vfio/pci/hisilicon/hisi_acc_vfio_pci.c
-> @@ -1611,8 +1611,10 @@ static void hisi_acc_vfio_debug_init(struct hisi_acc_vf_core_device *hisi_acc_vd
->  	}
->  
->  	migf = kzalloc(sizeof(*migf), GFP_KERNEL);
-> -	if (!migf)
-> +	if (!migf) {
-> +		dput(vfio_dev_migration);
->  		return;
-> +	}
->  	hisi_acc_vdev->debug_migf = migf;
->  
->  	vfio_hisi_acc = debugfs_create_dir("hisi_acc", vfio_dev_migration);
-> @@ -1622,6 +1624,8 @@ static void hisi_acc_vfio_debug_init(struct hisi_acc_vf_core_device *hisi_acc_vd
->  				    hisi_acc_vf_migf_read);
->  	debugfs_create_devm_seqfile(dev, "cmd_state", vfio_hisi_acc,
->  				    hisi_acc_vf_debug_cmd);
-> +
-> +	dput(vfio_dev_migration);
->  }
->
+On the new hardware platform, the configuration register space
+of the live migration function is set on the PF, while on the
+old platform, this part is placed on the VF.
 
-Reviewed-by: Longfang Liu <liulongfang@huawei.com>
+Change v8 -> v9
+	Update the version name for driver matching
 
-Thanks!
-Longfang.
+Change v7 -> v8
+	Resolve hardware compatibility issues.
 
->  static void hisi_acc_vf_debugfs_exit(struct hisi_acc_vf_core_device *hisi_acc_vdev)
-> 
+Change v6 -> v7
+	Update the comment of the live migration configuration scheme.
+
+Change v5 -> v6
+	Update VF device properties
+
+Change v4 -> v5
+	Remove BAR length alignment
+
+Change v3 -> v4
+	Rebase on kernel 6.15
+
+Change v2 -> v3
+	Put the changes of Pre_Copy into another bugfix patchset.
+
+Change v1 -> v2
+	Delete the vf_qm_state read operation in Pre_Copy 
+
+Longfang Liu (2):
+  crypto: hisilicon - qm updates BAR configuration
+  hisi_acc_vfio_pci: adapt to new migration configuration
+
+ drivers/crypto/hisilicon/qm.c                 |  27 +++
+ .../vfio/pci/hisilicon/hisi_acc_vfio_pci.c    | 205 ++++++++++++------
+ .../vfio/pci/hisilicon/hisi_acc_vfio_pci.h    |  13 ++
+ include/linux/hisi_acc_qm.h                   |   3 +
+ 4 files changed, 187 insertions(+), 61 deletions(-)
+
+-- 
+2.33.0
+
 
