@@ -1,85 +1,56 @@
-Return-Path: <kvm+bounces-56535-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-56538-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 60A5DB3F787
-	for <lists+kvm@lfdr.de>; Tue,  2 Sep 2025 10:04:46 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id D727EB3F7E0
+	for <lists+kvm@lfdr.de>; Tue,  2 Sep 2025 10:13:23 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 8CFF57A8600
-	for <lists+kvm@lfdr.de>; Tue,  2 Sep 2025 08:03:08 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 998F82C0102
+	for <lists+kvm@lfdr.de>; Tue,  2 Sep 2025 08:12:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C389225A328;
-	Tue,  2 Sep 2025 08:03:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id ACBA02EA753;
+	Tue,  2 Sep 2025 08:10:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="XhBnInmr"
+	dkim=pass (1024-bit key) header.d=tu-dortmund.de header.i=@tu-dortmund.de header.b="RROp1G00"
 X-Original-To: kvm@vger.kernel.org
-Received: from NAM02-DM3-obe.outbound.protection.outlook.com (mail-dm3nam02on2044.outbound.protection.outlook.com [40.107.95.44])
+Received: from unimail.uni-dortmund.de (mx1.hrz.uni-dortmund.de [129.217.128.51])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 508DE2E8B8C;
-	Tue,  2 Sep 2025 08:03:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.95.44
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756800235; cv=fail; b=EX037IMaIQQZKANdYHK88suj63kEGJQLgM5LRADJ9LqUXxTvfijF54eT9/atkKmDHkWNMrH926smKIF1T6H9e9f6Ep6rpdhSH98Q+Q7WLYq4aXy1G0HGG9BHceSu9YVxBygnQPVpCxrsj4Hz6R9WaxRZ7OsoMvIhS8oyZM7M28Q=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756800235; c=relaxed/simple;
-	bh=DTRC8baTVROgYcnW9yQ+xgWwXHi0DAwqI9im0M+sojg=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=CoAb1X7mV30Quw2z7ZWUZwNSDkmnt5SWS1kJXGwME9i+Xs6KcMaxXqbaFwGBfM6+a723P0WAfb/MdDxLSq+H9LI8k/bN7IWlYBSSxzB3NjYp3BPxu7aUQf2qD1xF/P9Eyv8idTl4s/VmFrwwenxNJY3aVHBWb5E3AZRG2n+9iaM=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=XhBnInmr; arc=fail smtp.client-ip=40.107.95.44
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=QERlz2RLDO/C5/l6IRMffPJeQHUr3mX5ReeaFl699Hc128LD39oyklw/NeOXCEnDBr8U+j1YjHl1cbjT+anFNKkFXsci6J9P4CB9e86rW/4qYE0a+FWDhCFoXxjdABZOQYIID4LXfflnH6ggWYOsPY9PZUQDkN7WBUJuIYvt3Yop0GKq6o6dnFg0uKBIymN0Tj3lWW2nfNUOiOW420Az1MUugjaxJ518X0A6gH5LWxqlmxb8iW6hpOxDPwGtm2FrGX/iSGHC1TR+5Qt3BkIqjChMuW+n7sBxydcPr6LreXKwmcED3hM84rEx1/S4R4NqdV8azgmbmHWanDDqCrEJeA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=QUwRDQuF/MfCItz9I6B/voS4djqL4zjmGk1P4DPB2K4=;
- b=QkbnQ50tGMb5Bi8OzEBpD5hWBmR/6D7oPRP9eJiCygy9Z2m7BD0XOBRGzUe2jVkBpG2uWtVvEwRA4uZQ6IvaR9My8w+vmUwYu2+E+TKF14hIH1cM93vYj2nmubemn5mH1S82L7na6+UX/esH5YuSorpeuxPCa83US06TfoeFgNVnadE2Ijo0+BleRl7+JY2ntATLoD3hhgLutKGkco0TabVzE5f9PfK+zSxdVL/4RE/poMqkjFPAxoiY4heHluOKF2WVlMi0wd0b1Lb540j7HigOfVfLUz2CAcR9pYrk2oriVxjvPoChiIHzOYjgIMsTe3V+6h+Yqmv6eeuZO5suYg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 165.204.84.17) smtp.rcpttodomain=redhat.com smtp.mailfrom=amd.com; dmarc=pass
- (p=quarantine sp=quarantine pct=100) action=none header.from=amd.com;
- dkim=none (message not signed); arc=none (0)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=QUwRDQuF/MfCItz9I6B/voS4djqL4zjmGk1P4DPB2K4=;
- b=XhBnInmrTS5AS1Zk3+QCSaF4dpFv2lyRiXzgSgzPuZh1UuJygVCgpOUU5q4Gwa19GTl2lmePfj+k+SAqBrDCFqy8sCpZ8GvhDJX7hG6A7V4nf0KJ+whKx9gITOgeCBAWZX8HDwDvbnpGwrWSgc/hp2gHZIaIwWIdFNTGa1/5Ps0=
-Received: from CH2PR19CA0013.namprd19.prod.outlook.com (2603:10b6:610:4d::23)
- by PH8PR12MB6747.namprd12.prod.outlook.com (2603:10b6:510:1c3::15) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9073.27; Tue, 2 Sep
- 2025 08:03:51 +0000
-Received: from CH3PEPF0000000F.namprd04.prod.outlook.com
- (2603:10b6:610:4d:cafe::a8) by CH2PR19CA0013.outlook.office365.com
- (2603:10b6:610:4d::23) with Microsoft SMTP Server (version=TLS1_3,
- cipher=TLS_AES_256_GCM_SHA384) id 15.20.9073.27 via Frontend Transport; Tue,
- 2 Sep 2025 08:03:51 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
- smtp.mailfrom=amd.com; dkim=none (message not signed)
- header.d=none;dmarc=pass action=none header.from=amd.com;
-Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
- 165.204.84.17 as permitted sender) receiver=protection.outlook.com;
- client-ip=165.204.84.17; helo=SATLEXMB03.amd.com; pr=C
-Received: from SATLEXMB03.amd.com (165.204.84.17) by
- CH3PEPF0000000F.mail.protection.outlook.com (10.167.244.40) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.20.9094.14 via Frontend Transport; Tue, 2 Sep 2025 08:03:51 +0000
-Received: from Satlexmb09.amd.com (10.181.42.218) by SATLEXMB03.amd.com
- (10.181.40.144) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.39; Tue, 2 Sep
- 2025 03:03:50 -0500
-Received: from kaveri.amd.com (10.180.168.240) by satlexmb09.amd.com
- (10.181.42.218) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.2.1748.10; Tue, 2 Sep
- 2025 01:03:48 -0700
-From: Shivank Garg <shivankg@amd.com>
-To: <pbonzini@redhat.com>, <david@redhat.com>
-CC: <kvm@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-	<linux-coco@lists.linux.dev>, <shivankg@amd.com>
-Subject: [PATCH V2 kvm-next] KVM: guest_memfd: use kvm_gmem_get_index() in more places and smaller cleanups
-Date: Tue, 2 Sep 2025 08:03:08 +0000
-Message-ID: <20250902080307.153171-2-shivankg@amd.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D542E2E7BC7;
+	Tue,  2 Sep 2025 08:10:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=129.217.128.51
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1756800621; cv=none; b=D+M/3HDC9IHy9biwP2DzwUmCVEm7qsPMc+hR77OiVe/nlx35vVzdS8gBqCKbIXuNcrvOPsVFxkHexWpkB4RuWhEL5P3unseJWKfL5kSk1TI8ZNQML+bZzJVQ2kfzzI/GOwFrqoTwfWEwbxCiaL+s4ZQKK89FmRq3A4f3M2/eYNA=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1756800621; c=relaxed/simple;
+	bh=cyJKkcqZqbk709afqt1BPhXGf6CjrosVwsdhTAJwy7k=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=aQ+i9q/mqE6Ym5G2SORMd8Y1WwTRxLd/UCZABY7LyEiBTH4+vpG+DJOIq22Ij4oSZgksrwafDHeMUpPMo8y2TWvGG4k1BNyfz7NZ18SpIIKBNU2bGr1I+/IvZvFeASTUGYtTqY8KzUUD421Z8dm/IWBztyEwEbYgvivXAp+lkAo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=tu-dortmund.de; spf=pass smtp.mailfrom=tu-dortmund.de; dkim=pass (1024-bit key) header.d=tu-dortmund.de header.i=@tu-dortmund.de header.b=RROp1G00; arc=none smtp.client-ip=129.217.128.51
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=tu-dortmund.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=tu-dortmund.de
+Received: from simon-Latitude-5450.tu-dortmund.de (rechenknecht2.kn.e-technik.tu-dortmund.de [129.217.186.41])
+	(authenticated bits=0)
+	by unimail.uni-dortmund.de (8.18.1.9/8.18.1.10) with ESMTPSA id 58289x6R004012
+	(version=TLSv1.3 cipher=TLS_AES_256_GCM_SHA384 bits=256 verify=NOT);
+	Tue, 2 Sep 2025 10:10:06 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=tu-dortmund.de;
+	s=unimail; t=1756800607;
+	bh=cyJKkcqZqbk709afqt1BPhXGf6CjrosVwsdhTAJwy7k=;
+	h=From:To:Cc:Subject:Date;
+	b=RROp1G00rTRqLopxLsfYpYJW0yfO4NfbPS3b4C1nyB/PX8DeJA/HqfA2BarlvKtVq
+	 R4CJZnr8iLw068MHXJhdW/TTI1UcZmT3PnDUDr8js3fL3LJh+Dk4TXxKN7tUPcjIJJ
+	 HipDZvSDC2Fv57wREnt0vBmXA8PVZogZbudnlDwI=
+From: Simon Schippers <simon.schippers@tu-dortmund.de>
+To: willemdebruijn.kernel@gmail.com, jasowang@redhat.com, mst@redhat.com,
+        eperezma@redhat.com, stephen@networkplumber.org,
+        netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+        virtualization@lists.linux.dev, kvm@vger.kernel.org
+Cc: Simon Schippers <simon.schippers@tu-dortmund.de>
+Subject: [PATCH net-next v4 0/4] TUN/TAP & vhost_net: netdev queue flow control to avoid ptr_ring tail drop
+Date: Tue,  2 Sep 2025 10:09:53 +0200
+Message-ID: <20250902080957.47265-1-simon.schippers@tu-dortmund.de>
 X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
@@ -88,144 +59,87 @@ List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: SATLEXMB03.amd.com (10.181.40.144) To satlexmb09.amd.com
- (10.181.42.218)
-X-EOPAttributedMessage: 0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: CH3PEPF0000000F:EE_|PH8PR12MB6747:EE_
-X-MS-Office365-Filtering-Correlation-Id: bb6397a1-acb7-4ec6-0152-08dde9f74136
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|1800799024|36860700013|82310400026|376014;
-X-Microsoft-Antispam-Message-Info:
-	=?us-ascii?Q?vMzDU8A/UXWinBg0rsG6W4yjJbN8Se04U+7vakPDPnDWDZjW17jGHZm90ij+?=
- =?us-ascii?Q?GiyBLQB5+rRQ7SKOtSwgoOgFTvbCxU3oXGrlZT5RdkhmGIE+gPenI+YM7ErZ?=
- =?us-ascii?Q?/9FZGVOQ59iKlnEHBQBx9lWWS7fdPjzdsWqFmrlyKQr9yufyB88X2QRm1gst?=
- =?us-ascii?Q?6sabpwoVLtokm/Nwrci6cQxR19Y6MXjrQ++LoOBR04z1rwM7IXXvo9DWAwPU?=
- =?us-ascii?Q?BlAGOVcEv3MWWz3dyXYPvNBgdP91eREOHpB50oXMZG5sKSQN82jvSQESxAzu?=
- =?us-ascii?Q?mWn7joUvqhDfdhycUR3TwlD2yeB37tyjPpnLtKOUqL4eSzjMNDiY2rTqrVzL?=
- =?us-ascii?Q?bOj6wSvFkOdS6q/sk4mjPSr/ma4nBXWZiXvjswaIg7g1YA9K7W8IH3G/eExt?=
- =?us-ascii?Q?REjlmP7ROxrymnfRK3Qvg8ImV35qHnznOTx6kGZ0OGtgEHV7aLFQR+H/y/w6?=
- =?us-ascii?Q?MenVg2Kn+auohLGWFW2yQsu+xaSnXfLRCR4TSFDcnaP1Mk3PwtzhT/MgY1nA?=
- =?us-ascii?Q?AlFu5bImNt9CbuUtsO4QhJ61GDMj102OuWPK1dYqFgvy9vumyL185LgR8Gcw?=
- =?us-ascii?Q?SrCkEqwu3ZcCjmK+lNvzeoUqwAAeMaPYrKm3vz2CTggYeC2aYn+ncW4iq25Y?=
- =?us-ascii?Q?vsK3He6/BwXNkzJ2P5ZqwL0aKC92pf/QTtkaSsyzkYWS45aZMJZXV82dYrdG?=
- =?us-ascii?Q?8jh9kXgnX9cWYXg4aCDxLnM6hT+2rP5c0RCx5VldjpxSxYNQ45bw/qVRuMqM?=
- =?us-ascii?Q?/Z7uyS8XlC2t8upwqijZjbAZF5fx1iClq0EFLEoL0K6sw4ZU/U6AI17wPjMI?=
- =?us-ascii?Q?NKqbW9KQ0kpQcra8SoJGwcxja2yEzQM3oKZi5acRrbi3cFxnIFJADnSiTm/u?=
- =?us-ascii?Q?e2wATmx35bhQAAavrje3Pc1Ga/ATRqHE4WXH0lW/uv+KXp7FgGXT6SvrdT6d?=
- =?us-ascii?Q?bLUlEgtwkgJrRANfhHW83OvCA1/xnheyCBxWx6095t290bSl/wKVukET7pIt?=
- =?us-ascii?Q?gwld/9CYeO1p9edywajfnjay2ZhQ2TVprbuqJftJJOpfCgCDw+CT/XLXdKm1?=
- =?us-ascii?Q?0czls0hxaGZSDb1Bt0dSxzgVxc8RxmwA/SIZumcMRuaky4QSAvjlR2iIkHHl?=
- =?us-ascii?Q?uyQ7Bvpn/OS0hwOnPJd81JonH8qF3cJKrSErvSS6o/nwi2gRKW+TP2QFwEQv?=
- =?us-ascii?Q?5XlHLLVW6Klu2E2Lamvog/pHQBOYZ4mE4QSnjK5rsMAkj7Yoxnzhg667Obh/?=
- =?us-ascii?Q?CKb+RKzG91SyCiZSho/7//WTwphHRpUiV/HA3E9GBYoYDPUbKzsQWu7fEXiC?=
- =?us-ascii?Q?pLw1DVBfk4tNKDFAewdUegBfN7E41JIUSPDNZSOSby5d1tR2FPQUXibcPKwx?=
- =?us-ascii?Q?ZNiSXEspDYfC3YmhRez3SwGP+vLxUJtCkJT/xWpBiU8tTUMd9U3RhBtBH7MG?=
- =?us-ascii?Q?HwwonsEIhImjqr/hmi+OJFcpQQnpoBglfsTEZpsR0uotRKvQFSMtlOINCaYX?=
- =?us-ascii?Q?0xtg4Fwz9IJIJfVq4RsgoYDgDnTM2Lg7iGs18QeNtMXCxLJjnkDsl0Ak2w?=
- =?us-ascii?Q?=3D=3D?=
-X-Forefront-Antispam-Report:
-	CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB03.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230040)(1800799024)(36860700013)(82310400026)(376014);DIR:OUT;SFP:1101;
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 02 Sep 2025 08:03:51.6192
- (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: bb6397a1-acb7-4ec6-0152-08dde9f74136
-X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[SATLEXMB03.amd.com]
-X-MS-Exchange-CrossTenant-AuthSource:
-	CH3PEPF0000000F.namprd04.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH8PR12MB6747
 
-Move kvm_gmem_get_index() to the top of the file and make it available for
-use in more places.
+This patch series deals with TUN/TAP and vhost_net which drop incoming 
+SKBs whenever their internal ptr_ring buffer is full. Instead, with this 
+patch series, the associated netdev queue is stopped before this happens. 
+This allows the connected qdisc to function correctly as reported by [1] 
+and improves application-layer performance, see benchmarks.
 
-Remove redundant initialization of the gmem variable because it's already
-initialized.
+This patch series includes TUN, TAP, and vhost_net because they share 
+logic. Adjusting only one of them would break the others. Therefore, the 
+patch series is structured as follows:
+1. New ptr_ring_spare helper to check if the ptr_ring has spare capacity
+2. Netdev queue flow control for TUN: Logic for stopping the queue upon 
+full ptr_ring and waking the queue if ptr_ring has spare capacity
+3. Additions for TAP: Similar logic for waking the queue
+4. Additions for vhost_net: Calling TUN/TAP methods for waking the queue
 
-Replace magic number -1UL with ULONG_MAX.
+Benchmarks ([2] & [3]):
+- TUN: TCP throughput over real-world 120ms RTT OpenVPN connection 
+improved by 36% (117Mbit/s vs 185 Mbit/s)
+- TAP: TCP throughput to local qemu VM stays the same (2.2Gbit/s), an 
+improvement by factor 2 at emulated 120ms RTT (98Mbit/s vs 198Mbit/s)
+- TAP+vhost_net: TCP throughput to local qemu VM approx. the same 
+(23.4Gbit/s vs 23.9Gbit/s), same performance at emulated 120ms RTT 
+(200Mbit/s)
+- TUN/TAP/TAP+vhost_net: Reduction of ptr_ring size to ~10 packets 
+possible without losing performance
 
-No functional change intended.
+Possible future work:
+- Introduction of Byte Queue Limits as suggested by Stephen Hemminger
+- Adaption of the netdev queue flow control for ipvtap & macvtap
 
-Signed-off-by: Shivank Garg <shivankg@amd.com>
----
-Applies cleanly on kvm-next (a6ad54137) and guestmemfd-preview (3d23d4a27).
+[1] Link: 
+https://unix.stackexchange.com/questions/762935/traffic-shaping-ineffective-on-tun-device
+[2] Link: 
+https://cni.etit.tu-dortmund.de/storages/cni-etit/r/Research/Publications/2025/Gebauer_2025_VTCFall/Gebauer_VTCFall2025_AuthorsVersion.pdf
+[3] Link: https://github.com/tudo-cni/nodrop
+
+Links to previous versions:
+V3: 
+https://lore.kernel.org/netdev/20250825211832.84901-1-simon.schippers@tu-dortmund.de/T/#u
+V2: 
+https://lore.kernel.org/netdev/20250811220430.14063-1-simon.schippers@tu-dortmund.de/T/#u
+V1: 
+https://lore.kernel.org/netdev/20250808153721.261334-1-simon.schippers@tu-dortmund.de/T/#u
 
 Changelog:
-V2: Incorporate David's suggestions.
-V1: https://lore.kernel.org/all/20250901051532.207874-3-shivankg@amd.com
+V3 -> V4:
+- Target net-next instead of net
+- Changed to patch series instead of single patch
+- Changed to new title from old title
+"TUN/TAP: Improving throughput and latency by avoiding SKB drops"
+- Wake netdev queue with new helpers wake_netdev_queue when there is any 
+spare capacity in the ptr_ring instead of waiting for it to be empty
+- Use tun_file instead of tun_struct in tun_ring_recv as a more consistent 
+logic
+- Use smp_wmb() and smp_rmb() barrier pair, which avoids any packet drops 
+that happened rarely before
+- Use safer logic for vhost_net using RCU read locks to access TUN/TAP data
+
+V2 -> V3: Added support for TAP and TAP+vhost_net.
+
+V1 -> V2: Removed NETDEV_TX_BUSY return case in tun_net_xmit and removed 
+unnecessary netif_tx_wake_queue in tun_ring_recv.
 
 
- virt/kvm/guest_memfd.c | 17 +++++++++--------
- 1 file changed, 9 insertions(+), 8 deletions(-)
 
-diff --git a/virt/kvm/guest_memfd.c b/virt/kvm/guest_memfd.c
-index b2d6ad80f54c..1299e5e50844 100644
---- a/virt/kvm/guest_memfd.c
-+++ b/virt/kvm/guest_memfd.c
-@@ -44,6 +44,11 @@ static inline kvm_pfn_t folio_file_pfn(struct folio *folio, pgoff_t index)
- 	return folio_pfn(folio) + (index & (folio_nr_pages(folio) - 1));
- }
- 
-+static pgoff_t kvm_gmem_get_index(struct kvm_memory_slot *slot, gfn_t gfn)
-+{
-+	return gfn - slot->base_gfn + slot->gmem.pgoff;
-+}
-+
- static int __kvm_gmem_prepare_folio(struct kvm *kvm, struct kvm_memory_slot *slot,
- 				    pgoff_t index, struct folio *folio)
- {
-@@ -51,6 +56,7 @@ static int __kvm_gmem_prepare_folio(struct kvm *kvm, struct kvm_memory_slot *slo
- 	kvm_pfn_t pfn = folio_file_pfn(folio, index);
- 	gfn_t gfn = slot->base_gfn + index - slot->gmem.pgoff;
- 	int rc = kvm_arch_gmem_prepare(kvm, gfn, pfn, folio_order(folio));
-+
- 	if (rc) {
- 		pr_warn_ratelimited("gmem: Failed to prepare folio for index %lx GFN %llx PFN %llx error %d.\n",
- 				    index, gfn, pfn, rc);
-@@ -107,7 +113,7 @@ static int kvm_gmem_prepare_folio(struct kvm *kvm, struct kvm_memory_slot *slot,
- 	 * checked when creating memslots.
- 	 */
- 	WARN_ON(!IS_ALIGNED(slot->gmem.pgoff, 1 << folio_order(folio)));
--	index = gfn - slot->base_gfn + slot->gmem.pgoff;
-+	index = kvm_gmem_get_index(slot, gfn);
- 	index = ALIGN_DOWN(index, 1 << folio_order(folio));
- 	r = __kvm_gmem_prepare_folio(kvm, slot, index, folio);
- 	if (!r)
-@@ -327,8 +333,8 @@ static int kvm_gmem_release(struct inode *inode, struct file *file)
- 	 * Zap all SPTEs pointed at by this file.  Do not free the backing
- 	 * memory, as its lifetime is associated with the inode, not the file.
- 	 */
--	kvm_gmem_invalidate_begin(gmem, 0, -1ul);
--	kvm_gmem_invalidate_end(gmem, 0, -1ul);
-+	kvm_gmem_invalidate_begin(gmem, 0, ULONG_MAX);
-+	kvm_gmem_invalidate_end(gmem, 0, ULONG_MAX);
- 
- 	list_del(&gmem->entry);
- 
-@@ -354,10 +360,6 @@ static inline struct file *kvm_gmem_get_file(struct kvm_memory_slot *slot)
- 	return get_file_active(&slot->gmem.file);
- }
- 
--static pgoff_t kvm_gmem_get_index(struct kvm_memory_slot *slot, gfn_t gfn)
--{
--	return gfn - slot->base_gfn + slot->gmem.pgoff;
--}
- 
- static bool kvm_gmem_supports_mmap(struct inode *inode)
- {
-@@ -940,7 +942,6 @@ static struct folio *__kvm_gmem_get_pfn(struct file *file,
- 		return ERR_PTR(-EFAULT);
- 	}
- 
--	gmem = file->private_data;
- 	if (xa_load(&gmem->bindings, index) != slot) {
- 		WARN_ON_ONCE(xa_load(&gmem->bindings, index));
- 		return ERR_PTR(-EIO);
+Simon Schippers (4):
+  ptr_ring_spare: Helper to check if spare capacity of size cnt is
+    available
+  netdev queue flow control for TUN
+  netdev queue flow control for TAP
+  netdev queue flow control for vhost_net
+
+ drivers/net/tap.c        | 28 ++++++++++++++++
+ drivers/net/tun.c        | 39 ++++++++++++++++++++--
+ drivers/vhost/net.c      | 34 +++++++++++++++----
+ include/linux/if_tap.h   |  2 ++
+ include/linux/if_tun.h   |  3 ++
+ include/linux/ptr_ring.h | 71 ++++++++++++++++++++++++++++++++++++++++
+ 6 files changed, 168 insertions(+), 9 deletions(-)
+
 -- 
 2.43.0
 
