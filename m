@@ -1,428 +1,187 @@
-Return-Path: <kvm+bounces-56529-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-56530-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id BB5E1B3F243
-	for <lists+kvm@lfdr.de>; Tue,  2 Sep 2025 04:26:27 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5165AB3F288
+	for <lists+kvm@lfdr.de>; Tue,  2 Sep 2025 04:56:46 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8618C16A8A7
-	for <lists+kvm@lfdr.de>; Tue,  2 Sep 2025 02:26:27 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0CDF34837B9
+	for <lists+kvm@lfdr.de>; Tue,  2 Sep 2025 02:56:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 254D72DF142;
-	Tue,  2 Sep 2025 02:26:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 890612E040E;
+	Tue,  2 Sep 2025 02:56:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="AiBmQhjV"
 X-Original-To: kvm@vger.kernel.org
-Received: from szxga04-in.huawei.com (szxga04-in.huawei.com [45.249.212.190])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.9])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A04E8CA5E;
-	Tue,  2 Sep 2025 02:26:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.190
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8974B22688C;
+	Tue,  2 Sep 2025 02:56:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.9
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756779975; cv=none; b=BJ+KAIhlz7NsVDxhCK9d5mqv031pkV4cAS+xLTKUdBQF/C69EKIuEX5ze2P24cT3DEL8duh1bjG1bpPSJ5jKtf1LzsrZRl2c2r1Sw3CuT9l9RvZ3xNOel/IVmvrDoUwy6/yX0x+sUNYlh6uZ5PcU++M6vb0ppCxv5atXMcX6kDE=
+	t=1756781796; cv=none; b=iOOHejmbqOm3CnRoz4dikgyKVE9Y9Gn9PQ2H/w2WD+GbcQRPaoWIacv18k4PNedE4x+NQce5yPYpSay5BglOSUptIIRiu5zTR3KeMg3EX8Ngesy52abjcWX/VZpgs4PGRV9m9E05aOmJun3RURjT2g8r463FVcC2wFPjVGfZ0j4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756779975; c=relaxed/simple;
-	bh=9sz27uiUG8fCQstVeVl93aXa7QZnFHIyyNtBsENy2t8=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=jw32Q6kTdwKR8+LosR32BMwI7HyeZX+BxzZ1yL6+zFjEr4VRXLH29Hi9HMxf0MkzGAm16+ZYWuNA0x0mDdNl+zX9YzCdCcswdr8L7l9f9lw6pQZgw3rO6VcxIQp49tkAIWPoOvCTM4bKbio+AAVgWIAyD50ExSWse3oRQJHjf8A=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.190
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-Received: from mail.maildlp.com (unknown [172.19.88.234])
-	by szxga04-in.huawei.com (SkyGuard) with ESMTP id 4cG8d13qpMz2CgPL;
-	Tue,  2 Sep 2025 10:21:41 +0800 (CST)
-Received: from dggpemf500015.china.huawei.com (unknown [7.185.36.143])
-	by mail.maildlp.com (Postfix) with ESMTPS id 0638414027A;
-	Tue,  2 Sep 2025 10:26:10 +0800 (CST)
-Received: from huawei.com (10.90.31.46) by dggpemf500015.china.huawei.com
- (7.185.36.143) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.11; Tue, 2 Sep
- 2025 10:26:09 +0800
-From: Longfang Liu <liulongfang@huawei.com>
-To: <alex.williamson@redhat.com>, <jgg@nvidia.com>,
-	<shameerkolothum@gmail.com>, <jonathan.cameron@huawei.com>
-CC: <kvm@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-	<linuxarm@openeuler.org>, <liulongfang@huawei.com>
-Subject: [PATCH v9 2/2] hisi_acc_vfio_pci: adapt to new migration configuration
-Date: Tue, 2 Sep 2025 10:25:05 +0800
-Message-ID: <20250902022505.2034408-3-liulongfang@huawei.com>
-X-Mailer: git-send-email 2.33.0
-In-Reply-To: <20250902022505.2034408-1-liulongfang@huawei.com>
-References: <20250902022505.2034408-1-liulongfang@huawei.com>
+	s=arc-20240116; t=1756781796; c=relaxed/simple;
+	bh=nwlBC3m1EAeEwogxv/iS1BYOFM0m1DR1LuuecJJPrGc=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=faBvXYxqNrw9gw10m59ZVztEq+HsrOBoyiej1o7Fwsdei0zMQFKqkr0AnLYFg3zIbhvJvIy0vuADtg7yTH94xLTjlOilVLu2d0+W0SdGp2Um3XzED6l1UJNfywGwlG8Oq/4h0SKtoHXWWPti2CM2OdufXsGCPHHBm3Y5+0zyDKg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=AiBmQhjV; arc=none smtp.client-ip=198.175.65.9
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1756781795; x=1788317795;
+  h=message-id:date:mime-version:subject:to:cc:references:
+   from:in-reply-to:content-transfer-encoding;
+  bh=nwlBC3m1EAeEwogxv/iS1BYOFM0m1DR1LuuecJJPrGc=;
+  b=AiBmQhjVfxXc014wIZI+2JT0O3s9nFBq0nJJoU5Sc13kO9vH2CEtGZH0
+   4YZfWRC7Y3lUTC2edWlX6bEnlQBLYF5MQK1PaYnifxcpxRXYI/XvkpMNh
+   cd6Z0JH6UhJdVS0T0mSrrzKLCYXJy7LEyKqcXudRdOJkMalFm2XS8D2st
+   pA62rwszZ0TW58qEpnaLv1x3FnqnHps/VgY8ekbjD4XO6pMInZmHN3Uxo
+   1VEeyFtkLzRAPOELRY+x56LbfIz1Rldh93IQka+XWj5On5aBr7QnDuiqj
+   Z5wvLgSU1KpWZON1KfFa409PLg7LbScTSy1y15omWVlPYlL8PK37dkNRt
+   A==;
+X-CSE-ConnectionGUID: xmyysTn1Rn6oyPbHMDRCtg==
+X-CSE-MsgGUID: xbRTPlgtR0O5NnTakAEXcg==
+X-IronPort-AV: E=McAfee;i="6800,10657,11531"; a="81620347"
+X-IronPort-AV: E=Sophos;i="6.17,312,1747724400"; 
+   d="scan'208";a="81620347"
+Received: from fmviesa002.fm.intel.com ([10.60.135.142])
+  by orvoesa101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 01 Sep 2025 19:56:34 -0700
+X-CSE-ConnectionGUID: RKL+S6FMSU+vxaERIBsJng==
+X-CSE-MsgGUID: 1TN2TF0gSkiYbPObtqUUUQ==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.18,230,1751266800"; 
+   d="scan'208";a="194797416"
+Received: from binbinwu-mobl.ccr.corp.intel.com (HELO [10.124.233.111]) ([10.124.233.111])
+  by fmviesa002-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 01 Sep 2025 19:56:27 -0700
+Message-ID: <04d6d306-b495-428f-ac3a-44057fd6ccfc@linux.intel.com>
+Date: Tue, 2 Sep 2025 10:56:25 +0800
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: kwepems200002.china.huawei.com (7.221.188.68) To
- dggpemf500015.china.huawei.com (7.185.36.143)
+User-Agent: Mozilla Thunderbird
+Subject: Re: [RFC PATCH v2 04/23] KVM: TDX: Introduce tdx_clear_folio() to
+ clear huge pages
+To: Yan Zhao <yan.y.zhao@intel.com>
+Cc: pbonzini@redhat.com, seanjc@google.com, linux-kernel@vger.kernel.org,
+ kvm@vger.kernel.org, x86@kernel.org, rick.p.edgecombe@intel.com,
+ dave.hansen@intel.com, kas@kernel.org, tabba@google.com,
+ ackerleytng@google.com, quic_eberman@quicinc.com, michael.roth@amd.com,
+ david@redhat.com, vannapurve@google.com, vbabka@suse.cz,
+ thomas.lendacky@amd.com, pgonda@google.com, zhiquan1.li@intel.com,
+ fan.du@intel.com, jun.miao@intel.com, ira.weiny@intel.com,
+ isaku.yamahata@intel.com, xiaoyao.li@intel.com, chao.p.peng@intel.com
+References: <20250807093950.4395-1-yan.y.zhao@intel.com>
+ <20250807094214.4495-1-yan.y.zhao@intel.com>
+Content-Language: en-US
+From: Binbin Wu <binbin.wu@linux.intel.com>
+In-Reply-To: <20250807094214.4495-1-yan.y.zhao@intel.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-On new platforms greater than QM_HW_V3, the migration region has been
-relocated from the VF to the PF. The VF's own configuration space is
-restored to the complete 64KB, and there is no need to divide the
-size of the BAR configuration space equally. The driver should be
-modified accordingly to adapt to the new hardware device.
 
-On the older hardware platform QM_HW_V3, the live migration configuration
-region is placed in the latter 32K portion of the VF's BAR2 configuration
-space. On the new hardware platform QM_HW_V4, the live migration
-configuration region also exists in the same 32K area immediately following
-the VF's BAR2, just like on QM_HW_V3.
 
-However, access to this region is now controlled by hardware. Additionally,
-a copy of the live migration configuration region is present in the PF's
-BAR2 configuration space. On the new hardware platform QM_HW_V4, when an
-older version of the driver is loaded, it behaves like QM_HW_V3 and uses
-the configuration region in the VF, ensuring that the live migration
-function continues to work normally. When the new version of the driver is
-loaded, it directly uses the configuration region in the PF. Meanwhile,
-hardware configuration disables the live migration configuration region
-in the VF's BAR2: reads return all 0xF values, and writes are silently
-ignored.
+On 8/7/2025 5:42 PM, Yan Zhao wrote:
+> After removing or reclaiming a guest private page or a control page from a
+> TD, zero the physical page using movdir64b(), enabling the kernel to reuse
+> the pages.
+>
+> Introduce the function tdx_clear_folio() to zero out physical memory using
+> movdir64b(), starting from the page at "start_idx" within a "folio" and
+> spanning "npages" contiguous PFNs.
+>
+> Convert tdx_clear_page() to be a helper function to facilitate the
+> zeroing of 4KB pages.
 
-Signed-off-by: Longfang Liu <liulongfang@huawei.com>
-Reviewed-by: Shameer Kolothum <shameerkolothum@gmail.com>
----
- .../vfio/pci/hisilicon/hisi_acc_vfio_pci.c    | 205 ++++++++++++------
- .../vfio/pci/hisilicon/hisi_acc_vfio_pci.h    |  13 ++
- 2 files changed, 157 insertions(+), 61 deletions(-)
+I think this sentence is outdated?
 
-diff --git a/drivers/vfio/pci/hisilicon/hisi_acc_vfio_pci.c b/drivers/vfio/pci/hisilicon/hisi_acc_vfio_pci.c
-index 397f5e445136..fcf692a7bd4c 100644
---- a/drivers/vfio/pci/hisilicon/hisi_acc_vfio_pci.c
-+++ b/drivers/vfio/pci/hisilicon/hisi_acc_vfio_pci.c
-@@ -125,6 +125,72 @@ static int qm_get_cqc(struct hisi_qm *qm, u64 *addr)
- 	return 0;
- }
- 
-+static int qm_get_xqc_regs(struct hisi_acc_vf_core_device *hisi_acc_vdev,
-+			   struct acc_vf_data *vf_data)
-+{
-+	struct hisi_qm *qm = &hisi_acc_vdev->vf_qm;
-+	struct device *dev = &qm->pdev->dev;
-+	u32 eqc_addr, aeqc_addr;
-+	int ret;
-+
-+	if (hisi_acc_vdev->drv_mode == HW_ACC_V3) {
-+		eqc_addr = QM_EQC_DW0;
-+		aeqc_addr = QM_AEQC_DW0;
-+	} else {
-+		eqc_addr = QM_EQC_PF_DW0;
-+		aeqc_addr = QM_AEQC_PF_DW0;
-+	}
-+
-+	/* QM_EQC_DW has 7 regs */
-+	ret = qm_read_regs(qm, eqc_addr, vf_data->qm_eqc_dw, 7);
-+	if (ret) {
-+		dev_err(dev, "failed to read QM_EQC_DW\n");
-+		return ret;
-+	}
-+
-+	/* QM_AEQC_DW has 7 regs */
-+	ret = qm_read_regs(qm, aeqc_addr, vf_data->qm_aeqc_dw, 7);
-+	if (ret) {
-+		dev_err(dev, "failed to read QM_AEQC_DW\n");
-+		return ret;
-+	}
-+
-+	return 0;
-+}
-+
-+static int qm_set_xqc_regs(struct hisi_acc_vf_core_device *hisi_acc_vdev,
-+			   struct acc_vf_data *vf_data)
-+{
-+	struct hisi_qm *qm = &hisi_acc_vdev->vf_qm;
-+	struct device *dev = &qm->pdev->dev;
-+	u32 eqc_addr, aeqc_addr;
-+	int ret;
-+
-+	if (hisi_acc_vdev->drv_mode == HW_ACC_V3) {
-+		eqc_addr = QM_EQC_DW0;
-+		aeqc_addr = QM_AEQC_DW0;
-+	} else {
-+		eqc_addr = QM_EQC_PF_DW0;
-+		aeqc_addr = QM_AEQC_PF_DW0;
-+	}
-+
-+	/* QM_EQC_DW has 7 regs */
-+	ret = qm_write_regs(qm, eqc_addr, vf_data->qm_eqc_dw, 7);
-+	if (ret) {
-+		dev_err(dev, "failed to write QM_EQC_DW\n");
-+		return ret;
-+	}
-+
-+	/* QM_AEQC_DW has 7 regs */
-+	ret = qm_write_regs(qm, aeqc_addr, vf_data->qm_aeqc_dw, 7);
-+	if (ret) {
-+		dev_err(dev, "failed to write QM_AEQC_DW\n");
-+		return ret;
-+	}
-+
-+	return 0;
-+}
-+
- static int qm_get_regs(struct hisi_qm *qm, struct acc_vf_data *vf_data)
- {
- 	struct device *dev = &qm->pdev->dev;
-@@ -167,20 +233,6 @@ static int qm_get_regs(struct hisi_qm *qm, struct acc_vf_data *vf_data)
- 		return ret;
- 	}
- 
--	/* QM_EQC_DW has 7 regs */
--	ret = qm_read_regs(qm, QM_EQC_DW0, vf_data->qm_eqc_dw, 7);
--	if (ret) {
--		dev_err(dev, "failed to read QM_EQC_DW\n");
--		return ret;
--	}
--
--	/* QM_AEQC_DW has 7 regs */
--	ret = qm_read_regs(qm, QM_AEQC_DW0, vf_data->qm_aeqc_dw, 7);
--	if (ret) {
--		dev_err(dev, "failed to read QM_AEQC_DW\n");
--		return ret;
--	}
--
- 	return 0;
- }
- 
-@@ -239,20 +291,6 @@ static int qm_set_regs(struct hisi_qm *qm, struct acc_vf_data *vf_data)
- 		return ret;
- 	}
- 
--	/* QM_EQC_DW has 7 regs */
--	ret = qm_write_regs(qm, QM_EQC_DW0, vf_data->qm_eqc_dw, 7);
--	if (ret) {
--		dev_err(dev, "failed to write QM_EQC_DW\n");
--		return ret;
--	}
--
--	/* QM_AEQC_DW has 7 regs */
--	ret = qm_write_regs(qm, QM_AEQC_DW0, vf_data->qm_aeqc_dw, 7);
--	if (ret) {
--		dev_err(dev, "failed to write QM_AEQC_DW\n");
--		return ret;
--	}
--
- 	return 0;
- }
- 
-@@ -522,6 +560,10 @@ static int vf_qm_load_data(struct hisi_acc_vf_core_device *hisi_acc_vdev,
- 		return ret;
- 	}
- 
-+	ret = qm_set_xqc_regs(hisi_acc_vdev, vf_data);
-+	if (ret)
-+		return ret;
-+
- 	ret = hisi_qm_mb(qm, QM_MB_CMD_SQC_BT, qm->sqc_dma, 0, 0);
- 	if (ret) {
- 		dev_err(dev, "set sqc failed\n");
-@@ -589,6 +631,10 @@ static int vf_qm_state_save(struct hisi_acc_vf_core_device *hisi_acc_vdev,
- 	vf_data->vf_qm_state = QM_READY;
- 	hisi_acc_vdev->vf_qm_state = vf_data->vf_qm_state;
- 
-+	ret = qm_get_xqc_regs(hisi_acc_vdev, vf_data);
-+	if (ret)
-+		return ret;
-+
- 	ret = vf_qm_read_data(vf_qm, vf_data);
- 	if (ret)
- 		return ret;
-@@ -1186,34 +1232,52 @@ static int hisi_acc_vf_qm_init(struct hisi_acc_vf_core_device *hisi_acc_vdev)
- {
- 	struct vfio_pci_core_device *vdev = &hisi_acc_vdev->core_device;
- 	struct hisi_qm *vf_qm = &hisi_acc_vdev->vf_qm;
-+	struct hisi_qm *pf_qm = hisi_acc_vdev->pf_qm;
- 	struct pci_dev *vf_dev = vdev->pdev;
-+	u32 val;
- 
--	/*
--	 * ACC VF dev BAR2 region consists of both functional register space
--	 * and migration control register space. For migration to work, we
--	 * need access to both. Hence, we map the entire BAR2 region here.
--	 * But unnecessarily exposing the migration BAR region to the Guest
--	 * has the potential to prevent/corrupt the Guest migration. Hence,
--	 * we restrict access to the migration control space from
--	 * Guest(Please see mmap/ioctl/read/write override functions).
--	 *
--	 * Please note that it is OK to expose the entire VF BAR if migration
--	 * is not supported or required as this cannot affect the ACC PF
--	 * configurations.
--	 *
--	 * Also the HiSilicon ACC VF devices supported by this driver on
--	 * HiSilicon hardware platforms are integrated end point devices
--	 * and the platform lacks the capability to perform any PCIe P2P
--	 * between these devices.
--	 */
-+	val = readl(pf_qm->io_base + QM_MIG_REGION_SEL);
-+	if (pf_qm->ver > QM_HW_V3 && (val & QM_MIG_REGION_EN))
-+		hisi_acc_vdev->drv_mode = HW_ACC_V4;
-+	else
-+		hisi_acc_vdev->drv_mode = HW_ACC_V3;
- 
--	vf_qm->io_base =
--		ioremap(pci_resource_start(vf_dev, VFIO_PCI_BAR2_REGION_INDEX),
--			pci_resource_len(vf_dev, VFIO_PCI_BAR2_REGION_INDEX));
--	if (!vf_qm->io_base)
--		return -EIO;
-+	if (hisi_acc_vdev->drv_mode == HW_ACC_V4) {
-+		/*
-+		 * On hardware platforms greater than QM_HW_V3, the migration function
-+		 * register is placed in the BAR2 configuration region of the PF,
-+		 * and each VF device occupies 8KB of configuration space.
-+		 */
-+		vf_qm->io_base = pf_qm->io_base + QM_MIG_REGION_OFFSET +
-+				 hisi_acc_vdev->vf_id * QM_MIG_REGION_SIZE;
-+	} else {
-+		/*
-+		 * ACC VF dev BAR2 region consists of both functional register space
-+		 * and migration control register space. For migration to work, we
-+		 * need access to both. Hence, we map the entire BAR2 region here.
-+		 * But unnecessarily exposing the migration BAR region to the Guest
-+		 * has the potential to prevent/corrupt the Guest migration. Hence,
-+		 * we restrict access to the migration control space from
-+		 * Guest(Please see mmap/ioctl/read/write override functions).
-+		 *
-+		 * Please note that it is OK to expose the entire VF BAR if migration
-+		 * is not supported or required as this cannot affect the ACC PF
-+		 * configurations.
-+		 *
-+		 * Also the HiSilicon ACC VF devices supported by this driver on
-+		 * HiSilicon hardware platforms are integrated end point devices
-+		 * and the platform lacks the capability to perform any PCIe P2P
-+		 * between these devices.
-+		 */
- 
-+		vf_qm->io_base =
-+			ioremap(pci_resource_start(vf_dev, VFIO_PCI_BAR2_REGION_INDEX),
-+				pci_resource_len(vf_dev, VFIO_PCI_BAR2_REGION_INDEX));
-+		if (!vf_qm->io_base)
-+			return -EIO;
-+	}
- 	vf_qm->fun_type = QM_HW_VF;
-+	vf_qm->ver = pf_qm->ver;
- 	vf_qm->pdev = vf_dev;
- 	mutex_init(&vf_qm->mailbox_lock);
- 
-@@ -1250,6 +1314,28 @@ static struct hisi_qm *hisi_acc_get_pf_qm(struct pci_dev *pdev)
- 	return !IS_ERR(pf_qm) ? pf_qm : NULL;
- }
- 
-+static size_t hisi_acc_get_resource_len(struct vfio_pci_core_device *vdev,
-+					unsigned int index)
-+{
-+	struct hisi_acc_vf_core_device *hisi_acc_vdev =
-+			hisi_acc_drvdata(vdev->pdev);
-+
-+	/*
-+	 * On the old HW_V3 device, the ACC VF device BAR2
-+	 * region encompasses both functional register space
-+	 * and migration control register space.
-+	 * only the functional region should be report to Guest.
-+	 */
-+	if (hisi_acc_vdev->drv_mode == HW_ACC_V3)
-+		return (pci_resource_len(vdev->pdev, index) >> 1);
-+	/*
-+	 * On the new HW device, the migration control register
-+	 * has been moved to the PF device BAR2 region.
-+	 * The VF device BAR2 is entirely functional register space.
-+	 */
-+	return pci_resource_len(vdev->pdev, index);
-+}
-+
- static int hisi_acc_pci_rw_access_check(struct vfio_device *core_vdev,
- 					size_t count, loff_t *ppos,
- 					size_t *new_count)
-@@ -1260,8 +1346,9 @@ static int hisi_acc_pci_rw_access_check(struct vfio_device *core_vdev,
- 
- 	if (index == VFIO_PCI_BAR2_REGION_INDEX) {
- 		loff_t pos = *ppos & VFIO_PCI_OFFSET_MASK;
--		resource_size_t end = pci_resource_len(vdev->pdev, index) / 2;
-+		resource_size_t end;
- 
-+		end = hisi_acc_get_resource_len(vdev, index);
- 		/* Check if access is for migration control region */
- 		if (pos >= end)
- 			return -EINVAL;
-@@ -1282,8 +1369,9 @@ static int hisi_acc_vfio_pci_mmap(struct vfio_device *core_vdev,
- 	index = vma->vm_pgoff >> (VFIO_PCI_OFFSET_SHIFT - PAGE_SHIFT);
- 	if (index == VFIO_PCI_BAR2_REGION_INDEX) {
- 		u64 req_len, pgoff, req_start;
--		resource_size_t end = pci_resource_len(vdev->pdev, index) / 2;
-+		resource_size_t end;
- 
-+		end = hisi_acc_get_resource_len(vdev, index);
- 		req_len = vma->vm_end - vma->vm_start;
- 		pgoff = vma->vm_pgoff &
- 			((1U << (VFIO_PCI_OFFSET_SHIFT - PAGE_SHIFT)) - 1);
-@@ -1330,7 +1418,6 @@ static long hisi_acc_vfio_pci_ioctl(struct vfio_device *core_vdev, unsigned int
- 	if (cmd == VFIO_DEVICE_GET_REGION_INFO) {
- 		struct vfio_pci_core_device *vdev =
- 			container_of(core_vdev, struct vfio_pci_core_device, vdev);
--		struct pci_dev *pdev = vdev->pdev;
- 		struct vfio_region_info info;
- 		unsigned long minsz;
- 
-@@ -1345,12 +1432,7 @@ static long hisi_acc_vfio_pci_ioctl(struct vfio_device *core_vdev, unsigned int
- 		if (info.index == VFIO_PCI_BAR2_REGION_INDEX) {
- 			info.offset = VFIO_PCI_INDEX_TO_OFFSET(info.index);
- 
--			/*
--			 * ACC VF dev BAR2 region consists of both functional
--			 * register space and migration control register space.
--			 * Report only the functional region to Guest.
--			 */
--			info.size = pci_resource_len(pdev, info.index) / 2;
-+			info.size = hisi_acc_get_resource_len(vdev, info.index);
- 
- 			info.flags = VFIO_REGION_INFO_FLAG_READ |
- 					VFIO_REGION_INFO_FLAG_WRITE |
-@@ -1521,7 +1603,8 @@ static void hisi_acc_vfio_pci_close_device(struct vfio_device *core_vdev)
- 	hisi_acc_vf_disable_fds(hisi_acc_vdev);
- 	mutex_lock(&hisi_acc_vdev->open_mutex);
- 	hisi_acc_vdev->dev_opened = false;
--	iounmap(vf_qm->io_base);
-+	if (hisi_acc_vdev->drv_mode == HW_ACC_V3)
-+		iounmap(vf_qm->io_base);
- 	mutex_unlock(&hisi_acc_vdev->open_mutex);
- 	vfio_pci_core_close_device(core_vdev);
- }
-diff --git a/drivers/vfio/pci/hisilicon/hisi_acc_vfio_pci.h b/drivers/vfio/pci/hisilicon/hisi_acc_vfio_pci.h
-index 91002ceeebc1..d181cd1a258c 100644
---- a/drivers/vfio/pci/hisilicon/hisi_acc_vfio_pci.h
-+++ b/drivers/vfio/pci/hisilicon/hisi_acc_vfio_pci.h
-@@ -59,6 +59,18 @@
- #define ACC_DEV_MAGIC_V1	0XCDCDCDCDFEEDAACC
- #define ACC_DEV_MAGIC_V2	0xAACCFEEDDECADEDE
- 
-+#define QM_MIG_REGION_OFFSET		0x180000
-+#define QM_MIG_REGION_SIZE		0x2000
-+
-+#define QM_SUB_VERSION_ID		0x100210
-+#define QM_EQC_PF_DW0			0x1c00
-+#define QM_AEQC_PF_DW0			0x1c20
-+
-+enum hw_drv_mode {
-+	HW_ACC_V3 = 0,
-+	HW_ACC_V4,
-+};
-+
- struct acc_vf_data {
- #define QM_MATCH_SIZE offsetofend(struct acc_vf_data, qm_rsv_state)
- 	/* QM match information */
-@@ -125,6 +137,7 @@ struct hisi_acc_vf_core_device {
- 	struct pci_dev *vf_dev;
- 	struct hisi_qm *pf_qm;
- 	struct hisi_qm vf_qm;
-+	int drv_mode;
- 	/*
- 	 * vf_qm_state represents the QM_VF_STATE register value.
- 	 * It is set by Guest driver for the ACC VF dev indicating
--- 
-2.33.0
+>
+> Signed-off-by: Xiaoyao Li <xiaoyao.li@intel.com>
+> Signed-off-by: Isaku Yamahata <isaku.yamahata@intel.com>
+> Signed-off-by: Yan Zhao <yan.y.zhao@intel.com>
+> ---
+> RFC v2:
+> - Add tdx_clear_folio().
+> - Drop inner loop _tdx_clear_page() and move __mb() outside of the loop.
+>    (Rick)
+> - Use C99-style definition of variables inside a for loop.
+> - Note: [1] also changes tdx_clear_page(). RFC v2 is not based on [1] now.
+>
+> [1] https://lore.kernel.org/all/20250724130354.79392-2-adrian.hunter@intel.com
+>
+> RFC v1:
+> - split out, let tdx_clear_page() accept level.
+> ---
+>   arch/x86/kvm/vmx/tdx.c | 22 ++++++++++++++++------
+>   1 file changed, 16 insertions(+), 6 deletions(-)
+>
+> diff --git a/arch/x86/kvm/vmx/tdx.c b/arch/x86/kvm/vmx/tdx.c
+> index 8eaf8431c5f1..4fabefb27135 100644
+> --- a/arch/x86/kvm/vmx/tdx.c
+> +++ b/arch/x86/kvm/vmx/tdx.c
+> @@ -277,18 +277,21 @@ static inline void tdx_disassociate_vp(struct kvm_vcpu *vcpu)
+>   	vcpu->cpu = -1;
+>   }
+>   
+> -static void tdx_clear_page(struct page *page)
+> +static void tdx_clear_folio(struct folio *folio, unsigned long start_idx,
+> +			    unsigned long npages)
+>   {
+>   	const void *zero_page = (const void *) page_to_virt(ZERO_PAGE(0));
+> -	void *dest = page_to_virt(page);
+> -	unsigned long i;
+>   
+>   	/*
+>   	 * The page could have been poisoned.  MOVDIR64B also clears
+>   	 * the poison bit so the kernel can safely use the page again.
+>   	 */
+> -	for (i = 0; i < PAGE_SIZE; i += 64)
+> -		movdir64b(dest + i, zero_page);
+> +	for (unsigned long j = 0; j < npages; j++) {
+> +		void *dest = page_to_virt(folio_page(folio, start_idx + j));
+> +
+> +		for (unsigned long i = 0; i < PAGE_SIZE; i += 64)
+> +			movdir64b(dest + i, zero_page);
+> +	}
+>   	/*
+>   	 * MOVDIR64B store uses WC buffer.  Prevent following memory reads
+>   	 * from seeing potentially poisoned cache.
+> @@ -296,6 +299,13 @@ static void tdx_clear_page(struct page *page)
+>   	__mb();
+>   }
+>   
+> +static inline void tdx_clear_page(struct page *page)
+No need to tag a local static function with "inline".
+
+> +{
+> +	struct folio *folio = page_folio(page);
+> +
+> +	tdx_clear_folio(folio, folio_page_idx(folio, page), 1);
+
+This is strange at my first thought.
+And then I realized that it is to avoid unnecessary memory barrier.
+
+No better idea so far.
+> +}
+> +
+>   static void tdx_no_vcpus_enter_start(struct kvm *kvm)
+>   {
+>   	struct kvm_tdx *kvm_tdx = to_kvm_tdx(kvm);
+> @@ -1736,7 +1746,7 @@ static int tdx_sept_drop_private_spte(struct kvm *kvm, gfn_t gfn,
+>   		pr_tdx_error(TDH_PHYMEM_PAGE_WBINVD, err);
+>   		return -EIO;
+>   	}
+> -	tdx_clear_page(page);
+> +	tdx_clear_folio(folio, folio_page_idx(folio, page), KVM_PAGES_PER_HPAGE(level));
+>   	tdx_pamt_put(page, level);
+>   	tdx_unpin(kvm, page);
+>   	return 0;
 
 
