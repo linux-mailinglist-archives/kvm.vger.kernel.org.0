@@ -1,165 +1,135 @@
-Return-Path: <kvm+bounces-56602-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-56603-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id AFEA8B40813
-	for <lists+kvm@lfdr.de>; Tue,  2 Sep 2025 16:56:38 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0507EB4090E
+	for <lists+kvm@lfdr.de>; Tue,  2 Sep 2025 17:37:01 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id EE7895E5706
-	for <lists+kvm@lfdr.de>; Tue,  2 Sep 2025 14:54:34 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E3C8016B2CD
+	for <lists+kvm@lfdr.de>; Tue,  2 Sep 2025 15:36:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B7112322A2D;
-	Tue,  2 Sep 2025 14:50:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D7360326D50;
+	Tue,  2 Sep 2025 15:36:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="yiWzrT4P"
+	dkim=pass (2048-bit key) header.d=ventanamicro.com header.i=@ventanamicro.com header.b="T2Y5ChM9"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pf1-f201.google.com (mail-pf1-f201.google.com [209.85.210.201])
+Received: from mail-il1-f182.google.com (mail-il1-f182.google.com [209.85.166.182])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 55954320A33
-	for <kvm@vger.kernel.org>; Tue,  2 Sep 2025 14:50:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7B6C5322C99
+	for <kvm@vger.kernel.org>; Tue,  2 Sep 2025 15:36:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756824628; cv=none; b=nQE6m4LirzuTOMvz7EgNo8ic1f/LcA4lE6g3lkiUfxyDUumoQwPfHbCPjGN5a9kBdB+jnWrSbI6e+bjW30mQAOHJMYOxCObmHdDuffFVu+GPf4i13VpQbURc3IG7dM6ycu40cCTps0E9T/OBenDkluGlwbqB1wWAoqcCafM1l6s=
+	t=1756827374; cv=none; b=Ha5sHVnLxNaLyEPKX4ayhB6jvDd4uUP3kYgYgoZuFQqlGTOMDUBwVCPDD0iIHRZH9o4gUVFAkOZlU2YqVl+t+OeatpdE+5EcLmtxuRFLQ77wmwH7DjuyIy//cJu5z7bIXANrJbkdhpvYkI1pXQg+xw0s4jxjsfDkc+/6fbkxlLg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756824628; c=relaxed/simple;
-	bh=dH9WJqnnaUBg0PJEQdCMKAbP/OG3mpvTrdhmMKmcYHw=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=kM10tW4Ntw9Cj9V3+bWgDNNHD5nnv8g5FuNGtBkeH2P1L+J/I3ECz7d+idGWquQLa4DmZn1R9kpirlOSCnoSh2nPVMz7k2tj108M0GOgnqw6174YCepeLfCHXv4Vt2ZGrKTIxlsQyGB5soiYjcl93sp3bInrvCH52S6yvpEFepk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=yiWzrT4P; arc=none smtp.client-ip=209.85.210.201
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pf1-f201.google.com with SMTP id d2e1a72fcca58-76e2ea9366aso5260739b3a.2
-        for <kvm@vger.kernel.org>; Tue, 02 Sep 2025 07:50:27 -0700 (PDT)
+	s=arc-20240116; t=1756827374; c=relaxed/simple;
+	bh=pQfx5rbbo9VQV6yem/9gGiPAtj7wlmVzU3U4hgkJ1I0=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=VSavvD3w1JfCyOUrskehOzLQGXnY2spHxB8poXG96yd1Y3+92Z4Dy5BPWqnM9SWdeC7fIBfelJEij996Q6DnlrSI8aFDZdx6lN1TV1B9B8V+vESs91ClLOhNe7ZqHEg/yKU5BfzXZByAUOwdBjzQVmgRG0cLqCvSJXpZKC32TDQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ventanamicro.com; spf=pass smtp.mailfrom=ventanamicro.com; dkim=pass (2048-bit key) header.d=ventanamicro.com header.i=@ventanamicro.com header.b=T2Y5ChM9; arc=none smtp.client-ip=209.85.166.182
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ventanamicro.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ventanamicro.com
+Received: by mail-il1-f182.google.com with SMTP id e9e14a558f8ab-3f2b6e0b942so23772295ab.1
+        for <kvm@vger.kernel.org>; Tue, 02 Sep 2025 08:36:12 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1756824626; x=1757429426; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:from:subject:message-id:references
-         :mime-version:in-reply-to:date:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=BVhDXq7LIMwuZZc1aVBi0bntn8J+fEILMHHxGS2ec3Q=;
-        b=yiWzrT4PQjJgLy8fs6EhcAUdEd96gqW/soblg7P3rZLuhLOuqG4keii5hwV4an1dp0
-         HuRp+LzoIdkRBRhpLdNMIAFRePjsIiuOhQMKPoTiQqiA5LqKz6uRhejWVXeTFc7xJuc3
-         9lwVcVQXwmy+S2Sw6VA2vwbgy4BpxvRT0aWGD/RFWTjn/+6zk3Tk6x4nIhGSQa4FEK7Q
-         CnesL3vbauHSsn31sHYdPp3ocwy71ZS4wJ1WuCgbR93bSw5n3fYMVyDK4+29ZJsNr9XN
-         g1zzf1qXautgtybKpdmHxMOs/QeBLVj/IMVhla+zVyFw4xucZ9PW4GFNBvAWMoAlyzZr
-         AR+g==
+        d=ventanamicro.com; s=google; t=1756827371; x=1757432171; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=K9s+kfAE8HRXPT1H9Bh1Vhsm3UofgSwfxkPjIm95TJo=;
+        b=T2Y5ChM9hTNIdeDM5yJ1one2K7VvP7XcE2iK+G198VkCs3N1rdlI0hxHDjZuRk5jnb
+         xPSWnnSwceWN6cmrLHZUN1p6e3LcVSp7KAlCGY36zm8/rdZFutCg6Qi28oUmpYEAEaII
+         qCqQegFYf+jXfijc2xtFEtXW1HnJMJJmeG90BWIrDBALZFOvfs70Djo9WzHmkMl3lm41
+         6jAO61b1hO3WsDnJnYryszEgeYMi0pRDT6WM/h7xTYFPsJtfvkWSwfx1uY1IjC2uz8Bs
+         4SVoxvt+B+7pAOPgOUhEyfritekaFAWs5mxJS032uonpPQ2AgFsN3cxUtdyvHNAtDTJw
+         ygGA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1756824626; x=1757429426;
-        h=content-transfer-encoding:cc:to:from:subject:message-id:references
-         :mime-version:in-reply-to:date:x-gm-message-state:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=BVhDXq7LIMwuZZc1aVBi0bntn8J+fEILMHHxGS2ec3Q=;
-        b=V/2TqfYj1+Aak2RQnJWg6FMcvzumtrovjukAshA+Hrr8hBAm8gNbW/hyFPp0OEZKPy
-         0/Znz09QfHJFEPn0cZLoLMdhhXyoQpIkhZT620jClV35rhdLfHs1+KYaUmG6jfyFSylR
-         FGNpqgZZYl1nz/jvyLWpCx0qqUU20kJikbms0TMFdrEZ5B3lSfS9KOwXtzFl5i9KHW61
-         4eUMgfwz71a/dFQEinGmmbLg/eelTTSkMylHbkgJjcp4C8JJptDuJgBvTN+cwSgg+Odw
-         2zhThjXtC6v3nxcqS49+LhbnZafdCa687oPbCefHXpp/StwJIXXPkUU/X0q7jK4ov3kM
-         CsUg==
-X-Forwarded-Encrypted: i=1; AJvYcCWW6+MLAlH58IKzxPOa+tRam8KC1GjS8WyjsaJkRdy+9QC71H+m60mkY5jA6UIYGaVZRjs=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyElZagvEwH88mZ1sVc/Q0yVOpDUsXs84e4NRGxWKfViIoDNiM8
-	VMDVupv2TL0Pp9YbTY6ApKhn55sX5FkcJCM/BT8fVeVeuV+MjDymS8YFSdTqTB3f1y8Swq718ye
-	/Ws6yvQ==
-X-Google-Smtp-Source: AGHT+IFtWd0Vy9I1oKsoEPVbgz7z2BDFEVbR9IM8u1o9qW9c7L994gWT3hCAFl0msMpLwSM0dvMW7Cf8q/4=
-X-Received: from pfbdi11-n2.prod.google.com ([2002:a05:6a00:480b:20b0:76c:6ec8:ac2d])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a05:6a00:4fd2:b0:772:641:cfb8
- with SMTP id d2e1a72fcca58-7723e0d366emr11456143b3a.0.1756824626392; Tue, 02
- Sep 2025 07:50:26 -0700 (PDT)
-Date: Tue, 2 Sep 2025 07:50:24 -0700
-In-Reply-To: <fbdcca61-e9c4-47fc-b629-7a46ad35cd24@intel.com>
+        d=1e100.net; s=20230601; t=1756827371; x=1757432171;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=K9s+kfAE8HRXPT1H9Bh1Vhsm3UofgSwfxkPjIm95TJo=;
+        b=ovl8I1HWQUau/EU820A+wgo7iqXxA5iPPEoT6PJ/RoPrs05EEgfWWRMeFO568qhwme
+         GO2ilOUYGGznH+xwd7PDnKBFH5zjM6wngI6Ot4fpfbm2gN0f65QfIgIDGrGCrWy5nWkJ
+         R0++V/0P5a0+soF5J8YBQq+onhd16rbVFUdtW5j8skNl4/h67grT6EN+8d4aHlWDSCFV
+         5zRlw8N1gH5I6CO7gyxu9voB1Kym0E48B8CwoW7gjJZ49RxsSWkzbdOMaoVn9XCovmb/
+         sl6sQYcymIz3ijlTmjfTorbJxir9jjUPEOQFkoxTB6tLJGVS1HCAcd4oy5eXEl7Xey62
+         CbwA==
+X-Forwarded-Encrypted: i=1; AJvYcCWZCv3OTlLQTsmSpqw7HSplSd5DtXQejBrspGQIYZBxFBQWfRBztiuejrLQdF5vS2bS20I=@vger.kernel.org
+X-Gm-Message-State: AOJu0YymGyRGGWlC4PMXVSpYicGP5ZPGa9ePxj1jiADb9BvUq6Q7xJCd
+	IBvQzCYnw0CP4HF/cJZpvfa3Rwg/By2iGwW9jCSSI9tZ2p5S8heF6Q7UfHmFoMjtcis=
+X-Gm-Gg: ASbGncsmubk+iPuJb8g7AXQDN2HtrFPnfeDRmTItbS+eE2oWPCNopSCYorpyR2y/LFp
+	qiAmwlDWOPPnKWWkosyCtlkv+opZKX64eEzhuyMFtjXGMM19EFuT1W0p58DdhAsJZPPOjBSxkEw
+	BVxbZ1rAej2yrsVNbFwKHwsDsaM9YjwqCtuLMbmNJnsNMCLQhagYRR7UkDV5hEpzNyrVfVtz44q
+	7Noo8IIYaONKP+BWwbmCpIDwhfaks/WzWzYvT+m+2wmHVyXrHCn3XSTSwF9JRsw9n71sVn75T0T
+	uIP2QQQgAbXME34tLZGJcmyxPEOGx1AbjUrRmp24RY6A/x+0T78x46YF5XIwnYVcEr5MX+yaJrX
+	eCc5lxoK12YkrF8jHRmgRcyYX
+X-Google-Smtp-Source: AGHT+IES7nRiJ9CHZ2JkifKal6ueldn9qBf26MOJ0udQNkIKmIhptPxDm7X55cZKJRjHHzBvZ9JRfA==
+X-Received: by 2002:a05:6e02:2302:b0:3f0:62bf:f23 with SMTP id e9e14a558f8ab-3f401aee1b6mr224147135ab.15.1756827371527;
+        Tue, 02 Sep 2025 08:36:11 -0700 (PDT)
+Received: from localhost ([140.82.166.162])
+        by smtp.gmail.com with ESMTPSA id 8926c6da1cb9f-50d8f35cd88sm3180471173.59.2025.09.02.08.36.10
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 02 Sep 2025 08:36:10 -0700 (PDT)
+Date: Tue, 2 Sep 2025 10:36:10 -0500
+From: Andrew Jones <ajones@ventanamicro.com>
+To: dayss1224@gmail.com
+Cc: pbonzini@redhat.com, shuah@kernel.org, anup@brainfault.org, 
+	atish.patra@linux.dev, paul.walmsley@sifive.com, palmer@dabbelt.com, 
+	aou@eecs.berkeley.edu, alex@ghiti.fr, kvm@vger.kernel.org, 
+	linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org, kvm-riscv@lists.infradead.org, 
+	linux-riscv@lists.infradead.org
+Subject: Re: [PATCH v3 0/3] KVM: riscv: selftests: Enable supported test cases
+Message-ID: <20250902-9cc0d0dad59ba680062dbbf8@orel>
+References: <cover.1756710918.git.dayss1224@gmail.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20250805202224.1475590-1-seanjc@google.com> <20250805202224.1475590-5-seanjc@google.com>
- <424e2aaa-04df-4c7e-a7f9-c95f554bd847@intel.com> <849dd787-8821-41f1-8eef-26ede3032d90@linux.intel.com>
- <c4bc61da-c42c-453d-b484-f970b99cb616@zytor.com> <fbdcca61-e9c4-47fc-b629-7a46ad35cd24@intel.com>
-Message-ID: <aLcEMCMDRCEZnmdH@google.com>
-Subject: Re: [PATCH v3 4/6] KVM: x86: Add support for RDMSR/WRMSRNS w/
- immediate on Intel
-From: Sean Christopherson <seanjc@google.com>
-To: Xiaoyao Li <xiaoyao.li@intel.com>
-Cc: Xin Li <xin@zytor.com>, Binbin Wu <binbin.wu@linux.intel.com>, 
-	Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	Borislav Petkov <bp@alien8.de>
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <cover.1756710918.git.dayss1224@gmail.com>
 
-On Mon, Sep 01, 2025, Xiaoyao Li wrote:
-> On 9/1/2025 3:04 PM, Xin Li wrote:
-> > On 8/31/2025 11:34 PM, Binbin Wu wrote:
-> > > > We need to inject #UD for !guest_cpu_has(X86_FEATURE_MSR_IMM)
-> > > >=20
-> > >=20
-> > > Indeed.
-> >=20
-> > Good catch!
-> >=20
-> > >=20
-> > > There is a virtualization hole of this feature for the accesses to th=
-e
-> > > MSRs not intercepted. IIUIC, there is no other control in VMX for thi=
-s
-> > > feature. If the feature is supported in hardware, the guest will succ=
-eed
-> > > when it accesses to the MSRs not intercepted even when the feature is=
- not
-> > > exposed to the guest, but the guest will get #UD when access to the M=
-SRs
-> > > intercepted if KVM injects #UD.
-> >=20
-> > hpa mentioned this when I just started the work.=C2=A0 But I managed to=
- forget
-> > it later... Sigh!
-> >=20
-> > >=20
-> > > But I guess this is the guest's fault by not following the CPUID,
-> > > KVM should
-> > > still follow the spec?
-> >=20
-> > I think we should still inject #UD when a MSR is intercepted by KVM.
+On Mon, Sep 01, 2025 at 03:35:48PM +0800, dayss1224@gmail.com wrote:
+> From: Dong Yang <dayss1224@gmail.com>
+> 
+> Add supported KVM test cases and fix the compilation dependencies.
+> ---
+> Changes in v3:
+> - Reorder patches to fix build dependencies
+> - Sort common supported test cases alphabetically
+> - Move ucall_common.h include from common header to specific source files
+> 
+> Changes in v2:
+> - Delete some repeat KVM test cases on riscv
+> - Add missing headers to fix the build for new RISC-V KVM selftests
+> 
+> Dong Yang (1):
+>   KVM: riscv: selftests: Add missing headers for new testcases
+> 
+> Quan Zhou (2):
+>   KVM: riscv: selftests: Use the existing RISCV_FENCE macro in
+>     `rseq-riscv.h`
+>   KVM: riscv: selftests: Add common supported test cases
+> 
+>  tools/testing/selftests/kvm/Makefile.kvm                    | 6 ++++++
+>  tools/testing/selftests/kvm/access_tracking_perf_test.c     | 1 +
+>  tools/testing/selftests/kvm/include/riscv/processor.h       | 1 +
+>  .../selftests/kvm/memslot_modification_stress_test.c        | 1 +
+>  tools/testing/selftests/kvm/memslot_perf_test.c             | 1 +
+>  tools/testing/selftests/rseq/rseq-riscv.h                   | 3 +--
+>  6 files changed, 11 insertions(+), 2 deletions(-)
+> 
+> -- 
+> 2.34.1
 
-Hmm, no, inconsistent behavior (from the guest's perspective) is likely wor=
-se
-than eating with the virtualization hole.  Practically speaking, the only g=
-uest
-that's going to be surprised by the hole is a guest that's fuzzing opcodes,=
- and
-a guest that's fuzzing opcodes at CPL0 isn't is going to create an inherent=
-ly
-unstable environment no matter what.
+In the future please CC previous reviewers on the entire series
+(particularly when they have reviewed the entire previous series).
 
-Though that raises the question of whether or not KVM should emulate WRMSRN=
-S and
-whatever the official name for the "RDMSR with immediate" instruction is (I=
- can't
-find it in the SDM).  I'm leaning "no", because outside of forced emulation=
-, KVM
-should only "need" to emulate the instructions if Unrestricted Guest is dis=
-abled,
-the instructions should only be supported on CPUs with unrestricted guest, =
-there's
-no sane reason (other than testing) to run a guest without Unrestricted Gue=
-st,
-and using the instructions in Big RM would be quite bizarre.  On the other =
-hand,
-adding emulation support should be quite easy...
+For the series,
 
-Side topic, does RDMSRLIST have any VMX controls?
-
-> For handle_wrmsr_imm(), it seems we need to check
-> guest_cpu_cap_has(X86_FEATURE_WRMSRNS) as well, since immediate form of M=
-SR
-> write is only supported on WRMSRNS instruction.
->=20
-> It leads to another topic, do we need to bother checking the opcode of th=
-e
-> instruction on EXIT_REASON_MSR_WRITE and inject #UD when it is WRMSRNS
-> instuction and !guest_cpu_cap_has(X86_FEATURE_WRMSRNS)?
->=20
-> WRMSRNS has virtualization hole as well, but KVM at least can emulate the
-> architectural behavior when the write on MSRs are not pass through.
+Reviewed-by: Andrew Jones <ajones@ventanamicro.com>
 
