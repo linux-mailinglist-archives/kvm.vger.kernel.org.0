@@ -1,167 +1,93 @@
-Return-Path: <kvm+bounces-56683-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-56684-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6A220B41CEB
-	for <lists+kvm@lfdr.de>; Wed,  3 Sep 2025 13:19:54 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 88916B41E76
+	for <lists+kvm@lfdr.de>; Wed,  3 Sep 2025 14:09:39 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0456617507F
-	for <lists+kvm@lfdr.de>; Wed,  3 Sep 2025 11:19:54 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D075B1786FB
+	for <lists+kvm@lfdr.de>; Wed,  3 Sep 2025 12:08:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CCB0C2F618F;
-	Wed,  3 Sep 2025 11:19:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E5BDA2E62C3;
+	Wed,  3 Sep 2025 12:07:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="nHqnw+LI"
+	dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="xw/Zxpln";
+	dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="jPYvEOdC"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.10])
+Received: from galois.linutronix.de (Galois.linutronix.de [193.142.43.55])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 33D6D27A476;
-	Wed,  3 Sep 2025 11:19:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.10
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 94A3E286428;
+	Wed,  3 Sep 2025 12:07:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.142.43.55
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756898385; cv=none; b=Ybr1WhxsseKn5avspQTPui/xQP8o+IQJKETNhoqaz+P6Pb50rs/2oinLW0OKRXNcOUwZg47RajgMeftrnT0FTfoJ4aCg9o46DJlFl5Ziy0zjSP1zMquHBgP/Svf5QIPZAZhdGTOvIMlJ0Lwy3L5IW9fqraMgY5iyQRVgE3841W4=
+	t=1756901277; cv=none; b=SISwV4tDD6y482C6+gWp7usnl40MtZMgain3JiHCL8h6dDyxf/yhg6AlB4kKQPEROpIX17VrhMfeEQIxCsQ2qR6hcKtyzckkvIGRezO1zFxaZVozjraSFSJsM3IuexXkn0qydZNoEbmypeWvWDjv6Zf5f6VmMn5ecGBJiSM3LUc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756898385; c=relaxed/simple;
-	bh=Hhu23ZKM03iRMG9GrOYxaRgeFHhng4bMn3jUd+Yr/Tw=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=Q/u3OsWobrP4NwK+2Un9iG6UHt9mnICm5D/grxq//DleQp66nCB+HCLkwk1yaFE4pVD1UibHJXJWvzojmjBm3I1EU/hzVgrNYWKRlqe9Kk+6GZAjOE5XIFzPJmrXBaZJBgGz2wiPvtBEpGPhGr2ZRIDQqpAqaKqpBTy2QqTLVdI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=nHqnw+LI; arc=none smtp.client-ip=192.198.163.10
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1756898383; x=1788434383;
-  h=message-id:date:mime-version:subject:to:cc:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=Hhu23ZKM03iRMG9GrOYxaRgeFHhng4bMn3jUd+Yr/Tw=;
-  b=nHqnw+LIp0AuCFmPClCrgjyid5lAVVNmO/Hqw8JHqgyQRP05npY8Ivsb
-   exeopVgf5yrpp1tiKr4/JsxgN5vw8C72EkGfmIBYt4dhljqaoTT1B9qTv
-   BeugwK1Qpqn1+445do48LcyHX5h6yEVGdGGhdTr5qmUjvA0YYvj/bp8bi
-   LtATwKDJvoQiVwbj+L3nk3Tgum8MSjDyBQWxM6ysq/k5DFsoAZEWNogOG
-   x0kI1YUdcKL/itsFcfkI6C/fZw+w9gMy2evmh4Wl3hv8erYMu4/ob4zVm
-   i2dE6T8o7dkNAts00vP7DFpRjcHOuz272DI0zuWAhxMGxU94cNWh813SH
-   Q==;
-X-CSE-ConnectionGUID: VHmHla/PQui+K/CiWSbSQQ==
-X-CSE-MsgGUID: TZFlqZO1QmWMl3z98S1jjg==
-X-IronPort-AV: E=McAfee;i="6800,10657,11541"; a="70585862"
-X-IronPort-AV: E=Sophos;i="6.18,235,1751266800"; 
-   d="scan'208";a="70585862"
-Received: from fmviesa003.fm.intel.com ([10.60.135.143])
-  by fmvoesa104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 03 Sep 2025 04:19:42 -0700
-X-CSE-ConnectionGUID: oI7RqsbTRlOg+UjuWab8Jg==
-X-CSE-MsgGUID: VVJ9CYNzT2G8Jl44rq7Shw==
-X-ExtLoop1: 1
-Received: from junyubia-mobl1.ccr.corp.intel.com (HELO [10.124.233.111]) ([10.124.233.111])
-  by fmviesa003-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 03 Sep 2025 04:19:36 -0700
-Message-ID: <a42dae7e-4608-4488-9621-0cf32b68dfbc@linux.intel.com>
-Date: Wed, 3 Sep 2025 19:19:32 +0800
+	s=arc-20240116; t=1756901277; c=relaxed/simple;
+	bh=IedR9gLTqIst+0+I6/rCBWY1cT0eeORo9UueU/viVUs=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
+	 MIME-Version:Content-Type; b=nz1SS4VWWjYsl+JHs65s7Cpv2frTgbqmpDY40uWzApbOOm8VUhMje6n5ZCORKgLMzpETNHMolgeLiE23In4zrIm0kYgYYhNgGUgy0TPEloZVrMyolikxJCiKNj0PBPTRz0bBZPnSNgwd6mVo/UTt2HG3VMMyU05o2QFxMRba6Pk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de; spf=pass smtp.mailfrom=linutronix.de; dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=xw/Zxpln; dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=jPYvEOdC; arc=none smtp.client-ip=193.142.43.55
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linutronix.de
+From: Thomas Gleixner <tglx@linutronix.de>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
+	s=2020; t=1756901272;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=IedR9gLTqIst+0+I6/rCBWY1cT0eeORo9UueU/viVUs=;
+	b=xw/ZxplnLljYchtWLlcn8/J04+jjSWmOTBlUk/gySEikZE1mr57Wbp1d7/9uobUQVXr1Re
+	PC9yMoasYgYWcYxeqatqpDgKLJmb40+9epAxAishKhajLizLCIN9729JQvO7m/3rmiu/NV
+	c1bV6U/02I5tY7qN/w7XgBt89Kxh8LGPRpfwRKpL97zHuWBXP37P1ZxEGB0m1Mk3lizpPw
+	ElIIjQbOpvCqDh65s6WA1OPxwtBnkcofkLE4U9Ke3iJyyxI25x0bc/0CMoV/l8QFoo7phX
+	SKcImogCcFIxEKkB14R83VYNQa+wb47PrXeePbZm74VoH2n9SMxVYLYSwg4NKg==
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
+	s=2020e; t=1756901272;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=IedR9gLTqIst+0+I6/rCBWY1cT0eeORo9UueU/viVUs=;
+	b=jPYvEOdCiB5SxSTGT9FwgczyLLPEoJxm5A6QgwYbgaVy+O/K2p/7OfoPcRKZ0HSfnwhFHD
+	iXWyk916Zaz6ZXCA==
+To: Sascha Bischoff <Sascha.Bischoff@arm.com>,
+ "linux-arm-kernel@lists.infradead.org"
+ <linux-arm-kernel@lists.infradead.org>, "kvmarm@lists.linux.dev"
+ <kvmarm@lists.linux.dev>, "linux-kernel@vger.kernel.org"
+ <linux-kernel@vger.kernel.org>, "kvm@vger.kernel.org"
+ <kvm@vger.kernel.org>
+Cc: nd <nd@arm.com>, "maz@kernel.org" <maz@kernel.org>,
+ "oliver.upton@linux.dev" <oliver.upton@linux.dev>, Joey Gouly
+ <Joey.Gouly@arm.com>, Suzuki Poulose <Suzuki.Poulose@arm.com>,
+ "yuzenghui@huawei.com" <yuzenghui@huawei.com>, "will@kernel.org"
+ <will@kernel.org>, "lpieralisi@kernel.org" <lpieralisi@kernel.org>,
+ Timothy Hayes <Timothy.Hayes@arm.com>
+Subject: Re: [PATCH 5/5] irqchip/gic-v5: Drop has_gcie_v3_compat from
+ gic_kvm_info
+In-Reply-To: <20250828105925.3865158-6-sascha.bischoff@arm.com>
+References: <20250828105925.3865158-1-sascha.bischoff@arm.com>
+ <20250828105925.3865158-6-sascha.bischoff@arm.com>
+Date: Wed, 03 Sep 2025 14:07:51 +0200
+Message-ID: <874itjzqlk.ffs@tglx>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [RFC PATCH v2 04/23] KVM: TDX: Introduce tdx_clear_folio() to
- clear huge pages
-To: Yan Zhao <yan.y.zhao@intel.com>
-Cc: pbonzini@redhat.com, seanjc@google.com, linux-kernel@vger.kernel.org,
- kvm@vger.kernel.org, x86@kernel.org, rick.p.edgecombe@intel.com,
- dave.hansen@intel.com, kas@kernel.org, tabba@google.com,
- ackerleytng@google.com, quic_eberman@quicinc.com, michael.roth@amd.com,
- david@redhat.com, vannapurve@google.com, vbabka@suse.cz,
- thomas.lendacky@amd.com, pgonda@google.com, zhiquan1.li@intel.com,
- fan.du@intel.com, jun.miao@intel.com, ira.weiny@intel.com,
- isaku.yamahata@intel.com, xiaoyao.li@intel.com, chao.p.peng@intel.com
-References: <20250807093950.4395-1-yan.y.zhao@intel.com>
- <20250807094214.4495-1-yan.y.zhao@intel.com>
- <04d6d306-b495-428f-ac3a-44057fd6ccfc@linux.intel.com>
- <aLgPsZ6PxGVqmeZl@yzhao56-desk.sh.intel.com>
-Content-Language: en-US
-From: Binbin Wu <binbin.wu@linux.intel.com>
-In-Reply-To: <aLgPsZ6PxGVqmeZl@yzhao56-desk.sh.intel.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain
 
-
-
-On 9/3/2025 5:51 PM, Yan Zhao wrote:
-> On Tue, Sep 02, 2025 at 10:56:25AM +0800, Binbin Wu wrote:
->>
->> On 8/7/2025 5:42 PM, Yan Zhao wrote:
->>> After removing or reclaiming a guest private page or a control page from a
->>> TD, zero the physical page using movdir64b(), enabling the kernel to reuse
->>> the pages.
->>>
->>> Introduce the function tdx_clear_folio() to zero out physical memory using
->>> movdir64b(), starting from the page at "start_idx" within a "folio" and
->>> spanning "npages" contiguous PFNs.
->>>
->>> Convert tdx_clear_page() to be a helper function to facilitate the
->>> zeroing of 4KB pages.
->> I think this sentence is outdated?
-> No? tdx_clear_page() is still invoked to clear tdr_page.
-
-I didn't get the word "Convert".
-
+On Thu, Aug 28 2025 at 10:59, Sascha Bischoff wrote:
+> The presence of FEAT_GCIE_LEGACY is now handled as a CPU
+> feature. Therefore, drop the check and flag from the GIC driver and
+> gic_kvm_info as it is no longer required or used by KVM.
 >
->>> Signed-off-by: Xiaoyao Li <xiaoyao.li@intel.com>
->>> Signed-off-by: Isaku Yamahata <isaku.yamahata@intel.com>
->>> Signed-off-by: Yan Zhao <yan.y.zhao@intel.com>
->>> ---
->>> RFC v2:
->>> - Add tdx_clear_folio().
->>> - Drop inner loop _tdx_clear_page() and move __mb() outside of the loop.
->>>     (Rick)
->>> - Use C99-style definition of variables inside a for loop.
->>> - Note: [1] also changes tdx_clear_page(). RFC v2 is not based on [1] now.
->>>
->>> [1] https://lore.kernel.org/all/20250724130354.79392-2-adrian.hunter@intel.com
->>>
->>> RFC v1:
->>> - split out, let tdx_clear_page() accept level.
->>> ---
->>>    arch/x86/kvm/vmx/tdx.c | 22 ++++++++++++++++------
->>>    1 file changed, 16 insertions(+), 6 deletions(-)
->>>
->>> diff --git a/arch/x86/kvm/vmx/tdx.c b/arch/x86/kvm/vmx/tdx.c
->>> index 8eaf8431c5f1..4fabefb27135 100644
->>> --- a/arch/x86/kvm/vmx/tdx.c
->>> +++ b/arch/x86/kvm/vmx/tdx.c
->>> @@ -277,18 +277,21 @@ static inline void tdx_disassociate_vp(struct kvm_vcpu *vcpu)
->>>    	vcpu->cpu = -1;
->>>    }
->>> -static void tdx_clear_page(struct page *page)
->>> +static void tdx_clear_folio(struct folio *folio, unsigned long start_idx,
->>> +			    unsigned long npages)
->>>    {
->>>    	const void *zero_page = (const void *) page_to_virt(ZERO_PAGE(0));
->>> -	void *dest = page_to_virt(page);
->>> -	unsigned long i;
->>>    	/*
->>>    	 * The page could have been poisoned.  MOVDIR64B also clears
->>>    	 * the poison bit so the kernel can safely use the page again.
->>>    	 */
->>> -	for (i = 0; i < PAGE_SIZE; i += 64)
->>> -		movdir64b(dest + i, zero_page);
->>> +	for (unsigned long j = 0; j < npages; j++) {
->>> +		void *dest = page_to_virt(folio_page(folio, start_idx + j));
->>> +
->>> +		for (unsigned long i = 0; i < PAGE_SIZE; i += 64)
->>> +			movdir64b(dest + i, zero_page);
->>> +	}
->>>    	/*
->>>    	 * MOVDIR64B store uses WC buffer.  Prevent following memory reads
->>>    	 * from seeing potentially poisoned cache.
->>> @@ -296,6 +299,13 @@ static void tdx_clear_page(struct page *page)
->>>    	__mb();
->>>    }
->>> +static inline void tdx_clear_page(struct page *page)
->> No need to tag a local static function with "inline".
-> Ok.
->
+> Signed-off-by: Sascha Bischoff <sascha.bischoff@arm.com>
+
+Assuming this goes through the arm/kvm tree:
+
+Acked-by: Thomas Gleixner <tglx@linutronix.de>
 
 
