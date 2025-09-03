@@ -1,84 +1,84 @@
-Return-Path: <kvm+bounces-56686-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-56687-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5BD0CB420A8
-	for <lists+kvm@lfdr.de>; Wed,  3 Sep 2025 15:15:03 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 679EAB420B3
+	for <lists+kvm@lfdr.de>; Wed,  3 Sep 2025 15:15:52 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 047F1546168
-	for <lists+kvm@lfdr.de>; Wed,  3 Sep 2025 13:14:25 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D370D5659DA
+	for <lists+kvm@lfdr.de>; Wed,  3 Sep 2025 13:15:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 419AA307AEE;
-	Wed,  3 Sep 2025 13:11:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BBCF0302CB7;
+	Wed,  3 Sep 2025 13:13:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="fOU9V8+F"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="VF/+0vZn"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D9681301034
-	for <kvm@vger.kernel.org>; Wed,  3 Sep 2025 13:11:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 43E6A2FE56E
+	for <kvm@vger.kernel.org>; Wed,  3 Sep 2025 13:13:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756905064; cv=none; b=RrTdFWfMmfqrbYkkjjVkGDtt7waApsaopMGFHEijuOTGmODWMWreRrihnZCRKCDb9UoZAXqnM0myPaNG1UXBmRl/sVrwNj4M5LznhGVEt/TLNnJTraZY2R+OZdACbmMSRYbvjNNXXOACM/glFg+USBf3DzGxULccN45OPFFOatc=
+	t=1756905202; cv=none; b=ChxiWiQqY/b+Gd8BfPYdn/JTv+XnXJPcWtRDWX3pxD2KPgOuDYnX+e9jTieu/XNz6RZwMn3Sv+V6zbUvBJvku8oE3lDV8Q3YEnaKBW7Wyma0VxgiKWWeY2cvMpyFDTYxLWmExd+0GH+WWipEdctGNV/mM5kOyBSawIdsFiTJg0c=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756905064; c=relaxed/simple;
-	bh=Y/X2fWSGYvLP2GbzQgVsXw6QemqhTogGncbWhT+ee+4=;
+	s=arc-20240116; t=1756905202; c=relaxed/simple;
+	bh=mBGx6bKd//U8D94s4t2SoXU3lLXnSajCr2AAkuXi1ZM=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=GlQSUe5RfPhq21rQsXpvFC7vrc/sMnHHu4DAUZru08lOKsabzxcZ944YtmLw3kj6LIQTSiH+V5sdxQF6HoDgf2pA78mFYhys58n+vAy4y2y4MKjrrg9+wbZ5B++R7vo7jK96hYraSMORDztH97FE0f6tqBQacM52k7L0T+SeXHg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=fOU9V8+F; arc=none smtp.client-ip=170.10.133.124
+	 Content-Type:Content-Disposition:In-Reply-To; b=kCa/6SXfgfhivnEIIoDNcwMSP3JkUSqBeuGgW1lorELFXw2mrpBkRNWXB3PqavMq9m3ojKgDfCsIjuN5sw7FUKYKiDP7SeDZL/LvtiDA/bdwA6n/5fvceKNFSeIis97JLzs9L+0gzH7CHOAI5Diz+TE4lRvhWxhR69GNwU2u5UE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=VF/+0vZn; arc=none smtp.client-ip=170.10.129.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1756905061;
+	s=mimecast20190719; t=1756905199;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 in-reply-to:in-reply-to:references:references;
-	bh=Fu1nRMO4mP7hG3XcSYcXuE1KvbxzA7CKEO6dC9YqXJc=;
-	b=fOU9V8+Fy/wuJ8EREoBTDv6Sx64l6GmuBDDEFGhP0h67yPhjGC126t/Xmjd98kCKkXmxvL
-	L6hx3JpVHFpt22X9UEQCIUFpNVekgA3MG+FLZ9YucYreLwrib8aRfy4u0N8u3q/UoQKJ/m
-	GQAzLKCzmtZAooBtEooEGlIz04aEeUA=
-Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
- [209.85.128.72]) by relay.mimecast.com with ESMTP with STARTTLS
+	bh=yc++Bk4gHq8rVQO2rd4UcrQ6O5BuxTUofo1WcPNdozc=;
+	b=VF/+0vZnTxPQvsb0kKvZKoyveDOm5MKg8ToadYjjrJRpW2yyUABL8ifQShp+0960zS8+e7
+	yMxeK6/7uRgmBBvFigrePzuTgxu/PpLIs7Z11ZvV6MZPIoDm8qGLI6NiS7ChKsZtzTLMFM
+	XKbWC2zkEtAvS9JusgiO4Vpirv6xgNA=
+Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
+ [209.85.221.72]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-266-XNxJPA8RM7iP5MfoabVTxQ-1; Wed, 03 Sep 2025 09:10:59 -0400
-X-MC-Unique: XNxJPA8RM7iP5MfoabVTxQ-1
-X-Mimecast-MFC-AGG-ID: XNxJPA8RM7iP5MfoabVTxQ_1756905057
-Received: by mail-wm1-f72.google.com with SMTP id 5b1f17b1804b1-45cb5dbda9cso4340205e9.2
-        for <kvm@vger.kernel.org>; Wed, 03 Sep 2025 06:10:58 -0700 (PDT)
+ us-mta-121-wE_j6YsEO0CsMLiLFIwI4Q-1; Wed, 03 Sep 2025 09:13:16 -0400
+X-MC-Unique: wE_j6YsEO0CsMLiLFIwI4Q-1
+X-Mimecast-MFC-AGG-ID: wE_j6YsEO0CsMLiLFIwI4Q_1756905195
+Received: by mail-wr1-f72.google.com with SMTP id ffacd0b85a97d-3cf48ec9fc1so3295383f8f.0
+        for <kvm@vger.kernel.org>; Wed, 03 Sep 2025 06:13:16 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1756905057; x=1757509857;
+        d=1e100.net; s=20230601; t=1756905195; x=1757509995;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=Fu1nRMO4mP7hG3XcSYcXuE1KvbxzA7CKEO6dC9YqXJc=;
-        b=pE087F8lZd0/gDwWoL/vC9L3GrCWbZdtHlWSBB62wwiRVTLT2rBtmTC5UZKXSGo4Md
-         lnI8ITz1BO04rhgw6Dc/x41jMwPsSQzy3TMx6GpM8u9bxveCF8c4aK45y6HMrm0Z/ixt
-         jYlF9XFOrqpHRzZOHQgj6yDZNVLfSy4+3SJcN8ne/awMDH0E30HRT6fqfX6MIoHDX9Td
-         oHuvY8tMHkg+aNJw6naZS4ZNylBPV1vxt372XGVhHLDlOhrkcIokhc9yXawsUAeHHk34
-         ZegtwOROw7CTQsRFY+guDEWVvtsZxDTgG+JDgh6xEBl8kNzNHuxtFh89j35BxzJME06V
-         ssNg==
-X-Forwarded-Encrypted: i=1; AJvYcCVEOa8ZcBOCmsNOAiqhgm0wlQTBo0DEC9nIJCu/iLWdh+HJ+UuYD7qdm42unLLQAPZcnWQ=@vger.kernel.org
-X-Gm-Message-State: AOJu0YysOyhGw/thHdUjkYpKaU+X463d7B44U4bXPz6zW6CovWsVlVoU
-	ztpzFyGfFGEsEvuKi7Dpjs0pVogT5YKA1cYSYNbdHiStDF+hjdev2t6+N/RlVrX/NLRb7CcSjP0
-	CkglF7TFoaxnSYPeJkhfHvumq6XIvXX0WHZfnSfRU+mGPxS/pLLlQuw==
-X-Gm-Gg: ASbGnctqKK2a6JUhrZulAAPHNOuKmOd16RdTugSTDGIvzGBrKS55fBVpwJ8W7iT9C5Y
-	msWcGQOkiikoedrzxz+k6foxtyqhDW8UCpN1b37QQVkdjqOQSJ0OyF1hk89Y3U8BqvOGjZwz2HQ
-	UkCzE32/LvF3RExJk1iAvEmN/SS+VyjnzXPRUYpcwaHXYlei28XV7CnXD10OJxySAGwQR2rE9O+
-	q2ySHoxDoZ9xaFNDCvf0TbOFaye1+EQfFo99TEGmi66ix/MHLyETZBG+7Y6imT8wkxEtkrs/90/
-	I6SpDKpK8cA9WyPzQYAO7TwRH0JsyA==
-X-Received: by 2002:a05:6000:3110:b0:3cc:29e8:d52f with SMTP id ffacd0b85a97d-3d1dea86a76mr12153285f8f.38.1756905057065;
-        Wed, 03 Sep 2025 06:10:57 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IFb0624kVbYkja7DUsEoelJ71o6GXCbvgslVOj9fGNi28SVeur6o32uG23Fh/vV7MnRvsF1pw==
-X-Received: by 2002:a05:6000:3110:b0:3cc:29e8:d52f with SMTP id ffacd0b85a97d-3d1dea86a76mr12153241f8f.38.1756905056517;
-        Wed, 03 Sep 2025 06:10:56 -0700 (PDT)
+        bh=yc++Bk4gHq8rVQO2rd4UcrQ6O5BuxTUofo1WcPNdozc=;
+        b=fTD0mrn7Gz9HYKyUsoeyYsCi3Z/e0XDHcmmMgIOxlxpAcetwakIgVyUHtZTJfEGVTb
+         msM/ZDTC+dVD2EGekHqulgXaaROd/rGFURVVaS2DBOA4h/LYKF544vn+NTNsJfyYZTb2
+         H7CwTgaMK7O9soJ3r/R72AU8Onuen8ynN74tZ1s8ox7KkhtQx1rpXYqo5V7fQazQVEk5
+         AWxS0EX1p70QJaFrnyda6hERvIl8vzHJ/ElDWpFz3ui8X9s7puWJ/G4kC40zGH0Juzqz
+         e995ksqDx1kT+WHnWQY8XaC/5NXtw/aJlHvGmnYy0JP0VPn+Ja+RSNRiVN6jSRWDGAZl
+         PENg==
+X-Forwarded-Encrypted: i=1; AJvYcCU3N6UiZWHo7ROKvtpwe6wSYnKIx6raG8C+VDEd+xxTdbcjbCS0BdFCnHsUSmZPkfyWvpI=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzD0skSCPrFpz4ZZuXD82P7vTZ776wsUug8T50oFLfDPb47kN8c
+	DMFXxecLD0huH3GuhsTQqghN5OljFVhMwTlu02ab34Gs2eruQkaldzyTKY4TUnkNJ7iyqluVafu
+	8pMdCcgCt8FubE65gWWWR1inpGOeE3GIMirPDVp3UAhASvxmzhjZx/A==
+X-Gm-Gg: ASbGncs7hWPIDOEr0OyZ6BzH3aotBai2KLzxHCcIwbobp3FgmRuR6cCp+Q4+WEEkxzY
+	tGSccyRpg56VfftgZ71KDOuWCbIrJkixmYqmTLP6xwMcI6wHf9ZaY4vRMacZdcWFAiP/vICQPwf
+	OEqKyKE3N3qjbVOeX8lsunkbCS1Ivm4IAKni63Y5EjlZtWSwySUtnFCKIbwfl+Z3ttqsRqV+Za3
+	20y2f4gNAfIUFLqWerwEGCmjJa+Tbr1ZUTFOfQWMXqwjYC1v9hiq6c3xtXW6vkLfy0KUZnYeedT
+	f5o53EK6Q/yCxOwPKu7C9EuHpM1nwg==
+X-Received: by 2002:a05:6000:25ee:b0:3d6:92ed:cae8 with SMTP id ffacd0b85a97d-3d692edce86mr10643417f8f.34.1756905195271;
+        Wed, 03 Sep 2025 06:13:15 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IE5Rd9SrgoaV2dgKrR38B9EwqokmCVv2zYCp6Unv9lrkeF9C49ix2kdTmzDinE3j4u/W7oa3Q==
+X-Received: by 2002:a05:6000:25ee:b0:3d6:92ed:cae8 with SMTP id ffacd0b85a97d-3d692edce86mr10643375f8f.34.1756905194800;
+        Wed, 03 Sep 2025 06:13:14 -0700 (PDT)
 Received: from redhat.com ([2a0e:41b:f000:0:c4d3:2073:6af0:f91d])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-45b7e92a42asm237242065e9.20.2025.09.03.06.10.55
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3d2250115fdsm18102932f8f.40.2025.09.03.06.13.13
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 03 Sep 2025 06:10:56 -0700 (PDT)
-Date: Wed, 3 Sep 2025 09:10:54 -0400
+        Wed, 03 Sep 2025 06:13:14 -0700 (PDT)
+Date: Wed, 3 Sep 2025 09:13:12 -0400
 From: "Michael S. Tsirkin" <mst@redhat.com>
 To: Simon Schippers <simon.schippers@tu-dortmund.de>
 Cc: willemdebruijn.kernel@gmail.com, jasowang@redhat.com,
@@ -87,7 +87,7 @@ Cc: willemdebruijn.kernel@gmail.com, jasowang@redhat.com,
 	virtualization@lists.linux.dev, kvm@vger.kernel.org,
 	Tim Gebauer <tim.gebauer@tu-dortmund.de>
 Subject: Re: [PATCH 2/4] netdev queue flow control for TUN
-Message-ID: <20250903090723-mutt-send-email-mst@kernel.org>
+Message-ID: <20250903091235-mutt-send-email-mst@kernel.org>
 References: <20250902080957.47265-1-simon.schippers@tu-dortmund.de>
  <20250902080957.47265-3-simon.schippers@tu-dortmund.de>
 Precedence: bulk
@@ -107,7 +107,11 @@ On Tue, Sep 02, 2025 at 10:09:55AM +0200, Simon Schippers wrote:
 > the SKB is dropped. However, this never happened in my testing. To ensure
 > that the ptr_ring change is available to the consumer before the netdev
 > queue stop, an smp_wmb() is used.
-> 
+
+I think the stop -> wake bounce involves enough barriers already,
+no need for us to get cute.
+
+
 > Then in tun_ring_recv, the new helper wake_netdev_queue is called in the
 > blocking wait queue and after consuming an SKB from the ptr_ring. This
 > helper first checks if the netdev queue has stopped. Then with the paired
@@ -119,57 +123,81 @@ On Tue, Sep 02, 2025 at 10:09:55AM +0200, Simon Schippers wrote:
 > Co-developed-by: Tim Gebauer <tim.gebauer@tu-dortmund.de>
 > Signed-off-by: Tim Gebauer <tim.gebauer@tu-dortmund.de>
 > Signed-off-by: Simon Schippers <simon.schippers@tu-dortmund.de>
-
-
-Oh you just want to know if produce will succeed?
-Kind of a version of peek but for producer?
-
-So all this cuteness of looking at the consumer is actually not necessary,
-and bad for cache.
-
-You just want this:
-
-
-Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
-
-diff --git a/include/linux/ptr_ring.h b/include/linux/ptr_ring.h
-index 551329220e4f..de25fe81dd4e 100644
---- a/include/linux/ptr_ring.h
-+++ b/include/linux/ptr_ring.h
-@@ -96,6 +96,14 @@ static inline bool ptr_ring_full_bh(struct ptr_ring *r)
- 	return ret;
- }
- 
-+static inline int __ptr_ring_produce_peek(struct ptr_ring *r)
-+{
-+	if (unlikely(!r->size) || r->queue[r->producer])
-+		return -ENOSPC;
-+
-+	return 0;
-+}
-+
- /* Note: callers invoking this in a loop must use a compiler barrier,
-  * for example cpu_relax(). Callers must hold producer_lock.
-  * Callers are responsible for making sure pointer that is being queued
-@@ -103,8 +111,10 @@ static inline bool ptr_ring_full_bh(struct ptr_ring *r)
-  */
- static inline int __ptr_ring_produce(struct ptr_ring *r, void *ptr)
- {
--	if (unlikely(!r->size) || r->queue[r->producer])
--		return -ENOSPC;
-+	int r = __ptr_ring_produce_peek(r);
-+
-+	if (r)
-+		return r;
- 
- 	/* Make sure the pointer we are storing points to a valid data. */
- 	/* Pairs with the dependency ordering in __ptr_ring_consume. */
-
-
-
-Add some docs, and call this, then wake.  No?
-
--- 
-MST
+> ---
+>  drivers/net/tun.c | 33 ++++++++++++++++++++++++++++++---
+>  1 file changed, 30 insertions(+), 3 deletions(-)
+> 
+> diff --git a/drivers/net/tun.c b/drivers/net/tun.c
+> index cc6c50180663..735498e221d8 100644
+> --- a/drivers/net/tun.c
+> +++ b/drivers/net/tun.c
+> @@ -1060,13 +1060,21 @@ static netdev_tx_t tun_net_xmit(struct sk_buff *skb, struct net_device *dev)
+>  
+>  	nf_reset_ct(skb);
+>  
+> -	if (ptr_ring_produce(&tfile->tx_ring, skb)) {
+> +	queue = netdev_get_tx_queue(dev, txq);
+> +	if (unlikely(ptr_ring_produce(&tfile->tx_ring, skb))) {
+> +		/* Paired with smp_rmb() in wake_netdev_queue. */
+> +		smp_wmb();
+> +		netif_tx_stop_queue(queue);
+>  		drop_reason = SKB_DROP_REASON_FULL_RING;
+>  		goto drop;
+>  	}
+> +	if (ptr_ring_full(&tfile->tx_ring)) {
+> +		/* Paired with smp_rmb() in wake_netdev_queue. */
+> +		smp_wmb();
+> +		netif_tx_stop_queue(queue);
+> +	}
+>  
+>  	/* dev->lltx requires to do our own update of trans_start */
+> -	queue = netdev_get_tx_queue(dev, txq);
+>  	txq_trans_cond_update(queue);
+>  
+>  	/* Notify and wake up reader process */
+> @@ -2110,6 +2118,24 @@ static ssize_t tun_put_user(struct tun_struct *tun,
+>  	return total;
+>  }
+>  
+> +static inline void wake_netdev_queue(struct tun_file *tfile)
+> +{
+> +	struct netdev_queue *txq;
+> +	struct net_device *dev;
+> +
+> +	rcu_read_lock();
+> +	dev = rcu_dereference(tfile->tun)->dev;
+> +	txq = netdev_get_tx_queue(dev, tfile->queue_index);
+> +
+> +	if (netif_tx_queue_stopped(txq)) {
+> +		/* Paired with smp_wmb() in tun_net_xmit. */
+> +		smp_rmb();
+> +		if (ptr_ring_spare(&tfile->tx_ring, 1))
+> +			netif_tx_wake_queue(txq);
+> +	}
+> +	rcu_read_unlock();
+> +}
+> +
+>  static void *tun_ring_recv(struct tun_file *tfile, int noblock, int *err)
+>  {
+>  	DECLARE_WAITQUEUE(wait, current);
+> @@ -2139,7 +2165,7 @@ static void *tun_ring_recv(struct tun_file *tfile, int noblock, int *err)
+>  			error = -EFAULT;
+>  			break;
+>  		}
+> -
+> +		wake_netdev_queue(tfile);
+>  		schedule();
+>  	}
+>  
+> @@ -2147,6 +2173,7 @@ static void *tun_ring_recv(struct tun_file *tfile, int noblock, int *err)
+>  	remove_wait_queue(&tfile->socket.wq.wait, &wait);
+>  
+>  out:
+> +	wake_netdev_queue(tfile);
+>  	*err = error;
+>  	return ptr;
+>  }
+> -- 
+> 2.43.0
 
 
