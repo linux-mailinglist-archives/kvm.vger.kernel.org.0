@@ -1,136 +1,156 @@
-Return-Path: <kvm+bounces-56652-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-56653-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 48207B411A8
-	for <lists+kvm@lfdr.de>; Wed,  3 Sep 2025 03:08:17 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 592FFB412CF
+	for <lists+kvm@lfdr.de>; Wed,  3 Sep 2025 05:13:40 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id D5E1E1B25145
-	for <lists+kvm@lfdr.de>; Wed,  3 Sep 2025 01:08:37 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1FF6017CA75
+	for <lists+kvm@lfdr.de>; Wed,  3 Sep 2025 03:13:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4B01F1D63F3;
-	Wed,  3 Sep 2025 01:08:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B4DF72C3253;
+	Wed,  3 Sep 2025 03:13:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="CEBUmV9h"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="VqcRht0u"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.20])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BA2818F40;
-	Wed,  3 Sep 2025 01:08:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.20
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 37A71265631
+	for <kvm@vger.kernel.org>; Wed,  3 Sep 2025 03:13:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756861687; cv=none; b=juxLKWQy2rujoLyXOgfC2dF58UVofWP4Olyyg6n6wWwlSOXClsbCyic27pJ4TH8Uu/tZQnbR2J5veCitMFz+5KtXSER3eXI6x1nc+rYHvvo40DxJ9TvLdqNOu+ONSogY7o0ww+b70DuZcRL6vlyNJNZyRQm/Vsr4cYolgrzzukY=
+	t=1756869205; cv=none; b=tI4mySu0eGuoWr4DtCdpKhOiPGK7ei35Mq2t+SicwcIYOlb2So2CN0HmSf3tfXXKSaxj8FFeoyWfUS9BcvljkT14kWfOh+wCsuSVRYlYR8AVvRvH+8Df/Oo71L8T33o66a1Pa5Bh/VhiEj22mFUQuzSO1WV0ivfkJ5Ex40Iz7Uw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756861687; c=relaxed/simple;
-	bh=eFwtTOp488H2WYY50S1vuvKjFHgMVxD7w3AAU+mpx2o=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=fyVaMMYpeUiMZmn1OfL7020oDY5sUFglNaLzgfxLlWBoQs0Wvkgt6hcdd5vkJAi1PW+G3mDqYaqjJm1nhZc5hZNu9TLiEDwJv1Gp0IONxEXeQuOJnVehMCduKepJXQpgCkS1podUlEqAL8whOL8hU/Pt5l8s25hcz9NWrVcWz8k=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=CEBUmV9h; arc=none smtp.client-ip=198.175.65.20
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1756861686; x=1788397686;
-  h=message-id:date:mime-version:subject:to:cc:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=eFwtTOp488H2WYY50S1vuvKjFHgMVxD7w3AAU+mpx2o=;
-  b=CEBUmV9hFyHIFSkbBc+CXhpJtBHZrMuSJR6p6OrN4qSb3KXj1ljGQbq9
-   rKeuIEfpWEcuyJFqvrgmCG15ancwaEcdUfFYIF5neFJLTsfMGihXene0V
-   OEmTJcJU0VxXCKe9Blok8MTSAnmF4i+juJd6yqWALO5gvyPSUoRgO5901
-   u32y7K8x3f180SWWYDs5OMqgN+tsTuvg0hfzn5f2kngoFao4acFmGYX2C
-   IbffK7vSrpItPJYwa/Z2eUUqcO5O/NyuDIfwdcLIjR+ZQdYXGqV/Jm+h1
-   kKjflOQvjFpkkJx+pv9ZgyS0inefuYkncuWFzZEoz78DwCDg9tlnBv37R
-   A==;
-X-CSE-ConnectionGUID: Fjyj9cSpQpC1RJQ2kBUxYA==
-X-CSE-MsgGUID: XECOiO2hQWW8sQgzJPsIAg==
-X-IronPort-AV: E=McAfee;i="6800,10657,11541"; a="58860694"
-X-IronPort-AV: E=Sophos;i="6.18,233,1751266800"; 
-   d="scan'208";a="58860694"
-Received: from fmviesa007.fm.intel.com ([10.60.135.147])
-  by orvoesa112.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 02 Sep 2025 18:08:05 -0700
-X-CSE-ConnectionGUID: ClgcoAYWQ2WAA3Y7LiceAw==
-X-CSE-MsgGUID: wD1frc0nRta6PPFFK9ba6w==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.18,233,1751266800"; 
-   d="scan'208";a="170994387"
-Received: from unknown (HELO [10.238.0.107]) ([10.238.0.107])
-  by fmviesa007-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 02 Sep 2025 18:08:00 -0700
-Message-ID: <23effdc0-1fbe-430d-b570-bc927b10fcf2@linux.intel.com>
-Date: Wed, 3 Sep 2025 09:07:57 +0800
+	s=arc-20240116; t=1756869205; c=relaxed/simple;
+	bh=XMHugQRV8upAY2qAFOtTHC5h06Ia39RID/0cXKLd44M=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=CtA3pn59F+lDy4nhKOZ/2bgj9CrsARt5dDlVv8B/9VpHuEJ35+FzZjR1++OsPygtOcx7PmQRxxR7p3sje07La8DCw7D8CNEYwaVumSvjR2KFmIKdDz1jsaXiEIgQICpF4YoWPYYi2jXwiJ7WKlgBIfSKQ3FPvqoDFQKZj7oI8Ps=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=VqcRht0u; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1756869203;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=xol+alIBvLCv0kDjUEFNYzYfWJLZoeFZJYHsWzrrfsI=;
+	b=VqcRht0uShy+KAdFJropD2bhO1EIMTIPiVRCsZ2QUgANksYIoY5uw95Z3/4tTB7iwLako7
+	HTStvgt+OGv+5vloQh4dsIJLu4v+UZQAoNdwui0p1LJYISr+7joSLVR38sJS5LIMrjnorA
+	syzXoI1U5N7BYwZscLq2J3tOKLbe88I=
+Received: from mail-pj1-f69.google.com (mail-pj1-f69.google.com
+ [209.85.216.69]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-489-OkC1oSdRMyqm4ABjAqwXxQ-1; Tue, 02 Sep 2025 23:13:21 -0400
+X-MC-Unique: OkC1oSdRMyqm4ABjAqwXxQ-1
+X-Mimecast-MFC-AGG-ID: OkC1oSdRMyqm4ABjAqwXxQ_1756869200
+Received: by mail-pj1-f69.google.com with SMTP id 98e67ed59e1d1-329745d6960so3821252a91.0
+        for <kvm@vger.kernel.org>; Tue, 02 Sep 2025 20:13:21 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1756869200; x=1757474000;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=xol+alIBvLCv0kDjUEFNYzYfWJLZoeFZJYHsWzrrfsI=;
+        b=bdfzjGVt6YTB78bfDHwk+ffkpt9HkJvsRTkV1ZIGeklprrtJwxuGHgXLSphE108YYY
+         vSNMh5M1IsI48ro0G6tjdxLlGyGf5G5TcdZv3+SJc0pb3JZWExXlFdUlekKgL1ew/W16
+         ey5qZw2ptFG0K9/3OP9o1gBcXITYzp+gv7iu9ZW1MCtodGf6YVi96kqZFV7fEX8Zsd8W
+         9D4i+i4NMnelYypasEyqFe3zDMYwMjo8nwMANLD6XwQElv6vmDPuWsWlkQGZ2dZBclLz
+         G/z8Mn1lfie6zGaaj8i1xgrVsvz/nijVzTXWhM6t82JIJ8ZdO652k8H6mEM2d7qj6QMs
+         TtHA==
+X-Forwarded-Encrypted: i=1; AJvYcCUQ4FeEiVMP15c7EBxJWIL41Rls175V7UP3NB8lvrZYpop1oNGArHCdyNX99QJ2uiCOank=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yz6K0B3Z/UIOK2GEZgUcNGkmhaT4d7LYG8/8d/10skBOFMhI/mH
+	rm51G8AskYt9k7hAlb3iCeUdQtTYnFlL1BeE2zc8h5ZLyEzeE4En7xWXmNermbW4cRW004beIiP
+	4NuYA80S7ZZJxGjlWs7l93AJTBnrxojIdT5PN0TE5trfon9xtMkU/CSCL7/J7s0Q49Au2D/MP6S
+	4Usfr/7VRrAOanFrgriM2xl6ftU10p
+X-Gm-Gg: ASbGncs+T/rmue2wJ+ISmwl/BgsCfN0dokaVv0x7NKUy2YwZvcTSnCAtfOHZHbjjQU6
+	Mpz1kKhxahu4jZu+h70Mzmx0dIAgeelmycFIGqb4wRbPqN2cFzUHuodEz/XRj88wpFDASzpzhK1
+	zVYLEWQdXKK1o4Uz+YJ6YRUg==
+X-Received: by 2002:a17:90b:5867:b0:327:fd85:6cd2 with SMTP id 98e67ed59e1d1-328156c623emr18214882a91.24.1756869200504;
+        Tue, 02 Sep 2025 20:13:20 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IGTcvOJVfQMP9AtXeCfqc3GqOtFGl+2YHKFjgvAyMuI4oaGeseIgP7UAQtunJbi2+5RUMMF8o50W85VET7Ldak=
+X-Received: by 2002:a17:90b:5867:b0:327:fd85:6cd2 with SMTP id
+ 98e67ed59e1d1-328156c623emr18214850a91.24.1756869200081; Tue, 02 Sep 2025
+ 20:13:20 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v9 18/19] KVM: selftests: Add ucall support for TDX
-To: Sean Christopherson <seanjc@google.com>
-Cc: Sagi Shahar <sagis@google.com>, linux-kselftest@vger.kernel.org,
- Paolo Bonzini <pbonzini@redhat.com>, Shuah Khan <shuah@kernel.org>,
- Ackerley Tng <ackerleytng@google.com>, Ryan Afranji <afranji@google.com>,
- Andrew Jones <ajones@ventanamicro.com>,
- Isaku Yamahata <isaku.yamahata@intel.com>,
- Erdem Aktas <erdemaktas@google.com>,
- Rick Edgecombe <rick.p.edgecombe@intel.com>,
- Roger Wang <runanwang@google.com>, Oliver Upton <oliver.upton@linux.dev>,
- "Pratik R. Sampat" <pratikrajesh.sampat@amd.com>,
- Reinette Chatre <reinette.chatre@intel.com>, Ira Weiny
- <ira.weiny@intel.com>, Chao Gao <chao.gao@intel.com>,
- Chenyi Qiang <chenyi.qiang@intel.com>, linux-kernel@vger.kernel.org,
- kvm@vger.kernel.org
-References: <20250821042915.3712925-1-sagis@google.com>
- <20250821042915.3712925-19-sagis@google.com>
- <18bf858c-e135-4a9b-bda8-a70be3b3720e@linux.intel.com>
- <aLcRIn8ryB2kXWcD@google.com>
-Content-Language: en-US
-From: Binbin Wu <binbin.wu@linux.intel.com>
-In-Reply-To: <aLcRIn8ryB2kXWcD@google.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+References: <20250902080957.47265-1-simon.schippers@tu-dortmund.de>
+ <20250902080957.47265-2-simon.schippers@tu-dortmund.de> <willemdebruijn.kernel.6b96c721c235@gmail.com>
+In-Reply-To: <willemdebruijn.kernel.6b96c721c235@gmail.com>
+From: Jason Wang <jasowang@redhat.com>
+Date: Wed, 3 Sep 2025 11:13:07 +0800
+X-Gm-Features: Ac12FXyivnmUX4HGcNjFfQl5uUVCs0KxooT46aj1-W0YWPU72YBI_ajqRuEAnwE
+Message-ID: <CACGkMEuE-j0mwHUvDg9uocGCG78HAX4oCXVbt-YS7t5G1LTPfQ@mail.gmail.com>
+Subject: Re: [PATCH 1/4] ptr_ring_spare: Helper to check if spare capacity of
+ size cnt is available
+To: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+Cc: Simon Schippers <simon.schippers@tu-dortmund.de>, mst@redhat.com, eperezma@redhat.com, 
+	stephen@networkplumber.org, netdev@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, virtualization@lists.linux.dev, 
+	kvm@vger.kernel.org, Tim Gebauer <tim.gebauer@tu-dortmund.de>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-
-
-On 9/2/2025 11:45 PM, Sean Christopherson wrote:
-> On Wed, Aug 27, 2025, Binbin Wu wrote:
->> On 8/21/2025 12:29 PM, Sagi Shahar wrote:
->>> @@ -46,11 +69,23 @@ void *ucall_arch_get_ucall(struct kvm_vcpu *vcpu)
->>>    {
->>>    	struct kvm_run *run = vcpu->run;
->>> -	if (run->exit_reason == KVM_EXIT_IO && run->io.port == UCALL_PIO_PORT) {
->>> -		struct kvm_regs regs;
->>> +	switch (vm_type) {
->>> +	case KVM_X86_TDX_VM:
->>> +		if (vcpu->run->exit_reason == KVM_EXIT_MMIO &&
->>> +		    vcpu->run->mmio.phys_addr == host_ucall_mmio_gpa &&
->>> +		    vcpu->run->mmio.len == 8 && vcpu->run->mmio.is_write) {
->>> +			uint64_t data = *(uint64_t *)vcpu->run->mmio.data;
->>> +
->>> +			return (void *)data;
->>> +		}
->>> +		return NULL;
->> My first thought was how did SEV_ES or SNP work for this since they are not
->> able to get RDI neither.
->> Then I had a check in sev_smoke_test.c, both guest_sev_es_code() and
->> guest_snp_code() call GUEST_ASSERT(), which finally calls ucall_assert(), but
->> in test_sev(), the code doesn't handle ucall for SEV_ES or SNP.
->> Does it mean GUEST_ASSERT() is currently not working and ignored for SEV_ES
->> and SNP? Or did I miss anything?
-> GUEST_ASSERT() "works" for -ES and -SNP in the sense that it generates as test
-> failure due to the #VC not being handled (leads to SHUTDOWN).  But you're correct
-> that ucall isn't functional yet.  x86/sev_smoke_test.c fudges around lack of ucall
-> by using the GHCB MSR protocol to signal "done".
+On Wed, Sep 3, 2025 at 5:13=E2=80=AFAM Willem de Bruijn
+<willemdebruijn.kernel@gmail.com> wrote:
 >
->          /*
->           * TODO: Add GHCB and ucall support for SEV-ES guests.  For now, simply
->           * force "termination" to signal "done" via the GHCB MSR protocol.
->           */
->          wrmsr(MSR_AMD64_SEV_ES_GHCB, GHCB_MSR_TERM_REQ);
->          vmgexit();
+> Simon Schippers wrote:
+> > The implementation is inspired by ptr_ring_empty.
+> >
+> > Co-developed-by: Tim Gebauer <tim.gebauer@tu-dortmund.de>
+> > Signed-off-by: Tim Gebauer <tim.gebauer@tu-dortmund.de>
+> > Signed-off-by: Simon Schippers <simon.schippers@tu-dortmund.de>
+> > ---
+> >  include/linux/ptr_ring.h | 71 ++++++++++++++++++++++++++++++++++++++++
+> >  1 file changed, 71 insertions(+)
+> >
+> > diff --git a/include/linux/ptr_ring.h b/include/linux/ptr_ring.h
+> > index 551329220e4f..6b8cfaecf478 100644
+> > --- a/include/linux/ptr_ring.h
+> > +++ b/include/linux/ptr_ring.h
+> > @@ -243,6 +243,77 @@ static inline bool ptr_ring_empty_bh(struct ptr_ri=
+ng *r)
+> >       return ret;
+> >  }
+> >
+> > +/*
+> > + * Check if a spare capacity of cnt is available without taking any lo=
+cks.
+> > + *
+> > + * If cnt=3D=3D0 or cnt > r->size it acts the same as __ptr_ring_empty=
+.
 >
-OK, thanks for the explanation!
+> cnt >=3D r->size?
+>
+> > + *
+> > + * The same requirements apply as described for __ptr_ring_empty.
+> > + */
+> > +static inline bool __ptr_ring_spare(struct ptr_ring *r, int cnt)
+> > +{
+> > +     int size =3D r->size;
+> > +     int to_check;
+> > +
+> > +     if (unlikely(!size || cnt < 0))
+> > +             return true;
+>
+> Does !size ever happen.
+
+Yes, see 982fb490c298 ("ptr_ring: support zero length ring"). The
+reason is tun reuse dev->tx_queue_len for ptr_ring size.
+
+> Also no need for preconditions for trivial
+> errors that never happen, like passing negative values. Or prefer
+> an unsigned type.
+
++1.
+
+Thanks
 
 
