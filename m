@@ -1,112 +1,136 @@
-Return-Path: <kvm+bounces-56651-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-56652-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6292EB41154
-	for <lists+kvm@lfdr.de>; Wed,  3 Sep 2025 02:30:28 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 48207B411A8
+	for <lists+kvm@lfdr.de>; Wed,  3 Sep 2025 03:08:17 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1DD7C5E7C82
-	for <lists+kvm@lfdr.de>; Wed,  3 Sep 2025 00:30:27 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id D5E1E1B25145
+	for <lists+kvm@lfdr.de>; Wed,  3 Sep 2025 01:08:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A27E845948;
-	Wed,  3 Sep 2025 00:30:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4B01F1D63F3;
+	Wed,  3 Sep 2025 01:08:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="kmLSNv31"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="CEBUmV9h"
 X-Original-To: kvm@vger.kernel.org
-Received: from out-184.mta0.migadu.com (out-184.mta0.migadu.com [91.218.175.184])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.20])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4D4261E4AB
-	for <kvm@vger.kernel.org>; Wed,  3 Sep 2025 00:30:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.184
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BA2818F40;
+	Wed,  3 Sep 2025 01:08:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.20
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756859420; cv=none; b=DAnWZxOuv389Cbx6i91MC9Ogt+YBn44HpYVwE5pEir8ZzNZkspe7i/dSw09lJECZibFmDXCqqn7PEoQ9ygVefa4O48RA4kwc7p1x09Zq9JxhZ1i8mdit+xZ4R0gbxSGwwI4+QgcbcDB2sQpvD7Ir3iRXmdqzQCmA+a9AltMpJm8=
+	t=1756861687; cv=none; b=juxLKWQy2rujoLyXOgfC2dF58UVofWP4Olyyg6n6wWwlSOXClsbCyic27pJ4TH8Uu/tZQnbR2J5veCitMFz+5KtXSER3eXI6x1nc+rYHvvo40DxJ9TvLdqNOu+ONSogY7o0ww+b70DuZcRL6vlyNJNZyRQm/Vsr4cYolgrzzukY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756859420; c=relaxed/simple;
-	bh=avxoggIy7iNMq1V9YTUJVFJ2AwIXBC8XWfTRiq0XybI=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=KMZ/wfinL0Bp+nWQHBdnIRpIEV6wnZ+JNwhC7zbbpL1bNrgm175GjxLqrUwioEtsDjEYmRQ61QcpXFwePUlvYmG66A+yaw+dwDwWQM3re58/CAtswzxArkV5vIOYbBxOBQ/9OT7oi2V4sFhVXi/B1fjcRKJj0gK/GXlU1vgTy4g=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=kmLSNv31; arc=none smtp.client-ip=91.218.175.184
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1756859414;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=oATve04/PpCSXjt9BZQOkk2Qc8tlxwWxSK5sGt1qgbY=;
-	b=kmLSNv31AHeFXz4x//T4DbkgO+0bwAqi0uieRQ4eRXYRhIjH53r/biqthzW7KuMQeSDntt
-	xusOfsKlLb8wrFH5dftIh+JA+8imUMGm6VysmuXVdG+gyUlTeX1L6VaWNuyC52Z+MHmAq9
-	UzRbUuMnhFQ9hdnvD+Yv9J7Cg/SEdhk=
-From: Thorsten Blum <thorsten.blum@linux.dev>
-To: Sean Christopherson <seanjc@google.com>,
-	Paolo Bonzini <pbonzini@redhat.com>,
-	Thomas Gleixner <tglx@linutronix.de>,
-	Ingo Molnar <mingo@redhat.com>,
-	Borislav Petkov <bp@alien8.de>,
-	Dave Hansen <dave.hansen@linux.intel.com>,
-	x86@kernel.org,
-	"H. Peter Anvin" <hpa@zytor.com>
-Cc: Thorsten Blum <thorsten.blum@linux.dev>,
-	kvm@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH] KVM: SVM: Replace kzalloc() + copy_from_user() with memdup_user()
-Date: Wed,  3 Sep 2025 02:29:50 +0200
-Message-ID: <20250903002951.118912-1-thorsten.blum@linux.dev>
+	s=arc-20240116; t=1756861687; c=relaxed/simple;
+	bh=eFwtTOp488H2WYY50S1vuvKjFHgMVxD7w3AAU+mpx2o=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=fyVaMMYpeUiMZmn1OfL7020oDY5sUFglNaLzgfxLlWBoQs0Wvkgt6hcdd5vkJAi1PW+G3mDqYaqjJm1nhZc5hZNu9TLiEDwJv1Gp0IONxEXeQuOJnVehMCduKepJXQpgCkS1podUlEqAL8whOL8hU/Pt5l8s25hcz9NWrVcWz8k=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=CEBUmV9h; arc=none smtp.client-ip=198.175.65.20
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1756861686; x=1788397686;
+  h=message-id:date:mime-version:subject:to:cc:references:
+   from:in-reply-to:content-transfer-encoding;
+  bh=eFwtTOp488H2WYY50S1vuvKjFHgMVxD7w3AAU+mpx2o=;
+  b=CEBUmV9hFyHIFSkbBc+CXhpJtBHZrMuSJR6p6OrN4qSb3KXj1ljGQbq9
+   rKeuIEfpWEcuyJFqvrgmCG15ancwaEcdUfFYIF5neFJLTsfMGihXene0V
+   OEmTJcJU0VxXCKe9Blok8MTSAnmF4i+juJd6yqWALO5gvyPSUoRgO5901
+   u32y7K8x3f180SWWYDs5OMqgN+tsTuvg0hfzn5f2kngoFao4acFmGYX2C
+   IbffK7vSrpItPJYwa/Z2eUUqcO5O/NyuDIfwdcLIjR+ZQdYXGqV/Jm+h1
+   kKjflOQvjFpkkJx+pv9ZgyS0inefuYkncuWFzZEoz78DwCDg9tlnBv37R
+   A==;
+X-CSE-ConnectionGUID: Fjyj9cSpQpC1RJQ2kBUxYA==
+X-CSE-MsgGUID: XECOiO2hQWW8sQgzJPsIAg==
+X-IronPort-AV: E=McAfee;i="6800,10657,11541"; a="58860694"
+X-IronPort-AV: E=Sophos;i="6.18,233,1751266800"; 
+   d="scan'208";a="58860694"
+Received: from fmviesa007.fm.intel.com ([10.60.135.147])
+  by orvoesa112.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 02 Sep 2025 18:08:05 -0700
+X-CSE-ConnectionGUID: ClgcoAYWQ2WAA3Y7LiceAw==
+X-CSE-MsgGUID: wD1frc0nRta6PPFFK9ba6w==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.18,233,1751266800"; 
+   d="scan'208";a="170994387"
+Received: from unknown (HELO [10.238.0.107]) ([10.238.0.107])
+  by fmviesa007-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 02 Sep 2025 18:08:00 -0700
+Message-ID: <23effdc0-1fbe-430d-b570-bc927b10fcf2@linux.intel.com>
+Date: Wed, 3 Sep 2025 09:07:57 +0800
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Migadu-Flow: FLOW_OUT
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v9 18/19] KVM: selftests: Add ucall support for TDX
+To: Sean Christopherson <seanjc@google.com>
+Cc: Sagi Shahar <sagis@google.com>, linux-kselftest@vger.kernel.org,
+ Paolo Bonzini <pbonzini@redhat.com>, Shuah Khan <shuah@kernel.org>,
+ Ackerley Tng <ackerleytng@google.com>, Ryan Afranji <afranji@google.com>,
+ Andrew Jones <ajones@ventanamicro.com>,
+ Isaku Yamahata <isaku.yamahata@intel.com>,
+ Erdem Aktas <erdemaktas@google.com>,
+ Rick Edgecombe <rick.p.edgecombe@intel.com>,
+ Roger Wang <runanwang@google.com>, Oliver Upton <oliver.upton@linux.dev>,
+ "Pratik R. Sampat" <pratikrajesh.sampat@amd.com>,
+ Reinette Chatre <reinette.chatre@intel.com>, Ira Weiny
+ <ira.weiny@intel.com>, Chao Gao <chao.gao@intel.com>,
+ Chenyi Qiang <chenyi.qiang@intel.com>, linux-kernel@vger.kernel.org,
+ kvm@vger.kernel.org
+References: <20250821042915.3712925-1-sagis@google.com>
+ <20250821042915.3712925-19-sagis@google.com>
+ <18bf858c-e135-4a9b-bda8-a70be3b3720e@linux.intel.com>
+ <aLcRIn8ryB2kXWcD@google.com>
+Content-Language: en-US
+From: Binbin Wu <binbin.wu@linux.intel.com>
+In-Reply-To: <aLcRIn8ryB2kXWcD@google.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-Replace kzalloc() followed by copy_from_user() with memdup_user() to
-improve and simplify svm_set_nested_state().
 
-Return early if an error occurs instead of trying to allocate memory for
-'save' when memory allocation for 'ctl' already failed.
 
-Signed-off-by: Thorsten Blum <thorsten.blum@linux.dev>
----
- arch/x86/kvm/svm/nested.c | 20 +++++++++-----------
- 1 file changed, 9 insertions(+), 11 deletions(-)
-
-diff --git a/arch/x86/kvm/svm/nested.c b/arch/x86/kvm/svm/nested.c
-index b7fd2e869998..826473f2d7c7 100644
---- a/arch/x86/kvm/svm/nested.c
-+++ b/arch/x86/kvm/svm/nested.c
-@@ -1798,17 +1798,15 @@ static int svm_set_nested_state(struct kvm_vcpu *vcpu,
- 	if (kvm_state->size < sizeof(*kvm_state) + KVM_STATE_NESTED_SVM_VMCB_SIZE)
- 		return -EINVAL;
- 
--	ret  = -ENOMEM;
--	ctl  = kzalloc(sizeof(*ctl),  GFP_KERNEL);
--	save = kzalloc(sizeof(*save), GFP_KERNEL);
--	if (!ctl || !save)
--		goto out_free;
--
--	ret = -EFAULT;
--	if (copy_from_user(ctl, &user_vmcb->control, sizeof(*ctl)))
--		goto out_free;
--	if (copy_from_user(save, &user_vmcb->save, sizeof(*save)))
--		goto out_free;
-+	ctl = memdup_user(&user_vmcb->control, sizeof(*ctl));
-+	if (IS_ERR(ctl))
-+		return PTR_ERR(ctl);
-+
-+	save = memdup_user(&user_vmcb->save, sizeof(*save));
-+	if (IS_ERR(save)) {
-+		kfree(ctl);
-+		return PTR_ERR(save);
-+	}
- 
- 	ret = -EINVAL;
- 	__nested_copy_vmcb_control_to_cache(vcpu, &ctl_cached, ctl);
--- 
-2.51.0
+On 9/2/2025 11:45 PM, Sean Christopherson wrote:
+> On Wed, Aug 27, 2025, Binbin Wu wrote:
+>> On 8/21/2025 12:29 PM, Sagi Shahar wrote:
+>>> @@ -46,11 +69,23 @@ void *ucall_arch_get_ucall(struct kvm_vcpu *vcpu)
+>>>    {
+>>>    	struct kvm_run *run = vcpu->run;
+>>> -	if (run->exit_reason == KVM_EXIT_IO && run->io.port == UCALL_PIO_PORT) {
+>>> -		struct kvm_regs regs;
+>>> +	switch (vm_type) {
+>>> +	case KVM_X86_TDX_VM:
+>>> +		if (vcpu->run->exit_reason == KVM_EXIT_MMIO &&
+>>> +		    vcpu->run->mmio.phys_addr == host_ucall_mmio_gpa &&
+>>> +		    vcpu->run->mmio.len == 8 && vcpu->run->mmio.is_write) {
+>>> +			uint64_t data = *(uint64_t *)vcpu->run->mmio.data;
+>>> +
+>>> +			return (void *)data;
+>>> +		}
+>>> +		return NULL;
+>> My first thought was how did SEV_ES or SNP work for this since they are not
+>> able to get RDI neither.
+>> Then I had a check in sev_smoke_test.c, both guest_sev_es_code() and
+>> guest_snp_code() call GUEST_ASSERT(), which finally calls ucall_assert(), but
+>> in test_sev(), the code doesn't handle ucall for SEV_ES or SNP.
+>> Does it mean GUEST_ASSERT() is currently not working and ignored for SEV_ES
+>> and SNP? Or did I miss anything?
+> GUEST_ASSERT() "works" for -ES and -SNP in the sense that it generates as test
+> failure due to the #VC not being handled (leads to SHUTDOWN).  But you're correct
+> that ucall isn't functional yet.  x86/sev_smoke_test.c fudges around lack of ucall
+> by using the GHCB MSR protocol to signal "done".
+>
+>          /*
+>           * TODO: Add GHCB and ucall support for SEV-ES guests.  For now, simply
+>           * force "termination" to signal "done" via the GHCB MSR protocol.
+>           */
+>          wrmsr(MSR_AMD64_SEV_ES_GHCB, GHCB_MSR_TERM_REQ);
+>          vmgexit();
+>
+OK, thanks for the explanation!
 
 
