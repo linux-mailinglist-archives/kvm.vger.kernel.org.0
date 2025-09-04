@@ -1,65 +1,65 @@
-Return-Path: <kvm+bounces-56809-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-56810-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6CBA0B436D3
-	for <lists+kvm@lfdr.de>; Thu,  4 Sep 2025 11:18:11 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 70025B436FA
+	for <lists+kvm@lfdr.de>; Thu,  4 Sep 2025 11:23:32 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 0988F1C24552
-	for <lists+kvm@lfdr.de>; Thu,  4 Sep 2025 09:18:32 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 761103BBC12
+	for <lists+kvm@lfdr.de>; Thu,  4 Sep 2025 09:23:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4E6832EF64E;
-	Thu,  4 Sep 2025 09:17:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C284E2F066C;
+	Thu,  4 Sep 2025 09:23:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="jJAWrYlU"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="R6RV3lkL"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.7])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.10])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7DD732EE61B;
-	Thu,  4 Sep 2025 09:17:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.7
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EAA192EF662;
+	Thu,  4 Sep 2025 09:23:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.10
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756977471; cv=none; b=Vb0vYk0/KkcXnBNuW5XYVBT/PDP/mAI7faUZdu5WAWbqB3EBsje843FIlGB5n2aRbRdFJoQSAVJukJB2UAszjXm8FD/sOHeIUZHu5TRXL56MzWItayKK8ccBbjJoe7BT9mura/mVkgj2+QCdHQFNGDbiPCHY8F0w+yczbQFf/H0=
+	t=1756977803; cv=none; b=tqxfYdDS11YtI1hYTsFdzBE67E3ksyPYg7pHD7PS99BYyLgVsV+kvcQGIIL/2qQSdlAB0uvQKxHAK/H5xAOTLqvCTQuVgC3H2+p/EC9XDg1r9KWfz1HBsSHQEwGdx9u8e9FsBc7W6Py1Ku8eupna5NnZeM1xSZOgts5hPgMjjIg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756977471; c=relaxed/simple;
-	bh=AQpqNXGuwdtDJvMAxbZ3xMS7HgIncB27vU0YPQtZs+Y=;
+	s=arc-20240116; t=1756977803; c=relaxed/simple;
+	bh=TDSln1mF3xgUP8nsTtJypSwko7BDQHldbUJU4u28Q5k=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=JZEWmLMuG+bhbetXjAnxAofrF02umkpWAODc1UtHVCsBFMGWmz9y7i1X0e7xfa1YHOFOkwJuHzhf7shzKgxuhiw2oILuNy50Udtnc4RBTpm2liWlmxol819eRK5eahlAC9OX2woB3S08YJSLMWSMTohv3gBx6Xan1IIGh5X9v5E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=jJAWrYlU; arc=none smtp.client-ip=192.198.163.7
+	 In-Reply-To:Content-Type; b=TG5S2Npj/VRDhw4MKnO08e4bPSgo/q92U/VW9H6Z2098Z9DGH8xGbL9XYutNQGqcdeDxL4BCovgFg48obfNYz26tblIIHVtWiFFfBo6aX7QUN4CcuaBqVSdK2Ghsk/JtyfS35ezYiXDzt+tjM1+WdvM+SB33L9gcszL5Tj9PpFE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=R6RV3lkL; arc=none smtp.client-ip=192.198.163.10
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1756977469; x=1788513469;
+  t=1756977801; x=1788513801;
   h=message-id:date:mime-version:subject:to:cc:references:
    from:in-reply-to:content-transfer-encoding;
-  bh=AQpqNXGuwdtDJvMAxbZ3xMS7HgIncB27vU0YPQtZs+Y=;
-  b=jJAWrYlUcROxGMOEyX6AOQD+5Z6+bEtfanZ+QVV7b38WVwsINgRe8AuM
-   Viu/7usp+I1Zwu0eJ608oMjcwH9n+0OwdAcnsJxgsWkl5jtT3Y2l3kRiO
-   O1clQF53S4XSGx/yLRqjFDUVg/pj5Rj/W498NEDckxzhOXvtX86K4RIcm
-   2EQ1RZM9TP7VHfqLtfI5Kx01bJOfp10t4Rcvh7u2dPbuHmlrfKsyo2E/P
-   OhBX7oe3GgyqdexABmhb97KJIUSjLbBHuao9tZ6+PUofiSCUqqbD1DunM
-   Srqteef1y3rU70/iaGxXyulBVQcsg/zuxy9Z2oNlr5EOGR864pNAhmycR
+  bh=TDSln1mF3xgUP8nsTtJypSwko7BDQHldbUJU4u28Q5k=;
+  b=R6RV3lkL/WCPnDdBuWG0HDTGl/y5PLg65Y+Ew036cc6jT7jasfpJ193d
+   ddP3dX8hPnIDI+hY7DHcCpe9amnXTkPI8ivlOUsKGvXJekQOwZexRxn4r
+   goaD+8uWFBoNnpDnARxLyhtLf5Sj1iyUBTjmVUcvtla/Chtn9/fiiNg1B
+   5sj4TSc5JjapEp2NfU3E92cvnsVDn7wjWWtZ12gRzhtcqKkOz6JfmfnT0
+   qSX/0bBkJgt9zTeouIz+EvhWdCCiAtMpIJZOfs1jgoB0gqT/zuYSDZeeK
+   8ecZTO9mvbUyct1HNBTYMeNNeRnQzsVt204XfN5nFa134+YFbG2McS0Mx
    w==;
-X-CSE-ConnectionGUID: urXx3idNQvelscylAL/7zg==
-X-CSE-MsgGUID: iDijoNqLSIOZBrKvtGfu2A==
-X-IronPort-AV: E=McAfee;i="6800,10657,11542"; a="84739615"
+X-CSE-ConnectionGUID: TmqzdbTsTMuTnmb/0+omPA==
+X-CSE-MsgGUID: o2T1I4oKRI27u3qrrukXyA==
+X-IronPort-AV: E=McAfee;i="6800,10657,11542"; a="70683128"
 X-IronPort-AV: E=Sophos;i="6.18,237,1751266800"; 
-   d="scan'208";a="84739615"
-Received: from orviesa005.jf.intel.com ([10.64.159.145])
-  by fmvoesa101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 04 Sep 2025 02:17:49 -0700
-X-CSE-ConnectionGUID: HgCpv1rpQl2lZdm5XQX84w==
-X-CSE-MsgGUID: YQSugCF4Q0S0qKifcCsgZg==
+   d="scan'208";a="70683128"
+Received: from fmviesa008.fm.intel.com ([10.60.135.148])
+  by fmvoesa104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 04 Sep 2025 02:23:20 -0700
+X-CSE-ConnectionGUID: z1dtnF/cQLmbmzzeQ1j0pA==
+X-CSE-MsgGUID: 9JIJ4CuERhKgU/cdXTESqQ==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.18,237,1751266800"; 
-   d="scan'208";a="177101826"
+   d="scan'208";a="172209461"
 Received: from unknown (HELO [10.238.0.107]) ([10.238.0.107])
-  by orviesa005-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 04 Sep 2025 02:17:43 -0700
-Message-ID: <1dccc546-65fc-4a73-9414-132299454985@linux.intel.com>
-Date: Thu, 4 Sep 2025 17:17:40 +0800
+  by fmviesa008-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 04 Sep 2025 02:23:16 -0700
+Message-ID: <41c87e38-4855-48da-bb7e-fd9b3c39a439@linux.intel.com>
+Date: Thu, 4 Sep 2025 17:23:13 +0800
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -67,175 +67,123 @@ List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [RFC PATCH v2 21/23] KVM: TDX: Preallocate PAMT pages to be used
- in split path
-To: Yan Zhao <yan.y.zhao@intel.com>
-Cc: pbonzini@redhat.com, seanjc@google.com, linux-kernel@vger.kernel.org,
- kvm@vger.kernel.org, x86@kernel.org, rick.p.edgecombe@intel.com,
- dave.hansen@intel.com, kas@kernel.org, tabba@google.com,
- ackerleytng@google.com, quic_eberman@quicinc.com, michael.roth@amd.com,
- david@redhat.com, vannapurve@google.com, vbabka@suse.cz,
- thomas.lendacky@amd.com, pgonda@google.com, zhiquan1.li@intel.com,
- fan.du@intel.com, jun.miao@intel.com, ira.weiny@intel.com,
- isaku.yamahata@intel.com, xiaoyao.li@intel.com, chao.p.peng@intel.com
-References: <20250807093950.4395-1-yan.y.zhao@intel.com>
- <20250807094604.4762-1-yan.y.zhao@intel.com>
+Subject: Re: [PATCH v10 02/21] KVM: selftests: Expose functions to get default
+ sregs values
+To: Sagi Shahar <sagis@google.com>
+Cc: linux-kselftest@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
+ Shuah Khan <shuah@kernel.org>, Sean Christopherson <seanjc@google.com>,
+ Ackerley Tng <ackerleytng@google.com>, Ryan Afranji <afranji@google.com>,
+ Andrew Jones <ajones@ventanamicro.com>,
+ Isaku Yamahata <isaku.yamahata@intel.com>,
+ Erdem Aktas <erdemaktas@google.com>,
+ Rick Edgecombe <rick.p.edgecombe@intel.com>,
+ Roger Wang <runanwang@google.com>, Oliver Upton <oliver.upton@linux.dev>,
+ "Pratik R. Sampat" <pratikrajesh.sampat@amd.com>,
+ Reinette Chatre <reinette.chatre@intel.com>, Ira Weiny
+ <ira.weiny@intel.com>, Chao Gao <chao.gao@intel.com>,
+ Chenyi Qiang <chenyi.qiang@intel.com>, linux-kernel@vger.kernel.org,
+ kvm@vger.kernel.org
+References: <20250904065453.639610-1-sagis@google.com>
+ <20250904065453.639610-3-sagis@google.com>
 Content-Language: en-US
 From: Binbin Wu <binbin.wu@linux.intel.com>
-In-Reply-To: <20250807094604.4762-1-yan.y.zhao@intel.com>
+In-Reply-To: <20250904065453.639610-3-sagis@google.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+Content-Transfer-Encoding: 7bit
 
 
 
-On 8/7/2025 5:46 PM, Yan Zhao wrote:
-> From: "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>
+On 9/4/2025 2:54 PM, Sagi Shahar wrote:
+> TDX can't set sregs values directly using KVM_SET_SREGS. Expose the
+> default values of certain sregs used by TDX VMs so they can be set
+> manually.
 >
-> Preallocate a page to be used in the split_external_spt() path.
+> Signed-off-by: Sagi Shahar <sagis@google.com>
 
-Not just "a" page.
+Reviewed-by: Binbin Wu <binbin.wu@linux.intel.com>
 
->
-> Kernel needs one PAMT page pair for external_spt and one that provided
-> directly to the TDH.MEM.PAGE.DEMOTE SEAMCALL.
->
-> Signed-off-by: Kirill A. Shutemov <kirill.shutemov@linux.intel.com>
-> Co-developed-by: Yan Zhao <yan.y.zhao@intel.com>
-> Signed-off-by: Yan Zhao <yan.y.zhao@intel.com>
+One suggestion:
+It's better to add change history so that reviewers can know the change quickly
+without comparing b/t versions.
+
 > ---
-> RFC v2:
-> - Pulled from
->    git://git.kernel.org/pub/scm/linux/kernel/git/kas/linux.git tdx/dpamt-huge.
-> - Implemented the flow of topup pamt_page_cache in
->    tdp_mmu_split_huge_pages_root() (Yan)
-> ---
->   arch/x86/include/asm/kvm_host.h |  2 ++
->   arch/x86/kvm/mmu/mmu.c          |  1 +
->   arch/x86/kvm/mmu/tdp_mmu.c      | 51 +++++++++++++++++++++++++++++++++
->   3 files changed, 54 insertions(+)
+>   .../selftests/kvm/include/x86/processor.h     | 33 +++++++++++++++++++
+>   .../testing/selftests/kvm/lib/x86/processor.c | 12 +++----
+>   2 files changed, 38 insertions(+), 7 deletions(-)
 >
-> diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
-> index 6b6c46c27390..508b133df903 100644
-> --- a/arch/x86/include/asm/kvm_host.h
-> +++ b/arch/x86/include/asm/kvm_host.h
-> @@ -1591,6 +1591,8 @@ struct kvm_arch {
->   #define SPLIT_DESC_CACHE_MIN_NR_OBJECTS (SPTE_ENT_PER_PAGE + 1)
->   	struct kvm_mmu_memory_cache split_desc_cache;
+> diff --git a/tools/testing/selftests/kvm/include/x86/processor.h b/tools/testing/selftests/kvm/include/x86/processor.h
+> index 2efb05c2f2fb..f610c09cadf4 100644
+> --- a/tools/testing/selftests/kvm/include/x86/processor.h
+> +++ b/tools/testing/selftests/kvm/include/x86/processor.h
+> @@ -27,6 +27,10 @@ extern uint64_t guest_tsc_khz;
+>   #define MAX_NR_CPUID_ENTRIES 100
+>   #endif
 >   
-> +	struct kvm_mmu_memory_cache pamt_page_cache;
+> +#ifndef NUM_INTERRUPTS
+> +#define NUM_INTERRUPTS 256
+> +#endif
 > +
->   	gfn_t gfn_direct_bits;
+>   #define NONCANONICAL 0xaaaaaaaaaaaaaaaaull
 >   
->   	/*
-> diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
-> index f23d8fc59323..e581cee37f64 100644
-> --- a/arch/x86/kvm/mmu/mmu.c
-> +++ b/arch/x86/kvm/mmu/mmu.c
-> @@ -6848,6 +6848,7 @@ static void mmu_free_vm_memory_caches(struct kvm *kvm)
->   	kvm_mmu_free_memory_cache(&kvm->arch.split_desc_cache);
->   	kvm_mmu_free_memory_cache(&kvm->arch.split_page_header_cache);
->   	kvm_mmu_free_memory_cache(&kvm->arch.split_shadow_page_cache);
-> +	kvm_mmu_free_memory_cache(&kvm->arch.pamt_page_cache);
->   }
+>   /* Forced emulation prefix, used to invoke the emulator unconditionally. */
+> @@ -1456,4 +1460,33 @@ void virt_map_level(struct kvm_vm *vm, uint64_t vaddr, uint64_t paddr,
 >   
->   void kvm_mmu_uninit_vm(struct kvm *kvm)
-> diff --git a/arch/x86/kvm/mmu/tdp_mmu.c b/arch/x86/kvm/mmu/tdp_mmu.c
-> index eb758aaa4374..064c4e823658 100644
-> --- a/arch/x86/kvm/mmu/tdp_mmu.c
-> +++ b/arch/x86/kvm/mmu/tdp_mmu.c
-> @@ -1584,6 +1584,27 @@ static bool iter_cross_boundary(struct tdp_iter *iter, gfn_t start, gfn_t end)
->   		 (iter->gfn + KVM_PAGES_PER_HPAGE(iter->level)) <= end);
->   }
+>   bool sys_clocksource_is_based_on_tsc(void);
 >   
-> +static bool need_topup_mirror_caches(struct kvm *kvm)
+> +static inline uint16_t kvm_get_default_idt_limit(void)
 > +{
-> +	int nr = tdx_nr_pamt_pages() * 2;
-> +
-> +	return kvm_mmu_memory_cache_nr_free_objects(&kvm->arch.pamt_page_cache) < nr;
+> +	return NUM_INTERRUPTS * sizeof(struct idt_entry) - 1;
 > +}
 > +
-> +static int topup_mirror_caches(struct kvm *kvm)
+> +static inline uint16_t kvm_get_default_gdt_limit(void)
 > +{
-> +	int r, nr;
-> +
-> +	/* One for external_spt, one for TDH.MEM.PAGE.DEMOTE */
-
-The comment is a bit confusing.
-IIUC, external_spt is also for TDH.MEM.PAGE.DEMOTE.
-and it's "one pair" for PAMT pages.
-
-> +	nr = tdx_nr_pamt_pages() * 2;
-> +
-> +	r = kvm_mmu_topup_memory_cache(&kvm->arch.pamt_page_cache, nr);
-> +	if (r)
-> +		return r;
-> +
-> +	return 0;
-
-This could be simplified:
-diff --git a/arch/x86/kvm/mmu/tdp_mmu.c b/arch/x86/kvm/mmu/tdp_mmu.c
-index 064c4e823658..35d052aa408c 100644
---- a/arch/x86/kvm/mmu/tdp_mmu.c
-+++ b/arch/x86/kvm/mmu/tdp_mmu.c
-@@ -1593,16 +1593,12 @@ static bool need_topup_mirror_caches(struct kvm *kvm)
-
-  static int topup_mirror_caches(struct kvm *kvm)
-  {
--       int r, nr;
-+       int nr;
-
-         /* One for external_spt, one for TDH.MEM.PAGE.DEMOTE */
-         nr = tdx_nr_pamt_pages() * 2;
-
--       r = kvm_mmu_topup_memory_cache(&kvm->arch.pamt_page_cache, nr);
--       if (r)
--               return r;
--
--       return 0;
-+       return kvm_mmu_topup_memory_cache(&kvm->arch.pamt_page_cache, nr);
-  }
-
+> +	return getpagesize() - 1;
 > +}
 > +
->   static int tdp_mmu_split_huge_pages_root(struct kvm *kvm,
->   					 struct kvm_mmu_page *root,
->   					 gfn_t start, gfn_t end,
-> @@ -1656,6 +1677,36 @@ static int tdp_mmu_split_huge_pages_root(struct kvm *kvm,
->   			continue;
->   		}
+> +static inline uint64_t kvm_get_default_cr0(void)
+> +{
+> +	return X86_CR0_PE | X86_CR0_NE | X86_CR0_PG;
+> +}
+> +
+> +static inline uint64_t kvm_get_default_cr4(void)
+> +{
+> +	uint64_t cr4 = X86_CR4_PAE | X86_CR4_OSFXSR;
+> +
+> +	if (kvm_cpu_has(X86_FEATURE_XSAVE))
+> +		cr4 |= X86_CR4_OSXSAVE;
+> +	return cr4;
+> +}
+> +
+> +static inline uint64_t kvm_get_default_efer(void)
+> +{
+> +	return EFER_LME | EFER_LMA | EFER_NX;
+> +}
+> +
+>   #endif /* SELFTEST_KVM_PROCESSOR_H */
+> diff --git a/tools/testing/selftests/kvm/lib/x86/processor.c b/tools/testing/selftests/kvm/lib/x86/processor.c
+> index d4c19ac885a9..83efcf48faad 100644
+> --- a/tools/testing/selftests/kvm/lib/x86/processor.c
+> +++ b/tools/testing/selftests/kvm/lib/x86/processor.c
+> @@ -498,15 +498,13 @@ static void vcpu_init_sregs(struct kvm_vm *vm, struct kvm_vcpu *vcpu)
+>   	vcpu_sregs_get(vcpu, &sregs);
 >   
-> +		if (is_mirror_sp(root) && need_topup_mirror_caches(kvm)) {
-> +			int r;
-> +
-> +			rcu_read_unlock();
-> +
-> +			if (shared)
-> +				read_unlock(&kvm->mmu_lock);
-> +			else
-> +				write_unlock(&kvm->mmu_lock);
-> +
-> +			r = topup_mirror_caches(kvm);
-> +
-> +			if (shared)
-> +				read_lock(&kvm->mmu_lock);
-> +			else
-> +				write_lock(&kvm->mmu_lock);
-> +
-> +			if (r) {
-> +				trace_kvm_mmu_split_huge_page(iter.gfn,
-> +							      iter.old_spte,
-> +							      iter.level, r);
-> +				return r;
-> +			}
-> +
-> +			rcu_read_lock();
-> +
-> +			iter.yielded = true;
-> +			continue;
-> +		}
-> +
->   		tdp_mmu_init_child_sp(sp, &iter);
+>   	sregs.idt.base = vm->arch.idt;
+> -	sregs.idt.limit = NUM_INTERRUPTS * sizeof(struct idt_entry) - 1;
+> +	sregs.idt.limit = kvm_get_default_idt_limit();
+>   	sregs.gdt.base = vm->arch.gdt;
+> -	sregs.gdt.limit = getpagesize() - 1;
+> +	sregs.gdt.limit = kvm_get_default_gdt_limit();
 >   
->   		if (tdp_mmu_split_huge_page(kvm, &iter, sp, shared))
+> -	sregs.cr0 = X86_CR0_PE | X86_CR0_NE | X86_CR0_PG;
+> -	sregs.cr4 |= X86_CR4_PAE | X86_CR4_OSFXSR;
+> -	if (kvm_cpu_has(X86_FEATURE_XSAVE))
+> -		sregs.cr4 |= X86_CR4_OSXSAVE;
+> -	sregs.efer |= (EFER_LME | EFER_LMA | EFER_NX);
+> +	sregs.cr0 = kvm_get_default_cr0();
+> +	sregs.cr4 |= kvm_get_default_cr4();
+> +	sregs.efer |= kvm_get_default_efer();
+>   
+>   	kvm_seg_set_unusable(&sregs.ldt);
+>   	kvm_seg_set_kernel_code_64bit(&sregs.cs);
 
 
