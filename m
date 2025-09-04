@@ -1,187 +1,148 @@
-Return-Path: <kvm+bounces-56822-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-56823-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id 99971B43A5B
-	for <lists+kvm@lfdr.de>; Thu,  4 Sep 2025 13:39:44 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7634CB43AE7
+	for <lists+kvm@lfdr.de>; Thu,  4 Sep 2025 14:00:15 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 264804E2B93
-	for <lists+kvm@lfdr.de>; Thu,  4 Sep 2025 11:39:43 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id ABF657A01CF
+	for <lists+kvm@lfdr.de>; Thu,  4 Sep 2025 11:58:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A0DBC2DEA96;
-	Thu,  4 Sep 2025 11:39:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AB8F32FD7CC;
+	Thu,  4 Sep 2025 12:00:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="GwgoJECF"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="fR14sSbE"
 X-Original-To: kvm@vger.kernel.org
-Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pj1-f73.google.com (mail-pj1-f73.google.com [209.85.216.73])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1F7BA2C21C5;
-	Thu,  4 Sep 2025 11:39:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 73B022FB99C
+	for <kvm@vger.kernel.org>; Thu,  4 Sep 2025 11:59:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.73
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756985977; cv=none; b=cpgY3qdDx+Xxmf4MDoVmej+wfNOfgmswUpqy9fG9EuVeySHxF0FIy5NlJ9Zym90Qkwhd8hLWjQeRxVF+4UL6BBc/BDKjZymmRrk8zVDVlmThV/tICKjBsfS7SBYUD1XGXWy6T601WKM7NwBj2YsLk6MhGR1sgkNfv85VurFkTtM=
+	t=1756987199; cv=none; b=XhOR8+qh/Lt8bJUI50+uAYqsDj5/fU6VCgtz29YBWB0b9aY795ev1pzarLXzfYgfmpRvKfwEalmCDmasjCsr/VBo03Ky1rFPjkoaZiH2Aeczf1ZOO2k3nqTH0EZwSeFBa5T2cHPS1dPLSJjD+R9W3zN5sCZ3z6YhAYbykF4XzaM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756985977; c=relaxed/simple;
-	bh=M46UU1tIHZy0eX3aoyugvPUZJ2kQKeF4+naupJNksvM=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=LNCU/9EYQxZ6f6tPes3Zydl5xuOO9HqOGcFkTuaLYoPAA/c/JF3P6YiD4oFQ9S8NDiM1aJENi2Fzs8KIpiOPTkgg1Luei/ax2xtmXikjb3nADLGPuYvUsFnF3ulLxxd/CWAjBZzTTPBT2WU2PnUjcwGTWJa5ZE20Veu+3jS/DsM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=GwgoJECF; arc=none smtp.client-ip=148.163.158.5
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
-Received: from pps.filterd (m0360072.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 5841fp3U027125;
-	Thu, 4 Sep 2025 11:39:34 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
-	:content-transfer-encoding:date:from:message-id:mime-version
-	:subject:to; s=pp1; bh=jOdHlHLTzlTXgXIY0XPb73c/a7GizaF4qGFSA8TOg
-	dI=; b=GwgoJECFy/f+BUo6vsHKsrdDQSp2mF2uNRxnQbnywrg7tsUv3uQuIKUKl
-	g1A7wxg1wVLpttdWJP+49rS23YGGHp5nNt6S20id08s34R2bVhjsmSvP+sfpT/gc
-	uD8N2jaoPo2YXsm9izgAT6DTAUQst/PAixiMGPtRf1zPGMi6RT9TiBZvNVTF9QCH
-	w+jaEfnVvo8t1Ex0ckd7jSeOJF5vakkMGiDos6D9AaMrLyK5oZ/vDqjf/WFnzahu
-	0rzbHVf8brftS9++4LNp2JgkC2JvV1HptgDOECAyI22VgcZD8QkiaxXpHwJ/gZmO
-	iZDVzCuDOSUwJEMLcZa/TXHZCVNqw==
-Received: from ppma22.wdc07v.mail.ibm.com (5c.69.3da9.ip4.static.sl-reverse.com [169.61.105.92])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 48usua9c82-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 04 Sep 2025 11:39:33 +0000 (GMT)
-Received: from pps.filterd (ppma22.wdc07v.mail.ibm.com [127.0.0.1])
-	by ppma22.wdc07v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 5847oObF017634;
-	Thu, 4 Sep 2025 11:39:33 GMT
-Received: from smtprelay04.wdc07v.mail.ibm.com ([172.16.1.71])
-	by ppma22.wdc07v.mail.ibm.com (PPS) with ESMTPS id 48vc10vd2m-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 04 Sep 2025 11:39:33 +0000
-Received: from smtpav01.dal12v.mail.ibm.com (smtpav01.dal12v.mail.ibm.com [10.241.53.100])
-	by smtprelay04.wdc07v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 584BdVsf41157210
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Thu, 4 Sep 2025 11:39:32 GMT
-Received: from smtpav01.dal12v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id BD59E58058;
-	Thu,  4 Sep 2025 11:39:31 +0000 (GMT)
-Received: from smtpav01.dal12v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 98C3F58057;
-	Thu,  4 Sep 2025 11:39:29 +0000 (GMT)
-Received: from li-6365fdcc-3484-11b2-a85c-9bfb6e0c0d76.ibm.com.com (unknown [9.87.130.193])
-	by smtpav01.dal12v.mail.ibm.com (Postfix) with ESMTP;
-	Thu,  4 Sep 2025 11:39:29 +0000 (GMT)
-From: Christian Borntraeger <borntraeger@linux.ibm.com>
-To: Janosch Frank <frankja@linux.vnet.ibm.com>,
-        Claudio Imbrenda <imbrenda@linux.ibm.com>
-Cc: KVM <kvm@vger.kernel.org>,
-        Christian Borntraeger <borntraeger@linux.ibm.com>,
-        David Hildenbrand <david@redhat.com>,
-        Heiko Carstens <hca@linux.ibm.com>, Vasily Gorbik <gor@linux.ibm.com>,
-        Alexander Gordeev <agordeev@linux.ibm.com>,
-        Sven Schnelle <svens@linux.ibm.com>, linux-s390@vger.kernel.org
-Subject: [PATCH] KVM: s390: improve interrupt cpu for wakeup
-Date: Thu,  4 Sep 2025 13:39:27 +0200
-Message-ID: <20250904113927.119306-1-borntraeger@linux.ibm.com>
-X-Mailer: git-send-email 2.43.7
+	s=arc-20240116; t=1756987199; c=relaxed/simple;
+	bh=ZXNn7I+rDr8GQnTPEyxX8hDMbjRGz6pxIO5JVjmS4wM=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=eZqTGP/Q25iJfWy4dd/DBs1d9flyjRRNnvYANwfg5bzfGN+lpgh61vJGqQGHWydGxw5bvhedWTB1w65jLbSvutOnWBccXum2LYKT2S1+ViTInp2XjjVByTWAslgV5eiO9sJRFLSDNf8j5UUyMVAkz/TL0G0cYYHfyiWfomkPqj8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=fR14sSbE; arc=none smtp.client-ip=209.85.216.73
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+Received: by mail-pj1-f73.google.com with SMTP id 98e67ed59e1d1-3278bb34a68so835750a91.0
+        for <kvm@vger.kernel.org>; Thu, 04 Sep 2025 04:59:58 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1756987198; x=1757591998; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:from:subject:message-id:references
+         :mime-version:in-reply-to:date:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=Dto7K6eXvGSvhdBpztAXq5eWQrSsso/7rLd9mr1E24A=;
+        b=fR14sSbEaJim7HvVIfltSd3dXGIVPlqzLZlXm+98fIZfCb7atRyJ9jURKHdti7cM9N
+         V278HnrDVoN5Rowtj1GDcEA8T6l7PfWc5azsVXHksCEG1rqdtI4hTfxZdsU6CKu5Wf04
+         Ms0QB2xGwZC8WrJjuzxlYEBgVyKpyckcv9dWNn4a9Yw/GAdsLadKugmf2A8I0HYuPsaQ
+         OzQq6CiSKVTfFXj5QPQd15w1ss0JHCFAQuRhHI6WMMdlo8N55L8ScLh8X7ZRjKqDRTlD
+         d1givSFKeT4s67aQ8ZVuWZpc/J39V1gFxVIa/0iLAnWKUSmn5DvBvRbquGBSh69rP/ww
+         990Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1756987198; x=1757591998;
+        h=content-transfer-encoding:cc:to:from:subject:message-id:references
+         :mime-version:in-reply-to:date:x-gm-message-state:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=Dto7K6eXvGSvhdBpztAXq5eWQrSsso/7rLd9mr1E24A=;
+        b=HrdDN9LUOv1PFXdAyC+o6MU7ZWss6YIK88033EcY5B+8JLZJICZxpE6YhhlhnllG2D
+         Revi4Q64owpwqAGkOLP3K3rJnNvHIjyNLX2Ao5AuRDmQPnjGMU4wCRkvUYZbT5wNDxM/
+         icLVGmsWyAbqTB7sAIe9cGj0jmk2FsLfuE71Ho9+50bsoTe1/H4fBqwmcgeQUEvABkoG
+         UL9oiSzL5ZWXwV6D3Ra9mBB8gGwNXhAwKtCKROvf2uvCHKo5GXBDN6w2zoBZ5PQ5Bt1P
+         paPBX4h+RZAQNdCweu7TM2WSzOlyYgs9pRwh10Edd9+Z7009U9BSPAc5B892WX3sPbhc
+         c1/g==
+X-Forwarded-Encrypted: i=1; AJvYcCUc4fxcyiVkdFZsdmXSVLaEc+Fip0OIcbFry8neQ7PkmLYfaVjDmou/f9P34HAcqc0OVO0=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yw1Vds1VTvguOJNBGmC5PSanQROcTocLP/QGI8K1WvgSJGz3q/T
+	muqbyUWeWVTvn4AlQcbnrnzfL1z6kz2sDWkm4T1Y3iVbJ6FuilOJJiydwWVvtDuPUnHU4l92iav
+	2B7MCeg==
+X-Google-Smtp-Source: AGHT+IHP6++Ieg1NxgcxEx/LfHzuEBAPAP8bF6XQFVaVCxfhu7J+bDNjZtW76Vo5/SjfbbqGGuwo3OTmXSY=
+X-Received: from pjh5.prod.google.com ([2002:a17:90b:3f85:b0:325:7c49:9cce])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:1d03:b0:328:a89:71b8
+ with SMTP id 98e67ed59e1d1-328156e1238mr23720013a91.30.1756987197621; Thu, 04
+ Sep 2025 04:59:57 -0700 (PDT)
+Date: Thu, 4 Sep 2025 04:59:44 -0700
+In-Reply-To: <3268e953e14004d1786bf07c76ae52d98d0f8259.camel@infradead.org>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: cTRmZG7y2LPQirKo-wB9-ZdzjH3tr1hj
-X-Authority-Analysis: v=2.4 cv=U6uSDfru c=1 sm=1 tr=0 ts=68b97a75 cx=c_pps
- a=5BHTudwdYE3Te8bg5FgnPg==:117 a=5BHTudwdYE3Te8bg5FgnPg==:17
- a=yJojWOMRYYMA:10 a=VnNF1IyMAAAA:8 a=96_l8XAYGo8_1cjTnkcA:9
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUwODMwMDAzNCBTYWx0ZWRfX8afDW8j+TMqq
- YVZOqLcusnnSzZzrtuEXWi8gUAY2KrreEKpgV4A31Hm7YNWCHyZL52fvwjXCVtiw/WMUlte5wpK
- 6+avhc0Vk5QhFVBkWyYvmlvNJ/rKr0BrDhVIrDIJKnm/8Gc+R9fhQY7StA+rMfilD/h4eOFmE0Q
- L3vJYyFoZRbDAl5A/uLLBFtTLJGKgEx2/mugf3HucsQrjOHaV11c4Q+fnNKqcM+EvF5pQanZVr8
- PYHYuqXUiUj2WABgJ2950DZawm4p/DEnkfEs6lvgp0xRFeOjpC/QJFl6eVIRn2Y7rocsCFd572U
- TXrxmxl3+Z6SRvawT07DL2dyGqkREfAbF2RLsLviY6ndF6smZCs/pBNPy9q/ZPom4LLSR9jGhKe
- SNxS3Tgp
-X-Proofpoint-ORIG-GUID: cTRmZG7y2LPQirKo-wB9-ZdzjH3tr1hj
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1117,Hydra:6.1.9,FMLib:17.12.80.40
- definitions=2025-09-04_04,2025-08-28_01,2025-03-28_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- impostorscore=0 phishscore=0 adultscore=0 clxscore=1015 suspectscore=0
- priorityscore=1501 spamscore=0 bulkscore=0 malwarescore=0
- classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
- reason=mlx scancount=1 engine=8.19.0-2507300000 definitions=main-2508300034
+Mime-Version: 1.0
+References: <aK4LamiDBhKb-Nm_@google.com> <e6dd6de527d2eb92f4a2b4df0be593e2cf7a44d3.camel@infradead.org>
+ <aLDo3F3KKW0MzlcH@google.com> <ea0d7f43d910cee9600b254e303f468722fa355b.camel@infradead.org>
+ <54BCC060-1C9B-4BE4-8057-0161E816A9A3@amazon.co.uk> <caf7b1ea18eb25e817af5ea907b2f6ea31ecc3e1.camel@infradead.org>
+ <aLIPPxLt0acZJxYF@google.com> <d74ff3c1c70f815a10b8743647008bd4081e7625.camel@infradead.org>
+ <aLcuHHfxOlaF5htL@google.com> <3268e953e14004d1786bf07c76ae52d98d0f8259.camel@infradead.org>
+Message-ID: <aLl_MAk9AT5hRuoS@google.com>
+Subject: Re: [PATCH v2 0/3] Support "generic" CPUID timing leaf as KVM guest
+ and host
+From: Sean Christopherson <seanjc@google.com>
+To: David Woodhouse <dwmw2@infradead.org>
+Cc: Paul Durrant <pdurrant@amazon.co.uk>, Fred Griffoul <fgriffo@amazon.co.uk>, 
+	Colin Percival <cperciva@tarsnap.com>, Paolo Bonzini <pbonzini@redhat.com>, 
+	Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>, 
+	Dave Hansen <dave.hansen@linux.intel.com>, "x86@kernel.org" <x86@kernel.org>, 
+	"H. Peter Anvin" <hpa@zytor.com>, Vitaly Kuznetsov <vkuznets@redhat.com>, 
+	"kvm@vger.kernel.org" <kvm@vger.kernel.org>, 
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, "Graf (AWS), Alexander" <graf@amazon.de>, 
+	Ajay Kaher <ajay.kaher@broadcom.com>, Alexey Makhalov <alexey.makhalov@broadcom.com>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
 
-Turns out that picking an idle CPU for floating interrupts has some
-negative side effects. The guest will keep the IO workload on its CPU
-and rather use an IPI from the interrupt CPU instead of moving workload.
-For example a guest with 2 vCPUss and 1 fio process might run that fio on
-vcpu1. If after diag500 both vCPUs are idle then vcpu0 is woken up. The
-guest will then do an IPI from vcpu0 to vcpu1.
+On Tue, Sep 02, 2025, David Woodhouse wrote:
+> On Tue, 2025-09-02 at 10:49 -0700, Sean Christopherson wrote:
+> >=20
+> > > So even if a VMM has set the TSC frequency VM-wide with KVM_SET_TSC_K=
+HZ
+> > > instead of doing it the old per- vCPU way, how can it get the results=
+ for a
+> > > specific VM?
+> >=20
+> > I don't see any need for userspace to query per-VM support.=C2=A0 What =
+I'm proposing
+> > is that KVM advertise the feature if the bare metal TSC is constant and=
+ the CPU
+> > supports TSC scaling.=C2=A0 Beyond that, _KVM_ doesn't need to do anyth=
+ing to ensure
+> > the guest sees a constant frequency, it's userspace's responsibility to=
+ provide
+> > a sane configuration.
+> >=20
+> > And strictly speaking, CPUID is per-CPU, i.e. it's architecturally lega=
+l to set
+> > per-vCPU frequencies and then advertise a different frequency in CPUID =
+for each
+> > vCPU.=C2=A0 That's all but guaranteed to break guests as most/all kerne=
+ls assume that
+> > TSC operates at the same frequency on all CPUs, but as above, that's us=
+erspace's
+> > responsibility to not screw up.
+>=20
+> Sure, but doesn't that make this whole thing orthogonal to the original
+> problem being solved? Because userspace still doesn't *know* the actual
+> effective TSC frequency, whether it's scaled or not.
 
-So lets change the heuristics and prefer the last CPU that went to
-sleep. This one is likely still in halt polling and can be woken up
-quickly.
+I thought the original problem being solved was that the _guest_ doesn't kn=
+ow the
+effective TSC frequency?  Userspace can already get the effectively TSC fre=
+quency
+via KVM_GET_TSC_KHZ, why do we need another uAPI to provide that?  (Honest =
+question,
+I feel like I'm missing something)
 
-This patch shows significant improvements in terms of bandwidth or
-cpu consumption for fio and uperf workloads and seems to be a net
-win.
+> Or are you suggesting that we add the leaf (with unscaled values) in
+> KVM_GET_SUPPORTED_CPUID and *also* 'correct' the values if userspace
+> does pass that leaf to its guests, as I had originally proposed?
 
-Signed-off-by: Christian Borntraeger <borntraeger@linux.ibm.com>
----
- arch/s390/include/asm/kvm_host.h |  2 +-
- arch/s390/kvm/interrupt.c        | 20 +++++++++-----------
- 2 files changed, 10 insertions(+), 12 deletions(-)
-
-diff --git a/arch/s390/include/asm/kvm_host.h b/arch/s390/include/asm/kvm_host.h
-index f870d09515cc1..95d15416c39d2 100644
---- a/arch/s390/include/asm/kvm_host.h
-+++ b/arch/s390/include/asm/kvm_host.h
-@@ -356,7 +356,7 @@ struct kvm_s390_float_interrupt {
- 	int counters[FIRQ_MAX_COUNT];
- 	struct kvm_s390_mchk_info mchk;
- 	struct kvm_s390_ext_info srv_signal;
--	int next_rr_cpu;
-+	int last_sleep_cpu;
- 	struct mutex ais_lock;
- 	u8 simm;
- 	u8 nimm;
-diff --git a/arch/s390/kvm/interrupt.c b/arch/s390/kvm/interrupt.c
-index 60c360c18690f..b8e6f82e92c3f 100644
---- a/arch/s390/kvm/interrupt.c
-+++ b/arch/s390/kvm/interrupt.c
-@@ -1322,6 +1322,7 @@ int kvm_s390_handle_wait(struct kvm_vcpu *vcpu)
- 	VCPU_EVENT(vcpu, 4, "enabled wait: %llu ns", sltime);
- no_timer:
- 	kvm_vcpu_srcu_read_unlock(vcpu);
-+	vcpu->kvm->arch.float_int.last_sleep_cpu = vcpu->vcpu_idx;
- 	kvm_vcpu_halt(vcpu);
- 	vcpu->valid_wakeup = false;
- 	__unset_cpu_idle(vcpu);
-@@ -1948,18 +1949,15 @@ static void __floating_irq_kick(struct kvm *kvm, u64 type)
- 	if (!online_vcpus)
- 		return;
- 
--	/* find idle VCPUs first, then round robin */
--	sigcpu = find_first_bit(kvm->arch.idle_mask, online_vcpus);
--	if (sigcpu == online_vcpus) {
--		do {
--			sigcpu = kvm->arch.float_int.next_rr_cpu++;
--			kvm->arch.float_int.next_rr_cpu %= online_vcpus;
--			/* avoid endless loops if all vcpus are stopped */
--			if (nr_tries++ >= online_vcpus)
--				return;
--		} while (is_vcpu_stopped(kvm_get_vcpu(kvm, sigcpu)));
-+	for (sigcpu = kvm->arch.float_int.last_sleep_cpu; ; sigcpu++) {
-+		sigcpu %= online_vcpus;
-+		dst_vcpu = kvm_get_vcpu(kvm, sigcpu);
-+		if (!is_vcpu_stopped(dst_vcpu))
-+			break;
-+		/* avoid endless loops if all vcpus are stopped */
-+		if (nr_tries++ >= online_vcpus)
-+			return;
- 	}
--	dst_vcpu = kvm_get_vcpu(kvm, sigcpu);
- 
- 	/* make the VCPU drop out of the SIE, or wake it up if sleeping */
- 	switch (type) {
--- 
-2.43.5
-
+The effective guest TSC frequency should be whatever is reported in KVM_GET=
+_TSC_KHZ
+when done on a vCPU, modulo temporarily skewed results without hardware sca=
+ling.
+If that doesn't hold true, we should fix that.
 
