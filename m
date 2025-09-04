@@ -1,80 +1,80 @@
-Return-Path: <kvm+bounces-56786-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-56788-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 00DF2B43535
-	for <lists+kvm@lfdr.de>; Thu,  4 Sep 2025 10:14:42 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id AAB7FB4353A
+	for <lists+kvm@lfdr.de>; Thu,  4 Sep 2025 10:14:50 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 199E31C264C0
-	for <lists+kvm@lfdr.de>; Thu,  4 Sep 2025 08:14:18 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 918D31C273E1
+	for <lists+kvm@lfdr.de>; Thu,  4 Sep 2025 08:14:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 77FAC2D2482;
-	Thu,  4 Sep 2025 08:12:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7D17C2D23BC;
+	Thu,  4 Sep 2025 08:12:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="kKqDAMEk"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="MkuJ0NZT"
 X-Original-To: kvm@vger.kernel.org
 Received: from mail-ej1-f49.google.com (mail-ej1-f49.google.com [209.85.218.49])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 71DC72D1F68
-	for <kvm@vger.kernel.org>; Thu,  4 Sep 2025 08:11:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D91CE2D24BD
+	for <kvm@vger.kernel.org>; Thu,  4 Sep 2025 08:12:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.49
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756973521; cv=none; b=qtYZbi1InRQW5RrzTuBx6dAJwhQU12LVanVF34Lg2QPxjqepWPPaUeiDlIWg7Bq3eAms1q52sb3DLGLAUdjz69Pc5wAwrgfyuGqQQhTGkWdz7XJbQQa9PUF6yqg4uzbq/tgBNhnqrkbQYwT4xPTd2nm3KFL3YI2XNijsA4wpLV8=
+	t=1756973524; cv=none; b=jyrT9VPlnBsS6LWXOHQh2a6GY7kCEhOh0quwkTFD37bexT3vArHn6bNnFNhv3nckOlhx2j9bcNBN46fBZ54rSajFYT6wvMyOcSKMJF5qxOOca1KS/6QsicZfmFbBvMIvob+a5bAgpObSRElYIRFkcprC0OPqddrdfvspWeOMyzs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756973521; c=relaxed/simple;
-	bh=ymCWKRCoXSqz0MnE3RhkeGxhBI5pbpduq+psGAU4ZXI=;
+	s=arc-20240116; t=1756973524; c=relaxed/simple;
+	bh=Jbj41lUT7Zd1OiopuYZLug37r4ct7efDAMtJJheBoLA=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=jWS5gKsvR9v1b1/5KU0csA2FL7Fqx16QMlHbRuRbmRvKz1pWBSwM5KAXJj+PBWDOkAJKTckcPAcV9M5oo14jLsQMsIsosrO7LW6aZoyHePXp1z9bLzqhFX0w+p4vJxo3IukDwcXI6O7r52CfmxNpndliO0Lt8obAthOg9+GChnk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=kKqDAMEk; arc=none smtp.client-ip=209.85.218.49
+	 MIME-Version; b=tLvDNrhdlYuVWWEMc9MLq/dvhX4mpDie86FC7XXylqPMQXW033sT+VNm++LSOSCezgZYWoC7K+bPA4nGkVXLUAZ4/RoblHbw1FhGkvWGtmTGBJGU+G/t+oVcsGk5Xs/ZcQuq/I300S4w2SueDvShroTIP5MBIwJPYM2l/kA0WCs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=MkuJ0NZT; arc=none smtp.client-ip=209.85.218.49
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
-Received: by mail-ej1-f49.google.com with SMTP id a640c23a62f3a-b043da5a55fso107838466b.0
-        for <kvm@vger.kernel.org>; Thu, 04 Sep 2025 01:11:59 -0700 (PDT)
+Received: by mail-ej1-f49.google.com with SMTP id a640c23a62f3a-afcb7322da8so151140466b.0
+        for <kvm@vger.kernel.org>; Thu, 04 Sep 2025 01:12:02 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1756973518; x=1757578318; darn=vger.kernel.org;
+        d=linaro.org; s=google; t=1756973521; x=1757578321; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=KM2ZDhNYkLW1KWUOdLmFVe8gLAQ7wgd1StjOThDS9B0=;
-        b=kKqDAMEk1hyPIGUJUybOF1cDAAsWITnLXv+ZX19l8cMbfGHh7w+QKe8EigCDGPHhVu
-         cXWqzYpft2Zl6SLKHlU8cn9p+QcfLkONvo9z6hKcy2AHk+JIN2TThx4KB5k6NbTGu2Dv
-         NCidrc9GcqLnsP3Du+bVsLXpUPHHiIQz3uZBKNYDnen3oZvuNY7nnFnB1z6poSxGy76r
-         QF3fauC6mkoatNqcIKUUxj7pkmG1U9WOhQZUVQSdH4yTlpba/tzSZu2yPaQJmOk1SGik
-         Mxin3+4ifcU+umUrXbICRV6Wb7UNZr/+jWACQG6hgnOhcR6l8bZbYyifkcGDFCYG79Fy
-         oIrw==
+        bh=dryPG5cdTvon401P43IQAncMYcpBnZGjJaBP50H9h5s=;
+        b=MkuJ0NZT8s3ajZA87SdJex7VD/mdD708vFmDGREVIDAul7N/KRiA7Gq1jHpphlprpC
+         iLtvRzADnQnWSa4uq7fBoDQc1h7A9YW50VgoTeCRBNrN68rbMan5VjDdwMbTkVLnINjK
+         IhTOcNWIN8a7wRHrOQ8++tu0XzROKclWlJU7EMzBHs4nJqDeL4+m4peAscywH1GBqw4O
+         swdMWuGNCY+8Gswa3XIOWlVQCtsGaozvl8iGNvieLXTSctxcNX1Qw8jNn/i07qqxx22R
+         hxGMg30EJrbOZsWJMcRODJl/QIxttAiX3hSTU8U13ctkeqldG5nq90VprLQyjo1ZYAtH
+         ThdQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1756973518; x=1757578318;
+        d=1e100.net; s=20230601; t=1756973521; x=1757578321;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=KM2ZDhNYkLW1KWUOdLmFVe8gLAQ7wgd1StjOThDS9B0=;
-        b=tCUAMUtJnQM0UVrLVe+CyePQzWwZAIWvTvJXDdCp8nWDb4Lt/zb6/eygK5YrRuExTR
-         C3gZmcVapWdp0y2PDhfRJqbaqMo336lLQt/QpG1BSy3DGT9QiCt2MI6HMZ0b05UDRoD1
-         khP0ISqpOVmcHgdvXfljPdyvohNzwqaBvqWwUa0kXu86CDXOYC2kPOsdOJyAB5ToY0iG
-         o/o7U/bcO5CD4mBCuItQKyv4Dk0suKRGxlRvBcAOCDhqvA1Tg+yyg5Nyal6OXVbYa9Id
-         Krb4ruSzYPs2wIt6aJJuh05Z/LPRzQenSBVVVj3i8MpRX6FEEtmMfHvt9G3ZmKTSrtti
-         yvdQ==
-X-Forwarded-Encrypted: i=1; AJvYcCV4Mb/tYxI1F35ws0DozmJ5zOY4K0FMEqtC/q+frsE5Ob9kzuKEsyC8mhaX8uT/bk26p9I=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyemhX2Ka/k9cVtIrVCgCJZWtkKV6X5a0HeAXyJw48yhNU4YTck
-	5GNTdlQwg1IapQJMoxnLO/yrjWOH+XXyulfD9yEef1ftoPIfBWIOCMFD+lX2rfdjnnM=
-X-Gm-Gg: ASbGncsG5rQ6v6Yw8h/Cv23U71a6EYYnOZ+uwaMLxhEuFWoJ9DEyiQnYkDWTWHP45G/
-	UI6qokvxTA9WuKXqPQfF+ZdRpIrgPkPGYRldi0coKkCn56Ve4P6j1Wc7sMp6I3A1lxBrT/t/6LI
-	blLmhYAy2qmylE6QRGzZ5H73xpV3rC4KT7Dgw5alQYm8ZvjG6dlc1FeOnceFVTPZCRzuHxwqjc+
-	AjvPAsFRWpVMJgkC5862i9YnLsL/1SH7s/+dXPnIa+6TAJVT11wkQYR5PUFOyyvGAdlDroY+adn
-	SJlP05WL2+my3JcNjCYlgim/Hc80dcCC1SY0PPZebC7WR9VTNM+ZOyJeWarcHp7ZuVel6nQzCZ+
-	BX7lLazxsIgJ2htQRzOGYpkH+6f5PNJwzVA==
-X-Google-Smtp-Source: AGHT+IE6k0GqNytWpGYUw8aMikHxjbuztoWFqvzmVO/on4V3dK6nYD0ba2/sDJcNk3Tb6kLpXPbyDw==
-X-Received: by 2002:a17:907:961a:b0:b04:2edd:280b with SMTP id a640c23a62f3a-b042edd2a50mr1478196866b.39.1756973517480;
-        Thu, 04 Sep 2025 01:11:57 -0700 (PDT)
+        bh=dryPG5cdTvon401P43IQAncMYcpBnZGjJaBP50H9h5s=;
+        b=pGJSm6bZrs5hAp+hnAotWLO0FLxKbkKLVHQpjnYENtrgAJj/jVj5sZRyKBCdQBwFR6
+         74gUOnNTfALbvIOjojYkXhwDiNsA/9Kom1DBgYtGbI0zTfFgaWDSUSG5c+ysPNPtDEYb
+         F4sqxkynIaAWYoKKf/SXV0bjruBb/x4p0wmroiubXzpUZrN6T7QI6EN7iS1jZg1O9NBf
+         QMAY9Ziy58IpN68sijMNHEb1u3yq6k93QYMukriAK4HxllcMOU43ClIfuHiYEgt8Rdju
+         aFHxrvyiAO2Q0817FZWkbbq+/NohWihRNKe3euwDzMfBUNzNWkLEp4pzUSXcWThQa7Nr
+         LGNw==
+X-Forwarded-Encrypted: i=1; AJvYcCWt+3uDwMG4KIpbpu7HDP7tTJbTg680isNqaPnGUPQxI70ux+GKsjrqpPweldRHaVgDYDU=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzL4ygllSpq3UBMWtc80LZnXs6uNnDAyfRsjJfnTHURGaY9aAJv
+	rTLe1FXQQ4vrcuJvVpB750hx1WK6OWIeHgDN23gTa9EcyYb45eSpOmBXEz6OuKe6EDg=
+X-Gm-Gg: ASbGncv7zpZlp6vDIjMVj3SudNehn0TgzyGiaaJBpsbElsl5QQn481PfBWqnmisZElO
+	kaBMJGDgxNGveEzJwaYxnuSk/oL7wAB6/Kq00QOmkyTocWc2V42MAAVF16hKQM7Fi2d3ZGdWHu/
+	0vkumDTs4QGJD7nS+VszBtHslYq498z2cCbvz7O4MLDuGCLLOVvdeET3stmUHtOTBHM6TsBCorx
+	DfdnAuR//9Rr0yTaNCPBzv/CVSu0NIIK6p5jZJ3Jal7TjhdakbVI8fgva7REkhHvJZhWb/Hr72X
+	6tpaECllF+/u5+g2j4ByWgn7y0BMDfuQWtzIgn0r7U+bK9q8kpKuQJOr2CjFRg0zugfpf9m3dp5
+	EFSU0ik3ewQSjE1KF90lNM98=
+X-Google-Smtp-Source: AGHT+IGDnb25U4p97OCHED0J2lFk0ur4/KBbXrud2PABbqZVX6GA8E6Xsu3KLiaHB+cjs0txk70Kjg==
+X-Received: by 2002:a17:907:7ea8:b0:b04:53cc:441c with SMTP id a640c23a62f3a-b0453cc4688mr868679666b.28.1756973521151;
+        Thu, 04 Sep 2025 01:12:01 -0700 (PDT)
 Received: from draig.lan ([185.126.160.19])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-b041f6fb232sm1080452766b.87.2025.09.04.01.11.50
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-aff12a6b404sm1395198066b.88.2025.09.04.01.11.52
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
         Thu, 04 Sep 2025 01:11:55 -0700 (PDT)
 Received: from draig.lan (localhost [IPv6:::1])
-	by draig.lan (Postfix) with ESMTP id 30E81601A8;
+	by draig.lan (Postfix) with ESMTP id 8A375601B3;
 	Thu, 04 Sep 2025 09:11:34 +0100 (BST)
 From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
 To: qemu-devel@nongnu.org
@@ -162,9 +162,9 @@ Cc: Reinoud Zandijk <reinoud@netbsd.org>,
 	=?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>,
 	Nicholas Piggin <npiggin@gmail.com>,
 	John Levon <john.levon@nutanix.com>
-Subject: [PATCH v2 049/281] semihosting: Initialize heap once per process
-Date: Thu,  4 Sep 2025 09:07:23 +0100
-Message-ID: <20250904081128.1942269-50-alex.bennee@linaro.org>
+Subject: [PATCH v2 051/281] linux-user: Move ppc uabi/asm/elf.h workaround to osdep.h
+Date: Thu,  4 Sep 2025 09:07:25 +0100
+Message-ID: <20250904081128.1942269-52-alex.bennee@linaro.org>
 X-Mailer: git-send-email 2.47.2
 In-Reply-To: <20250904081128.1942269-1-alex.bennee@linaro.org>
 References: <20250904081128.1942269-1-alex.bennee@linaro.org>
@@ -178,180 +178,77 @@ Content-Transfer-Encoding: 8bit
 
 From: Richard Henderson <richard.henderson@linaro.org>
 
-While semihosting isn't really thread aware, the current
-implementation allocates space for the heap per-thread.
+Move the workaround out of linux-user/elfload.c, so that
+we don't have to replicate it in many places.  Place it
+immediately after the include of <signal.h>, which draws
+in the relevant symbols.
 
-Remove the heap_base and heap_limit fields from TaskState.
-Replace with static variables within do_common_semihosting.
+Note that ARCH_DLINFO is not defined by the kernel header,
+and so there's no need to undef it either.
 
 Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
 Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 ---
- linux-user/qemu.h             |  5 -----
- linux-user/aarch64/cpu_loop.c |  7 -------
- linux-user/arm/cpu_loop.c     | 25 +++++++++++--------------
- linux-user/m68k/cpu_loop.c    |  8 --------
- linux-user/riscv/cpu_loop.c   |  4 ----
- semihosting/arm-compat-semi.c | 22 +++++++++-------------
- 6 files changed, 20 insertions(+), 51 deletions(-)
+ include/qemu/osdep.h |  8 ++++++++
+ hw/core/loader.c     |  4 ----
+ linux-user/elfload.c | 10 ----------
+ 3 files changed, 8 insertions(+), 14 deletions(-)
 
-diff --git a/linux-user/qemu.h b/linux-user/qemu.h
-index b6621536b36..4d6fad28c63 100644
---- a/linux-user/qemu.h
-+++ b/linux-user/qemu.h
-@@ -121,11 +121,6 @@ struct TaskState {
-     abi_ulong child_tidptr;
- #ifdef TARGET_M68K
-     abi_ulong tp_value;
--#endif
--#if defined(TARGET_ARM) || defined(TARGET_M68K) || defined(TARGET_RISCV)
--    /* Extra fields for semihosted binaries.  */
--    abi_ulong heap_base;
--    abi_ulong heap_limit;
+diff --git a/include/qemu/osdep.h b/include/qemu/osdep.h
+index 96fe51bc390..be3460b32f2 100644
+--- a/include/qemu/osdep.h
++++ b/include/qemu/osdep.h
+@@ -133,6 +133,14 @@ QEMU_EXTERN_C int daemon(int, int);
+ #include <setjmp.h>
+ #include <signal.h>
+ 
++/*
++ * Avoid conflict with linux/arch/powerpc/include/uapi/asm/elf.h, included
++ * from <asm/sigcontext.h>, but we might as well do this unconditionally.
++ */
++#undef ELF_CLASS
++#undef ELF_DATA
++#undef ELF_ARCH
++
+ #ifdef CONFIG_IOVEC
+ #include <sys/uio.h>
  #endif
-     int used; /* non zero if used */
-     struct image_info *info;
-diff --git a/linux-user/aarch64/cpu_loop.c b/linux-user/aarch64/cpu_loop.c
-index b65999a75bf..030a630c936 100644
---- a/linux-user/aarch64/cpu_loop.c
-+++ b/linux-user/aarch64/cpu_loop.c
-@@ -140,9 +140,6 @@ void cpu_loop(CPUARMState *env)
- void target_cpu_copy_regs(CPUArchState *env, target_pt_regs *regs)
- {
-     ARMCPU *cpu = env_archcpu(env);
--    CPUState *cs = env_cpu(env);
--    TaskState *ts = get_task_state(cs);
--    struct image_info *info = ts->info;
-     int i;
- 
-     if (!(arm_feature(env, ARM_FEATURE_AARCH64))) {
-@@ -167,8 +164,4 @@ void target_cpu_copy_regs(CPUArchState *env, target_pt_regs *regs)
-     if (cpu_isar_feature(aa64_pauth, cpu)) {
-         qemu_guest_getrandom_nofail(&env->keys, sizeof(env->keys));
-     }
--
--    ts->heap_base = info->brk;
--    /* This will be filled in on the first SYS_HEAPINFO call.  */
--    ts->heap_limit = 0;
+diff --git a/hw/core/loader.c b/hw/core/loader.c
+index e7056ba4bd3..524af6f14a0 100644
+--- a/hw/core/loader.c
++++ b/hw/core/loader.c
+@@ -295,10 +295,6 @@ static void *load_at(int fd, off_t offset, size_t size)
+     return ptr;
  }
-diff --git a/linux-user/arm/cpu_loop.c b/linux-user/arm/cpu_loop.c
-index e40d6beafa2..9d54422736c 100644
---- a/linux-user/arm/cpu_loop.c
-+++ b/linux-user/arm/cpu_loop.c
-@@ -492,19 +492,16 @@ void target_cpu_copy_regs(CPUArchState *env, target_pt_regs *regs)
-     for(i = 0; i < 16; i++) {
-         env->regs[i] = regs->uregs[i];
-     }
--#if TARGET_BIG_ENDIAN
--    /* Enable BE8.  */
--    if (EF_ARM_EABI_VERSION(info->elf_flags) >= EF_ARM_EABI_VER4
--        && (info->elf_flags & EF_ARM_BE8)) {
--        env->uncached_cpsr |= CPSR_E;
--        env->cp15.sctlr_el[1] |= SCTLR_E0E;
--    } else {
--        env->cp15.sctlr_el[1] |= SCTLR_B;
--    }
--    arm_rebuild_hflags(env);
+ 
+-#ifdef ELF_CLASS
+-#undef ELF_CLASS
 -#endif
+-
+ #define ELF_CLASS   ELFCLASS32
+ #include "elf.h"
  
--    ts->heap_base = info->brk;
--    /* This will be filled in on the first SYS_HEAPINFO call.  */
--    ts->heap_limit = 0;
-+    if (TARGET_BIG_ENDIAN) {
-+        /* Enable BE8.  */
-+        if (EF_ARM_EABI_VERSION(info->elf_flags) >= EF_ARM_EABI_VER4
-+            && (info->elf_flags & EF_ARM_BE8)) {
-+            env->uncached_cpsr |= CPSR_E;
-+            env->cp15.sctlr_el[1] |= SCTLR_E0E;
-+        } else {
-+            env->cp15.sctlr_el[1] |= SCTLR_B;
-+        }
-+        arm_rebuild_hflags(env);
-+    }
- }
-diff --git a/linux-user/m68k/cpu_loop.c b/linux-user/m68k/cpu_loop.c
-index 3aaaf02ca4e..23693f33582 100644
---- a/linux-user/m68k/cpu_loop.c
-+++ b/linux-user/m68k/cpu_loop.c
-@@ -94,10 +94,6 @@ void cpu_loop(CPUM68KState *env)
- 
- void target_cpu_copy_regs(CPUArchState *env, target_pt_regs *regs)
- {
--    CPUState *cpu = env_cpu(env);
--    TaskState *ts = get_task_state(cpu);
--    struct image_info *info = ts->info;
--
-     env->pc = regs->pc;
-     env->dregs[0] = regs->d0;
-     env->dregs[1] = regs->d1;
-@@ -116,8 +112,4 @@ void target_cpu_copy_regs(CPUArchState *env, target_pt_regs *regs)
-     env->aregs[6] = regs->a6;
-     env->aregs[7] = regs->usp;
-     env->sr = regs->sr;
--
--    ts->heap_base = info->brk;
--    /* This will be filled in on the first SYS_HEAPINFO call.  */
--    ts->heap_limit = 0;
- }
-diff --git a/linux-user/riscv/cpu_loop.c b/linux-user/riscv/cpu_loop.c
-index 541de765ffa..2dd30c7b288 100644
---- a/linux-user/riscv/cpu_loop.c
-+++ b/linux-user/riscv/cpu_loop.c
-@@ -108,8 +108,4 @@ void target_cpu_copy_regs(CPUArchState *env, target_pt_regs *regs)
-         error_report("Incompatible ELF: RVE cpu requires RVE ABI binary");
-         exit(EXIT_FAILURE);
-     }
--
--    ts->heap_base = info->brk;
--    /* This will be filled in on the first SYS_HEAPINFO call.  */
--    ts->heap_limit = 0;
- }
-diff --git a/semihosting/arm-compat-semi.c b/semihosting/arm-compat-semi.c
-index bc04b02eba8..bcd13cd6dfd 100644
---- a/semihosting/arm-compat-semi.c
-+++ b/semihosting/arm-compat-semi.c
-@@ -666,7 +666,7 @@ void do_common_semihosting(CPUState *cs)
-             int i;
- #ifdef CONFIG_USER_ONLY
-             TaskState *ts = get_task_state(cs);
--            target_ulong limit;
-+            static abi_ulong heapbase, heaplimit;
- #else
-             LayoutInfo info = common_semi_find_bases(cs);
+diff --git a/linux-user/elfload.c b/linux-user/elfload.c
+index ea214105ff8..4ca8c39dc26 100644
+--- a/linux-user/elfload.c
++++ b/linux-user/elfload.c
+@@ -35,16 +35,6 @@
+ #include "target/arm/cpu-features.h"
  #endif
-@@ -678,24 +678,20 @@ void do_common_semihosting(CPUState *cs)
-              * Some C libraries assume the heap immediately follows .bss, so
-              * allocate it using sbrk.
-              */
--            if (!ts->heap_limit) {
--                abi_ulong ret;
+ 
+-#ifdef _ARCH_PPC64
+-#undef ARCH_DLINFO
+-#undef ELF_PLATFORM
+-#undef ELF_HWCAP
+-#undef ELF_HWCAP2
+-#undef ELF_CLASS
+-#undef ELF_DATA
+-#undef ELF_ARCH
+-#endif
 -
--                ts->heap_base = do_brk(0);
--                limit = ts->heap_base + COMMON_SEMI_HEAP_SIZE;
-+            if (!heaplimit) {
-+                heapbase = do_brk(0);
-                 /* Try a big heap, and reduce the size if that fails.  */
--                for (;;) {
--                    ret = do_brk(limit);
-+                for (abi_ulong size = COMMON_SEMI_HEAP_SIZE; ; size >>= 1) {
-+                    abi_ulong limit = heapbase + size;
-+                    abi_ulong ret = do_brk(limit);
-                     if (ret >= limit) {
-+                        heaplimit = limit;
-                         break;
-                     }
--                    limit = (ts->heap_base >> 1) + (limit >> 1);
-                 }
--                ts->heap_limit = limit;
-             }
--
--            retvals[0] = ts->heap_base;
--            retvals[1] = ts->heap_limit;
-+            retvals[0] = heapbase;
-+            retvals[1] = heaplimit;
-             /*
-              * Note that semihosting is *not* thread aware.
-              * Always return the stack base of the main thread.
+ #ifndef TARGET_ARCH_HAS_SIGTRAMP_PAGE
+ #define TARGET_ARCH_HAS_SIGTRAMP_PAGE 0
+ #endif
 -- 
 2.47.2
 
