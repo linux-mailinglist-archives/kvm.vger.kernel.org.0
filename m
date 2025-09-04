@@ -1,81 +1,81 @@
-Return-Path: <kvm+bounces-56793-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-56791-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 52250B43533
-	for <lists+kvm@lfdr.de>; Thu,  4 Sep 2025 10:14:31 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id BF0CDB4353D
+	for <lists+kvm@lfdr.de>; Thu,  4 Sep 2025 10:15:06 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 12F9F16A6A9
-	for <lists+kvm@lfdr.de>; Thu,  4 Sep 2025 08:14:31 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id C25241C83780
+	for <lists+kvm@lfdr.de>; Thu,  4 Sep 2025 08:14:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9D8C52D3EC2;
-	Thu,  4 Sep 2025 08:12:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 10CA62D3756;
+	Thu,  4 Sep 2025 08:12:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="Oe/dA3g/"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="jM0aEvcU"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-ej1-f50.google.com (mail-ej1-f50.google.com [209.85.218.50])
+Received: from mail-ed1-f43.google.com (mail-ed1-f43.google.com [209.85.208.43])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1A9142D29D8
-	for <kvm@vger.kernel.org>; Thu,  4 Sep 2025 08:12:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.50
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7DB362C0F95
+	for <kvm@vger.kernel.org>; Thu,  4 Sep 2025 08:12:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.43
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756973533; cv=none; b=Y2ssj3aY8J2wkY5knwgU1MowMD1hq6e+CZv7hx1w0sDxhJo9WF3sXp6fkQBGegKTvsKWuM8YfjOog4hC2arym9rgfr3I9TS+Zrr7XWb7HoUiCmsas4dclhlUDvHfDsuaEnJdk9KndNH+djxLW6ORvimExsjMzL/ons6dgyOd5LU=
+	t=1756973532; cv=none; b=ldaNJQ13aTK3+0TzSY/YW4ysyykXakTbiRLzwCZih2cUyVQcO4xNNNjL35bq/qFBg6S1o/8ydggyUg8YBXAXGVlWfs+nA7v6UUg0pj9pu3cqhHcolfiUYsiN3QvH7hn4n6meti4ipl3SJ9ZzXx2Ji6oOvRyADfm+yL2rueC0yuc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756973533; c=relaxed/simple;
-	bh=H1u0xIrHRBsI5iBWiPGxvfuroguBcudIhZAGEhEwpfg=;
+	s=arc-20240116; t=1756973532; c=relaxed/simple;
+	bh=86qax4iskeRy1MsvuxSDiAUgfweBfKrMbbGNI40Er+0=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=g1+6rGg3JHpF7dCvTSCEBw0tmGzjg0guRSYOOKSrx1endphp8ItF3dbbgj+SDNoBlC3li2yvCODEuejR5jHPgfFo8HWrB5/7+8DVAINjaRRSGsTvn5vdUmiNwNtobzfntmjJqKvsq8ZE915OTjlU42EEZuuQq1G8YmnU61t575s=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=Oe/dA3g/; arc=none smtp.client-ip=209.85.218.50
+	 MIME-Version; b=t4Z6qObrgnEiUEzEZ19UhtipVEFeAISGu4P5sGqgxu4r7FZEzr0JDsd5424jvzFkXw0hFW6oR3bOqbuC+SMmGl9bTXY6q1oaSyh5Gvf3F+iwozyKv9yeoiMScATK6qPCKQwG3sPc5tHcEGyAXN4wIaUCuew+iV9OAZnR2wYyWH0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=jM0aEvcU; arc=none smtp.client-ip=209.85.208.43
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
-Received: by mail-ej1-f50.google.com with SMTP id a640c23a62f3a-b042cc39551so125979666b.0
-        for <kvm@vger.kernel.org>; Thu, 04 Sep 2025 01:12:11 -0700 (PDT)
+Received: by mail-ed1-f43.google.com with SMTP id 4fb4d7f45d1cf-61cd6089262so1203900a12.3
+        for <kvm@vger.kernel.org>; Thu, 04 Sep 2025 01:12:10 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1756973530; x=1757578330; darn=vger.kernel.org;
+        d=linaro.org; s=google; t=1756973529; x=1757578329; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=arwdiSLHZSf6gZ/oJp/0pmlfrIs2tD4nzezQj8ONLa8=;
-        b=Oe/dA3g/+pkPZ3L5OX5iCSblBCHitswzIteEAu+7aLroQgjxonU/ElNs4wB951hWHI
-         pmZ0SzrCMND0/oMZextTFVgsHwVX0r/aHq8HefKVkGRgTTHfRvf/I/NtFJGQsr2eMuor
-         r2n/Lse7yqoM10ccaQLcq6k7WPFAONAl8GH/IaJBTNlsmOGRmuCdT8dw+OH3MlMN129R
-         HwVMSTEBLaCveIHvvjI+JVcrNMscR/ROUjABJh5uLXM6u1NOzZuwVWTvwhUumuKiTXJp
-         xfCszGCXSxQ+9mrcXDYxbW3iYYS1FB4Ie57oggLj0PF6SGCa6+0H3oFfHVcHfUmDCU3r
-         X/rw==
+        bh=nJY1IlIgq7GGkBP3hhYu6s36xjwpVbPeSOjHkNAYnEM=;
+        b=jM0aEvcUfO5KjRHBJbYIni3OMKxhgXgpXBthQF2JVp/qqLdsAC87e0dI12AMv7bF/a
+         vy6gXScVTUKi/yZ+66wQBU8M0qnZdROulHFfZdl0IKlahd7+CnhvfTB0Sxrc7ICsBooL
+         hfG5vkP+sNpaozww26NUHgiRwaiVcMZNlsJKcF4itQ/TX6O+Bz9VxcWFYDIRdUGumlZk
+         8CHiVvZQIVPxHABA0IKYVj8jK/9hl/UYLtLSbZLo8R265qBus/H0ViecrJIpeU27CAxw
+         4IVEUobgYwEVrrgY+dcbKWn7Cobjoz81R5oIcZ/ylnXa+U6MhA/oja49S45m8SOnKVvC
+         SpSA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1756973530; x=1757578330;
+        d=1e100.net; s=20230601; t=1756973529; x=1757578329;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=arwdiSLHZSf6gZ/oJp/0pmlfrIs2tD4nzezQj8ONLa8=;
-        b=X0e9QRCqLi5DdoTkvoD6gKIlhNWvlDeSMBBjZJke0b7YZGsl1XjBJ1JWiNf3qXZVtI
-         Iz6ocAHPnEzNeNhDyTkfTT9fLgUrAEW6GF07Q3DLsNySeFJvQzkt1npvKiRyDLvZYFwL
-         9SUPuB2+RDNwC56SsRxyrUCzzwq2asuBFtQVfN9N4mdN7IJrrDLKvi/I0p2OC4+tySLA
-         Ga6xCk/hkoZc8OqbtWseB/I7HjsdM1iXUf8ATIBT4G00YRtBBG/kiPQQLjKWnsfx6Li1
-         K9Ru16iFuDsJ1TMK10iKXdxfwvQ3gFZ/WFHOROoKW+W676pMG6SJhd8ooLqCrN71m2yW
-         gKVg==
-X-Forwarded-Encrypted: i=1; AJvYcCXHw+mjB/cHsKKaHZ1XcbYYDhkYfS9dQFxVha9vO258MwyUtCEa/IUKW5VWo9ZcheiWgRo=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yy+BDy9do6XPovaiUfA8WCQp2hQRptA53AhILWWN21ApGQerH/5
-	OfMavQckyC9IEey5K6NJdQ5Gu9LExTIXa43FgaojHDfQWgPQDMJZtjb9287bjndtD3I=
-X-Gm-Gg: ASbGnctF1Rdgk/mCU5nCmg4nWWcnU+yjjxnLlNhRQos3olFVv6jgeaWbnFnfrl/5IRH
-	5NPsozFQ58jjwCmHcABqFuy8EikK521WWZWfS2QiLQLIcqOvTAG1ZF8RXqwlx04OY56ADn+JQcM
-	5lUccN6QV1myYOvb1xoVICqXmV6P9Pxpt/D8aP2tA7FXa9mKhzRTj/5pfJJ6Ee50x4sRvuHc/Th
-	4MiTO/fV3nyTYTMIjK7Uu88E8BlT6+SsM6d5Nz7ZqIL62Qc9ICEIVk2vAsEkpVZTkllWV7HutIu
-	QbK3LKTdXwYCxroG4aCbI38u0jj+HwiBv43jQwnfR+4B9+CylkRfjWE3Am6vjComu9PjR/6Lmxz
-	68IdUYaftWci4Wecxm10IMT6qYkvFP5oNiw==
-X-Google-Smtp-Source: AGHT+IFQfEnVE3jwf+K8A9mRCuKbsvAdVucPiFVZ9gLtG5kMjB7TuNZVupCy9McVaCvmyY+uZupkMA==
-X-Received: by 2002:a17:907:7f20:b0:afe:d62a:f04b with SMTP id a640c23a62f3a-b01d8a25c7bmr1778270066b.3.1756973529775;
-        Thu, 04 Sep 2025 01:12:09 -0700 (PDT)
+        bh=nJY1IlIgq7GGkBP3hhYu6s36xjwpVbPeSOjHkNAYnEM=;
+        b=s5EsXmCLWR2cQSpSs9ACTVAea11mVGx3nzP4Lbtkj0Gx8YYjYzyvyhmznLd3baKcTe
+         RxR5/B6x8fbu0Iooc3Klphdi/Ybq5FxHuo/soGUPkOpite8dK8KMaUE9Wr9nUEYQ4hro
+         CbvPifDUCkI+zSJMG9395jUvwXoTk1lzfyHOs/GTWdCouGiQhgf/bdSRLDbHCNqEmBz1
+         dwbri1X7bxMVyAM0jCHyRhT16m7xC34fTMHjDXJPpXu3a9513zKlwLwf+pJ/bSXN+2SJ
+         Kn2ZrqkJMhXVbcYTvzeiQ8ewlbynAfMRUuobdGCaCODVP/rF5vo9TOscJWFW3EstnkU8
+         6X+g==
+X-Forwarded-Encrypted: i=1; AJvYcCUcDxWInzNA7Z2phSXxN7nyTyRvKw2EgG00IBn2YUUVUBT2EmrWwaSvwh4xJe52ezKeeGU=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yyn/5FkuuIxL7NgsXg6PlwReWq7hbMfSQzTBrnH1L6CDW9mJPL4
+	fedetYwH3ix42EiA24oQboiJpU0LiN45tXGQk910N/1/1aQlRN1bZT3+M+8v4XVLSqM=
+X-Gm-Gg: ASbGncs8naSa1DnguJJ46dYTqjDWz3oHi5PwBfQNuowXEKjXvyaO4t/yuccodDqY9s1
+	EiC1Ft1DOXL1GkCk9qQkyjdteixyyWV/YYix+HdZJy6tCaaVPglb9ANNNszS9IM9p/USLfVJQK9
+	eIusmq0ccA0nOPMpvRwQ1qO18djECfZBKAfVpzvvBtffnEoG5738WOMbqDZzRLSrBMtGYulgDlD
+	QbCtkfyYu/m4acyUgl4U8VRpnLugIfeUp1PBp5fI+/dpsnthlmXfoV8IO2jxPQIPI4spx1j4xjV
+	4PtJRs5diRQCZ+frJd+lSvzH2F+0KVOPgbB7SxjoKer4PlVM9KTP6j5yZ9ZcQRotyXjbuzZhKxS
+	aU58Spf2NQ49y1+z+/ffG7Q0=
+X-Google-Smtp-Source: AGHT+IEi9pe0oeBOE15/8xuZT4mmtCw/EODsHqznTJDr3Z4WP9YjhwiV366LnSMgu6QLvZ6qkctWyg==
+X-Received: by 2002:a17:907:86a6:b0:afe:bdcb:9e62 with SMTP id a640c23a62f3a-b01d973074dmr1930653766b.33.1756973527252;
+        Thu, 04 Sep 2025 01:12:07 -0700 (PDT)
 Received: from draig.lan ([185.126.160.19])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-b04110b94cbsm1152568366b.93.2025.09.04.01.11.59
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-b0424cc1698sm987487966b.21.2025.09.04.01.12.01
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
         Thu, 04 Sep 2025 01:12:04 -0700 (PDT)
 Received: from draig.lan (localhost [IPv6:::1])
-	by draig.lan (Postfix) with ESMTP id 694A560AAF;
-	Thu, 04 Sep 2025 09:11:37 +0100 (BST)
+	by draig.lan (Postfix) with ESMTP id 093DB60ABF;
+	Thu, 04 Sep 2025 09:11:38 +0100 (BST)
 From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
 To: qemu-devel@nongnu.org
 Cc: Reinoud Zandijk <reinoud@netbsd.org>,
@@ -162,9 +162,9 @@ Cc: Reinoud Zandijk <reinoud@netbsd.org>,
 	=?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>,
 	Nicholas Piggin <npiggin@gmail.com>,
 	John Levon <john.levon@nutanix.com>
-Subject: [PATCH v2 071/281] linux-user: Move target_cpu_copy_regs decl to qemu.h
-Date: Thu,  4 Sep 2025 09:07:45 +0100
-Message-ID: <20250904081128.1942269-72-alex.bennee@linaro.org>
+Subject: [PATCH v2 076/281] linux-user/aarch64: Create init_main_thread
+Date: Thu,  4 Sep 2025 09:07:50 +0100
+Message-ID: <20250904081128.1942269-77-alex.bennee@linaro.org>
 X-Mailer: git-send-email 2.47.2
 In-Reply-To: <20250904081128.1942269-1-alex.bennee@linaro.org>
 References: <20250904081128.1942269-1-alex.bennee@linaro.org>
@@ -178,41 +178,73 @@ Content-Transfer-Encoding: 8bit
 
 From: Richard Henderson <richard.henderson@linaro.org>
 
-The function is not used by bsd-user, so placement
-within include/user/cpu_loop.h is not ideal.
+Merge init_thread and target_cpu_copy_regs.
+There's no point going through a target_pt_regs intermediate.
 
 Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
 Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 ---
- include/user/cpu_loop.h | 4 ----
- linux-user/qemu.h       | 3 +++
- 2 files changed, 3 insertions(+), 4 deletions(-)
+ linux-user/aarch64/cpu_loop.c | 14 ++++++--------
+ linux-user/elfload.c          | 10 +---------
+ 2 files changed, 7 insertions(+), 17 deletions(-)
 
-diff --git a/include/user/cpu_loop.h b/include/user/cpu_loop.h
-index ad8a1d711f0..346e37ede8b 100644
---- a/include/user/cpu_loop.h
-+++ b/include/user/cpu_loop.h
-@@ -81,8 +81,4 @@ void target_exception_dump(CPUArchState *env, const char *fmt, int code);
- #define EXCP_DUMP(env, fmt, code) \
-     target_exception_dump(env, fmt, code)
+diff --git a/linux-user/aarch64/cpu_loop.c b/linux-user/aarch64/cpu_loop.c
+index 030a630c936..4c4921152e8 100644
+--- a/linux-user/aarch64/cpu_loop.c
++++ b/linux-user/aarch64/cpu_loop.c
+@@ -137,10 +137,10 @@ void cpu_loop(CPUARMState *env)
+     }
+ }
  
--typedef struct target_pt_regs target_pt_regs;
--
--void target_cpu_copy_regs(CPUArchState *env, target_pt_regs *regs);
--
- #endif
-diff --git a/linux-user/qemu.h b/linux-user/qemu.h
-index 4d6fad28c63..0c3cfe93a14 100644
---- a/linux-user/qemu.h
-+++ b/linux-user/qemu.h
-@@ -359,4 +359,7 @@ void *lock_user_string(abi_ulong guest_addr);
- /* Clone cpu state */
- CPUArchState *cpu_copy(CPUArchState *env);
+-void target_cpu_copy_regs(CPUArchState *env, target_pt_regs *regs)
++void init_main_thread(CPUState *cs, struct image_info *info)
+ {
++    CPUARMState *env = cpu_env(cs);
+     ARMCPU *cpu = env_archcpu(env);
+-    int i;
  
-+typedef struct target_pt_regs target_pt_regs;
-+void target_cpu_copy_regs(CPUArchState *env, target_pt_regs *regs);
+     if (!(arm_feature(env, ARM_FEATURE_AARCH64))) {
+         fprintf(stderr,
+@@ -148,14 +148,12 @@ void target_cpu_copy_regs(CPUArchState *env, target_pt_regs *regs)
+         exit(EXIT_FAILURE);
+     }
+ 
+-    for (i = 0; i < 31; i++) {
+-        env->xregs[i] = regs->regs[i];
+-    }
+-    env->pc = regs->pc;
+-    env->xregs[31] = regs->sp;
++    env->pc = info->entry & ~0x3ULL;
++    env->xregs[31] = info->start_stack;
 +
- #endif /* QEMU_H */
+ #if TARGET_BIG_ENDIAN
+     env->cp15.sctlr_el[1] |= SCTLR_E0E;
+-    for (i = 1; i < 4; ++i) {
++    for (int i = 1; i < 4; ++i) {
+         env->cp15.sctlr_el[i] |= SCTLR_EE;
+     }
+     arm_rebuild_hflags(env);
+diff --git a/linux-user/elfload.c b/linux-user/elfload.c
+index 95868739546..f93afbdcea3 100644
+--- a/linux-user/elfload.c
++++ b/linux-user/elfload.c
+@@ -395,15 +395,7 @@ static const VdsoImageInfo *vdso_image_info(uint32_t elf_flags)
+ #define ELF_ARCH        EM_AARCH64
+ #define ELF_CLASS       ELFCLASS64
+ 
+-static inline void init_thread(struct target_pt_regs *regs,
+-                               struct image_info *infop)
+-{
+-    abi_long stack = infop->start_stack;
+-    memset(regs, 0, sizeof(*regs));
+-
+-    regs->pc = infop->entry & ~0x3ULL;
+-    regs->sp = stack;
+-}
++#define HAVE_INIT_MAIN_THREAD
+ 
+ #define ELF_NREG    34
+ typedef target_elf_greg_t  target_elf_gregset_t[ELF_NREG];
 -- 
 2.47.2
 
