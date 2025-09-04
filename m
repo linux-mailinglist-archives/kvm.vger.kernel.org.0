@@ -1,80 +1,80 @@
-Return-Path: <kvm+bounces-56801-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-56787-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id CC6BDB4356B
-	for <lists+kvm@lfdr.de>; Thu,  4 Sep 2025 10:18:57 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8C859B43537
+	for <lists+kvm@lfdr.de>; Thu,  4 Sep 2025 10:14:46 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 81ACF171A93
-	for <lists+kvm@lfdr.de>; Thu,  4 Sep 2025 08:18:57 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id E8F201C26CE0
+	for <lists+kvm@lfdr.de>; Thu,  4 Sep 2025 08:14:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 08F5A2C11E7;
-	Thu,  4 Sep 2025 08:18:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0DAFC2D3204;
+	Thu,  4 Sep 2025 08:12:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="orTnXy9i"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="GMH79qoP"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-ej1-f44.google.com (mail-ej1-f44.google.com [209.85.218.44])
+Received: from mail-ej1-f51.google.com (mail-ej1-f51.google.com [209.85.218.51])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3EE042BDC13
-	for <kvm@vger.kernel.org>; Thu,  4 Sep 2025 08:18:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.44
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 41A8F2D239F
+	for <kvm@vger.kernel.org>; Thu,  4 Sep 2025 08:12:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756973922; cv=none; b=iBiKnKi6htV+q47udmb6SAu9nv+ilUXPRiUJSYkQcutMb3Is1FSpo15gt3fCck2NUFCOwVhD4tQYT4FeplPANCbjsFOr66SSSJ3pjP6dJ+iROE4v7sOuOdFlZLRGrhcc2IMmF8OWauAy1+D+v0giIYpqygarIz89jrz0mnNPZxc=
+	t=1756973523; cv=none; b=cj4GC6Zk/0aiUhoMP/2uWwlB8rQ3n3yQ2eCQPX61Pn5jdlFx7shUSUSuHpRPn5gaZO9qE1UiAQiOsisr586jKIS/luL+mqjNT2CeuAq5L9dgX9yyiRx2yTm+YDEyNIccYrpWpeq8g8FJ1zaDmnoF5FM+CY7XgMMHEab7gu7SnSA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756973922; c=relaxed/simple;
-	bh=hxeIfx20g7cYcGNYqYWaBdGJWYym53wbjhT65dexDS0=;
+	s=arc-20240116; t=1756973523; c=relaxed/simple;
+	bh=ds+tcWZhl3qNw2U3ZWzgwTiRQDc02aoniF0oXcthNyI=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=frxGzFOjlRPjZUFl86hoLsFJg3vhzbJah0DaC/1OyU/E+8UfWQwSer2Jnds0LiGRe7e6B0clCh+VsWN0zwioyQmbWdcTpJmyKWJsyoV2ZMPk4Z8ENpgcaZWnrNHqYjaHtR8VFrXmfU3cbrLz491akrtYVhjU3MK321ilZMa9zoY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=orTnXy9i; arc=none smtp.client-ip=209.85.218.44
+	 MIME-Version; b=pWc4REVoOlGI5/3IKAdyXshodSIXKCt5DngLHvj79IhUsZ0Pn7GR8a50erveTvk9wAsLKFGsO2W1amwoesgkuXwiKVJiTlisc90nPW1STb+hrwFScgAvbajwG0hoblzz5d15bE/WkiH9NnmSuA+CuVqzZw0iI8IS45gfxuYh/bI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=GMH79qoP; arc=none smtp.client-ip=209.85.218.51
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
-Received: by mail-ej1-f44.google.com with SMTP id a640c23a62f3a-b047f28a83dso81487566b.2
-        for <kvm@vger.kernel.org>; Thu, 04 Sep 2025 01:18:39 -0700 (PDT)
+Received: by mail-ej1-f51.google.com with SMTP id a640c23a62f3a-b0418f6fc27so103936066b.3
+        for <kvm@vger.kernel.org>; Thu, 04 Sep 2025 01:12:01 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1756973918; x=1757578718; darn=vger.kernel.org;
+        d=linaro.org; s=google; t=1756973519; x=1757578319; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=fTwVN2pdB6APtd4vJTidA71Ye17u96MfvC5vKsLhS50=;
-        b=orTnXy9il2OgQup3RyFDjJoK2F462TVKe9ja4nrmquRhl39xhywVzVngOtbWcxtV9e
-         9qnT4Br/yiRJNAIb0JUk9z6qoA8eiMQYUol249AYBJ9xN3tmyp7nA6CiBfxcIzBFhiG9
-         marAzrLbIalTnfyQkmd7wzWNZ8A0fVn/r2CcDdquTUTsHvwn2kf53+gcMM4lyE+C136F
-         ILvdd4zaykSe3YM/cvXUJ0uehFss+tog+GkqX6qVC0O13vMjS/DOjUJd6PPGJICs7cag
-         Xzas/zuBS+CRRUTYC5Fa8xCL5mZGoaAkSVxo8hSn2QXkj4h8WI06dbuA15AN1ip2BKfT
-         DOwg==
+        bh=TRlsHGqvmjF2Vf3U8TOAt/9n2Jks0amzBlUrbfofXWc=;
+        b=GMH79qoPghTsIvily5FlREOh4n48D/t0m9iS+NXqW34aMiP3IlNkR8q9Qr9hjeIowI
+         NuZKsvPhJRObp9UW47GOXYP7z6/lSTrv0ORtlNAxzpc9WjWB2G+0hyUYnDtSUTdpp8lj
+         qhlbq68vwLbRc8oW1FwotzG+5JQJdrc7reOIAsN13h08D65ddJPRQiJp0h54zWSsPeY/
+         QrXNLsqd2VK4uXTwTgxSZhWqQ9sjvStIzV1sRnNWwS0m2b4QHeJU9mSH+Tvy0hkdXO8J
+         K9oGC/vT1vtVdWM4TIDIYo/ScJmQGkN2jehgG6nJON/xjNgAUWF7JITPRg4309pIB0e/
+         sbSg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1756973918; x=1757578718;
+        d=1e100.net; s=20230601; t=1756973519; x=1757578319;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=fTwVN2pdB6APtd4vJTidA71Ye17u96MfvC5vKsLhS50=;
-        b=K0mWOh0HWAcvEU4j2boE58CuM1BI4xWdZGcWYweogHjG/wR3ZzQqPSYfsB8kvt+Eeo
-         TmIZKd0euxzhWRcNca3V7GztvAJsiwWrgsLtYmJ7z8sb6X//bqnoED6s0kfINCvz1g6O
-         XAD+DpcFmAmm/V5GAczHcRUChF4Tc3yYGA0DcUStOpL6rp6RZ+9Pw3XJb/n4DeOoe6HW
-         s4gBY3YjdOtRfxdB10ghAm6uSDParejc41rj+yc/i8L8bLCOlw0P07CokxFWHfMKI5Bj
-         81q4GCgE5BU5JlnYn9NG3vKezQy5fD4NeeQEsSGx9UB0epKKoq9R4g+bvjCtEyOwLCrN
-         dmXQ==
-X-Forwarded-Encrypted: i=1; AJvYcCXbI/rm6mv/l452vDXwFFta0jR6FLWaiBW8GA+puvNMC9e1UOR4wFc+lN5Rf4MY2TC2bGA=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxD6LtdyG4VNcGhb68Ed2WGeu0XRUNrxojshn9XWAHT+lDEX9Te
-	o3GwZmfqi81QdM68SP27iUrWwthwbWZ7wbtMWNYdSJFdpDuv6lZil0fo+r9r02vxnsw=
-X-Gm-Gg: ASbGncvmNimXqlrCmN9kvcEdTLA4dfT/GSCbA4h/mxiYXCZxgF/55kV930sIQ7/WrvL
-	udnPsWAqZ8Or4RqkMCO5w8/Oso3DZWDNjS9g67XCyFvuNwMVykvnZX6s2mvY3rnGW7OtpuFdCZx
-	JiM6XQ4VZqLeScyUirGx1QbUZeTq4H8b7WPJ5Z/6Id8w3v5XrbkAOLnEX7okM9Ou6U9bsbQI5u/
-	sZs926EyuUtK9erS0GhOhbzebQUfUQdoZpp5qWcbKh+/gL7OUwyC/uz9spEkak06jPR4esrvm8X
-	VdhXWZJger7mBBJY9AeIsBXXfb4Tokaz1AiUsIILvSF1kOYXG7q2sRJTzetIXtTkfQBuE8+aNDE
-	d0Qe9NdAUts1U3w5MnG3OCJeFJD5M0z2H2Q==
-X-Google-Smtp-Source: AGHT+IF1g0xPlQZwXvixbktzxWp7pylp9yJpF3ozVocEpxZl4vhVy/vLrP8CDNUZO12I//3cD7pawA==
-X-Received: by 2002:a17:907:7e86:b0:afe:ad18:8662 with SMTP id a640c23a62f3a-b01d8c74c8emr1897318666b.23.1756973918422;
-        Thu, 04 Sep 2025 01:18:38 -0700 (PDT)
+        bh=TRlsHGqvmjF2Vf3U8TOAt/9n2Jks0amzBlUrbfofXWc=;
+        b=SijqyT0I/v2pJdeYvAjRVdJXSrfzF91ZOPdIf2iYxuMl8biPJPt0dXtGurDow7gd5N
+         buVVz66m4P3RinXeHYyHXAiDpOF8uoLC+8x33ZzSUvzgmGbcpmtlFUwAj1wd7OqM0aCQ
+         QianVN/jxRiQX6haNOhvshfCs8qjIAfehcli9ZbrvDoAulZqMxwwxVcaq40pcIGkqc55
+         lMwjDmcLSo5BgzdwLXjfbI6hixMwH+a3FWboxofr1WSp2ytQqRTJ4FQtrxP4W4u5U4ID
+         7k671SR1qBKhya+oqFgc5V0y2mymQAVd7Xodmc7vOxNkYpgMT2JZkKTWfq7GVIBrhZCb
+         HjTQ==
+X-Forwarded-Encrypted: i=1; AJvYcCXDVoIZOVRoBCOAaoYgAg5GXzGWAp8Q6aEAEuEG+VnE6UFVoWtg9uiTtqLrin3aPCR2KHc=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzIsQYKy2MOH+te5u+LS3I35WQpj+2fOeLzm+dAZMGnTyCMyRXe
+	CxVT1e6t1qZuYjQvcsBJUckOj3kc3EY1uqpC5CR1FOPfAUA2QTejk4JIAxOPtz6mDEA=
+X-Gm-Gg: ASbGncsl+wVu3Y7SQS+Q58yZVquMLsEhe6foO93EPc75v3bWly4+TZq+qLY9VziYUOD
+	at1G+tKmx9NRFbRYiDnw+BrhhJA2MJvLxrXmzDH49dVR4tqiazE4JP9IKAL7w0qj+F9xtbPHaaC
+	DmQVccEajda52CCHP7OWzBQIQ8EiyLI7jYKQXG/j9207QUJJ9CjO9r5CzqL8Rh8eNHhjWvz2O1P
+	GQrbkU59ZiuD+DuPbaq0ERehxeVuoPek6SmUCWtuGuUiRLjCAytcOMLyfLFHwntj1MBZ3oUOv1b
+	9ny0CZeJJP3z6Pzmi5EK5NQzaUgvlPqGye0DAOnPWJRK/rORhlIuV3R5vnu4crvAq4gHw7tdyA9
+	8GpEcr2nIiIo2LRn+57aAYik=
+X-Google-Smtp-Source: AGHT+IHiB61XSQJ8aB9kXr4pJ7kTktTaOCm5+fM0Vksx2NmfVFmOxv3vcmFjV8pk0rEQY7r1+KjTyw==
+X-Received: by 2002:a17:907:3cca:b0:b04:354e:47a5 with SMTP id a640c23a62f3a-b04354e4b78mr1354661066b.17.1756973519415;
+        Thu, 04 Sep 2025 01:11:59 -0700 (PDT)
 Received: from draig.lan ([185.126.160.19])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-aff12a6b404sm1396323866b.88.2025.09.04.01.18.35
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-b0432937d7esm869790666b.17.2025.09.04.01.11.55
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 04 Sep 2025 01:18:37 -0700 (PDT)
+        Thu, 04 Sep 2025 01:11:55 -0700 (PDT)
 Received: from draig.lan (localhost [IPv6:::1])
-	by draig.lan (Postfix) with ESMTP id 5CC61601C5;
+	by draig.lan (Postfix) with ESMTP id 9C0DE60363;
 	Thu, 04 Sep 2025 09:11:35 +0100 (BST)
 From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
 To: qemu-devel@nongnu.org
@@ -162,9 +162,9 @@ Cc: Reinoud Zandijk <reinoud@netbsd.org>,
 	=?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>,
 	Nicholas Piggin <npiggin@gmail.com>,
 	John Levon <john.levon@nutanix.com>
-Subject: [PATCH v2 055/281] linux-user: Move get_elf_hwcap to sparc/elfload.c
-Date: Thu,  4 Sep 2025 09:07:29 +0100
-Message-ID: <20250904081128.1942269-56-alex.bennee@linaro.org>
+Subject: [PATCH v2 057/281] linux-user: Move get_elf_hwcap to loongarch64/elfload.c
+Date: Thu,  4 Sep 2025 09:07:31 +0100
+Message-ID: <20250904081128.1942269-58-alex.bennee@linaro.org>
 X-Mailer: git-send-email 2.47.2
 In-Reply-To: <20250904081128.1942269-1-alex.bennee@linaro.org>
 References: <20250904081128.1942269-1-alex.bennee@linaro.org>
@@ -183,119 +183,151 @@ Change the return type to abi_ulong, and pass in the cpu.
 Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
 Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 ---
- linux-user/loader.h           |  3 ++-
- linux-user/sparc/target_elf.h |  2 ++
- linux-user/elfload.c          | 30 +-----------------------------
- linux-user/sparc/elfload.c    | 27 +++++++++++++++++++++++++++
- 4 files changed, 32 insertions(+), 30 deletions(-)
+ linux-user/loader.h                 |  3 +-
+ linux-user/loongarch64/target_elf.h |  2 ++
+ linux-user/elfload.c                | 49 +----------------------------
+ linux-user/loongarch64/elfload.c    | 47 +++++++++++++++++++++++++++
+ 4 files changed, 52 insertions(+), 49 deletions(-)
 
 diff --git a/linux-user/loader.h b/linux-user/loader.h
-index 151a06f5db5..2c8414e0e53 100644
+index 818c5e6d7d7..92b6d41145e 100644
 --- a/linux-user/loader.h
 +++ b/linux-user/loader.h
-@@ -101,7 +101,8 @@ extern unsigned long guest_stack_size;
- /* Note that Elf32 and Elf64 use uint32_t for e_flags. */
+@@ -102,7 +102,8 @@ extern unsigned long guest_stack_size;
  const char *get_elf_cpu_model(uint32_t eflags);
  
--#if defined(TARGET_I386) || defined(TARGET_X86_64) || defined(TARGET_ARM)
-+#if defined(TARGET_I386) || defined(TARGET_X86_64) || defined(TARGET_ARM) \
-+    || defined(TARGET_SPARC)
+ #if defined(TARGET_I386) || defined(TARGET_X86_64) || defined(TARGET_ARM) \
+-    || defined(TARGET_SPARC) || defined(TARGET_PPC)
++    || defined(TARGET_SPARC) || defined(TARGET_PPC) \
++    || defined(TARGET_LOONGARCH64)
  abi_ulong get_elf_hwcap(CPUState *cs);
  abi_ulong get_elf_hwcap2(CPUState *cs);
  #endif
-diff --git a/linux-user/sparc/target_elf.h b/linux-user/sparc/target_elf.h
-index 7e46748d261..b7544db0a1c 100644
---- a/linux-user/sparc/target_elf.h
-+++ b/linux-user/sparc/target_elf.h
-@@ -8,4 +8,6 @@
- #ifndef SPARC_TARGET_ELF_H
- #define SPARC_TARGET_ELF_H
+diff --git a/linux-user/loongarch64/target_elf.h b/linux-user/loongarch64/target_elf.h
+index 39a08d35d9b..037740d36f2 100644
+--- a/linux-user/loongarch64/target_elf.h
++++ b/linux-user/loongarch64/target_elf.h
+@@ -6,4 +6,6 @@
+ #ifndef LOONGARCH_TARGET_ELF_H
+ #define LOONGARCH_TARGET_ELF_H
  
 +#define HAVE_ELF_HWCAP          1
 +
  #endif
 diff --git a/linux-user/elfload.c b/linux-user/elfload.c
-index 149d1313c0a..16709865f78 100644
+index 843b1f7b6cc..574b37a22c1 100644
 --- a/linux-user/elfload.c
 +++ b/linux-user/elfload.c
-@@ -565,35 +565,7 @@ static void elf_core_copy_regs(target_elf_gregset_t *regs,
- # define ELF_ARCH   EM_SPARCV9
- #endif
+@@ -725,54 +725,7 @@ static void elf_core_copy_regs(target_elf_gregset_t *regs,
+ #define USE_ELF_CORE_DUMP
+ #define ELF_EXEC_PAGESIZE        4096
  
--#include "elf.h"
--
 -#define ELF_HWCAP get_elf_hwcap()
+-
+-/* See arch/loongarch/include/uapi/asm/hwcap.h */
+-enum {
+-    HWCAP_LOONGARCH_CPUCFG   = (1 << 0),
+-    HWCAP_LOONGARCH_LAM      = (1 << 1),
+-    HWCAP_LOONGARCH_UAL      = (1 << 2),
+-    HWCAP_LOONGARCH_FPU      = (1 << 3),
+-    HWCAP_LOONGARCH_LSX      = (1 << 4),
+-    HWCAP_LOONGARCH_LASX     = (1 << 5),
+-    HWCAP_LOONGARCH_CRC32    = (1 << 6),
+-    HWCAP_LOONGARCH_COMPLEX  = (1 << 7),
+-    HWCAP_LOONGARCH_CRYPTO   = (1 << 8),
+-    HWCAP_LOONGARCH_LVZ      = (1 << 9),
+-    HWCAP_LOONGARCH_LBT_X86  = (1 << 10),
+-    HWCAP_LOONGARCH_LBT_ARM  = (1 << 11),
+-    HWCAP_LOONGARCH_LBT_MIPS = (1 << 12),
+-};
 -
 -static uint32_t get_elf_hwcap(void)
 -{
--    /* There are not many sparc32 hwcap bits -- we have all of them. */
--    uint32_t r = HWCAP_SPARC_FLUSH | HWCAP_SPARC_STBAR |
--                 HWCAP_SPARC_SWAP | HWCAP_SPARC_MULDIV;
+-    LoongArchCPU *cpu = LOONGARCH_CPU(thread_cpu);
+-    uint32_t hwcaps = 0;
 -
--#ifdef TARGET_SPARC64
--    CPUSPARCState *env = cpu_env(thread_cpu);
--    uint32_t features = env->def.features;
+-    hwcaps |= HWCAP_LOONGARCH_CRC32;
 -
--    r |= HWCAP_SPARC_V9 | HWCAP_SPARC_V8PLUS;
--    /* 32x32 multiply and divide are efficient. */
--    r |= HWCAP_SPARC_MUL32 | HWCAP_SPARC_DIV32;
--    /* We don't have an internal feature bit for this. */
--    r |= HWCAP_SPARC_POPC;
--    r |= features & CPU_FEATURE_FSMULD ? HWCAP_SPARC_FSMULD : 0;
--    r |= features & CPU_FEATURE_VIS1 ? HWCAP_SPARC_VIS : 0;
--    r |= features & CPU_FEATURE_VIS2 ? HWCAP_SPARC_VIS2 : 0;
--    r |= features & CPU_FEATURE_FMAF ? HWCAP_SPARC_FMAF : 0;
--    r |= features & CPU_FEATURE_VIS3 ? HWCAP_SPARC_VIS3 : 0;
--    r |= features & CPU_FEATURE_IMA ? HWCAP_SPARC_IMA : 0;
--#endif
+-    if (FIELD_EX32(cpu->env.cpucfg[1], CPUCFG1, UAL)) {
+-        hwcaps |= HWCAP_LOONGARCH_UAL;
+-    }
 -
--    return r;
+-    if (FIELD_EX32(cpu->env.cpucfg[2], CPUCFG2, FP)) {
+-        hwcaps |= HWCAP_LOONGARCH_FPU;
+-    }
+-
+-    if (FIELD_EX32(cpu->env.cpucfg[2], CPUCFG2, LAM)) {
+-        hwcaps |= HWCAP_LOONGARCH_LAM;
+-    }
+-
+-    if (FIELD_EX32(cpu->env.cpucfg[2], CPUCFG2, LSX)) {
+-        hwcaps |= HWCAP_LOONGARCH_LSX;
+-    }
+-
+-    if (FIELD_EX32(cpu->env.cpucfg[2], CPUCFG2, LASX)) {
+-        hwcaps |= HWCAP_LOONGARCH_LASX;
+-    }
+-
+-    return hwcaps;
 -}
 +#define ELF_HWCAP get_elf_hwcap(thread_cpu)
  
- static inline void init_thread(struct target_pt_regs *regs,
-                                struct image_info *infop)
-diff --git a/linux-user/sparc/elfload.c b/linux-user/sparc/elfload.c
-index 243e6f9b66a..32ca1b05b1a 100644
---- a/linux-user/sparc/elfload.c
-+++ b/linux-user/sparc/elfload.c
-@@ -3,6 +3,7 @@
- #include "qemu/osdep.h"
- #include "qemu.h"
- #include "loader.h"
-+#include "elf.h"
+ #define ELF_PLATFORM "loongarch"
  
- 
- const char *get_elf_cpu_model(uint32_t eflags)
-@@ -13,3 +14,29 @@ const char *get_elf_cpu_model(uint32_t eflags)
-     return "Fujitsu MB86904";
- #endif
+diff --git a/linux-user/loongarch64/elfload.c b/linux-user/loongarch64/elfload.c
+index 874dc4c2304..ee4a85b8d6c 100644
+--- a/linux-user/loongarch64/elfload.c
++++ b/linux-user/loongarch64/elfload.c
+@@ -9,3 +9,50 @@ const char *get_elf_cpu_model(uint32_t eflags)
+ {
+     return "la464";
  }
++
++/* See arch/loongarch/include/uapi/asm/hwcap.h */
++enum {
++    HWCAP_LOONGARCH_CPUCFG   = (1 << 0),
++    HWCAP_LOONGARCH_LAM      = (1 << 1),
++    HWCAP_LOONGARCH_UAL      = (1 << 2),
++    HWCAP_LOONGARCH_FPU      = (1 << 3),
++    HWCAP_LOONGARCH_LSX      = (1 << 4),
++    HWCAP_LOONGARCH_LASX     = (1 << 5),
++    HWCAP_LOONGARCH_CRC32    = (1 << 6),
++    HWCAP_LOONGARCH_COMPLEX  = (1 << 7),
++    HWCAP_LOONGARCH_CRYPTO   = (1 << 8),
++    HWCAP_LOONGARCH_LVZ      = (1 << 9),
++    HWCAP_LOONGARCH_LBT_X86  = (1 << 10),
++    HWCAP_LOONGARCH_LBT_ARM  = (1 << 11),
++    HWCAP_LOONGARCH_LBT_MIPS = (1 << 12),
++};
 +
 +abi_ulong get_elf_hwcap(CPUState *cs)
 +{
-+    /* There are not many sparc32 hwcap bits -- we have all of them. */
-+    uint32_t r = HWCAP_SPARC_FLUSH | HWCAP_SPARC_STBAR |
-+                 HWCAP_SPARC_SWAP | HWCAP_SPARC_MULDIV;
++    LoongArchCPU *cpu = LOONGARCH_CPU(cs);
++    abi_ulong hwcaps = 0;
 +
-+#ifdef TARGET_SPARC64
-+    CPUSPARCState *env = cpu_env(cs);
-+    uint32_t features = env->def.features;
++    hwcaps |= HWCAP_LOONGARCH_CRC32;
 +
-+    r |= HWCAP_SPARC_V9 | HWCAP_SPARC_V8PLUS;
-+    /* 32x32 multiply and divide are efficient. */
-+    r |= HWCAP_SPARC_MUL32 | HWCAP_SPARC_DIV32;
-+    /* We don't have an internal feature bit for this. */
-+    r |= HWCAP_SPARC_POPC;
-+    r |= features & CPU_FEATURE_FSMULD ? HWCAP_SPARC_FSMULD : 0;
-+    r |= features & CPU_FEATURE_VIS1 ? HWCAP_SPARC_VIS : 0;
-+    r |= features & CPU_FEATURE_VIS2 ? HWCAP_SPARC_VIS2 : 0;
-+    r |= features & CPU_FEATURE_FMAF ? HWCAP_SPARC_FMAF : 0;
-+    r |= features & CPU_FEATURE_VIS3 ? HWCAP_SPARC_VIS3 : 0;
-+    r |= features & CPU_FEATURE_IMA ? HWCAP_SPARC_IMA : 0;
-+#endif
++    if (FIELD_EX32(cpu->env.cpucfg[1], CPUCFG1, UAL)) {
++        hwcaps |= HWCAP_LOONGARCH_UAL;
++    }
 +
-+    return r;
++    if (FIELD_EX32(cpu->env.cpucfg[2], CPUCFG2, FP)) {
++        hwcaps |= HWCAP_LOONGARCH_FPU;
++    }
++
++    if (FIELD_EX32(cpu->env.cpucfg[2], CPUCFG2, LAM)) {
++        hwcaps |= HWCAP_LOONGARCH_LAM;
++    }
++
++    if (FIELD_EX32(cpu->env.cpucfg[2], CPUCFG2, LSX)) {
++        hwcaps |= HWCAP_LOONGARCH_LSX;
++    }
++
++    if (FIELD_EX32(cpu->env.cpucfg[2], CPUCFG2, LASX)) {
++        hwcaps |= HWCAP_LOONGARCH_LASX;
++    }
++
++    return hwcaps;
 +}
 -- 
 2.47.2
