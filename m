@@ -1,81 +1,81 @@
-Return-Path: <kvm+bounces-56800-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-56784-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 893D4B43569
-	for <lists+kvm@lfdr.de>; Thu,  4 Sep 2025 10:18:52 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id ABBCCB43534
+	for <lists+kvm@lfdr.de>; Thu,  4 Sep 2025 10:14:32 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4A25B170C03
-	for <lists+kvm@lfdr.de>; Thu,  4 Sep 2025 08:18:52 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 130971882DF3
+	for <lists+kvm@lfdr.de>; Thu,  4 Sep 2025 08:14:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8C7A92C11C5;
-	Thu,  4 Sep 2025 08:18:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BC4BA2D1F7B;
+	Thu,  4 Sep 2025 08:11:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="F7/w6wpU"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="KAeavJqp"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-ed1-f45.google.com (mail-ed1-f45.google.com [209.85.208.45])
+Received: from mail-ed1-f54.google.com (mail-ed1-f54.google.com [209.85.208.54])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4A6232C028A
-	for <kvm@vger.kernel.org>; Thu,  4 Sep 2025 08:18:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.45
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1A8E52D12ED
+	for <kvm@vger.kernel.org>; Thu,  4 Sep 2025 08:11:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.54
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756973920; cv=none; b=lEPArG6A+fzFisnXPM4faR9xeJoVXWC1xerI/On7iJ7NVP0739y1Q2otFt9zP2mmNOnhFxNMFoa9k97zi2964G4w70x9OhGR4/gZkXMjKggO2C/0jeqXIs7iF609i0Q8LN5RQ+D3H7ThObjZiNV+H2t/UGSIi87y/mwR6sLKvbk=
+	t=1756973518; cv=none; b=glrSEyQ754MOaAMq1McGMhc2xXY/SmpEhabiG+joYEzOC4EIT/ZMIDa9Wrgm8t7H4uifXB01rbgPKy2RnrEtQWu3tIBgMNysktg7nelhI6ynDZCbvVLR7q7Zg/B2ib9aPTUT0rJx7c3pFiBlpecb7xTCJopJtdRtsUFD5Zw2ySI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756973920; c=relaxed/simple;
-	bh=+oFMDmPWrsOGEYfuovDcs5CPDY9/41AQ4NnxJoOpjlw=;
+	s=arc-20240116; t=1756973518; c=relaxed/simple;
+	bh=Qm+nKayGtipuaRlw7oPzYnxjuZME3YPcTOffdEwhJD4=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=W3E8vHCj7sf70eFtLTvAVGTNQfFnJ5pcFOCOQ9yiH3FtRsrRK+yhFkGFVpQLpMDjW6Vd9LzLcHCAcnsKk3EEAn6njgx/DJYI8oVlVt/9YdoTaU51EQGMS+fk0/whe71nlh570L9hPEZ+plqekjjxsSf393BlFas0MK/NjjHNEdg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=F7/w6wpU; arc=none smtp.client-ip=209.85.208.45
+	 MIME-Version:Content-Type; b=Lh2jC5YvCEmV34KZWYcMJxxnK+rB9sXF49TvcwzFThV+sc7BkRSujnDtVuuHcAQxh0LovB4sl+fLSN/2mBEprdFZ6YTcE/fBRW/we9CliFltMp5riKMSuHuYz1yzHRc6E4d4uyZBxpeLXv1EpVI64EEw6JwOT9L0MD93KjAyiyU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=KAeavJqp; arc=none smtp.client-ip=209.85.208.54
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
-Received: by mail-ed1-f45.google.com with SMTP id 4fb4d7f45d1cf-6188b6f501cso923744a12.2
-        for <kvm@vger.kernel.org>; Thu, 04 Sep 2025 01:18:37 -0700 (PDT)
+Received: by mail-ed1-f54.google.com with SMTP id 4fb4d7f45d1cf-61ce4c32a36so1285773a12.3
+        for <kvm@vger.kernel.org>; Thu, 04 Sep 2025 01:11:56 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1756973916; x=1757578716; darn=vger.kernel.org;
+        d=linaro.org; s=google; t=1756973515; x=1757578315; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=R1Jmcmvj/wxtRZkBbPu5k8WLatNgN3qwXd3zyWr/Gsg=;
-        b=F7/w6wpUSGyS6Ub+YOL6pppGO7Sy9QdzXljU0G7gOcgRGxUbzr5i45LAxAiHf9tdTm
-         snrJCkx6VBcpLpBYKPAUWdATGZqkBIp2QckOa0IaZRwmB39RR460pLIpP/1/GuxowTVg
-         VgJq0a7PatNobNTbzLMo+xdry3+yhdb/9EiVvL/9Urcoos/fzn8536VPEPPzn727EK3d
-         eZe4dFDtOX96w87TQzkDq5cUGTuNHug6qcD0XlmjVxLGEJR5t+Oj6BOaoJSSqyl0MqwF
-         9wS1IY1qJggGF/QiwLmqDLh0H+TO2nY1WenDACgT1tKm9uZn2OUAph/pKsud+0Xbch9p
-         em4Q==
+        bh=KKf3LX74QuDicrn7aIOxjy5IHw4dOUBMKNzlJ8lYJDM=;
+        b=KAeavJqpCjbiAH74z0Q6JHV2SNhuiZbmJldEgyIPXuPQ1XlIFdMuxkqTf7g2u6acZl
+         EVQb9G6XnPLVkPW8BA9UeW+neCJY2PcUeUnBsSeC2NFNK32q9xsFSfYDAETEkIf93192
+         CYPuxiCaRAKFx9gpBNn5PKy/+SN22yUtJrP8O4TrcjXLHz5Z6gCWRBCn50H31jjL9TyD
+         qDXwKeBh/X9CkXSNeRg1TvM6qv0zwiSpnAsUXHg1L5RuzN0EKTuBZq17+nx/9YOt+P7d
+         10U99MvNfHciDTTCdKDRqCj6dVJTkSjk+yWNAbf0xMO4/ZsKaJORV77njr/+1Lks6W9P
+         tNmw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1756973916; x=1757578716;
+        d=1e100.net; s=20230601; t=1756973515; x=1757578315;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=R1Jmcmvj/wxtRZkBbPu5k8WLatNgN3qwXd3zyWr/Gsg=;
-        b=I3bMbjO8K7ZCPlbpTkw4lrlQkUZDI5V8uaGNFrSZYIWlsnSpAIJ5bXWiiQAXo6gewn
-         SG73j5VSt4oL4RXPQXE1OuUJkhnPrU6Wk50h3/iIj0rmbMGzb295bxM6WoI+49KhET2K
-         SPZMVq7vQaaLLGL+6nA13reSFukrBppaPcQwdBS8vr+fmQMdrYACfls+rBYZ2Kgn98Jw
-         VzIHTiSIWEGOgwXi/GSZ6Y5yQ2DykqaZKgVP76aUHXPV4UPJMQtcF3KMbvwaNFSZ8Wzi
-         8t/pC8naD1e2yDYaW1zYTJeqvKwVEWCV6d8GDMULpCcPU6HPp8Iyzgc8wQ5722e+IrCC
-         06QQ==
-X-Forwarded-Encrypted: i=1; AJvYcCXDdQxLErF9xin5wivpD2jvPxbRS4rUS2aOIa0cqPCM0hteuj4wetNJr3AMT5YhKZMrmoI=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxKoNN69bafRIuXA9lb6CmxSv+Dlxv5Bw0Sm9p7rOKv9DlmEC16
-	Vxdf1AwZ7yYEBWZUXKNmiXddS5DLF5jyFrT6Dd2SNi78n+Q1iP2ROV0xDzON55/bqSE=
-X-Gm-Gg: ASbGncu/ptFe/OJ1KyFoZzHIuZQ/BmI40y3HA89DfJao5QykZmpU9Tk/tksKV9o+afB
-	loOf+a6KNPOvfJv3Tv2HLVDZOeyEFTv1oZknMf8V93oVtjI9WI+D03ziL/SF28yeeONXtrJ6EQl
-	G/xUwb1KGSQrWEo5JXqyaBJRo8xf2sDM5ENmtzzf+skplpRXiPS9p8OqYZBZ3BrQZMy9J/mbZ8M
-	993EhHnYzE27Hy2bPZDuCDcqDlIoNSwhTQhUp0ZdtzOC+TUVempHp7U9iE0z7un+07XYWKQvRkC
-	Q+gQerkm9JNy+eshc8DOa6AooFG4Z76unvT/GuKJMI81tFOnOqBMjOUW5/NSE/feOOl+wV5IOHF
-	iobtatDc0uye8Ge1kfqGDPyK5a91uG7W9USeznT++dkzA
-X-Google-Smtp-Source: AGHT+IGd7u3Qk721bQxPxAfrzD3eIhPfOWYwPcIsP6SkUyYfzaxGv5T68HkRcWFbq+cH9ffQb7YK1w==
-X-Received: by 2002:a05:6402:847:b0:61d:144:81be with SMTP id 4fb4d7f45d1cf-61d2699473dmr17896861a12.16.1756973916345;
-        Thu, 04 Sep 2025 01:18:36 -0700 (PDT)
+        bh=KKf3LX74QuDicrn7aIOxjy5IHw4dOUBMKNzlJ8lYJDM=;
+        b=mtNNBqnBw8NNuuS/KQ3qmlo1gQyCrsl0AUigy/uJdQM4f5uqln6orEP68S7xtjHAtD
+         X2Uld6b4cs6YYsk76bkSNX494gUV4syxlpNV0cjmX+EXigINv1pTf5AiIni0zklHswRT
+         YPe2MawX0J4JVasP0kYVeRzlwb4xV/6ND39dGc/k4WLacMz4/XX59n8NgT8PaeWXwKfm
+         7BLZHxXegr8RojFJqTm9XLoB8dtP1UYmNR3kbA7upP5kK7oLfwHWZ+dpnCpJC3T+gZV2
+         PhkU0bOe16MbWMJPMDnW2R9+6lvF8Gs5RAqMYyNh8aX7SCYWePLmZ+VupNDZZUnIHMmP
+         mb/A==
+X-Forwarded-Encrypted: i=1; AJvYcCWX63rpyjJI8Y0Gduwx2gpOMXo6ex3nsSMJjTf2DZHC030kqSB4yustfkqKPOIWChv9xhY=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwG0h148LH2qVoRh+th8eZHCS8GwvbWDhVDgOD4/3t4gIazvHl/
+	Ha9Fzq90KprodcIb2BBtu9vVs/vRABqh7aMXvydy/1X28TtNqZSHH7MkwnmkmuIbCAw=
+X-Gm-Gg: ASbGnctjBVHAnoxf4kaZkzULDv97O3ryGNsWpSsU8Z+M2eibcPSFnxoe3D037L8A6OO
+	DuDqyLKeKAL2mqNInvmHYlOANqrMklEC2OyyTpbzoaoGBdQ/z7OTzREQ7wgDLOV461x36xYgQbe
+	4tysesi6pQr6xyeTh91m9OcfV8LHw7oL5NNr80ASqf+gQa9pzRFoIQuJDgsc1FLS+BmV15GduSk
+	e4CCU00IMYxM/S4WuRdYSuJsk+th1kIIgpnyjYHzMsHcJpDdkah54eYBLDNB8KHrGVMguXIh5JH
+	uzLCR4CU327irMCtaw/Nz2P8k2ILZTKdUBCG/DIJnXN9IQ+39NzbdqQ9UjLHLKdfPH5fLobKZ6P
+	bFAm8n5jwVlOQsg23njbDMj6PEIOcUUjYiA==
+X-Google-Smtp-Source: AGHT+IGx8ZJxjps5cff/PZm9JBRuTzbh2ffGQw/tl1lRzj/lZpIUq6TJ0w2xsdrM6qRT2xpIi5PODA==
+X-Received: by 2002:a05:6402:1e8c:b0:620:894c:656c with SMTP id 4fb4d7f45d1cf-620894c7c6fmr30028a12.29.1756973515184;
+        Thu, 04 Sep 2025 01:11:55 -0700 (PDT)
 Received: from draig.lan ([185.126.160.19])
-        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-61cfc4bbc51sm13480108a12.27.2025.09.04.01.18.33
+        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-61cfc5622f0sm13427169a12.51.2025.09.04.01.11.48
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 04 Sep 2025 01:18:34 -0700 (PDT)
+        Thu, 04 Sep 2025 01:11:49 -0700 (PDT)
 Received: from draig.lan (localhost [IPv6:::1])
-	by draig.lan (Postfix) with ESMTP id 5F91E60135;
-	Thu, 04 Sep 2025 09:11:32 +0100 (BST)
+	by draig.lan (Postfix) with ESMTP id A1FB260193;
+	Thu, 04 Sep 2025 09:11:33 +0100 (BST)
 From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
 To: qemu-devel@nongnu.org
 Cc: Reinoud Zandijk <reinoud@netbsd.org>,
@@ -161,11 +161,10 @@ Cc: Reinoud Zandijk <reinoud@netbsd.org>,
 	Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
 	=?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>,
 	Nicholas Piggin <npiggin@gmail.com>,
-	John Levon <john.levon@nutanix.com>,
-	Pierrick Bouvier <pierrick.bouvier@linaro.org>
-Subject: [PATCH v2 034/281] tests/functional: Move x86_64 tests into target-specific folder
-Date: Thu,  4 Sep 2025 09:07:08 +0100
-Message-ID: <20250904081128.1942269-35-alex.bennee@linaro.org>
+	John Levon <john.levon@nutanix.com>
+Subject: [PATCH v2 045/281] rust/qemu-api-macros: make derive(Object) friendly when missing parent
+Date: Thu,  4 Sep 2025 09:07:19 +0100
+Message-ID: <20250904081128.1942269-46-alex.bennee@linaro.org>
 X-Mailer: git-send-email 2.47.2
 In-Reply-To: <20250904081128.1942269-1-alex.bennee@linaro.org>
 References: <20250904081128.1942269-1-alex.bennee@linaro.org>
@@ -175,368 +174,39 @@ List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 
-From: Thomas Huth <thuth@redhat.com>
+From: Marc-André Lureau <marcandre.lureau@redhat.com>
 
-The tests/functional folder has become quite crowded, thus move the
-x86_64 tests into a target-specific subfolder.
-
-Reviewed-by: Pierrick Bouvier <pierrick.bouvier@linaro.org>
-Signed-off-by: Thomas Huth <thuth@redhat.com>
-Message-ID: <20250819112403.432587-23-thuth@redhat.com>
+Signed-off-by: Marc-André Lureau <marcandre.lureau@redhat.com>
+Link: https://lore.kernel.org/r/20250826133132.4064478-5-marcandre.lureau@redhat.com
+Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- MAINTAINERS                                   | 32 ++++++++--------
- tests/functional/meson.build                  | 37 +------------------
- tests/functional/x86_64/meson.build           | 37 +++++++++++++++++++
- .../functional/{ => x86_64}/test_acpi_bits.py |  0
- .../test_cpu_model_versions.py}               |  0
- .../{ => x86_64}/test_cpu_queries.py          |  0
- .../test_hotplug_blk.py}                      |  0
- .../test_hotplug_cpu.py}                      |  0
- .../{ => x86_64}/test_intel_iommu.py          |  0
- .../test_kvm_xen.py}                          |  0
- .../{ => x86_64}/test_linux_initrd.py         |  0
- .../{ => x86_64}/test_mem_addr_space.py       |  0
- tests/functional/{ => x86_64}/test_memlock.py |  0
- .../test_migration.py}                        |  0
- .../test_multiprocess.py}                     |  0
- .../{ => x86_64}/test_netdev_ethtool.py       |  0
- .../{ => x86_64}/test_pc_cpu_hotplug_props.py |  0
- .../test_replay.py}                           |  0
- .../test_reverse_debug.py}                    |  0
- .../test_tuxrun.py}                           |  0
- .../{ => x86_64}/test_virtio_balloon.py       |  0
- .../{ => x86_64}/test_virtio_gpu.py           |  0
- .../{ => x86_64}/test_virtio_version.py       |  0
- 23 files changed, 55 insertions(+), 51 deletions(-)
- create mode 100644 tests/functional/x86_64/meson.build
- rename tests/functional/{ => x86_64}/test_acpi_bits.py (100%)
- rename tests/functional/{test_x86_cpu_model_versions.py => x86_64/test_cpu_model_versions.py} (100%)
- rename tests/functional/{ => x86_64}/test_cpu_queries.py (100%)
- rename tests/functional/{test_x86_64_hotplug_blk.py => x86_64/test_hotplug_blk.py} (100%)
- rename tests/functional/{test_x86_64_hotplug_cpu.py => x86_64/test_hotplug_cpu.py} (100%)
- rename tests/functional/{ => x86_64}/test_intel_iommu.py (100%)
- rename tests/functional/{test_x86_64_kvm_xen.py => x86_64/test_kvm_xen.py} (100%)
- rename tests/functional/{ => x86_64}/test_linux_initrd.py (100%)
- rename tests/functional/{ => x86_64}/test_mem_addr_space.py (100%)
- rename tests/functional/{ => x86_64}/test_memlock.py (100%)
- rename tests/functional/{test_x86_64_migration.py => x86_64/test_migration.py} (100%)
- rename tests/functional/{test_x86_64_multiprocess.py => x86_64/test_multiprocess.py} (100%)
- rename tests/functional/{ => x86_64}/test_netdev_ethtool.py (100%)
- rename tests/functional/{ => x86_64}/test_pc_cpu_hotplug_props.py (100%)
- rename tests/functional/{test_x86_64_replay.py => x86_64/test_replay.py} (100%)
- rename tests/functional/{test_x86_64_reverse_debug.py => x86_64/test_reverse_debug.py} (100%)
- rename tests/functional/{test_x86_64_tuxrun.py => x86_64/test_tuxrun.py} (100%)
- rename tests/functional/{ => x86_64}/test_virtio_balloon.py (100%)
- rename tests/functional/{ => x86_64}/test_virtio_gpu.py (100%)
- rename tests/functional/{ => x86_64}/test_virtio_version.py (100%)
+ rust/qemu-api-macros/src/lib.rs | 10 +++++++++-
+ 1 file changed, 9 insertions(+), 1 deletion(-)
 
-diff --git a/MAINTAINERS b/MAINTAINERS
-index b46445ff5c0..7b1a94f696c 100644
---- a/MAINTAINERS
-+++ b/MAINTAINERS
-@@ -147,6 +147,7 @@ F: target/i386/Kconfig
- F: target/i386/meson.build
- F: tools/i386/
- F: tests/functional/i386/
-+F: tests/functional/x86_64/
+diff --git a/rust/qemu-api-macros/src/lib.rs b/rust/qemu-api-macros/src/lib.rs
+index b525d89c09e..a6147418891 100644
+--- a/rust/qemu-api-macros/src/lib.rs
++++ b/rust/qemu-api-macros/src/lib.rs
+@@ -85,7 +85,15 @@ fn derive_object_or_error(input: DeriveInput) -> Result<proc_macro2::TokenStream
+     is_c_repr(&input, "#[derive(Object)]")?;
  
- Guest CPU cores (TCG)
- ---------------------
-@@ -483,7 +484,7 @@ F: docs/system/i386/sgx.rst
- F: target/i386/kvm/
- F: target/i386/sev*
- F: scripts/kvm/vmxcap
--F: tests/functional/test_x86_64_hotplug_cpu.py
-+F: tests/functional/x86_64/test_hotplug_cpu.py
+     let name = &input.ident;
+-    let parent = &get_fields(&input, "#[derive(Object)]")?[0].ident;
++    let parent = &get_fields(&input, "#[derive(Object)]")?
++        .get(0)
++        .ok_or_else(|| {
++            Error::new(
++                input.ident.span(),
++                "#[derive(Object)] requires a parent field",
++            )
++        })?
++        .ident;
  
- Xen emulation on X86 KVM CPUs
- M: David Woodhouse <dwmw2@infradead.org>
-@@ -492,7 +493,7 @@ S: Supported
- F: include/system/kvm_xen.h
- F: target/i386/kvm/xen*
- F: hw/i386/kvm/xen*
--F: tests/functional/test_x86_64_kvm_xen.py
-+F: tests/functional/x86_64/test_kvm_xen.py
- 
- Guest CPU Cores (other accelerators)
- ------------------------------------
-@@ -1894,11 +1895,11 @@ F: include/hw/isa/apm.h
- F: tests/unit/test-x86-topo.c
- F: tests/qtest/test-x86-cpuid-compat.c
- F: tests/functional/i386/test_tuxrun.py
--F: tests/functional/test_linux_initrd.py
--F: tests/functional/test_mem_addr_space.py
--F: tests/functional/test_pc_cpu_hotplug_props.py
--F: tests/functional/test_x86_64_tuxrun.py
--F: tests/functional/test_x86_cpu_model_versions.py
-+F: tests/functional/x86_64/test_linux_initrd.py
-+F: tests/functional/x86_64/test_mem_addr_space.py
-+F: tests/functional/x86_64/test_pc_cpu_hotplug_props.py
-+F: tests/functional/x86_64/test_tuxrun.py
-+F: tests/functional/x86_64/test_cpu_model_versions.py
- 
- PC Chipset
- M: Michael S. Tsirkin <mst@redhat.com>
-@@ -1974,7 +1975,7 @@ F: include/hw/boards.h
- F: include/hw/core/cpu.h
- F: include/hw/cpu/cluster.h
- F: include/system/numa.h
--F: tests/functional/test_cpu_queries.py
-+F: tests/functional/x86_64/test_cpu_queries.py
- F: tests/functional/test_empty_cpu_model.py
- F: tests/unit/test-smp-parse.c
- T: git https://gitlab.com/ehabkost/qemu.git machine-next
-@@ -2159,7 +2160,7 @@ M: Ani Sinha <anisinha@redhat.com>
- M: Michael S. Tsirkin <mst@redhat.com>
- S: Supported
- F: tests/functional/acpi-bits/*
--F: tests/functional/test_acpi_bits.py
-+F: tests/functional/x86_64/test_acpi_bits.py
- F: docs/devel/testing/acpi-bits.rst
- 
- ACPI/HEST/GHES
-@@ -2345,7 +2346,7 @@ F: net/vhost-user.c
- F: include/hw/virtio/
- F: docs/devel/virtio*
- F: docs/devel/migration/virtio.rst
--F: tests/functional/test_virtio_version.py
-+F: tests/functional/x86_64/test_virtio_version.py
- 
- virtio-balloon
- M: Michael S. Tsirkin <mst@redhat.com>
-@@ -2357,7 +2358,7 @@ F: include/hw/virtio/virtio-balloon.h
- F: system/balloon.c
- F: include/system/balloon.h
- F: tests/qtest/virtio-balloon-test.c
--F: tests/functional/test_virtio_balloon.py
-+F: tests/functional/x86_64/test_virtio_balloon.py
- 
- virtio-9p
- M: Christian Schoenebeck <qemu_oss@crudebyte.com>
-@@ -2380,7 +2381,7 @@ F: hw/block/virtio-blk.c
- F: hw/block/dataplane/*
- F: include/hw/virtio/virtio-blk-common.h
- F: tests/qtest/virtio-blk-test.c
--F: tests/functional/test_x86_64_hotplug_blk.py
-+F: tests/functional/x86_64/test_hotplug_blk.py
- T: git https://github.com/stefanha/qemu.git block
- 
- virtio-ccw
-@@ -2604,7 +2605,7 @@ R: Sriram Yagnaraman <sriram.yagnaraman@ericsson.com>
- S: Odd Fixes
- F: docs/system/devices/igb.rst
- F: hw/net/igb*
--F: tests/functional/test_netdev_ethtool.py
-+F: tests/functional/x86_64/test_netdev_ethtool.py
- F: tests/qtest/igb-test.c
- F: tests/qtest/libqos/igb.c
- 
-@@ -2713,6 +2714,7 @@ F: hw/display/virtio-vga.*
- F: include/hw/virtio/virtio-gpu.h
- F: docs/system/devices/virtio-gpu.rst
- F: tests/functional/aarch64/test_virt_gpu.py
-+F: tests/functional/x86_64/test_virtio_gpu.py
- 
- vhost-user-blk
- M: Raphael Norwitz <raphael@enfabrica.net>
-@@ -3856,7 +3858,7 @@ S: Supported
- F: hw/i386/intel_iommu.c
- F: hw/i386/intel_iommu_internal.h
- F: include/hw/i386/intel_iommu.h
--F: tests/functional/test_intel_iommu.py
-+F: tests/functional/x86_64/test_intel_iommu.py
- F: tests/qtest/intel-iommu-test.c
- 
- AMD-Vi Emulation
-@@ -4330,7 +4332,7 @@ F: scripts/ci/
- F: tests/docker/
- F: tests/vm/
- F: tests/lcitool/
--F: tests/functional/test_*_tuxrun.py
-+F: tests/functional/*/test_tuxrun.py
- F: scripts/archive-source.sh
- F: docs/devel/testing/ci*
- F: docs/devel/testing/main.rst
-diff --git a/tests/functional/meson.build b/tests/functional/meson.build
-index 00d18dba3ce..34e30239a6b 100644
---- a/tests/functional/meson.build
-+++ b/tests/functional/meson.build
-@@ -34,15 +34,7 @@ subdir('sh4')
- subdir('sh4eb')
- subdir('sparc')
- subdir('sparc64')
--
--test_x86_64_timeouts = {
--  'acpi_bits' : 420,
--  'intel_iommu': 300,
--  'netdev_ethtool' : 180,
--  'virtio_balloon': 120,
--  'x86_64_kvm_xen' : 180,
--  'x86_64_replay' : 480,
--}
-+subdir('x86_64')
- 
- tests_generic_system = [
-   'empty_cpu_model',
-@@ -56,33 +48,6 @@ tests_generic_linuxuser = [
- tests_generic_bsduser = [
- ]
- 
--tests_x86_64_system_quick = [
--  'cpu_queries',
--  'mem_addr_space',
--  'x86_64_migration',
--  'pc_cpu_hotplug_props',
--  'virtio_version',
--  'x86_cpu_model_versions',
--  'vnc',
--  'memlock',
--]
--
--tests_x86_64_system_thorough = [
--  'acpi_bits',
--  'intel_iommu',
--  'linux_initrd',
--  'x86_64_multiprocess',
--  'netdev_ethtool',
--  'virtio_balloon',
--  'virtio_gpu',
--  'x86_64_hotplug_blk',
--  'x86_64_hotplug_cpu',
--  'x86_64_kvm_xen',
--  'x86_64_replay',
--  'x86_64_reverse_debug',
--  'x86_64_tuxrun',
--]
--
- tests_xtensa_system_thorough = [
-   'xtensa_lx60',
-   'xtensa_replay',
-diff --git a/tests/functional/x86_64/meson.build b/tests/functional/x86_64/meson.build
-new file mode 100644
-index 00000000000..696a9ecab42
---- /dev/null
-+++ b/tests/functional/x86_64/meson.build
-@@ -0,0 +1,37 @@
-+# SPDX-License-Identifier: GPL-2.0-or-later
-+
-+test_x86_64_timeouts = {
-+  'acpi_bits' : 420,
-+  'intel_iommu': 300,
-+  'kvm_xen' : 180,
-+  'netdev_ethtool' : 180,
-+  'replay' : 480,
-+  'virtio_balloon': 120,
-+}
-+
-+tests_x86_64_system_quick = [
-+  'cpu_model_versions',
-+  'cpu_queries',
-+  'mem_addr_space',
-+  'migration',
-+  'pc_cpu_hotplug_props',
-+  'virtio_version',
-+  'vnc',
-+  'memlock',
-+]
-+
-+tests_x86_64_system_thorough = [
-+  'acpi_bits',
-+  'hotplug_blk',
-+  'hotplug_cpu',
-+  'intel_iommu',
-+  'kvm_xen',
-+  'linux_initrd',
-+  'multiprocess',
-+  'netdev_ethtool',
-+  'replay',
-+  'reverse_debug',
-+  'tuxrun',
-+  'virtio_balloon',
-+  'virtio_gpu',
-+]
-diff --git a/tests/functional/test_acpi_bits.py b/tests/functional/x86_64/test_acpi_bits.py
-similarity index 100%
-rename from tests/functional/test_acpi_bits.py
-rename to tests/functional/x86_64/test_acpi_bits.py
-diff --git a/tests/functional/test_x86_cpu_model_versions.py b/tests/functional/x86_64/test_cpu_model_versions.py
-similarity index 100%
-rename from tests/functional/test_x86_cpu_model_versions.py
-rename to tests/functional/x86_64/test_cpu_model_versions.py
-diff --git a/tests/functional/test_cpu_queries.py b/tests/functional/x86_64/test_cpu_queries.py
-similarity index 100%
-rename from tests/functional/test_cpu_queries.py
-rename to tests/functional/x86_64/test_cpu_queries.py
-diff --git a/tests/functional/test_x86_64_hotplug_blk.py b/tests/functional/x86_64/test_hotplug_blk.py
-similarity index 100%
-rename from tests/functional/test_x86_64_hotplug_blk.py
-rename to tests/functional/x86_64/test_hotplug_blk.py
-diff --git a/tests/functional/test_x86_64_hotplug_cpu.py b/tests/functional/x86_64/test_hotplug_cpu.py
-similarity index 100%
-rename from tests/functional/test_x86_64_hotplug_cpu.py
-rename to tests/functional/x86_64/test_hotplug_cpu.py
-diff --git a/tests/functional/test_intel_iommu.py b/tests/functional/x86_64/test_intel_iommu.py
-similarity index 100%
-rename from tests/functional/test_intel_iommu.py
-rename to tests/functional/x86_64/test_intel_iommu.py
-diff --git a/tests/functional/test_x86_64_kvm_xen.py b/tests/functional/x86_64/test_kvm_xen.py
-similarity index 100%
-rename from tests/functional/test_x86_64_kvm_xen.py
-rename to tests/functional/x86_64/test_kvm_xen.py
-diff --git a/tests/functional/test_linux_initrd.py b/tests/functional/x86_64/test_linux_initrd.py
-similarity index 100%
-rename from tests/functional/test_linux_initrd.py
-rename to tests/functional/x86_64/test_linux_initrd.py
-diff --git a/tests/functional/test_mem_addr_space.py b/tests/functional/x86_64/test_mem_addr_space.py
-similarity index 100%
-rename from tests/functional/test_mem_addr_space.py
-rename to tests/functional/x86_64/test_mem_addr_space.py
-diff --git a/tests/functional/test_memlock.py b/tests/functional/x86_64/test_memlock.py
-similarity index 100%
-rename from tests/functional/test_memlock.py
-rename to tests/functional/x86_64/test_memlock.py
-diff --git a/tests/functional/test_x86_64_migration.py b/tests/functional/x86_64/test_migration.py
-similarity index 100%
-rename from tests/functional/test_x86_64_migration.py
-rename to tests/functional/x86_64/test_migration.py
-diff --git a/tests/functional/test_x86_64_multiprocess.py b/tests/functional/x86_64/test_multiprocess.py
-similarity index 100%
-rename from tests/functional/test_x86_64_multiprocess.py
-rename to tests/functional/x86_64/test_multiprocess.py
-diff --git a/tests/functional/test_netdev_ethtool.py b/tests/functional/x86_64/test_netdev_ethtool.py
-similarity index 100%
-rename from tests/functional/test_netdev_ethtool.py
-rename to tests/functional/x86_64/test_netdev_ethtool.py
-diff --git a/tests/functional/test_pc_cpu_hotplug_props.py b/tests/functional/x86_64/test_pc_cpu_hotplug_props.py
-similarity index 100%
-rename from tests/functional/test_pc_cpu_hotplug_props.py
-rename to tests/functional/x86_64/test_pc_cpu_hotplug_props.py
-diff --git a/tests/functional/test_x86_64_replay.py b/tests/functional/x86_64/test_replay.py
-similarity index 100%
-rename from tests/functional/test_x86_64_replay.py
-rename to tests/functional/x86_64/test_replay.py
-diff --git a/tests/functional/test_x86_64_reverse_debug.py b/tests/functional/x86_64/test_reverse_debug.py
-similarity index 100%
-rename from tests/functional/test_x86_64_reverse_debug.py
-rename to tests/functional/x86_64/test_reverse_debug.py
-diff --git a/tests/functional/test_x86_64_tuxrun.py b/tests/functional/x86_64/test_tuxrun.py
-similarity index 100%
-rename from tests/functional/test_x86_64_tuxrun.py
-rename to tests/functional/x86_64/test_tuxrun.py
-diff --git a/tests/functional/test_virtio_balloon.py b/tests/functional/x86_64/test_virtio_balloon.py
-similarity index 100%
-rename from tests/functional/test_virtio_balloon.py
-rename to tests/functional/x86_64/test_virtio_balloon.py
-diff --git a/tests/functional/test_virtio_gpu.py b/tests/functional/x86_64/test_virtio_gpu.py
-similarity index 100%
-rename from tests/functional/test_virtio_gpu.py
-rename to tests/functional/x86_64/test_virtio_gpu.py
-diff --git a/tests/functional/test_virtio_version.py b/tests/functional/x86_64/test_virtio_version.py
-similarity index 100%
-rename from tests/functional/test_virtio_version.py
-rename to tests/functional/x86_64/test_virtio_version.py
+     Ok(quote! {
+         ::qemu_api::assert_field_type!(#name, #parent,
 -- 
 2.47.2
 
