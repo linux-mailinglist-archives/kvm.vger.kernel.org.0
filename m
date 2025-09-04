@@ -1,228 +1,212 @@
-Return-Path: <kvm+bounces-56820-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-56821-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id EB375B4399A
-	for <lists+kvm@lfdr.de>; Thu,  4 Sep 2025 13:08:57 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 117FEB439A4
+	for <lists+kvm@lfdr.de>; Thu,  4 Sep 2025 13:12:47 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 8FD1A1B285E9
-	for <lists+kvm@lfdr.de>; Thu,  4 Sep 2025 11:09:18 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id AA1DF587E62
+	for <lists+kvm@lfdr.de>; Thu,  4 Sep 2025 11:12:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CF0312FC895;
-	Thu,  4 Sep 2025 11:08:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 993372FC881;
+	Thu,  4 Sep 2025 11:12:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="WX+06C28"
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="bRPTOnXh"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.13])
+Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 03D762EC08B;
-	Thu,  4 Sep 2025 11:08:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=198.175.65.13
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756984130; cv=fail; b=Fi7NntVwKs1pZ9RRBWj/a5ob65ptsMIX2wZPc+FwrkJkiieCHB+9gbfEnkupYpfMqpuX5F8o5UHnF3nc/sEFwGxdvsjIV2W/wK6a1vRg8tfQMTzJx03GyAh687an5DPiMT3hQlYn3dlv/q5Zz/ZvO1eZ1I9sMyBhW7sdPEBqMZc=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756984130; c=relaxed/simple;
-	bh=fM4UdfaaybS8ozVAGEBE07Vfo7RwZkHUq+PIeYcNbpI=;
-	h=Date:From:To:Subject:Message-ID:References:Content-Type:
-	 Content-Disposition:In-Reply-To:MIME-Version; b=nvphsPHbwGcXZ9r4xNwgMQQiBOzejtNjppMPLUKQcLDafNOso42b5fDkg5j5uFgIVEjk8qcyazPCKnN09T63jekpit70ZKRxxAJcC1pvn/KRqhgRDWbbtW0hqo9Li9pzyCq/O6XXfhxetuMWyo493bWv4FDPD3JAO6W9W17LJ7g=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=WX+06C28; arc=fail smtp.client-ip=198.175.65.13
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1756984129; x=1788520129;
-  h=date:from:to:subject:message-id:reply-to:references:
-   in-reply-to:mime-version;
-  bh=fM4UdfaaybS8ozVAGEBE07Vfo7RwZkHUq+PIeYcNbpI=;
-  b=WX+06C28i1hAlpokuJC/z6KV177kjpQv9lwPE8J7Z2GkXu1eirlj+iKG
-   VrpYqymjeBPftZRKu1GYSmzSq0UC2VPxfNRaTwc7Lo/0sdN29nY6M8pJf
-   mEX9Y7N9r8uWCnak1Lc+kvUWNocdSy/zG/dLV/Ofu0jaw62Fyv3tHyLgn
-   RH2HHe4TYW2sMP9NcpiPvp/rZFfZn5XceR6HVeWUPwv2yIRhk7RmngOzt
-   zlyELzsIfsvB9uSK+ltabhMUbIVKj81GRvWtYvPHrMmtKRFraUzjlPtu7
-   z0rgAwnjspMNevPxgEfA54qftszo0u7uCrG7388qhZZgFvU2FWt86Ymsa
-   w==;
-X-CSE-ConnectionGUID: mRUimNp6Sc6tYjA9OHGzaA==
-X-CSE-MsgGUID: yP53cRGFSJyGjHw3LsKIWg==
-X-IronPort-AV: E=McAfee;i="6800,10657,11542"; a="70412398"
-X-IronPort-AV: E=Sophos;i="6.18,238,1751266800"; 
-   d="scan'208";a="70412398"
-Received: from orviesa003.jf.intel.com ([10.64.159.143])
-  by orvoesa105.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 04 Sep 2025 04:08:49 -0700
-X-CSE-ConnectionGUID: ddc+M4Z3QJuuPB//aPTvbg==
-X-CSE-MsgGUID: pYr9fymiTr6eMWXvWYsQ0g==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.18,238,1751266800"; 
-   d="scan'208";a="175980275"
-Received: from fmsmsx903.amr.corp.intel.com ([10.18.126.92])
-  by orviesa003.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 04 Sep 2025 04:08:47 -0700
-Received: from FMSMSX903.amr.corp.intel.com (10.18.126.92) by
- fmsmsx903.amr.corp.intel.com (10.18.126.92) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.17; Thu, 4 Sep 2025 04:08:47 -0700
-Received: from fmsedg902.ED.cps.intel.com (10.1.192.144) by
- FMSMSX903.amr.corp.intel.com (10.18.126.92) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.17 via Frontend Transport; Thu, 4 Sep 2025 04:08:47 -0700
-Received: from NAM12-DM6-obe.outbound.protection.outlook.com (40.107.243.53)
- by edgegateway.intel.com (192.55.55.82) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.17; Thu, 4 Sep 2025 04:08:46 -0700
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=K9yJs8dbQEXjD8TzGREcFMa5FzpvPmJgXiJCNkhljb0367f2OvXVQeOqax9NgfhR3KPv3kn9U0y13w7BvdPtSXsbMwLRC+ymnUmt8Li5bZVWT4rsQExGh/62MZ9zRyU9hVt2KVIfN/ybxekzjZctNRTh1fBRFB71jbOgJbWotIMNZEnLaznlc6b4Jo96zWBjGCZiORCIAJmH5ToC5A4LMaOSgpNAprNueyyv6p6VCwBzQPVWK6MiyMzV81eNsHal5miXD09+YVNjyezkWZh/mYSw2bINZSJMW6DW8FQ1Ysi0NyTAQ7qzyTVJgrc14xje0+zc5cOAURoKcIJrtKkVEA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=/jY/v6brggSNaUYGS/9ATFo+59zFiitNuUGJ97Mhw3k=;
- b=QGkR9DcDzweOGBAj4Ebb6i+p8HuZKvL5zdop35HahQRHil1VF5jAT7MqRA/r0xNmi8SIxAAz1lQjS/mW/4qmZe1o35aLYv21GiUS0cL/f5ewxnm4DqdrNY4O9KeqPm5caIi+Kupdqh3P045QwJX6/XOASX6UrN+CHFqig5HcGh4q15jbMtDyoBnOptfm0w0CPQmCCfx6MLIZaOG1vxYkyIkO1WaiO+YJKqcxfSV5eRqLOLuW5jumnB8VSPZFALAchNHGwRPKFVc0QLGnpPWeUd7YIZflDBl7HUUF2U7eyBBjzxFGoKrHLG1BZlR3Dc1APPH4K7v9giSOqfEDSG/3Sw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-Received: from DS7PR11MB5966.namprd11.prod.outlook.com (2603:10b6:8:71::6) by
- PH3PPFFA27DACA6.namprd11.prod.outlook.com (2603:10b6:518:1::d63) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9094.17; Thu, 4 Sep
- 2025 11:08:35 +0000
-Received: from DS7PR11MB5966.namprd11.prod.outlook.com
- ([fe80::e971:d8f4:66c4:12ca]) by DS7PR11MB5966.namprd11.prod.outlook.com
- ([fe80::e971:d8f4:66c4:12ca%7]) with mapi id 15.20.9073.026; Thu, 4 Sep 2025
- 11:08:35 +0000
-Date: Thu, 4 Sep 2025 19:07:39 +0800
-From: Yan Zhao <yan.y.zhao@intel.com>
-To: Binbin Wu <binbin.wu@linux.intel.com>, <pbonzini@redhat.com>,
-	<seanjc@google.com>, <linux-kernel@vger.kernel.org>, <kvm@vger.kernel.org>,
-	<x86@kernel.org>, <rick.p.edgecombe@intel.com>, <dave.hansen@intel.com>,
-	<kas@kernel.org>, <tabba@google.com>, <ackerleytng@google.com>,
-	<michael.roth@amd.com>, <david@redhat.com>, <vannapurve@google.com>,
-	<vbabka@suse.cz>, <thomas.lendacky@amd.com>, <pgonda@google.com>,
-	<fan.du@intel.com>, <jun.miao@intel.com>, <ira.weiny@intel.com>,
-	<isaku.yamahata@intel.com>, <xiaoyao.li@intel.com>, <chao.p.peng@intel.com>
-Subject: Re: [RFC PATCH v2 17/23] KVM: guest_memfd: Split for punch hole and
- private-to-shared conversion
-Message-ID: <aLly++6PDqzNF6YH@yzhao56-desk.sh.intel.com>
-Reply-To: Yan Zhao <yan.y.zhao@intel.com>
-References: <20250807093950.4395-1-yan.y.zhao@intel.com>
- <20250807094503.4691-1-yan.y.zhao@intel.com>
- <6b61cee4-0405-4967-afee-af934df34c5f@linux.intel.com>
- <aLlgesTc3ZIvgPg6@yzhao56-desk.sh.intel.com>
-Content-Type: text/plain; charset="us-ascii"
-Content-Disposition: inline
-In-Reply-To: <aLlgesTc3ZIvgPg6@yzhao56-desk.sh.intel.com>
-X-ClientProxiedBy: SI1PR02CA0052.apcprd02.prod.outlook.com
- (2603:1096:4:1f5::20) To DS7PR11MB5966.namprd11.prod.outlook.com
- (2603:10b6:8:71::6)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DD4CB2EC08B;
+	Thu,  4 Sep 2025 11:12:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1756984358; cv=none; b=rTksIZz9D7Iphvfp0hmD5XlelzhBi6Hw4krII1kF36FOZagZ+zEo6F6T8/4f+xArhPQeC2gpWmbScqjBIg9kw3Y/xSDV8oh+CrfIC4tnvHTpXa8DvyNUY3/eGncLdQEoZdFopc9JbsafL+WYlUVS0rp0TTEgx7Hrar4taN9sUmM=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1756984358; c=relaxed/simple;
+	bh=NUh4Ct3rcDGpktOBV6+CRcuN5e1CANyp9gZr1JFgsFk=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=mrf/habRCGzUYiduJPwWML1wkLLFnnVUZDfJ17vXILjBnl+uczc1+lig8hYVgwJCKFBoY8MUniv4WU6fFPvl90k1FCIBjxAmYGgzWyqPVxaKVl/RETLP5M8WWTvVuAbSUJkShHfrlLnuCP2FPxzfLUMLPNqMF6MOPpu41BOxjig=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=bRPTOnXh; arc=none smtp.client-ip=148.163.158.5
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
+Received: from pps.filterd (m0356516.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 58493o0q001636;
+	Thu, 4 Sep 2025 11:12:34 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
+	:content-transfer-encoding:content-type:date:from:in-reply-to
+	:message-id:mime-version:references:subject:to; s=pp1; bh=fJdoxL
+	fUDXXsS/d69LQviT/kSS1XVQYsqlBlsnjzJQY=; b=bRPTOnXhvvfQjliamjrXZA
+	JRZxYRQHQu4JTWNSbxihlku4vQ91bFKXgW2odznOK38B9O449LyCumbwoDgFqW5C
+	XE1XolxAkgduV6EVXRmO0C8UN/tS6Z5uEIdbOwj0MopPnQeAm9Q8UqsR/1xCXoNw
+	O14fLE25lODSFC26C6e3BdQlSqg58XQvGLuXN6Q4XgVzX1htcvcpij9YHG0DvfFv
+	1q2pzpUcA2ahos6YmRnmjq4vPEnfp5wtCc59rvlD2XkmpQ3iTwJQOzxAJsRrc3yo
+	vMNjPymryOBOprFAtXaJZfx1ajTF58er8oHHaIrtcip03MWe9iHmIxXI6Iwnr3zw
+	==
+Received: from ppma11.dal12v.mail.ibm.com (db.9e.1632.ip4.static.sl-reverse.com [50.22.158.219])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 48wshf5fq6-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Thu, 04 Sep 2025 11:12:33 +0000 (GMT)
+Received: from pps.filterd (ppma11.dal12v.mail.ibm.com [127.0.0.1])
+	by ppma11.dal12v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 584916hH014345;
+	Thu, 4 Sep 2025 11:12:33 GMT
+Received: from smtprelay03.fra02v.mail.ibm.com ([9.218.2.224])
+	by ppma11.dal12v.mail.ibm.com (PPS) with ESMTPS id 48veb3kv9u-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Thu, 04 Sep 2025 11:12:33 +0000
+Received: from smtpav04.fra02v.mail.ibm.com (smtpav04.fra02v.mail.ibm.com [10.20.54.103])
+	by smtprelay03.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 584BCSQ851446232
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Thu, 4 Sep 2025 11:12:28 GMT
+Received: from smtpav04.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id CCC682004E;
+	Thu,  4 Sep 2025 11:12:28 +0000 (GMT)
+Received: from smtpav04.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id DC20420043;
+	Thu,  4 Sep 2025 11:12:27 +0000 (GMT)
+Received: from [9.87.130.193] (unknown [9.87.130.193])
+	by smtpav04.fra02v.mail.ibm.com (Postfix) with ESMTP;
+	Thu,  4 Sep 2025 11:12:27 +0000 (GMT)
+Message-ID: <7b5c5629-49b1-42c0-ad88-e955be7b6e2b@linux.ibm.com>
+Date: Thu, 4 Sep 2025 13:12:27 +0200
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: DS7PR11MB5966:EE_|PH3PPFFA27DACA6:EE_
-X-MS-Office365-Filtering-Correlation-Id: fffc6844-b952-4e95-5ae7-08ddeba36444
-X-LD-Processed: 46c98d88-e344-4ed4-8496-4ed7712e255d,ExtAddr
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230040|7416014|376014|1800799024|366016|921020;
-X-Microsoft-Antispam-Message-Info: =?us-ascii?Q?ENJ4XTlsdQua9uRq0OF5HA86XPR1Vpc3KEXTg8bzabhmV6iuRtGjAys6+SWU?=
- =?us-ascii?Q?0M6CtYrCX0obFpW8VVykrcAPMQvotI60AHXGK1be15oYWuEbAZfRNRoSmyFC?=
- =?us-ascii?Q?rTz6WlOBJrvBAuCcHC+rNp9O8qjsQ8WIGG2W5avD+0DySOOd6W9DyA+tqZny?=
- =?us-ascii?Q?b3LQBRWpCHpCXLxH5OygR1HrOG6MvX2nao+HbFYRAI42JVFbOtJpXcsVZgF3?=
- =?us-ascii?Q?wHo/IasO1rpURrhcX0nVAsUYJd2oUTW6Z8i+qupss/s3sMfuOqnNNVlsKpPp?=
- =?us-ascii?Q?uCnyFDSoh2TmoU0g3Lpj+lbnDgfucvnoUeGaiBnjBbKSplQAxuoCJsATyxAg?=
- =?us-ascii?Q?QuwtR9hJEAnOkZKDfWG0ewKEmb+IJpPZ6wNmjCWcZmNTmV+fH4KXQ73MmaKO?=
- =?us-ascii?Q?H6pVLEfBK92nNf+mKYu6D7u4cr1XIenG0w5mZGe3FyRXE3fWTlXRFEkexyeY?=
- =?us-ascii?Q?xsSYik+kxzBvFsGg8ne821w2h2qObwTI78ysLPC44o7BjUXFmRsHhhnuGB63?=
- =?us-ascii?Q?NA3HAUVL66QVgnRoUptsVxVspNoMP4jte4ecUOBKaV3UMaYr0bCcPSlA1W3O?=
- =?us-ascii?Q?TmebFxs43U3yhQjri4bC0YdFDKpnymJT0BaUEqybZVbcMlcFGQmS8U+LKEuH?=
- =?us-ascii?Q?bWdTfb0Hc5LIoqv/5LKdQQCqYTV2Pqm8+NQ7VqgRZpD7sIJPsAuWplHtPJ+a?=
- =?us-ascii?Q?aEbDeeNYE1BBmbbE98+mnfXnriTCCUD/iqOGqMoicPAU/H8T+xR9y0a3ZM0r?=
- =?us-ascii?Q?4r6eojLjEjW6gf1Zeh4BpGb+j9gLGZMn4hCTttnWHN9KXRByBpxZ3ivjXJD+?=
- =?us-ascii?Q?HrJXP1PqUxwebWXfXkurkj9JkfVMO8/L2jruWzVu9Ps5Dn2Whi2bRAPB2i1y?=
- =?us-ascii?Q?dXmfQqw0JxuJO/GpcuWpPlIeiIujsFiDr0q7ku9tSpKqFTJXrcstN3CD7gnE?=
- =?us-ascii?Q?LGjW6IiTyspFGofw+actuUEs9otmssdqyAAfzB9plTN4hfbU9gQbS7y5RTRZ?=
- =?us-ascii?Q?1VivdW+w12bSqzD4SqBXI0NtfAJtgfQ7sTEXIxWxhG/lG2aWJiDjt9DcWIwy?=
- =?us-ascii?Q?mhlpfGNQSgpyT1QDVm7OEm36lsMF2Eq9mBumliy7IR11TgLpyvpWNoeD4sLe?=
- =?us-ascii?Q?5srdBP4S/QG8Gv8TqN+hxVAhR+CMaFtRqT3GuPBU3nwnKNnOY7nVwX6S45PU?=
- =?us-ascii?Q?cePt/Lky2NW4jEUgIV99uwq0UgIKhNeYWPwqoKR3Ta+drNWIjKlkE3JM/bYN?=
- =?us-ascii?Q?aARLruN95XIca9T7P89FG/KETenfs/c4fYDEs0IsTschHbEqoCoaPPNpmsGJ?=
- =?us-ascii?Q?QqogsYpbh4TNhX7XZ2a63ZSfPZYgXjnbVLR0WzkQWPXNoda5tgnRG1onYc5w?=
- =?us-ascii?Q?I+xE9orFqk7lzcxKegThRiHbfJj77O8x7jNH7KCOaBw45+vEjGpKaM0YhYV9?=
- =?us-ascii?Q?IFkbmfuqdY6ti/KBU1bU9n/dD+P/jHy+uXc2AU7EoQFkQxpaNAcjhw=3D=3D?=
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DS7PR11MB5966.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(7416014)(376014)(1800799024)(366016)(921020);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?DzsILP6vHTlJ8d4qHlOp2w4fOuFoWF710xNY0D+u2W1FsZSscbcZiDZc8RTz?=
- =?us-ascii?Q?YQzjm1tWIuAVCbDQWt0jqxJJU3NUrNoohB+m/MvZF654kNC3ZW4Ok8aA9UZf?=
- =?us-ascii?Q?zudov3sC+48mJYdwqfT0P38qwQBJu7WkyjwLUvL7ORvWiQB/nhZy9ouch4we?=
- =?us-ascii?Q?CO1bGSva8KYOeB9BKMJ1nKLxv4qO915+MENMsTxGAkBN7y8oRYUYuI9RAdry?=
- =?us-ascii?Q?TcANbPpK0wa7XClwFFBYwMH6t+e7oXiWWQD4ytn3/e4gsjzKtm2ZI4omivd+?=
- =?us-ascii?Q?ANJF9PIPcMewanodBi5MrnEkjvNwNUJoidIWHxoF7sO8eNA80CqzpQ32OCdC?=
- =?us-ascii?Q?oz2Pq6uU5oTh354rUycP2zE4+pNk9wFrclv0VWwXEV0odiBk8enY31b3bDWJ?=
- =?us-ascii?Q?bch8Xf91GFdELIVETfFm6pU+SQboHzhmDZmnxc8XJnQKAlKvwxjO1ocf5gTv?=
- =?us-ascii?Q?xlPEFydKfcxwD4E7HzK/b20g6hx6+0pu5wsebegCE68jPbnqLRaeplLgW0GV?=
- =?us-ascii?Q?y6pvo6NYUp41uPQN3CzALobm4N8GzQCnaMbieTEL4mGAeNteK4w+KBJqCNCu?=
- =?us-ascii?Q?4N56y0iwFRzb2kNHdcxySRIlB8Z3gnwL3HKVo2bkG5tT+rvk60Ix3czn1nw+?=
- =?us-ascii?Q?3ZsBgYqajQSls1Xc7qJZGisQ1nZNF/+Lt7DZIZgAffLqcmttHK+nmb0CTQw/?=
- =?us-ascii?Q?zajEsUAu6El69RDUUPb6mQj5t6FaXQQ0HFWIBnQ667GtJdmW0U+vksGaISci?=
- =?us-ascii?Q?lC+yDkRRPZ14vFaMUszUucWqlVf4emqIGZUqQLJi4mdnPS89r+UQp978YdZG?=
- =?us-ascii?Q?DMsIoj7/IZ3FUy8AKjpztHL022QAiipRijCkAzLYng15iBnDNTQfX7PPfg8W?=
- =?us-ascii?Q?cYNXyAhGALT41cxycLfvEh0zJ1qf+Argt576ddtAS7W9Umybc6zVnZER2Uwb?=
- =?us-ascii?Q?e/Ir2Xgc8A1j18vuk3hEeOCL/CEThMLt7if/DOu3HXDADkI79+L0CIZq15er?=
- =?us-ascii?Q?X+NgtQHdOZqum9xcP+hDkY3QvGIdNAe2yDYKaRSIlzi+a4cFzo8OHAnmBekw?=
- =?us-ascii?Q?k6wKK1dxXmJEc9G8R8MFLAPmAqgJSGcAgDmseFmLrItMf+ZIeotHICQKQcAV?=
- =?us-ascii?Q?6I0qDaBwq0VjWnvFyqST+tDZiXdQXSadcLsmYkO4t8NlyQgSMfm0vUus+KM3?=
- =?us-ascii?Q?iPlUp91Xl1G5CAA1me0z/Hti8sOgUzfEJ44hATcUPuuVQwEgPvduP0unbQQt?=
- =?us-ascii?Q?60K0nz/gjMplPe7IKrT93gthxrBQegrnyF5rPUzuTNNHCniXjAp+cMySG8ZG?=
- =?us-ascii?Q?y6oW2IjxZ2zvQzoLN3knKzFoyLlPgYKf8KJ+SCmaBtBbW+ciwNwHQl8vuI3X?=
- =?us-ascii?Q?HcskVoeypkI3c0bBzTJ7wS6zK2bXr9AOUyY5lspPvMsDIgW8ukMZk4H4KP0k?=
- =?us-ascii?Q?kD9N44riswiMUFsMPSA+yd2qtJKGe7wH1N+5MBx/UEpXSiWo4XemR3Iql+pG?=
- =?us-ascii?Q?NVDM/rCSX/NC+tHae9/sIxdQg+VG5iKqRLAIItrtwJv3iis345wEKr6Z2KK4?=
- =?us-ascii?Q?nbX6OaCFESFsL5tME+2gEkQf9HmY4RL0KtDvvMag?=
-X-MS-Exchange-CrossTenant-Network-Message-Id: fffc6844-b952-4e95-5ae7-08ddeba36444
-X-MS-Exchange-CrossTenant-AuthSource: DS7PR11MB5966.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 04 Sep 2025 11:08:35.3042
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: pCsxLuhxssJoSE4sj9e49gHGUnp5O2hWH8foJMvRZ+Lh1qd8d2DKV8QNGRku6QdKZwnx+cnpSFjNUWBnwMM98A==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH3PPFFA27DACA6
-X-OriginatorOrg: intel.com
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH] KVM: s390: Fix access to unavailable adapter indicator
+ pages during postcopy
+To: Thomas Huth <thuth@redhat.com>, Janosch Frank <frankja@linux.ibm.com>,
+        Claudio Imbrenda <imbrenda@linux.ibm.com>, kvm@vger.kernel.org
+Cc: Peter Xu <peterx@redhat.com>, David Hildenbrand <david@redhat.com>,
+        Heiko Carstens <hca@linux.ibm.com>, Vasily Gorbik <gor@linux.ibm.com>,
+        Alexander Gordeev <agordeev@linux.ibm.com>,
+        Sven Schnelle <svens@linux.ibm.com>, linux-s390@vger.kernel.org,
+        linux-kernel@vger.kernel.org,
+        Douglas Freimuth <freimuth@linux.ibm.com>,
+        Matthew Rosato <mjrosato@linux.ibm.com>
+References: <20250821152309.847187-1-thuth@redhat.com>
+Content-Language: en-US
+From: Christian Borntraeger <borntraeger@linux.ibm.com>
+In-Reply-To: <20250821152309.847187-1-thuth@redhat.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: -DVYUYSDcWqDqcfSbqDpZA1CMZZZTQOk
+X-Authority-Analysis: v=2.4 cv=do3bC0g4 c=1 sm=1 tr=0 ts=68b97422 cx=c_pps
+ a=aDMHemPKRhS1OARIsFnwRA==:117 a=aDMHemPKRhS1OARIsFnwRA==:17
+ a=IkcTkHD0fZMA:10 a=yJojWOMRYYMA:10 a=20KFwNOVAAAA:8 a=XFCOAtceyYmSXJIPWGwA:9
+ a=QEXdDO2ut3YA:10
+X-Proofpoint-ORIG-GUID: -DVYUYSDcWqDqcfSbqDpZA1CMZZZTQOk
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUwOTAyMDA0MCBTYWx0ZWRfX+OIuZGaxCPHI
+ qqIuXuLPOGlefmOgGgmBsRpNE//VCq2m7SJamL6w4AZodUGQ0hBf/cOFRUg8lFZ4et1CEHIS0Fg
+ DUH+qioJGH9clJNr9HB6BwkJHlDQUPRGl9Fac+U6bf0nTF0yTW1LENoRTUp3nHKzVRr4tONThnA
+ Sna2b6IUChwuLb1o3xIgy30xJuB4qaYgHC5e4UHc9XEuwGRUEA6pIbDQhkDW+dAGRP3sjxy4Efi
+ 6ug6UFhJgA7+MO7mcSbjCMEQaw1XkhuJNz/GTnerobFKLcmusuFFzsxJ0w52J7peHgjXE2FeS21
+ EpBwgxZjIau6JMkdgm86zu3F61jzJjL0aMCF59tENIyC52p/zRMlPccbv9Z3dUTCFJE2fOF6S3c
+ yNDJSAam
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1117,Hydra:6.1.9,FMLib:17.12.80.40
+ definitions=2025-09-04_04,2025-08-28_01,2025-03-28_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ phishscore=0 clxscore=1011 impostorscore=0 bulkscore=0 suspectscore=0
+ malwarescore=0 spamscore=0 priorityscore=1501 adultscore=0
+ classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
+ reason=mlx scancount=1 engine=8.19.0-2507300000 definitions=main-2509020040
 
-On Thu, Sep 04, 2025 at 05:48:42PM +0800, Yan Zhao wrote:
-> On Thu, Sep 04, 2025 at 03:58:54PM +0800, Binbin Wu wrote:
-> > > @@ -1906,8 +1926,14 @@ static int kvm_gmem_error_folio(struct address_space *mapping, struct folio *fol
-> > >   	start = folio->index;
-> > >   	end = start + folio_nr_pages(folio);
-> > > -	list_for_each_entry(gmem, gmem_list, entry)
-> > > -		kvm_gmem_invalidate_begin_and_zap(gmem, start, end);
-> > > +	/* The size of the SEPT will not exceed the size of the folio */
-> > To me, the comment alone without the context doesn't give a direct expression that
-> > split is not needed. If it's not too wordy, could you make it more informative?
-> What about:
-> The zap is limited to the range covered by a single folio.
-> As a S-EPT leaf entry can't cover a range larger than its backend folio size,
-> the zap can't cross two S-EPT leaf entries. So, no split is required.
-Sorry, my brain just froze.
-Should just be:
-
-As a leaf SPTE can't cover a range larger than its backend folio size,
-no splitting is required before the zap.
+CC Douglas, since Doug is looking into kvm_arch_set_irq_inatomic and this might have implications.
 
 
-> > > +	list_for_each_entry(gmem, gmem_list, entry) {
-> > > +		enum kvm_gfn_range_filter filter;
-> > > +
-> > > +		kvm_gmem_invalidate_begin(gmem, start, end);
-> > > +		filter = KVM_FILTER_PRIVATE | KVM_FILTER_SHARED;
-> > > +		kvm_gmem_zap(gmem, start, end, filter);
-> > > +	}
-> > >   	/*
-> > >   	 * Do not truncate the range, what action is taken in response to the
-> > 
+Am 21.08.25 um 17:23 schrieb Thomas Huth:
+> From: Thomas Huth <thuth@redhat.com>
+> 
+> When you run a KVM guest with vhost-net and migrate that guest to
+> another host, and you immediately enable postcopy after starting the
+> migration, there is a big chance that the network connection of the
+> guest won't work anymore on the destination side after the migration.
+> 
+> With a debug kernel v6.16.0, there is also a call trace that looks
+> like this:
+> 
+>   FAULT_FLAG_ALLOW_RETRY missing 881
+>   CPU: 6 UID: 0 PID: 549 Comm: kworker/6:2 Kdump: loaded Not tainted 6.16.0 #56 NONE
+>   Hardware name: IBM 3931 LA1 400 (LPAR)
+>   Workqueue: events irqfd_inject [kvm]
+>   Call Trace:
+>    [<00003173cbecc634>] dump_stack_lvl+0x104/0x168
+>    [<00003173cca69588>] handle_userfault+0xde8/0x1310
+>    [<00003173cc756f0c>] handle_pte_fault+0x4fc/0x760
+>    [<00003173cc759212>] __handle_mm_fault+0x452/0xa00
+>    [<00003173cc7599ba>] handle_mm_fault+0x1fa/0x6a0
+>    [<00003173cc73409a>] __get_user_pages+0x4aa/0xba0
+>    [<00003173cc7349e8>] get_user_pages_remote+0x258/0x770
+>    [<000031734be6f052>] get_map_page+0xe2/0x190 [kvm]
+>    [<000031734be6f910>] adapter_indicators_set+0x50/0x4a0 [kvm]
+>    [<000031734be7f674>] set_adapter_int+0xc4/0x170 [kvm]
+>    [<000031734be2f268>] kvm_set_irq+0x228/0x3f0 [kvm]
+>    [<000031734be27000>] irqfd_inject+0xd0/0x150 [kvm]
+>    [<00003173cc00c9ec>] process_one_work+0x87c/0x1490
+>    [<00003173cc00dda6>] worker_thread+0x7a6/0x1010
+>    [<00003173cc02dc36>] kthread+0x3b6/0x710
+>    [<00003173cbed2f0c>] __ret_from_fork+0xdc/0x7f0
+>    [<00003173cdd737ca>] ret_from_fork+0xa/0x30
+>   3 locks held by kworker/6:2/549:
+>    #0: 00000000800bc958 ((wq_completion)events){+.+.}-{0:0}, at: process_one_work+0x7ee/0x1490
+>    #1: 000030f3d527fbd0 ((work_completion)(&irqfd->inject)){+.+.}-{0:0}, at: process_one_work+0x81c/0x1490
+>    #2: 00000000f99862b0 (&mm->mmap_lock){++++}-{3:3}, at: get_map_page+0xa8/0x190 [kvm]
+> 
+> The "FAULT_FLAG_ALLOW_RETRY missing" indicates that handle_userfaultfd()
+> saw a page fault request without ALLOW_RETRY flag set, hence userfaultfd
+> cannot remotely resolve it (because the caller was asking for an immediate
+> resolution, aka, FAULT_FLAG_NOWAIT, while remote faults can take time).
+> With that, get_map_page() failed and the irq was lost.
+> 
+> We should not be strictly in an atomic environment here and the worker
+> should be sleepable (the call is done during an ioctl from userspace),
+> so we can allow adapter_indicators_set() to just sleep waiting for the
+> remote fault instead.
+> 
+> Link: https://issues.redhat.com/browse/RHEL-42486
+> Signed-off-by: Peter Xu <peterx@redhat.com>
+> [thuth: Assembled patch description and fixed some cosmetical issues]
+> Signed-off-by: Thomas Huth <thuth@redhat.com>
+> ---
+>   Note: Instructions for reproducing the bug can be found in the ticket here:
+>   https://issues.redhat.com/browse/RHEL-42486?focusedId=26661116#comment-26661116
+> 
+>   arch/s390/kvm/interrupt.c | 15 +++++++++++----
+>   1 file changed, 11 insertions(+), 4 deletions(-)
+> 
+> diff --git a/arch/s390/kvm/interrupt.c b/arch/s390/kvm/interrupt.c
+> index 60c360c18690f..dcce826ae9875 100644
+> --- a/arch/s390/kvm/interrupt.c
+> +++ b/arch/s390/kvm/interrupt.c
+> @@ -2777,12 +2777,19 @@ static unsigned long get_ind_bit(__u64 addr, unsigned long bit_nr, bool swap)
+>   
+>   static struct page *get_map_page(struct kvm *kvm, u64 uaddr)
+>   {
+> +	struct mm_struct *mm = kvm->mm;
+>   	struct page *page = NULL;
+> +	int locked = 1;
+> +
+> +	if (mmget_not_zero(mm)) {
+> +		mmap_read_lock(mm);
+> +		get_user_pages_remote(mm, uaddr, 1, FOLL_WRITE,
+> +				      &page, &locked);
+> +		if (locked)
+> +			mmap_read_unlock(mm);
+> +		mmput(mm);
+> +	}
+>   
+> -	mmap_read_lock(kvm->mm);
+> -	get_user_pages_remote(kvm->mm, uaddr, 1, FOLL_WRITE,
+> -			      &page, NULL);
+> -	mmap_read_unlock(kvm->mm);
+>   	return page;
+>   }
+>   
+
 
