@@ -1,46 +1,46 @@
-Return-Path: <kvm+bounces-56844-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-56845-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 059FBB44586
-	for <lists+kvm@lfdr.de>; Thu,  4 Sep 2025 20:36:05 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id C998EB44587
+	for <lists+kvm@lfdr.de>; Thu,  4 Sep 2025 20:36:16 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C13F1586CCF
-	for <lists+kvm@lfdr.de>; Thu,  4 Sep 2025 18:36:04 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9664D586165
+	for <lists+kvm@lfdr.de>; Thu,  4 Sep 2025 18:36:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A58B130BBBC;
-	Thu,  4 Sep 2025 18:35:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 853A1136988;
+	Thu,  4 Sep 2025 18:36:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="dlTnYTAb"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ZfJPEm89"
 X-Original-To: kvm@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CBB2A2D6630
-	for <kvm@vger.kernel.org>; Thu,  4 Sep 2025 18:35:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AA9792367D5
+	for <kvm@vger.kernel.org>; Thu,  4 Sep 2025 18:36:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757010958; cv=none; b=oZ5N7XBvqICv/1ABsiDpSCB9UFGrMNSMO0SVyIz1+SYxXOXVxW9oojBbB4WD8ScUQB4Be0AG4mo/wsutSP7TZ0J8+GhnHKZ3j3UqQd0sUNKVYx6toht+xWGmUHemutR2CgKHPruSO9zNOfq9zJ6sDpgUp6q5qS2SbMETOpna9xQ=
+	t=1757010970; cv=none; b=iz5Wy7WMC/ivzoAyqhH0gFAagxxnEl5N6uRfwlN1fa58jnKhmPD2N3KyJwQcs3hkbYIlm/5q0ZyTk9+T9b0KdNoIuLv2BmdcOgY3jPK7u+3dOl66x/MWpd3SBJhEKhIObTSt7r0KYOpIPXxqg85cqhXaF08N2ELT05at/OFAWLU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757010958; c=relaxed/simple;
-	bh=5JJUhuDphwQRDsn4xnJY27gsjgfY8NFDiTRQ6+7yP0M=;
+	s=arc-20240116; t=1757010970; c=relaxed/simple;
+	bh=11446e89j8O3rIbhJn3eks1GWSPFHMDj36o+PFuuH7Q=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=a6t6ZDswRfbsjlV2MDNc1IPfg3p3hsB/HFSBPLKuDY4fEO1SG6xqukwvEUkK7EgLjCqEH/q/feSCU9y8DnLBik1ineCV1EnWu8r/r0sMRS8E7JbPorS4qON+8GIz/gf/x9ip+vdAGtNxa3PnMT1p57lStD51vJ7polBU1U4uinY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=dlTnYTAb; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 602CCC4CEF0;
-	Thu,  4 Sep 2025 18:35:56 +0000 (UTC)
+	 MIME-Version; b=Bl9u57VNR4zd650LM6oWj8YoHZphYynIKVHyMTB8OrNn5JZP7WJyrFbDeqhciT2XETkrTaJ7e0Ik6tIs743VcVqq79vB1L6kE4EVbDAtLXfCuoKQgoJ19R3vzce7xGUW78zxAzZkP4HEcB4rzjJl81rGACLXRE5gHZk16HiBkKE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ZfJPEm89; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 43B16C4CEF0;
+	Thu,  4 Sep 2025 18:36:09 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1757010958;
-	bh=5JJUhuDphwQRDsn4xnJY27gsjgfY8NFDiTRQ6+7yP0M=;
+	s=k20201202; t=1757010970;
+	bh=11446e89j8O3rIbhJn3eks1GWSPFHMDj36o+PFuuH7Q=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=dlTnYTAbBikpc5cKD23RFmH4fFsrvvdTstTfv0bW6oCw75Y9UCsxAGxID5oxI69zg
-	 VkJgdGCtqeski+G7MvpTGm0W6xmTBSbTX2ELJUkS3XIgjSHN+K5X40xhRSa/ky1Ffi
-	 iCy+gNV478tQJG63YSCJqkwZT++yo1fteZZvCPRACVbg5rY4uHIKF0XkwreijoDzks
-	 JRowIdyTQoYjneYPVYXL9ZDng2+gY+RmcRx7xiaPHV95sWc12NUeXoKQyiT9sUdeFd
-	 R03FnSSqYnniidZY6yHmChLkddd64cimrIQvB6NjMrk9qT66nUieziTcyGOPwzvRik
-	 9ZVdKK7sTt3EQ==
+	b=ZfJPEm89M90THiFsA+RwMbzYNX/L2SrRv+Rfki6uHaMAlTTMgXr8uABobS3VMMLlJ
+	 SBkuTQQz6by6myMTunWv09iebPlrMzdDItY+4S4eWnLPxvvYiMEbsVtnOqopKkFyw3
+	 txAVgtXKkYcew2fDhel1mRhsaTJGSpLaIttCcK0aFiV5oSjtvQS1GYwdCzP5AZPiy4
+	 jissCsY3Zz6+J6e7jqVTw708xbnVlFXxmjJXqTNSjlOFXAPZe6p19bIgdu/9XbmVTW
+	 V0NVevlGEFGIRXUwmyi/UDNX1DsJOdJVxBLKm4I1AMyOi8AvCtcwdUFCTEXP6SDnmI
+	 iBGwpHyAOndNg==
 From: "Naveen N Rao (AMD)" <naveen@kernel.org>
 To: Sean Christopherson <seanjc@google.com>,
 	Paolo Bonzini <pbonzini@redhat.com>,
@@ -59,9 +59,9 @@ Cc: <x86@kernel.org>,
 	Alejandro Jimenez <alejandro.j.jimenez@oracle.com>,
 	Joao Martins <joao.m.martins@oracle.com>,
 	"Maciej S. Szmigiero" <maciej.szmigiero@oracle.com>
-Subject: [RESEND v4 3/7] KVM: SVM: Replace hard-coded value 0x1FF with the corresponding macro
-Date: Fri,  5 Sep 2025 00:03:03 +0530
-Message-ID: <95795f449c68bffcb3e1789ee2b0b7393711d37d.1757009416.git.naveen@kernel.org>
+Subject: [RESEND v4 4/7] KVM: SVM: Expand AVIC_PHYSICAL_MAX_INDEX_MASK to be a 12-bit field
+Date: Fri,  5 Sep 2025 00:03:04 +0530
+Message-ID: <a24ae953cea716bf9c56c136f7ca4bf5e97b1080.1757009416.git.naveen@kernel.org>
 X-Mailer: git-send-email 2.50.1
 In-Reply-To: <cover.1757009416.git.naveen@kernel.org>
 References: <cover.1757009416.git.naveen@kernel.org>
@@ -73,34 +73,37 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-The lower 9-bit field in EXITINFO2 represents an index into the AVIC
-Physical/Logical APIC ID table for a AVIC_INCOMPLETE_IPI #VMEXIT. Since
-the index into the Logical APIC ID table is just 8 bits, this field is
-actually bound by the bit-width of the index into the AVIC Physical ID
-table which is represented by AVIC_PHYSICAL_MAX_INDEX_MASK. So, use that
-macro to mask EXITINFO2.Index instead of hard coding 0x1FF in
-avic_incomplete_ipi_interception().
+In the latest APM describing AVIC support for 4k vCPUs, VMCB
+AVIC_PHYSICAL_MAX_INDEX (Offset 0xF8) and EXITINFO2.Index are both
+updated from 9-bit wide to 12-bit wide fields unconditionally (i.e.,
+regardless of AVIC support for 4k vCPUs). Expand
+AVIC_PHYSICAL_MAX_INDEX_MASK accordingly.
 
-Co-developed-by: Suravee Suthikulpanit <suravee.suthikulpanit@amd.com>
-Signed-off-by: Suravee Suthikulpanit <suravee.suthikulpanit@amd.com>
+While AVIC_PHYSICAL_MAX_INDEX_MASK is updated to a 12-bit field, KVM
+will limit the max vCPU/APIC ID based on the maximum supported on a
+specific processor and enforce that limit during vCPU creation. I.e.,
+we don't need to rely on the mask to ensure that the max APIC ID being
+programmed in the VMCB is in range. The additional bits (11:9) were
+previously marked reserved and were never set/read by older processors.
+
 Signed-off-by: Naveen N Rao (AMD) <naveen@kernel.org>
 ---
- arch/x86/kvm/svm/avic.c | 2 +-
+ arch/x86/include/asm/svm.h | 2 +-
  1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/arch/x86/kvm/svm/avic.c b/arch/x86/kvm/svm/avic.c
-index 4f00e31347c3..d00b8f34e8d3 100644
---- a/arch/x86/kvm/svm/avic.c
-+++ b/arch/x86/kvm/svm/avic.c
-@@ -500,7 +500,7 @@ int avic_incomplete_ipi_interception(struct kvm_vcpu *vcpu)
- 	u32 icrh = svm->vmcb->control.exit_info_1 >> 32;
- 	u32 icrl = svm->vmcb->control.exit_info_1;
- 	u32 id = svm->vmcb->control.exit_info_2 >> 32;
--	u32 index = svm->vmcb->control.exit_info_2 & 0x1FF;
-+	u32 index = svm->vmcb->control.exit_info_2 & AVIC_PHYSICAL_MAX_INDEX_MASK;
- 	struct kvm_lapic *apic = vcpu->arch.apic;
+diff --git a/arch/x86/include/asm/svm.h b/arch/x86/include/asm/svm.h
+index 17f6c3fedeee..d227e710c6b4 100644
+--- a/arch/x86/include/asm/svm.h
++++ b/arch/x86/include/asm/svm.h
+@@ -279,7 +279,7 @@ enum avic_ipi_failure_cause {
+ 	AVIC_IPI_FAILURE_INVALID_IPI_VECTOR,
+ };
  
- 	trace_kvm_avic_incomplete_ipi(vcpu->vcpu_id, icrh, icrl, id, index);
+-#define AVIC_PHYSICAL_MAX_INDEX_MASK	GENMASK_ULL(8, 0)
++#define AVIC_PHYSICAL_MAX_INDEX_MASK	GENMASK_ULL(11, 0)
+ 
+ /*
+  * For AVIC, the max index allowed for physical APIC ID table is 0xfe (254), as
 -- 
 2.50.1
 
