@@ -1,81 +1,81 @@
-Return-Path: <kvm+bounces-56780-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-56781-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 73838B43524
-	for <lists+kvm@lfdr.de>; Thu,  4 Sep 2025 10:13:27 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4B16EB4352C
+	for <lists+kvm@lfdr.de>; Thu,  4 Sep 2025 10:14:00 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A177D583F15
-	for <lists+kvm@lfdr.de>; Thu,  4 Sep 2025 08:13:15 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3D0597C40D9
+	for <lists+kvm@lfdr.de>; Thu,  4 Sep 2025 08:13:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 79ACF2D028A;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C8C932D060D;
 	Thu,  4 Sep 2025 08:11:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="QOmrJsiS"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="MJBi+vki"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-ej1-f41.google.com (mail-ej1-f41.google.com [209.85.218.41])
+Received: from mail-ej1-f50.google.com (mail-ej1-f50.google.com [209.85.218.50])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D78882C1780
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F361D2D027E
 	for <kvm@vger.kernel.org>; Thu,  4 Sep 2025 08:11:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.41
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.50
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756973511; cv=none; b=VqPfOTtcp2zug8r1hRsQNswqaBF9ydTpJDHsdunSOhXWpQt9JoixaCRKXyDZGnOOcxFvJUx/xcw6AH9i13IPqwMO9Lfg+LekI5oDoKeXFkUtllxHKr0CB/VX25tx5UVqdqBFk7cYqTN0sHqmtnpdogJBFVc1vo/VFSDZ2Z2caf8=
+	t=1756973512; cv=none; b=FFwbhg5d0z7BbYgUXC6sVuswChKTwY7ty5nl9h6UDhcJ1Hkdw64Z+H35esUae65GQs74+MXMTWhAG+niSvcaMQed8ZWtqTaH/Gi5KdvS/Nn6mRi2ZaYa1lWI5RdtVM3Ewl4S+5Ww89kq45eCqF4W+o1rQxQZZFjIAXh79dB3uLw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756973511; c=relaxed/simple;
-	bh=SWpLLEKeZUUpUvhAxiBTlBToXP1NiBAaLW6nsRhuo7Q=;
+	s=arc-20240116; t=1756973512; c=relaxed/simple;
+	bh=ahEqKxILOTV7FRYebgoUrIiscHDAM7NCLSnUKU5P1eY=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=feSOZCX8sFYxdlWcjX7LcUZfDR9gAjk1bl+p8xi0/hRMDoe0609XHCz4p/fS0LT5jwFyg07XGhNUglcGQpDGZ2IvOXum10H+Zix2TLgmGGE042xaOmJJeLIa2K7taZzINWUSkWGrXszBibBqSL+iZnIuGKSfluAhZ1oA4ymp+EU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=QOmrJsiS; arc=none smtp.client-ip=209.85.218.41
+	 MIME-Version:Content-Type; b=UPHA+8QLNY/O/d/lHIYthxPr+BxPkEP3gdA8YH8lYg7eJs1scDFXo88qzTOop3V1wKnEbxrjH8j2ru/iYhEL7/Gb1IZsYzI0H0bGqnL3etOFwiIIy8G/EDhP4HNvX6IhdB2fTRMjPA67X9EUa9Owie4K8gCYul313DQBpvvp4QM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=MJBi+vki; arc=none smtp.client-ip=209.85.218.50
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
-Received: by mail-ej1-f41.google.com with SMTP id a640c23a62f3a-afebb6d4093so142481566b.1
+Received: by mail-ej1-f50.google.com with SMTP id a640c23a62f3a-b02c719a117so132860866b.1
         for <kvm@vger.kernel.org>; Thu, 04 Sep 2025 01:11:49 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=linaro.org; s=google; t=1756973508; x=1757578308; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=omV0Vr4nYXMtMeXSQYoBuMjm05IYf3r1DGykbz6eHk0=;
-        b=QOmrJsiSEWrDm3pTfA9podIRTVITAS5skdygJZXNKMXXBtYRVV/W3wyicEZt8ckYMD
-         Gj9WRDHDLeDAE4m6OPl4Y714QaY7oR27isXpK2R6E4vP2Jj9vj5XZU9JgFNfdtAcov6q
-         rLnw4T8/hVQz1q1c+SQt2GYm8EhsH+Oz5Nld8lPEpDbTdx7WNO1kVVOyYXvlHTi+j7oC
-         OLpiVkUgdpa2PlBxf3ULsFPjYDlAGCi3hxVyqH0qjCEj8/HdMTmvHPm6U9VLXHunwkAJ
-         0xG7TOEstOVWKqAVum0tf1B1phV9WetqK3Q36+ITgypeSl3CXrhdKzfzCpMoVssNm9z9
-         ngFA==
+        bh=cDNuaOsGD6r42U8ngLUfY1h4DF7myqs0cRJmalDhUb4=;
+        b=MJBi+vki9lPdHI5A4x/3RtF9OyfPUXtJzihCUXO+cPyM2izzaQfRXKzIqpkjVEcn7b
+         QSH9xxOdPd3rGv1tcIRwUGYDq4KGUKp0JROgQSK7BpsanpWRqWwSfTZhsGBJbccMNDhR
+         /i3uGocgiP02v6pmz/VZbbYbQVN7wGSFNOUrZDs/NTuRUJ+1IftUdMwzF87c8FKhRbku
+         eAvsQTvKMO+zEEsAHKfHjV2xuy8p0l8FbhLsRFnNCUPSIkC25spP5WToIndYKNK/CQlT
+         CxhGoiXqYDgYzjbjfJV66VMocJHWzUN+NvKiqaMvq1pbEf8gQabT+0BwHGCZ3kkirMT1
+         zkgw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20230601; t=1756973508; x=1757578308;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=omV0Vr4nYXMtMeXSQYoBuMjm05IYf3r1DGykbz6eHk0=;
-        b=kMcWr2GbPJbN38pcvRc4QqYeCF1XfCpWhYMH7oxcGgdMbYku/w3cecsU9WiUh0LxoF
-         GbNDu95mxnrPZM/bYl5O/ixfbCJafJw+4hTp7f1fAiuVszMZh3eS7YXDwa3iFX6t619r
-         Oo76guKNFW5mzmSumkmE4f6K2+VFnUVjtobFgwlwEigk3L+Y7V+J0+ys9rdN6lBGM6HK
-         u9QasiqR9VhZyeusmtjpaHjFLjg7J+qikQ5W1k7DJII+CHOCrJRh3CUvNvZrYWnKQKN+
-         sXTIIZ//YrZCzZc2FmkiP2TsC5NIkTk4akDaev5oAfTc6NQlfOA/klHLyezMLJbVYWtK
-         zzpg==
-X-Forwarded-Encrypted: i=1; AJvYcCXsi4o5dvkg+iJ0RCvnBb9hYo0KcoaUl508BQNVdMXjE9dAbELXOJ1wvxAWajD3RD7fU64=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwvrmNtaABuyrNeFXHuIVqa7x8YbTIrXZjBIuDsvh4H2ahOpldw
-	AubAHi/cIsoahD7K0fLVwNagn/9TBo3Aixg1maKiVIvXFZV1lZQ10bD1ptmH9l6xA7M=
-X-Gm-Gg: ASbGncvd+hm1v84RIHVOUHG3i1aOA1SGd1/loE0oMFLVSLfeY56KgDZI9luDT0vIqij
-	Ti0JbNBdv3DO1AohtotpnyVKw2SVAnPifAb/QtNZB774ekNBBzGQpRszLG/LYQmFJH8eUX/NkFP
-	215ojooWnH17yzvAbl6FlZmEbmFDcQUbHnbyeQbAdYaNT0yRwR0pHARsREBUMtZBCyOI5De0LQl
-	fyhesDY5uKj14aTAQLrpJZZHNLt0DLDu3W+m3UMNfFe2C4Wd9E7yUYCIImUsmuNn1nXkkY95MRk
-	4xSjbaO/Ka4Cree95hxn2XKKnYQ+g/SpGBA8yO86K0NU1zIcqZAlwPwf7S7BFCBJskBzXIyAG7W
-	m++0Maj3X/qyShrMkIhunEsQ=
-X-Google-Smtp-Source: AGHT+IFABY+GNZll4Er2gNXt3l+Crhs6fVMAbrNAexTY49T7TJMEwSOPjIndEkqPytMN7BQSr89N5A==
-X-Received: by 2002:a17:907:3cd2:b0:afe:9777:ed0e with SMTP id a640c23a62f3a-b01af2e15camr1761502866b.0.1756973508120;
-        Thu, 04 Sep 2025 01:11:48 -0700 (PDT)
+        bh=cDNuaOsGD6r42U8ngLUfY1h4DF7myqs0cRJmalDhUb4=;
+        b=s9UCsPUoAy0fqsQ4eg3Pcm4asim3vwtA2P9N78akQ/D+dGg3y0L4uNfIOW0BxkuZC+
+         Y9vkCUl9wlZ1HJw7DXdsVCOqni6PWEub+FTsKUvQ19W916w6qKs3XO1uriBXVEhWZO/Q
+         2x0pkonvkA2p4NiR6rMZnnwbZ3rH/OeK21x/KcUDDcF4SBm++WGwGuY90u5tQ6Gv53dC
+         FCIGPYLxoh7cxl0agvyNJv+36vri/cHgSxc8Weo1/074dgav5gurIyZhSY1okrwtvdLC
+         r4/Ee8CLE26MTrfHIVnz+T7Ld87ZEAo/Ovy/PiSb9kMRLXlAHDgXxezaHQs1PPLgqbNB
+         ggEg==
+X-Forwarded-Encrypted: i=1; AJvYcCU6cvULKUT3HIq4SWkKWr7BdhXxjwCAJoNbGapAMUWlZWbCiXB5F57aFx95VkeWunUQd28=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwTWx6oPpV/xUnraQ3pJPg/CtwB2O+0pkYi8VgR5+Qzq99Osgwh
+	vdSJ3yKb8seNge6eR2rkWDN1tnZ7XiouzB/WNKR4wTBJJvnS2O3kuaTplvFGeBKGaYc=
+X-Gm-Gg: ASbGncuaWJPNsmjUxdQp4wLrp1EpUKAsoO9bI4l3jlQfLs2hnJrdNs04WbISo0Qpqht
+	0tludQfH0zKt5O9s+1U1glOzZpR30Jj84a+2lwRJtv5yDNCLftVfJCRUkbb0o2yPSbyzJhVuu4p
+	aYY1+G9zrcetQvIWtZwrK1TcySh+SRFAK1FVZLCec9GH7agqrj1N81GuAhNXMCHCkKgrvE7YffF
+	1qvfFbhQd/luKPXqoIX4yeTeoLXvLREvk8NAXG9BEYMRcpcbmm8TW9ZKe1ku1d60ewPGTvlZjD0
+	m2X2QlL3X0sXPIncxw3/7EhB4IYy8wkzQgBAzfQlk6Csq1LWZ0Xy+9QwNsGpAfZVESa58ToF8W7
+	QXN87Qkmccx7fm6qU4fictJ2v+2ROLvIVmjGw4JSJoLis
+X-Google-Smtp-Source: AGHT+IEuGPLBjng4TGodrmsMkqQv/1x2d0i2N2XuU6rOMtEyrvdgiQZZOH9o9y1LB92mX/fQfkpwaw==
+X-Received: by 2002:a17:906:9f92:b0:afe:a615:39ef with SMTP id a640c23a62f3a-b01d8a2667emr1911016566b.9.1756973507309;
+        Thu, 04 Sep 2025 01:11:47 -0700 (PDT)
 Received: from draig.lan ([185.126.160.19])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-b046f888b95sm275965566b.34.2025.09.04.01.11.39
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-b0416e878a2sm1085838766b.95.2025.09.04.01.11.40
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
         Thu, 04 Sep 2025 01:11:43 -0700 (PDT)
 Received: from draig.lan (localhost [IPv6:::1])
-	by draig.lan (Postfix) with ESMTP id B85DB5FAA7;
-	Thu, 04 Sep 2025 09:11:30 +0100 (BST)
+	by draig.lan (Postfix) with ESMTP id 19D475FAD0;
+	Thu, 04 Sep 2025 09:11:31 +0100 (BST)
 From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
 To: qemu-devel@nongnu.org
 Cc: Reinoud Zandijk <reinoud@netbsd.org>,
@@ -163,9 +163,9 @@ Cc: Reinoud Zandijk <reinoud@netbsd.org>,
 	Nicholas Piggin <npiggin@gmail.com>,
 	John Levon <john.levon@nutanix.com>,
 	Pierrick Bouvier <pierrick.bouvier@linaro.org>
-Subject: [PATCH v2 021/281] tests/functional: Move hppa tests into architecture specific folder
-Date: Thu,  4 Sep 2025 09:06:55 +0100
-Message-ID: <20250904081128.1942269-22-alex.bennee@linaro.org>
+Subject: [PATCH v2 024/281] tests/functional: Move m68k tests into architecture specific folder
+Date: Thu,  4 Sep 2025 09:06:58 +0100
+Message-ID: <20250904081128.1942269-25-alex.bennee@linaro.org>
 X-Mailer: git-send-email 2.47.2
 In-Reply-To: <20250904081128.1942269-1-alex.bennee@linaro.org>
 References: <20250904081128.1942269-1-alex.bennee@linaro.org>
@@ -181,72 +181,131 @@ Content-Transfer-Encoding: 8bit
 From: Thomas Huth <thuth@redhat.com>
 
 The tests/functional folder has become quite crowded, thus move the
-avr tests into a target-specific subfolder.
+m68k tests into a target-specific subfolder.
 
 Reviewed-by: Pierrick Bouvier <pierrick.bouvier@linaro.org>
 Reviewed-by: Philippe Mathieu-Daudé <philmd@linaro.org>
 Signed-off-by: Thomas Huth <thuth@redhat.com>
-Message-ID: <20250819112403.432587-10-thuth@redhat.com>
+Message-ID: <20250819112403.432587-13-thuth@redhat.com>
 ---
- MAINTAINERS                                                  | 2 +-
- tests/functional/hppa/meson.build                            | 5 +++++
- .../{test_hppa_seabios.py => hppa/test_seabios.py}           | 0
- tests/functional/meson.build                                 | 5 +----
- 4 files changed, 7 insertions(+), 5 deletions(-)
- create mode 100644 tests/functional/hppa/meson.build
- rename tests/functional/{test_hppa_seabios.py => hppa/test_seabios.py} (100%)
+ MAINTAINERS                                              | 8 ++++----
+ tests/functional/m68k/meson.build                        | 9 +++++++++
+ .../{test_m68k_mcf5208evb.py => m68k/test_mcf5208evb.py} | 0
+ .../{test_m68k_nextcube.py => m68k/test_nextcube.py}     | 0
+ .../functional/{test_m68k_q800.py => m68k/test_q800.py}  | 0
+ .../{test_m68k_replay.py => m68k/test_replay.py}         | 0
+ .../{test_m68k_tuxrun.py => m68k/test_tuxrun.py}         | 0
+ tests/functional/meson.build                             | 9 +--------
+ 8 files changed, 14 insertions(+), 12 deletions(-)
+ create mode 100644 tests/functional/m68k/meson.build
+ rename tests/functional/{test_m68k_mcf5208evb.py => m68k/test_mcf5208evb.py} (100%)
+ rename tests/functional/{test_m68k_nextcube.py => m68k/test_nextcube.py} (100%)
+ rename tests/functional/{test_m68k_q800.py => m68k/test_q800.py} (100%)
+ rename tests/functional/{test_m68k_replay.py => m68k/test_replay.py} (100%)
+ rename tests/functional/{test_m68k_tuxrun.py => m68k/test_tuxrun.py} (100%)
 
 diff --git a/MAINTAINERS b/MAINTAINERS
-index d01afcbea6d..2e1754912f6 100644
+index 716127e831d..e188de813fb 100644
 --- a/MAINTAINERS
 +++ b/MAINTAINERS
-@@ -1273,7 +1273,7 @@ F: include/hw/pci-host/astro.h
- F: include/hw/pci-host/dino.h
- F: pc-bios/hppa-firmware.img
- F: roms/seabios-hppa/
--F: tests/functional/test_hppa_seabios.py
-+F: tests/functional/hppa/test_seabios.py
+@@ -1312,7 +1312,7 @@ F: hw/m68k/mcf_intc.c
+ F: hw/char/mcf_uart.c
+ F: hw/net/mcf_fec.c
+ F: include/hw/m68k/mcf*.h
+-F: tests/functional/test_m68k_mcf5208evb.py
++F: tests/functional/m68k/test_mcf5208evb.py
  
- LoongArch Machines
- ------------------
-diff --git a/tests/functional/hppa/meson.build b/tests/functional/hppa/meson.build
+ NeXTcube
+ M: Thomas Huth <huth@tuxfamily.org>
+@@ -1320,7 +1320,7 @@ S: Odd Fixes
+ F: hw/m68k/next-*.c
+ F: hw/display/next-fb.c
+ F: include/hw/m68k/next-cube.h
+-F: tests/functional/test_m68k_nextcube.py
++F: tests/functional/m68k/test_nextcube.py
+ 
+ q800
+ M: Laurent Vivier <laurent@vivier.eu>
+@@ -1346,7 +1346,7 @@ F: include/hw/m68k/q800-glue.h
+ F: include/hw/misc/djmemc.h
+ F: include/hw/misc/iosb.h
+ F: include/hw/audio/asc.h
+-F: tests/functional/test_m68k_q800.py
++F: tests/functional/m68k/test_q800.py
+ 
+ virt
+ M: Laurent Vivier <laurent@vivier.eu>
+@@ -1361,7 +1361,7 @@ F: include/hw/intc/goldfish_pic.h
+ F: include/hw/intc/m68k_irqc.h
+ F: include/hw/misc/virt_ctrl.h
+ F: docs/specs/virt-ctlr.rst
+-F: tests/functional/test_m68k_tuxrun.py
++F: tests/functional/m68k/test_tuxrun.py
+ 
+ MicroBlaze Machines
+ -------------------
+diff --git a/tests/functional/m68k/meson.build b/tests/functional/m68k/meson.build
 new file mode 100644
-index 00000000000..a3348370884
+index 00000000000..e29044a6d73
 --- /dev/null
-+++ b/tests/functional/hppa/meson.build
-@@ -0,0 +1,5 @@
++++ b/tests/functional/m68k/meson.build
+@@ -0,0 +1,9 @@
 +# SPDX-License-Identifier: GPL-2.0-or-later
 +
-+tests_hppa_system_quick = [
-+  'seabios',
++tests_m68k_system_thorough = [
++  'mcf5208evb',
++  'nextcube',
++  'replay',
++  'q800',
++  'tuxrun',
 +]
-diff --git a/tests/functional/test_hppa_seabios.py b/tests/functional/hppa/test_seabios.py
+diff --git a/tests/functional/test_m68k_mcf5208evb.py b/tests/functional/m68k/test_mcf5208evb.py
 similarity index 100%
-rename from tests/functional/test_hppa_seabios.py
-rename to tests/functional/hppa/test_seabios.py
+rename from tests/functional/test_m68k_mcf5208evb.py
+rename to tests/functional/m68k/test_mcf5208evb.py
+diff --git a/tests/functional/test_m68k_nextcube.py b/tests/functional/m68k/test_nextcube.py
+similarity index 100%
+rename from tests/functional/test_m68k_nextcube.py
+rename to tests/functional/m68k/test_nextcube.py
+diff --git a/tests/functional/test_m68k_q800.py b/tests/functional/m68k/test_q800.py
+similarity index 100%
+rename from tests/functional/test_m68k_q800.py
+rename to tests/functional/m68k/test_q800.py
+diff --git a/tests/functional/test_m68k_replay.py b/tests/functional/m68k/test_replay.py
+similarity index 100%
+rename from tests/functional/test_m68k_replay.py
+rename to tests/functional/m68k/test_replay.py
+diff --git a/tests/functional/test_m68k_tuxrun.py b/tests/functional/m68k/test_tuxrun.py
+similarity index 100%
+rename from tests/functional/test_m68k_tuxrun.py
+rename to tests/functional/m68k/test_tuxrun.py
 diff --git a/tests/functional/meson.build b/tests/functional/meson.build
-index 81eaa9c218c..8f85c13d3d1 100644
+index e2e66dcf523..d32dd4a371f 100644
 --- a/tests/functional/meson.build
 +++ b/tests/functional/meson.build
-@@ -13,6 +13,7 @@ subdir('aarch64')
- subdir('alpha')
- subdir('arm')
- subdir('avr')
-+subdir('hppa')
+@@ -16,6 +16,7 @@ subdir('avr')
+ subdir('hppa')
+ subdir('i386')
+ subdir('loongarch64')
++subdir('m68k')
  
  test_mips_timeouts = {
    'mips_malta' : 480,
-@@ -78,10 +79,6 @@ tests_generic_linuxuser = [
+@@ -81,14 +82,6 @@ tests_generic_linuxuser = [
  tests_generic_bsduser = [
  ]
  
--tests_hppa_system_quick = [
--  'hppa_seabios',
+-tests_m68k_system_thorough = [
+-  'm68k_mcf5208evb',
+-  'm68k_nextcube',
+-  'm68k_replay',
+-  'm68k_q800',
+-  'm68k_tuxrun',
 -]
 -
- tests_i386_system_quick = [
-   'i386_migration',
- ]
+ tests_microblaze_system_thorough = [
+   'microblaze_replay',
+   'microblaze_s3adsp1800'
 -- 
 2.47.2
 
