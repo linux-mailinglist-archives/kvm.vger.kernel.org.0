@@ -1,80 +1,80 @@
-Return-Path: <kvm+bounces-56776-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-56774-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id D2F2BB43525
-	for <lists+kvm@lfdr.de>; Thu,  4 Sep 2025 10:13:27 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4F6B0B43519
+	for <lists+kvm@lfdr.de>; Thu,  4 Sep 2025 10:12:52 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id E20101C83521
-	for <lists+kvm@lfdr.de>; Thu,  4 Sep 2025 08:13:02 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0A89B5A13D9
+	for <lists+kvm@lfdr.de>; Thu,  4 Sep 2025 08:12:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 673A32C17A0;
-	Thu,  4 Sep 2025 08:11:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 01B9B2C1583;
+	Thu,  4 Sep 2025 08:11:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="TcYGeCHY"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="v3LBeKJy"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-ej1-f45.google.com (mail-ej1-f45.google.com [209.85.218.45])
+Received: from mail-ej1-f47.google.com (mail-ej1-f47.google.com [209.85.218.47])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BEFEE2C158E
-	for <kvm@vger.kernel.org>; Thu,  4 Sep 2025 08:11:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.45
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 560EA2C0F8E
+	for <kvm@vger.kernel.org>; Thu,  4 Sep 2025 08:11:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.47
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756973503; cv=none; b=C/bkPG73puGCnx6e6vFMp7aDKY5bgvyrAQYAPl2+ToLSy8nfYdZwBR5XT5xcZzKD8an2q1HhllRbUBl2wTxEH7O12PaCakwnWAGwwXM1abg/VgzBPcA1cX7kytNhY1Eqm9N1d1XrL6yUjyObVOCHrtpLforBce4FVSVJ8ciz4CA=
+	t=1756973502; cv=none; b=UBXfAIN2103WfNCjUfBSe2ga4u5mvFkNZuVb91mXpYKJekcS88knepDBjgUfTH6EXbAtWD4lliQikC/g2J4sNTdiojh6JWXIos3X/+6fc62tHzyKLRtJUMv+vMVhPEC23Ml6cOyYksy57fS87rhNTXz0/10DWT/jgzIl99aoqew=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756973503; c=relaxed/simple;
-	bh=MH8lHfJJTUl+IzdkOhZKDn6JSTFps1XryAlX1AbFmeI=;
+	s=arc-20240116; t=1756973502; c=relaxed/simple;
+	bh=B34MyvIdNoAzlkhE9CwLIM2ehaejkaBF4in9KyFUfe4=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=RxX92v9dIjie8vCEG91s646StKLDW5zh6XzXOBE2g44ufccWb/u2gjkCD6mkMryojF5AhOJ4UQ1OP3AlFge5LmFPg+JKRPWoGFoW97/EfFDq1Xa+KLa5h8KoIWmesoN7QlD8xE6BvLt/A7GXorqyjmsENv+jpR4C3/+Phv1v4Og=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=TcYGeCHY; arc=none smtp.client-ip=209.85.218.45
+	 MIME-Version; b=E8YkjBHArjHrhu9+rwag2WydK43xQSYPocVQJoC5hBIHztk86U0v0ORfuxpzObtq1nXFRy3jZ5CxxeEoj+u5pWYokFSwOQNzF94smxZPBT7pZRXmUGCOKryNjyVdbMyyhphTBm45c+QJkHCBLFNJbQRAzhSCDbW6vxnOKlEfSLg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=v3LBeKJy; arc=none smtp.client-ip=209.85.218.47
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
-Received: by mail-ej1-f45.google.com with SMTP id a640c23a62f3a-b02c719a117so132835366b.1
-        for <kvm@vger.kernel.org>; Thu, 04 Sep 2025 01:11:41 -0700 (PDT)
+Received: by mail-ej1-f47.google.com with SMTP id a640c23a62f3a-b04770a25f2so102691166b.2
+        for <kvm@vger.kernel.org>; Thu, 04 Sep 2025 01:11:40 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1756973500; x=1757578300; darn=vger.kernel.org;
+        d=linaro.org; s=google; t=1756973499; x=1757578299; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=YHrtANvKFxNzkcAR0b6AvL2FoL97RQya7kVY684YbqM=;
-        b=TcYGeCHY7kqt7zoIDZ5oXV4NCF4A6aPqMRitksHLl0XfC8hp6EEUOW9Prxd7g6wdoJ
-         rt2Lt4bDUKpJwCUsJMrA6QrHTviJpwVc3ef7+qORPWXLdx4Z5RdeD1wdEmwhXd4RedlN
-         eH9hQk2h5GE6jF5k1Zo2UrXxvydSRuNsxYOdN+9XkydXFEyacx7LGLI3M28fT0gvndjB
-         88nL6TahmfGBPOmboXHjEAiEuK0adNARzujIrS5GZ6DxZusmNQHpIMQdZOionf07Z6mA
-         IyeRkbP6O3xGXxygD8TMu98Pzvcp8lDPEsfyw2HIjYftv0yDrZSSBwMMEt6ecL81hCpf
-         RlDA==
+        bh=JNutAIaXOMQtmCL/HAblUioHloxc8S7R+7KvtZJ66hg=;
+        b=v3LBeKJyPZIwDmwOJ8wYccGEEQGHsTFJpnKx//dsdE7mIoZJpNA38X44OHsJUSSkPS
+         hXhvBkuypiur8dKV9kTi4ooIvaBCFriG0vmF1VSeT5qy3NZhrdnLAkm4p5iEY/7DmY49
+         8IMKqSMlov+HNOFpecjFhFshxjaSjYg3+8YcSJotgVryWYISm8F/afmDJYGVnwpeXavY
+         kBC6oCgU2GlAodxipXyWfq5TSTvMw45pFv825Y8DkRSWnArC7eWTv2sY8wKMU6965zU7
+         DMLfr0t2jkpnd6bZpVAinTxQFiOdjspcQIiXFbK6x41bZXzV/+mPDcQDX9xZ36JFzDqY
+         9JjA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1756973500; x=1757578300;
+        d=1e100.net; s=20230601; t=1756973499; x=1757578299;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=YHrtANvKFxNzkcAR0b6AvL2FoL97RQya7kVY684YbqM=;
-        b=tJrmyOCpugimZhPihbo3mgnhREw8YpUbtP/iBPF0EYNZyZWF/JuAc8CdUwKFivWIjP
-         4//Di5Xa4Mnt2z8KG4jI40pVPbohDXMkYKTbNnmBqP2G+yP+B1kcAgxkD6+Jx6csHjsW
-         0UaBd+229zn3O3pL4JoxGxL14MG8pkTcw1TZZzbZhv9eBm1bv00Hi2Qm62Ht3U9LwaCI
-         wVhqUo64fx/8Vwj/WG20xbmqaWVNUGUYlIvGsnSHq9M85c05gAI4BxoZZJQ3vBJEEI4A
-         zB0TkNrAGnBqFKBDtSwqtExWTWhROoxQuyTP0O2rqaWe+N+t1aDMMghNUGqpA7qQr6Xc
-         j69g==
-X-Forwarded-Encrypted: i=1; AJvYcCVddK77IOdPBKiD6DxvE2mgNlhOgQtlq4b2xwc0p0KAnyo9UB/ZpeH/HQ5bIdPp5rFiwgM=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyJU5KAEhl64yPzDjYr8mppJKd1z3Dp0DPD48921ueerRyQgDwQ
-	6+Fccm+1lgonP2yEI8jyeZjI6v1ELy7xFTMCIypcTS6w6pP8KpSaYzRIircM41mRQik=
-X-Gm-Gg: ASbGnctE+07D4lBmABzKZ9XWONSEgkNOrurzh7gXjShC77kHAPFF9UGOxUC9+i++W3N
-	KAaTzTMUkc09bFLovaOF7qE6wiDFCeAcs0milVDS9mQ3qt40oTlHlCBlRpscj8ayo2a75zO1/mq
-	u2PY44ia5bNltc/bo0bKnFKHdExXHtdJXqxLimWy3OS0TGW1USVTJgwoIuuQRgbT2imdJGNLMbm
-	BCejGks+x/1C8Pqg/Aqn7enOTESZr1DWnII30rZn8EUq2ojnTMXFBYWjOsMB+56HPcN1ObwKDLE
-	XcTKPINvwxAGeM6GRgwRlORBqGgvGu37j3Z0Llk5eM8Nl7xeLfIi+sQvFWjrkvk6zacqlDvKN3p
-	BMu9m7o5Fxbsgf7/CEjazzCc=
-X-Google-Smtp-Source: AGHT+IHWlLajDsQ384nIBXustMLg5QOay+NZ7bnHzT4T4G8CTt2TPFaQ6+dQTw7Hxia/vwaMzjizQQ==
-X-Received: by 2002:a17:906:12cf:b0:b04:11e5:9a8e with SMTP id a640c23a62f3a-b0411e59b44mr1462147366b.40.1756973499887;
-        Thu, 04 Sep 2025 01:11:39 -0700 (PDT)
+        bh=JNutAIaXOMQtmCL/HAblUioHloxc8S7R+7KvtZJ66hg=;
+        b=mN9diM/HH6VdoMHUllHvkb7z9pw3ycwMDwi4nImHrL0oQFYaEtB8TcE37ZlboTAi0h
+         IURVQJ79nHpPQ9w4COTzHpD1Rs2dygb9rLYpuDJ5w9Gw4MGYHbz0swMgCd/VhZJfRSGd
+         0mo43TAtOWnRKewGBip+oAGvrmWAZKjdr8gdD/zVs7WADs/Mo1jTmmlX/cogaHHlXPnC
+         slslk71SKd0Kw6gkWh4YiDYO+K6h1EyAp3JN2qnIhJTbU3W9vGkwEiqmHKnjE8fTtd+i
+         JLv1bp4QJt7KjbSsQKQlOxK2N5RDI9G0UEsP7aihgSdxaoIA9koZ/meDAfuFgsrIs+i4
+         /fiA==
+X-Forwarded-Encrypted: i=1; AJvYcCXYEO2i33ivrKrQrRmgR7HQQi+nLZbgKq8QhwnfVDCltz/TEYFJQMb3tEZGzCyYwce4Rws=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzebI1R5GcdsqfNuhQlTB2AKOAlaME1CFcQPg/d4eqqRchWDMvD
+	zNtfMlEDKb8g6mrzgzYS7Z5cSBUIK5t+o+rwTLbva1nlBZOJiDo04ffR2wC3VLOI9O8=
+X-Gm-Gg: ASbGncvtqqdzUYZGSL8xrhByUhxIRDw2Y9bhzDAZaoW+tks4js4fQQDHCHJEvXg2NYu
+	e3rDyI2p9xVU3rVYPhCq75eUwGLp1L9HqF9KSphis79ed7dzn+9YXODLrQeYLCZC5AYm7pecwqk
+	UBNfOE+HWpkzVUwCBvqNmcsFVcXfRSbBHkAVHyde1Am7llO/fVqdr4Ov9N8Aog+gpAP1tQn3SJ7
+	5O5837Wy+B9Q20unP6Q3VXD9DoOQfPIbJQa9NJVo1ILRe9S18sIumYsYXE/evIeA3gv8ySqQvw8
+	BoC2oeojJRJ7QbVx19YnuaF3neKUgal/GXt+j6qKQo+OIq9sywr4ZQdNzlvQG7YabJVoA5UDfrH
+	L+eF9ob2XBG0IWXfpiJsrsSO2JGRhoNQVWxhYSEA6ZMcS
+X-Google-Smtp-Source: AGHT+IFJkCbW6+YbkwCqXH5HqGu4cDJmqLYEEKmaO7rAylz2zE8LC1W+s4a2pcKUaXmJqvD/qrocUg==
+X-Received: by 2002:a17:907:948a:b0:afe:93e2:3984 with SMTP id a640c23a62f3a-b01d8a321f3mr1572672866b.8.1756973498594;
+        Thu, 04 Sep 2025 01:11:38 -0700 (PDT)
 Received: from draig.lan ([185.126.160.19])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-b046d420e02sm306741066b.39.2025.09.04.01.11.32
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-aff0971379esm1438937866b.102.2025.09.04.01.11.33
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
         Thu, 04 Sep 2025 01:11:37 -0700 (PDT)
 Received: from draig.lan (localhost [IPv6:::1])
-	by draig.lan (Postfix) with ESMTP id D1C1B5F93A;
+	by draig.lan (Postfix) with ESMTP id EA7D95F93B;
 	Thu, 04 Sep 2025 09:11:28 +0100 (BST)
 From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
 To: qemu-devel@nongnu.org
@@ -163,9 +163,9 @@ Cc: Reinoud Zandijk <reinoud@netbsd.org>,
 	Nicholas Piggin <npiggin@gmail.com>,
 	John Levon <john.levon@nutanix.com>,
 	Stefan Hajnoczi <stefanha@redhat.com>
-Subject: [PATCH v2 006/281] Update version for the v10.1.0 release
-Date: Thu,  4 Sep 2025 09:06:40 +0100
-Message-ID: <20250904081128.1942269-7-alex.bennee@linaro.org>
+Subject: [PATCH v2 007/281] Open 10.2 development tree
+Date: Thu,  4 Sep 2025 09:06:41 +0100
+Message-ID: <20250904081128.1942269-8-alex.bennee@linaro.org>
 X-Mailer: git-send-email 2.47.2
 In-Reply-To: <20250904081128.1942269-1-alex.bennee@linaro.org>
 References: <20250904081128.1942269-1-alex.bennee@linaro.org>
@@ -185,12 +185,12 @@ Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
  1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/VERSION b/VERSION
-index dadcbd47d3c..4149c39eec6 100644
+index 4149c39eec6..9856be5dd98 100644
 --- a/VERSION
 +++ b/VERSION
 @@ -1 +1 @@
--10.0.94
-+10.1.0
+-10.1.0
++10.1.50
 -- 
 2.47.2
 
