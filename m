@@ -1,80 +1,80 @@
-Return-Path: <kvm+bounces-56789-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-56790-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id D683AB4353B
-	for <lists+kvm@lfdr.de>; Thu,  4 Sep 2025 10:14:54 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id AE5D3B4353C
+	for <lists+kvm@lfdr.de>; Thu,  4 Sep 2025 10:15:00 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 3A06B188F1A7
-	for <lists+kvm@lfdr.de>; Thu,  4 Sep 2025 08:14:32 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id BE60A688480
+	for <lists+kvm@lfdr.de>; Thu,  4 Sep 2025 08:14:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B0DF62C0F84;
-	Thu,  4 Sep 2025 08:12:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7E9512D3725;
+	Thu,  4 Sep 2025 08:12:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="jpgXpgec"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="pypdYqy4"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-ed1-f44.google.com (mail-ed1-f44.google.com [209.85.208.44])
+Received: from mail-ej1-f47.google.com (mail-ej1-f47.google.com [209.85.218.47])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DA9202D2496
-	for <kvm@vger.kernel.org>; Thu,  4 Sep 2025 08:12:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.44
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D30E82C0F6C
+	for <kvm@vger.kernel.org>; Thu,  4 Sep 2025 08:12:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.47
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756973527; cv=none; b=TVF25TuDhrCh/VYzRN3/k+uin+mym+zyUW9zNPTp9CAkTFY5oN9KZmflxT0NmlxSJ84TbfGE1x75Lq2OIbrbcN6ItyytJnjYSnP5kfylp5ij15fXlxmXTBfoCxKoFH7ryB/7p/rb+bAve7cUG+wUakJwQjmR0JnGP15ZqIS9tjk=
+	t=1756973531; cv=none; b=bhiIYQ5fn267SxK5M/k/1ziCoWsSsNrLKh5Z38+ykQ+ZSSRVyCWs77myWRheGoyYJxyZ4OecaWHPZitEgGXp8/Bmyx5OPSDT0vq6DdGCTunEiPrAgFO5jYFA3kN9eEt4ufjXdOspUDShZNiOPsTHFSjsU2fhO+dcqYo2VieBcsY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756973527; c=relaxed/simple;
-	bh=BEw1FuhWBeVCXqnjsjp8lj10DaNP4Bc5Yc1ZZdmfN7Q=;
+	s=arc-20240116; t=1756973531; c=relaxed/simple;
+	bh=bkDU4AeLCpmZGZtYEonzSjDNaqIGvr51jMzo1ykPs6Y=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=o6/KCWShPP4WH3Tygt3TB1HHzgfJwN6fyry13bbjSI07hmMMeUFGUN/OKZR6DVt50/4CLXjG4gka07WSfP3JaFJaAkYlHe1d56QTdAPuSBiIfeKm+mM2ccsPbbhCrjZYV1tzz19qLai4O+1ME4QiJLHu1hGbFnvpW4O8YzfSAhk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=jpgXpgec; arc=none smtp.client-ip=209.85.208.44
+	 MIME-Version; b=LcbqvGxelpm5JAXiGz+ROlPr0uXGq9ULy3IlW6vC67lX8MJu6siIsObHfmwPaiLPZUHcF3Ffn0XVcHLLjMkOTXyajWzftf2O79vqU1Y3b9Zw6IC1v3vKkciZsKyIw9jyWqw6ZkehP2/7iJfxeJnFNzqjf2Z0TRfMxqzXutqdcek=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=pypdYqy4; arc=none smtp.client-ip=209.85.218.47
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
-Received: by mail-ed1-f44.google.com with SMTP id 4fb4d7f45d1cf-61e8fdfd9b4so1639203a12.1
-        for <kvm@vger.kernel.org>; Thu, 04 Sep 2025 01:12:05 -0700 (PDT)
+Received: by mail-ej1-f47.google.com with SMTP id a640c23a62f3a-b0449b1b56eso111726766b.1
+        for <kvm@vger.kernel.org>; Thu, 04 Sep 2025 01:12:08 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1756973524; x=1757578324; darn=vger.kernel.org;
+        d=linaro.org; s=google; t=1756973527; x=1757578327; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=JLxFb3NYbTS9f/pm1eUqTOiDM/5DBuFeeS5GZ+vjJzw=;
-        b=jpgXpgecnxq+pzwy6kwvMP+XI8IsBNS3t+OFGmDFQ7AVY9D3vmbUd+3rllLh6SZN/I
-         NckjZn+vNS/iAxhdL28bkptv9Yb+kAr5yZdks6D8037B9b6m7o2oBXBS/8Ypcf0xms90
-         Tlghm+Hn4LbKUQn18MoCVRRJFka9acoqhWYeCnj5Oouu20dgriW3+/eup24PgAEGLDGh
-         mE79KvY3vgSyCJam6WRTL7synSJPdTaRLPHR8rAhXo4rhAVLt19Te4tRC2f0dYrppWUY
-         z98HaYaH0arAjwc9ioCZJSngzmmnbp2nnvoCgmJ2QsyG0F9Op6rsbRd68yRNNuLfZSce
-         ptlw==
+        bh=3igMVo/0Jk0/NNNrfQhFH8hc6okngEKnzdXk+lVC71M=;
+        b=pypdYqy4nGhlaTiQ1OPOwJVkDuBXFfR8AFEWS0hQi64SqGpW5/D5C3OlC+DxaRH6pP
+         +35BB2dMDMkDKtZmK8UfMgqL7jCRvmu5PlTAh+GVLotPQlWTgE+Ym0ANPMnFib+NcqtE
+         eJI982en0CpwQPS+dlLiEOEa0qQhuPzlkGrkzNtax5QErE2J/sWiN8AEiJQ9qChdjudW
+         qkdb7r2N4o/N5dXA64b3YZQt9U8DXOHRu/o2TusY3UUHjO9pVhPbmNKSPjz8UVvOgiM+
+         YOl50oHaad5IpXfD/LO4GOJu/sVLQnsD7drstPwvtQR/cfgAeU0EimjVq2Phm7eeVPho
+         V65g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1756973524; x=1757578324;
+        d=1e100.net; s=20230601; t=1756973527; x=1757578327;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=JLxFb3NYbTS9f/pm1eUqTOiDM/5DBuFeeS5GZ+vjJzw=;
-        b=OkfMONqyunfCYk8PPjdU7QWHO7Fn2Mr1OtQ9c+AokLn3fhTxzmv1QYpXQ/s1KOpAve
-         z0dJGE3I07zagKKZAa8273bQsS3tI6lUPjtn7PetAURJQLrdXmPyC4QNSEdrYXrFAmQG
-         NKgB0DWo1C04YL3pOmGfn/jx73JuMqXQ7ykLc7I8AIMoaFQ7TQyjWYwBA3JGlI5EOg35
-         fsOSQWNP85Ks6+JZwTIk8LZaNiIHAicAfhBLZlYQaG/TTiReYemYspzNoIbrX0DT1AIn
-         5iNBoM1R19s+Orbz87QSm1HDlOkOA/p/buAGae1T98pdTEpCJvROYRT4HkHlPECMr+9/
-         Xzpw==
-X-Forwarded-Encrypted: i=1; AJvYcCU9xVXt/stF4px45oYTEfBzjzJ3gJL2xOpjvEdcEUwEFS3I8yBFGW2dky4wsAAX4wPF884=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwZ9Mj34S4cHygUyV5hgi9T5htaqfJ52loHxlADPc7Ai7ow6rvn
-	epw3FRwFYrbCN4RrfLnstbDXzXopE22s51a93/weKZeLOAJIwFIhUU2arUwvzco4UJA=
-X-Gm-Gg: ASbGncuRUUjhq7tcFlqUW+PXD7ISOttGVKoCkmIEwCU0Vhcm+HKqH7NRTrZqDW1XZbs
-	qtxGLEQpOzWt2nBdMbZ7p827VrGE/U0yI9YJqIFI/fvwkBi9JoeLlZ4rEO9UfJf/rhrImRM6o8p
-	CV+a2PRmb+buQBlx0/9iqZWS4ZYiwDrmQxTHP4sB7qAzX8hsC1Byf/ALSdEbBx+7yboyt4Ov1yi
-	KmNK/EoE3S1bsYSv9kRJYHix9UNjaz44bTgVVIIQyHKPwQYG+6hSlfBfYvsfTpz4fLpboy+jpPF
-	u+JWxxzWliPLABHRg17hLg4GVhPGi6Qeo/5gOBzByCI12lVWFMHa+3d755Hx5jh7KJCzwFgiQ7/
-	bw6PFmBzlAJvLreLrkldJb7A=
-X-Google-Smtp-Source: AGHT+IGCIzSs++vG4Q/r44POEQofytYBuUaIuGpsL8NKxkWgprP60aqkJ1SOMVPil+NtFGgd+q+1ug==
-X-Received: by 2002:a05:6402:2356:b0:61c:e287:7ad3 with SMTP id 4fb4d7f45d1cf-61d22dfbd0emr19350555a12.6.1756973524107;
-        Thu, 04 Sep 2025 01:12:04 -0700 (PDT)
+        bh=3igMVo/0Jk0/NNNrfQhFH8hc6okngEKnzdXk+lVC71M=;
+        b=HrqfOYhPtwQAZEmhs03VvewAiGOcuo5VrPHy7vgBVh2lF1+VxVW+/hcdBzKBRXVxbZ
+         ItlEWwVl5QK4mi5CbCPWruADoRBbGYpavIWPxAiVwcwNML1AbF5Kl3gIoHjpGsU2hpeu
+         WWEpdmARYWM7UruW5/wOh5CMBQ00rtCTV9pCkswoDfBWYgyTpPlDNGjO7ujQwge7XzTH
+         MgNsvZ0+uSUGP2gul+xjbalafSy2G1/nxBJB3GGexa6lyrKLWAlcPONepxywugasIUys
+         37EeSXCZRHUEJ+bdGVogrKtjuowexcSlJ/lK5jvIEdpS6VMYuIVkrTssuTLqEbafqWuC
+         sjwQ==
+X-Forwarded-Encrypted: i=1; AJvYcCXeZccihVwT/XLj407XB1v0wTBSCA6WnpvCnYMDoGLU89G0UR/0jl78Dc+vyGmVFVQdvnU=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwotW68hW2LPj7FBjicDtXX6fHNO8UwjqViFea4IcFEDjw3D/UA
+	pBc9IgSR86hJgfB+8EzdMbseCM6IHc1MaOB3O9xLL+itLkaq680qs22hCQO6WZg8gxM=
+X-Gm-Gg: ASbGnctwdqiAnI7jXymiFpQWcxyn2ib13XJenONt3+SunpIIqWV6K2l7PubXTSJoGfx
+	siX12kbM7raad6PfOI28nUtgbjKSfjCIMrU9et+QvEaB3E8eBzMHk6USmXJFvSXs7OCROZ3Cm78
+	RkeAJJTR+k5YE7xlve4imyacp6FU+3qgBfGmforOQBFJ8i0DB5CFBcW7RNh7bpT7aFAVnnSIVLd
+	HFf9KbYgttS2RhNSQFyvt0HXUGZsausPlIsnMsbLfstrWMHlbqKQLw9pGwYXo0QfwpLvgPRvZf8
+	t9ARD991fEh4uBjTgS+f+G8Aa7dzlz8JxxLAjtKzJ9TaihNCv4cA4ikI+FL1wto9Km2UCrgi97m
+	5kMVPDU7LkghNmk6jwIOqDOHpz77g41Yo7w==
+X-Google-Smtp-Source: AGHT+IFBeYdGfWRJI/K+rgayz8OQ6j9nasTrUeDkKNPhr0lTLkj3JNN2B5iyPDqJVVGSAcD8I8KKGQ==
+X-Received: by 2002:a17:907:2d24:b0:b04:74d1:a561 with SMTP id a640c23a62f3a-b0474d1af73mr412166966b.25.1756973525652;
+        Thu, 04 Sep 2025 01:12:05 -0700 (PDT)
 Received: from draig.lan ([185.126.160.19])
-        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-61cfc216304sm12809226a12.19.2025.09.04.01.11.55
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-b04241b2e7esm979865566b.43.2025.09.04.01.11.55
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 04 Sep 2025 01:11:58 -0700 (PDT)
+        Thu, 04 Sep 2025 01:12:02 -0700 (PDT)
 Received: from draig.lan (localhost [IPv6:::1])
-	by draig.lan (Postfix) with ESMTP id BE271603EE;
+	by draig.lan (Postfix) with ESMTP id DF9806045A;
 	Thu, 04 Sep 2025 09:11:35 +0100 (BST)
 From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
 To: qemu-devel@nongnu.org
@@ -162,9 +162,9 @@ Cc: Reinoud Zandijk <reinoud@netbsd.org>,
 	=?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>,
 	Nicholas Piggin <npiggin@gmail.com>,
 	John Levon <john.levon@nutanix.com>
-Subject: [PATCH v2 058/281] linux-user: Move get_elf_hwcap to mips/elfload.c
-Date: Thu,  4 Sep 2025 09:07:32 +0100
-Message-ID: <20250904081128.1942269-59-alex.bennee@linaro.org>
+Subject: [PATCH v2 059/281] linux-user: Move get_elf_hwcap to sh4/elfload.c
+Date: Thu,  4 Sep 2025 09:07:33 +0100
+Message-ID: <20250904081128.1942269-60-alex.bennee@linaro.org>
 X-Mailer: git-send-email 2.47.2
 In-Reply-To: <20250904081128.1942269-1-alex.bennee@linaro.org>
 References: <20250904081128.1942269-1-alex.bennee@linaro.org>
@@ -183,169 +183,112 @@ Change the return type to abi_ulong, and pass in the cpu.
 Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
 Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 ---
- linux-user/loader.h            |  2 +-
- linux-user/mips/target_elf.h   |  2 ++
- linux-user/mips64/target_elf.h |  2 ++
- linux-user/elfload.c           | 52 +---------------------------------
- linux-user/mips/elfload.c      | 50 ++++++++++++++++++++++++++++++++
- 5 files changed, 56 insertions(+), 52 deletions(-)
+ linux-user/loader.h         |  3 ++-
+ linux-user/sh4/target_elf.h |  2 ++
+ linux-user/elfload.c        | 29 +----------------------------
+ linux-user/sh4/elfload.c    | 27 +++++++++++++++++++++++++++
+ 4 files changed, 32 insertions(+), 29 deletions(-)
 
 diff --git a/linux-user/loader.h b/linux-user/loader.h
-index 92b6d41145e..04457737dd4 100644
+index 04457737dd4..d8a93998076 100644
 --- a/linux-user/loader.h
 +++ b/linux-user/loader.h
-@@ -103,7 +103,7 @@ const char *get_elf_cpu_model(uint32_t eflags);
+@@ -103,7 +103,8 @@ const char *get_elf_cpu_model(uint32_t eflags);
  
  #if defined(TARGET_I386) || defined(TARGET_X86_64) || defined(TARGET_ARM) \
      || defined(TARGET_SPARC) || defined(TARGET_PPC) \
--    || defined(TARGET_LOONGARCH64)
-+    || defined(TARGET_LOONGARCH64) || defined(TARGET_MIPS)
+-    || defined(TARGET_LOONGARCH64) || defined(TARGET_MIPS)
++    || defined(TARGET_LOONGARCH64) || defined(TARGET_MIPS) \
++    || defined(TARGET_SH4)
  abi_ulong get_elf_hwcap(CPUState *cs);
  abi_ulong get_elf_hwcap2(CPUState *cs);
  #endif
-diff --git a/linux-user/mips/target_elf.h b/linux-user/mips/target_elf.h
-index febf710c7ae..877f8347d70 100644
---- a/linux-user/mips/target_elf.h
-+++ b/linux-user/mips/target_elf.h
+diff --git a/linux-user/sh4/target_elf.h b/linux-user/sh4/target_elf.h
+index d17011bd752..badd0f5371f 100644
+--- a/linux-user/sh4/target_elf.h
++++ b/linux-user/sh4/target_elf.h
 @@ -8,4 +8,6 @@
- #ifndef MIPS_TARGET_ELF_H
- #define MIPS_TARGET_ELF_H
- 
-+#define HAVE_ELF_HWCAP          1
-+
- #endif
-diff --git a/linux-user/mips64/target_elf.h b/linux-user/mips64/target_elf.h
-index 02e6d14840a..c0347e5cb6e 100644
---- a/linux-user/mips64/target_elf.h
-+++ b/linux-user/mips64/target_elf.h
-@@ -8,4 +8,6 @@
- #ifndef MIPS64_TARGET_ELF_H
- #define MIPS64_TARGET_ELF_H
+ #ifndef SH4_TARGET_ELF_H
+ #define SH4_TARGET_ELF_H
  
 +#define HAVE_ELF_HWCAP          1
 +
  #endif
 diff --git a/linux-user/elfload.c b/linux-user/elfload.c
-index 574b37a22c1..dc3f502277a 100644
+index dc3f502277a..7e1c11c39f2 100644
 --- a/linux-user/elfload.c
 +++ b/linux-user/elfload.c
-@@ -834,57 +834,7 @@ static void elf_core_copy_regs(target_elf_gregset_t *regs, const CPUMIPSState *e
+@@ -963,34 +963,7 @@ static inline void elf_core_copy_regs(target_elf_gregset_t *regs,
  #define USE_ELF_CORE_DUMP
  #define ELF_EXEC_PAGESIZE        4096
  
--/* See arch/mips/include/uapi/asm/hwcap.h.  */
 -enum {
--    HWCAP_MIPS_R6           = (1 << 0),
--    HWCAP_MIPS_MSA          = (1 << 1),
--    HWCAP_MIPS_CRC32        = (1 << 2),
--    HWCAP_MIPS_MIPS16       = (1 << 3),
--    HWCAP_MIPS_MDMX         = (1 << 4),
--    HWCAP_MIPS_MIPS3D       = (1 << 5),
--    HWCAP_MIPS_SMARTMIPS    = (1 << 6),
--    HWCAP_MIPS_DSP          = (1 << 7),
--    HWCAP_MIPS_DSP2         = (1 << 8),
--    HWCAP_MIPS_DSP3         = (1 << 9),
--    HWCAP_MIPS_MIPS16E2     = (1 << 10),
--    HWCAP_LOONGSON_MMI      = (1 << 11),
--    HWCAP_LOONGSON_EXT      = (1 << 12),
--    HWCAP_LOONGSON_EXT2     = (1 << 13),
--    HWCAP_LOONGSON_CPUCFG   = (1 << 14),
+-    SH_CPU_HAS_FPU            = 0x0001, /* Hardware FPU support */
+-    SH_CPU_HAS_P2_FLUSH_BUG   = 0x0002, /* Need to flush the cache in P2 area */
+-    SH_CPU_HAS_MMU_PAGE_ASSOC = 0x0004, /* SH3: TLB way selection bit support */
+-    SH_CPU_HAS_DSP            = 0x0008, /* SH-DSP: DSP support */
+-    SH_CPU_HAS_PERF_COUNTER   = 0x0010, /* Hardware performance counters */
+-    SH_CPU_HAS_PTEA           = 0x0020, /* PTEA register */
+-    SH_CPU_HAS_LLSC           = 0x0040, /* movli.l/movco.l */
+-    SH_CPU_HAS_L2_CACHE       = 0x0080, /* Secondary cache / URAM */
+-    SH_CPU_HAS_OP32           = 0x0100, /* 32-bit instruction support */
+-    SH_CPU_HAS_PTEAEX         = 0x0200, /* PTE ASID Extension support */
 -};
 -
 -#define ELF_HWCAP get_elf_hwcap()
 -
--#define GET_FEATURE_INSN(_flag, _hwcap) \
--    do { if (cpu->env.insn_flags & (_flag)) { hwcaps |= _hwcap; } } while (0)
--
--#define GET_FEATURE_REG_SET(_reg, _mask, _hwcap) \
--    do { if (cpu->env._reg & (_mask)) { hwcaps |= _hwcap; } } while (0)
--
--#define GET_FEATURE_REG_EQU(_reg, _start, _length, _val, _hwcap) \
--    do { \
--        if (extract32(cpu->env._reg, (_start), (_length)) == (_val)) { \
--            hwcaps |= _hwcap; \
--        } \
--    } while (0)
--
 -static uint32_t get_elf_hwcap(void)
 -{
--    MIPSCPU *cpu = MIPS_CPU(thread_cpu);
--    uint32_t hwcaps = 0;
+-    SuperHCPU *cpu = SUPERH_CPU(thread_cpu);
+-    uint32_t hwcap = 0;
 -
--    GET_FEATURE_REG_EQU(CP0_Config0, CP0C0_AR, CP0C0_AR_LENGTH,
--                        2, HWCAP_MIPS_R6);
--    GET_FEATURE_REG_SET(CP0_Config3, 1 << CP0C3_MSAP, HWCAP_MIPS_MSA);
--    GET_FEATURE_INSN(ASE_LMMI, HWCAP_LOONGSON_MMI);
--    GET_FEATURE_INSN(ASE_LEXT, HWCAP_LOONGSON_EXT);
+-    hwcap |= SH_CPU_HAS_FPU;
 -
--    return hwcaps;
+-    if (cpu->env.features & SH_FEATURE_SH4A) {
+-        hwcap |= SH_CPU_HAS_LLSC;
+-    }
+-
+-    return hwcap;
 -}
--
--#undef GET_FEATURE_REG_EQU
--#undef GET_FEATURE_REG_SET
--#undef GET_FEATURE_INSN
 +#define ELF_HWCAP get_elf_hwcap(thread_cpu)
  
- #endif /* TARGET_MIPS */
- 
-diff --git a/linux-user/mips/elfload.c b/linux-user/mips/elfload.c
-index 04e3b767401..739f71c21b1 100644
---- a/linux-user/mips/elfload.c
-+++ b/linux-user/mips/elfload.c
-@@ -42,3 +42,53 @@ const char *get_elf_cpu_model(uint32_t eflags)
-     return "24Kf";
  #endif
+ 
+diff --git a/linux-user/sh4/elfload.c b/linux-user/sh4/elfload.c
+index 546034ec07e..99ad4f6334c 100644
+--- a/linux-user/sh4/elfload.c
++++ b/linux-user/sh4/elfload.c
+@@ -9,3 +9,30 @@ const char *get_elf_cpu_model(uint32_t eflags)
+ {
+     return "sh7785";
  }
 +
-+/* See arch/mips/include/uapi/asm/hwcap.h.  */
 +enum {
-+    HWCAP_MIPS_R6           = (1 << 0),
-+    HWCAP_MIPS_MSA          = (1 << 1),
-+    HWCAP_MIPS_CRC32        = (1 << 2),
-+    HWCAP_MIPS_MIPS16       = (1 << 3),
-+    HWCAP_MIPS_MDMX         = (1 << 4),
-+    HWCAP_MIPS_MIPS3D       = (1 << 5),
-+    HWCAP_MIPS_SMARTMIPS    = (1 << 6),
-+    HWCAP_MIPS_DSP          = (1 << 7),
-+    HWCAP_MIPS_DSP2         = (1 << 8),
-+    HWCAP_MIPS_DSP3         = (1 << 9),
-+    HWCAP_MIPS_MIPS16E2     = (1 << 10),
-+    HWCAP_LOONGSON_MMI      = (1 << 11),
-+    HWCAP_LOONGSON_EXT      = (1 << 12),
-+    HWCAP_LOONGSON_EXT2     = (1 << 13),
-+    HWCAP_LOONGSON_CPUCFG   = (1 << 14),
++    SH_CPU_HAS_FPU            = 0x0001, /* Hardware FPU support */
++    SH_CPU_HAS_P2_FLUSH_BUG   = 0x0002, /* Need to flush the cache in P2 area */
++    SH_CPU_HAS_MMU_PAGE_ASSOC = 0x0004, /* SH3: TLB way selection bit support */
++    SH_CPU_HAS_DSP            = 0x0008, /* SH-DSP: DSP support */
++    SH_CPU_HAS_PERF_COUNTER   = 0x0010, /* Hardware performance counters */
++    SH_CPU_HAS_PTEA           = 0x0020, /* PTEA register */
++    SH_CPU_HAS_LLSC           = 0x0040, /* movli.l/movco.l */
++    SH_CPU_HAS_L2_CACHE       = 0x0080, /* Secondary cache / URAM */
++    SH_CPU_HAS_OP32           = 0x0100, /* 32-bit instruction support */
++    SH_CPU_HAS_PTEAEX         = 0x0200, /* PTE ASID Extension support */
 +};
-+
-+#define GET_FEATURE_INSN(_flag, _hwcap) \
-+    do { if (cpu->env.insn_flags & (_flag)) { hwcaps |= _hwcap; } } while (0)
-+
-+#define GET_FEATURE_REG_SET(_reg, _mask, _hwcap) \
-+    do { if (cpu->env._reg & (_mask)) { hwcaps |= _hwcap; } } while (0)
-+
-+#define GET_FEATURE_REG_EQU(_reg, _start, _length, _val, _hwcap) \
-+    do { \
-+        if (extract32(cpu->env._reg, (_start), (_length)) == (_val)) { \
-+            hwcaps |= _hwcap; \
-+        } \
-+    } while (0)
 +
 +abi_ulong get_elf_hwcap(CPUState *cs)
 +{
-+    MIPSCPU *cpu = MIPS_CPU(cs);
-+    abi_ulong hwcaps = 0;
++    SuperHCPU *cpu = SUPERH_CPU(cs);
++    abi_ulong hwcap = 0;
 +
-+    GET_FEATURE_REG_EQU(CP0_Config0, CP0C0_AR, CP0C0_AR_LENGTH,
-+                        2, HWCAP_MIPS_R6);
-+    GET_FEATURE_REG_SET(CP0_Config3, 1 << CP0C3_MSAP, HWCAP_MIPS_MSA);
-+    GET_FEATURE_INSN(ASE_LMMI, HWCAP_LOONGSON_MMI);
-+    GET_FEATURE_INSN(ASE_LEXT, HWCAP_LOONGSON_EXT);
++    hwcap |= SH_CPU_HAS_FPU;
 +
-+    return hwcaps;
++    if (cpu->env.features & SH_FEATURE_SH4A) {
++        hwcap |= SH_CPU_HAS_LLSC;
++    }
++
++    return hwcap;
 +}
-+
-+#undef GET_FEATURE_REG_EQU
-+#undef GET_FEATURE_REG_SET
-+#undef GET_FEATURE_INSN
 -- 
 2.47.2
 
