@@ -1,74 +1,74 @@
-Return-Path: <kvm+bounces-56738-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-56734-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2377DB430EE
-	for <lists+kvm@lfdr.de>; Thu,  4 Sep 2025 06:12:35 +0200 (CEST)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
+	by mail.lfdr.de (Postfix) with ESMTPS id 91146B430E7
+	for <lists+kvm@lfdr.de>; Thu,  4 Sep 2025 06:11:31 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D2E6B5E0C86
-	for <lists+kvm@lfdr.de>; Thu,  4 Sep 2025 04:12:33 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 370314E26F3
+	for <lists+kvm@lfdr.de>; Thu,  4 Sep 2025 04:11:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 48E4827A11A;
-	Thu,  4 Sep 2025 04:08:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4319E26A0DB;
+	Thu,  4 Sep 2025 04:08:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="CyI8JK9u"
+	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="aSDBu0gQ"
 X-Original-To: kvm@vger.kernel.org
-Received: from NAM11-CO1-obe.outbound.protection.outlook.com (mail-co1nam11on2085.outbound.protection.outlook.com [40.107.220.85])
+Received: from NAM11-DM6-obe.outbound.protection.outlook.com (mail-dm6nam11on2044.outbound.protection.outlook.com [40.107.223.44])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 26AAC270ED9;
-	Thu,  4 Sep 2025 04:08:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.220.85
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9210125A65B;
+	Thu,  4 Sep 2025 04:08:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.223.44
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756958933; cv=fail; b=LvDj4fApgsYUT0InqeRf/e1HTlmbixZevA5g2Yy0o8NTUBt661aR9vtQSonGRkNu/Vg4eXocMba9gasQzTkT2QYYjmla9mF4DgXX2lSznwTaeKhZd0zE2/2wHZv8hky7FKVjJe1D3JySgO198rII903/lVu7uAvyXmYFljdevko=
+	t=1756958929; cv=fail; b=BlZkNQy2GZoDqL5p1Azmj7z8Cxr2VMFl5OBgNRwNn8SJ9zQ4PTG4x6YqI0PzZMssBmwEyYhtf85CLU7HipB7zjwvgSW3Q/UmmqQtRjkIUdiEOz0mLXx+Hiv+ub/07ojVBh+tuW2Vqo39fDCmu9+PsIozRjy5AXN3d2ZdaK+2UCI=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756958933; c=relaxed/simple;
-	bh=RMWczn1FNhW+1XGc2lfPXuslvoZbcc6h22zsEt8Frjk=;
+	s=arc-20240116; t=1756958929; c=relaxed/simple;
+	bh=zOAXaHa/xO5N9QYTZEPrDXfQ9I6bNF/usDo6ghY65qo=;
 	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=cpvA+lI6jscKq1hOQTbAtbOoyhCEdOGge8/hUZuU86GQw5Rp7Rnvcg5si6NLBKamzlxmYcGy3XVBOSQQexxEwd+uVv4daxV1VtDcamg+l0m/2w1mqsE82DMUENS9riZyD4edBuIxsJR3ItNxtthcKQGIQQtmHyCdwflzNKjBdWA=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=CyI8JK9u; arc=fail smtp.client-ip=40.107.220.85
+	 MIME-Version:Content-Type; b=j0moJYLVu4AAWkaT25riCcpdLTGifS65U4Eyjk3miYkhMCB/L6PjCqaA6oVBuu+th0Lk+pkY0Ueu/1NBhWEGmTJWBjOy8PFgIPH48jInNm/zRficOQb/Zj/TKoHI4WA9hjeVZXs+wQiV+XQzFj860zeE19HXg1iJEJgfdRfO/zY=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=aSDBu0gQ; arc=fail smtp.client-ip=40.107.223.44
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
 Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=Z1gKk3rxBRihZ/22jKVLDpqHTzMNtv3BAxkAYglHQr6a8sZTK/8FSuTRo+iRFh9kmZIZEdNNExNG7wkyxyg40BVoIuMlkODRluTK3PbM3dqg2CWU0gBcDWnufeO1iDzKdqMvn5iRTX6fr6zVqUspIRhLKZhhfpiRpjDyxw/VDE1T++gJ44TJyC/umxSVGsQMrEl8faykagfYFWUkuVtRvyfZY6GtVvYtnfEEpBO3vsl3rkU44LX2yzC7XGIqcF/f5xcOs94FDyW0MD5OlqNTJG2fCWTjWBVH9lisOibpeKEwNSHSxcZD5+059RVcINP33eMFchqyB74cleuNfERQaA==
+ b=Z9FGyi8yvpcTr5sskl7d9APsLyBvQzW0uy82FZ0ZD9liK6MtxtUE/tH+jb9c495l/7agN4R6CVnJM3thCR9d7o/NBYgJi8Kg9ZEY32uk0QHlN1zMczw+8pS86mNMnGXF89rz/ki8GTdh4kF5Cqaujdhp2xMg8emB5Nq1n6QmqxiF0WDrV++XtQEYAcOx/DkL/j3fbW4g1CjdGcJcDATAkxyE0KJVd6y2gD/PAtquaR8t4lklLqyA7Pk2HnLKJGnL6V62yUL1OiRGrvXewfH8lU+pXgjn4sEDqd4PAP7/uWlq+sXmlUbfcBKf9ArX8EM420hocZK5biHS6d+ft+rkew==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector10001;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=cDVxtfNzHkobm8rKo2QFfNTB6iNwPUmxc7x505yGi/Q=;
- b=GpiEQg4O3klf8hnJswBE+DhQfvW0e7TzJyZJEK4+WoiMYFYE+svMSgqKuHCfLh+uUaMrc+n6y0/sIVp1m8TXiEbS6ZIoGWAC+psBMTiiDE5d1FQZjgAWyOoBRaEYJD92q+B2MNb5/xYVmxxI/zDD4jgDdeTwhBOCpPIlpTC7C075ZAmQ6/IGiOPuocOM58rdOSnhTdRvug7f3IwijfhHX0X5FvkvLV6LynGDLx24M3HzH7TCZ0mdeR1v1UZFmr3p7TcJG56+rEFJx0wruG3rpbk35f6Ee2AnsbxyFsqERuZZ4ntYHPLKgHRDQ2KsV5or7KC79KpokwcYPzmlgPxoow==
+ bh=5LxRM8U49l+wWLu1IBuPy19Urz8r7McS06JfqfyR/lU=;
+ b=TfPe/kiCkgOZyd+QWHrPj+RhTY3wI0sTbymaBCqxPxNNyqRWrvNBxTrOC/xSi/0bOjzQsWln9RMBx+AIqEVusI1MMNH/ZU5NCoQCCDuIsvWyGsTlMt4A8VX2ypuOHfEHZx39YdNOQ08wY3qvrks4SW979b4/U+Lw0X1WWitE/UbDK0Ai9x15qa2XBGM5HfTFEGnLtUkCO6+l2BxQV5sRe3UlCa7xQ1xT18mPetFyyYdCSRG4wOYj2jn1CDHvkDPElJzSq+eo2emJM4PVEWMzaXbr824VHoHx3p0K0mWbpZUFQaVI8W5vDDqZOI0grdv2hu/BRLOBsnnxqGKiybwecA==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 216.228.118.232) smtp.rcpttodomain=vger.kernel.org smtp.mailfrom=nvidia.com;
+ 216.228.118.233) smtp.rcpttodomain=vger.kernel.org smtp.mailfrom=nvidia.com;
  dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
  dkim=none (message not signed); arc=none (0)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
  s=selector2;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=cDVxtfNzHkobm8rKo2QFfNTB6iNwPUmxc7x505yGi/Q=;
- b=CyI8JK9utZ9HpvPpMzEWMV25DwCZgAtLaI6nvLPcRyqVLwsgQPhS1tUH2CbMxH/gmZ6ORy0vpNhOZ/46OoV+DvDwDq6VePAHHHlQ6njuvkAXN3Jl2Ufu9QpruNstg/uz/MnqXGAS4hY+DQjn65hjsW50Yu3uCf4mQGCidFYDAxTdjOO1TiDZlleUSCwNPxkr+cQQNflXx9vVtDgPdpaLetVyzGnucS9wM/35G7GBm/vR/v9NP5MibBOalXlqaZhuR5k+VV3gt7MvQSCBZ9P+L/pseTb2frhX3EwnKziJR2dnn2eBwzeEwwkIBpkqkKwQ87GGZ3ShE+b5CiJhR1Gn9w==
-Received: from SA9PR13CA0124.namprd13.prod.outlook.com (2603:10b6:806:27::9)
- by BL1PR12MB5993.namprd12.prod.outlook.com (2603:10b6:208:399::9) with
+ bh=5LxRM8U49l+wWLu1IBuPy19Urz8r7McS06JfqfyR/lU=;
+ b=aSDBu0gQ7mEdy2DQMNb7ogRWn0/YEuOuiV0V3Y7HrXpBg4mzSv5WHH5efhkcG8KZaJr/oGQq1zwNvT8yYdRbETOR6gSVoUY2ue+E6R44lhJ8HKl8CplBnnnGpcaHc3nsVZPs04jTwx4fVNdmmfKgSTiaa9t3lWX3QzasnwGnirlmD0RedDsvwiixYyxt4/VIpbpvQBxqIagQHuHKrigrFrUAvoGFPqo+TghGMXc6AGu0HqgU+tmi4dqcwTbEpfeg4iAk18BDELt6JmmYlu7HTQOkbbiFsSGO+bHaY1rLatz/eimWHr7YEbf+PpptKiib0gNvUTwU8QsQ8bkWYSYmNw==
+Received: from BYAPR03CA0016.namprd03.prod.outlook.com (2603:10b6:a02:a8::29)
+ by MN2PR12MB4317.namprd12.prod.outlook.com (2603:10b6:208:1d0::16) with
  Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9094.16; Thu, 4 Sep
- 2025 04:08:44 +0000
-Received: from SN1PEPF0002529D.namprd05.prod.outlook.com
- (2603:10b6:806:27:cafe::7f) by SA9PR13CA0124.outlook.office365.com
- (2603:10b6:806:27::9) with Microsoft SMTP Server (version=TLS1_3,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9094.17; Thu, 4 Sep
+ 2025 04:08:43 +0000
+Received: from SJ5PEPF000001D5.namprd05.prod.outlook.com
+ (2603:10b6:a02:a8:cafe::21) by BYAPR03CA0016.outlook.office365.com
+ (2603:10b6:a02:a8::29) with Microsoft SMTP Server (version=TLS1_3,
  cipher=TLS_AES_256_GCM_SHA384) id 15.20.9094.16 via Frontend Transport; Thu,
- 4 Sep 2025 04:08:41 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.118.232)
+ 4 Sep 2025 04:08:43 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.118.233)
  smtp.mailfrom=nvidia.com; dkim=none (message not signed)
  header.d=none;dmarc=pass action=none header.from=nvidia.com;
 Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
- 216.228.118.232 as permitted sender) receiver=protection.outlook.com;
- client-ip=216.228.118.232; helo=mail.nvidia.com; pr=C
-Received: from mail.nvidia.com (216.228.118.232) by
- SN1PEPF0002529D.mail.protection.outlook.com (10.167.242.4) with Microsoft
+ 216.228.118.233 as permitted sender) receiver=protection.outlook.com;
+ client-ip=216.228.118.233; helo=mail.nvidia.com; pr=C
+Received: from mail.nvidia.com (216.228.118.233) by
+ SJ5PEPF000001D5.mail.protection.outlook.com (10.167.242.57) with Microsoft
  SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.9094.14 via Frontend Transport; Thu, 4 Sep 2025 04:08:44 +0000
+ 15.20.9094.14 via Frontend Transport; Thu, 4 Sep 2025 04:08:43 +0000
 Received: from drhqmail202.nvidia.com (10.126.190.181) by mail.nvidia.com
- (10.127.129.5) with Microsoft SMTP Server (version=TLS1_2,
+ (10.127.129.6) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.14; Wed, 3 Sep
  2025 21:08:34 -0700
 Received: from drhqmail202.nvidia.com (10.126.190.181) by
@@ -88,9 +88,9 @@ CC: <aniketa@nvidia.com>, <cjia@nvidia.com>, <kwankhede@nvidia.com>,
 	<apopple@nvidia.com>, <jhubbard@nvidia.com>, <danw@nvidia.com>,
 	<anuaggarwal@nvidia.com>, <mochs@nvidia.com>, <kjaju@nvidia.com>,
 	<dnigam@nvidia.com>, <kvm@vger.kernel.org>, <linux-kernel@vger.kernel.org>
-Subject: [RFC 13/14] vfio/nvgrace-egm: expose the egm size through sysfs
-Date: Thu, 4 Sep 2025 04:08:27 +0000
-Message-ID: <20250904040828.319452-14-ankita@nvidia.com>
+Subject: [RFC 14/14] vfio/nvgrace-gpu: Add link from pci to EGM
+Date: Thu, 4 Sep 2025 04:08:28 +0000
+Message-ID: <20250904040828.319452-15-ankita@nvidia.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20250904040828.319452-1-ankita@nvidia.com>
 References: <20250904040828.319452-1-ankita@nvidia.com>
@@ -105,120 +105,155 @@ Content-Type: text/plain
 X-NV-OnPremToCloud: ExternallySecured
 X-EOPAttributedMessage: 0
 X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: SN1PEPF0002529D:EE_|BL1PR12MB5993:EE_
-X-MS-Office365-Filtering-Correlation-Id: 08f378de-9d51-4c51-7dcf-08ddeb68bd84
+X-MS-TrafficTypeDiagnostic: SJ5PEPF000001D5:EE_|MN2PR12MB4317:EE_
+X-MS-Office365-Filtering-Correlation-Id: cae901b3-d08c-4ea1-f7e5-08ddeb68bd00
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|36860700013|82310400026|1800799024|376014;
+	BCL:0;ARA:13230040|376014|1800799024|36860700013|82310400026;
 X-Microsoft-Antispam-Message-Info:
-	=?us-ascii?Q?oQ80znGw+L7IqJyrzaW35bVFahTmCEt7MDQq6m/LxcFVUxKL5DMEpcsqubvv?=
- =?us-ascii?Q?edPKcZLv4LIr7/7uPA6jSLuiCw/KHv7QVAXAU4MhizxekaT9gTPysgqGY5R1?=
- =?us-ascii?Q?+sj//5ydIsoapUFg1Ev8Xoqi55lHPe3JQhUh4ICmPOBvdAWoBbw9BIp2lBJN?=
- =?us-ascii?Q?Cf/UguQlm/OaboWaoZ9h5nwmPhtQG9Lm2MmspHYfjAlBXAdJEezWWCOVfXC/?=
- =?us-ascii?Q?Wh4CEToB80Mo4uHE+rlsBsXFMRwlutVrBfM7BgI2IVVs9XTuCRoOMGZxRn15?=
- =?us-ascii?Q?YaITtIPocIviNM13qf9BKLi/Q6HguuHNEDrnv7qt1won4LNITdboiRme3JXw?=
- =?us-ascii?Q?URtusZ5l9/RL4IwWmmMbTI6mlCpqBhHEEaMwtBLVendzQ/IGwmCvS9KvwPaR?=
- =?us-ascii?Q?6BRrnVk0avoeEUoGIq/nEFx3/zYAdOOx1A2qY4FTqH7iP6tE+J1dug/2Pp8q?=
- =?us-ascii?Q?7yL0ftLG9x7lYrbwRy1MmMKFbjWTTrgrWiRb14WNKhwXlcozwLLyW0dC8Sog?=
- =?us-ascii?Q?DnR4tCj0bo5YEAme95uAyUtoKBHcpeX6+sh/R6VD7P7K4yGE+X8d1YHB35Kq?=
- =?us-ascii?Q?6xJ/Ox2Znlf/aVFuQmAwqVlrgEGhdmbAkzqtepczqWturw2aPCIgRHlMyB8d?=
- =?us-ascii?Q?0wT0CBka1UZbMBJol/wwfVBTTbO4lAshvlc23MPqiZnxngx3RIViWa2zXxO9?=
- =?us-ascii?Q?HdQWE1fUp5LbSDb/vo4fumxSo6iynVByAMNpueUaLCYHswLNaqtHD/KldLV3?=
- =?us-ascii?Q?JD819INL8ez9GFG1Ducj+lXM9rV1W8cvGW35LZy/ru98JddErcSLv0ls7VDo?=
- =?us-ascii?Q?y1Dng4F+8f6WkhT174lZIMf9vUkhToVAfxhtBzX095UB4uipQA6fvNUDIIOv?=
- =?us-ascii?Q?qTePFlyzOuAMwMM/v5QvXqqJXMOQSAVCHoi55lcdiohyfzJWLQnJ/AmI1XmE?=
- =?us-ascii?Q?GY0V2ear/kIu9kzuPV+hVFGdpntf4r2r9UQQ44dWvt07a78fsXHIPXtKG3C+?=
- =?us-ascii?Q?1cnRSAeTpCS5v/WpF9IRiXiiqE4bTX+XJhRhYBGh5rKsuc5kRmHCUnZRaai4?=
- =?us-ascii?Q?+WAKvzyk8v5sijphQq7OEtZwSvhAJQ8O+1p6T8OFf0avapeFnZLp0L2U8t0y?=
- =?us-ascii?Q?eNDxJ2o9V+6CWyFmMZZU8XmRhzmRDyF2KLZNxxn3fQc/66hKAWGzDQvO4LWQ?=
- =?us-ascii?Q?Bsw/QNOZRkG708VSGErviv2J56IJ1ChObFfPTWHRfXs3YsUxP6XP2G7E9zlp?=
- =?us-ascii?Q?4oMl4jPtaYqAtbF7oRsR6tF9ZdIhoMa87j/7BtVrTrcdqA26PfP8aR2rM+wf?=
- =?us-ascii?Q?qqRs6m3T1eHcuFRO/236KFDOJkMhC2Qxr3YulbFjDTOGXp9afLfEsktWXN9p?=
- =?us-ascii?Q?JaFjAmWaIQlTO8Y/G70OglERsQk5+zg4OtIoKWw1Pf7ha8hets9UUPxbrjfR?=
- =?us-ascii?Q?ICSAqoKh8XHbkIxNKnp1y6L9hjExRncJ63kWvQdmGYfvsi640X8ezaG38PiT?=
- =?us-ascii?Q?aF2RB+2C9A9U+FX/EIRGlukNa8/6EHnb89UC?=
+	=?us-ascii?Q?nXwEnFs+canT1IebrASUB7SsjBDSVkXTPR2Mrw4i/zZTn8VcL9LLOfo2TKJq?=
+ =?us-ascii?Q?nWvd11zPr/9u0JNahIsWeMcipOR889rvJN3F5JkuEwVL37yiz9lZdudH3Paq?=
+ =?us-ascii?Q?uXo7prTzxZb39w9uy/hUH3BylChcOTxLFaHnb58sii9ctvyweSZMzUHpACEe?=
+ =?us-ascii?Q?J6Li0bxOyr9rnrmdmxVR9Xqp1LKl9fTRa9zpnGewp0YM9vxBZ8z/jtapuioL?=
+ =?us-ascii?Q?qrPUIEM2snt4JAmnNg6Kn4wQBw6109FEOq09WaDikn6blgMCt/Lsf0YsPr7m?=
+ =?us-ascii?Q?j5/J2YiJkpGXHXy3fF3JGRGbGbi1DwDjaaXhT53FUx2e822ozFsrcHiM7+zt?=
+ =?us-ascii?Q?saHTP7OSCt2sXB3rB4d06kMlFDCOQ2pMMrQyDZKSg8VbwM/qqRcKe3vwAyjN?=
+ =?us-ascii?Q?v646xnmCExxmeaCgns0JSlrsNYt0gwhaHnCPHKxwH1Ya0PoydP6cyoowTrio?=
+ =?us-ascii?Q?eausFMrxHyJbIVMNOmh+/OHEvAKtquUbOMSlf8IeoVs9YAP/OPon25v2oRMz?=
+ =?us-ascii?Q?94bQO9gPHlGbKLmMxaZ6ruS4537q5EL1KEUfIEu5wGqqZOTsQIB2xqourrLl?=
+ =?us-ascii?Q?AHCbYL5335SVScwBt2jcgnizIk6VQgBErrE5LGKCYlAnVFSvPffF5NP3e1/D?=
+ =?us-ascii?Q?374nBS6zXHbvpExj1OWVTzQgZ+sxPC3ZR/ux0z7CY1bS3nWEXq912K0nzC/X?=
+ =?us-ascii?Q?8ci0N0VeW4p6CQtJXcfv1zuoWYGjRNK8PJg0WrTi9am+Lbv6LrSDMtb96ruv?=
+ =?us-ascii?Q?e9UIjg0MVEGpQQvEZm1u26Wu4FfouNNX8abrpthc6OwHkg/Ss2I+YrXhqJl1?=
+ =?us-ascii?Q?+VeqWkt/NvYTarUM5SpLDyLgPIHObQcr+5bs1mE853wLpO9Yrk3Wzr6xPw75?=
+ =?us-ascii?Q?Ubf9kDT2fYnFtQlw31mmbC3tkCWGjNU8LWWVC0HKjJMG4xBSPzhAS/Rbxhrm?=
+ =?us-ascii?Q?daD9Yq0QUzV6sFEoUp+UJlb/eKHcOAM4DCxGX8R0kjy4T3r0Gl7tb/WqlE57?=
+ =?us-ascii?Q?sdc21p5hbzJv1BK/MgKumugb8/7jwk1fXYDBmfehb+X0A2H9Yf9dGQOxikXc?=
+ =?us-ascii?Q?w86EJjRyNTt9vmyyydZ82eSC7N1/iHi26e7+egjhX2TCy/CAmnqrGeVf2k8u?=
+ =?us-ascii?Q?rYuRNbDf/5rPRIbhj+qkM4l36OIvJ+c5m7S+I8XEyF909sdhKy041WQm2TXa?=
+ =?us-ascii?Q?yijPcNeEWZdOK7V+M3M7d9ljELbSG4RayNSkPZYoNKHpkbYG9kSUdA9NaKdp?=
+ =?us-ascii?Q?aMne6Zp0H1iZ8N40nHOgpLmHPGYwv22ou1ld11SKVeRyPsysanbfKt5vnF6u?=
+ =?us-ascii?Q?17ZBE6SNVOB722aWE1Bbf1OGS49tH2jKb1hr0SR0r0Ly/AMFMpggXJmFnM7p?=
+ =?us-ascii?Q?IFMGMLtIUWjyqa4uvUyGXp6X8eqIi04j8AxYphk9eqCAWNMDmt9UyPo7Gau0?=
+ =?us-ascii?Q?RnyPCQ6iVEuvHIbKQ7Z5O9R301ydMVRM68v69LQMncDeyjd1uo0Dikmh3aVH?=
+ =?us-ascii?Q?BFVn2373afAE4+W5aA8qkI7eoOQboIcusNEo?=
 X-Forefront-Antispam-Report:
-	CIP:216.228.118.232;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc7edge1.nvidia.com;CAT:NONE;SFS:(13230040)(36860700013)(82310400026)(1800799024)(376014);DIR:OUT;SFP:1101;
+	CIP:216.228.118.233;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc7edge2.nvidia.com;CAT:NONE;SFS:(13230040)(376014)(1800799024)(36860700013)(82310400026);DIR:OUT;SFP:1101;
 X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 04 Sep 2025 04:08:44.3780
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 04 Sep 2025 04:08:43.6267
  (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 08f378de-9d51-4c51-7dcf-08ddeb68bd84
+X-MS-Exchange-CrossTenant-Network-Message-Id: cae901b3-d08c-4ea1-f7e5-08ddeb68bd00
 X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.118.232];Helo=[mail.nvidia.com]
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.118.233];Helo=[mail.nvidia.com]
 X-MS-Exchange-CrossTenant-AuthSource:
-	SN1PEPF0002529D.namprd05.prod.outlook.com
+	SJ5PEPF000001D5.namprd05.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Anonymous
 X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: BL1PR12MB5993
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: MN2PR12MB4317
 
 From: Ankit Agrawal <ankita@nvidia.com>
 
-To allocate the EGM, the userspace need to know its size. Currently,
-there is no easy way for the userspace to determine that.
+To replicate the host EGM topology in the VM in terms of
+the GPU affinity, the userspace need to be aware of which
+GPUs belong to the same socket as the EGM region.
 
-Make nvgrace-egm expose the size through sysfs that can be queried
-by the userspace from <aux_dev_path>/egm_size.
+Expose the list of GPUs associated with an EGM region
+through sysfs. The list can be queried from the auxiliary
+device path.
 
-On a 2-socket, 4 GPU Grace Blackwell setup, it shows up as:
-Socket0:
-/sys/devices/pci0008:00/0008:00:00.0/0008:01:00.0/nvgrace_gpu_vfio_pci.egm.4/egm/egm4/egm_size
-/sys/devices/pci0009:00/0009:00:00.0/0009:01:00.0/nvgrace_gpu_vfio_pci.egm.4/egm/egm4/egm_size
+On a 2-socket, 4 GPU Grace Blackwell setup, it shows up as the following:
+/sys/devices/pci0008:00/0008:00:00.0/0008:01:00.0/nvgrace_gpu_vfio_pci.egm.4
+/sys/devices/pci0009:00/0009:00:00.0/0009:01:00.0/nvgrace_gpu_vfio_pci.egm.4
+pointing to egm4.
 
-Socket1:
-/sys/devices/pci0018:00/0018:00:00.0/0018:01:00.0/nvgrace_gpu_vfio_pci.egm.5/egm/egm5/egm_size
-/sys/devices/pci0019:00/0019:00:00.0/0019:01:00.0/nvgrace_gpu_vfio_pci.egm.5/egm/egm5/egm_size
+/sys/devices/pci0018:00/0018:00:00.0/0018:01:00.0/nvgrace_gpu_vfio_pci.egm.5
+/sys/devices/pci0019:00/0019:00:00.0/0019:01:00.0/nvgrace_gpu_vfio_pci.egm.5
+pointing to egm5.
 
+Moreover
+/sys/devices/pci0008:00/0008:00:00.0/0008:01:00.0/nvgrace_gpu_vfio_pci.egm.4
+/sys/devices/pci0009:00/0009:00:00.0/0009:01:00.0/nvgrace_gpu_vfio_pci.egm.4
+lists links to both the 0008:01:00.0 & 0009:01:00.0 GPU devices.
+
+and
+/sys/devices/pci0018:00/0018:00:00.0/0018:01:00.0/nvgrace_gpu_vfio_pci.egm.5
+/sys/devices/pci0019:00/0019:00:00.0/0019:01:00.0/nvgrace_gpu_vfio_pci.egm.5
+lists links to both the 0018:01:00.0 & 0019:01:00.0.
+
+Suggested-by: Matthew R. Ochs <mochs@nvidia.com>
 Signed-off-by: Ankit Agrawal <ankita@nvidia.com>
 ---
- drivers/vfio/pci/nvgrace-gpu/egm.c | 27 +++++++++++++++++++++++++++
- 1 file changed, 27 insertions(+)
+ drivers/vfio/pci/nvgrace-gpu/egm_dev.c | 42 +++++++++++++++++++++++++-
+ 1 file changed, 41 insertions(+), 1 deletion(-)
 
-diff --git a/drivers/vfio/pci/nvgrace-gpu/egm.c b/drivers/vfio/pci/nvgrace-gpu/egm.c
-index 2cb100e39c4b..346607eeb0f9 100644
---- a/drivers/vfio/pci/nvgrace-gpu/egm.c
-+++ b/drivers/vfio/pci/nvgrace-gpu/egm.c
-@@ -343,6 +343,32 @@ static char *egm_devnode(const struct device *device, umode_t *mode)
- 	return NULL;
+diff --git a/drivers/vfio/pci/nvgrace-gpu/egm_dev.c b/drivers/vfio/pci/nvgrace-gpu/egm_dev.c
+index b8e143542bce..20e9213aa0ac 100644
+--- a/drivers/vfio/pci/nvgrace-gpu/egm_dev.c
++++ b/drivers/vfio/pci/nvgrace-gpu/egm_dev.c
+@@ -56,6 +56,36 @@ int nvgrace_gpu_fetch_egm_property(struct pci_dev *pdev, u64 *pegmphys,
+ 	return ret;
  }
  
-+static ssize_t egm_size_show(struct device *dev, struct device_attribute *attr,
-+			     char *buf)
++static int create_egm_symlinks(struct nvgrace_egm_dev *egm_dev,
++			       struct pci_dev *pdev)
 +{
-+	struct chardev *egm_chardev = container_of(dev, struct chardev, device);
-+	struct nvgrace_egm_dev *egm_dev =
-+		egm_chardev_to_nvgrace_egm_dev(egm_chardev);
++	int ret_l1, ret_l2;
 +
-+	return sysfs_emit(buf, "0x%lx\n", egm_dev->egmlength);
++	ret_l1 = sysfs_create_link_nowarn(&pdev->dev.kobj,
++					  &egm_dev->aux_dev.dev.kobj,
++					  dev_name(&egm_dev->aux_dev.dev));
++
++	/*
++	 * Allow if Link already exists - created since GPU is the auxiliary
++	 * device's parent; flag the error otherwise.
++	 */
++	if (ret_l1 && ret_l1 != -EEXIST)
++		return ret_l1;
++
++	ret_l2 = sysfs_create_link(&egm_dev->aux_dev.dev.kobj,
++				   &pdev->dev.kobj,
++				   dev_name(&pdev->dev));
++
++	/*
++	 * Remove the aux dev link only if wasn't already present.
++	 */
++	if (ret_l2 && !ret_l1)
++		sysfs_remove_link(&pdev->dev.kobj,
++				  dev_name(&egm_dev->aux_dev.dev));
++
++	return ret_l2;
 +}
 +
-+static DEVICE_ATTR_RO(egm_size);
-+
-+static struct attribute *attrs[] = {
-+	&dev_attr_egm_size.attr,
-+	NULL,
-+};
-+
-+static struct attribute_group attr_group = {
-+	.attrs = attrs,
-+};
-+
-+static const struct attribute_group *attr_groups[2] = {
-+	&attr_group,
-+	NULL
-+};
-+
- static int __init nvgrace_egm_init(void)
+ int add_gpu(struct nvgrace_egm_dev *egm_dev, struct pci_dev *pdev)
  {
- 	int ret;
-@@ -364,6 +390,7 @@ static int __init nvgrace_egm_init(void)
- 	}
+ 	struct gpu_node *node;
+@@ -68,7 +98,16 @@ int add_gpu(struct nvgrace_egm_dev *egm_dev, struct pci_dev *pdev)
  
- 	class->devnode = egm_devnode;
-+	class->dev_groups = attr_groups;
+ 	list_add_tail(&node->list, &egm_dev->gpus);
  
- 	ret = auxiliary_driver_register(&egm_driver);
- 	if (!ret)
+-	return 0;
++	return create_egm_symlinks(egm_dev, pdev);
++}
++
++static void remove_egm_symlinks(struct nvgrace_egm_dev *egm_dev,
++				struct pci_dev *pdev)
++{
++	sysfs_remove_link(&pdev->dev.kobj,
++			  dev_name(&egm_dev->aux_dev.dev));
++	sysfs_remove_link(&egm_dev->aux_dev.dev.kobj,
++			  dev_name(&pdev->dev));
+ }
+ 
+ void remove_gpu(struct nvgrace_egm_dev *egm_dev, struct pci_dev *pdev)
+@@ -77,6 +116,7 @@ void remove_gpu(struct nvgrace_egm_dev *egm_dev, struct pci_dev *pdev)
+ 
+ 	list_for_each_entry_safe(node, tmp, &egm_dev->gpus, list) {
+ 		if (node->pdev == pdev) {
++			remove_egm_symlinks(egm_dev, pdev);
+ 			list_del(&node->list);
+ 			kvfree(node);
+ 		}
 -- 
 2.34.1
 
