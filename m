@@ -1,161 +1,176 @@
-Return-Path: <kvm+bounces-56744-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-56745-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id B8120B43273
-	for <lists+kvm@lfdr.de>; Thu,  4 Sep 2025 08:34:53 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5E09CB432E9
+	for <lists+kvm@lfdr.de>; Thu,  4 Sep 2025 08:55:09 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8710A56460C
-	for <lists+kvm@lfdr.de>; Thu,  4 Sep 2025 06:34:53 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1D91C582DEF
+	for <lists+kvm@lfdr.de>; Thu,  4 Sep 2025 06:55:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CCD5C276020;
-	Thu,  4 Sep 2025 06:34:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D67B0286419;
+	Thu,  4 Sep 2025 06:55:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="TaKJafZS"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail.loongson.cn (mail.loongson.cn [114.242.206.163])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0D733253B5C;
-	Thu,  4 Sep 2025 06:34:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=114.242.206.163
+Received: from mail-pf1-f202.google.com (mail-pf1-f202.google.com [209.85.210.202])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 94EFF22D4F9
+	for <kvm@vger.kernel.org>; Thu,  4 Sep 2025 06:54:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756967686; cv=none; b=XYOmJJ93Oj+fk2twOhRUdlU898CzJBg7NCqnH90oPT4cTi0IymmYOJbsVM9Hr0Lf28/y89ClT4nzWOaJVh+e90Yp9Xa/HExINFUKA/5yEVMwWF2uYhvjVKRAqYtu/ttagfdEkP62rsDWTb8dDva307BRESWh29u0K1GLMreEl5Q=
+	t=1756968901; cv=none; b=CHcyM4ZWCgoUZJQgBj7qaV+tSsMGprt+z4XRwep1GyR0M/GQJauan2zRhEVcngWfDKEwgcyRik30RTDFQNPjdPdw/4WPNf/zxNQNkMJgLJdzf86jjp+AV1KXuayFw+acPtnqsE4B1gxNUbxsMc5M7qfG6s0Tjvkc75njWAI0T1Q=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756967686; c=relaxed/simple;
-	bh=YSV9ojTwVUCmOZLAW1nmzCEEdATne0F6waPXQ/CsoRg=;
-	h=Subject:To:Cc:References:From:Message-ID:Date:MIME-Version:
-	 In-Reply-To:Content-Type; b=ijazrTj+/o2ZADlywGgFuSeNsPTiZe6g/T91W6mwHItU6xS6vIFWLrJDt0czqSHADbbD+LJqmpsYdGaMGkXXmFFlHh5wlc+3lGhWLQxYApDju/jqPeRGU581+90IfJ48oQ+QMevpw9m7IjGqKXjigaaGEqprdBJVHmJusFsU7fs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=loongson.cn; spf=pass smtp.mailfrom=loongson.cn; arc=none smtp.client-ip=114.242.206.163
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=loongson.cn
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=loongson.cn
-Received: from loongson.cn (unknown [113.200.148.30])
-	by gateway (Coremail) with SMTP id _____8AxP_D9MrlofYsGAA--.13749S3;
-	Thu, 04 Sep 2025 14:34:37 +0800 (CST)
-Received: from [10.130.10.66] (unknown [113.200.148.30])
-	by front1 (Coremail) with SMTP id qMiowJAxE+T2Mrlo7lF9AA--.3223S3;
-	Thu, 04 Sep 2025 14:34:31 +0800 (CST)
-Subject: Re: [PATCH] LoongArch: KVM: remove unused returns.
-To: cuitao <cuitao@kylinos.cn>, zhaotianrui@loongson.cn, maobibo@loongson.cn,
- chenhuacai@kernel.org, loongarch@lists.linux.dev
-Cc: kernel@xen0n.name, kvm@vger.kernel.org, linux-kernel@vger.kernel.org
-References: <20250904042622.1291085-1-cuitao@kylinos.cn>
-From: Tiezhu Yang <yangtiezhu@loongson.cn>
-Message-ID: <462e346b-424d-263d-19a8-766d578d9781@loongson.cn>
-Date: Thu, 4 Sep 2025 14:34:30 +0800
-User-Agent: Mozilla/5.0 (X11; Linux loongarch64; rv:68.0) Gecko/20100101
- Thunderbird/68.7.0
+	s=arc-20240116; t=1756968901; c=relaxed/simple;
+	bh=/ZjwF0eb57MFfQ0u1/6Mn1Dzepvq+jsfOb0OYfST3cs=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=bS3B20PzcukHASY8871s3XVZkxHuprNuPuj0b9In0w8XwLb/auWtBI++WL0eTTgjlDTDOi+HQdnY5M3EcaN9UdDbIJ2t6OHTLqKroVnO7aYu2WZF2eV9zXEYfYW6nCrq3Ycm3DYQJmLzXK2yCf8S3dO0HG4HLX7eGXWzxp6ny9s=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--sagis.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=TaKJafZS; arc=none smtp.client-ip=209.85.210.202
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--sagis.bounces.google.com
+Received: by mail-pf1-f202.google.com with SMTP id d2e1a72fcca58-77243618babso767532b3a.0
+        for <kvm@vger.kernel.org>; Wed, 03 Sep 2025 23:54:59 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1756968899; x=1757573699; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=FHGYOIhg/J+dMYpL69zSQ+33zwU0B0JWFC+OU+r7YsU=;
+        b=TaKJafZSVadJ3pcOzPQB2JFY78l9hjvUvAAL3oVBZVLrK79yYPFd9X6jq2pn+lEI/C
+         ETZ52AR6X9lOyM0VtrTHT64VJHkczzjKj3A4TlRV4kcHvhdPNWhi+fNR6AHfK53ETrHb
+         sFBB9DsqnxuFK/Uk3BY/2VwNXMRqgME7exNefMlHg0RVYiZjTm7mt05tXXAyDmwrbRBi
+         T0Mz3wLOv/NfMTMJZWLkAvY/0uN34d+lz1fJ1h+iQdWwyM80aD6lwUMllhEZ+a28vO2p
+         qWT/soHJvDA2v8xGDFn3RaUBIBdCGHgAHUYNOBz/1Ms4FtOtja+YO+1cRI8dOFB3J2tq
+         2HDw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1756968899; x=1757573699;
+        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=FHGYOIhg/J+dMYpL69zSQ+33zwU0B0JWFC+OU+r7YsU=;
+        b=meEIUTjeYirLbJSoM2TGplxSP2rPUT3i/R6oVgGZYi7I1L/BrX3YvUjyuwgwsWn1R8
+         YzhxAWh+0OuTHri8NnkI+FzBjr0rh7EY3Ho8soSnQX5jBVzY+YZNKFZ5lMWr6KRG5ejh
+         CQZRM8Jah1JV2RlfaT+fz0/6L/TjIL1dMwj52MGowpBkE0EvQjtprFzkLryfM78skclS
+         MllIrfj9cLtT+V4Nhyy26JWdCoaVf1W7//aweNM4tdoADrfX+yuryWdIx9WmA/Rl0mTL
+         EYEtiVS9oVaGQac2bsI1Dst+dNakdKbga5KUxnibzRT6D56mk14CEx5isl1FHCZVb/qL
+         Q92g==
+X-Forwarded-Encrypted: i=1; AJvYcCUHtawd1TGPX75QzYegptGVxV7s8AQB52YK0YzAk3lntjtWBOXV/wY9LyMIn6J0V1S2Moo=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwLjxD6n2ZxQ/eLzDZg6Zr8NNYcpTE19vHJNPrm/qfkn+CAbZlY
+	VjqRC+V5dNCVMPk/o4cSoyoJXTiCrED7BBAdxY3cMvY/1KukhUZCemOzO8dqSrA+nxYxM5oYIkd
+	Mvg==
+X-Google-Smtp-Source: AGHT+IFvt4tNR/cPbIZfnDTcOZH10snlcQH3uYkOATnvhbTeDy0L0ItUv9BiEg/jI2hz3v5syTYuKkpAOw==
+X-Received: from pfbiv14.prod.google.com ([2002:a05:6a00:66ce:b0:772:493d:275e])
+ (user=sagis job=prod-delivery.src-stubby-dispatcher) by 2002:a05:6a00:230a:b0:76e:885a:c338
+ with SMTP id d2e1a72fcca58-7723e3e5340mr17200087b3a.30.1756968898723; Wed, 03
+ Sep 2025 23:54:58 -0700 (PDT)
+Date: Wed,  3 Sep 2025 23:54:30 -0700
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-In-Reply-To: <20250904042622.1291085-1-cuitao@kylinos.cn>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:qMiowJAxE+T2Mrlo7lF9AA--.3223S3
-X-CM-SenderInfo: p1dqw3xlh2x3gn0dqz5rrqw2lrqou0/
-X-Coremail-Antispam: 1Uk129KBj93XoW7uFW5CrWkWw4DGrykJF4xuFX_yoW8KFyfpr
-	nrArWFkw48Kr93GFZrZ34DWr4UurZ2kr12qFWjyFy8Wr4Dtr4rAr10yr95uF15t3W0vF1I
-	qasYgFnIvF4DJ3XCm3ZEXasCq-sJn29KB7ZKAUJUUUU5529EdanIXcx71UUUUU7KY7ZEXa
-	sCq-sGcSsGvfJ3Ic02F40EFcxC0VAKzVAqx4xG6I80ebIjqfuFe4nvWSU5nxnvy29KBjDU
-	0xBIdaVrnRJUUU9Fb4IE77IF4wAFF20E14v26r1j6r4UM7CY07I20VC2zVCF04k26cxKx2
-	IYs7xG6rWj6s0DM7CIcVAFz4kK6r1Y6r17M28lY4IEw2IIxxk0rwA2F7IY1VAKz4vEj48v
-	e4kI8wA2z4x0Y4vE2Ix0cI8IcVAFwI0_Xr0_Ar1l84ACjcxK6xIIjxv20xvEc7CjxVAFwI
-	0_Gr0_Cr1l84ACjcxK6I8E87Iv67AKxVW0oVCq3wA2z4x0Y4vEx4A2jsIEc7CjxVAFwI0_
-	GcCE3s1le2I262IYc4CY6c8Ij28IcVAaY2xG8wAqjxCEc2xF0cIa020Ex4CE44I27wAqx4
-	xG64xvF2IEw4CE5I8CrVC2j2WlYx0E2Ix0cI8IcVAFwI0_Jrv_JF1lYx0Ex4A2jsIE14v2
-	6r4j6F4UMcvjeVCFs4IE7xkEbVWUJVW8JwACjcxG0xvEwIxGrwCYjI0SjxkI62AI1cAE67
-	vIY487MxAIw28IcxkI7VAKI48JMxC20s026xCaFVCjc4AY6r1j6r4UMxCIbckI1I0E14v2
-	6r1q6r43MI8I3I0E5I8CrVAFwI0_Jr0_Jr4lx2IqxVCjr7xvwVAFwI0_JrI_JrWlx4CE17
-	CEb7AF67AKxVWUtVW8ZwCIc40Y0x0EwIxGrwCI42IY6xIIjxv20xvE14v26r1j6r1xMIIF
-	0xvE2Ix0cI8IcVCY1x0267AKxVWUJVW8JwCI42IY6xAIw20EY4v20xvaj40_Jr0_JF4lIx
-	AIcVC2z280aVAFwI0_Gr0_Cr1lIxAIcVC2z280aVCY1x0267AKxVW8JVW8JrUvcSsGvfC2
-	KfnxnUUI43ZEXa7IU8vApUUUUUU==
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.51.0.338.gd7d06c2dae-goog
+Message-ID: <20250904065453.639610-1-sagis@google.com>
+Subject: [PATCH v10 00/21] TDX KVM selftests
+From: Sagi Shahar <sagis@google.com>
+To: linux-kselftest@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>, 
+	Shuah Khan <shuah@kernel.org>, Sean Christopherson <seanjc@google.com>, 
+	Ackerley Tng <ackerleytng@google.com>, Ryan Afranji <afranji@google.com>, 
+	Andrew Jones <ajones@ventanamicro.com>, Isaku Yamahata <isaku.yamahata@intel.com>, 
+	Erdem Aktas <erdemaktas@google.com>, Rick Edgecombe <rick.p.edgecombe@intel.com>, 
+	Sagi Shahar <sagis@google.com>, Roger Wang <runanwang@google.com>, 
+	Binbin Wu <binbin.wu@linux.intel.com>, Oliver Upton <oliver.upton@linux.dev>, 
+	"Pratik R. Sampat" <pratikrajesh.sampat@amd.com>, Reinette Chatre <reinette.chatre@intel.com>, 
+	Ira Weiny <ira.weiny@intel.com>, Chao Gao <chao.gao@intel.com>, 
+	Chenyi Qiang <chenyi.qiang@intel.com>
+Cc: linux-kernel@vger.kernel.org, kvm@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 
-On 2025/9/4 下午12:26, cuitao wrote:
-> The default branch has already handled all undefined cases,
-> so the final return statement is redundant.
-> 
-> Signed-off-by: cuitao <cuitao@kylinos.cn>
-> ---
->   arch/loongarch/kvm/exit.c | 4 +---
->   1 file changed, 1 insertion(+), 3 deletions(-)
-> 
-> diff --git a/arch/loongarch/kvm/exit.c b/arch/loongarch/kvm/exit.c
-> index 2ce41f93b2a4..e501867740b1 100644
-> --- a/arch/loongarch/kvm/exit.c
-> +++ b/arch/loongarch/kvm/exit.c
-> @@ -778,9 +778,7 @@ static long kvm_save_notify(struct kvm_vcpu *vcpu)
->   		return 0;
->   	default:
->   		return KVM_HCALL_INVALID_CODE;
-> -	};
-> -
-> -	return KVM_HCALL_INVALID_CODE;
-> +	}
->   };
->   
->   /*
+This is v10 of the TDX selftests.
 
-In my opinion, there is only one case, no need to use switch case,
-the ";" at the end can be removed, the code can be like this:
+This series is based on v6.17-rc4 and has a dependency on
+"KVM: TDX: Force split irqchip for TDX at irqchip creation time" [1]
 
-static long kvm_save_notify(struct kvm_vcpu *vcpu)
-{
-         unsigned long id, data;
+Changes from v9 [2]:
+- Rebased on top of v6.17-rc4.
+- Addressed the comments from v9.
+- Removed special handling for split irqchip in the test code in favor
+  for the kvm fix in [1].
+- Removed outdated support for VM memory not backed by guest_memfd.
+- Split "KVM: selftests: Hook TDX support to vm and vcpu creation" into
+  4 separate patches.
 
-         id   = kvm_read_reg(vcpu, LOONGARCH_GPR_A1);
-         data = kvm_read_reg(vcpu, LOONGARCH_GPR_A2);
-         if (id == BIT(KVM_FEATURE_STEAL_TIME)) {
-                 if (data & ~(KVM_STEAL_PHYS_MASK | KVM_STEAL_PHYS_VALID))
-                         return KVM_HCALL_INVALID_PARAMETER;
+[1] https://lore.kernel.org/lkml/20250904062007.622530-1-sagis@google.com/
+[2] https://lore.kernel.org/lkml/20250821042915.3712925-1-sagis@google.com/
 
-                 vcpu->arch.st.guest_addr = data;
-                 if (!(data & KVM_STEAL_PHYS_VALID))
-                         return 0;
+Ackerley Tng (2):
+  KVM: selftests: Add helpers to init TDX memory and finalize VM
+  KVM: selftests: Add ucall support for TDX
 
-                 vcpu->arch.st.last_steal = current->sched_info.run_delay;
-                 kvm_make_request(KVM_REQ_STEAL_UPDATE, vcpu);
-                 return 0;
-         }
+Erdem Aktas (2):
+  KVM: selftests: Add TDX boot code
+  KVM: selftests: Add support for TDX TDCALL from guest
 
-         return KVM_HCALL_INVALID_CODE;
-}
+Isaku Yamahata (2):
+  KVM: selftests: Update kvm_init_vm_address_properties() for TDX
+  KVM: selftests: TDX: Use KVM_TDX_CAPABILITIES to validate TDs'
+    attribute configuration
 
-The following is the diff:
+Sagi Shahar (15):
+  KVM: selftests: Allocate pgd in virt_map() as necessary
+  KVM: selftests: Expose functions to get default sregs values
+  KVM: selftests: Expose function to allocate guest vCPU stack
+  KVM: selftests: Expose segment definitons to assembly files
+  KVM: selftests: Add kbuild definitons
+  KVM: selftests: Define structs to pass parameters to TDX boot code
+  KVM: selftests: Set up TDX boot code region
+  KVM: selftests: Set up TDX boot parameters region
+  KVM: selftests: Add helper to initialize TDX VM
+  KVM: selftests: Call TDX init when creating a new TDX vm
+  KVM: selftests: Setup memory regions for TDX on vm creation
+  KVM: selftests: Call KVM_TDX_INIT_VCPU when creating a new TDX vcpu
+  KVM: selftests: Set entry point for TDX guest code
+  KVM: selftests: Add wrapper for TDX MMIO from guest
+  KVM: selftests: Add TDX lifecycle test
 
-diff --git a/arch/loongarch/kvm/exit.c b/arch/loongarch/kvm/exit.c
-index 2ce41f93b2a4..0c18761539fc 100644
---- a/arch/loongarch/kvm/exit.c
-+++ b/arch/loongarch/kvm/exit.c
-@@ -764,8 +764,7 @@ static long kvm_save_notify(struct kvm_vcpu *vcpu)
+ tools/include/linux/kbuild.h                  |  18 +
+ tools/testing/selftests/kvm/Makefile.kvm      |  32 ++
+ .../selftests/kvm/include/x86/processor.h     |  35 ++
+ .../selftests/kvm/include/x86/processor_asm.h |  12 +
+ .../selftests/kvm/include/x86/tdx/td_boot.h   |  74 ++++
+ .../kvm/include/x86/tdx/td_boot_asm.h         |  16 +
+ .../selftests/kvm/include/x86/tdx/tdcall.h    |  34 ++
+ .../selftests/kvm/include/x86/tdx/tdx.h       |  14 +
+ .../selftests/kvm/include/x86/tdx/tdx_util.h  |  86 +++++
+ .../testing/selftests/kvm/include/x86/ucall.h |   4 +-
+ tools/testing/selftests/kvm/lib/kvm_util.c    |  10 +-
+ .../testing/selftests/kvm/lib/x86/processor.c |  91 +++--
+ .../selftests/kvm/lib/x86/tdx/td_boot.S       |  60 +++
+ .../kvm/lib/x86/tdx/td_boot_offsets.c         |  21 ++
+ .../selftests/kvm/lib/x86/tdx/tdcall.S        |  93 +++++
+ .../kvm/lib/x86/tdx/tdcall_offsets.c          |  16 +
+ tools/testing/selftests/kvm/lib/x86/tdx/tdx.c |  23 ++
+ .../selftests/kvm/lib/x86/tdx/tdx_util.c      | 354 ++++++++++++++++++
+ tools/testing/selftests/kvm/lib/x86/ucall.c   |  45 ++-
+ tools/testing/selftests/kvm/x86/tdx_vm_test.c |  31 ++
+ 20 files changed, 1032 insertions(+), 37 deletions(-)
+ create mode 100644 tools/include/linux/kbuild.h
+ create mode 100644 tools/testing/selftests/kvm/include/x86/processor_asm.h
+ create mode 100644 tools/testing/selftests/kvm/include/x86/tdx/td_boot.h
+ create mode 100644 tools/testing/selftests/kvm/include/x86/tdx/td_boot_asm.h
+ create mode 100644 tools/testing/selftests/kvm/include/x86/tdx/tdcall.h
+ create mode 100644 tools/testing/selftests/kvm/include/x86/tdx/tdx.h
+ create mode 100644 tools/testing/selftests/kvm/include/x86/tdx/tdx_util.h
+ create mode 100644 tools/testing/selftests/kvm/lib/x86/tdx/td_boot.S
+ create mode 100644 tools/testing/selftests/kvm/lib/x86/tdx/td_boot_offsets.c
+ create mode 100644 tools/testing/selftests/kvm/lib/x86/tdx/tdcall.S
+ create mode 100644 tools/testing/selftests/kvm/lib/x86/tdx/tdcall_offsets.c
+ create mode 100644 tools/testing/selftests/kvm/lib/x86/tdx/tdx.c
+ create mode 100644 tools/testing/selftests/kvm/lib/x86/tdx/tdx_util.c
+ create mode 100644 tools/testing/selftests/kvm/x86/tdx_vm_test.c
 
-         id   = kvm_read_reg(vcpu, LOONGARCH_GPR_A1);
-         data = kvm_read_reg(vcpu, LOONGARCH_GPR_A2);
--       switch (id) {
--       case BIT(KVM_FEATURE_STEAL_TIME):
-+       if (id == BIT(KVM_FEATURE_STEAL_TIME)) {
-                 if (data & ~(KVM_STEAL_PHYS_MASK | KVM_STEAL_PHYS_VALID))
-                         return KVM_HCALL_INVALID_PARAMETER;
-
-@@ -776,12 +775,10 @@ static long kvm_save_notify(struct kvm_vcpu *vcpu)
-                 vcpu->arch.st.last_steal = current->sched_info.run_delay;
-                 kvm_make_request(KVM_REQ_STEAL_UPDATE, vcpu);
-                 return 0;
--       default:
--               return KVM_HCALL_INVALID_CODE;
--       };
-+       }
-
-         return KVM_HCALL_INVALID_CODE;
--};
-+}
-
-  /*
-   * kvm_handle_lsx_disabled() - Guest used LSX while disabled in root.
-
-Thanks,
-Tiezhu
+-- 
+2.51.0.338.gd7d06c2dae-goog
 
 
