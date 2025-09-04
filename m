@@ -1,80 +1,80 @@
-Return-Path: <kvm+bounces-56772-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-56771-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id D7DCCB43522
+	by mail.lfdr.de (Postfix) with ESMTPS id 7E43DB43521
 	for <lists+kvm@lfdr.de>; Thu,  4 Sep 2025 10:13:04 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2125C7C45F0
-	for <lists+kvm@lfdr.de>; Thu,  4 Sep 2025 08:12:20 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9C8EA7C45C9
+	for <lists+kvm@lfdr.de>; Thu,  4 Sep 2025 08:12:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 454932C11E2;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 29EDE2C11DB;
 	Thu,  4 Sep 2025 08:11:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="mClMqv2P"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="RwQSEXuT"
 X-Original-To: kvm@vger.kernel.org
 Received: from mail-ej1-f45.google.com (mail-ej1-f45.google.com [209.85.218.45])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B7E962C11C6
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6B49A2C0F89
 	for <kvm@vger.kernel.org>; Thu,  4 Sep 2025 08:11:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.45
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756973499; cv=none; b=ChPdPLFraHI+smcIUGdfU3fwOCMDBFFEsZ8u+ylqVDooXgKZEUX0GtmkaO9eSqlwR1AwoQIzSBN+nXonvqfdfAE463TkfpGzmYOvzPdQLnD3StvqXqf5lBtFVtsCXDsC2YWIXtmrykH9yVwSSWiZrSFawkXBbI5dLusab9VtRPQ=
+	t=1756973499; cv=none; b=HXEjSop2IJMHOCI7Thf4rBTiqPVdjJwlT/w5JmFW4d6PTOnU4AwqQozRLjH2g+DlCE1/iSk7JA0SIEzWWTIJzWw7BL8J0OwZOBlKWO9yfdRdhZEcM+xNoSZ6R2xY/UWoifvnLfbdxcL8cSdMkQCc81GTiVZVXKuh+9UTJIuCiLA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1756973499; c=relaxed/simple;
-	bh=zu1LXP6rhyiOpL2wPJe0GxiX4pJVRDMff1/5Xg3DoWc=;
+	bh=4w3qe2ixMqPGcvZjsIbbYIT1F7PXQ70EjuRIksHMo60=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=SraQGtGPwYbQD66DnZb+6u8alkSve+JnASW8tHoRd41eDe40ifxKDgytyJWETCUko67usP0awgY5DaWjNr+0cRTShY0GdF7APrZDzKv9u/Glp68mRSbdY+mwJbl3v7uzI9D+eoFQgvXSSkLD2A9V8XikSQZCeGM+JkkLbmS/NJI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=mClMqv2P; arc=none smtp.client-ip=209.85.218.45
+	 MIME-Version:Content-Type; b=CKhRhhuQbkugzX8HxrOl7dQhIUGjCTt0bq72LAwicASUeuudEdEe4gpoH5iPwBuGVJf6OU03lfv6+5iHlt6nXW5X1Qe5BygW19SG7KdVcdaLTl+sk8j5Etk8/TaviUXHQFHtEFu6RmoVwFFtZGlMMtNKMCLx5WtDiA1wieR0c2s=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=RwQSEXuT; arc=none smtp.client-ip=209.85.218.45
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
-Received: by mail-ej1-f45.google.com with SMTP id a640c23a62f3a-b042cc3954fso129232466b.0
+Received: by mail-ej1-f45.google.com with SMTP id a640c23a62f3a-b042cc3954fso129230566b.0
         for <kvm@vger.kernel.org>; Thu, 04 Sep 2025 01:11:37 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=linaro.org; s=google; t=1756973496; x=1757578296; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=XYe2srEOzuPavOLB2dyXu3UjjKzRy0khJhV96Tf8OLU=;
-        b=mClMqv2PFsQ+zDAyqIk6Uwf1SXeX22y1/P4TGubYw34tljclmfRZgHtOCuMv7qsdPA
-         4XCja1c5m2D4q+gvHBSs+zFE5hqUTxV8kjvQcvjcN5RVu4kWIud5P27nG8BlaaQfM7f3
-         sGxkKLgLzNUa3d33qBkGK8nBwFY9nt2AnB4u4NpppfYVT9Ek371lSKG9HabdOOJKPAXx
-         LzOwpq3bxXLLLNki/KVa11F5BNkFDM6v5dOvGH/FmKq0aSp0lJ9FmD1mTWojwRnG0liH
-         cX85yUeUE/8QVdQSA1gzbhogkFMPGiVFk7RWt+kEMyaOwAcij1JU0VbE5J7faiz1GDDu
-         jT5Q==
+        bh=Wv6wFcI7G6DdUK88SJsbLfMk3oLK1TTP1R3ujLyoIqI=;
+        b=RwQSEXuTsWTP8T8MS4TimeQNycWlsPFI4nKS7RRzTCkwWX+DaVm1e9Ld58N0KKkF/7
+         /XwI9LIPwxia8iETAY5lCC2WIA3rLnrwEOhXE0EKCaRcDBocWOV1fk9Y0gOjX7jIiCyM
+         yyAyTy6UnHI282uzmRAQP86QfqOXnoihKGtcBcz0znlUbJEe3yScSXM3DzuwhRqLgFsx
+         4cAOBPGzAoUkct4Ynn1kC2XHeS7uvAzQa+c0NYermc2DFegHC8TI/cPUh0bhFmM6VVRJ
+         mfF5pItFXLyjomVQhCc+pf8gBdpfiD4NxoDzlLcdzBt+XKW3PbMCyhK2ppLrmS86mPYX
+         /SjQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20230601; t=1756973496; x=1757578296;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=XYe2srEOzuPavOLB2dyXu3UjjKzRy0khJhV96Tf8OLU=;
-        b=JFAz1IFwKxn7HGXUckDGjnNF94Jt6XTyfhuyrBSZUj/it/NH36d2a2MgMQIyW/NKWt
-         79p6a+G4DWpI/e+80EwNFpX+y/Edy9EytLiGx5uYvF3VD+GvanmPEqEOmw68ksx7gFjF
-         EQI1gFvjmVtRuMofCI1DdHvMSv/8+2Z/Txkt0oXmaUn27uFmbZxH32jqBluX56ycqxy2
-         nzTskNll7vt9rEoELRAWDed7eSKADCuEAN5ZVCKyZtMcdTYO2EFn2CZDLEAY35U28GDd
-         w2fZFp93C86ML0xmrEG14K+69pxYfWDvNnsIiHlgviR4lsREsk5KszwMXVltD27x/4IT
-         jvvQ==
-X-Forwarded-Encrypted: i=1; AJvYcCUM4Niij0w4IY22MxG6veVyUlK0pilggrfBXqVxFAAD4THJILSASnVAael7JTfye5qxRUk=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yyi+suCPePKsRVVkT5UXrvt/XzbEl+qVPPAIlBt3AmPo1ORFtBG
-	NJMkczDXrCWNPqeQjgAX4uNcnpuBsgASUYaV6DzxxmAQ5/pTgoO2ZjO11OxCNJN5cZI=
-X-Gm-Gg: ASbGncvAahurC0WkNF3dQnvCisV8kEKb0ftNv33Xi00u8jhle9syH2VBV3sEPbAsr08
-	rvXyLDoljtk0whZeqwKF4w/Do2TkfvLQLQJEaxo+f9JXo3ZqOMojMMkVZTbiu0EVC/ARS80LnLX
-	ftWYdfAgvh1ga7Qj4iWsq80gYLhFCZckhB8WyRrGHUS+mh0l3/2ml19UJtaiA6W4U4h5w5GnrFI
-	GYS11Ls8RV1lufykragMX/s+xiGjKm4kgnYtcz5Y20Xc884iiKUhHKLDHp4a4ds/huypCTt9YO0
-	3G/RnYT+3jUL4YtNuaP8md3L+FtM2fAxe8X5mBLaNIdz4ed1A/ISD0KrEfA6VbFBCbC1mG5mm//
-	O6Hj5rAvz0ncY/q6bXaoJep0zgksfHLt0gQ==
-X-Google-Smtp-Source: AGHT+IFuFf8b0FN8m1f6QwjfoO5kUp2eWUieR36l5Mw4cqCx0SRMNKUchjBVGkuWlbdtmtCQOxC3yA==
-X-Received: by 2002:a17:906:7953:b0:b04:813e:491 with SMTP id a640c23a62f3a-b04813e1a1amr139361166b.12.1756973495989;
+        bh=Wv6wFcI7G6DdUK88SJsbLfMk3oLK1TTP1R3ujLyoIqI=;
+        b=GzpJp4nu+iQDdqFYjo2R6vwXEKGN+h/03gcHZhXdsmRRADx0RM2vZxcZK14au0YVub
+         0ftuBKIbW8M53clET3T8Kmy6ZAOuvSLaqGJapLuXbnl/Qhhw8MSSTkKH/eoCv0ubAgcf
+         8QGbRclL2XCPONBJ+Lmtr9rcHcTHiXGg9eOfmbAitlQyu2lcHMav2+zdgg9q8en1Xf+b
+         1SNqbgjTmptmgkmoA6jmIzYRUSyooEmdH/nefdppc6e+VMM88mn+ZP/wU8Fxu4Qktk2k
+         CyWZvFNOwWSz/oSvWV98lDxZRjk7qI+A3UjqCaeYK7GehKy1aEpokjiQXIWueCyK8TH5
+         V4PQ==
+X-Forwarded-Encrypted: i=1; AJvYcCVyP8IjA2oAmKuPN/ezBCcimO3o7hXY1eJbExEqbU3V58QbhkVqZQ1UXzVXYIAh70pgiUo=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzFClLz7CBO8m/ZS5vhpTreTJsi3F0YwsKX8SYWplnhWka7+DuB
+	HACq5kz7XZh7F7OuZsIFrC9OOFoZff35vwcnJgvo45r53PaPF8tDvKk8c/W2YOUmWHk=
+X-Gm-Gg: ASbGncvhEwfaHp1DSmxIZajosqvf7Hz0rnT6C3PP+6bV+FtjIVxsn+w5ILLrvTZXtM6
+	hxHInbgBktBMxH3YKrQL1BzpRm97DbMqS+GgtdhcprrqitA1NODxJMXL0uonJ60fLzQMolmNTPc
+	m8+wYJzC/Xe0RuYZ85r5N7QkHynARy9movdBM3UEkJy1YZfAVKiqJiioxrXYiZgcRyH4wqW7pcP
+	cVKyIaXyfoQqNKKCXuE3WBTUiyCcdYTjhW+c9qr7Cpkkr2XXGYc/ZCgJAqo9oPMM1cENN8jjdHU
+	WhtYX8jYjrzsE+jdgWFed0nSt0r9PpG8rzBeD0CcBMC4hhk3aTWZnKKJaSkXAJU5wJKXBtvPHfX
+	nb4LeCvTgzGicrSOQ8Btc444DMAMz8lsRnQ==
+X-Google-Smtp-Source: AGHT+IElPpn0KvMqOR0Q75Gfkj0ncOLp1bLOMMk7oeP9JIeBPVNdyXvx2TH7ciqYVtSvBIeB+x6WBg==
+X-Received: by 2002:a17:906:7953:b0:b04:813e:491 with SMTP id a640c23a62f3a-b04813e1a1amr139359366b.12.1756973495570;
         Thu, 04 Sep 2025 01:11:35 -0700 (PDT)
 Received: from draig.lan ([185.126.160.19])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-b0471c7a163sm248962666b.47.2025.09.04.01.11.31
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-b0484e8a4a1sm55305766b.83.2025.09.04.01.11.31
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
         Thu, 04 Sep 2025 01:11:32 -0700 (PDT)
 Received: from draig.lan (localhost [IPv6:::1])
-	by draig.lan (Postfix) with ESMTP id 807A05F92E;
+	by draig.lan (Postfix) with ESMTP id 9A3B85F92F;
 	Thu, 04 Sep 2025 09:11:28 +0100 (BST)
 From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
 To: qemu-devel@nongnu.org
@@ -161,10 +161,11 @@ Cc: Reinoud Zandijk <reinoud@netbsd.org>,
 	Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
 	=?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>,
 	Nicholas Piggin <npiggin@gmail.com>,
-	John Levon <john.levon@nutanix.com>
-Subject: [PATCH v2 003/281] scripts/minikconf.py: s/Error/KconfigParserError
-Date: Thu,  4 Sep 2025 09:06:37 +0100
-Message-ID: <20250904081128.1942269-4-alex.bennee@linaro.org>
+	John Levon <john.levon@nutanix.com>,
+	qemu-stable@nongnu.org
+Subject: [PATCH v2 004/281] python: mkvenv: fix messages printed by mkvenv
+Date: Thu,  4 Sep 2025 09:06:38 +0100
+Message-ID: <20250904081128.1942269-5-alex.bennee@linaro.org>
 X-Mailer: git-send-email 2.47.2
 In-Reply-To: <20250904081128.1942269-1-alex.bennee@linaro.org>
 References: <20250904081128.1942269-1-alex.bennee@linaro.org>
@@ -174,35 +175,50 @@ List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 
-From: Manos Pitsidianakis <manos.pitsidianakis@linaro.org>
+From: Paolo Bonzini <pbonzini@redhat.com>
 
-Error is not defined in this script, raise KconfigParserError instead.
+The new Matcher class does not have a __str__ implementation, and therefore
+it prints the debugging representation of the internal object:
 
-Fixes: 82f5181777ebe04b550fd94a1d04c49dd3f012dc ("kconfig: introduce kconfig files")
-Signed-off-by: Manos Pitsidianakis <manos.pitsidianakis@linaro.org>
-Link: https://lore.kernel.org/r/20250820-scripts-minikconf-fixes-v1-2-252041a9125e@linaro.org
+  $ ../configure --enable-rust && make qemu-system-arm --enable-download
+  python determined to be '/usr/bin/python3'
+  python version: Python 3.13.6
+  mkvenv: Creating non-isolated virtual environment at 'pyvenv'
+  mkvenv: checking for LegacyMatcher('meson>=1.5.0')
+  mkvenv: checking for LegacyMatcher('pycotap>=1.1.0')
+
+Add the method to print the nicer
+
+  mkvenv: checking for meson>=1.5.0
+  mkvenv: checking for pycotap>=1.1.0
+
+Cc: qemu-stable@nongnu.org
+Cc: John Snow <jsnow@redhat.com>
+Reviewed-by: Manos Pitsidianakis <manos.pitsidianakis@linaro.org>
+Reviewed-by: Philippe Mathieu-Daudé <philmd@linaro.org>
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- scripts/minikconf.py | 4 +++-
- 1 file changed, 3 insertions(+), 1 deletion(-)
+ python/scripts/mkvenv.py | 4 ++++
+ 1 file changed, 4 insertions(+)
 
-diff --git a/scripts/minikconf.py b/scripts/minikconf.py
-index 2a4694fb6a3..4de5aeed11a 100644
---- a/scripts/minikconf.py
-+++ b/scripts/minikconf.py
-@@ -363,7 +363,9 @@ def parse_file(self, fp):
+diff --git a/python/scripts/mkvenv.py b/python/scripts/mkvenv.py
+index f102527c4de..9aed266df1b 100644
+--- a/python/scripts/mkvenv.py
++++ b/python/scripts/mkvenv.py
+@@ -184,6 +184,10 @@ def match(self, version_str: str) -> bool:
+             )
+         )
  
-     def do_assignment(self, var, val):
-         if not var.startswith("CONFIG_"):
--            raise Error('assigned variable should start with CONFIG_')
-+            raise KconfigParserError(
-+                self, "assigned variable should start with CONFIG_"
-+            )
-         var = self.data.do_var(var[7:])
-         self.data.do_assignment(var, val)
- 
++    def __str__(self) -> str:
++        """String representation delegated to the backend."""
++        return str(self._m)
++
+     def __repr__(self) -> str:
+         """Stable debug representation delegated to the backend."""
+         return repr(self._m)
 -- 
 2.47.2
 
