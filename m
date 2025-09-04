@@ -1,81 +1,81 @@
-Return-Path: <kvm+bounces-56790-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-56804-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id AE5D3B4353C
-	for <lists+kvm@lfdr.de>; Thu,  4 Sep 2025 10:15:00 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3E5FCB4356E
+	for <lists+kvm@lfdr.de>; Thu,  4 Sep 2025 10:19:14 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id BE60A688480
-	for <lists+kvm@lfdr.de>; Thu,  4 Sep 2025 08:14:15 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 2AD49188334B
+	for <lists+kvm@lfdr.de>; Thu,  4 Sep 2025 08:19:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7E9512D3725;
-	Thu,  4 Sep 2025 08:12:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2A5892C11CF;
+	Thu,  4 Sep 2025 08:18:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="pypdYqy4"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="U+AuvpzN"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-ej1-f47.google.com (mail-ej1-f47.google.com [209.85.218.47])
+Received: from mail-ej1-f44.google.com (mail-ej1-f44.google.com [209.85.218.44])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D30E82C0F6C
-	for <kvm@vger.kernel.org>; Thu,  4 Sep 2025 08:12:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.47
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5E4C02C11F6
+	for <kvm@vger.kernel.org>; Thu,  4 Sep 2025 08:18:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.44
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756973531; cv=none; b=bhiIYQ5fn267SxK5M/k/1ziCoWsSsNrLKh5Z38+ykQ+ZSSRVyCWs77myWRheGoyYJxyZ4OecaWHPZitEgGXp8/Bmyx5OPSDT0vq6DdGCTunEiPrAgFO5jYFA3kN9eEt4ufjXdOspUDShZNiOPsTHFSjsU2fhO+dcqYo2VieBcsY=
+	t=1756973925; cv=none; b=seKEiRGM1ctL9JIqV5OYWQ4wjsBTHJxhh4RuDg5rD2uLcX3oK3rhUEkgSbX4GndyH9OF/Cbp7J6aG0hgXo0nfAd0ILqpLrkS5Y0hbnBCUzbVgfq0PVvWnzL4Uw2ZKClqvu8PY92r1pbMfICTN8xJvHMJkZlYERO7Szq/MHMc/ho=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756973531; c=relaxed/simple;
-	bh=bkDU4AeLCpmZGZtYEonzSjDNaqIGvr51jMzo1ykPs6Y=;
+	s=arc-20240116; t=1756973925; c=relaxed/simple;
+	bh=Ce7Nj9k0E9dcQQLbID9KlUYhNtKU/RoRR6PHZXUoaiU=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=LcbqvGxelpm5JAXiGz+ROlPr0uXGq9ULy3IlW6vC67lX8MJu6siIsObHfmwPaiLPZUHcF3Ffn0XVcHLLjMkOTXyajWzftf2O79vqU1Y3b9Zw6IC1v3vKkciZsKyIw9jyWqw6ZkehP2/7iJfxeJnFNzqjf2Z0TRfMxqzXutqdcek=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=pypdYqy4; arc=none smtp.client-ip=209.85.218.47
+	 MIME-Version; b=aqapbK/PczyIG51WbndAwPfLN07BCTboqb1losMAS8zX2pzMR/nuLeUUDjZYW2IP/WHomNIPcc2wkKXVcxmqUNeMbBd1WRZ6+O+7iIdgw1QoXa8M6Um/0xAZE0PtO5Vg0JrmpoqrpOsvfcDzPGCRYtDKmIGICERWOI8E4jbo9L4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=U+AuvpzN; arc=none smtp.client-ip=209.85.218.44
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
-Received: by mail-ej1-f47.google.com with SMTP id a640c23a62f3a-b0449b1b56eso111726766b.1
-        for <kvm@vger.kernel.org>; Thu, 04 Sep 2025 01:12:08 -0700 (PDT)
+Received: by mail-ej1-f44.google.com with SMTP id a640c23a62f3a-b03fa5c5a89so108098166b.2
+        for <kvm@vger.kernel.org>; Thu, 04 Sep 2025 01:18:43 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1756973527; x=1757578327; darn=vger.kernel.org;
+        d=linaro.org; s=google; t=1756973922; x=1757578722; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=3igMVo/0Jk0/NNNrfQhFH8hc6okngEKnzdXk+lVC71M=;
-        b=pypdYqy4nGhlaTiQ1OPOwJVkDuBXFfR8AFEWS0hQi64SqGpW5/D5C3OlC+DxaRH6pP
-         +35BB2dMDMkDKtZmK8UfMgqL7jCRvmu5PlTAh+GVLotPQlWTgE+Ym0ANPMnFib+NcqtE
-         eJI982en0CpwQPS+dlLiEOEa0qQhuPzlkGrkzNtax5QErE2J/sWiN8AEiJQ9qChdjudW
-         qkdb7r2N4o/N5dXA64b3YZQt9U8DXOHRu/o2TusY3UUHjO9pVhPbmNKSPjz8UVvOgiM+
-         YOl50oHaad5IpXfD/LO4GOJu/sVLQnsD7drstPwvtQR/cfgAeU0EimjVq2Phm7eeVPho
-         V65g==
+        bh=4Qo9EKDwE3/n/WLrIsObXlhp0emB+zNEnQk4ZCSW4aE=;
+        b=U+AuvpzNTzdrSCuCeIA3R5/BibBQiJjNUoX0odndDIoq6f+AtgBUHHb0+PNso/6ckQ
+         bv06UTS9SMbw+LWQFnyjtCiHTL5W/oi72K06c/4ss3/xG9tLzJvJ8QvIjoZkz+syLRjp
+         Cua3LA3Q2JxoTJIBa+jcOlVU3l3jU50T8c35c3R7X3hk+Olin7NidRtnAm/4eykl6LBg
+         QgHt/bYV8RnFzMfVqzliP6c3jZrCVbV+JNVJ1fbYtk6R0lzLgpADSrUzf96+0ghJ1QMq
+         NmNPCwQ2TL8gW6nIkbsP34VjPe8wpEwl0B9wrII4GHxli4UlmntQpiwGL1vml0We3Q4k
+         Hm0A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1756973527; x=1757578327;
+        d=1e100.net; s=20230601; t=1756973922; x=1757578722;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=3igMVo/0Jk0/NNNrfQhFH8hc6okngEKnzdXk+lVC71M=;
-        b=HrqfOYhPtwQAZEmhs03VvewAiGOcuo5VrPHy7vgBVh2lF1+VxVW+/hcdBzKBRXVxbZ
-         ItlEWwVl5QK4mi5CbCPWruADoRBbGYpavIWPxAiVwcwNML1AbF5Kl3gIoHjpGsU2hpeu
-         WWEpdmARYWM7UruW5/wOh5CMBQ00rtCTV9pCkswoDfBWYgyTpPlDNGjO7ujQwge7XzTH
-         MgNsvZ0+uSUGP2gul+xjbalafSy2G1/nxBJB3GGexa6lyrKLWAlcPONepxywugasIUys
-         37EeSXCZRHUEJ+bdGVogrKtjuowexcSlJ/lK5jvIEdpS6VMYuIVkrTssuTLqEbafqWuC
-         sjwQ==
-X-Forwarded-Encrypted: i=1; AJvYcCXeZccihVwT/XLj407XB1v0wTBSCA6WnpvCnYMDoGLU89G0UR/0jl78Dc+vyGmVFVQdvnU=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwotW68hW2LPj7FBjicDtXX6fHNO8UwjqViFea4IcFEDjw3D/UA
-	pBc9IgSR86hJgfB+8EzdMbseCM6IHc1MaOB3O9xLL+itLkaq680qs22hCQO6WZg8gxM=
-X-Gm-Gg: ASbGnctwdqiAnI7jXymiFpQWcxyn2ib13XJenONt3+SunpIIqWV6K2l7PubXTSJoGfx
-	siX12kbM7raad6PfOI28nUtgbjKSfjCIMrU9et+QvEaB3E8eBzMHk6USmXJFvSXs7OCROZ3Cm78
-	RkeAJJTR+k5YE7xlve4imyacp6FU+3qgBfGmforOQBFJ8i0DB5CFBcW7RNh7bpT7aFAVnnSIVLd
-	HFf9KbYgttS2RhNSQFyvt0HXUGZsausPlIsnMsbLfstrWMHlbqKQLw9pGwYXo0QfwpLvgPRvZf8
-	t9ARD991fEh4uBjTgS+f+G8Aa7dzlz8JxxLAjtKzJ9TaihNCv4cA4ikI+FL1wto9Km2UCrgi97m
-	5kMVPDU7LkghNmk6jwIOqDOHpz77g41Yo7w==
-X-Google-Smtp-Source: AGHT+IFBeYdGfWRJI/K+rgayz8OQ6j9nasTrUeDkKNPhr0lTLkj3JNN2B5iyPDqJVVGSAcD8I8KKGQ==
-X-Received: by 2002:a17:907:2d24:b0:b04:74d1:a561 with SMTP id a640c23a62f3a-b0474d1af73mr412166966b.25.1756973525652;
-        Thu, 04 Sep 2025 01:12:05 -0700 (PDT)
+        bh=4Qo9EKDwE3/n/WLrIsObXlhp0emB+zNEnQk4ZCSW4aE=;
+        b=CGgxZHvsAbUMjBfJVubR3P5SceYg7JDByRGonOx1tx0VX1Xq3GRmqgVMJLg2kpXxy4
+         RNwlayntYg7jPOvCdsuoThkfDk7phGHl1iPFq7Fog/SF/LpwLk1Za54c0tZZ0a1+z+cz
+         HvZZyYRAZp/LPLZnsYHlQ7ubyDI8RAzCPpwuMkEvLTtC5WVYFWFyNpcNi+pcT0moXFe2
+         N9o87WbIeFHF3U5TQU218bUNHCPouCPOCLByL+Lr/UkaOiB/pPqYRzL32pX64MJp41fY
+         lxXze+u1785vUD15/OR22cZ7ypHuni9HHyik0/CASLWEYUDvcZsuwT4MJjUuQj/nLxE5
+         8Yog==
+X-Forwarded-Encrypted: i=1; AJvYcCU3JLp0aXrQC5BiL/fueVH1LmJSx4ERkViWoHUlPyYKJpKWPua9EutIxKG4xY/cxcIiTRI=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yx9ZU9U6+GRaj/hnlAylB2SRChbpNzRviCCSCXQZxwJcF33KQtz
+	qiPkKUTfjsd6CN3IPiDWnbhmUIAuDR/Mn78wvrc9dJ3hPFl0qzp4ZU8wljvEm72duRc=
+X-Gm-Gg: ASbGncui84+rIzMOZ3DnGgF4JvYPqrAZ7iGLEvH+ZSt3K532IMSSvnRItvBTHZ+btxR
+	4L6ySqDmNC/8qdmyGwKL1EqFBB7OTb4qduC1UGqcKb5nlxw2ac41U1eKj1tAUo3fvX0+i+iU51O
+	HbEvAIsdk8J1vLWH8Iza1QjkhaoVnme8ZLx53mx8j4qbQW4ycs8hcTKW1/mFcBlvyW2GGQbZFnG
+	pv402JHWKFpY2cu0ndnfWgr9ct6a6snrXFzbMQTtfhi8QwyIVyLeZAPqX4jWk8YMaKU9I9yM1Hm
+	XWM5HeQw8TXMhLIf84Hqs1Qma3GKebmoey2no/Bx0FLXNp2Tfv7eJUKch/tqU4XvwpzVZR9RX31
+	8PlBuCY6FQ4btkepoo3mrQmmf1CbnxubRww==
+X-Google-Smtp-Source: AGHT+IH72PsAQjSge09/VEswdIRor8b+s0ivH0yVqM4TiBV9FovWzP9bspcPBbf4+HVqFBF5NwAp4Q==
+X-Received: by 2002:a17:907:7245:b0:b04:76ed:3ff5 with SMTP id a640c23a62f3a-b0476ed442bmr339748766b.40.1756973921478;
+        Thu, 04 Sep 2025 01:18:41 -0700 (PDT)
 Received: from draig.lan ([185.126.160.19])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-b04241b2e7esm979865566b.43.2025.09.04.01.11.55
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-b04634dbd5csm417619266b.19.2025.09.04.01.18.36
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 04 Sep 2025 01:12:02 -0700 (PDT)
+        Thu, 04 Sep 2025 01:18:37 -0700 (PDT)
 Received: from draig.lan (localhost [IPv6:::1])
-	by draig.lan (Postfix) with ESMTP id DF9806045A;
-	Thu, 04 Sep 2025 09:11:35 +0100 (BST)
+	by draig.lan (Postfix) with ESMTP id 2C5BA60A38;
+	Thu, 04 Sep 2025 09:11:37 +0100 (BST)
 From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
 To: qemu-devel@nongnu.org
 Cc: Reinoud Zandijk <reinoud@netbsd.org>,
@@ -162,9 +162,9 @@ Cc: Reinoud Zandijk <reinoud@netbsd.org>,
 	=?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>,
 	Nicholas Piggin <npiggin@gmail.com>,
 	John Levon <john.levon@nutanix.com>
-Subject: [PATCH v2 059/281] linux-user: Move get_elf_hwcap to sh4/elfload.c
-Date: Thu,  4 Sep 2025 09:07:33 +0100
-Message-ID: <20250904081128.1942269-60-alex.bennee@linaro.org>
+Subject: [PATCH v2 069/281] linux-user: Remove ELF_PLATFORM
+Date: Thu,  4 Sep 2025 09:07:43 +0100
+Message-ID: <20250904081128.1942269-70-alex.bennee@linaro.org>
 X-Mailer: git-send-email 2.47.2
 In-Reply-To: <20250904081128.1942269-1-alex.bennee@linaro.org>
 References: <20250904081128.1942269-1-alex.bennee@linaro.org>
@@ -178,117 +178,94 @@ Content-Transfer-Encoding: 8bit
 
 From: Richard Henderson <richard.henderson@linaro.org>
 
-Change the return type to abi_ulong, and pass in the cpu.
+All real definitions of ELF_PLATFORM are now identical, and the stub
+definitions are NULL.  Use HAVE_ELF_PLATFORM and provide a stub as a
+fallback definition of get_elf_platform.
 
 Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
 Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 ---
- linux-user/loader.h         |  3 ++-
- linux-user/sh4/target_elf.h |  2 ++
- linux-user/elfload.c        | 29 +----------------------------
- linux-user/sh4/elfload.c    | 27 +++++++++++++++++++++++++++
- 4 files changed, 32 insertions(+), 29 deletions(-)
+ linux-user/elfload.c | 18 ++++--------------
+ 1 file changed, 4 insertions(+), 14 deletions(-)
 
-diff --git a/linux-user/loader.h b/linux-user/loader.h
-index 04457737dd4..d8a93998076 100644
---- a/linux-user/loader.h
-+++ b/linux-user/loader.h
-@@ -103,7 +103,8 @@ const char *get_elf_cpu_model(uint32_t eflags);
- 
- #if defined(TARGET_I386) || defined(TARGET_X86_64) || defined(TARGET_ARM) \
-     || defined(TARGET_SPARC) || defined(TARGET_PPC) \
--    || defined(TARGET_LOONGARCH64) || defined(TARGET_MIPS)
-+    || defined(TARGET_LOONGARCH64) || defined(TARGET_MIPS) \
-+    || defined(TARGET_SH4)
- abi_ulong get_elf_hwcap(CPUState *cs);
- abi_ulong get_elf_hwcap2(CPUState *cs);
- #endif
-diff --git a/linux-user/sh4/target_elf.h b/linux-user/sh4/target_elf.h
-index d17011bd752..badd0f5371f 100644
---- a/linux-user/sh4/target_elf.h
-+++ b/linux-user/sh4/target_elf.h
-@@ -8,4 +8,6 @@
- #ifndef SH4_TARGET_ELF_H
- #define SH4_TARGET_ELF_H
- 
-+#define HAVE_ELF_HWCAP          1
-+
- #endif
 diff --git a/linux-user/elfload.c b/linux-user/elfload.c
-index dc3f502277a..7e1c11c39f2 100644
+index 83cb6731ec8..d2d73b06fc0 100644
 --- a/linux-user/elfload.c
 +++ b/linux-user/elfload.c
-@@ -963,34 +963,7 @@ static inline void elf_core_copy_regs(target_elf_gregset_t *regs,
+@@ -149,8 +149,6 @@ typedef abi_int         target_pid_t;
+ 
+ #ifdef TARGET_I386
+ 
+-#define ELF_PLATFORM get_elf_platform(thread_cpu)
+-
+ #ifdef TARGET_X86_64
+ #define ELF_CLASS      ELFCLASS64
+ #define ELF_ARCH       EM_X86_64
+@@ -309,8 +307,6 @@ static void elf_core_copy_regs(target_elf_gregset_t *regs, const CPUX86State *en
+ 
+ #ifdef TARGET_ARM
+ 
+-#define ELF_PLATFORM get_elf_platform(thread_cpu)
+-
+ #ifndef TARGET_AARCH64
+ /* 32 bit ARM definitions */
+ 
+@@ -665,8 +661,6 @@ static void elf_core_copy_regs(target_elf_gregset_t *regs,
  #define USE_ELF_CORE_DUMP
  #define ELF_EXEC_PAGESIZE        4096
  
--enum {
--    SH_CPU_HAS_FPU            = 0x0001, /* Hardware FPU support */
--    SH_CPU_HAS_P2_FLUSH_BUG   = 0x0002, /* Need to flush the cache in P2 area */
--    SH_CPU_HAS_MMU_PAGE_ASSOC = 0x0004, /* SH3: TLB way selection bit support */
--    SH_CPU_HAS_DSP            = 0x0008, /* SH-DSP: DSP support */
--    SH_CPU_HAS_PERF_COUNTER   = 0x0010, /* Hardware performance counters */
--    SH_CPU_HAS_PTEA           = 0x0020, /* PTEA register */
--    SH_CPU_HAS_LLSC           = 0x0040, /* movli.l/movco.l */
--    SH_CPU_HAS_L2_CACHE       = 0x0080, /* Secondary cache / URAM */
--    SH_CPU_HAS_OP32           = 0x0100, /* 32-bit instruction support */
--    SH_CPU_HAS_PTEAEX         = 0x0200, /* PTE ASID Extension support */
--};
+-#define ELF_PLATFORM get_elf_platform(thread_cpu)
 -
--#define ELF_HWCAP get_elf_hwcap()
--
--static uint32_t get_elf_hwcap(void)
--{
--    SuperHCPU *cpu = SUPERH_CPU(thread_cpu);
--    uint32_t hwcap = 0;
--
--    hwcap |= SH_CPU_HAS_FPU;
--
--    if (cpu->env.features & SH_FEATURE_SH4A) {
--        hwcap |= SH_CPU_HAS_LLSC;
--    }
--
--    return hwcap;
--}
-+#define ELF_HWCAP get_elf_hwcap(thread_cpu)
+ #endif /* TARGET_LOONGARCH64 */
  
+ #ifdef TARGET_MIPS
+@@ -846,8 +840,6 @@ static void elf_core_copy_regs(target_elf_gregset_t *regs,
+     (*regs)[33] = tswapreg(cpu_get_sr(env));
+ }
+ 
+-#define ELF_PLATFORM NULL
+-
+ #endif /* TARGET_OPENRISC */
+ 
+ #ifdef TARGET_SH4
+@@ -1046,7 +1038,6 @@ static inline void init_thread(struct target_pt_regs *regs,
+ 
+ #define ELF_CLASS       ELFCLASS32
+ #define ELF_ARCH        EM_PARISC
+-#define ELF_PLATFORM    get_elf_platform(thread_cpu)
+ #define STACK_GROWS_DOWN 0
+ #define STACK_ALIGNMENT  64
+ 
+@@ -1182,10 +1173,6 @@ static inline void init_thread(struct target_pt_regs *regs,
+ #define ELF_BASE_PLATFORM (NULL)
  #endif
  
-diff --git a/linux-user/sh4/elfload.c b/linux-user/sh4/elfload.c
-index 546034ec07e..99ad4f6334c 100644
---- a/linux-user/sh4/elfload.c
-+++ b/linux-user/sh4/elfload.c
-@@ -9,3 +9,30 @@ const char *get_elf_cpu_model(uint32_t eflags)
- {
-     return "sh7785";
- }
-+
-+enum {
-+    SH_CPU_HAS_FPU            = 0x0001, /* Hardware FPU support */
-+    SH_CPU_HAS_P2_FLUSH_BUG   = 0x0002, /* Need to flush the cache in P2 area */
-+    SH_CPU_HAS_MMU_PAGE_ASSOC = 0x0004, /* SH3: TLB way selection bit support */
-+    SH_CPU_HAS_DSP            = 0x0008, /* SH-DSP: DSP support */
-+    SH_CPU_HAS_PERF_COUNTER   = 0x0010, /* Hardware performance counters */
-+    SH_CPU_HAS_PTEA           = 0x0020, /* PTEA register */
-+    SH_CPU_HAS_LLSC           = 0x0040, /* movli.l/movco.l */
-+    SH_CPU_HAS_L2_CACHE       = 0x0080, /* Secondary cache / URAM */
-+    SH_CPU_HAS_OP32           = 0x0100, /* 32-bit instruction support */
-+    SH_CPU_HAS_PTEAEX         = 0x0200, /* PTE ASID Extension support */
-+};
-+
-+abi_ulong get_elf_hwcap(CPUState *cs)
-+{
-+    SuperHCPU *cpu = SUPERH_CPU(cs);
-+    abi_ulong hwcap = 0;
-+
-+    hwcap |= SH_CPU_HAS_FPU;
-+
-+    if (cpu->env.features & SH_FEATURE_SH4A) {
-+        hwcap |= SH_CPU_HAS_LLSC;
-+    }
-+
-+    return hwcap;
-+}
+-#ifndef ELF_PLATFORM
+-#define ELF_PLATFORM (NULL)
+-#endif
+-
+ #ifndef ELF_MACHINE
+ #define ELF_MACHINE ELF_ARCH
+ #endif
+@@ -1229,6 +1216,9 @@ abi_ulong get_elf_hwcap(CPUState *cs) { return 0; }
+ abi_ulong get_elf_hwcap2(CPUState *cs) { g_assert_not_reached(); }
+ #define HAVE_ELF_HWCAP2 0
+ #endif
++#ifndef HAVE_ELF_PLATFORM
++const char *get_elf_platform(CPUState *cs) { return NULL; }
++#endif
+ 
+ #include "elf.h"
+ 
+@@ -1699,7 +1689,7 @@ static abi_ulong create_elf_tables(abi_ulong p, int argc, int envc,
+     }
+ 
+     u_platform = 0;
+-    k_platform = ELF_PLATFORM;
++    k_platform = get_elf_platform(thread_cpu);
+     if (k_platform) {
+         size_t len = strlen(k_platform) + 1;
+         if (STACK_GROWS_DOWN) {
 -- 
 2.47.2
 
