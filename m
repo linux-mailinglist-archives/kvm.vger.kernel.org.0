@@ -1,70 +1,70 @@
-Return-Path: <kvm+bounces-56756-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-56757-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 03BD4B43307
-	for <lists+kvm@lfdr.de>; Thu,  4 Sep 2025 08:58:05 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 450B5B43310
+	for <lists+kvm@lfdr.de>; Thu,  4 Sep 2025 08:58:43 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id AD1FE16331A
-	for <lists+kvm@lfdr.de>; Thu,  4 Sep 2025 06:57:59 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 555521C2615C
+	for <lists+kvm@lfdr.de>; Thu,  4 Sep 2025 06:58:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5961329993F;
-	Thu,  4 Sep 2025 06:55:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9AA7829A326;
+	Thu,  4 Sep 2025 06:55:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="qWQDuyD/"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="GHDsK5Ms"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pj1-f74.google.com (mail-pj1-f74.google.com [209.85.216.74])
+Received: from mail-pj1-f73.google.com (mail-pj1-f73.google.com [209.85.216.73])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DD4BE28D8CC
-	for <kvm@vger.kernel.org>; Thu,  4 Sep 2025 06:55:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.74
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2EFA32980C2
+	for <kvm@vger.kernel.org>; Thu,  4 Sep 2025 06:55:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.73
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756968922; cv=none; b=td+cDa7FlGpWLEgACej6CEnDHgL6V8pRuw+pARFF2GgBjgI1j1HU4MlN4wM/SqG1itIA8xTLtB5k3xdOh3AcOT67fPLJ679WVOg6a8cI6C6u6sqz7oFlXVhD8m3NwjhiO0ad4jgzlYi/uuQr3eLkHJ7jbITLqI1JD641l8RGF2w=
+	t=1756968923; cv=none; b=UwUJnH39PUYbYDPCSPtmB3XbOXsWbqBdBwrW1NRMPR9xjPGk3zlZ+brd/ZTLv871Gk932MWVLzRrJVTmOTAtCaacJu4xvIeRXsUrWMaR5iydnDin2h6zFiIPLYIzNWY/EtzYxE2y0ElA0xGGSI1X5Pu7HxW6tCb3D4POt78R6mw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756968922; c=relaxed/simple;
-	bh=DsOMXiVoMzD7AjveM4os7tdOwV3YpbNGpBZ+UsnN0/k=;
+	s=arc-20240116; t=1756968923; c=relaxed/simple;
+	bh=aonB/eCuRYccRY3VvDhmGFtx766iDhuLel2iFuyfPvg=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=AQhoGPlsU9vuCb08XntwE960sMx+Q86+lAlBlFfSm3ZyXx+kQ+jTMQM4cQSw/6oW42uZHeQWUA2c/bg62HTfP0cbqaQSvyk+Fxk5iYenhqmLw3OlETr6w8JnqQ+wtbdDnj9q+AvEM7bYa7l6hlx8QfLOKVuF71Oo79JJaMipHrU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--sagis.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=qWQDuyD/; arc=none smtp.client-ip=209.85.216.74
+	 To:Cc:Content-Type; b=Gi3swZAVwlnynZ7hcFqQgKtHbtEHAt4lwl1KN3y9tNwXmD4s5pbuYvuw3KpZWB5SjOTMVsMRDY4Mm3TyUKvMkYmBKC7TQafDQJyu+UOaR0subucxy6j1BpkP4aWS9T8QjL0whd3z8LydEqC51frUb34dLuxHVa41zhdpRZ238Mo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--sagis.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=GHDsK5Ms; arc=none smtp.client-ip=209.85.216.73
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--sagis.bounces.google.com
-Received: by mail-pj1-f74.google.com with SMTP id 98e67ed59e1d1-32b698861d8so638092a91.2
-        for <kvm@vger.kernel.org>; Wed, 03 Sep 2025 23:55:20 -0700 (PDT)
+Received: by mail-pj1-f73.google.com with SMTP id 98e67ed59e1d1-32b58eeb874so605284a91.3
+        for <kvm@vger.kernel.org>; Wed, 03 Sep 2025 23:55:22 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1756968920; x=1757573720; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1756968921; x=1757573721; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=FDaZx4H9qbNOCPJR00gXyS56Y7NvQgh76OJPTkrUQig=;
-        b=qWQDuyD/qBPabd13NsMt4lQL6jyNbe66Tn2CEmQNtNSgH9ETAWPNuimGpiVcES3Sln
-         JQ7BdQYZpFYgHUQX1fpXhThKL0WcnRwKdIU7zoukjGl4YGminvbc6jr5Yi1pdtsjtaiY
-         ctDQ+bV20eVrzbAAN5VUYMWgyvy5l4odfad5CuZO2Rqo4tV2Vykz1Qrs8YGunVpEJ4Lk
-         y8+x6okmBl65rb0dvFOGR2cFzohe9LyffixNRQ7WNNqqrXw7gV60EpAa5BWISmhI65pV
-         cLtVbN+tYLFBeKo17a5GVy8nUzs1D8JhO3zL4aVm/PGpXGRRqj5iEren83fqz2Hu3qUg
-         k8Rg==
+        bh=qvz/RUhUzWK3YIgJJiz6JbOWQToi8UuNVcz+/1d9b6I=;
+        b=GHDsK5MsAxRggN8MPd96QUG9UIUHn0pfsyYCtpnYrmhrkYwsD7hM/fiV8KOnCNdW5P
+         SkmlnxQ2KYca14SgJZFcHUenorcWwYIFOtLKkVB4mekRmjHLw9bw8qJZpMquwroZFlaZ
+         3YLbjb/YlGpGw+a7gii08gCHzdeiBzcuisBMxXXBTt0tdQkja4kdvxYBIKpZRYVHUs85
+         lSy4GsKD7w67dQe0UX1e1TmkC+46ThiFg/DJPL9VrbbNSzczmgIlzf3bnQP3BxD8zJTi
+         QOavwF8T7pyUoKD95LTIg0vJF0P0TnrFLS+2HKr3AcUgcgRMmo6U8Yda1rS+JWpr6Vuh
+         gc+A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1756968920; x=1757573720;
+        d=1e100.net; s=20230601; t=1756968921; x=1757573721;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=FDaZx4H9qbNOCPJR00gXyS56Y7NvQgh76OJPTkrUQig=;
-        b=thl0fnr8JzUvVMMlwDApOsFqZ9WMHFKWjEMmZzm8UQzh0Yy/hnbLOM/Yc5+MgXo5kR
-         +3p27pTBXlHMzIq5N1N3V3SnpMvPutiybnGQ2MU4KeKspA/SPMsvDHaNeifuibzJyHM6
-         0lZ6QgjMgV4y56bISPeerKFm16sEhyNO30sa0CNu/EeKQuYoM1jKxXF4Dsj8gfDXaj2o
-         ZjzvXxeY9CJbxQrX5TOVjUlwPIaEPLVyEfUJOybMP5fn3mwg3BOXpxYYZJBWufZcorp8
-         6u/6MBp3nMtfyDrFVNd9JOqp35PI8zULrbNkkn5H5VwpK39CW7Vhux31vwGJ+OI8BdUu
-         ywlQ==
-X-Forwarded-Encrypted: i=1; AJvYcCXm4Ey6JvZBfnQ6BYpDyqvpaySe4RYvbbunDLlPEdCc05OKrKyVlcptJXUrWeog3nzHa8A=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxAZjL7uPXLsfUU7c5PZ8QYO+vWAud9Cel82qnMX3wWayb7Q5Cq
-	wwT/8V+t1NO/FkuQwdLGJxBUa9sCb/ZD85bZeBKnBv1BbdJSfBwMK+UqS/MsXQ69VPf9Llq4qol
-	tlA==
-X-Google-Smtp-Source: AGHT+IFwkf7FIzU9KeSXQcb1R3yIatVLrOEcgEEjvXReXde8fLVjRfRLB+K0+EJVwCWgTd750O/qpZWEUg==
-X-Received: from pjbcz11.prod.google.com ([2002:a17:90a:d44b:b0:324:e6a7:84ce])
- (user=sagis job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:3809:b0:329:dff0:701b
- with SMTP id 98e67ed59e1d1-329dff070c6mr14129656a91.17.1756968920139; Wed, 03
- Sep 2025 23:55:20 -0700 (PDT)
-Date: Wed,  3 Sep 2025 23:54:41 -0700
+        bh=qvz/RUhUzWK3YIgJJiz6JbOWQToi8UuNVcz+/1d9b6I=;
+        b=nlYPhjIPXftmjgg127D+zv54zSWH4uHcFd96XhCAhe1K5lQfnWhScCxFzaIDNjm+2C
+         cSyP+AWZEnmQPU4n45YjtDsmnXOdyi85eXvswFdcvAbxv/v0yqLbF+4CLDMVGVRJB0GN
+         yBL0OE5uhYRCgpcWdo4crgifEprs7bKJ8cg6ho58mZbIyyn6JMrj8rrDKF/OuewbchkF
+         jCAvClp19/kUGCnB20UuwSsJNd4uz4u+OI0eXL4JIuM/JaKsfMZXgElcd1lHHaRqoGKX
+         e9olcOkepqIk9eqnlW6njxeGeJv484T5drNoxDKL0tqTQEGwJUvgUSkxThmwPcXE8xkF
+         TZXQ==
+X-Forwarded-Encrypted: i=1; AJvYcCV5rxM0nOm5u6qixwJHkbMv1MWdgaR6PnL7azd2uzTlFJ94u4+plG1U5nA2S5bs7MbOq30=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yz7s+kzKjSkVQqcQZ14nuO+aEaZVDadbbqVy0p9p5aBnSZH0Z7A
+	/Egb7Dp3f3JVGolKFvxllidXfQIXrv5J0xM0v8tgL/8cOarbxgrqphtcTrUWGPFzwmjSqr5t6uM
+	r+g==
+X-Google-Smtp-Source: AGHT+IHOjWuQK34dUf4IdxwrpKRnSqRG6X0hBaPJ0I2Ra4SwU/ya2UpxFzedgGOgdGACsTrDLh7HJK5caQ==
+X-Received: from pjbse15.prod.google.com ([2002:a17:90b:518f:b0:32b:95bb:dbc])
+ (user=sagis job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:570d:b0:329:f535:6e3c
+ with SMTP id 98e67ed59e1d1-329f5356ef7mr10386542a91.35.1756968921579; Wed, 03
+ Sep 2025 23:55:21 -0700 (PDT)
+Date: Wed,  3 Sep 2025 23:54:42 -0700
 In-Reply-To: <20250904065453.639610-1-sagis@google.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
@@ -74,8 +74,9 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
 References: <20250904065453.639610-1-sagis@google.com>
 X-Mailer: git-send-email 2.51.0.338.gd7d06c2dae-goog
-Message-ID: <20250904065453.639610-12-sagis@google.com>
-Subject: [PATCH v10 11/21] KVM: selftests: Add helper to initialize TDX VM
+Message-ID: <20250904065453.639610-13-sagis@google.com>
+Subject: [PATCH v10 12/21] KVM: selftests: TDX: Use KVM_TDX_CAPABILITIES to
+ validate TDs' attribute configuration
 From: Sagi Shahar <sagis@google.com>
 To: linux-kselftest@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>, 
 	Shuah Khan <shuah@kernel.org>, Sean Christopherson <seanjc@google.com>, 
@@ -90,230 +91,52 @@ To: linux-kselftest@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
 Cc: linux-kernel@vger.kernel.org, kvm@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
 
-KVM_TDX_INIT_VM needs to be called after KVM_CREATE_VM and before
-creating any VCPUs, thus before KVM_SET_CPUID2. KVM_TDX_INIT_VM accepts
-the CPUID values directly.
+From: Isaku Yamahata <isaku.yamahata@intel.com>
 
-Since KVM_GET_CPUID2 can't be used at this point, calculate the CPUID
-values manually by using kvm_get_supported_cpuid() and filter the
-returned CPUIDs against the supported CPUID values read from the TDX
-module.
+Make sure that all the attributes enabled by the test are reported as
+supported by the TDX module.
 
-Co-developed-by: Isaku Yamahata <isaku.yamahata@intel.com>
+This also exercises the KVM_TDX_CAPABILITIES ioctl.
+
 Signed-off-by: Isaku Yamahata <isaku.yamahata@intel.com>
-Co-developed-by: Rick Edgecombe <rick.p.edgecombe@intel.com>
-Signed-off-by: Rick Edgecombe <rick.p.edgecombe@intel.com>
+Co-developed-by: Sagi Shahar <sagis@google.com>
 Signed-off-by: Sagi Shahar <sagis@google.com>
 ---
- .../selftests/kvm/include/x86/tdx/tdx_util.h  |  54 +++++++
- .../selftests/kvm/lib/x86/tdx/tdx_util.c      | 132 ++++++++++++++++++
- 2 files changed, 186 insertions(+)
+ tools/testing/selftests/kvm/lib/x86/tdx/tdx_util.c | 14 ++++++++++++++
+ 1 file changed, 14 insertions(+)
 
-diff --git a/tools/testing/selftests/kvm/include/x86/tdx/tdx_util.h b/tools/testing/selftests/kvm/include/x86/tdx/tdx_util.h
-index dafdc7e46abe..a2509959c7ce 100644
---- a/tools/testing/selftests/kvm/include/x86/tdx/tdx_util.h
-+++ b/tools/testing/selftests/kvm/include/x86/tdx/tdx_util.h
-@@ -11,6 +11,60 @@ static inline bool is_tdx_vm(struct kvm_vm *vm)
- 	return vm->type == KVM_X86_TDX_VM;
- }
- 
-+/*
-+ * TDX ioctls
-+ */
-+
-+#define __vm_tdx_vm_ioctl(vm, cmd, metadata, arg)			\
-+({									\
-+	int r;								\
-+									\
-+	union {								\
-+		struct kvm_tdx_cmd c;					\
-+		unsigned long raw;					\
-+	} tdx_cmd = { .c = {						\
-+		.id = (cmd),						\
-+		.flags = (uint32_t)(metadata),				\
-+		.data = (uint64_t)(arg),				\
-+	} };								\
-+									\
-+	r = __vm_ioctl(vm, KVM_MEMORY_ENCRYPT_OP, &tdx_cmd.raw);	\
-+	r ?: tdx_cmd.c.hw_error;					\
-+})
-+
-+#define vm_tdx_vm_ioctl(vm, cmd, flags, arg)				\
-+({									\
-+	int ret = __vm_tdx_vm_ioctl(vm, cmd, flags, arg);		\
-+									\
-+	__TEST_ASSERT_VM_VCPU_IOCTL(!ret, #cmd,	ret, vm);		\
-+})
-+
-+#define __vm_tdx_vcpu_ioctl(vcpu, cmd, metadata, arg)			\
-+({									\
-+	int r;								\
-+									\
-+	union {								\
-+		struct kvm_tdx_cmd c;					\
-+		unsigned long raw;					\
-+	} tdx_cmd = { .c = {						\
-+		.id = (cmd),						\
-+		.flags = (uint32_t)(metadata),				\
-+		.data = (uint64_t)(arg),				\
-+	} };								\
-+									\
-+	r = __vcpu_ioctl(vcpu, KVM_MEMORY_ENCRYPT_OP, &tdx_cmd.raw);	\
-+	r ?: tdx_cmd.c.hw_error;					\
-+})
-+
-+#define vm_tdx_vcpu_ioctl(vcpu, cmd, flags, arg)			\
-+({									\
-+	int ret = __vm_tdx_vcpu_ioctl(vcpu, cmd, flags, arg);		\
-+									\
-+	__TEST_ASSERT_VM_VCPU_IOCTL(!ret, #cmd, ret, (vcpu)->vm);	\
-+})
-+
-+void vm_tdx_init_vm(struct kvm_vm *vm, uint64_t attributes);
-+
- void vm_tdx_setup_boot_code_region(struct kvm_vm *vm);
- void vm_tdx_setup_boot_parameters_region(struct kvm_vm *vm, uint32_t nr_runnable_vcpus);
- void vm_tdx_load_common_boot_parameters(struct kvm_vm *vm);
 diff --git a/tools/testing/selftests/kvm/lib/x86/tdx/tdx_util.c b/tools/testing/selftests/kvm/lib/x86/tdx/tdx_util.c
-index ff61333bc848..aa0cb6c2205b 100644
+index aa0cb6c2205b..1b5c01faf1cd 100644
 --- a/tools/testing/selftests/kvm/lib/x86/tdx/tdx_util.c
 +++ b/tools/testing/selftests/kvm/lib/x86/tdx/tdx_util.c
-@@ -127,3 +127,135 @@ void vm_tdx_set_vcpu_entry_point(struct kvm_vcpu *vcpu, void *guest_code)
- 
- 	vcpu_params->guest_code = (uint64_t)guest_code;
+@@ -234,6 +234,18 @@ static void vm_tdx_filter_cpuid(struct kvm_vm *vm,
+ 	free(tdx_cap);
  }
-+
-+static struct kvm_tdx_capabilities *tdx_read_capabilities(struct kvm_vm *vm)
-+{
-+	struct kvm_tdx_capabilities *tdx_cap = NULL;
-+	int nr_cpuid_configs = 4;
-+	int rc = -1;
-+	int i;
-+
-+	do {
-+		nr_cpuid_configs *= 2;
-+
-+		tdx_cap = realloc(tdx_cap, sizeof(*tdx_cap) +
-+					   sizeof(tdx_cap->cpuid) +
-+					   (sizeof(struct kvm_cpuid_entry2) * nr_cpuid_configs));
-+		TEST_ASSERT(tdx_cap,
-+			    "Could not allocate memory for tdx capability nr_cpuid_configs %d\n",
-+			    nr_cpuid_configs);
-+
-+		tdx_cap->cpuid.nent = nr_cpuid_configs;
-+		rc = __vm_tdx_vm_ioctl(vm, KVM_TDX_CAPABILITIES, 0, tdx_cap);
-+	} while (rc < 0 && errno == E2BIG);
-+
-+	TEST_ASSERT(rc == 0, "KVM_TDX_CAPABILITIES failed: %d %d",
-+		    rc, errno);
-+
-+	pr_debug("tdx_cap: supported_attrs: 0x%016llx\n"
-+		 "tdx_cap: supported_xfam 0x%016llx\n",
-+		 tdx_cap->supported_attrs, tdx_cap->supported_xfam);
-+
-+	for (i = 0; i < tdx_cap->cpuid.nent; i++) {
-+		const struct kvm_cpuid_entry2 *config = &tdx_cap->cpuid.entries[i];
-+
-+		pr_debug("cpuid config[%d]: leaf 0x%x sub_leaf 0x%x eax 0x%08x ebx 0x%08x ecx 0x%08x edx 0x%08x\n",
-+			 i, config->function, config->index,
-+			 config->eax, config->ebx, config->ecx, config->edx);
-+	}
-+
-+	return tdx_cap;
-+}
-+
-+static struct kvm_cpuid_entry2 *tdx_find_cpuid_config(struct kvm_tdx_capabilities *cap,
-+						      uint32_t leaf, uint32_t sub_leaf)
-+{
-+	struct kvm_cpuid_entry2 *config;
-+	uint32_t i;
-+
-+	for (i = 0; i < cap->cpuid.nent; i++) {
-+		config = &cap->cpuid.entries[i];
-+
-+		if (config->function == leaf && config->index == sub_leaf)
-+			return config;
-+	}
-+
-+	return NULL;
-+}
-+
-+/*
-+ * Filter CPUID based on TDX supported capabilities
-+ *
-+ * Input Args:
-+ *   vm - Virtual Machine
-+ *   cpuid_data - CPUID fileds to filter
-+ *
-+ * Output Args: None
-+ *
-+ * Return: None
-+ *
-+ * For each CPUID leaf, filter out non-supported bits based on the capabilities reported
-+ * by the TDX module
-+ */
-+static void vm_tdx_filter_cpuid(struct kvm_vm *vm,
-+				struct kvm_cpuid2 *cpuid_data)
+ 
++static void tdx_check_attributes(struct kvm_vm *vm, uint64_t attributes)
 +{
 +	struct kvm_tdx_capabilities *tdx_cap;
-+	struct kvm_cpuid_entry2 *config;
-+	struct kvm_cpuid_entry2 *e;
-+	int i;
 +
 +	tdx_cap = tdx_read_capabilities(vm);
 +
-+	i = 0;
-+	while (i < cpuid_data->nent) {
-+		e = cpuid_data->entries + i;
-+		config = tdx_find_cpuid_config(tdx_cap, e->function, e->index);
-+
-+		if (!config) {
-+			int left = cpuid_data->nent - i - 1;
-+
-+			if (left > 0)
-+				memmove(cpuid_data->entries + i,
-+					cpuid_data->entries + i + 1,
-+					sizeof(*cpuid_data->entries) * left);
-+			cpuid_data->nent--;
-+			continue;
-+		}
-+
-+		e->eax &= config->eax;
-+		e->ebx &= config->ebx;
-+		e->ecx &= config->ecx;
-+		e->edx &= config->edx;
-+
-+		i++;
-+	}
++	/* Make sure all the attributes are reported as supported by the TDX module */
++	TEST_ASSERT_EQ(attributes & tdx_cap->supported_attrs, attributes);
 +
 +	free(tdx_cap);
 +}
 +
-+void vm_tdx_init_vm(struct kvm_vm *vm, uint64_t attributes)
-+{
-+	struct kvm_tdx_init_vm *init_vm;
-+	const struct kvm_cpuid2 *tmp;
-+	struct kvm_cpuid2 *cpuid;
+ void vm_tdx_init_vm(struct kvm_vm *vm, uint64_t attributes)
+ {
+ 	struct kvm_tdx_init_vm *init_vm;
+@@ -253,6 +265,8 @@ void vm_tdx_init_vm(struct kvm_vm *vm, uint64_t attributes)
+ 	memcpy(&init_vm->cpuid, cpuid, kvm_cpuid2_size(cpuid->nent));
+ 	free(cpuid);
+ 
++	tdx_check_attributes(vm, attributes);
 +
-+	tmp = kvm_get_supported_cpuid();
-+
-+	cpuid = allocate_kvm_cpuid2(MAX_NR_CPUID_ENTRIES);
-+	memcpy(cpuid, tmp, kvm_cpuid2_size(tmp->nent));
-+	vm_tdx_filter_cpuid(vm, cpuid);
-+
-+	init_vm = calloc(1, sizeof(*init_vm) +
-+			 sizeof(init_vm->cpuid.entries[0]) * cpuid->nent);
-+	TEST_ASSERT(init_vm, "init_vm allocation failed");
-+
-+	memcpy(&init_vm->cpuid, cpuid, kvm_cpuid2_size(cpuid->nent));
-+	free(cpuid);
-+
-+	init_vm->attributes = attributes;
-+
-+	vm_tdx_vm_ioctl(vm, KVM_TDX_INIT_VM, 0, init_vm);
-+
-+	free(init_vm);
-+}
+ 	init_vm->attributes = attributes;
+ 
+ 	vm_tdx_vm_ioctl(vm, KVM_TDX_INIT_VM, 0, init_vm);
 -- 
 2.51.0.338.gd7d06c2dae-goog
 
