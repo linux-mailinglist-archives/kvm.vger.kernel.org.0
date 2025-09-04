@@ -1,81 +1,81 @@
-Return-Path: <kvm+bounces-56778-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-56779-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1D7ACB43528
-	for <lists+kvm@lfdr.de>; Thu,  4 Sep 2025 10:13:39 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id E8856B4352A
+	for <lists+kvm@lfdr.de>; Thu,  4 Sep 2025 10:13:46 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 02EC9686EFD
-	for <lists+kvm@lfdr.de>; Thu,  4 Sep 2025 08:12:56 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B6AC76884C8
+	for <lists+kvm@lfdr.de>; Thu,  4 Sep 2025 08:13:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7DC592C324F;
-	Thu,  4 Sep 2025 08:11:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7C7762C326F;
+	Thu,  4 Sep 2025 08:11:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="Xg0C6YbC"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="kbG5acIi"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-ej1-f51.google.com (mail-ej1-f51.google.com [209.85.218.51])
+Received: from mail-ed1-f46.google.com (mail-ed1-f46.google.com [209.85.208.46])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E39972C1585
-	for <kvm@vger.kernel.org>; Thu,  4 Sep 2025 08:11:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.51
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DB4882C21D5
+	for <kvm@vger.kernel.org>; Thu,  4 Sep 2025 08:11:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.46
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756973506; cv=none; b=Nr2RzjBUh6zbrd82UYkuVoaMOBejG3rtd9pGNR59Vu8jCCxVAGBpwbvKjgHX/oHjv6OhkMAIty5M66zjIvnX4y4Ja8wIQW2lftkfTl5IYNidXKBt/c03OTXnwhw5tluEeQl34f4sB3Xuqx0Di3uwMWodhfm/Da47jqsZ8vDldHA=
+	t=1756973507; cv=none; b=j5+rzpbO1qqnRjSo6w+TjlRFrHdlYmrAOE6PC0LTMLoFJIIwrrpYrOmdmwDrztDLLH0aw6CjloCLFq1tXisz35SYIPmuVSuQ1c+9rR8SkuAvFGhx/RnpUxciOtX+m3PTmFGjdXdCpkunLCFwldpaQnrAXUG0qIC1WGshs775jy4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756973506; c=relaxed/simple;
-	bh=ZHzuEjS+tIsAD+34TyxBcrkEz+QsALk9vHVGZLvzMEE=;
+	s=arc-20240116; t=1756973507; c=relaxed/simple;
+	bh=BQMNJSFYDOADxPmjE7KhCHj8ong/Jy5m8lGgFICBako=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=ix1zp0BAbKcBWDSMCFFXYqyzCfimVZNPq8jsVkXvObLqL1ofnmd4N+2zcIuKX1DPuamyfLH+7VgPZfNAiJjjzG/vA673MDwFnSezZhKpC+hAbMtB/KkE+v5tydo2H2KjOjq0VJhN4IxX9ayfy8k1LD09hUIn2R5tnpFqXePUoig=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=Xg0C6YbC; arc=none smtp.client-ip=209.85.218.51
+	 MIME-Version; b=AeyCaUKhytRbcX/ZYI5RHWdkjNBAKDJUxWkUebRvzObrZX7auoYwG3hr8U0fBqL2LzTvTo8DfUTrMV2h/sL4RFNrczhvNM8nqklQS6+BlIenNzPqt6MAVR7zM15gmv3YO1SDmCMeP7IGORoDU1o+Woxs68+2qybvcmtd4q8gOto=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=kbG5acIi; arc=none smtp.client-ip=209.85.208.46
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
-Received: by mail-ej1-f51.google.com with SMTP id a640c23a62f3a-afcb7ace3baso137843566b.3
-        for <kvm@vger.kernel.org>; Thu, 04 Sep 2025 01:11:44 -0700 (PDT)
+Received: by mail-ed1-f46.google.com with SMTP id 4fb4d7f45d1cf-6188b5ae1e8so921236a12.0
+        for <kvm@vger.kernel.org>; Thu, 04 Sep 2025 01:11:45 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1756973503; x=1757578303; darn=vger.kernel.org;
+        d=linaro.org; s=google; t=1756973504; x=1757578304; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=KFEhhh8NSACPPy03lAUeW1WvXOIqiNIP9Gmw/5CKVpI=;
-        b=Xg0C6YbCM/g3C+uGG2+rZ738ALD7tQ/zAt1ue75wJQrKUW1qXYQlLM2Aat/i/BhA1T
-         23hkrQDh/qWSyCEW2RVmO2pyaEyEAOF60+JprZra4TFxiA1dkOBTXeaFmdMcj6FME7MJ
-         a9yDFHyUL6EJADWlTYAePuGyDTf8WagCq5OrO4mfsBsLigTdNDj63e+QUd3Ez47KKkiM
-         kiWvPg3hKC+HnPCKxt70JOTRH+ZGIdsv87ukgxU19+vfjNRGRL7uqSPBVfo1NTd2p55k
-         tUQskR5wFjSlmjMYk2jgRkNzbpsx3PLz1cEH0PU1ubLTlu4cPwRMHJlqgj7QvFbkVe1J
-         7hpA==
+        bh=myCatgpniSey/NjO+dQuRIOhbIuhsJO0uetvy2+5HH0=;
+        b=kbG5acIiF5n9tZeuc2OnhkLxiHYZHxEh6WkSAkFYS5uKb3HlFGVBJCYF0ZLkEiU8Zz
+         cIRvvdgQwqoB6YIM0b8afv9lpoUVFcBxRezcFVYZY6gMQXtV9GVYIngG6aMLOv0E1CF8
+         zND8Ur9VmUxdYs2BnJSvU6+VzcF4tcvRGuuu+ets56E3V/neMK3KlhYDiTw5UV5Seho4
+         BFAcdLQnCiMoY00noG9hhHyvItwzGr2zIkvUMBiakd6gfVRcQDaftHjBLb1REyKANYfy
+         Z0/e4wh8qcFGtDoY3VSJa6HDpbeGQ+Uo4TpGw8PnMno0+Io1xYFZnVTmyVekZzHQKfsL
+         /0xA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1756973503; x=1757578303;
+        d=1e100.net; s=20230601; t=1756973504; x=1757578304;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=KFEhhh8NSACPPy03lAUeW1WvXOIqiNIP9Gmw/5CKVpI=;
-        b=Taq8QDRzgaNiiwl6PAP6I/XE6XLeoT1npbGCWhtLjwMfx8pMGNG/9us3LNrWSCMUhP
-         fzhRhVS/Os+jLZO6wnj01Ztl3uH7234HYHDVFPun7PDuYLM8w9YqTkGLB5XSquY/zHvL
-         OtcllqvBrN/w4/qAeobYIeCwbk0adnmev5m8WvsnYDB/M2zJNY7iRd8HjuuvOBdoV2Zh
-         YhzTSsphf40VXMDv4IswERKK5RAo7YO5mKSHRZ4UmCOKVCbCkC6895LCxtEI22etZdAP
-         80w7lmMONFUGahadL34/NTd6ZfI80rWdHBJgKf54rCIVpHYMNrqmrBG0XmtNbHzfo0Du
-         kY1A==
-X-Forwarded-Encrypted: i=1; AJvYcCVfJDdiA4AGjW6VeJOoTCVhjbKPU4PyhZnnQenOh5K+pE5y6UvSQTwVgdaC14/dqhaY7hQ=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxKsUH5omHszJ05MVGsFZFDGVdIWq448hl9au5OJY/b9RpuffHz
-	K7a9bNTHmUDCP716NIDmlg00vbj85/9pNDobcapxFkb6P8bQEWTKp31hi4w5MuDfnFw=
-X-Gm-Gg: ASbGnctXBLW25l/jfvP2eYf7m8KFEKUkb+TZnRuViYlWuVUbmniztPE7WxyUzY5RDN6
-	FbopQJ9Z4/5LGW1Ofd2zmqMIcSs4l3w49LPrFYiGug89UzCluRWEjWjjlt5BGBzVT692IwVlMD9
-	6kiaMXE463TZ2qjnEJymJYmfNBv5i8B8hYEXjD70LYHuCiV7d0fUiDihiv17d9FHc3SYtxfOFNE
-	U1BQerB/G9/ltrUZ0wD9WoVu8gD8AlCCiNzROHz9yBRqCRKnAdz0M4zQ+WfkAzTt7kv03lBFBvH
-	6JOkAC8CbcYIWwNdCwtjfgu3syKTWQ5LK3/ElItZDrys0+kVxaCQqCyiZKebaNA3vulYKPgOzk7
-	xml9P6mLBo0WLNjXu4IpMLjAJMYyTEdwLzQ==
-X-Google-Smtp-Source: AGHT+IFlmoTtWtJZg3Geb0kfl+Z+ucuFEHRktCaxjXa7c0bTRextSI2xhSOy4rmatDTUkMpDVjITog==
-X-Received: by 2002:a17:907:3e8f:b0:b04:6c19:ed8d with SMTP id a640c23a62f3a-b046c19eea9mr457804566b.26.1756973503102;
-        Thu, 04 Sep 2025 01:11:43 -0700 (PDT)
+        bh=myCatgpniSey/NjO+dQuRIOhbIuhsJO0uetvy2+5HH0=;
+        b=FdI49uIfwc0h7mO3zV1/+8HRpU4H7eViIdw4azk8XkpmB7i7exY6hpHdcDQOMolA4+
+         kLtEV0GfeKzCPl/Gocrm9PuNJFWUvidx+0HgXJQATVlNzVQh75A7Jai19BjVsRB09WHO
+         wcAjTLv2a8rINMi5ZNohW7LwV0QbAGj0F8idN8nFQ1nuDnRyfmicvB9uLGDLLRyqEse+
+         3x7GyMRt17IzxDlvxf3wE3xeynM0g+4amJgjjILjKwRoDpRtJv+f85RHkeHPNpOFV3Ry
+         tT4iAKDKz6tP91+UmCd2tv/MMwDSzU75UR1FGkRvkuvfDLCkpI6mCgZfhF9D9f+BBuye
+         cIHQ==
+X-Forwarded-Encrypted: i=1; AJvYcCWrQSeIVUhyE6wrRgM3XMdTrSG1RIb9J8c8q0H1gTwkHPnvMMa2ilqxVA+HpQ552T+sTA0=@vger.kernel.org
+X-Gm-Message-State: AOJu0Ywi92Ak1dT5nZXIyEpyVwNMGw6WiY22PiUM4TT1dbceyKhJEoM3
+	M77xQIvdpRC6MJ5ROKzlY3WtpADloToHHJWFQDy4NSjh5NUleJZN3wO7FGCNID7PTwY=
+X-Gm-Gg: ASbGncvDjk4wfsCDBntexK++x5I40/QxCvgIiye8IwFlZ9e4YCKkT/G4EIYwXN2xqx2
+	CqjN8UuFCwRUsQxgOS0gNLnjNJfFPXe+IaVFdKMbZm1HexGLBGPWLuTq6MbpazxmwPfedJO9IBD
+	2khsWM9OvVKoh/BOJtHmnSHuQmOHpA6dbBzvIEE9TIqAf9nprkpXCC3pcIlQYlf45wxZcC33Rdl
+	s5xFQ0PaOVHbYN7jTs1K/W3dIBFzdZRVIWitCyx1E0JiUXWLH/CdKbdCns4c63fdSgb4TsdfhMI
+	Ii1pICRuixqurnaD5UR1zhH9Ix+dW9ay2mCSfKN6xJkP7WH1gzjF057nCkmsS4FK5DqjD4wadf6
+	rxvAp3cJkrlocAON4a8q1vDM=
+X-Google-Smtp-Source: AGHT+IEkvYRALNYOlXlCh0M9P7tOTgw2dIkqwHytdvjqGaEFKKMvexexT1+4HGfULBPkmc4HuBN2QQ==
+X-Received: by 2002:a05:6402:40ce:b0:61d:cd5:8b6e with SMTP id 4fb4d7f45d1cf-61d260cc220mr16736785a12.0.1756973504083;
+        Thu, 04 Sep 2025 01:11:44 -0700 (PDT)
 Received: from draig.lan ([185.126.160.19])
-        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-61cfc4e50fbsm13438274a12.38.2025.09.04.01.11.37
+        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-61ede659366sm2877110a12.24.2025.09.04.01.11.37
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 04 Sep 2025 01:11:37 -0700 (PDT)
+        Thu, 04 Sep 2025 01:11:43 -0700 (PDT)
 Received: from draig.lan (localhost [IPv6:::1])
-	by draig.lan (Postfix) with ESMTP id F0D1B5FA1B;
-	Thu, 04 Sep 2025 09:11:29 +0100 (BST)
+	by draig.lan (Postfix) with ESMTP id 16B025FA31;
+	Thu, 04 Sep 2025 09:11:30 +0100 (BST)
 From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
 To: qemu-devel@nongnu.org
 Cc: Reinoud Zandijk <reinoud@netbsd.org>,
@@ -163,9 +163,9 @@ Cc: Reinoud Zandijk <reinoud@netbsd.org>,
 	Nicholas Piggin <npiggin@gmail.com>,
 	John Levon <john.levon@nutanix.com>,
 	Pierrick Bouvier <pierrick.bouvier@linaro.org>
-Subject: [PATCH v2 015/281] tests/functional/meson.build: Split timeout settings by target
-Date: Thu,  4 Sep 2025 09:06:49 +0100
-Message-ID: <20250904081128.1942269-16-alex.bennee@linaro.org>
+Subject: [PATCH v2 016/281] tests/functional/meson.build: Allow tests to reside in subfolders
+Date: Thu,  4 Sep 2025 09:06:50 +0100
+Message-ID: <20250904081128.1942269-17-alex.bennee@linaro.org>
 X-Mailer: git-send-email 2.47.2
 In-Reply-To: <20250904081128.1942269-1-alex.bennee@linaro.org>
 References: <20250904081128.1942269-1-alex.bennee@linaro.org>
@@ -179,122 +179,36 @@ Content-Transfer-Encoding: 8bit
 
 From: Thomas Huth <thuth@redhat.com>
 
-We are going to move these settings into target-specific subfolders.
-As a first step, split the big test_timeouts array up into individual
-ones.
+We are going to move target-specific tests to subfolders that are
+named after the target (and generic tests will be put into a "generic"
+folder), so prepare the meson.build file to allow such locations, too.
 
 Reviewed-by: Pierrick Bouvier <pierrick.bouvier@linaro.org>
 Signed-off-by: Thomas Huth <thuth@redhat.com>
-Message-ID: <20250819112403.432587-4-thuth@redhat.com>
+Message-ID: <20250819112403.432587-5-thuth@redhat.com>
 ---
- tests/functional/meson.build | 50 +++++++++++++++++++++++++++++++-----
- 1 file changed, 44 insertions(+), 6 deletions(-)
+ tests/functional/meson.build | 8 +++++++-
+ 1 file changed, 7 insertions(+), 1 deletion(-)
 
 diff --git a/tests/functional/meson.build b/tests/functional/meson.build
-index 38ae0d6cd3b..356aad12dee 100644
+index 356aad12dee..8c24ac1cc2d 100644
 --- a/tests/functional/meson.build
 +++ b/tests/functional/meson.build
-@@ -10,7 +10,7 @@ if get_option('tcg_interpreter')
- endif
+@@ -423,7 +423,13 @@ foreach speed : ['quick', 'thorough']
  
- # Timeouts for individual tests that can be slow e.g. with debugging enabled
--test_timeouts = {
-+test_aarch64_timeouts = {
-   'aarch64_aspeed_ast2700' : 600,
-   'aarch64_aspeed_ast2700fc' : 600,
-   'aarch64_device_passthrough' : 720,
-@@ -25,7 +25,9 @@ test_timeouts = {
-   'aarch64_tuxrun' : 240,
-   'aarch64_virt' : 360,
-   'aarch64_virt_gpu' : 480,
--  'acpi_bits' : 420,
-+}
-+
-+test_arm_timeouts = {
-   'arm_aspeed_palmetto' : 120,
-   'arm_aspeed_romulus' : 120,
-   'arm_aspeed_witherspoon' : 120,
-@@ -44,24 +46,55 @@ test_timeouts = {
-   'arm_replay' : 240,
-   'arm_tuxrun' : 240,
-   'arm_sx1' : 360,
--  'intel_iommu': 300,
-+}
-+
-+test_mips_timeouts = {
-   'mips_malta' : 480,
-+}
-+
-+test_mipsel_timeouts = {
-   'mipsel_malta' : 420,
-   'mipsel_replay' : 480,
-+}
-+
-+test_mips64_timeouts = {
-   'mips64_malta' : 240,
-+}
-+
-+test_mips64el_timeouts = {
-   'mips64el_malta' : 420,
-   'mips64el_replay' : 180,
--  'netdev_ethtool' : 180,
-+}
-+
-+test_ppc_timeouts = {
-   'ppc_40p' : 240,
-+}
-+
-+test_ppc64_timeouts = {
-   'ppc64_hv' : 1000,
-   'ppc64_powernv' : 480,
-   'ppc64_pseries' : 480,
-   'ppc64_replay' : 210,
-   'ppc64_tuxrun' : 420,
-   'ppc64_mac99' : 120,
-+}
-+
-+test_riscv64_timeouts = {
-   'riscv64_tuxrun' : 120,
-+}
-+
-+test_s390x_timeouts = {
-   's390x_ccw_virtio' : 420,
-+}
-+
-+test_sh4_timeouts = {
-   'sh4_tuxrun' : 240,
-+}
-+
-+test_x86_64_timeouts = {
-+  'acpi_bits' : 420,
-+  'intel_iommu': 300,
-+  'netdev_ethtool' : 180,
-   'virtio_balloon': 120,
-   'x86_64_kvm_xen' : 180,
-   'x86_64_replay' : 480,
-@@ -404,6 +437,11 @@ foreach speed : ['quick', 'thorough']
-                                build_by_default: false,
-                                env: test_precache_env)
-       precache_all += precache
-+      if is_variable('test_' + target_base + '_timeouts')
-+        time_out = get_variable('test_' + target_base + '_timeouts').get(test, 90)
+     foreach test : target_tests
+       testname = '@0@-@1@'.format(target_base, test)
+-      testfile = 'test_' + test + '.py'
++      if fs.exists('test_' + test + '.py')
++        testfile = 'test_' + test + '.py'
++      elif fs.exists('generic' / 'test_' + test + '.py')
++        testfile = 'generic' / 'test_' + test + '.py'
 +      else
-+        time_out = 90
++        testfile = target_base / 'test_' + test + '.py'
 +      endif
- 
-       # Ideally we would add 'precache' to 'depends' here, such that
-       # 'build_by_default: false' lets the pre-caching automatically
-@@ -419,8 +457,8 @@ foreach speed : ['quick', 'thorough']
-            env: test_env,
-            args: [testpath],
-            protocol: 'tap',
--           timeout: test_timeouts.get(test, 90),
--           priority: test_timeouts.get(test, 90),
-+           timeout: time_out,
-+           priority: time_out,
-            suite: suites)
-     endforeach
-   endforeach
+       testpath = meson.current_source_dir() / testfile
+       teststamp = testname + '.tstamp'
+       test_precache_env = environment()
 -- 
 2.47.2
 
