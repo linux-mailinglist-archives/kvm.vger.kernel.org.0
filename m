@@ -1,173 +1,138 @@
-Return-Path: <kvm+bounces-56815-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-56816-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id B74DFB4375B
-	for <lists+kvm@lfdr.de>; Thu,  4 Sep 2025 11:41:16 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 75E8EB43780
+	for <lists+kvm@lfdr.de>; Thu,  4 Sep 2025 11:48:45 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 771441C225BA
-	for <lists+kvm@lfdr.de>; Thu,  4 Sep 2025 09:41:37 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2A29D3A6F5F
+	for <lists+kvm@lfdr.de>; Thu,  4 Sep 2025 09:48:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DB8E32F7479;
-	Thu,  4 Sep 2025 09:41:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 08B4D2F8BCA;
+	Thu,  4 Sep 2025 09:48:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="emZOx7j1"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ji4B1n1Z"
 X-Original-To: kvm@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pj1-f66.google.com (mail-pj1-f66.google.com [209.85.216.66])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1112B26B2CE
-	for <kvm@vger.kernel.org>; Thu,  4 Sep 2025 09:41:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ADE652E62D1;
+	Thu,  4 Sep 2025 09:48:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.66
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756978870; cv=none; b=tbUFx8KJGu26LpMKS0BSFjyDOA7Dz5VVrNbULx8Af0HW8RVSXDJw0BCXBLdgJeabAb3VwNKQougVbEH6jC2ih+fKoRg+KQWXvjw0TMafigLwdMKOYB05wXjcBJPE7SNEyVxxf+HmU3LgMCirRUjYQt7XK6tKCkYNSdZ4x1/RFJo=
+	t=1756979315; cv=none; b=nLk5Vdme2XkeQjkeJGgq1HYzge8KE981kD1gHkRKo5dC6ndobVhcGWM92UMabNsXhyii858ipiJppLrghVWLlJ3uwsH54/mdR7qA9igZ2s+/oZtsh3TRNgIY5FloPUn07zzLqlW78BW19IWL9p6sgT0sMpVMb/TuCGgix9H7Aqk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756978870; c=relaxed/simple;
-	bh=XYdtB4QgovF+/4eIgDO6JOdgw1qaH6+X67HqQbA3+NA=;
-	h=Mime-Version:Content-Type:Date:Message-Id:Subject:Cc:To:From:
-	 References:In-Reply-To; b=IXU3/tZKT9puRsylX3NSM6i9dwlzdYjikaGrZg5TjzDrkCVIxjYbcTw8yAEE1xN+GuwV4mebgjtNJdYz52fGxMXovIB4DDfeSaY02geea0IEkWkXunK+kDGG1OtNzAWjmlrHZJksTtE71aYOVwPyy0PY6VcVtlI7Rt6ZgHFqBq4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=emZOx7j1; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B5E2CC4CEF0;
-	Thu,  4 Sep 2025 09:41:05 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1756978869;
-	bh=XYdtB4QgovF+/4eIgDO6JOdgw1qaH6+X67HqQbA3+NA=;
-	h=Date:Subject:Cc:To:From:References:In-Reply-To:From;
-	b=emZOx7j1dmRvG9tz6tSHCvhrVWXUU7ddp38STr5r/X91vmjD9gBl42jgA3duq/Usl
-	 FYoAI67aenRw9P7j9jyjQ1dSYu9dOfWH5EJ2LtggRvIDijDhZ/QJHgEPTQwT46QedR
-	 nKQjVLO1a7GWUbcwBz/rCi04elO5DhK4RBJFx9Gych2+PHwF2V6+snjYwQ0Ep3zRP9
-	 j6KBvAjES8255+XPyFqCJqitNUB7rbZDQhxO1ockGOCSQs3RQLnAWyjkvjVq9zbfhZ
-	 ICInW73iRQfgU8ShTte2Bws7+KueMHQo/wFDvI1iyqz5kS5Zk0IorznGEsoyoUKa89
-	 PrL4Qq41iykXw==
+	s=arc-20240116; t=1756979315; c=relaxed/simple;
+	bh=sSwkUYF31EYfDWUi1ekgZrvpYkbnG+yUu343gN42CB4=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=CABUOedoLfAovkxP/+oYARDFoAuxRF3ktRIem2Mgi4SOA8V+356ERIx4Sqw3yCvtIUK4c22cZGmCQHFDThyhJnIF6xdZPqwRsicn/em6KtwAbLkokxFNQJcfXZW9GTffLlIcAC7Iwvk3bLzZkmAv9NQENCCmVqMPgVDdME8d0xg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ji4B1n1Z; arc=none smtp.client-ip=209.85.216.66
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pj1-f66.google.com with SMTP id 98e67ed59e1d1-32326e20aadso865609a91.2;
+        Thu, 04 Sep 2025 02:48:33 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1756979313; x=1757584113; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=1IurcVIvDmIouCP1bc4ecxaPSklAYPP27lDW3IVEMq8=;
+        b=ji4B1n1ZeIOvEnmtihxYnxPG/TBXF4jPvs7SO/4wcwnOtJ9aC/ekqJGppLiDTIdzZ8
+         wxrCTvkY47Ahp10kSQjrHchgD2MOosc9ec2EuE29rAPwHFBKAIk0HBWlyz9G2Mw2sLif
+         M3bETKkxyQzArWfIjZmuBHIMfw41Ddpr+BnvmkDguKoaxzFSmRq2fBXVRl6nMW10MI2O
+         d6LvyQ5kODqdNl2KNws6Wlz370O5DPb84xzrlFth1ELYmVWwnOdTF+jeNzksMePrKRJk
+         N38zJaL/FdjwjHxmhM5gT+jTLN2TPlmWadmE365tvrHWskphia0KWmg18Pu8O5frRl5s
+         v6Sg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1756979313; x=1757584113;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=1IurcVIvDmIouCP1bc4ecxaPSklAYPP27lDW3IVEMq8=;
+        b=lxjsG9p4cN6WkJEMSqCDG8a7dRerpyKTRPqMmqLeOd8ArWUGK76D/7OwrrgXjmrrPJ
+         xfKY5UMPM8qXq6sAe1zF8bMkHPXjGgAmtWb9B/3ZJRfq3XzqypcLSA8U0pNW8wkCL/YS
+         LsyCyQqS9akxJjGVGupe8CitfC1JzW5GRN0GX+RE/60HwIjXKKCRB582bOn76TvBJIb8
+         LQR6qyxpPgIFnTGjXH1VKlxQzoLJ06C32ll59RsTuGLHaC4xdi64F5I/5V3O/3c1ASTm
+         E4uAAiHyeyRk9P8bp42nsKTW2LDGJ43gdd2qYn431OR0fwdrx1w5ghKfodGhMrO4faJe
+         0H2g==
+X-Forwarded-Encrypted: i=1; AJvYcCV55d26uDV4roLS+0lxke903YykNKEoP5n0U6il14bxpqm3P8hi7tbFUDUvuJpyILzo7fQ=@vger.kernel.org, AJvYcCWRDeM2piQYgAjcmZQq8khu80UAkiMLwXMjw9uNcEB74k8l/j08j/h4XXJzR6S4vnTe7cfF/3im8vfrkSDI@vger.kernel.org, AJvYcCWyHjOiwqPRTFzrmq6N2gJ64pZLxMd9HdAOYDHn1tjEj1IiAQQmL4MCBQsxWgxW528C4rDclcFvE4i9+1OY/xwE@vger.kernel.org
+X-Gm-Message-State: AOJu0Yxig6BqUDSp7zfb02niM7swp7kCCDNyXRtQ+VJ5PauPzdJq6Dmv
+	QrgdtySqGzAIhYUaE7zhD5R8csO62ly1lnsxxmoh5Tt2i4AckDSO+aWf
+X-Gm-Gg: ASbGncsqK5bXPkuhYdg/cZ/+eU/pnXae/yxqzrHrYghjyEsYPnyPS3d/NQwy61h95n1
+	GUik7b6UhertqcE0gYpAMcUXmwdipyKTA8iUlX8y8mhyclsayAr1baHRlznsywpSRHOTnbsO/hn
+	ZnB5Yw1aW7CZga49+wjh3/MaP6VtAw2fvnzWIksOr2yxGvX9SyriewK4qDF/H5H73MQj6uN53qe
+	fF7lu0Gnbiaw9GAyzH+ZVtU53Bea/b8mcvk4O0dM5wydHcXBnQVg804xi+y316BFAsTqtK/i6VJ
+	vlL9xtPdNqdnFnq9T9kEtfKOJqCCjRD6VJ4jWUBTSj25haIgCN43PIKA/CiFddnIsQNHm735ldx
+	kmrnrnElpwtEb7NWYA6EdxKeM
+X-Google-Smtp-Source: AGHT+IEjJvp6rZMEUJSWcF25yiJN1Bj1VOnRLqvBit6RxKK7N20DSMX22/c7VA4ex8hcWLfqNlRIIw==
+X-Received: by 2002:a17:90b:1dcc:b0:31e:7410:a4d7 with SMTP id 98e67ed59e1d1-328156e473cmr24241658a91.33.1756979312777;
+        Thu, 04 Sep 2025 02:48:32 -0700 (PDT)
+Received: from days-ASUSLaptop ([50.7.253.114])
+        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-329e1c8e07bsm7668990a91.4.2025.09.04.02.48.26
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 04 Sep 2025 02:48:32 -0700 (PDT)
+Date: Thu, 4 Sep 2025 17:48:21 +0800
+From: Dong Yang <dayss1224@gmail.com>
+To: Andrew Jones <ajones@ventanamicro.com>
+Cc: pbonzini@redhat.com, shuah@kernel.org, anup@brainfault.org,
+	atish.patra@linux.dev, paul.walmsley@sifive.com, palmer@dabbelt.com,
+	aou@eecs.berkeley.edu, alex@ghiti.fr, kvm@vger.kernel.org,
+	linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org,
+	kvm-riscv@lists.infradead.org, linux-riscv@lists.infradead.org
+Subject: Re: [PATCH v3 0/3] KVM: riscv: selftests: Enable supported test cases
+Message-ID: <aLlf6ZQ1uNjs8XS+@days-ASUSLaptop>
+References: <cover.1756710918.git.dayss1224@gmail.com>
+ <20250902-9cc0d0dad59ba680062dbbf8@orel>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-Content-Type: text/plain; charset=UTF-8
-Date: Thu, 04 Sep 2025 11:41:03 +0200
-Message-Id: <DCJX0ZBB1ATN.1WPXONLVV8RYD@kernel.org>
-Subject: Re: [RFC v2 03/14] vfio/nvidia-vgpu: introduce vGPU type uploading
-Cc: <kvm@vger.kernel.org>, <alex.williamson@redhat.com>,
- <kevin.tian@intel.com>, <jgg@nvidia.com>, <airlied@gmail.com>,
- <daniel@ffwll.ch>, <acurrid@nvidia.com>, <cjia@nvidia.com>,
- <smitra@nvidia.com>, <ankita@nvidia.com>, <aniketa@nvidia.com>,
- <kwankhede@nvidia.com>, <targupta@nvidia.com>, <zhiwang@kernel.org>,
- <acourbot@nvidia.com>, <joelagnelf@nvidia.com>, <apopple@nvidia.com>,
- <jhubbard@nvidia.com>, <nouveau@lists.freedesktop.org>
-To: "Zhi Wang" <zhiw@nvidia.com>
-From: "Danilo Krummrich" <dakr@kernel.org>
-References: <20250903221111.3866249-1-zhiw@nvidia.com>
- <20250903221111.3866249-4-zhiw@nvidia.com>
- <DCJWXVLI2GWB.3UBHWIZCZXKD2@kernel.org>
-In-Reply-To: <DCJWXVLI2GWB.3UBHWIZCZXKD2@kernel.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250902-9cc0d0dad59ba680062dbbf8@orel>
 
-(Cc: Alex, John, Joel, Alistair, nouveau)
-
-On Thu Sep 4, 2025 at 11:37 AM CEST, Danilo Krummrich wrote:
-> On Thu Sep 4, 2025 at 12:11 AM CEST, Zhi Wang wrote:
->> diff --git a/drivers/vfio/pci/nvidia-vgpu/include/nvrm/gsp.h b/drivers/v=
-fio/pci/nvidia-vgpu/include/nvrm/gsp.h
->> new file mode 100644
->> index 000000000000..c3fb7b299533
->> --- /dev/null
->> +++ b/drivers/vfio/pci/nvidia-vgpu/include/nvrm/gsp.h
->> @@ -0,0 +1,18 @@
->> +/* SPDX-License-Identifier: MIT */
->> +#ifndef __NVRM_GSP_H__
->> +#define __NVRM_GSP_H__
->> +
->> +#include <nvrm/nvtypes.h>
->> +
->> +/* Excerpt of RM headers from https://github.com/NVIDIA/open-gpu-kernel=
--modules/tree/570 */
->> +
->> +#define NV2080_CTRL_CMD_GSP_GET_FEATURES (0x20803601)
->> +
->> +typedef struct NV2080_CTRL_GSP_GET_FEATURES_PARAMS {
->> +	NvU32  gspFeatures;
->> +	NvBool bValid;
->> +	NvBool bDefaultGspRmGpu;
->> +	NvU8   firmwareVersion[GSP_MAX_BUILD_VERSION_LENGTH];
->> +} NV2080_CTRL_GSP_GET_FEATURES_PARAMS;
->> +
->> +#endif
->
-> <snip>
->
->> +static struct version supported_version_list[] =3D {
->> +	{ 18, 1, "570.144" },
->> +};
->
-> nova-core won't provide any firmware specific APIs, it is meant to serve =
-as a
-> hardware and firmware abstraction layer for higher level drivers, such as=
- vGPU
-> or nova-drm.
->
-> As a general rule the interface between nova-core and higher level driver=
-s must
-> not leak any hardware or firmware specific details, but work on a higher =
-level
-> abstraction layer.
->
-> Now, I recognize that at some point it might be necessary to do some kind=
- of
-> versioning in this API anyways. For instance, when the semantics of the f=
-irmware
-> API changes too significantly.
->
-> However, this would be a separte API where nova-core, at the initial hand=
-shake,
-> then asks clients to use e.g. v2 of the nova-core API, still hiding any f=
-irmware
-> and hardware details from the client.
->
-> Some more general notes, since I also had a look at the nova-core <-> vGP=
-U
-> interface patches in your tree (even though I'm aware that they're not pa=
-rt of
-> the RFC of course):
->
-> The interface for the general lifecycle management for any clients attach=
-ing to
-> nova-core (VGPU, nova-drm) should be common and not specific to vGPU. (Th=
-e same
-> goes for interfaces that will be used by vGPU and nova-drm.)
->
-> The interface nova-core provides for that should be designed in Rust, so =
-we can
-> take advantage of all the features the type system provides us with conne=
-cting
-> to Rust clients (nova-drm).
->
-> For vGPU, we can then monomorphize those types into the corresponding C
-> structures and provide the corresponding functions very easily.
->
-> Doing it the other way around would be a very bad idea, since the Rust ty=
-pe
-> system is much more powerful and hence it'd be very hard to avoid introdu=
-cing
-> limitations on the Rust side of things.
->
-> Hence, I recommend to start with some patches defining the API in nova-co=
-re for
-> the general lifecycle (in Rust), so we can take it from there.
->
-> Another note: I don't see any use of the auxiliary bus in vGPU, any clien=
-ts
-> should attach via the auxiliary bus API, it provides proper matching wher=
-e
-> there's more than on compatible GPU in the system. nova-core already regi=
-sters
-> an auxiliary device for each bound PCI device.
->
-> Please don't re-implement what the auxiliary bus already does for us.
->
-> - Danilo
-
+On Tue, Sep 02, 2025 at 10:36:10AM -0500, Andrew Jones wrote:
+> On Mon, Sep 01, 2025 at 03:35:48PM +0800, dayss1224@gmail.com wrote:
+> > From: Dong Yang <dayss1224@gmail.com>
+> > 
+> > Add supported KVM test cases and fix the compilation dependencies.
+> > ---
+> > Changes in v3:
+> > - Reorder patches to fix build dependencies
+> > - Sort common supported test cases alphabetically
+> > - Move ucall_common.h include from common header to specific source files
+> > 
+> > Changes in v2:
+> > - Delete some repeat KVM test cases on riscv
+> > - Add missing headers to fix the build for new RISC-V KVM selftests
+> > 
+> > Dong Yang (1):
+> >   KVM: riscv: selftests: Add missing headers for new testcases
+> > 
+> > Quan Zhou (2):
+> >   KVM: riscv: selftests: Use the existing RISCV_FENCE macro in
+> >     `rseq-riscv.h`
+> >   KVM: riscv: selftests: Add common supported test cases
+> > 
+> >  tools/testing/selftests/kvm/Makefile.kvm                    | 6 ++++++
+> >  tools/testing/selftests/kvm/access_tracking_perf_test.c     | 1 +
+> >  tools/testing/selftests/kvm/include/riscv/processor.h       | 1 +
+> >  .../selftests/kvm/memslot_modification_stress_test.c        | 1 +
+> >  tools/testing/selftests/kvm/memslot_perf_test.c             | 1 +
+> >  tools/testing/selftests/rseq/rseq-riscv.h                   | 3 +--
+> >  6 files changed, 11 insertions(+), 2 deletions(-)
+> > 
+> > -- 
+> > 2.34.1
+> 
+> In the future please CC previous reviewers on the entire series
+> (particularly when they have reviewed the entire previous series).
+Okay, I will pay attention to this in the future. Thanks.
+> 
+> For the series,
+> 
+> Reviewed-by: Andrew Jones <ajones@ventanamicro.com>
 
