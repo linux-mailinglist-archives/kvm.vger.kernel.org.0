@@ -1,81 +1,81 @@
-Return-Path: <kvm+bounces-56784-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-56785-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id ABBCCB43534
-	for <lists+kvm@lfdr.de>; Thu,  4 Sep 2025 10:14:32 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7E9E3B4352B
+	for <lists+kvm@lfdr.de>; Thu,  4 Sep 2025 10:13:56 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 130971882DF3
-	for <lists+kvm@lfdr.de>; Thu,  4 Sep 2025 08:14:08 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A4C74580AA7
+	for <lists+kvm@lfdr.de>; Thu,  4 Sep 2025 08:13:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BC4BA2D1F7B;
-	Thu,  4 Sep 2025 08:11:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EF0432D2395;
+	Thu,  4 Sep 2025 08:12:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="KAeavJqp"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="RZI0VbZ/"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-ed1-f54.google.com (mail-ed1-f54.google.com [209.85.208.54])
+Received: from mail-ej1-f50.google.com (mail-ej1-f50.google.com [209.85.218.50])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1A8E52D12ED
-	for <kvm@vger.kernel.org>; Thu,  4 Sep 2025 08:11:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.54
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 266072C08D9
+	for <kvm@vger.kernel.org>; Thu,  4 Sep 2025 08:11:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.50
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756973518; cv=none; b=glrSEyQ754MOaAMq1McGMhc2xXY/SmpEhabiG+joYEzOC4EIT/ZMIDa9Wrgm8t7H4uifXB01rbgPKy2RnrEtQWu3tIBgMNysktg7nelhI6ynDZCbvVLR7q7Zg/B2ib9aPTUT0rJx7c3pFiBlpecb7xTCJopJtdRtsUFD5Zw2ySI=
+	t=1756973520; cv=none; b=WCK9PBudlW4mWn8HvCdqh1P9Vkuu6zHc7WZ/FoCgO35+n4UBIu/fhpANt98+OMvQ352RU7QjkjFG+Jjt40NhnV3GsLxFTl702m5Y3lUsjwXSEnW264BIUd8oprsa+IAUwfztkCHUlWLx4d64KhRaMJ0ZxrC/D5BoEpSxCbwqaDA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756973518; c=relaxed/simple;
-	bh=Qm+nKayGtipuaRlw7oPzYnxjuZME3YPcTOffdEwhJD4=;
+	s=arc-20240116; t=1756973520; c=relaxed/simple;
+	bh=5xDSBXc9nXN4ta/QPhfxKSQn6ju6Su21gkFlP+oTifg=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=Lh2jC5YvCEmV34KZWYcMJxxnK+rB9sXF49TvcwzFThV+sc7BkRSujnDtVuuHcAQxh0LovB4sl+fLSN/2mBEprdFZ6YTcE/fBRW/we9CliFltMp5riKMSuHuYz1yzHRc6E4d4uyZBxpeLXv1EpVI64EEw6JwOT9L0MD93KjAyiyU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=KAeavJqp; arc=none smtp.client-ip=209.85.208.54
+	 MIME-Version; b=JFGrz92zpS0weKNPgPBH38QqLLUg8kKafSkz2fku3BhLcamunOWBhM2OokabsuKEzGhdxMmJRgHnmfQENLKDQIkiTyTUns1YsT/5RgEv3p4VXB3tEHdMpv5eZe3pgXBoolyeypnSQHxwpVSV6UKQurSjlpwi59pbCatLc4EJjVo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=RZI0VbZ/; arc=none smtp.client-ip=209.85.218.50
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
-Received: by mail-ed1-f54.google.com with SMTP id 4fb4d7f45d1cf-61ce4c32a36so1285773a12.3
-        for <kvm@vger.kernel.org>; Thu, 04 Sep 2025 01:11:56 -0700 (PDT)
+Received: by mail-ej1-f50.google.com with SMTP id a640c23a62f3a-b042eb09948so122951666b.3
+        for <kvm@vger.kernel.org>; Thu, 04 Sep 2025 01:11:57 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1756973515; x=1757578315; darn=vger.kernel.org;
+        d=linaro.org; s=google; t=1756973516; x=1757578316; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=KKf3LX74QuDicrn7aIOxjy5IHw4dOUBMKNzlJ8lYJDM=;
-        b=KAeavJqpCjbiAH74z0Q6JHV2SNhuiZbmJldEgyIPXuPQ1XlIFdMuxkqTf7g2u6acZl
-         EVQb9G6XnPLVkPW8BA9UeW+neCJY2PcUeUnBsSeC2NFNK32q9xsFSfYDAETEkIf93192
-         CYPuxiCaRAKFx9gpBNn5PKy/+SN22yUtJrP8O4TrcjXLHz5Z6gCWRBCn50H31jjL9TyD
-         qDXwKeBh/X9CkXSNeRg1TvM6qv0zwiSpnAsUXHg1L5RuzN0EKTuBZq17+nx/9YOt+P7d
-         10U99MvNfHciDTTCdKDRqCj6dVJTkSjk+yWNAbf0xMO4/ZsKaJORV77njr/+1Lks6W9P
-         tNmw==
+        bh=ihVvxQgeNn/GjHbnY+gzjmvaE+8lZrZaLCxntP4XREM=;
+        b=RZI0VbZ/SMv1xZHWVP+eXfOODXN7T/TZWKCVFR1RIbgM/uXabtmSan+dqomU3290vc
+         IlfCJaqmOt1ULDFpjWwqT78Ia99Yi8Y/LA8fFuVU8u2unchGrvvYSImKIG1W0E6Pc/I7
+         yJe7eCpySveyGyZE1oicycZOPVDxsAfA+mlBDYBcaWWT9of4Uzy2bb/EE0Z8MkDimzDY
+         wx8emBvo1ns2lJeJGwVFhLp52scduQnPdWWhQNVs62ICybb3soOATmW+qIVu+zJuz1Jx
+         8VBkMtPC3Fx+2CuO6LWtnrPsmsB7kJomktDodejH/1LSruXdTEG/GiJG7DLwd9s4DZtq
+         gZrw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1756973515; x=1757578315;
+        d=1e100.net; s=20230601; t=1756973516; x=1757578316;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=KKf3LX74QuDicrn7aIOxjy5IHw4dOUBMKNzlJ8lYJDM=;
-        b=mtNNBqnBw8NNuuS/KQ3qmlo1gQyCrsl0AUigy/uJdQM4f5uqln6orEP68S7xtjHAtD
-         X2Uld6b4cs6YYsk76bkSNX494gUV4syxlpNV0cjmX+EXigINv1pTf5AiIni0zklHswRT
-         YPe2MawX0J4JVasP0kYVeRzlwb4xV/6ND39dGc/k4WLacMz4/XX59n8NgT8PaeWXwKfm
-         7BLZHxXegr8RojFJqTm9XLoB8dtP1UYmNR3kbA7upP5kK7oLfwHWZ+dpnCpJC3T+gZV2
-         PhkU0bOe16MbWMJPMDnW2R9+6lvF8Gs5RAqMYyNh8aX7SCYWePLmZ+VupNDZZUnIHMmP
-         mb/A==
-X-Forwarded-Encrypted: i=1; AJvYcCWX63rpyjJI8Y0Gduwx2gpOMXo6ex3nsSMJjTf2DZHC030kqSB4yustfkqKPOIWChv9xhY=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwG0h148LH2qVoRh+th8eZHCS8GwvbWDhVDgOD4/3t4gIazvHl/
-	Ha9Fzq90KprodcIb2BBtu9vVs/vRABqh7aMXvydy/1X28TtNqZSHH7MkwnmkmuIbCAw=
-X-Gm-Gg: ASbGnctjBVHAnoxf4kaZkzULDv97O3ryGNsWpSsU8Z+M2eibcPSFnxoe3D037L8A6OO
-	DuDqyLKeKAL2mqNInvmHYlOANqrMklEC2OyyTpbzoaoGBdQ/z7OTzREQ7wgDLOV461x36xYgQbe
-	4tysesi6pQr6xyeTh91m9OcfV8LHw7oL5NNr80ASqf+gQa9pzRFoIQuJDgsc1FLS+BmV15GduSk
-	e4CCU00IMYxM/S4WuRdYSuJsk+th1kIIgpnyjYHzMsHcJpDdkah54eYBLDNB8KHrGVMguXIh5JH
-	uzLCR4CU327irMCtaw/Nz2P8k2ILZTKdUBCG/DIJnXN9IQ+39NzbdqQ9UjLHLKdfPH5fLobKZ6P
-	bFAm8n5jwVlOQsg23njbDMj6PEIOcUUjYiA==
-X-Google-Smtp-Source: AGHT+IGx8ZJxjps5cff/PZm9JBRuTzbh2ffGQw/tl1lRzj/lZpIUq6TJ0w2xsdrM6qRT2xpIi5PODA==
-X-Received: by 2002:a05:6402:1e8c:b0:620:894c:656c with SMTP id 4fb4d7f45d1cf-620894c7c6fmr30028a12.29.1756973515184;
-        Thu, 04 Sep 2025 01:11:55 -0700 (PDT)
+        bh=ihVvxQgeNn/GjHbnY+gzjmvaE+8lZrZaLCxntP4XREM=;
+        b=HA2B9tadOkZAHldD+7v/XgIjN9DTRKeHOsNTlMe9EEOzdJhaSEXlMUZJmdYdv9vYeJ
+         e0npfk0lNk09pfdHKg5fuEZnOBM1zMq2EqxCY5scjsWTbp0mAIopAOATgJBIPDMJJd5Z
+         iBnIjjMuM+FOCYd6Ix3aS+tkZp+UwKyaeadyjQh/aLCVL46YY0+JQkKf97YSpt1rwi5M
+         kS2d/LhLbXKY3A+qSFPqQG5AsKEJ/K+HZTV82X0RBtkE+KCXK4G2eqUFrF15IPG5/eq6
+         bCntTO6dJTmJBOESKPXNNfumcJy1KqqzPKOJYv5o41dXslbFIaM0NYC5vNGngJfkpmEu
+         dXLQ==
+X-Forwarded-Encrypted: i=1; AJvYcCW3V6hhW2uu2yvEMmM7vd+9R+Ib4pASLIVkdK2q8LnKu4+yYKGllwkXSgHPlcmDwynHVk8=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyjpFCSXz11+Mzybf6TFa4Pe1fb3NXBeRGIocJ92/NsP5YthXkF
+	uAa6VzymN0KC2ZMK8oRaVztL9rMks3MduU4TWtRF0Dbk8Eq7OOiRkkA4vl3syeCfkp0=
+X-Gm-Gg: ASbGncvumESMSGlOd+Uj6EmteXmNj9JhCvjmQmNOsgbL3kTx4/oXDNr5VSKvzSSMtM0
+	Ys8m5DnS+o2JsaUM/kbn2lpvRasJoCCvquiZ7d2lU+wsTwuIH6wkDNMhQs4QNjKqVYlQm77mZs4
+	XEOv/SjVEA11gxtGGByeyQasrlpVnehO2DEOKvWdzPzVaT8RZ2BCmi49/SrKkjp5aVHjY3qZVY7
+	ZBcLGF3epaDVmuM9C29yduiD5bj2XErulFL8HEopK7KoZRrDv4TAz7r06/vXrSprnaXipOVXWaJ
+	xTKPOUqKa8C+EgAotE5yudXUJlA5opI9VJoSkjnTomM8Werbr034G4CH3P7LmkMCTJFL3M9yPPy
+	kTomWqfwymfulQWu1G/3j8Aw=
+X-Google-Smtp-Source: AGHT+IE6icEl4XuEBWlH8j8BpgjiN6xgfsXzhcsYUMtNnFW6HtKULX+/oPffLgfaZHVhKWGCJwwp1Q==
+X-Received: by 2002:a17:907:2682:b0:afd:d9e4:51e7 with SMTP id a640c23a62f3a-b01f20bde05mr360782366b.63.1756973516361;
+        Thu, 04 Sep 2025 01:11:56 -0700 (PDT)
 Received: from draig.lan ([185.126.160.19])
-        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-61cfc5622f0sm13427169a12.51.2025.09.04.01.11.48
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-b04709b3effsm279304666b.5.2025.09.04.01.11.50
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 04 Sep 2025 01:11:49 -0700 (PDT)
+        Thu, 04 Sep 2025 01:11:55 -0700 (PDT)
 Received: from draig.lan (localhost [IPv6:::1])
-	by draig.lan (Postfix) with ESMTP id A1FB260193;
-	Thu, 04 Sep 2025 09:11:33 +0100 (BST)
+	by draig.lan (Postfix) with ESMTP id 0EB89601A4;
+	Thu, 04 Sep 2025 09:11:34 +0100 (BST)
 From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
 To: qemu-devel@nongnu.org
 Cc: Reinoud Zandijk <reinoud@netbsd.org>,
@@ -162,9 +162,9 @@ Cc: Reinoud Zandijk <reinoud@netbsd.org>,
 	=?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>,
 	Nicholas Piggin <npiggin@gmail.com>,
 	John Levon <john.levon@nutanix.com>
-Subject: [PATCH v2 045/281] rust/qemu-api-macros: make derive(Object) friendly when missing parent
-Date: Thu,  4 Sep 2025 09:07:19 +0100
-Message-ID: <20250904081128.1942269-46-alex.bennee@linaro.org>
+Subject: [PATCH v2 048/281] semihosting: Retrieve stack top from image_info
+Date: Thu,  4 Sep 2025 09:07:22 +0100
+Message-ID: <20250904081128.1942269-49-alex.bennee@linaro.org>
 X-Mailer: git-send-email 2.47.2
 In-Reply-To: <20250904081128.1942269-1-alex.bennee@linaro.org>
 References: <20250904081128.1942269-1-alex.bennee@linaro.org>
@@ -174,39 +174,101 @@ List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 
-From: Marc-André Lureau <marcandre.lureau@redhat.com>
+From: Richard Henderson <richard.henderson@linaro.org>
 
-Signed-off-by: Marc-André Lureau <marcandre.lureau@redhat.com>
-Link: https://lore.kernel.org/r/20250826133132.4064478-5-marcandre.lureau@redhat.com
-Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+Remove the write-once field TaskState.stack_base, and use the
+same value from struct image_info.
+
+Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
+Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 ---
- rust/qemu-api-macros/src/lib.rs | 10 +++++++++-
- 1 file changed, 9 insertions(+), 1 deletion(-)
+ linux-user/qemu.h             | 1 -
+ linux-user/aarch64/cpu_loop.c | 1 -
+ linux-user/arm/cpu_loop.c     | 1 -
+ linux-user/m68k/cpu_loop.c    | 1 -
+ linux-user/riscv/cpu_loop.c   | 1 -
+ semihosting/arm-compat-semi.c | 6 +++++-
+ 6 files changed, 5 insertions(+), 6 deletions(-)
 
-diff --git a/rust/qemu-api-macros/src/lib.rs b/rust/qemu-api-macros/src/lib.rs
-index b525d89c09e..a6147418891 100644
---- a/rust/qemu-api-macros/src/lib.rs
-+++ b/rust/qemu-api-macros/src/lib.rs
-@@ -85,7 +85,15 @@ fn derive_object_or_error(input: DeriveInput) -> Result<proc_macro2::TokenStream
-     is_c_repr(&input, "#[derive(Object)]")?;
+diff --git a/linux-user/qemu.h b/linux-user/qemu.h
+index 0b19fa43e65..b6621536b36 100644
+--- a/linux-user/qemu.h
++++ b/linux-user/qemu.h
+@@ -127,7 +127,6 @@ struct TaskState {
+     abi_ulong heap_base;
+     abi_ulong heap_limit;
+ #endif
+-    abi_ulong stack_base;
+     int used; /* non zero if used */
+     struct image_info *info;
+     struct linux_binprm *bprm;
+diff --git a/linux-user/aarch64/cpu_loop.c b/linux-user/aarch64/cpu_loop.c
+index fea43cefa6b..b65999a75bf 100644
+--- a/linux-user/aarch64/cpu_loop.c
++++ b/linux-user/aarch64/cpu_loop.c
+@@ -168,7 +168,6 @@ void target_cpu_copy_regs(CPUArchState *env, target_pt_regs *regs)
+         qemu_guest_getrandom_nofail(&env->keys, sizeof(env->keys));
+     }
  
-     let name = &input.ident;
--    let parent = &get_fields(&input, "#[derive(Object)]")?[0].ident;
-+    let parent = &get_fields(&input, "#[derive(Object)]")?
-+        .get(0)
-+        .ok_or_else(|| {
-+            Error::new(
-+                input.ident.span(),
-+                "#[derive(Object)] requires a parent field",
-+            )
-+        })?
-+        .ident;
+-    ts->stack_base = info->start_stack;
+     ts->heap_base = info->brk;
+     /* This will be filled in on the first SYS_HEAPINFO call.  */
+     ts->heap_limit = 0;
+diff --git a/linux-user/arm/cpu_loop.c b/linux-user/arm/cpu_loop.c
+index 33f63951a95..e40d6beafa2 100644
+--- a/linux-user/arm/cpu_loop.c
++++ b/linux-user/arm/cpu_loop.c
+@@ -504,7 +504,6 @@ void target_cpu_copy_regs(CPUArchState *env, target_pt_regs *regs)
+     arm_rebuild_hflags(env);
+ #endif
  
-     Ok(quote! {
-         ::qemu_api::assert_field_type!(#name, #parent,
+-    ts->stack_base = info->start_stack;
+     ts->heap_base = info->brk;
+     /* This will be filled in on the first SYS_HEAPINFO call.  */
+     ts->heap_limit = 0;
+diff --git a/linux-user/m68k/cpu_loop.c b/linux-user/m68k/cpu_loop.c
+index 5da91b997ae..3aaaf02ca4e 100644
+--- a/linux-user/m68k/cpu_loop.c
++++ b/linux-user/m68k/cpu_loop.c
+@@ -117,7 +117,6 @@ void target_cpu_copy_regs(CPUArchState *env, target_pt_regs *regs)
+     env->aregs[7] = regs->usp;
+     env->sr = regs->sr;
+ 
+-    ts->stack_base = info->start_stack;
+     ts->heap_base = info->brk;
+     /* This will be filled in on the first SYS_HEAPINFO call.  */
+     ts->heap_limit = 0;
+diff --git a/linux-user/riscv/cpu_loop.c b/linux-user/riscv/cpu_loop.c
+index 3ac8bbfec1f..541de765ffa 100644
+--- a/linux-user/riscv/cpu_loop.c
++++ b/linux-user/riscv/cpu_loop.c
+@@ -109,7 +109,6 @@ void target_cpu_copy_regs(CPUArchState *env, target_pt_regs *regs)
+         exit(EXIT_FAILURE);
+     }
+ 
+-    ts->stack_base = info->start_stack;
+     ts->heap_base = info->brk;
+     /* This will be filled in on the first SYS_HEAPINFO call.  */
+     ts->heap_limit = 0;
+diff --git a/semihosting/arm-compat-semi.c b/semihosting/arm-compat-semi.c
+index 86e5260e504..bc04b02eba8 100644
+--- a/semihosting/arm-compat-semi.c
++++ b/semihosting/arm-compat-semi.c
+@@ -696,7 +696,11 @@ void do_common_semihosting(CPUState *cs)
+ 
+             retvals[0] = ts->heap_base;
+             retvals[1] = ts->heap_limit;
+-            retvals[2] = ts->stack_base;
++            /*
++             * Note that semihosting is *not* thread aware.
++             * Always return the stack base of the main thread.
++             */
++            retvals[2] = ts->info->start_stack;
+             retvals[3] = 0; /* Stack limit.  */
+ #else
+             retvals[0] = info.heapbase;  /* Heap Base */
 -- 
 2.47.2
 
