@@ -1,80 +1,80 @@
-Return-Path: <kvm+bounces-56768-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-56770-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 04AEBB43517
-	for <lists+kvm@lfdr.de>; Thu,  4 Sep 2025 10:12:44 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 36ABFB4351F
+	for <lists+kvm@lfdr.de>; Thu,  4 Sep 2025 10:13:01 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id BBBF07C42B9
-	for <lists+kvm@lfdr.de>; Thu,  4 Sep 2025 08:11:53 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 670101C25E6E
+	for <lists+kvm@lfdr.de>; Thu,  4 Sep 2025 08:12:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BFCE72C08BE;
-	Thu,  4 Sep 2025 08:11:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 468FA2C028C;
+	Thu,  4 Sep 2025 08:11:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="L/uYbVoh"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="edEz+Zu8"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-ed1-f49.google.com (mail-ed1-f49.google.com [209.85.208.49])
+Received: from mail-ed1-f53.google.com (mail-ed1-f53.google.com [209.85.208.53])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B97E22BEFF0
-	for <kvm@vger.kernel.org>; Thu,  4 Sep 2025 08:11:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.49
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 57CD52C08AF
+	for <kvm@vger.kernel.org>; Thu,  4 Sep 2025 08:11:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.53
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756973494; cv=none; b=dX2JY0jBKq7590qikv1GbZ1Z5TpSoLOZxxathVn0+VT2ib+Hgw8g8H4hsmk7ss16roMAWm/B4QKr2ftvVmcLI6JOA2ilS+EzEobFVqSST48KFTcDETy+4P+XATHOJZVp2de/nGZZ4uDN9/Xv3lzRUFtrBilO8HYYdlTVlrY64mw=
+	t=1756973497; cv=none; b=DW49RJPeHAIEbSJaH/V5cR5/b0XloWqZL9dpHmM5uPeum98Jy0WQdOIkh2MvBo4Tt/0eGuBqfKA4+M4scawgoXy1cAweu39TgKN4hK/uRHibGOJxDG41GAVaddZq+hTE9QxrFqDaEIY7wZShzYlw6Wtno7SSeldkyELfN37ZrTc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756973494; c=relaxed/simple;
-	bh=g2c2rwvNXwtPXn1nZWME/EQrYmx/Nv8VVrnHzRxtp64=;
+	s=arc-20240116; t=1756973497; c=relaxed/simple;
+	bh=qvS8sAyc8SkWCq3FYME7uB8L+MbWDghaWVjUjWkJvtk=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=MKOLGb1/uj0f9oIWGrDdzkTQbHWGQzYNYu+15WA4rTXmyH90vFFuj14mYk5eZvElnMR4S2g5hAuMfvUZ1D+ci+7U/i2hDkeRnTqGbByMsRu9elLE1GEtwlqOnkKM7BlnoXDzZ/HPO5seRHMzlbnRotizy5oB8euo1F+dXKgTiEw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=L/uYbVoh; arc=none smtp.client-ip=209.85.208.49
+	 MIME-Version; b=VfD3qhxWUluLjzX/0bqWtvaVOM1LL0brjOUeUgDjJ8APSI+vQizzXPsJWhsrURitTnhUwnjST+SOXNFp/yJNICU1T7gZPyEEBg/VNn5F6UoEZn933gJCl1WOOEnA9n2HBxhUMZUZtcOwlA49TrKKc4hQf4v182p3fzC+nBMo4lI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=edEz+Zu8; arc=none smtp.client-ip=209.85.208.53
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
-Received: by mail-ed1-f49.google.com with SMTP id 4fb4d7f45d1cf-61ce4c32a36so1285099a12.3
-        for <kvm@vger.kernel.org>; Thu, 04 Sep 2025 01:11:32 -0700 (PDT)
+Received: by mail-ed1-f53.google.com with SMTP id 4fb4d7f45d1cf-620724883e6so159820a12.2
+        for <kvm@vger.kernel.org>; Thu, 04 Sep 2025 01:11:35 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1756973491; x=1757578291; darn=vger.kernel.org;
+        d=linaro.org; s=google; t=1756973493; x=1757578293; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=BNEGVA0a3lSomvk/RYtnyV9U8MhQRFndjMqEzv6fEMo=;
-        b=L/uYbVoh5TxKCYzW79SN5CIPMRrEUdMb2C38lm62KXgVztSRlQw/YF0ZLU3+GDuFUm
-         XeUZL9e69ZXGAZvwIQcg8bcFD81fr8s6NYk/4/ONPVBRQ+wL3taHjVYdeZ8TwaQvnRpD
-         ++CU7gFevrQlOedSAvy2cV5JJTDPv/n19EX3NfxTwIDxtYvpmIopUTKFRM4Wbe8htxrm
-         tINPuXDsnlXJwqpFbcixR+dOUj2Ikp5VzM1/dx6ESNsZaK9smrmRfCNL8w7oKQ82x2tQ
-         pmjskts6deT6MTu9+1PDKYIshNZ1YqWRGg+Kt29IzaiLSVituSSWhkQaBZV7ugEtHejr
-         Zyvg==
+        bh=pfipyU6Vd8H7OBNmQiaCitsZISqNnzAeEnNiRJw+yKE=;
+        b=edEz+Zu8Aa6GR9ob17R0PKbb97Z/zAhINqwHsCgu+QOs2e78qnmAaX6HbRH13ZlPDO
+         4Cc48SKS2KJ10LsuF1TwXeAz15JWTXq03ql+kg/ZkcKocV/7xSZjXKPeqgM6tMgB2Ybc
+         c7MBpQwQfS+qpeApnDz8GjdyYrnSGdPAj6twPUlRaKnuZh9cMN6HXruPu5OgA1TojP05
+         oXZpYJ89kklPfXGTdZ63zQ3dHL6d4fAIC8VqjOwEK6WZVvXq5kp0hoJ054+eaysrXLea
+         H5fuOCChrRwj/7Jjx9pD2XKFIwOYmJL9PNCaMoOkqxfK7DS+7/gpxixUtiBzUpjiPEXq
+         COww==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1756973491; x=1757578291;
+        d=1e100.net; s=20230601; t=1756973493; x=1757578293;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=BNEGVA0a3lSomvk/RYtnyV9U8MhQRFndjMqEzv6fEMo=;
-        b=rhF8Didr+jWbnM54Ox+CFmf+gSN/jtP+fFzk8nOQgiTs3fpzhFRSlndojb3OcQG/5c
-         NiFEyF1CUJNGqo1opNwhZVCrfvNLcoh0SzQ/INhCyE/elD7L57jgfjrpyxfKZz/S9bVT
-         ycQCaqFUJFQ62b6MzXIV9FjacgTwdUAzV2OZheh53ARsgd6hNFav3a1IV5cFiaWBdRmr
-         dWhZyq3O88M0jGd+U2yJJhgdW5rOVnLwruEqmk1SXtnTwsJjFlhzjY4Xo8Xgvusp+ujB
-         moiWp9ilfkf4xhSL110x0/uAb8bSjbMRQxuz48HipxRxpLNw7IT0nKwlfTuoz7i3rVhx
-         Ks1A==
-X-Forwarded-Encrypted: i=1; AJvYcCXI+qtGEa4n0iYU6Qf/VsH/YkMK/fbzn9UfEj8LFBPzl7s41shVq6lKo9cj4MqkmlknhjY=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxOTcQ1BxZ5wa95AbWcUcGubDAUguFZpP8bMtMlIdxVntzSqSMf
-	LaGRe2upvZie3ADpR+DczlmQz51TXug3ceqB8e2q+hlWgyVaQAoqgGPmq9LEPTefo2Y=
-X-Gm-Gg: ASbGncuECS34NQ60lt6lWLLRg4aPUhhV1pVaIkDS3DzYsO4dKDhzuwhLAUS/+iHx7lf
-	/DSbWtYQuS8ABcZu72FXxyfUYXbxk7Zj/2si8N5uqAgyCyaIbxRfdk6VtJ7y9pjZ9Umcz5PsnTF
-	mNEm4jmDeJ87vHBCNl2TCwHGiS8kO8KorzAgngyNhzQtx8e2987KWtBMd/OygClZFj+tmWE2cFl
-	KOiibjOZkwUn7UHk/bFkI8auk/P5noxyyB76Fq8tZ69dNu6RH+QRppTLmjpNUWn7b7t0ef8brWq
-	DVbvtASJ1rXoZfzwOcYUu8a0Ronw2sLPN6xLkrt7Ds6tArujqVC2n52fwcsIeZ2ZIp/PSVAZrBr
-	blI4ODEaaAgb8XRixYIc2rma5G2DQYgs/vA==
-X-Google-Smtp-Source: AGHT+IHexK94NPWoWCrwjuk3gIAjHKSuKZUcH35FtgtMhup7hPhQojKoYZ1y3LzApeF9bdhKrTjgdQ==
-X-Received: by 2002:a05:6402:1e8c:b0:620:894c:656c with SMTP id 4fb4d7f45d1cf-620894c7c6fmr28663a12.29.1756973490788;
-        Thu, 04 Sep 2025 01:11:30 -0700 (PDT)
+        bh=pfipyU6Vd8H7OBNmQiaCitsZISqNnzAeEnNiRJw+yKE=;
+        b=n6uhIpggViElveLLWqt/ikn6/JGaFENF6A76XAPsmOcEPxCRXV/UpU+s4u4jPrhzhb
+         384xcTNVCG+Zc5FZe3OH04maaDSq6HfiVHZsSsrNl7jR0IMkmpz3TYlFkfjsaLq5/aeW
+         qMihs17FFbB4exm6qvyiS7P9Qr4ZBaZftziPqtT91uNNq3M7B4mNXzPac3J9CM1rNIDU
+         Qta1IprWaUCChROcjBsTFyd75UceDW8rDQGD5HQZS0sBQ62lsklMGCSH9gFW2nHEoO3h
+         oKNvbGcb3FRs7zKg5QytR+sDup0KAZiSAN+h/0griZj/blnFJHkN95lYwIU5AFGebeaj
+         HRmQ==
+X-Forwarded-Encrypted: i=1; AJvYcCUvEuF1mT5srJeRVyxAyn6BUlh2Q8TrJzj6fIGYXxz2qyHe6akPSqK/jFNr1jKUDGRQn+Q=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyOtO4u59YOBHdJdfQ5XR9ogEa3MSDsRbAXBiuJJeomfm9w2HgI
+	/eSMJpbunma1l+4oLGVBfu/ukfOFF4Dt4QnIlaswhx7XhRRUY/gEBeC8G13ZFHUQsPA=
+X-Gm-Gg: ASbGncuUMK084pcCm4YlRcZfJEw8mv48+TjY44Zk3vOwU4g1zTn5PNXuzLi4jVNf6SI
+	x7qEnw5FKsMtcFQ0PWOoljWaFzX5d8YAWT2egRDJFLWpsRv5CpXe37dczMu3COH065BnYimQFC4
+	DpsJuGH+bS6ZCQ/6H8RDrOE+Al7TPWbgxlIOsvvIYJ59hCgGgdA4qyUSVVVS4EWVuA7NZgxcBWl
+	zZ/ReVDaOmVIYrCe+iJGb4e3KjkyG6URTNxp//ASHm9POkV9/KQNK7Yxuagg0hUoudxQSBaqAs7
+	FeejxOuHp2AedWeDtfdj/nMNBk7gTPAlFon8KqKx0bgXHj80AjVPO5ijQnYg0wzOg8bimzuRdgU
+	NZzBiUGitETo+DNWr0yz8o/4=
+X-Google-Smtp-Source: AGHT+IEoaLYHbkuQ5w0GIOHrSrp6jiGSZD/L88aCCuGmKVKhMNAGz92wDlGLKlrjfHoRe3Zrhm5FPg==
+X-Received: by 2002:a05:6402:40c8:b0:620:1c6d:e6c4 with SMTP id 4fb4d7f45d1cf-6201c6de967mr689986a12.38.1756973493583;
+        Thu, 04 Sep 2025 01:11:33 -0700 (PDT)
 Received: from draig.lan ([185.126.160.19])
-        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-61cfc5575dcsm13745805a12.49.2025.09.04.01.11.29
+        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-61cfc52ade4sm13646124a12.45.2025.09.04.01.11.30
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 04 Sep 2025 01:11:29 -0700 (PDT)
+        Thu, 04 Sep 2025 01:11:32 -0700 (PDT)
 Received: from draig.lan (localhost [IPv6:::1])
-	by draig.lan (Postfix) with ESMTP id 4CE8D5F900;
+	by draig.lan (Postfix) with ESMTP id 674E15F913;
 	Thu, 04 Sep 2025 09:11:28 +0100 (BST)
 From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
 To: qemu-devel@nongnu.org
@@ -161,11 +161,10 @@ Cc: Reinoud Zandijk <reinoud@netbsd.org>,
 	Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
 	=?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>,
 	Nicholas Piggin <npiggin@gmail.com>,
-	John Levon <john.levon@nutanix.com>,
-	Xin Wang <wangxinxin.wang@huawei.com>
-Subject: [PATCH v2 001/281] target/i386: Add support for save/load of exception error code
-Date: Thu,  4 Sep 2025 09:06:35 +0100
-Message-ID: <20250904081128.1942269-2-alex.bennee@linaro.org>
+	John Levon <john.levon@nutanix.com>
+Subject: [PATCH v2 002/281] scripts/minikconf.py: fix invalid attribute access
+Date: Thu,  4 Sep 2025 09:06:36 +0100
+Message-ID: <20250904081128.1942269-3-alex.bennee@linaro.org>
 X-Mailer: git-send-email 2.47.2
 In-Reply-To: <20250904081128.1942269-1-alex.bennee@linaro.org>
 References: <20250904081128.1942269-1-alex.bennee@linaro.org>
@@ -177,67 +176,32 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-From: Xin Wang <wangxinxin.wang@huawei.com>
+From: Manos Pitsidianakis <manos.pitsidianakis@linaro.org>
 
-For now, qemu save/load CPU exception info(such as exception_nr and
-has_error_code), while the exception error_code is ignored. This will
-cause the dest hypervisor reinject a vCPU exception with error_code(0),
-potentially causing a guest kernel panic.
+Fix parse method to use `defconfig` global variable instead of the
+non-existent KconfigParser class attribute
 
-For instance, if src VM stopped with an user-mode write #PF (error_code 6),
-the dest hypervisor will reinject an #PF with error_code(0) when vCPU resume,
-then guest kernel panic as:
-  BUG: unable to handle page fault for address: 00007f80319cb010
-  #PF: supervisor read access in user mode
-  #PF: error_code(0x0000) - not-present page
-  RIP: 0033:0x40115d
-
-To fix it, support save/load exception error_code.
-
-Signed-off-by: Xin Wang <wangxinxin.wang@huawei.com>
-Link: https://lore.kernel.org/r/20250819145834.3998-1-wangxinxin.wang@huawei.com
+Fixes: f349474920d80838ecea3d421531fdb0660b8740 ("minikconfig: implement allnoconfig and defconfig modes")
+Signed-off-by: Manos Pitsidianakis <manos.pitsidianakis@linaro.org>
+Link: https://lore.kernel.org/r/20250820-scripts-minikconf-fixes-v1-1-252041a9125e@linaro.org
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- target/i386/machine.c | 19 +++++++++++++++++++
- 1 file changed, 19 insertions(+)
+ scripts/minikconf.py | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/target/i386/machine.c b/target/i386/machine.c
-index dd2dac1d443..45b7cea80aa 100644
---- a/target/i386/machine.c
-+++ b/target/i386/machine.c
-@@ -462,6 +462,24 @@ static const VMStateDescription vmstate_exception_info = {
-     }
- };
+diff --git a/scripts/minikconf.py b/scripts/minikconf.py
+index 6f7f43b2918..2a4694fb6a3 100644
+--- a/scripts/minikconf.py
++++ b/scripts/minikconf.py
+@@ -340,7 +340,7 @@ class KconfigParser:
  
-+static bool cpu_errcode_needed(void *opaque)
-+{
-+    X86CPU *cpu = opaque;
-+
-+    return cpu->env.has_error_code != 0;
-+}
-+
-+static const VMStateDescription vmstate_error_code = {
-+    .name = "cpu/error_code",
-+    .version_id = 1,
-+    .minimum_version_id = 1,
-+    .needed = cpu_errcode_needed,
-+    .fields = (const VMStateField[]) {
-+        VMSTATE_INT32(env.error_code, X86CPU),
-+        VMSTATE_END_OF_LIST()
-+    }
-+};
-+
- /* Poll control MSR enabled by default */
- static bool poll_control_msr_needed(void *opaque)
- {
-@@ -1746,6 +1764,7 @@ const VMStateDescription vmstate_x86_cpu = {
-     },
-     .subsections = (const VMStateDescription * const []) {
-         &vmstate_exception_info,
-+        &vmstate_error_code,
-         &vmstate_async_pf_msr,
-         &vmstate_async_pf_int_msr,
-         &vmstate_pv_eoi_msr,
+     @classmethod
+     def parse(self, fp, mode=None):
+-        data = KconfigData(mode or KconfigParser.defconfig)
++        data = KconfigData(mode or defconfig)
+         parser = KconfigParser(data)
+         parser.parse_file(fp)
+         return data
 -- 
 2.47.2
 
