@@ -1,195 +1,163 @@
-Return-Path: <kvm+bounces-56864-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-56865-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 69307B45089
-	for <lists+kvm@lfdr.de>; Fri,  5 Sep 2025 09:57:35 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id A7A9CB4513E
+	for <lists+kvm@lfdr.de>; Fri,  5 Sep 2025 10:23:38 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1B1B35401E1
-	for <lists+kvm@lfdr.de>; Fri,  5 Sep 2025 07:57:35 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 21C003B996F
+	for <lists+kvm@lfdr.de>; Fri,  5 Sep 2025 08:23:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 171A22F7456;
-	Fri,  5 Sep 2025 07:57:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 39B863002C4;
+	Fri,  5 Sep 2025 08:23:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="vSyMFCjo"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="CrAvtl8D"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pj1-f74.google.com (mail-pj1-f74.google.com [209.85.216.74])
+Received: from mail-pf1-f201.google.com (mail-pf1-f201.google.com [209.85.210.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BD0462F39D0
-	for <kvm@vger.kernel.org>; Fri,  5 Sep 2025 07:57:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.74
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EDE0B285C91
+	for <kvm@vger.kernel.org>; Fri,  5 Sep 2025 08:23:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757059046; cv=none; b=kV3/9hIyyQtwDFh1U4mz9opaeTcd+CJkU8xrQaHrMPolJztMtCirQT7Z9VOuTXqvXUBy7ufVLVZM65MHEoGP6zkLkXQS6i2E00FEQHJ9b4HE/uC1C8OJ9BaolWE+S7rTl2/2pTKvn6HtKdPsf4pA99KzlJtcCZtW+9uhkSfogVw=
+	t=1757060608; cv=none; b=tejPNEzYXZPAJAY4HuP5tTknptMhHGGc514FI5wn0x0no+5vDQkXcmOXWPE0uUaZKq3O/6YBqS77s6+2De313oydFK2O7bd+7E3AnYQfbS1/Y4ua7Fa2K7RPD9+w+53n0XwjBCuXkSXw/0xaAiGBpI1P3cKcuQ3w+5kfV8IgNvg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757059046; c=relaxed/simple;
-	bh=taJPAeAG+2Zan+gki5TcDy/2fEVopYdaZ3wK1NDP3ys=;
+	s=arc-20240116; t=1757060608; c=relaxed/simple;
+	bh=APGqKF3GyU/I3fMyI+XPtYWiVqEWpTDET7JPhtTGQV8=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=eqeqsxYj3gOj2t8n3AcU40Bfrf58mZo9PgBuTxg9OYi+BPGV9UUjLK/cvsO/0bHNy/bdb+W6bxifE8VR1qHyRBIg6HjN+8yqQtsAj+TREf8goU1pW808r4CFpZY8xyYfn+OKF5jp/Eac+E6Vl4xGtsKJlT8NmVsCIKINgDRhUO8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=vSyMFCjo; arc=none smtp.client-ip=209.85.216.74
+	 To:Cc:Content-Type; b=Wgm5fMxqdgGQrw1guoHoa1ZTcOeSE6ydzn2Fd10KgyYLRtkOmvVUkFNoanwR0kfFEcHum2zu3HUkuEHwx0JrsG2ai6hro1ntyldLmHt1i4E+m7Ge1WRkUPfR3Cf8vRoDjygILm+GvwTy2Eb+49ycSAoeC7xiEOluoQqIteWwXR4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=CrAvtl8D; arc=none smtp.client-ip=209.85.210.201
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pj1-f74.google.com with SMTP id 98e67ed59e1d1-329745d6960so1849344a91.0
-        for <kvm@vger.kernel.org>; Fri, 05 Sep 2025 00:57:24 -0700 (PDT)
+Received: by mail-pf1-f201.google.com with SMTP id d2e1a72fcca58-7724688833bso2074301b3a.2
+        for <kvm@vger.kernel.org>; Fri, 05 Sep 2025 01:23:26 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1757059044; x=1757663844; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1757060606; x=1757665406; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:from:subject:message-id:references
          :mime-version:in-reply-to:date:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=o1p4RNecGHbuiyzLdGgu+/L6P6vwBjZh1dqH7jZHHi0=;
-        b=vSyMFCjoPB+rD1vi2yTABZY6T+9blwto1/CEWd2zqPF7Zfk+jeRdhkaYn3QJwmKcn2
-         YSWhRI9jFHoKiEhE+jwfUgfmuTUAs76ntO8/f4PJFBmeUZGA/jyN5DWpHKxBbozgUNNZ
-         lY9Ho6whc5Fkdgb0ba8/zAzhVnjO5IOOguYfcpsBL7Irt8KwlD90+4yiP425A/8M/zcg
-         +pAJhmj+ZhMl4pitsUgrBpTLq01cdULR0ugagopYExajIAtmoGyzjRO7KlNc4q0GEpT6
-         mKNH+UXHFMtJ6DsBELtcFF6bi9pos34CkLhorAoYaCxQ3agVsehJ/XJlX1oYKYNI0OjX
-         E5DQ==
+        bh=XJnhSI4zKDT3ImFhZhJBvG+6tvoITddVraqHrrqOWpc=;
+        b=CrAvtl8Dvy16B69I1/8/nF3mRCSVXYcExVPjCMsr7bJSbsnblfIuWfKGs+LcJDYVj/
+         kjINdr+Hyeq5iiulmbNdIDZwcbuq0oQ6/a+EOoPMKoHT6Emj+kDMou4fRBPqjZYzbqiJ
+         IOrKggTDOxPtQlf8WS0gzBFSDfh9Y4Kl2v0RYEC1betj2EhhP0esTUDFj7EiltYfmqp8
+         tvhAMPhMuSiJY7lD5tpON1/5qcfx01KDytZVRHhgxvifgD1c9O8y0g2EXyqqtTKhhHKI
+         zlmL5Ek7FY8i6hx6qGndsrAFRcjDOeOCyjih3ZZzQG2ttL0qo7HxScZgmi+50OeqKwDi
+         h5DQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1757059044; x=1757663844;
+        d=1e100.net; s=20230601; t=1757060606; x=1757665406;
         h=content-transfer-encoding:cc:to:from:subject:message-id:references
          :mime-version:in-reply-to:date:x-gm-message-state:from:to:cc:subject
          :date:message-id:reply-to;
-        bh=o1p4RNecGHbuiyzLdGgu+/L6P6vwBjZh1dqH7jZHHi0=;
-        b=RJn53uU1oZnWbbFfhdFix/vK3N9/6dF4SftQL0QANDjf2qg8OkGjKS455DvZf9z/fj
-         bLlamVUvXqDnSheSmD+8MtL/uAXimiOU2ZT4YlA0qG9zb5sc++gYPDZX4CTgY2G+6qlZ
-         vOn9sSkeGqD9izZLwKWDN7n8b4OK2SMdgWAxH0Wx75FEd5P99MRpIzx5+pRjkUD65rXX
-         D4WWiPvE26WvvJz/fizpMfQz9aYj0idOvfDxRguTIlP8fmoiIL3rdYefiEAofS6YDHW1
-         Bb2QMmB92OaDjmqIKyhBJfAIqMBo3qYZKujVe2nHACEkox6jlnXAB7VNnBjXSXqX7fFz
-         IbiQ==
-X-Forwarded-Encrypted: i=1; AJvYcCUz6UuR1PS64p3J+HojQ3iQ0GA6Hi+o7m8svztQHwxLxM67vh5x6c0k/WYinmz/D43Q+hs=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwvsrT4xscPU3OyBmKAuqhQ8nBuOEgaAnzwA7XROmcHR7vbhIJN
-	7yJsOeIsWlfFy17HhIiXAM4WH90aiGqXhD75pOY539ZObXCz8okyTlqIn1T6IIfQUAOIf0/VHXF
-	IPs4gxw==
-X-Google-Smtp-Source: AGHT+IElsE4xl0K6N1F4A7p04K+uccLu+aOxepEYOmrdsvIE1VqRxT8W9nlwBhTx39jAmxfTvyceCLWwNwc=
-X-Received: from pji16.prod.google.com ([2002:a17:90b:3fd0:b0:329:8c4b:3891])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:57e7:b0:327:9345:7097
- with SMTP id 98e67ed59e1d1-32815437431mr31005228a91.10.1757059044131; Fri, 05
- Sep 2025 00:57:24 -0700 (PDT)
-Date: Fri, 5 Sep 2025 00:57:07 -0700
-In-Reply-To: <62d1231571c44b166a18181d724b32da33b38efb.camel@infradead.org>
+        bh=XJnhSI4zKDT3ImFhZhJBvG+6tvoITddVraqHrrqOWpc=;
+        b=e390P91eFIUVL/lU8Y5rKDxbaEm9kKqZrkZ7Q1oIgHYTEzh1rdvyo0GTI293ksIhNk
+         KoDuaPgQBQ/hdZT1cpF04EH1eZcDm544BIFriE6KmGYtjyClWwjssG7hKlS8eqzHnV9G
+         TsBSzeoi91o0tdnhlVBw25i4lKabWKA29GUSsC8QQ/P41uXdixsSwCwo0/X+TsMKvBpb
+         AShrG9Bo5jZl+tJom4B2FI0AFIYINU8EiFq0mYNlIRKJIugQLcWcE2gTppNkcRWOYWoN
+         QFwbGchY0KFQaSyUaoczsQrWotGtmX4zUaNwAe/VGtN1sdbgNRXTZP+5kL2X2wmCUx7c
+         dqfA==
+X-Forwarded-Encrypted: i=1; AJvYcCUc6rbyAwTkrZoa2hznL2UVfPXeRGBTMY+aSXBIH/9UyyjsOrcBZO7MXFryy30PB/0pZ7A=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxPvUR20IV3BU9W997uk7lERxtfcTXzBhSvi+9POOo7vbG3AjHi
+	lPqrxuJXV4uiguNAsJ9ZheagydRfShw9+8BM+FWYXDm+YB9Cw5GKqTZzhj7k1OdMs3N7NVXjyXw
+	pLb6JoQ==
+X-Google-Smtp-Source: AGHT+IF349552GT13Po4cUSXoxXNT8kDuTD1Q1OQDc9T2EDq42EP/PDKUPEXnt4B6nyuOStBDkTUDu8oxLg=
+X-Received: from pfgu35.prod.google.com ([2002:a05:6a00:9a3:b0:772:8559:f89f])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a05:6a20:734d:b0:24b:c7d9:88e4
+ with SMTP id adf61e73a8af0-24bc7d99007mr7502786637.42.1757060606101; Fri, 05
+ Sep 2025 01:23:26 -0700 (PDT)
+Date: Fri, 5 Sep 2025 01:23:17 -0700
+In-Reply-To: <CAHBxVyHFkNtFdX-vciPvYnTOH=GXvHVW7hjFrLA4MFr9wqWVvQ@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
-References: <54BCC060-1C9B-4BE4-8057-0161E816A9A3@amazon.co.uk>
- <caf7b1ea18eb25e817af5ea907b2f6ea31ecc3e1.camel@infradead.org>
- <aLIPPxLt0acZJxYF@google.com> <d74ff3c1c70f815a10b8743647008bd4081e7625.camel@infradead.org>
- <aLcuHHfxOlaF5htL@google.com> <3268e953e14004d1786bf07c76ae52d98d0f8259.camel@infradead.org>
- <aLl_MAk9AT5hRuoS@google.com> <4a3be390fe559de0bd5c61d24853d88f96a6ab6a.camel@infradead.org>
- <aLmTXb6PO02idqeM@google.com> <62d1231571c44b166a18181d724b32da33b38efb.camel@infradead.org>
-Message-ID: <aLqX035O0lQEVPrl@google.com>
-Subject: Re: [PATCH v2 0/3] Support "generic" CPUID timing leaf as KVM guest
- and host
+References: <20250829-pmu_event_info-v5-0-9dca26139a33@rivosinc.com>
+ <20250829-pmu_event_info-v5-6-9dca26139a33@rivosinc.com> <aLIR3deQPxVI2VrE@google.com>
+ <CAHBxVyHFkNtFdX-vciPvYnTOH=GXvHVW7hjFrLA4MFr9wqWVvQ@mail.gmail.com>
+Message-ID: <aLqd9bKB6ucarR3e@google.com>
+Subject: Re: [PATCH v5 6/9] KVM: Add a helper function to check if a gpa is in
+ writable memselot
 From: Sean Christopherson <seanjc@google.com>
-To: David Woodhouse <dwmw2@infradead.org>
-Cc: Paul Durrant <pdurrant@amazon.co.uk>, Fred Griffoul <fgriffo@amazon.co.uk>, 
-	Colin Percival <cperciva@tarsnap.com>, Paolo Bonzini <pbonzini@redhat.com>, 
-	Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>, 
-	Dave Hansen <dave.hansen@linux.intel.com>, "x86@kernel.org" <x86@kernel.org>, 
-	"H. Peter Anvin" <hpa@zytor.com>, Vitaly Kuznetsov <vkuznets@redhat.com>, 
-	"kvm@vger.kernel.org" <kvm@vger.kernel.org>, 
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, "Graf (AWS), Alexander" <graf@amazon.de>, 
-	Ajay Kaher <ajay.kaher@broadcom.com>, Alexey Makhalov <alexey.makhalov@broadcom.com>
+To: Atish Kumar Patra <atishp@rivosinc.com>
+Cc: Anup Patel <anup@brainfault.org>, Will Deacon <will@kernel.org>, 
+	Mark Rutland <mark.rutland@arm.com>, Paul Walmsley <paul.walmsley@sifive.com>, 
+	Palmer Dabbelt <palmer@dabbelt.com>, Mayuresh Chitale <mchitale@ventanamicro.com>, 
+	linux-riscv@lists.infradead.org, linux-arm-kernel@lists.infradead.org, 
+	linux-kernel@vger.kernel.org, kvm@vger.kernel.org, 
+	kvm-riscv@lists.infradead.org
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Thu, Sep 04, 2025, David Woodhouse wrote:
-> On Thu, 2025-09-04 at 06:25 -0700, Sean Christopherson wrote:
-> > Anyways, I'm a-ok reporting that information in KVM_GET_SUPPORTED_CPUID=
- (again,
-> > only with constant TSC and scaling).=C2=A0 Reporting the effective freq=
-uency would be
-> > useful for the host too, e.g. for sanity checks.=C2=A0 What I specifica=
-lly want to
-> > avoid is modifying guest CPUID at runtime.
+On Wed, Sep 03, 2025, Atish Kumar Patra wrote:
+> On Fri, Aug 29, 2025 at 1:47=E2=80=AFPM Sean Christopherson <seanjc@googl=
+e.com> wrote:
+> >
+> > On Fri, Aug 29, 2025, Atish Patra wrote:
+> > > +static inline bool kvm_is_gpa_in_writable_memslot(struct kvm *kvm, g=
+pa_t gpa)
+> > > +{
+> > > +     bool writable;
+> > > +     unsigned long hva =3D gfn_to_hva_prot(kvm, gpa_to_gfn(gpa), &wr=
+itable);
+> > > +
+> > > +     return !kvm_is_error_hva(hva) && writable;
+> >
+> > I don't hate this API, but I don't love it either.  Because knowing tha=
+t the
+> > _memslot_ is writable doesn't mean all that much.  E.g. in this usage:
+> >
+> >         hva =3D kvm_vcpu_gfn_to_hva_prot(vcpu, shmem >> PAGE_SHIFT, &wr=
+itable);
+> >         if (kvm_is_error_hva(hva) || !writable)
+> >                 return SBI_ERR_INVALID_ADDRESS;
+> >
+> >         ret =3D kvm_vcpu_write_guest(vcpu, shmem, &zero_sta, sizeof(zer=
+o_sta));
+> >         if (ret)
+> >                 return SBI_ERR_FAILURE;
+> >
+> > the error code returned to the guest will be different if the memslot i=
+s read-only
+> > versus if the VMA is read-only (or not even mapped!).  Unless every rea=
+d-only
+> > memslot is explicitly communicated as such to the guest, I don't see ho=
+w the guest
+> > can *know* that a memslot is read-only, so returning INVALID_ADDRESS in=
+ that case
+> > but not when the underlying VMA isn't writable seems odd.
+> >
+> > It's also entirely possible the memslot could be replaced with a read-o=
+nly memslot
+> > after the check, or vice versa, i.e. become writable after being reject=
+ed.  Is it
+> > *really* a problem to return FAILURE if the guest attempts to setup ste=
+al-time in
+> > a read-only memslot?  I.e. why not do this and call it good?
+> >
 >=20
-> Hm, in some cases I thought KVM had deliberately moved *to* doing CPUID
-> updates at runtime, so that its doesn't have to exempt the changable
-> leaves from the sanity checks which prevent userspace from updating
-> CPUID for a CPU which has already been run.
-
-Ah, I shouldn't have qualified my statement with "runtime".  I don't want K=
-VM
-modifying incoming CPUID at all, as KVM's attempts to "help" userspace have
-backfired more often than not.  The only scenarios where modifying CPUID is=
- ok
-is for cases where a change in state architectural affects CPUID output, e.=
-g. on
-CR4 or MSR changes.
-
-Moving the Xen CPUID fixup to runtime was essentially the least awful way t=
-o deal
-with KVM disallowing post-run CPUID changes, the underlying problem is that=
- KVM
-was filling Xen CPUID in the first place.
-
-> It's not just the existing Xen TSC leaf which is updated at runtime in
-> kvm_cpuid().
+> Reposting the response as gmail converted my previous response as
+> html. Sorry for the spam.
 >=20
-> But I don't mind too much. If we give userspace a way to *know* the
-> effective frequency, I'm OK with requiring that userspace do so and
-> populate the corresponding CPUID leaves for itself, for Xen and KVM
-> alike. We'd need to expose the FSB frequency too, not just TSC.
->=20
-> I was only going with the runtime update because we are literally
-> already *doing* it this way in KVM.
->=20
-> > Hmm, the only wrinkle is that, if there is slop, KVM could report diffe=
-rent
-> > information when run on different platforms, e.g. after live migration.=
-=C2=A0 But so
-> > long as that possibility is documented, I don't think it's truly proble=
-matic.
-> > And it's another argument for not modifying guest CPUID directly; I'd r=
-ather let
-> > userspace figure out whether or not they care about the divergence than=
- silently
-> > change things from the guest's perspective.
-> >=20
-> > Alternatively (or in addition to), part of me wants to stealtily update
-> > KVM_GET_TSC_KHZ to report back the effective frequency, but I can see t=
-hat being
-> > problematic, e.g. if a naive VMM reads KVM_GET_TSC_KHZ when saving vCPU=
- state for
-> > live migration and after enough migrations, the slop ends up drasticall=
-y skewing
-> > the guest's frequency.
->=20
-> Indeed. And I also want to tell userspace the precise *ratio* being
-> applied by hardware scaling, for the VMClock case where userspace
-> definitely knows *better* about what the host TSC frequency is at this
-> precise moment, and has to tell the guest what *its* TSC frequency is,
-> with the same precision.
+> From a functionality pov, that should be fine. However, we have
+> explicit error conditions for read only memory defined in the SBI STA
+> specification[1].
+> Technically, we will violate the spec if we return FAILURE instead of
+> INVALID_ADDRESS for read only memslot.
 
-Maybe add the scaled/effective frequency and the ratio information as read-=
-only
-TSC attributes, e.g.
+But KVM is already violating the spec, as kvm_vcpu_write_guest() redoes the
+memslot lookup and so could encounter a read-only memslot (if it races with
+a memslot update), and because the underlying memory could be read-only eve=
+n if
+the memslot is writable.
 
-diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-index 7ba2cdfdac44..4ba4c88f3d33 100644
---- a/arch/x86/kvm/x86.c
-+++ b/arch/x86/kvm/x86.c
-@@ -5788,6 +5788,18 @@ static int kvm_arch_tsc_get_attr(struct kvm_vcpu *vc=
-pu,
-                        break;
-                r =3D 0;
-                break;
-+       case KVM_VCPU_TSC_SCALED_KHZ:
-+               r =3D -EFAULT;
-+               if (put_user(vcpu->arch.hw_tsc_khz, uaddr))
-+                       break;
-+               r =3D 0;
-+               break;
-+       case KVM_VCPU_TSC_SCALED_RATIO:
-+               r =3D -EFAULT;
-+               if (put_user(<math>, uaddr))
-+                       break;
-+               r =3D 0;
-+               break;
-        default:
-                r =3D -ENXIO;
-        }
+Why not simply return SBI_ERR_INVALID_ADDRESS on kvm_vcpu_write_guest() fai=
+lure?
+The only downside of that is KVM will also return SBI_ERR_INVALID_ADDRESS i=
+f the
+userspace mapping is completely missing, but AFAICT that doesn't seem to be=
+ an
+outright spec violation.
 
