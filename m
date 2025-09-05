@@ -1,230 +1,113 @@
-Return-Path: <kvm+bounces-56887-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-56888-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id DD7A5B45A1D
-	for <lists+kvm@lfdr.de>; Fri,  5 Sep 2025 16:10:15 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 30A80B45A38
+	for <lists+kvm@lfdr.de>; Fri,  5 Sep 2025 16:22:07 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E9EB13ADDC1
-	for <lists+kvm@lfdr.de>; Fri,  5 Sep 2025 14:10:09 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 0D4891CC453F
+	for <lists+kvm@lfdr.de>; Fri,  5 Sep 2025 14:22:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C2E1F3629AB;
-	Fri,  5 Sep 2025 14:10:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 151FE36CDFC;
+	Fri,  5 Sep 2025 14:21:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="sRk8BrOs"
+	dkim=pass (2048-bit key) header.d=ventanamicro.com header.i=@ventanamicro.com header.b="WDor94x+"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pj1-f73.google.com (mail-pj1-f73.google.com [209.85.216.73])
+Received: from mail-il1-f180.google.com (mail-il1-f180.google.com [209.85.166.180])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2B6B7362089
-	for <kvm@vger.kernel.org>; Fri,  5 Sep 2025 14:10:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.73
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AFFBE36CDE8
+	for <kvm@vger.kernel.org>; Fri,  5 Sep 2025 14:21:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.180
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757081404; cv=none; b=sPKeUtkyDV1NVMoFI8QdMCarg0MStiKSRu2XBvRsE2P7vHe8IaAydR994CCbf/nd57qRdnzjhWU3AeQO864ZTcYuJ6mCBCQd/wL869NWmWaOGTNF7G2qWrys/uNrj7NsExP5QHp5FNA1eRxP5c0hwZZu4BH73smx6Zjh2VFf6jc=
+	t=1757082115; cv=none; b=EEb87u/J8PSwlyZ4XiaQjoIxo0H+vkVF7P1e9lHBStZETqQn10J24/K6eeDsI4xoSC7Y+Hw9yf8j5fNTjvP9gO6ke8lN9a8HU+6joqoA4zhsx8V+YaajpnsYaum2LkywhHG9ueAx9HRX7s597dbIUXps+5jYHf/7S4TncRI8sr0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757081404; c=relaxed/simple;
-	bh=oVu6rTZbUhGzPDAYb9Eb7nO0W+rPrpZjkGeIPs5Do4Y=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=KZdL0cx0lKS5F2STc7jcnpJXD07IJYM6v0vnEhbKDMwAbDxM+5iKQmkRZcniW4k/HtnJEilFHdZBTzA5QiG+m8Sekq1pFMoJ4SUxuEX9SlC1kIwo4T+it7VEROQEQ4BtFiogy0HyGKlRFg9t+hTCwM4l/Cle2ffj7pvrGyfUh6A=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=sRk8BrOs; arc=none smtp.client-ip=209.85.216.73
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pj1-f73.google.com with SMTP id 98e67ed59e1d1-329ccb59ef6so2570038a91.0
-        for <kvm@vger.kernel.org>; Fri, 05 Sep 2025 07:10:02 -0700 (PDT)
+	s=arc-20240116; t=1757082115; c=relaxed/simple;
+	bh=oxUImwhK8PCX5aXJPu6YXlDrtbpPUKA4Yd9Mnt3Xf38=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=ENStYHnUglFehOZmDMjUcUMIG11YRs1wOjqiHJiOvXVMpNYIBM0SsPHYWvvg70jQ4hDbEfWxX5Hl5LPekDWUsxRWHORWRIrrVc7ree1Z7mEbvZvqxBIm47N1YM37c5eaafzreXGv4RwbcSXK9C8o1geoOrPLNXIIgxLEeM/vcuM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ventanamicro.com; spf=pass smtp.mailfrom=ventanamicro.com; dkim=pass (2048-bit key) header.d=ventanamicro.com header.i=@ventanamicro.com header.b=WDor94x+; arc=none smtp.client-ip=209.85.166.180
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ventanamicro.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ventanamicro.com
+Received: by mail-il1-f180.google.com with SMTP id e9e14a558f8ab-3f669e78eadso11537335ab.1
+        for <kvm@vger.kernel.org>; Fri, 05 Sep 2025 07:21:53 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1757081402; x=1757686202; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=2cnfE4bCiy2VBXs12iYQk842LQr812w5LNrCYBvaphs=;
-        b=sRk8BrOsR6lefmJWisedk728LmzQvbvAR3NCMLCHK+HODifRaFLkq+/n5pVqjGy2dB
-         wU8KZ3HpfcOBOUHUFesbqNaAElC6+5VIiYbFvfl8rPe08AzpF6exRNJf851zJ39gvpuB
-         gn9lqhilcicmsIvqJTsNcusJ3y+YEXfdlVyLu7moMpYGF/b9VzI5JTtQ2jSZxUa/zvmG
-         28vx2c/J2elRf2nMJpc4PoeFE/5HrqO3qDwIlQC/YMQ/fl4UghrsBGDPNDukNEghWPBP
-         uB5388GD9I0CsU/NXoZqUSbjlCGn3ERSVKKATJoQRgAQx9HMdQmGkZZn1tIxx8g0achw
-         /pcQ==
+        d=ventanamicro.com; s=google; t=1757082113; x=1757686913; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=WAIXNF/yhxj3WIda95HMOmBhnbf7MpGftHHpVlcqDy4=;
+        b=WDor94x+a30PsCd8eKo7y/hwzZozoyy8N/X/5ZTOXIR21HkIsfU4ybqfFbznbM1QuV
+         hOoIv9ysNc9EKDDIjQ9bLXrEgncDt7LE3/++NPrcbeULM5on6bYbRLB/NABybZa6dvyC
+         iqioslBMr59lrmupnf6ZxnaNSWOxTiDYcdWi6Rv7bs3rEslr3ydWd7gCfTcnT4JlQ4Gu
+         5vnIVerOkndj4PI8QEksNoqXFgRZmRz1zcefZVBLz3knON8w/hJGmZh2kFXo7GtoXGea
+         OKvuHjcSaxqDVCwJl+dfoqBinYSL7lsIOxwXq+GMJmkp3GsWhn/7bilHmiPAjY0RrjbG
+         ky9A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1757081402; x=1757686202;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=2cnfE4bCiy2VBXs12iYQk842LQr812w5LNrCYBvaphs=;
-        b=fd5GsXfXeATDs1O1So85F41MoHTpMy3gHOC3QV0z3Os7ed6J22eAtrBE/6bBclIvPP
-         1YCL/OJ4hz6jmFKFBP0tY6E5z/P7kFmcwcCbl+SPs0SxDzi2NlNa8m55r4828vwux76v
-         rSHROeBk5IfBQAPLd0U13Jmeal+TUIY66SMEQ88i3EwTDag7hoh/aQ5n77RjuOK6ZRz6
-         lTMgYU5BwRF4dWZANBcYQQzfBpD4rK6jw4tNBsEYs0hbpNagT3g9W0e31nU1gKhocxYn
-         uL42/4PpwiqFZKFF1RgEHAvimFFZLg7Hmtyt304b+msIcZSDqJp1woX4Ke/f3GHJDX2C
-         t8dg==
-X-Gm-Message-State: AOJu0YxJz9UIwPtZLZsiECt2gEdjaeLPeqI3P/8MLdqW9/By2OJr5S6h
-	mFmOtcMgG2enmuImCKDdRMAkI6Ci22iRvRL7W+0hHt3NXLZ8sDHHFlpQIMgREuR7Nvr4N7vN/sR
-	CsuYxTA==
-X-Google-Smtp-Source: AGHT+IEOLpxllDHvfK5C/dA8xOZcRKV2+JrJ68qneanLw4PJD2TZQegnG8wL7O0EjCXIXyLbhYUtND9DG8o=
-X-Received: from pjeb1.prod.google.com ([2002:a17:90a:10c1:b0:32b:b3c4:a304])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:3952:b0:32b:87b7:6dd9
- with SMTP id 98e67ed59e1d1-32b87b7706cmr10790960a91.12.1757081402340; Fri, 05
- Sep 2025 07:10:02 -0700 (PDT)
-Date: Fri, 5 Sep 2025 07:09:49 -0700
-In-Reply-To: <20221005211551.152216-1-thanos.makatos@nutanix.com>
+        d=1e100.net; s=20230601; t=1757082113; x=1757686913;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=WAIXNF/yhxj3WIda95HMOmBhnbf7MpGftHHpVlcqDy4=;
+        b=mTpEc81H6YzKp1bJKNYKYGSdfLoBn/A44wmKA1r7DxG0UqrB8GHOE002T38Yy2wQW7
+         gTD9lvl4MMrRIb8CrWX9/Wf1RSsMxQskb+DMvLDnse0vtjS1nHYzokWTi+0Ur4KXE0Zf
+         CPMiJAsOet1WpJ29TSRn7nx3l0npXcAWpAyvq9aFyUZrW6F7zaKNinWJkf4lqCeYpnJJ
+         SjI9Hf6syAp5aLlqwbv2Pd+bE1L/cAbVpkHBI0ktd7CLwhoSE88U+UwpcekkBvKEthbA
+         dSn6RsUAYzCteXu7sg2KcwpJL49GiyNwBj3heV0Kz1Xn6ma+oa68ISLBe0kS6GhS7Qj8
+         3hAA==
+X-Forwarded-Encrypted: i=1; AJvYcCW2AQGU8/5j2FSlNWGgIODCO4rfxL/fQFXX76lRQZdu/75yANJWEh44QohNua14+yvB/y8=@vger.kernel.org
+X-Gm-Message-State: AOJu0YygQ6+dXRiJvahKT10JliClRVIsYjGqUEucUjSkQ4vB8yfE2bnl
+	TeBTzS705RXQizh0Cx2S81gSn7WkfVlD7e0kJd+fMSWmBArNGnT3uqeBwAKVjVfFnm8h6tjW8R8
+	gbGFygyU=
+X-Gm-Gg: ASbGncvA4ohgyWHhslbNrBlvovF+fBX/3jK1qpfw/qz5k3j1iBQ2Fd5b9R9nU5iu9iP
+	TbbRxH6ImXC5ypOSd/lfW8RId4igMlbr/BZls8ETVqQP04ZYPLGsbduQybuqMAEGm168HOHPT+2
+	hjqOkj9KSAVTiaKdoWoc5tfpA6Bavav2d/lVbiYGw5HG6rf9Ud7Japgez8V2c5UcV407U/zd486
+	IrfgWIBITsx3upjrCDIHHyCJfiQqDeVG1Bc2OVOYzbfuEqBzfP2PFtU1gwY5yDFNt2nQmenpRqH
+	I+p3RqJh897lMAwGmXxkh6JwcKzMLko8+iKJ6Lawdt3auQktKfDhSwtHbuubmxUNtPrvVMnRPz/
+	W4NMWeGKMq0217PqvZDM/thiw
+X-Google-Smtp-Source: AGHT+IGf4qxxSXO6iewjkiZTlmr4yvaEZFX/IytJuUl4Nj32J40fOreM/84N8MX0m+sgaZr+dqFiDw==
+X-Received: by 2002:a05:6e02:240c:b0:3f6:6198:b39e with SMTP id e9e14a558f8ab-3f7b6808028mr57130415ab.0.1757082112699;
+        Fri, 05 Sep 2025 07:21:52 -0700 (PDT)
+Received: from localhost ([140.82.166.162])
+        by smtp.gmail.com with ESMTPSA id 8926c6da1cb9f-50d8f0d594fsm6185353173.23.2025.09.05.07.21.51
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 05 Sep 2025 07:21:52 -0700 (PDT)
+Date: Fri, 5 Sep 2025 09:21:51 -0500
+From: Andrew Jones <ajones@ventanamicro.com>
+To: Anup Patel <apatel@ventanamicro.com>
+Cc: Atish Patra <atish.patra@linux.dev>, 
+	Palmer Dabbelt <palmer@dabbelt.com>, Paul Walmsley <paul.walmsley@sifive.com>, 
+	Alexandre Ghiti <alex@ghiti.fr>, Anup Patel <anup@brainfault.org>, 
+	Paolo Bonzini <pbonzini@redhat.com>, Shuah Khan <shuah@kernel.org>, kvm@vger.kernel.org, 
+	kvm-riscv@lists.infradead.org, linux-riscv@lists.infradead.org, linux-kernel@vger.kernel.org, 
+	linux-kselftest@vger.kernel.org
+Subject: Re: [PATCH v3 5/6] RISC-V: KVM: Implement ONE_REG interface for SBI
+ FWFT state
+Message-ID: <20250905-005c0bc3e16e909c5d91eef4@orel>
+References: <20250823155947.1354229-1-apatel@ventanamicro.com>
+ <20250823155947.1354229-6-apatel@ventanamicro.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20221005211551.152216-1-thanos.makatos@nutanix.com>
-Message-ID: <aLrvLfkiz6TwR4ML@google.com>
-Subject: Re: [RFC PATCH] KVM: optionally commit write on ioeventfd write
-From: Sean Christopherson <seanjc@google.com>
-To: Thanos Makatos <thanos.makatos@nutanix.com>
-Cc: kvm@vger.kernel.org, john.levon@nutanix.com, mst@redhat.com, 
-	john.g.johnson@oracle.com, dinechin@redhat.com, cohuck@redhat.com, 
-	jasowang@redhat.com, stefanha@redhat.com, jag.raman@oracle.com, 
-	eafanasova@gmail.com, elena.ufimtseva@oracle.com, changpeng.liu@intel.com, 
-	james.r.harris@intel.com, benjamin.walker@intel.com
-Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250823155947.1354229-6-apatel@ventanamicro.com>
 
-On Wed, Oct 05, 2022, Thanos Makatos wrote:
-
-Amusingly, I floated this exact idea internally without ever seeing this patch
-(we ended up going a different direction).  Sadly, I can't claim infringement,
-as my suggestion was timestamped from December 2022 :-D
-
-If this is useful for y'all, I don't see a reason not to do it.
-
+On Sat, Aug 23, 2025 at 09:29:46PM +0530, Anup Patel wrote:
+> The KVM user-space needs a way to save/restore the state of
+> SBI FWFT features so implement SBI extension ONE_REG callbacks.
+> 
+> Signed-off-by: Anup Patel <apatel@ventanamicro.com>
 > ---
->  include/uapi/linux/kvm.h       | 5 ++++-
->  tools/include/uapi/linux/kvm.h | 2 ++
->  virt/kvm/eventfd.c             | 9 +++++++++
->  3 files changed, 15 insertions(+), 1 deletion(-)
-> 
-> diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
-> index eed0315a77a6..0a884ac1cc76 100644
-> --- a/include/uapi/linux/kvm.h
-> +++ b/include/uapi/linux/kvm.h
-> @@ -804,6 +804,7 @@ enum {
->  	kvm_ioeventfd_flag_nr_deassign,
->  	kvm_ioeventfd_flag_nr_virtio_ccw_notify,
->  	kvm_ioeventfd_flag_nr_fast_mmio,
-> +	kvm_ioevetnfd_flag_nr_commit_write,
->  	kvm_ioeventfd_flag_nr_max,
->  };
->  
-> @@ -812,16 +813,18 @@ enum {
->  #define KVM_IOEVENTFD_FLAG_DEASSIGN  (1 << kvm_ioeventfd_flag_nr_deassign)
->  #define KVM_IOEVENTFD_FLAG_VIRTIO_CCW_NOTIFY \
->  	(1 << kvm_ioeventfd_flag_nr_virtio_ccw_notify)
-> +#define KVM_IOEVENTFD_FLAG_COMMIT_WRITE (1 << kvm_ioevetnfd_flag_nr_commit_write)
+>  arch/riscv/include/asm/kvm_vcpu_sbi_fwft.h |   1 +
+>  arch/riscv/include/uapi/asm/kvm.h          |  15 ++
+>  arch/riscv/kvm/vcpu_sbi_fwft.c             | 197 +++++++++++++++++++--
+>  3 files changed, 200 insertions(+), 13 deletions(-)
+>
 
-Maybe POST_WRITE to try to capture the effective semantics?  As for read after
-write hazards, my vote is to document that KVM provides no guarantees on that
-front.  I can't envision a use case where it makes sense to provide guarantees
-in the kernel, since doing so would largely defeat the purpose of handling writes
-in the fastpath.
-
->  #define KVM_IOEVENTFD_VALID_FLAG_MASK  ((1 << kvm_ioeventfd_flag_nr_max) - 1)
->  
->  struct kvm_ioeventfd {
->  	__u64 datamatch;
->  	__u64 addr;        /* legal pio/mmio address */
-> +	__u64 vaddr;       /* user address to write to if COMMIT_WRITE is set */
-
-This needs to be placed at the end, i.e. actually needs to consume the pad[]
-bytes.  Inserting into the middle changes the layout of the structure and thus
-breaks ABI.
-
-And maybe post_addr (or commit_addr)?  Because vaddr might be interpreted as the
-host virtual address that corresponds to "addr", which may or may not be the case.
-
->  	__u32 len;         /* 1, 2, 4, or 8 bytes; or 0 to ignore length */
->  	__s32 fd;
->  	__u32 flags;
-> -	__u8  pad[36];
-> +	__u8  pad[28];
->  };
- 
-...
-
-> @@ -812,6 +813,7 @@ enum {
->  #define KVM_IOEVENTFD_FLAG_DEASSIGN  (1 << kvm_ioeventfd_flag_nr_deassign)
->  #define KVM_IOEVENTFD_FLAG_VIRTIO_CCW_NOTIFY \
->  	(1 << kvm_ioeventfd_flag_nr_virtio_ccw_notify)
-> +#define KVM_IOEVENTFD_FLAG_COMMIT_WRITE (1 << kvm_ioevetnfd_flag_nr_commit_write)
->  
->  #define KVM_IOEVENTFD_VALID_FLAG_MASK  ((1 << kvm_ioeventfd_flag_nr_max) - 1)
->  
-> diff --git a/virt/kvm/eventfd.c b/virt/kvm/eventfd.c
-> index 2a3ed401ce46..c98e7b54fafa 100644
-> --- a/virt/kvm/eventfd.c
-> +++ b/virt/kvm/eventfd.c
-> @@ -682,6 +682,8 @@ struct _ioeventfd {
->  	struct kvm_io_device dev;
->  	u8                   bus_idx;
->  	bool                 wildcard;
-> +	bool                 commit_write;
-> +	void                 *vaddr;
-
-There's no need for a separate bool, just pivot on the validity of the pointer.
-The simplest approach is to disallow NULL pointers (which aren't technically
-illegal for userspace, but I doubt any use case actually cares).  Alternatively,
-set the internal pointer to e.g. -EINVAL and then act on !IS_ERR().
-
-The pointer also needs to be tagged __user.
-
->  };
->  
->  static inline struct _ioeventfd *
-> @@ -753,6 +755,10 @@ ioeventfd_write(struct kvm_vcpu *vcpu, struct kvm_io_device *this, gpa_t addr,
->  	if (!ioeventfd_in_range(p, addr, len, val))
->  		return -EOPNOTSUPP;
->  
-> +	if (p->commit_write) {
-> +		if (unlikely(copy_to_user(p->vaddr, val, len)))
-
-This needs to check that len > 0.  I think it's also worth hoisting the validity
-checks into kvm_assign_ioeventfd_idx() so that this can use the slightly more
-optimal __copy_to_user().
-
-E.g. 
-
-	if (args->flags & KVM_IOEVENTFD_FLAG_REDIRECT) {
-		if (!args->len || !args->post_addr ||
-		    args->redirect != untagged_addr(args->post_addr) ||
-		    !access_ok((void __user *)(unsigned long)args->post_addr, args->len)) {
-			ret = -EINVAL;
-			goto fail;
-		}
-
-		p->post_addr = (void __user *)(unsigned long)args->post_addr;
-	}
-
-And then the usage here can be
-
-	if (p->post_addr && __copy_to_user(p->post_addr, val, len))
-		return -EFAULT;
-
-I assume the spinlock in eventfd_signal() provides ordering even on weakly
-ordered architectures, but we should double check that, i.e. that we don't need
-an explicitly barrier of some kind.
-
-Lastly, I believe kvm_deassign_ioeventfd_idx() needs to check for a match on
-post_addr (or whatever it gets named).
-
-> +			return -EFAULT;
-> +	}
->  	eventfd_signal(p->eventfd, 1);
->  	return 0;
->  }
-> @@ -832,6 +838,9 @@ static int kvm_assign_ioeventfd_idx(struct kvm *kvm,
->  	else
->  		p->wildcard = true;
->  
-> +	p->commit_write = args->flags & KVM_IOEVENTFD_FLAG_COMMIT_WRITE;
-> +	p->vaddr = (void *)args->vaddr;
-> +
->  	mutex_lock(&kvm->slots_lock);
->  
->  	/* Verify that there isn't a match already */
-> -- 
-> 2.22.3
-> 
+Reviewed-by: Andrew Jones <ajones@ventanamicro.com>
 
