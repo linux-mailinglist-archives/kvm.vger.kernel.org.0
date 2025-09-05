@@ -1,136 +1,108 @@
-Return-Path: <kvm+bounces-56859-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-56860-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id DEBAFB44E47
-	for <lists+kvm@lfdr.de>; Fri,  5 Sep 2025 08:52:11 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id A9F01B44FCA
+	for <lists+kvm@lfdr.de>; Fri,  5 Sep 2025 09:32:26 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3773D17E9C6
-	for <lists+kvm@lfdr.de>; Fri,  5 Sep 2025 06:52:11 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 2C559B627D5
+	for <lists+kvm@lfdr.de>; Fri,  5 Sep 2025 07:29:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 11F5C2D1F40;
-	Fri,  5 Sep 2025 06:52:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DCCAA2EA477;
+	Fri,  5 Sep 2025 07:29:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=brainfault-org.20230601.gappssmtp.com header.i=@brainfault-org.20230601.gappssmtp.com header.b="OlbAFEVm"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="oGuR7LOd"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-il1-f179.google.com (mail-il1-f179.google.com [209.85.166.179])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CD9DC2D0C69
-	for <kvm@vger.kernel.org>; Fri,  5 Sep 2025 06:51:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.179
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 055A82E92D2;
+	Fri,  5 Sep 2025 07:29:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757055120; cv=none; b=SOUY6gEYfAquYeDyLVQEIZu/d4gekqYGK057+z9JQdZ7dpFpfEtzJOfWDk0SUMvH48mAvrPSaKFQUujgqP8/ZAu16IdKoBW87/wxt7yw2sqSgSA+wVvroG4NIYQfQZvZcZjMWLsxylnED5/qpoUrFJiMdCJxR0B6To/5TG95RsY=
+	t=1757057345; cv=none; b=SSToHu8brjNXwS9BAXLFohJpVARN6cxfzC9kWJ97APXDmkl2jPqO8GVHOdM5IMAY7szsdd6z0bGQTSmnLT4XHO+RDTwraSYR4Y1DxsXYev0pspkpuqIZZL5PrR+7JW4nis5cA/DhR7gYJwIQBsyoODJfb/yCqWx+I1bL4PLfIBQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757055120; c=relaxed/simple;
-	bh=DaOHBz3Vp86bsV/wqEUhViNPWlyVfnJ/beJ1Xp5QxAw=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=HlmEkWz+o9rif81hb0u+/DMWNZCosxTis84LOIKsRs/YNFMWEoHr+ph2LnZ4lJ7dsE6plPBckM6YUQR3BhO+TjNViGcYeFJ3bbTZNaHNTi8yuWEFgA6WthcyNgt3cRUh9Q8SAOioaSUsv2U3YVbIkLQNheghlYRyBYsY3pXstoQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=brainfault.org; spf=none smtp.mailfrom=brainfault.org; dkim=pass (2048-bit key) header.d=brainfault-org.20230601.gappssmtp.com header.i=@brainfault-org.20230601.gappssmtp.com header.b=OlbAFEVm; arc=none smtp.client-ip=209.85.166.179
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=brainfault.org
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=brainfault.org
-Received: by mail-il1-f179.google.com with SMTP id e9e14a558f8ab-3f0fcd81068so13506195ab.2
-        for <kvm@vger.kernel.org>; Thu, 04 Sep 2025 23:51:58 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=brainfault-org.20230601.gappssmtp.com; s=20230601; t=1757055118; x=1757659918; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=4nDTd5Gv36YNMyq5Qhnn8xJEK9lVHzvftyFkSysDc/4=;
-        b=OlbAFEVmU5dnqNJzUnvocJUJH1fIAVCjYx6awQaowJXgrGDDJf1u6/d2qo1qEeSCz/
-         PvyL+XrJ50KclY3zPkyaIf61uLvXky9vi7fLwMvDBErRF2NnVO59QnDn1LVSyL8MSTJG
-         00l4dYxuYJYuMPa9tI3pOk1b9G+rM2N578imvUt92lTpRVOaAcq0bvfMl+I5NpYktL/B
-         3q4gepybSzfip+/ybsJHWyk03qur7JpHK8nNkwZ/fuI1+U6wDEfu3SaI83qgO3XICML3
-         JvTVAYWwuCYi0/yBmXZQ0FVLzI0aiT/GVmJk5DJ38N5V6GE9NDuHAg85pUgOz23u/MVx
-         c3+Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1757055118; x=1757659918;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=4nDTd5Gv36YNMyq5Qhnn8xJEK9lVHzvftyFkSysDc/4=;
-        b=PyuEkg9qupHpk6zf6L6R3L42Gyut7+8MCXFppYVmJ4qHyrdeTNNFGTAbcsL7FfVS5X
-         8tgeB57UlykHm79COXIZI1fezPNtY6z2MMdxVl4CpW8kWRgYVT3MiZuiE0O0GpfPRyxR
-         5LN+CzaQaDY6XHBG790bbQ6s0AEtpA8HzujhFfCmIx5eDZFIBdPEC4MTGEc4zNuK1VQZ
-         mkec+EFbhbdvjPeT9DYxFl2fq3eDLs8hQT5YGpgS6b3COibMbZ7JnLVv4+zrOydXuY0i
-         rVYEq2bOEPrrvYqY06UPpj128ajV77GPDjCnQPuxqpD+6PGwxR6GjIcqRfsP6SaBaHRd
-         691g==
-X-Forwarded-Encrypted: i=1; AJvYcCUhkmgup9HHCEE3+zQxN2RySHILkx+vEj56mjNkO4N4tNF+4R+pGuKVsBZh16mnfBXyg10=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxZwCNRPIHQLXBsVXd0JEoVR6LuqzwhK0kCnRjN+xGNpmcs6/V9
-	QaENPuHu2jV6t2zRhWIBKfeyj7UWzlvUbpRlR+4LfEZykG7Sse+6taqWUtfTPfc1WpgxLpS3wU4
-	UZGHw9yiNmn0cARqIVnTWBPsfZKKSTAotZQyPKcpwVyakHcGhIKiI
-X-Gm-Gg: ASbGncuB0kZNygiU3D7i6lCcTAwG8BDMtRFdRY7fCoFpLmmrXeh4CNY1QZCVDxGqq0A
-	H6CiD1tuDjChrkuNATWKkcjfIo4PMdqDiYIsyByOLaYYNNEb6g+B7b3T6LOKJsPwKj4j9NxGuKq
-	XhrZgTYrup7OLQE6xdVkQ7LzvfI32dGUzSwxzT2froNvlWT8Jos3FloPJkjYcKkoQpig5pKnDj1
-	rXX+8E2KhE6vvj8533HVtuwqkQKEtjQNW60uNcPixtwWTQ8OI50uoFPLFMY7g==
-X-Google-Smtp-Source: AGHT+IFqhsp8QkbEH2AYxxy6aZR2+3njRKvf1EkNjHXrSfDyXXsLjXgWGyrgUdjW9lEocsZBNm6jnwrKVQArR5mwmho=
-X-Received: by 2002:a05:6e02:4616:b0:3f6:554f:f83e with SMTP id
- e9e14a558f8ab-3f6554ff9d2mr206848225ab.18.1757055117887; Thu, 04 Sep 2025
- 23:51:57 -0700 (PDT)
+	s=arc-20240116; t=1757057345; c=relaxed/simple;
+	bh=yVy1f3yKmPmzFcw9VKqDyY9YboyVtGIYlwJrQrV2qog=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=mT6B9P3/VW3lGSqaVbiVU1hBFdiituZ9OTYx6gMXShIHKjVXVIHIkQxsmzpJoIu8iXWdKuw455W9XDtSHFFshoNu7d3Cu3BJC3B6in4o56xnzLlEH79e1pWDyeh7Vi0wXd0WIdJbRlyXwYY8p7ksQ7mKaA29B2iK0Mm7mma4Jcg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=oGuR7LOd; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8D324C4CEF1;
+	Fri,  5 Sep 2025 07:29:04 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1757057344;
+	bh=yVy1f3yKmPmzFcw9VKqDyY9YboyVtGIYlwJrQrV2qog=;
+	h=From:To:Cc:Subject:Date:From;
+	b=oGuR7LOdCqpTVIeg+Y1AtdcT434yJI73d6FnTZh8Ibgz6vjBV+WB2H1zg7zyA8Q3X
+	 4uZ61Bvtmm9/OU65Kg4MeJAzI9AoeM4UJnAW9Yl2zfvURlKc54UDDFl3BmXsepJIFf
+	 P8Q9juSPgRsENh5jbPAzr2C0LdpcHd63f++ybzmoTlZjMhuCwmuyMiPaw1t3Lzg2RK
+	 iDf1mBgpf2+rM79po6E0bMX8KRCPq5Kc0VPAYDf/tPTA361hbOao+jIyGeaymAT9JQ
+	 3dPB/R3UgXUd4Lr6YRaW8KVDpqEmuFoHJvEvy8+2+GOv96t7TPxgPTAMyJx4v2P4OO
+	 9T3NUhB0jcahA==
+Received: from [131.175.126.3] (helo=lobster-girl.dot1x.polimi.it)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.98.2)
+	(envelope-from <maz@kernel.org>)
+	id 1uuQsY-00000003Y39-0yts;
+	Fri, 05 Sep 2025 07:29:02 +0000
+From: Marc Zyngier <maz@kernel.org>
+To: kvmarm@lists.linux.dev,
+	kvm@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org
+Cc: Joey Gouly <joey.gouly@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Oliver Upton <oliver.upton@linux.dev>,
+	Zenghui Yu <yuzenghui@huawei.com>
+Subject: [PATCH] KVM: arm64: Mark freed S2 MMUs as invalid
+Date: Fri,  5 Sep 2025 08:28:59 +0100
+Message-ID: <20250905072859.211369-1-maz@kernel.org>
+X-Mailer: git-send-email 2.47.2
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250821142542.2472079-1-guoren@kernel.org>
-In-Reply-To: <20250821142542.2472079-1-guoren@kernel.org>
-From: Anup Patel <anup@brainfault.org>
-Date: Fri, 5 Sep 2025 12:21:46 +0530
-X-Gm-Features: Ac12FXzs-ev06L7BPaxBsQRN2id94q1V5j-qhNEmATN7a2fxkATv2aO3WzvlWf0
-Message-ID: <CAAhSdy35BTE8YwxKb+1YwE3eHDfRytt71fU4014zYjwyXYn5qw@mail.gmail.com>
-Subject: Re: [PATCH V4 RESEND 0/3] Fixup & optimize hgatp mode & vmid detect functions
-To: guoren@kernel.org
-Cc: troy.mitchell@linux.dev, alex@ghiti.fr, aou@eecs.berkeley.edu, 
-	atish.patra@linux.dev, fangyu.yu@linux.alibaba.com, guoren@linux.alibaba.com, 
-	kvm-riscv@lists.infradead.org, kvm@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, linux-riscv@lists.infradead.org, 
-	palmer@dabbelt.com, paul.walmsley@sifive.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
+X-SA-Exim-Connect-IP: 131.175.126.3
+X-SA-Exim-Rcpt-To: kvmarm@lists.linux.dev, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, joey.gouly@arm.com, suzuki.poulose@arm.com, oliver.upton@linux.dev, yuzenghui@huawei.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Thu, Aug 21, 2025 at 7:56=E2=80=AFPM <guoren@kernel.org> wrote:
->
-> From: "Guo Ren (Alibaba DAMO Academy)" <guoren@kernel.org>
->
-> Here are serval fixup & optmizitions for hgatp detect according
-> to the RISC-V Privileged Architecture Spec.
->
-> ---
-> Changes in v4:
->  - Involve ("RISC-V: KVM: Prevent HGATP_MODE_BARE passed"), which
->    explain why gstage_mode_detect needs reset HGATP to zero.
->  - RESEND for wrong mailing thread.
->
-> Changes in v3:
->  - Add "Fixes" tag.
->  - Involve("RISC-V: KVM: Remove unnecessary HGATP csr_read"), which
->    depends on patch 1.
->
-> Changes in v2:
->  - Fixed build error since kvm_riscv_gstage_mode() has been modified.
-> ---
->
-> Fangyu Yu (1):
->   RISC-V: KVM: Write hgatp register with valid mode bits
->
-> Guo Ren (Alibaba DAMO Academy) (2):
->   RISC-V: KVM: Remove unnecessary HGATP csr_read
->   RISC-V: KVM: Prevent HGATP_MODE_BARE passed
->
->  arch/riscv/kvm/gstage.c | 27 ++++++++++++++++++++++++---
->  arch/riscv/kvm/main.c   | 35 +++++++++++++++++------------------
->  arch/riscv/kvm/vmid.c   |  8 +++-----
->  3 files changed, 44 insertions(+), 26 deletions(-)
->
-> --
-> 2.40.1
->
+When freeing an S2 MMU, we free the associated pgd, but omit to
+mark the structure as invalid. Subsequently, a call to
+kvm_nested_s2_unmap() would pick these invalid S2 MMUs and
+pass them down the teardown path.
 
-Queued this series for Linux-6.18
+This ends up with a nasty warning as we try to unmap an unallocated
+set of page tables.
 
-Regards,
-Anup
+Fix this by making the S2 MMU invalid on freeing the pgd by calling
+kvm_init_nested_s2_mmu().
+
+Fixes: 4f128f8e1aaa ("KVM: arm64: nv: Support multiple nested Stage-2 mmu structures")
+Signed-off-by: Marc Zyngier <maz@kernel.org>
+---
+ arch/arm64/kvm/mmu.c | 4 ++++
+ 1 file changed, 4 insertions(+)
+
+diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
+index 9a45daf817bf..315aaadfda30 100644
+--- a/arch/arm64/kvm/mmu.c
++++ b/arch/arm64/kvm/mmu.c
+@@ -1074,6 +1074,10 @@ void kvm_free_stage2_pgd(struct kvm_s2_mmu *mmu)
+ 		mmu->pgt = NULL;
+ 		free_percpu(mmu->last_vcpu_ran);
+ 	}
++
++	if (kvm_is_nested_s2_mmu(kvm, mmu))
++		kvm_init_nested_s2_mmu(mmu);
++		
+ 	write_unlock(&kvm->mmu_lock);
+ 
+ 	if (pgt) {
+-- 
+2.47.2
+
 
