@@ -1,143 +1,195 @@
-Return-Path: <kvm+bounces-56863-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-56864-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3C971B4504C
-	for <lists+kvm@lfdr.de>; Fri,  5 Sep 2025 09:52:12 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 69307B45089
+	for <lists+kvm@lfdr.de>; Fri,  5 Sep 2025 09:57:35 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9D5AAA0610A
-	for <lists+kvm@lfdr.de>; Fri,  5 Sep 2025 07:52:09 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1B1B35401E1
+	for <lists+kvm@lfdr.de>; Fri,  5 Sep 2025 07:57:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 834C72F066D;
-	Fri,  5 Sep 2025 07:52:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 171A22F7456;
+	Fri,  5 Sep 2025 07:57:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="KKzpGvyN"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="vSyMFCjo"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pf1-f174.google.com (mail-pf1-f174.google.com [209.85.210.174])
+Received: from mail-pj1-f74.google.com (mail-pj1-f74.google.com [209.85.216.74])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E56DA2E92D2;
-	Fri,  5 Sep 2025 07:51:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.174
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BD0462F39D0
+	for <kvm@vger.kernel.org>; Fri,  5 Sep 2025 07:57:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.74
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757058719; cv=none; b=SIDm7LonftwEtzNrJJ/wQ3ZSI6m0vgKEI7T93RgOotUCe0dh2mvi0ogxPyA5lW+as9Mn6iKpgUM7h73zhXnYtYlx6JzXhl0IUXD3Tl3US6h1KgABEQ2q7x/cI04sZOpb4dvhHSAk6Oe/bIcqfZByn+krvlAPmSI7xhnYd7v9gn8=
+	t=1757059046; cv=none; b=kV3/9hIyyQtwDFh1U4mz9opaeTcd+CJkU8xrQaHrMPolJztMtCirQT7Z9VOuTXqvXUBy7ufVLVZM65MHEoGP6zkLkXQS6i2E00FEQHJ9b4HE/uC1C8OJ9BaolWE+S7rTl2/2pTKvn6HtKdPsf4pA99KzlJtcCZtW+9uhkSfogVw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757058719; c=relaxed/simple;
-	bh=wnEDbEqupkldvgMSCmGzgTuDsfuXoqTVNqOMp0k9RM0=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=MehbdhXo0ps6swMOAFGfsdhwNYBmq+W/OEk+9JgYnVhPd7HbuApLf5YZiBeXJdAlYMBXpfWWI/bLd/HgBJwjVITuyK49jV+2FtqxMDcWMy/Fv1TK8C/8pWXf7TFvrlRGB87KTo5ghNmVI29/HEQe8W8+21ik2fR/ahO3VtMsOa4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=KKzpGvyN; arc=none smtp.client-ip=209.85.210.174
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pf1-f174.google.com with SMTP id d2e1a72fcca58-7723bf02181so1479740b3a.1;
-        Fri, 05 Sep 2025 00:51:57 -0700 (PDT)
+	s=arc-20240116; t=1757059046; c=relaxed/simple;
+	bh=taJPAeAG+2Zan+gki5TcDy/2fEVopYdaZ3wK1NDP3ys=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=eqeqsxYj3gOj2t8n3AcU40Bfrf58mZo9PgBuTxg9OYi+BPGV9UUjLK/cvsO/0bHNy/bdb+W6bxifE8VR1qHyRBIg6HjN+8yqQtsAj+TREf8goU1pW808r4CFpZY8xyYfn+OKF5jp/Eac+E6Vl4xGtsKJlT8NmVsCIKINgDRhUO8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=vSyMFCjo; arc=none smtp.client-ip=209.85.216.74
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+Received: by mail-pj1-f74.google.com with SMTP id 98e67ed59e1d1-329745d6960so1849344a91.0
+        for <kvm@vger.kernel.org>; Fri, 05 Sep 2025 00:57:24 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1757058717; x=1757663517; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=D//zcibIIUwpQZGGbW48bB+RJuGF8/HXmWRaYXLQrh4=;
-        b=KKzpGvyNF/bzDbXBJVZZD4skCxQr3VIZyFsrnfdwJ9dKn1GklgGxRwjqW4rJL8LP3v
-         cXGOSfBrG5eZmdDHKuHQg31J6JXiczTQ6eC74PbjZTpiOnA6aIZtbeOSePQ1W05Zf+qc
-         LO9pD0uUKybcZMsxANDqdBvf/VZkv1IAZfDMGVT3ecXcSsNpAV3xFGq87qP58iKXfrGK
-         rPnJSlCd8LbewTbjj0OMbwcc820yUbgvmx7Tvl4x4+47J3lDCDli9kl6cK+6Lkm8lnQ/
-         rQF9nmsILDzBkS4N5dKSHqWVUCjP7CVs5wyxc+USzunP3TDxdUlHui8nGIvJ9PNTr9EJ
-         W73w==
+        d=google.com; s=20230601; t=1757059044; x=1757663844; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:from:subject:message-id:references
+         :mime-version:in-reply-to:date:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=o1p4RNecGHbuiyzLdGgu+/L6P6vwBjZh1dqH7jZHHi0=;
+        b=vSyMFCjoPB+rD1vi2yTABZY6T+9blwto1/CEWd2zqPF7Zfk+jeRdhkaYn3QJwmKcn2
+         YSWhRI9jFHoKiEhE+jwfUgfmuTUAs76ntO8/f4PJFBmeUZGA/jyN5DWpHKxBbozgUNNZ
+         lY9Ho6whc5Fkdgb0ba8/zAzhVnjO5IOOguYfcpsBL7Irt8KwlD90+4yiP425A/8M/zcg
+         +pAJhmj+ZhMl4pitsUgrBpTLq01cdULR0ugagopYExajIAtmoGyzjRO7KlNc4q0GEpT6
+         mKNH+UXHFMtJ6DsBELtcFF6bi9pos34CkLhorAoYaCxQ3agVsehJ/XJlX1oYKYNI0OjX
+         E5DQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1757058717; x=1757663517;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=D//zcibIIUwpQZGGbW48bB+RJuGF8/HXmWRaYXLQrh4=;
-        b=bmRCS95ivIIiVnNSQX/Lb0QNAh2JCIkpk0Mvjf7Lb8pnwWX17ghXKIXo/3DI2UMWuy
-         qSnwuybf7QiD/LjfdF+0T+2ju/EiFNtqzSw6t0xe3d58IXxJ229i5NOLlrwOkyLYpA2C
-         ALkI77Z496s0S3TiMtulm6xAz/8vfS1aM6La9ctZ9demjJdqkXejUvgUm+aeu+p95kEg
-         z2HdUZkAWEVkQD/eDMFaLu/oHXtv43hfJpA1f1kVuml4BbxvyCObjwbmlXxDXsxvaMIs
-         wfJJvniJTRwviL1qEF6cgsFVYQbGuMItiKsKVcyDZtOdz5Q3vVIlbnz53fBTI9oyQBkC
-         Q6+Q==
-X-Forwarded-Encrypted: i=1; AJvYcCVBkK8I01dMBjFEQomfAaProqRflFHGxJE0HGE2Wm+nSaFwoJzHvSSTFtFiP0W3JPuJLARhekEPnYoW4Gdv@vger.kernel.org, AJvYcCVkjbyTbH4JEMxoOoXxbcw62xNcHTcRtwpoCA4ZTKGhTh+ELOO8cuuM4osg0J4AWJKb0bA=@vger.kernel.org
-X-Gm-Message-State: AOJu0Ywc6tIFnGgPeJY9xATy0WWCxl2hVi6H/53HVRyzup49m8dAZ+No
-	4PcucQsFnzKrWEHWMByX8/nLe6A8W1pGf7JdCZigRZpNNnQcpsfV1ye7bt+/OmZdKuo=
-X-Gm-Gg: ASbGncu/55x7XIF1rlwAF/HihwIKmj0h7CYdedNKE+ayZQqOt5FRrtA+cjlIM9935UZ
-	D72Kro6IZE4hMLSkmBcAtaSSCNUHOAIB2T0pHCX293LO5V7gKXx8OD8/ycOS9WNZU5UP0Tu3N6K
-	a9JAwypZVlQRVJXAq6mR3xja7TiZqL3UkOXSrkrSN/AwpUTEfqoMl76orMtK3EFX2C7ltCsTDeu
-	Z3719cbaY/wU7rpm3CmoDJv243Y89hMlYlL0mm0BMwbhYrLx9Hbj0b5Eg6+Nkd5mu676OJ/uL/R
-	zxaHD8TFFvoJIAdMG4Fy3XdiCCYGGpQ+E5ypK2W1ndhX/v4VKM/lBBQYgvxa6lPli2a238qsYn1
-	TfCg00JwouOnFMkvAxoZKAOKa/xM6zU9bid/oaoaNW0UQ
-X-Google-Smtp-Source: AGHT+IHqRHN2nCREFIU+7WvTgIgAGT3NHsGXx+k4qM4IQOHTL9he4Tumt/53A3Ee/HS8Ncy48DfPrw==
-X-Received: by 2002:a05:6a20:3ca1:b0:24f:53e8:ccb1 with SMTP id adf61e73a8af0-24f53e8ce0bmr2614951637.55.1757058716443;
-        Fri, 05 Sep 2025 00:51:56 -0700 (PDT)
-Received: from ustb520lab-MS-7E07.. ([115.25.44.221])
-        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-b4cd347db1fsm18842120a12.47.2025.09.05.00.51.52
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 05 Sep 2025 00:51:56 -0700 (PDT)
-From: Jiaming Zhang <r772577952@gmail.com>
-To: pbonzini@redhat.com,
-	seanjc@google.com,
-	corbet@lwn.net,
-	kvm@vger.kernel.org
-Cc: linux-doc@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Jiaming Zhang <r772577952@gmail.com>
-Subject: [PATCH] Documentation: KVM: Add reference specs for PIT and LAPIC ioctls
-Date: Fri,  5 Sep 2025 15:51:15 +0800
-Message-Id: <20250905075115.779749-1-r772577952@gmail.com>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <CANypQFZKnwafAFm2v5S_kbgr=p0UBBsmcSVsE2r65cayObaoiA@mail.gmail.com>
-References: <CANypQFZKnwafAFm2v5S_kbgr=p0UBBsmcSVsE2r65cayObaoiA@mail.gmail.com>
+        d=1e100.net; s=20230601; t=1757059044; x=1757663844;
+        h=content-transfer-encoding:cc:to:from:subject:message-id:references
+         :mime-version:in-reply-to:date:x-gm-message-state:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=o1p4RNecGHbuiyzLdGgu+/L6P6vwBjZh1dqH7jZHHi0=;
+        b=RJn53uU1oZnWbbFfhdFix/vK3N9/6dF4SftQL0QANDjf2qg8OkGjKS455DvZf9z/fj
+         bLlamVUvXqDnSheSmD+8MtL/uAXimiOU2ZT4YlA0qG9zb5sc++gYPDZX4CTgY2G+6qlZ
+         vOn9sSkeGqD9izZLwKWDN7n8b4OK2SMdgWAxH0Wx75FEd5P99MRpIzx5+pRjkUD65rXX
+         D4WWiPvE26WvvJz/fizpMfQz9aYj0idOvfDxRguTIlP8fmoiIL3rdYefiEAofS6YDHW1
+         Bb2QMmB92OaDjmqIKyhBJfAIqMBo3qYZKujVe2nHACEkox6jlnXAB7VNnBjXSXqX7fFz
+         IbiQ==
+X-Forwarded-Encrypted: i=1; AJvYcCUz6UuR1PS64p3J+HojQ3iQ0GA6Hi+o7m8svztQHwxLxM67vh5x6c0k/WYinmz/D43Q+hs=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwvsrT4xscPU3OyBmKAuqhQ8nBuOEgaAnzwA7XROmcHR7vbhIJN
+	7yJsOeIsWlfFy17HhIiXAM4WH90aiGqXhD75pOY539ZObXCz8okyTlqIn1T6IIfQUAOIf0/VHXF
+	IPs4gxw==
+X-Google-Smtp-Source: AGHT+IElsE4xl0K6N1F4A7p04K+uccLu+aOxepEYOmrdsvIE1VqRxT8W9nlwBhTx39jAmxfTvyceCLWwNwc=
+X-Received: from pji16.prod.google.com ([2002:a17:90b:3fd0:b0:329:8c4b:3891])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:57e7:b0:327:9345:7097
+ with SMTP id 98e67ed59e1d1-32815437431mr31005228a91.10.1757059044131; Fri, 05
+ Sep 2025 00:57:24 -0700 (PDT)
+Date: Fri, 5 Sep 2025 00:57:07 -0700
+In-Reply-To: <62d1231571c44b166a18181d724b32da33b38efb.camel@infradead.org>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+Mime-Version: 1.0
+References: <54BCC060-1C9B-4BE4-8057-0161E816A9A3@amazon.co.uk>
+ <caf7b1ea18eb25e817af5ea907b2f6ea31ecc3e1.camel@infradead.org>
+ <aLIPPxLt0acZJxYF@google.com> <d74ff3c1c70f815a10b8743647008bd4081e7625.camel@infradead.org>
+ <aLcuHHfxOlaF5htL@google.com> <3268e953e14004d1786bf07c76ae52d98d0f8259.camel@infradead.org>
+ <aLl_MAk9AT5hRuoS@google.com> <4a3be390fe559de0bd5c61d24853d88f96a6ab6a.camel@infradead.org>
+ <aLmTXb6PO02idqeM@google.com> <62d1231571c44b166a18181d724b32da33b38efb.camel@infradead.org>
+Message-ID: <aLqX035O0lQEVPrl@google.com>
+Subject: Re: [PATCH v2 0/3] Support "generic" CPUID timing leaf as KVM guest
+ and host
+From: Sean Christopherson <seanjc@google.com>
+To: David Woodhouse <dwmw2@infradead.org>
+Cc: Paul Durrant <pdurrant@amazon.co.uk>, Fred Griffoul <fgriffo@amazon.co.uk>, 
+	Colin Percival <cperciva@tarsnap.com>, Paolo Bonzini <pbonzini@redhat.com>, 
+	Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>, 
+	Dave Hansen <dave.hansen@linux.intel.com>, "x86@kernel.org" <x86@kernel.org>, 
+	"H. Peter Anvin" <hpa@zytor.com>, Vitaly Kuznetsov <vkuznets@redhat.com>, 
+	"kvm@vger.kernel.org" <kvm@vger.kernel.org>, 
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, "Graf (AWS), Alexander" <graf@amazon.de>, 
+	Ajay Kaher <ajay.kaher@broadcom.com>, Alexey Makhalov <alexey.makhalov@broadcom.com>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
 
-The behavior of KVM_SET_PIT2 and KVM_SET_LAPIC conforms to their
-respective hardware specifications. Add references to the Intel 8254
-PIT datasheet and the Software Developer's Manual (SDM)  to ensure
-users can rely on the official datasheets for behavioral details.
+On Thu, Sep 04, 2025, David Woodhouse wrote:
+> On Thu, 2025-09-04 at 06:25 -0700, Sean Christopherson wrote:
+> > Anyways, I'm a-ok reporting that information in KVM_GET_SUPPORTED_CPUID=
+ (again,
+> > only with constant TSC and scaling).=C2=A0 Reporting the effective freq=
+uency would be
+> > useful for the host too, e.g. for sanity checks.=C2=A0 What I specifica=
+lly want to
+> > avoid is modifying guest CPUID at runtime.
+>=20
+> Hm, in some cases I thought KVM had deliberately moved *to* doing CPUID
+> updates at runtime, so that its doesn't have to exempt the changable
+> leaves from the sanity checks which prevent userspace from updating
+> CPUID for a CPU which has already been run.
 
-Signed-off-by: Jiaming Zhang <r772577952@gmail.com>
----
- Documentation/virt/kvm/api.rst | 13 +++++++++++++
- 1 file changed, 13 insertions(+)
+Ah, I shouldn't have qualified my statement with "runtime".  I don't want K=
+VM
+modifying incoming CPUID at all, as KVM's attempts to "help" userspace have
+backfired more often than not.  The only scenarios where modifying CPUID is=
+ ok
+is for cases where a change in state architectural affects CPUID output, e.=
+g. on
+CR4 or MSR changes.
 
-diff --git a/Documentation/virt/kvm/api.rst b/Documentation/virt/kvm/api.rst
-index 6aa40ee05a4a..d21494aa7dc2 100644
---- a/Documentation/virt/kvm/api.rst
-+++ b/Documentation/virt/kvm/api.rst
-@@ -2083,6 +2083,11 @@ The format of the APIC ID register (bytes 32-35 of struct kvm_lapic_state's
- regs field) depends on the state of the KVM_CAP_X2APIC_API capability.
- See the note in KVM_GET_LAPIC.
- 
-+.. Tip::
-+  ``KVM_SET_LAPIC`` ioctl strictly adheres to Intel® 64 and IA-32 Architectures
-+  Software Developer's Manual (SDM). Refer volume 3A of the `Intel SDM <https://
-+  www.intel.com/content/www/us/en/developer/articles/technical/intel-sdm.html>`_.
-+
- 
- 4.59 KVM_IOEVENTFD
- ------------------
-@@ -3075,6 +3080,14 @@ This IOCTL replaces the obsolete KVM_GET_PIT.
- Sets the state of the in-kernel PIT model. Only valid after KVM_CREATE_PIT2.
- See KVM_GET_PIT2 for details on struct kvm_pit_state2.
- 
-+.. Tip::
-+
-+  ``KVM_SET_PIT2`` ioctl strictly adheres to the spec of Intel 8254 PIT.
-+  For example, a ``count`` value of 0 in ``struct kvm_pit_channel_state`` is
-+  interpreted as 65536, which is the maximum count value. Refer `Intel
-+  8254 programmable interval timer <https://www.scs.stanford.edu/10wi-cs140/
-+  pintos/specs/8254.pdf>`_.
-+
- This IOCTL replaces the obsolete KVM_SET_PIT.
- 
- 
--- 
-2.34.1
+Moving the Xen CPUID fixup to runtime was essentially the least awful way t=
+o deal
+with KVM disallowing post-run CPUID changes, the underlying problem is that=
+ KVM
+was filling Xen CPUID in the first place.
 
+> It's not just the existing Xen TSC leaf which is updated at runtime in
+> kvm_cpuid().
+>=20
+> But I don't mind too much. If we give userspace a way to *know* the
+> effective frequency, I'm OK with requiring that userspace do so and
+> populate the corresponding CPUID leaves for itself, for Xen and KVM
+> alike. We'd need to expose the FSB frequency too, not just TSC.
+>=20
+> I was only going with the runtime update because we are literally
+> already *doing* it this way in KVM.
+>=20
+> > Hmm, the only wrinkle is that, if there is slop, KVM could report diffe=
+rent
+> > information when run on different platforms, e.g. after live migration.=
+=C2=A0 But so
+> > long as that possibility is documented, I don't think it's truly proble=
+matic.
+> > And it's another argument for not modifying guest CPUID directly; I'd r=
+ather let
+> > userspace figure out whether or not they care about the divergence than=
+ silently
+> > change things from the guest's perspective.
+> >=20
+> > Alternatively (or in addition to), part of me wants to stealtily update
+> > KVM_GET_TSC_KHZ to report back the effective frequency, but I can see t=
+hat being
+> > problematic, e.g. if a naive VMM reads KVM_GET_TSC_KHZ when saving vCPU=
+ state for
+> > live migration and after enough migrations, the slop ends up drasticall=
+y skewing
+> > the guest's frequency.
+>=20
+> Indeed. And I also want to tell userspace the precise *ratio* being
+> applied by hardware scaling, for the VMClock case where userspace
+> definitely knows *better* about what the host TSC frequency is at this
+> precise moment, and has to tell the guest what *its* TSC frequency is,
+> with the same precision.
+
+Maybe add the scaled/effective frequency and the ratio information as read-=
+only
+TSC attributes, e.g.
+
+diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+index 7ba2cdfdac44..4ba4c88f3d33 100644
+--- a/arch/x86/kvm/x86.c
++++ b/arch/x86/kvm/x86.c
+@@ -5788,6 +5788,18 @@ static int kvm_arch_tsc_get_attr(struct kvm_vcpu *vc=
+pu,
+                        break;
+                r =3D 0;
+                break;
++       case KVM_VCPU_TSC_SCALED_KHZ:
++               r =3D -EFAULT;
++               if (put_user(vcpu->arch.hw_tsc_khz, uaddr))
++                       break;
++               r =3D 0;
++               break;
++       case KVM_VCPU_TSC_SCALED_RATIO:
++               r =3D -EFAULT;
++               if (put_user(<math>, uaddr))
++                       break;
++               r =3D 0;
++               break;
+        default:
+                r =3D -ENXIO;
+        }
 
