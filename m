@@ -1,113 +1,140 @@
-Return-Path: <kvm+bounces-56955-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-56956-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id C6705B46ACF
-	for <lists+kvm@lfdr.de>; Sat,  6 Sep 2025 12:34:52 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 15F12B47644
+	for <lists+kvm@lfdr.de>; Sat,  6 Sep 2025 20:44:02 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 882D2584B1D
-	for <lists+kvm@lfdr.de>; Sat,  6 Sep 2025 10:34:52 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C5A6916A515
+	for <lists+kvm@lfdr.de>; Sat,  6 Sep 2025 18:44:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 83EA02E92D2;
-	Sat,  6 Sep 2025 10:34:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 28FE127FD44;
+	Sat,  6 Sep 2025 18:43:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="JfyT/RJF"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="WqNb8pV9"
 X-Original-To: kvm@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ej1-f45.google.com (mail-ej1-f45.google.com [209.85.218.45])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A53ED244668
-	for <kvm@vger.kernel.org>; Sat,  6 Sep 2025 10:34:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ACF96315D2B;
+	Sat,  6 Sep 2025 18:43:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.45
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757154886; cv=none; b=iXupJg9NgZnik0Udiw6MBJdB8X2Ukw5wU5kUpB5gyHVrWZI7w5duga17NPhY3e6++oE3u40nn4mMt3hbNXFKc4Kxc/F3x1EdEHeLtW4T97uoCMA12fvieyHM64kETvKG8LUTclArHXS/j8QUX95MoR6Hshyex5TMsk1xMl0w/ZU=
+	t=1757184231; cv=none; b=QnQhxRt1oMH59cPMShMfl9KTLkb7/58Mqi3d7H4byggrtfrJVJCvUH01RDb5KBQlFmQ1Ep1PHEm7vztold+xU5teiF4KOWEtPkvfJ52nOKLybH4w71NFycd8DaGC826JCOV2lyCB9OX1NHed4zSOid1TvMXJT3jFzoKOKAsaRmY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757154886; c=relaxed/simple;
-	bh=3dNxUbUU16M06cF3tAn6zCooVRvy93Ujlcyz6MsdRsc=;
-	h=Mime-Version:Content-Type:Date:Message-Id:Subject:Cc:To:From:
-	 References:In-Reply-To; b=lvD39ydjLKIVCd0cNYG7S/vNmP1+3qgLlweE8WvFIF1FarbFXKYMpxXoaXdvnnkGQvhZcyHgkq9zbVQzNuC6B6KoVmLg9sNlVoZtwpZpu8sS3NZ2v6mpGzLJlQvDU0IZNjJ9mtgbdANbhoCoDUVnJbFKfpSedh4JWKqOo2HXMNs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=JfyT/RJF; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 75308C4CEE7;
-	Sat,  6 Sep 2025 10:34:42 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1757154886;
-	bh=3dNxUbUU16M06cF3tAn6zCooVRvy93Ujlcyz6MsdRsc=;
-	h=Date:Subject:Cc:To:From:References:In-Reply-To:From;
-	b=JfyT/RJFIPVDWp1xIdaAv0dsrenrptpdo11wGP2msIu27WVZEy0AJytFB+CGZAwGs
-	 8pGQVgazZyyd8fDoePmGPtGUtToSGszMkfw1bF7lGwRyjYGyF13csw1znEJW1dycId
-	 0H/oIOGVwd2jsi2KqCaRwcf+BzwmFOw+uI51fuf7EBXSXbEllCBDgoiWk4fQ+5xry8
-	 Hs1aN9DfrJGLvWW8wahLuN8E88Lmsj/lInXaA9eDL0wIfYz2RhFV2pP/FlzRl9LHJW
-	 yKZBRTrbqcgxZaHZS9JtOtl11uPfzxiC0F38tiO5fPYGVrdUhWioSFdY+IdZ/NJfCe
-	 iCC3AGSxaIEbQ==
+	s=arc-20240116; t=1757184231; c=relaxed/simple;
+	bh=A2SfHCO2en4ZibxLIFm+2RXjb315oSn5JIZ9vIAmY8E=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=Vg6fNb1kSgBO3Id6SghTbGls3OijS4sQKDhC912DKokvc6qI7wQIKeKb4Hfuq5F+0ocwlwFb6u7J1OTfsImNmd1/xvQV99hjkv8i0uTMrtNq6dtUigpY01ZQ35huTS5wyJYzoVN0lpp5oh3+V5pGvyzkxFRWjhWf5qn8ejE5j/Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=WqNb8pV9; arc=none smtp.client-ip=209.85.218.45
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ej1-f45.google.com with SMTP id a640c23a62f3a-b02c719a117so572925466b.1;
+        Sat, 06 Sep 2025 11:43:48 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1757184227; x=1757789027; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=GPAi90Hux0mu62Ys4IXO2Pj4eDbqG6EQAkVC5R4v2uU=;
+        b=WqNb8pV91L9rJE3R0wpitjxd/17CVV1XLyhnrL4u7DR98CXLuj2avNnmGtgL2YM1r5
+         ZkKpC45jw6JpxjEwaGjd9XljXFb1EK//W92bjMT/eIEgaRBc4K+N6vslXxYAPtHMXTUu
+         BZlyomsbVCktzOoAqKXfXPmipmcLyABXiF8Z6UuIWtrAxWBvI7GPDMx9zk8fnOJV5XVv
+         SjO6HxqmCO+BqbQj2C5J/VisTZkR+0OcRhDHg8W9w4CVReA2ZDq9DFCJv9tcKXLb5B9X
+         954FGapAKOC0tzdseYvPaB0xTnUfHixtBtTHyPnAQR5/fQmp2ydj+za4AZaQhMkJpwFC
+         Zg+Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1757184227; x=1757789027;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=GPAi90Hux0mu62Ys4IXO2Pj4eDbqG6EQAkVC5R4v2uU=;
+        b=KRULYuz/90Ywev2lATMxwv2N9BToghvikdw7gxTWRk5QrTFo1vn4r2U17MXa/0tJVV
+         IRMR+6vGxNc+ZYELr2tGCseg0hf8FM6yP0KI6gg40gIrtCWjBkjK27ZR0vxkEOW9i+Vw
+         UqvH66QWZfZz/9g7/zEhNlBpl6ZFFFbvhb9y2IF7su8wz0jyKJAfG7rDJAeGpt3B19Tb
+         KZc/+QR84QcrMag2ncOGyMg0o45MROVZtv4YBw8S4rvtEfL2Yk4+aYFFXVMaPgSprWY3
+         5I3BbgYkfJkVI0ptzox73YRkb0kAQ79UO9ZSixyAdQU8/xG1YkNtb+isZ4DGpElZwx+v
+         nF2A==
+X-Forwarded-Encrypted: i=1; AJvYcCVAW0HlVRRSFpEwhUnUCgMNb/MkrpvaF0xpWi9blLB9RcZB6ERXpIim6azcOk1ywyfzYt8Fd5wtZ1flKJKv@vger.kernel.org, AJvYcCVgFrYMeWC9T7oDke4aejmJB3a+EjnxvGthCo3DEzCDaCKwv2tW+4iUvjPS8kXi3+X0uuY=@vger.kernel.org, AJvYcCWHfmX8I4rxz3RU+SMIqjFRvjm/ISU8F+qRZ7jJ3iH+vGDAvSSYjF8/6BeLJ+ti87+4M7ke9WiNx1Twkl7sP3gC@vger.kernel.org
+X-Gm-Message-State: AOJu0YxkjJPWb47SAiKVjDiknKG3rij3knHMAu7jmGEqoOHnYsEUJuko
+	VEUcwBBrUuOhBB5x5EFY41ebXoibB7bgf1seD8X4g7FMZgMzoeOCRan6
+X-Gm-Gg: ASbGncsPRkKLHFPuXS32oYZnNVYchxi4LpcwU82OgXcyD6HO0sFC8zfwkknvsEVopPE
+	POt3wrfsXvWm/G5kSXIgF5RuwGY2xobZowhFvw5UgqrGQLUJCtElEGdCO3p8MTCIdNm1KDXP7Oz
+	3Bbk3bQaEzfiNnftrbdiOG3LTpN43GZO3wTProluxLlQdDe/N/Q3aCF7ImtspBbXOuxxMluXf1n
+	NTBTjfKsCcfl79rn1NS4BvHauwbzz5KOIdnOuiIMUWXWnqrpxyGX6VARHPqTysezfWcH+HmCI3I
+	yt0KaxvrafD+6J0P0+p1qR6Z/oo6bieyX/9Uc7TWF/bN3NWUzyLRX1wCJ7oquUVmRt+rV28zEHf
+	MSwU8IN9pq6SJC80=
+X-Google-Smtp-Source: AGHT+IHE2NZIt0wrvI86xs9hDbwS5+mTK6rKNdU1UL89vVA8Qvv/fkz3LiQ4We8x5UFPjNvHXXIAog==
+X-Received: by 2002:a17:907:6d05:b0:b04:3c66:ee5a with SMTP id a640c23a62f3a-b04b147d878mr264654366b.23.1757184226681;
+        Sat, 06 Sep 2025 11:43:46 -0700 (PDT)
+Received: from hsukr3.. ([141.70.88.200])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-b047b61cf00sm700359666b.15.2025.09.06.11.43.44
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sat, 06 Sep 2025 11:43:46 -0700 (PDT)
+From: Sukrut Heroorkar <hsukrut3@gmail.com>
+To: 
+Cc: skhan@linuxfoundation.org,
+	david.hunter.linux@gmail.com,
+	Sukrut Heroorkar <hsukrut3@gmail.com>,
+	Sean Christopherson <seanjc@google.com>,
+	Paolo Bonzini <pbonzini@redhat.com>,
+	Shuah Khan <shuah@kernel.org>,
+	kvm@vger.kernel.org (open list:KERNEL VIRTUAL MACHINE FOR X86 (KVM/x86)),
+	linux-kselftest@vger.kernel.org (open list:KERNEL SELFTEST FRAMEWORK),
+	linux-kernel@vger.kernel.org (open list)
+Subject: [PATCH] selftests/kvm: Use vcpus count instead of hardcoded 0xff in test_icr
+Date: Sat,  6 Sep 2025 20:43:20 +0200
+Message-ID: <20250906184324.89974-1-hsukrut3@gmail.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-Content-Type: text/plain; charset=UTF-8
-Date: Sat, 06 Sep 2025 12:34:40 +0200
-Message-Id: <DCLNF4ADS21M.1WJ4YMSZ4RNF1@kernel.org>
-Subject: Re: [RFC v2 03/14] vfio/nvidia-vgpu: introduce vGPU type uploading
-Cc: <kvm@vger.kernel.org>, <alex.williamson@redhat.com>,
- <kevin.tian@intel.com>, <jgg@nvidia.com>, <airlied@gmail.com>,
- <daniel@ffwll.ch>, <acurrid@nvidia.com>, <cjia@nvidia.com>,
- <smitra@nvidia.com>, <ankita@nvidia.com>, <aniketa@nvidia.com>,
- <kwankhede@nvidia.com>, <targupta@nvidia.com>, <zhiwang@kernel.org>,
- <acourbot@nvidia.com>, <joelagnelf@nvidia.com>, <apopple@nvidia.com>,
- <jhubbard@nvidia.com>, <nouveau@lists.freedesktop.org>
-To: "Zhi Wang" <zhiw@nvidia.com>
-From: "Danilo Krummrich" <dakr@kernel.org>
-References: <20250903221111.3866249-1-zhiw@nvidia.com>
- <20250903221111.3866249-4-zhiw@nvidia.com>
- <DCJWXVLI2GWB.3UBHWIZCZXKD2@kernel.org>
- <DCJX0ZBB1ATN.1WPXONLVV8RYD@kernel.org>
- <20250904174213.00003c38@nvidia.com>
-In-Reply-To: <20250904174213.00003c38@nvidia.com>
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 
-On Thu Sep 4, 2025 at 5:43 PM CEST, Zhi Wang wrote:
-> On Thu, 04 Sep 2025 11:41:03 +0200
-> "Danilo Krummrich" <dakr@kernel.org> wrote:
->
->> (Cc: Alex, John, Joel, Alistair, nouveau)
->>=20
->> On Thu Sep 4, 2025 at 11:37 AM CEST, Danilo Krummrich wrote:
->> > nova-core won't provide any firmware specific APIs, it is meant to ser=
-ve as a
->> > hardware and firmware abstraction layer for higher level drivers, such=
- as vGPU
->> > or nova-drm.
->> >
->> > As a general rule the interface between nova-core and higher level dri=
-vers must
->> > not leak any hardware or firmware specific details, but work on a high=
-er level
->> > abstraction layer.
->> >
->
-> It is more a matter of where we are going to place vGPU specific
-> functionality in the whole picture. In this case, if we are thinking abou=
-t
-> the requirement of vGPU type loading, which requires the GSP version
-> number and checking. Are we leaning towards putting some vGPU specific
-> functionality also in nova-core?
+Replace the hardcoded 0xff in test_icr() with the actual number of vcpus
+created for the vm. This address the existing TODO and keeps the test
+correct if it is ever run with multiple vcpus.
 
-As much as needed to abstract firmware (and hardware) API details.
+Signed-off-by: Sukrut Heroorkar <hsukrut3@gmail.com>
+---
+ tools/testing/selftests/kvm/x86/xapic_state_test.c | 13 ++++++++++++-
+ 1 file changed, 12 insertions(+), 1 deletion(-)
 
-> Regarding not leaking any of the hardware details, is that doable?=20
-> Looking at {nv04 * _fence}.c {chan*}.c in the current NVIF interfaces, I
-> think we will expose the HW concept somehow.
+diff --git a/tools/testing/selftests/kvm/x86/xapic_state_test.c b/tools/testing/selftests/kvm/x86/xapic_state_test.c
+index fdebff1165c7..4af36682503e 100644
+--- a/tools/testing/selftests/kvm/x86/xapic_state_test.c
++++ b/tools/testing/selftests/kvm/x86/xapic_state_test.c
+@@ -56,6 +56,17 @@ static void x2apic_guest_code(void)
+ 	} while (1);
+ }
+ 
++static unsigned int vm_nr_vcpus(struct kvm_vm *vm)
++{
++	struct kvm_vcpu *vcpu;
++	unsigned int count = 0;
++
++	list_for_each_entry(vcpu, &vm->vcpus, list)
++		count++;
++
++	return count;
++}
++
+ static void ____test_icr(struct xapic_vcpu *x, uint64_t val)
+ {
+ 	struct kvm_vcpu *vcpu = x->vcpu;
+@@ -124,7 +135,7 @@ static void test_icr(struct xapic_vcpu *x)
+ 	 * vCPUs, not vcpu.id + 1.  Arbitrarily use vector 0xff.
+ 	 */
+ 	icr = APIC_INT_ASSERT | 0xff;
+-	for (i = 0; i < 0xff; i++) {
++	for (i = 0; i < vm_nr_vcpus(vcpu->vm); i++) {
+ 		if (i == vcpu->id)
+ 			continue;
+ 		for (j = 0; j < 8; j++)
+-- 
+2.43.0
 
-I don't really mean that vGPU must be entirely unaware of the hardware, it'=
-s
-still a driver of course. But for the API between nova-core and client driv=
-ers
-we want to abstract how the firmware and hardware is programmed, i.e. not l=
-eak
-any (version specific) RM structures or provide APIs that consume raw regis=
-ter
-values to write, etc.
 
