@@ -1,81 +1,80 @@
-Return-Path: <kvm+bounces-57004-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-57005-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1538BB49A4B
-	for <lists+kvm@lfdr.de>; Mon,  8 Sep 2025 21:46:56 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8F63BB49A5C
+	for <lists+kvm@lfdr.de>; Mon,  8 Sep 2025 21:52:37 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id F3A761B246C4
-	for <lists+kvm@lfdr.de>; Mon,  8 Sep 2025 19:47:16 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 6E6401B27273
+	for <lists+kvm@lfdr.de>; Mon,  8 Sep 2025 19:52:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 300B52D3A60;
-	Mon,  8 Sep 2025 19:46:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 12C3F2D46D8;
+	Mon,  8 Sep 2025 19:52:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="oP4A1pOo"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="z2YH7Uvw"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pl1-f202.google.com (mail-pl1-f202.google.com [209.85.214.202])
+Received: from mail-pj1-f74.google.com (mail-pj1-f74.google.com [209.85.216.74])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EAC742D3745
-	for <kvm@vger.kernel.org>; Mon,  8 Sep 2025 19:46:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C75482D3ED9
+	for <kvm@vger.kernel.org>; Mon,  8 Sep 2025 19:52:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.74
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757360805; cv=none; b=Ct42kYwSSySbNuLZ83aBB52J9bdDMOTxhJhXeqD+48I+9EAnHQp2fBUTdM5APDvnywIni/8SqtW9PRr2uBTtL1r7i1iVALACUIq8qSyLtQOgWxS764PxxdazarPkl0+HaZhRtAxJ3ZzPy6kavU3c7XPWC3SWEaOeu+r2bpD6WWw=
+	t=1757361146; cv=none; b=Wamd53f/hyTtChHX3JdUhLDCtyXw9eDKIm0VpW5UwzHq2G/jC7lhtVeyCMa4qjecLYuuYO1CjGU1J8IYGKTm8wWIadN3JJg64LjHVF8CWbb20a6TbTup6iaXeAfR4ZUrSKj8x9DQGEpK/v+s/wFvHQICriIGxsgmSTDMlYDQ7yc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757360805; c=relaxed/simple;
-	bh=OR45YgabH7Xzwh9KWzzPc1daGgk0Nr/x02ecaLsxgSs=;
+	s=arc-20240116; t=1757361146; c=relaxed/simple;
+	bh=ni41cp1kJj0k2/vDWCHyxCjBN8Adfrh4nUQNG0JAfr0=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=bnHl5P/tUQhe0VPyHRLP4SQ7pU4PpWPc2Ll2OYYeVPmthUekPFf3LVbiw7boykZxRigIVlIYSMmjX1UulZIlkPf0R2TWvk6udHNdNjXgdpuvwoldNum0Zkx4W+074NH+V4Ool8r+HzUPH9TNUDbBhu0Sq2K97yd8bukmTaVhq8s=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=oP4A1pOo; arc=none smtp.client-ip=209.85.214.202
+	 To:Cc:Content-Type; b=ghYy8AgXmDzlhJAMJ4GUSjOS0zQW8F15B1IMcCajxZUYEvy5FG8gJ4dponfY+UuUlpzsEQ+nmp3EvsKXaI3fqFC03M5h/KwkU3PXpRmj0GTx+I0ymbMwNBA6H6lL/tly3R3miO6xKymku7ZjA6YONI2xcKg5gqCQsp9K/t1MLYo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=z2YH7Uvw; arc=none smtp.client-ip=209.85.216.74
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pl1-f202.google.com with SMTP id d9443c01a7336-244581953b8so53747585ad.2
-        for <kvm@vger.kernel.org>; Mon, 08 Sep 2025 12:46:43 -0700 (PDT)
+Received: by mail-pj1-f74.google.com with SMTP id 98e67ed59e1d1-32972a6db98so8203467a91.3
+        for <kvm@vger.kernel.org>; Mon, 08 Sep 2025 12:52:24 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1757360803; x=1757965603; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1757361144; x=1757965944; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=OtuFE8fz0uXe9VtzwZec8xI+z6SKpPfaDmAZDtJxuFo=;
-        b=oP4A1pOo8K7zMGwGhdn8TaZX07j3rFwXsfVbgMoolBCly4Dd5KjVT311E28xLeYmFm
-         Pdc9K04h7U7ODJXEsYIufIB1JI/E3y0SJT7k3LuLGpnQCJEpMqWzkIslSqZ1wFTplYK7
-         l+mkbqRDyQLSfX2yRUGeaJ2976eSZDG6Ef831K60L+K4yCunsJ1pItTnUzSilUiLPyNN
-         Sv3AO7Dvq+KPZhfFQizdfDh3FHVG8jO4nZbrEQCLi6ux1SUCv2CG/8l4rLDAO88ZFvYv
-         SAfxTrbodTk8OMLn8ss/RlDHQNcbwGt8/2blEvDLYjYu+8PhBW79j//cLyieoJXaG+wE
-         M1tg==
+        bh=5WmHxV7Lreaj5eVFu8hF6qzhJomNY/sSV63hQxdrkJQ=;
+        b=z2YH7UvwPHG7hOnsoUEJAbW5/zfEZUnPeGWx1nBphACZjKch98yX1KPeI9m/K6QCEa
+         YQuox+R4y1dSujCmUX3Z+Lf+7PgiI30juQCWKwUxHQnrB0/YN8c3v5i7iwj7iTcQsfs0
+         wzZ4fDMnYo36fsgEPhAZN7O/mkHLgN0d8f8J5harw8RbG78HCXvuAsvte2vQk9vmLcA3
+         Cbd16EISVJwjqUjXVKan6fUJdN+Y2WQpzUEx63Jx59EP7vC5KzUaZQ4GMo+FL/MxMplA
+         8yIYDMh9cZrpwtzzdwXobLE3atlkqgSFn0al5IAo03NyZukluiWjCxGDt5riekzMnaU7
+         vYYQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1757360803; x=1757965603;
+        d=1e100.net; s=20230601; t=1757361144; x=1757965944;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=OtuFE8fz0uXe9VtzwZec8xI+z6SKpPfaDmAZDtJxuFo=;
-        b=RLT9DGPKKr5vAdhVKWmbxhdnsZ22oi+EcFUrKmibTvZgOVR0Ig1hR+fg42f6OaZdRO
-         ods+5lMJklOXomuswAxsAlZealySQZSvASp8/e9Mb4dPX8QyJjXhbDtP3KTPBVBc+85J
-         V5Wngk+SbWjZYuBRzXL/b0r5JBiLy8kLIVFJq8R+/ItnaT6uXoyeM8/GOWcVOdxnWYGG
-         kx4X0tLqYHjv2Rj+6Rpcy7bTU/Nt3omIX4yKofVsSxcTzpMkI74Znvk29VTaZ8Bha5qQ
-         jGKUUWFrdyiHuk4jO2av4ZMGrQjT1yvCFNw0XAERhN4a3T55raFEYkwqXWePjTGsXiaS
-         lWpw==
-X-Forwarded-Encrypted: i=1; AJvYcCVvufi5YrY/7Aev4Uv8IhvsNp5bOUfGU9e+pxBwd5/+x1L7sk3Wa4lcZXxTV3zKv1k7J0c=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yyv2bEbOB8AC1TjbWb9wRljOxblRijVA/IrMHhlg5mYi/LSBOOV
-	KuDZqreiiPHnBDafz3iMQ9Z6lu6m7tLCjTRR7j+1v39Wr+FLc+GVWQ+e6Smzceuh92CshkqSoup
-	5qt2qCg==
-X-Google-Smtp-Source: AGHT+IFb1neEFkxq+1aKM895lwflQXUWxZfzQ3TkgAtLxYrbO6zawNDmMq2mZAuMldFhSu9Kf+nu0tLZnJY=
-X-Received: from pjeb1.prod.google.com ([2002:a17:90a:10c1:b0:32b:b3c4:a304])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:902:ec8e:b0:24e:e5c9:ed14
- with SMTP id d9443c01a7336-251734f2fbemr125000785ad.35.1757360803162; Mon, 08
- Sep 2025 12:46:43 -0700 (PDT)
-Date: Mon, 8 Sep 2025 12:46:41 -0700
-In-Reply-To: <20250819090853.3988626-4-keirf@google.com>
+        bh=5WmHxV7Lreaj5eVFu8hF6qzhJomNY/sSV63hQxdrkJQ=;
+        b=cPJ9ExSARSPGyYTtggXszAj3Aw5nugVNJWcR0Dil/lJ0ffMTLWm4yEu2NATPLWPAf8
+         iQvbVXcZk6fcSTXw5yrqG/M+5GwJh/vVj2X3NlYK3bwSFltQ7AC5eot49lmI8MiAeafS
+         0vcxUUpuDFP5VruoeJnNQAY3TgY+rhoW2RxiYBmtzaTIIOXfwditXIx3ecoVQzCUg86H
+         Lp3wRLoT7GPt2Ulx4v3eGiHw7LHG4tWBC2tSa2bmb1rvtgLDL8MKHya6DJCOj7zpLCnw
+         LWTjnyiZjWvO1/1yVKLATM/THJpj8O4MXtSigzj87UiWKAzUz9erfnrUcSZKgs8xBiUF
+         +KlA==
+X-Forwarded-Encrypted: i=1; AJvYcCXhGHffYiVw8f6A/yInfhzff0+CSNFFiV171Wd+Vh0y1+00yFVXmp/8ofhKFlOmUV07NVU=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyEvn7d84CcixIgfFZN23+tDKd/AtWVp+pZhVLhfhMd2KmMTS2f
+	yrWt0PJYDJOUG53+D2a9qQXyEe+Kt2sNO/tr3bgdH4WAIp/vshrRb7ubD1hkWCWzsjBgGnEN4F+
+	eKGzIog==
+X-Google-Smtp-Source: AGHT+IExCPRBqVtXN8qVa8YjvqbzwvBpn9IxtzEsHXQ/2kgRMpC8TgSSgM/sP14o8i1EVRy2DO9MXQPJ5wU=
+X-Received: from pjbsj13.prod.google.com ([2002:a17:90b:2d8d:b0:328:116e:273])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:5185:b0:32b:d851:be44
+ with SMTP id 98e67ed59e1d1-32d43f0b8e9mr11203024a91.11.1757361144105; Mon, 08
+ Sep 2025 12:52:24 -0700 (PDT)
+Date: Mon, 8 Sep 2025 12:52:22 -0700
+In-Reply-To: <20250819090853.3988626-1-keirf@google.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
-References: <20250819090853.3988626-1-keirf@google.com> <20250819090853.3988626-4-keirf@google.com>
-Message-ID: <aL8yoZLK73svpYv7@google.com>
-Subject: Re: [PATCH v3 3/4] KVM: Implement barriers before accessing
- kvm->buses[] on SRCU read paths
+References: <20250819090853.3988626-1-keirf@google.com>
+Message-ID: <aL8z9vZOAeQvTBKF@google.com>
+Subject: Re: [PATCH v3 0/4] KVM: Speed up MMIO registrations
 From: Sean Christopherson <seanjc@google.com>
 To: Keir Fraser <keirf@google.com>
 Cc: linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, 
@@ -85,101 +84,44 @@ Cc: linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
 Content-Type: text/plain; charset="us-ascii"
 
 On Tue, Aug 19, 2025, Keir Fraser wrote:
-> This ensures that, if a VCPU has "observed" that an IO registration has
-> occurred, the instruction currently being trapped or emulated will also
-> observe the IO registration.
+> This is version 3 of the patches I previously posted here:
 > 
-> At the same time, enforce that kvm_get_bus() is used only on the
-> update side, ensuring that a long-term reference cannot be obtained by
-> an SRCU reader.
+>  https://lore.kernel.org/all/20250716110737.2513665-1-keirf@google.com/
 > 
-> Signed-off-by: Keir Fraser <keirf@google.com>
-> ---
->  arch/x86/kvm/vmx/vmx.c   |  7 +++++++
->  include/linux/kvm_host.h | 10 +++++++---
->  virt/kvm/kvm_main.c      | 33 +++++++++++++++++++++++++++------
->  3 files changed, 41 insertions(+), 9 deletions(-)
+> Changes since v2:
 > 
-> diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
-> index aa157fe5b7b3..2d3c8cb4f860 100644
-> --- a/arch/x86/kvm/vmx/vmx.c
-> +++ b/arch/x86/kvm/vmx/vmx.c
-> @@ -5785,6 +5785,13 @@ static int handle_invalid_guest_state(struct kvm_vcpu *vcpu)
->  		if (kvm_test_request(KVM_REQ_EVENT, vcpu))
->  			return 1;
->  
-> +		/*
-> +		 * Ensure that any updates to kvm->buses[] observed by the
-> +		 * previous instruction (emulated or otherwise) are also
-> +		 * visible to the instruction we are about to emulate.
+>  * Rebased to v6.17-rc2
 
-Please avoid pronouns, e.g.
+Note, looks like you missed a tested tag from Li on patch 4:
 
-		 * visible to the instruction KVM is about to emulate.
+https://lkml.kernel.org/r/b778c98abb4b425186bfeb1f9bed0c7a%40baidu.com
 
-> +		 */
-> +		smp_rmb();
+Nits aside, this looks good to my eyes (though I haven't tested yet).
 
-...
+Marc/Oliver,
 
->  static inline struct kvm_vcpu *kvm_get_vcpu(struct kvm *kvm, int i)
-> diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
-> index 6c07dd423458..4f35ae23ee5a 100644
-> --- a/virt/kvm/kvm_main.c
-> +++ b/virt/kvm/kvm_main.c
-> @@ -1103,6 +1103,15 @@ void __weak kvm_arch_create_vm_debugfs(struct kvm *kvm)
->  {
->  }
->  
-> +/* Called only on cleanup and destruction paths when there are no users. */
-> +static inline struct kvm_io_bus *kvm_get_bus_for_destruction(struct kvm *kvm,
-> +							     enum kvm_bus idx)
-> +{
-> +	return rcu_dereference_protected(kvm->buses[idx],
-> +					 !refcount_read(&kvm->users_count));
-> +}
-> +
+Can you weigh in on the vgic changes when you get a chance?  And a more expert
+set of eyeballs on the memory ordering side of things would be nice to have, too :-)
 
-Extra newline.
+As for landing this, I'd be happy to take this through a dedicated kvm-x86 topic
+branch, or I can provide an ack on patches 3 and 4 (there's basically zero chance
+of this causing a conflict in x86).
 
-> +
->  static struct kvm *kvm_create_vm(unsigned long type, const char *fdname)
->  {
->  	struct kvm *kvm = kvm_arch_alloc_vm();
-> @@ -1228,7 +1237,7 @@ static struct kvm *kvm_create_vm(unsigned long type, const char *fdname)
->  out_err_no_arch_destroy_vm:
->  	WARN_ON_ONCE(!refcount_dec_and_test(&kvm->users_count));
->  	for (i = 0; i < KVM_NR_BUSES; i++)
-> -		kfree(kvm_get_bus(kvm, i));
-> +		kfree(kvm_get_bus_for_destruction(kvm, i));
->  	kvm_free_irq_routing(kvm);
->  out_err_no_irq_routing:
->  	cleanup_srcu_struct(&kvm->irq_srcu);
-> @@ -1276,7 +1285,7 @@ static void kvm_destroy_vm(struct kvm *kvm)
->  
->  	kvm_free_irq_routing(kvm);
->  	for (i = 0; i < KVM_NR_BUSES; i++) {
-> -		struct kvm_io_bus *bus = kvm_get_bus(kvm, i);
-> +		struct kvm_io_bus *bus = kvm_get_bus_for_destruction(kvm, i);
->  
->  		if (bus)
->  			kvm_io_bus_destroy(bus);
-> @@ -5843,6 +5852,18 @@ static int __kvm_io_bus_write(struct kvm_vcpu *vcpu, struct kvm_io_bus *bus,
->  	return -EOPNOTSUPP;
->  }
->  
-> +static struct kvm_io_bus *kvm_get_bus_srcu(struct kvm *kvm, enum kvm_bus idx)
-> +{
-> +	/*
-> +	 * Ensure that any updates to kvm_buses[] observed by the previous VCPU
-
-s/VCPU/vCPU to match KVM's preferred/typical style.
-
-> +	 * machine instruction are also visible to the VCPU machine instruction
-> +	 * that triggered this call.
-> +	 */
-> +	smp_mb__after_srcu_read_lock();
-> +
-> +	return srcu_dereference(kvm->buses[idx], &kvm->srcu);
-> +}
+> Keir Fraser (4):
+>   KVM: arm64: vgic-init: Remove vgic_ready() macro
+>   KVM: arm64: vgic: Explicitly implement vgic_dist::ready ordering
+>   KVM: Implement barriers before accessing kvm->buses[] on SRCU read
+>     paths
+>   KVM: Avoid synchronize_srcu() in kvm_io_bus_register_dev()
+> 
+>  arch/arm64/kvm/vgic/vgic-init.c | 14 +++--------
+>  arch/x86/kvm/vmx/vmx.c          |  7 ++++++
+>  include/kvm/arm_vgic.h          |  1 -
+>  include/linux/kvm_host.h        | 11 ++++++---
+>  virt/kvm/kvm_main.c             | 43 +++++++++++++++++++++++++++------
+>  5 files changed, 53 insertions(+), 23 deletions(-)
+> 
+> -- 
+> 2.51.0.rc1.193.gad69d77794-goog
+> 
 
