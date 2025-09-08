@@ -1,99 +1,72 @@
-Return-Path: <kvm+bounces-56976-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-56977-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7DB5EB48F03
-	for <lists+kvm@lfdr.de>; Mon,  8 Sep 2025 15:14:15 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9A6CDB48F60
+	for <lists+kvm@lfdr.de>; Mon,  8 Sep 2025 15:25:50 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2A89116C227
-	for <lists+kvm@lfdr.de>; Mon,  8 Sep 2025 13:12:23 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id C751F7AA1E6
+	for <lists+kvm@lfdr.de>; Mon,  8 Sep 2025 13:23:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F256F2F546E;
-	Mon,  8 Sep 2025 13:12:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6800330AD06;
+	Mon,  8 Sep 2025 13:25:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="u9IVBsBv"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Vr6NNYXt"
 X-Original-To: kvm@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1E2AE306B2B
-	for <kvm@vger.kernel.org>; Mon,  8 Sep 2025 13:12:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 83CE430ACF6;
+	Mon,  8 Sep 2025 13:25:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757337130; cv=none; b=KNSpQnaRduwufvGWe5cFefulAJthwkMpmY/41Cx2+JPzWtUvn5KeqgBeblfP0Gx5NsD7f2Evzm7HFS+2wHQ1LRZ/waxQaqKP7j6jfTNMakT6VMShTzh7XGQqJQVVN9bF9vxHBz83JO7JU7NI1CJY0JUJ6hhYORrXEa2Adio1qKY=
+	t=1757337923; cv=none; b=EYeACXoebL7ssuYfsCKYmSOO3HcL1gx4CuA9B2CY4XIrYwQ2e58fHX9Gkk+ip5Y3EE5IzU4IvSU3UuJkadnLQhJY+DTjdrIaKqvRDEJlZSMjKMUsfjchy9qN83pZlA/jOuj0HKW20pnONrDBQYlbaAvseIzbFUDCaaCxoLytawQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757337130; c=relaxed/simple;
-	bh=FCHC9R3vg1FGoxrNV0iSS+Tjy5mo2E9qTUxd1wYJ8Bw=;
-	h=From:To:Subject:Date:Message-ID:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=ZIxSeTb/0VBH00I3VqTmr7QTnyVm843R5T3RIqypbUIgOEQXkNyJNYH5fQ0YSNOSEXGDKlL/2T4Eo+KLkRayuV/+Wny7byATPilXLoO3jOgw+ZKnZY/p6iB8s6JhU+Bj8+t+QezNTp1e/1i9cPk9s25Ms8/sDQqWVGOvYnTL0og=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=u9IVBsBv; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id AA034C4CEFA
-	for <kvm@vger.kernel.org>; Mon,  8 Sep 2025 13:12:09 +0000 (UTC)
+	s=arc-20240116; t=1757337923; c=relaxed/simple;
+	bh=y0jr9P2vLFUAvWYOjc4mNs3/bRNqNluga8F3APLirjo=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Dv+ugBCxm2Hhok5ktp0ygbRoWpkGTN6FqXMqZUlk/7be2zVaS1cpjtHLF3XATYjeTdpn2uqUBE9TK9OWPwFUhN8KgrAlI9Lv978mxt5HUCvy1wN58ByAfiwoF58jh8pi6NAQW8gJppzKZr47fQXY8F5cpCeQuCKZri6dYB1zq+w=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Vr6NNYXt; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id AA3AFC4CEF1;
+	Mon,  8 Sep 2025 13:25:21 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1757337129;
-	bh=FCHC9R3vg1FGoxrNV0iSS+Tjy5mo2E9qTUxd1wYJ8Bw=;
-	h=From:To:Subject:Date:In-Reply-To:References:From;
-	b=u9IVBsBvnXfOF0wTogFNrO4lgO0GDLGG/A7z9h7y8i7dXX6Uvnrp3MuBvdyI1YS4U
-	 MoOA8jQbIF2byg7BLcRekG9AUnb8vFNMn9bNMf3M/S9bDJUNNEdrQm1hqM11NOEGHd
-	 aAKXMCMSHZPkhEahnFhaaaBSdxmPgytQ59cQXqorsujuIDoK04LnHiMq2f0WkwpN6u
-	 v58Zu5AMGyjDSZyKe9uh8j4oN99KwcfIvpkmNqjUqbNfHWlo3lbUH+KP+X+2gVGnKn
-	 BN9mceE4h9WSfRQ8UyMACriQpLpAszOz6gtREVFi3sgUbvgVLzATeCpnQKmQ02Nvbx
-	 8bf1XmraFpQRw==
-Received: by aws-us-west-2-korg-bugzilla-1.web.codeaurora.org (Postfix, from userid 48)
-	id 9FDE2C433E1; Mon,  8 Sep 2025 13:12:09 +0000 (UTC)
-From: bugzilla-daemon@kernel.org
-To: kvm@vger.kernel.org
-Subject: [Bug 220549] [KVM/VMX] Level triggered interrupts mishandled on
- Windows w/ nested virt(Credential Guard) when using split irqchip
-Date: Mon, 08 Sep 2025 13:12:09 +0000
-X-Bugzilla-Reason: None
-X-Bugzilla-Type: changed
-X-Bugzilla-Watch-Reason: AssignedTo virtualization_kvm@kernel-bugs.osdl.org
-X-Bugzilla-Product: Virtualization
-X-Bugzilla-Component: kvm
-X-Bugzilla-Version: unspecified
-X-Bugzilla-Keywords: 
-X-Bugzilla-Severity: normal
-X-Bugzilla-Who: aros@gmx.com
-X-Bugzilla-Status: RESOLVED
-X-Bugzilla-Resolution: DUPLICATE
-X-Bugzilla-Priority: P3
-X-Bugzilla-Assigned-To: virtualization_kvm@kernel-bugs.osdl.org
-X-Bugzilla-Flags: 
-X-Bugzilla-Changed-Fields: bug_status resolution
-Message-ID: <bug-220549-28872-K7UAisy9MA@https.bugzilla.kernel.org/>
-In-Reply-To: <bug-220549-28872@https.bugzilla.kernel.org/>
-References: <bug-220549-28872@https.bugzilla.kernel.org/>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Bugzilla-URL: https://bugzilla.kernel.org/
-Auto-Submitted: auto-generated
+	s=k20201202; t=1757337923;
+	bh=y0jr9P2vLFUAvWYOjc4mNs3/bRNqNluga8F3APLirjo=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=Vr6NNYXtSMvOm43mYkK4BbzmIYBoKPdkU9UCjQZ+0w/ZLzC2wE8Y7EyhLYOY1NSD/
+	 bsnAGDTWjq9FeBBjTDzrTUoHpOHXxdci5P+isp6jC7EXbn+AS16PqruQS2sbyXZ/7Y
+	 ZErWBNFHKABgCi4qCYJokjrKdWfOKwf68TRpdC9gVeNeRT62lK/8EpY3wlwB93Xf7V
+	 8CcG77wwixILtegnkWbsshU7y2zG2PLcfWdllk11gHXPVI26Jmrc4Qe7DgsqMl/b7b
+	 +FxdqAmlQWEUKmBRuVMBX2aybmxLORtY3gUqTTQJEG5iWk1Z2+26mFrOE6wdIXRLWL
+	 mxKKH6ARecZ7g==
+Date: Mon, 8 Sep 2025 14:25:18 +0100
+From: Will Deacon <will@kernel.org>
+To: Andre Przywara <andre.przywara@arm.com>
+Cc: Julien Thierry <julien.thierry.kdev@gmail.com>,
+	Marc Zyngier <maz@kernel.org>, kvm@vger.kernel.org,
+	kvmarm@lists.linux.dev, Alexandru Elisei <alexandru.elisei@arm.com>
+Subject: Re: [PATCH kvmtool v3 0/6] arm64: Nested virtualization support
+Message-ID: <aL7ZPlm3kANwiWb3@willie-the-truck>
+References: <20250729095745.3148294-1-andre.przywara@arm.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250729095745.3148294-1-andre.przywara@arm.com>
 
-https://bugzilla.kernel.org/show_bug.cgi?id=3D220549
+Hi Andre,
 
-Artem S. Tashkinov (aros@gmx.com) changed:
+On Tue, Jul 29, 2025 at 10:57:39AM +0100, Andre Przywara wrote:
+> This is v3 of the nested virt support series, adjusting commit messages
+> and adding a check that FEAT_E2H0 is really available.
 
-           What    |Removed                     |Added
-----------------------------------------------------------------------------
-             Status|NEW                         |RESOLVED
-         Resolution|---                         |DUPLICATE
+Do you plan to respin this addressing Alexandru's outstanding comments?
 
---- Comment #1 from Artem S. Tashkinov (aros@gmx.com) ---
-
-
-*** This bug has been marked as a duplicate of bug 220548 ***
-
---=20
-You may reply to this email to add a comment.
-
-You are receiving this mail because:
-You are watching the assignee of the bug.=
+Will
 
