@@ -1,298 +1,269 @@
-Return-Path: <kvm+bounces-56974-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-56975-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 08548B48E2F
-	for <lists+kvm@lfdr.de>; Mon,  8 Sep 2025 14:53:28 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5AADEB48E82
+	for <lists+kvm@lfdr.de>; Mon,  8 Sep 2025 15:02:57 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 54D683B7264
-	for <lists+kvm@lfdr.de>; Mon,  8 Sep 2025 12:53:25 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 39C01188704C
+	for <lists+kvm@lfdr.de>; Mon,  8 Sep 2025 13:03:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1AB1E305E19;
-	Mon,  8 Sep 2025 12:53:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7E10E3081A1;
+	Mon,  8 Sep 2025 13:02:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="bnu3yxtY"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="PGsKID9X"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yw1-f179.google.com (mail-yw1-f179.google.com [209.85.128.179])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3F920304BBF
-	for <kvm@vger.kernel.org>; Mon,  8 Sep 2025 12:53:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0FC9E2FF657
+	for <kvm@vger.kernel.org>; Mon,  8 Sep 2025 13:02:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.179
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757335990; cv=none; b=lF62kl/4tf/iyXWGLY6de+bS1oS0dJ0z425s1hGujunRNqnqD4xLGHhJ6i74ZwTW3hoc4DZkA+7yiMZfO2/bltgZIvVDPjaXWUtMrANBecIxqqVC3uN5uDsmW1M6uwuxZT8UXw79tHmXSM5oYpTIfNxm3KdyEScXqdEKfJgNdso=
+	t=1757336568; cv=none; b=JGaWS7n33VBNxbqwSes2SAX5RJExLeC4ejsVXbPnVm7QFu4tGYTbEkIEmUfVEaVyZNUXIksWqTPf/HrndzQCprOpLhndhtnhnHH1FoyPOg5RdDO96chtdHAjeJTBV4drp7wj2/KtfexhlbLXxps/jZuGLRr6zTeEPIWIAyfwGOw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757335990; c=relaxed/simple;
-	bh=0ClgqSIXKhbh5XgX8+FxmnxzM4Hpi3RCF75Ghod4Apk=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=WRhYt2dcYr9kK/2fQGeFrathwZQpZVI+zhpOqFuBA+7v8flDQpAjSlOVCJ2ZG78S9En+9DtYfVmF2VJ5Ee6951+AIhH6D7FmFM6pLotz7il33FstYFIbWRbKJ8Z8tD9aDyGwcegH070oIBIbIA5twqPSOmY8acIiybbFDs3i4e0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=bnu3yxtY; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1757335987;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-	bh=nqKqSNT26uK0ctF10EJrKeCsL0Ppf+8ee2pPXGgNN7Q=;
-	b=bnu3yxtYkcXe0OTHnBYCpKPzE1C2Gc7e/GNrWQNvBTQcyE7ZNNyJdqOtasldnxG/Ucf1Ob
-	mfnOV4ty6PYeO/2mHnSGM50ucwErdOUzgHs7Gyc2AXNfGnuuPrzn1O67mBkAk62huBdsfE
-	qUmTERAHqyD5VVZ7VjUFjq7HdvFCdMA=
-Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
- [209.85.221.71]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-648-iKtkpN-eNWa_I7FMDwZ3BQ-1; Mon, 08 Sep 2025 08:53:06 -0400
-X-MC-Unique: iKtkpN-eNWa_I7FMDwZ3BQ-1
-X-Mimecast-MFC-AGG-ID: iKtkpN-eNWa_I7FMDwZ3BQ_1757335985
-Received: by mail-wr1-f71.google.com with SMTP id ffacd0b85a97d-3e26b5e3f41so1730977f8f.1
-        for <kvm@vger.kernel.org>; Mon, 08 Sep 2025 05:53:05 -0700 (PDT)
+	s=arc-20240116; t=1757336568; c=relaxed/simple;
+	bh=+JreuUwhzJ0RPCwLVRN+u/0EQ2f/982qQTQn0rO0/Zc=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=V4xIhNBgi4IR0qDA1ywNJUkV/n/Hp9CwDhgsY/8IIiBtaKFwEgvA6w/A906S7dnaWjkTiZmsMSvkJDsSZvYJSDTeRbD3lgv9NJjkeJxoD2gqDNNIO+alhXCW9BGv26h60JLWUyoTwNXt7LfuBR4WsIscOSyvmC5FW8RG7jjvxhM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=PGsKID9X; arc=none smtp.client-ip=209.85.128.179
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-yw1-f179.google.com with SMTP id 00721157ae682-724b9ba77d5so46025137b3.3
+        for <kvm@vger.kernel.org>; Mon, 08 Sep 2025 06:02:46 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1757336566; x=1757941366; darn=vger.kernel.org;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=PnaJYM8o+bNZjQrfX5qfOUjpVL9bEtu2ZIamOA9HfJE=;
+        b=PGsKID9XotFTXeWNkO/xhArYXh5COKnieJiEh/+pRlK5AdO055fhYxMBpCfl96mAmW
+         pLSa1fwONxa+FtXLhbI+rdeumdp2XU+qxxoei5cRH3vo77c4XEuVZ3bnyXPY1We6WwuC
+         Z+O4xAYfKDQRNp9CCPr6htol617ZLo4sYZHldM9lG9j68KJCDP99a22T89GZk+8zj0BI
+         raZa0pMro7SpGWSpcsd0qShsVh66UDCf597b4POPEP0CSaZhrrcWtyKG4ruYQFIU0aX5
+         FULSgX2eA1BH/a7HYe9B3Y11pQ1ADHHQmuD14lSqO8pZB+hOLxCc1cgVxSHJ6CwmsVtR
+         0Izg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1757335985; x=1757940785;
-        h=content-transfer-encoding:in-reply-to:autocrypt:content-language
-         :from:references:cc:to:subject:user-agent:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=nqKqSNT26uK0ctF10EJrKeCsL0Ppf+8ee2pPXGgNN7Q=;
-        b=TVBm7soD7E//G9441hMEC6/VT9t/pbq7HQlRwSCOYRQl4vp4T4IoSk9kCDsAPd494K
-         8+ka2msu3SscUZuepGmKITFDPWscx1C1jIJ+d5r5rIvtzDmpQhlD7I9SlP3cHTQ9O46s
-         s+Uu60lPwl2h0T2BPGfyXg1Q1i53maGOaTNweOjYI2K7Tl3kk0ad6iec2NGMJk2dIYEP
-         IrPFpxhxalABJJrUGaRHmEDaBAfYm6GU44ELUb1Qf7cwwfkeAZ8mnZkQAMLA4jIL+4Us
-         kNmpsXEJrNjPdvDgM/XcsZdJHBk5bX/WbyzwtbLJ7rtvidB6Jj07uCCOH45Ym6vyw1Lw
-         Rw9A==
-X-Forwarded-Encrypted: i=1; AJvYcCVDZbVEBU60nDaIkw6iNsGq43ke+kFhb7/QfhaMJoL/KpkjQOE66g5MMaXRN60qR+HNlok=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yz8marJfwQgXwDl+nX6UH5+hz94x0iHoNXmiJlc8k6lEKKX9mYC
-	bYxNEKknfI6VoaSWBDcixqKsh9QPlH4erKHpMiGIvYIdVOUTRJCB6oYBnBOyMRnz7SsCfMnndXT
-	/1LJdyMZYeevuKgGHdqv6HMkrFnQg15mgAPl1Tq51wZIXpiroFOIPvw==
-X-Gm-Gg: ASbGncv/STsXeqEdW5CfQiyHet8tOgntEa5pkT8egGIhsoYaPqCyIyfoDaXEqjv9AnV
-	ARA0fxaRqEB5XsIr0B64VVduQgdeLz1xqSi5afZFBResDqCSzvItRHS6dAadZPyMkHrh1zyEU3w
-	1PGHKrDRW4FqAcLG/eBT3VFBUHmNAIM7Pes5GkWcXlQY8e6IVrUGAxXJ5FRR1yMdRzAxP83fIPG
-	0zjd7g44KAgpjnbrovEfFZlOdqjXpHAtY3VzHQs65UOC+A/hV0WvRHemOl92tYnrso8rTdMkLct
-	PKlZxKH87hCxll/CnbC5aL77pwGyorU9iDqBjLtcxW6OF3lMlIpOR6VbTrsC44Uz5NjbTg2q1hn
-	Yt+Owd8JTmcH7UGXTO1mJkwZeu+sU4sEiXiNNj9NhsyAQEYEvRrFhC1yMuCK2goyx
-X-Received: by 2002:a5d:64e4:0:b0:3df:58c5:efd1 with SMTP id ffacd0b85a97d-3e6427d6e15mr6188460f8f.25.1757335984616;
-        Mon, 08 Sep 2025 05:53:04 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IFCDxFquotzqnajJLjBsVtEGOKTyR3mfE6vqo6/1C+mdI526t5VUp3r/8RO80kgSz2c6+Q56w==
-X-Received: by 2002:a5d:64e4:0:b0:3df:58c5:efd1 with SMTP id ffacd0b85a97d-3e6427d6e15mr6188391f8f.25.1757335984032;
-        Mon, 08 Sep 2025 05:53:04 -0700 (PDT)
-Received: from ?IPV6:2003:d8:2f25:700:d846:15f3:6ca0:8029? (p200300d82f250700d84615f36ca08029.dip0.t-ipconnect.de. [2003:d8:2f25:700:d846:15f3:6ca0:8029])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3d1007c0dc8sm40030772f8f.53.2025.09.08.05.53.01
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 08 Sep 2025 05:53:03 -0700 (PDT)
-Message-ID: <7ee0b58a-8fe4-46fe-bfef-f04f900f3040@redhat.com>
-Date: Mon, 8 Sep 2025 14:53:00 +0200
+        d=1e100.net; s=20230601; t=1757336566; x=1757941366;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=PnaJYM8o+bNZjQrfX5qfOUjpVL9bEtu2ZIamOA9HfJE=;
+        b=RJgLFQVsCyxo5vfjl1G699LacrY4LCltfScvbDNCX+aQMeVX0j1LgV97IMcI9CbBRx
+         xfmeN+1j/BKus2Xhb2hCW+phV95f+sJwzFe070EYuUJsRqcMvoKLypbVhRmhs4uZyHWu
+         DDKHOcXSxoUArx0PGYBzwZTwlCORfzyAzTSsFZnxpTeXAfBprl6egYQXqlHVF361oKGw
+         /oRLMWOBgCQHlhDp/EaP7D9thuJ22cw/AOfhLiUYn4LbjwTctUehsz497tJdDkrwDvc0
+         V3aoRVTNn0pairocEBCWdOHRsncf6bjC/9cPWvEJs76vpRngKUx5iSx6PzePS5PUC/hD
+         G0vA==
+X-Forwarded-Encrypted: i=1; AJvYcCWAI6xWRIGLUqAW5fN5FWGjI/w8pPOYrJ+VizBe003HOBTOuMqw/Kx6UjRoQDRmySMy348=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzfxlRpi0mv2W8kTK8DY1SzdkpeYGv7RdVW4obr4PkfZlvtxN7e
+	rXRe6z3p5uIuGtuoUJ4sm5pPLZKpvNE5PDZzgclV7Ax8V6t2gXg9WU8=
+X-Gm-Gg: ASbGncs8E57eDM8fzfdLi6osBabq9UOhcwl0NNSJu5mwOWo1YTZRrT7TCCl7XhrrI/D
+	2omyba4A2uJlNhP8NJdw9XBB9W55xc5LUHKgK44PUoYLi9+70TL0M84N5HFRo2ej0z2Ks6wZEiS
+	InAM3c8rVdbu4XyzMTZpy8rWXM7By4P2FO0RuFunGdWK+lqAMH2rpdTVQERe4MEvipkTToJalSy
+	qwHvMaha1Uf/PH9nV2lGRfUzj03JEGdRZUb7RB+uT4SVZARcT60Y91BT8+z+vgH1DqH7mwxx5s3
+	qkR2PKYxD3lmAbmCffhJZzZgrqqE3777/Lc4MSXAavgoX0/rIuUg/FLUTKE1OLFqRIFPoygSuq8
+	7juXlNuRvnNNaVrh1RGG1MQfNhe0ozw1g4sxZt52XZx0Q4EdCOPAw
+X-Google-Smtp-Source: AGHT+IH3Y5Q/tuSb5yRjqdwtBfa9u1u8dwWJ5vPAEO/WdjT9i8cCuZ1M+GPWGkMyGLrmnb3YdTIA/g==
+X-Received: by 2002:a53:a6c7:0:b0:612:5a11:387f with SMTP id 956f58d0204a3-6125a113915mr4313127d50.34.1757336564375;
+        Mon, 08 Sep 2025 06:02:44 -0700 (PDT)
+Received: from t-chicago-u-2404 ([2001:19f0:5c00:2be4:5400:5ff:fe7e:238d])
+        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-720add66632sm122536796d6.32.2025.09.08.06.02.43
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 08 Sep 2025 06:02:43 -0700 (PDT)
+Date: Mon, 8 Sep 2025 21:02:41 +0800
+From: Ted Chen <znscnchen@gmail.com>
+To: Dave Martin <Dave.Martin@arm.com>
+Cc: Ben Horgan <ben.horgan@arm.com>, pbonzini@redhat.com,
+	kvm@vger.kernel.org
+Subject: Re: [PATCH] KVM: Avoid debugfs warning caused by repeated vm fd
+ number
+Message-ID: <aL7T8R25Rr3ALr2H@t-chicago-u-2404>
+References: <20250901130336.112842-1-znscnchen@gmail.com>
+ <b227a304-9b2f-4e89-9ca5-41d836ae4bae@arm.com>
+ <aLbnOUXUq7fbF6Mv@t-chicago-u-2404>
+ <aLcUGm3HcU39q2gp@e133380.arm.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2 19/37] mm/gup: remove record_subpages()
-To: Lorenzo Stoakes <lorenzo.stoakes@oracle.com>
-Cc: John Hubbard <jhubbard@nvidia.com>, linux-kernel@vger.kernel.org,
- Alexander Potapenko <glider@google.com>,
- Andrew Morton <akpm@linux-foundation.org>,
- Brendan Jackman <jackmanb@google.com>, Christoph Lameter <cl@gentwo.org>,
- Dennis Zhou <dennis@kernel.org>, Dmitry Vyukov <dvyukov@google.com>,
- dri-devel@lists.freedesktop.org, intel-gfx@lists.freedesktop.org,
- iommu@lists.linux.dev, io-uring@vger.kernel.org,
- Jason Gunthorpe <jgg@nvidia.com>, Jens Axboe <axboe@kernel.dk>,
- Johannes Weiner <hannes@cmpxchg.org>, kasan-dev@googlegroups.com,
- kvm@vger.kernel.org, "Liam R. Howlett" <Liam.Howlett@oracle.com>,
- Linus Torvalds <torvalds@linux-foundation.org>, linux-arm-kernel@axis.com,
- linux-arm-kernel@lists.infradead.org, linux-crypto@vger.kernel.org,
- linux-ide@vger.kernel.org, linux-kselftest@vger.kernel.org,
- linux-mips@vger.kernel.org, linux-mmc@vger.kernel.org, linux-mm@kvack.org,
- linux-riscv@lists.infradead.org, linux-s390@vger.kernel.org,
- linux-scsi@vger.kernel.org, Marco Elver <elver@google.com>,
- Marek Szyprowski <m.szyprowski@samsung.com>, Michal Hocko <mhocko@suse.com>,
- Mike Rapoport <rppt@kernel.org>, Muchun Song <muchun.song@linux.dev>,
- netdev@vger.kernel.org, Oscar Salvador <osalvador@suse.de>,
- Peter Xu <peterx@redhat.com>, Robin Murphy <robin.murphy@arm.com>,
- Suren Baghdasaryan <surenb@google.com>, Tejun Heo <tj@kernel.org>,
- virtualization@lists.linux.dev, Vlastimil Babka <vbabka@suse.cz>,
- wireguard@lists.zx2c4.com, x86@kernel.org, Zi Yan <ziy@nvidia.com>
-References: <20250901150359.867252-1-david@redhat.com>
- <20250901150359.867252-20-david@redhat.com>
- <016307ba-427d-4646-8e4d-1ffefd2c1968@nvidia.com>
- <85e760cf-b994-40db-8d13-221feee55c60@redhat.com>
- <727cabec-5ee8-4793-926b-8d78febcd623@lucifer.local>
-From: David Hildenbrand <david@redhat.com>
-Content-Language: en-US
-Autocrypt: addr=david@redhat.com; keydata=
- xsFNBFXLn5EBEAC+zYvAFJxCBY9Tr1xZgcESmxVNI/0ffzE/ZQOiHJl6mGkmA1R7/uUpiCjJ
- dBrn+lhhOYjjNefFQou6478faXE6o2AhmebqT4KiQoUQFV4R7y1KMEKoSyy8hQaK1umALTdL
- QZLQMzNE74ap+GDK0wnacPQFpcG1AE9RMq3aeErY5tujekBS32jfC/7AnH7I0v1v1TbbK3Gp
- XNeiN4QroO+5qaSr0ID2sz5jtBLRb15RMre27E1ImpaIv2Jw8NJgW0k/D1RyKCwaTsgRdwuK
- Kx/Y91XuSBdz0uOyU/S8kM1+ag0wvsGlpBVxRR/xw/E8M7TEwuCZQArqqTCmkG6HGcXFT0V9
- PXFNNgV5jXMQRwU0O/ztJIQqsE5LsUomE//bLwzj9IVsaQpKDqW6TAPjcdBDPLHvriq7kGjt
- WhVhdl0qEYB8lkBEU7V2Yb+SYhmhpDrti9Fq1EsmhiHSkxJcGREoMK/63r9WLZYI3+4W2rAc
- UucZa4OT27U5ZISjNg3Ev0rxU5UH2/pT4wJCfxwocmqaRr6UYmrtZmND89X0KigoFD/XSeVv
- jwBRNjPAubK9/k5NoRrYqztM9W6sJqrH8+UWZ1Idd/DdmogJh0gNC0+N42Za9yBRURfIdKSb
- B3JfpUqcWwE7vUaYrHG1nw54pLUoPG6sAA7Mehl3nd4pZUALHwARAQABzSREYXZpZCBIaWxk
- ZW5icmFuZCA8ZGF2aWRAcmVkaGF0LmNvbT7CwZoEEwEIAEQCGwMCF4ACGQEFCwkIBwICIgIG
- FQoJCAsCBBYCAwECHgcWIQQb2cqtc1xMOkYN/MpN3hD3AP+DWgUCaJzangUJJlgIpAAKCRBN
- 3hD3AP+DWhAxD/9wcL0A+2rtaAmutaKTfxhTP0b4AAp1r/eLxjrbfbCCmh4pqzBhmSX/4z11
- opn2KqcOsueRF1t2ENLOWzQu3Roiny2HOU7DajqB4dm1BVMaXQya5ae2ghzlJN9SIoopTWlR
- 0Af3hPj5E2PYvQhlcqeoehKlBo9rROJv/rjmr2x0yOM8qeTroH/ZzNlCtJ56AsE6Tvl+r7cW
- 3x7/Jq5WvWeudKrhFh7/yQ7eRvHCjd9bBrZTlgAfiHmX9AnCCPRPpNGNedV9Yty2Jnxhfmbv
- Pw37LA/jef8zlCDyUh2KCU1xVEOWqg15o1RtTyGV1nXV2O/mfuQJud5vIgzBvHhypc3p6VZJ
- lEf8YmT+Ol5P7SfCs5/uGdWUYQEMqOlg6w9R4Pe8d+mk8KGvfE9/zTwGg0nRgKqlQXrWRERv
- cuEwQbridlPAoQHrFWtwpgYMXx2TaZ3sihcIPo9uU5eBs0rf4mOERY75SK+Ekayv2ucTfjxr
- Kf014py2aoRJHuvy85ee/zIyLmve5hngZTTe3Wg3TInT9UTFzTPhItam6dZ1xqdTGHZYGU0O
- otRHcwLGt470grdiob6PfVTXoHlBvkWRadMhSuG4RORCDpq89vu5QralFNIf3EysNohoFy2A
- LYg2/D53xbU/aa4DDzBb5b1Rkg/udO1gZocVQWrDh6I2K3+cCs7BTQRVy5+RARAA59fefSDR
- 9nMGCb9LbMX+TFAoIQo/wgP5XPyzLYakO+94GrgfZjfhdaxPXMsl2+o8jhp/hlIzG56taNdt
- VZtPp3ih1AgbR8rHgXw1xwOpuAd5lE1qNd54ndHuADO9a9A0vPimIes78Hi1/yy+ZEEvRkHk
- /kDa6F3AtTc1m4rbbOk2fiKzzsE9YXweFjQvl9p+AMw6qd/iC4lUk9g0+FQXNdRs+o4o6Qvy
- iOQJfGQ4UcBuOy1IrkJrd8qq5jet1fcM2j4QvsW8CLDWZS1L7kZ5gT5EycMKxUWb8LuRjxzZ
- 3QY1aQH2kkzn6acigU3HLtgFyV1gBNV44ehjgvJpRY2cC8VhanTx0dZ9mj1YKIky5N+C0f21
- zvntBqcxV0+3p8MrxRRcgEtDZNav+xAoT3G0W4SahAaUTWXpsZoOecwtxi74CyneQNPTDjNg
- azHmvpdBVEfj7k3p4dmJp5i0U66Onmf6mMFpArvBRSMOKU9DlAzMi4IvhiNWjKVaIE2Se9BY
- FdKVAJaZq85P2y20ZBd08ILnKcj7XKZkLU5FkoA0udEBvQ0f9QLNyyy3DZMCQWcwRuj1m73D
- sq8DEFBdZ5eEkj1dCyx+t/ga6x2rHyc8Sl86oK1tvAkwBNsfKou3v+jP/l14a7DGBvrmlYjO
- 59o3t6inu6H7pt7OL6u6BQj7DoMAEQEAAcLBfAQYAQgAJgIbDBYhBBvZyq1zXEw6Rg38yk3e
- EPcA/4NaBQJonNqrBQkmWAihAAoJEE3eEPcA/4NaKtMQALAJ8PzprBEXbXcEXwDKQu+P/vts
- IfUb1UNMfMV76BicGa5NCZnJNQASDP/+bFg6O3gx5NbhHHPeaWz/VxlOmYHokHodOvtL0WCC
- 8A5PEP8tOk6029Z+J+xUcMrJClNVFpzVvOpb1lCbhjwAV465Hy+NUSbbUiRxdzNQtLtgZzOV
- Zw7jxUCs4UUZLQTCuBpFgb15bBxYZ/BL9MbzxPxvfUQIPbnzQMcqtpUs21CMK2PdfCh5c4gS
- sDci6D5/ZIBw94UQWmGpM/O1ilGXde2ZzzGYl64glmccD8e87OnEgKnH3FbnJnT4iJchtSvx
- yJNi1+t0+qDti4m88+/9IuPqCKb6Stl+s2dnLtJNrjXBGJtsQG/sRpqsJz5x1/2nPJSRMsx9
- 5YfqbdrJSOFXDzZ8/r82HgQEtUvlSXNaXCa95ez0UkOG7+bDm2b3s0XahBQeLVCH0mw3RAQg
- r7xDAYKIrAwfHHmMTnBQDPJwVqxJjVNr7yBic4yfzVWGCGNE4DnOW0vcIeoyhy9vnIa3w1uZ
- 3iyY2Nsd7JxfKu1PRhCGwXzRw5TlfEsoRI7V9A8isUCoqE2Dzh3FvYHVeX4Us+bRL/oqareJ
- CIFqgYMyvHj7Q06kTKmauOe4Nf0l0qEkIuIzfoLJ3qr5UyXc2hLtWyT9Ir+lYlX9efqh7mOY
- qIws/H2t
-In-Reply-To: <727cabec-5ee8-4793-926b-8d78febcd623@lucifer.local>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <aLcUGm3HcU39q2gp@e133380.arm.com>
 
-On 08.09.25 14:25, Lorenzo Stoakes wrote:
-> On Sat, Sep 06, 2025 at 08:56:48AM +0200, David Hildenbrand wrote:
->> On 06.09.25 03:05, John Hubbard wrote:
->>>
->>> Probably a similar sentiment as Lorenzo here...the above diffs make the code
->>> *worse* to read. In fact, I recall adding record_subpages() here long ago,
->>> specifically to help clarify what was going on.
->>
->> Well, there is a lot I dislike about record_subpages() to go back there.
->> Starting with "as Willy keeps explaining, the concept of subpages do
->> not exist and ending with "why do we fill out the array even on failure".
+On Tue, Sep 02, 2025 at 04:58:18PM +0100, Dave Martin wrote:
+> Hi,
 > 
-> Yes
+> On Tue, Sep 02, 2025 at 08:46:49PM +0800, Ted Chen wrote:
+> > On Mon, Sep 01, 2025 at 02:39:06PM +0100, Ben Horgan wrote:
+> > > Hi Ted,
+> > > 
+> > > On 9/1/25 14:03, Ted Chen wrote:
+> > > > Avoid debugfs warning like "KVM: debugfs: duplicate directory 59904-4"
+> > > > caused by creating VMs with the same vm fd number in a single process.
+> > > > 
+> > > > As shown in the below test case, two test() are executed sequentially in a
+> > > > single process, each creating a new VM.
+> > > > 
+> > > > Though the 2nd test() creates a new VM after the 1st test() closes the
+> > > > vm_fd, KVM prints warnings like "KVM: debugfs: duplicate directory 59904-4"
+> > > > on creating the 2nd VM.
+> > > > 
+> > > > This is due to the dup() of the vcpu_fd in test(). So, after closing the
+> > > > 1st vm_fd, kvm->users_count of the 1st VM is still > 0 when creating the
+> > > > 2nd VM. So, KVM has not yet invoked kvm_destroy_vm() and
+> > > > kvm_destroy_vm_debugfs() for the 1st VM after closing the 1st vm_fd. The
+> > > > 2nd test() thus will be able to create a different VM with the same vm fd
+> > > > number as the 1st VM.
+> > > > 
+> > > > Therefore, besides having "pid" and "fdname" in the dir_name of the
+> > > > debugfs, add a random number to differentiate different VMs to avoid
+> > > > printing warning, also allowing the 2nd VM to have a functional debugfs.
+> > > > 
+> > > > Use get_random_u32() to avoid dir_name() taking up too much memory while
+> > > > greatly reducing the chance of printing warning.
+> > > > 
+> > > > void test(void)
+> > > > {
+> > > >         int kvm_fd, vm_fd, vcpu_fd;
+> > > > 
+> > > >         kvm_fd = open("/dev/kvm", O_RDWR);
+> > > >         if (kvm_fd == -1)
+> > > >                 return;
+> > > > 
+> > > >         vm_fd = ioctl(kvm_fd, KVM_CREATE_VM, 0);
+> > > >         if (vm_fd == -1)
+> > > >                 return;
+> > > >         vcpu_fd = ioctl(vm_fd, KVM_CREATE_VCPU, 0);
+> > > >         if (vcpu_fd == -1)
+> > > >                 return;
+> > > > 
+> > > >         dup(vcpu_fd);
+> > > >         close(vcpu_fd);
+> > > >         close(vm_fd);
+> > > >         close(kvm_fd);
+> > > > }
+> > > > 
+> > > > int main()
+> > > > {
+> > > >         test();
+> > > >         test();
+> > > > 
+> > > >         return 0;
+> > > > }
+> > > > 
+> > > > Signed-off-by: Ted Chen <znscnchen@gmail.com>
+> > > > ---
+> > > >  virt/kvm/kvm_main.c | 5 +++--
+> > > >  1 file changed, 3 insertions(+), 2 deletions(-)
+> > > > 
+> > > > diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
+> > > > index 6c07dd423458..f92a60ed5de8 100644
+> > > > --- a/virt/kvm/kvm_main.c
+> > > > +++ b/virt/kvm/kvm_main.c
+> > > > @@ -1017,7 +1017,7 @@ static int kvm_create_vm_debugfs(struct kvm *kvm, const char *fdname)
+> > > >  {
+> > > >  	static DEFINE_MUTEX(kvm_debugfs_lock);
+> > > >  	struct dentry *dent;
+> > > > -	char dir_name[ITOA_MAX_LEN * 2];
+> > > > +	char dir_name[ITOA_MAX_LEN * 3];
+> > > >  	struct kvm_stat_data *stat_data;
+> > > >  	const struct _kvm_stats_desc *pdesc;
+> > > >  	int i, ret = -ENOMEM;
+> > > > @@ -1027,7 +1027,8 @@ static int kvm_create_vm_debugfs(struct kvm *kvm, const char *fdname)
+> > > >  	if (!debugfs_initialized())
+> > > >  		return 0;
+> > > >  
+> > > > -	snprintf(dir_name, sizeof(dir_name), "%d-%s", task_pid_nr(current), fdname);
+> > > > +	snprintf(dir_name, sizeof(dir_name), "%d-%s-%u", task_pid_nr(current),
+> > > > +		 fdname, get_random_u32());
+> > > 
+> > > This does make the directory names (very likely) to be unique but it's
+> > > not helpful in distinguishing which directory maps to which vm. I wonder
+> > > if there is some better id we could use here.
+> > Good point. Maybe use timestamp instead?
+> > So, we can know a bigger timestamp value corresponds to a VM created later.
+> > Also since VMs are created in a single thread, they can't have the same
 > 
->>
->> :)
->>
->>>
->>> Now it's been returned to it's original, cryptic form.
->>>
->>
->> The code in the caller was so uncryptic that both me and Lorenzo missed
->> that magical addition. :P
-> 
-> :'(
-> 
->>
->>> Just my take on it, for whatever that's worth. :)
->>
->> As always, appreciated.
->>
->> I could of course keep the simple loop in some "record_folio_pages"
->> function and clean up what I dislike about record_subpages().
->>
->> But I much rather want the call chain to be cleaned up instead, if possible.
->>
->>
->> Roughly, what I am thinking (limiting it to pte+pmd case) about is the following:
-> 
-> I cannot get the below to apply even with the original patch here applied + fix.
-> 
-> It looks like (in mm-new :) commit e73f43a66d5f ("mm/gup: remove dead pgmap
-> refcounting code") by Alastair has conflicted here, but even then I can't make
-> it apply, with/without your fix...!
+> Why must all VMs be created in a single thread?
+I happened to encounter this warning when I wrote a testcase which runs
+in a single process but needs to create several VMs sequentially for
+testing various cases.
 
-To be clear: it was never intended to be applied, because it wouldn't 
-even compile in the current form.
-
-It was based on this nth_page submission + fix.
-
-
-[...]
-
->>   }
->>   static int gup_fast_pud_range(p4d_t *p4dp, p4d_t p4d, unsigned long addr,
+> > timestamp value.
+> > 
+> > diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
+> > index 6c07dd423458..c3b0880be79a 100644
+> > --- a/virt/kvm/kvm_main.c
+> > +++ b/virt/kvm/kvm_main.c
+> > @@ -1017,7 +1017,7 @@ static int kvm_create_vm_debugfs(struct kvm *kvm, const char *fdname)
+> >  {
+> >         static DEFINE_MUTEX(kvm_debugfs_lock);
+> >         struct dentry *dent;
+> > -       char dir_name[ITOA_MAX_LEN * 2];
+> > +       char dir_name[ITOA_MAX_LEN * 4];
 > 
-> OK I guess you intentionally left the rest as a TODO :)
+> Hmmm.
 > 
-> So I'll wait for you to post it before reviewing in-depth.
+> >         struct kvm_stat_data *stat_data;
+> >         const struct _kvm_stats_desc *pdesc;
+> >         int i, ret = -ENOMEM;
+> > @@ -1027,7 +1027,8 @@ static int kvm_create_vm_debugfs(struct kvm *kvm, const char *fdname)
+> >         if (!debugfs_initialized())
+> >                 return 0;
+> > 
+> > -       snprintf(dir_name, sizeof(dir_name), "%d-%s", task_pid_nr(current), fdname);
+> > +       snprintf(dir_name, sizeof(dir_name), "%d-%s-%llx", task_pid_nr(current),
+> > +                fdname, ktime_get_ns());
+> >         mutex_lock(&kvm_debugfs_lock);
+> >         dent = debugfs_lookup(dir_name, kvm_debugfs_dir);
+> >         if (dent) {
+> > 
+> > 
+> > > Should the vm stats_id also be updated to be unique and use the same scheme?
+> >
+> > I don't think so. Unlike debugfs paths that will be accessed directly by
+> > userspace, the stats_id is used by anonymous inode files openned with unique
+> > fd numbers in a single process. So, duplicated names should be ok.
 > 
-> This generally LGTM as an approach, getting rid of *nr is important that's
-> really horrible.
-
-Yes. Expect a cleanup in that direction soonish (again, either from me 
-or someone else I poke)
-
+> Just sticking my oar in here, since I'm interested in how we identify
+> VMs and vCPUs for use by other kernel subsystems:
 > 
->> --
->> 2.50.1
->>
->>
->>
->> Oh, I might even have found a bug moving away from that questionable
->> "ret==1 means success" handling in gup_fast_pte_range()? Will
->> have to double-check, but likely the following is the right thing to do.
->>
->>
->>
->>  From 8f48b25ef93e7ef98611fd58ec89384ad5171782 Mon Sep 17 00:00:00 2001
->> From: David Hildenbrand <david@redhat.com>
->> Date: Sat, 6 Sep 2025 08:46:45 +0200
->> Subject: [PATCH] mm/gup: fix handling of errors from
->>   arch_make_folio_accessible() in follow_page_pte()
->>
->> In case we call arch_make_folio_accessible() and it fails, we would
->> incorrectly return a value that is "!= 0" to the caller, indicating that
->> we pinned all requested pages and that the caller can keep going.
->>
->> follow_page_pte() is not supposed to return error values, but instead
->> 0 on failure and 1 on success.
->>
->> That is of course wrong, because the caller will just keep going pinning
->> more pages. If we happen to pin a page afterwards, we're in trouble,
->> because we essentially skipped some pages.
->>
->> Fixes: f28d43636d6f ("mm/gup/writeback: add callbacks for inaccessible pages")
->> Signed-off-by: David Hildenbrand <david@redhat.com>
->> ---
->>   mm/gup.c | 3 +--
->>   1 file changed, 1 insertion(+), 2 deletions(-)
->>
->> diff --git a/mm/gup.c b/mm/gup.c
->> index 22420f2069ee1..cff226ec0ee7d 100644
->> --- a/mm/gup.c
->> +++ b/mm/gup.c
->> @@ -2908,8 +2908,7 @@ static int gup_fast_pte_range(pmd_t pmd, pmd_t *pmdp, unsigned long addr,
->>   		 * details.
->>   		 */
->>   		if (flags & FOLL_PIN) {
->> -			ret = arch_make_folio_accessible(folio);
->> -			if (ret) {
->> +			if (arch_make_folio_accessible(folio)) {
+> The two proposed approaches may not guarantee uniqueness.  The PID is
+> not unique because a single process can create multiple VMs.  Possibly,
+> VMs can outlive the PID of the creating process (if a KVM fd is passed
+> to another process, and the original process terminates).  The fd is
+> not unique because fds can be moved around with dup() and reallocated.
+> Random numbers are not unique (only _probably_ unique.)
 > 
-> Oh Lord above. Lol. Yikes.
+> If VMs are created from two threads simultaneously and if ownership of
+> kvm_debugfs_lock can move fast enough, or there is enough skid or
+> imprecision in the timestamp, then can ktime_get_ns() be non-unique too?
+I don't find a way of having 2 VMs to the same
+"PID + fd number + ktime_get_ns()".
+
+Could you elaborate if you think it's possible？
+
+> _Maybe_ this is good enough for debugfs -- which is often treated in a
+> best-effort way by kernel code.
+Right, so I tried to make it unique while keeping least effort to KVM.
+
+> However, if we really want a robust ID that can not only distinguish
+> between VMs but can also tell us reliably (and usefully) which is which
+> even when multiple VMs are created by a single process, I think KVM
+> userspace needs to be able to set and/or retrieve the ID, or part of it.
+>
+> It might make sense to define a new kind of identifier for such
+> purposes.
+Hmm, it may not be worthwhile in my scenario.
+
+> I'm guessing that this is out of the scope for this patch, though.
 > 
-> Yeah I think your fix is valid...
-
-I sent it out earlier today. Fortunately that function shouldn't usually 
-really fail IIUC.
-
--- 
-Cheers
-
-David / dhildenb
-
+> Cheers
+> ---Dave
 
