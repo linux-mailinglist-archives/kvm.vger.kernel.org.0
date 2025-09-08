@@ -1,132 +1,148 @@
-Return-Path: <kvm+bounces-56969-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-56970-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5CE6EB487C4
-	for <lists+kvm@lfdr.de>; Mon,  8 Sep 2025 11:06:19 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0D6F4B48836
+	for <lists+kvm@lfdr.de>; Mon,  8 Sep 2025 11:23:14 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id E0D4E7AC7E7
-	for <lists+kvm@lfdr.de>; Mon,  8 Sep 2025 09:04:35 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id DB5E5189FDD0
+	for <lists+kvm@lfdr.de>; Mon,  8 Sep 2025 09:23:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 670D32F067F;
-	Mon,  8 Sep 2025 09:05:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 836782F0C6F;
+	Mon,  8 Sep 2025 09:23:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="WMf7Hi4N"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="Yk24scfG"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.9])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 15A4F2EB5BF
-	for <kvm@vger.kernel.org>; Mon,  8 Sep 2025 09:05:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CEC821C4A13;
+	Mon,  8 Sep 2025 09:23:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.9
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757322357; cv=none; b=oluOgQV8IOwdfKXtJP0xS64kL3pFJ/M2E6LjQMQUO5reXbFylEOzUxpsVxcVyqid9+Lgxe6/Ic21IgJUO22CsrX7t6/kOIUW8MTbggPnkIfCVO1T9pKot5OMcrZ7CndyhLIy61wSZD5EZCkwjtHadxY4G8UzsiL4exh08Kd7WoA=
+	t=1757323384; cv=none; b=Is9LxSOUDFpWCrXI8WyVTY//BUxCr4sQJWiFC+7CwycGLyR/ZVCqVYw2CHqc6KaVx3ijD4DNl/Po3KyvtvAUpMJhLYSXtPNOzh+wLUDLPBJWehftn6AwQlEiyaQCBi3LJ5696d8ZxZ1ldQMLS4KXM8FtHo0p8A8pBvI6Xnne79E=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757322357; c=relaxed/simple;
-	bh=P7ve4bSvP7D//DVLn8z2qtyy/eqBVe8bFLdQw6y81a0=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
-	 MIME-Version:Content-Type; b=iv/o/FovFD5gmBtATqLJPG6uiHhAgViRn7jV9s4OzCI2EU+xrS5AURuZZrZJ20CxMRkZvdP1Ysw0jxrKIKG3JH0cAPn7aMF80FpNNTdPR876SNxOFDaP+x4YZHZ8yPDmXep3qzggTkkUnuZsFWoxPIGd18sYgHPLj+M5jElgOkQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=WMf7Hi4N; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1757322353;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=CCKOAqyJnX/UJPJicswImDhbccEcHQgSYKYFWGw4a9k=;
-	b=WMf7Hi4N8DMy3tXCIIcJ6B0Ks9PB2Nor+jNE5KHSULyRa8A/QiAI+quhvbUG7b0qSzrVEy
-	HTWp0uZrGZmkn/HIugwQHWm6rqz2ccbPE96+yQEYOlaic7LaLEE+FMiGLryRigfNX2AIGS
-	orJEVXNXCXjMPJvXSkZOgRtYaaapjc8=
-Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
- [209.85.221.70]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-622-oqh8QnlfPECfcyk7JGUFgw-1; Mon, 08 Sep 2025 05:05:50 -0400
-X-MC-Unique: oqh8QnlfPECfcyk7JGUFgw-1
-X-Mimecast-MFC-AGG-ID: oqh8QnlfPECfcyk7JGUFgw_1757322349
-Received: by mail-wr1-f70.google.com with SMTP id ffacd0b85a97d-3e2055ce8b7so1485025f8f.0
-        for <kvm@vger.kernel.org>; Mon, 08 Sep 2025 02:05:50 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1757322349; x=1757927149;
-        h=mime-version:message-id:date:references:in-reply-to:subject:cc:to
-         :from:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=CCKOAqyJnX/UJPJicswImDhbccEcHQgSYKYFWGw4a9k=;
-        b=QboaNGEjIm+qXUfZ2mkYaHImDE931SnHJwCrMTi5s/fCkoVXyMNCaCpt1ff0lZrqDX
-         +aIh8/8ihALuHwMYmRcCc5bdIRbXDwKdx69/P348q5FfIyveDZbNmvvIe5gr6r+aRJYn
-         aPUtv83+vFUuP2r0fYDlWlY9BxY/bBrceiVhUn9kTzunyvLxKGYtj2DXaRBlIA2qeHD+
-         J8ZinYdpllJ9T7DrzfvQFTK3kGELAkm5aGzFKjC24X9LueOCm6UW+iijvzxEhspQQsW8
-         dozSQvtpHxrH0ZhF/tOnIuwcus3TM6CA5CAeFJWr0+jOFpXEbtTqM2twIiUyR3GEj5kg
-         c4PA==
-X-Forwarded-Encrypted: i=1; AJvYcCVWXhaz0znEBlIKLpFYEgRdnYgEIT+OZBheZNrW8kGc605cBf2qH7B462adyolX7QjBtrQ=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyD0+pbLQBJcEj0KjsE+zKAIevKc7p+ZeH2YIxuytILq83yFEuh
-	lqqeNqO0yMBf8gBkG6TqpbalJN9xtIbHJaYCSKxYWTUPATEnGAv1kfgMbquKQI9spaM1az+Z3kJ
-	G1C1Qu2NNICRgZ6u35eKrPsHgrImGvU2Ef4mH4MhIVwZ7Q9bi2zvPzQ==
-X-Gm-Gg: ASbGncu7cRaD+dzarshruZXdpkuGd7COLQSeaxvN2Hhn21/amHHIHyCbahtAnFRB70t
-	3dmLb/0c+kVOXG15+TdxNTNxkqc68TX4JniaaiUzJPw3BmyOA4QETP2mJ5NqnZs86zBdM96nM23
-	jAySSPayYuPLIJuYkAdYcay614uxAqx9iFaRSa7vs1C3/lAcEVJusyRYsTu/FOwhV/307i3/PdJ
-	uq220sG9h+SZK+oz5I8TKEJD0pIawXTnd6G4L4ite2eDhvH4+yGaO39votzj5BXTQy2n0JVzbOM
-	ZOsDdIIr7EYAXPhhSQGTzYSLoXirluyOGPM=
-X-Received: by 2002:a05:6000:2909:b0:3e7:44f9:131f with SMTP id ffacd0b85a97d-3e744f91924mr3349909f8f.1.1757322349176;
-        Mon, 08 Sep 2025 02:05:49 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IHAtDjoTu66KftpdkoNBJ3Mi4sooxHp7L/u6879vG7/2W23K/UfayFxyfeL/kY+x1C2acs1Kg==
-X-Received: by 2002:a05:6000:2909:b0:3e7:44f9:131f with SMTP id ffacd0b85a97d-3e744f91924mr3349885f8f.1.1757322348768;
-        Mon, 08 Sep 2025 02:05:48 -0700 (PDT)
-Received: from fedora (g3.ign.cz. [91.219.240.17])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3db9b973869sm22277715f8f.18.2025.09.08.02.05.48
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 08 Sep 2025 02:05:48 -0700 (PDT)
-From: Vitaly Kuznetsov <vkuznets@redhat.com>
-To: Khushit Shah <khushit.shah@nutanix.com>
-Cc: "seanjc@google.com" <seanjc@google.com>, "pbonzini@redhat.com"
- <pbonzini@redhat.com>,"kvm@vger.kernel.org" <kvm@vger.kernel.org>,
- "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, Shaju
- Abraham <shaju.abraham@nutanix.com>
-Subject: Re: [BUG] [KVM/VMX] Level triggered interrupts mishandled on
- Windows w/ nested virt(Credential Guard) when using split irqchip
-In-Reply-To: <7D497EF1-607D-4D37-98E7-DAF95F099342@nutanix.com>
-References: <7D497EF1-607D-4D37-98E7-DAF95F099342@nutanix.com>
-Date: Mon, 08 Sep 2025 12:05:47 +0300
-Message-ID: <87a535fh5g.fsf@redhat.com>
+	s=arc-20240116; t=1757323384; c=relaxed/simple;
+	bh=r6CEOEZhGguz+T46D0YNklZcEc/4ZVQ7i6sW/89ApFg=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=H5dNEWJ5UyyV2KY19DiUtONIPZYOjGRZllw4q3TUeWxSq4P7ZlpQxfuViCxAdi5pyB5g6Q6OHOWgH26l4BzNIoym2f0A0/HNzn6FNvBROPPh7LtqumwO7Pc2tkTKqsm0/nrnYGcq4unKcLsH6N8uSB8egWkGqXzZRymPtfIyXFo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=Yk24scfG; arc=none smtp.client-ip=192.198.163.9
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1757323383; x=1788859383;
+  h=message-id:date:mime-version:subject:to:cc:references:
+   from:in-reply-to:content-transfer-encoding;
+  bh=r6CEOEZhGguz+T46D0YNklZcEc/4ZVQ7i6sW/89ApFg=;
+  b=Yk24scfGXBuiFiNQJayaDKSIY/Fhe6S2NQNHOdl2VBw1KwIjY6XP/DVr
+   a3UbQ0wvX8csKCUdTScnERZ09AnfgvIoyo/pe8DTIstFQNwIoSrcjgeIM
+   tI7m2VGzvu73dSUp94oJhBR85v/jJrdQ5BTcHkxw5QKOQV0n0EKoFBqyW
+   O2Y7uYymk7zbPtetkIJKIaljM38jlqkAoLOGwCDWAuWBK83FgS5jPA5cu
+   8E+QgxbOArqg/4dMNuM6L+fikOLJJGPtKVd5MLhADjuZEYuwp2QiQnaWC
+   jHXg2ipM4VWb+y2Hpg8mQYY7u+z8v2mQ/Kg/z6COmzqZkfelIUmukXNBp
+   g==;
+X-CSE-ConnectionGUID: fHrEZ3z5QHeL75XQ2Y4hlA==
+X-CSE-MsgGUID: jwCNdX/rRxemuhDC+lCm4A==
+X-IronPort-AV: E=McAfee;i="6800,10657,11546"; a="70278518"
+X-IronPort-AV: E=Sophos;i="6.18,248,1751266800"; 
+   d="scan'208";a="70278518"
+Received: from orviesa001.jf.intel.com ([10.64.159.141])
+  by fmvoesa103.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 08 Sep 2025 02:23:02 -0700
+X-CSE-ConnectionGUID: XWxThIliTqeVbgU08JP15A==
+X-CSE-MsgGUID: QWTScLrHQjGPlZSWcE063w==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.18,248,1751266800"; 
+   d="scan'208";a="209904131"
+Received: from unknown (HELO [10.238.0.107]) ([10.238.0.107])
+  by smtpauth.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 08 Sep 2025 02:22:57 -0700
+Message-ID: <0b176a5a-958d-4fb7-b4d3-e8aae2b5cf5c@linux.intel.com>
+Date: Mon, 8 Sep 2025 17:22:54 +0800
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v10 12/21] KVM: selftests: TDX: Use KVM_TDX_CAPABILITIES
+ to validate TDs' attribute configuration
+To: Sagi Shahar <sagis@google.com>
+Cc: linux-kselftest@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
+ Shuah Khan <shuah@kernel.org>, Sean Christopherson <seanjc@google.com>,
+ Ackerley Tng <ackerleytng@google.com>, Ryan Afranji <afranji@google.com>,
+ Andrew Jones <ajones@ventanamicro.com>,
+ Isaku Yamahata <isaku.yamahata@intel.com>,
+ Erdem Aktas <erdemaktas@google.com>,
+ Rick Edgecombe <rick.p.edgecombe@intel.com>,
+ Roger Wang <runanwang@google.com>, Oliver Upton <oliver.upton@linux.dev>,
+ "Pratik R. Sampat" <pratikrajesh.sampat@amd.com>,
+ Reinette Chatre <reinette.chatre@intel.com>, Ira Weiny
+ <ira.weiny@intel.com>, Chao Gao <chao.gao@intel.com>,
+ Chenyi Qiang <chenyi.qiang@intel.com>, linux-kernel@vger.kernel.org,
+ kvm@vger.kernel.org
+References: <20250904065453.639610-1-sagis@google.com>
+ <20250904065453.639610-13-sagis@google.com>
+Content-Language: en-US
+From: Binbin Wu <binbin.wu@linux.intel.com>
+In-Reply-To: <20250904065453.639610-13-sagis@google.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-Khushit Shah <khushit.shah@nutanix.com> writes:
 
-[trimmed 'Cc' list a bit]
 
-> [1.] One line summary:
-> [KVM/VMX] Level triggered interrupts mishandled on Windows w/ nested virt(Credential Guard) when using split irqchip
+On 9/4/2025 2:54 PM, Sagi Shahar wrote:
+> From: Isaku Yamahata <isaku.yamahata@intel.com>
 >
-> [2.]  Problem/Report:
-> When running Windows with Credential Guard enabled and with split-irqchip, level triggered interrupts are not properly forwarded to L2 (Credential Guard) by L1 (Windows), instead L1 EOIs the interrupt. Which leads to extremely slow Windows boot time. This issue is only seen on Intel + split-irqchip. Intel + kernel-irqchip, AMD + (kernel/split)-irqchip works fine. 
+> Make sure that all the attributes enabled by the test are reported as
+> supported by the TDX module.
 >
-> Qemu command used to create the vm:
-> /usr/libexec/qemu-kvm \
->   -machine q35,accel=kvm,smm=on,usb=off,acpi=on,kernel-irqchip=split \
->   -cpu host,+vmx,+invpcid,+ssse3,+aes,+xsave,+xsaveopt,+xgetbv1,+xsaves,+rdtscp,+tsc-deadline \
+> This also exercises the KVM_TDX_CAPABILITIES ioctl.
+>
+> Signed-off-by: Isaku Yamahata <isaku.yamahata@intel.com>
+> Co-developed-by: Sagi Shahar <sagis@google.com>
+> Signed-off-by: Sagi Shahar <sagis@google.com>
+> ---
+>   tools/testing/selftests/kvm/lib/x86/tdx/tdx_util.c | 14 ++++++++++++++
+>   1 file changed, 14 insertions(+)
+>
+> diff --git a/tools/testing/selftests/kvm/lib/x86/tdx/tdx_util.c b/tools/testing/selftests/kvm/lib/x86/tdx/tdx_util.c
+> index aa0cb6c2205b..1b5c01faf1cd 100644
+> --- a/tools/testing/selftests/kvm/lib/x86/tdx/tdx_util.c
+> +++ b/tools/testing/selftests/kvm/lib/x86/tdx/tdx_util.c
+> @@ -234,6 +234,18 @@ static void vm_tdx_filter_cpuid(struct kvm_vm *vm,
+>   	free(tdx_cap);
+>   }
+>   
+> +static void tdx_check_attributes(struct kvm_vm *vm, uint64_t attributes)
+> +{
+> +	struct kvm_tdx_capabilities *tdx_cap;
+> +
+> +	tdx_cap = tdx_read_capabilities(vm);
+> +
+> +	/* Make sure all the attributes are reported as supported by the TDX module */
 
-Is there a specific reason to not enable any Hyper-V enlightenments for
-your guest? For nested cases, features like Enightended VMCS
-('hv-evmcs'), 'hv-vapic', 'hv-apicv', ... can change Windows's behavior
-a lot. I'd even suggest you start with 'hv-passthrough' to see if the
-slowness goes away and if yes, then try to find the required set of
-options you can use in your setup.
+I think "by the TDX module" can be dropped, since KVM only reports the
+attributes it supports.
 
->   -m 20G -smp 1 \
-
-Single CPU Windows guests are always very slow, doubly so when running
-nested.
-
-...
-
--- 
-Vitaly
+> +	TEST_ASSERT_EQ(attributes & tdx_cap->supported_attrs, attributes);
+> +
+> +	free(tdx_cap);
+> +}
+> +
+>   void vm_tdx_init_vm(struct kvm_vm *vm, uint64_t attributes)
+>   {
+>   	struct kvm_tdx_init_vm *init_vm;
+> @@ -253,6 +265,8 @@ void vm_tdx_init_vm(struct kvm_vm *vm, uint64_t attributes)
+>   	memcpy(&init_vm->cpuid, cpuid, kvm_cpuid2_size(cpuid->nent));
+>   	free(cpuid);
+>   
+> +	tdx_check_attributes(vm, attributes);
+> +
+>   	init_vm->attributes = attributes;
+>   
+>   	vm_tdx_vm_ioctl(vm, KVM_TDX_INIT_VM, 0, init_vm);
 
 
