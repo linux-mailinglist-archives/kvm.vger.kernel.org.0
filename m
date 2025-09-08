@@ -1,136 +1,108 @@
-Return-Path: <kvm+bounces-56996-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-56997-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 26136B49838
-	for <lists+kvm@lfdr.de>; Mon,  8 Sep 2025 20:24:14 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3A3CEB4983A
+	for <lists+kvm@lfdr.de>; Mon,  8 Sep 2025 20:24:48 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id CAB9E443494
-	for <lists+kvm@lfdr.de>; Mon,  8 Sep 2025 18:24:04 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 8543D7AFCE2
+	for <lists+kvm@lfdr.de>; Mon,  8 Sep 2025 18:22:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B863431C572;
-	Mon,  8 Sep 2025 18:23:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 05A5131B83D;
+	Mon,  8 Sep 2025 18:23:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="hr0MirQC"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="jLts+UE6"
 X-Original-To: kvm@vger.kernel.org
-Received: from out-172.mta0.migadu.com (out-172.mta0.migadu.com [91.218.175.172])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pj1-f73.google.com (mail-pj1-f73.google.com [209.85.216.73])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4788231B132
-	for <kvm@vger.kernel.org>; Mon,  8 Sep 2025 18:23:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.172
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DAEAD31B100
+	for <kvm@vger.kernel.org>; Mon,  8 Sep 2025 18:23:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.73
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757355821; cv=none; b=ZuhHIQ5DIrfp6yCCsG6QjCWh0/MUlM6r196vCJTJ+G2nKh3jghAM8VNcDSRs/nxofUPAyR/FpQndOF2ta9+dYbddpEtAOYpE3vjS9ds15SiHxIl/ncigdBInia7YOyd3iq9IF0LuDjG+fhf2gG+W+Of3+nDiuUKPONnK211Q0wU=
+	t=1757355833; cv=none; b=kBymcd2TqG5xKHeDTyHQQzXoIl53f6d4g9PvDs9T0M8JJxlFgyofRBxcf+9Rp8AVcyi3Ycd72I3XcdNf0SpLH+9TgYssAfKCdt3csceGBBr1H2wtzP6PwbxCgV2a4BZ2h3TyxXsSFTpTQFM1t9SFHw9ZIkkkyA1NVdsVLEXy0SQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757355821; c=relaxed/simple;
-	bh=q7+rI0XYfEZFNUn67PEP3XYfpe5ZJvpIL7VRrj0roKk=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=JgnOYUgxj8SPBimAzwYxSBSINAOFLO4o0rFxslghjG68/uFOhgFjSeFnbsgk2J08Q0fm5XsXnprBRki6vg2We8Zz/6ViqprKnAnuaI3NxGsK9tDeYiG1aFADDusHwa8Nf8e1MiO1cV+90HXIvjkYr3KA4JAPBQDd0nxN3Zg8f6A=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=hr0MirQC; arc=none smtp.client-ip=91.218.175.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Date: Mon, 8 Sep 2025 13:23:35 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1757355818;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=wfvbyRUrus9DdcW9zzI7on+fJXo5hCh3vG+emK2AfHg=;
-	b=hr0MirQCQnOn5qgB12A20Crtc/ogkmtkyeS6UzFumatxvYvHFDpT/b/4H2BTtwjguNtujd
-	GbhgrR09+x6HdohMi6e4Nr4/TLPzR9gNJOl5O8BxnVyg2q4lnxNWyjCPc0QkwTC7ukR6Yl
-	LW7UOuyJ3BFDBcaDtuFsO3v7Fl/dfjU=
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Andrew Jones <andrew.jones@linux.dev>
-To: Nicholas Piggin <npiggin@gmail.com>
-Cc: kvm@vger.kernel.org, Shaoqin Huang <shahuang@redhat.com>, 
-	Alexandru Elisei <alexandru.elisei@arm.com>, Claudio Imbrenda <imbrenda@linux.ibm.com>, 
-	Thomas Huth <thuth@redhat.com>, Sean Christopherson <seanjc@google.com>, 
-	kvm-riscv@lists.infradead.org, Joel Stanley <joel@jms.id.au>
-Subject: Re: [PATCH 2/2] shellcheck: suppress SC2327,2328 false positives
-Message-ID: <20250908-d271d19e8179dae99c23143f@orel>
-References: <20250908010618.440178-1-npiggin@gmail.com>
- <20250908010618.440178-2-npiggin@gmail.com>
+	s=arc-20240116; t=1757355833; c=relaxed/simple;
+	bh=Plw9JR/aMqfPdB27PDwUiGPqBgnuI2/PGE1uxMuCVwM=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=p021XSIwxoYXBSmMc+T32ey9/YSQcEhRFFUqghW0hUoiojm29Sx8WN5TbsYuK4PEGAMD8uu/zrn3YtDlTcboQ0d6vK8dxjDaqz933M0HQtvii77sQY8RBzn8M8coWuOKF4k1DoD+J85dgPyKB9A13iVm8tRZsMKpqSw9wk/OM9w=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=jLts+UE6; arc=none smtp.client-ip=209.85.216.73
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+Received: by mail-pj1-f73.google.com with SMTP id 98e67ed59e1d1-329b750757aso4299633a91.1
+        for <kvm@vger.kernel.org>; Mon, 08 Sep 2025 11:23:51 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1757355831; x=1757960631; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=1nSQsxLZOUXb7Htk3aEKe3ifM6QfGlXxpSgXrbf3nV4=;
+        b=jLts+UE6wUAUSXj6FIHzwd81OI5W41rTTiDnkiGbbg6gUbPVYMeeVaRAYjRaSndsdu
+         OcVp4NMs9SP222OnFkdYChEVh4xLWg9jX3sZeT0kaVez9l+yp6OhZjvTFRxbFeAyVfwl
+         8ENqX7go0qWutV9fSLAfu26L5C4/2EQD3414Xk7/ThY4ECVqPTAVr20SyVBJV+WEriLv
+         TP61+VRSfao6UY/RZW5GL9AiJVbRUIYUp+deK+0WJSXf1uvwyR4cP36O99Tx2dIRxOG2
+         MHEEydn4wyOqocoZlVL4UA26MQa2SrMOmN3qp0aClnkS1zcZSqXrFe4ntP7P2KIs18mK
+         Q4DA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1757355831; x=1757960631;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=1nSQsxLZOUXb7Htk3aEKe3ifM6QfGlXxpSgXrbf3nV4=;
+        b=hhlh2LcMM8dTm5thcCN0fcJWzj7zl64qnMqQhOKc+Br4w1w8uJyTYn5rOUt57KDhOp
+         Rn735n6I0aMlYdFlb/omTlgAijVhNQOVnJatmOjxw/0OitD2LqmSQHwkkfEDqA/qLgVb
+         U1YqQPLsGy7WGp8zLI5UB6yBYsW65uH6Ndn1K5rfWiZ8UaWje8wCY8wVQ6aX81ZnBCHR
+         ZkANyAZ5H7aPGOvvGSNpAh2LA4JuyTkAoiGIl4P2on33TIwMDsNockKAl6otnSqxq8BN
+         O4YnbTUSpGB7KoPIHNbaAfEQHorHWJJ91Na5TN5MU94r4HDBZFQKVqtbmVnutLI3S1pg
+         +B8w==
+X-Forwarded-Encrypted: i=1; AJvYcCXUzBcgRWpneUtK3uFaBBAJaTAXfm6ikK6v10/Yq6T2LAc6Y2wB7JAMksDt65YHWVX4Dw0=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwMmpbqsguO4nQ4LZH7M6Cv2XeFxe54nSQKMxJi4hWM47qzYhUP
+	Yniqxb52//6XchW32Y6FJYuTzNA64Ix4j6GhupiqZ6o/ua4JQCtv5Rb2NDf4RUfCb68E8le2wIu
+	iZAFhYg==
+X-Google-Smtp-Source: AGHT+IF78R1uV7x1ogjmInLr/cHkHlP92Oatdcz/yCLS1lFHwz0g8eoZ45c4cQIVzgzl4K7+nwozoFhZcTk=
+X-Received: from pjbtd12.prod.google.com ([2002:a17:90b:544c:b0:329:7289:8bdb])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:4fcb:b0:32b:b8d2:29e0
+ with SMTP id 98e67ed59e1d1-32d43f82685mr10534524a91.29.1757355831249; Mon, 08
+ Sep 2025 11:23:51 -0700 (PDT)
+Date: Mon, 8 Sep 2025 11:23:49 -0700
+In-Reply-To: <d378c6b6-68ba-49c0-b480-5d3dec9dc902@maciej.szmigiero.name>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250908010618.440178-2-npiggin@gmail.com>
-X-Migadu-Flow: FLOW_OUT
+Mime-Version: 1.0
+References: <cover.1756139678.git.maciej.szmigiero@oracle.com> <d378c6b6-68ba-49c0-b480-5d3dec9dc902@maciej.szmigiero.name>
+Message-ID: <aL8fNdpoEuSERs-G@google.com>
+Subject: Re: [PATCH v2 0/2] KVM: SVM: Fix missing LAPIC TPR sync into
+ VMCB::V_TPR with AVIC on
+From: Sean Christopherson <seanjc@google.com>
+To: "Maciej S. Szmigiero" <mail@maciej.szmigiero.name>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, Maxim Levitsky <mlevitsk@redhat.com>, 
+	Suravee Suthikulpanit <Suravee.Suthikulpanit@amd.com>, Naveen N Rao <naveen@kernel.org>, 
+	Alejandro Jimenez <alejandro.j.jimenez@oracle.com>, kvm@vger.kernel.org, 
+	linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="us-ascii"
 
-On Mon, Sep 08, 2025 at 11:06:18AM +1000, Nicholas Piggin wrote:
-> Shellcheck warnings SC2327,SC2328 complain that a command substitution
-> will be empty if the output is redirected, which is a valid warning but
-> shellcheck is not smart enough to see when output is redirected into a
-> command that outputs what the command substitution wanted.
+On Mon, Sep 08, 2025, Maciej S. Szmigiero wrote:
+> On 25.08.2025 18:44, Maciej S. Szmigiero wrote:
+> > From: "Maciej S. Szmigiero" <maciej.szmigiero@oracle.com>
+> > 
+> > This is an updated v2 patch series of the v1 series located at:
+> > https://lore.kernel.org/kvm/cover.1755609446.git.maciej.szmigiero@oracle.com/
+> > 
+> > 
+> > Changes from v1:
+> > Fix this issue by doing unconditional LAPIC -> V_TPR sync at each VMRUN
+> > rather than by just patching the KVM_SET_LAPIC ioctl() code path
+> > (and similar ones).
+> > 
+> > 
+> Any further comments there?
 > 
-> Add comments and shellcheck directives to these cases.
-> 
-> Signed-off-by: Nicholas Piggin <npiggin@gmail.com>
-> ---
->  scripts/arch-run.bash | 9 +++++++++
->  scripts/runtime.bash  | 6 ++++++
->  2 files changed, 15 insertions(+)
-> 
-> diff --git a/scripts/arch-run.bash b/scripts/arch-run.bash
-> index 58e4f93f..9c089f88 100644
-> --- a/scripts/arch-run.bash
-> +++ b/scripts/arch-run.bash
-> @@ -9,6 +9,11 @@ run_test ()
->  
->  	# stdout to {stdout}, stderr to $errors and stderr
->  	exec {stdout}>&1
-> +	# SC complains that redirection without tee takes output way from
+> The fix itself is trivial, would be nice to have it merged even
+> if the reproducer/selftest is still under discussion.
 
-s/way/away/
-
-Same comment for the other uses below.
-
-> +	# command substitution, but that is what we want here (stderr output
-> +	# does go to command substitution because tee is used, but stdout does
-> +	# not).
-> +	# shellcheck disable=SC2327,SC2328
->  	errors=$("${@}" $INITRD </dev/null 2> >(tee /dev/stderr) > /dev/fd/$stdout)
->  	ret=$?
->  	exec {stdout}>&-
-> @@ -23,6 +28,10 @@ run_test_status ()
->  	local stdout ret
->  
->  	exec {stdout}>&1
-> +	# SC complains that redirection without tee takes output way from
-> +	# command substitution, but that is what we want here (tee is used
-> +	# inside the parenthesis).
-> +	# shellcheck disable=SC2327,SC2328
->  	lines=$(run_test "$@" > >(tee /dev/fd/$stdout))
->  	ret=$?
->  	exec {stdout}>&-
-> diff --git a/scripts/runtime.bash b/scripts/runtime.bash
-> index 289e52bb..12ac0f38 100644
-> --- a/scripts/runtime.bash
-> +++ b/scripts/runtime.bash
-> @@ -190,6 +190,12 @@ function run()
->      # qemu_params/extra_params in the config file may contain backticks that
->      # need to be expanded, so use eval to start qemu.  Use "> >(foo)" instead of
->      # a pipe to preserve the exit status.
-> +    #
-> +    # SC complains that redirection without tee takes output way from command
-> +    # substitution, but that is what we want here (tee is used inside the
-> +    # parenthesis and output piped to extract_summary which is captured by
-> +    # command substitution).
-> +    # shellcheck disable=SC2327,SC2328
->      summary=$(eval "$cmdline" 2> >(RUNTIME_log_stderr $testname) \
->                               > >(tee >(RUNTIME_log_stdout $testname $kernel) | extract_summary))
->      ret=$?
-> -- 
-> 2.51.0
-
-Changed way to away while merging.
-
-Thanks,
-drew
+I'll get the fix queued for 6.17 this, I didn't get much of anything done last
+week due to KVM Forum.
 
