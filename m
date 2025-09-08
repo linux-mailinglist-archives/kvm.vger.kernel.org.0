@@ -1,240 +1,231 @@
-Return-Path: <kvm+bounces-56981-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-56982-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id B87BBB491DC
-	for <lists+kvm@lfdr.de>; Mon,  8 Sep 2025 16:41:40 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id E6D64B49223
+	for <lists+kvm@lfdr.de>; Mon,  8 Sep 2025 16:55:51 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 9D65B18977E6
-	for <lists+kvm@lfdr.de>; Mon,  8 Sep 2025 14:42:01 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id ED9BE3AE268
+	for <lists+kvm@lfdr.de>; Mon,  8 Sep 2025 14:55:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5946822A4EB;
-	Mon,  8 Sep 2025 14:41:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0FACD30BB86;
+	Mon,  8 Sep 2025 14:55:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="o2xftqg9"
+	dkim=pass (2048-bit key) header.d=bytedance.com header.i=@bytedance.com header.b="WrFz8aU8"
 X-Original-To: kvm@vger.kernel.org
-Received: from NAM02-DM3-obe.outbound.protection.outlook.com (mail-dm3nam02on2056.outbound.protection.outlook.com [40.107.95.56])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pj1-f46.google.com (mail-pj1-f46.google.com [209.85.216.46])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CA0E31C7013;
-	Mon,  8 Sep 2025 14:41:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.95.56
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757342491; cv=fail; b=ZMRhY2C1Lo+FiIcSsZSRSaA1CIneGPJKO13myfUATfjryxaW9uTZeKlf2O91aZohUeFjCe7IW6SBPjAXJQMBXAyoDNvETuwaZQU1ZFmH2EEcuRuF0Neps/egnMeo9dFs4FdpGa9jkph3f+kykFL7qwXp0jwCh5PqQbxWIR26gTI=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757342491; c=relaxed/simple;
-	bh=Gedjl2ie5Z3jDa8Jct5ns5wOAugxNnCZnvE/KaBWZjQ=;
-	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
-	 Content-Type:MIME-Version; b=CxF0Y+PqBhadWPyZf6LRnEqgw5tsyua+n5UnRSRpW7QRsPPso8bkDTmh8gCoUKk8Eg2M825yWAWB1kK43Tm+QobG1l3u5Zd2uk+OePnpzwSdnD0BssNaRJ2025Tkmh0bQVROYhxIFEeAGlo4stjEEJgrfcZ/KButKqQkww+XwXY=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=o2xftqg9; arc=fail smtp.client-ip=40.107.95.56
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=NfHcgezXGLB2G+G14UEfSguUxNziQRBe46tNPKcWfXgsj4OTkTBc8Plr71JfXrEaN6wS6SJ5SZeJtgkKIZiU0FC/cSV/cFMvuMS5nhaIK+6Rzi1eg126n+6m7WhY1soZGDeTPbXCqKnN39AZ+u1qRd1STCkKoPFtOv0DAlMU4YeGEjxxsTpAAEC7Olq1XJpXO/bxntk/3ZWq/3fqwobhEFoqG9d+52dD633etzgW6Z/TEmUsUnzQ73y1krjHpmc2DF1FJW5l5aHe9FHWYJfTMsQYa5BZuukZ+QglCOPt5efVe2kjRHG61zHXaHXPZ8F31uui2vNyOFbCBDVtC60FmQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=iZByfrrxLzdBnMAULlt6XtlTrUZllTd8j41qDc8Isxc=;
- b=gLgY+0f545zyr8Sii1stJpuD6i4VG0yNZaTgcKLGQiA/+EjJL+g/+Qo32Aa7FM5Tux2VTqvQXTkAyTu7o0JhWyZzmMFlPqT+voTJGBk8lJivalKOQ8LS3/a8KRaqgTH1a59VujO1cyfCt6SuX9f4mdooypmPR61P3leYyx0NYzfokxTKR+CsJi+3E7TFcfDRDvK6kt+2ByZuOv98s+TnCoST/lCMQU3JForKw2p7GgQbmDopHi94x0Algt25GAtgUs3W7o8+D+XZQj35ziSEIAa4aIttd3YvYx3UHfgxKz8a6Uk2KX4Fdo1XlcMJVk5D5KUs5u3KsrmkNUdi56kqMw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
- header.d=amd.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=iZByfrrxLzdBnMAULlt6XtlTrUZllTd8j41qDc8Isxc=;
- b=o2xftqg9ASGtCiIBacLny7IpdLxAnczWPORGdbNZi4ZmxwGAR5e3dR+oVdlPk8S/47MtI8/BtGhn5A8LziPn11xMs4tJPzBA3Ah+xSsCeeWtSEhll+NHV86b0YDGJKzfoEeGLhFANrHXYNSlBD8FjfRCr+PioFnOfV3mpwE5R84=
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=amd.com;
-Received: from IA0PPF9A76BB3A6.namprd12.prod.outlook.com
- (2603:10b6:20f:fc04::bdc) by PH0PR12MB7862.namprd12.prod.outlook.com
- (2603:10b6:510:26d::9) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9094.22; Mon, 8 Sep
- 2025 14:41:25 +0000
-Received: from IA0PPF9A76BB3A6.namprd12.prod.outlook.com
- ([fe80::bed0:97a3:545d:af16]) by IA0PPF9A76BB3A6.namprd12.prod.outlook.com
- ([fe80::bed0:97a3:545d:af16%7]) with mapi id 15.20.9094.021; Mon, 8 Sep 2025
- 14:41:25 +0000
-Message-ID: <d3e4ddd7-2ca2-4601-8191-53e00632bf93@amd.com>
-Date: Mon, 8 Sep 2025 09:41:22 -0500
-User-Agent: Mozilla Thunderbird
-Reply-To: babu.moger@amd.com
-Subject: Re: [PATCH v18 05/33] x86/cpufeatures: Add support for Assignable
- Bandwidth Monitoring Counters (ABMC)
-To: Reinette Chatre <reinette.chatre@intel.com>, corbet@lwn.net,
- tony.luck@intel.com, Dave.Martin@arm.com, james.morse@arm.com,
- tglx@linutronix.de, mingo@redhat.com, bp@alien8.de,
- dave.hansen@linux.intel.com
-Cc: x86@kernel.org, hpa@zytor.com, kas@kernel.org,
- rick.p.edgecombe@intel.com, akpm@linux-foundation.org, paulmck@kernel.org,
- frederic@kernel.org, pmladek@suse.com, rostedt@goodmis.org, kees@kernel.org,
- arnd@arndb.de, fvdl@google.com, seanjc@google.com, thomas.lendacky@amd.com,
- pawan.kumar.gupta@linux.intel.com, perry.yuan@amd.com,
- manali.shukla@amd.com, sohil.mehta@intel.com, xin@zytor.com,
- Neeraj.Upadhyay@amd.com, peterz@infradead.org, tiala@microsoft.com,
- mario.limonciello@amd.com, dapeng1.mi@linux.intel.com, michael.roth@amd.com,
- chang.seok.bae@intel.com, linux-doc@vger.kernel.org,
- linux-kernel@vger.kernel.org, linux-coco@lists.linux.dev,
- kvm@vger.kernel.org, peternewman@google.com, eranian@google.com,
- gautham.shenoy@amd.com
-References: <cover.1757108044.git.babu.moger@amd.com>
- <08c0ad5eb21ab2b9a4378f43e59a095572e468d0.1757108044.git.babu.moger@amd.com>
- <fb2d5df6-543f-43da-a86a-05ecf75be46d@intel.com>
-Content-Language: en-US
-From: "Moger, Babu" <babu.moger@amd.com>
-In-Reply-To: <fb2d5df6-543f-43da-a86a-05ecf75be46d@intel.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-X-ClientProxiedBy: SA1PR04CA0016.namprd04.prod.outlook.com
- (2603:10b6:806:2ce::21) To IA0PPF9A76BB3A6.namprd12.prod.outlook.com
- (2603:10b6:20f:fc04::bdc)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 436752F5474
+	for <kvm@vger.kernel.org>; Mon,  8 Sep 2025 14:55:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.46
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1757343323; cv=none; b=dmg5HMRiuWfVbSt2Nk+XisZT3PwrU8x0CLUtiX6AxFopoJ4GkPXsWwqM1OR15OWb+XxB8NTMaX7h0bmS/w6z0p50sBSp7YRQ68/Z46kPS8kXy0OGEg1n3PTP4+rZwgFqO9LuLHVesGMbIjYw063Z14x/cwHUBq2FHiZCsUHPoDE=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1757343323; c=relaxed/simple;
+	bh=Ee3FEGF3xAzaNWyedS6bEV11L5ZuNpo5FfZvcXJOKIQ=;
+	h=Message-ID:Date:MIME-Version:Subject:From:To:Cc:References:
+	 In-Reply-To:Content-Type; b=FUofdX/984Lmti4ojDoxqojcCtuYh+ngQIyV8Zk6T7fk1UiT83oJPh74JOT9fhIm8mtHokvxaxWZ6LmwC8OvdjEF1lnEhZ+aKkrWYt2XUDhsA4SNCcxb9JszGQpEPgSZEJBwqGBWuKNKDW0Vct9oD/SSVQk5sBcQtxEmaWydDIo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=bytedance.com; spf=pass smtp.mailfrom=bytedance.com; dkim=pass (2048-bit key) header.d=bytedance.com header.i=@bytedance.com header.b=WrFz8aU8; arc=none smtp.client-ip=209.85.216.46
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=bytedance.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bytedance.com
+Received: by mail-pj1-f46.google.com with SMTP id 98e67ed59e1d1-32b70820360so3454408a91.2
+        for <kvm@vger.kernel.org>; Mon, 08 Sep 2025 07:55:20 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=bytedance.com; s=google; t=1757343320; x=1757948120; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:content-language:references
+         :cc:to:from:subject:user-agent:mime-version:date:message-id:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=VWM7u6gzgr9T/MqWNSjboANbXNdcmY+DYtZN3CoqJLg=;
+        b=WrFz8aU8p7aB1ILxDWI832H5VvrsRdjoiaPxI1Myvd/5fDN0aXYJLu52zkjUg0rJOT
+         Md9oyxrt4MO5Dgla+NaN1did9fnTXMeebdHzKIpRDYcPx+QXlgM7JHH/BLV1esb2DMNh
+         GiMlOrw0BS/dWnq9hHt/I89LlGUJHpsShqwswRjFOfupir+OR1qMDfIZK4umAS3MR4/m
+         LtmQy+fnuQ6nMCM261lYz48JLiNKmxSEi0yipkurgIDDZYAVV1sRdFRtOpSbCq0t0CXN
+         NrIlK0DgarI/JwxeQVOufonJNzFcw3CnzZmiQvFrMomnzEc7EI1s4SSlhaQz5DPXMl0A
+         0XPw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1757343320; x=1757948120;
+        h=content-transfer-encoding:in-reply-to:content-language:references
+         :cc:to:from:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=VWM7u6gzgr9T/MqWNSjboANbXNdcmY+DYtZN3CoqJLg=;
+        b=frEZztwscSEr8kgnGbdRTHSx6yfqm4+j2M0KTgTL9GOOt7dRjyCKT9Yk1btXe+8NF0
+         EzkQEODge03QEdMQpj3n1G/8fxEgZQ3r9FZqtn2aJ890Sz2DXsz9WqiUCHhyIIq+VOqI
+         c6sWTEcDSmB1V1oMGLAlXWXsyaTM/Qok9GSrFafFkJlxXN0g2P4CEvXkFQ+wtwMhEqjX
+         si4It1qEI1Q5OHlkOOQm8wW7KlAj3OLlgQTd7oX+eFGVLXKpp0cXLD+Ji/9RtX1PPqKJ
+         RlonQcuIBdGFY989L3dxMXWROaqwplUc6C4oeUkPJRIoTaqMNoojDeOKoLXMCUNYqfAj
+         ByYA==
+X-Forwarded-Encrypted: i=1; AJvYcCUIjso6fnUAPSDuNZBgejy93SjznRFbA3SWWSCC/Vb4yyE0b64KB4UZOPnbwwNG4UY/+Ls=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyimNhuswz1biogGaHbb8UbJZVfPMkCpMhDJywPhHOpI/XvSKnq
+	GAqAQUBA//jRrD8rO9lTtSvJrEe5TvhXX7NMc++OuKkHO4T7K1ENxWZih23W377oXZc=
+X-Gm-Gg: ASbGncvG2viTzYX3fABZeRpT4Z2UP1+N1N4jJhDMjNcA58X7Z34VEq1qmXkq+Dzyqet
+	4DlUo29QvyowGYPooFKr7SaD9ERxLmvOzPxXmK3yZ6vO4R5/Y+EdRgIQE9IKWbR26R1l47t+a7E
+	wQ0Wbn0y51RjqvCcL55O0pVKp7Li30/7/dxC/DP+qpCTVA1hIshEZ9KecnEftgRXOZMuwzopbUN
+	Uh9qp3ZTuuuUSlZAGyM7VOIaGhJh/ijd8B4czJeaeGpOnNSe79QJ20OS97vYU2V7QSckzCuW8Li
+	8qBW+OZJmGo3k7PkrHQWkl0VdeW+FAePEQSx6sun/UmyrVFhXr4j1lfkdt25cLNHtbmJSR0XZjD
+	z2B+nIgoy8uzxqsF2C/ycT43Cm/16MI8yaNPB72X0KfCJNYN5zsu8k+LyC1frrGo=
+X-Google-Smtp-Source: AGHT+IHQQxVqMdGburuSqybk1K9hiDqhGVVKjqoe0QgNVws6jTvHrNuDup3Nz5V5FroJtX3PJ2Ck5A==
+X-Received: by 2002:a17:90b:530b:b0:31f:ca:63cd with SMTP id 98e67ed59e1d1-32d43ef0790mr9924165a91.2.1757343320170;
+        Mon, 08 Sep 2025 07:55:20 -0700 (PDT)
+Received: from [10.4.109.2] ([139.177.225.231])
+        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-32d7d4074b4sm3854864a91.4.2025.09.08.07.55.15
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 08 Sep 2025 07:55:19 -0700 (PDT)
+Message-ID: <c2979c40-0cf9-4238-9fb5-5cef6dd9f411@bytedance.com>
+Date: Mon, 8 Sep 2025 22:55:07 +0800
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: IA0PPF9A76BB3A6:EE_|PH0PR12MB7862:EE_
-X-MS-Office365-Filtering-Correlation-Id: ad6f2e3f-42c3-4938-8b57-08ddeee5c990
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|1800799024|366016|376014|7416014|7053199007|13003099007;
-X-Microsoft-Antispam-Message-Info:
-	=?utf-8?B?TUdra1FVWDY1SWU2Ty9nOERtOXRoNjZPbzRsVXdzVnFyRjR5eEhmRUk5T0lo?=
- =?utf-8?B?cmFVYVdPWHhraW1hVUQwUFgxeFdGc2QvZU9wdU5XeStIZEh2cjZzRktzek5x?=
- =?utf-8?B?Qy95WlhuNFJRNFF6MEgxVnNtbExITksraHNrOGJsendDZnVYaWVraVRqcjQ4?=
- =?utf-8?B?RllyNzdaeXhvbjd6SU5uNE00Q0NFWTdRVmtLa3ZDOUR0YkFnbURSUW03YytQ?=
- =?utf-8?B?bmxiVHkvb3NVa2h1SCt3VW4vZVViSW1oeSs5MGV3dG5Eb1lPOWU0aCtuaWFk?=
- =?utf-8?B?UnBHdUhVSWplSjZqUitZdFE3anVyNWREK3hqaFcweitVWjFZWVUwektsTTBZ?=
- =?utf-8?B?UEZlV3psVm5sTmM3Q3oxY0Z5UnZueml1YkNEU0FTSmt5bGRpd3VNVzc2cEFm?=
- =?utf-8?B?RXI4TEo5R3hNeUZRRWpQaWpKNThmMjdhVzBDd0xaWjFrdEJYa1R5eUVLdUY0?=
- =?utf-8?B?ZTlNemtRVE9GQzE0S3YrbzF3YmYzSjJlam43MjNPUkpEc0xNdExkUkFGTG1u?=
- =?utf-8?B?eGxia1FrcWtKcGFYVHVBQzJzdU1tNytmVm1pVzFYODczOGozemR4Mm5DR3o5?=
- =?utf-8?B?NmRuWm5oTm5PS2dkQzc1Q3JINVFiUVZIMWRwK0lJbzZBamw4cndMeUI1L096?=
- =?utf-8?B?dzFnZGdwQlJGOFhEbEkxUWloVjl1K3V5dVpYNGE1eVd3cHlOOWVNYWVvVllV?=
- =?utf-8?B?cHFYL0ZNK0RQUXd3ZGs4V3g4T296N0E5bXlTT0FrMkRmTk5jc3Y4a1RyTWk1?=
- =?utf-8?B?V0t4SVdidTRTRUVxQkNhN1k4U2pVV1NWNXVNeUFhMUZMa3Ftc0kvQ0srNEJq?=
- =?utf-8?B?UStQcmxXdU1Cb1RxTThPdW5MR3dUV1VpUXgwck81dTgxK0h0OVQ4MWQ0aDB2?=
- =?utf-8?B?MlFwcnJaSXdmS3hXLzB2MHpvSWZPdG1DdjRyZk54YWRPR1dwVnBhRjlkM2Nx?=
- =?utf-8?B?dWNGdTAxOGQwaDAxWTNuVlhVNUM0UjJLMUFWcFZNb0tGMFhMaVMyRXdjR0k4?=
- =?utf-8?B?UllnSWZiMk1ndmtvbVozQ3h3MG5MYzVGN1EyNHJvelpGNkRGY1dzTDVQa0d1?=
- =?utf-8?B?ZE5FZndKODY1V29jUnUxVnFpbWNDWFpLeGtRSEY1dGQ5aUd0Q3A5WEJkZDFw?=
- =?utf-8?B?UlpNd1dhSVVFWWREU2ZWWXBDNklZa1lVMDJ6Q2xYZHRyTk5kZk9VbXp0cktU?=
- =?utf-8?B?YkF2UVk2RklQZ1NRd3BVTHpaLzRPTUtTVnphL0ExZHBOYm1IbE8vSW1ndGtp?=
- =?utf-8?B?VThWN25yMHVsam43ZzlLd1VVdmlKZmJ4RkFDS09CQ1p5WDhKa0hIU2swV3hx?=
- =?utf-8?B?MitWZElKZmJPQ2p5SE4yRkVlMGJtRHlxYy9seXJ0ei8wcWNpMkVNVXZORzhF?=
- =?utf-8?B?akpyVHFDSEMrcmVxQnhLbFArRFhMOXp1RkZZZEc2c3ltaHUrbC9MSjFrNC95?=
- =?utf-8?B?Vmt0SHFaU0p5QXhzaGxRMDhRYzdVQ3lsMnFSU3Byc1R4WTQ3SlVIZklWbGFS?=
- =?utf-8?B?K1JKYUNTR0lwQ3IzK1BPWEVPemhhQVdEWmZ4WitsYWJ4cTZWS0xJV0xlZmph?=
- =?utf-8?B?UmxJQTY3U0tVNHhkTEswQTlweThzOXZsdjJ3Q0x3a0QxMUlXaVNuaktOM1dp?=
- =?utf-8?B?L3c1Qm14K1ovTDhjdTJ3dzMvSUZJVFZqd2hOdzFSeGsxWU1Jb2RkYkx6OW53?=
- =?utf-8?B?Um9ESGRYMXVjN1ZmcXQ1R0FYaGo2M3hodU00ZmhhQXFSL2lJSHNYNEpqUnl0?=
- =?utf-8?B?Y0x5OE9ESnpEaWdxUUFDVGFHa3l4WUdxWVYzZHVLOEhlQWMyQ3hYbE9BR29F?=
- =?utf-8?B?aDdrK09rMytaMmREbStvWWRtd0VubmN0QnpMMlMrRUZXbG9neFNJdnBrOHA5?=
- =?utf-8?Q?3nOdkzzVF2fmt?=
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:IA0PPF9A76BB3A6.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(366016)(376014)(7416014)(7053199007)(13003099007);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?utf-8?B?b29FTE1YbVR2TFB3cU95VENMTng1Yk5BVGNyTEozeTEwUnpobmdhaU0rcFNz?=
- =?utf-8?B?MXhLNjRmSHdBWGFJNU5QZzNOV3VDaGlpY1dCZ1U3aUJoRG1YUjRGdTZSZHEv?=
- =?utf-8?B?WTRmVTYvOU4xWm9xMnd6bVlVNFhYZnkyQkVEMkZhT2dvem80akRiZWkxRGNC?=
- =?utf-8?B?M3k5Ry85Yzh1WnEvWmx0MHE2QWY2aGRqaHhMU1pzUk5ma0ZmRFhDeVcxVGkz?=
- =?utf-8?B?dFdrVnlLNVZuZHdRN05nUEFSaUJ6dDhIYzZEaUJYNHNrYjFVSmZXYksxM2c4?=
- =?utf-8?B?NHF6cVJ2cHJoTjU0aEVBS2JzTm02UXl2STVzN2hiWWZqRUYxMnRQanJLNkZm?=
- =?utf-8?B?RW0vdGFMc09xY0JpUURxUjhNd2tOemlxb1JyR0dIN3NESS9Gd0ErMGpjL3Zn?=
- =?utf-8?B?d2pHMWp3blQ5UDZhNFVDeGpsTU1TbkJPTndQQzJYdFhvVU9SNzU4ZmsvSkFO?=
- =?utf-8?B?OXppVjg4alB1L2o2SlJHZk1JWnI1KzFTSG10OXVlUThqeGU2aithcTFPZVo0?=
- =?utf-8?B?OENwM1V5Uk5xeFpVenJYMTFkMG4vOHlUZjBYeFoyeFFQNHZnd0lGcnljZ21p?=
- =?utf-8?B?TmoyaTVKbWhVTUpUekdWNWo0ZUY4Y1ZkRGRzWDFpRnMwK0hYcVVYNWFhVjEv?=
- =?utf-8?B?SXJMbXZkZnpFYUg4MUlXSCtJdUpacmNzTlplMy93Vm1TbDIwUCt2cGpjM0NZ?=
- =?utf-8?B?S21ZOUl2TDAzSzEwVzFUYXFqUHNPZjdiemlzSlhSZGtBSTBlcWFBUzl5UDE5?=
- =?utf-8?B?Ty9ORnQyd1VaRUo3eEJHazRmeWdMbjdtYkZnaEFJZkNHdGo2TTFZR0tIbjZP?=
- =?utf-8?B?OWZJcWpmdjIwcmhDWngyL2FLRnV0ZGdLeGM4RGk5QkdYRFNmOEpzZy83Yjdn?=
- =?utf-8?B?SXViUWRpL3d4NytMYjgrUmZkWWVkWmh2dXJuQWxvZC9Nc2dBcDVIR1VIYWFU?=
- =?utf-8?B?ajgxazJaZDBTaTlXdHVSaXVMVkg3TVV3Ti9UZEpwVzVwUkNSdWc2M0RBUG9G?=
- =?utf-8?B?UHlXN2pSU1JGbHBpY1lKdXJ3TkpQOWRZRXZIdStIWHZ4UVdSMmprMy9SVWVr?=
- =?utf-8?B?ckhnT2xLU2t4LzNPTEgraWdIK0c0L0kzR3dqcWJ2UFhnYmRENng5MUk1VlJz?=
- =?utf-8?B?NVQyckVmd0ZUcTFkSUZJWW85R3Byd3pweDVLMi9vQVVObE1TT3ByK0E3NTk3?=
- =?utf-8?B?MHJ0dDhreHErL1pUenVUTFlha2lGOCtCQVhmNHNTbDNrcnFqdFdiU1I5Tkgx?=
- =?utf-8?B?UHB2SG9pT1dNd01FZ2l0NkdEWmlyb0Z1TE5XK29zZVI1dFFZNm83ZXhwcXJu?=
- =?utf-8?B?KzJDc3lCajNtRThBU1BBeklQRVBSRTE3VjVCUFFNZHkwa2ljeVdZOEZiV3Iz?=
- =?utf-8?B?M3FuK2FrVmZxZ3JubGw3Qy9jdkh4cFpkTmlFS0xWYjlGbGxzcjNUWm9HNUhw?=
- =?utf-8?B?dlVTTkxZbzVpc2hwOVU5SDBCVkN0UDczZnNCT0w1bE5rb3g0V0VBMmVZR3Nv?=
- =?utf-8?B?N0Y5UjBsdDVwc1UwTzVpWE5VNzkvSksvRktocVZFUWRjQW5yVmt0WHBIa1RZ?=
- =?utf-8?B?Y2l1ZWJyWU9xT1hFSlAzKzR5cnhmcStodFJkL2J1bHdwUlUza0ZVcnFOMUJz?=
- =?utf-8?B?UHpTSlA0YU15Z3l4L3VGeE5yb3RUem93T2R3Mk9iSWVwVmsrYzVoY2xzSGVP?=
- =?utf-8?B?Tk9wRytGU0VZdGs4cTNkeVorZzB2MTBYRVNQUjcxY3VJUzJpeERBRnRxVFBO?=
- =?utf-8?B?Ly9aK2Y1emVxN2JFMXhnRks2SHNUZWkrSnpzR3VhVGloNEJEOEppWHN3a3hz?=
- =?utf-8?B?RVZlM2hhV1dSQjhTMWhvajRMa2lCeUVvUklGTTJIUEU1NFVEM0Z1Ri9DV1Zq?=
- =?utf-8?B?QjJQa3hGeDNzOHNyVjU0SXEzNDhlMnRJeWFwVzhTanV2MU0yMmRDbGNmU28w?=
- =?utf-8?B?SS9oaGQrczlUWnZFampXUFd0NDhEL3orbWVpQ2doaHRIMm51NGZjSVdaeXpy?=
- =?utf-8?B?WW40THlHeEp0SnNud2R6a0xzQkFyWVlmVFdVVElrcU9lZTdUSGg0SnJLUEhG?=
- =?utf-8?B?MGt3NC9kQ2NVTmFWckRpMG5yOG1meVNMd3I1VTM2blkvQ1Y1Q2J2TFhkMy92?=
- =?utf-8?Q?UlGo=3D?=
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: ad6f2e3f-42c3-4938-8b57-08ddeee5c990
-X-MS-Exchange-CrossTenant-AuthSource: IA0PPF9A76BB3A6.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 08 Sep 2025 14:41:25.5167
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: kqCF+ykmMkIDdqRmOlSNqZss8Nx+JWll70sZcYgaMIc8TE0IEmTaRoEwhhziJ53H
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH0PR12MB7862
+User-Agent: Mozilla Thunderbird
+Subject: Re: [External] Re: [PATCH] KVM: x86: Latch INITs only in specific CPU
+ states in KVM_SET_VCPU_EVENTS
+From: Fei Li <lifei.shirley@bytedance.com>
+To: Paolo Bonzini <pbonzini@redhat.com>,
+ Sean Christopherson <seanjc@google.com>
+Cc: tglx@linutronix.de, mingo@redhat.com, bp@alien8.de,
+ dave.hansen@linux.intel.com, liran.alon@oracle.com, hpa@zytor.com,
+ wanpeng.li@hotmail.com, kvm@vger.kernel.org, x86@kernel.org,
+ linux-kernel@vger.kernel.org, stable@vger.kernel.org
+References: <20250827152754.12481-1-lifei.shirley@bytedance.com>
+ <aK8r11trXDjBnRON@google.com>
+ <CABgObfYqVTK3uB00pAyZAdX=Vx1Xx_M0MOwUzm+D1C04mrVfig@mail.gmail.com>
+ <f904b674-98ba-4e13-a64c-fd30b6ac4a2e@bytedance.com>
+ <CABgObfb4ocYcaZixoPD_VZL5Z_SieTGJW3GBCFB-_LuOH5Ut2g@mail.gmail.com>
+ <d686f056-180c-4a22-a359-81eadb062629@bytedance.com>
+Content-Language: en-US
+In-Reply-To: <d686f056-180c-4a22-a359-81eadb062629@bytedance.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 
-Hi Reinette,
 
-On 9/5/25 23:49, Reinette Chatre wrote:
-> Hi Babu,
-> 
-> On 9/5/25 2:34 PM, Babu Moger wrote:
+On 9/5/25 10:59 PM, Fei Li wrote:
+>
+> On 8/29/25 12:44 AM, Paolo Bonzini wrote:
+>> On Thu, Aug 28, 2025 at 5:13 PM Fei Li <lifei.shirley@bytedance.com> 
+>> wrote:
+>>> Actually this is a bug triggered by one monitor tool in our production
+>>> environment. This monitor executes 'info registers -a' hmp at a fixed
+>>> frequency, even during VM startup process, which makes some AP stay in
+>>> KVM_MP_STATE_UNINITIALIZED forever. But this race only occurs with
+>>> extremely low probability, about 1~2 VM hangs per week.
+>>>
+>>> Considering other emulators, like cloud-hypervisor and firecracker 
+>>> maybe
+>>> also have similar potential race issues, I think KVM had better do some
+>>> handling. But anyway, I will check Qemu code to avoid such race. Thanks
+>>> for both of your comments. 🙂
+>> If you can check whether other emulators invoke KVM_SET_VCPU_EVENTS in
+>> similar cases, that of course would help understanding the situation
+>> better.
 >>
->> The ABMC feature details are documented in APM [1] available from [2].
->> [1] AMD64 Architecture Programmer's Manual Volume 2: System Programming
->> Publication # 24593 Revision 3.41 section 19.3.3.3 Assignable Bandwidth
->> Monitoring (ABMC).
+>> In QEMU, it is possible to delay KVM_GET_VCPU_EVENTS until after all
+>> vCPUs have halted.
 >>
->> Link: https://bugzilla.kernel.org/show_bug.cgi?id=206537 # [2]
->> Signed-off-by: Babu Moger <babu.moger@amd.com>
->> Reviewed-by: Reinette Chatre <reinette.chatre@intel.com>
->> ---
-> 
-> Apologies for not catching this earlier. I double checked to make sure
-> we get this right and I interpret Documentation/process/maintainer-tip.rst
-> to say that "Link:" should be the final tag.
-> 
+>> Paolo
+>>
+> Hi Paolo and Sean,
+>
+>
+> Sorry for the late response, I have been a little busy with other 
+> things recently. The complete calling processes for the bad case are 
+> as follows:
+>
+> `info registers -a` hmp per 2ms[1]      AP(vcpu1) thread[2]           
+> BSP(vcpu0) send INIT/SIPI[3]
+>
+>                                  [2]
+>                                  KVM: KVM_RUN and then
+>                           schedule() in kvm_vcpu_block() loop
+>
+> [1]
+> for each cpu: cpu_synchronize_state
+> if !qemu_thread_is_self()
+> 1. insert to cpu->work_list, and handle asynchronously
+> 2. then kick the AP(vcpu1) by sending SIG_IPI/SIGUSR1 signal
+>
+>                       [2]
+>                       KVM: checks signal_pending, breaks loop and 
+> returns -EINTR
+> Qemu: break kvm_cpu_exec loop, run
+>   1. qemu_wait_io_event()
+>   => process_queued_cpu_work => cpu->work_list.func()
+>        e.i. do_kvm_cpu_synchronize_state() callback
+>        => kvm_arch_get_registers
+>             => kvm_get_mp_state /* KVM: get_mpstate also calls
+>            kvm_apic_accept_events() to handle INIT and SIPI */
+>        => cpu->vcpu_dirty = true;
+>   // end of qemu_wait_io_event
+>
+>                                   [3]
+>                                   SeaBIOS: BSP enters non-root mode 
+> and runs reset_vector() in SeaBIOS.
+>                                            send INIT and then SIPI by 
+> writing APIC_ICR during smp_scan
+>                                   KVM: BSP(vcpu0) exits, then => 
+> handle_apic_write
+>                                        => kvm_lapic_reg_write => 
+> kvm_apic_send_ipi to all APs
+>                                        => for each AP: 
+> __apic_accept_irq, e.g. for AP(vcpu1)
+>                                             => case APIC_DM_INIT: 
+> apic->pending_events = (1UL << KVM_APIC_INIT)
+>                                                  (not kick the AP yet)
+>                                             => case APIC_DM_STARTUP: 
+> set_bit(KVM_APIC_SIPI, &apic->pending_events)
+>                                                  (not kick the AP yet)
+>
+>   [2]
+>   2. kvm_cpu_exec()
+>   => if (cpu->vcpu_dirty):
+>      => kvm_arch_put_registers
+>         => kvm_put_vcpu_events
+>                       KVM: kvm_vcpu_ioctl_x86_set_vcpu_events
+>  => clear_bit(KVM_APIC_INIT, &vcpu->arch.apic->pending_events);
+>       e.i. pending_events changes from 11b to 10b
+>  // end of kvm_vcpu_ioctl_x86_set_vcpu_events
+> Qemu: => after put_registers, cpu->vcpu_dirty = false;
+>         => kvm_vcpu_ioctl(cpu, KVM_RUN, 0)
+>                       KVM: KVM_RUN
+>  => schedule() in kvm_vcpu_block() until Qemu's next SIG_IPI/SIGUSR1 
+> signal
+>  /* But AP(vcpu1)'s mp_state will never change from 
+> KVM_MP_STATE_UNINITIALIZED
+>    to KVM_MP_STATE_INIT_RECEIVED, even then to KVM_MP_STATE_RUNNABLE
+> without handling INIT inside kvm_apic_accept_events(), considering BSP 
+> will never
+>    send INIT/SIPI again during smp_scan. Then AP(vcpu1) will never enter
+>    non-root mode */
+>
+>                                   [3]
+>                                   SeaBIOS: waits CountCPUs == 
+> expected_cpus_count and loops forever
+>                                   e.i. the AP(vcpu1) stays: 
+> EIP=0000fff0 && CS =f000 ffff0000
+>                                         and BSP(vcpu0) appears 100% 
+> utilized as it is in a while loop.
+>
+> As for other emulators (like cloud-hypervisor and firecracker), there 
+> is no interactive command like 'info registers -a'.
+> But sorry again that I haven't had time to check code to confirm 
+> whether they invoke KVM_SET_VCPU_EVENTS in similar cases, maybe later. :)
+>
+>
+> Have a nice day, thanks
+> Fei
+>
 
-That’s fine. It wasn’t very clear to me in maintainer-tip.rst.
-
-I checked a few older commits, and the placement seems mixed—some have it
-at the end, but it’s not very consistent. I can update my patches
-accordingly and apply the same change across all of them.
-
-
- The ABMC feature details are documented in APM [1] available from [2].
- [1] AMD64 Architecture Programmer's Manual Volume 2: System Programming
- Publication # 24593 Revision 3.41 section 19.3.3.3 Assignable Bandwidth
- Monitoring (ABMC).
-
- Signed-off-by: Babu Moger <babu.moger@amd.com>
- Reviewed-by: Reinette Chatre <reinette.chatre@intel.com>
- Link: https://bugzilla.kernel.org/show_bug.cgi?id=206537 # [2]
-
-
-I’ve been basing the patches on top of:
-git.kernel.org/pub/scm/linux/kernel/git/tip/tip.git
-with `origin/HEAD -> origin/master`.
-
-Please let me know if this is the correct branch to use to make the merge
-process easier.
-
--- 
-Thanks
-Babu Moger
-
+By the way, this doesn't seem to be a Qemu bug, since calling "info 
+registers -a" is allowed regardless of the vcpu state (including when 
+the VM is in the bootloader). Thus the INIT should not be latched in 
+this case. To fix this, I think we need add the 
+kvm_apic_init_sipi_allowed() condition: only latch INITs in specific CPU 
+states. Or change mp_state to KVM_MP_STATE_INIT_RECEIVED and then clear 
+INIT here. Should I send a v2 patch with a clearer commit message?
+Have a nice day, thanks
+Fei
 
