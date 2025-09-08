@@ -1,133 +1,120 @@
-Return-Path: <kvm+bounces-56978-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-56979-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id CB45BB4900F
-	for <lists+kvm@lfdr.de>; Mon,  8 Sep 2025 15:47:22 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 05A73B4900E
+	for <lists+kvm@lfdr.de>; Mon,  8 Sep 2025 15:47:20 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 800587AE2A5
-	for <lists+kvm@lfdr.de>; Mon,  8 Sep 2025 13:45:10 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E2B143ACC18
+	for <lists+kvm@lfdr.de>; Mon,  8 Sep 2025 13:46:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 88FDA2FC896;
-	Mon,  8 Sep 2025 13:46:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3F4A130BF54;
+	Mon,  8 Sep 2025 13:46:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="VbqKNgQb"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="j8lRMQMZ"
 X-Original-To: kvm@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 94B242FF153;
-	Mon,  8 Sep 2025 13:46:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 41ABA306B35;
+	Mon,  8 Sep 2025 13:46:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757339192; cv=none; b=kGPbVIcBP3dR1wfy3kAjyxz6JecE+woPBsGb+MOBqa3QqOtX981KUJMt+tb8dP75Z5F/Uhx+or8aKOHyKz6ciuHwe0Bv2AiHnHBU+nL1XMEt2af6hAoUw2gy4bNoPlGBoJWuhty0XPCPaq4bX3kn5aWqLenDC0BcDyBa6he/2ug=
+	t=1757339196; cv=none; b=m186y7nxLlOJ17K3LBy7h9zfRXJzObvpoU3ZrHO2h5LLu08Yu7tcZiKxzvUS+w9Z77tDbtnLoBShac7X/b67HTL8Fu0ui3ZNwJal20Vl00+9zheLgI/+vw/UEowY1Oaun1u3jREOSa95TCnlFuc7lywK2LtyZMuIDwDVgZkOkKU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757339192; c=relaxed/simple;
-	bh=vp3Ll0DD8f6GHuC6ep/boDdVQoM4zx28t3tUYlvipAQ=;
+	s=arc-20240116; t=1757339196; c=relaxed/simple;
+	bh=CTe4rGRu7tQeVsXNFvoCD5+pC/mdlOMNsYbe3nACYh0=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=axYMlWNGtiB+cjepI2Y6WwnR0quy5C3autfJqNAm4P4ubBcBPLLvnDwJCFP4JuMNRWLIx/SQJABDqUpMejKx/8K/ObJdOlTaq1Ag+tHn4R361nPbCi2PW2E5EjpGB25mvvD+Bd3a4tp7WZr2H/7Qoy5qN4exGJOSWsGLAcGC2cY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=VbqKNgQb; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6321CC4CEF1;
-	Mon,  8 Sep 2025 13:46:31 +0000 (UTC)
+	 Content-Type:Content-Disposition:In-Reply-To; b=SdWz5aIogjzwDSbHGfHB4CMa9Y1elwA9TIYi/cX1WVfNPcX+iBgQFziiaaNN8Sci9Add91BcoG1LcR9h7C0Om2PrJmwiLisUbA2NcwigdrkO7sVGwKN6X/5Ell7HguePpjqplTIZuqxzUh+8oHiZGxYJSkk25S5mCFJn1Ny6XSI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=j8lRMQMZ; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id ED23CC4CEF7;
+	Mon,  8 Sep 2025 13:46:34 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1757339192;
-	bh=vp3Ll0DD8f6GHuC6ep/boDdVQoM4zx28t3tUYlvipAQ=;
+	s=k20201202; t=1757339195;
+	bh=CTe4rGRu7tQeVsXNFvoCD5+pC/mdlOMNsYbe3nACYh0=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=VbqKNgQb30mJAz3xeH4qBnsukYcMxuJ/Cw/0QQxLu9Y9gHT/3s7tMlP3CCD5phpZX
-	 0vQZkJBcOEw+i9PAwKGz8klrX5fYrng6qoOlREsnkcIdDxNZ731A13w8YT2CU7wXC+
-	 Fyb/ftYaA5HesuKL6u3V+ncYjY7V9K+upmv7Fy59/kkeHsBfiWVAxENLhItPm5+4Na
-	 /SRj83XI+ILHDwTow7fdXkHYLVNZeW3hclbtkMTlBFl1QZ9ShpfS8lqi9csCTSJ9Y6
-	 pqXqSOcL2muT8niikgnTtfwk3P7loDEf+2m4XUqgNiwhIJ83XnXgSCsIJWTdDYgFkb
-	 CV6Ln400inaPQ==
-Date: Mon, 8 Sep 2025 19:09:41 +0530
+	b=j8lRMQMZKzJAMXGs2/yg5yLBIF9HGu4r5h1bpyMi/dedTvIpmB+GJXqR7cfrxwLX+
+	 SxEo1u0zexPUAF1FLCt/3h4a4TyQVeGg4BQZ0SsciXD+3LlSvAUiPFnrPbWjJPA4r6
+	 iCRHb82NqfQy/LQJDb1vybEXprBtJLnMUOZNKKh6kA2oNXV/6MLaXz60awMBLlnyXN
+	 tfUJTJbuvPnKWDOMbrvGe6hX1RnupFViXIpnTQg+L0OLaS5NXA659feS7HhAcRclQi
+	 eOt2ZDFkrj/+EjPxAVvO564l9/gf6NNMBD1XpgDEXzSqOqPNGl2SiYzVW9r4/dXbPL
+	 FGqBaGlfiTM9w==
+Date: Mon, 8 Sep 2025 19:11:55 +0530
 From: Naveen N Rao <naveen@kernel.org>
 To: Manali Shukla <manali.shukla@amd.com>
 Cc: kvm@vger.kernel.org, linux-perf-users@vger.kernel.org, 
 	linux-doc@vger.kernel.org, seanjc@google.com, pbonzini@redhat.com, nikunj@amd.com, 
 	bp@alien8.de, peterz@infradead.org, mingo@redhat.com, mizhang@google.com, 
 	thomas.lendacky@amd.com, ravi.bangoria@amd.com, Sandipan.Das@amd.com
-Subject: Re: [PATCH v2 04/12] x86/cpufeatures: Add CPUID feature bit for
- Extended LVT
-Message-ID: <kgavy7x2hweqc5fbg65fwxv7twmaiyt3l5brluqhxt57rjfvmq@aixr2qd436a2>
+Subject: Re: [PATCH v2 05/12] KVM: x86: Add emulation support for Extented
+ LVT registers
+Message-ID: <xnwr5tch7yeme3feo6m4irp46ju5lu6gr4kurn6oxlgoutvabt@3k3xh2pbdbje>
 References: <20250901051656.209083-1-manali.shukla@amd.com>
- <20250901052212.209171-1-manali.shukla@amd.com>
+ <20250901052238.209184-1-manali.shukla@amd.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20250901052212.209171-1-manali.shukla@amd.com>
+In-Reply-To: <20250901052238.209184-1-manali.shukla@amd.com>
 
-On Mon, Sep 01, 2025 at 10:52:12AM +0530, Manali Shukla wrote:
+On Mon, Sep 01, 2025 at 10:52:38AM +0530, Manali Shukla wrote:
 > From: Santosh Shukla <santosh.shukla@amd.com>
 > 
-> Local interrupts can be extended to include more LVT registers in
+> The local interrupts are extended to include more LVT registers in
 > order to allow additional interrupt sources, like Instruction Based
-> Sampling (IBS).
+> Sampling (IBS) and many more.
 > 
-> The Extended APIC feature register indicates the number of extended
-> Local Vector Table(LVT) registers in the local APIC.  Currently, there
-> are 4 extended LVT registers available which are located at APIC
-> offsets (400h-530h).
+> Currently there are four additional LVT registers defined and they are
+> located at APIC offsets 400h-530h.
 > 
-> The EXTLVT feature bit changes the behavior associated with reading
-> and writing an extended LVT register when AVIC is enabled. When the
-> EXTLVT and AVIC are enabled, a write to an extended LVT register
-> changes from a fault style #VMEXIT to a trap style #VMEXIT and a read
-> of an extended LVT register no longer triggers a #VMEXIT [2].
+> AMD IBS driver is designed to use EXTLVT (Extended interrupt local
+> vector table) by default for driver initialization.
 > 
-> Presence of the EXTLVT feature is indicated via CPUID function
-> 0x8000000A_EDX[27].
+> Extended LVT registers are required to be emulated to initialize the
+> guest IBS driver successfully.
 > 
-> More details about the EXTLVT feature can be found at [1].
-> 
-> [1]: AMD Programmer's Manual Volume 2,
-> Section 16.4.5 Extended Interrupts.
-> https://bugzilla.kernel.org/attachment.cgi?id=306250
-> 
-> [2]: AMD Programmer's Manual Volume 2,
-> Table 15-22. Guest vAPIC Register Access Behavior.
-> https://bugzilla.kernel.org/attachment.cgi?id=306250
+> Please refer to Section 16.4.5 in AMD Programmer's Manual Volume 2 at
+> https://bugzilla.kernel.org/attachment.cgi?id=306250 for more details
+> on Extended LVT.
 > 
 > Signed-off-by: Santosh Shukla <santosh.shukla@amd.com>
+> Co-developed-by: Manali Shukla <manali.shukla@amd.com>
 > Signed-off-by: Manali Shukla <manali.shukla@amd.com>
 > ---
->  arch/x86/include/asm/cpufeatures.h | 1 +
->  1 file changed, 1 insertion(+)
+>  arch/x86/include/asm/apicdef.h | 17 ++++++++++++++
+>  arch/x86/kvm/cpuid.c           |  6 +++++
+>  arch/x86/kvm/lapic.c           | 42 ++++++++++++++++++++++++++++++++++
+>  arch/x86/kvm/lapic.h           |  1 +
+>  arch/x86/kvm/svm/avic.c        |  4 ++++
+>  arch/x86/kvm/svm/svm.c         |  6 +++++
+>  6 files changed, 76 insertions(+)
 > 
-> diff --git a/arch/x86/include/asm/cpufeatures.h b/arch/x86/include/asm/cpufeatures.h
-> index 286d509f9363..0dd44cbf7196 100644
-> --- a/arch/x86/include/asm/cpufeatures.h
-> +++ b/arch/x86/include/asm/cpufeatures.h
-> @@ -378,6 +378,7 @@
->  #define X86_FEATURE_X2AVIC		(15*32+18) /* "x2avic" Virtual x2apic */
->  #define X86_FEATURE_V_SPEC_CTRL		(15*32+20) /* "v_spec_ctrl" Virtual SPEC_CTRL */
->  #define X86_FEATURE_VNMI		(15*32+25) /* "vnmi" Virtual NMI */
-> +#define X86_FEATURE_EXTLVT		(15*32+27) /* Extended Local vector Table */
 
-Per APM Vol 3, Appendix E.4.9 "Function 8000_000Ah", bit 27 is:
-ExtLvtAvicAccessChgExtended: Interrupt Local Vector Table Register AVIC 
-Access changes. See “Virtual APIC Register Accesses.”
+<snip>
 
-And, APM Vol 2, 15.29.3.1 "Virtual APIC Register Accesses" says:
-Extended Interrupt [3:0] Local Vector Table Registers:
-	CPUID Fn8000_000A_EDX[27]=1:
-		Read: Allowed
-		Write: #VMEXIT (trap)
-	CPUID Fn8000_000A_EDX[27]=0:
-		Read: #VMEXIT (fault)
-		Write: #VMEXIT(fault)
+> diff --git a/arch/x86/kvm/svm/avic.c b/arch/x86/kvm/svm/avic.c
+> index a34c5c3b164e..1b46de10e328 100644
+> --- a/arch/x86/kvm/svm/avic.c
+> +++ b/arch/x86/kvm/svm/avic.c
+> @@ -669,6 +669,10 @@ static bool is_avic_unaccelerated_access_trap(u32 offset)
+>  	case APIC_LVTERR:
+>  	case APIC_TMICT:
+>  	case APIC_TDCR:
+> +	case APIC_EILVTn(0):
+> +	case APIC_EILVTn(1):
+> +	case APIC_EILVTn(2):
+> +	case APIC_EILVTn(3):
 
-So, as far as I can tell, this feature is only used to determine how 
-AVIC hardware handles accesses to the extended LVT entries. Does this 
-matter for vIBS? In the absence of this feature, we should take a fault 
-and KVM should be able to handle that.
+This should actually be conditional on X86_FEATURE_EXTLVT.
+
+I also forgot to add for the previous patch: the feature name needs to 
+be changed to reflect the true nature of the feature bit.
 
 
 - Naveen
