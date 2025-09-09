@@ -1,80 +1,81 @@
-Return-Path: <kvm+bounces-57053-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-57054-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 45957B4A2D7
-	for <lists+kvm@lfdr.de>; Tue,  9 Sep 2025 09:03:37 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 912D3B4A2DA
+	for <lists+kvm@lfdr.de>; Tue,  9 Sep 2025 09:03:45 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id BDBB84E2480
-	for <lists+kvm@lfdr.de>; Tue,  9 Sep 2025 07:03:35 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 39EB516AF8B
+	for <lists+kvm@lfdr.de>; Tue,  9 Sep 2025 07:03:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 20201305942;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D3EAC306D2A;
 	Tue,  9 Sep 2025 07:03:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=rivosinc.com header.i=@rivosinc.com header.b="Xz6nUsID"
+	dkim=pass (2048-bit key) header.d=rivosinc.com header.i=@rivosinc.com header.b="VoVuFYPM"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pf1-f171.google.com (mail-pf1-f171.google.com [209.85.210.171])
+Received: from mail-pf1-f180.google.com (mail-pf1-f180.google.com [209.85.210.180])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 974502FF64E
-	for <kvm@vger.kernel.org>; Tue,  9 Sep 2025 07:03:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.171
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6665A3019B3
+	for <kvm@vger.kernel.org>; Tue,  9 Sep 2025 07:03:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.180
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757401407; cv=none; b=Zix/1q4HbNsawz18jEGsKV+8YuMca+SyWZYRzL4EX/SLamPSbkUzY5Bpah4RcIGweQvqWwTOjg5GAWsZ+eZrsOSSnLTjUiopbCuvxEw8aDaE0+7Fw8tUWSHFwCZUetIl5vI2upxSxiUAHrte7TjeN3HUX2FMCrSzJfhoqAWlnhY=
+	t=1757401407; cv=none; b=P8j+wAAQqi+yUCALwL2dTtnIS9oNqHGX4rntw5QeujaxKTztYD86PKNuNZ7UNW6XZq4/Y7x+X0SqB63oZUkUhx9skTqTR9CwHNquNi27Ouz1dpTvKTzHmFXDzOZfsgjOoK1/ErMC3POVndYUcwn4VeTadwtzZet2YYNcYtE84xM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1757401407; c=relaxed/simple;
-	bh=YiWO+f6yiqoYUMb8nGevg0JVmM0gfAGm3UgzoJnSL1M=;
-	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:Cc; b=Pm0s0gi30sAcLGZ7XCCaFAsMGeTCt1AAYj30vRttj/mIS4qQZ3rYqAPh5Mpfoe4H3cnpHSISMnJG64ser2ppQMNCIL7yIp657XIiO4CQiZB1h1rHViS1rrK2drdYWqAvXHJWAI4JCGLh0lFaYZbTdulK4PubfltXJ+7k/nw4H+c=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=rivosinc.com; spf=pass smtp.mailfrom=rivosinc.com; dkim=pass (2048-bit key) header.d=rivosinc.com header.i=@rivosinc.com header.b=Xz6nUsID; arc=none smtp.client-ip=209.85.210.171
+	bh=m2E8W7DiSx6Ltrasj+rnR9WEkMr09MKsEoyxo0F+Klg=;
+	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
+	 In-Reply-To:To:Cc; b=uV0KsO9OSseOY83hTCAf4wBiJAA8ZR86winlqlPSSN+kudZAyD9dOR/EbZD121js7Gj9fJgoIo9i7DyaXTEl6jCLrpfhZSIxnlWE/3lhX0QGg23A2jyy2QwJZ44JIwNf2uMIqpG5u3jh0NNFfFSP+13w8JIrrmnlDfkfggXd31E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=rivosinc.com; spf=pass smtp.mailfrom=rivosinc.com; dkim=pass (2048-bit key) header.d=rivosinc.com header.i=@rivosinc.com header.b=VoVuFYPM; arc=none smtp.client-ip=209.85.210.180
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=rivosinc.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=rivosinc.com
-Received: by mail-pf1-f171.google.com with SMTP id d2e1a72fcca58-7726c7ff7e5so4457978b3a.3
-        for <kvm@vger.kernel.org>; Tue, 09 Sep 2025 00:03:25 -0700 (PDT)
+Received: by mail-pf1-f180.google.com with SMTP id d2e1a72fcca58-77238cb3cbbso5517007b3a.0
+        for <kvm@vger.kernel.org>; Tue, 09 Sep 2025 00:03:26 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=rivosinc.com; s=google; t=1757401405; x=1758006205; darn=vger.kernel.org;
-        h=cc:to:content-transfer-encoding:mime-version:message-id:date
-         :subject:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=RNthXv7xmnVgNBJdwKS6Eu1LchZyxPFP+JzXVAI2vr4=;
-        b=Xz6nUsIDThbqFGkYrfKSLt7MJaFlvG+Hs5SlmAYVFjYVSITUv5gQnvxcg3S28GyMy/
-         CaauypcbSSpPR69RWsLVdzxngKgEaUnMEIxXy0UTpd87ZT9YF2FW3ZJZuFmYecoktXAl
-         qBz0J41vkACew89/QMqu05ctVdi8muNiedUDgjImgyzsEzDz9ajQ6mA0VuhMvQO2F1Iq
-         aZcXyzbdHgb8JsTJoTWjNBMsMikbbZLKvQsnFJQbYDXvLw8f66lWQNv2S5+2K9a6yeMK
-         HB2W9CR0ARfblg7Az5yuX1eg9ilyrSpkSXFB3rMqqKdMtEWMKTUrB5nl2+v5SjDp/HGW
-         8dHw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1757401405; x=1758006205;
-        h=cc:to:content-transfer-encoding:mime-version:message-id:date
-         :subject:from:x-gm-message-state:from:to:cc:subject:date:message-id
+        d=rivosinc.com; s=google; t=1757401406; x=1758006206; darn=vger.kernel.org;
+        h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
+         :mime-version:subject:date:from:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=RNthXv7xmnVgNBJdwKS6Eu1LchZyxPFP+JzXVAI2vr4=;
-        b=U8PyZouiqsSTMI+CU2b+BP+IpSmmrUjMFeEjniEIpqb6JIX+2pM7wok23jNCJLs9Co
-         i5grcapRfGsf4EFaSbBdY90LZBHRl2VkOWOs/HD29x1eNfMNphW6Oy3gRniWHw6+y6Dm
-         FWEM2apax+fqNRvA6hiZEPSEGemT3+k8BFv7KxXP3FKtP05R5A/fBO4KyQEJnhoXb8GB
-         ldf88uw+vLDsITHBuR77lt4Sb1T8DV/u4BGjW6XovBRS6QI0o+FEAcy55B9R4MXlcw5M
-         PpovjhUjFtgY0WgbvfunjjOPNFEom9/cW7034N0JFNZNL4cfSPNOuBDa9smKf8auLEA3
-         jLYQ==
-X-Forwarded-Encrypted: i=1; AJvYcCXoOiQuSySZttV20eRD1rMNJFYCd/JHjqsjsF43qs+NOifd21deyZslVMT4BC0VrFS7HF8=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yzz+lWGG+qA7AwQgo69d7N3mrPWTAzLkkL9EZ8n60HbLramXZ0i
-	uCSHx3qM0o0JI1geoz07iRCIuVnKOUy+EFXF7eLjuI6suEUN+qZkSIqu/HhQfDfvX94=
-X-Gm-Gg: ASbGncsTqVkrlpBDXCg/KtVE7alazxxZOv65El+vuVukn4t/OJLgjuxZVEDRxE5Yi45
-	Spno7/68N+CU9Snq4o3ftHTJQQPd7eJRL5Ic2RbhPxJ/MdpS5ktcOrlhFkKAf2Upm/WC8Q4otyU
-	lnUnFgWeQtLTHYabeSmaZf7PAZuSCQMbY4HDs4NLUJwEc0RhaZzK2Cl0EVuf5KYBQHoz7sQsnD7
-	h4jxbXAUx7In21q3z4Bvy2MSAOysMjDdSo8EhDkGQ6qdfEhVgTFPRJRzuHpIP+NAnDGAogf5Bro
-	4ze3t7eVNY58au7bqIm7WCBbgnUVoeDzZ1ANsvLWJgcw5WSIr2azKJ+bc1apbsOHiKHM37RLvTM
-	IVj6exmFNUbXdjWOyCbVTfQBfyBIMZJLaJZ0=
-X-Google-Smtp-Source: AGHT+IFVlHtNE2LMGS7gSQLQT0W4LugB0ERiut2YB2J1SVxQq4kRk0S88rF/oo0Map16D7hoJpjjYQ==
-X-Received: by 2002:a05:6a00:c94:b0:772:332c:7976 with SMTP id d2e1a72fcca58-7742db6308dmr11948119b3a.0.1757401404738;
-        Tue, 09 Sep 2025 00:03:24 -0700 (PDT)
+        bh=QppemwXg72umVaHol/lc8lTgDOnrssZANvnDyByXBzA=;
+        b=VoVuFYPMGG7mF6nKhQqKrHMYMOIktE34kOU97h38mZSiLfPSc6hA5CD2IfnxEdQZNr
+         4FZxCHIgMnW5fyPmUGx4tYQ0WhZ6eCeMB+FbMCq12p1+MuTvi+Yv8nonOXkq4WiPvYWs
+         EOJ5Gvk9o+ONJqH4heQLAJduA/8ZxP/Kcc2gmepDGq5CL16gJfpeGsao4u2OfwtZjqle
+         YJQztVnhN3ESQKULvNTNSOU/pbnYIX5XIY2fEQUU1vTJVS6mN4ilasSa9qPnn50EAuim
+         ko7+k/dnMdZU9BdYVQmeutlSGeajiFIcLfsZWCRW6rMP62RSOqI5Avm6hf9E0IZP3G+9
+         kZFg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1757401406; x=1758006206;
+        h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
+         :mime-version:subject:date:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=QppemwXg72umVaHol/lc8lTgDOnrssZANvnDyByXBzA=;
+        b=DLpV7UYoiY8m+uG9x2Cccrioup1E1R+upvovMfzyPlwy9SCD6eIXOyHLPPAgCZJZFJ
+         tBBctdmVUIL2LyDpfGu2Is96K1Mo9e1HOqC5PhccwjXEpCOAYzgVslVEbqyNQIM5lnS6
+         DgUGyOCcIXlSLxT0TzovgJdIH8YO3v6rmZNpZkN3EKLKW75A6SILB/kBn52/N4PtWttg
+         bUkc7tpiiw9ezCp4kEIs0Zck44NGOwI0+L0oW1sxJ8MjOLcINSlRA0dF8Gm0Z8Mb/FKZ
+         Eoo9CN8osgpkEk3cMI/iRPqrpBaXZV+WP+ulnVDUegQWskDD0H4RIM82wUG/ilOdUQoX
+         dmmA==
+X-Forwarded-Encrypted: i=1; AJvYcCVWZEARKPvTBkfHmNzqX9DIRjp3+LL7igC8PaCgrYFgfx2Wm86KZ4Y90OfR27BUpcaOAVo=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxXUB86HQ0bU7LP1uE5QQ2YnxaXRjjBg6S8HOOoa3LDfZUVERya
+	i+tQPbmTAeEVBMytAnDdmoUKWtrgRqDXG5dTJjDGQUspfUzRjC51ren4rAbQyu81LIw=
+X-Gm-Gg: ASbGncvtwQFpPHnbmWDKEJdujq8Tny3xE7WVcoRYECPw0ZZ9SQ+918UbTD2l6qzJ0uT
+	unLrx7rMAWFX6kuaE23u9GyoYTAq7zfUdyZVHF7nMZsImwKKAGkNfdXdqa0xYXFXzopETRlIxjU
+	jogENK3clgUjhpxFlEqZ5WuM/6bvBlpTmPH4qUxRCLXovp9oM0Tvgk6qbGOyGxtKyZORnjTNEsg
+	4RGWU+QzWbvMLjkCtuJlB+jqrvqgY2SGBc9oEUo2g9w9dhTIR3yK+mWx5WOBYVg0Y0GUlQc1L2U
+	N48VO4rrUMr/ERz+t+Fi3tFRV6xgrNDjlmY32w5S5RWy8jXR7tvgczplmeq85yumDY+Ivjp2g/g
+	ljBt2gg/a2f/w8/Mu4FLEAOlNlC4w8E6ipSs=
+X-Google-Smtp-Source: AGHT+IGTI0+CANiAOY9dQTvuxmq7UvW41+dk3xf0GTORfOZzG86GOBRQUviZ8wH9nFVkT6u1ya+N/Q==
+X-Received: by 2002:a05:6a00:928c:b0:772:4b05:789e with SMTP id d2e1a72fcca58-7742ddadae6mr13433332b3a.2.1757401405716;
+        Tue, 09 Sep 2025 00:03:25 -0700 (PDT)
 Received: from atishp.ba.rivosinc.com ([64.71.180.162])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-774662c7158sm1025535b3a.72.2025.09.09.00.03.23
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-774662c7158sm1025535b3a.72.2025.09.09.00.03.24
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 09 Sep 2025 00:03:24 -0700 (PDT)
+        Tue, 09 Sep 2025 00:03:25 -0700 (PDT)
 From: Atish Patra <atishp@rivosinc.com>
-Subject: [PATCH v6 0/8] Add SBI v3.0 PMU enhancements
-Date: Tue, 09 Sep 2025 00:03:19 -0700
-Message-Id: <20250909-pmu_event_info-v6-0-d8f80cacb884@rivosinc.com>
+Date: Tue, 09 Sep 2025 00:03:20 -0700
+Subject: [PATCH v6 1/8] drivers/perf: riscv: Add SBI v3.0 flag
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -83,13 +84,9 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-X-B4-Tracking: v=1; b=H4sIADfRv2gC/23R32rDIBQG8FcJXs+Sc/wTLWPsPcYoxujqRZJOU
- 9koffeZhNGt6eUR/On5vgtJLgaXyL66kOhySGEcyiCfKmKPZvhwNHRlJlgjhxoUPfXng8tumA5
- h8CPVSjoE62TbMVIunaLz4WsB397LfAxpGuP34meYT1cKQN9TGWhNDfdaauAIXr3GkMcUBruzY
- 09mLeOvIGoAsRGwCIorEG1TM8XaBwK7CQJxI7Ai+KZtTeM7bb17IPCb0CBsBD5vYRvZCGU4Sv1
- AEDdB4TYHUQTdWYMSmDaM3QnXNeboPs+lrmnNmvQuJbPUta+el4gR/q63tHIoCa0hAXPle15oi
- f/4l7nE1iRHy9CHaV9luQNGo8Xy8vUHDuHwgjACAAA=
-X-Change-ID: 20241018-pmu_event_info-986e21ce6bd3
+Message-Id: <20250909-pmu_event_info-v6-1-d8f80cacb884@rivosinc.com>
+References: <20250909-pmu_event_info-v6-0-d8f80cacb884@rivosinc.com>
+In-Reply-To: <20250909-pmu_event_info-v6-0-d8f80cacb884@rivosinc.com>
 To: Anup Patel <anup@brainfault.org>, Will Deacon <will@kernel.org>, 
  Mark Rutland <mark.rutland@arm.com>, 
  Paul Walmsley <paul.walmsley@sifive.com>, 
@@ -97,85 +94,43 @@ To: Anup Patel <anup@brainfault.org>, Will Deacon <will@kernel.org>,
  Mayuresh Chitale <mchitale@ventanamicro.com>
 Cc: linux-riscv@lists.infradead.org, linux-arm-kernel@lists.infradead.org, 
  linux-kernel@vger.kernel.org, kvm@vger.kernel.org, 
- kvm-riscv@lists.infradead.org, Atish Patra <atishp@rivosinc.com>, 
- Sean Christopherson <seanjc@google.com>
+ kvm-riscv@lists.infradead.org, Atish Patra <atishp@rivosinc.com>
 X-Mailer: b4 0.15-dev-50721
 
-SBI v3.0 specification[1] added two new improvements to the PMU chaper.
-The SBI v3.0 specification is frozen and under public review phase as
-per the RISC-V International guidelines. 
+There are new PMU related features introduced in SBI v3.0.
+1. Raw Event v2 which allows mhpmeventX value to be 56 bit wide.
+2. Get Event info function to do a bulk query at one shot.
 
-1. Added an additional get_event_info function to query event availablity
-in bulk instead of individual SBI calls for each event. This helps in
-improving the boot time.
-
-2. Raw event width allowed by the platform is widened to have 56 bits
-with RAW event v2 as per new clarification in the priv ISA[2].
-
-Apart from implementing these new features, this series improves the gpa
-range check in KVM and updates the kvm SBI implementation to SBI v3.0.
-
-The opensbi patches have been merged. This series can be found at [3].
-
-[1] https://github.com/riscv-non-isa/riscv-sbi-doc/releases/download/v3.0-rc7/riscv-sbi.pdf 
-[2] https://github.com/riscv/riscv-isa-manual/issues/1578
-[3] https://github.com/atishp04/linux/tree/b4/pmu_event_info_v6
-
+Reviewed-by: Anup Patel <anup@brainfault.org>
 Signed-off-by: Atish Patra <atishp@rivosinc.com>
 ---
-Changes in v6:
-- Dropped the helper function to check writable slot 
-- Updated PATCH 7 to return invalid address error if vcpu_write_guest fails
-- Link to v5: https://lore.kernel.org/r/20250829-pmu_event_info-v5-0-9dca26139a33@rivosinc.com
+ drivers/perf/riscv_pmu_sbi.c | 4 ++++
+ 1 file changed, 4 insertions(+)
 
-Changes in v5:
-- Rebased on top of v6.17-rc3
-- Updated PATCH 6 as per feedback to improve the generic helper function
-- Adapted PATCH 7 & 8 as per PATCH 6.
-- Link to v4: https://lore.kernel.org/r/20250721-pmu_event_info-v4-0-ac76758a4269@rivosinc.com
+diff --git a/drivers/perf/riscv_pmu_sbi.c b/drivers/perf/riscv_pmu_sbi.c
+index 698de8ddf895..cfd6946fca42 100644
+--- a/drivers/perf/riscv_pmu_sbi.c
++++ b/drivers/perf/riscv_pmu_sbi.c
+@@ -63,6 +63,7 @@ PMU_FORMAT_ATTR(event, "config:0-47");
+ PMU_FORMAT_ATTR(firmware, "config:62-63");
+ 
+ static bool sbi_v2_available;
++static bool sbi_v3_available;
+ static DEFINE_STATIC_KEY_FALSE(sbi_pmu_snapshot_available);
+ #define sbi_pmu_snapshot_available() \
+ 	static_branch_unlikely(&sbi_pmu_snapshot_available)
+@@ -1452,6 +1453,9 @@ static int __init pmu_sbi_devinit(void)
+ 	if (sbi_spec_version >= sbi_mk_version(2, 0))
+ 		sbi_v2_available = true;
+ 
++	if (sbi_spec_version >= sbi_mk_version(3, 0))
++		sbi_v3_available = true;
++
+ 	ret = cpuhp_setup_state_multi(CPUHP_AP_PERF_RISCV_STARTING,
+ 				      "perf/riscv/pmu:starting",
+ 				      pmu_sbi_starting_cpu, pmu_sbi_dying_cpu);
 
-Changes in v4:
-- Rebased on top of v6.16-rc7 
-- Fixed a potential compilation issue in PATCH5.
-- Minor typos fixed PATCH2 and PATCH3.
-- Fixed variable ordering in PATCH6 
-- Link to v3: https://lore.kernel.org/r/20250522-pmu_event_info-v3-0-f7bba7fd9cfe@rivosinc.com
-
-Changes in v3:
-- Rebased on top of v6.15-rc7 
-- Link to v2: https://lore.kernel.org/r/20250115-pmu_event_info-v2-0-84815b70383b@rivosinc.com
-
-Changes in v2:
-- Dropped PATCH 2 to be taken during rcX.
-- Improved gpa range check validation by introducing a helper function
-  and checking the entire range.
-- Link to v1: https://lore.kernel.org/r/20241119-pmu_event_info-v1-0-a4f9691421f8@rivosinc.com
-
----
-Atish Patra (8):
-      drivers/perf: riscv: Add SBI v3.0 flag
-      drivers/perf: riscv: Add raw event v2 support
-      RISC-V: KVM: Add support for Raw event v2
-      drivers/perf: riscv: Implement PMU event info function
-      drivers/perf: riscv: Export PMU event info function
-      RISC-V: KVM: No need of explicit writable slot check
-      RISC-V: KVM: Implement get event info function
-      RISC-V: KVM: Upgrade the supported SBI version to 3.0
-
- arch/riscv/include/asm/kvm_vcpu_pmu.h |   3 +
- arch/riscv/include/asm/kvm_vcpu_sbi.h |   2 +-
- arch/riscv/include/asm/sbi.h          |  13 +++
- arch/riscv/kvm/vcpu_pmu.c             |  74 +++++++++++--
- arch/riscv/kvm/vcpu_sbi_pmu.c         |   3 +
- arch/riscv/kvm/vcpu_sbi_sta.c         |   9 +-
- drivers/perf/riscv_pmu_sbi.c          | 191 +++++++++++++++++++++++++---------
- include/linux/perf/riscv_pmu.h        |   1 +
- 8 files changed, 229 insertions(+), 67 deletions(-)
----
-base-commit: e32a80927434907f973f38a88cd19d7e51991d24
-change-id: 20241018-pmu_event_info-986e21ce6bd3
---
-Regards,
-Atish patra
+-- 
+2.43.0
 
 
