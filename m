@@ -1,172 +1,155 @@
-Return-Path: <kvm+bounces-57048-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-57049-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id A2135B4A119
-	for <lists+kvm@lfdr.de>; Tue,  9 Sep 2025 07:04:33 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7C3E7B4A11B
+	for <lists+kvm@lfdr.de>; Tue,  9 Sep 2025 07:08:57 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4E4973B5119
-	for <lists+kvm@lfdr.de>; Tue,  9 Sep 2025 05:04:32 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 18C9A4E363D
+	for <lists+kvm@lfdr.de>; Tue,  9 Sep 2025 05:08:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 45CAF2EBB89;
-	Tue,  9 Sep 2025 05:04:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 156372E888F;
+	Tue,  9 Sep 2025 05:08:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="eSm37yw9"
+	dkim=pass (1024-bit key) header.d=jms.id.au header.i=@jms.id.au header.b="fuH4//gm"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yx1-f51.google.com (mail-yx1-f51.google.com [74.125.224.51])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F2E56147C9B
-	for <kvm@vger.kernel.org>; Tue,  9 Sep 2025 05:04:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8C0F1221F26
+	for <kvm@vger.kernel.org>; Tue,  9 Sep 2025 05:08:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.224.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757394265; cv=none; b=of4Af0ZfUBEoFAt2zxBQKVUMkfVENySqh46lFx8H11SMC+VdlDmxSmOTy+AxOpTJ0CbPrIeJ0LhOcCQ+lP7XXWjlkWALDUzUPuG0tbVmjZcbVw6/axcjogozHrDFsZy4NqvFOZAMuBdKiAQ5kRlhUtl7dofZBa9ylFyO3yS+Fxw=
+	t=1757394530; cv=none; b=QDGr8FF5G9PO+37GszKM+n/SQnuXyfU6j+xfbe42H0nCNFv6tUIqjsEH8giURZBm7gJMvhOrT/MYCIFtgraKFWIYbcxEabAew012mswhUHNTj7+YlI9/FK8wFvrt0M3MfTwXdblogM80gMWOS8Zm9KgrG6xfuR27NllDabQ6rDM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757394265; c=relaxed/simple;
-	bh=WRKEjVB88UyDSuQnn2M8CsE1PKosjlo1Gos8s6oIScU=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=rurwWaXjBQHiPEXwdhHCPH3R85whcRGvrTbzU+cnrFwz9dJT/3GeBBQgpOosUwCi+8XzSBBPkQrP4JMZiqJdIm/+kYRRMl+QK1ROcY8+r7CpqpJoQcvK2akR56y3BHeAXc9tq7PQqFphQtSfQHjtGHJQIZRA3sL6QtdY5YQjwKw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=eSm37yw9; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1757394262;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=Wr2ePTIKgu+dXGPmYEIQm5pOk8ImaQGQj8O0LKwZ6pU=;
-	b=eSm37yw9NOpsyoundLVopN2CaT50Q0JxrKMxqrSx5VTjO5ldAcrQsD0BAO4S2/sCL2lI6r
-	FUYXXE9kALTPlS6190Ed1ic3fAlXRQZUxsxqgDhRJRtV2ChfHbLJwiPlvJB4454wJ+B4dM
-	lMUEEWNp7a0uuTzQ5EZFsILV6SAIoSk=
-Received: from mail-qk1-f200.google.com (mail-qk1-f200.google.com
- [209.85.222.200]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-424-Qf2XM5-vPOu5AXRGJ-1Cww-1; Tue, 09 Sep 2025 01:04:21 -0400
-X-MC-Unique: Qf2XM5-vPOu5AXRGJ-1Cww-1
-X-Mimecast-MFC-AGG-ID: Qf2XM5-vPOu5AXRGJ-1Cww_1757394260
-Received: by mail-qk1-f200.google.com with SMTP id af79cd13be357-81b8e3e29edso56483885a.0
-        for <kvm@vger.kernel.org>; Mon, 08 Sep 2025 22:04:21 -0700 (PDT)
+	s=arc-20240116; t=1757394530; c=relaxed/simple;
+	bh=CPT83K5BQ2++eeCdTesMxh0fJYcO6fqWAnQ60c8osbg=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=ghZ1q5uGd5GFsgW1j8D4WLnoM0+NfOi33ikGb4Tr1xtpaAVGHDx/Aesgg4StXLCyEwV8mr5F0DhxKXEo9NZMB2kfP2qmqlFmZAf4MBAvhDJpenv2fYA/TgDt3hiMnv4SM6OqCchg5Ld9cVYdbDRYkOusjpfJ+zWd5sKjTVfIqvQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=jms.id.au; spf=pass smtp.mailfrom=gmail.com; dkim=pass (1024-bit key) header.d=jms.id.au header.i=@jms.id.au header.b=fuH4//gm; arc=none smtp.client-ip=74.125.224.51
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=jms.id.au
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-yx1-f51.google.com with SMTP id 956f58d0204a3-60f47bcdc52so1755115d50.2
+        for <kvm@vger.kernel.org>; Mon, 08 Sep 2025 22:08:46 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=jms.id.au; s=google; t=1757394525; x=1757999325; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=8v83NhoMV3/Set65PIGiCZnF+wEhzRaTeeF1y4TM/iY=;
+        b=fuH4//gm61K0OUEijp4amLFYCYUn0lphy/O+hLCtgrhxqnMNpKy5x2tdFb10dxJGHk
+         isFV0iSjsw1Z263LZVT4o0xIAwbnxKAWGLz3rRWvX2RNWBGWgQWhrezyCnhqAVs1PF9T
+         wI/KrgIIZ3UW0VqIRWLth6KGxh7FfCAKYVbWw=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1757394260; x=1757999060;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=Wr2ePTIKgu+dXGPmYEIQm5pOk8ImaQGQj8O0LKwZ6pU=;
-        b=mA4/4VQgiI6nZKEtP42UpC+qVqusNfpEBkanIi2bVQa6D5o6/8GG8dFwx+L7VGF0JU
-         yWX/X+HE1gBwdpGPyD2mJldZa+q80ojoulHBh2BJ9pHZF9wDygW2VTCPu6rOocd4lC3h
-         iNe1IOmKJqAI5TuTUex9zfkBn5ilepvQzS1UtOBE0oqAsMTNfohBg19uxRjluqxnzfrt
-         dd3bfeCBZkYDS0Bxbu+aEYkq8LR2JEV9PPKKn98VC8hiO0rmzFlwIUJVeTn7Kz7FTMoL
-         Mm+aj8OLiniREewbCSXXG4wW1IA4M1a9D85uHTbo16Wm3YpyxdyhgbSNuqFYamnmTxnf
-         cOsw==
-X-Forwarded-Encrypted: i=1; AJvYcCUyJYJNcSjKCBsbc6TVe+OUG4UU3gSW3653AKHcCfBVe9lPMttM6/ynjrw8SXhhCCGWu3w=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwcBICIqIpi34RflnOtieCnuWBTI5EYD1k76YP+uo2wm5QoRfUD
-	4e18u776x8SJdOSV2n1R1bcx3Q/vDFmOD5Jgc3hJkI2PLIIfGDM3jfW9tprKBFx0622m22aVFaT
-	dlFQKq8lTIQVny4IwZIni/xUmLFxiHn9TKxABnei43R2ISqvK3Ji7Kw==
-X-Gm-Gg: ASbGncsAAPX+7dju12w0Qi8dCCcCeY9hUTKfO9ZC19IHFiwCN2EbhQSv1RMwSLV7j4X
-	GrltIJ/jXtLGfJyOppjfzKUPmbigJcqtVogQ0YuI1CaSZp4opXfUJYKwzP9DYcCqzL3fCRbNbZ9
-	lRRTXD6Wg8/jx6v30Csad6A/+bIIlMrc6++FBViN95MUC0PbYILTzp8AJHvKLKOlzQwZo68GJJt
-	1bJb4akbEQVutLSVDXjMPnyKrSBUtdhhC7XZEGWaI15WT4tMP37SoNj79Rz45Y8zHa/8Wnb7ZWG
-	wLGFwpZDqMgBRuzHDKtvNsxkhh1CuJQHU3mPTw9y
-X-Received: by 2002:a05:620a:4049:b0:7e6:9a11:f0c8 with SMTP id af79cd13be357-813beffa169mr1079399285a.21.1757394260364;
-        Mon, 08 Sep 2025 22:04:20 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IG+4M9jnqZ7XEtL8iNZFr7DfeWbk4fN2cPgrooLCIHf05hyNRzqCDxbOlnIixcIpPme44IWnw==
-X-Received: by 2002:a05:620a:4049:b0:7e6:9a11:f0c8 with SMTP id af79cd13be357-813beffa169mr1079397285a.21.1757394259952;
-        Mon, 08 Sep 2025 22:04:19 -0700 (PDT)
-Received: from [192.168.40.164] ([70.105.235.240])
-        by smtp.gmail.com with ESMTPSA id af79cd13be357-81b58c51dacsm64417585a.12.2025.09.08.22.04.18
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 08 Sep 2025 22:04:19 -0700 (PDT)
-Message-ID: <b71c7500-3e1b-491b-8cf0-989401bc6795@redhat.com>
-Date: Tue, 9 Sep 2025 01:04:17 -0400
+        d=1e100.net; s=20230601; t=1757394525; x=1757999325;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=8v83NhoMV3/Set65PIGiCZnF+wEhzRaTeeF1y4TM/iY=;
+        b=p8D5AtJZ0Hhv67CVIm+jYkojnYV+shWUGT2YSNrDqMehuLagqGTTKgY1RzB9PCLsq0
+         qvg+5GNPC5l5aJn2iCTPXGeeOiQhURhnFMn20LAMnGqYguuKJiJFW4TyP99Gl9YDDnvF
+         38UQuGQM6kbOGjy8qzSFgbQbfp2HCM3SfHS86tAdw7j8/qh45ixPFvmoreQwzwpg8V8c
+         UJf+mjcr8RmvG8rzFklV43M3hN3yR2ojCe5LdCl/9P6Zo7ry6crSAZdHV9enXA8A3blU
+         B/6Hy9/UQ/XB6aoJ0LMrjYPf4EhemFXjJKHPutG5qpzz2PpEeMaVLKwQehhKsgMkHMy3
+         82Yg==
+X-Forwarded-Encrypted: i=1; AJvYcCUkrQ4hNirQJrcC5B3zAEN/EHzXIYkjiL+XKCFQYKHM8E6HqHI16zgvyH5eUHZ4V8TiWxg=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwdQfQD+hxsLviS08EcRjeCbSNvuiOAnhzqtEapJPceMbt9Saru
+	FBBwRTms3ypw/kKuF+8NWnzgfWLZ0i+6SBzV4yaUtnMHy0irI65EJonN8NfIea8aYlPNZtkrDz9
+	5w5yZmWyf3S27rQYrEqbeij/kolrKNxnhCzqX
+X-Gm-Gg: ASbGncvzGEETbOF9gjTtl78VwJ+QjCwErspWR7hrNSxgUZE+YUN4F5t8ixgRhdJN7HF
+	qiqkFyq3eaEjEu8zFbRE9cjDT5HnyRmIl7YuTI8/lPVLxNGPvoyJ+blzIhNlhmICuaBwiaFjJAx
+	OFkg3nwdgWF7xO0rEcWT0n81dxxREW3312IYbq62k9QncrcTSoJCujLGH5t7VeZgQSRIVjPcQmg
+	0l80Y1rdoJJHeaIbQ==
+X-Google-Smtp-Source: AGHT+IHkUFM3tIDPd+HCHUsiQaSV2Uumae9Nz9ns0Y9dI67zYpHeBh+7GAWmWM5/jnTI8MgQRVzuAyjRsDPU3DiDOWk=
+X-Received: by 2002:a05:690e:250d:10b0:5fb:78c2:b71f with SMTP id
+ 956f58d0204a3-61032fe7a13mr8005880d50.18.1757394525330; Mon, 08 Sep 2025
+ 22:08:45 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v3 11/11] PCI: Check ACS Extended flags for
- pci_bus_isolated()
-Content-Language: en-US
-To: Jason Gunthorpe <jgg@nvidia.com>, Bjorn Helgaas <bhelgaas@google.com>,
- iommu@lists.linux.dev, Joerg Roedel <joro@8bytes.org>,
- linux-pci@vger.kernel.org, Robin Murphy <robin.murphy@arm.com>,
- Will Deacon <will@kernel.org>
-Cc: Alex Williamson <alex.williamson@redhat.com>,
- Lu Baolu <baolu.lu@linux.intel.com>, galshalom@nvidia.com,
- Joerg Roedel <jroedel@suse.de>, Kevin Tian <kevin.tian@intel.com>,
- kvm@vger.kernel.org, maorg@nvidia.com, patches@lists.linux.dev,
- tdave@nvidia.com
-References: <11-v3-8827cc7fc4e0+23f-pcie_switch_groups_jgg@nvidia.com>
-From: Donald Dutile <ddutile@redhat.com>
-In-Reply-To: <11-v3-8827cc7fc4e0+23f-pcie_switch_groups_jgg@nvidia.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+References: <CACPK8XddfiKcS_-pYwG5b7i8pwh7ea-QDA=fwZgkP245Ad9ECQ@mail.gmail.com>
+ <20250904-11ba6fa251f914016170c0e4@orel>
+In-Reply-To: <20250904-11ba6fa251f914016170c0e4@orel>
+From: Joel Stanley <joel@jms.id.au>
+Date: Tue, 9 Sep 2025 14:38:34 +0930
+X-Gm-Features: AS18NWD7IqIrRLFAZ974tA0j1eH-dJLYx1GRysFMdqkPB52xRhZMNwMvKB_OEak
+Message-ID: <CACPK8XcV_zCy7sVeSg+muCQ89ZxuhPPXJPMztSisi_oHgMK_Sw@mail.gmail.com>
+Subject: Re: [kvm-unit-tests] riscv build failure
+To: Andrew Jones <andrew.jones@linux.dev>
+Cc: kvm-riscv@lists.infradead.org, Nicholas Piggin <npiggin@gmail.com>, 
+	Buildroot Mailing List <buildroot@buildroot.org>, kvm@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 
+On Fri, 5 Sept 2025 at 07:54, Andrew Jones <andrew.jones@linux.dev> wrote:
 
+> I applied similar steps but couldn't reproduce this. It also looks like we
+> have a dependency because configuring with '--cc=/path/to/mygcc', where
+> mygcc is
+>
+>    #!/bin/bash
+>    for x in $@; do
+>        if [[ $x =~ sbi-asm ]] && ! [[ $x =~ sbi-asm-offsets ]]; then
+>            sleep 5
+>            break
+>        fi
+>    done
+>    /path/to/riscv64-linux-gnu-gcc $@
+>
+> stalls the build 5 seconds when compiling sbi-asm.S but doesn't reproduce
+> the issue. That said, running make with -d shows that riscv/sbi-asm.o is
+> an implicit prerequisite, although so are other files. I'm using
+> GNU Make 4.4.1. Which version are you using?
 
-On 9/5/25 2:06 PM, Jason Gunthorpe wrote:
-> When looking at a PCIe switch we want to see that the USP/DSP MMIO have
-> request redirect enabled. Detect the case where the USP is expressly not
-> isolated from the DSP and ensure the USP is included in the group.
-> 
-> The DSP Memory Target also applies to the Root Port, check it there
-> too. If upstream directed transactions can reach the root port MMIO then
-> it is not isolated.
-> 
-> Signed-off-by: Jason Gunthorpe <jgg@nvidia.com>
-> ---
->   drivers/pci/search.c | 16 +++++++++++++---
->   1 file changed, 13 insertions(+), 3 deletions(-)
-> 
-> diff --git a/drivers/pci/search.c b/drivers/pci/search.c
-> index dac6b042fd5f5d..cba417cbe3476e 100644
-> --- a/drivers/pci/search.c
-> +++ b/drivers/pci/search.c
-> @@ -127,6 +127,8 @@ static enum pci_bus_isolation pcie_switch_isolated(struct pci_bus *bus)
->   	 * traffic flowing upstream back downstream through another DSP.
->   	 *
->   	 * Thus any non-permissive DSP spoils the whole bus.
-> +	 * PCI_ACS_UNCLAIMED_RR is not required since rejecting requests with
-> +	 * error is still isolation.
->   	 */
->   	guard(rwsem_read)(&pci_bus_sem);
->   	list_for_each_entry(pdev, &bus->devices, bus_list) {
-> @@ -136,8 +138,14 @@ static enum pci_bus_isolation pcie_switch_isolated(struct pci_bus *bus)
->   		    pdev->dma_alias_mask)
->   			return PCIE_NON_ISOLATED;
->   
-> -		if (!pci_acs_enabled(pdev, PCI_ACS_ISOLATED))
-> +		if (!pci_acs_enabled(pdev, PCI_ACS_ISOLATED |
-> +						   PCI_ACS_DSP_MT_RR |
-> +						   PCI_ACS_USP_MT_RR)) {
-> +			/* The USP is isolated from the DSP */
-> +			if (!pci_acs_enabled(pdev, PCI_ACS_USP_MT_RR))
-> +				return PCIE_NON_ISOLATED;
->   			return PCIE_SWITCH_DSP_NON_ISOLATED;
-> +		}
->   	}
->   	return PCIE_ISOLATED;
->   }
-> @@ -232,11 +240,13 @@ enum pci_bus_isolation pci_bus_isolated(struct pci_bus *bus)
->   	/*
->   	 * Since PCIe links are point to point root ports are isolated if there
->   	 * is no internal loopback to the root port's MMIO. Like MFDs assume if
-> -	 * there is no ACS cap then there is no loopback.
-> +	 * there is no ACS cap then there is no loopback. The root port uses
-> +	 * DSP_MT_RR for its own MMIO.
->   	 */
->   	case PCI_EXP_TYPE_ROOT_PORT:
->   		if (bridge->acs_cap &&
-> -		    !pci_acs_enabled(bridge, PCI_ACS_ISOLATED))
-> +		    !pci_acs_enabled(bridge,
-> +				     PCI_ACS_ISOLATED | PCI_ACS_DSP_MT_RR))
->   			return PCIE_NON_ISOLATED;
->   		return PCIE_ISOLATED;
->   
-Reviewed-by: Donald Dutile <ddutile@redhat.com>
+As Nick discovered, it was the older version of make that was causing
+the issue. Thanks to you both for sorting it out! I'll send the patch
+along to buildroot.
 
+> Also, while the steps above shouldn't cause problems, they are a bit odd
+>  * '--endian' only applies to ppc64
+>  * -j385 is quite large and specific. Typicall -j$(nproc) is recommended.
+
+This is a curious number. I went digging, it seems buildroot does a $nproc+1:
+
+PARALLEL_JOBS := $(shell echo \
+        $$((1 + `getconf _NPROCESSORS_ONLN 2>/dev/null || echo 1`)))
+
+Knowing how these things go I'm sure there is some reason they do this
+instead of calling nproc.
+
+Less counting perhaps? getconf ends up reading sysfs:
+
+openat(AT_FDCWD, "/sys/devices/system/cpu/online", O_RDONLY|O_CLOEXEC) = 3
+read(3, "0-383\n", 1024)                = 6
+
+Whereas nproc calls sched_getaffinity, and then depending on how new
+the glibc is will loop over all the CPUs to get a count:
+
+sched_getaffinity(0, 128, [0 ... 383]) = 48
+
+coreutils has this to say:
+
+  /* On systems with a modern affinity mask system call, we have
+         sysconf (_SC_NPROCESSORS_CONF)
+            >= sysconf (_SC_NPROCESSORS_ONLN)
+               >= num_processors_via_affinity_mask ()
+     The first number is the number of CPUs configured in the system.
+     The second number is the number of CPUs available to the scheduler.
+     The third number is the number of CPUs available to the current process.
+
+     Note! On Linux systems with glibc, the first and second number come from
+     the /sys and /proc file systems (see
+     glibc/sysdeps/unix/sysv/linux/getsysstats.c).
+     In some situations these file systems are not mounted, and the sysconf call
+     returns 1 or 2 (<https://sourceware.org/bugzilla/show_bug.cgi?id=21542>),
+     which does not reflect the reality.  */
+
+Anyway. That's how we arrived at 385!
+
+Cheers,
+
+Joel
 
