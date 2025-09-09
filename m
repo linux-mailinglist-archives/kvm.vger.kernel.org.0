@@ -1,165 +1,134 @@
-Return-Path: <kvm+bounces-57109-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-57110-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0DE04B4FE91
-	for <lists+kvm@lfdr.de>; Tue,  9 Sep 2025 16:02:46 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 11ADEB4FF25
+	for <lists+kvm@lfdr.de>; Tue,  9 Sep 2025 16:18:38 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C065A5E1D83
-	for <lists+kvm@lfdr.de>; Tue,  9 Sep 2025 14:02:44 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id C1E4E1885988
+	for <lists+kvm@lfdr.de>; Tue,  9 Sep 2025 14:18:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 45470229B38;
-	Tue,  9 Sep 2025 14:02:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6343D3451B3;
+	Tue,  9 Sep 2025 14:18:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="Fvu5U9WH"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="k5oVGOib"
 X-Original-To: kvm@vger.kernel.org
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pg1-f202.google.com (mail-pg1-f202.google.com [209.85.215.202])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E672C22F77E
-	for <kvm@vger.kernel.org>; Tue,  9 Sep 2025 14:02:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 19FEB1E5718
+	for <kvm@vger.kernel.org>; Tue,  9 Sep 2025 14:18:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757426554; cv=none; b=SM4DczmoESujNXke4RMoJboclvdf3VrdvgvX2BVj1QS30ydYsp9C2tBbgrcuIbWbwBg8mwC7MP2y5QNsmU/qJPWZhYUK4TyGgAxSd8+mLwlpBWhshQD5iD3037WG0GwkkK22LEX+ibd4KtLG3DWWdPeRx5ORGPrAZaiwa6JYj98=
+	t=1757427506; cv=none; b=WwmEDdTMDe2Bgs7f7rNoA+ym4Qyu2A34HXYazYoYAr/KxcTY+ZvEIV5ndHQnnvpLo0fr5kp9ikoPXrdGeZCRPNGy3IWTFeyp3C0BOgxOAHt6eW02gZfrzsLLjq7X7ZMVYmtdiYYN4V2wXk+9O2Gt2EvchQs2SB+Ln1u4DW10sA0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757426554; c=relaxed/simple;
-	bh=G1dPPDxJXLZo8fMZuEE7FGykyGE8FBrH9KLefb2wg/s=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=rAi8xWUm6sCD5jvlEN1ifJPdzeR1Fa/Sp3qzA0btvpgkwQIrv/5Bxlj651ePCeWHl8J+YoCpURMVpnMgVQ6w15C5xtCLl4dJz+e9qMYFPB9rQkasp4cib4ccpfKL2IkPoC6BVAeiTreZqwPgQq+SGWq2DmFkpknjthiNxRpK7/s=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=Fvu5U9WH; arc=none smtp.client-ip=148.163.156.1
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
-Received: from pps.filterd (m0353729.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 5896qZJc022621;
-	Tue, 9 Sep 2025 14:02:25 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
-	:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=pp1; bh=x5cSmE
-	2GiowbYIIxGD1VOGSOplzrFRBCQcKij5HxouU=; b=Fvu5U9WHty6h08lgYJzxdQ
-	zYjHjbptz8GENbRw5Qrke6cwMkvKAGMSvmPDe+w4rn9bGnS0zPKqTm2GdXNEW/Qd
-	0j5VvYnh7IKzB1H66pnf6P6QulPBqE0/cOHFGBqScXQuOgKJ43i5zG0UHV8OzRSk
-	6Q5176D9Szp7yN2tHLLLkVNNwg7MJKfJ91HnCUrois4lWfjydtASn/KNUWAIrkgs
-	KRvZbMItkpd9CPAGl4xuoq6qCYHcNKjZCwnU0KTeAkH7x5DrwlA/TUt6m7qJbTqf
-	Nl7Qvhagvd5OjHT6mw/mE1jkeFVBC1vOY1M7oxvJ/WgmZtT2g9yk+u2Y2k+CDS1A
-	==
-Received: from ppma12.dal12v.mail.ibm.com (dc.9e.1632.ip4.static.sl-reverse.com [50.22.158.220])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 490cmwr873-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Tue, 09 Sep 2025 14:02:25 +0000 (GMT)
-Received: from pps.filterd (ppma12.dal12v.mail.ibm.com [127.0.0.1])
-	by ppma12.dal12v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 589D9EEU011434;
-	Tue, 9 Sep 2025 14:02:23 GMT
-Received: from smtprelay04.fra02v.mail.ibm.com ([9.218.2.228])
-	by ppma12.dal12v.mail.ibm.com (PPS) with ESMTPS id 490y9ubpuh-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Tue, 09 Sep 2025 14:02:23 +0000
-Received: from smtpav05.fra02v.mail.ibm.com (smtpav05.fra02v.mail.ibm.com [10.20.54.104])
-	by smtprelay04.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 589E2JiA31982190
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Tue, 9 Sep 2025 14:02:20 GMT
-Received: from smtpav05.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id D4DE120040;
-	Tue,  9 Sep 2025 14:02:19 +0000 (GMT)
-Received: from smtpav05.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 850CA2004D;
-	Tue,  9 Sep 2025 14:02:19 +0000 (GMT)
-Received: from p-imbrenda (unknown [9.111.75.184])
-	by smtpav05.fra02v.mail.ibm.com (Postfix) with SMTP;
-	Tue,  9 Sep 2025 14:02:19 +0000 (GMT)
-Date: Tue, 9 Sep 2025 15:49:08 +0200
-From: Claudio Imbrenda <imbrenda@linux.ibm.com>
-To: Thomas Huth <thuth@redhat.com>
-Cc: kvm@vger.kernel.org, Andrew Jones <andrew.jones@linux.dev>,
-        Janosch
- Frank <frankja@linux.ibm.com>,
-        Nico =?UTF-8?B?QsO2aHI=?=
- <nrb@linux.ibm.com>
-Subject: Re: [kvm-unit-tests PATCH v2] scripts/arch-run.bash: Drop the
- dependency on "jq"
-Message-ID: <20250909154908.49943d59@p-imbrenda>
-In-Reply-To: <20250909045855.71512-1-thuth@redhat.com>
-References: <20250909045855.71512-1-thuth@redhat.com>
-Organization: IBM
-X-Mailer: Claws Mail 4.3.1 (GTK 3.24.49; x86_64-redhat-linux-gnu)
+	s=arc-20240116; t=1757427506; c=relaxed/simple;
+	bh=nr6jAAPv1DstOpTATAmpLEi+i/7+vIDpb7U41NZDK3c=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=cqRb5jRS1YdPUYxjkmXSeo77qAamyaJ+a5CmY4WU9HImbx8hdaBDn0scOv1ZufvN17F3ehs7fKHVoNIo+ootavvQRBdjZBpnG3eyGQxbOXuBzU0Dd731dxxlN7/8jqUdrcZycafzgfbkTW8LU/k2SwdKEICGjbdFgFF2kyyreIc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=k5oVGOib; arc=none smtp.client-ip=209.85.215.202
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+Received: by mail-pg1-f202.google.com with SMTP id 41be03b00d2f7-b471737c5efso4100986a12.1
+        for <kvm@vger.kernel.org>; Tue, 09 Sep 2025 07:18:24 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1757427504; x=1758032304; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=uNEX+HX4i8Zee6p5GwSFppRRtMTU8aAW6YWdaSYbVnQ=;
+        b=k5oVGOibIlUXK9X++g0buH1qTTEGAq8Ducb+XoDrL4b00u4ugoM7bty5K8VptnWbX6
+         +SjTpo0H04jF8Xc5SM+4jF7kIgGu6+YyBHHExCV+zMooM8ozVLcllR72QXfORXvYJn24
+         cZldndPhcl+pVfkIFOuuuFPUXx2IqoapFxL35uPGN3CZcmiXPfTUzBY9vemcBKzFhm2a
+         fnFJZ3lvGFGvMr7Yj08OFbZoEvynWBbY7qz13YnFjmux7ZRhce5zRETavU0/Rf8jigxs
+         bsVN764kBoC6rWIiZ9Hp2MnHxgl6bKZktGdPhKJw4EDaDb3j5qQGi3yeWxa9MKe66SyZ
+         wIQg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1757427504; x=1758032304;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=uNEX+HX4i8Zee6p5GwSFppRRtMTU8aAW6YWdaSYbVnQ=;
+        b=RKkYN0HrM2x8vaKJi7PAhB4+UEJsmSv8uvWtjGByn/WhyoE427V8MKAEcBQw1m7GiF
+         sWvp1MWCt6JroTxbeiSkZth56FfAiXIIo49yXa+UmxBVS+zBY6UhFbYX8gQXzbxXrq0M
+         xL7IOI+kXCdt3e5vuvxLWNRmdiH2S7PrAjN5J4W7IxoDPDasiXJuCXuumcGW1f+QzBc+
+         0eTxvJU/fPKnAVcZpDCOUe+t2fk6uesXYp7h4+dr45lOyWP8YBSfPEWucYhTbjmFaHOB
+         XD0hNGIpOezWz9W396dJscwl52sd25nlsrLwvpkBq7COhTV7ouBbEBjSm4ewyvG+o5oq
+         +/xA==
+X-Forwarded-Encrypted: i=1; AJvYcCV6DWMyg2OCjmBFckafhKb8nrKeVgYvpBdzt07e/QWoKYXeevwHoixJyGXPb7eRZwPhKZY=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yzuuv573szRtmPYoiyvgqAYTQip7cyBdYEtMmrRHl/dMZNojiHt
+	XuJi4EFc246YDs7ca2YJ2vnBvjpwISI8kQlrN98vB/qaiBE6PHcQ/zOrpvFilEwHlBTE1JQjiNB
+	FpTOj4A==
+X-Google-Smtp-Source: AGHT+IGjBKRuus6AQPq5wORgSoqZJ5Tvjrd4h24fLb2PTkSPtnUoSNeAfh5TUD6Fe2fxb8hp+hqfCAOt00c=
+X-Received: from pjm15.prod.google.com ([2002:a17:90b:2fcf:b0:31e:3c57:ffc8])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:902:f786:b0:24b:74da:6273
+ with SMTP id d9443c01a7336-2516f04e031mr162886165ad.3.1757427504302; Tue, 09
+ Sep 2025 07:18:24 -0700 (PDT)
+Date: Tue, 9 Sep 2025 07:18:22 -0700
+In-Reply-To: <2257f7a6-e4f5-4b90-bb18-cb0af756323f@linux.intel.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: LL5a0u_SGauvi1ZNrbbBgpFM9UYko3WS
-X-Proofpoint-ORIG-GUID: LL5a0u_SGauvi1ZNrbbBgpFM9UYko3WS
-X-Authority-Analysis: v=2.4 cv=J52q7BnS c=1 sm=1 tr=0 ts=68c03371 cx=c_pps
- a=bLidbwmWQ0KltjZqbj+ezA==:117 a=bLidbwmWQ0KltjZqbj+ezA==:17
- a=kj9zAlcOel0A:10 a=yJojWOMRYYMA:10 a=20KFwNOVAAAA:8 a=VnNF1IyMAAAA:8
- a=i0M0ddQKDvQEzp8E9eUA:9 a=CjuIK1q_8ugA:10
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUwOTA2MDAyNSBTYWx0ZWRfXyXSJEzuqvbvS
- 3xiQHjOO/6DUyz2fYr7MW3GxDYgWV0fNnZ4+b1wU5C+98rt6H/xQMr4ErZXW+8EN4I07xsADmut
- Y9xnS3Is+cr2DKB7Q8cX9tmwKlbHiBKNKpFRnb2TpQj/6r7zOuW6eIJuu+sflfzo72F74uPbQF+
- kCOy6aP/PaWhl5CrBE/nHbR5pXV2hmFcECRxuB6VJKxLMIq2DNVWgdNENixpVh07KXxBnVJJ+ka
- bCG8dtCc5jPqUSTHtKo4ZsIyJUWkX9bIUDGetbdm0iR4tUdXbzshfGuqsfqMCu4UMWvfx4xdNe7
- ge0z7MA1gSSd5Kp4zBc5+3jU2WdXhB6S7QDJnrDglaq6h/uAc877WfPeem7ER5XMUWacKiWkzAt
- JkJEaLVI
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1117,Hydra:6.1.9,FMLib:17.12.80.40
- definitions=2025-09-09_02,2025-09-08_02,2025-03-28_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- impostorscore=0 clxscore=1015 suspectscore=0 spamscore=0 phishscore=0
- bulkscore=0 adultscore=0 malwarescore=0 priorityscore=1501
- classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
- reason=mlx scancount=1 engine=8.19.0-2507300000 definitions=main-2509060025
+Mime-Version: 1.0
+References: <20250822070305.26427-1-yan.y.zhao@intel.com> <20250822070523.26495-1-yan.y.zhao@intel.com>
+ <2257f7a6-e4f5-4b90-bb18-cb0af756323f@linux.intel.com>
+Message-ID: <aMA3LjGP9nezNM7e@google.com>
+Subject: Re: [PATCH v2 2/3] KVM: TDX: Do not retry locally when the retry is
+ caused by invalid memslot
+From: Sean Christopherson <seanjc@google.com>
+To: Binbin Wu <binbin.wu@linux.intel.com>
+Cc: Yan Zhao <yan.y.zhao@intel.com>, pbonzini@redhat.com, reinette.chatre@intel.com, 
+	rick.p.edgecombe@intel.com, linux-kernel@vger.kernel.org, kvm@vger.kernel.org
+Content-Type: text/plain; charset="us-ascii"
 
-On Tue,  9 Sep 2025 06:58:55 +0200
-Thomas Huth <thuth@redhat.com> wrote:
-
-> From: Thomas Huth <thuth@redhat.com>
+On Tue, Sep 09, 2025, Binbin Wu wrote:
+> On 8/22/2025 3:05 PM, Yan Zhao wrote:
+> > diff --git a/arch/x86/kvm/vmx/tdx.c b/arch/x86/kvm/vmx/tdx.c
+> > index 6784aaaced87..de2c4bb36069 100644
+> > --- a/arch/x86/kvm/vmx/tdx.c
+> > +++ b/arch/x86/kvm/vmx/tdx.c
+> > @@ -1992,6 +1992,11 @@ static int tdx_handle_ept_violation(struct kvm_vcpu *vcpu)
+> >   	 * blocked by TDs, false positives are inevitable i.e., KVM may re-enter
+> >   	 * the guest even if the IRQ/NMI can't be delivered.
+> >   	 *
+> > +	 * Breaking out of the local retries if a retry is caused by faulting
+> > +	 * in an invalid memslot (indicating the slot is under removal), so that
+> > +	 * the slot removal will not be blocked due to waiting for releasing
+> > +	 * SRCU lock in the VMExit handler.
+> > +	 *
+> >   	 * Note: even without breaking out of local retries, zero-step
+> >   	 * mitigation may still occur due to
+> >   	 * - invoking of TDH.VP.ENTER after KVM_EXIT_MEMORY_FAULT,
+> > @@ -2002,6 +2007,8 @@ static int tdx_handle_ept_violation(struct kvm_vcpu *vcpu)
+> >   	 * handle retries locally in their EPT violation handlers.
+> >   	 */
+> >   	while (1) {
+> > +		struct kvm_memory_slot *slot;
+> > +
+> >   		ret = __vmx_handle_ept_violation(vcpu, gpa, exit_qual);
+> >   		if (ret != RET_PF_RETRY || !local_retry)
+> > @@ -2015,6 +2022,10 @@ static int tdx_handle_ept_violation(struct kvm_vcpu *vcpu)
+> >   			break;
+> >   		}
+> > +		slot = kvm_vcpu_gfn_to_memslot(vcpu, gpa_to_gfn(gpa));
+> > +		if (slot && slot->flags & KVM_MEMSLOT_INVALID)
 > 
-> For checking whether a panic event occurred, a simple "grep"
-> for the related text in the output is enough - it's very unlikely
-> that the output of QEMU will change. This way we can drop the
-> dependency on the program "jq" which might not be installed on
-> some systems.
-> 
-> Signed-off-by: Thomas Huth <thuth@redhat.com>
+> The slot couldn't be NULL here, right?
 
-Reviewed-by: Claudio Imbrenda <imbrenda@linux.ibm.com>
+Uh, hmm.  It could be NULL.  If the memslot deletion starts concurrently with the
+S-EPT violation, then the memslot could be transitioned to INVALID (prepared for
+deletion) prior to the vCPU acquiring SRCU after the VM-Exit.  Memslot deletion
+could then assign to kvm->memslots with a NULL memslot.
 
-> ---
->  v2: Change the regular expression according to Claudio's suggestion
-> 
->  scripts/arch-run.bash | 8 +-------
->  1 file changed, 1 insertion(+), 7 deletions(-)
-> 
-> diff --git a/scripts/arch-run.bash b/scripts/arch-run.bash
-> index 36222355..16417a1e 100644
-> --- a/scripts/arch-run.bash
-> +++ b/scripts/arch-run.bash
-> @@ -296,11 +296,6 @@ do_migration ()
->  
->  run_panic ()
->  {
-> -	if ! command -v jq >/dev/null 2>&1; then
-> -		echo "${FUNCNAME[0]} needs jq" >&2
-> -		return 77
-> -	fi
-> -
->  	trap 'trap - TERM ; kill 0 ; exit 2' INT TERM
->  	trap 'rm -f ${qmp}.in ${qmp}.out' RETURN EXIT
->  
-> @@ -312,8 +307,7 @@ run_panic ()
->  		-mon chardev=mon,mode=control -S &
->  	echo '{ "execute": "qmp_capabilities" }{ "execute": "cont" }' > ${qmp}.in
->  
-> -	panic_event_count=$(jq -c 'select(.event == "GUEST_PANICKED")' < ${qmp}.out | wc -l)
-> -	if [ "$panic_event_count" -lt 1 ]; then
-> +	if ! grep -E -q '"event"[[:blank:]]*:[[:blank:]]*"GUEST_PANICKED"' ${qmp}.out ; then
->  		echo "FAIL: guest did not panic"
->  		ret=3
->  	else
-
+  vCPU                          DELETE
+  S-EPT Violation
+                                Set KVM_MEMSLOT_INVALID
+                                synchronize_srcu_expedited()
+  Acquire SRCU
+  __vmx_handle_ept_violation()
+  RET_PF_RETRY due to INVALID
+                                Set memslot NULL
+  kvm_vcpu_gfn_to_memslot()
 
