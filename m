@@ -1,111 +1,114 @@
-Return-Path: <kvm+bounces-57116-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-57117-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8FA76B50216
-	for <lists+kvm@lfdr.de>; Tue,  9 Sep 2025 18:06:07 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2CF56B50260
+	for <lists+kvm@lfdr.de>; Tue,  9 Sep 2025 18:20:41 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3DB4E445C36
-	for <lists+kvm@lfdr.de>; Tue,  9 Sep 2025 16:06:01 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 0269F1C61F4C
+	for <lists+kvm@lfdr.de>; Tue,  9 Sep 2025 16:20:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8FE5032CF76;
-	Tue,  9 Sep 2025 16:05:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 07E41352066;
+	Tue,  9 Sep 2025 16:20:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="lTj96fNZ"
+	dkim=pass (4096-bit key) header.d=alien8.de header.i=@alien8.de header.b="kcmnc1GC"
 X-Original-To: kvm@vger.kernel.org
-Received: from out-177.mta1.migadu.com (out-177.mta1.migadu.com [95.215.58.177])
+Received: from mail.alien8.de (mail.alien8.de [65.109.113.108])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CA78121B9C0
-	for <kvm@vger.kernel.org>; Tue,  9 Sep 2025 16:05:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.177
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 613C32676DE;
+	Tue,  9 Sep 2025 16:20:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=65.109.113.108
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757433953; cv=none; b=aG68VK1S8IiqtP6HzevpfGJWzN2G1ny0AnSwurRhsNQIXDsy7qzP9qdcXAyqvu88z11+x+EbPxRP/DSunsd6+USsmbjKk4v5Jo0Nc0qK+HsweE8I5zB/6CAoWBnhLtbhCjfMNFaMXIIKR6VUCi3ECMooQpxlvYHJfrTe0g34Py8=
+	t=1757434821; cv=none; b=uplQFROWHr+mFLRrwHgKzpR3tz1ibFTGQLRnucJk/nMbwSjDpdVKAdT9Yn0WHRsThdGLP5TchMbdCdoKZrgliwae6/arnmUm4p5cTgEdWN6Alq7uRDKg+eGYX0w5s9YFV35+VGF5h6X0XxUYbOleaShgE5n/7Ea5XPWUGByLcCk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757433953; c=relaxed/simple;
-	bh=BayPygkvSB3pW7SeNQ4pT1Dw+756o87lhKeFhVlzsiE=;
+	s=arc-20240116; t=1757434821; c=relaxed/simple;
+	bh=DZrzh3YrIPCMm+fmI9j9QYQyXWS+KJz5vNz1swKkAZc=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Dr32Q7srFT6liI0kn/QZf/GMPx/12iGikx1ua6isWcYX2xtCMqn6+YUNZjz0/voG+rJIAYh6XOalvQ7+N2SVtUbnIT8dEmXpfHvMBkkqYzijs9TnBw8J1OU0U+LoesXQHEEgkK/0DuhTY8oU0xnXwXfuDWpOkcCi/2DKaR+dcOs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=lTj96fNZ; arc=none smtp.client-ip=95.215.58.177
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Date: Tue, 9 Sep 2025 11:05:31 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1757433948;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=U65ZvJGogLI9XWduZqdaqweGCV4FAS/M646h++xRfuY=;
-	b=lTj96fNZndhKkuqjhWqZ5yrp86riiJAyVEt6EiyphVxIQY1W7Qn+JVPxwgOQDYjkgZkjFH
-	k+E0fvSgn2OQgPxzxJyUKpePI3mw5qwdmt9ZEPKW//Whn2oKF2g5DoSljCQ4DvJ4h0QTjR
-	Eztay8rshdbo9AeNrV1BY2qG+IsqnZI=
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Andrew Jones <andrew.jones@linux.dev>
-To: Thomas Huth <thuth@redhat.com>
-Cc: kvm@vger.kernel.org, Claudio Imbrenda <imbrenda@linux.ibm.com>, 
-	Janosch Frank <frankja@linux.ibm.com>, Nico =?utf-8?B?QsO2aHI=?= <nrb@linux.ibm.com>
-Subject: Re: [kvm-unit-tests PATCH v2] scripts/arch-run.bash: Drop the
- dependency on "jq"
-Message-ID: <20250909-007d720ee7bacfea514e5f19@orel>
-References: <20250909045855.71512-1-thuth@redhat.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=M9JuMh07Zq2QNi+l2Jj1bJUm8qNQky8yRB+xawEmMq1+mOt2q3XH+F48iNzF8xeJk+6DxJQc0/YahQSQm3yngSY0y+kHnleAiJ7GAw5Tbw7K+vBhnd7sC1UhoFw5Y7GPd0aA3QBazZux8oclLd3dkUrzHextqpu3pn5jCK/f5TA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=alien8.de; spf=pass smtp.mailfrom=alien8.de; dkim=pass (4096-bit key) header.d=alien8.de header.i=@alien8.de header.b=kcmnc1GC; arc=none smtp.client-ip=65.109.113.108
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=alien8.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=alien8.de
+Received: from localhost (localhost.localdomain [127.0.0.1])
+	by mail.alien8.de (SuperMail on ZX Spectrum 128k) with ESMTP id B178640E015C;
+	Tue,  9 Sep 2025 16:20:17 +0000 (UTC)
+X-Virus-Scanned: Debian amavisd-new at mail.alien8.de
+Authentication-Results: mail.alien8.de (amavisd-new); dkim=pass (4096-bit key)
+	header.d=alien8.de
+Received: from mail.alien8.de ([127.0.0.1])
+	by localhost (mail.alien8.de [127.0.0.1]) (amavisd-new, port 10026)
+	with ESMTP id JWkyA880veGD; Tue,  9 Sep 2025 16:20:14 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=alien8;
+	t=1757434814; bh=JXykKyxBLHPVAEdl8ppaWAN7HuPa8yfNHgz3CX8cwqU=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=kcmnc1GCRz9SHgxzzrXJ63GQDbBvJcdzZtKmen8BLUqe2LJS+m9Br8OammWEpS0Ia
+	 tElg+Gy16W/i17ZoG6U1z31PNB66l/wIg3qPgbLDniEYspZ3QAct1na/8mC1P3xjxG
+	 q50ZN2hf1+L74xulicSh/PdfGXKR6LvOyPv39orm4N1BK0cfU9Bg4HyEljgMFzNIDT
+	 dUNX8U6W53J9zF658boiBukyD7u2P3/mOqzATPSzQNdm1kaDAh8JBrwWkamEcGrYMr
+	 LsurNyA91GCLYpMMr8g1Jxl65wECTdLNkvl0U3tYrZmcrbKxWul4NTfeSsWRQXcmvg
+	 F0OwvmfByKCM4jx/x155nHi/2CDzhl6uqxGz9z1vKEQ3XijEi10Wu0Xqpm2iY6j/ip
+	 AHPV3gaSxzwvSsEKJ52qWK3Xm/Ys6KXZenjmUKL3oyUAhp4DwWQdRozm1Ru1Hmldgv
+	 wR35iE9/jibplztA8xr7rxtff48fsvEzPp1JUeDqPUFw/whH2ANUq1cl/1rLxN3LN6
+	 i5e3CL9UB2kAj06nFmbA7bL2FJ+lfRO4aQHLtvTSq8B6GwAg3DykheyJEKTowehsnX
+	 fhIvKU5e8/KPncZa0+gg585jgNOOldGsWDtSFN4XL7sP5FYZxo1454MdTuhk6xvxP8
+	 9MpMWVGymPDe+d6nV1jkQcOo=
+Received: from zn.tnic (p5de8ed27.dip0.t-ipconnect.de [93.232.237.39])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange ECDHE (P-256) server-signature ECDSA (P-256) server-digest SHA256)
+	(No client certificate requested)
+	by mail.alien8.de (SuperMail on ZX Spectrum 128k) with UTF8SMTPSA id D60D140E015F;
+	Tue,  9 Sep 2025 16:19:31 +0000 (UTC)
+Date: Tue, 9 Sep 2025 18:19:30 +0200
+From: Borislav Petkov <bp@alien8.de>
+To: Reinette Chatre <reinette.chatre@intel.com>
+Cc: Babu Moger <babu.moger@amd.com>, corbet@lwn.net, tony.luck@intel.com,
+	Dave.Martin@arm.com, james.morse@arm.com, tglx@linutronix.de,
+	mingo@redhat.com, dave.hansen@linux.intel.com, x86@kernel.org,
+	hpa@zytor.com, kas@kernel.org, rick.p.edgecombe@intel.com,
+	akpm@linux-foundation.org, paulmck@kernel.org, frederic@kernel.org,
+	pmladek@suse.com, rostedt@goodmis.org, kees@kernel.org,
+	arnd@arndb.de, fvdl@google.com, seanjc@google.com,
+	thomas.lendacky@amd.com, pawan.kumar.gupta@linux.intel.com,
+	perry.yuan@amd.com, manali.shukla@amd.com, sohil.mehta@intel.com,
+	xin@zytor.com, Neeraj.Upadhyay@amd.com, peterz@infradead.org,
+	tiala@microsoft.com, mario.limonciello@amd.com,
+	dapeng1.mi@linux.intel.com, michael.roth@amd.com,
+	chang.seok.bae@intel.com, linux-doc@vger.kernel.org,
+	linux-kernel@vger.kernel.org, linux-coco@lists.linux.dev,
+	kvm@vger.kernel.org, peternewman@google.com, eranian@google.com,
+	gautham.shenoy@amd.com
+Subject: Re: [PATCH v18 00/33] x86,fs/resctrl: Support AMD Assignable
+ Bandwidth Monitoring Counters (ABMC)
+Message-ID: <20250909161930.GBaMBTku_VgKUpTs2V@fat_crate.local>
+References: <cover.1757108044.git.babu.moger@amd.com>
+ <107058d3-9c2d-4cd4-beba-d65b7c6bd9a0@intel.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20250909045855.71512-1-thuth@redhat.com>
-X-Migadu-Flow: FLOW_OUT
+In-Reply-To: <107058d3-9c2d-4cd4-beba-d65b7c6bd9a0@intel.com>
 
-On Tue, Sep 09, 2025 at 06:58:55AM +0200, Thomas Huth wrote:
-> From: Thomas Huth <thuth@redhat.com>
-> 
-> For checking whether a panic event occurred, a simple "grep"
-> for the related text in the output is enough - it's very unlikely
-> that the output of QEMU will change. This way we can drop the
-> dependency on the program "jq" which might not be installed on
-> some systems.
-> 
-> Signed-off-by: Thomas Huth <thuth@redhat.com>
-> ---
->  v2: Change the regular expression according to Claudio's suggestion
-> 
->  scripts/arch-run.bash | 8 +-------
->  1 file changed, 1 insertion(+), 7 deletions(-)
-> 
-> diff --git a/scripts/arch-run.bash b/scripts/arch-run.bash
-> index 36222355..16417a1e 100644
-> --- a/scripts/arch-run.bash
-> +++ b/scripts/arch-run.bash
-> @@ -296,11 +296,6 @@ do_migration ()
->  
->  run_panic ()
->  {
-> -	if ! command -v jq >/dev/null 2>&1; then
-> -		echo "${FUNCNAME[0]} needs jq" >&2
-> -		return 77
-> -	fi
-> -
->  	trap 'trap - TERM ; kill 0 ; exit 2' INT TERM
->  	trap 'rm -f ${qmp}.in ${qmp}.out' RETURN EXIT
->  
-> @@ -312,8 +307,7 @@ run_panic ()
->  		-mon chardev=mon,mode=control -S &
->  	echo '{ "execute": "qmp_capabilities" }{ "execute": "cont" }' > ${qmp}.in
->  
-> -	panic_event_count=$(jq -c 'select(.event == "GUEST_PANICKED")' < ${qmp}.out | wc -l)
-> -	if [ "$panic_event_count" -lt 1 ]; then
-> +	if ! grep -E -q '"event"[[:blank:]]*:[[:blank:]]*"GUEST_PANICKED"' ${qmp}.out ; then
->  		echo "FAIL: guest did not panic"
->  		ret=3
->  	else
-> -- 
-> 2.51.0
->
+On Tue, Sep 09, 2025 at 09:03:13AM -0700, Reinette Chatre wrote:
+> When I checked tip/master did not include x86/urgent yet but when it does (and
+> tip/master thus includes x86/cache and x86/urgent), could you please
+> merge your series on top of tip/master to ensure all conflicts can be resolved
+> cleanly and ready to provide conflict resolutions to Boris if needed?
 
-Reviewed-by: Andrew Jones <andrew.jones@linux.dev>
+Thanks, just give it a test but no rebasing anymore - I'm going through the
+set. If there are conflicts, we do enough patch tetris in tip to catch them
+and handle them upfront - you guys don't have to worry about it.
+
+Thx.
+
+-- 
+Regards/Gruss,
+    Boris.
+
+https://people.kernel.org/tglx/notes-about-netiquette
 
