@@ -1,154 +1,134 @@
-Return-Path: <kvm+bounces-57142-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-57143-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 44F06B5071C
-	for <lists+kvm@lfdr.de>; Tue,  9 Sep 2025 22:30:31 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 65C72B5076F
+	for <lists+kvm@lfdr.de>; Tue,  9 Sep 2025 22:48:59 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2AB283A483C
-	for <lists+kvm@lfdr.de>; Tue,  9 Sep 2025 20:30:06 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 8B7ED1C659C2
+	for <lists+kvm@lfdr.de>; Tue,  9 Sep 2025 20:49:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A356136C071;
-	Tue,  9 Sep 2025 20:28:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5BF6F342C93;
+	Tue,  9 Sep 2025 20:48:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="UgTRwrzG"
+	dkim=pass (1024-bit key) header.d=raptorengineering.com header.i=@raptorengineering.com header.b="vHUt4pHm"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pf1-f201.google.com (mail-pf1-f201.google.com [209.85.210.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from raptorengineering.com (mail.raptorengineering.com [23.155.224.40])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 47F013680B6
-	for <kvm@vger.kernel.org>; Tue,  9 Sep 2025 20:28:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 670A23597A
+	for <kvm@vger.kernel.org>; Tue,  9 Sep 2025 20:48:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=23.155.224.40
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757449727; cv=none; b=jNmYhYSrouLRRFkstQLa/D52ajN+wP+sC5nslJlSmwaoQQZzlB7vB+S4HZpKgmbpskVKqaN+HzVTKv+1RiWG2z7GdM2VZfmd3wlbtoW8IunnGnpU+L7Cd9krDqG0bXNFjJ7MmZGhwoESLXAvC62Hv4alO0uzYNOzP5EwqHO7m8k=
+	t=1757450933; cv=none; b=CTR5ZxVyokPv693Npp5RTKTKUR89ulHTfKbXUi4lIBVMA5in0FXlss1se/2vBLnkGVc6jx+Ct7vltGaJShFQ9UEvwGRqFctcGVsqvT9hIQoGYY2kLkPGieJuScSOR9u2rWwY2oKp6c2HXAOWfOww1vuC2CPGv5dDGvKjxjUOFvg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757449727; c=relaxed/simple;
-	bh=l1p+ajwaVGWFswKTwWM0EkrL8pc+SEJVITkZ4XN4ybI=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=kyzaM7U2ETyTXMnpWqQctvTkXKcbY4eC4RLUoTX4Krd82r+jW0wWsqLfI0he/6Vfz8ZoIQJURmUtXeyn2Gc43V6pX+JXfaSHubv6297mWtv7GIYn+CdwcaJXC4Ng8d4aiNec5qwsKnwP8xWAlf8s8HbNjLswgIvIHgZBHHbFoJU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=UgTRwrzG; arc=none smtp.client-ip=209.85.210.201
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pf1-f201.google.com with SMTP id d2e1a72fcca58-7723aca1cbcso5714020b3a.2
-        for <kvm@vger.kernel.org>; Tue, 09 Sep 2025 13:28:46 -0700 (PDT)
+	s=arc-20240116; t=1757450933; c=relaxed/simple;
+	bh=g6R1h/BhvYe2WmruXaj8MDnedgDzaue30m/ddAAmfFs=;
+	h=Date:From:To:Cc:Message-ID:Subject:MIME-Version:Content-Type; b=EQM0nW8Yh9lWzzV80pe4Hf99CDm3balIdKeDj0NROXVDAJfEam3IWOQy8gSM0Yr8NPmYC2+cro1g2FkKEh+HcWiv6uHxxPjEcLeeFFaN4uF4qISFhLzAwFXvC4oi5amsLyeN9YBKB31D6hjhNTGNR2ggswVBj/sllrO5uKgXENo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=raptorengineering.com; spf=pass smtp.mailfrom=raptorengineering.com; dkim=pass (1024-bit key) header.d=raptorengineering.com header.i=@raptorengineering.com header.b=vHUt4pHm; arc=none smtp.client-ip=23.155.224.40
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=raptorengineering.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=raptorengineering.com
+Received: from localhost (localhost [127.0.0.1])
+	by mail.rptsys.com (Postfix) with ESMTP id 12F378287DA8;
+	Tue,  9 Sep 2025 15:48:48 -0500 (CDT)
+Received: from mail.rptsys.com ([127.0.0.1])
+	by localhost (vali.starlink.edu [127.0.0.1]) (amavisd-new, port 10032)
+	with ESMTP id jAc376xn005e; Tue,  9 Sep 2025 15:48:47 -0500 (CDT)
+Received: from localhost (localhost [127.0.0.1])
+	by mail.rptsys.com (Postfix) with ESMTP id 5FBE58287DE2;
+	Tue,  9 Sep 2025 15:48:47 -0500 (CDT)
+DKIM-Filter: OpenDKIM Filter v2.10.3 mail.rptsys.com 5FBE58287DE2
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1757449725; x=1758054525; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:reply-to:from:to:cc:subject:date:message-id:reply-to;
-        bh=TVVFhn/odeLoh98SYAt/1c5wREWCW1GdBR24cmSPAxM=;
-        b=UgTRwrzGbzYZdVTNztHQsx564NlIwwqYEm9xFoEH+tpVgsEyaKKSdwBYvX8jOV5mTY
-         nXXCNMbHP2kxNt0p3PKPpPD+QzcqbqjL3d7UhavP8COua5rfpysQ1zI9UMTUQOHK5mK4
-         Rg4mc/f21k/h/pcL4qdfbDVGDWsZgZyXGcEq6k0zW206fP+3iCHy9og6g7przEc8URB9
-         1UyLaq77PuDaqxDxx1sLecAObLS7j+lXAK5rrnANc5Ep2Ki2GjXscOTW67uat+IAkD0J
-         DFWJLBSkNGbQeKXrEEIty0lSdFBhpaHSXy35gF4tYVGLbHvks8+J0qKjk59MZbguiCTX
-         vaGQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1757449725; x=1758054525;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:reply-to:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=TVVFhn/odeLoh98SYAt/1c5wREWCW1GdBR24cmSPAxM=;
-        b=KAZCIsT2lPP86d9xKlaOVznfcRxu+Bu1GReKLm9+neWm94bOCn2UhgGV9QMj1lmEnj
-         AzsefoTi+NPY7xwuGrWQdt/oyBVsXWHjojBT1iPP+Mpq7mIwZ7dDfhiPgxcJ2yB1eeLl
-         8FypFriq+vgwV5xsZskXHYXgphll2Gab0ydJkh1jOycO2tVEH6M1fNaD+B9pQ5EX1QFn
-         cdM2L+Lo+BT5IkM40BxBqwGT/2imdPQoy+/vRS738psX5EmkBJPvyj1hLo4AjxTxfrCy
-         4RX4NUR86RLg12qwTUEwdnoTi5u2gkvJwiWA5CKxLmuHKaGCoRms7oHoNrkNjTuhcT94
-         BzkA==
-X-Gm-Message-State: AOJu0YwzupNRcjITz/AcTw56TiEPWgMDX7cUBIyWC89xlUsY9GJXos0V
-	a0moeHCvZ1yK8JvxG0HvFiJX6vM+qwmMj+RoJIsvmvh7x1tsM9HqeEy81gbTFHfj11TPCLOorkI
-	FES2/9g==
-X-Google-Smtp-Source: AGHT+IH8uNMlu5Y0TjLA9EVWSsLg10Gx/gLxUasJpNUgiCjgYV16KpeaSDIBsZoEG0G6FLCAc+Hh4TDudAk=
-X-Received: from pjl8.prod.google.com ([2002:a17:90b:2f88:b0:327:e697:7bdf])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a05:6a20:2583:b0:250:c76d:1cd8
- with SMTP id adf61e73a8af0-2533f8c9498mr19873101637.20.1757449725604; Tue, 09
- Sep 2025 13:28:45 -0700 (PDT)
-Reply-To: Sean Christopherson <seanjc@google.com>
-Date: Tue,  9 Sep 2025 13:28:35 -0700
-In-Reply-To: <20250909202835.333554-1-seanjc@google.com>
+	d=raptorengineering.com; s=B8E824E6-0BE2-11E6-931D-288C65937AAD;
+	t=1757450927; bh=aHB5DXkErjn2E5tn1hQOECXYgRXXDEcJQb4TCKOHPKY=;
+	h=Date:From:To:Message-ID:MIME-Version;
+	b=vHUt4pHmyzEeERDA/vZRWNpHMRm9WD2860IVhEZ1SwCwQoRoc8v2xAmlDSGd2tuoY
+	 +7X70xJ8D2ffJcyZTx4KJwZKLX7SqxF4bKgmpAscvqeWEs3kSDPrTYdPDiRSDhGZGr
+	 ptSnybrUVuF+n2MmY3kszhjw4D80HIYK4AGOYMs4=
+X-Virus-Scanned: amavisd-new at rptsys.com
+Received: from mail.rptsys.com ([127.0.0.1])
+	by localhost (vali.starlink.edu [127.0.0.1]) (amavisd-new, port 10026)
+	with ESMTP id cD_RFPt7wzuY; Tue,  9 Sep 2025 15:48:47 -0500 (CDT)
+Received: from vali.starlink.edu (localhost [127.0.0.1])
+	by mail.rptsys.com (Postfix) with ESMTP id 263888287DA8;
+	Tue,  9 Sep 2025 15:48:47 -0500 (CDT)
+Date: Tue, 9 Sep 2025 15:48:46 -0500 (CDT)
+From: Timothy Pearson <tpearson@raptorengineering.com>
+To: kvm <kvm@vger.kernel.org>
+Cc: linuxppc-dev <linuxppc-dev@lists.ozlabs.org>
+Message-ID: <663798478.1707537.1757450926706.JavaMail.zimbra@raptorengineeringinc.com>
+Subject: [PATCH] vfio/pci: Fix INTx handling on legacy DisINTx- PCI devices
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20250909202835.333554-1-seanjc@google.com>
-X-Mailer: git-send-email 2.51.0.384.g4c02a37b29-goog
-Message-ID: <20250909202835.333554-5-seanjc@google.com>
-Subject: [PATCH 4/4] KVM: selftests: Add support for DIV and IDIV in the
- fastops test
-From: Sean Christopherson <seanjc@google.com>
-To: Sean Christopherson <seanjc@google.com>, Paolo Bonzini <pbonzini@redhat.com>
-Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 7bit
+X-Mailer: Zimbra 8.5.0_GA_3042 (ZimbraWebClient - GC139 (Linux)/8.5.0_GA_3042)
+Thread-Index: R10GhsXRj6kdi6znKwcsfy1REC69Aw==
+Thread-Topic: vfio/pci: Fix INTx handling on legacy DisINTx- PCI devices
 
-Extend the fastops test coverage to DIV and IDIV, specifically to provide
-coverage for #DE (divide error) exceptions, as #DE is the only exception
-that can occur in KVM's fastops path, i.e. that requires exception fixup.
+PCI devices prior to PCI 2.3 both use level interrupts and do not support
+interrupt masking, leading to a failure when passed through to a KVM guest on
+at least the ppc64 platform, which does not utilize the resample IRQFD. This
+failure manifests as receiving and acknowledging a single interrupt in the guest
+while leaving the host physical device VFIO IRQ pending.
 
-Signed-off-by: Sean Christopherson <seanjc@google.com>
+Level interrupts in general require special handling due to their inherently
+asynchronous nature; both the host and guest interrupt controller need to
+remain in synchronization in order to coordinate mask and unmask operations.
+When lazy IRQ masking is used on DisINTx- hardware, the following sequence
+occurs:
+
+ * Level IRQ assertion on host
+ * IRQ trigger within host interrupt controller, routed to VFIO driver
+ * Host EOI with hardware level IRQ still asserted
+ * Software mask of interrupt source by VFIO driver
+ * Generation of event and IRQ trigger in KVM guest interrupt controller
+ * Level IRQ deassertion on host
+ * Guest EOI
+ * Guest IRQ level deassertion
+ * Removal of software mask by VFIO driver
+
+Note that no actual state change occurs within the host interrupt controller,
+unlike what would happen with either DisINTx+ hardware or message interrupts.
+The host EOI is not fired with the hardware level IRQ deasserted, and the
+level interrupt is not re-armed within the host interrupt controller, leading
+to an unrecoverable stall of the device.
+
+Work around this by disabling lazy IRQ masking for DisINTx- INTx devices.
+
 ---
- .../testing/selftests/kvm/x86/fastops_test.c  | 38 +++++++++++++++++++
- 1 file changed, 38 insertions(+)
+ drivers/vfio/pci/vfio_pci_intrs.c | 5 +++++
+ 1 file changed, 5 insertions(+)
 
-diff --git a/tools/testing/selftests/kvm/x86/fastops_test.c b/tools/testing/selftests/kvm/x86/fastops_test.c
-index 26a381c8303a..8926cfe0e209 100644
---- a/tools/testing/selftests/kvm/x86/fastops_test.c
-+++ b/tools/testing/selftests/kvm/x86/fastops_test.c
-@@ -92,6 +92,42 @@
- 			ex_flags, insn, shift, (uint64_t)input, flags);			\
- })
+diff --git a/drivers/vfio/pci/vfio_pci_intrs.c b/drivers/vfio/pci/vfio_pci_intrs.c
+index 123298a4dc8f..011169ca7a34 100644
+--- a/drivers/vfio/pci/vfio_pci_intrs.c
++++ b/drivers/vfio/pci/vfio_pci_intrs.c
+@@ -304,6 +304,9 @@ static int vfio_intx_enable(struct vfio_pci_core_device *vdev,
  
-+#define guest_execute_fastop_div(__KVM_ASM_SAFE, insn, __a, __d, __rm, __flags)		\
-+({											\
-+	uint64_t ign_error_code;							\
-+	uint8_t vector;									\
-+											\
-+	__asm__ __volatile__(fastop(__KVM_ASM_SAFE(insn " %[denom]"))			\
-+			     : "+a"(__a), "+d"(__d), flags_constraint(__flags),		\
-+			       KVM_ASM_SAFE_OUTPUTS(vector, ign_error_code)		\
-+			     : [denom]"rm"(__rm), bt_constraint(__rm)			\
-+			     : "cc", "memory", KVM_ASM_SAFE_CLOBBERS);			\
-+	vector;										\
-+})
+ 	vdev->irq_type = VFIO_PCI_INTX_IRQ_INDEX;
+ 
++	if (is_intx(vdev) && !vdev->pci_2_3)
++		irq_set_status_flags(pdev->irq, IRQ_DISABLE_UNLAZY);
 +
-+#define guest_test_fastop_div(insn, type_t, __val1, __val2)				\
-+({											\
-+	type_t _a = __val1, _d = __val1, rm = __val2;					\
-+	type_t a = _a, d = _d, ex_a = _a, ex_d = _d;					\
-+	uint64_t flags, ex_flags;							\
-+	uint8_t v, ex_v;								\
-+											\
-+	ex_v = guest_execute_fastop_div(KVM_ASM_SAFE, insn, ex_a, ex_d, rm, ex_flags);	\
-+	v = guest_execute_fastop_div(KVM_ASM_SAFE_FEP, insn, a, d, rm, flags);		\
-+											\
-+	GUEST_ASSERT_EQ(v, ex_v);							\
-+	__GUEST_ASSERT(v == ex_v,							\
-+		       "Wanted vector 0x%x for '%s 0x%lx:0x%lx/0x%lx', got 0x%x",	\
-+		       ex_v, insn, (uint64_t)_a, (uint64_t)_d, (uint64_t)rm, v);	\
-+	__GUEST_ASSERT(a == ex_a && d == ex_d,						\
-+		       "Wanted 0x%lx:0x%lx for '%s 0x%lx:0x%lx/0x%lx', got 0x%lx:0x%lx",\
-+		       (uint64_t)ex_a, (uint64_t)ex_d, insn, (uint64_t)_a,		\
-+		       (uint64_t)_d, (uint64_t)rm, (uint64_t)a, (uint64_t)d);		\
-+	__GUEST_ASSERT(v || ex_v || (flags == ex_flags),				\
-+			"Wanted flags 0x%lx for '%s  0x%lx:0x%lx/0x%lx', got 0x%lx",	\
-+			ex_flags, insn, (uint64_t)_a, (uint64_t)_d, (uint64_t)rm, flags);\
-+})
-+
- static const uint64_t vals[] = {
- 	0,
- 	1,
-@@ -141,6 +177,8 @@ if (sizeof(type_t) != 1) {							\
- 			guest_test_fastop_cl("sar" suffix, type_t, vals[i], vals[j]);	\
- 			guest_test_fastop_cl("shl" suffix, type_t, vals[i], vals[j]);	\
- 			guest_test_fastop_cl("shr" suffix, type_t, vals[i], vals[j]);	\
-+											\
-+			guest_test_fastop_div("div" suffix, type_t, vals[i], vals[j]);	\
- 		}									\
- 	}										\
- } while (0)
+ 	ret = request_irq(pdev->irq, vfio_intx_handler,
+ 			  irqflags, ctx->name, ctx);
+ 	if (ret) {
+@@ -351,6 +354,8 @@ static void vfio_intx_disable(struct vfio_pci_core_device *vdev)
+ 	if (ctx) {
+ 		vfio_virqfd_disable(&ctx->unmask);
+ 		vfio_virqfd_disable(&ctx->mask);
++		if (!vdev->pci_2_3)
++			irq_clear_status_flags(pdev->irq, IRQ_DISABLE_UNLAZY);
+ 		free_irq(pdev->irq, ctx);
+ 		if (ctx->trigger)
+ 			eventfd_ctx_put(ctx->trigger);
 -- 
-2.51.0.384.g4c02a37b29-goog
-
+2.39.5
 
