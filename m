@@ -1,258 +1,215 @@
-Return-Path: <kvm+bounces-57062-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-57063-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3220EB4A4FE
-	for <lists+kvm@lfdr.de>; Tue,  9 Sep 2025 10:19:33 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 1E763B4A542
+	for <lists+kvm@lfdr.de>; Tue,  9 Sep 2025 10:28:56 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 8E0C77AA497
-	for <lists+kvm@lfdr.de>; Tue,  9 Sep 2025 08:17:54 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 7131A7A3061
+	for <lists+kvm@lfdr.de>; Tue,  9 Sep 2025 08:27:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D290224A078;
-	Tue,  9 Sep 2025 08:19:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A55B9243367;
+	Tue,  9 Sep 2025 08:28:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="Ue43Q/pk"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="QotmK/dV"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.12])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wr1-f44.google.com (mail-wr1-f44.google.com [209.85.221.44])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7B62A2459E1;
-	Tue,  9 Sep 2025 08:19:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=192.198.163.12
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757405950; cv=fail; b=ltfWLZ+4WoAz+qIRpihMUJFvHI2aO86r4WhIoCmqydL2eDFkJ4SoWTPov5fDmPXRFyr/kzHi0UgpY3Xoj/Sqza8FqMNfJXELYJXxBn000BLD0unk7ZRRadNu+El6LgrzqhXvhnDNRvXAzfn1EMeOlS0qmhSoP9lBGk0mp4fkjDM=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757405950; c=relaxed/simple;
-	bh=jWV6X8IaZbc1WIO9kFFr+EBw5Do9wyF8m1Y9KqoRVV8=;
-	h=Date:From:To:CC:Subject:Message-ID:References:Content-Type:
-	 Content-Disposition:In-Reply-To:MIME-Version; b=aGg8GFjlmTNmGsHaQTvBMUeWXf7QWhQjj20aQdc1ILJe3etol+5R9z8x0z+RekFoWcEOS8ZwXGnnvYiv4ZKStGU665mAeBsIuml09NSi4eNfQfdmiSB47IYMupvtxu06lEIbCNRzKji4I5aCXpeE9/T652Z9jO54OWTkfwpatjw=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=Ue43Q/pk; arc=fail smtp.client-ip=192.198.163.12
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1757405949; x=1788941949;
-  h=date:from:to:cc:subject:message-id:references:
-   in-reply-to:mime-version;
-  bh=jWV6X8IaZbc1WIO9kFFr+EBw5Do9wyF8m1Y9KqoRVV8=;
-  b=Ue43Q/pkOsqRgij9RyiUyI31YKiaNfhe99HwJ6Z8Z/yaqIu9g35xKDRL
-   9LxLkCtW5P1m0oIEiXtdfZm7a9JVpCwmy/IlHpCk5+22U289Me9jcDq4H
-   VRg44WninQDGarllqPP7yUfjNjFfndHnA2jJETLkfWKgYx73HsPWlEMW9
-   jY6GGaZWufOywj565S5+W+3J472dG0v3Xp3QOj8eUvGxHrPJoNGPzPPvU
-   DPsas34SfkV1pJHmwsbFxmmIBTawBBXwyCKY8z/Ijnq/0SdfyUqwaEvvX
-   tcwB++QcPkSSoYOcJWD5rejPTFWft5R12dNVVZkxy5cPhlAcIrNM3zoTQ
-   A==;
-X-CSE-ConnectionGUID: FDKf/JUqQBeHyU2t33jV7A==
-X-CSE-MsgGUID: wBKBQt4zTFumVYQMu2f+Iw==
-X-IronPort-AV: E=McAfee;i="6800,10657,11547"; a="63511465"
-X-IronPort-AV: E=Sophos;i="6.18,250,1751266800"; 
-   d="scan'208";a="63511465"
-Received: from orviesa005.jf.intel.com ([10.64.159.145])
-  by fmvoesa106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 09 Sep 2025 01:19:08 -0700
-X-CSE-ConnectionGUID: 2CzeqX3PRgKY5sY/RGp0Qg==
-X-CSE-MsgGUID: jf+2IxosRDyiIkMyJeeQ4g==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.18,250,1751266800"; 
-   d="scan'208";a="178242255"
-Received: from orsmsx902.amr.corp.intel.com ([10.22.229.24])
-  by orviesa005.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 09 Sep 2025 01:19:05 -0700
-Received: from ORSMSX903.amr.corp.intel.com (10.22.229.25) by
- ORSMSX902.amr.corp.intel.com (10.22.229.24) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.17; Tue, 9 Sep 2025 01:19:05 -0700
-Received: from ORSEDG902.ED.cps.intel.com (10.7.248.12) by
- ORSMSX903.amr.corp.intel.com (10.22.229.25) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.17 via Frontend Transport; Tue, 9 Sep 2025 01:19:05 -0700
-Received: from NAM10-MW2-obe.outbound.protection.outlook.com (40.107.94.57) by
- edgegateway.intel.com (134.134.137.112) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.17; Tue, 9 Sep 2025 01:19:04 -0700
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=RALWTeSPKseH6mwkN56IjfuEiPFI8Fi06Me0Zp+84KKIAQ2LwsSl9U5SjkilEdbK0q3cEaFWxMhibR7pxhy07zBLPOyWVYGxSKKhOd6Sl2+74S9JcICn/J8d9WNUA9ftuoW8txsYNKggqe3sLnSyF4T3mGo1gR7mu3vMfvm+6f+n72vcViCto0pu6B3QeVGZLgAgdkkqgh43DLD8hQhoCU42ERYITKMbmF7F90SXB39wEQtg3H6sCBx4NOlRUndqFi4q4ryx3RekPxMd58FKeXC0PT41V/p/yem7c3CA9cPOl+IJ9QcJbvQ6ekD1NdTJeSRPvzpYrNNQZn631/E16Q==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=VsLd68xtRB5SZtMIYLpzGu1kqW1aWWvqhiw7kW4p3Ac=;
- b=i1sVlt+zI+G4hh2JiuFgQhKWzUZj2+i42bX2akES5UuUNVtYUvuuQ+oPwHD8PhQPo1SlslJTPaZfVaQbagS6Fj6ZEoCuqvJMVK7WCw+Mn5dhpB8gmBZAlG1E599NCt4A1rAYqx4aXm28CRUxQ9Yz5VUUQgMQpd0zi1xxAWE7cAIXNVkeaLkFYQCTv/Rb31l9oV/MSWQwIpIlsnH/yh7uKzC3STsOAmhlaXW6xOOeswWfacnORrsKnuQdyeJLWUrVuMXE7xav4r9BhJJZeD7pKOMTAqTW0CP885OK+r2wDFEWe7Eq7Y9TCWCkGzrzDfrnEzl5IquUD7dASllsMHEZ4Q==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-Received: from CH3PR11MB8660.namprd11.prod.outlook.com (2603:10b6:610:1ce::13)
- by SA1PR11MB6944.namprd11.prod.outlook.com (2603:10b6:806:2bb::22) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9094.22; Tue, 9 Sep
- 2025 08:19:02 +0000
-Received: from CH3PR11MB8660.namprd11.prod.outlook.com
- ([fe80::cfad:add4:daad:fb9b]) by CH3PR11MB8660.namprd11.prod.outlook.com
- ([fe80::cfad:add4:daad:fb9b%4]) with mapi id 15.20.9094.021; Tue, 9 Sep 2025
- 08:19:02 +0000
-Date: Tue, 9 Sep 2025 16:18:49 +0800
-From: Chao Gao <chao.gao@intel.com>
-To: Xin Li <xin@zytor.com>
-CC: <kvm@vger.kernel.org>, <linux-kernel@vger.kernel.org>, <bp@alien8.de>,
-	<dave.hansen@linux.intel.com>, <hpa@zytor.com>, <john.allen@amd.com>,
-	<mingo@redhat.com>, <minipli@grsecurity.net>, <mlevitsk@redhat.com>,
-	<pbonzini@redhat.com>, <rick.p.edgecombe@intel.com>, <seanjc@google.com>,
-	<tglx@linutronix.de>, <weijiang.yang@intel.com>, <x86@kernel.org>
-Subject: Re: [PATCH v13 05/21] KVM: x86: Load guest FPU state when access
- XSAVE-managed MSRs
-Message-ID: <aL/i6cA6EjjZ1H6f@intel.com>
-References: <20250821133132.72322-1-chao.gao@intel.com>
- <20250821133132.72322-6-chao.gao@intel.com>
- <b61f8d7c-e8bf-476e-8d56-ce9660a13d02@zytor.com>
- <aKvP2AHKYeQCPm0x@intel.com>
-Content-Type: text/plain; charset="us-ascii"
-Content-Disposition: inline
-In-Reply-To: <aKvP2AHKYeQCPm0x@intel.com>
-X-ClientProxiedBy: SG2P153CA0005.APCP153.PROD.OUTLOOK.COM (2603:1096::15) To
- CH3PR11MB8660.namprd11.prod.outlook.com (2603:10b6:610:1ce::13)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A668F23C8C5
+	for <kvm@vger.kernel.org>; Tue,  9 Sep 2025 08:28:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.44
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1757406525; cv=none; b=GThhMDvd6kcQh9Xj2/0ytIpSKjv5AHOR+AhqokOlYxeoUJ7HhwUeU6x3h9JqkZm7ATvhjHslbv73cVNVCrsmxyiYfrLym/oxhuAtwtqYZIV1jgo1jzn2Fzj6v5f0elTasGAJ7x9NoGjt7DZ/EZ2yt2BLm38N6q53E1NE4+a7vhg=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1757406525; c=relaxed/simple;
+	bh=jbau4NvScM9WFmrEOaQaZDaL9+RJwNelRI8l9MUAzyQ=;
+	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
+	 Content-Disposition; b=XKdZ/FDhfXlDTE6zoyUsNYP+34MY+Xctq/lTY/0zwpUWqhsBPFgI1ddadRCT4zaZYS62ze0IT+ZI/lSqpVEr3p0EMLXLJc6zzQmfHPqOOQyttgUSGWk/zCSRnwrqzmjdI166GyYbpbDlsgV/0oL2X0qs7POQzejOWjs7JlgO4ZQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=QotmK/dV; arc=none smtp.client-ip=209.85.221.44
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
+Received: by mail-wr1-f44.google.com with SMTP id ffacd0b85a97d-3dad6252eacso2368151f8f.1
+        for <kvm@vger.kernel.org>; Tue, 09 Sep 2025 01:28:43 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google; t=1757406522; x=1758011322; darn=vger.kernel.org;
+        h=content-disposition:mime-version:message-id:subject:cc:to:from:date
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=ts8qPN/5ml6KznKXSDMs1ZerpTtSrzKRDP4paUzXNQE=;
+        b=QotmK/dVzQ+6ijf9sGt3pON7Y8K3HoZqW7MT3OAx2CyJi52HaVNuK67GcTXQLPxtC/
+         j55xca4hfpQ8kvjActY5MMPyfLkDAvwjX5zqOzj0MboTRCrru0x/gjStrJTJEEUdc0u0
+         aJ3tPAvTyyt8Py06DTiKiI4tBq8Lph5/JNOOvwDxxHeEoo/aVsuC/Hw/OQjgbZdIa0qy
+         X8NYlyttbjqqnvNk59WPL/Al5bEbxCMnojea4aGvI/nlAy4rwxJZbcdxGRQ1L2HSbUY1
+         NzfzQDtDu1BYKqBkk6ZvfKjrAeZqm8aewu2dN/M8nDuo4BbRMbgGFx2oyozDelYiuRQd
+         Uofg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1757406522; x=1758011322;
+        h=content-disposition:mime-version:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=ts8qPN/5ml6KznKXSDMs1ZerpTtSrzKRDP4paUzXNQE=;
+        b=FseAnWonuM6RuF4eNdYE35T5jEwu2nZVPLXrnXlvGJo3BP6ksy342EIZ4y8/PeJD83
+         j9GN5nhy5X2KpEKKnZ49CWM4S9BGI9lb60RnIavWDoJ3cTmvXLmHhsg5CcCbcPO6jNWY
+         xu5X+XdTBKTK0PRn48PztG4oG1+8X//vup3QqCdYSkmECHrOZQGbpuwtGADycvVegMNS
+         sbNswroj3xbwJbmo19pEZSGBdTsBJAAN8WLRN76HCumAcs+JyZ11HNm/WkKieURGOR0Z
+         1rCd1UM55E+ceYKnFoFzWA+lNK/j23VnJ2Thi0E932puNpkYayKq09vgKobrqIofSlAw
+         X3/w==
+X-Gm-Message-State: AOJu0Yz38JfMyooA5w2OF73zZ4HjW5UADL1C2ssnBlvMCtF1ROeQFszg
+	Dxkiab9ZJK3ZqqfaR3IGJ6OlfuTspoYRe6TciPQ3uF16m2CUDoXaPIgDtIeLU9a1lvY=
+X-Gm-Gg: ASbGncuZOXoJVg1RfUizcyP/vvXS6D79YEqAs+UiYyytprDK+YMULKwESl+cWE9W/W1
+	76aPFFhK6IN9fr9EkKGkwhemEe8dj6b9GrFRzTsBhmeXzsES15QIitFB6JuSPa6LufMNg+AKLdq
+	oysvGmqX1kSQ8Ii0AFO2uiD92JoRR/Q/ajtl85RIXTGyDHOrQ3yAt0u9d59BxQvrYPUy8BGKIcX
+	xqQB6EPOPgvkll5EV198SE/wxPZKw5mKdJ21yntkbmigAEkqbyobm2Se6vrw7ubow1zUKhH90t+
+	N7AskxYbmkVkc/Dz0ImqXnt4yhpykhOm9gabOiN3A1Rnnxa66OW6DJCUvJtarEAAEkM1y7RMH4h
+	1t0y5RLSRzRTOvlIYrp7XU/hwMvE=
+X-Google-Smtp-Source: AGHT+IEZM9w3N0O4wHGOcaZOsbBh21VHN0Vef/S4rAsCGfvPVxLSsDa77HhbViCTsFwCMFe3kf1qog==
+X-Received: by 2002:a05:6000:420e:b0:3c8:7fbf:2d6d with SMTP id ffacd0b85a97d-3e643e0884fmr6910997f8f.50.1757406521848;
+        Tue, 09 Sep 2025 01:28:41 -0700 (PDT)
+Received: from localhost ([196.207.164.177])
+        by smtp.gmail.com with UTF8SMTPSA id ffacd0b85a97d-3e7521bfd08sm1639310f8f.4.2025.09.09.01.28.40
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 09 Sep 2025 01:28:41 -0700 (PDT)
+Date: Tue, 9 Sep 2025 11:28:37 +0300
+From: Dan Carpenter <dan.carpenter@linaro.org>
+To: Isaku Yamahata <isaku.yamahata@intel.com>
+Cc: kvm@vger.kernel.org
+Subject: [bug report] KVM: TDX: Get system-wide info about TDX module on
+ initialization
+Message-ID: <aL_lNXLD3XG496lW@stanley.mountain>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: CH3PR11MB8660:EE_|SA1PR11MB6944:EE_
-X-MS-Office365-Filtering-Correlation-Id: a892ea59-71a5-4ab8-9eca-08ddef7988b6
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230040|1800799024|7416014|376014|366016;
-X-Microsoft-Antispam-Message-Info: =?us-ascii?Q?liBgu3CtRCdqgHq00CVEOZmrTrBWL9pGFNdzmqP8etRIhytdXWr7/1kTerhR?=
- =?us-ascii?Q?fWPWYp69bthBZnrGrU3opDzCnx2AoiWNPSMj9DBfzqQN3AX006sX4XEX9o+K?=
- =?us-ascii?Q?EbDe3JU6gze+gmuYi1RxDBP97kFmVMBda0erPJDAU4CShVhvs1p00MDCIqdr?=
- =?us-ascii?Q?LjrenjxM4fLFy/DBtpq6a2KFEzG3SE8Fs2q9ys7jDhtHe6YRNqifh4Ef4hmm?=
- =?us-ascii?Q?u59A6iiy23Ded8/34KuLBxbwAa/nej7L3Ppo1ZUxINtqO8vrIE+Y9bPyGsHy?=
- =?us-ascii?Q?jDut3/FWb5R3bqIAUonz3eT5Im9hjgPI0JMoI9Mwg3cPOgmJ1XpLjAzeZ6fv?=
- =?us-ascii?Q?o3Cc64P/ZQuRyJEeCIbX0NvP6Lu3KxML9fg4Z+fXE9ZJx3x7rLUsvXTU4fF6?=
- =?us-ascii?Q?INPxEsZdvDTvkp99slC/Hca3duVef3oIvB1GA2uoo2LNacYRRbPbbRvh6Suu?=
- =?us-ascii?Q?gGUG79vlJiOd7NrrU1zSJ4EphBcBv9ExNbNXxEDkb/oLLRgY9ysPYRlOgxbw?=
- =?us-ascii?Q?toU6R9Unfcrr7AINtGfXkUc55c9LuKA5s+PFcc7s2QRhFLLsUhnKHhWkUnc7?=
- =?us-ascii?Q?Nc9FzelE4HssMZO5KcvLm99RwDwQKMCUwlOQp5ZzMEbbB3xxR1kv34bxjyMl?=
- =?us-ascii?Q?H/UXC69gPHhuTB8VJz7akWN3I95FpCbVYSizy1Un6NhWYQ7/JuIfCCKocjBd?=
- =?us-ascii?Q?AUs2s91v4lMnG2m4S+0MO9bcIUAoELqILT7O32nwphFUhg9w/mCYJqXvXNwO?=
- =?us-ascii?Q?hY3cmMrhkjfb71o+8zlh0/qonw8zyj/uX4Y8BX4EG1A7WjQ36E+9+EscWs0X?=
- =?us-ascii?Q?SSHptFrLeO6KNnenkR7oiOA45ue3xJUey6BR28WyB5S2SkOE5vVUYPcEC80C?=
- =?us-ascii?Q?NPbb7dQhlSjJKWSd1kyocxG6tWjmt96/rfg3W09FdgHhlkJMf65FaARNAqQy?=
- =?us-ascii?Q?H/woXxyl88badvyGKFu/a5Fsj7r8c39l16NLvdM8iUErhVsJJevlRtQoL12t?=
- =?us-ascii?Q?HcLqY00MQVZFJAw/50T7yAIx+AUHg0sALiD/dY+qJ7x6CYvRtqfFAuC7jpTS?=
- =?us-ascii?Q?7lRivivHt9k3dtZss7TN9OXGvtHhmm/XMFHxZg4WsjExanhvPrx3VHpVNBn8?=
- =?us-ascii?Q?L9Qu45i17HtPMwgTGrKq/pQzofgBGhNcvImIROYcMddnW6umAvGk+aoQ/2ue?=
- =?us-ascii?Q?9esk+AsbYWeFQFZAs+8qkzekyGZfLCyrtB0wJrV/wpsrlsVS5QiwJqP1rl3U?=
- =?us-ascii?Q?eNmwmiZP9GPV2TY3dUlxawhoViC+Mae+GsvgNUE2mc1H/8NSlFfn1NJvHiYj?=
- =?us-ascii?Q?Mq3tn1tRozSNTcZsUZ/L9I2osrAxxBHie8DXxwopaiVg6lkw8TF6c5VvLnjs?=
- =?us-ascii?Q?IAR5PMrn2dzYiIXeW/TjSCgyMYWo9O31AS19xaWktuyxGQUO81RjhjJylA/y?=
- =?us-ascii?Q?fumdRBt/CSI=3D?=
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CH3PR11MB8660.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(7416014)(376014)(366016);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?u4s2VZmILLocZNitXTsn0RCW1i7TnjW3pGSFDf1wKKhEK0qPr+KJF5wqWmcX?=
- =?us-ascii?Q?Sm1ph1iE0UoqhpZVsO46/vK0p40RxElZzXbqbKdzw+ss/bltUQSgzOK99ZRE?=
- =?us-ascii?Q?js2aLvJmKnOb+V+LYI/izjqTigU4TGwd01n767E60ZH7Ogm4VhT4gB51G+xx?=
- =?us-ascii?Q?UwZ01BzQgeYLMjKOYpPKVPcdqTKhPyrWACBIfWe6NMeaTYh76kw0f+LWxfro?=
- =?us-ascii?Q?H4f6EmPhHEPqnnZA1vttNSVQxufZ4szo+WMBthmmw3tAAJbbd1br8WcL3Voy?=
- =?us-ascii?Q?Oz32EUlzZpkQAKmbuuXh0QFGiCZqN47ye6TuyxfahHW5olbOhoLX9xPk+PJU?=
- =?us-ascii?Q?sbR78HVxADANBcS1ktwzN/WSvhwp9VT5OBN2zaIhWQa+PC9ZiCHtOE11vDZN?=
- =?us-ascii?Q?YrATKxvLRLA+fRYnWM8y7wG/4KQT/WoxhY8WnM796s3fSgi8knCrgjutjlgE?=
- =?us-ascii?Q?tvdmf+tSI/9Fs+ckvElI7Ma6lH4YOiM/c116vzEttIYyuMcmHNNzAEvR9e/n?=
- =?us-ascii?Q?f67N6XXXaBlst7nScsla9df4zFRCL6zexzhQNTKlgVLbxfGOEDOIT7m2W96B?=
- =?us-ascii?Q?KXQmE7f+NIyILKwM3B5q5lhwYt+pWJsKppsoFaoGEwnNk9xAlqocWqIAgt0p?=
- =?us-ascii?Q?rf61am5oWL9XxfE+eCebrUnG2o3NPh++tl/TZQylOGRX1dTsiJziHaFjJUVL?=
- =?us-ascii?Q?MXL9E57SANqq2NcVpQ257PHNqDcg04CHFR6YiGU+wk5KNn9XBmcsk7FuC0BK?=
- =?us-ascii?Q?1c9UekOBwAYSr2308IC3yrYJWU6xz9S7Bb0y/Uw6iaSwZmzY9JQZ1MTIb7US?=
- =?us-ascii?Q?Nd4CLHKf9BujzfQm2NlGd/sQsYzzbMKpNwrJAt4tFrNsGnDFpn/3Gc8R4ppe?=
- =?us-ascii?Q?9BsdZlD9HxQfzZMpQCNpQdsSdaSJuJi7DxemRrvd93ysSvtJUVgwQn1Fs+Sa?=
- =?us-ascii?Q?n5VSU5TPSjudtQGFNggtplOJjyRJh+7Og785RB2/NfEKgb5Y1yAnc2LR1cok?=
- =?us-ascii?Q?SUB2JuinzfAI4co1/26CwShxhNCo6NCE3bR/vPJy+PpP9txMelnePAt4mV2f?=
- =?us-ascii?Q?xzQDGz/sZeb1dUmECHSFdIw0ED7XbbnFPXrw4zJwXdJvofrFmrUslbuGSIlX?=
- =?us-ascii?Q?ht6Q8pxolIKqWueeN1HjMv0Cu8zN+8/qv4O1dUHzcfP1fNsmH2C64Aj5yFVc?=
- =?us-ascii?Q?oNnF1whyzPdjN+5ybx0AOApEJlsMEIoCRlkp3LdtJBXbFJbjgwQy87f4zKxz?=
- =?us-ascii?Q?wshm+7oXuX4Uhy3qp7bvtk1oiG68bWttU13XqHdzFbiGooI90DOXrIGXECey?=
- =?us-ascii?Q?//IrqL7x7WPu3B0esfKJPzDdKCWXAO8/I6Hf7Vq1vgZXQSYPvg2zeC46H63E?=
- =?us-ascii?Q?rpf+dmS6HMMRdMp3jzvlbvISlaKWJWq4FtCSBJLksdUPHxQSy7UyoMsFhNXl?=
- =?us-ascii?Q?7mBXjSXWPFQU+6/nG86PCxkyWmlzx54KHsYTOGfppfkHcNn1CtTDaKF5RqR9?=
- =?us-ascii?Q?4gLtSYfjhXHsDHOtuSTfe9pgqSYsiQjUeTFAYMJN1tfC/xTF1uxGDRhZIem4?=
- =?us-ascii?Q?Lj9s6SsYQwBaLl/e27xZj1yuvo0Bg+5ncWrqA8Qc?=
-X-MS-Exchange-CrossTenant-Network-Message-Id: a892ea59-71a5-4ab8-9eca-08ddef7988b6
-X-MS-Exchange-CrossTenant-AuthSource: CH3PR11MB8660.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 09 Sep 2025 08:19:02.2017
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: s5p/l4G0tic0cJ1nvtIrUCGs6qI0A9wMmEHBbJH87NLFq6X14A8+YHblWy0/jUHamjll77gIDB7es1hzDIcxfw==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA1PR11MB6944
-X-OriginatorOrg: intel.com
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 
-On Mon, Aug 25, 2025 at 10:55:20AM +0800, Chao Gao wrote:
->On Sun, Aug 24, 2025 at 06:52:55PM -0700, Xin Li wrote:
->>> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
->>> index 6b01c6e9330e..799ac76679c9 100644
->>> --- a/arch/x86/kvm/x86.c
->>> +++ b/arch/x86/kvm/x86.c
->>> @@ -4566,6 +4569,21 @@ int kvm_get_msr_common(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
->>>   }
->>>   EXPORT_SYMBOL_GPL(kvm_get_msr_common);
->>> +/*
->>> + *  Returns true if the MSR in question is managed via XSTATE, i.e. is context
->>> + *  switched with the rest of guest FPU state.
->>> + */
->>> +static bool is_xstate_managed_msr(u32 index)
->>> +{
->>> +	switch (index) {
->>> +	case MSR_IA32_U_CET:
->>
->>
->>Why MSR_IA32_S_CET is not included here?
->
->Emm. I didn't think about this.
->
->MSR_IA32_S_CET is read from or written to a dedicated VMCS/B field, so KVM
->doesn't need to load the guest FPU to access MSR_IA32_S_CET. This pairs with
->the kvm_{get,set}_xstate_msr() in kvm_{get,set}_msr_common().
->
->That said, userspace writes can indeed cause an inconsistency between the guest
->FPU and VMCS fields regarding MSR_IA32_S_CET. If migration occurs right after a
->userspace write (without a VM-entry, which would bring them in sync) and
->userspace just restores MSR_IA32_S_CET from the guest FPU, the write before
->migration could be lost.
->
->If that migration issue is a practical problem, I think MSR_IA32_S_CET should
->be included here, and we need to perform a kvm_set_xstate_msr() after writing
->to the VMCS/B.
+Hello Isaku Yamahata,
 
-I prefer to make guest FPU and VMCS always consistent regarding MSR_IA32_S_CET.
-The cost is to load guest FPU before userspace accesses the MSR and save guest
-FPU after that. It isn't a problem as MSR_IA32_S_CET accesses from userspace
-shouldn't be on any hot-path. So, I will add:
+Commit 61bb28279623 ("KVM: TDX: Get system-wide info about TDX module
+on initialization") from Oct 30, 2024 (linux-next), leads to the
+following Smatch static checker warning:
 
-diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
-index 989008f5307e..92daf63c9487 100644
---- a/arch/x86/kvm/vmx/vmx.c
-+++ b/arch/x86/kvm/vmx/vmx.c
-@@ -2435,6 +2435,7 @@ int vmx_set_msr(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
-		break;
-	case MSR_IA32_S_CET:
-		vmcs_writel(GUEST_S_CET, data);
-+		kvm_set_xstate_msr(vcpu, msr_info);
-		break;
-	case MSR_KVM_INTERNAL_GUEST_SSP:
-		vmcs_writel(GUEST_SSP, data);
-diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-index a3770e3d5154..6f64a3355274 100644
---- a/arch/x86/kvm/x86.c
-+++ b/arch/x86/kvm/x86.c
-@@ -4647,6 +4647,7 @@ EXPORT_SYMBOL_GPL(kvm_get_msr_common);
- static bool is_xstate_managed_msr(u32 index)
- {
-	switch (index) {
-+	case MSR_IA32_S_CET:
-	case MSR_IA32_U_CET:
-	case MSR_IA32_PL0_SSP ... MSR_IA32_PL3_SSP:
-		return true;
+	arch/x86/kvm/vmx/tdx.c:3464 __tdx_bringup()
+	warn: missing error code 'r'
+
+arch/x86/kvm/vmx/tdx.c
+    3416 static int __init __tdx_bringup(void)
+    3417 {
+    3418         const struct tdx_sys_info_td_conf *td_conf;
+    3419         int r, i;
+    3420 
+    3421         for (i = 0; i < ARRAY_SIZE(tdx_uret_msrs); i++) {
+    3422                 /*
+    3423                  * Check if MSRs (tdx_uret_msrs) can be saved/restored
+    3424                  * before returning to user space.
+    3425                  *
+    3426                  * this_cpu_ptr(user_return_msrs)->registered isn't checked
+    3427                  * because the registration is done at vcpu runtime by
+    3428                  * tdx_user_return_msr_update_cache().
+    3429                  */
+    3430                 tdx_uret_msrs[i].slot = kvm_find_user_return_msr(tdx_uret_msrs[i].msr);
+    3431                 if (tdx_uret_msrs[i].slot == -1) {
+    3432                         /* If any MSR isn't supported, it is a KVM bug */
+    3433                         pr_err("MSR %x isn't included by kvm_find_user_return_msr\n",
+    3434                                 tdx_uret_msrs[i].msr);
+    3435                         return -EIO;
+    3436                 }
+    3437         }
+    3438 
+    3439         /*
+    3440          * Enabling TDX requires enabling hardware virtualization first,
+    3441          * as making SEAMCALLs requires CPU being in post-VMXON state.
+    3442          */
+    3443         r = kvm_enable_virtualization();
+    3444         if (r)
+    3445                 return r;
+    3446 
+    3447         cpus_read_lock();
+    3448         r = __do_tdx_bringup();
+    3449         cpus_read_unlock();
+    3450 
+    3451         if (r)
+    3452                 goto tdx_bringup_err;
+    3453 
+    3454         /* Get TDX global information for later use */
+    3455         tdx_sysinfo = tdx_get_sysinfo();
+    3456         if (WARN_ON_ONCE(!tdx_sysinfo)) {
+    3457                 r = -EINVAL;
+    3458                 goto get_sysinfo_err;
+    3459         }
+    3460 
+    3461         /* Check TDX module and KVM capabilities */
+    3462         if (!tdx_get_supported_attrs(&tdx_sysinfo->td_conf) ||
+    3463             !tdx_get_supported_xfam(&tdx_sysinfo->td_conf))
+--> 3464                 goto get_sysinfo_err;
+
+error code?
+
+    3465 
+    3466         if (!(tdx_sysinfo->features.tdx_features0 & MD_FIELD_ID_FEATURES0_TOPOLOGY_ENUM))
+    3467                 goto get_sysinfo_err;
+
+here too?
+
+    3468 
+    3469         /*
+    3470          * TDX has its own limit of maximum vCPUs it can support for all
+    3471          * TDX guests in addition to KVM_MAX_VCPUS.  Userspace needs to
+    3472          * query TDX guest's maximum vCPUs by checking KVM_CAP_MAX_VCPU
+    3473          * extension on per-VM basis.
+    3474          *
+    3475          * TDX module reports such limit via the MAX_VCPU_PER_TD global
+    3476          * metadata.  Different modules may report different values.
+    3477          * Some old module may also not support this metadata (in which
+    3478          * case this limit is U16_MAX).
+    3479          *
+    3480          * In practice, the reported value reflects the maximum logical
+    3481          * CPUs that ALL the platforms that the module supports can
+    3482          * possibly have.
+    3483          *
+    3484          * Simply forwarding the MAX_VCPU_PER_TD to userspace could
+    3485          * result in an unpredictable ABI.  KVM instead always advertise
+    3486          * the number of logical CPUs the platform has as the maximum
+    3487          * vCPUs for TDX guests.
+    3488          *
+    3489          * Make sure MAX_VCPU_PER_TD reported by TDX module is not
+    3490          * smaller than the number of logical CPUs, otherwise KVM will
+    3491          * report an unsupported value to userspace.
+    3492          *
+    3493          * Note, a platform with TDX enabled in the BIOS cannot support
+    3494          * physical CPU hotplug, and TDX requires the BIOS has marked
+    3495          * all logical CPUs in MADT table as enabled.  Just use
+    3496          * num_present_cpus() for the number of logical CPUs.
+    3497          */
+    3498         td_conf = &tdx_sysinfo->td_conf;
+    3499         if (td_conf->max_vcpus_per_td < num_present_cpus()) {
+    3500                 pr_err("Disable TDX: MAX_VCPU_PER_TD (%u) smaller than number of logical CPUs (%u).\n",
+    3501                                 td_conf->max_vcpus_per_td, num_present_cpus());
+    3502                 r = -EINVAL;
+    3503                 goto get_sysinfo_err;
+    3504         }
+    3505 
+    3506         if (misc_cg_set_capacity(MISC_CG_RES_TDX, tdx_get_nr_guest_keyids())) {
+    3507                 r = -EINVAL;
+    3508                 goto get_sysinfo_err;
+    3509         }
+    3510 
+    3511         /*
+    3512          * Leave hardware virtualization enabled after TDX is enabled
+    3513          * successfully.  TDX CPU hotplug depends on this.
+    3514          */
+    3515         return 0;
+    3516 
+    3517 get_sysinfo_err:
+    3518         __tdx_cleanup();
+    3519 tdx_bringup_err:
+    3520         kvm_disable_virtualization();
+    3521         return r;
+    3522 }
+
+regards,
+dan carpenter
 
