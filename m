@@ -1,60 +1,61 @@
-Return-Path: <kvm+bounces-57065-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-57064-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 852E5B4A84F
-	for <lists+kvm@lfdr.de>; Tue,  9 Sep 2025 11:40:19 +0200 (CEST)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
+	by mail.lfdr.de (Postfix) with ESMTPS id 04087B4A850
+	for <lists+kvm@lfdr.de>; Tue,  9 Sep 2025 11:40:20 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E776A4E1B4E
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id BC9F74E1812
 	for <lists+kvm@lfdr.de>; Tue,  9 Sep 2025 09:40:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A48562D1911;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A491A2D1913;
 	Tue,  9 Sep 2025 09:39:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="YNXUDUlO"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="RePqteug"
 X-Original-To: kvm@vger.kernel.org
 Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.11])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D190A2C21CF;
-	Tue,  9 Sep 2025 09:39:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E35672C21D5;
+	Tue,  9 Sep 2025 09:39:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.11
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757410797; cv=none; b=AVnRTznsvccNgUt1IPspCvKoom3T27wsfFVi7A9iNXUBRP6bxWGEEGAynwmt7OFOu4uXmzljE/lpvAyCMLsCSHiBmZ6wOCDD4OBmY2Ctp95MChdK6XE5QiYenRTgWVGQT1hkFg6KAmXoRv0aYyXVBJfni9rjq46vTw0BTN1/DtM=
+	t=1757410797; cv=none; b=dfQgFIfIlZwMrDwSXRwfHntZsCk8ZTsmRaJ35+mP8Of8QmHoKMorksFyhTM2YQnB5Nu70jAUahACfidvyxtzOdLupxfydUgi0mqVbUf4kYH8W8LPTwDjm8a8cSlHKPKO3ZaBi6iaw4XL2Voo3AwPr8blCYyDTG8P9l6iCRjpEqc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1757410797; c=relaxed/simple;
-	bh=xu2dANKyubAvxrmsFb1FCC6E9W8Kc5S2SO2nznkVz1s=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=QZSqeT/Ii8wBKUJAscN+NRzac6odqaaCG7Ua5Bea4M7MiR9/VuQU0fgafdwYDcgollgZONtZFfqOQx1LPFv0bXWo97XS4d73UNZzCybhUKmdHbaYk50sa6oRUOHZPAIN7ozypOTlscI9yJDUKsfEsv1O9nyvbTSwjMDlUdz0r8o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=YNXUDUlO; arc=none smtp.client-ip=192.198.163.11
+	bh=awSO2SajylR+9FfF5723lqDYN0HFNJlp3YMao7mQqgA=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=KrPff4nZvOaUtS3Qnf6wpQd/LbdobKZCc9rnfX7iaj0C9l408RXMmayFXH2WW8l+S4iaHNhx13KqSxf0WeLy+tufv75w8JPGfYF+EgZSQ/sljfI6kKKaTzwHbTeZNt/vZ6w+yE8WLIizauSxdLOrnmcOhcgYeZ4O16ufqZUFB6Q=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=RePqteug; arc=none smtp.client-ip=192.198.163.11
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
   t=1757410796; x=1788946796;
-  h=from:to:cc:subject:date:message-id:mime-version:
-   content-transfer-encoding;
-  bh=xu2dANKyubAvxrmsFb1FCC6E9W8Kc5S2SO2nznkVz1s=;
-  b=YNXUDUlOInMvISik0BgYaRJQCEACYezRQETgUReyupXZDl1yJKwErYj8
-   T2mbyA6Eeq1LStbw/OHVMnLJMzPw/cDM7GPQbNNruKzHUIqd5lZog0sBh
-   e/GD3hxI1hV77Yos85Iziz9tkVtGWAI5g/0qBQAz3s3JnsOJrJSxhzxEZ
-   nuirhX8QCFbyOApkzP8bQ2/nIyDjABODz+2uYN1l7K6KqbVWGBoBaJdue
-   TiJB/zmJ+WM/PHDYbC37BjZWrW5K6qJCvvgo6B/ud137pj7UWAgcsvBR8
-   Y4qPWlW+gspox2vtZgPVx16tNy7Y6ET8ovEylARo03AuA1kQRoonRVKxM
-   w==;
-X-CSE-ConnectionGUID: 93Q8W5L9S2WIgDqxUj/SqA==
-X-CSE-MsgGUID: AKBXvQkITrKMNzfZGSP1mQ==
-X-IronPort-AV: E=McAfee;i="6800,10657,11547"; a="70307170"
+  h=from:to:cc:subject:date:message-id:in-reply-to:
+   references:mime-version:content-transfer-encoding;
+  bh=awSO2SajylR+9FfF5723lqDYN0HFNJlp3YMao7mQqgA=;
+  b=RePqteugm3TFCjlgXAxJRc/FQcSwSLFyALlRtIBFRKkAwpvGOCLrDQI+
+   W4NNMO53ZWXXzJrZQwzb0GwPCPXDAt/tBpdNDp40kcNLmjBt6OFUxKgyl
+   It5sw03vhC3/WgFaERQPyy728RLDdYBv0nHLbG0MDXpOp6lLQ1ULjoERL
+   orSyN+pyGonJSFpEPHhGAopbACj3OKZG6CdeN0gGb7PaKyZGXF6yQV98l
+   q7fvzgVOGfhnJ66BM2Nk7CIESAR0ZLwExRRk3F8IHiT++kVk5V/n1Pjma
+   CroQLejqFabB8IOEC/PWzo9UHH2qM5gboegdeP+WPrYWoaV++1mVH5RZl
+   A==;
+X-CSE-ConnectionGUID: PD41bYJpSSmJ55zXy4kryA==
+X-CSE-MsgGUID: 7ZLmsCBqTnOQvrrvBKG6ZA==
+X-IronPort-AV: E=McAfee;i="6800,10657,11547"; a="70307178"
 X-IronPort-AV: E=Sophos;i="6.18,251,1751266800"; 
-   d="scan'208";a="70307170"
+   d="scan'208";a="70307178"
 Received: from orviesa006.jf.intel.com ([10.64.159.146])
   by fmvoesa105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 09 Sep 2025 02:39:54 -0700
-X-CSE-ConnectionGUID: /7Im4CaGT/+AcvI1lmO9EA==
-X-CSE-MsgGUID: piwWP0KET4aSw4UXarv1YQ==
+X-CSE-ConnectionGUID: Zl1dDcnHTu2Eday039ucNQ==
+X-CSE-MsgGUID: g6ubcS0DQSGExMHxzchO2g==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.18,251,1751266800"; 
-   d="scan'208";a="172207385"
+   d="scan'208";a="172207388"
 Received: from unknown (HELO CannotLeaveINTEL.jf.intel.com) ([10.165.54.94])
   by orviesa006-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 09 Sep 2025 02:39:54 -0700
 From: Chao Gao <chao.gao@intel.com>
@@ -80,10 +81,12 @@ Cc: acme@redhat.com,
 	x86@kernel.org,
 	xin@zytor.com,
 	xiaoyao.li@intel.com
-Subject: [PATCH v14 00/22] Enable CET Virtualization
-Date: Tue,  9 Sep 2025 02:39:31 -0700
-Message-ID: <20250909093953.202028-1-chao.gao@intel.com>
+Subject: [PATCH v14 01/22] KVM: x86: Introduce KVM_{G,S}ET_ONE_REG uAPIs support
+Date: Tue,  9 Sep 2025 02:39:32 -0700
+Message-ID: <20250909093953.202028-2-chao.gao@intel.com>
 X-Mailer: git-send-email 2.47.3
+In-Reply-To: <20250909093953.202028-1-chao.gao@intel.com>
+References: <20250909093953.202028-1-chao.gao@intel.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -92,130 +95,200 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-The FPU support for CET virtualization has already been merged into 6.17-rc1.
-Building on that, this series introduces Intel CET virtualization support for
-KVM.
+From: Yang Weijiang <weijiang.yang@intel.com>
 
-Changes in v14
-1. rename the type of guest SSP register to KVM_X86_REG_KVM and add docs
-   for register IDs in api.rst (Sean, Xiaoyao)
-2. update commit message of patch 1
-3. use rdmsrq/wrmsrq() instead of rdmsrl/wrmsrl() in patch 6 (Xin)
-4. split the introduction of per-guest guest_supported_xss into a
-separate patch. (Xiaoyao)
-5. make guest FPU and VMCS consistent regarding MSR_IA32_S_CET
-6. collect reviews from Xiaoyao.
+Enable KVM_{G,S}ET_ONE_REG uAPIs so that userspace can access MSRs and
+other non-MSR registers through them.
 
+This is in preparation for allowing userspace to read/write the guest SSP
+register, which is needed for the upcoming CET virtualization support.
+
+Currently, two types of registers are supported: KVM_X86_REG_TYPE_MSR and
+KVM_X86_REG_TYPE_KVM. All MSRs are in the former type; the latter type is
+added for registers that lack existing KVM uAPIs to access them. The "KVM"
+in the name is intended to be vague to give KVM flexibility to include
+other potential registers. We considered some specific names, like
+"SYNTHETIC" and "SYNTHETIC_MSR" before, but both are confusing and may put
+KVM itself into a corner.
+
+Suggested-by: Sean Christopherson <seanjc@google.com>
+Signed-off-by: Yang Weijiang <weijiang.yang@intel.com>
+Link: https://lore.kernel.org/all/20240219074733.122080-18-weijiang.yang@intel.com/ [1]
+Tested-by: Mathias Krause <minipli@grsecurity.net>
+Tested-by: John Allen <john.allen@amd.com>
+Tested-by: Rick Edgecombe <rick.p.edgecombe@intel.com>
+Signed-off-by: Chao Gao <chao.gao@intel.com>
 ---
-Control-flow Enforcement Technology (CET) is a kind of CPU feature used
-to prevent Return/CALL/Jump-Oriented Programming (ROP/COP/JOP) attacks.
-It provides two sub-features(SHSTK,IBT) to defend against ROP/COP/JOP
-style control-flow subversion attacks.
+v14:
+- Rename the group type of guest SSP register to KVM_X86_REG_KVM
+- Add docs for id patterns for x86 in api.rst
+- Update commit message
+---
+ Documentation/virt/kvm/api.rst  |  2 +
+ arch/x86/include/uapi/asm/kvm.h | 26 +++++++++++
+ arch/x86/kvm/x86.c              | 78 +++++++++++++++++++++++++++++++++
+ 3 files changed, 106 insertions(+)
 
-Shadow Stack (SHSTK):
-  A shadow stack is a second stack used exclusively for control transfer
-  operations. The shadow stack is separate from the data/normal stack and
-  can be enabled individually in user and kernel mode. When shadow stack
-  is enabled, CALL pushes the return address on both the data and shadow
-  stack. RET pops the return address from both stacks and compares them.
-  If the return addresses from the two stacks do not match, the processor
-  generates a #CP.
-
-Indirect Branch Tracking (IBT):
-  IBT introduces new instruction(ENDBRANCH)to mark valid target addresses
-  of indirect branches (CALL, JMP etc...). If an indirect branch is
-  executed and the next instruction is _not_ an ENDBRANCH, the processor
-  generates a #CP. These instruction behaves as a NOP on platforms that
-  doesn't support CET.
-
-CET states management
-=====================
-KVM cooperates with host kernel FPU framework to manage guest CET registers.
-With CET supervisor mode state support in this series, KVM can save/restore
-full guest CET xsave-managed states.
-
-CET user mode and supervisor mode xstates, i.e., MSR_IA32_{U_CET,PL3_SSP}
-and MSR_IA32_PL{0,1,2}, depend on host FPU framework to swap guest and host
-xstates. On VM-Exit, guest CET xstates are saved to guest fpu area and host
-CET xstates are loaded from task/thread context before vCPU returns to
-userspace, vice-versa on VM-Entry. See details in kvm_{load,put}_guest_fpu().
-
-CET supervisor mode states are grouped into two categories : XSAVE-managed
-and non-XSAVE-managed, the former includes MSR_IA32_PL{0,1,2}_SSP and are
-controlled by CET supervisor mode bit(S_CET bit) in XSS, the later consists
-of MSR_IA32_S_CET and MSR_IA32_INTR_SSP_TBL.
-
-VMX introduces new VMCS fields, {GUEST|HOST}_{S_CET,SSP,INTR_SSP_TABL}, to
-facilitate guest/host non-XSAVES-managed states. When VMX CET entry/exit load
-bits are set, guest/host MSR_IA32_{S_CET,INTR_SSP_TBL,SSP} are loaded from
-equivalent fields at VM-Exit/Entry. With these new fields, such supervisor
-states require no addtional KVM save/reload actions.
-
-Tests
-======
-This series has successfully passed the basic CET user shadow stack test
-and kernel IBT test in both L1 and L2 guests. The newly added
-KVM-unit-tests [2] also passed, and its v11 has been tested with the AMD
-CET series by John [3].
-
-For your convenience, you can use my WIP QEMU [1] for testing.
-
-[1]: https://github.com/gaochaointel/qemu-dev qemu-cet
-[2]: https://lore.kernel.org/kvm/20250626073459.12990-1-minipli@grsecurity.net/
-[3]: https://lore.kernel.org/kvm/aH6CH+x5mCDrvtoz@AUSJOHALLEN.amd.com/
-
-Chao Gao (5):
-  KVM: x86: Check XSS validity against guest CPUIDs
-  KVM: nVMX: Add consistency checks for CR0.WP and CR4.CET
-  KVM: nVMX: Add consistency checks for CET states
-  KVM: nVMX: Advertise new VM-Entry/Exit control bits for CET state
-  KVM: selftest: Add tests for KVM_{GET,SET}_ONE_REG
-
-Sean Christopherson (2):
-  KVM: x86: Report XSS as to-be-saved if there are supported features
-  KVM: x86: Load guest FPU state when access XSAVE-managed MSRs
-
-Yang Weijiang (15):
-  KVM: x86: Introduce KVM_{G,S}ET_ONE_REG uAPIs support
-  KVM: x86: Refresh CPUID on write to guest MSR_IA32_XSS
-  KVM: x86: Initialize kvm_caps.supported_xss
-  KVM: x86: Add fault checks for guest CR4.CET setting
-  KVM: x86: Report KVM supported CET MSRs as to-be-saved
-  KVM: VMX: Introduce CET VMCS fields and control bits
-  KVM: x86: Enable guest SSP read/write interface with new uAPIs
-  KVM: VMX: Emulate read and write to CET MSRs
-  KVM: x86: Save and reload SSP to/from SMRAM
-  KVM: VMX: Set up interception for CET MSRs
-  KVM: VMX: Set host constant supervisor states to VMCS fields
-  KVM: x86: Don't emulate instructions guarded by CET
-  KVM: x86: Enable CET virtualization for VMX and advertise to userspace
-  KVM: nVMX: Virtualize NO_HW_ERROR_CODE_CC for L1 event injection to L2
-  KVM: nVMX: Prepare for enabling CET support for nested guest
-
- Documentation/virt/kvm/api.rst                |   9 +
- arch/x86/include/asm/kvm_host.h               |   5 +-
- arch/x86/include/asm/vmx.h                    |   9 +
- arch/x86/include/uapi/asm/kvm.h               |  29 ++
- arch/x86/kvm/cpuid.c                          |  17 +-
- arch/x86/kvm/emulate.c                        |  46 ++-
- arch/x86/kvm/smm.c                            |   8 +
- arch/x86/kvm/smm.h                            |   2 +-
- arch/x86/kvm/svm/svm.c                        |   4 +
- arch/x86/kvm/vmx/capabilities.h               |   9 +
- arch/x86/kvm/vmx/nested.c                     | 163 ++++++++++-
- arch/x86/kvm/vmx/nested.h                     |   5 +
- arch/x86/kvm/vmx/vmcs12.c                     |   6 +
- arch/x86/kvm/vmx/vmcs12.h                     |  14 +-
- arch/x86/kvm/vmx/vmx.c                        |  85 +++++-
- arch/x86/kvm/vmx/vmx.h                        |   9 +-
- arch/x86/kvm/x86.c                            | 264 +++++++++++++++++-
- arch/x86/kvm/x86.h                            |  61 ++++
- tools/arch/x86/include/uapi/asm/kvm.h         |  29 ++
- tools/testing/selftests/kvm/Makefile.kvm      |   1 +
- .../selftests/kvm/x86/get_set_one_reg.c       |  30 ++
- 21 files changed, 764 insertions(+), 41 deletions(-)
- create mode 100644 tools/testing/selftests/kvm/x86/get_set_one_reg.c
-
+diff --git a/Documentation/virt/kvm/api.rst b/Documentation/virt/kvm/api.rst
+index 6aa40ee05a4a..28fc12b46eeb 100644
+--- a/Documentation/virt/kvm/api.rst
++++ b/Documentation/virt/kvm/api.rst
+@@ -2908,6 +2908,8 @@ such as set vcpu counter or reset vcpu, and they have the following id bit patte
+ 
+   0x9030 0000 0002 <reg:16>
+ 
++x86 MSR registers have the following id bit patterns::
++  0x2030 0002 <msr number:32>
+ 
+ 4.69 KVM_GET_ONE_REG
+ --------------------
+diff --git a/arch/x86/include/uapi/asm/kvm.h b/arch/x86/include/uapi/asm/kvm.h
+index 0f15d683817d..508b713ca52e 100644
+--- a/arch/x86/include/uapi/asm/kvm.h
++++ b/arch/x86/include/uapi/asm/kvm.h
+@@ -411,6 +411,32 @@ struct kvm_xcrs {
+ 	__u64 padding[16];
+ };
+ 
++#define KVM_X86_REG_TYPE_MSR		2
++#define KVM_X86_REG_TYPE_KVM		3
++
++#define KVM_X86_KVM_REG_SIZE(reg)						\
++({										\
++	reg == KVM_REG_GUEST_SSP ? KVM_REG_SIZE_U64 : 0;			\
++})
++
++#define KVM_X86_REG_TYPE_SIZE(type, reg)					\
++({										\
++	__u64 type_size = (__u64)type << 32;					\
++										\
++	type_size |= type == KVM_X86_REG_TYPE_MSR ? KVM_REG_SIZE_U64 :		\
++		     type == KVM_X86_REG_TYPE_KVM ? KVM_X86_KVM_REG_SIZE(reg) :	\
++		     0;								\
++	type_size;								\
++})
++
++#define KVM_X86_REG_ENCODE(type, index)				\
++	(KVM_REG_X86 | KVM_X86_REG_TYPE_SIZE(type, index) | index)
++
++#define KVM_X86_REG_MSR(index)					\
++	KVM_X86_REG_ENCODE(KVM_X86_REG_TYPE_MSR, index)
++#define KVM_X86_REG_KVM(index)					\
++	KVM_X86_REG_ENCODE(KVM_X86_REG_TYPE_KVM, index)
++
+ #define KVM_SYNC_X86_REGS      (1UL << 0)
+ #define KVM_SYNC_X86_SREGS     (1UL << 1)
+ #define KVM_SYNC_X86_EVENTS    (1UL << 2)
+diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+index 7ba2cdfdac44..f32d3edfc7b1 100644
+--- a/arch/x86/kvm/x86.c
++++ b/arch/x86/kvm/x86.c
+@@ -2254,6 +2254,31 @@ static int do_set_msr(struct kvm_vcpu *vcpu, unsigned index, u64 *data)
+ 	return kvm_set_msr_ignored_check(vcpu, index, *data, true);
+ }
+ 
++static int kvm_get_one_msr(struct kvm_vcpu *vcpu, u32 msr, u64 __user *value)
++{
++	u64 val;
++	int r;
++
++	r = do_get_msr(vcpu, msr, &val);
++	if (r)
++		return r;
++
++	if (put_user(val, value))
++		return -EFAULT;
++
++	return 0;
++}
++
++static int kvm_set_one_msr(struct kvm_vcpu *vcpu, u32 msr, u64 __user *value)
++{
++	u64 val;
++
++	if (get_user(val, value))
++		return -EFAULT;
++
++	return do_set_msr(vcpu, msr, &val);
++}
++
+ #ifdef CONFIG_X86_64
+ struct pvclock_clock {
+ 	int vclock_mode;
+@@ -4737,6 +4762,7 @@ int kvm_vm_ioctl_check_extension(struct kvm *kvm, long ext)
+ 	case KVM_CAP_IRQFD_RESAMPLE:
+ 	case KVM_CAP_MEMORY_FAULT_INFO:
+ 	case KVM_CAP_X86_GUEST_MODE:
++	case KVM_CAP_ONE_REG:
+ 		r = 1;
+ 		break;
+ 	case KVM_CAP_PRE_FAULT_MEMORY:
+@@ -5915,6 +5941,20 @@ static int kvm_vcpu_ioctl_enable_cap(struct kvm_vcpu *vcpu,
+ 	}
+ }
+ 
++struct kvm_x86_reg_id {
++	__u32 index;
++	__u8  type;
++	__u8  rsvd1;
++	__u8  rsvd2:4;
++	__u8  size:4;
++	__u8  x86;
++};
++
++static int kvm_translate_kvm_reg(struct kvm_x86_reg_id *reg)
++{
++	return -EINVAL;
++}
++
+ long kvm_arch_vcpu_ioctl(struct file *filp,
+ 			 unsigned int ioctl, unsigned long arg)
+ {
+@@ -6031,6 +6071,44 @@ long kvm_arch_vcpu_ioctl(struct file *filp,
+ 		srcu_read_unlock(&vcpu->kvm->srcu, idx);
+ 		break;
+ 	}
++	case KVM_GET_ONE_REG:
++	case KVM_SET_ONE_REG: {
++		struct kvm_x86_reg_id *id;
++		struct kvm_one_reg reg;
++		u64 __user *value;
++
++		r = -EFAULT;
++		if (copy_from_user(&reg, argp, sizeof(reg)))
++			break;
++
++		r = -EINVAL;
++		if ((reg.id & KVM_REG_ARCH_MASK) != KVM_REG_X86)
++			break;
++
++		id = (struct kvm_x86_reg_id *)&reg.id;
++		if (id->rsvd1 || id->rsvd2)
++			break;
++
++		if (id->type == KVM_X86_REG_TYPE_KVM) {
++			r = kvm_translate_kvm_reg(id);
++			if (r)
++				break;
++		}
++
++		r = -EINVAL;
++		if (id->type != KVM_X86_REG_TYPE_MSR)
++			break;
++
++		if ((reg.id & KVM_REG_SIZE_MASK) != KVM_REG_SIZE_U64)
++			break;
++
++		value = u64_to_user_ptr(reg.addr);
++		if (ioctl == KVM_GET_ONE_REG)
++			r = kvm_get_one_msr(vcpu, id->index, value);
++		else
++			r = kvm_set_one_msr(vcpu, id->index, value);
++		break;
++	}
+ 	case KVM_TPR_ACCESS_REPORTING: {
+ 		struct kvm_tpr_access_ctl tac;
+ 
 -- 
 2.47.3
 
