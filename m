@@ -1,215 +1,222 @@
-Return-Path: <kvm+bounces-57063-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-57065-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1E763B4A542
-	for <lists+kvm@lfdr.de>; Tue,  9 Sep 2025 10:28:56 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 852E5B4A84F
+	for <lists+kvm@lfdr.de>; Tue,  9 Sep 2025 11:40:19 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 7131A7A3061
-	for <lists+kvm@lfdr.de>; Tue,  9 Sep 2025 08:27:17 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E776A4E1B4E
+	for <lists+kvm@lfdr.de>; Tue,  9 Sep 2025 09:40:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A55B9243367;
-	Tue,  9 Sep 2025 08:28:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A48562D1911;
+	Tue,  9 Sep 2025 09:39:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="QotmK/dV"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="YNXUDUlO"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-wr1-f44.google.com (mail-wr1-f44.google.com [209.85.221.44])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.11])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A668F23C8C5
-	for <kvm@vger.kernel.org>; Tue,  9 Sep 2025 08:28:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.44
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D190A2C21CF;
+	Tue,  9 Sep 2025 09:39:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.11
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757406525; cv=none; b=GThhMDvd6kcQh9Xj2/0ytIpSKjv5AHOR+AhqokOlYxeoUJ7HhwUeU6x3h9JqkZm7ATvhjHslbv73cVNVCrsmxyiYfrLym/oxhuAtwtqYZIV1jgo1jzn2Fzj6v5f0elTasGAJ7x9NoGjt7DZ/EZ2yt2BLm38N6q53E1NE4+a7vhg=
+	t=1757410797; cv=none; b=AVnRTznsvccNgUt1IPspCvKoom3T27wsfFVi7A9iNXUBRP6bxWGEEGAynwmt7OFOu4uXmzljE/lpvAyCMLsCSHiBmZ6wOCDD4OBmY2Ctp95MChdK6XE5QiYenRTgWVGQT1hkFg6KAmXoRv0aYyXVBJfni9rjq46vTw0BTN1/DtM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757406525; c=relaxed/simple;
-	bh=jbau4NvScM9WFmrEOaQaZDaL9+RJwNelRI8l9MUAzyQ=;
-	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
-	 Content-Disposition; b=XKdZ/FDhfXlDTE6zoyUsNYP+34MY+Xctq/lTY/0zwpUWqhsBPFgI1ddadRCT4zaZYS62ze0IT+ZI/lSqpVEr3p0EMLXLJc6zzQmfHPqOOQyttgUSGWk/zCSRnwrqzmjdI166GyYbpbDlsgV/0oL2X0qs7POQzejOWjs7JlgO4ZQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=QotmK/dV; arc=none smtp.client-ip=209.85.221.44
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
-Received: by mail-wr1-f44.google.com with SMTP id ffacd0b85a97d-3dad6252eacso2368151f8f.1
-        for <kvm@vger.kernel.org>; Tue, 09 Sep 2025 01:28:43 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1757406522; x=1758011322; darn=vger.kernel.org;
-        h=content-disposition:mime-version:message-id:subject:cc:to:from:date
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=ts8qPN/5ml6KznKXSDMs1ZerpTtSrzKRDP4paUzXNQE=;
-        b=QotmK/dVzQ+6ijf9sGt3pON7Y8K3HoZqW7MT3OAx2CyJi52HaVNuK67GcTXQLPxtC/
-         j55xca4hfpQ8kvjActY5MMPyfLkDAvwjX5zqOzj0MboTRCrru0x/gjStrJTJEEUdc0u0
-         aJ3tPAvTyyt8Py06DTiKiI4tBq8Lph5/JNOOvwDxxHeEoo/aVsuC/Hw/OQjgbZdIa0qy
-         X8NYlyttbjqqnvNk59WPL/Al5bEbxCMnojea4aGvI/nlAy4rwxJZbcdxGRQ1L2HSbUY1
-         NzfzQDtDu1BYKqBkk6ZvfKjrAeZqm8aewu2dN/M8nDuo4BbRMbgGFx2oyozDelYiuRQd
-         Uofg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1757406522; x=1758011322;
-        h=content-disposition:mime-version:message-id:subject:cc:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=ts8qPN/5ml6KznKXSDMs1ZerpTtSrzKRDP4paUzXNQE=;
-        b=FseAnWonuM6RuF4eNdYE35T5jEwu2nZVPLXrnXlvGJo3BP6ksy342EIZ4y8/PeJD83
-         j9GN5nhy5X2KpEKKnZ49CWM4S9BGI9lb60RnIavWDoJ3cTmvXLmHhsg5CcCbcPO6jNWY
-         xu5X+XdTBKTK0PRn48PztG4oG1+8X//vup3QqCdYSkmECHrOZQGbpuwtGADycvVegMNS
-         sbNswroj3xbwJbmo19pEZSGBdTsBJAAN8WLRN76HCumAcs+JyZ11HNm/WkKieURGOR0Z
-         1rCd1UM55E+ceYKnFoFzWA+lNK/j23VnJ2Thi0E932puNpkYayKq09vgKobrqIofSlAw
-         X3/w==
-X-Gm-Message-State: AOJu0Yz38JfMyooA5w2OF73zZ4HjW5UADL1C2ssnBlvMCtF1ROeQFszg
-	Dxkiab9ZJK3ZqqfaR3IGJ6OlfuTspoYRe6TciPQ3uF16m2CUDoXaPIgDtIeLU9a1lvY=
-X-Gm-Gg: ASbGncuZOXoJVg1RfUizcyP/vvXS6D79YEqAs+UiYyytprDK+YMULKwESl+cWE9W/W1
-	76aPFFhK6IN9fr9EkKGkwhemEe8dj6b9GrFRzTsBhmeXzsES15QIitFB6JuSPa6LufMNg+AKLdq
-	oysvGmqX1kSQ8Ii0AFO2uiD92JoRR/Q/ajtl85RIXTGyDHOrQ3yAt0u9d59BxQvrYPUy8BGKIcX
-	xqQB6EPOPgvkll5EV198SE/wxPZKw5mKdJ21yntkbmigAEkqbyobm2Se6vrw7ubow1zUKhH90t+
-	N7AskxYbmkVkc/Dz0ImqXnt4yhpykhOm9gabOiN3A1Rnnxa66OW6DJCUvJtarEAAEkM1y7RMH4h
-	1t0y5RLSRzRTOvlIYrp7XU/hwMvE=
-X-Google-Smtp-Source: AGHT+IEZM9w3N0O4wHGOcaZOsbBh21VHN0Vef/S4rAsCGfvPVxLSsDa77HhbViCTsFwCMFe3kf1qog==
-X-Received: by 2002:a05:6000:420e:b0:3c8:7fbf:2d6d with SMTP id ffacd0b85a97d-3e643e0884fmr6910997f8f.50.1757406521848;
-        Tue, 09 Sep 2025 01:28:41 -0700 (PDT)
-Received: from localhost ([196.207.164.177])
-        by smtp.gmail.com with UTF8SMTPSA id ffacd0b85a97d-3e7521bfd08sm1639310f8f.4.2025.09.09.01.28.40
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 09 Sep 2025 01:28:41 -0700 (PDT)
-Date: Tue, 9 Sep 2025 11:28:37 +0300
-From: Dan Carpenter <dan.carpenter@linaro.org>
-To: Isaku Yamahata <isaku.yamahata@intel.com>
-Cc: kvm@vger.kernel.org
-Subject: [bug report] KVM: TDX: Get system-wide info about TDX module on
- initialization
-Message-ID: <aL_lNXLD3XG496lW@stanley.mountain>
+	s=arc-20240116; t=1757410797; c=relaxed/simple;
+	bh=xu2dANKyubAvxrmsFb1FCC6E9W8Kc5S2SO2nznkVz1s=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=QZSqeT/Ii8wBKUJAscN+NRzac6odqaaCG7Ua5Bea4M7MiR9/VuQU0fgafdwYDcgollgZONtZFfqOQx1LPFv0bXWo97XS4d73UNZzCybhUKmdHbaYk50sa6oRUOHZPAIN7ozypOTlscI9yJDUKsfEsv1O9nyvbTSwjMDlUdz0r8o=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=YNXUDUlO; arc=none smtp.client-ip=192.198.163.11
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1757410796; x=1788946796;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=xu2dANKyubAvxrmsFb1FCC6E9W8Kc5S2SO2nznkVz1s=;
+  b=YNXUDUlOInMvISik0BgYaRJQCEACYezRQETgUReyupXZDl1yJKwErYj8
+   T2mbyA6Eeq1LStbw/OHVMnLJMzPw/cDM7GPQbNNruKzHUIqd5lZog0sBh
+   e/GD3hxI1hV77Yos85Iziz9tkVtGWAI5g/0qBQAz3s3JnsOJrJSxhzxEZ
+   nuirhX8QCFbyOApkzP8bQ2/nIyDjABODz+2uYN1l7K6KqbVWGBoBaJdue
+   TiJB/zmJ+WM/PHDYbC37BjZWrW5K6qJCvvgo6B/ud137pj7UWAgcsvBR8
+   Y4qPWlW+gspox2vtZgPVx16tNy7Y6ET8ovEylARo03AuA1kQRoonRVKxM
+   w==;
+X-CSE-ConnectionGUID: 93Q8W5L9S2WIgDqxUj/SqA==
+X-CSE-MsgGUID: AKBXvQkITrKMNzfZGSP1mQ==
+X-IronPort-AV: E=McAfee;i="6800,10657,11547"; a="70307170"
+X-IronPort-AV: E=Sophos;i="6.18,251,1751266800"; 
+   d="scan'208";a="70307170"
+Received: from orviesa006.jf.intel.com ([10.64.159.146])
+  by fmvoesa105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 09 Sep 2025 02:39:54 -0700
+X-CSE-ConnectionGUID: /7Im4CaGT/+AcvI1lmO9EA==
+X-CSE-MsgGUID: piwWP0KET4aSw4UXarv1YQ==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.18,251,1751266800"; 
+   d="scan'208";a="172207385"
+Received: from unknown (HELO CannotLeaveINTEL.jf.intel.com) ([10.165.54.94])
+  by orviesa006-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 09 Sep 2025 02:39:54 -0700
+From: Chao Gao <chao.gao@intel.com>
+To: kvm@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Cc: acme@redhat.com,
+	bp@alien8.de,
+	dave.hansen@linux.intel.com,
+	hpa@zytor.com,
+	john.allen@amd.com,
+	mingo@kernel.org,
+	mingo@redhat.com,
+	minipli@grsecurity.net,
+	mlevitsk@redhat.com,
+	namhyung@kernel.org,
+	pbonzini@redhat.com,
+	prsampat@amd.com,
+	rick.p.edgecombe@intel.com,
+	seanjc@google.com,
+	shuah@kernel.org,
+	tglx@linutronix.de,
+	weijiang.yang@intel.com,
+	x86@kernel.org,
+	xin@zytor.com,
+	xiaoyao.li@intel.com
+Subject: [PATCH v14 00/22] Enable CET Virtualization
+Date: Tue,  9 Sep 2025 02:39:31 -0700
+Message-ID: <20250909093953.202028-1-chao.gao@intel.com>
+X-Mailer: git-send-email 2.47.3
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
 
-Hello Isaku Yamahata,
+The FPU support for CET virtualization has already been merged into 6.17-rc1.
+Building on that, this series introduces Intel CET virtualization support for
+KVM.
 
-Commit 61bb28279623 ("KVM: TDX: Get system-wide info about TDX module
-on initialization") from Oct 30, 2024 (linux-next), leads to the
-following Smatch static checker warning:
+Changes in v14
+1. rename the type of guest SSP register to KVM_X86_REG_KVM and add docs
+   for register IDs in api.rst (Sean, Xiaoyao)
+2. update commit message of patch 1
+3. use rdmsrq/wrmsrq() instead of rdmsrl/wrmsrl() in patch 6 (Xin)
+4. split the introduction of per-guest guest_supported_xss into a
+separate patch. (Xiaoyao)
+5. make guest FPU and VMCS consistent regarding MSR_IA32_S_CET
+6. collect reviews from Xiaoyao.
 
-	arch/x86/kvm/vmx/tdx.c:3464 __tdx_bringup()
-	warn: missing error code 'r'
+---
+Control-flow Enforcement Technology (CET) is a kind of CPU feature used
+to prevent Return/CALL/Jump-Oriented Programming (ROP/COP/JOP) attacks.
+It provides two sub-features(SHSTK,IBT) to defend against ROP/COP/JOP
+style control-flow subversion attacks.
 
-arch/x86/kvm/vmx/tdx.c
-    3416 static int __init __tdx_bringup(void)
-    3417 {
-    3418         const struct tdx_sys_info_td_conf *td_conf;
-    3419         int r, i;
-    3420 
-    3421         for (i = 0; i < ARRAY_SIZE(tdx_uret_msrs); i++) {
-    3422                 /*
-    3423                  * Check if MSRs (tdx_uret_msrs) can be saved/restored
-    3424                  * before returning to user space.
-    3425                  *
-    3426                  * this_cpu_ptr(user_return_msrs)->registered isn't checked
-    3427                  * because the registration is done at vcpu runtime by
-    3428                  * tdx_user_return_msr_update_cache().
-    3429                  */
-    3430                 tdx_uret_msrs[i].slot = kvm_find_user_return_msr(tdx_uret_msrs[i].msr);
-    3431                 if (tdx_uret_msrs[i].slot == -1) {
-    3432                         /* If any MSR isn't supported, it is a KVM bug */
-    3433                         pr_err("MSR %x isn't included by kvm_find_user_return_msr\n",
-    3434                                 tdx_uret_msrs[i].msr);
-    3435                         return -EIO;
-    3436                 }
-    3437         }
-    3438 
-    3439         /*
-    3440          * Enabling TDX requires enabling hardware virtualization first,
-    3441          * as making SEAMCALLs requires CPU being in post-VMXON state.
-    3442          */
-    3443         r = kvm_enable_virtualization();
-    3444         if (r)
-    3445                 return r;
-    3446 
-    3447         cpus_read_lock();
-    3448         r = __do_tdx_bringup();
-    3449         cpus_read_unlock();
-    3450 
-    3451         if (r)
-    3452                 goto tdx_bringup_err;
-    3453 
-    3454         /* Get TDX global information for later use */
-    3455         tdx_sysinfo = tdx_get_sysinfo();
-    3456         if (WARN_ON_ONCE(!tdx_sysinfo)) {
-    3457                 r = -EINVAL;
-    3458                 goto get_sysinfo_err;
-    3459         }
-    3460 
-    3461         /* Check TDX module and KVM capabilities */
-    3462         if (!tdx_get_supported_attrs(&tdx_sysinfo->td_conf) ||
-    3463             !tdx_get_supported_xfam(&tdx_sysinfo->td_conf))
---> 3464                 goto get_sysinfo_err;
+Shadow Stack (SHSTK):
+  A shadow stack is a second stack used exclusively for control transfer
+  operations. The shadow stack is separate from the data/normal stack and
+  can be enabled individually in user and kernel mode. When shadow stack
+  is enabled, CALL pushes the return address on both the data and shadow
+  stack. RET pops the return address from both stacks and compares them.
+  If the return addresses from the two stacks do not match, the processor
+  generates a #CP.
 
-error code?
+Indirect Branch Tracking (IBT):
+  IBT introduces new instruction(ENDBRANCH)to mark valid target addresses
+  of indirect branches (CALL, JMP etc...). If an indirect branch is
+  executed and the next instruction is _not_ an ENDBRANCH, the processor
+  generates a #CP. These instruction behaves as a NOP on platforms that
+  doesn't support CET.
 
-    3465 
-    3466         if (!(tdx_sysinfo->features.tdx_features0 & MD_FIELD_ID_FEATURES0_TOPOLOGY_ENUM))
-    3467                 goto get_sysinfo_err;
+CET states management
+=====================
+KVM cooperates with host kernel FPU framework to manage guest CET registers.
+With CET supervisor mode state support in this series, KVM can save/restore
+full guest CET xsave-managed states.
 
-here too?
+CET user mode and supervisor mode xstates, i.e., MSR_IA32_{U_CET,PL3_SSP}
+and MSR_IA32_PL{0,1,2}, depend on host FPU framework to swap guest and host
+xstates. On VM-Exit, guest CET xstates are saved to guest fpu area and host
+CET xstates are loaded from task/thread context before vCPU returns to
+userspace, vice-versa on VM-Entry. See details in kvm_{load,put}_guest_fpu().
 
-    3468 
-    3469         /*
-    3470          * TDX has its own limit of maximum vCPUs it can support for all
-    3471          * TDX guests in addition to KVM_MAX_VCPUS.  Userspace needs to
-    3472          * query TDX guest's maximum vCPUs by checking KVM_CAP_MAX_VCPU
-    3473          * extension on per-VM basis.
-    3474          *
-    3475          * TDX module reports such limit via the MAX_VCPU_PER_TD global
-    3476          * metadata.  Different modules may report different values.
-    3477          * Some old module may also not support this metadata (in which
-    3478          * case this limit is U16_MAX).
-    3479          *
-    3480          * In practice, the reported value reflects the maximum logical
-    3481          * CPUs that ALL the platforms that the module supports can
-    3482          * possibly have.
-    3483          *
-    3484          * Simply forwarding the MAX_VCPU_PER_TD to userspace could
-    3485          * result in an unpredictable ABI.  KVM instead always advertise
-    3486          * the number of logical CPUs the platform has as the maximum
-    3487          * vCPUs for TDX guests.
-    3488          *
-    3489          * Make sure MAX_VCPU_PER_TD reported by TDX module is not
-    3490          * smaller than the number of logical CPUs, otherwise KVM will
-    3491          * report an unsupported value to userspace.
-    3492          *
-    3493          * Note, a platform with TDX enabled in the BIOS cannot support
-    3494          * physical CPU hotplug, and TDX requires the BIOS has marked
-    3495          * all logical CPUs in MADT table as enabled.  Just use
-    3496          * num_present_cpus() for the number of logical CPUs.
-    3497          */
-    3498         td_conf = &tdx_sysinfo->td_conf;
-    3499         if (td_conf->max_vcpus_per_td < num_present_cpus()) {
-    3500                 pr_err("Disable TDX: MAX_VCPU_PER_TD (%u) smaller than number of logical CPUs (%u).\n",
-    3501                                 td_conf->max_vcpus_per_td, num_present_cpus());
-    3502                 r = -EINVAL;
-    3503                 goto get_sysinfo_err;
-    3504         }
-    3505 
-    3506         if (misc_cg_set_capacity(MISC_CG_RES_TDX, tdx_get_nr_guest_keyids())) {
-    3507                 r = -EINVAL;
-    3508                 goto get_sysinfo_err;
-    3509         }
-    3510 
-    3511         /*
-    3512          * Leave hardware virtualization enabled after TDX is enabled
-    3513          * successfully.  TDX CPU hotplug depends on this.
-    3514          */
-    3515         return 0;
-    3516 
-    3517 get_sysinfo_err:
-    3518         __tdx_cleanup();
-    3519 tdx_bringup_err:
-    3520         kvm_disable_virtualization();
-    3521         return r;
-    3522 }
+CET supervisor mode states are grouped into two categories : XSAVE-managed
+and non-XSAVE-managed, the former includes MSR_IA32_PL{0,1,2}_SSP and are
+controlled by CET supervisor mode bit(S_CET bit) in XSS, the later consists
+of MSR_IA32_S_CET and MSR_IA32_INTR_SSP_TBL.
 
-regards,
-dan carpenter
+VMX introduces new VMCS fields, {GUEST|HOST}_{S_CET,SSP,INTR_SSP_TABL}, to
+facilitate guest/host non-XSAVES-managed states. When VMX CET entry/exit load
+bits are set, guest/host MSR_IA32_{S_CET,INTR_SSP_TBL,SSP} are loaded from
+equivalent fields at VM-Exit/Entry. With these new fields, such supervisor
+states require no addtional KVM save/reload actions.
+
+Tests
+======
+This series has successfully passed the basic CET user shadow stack test
+and kernel IBT test in both L1 and L2 guests. The newly added
+KVM-unit-tests [2] also passed, and its v11 has been tested with the AMD
+CET series by John [3].
+
+For your convenience, you can use my WIP QEMU [1] for testing.
+
+[1]: https://github.com/gaochaointel/qemu-dev qemu-cet
+[2]: https://lore.kernel.org/kvm/20250626073459.12990-1-minipli@grsecurity.net/
+[3]: https://lore.kernel.org/kvm/aH6CH+x5mCDrvtoz@AUSJOHALLEN.amd.com/
+
+Chao Gao (5):
+  KVM: x86: Check XSS validity against guest CPUIDs
+  KVM: nVMX: Add consistency checks for CR0.WP and CR4.CET
+  KVM: nVMX: Add consistency checks for CET states
+  KVM: nVMX: Advertise new VM-Entry/Exit control bits for CET state
+  KVM: selftest: Add tests for KVM_{GET,SET}_ONE_REG
+
+Sean Christopherson (2):
+  KVM: x86: Report XSS as to-be-saved if there are supported features
+  KVM: x86: Load guest FPU state when access XSAVE-managed MSRs
+
+Yang Weijiang (15):
+  KVM: x86: Introduce KVM_{G,S}ET_ONE_REG uAPIs support
+  KVM: x86: Refresh CPUID on write to guest MSR_IA32_XSS
+  KVM: x86: Initialize kvm_caps.supported_xss
+  KVM: x86: Add fault checks for guest CR4.CET setting
+  KVM: x86: Report KVM supported CET MSRs as to-be-saved
+  KVM: VMX: Introduce CET VMCS fields and control bits
+  KVM: x86: Enable guest SSP read/write interface with new uAPIs
+  KVM: VMX: Emulate read and write to CET MSRs
+  KVM: x86: Save and reload SSP to/from SMRAM
+  KVM: VMX: Set up interception for CET MSRs
+  KVM: VMX: Set host constant supervisor states to VMCS fields
+  KVM: x86: Don't emulate instructions guarded by CET
+  KVM: x86: Enable CET virtualization for VMX and advertise to userspace
+  KVM: nVMX: Virtualize NO_HW_ERROR_CODE_CC for L1 event injection to L2
+  KVM: nVMX: Prepare for enabling CET support for nested guest
+
+ Documentation/virt/kvm/api.rst                |   9 +
+ arch/x86/include/asm/kvm_host.h               |   5 +-
+ arch/x86/include/asm/vmx.h                    |   9 +
+ arch/x86/include/uapi/asm/kvm.h               |  29 ++
+ arch/x86/kvm/cpuid.c                          |  17 +-
+ arch/x86/kvm/emulate.c                        |  46 ++-
+ arch/x86/kvm/smm.c                            |   8 +
+ arch/x86/kvm/smm.h                            |   2 +-
+ arch/x86/kvm/svm/svm.c                        |   4 +
+ arch/x86/kvm/vmx/capabilities.h               |   9 +
+ arch/x86/kvm/vmx/nested.c                     | 163 ++++++++++-
+ arch/x86/kvm/vmx/nested.h                     |   5 +
+ arch/x86/kvm/vmx/vmcs12.c                     |   6 +
+ arch/x86/kvm/vmx/vmcs12.h                     |  14 +-
+ arch/x86/kvm/vmx/vmx.c                        |  85 +++++-
+ arch/x86/kvm/vmx/vmx.h                        |   9 +-
+ arch/x86/kvm/x86.c                            | 264 +++++++++++++++++-
+ arch/x86/kvm/x86.h                            |  61 ++++
+ tools/arch/x86/include/uapi/asm/kvm.h         |  29 ++
+ tools/testing/selftests/kvm/Makefile.kvm      |   1 +
+ .../selftests/kvm/x86/get_set_one_reg.c       |  30 ++
+ 21 files changed, 764 insertions(+), 41 deletions(-)
+ create mode 100644 tools/testing/selftests/kvm/x86/get_set_one_reg.c
+
+-- 
+2.47.3
+
 
