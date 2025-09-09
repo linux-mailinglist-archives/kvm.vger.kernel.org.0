@@ -1,52 +1,65 @@
-Return-Path: <kvm+bounces-57033-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-57034-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9F764B49F14
-	for <lists+kvm@lfdr.de>; Tue,  9 Sep 2025 04:19:06 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 6EC1BB49F5A
+	for <lists+kvm@lfdr.de>; Tue,  9 Sep 2025 04:46:48 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C6AE74E212E
-	for <lists+kvm@lfdr.de>; Tue,  9 Sep 2025 02:19:04 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 290A24433EB
+	for <lists+kvm@lfdr.de>; Tue,  9 Sep 2025 02:46:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BD43624BBF0;
-	Tue,  9 Sep 2025 02:18:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 24B702561AA;
+	Tue,  9 Sep 2025 02:46:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="BAntUjAd"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="d92lNrJc"
 X-Original-To: kvm@vger.kernel.org
-Received: from bombadil.infradead.org (bombadil.infradead.org [198.137.202.133])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.10])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4CC641A5B8A;
-	Tue,  9 Sep 2025 02:18:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.133
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7F70C2AE99;
+	Tue,  9 Sep 2025 02:46:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.10
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757384329; cv=none; b=BLjrl1Uazw/2vgzkLIiXY+Phlfvp+2ef5+yut+yyEiZjN3f5DY1A8hvprLFGw/xIoBuU4imll988Cmh0KZ2F+/ihiDDOh5HmftEhpP/6cCXvj93fFO4yWhZBv5cJTPLcF5DI1B7pmXGRL5zUcaDUwO9+xcFqzIImFddxsvP3rjY=
+	t=1757385998; cv=none; b=sjsh5nsodtx05SfJETaBShpysf2n+6J/nofy6Am/MEAuxmgZCbKhqzXMkW20xYqwJDKnvFNkEk7ViMdOIIWNzC4cZiKGf8IB3S5RSoZPdnUekQL1D8HcT7MqJnPSlnSkO1kRUtZtctnEbeN3zGjFB9q7hbNDsrBB9m4qwsDK7CM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757384329; c=relaxed/simple;
-	bh=WGDFdrUIO57RFhL1Hx4aXR5epVMihSnh5sl8CIbKJtw=;
+	s=arc-20240116; t=1757385998; c=relaxed/simple;
+	bh=VxqzwwDMmggUPxDs4iUk/QJ7RrWb0r/ma1DnZipoOL8=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=em/4yS26MUqWibdqDTYe0Ah7B3I+dfxvdvHYuxpmrV/dUF3cQ4MtsUo4f1NG7zeaaUm3c2C20hH6WZCy2yZSC+JFLj0qQSQNT4snVbu5uw7nj34VTrFj5+zMGp9KcAq/PFlC7ygTRMNIkfxaTxHgnGWalQG8L+quy10t6Hi+fX0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=BAntUjAd; arc=none smtp.client-ip=198.137.202.133
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=infradead.org
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=infradead.org; s=bombadil.20210309; h=Content-Transfer-Encoding:
-	Content-Type:In-Reply-To:From:References:Cc:To:Subject:MIME-Version:Date:
-	Message-ID:Sender:Reply-To:Content-ID:Content-Description;
-	bh=IofV6huNpOfUH9kOcfLlUEgXZUkpn9/vanabM6dcCKQ=; b=BAntUjAdRiibQDvNg0XKZqYZBb
-	uGS+5AXqc8fqzISX1z2qOliaasU/p2spviAOv2gCoHCzu97fImJnVGPbIO7+5qiq5vXH2z0APUrdR
-	0VW1qMpeX7crDrwIVBJZODZV4jCTTBKqII6TYICsRMGUxmON4eBFjWj5XPinAFI06lVEmEDrSKTz+
-	QO1O7ml6iv0vOLAcZV+SHb12MXaDF8f/u9FsI93hm/p0JmCxZZskvruXz3v52f5bciGWbaiu/5gLB
-	GaLecD5nPNIqM4Qw7M9T1obxoelYO+4sm9ghb2Jv05lXF70+cxI3mB2pT7npQJ9RwWaT+74+RcTJ0
-	t8OVHqqw==;
-Received: from [50.53.25.54] (helo=[192.168.254.17])
-	by bombadil.infradead.org with esmtpsa (Exim 4.98.2 #2 (Red Hat Linux))
-	id 1uvnwL-00000003eGh-0Sp2;
-	Tue, 09 Sep 2025 02:18:37 +0000
-Message-ID: <b23d3799-f8c3-4bd3-82ae-df9c3e965555@infradead.org>
-Date: Mon, 8 Sep 2025 19:18:36 -0700
+	 In-Reply-To:Content-Type; b=sN22RICgw9u6lfr7TlZfAi0X0+hBXg5Zkuf4LPaUBxABWBGFPC7UnCaNMpxQMJpxAhbErswfzg6s7MKtA8e2EoJtHzTJ7P2Cl6aQqlY9N1nCnxw2FFUivwi/VmwbRj9qae5Yxyh5JCY8V2ZuGi600/zJD4NpZq5kKTcK7+f36xc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=d92lNrJc; arc=none smtp.client-ip=198.175.65.10
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1757385997; x=1788921997;
+  h=message-id:date:mime-version:subject:to:cc:references:
+   from:in-reply-to:content-transfer-encoding;
+  bh=VxqzwwDMmggUPxDs4iUk/QJ7RrWb0r/ma1DnZipoOL8=;
+  b=d92lNrJciUakkSHAoPdFZdLI9zGnxHdyTW8HEe3HIJYUFPYQF4Y4jQEC
+   GzY/lvIXYIuPlARkj4TotwmnnoN3j3QCfzjrr9wdxOkayH02DwlInxlj0
+   Mu3VtMI0MKHTegdsDW2z0h6fxXaU1rcGo2ofjNZrRFEEFlPG9hOcPCSqW
+   Tl5I6j5XQnK6qu1iDa7a+vsLEvv5pZRHVTSqIv1UlrrmN6SSgEQMWQ9iO
+   3Cx+mt5ezEPxAe3g+3lXkJ43cw9oFmXPBNlANSO6iK/SwysyUdlUYUmvV
+   uajs18Vo5KtjFjj77Jzuf0FPU4dQsYzVYsrBN2mn546t4IiagnWGhtzQF
+   Q==;
+X-CSE-ConnectionGUID: 7uHtTdNrS9KJRqB3F1xf5Q==
+X-CSE-MsgGUID: yYMRfgFqSs6CnW8yAGai9Q==
+X-IronPort-AV: E=McAfee;i="6800,10657,11547"; a="77116180"
+X-IronPort-AV: E=Sophos;i="6.18,250,1751266800"; 
+   d="scan'208";a="77116180"
+Received: from orviesa010.jf.intel.com ([10.64.159.150])
+  by orvoesa102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 08 Sep 2025 19:46:36 -0700
+X-CSE-ConnectionGUID: AYacolEkQjSGPIlZWaLtBg==
+X-CSE-MsgGUID: NofuoqEfRvKhagpN/BQnXQ==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.18,250,1751266800"; 
+   d="scan'208";a="172221910"
+Received: from unknown (HELO [10.238.0.107]) ([10.238.0.107])
+  by orviesa010-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 08 Sep 2025 19:46:34 -0700
+Message-ID: <ea1603bc-68f2-44cd-8cdf-ec5969486dea@linux.intel.com>
+Date: Tue, 9 Sep 2025 10:46:31 +0800
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -54,74 +67,96 @@ List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] KVM: x86: Fix hypercalls docs section number order
-To: Bagas Sanjaya <bagasdotme@gmail.com>,
- Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
- Linux KVM <kvm@vger.kernel.org>,
- Linux Documentation <linux-doc@vger.kernel.org>
-Cc: Sean Christopherson <seanjc@google.com>,
- Paolo Bonzini <pbonzini@redhat.com>, Jonathan Corbet <corbet@lwn.net>,
- Wanpeng Li <wanpengli@tencent.com>
-References: <20250909003952.10314-1-bagasdotme@gmail.com>
+Subject: Re: [PATCH v2 1/3] KVM: x86/mmu: Return -EAGAIN if userspace
+ deletes/moves memslot during prefault
+To: Yan Zhao <yan.y.zhao@intel.com>, seanjc@google.com
+Cc: pbonzini@redhat.com, reinette.chatre@intel.com,
+ rick.p.edgecombe@intel.com, linux-kernel@vger.kernel.org, kvm@vger.kernel.org
+References: <20250822070305.26427-1-yan.y.zhao@intel.com>
+ <20250822070347.26451-1-yan.y.zhao@intel.com>
 Content-Language: en-US
-From: Randy Dunlap <rdunlap@infradead.org>
-In-Reply-To: <20250909003952.10314-1-bagasdotme@gmail.com>
-Content-Type: text/plain; charset=UTF-8
+From: Binbin Wu <binbin.wu@linux.intel.com>
+In-Reply-To: <20250822070347.26451-1-yan.y.zhao@intel.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 
 
 
-On 9/8/25 5:39 PM, Bagas Sanjaya wrote:
-> Commit 4180bf1b655a79 ("KVM: X86: Implement "send IPI" hypercall")
-> documents KVM_HC_SEND_IPI hypercall, yet its section number duplicates
-> KVM_HC_CLOCK_PAIRING one (which both are 6th). Fix the numbering order
-> so that the former should be 7th.
-> 
-> Fixes: 4180bf1b655a ("KVM: X86: Implement "send IPI" hypercall")
-> Signed-off-by: Bagas Sanjaya <bagasdotme@gmail.com>
+On 8/22/2025 3:03 PM, Yan Zhao wrote:
+> From: Sean Christopherson <seanjc@google.com>
+>
+> Return -EAGAIN if userspace attempts to delete or move a memslot while also
+> prefaulting memory for that same memslot, i.e. force userspace to retry
+> instead of trying to handle the scenario entirely within KVM.  Unlike
+> KVM_RUN, which needs to handle the scenario entirely within KVM because
+> userspace has come to depend on such behavior, KVM_PRE_FAULT_MEMORY can
+> return -EAGAIN without breaking userspace as this scenario can't have ever
+> worked (and there's no sane use case for prefaulting to a memslot that's
+> being deleted/moved).
+>
+> And also unlike KVM_RUN, the prefault path doesn't naturally gaurantee
 
-Yep. Thanks.
+gaurantee -> guarantee
 
-Reviewed-by: Randy Dunlap <rdunlap@infradead.org>
+> forward progress.  E.g. to handle such a scenario, KVM would need to drop
+> and reacquire SRCU to break the deadlock between the memslot update
+> (synchronizes SRCU) and the prefault (waits for the memslot update to
+> complete).
+>
+> However, dropping SRCU creates more problems, as completing the memslot
+> update will bump the memslot generation, which in turn will invalidate the
+> MMU root.  To handle that, prefaulting would need to handle pending
+> KVM_REQ_MMU_FREE_OBSOLETE_ROOTS requests and do kvm_mmu_reload() prior to
+> mapping each individual.
+>
+> I.e. to fully handle this scenario, prefaulting would eventually need to
+> look a lot like vcpu_enter_guest().  Given that there's no reasonable use
+> case and practically zero risk of breaking userspace, punt the problem to
+> userspace and avoid adding unnecessary complexity to the prefualt path.
+
+prefualt -> prefault
+
+>
+> Note, TDX's guest_memfd post-populate path is unaffected as slots_lock is
+> held for the entire duration of populate(), i.e. any memslot modifications
+> will be fully serialized against TDX's flavor of prefaulting.
+>
+> Reported-by: Reinette Chatre <reinette.chatre@intel.com>
+> Closes: https://lore.kernel.org/all/20250519023737.30360-1-yan.y.zhao@intel.com
+> Debugged-by: Yan Zhao <yan.y.zhao@intel.com>
+> Signed-off-by: Sean Christopherson <seanjc@google.com>
+
+Two typos above.
+
+Otherwise,
+Reviewed-by: Binbin Wu <binbin.wu@linux.intel.com>
 
 > ---
->  Documentation/virt/kvm/x86/hypercalls.rst | 6 +++---
->  1 file changed, 3 insertions(+), 3 deletions(-)
-> 
-> diff --git a/Documentation/virt/kvm/x86/hypercalls.rst b/Documentation/virt/kvm/x86/hypercalls.rst
-> index 10db7924720f16..521ecf9a8a361a 100644
-> --- a/Documentation/virt/kvm/x86/hypercalls.rst
-> +++ b/Documentation/virt/kvm/x86/hypercalls.rst
-> @@ -137,7 +137,7 @@ compute the CLOCK_REALTIME for its clock, at the same instant.
->  Returns KVM_EOPNOTSUPP if the host does not use TSC clocksource,
->  or if clock type is different than KVM_CLOCK_PAIRING_WALLCLOCK.
->  
-> -6. KVM_HC_SEND_IPI
-> +7. KVM_HC_SEND_IPI
->  ------------------
->  
->  :Architecture: x86
-> @@ -158,7 +158,7 @@ corresponds to the APIC ID a2+1, and so on.
->  
->  Returns the number of CPUs to which the IPIs were delivered successfully.
->  
-> -7. KVM_HC_SCHED_YIELD
-> +8. KVM_HC_SCHED_YIELD
->  ---------------------
->  
->  :Architecture: x86
-> @@ -170,7 +170,7 @@ a0: destination APIC ID
->  :Usage example: When sending a call-function IPI-many to vCPUs, yield if
->  	        any of the IPI target vCPUs was preempted.
->  
-> -8. KVM_HC_MAP_GPA_RANGE
-> +9. KVM_HC_MAP_GPA_RANGE
->  -------------------------
->  :Architecture: x86
->  :Status: active
-> 
-> base-commit: a6ad54137af92535cfe32e19e5f3bc1bb7dbd383
+>   arch/x86/kvm/mmu/mmu.c | 10 ++++++++--
+>   1 file changed, 8 insertions(+), 2 deletions(-)
+>
+> diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
+> index 92ff15969a36..f31fad33c423 100644
+> --- a/arch/x86/kvm/mmu/mmu.c
+> +++ b/arch/x86/kvm/mmu/mmu.c
+> @@ -4653,10 +4653,16 @@ static int kvm_mmu_faultin_pfn(struct kvm_vcpu *vcpu,
+>   	/*
+>   	 * Retry the page fault if the gfn hit a memslot that is being deleted
+>   	 * or moved.  This ensures any existing SPTEs for the old memslot will
+> -	 * be zapped before KVM inserts a new MMIO SPTE for the gfn.
+> +	 * be zapped before KVM inserts a new MMIO SPTE for the gfn.  Punt the
+> +	 * error to userspace if this is a prefault, as KVM's prefaulting ABI
+> +	 * doesn't need provide the same forward progress guarantees as KVM_RUN.
+>   	 */
+> -	if (slot->flags & KVM_MEMSLOT_INVALID)
+> +	if (slot->flags & KVM_MEMSLOT_INVALID) {
+> +		if (fault->prefetch)
+> +			return -EAGAIN;
+> +
+>   		return RET_PF_RETRY;
+> +	}
+>   
+>   	if (slot->id == APIC_ACCESS_PAGE_PRIVATE_MEMSLOT) {
+>   		/*
 
--- 
-~Randy
 
