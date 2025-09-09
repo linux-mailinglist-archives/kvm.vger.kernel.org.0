@@ -1,134 +1,237 @@
-Return-Path: <kvm+bounces-57143-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-57144-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 65C72B5076F
-	for <lists+kvm@lfdr.de>; Tue,  9 Sep 2025 22:48:59 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7183BB5079F
+	for <lists+kvm@lfdr.de>; Tue,  9 Sep 2025 23:03:49 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 8B7ED1C659C2
-	for <lists+kvm@lfdr.de>; Tue,  9 Sep 2025 20:49:20 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 186A11746D1
+	for <lists+kvm@lfdr.de>; Tue,  9 Sep 2025 21:03:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5BF6F342C93;
-	Tue,  9 Sep 2025 20:48:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D119B242D6B;
+	Tue,  9 Sep 2025 21:03:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=raptorengineering.com header.i=@raptorengineering.com header.b="vHUt4pHm"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Rker6rYa"
 X-Original-To: kvm@vger.kernel.org
-Received: from raptorengineering.com (mail.raptorengineering.com [23.155.224.40])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 670A23597A
-	for <kvm@vger.kernel.org>; Tue,  9 Sep 2025 20:48:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=23.155.224.40
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EAE9B80B;
+	Tue,  9 Sep 2025 21:03:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757450933; cv=none; b=CTR5ZxVyokPv693Npp5RTKTKUR89ulHTfKbXUi4lIBVMA5in0FXlss1se/2vBLnkGVc6jx+Ct7vltGaJShFQ9UEvwGRqFctcGVsqvT9hIQoGYY2kLkPGieJuScSOR9u2rWwY2oKp6c2HXAOWfOww1vuC2CPGv5dDGvKjxjUOFvg=
+	t=1757451820; cv=none; b=r5lF5n4mMp9BCmBI31ESM9AJeaM7QPOflbOWiZmh8YSq/dliU6/zk/0JLbRNxXlMnPO5RX7+KuwXHXKJi5UdCXRLdTSJh0arlWbYL+fm8TyOZiHcYIb8McofguPeD9/yx/N/mN9ON1L8qASrDIHASj8YiDKAbktNgRChj/7Bor4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757450933; c=relaxed/simple;
-	bh=g6R1h/BhvYe2WmruXaj8MDnedgDzaue30m/ddAAmfFs=;
-	h=Date:From:To:Cc:Message-ID:Subject:MIME-Version:Content-Type; b=EQM0nW8Yh9lWzzV80pe4Hf99CDm3balIdKeDj0NROXVDAJfEam3IWOQy8gSM0Yr8NPmYC2+cro1g2FkKEh+HcWiv6uHxxPjEcLeeFFaN4uF4qISFhLzAwFXvC4oi5amsLyeN9YBKB31D6hjhNTGNR2ggswVBj/sllrO5uKgXENo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=raptorengineering.com; spf=pass smtp.mailfrom=raptorengineering.com; dkim=pass (1024-bit key) header.d=raptorengineering.com header.i=@raptorengineering.com header.b=vHUt4pHm; arc=none smtp.client-ip=23.155.224.40
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=raptorengineering.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=raptorengineering.com
-Received: from localhost (localhost [127.0.0.1])
-	by mail.rptsys.com (Postfix) with ESMTP id 12F378287DA8;
-	Tue,  9 Sep 2025 15:48:48 -0500 (CDT)
-Received: from mail.rptsys.com ([127.0.0.1])
-	by localhost (vali.starlink.edu [127.0.0.1]) (amavisd-new, port 10032)
-	with ESMTP id jAc376xn005e; Tue,  9 Sep 2025 15:48:47 -0500 (CDT)
-Received: from localhost (localhost [127.0.0.1])
-	by mail.rptsys.com (Postfix) with ESMTP id 5FBE58287DE2;
-	Tue,  9 Sep 2025 15:48:47 -0500 (CDT)
-DKIM-Filter: OpenDKIM Filter v2.10.3 mail.rptsys.com 5FBE58287DE2
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=raptorengineering.com; s=B8E824E6-0BE2-11E6-931D-288C65937AAD;
-	t=1757450927; bh=aHB5DXkErjn2E5tn1hQOECXYgRXXDEcJQb4TCKOHPKY=;
-	h=Date:From:To:Message-ID:MIME-Version;
-	b=vHUt4pHmyzEeERDA/vZRWNpHMRm9WD2860IVhEZ1SwCwQoRoc8v2xAmlDSGd2tuoY
-	 +7X70xJ8D2ffJcyZTx4KJwZKLX7SqxF4bKgmpAscvqeWEs3kSDPrTYdPDiRSDhGZGr
-	 ptSnybrUVuF+n2MmY3kszhjw4D80HIYK4AGOYMs4=
-X-Virus-Scanned: amavisd-new at rptsys.com
-Received: from mail.rptsys.com ([127.0.0.1])
-	by localhost (vali.starlink.edu [127.0.0.1]) (amavisd-new, port 10026)
-	with ESMTP id cD_RFPt7wzuY; Tue,  9 Sep 2025 15:48:47 -0500 (CDT)
-Received: from vali.starlink.edu (localhost [127.0.0.1])
-	by mail.rptsys.com (Postfix) with ESMTP id 263888287DA8;
-	Tue,  9 Sep 2025 15:48:47 -0500 (CDT)
-Date: Tue, 9 Sep 2025 15:48:46 -0500 (CDT)
-From: Timothy Pearson <tpearson@raptorengineering.com>
-To: kvm <kvm@vger.kernel.org>
-Cc: linuxppc-dev <linuxppc-dev@lists.ozlabs.org>
-Message-ID: <663798478.1707537.1757450926706.JavaMail.zimbra@raptorengineeringinc.com>
-Subject: [PATCH] vfio/pci: Fix INTx handling on legacy DisINTx- PCI devices
+	s=arc-20240116; t=1757451820; c=relaxed/simple;
+	bh=fHQCgeIfFerWfyiKnWevc0KBl+geiQXdoCwRBomFimI=;
+	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
+	 Content-Disposition:In-Reply-To; b=DXZjNRQppIbaVhlvHnf998zlaLE4gx6NpClfUys/M2y5UVN+rFVkO8/eWPpACLgFGdKIx4z2T0i03bVwTeEGonFCJ5qhcdWi3kC9OnxeqoMVZbNYH1YSeM1GUfMpjrGVD9LqBGOZd52m/OUgIdsDxZpQW2UjD87SIIvlcdOVhq4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Rker6rYa; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 47896C4CEF4;
+	Tue,  9 Sep 2025 21:03:38 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1757451818;
+	bh=fHQCgeIfFerWfyiKnWevc0KBl+geiQXdoCwRBomFimI=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:From;
+	b=Rker6rYavqlM4A5gbdTJTChCkhUD/zdGVai3dsg0VVvo0D8PfdNfhKKuEkAi9VxCy
+	 QBj4072DohjOxPE16KKBScYpvG/ctY8ttTCI9JKCr5UmS+knmZflPvRlXBoArLzf/o
+	 MTHj0K324OhfiS/4WIEYji9oSs39ja5Gn+ABKUzB7SHeQ86WDkfze0V2HiTfgZfFoU
+	 5h69l3DuhOIuCOwTUA4v12omQDapX4iZxVPCqBCulWT2jNlXrSOwc4lUwgfEvHKbgB
+	 WJlgEgJJgHeQEtlec/g8AcgUSEiKobCQ5qteSzFNMCPbhsAJtgm6d1vgK6knCQxv3F
+	 QQz5j+0tm9ZMQ==
+Date: Tue, 9 Sep 2025 16:03:36 -0500
+From: Bjorn Helgaas <helgaas@kernel.org>
+To: Jason Gunthorpe <jgg@nvidia.com>
+Cc: Bjorn Helgaas <bhelgaas@google.com>, iommu@lists.linux.dev,
+	Joerg Roedel <joro@8bytes.org>, linux-pci@vger.kernel.org,
+	Robin Murphy <robin.murphy@arm.com>, Will Deacon <will@kernel.org>,
+	Alex Williamson <alex.williamson@redhat.com>,
+	Lu Baolu <baolu.lu@linux.intel.com>,
+	Donald Dutile <ddutile@redhat.com>, galshalom@nvidia.com,
+	Joerg Roedel <jroedel@suse.de>, Kevin Tian <kevin.tian@intel.com>,
+	kvm@vger.kernel.org, maorg@nvidia.com, patches@lists.linux.dev,
+	tdave@nvidia.com, Tony Zhu <tony.zhu@intel.com>
+Subject: Re: [PATCH v3 05/11] PCI: Add pci_reachable_set()
+Message-ID: <20250909210336.GA1507895@bhelgaas>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
-X-Mailer: Zimbra 8.5.0_GA_3042 (ZimbraWebClient - GC139 (Linux)/8.5.0_GA_3042)
-Thread-Index: R10GhsXRj6kdi6znKwcsfy1REC69Aw==
-Thread-Topic: vfio/pci: Fix INTx handling on legacy DisINTx- PCI devices
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <5-v3-8827cc7fc4e0+23f-pcie_switch_groups_jgg@nvidia.com>
 
-PCI devices prior to PCI 2.3 both use level interrupts and do not support
-interrupt masking, leading to a failure when passed through to a KVM guest on
-at least the ppc64 platform, which does not utilize the resample IRQFD. This
-failure manifests as receiving and acknowledging a single interrupt in the guest
-while leaving the host physical device VFIO IRQ pending.
+On Fri, Sep 05, 2025 at 03:06:20PM -0300, Jason Gunthorpe wrote:
+> Implement pci_reachable_set() to efficiently compute a set of devices on
+> the same bus that are "reachable" from a starting device. The meaning of
+> reachability is defined by the caller through a callback function.
+> 
+> This is a faster implementation of the same logic in
+> pci_device_group(). Being inside the PCI core allows use of pci_bus_sem so
+> it can use list_for_each_entry() on a small list of devices instead of the
+> expensive for_each_pci_dev(). Server systems can now have hundreds of PCI
+> devices, but typically only a very small number of devices per bus.
+> 
+> An example of a reachability function would be pci_devs_are_dma_aliases()
+> which would compute a set of devices on the same bus that are
+> aliases. This would also be useful in future support for the ACS P2P
+> Egress Vector which has a similar reachability problem.
+> 
+> This is effectively a graph algorithm where the set of devices on the bus
+> are vertexes and the reachable() function defines the edges. It returns a
+> set of vertexes that form a connected graph.
+> 
+> Signed-off-by: Jason Gunthorpe <jgg@nvidia.com>
+> ---
+>  drivers/pci/search.c | 90 ++++++++++++++++++++++++++++++++++++++++++++
+>  include/linux/pci.h  | 12 ++++++
+>  2 files changed, 102 insertions(+)
+> 
+> diff --git a/drivers/pci/search.c b/drivers/pci/search.c
+> index fe6c07e67cb8ce..dac6b042fd5f5d 100644
+> --- a/drivers/pci/search.c
+> +++ b/drivers/pci/search.c
+> @@ -595,3 +595,93 @@ int pci_dev_present(const struct pci_device_id *ids)
+>  	return 0;
+>  }
+>  EXPORT_SYMBOL(pci_dev_present);
+> +
+> +/**
+> + * pci_reachable_set - Generate a bitmap of devices within a reachability set
+> + * @start: First device in the set
+> + * @devfns: The set of devices on the bus
 
-Level interrupts in general require special handling due to their inherently
-asynchronous nature; both the host and guest interrupt controller need to
-remain in synchronization in order to coordinate mask and unmask operations.
-When lazy IRQ masking is used on DisINTx- hardware, the following sequence
-occurs:
+@devfns is a return parameter, right?  Maybe mention that somewhere?
+And the fact that the set only includes the *reachable* devices on the
+bus.
 
- * Level IRQ assertion on host
- * IRQ trigger within host interrupt controller, routed to VFIO driver
- * Host EOI with hardware level IRQ still asserted
- * Software mask of interrupt source by VFIO driver
- * Generation of event and IRQ trigger in KVM guest interrupt controller
- * Level IRQ deassertion on host
- * Guest EOI
- * Guest IRQ level deassertion
- * Removal of software mask by VFIO driver
-
-Note that no actual state change occurs within the host interrupt controller,
-unlike what would happen with either DisINTx+ hardware or message interrupts.
-The host EOI is not fired with the hardware level IRQ deasserted, and the
-level interrupt is not re-armed within the host interrupt controller, leading
-to an unrecoverable stall of the device.
-
-Work around this by disabling lazy IRQ masking for DisINTx- INTx devices.
-
----
- drivers/vfio/pci/vfio_pci_intrs.c | 5 +++++
- 1 file changed, 5 insertions(+)
-
-diff --git a/drivers/vfio/pci/vfio_pci_intrs.c b/drivers/vfio/pci/vfio_pci_intrs.c
-index 123298a4dc8f..011169ca7a34 100644
---- a/drivers/vfio/pci/vfio_pci_intrs.c
-+++ b/drivers/vfio/pci/vfio_pci_intrs.c
-@@ -304,6 +304,9 @@ static int vfio_intx_enable(struct vfio_pci_core_device *vdev,
- 
- 	vdev->irq_type = VFIO_PCI_INTX_IRQ_INDEX;
- 
-+	if (is_intx(vdev) && !vdev->pci_2_3)
-+		irq_set_status_flags(pdev->irq, IRQ_DISABLE_UNLAZY);
-+
- 	ret = request_irq(pdev->irq, vfio_intx_handler,
- 			  irqflags, ctx->name, ctx);
- 	if (ret) {
-@@ -351,6 +354,8 @@ static void vfio_intx_disable(struct vfio_pci_core_device *vdev)
- 	if (ctx) {
- 		vfio_virqfd_disable(&ctx->unmask);
- 		vfio_virqfd_disable(&ctx->mask);
-+		if (!vdev->pci_2_3)
-+			irq_clear_status_flags(pdev->irq, IRQ_DISABLE_UNLAZY);
- 		free_irq(pdev->irq, ctx);
- 		if (ctx->trigger)
- 			eventfd_ctx_put(ctx->trigger);
--- 
-2.39.5
+> + * @reachable: Callback to tell if two devices can reach each other
+> + *
+> + * Compute a bitmap where every set bit is a device on the bus that is reachable
+> + * from the start device, including the start device. Reachability between two
+> + * devices is determined by a callback function.
+> + *
+> + * This is a non-recursive implementation that invokes the callback once per
+> + * pair. The callback must be commutative:
+> + *    reachable(a, b) == reachable(b, a)
+> + * reachable() can form a cyclic graph:
+> + *    reachable(a,b) == reachable(b,c) == reachable(c,a) == true
+> + *
+> + * Since this function is limited to a single bus the largest set can be 256
+> + * devices large.
+> + */
+> +void pci_reachable_set(struct pci_dev *start, struct pci_reachable_set *devfns,
+> +		       bool (*reachable)(struct pci_dev *deva,
+> +					 struct pci_dev *devb))
+> +{
+> +	struct pci_reachable_set todo_devfns = {};
+> +	struct pci_reachable_set next_devfns = {};
+> +	struct pci_bus *bus = start->bus;
+> +	bool again;
+> +
+> +	/* Assume devfn of all PCI devices is bounded by MAX_NR_DEVFNS */
+> +	static_assert(sizeof(next_devfns.devfns) * BITS_PER_BYTE >=
+> +		      MAX_NR_DEVFNS);
+> +
+> +	memset(devfns, 0, sizeof(devfns->devfns));
+> +	__set_bit(start->devfn, devfns->devfns);
+> +	__set_bit(start->devfn, next_devfns.devfns);
+> +
+> +	down_read(&pci_bus_sem);
+> +	while (true) {
+> +		unsigned int devfna;
+> +		unsigned int i;
+> +
+> +		/*
+> +		 * For each device that hasn't been checked compare every
+> +		 * device on the bus against it.
+> +		 */
+> +		again = false;
+> +		for_each_set_bit(devfna, next_devfns.devfns, MAX_NR_DEVFNS) {
+> +			struct pci_dev *deva = NULL;
+> +			struct pci_dev *devb;
+> +
+> +			list_for_each_entry(devb, &bus->devices, bus_list) {
+> +				if (devb->devfn == devfna)
+> +					deva = devb;
+> +
+> +				if (test_bit(devb->devfn, devfns->devfns))
+> +					continue;
+> +
+> +				if (!deva) {
+> +					deva = devb;
+> +					list_for_each_entry_continue(
+> +						deva, &bus->devices, bus_list)
+> +						if (deva->devfn == devfna)
+> +							break;
+> +				}
+> +
+> +				if (!reachable(deva, devb))
+> +					continue;
+> +
+> +				__set_bit(devb->devfn, todo_devfns.devfns);
+> +				again = true;
+> +			}
+> +		}
+> +
+> +		if (!again)
+> +			break;
+> +
+> +		/*
+> +		 * Every new bit adds a new deva to check, reloop the whole
+> +		 * thing. Expect this to be rare.
+> +		 */
+> +		for (i = 0; i != ARRAY_SIZE(devfns->devfns); i++) {
+> +			devfns->devfns[i] |= todo_devfns.devfns[i];
+> +			next_devfns.devfns[i] = todo_devfns.devfns[i];
+> +			todo_devfns.devfns[i] = 0;
+> +		}
+> +	}
+> +	up_read(&pci_bus_sem);
+> +}
+> +EXPORT_SYMBOL_GPL(pci_reachable_set);
+> diff --git a/include/linux/pci.h b/include/linux/pci.h
+> index fb9adf0562f8ef..21f6b20b487f8d 100644
+> --- a/include/linux/pci.h
+> +++ b/include/linux/pci.h
+> @@ -855,6 +855,10 @@ struct pci_dynids {
+>  	struct list_head	list;	/* For IDs added at runtime */
+>  };
+>  
+> +struct pci_reachable_set {
+> +	DECLARE_BITMAP(devfns, 256);
+> +};
+> +
+>  enum pci_bus_isolation {
+>  	/*
+>  	 * The bus is off a root port and the root port has isolated ACS flags
+> @@ -1269,6 +1273,9 @@ struct pci_dev *pci_get_domain_bus_and_slot(int domain, unsigned int bus,
+>  struct pci_dev *pci_get_class(unsigned int class, struct pci_dev *from);
+>  struct pci_dev *pci_get_base_class(unsigned int class, struct pci_dev *from);
+>  
+> +void pci_reachable_set(struct pci_dev *start, struct pci_reachable_set *devfns,
+> +		       bool (*reachable)(struct pci_dev *deva,
+> +					 struct pci_dev *devb));
+>  enum pci_bus_isolation pci_bus_isolated(struct pci_bus *bus);
+>  
+>  int pci_dev_present(const struct pci_device_id *ids);
+> @@ -2084,6 +2091,11 @@ static inline struct pci_dev *pci_get_base_class(unsigned int class,
+>  						 struct pci_dev *from)
+>  { return NULL; }
+>  
+> +static inline void
+> +pci_reachable_set(struct pci_dev *start, struct pci_reachable_set *devfns,
+> +		  bool (*reachable)(struct pci_dev *deva, struct pci_dev *devb))
+> +{ }
+> +
+>  static inline enum pci_bus_isolation pci_bus_isolated(struct pci_bus *bus)
+>  { return PCIE_NON_ISOLATED; }
+>  
+> -- 
+> 2.43.0
+> 
 
