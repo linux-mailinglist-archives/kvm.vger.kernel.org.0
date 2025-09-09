@@ -1,71 +1,71 @@
-Return-Path: <kvm+bounces-57140-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-57141-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8FDF1B50715
-	for <lists+kvm@lfdr.de>; Tue,  9 Sep 2025 22:29:33 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 6E343B50718
+	for <lists+kvm@lfdr.de>; Tue,  9 Sep 2025 22:29:46 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 36480168E63
-	for <lists+kvm@lfdr.de>; Tue,  9 Sep 2025 20:29:33 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2909A563B64
+	for <lists+kvm@lfdr.de>; Tue,  9 Sep 2025 20:29:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 39020352FFD;
-	Tue,  9 Sep 2025 20:28:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 05B8B369325;
+	Tue,  9 Sep 2025 20:28:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="Riz+xrg3"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="KcckoLpY"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pj1-f73.google.com (mail-pj1-f73.google.com [209.85.216.73])
+Received: from mail-pl1-f202.google.com (mail-pl1-f202.google.com [209.85.214.202])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D292F35FC38
-	for <kvm@vger.kernel.org>; Tue,  9 Sep 2025 20:28:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.73
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BC86C3629A6
+	for <kvm@vger.kernel.org>; Tue,  9 Sep 2025 20:28:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757449724; cv=none; b=gb8sS8GgE69ICBD7mN6jnYxs39kbuFn7BwBBZEyeS5GXctNQRhPidIeehL1Hyg+RjYMeqTlnvyXyY1OJX8G/l6hWvCme1mnqwn2TnHLFR0FGmmz7T68V6q2NeUDgJlCiaUtLXCvB6ufrmRyGWYFPUo6Uu9RYRZXA4NiGDHOACYA=
+	t=1757449726; cv=none; b=spTv2qdUFbBNfNDoRMgzKIL7jAWy5fsPvkdyckfZvvByWPz+gPbbE6eX4pXn9hJGkKluPn9vYHhhPppIfZoAvyoQLqYY5HStKFEFnSsgs1MAXp2VyGdl+kV45shGtZz2UGwI5kKbrn0xnmREjyDOBUgS9mHgBqL3p4Fkq6yOixU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757449724; c=relaxed/simple;
-	bh=QmVux2JvmbyMClzeW5DTZk69kxWxw7C1UcmEM9nW6Yg=;
+	s=arc-20240116; t=1757449726; c=relaxed/simple;
+	bh=vtdJbK7wreG5s5RioxYrcTeNIZaeOWo9M19O9uJimxs=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=uy4Qmk01YRPEzcyk3eGxcgxPoQ0kGHvCQVDUr4ksfXjC1wxTAUpQM+ENwE9nrtWAZJHZhl3xv8HMiM2/ZHIUKaC6gn1GkUmNKskg9Y8rHKlDDMMbzNS/dWTkp8A/YaEMiw7HgVmE8Yf9DTJwjeqXWmoVKq6PYZXsN2ptg+sZPOg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=Riz+xrg3; arc=none smtp.client-ip=209.85.216.73
+	 To:Cc:Content-Type; b=T4PVwZO692oArdMn1Fg5aY63zXAOus7yA2cIPoeNDyrbucx+FYvoef3IdyEAnxppFwjrHmGjg43bqJHNqDdidVAyFLxgmYCoS2rexSFWmDtz+FtnqKJ7KRk+sz/J1xuNHKjy0TCeWCbs0AJT02tE5vYN8690IDxZqokyIMKMtmA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=KcckoLpY; arc=none smtp.client-ip=209.85.214.202
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pj1-f73.google.com with SMTP id 98e67ed59e1d1-32b58eeb874so5721382a91.3
-        for <kvm@vger.kernel.org>; Tue, 09 Sep 2025 13:28:42 -0700 (PDT)
+Received: by mail-pl1-f202.google.com with SMTP id d9443c01a7336-24c8264a137so72388075ad.3
+        for <kvm@vger.kernel.org>; Tue, 09 Sep 2025 13:28:44 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1757449722; x=1758054522; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1757449724; x=1758054524; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:reply-to:from:to:cc:subject:date:message-id:reply-to;
-        bh=zFN18xXBIM875rVGUIf15K3R2MElVqiHDd3tbRot1Bc=;
-        b=Riz+xrg3dr2pq//vhyCd7kXwtvqfF1bmWCUj8QgpjBB9UqpRkutDZ8KqOXH6UEtcpo
-         beh0GT7gRG5CdOWscU00RxMoCutPB884pAiBlqty6N3jqsVbc4EH034QzvA7DMYA3ILp
-         cOuvYfCa96ziC0LjYxuN2CxIFtyzbXdlHz36jU5bcSqsPbNbNRKB5pCR9GZ6RrbUHlOe
-         IpGZuI3tNkIQ94AE2aQQU275xe8jFaS36AzIDM4iYZ4QrLSTP2uW6ysXrKSsdIFppndy
-         AsvzNxJsLPbTQgkVJrTKgZK4JgfwfILSt9d+aHs/Dv3tvJYotZzd1LoCWlp3IDOLcLyZ
-         OtOw==
+        bh=CMiFM11/UgOTiqujCsfr58bBaclwwZCG3bf7Rw+V6nY=;
+        b=KcckoLpYDUPBtj1YzWWlCH2w03HGbPWxrGwAWPZRQPaw/AYeEY6SwdzPC+VneTyAPF
+         lp/QVrbHRNflioj3BsppEVwieBc6vL0DMXu0ebS2wp9HFf2CsnJiqVoKCoL7Uu+Qowu/
+         I2wInPl8IFQux3XoyQN4S7bmgnIOgxb5Pc+epMIHKVyqP2DdMNyi+TNidvckf7eafXJ9
+         /0KDc/oAMPJVaiLzrq/gfpT5GJA/YbE+yqPWAirr7NrnMlYVQAMfQefiWf2F6ykyJRc3
+         UuhiVSEeD4HBDHDdnz5qMgBFh1ibDg/7IjwzkexVhkK4askRtGrAqiwXxTJMXVOn8/6y
+         5WIQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1757449722; x=1758054522;
+        d=1e100.net; s=20230601; t=1757449724; x=1758054524;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:reply-to:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=zFN18xXBIM875rVGUIf15K3R2MElVqiHDd3tbRot1Bc=;
-        b=jsYwjSiPTyoICKib4YPKomLQ/IOZPA2NT69rQthffYnELJgBrKAnGF995J2NYUAoBN
-         A5d9rZZ9W5qIrgywUxY+g8QKWN05zHA96IX2+w9pHW10vu81czce061MIeuc+xCady+K
-         zmE9uy4zVXy1Ie47iiBnHrciFwIgbalStY6W4wW4eO0wULwpNvRu1gXL9lRf0E69RqYf
-         nX4srggtlFd/P4aON1rMtgC0rxhpefHd/cqvE0/XDxEqTBoVPMWvPI0HhsvEi4LWkks7
-         Gqh6hr92xkcPxFRJ5hcrpG52gjYMSX19RMdJJipd3aKOlJqZ4KCEqVCTA98W4AT53tJo
-         Luug==
-X-Gm-Message-State: AOJu0YwC9Dl7S0Tkob5YYx4wmUyGxghJ5gGXVQ+OJP1EZb5cj/BuoESK
-	/9vnCImJNmJ2Gn/B9Do2yGVVWLTL2wEtJ5EJNK/5PljN7joQG+cYON57k0A8s38pnrdB7zLGi1l
-	mPWFSxA==
-X-Google-Smtp-Source: AGHT+IG1LDhj9gttCv49esypEKAYUt6EpytM/C97fa1pwQVwmJjr1csJL3R4A2vjMmiXLxHRd+2zLC5q0+Q=
-X-Received: from pjbov13.prod.google.com ([2002:a17:90b:258d:b0:32d:a359:8e4d])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:1dcb:b0:32b:ca6f:123f
- with SMTP id 98e67ed59e1d1-32d43ee718dmr15415029a91.5.1757449722107; Tue, 09
- Sep 2025 13:28:42 -0700 (PDT)
+        bh=CMiFM11/UgOTiqujCsfr58bBaclwwZCG3bf7Rw+V6nY=;
+        b=riRZIuL/rGmuvi0fQeExy2c70dNuzz+6ZS5c0p1SOrVPQ9DaAiCC+pQpRuTuYubsNG
+         60v9nJVz7BZL8jqKEmEO3n7rX1vphy6Y3nPpLhB9r5d1avQ3S2UMuS1fyv7v7n46sAj9
+         r25Ikb5rcqm74NyjfmS8UkTnNKv3TT+VVUrBAd2q7tQhMptzWD7nwCCTpP8darPkDyWe
+         88C1WzfGrcMypFxgjMksvamCWRRHWPKduG+wUISQ0m4eK1ik4Ebw8/n2iPrhfRanz0oc
+         A0RRMa+IIDC1TvaoXOW/Ej1rG9pzPz5bsZrAjvHhUSKYDP9kfbCc7VBFZuNMptpcl/pQ
+         JZSg==
+X-Gm-Message-State: AOJu0YwppryicIJdzRTuJWMUu0oX/EJzomFlhLvf5nyfcMJnus1JNM+A
+	YGYUUFeqjgTuxnhzRzUjHnNV5h+R2AfcU7cyji+vqFh0ke7m4pKI1kD7La/SvpJZeEGJQJnrQoA
+	ShIsReA==
+X-Google-Smtp-Source: AGHT+IGtmVKP/LwQkTqqYTi72JKKi44xEFgNIfHXbNe2MHRDjv1vB5/IxJ0ew/FNcnhQLmQE78maXbxcXAk=
+X-Received: from pjx15.prod.google.com ([2002:a17:90b:568f:b0:329:7040:8862])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:902:f78f:b0:240:3eb9:5363
+ with SMTP id d9443c01a7336-2516e69aedamr155274045ad.27.1757449723965; Tue, 09
+ Sep 2025 13:28:43 -0700 (PDT)
 Reply-To: Sean Christopherson <seanjc@google.com>
-Date: Tue,  9 Sep 2025 13:28:33 -0700
+Date: Tue,  9 Sep 2025 13:28:34 -0700
 In-Reply-To: <20250909202835.333554-1-seanjc@google.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
@@ -75,109 +75,87 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
 References: <20250909202835.333554-1-seanjc@google.com>
 X-Mailer: git-send-email 2.51.0.384.g4c02a37b29-goog
-Message-ID: <20250909202835.333554-3-seanjc@google.com>
-Subject: [PATCH 2/4] KVM: selftests: Add coverage for 'b' (byte) sized fastops emulation
+Message-ID: <20250909202835.333554-4-seanjc@google.com>
+Subject: [PATCH 3/4] KVM: selftests: Dedup the gnarly constraints of the
+ fastops tests (more macros!)
 From: Sean Christopherson <seanjc@google.com>
 To: Sean Christopherson <seanjc@google.com>, Paolo Bonzini <pbonzini@redhat.com>
 Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
 
-Extend the fastops test to cover instructions that operate on 8-bit data.
-Support for 8-bit instructions was omitted from the original commit purely
-due to complications with BT not having a r/m8 variant.  To keep the
-RFLAGS.CF behavior deterministic and not heavily biased to '0' or '1',
-continue using BT, but cast and load the to-be-tested value into a
-dedicated 32-bit constraint.
+Add a fastop() macro along with macros to define its required constraints,
+and use the macros to dedup the innermost guts of the fastop testcases.
 
-Supporting 8-bit operations will allow using guest_test_fastops() as-is to
-provide full coverage for DIV and IDIV.  For divide operations, covering
-all operand sizes _is_ interesting, because KVM needs provide exception
-fixup for each size (failure to handle a #DE could panic the host).
+No functional change intended.
 
-Link: https://lore.kernel.org/all/aIF7ZhWZxlkcpm4y@google.com
 Signed-off-by: Sean Christopherson <seanjc@google.com>
 ---
- .../testing/selftests/kvm/x86/fastops_test.c  | 20 ++++++++++++-------
- 1 file changed, 13 insertions(+), 7 deletions(-)
+ .../testing/selftests/kvm/x86/fastops_test.c  | 36 +++++++++----------
+ 1 file changed, 18 insertions(+), 18 deletions(-)
 
 diff --git a/tools/testing/selftests/kvm/x86/fastops_test.c b/tools/testing/selftests/kvm/x86/fastops_test.c
-index 2ac89d6c1e46..6c9a2dbf6365 100644
+index 6c9a2dbf6365..26a381c8303a 100644
 --- a/tools/testing/selftests/kvm/x86/fastops_test.c
 +++ b/tools/testing/selftests/kvm/x86/fastops_test.c
-@@ -10,12 +10,13 @@
+@@ -8,14 +8,20 @@
+  * to set RFLAGS.CF based on whether or not the input is even or odd, so that
+  * instructions like ADC and SBB are deterministic.
   */
++#define fastop(__insn)									\
++	"bt $0, %[bt_val]\n\t"								\
++	__insn "\n\t"									\
++	"pushfq\n\t"									\
++	"pop %[flags]\n\t"
++
++#define flags_constraint(flags_val) [flags]"=r"(flags_val)
++#define bt_constraint(__bt_val) [bt_val]"rm"((uint32_t)__bt_val)
++
  #define guest_execute_fastop_1(FEP, insn, __val, __flags)				\
  ({											\
--	__asm__ __volatile__("bt $0, %[val]\n\t"					\
-+	__asm__ __volatile__("bt $0, %[ro_val]\n\t"					\
- 			     FEP insn " %[val]\n\t"					\
- 			     "pushfq\n\t"						\
- 			     "pop %[flags]\n\t"						\
- 			     : [val]"+r"(__val), [flags]"=r"(__flags)			\
--			     : : "cc", "memory");					\
-+			     : [ro_val]"rm"((uint32_t)__val)				\
-+			     : "cc", "memory");						\
+-	__asm__ __volatile__("bt $0, %[ro_val]\n\t"					\
+-			     FEP insn " %[val]\n\t"					\
+-			     "pushfq\n\t"						\
+-			     "pop %[flags]\n\t"						\
+-			     : [val]"+r"(__val), [flags]"=r"(__flags)			\
+-			     : [ro_val]"rm"((uint32_t)__val)				\
++	__asm__ __volatile__(fastop(FEP insn " %[val]")					\
++			     : [val]"+r"(__val), flags_constraint(__flags)		\
++			     : bt_constraint(__val)					\
+ 			     : "cc", "memory");						\
  })
  
- #define guest_test_fastop_1(insn, type_t, __val)					\
-@@ -36,12 +37,13 @@
+@@ -37,12 +43,9 @@
  
  #define guest_execute_fastop_2(FEP, insn, __input, __output, __flags)			\
  ({											\
--	__asm__ __volatile__("bt $0, %[output]\n\t"					\
-+	__asm__ __volatile__("bt $0, %[ro_val]\n\t"					\
- 			     FEP insn " %[input], %[output]\n\t"			\
- 			     "pushfq\n\t"						\
- 			     "pop %[flags]\n\t"						\
- 			     : [output]"+r"(__output), [flags]"=r"(__flags)		\
--			     : [input]"r"(__input) : "cc", "memory");			\
-+			     : [input]"r"(__input), [ro_val]"rm"((uint32_t)__output)	\
-+			     : "cc", "memory");						\
+-	__asm__ __volatile__("bt $0, %[ro_val]\n\t"					\
+-			     FEP insn " %[input], %[output]\n\t"			\
+-			     "pushfq\n\t"						\
+-			     "pop %[flags]\n\t"						\
+-			     : [output]"+r"(__output), [flags]"=r"(__flags)		\
+-			     : [input]"r"(__input), [ro_val]"rm"((uint32_t)__output)	\
++	__asm__ __volatile__(fastop(FEP insn " %[input], %[output]")			\
++			     : [output]"+r"(__output), flags_constraint(__flags)	\
++			     : [input]"r"(__input), bt_constraint(__output)		\
+ 			     : "cc", "memory");						\
  })
  
- #define guest_test_fastop_2(insn, type_t, __val1, __val2)				\
-@@ -63,12 +65,13 @@
+@@ -65,12 +68,9 @@
  
  #define guest_execute_fastop_cl(FEP, insn, __shift, __output, __flags)			\
  ({											\
--	__asm__ __volatile__("bt $0, %[output]\n\t"					\
-+	__asm__ __volatile__("bt $0, %[ro_val]\n\t"					\
- 			     FEP insn " %%cl, %[output]\n\t"				\
- 			     "pushfq\n\t"						\
- 			     "pop %[flags]\n\t"						\
- 			     : [output]"+r"(__output), [flags]"=r"(__flags)		\
--			     : "c"(__shift) : "cc", "memory");				\
-+			     : "c"(__shift), [ro_val]"rm"((uint32_t)__output)		\
-+			     : "cc", "memory");						\
+-	__asm__ __volatile__("bt $0, %[ro_val]\n\t"					\
+-			     FEP insn " %%cl, %[output]\n\t"				\
+-			     "pushfq\n\t"						\
+-			     "pop %[flags]\n\t"						\
+-			     : [output]"+r"(__output), [flags]"=r"(__flags)		\
+-			     : "c"(__shift), [ro_val]"rm"((uint32_t)__output)		\
++	__asm__ __volatile__(fastop(FEP insn " %%cl, %[output]")			\
++			     : [output]"+r"(__output), flags_constraint(__flags)	\
++			     : "c"(__shift), bt_constraint(__output)			\
+ 			     : "cc", "memory");						\
  })
  
- #define guest_test_fastop_cl(insn, type_t, __val1, __val2)				\
-@@ -115,14 +118,16 @@ do {											\
- 			guest_test_fastop_2("add" suffix, type_t, vals[i], vals[j]);	\
- 			guest_test_fastop_2("adc" suffix, type_t, vals[i], vals[j]);	\
- 			guest_test_fastop_2("and" suffix, type_t, vals[i], vals[j]);	\
-+if (sizeof(type_t) != 1) {							\
- 			guest_test_fastop_2("bsf" suffix, type_t, vals[i], vals[j]);	\
- 			guest_test_fastop_2("bsr" suffix, type_t, vals[i], vals[j]);	\
- 			guest_test_fastop_2("bt" suffix, type_t, vals[i], vals[j]);	\
- 			guest_test_fastop_2("btc" suffix, type_t, vals[i], vals[j]);	\
- 			guest_test_fastop_2("btr" suffix, type_t, vals[i], vals[j]);	\
- 			guest_test_fastop_2("bts" suffix, type_t, vals[i], vals[j]);	\
--			guest_test_fastop_2("cmp" suffix, type_t, vals[i], vals[j]);	\
- 			guest_test_fastop_2("imul" suffix, type_t, vals[i], vals[j]);	\
-+}											\
-+			guest_test_fastop_2("cmp" suffix, type_t, vals[i], vals[j]);	\
- 			guest_test_fastop_2("or" suffix, type_t, vals[i], vals[j]);	\
- 			guest_test_fastop_2("sbb" suffix, type_t, vals[i], vals[j]);	\
- 			guest_test_fastop_2("sub" suffix, type_t, vals[i], vals[j]);	\
-@@ -142,6 +147,7 @@ do {											\
- 
- static void guest_code(void)
- {
-+	guest_test_fastops(uint8_t, "b");
- 	guest_test_fastops(uint16_t, "w");
- 	guest_test_fastops(uint32_t, "l");
- 	guest_test_fastops(uint64_t, "q");
 -- 
 2.51.0.384.g4c02a37b29-goog
 
