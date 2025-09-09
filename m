@@ -1,66 +1,67 @@
-Return-Path: <kvm+bounces-57154-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-57156-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id D0B37B508A3
-	for <lists+kvm@lfdr.de>; Wed, 10 Sep 2025 00:02:02 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 42CF7B508A8
+	for <lists+kvm@lfdr.de>; Wed, 10 Sep 2025 00:02:38 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id F34D95E531A
-	for <lists+kvm@lfdr.de>; Tue,  9 Sep 2025 22:01:29 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7AA825E7727
+	for <lists+kvm@lfdr.de>; Tue,  9 Sep 2025 22:01:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D624F2797B5;
-	Tue,  9 Sep 2025 22:00:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3C11A28369A;
+	Tue,  9 Sep 2025 22:00:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="QH0BnNyy"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="NJbqlac2"
 X-Original-To: kvm@vger.kernel.org
 Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.12])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 148A226A0A7;
-	Tue,  9 Sep 2025 22:00:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5121626FD97;
+	Tue,  9 Sep 2025 22:00:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.12
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757455215; cv=none; b=A6QoGfMdtTYvqtqojOMijcSNw+WY9TyNkWxkcjTC3rRiIbNBfIxUXM1x1dNz4hr+oJoHAOkdsWTu6cQU1D6O/VxDu5OUVI7BafIKEFtXVEUeLGy9rMWG8mx+0q+bievXJIPAr3gLRUevyjk/0zVQAYAuurhDPmMTjMMU9mi2BZU=
+	t=1757455217; cv=none; b=NZOy5cK75/cngFrVyeMCwnlK1xIorlRe2gfa9yvRNf6XJC8swZj5oYTvRpd3BHFI6WWPR8C2/2XuaDQ5wc8V1VTOmPDoEiLEfJ3loKm9+dsg6Hd2/V195TDDpyl7jCVR8B/lFPyelQode4ErjOdUGmgouuFTnq5URvWjl5WNvj4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757455215; c=relaxed/simple;
-	bh=Zbi2e2VvKzf88ESYqAWc3a4461r6YnvPI+Q6t4jVxPE=;
+	s=arc-20240116; t=1757455217; c=relaxed/simple;
+	bh=IkacwfdlFmsVBWA5lp9RHRN9qNWyVF239IiYhl7cN/A=;
 	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=QLqFU9VfiStdtEe4RPl9J4s0ne0x2WBJBWuNiiF13kzBQdmZ1Ml6sI0AmqDINLhlx/+ZgRq3rvW9PNdcnofYIBNlOcNlvj24YY6wP/n+1ymDQLbhhdAwfCCYpwRa4aEiAaP8s8/02IZEAsto2j9TwX8Jt/kWuOC9Jl2xk1ePV2w=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=QH0BnNyy; arc=none smtp.client-ip=192.198.163.12
+	 In-Reply-To:To:Cc; b=Xw9abhe882ZDG47tX+N0D/0waKzvI1nYPJygmUW9MKzgqf7X/ooRBin1T3klw2jy+K+k7AnX2XN8hofhhjpl8Gwr2hQcVaSaLgfXORVOgO0pFi5aYxbeS4J8DV5nWA74Dk96DgaQBSSc5qIT+KqX6Q9IJptQi9376YOtWSj6E2Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=NJbqlac2; arc=none smtp.client-ip=192.198.163.12
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1757455213; x=1788991213;
+  t=1757455214; x=1788991214;
   h=from:date:subject:mime-version:content-transfer-encoding:
    message-id:references:in-reply-to:to:cc;
-  bh=Zbi2e2VvKzf88ESYqAWc3a4461r6YnvPI+Q6t4jVxPE=;
-  b=QH0BnNyyYZvshQlkp3uQGLebk6KSMUkvlcVmexwWeMje5NvKLBoP+GRD
-   r+gcqsxstiQJwIZA43zAjoaciIAyXFjaC3ZPLcO02UpmeFpJnZ+Tli0WY
-   P1EefJK/457DeZX49jwfvqdJ1YkH7e2qDTW08efuiz9W7zCZQz9qdkduV
-   zqKEhKhzPc/8utAaRX8zhqLQHHtipQCL97p0FOi2J5kH/jqi2OfGtzVnh
-   1BaOUPw4XOw7lB555Nz043CKa4F9H0xcuS/VvOVxjv4wU+ILJG9287+4J
-   QCr5YXeOducJr6yWbuk4+Mgoe/CJNGLXTjdFhKEDH1W+pSGlUl9CMzf+Z
-   A==;
-X-CSE-ConnectionGUID: NCaQgkyeSKO3pn9+Y27ydQ==
-X-CSE-MsgGUID: 8FJkW35cQYOYMaC7a7JjNQ==
-X-IronPort-AV: E=McAfee;i="6800,10657,11548"; a="63584668"
+  bh=IkacwfdlFmsVBWA5lp9RHRN9qNWyVF239IiYhl7cN/A=;
+  b=NJbqlac2ijvaEKmWXHyv4XoUg/z45C2a+ypJ3MhQzyp5H4zvMf7JPiKU
+   jw98n30+kuBszcgqo6WHKc50jPM6dNlGkO1E+qRJ/Uz1A9/GciJlKoNWi
+   9yrqqWcfWiNM/AfTbOQ+Xh1hgSynKnzgGWwqc3dqPpalEsAPuaSCRlb1L
+   Mrt1AqJItFGCxwFVm3/zNKYLo14OyyEYtLaAEYUH+6hkXMIrzeEQk0EKm
+   QI5lTPMEqrs3H8EbgsC8xJ1AcoWoC8QXBGuRhjI+xfr11PF6I22NODvI5
+   XYYz88pEaZ7vZ4K6aHHPJQIiK2PxYAp8MoOuGj9wItEu62U7qucSZH3Dd
+   g==;
+X-CSE-ConnectionGUID: qTz99/puTi2xdxYrabm/YQ==
+X-CSE-MsgGUID: ekUZm7huTy+cfsnhsDI4gw==
+X-IronPort-AV: E=McAfee;i="6800,10657,11548"; a="63584674"
 X-IronPort-AV: E=Sophos;i="6.18,252,1751266800"; 
-   d="scan'208";a="63584668"
+   d="scan'208";a="63584674"
 Received: from orviesa009.jf.intel.com ([10.64.159.149])
   by fmvoesa106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 09 Sep 2025 15:00:09 -0700
-X-CSE-ConnectionGUID: l72Vu2WKSk6+qgZjp+zxcg==
-X-CSE-MsgGUID: YAUTIRX/QWal3k5073zBYQ==
+X-CSE-ConnectionGUID: MSEoKOxQTeeZ4gO7PkzmHg==
+X-CSE-MsgGUID: tFveJ0vuSka+U/FRA2sJMg==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.18,252,1751266800"; 
-   d="scan'208";a="172780968"
+   d="scan'208";a="172780972"
 Received: from orcnseosdtjek.jf.intel.com (HELO [10.166.28.70]) ([10.166.28.70])
   by orviesa009-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 09 Sep 2025 15:00:08 -0700
 From: Jacob Keller <jacob.e.keller@intel.com>
-Date: Tue, 09 Sep 2025 14:57:54 -0700
-Subject: [PATCH RFC net-next 5/7] ice: add remaining migration TLVs
+Date: Tue, 09 Sep 2025 14:57:55 -0700
+Subject: [PATCH RFC net-next 6/7] ice-vfio-pci: add ice VFIO PCI live
+ migration driver
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -69,7 +70,7 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Message-Id: <20250909-e810-live-migration-jk-migration-tlv-v1-5-4d1dc641e31f@intel.com>
+Message-Id: <20250909-e810-live-migration-jk-migration-tlv-v1-6-4d1dc641e31f@intel.com>
 References: <20250909-e810-live-migration-jk-migration-tlv-v1-0-4d1dc641e31f@intel.com>
 In-Reply-To: <20250909-e810-live-migration-jk-migration-tlv-v1-0-4d1dc641e31f@intel.com>
 To: Tony Nguyen <anthony.l.nguyen@intel.com>, 
@@ -87,899 +88,843 @@ Cc: linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
  Jacob Keller <jacob.e.keller@intel.com>, 
  Aleksandr Loktionov <aleksandr.loktionov@intel.com>
 X-Mailer: b4 0.15-dev-c61db
-X-Developer-Signature: v=1; a=openpgp-sha256; l=28999;
+X-Developer-Signature: v=1; a=openpgp-sha256; l=25059;
  i=jacob.e.keller@intel.com; h=from:subject:message-id;
- bh=Zbi2e2VvKzf88ESYqAWc3a4461r6YnvPI+Q6t4jVxPE=;
- b=owGbwMvMwCWWNS3WLp9f4wXjabUkhowDi1NP1jE/KOa6sScwfcpN0diXdbO1p8gpfu5dsf6Gt
- 2nJVNn0jlIWBjEuBlkxRRYFh5CV140nhGm9cZaDmcPKBDKEgYtTACYS/Y3hr7zcrz+OWjpKvU1R
- LML381/K82Vszb2i3rDaaM4a47OOGxn+KZf1pETGGBoGH/BfsPhTZgrDJDUrDysRBh717ognPsu
- 4AQ==
+ bh=IkacwfdlFmsVBWA5lp9RHRN9qNWyVF239IiYhl7cN/A=;
+ b=owGbwMvMwCWWNS3WLp9f4wXjabUkhowDi9MUJJ4qCGXdXvTpwKrC5ZueyMYf9NT5/kfYz2xH1
+ ZNbSz41dpSyMIhxMciKKbIoOISsvG48IUzrjbMczBxWJpAhDFycAjARiQsM/0NKFohfOfxGdeH/
+ zv1ZVrHxLv93ffsw/YilwYy3cbfOdt9gZDg40cTBL6bqz47zE5L/3BFS432pn560UebT/Uc7Wkr
+ e3GUGAA==
 X-Developer-Key: i=jacob.e.keller@intel.com; a=openpgp;
  fpr=204054A9D73390562AEC431E6A965D3E6F0F28E8
 
-Add a handful of remaining TLVs to complete the migration payload data
-including:
+Add the ice-vfio-pci driver module which enables live migration support via
+the vfio_migration_ops for the ice E800 series hardware.
 
- * ICE_MIG_TLV_MBX_REGS
+To use this module, you can create VFs in the usual way and then unbind
+them from iavf, and bind them to ice-vfio-pci:
 
-   This TLV contains the VF mailbox registers data to migrate and restore
-   the mailbox queue to its appropriate state.
+  echo 2 >/sys/class/net/enp175s0f0np0/device/sriov_numvfs
 
- * ICE_MIG_TLV_STATS
+  echo "0000:af:01.0" >/sys/bus/pci/drivers/iavf/unbind
+  echo "0000:af:01.1" >/sys/bus/pci/drivers/iavf/unbind
 
-   This TLV contains the VF statistics to ensure that the original and
-   target VM maintain the same stat counts.
+  modprobe ice_vfio_pci
 
- * ICE_MIG_TLV_RSS
+  echo "8086 1889" >/sys/bus/pci/drivers/ice-vfio-pci/new_id
 
-   This TLV contains the RSS information from the original host, ensuring
-   that such configuration is applied on the new host.
+I've tested with QEMU using the "enable-migration=on" and
+"x-pre-copy-dirty-page-tracking=off" settings, as we do not currently
+support dirty page tracking.
 
- * ICE_MIG_TLV_VLAN_FILTERS
+The initial host QEMU instance is launched as usual, while the target QEMU
+instance is launched with the -incoming tcp:localhost:4444 option.
 
-   This TLV contains all the VLAN filters currently programmed into
-   hardware by the VF. It is sent as a single variable length flexible
-   array instead of as individual TLVs per VLAN to avoid a 4-byte overhead
-   per-VLAN.
+To initiate migration you can issue the migration command from the QEMU
+console:
 
- * ICE_MIG_TLV_MAC_FILTERS
+  migrate tcp:localhost:4444
 
-   This TLV contains all of the MAC filters currently programmed into the
-   hardware by the VF. As with VLANs, it is sent as a flexible array to
-   avoid too much overhead when there are many filters.
+The ice-vfio-pci driver connects to the ice driver using the interface
+defined in <linux/net/intel/ice_migration.h>. The migration driver
+initializes by calling ice_migration_init_dev(). To save device state, the
+VF is paused using ice_migration_suspend_dev(), and then state is captured
+by ice_migration_save_devstate().
 
-Add functions to save and restore this data appropriately during the live
-migration process.
+Some information about the VF must be saved during device suspend, as
+otherwise the data could be lost when stopping the device.
+
+For this reason, the ice_migration_suspend_dev() function takes a boolean
+indicating whether state should be saved. The VFIO migration state machine
+must suspend the initial device when stopping, but also suspends the target
+device when resuming. In the resume case, we do not need to save the state,
+so this can be elided when the VFIO state machine is transitioning to the
+resuming state.
+
+Note that full support is not functional until the PCI .reset_done handler
+is implemented in a following change. This was split out in order to better
+callout and explain the locking mechanism due to the complexity required to
+avoid ABBA locking violations.
 
 Signed-off-by: Jacob Keller <jacob.e.keller@intel.com>
 Reviewed-by: Aleksandr Loktionov <aleksandr.loktionov@intel.com>
 ---
- drivers/net/ethernet/intel/ice/ice_hw_autogen.h    |   8 +
- .../net/ethernet/intel/ice/virt/migration_tlv.h    | 133 +++++
- drivers/net/ethernet/intel/ice/virt/migration.c    | 616 +++++++++++++++++++++
- 3 files changed, 757 insertions(+)
+ drivers/vfio/pci/ice/main.c   | 699 ++++++++++++++++++++++++++++++++++++++++++
+ MAINTAINERS                   |   7 +
+ drivers/vfio/pci/Kconfig      |   2 +
+ drivers/vfio/pci/Makefile     |   2 +
+ drivers/vfio/pci/ice/Kconfig  |   8 +
+ drivers/vfio/pci/ice/Makefile |   4 +
+ 6 files changed, 722 insertions(+)
 
-diff --git a/drivers/net/ethernet/intel/ice/ice_hw_autogen.h b/drivers/net/ethernet/intel/ice/ice_hw_autogen.h
-index dd520aa4d1d6..954d671aee64 100644
---- a/drivers/net/ethernet/intel/ice/ice_hw_autogen.h
-+++ b/drivers/net/ethernet/intel/ice/ice_hw_autogen.h
-@@ -39,8 +39,16 @@
- #define PF_FW_ATQLEN_ATQVFE_M			BIT(28)
- #define PF_FW_ATQLEN_ATQOVFL_M			BIT(29)
- #define PF_FW_ATQLEN_ATQCRIT_M			BIT(30)
-+#define VF_MBX_ARQBAH(_VF)			(0x0022B800 + ((_VF) * 4))
-+#define VF_MBX_ARQBAL(_VF)			(0x0022B400 + ((_VF) * 4))
-+#define VF_MBX_ARQH(_VF)			(0x0022C000 + ((_VF) * 4))
- #define VF_MBX_ARQLEN(_VF)			(0x0022BC00 + ((_VF) * 4))
-+#define VF_MBX_ARQT(_VF)			(0x0022C400 + ((_VF) * 4))
-+#define VF_MBX_ATQBAH(_VF)			(0x0022A400 + ((_VF) * 4))
-+#define VF_MBX_ATQBAL(_VF)			(0x0022A000 + ((_VF) * 4))
-+#define VF_MBX_ATQH(_VF)			(0x0022AC00 + ((_VF) * 4))
- #define VF_MBX_ATQLEN(_VF)			(0x0022A800 + ((_VF) * 4))
-+#define VF_MBX_ATQT(_VF)			(0x0022B000 + ((_VF) * 4))
- #define PF_FW_ATQLEN_ATQENABLE_M		BIT(31)
- #define PF_FW_ATQT				0x00080400
- #define PF_MBX_ARQBAH				0x0022E400
-diff --git a/drivers/net/ethernet/intel/ice/virt/migration_tlv.h b/drivers/net/ethernet/intel/ice/virt/migration_tlv.h
-index 3e10e53868b2..183555cda9b3 100644
---- a/drivers/net/ethernet/intel/ice/virt/migration_tlv.h
-+++ b/drivers/net/ethernet/intel/ice/virt/migration_tlv.h
-@@ -82,6 +82,16 @@ struct ice_migration_tlv {
-  * @ICE_MIG_TLV_MSIX_REGS: MSI-X register data for the VF. Appears once per
-  * MSI-X interrupt, including the miscellaneous interrupt for the mailbox.
-  *
-+ * @ICE_MIG_TLV_MBX_REGS: Mailbox register data for the VF.
-+ *
-+ * @ICE_MIG_TLV_STATS: Current statistics counts of the VF.
-+ *
-+ * @ICE_MIG_TLV_RSS: RSS configuration for the VF.
-+ *
-+ * @ICE_MIG_TLV_VLAN_FILTERS: VLAN filter information.
-+ *
-+ * @ICE_MIG_TLV_MAC_FILTERS: MAC filter information.
-+ *
-  * @NUM_ICE_MIG_TLV: Number of known TLV types. Any type equal to or larger
-  * than this value is unrecognized by this version.
-  *
-@@ -97,6 +107,11 @@ enum ice_migration_tlvs {
- 	ICE_MIG_TLV_TX_QUEUE,
- 	ICE_MIG_TLV_RX_QUEUE,
- 	ICE_MIG_TLV_MSIX_REGS,
-+	ICE_MIG_TLV_MBX_REGS,
-+	ICE_MIG_TLV_STATS,
-+	ICE_MIG_TLV_RSS,
-+	ICE_MIG_TLV_VLAN_FILTERS,
-+	ICE_MIG_TLV_MAC_FILTERS,
- 
- 	/* Add new types above here */
- 	NUM_ICE_MIG_TLV
-@@ -258,6 +273,119 @@ struct ice_mig_msix_regs {
- 	u16 vector_id;
- } __packed;
- 
+diff --git a/drivers/vfio/pci/ice/main.c b/drivers/vfio/pci/ice/main.c
+new file mode 100644
+index 000000000000..161053ba383c
+--- /dev/null
++++ b/drivers/vfio/pci/ice/main.c
+@@ -0,0 +1,699 @@
++// SPDX-License-Identifier: GPL-2.0
++/* Copyright (C) 2018-2025 Intel Corporation */
++
++#include <linux/device.h>
++#include <linux/module.h>
++#include <linux/types.h>
++#include <linux/file.h>
++#include <linux/pci.h>
++#include <linux/vmalloc.h>
++#include <linux/vfio_pci_core.h>
++#include <linux/net/intel/ice_migration.h>
++#include <linux/anon_inodes.h>
++
 +/**
-+ * struct ice_mig_stats - Hardware statistics counts from migrating VF
-+ * @rx_bytes: total nr received bytes (gorc)
-+ * @rx_unicast: total nr received unicast packets (uprc)
-+ * @rx_multicast: total nr received multicast packets (mprc)
-+ * @rx_broadcast: total nr received broadcast packets (bprc)
-+ * @rx_discards: total nr packets discarded on receipt (rdpc)
-+ * @rx_unknown_protocol: total nr Rx packets with unrecognized protocol (rupp)
-+ * @tx_bytes: total nr transmitted bytes (gotc)
-+ * @tx_unicast: total nr transmitted unicast packets (uptc)
-+ * @tx_multicast: total nr transmitted multicast packets (mptc)
-+ * @tx_broadcast: total nr transmitted broadcast packets (bptc)
-+ * @tx_discards: total nr packets discarded on transmit (tdpc)
-+ * @tx_errors: total number of transmit errors (tepc)
++ * struct ice_vfio_pci_migration_file - Migration payload file contents
++ * @filp: the file pointer for communicating with user space
++ * @lock: mutex protecting the migration file access
++ * @payload_length: length of the migration payload
++ * @disabled: if true, the migration file descriptor has been disabled
++ * @mig_data: buffer holding migration payload
++ *
++ * When saving device state, the payload length is calculated ahead of time
++ * and the buffer is sized appropriately. The receiver sets payload_length to
++ * SZ_128K which should be sufficient space for any migration.
 + */
-+struct ice_mig_stats {
-+	u64 rx_bytes;
-+	u64 rx_unicast;
-+	u64 rx_multicast;
-+	u64 rx_broadcast;
-+	u64 rx_discards;
-+	u64 rx_unknown_protocol;
-+	u64 tx_bytes;
-+	u64 tx_unicast;
-+	u64 tx_multicast;
-+	u64 tx_broadcast;
-+	u64 tx_discards;
-+	u64 tx_errors;
-+} __packed;
++struct ice_vfio_pci_migration_file {
++	struct file *filp;
++	struct mutex lock;
++	size_t payload_length;
++	bool disabled:1;
++	u8 mig_data[] __counted_by(payload_length);
++};
 +
 +/**
-+ * struct ice_mig_mbx_regs - PF<->VF Mailbox register data for the VF
-+ * @atq_head: the head position of the VF AdminQ Tx ring
-+ * @atq_tail: the tail position of the VF AdminQ Tx ring
-+ * @atq_bal: lower 32-bits of the VF AdminQ Tx ring base address
-+ * @atq_bah: upper 32-bits of the VF AdminQ Tx ring base address
-+ * @atq_len: length of the VF AdminQ Tx ring
-+ * @arq_head: the head position of the VF AdminQ Rx ring
-+ * @arq_tail: the tail position of the VF AdminQ Tx ring
-+ * @arq_bal: lower 32-bits of the VF AdminQ Rx ring base address
-+ * @arq_bah: upper 32-bits of the VF AdminQ Rx ring base address
-+ * @arq_len: length of the VF AdminQ Rx ring
++ * struct ice_vfio_pci_device - Migration driver structure
++ * @core_device: The core device being operated on
++ * @mig_info: Migration information
++ * @state_mutex: mutex protecting the migration state
++ * @resuming_migf: Migration file containing data for the resuming VF
++ * @saving_migf: Migration file used to store data from saving VF
++ * @mig_state: the current migration state of the device
 + */
-+struct ice_mig_mbx_regs {
-+	u32 atq_head;
-+	u32 atq_tail;
-+	u32 atq_bal;
-+	u32 atq_bah;
-+	u32 atq_len;
-+	u32 arq_head;
-+	u32 arq_tail;
-+	u32 arq_bal;
-+	u32 arq_bah;
-+	u32 arq_len;
-+} __packed;
++struct ice_vfio_pci_device {
++	struct vfio_pci_core_device core_device;
++	struct vfio_device_migration_info mig_info;
++	struct mutex state_mutex;
++	struct ice_vfio_pci_migration_file *resuming_migf;
++	struct ice_vfio_pci_migration_file *saving_migf;
++	enum vfio_device_mig_state mig_state;
++};
++
++#define to_ice_vdev(dev) \
++	container_of((dev), struct ice_vfio_pci_device, core_device.vdev)
 +
 +/**
-+ * struct ice_mig_rss - RSS configuration for the migrating VF
-+ * @hashcfg: RSS Hash filter configuration
-+ * @key: RSS key
-+ * @lut_size: size of the RSS lookup table
-+ * @hfunc: RSS hash function selected
-+ * @lut: RSS lookup table configuration
-+ */
-+struct ice_mig_rss {
-+	u64 hashcfg;
-+	/* TODO: Can this key change size? Should this be a plain buffer
-+	 * instead of the struct?
-+	 */
-+	struct ice_aqc_get_set_rss_keys key;
-+	u16 lut_size;
-+	u8 hfunc;
-+	u8 lut[] __counted_by(lut_size);
-+} __packed;
-+
-+/**
-+ * struct ice_mig_vlan_filter - VLAN filter information
-+ * @tpid: VLAN TPID
-+ * @vid: VLAN ID
-+ */
-+struct ice_mig_vlan_filter {
-+	u16 tpid;
-+	u16 vid;
-+} __packed;
-+
-+/**
-+ * struct ice_mig_vlan_filters - List of VLAN filters for the VF
-+ * @num_vlans: number of VLANs for this VF
-+ * @vlans: VLAN data
-+ */
-+struct ice_mig_vlan_filters {
-+	u16 num_vlans;
-+	struct ice_mig_vlan_filter vlans[] __counted_by(num_vlans);
-+} __packed;
-+
-+/**
-+ * struct ice_mig_mac_filter - MAC address data for a VF filter
-+ * @mac_addr: the MAC address
-+ */
-+struct ice_mig_mac_filter {
-+	u8 mac_addr[ETH_ALEN];
-+} __packed;
-+
-+/**
-+ * struct ice_mig_mac_filters - List of MAC filters for the VF
-+ * @num_macs: number of MAC filters for this VF
-+ * @macs: MAC address data
-+ */
-+struct ice_mig_mac_filters {
-+	u16 num_macs;
-+	struct ice_mig_mac_filter macs[] __counted_by(num_macs);
-+} __packed;
-+
- /**
-  * ice_mig_tlv_type - Convert a TLV type to its number
-  * @p: the TLV structure type
-@@ -273,6 +401,11 @@ struct ice_mig_msix_regs {
- 		 struct ice_mig_tx_queue : ICE_MIG_TLV_TX_QUEUE,	\
- 		 struct ice_mig_rx_queue : ICE_MIG_TLV_RX_QUEUE,	\
- 		 struct ice_mig_msix_regs : ICE_MIG_TLV_MSIX_REGS,	\
-+		 struct ice_mig_mbx_regs : ICE_MIG_TLV_MBX_REGS,	\
-+		 struct ice_mig_stats : ICE_MIG_TLV_STATS,		\
-+		 struct ice_mig_rss : ICE_MIG_TLV_RSS,			\
-+		 struct ice_mig_vlan_filters : ICE_MIG_TLV_VLAN_FILTERS,\
-+		 struct ice_mig_mac_filters : ICE_MIG_TLV_MAC_FILTERS,	\
- 		 default : ICE_MIG_TLV_END)
- 
- /**
-diff --git a/drivers/net/ethernet/intel/ice/virt/migration.c b/drivers/net/ethernet/intel/ice/virt/migration.c
-index e59eb99b20da..a9f6d3019c0c 100644
---- a/drivers/net/ethernet/intel/ice/virt/migration.c
-+++ b/drivers/net/ethernet/intel/ice/virt/migration.c
-@@ -401,6 +401,320 @@ static int ice_migration_save_msix_regs(struct ice_vf *vf,
- 	return err;
- }
- 
-+/**
-+ * ice_migration_save_mbx_regs - Save Mailbox registers
-+ * @vf: pointer to the VF being migrated
++ * ice_vfio_pci_load_state - VFIO device state reloading
++ * @ice_vdev: pointer to ice-vfio-pci core device structure
 + *
-+ * Save the mailbox registers for communicating with VF in preparation for
-+ * live migration.
-+ *
-+ * Return: 0 for success, negative for error
-+ */
-+static int ice_migration_save_mbx_regs(struct ice_vf *vf)
-+{
-+	struct ice_mig_mbx_regs *mbx_regs;
-+	struct ice_hw *hw = &vf->pf->hw;
-+
-+	lockdep_assert_held(&vf->cfg_lock);
-+
-+	mbx_regs = ice_mig_alloc_tlv(mbx_regs);
-+	if (!mbx_regs)
-+		return -ENOMEM;
-+
-+	mbx_regs->atq_head = rd32(hw, VF_MBX_ATQH(vf->vf_id));
-+	mbx_regs->atq_tail = rd32(hw, VF_MBX_ATQT(vf->vf_id));
-+	mbx_regs->atq_bal = rd32(hw, VF_MBX_ATQBAL(vf->vf_id));
-+	mbx_regs->atq_bah = rd32(hw, VF_MBX_ATQBAH(vf->vf_id));
-+	mbx_regs->atq_len = rd32(hw, VF_MBX_ATQLEN(vf->vf_id));
-+
-+	mbx_regs->arq_head = rd32(hw, VF_MBX_ARQH(vf->vf_id));
-+	mbx_regs->arq_tail = rd32(hw, VF_MBX_ARQT(vf->vf_id));
-+	mbx_regs->arq_bal = rd32(hw, VF_MBX_ARQBAL(vf->vf_id));
-+	mbx_regs->arq_bah = rd32(hw, VF_MBX_ARQBAH(vf->vf_id));
-+	mbx_regs->arq_len = rd32(hw,  VF_MBX_ARQLEN(vf->vf_id));
-+
-+	ice_mig_tlv_add_tail(mbx_regs, &vf->mig_tlvs);
-+
-+	return 0;
-+}
-+
-+/**
-+ * ice_migration_save_stats - Save VF statistics counters
-+ * @vf: pointer to the VF being migrated
-+ * @vsi: the VSI for this VF
-+ *
-+ * Update and save the current statistics values for the VF.
-+ *
-+ * Return: 0 for success, negative for error
-+ */
-+static int ice_migration_save_stats(struct ice_vf *vf, struct ice_vsi *vsi)
-+{
-+	struct ice_mig_stats *stats;
-+
-+	lockdep_assert_held(&vf->cfg_lock);
-+
-+	stats = ice_mig_alloc_tlv(stats);
-+	if (!stats)
-+		return -ENOMEM;
-+
-+	ice_update_eth_stats(vsi);
-+
-+	stats->rx_bytes = vsi->eth_stats.rx_bytes;
-+	stats->rx_unicast = vsi->eth_stats.rx_unicast;
-+	stats->rx_multicast = vsi->eth_stats.rx_multicast;
-+	stats->rx_broadcast = vsi->eth_stats.rx_broadcast;
-+	stats->rx_discards = vsi->eth_stats.rx_discards;
-+	stats->rx_unknown_protocol = vsi->eth_stats.rx_unknown_protocol;
-+	stats->tx_bytes = vsi->eth_stats.tx_bytes;
-+	stats->tx_unicast = vsi->eth_stats.tx_unicast;
-+	stats->tx_multicast = vsi->eth_stats.tx_multicast;
-+	stats->tx_broadcast = vsi->eth_stats.tx_broadcast;
-+	stats->tx_discards = vsi->eth_stats.tx_discards;
-+	stats->tx_errors = vsi->eth_stats.tx_errors;
-+
-+	ice_mig_tlv_add_tail(stats, &vf->mig_tlvs);
-+
-+	return 0;
-+}
-+
-+/**
-+ * ice_migration_save_rss - Save RSS configuration during suspend
-+ * @vf: pointer to the VF being migrated
-+ * @vsi: the VSI for this VF
-+ *
-+ * Save the RSS configuration for this VF, including the hash function, hash
-+ * set configuration, lookup table, and RSS key.
-+ *
-+ * Return: 0 on success, or an error code on failure.
-+ */
-+static int ice_migration_save_rss(struct ice_vf *vf, struct ice_vsi *vsi)
-+{
-+	struct device *dev = ice_pf_to_dev(vf->pf);
-+	struct ice_hw *hw = &vf->pf->hw;
-+	struct ice_mig_rss *rss;
-+
-+	lockdep_assert_held(&vf->cfg_lock);
-+
-+	/* Skip RSS if its not supported by this PF */
-+	if (!test_bit(ICE_FLAG_RSS_ENA, vf->pf->flags)) {
-+		dev_dbg(dev, "RSS is not supported by the PF\n");
-+		return 0;
-+	}
-+
-+	dev_dbg(dev, "Saving RSS config for VF %u\n",
-+		vf->vf_id);
-+
-+	/* When ice PF supports variable RSS LUT sizes, this will need to be
-+	 * updated. For now, the PF enforces a strict table size of
-+	 * ICE_LUT_VSI_SIZE.
-+	 */
-+	rss = ice_mig_alloc_flex_tlv(rss, lut, ICE_LUT_VSI_SIZE);
-+	if (!rss)
-+		return -ENOMEM;
-+
-+	rss->hashcfg = vf->rss_hashcfg;
-+	rss->hfunc = vsi->rss_hfunc;
-+	rss->lut_size = ICE_LUT_VSI_SIZE;
-+	ice_aq_get_rss_key(hw, vsi->idx, &rss->key);
-+	ice_get_rss_lut(vsi, rss->lut, ICE_LUT_VSI_SIZE);
-+
-+	ice_mig_tlv_add_tail(rss, &vf->mig_tlvs);
-+
-+	return 0;
-+}
-+
-+/**
-+ * ice_migration_save_vlan_filters - Save all VLAN filters used by VF
-+ * @vf: pointer to the VF being migrated
-+ * @vsi: the VSI for this VF
-+ *
-+ * Save the VLAN filters configured for the VF when suspending it for live
-+ * migration.
-+ *
-+ * Return: 0 on success, negative error code on failure.
-+ */
-+static int ice_migration_save_vlan_filters(struct ice_vf *vf,
-+					   struct ice_vsi *vsi)
-+{
-+	struct device *dev = ice_pf_to_dev(vf->pf);
-+	struct ice_fltr_mgmt_list_entry *fm_entry;
-+	struct ice_mig_vlan_filters *vlan_filters;
-+	struct ice_hw *hw = &vf->pf->hw;
-+	struct list_head *rule_head;
-+	struct ice_switch_info *sw;
-+	int vlan_idx;
-+
-+	lockdep_assert_held(&vf->cfg_lock);
-+
-+	if (!vsi->num_vlan)
-+		return 0;
-+
-+	dev_dbg(dev, "Saving %u VLANs for VF %d\n",
-+		vsi->num_vlan, vf->vf_id);
-+
-+	/* Ensure variable size TLV is aligned to 4 bytes */
-+	vlan_filters = ice_mig_alloc_flex_tlv(vlan_filters, vlans,
-+					      vsi->num_vlan);
-+	if (!vlan_filters)
-+		return -ENOMEM;
-+
-+	vlan_filters->num_vlans = vsi->num_vlan;
-+
-+	sw = hw->switch_info;
-+	rule_head = &sw->recp_list[ICE_SW_LKUP_VLAN].filt_rules;
-+
-+	mutex_lock(&sw->recp_list[ICE_SW_LKUP_VLAN].filt_rule_lock);
-+
-+	list_for_each_entry(fm_entry, rule_head, list_entry) {
-+		struct ice_mig_vlan_filter *vlan;
-+
-+		/* ignore anything that isn't a VLAN VSI filter */
-+		if (fm_entry->fltr_info.lkup_type != ICE_SW_LKUP_VLAN ||
-+		    (fm_entry->fltr_info.fltr_act != ICE_FWD_TO_VSI &&
-+		     fm_entry->fltr_info.fltr_act != ICE_FWD_TO_VSI_LIST))
-+			continue;
-+
-+		if (fm_entry->vsi_count < 2 && !fm_entry->vsi_list_info &&
-+		    fm_entry->fltr_info.fltr_act == ICE_FWD_TO_VSI) {
-+			/* Check if ICE_FWD_TO_VSI matches this VSI */
-+			if (fm_entry->fltr_info.vsi_handle != vsi->idx)
-+				continue;
-+		} else if (fm_entry->vsi_list_info &&
-+			   fm_entry->fltr_info.fltr_act == ICE_FWD_TO_VSI_LIST) {
-+			/* Check if ICE_FWD_TO_VSI_LIST matches this VSI */
-+			if (!test_bit(vsi->idx,
-+				      fm_entry->vsi_list_info->vsi_map))
-+				continue;
-+		} else {
-+			dev_dbg(dev, "Ignoring malformed filter entry that doesn't look like either a VSI or VSI list filter.\n");
-+			continue;
-+		}
-+
-+		/* We shouldn't hit this, assuming num_vlan is consistent with
-+		 * the actual number of entries in the table.
-+		 */
-+		if (vlan_idx >= vsi->num_vlan) {
-+			dev_warn(dev, "VF VSI claims to have %d VLAN filters but we found more than that in the switch table. Some filters might be lost in migration\n",
-+				 vsi->num_vlan);
-+			break;
-+		}
-+
-+		vlan = &vlan_filters->vlans[vlan_idx];
-+		vlan->vid = fm_entry->fltr_info.l_data.vlan.vlan_id;
-+		if (fm_entry->fltr_info.l_data.vlan.tpid_valid)
-+			vlan->tpid = fm_entry->fltr_info.l_data.vlan.tpid;
-+		else
-+			vlan->tpid = ETH_P_8021Q;
-+
-+		vlan_idx++;
-+	}
-+
-+	if (vlan_idx != vsi->num_vlan) {
-+		dev_warn(dev, "VSI had %u VLANs, but we only found %u VLANs\n",
-+			 vsi->num_vlan, vlan_idx);
-+		vlan_filters->num_vlans = vlan_idx;
-+	}
-+
-+	ice_mig_tlv_add_tail(vlan_filters, &vf->mig_tlvs);
-+
-+	mutex_unlock(&sw->recp_list[ICE_SW_LKUP_VLAN].filt_rule_lock);
-+
-+	return 0;
-+}
-+
-+/**
-+ * ice_migration_save_mac_filters - Save MAC filters used by VF
-+ * @vf: pointer to the VF being migrated
-+ * @vsi: the VSI for this VF
-+ *
-+ * Save the MAC filters configured for the VF when suspending it for live
-+ * migration.
-+ *
-+ * Return: 0 on success, negative error code on failure.
-+ */
-+static int ice_migration_save_mac_filters(struct ice_vf *vf,
-+					  struct ice_vsi *vsi)
-+{
-+	struct device *dev = ice_pf_to_dev(vf->pf);
-+	struct ice_fltr_mgmt_list_entry *fm_entry;
-+	struct ice_mig_mac_filters *mac_filters;
-+	struct ice_hw *hw = &vf->pf->hw;
-+	struct list_head *rule_head;
-+	struct ice_switch_info *sw;
-+	int mac_idx;
-+
-+	lockdep_assert_held(&vf->cfg_lock);
-+
-+	if (!vf->num_mac)
-+		return 0;
-+
-+	dev_dbg(dev, "Saving %u MAC filters for VF %u\n",
-+		vf->num_mac, vf->vf_id);
-+
-+	/* Ensure variable size TLV is aligned to 4 bytes */
-+	mac_filters = ice_mig_alloc_flex_tlv(mac_filters, macs,
-+					     vf->num_mac);
-+	if (!mac_filters)
-+		return -ENOMEM;
-+
-+	mac_filters->num_macs = vf->num_mac;
-+
-+	sw = hw->switch_info;
-+	rule_head = &sw->recp_list[ICE_SW_LKUP_MAC].filt_rules;
-+
-+	mutex_lock(&sw->recp_list[ICE_SW_LKUP_MAC].filt_rule_lock);
-+
-+	mac_idx = 0;
-+	list_for_each_entry(fm_entry, rule_head, list_entry) {
-+		/* ignore anything that isn't a MAC VSI filter */
-+		if (fm_entry->fltr_info.lkup_type != ICE_SW_LKUP_MAC ||
-+		    (fm_entry->fltr_info.fltr_act != ICE_FWD_TO_VSI &&
-+		     fm_entry->fltr_info.fltr_act != ICE_FWD_TO_VSI_LIST))
-+			continue;
-+
-+		if (fm_entry->vsi_count < 2 && !fm_entry->vsi_list_info &&
-+		    fm_entry->fltr_info.fltr_act == ICE_FWD_TO_VSI) {
-+			/* Check if ICE_FWD_TO_VSI matches this VSI */
-+			if (fm_entry->fltr_info.vsi_handle != vsi->idx)
-+				continue;
-+		} else if (fm_entry->vsi_list_info &&
-+			   fm_entry->fltr_info.fltr_act == ICE_FWD_TO_VSI_LIST) {
-+			/* Check if ICE_FWD_TO_VSI_LIST matches this VSI */
-+			if (!test_bit(vsi->idx,
-+				      fm_entry->vsi_list_info->vsi_map))
-+				continue;
-+		} else {
-+			dev_dbg(dev, "Ignoring malformed filter entry that doesn't look like either a VSI or VSI list filter.\n");
-+			continue;
-+		}
-+
-+		/* We shouldn't hit this, assuming num_mac is consistent with
-+		 * the actual number of entries in the table.
-+		 */
-+		if (mac_idx >= vf->num_mac) {
-+			dev_warn(dev, "VF claims to have %d MAC filters but we found more than that in the switch table. Some filters might be lost in migration\n",
-+				 vf->num_mac);
-+			break;
-+		}
-+
-+		ether_addr_copy(mac_filters->macs[mac_idx].mac_addr,
-+				fm_entry->fltr_info.l_data.mac.mac_addr);
-+		mac_idx++;
-+	}
-+
-+	if (mac_idx != vf->num_mac) {
-+		dev_warn(dev, "VF VSI had %u MAC filters, but we only found %u MAC filters\n",
-+			 vf->num_mac, mac_idx);
-+		mac_filters->num_macs = mac_idx;
-+	}
-+
-+	ice_mig_tlv_add_tail(mac_filters, &vf->mig_tlvs);
-+
-+	mutex_unlock(&sw->recp_list[ICE_SW_LKUP_MAC].filt_rule_lock);
-+
-+	return 0;
-+}
-+
- /**
-  * ice_migration_suspend_dev - suspend device
-  * @vf_dev: pointer to the VF PCI device
-@@ -463,6 +777,17 @@ int ice_migration_suspend_dev(struct pci_dev *vf_dev, bool save_state)
- 		if (err)
- 			goto err_free_mig_tlvs;
- 
-+		err = ice_migration_save_rss(vf, vsi);
-+		if (err)
-+			goto err_free_mig_tlvs;
-+
-+		err = ice_migration_save_vlan_filters(vf, vsi);
-+		if (err)
-+			goto err_free_mig_tlvs;
-+
-+		err = ice_migration_save_mac_filters(vf, vsi);
-+		if (err)
-+			goto err_free_mig_tlvs;
- 	}
- 
- 	/* Prevent VSI from queuing incoming packets by removing all filters */
-@@ -498,6 +823,16 @@ int ice_migration_suspend_dev(struct pci_dev *vf_dev, bool save_state)
- 		err = ice_migration_save_tx_queues(vf, vsi);
- 		if (err)
- 			goto err_free_mig_tlvs;
-+
-+		/* Save mailbox registers */
-+		err = ice_migration_save_mbx_regs(vf);
-+		if (err)
-+			goto err_free_mig_tlvs;
-+
-+		/* Save current VF statistics */
-+		err = ice_migration_save_stats(vf, vsi);
-+		if (err)
-+			goto err_free_mig_tlvs;
- 	}
- 
- 	mutex_unlock(&vf->cfg_lock);
-@@ -1397,6 +1732,272 @@ ice_migration_load_msix_regs(struct ice_vf *vf, struct ice_vsi *vsi,
- 	return 0;
- }
- 
-+/**
-+ * ice_migration_load_mbx_regs - Load mailbox registers from migration payload
-+ * @vf: pointer to the VF being migrated to
-+ * @mbx_regs: the mailbox register data from migration payload
-+ *
-+ * Load the mailbox register configuration from the migration payload and
-+ * initialize the target VF.
-+ */
-+static void ice_migration_load_mbx_regs(struct ice_vf *vf,
-+					const struct ice_mig_mbx_regs *mbx_regs)
-+{
-+	struct ice_hw *hw = &vf->pf->hw;
-+
-+	lockdep_assert_held(&vf->cfg_lock);
-+
-+	wr32(hw, VF_MBX_ATQH(vf->vf_id), mbx_regs->atq_head);
-+	wr32(hw, VF_MBX_ATQT(vf->vf_id), mbx_regs->atq_tail);
-+	wr32(hw, VF_MBX_ATQBAL(vf->vf_id), mbx_regs->atq_bal);
-+	wr32(hw, VF_MBX_ATQBAH(vf->vf_id), mbx_regs->atq_bah);
-+	wr32(hw, VF_MBX_ATQLEN(vf->vf_id), mbx_regs->atq_len);
-+
-+	wr32(hw, VF_MBX_ARQH(vf->vf_id), mbx_regs->arq_head);
-+	wr32(hw, VF_MBX_ARQT(vf->vf_id), mbx_regs->arq_tail);
-+	wr32(hw, VF_MBX_ARQBAL(vf->vf_id), mbx_regs->arq_bal);
-+	wr32(hw, VF_MBX_ARQBAH(vf->vf_id), mbx_regs->arq_bah);
-+	wr32(hw, VF_MBX_ARQLEN(vf->vf_id), mbx_regs->arq_len);
-+}
-+
-+/**
-+ * ice_migration_load_stats - Load VF statistics from migration buffer
-+ * @vf: pointer to the VF being migrated to
-+ * @vsi: the VSI for this VF
-+ * @stats: the statistics values from the migration buffer.
-+ *
-+ * Load the VF statistics from the migration buffer, and re-initialize HW
-+ * stats offsets to match.
-+ */
-+static void ice_migration_load_stats(struct ice_vf *vf, struct ice_vsi *vsi,
-+				     const struct ice_mig_stats *stats)
-+{
-+	lockdep_assert_held(&vf->cfg_lock);
-+
-+	vsi->eth_stats.rx_bytes = stats->rx_bytes;
-+	vsi->eth_stats.rx_unicast = stats->rx_unicast;
-+	vsi->eth_stats.rx_multicast = stats->rx_multicast;
-+	vsi->eth_stats.rx_broadcast = stats->rx_broadcast;
-+	vsi->eth_stats.rx_discards = stats->rx_discards;
-+	vsi->eth_stats.rx_unknown_protocol = stats->rx_unknown_protocol;
-+	vsi->eth_stats.tx_bytes = stats->tx_bytes;
-+	vsi->eth_stats.tx_unicast = stats->tx_unicast;
-+	vsi->eth_stats.tx_multicast = stats->tx_multicast;
-+	vsi->eth_stats.tx_broadcast = stats->tx_broadcast;
-+	vsi->eth_stats.tx_discards = stats->tx_discards;
-+	vsi->eth_stats.tx_errors = stats->tx_errors;
-+
-+	/* Force the stats offsets to reload so that reported statistics
-+	 * exactly match the values from the migration buffer.
-+	 */
-+	vsi->stat_offsets_loaded = false;
-+	ice_update_eth_stats(vsi);
-+}
-+
-+/**
-+ * ice_migration_load_rss - Load VF RSS configuration from migration buffer
-+ * @vf: pointer to the VF being migrated to
-+ * @vsi: the VSI for this VF
-+ * @rss: the RSS configuration from the migration buffer
-+ *
-+ * Load the VF RSS configuration from the migration buffer, and configure the
-+ * target VF to match.
++ * Load device state. This function is called when the userspace VFIO uAPI
++ * consumer wants to load the device state info from VFIO migration region and
++ * load them into the device. This function should make sure all the device
++ * state info is loaded successfully. As a result, return value is mandatory
++ * to be checked.
 + *
 + * Return: 0 on success, or a negative error code on failure.
 + */
-+static int ice_migration_load_rss(struct ice_vf *vf, struct ice_vsi *vsi,
-+				  const struct ice_mig_rss *rss)
++static int __must_check
++ice_vfio_pci_load_state(struct ice_vfio_pci_device *ice_vdev)
 +{
-+	struct device *dev = ice_pf_to_dev(vf->pf);
-+	struct ice_hw *hw = &vf->pf->hw;
-+	int err;
++	struct ice_vfio_pci_migration_file *migf = ice_vdev->resuming_migf;
++	struct pci_dev *pdev = ice_vdev->core_device.pdev;
 +
-+	if (!test_bit(ICE_FLAG_RSS_ENA, vf->pf->flags)) {
-+		dev_err(dev, "RSS is not supported by the PF\n");
-+		return -EOPNOTSUPP;
++	return ice_migration_load_devstate(pdev,
++					   migf->mig_data,
++					   migf->payload_length);
++}
++
++/**
++ * ice_vfio_pci_save_state - VFIO device state saving
++ * @ice_vdev: pointer to ice-vfio-pci core device structure
++ * @migf: pointer to migration file
++ *
++ * Snapshot the device state and save it. This function is called when the
++ * VFIO uAPI consumer wants to snapshot the current device state and saves
++ * it into the VFIO migration region. This function should make sure all
++ * of the device state info is collected and saved successfully. As a
++ * result, return value is mandatory to be checked.
++ *
++ * Return: 0 on success, or a negative error code on failure.
++ */
++static int __must_check
++ice_vfio_pci_save_state(struct ice_vfio_pci_device *ice_vdev,
++			struct ice_vfio_pci_migration_file *migf)
++{
++	struct pci_dev *pdev = ice_vdev->core_device.pdev;
++
++	return ice_migration_save_devstate(pdev,
++					   migf->mig_data,
++					   migf->payload_length);
++}
++
++/**
++ * ice_vfio_migration_init - Initialization for live migration function
++ * @ice_vdev: pointer to ice-vfio-pci core device structure
++ *
++ * Return: 0 on success, or a negative error code on failure.
++ */
++static int ice_vfio_migration_init(struct ice_vfio_pci_device *ice_vdev)
++{
++	struct pci_dev *pdev = ice_vdev->core_device.pdev;
++
++	return ice_migration_init_dev(pdev);
++}
++
++/**
++ * ice_vfio_migration_uninit - Cleanup for live migration function
++ * @ice_vdev: pointer to ice-vfio-pci core device structure
++ */
++static void ice_vfio_migration_uninit(struct ice_vfio_pci_device *ice_vdev)
++{
++	struct pci_dev *pdev = ice_vdev->core_device.pdev;
++
++	ice_migration_uninit_dev(pdev);
++}
++
++/**
++ * ice_vfio_pci_disable_fd - Close migration file
++ * @migf: pointer to ice-vfio-pci migration file
++ */
++static void ice_vfio_pci_disable_fd(struct ice_vfio_pci_migration_file *migf)
++{
++	guard(mutex)(&migf->lock);
++
++	migf->disabled = true;
++	migf->payload_length = 0;
++	migf->filp->f_pos = 0;
++}
++
++/**
++ * ice_vfio_pci_disable_fds - Close migration files of ice-vfio-pci device
++ * @ice_vdev: pointer to ice-vfio-pci core device structure
++ */
++static void ice_vfio_pci_disable_fds(struct ice_vfio_pci_device *ice_vdev)
++{
++	if (ice_vdev->resuming_migf) {
++		ice_vfio_pci_disable_fd(ice_vdev->resuming_migf);
++		fput(ice_vdev->resuming_migf->filp);
++		ice_vdev->resuming_migf = NULL;
 +	}
-+
-+	dev_dbg(dev, "Loading RSS configuration for VF %u\n", vf->vf_id);
-+
-+	err = ice_set_rss_key(vsi, (u8 *)&rss->key);
-+	if (err) {
-+		dev_dbg(dev, "Failed to set RSS key for VF %d, err %d\n",
-+			vf->vf_id, err);
-+		return err;
++	if (ice_vdev->saving_migf) {
++		ice_vfio_pci_disable_fd(ice_vdev->saving_migf);
++		fput(ice_vdev->saving_migf->filp);
++		ice_vdev->saving_migf = NULL;
 +	}
++}
 +
-+	err = ice_set_rss_lut(vsi, (u8 *)rss->lut, rss->lut_size);
-+	if (err) {
-+		dev_dbg(dev, "Failed to set RSS lookup table for VF %d, err %d\n",
-+			vf->vf_id, err);
-+		return err;
++/**
++ * ice_vfio_pci_open_device - VFIO .open_device callback
++ * @vdev: the VFIO device to open
++ *
++ * Called when a VFIO device is probed by VFIO uAPI. Initializes the VFIO
++ * device and sets up the migration state.
++ *
++ * Return: 0 on success, or a negative error code on failure.
++ */
++static int ice_vfio_pci_open_device(struct vfio_device *vdev)
++{
++	struct vfio_pci_core_device *core_vdev;
++	struct ice_vfio_pci_device *ice_vdev;
++	int ret;
++
++	ice_vdev = to_ice_vdev(vdev);
++	core_vdev = &ice_vdev->core_device;
++
++	ret = vfio_pci_core_enable(core_vdev);
++	if (ret)
++		return ret;
++
++	ret = ice_vfio_migration_init(ice_vdev);
++	if (ret) {
++		vfio_pci_core_disable(core_vdev);
++		return ret;
 +	}
-+
-+	err = ice_set_rss_hfunc(vsi, rss->hfunc);
-+	if (err) {
-+		dev_dbg(dev, "Failed to set RSS hash function for VF %d, err %d\n",
-+			vf->vf_id, err);
-+		return err;
-+	}
-+
-+	err = ice_rem_vsi_rss_cfg(hw, vsi->idx);
-+	if (err && !rss->hashcfg) {
-+		/* only report failure to clear the current RSS configuration
-+		 * if that was clearly the migrated VF's intention.
-+		 */
-+		dev_dbg(dev, "Failed to clear RSS hash configuration for VF %d, err %d\n",
-+			vf->vf_id, err);
-+		return err;
-+	}
-+
-+	if (!rss->hashcfg)
-+		return 0;
-+
-+	err = ice_add_avf_rss_cfg(hw, vsi, rss->hashcfg);
-+	if (err) {
-+		dev_dbg(dev, "Failed to set RSS hash configuration for VF %d, err %d\n",
-+			vf->vf_id, err);
-+		return err;
-+	}
++	ice_vdev->mig_state = VFIO_DEVICE_STATE_RUNNING;
++	vfio_pci_core_finish_enable(core_vdev);
 +
 +	return 0;
 +}
 +
 +/**
-+ * ice_migration_load_vlan_filters - Load VLAN filters from migration buffer
-+ * @vf: pointer to the VF being migrated to
-+ * @vsi: the VSI for this VF
-+ * @vlan_filters: VLAN filters from the migration payload
++ * ice_vfio_pci_close_device - VFIO .close_device callback
++ * @vdev: the VFIO device to close
 + *
-+ * Load the VLAN filters from the migration payload and program the target VF
-+ * to match.
++ * Called when a VFIO device fd is closed. Destroys migration state.
++ */
++static void ice_vfio_pci_close_device(struct vfio_device *vdev)
++{
++	struct ice_vfio_pci_device *ice_vdev = to_ice_vdev(vdev);
++
++	ice_vfio_pci_disable_fds(ice_vdev);
++	vfio_pci_core_close_device(vdev);
++	ice_vfio_migration_uninit(ice_vdev);
++}
++
++/**
++ * ice_vfio_pci_release_file - Release ice-vfio-pci migration file
++ * @inode: pointer to inode
++ * @filp: pointer to the file to release
++ *
++ * Return: 0.
++ */
++static int ice_vfio_pci_release_file(struct inode *inode, struct file *filp)
++{
++	struct ice_vfio_pci_migration_file *migf = filp->private_data;
++
++	ice_vfio_pci_disable_fd(migf);
++	mutex_destroy(&migf->lock);
++	vfree(migf);
++	return 0;
++}
++
++/**
++ * ice_vfio_pci_save_read - Save migration file data to user space
++ * @filp: pointer to migration file
++ * @buf: pointer to user space buffer
++ * @len: data length to be saved
++ * @pos: must be 0
++ *
++ * Return: length of the saved data, or a negative error code on failure.
++ */
++static ssize_t ice_vfio_pci_save_read(struct file *filp, char __user *buf,
++				      size_t len, loff_t *pos)
++{
++	struct ice_vfio_pci_migration_file *migf = filp->private_data;
++	loff_t *off = &filp->f_pos;
++	ssize_t done = 0;
++	int ret;
++
++	if (pos)
++		return -ESPIPE;
++
++	guard(mutex)(&migf->lock);
++
++	if (*off > migf->payload_length)
++		return -EINVAL;
++
++	if (migf->disabled)
++		return -ENODEV;
++
++	len = min_t(size_t, migf->payload_length - *off, len);
++	if (len) {
++		ret = copy_to_user(buf, migf->mig_data + *off, len);
++		if (ret)
++			return -EFAULT;
++
++		*off += len;
++		done = len;
++	}
++
++	return done;
++}
++
++static const struct file_operations ice_vfio_pci_save_fops = {
++	.owner = THIS_MODULE,
++	.read = ice_vfio_pci_save_read,
++	.release = ice_vfio_pci_release_file,
++};
++
++/**
++ * ice_vfio_pci_stop_copy - Create migration file and save migration state
++ * @ice_vdev: pointer to ice-vfio-pci core device structure
++ *
++ * Return: pointer to the migration file structure, or an error pointer on
++ *         failure.
++ */
++static struct ice_vfio_pci_migration_file *
++ice_vfio_pci_stop_copy(struct ice_vfio_pci_device *ice_vdev)
++{
++	struct pci_dev *pdev = ice_vdev->core_device.pdev;
++	struct ice_vfio_pci_migration_file *migf;
++	size_t payload_length;
++	int ret;
++
++	payload_length = ice_migration_get_required_size(pdev);
++	if (!payload_length)
++		return ERR_PTR(-EIO);
++
++	migf = vzalloc(struct_size(migf, mig_data, payload_length));
++	if (!migf)
++		return ERR_PTR(-ENOMEM);
++
++	migf->payload_length = payload_length;
++	migf->filp = anon_inode_getfile("ice_vfio_pci_mig",
++					&ice_vfio_pci_save_fops, migf,
++					O_RDONLY);
++	if (IS_ERR(migf->filp)) {
++		ret = PTR_ERR(migf->filp);
++		goto err_free_migf;
++	}
++
++	stream_open(migf->filp->f_inode, migf->filp);
++	mutex_init(&migf->lock);
++
++	ret = ice_vfio_pci_save_state(ice_vdev, migf);
++	if (ret)
++		goto err_put_migf_filp;
++
++	return migf;
++
++err_put_migf_filp:
++	fput(migf->filp);
++err_free_migf:
++	vfree(migf);
++
++	return ERR_PTR(ret);
++}
++
++/**
++ * ice_vfio_pci_resume_write - Copy migration file data from user space
++ * @filp: pointer to migration file
++ * @buf: pointer to user space buffer
++ * @len: data length to be copied
++ * @pos: must be 0
++ *
++ * Return: length of the data copied, or a negative error code on failure.
++ */
++static ssize_t ice_vfio_pci_resume_write(struct file *filp,
++					 const char __user *buf,
++					 size_t len, loff_t *pos)
++{
++	struct ice_vfio_pci_migration_file *migf = filp->private_data;
++	loff_t *off = &filp->f_pos;
++	loff_t requested_length;
++	ssize_t done = 0;
++	int ret;
++
++	if (pos)
++		return -ESPIPE;
++
++	if (*off < 0 ||
++	    check_add_overflow((loff_t)len, *off, &requested_length))
++		return -EINVAL;
++
++	if (requested_length > migf->payload_length)
++		return -ENOMEM;
++
++	guard(mutex)(&migf->lock);
++
++	if (migf->disabled)
++		return -ENODEV;
++
++	ret = copy_from_user(migf->mig_data + *off, buf, len);
++	if (ret)
++		return -EFAULT;
++
++	*off += len;
++	done = len;
++	migf->payload_length += len;
++
++	return done;
++}
++
++static const struct file_operations ice_vfio_pci_resume_fops = {
++	.owner = THIS_MODULE,
++	.write = ice_vfio_pci_resume_write,
++	.release = ice_vfio_pci_release_file,
++};
++
++/**
++ * ice_vfio_pci_resume - Create resuming migration file
++ * @ice_vdev: pointer to ice-vfio-pci core device structure
++ *
++ * Return: pointer to the migration file handler, or an error pointer on
++ *         failure.
++ */
++static struct ice_vfio_pci_migration_file *
++ice_vfio_pci_resume(struct ice_vfio_pci_device *ice_vdev)
++{
++	struct ice_vfio_pci_migration_file *migf;
++
++	migf = vzalloc(struct_size(migf, mig_data, SZ_128K));
++	if (!migf)
++		return ERR_PTR(-ENOMEM);
++
++	migf->payload_length = SZ_128K;
++	migf->filp = anon_inode_getfile("ice_vfio_pci_mig",
++					&ice_vfio_pci_resume_fops, migf,
++					O_WRONLY);
++	if (IS_ERR(migf->filp)) {
++		int ret = PTR_ERR(migf->filp);
++
++		vfree(migf);
++
++		return ERR_PTR(ret);
++	}
++
++	stream_open(migf->filp->f_inode, migf->filp);
++	mutex_init(&migf->lock);
++
++	return migf;
++}
++
++/**
++ * ice_vfio_pci_step_device_state_locked - Process device state change
++ * @ice_vdev: pointer to ice-vfio-pci core device structure
++ * @new: new device state
++ * @final: final device state
++ *
++ * Return: pointer to the migration file handler or NULL on success, or an
++ *         error pointer on failure.
++ */
++static struct file *
++ice_vfio_pci_step_device_state_locked(struct ice_vfio_pci_device *ice_vdev,
++				      enum vfio_device_mig_state new,
++				      enum vfio_device_mig_state final)
++{
++	enum vfio_device_mig_state cur = ice_vdev->mig_state;
++	struct pci_dev *pdev = ice_vdev->core_device.pdev;
++	int ret;
++
++	if (cur == VFIO_DEVICE_STATE_RUNNING && new == VFIO_DEVICE_STATE_RUNNING_P2P) {
++		bool save_state = final != VFIO_DEVICE_STATE_RESUMING;
++
++		/* The ice driver needs to keep track of some state which
++		 * would otherwise be lost when suspending the device. It only
++		 * needs this state if the device later transitions into
++		 * STOP_COPY, which copies the device state for migration.
++		 * The transition from RUNNING to RUNNING_P2P also occurs as
++		 * part of transitioning into the RESUME state.
++		 *
++		 * Avoid saving the device state if its known to be
++		 * unnecessary.
++		 */
++		ice_migration_suspend_dev(pdev, save_state);
++		return NULL;
++	}
++
++	if (cur == VFIO_DEVICE_STATE_RUNNING_P2P && new == VFIO_DEVICE_STATE_STOP)
++		return NULL;
++
++	if (cur == VFIO_DEVICE_STATE_STOP && new == VFIO_DEVICE_STATE_STOP_COPY) {
++		struct ice_vfio_pci_migration_file *migf;
++
++		migf = ice_vfio_pci_stop_copy(ice_vdev);
++		if (IS_ERR(migf))
++			return ERR_CAST(migf);
++		get_file(migf->filp);
++		ice_vdev->saving_migf = migf;
++		return migf->filp;
++	}
++
++	if (cur == VFIO_DEVICE_STATE_STOP_COPY && new == VFIO_DEVICE_STATE_STOP) {
++		ice_vfio_pci_disable_fds(ice_vdev);
++		return NULL;
++	}
++
++	if (cur == VFIO_DEVICE_STATE_STOP && new == VFIO_DEVICE_STATE_RESUMING) {
++		struct ice_vfio_pci_migration_file *migf;
++
++		migf = ice_vfio_pci_resume(ice_vdev);
++		if (IS_ERR(migf))
++			return ERR_CAST(migf);
++		get_file(migf->filp);
++		ice_vdev->resuming_migf = migf;
++		return migf->filp;
++	}
++
++	if (cur == VFIO_DEVICE_STATE_RESUMING && new == VFIO_DEVICE_STATE_STOP)
++		return NULL;
++
++	if (cur == VFIO_DEVICE_STATE_STOP && new == VFIO_DEVICE_STATE_RUNNING_P2P) {
++		ret = ice_vfio_pci_load_state(ice_vdev);
++		if (ret)
++			return ERR_PTR(ret);
++		ice_vfio_pci_disable_fds(ice_vdev);
++		return NULL;
++	}
++
++	if (cur == VFIO_DEVICE_STATE_RUNNING_P2P && new == VFIO_DEVICE_STATE_RUNNING)
++		return NULL;
++
++	/*
++	 * vfio_mig_get_next_state() does not use arcs other than the above
++	 */
++	WARN_ON(true);
++	return ERR_PTR(-EINVAL);
++}
++
++/**
++ * ice_vfio_pci_set_device_state - Configure the device state
++ * @vdev: pointer to VFIO device
++ * @new_state: device state
++ *
++ * Return: 0 on success, or a negative error code on failure.
++ */
++static struct file *
++ice_vfio_pci_set_device_state(struct vfio_device *vdev,
++			      enum vfio_device_mig_state new_state)
++{
++	struct ice_vfio_pci_device *ice_vdev = to_ice_vdev(vdev);
++	enum vfio_device_mig_state next_state;
++	struct file *res = NULL;
++	int ret;
++
++	mutex_lock(&ice_vdev->state_mutex);
++
++	while (new_state != ice_vdev->mig_state) {
++		ret = vfio_mig_get_next_state(vdev, ice_vdev->mig_state,
++					      new_state, &next_state);
++		if (ret) {
++			res = ERR_PTR(ret);
++			break;
++		}
++
++		res = ice_vfio_pci_step_device_state_locked(ice_vdev,
++							    next_state,
++							    new_state);
++		if (IS_ERR(res))
++			break;
++
++		ice_vdev->mig_state = next_state;
++		if (WARN_ON(res && new_state != ice_vdev->mig_state)) {
++			fput(res);
++			res = ERR_PTR(-EINVAL);
++			break;
++		}
++	}
++
++	mutex_unlock(&ice_vdev->state_mutex);
++
++	return res;
++}
++
++/**
++ * ice_vfio_pci_get_device_state - Get device state
++ * @vdev: pointer to VFIO device
++ * @curr_state: device state
++ *
++ * Return: 0.
++ */
++static int ice_vfio_pci_get_device_state(struct vfio_device *vdev,
++					 enum vfio_device_mig_state *curr_state)
++{
++	struct ice_vfio_pci_device *ice_vdev = to_ice_vdev(vdev);
++
++	mutex_lock(&ice_vdev->state_mutex);
++
++	*curr_state = ice_vdev->mig_state;
++
++	mutex_unlock(&ice_vdev->state_mutex);
++
++	return 0;
++}
++
++/**
++ * ice_vfio_pci_get_data_size - Get estimated migration data size
++ * @vdev: pointer to VFIO device
++ * @stop_copy_length: migration data size
++ *
++ * Return: 0.
++ */
++static int ice_vfio_pci_get_data_size(struct vfio_device *vdev,
++				      unsigned long *stop_copy_length)
++{
++	*stop_copy_length = SZ_128K;
++	return 0;
++}
++
++static const struct vfio_migration_ops ice_vfio_pci_migrn_state_ops = {
++	.migration_set_state = ice_vfio_pci_set_device_state,
++	.migration_get_state = ice_vfio_pci_get_device_state,
++	.migration_get_data_size = ice_vfio_pci_get_data_size,
++};
++
++/**
++ * ice_vfio_pci_core_init_dev - initialize VFIO device
++ * @vdev: pointer to VFIO device
++ *
++ * Return: 0.
++ */
++static int ice_vfio_pci_core_init_dev(struct vfio_device *vdev)
++{
++	struct ice_vfio_pci_device *ice_vdev = to_ice_vdev(vdev);
++
++	mutex_init(&ice_vdev->state_mutex);
++
++	vdev->migration_flags =
++		VFIO_MIGRATION_STOP_COPY | VFIO_MIGRATION_P2P;
++	vdev->mig_ops = &ice_vfio_pci_migrn_state_ops;
++
++	return vfio_pci_core_init_dev(vdev);
++}
++
++/**
++ * ice_vfio_pci_core_release_dev - Release VFIO device
++ * @vdev: pointer to VFIO device
++ */
++static void ice_vfio_pci_core_release_dev(struct vfio_device *vdev)
++{
++	struct ice_vfio_pci_device *ice_vdev = to_ice_vdev(vdev);
++
++	mutex_destroy(&ice_vdev->state_mutex);
++
++	vfio_pci_core_release_dev(vdev);
++}
++
++static const struct vfio_device_ops ice_vfio_pci_ops = {
++	.name		= "ice-vfio-pci",
++	.init		= ice_vfio_pci_core_init_dev,
++	.release	= ice_vfio_pci_core_release_dev,
++	.open_device	= ice_vfio_pci_open_device,
++	.close_device	= ice_vfio_pci_close_device,
++	.device_feature = vfio_pci_core_ioctl_feature,
++	.read		= vfio_pci_core_read,
++	.write		= vfio_pci_core_write,
++	.ioctl		= vfio_pci_core_ioctl,
++	.mmap		= vfio_pci_core_mmap,
++	.request	= vfio_pci_core_request,
++	.match		= vfio_pci_core_match,
++	.bind_iommufd	= vfio_iommufd_physical_bind,
++	.unbind_iommufd	= vfio_iommufd_physical_unbind,
++	.attach_ioas	= vfio_iommufd_physical_attach_ioas,
++	.detach_ioas	= vfio_iommufd_physical_detach_ioas,
++};
++
++/**
++ * ice_vfio_pci_probe - Device initialization routine
++ * @pdev: PCI device information struct
++ * @id: entry in ice_vfio_pci_table
 + *
 + * Return: 0 on success, or a negative error code on failure.
 + */
 +static int
-+ice_migration_load_vlan_filters(struct ice_vf *vf, struct ice_vsi *vsi,
-+				const struct ice_mig_vlan_filters *vlan_filters)
++ice_vfio_pci_probe(struct pci_dev *pdev, const struct pci_device_id *id)
 +{
-+	struct device *dev = ice_pf_to_dev(vf->pf);
-+	struct ice_vsi_vlan_ops *vlan_ops;
-+	struct ice_hw *hw = &vf->pf->hw;
-+	int err;
++	struct ice_vfio_pci_device *ice_vdev;
++	int ret;
 +
-+	dev_dbg(dev, "Loading %u VLANs for VF %d\n",
-+		vlan_filters->num_vlans, vf->vf_id);
++	ice_vdev = vfio_alloc_device(ice_vfio_pci_device, core_device.vdev,
++				     &pdev->dev, &ice_vfio_pci_ops);
++	if (!ice_vdev)
++		return -ENOMEM;
 +
-+	for (int idx = 0; idx < vlan_filters->num_vlans; idx++) {
-+		const struct ice_mig_vlan_filter *entry;
-+		struct ice_vlan vlan;
++	dev_set_drvdata(&pdev->dev, &ice_vdev->core_device);
 +
-+		entry = &vlan_filters->vlans[idx];
-+		vlan = ICE_VLAN(entry->tpid, entry->vid, 0);
-+
-+		/* ice_vsi_add_vlan converts -EEXIST errors from
-+		 * ice_fltr_add_vlan() into a successful return.
-+		 */
-+		err = ice_vsi_add_vlan(vsi, &vlan);
-+		if (err) {
-+			dev_dbg(dev, "Failed to add VLAN %d for VF %d, err %d\n",
-+				entry->vid, vf->vf_id, err);
-+			return err;
-+		}
-+
-+		/* We're re-adding the hardware vlan filters. The VF can
-+		 * either add outer VLANs (in DVM), or inner VLANs (in
-+		 * SVM). In SVM, we only enable promiscuous if the port VLAN
-+		 * is hot set.
-+		 */
-+		if (ice_is_vlan_promisc_allowed(vf) &&
-+		    (ice_is_dvm_ena(hw) || !ice_vf_is_port_vlan_ena(vf))) {
-+			err = ice_vf_ena_vlan_promisc(vf, vsi, &vlan);
-+			if (err) {
-+				dev_dbg(dev, "Failed to enable promiscuous filter on VLAN %d for VF %d, err %d\n",
-+					entry->vid, vf->vf_id, err);
-+				return err;
-+			}
-+		}
-+	}
-+
-+	vlan_ops = ice_get_compat_vsi_vlan_ops(vsi);
-+
-+	if (ice_vsi_has_non_zero_vlans(vsi)) {
-+		err = vlan_ops->ena_rx_filtering(vsi);
-+		if (err) {
-+			dev_dbg(dev, "Failed to enable VLAN pruning, err %d\n",
-+				err);
-+			return err;
-+		}
-+
-+		if (vf->spoofchk) {
-+			err = vlan_ops->ena_tx_filtering(vsi);
-+			if (err) {
-+				dev_dbg(dev, "Failed to enable VLAN anti-spoofing, err %d\n",
-+					err);
-+				return err;
-+			}
-+		}
-+	} else {
-+		/* Disable VLAN filtering when only VLAN 0 is left */
-+		vlan_ops->dis_tx_filtering(vsi);
-+		vlan_ops->dis_rx_filtering(vsi);
-+	}
-+
-+	if (vsi->num_vlan != vlan_filters->num_vlans)
-+		dev_dbg(dev, "VF %d has %d VLAN filters, but we expected to have %d\n",
-+			vf->vf_id, vsi->num_vlan, vlan_filters->num_vlans);
++	ret = vfio_pci_core_register_device(&ice_vdev->core_device);
++	if (ret)
++		goto out_free;
 +
 +	return 0;
++
++out_free:
++	vfio_put_device(&ice_vdev->core_device.vdev);
++	return ret;
 +}
 +
 +/**
-+ * ice_migration_load_mac_filters - Load MAC filters from migration buffer
-+ * @vf: pointer to the VF being migrated to
-+ * @vsi: the VSI for this VF
-+ * @mac_filters: MAC address filters from the migration payload
-+ *
-+ * Load the MAC filters from the migration payload and program them into the
-+ * target VF.
-+ *
-+ * Return: 0 on success, or a negative error code on failure.
++ * ice_vfio_pci_remove - Device removal routine
++ * @pdev: PCI device information struct
 + */
-+static int
-+ice_migration_load_mac_filters(struct ice_vf *vf, struct ice_vsi *vsi,
-+			       const struct ice_mig_mac_filters *mac_filters)
++static void ice_vfio_pci_remove(struct pci_dev *pdev)
 +{
-+	struct device *dev = ice_pf_to_dev(vf->pf);
++	struct ice_vfio_pci_device *ice_vdev = dev_get_drvdata(&pdev->dev);
 +
-+	dev_dbg(dev, "Loading %u MAC filters for VF %d\n",
-+		mac_filters->num_macs, vf->vf_id);
-+
-+	for (int idx = 0; idx < mac_filters->num_macs; idx++) {
-+		const struct ice_mig_mac_filter *entry;
-+		int err;
-+
-+		entry = &mac_filters->macs[idx];
-+
-+		err = ice_fltr_add_mac(vsi, entry->mac_addr, ICE_FWD_TO_VSI);
-+		if (!err) {
-+			vf->num_mac++;
-+		} else if (err == -EEXIST) {
-+			/* Ignore duplicate filters, since initial filters may
-+			 * already exist due to the resetting when loading the
-+			 * VF information TLV.
-+			 */
-+		} else {
-+			dev_dbg(dev, "Failed to add MAC %pM for VF %d, err %d\n",
-+				entry->mac_addr, vf->vf_id, err);
-+			return err;
-+		}
-+	}
-+
-+	if (vf->num_mac != mac_filters->num_macs)
-+		dev_dbg(dev, "VF %d has %d MAC filters, but we expected to have %d\n",
-+			vf->vf_id, vf->num_mac, mac_filters->num_macs);
-+
-+	return 0;
++	vfio_pci_core_unregister_device(&ice_vdev->core_device);
++	vfio_put_device(&ice_vdev->core_device.vdev);
 +}
 +
- /**
-  * ice_migration_load_devstate - Load device state into the target VF
-  * @vf_dev: pointer to the VF PCI device
-@@ -1493,6 +2094,21 @@ int ice_migration_load_devstate(struct pci_dev *vf_dev, const void *buf,
- 		case ICE_MIG_TLV_MSIX_REGS:
- 			err = ice_migration_load_msix_regs(vf, vsi, data);
- 			break;
-+		case ICE_MIG_TLV_MBX_REGS:
-+			ice_migration_load_mbx_regs(vf, data);
-+			break;
-+		case ICE_MIG_TLV_STATS:
-+			ice_migration_load_stats(vf, vsi, data);
-+			break;
-+		case ICE_MIG_TLV_RSS:
-+			err = ice_migration_load_rss(vf, vsi, data);
-+			break;
-+		case ICE_MIG_TLV_VLAN_FILTERS:
-+			err = ice_migration_load_vlan_filters(vf, vsi, data);
-+			break;
-+		case ICE_MIG_TLV_MAC_FILTERS:
-+			err = ice_migration_load_mac_filters(vf, vsi, data);
-+			break;
- 		default:
- 			dev_dbg(dev, "Unexpected TLV %d in payload?\n",
- 				tlv->type);
++/* ice_pci_tbl - PCI Device ID Table
++ *
++ * Wildcard entries (PCI_ANY_ID) should come last
++ * Last entry must be all 0s
++ *
++ * { Vendor ID, Device ID, SubVendor ID, SubDevice ID,
++ *   Class, Class Mask, private data (not used) }
++ */
++static const struct pci_device_id ice_vfio_pci_table[] = {
++	{ PCI_DRIVER_OVERRIDE_DEVICE_VFIO(PCI_VENDOR_ID_INTEL, 0x1889) },
++	{}
++};
++MODULE_DEVICE_TABLE(pci, ice_vfio_pci_table);
++
++static const struct pci_error_handlers ice_vfio_pci_core_err_handlers = {
++	.error_detected = vfio_pci_core_aer_err_detected,
++};
++
++static struct pci_driver ice_vfio_pci_driver = {
++	.name			= "ice-vfio-pci",
++	.id_table		= ice_vfio_pci_table,
++	.probe			= ice_vfio_pci_probe,
++	.remove			= ice_vfio_pci_remove,
++	.err_handler            = &ice_vfio_pci_core_err_handlers,
++	.driver_managed_dma	= true,
++};
++
++module_pci_driver(ice_vfio_pci_driver);
++
++MODULE_LICENSE("GPL");
++MODULE_DESCRIPTION("ICE VFIO PCI - User Level meta-driver for Intel E800 device family");
+diff --git a/MAINTAINERS b/MAINTAINERS
+index b81595e9ea95..512808140ebe 100644
+--- a/MAINTAINERS
++++ b/MAINTAINERS
+@@ -26477,6 +26477,13 @@ L:	kvm@vger.kernel.org
+ S:	Maintained
+ F:	drivers/vfio/pci/hisilicon/
+ 
++VFIO ICE PCI DRIVER
++M:	Jacob Keller <jacob.e.keller@intel.com>
++L:	kvm@vger.kernel.org
++S:	Supported
++F:	drivers/vfio/pci/ice/
++F:	include/linux/net/intel/ice_migration.h
++
+ VFIO MEDIATED DEVICE DRIVERS
+ M:	Kirti Wankhede <kwankhede@nvidia.com>
+ L:	kvm@vger.kernel.org
+diff --git a/drivers/vfio/pci/Kconfig b/drivers/vfio/pci/Kconfig
+index 2b0172f54665..74e0fb571936 100644
+--- a/drivers/vfio/pci/Kconfig
++++ b/drivers/vfio/pci/Kconfig
+@@ -67,4 +67,6 @@ source "drivers/vfio/pci/nvgrace-gpu/Kconfig"
+ 
+ source "drivers/vfio/pci/qat/Kconfig"
+ 
++source "drivers/vfio/pci/ice/Kconfig"
++
+ endmenu
+diff --git a/drivers/vfio/pci/Makefile b/drivers/vfio/pci/Makefile
+index cf00c0a7e55c..721b01ad3a2e 100644
+--- a/drivers/vfio/pci/Makefile
++++ b/drivers/vfio/pci/Makefile
+@@ -19,3 +19,5 @@ obj-$(CONFIG_VIRTIO_VFIO_PCI) += virtio/
+ obj-$(CONFIG_NVGRACE_GPU_VFIO_PCI) += nvgrace-gpu/
+ 
+ obj-$(CONFIG_QAT_VFIO_PCI) += qat/
++
++obj-$(CONFIG_ICE_VFIO_PCI) += ice/
+diff --git a/drivers/vfio/pci/ice/Kconfig b/drivers/vfio/pci/ice/Kconfig
+new file mode 100644
+index 000000000000..3e8f5d6e60dc
+--- /dev/null
++++ b/drivers/vfio/pci/ice/Kconfig
+@@ -0,0 +1,8 @@
++# SPDX-License-Identifier: GPL-2.0-only
++config ICE_VFIO_PCI
++	tristate "VFIO support for Intel(R) Ethernet Connection E800 Series"
++	depends on ICE
++	select VFIO_PCI_CORE
++	help
++	  This provides migration support for Intel(R) Ethernet connection E800
++	  series devices using the VFIO framework.
+diff --git a/drivers/vfio/pci/ice/Makefile b/drivers/vfio/pci/ice/Makefile
+new file mode 100644
+index 000000000000..5b8df8234b31
+--- /dev/null
++++ b/drivers/vfio/pci/ice/Makefile
+@@ -0,0 +1,4 @@
++# SPDX-License-Identifier: GPL-2.0-only
++obj-$(CONFIG_ICE_VFIO_PCI) += ice-vfio-pci.o
++ice-vfio-pci-y := main.o
++
 
 -- 
 2.51.0.rc1.197.g6d975e95c9d7
