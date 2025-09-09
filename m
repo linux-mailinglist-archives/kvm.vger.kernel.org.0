@@ -1,63 +1,63 @@
-Return-Path: <kvm+bounces-57077-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-57078-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5CBF9B4A873
-	for <lists+kvm@lfdr.de>; Tue,  9 Sep 2025 11:43:37 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 01199B4A874
+	for <lists+kvm@lfdr.de>; Tue,  9 Sep 2025 11:43:46 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1DDB716E8D0
-	for <lists+kvm@lfdr.de>; Tue,  9 Sep 2025 09:43:37 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9CAE81710EF
+	for <lists+kvm@lfdr.de>; Tue,  9 Sep 2025 09:43:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8275A30B50C;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EB93930BB88;
 	Tue,  9 Sep 2025 09:40:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="OMjtXKKZ"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="PhOtpKHh"
 X-Original-To: kvm@vger.kernel.org
 Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.11])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 76E383081A4;
-	Tue,  9 Sep 2025 09:40:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0E07F308F15;
+	Tue,  9 Sep 2025 09:40:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.11
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757410806; cv=none; b=rlrJCWLgO9ZLHZHmFDfNkFV9zqiJPiNRhhb/tmeAxEGuGUOF/l47D9VQ86OtqKctT8587KtRrficphglySCq4tNcQa+hTpY3Z1M/Qy1S0eGvoGfdzX7IUwVjZ2VOvyck62FgssC8IUQRSDnBGTzS3l48L91/cyi5lrgQVLQVuzY=
+	t=1757410806; cv=none; b=mcGB9Hm/a+jmuUmBdVAzikxtq2z0yqFyIBQWcnkm468EZgoOnpvUsrnNaaeGjH6vwUVDcqr6EC5n2+YYqgx6ZEmzBJ994xpD7dR5DdRt0/za3Frj0CcVYmy04AF8ZiWMOBnMK11+AuetGWtFm1VkIWTWR4KdZmTLXguh+JUJOa0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1757410806; c=relaxed/simple;
-	bh=KOFFeBEs7QhCsltveRbSIhh4fed0gwK98txg6TSwRys=;
+	bh=igohFjfGtW8SELdeBSvgCImuuHQp9innMtVfFIGRIX4=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=pBAs4yRsuCxk2njxbqTVwNtYtNUNO4tJMo+z025rSklM/6o6iTTOPWgqkNVB6Ew97DpJ3iADklF5pxNeiH3VLD8bpgiWYCtZcSicCFnG28XErXadccKGOdMRSE9maHawJF0tcqTqSeU67ahWlxKs2+eX44Uw3fV8HpUoNfl+nMI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=OMjtXKKZ; arc=none smtp.client-ip=192.198.163.11
+	 MIME-Version; b=B870Su/Om4DdJTgjw3gT2zBt70Q38cLSW98e2a70vzel07nHMT+Hu7lTewCR/S1y19p/3CP49YR2FNmRok1B4OSEbhDUw/3eHjA0vmhltuY21C6w4FPuVH6T5ZKsM67ShZf7JS+3qRaMua17ne6q9m3VM1rVqFuCws5axBwyoKs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=PhOtpKHh; arc=none smtp.client-ip=192.198.163.11
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1757410804; x=1788946804;
+  t=1757410805; x=1788946805;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=KOFFeBEs7QhCsltveRbSIhh4fed0gwK98txg6TSwRys=;
-  b=OMjtXKKZvZPG0szpYs8TtBkvGyqSEeCWyXwCKV5ooY3tQRHMDMdM1fP8
-   gnNb8QsNke/1RyXpxU81ndYWgkoNiCcjXniQkPLrZWgwRR3S3UyC71Kew
-   hwJkJSSvYv0rwmB2qMrVfExOM2eqpHRCRuJhVSsM4+0CL1by16iJCiJD0
-   ou7gIg8slf8cOTIjPSIra2lbjuRmPvPdTOv79ESOsrU7bN/vXu2EyWzqe
-   39EH9LR5tAT9nEUZ39oAEYucCjhx9h0rKsEF3VeeiNnnFpyX5wcbOs6qF
-   sgzZXCjaw5hh6ytvxwCE3hEPiSmF0xSKQWlmKIfWTGxAyRcEYDnTwAIAM
-   g==;
-X-CSE-ConnectionGUID: ACKrvq/qRgOFuBkbBj+jqg==
-X-CSE-MsgGUID: lNIUh4yBTwy/r4WzigLiPQ==
-X-IronPort-AV: E=McAfee;i="6800,10657,11547"; a="70307279"
+  bh=igohFjfGtW8SELdeBSvgCImuuHQp9innMtVfFIGRIX4=;
+  b=PhOtpKHhzT1+boOg5abODH11MMgD6ZZInxaGThCJQ7YzLY5hSrEp0wn7
+   tCFjxtq0qQUEq3oNYrJL8aAJJ12BtBd5SuUwFatA8528Tw/qGLqsBoI0g
+   JZBLMVqFUZH0qCnhqerM+UvHx2pkKnavvLxid7F7yr4nuoF1sqd/PG79v
+   YOUzp33l8aaqWe8XRzuF0mvwFk6P8SKaU069UzaKnPEgBlOxmaM073cFQ
+   jrO86GYY/OtKASE6rwBi4PlngtcZRFoDk2V6pNJ9w6oI6TLMNFnbhcYQi
+   Xi9lWrC+DLnUaG65eA6L1rg/FS1IOQeCqjnFS8wnr2yFG+/arf6M8fHlh
+   w==;
+X-CSE-ConnectionGUID: mmMCaDspQS+6lZsuGcPbsg==
+X-CSE-MsgGUID: QBvOWKepRPeXaj7C3odSLg==
+X-IronPort-AV: E=McAfee;i="6800,10657,11547"; a="70307291"
 X-IronPort-AV: E=Sophos;i="6.18,251,1751266800"; 
-   d="scan'208";a="70307279"
+   d="scan'208";a="70307291"
 Received: from orviesa006.jf.intel.com ([10.64.159.146])
   by fmvoesa105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 09 Sep 2025 02:39:56 -0700
-X-CSE-ConnectionGUID: IW6j0dD0S4SFl8Nv2dpDhw==
-X-CSE-MsgGUID: 5ImhtPHrTbWfzrOuSBUYvw==
+X-CSE-ConnectionGUID: 5mCj/D1KTZmdCoJTecswlg==
+X-CSE-MsgGUID: B70LiylvQtqH/Qs//eJRNg==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.18,251,1751266800"; 
-   d="scan'208";a="172207424"
+   d="scan'208";a="172207427"
 Received: from unknown (HELO CannotLeaveINTEL.jf.intel.com) ([10.165.54.94])
-  by orviesa006-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 09 Sep 2025 02:39:56 -0700
+  by orviesa006-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 09 Sep 2025 02:39:57 -0700
 From: Chao Gao <chao.gao@intel.com>
 To: kvm@vger.kernel.org,
 	linux-kernel@vger.kernel.org
@@ -81,9 +81,9 @@ Cc: acme@redhat.com,
 	x86@kernel.org,
 	xin@zytor.com,
 	xiaoyao.li@intel.com
-Subject: [PATCH v14 13/22] KVM: VMX: Set up interception for CET MSRs
-Date: Tue,  9 Sep 2025 02:39:44 -0700
-Message-ID: <20250909093953.202028-14-chao.gao@intel.com>
+Subject: [PATCH v14 14/22] KVM: VMX: Set host constant supervisor states to VMCS fields
+Date: Tue,  9 Sep 2025 02:39:45 -0700
+Message-ID: <20250909093953.202028-15-chao.gao@intel.com>
 X-Mailer: git-send-email 2.47.3
 In-Reply-To: <20250909093953.202028-1-chao.gao@intel.com>
 References: <20250909093953.202028-1-chao.gao@intel.com>
@@ -97,65 +97,113 @@ Content-Transfer-Encoding: 8bit
 
 From: Yang Weijiang <weijiang.yang@intel.com>
 
-Enable/disable CET MSRs interception per associated feature configuration.
+Save constant values to HOST_{S_CET,SSP,INTR_SSP_TABLE} field explicitly.
+Kernel IBT is supported and the setting in MSR_IA32_S_CET is static after
+post-boot(The exception is BIOS call case but vCPU thread never across it)
+and KVM doesn't need to refresh HOST_S_CET field before every VM-Enter/
+VM-Exit sequence.
 
-Pass through CET MSRs that are managed by XSAVE, as they cannot be
-intercepted without also intercepting XSAVE. However, intercepting XSAVE
-would likely cause unacceptable performance overhead.
-MSR_IA32_INT_SSP_TAB is not managed by XSAVE, so it is intercepted.
+Host supervisor shadow stack is not enabled now and SSP is not accessible
+to kernel mode, thus it's safe to set host IA32_INT_SSP_TAB/SSP VMCS field
+to 0s. When shadow stack is enabled for CPL3, SSP is reloaded from PL3_SSP
+before it exits to userspace. Check SDM Vol 2A/B Chapter 3/4 for SYSCALL/
+SYSRET/SYSENTER SYSEXIT/RDSSP/CALL etc.
 
-Note, this MSR design introduced an architectural limitation of SHSTK and
-IBT control for guest, i.e., when SHSTK is exposed, IBT is also available
-to guest from architectural perspective since IBT relies on subset of SHSTK
-relevant MSRs.
+Prevent KVM module loading if host supervisor shadow stack SHSTK_EN is set
+in MSR_IA32_S_CET as KVM cannot co-exit with it correctly.
 
 Suggested-by: Sean Christopherson <seanjc@google.com>
+Suggested-by: Chao Gao <chao.gao@intel.com>
 Signed-off-by: Yang Weijiang <weijiang.yang@intel.com>
+Reviewed-by: Maxim Levitsky <mlevitsk@redhat.com>
+Reviewed-by: Chao Gao <chao.gao@intel.com>
 Tested-by: Mathias Krause <minipli@grsecurity.net>
 Tested-by: John Allen <john.allen@amd.com>
 Tested-by: Rick Edgecombe <rick.p.edgecombe@intel.com>
 Signed-off-by: Chao Gao <chao.gao@intel.com>
 ---
- arch/x86/kvm/vmx/vmx.c | 19 +++++++++++++++++++
- 1 file changed, 19 insertions(+)
+ arch/x86/kvm/vmx/capabilities.h |  4 ++++
+ arch/x86/kvm/vmx/vmx.c          | 15 +++++++++++++++
+ arch/x86/kvm/x86.c              | 12 ++++++++++++
+ arch/x86/kvm/x86.h              |  1 +
+ 4 files changed, 32 insertions(+)
 
+diff --git a/arch/x86/kvm/vmx/capabilities.h b/arch/x86/kvm/vmx/capabilities.h
+index 5316c27f6099..7d290b2cb0f4 100644
+--- a/arch/x86/kvm/vmx/capabilities.h
++++ b/arch/x86/kvm/vmx/capabilities.h
+@@ -103,6 +103,10 @@ static inline bool cpu_has_load_perf_global_ctrl(void)
+ 	return vmcs_config.vmentry_ctrl & VM_ENTRY_LOAD_IA32_PERF_GLOBAL_CTRL;
+ }
+ 
++static inline bool cpu_has_load_cet_ctrl(void)
++{
++	return (vmcs_config.vmentry_ctrl & VM_ENTRY_LOAD_CET_STATE);
++}
+ static inline bool cpu_has_vmx_mpx(void)
+ {
+ 	return vmcs_config.vmentry_ctrl & VM_ENTRY_LOAD_BNDCFGS;
 diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
-index 22bd71bebfad..70f5a9e05cec 100644
+index 70f5a9e05cec..3430a17ecd23 100644
 --- a/arch/x86/kvm/vmx/vmx.c
 +++ b/arch/x86/kvm/vmx/vmx.c
-@@ -4102,6 +4102,8 @@ void pt_update_intercept_for_msr(struct kvm_vcpu *vcpu)
+@@ -4321,6 +4321,21 @@ void vmx_set_constant_host_state(struct vcpu_vmx *vmx)
  
- void vmx_recalc_msr_intercepts(struct kvm_vcpu *vcpu)
- {
-+	bool intercept;
+ 	if (cpu_has_load_ia32_efer())
+ 		vmcs_write64(HOST_IA32_EFER, kvm_host.efer);
 +
- 	if (!cpu_has_vmx_msr_bitmap())
- 		return;
++	/*
++	 * Supervisor shadow stack is not enabled on host side, i.e.,
++	 * host IA32_S_CET.SHSTK_EN bit is guaranteed to 0 now, per SDM
++	 * description(RDSSP instruction), SSP is not readable in CPL0,
++	 * so resetting the two registers to 0s at VM-Exit does no harm
++	 * to kernel execution. When execution flow exits to userspace,
++	 * SSP is reloaded from IA32_PL3_SSP. Check SDM Vol.2A/B Chapter
++	 * 3 and 4 for details.
++	 */
++	if (cpu_has_load_cet_ctrl()) {
++		vmcs_writel(HOST_S_CET, kvm_host.s_cet);
++		vmcs_writel(HOST_SSP, 0);
++		vmcs_writel(HOST_INTR_SSP_TABLE, 0);
++	}
+ }
  
-@@ -4147,6 +4149,23 @@ void vmx_recalc_msr_intercepts(struct kvm_vcpu *vcpu)
- 		vmx_set_intercept_for_msr(vcpu, MSR_IA32_FLUSH_CMD, MSR_TYPE_W,
- 					  !guest_cpu_cap_has(vcpu, X86_FEATURE_FLUSH_L1D));
+ void set_cr4_guest_host_mask(struct vcpu_vmx *vmx)
+diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+index 79861b7ad44d..d67aef261638 100644
+--- a/arch/x86/kvm/x86.c
++++ b/arch/x86/kvm/x86.c
+@@ -9890,6 +9890,18 @@ int kvm_x86_vendor_init(struct kvm_x86_init_ops *ops)
+ 		return -EIO;
+ 	}
  
-+	if (kvm_cpu_cap_has(X86_FEATURE_SHSTK)) {
-+		intercept = !guest_cpu_cap_has(vcpu, X86_FEATURE_SHSTK);
-+
-+		vmx_set_intercept_for_msr(vcpu, MSR_IA32_PL0_SSP, MSR_TYPE_RW, intercept);
-+		vmx_set_intercept_for_msr(vcpu, MSR_IA32_PL1_SSP, MSR_TYPE_RW, intercept);
-+		vmx_set_intercept_for_msr(vcpu, MSR_IA32_PL2_SSP, MSR_TYPE_RW, intercept);
-+		vmx_set_intercept_for_msr(vcpu, MSR_IA32_PL3_SSP, MSR_TYPE_RW, intercept);
++	if (boot_cpu_has(X86_FEATURE_SHSTK)) {
++		rdmsrq(MSR_IA32_S_CET, kvm_host.s_cet);
++		/*
++		 * Linux doesn't yet support supervisor shadow stacks (SSS), so
++		 * KVM doesn't save/restore the associated MSRs, i.e. KVM may
++		 * clobber the host values.  Yell and refuse to load if SSS is
++		 * unexpectedly enabled, e.g. to avoid crashing the host.
++		 */
++		if (WARN_ON_ONCE(kvm_host.s_cet & CET_SHSTK_EN))
++			return -EIO;
 +	}
 +
-+	if (kvm_cpu_cap_has(X86_FEATURE_SHSTK) || kvm_cpu_cap_has(X86_FEATURE_IBT)) {
-+		intercept = !guest_cpu_cap_has(vcpu, X86_FEATURE_IBT) &&
-+			    !guest_cpu_cap_has(vcpu, X86_FEATURE_SHSTK);
-+
-+		vmx_set_intercept_for_msr(vcpu, MSR_IA32_U_CET, MSR_TYPE_RW, intercept);
-+		vmx_set_intercept_for_msr(vcpu, MSR_IA32_S_CET, MSR_TYPE_RW, intercept);
-+	}
-+
- 	/*
- 	 * x2APIC and LBR MSR intercepts are modified on-demand and cannot be
- 	 * filtered by userspace.
+ 	memset(&kvm_caps, 0, sizeof(kvm_caps));
+ 
+ 	x86_emulator_cache = kvm_alloc_emulator_cache();
+diff --git a/arch/x86/kvm/x86.h b/arch/x86/kvm/x86.h
+index 95d2a82a4674..3da60b046ce8 100644
+--- a/arch/x86/kvm/x86.h
++++ b/arch/x86/kvm/x86.h
+@@ -50,6 +50,7 @@ struct kvm_host_values {
+ 	u64 efer;
+ 	u64 xcr0;
+ 	u64 xss;
++	u64 s_cet;
+ 	u64 arch_capabilities;
+ };
+ 
 -- 
 2.47.3
 
