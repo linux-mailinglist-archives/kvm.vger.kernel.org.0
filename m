@@ -1,86 +1,86 @@
-Return-Path: <kvm+bounces-57047-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-57048-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 924BCB4A117
-	for <lists+kvm@lfdr.de>; Tue,  9 Sep 2025 07:02:39 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id A2135B4A119
+	for <lists+kvm@lfdr.de>; Tue,  9 Sep 2025 07:04:33 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4D6C53B5DB8
-	for <lists+kvm@lfdr.de>; Tue,  9 Sep 2025 05:02:38 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4E4973B5119
+	for <lists+kvm@lfdr.de>; Tue,  9 Sep 2025 05:04:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7CBD92EC0B4;
-	Tue,  9 Sep 2025 05:02:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 45CAF2EBB89;
+	Tue,  9 Sep 2025 05:04:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="HzPK/b6z"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="eSm37yw9"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 12AD3147C9B
-	for <kvm@vger.kernel.org>; Tue,  9 Sep 2025 05:02:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F2E56147C9B
+	for <kvm@vger.kernel.org>; Tue,  9 Sep 2025 05:04:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757394150; cv=none; b=amPIwyl86M9inc9KNdW/iqeEqTJD3k0ngy8JSnPXsOs1USvk7vP1YwTF1QyJcY8Q9HWR5dx0evX9WvjrLzCqaleCU9qjgAm2h/DSu4DBYBxdi1i/xSrke/G/oqCoutA0fpPktxzCIPG+QuE3hXBrY53OilTxGjVTbAO2Ub1sog0=
+	t=1757394265; cv=none; b=of4Af0ZfUBEoFAt2zxBQKVUMkfVENySqh46lFx8H11SMC+VdlDmxSmOTy+AxOpTJ0CbPrIeJ0LhOcCQ+lP7XXWjlkWALDUzUPuG0tbVmjZcbVw6/axcjogozHrDFsZy4NqvFOZAMuBdKiAQ5kRlhUtl7dofZBa9ylFyO3yS+Fxw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757394150; c=relaxed/simple;
-	bh=gXv5DczA8BHmj10ljecAUFcrTfjIfTSGoxbnbtpszVY=;
+	s=arc-20240116; t=1757394265; c=relaxed/simple;
+	bh=WRKEjVB88UyDSuQnn2M8CsE1PKosjlo1Gos8s6oIScU=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=UtVQ6KUKW/u59yOAz6cba/3pEjVnp0mbQXJGZ9YS/vYKSmyOESR+qjwbfW8upcZnMtRVE4B0PS+7H7eHmMJDx9IWSFpTuiupXPiADPoEX0Fxo7jVdizGr8lrdS5h5CPpybcgKx68R05uiP6aaOQxFHhzDCZwh7BTRxgl4uCWvhg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=HzPK/b6z; arc=none smtp.client-ip=170.10.129.124
+	 In-Reply-To:Content-Type; b=rurwWaXjBQHiPEXwdhHCPH3R85whcRGvrTbzU+cnrFwz9dJT/3GeBBQgpOosUwCi+8XzSBBPkQrP4JMZiqJdIm/+kYRRMl+QK1ROcY8+r7CpqpJoQcvK2akR56y3BHeAXc9tq7PQqFphQtSfQHjtGHJQIZRA3sL6QtdY5YQjwKw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=eSm37yw9; arc=none smtp.client-ip=170.10.133.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1757394148;
+	s=mimecast20190719; t=1757394262;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=wCS+GXo7l3jWjrg5Bypd/akHpCsecj9WSjxZu9TyHkQ=;
-	b=HzPK/b6zVWclVq8lLRfCwxg6hhjd/4vafpj5ADCJIhmN+6o1sE4zlqxtH1UvdA0sSuTyCC
-	K/lnNQSVkYA2cTDlhDcitdlVllqTep+FvFUvnAyJ+BPRUgKDRKmb6aqZfdo8+J5pWgUUJc
-	droK6bNoKNPHeNmizeYCMQKcgvnukEM=
-Received: from mail-qv1-f71.google.com (mail-qv1-f71.google.com
- [209.85.219.71]) by relay.mimecast.com with ESMTP with STARTTLS
+	bh=Wr2ePTIKgu+dXGPmYEIQm5pOk8ImaQGQj8O0LKwZ6pU=;
+	b=eSm37yw9NOpsyoundLVopN2CaT50Q0JxrKMxqrSx5VTjO5ldAcrQsD0BAO4S2/sCL2lI6r
+	FUYXXE9kALTPlS6190Ed1ic3fAlXRQZUxsxqgDhRJRtV2ChfHbLJwiPlvJB4454wJ+B4dM
+	lMUEEWNp7a0uuTzQ5EZFsILV6SAIoSk=
+Received: from mail-qk1-f200.google.com (mail-qk1-f200.google.com
+ [209.85.222.200]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-601-sZUgpMbjOnuYDNs-M9qXYg-1; Tue, 09 Sep 2025 01:02:27 -0400
-X-MC-Unique: sZUgpMbjOnuYDNs-M9qXYg-1
-X-Mimecast-MFC-AGG-ID: sZUgpMbjOnuYDNs-M9qXYg_1757394146
-Received: by mail-qv1-f71.google.com with SMTP id 6a1803df08f44-71ffd145fa9so154779096d6.2
-        for <kvm@vger.kernel.org>; Mon, 08 Sep 2025 22:02:27 -0700 (PDT)
+ us-mta-424-Qf2XM5-vPOu5AXRGJ-1Cww-1; Tue, 09 Sep 2025 01:04:21 -0400
+X-MC-Unique: Qf2XM5-vPOu5AXRGJ-1Cww-1
+X-Mimecast-MFC-AGG-ID: Qf2XM5-vPOu5AXRGJ-1Cww_1757394260
+Received: by mail-qk1-f200.google.com with SMTP id af79cd13be357-81b8e3e29edso56483885a.0
+        for <kvm@vger.kernel.org>; Mon, 08 Sep 2025 22:04:21 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1757394146; x=1757998946;
+        d=1e100.net; s=20230601; t=1757394260; x=1757999060;
         h=content-transfer-encoding:in-reply-to:from:references:cc:to
          :content-language:subject:user-agent:mime-version:date:message-id
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=wCS+GXo7l3jWjrg5Bypd/akHpCsecj9WSjxZu9TyHkQ=;
-        b=QIq/EaP+CusPuSvx05vDkIEDlvhpFRdRb2XeqaIroivdZ4PY9Y3iNGLD2vB9H2oepb
-         R/hTtYyBTm97Vt/L+mnJzd6Iu84QSGRjrAXouN4mxi7RbJrWU/vSgcmIUlqfWUInQmdx
-         GqwpB3QTWUq6NCQMCil/1bA1rzVwn6bHesqFlY9W0aWZBhxmiN+P2vFRmQ9lj1jmnSO/
-         T+6d7ckQIqoZZXlggdKH75qBCtMKZ2dKu1ypwqn4JsEaMuGT+VMHJD9s3fp55GDF5y58
-         tlUJZbepk+0tJJouPPo0Xm4SpvrfQ2xaaNFjHgNx/KVHtE1trO5S6fl5U0qUsE9kQl03
-         p9xg==
-X-Forwarded-Encrypted: i=1; AJvYcCUIS5evMeqkoxb85D+8gTEnVNM+TnIG5vl34q3NC3ZLIG0+I+cqFUdO71cIQAfjt20NlPs=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzoTQTA2icXKisut4THMgmXVCT6FtAm/AfAU/qUJZd5Ku+ALSdE
-	hZ/7+ijKfNhpxM2MaHrJ/OWCpl1gfdJ5irQ7cDKcXYIAEw23gOWSuGKjBvk3G/jWau9uWQ5seBH
-	vhpC1CIvCbY3uoEuD1FXCXEKJFVPy3vFgHaJOwJpHvxs+mcBXmcrDHA==
-X-Gm-Gg: ASbGnctksoNwHFVvN41zlh9/EG0Ushhh+v/I9hCCs9Ki6nJOcOf0WkEoKiLKgFfbolu
-	hXWZ8E9ARpnqtiZWxSpXoMwk003XgyX2k0eu1alakK/E8aCwYDvCK+l2L7PTdNBm18EQ/DDH5uw
-	v4MwGDPYdsAC/rA+7d6X+cO4hl+hCd2i45l/2o4b56jTeFO6RqWqV80P6ABEG1bquavaemc06Go
-	fiCCWHaiXIp5ARpnNNRwxxcos/Tp80U9gtTWU+i4hHrerXWU5/vk8yVMFVMIbA+kUofuw4J/qfY
-	y94Vi3NBRaNVMFtx+gSc+joJrQmb/h/4y50JlsW/
-X-Received: by 2002:a05:6214:2a4a:b0:720:4a66:d3e6 with SMTP id 6a1803df08f44-739315968ddmr121084156d6.21.1757394146398;
-        Mon, 08 Sep 2025 22:02:26 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IHn85npmWzjIJW0hynDE6Mpm3rDqP/qRIIKt5rOWGiYhcWvV1gB7Jh1a3RQQxtStWY9TJrKrg==
-X-Received: by 2002:a05:6214:2a4a:b0:720:4a66:d3e6 with SMTP id 6a1803df08f44-739315968ddmr121083966d6.21.1757394146035;
-        Mon, 08 Sep 2025 22:02:26 -0700 (PDT)
+        bh=Wr2ePTIKgu+dXGPmYEIQm5pOk8ImaQGQj8O0LKwZ6pU=;
+        b=mA4/4VQgiI6nZKEtP42UpC+qVqusNfpEBkanIi2bVQa6D5o6/8GG8dFwx+L7VGF0JU
+         yWX/X+HE1gBwdpGPyD2mJldZa+q80ojoulHBh2BJ9pHZF9wDygW2VTCPu6rOocd4lC3h
+         iNe1IOmKJqAI5TuTUex9zfkBn5ilepvQzS1UtOBE0oqAsMTNfohBg19uxRjluqxnzfrt
+         dd3bfeCBZkYDS0Bxbu+aEYkq8LR2JEV9PPKKn98VC8hiO0rmzFlwIUJVeTn7Kz7FTMoL
+         Mm+aj8OLiniREewbCSXXG4wW1IA4M1a9D85uHTbo16Wm3YpyxdyhgbSNuqFYamnmTxnf
+         cOsw==
+X-Forwarded-Encrypted: i=1; AJvYcCUyJYJNcSjKCBsbc6TVe+OUG4UU3gSW3653AKHcCfBVe9lPMttM6/ynjrw8SXhhCCGWu3w=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwcBICIqIpi34RflnOtieCnuWBTI5EYD1k76YP+uo2wm5QoRfUD
+	4e18u776x8SJdOSV2n1R1bcx3Q/vDFmOD5Jgc3hJkI2PLIIfGDM3jfW9tprKBFx0622m22aVFaT
+	dlFQKq8lTIQVny4IwZIni/xUmLFxiHn9TKxABnei43R2ISqvK3Ji7Kw==
+X-Gm-Gg: ASbGncsAAPX+7dju12w0Qi8dCCcCeY9hUTKfO9ZC19IHFiwCN2EbhQSv1RMwSLV7j4X
+	GrltIJ/jXtLGfJyOppjfzKUPmbigJcqtVogQ0YuI1CaSZp4opXfUJYKwzP9DYcCqzL3fCRbNbZ9
+	lRRTXD6Wg8/jx6v30Csad6A/+bIIlMrc6++FBViN95MUC0PbYILTzp8AJHvKLKOlzQwZo68GJJt
+	1bJb4akbEQVutLSVDXjMPnyKrSBUtdhhC7XZEGWaI15WT4tMP37SoNj79Rz45Y8zHa/8Wnb7ZWG
+	wLGFwpZDqMgBRuzHDKtvNsxkhh1CuJQHU3mPTw9y
+X-Received: by 2002:a05:620a:4049:b0:7e6:9a11:f0c8 with SMTP id af79cd13be357-813beffa169mr1079399285a.21.1757394260364;
+        Mon, 08 Sep 2025 22:04:20 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IG+4M9jnqZ7XEtL8iNZFr7DfeWbk4fN2cPgrooLCIHf05hyNRzqCDxbOlnIixcIpPme44IWnw==
+X-Received: by 2002:a05:620a:4049:b0:7e6:9a11:f0c8 with SMTP id af79cd13be357-813beffa169mr1079397285a.21.1757394259952;
+        Mon, 08 Sep 2025 22:04:19 -0700 (PDT)
 Received: from [192.168.40.164] ([70.105.235.240])
-        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-725dda254d4sm118146646d6.8.2025.09.08.22.02.24
+        by smtp.gmail.com with ESMTPSA id af79cd13be357-81b58c51dacsm64417585a.12.2025.09.08.22.04.18
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 08 Sep 2025 22:02:25 -0700 (PDT)
-Message-ID: <d5875eab-2c69-4e50-9b11-27d6a77c4db3@redhat.com>
-Date: Tue, 9 Sep 2025 01:02:23 -0400
+        Mon, 08 Sep 2025 22:04:19 -0700 (PDT)
+Message-ID: <b71c7500-3e1b-491b-8cf0-989401bc6795@redhat.com>
+Date: Tue, 9 Sep 2025 01:04:17 -0400
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -88,8 +88,8 @@ List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v3 10/11] PCI: Check ACS DSP/USP redirect bits in
- pci_enable_pasid()
+Subject: Re: [PATCH v3 11/11] PCI: Check ACS Extended flags for
+ pci_bus_isolated()
 Content-Language: en-US
 To: Jason Gunthorpe <jgg@nvidia.com>, Bjorn Helgaas <bhelgaas@google.com>,
  iommu@lists.linux.dev, Joerg Roedel <joro@8bytes.org>,
@@ -99,146 +99,74 @@ Cc: Alex Williamson <alex.williamson@redhat.com>,
  Lu Baolu <baolu.lu@linux.intel.com>, galshalom@nvidia.com,
  Joerg Roedel <jroedel@suse.de>, Kevin Tian <kevin.tian@intel.com>,
  kvm@vger.kernel.org, maorg@nvidia.com, patches@lists.linux.dev,
- tdave@nvidia.com, Tony Zhu <tony.zhu@intel.com>
-References: <10-v3-8827cc7fc4e0+23f-pcie_switch_groups_jgg@nvidia.com>
+ tdave@nvidia.com
+References: <11-v3-8827cc7fc4e0+23f-pcie_switch_groups_jgg@nvidia.com>
 From: Donald Dutile <ddutile@redhat.com>
-In-Reply-To: <10-v3-8827cc7fc4e0+23f-pcie_switch_groups_jgg@nvidia.com>
+In-Reply-To: <11-v3-8827cc7fc4e0+23f-pcie_switch_groups_jgg@nvidia.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 
 
 
 On 9/5/25 2:06 PM, Jason Gunthorpe wrote:
-> Switches ignore the PASID when routing TLPs. This means the path from the
-> PASID issuing end point to the IOMMU must be direct with no possibility
-> for another device to claim the addresses.
+> When looking at a PCIe switch we want to see that the USP/DSP MMIO have
+> request redirect enabled. Detect the case where the USP is expressly not
+> isolated from the DSP and ensure the USP is included in the group.
 > 
-> This is done using ACS flags and pci_enable_pasid() checks for this.
+> The DSP Memory Target also applies to the Root Port, check it there
+> too. If upstream directed transactions can reach the root port MMIO then
+> it is not isolated.
 > 
-> The new ACS Enhanced bits clarify some undefined behaviors in the spec
-> around what P2P Request Redirect means.
-> 
-> Linux has long assumed that PCI_ACS_RR implies PCI_ACS_DSP_MT_RR |
-> PCI_ACS_USP_MT_RR | PCI_ACS_UNCLAIMED_RR.
-> 
-> If the device supports ACS Enhanced then use the information it reports to
-> determine if PASID SVA is supported or not.
-> 
->   PCI_ACS_DSP_MT_RR: Prevents Downstream Port BAR's from claiming upstream
->                      flowing transactions
-> 
->   PCI_ACS_USP_MT_RR: Prevents Upstream Port BAR's from claiming upstream
->                      flowing transactions
-> 
->   PCI_ACS_UNCLAIMED_RR: Prevents a hole in the USP bridge window compared
->                         to all the DSP bridge windows from generating a
->                         error.
-> 
-> Each of these cases would poke a hole in the PASID address space which is
-> not permitted.
-> 
-> Enhance the comments around pci_acs_flags_enabled() to better explain the
-> reasoning for its logic. Continue to take the approach of assuming the
-> device is doing the "right ACS" if it does not explicitly declare
-> otherwise.
-> 
-> Fixes: 201007ef707a ("PCI: Enable PASID only when ACS RR & UF enabled on upstream path")
 > Signed-off-by: Jason Gunthorpe <jgg@nvidia.com>
 > ---
->   drivers/pci/ats.c |  4 +++-
->   drivers/pci/pci.c | 54 +++++++++++++++++++++++++++++++++++++++++------
->   2 files changed, 50 insertions(+), 8 deletions(-)
+>   drivers/pci/search.c | 16 +++++++++++++---
+>   1 file changed, 13 insertions(+), 3 deletions(-)
 > 
-> diff --git a/drivers/pci/ats.c b/drivers/pci/ats.c
-> index ec6c8dbdc5e9c9..00603c2c4ff0ea 100644
-> --- a/drivers/pci/ats.c
-> +++ b/drivers/pci/ats.c
-> @@ -416,7 +416,9 @@ int pci_enable_pasid(struct pci_dev *pdev, int features)
->   	if (!pasid)
->   		return -EINVAL;
+> diff --git a/drivers/pci/search.c b/drivers/pci/search.c
+> index dac6b042fd5f5d..cba417cbe3476e 100644
+> --- a/drivers/pci/search.c
+> +++ b/drivers/pci/search.c
+> @@ -127,6 +127,8 @@ static enum pci_bus_isolation pcie_switch_isolated(struct pci_bus *bus)
+>   	 * traffic flowing upstream back downstream through another DSP.
+>   	 *
+>   	 * Thus any non-permissive DSP spoils the whole bus.
+> +	 * PCI_ACS_UNCLAIMED_RR is not required since rejecting requests with
+> +	 * error is still isolation.
+>   	 */
+>   	guard(rwsem_read)(&pci_bus_sem);
+>   	list_for_each_entry(pdev, &bus->devices, bus_list) {
+> @@ -136,8 +138,14 @@ static enum pci_bus_isolation pcie_switch_isolated(struct pci_bus *bus)
+>   		    pdev->dma_alias_mask)
+>   			return PCIE_NON_ISOLATED;
 >   
-> -	if (!pci_acs_path_enabled(pdev, NULL, PCI_ACS_RR | PCI_ACS_UF))
-> +	if (!pci_acs_path_enabled(pdev, NULL,
-> +				  PCI_ACS_RR | PCI_ACS_UF | PCI_ACS_USP_MT_RR |
-> +				  PCI_ACS_DSP_MT_RR | PCI_ACS_UNCLAIMED_RR))
->   		return -EINVAL;
->   
->   	pci_read_config_word(pdev, pasid + PCI_PASID_CAP, &supported);
-> diff --git a/drivers/pci/pci.c b/drivers/pci/pci.c
-> index 983f71211f0055..620b7f79093854 100644
-> --- a/drivers/pci/pci.c
-> +++ b/drivers/pci/pci.c
-> @@ -3606,6 +3606,52 @@ void pci_configure_ari(struct pci_dev *dev)
+> -		if (!pci_acs_enabled(pdev, PCI_ACS_ISOLATED))
+> +		if (!pci_acs_enabled(pdev, PCI_ACS_ISOLATED |
+> +						   PCI_ACS_DSP_MT_RR |
+> +						   PCI_ACS_USP_MT_RR)) {
+> +			/* The USP is isolated from the DSP */
+> +			if (!pci_acs_enabled(pdev, PCI_ACS_USP_MT_RR))
+> +				return PCIE_NON_ISOLATED;
+>   			return PCIE_SWITCH_DSP_NON_ISOLATED;
+> +		}
 >   	}
+>   	return PCIE_ISOLATED;
 >   }
+> @@ -232,11 +240,13 @@ enum pci_bus_isolation pci_bus_isolated(struct pci_bus *bus)
+>   	/*
+>   	 * Since PCIe links are point to point root ports are isolated if there
+>   	 * is no internal loopback to the root port's MMIO. Like MFDs assume if
+> -	 * there is no ACS cap then there is no loopback.
+> +	 * there is no ACS cap then there is no loopback. The root port uses
+> +	 * DSP_MT_RR for its own MMIO.
+>   	 */
+>   	case PCI_EXP_TYPE_ROOT_PORT:
+>   		if (bridge->acs_cap &&
+> -		    !pci_acs_enabled(bridge, PCI_ACS_ISOLATED))
+> +		    !pci_acs_enabled(bridge,
+> +				     PCI_ACS_ISOLATED | PCI_ACS_DSP_MT_RR))
+>   			return PCIE_NON_ISOLATED;
+>   		return PCIE_ISOLATED;
 >   
-> +
-> +/*
-> + * The spec is not clear what it means if the capability bit is 0. One view is
-> + * that the device acts as though the ctrl bit is zero, another view is the
-> + * device behavior is undefined.
-> + *
-> + * Historically Linux has taken the position that the capability bit as 0 means
-> + * the device supports the most favorable interpretation of the spec - ie that
-> + * things like P2P RR are always on. As this is security sensitive we expect
-> + * devices that do not follow this rule to be quirked.
-> + *
-> + * ACS Enhanced eliminated undefined areas of the spec around MMIO in root ports
-> + * and switch ports. If those ports have no MMIO then it is not relavent.
-> + * PCI_ACS_UNCLAIMED_RR eliminates the undefined area around an upstream switch
-> + * window that is not fully decoded by the downstream windows.
-> + *
-> + * This takes the same approach with ACS Enhanced, if the device does not
-> + * support it then we assume the ACS P2P RR has all the enhanced behaviors too.
-> + *
-> + * Due to ACS Enhanced bits being force set to 0 by older Linux kernels, and
-> + * those values would break old kernels on the edge cases they cover, the only
-> + * compatible thing for a new device to implement is ACS Enhanced supported with
-> + * the control bits (except PCI_ACS_IORB) wired to follow ACS_RR.
-> + */
-> +static u16 pci_acs_ctrl_mask(struct pci_dev *pdev, u16 hw_cap)
-> +{
-> +	/*
-> +	 * Egress Control enables use of the Egress Control Vector which is not
-> +	 * present without the cap.
-> +	 */
-> +	u16 mask = PCI_ACS_EC;
-> +
-> +	mask = hw_cap & (PCI_ACS_SV | PCI_ACS_TB | PCI_ACS_RR |
-> +				      PCI_ACS_CR | PCI_ACS_UF | PCI_ACS_DT);
-> +
-> +	/*
-> +	 * If ACS Enhanced is supported the device reports what it is doing
-> +	 * through these bits which may not be settable.
-> +	 */
-> +	if (hw_cap & PCI_ACS_ENHANCED)
-> +		mask |= PCI_ACS_IORB | PCI_ACS_DSP_MT_RB | PCI_ACS_DSP_MT_RR |
-> +			PCI_ACS_USP_MT_RB | PCI_ACS_USP_MT_RR |
-> +			PCI_ACS_UNCLAIMED_RR;
-> +	return mask;
-> +}
-> +
->   static bool pci_acs_flags_enabled(struct pci_dev *pdev, u16 acs_flags)
->   {
->   	int pos;
-> @@ -3615,15 +3661,9 @@ static bool pci_acs_flags_enabled(struct pci_dev *pdev, u16 acs_flags)
->   	if (!pos)
->   		return false;
->   
-> -	/*
-> -	 * Except for egress control, capabilities are either required
-> -	 * or only required if controllable.  Features missing from the
-> -	 * capability field can therefore be assumed as hard-wired enabled.
-> -	 */
->   	pci_read_config_word(pdev, pos + PCI_ACS_CAP, &cap);
-> -	acs_flags &= (cap | PCI_ACS_EC);
-> -
->   	pci_read_config_word(pdev, pos + PCI_ACS_CTRL, &ctrl);
-> +	acs_flags &= pci_acs_ctrl_mask(pdev, cap);
->   	return (ctrl & acs_flags) == acs_flags;
->   }
->   
-
 Reviewed-by: Donald Dutile <ddutile@redhat.com>
 
 
