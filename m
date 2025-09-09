@@ -1,113 +1,165 @@
-Return-Path: <kvm+bounces-57108-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-57109-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6794FB4FE14
-	for <lists+kvm@lfdr.de>; Tue,  9 Sep 2025 15:51:14 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0DE04B4FE91
+	for <lists+kvm@lfdr.de>; Tue,  9 Sep 2025 16:02:46 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id BFFD44E4884
-	for <lists+kvm@lfdr.de>; Tue,  9 Sep 2025 13:45:53 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C065A5E1D83
+	for <lists+kvm@lfdr.de>; Tue,  9 Sep 2025 14:02:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 08E6234A331;
-	Tue,  9 Sep 2025 13:45:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 45470229B38;
+	Tue,  9 Sep 2025 14:02:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="J0s6bTjR"
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="Fvu5U9WH"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pj1-f73.google.com (mail-pj1-f73.google.com [209.85.216.73])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C5A6E3431FF
-	for <kvm@vger.kernel.org>; Tue,  9 Sep 2025 13:45:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.73
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E672C22F77E
+	for <kvm@vger.kernel.org>; Tue,  9 Sep 2025 14:02:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757425508; cv=none; b=lkGPHaYynh8ZPtgerM9fb5RH03LY81R0D875LVX85VGcKisPDbqYxgn5vsLHo7ZjVBOhBMOEgbveLhkeuu62zMvjGRl8x2UJEZzZmlG3ugOq1EzeyjThYFmu0KaooiBVPtME7HgR21qDgMHQ8gntbVxZ2iUn0/WZOwXVOpYRbmo=
+	t=1757426554; cv=none; b=SM4DczmoESujNXke4RMoJboclvdf3VrdvgvX2BVj1QS30ydYsp9C2tBbgrcuIbWbwBg8mwC7MP2y5QNsmU/qJPWZhYUK4TyGgAxSd8+mLwlpBWhshQD5iD3037WG0GwkkK22LEX+ibd4KtLG3DWWdPeRx5ORGPrAZaiwa6JYj98=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757425508; c=relaxed/simple;
-	bh=ENKhO7lmiNhb5G2bgE6pBOiTO7AJKt6gqD/IBN4lWwo=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=KVALYaonxenClUsvgVUBB5R8Baa5PnCmTVxRo7X4QXo1RS8X2ZiOIec2/7X+FBV2qV62eZGJUXdN6zPlq62azDESPokZCy+6n2e4+7s2D0IA0y/nI07w9jv1yBqETHb8S5KeTcUmvSqno1+ACcLUAyPnYFAVDN/OdUGm4G481Vw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=J0s6bTjR; arc=none smtp.client-ip=209.85.216.73
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pj1-f73.google.com with SMTP id 98e67ed59e1d1-32da1357bf2so1752981a91.1
-        for <kvm@vger.kernel.org>; Tue, 09 Sep 2025 06:45:06 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1757425506; x=1758030306; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=qn2zi/7J+iyg494tdy2kZv2JyMDDtFbWj2UOTuXwNmc=;
-        b=J0s6bTjROjAa53Z/tjnirkmc7nuXaug92EFC9VkbCQQCSXEhI3irkesCNGbOsBj1sh
-         gswK/pBMtHbtxzKe5ID3mF7ix8GH8K36/3h4ObyucwxYdYvdk+d+Q8JOBSlCxzLe3ynl
-         DuvsrWjeFbJDUmppcBHNMcDeE9xLuBJRvnRyj1XKLzwJZV7I5Zw4TBj0csZexv8qKGTp
-         QSYMsDdgGikYNT6wbz7kQuRQbsmTeFS/h/W5khGL9HqQgbsmklUpeWZ6fz/N5TD4v0Mu
-         uS/sH2AZFivDTOUAp5K8X4iQIqmhB0Zcyu/qJp0fBtUQkRVTqV/tvZ7uRNqJevBnxp2R
-         W59g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1757425506; x=1758030306;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=qn2zi/7J+iyg494tdy2kZv2JyMDDtFbWj2UOTuXwNmc=;
-        b=gnsEKpW7MonkOb+2bmdtixZzKwN6JNFumXIMh6XUnL37fI8L0Wc+yfwQIbKxSXF3uo
-         yPVR5mSr2iMYa51a9z/YLKGHuqC8D0hQOibQxv3KhJwQkPNc/EE2MwmMjRoOSuYWFEEO
-         Wkmye65LkTgqI7RMuQnEy7ZkYZUkbNGhSiymf4G5V2qLs3ZDJFJxFuV8i/8wIbYf63ol
-         473m+N7ICRx2se20JIzXKImJqfXFLWEqb41gY2rYSjHwqsCSaiNpzTbTKFSyWaTZmLay
-         1uiPOP9YbEAZqTsnLJwZEOVY041ST6ylDWopDv/icFDpd6e/jVsdloM33sRqjv36x1Hn
-         OaFA==
-X-Forwarded-Encrypted: i=1; AJvYcCVjTfKSaVuTKT49BXjAf1qTLJJWPGpIN0blZw0uzTf/I4dE+6jZJw2wdd2b77FAYXtFaKM=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yxr0Re3jWUHnEeGc7iSggFXU+4UOYsy6R3IH5ne6BuoMPTnemnI
-	Ht8xZEeDfiqVnE4isGL/QGSzwwbEPhmAejI/p5j5Is9DvOh7D/dPfwmg3F7qCL1xmXnKdeYtRBL
-	eS1fDEA==
-X-Google-Smtp-Source: AGHT+IEiKctnxhjATdRdSheVFoKSsBIIFr/SPSqQTp8ZU+FER3+ZY1kRQ08tw8vcuWl7ATgmdnFngXHPK/o=
-X-Received: from pjyd8.prod.google.com ([2002:a17:90a:dfc8:b0:325:8e70:8d5e])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:3fc8:b0:328:a89:3dc8
- with SMTP id 98e67ed59e1d1-32d43f19a21mr14704499a91.14.1757425505993; Tue, 09
- Sep 2025 06:45:05 -0700 (PDT)
-Date: Tue, 9 Sep 2025 06:45:04 -0700
-In-Reply-To: <aMAKBUAD-fdJBhOD@tlindgre-MOBL1>
+	s=arc-20240116; t=1757426554; c=relaxed/simple;
+	bh=G1dPPDxJXLZo8fMZuEE7FGykyGE8FBrH9KLefb2wg/s=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=rAi8xWUm6sCD5jvlEN1ifJPdzeR1Fa/Sp3qzA0btvpgkwQIrv/5Bxlj651ePCeWHl8J+YoCpURMVpnMgVQ6w15C5xtCLl4dJz+e9qMYFPB9rQkasp4cib4ccpfKL2IkPoC6BVAeiTreZqwPgQq+SGWq2DmFkpknjthiNxRpK7/s=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=Fvu5U9WH; arc=none smtp.client-ip=148.163.156.1
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
+Received: from pps.filterd (m0353729.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 5896qZJc022621;
+	Tue, 9 Sep 2025 14:02:25 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
+	:content-transfer-encoding:content-type:date:from:in-reply-to
+	:message-id:mime-version:references:subject:to; s=pp1; bh=x5cSmE
+	2GiowbYIIxGD1VOGSOplzrFRBCQcKij5HxouU=; b=Fvu5U9WHty6h08lgYJzxdQ
+	zYjHjbptz8GENbRw5Qrke6cwMkvKAGMSvmPDe+w4rn9bGnS0zPKqTm2GdXNEW/Qd
+	0j5VvYnh7IKzB1H66pnf6P6QulPBqE0/cOHFGBqScXQuOgKJ43i5zG0UHV8OzRSk
+	6Q5176D9Szp7yN2tHLLLkVNNwg7MJKfJ91HnCUrois4lWfjydtASn/KNUWAIrkgs
+	KRvZbMItkpd9CPAGl4xuoq6qCYHcNKjZCwnU0KTeAkH7x5DrwlA/TUt6m7qJbTqf
+	Nl7Qvhagvd5OjHT6mw/mE1jkeFVBC1vOY1M7oxvJ/WgmZtT2g9yk+u2Y2k+CDS1A
+	==
+Received: from ppma12.dal12v.mail.ibm.com (dc.9e.1632.ip4.static.sl-reverse.com [50.22.158.220])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 490cmwr873-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Tue, 09 Sep 2025 14:02:25 +0000 (GMT)
+Received: from pps.filterd (ppma12.dal12v.mail.ibm.com [127.0.0.1])
+	by ppma12.dal12v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 589D9EEU011434;
+	Tue, 9 Sep 2025 14:02:23 GMT
+Received: from smtprelay04.fra02v.mail.ibm.com ([9.218.2.228])
+	by ppma12.dal12v.mail.ibm.com (PPS) with ESMTPS id 490y9ubpuh-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Tue, 09 Sep 2025 14:02:23 +0000
+Received: from smtpav05.fra02v.mail.ibm.com (smtpav05.fra02v.mail.ibm.com [10.20.54.104])
+	by smtprelay04.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 589E2JiA31982190
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Tue, 9 Sep 2025 14:02:20 GMT
+Received: from smtpav05.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id D4DE120040;
+	Tue,  9 Sep 2025 14:02:19 +0000 (GMT)
+Received: from smtpav05.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 850CA2004D;
+	Tue,  9 Sep 2025 14:02:19 +0000 (GMT)
+Received: from p-imbrenda (unknown [9.111.75.184])
+	by smtpav05.fra02v.mail.ibm.com (Postfix) with SMTP;
+	Tue,  9 Sep 2025 14:02:19 +0000 (GMT)
+Date: Tue, 9 Sep 2025 15:49:08 +0200
+From: Claudio Imbrenda <imbrenda@linux.ibm.com>
+To: Thomas Huth <thuth@redhat.com>
+Cc: kvm@vger.kernel.org, Andrew Jones <andrew.jones@linux.dev>,
+        Janosch
+ Frank <frankja@linux.ibm.com>,
+        Nico =?UTF-8?B?QsO2aHI=?=
+ <nrb@linux.ibm.com>
+Subject: Re: [kvm-unit-tests PATCH v2] scripts/arch-run.bash: Drop the
+ dependency on "jq"
+Message-ID: <20250909154908.49943d59@p-imbrenda>
+In-Reply-To: <20250909045855.71512-1-thuth@redhat.com>
+References: <20250909045855.71512-1-thuth@redhat.com>
+Organization: IBM
+X-Mailer: Claws Mail 4.3.1 (GTK 3.24.49; x86_64-redhat-linux-gnu)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20250909101638.170135-1-tony.lindgren@linux.intel.com>
- <20e22c04918a34268c6aa93efc2950b2c9d3b377.camel@intel.com> <aMAKBUAD-fdJBhOD@tlindgre-MOBL1>
-Message-ID: <aMAvYIN7-6iqQNBt@google.com>
-Subject: Re: [PATCH 1/1] KVM: TDX: Fix uninitialized error code for __tdx_bringup()
-From: Sean Christopherson <seanjc@google.com>
-To: Tony Lindgren <tony.lindgren@linux.intel.com>
-Cc: Kai Huang <kai.huang@intel.com>, "pbonzini@redhat.com" <pbonzini@redhat.com>, 
-	Xiaoyao Li <xiaoyao.li@intel.com>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>, 
-	Rick P Edgecombe <rick.p.edgecombe@intel.com>, 
-	"dan.carpenter@linaro.org" <dan.carpenter@linaro.org>, 
-	"binbin.wu@linux.intel.com" <binbin.wu@linux.intel.com>, Isaku Yamahata <isaku.yamahata@intel.com>
-Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: LL5a0u_SGauvi1ZNrbbBgpFM9UYko3WS
+X-Proofpoint-ORIG-GUID: LL5a0u_SGauvi1ZNrbbBgpFM9UYko3WS
+X-Authority-Analysis: v=2.4 cv=J52q7BnS c=1 sm=1 tr=0 ts=68c03371 cx=c_pps
+ a=bLidbwmWQ0KltjZqbj+ezA==:117 a=bLidbwmWQ0KltjZqbj+ezA==:17
+ a=kj9zAlcOel0A:10 a=yJojWOMRYYMA:10 a=20KFwNOVAAAA:8 a=VnNF1IyMAAAA:8
+ a=i0M0ddQKDvQEzp8E9eUA:9 a=CjuIK1q_8ugA:10
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUwOTA2MDAyNSBTYWx0ZWRfXyXSJEzuqvbvS
+ 3xiQHjOO/6DUyz2fYr7MW3GxDYgWV0fNnZ4+b1wU5C+98rt6H/xQMr4ErZXW+8EN4I07xsADmut
+ Y9xnS3Is+cr2DKB7Q8cX9tmwKlbHiBKNKpFRnb2TpQj/6r7zOuW6eIJuu+sflfzo72F74uPbQF+
+ kCOy6aP/PaWhl5CrBE/nHbR5pXV2hmFcECRxuB6VJKxLMIq2DNVWgdNENixpVh07KXxBnVJJ+ka
+ bCG8dtCc5jPqUSTHtKo4ZsIyJUWkX9bIUDGetbdm0iR4tUdXbzshfGuqsfqMCu4UMWvfx4xdNe7
+ ge0z7MA1gSSd5Kp4zBc5+3jU2WdXhB6S7QDJnrDglaq6h/uAc877WfPeem7ER5XMUWacKiWkzAt
+ JkJEaLVI
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1117,Hydra:6.1.9,FMLib:17.12.80.40
+ definitions=2025-09-09_02,2025-09-08_02,2025-03-28_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ impostorscore=0 clxscore=1015 suspectscore=0 spamscore=0 phishscore=0
+ bulkscore=0 adultscore=0 malwarescore=0 priorityscore=1501
+ classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
+ reason=mlx scancount=1 engine=8.19.0-2507300000 definitions=main-2509060025
 
-On Tue, Sep 09, 2025, Tony Lindgren wrote:
-> On Tue, Sep 09, 2025 at 10:55:18AM +0000, Huang, Kai wrote:
-> > How about we just initialize r to -EINVAL once before tdx_get_sysinfo() so
-> > that all 'r = -EINVAL;' can be removed?  I think in this way the code
-> > would be simpler (see below diff [*])?
-> > 
-> > The "Fixes" tag would be hard to identify,
+On Tue,  9 Sep 2025 06:58:55 +0200
+Thomas Huth <thuth@redhat.com> wrote:
 
-No, Fixes always points at the commit(s) that introduced buggy behavior.  While
-one might argue that commit 61bb28279623 was set up to fail by earlier commits,
-that commit is unequivocally the one and only Fixes commit.
-
-> > though, because the diff
-> > touches the code introduced multiple commits.  But I am not sure whether
-> > this is a true issue since AFAICT we can use multiple "Fixes" tags.
+> From: Thomas Huth <thuth@redhat.com>
 > 
-> Your diff looks fine to me, however my personal preference would be to do
-> the fix first then clean-up :) 
+> For checking whether a panic event occurred, a simple "grep"
+> for the related text in the output is enough - it's very unlikely
+> that the output of QEMU will change. This way we can drop the
+> dependency on the program "jq" which might not be installed on
+> some systems.
+> 
+> Signed-off-by: Thomas Huth <thuth@redhat.com>
 
-Eh, fixes can also harden against similar failures in the future.  I don't see
-any reason to split this one up.  The buggy commit was introduced in v6.16 and
-Kai's suggestion applies cleanly there, so the more aggressive fix won't lead to
-stable@ conflicts either.
+Reviewed-by: Claudio Imbrenda <imbrenda@linux.ibm.com>
 
-In short, let's go straight to Kai's version.
+> ---
+>  v2: Change the regular expression according to Claudio's suggestion
+> 
+>  scripts/arch-run.bash | 8 +-------
+>  1 file changed, 1 insertion(+), 7 deletions(-)
+> 
+> diff --git a/scripts/arch-run.bash b/scripts/arch-run.bash
+> index 36222355..16417a1e 100644
+> --- a/scripts/arch-run.bash
+> +++ b/scripts/arch-run.bash
+> @@ -296,11 +296,6 @@ do_migration ()
+>  
+>  run_panic ()
+>  {
+> -	if ! command -v jq >/dev/null 2>&1; then
+> -		echo "${FUNCNAME[0]} needs jq" >&2
+> -		return 77
+> -	fi
+> -
+>  	trap 'trap - TERM ; kill 0 ; exit 2' INT TERM
+>  	trap 'rm -f ${qmp}.in ${qmp}.out' RETURN EXIT
+>  
+> @@ -312,8 +307,7 @@ run_panic ()
+>  		-mon chardev=mon,mode=control -S &
+>  	echo '{ "execute": "qmp_capabilities" }{ "execute": "cont" }' > ${qmp}.in
+>  
+> -	panic_event_count=$(jq -c 'select(.event == "GUEST_PANICKED")' < ${qmp}.out | wc -l)
+> -	if [ "$panic_event_count" -lt 1 ]; then
+> +	if ! grep -E -q '"event"[[:blank:]]*:[[:blank:]]*"GUEST_PANICKED"' ${qmp}.out ; then
+>  		echo "FAIL: guest did not panic"
+>  		ret=3
+>  	else
+
 
