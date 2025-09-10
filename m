@@ -1,128 +1,118 @@
-Return-Path: <kvm+bounces-57212-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-57213-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0FE72B51EBE
-	for <lists+kvm@lfdr.de>; Wed, 10 Sep 2025 19:19:07 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 78354B51EE2
+	for <lists+kvm@lfdr.de>; Wed, 10 Sep 2025 19:27:46 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id BF093A005ED
-	for <lists+kvm@lfdr.de>; Wed, 10 Sep 2025 17:19:05 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id A1DE11B27479
+	for <lists+kvm@lfdr.de>; Wed, 10 Sep 2025 17:28:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EB6A63148A9;
-	Wed, 10 Sep 2025 17:18:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B0775321448;
+	Wed, 10 Sep 2025 17:27:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="nWWKufl0"
+	dkim=pass (4096-bit key) header.d=alien8.de header.i=@alien8.de header.b="YoIYZjZz"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pl1-f169.google.com (mail-pl1-f169.google.com [209.85.214.169])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mail.alien8.de (mail.alien8.de [65.109.113.108])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A7E1419C566
-	for <kvm@vger.kernel.org>; Wed, 10 Sep 2025 17:18:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.169
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8FC2C255F5E;
+	Wed, 10 Sep 2025 17:27:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=65.109.113.108
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757524736; cv=none; b=qnrDhBP0qwDkkAor7EZBVCRnUqkeFHlMY1JcXXszfsAumGIm2/8c3XEjQPbyNw767+oaw1ZeZTpHJh5GxSwFvmT/akUa9xTwZBO+8YZeLbzqjfGJbkFOnUu2PogQ91W80Qal2jKf4UNzLNLtOac0mcH7BpPo/Uhcm5QEMRFfKmU=
+	t=1757525255; cv=none; b=BAL+/AQHReKph6AMKfOqocxxeJWfN1MZTs201B+MMI0dMCjt8ciZrqKE3Dy9+bauRFQW4Y800eOt0GWvZxW6hrdWI/qapbor1jmUNTub5wxnMUEpC0qR1RLrRHsUjcmHq+shV1Oa9Sn+gEgs/5u6RCCTszpkioCB+5cAb95VyBk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757524736; c=relaxed/simple;
-	bh=8NO5AGg49+T5ajYObkd0y9xDyV0ygdMLFtI81YL8HQI=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=V1hGsP4PmOlfJMl0CLZxToeS7vT2tX9QPyU4exkNmnWGWYdh5Y82A5CtE1f9cHvirKEsVCqK/WqHPVSUbTF5U1jbI/H/Bbi0BgUKHgykw36ZRVgJuMcdDDKnmBX5EW2nAx0au2mRJIdFmepsIMvhctHnXY7ElpaYTwgucPEo7h8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=nWWKufl0; arc=none smtp.client-ip=209.85.214.169
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-pl1-f169.google.com with SMTP id d9443c01a7336-24b2d018f92so11015ad.1
-        for <kvm@vger.kernel.org>; Wed, 10 Sep 2025 10:18:54 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1757524734; x=1758129534; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=8NO5AGg49+T5ajYObkd0y9xDyV0ygdMLFtI81YL8HQI=;
-        b=nWWKufl0VQnPx3YMgbuHNwTTI+Fc7n9fz3C+VO8NZmfrCYh1ZmUFHdgfRsHN1t3TFk
-         YmUyQVtrzjjj7c1aKjivW4UsGvOql0dL6PMSKUzOtd0jCjZF+0os5e0hPuGrwQjWuGpg
-         K9JDCRr0O8eRjIxTmlKQUVP6XraOQ5UrS3Vzit9m5dW97CEIIgg2qkzyjsUXpeWqaqUE
-         nF+jmIQdOTx1TXxntPd0oIRuWyL9HOt8eQCEPYmcl/E4UqtW7X2mZMMv3uF5e14WZTbY
-         oi+itCTkKc880XAkHQym43G4+L8QV7NA3lsWYvXWQP/e91rm6PaGXE7J9O7cPwQA23c+
-         rfyw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1757524734; x=1758129534;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=8NO5AGg49+T5ajYObkd0y9xDyV0ygdMLFtI81YL8HQI=;
-        b=AFpoXsIvIgRnbs9Y5oM56Mzm7ryQD0KSo8DKxYrAaKGBHlsdcn7YQ8hgncuEa2QNYA
-         GpVU2cd7cEoDGaIqe7J5Wz1KWxjT9w1/DZ8HgkErqXFAuJjulLw35IB4UoVrvnDln/Xx
-         ZfO/x7XTeTaIWUuP74TZeB4j/8VJw5/tljIq7myzO06d/y+AX2unRjB/oE8xlJQcYqhE
-         r9avp6zR0Oxk1nWoggwUK4wAzTqpeX97VDr4H8SIU5BXwcQn8iCODZnHmgeGTbZ9ijrc
-         uVQ9dok53su1AhDT4H9+kQrFA5pwbGi8ue7vrTl66RgkTF3bZxmsfoMa82LGRlmHtAzC
-         xxZg==
-X-Forwarded-Encrypted: i=1; AJvYcCUqEatBwU0tSMYj7c/U6O+E8V9ViKGTlqVFBSH3hszHTQzsbzr5XtdnGv+oFCyxfSq+uwg=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwhspPQ75WJOpKWzRe/c9M7ST3vDwHnWOIGsEMXRRh7qqpSZ+Hi
-	I3cmK/vgbHRODauuO9FHg047X1hBfID/YNB3rsvnhRSleM0jYrxsZ2nn3vAXOdQkCF2uZvLajH4
-	2AnMUueqfiRWpo3e9bcDvNcWb4+1F/OZeXA/wpKfr
-X-Gm-Gg: ASbGncv/bHMj3oWSE8rF59daztMDkFl27c8gkPp9L1CtkIjLveYuOpPbpgd42g9DwJd
-	uFONc+dJ4KqijQyTtw6QPl2VFrc5yDtBzo9p+RVJBk/Pzn8BbP7DwHUAAoWvo/0nplDZ4Cq37lO
-	D+EIqELNiqCh6mKy+ALGQEL79nxLyBOmU/3lANVjeSehoRu2C2VZmm0HiXfD5ep8i8BKPdFWRRH
-	awLp4L2ZN9iF82WpvwBPna4E/O/8ALoZKwpdNbQCRReJTZ6hg66hH0=
-X-Google-Smtp-Source: AGHT+IHCUkd4DH5Y6JVUzen1aiRKVsuVwVddE1fVh3QxgdLia5R9VcHQ0lxR8oXmVv5fSqX3gWLykbYPG5i7ULXFWuU=
-X-Received: by 2002:a17:903:32c8:b0:24c:1a94:e603 with SMTP id
- d9443c01a7336-25a7d6a471emr4327895ad.1.1757524733490; Wed, 10 Sep 2025
- 10:18:53 -0700 (PDT)
+	s=arc-20240116; t=1757525255; c=relaxed/simple;
+	bh=IbDI6NByxIuvJpDQV0z450B/UbqXV9f1soeWIoUs718=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=KmJy1ixWWLsrmpcsdiXPwUiX80Zgbtpf8qdq7jp7gWaqMzSRVznRCUXntYqk2z9HIZuIoF6Iw3BLAIn5tt0gx3WkS+vGDrWbfKwcs+VrIIai2RyMu+hIMcOjutGAQphvSLb8mD4qJTlfxi6ikeenwRAf3+ZFqrd5+f/xSXyqFpU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=alien8.de; spf=pass smtp.mailfrom=alien8.de; dkim=pass (4096-bit key) header.d=alien8.de header.i=@alien8.de header.b=YoIYZjZz; arc=none smtp.client-ip=65.109.113.108
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=alien8.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=alien8.de
+Received: from localhost (localhost.localdomain [127.0.0.1])
+	by mail.alien8.de (SuperMail on ZX Spectrum 128k) with ESMTP id 698A140E01D2;
+	Wed, 10 Sep 2025 17:27:23 +0000 (UTC)
+X-Virus-Scanned: Debian amavisd-new at mail.alien8.de
+Authentication-Results: mail.alien8.de (amavisd-new); dkim=pass (4096-bit key)
+	header.d=alien8.de
+Received: from mail.alien8.de ([127.0.0.1])
+	by localhost (mail.alien8.de [127.0.0.1]) (amavisd-new, port 10026)
+	with ESMTP id ejTizIk3HIBh; Wed, 10 Sep 2025 17:27:19 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=alien8;
+	t=1757525238; bh=AaHxBJ1T5/lzqwfAIWFqoerftxnxSVKw4mzH9fNFLvQ=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=YoIYZjZz7DB/GNwEwUULywd3ovui4UA0jSTMFhu59QEAtf45IB08kRZFA+JHt4Z8e
+	 h8wTl7aBch86V1TbFJ6csu0YyK3MZMArHg5LKD3xKxWn7HnnTcdGejMlWP/nRuTKcH
+	 asNn23Ya35Z39N9uCWjB3qBnJFGET9cAeveBzp0xyvIGQRTWL9tiCkk2cRF0bD8Mfg
+	 Rc2fhhMbUc+6zj+UIge9ORMbI3zOdrvIuxJ54Kd2i54Kr27OJZJZGTAxsz5JkNXk3e
+	 kGbs1v8GKaF4jF8ODc564UfR7oqMwjUZSOvMSHqYnRAHQLn6Ji2sMcKT82KMK6PV/K
+	 hrW670pt2m2Ru7I+NkmUKr+oTbIr1M2u2nW1rDhG0lMpwaJ5aHl/dfe5ItJoprAGb+
+	 kSOpAH6Yw1GnSNPy/e7CfcpK8pBBfkjzcMsXgyP7jMH2HdlXnmAfRoGckzw4Q6hPQM
+	 ifjkfVFsDyUOj7U4UWcCXWJs1bls+JKyvFoKRkp+BdqEwSZsGc2VJCWCAe7nWgC7Mx
+	 OB6qBF7WLbuv8K+jHMa63UsRB2yX5v4rMttSTxkXM6d8nZv+QXBi/GTPMQW6NK/dpd
+	 Ap5kFEG/3LfRka8OpNjLATnxhZz7IXPDLPZjT4NnXXxyXjm8PxXa0PvHOBgEzBCqP0
+	 GIqu/SuwgH7nbr3m+nmFGv/g=
+Received: from zn.tnic (p5de8ed27.dip0.t-ipconnect.de [93.232.237.39])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange ECDHE (P-256) server-signature ECDSA (P-256) server-digest SHA256)
+	(No client certificate requested)
+	by mail.alien8.de (SuperMail on ZX Spectrum 128k) with UTF8SMTPSA id 37CA240E00DD;
+	Wed, 10 Sep 2025 17:26:36 +0000 (UTC)
+Date: Wed, 10 Sep 2025 19:26:27 +0200
+From: Borislav Petkov <bp@alien8.de>
+To: Babu Moger <babu.moger@amd.com>
+Cc: corbet@lwn.net, tony.luck@intel.com, reinette.chatre@intel.com,
+	Dave.Martin@arm.com, james.morse@arm.com, tglx@linutronix.de,
+	mingo@redhat.com, dave.hansen@linux.intel.com, x86@kernel.org,
+	hpa@zytor.com, kas@kernel.org, rick.p.edgecombe@intel.com,
+	akpm@linux-foundation.org, paulmck@kernel.org, frederic@kernel.org,
+	pmladek@suse.com, rostedt@goodmis.org, kees@kernel.org,
+	arnd@arndb.de, fvdl@google.com, seanjc@google.com,
+	thomas.lendacky@amd.com, pawan.kumar.gupta@linux.intel.com,
+	perry.yuan@amd.com, manali.shukla@amd.com, sohil.mehta@intel.com,
+	xin@zytor.com, Neeraj.Upadhyay@amd.com, peterz@infradead.org,
+	tiala@microsoft.com, mario.limonciello@amd.com,
+	dapeng1.mi@linux.intel.com, michael.roth@amd.com,
+	chang.seok.bae@intel.com, linux-doc@vger.kernel.org,
+	linux-kernel@vger.kernel.org, linux-coco@lists.linux.dev,
+	kvm@vger.kernel.org, peternewman@google.com, eranian@google.com,
+	gautham.shenoy@amd.com
+Subject: Re: [PATCH v18 14/33] x86/resctrl: Add data structures and
+ definitions for ABMC assignment
+Message-ID: <20250910172627.GCaMG0w6UP4ksqZZ50@fat_crate.local>
+References: <cover.1757108044.git.babu.moger@amd.com>
+ <1eb6f7ba74f37757ebf3a45cfe84081b8e6cd89a.1757108044.git.babu.moger@amd.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250609191340.2051741-1-kirill.shutemov@linux.intel.com>
- <2537ad07-6e49-401b-9ffa-63a07740db4a@intel.com> <p5tqgxmmwnw2ie6ea2q7b2v7ivbsebyjpucm6csrvl2eghuzw5@bods3pzhyslj>
- <4be5db34-aadb-49e3-9a94-49d39c8bd31d@intel.com>
-In-Reply-To: <4be5db34-aadb-49e3-9a94-49d39c8bd31d@intel.com>
-From: Vishal Annapurve <vannapurve@google.com>
-Date: Wed, 10 Sep 2025 10:18:40 -0700
-X-Gm-Features: Ac12FXwizQV2e3Qmj9lOxxFpjbgzFrxvQifAmyKv0lv5qG3kU9tlMxyMvEl_A1w
-Message-ID: <CAGtprH-MnG6sxjbWZBLMM83j6mohzRvc-shv3XCJOjJWqwQzXQ@mail.gmail.com>
-Subject: Re: [PATCHv2 00/12] TDX: Enable Dynamic PAMT
-To: Dave Hansen <dave.hansen@intel.com>
-Cc: Kiryl Shutsemau <kirill@shutemov.name>, 
-	"Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>, pbonzini@redhat.com, seanjc@google.com, 
-	dave.hansen@linux.intel.com, rick.p.edgecombe@intel.com, 
-	isaku.yamahata@intel.com, kai.huang@intel.com, yan.y.zhao@intel.com, 
-	chao.gao@intel.com, tglx@linutronix.de, mingo@redhat.com, bp@alien8.de, 
-	kvm@vger.kernel.org, x86@kernel.org, linux-coco@lists.linux.dev, 
-	linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <1eb6f7ba74f37757ebf3a45cfe84081b8e6cd89a.1757108044.git.babu.moger@amd.com>
 
-On Tue, Sep 9, 2025 at 8:24=E2=80=AFAM Dave Hansen <dave.hansen@intel.com> =
-wrote:
->
-> On 9/9/25 04:16, Kiryl Shutsemau wrote:
->
-> > And it is going to be very wasteful. With huge pages, in most cases, yo=
-u
-> > only need dynamic PAMT for control pages. You will have a lot of memory
-> > sitting in stash with zero use.
->
-> I think it's going to be hard to convince me without actual data on this
-> one.
->
+On Fri, Sep 05, 2025 at 04:34:13PM -0500, Babu Moger wrote:
+> diff --git a/arch/x86/include/asm/msr-index.h b/arch/x86/include/asm/msr-index.h
+> index 18222527b0ee..48230814098d 100644
+> --- a/arch/x86/include/asm/msr-index.h
+> +++ b/arch/x86/include/asm/msr-index.h
+> @@ -1232,6 +1232,7 @@
+>  /* - AMD: */
+>  #define MSR_IA32_MBA_BW_BASE		0xc0000200
+>  #define MSR_IA32_SMBA_BW_BASE		0xc0000280
+> +#define MSR_IA32_L3_QOS_ABMC_CFG	0xc00003fd
+>  #define MSR_IA32_L3_QOS_EXT_CFG		0xc00003ff
+>  #define MSR_IA32_EVT_CFG_BASE		0xc0000400
 
-* With 1G page backing and with DPAMT entries created only for 4K EPT mappi=
-ngs
-- ~5MB of DPAMT memory usage for 704G guest memory size. We expect the
-DPAMT memory usage to be in MBs even with 4096G guest memory size.
+Some of those MSRs are AMD-specific: why do they have "IA32" in the name and
+not "AMD64"?
 
-* With DPAMT entries created for all private memory irrespective of
-mapping granularity
-- DPAMT memory usage is around ~3GB for 704G guest memory size and
-around ~16G for 4096G guest memory size.
+-- 
+Regards/Gruss,
+    Boris.
 
-For a 4TB guest memory size with 1G page backing, the DPAMT memory usage
-
-> Even then, we're talking about 0.4% of system memory. So how much code
-> and complexity are we talking about in order to save a *maximum* of 0.4%
-> of system memory?
->
+https://people.kernel.org/tglx/notes-about-netiquette
 
