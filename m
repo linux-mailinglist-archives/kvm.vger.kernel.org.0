@@ -1,43 +1,44 @@
-Return-Path: <kvm+bounces-57164-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-57169-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5556AB50BCC
-	for <lists+kvm@lfdr.de>; Wed, 10 Sep 2025 04:50:38 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4879FB50BF9
+	for <lists+kvm@lfdr.de>; Wed, 10 Sep 2025 04:56:08 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E8D4E3B0FD4
-	for <lists+kvm@lfdr.de>; Wed, 10 Sep 2025 02:49:50 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 715D5189099E
+	for <lists+kvm@lfdr.de>; Wed, 10 Sep 2025 02:56:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 01335246786;
-	Wed, 10 Sep 2025 02:49:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 602E925A2D8;
+	Wed, 10 Sep 2025 02:55:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=antgroup.com header.i=@antgroup.com header.b="jShTTKP+"
+	dkim=pass (1024-bit key) header.d=antgroup.com header.i=@antgroup.com header.b="d2wXsRxt"
 X-Original-To: kvm@vger.kernel.org
-Received: from out28-123.mail.aliyun.com (out28-123.mail.aliyun.com [115.124.28.123])
+Received: from out198-15.us.a.mail.aliyun.com (out198-15.us.a.mail.aliyun.com [47.90.198.15])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 40A8C2033A;
-	Wed, 10 Sep 2025 02:49:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.28.123
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CD56A248F5E;
+	Wed, 10 Sep 2025 02:55:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=47.90.198.15
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757472576; cv=none; b=kuJdz9G/MCmO6LvBukMEcL1cVZ/dffScAOE9KpyOYh0+SDSKtgCOUIWoQfgBweGPMM7L6UHnKhdAB5d+oh6Vk5uTz0iemI1YMs82kTX90RI4JixpsuEu/ypYOEPzWuzel7DGSegLHCICtmyMSS21yDNjjbIHgMYkhUgmfztSDTI=
+	t=1757472903; cv=none; b=n7KlqcDcMQapANtT4Ef2LMYjP8FLMHWwrV3wEeXoGgYJV3UHdB3XXpGwtxgjqEeGIV9z5Z/iVO8dgU7BmBBeN6zdXox9OdCUH4Lrxm26D4dmbKqT2KYt8TZkYCHdIJY256fH1WiqMn4VbC8MX4aJixYDTDBx4R7FAFPLo3Xp0Qc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757472576; c=relaxed/simple;
-	bh=W/lNsHQOpMwOw6qbBISXNboe+wqRqgWIvQw5KI4JO0k=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=kNkaVITmbwgJnUChf55yGR+EWEfZSljdnFCPBbEBV2nj+DS0bIBeL2SYJxG/9ej1ZrRqo1UXnZbV270QGStbwA+1H4+MGQyPVq9b9o/k6eTkqiT/Bp3nG+dqflmcpAzgBdX5dsKeEgA+Q/4xC7vT33T4LKhN1E9vNse2Pe+Anfg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=antgroup.com; spf=pass smtp.mailfrom=antgroup.com; dkim=pass (1024-bit key) header.d=antgroup.com header.i=@antgroup.com header.b=jShTTKP+; arc=none smtp.client-ip=115.124.28.123
+	s=arc-20240116; t=1757472903; c=relaxed/simple;
+	bh=ELenBpY/5KgZte93vWBfudD9K2sGtS9FzpmRBYNgrcU=;
+	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
+	 MIME-Version; b=Vl+Eg/Fy0eJvPMqtUH8hBfrNw2tEcfDHSqjQWsUE+LFtD8G7v9YUTaNSTyDCqwD4XeRCsaqC7cvYZl72pHc/y4GHGiuaJEiOicGQTffJD8SvcX3RLZoU/xVRBx7O6hsh/rpKDThkdskMQFXEuD7Ar6M7Ra6Hj4Xq1z2AQIPmyI8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=antgroup.com; spf=pass smtp.mailfrom=antgroup.com; dkim=pass (1024-bit key) header.d=antgroup.com header.i=@antgroup.com header.b=d2wXsRxt; arc=none smtp.client-ip=47.90.198.15
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=antgroup.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=antgroup.com
 DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
 	d=antgroup.com; s=default;
-	t=1757472563; h=From:To:Subject:Date:Message-Id:MIME-Version;
-	bh=WqFTYK/ICNliwAdi5HA1h5xy4TAhp+T7+wGB7zW5Ln0=;
-	b=jShTTKP+GoT7WrZhHxQXFtqdSPiDq/PvZiRXgCDIJ7bdGBBUaBu6ArkCtXsisUQwCMIqztqjcRhUfFqkQebsZ7zQf/+JbKxnbpZ8s8CYM3qewW/IPSH9lUlmtFrOs3iuA+a1giiFsyaJ4L15RbydyMcpA+sAE/UjYVx18IRFJHc=
-Received: from localhost(mailfrom:houwenlong.hwl@antgroup.com fp:SMTPD_---.ebbFypy_1757472562 cluster:ay29)
+	t=1757472883; h=From:To:Subject:Date:Message-Id:MIME-Version;
+	bh=YXYjSPwBEzyTiJUkKnb+LmPlxLCJZLMXoTgZ0VFZOcg=;
+	b=d2wXsRxtWBnGdlA8lITyJaS91t2Ioh+U22y9eR8OzsEsPlXD45vUAC1IAnQ9+wZ2u7cxVu+zLFZACVngXXDcmu1DSH1nNjs00GenSBskac7SMv383dx+IjwcsJebv6CmC8L66B52m+DgmqpkIq+OwVqxyEMvLybTu371c/BcJrg=
+Received: from localhost(mailfrom:houwenlong.hwl@antgroup.com fp:SMTPD_---.ebfmCoJ_1757472563 cluster:ay29)
           by smtp.aliyun-inc.com;
-          Wed, 10 Sep 2025 10:49:22 +0800
+          Wed, 10 Sep 2025 10:49:24 +0800
 From: Hou Wenlong <houwenlong.hwl@antgroup.com>
 To: kvm@vger.kernel.org
 Cc: Lai Jiangshan <jiangshan.ljs@antgroup.com>,
@@ -49,13 +50,13 @@ Cc: Lai Jiangshan <jiangshan.ljs@antgroup.com>,
 	Dave Hansen <dave.hansen@linux.intel.com>,
 	x86@kernel.org,
 	"H. Peter Anvin" <hpa@zytor.com>,
-	Shuah Khan <shuah@kernel.org>,
-	linux-kernel@vger.kernel.org,
-	linux-kselftest@vger.kernel.org
-Subject: [PATCH 0/7] KVM: x86: Improve the handling of debug exceptions during instruction emulation
-Date: Wed, 10 Sep 2025 10:49:12 +0800
-Message-Id: <cover.1757416809.git.houwenlong.hwl@antgroup.com>
+	linux-kernel@vger.kernel.org
+Subject: [PATCH 1/7] KVM: x86: Set guest DR6 by kvm_queue_exception_p() in instruction emulation
+Date: Wed, 10 Sep 2025 10:49:13 +0800
+Message-Id: <14773b9e2387eaeee3af9fe0c6ca28a0b8fcee69.1757416809.git.houwenlong.hwl@antgroup.com>
 X-Mailer: git-send-email 2.31.1
+In-Reply-To: <cover.1757416809.git.houwenlong.hwl@antgroup.com>
+References: <cover.1757416809.git.houwenlong.hwl@antgroup.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -64,58 +65,91 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-During my testing, I found that guest debugging with 'DR6.BD' does not
-work in instruction emulation, as the current code only considers the
-guest's DR7. Upon reviewing the code, I also observed that the checks
-for the userspace guest debugging feature and the guest's own debugging
-feature are repeated in different places during instruction
-emulation, but the overall logic is the same. If guest debugging
-is enabled, it needs to exit to userspace; otherwise, a #DB
-exception needs to be injected into the guest. Therefore, as
-suggested by Jiangshan Lai, some cleanup has been done for #DB
-handling in instruction emulation in this patchset. A new
-function named 'kvm_inject_emulated_db()' is introduced to
-consolidate all the checking logic. Moreover, I hope we can make
-the #DB interception path use the same function as well.
+Record DR6 in emulate_db() and use kvm_queue_exception_p() to set DR6
+instead of directly using kvm_set_dr6() in emulation, which keeps the
+handling of DR6 during #DB injection consistent with other code paths.
 
-Additionally, when I looked into the single-step #DB handling in
-instruction emulation, I noticed that the interrupt shadow is toggled,
-but it is not considered in the single-step #DB injection. This
-oversight causes VM entry to fail on VMX (due to pending debug
-exceptions checking) or breaks the 'MOV SS' suppressed #DB. For the
-latter, I have kept the behavior for now in my patchset, as I need some
-suggestions.
+No functional change intended.
 
-Hou Wenlong (7):
-  KVM: x86: Set guest DR6 by kvm_queue_exception_p() in instruction
-    emulation
-  KVM: x86: Check guest debug in DR access instruction emulation
-  KVM: x86: Only check effective code breakpoint in emulation
-  KVM: x86: Consolidate KVM_GUESTDBG_SINGLESTEP check into the
-    kvm_inject_emulated_db()
-  KVM: VMX: Set 'BS' bit in pending debug exceptions during instruction
-    emulation
-  KVM: selftests: Verify guest debug DR7.GD checking during instruction
-    emulation
-  KVM: selftests: Verify 'BS' bit checking in pending debug exception
-    during VM entry
+Signed-off-by: Hou Wenlong <houwenlong.hwl@antgroup.com>
+---
+ arch/x86/kvm/emulate.c     | 14 ++++----------
+ arch/x86/kvm/kvm_emulate.h |  6 +++++-
+ arch/x86/kvm/x86.c         |  3 +++
+ 3 files changed, 12 insertions(+), 11 deletions(-)
 
- arch/x86/include/asm/kvm-x86-ops.h            |   1 +
- arch/x86/include/asm/kvm_host.h               |   1 +
- arch/x86/kvm/emulate.c                        |  14 +--
- arch/x86/kvm/kvm_emulate.h                    |   7 +-
- arch/x86/kvm/vmx/main.c                       |   9 ++
- arch/x86/kvm/vmx/vmx.c                        |  14 ++-
- arch/x86/kvm/vmx/x86_ops.h                    |   1 +
- arch/x86/kvm/x86.c                            | 109 +++++++++++-------
- arch/x86/kvm/x86.h                            |   7 ++
- .../selftests/kvm/include/x86/processor.h     |   3 +-
- tools/testing/selftests/kvm/x86/debug_regs.c  |  64 +++++++++-
- 11 files changed, 167 insertions(+), 63 deletions(-)
-
-
-base-commit: ecbcc2461839e848970468b44db32282e5059925
---
+diff --git a/arch/x86/kvm/emulate.c b/arch/x86/kvm/emulate.c
+index 542d3664afa3..18e3a732d106 100644
+--- a/arch/x86/kvm/emulate.c
++++ b/arch/x86/kvm/emulate.c
+@@ -593,8 +593,9 @@ static int emulate_exception(struct x86_emulate_ctxt *ctxt, int vec,
+ 	return X86EMUL_PROPAGATE_FAULT;
+ }
+ 
+-static int emulate_db(struct x86_emulate_ctxt *ctxt)
++static int emulate_db(struct x86_emulate_ctxt *ctxt, unsigned long dr6)
+ {
++	ctxt->exception.dr6 = dr6;
+ 	return emulate_exception(ctxt, DB_VECTOR, 0, false);
+ }
+ 
+@@ -3857,15 +3858,8 @@ static int check_dr_read(struct x86_emulate_ctxt *ctxt)
+ 	if ((cr4 & X86_CR4_DE) && (dr == 4 || dr == 5))
+ 		return emulate_ud(ctxt);
+ 
+-	if (ctxt->ops->get_dr(ctxt, 7) & DR7_GD) {
+-		ulong dr6;
+-
+-		dr6 = ctxt->ops->get_dr(ctxt, 6);
+-		dr6 &= ~DR_TRAP_BITS;
+-		dr6 |= DR6_BD | DR6_ACTIVE_LOW;
+-		ctxt->ops->set_dr(ctxt, 6, dr6);
+-		return emulate_db(ctxt);
+-	}
++	if (ctxt->ops->get_dr(ctxt, 7) & DR7_GD)
++		return emulate_db(ctxt, DR6_BD);
+ 
+ 	return X86EMUL_CONTINUE;
+ }
+diff --git a/arch/x86/kvm/kvm_emulate.h b/arch/x86/kvm/kvm_emulate.h
+index 7b5ddb787a25..a6fad7b938e3 100644
+--- a/arch/x86/kvm/kvm_emulate.h
++++ b/arch/x86/kvm/kvm_emulate.h
+@@ -24,7 +24,11 @@ struct x86_exception {
+ 	bool error_code_valid;
+ 	u16 error_code;
+ 	bool nested_page_fault;
+-	u64 address; /* cr2 or nested page fault gpa */
++	union {
++		u64 address; /* cr2 or nested page fault gpa */
++		unsigned long dr6;
++		u64 payload;
++	};
+ 	u8 async_page_fault;
+ 	unsigned long exit_qualification;
+ };
+diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+index 7ba2cdfdac44..b2e8322aeca7 100644
+--- a/arch/x86/kvm/x86.c
++++ b/arch/x86/kvm/x86.c
+@@ -8612,6 +8612,8 @@ static void inject_emulated_exception(struct kvm_vcpu *vcpu)
+ 
+ 	if (ctxt->exception.vector == PF_VECTOR)
+ 		kvm_inject_emulated_page_fault(vcpu, &ctxt->exception);
++	else if (ctxt->exception.vector == DB_VECTOR)
++		kvm_queue_exception_p(vcpu, DB_VECTOR, ctxt->exception.dr6);
+ 	else if (ctxt->exception.error_code_valid)
+ 		kvm_queue_exception_e(vcpu, ctxt->exception.vector,
+ 				      ctxt->exception.error_code);
+@@ -8656,6 +8658,7 @@ static void init_emulate_ctxt(struct kvm_vcpu *vcpu)
+ 	ctxt->interruptibility = 0;
+ 	ctxt->have_exception = false;
+ 	ctxt->exception.vector = -1;
++	ctxt->exception.payload = 0;
+ 	ctxt->perm_ok = false;
+ 
+ 	init_decode_cache(ctxt);
+-- 
 2.31.1
 
 
