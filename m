@@ -1,118 +1,114 @@
-Return-Path: <kvm+bounces-57249-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-57250-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2D985B52187
-	for <lists+kvm@lfdr.de>; Wed, 10 Sep 2025 22:00:55 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8D9D1B52198
+	for <lists+kvm@lfdr.de>; Wed, 10 Sep 2025 22:10:43 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 42E453B65C2
-	for <lists+kvm@lfdr.de>; Wed, 10 Sep 2025 20:00:48 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 43304565ECB
+	for <lists+kvm@lfdr.de>; Wed, 10 Sep 2025 20:10:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 41D832EDD58;
-	Wed, 10 Sep 2025 20:00:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0881A2EF664;
+	Wed, 10 Sep 2025 20:10:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (4096-bit key) header.d=alien8.de header.i=@alien8.de header.b="MBm8ZZIX"
+	dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="KFXwlq//";
+	dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="9cIp2XSP"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail.alien8.de (mail.alien8.de [65.109.113.108])
+Received: from galois.linutronix.de (Galois.linutronix.de [193.142.43.55])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 216172D6E74;
-	Wed, 10 Sep 2025 20:00:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=65.109.113.108
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9B5252BB1D;
+	Wed, 10 Sep 2025 20:10:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.142.43.55
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757534436; cv=none; b=tAGJL4yY3Z6Ci2SmdULZxqFVQRt9Le+rv3J2WP7+EiztmnyZ8D/uk3UPC22QI4wcJMV4XdutpHVSSx//K0JVQRiDqi39jrVqpvyJapLNreEUe8CMa9ZLtfKQnr+PbngcUKtP5kdbvLNtePgMUEHxlkTCRnpKbvCJhDJpOGZNRT8=
+	t=1757535021; cv=none; b=iDJ0ZI98y2TCJySuF0l9iTgVzuoQMjdJTidMItU5+S5WBC5I5P7HYYfEHIS1gPjrtrKnhLj5UxU56SPOe0hS94J2FARNduOhfpos9jLAYawoAX07HdiC1lXJD/RcklvFBHhFKtd+5tkqxDgJ4LMgevtIQDQ4hDk9HS1qY8aSZzg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757534436; c=relaxed/simple;
-	bh=EKTQ7/KKk06PC4P0hrBSaQFg209GpQVgW+Z8KM2n3tk=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=WLSTcmtUL/XsBMlFHE7Y76UGUk94Gk47dq6EnEs1cAX1g2XRKA16UcUpWIOeWXco67EgxEqqyeekAh2+u6KWJypNnvVTiRNPt/njFk8NyDe+ox1cGcgk3Ajb+9TsGtrsRi5UZuiTF6cjdOZQ0z1vFDoCqYj2j8l0SeCtaF3je/o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=alien8.de; spf=pass smtp.mailfrom=alien8.de; dkim=fail (4096-bit key) header.d=alien8.de header.i=@alien8.de header.b=MBm8ZZIX reason="signature verification failed"; arc=none smtp.client-ip=65.109.113.108
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=alien8.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=alien8.de
-Received: from localhost (localhost.localdomain [127.0.0.1])
-	by mail.alien8.de (SuperMail on ZX Spectrum 128k) with ESMTP id 3FA8140E00DD;
-	Wed, 10 Sep 2025 20:00:31 +0000 (UTC)
-X-Virus-Scanned: Debian amavisd-new at mail.alien8.de
-Authentication-Results: mail.alien8.de (amavisd-new); dkim=fail (4096-bit key)
-	reason="fail (body has been altered)" header.d=alien8.de
-Received: from mail.alien8.de ([127.0.0.1])
-	by localhost (mail.alien8.de [127.0.0.1]) (amavisd-new, port 10026)
-	with ESMTP id 7Rba-gI6y12Q; Wed, 10 Sep 2025 20:00:27 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=alien8;
-	t=1757534427; bh=tTP7WJCPA0F+L78sq3fAHJi/fZvPP2QjtFGkh16jzvk=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=MBm8ZZIXpeiwEFsNoNXjttLv44Pi8fbzsOCoein670ovE7xQz638krZknHGzwyTno
-	 gusHc8We5VrAJOHSmhvEh4eEeDLj9MBak9t50vlVjx6kn9J92Hoo69qiaBjkBukDd+
-	 GNg0Do18zD265RFs2k7bihM64E3vCPCUWy+3PMQtuO2ZNe6ixg/G0zd6MfHuitg42i
-	 inMdkR1ElxD3+F8bQAAIXx9ENo2LolVsml3B2e4tZ6kjhzEBPo0+wPwx0KAaQaqK2X
-	 9WVREVn+z/7tFn928gIK9tVaKkxgE02wemggrGfr4oxytA2lcp6Pvo03IzQ0mFM5op
-	 fy9ryiBeHpyvwTgB0pBZUay3HTuVoZmKeZbAaasRLQbnJd3c2y6k8L4VgBkOFR8xS7
-	 ejtye3nd8ETo1kCi4EtKdFShRwaVbJUCr3sHpGZI5RwLTnO0yfh39Ah6NAt7Q672u/
-	 lOWq2pmGynH/6dptXRmCSO86xq5H+DzLqz0jsqsCn10Cft+i20/FM+IDgpc7sSEC8R
-	 OHhVI2jEqgFxQK277O3KSBuHJyVboSCun1VgwYf2UMoCQTEOJLEDpMZWOYzY3SHueJ
-	 2N6Wi0L2XXkLiXlNSJlawA7CzidgQDN8pVOUuK8WZ9J3H9JH2Q3N4QNCwPXtyxge46
-	 JgAMknovkq4d+JBgd8QJEor4=
-Received: from zn.tnic (p5de8ed27.dip0.t-ipconnect.de [93.232.237.39])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange ECDHE (P-256) server-signature ECDSA (P-256) server-digest SHA256)
-	(No client certificate requested)
-	by mail.alien8.de (SuperMail on ZX Spectrum 128k) with UTF8SMTPSA id 100A440E01D2;
-	Wed, 10 Sep 2025 19:59:45 +0000 (UTC)
-Date: Wed, 10 Sep 2025 21:59:38 +0200
-From: Borislav Petkov <bp@alien8.de>
-To: "Moger, Babu" <babu.moger@amd.com>
-Cc: corbet@lwn.net, tony.luck@intel.com, reinette.chatre@intel.com,
-	Dave.Martin@arm.com, james.morse@arm.com, tglx@linutronix.de,
-	mingo@redhat.com, dave.hansen@linux.intel.com, x86@kernel.org,
-	hpa@zytor.com, kas@kernel.org, rick.p.edgecombe@intel.com,
-	akpm@linux-foundation.org, paulmck@kernel.org, frederic@kernel.org,
-	pmladek@suse.com, rostedt@goodmis.org, kees@kernel.org,
-	arnd@arndb.de, fvdl@google.com, seanjc@google.com,
-	thomas.lendacky@amd.com, pawan.kumar.gupta@linux.intel.com,
-	perry.yuan@amd.com, manali.shukla@amd.com, sohil.mehta@intel.com,
-	xin@zytor.com, Neeraj.Upadhyay@amd.com, peterz@infradead.org,
-	tiala@microsoft.com, mario.limonciello@amd.com,
-	dapeng1.mi@linux.intel.com, michael.roth@amd.com,
-	chang.seok.bae@intel.com, linux-doc@vger.kernel.org,
-	linux-kernel@vger.kernel.org, linux-coco@lists.linux.dev,
-	kvm@vger.kernel.org, peternewman@google.com, eranian@google.com,
-	gautham.shenoy@amd.com
-Subject: Re: [PATCH v18 14/33] x86/resctrl: Add data structures and
- definitions for ABMC assignment
-Message-ID: <20250910195938.GAaMHYqjfOdFQmllbQ@fat_crate.local>
-References: <cover.1757108044.git.babu.moger@amd.com>
- <1eb6f7ba74f37757ebf3a45cfe84081b8e6cd89a.1757108044.git.babu.moger@amd.com>
- <20250910172627.GCaMG0w6UP4ksqZZ50@fat_crate.local>
- <1096bc24-2bac-4bc2-bc4f-9d653839e81d@amd.com>
+	s=arc-20240116; t=1757535021; c=relaxed/simple;
+	bh=mjnlmH46vqpUybfgGI0GS2mBSC0pyBMO3eFuAUlJV7U=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
+	 MIME-Version:Content-Type; b=pa0paYQx7W81ePzKtD48iXAheb8JC++Pw1rwudYNSat6K4QM9dGIakX+9w3nB0Ltjr5q3H4lSPk1+zbGu+Ofpdst4bINzMC6QmrWLoZVX3e+Up9niYCbAI5M/9GEXZiE2sDI6Ye4Y71hbhGDnw9M1tSYwXwDxRLYNKD59gemDmo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de; spf=pass smtp.mailfrom=linutronix.de; dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=KFXwlq//; dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=9cIp2XSP; arc=none smtp.client-ip=193.142.43.55
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linutronix.de
+From: Thomas Gleixner <tglx@linutronix.de>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
+	s=2020; t=1757535016;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=U6mXI0MTVp+bH+g5mA/2NKnCLozHXgMVpvTCY2YWC3M=;
+	b=KFXwlq//dUndcehlpb7inmHGwD1eHjIW42/VrrODS7bVJHHTp342kxF5EFXbIQn51ulmZT
+	arD+8qvvbdeuWYzJx7Bb1DsHeulrrVJX9T04IIfa8DyXcVuafQogDKdCDLA9JTEL+cfz52
+	4JA25jbkgFjzQEqbmZhNl3eX8FoocLxWPX//lqjhHUvtzu7KG0Gq7O/4jyGhQTDctwpt3e
+	N+7Q9xZO97I621SvXSO/vSjkkhzsaYkKZB+uNo7T1dv0lctARoP1MH/LRs09OskEUW8Wem
+	+uRxsDlVJeTpw2Qnz2deHiMUL+8JVpK+liKPUBATeaKGuUrP0lPHO3sdQWac/Q==
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
+	s=2020e; t=1757535016;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=U6mXI0MTVp+bH+g5mA/2NKnCLozHXgMVpvTCY2YWC3M=;
+	b=9cIp2XSP1UIAp4oO9SV5sxJh/Ku64vQiWZeqLjc7gqy1cXzCvd7jQkABSMMjXxo4i20v9j
+	k/BcSLjVuzI115CQ==
+To: K Prateek Nayak <kprateek.nayak@amd.com>, Ingo Molnar
+ <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>, Dave Hansen
+ <dave.hansen@linux.intel.com>, Sean Christopherson <seanjc@google.com>,
+ Paolo Bonzini <pbonzini@redhat.com>, Jonathan Corbet <corbet@lwn.net>,
+ x86@kernel.org
+Cc: Naveen rao <naveen.rao@amd.com>, Sairaj Kodilkar <sarunkod@amd.com>, "H.
+ Peter Anvin" <hpa@zytor.com>, "Peter Zijlstra (Intel)"
+ <peterz@infradead.org>, "Xin Li (Intel)" <xin@zytor.com>, Pawan Gupta
+ <pawan.kumar.gupta@linux.intel.com>, linux-kernel@vger.kernel.org,
+ kvm@vger.kernel.org, Mario Limonciello <mario.limonciello@amd.com>,
+ "Gautham R. Shenoy" <gautham.shenoy@amd.com>, Babu Moger
+ <babu.moger@amd.com>, Suravee Suthikulpanit
+ <suravee.suthikulpanit@amd.com>, K Prateek Nayak <kprateek.nayak@amd.com>,
+ stable@vger.kernel.org, Naveen N
+ Rao <naveen@kernel.org>
+Subject: Re: [PATCH v5 1/4] x86/cpu/topology: Always try
+ cpu_parse_topology_ext() on AMD/Hygon
+In-Reply-To: <20250901170418.4314-2-kprateek.nayak@amd.com>
+References: <20250901170418.4314-1-kprateek.nayak@amd.com>
+ <20250901170418.4314-2-kprateek.nayak@amd.com>
+Date: Wed, 10 Sep 2025 22:10:15 +0200
+Message-ID: <87o6rirrvc.ffs@tglx>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <1096bc24-2bac-4bc2-bc4f-9d653839e81d@amd.com>
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain
 
-On Wed, Sep 10, 2025 at 02:49:23PM -0500, Moger, Babu wrote:
-> No particular reason =E2=80=94 it was just carried over from older MSRs=
- by copy-paste.
->=20
-> In fact, all five of them are AMD-specific in this case. Let me know th=
-e
-> best way to handle this.
+On Mon, Sep 01 2025 at 17:04, K. Prateek Nayak wrote:
+> Unconditionally call cpu_parse_topology_ext() on AMD and Hygon
+> processors to first parse the topology using the XTOPOLOGY leaves
+> (0x80000026 / 0xb) before using the TOPOEXT leaf (0x8000001e).
+>
+> While at it, break down the single large comment in parse_topology_amd()
+> to better highlight the purpose of each CPUID leaf.
+>
+> Cc: stable@vger.kernel.org # Only v6.9 and above; Depends on x86 topology rewrite
+> Link: https://lore.kernel.org/lkml/1529686927-7665-1-git-send-email-suravee.suthikulpanit@amd.com/ [1]
+> Link: https://lore.kernel.org/lkml/20080818181435.523309000@linux-os.sc.intel.com/ [2]
+> Link: https://bugzilla.kernel.org/show_bug.cgi?id=206537 [3]
+> Suggested-by: Naveen N Rao (AMD) <naveen@kernel.org>
+> Fixes: 3986a0a805e6 ("x86/CPU/AMD: Derive CPU topology from CPUID function 0xB when available")
+> Signed-off-by: K Prateek Nayak <kprateek.nayak@amd.com>
+> ---
+> Changelog v4..v5:
+>
+> o Made a note on only targeting versions >= v6.9 for stable backports
+>   since the fix depends on the x86 topology rewrite. (Boris)
 
-You could s/IA32/AMD/ them later, when the dust settles.
+Shouldn't that be backported? I think so, so leave that v6.9 and above
+comment out. The stable folks will notice that it does not apply to pre
+6.9 kernels and send you a nice email asking you to provide a solution
+for pre 6.9 stable kernels.
 
-"AMD64" would mean they're architectural which doesn't look like it ... y=
-et.
+Thanks,
 
---=20
-Regards/Gruss,
-    Boris.
-
-https://people.kernel.org/tglx/notes-about-netiquette
+        tglx
 
