@@ -1,206 +1,151 @@
-Return-Path: <kvm+bounces-57177-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-57178-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id B99DBB50FDF
-	for <lists+kvm@lfdr.de>; Wed, 10 Sep 2025 09:46:21 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9CA42B51011
+	for <lists+kvm@lfdr.de>; Wed, 10 Sep 2025 09:57:39 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A822317FAB6
-	for <lists+kvm@lfdr.de>; Wed, 10 Sep 2025 07:46:20 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 861BB7B2FC4
+	for <lists+kvm@lfdr.de>; Wed, 10 Sep 2025 07:55:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D350230CDA1;
-	Wed, 10 Sep 2025 07:46:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 51FB330DD03;
+	Wed, 10 Sep 2025 07:57:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="HrT4ieTt"
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="fwCagt4P"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.20])
+Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4FBB925D218;
-	Wed, 10 Sep 2025 07:46:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.20
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C78CD30CDBF
+	for <kvm@vger.kernel.org>; Wed, 10 Sep 2025 07:57:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757490372; cv=none; b=p7N8YwDUM3jpA09g7BZUcXy0R60IHTc7/dNujPvUdnQdR3eviRlJP4JBEOrC7vXcccJNVV1a4ZgsCUj6mV1Wze9sJVtkvJbMi0xktJ+LoNB0HJwTT79S4P3DxfitGSlt5WqsrspLOoRHgpv6kbb5etJQwT16xIdUnaZltaA9pwo=
+	t=1757491049; cv=none; b=JGMsb4LSnkF2nc5wWyi++3566h6OooO5m1VntFoJXmuGkUaOpV7XcpZjq52uoHzI9Y5UBD4kBk6g35tCnE5rKa8xIswD0oJSxwpJ6vlK5YHvm0LVyQlSCmCBbWdnQOFsAUEJzciYTsHgfwxHntqgYDcVJTluKeNrhzul0H/IRbo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757490372; c=relaxed/simple;
-	bh=a3PrR//qxp7Ywbw0ah2IhyTG8FHH1p9QljBrCn/jMvE=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=Wmc6TPK8xCSqXVPpPqsWmcEd04bKWvriaT+9ueZXBjGjgoYJldH4suP7gnWEJZnjRgLgn9KOTjg6OzZx4TRGXb+/f+QGQr8eKrty3IOvm5E1w/ngbIRBkc9ExKgFhd0jL1II8BkMKrKeWXDqyTpi2WhUs55BXnte4+Dp6r+3h2g=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=HrT4ieTt; arc=none smtp.client-ip=198.175.65.20
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1757490371; x=1789026371;
-  h=message-id:date:mime-version:subject:to:cc:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=a3PrR//qxp7Ywbw0ah2IhyTG8FHH1p9QljBrCn/jMvE=;
-  b=HrT4ieTtHdFvtAtwFhMY6k5xoBP/ai2CRzdUkm/UhHN3lLASDBvrbPqy
-   PAQ710phlmQVizNkZAePQy0Mkb8TFzIrj4DDJUtOfxMOa1BBSn5OCKDHX
-   stli15OgJEGIgrnooNNgvPGjN55GrgFZEpM4vuxtVpaI7mPyg2ai3IQtD
-   3dWK6Eb0V3HJN4mJmnhh52ltZxLz68RXdSxtLfO1ShimXco7xmhMDAPfs
-   7NQCE5LoUlat/N6FaQCbeAyTM/5GbFk8k3m5GqJho5eVxpIBl+c0+H94y
-   wIoAgX2+ULNYrx6gM3tm3FwP/4zma5UXOzhTsPrg+QJyjo/ejMBWeGM2l
-   A==;
-X-CSE-ConnectionGUID: db2pRuZ+TT6BXXdt5RG6NA==
-X-CSE-MsgGUID: EmTTdH02SvKD1MIgLRrxSA==
-X-IronPort-AV: E=McAfee;i="6800,10657,11548"; a="59485499"
-X-IronPort-AV: E=Sophos;i="6.18,253,1751266800"; 
-   d="scan'208";a="59485499"
-Received: from orviesa005.jf.intel.com ([10.64.159.145])
-  by orvoesa112.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Sep 2025 00:46:10 -0700
-X-CSE-ConnectionGUID: Rel6eZKfS+m2Gegfel2PNw==
-X-CSE-MsgGUID: cmEvQ3VPQ+mcH/+yZKy4EQ==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.18,253,1751266800"; 
-   d="scan'208";a="178533882"
-Received: from unknown (HELO [10.238.0.107]) ([10.238.0.107])
-  by orviesa005-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Sep 2025 00:46:05 -0700
-Message-ID: <46946d39-c980-42a5-9f67-1642fa7f0beb@linux.intel.com>
-Date: Wed, 10 Sep 2025 15:46:02 +0800
+	s=arc-20240116; t=1757491049; c=relaxed/simple;
+	bh=2yWjQtca9vIFurOaNmKLaOJeKwiFA5Qvxekl5cC7zrI=;
+	h=Mime-Version:Content-Type:Date:Message-Id:Cc:Subject:From:To:
+	 References:In-Reply-To; b=V5MfwWVVyaZDe6y+139x3IipzDPiO3V6qr9+1e2Rzt7Zbo2XZLQsBNA2z/pUcLFfVbQYw75Woqc4j4veP/GBSlR9cncCo8e5psCp7IGpfQVpOgCW5gFiaep1gwvA/lI5N7BX4wTczBlNgiYZln0eK0mLVjy2TTf/9mwLn/1ls4o=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=fwCagt4P; arc=none smtp.client-ip=148.163.158.5
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
+Received: from pps.filterd (m0356516.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 589K4bwg018625;
+	Wed, 10 Sep 2025 07:57:22 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
+	:content-transfer-encoding:content-type:date:from:in-reply-to
+	:message-id:mime-version:references:subject:to; s=pp1; bh=T3AdB4
+	hqqFlARSsNDT6AJcRm4apQQebfJeVbRsEuVTs=; b=fwCagt4PUxXtZX/SuFW3Ha
+	CiXZoWCoFqIbJHh4u9ZQuftSB/IJ4VBe7sj3dWqmNaYr6Xplu4F/OA1jlb+bJ4Bw
+	e9HuPdxW+a87aTlKTXqHl9G2fdKtJqE2VKlv/Za8f0EsxMuNCM/8KjLRYcCftWLq
+	/xygDgfU5LewLmSQVr3XY2ATX7htVpo+zqq86WRlBe1SuKG0UeM/g3Xd8cfvVnES
+	kGULwPwpvRfZoxkBb9BPlgBI+0mcgs5Jzf0mnEwwGjqx9Wo9WpEUEuw2DYC01ZuY
+	Dbai10h+QqPd6lS/7GdCZ2c0TdBD8QFm7w4mF11yW9a/fdfv2srKGcsgH/r2gzQA
+	==
+Received: from ppma21.wdc07v.mail.ibm.com (5b.69.3da9.ip4.static.sl-reverse.com [169.61.105.91])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 490acr4f6y-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Wed, 10 Sep 2025 07:57:22 +0000 (GMT)
+Received: from pps.filterd (ppma21.wdc07v.mail.ibm.com [127.0.0.1])
+	by ppma21.wdc07v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 58A5m0qZ007950;
+	Wed, 10 Sep 2025 07:57:22 GMT
+Received: from smtprelay02.fra02v.mail.ibm.com ([9.218.2.226])
+	by ppma21.wdc07v.mail.ibm.com (PPS) with ESMTPS id 49109pqc2x-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Wed, 10 Sep 2025 07:57:21 +0000
+Received: from smtpav03.fra02v.mail.ibm.com (smtpav03.fra02v.mail.ibm.com [10.20.54.102])
+	by smtprelay02.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 58A7vHS552560248
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Wed, 10 Sep 2025 07:57:17 GMT
+Received: from smtpav03.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id C9FC620040;
+	Wed, 10 Sep 2025 07:57:17 +0000 (GMT)
+Received: from smtpav03.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 31F3220043;
+	Wed, 10 Sep 2025 07:57:17 +0000 (GMT)
+Received: from t14-nrb (unknown [9.155.202.117])
+	by smtpav03.fra02v.mail.ibm.com (Postfix) with ESMTP;
+	Wed, 10 Sep 2025 07:57:17 +0000 (GMT)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v10 20/21] KVM: selftests: Add ucall support for TDX
-To: Sagi Shahar <sagis@google.com>
-Cc: linux-kselftest@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
- Shuah Khan <shuah@kernel.org>, Sean Christopherson <seanjc@google.com>,
- Ackerley Tng <ackerleytng@google.com>, Ryan Afranji <afranji@google.com>,
- Andrew Jones <ajones@ventanamicro.com>,
- Isaku Yamahata <isaku.yamahata@intel.com>,
- Erdem Aktas <erdemaktas@google.com>,
- Rick Edgecombe <rick.p.edgecombe@intel.com>,
- Roger Wang <runanwang@google.com>, Oliver Upton <oliver.upton@linux.dev>,
- "Pratik R. Sampat" <pratikrajesh.sampat@amd.com>,
- Reinette Chatre <reinette.chatre@intel.com>, Ira Weiny
- <ira.weiny@intel.com>, Chao Gao <chao.gao@intel.com>,
- Chenyi Qiang <chenyi.qiang@intel.com>, linux-kernel@vger.kernel.org,
- kvm@vger.kernel.org
-References: <20250904065453.639610-1-sagis@google.com>
- <20250904065453.639610-21-sagis@google.com>
-Content-Language: en-US
-From: Binbin Wu <binbin.wu@linux.intel.com>
-In-Reply-To: <20250904065453.639610-21-sagis@google.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+Mime-Version: 1.0
+Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=UTF-8
+Date: Wed, 10 Sep 2025 09:57:17 +0200
+Message-Id: <DCOYKSEY6V79.3HE423J6WWXTT@linux.ibm.com>
+Cc: "Andrew Jones" <andrew.jones@linux.dev>,
+        "Janosch Frank"
+ <frankja@linux.ibm.com>
+Subject: Re: [kvm-unit-tests PATCH v2] scripts/arch-run.bash: Drop the
+ dependency on "jq"
+From: "Nico Boehr" <nrb@linux.ibm.com>
+To: "Thomas Huth" <thuth@redhat.com>, <kvm@vger.kernel.org>,
+        "Claudio
+ Imbrenda" <imbrenda@linux.ibm.com>
+X-Mailer: aerc 0.20.1
+References: <20250909045855.71512-1-thuth@redhat.com>
+In-Reply-To: <20250909045855.71512-1-thuth@redhat.com>
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: nLkCKCXGlfgUh3xVynvAMU9vNZ1ekW2d
+X-Authority-Analysis: v=2.4 cv=Mp1S63ae c=1 sm=1 tr=0 ts=68c12f62 cx=c_pps
+ a=GFwsV6G8L6GxiO2Y/PsHdQ==:117 a=GFwsV6G8L6GxiO2Y/PsHdQ==:17
+ a=IkcTkHD0fZMA:10 a=yJojWOMRYYMA:10 a=JApUutT44eaPP5SMeaQA:9
+ a=QEXdDO2ut3YA:10
+X-Proofpoint-ORIG-GUID: nLkCKCXGlfgUh3xVynvAMU9vNZ1ekW2d
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUwOTA2MDAwMCBTYWx0ZWRfX4XpSfBW+stAp
+ h3u4TbTbgY54JhluKRdypZ2/E8JdJvRObIiQGi5X8Nz1MnN2RyjNxDp4jT5TGvF4aVrAO+DPzSH
+ BnY+m+TGoxWa74WC/cgN3VfHj0f59tamaw54HD9/NMPffTSjf1lEp/YqKShMepdcWE/57/TgmKz
+ g1RHcpIylkH3yR8EG0yv6KlBdLyKCyKcA+edGrOQHb7FrAGsoqh789kxFbW0ZC63qVXJx5950oO
+ V8EZZcwE3HGFxnvi23Ba2H+crMhIUTrwk7Xk3WWthWJd3xkLUZRyu6nUvBOFZx5bf14Pav9nwNx
+ vLpuNK/AD0qyPLdTWs9Er+s+py8nQh4IbrPfRFBCu4PPaP5HrWjVfeT5nZ5/LXo9bv1ycaYMFSf
+ BypFtyxa
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1117,Hydra:6.1.9,FMLib:17.12.80.40
+ definitions=2025-09-09_03,2025-09-10_01,2025-03-28_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ impostorscore=0 malwarescore=0 clxscore=1011 phishscore=0 spamscore=0
+ adultscore=0 priorityscore=1501 bulkscore=0 suspectscore=0
+ classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
+ reason=mlx scancount=1 engine=8.19.0-2507300000 definitions=main-2509060000
 
+On Tue Sep 9, 2025 at 6:58 AM CEST, Thomas Huth wrote:
+> For checking whether a panic event occurred, a simple "grep"
+> for the related text in the output is enough - it's very unlikely
+> that the output of QEMU will change. This way we can drop the
+> dependency on the program "jq" which might not be installed on
+> some systems.
 
+Trying to understand which problem you're trying to solve here.
 
-On 9/4/2025 2:54 PM, Sagi Shahar wrote:
-> From: Ackerley Tng <ackerleytng@google.com>
->
-> ucalls for non-Coco VMs work by having the guest write to the rdi
-> register, then perform an io instruction to exit to the host. The host
-> then reads rdi using kvm_get_regs().
->
-> CPU registers can't be read using kvm_get_regs() for TDX, so TDX
-> guests use MMIO to pass the struct ucall's hva to the host. MMIO was
-> chosen because it is one of the simplest (hence unlikely to fail)
-> mechanisms that support passing 8 bytes from guest to host.
->
-> Signed-off-by: Ackerley Tng <ackerleytng@google.com>
-> Co-developed-by: Sagi Shahar <sagis@google.com>
-> Signed-off-by: Sagi Shahar <sagis@google.com>
-> ---
->   .../testing/selftests/kvm/include/x86/ucall.h |  4 +-
->   tools/testing/selftests/kvm/lib/x86/ucall.c   | 45 ++++++++++++++++---
->   2 files changed, 41 insertions(+), 8 deletions(-)
->
-> diff --git a/tools/testing/selftests/kvm/include/x86/ucall.h b/tools/testing/selftests/kvm/include/x86/ucall.h
-> index d3825dcc3cd9..0494a4a21557 100644
-> --- a/tools/testing/selftests/kvm/include/x86/ucall.h
-> +++ b/tools/testing/selftests/kvm/include/x86/ucall.h
-> @@ -6,8 +6,6 @@
->   
->   #define UCALL_EXIT_REASON       KVM_EXIT_IO
->   
-> -static inline void ucall_arch_init(struct kvm_vm *vm, vm_paddr_t mmio_gpa)
-> -{
-> -}
-> +void ucall_arch_init(struct kvm_vm *vm, vm_paddr_t mmio_gpa);
+Is there any major distribution which doesn't have jq in its repos? Or any
+reason why you wouldn't install it?
 
-It has been declared in ucall_common.h,  this should be removed here?
+> diff --git a/scripts/arch-run.bash b/scripts/arch-run.bash
+> index 36222355..16417a1e 100644
+> --- a/scripts/arch-run.bash
+> +++ b/scripts/arch-run.bash
+> @@ -296,11 +296,6 @@ do_migration ()
+> =20
+>  run_panic ()
+>  {
+[...]
+> -	panic_event_count=3D$(jq -c 'select(.event =3D=3D "GUEST_PANICKED")' < =
+${qmp}.out | wc -l)
+> -	if [ "$panic_event_count" -lt 1 ]; then
+> +	if ! grep -E -q '"event"[[:blank:]]*:[[:blank:]]*"GUEST_PANICKED"' ${qm=
+p}.out ; then
 
->   
->   #endif
-> diff --git a/tools/testing/selftests/kvm/lib/x86/ucall.c b/tools/testing/selftests/kvm/lib/x86/ucall.c
-> index 1265cecc7dd1..0ad24baaa3c4 100644
-> --- a/tools/testing/selftests/kvm/lib/x86/ucall.c
-> +++ b/tools/testing/selftests/kvm/lib/x86/ucall.c
-> @@ -5,11 +5,34 @@
->    * Copyright (C) 2018, Red Hat, Inc.
->    */
->   #include "kvm_util.h"
-> +#include "tdx/tdx.h"
->   
->   #define UCALL_PIO_PORT ((uint16_t)0x1000)
->   
-> +static uint8_t vm_type;
-> +static vm_paddr_t host_ucall_mmio_gpa;
-> +static vm_paddr_t ucall_mmio_gpa;
-> +
-> +void ucall_arch_init(struct kvm_vm *vm, vm_paddr_t mmio_gpa)
-> +{
-> +	vm_type = vm->type;
-> +	sync_global_to_guest(vm, vm_type);
-> +
-> +	host_ucall_mmio_gpa = ucall_mmio_gpa = mmio_gpa;
-> +
-> +	if (vm_type == KVM_X86_TDX_VM)
-Nit: is_tdx_vm(vm)
+This changes behaviour.
 
-Also, maybe it can skip the initialization of mmio info for non TDX case to tell
-that the info is only used by TDX?
+Now "event" can be arbitrarily deep nested in the JSON. It could even be
+completely invalid JSON.
 
-> +		ucall_mmio_gpa |= vm->arch.s_bit;
-> +
-> +	sync_global_to_guest(vm, ucall_mmio_gpa);
-> +}
-> +
->   void ucall_arch_do_ucall(vm_vaddr_t uc)
->   {
-> +	if (vm_type == KVM_X86_TDX_VM) {
-> +		tdg_vp_vmcall_ve_request_mmio_write(ucall_mmio_gpa, 8, uc);
-> +		return;
-> +	}
-> +
->   	/*
->   	 * FIXME: Revert this hack (the entire commit that added it) once nVMX
->   	 * preserves L2 GPRs across a nested VM-Exit.  If a ucall from L2, e.g.
-> @@ -46,11 +69,23 @@ void *ucall_arch_get_ucall(struct kvm_vcpu *vcpu)
->   {
->   	struct kvm_run *run = vcpu->run;
->   
-> -	if (run->exit_reason == KVM_EXIT_IO && run->io.port == UCALL_PIO_PORT) {
-> -		struct kvm_regs regs;
-> +	switch (vm_type) {
-> +	case KVM_X86_TDX_VM:
-> +		if (vcpu->run->exit_reason == KVM_EXIT_MMIO &&
-> +		    vcpu->run->mmio.phys_addr == host_ucall_mmio_gpa &&
-> +		    vcpu->run->mmio.len == 8 && vcpu->run->mmio.is_write) {
-> +			uint64_t data = *(uint64_t *)vcpu->run->mmio.data;
-> +
-> +			return (void *)data;
-> +		}
-> +		return NULL;
-> +	default:
-> +		if (run->exit_reason == KVM_EXIT_IO && run->io.port == UCALL_PIO_PORT) {
-> +			struct kvm_regs regs;
->   
-> -		vcpu_regs_get(vcpu, &regs);
-> -		return (void *)regs.rdi;
-> +			vcpu_regs_get(vcpu, &regs);
-> +			return (void *)regs.rdi;
-> +		}
-> +		return NULL;
->   	}
-> -	return NULL;
->   }
-
+Not saying we shouldn't do this, it just comes with a cost and we need to s=
+ee if
+it's worth paying that.
 
