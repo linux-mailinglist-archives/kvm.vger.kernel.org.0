@@ -1,258 +1,232 @@
-Return-Path: <kvm+bounces-57191-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-57192-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8420DB512BA
-	for <lists+kvm@lfdr.de>; Wed, 10 Sep 2025 11:39:21 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 62092B5151D
+	for <lists+kvm@lfdr.de>; Wed, 10 Sep 2025 13:12:25 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7AAD1562FD0
-	for <lists+kvm@lfdr.de>; Wed, 10 Sep 2025 09:39:20 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2AF35443B1A
+	for <lists+kvm@lfdr.de>; Wed, 10 Sep 2025 11:11:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 97E503148C0;
-	Wed, 10 Sep 2025 09:39:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 04F913176F2;
+	Wed, 10 Sep 2025 11:11:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="l+/n/fc1"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="YKGZCT6/"
 X-Original-To: kvm@vger.kernel.org
-Received: from casper.infradead.org (casper.infradead.org [90.155.50.34])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.12])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7BADD3148A1;
-	Wed, 10 Sep 2025 09:39:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=90.155.50.34
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757497151; cv=none; b=n54zh7S1lliFpKpw+F0Q4xqz8zSScZcpg5TKszAqkAQ3Uad2Po9H5vkCamNygiT1NWwqzYHmdAhkWb6vh7QQKonp2S6aQ4FfJuOtrvKagPVQPqF4oSoLU32kZnT+LHy6vZQm1/qLaeje8ejLI3XiDb3B4FwGnq3wAs9tFUqno74=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757497151; c=relaxed/simple;
-	bh=F0hzqbKYzZ1FOBOhCdSWYTUeBbEmjSoAQE0V6lQDKVM=;
-	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=HCm/eoyDR4eEKY9XszuP3A+CtaLDfZrK1DruC5c8LZZ7b0zj/SsM8Ql2YcD/SOlNuA/Hl5XPJq8NrxDhzElfnPKXmuc8pszICjgvEkLs6cv2uO3GYqbsPmEnHqwRPwWmxCkkMuOlVg86LE4Mq8R0QO7ve6rm8auRFQxq+OwsgLE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=casper.srs.infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=l+/n/fc1; arc=none smtp.client-ip=90.155.50.34
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=casper.srs.infradead.org
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=infradead.org; s=casper.20170209; h=MIME-Version:Content-Type:References:
-	In-Reply-To:Date:Cc:To:From:Subject:Message-ID:Sender:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description;
-	bh=F0hzqbKYzZ1FOBOhCdSWYTUeBbEmjSoAQE0V6lQDKVM=; b=l+/n/fc1OUqigTJV5jGZqICZtN
-	1nFwm6G2DY+wZrFrryg/zO6gh1kGp/C9eTqVZ+dYldOwi65SmXMEqxHEx3zKaByDKe2jIhhapyTEr
-	M+H60u9TxZiLucwJw5ub6Brpw1WHig9VD/ea8i44ZfCDd63Sfw1/46bQP/FAkF6ZfIrnhBo0EJqll
-	IgWXCeTaCeyQ7JD2VcNMw3yNgeu/F+JdgCexLGqj+Ux6HqCqYBJHqUV9vEM3ijcpBQpUTmwTu6Mfm
-	05TdwB3dwHPf77eHQaIbYUEOk4fy+BeDugvmI0EPYg2hBWHa0ZOtV18FlDUUg2SdD2UCdl9RDzwh6
-	Gouy/W6Q==;
-Received: from 54-240-197-236.amazon.com ([54.240.197.236] helo=freeip.amazon.com)
-	by casper.infradead.org with esmtpsa (Exim 4.98.2 #2 (Red Hat Linux))
-	id 1uwHI9-00000006aCB-00j2;
-	Wed, 10 Sep 2025 09:39:05 +0000
-Message-ID: <dcc29d43904f4d26fea25dbdf8a86a2bae1087a9.camel@infradead.org>
-Subject: Re: [BUG] [KVM/VMX] Level triggered interrupts mishandled on
- Windows w/ nested virt(Credential Guard) when using split irqchip
-From: David Woodhouse <dwmw2@infradead.org>
-To: Vitaly Kuznetsov <vkuznets@redhat.com>, Khushit Shah
-	 <khushit.shah@nutanix.com>
-Cc: "seanjc@google.com" <seanjc@google.com>, "pbonzini@redhat.com"
-	 <pbonzini@redhat.com>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>, 
- "linux-kernel@vger.kernel.org"
-	 <linux-kernel@vger.kernel.org>, Shaju Abraham <shaju.abraham@nutanix.com>
-Date: Wed, 10 Sep 2025 10:39:03 +0100
-In-Reply-To: <87ms72g0zk.fsf@redhat.com>
-References: <7D497EF1-607D-4D37-98E7-DAF95F099342@nutanix.com>
-	 <87a535fh5g.fsf@redhat.com>
-	 <D373804C-B758-48F9-8178-393034AF12DD@nutanix.com>
-	 <87wm69dvbu.fsf@redhat.com>
-	 <376ABCC7-CF9A-4E29-9CC7-0E3BEE082119@nutanix.com>
-	 <87ms72g0zk.fsf@redhat.com>
-Content-Type: multipart/signed; micalg="sha-256"; protocol="application/pkcs7-signature";
-	boundary="=-m42kkFnwE69/VuJqghtc"
-User-Agent: Evolution 3.52.3-0ubuntu1 
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6436D30AD10;
+	Wed, 10 Sep 2025 11:11:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=198.175.65.12
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1757502679; cv=fail; b=XShWqpZaWpiyUgCbUObSC3pxaa8MIVP+PozoIb3Zp9Zv68rUU6vgHQ61rYT7Z9RrCBHWrH2zOhctRBDCpK7hHo77HLBf+ycTQB+R4di/Mq35Gy4L1oT8bml7fug4WZ0aZpCaiW6PFt9A92+O1mBMZPOd8ci5PmIsgrEHdcOYH44=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1757502679; c=relaxed/simple;
+	bh=EGOfaTfMKd1th0WwKk698kzRFp1GecqjPor3uTjt2w8=;
+	h=Date:From:To:CC:Subject:Message-ID:References:Content-Type:
+	 Content-Disposition:In-Reply-To:MIME-Version; b=rxS0iVSMVMPB2AMUYEFhL8CobvzO+awyY1mYLKtAMhjZbj8ErM9MwCYpjVKdgL5uUKM/XXrmjYm8lzic6HPjp/f/i0Ie90vlMs9e5BxRSciOxVBVEyVhSnpWxm7Ia3BYx4PglzPSDo4U+wOBjuqFpRZOggKSV2HfYSuAASb3SiI=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=YKGZCT6/; arc=fail smtp.client-ip=198.175.65.12
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1757502677; x=1789038677;
+  h=date:from:to:cc:subject:message-id:references:
+   in-reply-to:mime-version;
+  bh=EGOfaTfMKd1th0WwKk698kzRFp1GecqjPor3uTjt2w8=;
+  b=YKGZCT6/XkSY81Gia85x/4VqR5ySb9ahjBaM0XL8yy/yNIFp785b9tt9
+   WoAD1GM91z5RgdXwG83mNw9j5+eFrgj4A+XCU8iq26SNeV2kGIfqlVyCG
+   EBEyI2Iq5sEAS3h4/Wmr8Y1bKoYHWg1jjB2OuFmQCkY/VeBtNxGqNBkGN
+   5Dg0xq5mMyF9CCeBViEFfLrYfvUTnUNbWgbqxGXgT+ZX4Kkt/GxLimev7
+   x92jI+4iNpBzlNzPpA8cDtXPW2HE696oNLwDkNjTavCvmo45U9tNoq7kz
+   wLJQyA+bma1iFRTxyDV6zIwhKXRMBiferqqtMMewyfGaY8YZx7iduIvaa
+   A==;
+X-CSE-ConnectionGUID: OIBlTgn0SlGQ9GUyI4EmvQ==
+X-CSE-MsgGUID: g03wy6QlRLeFTHtQ+FLdXA==
+X-IronPort-AV: E=McAfee;i="6800,10657,11548"; a="71224032"
+X-IronPort-AV: E=Sophos;i="6.18,254,1751266800"; 
+   d="scan'208";a="71224032"
+Received: from fmviesa009.fm.intel.com ([10.60.135.149])
+  by orvoesa104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Sep 2025 04:11:16 -0700
+X-CSE-ConnectionGUID: A+zMeBQXRISe1Zecx+c+Gg==
+X-CSE-MsgGUID: dd4KIGy/S2KoLXnFWd9mAQ==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.18,254,1751266800"; 
+   d="scan'208";a="173814273"
+Received: from orsmsx901.amr.corp.intel.com ([10.22.229.23])
+  by fmviesa009.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Sep 2025 04:11:15 -0700
+Received: from ORSMSX902.amr.corp.intel.com (10.22.229.24) by
+ ORSMSX901.amr.corp.intel.com (10.22.229.23) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.2562.17; Wed, 10 Sep 2025 04:11:14 -0700
+Received: from ORSEDG903.ED.cps.intel.com (10.7.248.13) by
+ ORSMSX902.amr.corp.intel.com (10.22.229.24) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.2562.17 via Frontend Transport; Wed, 10 Sep 2025 04:11:14 -0700
+Received: from NAM10-DM6-obe.outbound.protection.outlook.com (40.107.93.64) by
+ edgegateway.intel.com (134.134.137.113) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.2562.17; Wed, 10 Sep 2025 04:11:13 -0700
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=mf2JhZRHzfX9yRQaUA+kQ5vQ+xQq9tthmE5tlKTSzxGfeoYYc1nIMyPnVMzNKzxuIBTC9fPtD4Kp900iB5P0IjLQ5CCTDjb0hamOHYlfq9me7TkzV25ZZXQLbHjp1MucNhwcpYvWsOUZEwqrvvCWNKE/uSCIHKjbKCqbEi7WiW88yri/p6PFKK+xIS1Tlas8lU5W59eCRWXnbHLN/5M60IvYoJkBhZxa77kJV5m5yvB+EzKgeb0PbygOOEAJH9xoXKqhwdqgfgo3gTXHrIMdlUb2jjs5cg+LLeqdMtAIFxZWduZ3iugu1VWF5/L4yKeZUp1YaAOsTjWtYjutpPYPzg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=Gl9p6U7spL2k5i2oKLzZNj5Dx+9uFalO4AlFLH8B0T8=;
+ b=ywgm2lvqoWN0qMG7AK8kugAy+oaQCZaetdc3p24kPfgffxMznzX2S0OA7lt7l9EvHjHE7s4w1SGy/EfdSwpNY8AlpzNPBIyQz/9iZR0bhw8KNK7epJ2FujOn0+zp1m0uguk5oe0agAGqqv3kqMCxFRkjacsKP+O8oywvce1J0L98rKk/CPhAQqHq2FIU2TU7kQyeHg54VaYHYhfNRE/wqpnHvpxLOvD4Zi+rTN7GHHx8EL8GVmhDJFF+hpT1yWbNHkokn9RM+cwM+DoGLwsRsaUl20qWp37LDY8N8zgY4Xwqla8KuIjwi0IfVhmDSyRHezAkqnejtNf9QHTKbiv+uQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+Received: from CH3PR11MB8660.namprd11.prod.outlook.com (2603:10b6:610:1ce::13)
+ by MN6PR11MB8194.namprd11.prod.outlook.com (2603:10b6:208:477::21) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9094.22; Wed, 10 Sep
+ 2025 11:11:11 +0000
+Received: from CH3PR11MB8660.namprd11.prod.outlook.com
+ ([fe80::cfad:add4:daad:fb9b]) by CH3PR11MB8660.namprd11.prod.outlook.com
+ ([fe80::cfad:add4:daad:fb9b%4]) with mapi id 15.20.9094.021; Wed, 10 Sep 2025
+ 11:11:11 +0000
+Date: Wed, 10 Sep 2025 19:10:57 +0800
+From: Chao Gao <chao.gao@intel.com>
+To: "Huang, Kai" <kai.huang@intel.com>
+CC: "kvm@vger.kernel.org" <kvm@vger.kernel.org>, "linux-pm@vger.kernel.org"
+	<linux-pm@vger.kernel.org>, "linux-kernel@vger.kernel.org"
+	<linux-kernel@vger.kernel.org>, "xin@zytor.com" <xin@zytor.com>,
+	"brgerst@gmail.com" <brgerst@gmail.com>, "andrew.cooper3@citrix.com"
+	<andrew.cooper3@citrix.com>, "arjan@linux.intel.com" <arjan@linux.intel.com>,
+	"Williams, Dan J" <dan.j.williams@intel.com>, "dave.hansen@linux.intel.com"
+	<dave.hansen@linux.intel.com>, "Edgecombe, Rick P"
+	<rick.p.edgecombe@intel.com>, "seanjc@google.com" <seanjc@google.com>,
+	"mingo@redhat.com" <mingo@redhat.com>, "pbonzini@redhat.com"
+	<pbonzini@redhat.com>, "tglx@linutronix.de" <tglx@linutronix.de>,
+	"hpa@zytor.com" <hpa@zytor.com>, "peterz@infradead.org"
+	<peterz@infradead.org>, "pavel@kernel.org" <pavel@kernel.org>, "bp@alien8.de"
+	<bp@alien8.de>, "kprateek.nayak@amd.com" <kprateek.nayak@amd.com>,
+	"rafael@kernel.org" <rafael@kernel.org>, "david.kaplan@amd.com"
+	<david.kaplan@amd.com>, "x86@kernel.org" <x86@kernel.org>
+Subject: Re: [RFC PATCH v1 1/5] x86/boot: Shift VMXON from KVM init to CPU
+ startup phase
+Message-ID: <aMFcwXEWMc2VIzQQ@intel.com>
+References: <20250909182828.1542362-1-xin@zytor.com>
+ <20250909182828.1542362-2-xin@zytor.com>
+ <1301b802284ed5755fe397f54e1de41638aec49c.camel@intel.com>
+Content-Type: text/plain; charset="us-ascii"
+Content-Disposition: inline
+In-Reply-To: <1301b802284ed5755fe397f54e1de41638aec49c.camel@intel.com>
+X-ClientProxiedBy: SI1PR02CA0012.apcprd02.prod.outlook.com
+ (2603:1096:4:1f7::8) To CH3PR11MB8660.namprd11.prod.outlook.com
+ (2603:10b6:610:1ce::13)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-SRS-Rewrite: SMTP reverse-path rewritten from <dwmw2@infradead.org> by casper.infradead.org. See http://www.infradead.org/rpr.html
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: CH3PR11MB8660:EE_|MN6PR11MB8194:EE_
+X-MS-Office365-Filtering-Correlation-Id: 6349b2d0-8463-45a2-08ef-08ddf05ac002
+X-LD-Processed: 46c98d88-e344-4ed4-8496-4ed7712e255d,ExtAddr
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;ARA:13230040|366016|376014|7416014|1800799024;
+X-Microsoft-Antispam-Message-Info: =?us-ascii?Q?DkNiQbp9zlXYCdmKDbX2H0EZRIgiyyDwHJXeA6G1NSMsi6oOXG+LdMMjqb/i?=
+ =?us-ascii?Q?ey8Xx3euLKkDNtkVe8dxBj3HtM++kO9p9gbEja/QNh9dN+al+dW6cx/iRtTJ?=
+ =?us-ascii?Q?UjZSNd9IiM9mUZM4zuYpaA20nOlISfbpOrg/DG/dfWPJ6ztMiE6Vgn/mbaLK?=
+ =?us-ascii?Q?cFTMiGu8tWJmo+RAW3ADz/4I8ztUnRCU/foWIzSe7BljWZOQE0M4pKgyY+PH?=
+ =?us-ascii?Q?SOh7fJmQgsWZ2uwC0sm7vrC+RdXaQSKXbb2WyOkz8h8DiKbrB2iAt/XhdCt1?=
+ =?us-ascii?Q?Mnf+Cc0v45d5oDPYoCUGiQpyUBrKfdImbpEEaIs61RrocXJKcVGlTrws8+EW?=
+ =?us-ascii?Q?rYlcXctJS9M1u1bT4ycXADB0xQGOzFyBot2fhMNOVVJX2hJ1oCb7w/ugjjek?=
+ =?us-ascii?Q?93DUhRC/JDHSidGE8nk79TNkwCVZs2BcJdzieTnknudZFfj6UYw2dEQRp8rI?=
+ =?us-ascii?Q?jC72Hhf6IWrJ61F0oJqZlw7ATZHp3oj86smXq+mDpxK464XBUV1NLj/NOc9u?=
+ =?us-ascii?Q?2QYAUkeRfkkZqulIdBwtd2NIlRKP4Tv/24cgtpPjeBUxtepz53IHOX0SZpcH?=
+ =?us-ascii?Q?KbarH+Nvo7hJOIM8z36Hcz5kGQqsn4p/OJYWc7zAsKzlAkRL75+e0yRcAuq8?=
+ =?us-ascii?Q?qp2t+S+zEKavAHD0NCs2exWh0Wb80fIx8nt/hBqO4OyF9iaSZRSXESMLRf1m?=
+ =?us-ascii?Q?uVzeSx6hGQhAhhe28WoU1jXqIniM5Wo8gjI9VGZiqst/b7j88sKaIq0Ey4eG?=
+ =?us-ascii?Q?BVkkQ4+ljx6G0XJMaRin3E1VNjDgU+t0caWiCk+hVn5uwArNK+oeYSQkjVxB?=
+ =?us-ascii?Q?5vntVng9LKVlYmKkdYFchf13+a/O9phaELKyyvNLJ3R77C2ry1d4vu+a+pWq?=
+ =?us-ascii?Q?ZqMlqMtLaXEhFMBInjx+fYz4jYyyT5ya6wocjLNvY2JwRqDiub4T3rftivdT?=
+ =?us-ascii?Q?ulGvzWcAx90/CLZutbzvg41dmWsuvBZKOV7MLFttMzxqcPPAmKLEvzHRd+6t?=
+ =?us-ascii?Q?fZbT85RW8e6dEN4NeaJHFxQXjUZchbywIqhOio49foCRrPB3NgbXfqdHbWqM?=
+ =?us-ascii?Q?DOVyKypCH0cJwJjycFevy7nAJYPOhuzc3jKnRpCvFmQBio3qwn0tcbm+3qlh?=
+ =?us-ascii?Q?cqYvSeMVzwOS1UbpDM7xnWatI9U6PTyaMwjgYtUyDWyeVsbgP/YQGclyXPtp?=
+ =?us-ascii?Q?Csrf6H6+RwH1VOK+pbbliJvvt7idI8hMAijn2OpHUi41krEa3uaddMqxNXFT?=
+ =?us-ascii?Q?z04xfdFBr20qZP/A/EEAVTtoSPG55xnpYFhD4253z/cKULfF/rzGsjxJF9RJ?=
+ =?us-ascii?Q?KFm/qpwlqsxwX9edi6R+82xSL+fhuKnuatCTJsYIna8SuB7vNVhAXBgcGSf+?=
+ =?us-ascii?Q?s4TXaDxMPuq4QJ4wB0/2jDaJaEoC6cPofLRA6LD3IWi4hjWJQnO9tM/9r9Q3?=
+ =?us-ascii?Q?mRKnSKOuJkI=3D?=
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CH3PR11MB8660.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(376014)(7416014)(1800799024);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?2tLbk/j9qCmlhlhdKsq5W4Z/jefFhU1rsFZ+wvZOZCKlXkOPSP8EgL46RW8S?=
+ =?us-ascii?Q?snCTjwFnYbnZWv9HpPOOITUfpvwbWMBsQzGlTyEQ9y4AlTE2lrdUl5Fq1Woy?=
+ =?us-ascii?Q?5PyVzpSngua3/oLd0i/7XUbHTUKgsWL/F9M7FETos4z+5tJFmjC+6BYw90ob?=
+ =?us-ascii?Q?F1hWeMfJLcww9Zk1ZD1gmuNQn+hqFzaSa37dWvpQ2w6Ynkn6hswt1Lp/LC1u?=
+ =?us-ascii?Q?3tS/tY3nz8YGXe52d4uqN4NjPkYQC/zT5VySc19WZd7z4Nssz6Us7qhV4Nh2?=
+ =?us-ascii?Q?5TXnaFUEkGIN6HIWoAroelMZ7tpDN5AEiHDAi4rji6QnZbxcFgHXT6OBTEkb?=
+ =?us-ascii?Q?hwpYZO/Jf81iAnzRegsE1le2OTO7qHJSIFpF9Y9+ojvGY7Jw0IC2mCdPQzPS?=
+ =?us-ascii?Q?AUTEO2Hfi+G0sZhJcanO2cFGZnoa90UxnVQsqtA5FRlzp1AYyv4hexRfivS5?=
+ =?us-ascii?Q?wrPM/wdRybrrEOt0kQPJ5RzPhKfphfUczIrqHiSkCSk+U7EuoQONImdmxk+5?=
+ =?us-ascii?Q?PpD3aqnAxmT267SkkFlHyuov2yq1fI6BU4NKArqy54aL0lYFU8qJnxsTv2Gd?=
+ =?us-ascii?Q?CUTIGAVXFEmzcb2k4FaNVt+Ct0LkHoSvWmNZP8Hcf7KtVdGEp+a1+9F0bqhz?=
+ =?us-ascii?Q?m+ggL0h43Z5gSOauyhk35qcFXOVCOqHNaWED2+HSPg5YJ00jgkgkf+crXxrO?=
+ =?us-ascii?Q?zNk0+Huy4aw2JmuL6NNC+OkLPS2xoz/QqnGNTesnWFueXf6FF3PTXhZNJ1R4?=
+ =?us-ascii?Q?MgN+3ylcBkOqbUflobWrViz6v9H6JCPP1Ak+lvZxIDkvruxlHM0aAXdefNgR?=
+ =?us-ascii?Q?KKVlTQYG+a5dLcEWYLieexAqTnZWDgWHab+PBzH33J65gQghi5q1JyYRr2cK?=
+ =?us-ascii?Q?MvxsAQ2sMpcIAlwAmsSqhuPeDq2ZsOcw+toy/khI6PCbX2Hbn9fQwT5nhdr9?=
+ =?us-ascii?Q?UBOPxN4Ha/4HW1umlBQgDe1cOJafv0c2d2+zriseAbRIOUk7ebm08b3WaLZL?=
+ =?us-ascii?Q?uBxaJ2q2Mka6ukgLdPZ0Cd/d/IbCnvF/3rll0OEoPpwRBTrnUvwFoo+gIUHn?=
+ =?us-ascii?Q?aOU/AjESqBGff44s4MZWIihaok+Wj5dBLSl/wg6IYkp4Vx4TZA2/+r/4zC0C?=
+ =?us-ascii?Q?X33Jwe7ZGIGWVdUlYBOvVLUvduN+FeaiASrbcsM4MfnG5AD3RXHT4gUlIIWe?=
+ =?us-ascii?Q?XNmLgNARZe6mEdi/E+5icjnZ8E+ZZxUHM1vk/758KsZZEVrKdjMCcSt77U0Y?=
+ =?us-ascii?Q?qNK/R0nGC3nw6hSDpzG64r1qRIm1gFQ8G4VeApmioZpyIF8On3coy6YmGvPa?=
+ =?us-ascii?Q?5MMglqNWsN6sU6VT8Wkg0/lJt7hv9KfltSsbCUkKjNFy0vAo6RopC6v1mxY+?=
+ =?us-ascii?Q?79BlGD0GMBwSpeBf9Uco+3YBjA5+vQJrJI9KHvKhzmFNRhEvykD6yAVkZHOG?=
+ =?us-ascii?Q?yURVW77KJVXlp30fMhUTrUONUKH57+zShBrsAhGXfVrJXJ6Qre3tO/e6WvOA?=
+ =?us-ascii?Q?6QERKpe2rJL1dtBsCoWrNgVrfvfjFyA5yn5/OCCyWbz7U0lHtfBPmlGiTHx6?=
+ =?us-ascii?Q?ajlEVFahw1Ie13JujcV4u08x/5W6LaEsjm95rDiW?=
+X-MS-Exchange-CrossTenant-Network-Message-Id: 6349b2d0-8463-45a2-08ef-08ddf05ac002
+X-MS-Exchange-CrossTenant-AuthSource: CH3PR11MB8660.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 10 Sep 2025 11:11:11.7682
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: mfh0Dsr2YFmPiCHhSoO7xTvyVQzym2FMg2d6UZQvGfaR+ZKsnbkEmRL7fjIc/MpOBmZcTo0UDD+nuDJL9cjYHQ==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: MN6PR11MB8194
+X-OriginatorOrg: intel.com
 
+>> @@ -2551,6 +2636,12 @@ void __init arch_cpu_finalize_init(void)
+>>  	*c = boot_cpu_data;
+>>  	c->initialized = true;
+>>  
+>> +	/*
+>> +	 * Enable BSP virtualization right after the BSP cpuinfo_x86 structure
+>> +	 * is initialized to ensure this_cpu_has() works as expected.
+>> +	 */
+>> +	cpu_enable_virtualization();
+>> +
+>> 
+>
+>Any reason that you choose to do it in arch_cpu_finalize_init()?  Perhaps
+>just a arch_initcall() or similar?
+>
+>KVM has a specific CPUHP_AP_KVM_ONLINE to handle VMXON/OFF for CPU
+>online/offline.  And it's not in STARTUP section (which is not allowed to
+>fail) so it can handle the failure of VMXON.
+>
+>How about adding a VMX specific CPUHP callback instead?
+>
+>In this way, not only we can put all VMX related code together (e.g.,
+>arch/x86/virt/vmx/vmx.c) which is way easier to review/maintain, but also
+>we can still handle the failure of VMXON just like in KVM.
 
---=-m42kkFnwE69/VuJqghtc
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-
-On Wed, 2025-09-10 at 10:34 +0200, Vitaly Kuznetsov wrote:
-> Khushit Shah <khushit.shah@nutanix.com> writes:
->=20
-> > > On 8 Sep 2025, at 5:12=E2=80=AFPM, Vitaly Kuznetsov <vkuznets@redhat.=
-com> wrote:
-> > >=20
->=20
-> ...
->=20
-> > > Also, I've just recalled I fixed (well, 'workarounded') an issue
-> > > similar
-> > > to yours a while ago in QEMU:
-> > >=20
-> > > commit 958a01dab8e02fc49f4fd619fad8c82a1108afdb
-> > > Author: Vitaly Kuznetsov <vkuznets@redhat.com>
-> > > Date:=C2=A0=C2=A0 Tue Apr 2 10:02:15 2019 +0200
-> > >=20
-> > > =C2=A0=C2=A0 ioapic: allow buggy guests mishandling level-triggered
-> > > interrupts to make progress
-> > >=20
-> > > maybe something has changed and it doesn't work anymore?
-> >=20
-> > This is really interesting, we are facing a very similar issue, but
-> > the interrupt storm only occurs when using split-irqchip.=20
-> > Using kernel-irqchip, we do not even see consecutive level
-> > triggered interrupts of the same vector. From the logs it is=20
-> > clear that somehow with kernel-irqchip, L1 passes the interrupt to
-> > L2 to service, but with split-irqchip, L1 EOI=E2=80=99s without=20
-> > servicing the interrupt. As it is working properly on kernel-
-> > irqchip, we can=E2=80=99t really point it as an Hyper-V issue. AFAIK,=
-=20
-> > kernel-irqchip setting should be transparent to the guest, can you
-> > think of anything that can change this?
->=20
-> The problem I've fixed back then was also only visible with split
-> irqchip. The reason was:
->=20
-> """
-> in-kernel IOAPIC implementation has commit 184564efae4d ("kvm:
-> ioapic: conditionally delay
-> irq delivery duringeoi broadcast")
-> """
->=20
-> so even though the guest cannot really distinguish between in-kernel
-> and
-> split irqchips, the small differences in implementation can make a
-> big
-> difference in the observed behavior. In case we re-assert improperly
-> handled level-triggered interrupt too fast, the guest is not able to
-> make much progress but if we let it execute for even the tiniest
-> fraction of time, then the forward progress happens.=20
->=20
-> I don't exactly know what happens in this particular case but I'd
-> suggest you try to atrificially delay re-asserting level triggered
-> interrupts and see what happens.
-
-We know that QEMU reasserts INTx interrupts too soon anyway.
-
-The in-kernel irqchip will trigger the VFIO resamplefd when the
-interrupt is EOI'd in the I/O APIC. as $DEITY intended.
-
-QEMU, on the other hand, will unmap the device BARs when the interrupt
-happens and intercept subsequent access, triggering the VFIO resamplefd
-as soon as the next access happens =E2=80=94 even before it's EOI'd.
-
-Could that be making a difference here?
-
-I guess, in theory, "too soon" probably shouldn't matter if it's all
-handled correctly elsewhere =E2=80=94 it should get masked again in the
-hardware and the pending status tracked correctly until it's
-redelivered to the guest(s). But it's probably worth testing, given
-that's one of the big behavioural differences between kernel and
-userspace I/O APIC?
-
-It's somewhat non-trivial to fix it 'properly' across all of QEMU's
-interrupt controllers and IRQ abstractions, but hacking something up
-which does the right thing just for this x86 platform and I/O APIC and
-avoids the current MMIO-unmapping abomination might be worth a test?
-
---=-m42kkFnwE69/VuJqghtc
-Content-Type: application/pkcs7-signature; name="smime.p7s"
-Content-Disposition: attachment; filename="smime.p7s"
-Content-Transfer-Encoding: base64
-
-MIAGCSqGSIb3DQEHAqCAMIACAQExDzANBglghkgBZQMEAgEFADCABgkqhkiG9w0BBwEAAKCCD9Aw
-ggSOMIIDdqADAgECAhAOmiw0ECVD4cWj5DqVrT9PMA0GCSqGSIb3DQEBCwUAMGUxCzAJBgNVBAYT
-AlVTMRUwEwYDVQQKEwxEaWdpQ2VydCBJbmMxGTAXBgNVBAsTEHd3dy5kaWdpY2VydC5jb20xJDAi
-BgNVBAMTG0RpZ2lDZXJ0IEFzc3VyZWQgSUQgUm9vdCBDQTAeFw0yNDAxMzAwMDAwMDBaFw0zMTEx
-MDkyMzU5NTlaMEExCzAJBgNVBAYTAkFVMRAwDgYDVQQKEwdWZXJva2V5MSAwHgYDVQQDExdWZXJv
-a2V5IFNlY3VyZSBFbWFpbCBHMjCCASIwDQYJKoZIhvcNAQEBBQADggEPADCCAQoCggEBAMjvgLKj
-jfhCFqxYyRiW8g3cNFAvltDbK5AzcOaR7yVzVGadr4YcCVxjKrEJOgi7WEOH8rUgCNB5cTD8N/Et
-GfZI+LGqSv0YtNa54T9D1AWJy08ZKkWvfGGIXN9UFAPMJ6OLLH/UUEgFa+7KlrEvMUupDFGnnR06
-aDJAwtycb8yXtILj+TvfhLFhafxroXrflspavejQkEiHjNjtHnwbZ+o43g0/yxjwnarGI3kgcak7
-nnI9/8Lqpq79tLHYwLajotwLiGTB71AGN5xK+tzB+D4eN9lXayrjcszgbOv2ZCgzExQUAIt98mre
-8EggKs9mwtEuKAhYBIP/0K6WsoMnQCcCAwEAAaOCAVwwggFYMBIGA1UdEwEB/wQIMAYBAf8CAQAw
-HQYDVR0OBBYEFIlICOogTndrhuWByNfhjWSEf/xwMB8GA1UdIwQYMBaAFEXroq/0ksuCMS1Ri6en
-IZ3zbcgPMA4GA1UdDwEB/wQEAwIBhjAdBgNVHSUEFjAUBggrBgEFBQcDBAYIKwYBBQUHAwIweQYI
-KwYBBQUHAQEEbTBrMCQGCCsGAQUFBzABhhhodHRwOi8vb2NzcC5kaWdpY2VydC5jb20wQwYIKwYB
-BQUHMAKGN2h0dHA6Ly9jYWNlcnRzLmRpZ2ljZXJ0LmNvbS9EaWdpQ2VydEFzc3VyZWRJRFJvb3RD
-QS5jcnQwRQYDVR0fBD4wPDA6oDigNoY0aHR0cDovL2NybDMuZGlnaWNlcnQuY29tL0RpZ2lDZXJ0
-QXNzdXJlZElEUm9vdENBLmNybDARBgNVHSAECjAIMAYGBFUdIAAwDQYJKoZIhvcNAQELBQADggEB
-ACiagCqvNVxOfSd0uYfJMiZsOEBXAKIR/kpqRp2YCfrP4Tz7fJogYN4fxNAw7iy/bPZcvpVCfe/H
-/CCcp3alXL0I8M/rnEnRlv8ItY4MEF+2T/MkdXI3u1vHy3ua8SxBM8eT9LBQokHZxGUX51cE0kwa
-uEOZ+PonVIOnMjuLp29kcNOVnzf8DGKiek+cT51FvGRjV6LbaxXOm2P47/aiaXrDD5O0RF5SiPo6
-xD1/ClkCETyyEAE5LRJlXtx288R598koyFcwCSXijeVcRvBB1cNOLEbg7RMSw1AGq14fNe2cH1HG
-W7xyduY/ydQt6gv5r21mDOQ5SaZSWC/ZRfLDuEYwggWbMIIEg6ADAgECAhAH5JEPagNRXYDiRPdl
-c1vgMA0GCSqGSIb3DQEBCwUAMEExCzAJBgNVBAYTAkFVMRAwDgYDVQQKEwdWZXJva2V5MSAwHgYD
-VQQDExdWZXJva2V5IFNlY3VyZSBFbWFpbCBHMjAeFw0yNDEyMzAwMDAwMDBaFw0yODAxMDQyMzU5
-NTlaMB4xHDAaBgNVBAMME2R3bXcyQGluZnJhZGVhZC5vcmcwggIiMA0GCSqGSIb3DQEBAQUAA4IC
-DwAwggIKAoICAQDali7HveR1thexYXx/W7oMk/3Wpyppl62zJ8+RmTQH4yZeYAS/SRV6zmfXlXaZ
-sNOE6emg8WXLRS6BA70liot+u0O0oPnIvnx+CsMH0PD4tCKSCsdp+XphIJ2zkC9S7/yHDYnqegqt
-w4smkqUqf0WX/ggH1Dckh0vHlpoS1OoxqUg+ocU6WCsnuz5q5rzFsHxhD1qGpgFdZEk2/c//ZvUN
-i12vPWipk8TcJwHw9zoZ/ZrVNybpMCC0THsJ/UEVyuyszPtNYeYZAhOJ41vav1RhZJzYan4a1gU0
-kKBPQklcpQEhq48woEu15isvwWh9/+5jjh0L+YNaN0I//nHSp6U9COUG9Z0cvnO8FM6PTqsnSbcc
-0j+GchwOHRC7aP2t5v2stVx3KbptaYEzi4MQHxm/0+HQpMEVLLUiizJqS4PWPU6zfQTOMZ9uLQRR
-ci+c5xhtMEBszlQDOvEQcyEG+hc++fH47K+MmZz21bFNfoBxLP6bjR6xtPXtREF5lLXxp+CJ6KKS
-blPKeVRg/UtyJHeFKAZXO8Zeco7TZUMVHmK0ZZ1EpnZbnAhKE19Z+FJrQPQrlR0gO3lBzuyPPArV
-hvWxjlO7S4DmaEhLzarWi/ze7EGwWSuI2eEa/8zU0INUsGI4ywe7vepQz7IqaAovAX0d+f1YjbmC
-VsAwjhLmveFjNwIDAQABo4IBsDCCAawwHwYDVR0jBBgwFoAUiUgI6iBOd2uG5YHI1+GNZIR//HAw
-HQYDVR0OBBYEFFxiGptwbOfWOtMk5loHw7uqWUOnMDAGA1UdEQQpMCeBE2R3bXcyQGluZnJhZGVh
-ZC5vcmeBEGRhdmlkQHdvb2Rob3Uuc2UwFAYDVR0gBA0wCzAJBgdngQwBBQEBMA4GA1UdDwEB/wQE
-AwIF4DAdBgNVHSUEFjAUBggrBgEFBQcDAgYIKwYBBQUHAwQwewYDVR0fBHQwcjA3oDWgM4YxaHR0
-cDovL2NybDMuZGlnaWNlcnQuY29tL1Zlcm9rZXlTZWN1cmVFbWFpbEcyLmNybDA3oDWgM4YxaHR0
-cDovL2NybDQuZGlnaWNlcnQuY29tL1Zlcm9rZXlTZWN1cmVFbWFpbEcyLmNybDB2BggrBgEFBQcB
-AQRqMGgwJAYIKwYBBQUHMAGGGGh0dHA6Ly9vY3NwLmRpZ2ljZXJ0LmNvbTBABggrBgEFBQcwAoY0
-aHR0cDovL2NhY2VydHMuZGlnaWNlcnQuY29tL1Zlcm9rZXlTZWN1cmVFbWFpbEcyLmNydDANBgkq
-hkiG9w0BAQsFAAOCAQEAQXc4FPiPLRnTDvmOABEzkIumojfZAe5SlnuQoeFUfi+LsWCKiB8Uextv
-iBAvboKhLuN6eG/NC6WOzOCppn4mkQxRkOdLNThwMHW0d19jrZFEKtEG/epZ/hw/DdScTuZ2m7im
-8ppItAT6GXD3aPhXkXnJpC/zTs85uNSQR64cEcBFjjoQDuSsTeJ5DAWf8EMyhMuD8pcbqx5kRvyt
-JPsWBQzv1Dsdv2LDPLNd/JUKhHSgr7nbUr4+aAP2PHTXGcEBh8lTeYea9p4d5k969pe0OHYMV5aL
-xERqTagmSetuIwolkAuBCzA9vulg8Y49Nz2zrpUGfKGOD0FMqenYxdJHgDCCBZswggSDoAMCAQIC
-EAfkkQ9qA1FdgOJE92VzW+AwDQYJKoZIhvcNAQELBQAwQTELMAkGA1UEBhMCQVUxEDAOBgNVBAoT
-B1Zlcm9rZXkxIDAeBgNVBAMTF1Zlcm9rZXkgU2VjdXJlIEVtYWlsIEcyMB4XDTI0MTIzMDAwMDAw
-MFoXDTI4MDEwNDIzNTk1OVowHjEcMBoGA1UEAwwTZHdtdzJAaW5mcmFkZWFkLm9yZzCCAiIwDQYJ
-KoZIhvcNAQEBBQADggIPADCCAgoCggIBANqWLse95HW2F7FhfH9bugyT/danKmmXrbMnz5GZNAfj
-Jl5gBL9JFXrOZ9eVdpmw04Tp6aDxZctFLoEDvSWKi367Q7Sg+ci+fH4KwwfQ8Pi0IpIKx2n5emEg
-nbOQL1Lv/IcNiep6Cq3DiyaSpSp/RZf+CAfUNySHS8eWmhLU6jGpSD6hxTpYKye7PmrmvMWwfGEP
-WoamAV1kSTb9z/9m9Q2LXa89aKmTxNwnAfD3Ohn9mtU3JukwILRMewn9QRXK7KzM+01h5hkCE4nj
-W9q/VGFknNhqfhrWBTSQoE9CSVylASGrjzCgS7XmKy/BaH3/7mOOHQv5g1o3Qj/+cdKnpT0I5Qb1
-nRy+c7wUzo9OqydJtxzSP4ZyHA4dELto/a3m/ay1XHcpum1pgTOLgxAfGb/T4dCkwRUstSKLMmpL
-g9Y9TrN9BM4xn24tBFFyL5znGG0wQGzOVAM68RBzIQb6Fz758fjsr4yZnPbVsU1+gHEs/puNHrG0
-9e1EQXmUtfGn4InoopJuU8p5VGD9S3Ikd4UoBlc7xl5yjtNlQxUeYrRlnUSmdlucCEoTX1n4UmtA
-9CuVHSA7eUHO7I88CtWG9bGOU7tLgOZoSEvNqtaL/N7sQbBZK4jZ4Rr/zNTQg1SwYjjLB7u96lDP
-sipoCi8BfR35/ViNuYJWwDCOEua94WM3AgMBAAGjggGwMIIBrDAfBgNVHSMEGDAWgBSJSAjqIE53
-a4blgcjX4Y1khH/8cDAdBgNVHQ4EFgQUXGIam3Bs59Y60yTmWgfDu6pZQ6cwMAYDVR0RBCkwJ4ET
-ZHdtdzJAaW5mcmFkZWFkLm9yZ4EQZGF2aWRAd29vZGhvdS5zZTAUBgNVHSAEDTALMAkGB2eBDAEF
-AQEwDgYDVR0PAQH/BAQDAgXgMB0GA1UdJQQWMBQGCCsGAQUFBwMCBggrBgEFBQcDBDB7BgNVHR8E
-dDByMDegNaAzhjFodHRwOi8vY3JsMy5kaWdpY2VydC5jb20vVmVyb2tleVNlY3VyZUVtYWlsRzIu
-Y3JsMDegNaAzhjFodHRwOi8vY3JsNC5kaWdpY2VydC5jb20vVmVyb2tleVNlY3VyZUVtYWlsRzIu
-Y3JsMHYGCCsGAQUFBwEBBGowaDAkBggrBgEFBQcwAYYYaHR0cDovL29jc3AuZGlnaWNlcnQuY29t
-MEAGCCsGAQUFBzAChjRodHRwOi8vY2FjZXJ0cy5kaWdpY2VydC5jb20vVmVyb2tleVNlY3VyZUVt
-YWlsRzIuY3J0MA0GCSqGSIb3DQEBCwUAA4IBAQBBdzgU+I8tGdMO+Y4AETOQi6aiN9kB7lKWe5Ch
-4VR+L4uxYIqIHxR7G2+IEC9ugqEu43p4b80LpY7M4KmmfiaRDFGQ50s1OHAwdbR3X2OtkUQq0Qb9
-6ln+HD8N1JxO5nabuKbymki0BPoZcPdo+FeRecmkL/NOzzm41JBHrhwRwEWOOhAO5KxN4nkMBZ/w
-QzKEy4PylxurHmRG/K0k+xYFDO/UOx2/YsM8s138lQqEdKCvudtSvj5oA/Y8dNcZwQGHyVN5h5r2
-nh3mT3r2l7Q4dgxXlovERGpNqCZJ624jCiWQC4ELMD2+6WDxjj03PbOulQZ8oY4PQUyp6djF0keA
-MYIDuzCCA7cCAQEwVTBBMQswCQYDVQQGEwJBVTEQMA4GA1UEChMHVmVyb2tleTEgMB4GA1UEAxMX
-VmVyb2tleSBTZWN1cmUgRW1haWwgRzICEAfkkQ9qA1FdgOJE92VzW+AwDQYJYIZIAWUDBAIBBQCg
-ggE3MBgGCSqGSIb3DQEJAzELBgkqhkiG9w0BBwEwHAYJKoZIhvcNAQkFMQ8XDTI1MDkxMDA5Mzkw
-M1owLwYJKoZIhvcNAQkEMSIEIHBVDBb/DAZtk5Hrx4Jd9XTGuaAAH0szK9wVucDII+qXMGQGCSsG
-AQQBgjcQBDFXMFUwQTELMAkGA1UEBhMCQVUxEDAOBgNVBAoTB1Zlcm9rZXkxIDAeBgNVBAMTF1Zl
-cm9rZXkgU2VjdXJlIEVtYWlsIEcyAhAH5JEPagNRXYDiRPdlc1vgMGYGCyqGSIb3DQEJEAILMVeg
-VTBBMQswCQYDVQQGEwJBVTEQMA4GA1UEChMHVmVyb2tleTEgMB4GA1UEAxMXVmVyb2tleSBTZWN1
-cmUgRW1haWwgRzICEAfkkQ9qA1FdgOJE92VzW+AwDQYJKoZIhvcNAQEBBQAEggIAbmAX2Zr66NwP
-yg9HQgxRgBFup9MsKB1opiT9NbOUAQMMtB3YvzMoQpK0hOF92rSGDm+XQnLI/YlXjZdWlyZIiwlz
-Ldyhrb1CK9bj1X2dABj2VfgNfMa5HXMoYS/hYOBIQ57nh6sruMrGdgWLL5c+kHv+BsZNCaPcYoxx
-P8J+HEg2yIDfvCpK6HF6GRIJZS53Cn19RnvXiFtCYcE0ZZIUT3PrR5klhL0TJ3d56VdAlepKH7re
-xYKfcuOLr/Cm4LXdjaYQifng1PmmJOvdkaxIOwg+yadpK2dj73EilueFNIdh6shWeeX1D8aYKsNU
-OreH8VI9kn4pZcbq4lIkyuZGD0OUkt7chzgxeY4cFoicKzmUuMrbi5XV4XRkKwJWnXgbPGNRrt5T
-p8f0aIW7LN2nuCg/23SFN2Nge2eetQ+gAbvd9vz9nQmE0yQMmVOpjR6zuHTxLlnlAK8/wIl3QW6V
-FqSuHNUcMKys7oytLZHm6I630NGmTWfm6FTAJiWh0GleSWssXT/zvybTDZNXIffCzl1LTlAERzfU
-kzkVVPF2rbJsQcsz2xCNYUtt/vS/WSgUj7XxKjt54qBQXa/PIged3H1vCUdkxxnob5VKw1ubQOjx
-n0k8wDRGUmuzK5AH8wxSy0516a3DlOyrdiHJrq204U/ns89+NI8to2IVoK8ck90AAAAAAAA=
-
-
---=-m42kkFnwE69/VuJqghtc--
+KVM's policy is that a CPU can be online if there is no VM running. It is hard
+to implement/move the same logic inside the core kernel because the core kernel
+would need to refcount the running VMs. Any idea/suggestion on how to handle
+VMXON failure in the core kernel?
 
