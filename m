@@ -1,173 +1,156 @@
-Return-Path: <kvm+bounces-57218-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-57219-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9C7DAB51F79
-	for <lists+kvm@lfdr.de>; Wed, 10 Sep 2025 19:51:23 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 467D7B51FB7
+	for <lists+kvm@lfdr.de>; Wed, 10 Sep 2025 20:06:40 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id E26457B852E
-	for <lists+kvm@lfdr.de>; Wed, 10 Sep 2025 17:48:56 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id E87F07B4883
+	for <lists+kvm@lfdr.de>; Wed, 10 Sep 2025 18:04:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E91AF33436F;
-	Wed, 10 Sep 2025 17:50:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 419D233A020;
+	Wed, 10 Sep 2025 18:06:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="jvdVsR8M"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="Inyajxy6"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pf1-f202.google.com (mail-pf1-f202.google.com [209.85.210.202])
+Received: from mail-pg1-f201.google.com (mail-pg1-f201.google.com [209.85.215.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ADD41255F5E
-	for <kvm@vger.kernel.org>; Wed, 10 Sep 2025 17:50:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0710B334388
+	for <kvm@vger.kernel.org>; Wed, 10 Sep 2025 18:06:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757526623; cv=none; b=trq8JNoQl8IUb3USF/9s83u3+tByG0Ax7agN8xNctPo8gxfmTR4pJ6AsIagzv6MoJ/4E+2ATUIwOzQJjRsVFSew2k5JKIQsyQthktpOWrC0YGOoyrR50c38/8SCYbPJS8l5ASZlZemE35GnpUCX6ueiAvy7VcrVsHqJ8OhS8UaA=
+	t=1757527582; cv=none; b=udJTgp654jdWrvDr2zK1a8qsMt3+C/j3QfKQnKw+5aTgptK0j1oPddmmFx0cz9MCq8mrLVIl9v4TndHoAi/H2kvbvzuySZoQpKhRBWtQUqeBNbMfDhQojfZEYfmNmMlgV88RSo45usThgD+LJfPZus5r/UEccX/luqBNvG2ldao=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757526623; c=relaxed/simple;
-	bh=kPnVJMDAr/6Z3m/fScpPLFT8Oxlrmeg2w8pvxqaiJI8=;
+	s=arc-20240116; t=1757527582; c=relaxed/simple;
+	bh=OUrGVouFgRVC1KBlj4tFW8fG8b2yPwjv/geLcZRlEdc=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=AOFgqF6BYjEaZTBj01BkUUFFTlFdyOtmsIiBv06VQtbP0nqJ++dcGKeAFGEp2be4dMi1iXQgYwEBvfunRvwwQwZOo1JnQxZPslJAvpw4BWBWKAy1q2hxbcxbMzEo3W1kqOqkb9yNdEkDzmSfx+HJLtSE/m7JALHNdRoTmtgVCK4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=jvdVsR8M; arc=none smtp.client-ip=209.85.210.202
+	 To:Cc:Content-Type; b=UTrILtGyBOafVvbAh/+Li+1XpKz2LeM1uYDCRD0mOgZ+pzlRv0O3ZPXu4nzNf0CP6tgWQgV5kzf4miOSWANf2amH08YdGJ0lLATD4vdnEX9l1H+628OlLnA8tTXj2R7DZvQNdDwRzHBjlC+2lobI4ImWE/p9xY1h8W2g9QzGcKE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=Inyajxy6; arc=none smtp.client-ip=209.85.215.201
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pf1-f202.google.com with SMTP id d2e1a72fcca58-7723d779674so6478161b3a.3
-        for <kvm@vger.kernel.org>; Wed, 10 Sep 2025 10:50:21 -0700 (PDT)
+Received: by mail-pg1-f201.google.com with SMTP id 41be03b00d2f7-b52047b3f21so3725370a12.2
+        for <kvm@vger.kernel.org>; Wed, 10 Sep 2025 11:06:20 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1757526621; x=1758131421; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1757527580; x=1758132380; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=IUgfnEy4aH7Vf+d3WQbxgyXPH/BkEH0zY6EdXplzY4A=;
-        b=jvdVsR8MAD/2AdHbrYttFysLT1a/tDQB7eV1NH/VzcKcEqwEu91fvHM6TIHN1TjUvG
-         KBVY9ExIMTIbFYdx+R9PPtSC9S86kjvT1kjR5A5hO1ZGInRkleTntJ8Z/OLoSYjAeFtI
-         Wtz1G+D0Bc983qvFhd9n+9W9crb0YhDR5SfA27HDUoAGHFE6QPlCooOzYROiQROjUUi+
-         J9zoe3dZXIXtBT4wIJb39DUrlbh31NMvB/tKk4iR18++Z+qMpL5pb9iOxg6olbunyN+3
-         eOYBQf7eZQViBHOEvKDsMcEKRyktgd57an+zMJt2QIVCq2rziLaE+3F8zCFbGw2CvWok
-         9T9Q==
+        bh=UVGOVWtRHXvatY0bYJx5CVZgGyj363t5d9nI3Zws7Pk=;
+        b=Inyajxy6EJwv0mNHHpP+3Nraek3HZgkeOIBqz1Ev/LZPiPEClGPYPQSFcDeTE8clh1
+         dv7ifnUopplBtkjVDgsrmSRmOgjqqYlfr64zHOVBVrjKiuNMwAIIS116tJR8eiD5N4hb
+         y+WV7XG1YFHr2QztcerXMEbAD+jXwskUsxlj0Y0Gqsj4N2F+Nm2X7arBRVvRRfL2b4Dv
+         OX4l5f/Wpp4nUxUIdz8Bq1YG72tCt1j+eoa8tCWX8xUchC29TMgvmCCUL1lAriP5Seq+
+         soPXjH7Bzog2IKqjYaO8UGDa75g1xjqsDzv0c0VBZ619mtxQiMw8aH0wv03xt6DfUPMF
+         Wf/Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1757526621; x=1758131421;
+        d=1e100.net; s=20230601; t=1757527580; x=1758132380;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=IUgfnEy4aH7Vf+d3WQbxgyXPH/BkEH0zY6EdXplzY4A=;
-        b=F9RbKsOtAUlkj7BAou9nOBMWXaR/cazCA/5om3ZgD7IvO2Bu0vAsuT5d1Z/M/sht32
-         xzjBmaxBbZkgokTovwRKZ9mmYgG9XUtLZTvYxfV318yDr2xUFlCo8HpmCVRzMfjHQv4/
-         ubXsXH4d0cvX3QjaAi/0jNt2YOl1Y8aQDZZwpge3Vu3ZZMca10yEMGgaV/HgNDnjTVpx
-         egksFz1nTJUNCQoyZnPjQ8jRKtRqG2uib0MTItP8RW3CAfXo/SygRdg+hn0N/gcMb/R7
-         X+U93Hls//soJeJhBgVfxkO5BwsjX9/Hxr7t7PTewjBNjbaXBt3yuvjCIf1qGud48fe8
-         GPSg==
-X-Forwarded-Encrypted: i=1; AJvYcCX2v4x4/DKlzEcJ6C6YcLWimy2MN7DSx9Z8ALjX0qNvCYUsQhubvB0OMqknRWWIpaLUU1M=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyU2iHHOdS4vUbEt6xqoMUwZeki43tz+SuofiAu3wp1dtXgSvom
-	N27Eu632pQWfajZqQGSMXn0wRmS/9tDY1j92JNPjxgVOf0cz99vCMDSLX95/OXZ/vRpozm0rRPA
-	I+9mKVQ==
-X-Google-Smtp-Source: AGHT+IE0PBz+CoprrtHW8pDY4jQGWJaV/o6dVyl7o9HIHMuSqSir0HcUrugd2aROC3ZRJusmLA1OpAmyzDs=
-X-Received: from pfll7.prod.google.com ([2002:a05:6a00:1587:b0:772:2f71:c54b])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a05:6a00:2316:b0:772:4759:e45d
- with SMTP id d2e1a72fcca58-7742de8f0e6mr20966795b3a.22.1757526620819; Wed, 10
- Sep 2025 10:50:20 -0700 (PDT)
-Date: Wed, 10 Sep 2025 10:50:19 -0700
-In-Reply-To: <aMFedyAqac+S38P2@intel.com>
+        bh=UVGOVWtRHXvatY0bYJx5CVZgGyj363t5d9nI3Zws7Pk=;
+        b=vrUMKKgQRJDIT9NQjuhftvgge4iTPt6vxXp5/0ROPg2s5STcVcr0MQm2mWf/MLs1ja
+         YLOG9L4L/1+KrUBWIlamFsk+wjjmXHJvGzqXCVctve+whtctZZoUIZ8w0cxqjN6NaSQc
+         TwLkwP1okbajHqd2OJg5iVpF8GV8MIyHOYPSKI+ThT0eGSWrEXSBNta38bb2XS6MKg18
+         j7e7AuWzncS2eHor8rvE43GMPWJMoshwxdCJkSSzuEqMOImVRJ3n6gps06G+LuftZlD+
+         NDyH9HkCo/90tdGoPZF9gaHrqYreOwxNCWk6iS3ee6VLpYCsDe2Ea1oGmkHWAimtQHG8
+         mMEg==
+X-Gm-Message-State: AOJu0Ywb3Hws/3AXsluGAJmF3MTn2ZxKJZKVug7gAPBUU/vp/XsmvslV
+	25abxb6QuTtBM0ybPcstrDRwM1MwDBFaCO/D2CUv8UVFLmhY1Gb+jWqvmZh6XAaKNyAGgUc6Pd3
+	MdCm/GQ==
+X-Google-Smtp-Source: AGHT+IE/5ogtjOVM49AIkJg96HNYIRC2cVumzLNlxW2YPKSDkeUIvZ0HyOM1ZQI2TOugK9y0O3Wf9/5cigU=
+X-Received: from pjuw5.prod.google.com ([2002:a17:90a:d605:b0:32b:8ba7:306a])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:902:cf04:b0:24c:c58e:9d91
+ with SMTP id d9443c01a7336-25172e339e2mr233912515ad.59.1757527580330; Wed, 10
+ Sep 2025 11:06:20 -0700 (PDT)
+Date: Wed, 10 Sep 2025 11:06:18 -0700
+In-Reply-To: <20250909093953.202028-23-chao.gao@intel.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
-References: <20250909093953.202028-1-chao.gao@intel.com> <20250909093953.202028-7-chao.gao@intel.com>
- <be3459db-d972-4d46-a48a-2fab1cde7faa@intel.com> <aMFedyAqac+S38P2@intel.com>
-Message-ID: <aMG6Wx9k2T47OTge@google.com>
-Subject: Re: [PATCH v14 06/22] KVM: x86: Load guest FPU state when access
- XSAVE-managed MSRs
+References: <20250909093953.202028-1-chao.gao@intel.com> <20250909093953.202028-23-chao.gao@intel.com>
+Message-ID: <aMG-GoL5Sfn1WSG5@google.com>
+Subject: Re: [PATCH v14 22/22] KVM: selftest: Add tests for KVM_{GET,SET}_ONE_REG
 From: Sean Christopherson <seanjc@google.com>
 To: Chao Gao <chao.gao@intel.com>
-Cc: Xiaoyao Li <xiaoyao.li@intel.com>, kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	acme@redhat.com, bp@alien8.de, dave.hansen@linux.intel.com, hpa@zytor.com, 
-	john.allen@amd.com, mingo@kernel.org, mingo@redhat.com, 
-	minipli@grsecurity.net, mlevitsk@redhat.com, namhyung@kernel.org, 
-	pbonzini@redhat.com, prsampat@amd.com, rick.p.edgecombe@intel.com, 
-	shuah@kernel.org, tglx@linutronix.de, weijiang.yang@intel.com, x86@kernel.org, 
-	xin@zytor.com
+Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org, acme@redhat.com, 
+	bp@alien8.de, dave.hansen@linux.intel.com, hpa@zytor.com, john.allen@amd.com, 
+	mingo@kernel.org, mingo@redhat.com, minipli@grsecurity.net, 
+	mlevitsk@redhat.com, namhyung@kernel.org, pbonzini@redhat.com, 
+	prsampat@amd.com, rick.p.edgecombe@intel.com, shuah@kernel.org, 
+	tglx@linutronix.de, weijiang.yang@intel.com, x86@kernel.org, xin@zytor.com, 
+	xiaoyao.li@intel.com
 Content-Type: text/plain; charset="us-ascii"
 
-On Wed, Sep 10, 2025, Chao Gao wrote:
-> On Wed, Sep 10, 2025 at 05:37:50PM +0800, Xiaoyao Li wrote:
-> >On 9/9/2025 5:39 PM, Chao Gao wrote:
-> >> From: Sean Christopherson <seanjc@google.com>
-> >> 
-> >> Load the guest's FPU state if userspace is accessing MSRs whose values
-> >> are managed by XSAVES. Introduce two helpers, kvm_{get,set}_xstate_msr(),
-> >> to facilitate access to such kind of MSRs.
-> >> 
-> >> If MSRs supported in kvm_caps.supported_xss are passed through to guest,
-> >> the guest MSRs are swapped with host's before vCPU exits to userspace and
-> >> after it reenters kernel before next VM-entry.
-> >> 
-> >> Because the modified code is also used for the KVM_GET_MSRS device ioctl(),
-> >> explicitly check @vcpu is non-null before attempting to load guest state.
-> >> The XSAVE-managed MSRs cannot be retrieved via the device ioctl() without
-> >> loading guest FPU state (which doesn't exist).
-> >> 
-> >> Note that guest_cpuid_has() is not queried as host userspace is allowed to
-> >> access MSRs that have not been exposed to the guest, e.g. it might do
-> >> KVM_SET_MSRS prior to KVM_SET_CPUID2.
+On Tue, Sep 09, 2025, Chao Gao wrote:
+> Add tests for newly added KVM_{GET,SET}_ONE_REG support for x86. Verify the
+> new ioctls can read and write real MSRs and synthetic MSRs.
 > 
-> ...
+> Signed-off-by: Chao Gao <chao.gao@intel.com>
+> ---
+>  tools/arch/x86/include/uapi/asm/kvm.h         | 29 ++++++++++++++++++
+>  tools/testing/selftests/kvm/Makefile.kvm      |  1 +
+>  .../selftests/kvm/x86/get_set_one_reg.c       | 30 +++++++++++++++++++
+>  3 files changed, 60 insertions(+)
+>  create mode 100644 tools/testing/selftests/kvm/x86/get_set_one_reg.c
 > 
-> >> +	bool fpu_loaded = false;
-> >>   	int i;
-> >> -	for (i = 0; i < msrs->nmsrs; ++i)
-> >> +	for (i = 0; i < msrs->nmsrs; ++i) {
-> >> +		/*
-> >> +		 * If userspace is accessing one or more XSTATE-managed MSRs,
-> >> +		 * temporarily load the guest's FPU state so that the guest's
-> >> +		 * MSR value(s) is resident in hardware, i.e. so that KVM can
-> >> +		 * get/set the MSR via RDMSR/WRMSR.
-> >> +		 */
-> >> +		if (vcpu && !fpu_loaded && kvm_caps.supported_xss &&
-> >
-> >why not check vcpu->arch.guest_supported_xss?
-> 
-> Looks like Sean anticipated someone would ask this question.
+> diff --git a/tools/arch/x86/include/uapi/asm/kvm.h b/tools/arch/x86/include/uapi/asm/kvm.h
+> index 6f3499507c5e..59ac0b46ebcc 100644
+> --- a/tools/arch/x86/include/uapi/asm/kvm.h
+> +++ b/tools/arch/x86/include/uapi/asm/kvm.h
 
-I don't think so, I'm pretty sure querying kvm_caps.supported_xss is a holdover
-from the early days of this patch, e.g. before guest_cpu_cap_has() existed, and
-potentially even before vcpu->arch.guest_supported_xss existed.
+Don't copy KVM headers to tools/, KVM selftests don't actually use them (i.e.
+copying them is confusing/misleadling).  The copied headers are mainly used by
+tools/perf, and they run a script to synchronize everything.
 
-I'm pretty sure we can make this less weird and more accurate:
+> diff --git a/tools/testing/selftests/kvm/Makefile.kvm b/tools/testing/selftests/kvm/Makefile.kvm
+> index f6fe7a07a0a2..9a375d5faf1c 100644
+> --- a/tools/testing/selftests/kvm/Makefile.kvm
+> +++ b/tools/testing/selftests/kvm/Makefile.kvm
+> @@ -136,6 +136,7 @@ TEST_GEN_PROGS_x86 += x86/max_vcpuid_cap_test
+>  TEST_GEN_PROGS_x86 += x86/triple_fault_event_test
+>  TEST_GEN_PROGS_x86 += x86/recalc_apic_map_test
+>  TEST_GEN_PROGS_x86 += x86/aperfmperf_test
+> +TEST_GEN_PROGS_x86 += x86/get_set_one_reg
+>  TEST_GEN_PROGS_x86 += access_tracking_perf_test
+>  TEST_GEN_PROGS_x86 += coalesced_io_test
+>  TEST_GEN_PROGS_x86 += dirty_log_perf_test
+> diff --git a/tools/testing/selftests/kvm/x86/get_set_one_reg.c b/tools/testing/selftests/kvm/x86/get_set_one_reg.c
+> new file mode 100644
+> index 000000000000..8a4dbc812214
+> --- /dev/null
+> +++ b/tools/testing/selftests/kvm/x86/get_set_one_reg.c
+> @@ -0,0 +1,30 @@
+> +// SPDX-License-Identifier: GPL-2.0
+> +#include <fcntl.h>
+> +#include <stdint.h>
+> +#include <sys/ioctl.h>
+> +
+> +#include "test_util.h"
+> +#include "kvm_util.h"
+> +#include "processor.h"
+> +
+> +int main(int argc, char *argv[])
+> +{
+> +	struct kvm_vcpu *vcpu;
+> +	struct kvm_vm *vm;
+> +	u64 data;
+> +
+> +	TEST_REQUIRE(kvm_has_cap(KVM_CAP_ONE_REG));
+> +
+> +	vm = vm_create_with_one_vcpu(&vcpu, NULL);
+> +
+> +	TEST_ASSERT_EQ(__vcpu_get_reg(vcpu, KVM_X86_REG_MSR(MSR_EFER), &data), 0);
+> +	TEST_ASSERT_EQ(__vcpu_set_reg(vcpu, KVM_X86_REG_MSR(MSR_EFER), data), 0);
+> +
+> +	if (kvm_cpu_has(X86_FEATURE_SHSTK)) {
+> +		TEST_ASSERT_EQ(__vcpu_get_reg(vcpu, KVM_X86_REG_KVM(KVM_REG_GUEST_SSP), &data), 0);
+> +		TEST_ASSERT_EQ(__vcpu_set_reg(vcpu, KVM_X86_REG_KVM(KVM_REG_GUEST_SSP), data), 0);
 
-/*
- * Returns true if the MSR in question is managed via XSTATE, i.e. is context
- * switched with the rest of guest FPU state.  Note!  S_CET is _not_ context
- * switched via XSTATE even though it _is_ saved/restored via XSAVES/XRSTORS.
- * Because S_CET is loaded on VM-Enter and VM-Exit via dedicated VMCS fields,
- * the value saved/restored via XSTATE is always the host's value.  That detail
- * is _extremely_ important, as the guest's S_CET must _never_ be resident in
- * hardware while executing in the host.  Loading guest values for U_CET and
- * PL[0-3]_SSP while executing in the kernel is safe, as U_CET is specific to
- * userspace, and PL[0-3]_SSP are only consumed when transitioning to lower
- * privilegel levels, i.e. are effectively only consumed by userspace as well.
- */
-static bool is_xstate_managed_msr(struct kvm_vcpu *vcpu, u32 msr)
-{
-	if (!vcpu)
-		return false;
-
-	switch (msr) {
-	case MSR_IA32_U_CET:
-		return guest_cpu_cap_has(vcpu, X86_FEATURE_SHSTK) ||
-		       guest_cpu_cap_has(vcpu, X86_FEATURE_IBT);
-	case MSR_IA32_PL0_SSP ... MSR_IA32_PL3_SSP:
-		return guest_cpu_cap_has(vcpu, X86_FEATURE_SHSTK);
-	default:
-		return false;
-	}
-}
-
-Which is very desirable because the KVM_{G,S}ET_ONE_REG path also needs to
-load/put the FPU, as found via a WIP selftest that tripped:
-
-  KVM_BUG_ON(!vcpu->arch.guest_fpu.fpstate->in_use, vcpu->kvm);
-
-And if we simplify is_xstate_managed_msr(), then the accessors can also do:
-
-  KVM_BUG_ON(!is_xstate_managed_msr(vcpu, msr_info->index), vcpu->kvm);
+This isn't a very useful test, nor is it extensible.  I finally bit the bullet
+and created an MSR test to mostly replace KUT's msr.c, and to add coverage for
+KVM_{G,S}ET_ONE_REG and KVM_GET_REG_LIST.
 
