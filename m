@@ -1,181 +1,124 @@
-Return-Path: <kvm+bounces-57199-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-57200-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1CA52B51789
-	for <lists+kvm@lfdr.de>; Wed, 10 Sep 2025 15:02:40 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 06D82B517B4
+	for <lists+kvm@lfdr.de>; Wed, 10 Sep 2025 15:14:30 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id D08447AFB00
-	for <lists+kvm@lfdr.de>; Wed, 10 Sep 2025 13:00:52 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 34A531C21C2C
+	for <lists+kvm@lfdr.de>; Wed, 10 Sep 2025 13:14:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4CD531A9FB5;
-	Wed, 10 Sep 2025 13:02:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A1D6E31A54A;
+	Wed, 10 Sep 2025 13:14:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="RKBJSlnf"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="kbAf2RUe"
 X-Original-To: kvm@vger.kernel.org
-Received: from NAM02-BN1-obe.outbound.protection.outlook.com (mail-bn1nam02on2042.outbound.protection.outlook.com [40.107.212.42])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.7])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C34FC1957FC;
-	Wed, 10 Sep 2025 13:02:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.212.42
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757509340; cv=fail; b=HL9LUzLZ33AOYRQg2PVFGemz/DCx80yAXc0K62ExARm81T6HdZfLdCoiB0GW3njBx2Rj/n4RoqpHXTtbGjVsF0YOGKWLEjCZQrlrNQx6GuHyMkDFoGQcSrV3vJzxDWgtz9tR4ULW4G8okKjj+gdMLAsnqZUvnFis4J/+i9/+XHY=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757509340; c=relaxed/simple;
-	bh=xNtg2VA3opUiXvctaInLw3olPZeSwMtSFcgEg/iPYNU=;
-	h=From:To:CC:Subject:In-Reply-To:References:Date:Message-ID:
-	 MIME-Version:Content-Type; b=hN/2pvwKqLyT2xY6Hb6ZEwDkCT9mj7PAm5rZn18W8Yg4TNwHBfWFEq9/HcPDHBxNOqS85kyT49e/jYD5HaEThszlviUSsjCwDHLQ+j9P9if3Ydy+j3uzdGiFMIHrbUULmH5XFdTYLlbl3cZwKR4P3TXY8j8Bk3Rj/Z67PGHm+J8=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=RKBJSlnf; arc=fail smtp.client-ip=40.107.212.42
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=V5FedJmBIdrXHD8F30OlAXbuf3sEfe37A78DeQnnS6hc/oHnev3dxb9/v60zzzxH/cYI7ufdM0xZw1k5knqS1Gaz2VlF10ghedmi0YjTvJHyH4v3BKmbrPOKfJrzUPXfNM9NLUd29hxWQeX+VAJGFvnqn03s6jmCitkOzu2WNXC/ib12lHy/ke30HG/fQReX8O+hTKHZ1EBSQQu9LAvjQnFAAa7hiwQw2K6a7eQ+x01Ky7P7EVjEE7jtrHAoPu+QW1aKSJJJJROr5cR1xGg6AlZiyX357OA1xAmhT6CCgO64QiLfeAa+5WbC+2lppqL2HJKdcvFWsoMh6iUE7TmZIg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=NyXE6e1zvswoEfzIcRHGBH79axWpMty3CfosNKwsfYQ=;
- b=xC+OPtopxqb2WZX/edqVfEpHmtIvgIF9IU1xGE9bLQ/fVZ6Lwi83gSp5V/q04d/Kx/lsBrgWdSh7JUSVAPU79BYPYMBfqwlUuzmr+uHJ1CFm3f4/abQhDALeapLc8LE483XuANBJhFqxAjAWWwUoq7X6x+RBd30vq9QV6gI3XZo1g1eXLzR0Fq1IJx46YM9uonMnoCEiOoIcMvXwNlwZcNmWAaduy9cw7c2wjy4+XGQs96cC9SoVPhA7H2UK6qBBgqJm8MKGvZQ8rcinC/SQpCV386ibORCtsZlK5NVXXIIl/WH3hZHRTK/m8tQmWMcxLW9UX76oYsiD3XDHhNfwbw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 165.204.84.17) smtp.rcpttodomain=google.com smtp.mailfrom=amd.com; dmarc=pass
- (p=quarantine sp=quarantine pct=100) action=none header.from=amd.com;
- dkim=none (message not signed); arc=none (0)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=NyXE6e1zvswoEfzIcRHGBH79axWpMty3CfosNKwsfYQ=;
- b=RKBJSlnf0FOkEA58ILSV66sjnCGVTIypM50Yir1gisTunvjjaidYdEWpqndX4sMmjXX6Abb+xC7oZySZ/p9nUrRO1g4boMFRJPBCfxEU9JCzx/2EkHkdu2BeqSeXghCuvr8aH57QdA9OBjPzlVLiYhOWUC4GQVi8ajjWhvp1XLg=
-Received: from BYAPR05CA0086.namprd05.prod.outlook.com (2603:10b6:a03:e0::27)
- by SA5PPF6CDAEAF48.namprd12.prod.outlook.com (2603:10b6:80f:fc04::8cf) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9094.22; Wed, 10 Sep
- 2025 13:02:13 +0000
-Received: from SJ1PEPF00002326.namprd03.prod.outlook.com
- (2603:10b6:a03:e0:cafe::56) by BYAPR05CA0086.outlook.office365.com
- (2603:10b6:a03:e0::27) with Microsoft SMTP Server (version=TLS1_3,
- cipher=TLS_AES_256_GCM_SHA384) id 15.20.9115.14 via Frontend Transport; Wed,
- 10 Sep 2025 13:02:13 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
- smtp.mailfrom=amd.com; dkim=none (message not signed)
- header.d=none;dmarc=pass action=none header.from=amd.com;
-Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
- 165.204.84.17 as permitted sender) receiver=protection.outlook.com;
- client-ip=165.204.84.17; helo=satlexmb07.amd.com; pr=C
-Received: from satlexmb07.amd.com (165.204.84.17) by
- SJ1PEPF00002326.mail.protection.outlook.com (10.167.242.89) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.9115.13 via Frontend Transport; Wed, 10 Sep 2025 13:02:13 +0000
-Received: from BLR-L1-NDADHANI (10.180.168.240) by satlexmb07.amd.com
- (10.181.42.216) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.17; Wed, 10 Sep
- 2025 06:02:08 -0700
-From: Nikunj A Dadhania <nikunj@amd.com>
-To: Manali Shukla <manali.shukla@amd.com>, <kvm@vger.kernel.org>,
-	<linux-perf-users@vger.kernel.org>, <linux-doc@vger.kernel.org>
-CC: <seanjc@google.com>, <pbonzini@redhat.com>, <manali.shukla@amd.com>,
-	<bp@alien8.de>, <peterz@infradead.org>, <mingo@redhat.com>,
-	<mizhang@google.com>, <thomas.lendacky@amd.com>, <ravi.bangoria@amd.com>,
-	<Sandipan.Das@amd.com>
-Subject: Re: [PATCH v2 06/12] x86/cpufeatures: Add CPUID feature bit for
- VIBS in SVM/SEV guests
-In-Reply-To: <20250901052304.209199-1-manali.shukla@amd.com>
-References: <20250901051656.209083-1-manali.shukla@amd.com>
- <20250901052304.209199-1-manali.shukla@amd.com>
-Date: Wed, 10 Sep 2025 13:01:50 +0000
-Message-ID: <85v7lq31hd.fsf@amd.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 41D3C27F747;
+	Wed, 10 Sep 2025 13:14:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.7
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1757510059; cv=none; b=hfAF3pNGaX0CCbLA5HRPZqj2tMqpG542bAkaryO6wG7hclRq7StaSn16UHbH9INDMengdHyO4ZSmcAI2k7x2nE8jcZJoMT7vbxuk+uSAAfYmJ887y1ApS3YWL1eWZE4KeKxTo7+ZEbJXyJ8te23crVmFQ2YywAckBJbXxh3aKnc=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1757510059; c=relaxed/simple;
+	bh=9Pe02Wp9Wa61TyWuZketBjA9b9YjXG6KBrzkRTagEIM=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=S+vk5M5jXSDRBC5b1AKODMOWLFg8OLziQGcR6ZQ5qgL/ID7uCju4fBcvcMvmVb51wN0jrNphGRAOnVeygSq75z+WkCCUA/dXy+hyqQeYO3weYiUwaHKo231ZIBQBDm7tlr6IyNV698kvJOavN5Dx3wRfa8WWb1ZmuwECnRTKt8w=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=kbAf2RUe; arc=none smtp.client-ip=192.198.163.7
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1757510058; x=1789046058;
+  h=message-id:date:mime-version:subject:to:cc:references:
+   from:in-reply-to:content-transfer-encoding;
+  bh=9Pe02Wp9Wa61TyWuZketBjA9b9YjXG6KBrzkRTagEIM=;
+  b=kbAf2RUeuYl6Mv+bm9REmsVKmJj1zUTo/u6yfp1gCgy3s5AYAUPUppfu
+   84DqvzigUHA0SBw6DNIWXCoT1IoGwbEVNJvulnXqyEqXr5LWOZ8J85UCc
+   uXf/XgyfNLzA6mekiU0zsyAxkx/lpPOvIoPqskMnuiRIRlSp9My7BCGUW
+   Fo8tn9jLry7pX1c4euyeAXIwj6wR40mE+FNs1SSY1S6uRMGMSyqdYuGb1
+   +TA4oK7G5cz+3MTJ7L/Ms75Xx7Vh0X/MtW3yW+b2OmmJx3NWojoWhBIS/
+   4sKjpnLa1PptABOTShDgYmdaZhcJPhHq2A6VmWtVi85jIq2I+OQD82WX8
+   A==;
+X-CSE-ConnectionGUID: X9Cf4j54QQ2qIQGeKXRMtg==
+X-CSE-MsgGUID: WSDFDTEDTnW19IQlRCFPOA==
+X-IronPort-AV: E=McAfee;i="6800,10657,11549"; a="85262895"
+X-IronPort-AV: E=Sophos;i="6.18,254,1751266800"; 
+   d="scan'208";a="85262895"
+Received: from fmviesa002.fm.intel.com ([10.60.135.142])
+  by fmvoesa101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Sep 2025 06:14:17 -0700
+X-CSE-ConnectionGUID: nvYFnd3DSq+q8t+5CqgS5w==
+X-CSE-MsgGUID: h1V5Bt/aSRKm0ETaLO0Hfw==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.18,254,1751266800"; 
+   d="scan'208";a="197062774"
+Received: from qliang3-mobl3.ccr.corp.intel.com (HELO [10.125.65.247]) ([10.125.65.247])
+  by fmviesa002-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Sep 2025 06:14:12 -0700
+Message-ID: <c29abf85-aafe-4cf8-b4e8-6d3b5b250ce6@linux.intel.com>
+Date: Wed, 10 Sep 2025 06:13:59 -0700
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
-X-ClientProxiedBy: satlexmb08.amd.com (10.181.42.217) To satlexmb07.amd.com
- (10.181.42.216)
-X-EOPAttributedMessage: 0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: SJ1PEPF00002326:EE_|SA5PPF6CDAEAF48:EE_
-X-MS-Office365-Filtering-Correlation-Id: d680d1f6-8427-42c9-6aeb-08ddf06a42c5
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|82310400026|1800799024|376014|36860700013;
-X-Microsoft-Antispam-Message-Info:
-	=?us-ascii?Q?0ob8iHEoNNxMFVjV7+pJVMcESbStuYjzLfkYmjhHmNmYuHB1l5s7MOOSZh0H?=
- =?us-ascii?Q?5gv+0YHgljYRQcnOSUZtKUeVxP5i9VYp1uefjUjJOOc7wkm5WiT0zLFPnzvr?=
- =?us-ascii?Q?v8BkpBJe8S6CsH7Q6zcIwD0tKZE/xr5BRn3E9cBdjC0d9sfGMz4zP//foQME?=
- =?us-ascii?Q?fhwgDvDSyP/OD3Hod46MgDZ2zXEPgq5J0NX3G1pjaIHkLIT+IqGKS+r4EhTR?=
- =?us-ascii?Q?TShRacUq5DoZNck4joIkkK/F5cmnvSQ9DRxz8GSaPPvMfF+50ayNPhCvcYoO?=
- =?us-ascii?Q?aursFEXSTnfvsNa2n5EMvYkeqPP6Qi2M2/CsKLOZE/mJAwQW+GMhDKVvDPZn?=
- =?us-ascii?Q?aM/PiJbfIbySgNQeS1Fl0IyILJlkMiaorJ4UMM/nWhIc+eIrIh1TLh2zYGJF?=
- =?us-ascii?Q?566QDKISUN9rScASu0BIym6GrHufVuyKuchfgSkasmdQWOnOs+7I3sCn5Wuo?=
- =?us-ascii?Q?9ReFh1ISApgCbNamLlh6VTGLmg6jSBSK+WvQJdjbKmcyi6VaWVRcoxiF1Vxa?=
- =?us-ascii?Q?i4z1k3RWSp3ninnLIfz318tIhVjNOGLlhc4V6H18V1HjzIFz6VCuKECcjYsm?=
- =?us-ascii?Q?U6yF+tnfs4imtWEMyT08AViCyKTp+YCi5UaTzE+21qgVd2u4KKTXLNp1vxCF?=
- =?us-ascii?Q?hApr2/6+s4Y5wvRsqH96/T2nz4S2BTKCT/xEF+r23QNM+ZF/A3ulmaVE1X1f?=
- =?us-ascii?Q?Vvl54/wiidO9RRTsgzIq3saR8t7OqwuCp3DK5yYjd1Yr/dm73Cwqe92uKgFk?=
- =?us-ascii?Q?ipJYfUzpvwQQsZjrksmCIzcSz74kGL6xXWX+EfkfKel7oPg8uk93esLTO9WP?=
- =?us-ascii?Q?RzyKIidrRicjM6gTCgPbtnyqeARGFIgmZw8aZ/2lresUD2nfruT9YueBRkgy?=
- =?us-ascii?Q?Xz47HmzarxYpXf8f4d89Jy/Be4wl5WTp6aDlq/On1XeSZsKFJ3+UELknSYJk?=
- =?us-ascii?Q?FxmQQY8InqCln+oVaxGUoAZ9TgZIQ4XuHSSyGC72UF1pu/d856NfUyrVxWda?=
- =?us-ascii?Q?nzxf+70wwMWV6kc4k8No2sQ/L+oomU/Nh9cHycmpaHUL2zXtO934UeSitf+r?=
- =?us-ascii?Q?7y+izSiK77yqvebAQz8AX9VlDRrKNFHOYwt2O+RPTavMZstFadHZn6gqVRpT?=
- =?us-ascii?Q?9arGmvMivfTQrJkSUwdPv25+Reo/6/Wu3CtgiSQRF5MNbyiRAOcQaAEjP1nO?=
- =?us-ascii?Q?hfnWGybNJHliZYg0mQeLykswUIdp21WJNVXKN6JQAmNpnky1pmytPCONCkDh?=
- =?us-ascii?Q?p0VsswNQPP2m2YwDlA9vt4QFV/msO9ZyEE/q6t1wfA9gOsMOokwnYeEy7DfV?=
- =?us-ascii?Q?ZWdf4X7THLa3u1X57Mq2jWD0Yo1MLA4VpyE2ZsB7NILvU8jFw87GC9GxhkL6?=
- =?us-ascii?Q?FwWBz1tHSMJANJ6X5DzxRal3tWp1uXAU2a8M3v3K/hwDueivNznhlNb4b2+C?=
- =?us-ascii?Q?dxyrKpdPbx/oD8hM7LH//HIWMvQIJDR+wr4avm7QZKJ9VmK7w3zYf5/oJEy7?=
- =?us-ascii?Q?j3epUD8UEO/FrIbH6wy5rrBCZCA9Rp+JlhEz?=
-X-Forefront-Antispam-Report:
-	CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:satlexmb07.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230040)(82310400026)(1800799024)(376014)(36860700013);DIR:OUT;SFP:1101;
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 10 Sep 2025 13:02:13.2573
- (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: d680d1f6-8427-42c9-6aeb-08ddf06a42c5
-X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[satlexmb07.amd.com]
-X-MS-Exchange-CrossTenant-AuthSource:
-	SJ1PEPF00002326.namprd03.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA5PPF6CDAEAF48
+User-Agent: Mozilla Thunderbird
+Subject: Re: [RFC PATCH v1 1/5] x86/boot: Shift VMXON from KVM init to CPU
+ startup phase
+To: "Huang, Kai" <kai.huang@intel.com>, "Gao, Chao" <chao.gao@intel.com>
+Cc: "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+ "brgerst@gmail.com" <brgerst@gmail.com>,
+ "andrew.cooper3@citrix.com" <andrew.cooper3@citrix.com>,
+ "x86@kernel.org" <x86@kernel.org>, "rafael@kernel.org" <rafael@kernel.org>,
+ "dave.hansen@linux.intel.com" <dave.hansen@linux.intel.com>,
+ "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+ "seanjc@google.com" <seanjc@google.com>, "xin@zytor.com" <xin@zytor.com>,
+ "pbonzini@redhat.com" <pbonzini@redhat.com>,
+ "mingo@redhat.com" <mingo@redhat.com>,
+ "tglx@linutronix.de" <tglx@linutronix.de>, "hpa@zytor.com" <hpa@zytor.com>,
+ "peterz@infradead.org" <peterz@infradead.org>,
+ "Edgecombe, Rick P" <rick.p.edgecombe@intel.com>,
+ "linux-pm@vger.kernel.org" <linux-pm@vger.kernel.org>,
+ "kprateek.nayak@amd.com" <kprateek.nayak@amd.com>,
+ "pavel@kernel.org" <pavel@kernel.org>,
+ "david.kaplan@amd.com" <david.kaplan@amd.com>,
+ "Williams, Dan J" <dan.j.williams@intel.com>, "bp@alien8.de" <bp@alien8.de>
+References: <20250909182828.1542362-1-xin@zytor.com>
+ <20250909182828.1542362-2-xin@zytor.com>
+ <1301b802284ed5755fe397f54e1de41638aec49c.camel@intel.com>
+ <aMFcwXEWMc2VIzQQ@intel.com>
+ <16a9cc439f2826ee99ff1cfc42c9006a7a544dd4.camel@intel.com>
+Content-Language: en-US
+From: Arjan van de Ven <arjan@linux.intel.com>
+In-Reply-To: <16a9cc439f2826ee99ff1cfc42c9006a7a544dd4.camel@intel.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-Manali Shukla <manali.shukla@amd.com> writes:
+> 
+> Since I think doing VMXON when bringing up CPU unconditionally is a
+> dramatic move at this stage, I was actually thinking we don't do VMXON in
+> CPUHP callback, but only do prepare things like sanity check and VMXON
+> region setup etc.  If anything fails, we refuse to online CPU, or mark CPU
+> as VMX not supported, whatever.
 
-> From: Santosh Shukla <santosh.shukla@amd.com>
->
-> The virtualized IBS (VIBS) feature allows the guest to collect IBS
-> samples without exiting the guest.
->
-> Presence of the VIBS feature is indicated via CPUID function
-> 0x8000000A_EDX[26].
->
-> Signed-off-by: Santosh Shukla <santosh.shukla@amd.com>
-> Signed-off-by: Manali Shukla <manali.shukla@amd.com>
-> ---
->  arch/x86/include/asm/cpufeatures.h | 1 +
->  1 file changed, 1 insertion(+)
->
-> diff --git a/arch/x86/include/asm/cpufeatures.h b/arch/x86/include/asm/cpufeatures.h
-> index 0dd44cbf7196..3c31dea00671 100644
-> --- a/arch/x86/include/asm/cpufeatures.h
-> +++ b/arch/x86/include/asm/cpufeatures.h
-> @@ -379,6 +379,7 @@
->  #define X86_FEATURE_V_SPEC_CTRL		(15*32+20) /* "v_spec_ctrl" Virtual SPEC_CTRL */
->  #define X86_FEATURE_VNMI		(15*32+25) /* "vnmi" Virtual NMI */
->  #define X86_FEATURE_EXTLVT		(15*32+27) /* Extended Local vector Table */
-> +#define X86_FEATURE_VIBS		(15*32+26) /* Virtual IBS */
+the whole point is to always vmxon -- and simplify all the complexity
+from doing this dynamic.
+So yes "dramatic" maybe but needed -- especially as things like TDX
+and TDX connect need vmxon to be enabled outside of KVM context.
 
-Please move before EXTLVT to maintain bit position order
 
-Regards,
-Nikunj
+> 
+> The core kernel then provides two APIs to do VMXON/VMXOFF respectively,
+> and KVM can use them.  The APIs needs to handle concurrent requests from
+> multiple users, though.  VMCLEAR could still be in KVM since this is kinda
+> KVM's internal on how to manage vCPUs.
+> 
+> Does this make sense?
 
->  #define X86_FEATURE_SVME_ADDR_CHK	(15*32+28) /* SVME addr check */
->  #define X86_FEATURE_BUS_LOCK_THRESHOLD	(15*32+29) /* Bus lock threshold */
->  #define X86_FEATURE_IDLE_HLT		(15*32+30) /* IDLE HLT intercept */
-> -- 
-> 2.43.0
+not to me -- the whole point is to not having this dynamic thing
+
 
