@@ -1,154 +1,208 @@
-Return-Path: <kvm+bounces-57210-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-57211-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6E7CBB51E63
-	for <lists+kvm@lfdr.de>; Wed, 10 Sep 2025 18:57:27 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4836EB51EBA
+	for <lists+kvm@lfdr.de>; Wed, 10 Sep 2025 19:18:10 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 8ABC71C8718A
-	for <lists+kvm@lfdr.de>; Wed, 10 Sep 2025 16:57:48 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 02D99A005B6
+	for <lists+kvm@lfdr.de>; Wed, 10 Sep 2025 17:18:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 39179288538;
-	Wed, 10 Sep 2025 16:57:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4EB2230C61A;
+	Wed, 10 Sep 2025 17:18:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="RjrcCUug"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="MvIWxGb6"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.13])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f202.google.com (mail-pl1-f202.google.com [209.85.214.202])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 81C57329F38;
-	Wed, 10 Sep 2025 16:57:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.13
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E2CFC23BCEF
+	for <kvm@vger.kernel.org>; Wed, 10 Sep 2025 17:17:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757523436; cv=none; b=CkSBLwbmQK7BO6vesONZ8TWksuo8S1ft4USylYu/6KOIqA12vamAhlQWiw+AKbXX2W/IEyS5yH+WTwbVBZiae7ut8tqgAz5nzVPU1/NUOQjimHjUUFNhvmjy8ErXF+A/DrPoCQ5R4/NdsWU4F2aMK35eMD+qG+3WXOXgy/N/HR8=
+	t=1757524679; cv=none; b=R/3FoB7MtfXrLaWBsokhlGHn9UYfYuuMmITuvJrS7pX5PUMctzffQVxjbmBa3iqoA+4n15Zj0daKHxljIVarBUMOsrDyNRT755FB/2AG0AE+D5qBlAHGhe0unXcmAFsYIFhZPT5eWR5y927j+s2mMCFo+Yvdco5TVxV7OXAHUzs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757523436; c=relaxed/simple;
-	bh=29yavP7OV8ZvespV4CLRsLc0fldknIlUzCfZijOolDI=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=Qv748nDTE/L47r0CCrODMLk40bLo4EY1DzGZl3fs8Em0qJ6LxjWPvwLxFoTzjzSMmv4zcIeddSwkBNZYVZgtX7KqK68YOgqfwiPjqPkBJxbp1TvdIarnLB3CiMLpWKJDMaCxwlCPymqzu/jcS6ZiyTFap03gqdvNamc4vLNM6eQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=RjrcCUug; arc=none smtp.client-ip=198.175.65.13
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1757523434; x=1789059434;
-  h=message-id:date:mime-version:subject:to:cc:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=29yavP7OV8ZvespV4CLRsLc0fldknIlUzCfZijOolDI=;
-  b=RjrcCUug19Ck2roHbhFe9AIebGyWFP0eF7qtEL4l6O4sVRfwm+MG4usl
-   DLKs78lgln3TiIDNVvGf5EgpatxOQ/cZUOJxWR/Be7TFy/0Tn3x52zqGE
-   UQKsTlWWWufWkEvsEFmxuii7i4YOiBjo4xRj/Y5EASoCwrieYf1onITIF
-   8z/T7AV7LZi+xlOuI3NZOwiNFw3bjMGIjTujyKjpf4WOQSILXrH9q/te/
-   p6gM+Wvkos0loPaPRDmiCNF0agNCVVxSHPmj8Tv42MxeqyScusQV7qW6k
-   Hut63i23qYEFkMmBuDiD3XQslRFiTdAWAh9IsB1e8prL4qY2IBXnbZyRl
-   Q==;
-X-CSE-ConnectionGUID: XJjXjXCiTnmpMPR+Z8FjPA==
-X-CSE-MsgGUID: fchBigQlQh+RgZY5Y2ubnA==
-X-IronPort-AV: E=McAfee;i="6800,10657,11549"; a="70940735"
-X-IronPort-AV: E=Sophos;i="6.18,254,1751266800"; 
-   d="scan'208";a="70940735"
-Received: from orviesa004.jf.intel.com ([10.64.159.144])
-  by orvoesa105.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Sep 2025 09:57:14 -0700
-X-CSE-ConnectionGUID: zI1fsTZxQzyIEKTu0cPGbQ==
-X-CSE-MsgGUID: hNdcYcQ4SrCunwflNKG+mw==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.18,254,1751266800"; 
-   d="scan'208";a="177731260"
-Received: from gabaabhi-mobl2.amr.corp.intel.com (HELO [10.125.110.214]) ([10.125.110.214])
-  by orviesa004-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Sep 2025 09:57:14 -0700
-Message-ID: <6a5b66e4-d534-41ff-8feb-ce0ad3ebdff5@intel.com>
-Date: Wed, 10 Sep 2025 09:57:13 -0700
+	s=arc-20240116; t=1757524679; c=relaxed/simple;
+	bh=PgIxU6HxGjxJFnhHkkcIM4U0CRWvbE3Zo8jghpXps1g=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=QFNeZ7rFu3u6K0b6XVDpyU3hjBcybphKuFhMV3pPi2XPwc4mr/cy1C70R/1D816MTpn3T2XwB158Mo5XQ2gnu1/9QjOpHWzNlidgjoZVE+cuelzKMfenMqSRqOcXuR8/cpiJsN/et6t781JA9b5G3qKYU7f7P2qStN6ySA3kGYI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=MvIWxGb6; arc=none smtp.client-ip=209.85.214.202
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+Received: by mail-pl1-f202.google.com with SMTP id d9443c01a7336-24b0e137484so60220305ad.0
+        for <kvm@vger.kernel.org>; Wed, 10 Sep 2025 10:17:57 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1757524677; x=1758129477; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=ewK5ux8kVgVo01EbJepvYu9t1k7WNG6QakFU4KXSnBc=;
+        b=MvIWxGb6NbNF5KBgSCSbdzL6t7i6MouDCEfj5FLy1bQABkTGXAlkvm3Zki2JsZ/SNO
+         ysgzXGYE9VJDMzc7i+0oz5tgXbQzVPCU0xxTS/TTcgH+1329JUbmrsLAZt7IGn1LGo+D
+         h6OgT6uluKYkEQNUjDf0vQef+FcmB28QHcscrDqGFZlBwsN0iIn9YR1RPFxv7WftzWaO
+         21Y9W/OLX9ZbtEEpxp6+c5px7l8hcpLltCH2uyLBmeuOYQBSww8LspX9xkjbGRxM5com
+         SzbfA/zvOg3LqFbVYh53kGNeViuBnaLaUW0k5dXJ3QKyIHThtlIadIkvqciGk62iVLrT
+         nJ6w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1757524677; x=1758129477;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=ewK5ux8kVgVo01EbJepvYu9t1k7WNG6QakFU4KXSnBc=;
+        b=jFrjg/QOuL+KK9+TSVDV9GXXakPrMwTHPbV0oJ1Kf+DVihZhZ5L1SqtEiGFnHRWawe
+         reKg65i54OMC5/eMfLDEE1TfoZ9oF2CZFjoVLueDWjfGXqLlu+v2E19vmD2V/NwJ5lAF
+         iCXGn1VusKsTwmUZgnaesKIsIS7uACkAnHxZFWvo+ncUsEEiTx4rcaWwZttShITX9pS3
+         ichY0z5BeorDJRJSNPs/KBCDknWOH1ev10kt42j10MiOxK1qjfcRj96F9ALq5AwuQ2x3
+         uuz3MYBPO9k1PkGmQyUhfoq4Jw2pflvWVQuuNvcIERy34A5qAV5+fM8H1X2fxqlAhTaZ
+         sjZQ==
+X-Gm-Message-State: AOJu0YxHCUh/EgNc+GsOgvB68xXPvk41hrZJA8uEBVJ+fB0XrnBriupm
+	YCQp1j9pg4UrQrIyAcN6o+ZFOsQwtb8VAJAf8P+dT9R18qYh87SN7dx0jnFV272hWmCXB502Z+0
+	XjAFJzw==
+X-Google-Smtp-Source: AGHT+IFZtQBBzexcP4QMpOCpPZPy4urzKXIL+qxHVIb84NJY5TDb2iChlS1MuK3DF8izCt7K8atw/7uy7V4=
+X-Received: from plbkr3.prod.google.com ([2002:a17:903:803:b0:240:33b6:5880])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:902:d48e:b0:24e:e5c9:ed0c
+ with SMTP id d9443c01a7336-25173308a06mr218680595ad.43.1757524676973; Wed, 10
+ Sep 2025 10:17:56 -0700 (PDT)
+Date: Wed, 10 Sep 2025 10:17:55 -0700
+In-Reply-To: <20250909093953.202028-2-chao.gao@intel.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] x86/virt/tdx: Use precalculated TDVPR page physical
- address
-To: Kiryl Shutsemau <kas@kernel.org>
-Cc: Dave Hansen <dave.hansen@linux.intel.com>, linux-kernel@vger.kernel.org,
- Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>,
- Borislav Petkov <bp@alien8.de>, x86@kernel.org,
- "H. Peter Anvin" <hpa@zytor.com>, Rick Edgecombe
- <rick.p.edgecombe@intel.com>, Sean Christopherson <seanjc@google.com>,
- Paolo Bonzini <pbonzini@redhat.com>, Kai Huang <kai.huang@intel.com>,
- Isaku Yamahata <isaku.yamahata@intel.com>,
- Vishal Annapurve <vannapurve@google.com>, Thomas Huth <thuth@redhat.com>,
- Adrian Hunter <adrian.hunter@intel.com>, linux-coco@lists.linux.dev,
- kvm@vger.kernel.org, Farrah Chen <farrah.chen@intel.com>
-References: <20250910144453.1389652-1-dave.hansen@linux.intel.com>
- <oyagitkaefceadeqoqgycqhubw4hnlsjxf6lytazxpjnzueb4k@bmcvegkzrycq>
- <684e83b3-756b-4995-9804-6b1d0cfa4103@intel.com>
- <766raob5ltycizxfzcqh5blvdyk5girzfu2575n7gu4g7cmco5@zttwu3qwmjlm>
-From: Dave Hansen <dave.hansen@intel.com>
-Content-Language: en-US
-Autocrypt: addr=dave.hansen@intel.com; keydata=
- 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
-In-Reply-To: <766raob5ltycizxfzcqh5blvdyk5girzfu2575n7gu4g7cmco5@zttwu3qwmjlm>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Mime-Version: 1.0
+References: <20250909093953.202028-1-chao.gao@intel.com> <20250909093953.202028-2-chao.gao@intel.com>
+Message-ID: <aMGyw1B7Cw_xHjh3@google.com>
+Subject: Re: [PATCH v14 01/22] KVM: x86: Introduce KVM_{G,S}ET_ONE_REG uAPIs support
+From: Sean Christopherson <seanjc@google.com>
+To: Chao Gao <chao.gao@intel.com>
+Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org, acme@redhat.com, 
+	bp@alien8.de, dave.hansen@linux.intel.com, hpa@zytor.com, john.allen@amd.com, 
+	mingo@kernel.org, mingo@redhat.com, minipli@grsecurity.net, 
+	mlevitsk@redhat.com, namhyung@kernel.org, pbonzini@redhat.com, 
+	prsampat@amd.com, rick.p.edgecombe@intel.com, shuah@kernel.org, 
+	tglx@linutronix.de, weijiang.yang@intel.com, x86@kernel.org, xin@zytor.com, 
+	xiaoyao.li@intel.com
+Content-Type: text/plain; charset="us-ascii"
 
-On 9/10/25 09:12, Kiryl Shutsemau wrote:
-> On Wed, Sep 10, 2025 at 09:10:06AM -0700, Dave Hansen wrote:
->> On 9/10/25 09:06, Kiryl Shutsemau wrote:
->>>>  struct tdx_vp {
->>>>  	/* TDVP root page */
->>>>  	struct page *tdvpr_page;
->>>> +	/* precalculated page_to_phys(tdvpr_page) for use in noinstr code */
->>>> +	phys_addr_t tdvpr_pa;
->>> Missing newline above the new field?
->> I was actually trying to group the two fields together that are aliases
->> for the same logical thing.
->>
->> Is that problematic?
-> No. Just looks odd to me. But I see 'struct tdx_td' also uses similar
-> style.
+On Tue, Sep 09, 2025, Chao Gao wrote:
+> +static int kvm_set_one_msr(struct kvm_vcpu *vcpu, u32 msr, u64 __user *value)
+> +{
+> +	u64 val;
+> +
+> +	if (get_user(val, value))
+> +		return -EFAULT;
+> +
+> +	return do_set_msr(vcpu, msr, &val);
 
-Your review or ack tag there seems to have been mangled by your email
-client. Could you try to resend it, please? ;)
+This needs to explicitly return -EINVAL on failure, otherwise KVM will return
+semi-arbitrary positive values to userspace.
+
+> +}
+> +
+>  #ifdef CONFIG_X86_64
+>  struct pvclock_clock {
+>  	int vclock_mode;
+> @@ -4737,6 +4762,7 @@ int kvm_vm_ioctl_check_extension(struct kvm *kvm, long ext)
+>  	case KVM_CAP_IRQFD_RESAMPLE:
+>  	case KVM_CAP_MEMORY_FAULT_INFO:
+>  	case KVM_CAP_X86_GUEST_MODE:
+> +	case KVM_CAP_ONE_REG:
+
+We should add (partial) support for KVM_GET_REG_LIST, otherwise the ABI for
+handling GUEST_SSP is effectively undefined.  And because the ioctl is per-vCPU,
+utilizing KVM_GET_REG_LIST gives us the opportunity to avoid the horrors we
+created with KVM_GET_MSR_INDEX_LIST, where KVM enumerates MSRs that aren't fully
+supported by the vCPU.
+
+If we don't enumerate GUEST_SSP via KVM_GET_REG_LIST, then trying to do
+KVM_{G,S}ET_ONE_REG will "unexpectedly" fail if the vCPU doesn't have SHSTK.
+By enumerating GUEST_SSP in KVM_GET_REG_LIST _if and only if_ it's fully supported,
+we'll have a much more explicit ABI than we do for MSRs.  And if we don't do that,
+we'd have to special case MSR_KVM_INTERNAL_GUEST_SSP in kvm_is_advertised_msr().
+
+As for MSRs, that's where "partial" support comes in.  For MSRs, I think the least
+awful option is to keep using KVM_GET_MSR_INDEX_LIST for enumerating MSRs, and
+document that any MSRs that can be accessed via KVM_{G,S}ET_MSRS can be accessed
+via KVM_{G,S}ET_ONE_REG.  That avoids having to bake in different behavior for
+MSR vs. ONE_REG accesses (and avoids having to add a pile of code to precisely
+enumerate support for per-vCPU MSRs).
+
+>  		r = 1;
+>  		break;
+>  	case KVM_CAP_PRE_FAULT_MEMORY:
+> @@ -5915,6 +5941,20 @@ static int kvm_vcpu_ioctl_enable_cap(struct kvm_vcpu *vcpu,
+>  	}
+>  }
+>  
+> +struct kvm_x86_reg_id {
+> +	__u32 index;
+> +	__u8  type;
+> +	__u8  rsvd1;
+> +	__u8  rsvd2:4;
+> +	__u8  size:4;
+> +	__u8  x86;
+> +};
+> +
+> +static int kvm_translate_kvm_reg(struct kvm_x86_reg_id *reg)
+> +{
+> +	return -EINVAL;
+> +}
+> +
+>  long kvm_arch_vcpu_ioctl(struct file *filp,
+>  			 unsigned int ioctl, unsigned long arg)
+>  {
+> @@ -6031,6 +6071,44 @@ long kvm_arch_vcpu_ioctl(struct file *filp,
+>  		srcu_read_unlock(&vcpu->kvm->srcu, idx);
+>  		break;
+>  	}
+> +	case KVM_GET_ONE_REG:
+> +	case KVM_SET_ONE_REG: {
+> +		struct kvm_x86_reg_id *id;
+> +		struct kvm_one_reg reg;
+> +		u64 __user *value;
+> +
+> +		r = -EFAULT;
+> +		if (copy_from_user(&reg, argp, sizeof(reg)))
+> +			break;
+> +
+> +		r = -EINVAL;
+> +		if ((reg.id & KVM_REG_ARCH_MASK) != KVM_REG_X86)
+> +			break;
+> +
+> +		id = (struct kvm_x86_reg_id *)&reg.id;
+> +		if (id->rsvd1 || id->rsvd2)
+> +			break;
+> +
+> +		if (id->type == KVM_X86_REG_TYPE_KVM) {
+> +			r = kvm_translate_kvm_reg(id);
+> +			if (r)
+> +				break;
+> +		}
+> +
+> +		r = -EINVAL;
+> +		if (id->type != KVM_X86_REG_TYPE_MSR)
+> +			break;
+> +
+> +		if ((reg.id & KVM_REG_SIZE_MASK) != KVM_REG_SIZE_U64)
+> +			break;
+> +
+> +		value = u64_to_user_ptr(reg.addr);
+> +		if (ioctl == KVM_GET_ONE_REG)
+> +			r = kvm_get_one_msr(vcpu, id->index, value);
+> +		else
+> +			r = kvm_set_one_msr(vcpu, id->index, value);
+> +		break;
+> +	}
+
+I think it makes sense to put this in a separate helper, if only so that the
+error returns are more obvious.
+
+
+>  	case KVM_TPR_ACCESS_REPORTING: {
+>  		struct kvm_tpr_access_ctl tac;
+>  
+> -- 
+> 2.47.3
+> 
 
