@@ -1,343 +1,307 @@
-Return-Path: <kvm+bounces-57273-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-57274-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id C415DB527C8
-	for <lists+kvm@lfdr.de>; Thu, 11 Sep 2025 06:38:10 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id BC092B5284C
+	for <lists+kvm@lfdr.de>; Thu, 11 Sep 2025 07:49:33 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7F71D3A5B4D
-	for <lists+kvm@lfdr.de>; Thu, 11 Sep 2025 04:38:09 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 786A6A0294E
+	for <lists+kvm@lfdr.de>; Thu, 11 Sep 2025 05:49:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D8A3923BD02;
-	Thu, 11 Sep 2025 04:38:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 74BDD253B58;
+	Thu, 11 Sep 2025 05:49:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="kx9AmEWR"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="SCaHCpL5"
 X-Original-To: kvm@vger.kernel.org
-Received: from NAM11-DM6-obe.outbound.protection.outlook.com (mail-dm6nam11on2070.outbound.protection.outlook.com [40.107.223.70])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2DD4C329F3C;
-	Thu, 11 Sep 2025 04:37:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.223.70
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757565482; cv=fail; b=C5xIiNX/K7LTdcIZNq85BgTt/zMAg7Jrim7MNdYIZIQtVxMf7yek+EcDvOjYW7nko5PwvQsxhO3s2dwaD1ZkTTZ0qfIejiyirhEUaKI+sBaHXEbSHAPwlm2sCx7rMl6il+cR2QeKA3oeMYedeFBq5Hprrs2O982cistyi8datW8=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757565482; c=relaxed/simple;
-	bh=3hDYoxkyVgQHOkYcoI7Z1Ln8LrwTkf4HmSbi5sNYcko=;
-	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
-	 In-Reply-To:Content-Type; b=ULDVDyvQZYDkFTVZaRjo17qQqeo3hFXY0i78yY2iERab2VLCRMgiQUc7BPiJz4akj7ajiWaWmRAOb7KXLorn5sr6Z+72VQqVjUmQCeccWZY9QAQUOhWzoYgXUdt+yABk5XWw8OGpneHRuRlxT4ej4DzHWCdbjbVhC8lF0HHKT4g=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=kx9AmEWR; arc=fail smtp.client-ip=40.107.223.70
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=TCyGj6USZT2RFbbVHDO0n2usmXk/j9r3ik09H4I6Qtu8uewSZ9mkHPUp1Po1EpcecgT3jmiY6tFrgDdW+oBga/NelA06BV2EaVWiBWPwHAVVnODXc8eQX6O8zSuhGSnOPFAnz22Lf65bCaLNtOYhEgJykW18nWWbM3zLXKx5hs08vHkoRsGVciugp6YkYjV8tlQaZCnavXRhbcV0ZL9OvnP9+3JyjGj9DgTBmFC9gIbRZoCDE2m1qVCg3Upv861/hqoSnLsN8abO5bZAqALaJyLbUMT2r+u5bh+e8qlNS+PUU1d0wYF+0kZHZkrHZ/46hkoUIUma1zGqJKOKRhoxyg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=zoHePVqIWxrtYnkox6Kj7fWxAnUVHjkCBKfIygL1ZYY=;
- b=m2kf7EWtRszEjp+fVVhhg23Jb6bS+kbmyT8ubup3Im0QKsXk26vkhTtnI3D/Atfdymhqk2LIiMlq7rErXFPWp2ILNnGJUnHJFXAj/WcHc9J4oA+qHYfFINeKcaGjDwuWxrjKiUkaINN3NwLWOJQfiEapRX8svT0J3PNAM1owSPgtfPBhqlCLAgHEaIj6dUZspXtrFnJE9+at7s49W+NCcWC2q+069frQtU5NKnu9N7882OXe2VPSW1xABgIV5J3LNAY4hpPvS/uP24bEb1FUIuGS1ozwoXHDKlnHRDIBIIw6vs6ReBOQCkseQPe5U6bZE2SGZfUKx3F/sbLzV4Lu+A==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 165.204.84.17) smtp.rcpttodomain=linutronix.de smtp.mailfrom=amd.com;
- dmarc=pass (p=quarantine sp=quarantine pct=100) action=none
- header.from=amd.com; dkim=none (message not signed); arc=none (0)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=zoHePVqIWxrtYnkox6Kj7fWxAnUVHjkCBKfIygL1ZYY=;
- b=kx9AmEWRS8gbi2a0Q6Iyll40gm4fLqIWlrs533UuuNdi3xDNHortDnFeFyF8OFBlSMI03EM6t0Itn5vH7KWNZ5vGNuCvNbdf/4x0Ky7dEZgM3nkW4PSfFUMor2YhwS8pQH6+feyeLklOZ8M0gy3Zvd5SXpXT241pdsGG7vcYPKM=
-Received: from BY5PR17CA0058.namprd17.prod.outlook.com (2603:10b6:a03:167::35)
- by DM4PR12MB8500.namprd12.prod.outlook.com (2603:10b6:8:190::14) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9094.22; Thu, 11 Sep
- 2025 04:37:54 +0000
-Received: from SJ5PEPF000001CB.namprd05.prod.outlook.com
- (2603:10b6:a03:167:cafe::9b) by BY5PR17CA0058.outlook.office365.com
- (2603:10b6:a03:167::35) with Microsoft SMTP Server (version=TLS1_3,
- cipher=TLS_AES_256_GCM_SHA384) id 15.20.9073.25 via Frontend Transport; Thu,
- 11 Sep 2025 04:37:54 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
- smtp.mailfrom=amd.com; dkim=none (message not signed)
- header.d=none;dmarc=pass action=none header.from=amd.com;
-Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
- 165.204.84.17 as permitted sender) receiver=protection.outlook.com;
- client-ip=165.204.84.17; helo=satlexmb08.amd.com; pr=C
-Received: from satlexmb08.amd.com (165.204.84.17) by
- SJ5PEPF000001CB.mail.protection.outlook.com (10.167.242.40) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.9115.13 via Frontend Transport; Thu, 11 Sep 2025 04:37:53 +0000
-Received: from Satlexmb09.amd.com (10.181.42.218) by satlexmb08.amd.com
- (10.181.42.217) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.17; Wed, 10 Sep
- 2025 21:37:53 -0700
-Received: from satlexmb08.amd.com (10.181.42.217) by satlexmb09.amd.com
- (10.181.42.218) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.17; Wed, 10 Sep
- 2025 21:37:52 -0700
-Received: from [172.31.178.191] (10.180.168.240) by satlexmb08.amd.com
- (10.181.42.217) with Microsoft SMTP Server id 15.2.2562.17 via Frontend
- Transport; Wed, 10 Sep 2025 21:37:46 -0700
-Message-ID: <8a4272f7-0d22-43f0-993b-6d53172b7f65@amd.com>
-Date: Thu, 11 Sep 2025 10:07:39 +0530
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AB7601547EE
+	for <kvm@vger.kernel.org>; Thu, 11 Sep 2025 05:49:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1757569763; cv=none; b=Q7SmIb9ENCABW9MR+e6c1o6XspR+8LS9eTci8G6T9qLUdU587yVPy6nFoHml42aCyt4WPPcQWQwisAAox0uI7U4+72+Cy5nOPV4zqfJNA4sg+3+a7DHP65w7FjgTsEcfcCGdKAAQU39jPl0gtRCkdrGfRTBsMJuqzYwghLl+oJ8=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1757569763; c=relaxed/simple;
+	bh=JIYVIQlB7J9T03D+eAy6Vs64tXPxmHEhF7bGRnRDbzo=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=Za6Otfnt241agofuBwQ+UzZ2iejNg5gXswSp6D6b2OboaStHx1rw/W5Rvm4zYnQgrSty601ggqITPcQteQbPfdfRUYDsEEv1FsUPKIGQoF+Bb6KTzJ7k8bIPbo/trkEGxYbg9RyDYGZvPLos6Or60xsNoIsBkYiT26I2ueJdQis=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=SCaHCpL5; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1757569760;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=lA/nIyygxp23zR9n/0zHUPCz01RuhWaoaOgXYYqwEFU=;
+	b=SCaHCpL5HkwjGtG1gt0c7z6ysbjo81fFoDo1c2V49rmOTXx7ntcG5qccgtgOpkKOa7Y8n+
+	UZHXJbZRYezWAbVqrVD8DJmUunSauRs9IBR5DPHdRnZk5EBDCgQLnir4xFRj6VhlPhCaPr
+	gtcZx83TFQEUXGoPLdTOPl6tV/eNGKM=
+Received: from mail-pl1-f200.google.com (mail-pl1-f200.google.com
+ [209.85.214.200]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-150-oLQwTZ9mOAG6KuzjVr7AwA-1; Thu, 11 Sep 2025 01:49:18 -0400
+X-MC-Unique: oLQwTZ9mOAG6KuzjVr7AwA-1
+X-Mimecast-MFC-AGG-ID: oLQwTZ9mOAG6KuzjVr7AwA_1757569758
+Received: by mail-pl1-f200.google.com with SMTP id d9443c01a7336-24c9304b7bcso4362385ad.3
+        for <kvm@vger.kernel.org>; Wed, 10 Sep 2025 22:49:18 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1757569757; x=1758174557;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=lA/nIyygxp23zR9n/0zHUPCz01RuhWaoaOgXYYqwEFU=;
+        b=oM6o6rvwD4o6YNswFl9bBlkVsMDzPJHeRS9KsTwWDwwFiEdhQJcdJhdyvuFiai+J/f
+         PPzSFqPNoDNMFhX9QRvbPLQO2gl4bla2KgRZ/CBoKq/Ffryr4+/yGSJAJn801D5qYiGM
+         lDfINcds9/VENnWxmsR3uVLAy06fgYMlEHHuqTRA0yiWrnkctdUEuIgSWcuKN9OpaVvU
+         70JrNolciYIsbnF+U8we9nIZU/P/mmX3mnTTJ4eqRfJPBR82PXf17uTPWvf5VUPqN4A3
+         kVq2vJchv4ijfJ4/qZ17QA6QLDDJ6R/FBNcGrPr03Y5v47AYSLZWqUtVHRpF/jpagUSp
+         m7Tw==
+X-Forwarded-Encrypted: i=1; AJvYcCXnSagsrQRxEJFSFa4IvVh17EXTMHr3zRliNklohSDO8iJ/rZRh2bVfC6Jyw0yY3UutdN4=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yw6Pht7kYS4RkJonSpT/cchVJTEyDui/YbJp0Jq4O0RTynPd0K4
+	jekGxTpRn++Wwc/p/giFv9qEYVqp5SYxAi6Jn9hdn6IxTq1xtIlzygBYUmZA6zeof2ZfQx1tnc+
+	9UEtRwHXlENMnd04Zmzo+ddheIJonwQeypmpu4l7P/lYQkMogPhJzElBzhh41Si2MSVDWxA+6OI
+	XqLogCE3ErzRXAlyvlQSf2y4rWXswh
+X-Gm-Gg: ASbGnctRiOIvCGA2PAyB6ftglQkrGXdFLuzV9VhNLCLcNUkFQcNtRVn5S36HrJescog
+	z3E/tHg59tmfOE8gsxgTWa/aHwHQ24DkrgJ4/QdqjdPBGxTcysJWrL0wdZ5Ts9iPbulXrfFbgkl
+	stp6czQIHXaI4KkShFUdM=
+X-Received: by 2002:a17:90b:2f48:b0:32d:dadf:b6ac with SMTP id 98e67ed59e1d1-32ddadfbc40mr584405a91.33.1757569757638;
+        Wed, 10 Sep 2025 22:49:17 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IHwWFrSzVREtFpLHQeMGB7oIiUl7lSi6qj8cNkKYaS39zzL0tJAYGt0Ag8spgomwA5uNHDMMOTpsNPlW3ePagM=
+X-Received: by 2002:a17:90b:2f48:b0:32d:dadf:b6ac with SMTP id
+ 98e67ed59e1d1-32ddadfbc40mr584389a91.33.1757569757109; Wed, 10 Sep 2025
+ 22:49:17 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v5 1/4] x86/cpu/topology: Always try
- cpu_parse_topology_ext() on AMD/Hygon
-To: Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>,
-	Borislav Petkov <bp@alien8.de>, Dave Hansen <dave.hansen@linux.intel.com>,
-	Sean Christopherson <seanjc@google.com>, Paolo Bonzini <pbonzini@redhat.com>,
-	Jonathan Corbet <corbet@lwn.net>, <x86@kernel.org>
-CC: Naveen rao <naveen.rao@amd.com>, Sairaj Kodilkar <sarunkod@amd.com>, "H.
- Peter Anvin" <hpa@zytor.com>, "Peter Zijlstra (Intel)"
-	<peterz@infradead.org>, "Xin Li (Intel)" <xin@zytor.com>, Pawan Gupta
-	<pawan.kumar.gupta@linux.intel.com>, <linux-kernel@vger.kernel.org>,
-	<kvm@vger.kernel.org>, Mario Limonciello <mario.limonciello@amd.com>,
-	"Gautham R. Shenoy" <gautham.shenoy@amd.com>, Babu Moger
-	<babu.moger@amd.com>, Suravee Suthikulpanit <suravee.suthikulpanit@amd.com>,
-	<stable@vger.kernel.org>, Naveen N Rao <naveen@kernel.org>
-References: <20250901170418.4314-1-kprateek.nayak@amd.com>
- <20250901170418.4314-2-kprateek.nayak@amd.com> <87o6rirrvc.ffs@tglx>
-Content-Language: en-US
-From: K Prateek Nayak <kprateek.nayak@amd.com>
-In-Reply-To: <87o6rirrvc.ffs@tglx>
+References: <20250501020428.1889162-1-jon@nutanix.com> <174649563599.1007977.10317536057166889809.git-patchwork-notify@kernel.org>
+ <154EA998-3FBB-41E9-B07E-4841B027B1B5@nutanix.com> <20250910155110-mutt-send-email-mst@kernel.org>
+In-Reply-To: <20250910155110-mutt-send-email-mst@kernel.org>
+From: Jason Wang <jasowang@redhat.com>
+Date: Thu, 11 Sep 2025 13:49:05 +0800
+X-Gm-Features: Ac12FXz2GiW7KSQdNYNxPu26Ksj8x667AJ6XM8sYkMeO98LgOStRktKKhO4igRI
+Message-ID: <CACGkMEvggRncZegemhR9fnkRDGJh1G3jgjycDG0ZX8RKg2-X-Q@mail.gmail.com>
+Subject: Re: vhost_iotlb_miss tight loop lockup - RE vhost/net: Defer TX queue
+ re-enable until after sendmsg
+To: "Michael S. Tsirkin" <mst@redhat.com>
+Cc: Jon Kohler <jon@nutanix.com>, 
+	"patchwork-bot+netdevbpf@kernel.org" <patchwork-bot+netdevbpf@kernel.org>, 
+	"eperezma@redhat.com" <eperezma@redhat.com>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>, 
+	"virtualization@lists.linux.dev" <virtualization@lists.linux.dev>, 
+	"netdev@vger.kernel.org" <netdev@vger.kernel.org>, 
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 7bit
-X-EOPAttributedMessage: 0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: SJ5PEPF000001CB:EE_|DM4PR12MB8500:EE_
-X-MS-Office365-Filtering-Correlation-Id: f8c6feff-a299-4ff7-3ba1-08ddf0ecf914
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|82310400026|30052699003|376014|7416014|36860700013|1800799024|13003099007;
-X-Microsoft-Antispam-Message-Info:
-	=?utf-8?B?eEJadjFKWGRDaVhpQUhMVHA3UklyUmYveGwzeHVjbTZuOU5Takl1VUFNdUlj?=
- =?utf-8?B?QnFpR1FSbFIwR0NYbS9rMlJ1SGxCM21pWUNqYkdSV1lhTjFHdFpCWDB6WFNr?=
- =?utf-8?B?a052bTYyU1hoSktVRGJiUWJJd0NYOWxUT2hOa0tHV29ubUl0M3ArWlBUU1Ez?=
- =?utf-8?B?UHlMSGt4a3VPK1ZwNzdGc2l6N0ZJdmN2akpFdmc5TUxQZjMwOUR4SC9wdSto?=
- =?utf-8?B?UjBjdWUyTkJoeFI5cVJaczdZNHZ2enlzUFZKdVFqeHhHZVZXM0g5YkpkVk5u?=
- =?utf-8?B?MDF2ZldJU09semc5RlFUM3pYSlQzLy9Lb0ZOL3I0aWk1emRDbmtFZ2JmWkpM?=
- =?utf-8?B?a1JOVGtQSzExY0hTL1FJOFZaL3IrMFljRmNFSHMxTVpCUS9iYit4azZqbmNT?=
- =?utf-8?B?WldIdktsNkk2d29Sa0FHQmthc2Y1Z2hHbTlkOWV2T3Z5SVIwUjE3L2Mrc0lz?=
- =?utf-8?B?U2p5RlhnbFBDaXNIbW1EUUVESVFyMVRWbDZFSnFqSkl2S1pzUzZVUnZ3alEz?=
- =?utf-8?B?L1NaYzRYcStkR2ZZSk14ZUZYdTFqWkRmMG1SUlhZL3hVWHl1UTdxK0lXVWpY?=
- =?utf-8?B?dlRZb2RJRGxCaEZPZTRKOCtLOFdtQStsK3R5Rzg4cmtZN3MrOE5PYkZvNkJB?=
- =?utf-8?B?TnNlMzYxa2tIVEk0TzBmMFp2TWJMc29aRGR3eG9VNXJaK1NjVG1RZTltMDZ6?=
- =?utf-8?B?aWJKRHdmWXhPZC9DdjFEd2VHTTJZdmhtc2l1ejBzU1lDelovUkIrYjNjVm9H?=
- =?utf-8?B?UXhsaUllWnBRTFZOeVpXeURxZDFEVXNNVVU2c2ttTS9KY1dJUkQ1WmJ2SHdQ?=
- =?utf-8?B?SE9ycUROZFk5S3RyYVFHVG5yMHFCUEQ3YWx4dUtUQkNRQ1lsa0hCaDBiLzR6?=
- =?utf-8?B?aHpmRFRsRVJESEJWVmQwYUVJNXdQNVA0TVFpT3M3UW41am5CeXRJM2ZDZWlX?=
- =?utf-8?B?djB4NG1oak10cU13Rko1dmhrWEYyamFrcFcvWCtPSjlQaXFCSEVMTjdJbVVS?=
- =?utf-8?B?a21WeDFRQjdvUVhDMVRpVzNtL3NTd09YNEtvZzg2TGpEemhqVVlHTTJnRG0z?=
- =?utf-8?B?aE54WDhQK2tuREE5aGdpMExBRWNHdWlUY2hJWkZtSWttbmluaXFxUTNCNWdR?=
- =?utf-8?B?dzZSK0JEVXU5VnR6MlI1c3hZQ2dJN2xrQlhsUXV0RGZsU3AyMUdmSW5nc3BF?=
- =?utf-8?B?MHJ3WlRJbm9rZlJnQWN5ZXU1aVNjVWduVGJDOU5Za1BYdmQ0RjQ4ejVzZVBv?=
- =?utf-8?B?dWJJZDNoZURGNWYzaUV6RlMrLzNtL2xCazJKSDJOVTAzUDU4YU0wM1Z0UVUw?=
- =?utf-8?B?RmtUQjdRMFJnbVh2Y0R3Y1dhSGZYUUxIWm1SVi9IdmNuTUZWcFIxbmxWZEVX?=
- =?utf-8?B?a3pjNG9CTzRlUzY3eVVsbVpvSlBHVjhXOGpLY1h6TzRBZDV0OUNCZ3pRdTlS?=
- =?utf-8?B?S2w2VUtaSmhJTWI2RWZacmxuWHVucXVIUjVRUEhRYlluRWRwQ3lwRkgzUXBs?=
- =?utf-8?B?Rzg5dmlVaXBpTkNTS0N5REh1b2FHQVdESHVldkFRczczY0FMeG1DUm4xdnRC?=
- =?utf-8?B?UWpEZ2I2VnRaWXdqck5uMzRrNVN3elJJTUlpeUN2NzFKVG1neWNDT1MzNXVN?=
- =?utf-8?B?aVl1UFZOL1BXYWFzRm1CSUZVbHBPN0hOM2JjQ3lEVkpxeitYZ0pIVm9IUmlV?=
- =?utf-8?B?R1ZaMkNUaEZFN0dFVENBT256b1dNb0lacnJ6RG1YM1RoUSs5YktJTGRQTHZy?=
- =?utf-8?B?YnBJY3IwZnU1MWh0VTQ0N3d1dCtoME5wYVRBcmZTckplanBQMjZLNHpXK0hr?=
- =?utf-8?B?MEF0N0xyaDlVMDVlWkFxTjBLSkJoKzZXSUV4UTF4ZnROY3l6bnRBL2VKL1I5?=
- =?utf-8?B?S1AzWEFpeml3b1FteHRiSm53d2x0VnJSQ1NWRkp4bDhnRlgyQVVxUjhFOGwz?=
- =?utf-8?B?bXhCY0JWTEZLR2xibG05U0psYm5pRGFmVEpWbTI5OEdYOEhNeGFveUNnOW41?=
- =?utf-8?Q?Hs/PvbZaycHcHrw2z/ahB/QfDMieaw=3D?=
-X-Forefront-Antispam-Report:
-	CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:satlexmb08.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230040)(82310400026)(30052699003)(376014)(7416014)(36860700013)(1800799024)(13003099007);DIR:OUT;SFP:1101;
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 11 Sep 2025 04:37:53.6938
- (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: f8c6feff-a299-4ff7-3ba1-08ddf0ecf914
-X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[satlexmb08.amd.com]
-X-MS-Exchange-CrossTenant-AuthSource:
-	SJ5PEPF000001CB.namprd05.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM4PR12MB8500
+Content-Transfer-Encoding: quoted-printable
 
-Hello Thomas,
+On Thu, Sep 11, 2025 at 4:11=E2=80=AFAM Michael S. Tsirkin <mst@redhat.com>=
+ wrote:
+>
+> On Wed, Sep 10, 2025 at 06:58:18PM +0000, Jon Kohler wrote:
+> >
+> >
+> > > On May 5, 2025, at 9:40=E2=80=AFPM, patchwork-bot+netdevbpf@kernel.or=
+g wrote:
+> > >
+> > > Hello:
+> > >
+> > > This patch was applied to netdev/net-next.git (main)
+> > > by Jakub Kicinski <kuba@kernel.org>:
+> >
+> > Hey all,
+> > Writing to fire up a flare and point out a problem that we=E2=80=99re s=
+eeing
+> > with this patch internally, specifically when we enable iommu on the
+> > virtio-net device.
+> >
+> > With this patch applied on 6.12.y-based bare metal instance and then
+> > starting a 6.12.y based guest with iommu enabled, we see lockups
+> > within the guest in short order, as well as vmm (qemu) stuck in a tight
+> > loop responding to iommu misses from vhost net loop.
+> >
+> > We've bisected this in our internal tree, and for sure it is this
+> > patch that is alledgedly causing the problem, so I wanted to point out
+> > there is some sort of issue here.
+> >
+> > Working on trying to figure this out, but if jumps off the page to
+> > anyone, happy to take advice!
+> >
+> > Flamegraph:
+> > https://gist.github.com/JonKohler/0e83c014230ab59ddc950f10441335f1#file=
+-iotlb-lockup-svg
+> >
+> > Guest dmesg errors like so:
+> > [   66.081694] virtio_net virtio0 eth0: NETDEV WATCHDOG: CPU: 1: transm=
+it queue 0 timed out 5500 ms
+> > [   68.145155] virtio_net virtio0 eth0: TX timeout on queue: 0, sq: out=
+put.0, vq: 0x1, name: output.0, 7560000 usecs ago
+> > [  112.907012] virtio_net virtio0 eth0: NETDEV WATCHDOG: CPU: 1: transm=
+it queue 0 timed out 5568 ms
+> > [  124.117540] virtio_net virtio0 eth0: TX timeout on queue: 0, sq: out=
+put.0, vq: 0x1, name: output.0, 16776000 usecs ago
+> > [  124.118050] virtio_net virtio0 eth0: NETDEV WATCHDOG: CPU: 1: transm=
+it queue 0 timed out 16776 ms
+> > [  124.118447] virtio_net virtio0 eth0: TX timeout on queue: 0, sq: out=
+put.0, vq: 0x1, name: output.0, 16776000 usecs ago
+> >
+> > Host level top output
+> > 3992758 qemu      20   0   16.6g  52168  26704 R  99.9   0.0  21:23.72 =
+qemu-kvm       <<< this is the qemu main thread
+> > 3992769 qemu      20   0   16.6g  52168  26704 R  58.8   0.0  13:33.44 =
+vhost-3992758 <<< this is the vhost-net kthread
+> >
+> > For qemu-kvm main thread:
+> > Samples: 13K of event 'cycles:P', 4000 Hz, Event count (approx.): 51319=
+22583 lost: 0/0 drop: 0/0
+> >   Children      Self  Shared Object     Symbol
+> > -   87.41%     0.30%  [kernel]          [k] entry_SYSCALL_64_after_hwfr=
+ame
+> >    - 87.11% entry_SYSCALL_64_after_hwframe
+> >       - do_syscall_64
+> >          - 44.79% ksys_write
+> >             - 43.74% vfs_write
+> >                - 40.96% vhost_chr_write_iter
+> >                   - 38.22% vhost_process_iotlb_msg
+> >                      - 13.72% vhost_iotlb_add_range_ctx
+> >                         - 7.43% vhost_iotlb_map_free
+> >                            - 4.37% vhost_iotlb_itree_remove
+> >                                 rb_next
+> >                              1.78% __rb_erase_color
+> >                              0.73% kfree
+> >                           1.15% __rb_insert_augmented
+> >                           0.68% __kmalloc_cache_noprof
+> >                      - 10.73% vhost_vq_work_queue
+> >                         - 7.65% try_to_wake_up
+> >                            - 2.55% ttwu_queue_wakelist
+> >                               - 1.72% __smp_call_single_queue
+> >                                    1.36% call_function_single_prep_ipi
+> >                            - 1.32% __task_rq_lock
+> >                               - _raw_spin_lock
+> >                                    native_queued_spin_lock_slowpath
+> >                            - 1.30% select_task_rq
+> >                               - select_task_rq_fair
+> >                                  - 0.88% wake_affine
+> >                                       available_idle_cpu
+> >                           2.06% llist_add_batch
+> >                      - 4.05% __mutex_lock.constprop.0
+> >                           2.14% mutex_spin_on_owner
+> >                           0.72% osq_lock
+> >                        3.00% mutex_lock
+> >                      - 1.72% kfree
+> >                         - 1.16% __slab_free
+> >                              slab_update_freelist.constprop.0.isra.0
+> >                        1.37% _raw_spin_lock
+> >                        1.08% mutex_unlock
+> >                     1.98% _copy_from_iter
+> >                - 1.86% rw_verify_area
+> >                   - security_file_permission
+> >                      - 1.13% file_has_perm
+> >                           0.69% avc_has_perm
+> >               0.63% fdget_pos
+> >          - 27.86% syscall_exit_to_user_mode
+> >             - syscall_exit_to_user_mode_prepare
+> >                - 25.96% __audit_syscall_exit
+> >                   - 25.03% __audit_filter_op
+> >                        6.66% audit_filter_rules.constprop.0
+> >                  1.27% audit_reset_context.part.0.constprop.0
+> >          - 10.86% ksys_read
+> >             - 9.37% vfs_read
+> >                - 6.67% vhost_chr_read_iter
+> >                     1.48% _copy_to_iter
+> >                     1.36% _raw_spin_lock
+> >                   - 1.30% __wake_up
+> >                        0.81% _raw_spin_lock_irqsave
+> >                   - 1.25% vhost_enqueue_msg
+> >                        _raw_spin_lock
+> >                - 1.83% rw_verify_area
+> >                   - security_file_permission
+> >                      - 1.03% file_has_perm
+> >                           0.64% avc_has_perm
+> >               0.65% fdget_pos
+> >               0.57% fput
+> >          - 2.56% syscall_trace_enter
+> >             - 1.25% __seccomp_filter
+> >                  seccomp_run_filters
+> >               0.54% __audit_syscall_entry
+> >
+> > vhost-net thread
+> > Samples: 20K of event 'cycles:P', 4000 Hz, Event count (approx.): 77964=
+56297 lost: 0/0 drop: 0/0
+> >   Children      Self  Shared Object     Symbol
+> > -  100.00%     3.38%  [kernel]          [k] vhost_task_fn
+> >      38.26% 0xffffffff930bb8c0
+> >    - 3.36% 0
+> >         ret_from_fork_asm
+> >         ret_from_fork
+> >    - 1.16% vhost_task_fn
+> >       - 2.35% vhost_run_work_list
+> >          - 1.67% handle_tx
+> >             - 7.09% __mutex_lock.constprop.0
+> >                  6.64% mutex_spin_on_owner
+> >             - 0.84% vq_meta_prefetch
+> >                - 3.22% iotlb_access_ok
+> >                     2.50% vhost_iotlb_itree_first
+> >               0.80% mutex_lock
+> >             - 0.75% handle_tx_copy
+> >            0.86% llist_reverse_order
+> >
+> > >
+> > > On Wed, 30 Apr 2025 19:04:28 -0700 you wrote:
+> > >> In handle_tx_copy, TX batching processes packets below ~PAGE_SIZE an=
+d
+> > >> batches up to 64 messages before calling sock->sendmsg.
+> > >>
+> > >> Currently, when there are no more messages on the ring to dequeue,
+> > >> handle_tx_copy re-enables kicks on the ring *before* firing off the
+> > >> batch sendmsg. However, sock->sendmsg incurs a non-zero delay,
+> > >> especially if it needs to wake up a thread (e.g., another vhost work=
+er).
+> > >>
+> > >> [...]
+> > >
+> > > Here is the summary with links:
+> > >  - [net-next,v3] vhost/net: Defer TX queue re-enable until after send=
+msg
+> > >    https://urldefense.proofpoint.com/v2/url?u=3Dhttps-3A__git.kernel.=
+org_netdev_net-2Dnext_c_8c2e6b26ffe2&d=3DDwIDaQ&c=3Ds883GpUCOChKOHiocYtGcg&=
+r=3DNGPRGGo37mQiSXgHKm5rCQ&m=3D0XoR6N9VbkaJ_wBENy8Z28uDdqjCe4HRNCyV-8o4etqX=
+eEJOqoFFGjeGGP5sQcmt&s=3D-X8si_rU8pXKNyWNNzBqx5Fmv-ut9w2gS5E6coMDApM&e=3D
+> > >
+> > > You are awesome, thank you!
+> > > --
+> > > Deet-doot-dot, I am a bot.
+> > > https://urldefense.proofpoint.com/v2/url?u=3Dhttps-3A__korg.docs.kern=
+el.org_patchwork_pwbot.html&d=3DDwIDaQ&c=3Ds883GpUCOChKOHiocYtGcg&r=3DNGPRG=
+Go37mQiSXgHKm5rCQ&m=3D0XoR6N9VbkaJ_wBENy8Z28uDdqjCe4HRNCyV-8o4etqXeEJOqoFFG=
+jeGGP5sQcmt&s=3DsydedZsBCMSJM9_Ldw6Al-BplvM7FokLwV_80bJpGnM&e=3D
+> > >
+> > >
+> >
+>
+>
+> Well it seems that if  get_tx_bufs failed with -EAGAIN then we
+> previously bailed out, but now we will redo poll and so on, forever.
 
-On 9/11/2025 1:40 AM, Thomas Gleixner wrote:
-> On Mon, Sep 01 2025 at 17:04, K. Prateek Nayak wrote:
->> Unconditionally call cpu_parse_topology_ext() on AMD and Hygon
->> processors to first parse the topology using the XTOPOLOGY leaves
->> (0x80000026 / 0xb) before using the TOPOEXT leaf (0x8000001e).
->>
->> While at it, break down the single large comment in parse_topology_amd()
->> to better highlight the purpose of each CPUID leaf.
->>
->> Cc: stable@vger.kernel.org # Only v6.9 and above; Depends on x86 topology rewrite
->> Link: https://lore.kernel.org/lkml/1529686927-7665-1-git-send-email-suravee.suthikulpanit@amd.com/ [1]
->> Link: https://lore.kernel.org/lkml/20080818181435.523309000@linux-os.sc.intel.com/ [2]
->> Link: https://bugzilla.kernel.org/show_bug.cgi?id=206537 [3]
->> Suggested-by: Naveen N Rao (AMD) <naveen@kernel.org>
->> Fixes: 3986a0a805e6 ("x86/CPU/AMD: Derive CPU topology from CPUID function 0xB when available")
->> Signed-off-by: K Prateek Nayak <kprateek.nayak@amd.com>
->> ---
->> Changelog v4..v5:
->>
->> o Made a note on only targeting versions >= v6.9 for stable backports
->>   since the fix depends on the x86 topology rewrite. (Boris)
-> 
-> Shouldn't that be backported? I think so, so leave that v6.9 and above
-> comment out. The stable folks will notice that it does not apply to pre
-> 6.9 kernels and send you a nice email asking you to provide a solution
-> for pre 6.9 stable kernels.
+Something like this, the vhost_vq_avail_empty() will cause the
+vhost_poll_queue() to be queued in this case.
 
-Ack! Since this is already in tip:x86/urgent as commit cba4262a19af
-("x86/cpu/topology: Always try cpu_parse_topology_ext() on AMD/Hygon")
-let me know if I should resend it or that comment can be zapped
-in-place.
+Let me post a patch to fix that.
 
-I can also send out a separate patch targeting stable with the intended
-changes. Since we are on the topic, here is the patch I would have sent
-out to stable:
+Thanks
 
-(Note: Only tested on top of v6.6.105 stable on a Zen3 machine; no
- changes found in /sys/devices/system/cpu/cpu*/topology/* with the patch
- applied on top)
-
-From: K Prateek Nayak <kprateek.nayak@amd.com>
-Subject: [PATCH stable] x86/cpu/amd: Always try detect_extended_topology()
- on AMD processors
-
-commit cba4262a19afae21665ee242b3404bcede5a94d7 upstream.
-
-Support for parsing the topology on AMD/Hygon processors using CPUID leaf 0xb
-was added in
-
-  3986a0a805e6 ("x86/CPU/AMD: Derive CPU topology from CPUID function 0xB when available").
-
-In an effort to keep all the topology parsing bits in one place, this commit
-also introduced a pseudo dependency on the TOPOEXT feature to parse the CPUID
-leaf 0xb.
-
-The TOPOEXT feature (CPUID 0x80000001 ECX[22]) advertises the support for
-Cache Properties leaf 0x8000001d and the CPUID leaf 0x8000001e EAX for
-"Extended APIC ID" however support for 0xb was introduced alongside the x2APIC
-support not only on AMD [1], but also historically on x86 [2].
-
-The support for the 0xb leaf is expected to be confirmed by ensuring
-
-  leaf <= max supported cpuid_level
-
-and then parsing the level 0 of the leaf to confirm EBX[15:0]
-(LogProcAtThisLevel) is non-zero as stated in the definition of
-"CPUID_Fn0000000B_EAX_x00 [Extended Topology Enumeration]
-(Core::X86::Cpuid::ExtTopEnumEax0)" in Processor Programming Reference (PPR)
-for AMD Family 19h Model 01h Rev B1 Vol1 [3] Sec. 2.1.15.1 "CPUID Instruction
-Functions".
-
-This has not been a problem on baremetal platforms since support for TOPOEXT
-(Fam 0x15 and later) predates the support for CPUID leaf 0xb (Fam 0x17[Zen2]
-and later), however, for AMD guests on QEMU, the "x2apic" feature can be
-enabled independent of the "topoext" feature where QEMU expects topology and
-the initial APICID to be parsed using the CPUID leaf 0xb (especially when
-number of cores > 255) which is populated independent of the "topoext" feature
-flag.
-
-Unconditionally call detect_extended_topology() on AMD processors to first
-parse the topology using the extended topology leaf 0xb before using the
-TOPOEXT leaf (0x8000001e).
-
-Fixes: 3986a0a805e6 ("x86/CPU/AMD: Derive CPU topology from CPUID function 0xB when available")
-Suggested-by: Naveen N Rao (AMD) <naveen@kernel.org>
-Signed-off-by: K Prateek Nayak <kprateek.nayak@amd.com>
-Link: https://lore.kernel.org/lkml/1529686927-7665-1-git-send-email-suravee.suthikulpanit@amd.com/ [1]
-Link: https://lore.kernel.org/lkml/20080818181435.523309000@linux-os.sc.intel.com/ [2]
-Link: https://bugzilla.kernel.org/show_bug.cgi?id=206537 [3]
----
-For stable maintainers,
-
-The original changes from commit cba4262a19af ("x86/cpu/topology: Always try
-cpu_parse_topology_ext() on AMD/Hygon") cannot be easily backported due to the
-extensive x86 topology rewrite in v6.9.
-
-This patch cleanly applies on top of all stable kernels from v6.6.y to v5.4.y.
-Boris' S-o-b from commit commit cba4262a19af has been dropped since the changes
-on top of the stable kernels are slightly different.
----
- arch/x86/kernel/cpu/amd.c | 37 ++++++++++++++++++++++---------------
- 1 file changed, 22 insertions(+), 15 deletions(-)
-
-diff --git a/arch/x86/kernel/cpu/amd.c b/arch/x86/kernel/cpu/amd.c
-index 864d62e94614..33d8bbdd7b69 100644
---- a/arch/x86/kernel/cpu/amd.c
-+++ b/arch/x86/kernel/cpu/amd.c
-@@ -391,34 +391,41 @@ static void legacy_fixup_core_id(struct cpuinfo_x86 *c)
-  */
- static void amd_get_topology(struct cpuinfo_x86 *c)
- {
-+	/*
-+	 * Try to get the topology information from the 0xb leaf first.
-+	 * If detect_extended_topology() returns 0, parsing was successful
-+	 * and APIC ID, cpu_core_id, cpu_die_id, phys_proc_id, and
-+	 * __max_die_per_package are already populated.
-+	 */
-+	bool has_extended_topology = !detect_extended_topology(c);
- 	int cpu = smp_processor_id();
- 
-+	if (has_extended_topology)
-+		c->x86_coreid_bits = get_count_order(c->x86_max_cores);
-+
- 	/* get information required for multi-node processors */
- 	if (boot_cpu_has(X86_FEATURE_TOPOEXT)) {
--		int err;
- 		u32 eax, ebx, ecx, edx;
- 
- 		cpuid(0x8000001e, &eax, &ebx, &ecx, &edx);
- 
--		c->cpu_die_id  = ecx & 0xff;
--
- 		if (c->x86 == 0x15)
- 			c->cu_id = ebx & 0xff;
- 
--		if (c->x86 >= 0x17) {
--			c->cpu_core_id = ebx & 0xff;
--
--			if (smp_num_siblings > 1)
--				c->x86_max_cores /= smp_num_siblings;
--		}
--
- 		/*
--		 * In case leaf B is available, use it to derive
--		 * topology information.
-+		 * If the extended topology leaf 0xb leaf doesn't exits,
-+		 * derive CORE and DIE information from the 0x8000001e leaf.
- 		 */
--		err = detect_extended_topology(c);
--		if (!err)
--			c->x86_coreid_bits = get_count_order(c->x86_max_cores);
-+		if (!has_extended_topology) {
-+			c->cpu_die_id  = ecx & 0xff;
-+
-+			if (c->x86 >= 0x17) {
-+				c->cpu_core_id = ebx & 0xff;
-+
-+				if (smp_num_siblings > 1)
-+					c->x86_max_cores /= smp_num_siblings;
-+			}
-+		}
- 
- 		cacheinfo_amd_init_llc_id(c, cpu);
- 
-
-base-commit: fe9731e100041bb2cc186717bde3e05ca175623b
---
-
-Let me know what you think.
-
--- 
-Thanks and Regards,
-Prateek
+>
+>
+> No?
+>
+>
+> --
+> MST
+>
 
 
