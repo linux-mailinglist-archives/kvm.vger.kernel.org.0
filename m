@@ -1,46 +1,46 @@
-Return-Path: <kvm+bounces-57312-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-57313-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 91E15B53191
-	for <lists+kvm@lfdr.de>; Thu, 11 Sep 2025 13:58:28 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3868CB53192
+	for <lists+kvm@lfdr.de>; Thu, 11 Sep 2025 13:58:34 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4B263584B55
-	for <lists+kvm@lfdr.de>; Thu, 11 Sep 2025 11:58:28 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id EDA704859AF
+	for <lists+kvm@lfdr.de>; Thu, 11 Sep 2025 11:58:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DAF103203B0;
-	Thu, 11 Sep 2025 11:57:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8772F3203BD;
+	Thu, 11 Sep 2025 11:57:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="PTFhELJ9"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="K9Kq2SBb"
 X-Original-To: kvm@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0D9732D0612
-	for <kvm@vger.kernel.org>; Thu, 11 Sep 2025 11:57:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A4B0E3203B5
+	for <kvm@vger.kernel.org>; Thu, 11 Sep 2025 11:57:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757591863; cv=none; b=kbUdAhMgKcFknp/N+cEoO5yiKebFYWb+C3qzbObLA1F7dADm5jm1EZOm8tDQurkuNzSelbudQl9gKZJlw+f/vbKrFZDbTvsG8Prz8bFJRwVhNRFacgWLKJl+SxtB/3hYlg+PnKvMWw/NpY1RtKUGFLHvGPwogd3fvY3UIC+vTWQ=
+	t=1757591868; cv=none; b=td371t7Oo8vCUlQhgLlcCll8v5cFSSXFy1hZDfiydFB55PH8ZU8/b0TfNtdSYQqC0ivPvHwKxZiSeEQfRmVciSG5Igy8fGMjI7JYOwYPg05/+oAGRfrCYCQYiQh0XJ6hbtvAlrFWfLEvMD1rKrb7lufI3rlGTNS+UgZ3aI40QNU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757591863; c=relaxed/simple;
-	bh=FqYI/fFenEh9NNXj5tqAx70QKfo6zQDqB92zhCRqVd0=;
+	s=arc-20240116; t=1757591868; c=relaxed/simple;
+	bh=Q3CepnBB4cHosxsbgQq/BWCHIzMOIfZtr4L86ETM60c=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=pYX/IrOJbu6TP2oyPVUSgAIKt7u69jZKyY6P8dz1Z/qaQVrywD070xrw/Kbx3PwwSUoftUjQuqbd5MQYfpXlv/qoPJ7ABRR+XwRruQMgOWAjYgH1Vh1vB7a4f879bN2MEHIku/OEL3hTc1EeOYM43BO72rNpfT32X/skyQC5duk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=PTFhELJ9; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id BD8F4C4CEF0;
-	Thu, 11 Sep 2025 11:57:41 +0000 (UTC)
+	 MIME-Version; b=Q1cvRfoaMuQTwecxiISNWD7Wp6t+kR7L1BKZebMrgDOXMfWP+yDL9wF7b2VUHE1/CgHyUamlpZmqi9t+F0V/LU6ovdPmEHNnC6A4hb3noIeyQv78snyh5ZOowlyKSzOnrkedj1BIwD1fyDD8Ri+A0IwIkgZnzCeMdLO30uc5MPU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=K9Kq2SBb; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 67916C4CEF0;
+	Thu, 11 Sep 2025 11:57:46 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1757591862;
-	bh=FqYI/fFenEh9NNXj5tqAx70QKfo6zQDqB92zhCRqVd0=;
+	s=k20201202; t=1757591867;
+	bh=Q3CepnBB4cHosxsbgQq/BWCHIzMOIfZtr4L86ETM60c=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=PTFhELJ9YB5jcNQyGYI1KUtcaO2BUbASn4g1PmS2sJsQn6OcojeuIw6jtKKdkSMN/
-	 oJxFw93lEK+gCToqKgECCVzjgJIY/90OnzKEKLZdt9CbQwjDv3403JAg7KzL38c6kv
-	 zLpRLHHBHumzlLo2KBPpqjIljGzS+TmDrUjTeUVIbjoX8mt6lVWFJoFjTzox9M2R1E
-	 1FTZB98irrvpGjZAMcnXWvt/yHbzbxZ9GijPAQ0JrTGaQKbo4w4vQcbkI1VfvLarUD
-	 5fp7ZS1vLrcg8D0ggoOVUNfwLUBBruWvpaYJM1psnY1VxA8TJhwqv9vzC6/t7A1r2G
-	 lv4xxOxMxLs8g==
+	b=K9Kq2SBbcrBBgMPPopSCW8mK4WtaloHNpIkxibYgl7dxtwYYuFRYv1dfw9+tVjvsp
+	 2NRdtenfxAPDguvFryFEASdoDoxHjLIcyBujCNdO0fx+YSFRyg4xAC+1eANefmxElQ
+	 MnQyVnidCecqJQmtkbfRAs8N9GVzZgOucuwJCQNxuKMhVhK57HPER5trA/G/3UQm8w
+	 aNrzbYLroM4Mt3BefQqNmhxOjZExFlYOo27gztca9eq43YHWhJhPtS6734qRSfyuu7
+	 iB/UCZZwN8YUkgOK87u3bSg/kK+SpA41zpwCOOdXhmxRJS3x3vSHZEv7xv6pRkFh/u
+	 JxeOHaL29eaKA==
 From: "Naveen N Rao (AMD)" <naveen@kernel.org>
 To: Paolo Bonzini <pbonzini@redhat.com>,
 	Sean Christopherson <seanjc@google.com>
@@ -56,10 +56,11 @@ Cc: qemu-devel <qemu-devel@nongnu.org>,
 	Tom Lendacky <thomas.lendacky@amd.com>,
 	Michael Roth <michael.roth@amd.com>,
 	Neeraj Upadhyay <neeraj.upadhyay@amd.com>,
-	Roy Hopkins <roy.hopkins@randomman.co.uk>
-Subject: [RFC PATCH 4/7] target/i386: SEV: Enable use of KVM_SEV_INIT2 for SEV-ES guests
-Date: Thu, 11 Sep 2025 17:24:23 +0530
-Message-ID: <84893d59f11b16890612ef2436ad233526ebe3fd.1757589490.git.naveen@kernel.org>
+	Roy Hopkins <roy.hopkins@randomman.co.uk>,
+	Ketan Chaturvedi <Ketan.Chaturvedi@amd.com>
+Subject: [RFC PATCH 5/7] target/i386: SEV: Add support for enabling Secure TSC SEV feature
+Date: Thu, 11 Sep 2025 17:24:24 +0530
+Message-ID: <4c5ecb5835d8600e1b7b30fba2e36e1163b8da83.1757589490.git.naveen@kernel.org>
 X-Mailer: git-send-email 2.50.1
 In-Reply-To: <cover.1757589490.git.naveen@kernel.org>
 References: <cover.1757589490.git.naveen@kernel.org>
@@ -71,34 +72,90 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Now that users can enable VMSA SEV features, update sev_init2_required()
-to return true if any SEV features are requested. This enables qemu to
-use KVM_SEV_INIT2 for SEV-ES guests when necessary.
+Add support for enabling Secure TSC VMSA SEV feature in SEV-SNP guests
+through a new "secure-tsc" boolean property on SEV-SNP guest objects.
 
 Sample command-line:
   -machine q35,confidential-guest-support=sev0 \
-  -object sev-guest,id=sev0,policy=0x5,cbitpos=51,reduced-phys-bits=1,debug-swap=on
+  -object sev-snp-guest,id=sev0,cbitpos=51,reduced-phys-bits=1,secure-tsc=on
 
-Reviewed-by: Nikunj A Dadhania <nikunj@amd.com>
+Co-developed-by: Ketan Chaturvedi <Ketan.Chaturvedi@amd.com>
+Signed-off-by: Ketan Chaturvedi <Ketan.Chaturvedi@amd.com>
+Co-developed-by: Nikunj A Dadhania <nikunj@amd.com>
+Signed-off-by: Nikunj A Dadhania <nikunj@amd.com>
 Signed-off-by: Naveen N Rao (AMD) <naveen@kernel.org>
 ---
- target/i386/sev.c | 3 +--
- 1 file changed, 1 insertion(+), 2 deletions(-)
+ target/i386/sev.h |  1 +
+ target/i386/sev.c | 13 +++++++++++++
+ qapi/qom.json     |  5 ++++-
+ 3 files changed, 18 insertions(+), 1 deletion(-)
 
+diff --git a/target/i386/sev.h b/target/i386/sev.h
+index 8e09b2ce1976..87e73034ad15 100644
+--- a/target/i386/sev.h
++++ b/target/i386/sev.h
+@@ -46,6 +46,7 @@ bool sev_snp_enabled(void);
+ 
+ #define SVM_SEV_FEAT_SNP_ACTIVE     BIT(0)
+ #define SVM_SEV_FEAT_DEBUG_SWAP     BIT(5)
++#define SVM_SEV_FEAT_SECURE_TSC     BIT(9)
+ 
+ typedef struct SevKernelLoaderContext {
+     char *setup_data;
 diff --git a/target/i386/sev.c b/target/i386/sev.c
-index b3e4d0f2c1d5..3063ad2d077a 100644
+index 3063ad2d077a..8f88df19a408 100644
 --- a/target/i386/sev.c
 +++ b/target/i386/sev.c
-@@ -1704,8 +1704,7 @@ sev_vm_state_change(void *opaque, bool running, RunState state)
-  */
- static bool sev_init2_required(SevGuestState *sev_guest)
- {
--    /* Currently no KVM_SEV_INIT2-specific options are exposed via QEMU */
--    return false;
-+    return !!SEV_COMMON(sev_guest)->sev_features;
+@@ -3117,6 +3117,16 @@ sev_snp_guest_set_host_data(Object *obj, const char *value, Error **errp)
+     memcpy(finish->host_data, blob, len);
  }
  
- static int sev_kvm_type(X86ConfidentialGuest *cg)
++static bool sev_snp_guest_get_secure_tsc(Object *obj, Error **errp)
++{
++    return is_sev_feature_set(SEV_COMMON(obj), SVM_SEV_FEAT_SECURE_TSC);
++}
++
++static void sev_snp_guest_set_secure_tsc(Object *obj, bool value, Error **errp)
++{
++    sev_set_feature(SEV_COMMON(obj), SVM_SEV_FEAT_SECURE_TSC, value);
++}
++
+ static void
+ sev_snp_guest_class_init(ObjectClass *oc, const void *data)
+ {
+@@ -3152,6 +3162,9 @@ sev_snp_guest_class_init(ObjectClass *oc, const void *data)
+     object_class_property_add_str(oc, "host-data",
+                                   sev_snp_guest_get_host_data,
+                                   sev_snp_guest_set_host_data);
++    object_class_property_add_bool(oc, "secure-tsc",
++                                  sev_snp_guest_get_secure_tsc,
++                                  sev_snp_guest_set_secure_tsc);
+ }
+ 
+ static void
+diff --git a/qapi/qom.json b/qapi/qom.json
+index 71cd8ad588b5..b05a475ef499 100644
+--- a/qapi/qom.json
++++ b/qapi/qom.json
+@@ -1100,6 +1100,8 @@
+ #     firmware.  Set this to true to disable the use of VCEK.
+ #     (default: false) (since: 9.1)
+ #
++# @secure-tsc: enable Secure TSC (default: false) (since 10.2)
++#
+ # Since: 9.1
+ ##
+ { 'struct': 'SevSnpGuestProperties',
+@@ -1111,7 +1113,8 @@
+             '*id-auth': 'str',
+             '*author-key-enabled': 'bool',
+             '*host-data': 'str',
+-            '*vcek-disabled': 'bool' } }
++            '*vcek-disabled': 'bool',
++            '*secure-tsc': 'bool' } }
+ 
+ ##
+ # @TdxGuestProperties:
 -- 
 2.50.1
 
