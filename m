@@ -1,69 +1,69 @@
-Return-Path: <kvm+bounces-57352-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-57353-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 79F09B53B95
-	for <lists+kvm@lfdr.de>; Thu, 11 Sep 2025 20:35:32 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 084B6B53B9A
+	for <lists+kvm@lfdr.de>; Thu, 11 Sep 2025 20:36:13 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2C1335A1F11
-	for <lists+kvm@lfdr.de>; Thu, 11 Sep 2025 18:35:32 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 55525482501
+	for <lists+kvm@lfdr.de>; Thu, 11 Sep 2025 18:36:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B6B8137C0F8;
-	Thu, 11 Sep 2025 18:33:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 314CF393DFF;
+	Thu, 11 Sep 2025 18:33:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="BUiY4z3h"
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="daYGfCE+"
 X-Original-To: kvm@vger.kernel.org
 Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CCFD1371E93;
-	Thu, 11 Sep 2025 18:33:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9A63B37C0F2;
+	Thu, 11 Sep 2025 18:33:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757615602; cv=none; b=ZRlZ+cnlc64ijYcOHZkCkfzFVum8IAfH6BsMU7sv6NcUtI/01VSx93r0aOCfSx+B8Qa+VdxRwJGO+0rLwSLERxxIm36UuVHE4fDXdH6Xek47lBvv4dvRn1oJ0yCKs7chrRJ+/pIdpF3LT04htdDuIoikhGPxXZzMXJUDkOxqsmQ=
+	t=1757615605; cv=none; b=q6zthcm0Qxc/vKggk+hXV0Gh/QDgwiexn3pqKVOWQkuAj5wR1DU0AUWieivMjPiClpttxlbsq4MoYqTn6QQQttFJla/96s4wqeZbOnDYDw2FDb/AUo6K2G5lFhhNHZg/JzlvtxHUQemMj7tuUoaHXq8jV32xdCMoMrcZpQiSyIE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757615602; c=relaxed/simple;
-	bh=VKeAI6fRQ/t72OGx2CEndr/00kQZFDBkNl8vad6U7fM=;
+	s=arc-20240116; t=1757615605; c=relaxed/simple;
+	bh=ytFXbNEKbWNWIa4e99DqMpdEgtgPube/J3VaS5HzAEQ=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=ZcMG9/ezVc8NcijxHiAKYese18v/4u6x3R97JK/cTrP3v95roIY8F1wKoU6fMn4Oi89cZoXSvUjGQf76UoHVK216/Ye3XNTHIwyQ83akT9uLkYsfYsieSh0oEt7qDn024r8FC3NY7hNUls1+QPQAFU6FivVYGKQOmHmTDkLbnj0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=BUiY4z3h; arc=none smtp.client-ip=148.163.158.5
+	 MIME-Version; b=Me/JpsjhGAhCkZcTN53Z4QC+HLDV8rXOQm6HVE01THyV7rsYxSsmsIwU/taVTNq/ZXJv1TsAGUqziojyCY7uL/9q75U920TBgqKLKk2pAKRO/KPfhk0qA3k4WmEzA+nhCTULp4jIcywLlzCDhW5vgALL1Xh307pVV0irqWLOgCk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=daYGfCE+; arc=none smtp.client-ip=148.163.158.5
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
-Received: from pps.filterd (m0353725.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 58BI960T021177;
-	Thu, 11 Sep 2025 18:33:16 GMT
+Received: from pps.filterd (m0356516.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 58BHarQO031789;
+	Thu, 11 Sep 2025 18:33:19 GMT
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
 	:content-transfer-encoding:date:from:in-reply-to:message-id
-	:mime-version:references:subject:to; s=pp1; bh=uNqMkd8x9H8pA4z+q
-	I3lWSnlmkia9DOlDSAcCRov0BY=; b=BUiY4z3hIZBH/BBzekOZQSGax09wWL8+F
-	IoRSnyhrlRxCRPseDxAA6pRKkHMB299yUYf5p/X621bcY8S/uASznJ9+wNPbmb71
-	P3ztK9NdqLYV9der2X+wQf/oSap+BPl2V1v4aHQ5Q3+VvLTtEK7iYNx5/8UEgbPt
-	0VLqszRrfe8+z8W+a/BbSBNazYVzSX0owBC+3LLCk8zBUCukdYSs+zqBo6TcHL1v
-	s7hRdeyltBHXoCABP1uIG4+JUY0AiJ/GCec6NXbyzvzNxwnT8Sev3oKWsejheekS
-	/r78ygBVYs2xkUMEwhna7TsLhJqO6JCMhZAqO9dOTlC7k/PuYGX9A==
-Received: from ppma13.dal12v.mail.ibm.com (dd.9e.1632.ip4.static.sl-reverse.com [50.22.158.221])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 490bct5v8f-1
+	:mime-version:references:subject:to; s=pp1; bh=wJWMYHMfvbzU5BQsW
+	YZErSvZaRLa/7xMVP6aVFziDXk=; b=daYGfCE+GJxCX41C/ndtdQ5ZmzeZZ6LTW
+	G5mVQVCWpxx3kiyW9A+N+93eWeqBPvlOLaHSPMxrKM55x/f+I82cbKoTQrd0eJ2m
+	kxAKawfmJzMIvr4cmnOTwt4YTrCYzQPy400ZSRn+cfsBzoWisGmolnV9zWMBq0xm
+	dg8jYuTfMPJ14yQCZIqpgHZuekwcvAsyHn8fWK8GmI+AV9ivg6QzCA1ZFJCLSQfG
+	/MV8FVwXGfm4ZXjX6mCqb/8djcAYyEw3j9O6R9UO2e41A0uhDqi+hwWOSpXA8o+l
+	d3ivcgbCNsL/R9eUb34HV9y/Op5YhdWMwJT0jE2n6YR4vm9hEhZBg==
+Received: from ppma12.dal12v.mail.ibm.com (dc.9e.1632.ip4.static.sl-reverse.com [50.22.158.220])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 490acrdxay-1
 	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 11 Sep 2025 18:33:16 +0000 (GMT)
-Received: from pps.filterd (ppma13.dal12v.mail.ibm.com [127.0.0.1])
-	by ppma13.dal12v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 58BI6ZvI017218;
-	Thu, 11 Sep 2025 18:33:15 GMT
-Received: from smtprelay03.dal12v.mail.ibm.com ([172.16.1.5])
-	by ppma13.dal12v.mail.ibm.com (PPS) with ESMTPS id 4911gmq2cc-1
+	Thu, 11 Sep 2025 18:33:18 +0000 (GMT)
+Received: from pps.filterd (ppma12.dal12v.mail.ibm.com [127.0.0.1])
+	by ppma12.dal12v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 58BGF2dC011434;
+	Thu, 11 Sep 2025 18:33:17 GMT
+Received: from smtprelay03.wdc07v.mail.ibm.com ([172.16.1.70])
+	by ppma12.dal12v.mail.ibm.com (PPS) with ESMTPS id 490y9uqgrh-1
 	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 11 Sep 2025 18:33:15 +0000
+	Thu, 11 Sep 2025 18:33:17 +0000
 Received: from smtpav01.dal12v.mail.ibm.com (smtpav01.dal12v.mail.ibm.com [10.241.53.100])
-	by smtprelay03.dal12v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 58BIXEU824642150
+	by smtprelay03.wdc07v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 58BIX6cW29622840
 	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Thu, 11 Sep 2025 18:33:15 GMT
+	Thu, 11 Sep 2025 18:33:06 GMT
 Received: from smtpav01.dal12v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id DAB535805D;
-	Thu, 11 Sep 2025 18:33:14 +0000 (GMT)
+	by IMSVA (Postfix) with ESMTP id A89DC58059;
+	Thu, 11 Sep 2025 18:33:15 +0000 (GMT)
 Received: from smtpav01.dal12v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 30ECC58058;
-	Thu, 11 Sep 2025 18:33:14 +0000 (GMT)
+	by IMSVA (Postfix) with ESMTP id 04A1B58057;
+	Thu, 11 Sep 2025 18:33:15 +0000 (GMT)
 Received: from IBM-D32RQW3.ibm.com (unknown [9.61.249.32])
 	by smtpav01.dal12v.mail.ibm.com (Postfix) with ESMTP;
 	Thu, 11 Sep 2025 18:33:14 +0000 (GMT)
@@ -72,9 +72,9 @@ To: linux-s390@vger.kernel.org, kvm@vger.kernel.org,
         linux-kernel@vger.kernel.org, linux-pci@vger.kernel.org
 Cc: alex.williamson@redhat.com, helgaas@kernel.org, alifm@linux.ibm.com,
         schnelle@linux.ibm.com, mjrosato@linux.ibm.com
-Subject: [PATCH v3 08/10] vfio-pci/zdev: Add a device feature for error information
-Date: Thu, 11 Sep 2025 11:33:05 -0700
-Message-ID: <20250911183307.1910-9-alifm@linux.ibm.com>
+Subject: [PATCH v3 09/10] vfio: Add a reset_done callback for vfio-pci driver
+Date: Thu, 11 Sep 2025 11:33:06 -0700
+Message-ID: <20250911183307.1910-10-alifm@linux.ibm.com>
 X-Mailer: git-send-email 2.43.0
 In-Reply-To: <20250911183307.1910-1-alifm@linux.ibm.com>
 References: <20250911183307.1910-1-alifm@linux.ibm.com>
@@ -86,150 +86,66 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-TM-AS-GCONF: 00
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUwOTA2MDAxMCBTYWx0ZWRfX1dYPr69qqEYR
- PpzgoYQauD+JZNADK1qz6Rol2nRXHQbN11aELKKo3B/ezS/bYzeyCN/uHVAWaTezscAk3npNPii
- huEygyvr/lWGZ/RYDngtXGdiWdozzNliOcrxRoftKI+//gHZSH2Bhzt2leTgZ4ZE0B2GhBHj6n0
- 1AfcX6IwekcM6nlV+mQ0aRskli++T+Vfvaf8vov4IFZSMBrw9WOEIft5UCY+I246UZAhm/pLEPf
- 9xEW8Wgihb0on1tw9/PNwdbf6lP/CUE4yz6Kx0J21sNiOrXA4dJVNPRjNzXChsrB+iuDHKu0+uV
- r/ZsrtFxdnVmw3jWXt4Y1u/8Jp2p0NGIxX5YaF+IAZCuonIHhdcL4ZyH9IMLITlBQT9pw3tw3pI
- Mwdhd4ki
-X-Authority-Analysis: v=2.4 cv=SKNCVPvH c=1 sm=1 tr=0 ts=68c315ec cx=c_pps
- a=AfN7/Ok6k8XGzOShvHwTGQ==:117 a=AfN7/Ok6k8XGzOShvHwTGQ==:17
- a=yJojWOMRYYMA:10 a=VnNF1IyMAAAA:8 a=QIy8Zix3hhx26zbqT_4A:9
-X-Proofpoint-GUID: maYmdmJIrT37lHslglJSrDLdN-26WcIV
-X-Proofpoint-ORIG-GUID: maYmdmJIrT37lHslglJSrDLdN-26WcIV
+X-Proofpoint-GUID: 4uHlJCifPCGHmGXWRAptpuGsRZWxM_aj
+X-Authority-Analysis: v=2.4 cv=Mp1S63ae c=1 sm=1 tr=0 ts=68c315ee cx=c_pps
+ a=bLidbwmWQ0KltjZqbj+ezA==:117 a=bLidbwmWQ0KltjZqbj+ezA==:17
+ a=yJojWOMRYYMA:10 a=VnNF1IyMAAAA:8 a=hcTHx3Z5Akp3fEzgVBYA:9
+X-Proofpoint-ORIG-GUID: 4uHlJCifPCGHmGXWRAptpuGsRZWxM_aj
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUwOTA2MDAwMCBTYWx0ZWRfX7TXy8smtZ86K
+ zwV8zsC48Oir+y33umkd1k0Vi7uvVQpOJ55XchIPmf/sVjJelGGZHSRrPRwOAYnudio3Rpjxxpp
+ SrB2Xb5Y4qYJ5Yd2yRplF8BdJcn9AYGE0X30xxgyAtsKaP41tEy7GHmZXLamO9kddAdRHG5H2Rz
+ UWaL4MO9GlFGX5BzhRw78FqqfhfZ0PEbdhUHhvuqfAo/YA7gKG8MCc5EIJmQYmxwrBCyRHv0LBj
+ cneQpb+6N7fRxJGAluvJZ+UXH4oKV9Pi7HcgvIsDsF9HIcexlGmtk6Auh93dd4rUV9Aj9JHyrD9
+ dmmIddBzUMzVR+/FDVLp7Pq702KVorBUIl2ftxbAsWPHzLauzeumj3xbQX0Sa7MG+JmhuNjznTx
+ iZWp29QD
 X-Proofpoint-Virus-Version: vendor=baseguard
  engine=ICAP:2.0.293,Aquarius:18.0.1117,Hydra:6.1.9,FMLib:17.12.80.40
  definitions=2025-09-11_03,2025-09-11_02,2025-03-28_01
 X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- clxscore=1015 spamscore=0 priorityscore=1501 bulkscore=0 malwarescore=0
- adultscore=0 suspectscore=0 impostorscore=0 phishscore=0
+ impostorscore=0 malwarescore=0 clxscore=1011 phishscore=0 spamscore=0
+ adultscore=0 priorityscore=1501 bulkscore=0 suspectscore=0
  classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
- reason=mlx scancount=1 engine=8.19.0-2507300000 definitions=main-2509060010
+ reason=mlx scancount=1 engine=8.19.0-2507300000 definitions=main-2509060000
 
-For zPCI devices, we have platform specific error information. The platform
-firmware provides this error information to the operating system in an
-architecture specific mechanism. To enable recovery from userspace for
-these devices, we want to expose this error information to userspace. Add a
-new device feature to expose this information.
+On error recovery for a PCI device bound to vfio-pci driver, we want to
+recover the state of the device to its last known saved state. The callback
+restores the state of the device to its initial saved state.
 
 Signed-off-by: Farhan Ali <alifm@linux.ibm.com>
 ---
- drivers/vfio/pci/vfio_pci_core.c |  2 ++
- drivers/vfio/pci/vfio_pci_priv.h |  8 ++++++++
- drivers/vfio/pci/vfio_pci_zdev.c | 34 ++++++++++++++++++++++++++++++++
- include/uapi/linux/vfio.h        | 14 +++++++++++++
- 4 files changed, 58 insertions(+)
+ drivers/vfio/pci/vfio_pci_core.c | 12 ++++++++++++
+ 1 file changed, 12 insertions(+)
 
 diff --git a/drivers/vfio/pci/vfio_pci_core.c b/drivers/vfio/pci/vfio_pci_core.c
-index 7dcf5439dedc..378adb3226db 100644
+index 378adb3226db..f2fcb81b3e69 100644
 --- a/drivers/vfio/pci/vfio_pci_core.c
 +++ b/drivers/vfio/pci/vfio_pci_core.c
-@@ -1514,6 +1514,8 @@ int vfio_pci_core_ioctl_feature(struct vfio_device *device, u32 flags,
- 		return vfio_pci_core_pm_exit(device, flags, arg, argsz);
- 	case VFIO_DEVICE_FEATURE_PCI_VF_TOKEN:
- 		return vfio_pci_core_feature_token(device, flags, arg, argsz);
-+	case VFIO_DEVICE_FEATURE_ZPCI_ERROR:
-+		return vfio_pci_zdev_feature_err(device, flags, arg, argsz);
- 	default:
- 		return -ENOTTY;
- 	}
-diff --git a/drivers/vfio/pci/vfio_pci_priv.h b/drivers/vfio/pci/vfio_pci_priv.h
-index a9972eacb293..a4a7f97fdc2e 100644
---- a/drivers/vfio/pci/vfio_pci_priv.h
-+++ b/drivers/vfio/pci/vfio_pci_priv.h
-@@ -86,6 +86,8 @@ int vfio_pci_info_zdev_add_caps(struct vfio_pci_core_device *vdev,
- 				struct vfio_info_cap *caps);
- int vfio_pci_zdev_open_device(struct vfio_pci_core_device *vdev);
- void vfio_pci_zdev_close_device(struct vfio_pci_core_device *vdev);
-+int vfio_pci_zdev_feature_err(struct vfio_device *device, u32 flags,
-+			      void __user *arg, size_t argsz);
- #else
- static inline int vfio_pci_info_zdev_add_caps(struct vfio_pci_core_device *vdev,
- 					      struct vfio_info_cap *caps)
-@@ -100,6 +102,12 @@ static inline int vfio_pci_zdev_open_device(struct vfio_pci_core_device *vdev)
- 
- static inline void vfio_pci_zdev_close_device(struct vfio_pci_core_device *vdev)
- {}
-+
-+static int vfio_pci_zdev_feature_err(struct vfio_device *device, u32 flags,
-+				     void __user *arg, size_t argsz);
-+{
-+	return -ENODEV;
-+}
- #endif
- 
- static inline bool vfio_pci_is_vga(struct pci_dev *pdev)
-diff --git a/drivers/vfio/pci/vfio_pci_zdev.c b/drivers/vfio/pci/vfio_pci_zdev.c
-index 2be37eab9279..261954039aa9 100644
---- a/drivers/vfio/pci/vfio_pci_zdev.c
-+++ b/drivers/vfio/pci/vfio_pci_zdev.c
-@@ -141,6 +141,40 @@ int vfio_pci_info_zdev_add_caps(struct vfio_pci_core_device *vdev,
- 	return ret;
+@@ -2241,6 +2241,17 @@ pci_ers_result_t vfio_pci_core_aer_err_detected(struct pci_dev *pdev,
  }
+ EXPORT_SYMBOL_GPL(vfio_pci_core_aer_err_detected);
  
-+int vfio_pci_zdev_feature_err(struct vfio_device *device, u32 flags,
-+			      void __user *arg, size_t argsz)
++static void vfio_pci_core_aer_reset_done(struct pci_dev *pdev)
 +{
-+	struct vfio_device_feature_zpci_err err;
-+	struct vfio_pci_core_device *vdev =
-+		container_of(device, struct vfio_pci_core_device, vdev);
-+	struct zpci_dev *zdev = to_zpci(vdev->pdev);
-+	int ret;
-+	int head = 0;
++	struct vfio_pci_core_device *vdev = dev_get_drvdata(&pdev->dev);
 +
-+	if (!zdev)
-+		return -ENODEV;
++	if (!vdev->pci_saved_state)
++		return;
 +
-+	ret = vfio_check_feature(flags, argsz, VFIO_DEVICE_FEATURE_GET,
-+				 sizeof(err));
-+	if (ret != 1)
-+		return ret;
-+
-+	mutex_lock(&zdev->pending_errs_lock);
-+	if (zdev->pending_errs.count) {
-+		head = zdev->pending_errs.head % ZPCI_ERR_PENDING_MAX;
-+		err.pec = zdev->pending_errs.err[head].pec;
-+		zdev->pending_errs.head++;
-+		zdev->pending_errs.count--;
-+		err.pending_errors = zdev->pending_errs.count;
-+	}
-+	mutex_unlock(&zdev->pending_errs_lock);
-+
-+	if (copy_to_user(arg, &err, sizeof(err)))
-+		return -EFAULT;
-+
-+	return 0;
++	pci_load_saved_state(pdev, vdev->pci_saved_state);
++	pci_restore_state(pdev);
 +}
 +
- int vfio_pci_zdev_open_device(struct vfio_pci_core_device *vdev)
+ int vfio_pci_core_sriov_configure(struct vfio_pci_core_device *vdev,
+ 				  int nr_virtfn)
  {
- 	struct zpci_dev *zdev = to_zpci(vdev->pdev);
-diff --git a/include/uapi/linux/vfio.h b/include/uapi/linux/vfio.h
-index 75100bf009ba..a950c341602d 100644
---- a/include/uapi/linux/vfio.h
-+++ b/include/uapi/linux/vfio.h
-@@ -1478,6 +1478,20 @@ struct vfio_device_feature_bus_master {
+@@ -2305,6 +2316,7 @@ EXPORT_SYMBOL_GPL(vfio_pci_core_sriov_configure);
+ 
+ const struct pci_error_handlers vfio_pci_core_err_handlers = {
+ 	.error_detected = vfio_pci_core_aer_err_detected,
++	.reset_done = vfio_pci_core_aer_reset_done,
  };
- #define VFIO_DEVICE_FEATURE_BUS_MASTER 10
+ EXPORT_SYMBOL_GPL(vfio_pci_core_err_handlers);
  
-+/**
-+ * VFIO_DEVICE_FEATURE_ZPCI_ERROR feature provides PCI error information to
-+ * userspace for vfio-pci devices on s390x. On s390x PCI error recovery involves
-+ * platform firmware and notification to operating system is done by
-+ * architecture specific mechanism.  Exposing this information to userspace
-+ * allows userspace to take appropriate actions to handle an error on the
-+ * device.
-+ */
-+struct vfio_device_feature_zpci_err {
-+	__u16 pec;
-+	int pending_errors;
-+};
-+#define VFIO_DEVICE_FEATURE_ZPCI_ERROR 11
-+
- /* -------- API for Type1 VFIO IOMMU -------- */
- 
- /**
 -- 
 2.43.0
 
