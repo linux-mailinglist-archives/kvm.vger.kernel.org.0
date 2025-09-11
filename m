@@ -1,54 +1,65 @@
-Return-Path: <kvm+bounces-57281-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-57282-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id AEBD0B5295D
-	for <lists+kvm@lfdr.de>; Thu, 11 Sep 2025 08:58:28 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0F1EDB52983
+	for <lists+kvm@lfdr.de>; Thu, 11 Sep 2025 09:02:38 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6B2476815CC
-	for <lists+kvm@lfdr.de>; Thu, 11 Sep 2025 06:58:27 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 56BA51C23702
+	for <lists+kvm@lfdr.de>; Thu, 11 Sep 2025 07:02:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D08EF262808;
-	Thu, 11 Sep 2025 06:58:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 49A4B265632;
+	Thu, 11 Sep 2025 07:02:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=zytor.com header.i=@zytor.com header.b="krP0Mf43"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="AAvuE2VD"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail.zytor.com (terminus.zytor.com [198.137.202.136])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AD23023E355;
-	Thu, 11 Sep 2025 06:58:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.136
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0827E329F0F;
+	Thu, 11 Sep 2025 07:02:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.17
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757573886; cv=none; b=n5DanHOMV3OEOZ4I2o8R53E8FVVPsjzXfhQBEUiSaWyQvlccU47UJWAGTT9j6mWG2POg5pmGjG6/RuAsSMixNr6fzcjxgrthp1pC0EKgD1cb3uzTA+IJXtVszsnnzRfvdKJVsn1P32CaruZTj2ptTia0zTP5ppBtNyvYptGrZG4=
+	t=1757574146; cv=none; b=Lw/T6juE5F2HwiLVuPUzTMj1aqscFMWNWyUlP4ma2sT95aURY9wQQff0KeIqh1+05xpdOhHlZta1sncR+0HLxevnVeplawjFyYh+ZLMPvfQJxXpeJWMJo17LSb7no4iC7oxu7f2rXbRmNP6eE+x+7QCwA7Pt4f5e0dyJ3cO/pDY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757573886; c=relaxed/simple;
-	bh=ezYmetIuXixRHkPs5XqtQKqJxfsVsN9SqTJaOciWsro=;
-	h=Message-ID:Date:MIME-Version:From:Subject:To:Cc:References:
-	 In-Reply-To:Content-Type; b=B6kTphm3meICbP2KCIIiyIugyc3f9Vu43TiCA6Nqo4eopg9YbW0gRImJVcjvUYtP8TkLnNN6yeFbQc0h5t3Noyu1wJez780LWMfcSuakCYeo5E5Fwdtjecy4rlCr/aBA0vNMEMH1jnk/bXiGiaS98PqhEerlo4u/PzI1EtqRD3Q=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=zytor.com; spf=pass smtp.mailfrom=zytor.com; dkim=pass (2048-bit key) header.d=zytor.com header.i=@zytor.com header.b=krP0Mf43; arc=none smtp.client-ip=198.137.202.136
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=zytor.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=zytor.com
-Received: from [192.168.7.202] ([71.202.166.45])
-	(authenticated bits=0)
-	by mail.zytor.com (8.18.1/8.17.1) with ESMTPSA id 58B6v1Uk3451381
-	(version=TLSv1.3 cipher=TLS_AES_128_GCM_SHA256 bits=128 verify=NO);
-	Wed, 10 Sep 2025 23:57:02 -0700
-DKIM-Filter: OpenDKIM Filter v2.11.0 mail.zytor.com 58B6v1Uk3451381
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=zytor.com;
-	s=2025082201; t=1757573824;
-	bh=lEaOcSoBLUph9n1Zjxl5jBw1XZCkL3NrlYg8XzrZUFI=;
-	h=Date:From:Subject:To:Cc:References:In-Reply-To:From;
-	b=krP0Mf43urhSNBqtVCqSlpqqaRB2ULapg86LJzirl5u3i0JRoOfXPMhSFPl282rO1
-	 c/MJna3YFTY0ZmLxcdmWQzk6C2Pr7da79A+gzJ3UJRWDYkR2pEVk2w8GOd73jln0cd
-	 A0hDmRLzu4QkkruOX1INFT5JNscCIXrFaHPkY66iBQRnzLCnZDqEJRpUYc5scmCxjQ
-	 bBfx8Url652IvOBbAQgx9Xp/0aeGEP9YrzTwwZp9MLtlrvsmsJD2WgM6+o9PJyH1Br
-	 +0t+boYOd09GKuESb3jybj2ov95D/dkrX7KPvZfgsK2lH98NFq2fBMXvw0eVgeOUZm
-	 2sHZodNui2Glw==
-Message-ID: <a8fa891e-0f35-449b-970c-24e5ca01e2f6@zytor.com>
-Date: Wed, 10 Sep 2025 23:57:01 -0700
+	s=arc-20240116; t=1757574146; c=relaxed/simple;
+	bh=TtDGs5cCuBB/0vsasgCRdQvt55EHjiBp1kQwXGLwQow=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=FEjyVFn5SRE5U1FaQgNiHWKuCRfECQt6RBDCyVj5ILALjvSsLkaM2HZq9SO1yzDhV33YyfJzHfO3H7SuHKuEXoJRqJRs/K3QTmnx8vvMeEZpyhlzL+Lxdnlcf9xQchEnaSXG+T6QHMdohww9Dp3aH3IwucW9jORH3zdPXfRiUVU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=AAvuE2VD; arc=none smtp.client-ip=198.175.65.17
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1757574145; x=1789110145;
+  h=message-id:date:mime-version:subject:to:cc:references:
+   from:in-reply-to:content-transfer-encoding;
+  bh=TtDGs5cCuBB/0vsasgCRdQvt55EHjiBp1kQwXGLwQow=;
+  b=AAvuE2VDtDuTPufjrNUlB1cTjmV6vx8YpofvwJ6GWcRxVYpEGcfnqwkd
+   iGp4xZ3x0mLM0T7SaeTswV69FgfJ4Y2bvySmY1T6va2K8xKazsbEQnu0E
+   ipLBjWYtuQIii+DMwWlFpCXwQJmynBkgzX6gx8Un5AkEQvpO1zy6QYI34
+   5k0gdxxy2RGSJ0Ka6ds+adv2iay5BH76w1ic5pdC5uz1Z2EeWOEKk+bli
+   O9g4UezI+NAuUvNrWHTzl/NZ9cUNSz9N3S8Txv6a1DC3KtChNhlfWz/5Z
+   hf+Nbbfm9DNPpgKLiOYfOVyhhmgjR3uk6wQANxqiNGldCv+Lh8vUiJ/vX
+   Q==;
+X-CSE-ConnectionGUID: ezK8Mu0dQiSWJl4gmVXnUA==
+X-CSE-MsgGUID: 0g7GE/j0QRixqdLw+5dhqw==
+X-IronPort-AV: E=McAfee;i="6800,10657,11531"; a="59844086"
+X-IronPort-AV: E=Sophos;i="6.17,312,1747724400"; 
+   d="scan'208";a="59844086"
+Received: from orviesa002.jf.intel.com ([10.64.159.142])
+  by orvoesa109.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 11 Sep 2025 00:02:24 -0700
+X-CSE-ConnectionGUID: +uG7AjgWRzSKDV9DIsJjWw==
+X-CSE-MsgGUID: P+d9dd6/RUmd3TObSrB46A==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.18,256,1751266800"; 
+   d="scan'208";a="204381029"
+Received: from unknown (HELO [10.238.0.107]) ([10.238.0.107])
+  by orviesa002-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 11 Sep 2025 00:02:19 -0700
+Message-ID: <27d1afdc-350c-45a0-a4f9-1d9688314256@linux.intel.com>
+Date: Thu, 11 Sep 2025 15:02:16 +0800
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -56,117 +67,88 @@ List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-From: Xin Li <xin@zytor.com>
-Subject: Re: [RFC PATCH v1 1/5] x86/boot: Shift VMXON from KVM init to CPU
- startup phase
+Subject: Re: [PATCH v14 04/22] KVM: x86: Refresh CPUID on write to guest
+ MSR_IA32_XSS
 To: Chao Gao <chao.gao@intel.com>
-Cc: linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        linux-pm@vger.kernel.org, seanjc@google.com, pbonzini@redhat.com,
-        tglx@linutronix.de, mingo@redhat.com, bp@alien8.de,
-        dave.hansen@linux.intel.com, x86@kernel.org, hpa@zytor.com,
-        rafael@kernel.org, pavel@kernel.org, brgerst@gmail.com,
-        david.kaplan@amd.com, peterz@infradead.org, andrew.cooper3@citrix.com,
-        kprateek.nayak@amd.com, arjan@linux.intel.com,
-        rick.p.edgecombe@intel.com, dan.j.williams@intel.com
-References: <20250909182828.1542362-1-xin@zytor.com>
- <20250909182828.1542362-2-xin@zytor.com> <aMEn4czyuqrQ1+oF@intel.com>
+Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org, acme@redhat.com,
+ bp@alien8.de, dave.hansen@linux.intel.com, hpa@zytor.com,
+ john.allen@amd.com, mingo@kernel.org, mingo@redhat.com,
+ minipli@grsecurity.net, mlevitsk@redhat.com, namhyung@kernel.org,
+ pbonzini@redhat.com, prsampat@amd.com, rick.p.edgecombe@intel.com,
+ seanjc@google.com, shuah@kernel.org, tglx@linutronix.de,
+ weijiang.yang@intel.com, x86@kernel.org, xin@zytor.com, xiaoyao.li@intel.com
+References: <20250909093953.202028-1-chao.gao@intel.com>
+ <20250909093953.202028-5-chao.gao@intel.com>
 Content-Language: en-US
-Autocrypt: addr=xin@zytor.com; keydata=
- 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
- l75w1xInsg==
-In-Reply-To: <aMEn4czyuqrQ1+oF@intel.com>
+From: Binbin Wu <binbin.wu@linux.intel.com>
+In-Reply-To: <20250909093953.202028-5-chao.gao@intel.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-
-On 9/10/2025 12:25 AM, Chao Gao wrote:
->> void vmx_vm_destroy(struct kvm *kvm)
->> @@ -8499,10 +8396,6 @@ __init int vmx_hardware_setup(void)
->>
->> 	vmx_set_cpu_caps();
->>
->> -	r = alloc_kvm_area();
->> -	if (r && nested)
->> -		nested_vmx_hardware_unsetup();
->> -
-> 
-> There is a "return r" at the end of this function. with the removal
-> of "r = alloc_kvm_area()", @r may be uninitialized.
-
-Good catch!
-
-There’s no need for r to have function-wide scope anymore; just return 0 at
-the end of vmx_hardware_setup() after changing the definition of r as the
-following
-
-	if (nested) {
-		int r = 0;
-		...
-	}
+Content-Transfer-Encoding: 7bit
 
 
-BTW, it's a good habit to always initialize local variables, which helps to
-avoid this kind of mistakes I made here.
 
+On 9/9/2025 5:39 PM, Chao Gao wrote:
+> From: Yang Weijiang <weijiang.yang@intel.com>
+>
+> Update CPUID.(EAX=0DH,ECX=1).EBX to reflect current required xstate size
+> due to XSS MSR modification.
+> CPUID(EAX=0DH,ECX=1).EBX reports the required storage size of all enabled
+> xstate features in (XCR0 | IA32_XSS). The CPUID value can be used by guest
+> before allocate sufficient xsave buffer.
 
->> diff --git a/arch/x86/power/cpu.c b/arch/x86/power/cpu.c
->> index 916441f5e85c..0eec314b79c2 100644
->> --- a/arch/x86/power/cpu.c
->> +++ b/arch/x86/power/cpu.c
->> @@ -206,11 +206,11 @@ static void notrace __restore_processor_state(struct saved_context *ctxt)
->> 	/* cr4 was introduced in the Pentium CPU */
->> #ifdef CONFIG_X86_32
->> 	if (ctxt->cr4)
->> -		__write_cr4(ctxt->cr4);
->> +		__write_cr4(ctxt->cr4 & ~X86_CR4_VMXE);
-> 
-> any reason to mask off X86_CR4_VMXE here?
+Nit:
+allocate -> allocating.
 
-In this patch set, X86_CR4_VMXE is an indicator of whether VMX is on.  I
-used a per-CPU variable to track that, but later it seems better to track
-X86_CR4_VMXE.
+Otherwise,
+Reviewed-by: Binbin Wu <binbin.wu@linux.intel.com>
 
-> 
-> I assume before suspend, VMXOFF is executed and CR4.VMXE is cleared. then
-> ctxt->cr4 here won't have CR4.VMXE set.
-
-What you said is for APs per my understanding.
-
-cpu_{enable,disable}_virtualization() in arch/x86/power/cpu.c are only used
-to execute VMXON/VMXOFF on BSP.
-
-TBH, there are lot of power management details I don't understand, e.g., AP
-states don't seem saved.  But the changes here are required to make S4
-work :)
+>
+> Note, KVM does not yet support any XSS based features, i.e. supported_xss
+> is guaranteed to be zero at this time.
+>
+> Opportunistically skip CPUID updates if XSS value doesn't change.
+>
+> Suggested-by: Sean Christopherson <seanjc@google.com>
+> Co-developed-by: Zhang Yi Z <yi.z.zhang@linux.intel.com>
+> Signed-off-by: Zhang Yi Z <yi.z.zhang@linux.intel.com>
+> Signed-off-by: Yang Weijiang <weijiang.yang@intel.com>
+> Reviewed-by: Maxim Levitsky <mlevitsk@redhat.com>
+> Reviewed-by: Chao Gao <chao.gao@intel.com>
+> Tested-by: Mathias Krause <minipli@grsecurity.net>
+> Tested-by: John Allen <john.allen@amd.com>
+> Tested-by: Rick Edgecombe <rick.p.edgecombe@intel.com>
+> Signed-off-by: Chao Gao <chao.gao@intel.com>
+> ---
+>   arch/x86/kvm/cpuid.c | 3 ++-
+>   arch/x86/kvm/x86.c   | 2 ++
+>   2 files changed, 4 insertions(+), 1 deletion(-)
+>
+> diff --git a/arch/x86/kvm/cpuid.c b/arch/x86/kvm/cpuid.c
+> index 46cf616663e6..b5f87254ced7 100644
+> --- a/arch/x86/kvm/cpuid.c
+> +++ b/arch/x86/kvm/cpuid.c
+> @@ -316,7 +316,8 @@ static void kvm_update_cpuid_runtime(struct kvm_vcpu *vcpu)
+>   	best = kvm_find_cpuid_entry_index(vcpu, 0xD, 1);
+>   	if (best && (cpuid_entry_has(best, X86_FEATURE_XSAVES) ||
+>   		     cpuid_entry_has(best, X86_FEATURE_XSAVEC)))
+> -		best->ebx = xstate_required_size(vcpu->arch.xcr0, true);
+> +		best->ebx = xstate_required_size(vcpu->arch.xcr0 |
+> +						 vcpu->arch.ia32_xss, true);
+>   }
+>   
+>   static bool kvm_cpuid_has_hyperv(struct kvm_vcpu *vcpu)
+> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+> index 6c167117018c..bbae3bf405c7 100644
+> --- a/arch/x86/kvm/x86.c
+> +++ b/arch/x86/kvm/x86.c
+> @@ -4020,6 +4020,8 @@ int kvm_set_msr_common(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
+>   		 */
+>   		if (data & ~vcpu->arch.guest_supported_xss)
+>   			return 1;
+> +		if (vcpu->arch.ia32_xss == data)
+> +			break;
+>   		vcpu->arch.ia32_xss = data;
+>   		vcpu->arch.cpuid_dynamic_bits_dirty = true;
+>   		break;
 
 
