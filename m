@@ -1,212 +1,211 @@
-Return-Path: <kvm+bounces-57320-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-57321-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 06E17B53382
-	for <lists+kvm@lfdr.de>; Thu, 11 Sep 2025 15:20:03 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id C0B9DB53399
+	for <lists+kvm@lfdr.de>; Thu, 11 Sep 2025 15:24:38 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9EAA5585B8F
-	for <lists+kvm@lfdr.de>; Thu, 11 Sep 2025 13:19:58 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 69045A0146F
+	for <lists+kvm@lfdr.de>; Thu, 11 Sep 2025 13:24:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7DCB4322DCA;
-	Thu, 11 Sep 2025 13:19:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9FF87327A07;
+	Thu, 11 Sep 2025 13:24:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="Yk1YDA1D"
+	dkim=pass (2048-bit key) header.d=bytedance.com header.i=@bytedance.com header.b="AZe2TiuN"
 X-Original-To: kvm@vger.kernel.org
-Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-oa1-f46.google.com (mail-oa1-f46.google.com [209.85.160.46])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D9199324B0B;
-	Thu, 11 Sep 2025 13:19:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 07089322DCA
+	for <kvm@vger.kernel.org>; Thu, 11 Sep 2025 13:24:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.46
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757596783; cv=none; b=BxDn1V/2YmgCFnZIlq//bqIr7RkTUhnoBtLErVXVcFnAcA4+oh1E3u5vH5rqCJ6CVXOYO8HENzHJ4sD1WjiZwG9ikMXJWtZhI2eDJmxCxedF/xvT+4ATbTmd5ZqixGyIJluJaL0ijKIS/8WdUvDDDyJZQuUlq+eygxli9WqzahM=
+	t=1757597059; cv=none; b=IomYC7LUOOTLwW3nSOlicMIUkdMyxtAYmHAkCjxOELCORogNi3ZT/lx7U8texDyQ0F0JGfFje3mJMSEpJqlRWafSFHCSLYhlDXH9E/0AE6rux2sl4s8E3sPPnWt5x8hhWrlT1Vdg6P6pYqj6Sf5to11w4QfIs1XYeuRJpEOV9fY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757596783; c=relaxed/simple;
-	bh=+yEjZSzV5FAVZ72/nT3u8PRtna74Onm4LO+syKkb3so=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=pog9LNrERQlFQUAGawxWzt5czzy8OtWBAeAPn9CkXKw61+FGyPYMgj5jr8hiv8B1b3B+VR+G5zbaMDR1oR+5j1r69/Nr5rJC60iuyWgmTwF6Sd9TR7CAh7+EppQ2cDFK1mgchTGca0ekT6C4xDqR7mthy5WK7NiMVGRskKKojvE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=Yk1YDA1D; arc=none smtp.client-ip=148.163.158.5
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
-Received: from pps.filterd (m0360072.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 58BDAfnq001272;
-	Thu, 11 Sep 2025 13:19:39 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
-	:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=pp1; bh=ThrRaP
-	bzrbPnQRDS36lYM0XQaSKvF27c/UkW/03ruSU=; b=Yk1YDA1D05pijSgSNfnmTV
-	4Aib39Dx5q95BUZXDw3eSaOx36C6l16rB2WIYM0umAcUBJ8ziZ2vVbdtKfF0t7aX
-	TQsQHwAqYRj1WA3LW3eYNLluHKEQ6U0IaMbqizA+SZ0qsWyUj/anA0a6E0tHroZH
-	E/u7eBUhrBxmMMuvgJhQRIZoUHsITkQasYn4oTx8RA7wJ68mq5SZUOoAtoz/uI5e
-	hPEP3/oq8n2Z1TT0orcdocshvjrX4N+nB2NAjUyGQA+m55n/6pgGuVL5JZxWuu4B
-	2DRz1E298fKwZh0Mpbt3hdyGDH8cJUziG4eNT2VjZwbSj/67AMyqZW/h/4Y3+RWg
-	==
-Received: from ppma13.dal12v.mail.ibm.com (dd.9e.1632.ip4.static.sl-reverse.com [50.22.158.221])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 490ukesjd4-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 11 Sep 2025 13:19:39 +0000 (GMT)
-Received: from pps.filterd (ppma13.dal12v.mail.ibm.com [127.0.0.1])
-	by ppma13.dal12v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 58BAGb4J017227;
-	Thu, 11 Sep 2025 13:19:38 GMT
-Received: from smtprelay05.fra02v.mail.ibm.com ([9.218.2.225])
-	by ppma13.dal12v.mail.ibm.com (PPS) with ESMTPS id 4911gmnrtw-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 11 Sep 2025 13:19:38 +0000
-Received: from smtpav05.fra02v.mail.ibm.com (smtpav05.fra02v.mail.ibm.com [10.20.54.104])
-	by smtprelay05.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 58BDJYmD48234832
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Thu, 11 Sep 2025 13:19:34 GMT
-Received: from smtpav05.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id C6DF720043;
-	Thu, 11 Sep 2025 13:19:34 +0000 (GMT)
-Received: from smtpav05.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 924ED20040;
-	Thu, 11 Sep 2025 13:19:34 +0000 (GMT)
-Received: from p-imbrenda (unknown [9.152.224.66])
-	by smtpav05.fra02v.mail.ibm.com (Postfix) with ESMTP;
-	Thu, 11 Sep 2025 13:19:34 +0000 (GMT)
-Date: Thu, 11 Sep 2025 15:19:32 +0200
-From: Claudio Imbrenda <imbrenda@linux.ibm.com>
-To: Janosch Frank <frankja@linux.ibm.com>
-Cc: kvm@vger.kernel.org, linux-s390@vger.kernel.org, borntraeger@de.ibm.com,
-        nsg@linux.ibm.com, nrb@linux.ibm.com, seiden@linux.ibm.com,
-        schlameuss@linux.ibm.com, hca@linux.ibm.com, svens@linux.ibm.com,
-        agordeev@linux.ibm.com, david@redhat.com,
-        gerald.schaefer@linux.ibm.com
-Subject: Re: [PATCH v2 09/20] KVM: s390: KVM page table management
- functions: clear and replace
-Message-ID: <20250911151932.2bce5e01@p-imbrenda>
-In-Reply-To: <91f044a5-803f-4672-960b-cd83f725af44@linux.ibm.com>
-References: <20250910180746.125776-1-imbrenda@linux.ibm.com>
-	<20250910180746.125776-10-imbrenda@linux.ibm.com>
-	<91f044a5-803f-4672-960b-cd83f725af44@linux.ibm.com>
-Organization: IBM
-X-Mailer: Claws Mail 4.3.1 (GTK 3.24.49; x86_64-redhat-linux-gnu)
+	s=arc-20240116; t=1757597059; c=relaxed/simple;
+	bh=TaQueTEoC6o4eB4nfhhT60PYphmO+Aqh4TLGtadNh0Y=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=ckTJfePzfzuKQ0GaXrRzbxSMnz/YaBUnSyct9zRQ0+QgdE4xPbpYIkEZqxrt54eGVaGBL8KFKfuZHnGFklAhQSp+bnYfKmpjlFXGIzdsqlok//4hgZ23NuwmhpIvYcyHypvO3hkqz53uCV5R5moaidgHc+6elUVsLAdV1d8CLWI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=bytedance.com; spf=pass smtp.mailfrom=bytedance.com; dkim=pass (2048-bit key) header.d=bytedance.com header.i=@bytedance.com header.b=AZe2TiuN; arc=none smtp.client-ip=209.85.160.46
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=bytedance.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bytedance.com
+Received: by mail-oa1-f46.google.com with SMTP id 586e51a60fabf-30cceb3be82so554655fac.2
+        for <kvm@vger.kernel.org>; Thu, 11 Sep 2025 06:24:17 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=bytedance.com; s=google; t=1757597057; x=1758201857; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=gfBLhNXXq9Rsc8Z2YKn++Jo2sHEm+zyXMU4WnJYLHBc=;
+        b=AZe2TiuNvKAyR3O64Gf1pmmac6nhibKl0D9U/RGp5QiY4wdCa9iqwGCc7mlUqEurJL
+         Axull3NGyACzSOti43Eh3Rahh9250OVwGJAta2enzLZoXLgc4+139qgE8EQF3rXfnyYH
+         sthP5xJ7cjaqBKnTinsd7fxYveZjjwwUTIGXajF6ANJE6DRB5lCrMGUm119ezv/LMhxW
+         0TJUDGGUdGGd57wZfgOLTt2fP5BxjtD6GEQIuEw6IuTXOozMt1UQjpmqB0Og1cEUoQi7
+         5neTIK5UhjJELgAtKrxVbHVkWqJKDzE7ETtWtpV8Y3psMF0XaLpYykLGG9cK2lp8D2up
+         wb8g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1757597057; x=1758201857;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=gfBLhNXXq9Rsc8Z2YKn++Jo2sHEm+zyXMU4WnJYLHBc=;
+        b=IBArII/JP7TJnD8iL0O4S/CfFzGRaxh986TDOYDmCl/5JaW59JYfuojDh5tqU4iTey
+         tffLMrUpkChypGfvZR6rSTQ02WuQpoS4l204XSdcBk/oZr/vpj9qA3i7UXo+vMSz/i+C
+         lD4M3Cwfv4N8OGit0BOxfJIIRmZMDdYkl2ulzCdx94PIY/95pumHc9Lx6Errpp9Ku1sm
+         jmeJTHItwPmDjSa/DmV10KWio8vF4w/rHrJusVIZtHAdtjRbGq86OsH9zXcr0EsLJKZD
+         R4npBtyqJHAuPlTHrYYN+Vi6w/C1zNiL4lpeinXkW2sXyUw296NWyNFP5AayjuOTUf3x
+         fRig==
+X-Forwarded-Encrypted: i=1; AJvYcCWP2Vw7NkEbSqKHXdWb1n65GQxQaTBQ3suU4VMCBN/i+NejpYWTVTQMXhwpMVAz3m7uZPY=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yxoh6lJWi/Hsv3Jq4thbOc7sVBYAT1wxuTij5+1Zj661hIsg/Ve
+	3qGmOWQD01Adhx/hHZ8IrB/8bengxqfqodfevoQaJERetnP/80fsk/DPAFarGHHW6OQBU6YLZtp
+	Z5U1txLUpSLBisDxyHvM1UUyrtmK+Jd4JjgCYlfi1AQ==
+X-Gm-Gg: ASbGncuIYKdr84XNiVIQL4gZMrUiGTQGxlT6FuxkMhnvedJ9A3lDh7aT0sEYwNdz/OX
+	YjCkclzlOBemogV8UBj1iQ1+yyc6l/XvmcMGFbsyP1dywm58Hx/KT6dZlE+9v/372re9hSJEyIv
+	23ZT/4FXaQSJ0q0z9hTJ1FmZIBWubH9zlb4uZXM0pDjguGgEZTV+LmW15lttQtXczaUQ5Ypue4L
+	6maGrl5VnxLuYVq
+X-Google-Smtp-Source: AGHT+IHRdBKXm1Bz1NHFHe2IrSKtcJoxyFdHCG+gmrlFxehDwahE40seZUC2QEjKPDn+5kw4bLLqvWTXBPHddQo3Z4w=
+X-Received: by 2002:a05:6870:4e8c:b0:31d:63f9:b247 with SMTP id
+ 586e51a60fabf-32264607e14mr11225562fac.25.1757597056938; Thu, 11 Sep 2025
+ 06:24:16 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUwOTA2MDE5NSBTYWx0ZWRfXzGmyY/q9446j
- 6Kzl/cGIhgrh8hwZZEKBBDout8sP9riCLdY4beRVNdKKcFZKoDBLAnNVyXL8eAu8iOEKtVTSqt3
- 5DklzdVpaY58WLhJZOSQDjxlsX/973uYXyUU6ghHh4+njCbK/GZkqLC+OZy9S1+6xafW8c3dhN1
- 7COebpma920RiDriPVWubGFV/aEJDevLPIBtCIUMtYTDX4TUUJfI/RQApTrVBM1UmmWz5yHDUsB
- Gv55ImccRXTENKtOvRBUalnH+TvOJQl8w3lfDHuJhOb75MBt9P6OxidoJI1UzCwA/l2lW7Wiq7i
- LZug+2mQTP05OvxkAUR2kTcETfxytHMcZjC9Jt421OcfS4xpdNkShV8Bt3pXlLMMXo9B/imWykw
- Af/ywrGw
-X-Proofpoint-ORIG-GUID: YoBl2pXYhS1simZ9dYkJ-9-V2xxXDxBS
-X-Proofpoint-GUID: YoBl2pXYhS1simZ9dYkJ-9-V2xxXDxBS
-X-Authority-Analysis: v=2.4 cv=StCQ6OO0 c=1 sm=1 tr=0 ts=68c2cc6b cx=c_pps
- a=AfN7/Ok6k8XGzOShvHwTGQ==:117 a=AfN7/Ok6k8XGzOShvHwTGQ==:17
- a=kj9zAlcOel0A:10 a=yJojWOMRYYMA:10 a=VnNF1IyMAAAA:8 a=0_kEiP-UzsYf8isQq8oA:9
- a=CjuIK1q_8ugA:10
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1117,Hydra:6.1.9,FMLib:17.12.80.40
- definitions=2025-09-10_04,2025-09-11_02,2025-03-28_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- spamscore=0 malwarescore=0 bulkscore=0 clxscore=1015 adultscore=0
- suspectscore=0 priorityscore=1501 impostorscore=0 phishscore=0
- classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
- reason=mlx scancount=1 engine=8.19.0-2507300000 definitions=main-2509060195
+References: <20250327-counter_delegation-v5-0-1ee538468d1b@rivosinc.com> <20250327-counter_delegation-v5-18-1ee538468d1b@rivosinc.com>
+In-Reply-To: <20250327-counter_delegation-v5-18-1ee538468d1b@rivosinc.com>
+From: yunhui cui <cuiyunhui@bytedance.com>
+Date: Thu, 11 Sep 2025 21:24:04 +0800
+X-Gm-Features: Ac12FXwLi65vQtG3EKjaprZe3vR6jcXi2qMAlWPQLWbqK3WvwYrKsOxiKlH-8R4
+Message-ID: <CAEEQ3wk92bmHQb=EbM-Ev0ra=eS-ZH6_aGTqAw1WENXpORXUKg@mail.gmail.com>
+Subject: Re: [External] [PATCH v5 18/21] RISC-V: perf: Add Qemu virt machine events
+To: Atish Patra <atishp@rivosinc.com>
+Cc: Paul Walmsley <paul.walmsley@sifive.com>, Palmer Dabbelt <palmer@dabbelt.com>, 
+	Rob Herring <robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley <conor+dt@kernel.org>, 
+	Anup Patel <anup@brainfault.org>, Atish Patra <atishp@atishpatra.org>, 
+	Will Deacon <will@kernel.org>, Mark Rutland <mark.rutland@arm.com>, 
+	Peter Zijlstra <peterz@infradead.org>, Ingo Molnar <mingo@redhat.com>, 
+	Arnaldo Carvalho de Melo <acme@kernel.org>, Namhyung Kim <namhyung@kernel.org>, 
+	Alexander Shishkin <alexander.shishkin@linux.intel.com>, Jiri Olsa <jolsa@kernel.org>, 
+	Ian Rogers <irogers@google.com>, Adrian Hunter <adrian.hunter@intel.com>, weilin.wang@intel.com, 
+	linux-riscv@lists.infradead.org, linux-kernel@vger.kernel.org, 
+	Conor Dooley <conor@kernel.org>, devicetree@vger.kernel.org, kvm@vger.kernel.org, 
+	kvm-riscv@lists.infradead.org, linux-arm-kernel@lists.infradead.org, 
+	linux-perf-users@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Thu, 11 Sep 2025 14:57:40 +0200
-Janosch Frank <frankja@linux.ibm.com> wrote:
+Hi Atish,
 
-> On 9/10/25 8:07 PM, Claudio Imbrenda wrote:
-> > Add page table management functions to be used for KVM guest (gmap)
-> > page tables.
-> > 
-> > This patch adds functions to clear, replace or exchange DAT table
-> > entries.
-> > 
-> > Signed-off-by: Claudio Imbrenda <imbrenda@linux.ibm.com>
-> > ---
-> >   arch/s390/kvm/dat.c | 120 ++++++++++++++++++++++++++++++++++++++++++++
-> >   arch/s390/kvm/dat.h |  40 +++++++++++++++
-> >   2 files changed, 160 insertions(+)
-> > 
-> > diff --git a/arch/s390/kvm/dat.c b/arch/s390/kvm/dat.c
-> > index 326be78adcda..f26e3579bd77 100644
-> > --- a/arch/s390/kvm/dat.c
-> > +++ b/arch/s390/kvm/dat.c
-> > @@ -89,3 +89,123 @@ void dat_free_level(struct crst_table *table, bool owns_ptes)
-> >   	}
-> >   	dat_free_crst(table);
-> >   }
-> > +
-> > +/**
-> > + * dat_crstep_xchg - exchange a guest CRST with another
-> > + * @crstep: pointer to the CRST entry
-> > + * @new: replacement entry
-> > + * @gfn: the affected guest address
-> > + * @asce: the ASCE of the address space
-> > + *
-> > + * This function is assumed to be called with the guest_table_lock
-> > + * held.
-> > + */
-> > +void dat_crstep_xchg(union crste *crstep, union crste new, gfn_t gfn, union asce asce)
-> > +{
-> > +	if (crstep->h.i) {
-> > +		WRITE_ONCE(*crstep, new);
-> > +		return;
-> > +	} else if (cpu_has_edat2()) {
-> > +		crdte_crste(crstep, *crstep, new, gfn, asce);
-> > +		return;
-> > +	}
-> > +
-> > +	if (machine_has_tlb_guest())
-> > +		idte_crste(crstep, gfn, IDTE_GUEST_ASCE, asce, IDTE_GLOBAL);
-> > +	else if (cpu_has_idte())
-> > +		idte_crste(crstep, gfn, 0, NULL_ASCE, IDTE_GLOBAL);
-> > +	else
-> > +		csp_invalidate_crste(crstep);  
-> 
-> I'm wondering if we can make stfle 3 (DTE) a requirement for KVM or 
-> Linux as a whole since it was introduced with z990 AFAIK.
+On Fri, Mar 28, 2025 at 3:46=E2=80=AFAM Atish Patra <atishp@rivosinc.com> w=
+rote:
+>
+> Qemu virt machine supports a very minimal set of legacy perf events.
+> Add them to the vendor table so that users can use them when
+> counter delegation is enabled.
+>
+> Signed-off-by: Atish Patra <atishp@rivosinc.com>
+> ---
+>  arch/riscv/include/asm/vendorid_list.h |  4 ++++
+>  drivers/perf/riscv_pmu_dev.c           | 36 ++++++++++++++++++++++++++++=
+++++++
+>  2 files changed, 40 insertions(+)
+>
+> diff --git a/arch/riscv/include/asm/vendorid_list.h b/arch/riscv/include/=
+asm/vendorid_list.h
+> index a5150cdf34d8..0eefc844923e 100644
+> --- a/arch/riscv/include/asm/vendorid_list.h
+> +++ b/arch/riscv/include/asm/vendorid_list.h
+> @@ -10,4 +10,8 @@
+>  #define SIFIVE_VENDOR_ID       0x489
+>  #define THEAD_VENDOR_ID                0x5b7
+>
+> +#define QEMU_VIRT_VENDOR_ID            0x000
+> +#define QEMU_VIRT_IMPL_ID              0x000
+> +#define QEMU_VIRT_ARCH_ID              0x000
+> +
+>  #endif
+> diff --git a/drivers/perf/riscv_pmu_dev.c b/drivers/perf/riscv_pmu_dev.c
+> index 8a079949e3a4..cd2ac4cf34f1 100644
+> --- a/drivers/perf/riscv_pmu_dev.c
+> +++ b/drivers/perf/riscv_pmu_dev.c
+> @@ -26,6 +26,7 @@
+>  #include <asm/sbi.h>
+>  #include <asm/cpufeature.h>
+>  #include <asm/vendor_extensions.h>
+> +#include <asm/vendorid_list.h>
+>  #include <asm/vendor_extensions/andes.h>
+>  #include <asm/hwcap.h>
+>  #include <asm/csr_ind.h>
+> @@ -391,7 +392,42 @@ struct riscv_vendor_pmu_events {
+>           .hw_event_map =3D _hw_event_map, .cache_event_map =3D _cache_ev=
+ent_map, \
+>           .attrs_events =3D _attrs },
+>
+> +/* QEMU virt PMU events */
+> +static const struct riscv_pmu_event qemu_virt_hw_event_map[PERF_COUNT_HW=
+_MAX] =3D {
+> +       PERF_MAP_ALL_UNSUPPORTED,
+> +       [PERF_COUNT_HW_CPU_CYCLES]              =3D {0x01, 0xFFFFFFF8},
+> +       [PERF_COUNT_HW_INSTRUCTIONS]            =3D {0x02, 0xFFFFFFF8}
+> +};
+> +
+> +static const struct riscv_pmu_event qemu_virt_cache_event_map[PERF_COUNT=
+_HW_CACHE_MAX]
+> +                                               [PERF_COUNT_HW_CACHE_OP_M=
+AX]
+> +                                               [PERF_COUNT_HW_CACHE_RESU=
+LT_MAX] =3D {
+> +       PERF_CACHE_MAP_ALL_UNSUPPORTED,
+> +       [C(DTLB)][C(OP_READ)][C(RESULT_MISS)]   =3D {0x10019, 0xFFFFFFF8}=
+,
+> +       [C(DTLB)][C(OP_WRITE)][C(RESULT_MISS)]  =3D {0x1001B, 0xFFFFFFF8}=
+,
+> +
+> +       [C(ITLB)][C(OP_READ)][C(RESULT_MISS)]   =3D {0x10021, 0xFFFFFFF8}=
+,
+> +};
+> +
+> +RVPMU_EVENT_CMASK_ATTR(cycles, cycles, 0x01, 0xFFFFFFF8);
+> +RVPMU_EVENT_CMASK_ATTR(instructions, instructions, 0x02, 0xFFFFFFF8);
+> +RVPMU_EVENT_CMASK_ATTR(dTLB-load-misses, dTLB_load_miss, 0x10019, 0xFFFF=
+FFF8);
+> +RVPMU_EVENT_CMASK_ATTR(dTLB-store-misses, dTLB_store_miss, 0x1001B, 0xFF=
+FFFFF8);
+> +RVPMU_EVENT_CMASK_ATTR(iTLB-load-misses, iTLB_load_miss, 0x10021, 0xFFFF=
+FFF8);
 
-AFAIK we don't support machines older than z10 anyway
+If other vendors intend to define it, would that throw a duplicate
+definition error?
 
-but in that case we can only get rid of csp_invalidate_crste(), which
-is not much.
+> +
+> +static struct attribute *qemu_virt_event_group[] =3D {
+> +       RVPMU_EVENT_ATTR_PTR(cycles),
+> +       RVPMU_EVENT_ATTR_PTR(instructions),
+> +       RVPMU_EVENT_ATTR_PTR(dTLB_load_miss),
+> +       RVPMU_EVENT_ATTR_PTR(dTLB_store_miss),
+> +       RVPMU_EVENT_ATTR_PTR(iTLB_load_miss),
+> +       NULL,
+> +};
+> +
+>  static struct riscv_vendor_pmu_events pmu_vendor_events_table[] =3D {
+> +       RISCV_VENDOR_PMU_EVENTS(QEMU_VIRT_VENDOR_ID, QEMU_VIRT_ARCH_ID, Q=
+EMU_VIRT_IMPL_ID,
+> +                               qemu_virt_hw_event_map, qemu_virt_cache_e=
+vent_map,
+> +                               qemu_virt_event_group)
+>  };
+>
+>  const struct riscv_pmu_event *current_pmu_hw_event_map;
+>
+> --
+> 2.43.0
+>
+>
 
-I can remove it, if you really think it's ugly
-
-> 
-> > +	WRITE_ONCE(*crstep, new);
-> > +}
-> > +
-> > +/**
-> > + * dat_crstep_xchg_atomic - exchange a gmap pmd with another
-> > + * @crstep: pointer to the crste entry
-> > + * @old: expected old value
-> > + * @new: replacement entry
-> > + * @gfn: the affected guest address
-> > + * @asce: the asce of the address space
-> > + *
-> > + * This function should only be called on invalid crstes, or on crstes with
-> > + * FC = 1, as that guarantees the presence of CSPG.
-> > + *
-> > + * Return: true if the exchange was successful.
-> > + */
-> > +bool dat_crstep_xchg_atomic(union crste *crstep, union crste old, union crste new, gfn_t gfn,
-> > +			    union asce asce)
-> > +{
-> > +	if (old.h.i)
-> > +		return arch_try_cmpxchg((long *)crstep, &old.val, new.val);
-> > +	if (cpu_has_edat2())
-> > +		return crdte_crste(crstep, old, new, gfn, asce);
-> > +	if (cpu_has_idte())
-> > +		return cspg_crste(crstep, old, new);
-> > +
-> > +	WARN_ONCE(1, "Machine does not have CSPG and DAT table was not invalid.");
-> > +	return false;
-> > +}  
-
+Thanks,
+Yunhui
 
