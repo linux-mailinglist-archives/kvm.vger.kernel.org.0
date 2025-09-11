@@ -1,168 +1,147 @@
-Return-Path: <kvm+bounces-57340-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-57341-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 604E7B53991
-	for <lists+kvm@lfdr.de>; Thu, 11 Sep 2025 18:46:59 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id C43A5B539BB
+	for <lists+kvm@lfdr.de>; Thu, 11 Sep 2025 18:56:08 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1C834AA15BE
-	for <lists+kvm@lfdr.de>; Thu, 11 Sep 2025 16:46:58 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id C9C551CC3C72
+	for <lists+kvm@lfdr.de>; Thu, 11 Sep 2025 16:56:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 32D9C340DB3;
-	Thu, 11 Sep 2025 16:46:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EB47F35E4EE;
+	Thu, 11 Sep 2025 16:55:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="V+n7/rtd"
+	dkim=pass (4096-bit key) header.d=alien8.de header.i=@alien8.de header.b="D7Li4eg/"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from mail.alien8.de (mail.alien8.de [65.109.113.108])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D3858236453
-	for <kvm@vger.kernel.org>; Thu, 11 Sep 2025 16:46:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AA65235E4D6;
+	Thu, 11 Sep 2025 16:55:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=65.109.113.108
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757609213; cv=none; b=aV1ll3cBBuNfjr4SzjIeDwUvspZnvcX7cZYSL9ZWmVttF7mYKbtk8g7xOko7MM2kOth8ghSNu3xCAMRL3Iw4/x0uNR00k/J0SJ4Qh/4xmKTyVgo6Fj5QgD/feVc/8r5UvkWpTujSwCpxKNFstbpZJfbKnYFZzuNCfWHpXEoCEy8=
+	t=1757609730; cv=none; b=ZfN/SXpJ5tehCHhp2EoDQxjCD1gIiSH1iXiuTOp2i446rkl7nOA6zp/4GXU31FOP2BxiQg2bzjO9V/dedzxCTOGaa5EyLGRJxwSLK81g9GXpVC8KOYDrmV9R9x4wPEP1k3KKMli7R20Y5+GDIDCDtOt2f+RrJsTWuvv0bAcsvpM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757609213; c=relaxed/simple;
-	bh=Qxo0B09NTnHspuzv4ArFG5GlK+5CwYc07R5WImThL94=;
-	h=Date:From:To:cc:Subject:In-Reply-To:Message-ID:References:
-	 MIME-Version:Content-Type; b=mb1yGmFxdCT/9q9EkBQPhrdZLIDbd+38JTPbJwADyKOJMYkRjWvIJv31VGdpokhQoorOBzb55jnvFMoPgkWKCszPjiez5msKrR6K4l1qDwOJwkCKA2JOGHHTdu0IP658Cypjv60efUBGyN/89/2gNxebfSR1We/dANQMeNwmrRk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=V+n7/rtd; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1757609210;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=NfLhSbNYEBMsg+7tun6uGQtYpAPcwFglJcubTMzrz7A=;
-	b=V+n7/rtdVt1DjSLCJlfPj0ijyv+bho5gmIsFRubIpVgnpeEroDT0khehxfaChXL+M9HADC
-	Wyn3TYqlx2hm9L4+5GOZFQeYmNr/f30Ukey2KpB2KRGpoI1wFOQWTFlhraE+u8XZvnlYao
-	Z1j2wTs6V+uYgmIrdN0i6l8qUklncr4=
-Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
- [209.85.128.71]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-561-V2F-KOfnN5KJkhwM9Y1fJQ-1; Thu, 11 Sep 2025 12:46:47 -0400
-X-MC-Unique: V2F-KOfnN5KJkhwM9Y1fJQ-1
-X-Mimecast-MFC-AGG-ID: V2F-KOfnN5KJkhwM9Y1fJQ_1757609206
-Received: by mail-wm1-f71.google.com with SMTP id 5b1f17b1804b1-45b99c18484so4175875e9.1
-        for <kvm@vger.kernel.org>; Thu, 11 Sep 2025 09:46:47 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1757609206; x=1758214006;
-        h=mime-version:references:message-id:in-reply-to:subject:cc:to:from
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=NfLhSbNYEBMsg+7tun6uGQtYpAPcwFglJcubTMzrz7A=;
-        b=qx/vLECwhvbuVv1e2mi9EB1FEnEGBV+0T6LGz4qNiK1arbUf4N2jIHp30A2Q08Yafg
-         jAOTyK+h/v9IOL7r5ShM4jDx3i8LDruVudSxeshmymmQ9aYg7yg5pKf2MsAoD2smZOGb
-         EddM80IZnmPyjn6MSApTHde6Mt7eUCmoD+rgACrkj6y0eLTXMGNxom0tPuxsWTGaM0WJ
-         rGR9Q+xElJLLoPEDQ8EGaQFxujCGKvRIhtBlzH4GrMJGYHVLqCQ5BBvS4ekOVuEeV87r
-         exUffKX9xNPtR0MH6ZP9uOY43E/11RFDG/+kfs/hqZLezIZH/HuVAI0Zq0QZoQBMSsoP
-         TjAQ==
-X-Forwarded-Encrypted: i=1; AJvYcCX6zUC5AtNCqZIjY5VE+CbaEtDwFRpBPrYnFZG+SW/M6lYf7NyjwL7hYFrfIHXSJGTgxvI=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzXeSCcDyF2C+v0L4cu8stvFMs3OC4eQ4xY4yN0maWnS9dtKhHp
-	DHfVvYzhg6BaLoUt5tblxt1KwFlLz1WtK4V/WjankDZv+qzkFdKSlNu+ZJ/m4LYjFYE5jUA4fcK
-	/oiSeGiM1ekjXkKKMkohdx+0lpR6aKXZFDgT5X8DSD4nX20XIKny6JA==
-X-Gm-Gg: ASbGncvd7uOZMJHP9owFeHq6Hk7B36ahwBpi/KViOnBdE4Sca+I5CwRmfCWiv7BAyi7
-	HR2KM9LI94w3VTjrHQt5IEHha25O/4d33+xQnXXJ9EMRZ8VWU65jo5tzKH4DKeYw/jEieOKDjcF
-	CgSW1iu/4JNY+fHsyYwzOmDqg0liogvwd8bthRzr9NqsxxlOJZoPp9vnuiYt5f+/x86YKGfHz28
-	zm3M+pXZSl7SFV3uiCT+2fpNIf8IkX5GLFb2u18mMCF1VJdhtU5/Xheeu9PbWSJC+C47Q6TgnwZ
-	BdJRYRuWMinbx20RzbLvEdvEmpCSks8fenkVcQvZ2aOVX4V+MpsIAqmtUg2F54Nva0axLs23GWK
-	d3VlBPwFaJOCmVQ==
-X-Received: by 2002:a05:600c:83cf:b0:45b:43cc:e558 with SMTP id 5b1f17b1804b1-45f21207be1mr1499125e9.35.1757609206252;
-        Thu, 11 Sep 2025 09:46:46 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IGzF7xdwiuJNiKLKdPH1FNf4ped6tYssSHKKe16I6IF6tF5/rGaCdBMHdg5t+uJppxMHK84qw==
-X-Received: by 2002:a05:600c:83cf:b0:45b:43cc:e558 with SMTP id 5b1f17b1804b1-45f21207be1mr1498835e9.35.1757609205837;
-        Thu, 11 Sep 2025 09:46:45 -0700 (PDT)
-Received: from rh (p200300f6af131a0027bd20bfc18c447d.dip0.t-ipconnect.de. [2003:f6:af13:1a00:27bd:20bf:c18c:447d])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-45e04cf2870sm13652215e9.1.2025.09.11.09.46.45
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 11 Sep 2025 09:46:45 -0700 (PDT)
-Date: Thu, 11 Sep 2025 18:46:44 +0200 (CEST)
-From: Sebastian Ott <sebott@redhat.com>
-To: Peter Maydell <peter.maydell@linaro.org>
-cc: Paolo Bonzini <pbonzini@redhat.com>, qemu-arm@nongnu.org, 
-    qemu-devel@nongnu.org, kvm@vger.kernel.org, kvmarm@lists.linux.dev, 
-    Cornelia Huck <cohuck@redhat.com>, Eric Auger <eric.auger@redhat.com>
-Subject: Re: [PATCH 0/2] arm: add kvm-psci-version vcpu property
-In-Reply-To: <CAFEAcA_ui7iyKx36fuhmOqizRWnNppb9B1iPc4nAxU2VnovMOQ@mail.gmail.com>
-Message-ID: <6f1eb1b8-29d4-cdcb-f379-9869d806a116@redhat.com>
-References: <20250911144923.24259-1-sebott@redhat.com> <CAFEAcA8EDJT1+ayyWNsfdOvNoGzczzWV-JSyiP1c1jbxmcBshQ@mail.gmail.com> <8bca09f1-48fe-0868-f82f-cdb0362699e1@redhat.com> <CAFEAcA8hUiQkYsyLOHFQqexzY3u4ZZZBXvi+DuueExGdJi_HVQ@mail.gmail.com>
- <3176813f-77c0-4c39-b363-11af3b181217@redhat.com> <CAFEAcA_ui7iyKx36fuhmOqizRWnNppb9B1iPc4nAxU2VnovMOQ@mail.gmail.com>
+	s=arc-20240116; t=1757609730; c=relaxed/simple;
+	bh=4cJtU/t0FdZWw6KNuoCu6d8SJpl8M6ogjVQ+HQSCxs0=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=a/LDfSK/E2HrZzXdm5p7ktZo2msfsOD1b4+9GdRaREmdnoQxarHDGA2Klk0Cqult3D2hhatx1iHoPmKQZugGzNdUIK4WdWg5FwFN0OFlLeVqCX7RUGlLAf18bfpn/PoapsHbd8XCgSqgY9DuZqyOxEq8gYZrLrWL5dbnGwWOzk4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=alien8.de; spf=pass smtp.mailfrom=alien8.de; dkim=pass (4096-bit key) header.d=alien8.de header.i=@alien8.de header.b=D7Li4eg/; arc=none smtp.client-ip=65.109.113.108
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=alien8.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=alien8.de
+Received: from localhost (localhost.localdomain [127.0.0.1])
+	by mail.alien8.de (SuperMail on ZX Spectrum 128k) with ESMTP id EC6BD40E0140;
+	Thu, 11 Sep 2025 16:55:24 +0000 (UTC)
+X-Virus-Scanned: Debian amavisd-new at mail.alien8.de
+Authentication-Results: mail.alien8.de (amavisd-new); dkim=pass (4096-bit key)
+	header.d=alien8.de
+Received: from mail.alien8.de ([127.0.0.1])
+	by localhost (mail.alien8.de [127.0.0.1]) (amavisd-new, port 10026)
+	with ESMTP id GbyUNlOUsH3D; Thu, 11 Sep 2025 16:55:21 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=alien8;
+	t=1757609721; bh=Stz8ndbzOk/9lU3pydnqDDO5LXGN0x06KMzK037HgYM=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=D7Li4eg/w8pnztqcM7ecRESztUR9tum0X9oJHu4Z/XN2jMVK9EfdPBUyX6wQAGqo3
+	 h++oKCCutBYR1CrsdatsNeyyhv+0Ksizc676Z82wRojyzdFP4E0G9dcU8+2QK7usCi
+	 uZkbiqpyR+HWPQSeLgZPNpRIlKQ0CacKeoHDoUFLMFf+TYPjCWB/Pi/3eGMOGa83CA
+	 +4tmWZnUwSLVr+RocnncpF/huY4zxZNOxX8Z0H1FCuurslt1a663c9hDyIfUX/mHRk
+	 zjFyVotOlW9s/CIEOGm50fx2kWM0I2rFdJN0NGQZ3fRSQQnSIhDXpQv7hZIzOT/YZF
+	 D0UeOK4Jpz8iWEGj27wrUDECSPDoDLGtbN3DXpS6afcBwatk5m4A2xcTWkiJU+o9Fv
+	 t5hh/QBQCVcfFW6lq/fYlncq0QEDosZ80eKBw8bHect2KjZenwvQ/zkKtgjBexOnsW
+	 2Tl+moHboBA+phbXKvIadnCQnO/0n7rs71D7IrmaHHZsN5VC4/5yVBdca+lgfysxlm
+	 R9CZXHs6C7OFsWTVaoaUFBETLqsU+u4fB0G38IuNeyNwgreoUiuilAHb0rE6GzTwTj
+	 OtmcD7GObLXc61+ukIxfrmPOtfdlEEiTYrxEAmSPSf0LCFAFdK+arkEdkV2QCrr4S6
+	 YhTnE/xQ1EjaP4m1TSHySTE4=
+Received: from zn.tnic (p5de8ed27.dip0.t-ipconnect.de [93.232.237.39])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange ECDHE (P-256) server-signature ECDSA (P-256) server-digest SHA256)
+	(No client certificate requested)
+	by mail.alien8.de (SuperMail on ZX Spectrum 128k) with UTF8SMTPSA id DCB2540E0174;
+	Thu, 11 Sep 2025 16:54:38 +0000 (UTC)
+Date: Thu, 11 Sep 2025 18:54:33 +0200
+From: Borislav Petkov <bp@alien8.de>
+To: Reinette Chatre <reinette.chatre@intel.com>
+Cc: Babu Moger <babu.moger@amd.com>, corbet@lwn.net, tony.luck@intel.com,
+	Dave.Martin@arm.com, james.morse@arm.com, tglx@linutronix.de,
+	mingo@redhat.com, dave.hansen@linux.intel.com, x86@kernel.org,
+	hpa@zytor.com, kas@kernel.org, rick.p.edgecombe@intel.com,
+	akpm@linux-foundation.org, paulmck@kernel.org, frederic@kernel.org,
+	pmladek@suse.com, rostedt@goodmis.org, kees@kernel.org,
+	arnd@arndb.de, fvdl@google.com, seanjc@google.com,
+	thomas.lendacky@amd.com, pawan.kumar.gupta@linux.intel.com,
+	perry.yuan@amd.com, manali.shukla@amd.com, sohil.mehta@intel.com,
+	xin@zytor.com, Neeraj.Upadhyay@amd.com, peterz@infradead.org,
+	tiala@microsoft.com, mario.limonciello@amd.com,
+	dapeng1.mi@linux.intel.com, michael.roth@amd.com,
+	chang.seok.bae@intel.com, linux-doc@vger.kernel.org,
+	linux-kernel@vger.kernel.org, linux-coco@lists.linux.dev,
+	kvm@vger.kernel.org, peternewman@google.com, eranian@google.com,
+	gautham.shenoy@amd.com
+Subject: Re: [PATCH v18 26/33] fs/resctrl: Introduce mbm_assign_on_mkdir to
+ enable assignments on mkdir
+Message-ID: <20250911165433.GBaML-yTUZHkywuJIe@fat_crate.local>
+References: <cover.1757108044.git.babu.moger@amd.com>
+ <3b73498a18ddd94b0c6ab5568a23ec42b62af52a.1757108044.git.babu.moger@amd.com>
+ <20250911150850.GAaMLmAoi5fTIznQzY@fat_crate.local>
+ <0bacc30d-0e0d-45da-ab13-dca971f27e2c@intel.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII; format=flowed
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <0bacc30d-0e0d-45da-ab13-dca971f27e2c@intel.com>
 
-On Thu, 11 Sep 2025, Peter Maydell wrote:
-> On Thu, 11 Sept 2025 at 17:29, Sebastian Ott <sebott@redhat.com> wrote:
->>
->> On Thu, 11 Sep 2025, Peter Maydell wrote:
->>> On Thu, 11 Sept 2025 at 16:59, Sebastian Ott <sebott@redhat.com> wrote:
->>>>
->>>> On Thu, 11 Sep 2025, Peter Maydell wrote:
->>>>> On Thu, 11 Sept 2025 at 15:49, Sebastian Ott <sebott@redhat.com> wrote:
->>>>>>
->>>>>> This series adds a vcpu knob to request a specific PSCI version
->>>>>> from KVM via the KVM_REG_ARM_PSCI_VERSION FW register.
->>>>>>
->>>>>> Note: in order to support PSCI v0.1 we need to drop vcpu
->>>>>> initialization with KVM_CAP_ARM_PSCI_0_2 in that case.
->>>>>> Alternatively we could limit support to versions >=0.2 .
->>>>>>
->>>>>> Sebastian Ott (2):
->>>>>>   target/arm/kvm: add constants for new PSCI versions
->>>>>>   target/arm/kvm: add kvm-psci-version vcpu property
->>>>>
->>>>> Could we have some rationale, please? What's the use case
->>>>> where you might need to specify a particular PSCI version?
->>>>
->>>> The use case is migrating between different host kernel versions.
->>>> Per default the kernel reports the latest PSCI version in the
->>>> KVM_REG_ARM_PSCI_VERSION register (for KVM_CAP_ARM_PSCI_0_2) -
->>>> when that differs between source and target a migration will fail.
->>>>
->>>> This property allows to request a PSCI version that is supported by
->>>> both sides. Specifically I want to support migration between host
->>>> kernels with and without the following Linux commit:
->>>>         8be82d536a9f KVM: arm64: Add support for PSCI v1.2 and v1.3
->>>
->>> So if the destination kernel is post that commit and the
->>> source kernel pre-dates it, do we fail migration?
->>
->> This case works with current qemu without any changes, since on
->> target qemu would write the register value it has stored from
->> the source side (QEMU_PSCI_VERSION_1_1) and thus requests kvm
->> on target to emulate that version.
->>
->>> Or is
->>> this only a migration failure when the destination doesn't
->>> support the PSCI version we defaulted to at the source end?
->>
->> Yes, this doesn't work with current qemu. On target qemu would
->> write QEMU_PSCI_VERSION_1_3 to the KVM_REG_ARM_PSCI_VERSION
->> register but that kernel doesn't know this version and the
->> migration will fail.
->
-> I was under the impression that trying to migrate backwards
-> from a newer kernel to an older one was likely to fail
-> for various reasons (notably "new kernel reports a new
-> system register the old one doesn't") ?  Perhaps we should
-> think about the problem in a wider scope than just the
-> PSCI version...
+On Thu, Sep 11, 2025 at 09:24:01AM -0700, Reinette Chatre wrote:
+> About repeating things: As I see it the annoying repeating results from desire to
+> follow the "context-problem-solution" changelog script while also ensuring each
+> patch stands on its own. With these new features many patches share the same context
+> and then copy&paste results. I see how this can be annoying when going through
+> the series and I can also see how this is a lazy approach since the context is
+> not tailored to each patch. Will work on this.
 
-Yes we already are ;-) See this series from Cornelia:
-https://lore.kernel.org/qemu-devel/20250414163849.321857-1-cohuck@redhat.com/
+Thanks. And I know it makes sense to repeat things to introduce the context
+but let's try to keep that at minimum and only when absolutely necessary.
 
-And this from Eric:
-https://lore.kernel.org/qemu-devel/20250911134324.3702720-1-eric.auger@redhat.com/
+> About too much text that explains the obvious: I hear you and will add these criteria
+> to how changelogs are measured. I do find the criteria a bit subjective though and expect
+> that I will not get this right immediately and appreciate and welcome your feedback until
+> I do.
 
-Both will help mitigate register differences for a backwards/downgrade
-migration.
+Yeah, that's fine, don't worry. But it is actually very simple: if it is
+visible from the diff itself, then there's no need to state it again in text.
+That would be waste of text.
 
-Sebastian
+Lemme paste my old git archeology example here in the hope it makes things
+more clear. :-)
 
+Do not talk about *what* the patch is doing in the commit message - that
+should be obvious from the diff itself. Rather, concentrate on the *why*
+it needs to be done.
+
+Imagine one fine day you're doing git archeology, you find the place in
+the code about which you want to find out why it was changed the way it 
+is now.
+
+You do git annotate <filename> ... find the line, see the commit id and
+you do:
+
+git show <commit id>
+
+You read the commit message and there's just gibberish and nothing's
+explaining *why* that change was done. And you start scratching your head,
+trying to figure out why. Because the damn commit message is not worth the
+electrons used to display it with.
+
+This happens to us maintainers at least once a week.
+
+-- 
+Regards/Gruss,
+    Boris.
+
+https://people.kernel.org/tglx/notes-about-netiquette
 
