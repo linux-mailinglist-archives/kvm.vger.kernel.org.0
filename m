@@ -1,273 +1,200 @@
-Return-Path: <kvm+bounces-57357-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-57358-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4A5EBB53C1E
-	for <lists+kvm@lfdr.de>; Thu, 11 Sep 2025 21:08:16 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 99EFEB53CB2
+	for <lists+kvm@lfdr.de>; Thu, 11 Sep 2025 21:51:26 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 5774B1BC0D56
-	for <lists+kvm@lfdr.de>; Thu, 11 Sep 2025 19:08:37 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 277647AEC97
+	for <lists+kvm@lfdr.de>; Thu, 11 Sep 2025 19:49:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 11314254B09;
-	Thu, 11 Sep 2025 19:08:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4B77931DDB2;
+	Thu, 11 Sep 2025 19:51:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="jd3iS14Z"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="e1TGNSXo"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-wm1-f50.google.com (mail-wm1-f50.google.com [209.85.128.50])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5871FDDC3
-	for <kvm@vger.kernel.org>; Thu, 11 Sep 2025 19:08:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.50
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 18848260590
+	for <kvm@vger.kernel.org>; Thu, 11 Sep 2025 19:51:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757617689; cv=none; b=VPbA1yQZULbMcruHbzcboBPhu+P16skwPpD+2rHtsyQiuTBbwH5KOkwtFETKLcOMwHktHm+b2fTbHFx8u18wriFPIamci4/t2clovg1baKXYb/NE4FmlMiQ/wc+whXSc/f9iRhccNq7J8yktr2Hlv/QTx3J0tlrktE+TWvUacXE=
+	t=1757620265; cv=none; b=B/WuGc+Wg6s2KExzJHX0QMyzY1B33CdGNKWjGnJfzIAagEIUOJrar12/ViQEG8Iaf6mdheVdLGCcXXivNLrHtYRiRK9DsAaU2Icsqd9hfeK6P2PD55NRIrYGP7JoUx0S0vvBN2Ty7ovTBF5PZGcnxaAt75wtIJl+OsEPi5e//Ps=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757617689; c=relaxed/simple;
-	bh=Wfj7lIjq3pNfZzFb/P8I2vIpixtvnnEGS+22MfzTLZc=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=SUG1xpVlWGAY5NlwHAdojRjKpSXPscIYwP6cay0ph3o+ciZEwA2+1/pGBkxb7heLbOdUQ5Rvgupskoxign4gO2ia2dZ30DwUeUqWU6kRllHEZ0rz40kboygqRwSqywT1qTvbCc5L4WTonpQoK1EpXJ3FU+CJQgvdXTTiL0ywVIU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=jd3iS14Z; arc=none smtp.client-ip=209.85.128.50
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-wm1-f50.google.com with SMTP id 5b1f17b1804b1-45decc9e83dso6615425e9.0
-        for <kvm@vger.kernel.org>; Thu, 11 Sep 2025 12:08:07 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1757617685; x=1758222485; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=aBmqXna/mSQXiT5+4xCTGt+Go4z3IoGusjQXw1U0C3M=;
-        b=jd3iS14Zx1t611h7gMZsAoiqUTkW2C/JpytY4GRJeM7q4JnDZawwBBwDGhBRut1wla
-         03sufC2UwiTEQc1i3bCHsp+Nx6KQpBp+W9b6kUacqDzlfAV427+dAt2aqdb63ewb6ydN
-         xSPZNNhl/l0DwSTieINsyh6Y2F351/x7Nkf2NKz3BI2eSOoFc4ReBmjxBqVZdWDEXRB9
-         2x6Ju6zqdyl0whCTjgBfsOoX+rEtaHB/DvVYm/kthu6uD4cdgjom5vHuyr7ea/MoVrMG
-         ePBcaNhDp+a5DaS+fjnTRk4swQCXPiskgR/Fko4vV6c2WsGUlprRB8yHozsmd1TOA8Do
-         0QmA==
+	s=arc-20240116; t=1757620265; c=relaxed/simple;
+	bh=hLur9OXrLJVNhi3C1WvtgxiOwyKSS2/BRYUd6nt2+lw=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=ttXflnHpPrpd50083pB1Wmk4g7Exk9fI9tIKNbHRJfoB2K5L+78B8xUyxibSuoDQ9+pmoWXQecYV4Mi9Fi8XjMwJ69utc16QuuTB9nV2ai2D3xVi8Kj9IYVb4FUYcf97ztdnT399S8krJfso2eY9+oeyMDumMGLjrlGd48SEVkI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=e1TGNSXo; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1757620262;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=09h8euVLQFnhNfq+GfL1OKCW/f8r8xXjiDas370lAT0=;
+	b=e1TGNSXoRBJfKbS/TR4Dc85kP+hA/3SaeCtosKAOgUsQ7l0k3mmsXaeClKmVZ6gj+KLU9f
+	sJzpfaeKK8Gk8IJXkXlB3cwYf309qdbwB2h8kKKNsqrzbqXL2qTdypo9phrZ9qlrsj9A9+
+	wHDG+tr7hSGy13rsH3m3tvH7kI+Q6Ko=
+Received: from mail-qv1-f72.google.com (mail-qv1-f72.google.com
+ [209.85.219.72]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-632-09SetDxYPJe8FEk3DcT86g-1; Thu, 11 Sep 2025 15:51:00 -0400
+X-MC-Unique: 09SetDxYPJe8FEk3DcT86g-1
+X-Mimecast-MFC-AGG-ID: 09SetDxYPJe8FEk3DcT86g_1757620260
+Received: by mail-qv1-f72.google.com with SMTP id 6a1803df08f44-70de52d2870so7595936d6.0
+        for <kvm@vger.kernel.org>; Thu, 11 Sep 2025 12:51:00 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1757617685; x=1758222485;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=aBmqXna/mSQXiT5+4xCTGt+Go4z3IoGusjQXw1U0C3M=;
-        b=MiGxxeTsAWqEL6PZOnpBm/+OMmMFdzUalN3Ty2/7Dh+DYXAXuPTzzn4bi0rVMa4vlq
-         T9o+pLvwwuiE0Y6Ss4EKajyYtWXNbX5+7Cr0VUn7bdJNwHrJIUxRqnJqgmuCKfy/ZD8y
-         tZauHOtA41dxoTXHoJm8WTup02mxoZGMBC/fSA4KUqyYgwm9FmCwmk0H8R7gkduHqee3
-         ShwBczU2WfsiL0bOn3YEz7p2/hiicEzjbKOZRnU++8YSrayKUkSRBHski8reI7yuH5sc
-         b2sHfo94b4Mi+r48sNhztwYzBwwelZUx65hVRcmRrpEDoiSUxEUQzk0lyVyVSv4kipOB
-         g8uw==
-X-Gm-Message-State: AOJu0YxbXmD/JRu4B0NWMP48w+NrvJfZaT8m7Xuswa+0ZulQ80V++79n
-	BF2Ojuhsm7d9EYer9W82fVXBVwTxbaR3Ar4rLgsw+trZCFSbAVYXLOws53pgQHwEC8EvLiU2YR2
-	Lkbk0jC4c+xSNoffSDdoMDnr7uz8Ao9m4bmUaSYAclUkjjMksOnKbvojOcOo=
-X-Gm-Gg: ASbGncupBS18TlAhVtQWvE9Y1zzfI5MmXjCK51xdexecBt0s7S2WVGZsykq7mM9wTGs
-	pRLRfY3twPN2j8XQw2lGO1N2dpMBFzTE8EJCE4f0M2ipKtigJpfGiiUmjN3Pz3uPJelxLOLBc+H
-	sauC15hdbPXCIfSBn1vWzUqYSwzZTE6N5lM7dBkzvZY1b084NyMRnkHnT80Vz1oGkg549Yf4Wxq
-	/vjjIYpG3iefOpLSW5KkhvONO/Y3/eHBMFk0aHANscz9DEo
-X-Google-Smtp-Source: AGHT+IFuROzJeQ33/5dwL/hLrwBPuADqYCZAfqicYRqZo/kj7MwQWCB53f7Kdz1j5uuq24WSf/3TpcZ3A42HWnfCmXo=
-X-Received: by 2002:a05:600c:294b:b0:45d:dc66:500c with SMTP id
- 5b1f17b1804b1-45f211f2fd4mr3258575e9.19.1757617685067; Thu, 11 Sep 2025
- 12:08:05 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1757620260; x=1758225060;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=09h8euVLQFnhNfq+GfL1OKCW/f8r8xXjiDas370lAT0=;
+        b=RTo5xfTMCgI+OnNa9lVk75yssz+uR4fea55tyuQecRr/Uj/la4hA5VvAf8wBhr4anF
+         jZiw32YO9gyr5REf1nA51uNT+zGPldZg+UxgDlqHktk9A88Bi8CglZlyGflLNnaHh7Sa
+         SyzEKzdZH5KGI6cKUSeoZEw8amO8UqeEDoVwhFKuibDRpeUU/GoBJL+c5J2ZH7+AkqRF
+         NTWpyxNlz4t8S6I34UTXT+shskddv1KV1uff6F3f375tZ73LQ9fqMCqeatFYvIE2qIiT
+         A7Pplarob5lURAODyvB7EeNxSRPBedUWz2Qvd1HkytSzN2Jndy5+3J4aESGOdGdRFB87
+         ufBw==
+X-Forwarded-Encrypted: i=1; AJvYcCWedketTJS4xFhOR2ipwM4jQQyRqSblD5dik4U9fPAZRjEAkkFN04iXWNmI0LhuzY1FN+g=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzpYOTKzI6xnowLc8sv52Bc1xDF5iMRVyRqBbbioXbuKfvBwD/e
+	r3NdW2wvrgty+NgUJq9P17M+QGveMU7SKx07sQJPv2TCOwZ/FPOCaBhkUkzqWCezd2JTsMX4MDT
+	f3CZiLIq9EwwgQhx2/JIK9dRcBa7bfjJoOLQ81+mSM3Ex7KsjbASHXw==
+X-Gm-Gg: ASbGncuuBOP7Ozy+ZR9TxgUjf5q92HtsfzbE/fVUOgCgHKTnmtmDvmB42Hkrl0+x5ye
+	UxJhTBfJgaFHMJRfRwsClTtuPabInsZVm6Qemr9G4STRevFtAhpm/be6u/UJ0x1x5GYzBmkRd95
+	05gAzSvsnjis167WouhpkP6oKmrSzwwnafip5rKXj5/Ge4zLn34v/KVaFR4+r1H3XX73cbERsaf
+	8Cc7zo0FwBXhsQSLtMzsbe6uf7lCCgsi5AXHQwQpg8499ys8Iggx0TqAReY+dGP608AQ3jeJzNa
+	uox1k2zSZtLVSL//JNqEWgE2lCkUjrBd/QIWdUIk
+X-Received: by 2002:a05:6214:2689:b0:70f:a2a7:ce72 with SMTP id 6a1803df08f44-767be2edcacmr5704796d6.29.1757620260131;
+        Thu, 11 Sep 2025 12:51:00 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IE25013zy+jxapmo75m2lXYdO9DhsJ09FzmF01ZPRWsNQN6+IV+NPQ6QZ2wA+tvyoAPi0B6ag==
+X-Received: by 2002:a05:6214:2689:b0:70f:a2a7:ce72 with SMTP id 6a1803df08f44-767be2edcacmr5704456d6.29.1757620259688;
+        Thu, 11 Sep 2025 12:50:59 -0700 (PDT)
+Received: from [192.168.40.164] ([70.105.235.240])
+        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-763b54a1f41sm15832166d6.20.2025.09.11.12.50.58
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 11 Sep 2025 12:50:59 -0700 (PDT)
+Message-ID: <827cc327-0d07-4b87-89e2-e45acede32ac@redhat.com>
+Date: Thu, 11 Sep 2025 15:50:57 -0400
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250820162926.3498713-1-chengkev@google.com>
-In-Reply-To: <20250820162926.3498713-1-chengkev@google.com>
-From: Kevin Cheng <chengkev@google.com>
-Date: Thu, 11 Sep 2025 15:07:53 -0400
-X-Gm-Features: AS18NWAH1ASWIUWrxNObAWG2CRJWVNBAGEOsSZhEd0iAhPrncutQf_AnJ0PTadI
-Message-ID: <CAE6NW_abZ=-GKA7u9sRB36K-t+buL26egTM5N1o8s2vG_-bCCA@mail.gmail.com>
-Subject: Re: [kvm-unit-tests PATCH] x86: nSVM: Add tests for instruction interrupts
-To: kvm@vger.kernel.org
-Cc: jmattson@google.com, pbonzini@redhat.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v3 10/11] PCI: Check ACS DSP/USP redirect bits in
+ pci_enable_pasid()
+Content-Language: en-US
+To: Jason Gunthorpe <jgg@nvidia.com>, Bjorn Helgaas <helgaas@kernel.org>
+Cc: Bjorn Helgaas <bhelgaas@google.com>, iommu@lists.linux.dev,
+ Joerg Roedel <joro@8bytes.org>, linux-pci@vger.kernel.org,
+ Robin Murphy <robin.murphy@arm.com>, Will Deacon <will@kernel.org>,
+ Alex Williamson <alex.williamson@redhat.com>,
+ Lu Baolu <baolu.lu@linux.intel.com>, galshalom@nvidia.com,
+ Joerg Roedel <jroedel@suse.de>, Kevin Tian <kevin.tian@intel.com>,
+ kvm@vger.kernel.org, maorg@nvidia.com, patches@lists.linux.dev,
+ tdave@nvidia.com, Tony Zhu <tony.zhu@intel.com>
+References: <10-v3-8827cc7fc4e0+23f-pcie_switch_groups_jgg@nvidia.com>
+ <20250909214350.GA1509037@bhelgaas> <20250910173405.GC922134@nvidia.com>
+From: Donald Dutile <ddutile@redhat.com>
+In-Reply-To: <20250910173405.GC922134@nvidia.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-On Wed, Aug 20, 2025 at 12:29=E2=80=AFPM Kevin Cheng <chengkev@google.com> =
-wrote:
->
-> The nVMX tests already have coverage for instruction intercepts.
-> Add a similar test for nSVM to improve test parity between nSVM and
-> nVMX.
->
-> Signed-off-by: Kevin Cheng <chengkev@google.com>
-> ---
->  x86/svm_tests.c | 120 ++++++++++++++++++++++++++++++++++++++++++++++++
->  1 file changed, 120 insertions(+)
->
-> diff --git a/x86/svm_tests.c b/x86/svm_tests.c
-> index 80d5aeb1..50201683 100644
-> --- a/x86/svm_tests.c
-> +++ b/x86/svm_tests.c
-> @@ -12,6 +12,7 @@
->  #include "util.h"
->  #include "x86/usermode.h"
->  #include "vmalloc.h"
-> +#include "pmu.h"
->
->  #define SVM_EXIT_MAX_DR_INTERCEPT 0x3f
->
-> @@ -2487,6 +2488,124 @@ static void test_dr(void)
->         vmcb->save.dr7 =3D dr_saved;
->  }
->
-> +asm(
-> +       "insn_sidt: sidt idt_descr;ret\n\t"
-> +       "insn_sgdt: sgdt gdt_descr;ret\n\t"
-> +       "insn_sldt: sldt %ax;ret\n\t"
-> +       "insn_str: str %ax;ret\n\t"
-> +       "insn_lidt: lidt idt_descr;ret\n\t"
-> +       "insn_lgdt: lgdt gdt_descr;ret\n\t"
-> +       "insn_lldt: xor %eax, %eax; lldt %ax;ret\n\t"
-> +       "insn_rdpmc: xor %ecx, %ecx; rdpmc;ret\n\t"
-> +       "insn_cpuid: mov $10, %eax; cpuid;ret\n\t"
-> +       "insn_invd: invd;ret\n\t"
-> +       "insn_pause: pause;ret\n\t"
-> +       "insn_hlt: hlt;ret\n\t"
-> +       "insn_invlpg: invlpg 0x12345678;ret\n\t"
-> +       "insn_monitor: xor %eax, %eax; xor %ecx, %ecx; xor %edx, %edx; mo=
-nitor;ret\n\t"
-> +       "insn_mwait: xor %eax, %eax; xor %ecx, %ecx; mwait;ret\n\t"
-> +);
-> +
-> +extern void insn_sidt(struct svm_test *test);
-> +extern void insn_sgdt(struct svm_test *test);
-> +extern void insn_sldt(struct svm_test *test);
-> +extern void insn_str(struct svm_test *test);
-> +extern void insn_lidt(struct svm_test *test);
-> +extern void insn_lgdt(struct svm_test *test);
-> +extern void insn_lldt(struct svm_test *test);
-> +extern void insn_rdpmc(struct svm_test *test);
-> +extern void insn_cpuid(struct svm_test *test);
-> +extern void insn_invd(struct svm_test *test);
-> +extern void insn_pause(struct svm_test *test);
-> +extern void insn_hlt(struct svm_test *test);
-> +extern void insn_invlpg(struct svm_test *test);
-> +extern void insn_monitor(struct svm_test *test);
-> +extern void insn_mwait(struct svm_test *test);
-> +
-> +u32 cur_insn;
-> +
-> +typedef bool (*supported_fn)(void);
-> +
-> +static bool this_cpu_has_mwait(void)
-> +{
-> +       return this_cpu_has(X86_FEATURE_MWAIT);
-> +}
-> +
-> +struct insn_table {
-> +       const char *name;
-> +       u32 flag;
-> +       void (*insn_func)(struct svm_test *test);
-> +       u32 reason;
-> +       u64 exit_info_1;
-> +       u64 exit_info_2;
-> +       bool always_traps;
-> +       const supported_fn supported_fn;
-> +};
-> +
-> +static struct insn_table insn_table[] =3D {
-> +       {"STORE IDTR", INTERCEPT_STORE_IDTR, insn_sidt, SVM_EXIT_IDTR_REA=
-D, 0, 0},
-> +       {"STORE GDTR", INTERCEPT_STORE_GDTR, insn_sgdt, SVM_EXIT_GDTR_REA=
-D, 0, 0},
-> +       {"STORE LDTR", INTERCEPT_STORE_LDTR, insn_sldt, SVM_EXIT_LDTR_REA=
-D, 0, 0},
-> +       {"STORE TR", INTERCEPT_STORE_TR, insn_str, SVM_EXIT_TR_READ, 0, 0=
-},
-> +       {"LOAD IDTR", INTERCEPT_LOAD_IDTR, insn_lidt, SVM_EXIT_IDTR_WRITE=
-, 0, 0},
-> +       {"LOAD GDTR", INTERCEPT_LOAD_GDTR, insn_lgdt, SVM_EXIT_GDTR_WRITE=
-, 0, 0},
-> +       {"LOAD LDTR", INTERCEPT_LOAD_LDTR, insn_lldt, SVM_EXIT_LDTR_WRITE=
-, 0, 0},
-> +       {"RDPMC", INTERCEPT_RDPMC, insn_rdpmc, SVM_EXIT_RDPMC, 0, 0, fals=
-e, this_cpu_has_pmu},
-> +       {"CPUID", INTERCEPT_CPUID, insn_cpuid, SVM_EXIT_CPUID, 0, 0, true=
-},
-> +       {"INVD", INTERCEPT_INVD, insn_invd, SVM_EXIT_INVD, 0, 0, true},
-> +       {"PAUSE", INTERCEPT_PAUSE, insn_pause, SVM_EXIT_PAUSE, 0, 0},
-> +       {"HLT", INTERCEPT_HLT, insn_hlt, SVM_EXIT_HLT, 0, 0},
-> +       {"INVLPG", INTERCEPT_INVLPG, insn_invlpg, SVM_EXIT_INVLPG, 0, 0},
-> +       {"MONITOR", INTERCEPT_MONITOR, insn_monitor, SVM_EXIT_MONITOR, 0,=
- 0, false, this_cpu_has_mwait},
-> +       {"MWAIT", INTERCEPT_MWAIT, insn_mwait, SVM_EXIT_MWAIT, 0, 0, fals=
-e, this_cpu_has_mwait},
-> +       {NULL},
-> +};
-> +
-> +static void insn_intercept_test(void)
-> +{
-> +       u32 exit_code;
-> +       u64 exit_info_1;
-> +       u64 exit_info_2;
-> +
-> +       for (cur_insn =3D 0; insn_table[cur_insn].name !=3D NULL; ++cur_i=
-nsn) {
-> +               struct insn_table insn =3D insn_table[cur_insn];
-> +
-> +               if (insn.supported_fn && !insn.supported_fn()) {
-> +                       printf("\tFeature required for %s is not supporte=
-d.\n",
-> +                              insn_table[cur_insn].name);
-> +                       continue;
-> +               }
-> +
-> +               test_set_guest(insn.insn_func);
-> +
-> +               if (insn.insn_func !=3D insn_hlt && !insn.always_traps)
-> +                       report(svm_vmrun() =3D=3D SVM_EXIT_VMMCALL, "exec=
-ute %s", insn.name);
-> +
-> +               vmcb->control.intercept |=3D 1 << insn.flag;
-> +
-> +               svm_vmrun();
-> +
-> +               exit_code =3D vmcb->control.exit_code;
-> +               exit_info_1 =3D vmcb->control.exit_info_1;
-> +               exit_info_2 =3D vmcb->control.exit_info_2;
-> +
-> +               report(exit_code =3D=3D insn.reason,
-> +                       "Expected exit code: 0x%x, received exit code: 0x=
-%x",
-> +                       exit_code, insn.reason);
-> +
-> +               if (!exit_info_1)
-> +                       report(exit_info_1 =3D=3D insn.exit_info_1,
-> +                       "Expected exit_info_1: 0x%lx, received exit_info_=
-1: 0x%lx",
-> +                       exit_info_1, insn.exit_info_1);
-> +               if (!exit_info_2)
-> +                       report(exit_info_2 =3D=3D insn.exit_info_2,
-> +                       "Expected exit_info_2: 0x%lx, received exit_info_=
-2: 0x%lx",
-> +                       exit_info_2, insn.exit_info_2);
-> +
-> +               vmcb->control.intercept &=3D ~(1 << insn.flag);
-> +       }
-> +}
-> +
->  /* TODO: verify if high 32-bits are sign- or zero-extended on bare metal=
- */
->  #define        TEST_BITMAP_ADDR(save_intercept, type, addr, exit_code,  =
-       \
->                          msg) {                                         \
-> @@ -3564,6 +3683,7 @@ struct svm_test svm_tests[] =3D {
->         TEST(svm_tsc_scale_test),
->         TEST(pause_filter_test),
->         TEST(svm_shutdown_intercept_test),
-> +       TEST(insn_intercept_test),
->         { NULL, NULL, NULL, NULL, NULL, NULL, NULL }
->  };
->
-> --
-> 2.51.0.261.g7ce5a0a67e-goog
->
 
-Just checking in as it's been a couple weeks :) If there is anyone
-else who would be better suited to take a look at these please let me
-know and I can cc them as well!
+
+On 9/10/25 1:34 PM, Jason Gunthorpe wrote:
+> On Tue, Sep 09, 2025 at 04:43:50PM -0500, Bjorn Helgaas wrote:
+>>> +/*
+>>> + * The spec is not clear what it means if the capability bit is 0. One view is
+>>> + * that the device acts as though the ctrl bit is zero, another view is the
+>>> + * device behavior is undefined.
+>>> + *
+>>> + * Historically Linux has taken the position that the capability bit as 0 means
+>>> + * the device supports the most favorable interpretation of the spec - ie that
+>>> + * things like P2P RR are always on. As this is security sensitive we expect
+>>> + * devices that do not follow this rule to be quirked.
+>>
+>> Interpreting a 0 Capability bit, i.e., per spec "the component does
+>> not implement the feature", as "the component behaves as though the
+>> feature is always enabled" sounds like a stretch to me.
+> 
+> I generally agree, but this is how it is implemented today.
+> 
+> I've revised this text, I think it is actually OK and supported by the
+> spec, but it is subtle:
+> 
+> /*
+>   * The spec has specific language about what bits must be supported in an ACS
+>   * capability. In some cases if the capability does not support the bit then it
+>   * really acts as though the bit is enabled. e.g.:
+>   *
+>   *    ACS P2P Request Redirect: must be implemented by Root Ports that support
+>   *     peer-to-peer traffic with other Root Ports
+>   *
+>   * Meaning if RR is not supported then P2P is definately not supported and the
+>   * device is effectively behaving as if RR is set.
+>   *
+>   * Summarizing the spec requirements:
+>   *      DSP   Root Port   MFD
+>   * SV    M        M        M
+>   * RR    M        E        E
+>   * CR    M        E        E
+>   * UF    M        E        N/A
+>   * TB    M        M        N/A
+>   * DT    M        E        E
+>   *   - M=Must Be Implemented
+>   *   - E=If not implemented the behavior is effecitvely as though it is enabled.
+>   *
+>   * Therefore take the simple approach and assume the above flags are enabled
+>   * if the cap is 0.
+>   *
+>   * ACS Enhanced eliminated undefined areas of the spec around MMIO in root ports
+>   * and switch ports. If those ports have no MMIO then it is not relevant.
+>   * PCI_ACS_UNCLAIMED_RR eliminates the undefined area around an upstream switch
+>   * window that is not fully decoded by the downstream windows.
+>   *
+>   * Though the spec is written on the assumption that existing devices without
+>   * ACS Enhanced can do whatever they want, Linux has historically assumed what
+>   * is now codified as PCI_ACS_DSP_MT_RB | PCI_ACS_DSP_MT_RR | PCI_ACS_USP_MT_RB
+>   * | PCI_ACS_USP_MT_RR | PCI_ACS_UNCLAIMED_RR.
+>   *
+>   * Changing how Linux understands existing ACS prior to ACS Enhanced would break
+>   * alot of systems.
+>   *
+>   * Thus continue as historical Linux has always done if ACS Enhanced is not
+>   * supported, while if ACS Enhanced is supported follow it.
+>   *
+>   * Due to ACS Enhanced bits being force set to 0 by older Linux kernels, and
+>   * those values would break old kernels on the edge cases they cover, the only
+>   * compatible thing for a new device to implement is ACS Enhanced supported with
+>   * the control bits (except PCI_ACS_IORB) wired to follow ACS_RR.
+>   */
+> 
+>> Sounds like a mess and might be worth an ECR to clarify the spec.
+> 
+> IMHO alot of this is badly designed for an OS. PCI SIG favours not
+> rendering existing HW incompatible with new revs of the spec, which
+> generally means the OS has no idea WTF is going on anymore.
+> 
+> For ACS it means the OS cannot accurately predict what the fabric
+> routing will be..
+> 
+> Jason
+> 
+Exec summary: the spec is clear as mud wrt RP/RCs. ;-p
+
+The above summary captures the proposed update conclusions to the spec,
+and enables a good reference if a future conclusion is made that should require
+another change in this area.  Thanks for the added verbage for future reference.
+
+- Don
+
+
 
