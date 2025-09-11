@@ -1,86 +1,86 @@
-Return-Path: <kvm+bounces-57356-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-57357-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 00B95B53C1D
-	for <lists+kvm@lfdr.de>; Thu, 11 Sep 2025 21:07:57 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 4A5EBB53C1E
+	for <lists+kvm@lfdr.de>; Thu, 11 Sep 2025 21:08:16 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 13ADE1BC1C4D
-	for <lists+kvm@lfdr.de>; Thu, 11 Sep 2025 19:08:19 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 5774B1BC0D56
+	for <lists+kvm@lfdr.de>; Thu, 11 Sep 2025 19:08:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A82FF255240;
-	Thu, 11 Sep 2025 19:07:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 11314254B09;
+	Thu, 11 Sep 2025 19:08:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="UASm7bhX"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="jd3iS14Z"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-wr1-f41.google.com (mail-wr1-f41.google.com [209.85.221.41])
+Received: from mail-wm1-f50.google.com (mail-wm1-f50.google.com [209.85.128.50])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F32A4DDC3
-	for <kvm@vger.kernel.org>; Thu, 11 Sep 2025 19:07:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.41
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5871FDDC3
+	for <kvm@vger.kernel.org>; Thu, 11 Sep 2025 19:08:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.50
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757617670; cv=none; b=SbJi7zY8DOh/gSVF/aN3jFOESM4ewRifazVMV9LHLAltEPXpzCCg3gEQG9CgC3PqpXWHMLcMZftzVoJWn5OG/i1KefcKdXlgZNZu20MYnovlgjsekM1Jpsq5Oafg2LXWEwwL2B6RO9hsffYqzh8a/tYZsaWDGnD10NeUo7r10s4=
+	t=1757617689; cv=none; b=VPbA1yQZULbMcruHbzcboBPhu+P16skwPpD+2rHtsyQiuTBbwH5KOkwtFETKLcOMwHktHm+b2fTbHFx8u18wriFPIamci4/t2clovg1baKXYb/NE4FmlMiQ/wc+whXSc/f9iRhccNq7J8yktr2Hlv/QTx3J0tlrktE+TWvUacXE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757617670; c=relaxed/simple;
-	bh=GR+IHsE9oBmwigop+GH/3AYSODF6ijZ1nNphFEkAYkk=;
+	s=arc-20240116; t=1757617689; c=relaxed/simple;
+	bh=Wfj7lIjq3pNfZzFb/P8I2vIpixtvnnEGS+22MfzTLZc=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=fA+lckhBxvfikA+5TfUvn3UQO7qA18cbKpMEQOaJM0onftePs8DgRQsnQAM15rvkiDIXqvFe8SjFt6D6CM0zwkmOlKPZfhHxju1uNOaLJFloWzb2IwNJjm87BMjvEPdvP5d9zTgweCHIMiSnunfzZFuudwBUbfx4RSgU5UyVBvQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=UASm7bhX; arc=none smtp.client-ip=209.85.221.41
+	 To:Cc:Content-Type; b=SUG1xpVlWGAY5NlwHAdojRjKpSXPscIYwP6cay0ph3o+ciZEwA2+1/pGBkxb7heLbOdUQ5Rvgupskoxign4gO2ia2dZ30DwUeUqWU6kRllHEZ0rz40kboygqRwSqywT1qTvbCc5L4WTonpQoK1EpXJ3FU+CJQgvdXTTiL0ywVIU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=jd3iS14Z; arc=none smtp.client-ip=209.85.128.50
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-wr1-f41.google.com with SMTP id ffacd0b85a97d-3e7512c8669so839803f8f.0
-        for <kvm@vger.kernel.org>; Thu, 11 Sep 2025 12:07:48 -0700 (PDT)
+Received: by mail-wm1-f50.google.com with SMTP id 5b1f17b1804b1-45decc9e83dso6615425e9.0
+        for <kvm@vger.kernel.org>; Thu, 11 Sep 2025 12:08:07 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1757617667; x=1758222467; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1757617685; x=1758222485; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=bZRbKJycM2io7uxPT6KucD+qPlNXKj3c25lQCd0KEBU=;
-        b=UASm7bhXHQFD1rDCfckuYCE1IVWkHbkzcpXevbCOrtR0OQGl4ZVuIpE8Nn5Do9+xiL
-         7UkDbR3YJCRUc5kRfitxgJrFP/EH1U1UtZZcUiyWPJcyXqpiRZ3N09RbOrWU/JWmAAQ/
-         Icm5t9sqr6YuMR1ikuQoUxf34WrXRFTRF/R893zPmw3qDLxmemMvCVSJ0nfiiCUpBA8C
-         VEQHA1poUMDo9jzkvbtbo0fQic0a6gHoTzK2HieRlD7qk6B8oE4IHJ/jgjbTNgOKroc/
-         SHtYWVIYXJX/Awl32ucllz7keHUvAYq7yKOeT6p7Y+2xtEgjBbqaUqjPAQcjFlCsNsuI
-         Du4g==
+        bh=aBmqXna/mSQXiT5+4xCTGt+Go4z3IoGusjQXw1U0C3M=;
+        b=jd3iS14Zx1t611h7gMZsAoiqUTkW2C/JpytY4GRJeM7q4JnDZawwBBwDGhBRut1wla
+         03sufC2UwiTEQc1i3bCHsp+Nx6KQpBp+W9b6kUacqDzlfAV427+dAt2aqdb63ewb6ydN
+         xSPZNNhl/l0DwSTieINsyh6Y2F351/x7Nkf2NKz3BI2eSOoFc4ReBmjxBqVZdWDEXRB9
+         2x6Ju6zqdyl0whCTjgBfsOoX+rEtaHB/DvVYm/kthu6uD4cdgjom5vHuyr7ea/MoVrMG
+         ePBcaNhDp+a5DaS+fjnTRk4swQCXPiskgR/Fko4vV6c2WsGUlprRB8yHozsmd1TOA8Do
+         0QmA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1757617667; x=1758222467;
+        d=1e100.net; s=20230601; t=1757617685; x=1758222485;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=bZRbKJycM2io7uxPT6KucD+qPlNXKj3c25lQCd0KEBU=;
-        b=iRld1+h4C/6dahePUcN41QvB6WaqAVNFrWKZ+BRPh1LA0y3ufDo4JPJuIXs0I50Aey
-         O1jtHMGJEA7nnvEHFr0Kid+t6BVzwLqCKAxyMLj1CCR2Ul+M54QEcE3Meco8jCaaMRWR
-         hSm6ci52m+9ozWnpm6XJzh8V2ye7saDfhm1ZPwPIe3MFiZJ9cscCtS+LMi8zmaLmnFvl
-         BmnvA3LLcwzyAean0vgQuZnRFBC4xWB1bSlHnDi+BXDtNik19UR2h/9XRogTQf++iYTQ
-         yFBS+5gyogtLfRjOLg34b7FWbsFncuW+a10kQKnc4uFnAPvtFh6oakgr7Ydb6AkFiyhQ
-         3pqg==
-X-Gm-Message-State: AOJu0YwMLoVbyAofVHAYAKKO0u5E0/TpWZU/GoU581p9iwLI2H1kZFla
-	gXHgd/KHnFRNXQz48aW+SzXNjw2wE8f3Sfe14Orb0BIbdvSu/FCNMbRQ42fqZg+4eoqM10sJJrm
-	JaCqVmk5DhMPzVQ3iJVjLphFyPhMbFyDeE0gzZZI6+I3/WcwWFd/bF+iE
-X-Gm-Gg: ASbGncs9lk9Etb+1VyX6RSxzJ0B6cwPe1chFiNQSj0ZDbnn932fggABXMzlPWJGETUJ
-	09uiHJ426AX6EFRLtxP43WXqbtUl0tOzkrPUABWka91yLDDasz5ESOIhy1L4rP/vsDk6o/gOGjx
-	Wzs80er+1hh0DSc33A9efU0MSZwVTnlsMdyYym0QlPMlWjtZx1EYdeOtbYjGz/coboucEXjxUOY
-	fv76TPQVS41slqru7OtPloKq3jCBqI1FLcksL8CSRK8m9BBJ+HEtIpZVLQ=
-X-Google-Smtp-Source: AGHT+IH7BTmXvhH3ZTAo5vJFtFj4rVvX2wrwBrcxJlcwQbdbwbdsXI3pcc0FUbiYCLuOzAS7fIkLEYs+15CAu4NtiqM=
-X-Received: by 2002:a05:6000:2203:b0:3e7:652e:a49d with SMTP id
- ffacd0b85a97d-3e765a26199mr396642f8f.46.1757617666798; Thu, 11 Sep 2025
- 12:07:46 -0700 (PDT)
+        bh=aBmqXna/mSQXiT5+4xCTGt+Go4z3IoGusjQXw1U0C3M=;
+        b=MiGxxeTsAWqEL6PZOnpBm/+OMmMFdzUalN3Ty2/7Dh+DYXAXuPTzzn4bi0rVMa4vlq
+         T9o+pLvwwuiE0Y6Ss4EKajyYtWXNbX5+7Cr0VUn7bdJNwHrJIUxRqnJqgmuCKfy/ZD8y
+         tZauHOtA41dxoTXHoJm8WTup02mxoZGMBC/fSA4KUqyYgwm9FmCwmk0H8R7gkduHqee3
+         ShwBczU2WfsiL0bOn3YEz7p2/hiicEzjbKOZRnU++8YSrayKUkSRBHski8reI7yuH5sc
+         b2sHfo94b4Mi+r48sNhztwYzBwwelZUx65hVRcmRrpEDoiSUxEUQzk0lyVyVSv4kipOB
+         g8uw==
+X-Gm-Message-State: AOJu0YxbXmD/JRu4B0NWMP48w+NrvJfZaT8m7Xuswa+0ZulQ80V++79n
+	BF2Ojuhsm7d9EYer9W82fVXBVwTxbaR3Ar4rLgsw+trZCFSbAVYXLOws53pgQHwEC8EvLiU2YR2
+	Lkbk0jC4c+xSNoffSDdoMDnr7uz8Ao9m4bmUaSYAclUkjjMksOnKbvojOcOo=
+X-Gm-Gg: ASbGncupBS18TlAhVtQWvE9Y1zzfI5MmXjCK51xdexecBt0s7S2WVGZsykq7mM9wTGs
+	pRLRfY3twPN2j8XQw2lGO1N2dpMBFzTE8EJCE4f0M2ipKtigJpfGiiUmjN3Pz3uPJelxLOLBc+H
+	sauC15hdbPXCIfSBn1vWzUqYSwzZTE6N5lM7dBkzvZY1b084NyMRnkHnT80Vz1oGkg549Yf4Wxq
+	/vjjIYpG3iefOpLSW5KkhvONO/Y3/eHBMFk0aHANscz9DEo
+X-Google-Smtp-Source: AGHT+IFuROzJeQ33/5dwL/hLrwBPuADqYCZAfqicYRqZo/kj7MwQWCB53f7Kdz1j5uuq24WSf/3TpcZ3A42HWnfCmXo=
+X-Received: by 2002:a05:600c:294b:b0:45d:dc66:500c with SMTP id
+ 5b1f17b1804b1-45f211f2fd4mr3258575e9.19.1757617685067; Thu, 11 Sep 2025
+ 12:08:05 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250820162951.3499017-1-chengkev@google.com>
-In-Reply-To: <20250820162951.3499017-1-chengkev@google.com>
+References: <20250820162926.3498713-1-chengkev@google.com>
+In-Reply-To: <20250820162926.3498713-1-chengkev@google.com>
 From: Kevin Cheng <chengkev@google.com>
-Date: Thu, 11 Sep 2025 15:07:35 -0400
-X-Gm-Features: AS18NWDlMma3W2waVgcQCHfqTo9p8Qu6FXlXKypPi_1l7HlH6tr3Dxpb_x90ofM
-Message-ID: <CAE6NW_Y2U_vgcagQeopLCdAno5Yf+nmjsauczv5gL8DB5ejMmA@mail.gmail.com>
-Subject: Re: [kvm-unit-tests PATCH] x86: nSVM: Add test for EPT A/D bits
+Date: Thu, 11 Sep 2025 15:07:53 -0400
+X-Gm-Features: AS18NWAH1ASWIUWrxNObAWG2CRJWVNBAGEOsSZhEd0iAhPrncutQf_AnJ0PTadI
+Message-ID: <CAE6NW_abZ=-GKA7u9sRB36K-t+buL26egTM5N1o8s2vG_-bCCA@mail.gmail.com>
+Subject: Re: [kvm-unit-tests PATCH] x86: nSVM: Add tests for instruction interrupts
 To: kvm@vger.kernel.org
 Cc: jmattson@google.com, pbonzini@redhat.com
 Content-Type: text/plain; charset="UTF-8"
@@ -89,219 +89,177 @@ Content-Transfer-Encoding: quoted-printable
 On Wed, Aug 20, 2025 at 12:29=E2=80=AFPM Kevin Cheng <chengkev@google.com> =
 wrote:
 >
-> The nVMX tests already have coverage for TDP A/D bits. Add a
-> similar test for nSVM to improve test parity between nSVM and nVMX.
+> The nVMX tests already have coverage for instruction intercepts.
+> Add a similar test for nSVM to improve test parity between nSVM and
+> nVMX.
 >
 > Signed-off-by: Kevin Cheng <chengkev@google.com>
 > ---
->  x86/svm.c     | 93 +++++++++++++++++++++++++++++++++++++++++++++++++++
->  x86/svm.h     |  5 +++
->  x86/svm_npt.c | 46 +++++++++++++++++++++++++
->  3 files changed, 144 insertions(+)
+>  x86/svm_tests.c | 120 ++++++++++++++++++++++++++++++++++++++++++++++++
+>  1 file changed, 120 insertions(+)
 >
-> diff --git a/x86/svm.c b/x86/svm.c
-> index e715e270..53b78d16 100644
-> --- a/x86/svm.c
-> +++ b/x86/svm.c
-> @@ -14,6 +14,8 @@
->  #include "isr.h"
->  #include "apic.h"
+> diff --git a/x86/svm_tests.c b/x86/svm_tests.c
+> index 80d5aeb1..50201683 100644
+> --- a/x86/svm_tests.c
+> +++ b/x86/svm_tests.c
+> @@ -12,6 +12,7 @@
+>  #include "util.h"
+>  #include "x86/usermode.h"
+>  #include "vmalloc.h"
+> +#include "pmu.h"
 >
-> +#include <asm/page.h>
-> +
->  /* for the nested page table*/
->  u64 *pml4e;
+>  #define SVM_EXIT_MAX_DR_INTERCEPT 0x3f
 >
-> @@ -43,6 +45,97 @@ u64 *npt_get_pml4e(void)
->         return pml4e;
+> @@ -2487,6 +2488,124 @@ static void test_dr(void)
+>         vmcb->save.dr7 =3D dr_saved;
 >  }
 >
-> +void clear_npt_ad(unsigned long *pml4e, u64 guest_cr3,
-> +                 unsigned long guest_addr)
+> +asm(
+> +       "insn_sidt: sidt idt_descr;ret\n\t"
+> +       "insn_sgdt: sgdt gdt_descr;ret\n\t"
+> +       "insn_sldt: sldt %ax;ret\n\t"
+> +       "insn_str: str %ax;ret\n\t"
+> +       "insn_lidt: lidt idt_descr;ret\n\t"
+> +       "insn_lgdt: lgdt gdt_descr;ret\n\t"
+> +       "insn_lldt: xor %eax, %eax; lldt %ax;ret\n\t"
+> +       "insn_rdpmc: xor %ecx, %ecx; rdpmc;ret\n\t"
+> +       "insn_cpuid: mov $10, %eax; cpuid;ret\n\t"
+> +       "insn_invd: invd;ret\n\t"
+> +       "insn_pause: pause;ret\n\t"
+> +       "insn_hlt: hlt;ret\n\t"
+> +       "insn_invlpg: invlpg 0x12345678;ret\n\t"
+> +       "insn_monitor: xor %eax, %eax; xor %ecx, %ecx; xor %edx, %edx; mo=
+nitor;ret\n\t"
+> +       "insn_mwait: xor %eax, %eax; xor %ecx, %ecx; mwait;ret\n\t"
+> +);
+> +
+> +extern void insn_sidt(struct svm_test *test);
+> +extern void insn_sgdt(struct svm_test *test);
+> +extern void insn_sldt(struct svm_test *test);
+> +extern void insn_str(struct svm_test *test);
+> +extern void insn_lidt(struct svm_test *test);
+> +extern void insn_lgdt(struct svm_test *test);
+> +extern void insn_lldt(struct svm_test *test);
+> +extern void insn_rdpmc(struct svm_test *test);
+> +extern void insn_cpuid(struct svm_test *test);
+> +extern void insn_invd(struct svm_test *test);
+> +extern void insn_pause(struct svm_test *test);
+> +extern void insn_hlt(struct svm_test *test);
+> +extern void insn_invlpg(struct svm_test *test);
+> +extern void insn_monitor(struct svm_test *test);
+> +extern void insn_mwait(struct svm_test *test);
+> +
+> +u32 cur_insn;
+> +
+> +typedef bool (*supported_fn)(void);
+> +
+> +static bool this_cpu_has_mwait(void)
 > +{
-> +       int l;
-> +       unsigned long *pt =3D (unsigned long *)guest_cr3, gpa;
-> +       u64 *npt_pte, pte, offset_in_page;
-> +       unsigned offset;
+> +       return this_cpu_has(X86_FEATURE_MWAIT);
+> +}
 > +
-> +       for (l =3D PAGE_LEVEL; ; --l) {
-> +               offset =3D PGDIR_OFFSET(guest_addr, l);
-> +               npt_pte =3D npt_get_pte((u64) &pt[offset]);
+> +struct insn_table {
+> +       const char *name;
+> +       u32 flag;
+> +       void (*insn_func)(struct svm_test *test);
+> +       u32 reason;
+> +       u64 exit_info_1;
+> +       u64 exit_info_2;
+> +       bool always_traps;
+> +       const supported_fn supported_fn;
+> +};
 > +
-> +               if(!npt_pte) {
-> +                       printf("NPT - guest level %d page table is not ma=
-pped.\n", l);
-> +                       return;
+> +static struct insn_table insn_table[] =3D {
+> +       {"STORE IDTR", INTERCEPT_STORE_IDTR, insn_sidt, SVM_EXIT_IDTR_REA=
+D, 0, 0},
+> +       {"STORE GDTR", INTERCEPT_STORE_GDTR, insn_sgdt, SVM_EXIT_GDTR_REA=
+D, 0, 0},
+> +       {"STORE LDTR", INTERCEPT_STORE_LDTR, insn_sldt, SVM_EXIT_LDTR_REA=
+D, 0, 0},
+> +       {"STORE TR", INTERCEPT_STORE_TR, insn_str, SVM_EXIT_TR_READ, 0, 0=
+},
+> +       {"LOAD IDTR", INTERCEPT_LOAD_IDTR, insn_lidt, SVM_EXIT_IDTR_WRITE=
+, 0, 0},
+> +       {"LOAD GDTR", INTERCEPT_LOAD_GDTR, insn_lgdt, SVM_EXIT_GDTR_WRITE=
+, 0, 0},
+> +       {"LOAD LDTR", INTERCEPT_LOAD_LDTR, insn_lldt, SVM_EXIT_LDTR_WRITE=
+, 0, 0},
+> +       {"RDPMC", INTERCEPT_RDPMC, insn_rdpmc, SVM_EXIT_RDPMC, 0, 0, fals=
+e, this_cpu_has_pmu},
+> +       {"CPUID", INTERCEPT_CPUID, insn_cpuid, SVM_EXIT_CPUID, 0, 0, true=
+},
+> +       {"INVD", INTERCEPT_INVD, insn_invd, SVM_EXIT_INVD, 0, 0, true},
+> +       {"PAUSE", INTERCEPT_PAUSE, insn_pause, SVM_EXIT_PAUSE, 0, 0},
+> +       {"HLT", INTERCEPT_HLT, insn_hlt, SVM_EXIT_HLT, 0, 0},
+> +       {"INVLPG", INTERCEPT_INVLPG, insn_invlpg, SVM_EXIT_INVLPG, 0, 0},
+> +       {"MONITOR", INTERCEPT_MONITOR, insn_monitor, SVM_EXIT_MONITOR, 0,=
+ 0, false, this_cpu_has_mwait},
+> +       {"MWAIT", INTERCEPT_MWAIT, insn_mwait, SVM_EXIT_MWAIT, 0, 0, fals=
+e, this_cpu_has_mwait},
+> +       {NULL},
+> +};
+> +
+> +static void insn_intercept_test(void)
+> +{
+> +       u32 exit_code;
+> +       u64 exit_info_1;
+> +       u64 exit_info_2;
+> +
+> +       for (cur_insn =3D 0; insn_table[cur_insn].name !=3D NULL; ++cur_i=
+nsn) {
+> +               struct insn_table insn =3D insn_table[cur_insn];
+> +
+> +               if (insn.supported_fn && !insn.supported_fn()) {
+> +                       printf("\tFeature required for %s is not supporte=
+d.\n",
+> +                              insn_table[cur_insn].name);
+> +                       continue;
 > +               }
 > +
-> +               *npt_pte &=3D ~(PT_AD_MASK);
+> +               test_set_guest(insn.insn_func);
 > +
-> +               pte =3D pt[offset];
-> +               if (l =3D=3D 1 || (l < 4 && (pte & PT_PAGE_SIZE_MASK)))
-> +                       break;
-> +               if (!(pte & PT_PRESENT_MASK))
-> +                       return;
-> +               pt =3D (unsigned long *)(pte & PT_ADDR_MASK);
+> +               if (insn.insn_func !=3D insn_hlt && !insn.always_traps)
+> +                       report(svm_vmrun() =3D=3D SVM_EXIT_VMMCALL, "exec=
+ute %s", insn.name);
+> +
+> +               vmcb->control.intercept |=3D 1 << insn.flag;
+> +
+> +               svm_vmrun();
+> +
+> +               exit_code =3D vmcb->control.exit_code;
+> +               exit_info_1 =3D vmcb->control.exit_info_1;
+> +               exit_info_2 =3D vmcb->control.exit_info_2;
+> +
+> +               report(exit_code =3D=3D insn.reason,
+> +                       "Expected exit code: 0x%x, received exit code: 0x=
+%x",
+> +                       exit_code, insn.reason);
+> +
+> +               if (!exit_info_1)
+> +                       report(exit_info_1 =3D=3D insn.exit_info_1,
+> +                       "Expected exit_info_1: 0x%lx, received exit_info_=
+1: 0x%lx",
+> +                       exit_info_1, insn.exit_info_1);
+> +               if (!exit_info_2)
+> +                       report(exit_info_2 =3D=3D insn.exit_info_2,
+> +                       "Expected exit_info_2: 0x%lx, received exit_info_=
+2: 0x%lx",
+> +                       exit_info_2, insn.exit_info_2);
+> +
+> +               vmcb->control.intercept &=3D ~(1 << insn.flag);
 > +       }
-> +
-> +       offset =3D PGDIR_OFFSET(guest_addr, l);
-> +       offset_in_page =3D guest_addr &  ((1 << PGDIR_BITS(l)) - 1);
-> +       gpa =3D (pt[offset] & PT_ADDR_MASK) | (guest_addr & offset_in_pag=
-e);
-> +       npt_pte =3D npt_get_pte(gpa);
-> +       *npt_pte &=3D ~(PT_AD_MASK);
 > +}
 > +
-> +void check_npt_ad(unsigned long *pml4e, u64 guest_cr3,
-> +       unsigned long guest_addr, int expected_gpa_ad,
-> +       int expected_pt_ad)
-> +{
-> +       int l;
-> +       unsigned long *pt =3D (unsigned long *)guest_cr3, gpa;
-> +       u64 *npt_pte, pte, offset_in_page;
-> +       unsigned offset;
-> +       bool bad_pt_ad =3D false;
-> +
-> +       for (l =3D PAGE_LEVEL; ; --l) {
-> +               offset =3D PGDIR_OFFSET(guest_addr, l);
-> +               npt_pte =3D npt_get_pte((u64) &pt[offset]);
-> +
-> +               if(!npt_pte) {
-> +                       printf("NPT - guest level %d page table is not ma=
-pped.\n", l);
-> +                       return;
-> +               }
-> +
-> +               if (!bad_pt_ad) {
-> +                       bad_pt_ad |=3D (*npt_pte & PT_AD_MASK) !=3D expec=
-ted_pt_ad;
-> +                       if(bad_pt_ad)
-> +                               report_fail("NPT - received guest level %=
-d page table A=3D%d/D=3D%d",
-> +                                           l,
-> +                                           !!(expected_pt_ad & PT_ACCESS=
-ED_MASK),
-> +                                           !!(expected_pt_ad & PT_DIRTY_=
-MASK));
-> +               }
-> +
-> +               pte =3D pt[offset];
-> +               if (l =3D=3D 1 || (l < 4 && (pte & PT_PAGE_SIZE_MASK)))
-> +                       break;
-> +               if (!(pte & PT_PRESENT_MASK))
-> +                       return;
-> +               pt =3D (unsigned long *)(pte & PT_ADDR_MASK);
-> +       }
-> +
-> +       if (!bad_pt_ad)
-> +               report_pass("NPT - guest page table structures A=3D%d/D=
-=3D%d",
-> +                           !!(expected_pt_ad & PT_ACCESSED_MASK),
-> +                           !!(expected_pt_ad & PT_DIRTY_MASK));
-> +
-> +       offset =3D PGDIR_OFFSET(guest_addr, l);
-> +       offset_in_page =3D guest_addr &  ((1 << PGDIR_BITS(l)) - 1);
-> +       gpa =3D (pt[offset] & PT_ADDR_MASK) | (guest_addr & offset_in_pag=
-e);
-> +
-> +       npt_pte =3D npt_get_pte(gpa);
-> +
-> +       if (!npt_pte) {
-> +               report_fail("NPT - guest physical address is not mapped")=
-;
-> +               return;
-> +       }
-> +       report((*npt_pte & PT_AD_MASK) =3D=3D expected_gpa_ad,
-> +              "NPT - guest physical address A=3D%d/D=3D%d",
-> +              !!(expected_gpa_ad & PT_ACCESSED_MASK),
-> +              !!(expected_gpa_ad & PT_DIRTY_MASK));
-> +}
-> +
->  bool smp_supported(void)
->  {
->         return cpu_count() > 1;
-> diff --git a/x86/svm.h b/x86/svm.h
-> index c1dd84af..1a83d778 100644
-> --- a/x86/svm.h
-> +++ b/x86/svm.h
-> @@ -415,6 +415,11 @@ u64 *npt_get_pte(u64 address);
->  u64 *npt_get_pde(u64 address);
->  u64 *npt_get_pdpe(u64 address);
->  u64 *npt_get_pml4e(void);
-> +void clear_npt_ad(unsigned long *pml4e, u64 guest_cr3,
-> +                 unsigned long guest_addr);
-> +void check_npt_ad(unsigned long *pml4e, u64 guest_cr3,
-> +                 unsigned long guest_addr, int expected_gpa_ad,
-> +                 int expected_pt_ad);
->  bool smp_supported(void);
->  bool default_supported(void);
->  bool vgif_supported(void);
-> diff --git a/x86/svm_npt.c b/x86/svm_npt.c
-> index bd5e8f35..abf44eb0 100644
-> --- a/x86/svm_npt.c
-> +++ b/x86/svm_npt.c
-> @@ -380,6 +380,51 @@ skip_pte_test:
->         vmcb->save.cr4 =3D sg_cr4;
->  }
->
-> +static void npt_ad_read_guest(struct svm_test *test)
-> +{
-> +       u64 *data =3D (void *)(0x80000);
-> +       (void)*(volatile u64 *)data;
-> +}
-> +
-> +static void npt_ad_write_guest(struct svm_test *test)
-> +{
-> +       u64 *data =3D (void *)(0x80000);
-> +       *data =3D 0;
-> +}
-> +
-> +static void npt_ad_test(void)
-> +{
-> +       u64 *data =3D (void *)(0x80000);
-> +       u64 guest_cr3 =3D vmcb->save.cr3;
-> +
-> +       if (!npt_supported()) {
-> +               report_skip("NPT not supported");
-> +               return;
-> +       }
-> +
-> +       clear_npt_ad(npt_get_pml4e(), guest_cr3, (unsigned long)data);
-> +
-> +       check_npt_ad(npt_get_pml4e(), guest_cr3, (unsigned long)data, 0, =
-0);
-> +
-> +       test_set_guest(npt_ad_read_guest);
-> +       svm_vmrun();
-> +
-> +       check_npt_ad(npt_get_pml4e(), guest_cr3,
-> +                    (unsigned long)data,
-> +                    PT_ACCESSED_MASK,
-> +                    PT_AD_MASK);
-> +
-> +       test_set_guest(npt_ad_write_guest);
-> +       svm_vmrun();
-> +
-> +       check_npt_ad(npt_get_pml4e(), guest_cr3,
-> +                    (unsigned long)data,
-> +                    PT_AD_MASK,
-> +                    PT_AD_MASK);
-> +
-> +       clear_npt_ad(npt_get_pml4e(), guest_cr3, (unsigned long)data);
-> +}
-> +
->  #define NPT_V1_TEST(name, prepare, guest_code, check)                   =
+>  /* TODO: verify if high 32-bits are sign- or zero-extended on bare metal=
+ */
+>  #define        TEST_BITMAP_ADDR(save_intercept, type, addr, exit_code,  =
        \
->         { #name, npt_supported, prepare, default_prepare_gif_clear, guest=
-_code, \
->           default_finished, check }
-> @@ -395,6 +440,7 @@ static struct svm_test npt_tests[] =3D {
->         NPT_V1_TEST(npt_l1mmio, npt_l1mmio_prepare, npt_l1mmio_test, npt_=
-l1mmio_check),
->         NPT_V1_TEST(npt_rw_l1mmio, npt_rw_l1mmio_prepare, npt_rw_l1mmio_t=
-est, npt_rw_l1mmio_check),
->         NPT_V2_TEST(svm_npt_rsvd_bits_test),
-> +       NPT_V2_TEST(npt_ad_test),
+>                          msg) {                                         \
+> @@ -3564,6 +3683,7 @@ struct svm_test svm_tests[] =3D {
+>         TEST(svm_tsc_scale_test),
+>         TEST(pause_filter_test),
+>         TEST(svm_shutdown_intercept_test),
+> +       TEST(insn_intercept_test),
 >         { NULL, NULL, NULL, NULL, NULL, NULL, NULL }
 >  };
 >
