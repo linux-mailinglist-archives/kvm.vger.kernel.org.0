@@ -1,240 +1,265 @@
-Return-Path: <kvm+bounces-57373-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-57374-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 88DF6B546C3
-	for <lists+kvm@lfdr.de>; Fri, 12 Sep 2025 11:19:18 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id D811AB546CF
+	for <lists+kvm@lfdr.de>; Fri, 12 Sep 2025 11:19:39 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 38279AC07A9
-	for <lists+kvm@lfdr.de>; Fri, 12 Sep 2025 09:18:46 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4B03AAC0AB3
+	for <lists+kvm@lfdr.de>; Fri, 12 Sep 2025 09:19:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9C013279DDB;
-	Fri, 12 Sep 2025 09:17:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4D5902848B3;
+	Fri, 12 Sep 2025 09:17:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="c70VdPsx"
+	dkim=pass (2048-bit key) header.d=amazon.co.uk header.i=@amazon.co.uk header.b="Wgae4W8C"
 X-Original-To: kvm@vger.kernel.org
-Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+Received: from fra-out-004.esa.eu-central-1.outbound.mail-perimeter.amazon.com (fra-out-004.esa.eu-central-1.outbound.mail-perimeter.amazon.com [3.74.81.189])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 09FFB266B6F;
-	Fri, 12 Sep 2025 09:17:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B8B9227FD5B;
+	Fri, 12 Sep 2025 09:17:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=3.74.81.189
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757668646; cv=none; b=LHOtoO0m2Jiy5qRMvHD1ec8Q4/19XnZ7jQqv13coqdMlR2YiNyo5b0evySyqeFti4ncv9qXYXO+Xh30cvMWA4WhInxT+fyEfaKdrhUWKlV5JQ25D1kgA16r6RpOzQ4JzurzShjLX9+6mqSqLf8fvq0QfWsyJ/Q910aJD00Ojqpo=
+	t=1757668664; cv=none; b=C0xwjpeX4dgnfBkWekcXUkijSAlrFlmaJmU8VgtaaTDwRPGKIUo4liqgIZC8htyqdVB8YaXgKUX2vh4PCDMuUJmcjaM0+6MUy7Gp/m9wxMobKnnOI0lWq0fY2Iaeqfetu3c6LySCfJlBnzv78RN2gwKQMxYEMvP+n5rc39Y3r8Y=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757668646; c=relaxed/simple;
-	bh=ySVkdDkZzRpGICWC/20iAQUj0OLivT9bOrUFLk7KceU=;
-	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=iyU/viO+vi2tVYYnJpA44jO/CfvhVdJVuJDx0VuNIW9kJe+753bWOYHPwx/fVvG1dgKuaLGy7+R/1tu8XMQn2xi6PSqwKvkL4Sic1FwmWrInLZyl4M8EuAs+9m1Y51H7h771tGCqOrInGXxEewM61T8McX5snU5+qXZNFzmjoMM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=c70VdPsx; arc=none smtp.client-ip=148.163.158.5
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
-Received: from pps.filterd (m0360072.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 58C9E9Mv029522;
-	Fri, 12 Sep 2025 09:17:22 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
-	:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=pp1; bh=DIz8zw
-	WBiXd9ENx7h03p1liHdRY8uIjoVFM9etGbA7o=; b=c70VdPsxZqkArlfTbL+eaX
-	Rb1FstmeOwpKPXSjkw/spOYUMdbdoqAUFVKFdjpA/mLylJiOopaIXk1n75N2olzR
-	fUjObLcyB5vUyAwJBvAwblTo231IYbrf2Lz4gmuQiwGvj2YM4blRG5kcM/vGoQX+
-	mTED5u4Jlj7rnE75y6Pc0a+khtBK+a048skNnpq84z3Sj0UFJS06VAmF2LY8o3AZ
-	nDhB145qirB/RNz184QvFodN22wbqHDGeoil8D+uMCHIyfCOmYXwEVrqgAhUZ9K3
-	RiOf2mHIq6EVfpEN+YwfdCU8e7GDKIC5uB4CGwWo6hxwOO0R4yg9tdPC916bYzTQ
-	==
-Received: from ppma12.dal12v.mail.ibm.com (dc.9e.1632.ip4.static.sl-reverse.com [50.22.158.220])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 490ukexm69-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Fri, 12 Sep 2025 09:17:22 +0000 (GMT)
-Received: from pps.filterd (ppma12.dal12v.mail.ibm.com [127.0.0.1])
-	by ppma12.dal12v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 58C8PXAG011428;
-	Fri, 12 Sep 2025 09:17:08 GMT
-Received: from smtprelay07.fra02v.mail.ibm.com ([9.218.2.229])
-	by ppma12.dal12v.mail.ibm.com (PPS) with ESMTPS id 490y9uteq9-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Fri, 12 Sep 2025 09:17:08 +0000
-Received: from smtpav06.fra02v.mail.ibm.com (smtpav06.fra02v.mail.ibm.com [10.20.54.105])
-	by smtprelay07.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 58C9H42p50725220
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Fri, 12 Sep 2025 09:17:04 GMT
-Received: from smtpav06.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 8A22B20040;
-	Fri, 12 Sep 2025 09:17:04 +0000 (GMT)
-Received: from smtpav06.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id C0E5920049;
-	Fri, 12 Sep 2025 09:17:03 +0000 (GMT)
-Received: from li-978a334c-2cba-11b2-a85c-a0743a31b510.ibm.com (unknown [9.111.85.40])
-	by smtpav06.fra02v.mail.ibm.com (Postfix) with ESMTP;
-	Fri, 12 Sep 2025 09:17:03 +0000 (GMT)
-Message-ID: <267557ab6a061d55e4961312f4dc756bd4e0eaec.camel@linux.ibm.com>
-Subject: Re: [PATCH v2 03/20] KVM: s390: Add gmap_helper_set_unused()
-From: Nina Schoetterl-Glausch <nsg@linux.ibm.com>
-To: Claudio Imbrenda <imbrenda@linux.ibm.com>, kvm@vger.kernel.org
-Cc: linux-s390@vger.kernel.org, borntraeger@de.ibm.com, frankja@linux.ibm.com,
-        nrb@linux.ibm.com, seiden@linux.ibm.com, schlameuss@linux.ibm.com,
-        hca@linux.ibm.com, svens@linux.ibm.com, agordeev@linux.ibm.com,
-        david@redhat.com, gerald.schaefer@linux.ibm.com
-Date: Fri, 12 Sep 2025 11:17:02 +0200
-In-Reply-To: <20250910180746.125776-4-imbrenda@linux.ibm.com>
-References: <20250910180746.125776-1-imbrenda@linux.ibm.com>
-	 <20250910180746.125776-4-imbrenda@linux.ibm.com>
-Content-Type: text/plain; charset="UTF-8"
+	s=arc-20240116; t=1757668664; c=relaxed/simple;
+	bh=V/gNybMhlcM17xEcJFIgonEkiuW7o9f1xXbH2RHhk9U=;
+	h=From:CC:Subject:Date:Message-ID:Content-Type:MIME-Version; b=X8kTJKfHaj9hpQT+vvSCKgqjqn3aBHw24XAP9tQdXOd+uiktfgVE9PClldPl5ib2+ueQRj/DnmnOc7PsptqmNX7Is/WM2PhHIHsUXJq8HnK2nZ4ZOG7Qt7eKvcSMrKALODqGcH30IxrB/9YgG5EcUqTGp8vJR87xlGAecTKXRYU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.co.uk; spf=pass smtp.mailfrom=amazon.co.uk; dkim=pass (2048-bit key) header.d=amazon.co.uk header.i=@amazon.co.uk header.b=Wgae4W8C; arc=none smtp.client-ip=3.74.81.189
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.co.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.uk
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+  d=amazon.co.uk; i=@amazon.co.uk; q=dns/txt;
+  s=amazoncorp2; t=1757668662; x=1789204662;
+  h=from:cc:subject:date:message-id:
+   content-transfer-encoding:mime-version;
+  bh=euX1DcBgIQsakeQD0gmDCocpRR5IiK5IHce/Exk3Qcs=;
+  b=Wgae4W8C5DIcmrQXWKzA83zcQ90BopXRyogffDu6DCx/Hji9nlGfOyYZ
+   /ZK1FZsCTstlj9nPF8kIeAyb+Fi9BAnLKgCMfgDGbiNOuKF5G83KhTXf5
+   iOSzdQja0htQsp31I0V6Kv8gfsGSnZCfmENJgzNCt+R4w08LADdt2fQjN
+   uafWcytoC9Q3T85L26EWTvI9qJmydnvU9VbBMzU9ieu2U1AfMW6Gu2e1D
+   Lzl04e/4J2PtfE7P8ORSaDYpbQTYtdVi7oJq6hZja++r5/K9MNubqUuJj
+   YEoLVeVLSuLrxrgvESIsgeeEpvhLQ8wHvcIPTCUlt50chkXAZttXJe1wK
+   A==;
+X-CSE-ConnectionGUID: din/RBPeSnGfqj64mcO16Q==
+X-CSE-MsgGUID: h+u6Z7AnQzWKlyQKajwbGQ==
+X-IronPort-AV: E=Sophos;i="6.18,259,1751241600"; 
+   d="scan'208";a="2004929"
+Received: from ip-10-6-3-216.eu-central-1.compute.internal (HELO smtpout.naws.eu-central-1.prod.farcaster.email.amazon.dev) ([10.6.3.216])
+  by internal-fra-out-004.esa.eu-central-1.outbound.mail-perimeter.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 12 Sep 2025 09:17:30 +0000
+Received: from EX19MTAEUB001.ant.amazon.com [54.240.197.234:6055]
+ by smtpin.naws.eu-central-1.prod.farcaster.email.amazon.dev [10.0.45.248:2525] with esmtp (Farcaster)
+ id 353fed0d-37b0-4710-853f-25025dd2cbc0; Fri, 12 Sep 2025 09:17:30 +0000 (UTC)
+X-Farcaster-Flow-ID: 353fed0d-37b0-4710-853f-25025dd2cbc0
+Received: from EX19D015EUB004.ant.amazon.com (10.252.51.13) by
+ EX19MTAEUB001.ant.amazon.com (10.252.51.26) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.2562.20;
+ Fri, 12 Sep 2025 09:17:29 +0000
+Received: from EX19D015EUB004.ant.amazon.com (10.252.51.13) by
+ EX19D015EUB004.ant.amazon.com (10.252.51.13) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.2562.20;
+ Fri, 12 Sep 2025 09:17:29 +0000
+Received: from EX19D015EUB004.ant.amazon.com ([fe80::2dc9:7aa9:9cd3:fc8a]) by
+ EX19D015EUB004.ant.amazon.com ([fe80::2dc9:7aa9:9cd3:fc8a%3]) with mapi id
+ 15.02.2562.020; Fri, 12 Sep 2025 09:17:29 +0000
+From: "Roy, Patrick" <roypat@amazon.co.uk>
+CC: "Thomson, Jack" <jackabt@amazon.co.uk>, "Kalyazin, Nikita"
+	<kalyazin@amazon.co.uk>, "Cali, Marco" <xmarcalx@amazon.co.uk>,
+	"derekmn@amazon.co.uk" <derekmn@amazon.co.uk>, "Roy, Patrick"
+	<roypat@amazon.co.uk>, "willy@infradead.org" <willy@infradead.org>,
+	"corbet@lwn.net" <corbet@lwn.net>, "pbonzini@redhat.com"
+	<pbonzini@redhat.com>, "maz@kernel.org" <maz@kernel.org>,
+	"oliver.upton@linux.dev" <oliver.upton@linux.dev>, "joey.gouly@arm.com"
+	<joey.gouly@arm.com>, "suzuki.poulose@arm.com" <suzuki.poulose@arm.com>,
+	"yuzenghui@huawei.com" <yuzenghui@huawei.com>, "catalin.marinas@arm.com"
+	<catalin.marinas@arm.com>, "will@kernel.org" <will@kernel.org>,
+	"chenhuacai@kernel.org" <chenhuacai@kernel.org>, "kernel@xen0n.name"
+	<kernel@xen0n.name>, "paul.walmsley@sifive.com" <paul.walmsley@sifive.com>,
+	"palmer@dabbelt.com" <palmer@dabbelt.com>, "aou@eecs.berkeley.edu"
+	<aou@eecs.berkeley.edu>, "alex@ghiti.fr" <alex@ghiti.fr>,
+	"agordeev@linux.ibm.com" <agordeev@linux.ibm.com>,
+	"gerald.schaefer@linux.ibm.com" <gerald.schaefer@linux.ibm.com>,
+	"hca@linux.ibm.com" <hca@linux.ibm.com>, "gor@linux.ibm.com"
+	<gor@linux.ibm.com>, "borntraeger@linux.ibm.com" <borntraeger@linux.ibm.com>,
+	"svens@linux.ibm.com" <svens@linux.ibm.com>, "dave.hansen@linux.intel.com"
+	<dave.hansen@linux.intel.com>, "luto@kernel.org" <luto@kernel.org>,
+	"peterz@infradead.org" <peterz@infradead.org>, "tglx@linutronix.de"
+	<tglx@linutronix.de>, "mingo@redhat.com" <mingo@redhat.com>, "bp@alien8.de"
+	<bp@alien8.de>, "x86@kernel.org" <x86@kernel.org>, "hpa@zytor.com"
+	<hpa@zytor.com>, "trondmy@kernel.org" <trondmy@kernel.org>, "anna@kernel.org"
+	<anna@kernel.org>, "hubcap@omnibond.com" <hubcap@omnibond.com>,
+	"martin@omnibond.com" <martin@omnibond.com>, "viro@zeniv.linux.org.uk"
+	<viro@zeniv.linux.org.uk>, "brauner@kernel.org" <brauner@kernel.org>,
+	"jack@suse.cz" <jack@suse.cz>, "akpm@linux-foundation.org"
+	<akpm@linux-foundation.org>, "david@redhat.com" <david@redhat.com>,
+	"lorenzo.stoakes@oracle.com" <lorenzo.stoakes@oracle.com>,
+	"Liam.Howlett@oracle.com" <Liam.Howlett@oracle.com>, "vbabka@suse.cz"
+	<vbabka@suse.cz>, "rppt@kernel.org" <rppt@kernel.org>, "surenb@google.com"
+	<surenb@google.com>, "mhocko@suse.com" <mhocko@suse.com>, "ast@kernel.org"
+	<ast@kernel.org>, "daniel@iogearbox.net" <daniel@iogearbox.net>,
+	"andrii@kernel.org" <andrii@kernel.org>, "martin.lau@linux.dev"
+	<martin.lau@linux.dev>, "eddyz87@gmail.com" <eddyz87@gmail.com>,
+	"song@kernel.org" <song@kernel.org>, "yonghong.song@linux.dev"
+	<yonghong.song@linux.dev>, "john.fastabend@gmail.com"
+	<john.fastabend@gmail.com>, "kpsingh@kernel.org" <kpsingh@kernel.org>,
+	"sdf@fomichev.me" <sdf@fomichev.me>, "haoluo@google.com" <haoluo@google.com>,
+	"jolsa@kernel.org" <jolsa@kernel.org>, "jgg@ziepe.ca" <jgg@ziepe.ca>,
+	"jhubbard@nvidia.com" <jhubbard@nvidia.com>, "peterx@redhat.com"
+	<peterx@redhat.com>, "jannh@google.com" <jannh@google.com>,
+	"pfalcato@suse.de" <pfalcato@suse.de>, "axelrasmussen@google.com"
+	<axelrasmussen@google.com>, "yuanchu@google.com" <yuanchu@google.com>,
+	"weixugc@google.com" <weixugc@google.com>, "hannes@cmpxchg.org"
+	<hannes@cmpxchg.org>, "zhengqi.arch@bytedance.com"
+	<zhengqi.arch@bytedance.com>, "shakeel.butt@linux.dev"
+	<shakeel.butt@linux.dev>, "shuah@kernel.org" <shuah@kernel.org>,
+	"seanjc@google.com" <seanjc@google.com>, "linux-fsdevel@vger.kernel.org"
+	<linux-fsdevel@vger.kernel.org>, "linux-doc@vger.kernel.org"
+	<linux-doc@vger.kernel.org>, "linux-kernel@vger.kernel.org"
+	<linux-kernel@vger.kernel.org>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+	"linux-arm-kernel@lists.infradead.org"
+	<linux-arm-kernel@lists.infradead.org>, "kvmarm@lists.linux.dev"
+	<kvmarm@lists.linux.dev>, "loongarch@lists.linux.dev"
+	<loongarch@lists.linux.dev>, "linux-riscv@lists.infradead.org"
+	<linux-riscv@lists.infradead.org>, "linux-s390@vger.kernel.org"
+	<linux-s390@vger.kernel.org>, "linux-nfs@vger.kernel.org"
+	<linux-nfs@vger.kernel.org>, "devel@lists.orangefs.org"
+	<devel@lists.orangefs.org>, "linux-mm@kvack.org" <linux-mm@kvack.org>,
+	"bpf@vger.kernel.org" <bpf@vger.kernel.org>,
+	"linux-kselftest@vger.kernel.org" <linux-kselftest@vger.kernel.org>
+Subject: [PATCH v6 00/11] Direct Map Removal Support for guest_memfd
+Thread-Topic: [PATCH v6 00/11] Direct Map Removal Support for guest_memfd
+Thread-Index: AQHcI8YPHCplp86cBE2LweCaK1PIkA==
+Date: Fri, 12 Sep 2025 09:17:29 +0000
+Message-ID: <20250912091708.17502-1-roypat@amazon.co.uk>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+Content-Type: text/plain; charset="iso-8859-1"
 Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.56.2 (3.56.2-1.fc42) 
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-TM-AS-GCONF: 00
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUwOTA2MDE5NSBTYWx0ZWRfX9vod4ksvTBXZ
- lXEEFKjjeWBG0T5MizFJ0fDJMzoOP5vQag6TKNAxhfISFTbNDAvl7jMbR43gjgrFEDupgFy72a6
- Z/MhJp76zEFIiUasO84SmUGdyyDU9XQ+jN6r3U3oyb6U6WLTtKSIu5G8ZMH4peXLe2OxtiUSJqK
- syDO3T/tmeC61tzAuY7DC6V77hpeVPOBoss6ZfXaTFS6JshsOOxMHhgaSwR1rzDwxmHmg5t3Amd
- Uaq5Nq/SwiiJvH48lscBk7DwZZnacQwR2r4bAgxbZBBljhuHGm3TUpoMcqCr8XghxPYoZOhOrG5
- MZJ4HpgYAlRyK2w77rf9V9DQ24WhmlCVeOSidtw9lK6jd9UCzop0cAbeyuHlreeFSg43WLxSCXV
- pSAIVJFM
-X-Proofpoint-ORIG-GUID: y0Ll2Sz6P_Mm42B1st_zSz2mcQI1AQhg
-X-Proofpoint-GUID: y0Ll2Sz6P_Mm42B1st_zSz2mcQI1AQhg
-X-Authority-Analysis: v=2.4 cv=StCQ6OO0 c=1 sm=1 tr=0 ts=68c3e522 cx=c_pps
- a=bLidbwmWQ0KltjZqbj+ezA==:117 a=bLidbwmWQ0KltjZqbj+ezA==:17
- a=IkcTkHD0fZMA:10 a=yJojWOMRYYMA:10 a=VnNF1IyMAAAA:8 a=fI3iV-jTyyiWxqSZq_oA:9
- a=QEXdDO2ut3YA:10
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1117,Hydra:6.1.9,FMLib:17.12.80.40
- definitions=2025-09-12_03,2025-09-11_02,2025-03-28_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- spamscore=0 malwarescore=0 bulkscore=0 clxscore=1011 adultscore=0
- suspectscore=0 priorityscore=1501 impostorscore=0 phishscore=0
- classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
- reason=mlx scancount=1 engine=8.19.0-2507300000 definitions=main-2509060195
 
-On Wed, 2025-09-10 at 20:07 +0200, Claudio Imbrenda wrote:
-> Add gmap_helper_set_unused() to mark userspace ptes as unused.
->=20
-> Core mm code will use that information to discard unused pages instead
-> of attempting to swap them.
->=20
-> Signed-off-by: Claudio Imbrenda <imbrenda@linux.ibm.com>
-
-LGTM
-> ---
->  arch/s390/include/asm/gmap_helpers.h |  1 +
->  arch/s390/mm/gmap_helpers.c          | 64 ++++++++++++++++++++++++++++
->  2 files changed, 65 insertions(+)
->=20
-> diff --git a/arch/s390/include/asm/gmap_helpers.h b/arch/s390/include/asm=
-/gmap_helpers.h
-> index 5356446a61c4..459bd39d0887 100644
-> --- a/arch/s390/include/asm/gmap_helpers.h
-> +++ b/arch/s390/include/asm/gmap_helpers.h
-> @@ -11,5 +11,6 @@
->  void gmap_helper_zap_one_page(struct mm_struct *mm, unsigned long vmaddr=
-);
->  void gmap_helper_discard(struct mm_struct *mm, unsigned long vmaddr, uns=
-igned long end);
->  int gmap_helper_disable_cow_sharing(void);
-> +void gmap_helper_set_unused(struct mm_struct *mm, unsigned long vmaddr);
-> =20
->  #endif /* _ASM_S390_GMAP_HELPERS_H */
-> diff --git a/arch/s390/mm/gmap_helpers.c b/arch/s390/mm/gmap_helpers.c
-> index a45d417ad951..69ffc0c6b654 100644
-> --- a/arch/s390/mm/gmap_helpers.c
-> +++ b/arch/s390/mm/gmap_helpers.c
-> @@ -91,6 +91,70 @@ void gmap_helper_discard(struct mm_struct *mm, unsigne=
-d long vmaddr, unsigned lo
->  }
->  EXPORT_SYMBOL_GPL(gmap_helper_discard);
-> =20
-> +/**
-> + * gmap_helper_set_unused() - mark a pte entry as unused
-> + * @mm: the mm
-> + * @vmaddr: the userspace address whose pte is to be marked
-> + *
-> + * Mark the pte corresponding the given address as unused. This will cau=
-se
-> + * core mm code to just drop this page instead of swapping it.
-> + *
-> + * This function needs to be called with interrupts disabled (for exampl=
-e
-> + * while holding a spinlock), or while holding the mmap lock. Normally t=
-his
-> + * function is called as a result of an unmap operation, and thus KVM co=
-mmon
-> + * code will already hold kvm->mmu_lock in write mode.
-> + *
-> + * Context: Needs to be called while holding the mmap lock or with inter=
-rupts
-> + *          disabled.
-> + */
-> +void gmap_helper_set_unused(struct mm_struct *mm, unsigned long vmaddr)
-
-Can you give this a better name? E.g. gmap_helper_try_set_pte_unused
-
-> +{
-> +	pmd_t *pmdp, pmd, pmdval;
-> +	pud_t *pudp, pud;
-> +	p4d_t *p4dp, p4d;
-> +	pgd_t *pgdp, pgd;
-> +	spinlock_t *ptl;
-> +	pte_t *ptep;
-> +
-> +	pgdp =3D pgd_offset(mm, vmaddr);
-> +	pgd =3D pgdp_get(pgdp);
-> +	if (pgd_none(pgd) || !pgd_present(pgd))
-> +		return;
-> +
-> +	p4dp =3D p4d_offset(pgdp, vmaddr);
-> +	p4d =3D p4dp_get(p4dp);
-> +	if (p4d_none(p4d) || !p4d_present(p4d))
-> +		return;
-> +
-> +	pudp =3D pud_offset(p4dp, vmaddr);
-> +	pud =3D pudp_get(pudp);
-> +	if (pud_none(pud) || pud_leaf(pud) || !pud_present(pud))
-> +		return;
-> +
-> +	pmdp =3D pmd_offset(pudp, vmaddr);
-> +	pmd =3D pmdp_get_lockless(pmdp);
-> +	if (pmd_none(pmd) || pmd_leaf(pmd) || !pmd_present(pmd))
-> +		return;
-> +
-> +	ptep =3D pte_offset_map_rw_nolock(mm, pmdp, vmaddr, &pmdval, &ptl);
-> +	if (!ptep)
-> +		return;
-> +
-> +	if (spin_trylock(ptl)) {
-
-Missing the comment you promised :) about deadlock prevention.
-
-> +		/*
-> +		 * Make sure the pte we are touching is still the correct
-> +		 * one. In theory this check should not be needed, but
-
-Why should it not be needed? I.e. why should we be protected against modifi=
-cation?
-> +		 * better safe than sorry.
-> +		 */
-> +		if (likely(pmd_same(pmdval, pmdp_get_lockless(pmdp))))
-> +			__atomic64_or(_PAGE_UNUSED, (long *)ptep);
-> +		spin_unlock(ptl);
-> +	}
-> +
-> +	pte_unmap(ptep);
-> +}
-> +EXPORT_SYMBOL_GPL(gmap_helper_set_unused);
-> +
->  static int find_zeropage_pte_entry(pte_t *pte, unsigned long addr,
->  				   unsigned long end, struct mm_walk *walk)
->  {
-
---=20
-IBM Deutschland Research & Development GmbH
-Vorsitzender des Aufsichtsrats: Wolfgang Wendt
-Gesch=C3=A4ftsf=C3=BChrung: David Faller
-Sitz der Gesellschaft: B=C3=B6blingen / Registergericht: Amtsgericht Stuttg=
-art, HRB 243294
+[ based on kvm/next ]=0A=
+=0A=
+Unmapping virtual machine guest memory from the host kernel's direct map is=
+ a=0A=
+successful mitigation against Spectre-style transient execution issues: If =
+the=0A=
+kernel page tables do not contain entries pointing to guest memory, then an=
+y=0A=
+attempted speculative read through the direct map will necessarily be block=
+ed=0A=
+by the MMU before any observable microarchitectural side-effects happen. Th=
+is=0A=
+means that Spectre-gadgets and similar cannot be used to target virtual mac=
+hine=0A=
+memory. Roughly 60% of speculative execution issues fall into this category=
+ [1,=0A=
+Table 1].=0A=
+=0A=
+This patch series extends guest_memfd with the ability to remove its memory=
+=0A=
+from the host kernel's direct map, to be able to attain the above protectio=
+n=0A=
+for KVM guests running inside guest_memfd.=0A=
+=0A=
+Additionally, a Firecracker branch with support for these VMs can be found =
+on=0A=
+GitHub [2].=0A=
+=0A=
+For more details, please refer to the v5 cover letter [v5]. No=0A=
+substantial changes in design have taken place since.=0A=
+=0A=
+=3D=3D=3D Changes Since v5 =3D=3D=3D =0A=
+=0A=
+- Fix up error handling for set_direct_map_[in]valid_noflush() (Mike)=0A=
+- Fix capability check for KVM_GUEST_MEMFD_NO_DIRECT_MAP (Mike)=0A=
+- Make secretmem_aops static in mm/secretmem.c (Mike)=0A=
+- Fixup some more comments in gup.c that referred to secretmem=0A=
+  specifically to instead point to AS_NO_DIRECT_MAP (Mike)=0A=
+- New patch (PATCH 4/11) to avoid ifdeffery in kvm_gmem_free_folio() (Mike)=
+=0A=
+- vma_is_no_direct_map() -> vma_has_no_direct_map() rename (David)=0A=
+- Squash some patches (David)=0A=
+- Fix up const-ness of parameters to new functions in pagemap.h (Fuad)=0A=
+=0A=
+[1]: https://download.vusec.net/papers/quarantine_raid23.pdf=0A=
+[2]: https://github.com/firecracker-microvm/firecracker/tree/feature/secret=
+-hiding=0A=
+[RFCv1]: https://lore.kernel.org/kvm/20240709132041.3625501-1-roypat@amazon=
+.co.uk/=0A=
+[RFCv2]: https://lore.kernel.org/kvm/20240910163038.1298452-1-roypat@amazon=
+.co.uk/=0A=
+[RFCv3]: https://lore.kernel.org/kvm/20241030134912.515725-1-roypat@amazon.=
+co.uk/=0A=
+[v4]: https://lore.kernel.org/kvm/20250221160728.1584559-1-roypat@amazon.co=
+.uk/=0A=
+[v5]: https://lore.kernel.org/kvm/20250828093902.2719-1-roypat@amazon.co.uk=
+/=0A=
+=0A=
+Elliot Berman (1):=0A=
+  filemap: Pass address_space mapping to ->free_folio()=0A=
+=0A=
+Patrick Roy (10):=0A=
+  arch: export set_direct_map_valid_noflush to KVM module=0A=
+  mm: introduce AS_NO_DIRECT_MAP=0A=
+  KVM: guest_memfd: Add stub for kvm_arch_gmem_invalidate=0A=
+  KVM: guest_memfd: Add flag to remove from direct map=0A=
+  KVM: selftests: load elf via bounce buffer=0A=
+  KVM: selftests: set KVM_MEM_GUEST_MEMFD in vm_mem_add() if guest_memfd=0A=
+    !=3D -1=0A=
+  KVM: selftests: Add guest_memfd based vm_mem_backing_src_types=0A=
+  KVM: selftests: stuff vm_mem_backing_src_type into vm_shape=0A=
+  KVM: selftests: cover GUEST_MEMFD_FLAG_NO_DIRECT_MAP in existing=0A=
+    selftests=0A=
+  KVM: selftests: Test guest execution from direct map removed gmem=0A=
+=0A=
+ Documentation/filesystems/locking.rst         |  2 +-=0A=
+ Documentation/virt/kvm/api.rst                |  5 ++=0A=
+ arch/arm64/include/asm/kvm_host.h             | 12 ++++=0A=
+ arch/arm64/mm/pageattr.c                      |  1 +=0A=
+ arch/loongarch/mm/pageattr.c                  |  1 +=0A=
+ arch/riscv/mm/pageattr.c                      |  1 +=0A=
+ arch/s390/mm/pageattr.c                       |  1 +=0A=
+ arch/x86/mm/pat/set_memory.c                  |  1 +=0A=
+ fs/nfs/dir.c                                  | 11 ++--=0A=
+ fs/orangefs/inode.c                           |  3 +-=0A=
+ include/linux/fs.h                            |  2 +-=0A=
+ include/linux/kvm_host.h                      |  9 +++=0A=
+ include/linux/pagemap.h                       | 16 +++++=0A=
+ include/linux/secretmem.h                     | 18 ------=0A=
+ include/uapi/linux/kvm.h                      |  2 +=0A=
+ lib/buildid.c                                 |  4 +-=0A=
+ mm/filemap.c                                  |  9 +--=0A=
+ mm/gup.c                                      | 19 ++----=0A=
+ mm/mlock.c                                    |  2 +-=0A=
+ mm/secretmem.c                                | 11 ++--=0A=
+ mm/vmscan.c                                   |  4 +-=0A=
+ .../testing/selftests/kvm/guest_memfd_test.c  |  2 +=0A=
+ .../testing/selftests/kvm/include/kvm_util.h  | 37 ++++++++---=0A=
+ .../testing/selftests/kvm/include/test_util.h |  8 +++=0A=
+ tools/testing/selftests/kvm/lib/elf.c         |  8 +--=0A=
+ tools/testing/selftests/kvm/lib/io.c          | 23 +++++++=0A=
+ tools/testing/selftests/kvm/lib/kvm_util.c    | 61 +++++++++++--------=0A=
+ tools/testing/selftests/kvm/lib/test_util.c   |  8 +++=0A=
+ tools/testing/selftests/kvm/lib/x86/sev.c     |  1 +=0A=
+ .../selftests/kvm/pre_fault_memory_test.c     |  1 +=0A=
+ .../selftests/kvm/set_memory_region_test.c    | 50 +++++++++++++--=0A=
+ .../kvm/x86/private_mem_conversions_test.c    |  7 ++-=0A=
+ virt/kvm/guest_memfd.c                        | 56 ++++++++++++++---=0A=
+ virt/kvm/kvm_main.c                           |  5 ++=0A=
+ 34 files changed, 288 insertions(+), 113 deletions(-)=0A=
+=0A=
+=0A=
+base-commit: a6ad54137af92535cfe32e19e5f3bc1bb7dbd383=0A=
+-- =0A=
+2.50.1=0A=
+=0A=
 
