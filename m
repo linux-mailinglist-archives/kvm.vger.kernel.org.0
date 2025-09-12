@@ -1,137 +1,159 @@
-Return-Path: <kvm+bounces-57390-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-57391-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id B2A90B54A87
-	for <lists+kvm@lfdr.de>; Fri, 12 Sep 2025 13:01:15 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id A7F1EB54ADC
+	for <lists+kvm@lfdr.de>; Fri, 12 Sep 2025 13:21:03 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 082B91D60779
-	for <lists+kvm@lfdr.de>; Fri, 12 Sep 2025 11:01:26 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5A9215A0F1D
+	for <lists+kvm@lfdr.de>; Fri, 12 Sep 2025 11:21:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 378E22FDC22;
-	Fri, 12 Sep 2025 11:00:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CA4213009D9;
+	Fri, 12 Sep 2025 11:20:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Y9jIiJ0S"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Ur4kWVDq"
 X-Original-To: kvm@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 481F14207A;
-	Fri, 12 Sep 2025 11:00:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 437952EB5BD
+	for <kvm@vger.kernel.org>; Fri, 12 Sep 2025 11:20:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757674853; cv=none; b=gKCIWcgdt47ZD6DCCd0R0N6z0atPf3cXvSDG8aU3n1RO198rwbOyU/Q+Rs8AjREeupw0tHcliwrZeOcsSTIjd+Bg7uLScwkqvZk6MAXMiXMf733eEjOv3NE2FyUj3mhDzef6saAbUOA9RskGIQ6V/svW1Q80irQH0iN6sqNYIjA=
+	t=1757676057; cv=none; b=oqHVLGSmxOgP1xo71ic0bvHh42O4dsuOlxe53FWEvkbHFBHjYU45CSNL/N/9Qe8Dsgkt3xNUh+ZqSswfdYsIJMHNkvNXYyPRo5kOPHfsBDXGbx0iGXSGC5Xa+pRmzjTU1wPb92LpLvheiShfeoI4JV68pjwArhjR/mEEBiCOJ2A=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757674853; c=relaxed/simple;
-	bh=9Hig5MO2Jffefaua87KEncrMekSgvRAlciqOrU/lgR8=;
-	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=H75seW5tD+izcMwq96fSXlMbMy91kcUU0AJScQtrZnWx8gIi4Vo69O//rXcQWNlqLSZIgWtuTCTTQr19uxr/cR34OlIVuwl1yHE4Z6m59OSyZvMBHR3H9RFOhpdJbRQ4NreNuZPtsXn8mlhLsQyOKSheCjlwW9+If0/t8SX5yKE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Y9jIiJ0S; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id CE1A1C4CEF1;
-	Fri, 12 Sep 2025 11:00:52 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1757674852;
-	bh=9Hig5MO2Jffefaua87KEncrMekSgvRAlciqOrU/lgR8=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=Y9jIiJ0SlD76AkupUHHfrxAvk88t0QaJTxlubaz7Lee2xy2D0BRqnWy9kHOd+UEyZ
-	 ucw6CFXjEg23lC4HIKq0YD3BJL7UetQbE0vKECGBR/Bq0X6LlaR/kmSB/pu1+AnrxX
-	 cbiUamOX6fsmRIK6CpkZMPRvhxzpyKtLeDtJq93aoQoHkN4MmaA3LlKMATXFOqd28O
-	 x3Kko9USQF71yCJC0lsZsB8W+T4D7IKWsudRCawlXuGZmzWDSLJyfmcr1/MaTJWn0t
-	 R4lj6LhwbLOIqKDKh49o/fHDe5jximaOFTDlE8JCRYKZ4rL5P4zYCoLAmaKXoHibiN
-	 Om0+/jjPkBRVQ==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.98.2)
-	(envelope-from <maz@kernel.org>)
-	id 1ux1WM-00000005etW-1zmH;
-	Fri, 12 Sep 2025 11:00:50 +0000
-Date: Fri, 12 Sep 2025 12:00:50 +0100
-Message-ID: <867by4c4v1.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: Itaru Kitayama <itaru.kitayama@linux.dev>
-Cc: Oliver Upton <oliver.upton@linux.dev>,
-	Joey Gouly <joey.gouly@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	Paolo Bonzini <pbonzini@redhat.com>,
-	Shuah Khan <shuah@kernel.org>,
-	linux-arm-kernel@lists.infradead.org,
-	kvmarm@lists.linux.dev,
-	kvm@vger.kernel.org,
-	linux-kselftest@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Itaru Kitayama <itaru.kitayama@fujitsu.com>
-Subject: Re: [PATCH] PMCR_EL0.N is RAZ/WI. At least a build failes in Ubuntu 22.04 LTS. Remove the set function.
-In-Reply-To: <20250912-selftest-fix3-v1-1-256710a5ae5b@linux.dev>
-References: <20250912-selftest-fix3-v1-1-256710a5ae5b@linux.dev>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+	s=arc-20240116; t=1757676057; c=relaxed/simple;
+	bh=8Dw3lVR2xucpJIiN549egDMsYKgC7uUhzdU3uBZexjc=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
+	 MIME-Version:Content-Type; b=do+Fe6xe8wXwQhyCuFHb8Hha/miPtsUNWgORHS2IOsxsg98mOv9oGtAGjostdGNWE76jJLQkV6bYZbsx7CrL0MRWoopg/iDPoFrRjAo4plwbZ54b0spWZkeGRJfZ4L1tY6ytJ9H9iE2dI0fIi2sc3/Svjpa8kqK8D9Tuf4byhZg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Ur4kWVDq; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1757676053;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=gSEQ4Qczks8i0U7Ra7o1VfmOwUG1VbNgYYjOq2bb5cc=;
+	b=Ur4kWVDqNJ4JbJofBZ5Am8qURVHIfC5UDM4Wur/1NZSOjwcb3r8A/XYLTl90ihfaMlFECY
+	6PHAd8TdTvzAM8cmJJe2Fpft5TUJQ0ekkZgifzAnTyu14tSAGcs73zHsE6FRrtfE04id9Y
+	HCT0kN/ZV3HHddbPGfVLjN3JAt55b68=
+Received: from mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-491-9qeUdjA9PSKj3r4VcW3dHw-1; Fri,
+ 12 Sep 2025 07:20:49 -0400
+X-MC-Unique: 9qeUdjA9PSKj3r4VcW3dHw-1
+X-Mimecast-MFC-AGG-ID: 9qeUdjA9PSKj3r4VcW3dHw_1757676047
+Received: from mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.12])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 39BF5180045C;
+	Fri, 12 Sep 2025 11:20:47 +0000 (UTC)
+Received: from blackfin.pond.sub.org (unknown [10.45.242.12])
+	by mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 6E59A19560B1;
+	Fri, 12 Sep 2025 11:20:46 +0000 (UTC)
+Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
+	id E2B6D21E6A27; Fri, 12 Sep 2025 13:20:43 +0200 (CEST)
+From: Markus Armbruster <armbru@redhat.com>
+To: "Naveen N Rao (AMD)" <naveen@kernel.org>
+Cc: Paolo Bonzini <pbonzini@redhat.com>,  Sean Christopherson
+ <seanjc@google.com>,  qemu-devel <qemu-devel@nongnu.org>,
+  <kvm@vger.kernel.org>,  "Daniel P. Berrange" <berrange@redhat.com>,
+  Eduardo Habkost <eduardo@habkost.net>,  Eric Blake <eblake@redhat.com>,
+  Marcelo Tosatti <mtosatti@redhat.com>,  Zhao Liu <zhao1.liu@intel.com>,
+  Nikunj A Dadhania <nikunj@amd.com>,  Tom Lendacky
+ <thomas.lendacky@amd.com>,  Michael Roth <michael.roth@amd.com>,  Neeraj
+ Upadhyay <neeraj.upadhyay@amd.com>,  Roy Hopkins
+ <roy.hopkins@randomman.co.uk>
+Subject: Re: [RFC PATCH 3/7] target/i386: SEV: Add support for enabling
+ debug-swap SEV feature
+In-Reply-To: <0a77cf472bc36fee7c1be78fc7d6d514d22bca9a.1757589490.git.naveen@kernel.org>
+	(Naveen N. Rao's message of "Thu, 11 Sep 2025 17:24:22 +0530")
+References: <cover.1757589490.git.naveen@kernel.org>
+	<0a77cf472bc36fee7c1be78fc7d6d514d22bca9a.1757589490.git.naveen@kernel.org>
+Date: Fri, 12 Sep 2025 13:20:43 +0200
+Message-ID: <87jz239at0.fsf@pond.sub.org>
+User-Agent: Gnus/5.13 (Gnus v5.13)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: itaru.kitayama@linux.dev, oliver.upton@linux.dev, joey.gouly@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, pbonzini@redhat.com, shuah@kernel.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, kvm@vger.kernel.org, linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org, itaru.kitayama@fujitsu.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+MIME-Version: 1.0
+Content-Type: text/plain
+X-Scanned-By: MIMEDefang 3.0 on 10.30.177.12
 
-On Fri, 12 Sep 2025 09:27:40 +0100,
-Itaru Kitayama <itaru.kitayama@linux.dev> wrote:
-> 
-> Signed-off-by: Itaru Kitayama <itaru.kitayama@fujitsu.com>
+"Naveen N Rao (AMD)" <naveen@kernel.org> writes:
 
-This isn't an acceptable commit message.
+> Add support for enabling debug-swap VMSA SEV feature in SEV-ES and
+> SEV-SNP guests through a new "debug-swap" boolean property on SEV guest
+> objects. Though the boolean property is available for plain SEV guests,
+> check_sev_features() will reject setting this for plain SEV guests.
 
-> ---
-> Seen a build failure with old Ubuntu 22.04 LTS, while the latest release
-> has no build issue, a write to the bit fields is RAZ/WI, remove the
-> function.
-> ---
->  tools/testing/selftests/kvm/arm64/vpmu_counter_access.c | 6 ------
->  1 file changed, 6 deletions(-)
-> 
-> diff --git a/tools/testing/selftests/kvm/arm64/vpmu_counter_access.c b/tools/testing/selftests/kvm/arm64/vpmu_counter_access.c
-> index f16b3b27e32ed7ca57481f27d689d47783aa0345..56214a4430be90b3e1d840f2719b22dd44f0b49b 100644
-> --- a/tools/testing/selftests/kvm/arm64/vpmu_counter_access.c
-> +++ b/tools/testing/selftests/kvm/arm64/vpmu_counter_access.c
-> @@ -45,11 +45,6 @@ static uint64_t get_pmcr_n(uint64_t pmcr)
->  	return FIELD_GET(ARMV8_PMU_PMCR_N, pmcr);
->  }
+Let's see whether I understand...
+
+It's a property of sev-guest and sev-snp-guest objects.  These are the
+"SEV guest objects".
+
+I guess a sev-snp-guest object implies it's a SEV-SNP guest, and setting
+@debug-swap on such an object just works.
+
+With a sev-guest object, it's either a "plain SEV guest" or a "SEV-ES"
+guest.
+
+If it's the latter, setting @debug-swap just works.
+
+If it's the former, and you set @debug-swap to true, then KVM
+accelerator initialization will fail later on.  This might trigger
+fallback to TCG.
+
+Am I confused?
+
+> Add helpers for setting and querying the VMSA SEV features so that they
+> can be re-used for subsequent VMSA SEV features, and convert the
+> existing SVM_SEV_FEAT_SNP_ACTIVE definition to use the BIT() macro for
+> consistency with the new feature flag.
+>
+> Sample command-line:
+>   -machine q35,confidential-guest-support=sev0 \
+>   -object sev-snp-guest,id=sev0,cbitpos=51,reduced-phys-bits=1,debug-swap=on
+>
+> Signed-off-by: Naveen N Rao (AMD) <naveen@kernel.org>
+
+[...]
+
+> diff --git a/qapi/qom.json b/qapi/qom.json
+> index 830cb2ffe781..71cd8ad588b5 100644
+> --- a/qapi/qom.json
+> +++ b/qapi/qom.json
+> @@ -1010,13 +1010,17 @@
+>  #     designated guest firmware page for measured boot with -kernel
+>  #     (default: false) (since 6.2)
+>  #
+> +# @debug-swap: enable virtualization of debug registers (default: false)
+> +#              (since 10.2)
+
+Please indent like this:
+
+   # @debug-swap: enable virtualization of debug registers
+   #     (default: false) (since 10.2)
+
+> +#
+>  # Since: 9.1
+>  ##
+>  { 'struct': 'SevCommonProperties',
+>    'data': { '*sev-device': 'str',
+>              '*cbitpos': 'uint32',
+>              'reduced-phys-bits': 'uint32',
+> -            '*kernel-hashes': 'bool' } }
+> +            '*kernel-hashes': 'bool',
+> +            '*debug-swap': 'bool' } }
 >  
-> -static void set_pmcr_n(uint64_t *pmcr, uint64_t pmcr_n)
-> -{
-> -	u64p_replace_bits((__u64 *) pmcr, pmcr_n, ARMV8_PMU_PMCR_N);
-> -}
-> -
->  static uint64_t get_counters_mask(uint64_t n)
->  {
->  	uint64_t mask = BIT(ARMV8_PMU_CYCLE_IDX);
-> @@ -490,7 +485,6 @@ static void test_create_vpmu_vm_with_pmcr_n(uint64_t pmcr_n, bool expect_fail)
->  	 * Setting a larger value of PMCR.N should not modify the field, and
->  	 * return a success.
->  	 */
-> -	set_pmcr_n(&pmcr, pmcr_n);
->  	vcpu_set_reg(vcpu, KVM_ARM64_SYS_REG(SYS_PMCR_EL0), pmcr);
->  	pmcr = vcpu_get_reg(vcpu, KVM_ARM64_SYS_REG(SYS_PMCR_EL0));
->  
-> 
+>  ##
+>  # @SevGuestProperties:
 
-So what are you fixing here? A build failure? A semantic defect?
-Something else? What makes this a valid change?
-
-Frankly, I have no idea.
-
-But KVM definitely allows PMCR_EL0.N to be written from userspace, and
-that's not going to change.
-
-	M.
-
--- 
-Without deviation from the norm, progress is not possible.
 
