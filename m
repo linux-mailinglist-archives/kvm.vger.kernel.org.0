@@ -1,71 +1,71 @@
-Return-Path: <kvm+bounces-57477-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-57478-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5DC62B55A40
-	for <lists+kvm@lfdr.de>; Sat, 13 Sep 2025 01:33:53 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id DEF1DB55A41
+	for <lists+kvm@lfdr.de>; Sat, 13 Sep 2025 01:34:04 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0E800165195
-	for <lists+kvm@lfdr.de>; Fri, 12 Sep 2025 23:33:53 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8FE3216FA90
+	for <lists+kvm@lfdr.de>; Fri, 12 Sep 2025 23:34:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B1EE22E5B26;
-	Fri, 12 Sep 2025 23:24:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 588212E62C5;
+	Fri, 12 Sep 2025 23:24:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="joukzraZ"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="lODHSsYh"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pj1-f74.google.com (mail-pj1-f74.google.com [209.85.216.74])
+Received: from mail-pg1-f201.google.com (mail-pg1-f201.google.com [209.85.215.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4D32E2E4254
-	for <kvm@vger.kernel.org>; Fri, 12 Sep 2025 23:24:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.74
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9A8FE2E54A7
+	for <kvm@vger.kernel.org>; Fri, 12 Sep 2025 23:24:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757719468; cv=none; b=rj3Zi+lqdE8jmPeE4E4ryd9U4GhAaDa86PsHB1ZeZMol7ZQ2DsLhd09wRRzN7JR8PB/+24ejhOMWrJIOZHiE7O5lZZI/d0IgpOhUb19rD74YyOEej2mWaUhMUmsA194T3Wdp/asZiKdf6oOPOj03I0NQN2EBtiLz7+Tt/9iYEvU=
+	t=1757719470; cv=none; b=oG84BjanKN6uEHDuCl+e/IkDZF+0Vdb88+A6/1BIjqqU11FJY1AcEOXOBVgFl97UehXOPnekuZmO7fsgRRTZi1tPvr6KP0p0QtBfqbsqie/Kd6C6CrF1oGluoCF5AK/XYa6JeNkwuky9KI69K46edO2RZxHO+yLae149PS+TgfM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757719468; c=relaxed/simple;
-	bh=UPKnKQSfYJAo3EQ9x1VivoNxgTxUElKxA35GroyTf1g=;
+	s=arc-20240116; t=1757719470; c=relaxed/simple;
+	bh=B/+fboJ5jcpg2gOGOCB/m3OcoD4VBafeiF/boJ4NMkk=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=Is8TIcTzfX/ENiFxlfM3mK5nLR5FOr/DS0mAfi5cDQWbnj8Wj9MYci06+qoVNafNiGXvpjvhGtMpYyoH0Zj7wyI026y6aAApXo449mXAkKjQuBOOnMA8M+RsXl1yIBkzAUxwOh4R1gNPTRHrU7WlhSDgiANYkhNoI+MhqPW1qcQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=joukzraZ; arc=none smtp.client-ip=209.85.216.74
+	 To:Cc:Content-Type; b=PTrfba0znyFzGB9bH3C/5v+0BT6VuLMG3iUh5nYAvId9rIkKX/MMunm0ocrWF4DzGNau05gxwCMExulSK0uUVVbtY5wYbOD53aAQhZujgXyFAhZsCQT/kYX8mTIxkhVvyYbY5X1wSwjHk7e5Oc3nMmmIQdX4uyQyhpa39MDlY0U=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=lODHSsYh; arc=none smtp.client-ip=209.85.215.201
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pj1-f74.google.com with SMTP id 98e67ed59e1d1-329ee69e7deso2264773a91.3
-        for <kvm@vger.kernel.org>; Fri, 12 Sep 2025 16:24:27 -0700 (PDT)
+Received: by mail-pg1-f201.google.com with SMTP id 41be03b00d2f7-b54abd7e048so764904a12.2
+        for <kvm@vger.kernel.org>; Fri, 12 Sep 2025 16:24:28 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1757719466; x=1758324266; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1757719468; x=1758324268; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:reply-to:from:to:cc:subject:date:message-id:reply-to;
-        bh=Sdm8oDN0/ysJNEKU/fuPIP7nuYKdlTH627rUAA97AnA=;
-        b=joukzraZHJupODE/eznr9DtbHrj5GQttsTmasLb8Rtoda1kelTClQUulyRFOY1PPgR
-         xG1bcR6eoEQAn8jjJrxgV/cGcniVU5csSzMHTvyYSBdp2TuBaMHw4yK4CrZ3ugBQ28ME
-         tdBLl87awDlphX90KrXjZut7vImXBuG4mbK0oNIZo1IWV4s0wyW/uPNszdKFn/QvzLAR
-         BUZ++3MybLVYf9192UGn6oS8YMtlsPnJ35cahXSi+S3/ZVHXeskXVLEPRe7phvmNAE14
-         /4BnewtNO/nb7uOInOT+sJL/Zi0ryaoqZr7v8SsQEGYnizcpsbnvyGGE4GXXSqoSTQy7
-         qu3g==
+        bh=Ody2DPDQuuD4Pb68BebF5fqDAK2OZjnGHkBkDngH0Ec=;
+        b=lODHSsYh6LOB1Teqsjuf1g/+ybRVCMWQgGGmBsUKfjUi0C2xT1HRyFwuzBDWDbMPpD
+         Tv97VIhmNJB088cb3AL1C+L6OroCZr95QTq8dcchEI1vcajbVDbhzbCSrIPItffRmR9q
+         8sw6kpAfZOtVp2BBvrpq7MmcIXPdLop1gzdziXMV+jvQHIOui/vxyxiz5nZ9r9ucscAl
+         lHARr5A+5Lv4zLywO7gG//aa+DZAxzPPoULj+rA0Tc25lo/IgljZRK4AisFg/J9nrWt8
+         GOt47m1x6zHbHiyxoTbohhPj+on6OGR0PAG/GgZURs+09y22184KO2wU52U2xdHgrECd
+         yQrg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1757719466; x=1758324266;
+        d=1e100.net; s=20230601; t=1757719468; x=1758324268;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:reply-to:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=Sdm8oDN0/ysJNEKU/fuPIP7nuYKdlTH627rUAA97AnA=;
-        b=CJnt10w893x01D5mMS7pB6GYsN7p78on2A+qB667w53XNS26jmali6UO9jDqgbF1Pv
-         B6fEZcW9nZYEK/r4qP9UtrIoXZxHpxLtUL/8WA7Mf1CYPv6BXFxh8iHRIch3DCXTwDhO
-         2l0/iZJEYk9dsedxcu7/C3tzgZENbCJldb8uY3s9Zu6Ejp+KeBaU/3zHU7+uW36egQuz
-         3ie1POluyu7zK3E0exQkYAqryxu26Yn1+PfXqT7hlLzr0cmiKjNeUwOGwbbYz2i0fDuh
-         1k6F/vfWjKbQSML/7iFKJXyfyYt72PQg4XxRlw4hcn19MYGnVzfS0kjh7uPwen6xp9Ue
-         3dWQ==
-X-Gm-Message-State: AOJu0YxPlsvt9xHYDBFYS9sTQVn1NaeZ0PlzbqLhJ0DtRrkTSfszqFNz
-	X0xHSwILMQXZaSyZ4PJV6D0pbCUTEsJZ2fbJVl/JaAxPS+HWJ+ka4Q9XAQp0lxpgBg6+oFP3sj4
-	NDm1l7A==
-X-Google-Smtp-Source: AGHT+IFdxaEc5cFiTTkclO1uSvqiG8c+ZQArkHF+CDxCdQDXFCgmSomwPdUgdl7m0VNTqmhTJiPLYIpJ6Jc=
-X-Received: from pjbqb3.prod.google.com ([2002:a17:90b:2803:b0:32b:8eda:24e8])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:17cc:b0:327:9e88:7714
- with SMTP id 98e67ed59e1d1-32de4fba10dmr5159788a91.37.1757719466439; Fri, 12
- Sep 2025 16:24:26 -0700 (PDT)
+        bh=Ody2DPDQuuD4Pb68BebF5fqDAK2OZjnGHkBkDngH0Ec=;
+        b=UsnMjgAFYXxjsACOK9I3PYGCEyGRFs8hWlXj6S/cooXveL91P9e3f8Jv1TpmpMrCfd
+         /+FYTxgfoE8kj08aOZI1iJ9wMAZHnUbucIeigjq3Mgo1GvqWAUsaOhodk8XshBIhNKxt
+         jx+9EPeaXniT8EEb9yfOLFwnFm9dCo8+N7t7iku9kh0Y+LAtqi3um4ybdBn5D8p3khto
+         OEqwv/mnzKNPHVTa3T58xYm5qmC++jL9ONUzwct0RGSnDSZPajTh5UUwRJHUTeR/830M
+         c1PV92NzgpELAE3sgdyiegder0n8nD3AW6S7irEz6a8FD8d5kusDdAVTvKUJ/fir40WU
+         ySlw==
+X-Gm-Message-State: AOJu0YzmW8sUgbcxLUqDHZktirvhQqERr02Wi++qp65WiRKb9pnmgHaa
+	sQ3UmTHH2joeY6W6pBPxBSwcwunHGebrSEMktbNiIDmU4pO+giQldeS7emAv39Znz15exJVJNxI
+	p8aPFmg==
+X-Google-Smtp-Source: AGHT+IHSkHoCYyr2f+mu2dwrdKUG2xiR19xQInw8PU/Rofl1P/JX8mJckrqo+5vlLZh7353SX4R7cbenNtM=
+X-Received: from pjbss7.prod.google.com ([2002:a17:90b:2ec7:b0:312:e266:f849])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a05:6a20:3ca3:b0:240:1e97:7a15
+ with SMTP id adf61e73a8af0-2602af7da02mr6197330637.27.1757719468023; Fri, 12
+ Sep 2025 16:24:28 -0700 (PDT)
 Reply-To: Sean Christopherson <seanjc@google.com>
-Date: Fri, 12 Sep 2025 16:23:12 -0700
+Date: Fri, 12 Sep 2025 16:23:13 -0700
 In-Reply-To: <20250912232319.429659-1-seanjc@google.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
@@ -75,9 +75,9 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
 References: <20250912232319.429659-1-seanjc@google.com>
 X-Mailer: git-send-email 2.51.0.384.g4c02a37b29-goog
-Message-ID: <20250912232319.429659-35-seanjc@google.com>
-Subject: [PATCH v15 34/41] KVM: selftests: Add ex_str() to print human
- friendly name of exception vectors
+Message-ID: <20250912232319.429659-36-seanjc@google.com>
+Subject: [PATCH v15 35/41] KVM: selftests: Add an MSR test to exercise
+ guest/host and read/write
 From: Sean Christopherson <seanjc@google.com>
 To: Paolo Bonzini <pbonzini@redhat.com>, Sean Christopherson <seanjc@google.com>
 Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
@@ -87,162 +87,308 @@ Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
 	Xiaoyao Li <xiaoyao.li@intel.com>, Zhang Yi Z <yi.z.zhang@linux.intel.com>
 Content-Type: text/plain; charset="UTF-8"
 
-Steal exception_mnemonic() from KVM-Unit-Tests as ex_str() (to keep line
-lengths reasonable) and use it in assert messages that currently print the
-raw vector number.
+Add a selftest to verify reads and writes to various MSRs, from both the
+guest and host, and expect success/failure based on whether or not the
+vCPU supports the MSR according to supported CPUID.
+
+Note, this test is extremely similar to KVM-Unit-Test's "msr" test, but
+provides more coverage with respect to host accesses, and will be extended
+to provide addition testing of CPUID-based features, save/restore lists,
+and KVM_{G,S}ET_ONE_REG, all which are extremely difficult to validate in
+KUT.
 
 Signed-off-by: Sean Christopherson <seanjc@google.com>
 ---
- .../selftests/kvm/include/x86/processor.h     |  2 ++
- .../testing/selftests/kvm/lib/x86/processor.c | 33 +++++++++++++++++++
- .../selftests/kvm/x86/hyperv_features.c       | 16 ++++-----
- .../selftests/kvm/x86/vmx_pmu_caps_test.c     |  4 +--
- .../selftests/kvm/x86/xcr0_cpuid_test.c       | 12 +++----
- 5 files changed, 51 insertions(+), 16 deletions(-)
+ tools/testing/selftests/kvm/Makefile.kvm    |   1 +
+ tools/testing/selftests/kvm/x86/msrs_test.c | 267 ++++++++++++++++++++
+ 2 files changed, 268 insertions(+)
+ create mode 100644 tools/testing/selftests/kvm/x86/msrs_test.c
 
-diff --git a/tools/testing/selftests/kvm/include/x86/processor.h b/tools/testing/selftests/kvm/include/x86/processor.h
-index efcc4b1de523..2ad84f3809e8 100644
---- a/tools/testing/selftests/kvm/include/x86/processor.h
-+++ b/tools/testing/selftests/kvm/include/x86/processor.h
-@@ -34,6 +34,8 @@ extern uint64_t guest_tsc_khz;
- 
- #define NMI_VECTOR		0x02
- 
-+const char *ex_str(int vector);
+diff --git a/tools/testing/selftests/kvm/Makefile.kvm b/tools/testing/selftests/kvm/Makefile.kvm
+index 66c82f51837b..1d1b77dabb36 100644
+--- a/tools/testing/selftests/kvm/Makefile.kvm
++++ b/tools/testing/selftests/kvm/Makefile.kvm
+@@ -87,6 +87,7 @@ TEST_GEN_PROGS_x86 += x86/kvm_clock_test
+ TEST_GEN_PROGS_x86 += x86/kvm_pv_test
+ TEST_GEN_PROGS_x86 += x86/kvm_buslock_test
+ TEST_GEN_PROGS_x86 += x86/monitor_mwait_test
++TEST_GEN_PROGS_x86 += x86/msrs_test
+ TEST_GEN_PROGS_x86 += x86/nested_emulation_test
+ TEST_GEN_PROGS_x86 += x86/nested_exceptions_test
+ TEST_GEN_PROGS_x86 += x86/platform_info_test
+diff --git a/tools/testing/selftests/kvm/x86/msrs_test.c b/tools/testing/selftests/kvm/x86/msrs_test.c
+new file mode 100644
+index 000000000000..dcb429cf1440
+--- /dev/null
++++ b/tools/testing/selftests/kvm/x86/msrs_test.c
+@@ -0,0 +1,267 @@
++// SPDX-License-Identifier: GPL-2.0-only
++#include <asm/msr-index.h>
 +
- #define X86_EFLAGS_FIXED	 (1u << 1)
- 
- #define X86_CR4_VME		(1ul << 0)
-diff --git a/tools/testing/selftests/kvm/lib/x86/processor.c b/tools/testing/selftests/kvm/lib/x86/processor.c
-index 3b63c99f7b96..f9182dbd07f2 100644
---- a/tools/testing/selftests/kvm/lib/x86/processor.c
-+++ b/tools/testing/selftests/kvm/lib/x86/processor.c
-@@ -23,6 +23,39 @@ bool host_cpu_is_intel;
- bool is_forced_emulation_enabled;
- uint64_t guest_tsc_khz;
- 
-+const char *ex_str(int vector)
++#include <stdint.h>
++
++#include "kvm_util.h"
++#include "processor.h"
++
++/* Use HYPERVISOR for MSRs that are emulated unconditionally (as is HYPERVISOR). */
++#define X86_FEATURE_NONE X86_FEATURE_HYPERVISOR
++
++struct kvm_msr {
++	const struct kvm_x86_cpu_feature feature;
++	const char *name;
++	const u64 reset_val;
++	const u64 write_val;
++	const u64 rsvd_val;
++	const u32 index;
++};
++
++#define __MSR_TEST(msr, str, val, rsvd, reset, feat)			\
++{									\
++	.index = msr,							\
++	.name = str,							\
++	.write_val = val,						\
++	.rsvd_val = rsvd,						\
++	.reset_val = reset,						\
++	.feature = X86_FEATURE_ ##feat,					\
++}
++
++#define MSR_TEST_NON_ZERO(msr, val, rsvd, reset, feat)			\
++	__MSR_TEST(msr, #msr, val, rsvd, reset, feat)
++
++#define MSR_TEST(msr, val, rsvd, feat)					\
++	__MSR_TEST(msr, #msr, val, rsvd, 0, feat)
++
++/*
++ * Note, use a page aligned value for the canonical value so that the value
++ * is compatible with MSRs that use bits 11:0 for things other than addresses.
++ */
++static const u64 canonical_val = 0x123456789000ull;
++
++#define MSR_TEST_CANONICAL(msr, feat)					\
++	__MSR_TEST(msr, #msr, canonical_val, NONCANONICAL, 0, feat)
++
++/*
++ * The main struct must be scoped to a function due to the use of structures to
++ * define features.  For the global structure, allocate enough space for the
++ * foreseeable future without getting too ridiculous, to minimize maintenance
++ * costs (bumping the array size every time an MSR is added is really annoying).
++ */
++static struct kvm_msr msrs[128];
++static int idx;
++
++static u64 fixup_rdmsr_val(u32 msr, u64 want)
 +{
-+	switch (vector) {
-+#define VEC_STR(v) case v##_VECTOR: return "#" #v
-+	case DE_VECTOR: return "no exception";
-+	case KVM_MAGIC_DE_VECTOR: return "#DE";
-+	VEC_STR(DB);
-+	VEC_STR(NMI);
-+	VEC_STR(BP);
-+	VEC_STR(OF);
-+	VEC_STR(BR);
-+	VEC_STR(UD);
-+	VEC_STR(NM);
-+	VEC_STR(DF);
-+	VEC_STR(TS);
-+	VEC_STR(NP);
-+	VEC_STR(SS);
-+	VEC_STR(GP);
-+	VEC_STR(PF);
-+	VEC_STR(MF);
-+	VEC_STR(AC);
-+	VEC_STR(MC);
-+	VEC_STR(XM);
-+	VEC_STR(VE);
-+	VEC_STR(CP);
-+	VEC_STR(HV);
-+	VEC_STR(VC);
-+	VEC_STR(SX);
-+	default: return "#??";
-+#undef VEC_STR
++	/* AMD CPUs drop bits 63:32, and KVM is supposed to emulate that. */
++	if (host_cpu_is_amd &&
++	    (msr == MSR_IA32_SYSENTER_ESP || msr == MSR_IA32_SYSENTER_EIP))
++		want &= GENMASK_ULL(31, 0);
++
++	return want;
++}
++
++static void __rdmsr(u32 msr, u64 want)
++{
++	u64 val;
++	u8 vec;
++
++	vec = rdmsr_safe(msr, &val);
++	__GUEST_ASSERT(!vec, "Unexpected %s on RDMSR(0x%x)", ex_str(vec), msr);
++
++	__GUEST_ASSERT(val == want, "Wanted 0x%lx from RDMSR(0x%x), got 0x%lx",
++		       want, msr, val);
++}
++
++static void __wrmsr(u32 msr, u64 val)
++{
++	u8 vec;
++
++	vec = wrmsr_safe(msr, val);
++	__GUEST_ASSERT(!vec, "Unexpected %s on WRMSR(0x%x, 0x%lx)",
++		       ex_str(vec), msr, val);
++	__rdmsr(msr, fixup_rdmsr_val(msr, val));
++}
++
++static void guest_test_supported_msr(const struct kvm_msr *msr)
++{
++	__rdmsr(msr->index, msr->reset_val);
++	__wrmsr(msr->index, msr->write_val);
++	GUEST_SYNC(fixup_rdmsr_val(msr->index, msr->write_val));
++
++	__rdmsr(msr->index, msr->reset_val);
++}
++
++static void guest_test_unsupported_msr(const struct kvm_msr *msr)
++{
++	u64 val;
++	u8 vec;
++
++	vec = rdmsr_safe(msr->index, &val);
++	__GUEST_ASSERT(vec == GP_VECTOR, "Wanted #GP on RDMSR(0x%x), got %s",
++		       msr->index, ex_str(vec));
++
++	vec = wrmsr_safe(msr->index, msr->write_val);
++	__GUEST_ASSERT(vec == GP_VECTOR, "Wanted #GP on WRMSR(0x%x, 0x%lx), got %s",
++		       msr->index, msr->write_val, ex_str(vec));
++
++	GUEST_SYNC(0);
++}
++
++static void guest_main(void)
++{
++	for (;;) {
++		const struct kvm_msr *msr = &msrs[READ_ONCE(idx)];
++
++		if (this_cpu_has(msr->feature))
++			guest_test_supported_msr(msr);
++		else
++			guest_test_unsupported_msr(msr);
++
++		/*
++		 * Skipped the "reserved" value check if the CPU will truncate
++		 * the written value (e.g. SYSENTER on AMD), in which case the
++		 * upper value is simply ignored.
++		 */
++		if (msr->rsvd_val &&
++		    msr->rsvd_val == fixup_rdmsr_val(msr->index, msr->rsvd_val)) {
++			u8 vec = wrmsr_safe(msr->index, msr->rsvd_val);
++
++			__GUEST_ASSERT(vec == GP_VECTOR,
++				       "Wanted #GP on WRMSR(0x%x, 0x%lx), got %s",
++				       msr->index, msr->rsvd_val, ex_str(vec));
++		}
++
++		GUEST_SYNC(msr->reset_val);
 +	}
 +}
 +
- static void regs_dump(FILE *stream, struct kvm_regs *regs, uint8_t indent)
- {
- 	fprintf(stream, "%*srax: 0x%.16llx rbx: 0x%.16llx "
-diff --git a/tools/testing/selftests/kvm/x86/hyperv_features.c b/tools/testing/selftests/kvm/x86/hyperv_features.c
-index 068e9c69710d..99d327084172 100644
---- a/tools/testing/selftests/kvm/x86/hyperv_features.c
-+++ b/tools/testing/selftests/kvm/x86/hyperv_features.c
-@@ -54,12 +54,12 @@ static void guest_msr(struct msr_data *msr)
- 
- 	if (msr->fault_expected)
- 		__GUEST_ASSERT(vector == GP_VECTOR,
--			       "Expected #GP on %sMSR(0x%x), got vector '0x%x'",
--			       msr->write ? "WR" : "RD", msr->idx, vector);
-+			       "Expected #GP on %sMSR(0x%x), got %s",
-+			       msr->write ? "WR" : "RD", msr->idx, ex_str(vector));
- 	else
- 		__GUEST_ASSERT(!vector,
--			       "Expected success on %sMSR(0x%x), got vector '0x%x'",
--			       msr->write ? "WR" : "RD", msr->idx, vector);
-+			       "Expected success on %sMSR(0x%x), got %s",
-+			       msr->write ? "WR" : "RD", msr->idx, ex_str(vector));
- 
- 	if (vector || is_write_only_msr(msr->idx))
- 		goto done;
-@@ -102,12 +102,12 @@ static void guest_hcall(vm_vaddr_t pgs_gpa, struct hcall_data *hcall)
- 	vector = __hyperv_hypercall(hcall->control, input, output, &res);
- 	if (hcall->ud_expected) {
- 		__GUEST_ASSERT(vector == UD_VECTOR,
--			       "Expected #UD for control '%lu', got vector '0x%x'",
--			       hcall->control, vector);
-+			       "Expected #UD for control '%lu', got %s",
-+			       hcall->control, ex_str(vector));
- 	} else {
- 		__GUEST_ASSERT(!vector,
--			       "Expected no exception for control '%lu', got vector '0x%x'",
--			       hcall->control, vector);
-+			       "Expected no exception for control '%lu', got %s",
-+			       hcall->control, ex_str(vector));
- 		GUEST_ASSERT_EQ(res, hcall->expect);
- 	}
- 
-diff --git a/tools/testing/selftests/kvm/x86/vmx_pmu_caps_test.c b/tools/testing/selftests/kvm/x86/vmx_pmu_caps_test.c
-index a1f5ff45d518..7d37f0cd4eb9 100644
---- a/tools/testing/selftests/kvm/x86/vmx_pmu_caps_test.c
-+++ b/tools/testing/selftests/kvm/x86/vmx_pmu_caps_test.c
-@@ -56,8 +56,8 @@ static void guest_test_perf_capabilities_gp(uint64_t val)
- 	uint8_t vector = wrmsr_safe(MSR_IA32_PERF_CAPABILITIES, val);
- 
- 	__GUEST_ASSERT(vector == GP_VECTOR,
--		       "Expected #GP for value '0x%lx', got vector '0x%x'",
--		       val, vector);
-+		       "Expected #GP for value '0x%lx', got %s",
-+		       val, ex_str(vector));
- }
- 
- static void guest_code(uint64_t current_val)
-diff --git a/tools/testing/selftests/kvm/x86/xcr0_cpuid_test.c b/tools/testing/selftests/kvm/x86/xcr0_cpuid_test.c
-index c8a5c5e51661..d038c1571729 100644
---- a/tools/testing/selftests/kvm/x86/xcr0_cpuid_test.c
-+++ b/tools/testing/selftests/kvm/x86/xcr0_cpuid_test.c
-@@ -81,13 +81,13 @@ static void guest_code(void)
- 
- 	vector = xsetbv_safe(0, XFEATURE_MASK_FP);
- 	__GUEST_ASSERT(!vector,
--		       "Expected success on XSETBV(FP), got vector '0x%x'",
--		       vector);
-+		       "Expected success on XSETBV(FP), got %s",
-+		       ex_str(vector));
- 
- 	vector = xsetbv_safe(0, supported_xcr0);
- 	__GUEST_ASSERT(!vector,
--		       "Expected success on XSETBV(0x%lx), got vector '0x%x'",
--		       supported_xcr0, vector);
-+		       "Expected success on XSETBV(0x%lx), got %s",
-+		       supported_xcr0, ex_str(vector));
- 
- 	for (i = 0; i < 64; i++) {
- 		if (supported_xcr0 & BIT_ULL(i))
-@@ -95,8 +95,8 @@ static void guest_code(void)
- 
- 		vector = xsetbv_safe(0, supported_xcr0 | BIT_ULL(i));
- 		__GUEST_ASSERT(vector == GP_VECTOR,
--			       "Expected #GP on XSETBV(0x%llx), supported XCR0 = %lx, got vector '0x%x'",
--			       BIT_ULL(i), supported_xcr0, vector);
-+			       "Expected #GP on XSETBV(0x%llx), supported XCR0 = %lx, got %s",
-+			       BIT_ULL(i), supported_xcr0, ex_str(vector));
- 	}
- 
- 	GUEST_DONE();
++static void host_test_msr(struct kvm_vcpu *vcpu, u64 guest_val)
++{
++	u64 reset_val = msrs[idx].reset_val;
++	u32 msr = msrs[idx].index;
++	u64 val;
++
++	if (!kvm_cpu_has(msrs[idx].feature))
++		return;
++
++	val = vcpu_get_msr(vcpu, msr);
++	TEST_ASSERT(val == guest_val, "Wanted 0x%lx from get_msr(0x%x), got 0x%lx",
++		    guest_val, msr, val);
++
++	vcpu_set_msr(vcpu, msr, reset_val);
++
++	val = vcpu_get_msr(vcpu, msr);
++	TEST_ASSERT(val == reset_val, "Wanted 0x%lx from get_msr(0x%x), got 0x%lx",
++		    reset_val, msr, val);
++}
++
++static void do_vcpu_run(struct kvm_vcpu *vcpu)
++{
++	struct ucall uc;
++
++	for (;;) {
++		vcpu_run(vcpu);
++
++		switch (get_ucall(vcpu, &uc)) {
++		case UCALL_SYNC:
++			host_test_msr(vcpu, uc.args[1]);
++			return;
++		case UCALL_PRINTF:
++			pr_info("%s", uc.buffer);
++			break;
++		case UCALL_ABORT:
++			REPORT_GUEST_ASSERT(uc);
++		case UCALL_DONE:
++			TEST_FAIL("Unexpected UCALL_DONE");
++		default:
++			TEST_FAIL("Unexpected ucall: %lu", uc.cmd);
++		}
++	}
++}
++
++static void __vcpus_run(struct kvm_vcpu **vcpus, const int NR_VCPUS)
++{
++	int i;
++
++	for (i = 0; i < NR_VCPUS; i++)
++		do_vcpu_run(vcpus[i]);
++}
++
++static void vcpus_run(struct kvm_vcpu **vcpus, const int NR_VCPUS)
++{
++	__vcpus_run(vcpus, NR_VCPUS);
++	__vcpus_run(vcpus, NR_VCPUS);
++}
++
++#define MISC_ENABLES_RESET_VAL (MSR_IA32_MISC_ENABLE_PEBS_UNAVAIL | MSR_IA32_MISC_ENABLE_BTS_UNAVAIL)
++
++static void test_msrs(void)
++{
++	const struct kvm_msr __msrs[] = {
++		MSR_TEST_NON_ZERO(MSR_IA32_MISC_ENABLE,
++				  MISC_ENABLES_RESET_VAL | MSR_IA32_MISC_ENABLE_FAST_STRING,
++				  MSR_IA32_MISC_ENABLE_FAST_STRING, MISC_ENABLES_RESET_VAL, NONE),
++		MSR_TEST_NON_ZERO(MSR_IA32_CR_PAT, 0x07070707, 0, 0x7040600070406, NONE),
++
++		MSR_TEST(MSR_IA32_SYSENTER_CS, 0x1234, 0, NONE),
++		/*
++		 * SYSENTER_{ESP,EIP} are technically non-canonical on Intel,
++		 * but KVM doesn't emulate that behavior on emulated writes,
++		 * i.e. this test will observe different behavior if the MSR
++		 * writes are handed by hardware vs. KVM.  KVM's behavior is
++		 * intended (though far from ideal), so don't bother testing
++		 * non-canonical values.
++		 */
++		MSR_TEST(MSR_IA32_SYSENTER_ESP, canonical_val, 0, NONE),
++		MSR_TEST(MSR_IA32_SYSENTER_EIP, canonical_val, 0, NONE),
++
++		MSR_TEST_CANONICAL(MSR_FS_BASE, LM),
++		MSR_TEST_CANONICAL(MSR_GS_BASE, LM),
++		MSR_TEST_CANONICAL(MSR_KERNEL_GS_BASE, LM),
++		MSR_TEST_CANONICAL(MSR_LSTAR, LM),
++		MSR_TEST_CANONICAL(MSR_CSTAR, LM),
++		MSR_TEST(MSR_SYSCALL_MASK, 0xffffffff, 0, LM),
++
++		MSR_TEST_CANONICAL(MSR_IA32_PL0_SSP, SHSTK),
++		MSR_TEST(MSR_IA32_PL0_SSP, canonical_val, canonical_val | 1, SHSTK),
++		MSR_TEST_CANONICAL(MSR_IA32_PL1_SSP, SHSTK),
++		MSR_TEST(MSR_IA32_PL1_SSP, canonical_val, canonical_val | 1, SHSTK),
++		MSR_TEST_CANONICAL(MSR_IA32_PL2_SSP, SHSTK),
++		MSR_TEST(MSR_IA32_PL2_SSP, canonical_val, canonical_val | 1, SHSTK),
++		MSR_TEST_CANONICAL(MSR_IA32_PL3_SSP, SHSTK),
++		MSR_TEST(MSR_IA32_PL3_SSP, canonical_val, canonical_val | 1, SHSTK),
++	};
++
++	/*
++	 * Create two vCPUs, but run them on the same task, to validate KVM's
++	 * context switching of MSR state.  Don't pin the task to a pCPU to
++	 * also validate KVM's handling of cross-pCPU migration.
++	 */
++	const int NR_VCPUS = 2;
++	struct kvm_vcpu *vcpus[NR_VCPUS];
++	struct kvm_vm *vm;
++
++	kvm_static_assert(sizeof(__msrs) <= sizeof(msrs));
++	kvm_static_assert(ARRAY_SIZE(__msrs) <= ARRAY_SIZE(msrs));
++	memcpy(msrs, __msrs, sizeof(__msrs));
++
++	vm = vm_create_with_vcpus(NR_VCPUS, guest_main, vcpus);
++
++	sync_global_to_guest(vm, msrs);
++
++	for (idx = 0; idx < ARRAY_SIZE(__msrs); idx++) {
++		sync_global_to_guest(vm, idx);
++
++		vcpus_run(vcpus, NR_VCPUS);
++		vcpus_run(vcpus, NR_VCPUS);
++	}
++
++	kvm_vm_free(vm);
++}
++
++int main(void)
++{
++	test_msrs();
++}
 -- 
 2.51.0.384.g4c02a37b29-goog
 
