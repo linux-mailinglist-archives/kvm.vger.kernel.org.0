@@ -1,139 +1,220 @@
-Return-Path: <kvm+bounces-57442-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-57443-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5B93BB559C8
-	for <lists+kvm@lfdr.de>; Sat, 13 Sep 2025 00:56:16 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2B019B559F9
+	for <lists+kvm@lfdr.de>; Sat, 13 Sep 2025 01:23:46 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4F5CAA06E24
-	for <lists+kvm@lfdr.de>; Fri, 12 Sep 2025 22:55:53 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 549937BC015
+	for <lists+kvm@lfdr.de>; Fri, 12 Sep 2025 23:22:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C8271286D7F;
-	Fri, 12 Sep 2025 22:55:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2CDBC28469E;
+	Fri, 12 Sep 2025 23:23:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="UjoqhsHB"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="Dzpi781M"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pg1-f202.google.com (mail-pg1-f202.google.com [209.85.215.202])
+Received: from mail-pf1-f202.google.com (mail-pf1-f202.google.com [209.85.210.202])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8DB442848B4
-	for <kvm@vger.kernel.org>; Fri, 12 Sep 2025 22:55:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ADA4027F73A
+	for <kvm@vger.kernel.org>; Fri, 12 Sep 2025 23:23:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757717731; cv=none; b=MsXHl7YToLQJWPDrGGPWRojJ1eQlktA7rJTiKE+SqbKKb99HABkKIBgIbavVftIRcqjP2fRULwrcMLdqgNB71GCY6qJpopUr/TSI0T8TW96qtk6sQL28V3XjtNHHLIBbA9aJtI+X2A56zF6AN5c7FsIx+kKUAa2wQZJm6u2t4bw=
+	t=1757719407; cv=none; b=mMbp5EdPD7Egvhs9iankL4VE7ZGgZhUSCfcf67IzWiKux/mq9e4xF+9ioTiXsDyuj5l4FJUqQAoMQI2dFPW+xlbDGjcLFNIceopwDC16+wNn5gg/gpKmbJDjMyhSx4LGaJKlk+RQpiW8oFMnCLxl1xBHA9iAU5Ra2cBwFnTkJCs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757717731; c=relaxed/simple;
-	bh=s81gDgnQeGccrS8LsVmeNH8hG65sh8m34+oHvpgsrrI=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=n55/iroFDJep1QcdrfCEtyperljJhblCviFSGBcNwK+YXmGmghUE4tu+cbxyQp9Vc/XyHhaCU/t2b2gflcryevkwap1KbfWQdtFzCkdFdjYQwmkfCUs9ijq/wrBn/POC8XXIveL9WdLLBvoKtCS+GfoxtTitnawcr5J9aUDywvU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=UjoqhsHB; arc=none smtp.client-ip=209.85.215.202
+	s=arc-20240116; t=1757719407; c=relaxed/simple;
+	bh=14Rc4mUmRilr9Ego6yqIcU+/4YK/OwLFOoZZkRgN3Sw=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=IbDht+hbklpp9w+lsPp5q9rmUHn/xRB5SKamSVhJKEbq30sK9RY+byVXgLrxlmpoMvliZKG5tSdqaFMBwhGN5Is72NzAYKLz/0hC0Nic+KwBmq0zInsFjQzbSrCydeGzGOsrcGFZuIm6HlLgLyTO0b1QXX1asTAa6wwT2X6LTUY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=Dzpi781M; arc=none smtp.client-ip=209.85.210.202
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pg1-f202.google.com with SMTP id 41be03b00d2f7-b47174bdce2so1722023a12.2
-        for <kvm@vger.kernel.org>; Fri, 12 Sep 2025 15:55:28 -0700 (PDT)
+Received: by mail-pf1-f202.google.com with SMTP id d2e1a72fcca58-77260b29516so4706976b3a.3
+        for <kvm@vger.kernel.org>; Fri, 12 Sep 2025 16:23:25 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1757717727; x=1758322527; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=M5UxjIlsEgvTF8daNW02GCq6jap774PItnDVhlq0f8c=;
-        b=UjoqhsHBA61DXGARwcZ/ROhWFgX4maQIWYOp5mN9IV3MW0X5MWk7xdLBpAeRRCMmUK
-         pdtcq2WVt3/qkLjJy9J4cbCRWaBCMWFzWpzRdYMot1MRQiRG3sb8w3/27juv7qVbFYHD
-         p4R5d/5O4cL34/hsCTStpRuAb41nW1UjuS5qxnKIlCnCRbMd9WWGP7T9wExKM+SvAby2
-         IokeMJjXzdMt8PFiw7++y+hFWdQSmw1pY2ovq8Es0v565lb0OVyNLKcAipNole5ZySiw
-         eH236h9HrPy7L/UA9CV+ZpzJ77BMC+Cow0MV1BopuB/yQaptc+ynze6vcxiSUpFUfOps
-         j8sQ==
+        d=google.com; s=20230601; t=1757719405; x=1758324205; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:mime-version:date:reply-to:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=kubXxZpXHDaOpO9GizDKWhMEt5cYzJPmZ1HT1Xnw+ZU=;
+        b=Dzpi781MprY0gtjirDtSxHNRsx/dm9Qzqlctbop1AfQEMWSmyAedb1vxRebmVEveyb
+         tvH0VlinOUqscNV8Z28SmFRRSbW28fVfCOXkSeXdTyj+CDb/ywmXbJmonFpWMmA65+BW
+         P6rXK0Dct5sGtPHgFO81dIElqceJkZQPy+pRoXDylIUaLj+EkXKghsxGA5zRodeAz5Du
+         J/PpzWmShswnk58wvVrWH6i/hCr05degrW+N9gbwxJu+8c3MJNVw3aW4p7n+IMtLjtfl
+         XBzccvFusmprNtNi27fCBFdnfrwCTIXY36clhT2FEg+AJHJQxClOtC9JZBbkja06f2Bf
+         0hhg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1757717727; x=1758322527;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=M5UxjIlsEgvTF8daNW02GCq6jap774PItnDVhlq0f8c=;
-        b=geyYDRUKuFFl5L5j2UIYxc7mEdOPDiuVvqkxdkcrXtl8j5BEd8+TLWMkIEepkj4i/j
-         3aAeIOWkBKJIBUwZ70UL0XTTyddtFW1uPbLQuNWgtRgAGhgP5paZx8LtIaFETGvd4T8R
-         dwpj2s55v+FkXNzfak8CwW6dt7zQj1XYEc8SWM5x7fECm3ECgzp6KtJ4ICnTuw+yTFbk
-         1/++W7rN7kuAi1zSkLKI+SqQqCngryeggH4dd9IPxJxhfJZM9SvPuEz30ON53YK1OrIb
-         +vk/EUxpWQC0LEj+rCCQrVC+6ZmbKKhXioD9NVO3QMB5G83YTXhffog5ORIOFFTpuiwJ
-         QGiQ==
-X-Gm-Message-State: AOJu0YyMO0ZBHJiExO5CiG9y2fxEfR8NenoS1pRGBhLOsYvUMzinur85
-	tMjIPGpDP2M8TRqrBiGu2IKAfgY4FPl5qazhejD1Bg27zA+leGTVeudC6CNdpiJiFYu8cNhpfzv
-	dwAn6OQ==
-X-Google-Smtp-Source: AGHT+IEBFW2+no450hTjR9z5hEWHspR3hha0vnhjysBUIwJUVLZG1hVKgUXc1l4Dd+5wBSZ/IjDFCVmvLWg=
-X-Received: from plbja20.prod.google.com ([2002:a17:902:efd4:b0:25c:a8a8:add6])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:902:f60d:b0:25d:df7a:b1a2
- with SMTP id d9443c01a7336-25ddf7ab591mr33868625ad.5.1757717727608; Fri, 12
- Sep 2025 15:55:27 -0700 (PDT)
-Date: Fri, 12 Sep 2025 15:55:25 -0700
-In-Reply-To: <20250908201750.98824-2-john.allen@amd.com>
+        d=1e100.net; s=20230601; t=1757719405; x=1758324205;
+        h=cc:to:from:subject:message-id:mime-version:date:reply-to
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=kubXxZpXHDaOpO9GizDKWhMEt5cYzJPmZ1HT1Xnw+ZU=;
+        b=F+RwLUAk+4sXRKahdMcKQn2VEUv4c3jDQB8eSQVZGE+kEqTMpqn4FXCb74oI1Bfvac
+         ZSARQuRF2y+tuak24HcR4OBDt7IZHsnf1i7LkPyAVOktU9sqAQFani0HEC44xXEDWqqt
+         bspn3oVdi76Z1/Gp0FIXd0gfCAhZHyfFpiHmqx4f/eSCW5/EPdHOtzowdoF6k1u64T0t
+         iQ6SdF7TV9tRj6ww61M6M+ezRppZS+IUJdcKL1yOWwh0jPjVWUUjKeXh4pp7LNEbD4RC
+         rfeTH2Py/pd9ObQKqFZ+fs/kDRqjSwFPVpxDh1kfoJ1L+8SCsCbcVRNlpRf5LEnKtRQI
+         sMzA==
+X-Gm-Message-State: AOJu0YzED+VXbt+xXTgmw+jITRI52NOGJ93u3KUEc+ALyfV8rKvr9AAI
+	VAQA7I2UL/Tf+V2YSq32NcPpi88+/5H0rJJmiiQ0GDYCsvDMK+uOZTACVLJSZH/b8cl0Y7y95em
+	sKXALXA==
+X-Google-Smtp-Source: AGHT+IFeKAgDTFsHmtJYEfy+u63LVZM9vhhHya2fp64ilql1pmY6B8TrVhx6wuWjZ/UoqKZtA4WXCHEDA1s=
+X-Received: from pfbcv5.prod.google.com ([2002:a05:6a00:44c5:b0:772:38cc:6145])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a05:6a00:4b53:b0:771:fdd9:efa0
+ with SMTP id d2e1a72fcca58-7761216c32bmr6336983b3a.15.1757719404835; Fri, 12
+ Sep 2025 16:23:24 -0700 (PDT)
+Reply-To: Sean Christopherson <seanjc@google.com>
+Date: Fri, 12 Sep 2025 16:22:38 -0700
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
-References: <20250908201750.98824-1-john.allen@amd.com> <20250908201750.98824-2-john.allen@amd.com>
-Message-ID: <aMSk3fY7XzScBuOx@google.com>
-Subject: Re: [PATCH v4 1/5] KVM: x86: SVM: Emulate reads and writes to shadow
- stack MSRs
+X-Mailer: git-send-email 2.51.0.384.g4c02a37b29-goog
+Message-ID: <20250912232319.429659-1-seanjc@google.com>
+Subject: [PATCH v15 00/41] KVM: x86: Mega-CET
 From: Sean Christopherson <seanjc@google.com>
-To: John Allen <john.allen@amd.com>
-Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org, x86@kernel.org, 
-	pbonzini@redhat.com, dave.hansen@intel.com, rick.p.edgecombe@intel.com, 
-	mlevitsk@redhat.com, weijiang.yang@intel.com, chao.gao@intel.com, 
-	bp@alien8.de, dave.hansen@linux.intel.com, hpa@zytor.com, mingo@redhat.com, 
-	tglx@linutronix.de, thomas.lendacky@amd.com
-Content-Type: text/plain; charset="us-ascii"
+To: Paolo Bonzini <pbonzini@redhat.com>, Sean Christopherson <seanjc@google.com>
+Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	Tom Lendacky <thomas.lendacky@amd.com>, Mathias Krause <minipli@grsecurity.net>, 
+	John Allen <john.allen@amd.com>, Rick Edgecombe <rick.p.edgecombe@intel.com>, 
+	Chao Gao <chao.gao@intel.com>, Maxim Levitsky <mlevitsk@redhat.com>, 
+	Xiaoyao Li <xiaoyao.li@intel.com>, Zhang Yi Z <yi.z.zhang@linux.intel.com>
+Content-Type: text/plain; charset="UTF-8"
 
-On Mon, Sep 08, 2025, John Allen wrote:
-> Emulate shadow stack MSR access by reading and writing to the
-> corresponding fields in the VMCB.
-> 
-> Signed-off-by: John Allen <john.allen@amd.com>
-> ---
->  arch/x86/kvm/svm/svm.c | 18 ++++++++++++++++++
->  1 file changed, 18 insertions(+)
-> 
-> diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
-> index e4af4907c7d8..fee60f3378e1 100644
-> --- a/arch/x86/kvm/svm/svm.c
-> +++ b/arch/x86/kvm/svm/svm.c
-> @@ -2767,6 +2767,15 @@ static int svm_get_msr(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
->  		if (guest_cpuid_is_intel_compatible(vcpu))
->  			msr_info->data |= (u64)svm->sysenter_esp_hi << 32;
->  		break;
-> +	case MSR_IA32_S_CET:
-> +		msr_info->data = svm->vmcb->save.s_cet;
-> +		break;
-> +	case MSR_IA32_INT_SSP_TAB:
-> +		msr_info->data = svm->vmcb->save.isst_addr;
-> +		break;
-> +	case MSR_KVM_INTERNAL_GUEST_SSP:
-> +		msr_info->data = svm->vmcb->save.ssp;
-> +		break;
->  	case MSR_TSC_AUX:
->  		msr_info->data = svm->tsc_aux;
->  		break;
-> @@ -2999,6 +3008,15 @@ static int svm_set_msr(struct kvm_vcpu *vcpu, struct msr_data *msr)
->  		svm->vmcb01.ptr->save.sysenter_esp = (u32)data;
->  		svm->sysenter_esp_hi = guest_cpuid_is_intel_compatible(vcpu) ? (data >> 32) : 0;
->  		break;
-> +	case MSR_IA32_S_CET:
-> +		svm->vmcb->save.s_cet = data;
+This series is (hopefully) all of the in-flight CET virtualization patches
+in one big bundle.  Please holler if I missed a patch or three as this is what
+I am planning on applying for 6.18 (modulo fixups and whatnot), i.e. if there's
+something else that's needed to enable CET virtualization, now's the time...
 
-These writes should mark VMCB_CET (the dirty/clean flag) dirty, and obviously
-KVM should mark VMCB_CET clean along with everything else on #VMEXIT.
+Patches 1-3 probably need the most attention, as they are new in v15 and I
+don't have a fully working SEV-ES setup (don't have the right guest firmware,
+ugh).  Though testing on everything would be much appreciated.
 
-> +		break;
-> +	case MSR_IA32_INT_SSP_TAB:
-> +		svm->vmcb->save.isst_addr = data;
-> +		break;
-> +	case MSR_KVM_INTERNAL_GUEST_SSP:
-> +		svm->vmcb->save.ssp = data;
-> +		break;
->  	case MSR_TSC_AUX:
->  		/*
->  		 * TSC_AUX is always virtualized for SEV-ES guests when the
-> -- 
-> 2.47.3
-> 
+I kept almost all Tested-by tags even for patches that I massaged a bit, and
+only dropped tags for the "don't emulate CET stuff" patch.  In theory, the
+changes I've made *should* be benign.  Please yell, loudly, if I broken
+something and/or you want me to drop your Tested-by.
+
+v15:
+ - Collect reviews (hopefully I got 'em all).
+ - Add support for KVM_GET_REG_LIST.
+ - Load FPU when accessing XSTATE MSRs via ONE_REG ioctls.
+ - Explicitly return -EINVAL on kvm_set_one_msr() failure.
+ - Make is_xstate_managed_msr() more precise (check guest caps).
+ - Dedup guts of kvm_{g,s}et_xstate_msr() (as kvm_access_xstate_msr()).
+ - WARN if KVM uses kvm_access_xstate_msr() to access an MSR that isn't
+   managed via XSAVE.
+ - Document why S_CET isn't treated as an XSTATE-managed MSR.
+ - Mark VMCB_CET as clean/dirty as appropriate.
+ - Add nSVM support for the CET VMCB fields.
+ - Add an "msrs" selftest to coverage ONE_REG and host vs. guest accesses in
+   general.
+ - Add patches to READ_ONCE() guest-writable GHCB fields, and to check the
+   validity of XCR0 "writes".
+ - Check the validity of XSS "writes" via common MSR emulation.
+ - Add {CP,HV,VC,SV}_VECTOR definitions so that tracing and selftests can
+   pretty print them.
+ - Add pretty printing for unexpected exceptions in selftests.
+ - Tweak the emulator rejection to be more precise (grab S_CET vs. U_CET based
+   CPL for near transfers), and to avoid unnecessary reads of CR4, S_CET, and
+   U_CET.
+
+Intel (v14): https://lkml.kernel.org/r/20250909093953.202028-1-chao.gao%40intel.com
+AMD    (v4): https://lore.kernel.org/all/20250908201750.98824-1-john.allen@amd.com
+grsec  (v3): https://lkml.kernel.org/r/20250813205957.14135-1-minipli%40grsecurity.net
+
+Chao Gao (4):
+  KVM: x86: Check XSS validity against guest CPUIDs
+  KVM: nVMX: Add consistency checks for CR0.WP and CR4.CET
+  KVM: nVMX: Add consistency checks for CET states
+  KVM: nVMX: Advertise new VM-Entry/Exit control bits for CET state
+
+John Allen (4):
+  KVM: x86: SVM: Emulate reads and writes to shadow stack MSRs
+  KVM: x86: SVM: Update dump_vmcb with shadow stack save area additions
+  KVM: x86: SVM: Pass through shadow stack MSRs as appropriate
+  KVM: SVM: Enable shadow stack virtualization for SVM
+
+Mathias Krause (1):
+  KVM: VMX: Make CR4.CET a guest owned bit
+
+Sean Christopherson (17):
+  KVM: SEV: Rename kvm_ghcb_get_sw_exit_code() to
+    kvm_get_cached_sw_exit_code()
+  KVM: SEV: Read save fields from GHCB exactly once
+  KVM: SEV: Validate XCR0 provided by guest in GHCB
+  KVM: x86: Report XSS as to-be-saved if there are supported features
+  KVM: x86: Load guest FPU state when access XSAVE-managed MSRs
+  KVM: nSVM: Save/load CET Shadow Stack state to/from vmcb12/vmcb02
+  KVM: SEV: Synchronize MSR_IA32_XSS from the GHCB when it's valid
+  KVM: x86: Add human friendly formatting for #XM, and #VE
+  KVM: x86: Define Control Protection Exception (#CP) vector
+  KVM: x86: Define AMD's #HV, #VC, and #SX exception vectors
+  KVM: selftests: Add ex_str() to print human friendly name of exception
+    vectors
+  KVM: selftests: Add an MSR test to exercise guest/host and read/write
+  KVM: selftests: Add support for MSR_IA32_{S,U}_CET to MSRs test
+  KVM: selftests: Extend MSRs test to validate vCPUs without supported
+    features
+  KVM: selftests: Add KVM_{G,S}ET_ONE_REG coverage to MSRs test
+  KVM: selftests: Add coverate for KVM-defined registers in MSRs test
+  KVM: selftests: Verify MSRs are (not) in save/restore list when
+    (un)supported
+
+Yang Weijiang (15):
+  KVM: x86: Introduce KVM_{G,S}ET_ONE_REG uAPIs support
+  KVM: x86: Refresh CPUID on write to guest MSR_IA32_XSS
+  KVM: x86: Initialize kvm_caps.supported_xss
+  KVM: x86: Add fault checks for guest CR4.CET setting
+  KVM: x86: Report KVM supported CET MSRs as to-be-saved
+  KVM: VMX: Introduce CET VMCS fields and control bits
+  KVM: x86: Enable guest SSP read/write interface with new uAPIs
+  KVM: VMX: Emulate read and write to CET MSRs
+  KVM: x86: Save and reload SSP to/from SMRAM
+  KVM: VMX: Set up interception for CET MSRs
+  KVM: VMX: Set host constant supervisor states to VMCS fields
+  KVM: x86: Don't emulate instructions affected by CET features
+  KVM: x86: Enable CET virtualization for VMX and advertise to userspace
+  KVM: nVMX: Virtualize NO_HW_ERROR_CODE_CC for L1 event injection to L2
+  KVM: nVMX: Prepare for enabling CET support for nested guest
+
+ Documentation/virt/kvm/api.rst                |  14 +-
+ arch/x86/include/asm/kvm_host.h               |   6 +-
+ arch/x86/include/asm/vmx.h                    |   9 +
+ arch/x86/include/uapi/asm/kvm.h               |  34 ++
+ arch/x86/kvm/cpuid.c                          |  17 +-
+ arch/x86/kvm/emulate.c                        |  58 ++-
+ arch/x86/kvm/kvm_cache_regs.h                 |   3 +-
+ arch/x86/kvm/smm.c                            |   8 +
+ arch/x86/kvm/smm.h                            |   2 +-
+ arch/x86/kvm/svm/nested.c                     |  20 +
+ arch/x86/kvm/svm/sev.c                        |  23 +-
+ arch/x86/kvm/svm/svm.c                        |  46 +-
+ arch/x86/kvm/svm/svm.h                        |  30 +-
+ arch/x86/kvm/trace.h                          |   5 +-
+ arch/x86/kvm/vmx/capabilities.h               |   9 +
+ arch/x86/kvm/vmx/nested.c                     | 163 ++++++-
+ arch/x86/kvm/vmx/nested.h                     |   5 +
+ arch/x86/kvm/vmx/vmcs12.c                     |   6 +
+ arch/x86/kvm/vmx/vmcs12.h                     |  14 +-
+ arch/x86/kvm/vmx/vmx.c                        |  84 +++-
+ arch/x86/kvm/vmx/vmx.h                        |   9 +-
+ arch/x86/kvm/x86.c                            | 362 +++++++++++++-
+ arch/x86/kvm/x86.h                            |  37 ++
+ tools/testing/selftests/kvm/Makefile.kvm      |   1 +
+ .../selftests/kvm/include/x86/processor.h     |   2 +
+ .../testing/selftests/kvm/lib/x86/processor.c |  33 ++
+ .../selftests/kvm/x86/hyperv_features.c       |  16 +-
+ tools/testing/selftests/kvm/x86/msrs_test.c   | 440 ++++++++++++++++++
+ .../selftests/kvm/x86/vmx_pmu_caps_test.c     |   4 +-
+ .../selftests/kvm/x86/xcr0_cpuid_test.c       |  12 +-
+ 30 files changed, 1382 insertions(+), 90 deletions(-)
+ create mode 100644 tools/testing/selftests/kvm/x86/msrs_test.c
+
+
+base-commit: b33f3c899e27cad5a62b15f9e3724fb5e61378c4
+-- 
+2.51.0.384.g4c02a37b29-goog
+
 
