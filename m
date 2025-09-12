@@ -1,71 +1,71 @@
-Return-Path: <kvm+bounces-57456-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-57457-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id AEC15B55A15
-	for <lists+kvm@lfdr.de>; Sat, 13 Sep 2025 01:27:53 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 27067B55A16
+	for <lists+kvm@lfdr.de>; Sat, 13 Sep 2025 01:28:14 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 65630AE04F5
-	for <lists+kvm@lfdr.de>; Fri, 12 Sep 2025 23:27:52 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D5D6CAE0FA8
+	for <lists+kvm@lfdr.de>; Fri, 12 Sep 2025 23:28:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5B32B2D6E71;
-	Fri, 12 Sep 2025 23:23:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C8C182D7DCE;
+	Fri, 12 Sep 2025 23:23:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="r1d5NAvx"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="NjE7J40C"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pf1-f201.google.com (mail-pf1-f201.google.com [209.85.210.201])
+Received: from mail-pj1-f74.google.com (mail-pj1-f74.google.com [209.85.216.74])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CD5272D5436
-	for <kvm@vger.kernel.org>; Fri, 12 Sep 2025 23:23:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4263D2D5959
+	for <kvm@vger.kernel.org>; Fri, 12 Sep 2025 23:23:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.74
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757719430; cv=none; b=BsVHxckJof73hOsbMz4XCm5ZQbEp8tlcG5ZWDO9zx1SxGq6cMHaHMLI8ljsc8znWwxgo/MDT2jD3VFrV7Futq+3BtXlUaCc8BD+TRh9ZOWKYgdHWriwpYVnfwpVo8IvOd4RBzUdnR776MOs+GzLRjjDMAeO4Q+Qptl0qsgGRk34=
+	t=1757719431; cv=none; b=aoMv52IC8TMSbn3GlK3BbbuUdBTSIl26m82PQM7A+ytJH9DKRfABYkBmxa8l58qA1GQr7aiMHZohm2DdnUE1qvJgl1jHAtAOKqJxXCz8i4G+O9+zX/oiKvOTQr/mrq2TiOMStRPE27dz5gpZQjdR34/i15CLlSrw15py3BipozI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757719430; c=relaxed/simple;
-	bh=985mQqULIGpufOuzaAVFSt7yUo06RAYS1zBwm4OIB80=;
+	s=arc-20240116; t=1757719431; c=relaxed/simple;
+	bh=vQDdu1zHF4bPFrrDNQxsUDgUl3nDRRZ82FO95++Z81I=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=YhTQE8739bGXGAv4+3VayKFR5qGhmrld6WWmw//6q2QunNBqLjj8F/eivpsZkIxMeuy+++Mg7ocyVLnswtIpgF6M2bCPkX5K3I6ahh5BM2jc3kxvXhz1dbzq5P3LMl/NT3VBk974oiikT+ERF20BdMEsceIns93xCxme2Pe705M=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=r1d5NAvx; arc=none smtp.client-ip=209.85.210.201
+	 To:Cc:Content-Type; b=ThWHIildMaAXgMHaHiw2dnAoyeErkfOZDRWWRQr6ROBoQqT/Irt+/+fnMzDD6XxaltCGfajk/n13pqDv3Tr1fnV89veC+ZTKDLSUaTP//Lw4SACdgjX8KPj/YVM5mGiDSoTlLZehkW6EpVbaEBQHCmpVYVeosDUfrv8vNMxv1KM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=NjE7J40C; arc=none smtp.client-ip=209.85.216.74
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pf1-f201.google.com with SMTP id d2e1a72fcca58-77260b29516so4707455b3a.3
-        for <kvm@vger.kernel.org>; Fri, 12 Sep 2025 16:23:48 -0700 (PDT)
+Received: by mail-pj1-f74.google.com with SMTP id 98e67ed59e1d1-32b57b0aa25so2525341a91.0
+        for <kvm@vger.kernel.org>; Fri, 12 Sep 2025 16:23:50 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1757719428; x=1758324228; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1757719430; x=1758324230; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:reply-to:from:to:cc:subject:date:message-id:reply-to;
-        bh=EGYFfxiDLtJ7q4NwudFUxWdrWn2kGXus37phRe1p0h4=;
-        b=r1d5NAvxKqmBTnUfjQtH4DnKocTiyZYfNhlMmERlKmyi7MzgvpOE3ygb2Gsjl+CDAq
-         opPYhZ2F+JI0q02wjm5B0NdjewenzS4BQGP2IThFGQDdD4g6hHSf32F6s6gd5tGyDAh8
-         qN/zJyQnzy3eBjtS+fZCw44iRxH7ML1eC0eZtu5nn/ZyBxcnrfwWsDFkP47pED7EHHfZ
-         p6q/ygdfS4yevQvfLKqcO7nUIXp3Qps3iVlHL16A/uWM6ATStKJk8xXLwJx3ry+mUViX
-         V2nyu9Fr+fvTRVHxbVrqOTbxcbwXxxjKZN1Se28yFgvnfbye6bYnnfQlQe+06qwq3IJP
-         nDcQ==
+        bh=tsK8S7ainZOuiq7DM/VWeS+FQWWRgudnHijGojTqtSE=;
+        b=NjE7J40CbkboexwUpkOVNsySS7jfEvBIcJ9SLkjIMvRAyC1C/QNC93TzI9QxHjMA4u
+         3r9GAMr7W+8SKm37PxZo+XfzmkekQn4+LlN5MfELwrS56UGuaJBmyuaViIENEziLtIup
+         L+YdMJN2vDfJFHugcxNqr+I5rhwYnvp2M8anMknkJPsAbTLF2UJ1l1cNec1v8tVs/I2+
+         ed26fka81WYQQlRWSDWxThbZIWIAmwSQjtystieDgNdnzYnu5pcXaAdxd1oGg0PwyjeP
+         DQRBvTTKVINWcRPhf4X+la3NV4hzlkMC0N3Z8HhWqw59syAY2dktdN1pQ+P4ZaH5w4J4
+         3bdQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1757719428; x=1758324228;
+        d=1e100.net; s=20230601; t=1757719430; x=1758324230;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:reply-to:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=EGYFfxiDLtJ7q4NwudFUxWdrWn2kGXus37phRe1p0h4=;
-        b=heUlzr83uGXf6u3tj4sOsurk5/FuDCyLeagHrxSMbSP9+AasIKnBqwXxrAIriWYmE5
-         pRIvJBrnqspqhWAwmMbUdul7pGQJZpmX6vUGmwsWecPH4PL9lOfREqgU8L0PcTVEtvqA
-         S8mMDgyoImFSAdQYno+3zdmLNUQXATp51hTUJeJXLwajSF7B2H++OogGFZIKMrxbDsTQ
-         WpDrE+yq3MjXA64Bqhljnv86jDXXe7W0QdXZxj0mUs8V0FeormrTn6cTrPVsDCZvfyaP
-         71Ez/EF4KqQ5Snq3xAK1XZpT5pLFSynJhCyQIUPwpWWOy2fJcM4p+Ym/pkquJcHpG32J
-         RcOQ==
-X-Gm-Message-State: AOJu0YzKYkGwzROqHszxDAY2m2yVpcz/llGBSZp850CiaqB5cen3M1IP
-	TvjYX2KZzYSfE4FJke0cEOkMD4/0rhmgcejsicfik0mAROjsJT6HBbUyKTIQElynIwdazEleTYu
-	9DZ65Bg==
-X-Google-Smtp-Source: AGHT+IF3EsKj/KEE1isiWP6uA4W6JiQbK2d3C0u8tqB9rJOm/OOK+jqg062W5TZ7UziXwYy9ajwdI76c0fw=
-X-Received: from pjbee16.prod.google.com ([2002:a17:90a:fc50:b0:32b:5ea2:778])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a05:6a20:9186:b0:243:15b9:765b
- with SMTP id adf61e73a8af0-2602cd11f0fmr5877361637.53.1757719428215; Fri, 12
- Sep 2025 16:23:48 -0700 (PDT)
+        bh=tsK8S7ainZOuiq7DM/VWeS+FQWWRgudnHijGojTqtSE=;
+        b=qt3Nmp+7an5GeDDstjjWFmzUSFaAzpEXWoJxy2G/uDqsGlSH0gGXAGvym+40gnWMId
+         z7X7REiWZZFb2Pu0jrcbVURi1DhrA8UMz1tKTqt7OQddJeV/EaLnQw9LOeR59v9lYbIU
+         UDX8nv2IeEBfTmUpQv9vG+LFzXg9fwRz+QlIphOYWF4oVDp/ZjCOFeJ9psn1VPwUZvIC
+         S2PHG/PdgEezhWXv7FlVmKRgD0jpSinQtDGeYBOWcye25pzgCTXy0LsaOJyq0zHKuZi3
+         l8gojGqHHlC1O8KkpodIrEIkp3qtQKdm7/E3XvYB1DIumG5C1HKQTXazomxrc1ylE1vr
+         vnEw==
+X-Gm-Message-State: AOJu0YwZsCY9wNyvwMxZfGd+7S0Wyp9xYnPFXqz6rH/LhELv1xMoNavi
+	WhZXvzfpzGxOSfFX7eWv/hw4uH0mCTRZS1exhU633cHMt+k4xHqfuFOGdKGq1k0NApRgRdJ89qG
+	OB5hY6A==
+X-Google-Smtp-Source: AGHT+IFvmwPke7/pDRYXxhNym9lrKDGTafHhCXPfQmEL//L2GNevsjrfbq484QdlEwKFAEmqSAGwTvkqMxo=
+X-Received: from pjj16.prod.google.com ([2002:a17:90b:5550:b0:328:887d:69f0])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:1dd1:b0:32d:dadf:b6ac
+ with SMTP id 98e67ed59e1d1-32de4fb1099mr5747605a91.33.1757719429747; Fri, 12
+ Sep 2025 16:23:49 -0700 (PDT)
 Reply-To: Sean Christopherson <seanjc@google.com>
-Date: Fri, 12 Sep 2025 16:22:51 -0700
+Date: Fri, 12 Sep 2025 16:22:52 -0700
 In-Reply-To: <20250912232319.429659-1-seanjc@google.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
@@ -75,9 +75,8 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
 References: <20250912232319.429659-1-seanjc@google.com>
 X-Mailer: git-send-email 2.51.0.384.g4c02a37b29-goog
-Message-ID: <20250912232319.429659-14-seanjc@google.com>
-Subject: [PATCH v15 13/41] KVM: x86: Enable guest SSP read/write interface
- with new uAPIs
+Message-ID: <20250912232319.429659-15-seanjc@google.com>
+Subject: [PATCH v15 14/41] KVM: VMX: Emulate read and write to CET MSRs
 From: Sean Christopherson <seanjc@google.com>
 To: Paolo Bonzini <pbonzini@redhat.com>, Sean Christopherson <seanjc@google.com>
 Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
@@ -89,14 +88,15 @@ Content-Type: text/plain; charset="UTF-8"
 
 From: Yang Weijiang <weijiang.yang@intel.com>
 
-Enable guest shadow stack pointer(SSP) access interface with new uAPIs.
-CET guest SSP is HW register which has corresponding VMCS field to save
-and restore guest values when VM-{Exit,Entry} happens. KVM handles SSP
-as a fake/synthetic MSR for userspace access.
+Add emulation interface for CET MSR access. The emulation code is split
+into common part and vendor specific part. The former does common checks
+for MSRs, e.g., accessibility, data validity etc., then passes operation
+to either XSAVE-managed MSRs via the helpers or CET VMCS fields.
 
-Use a translation helper to set up mapping for SSP synthetic index and
-KVM-internal MSR index so that userspace doesn't need to take care of
-KVM's management for synthetic MSRs and avoid conflicts.
+SSP can only be read via RDSSP. Writing even requires destructive and
+potentially faulting operations such as SAVEPREVSSP/RSTORSSP or
+SETSSBSY/CLRSSBSY. Let the host use a pseudo-MSR that is just a wrapper
+for the GUEST_SSP field of the VMCS.
 
 Suggested-by: Sean Christopherson <seanjc@google.com>
 Signed-off-by: Yang Weijiang <weijiang.yang@intel.com>
@@ -104,114 +104,189 @@ Tested-by: Mathias Krause <minipli@grsecurity.net>
 Tested-by: John Allen <john.allen@amd.com>
 Tested-by: Rick Edgecombe <rick.p.edgecombe@intel.com>
 Signed-off-by: Chao Gao <chao.gao@intel.com>
-Co-developed-by: Sean Christopherson <seanjc@google.com>
+[sean: drop call to kvm_set_xstate_msr() for S_CET, consolidate code]
 Signed-off-by: Sean Christopherson <seanjc@google.com>
 ---
- Documentation/virt/kvm/api.rst  |  8 ++++++++
- arch/x86/include/uapi/asm/kvm.h |  3 +++
- arch/x86/kvm/x86.c              | 23 +++++++++++++++++++++--
- arch/x86/kvm/x86.h              | 10 ++++++++++
- 4 files changed, 42 insertions(+), 2 deletions(-)
+ arch/x86/kvm/vmx/vmx.c | 18 ++++++++++++
+ arch/x86/kvm/x86.c     | 64 ++++++++++++++++++++++++++++++++++++++++--
+ arch/x86/kvm/x86.h     | 23 +++++++++++++++
+ 3 files changed, 103 insertions(+), 2 deletions(-)
 
-diff --git a/Documentation/virt/kvm/api.rst b/Documentation/virt/kvm/api.rst
-index abd02675a24d..6ae24c5ca559 100644
---- a/Documentation/virt/kvm/api.rst
-+++ b/Documentation/virt/kvm/api.rst
-@@ -2911,6 +2911,14 @@ such as set vcpu counter or reset vcpu, and they have the following id bit patte
- x86 MSR registers have the following id bit patterns::
-   0x2030 0002 <msr number:32>
- 
-+Following are the KVM-defined registers for x86:
-+
-+======================= ========= =============================================
-+    Encoding            Register  Description
-+======================= ========= =============================================
-+  0x2030 0003 0000 0000 SSP       Shadow Stack Pointer
-+======================= ========= =============================================
-+
- 4.69 KVM_GET_ONE_REG
- --------------------
- 
-diff --git a/arch/x86/include/uapi/asm/kvm.h b/arch/x86/include/uapi/asm/kvm.h
-index 508b713ca52e..8cc79eca34b2 100644
---- a/arch/x86/include/uapi/asm/kvm.h
-+++ b/arch/x86/include/uapi/asm/kvm.h
-@@ -437,6 +437,9 @@ struct kvm_xcrs {
- #define KVM_X86_REG_KVM(index)					\
- 	KVM_X86_REG_ENCODE(KVM_X86_REG_TYPE_KVM, index)
- 
-+/* KVM-defined registers starting from 0 */
-+#define KVM_REG_GUEST_SSP	0
-+
- #define KVM_SYNC_X86_REGS      (1UL << 0)
- #define KVM_SYNC_X86_SREGS     (1UL << 1)
- #define KVM_SYNC_X86_EVENTS    (1UL << 2)
+diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
+index 227b45430ad8..4fc1dbba2eb0 100644
+--- a/arch/x86/kvm/vmx/vmx.c
++++ b/arch/x86/kvm/vmx/vmx.c
+@@ -2106,6 +2106,15 @@ int vmx_get_msr(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
+ 		else
+ 			msr_info->data = vmx->pt_desc.guest.addr_a[index / 2];
+ 		break;
++	case MSR_IA32_S_CET:
++		msr_info->data = vmcs_readl(GUEST_S_CET);
++		break;
++	case MSR_KVM_INTERNAL_GUEST_SSP:
++		msr_info->data = vmcs_readl(GUEST_SSP);
++		break;
++	case MSR_IA32_INT_SSP_TAB:
++		msr_info->data = vmcs_readl(GUEST_INTR_SSP_TABLE);
++		break;
+ 	case MSR_IA32_DEBUGCTLMSR:
+ 		msr_info->data = vmx_guest_debugctl_read();
+ 		break;
+@@ -2424,6 +2433,15 @@ int vmx_set_msr(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
+ 		else
+ 			vmx->pt_desc.guest.addr_a[index / 2] = data;
+ 		break;
++	case MSR_IA32_S_CET:
++		vmcs_writel(GUEST_S_CET, data);
++		break;
++	case MSR_KVM_INTERNAL_GUEST_SSP:
++		vmcs_writel(GUEST_SSP, data);
++		break;
++	case MSR_IA32_INT_SSP_TAB:
++		vmcs_writel(GUEST_INTR_SSP_TABLE, data);
++		break;
+ 	case MSR_IA32_PERF_CAPABILITIES:
+ 		if (data & PMU_CAP_LBR_FMT) {
+ 			if ((data & PMU_CAP_LBR_FMT) !=
 diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-index 2c9908bc8b32..460ceae11495 100644
+index 460ceae11495..0b67b1b0e361 100644
 --- a/arch/x86/kvm/x86.c
 +++ b/arch/x86/kvm/x86.c
-@@ -6017,7 +6017,15 @@ struct kvm_x86_reg_id {
+@@ -1890,6 +1890,44 @@ static int __kvm_set_msr(struct kvm_vcpu *vcpu, u32 index, u64 data,
  
- static int kvm_translate_kvm_reg(struct kvm_x86_reg_id *reg)
- {
--	return -EINVAL;
-+	switch (reg->index) {
-+	case KVM_REG_GUEST_SSP:
-+		reg->type = KVM_X86_REG_TYPE_MSR;
-+		reg->index = MSR_KVM_INTERNAL_GUEST_SSP;
+ 		data = (u32)data;
+ 		break;
++	case MSR_IA32_U_CET:
++	case MSR_IA32_S_CET:
++		if (!guest_cpu_cap_has(vcpu, X86_FEATURE_SHSTK) &&
++		    !guest_cpu_cap_has(vcpu, X86_FEATURE_IBT))
++			return KVM_MSR_RET_UNSUPPORTED;
++		if (!kvm_is_valid_u_s_cet(vcpu, data))
++			return 1;
 +		break;
-+	default:
-+		return -EINVAL;
-+	}
-+	return 0;
++	case MSR_KVM_INTERNAL_GUEST_SSP:
++		if (!host_initiated)
++			return 1;
++		fallthrough;
++		/*
++		 * Note that the MSR emulation here is flawed when a vCPU
++		 * doesn't support the Intel 64 architecture. The expected
++		 * architectural behavior in this case is that the upper 32
++		 * bits do not exist and should always read '0'. However,
++		 * because the actual hardware on which the virtual CPU is
++		 * running does support Intel 64, XRSTORS/XSAVES in the
++		 * guest could observe behavior that violates the
++		 * architecture. Intercepting XRSTORS/XSAVES for this
++		 * special case isn't deemed worthwhile.
++		 */
++	case MSR_IA32_PL0_SSP ... MSR_IA32_INT_SSP_TAB:
++		if (!guest_cpu_cap_has(vcpu, X86_FEATURE_SHSTK))
++			return KVM_MSR_RET_UNSUPPORTED;
++		/*
++		 * MSR_IA32_INT_SSP_TAB is not present on processors that do
++		 * not support Intel 64 architecture.
++		 */
++		if (index == MSR_IA32_INT_SSP_TAB && !guest_cpu_cap_has(vcpu, X86_FEATURE_LM))
++			return KVM_MSR_RET_UNSUPPORTED;
++		if (is_noncanonical_msr_address(data, vcpu))
++			return 1;
++		/* All SSP MSRs except MSR_IA32_INT_SSP_TAB must be 4-byte aligned */
++		if (index != MSR_IA32_INT_SSP_TAB && !IS_ALIGNED(data, 4))
++			return 1;
++		break;
+ 	}
+ 
+ 	msr.data = data;
+@@ -1934,6 +1972,20 @@ static int __kvm_get_msr(struct kvm_vcpu *vcpu, u32 index, u64 *data,
+ 		    !guest_cpu_cap_has(vcpu, X86_FEATURE_RDPID))
+ 			return 1;
+ 		break;
++	case MSR_IA32_U_CET:
++	case MSR_IA32_S_CET:
++		if (!guest_cpu_cap_has(vcpu, X86_FEATURE_SHSTK) &&
++		    !guest_cpu_cap_has(vcpu, X86_FEATURE_IBT))
++			return KVM_MSR_RET_UNSUPPORTED;
++		break;
++	case MSR_KVM_INTERNAL_GUEST_SSP:
++		if (!host_initiated)
++			return 1;
++		fallthrough;
++	case MSR_IA32_PL0_SSP ... MSR_IA32_INT_SSP_TAB:
++		if (!guest_cpu_cap_has(vcpu, X86_FEATURE_SHSTK))
++			return KVM_MSR_RET_UNSUPPORTED;
++		break;
+ 	}
+ 
+ 	msr.index = index;
+@@ -3864,12 +3916,12 @@ static __always_inline void kvm_access_xstate_msr(struct kvm_vcpu *vcpu,
+ 	kvm_fpu_put();
  }
  
- static int kvm_get_one_msr(struct kvm_vcpu *vcpu, u32 msr, u64 __user *user_val)
-@@ -6097,11 +6105,22 @@ static int kvm_get_set_one_reg(struct kvm_vcpu *vcpu, unsigned int ioctl,
- static int kvm_get_reg_list(struct kvm_vcpu *vcpu,
- 			    struct kvm_reg_list __user *user_list)
+-static __maybe_unused void kvm_set_xstate_msr(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
++static void kvm_set_xstate_msr(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
  {
--	u64 nr_regs = 0;
-+	u64 nr_regs = guest_cpu_cap_has(vcpu, X86_FEATURE_SHSTK) ? 1 : 0;
-+	u64 user_nr_regs;
-+
-+	if (get_user(user_nr_regs, &user_list->n))
-+		return -EFAULT;
- 
- 	if (put_user(nr_regs, &user_list->n))
- 		return -EFAULT;
- 
-+	if (user_nr_regs < nr_regs)
-+		return -E2BIG;
-+
-+	if (nr_regs &&
-+	    put_user(KVM_X86_REG_KVM(KVM_REG_GUEST_SSP), &user_list->reg[0]))
-+		return -EFAULT;
-+
- 	return 0;
+ 	kvm_access_xstate_msr(vcpu, msr_info, MSR_TYPE_W);
  }
  
+-static __maybe_unused void kvm_get_xstate_msr(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
++static void kvm_get_xstate_msr(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
+ {
+ 	kvm_access_xstate_msr(vcpu, msr_info, MSR_TYPE_R);
+ }
+@@ -4255,6 +4307,10 @@ int kvm_set_msr_common(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
+ 		vcpu->arch.guest_fpu.xfd_err = data;
+ 		break;
+ #endif
++	case MSR_IA32_U_CET:
++	case MSR_IA32_PL0_SSP ... MSR_IA32_PL3_SSP:
++		kvm_set_xstate_msr(vcpu, msr_info);
++		break;
+ 	default:
+ 		if (kvm_pmu_is_valid_msr(vcpu, msr))
+ 			return kvm_pmu_set_msr(vcpu, msr_info);
+@@ -4604,6 +4660,10 @@ int kvm_get_msr_common(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
+ 		msr_info->data = vcpu->arch.guest_fpu.xfd_err;
+ 		break;
+ #endif
++	case MSR_IA32_U_CET:
++	case MSR_IA32_PL0_SSP ... MSR_IA32_PL3_SSP:
++		kvm_get_xstate_msr(vcpu, msr_info);
++		break;
+ 	default:
+ 		if (kvm_pmu_is_valid_msr(vcpu, msr_info->index))
+ 			return kvm_pmu_get_msr(vcpu, msr_info);
 diff --git a/arch/x86/kvm/x86.h b/arch/x86/kvm/x86.h
-index 786e36fcd0fb..a7c9c72fca93 100644
+index a7c9c72fca93..076eccba0f7e 100644
 --- a/arch/x86/kvm/x86.h
 +++ b/arch/x86/kvm/x86.h
-@@ -101,6 +101,16 @@ do {											\
- #define KVM_SVM_DEFAULT_PLE_WINDOW_MAX	USHRT_MAX
- #define KVM_SVM_DEFAULT_PLE_WINDOW	3000
+@@ -710,4 +710,27 @@ int ____kvm_emulate_hypercall(struct kvm_vcpu *vcpu, int cpl,
  
-+/*
-+ * KVM's internal, non-ABI indices for synthetic MSRs. The values themselves
-+ * are arbitrary and have no meaning, the only requirement is that they don't
-+ * conflict with "real" MSRs that KVM supports. Use values at the upper end
-+ * of KVM's reserved paravirtual MSR range to minimize churn, i.e. these values
-+ * will be usable until KVM exhausts its supply of paravirtual MSR indices.
-+ */
+ int kvm_emulate_hypercall(struct kvm_vcpu *vcpu);
+ 
++#define CET_US_RESERVED_BITS		GENMASK(9, 6)
++#define CET_US_SHSTK_MASK_BITS		GENMASK(1, 0)
++#define CET_US_IBT_MASK_BITS		(GENMASK_ULL(5, 2) | GENMASK_ULL(63, 10))
++#define CET_US_LEGACY_BITMAP_BASE(data)	((data) >> 12)
 +
-+#define MSR_KVM_INTERNAL_GUEST_SSP	0x4b564dff
++static inline bool kvm_is_valid_u_s_cet(struct kvm_vcpu *vcpu, u64 data)
++{
++	if (data & CET_US_RESERVED_BITS)
++		return false;
++	if (!guest_cpu_cap_has(vcpu, X86_FEATURE_SHSTK) &&
++	    (data & CET_US_SHSTK_MASK_BITS))
++		return false;
++	if (!guest_cpu_cap_has(vcpu, X86_FEATURE_IBT) &&
++	    (data & CET_US_IBT_MASK_BITS))
++		return false;
++	if (!IS_ALIGNED(CET_US_LEGACY_BITMAP_BASE(data), 4))
++		return false;
++	/* IBT can be suppressed iff the TRACKER isn't WAIT_ENDBR. */
++	if ((data & CET_SUPPRESS) && (data & CET_WAIT_ENDBR))
++		return false;
 +
- static inline unsigned int __grow_ple_window(unsigned int val,
- 		unsigned int base, unsigned int modifier, unsigned int max)
- {
++	return true;
++}
+ #endif
 -- 
 2.51.0.384.g4c02a37b29-goog
 
