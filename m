@@ -1,113 +1,150 @@
-Return-Path: <kvm+bounces-57436-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-57437-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 76510B558CF
-	for <lists+kvm@lfdr.de>; Sat, 13 Sep 2025 00:04:23 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 84705B55921
+	for <lists+kvm@lfdr.de>; Sat, 13 Sep 2025 00:25:54 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1AD7817AC44
-	for <lists+kvm@lfdr.de>; Fri, 12 Sep 2025 22:04:23 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 77407B6270F
+	for <lists+kvm@lfdr.de>; Fri, 12 Sep 2025 22:24:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 406FD2773C7;
-	Fri, 12 Sep 2025 22:04:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 388D727B4F7;
+	Fri, 12 Sep 2025 22:25:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="Joz2Dj7x"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="DoKgUEQ3"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pj1-f74.google.com (mail-pj1-f74.google.com [209.85.216.74])
+Received: from mail-pl1-f202.google.com (mail-pl1-f202.google.com [209.85.214.202])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EDD2A281376
-	for <kvm@vger.kernel.org>; Fri, 12 Sep 2025 22:04:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.74
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E6726257820
+	for <kvm@vger.kernel.org>; Fri, 12 Sep 2025 22:25:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757714653; cv=none; b=Gf3voBklyHcIqyYMyONKNmLmxhneS74Ig/mDZyg0vz9wToqJfwfpllRgIkAwnRJzcjNPRL/LGx0h2qTt88JuzQNO7rtnSXWj+TR1M7hpCmw8wPLY+bwqv+OF8TYBm2uFEK0oviyJY8xAHKnVVxEDWwBxvt0U7N4JHMEOWvq1aHs=
+	t=1757715938; cv=none; b=kQzHZIISy+u6G3vbLIFFJDF4kbE90MVSfsyvy7sM0cRJ3cqBdyfaI6QTpPgcIXhQuYYIaXgyAWeAo3XKLA/+UNqIVJDAlwTvxrvR1OvFO/SinWiB9FtZSztG3uSLk5zJLRUKVcn4cg7H/IN4BJD0gEVEiOgo8C4hKeLK27bAZL0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757714653; c=relaxed/simple;
-	bh=1k4h6sSYZLPEb1T1GQD57kAM3wQMLuiOfTd5z9kKNAU=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=MfFCzsKycUTixjsuvS0Oj1QofBV+TMTOIGhyfaxMHOfomN6F7/jQny8B97anEJxO7N8GkNyqNRhudoM+s96UXEdShDZt28FNGiukvd5f1fWfAT2TZDjTIXkMW2thYUvyG0ODrlS8y+GmWJHc8tAlfZCxrRDyav7hrx219jSjoF4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=Joz2Dj7x; arc=none smtp.client-ip=209.85.216.74
+	s=arc-20240116; t=1757715938; c=relaxed/simple;
+	bh=wGdCLlt9iZzPASFuHOAN3X/Ln6C99xyX7V0TA22N7bg=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=JmuavscrQJqssJpS289cynGMVSC+kF/A9gg3bBwPxltfTHSEq8W6qvSB54lShCmT2bSlLplnOkqO9UDJ6ulQIAlPS6RCv05QbvkpyOlAkTau5ZyboEyoFS4H7psrqxt57N8hm+wvkPQGDVys4LaMesf/uiTVGUMuo0Iq3BHkqOs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--dmatlack.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=DoKgUEQ3; arc=none smtp.client-ip=209.85.214.202
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pj1-f74.google.com with SMTP id 98e67ed59e1d1-32d4e8fe166so3280620a91.2
-        for <kvm@vger.kernel.org>; Fri, 12 Sep 2025 15:04:11 -0700 (PDT)
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--dmatlack.bounces.google.com
+Received: by mail-pl1-f202.google.com with SMTP id d9443c01a7336-24b4aa90c20so25030795ad.2
+        for <kvm@vger.kernel.org>; Fri, 12 Sep 2025 15:25:36 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1757714651; x=1758319451; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=JOnXqCTneQzY1nlQxY8LD3yfTLcbdMGUV0lpGUO6Hn4=;
-        b=Joz2Dj7xuWOLFb12MFvfYFLVP0Qd6z8LnQRFxfLlo+/nvld+oMDlK5itnJHTgH6EM3
-         C4b/OPcJHZAXQmVe9xQ8KGjdOl3CgDN+//ZNXpTzJaiCx7mLNdVbEMGHoxzdUQ8ErlGw
-         VzN2Jt9SOSJDAy/r1LVK/QRYObHS0zEqb4H2W8f2kLsjO0Q8u1gGLpE+mOaayHI+CSRg
-         mGkRB9/J/qjr1huOeh9Z96Myn2wZPw1m13zu0XzLXRfeKoltHEgzrNASdgIKR0/OGEU2
-         5jTv+No08a1ZWsZ9mct0xx3VMTV9cmgxQJ5TZtrTscMctCQLUOEtny6+hgLh8C0/jnlY
-         MZ/g==
+        d=google.com; s=20230601; t=1757715936; x=1758320736; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=299M/Z6pTRXV1Q5qkwkETIH636XUDaeorq+fJeIX7vw=;
+        b=DoKgUEQ3zdaWzuyTklELmf6SmdZnLypWko9BLNQxnDR15Dw8r8FaZg6eYw2YLxhT6l
+         vpTTlznjwweZqiq2JtPUx+RzNEzP9WobENzj/mr0f/1+rea7FHQHicJ5Yx7YBrCLI4F+
+         7P0plfhWAM8/u8tz3YAELP0xU2mkX0I9IWTx+Ohms3z4EzH9Olo7BkXVmj1pDs/KHzsl
+         sBa4uHYbRgEhOhYGxNbAldyxFDHDR9tVQvurIV1RKG4rRkADNQUO5smnEyW6UX0FkIQL
+         Q4k3SgjCTMgJ7Enr8cSsbSumWmFQQE8aTOjhsJL7Ptj0B6EkBpe0pJX9t7TwPeYIc1Ac
+         E50Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1757714651; x=1758319451;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=JOnXqCTneQzY1nlQxY8LD3yfTLcbdMGUV0lpGUO6Hn4=;
-        b=vIisyWK0z7NWLaKRshZyep3br3OqZiuh9/Jc5Yswf3CcrJu8H79fu6qFsYG49zibuo
-         VoJ5ug60d28TG2GbT76X6qR+4wMaNFJR9PuwP2O6Oi5lcO80MvBWy4mnyk7f0aKHZr26
-         kxdaHiOSKNWPjD/WayfLWAXTbYag+HUobDKFC2xpDDPJ/9KgWD0w0CiHOcLPribI1yhG
-         IWhjayXytRipfjQKgNegzkhJy8xmRsZUXWrr/RsbnDcuGbDFJfZAdV2WcTsGygTraH7C
-         G5Qn9816Lf73wyJSJkKELCPwAV415+ppVnd5Etfqc4HCo1p4d+8NBcEOCC1sOWYCN+OE
-         wYEQ==
-X-Gm-Message-State: AOJu0YyzkZxbIeURDY4uOvi6bC3kDTA2JRJ+bBn7eju7HCv9r1SEO2b1
-	+X1y+ZtLiQxLz2b9qj49XHaTkpyn/HkXHYrnZFSRkDBOq+1tqAZ4xl7ywrx7hYTT6HNksymiEBb
-	KOlivFQ==
-X-Google-Smtp-Source: AGHT+IHaZW4YTkAwLQ+mFC02kVapk34S7ndyYyK/6P4OrjB6MmeThbeRPbd4boVT3o71WQ0UAr704qqNMzw=
-X-Received: from pjbqd7.prod.google.com ([2002:a17:90b:3cc7:b0:32b:9872:3300])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90a:d2c7:b0:32d:dd0e:d319
- with SMTP id 98e67ed59e1d1-32de4fb3bf8mr4359183a91.32.1757714651232; Fri, 12
- Sep 2025 15:04:11 -0700 (PDT)
-Date: Fri, 12 Sep 2025 15:04:09 -0700
-In-Reply-To: <20250909093953.202028-15-chao.gao@intel.com>
+        d=1e100.net; s=20230601; t=1757715936; x=1758320736;
+        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=299M/Z6pTRXV1Q5qkwkETIH636XUDaeorq+fJeIX7vw=;
+        b=n0Wn4N94qLfcsIj+Z3dL4U1AhQ00o8U6xxCjtTJk1wLtGAkVWdkISahkwBNCKFwn7Z
+         X5gbQc6UFdxU2y3nz4MZlSozwEjsqTOBQTqBRkg2W6JdWDyEyuXlQaRlECG68z0RBKEs
+         pM8Nt2LoBQS2nM1ZlQgOpouIFP84/OD76uRIWybXXK8LyyOJtS/vNm2wpA9sXyRzpbl1
+         3+GRtNWsiVCmoqKKmd7ZdBhPO5V2XYkCBiR0kkORLNMO2RlFAFsPQ08KSMPVsQEmOrYb
+         u9DoHKPI8lJobyBMFYPxrxIhEiwrnMphmowwlnlSrN2spAiJUkDuJ6MQD22pzYKDZvwm
+         Fniw==
+X-Forwarded-Encrypted: i=1; AJvYcCUghivQ56mIVUZlAl82JwnnkWQN1HJmuUocaQUjCqFHSmeuBo73R7izP9QeRqJiP95avjA=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwIe9y6GuLUpn+5riScCgErotebitZFYZPAXL4uhHiavqRpT50e
+	rUZu47tNZOFNuKewKE5MyOyKlHGtlxKwDPAvRSmsSH3A2qx0mH41Z96RloqfU2J+ciyEtmoE7Fi
+	/CH+xDNBzCCEMTg==
+X-Google-Smtp-Source: AGHT+IHSTWCWMYGOA9WCRjuMhPoRpacqXhjAwRv9u7vbP6xlrFPR1i1SZvNGqHPv/kcEsrmBFPIvlucVaSo+9A==
+X-Received: from plbp14.prod.google.com ([2002:a17:903:174e:b0:24b:14e1:af2a])
+ (user=dmatlack job=prod-delivery.src-stubby-dispatcher) by
+ 2002:a17:903:3c30:b0:24d:7314:fe64 with SMTP id d9443c01a7336-25d27828f01mr55569785ad.57.1757715936261;
+ Fri, 12 Sep 2025 15:25:36 -0700 (PDT)
+Date: Fri, 12 Sep 2025 22:25:22 +0000
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
-References: <20250909093953.202028-1-chao.gao@intel.com> <20250909093953.202028-15-chao.gao@intel.com>
-Message-ID: <aMSY2e2vNe1D-hHj@google.com>
-Subject: Re: [PATCH v14 14/22] KVM: VMX: Set host constant supervisor states
- to VMCS fields
-From: Sean Christopherson <seanjc@google.com>
-To: Chao Gao <chao.gao@intel.com>
-Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org, acme@redhat.com, 
-	bp@alien8.de, dave.hansen@linux.intel.com, hpa@zytor.com, john.allen@amd.com, 
-	mingo@kernel.org, mingo@redhat.com, minipli@grsecurity.net, 
-	mlevitsk@redhat.com, namhyung@kernel.org, pbonzini@redhat.com, 
-	prsampat@amd.com, rick.p.edgecombe@intel.com, shuah@kernel.org, 
-	tglx@linutronix.de, weijiang.yang@intel.com, x86@kernel.org, xin@zytor.com, 
-	xiaoyao.li@intel.com
-Content-Type: text/plain; charset="us-ascii"
+X-Mailer: git-send-email 2.51.0.384.g4c02a37b29-goog
+Message-ID: <20250912222525.2515416-1-dmatlack@google.com>
+Subject: [PATCH 0/2] KVM: selftests: Link with VFIO selftests lib and test
+ device interrupts
+From: David Matlack <dmatlack@google.com>
+To: Paolo Bonzini <pbonzini@redhat.com>, Sean Christopherson <seanjc@google.com>
+Cc: Alex Williamson <alex.williamson@redhat.com>, kvm@vger.kernel.org, 
+	David Matlack <dmatlack@google.com>
+Content-Type: text/plain; charset="UTF-8"
 
-On Tue, Sep 09, 2025, Chao Gao wrote:
->  void set_cr4_guest_host_mask(struct vcpu_vmx *vmx)
-> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-> index 79861b7ad44d..d67aef261638 100644
-> --- a/arch/x86/kvm/x86.c
-> +++ b/arch/x86/kvm/x86.c
-> @@ -9890,6 +9890,18 @@ int kvm_x86_vendor_init(struct kvm_x86_init_ops *ops)
->  		return -EIO;
->  	}
->  
-> +	if (boot_cpu_has(X86_FEATURE_SHSTK)) {
+This series can be found on GitHub:
 
-This needs to check for "|| IBT"
+  https://github.com/dmatlack/linux/tree/kvm/selftests/vfio_pci_irq_test/v1
 
-> +		rdmsrq(MSR_IA32_S_CET, kvm_host.s_cet);
-> +		/*
-> +		 * Linux doesn't yet support supervisor shadow stacks (SSS), so
-> +		 * KVM doesn't save/restore the associated MSRs, i.e. KVM may
-> +		 * clobber the host values.  Yell and refuse to load if SSS is
-> +		 * unexpectedly enabled, e.g. to avoid crashing the host.
-> +		 */
-> +		if (WARN_ON_ONCE(kvm_host.s_cet & CET_SHSTK_EN))
-> +			return -EIO;
-> +	}
+I'm sending this series out a little early. VFIO selftests has landed in
+vfio/next[1] and is slated for 6.18, but has not yet been merged by
+Linus. But I wanted to start the discussion of linking the VFIO
+selftests library into KVM selftests so we can test VFIO-KVM
+interactions.
+
+To demostrate testing VFIO+KVM interactions, patch 2 contains a test to
+exercise delivering VFIO device interrupts to vCPUs. This test is
+heavily based on Sean's vfio_irq_test.c [2].
+
+Running selftests with VFIO devices is slightly different than typical
+KVM selftests since it requires a PCI device bound to vfio-pci. The VFIO
+selftests have a helper script for setting up a device:
+
+  $ ./run.sh -s -d 0000:6a:01.0
+  + echo "vfio-pci" > /sys/bus/pci/devices/0000:6a:01.0/driver_override
+  + echo "0000:6a:01.0" > /sys/bus/pci/drivers/vfio-pci/bind
+
+  Dropping into /bin/bash with VFIO_SELFTESTS_BDF=0000:6a:01.0
+
+The test can then be run and it will detect the $VFIO_SELFTESTS_BDF
+environment variable.
+
+  $ tools/testing/selftests/kvm/vfio_pci_irq_test
+  $ tools/testing/selftests/kvm/vfio_pci_irq_test -v64 -d -x
+
+You can also pass the BDF directly to the test on the command-line (i.e.
+using run.sh and the environment variable is not a required).
+
+  $ tools/testing/selftests/kvm/vfio_pci_irq_test 0000:6a:01.0
+  $ tools/testing/selftests/kvm/vfio_pci_irq_test -v64 -d -x 0000:6a:01.0
+
+In order to test with real MSIs generated by the device (-d option), the
+device must also have a supported driver in
+tools/testing/selftests/vfio/lib/drivers/. At the moment we only have
+drivers for Intel CBDMA and Intel DSA devices, so I haven't been able to
+test with -d on AMD yet.
+
+Currently this test only supports x86_64, but it should be portable to
+at least ARM in the future, so I optimistically placed it in the
+top-level KVM selftests directory.
+
+[1] https://github.com/awilliam/linux-vfio/tree/next
+[2] https://lore.kernel.org/kvm/20250404193923.1413163-68-seanjc@google.com/
+
+Cc: Sean Christopherson <seanjc@google.com>
+
+David Matlack (2):
+  KVM: selftests: Build and link sefltests/vfio/lib into KVM selftests
+  KVM: selftests: Add a test for vfio-pci device IRQ delivery to vCPUs
+
+ tools/testing/selftests/kvm/Makefile.kvm      |   6 +-
+ .../testing/selftests/kvm/vfio_pci_irq_test.c | 507 ++++++++++++++++++
+ 2 files changed, 512 insertions(+), 1 deletion(-)
+ create mode 100644 tools/testing/selftests/kvm/vfio_pci_irq_test.c
+
+
+base-commit: 093458c58f830d0a713fab0de037df5f0ce24fef
+prerequisite-patch-id: 72dce9cd586ac36ea378354735d9fabe2f3c445e
+prerequisite-patch-id: a8c7ccfd91ce3208f328e8af7b25c83bff8d464d
+-- 
+2.51.0.384.g4c02a37b29-goog
+
 
