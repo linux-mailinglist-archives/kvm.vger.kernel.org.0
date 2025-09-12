@@ -1,149 +1,125 @@
-Return-Path: <kvm+bounces-57437-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-57438-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 84705B55921
-	for <lists+kvm@lfdr.de>; Sat, 13 Sep 2025 00:25:54 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 23901B55920
+	for <lists+kvm@lfdr.de>; Sat, 13 Sep 2025 00:25:50 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 77407B6270F
-	for <lists+kvm@lfdr.de>; Fri, 12 Sep 2025 22:24:08 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id CF1CE5A31FF
+	for <lists+kvm@lfdr.de>; Fri, 12 Sep 2025 22:25:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 388D727B4F7;
-	Fri, 12 Sep 2025 22:25:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 13DE428469E;
+	Fri, 12 Sep 2025 22:25:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="DoKgUEQ3"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="KqIm6oK2"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pl1-f202.google.com (mail-pl1-f202.google.com [209.85.214.202])
+Received: from mail-pl1-f201.google.com (mail-pl1-f201.google.com [209.85.214.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E6726257820
-	for <kvm@vger.kernel.org>; Fri, 12 Sep 2025 22:25:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7C4B42741C9
+	for <kvm@vger.kernel.org>; Fri, 12 Sep 2025 22:25:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757715938; cv=none; b=kQzHZIISy+u6G3vbLIFFJDF4kbE90MVSfsyvy7sM0cRJ3cqBdyfaI6QTpPgcIXhQuYYIaXgyAWeAo3XKLA/+UNqIVJDAlwTvxrvR1OvFO/SinWiB9FtZSztG3uSLk5zJLRUKVcn4cg7H/IN4BJD0gEVEiOgo8C4hKeLK27bAZL0=
+	t=1757715940; cv=none; b=hUnM48uFXACSX0WxiDtp1c2N6/O58IW4txupIVfZ/stvDCjsNClWMfZWy+SclxwATB0as8UjOfnzUdru3U+q9iu9vbW4TMuLdVfKgkz57SFh5XgfUNo4aBRAYTVtdd0KK12eEJxt+FhwZ/eJqmwjYQULxEVX6qP5QoRBe2LiRN8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757715938; c=relaxed/simple;
-	bh=wGdCLlt9iZzPASFuHOAN3X/Ln6C99xyX7V0TA22N7bg=;
-	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=JmuavscrQJqssJpS289cynGMVSC+kF/A9gg3bBwPxltfTHSEq8W6qvSB54lShCmT2bSlLplnOkqO9UDJ6ulQIAlPS6RCv05QbvkpyOlAkTau5ZyboEyoFS4H7psrqxt57N8hm+wvkPQGDVys4LaMesf/uiTVGUMuo0Iq3BHkqOs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--dmatlack.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=DoKgUEQ3; arc=none smtp.client-ip=209.85.214.202
+	s=arc-20240116; t=1757715940; c=relaxed/simple;
+	bh=psx+NERoNJo4/HhihU9sbPPzE9T744Xou1CgVA4z4L0=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=O4zS53Nmmum7/DBj2vHMxJGFfj7uylm/wE8zWsXx0fuboXOLOU8Exo/2mZsyhWb5JZuS3qZApYnzkjQHYlIIbPS86cW4Fi2n71GYqwDLo1mWDReHFKedaObyIP1EB7GU3dhpszPKXli0/tHLvbQX9cl4FFn2xwqLzOnmrmcKtrg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--dmatlack.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=KqIm6oK2; arc=none smtp.client-ip=209.85.214.201
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--dmatlack.bounces.google.com
-Received: by mail-pl1-f202.google.com with SMTP id d9443c01a7336-24b4aa90c20so25030795ad.2
-        for <kvm@vger.kernel.org>; Fri, 12 Sep 2025 15:25:36 -0700 (PDT)
+Received: by mail-pl1-f201.google.com with SMTP id d9443c01a7336-2507ae2fa99so43384715ad.1
+        for <kvm@vger.kernel.org>; Fri, 12 Sep 2025 15:25:38 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1757715936; x=1758320736; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=299M/Z6pTRXV1Q5qkwkETIH636XUDaeorq+fJeIX7vw=;
-        b=DoKgUEQ3zdaWzuyTklELmf6SmdZnLypWko9BLNQxnDR15Dw8r8FaZg6eYw2YLxhT6l
-         vpTTlznjwweZqiq2JtPUx+RzNEzP9WobENzj/mr0f/1+rea7FHQHicJ5Yx7YBrCLI4F+
-         7P0plfhWAM8/u8tz3YAELP0xU2mkX0I9IWTx+Ohms3z4EzH9Olo7BkXVmj1pDs/KHzsl
-         sBa4uHYbRgEhOhYGxNbAldyxFDHDR9tVQvurIV1RKG4rRkADNQUO5smnEyW6UX0FkIQL
-         Q4k3SgjCTMgJ7Enr8cSsbSumWmFQQE8aTOjhsJL7Ptj0B6EkBpe0pJX9t7TwPeYIc1Ac
-         E50Q==
+        d=google.com; s=20230601; t=1757715938; x=1758320738; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=vwfWDEmcgfshuybXT2K41m0iYILW842GWaIfS8sv4Og=;
+        b=KqIm6oK2Z+z6w955C02eVL4GzQiEQ5Sdf+mA2up9oFZtMlGrIqAjGvpSHQa7BWKZAV
+         c0W/pAKiPyEIXXEvtkxnflxYQjKO3dq0fT9s2MMcFJrPk3ekpQdk7wIj3W01qxTny2qy
+         ko+XnV2LXfE4wOAea8+Z42YdstAvVKjXYUgdFEp5FPTupfmsleQeglsJ+yeoubvwreVN
+         i2BCEEraRdhb8IyXPQx/P3v6XCsFyk1K5uczUbIJ1R1zRWGJraYGiglJS3eLxBZtB5R/
+         XWpJtZvpCpu/wj3/qGvUyC135+Eb36Ag/EI4QMHw3f8Xg4CBvnJxqlp6vOlSJEvu0ht5
+         rtqA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1757715936; x=1758320736;
-        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=299M/Z6pTRXV1Q5qkwkETIH636XUDaeorq+fJeIX7vw=;
-        b=n0Wn4N94qLfcsIj+Z3dL4U1AhQ00o8U6xxCjtTJk1wLtGAkVWdkISahkwBNCKFwn7Z
-         X5gbQc6UFdxU2y3nz4MZlSozwEjsqTOBQTqBRkg2W6JdWDyEyuXlQaRlECG68z0RBKEs
-         pM8Nt2LoBQS2nM1ZlQgOpouIFP84/OD76uRIWybXXK8LyyOJtS/vNm2wpA9sXyRzpbl1
-         3+GRtNWsiVCmoqKKmd7ZdBhPO5V2XYkCBiR0kkORLNMO2RlFAFsPQ08KSMPVsQEmOrYb
-         u9DoHKPI8lJobyBMFYPxrxIhEiwrnMphmowwlnlSrN2spAiJUkDuJ6MQD22pzYKDZvwm
-         Fniw==
-X-Forwarded-Encrypted: i=1; AJvYcCUghivQ56mIVUZlAl82JwnnkWQN1HJmuUocaQUjCqFHSmeuBo73R7izP9QeRqJiP95avjA=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwIe9y6GuLUpn+5riScCgErotebitZFYZPAXL4uhHiavqRpT50e
-	rUZu47tNZOFNuKewKE5MyOyKlHGtlxKwDPAvRSmsSH3A2qx0mH41Z96RloqfU2J+ciyEtmoE7Fi
-	/CH+xDNBzCCEMTg==
-X-Google-Smtp-Source: AGHT+IHSTWCWMYGOA9WCRjuMhPoRpacqXhjAwRv9u7vbP6xlrFPR1i1SZvNGqHPv/kcEsrmBFPIvlucVaSo+9A==
-X-Received: from plbp14.prod.google.com ([2002:a17:903:174e:b0:24b:14e1:af2a])
+        d=1e100.net; s=20230601; t=1757715938; x=1758320738;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=vwfWDEmcgfshuybXT2K41m0iYILW842GWaIfS8sv4Og=;
+        b=W8/y8OhC9OyJoKkojo0SqL2FaWqJ1zqeIYbsoAiy7DaGgQHBJAKI4wBxi7SY45hfmw
+         TH4BrEpTIXChBzs4JEK1YpwonJTUOUivqRGETFENdlJsxypqbsfFMv/JA9MdM3gu3Spe
+         +I1kAcIapDkrPxDm0v9CdvoalZu8mcrDmjnDsQF5My3N2ozq5Fj1PWHOWfRcyIHEKpjB
+         s6q9aFkQzMQVDmr3Kz0zX859/E8FPY1ihloe2oHvUgccLMGEJ4yB/CveW0yygikj5BMY
+         O8RcDyo7O3fMjHSL4lhydFONiFnVKeY39RtX0Xyr7HHnoGv/y/OOMHyVN3jQElUBYhyr
+         SZLA==
+X-Forwarded-Encrypted: i=1; AJvYcCXO6Asd0L72bBJuJPJrK9AVC0IyhTCi4M95JNi4ezKwY8i6LUFb6w6asznH951tnnnzJ68=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwCdTDKkrAHznQlr0kPRAbqxy23Gn2YEQmky8J2qmirRx9OOMr/
+	MaZy+FsvbJ2sLRnifOvtPteLDuZ09nYCadIsmqo9n5r6pzW6trp9VsL/gh5STIoMhEIydrqwL92
+	d6St0k2fDg6dk8w==
+X-Google-Smtp-Source: AGHT+IFZ0pKLLn5TqH6MobggzBkvTKMCSloSjSZFg3k6m3b0Mu4Vm7a/FcizSkvt4x8JkRaxfVyNg4tFm5GNaw==
+X-Received: from pjbpl17.prod.google.com ([2002:a17:90b:2691:b0:329:d062:585b])
  (user=dmatlack job=prod-delivery.src-stubby-dispatcher) by
- 2002:a17:903:3c30:b0:24d:7314:fe64 with SMTP id d9443c01a7336-25d27828f01mr55569785ad.57.1757715936261;
- Fri, 12 Sep 2025 15:25:36 -0700 (PDT)
-Date: Fri, 12 Sep 2025 22:25:22 +0000
+ 2002:a17:902:f78c:b0:25d:89ca:35d4 with SMTP id d9443c01a7336-25d89ca40fdmr41015075ad.4.1757715937704;
+ Fri, 12 Sep 2025 15:25:37 -0700 (PDT)
+Date: Fri, 12 Sep 2025 22:25:23 +0000
+In-Reply-To: <20250912222525.2515416-1-dmatlack@google.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
+References: <20250912222525.2515416-1-dmatlack@google.com>
 X-Mailer: git-send-email 2.51.0.384.g4c02a37b29-goog
-Message-ID: <20250912222525.2515416-1-dmatlack@google.com>
-Subject: [PATCH 0/2] KVM: selftests: Link with VFIO selftests lib and test
- device interrupts
+Message-ID: <20250912222525.2515416-2-dmatlack@google.com>
+Subject: [PATCH 1/2] KVM: selftests: Build and link sefltests/vfio/lib into
+ KVM selftests
 From: David Matlack <dmatlack@google.com>
 To: Paolo Bonzini <pbonzini@redhat.com>, Sean Christopherson <seanjc@google.com>
 Cc: Alex Williamson <alex.williamson@redhat.com>, kvm@vger.kernel.org, 
 	David Matlack <dmatlack@google.com>
 Content-Type: text/plain; charset="UTF-8"
 
-This series can be found on GitHub:
+Include libvfio.mk into the KVM selftests Makefile and link it into all
+KVM selftests by adding it to LIBKVM_OBJS.
 
-  https://github.com/dmatlack/linux/tree/kvm/selftests/vfio_pci_irq_test/v1
+Note that KVM selftests build their own copy of sefltests/vfio/lib and
+the resulting object files are placed in $(OUTPUT)/lib. This allows the
+KVM and VFIO selftests to apply different CFLAGS when building without
+conflicting with each other.
 
-I'm sending this series out a little early. VFIO selftests has landed in
-vfio/next[1] and is slated for 6.18, but has not yet been merged by
-Linus. But I wanted to start the discussion of linking the VFIO
-selftests library into KVM selftests so we can test VFIO-KVM
-interactions.
+Cc: Alex Williamson <alex.williamson@redhat.com>
+Signed-off-by: David Matlack <dmatlack@google.com>
+---
+ tools/testing/selftests/kvm/Makefile.kvm | 5 ++++-
+ 1 file changed, 4 insertions(+), 1 deletion(-)
 
-To demostrate testing VFIO+KVM interactions, patch 2 contains a test to
-exercise delivering VFIO device interrupts to vCPUs. This test is
-heavily based on Sean's vfio_irq_test.c [2].
-
-Running selftests with VFIO devices is slightly different than typical
-KVM selftests since it requires a PCI device bound to vfio-pci. The VFIO
-selftests have a helper script for setting up a device:
-
-  $ ./run.sh -s -d 0000:6a:01.0
-  + echo "vfio-pci" > /sys/bus/pci/devices/0000:6a:01.0/driver_override
-  + echo "0000:6a:01.0" > /sys/bus/pci/drivers/vfio-pci/bind
-
-  Dropping into /bin/bash with VFIO_SELFTESTS_BDF=0000:6a:01.0
-
-The test can then be run and it will detect the $VFIO_SELFTESTS_BDF
-environment variable.
-
-  $ tools/testing/selftests/kvm/vfio_pci_irq_test
-  $ tools/testing/selftests/kvm/vfio_pci_irq_test -v64 -d -x
-
-You can also pass the BDF directly to the test on the command-line (i.e.
-using run.sh and the environment variable is not a required).
-
-  $ tools/testing/selftests/kvm/vfio_pci_irq_test 0000:6a:01.0
-  $ tools/testing/selftests/kvm/vfio_pci_irq_test -v64 -d -x 0000:6a:01.0
-
-In order to test with real MSIs generated by the device (-d option), the
-device must also have a supported driver in
-tools/testing/selftests/vfio/lib/drivers/. At the moment we only have
-drivers for Intel CBDMA and Intel DSA devices, so I haven't been able to
-test with -d on AMD yet.
-
-Currently this test only supports x86_64, but it should be portable to
-at least ARM in the future, so I optimistically placed it in the
-top-level KVM selftests directory.
-
-[1] https://github.com/awilliam/linux-vfio/tree/next
-[2] https://lore.kernel.org/kvm/20250404193923.1413163-68-seanjc@google.com/
-
-Cc: Sean Christopherson <seanjc@google.com>
-
-David Matlack (2):
-  KVM: selftests: Build and link sefltests/vfio/lib into KVM selftests
-  KVM: selftests: Add a test for vfio-pci device IRQ delivery to vCPUs
-
- tools/testing/selftests/kvm/Makefile.kvm      |   6 +-
- .../testing/selftests/kvm/vfio_pci_irq_test.c | 507 ++++++++++++++++++
- 2 files changed, 512 insertions(+), 1 deletion(-)
- create mode 100644 tools/testing/selftests/kvm/vfio_pci_irq_test.c
-
-
-base-commit: 093458c58f830d0a713fab0de037df5f0ce24fef
-prerequisite-patch-id: 72dce9cd586ac36ea378354735d9fabe2f3c445e
-prerequisite-patch-id: a8c7ccfd91ce3208f328e8af7b25c83bff8d464d
+diff --git a/tools/testing/selftests/kvm/Makefile.kvm b/tools/testing/selftests/kvm/Makefile.kvm
+index 2f7a0ed61452..ac283eddb66c 100644
+--- a/tools/testing/selftests/kvm/Makefile.kvm
++++ b/tools/testing/selftests/kvm/Makefile.kvm
+@@ -228,6 +228,7 @@ OVERRIDE_TARGETS = 1
+ # which causes the environment variable to override the makefile).
+ include ../lib.mk
+ include ../cgroup/lib/libcgroup.mk
++include ../vfio/lib/libvfio.mk
+ 
+ INSTALL_HDR_PATH = $(top_srcdir)/usr
+ LINUX_HDR_PATH = $(INSTALL_HDR_PATH)/include/
+@@ -281,7 +282,9 @@ LIBKVM_S := $(filter %.S,$(LIBKVM))
+ LIBKVM_C_OBJ := $(patsubst %.c, $(OUTPUT)/%.o, $(LIBKVM_C))
+ LIBKVM_S_OBJ := $(patsubst %.S, $(OUTPUT)/%.o, $(LIBKVM_S))
+ LIBKVM_STRING_OBJ := $(patsubst %.c, $(OUTPUT)/%.o, $(LIBKVM_STRING))
+-LIBKVM_OBJS = $(LIBKVM_C_OBJ) $(LIBKVM_S_OBJ) $(LIBKVM_STRING_OBJ) $(LIBCGROUP_O)
++LIBKVM_OBJS = $(LIBKVM_C_OBJ) $(LIBKVM_S_OBJ) $(LIBKVM_STRING_OBJ)
++LIBKVM_OBJS += $(LIBCGROUP_O)
++LIBKVM_OBJS += $(LIBVFIO_O)
+ SPLIT_TEST_GEN_PROGS := $(patsubst %, $(OUTPUT)/%, $(SPLIT_TESTS))
+ SPLIT_TEST_GEN_OBJ := $(patsubst %, $(OUTPUT)/$(SRCARCH)/%.o, $(SPLIT_TESTS))
+ 
 -- 
 2.51.0.384.g4c02a37b29-goog
 
