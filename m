@@ -1,204 +1,137 @@
-Return-Path: <kvm+bounces-57389-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-57390-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2CF5DB54A5A
-	for <lists+kvm@lfdr.de>; Fri, 12 Sep 2025 12:50:47 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id B2A90B54A87
+	for <lists+kvm@lfdr.de>; Fri, 12 Sep 2025 13:01:15 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id BA909189954C
-	for <lists+kvm@lfdr.de>; Fri, 12 Sep 2025 10:50:37 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 082B91D60779
+	for <lists+kvm@lfdr.de>; Fri, 12 Sep 2025 11:01:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 50238301018;
-	Fri, 12 Sep 2025 10:48:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 378E22FDC22;
+	Fri, 12 Sep 2025 11:00:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="pIhrbsz6";
-	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="3KzBQV3s";
-	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="pIhrbsz6";
-	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="3KzBQV3s"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Y9jIiJ0S"
 X-Original-To: kvm@vger.kernel.org
-Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.223.131])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A15742FE574
-	for <kvm@vger.kernel.org>; Fri, 12 Sep 2025 10:48:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.131
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 481F14207A;
+	Fri, 12 Sep 2025 11:00:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757674116; cv=none; b=Smx14jtQPOc3L1SULjCUDYkvMqqqZDABbEdns8P+B0wLz9Clh3VDEtqTVk3sXYY+HCN2ZWuOIF+4GNVyrGuo3q64sBKPu3UUJL3PCiYhJiW92IbMocMkjbj+rr2bJQJSR8uBlrCqktI5eKFL1XBFU1YTCJrwyJjLCdur/iS6eW0=
+	t=1757674853; cv=none; b=gKCIWcgdt47ZD6DCCd0R0N6z0atPf3cXvSDG8aU3n1RO198rwbOyU/Q+Rs8AjREeupw0tHcliwrZeOcsSTIjd+Bg7uLScwkqvZk6MAXMiXMf733eEjOv3NE2FyUj3mhDzef6saAbUOA9RskGIQ6V/svW1Q80irQH0iN6sqNYIjA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757674116; c=relaxed/simple;
-	bh=xj8SKsDc1sxZr1H/BYrv7BC55oRBLD49zCpgs1E0VxQ=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=KlxEWChwka4EN0HfBxcY0Bgf2Oh2+PGmbQj18NZRTLNEfD6zbusyBBx/rKJgjZOstCwxrh8XHby4PvT2oVR5vvDtTW3kLStyOl9coldZF+qOj5HNlSHPwjz1DMFKzX0OHxUE57YRhzf5OFjhqbw+d0xRjmCOnWFY9ttOAm1YIyg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de; spf=pass smtp.mailfrom=suse.de; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=pIhrbsz6; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=3KzBQV3s; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=pIhrbsz6; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=3KzBQV3s; arc=none smtp.client-ip=195.135.223.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.de
-Received: from imap1.dmz-prg2.suse.org (unknown [10.150.64.97])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by smtp-out2.suse.de (Postfix) with ESMTPS id 8A1A220760;
-	Fri, 12 Sep 2025 10:48:30 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-	t=1757674110; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=CWphaHK8OZGZX1V68Y5uJkPgW2mcaEuIYhBomIwfjhY=;
-	b=pIhrbsz6PFEg2rsKfYIDk9LSisUudy3RRRF+vPTEdTVNBEc/IYjMGMRlHJPMd81a3PeAPQ
-	enViOBHkrPb/ixVfVxnLyPU7+6VjTklFYkyeXlsUfBRq5C+jV7UXdmEmLyAdx4Q3d4ezXR
-	1O/cIWn77hOKnup2fdLIdwqygTz6oOk=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-	s=susede2_ed25519; t=1757674110;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=CWphaHK8OZGZX1V68Y5uJkPgW2mcaEuIYhBomIwfjhY=;
-	b=3KzBQV3sfhI2xmW0tXlMKSTmNI2mUbzMU7tkf31yqUEPagskAIo4a6mTeoFEttV9DasuS1
-	kLhxxYyMXH7/23Ag==
-Authentication-Results: smtp-out2.suse.de;
-	none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-	t=1757674110; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=CWphaHK8OZGZX1V68Y5uJkPgW2mcaEuIYhBomIwfjhY=;
-	b=pIhrbsz6PFEg2rsKfYIDk9LSisUudy3RRRF+vPTEdTVNBEc/IYjMGMRlHJPMd81a3PeAPQ
-	enViOBHkrPb/ixVfVxnLyPU7+6VjTklFYkyeXlsUfBRq5C+jV7UXdmEmLyAdx4Q3d4ezXR
-	1O/cIWn77hOKnup2fdLIdwqygTz6oOk=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-	s=susede2_ed25519; t=1757674110;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=CWphaHK8OZGZX1V68Y5uJkPgW2mcaEuIYhBomIwfjhY=;
-	b=3KzBQV3sfhI2xmW0tXlMKSTmNI2mUbzMU7tkf31yqUEPagskAIo4a6mTeoFEttV9DasuS1
-	kLhxxYyMXH7/23Ag==
-Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id 8C11E13869;
-	Fri, 12 Sep 2025 10:48:25 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
-	by imap1.dmz-prg2.suse.org with ESMTPSA
-	id RcKSHnn6w2gcWwAAD6G6ig
-	(envelope-from <pfalcato@suse.de>); Fri, 12 Sep 2025 10:48:25 +0000
-Date: Fri, 12 Sep 2025 11:48:15 +0100
-From: Pedro Falcato <pfalcato@suse.de>
-To: "Roy, Patrick" <roypat@amazon.co.uk>
-Cc: "Thomson, Jack" <jackabt@amazon.co.uk>, 
-	"Kalyazin, Nikita" <kalyazin@amazon.co.uk>, "Cali, Marco" <xmarcalx@amazon.co.uk>, 
-	"derekmn@amazon.co.uk" <derekmn@amazon.co.uk>, Elliot Berman <quic_eberman@quicinc.com>, 
-	"willy@infradead.org" <willy@infradead.org>, "corbet@lwn.net" <corbet@lwn.net>, 
-	"pbonzini@redhat.com" <pbonzini@redhat.com>, "maz@kernel.org" <maz@kernel.org>, 
-	"oliver.upton@linux.dev" <oliver.upton@linux.dev>, "joey.gouly@arm.com" <joey.gouly@arm.com>, 
-	"suzuki.poulose@arm.com" <suzuki.poulose@arm.com>, "yuzenghui@huawei.com" <yuzenghui@huawei.com>, 
-	"catalin.marinas@arm.com" <catalin.marinas@arm.com>, "will@kernel.org" <will@kernel.org>, 
-	"chenhuacai@kernel.org" <chenhuacai@kernel.org>, "kernel@xen0n.name" <kernel@xen0n.name>, 
-	"paul.walmsley@sifive.com" <paul.walmsley@sifive.com>, "palmer@dabbelt.com" <palmer@dabbelt.com>, 
-	"aou@eecs.berkeley.edu" <aou@eecs.berkeley.edu>, "alex@ghiti.fr" <alex@ghiti.fr>, 
-	"agordeev@linux.ibm.com" <agordeev@linux.ibm.com>, "gerald.schaefer@linux.ibm.com" <gerald.schaefer@linux.ibm.com>, 
-	"hca@linux.ibm.com" <hca@linux.ibm.com>, "gor@linux.ibm.com" <gor@linux.ibm.com>, 
-	"borntraeger@linux.ibm.com" <borntraeger@linux.ibm.com>, "svens@linux.ibm.com" <svens@linux.ibm.com>, 
-	"dave.hansen@linux.intel.com" <dave.hansen@linux.intel.com>, "luto@kernel.org" <luto@kernel.org>, 
-	"peterz@infradead.org" <peterz@infradead.org>, "tglx@linutronix.de" <tglx@linutronix.de>, 
-	"mingo@redhat.com" <mingo@redhat.com>, "bp@alien8.de" <bp@alien8.de>, "x86@kernel.org" <x86@kernel.org>, 
-	"hpa@zytor.com" <hpa@zytor.com>, "trondmy@kernel.org" <trondmy@kernel.org>, 
-	"anna@kernel.org" <anna@kernel.org>, "hubcap@omnibond.com" <hubcap@omnibond.com>, 
-	"martin@omnibond.com" <martin@omnibond.com>, "viro@zeniv.linux.org.uk" <viro@zeniv.linux.org.uk>, 
-	"brauner@kernel.org" <brauner@kernel.org>, "jack@suse.cz" <jack@suse.cz>, 
-	"akpm@linux-foundation.org" <akpm@linux-foundation.org>, "david@redhat.com" <david@redhat.com>, 
-	"lorenzo.stoakes@oracle.com" <lorenzo.stoakes@oracle.com>, "Liam.Howlett@oracle.com" <Liam.Howlett@oracle.com>, 
-	"vbabka@suse.cz" <vbabka@suse.cz>, "rppt@kernel.org" <rppt@kernel.org>, 
-	"surenb@google.com" <surenb@google.com>, "mhocko@suse.com" <mhocko@suse.com>, 
-	"ast@kernel.org" <ast@kernel.org>, "daniel@iogearbox.net" <daniel@iogearbox.net>, 
-	"andrii@kernel.org" <andrii@kernel.org>, "martin.lau@linux.dev" <martin.lau@linux.dev>, 
-	"eddyz87@gmail.com" <eddyz87@gmail.com>, "song@kernel.org" <song@kernel.org>, 
-	"yonghong.song@linux.dev" <yonghong.song@linux.dev>, "john.fastabend@gmail.com" <john.fastabend@gmail.com>, 
-	"kpsingh@kernel.org" <kpsingh@kernel.org>, "sdf@fomichev.me" <sdf@fomichev.me>, 
-	"haoluo@google.com" <haoluo@google.com>, "jolsa@kernel.org" <jolsa@kernel.org>, 
-	"jgg@ziepe.ca" <jgg@ziepe.ca>, "jhubbard@nvidia.com" <jhubbard@nvidia.com>, 
-	"peterx@redhat.com" <peterx@redhat.com>, "jannh@google.com" <jannh@google.com>, 
-	"axelrasmussen@google.com" <axelrasmussen@google.com>, "yuanchu@google.com" <yuanchu@google.com>, 
-	"weixugc@google.com" <weixugc@google.com>, "hannes@cmpxchg.org" <hannes@cmpxchg.org>, 
-	"zhengqi.arch@bytedance.com" <zhengqi.arch@bytedance.com>, "shakeel.butt@linux.dev" <shakeel.butt@linux.dev>, 
-	"shuah@kernel.org" <shuah@kernel.org>, "seanjc@google.com" <seanjc@google.com>, 
-	"linux-fsdevel@vger.kernel.org" <linux-fsdevel@vger.kernel.org>, "linux-doc@vger.kernel.org" <linux-doc@vger.kernel.org>, 
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>, 
-	"linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>, "kvmarm@lists.linux.dev" <kvmarm@lists.linux.dev>, 
-	"loongarch@lists.linux.dev" <loongarch@lists.linux.dev>, 
-	"linux-riscv@lists.infradead.org" <linux-riscv@lists.infradead.org>, "linux-s390@vger.kernel.org" <linux-s390@vger.kernel.org>, 
-	"linux-nfs@vger.kernel.org" <linux-nfs@vger.kernel.org>, "devel@lists.orangefs.org" <devel@lists.orangefs.org>, 
-	"linux-mm@kvack.org" <linux-mm@kvack.org>, "bpf@vger.kernel.org" <bpf@vger.kernel.org>, 
-	"linux-kselftest@vger.kernel.org" <linux-kselftest@vger.kernel.org>
-Subject: Re: [PATCH v6 01/11] filemap: Pass address_space mapping to
- ->free_folio()
-Message-ID: <2w22wsqar437lyp3w4bltyoql4ksn3exppkyaia5ogtnt2ttte@6nptj6ed4qnm>
-References: <20250912091708.17502-1-roypat@amazon.co.uk>
- <20250912091708.17502-2-roypat@amazon.co.uk>
+	s=arc-20240116; t=1757674853; c=relaxed/simple;
+	bh=9Hig5MO2Jffefaua87KEncrMekSgvRAlciqOrU/lgR8=;
+	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=H75seW5tD+izcMwq96fSXlMbMy91kcUU0AJScQtrZnWx8gIi4Vo69O//rXcQWNlqLSZIgWtuTCTTQr19uxr/cR34OlIVuwl1yHE4Z6m59OSyZvMBHR3H9RFOhpdJbRQ4NreNuZPtsXn8mlhLsQyOKSheCjlwW9+If0/t8SX5yKE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Y9jIiJ0S; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id CE1A1C4CEF1;
+	Fri, 12 Sep 2025 11:00:52 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1757674852;
+	bh=9Hig5MO2Jffefaua87KEncrMekSgvRAlciqOrU/lgR8=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=Y9jIiJ0SlD76AkupUHHfrxAvk88t0QaJTxlubaz7Lee2xy2D0BRqnWy9kHOd+UEyZ
+	 ucw6CFXjEg23lC4HIKq0YD3BJL7UetQbE0vKECGBR/Bq0X6LlaR/kmSB/pu1+AnrxX
+	 cbiUamOX6fsmRIK6CpkZMPRvhxzpyKtLeDtJq93aoQoHkN4MmaA3LlKMATXFOqd28O
+	 x3Kko9USQF71yCJC0lsZsB8W+T4D7IKWsudRCawlXuGZmzWDSLJyfmcr1/MaTJWn0t
+	 R4lj6LhwbLOIqKDKh49o/fHDe5jximaOFTDlE8JCRYKZ4rL5P4zYCoLAmaKXoHibiN
+	 Om0+/jjPkBRVQ==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.98.2)
+	(envelope-from <maz@kernel.org>)
+	id 1ux1WM-00000005etW-1zmH;
+	Fri, 12 Sep 2025 11:00:50 +0000
+Date: Fri, 12 Sep 2025 12:00:50 +0100
+Message-ID: <867by4c4v1.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Itaru Kitayama <itaru.kitayama@linux.dev>
+Cc: Oliver Upton <oliver.upton@linux.dev>,
+	Joey Gouly <joey.gouly@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	Paolo Bonzini <pbonzini@redhat.com>,
+	Shuah Khan <shuah@kernel.org>,
+	linux-arm-kernel@lists.infradead.org,
+	kvmarm@lists.linux.dev,
+	kvm@vger.kernel.org,
+	linux-kselftest@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Itaru Kitayama <itaru.kitayama@fujitsu.com>
+Subject: Re: [PATCH] PMCR_EL0.N is RAZ/WI. At least a build failes in Ubuntu 22.04 LTS. Remove the set function.
+In-Reply-To: <20250912-selftest-fix3-v1-1-256710a5ae5b@linux.dev>
+References: <20250912-selftest-fix3-v1-1-256710a5ae5b@linux.dev>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250912091708.17502-2-roypat@amazon.co.uk>
-X-Spamd-Result: default: False [-2.30 / 50.00];
-	BAYES_HAM(-3.00)[100.00%];
-	SUSPICIOUS_RECIPS(1.50)[];
-	NEURAL_HAM_LONG(-1.00)[-1.000];
-	MID_RHS_NOT_FQDN(0.50)[];
-	NEURAL_HAM_SHORT(-0.20)[-1.000];
-	MIME_GOOD(-0.10)[text/plain];
-	DKIM_SIGNED(0.00)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
-	FROM_HAS_DN(0.00)[];
-	ARC_NA(0.00)[];
-	FUZZY_RATELIMITED(0.00)[rspamd.com];
-	MIME_TRACE(0.00)[0:+];
-	TO_DN_EQ_ADDR_SOME(0.00)[];
-	FREEMAIL_CC(0.00)[amazon.co.uk,quicinc.com,infradead.org,lwn.net,redhat.com,kernel.org,linux.dev,arm.com,huawei.com,xen0n.name,sifive.com,dabbelt.com,eecs.berkeley.edu,ghiti.fr,linux.ibm.com,linux.intel.com,linutronix.de,alien8.de,zytor.com,omnibond.com,zeniv.linux.org.uk,suse.cz,linux-foundation.org,oracle.com,google.com,suse.com,iogearbox.net,gmail.com,fomichev.me,ziepe.ca,nvidia.com,cmpxchg.org,bytedance.com,vger.kernel.org,lists.infradead.org,lists.linux.dev,lists.orangefs.org,kvack.org];
-	R_RATELIMIT(0.00)[to_ip_from(RL1bpf5rdkmpo98mj6oa9xanz3)];
-	TO_DN_SOME(0.00)[];
-	TO_MATCH_ENVRCPT_SOME(0.00)[];
-	RCVD_COUNT_TWO(0.00)[2];
-	FROM_EQ_ENVFROM(0.00)[];
-	RCVD_TLS_ALL(0.00)[];
-	RCPT_COUNT_GT_50(0.00)[89];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TAGGED_RCPT(0.00)[];
-	MISSING_XM_UA(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[amazon.co.uk:email,suse.de:email]
-X-Spam-Flag: NO
-X-Spam-Level: 
-X-Spam-Score: -2.30
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: itaru.kitayama@linux.dev, oliver.upton@linux.dev, joey.gouly@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, pbonzini@redhat.com, shuah@kernel.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, kvm@vger.kernel.org, linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org, itaru.kitayama@fujitsu.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Fri, Sep 12, 2025 at 09:17:31AM +0000, Roy, Patrick wrote:
-> From: Elliot Berman <quic_eberman@quicinc.com>
+On Fri, 12 Sep 2025 09:27:40 +0100,
+Itaru Kitayama <itaru.kitayama@linux.dev> wrote:
 > 
-> When guest_memfd removes memory from the host kernel's direct map,
-> direct map entries must be restored before the memory is freed again. To
-> do so, ->free_folio() needs to know whether a gmem folio was direct map
-> removed in the first place though. While possible to keep track of this
-> information on each individual folio (e.g. via page flags), direct map
-> removal is an all-or-nothing property of the entire guest_memfd, so it
-> is less error prone to just check the flag stored in the gmem inode's
-> private data.  However, by the time ->free_folio() is called,
-> folio->mapping might be cleared. To still allow access to the address
-> space from which the folio was just removed, pass it in as an additional
-> argument to ->free_folio, as the mapping is well-known to all callers.
-> 
-> Link: https://lore.kernel.org/all/15f665b4-2d33-41ca-ac50-fafe24ade32f@redhat.com/
-> Suggested-by: David Hildenbrand <david@redhat.com>
-> Acked-by: David Hildenbrand <david@redhat.com>
-> Signed-off-by: Elliot Berman <quic_eberman@quicinc.com>
-> [patrick: rewrite shortlog for new usecase]
-> Signed-off-by: Patrick Roy <roypat@amazon.co.uk>
+> Signed-off-by: Itaru Kitayama <itaru.kitayama@fujitsu.com>
 
-Reviewed-by: Pedro Falcato <pfalcato@suse.de>
+This isn't an acceptable commit message.
+
+> ---
+> Seen a build failure with old Ubuntu 22.04 LTS, while the latest release
+> has no build issue, a write to the bit fields is RAZ/WI, remove the
+> function.
+> ---
+>  tools/testing/selftests/kvm/arm64/vpmu_counter_access.c | 6 ------
+>  1 file changed, 6 deletions(-)
+> 
+> diff --git a/tools/testing/selftests/kvm/arm64/vpmu_counter_access.c b/tools/testing/selftests/kvm/arm64/vpmu_counter_access.c
+> index f16b3b27e32ed7ca57481f27d689d47783aa0345..56214a4430be90b3e1d840f2719b22dd44f0b49b 100644
+> --- a/tools/testing/selftests/kvm/arm64/vpmu_counter_access.c
+> +++ b/tools/testing/selftests/kvm/arm64/vpmu_counter_access.c
+> @@ -45,11 +45,6 @@ static uint64_t get_pmcr_n(uint64_t pmcr)
+>  	return FIELD_GET(ARMV8_PMU_PMCR_N, pmcr);
+>  }
+>  
+> -static void set_pmcr_n(uint64_t *pmcr, uint64_t pmcr_n)
+> -{
+> -	u64p_replace_bits((__u64 *) pmcr, pmcr_n, ARMV8_PMU_PMCR_N);
+> -}
+> -
+>  static uint64_t get_counters_mask(uint64_t n)
+>  {
+>  	uint64_t mask = BIT(ARMV8_PMU_CYCLE_IDX);
+> @@ -490,7 +485,6 @@ static void test_create_vpmu_vm_with_pmcr_n(uint64_t pmcr_n, bool expect_fail)
+>  	 * Setting a larger value of PMCR.N should not modify the field, and
+>  	 * return a success.
+>  	 */
+> -	set_pmcr_n(&pmcr, pmcr_n);
+>  	vcpu_set_reg(vcpu, KVM_ARM64_SYS_REG(SYS_PMCR_EL0), pmcr);
+>  	pmcr = vcpu_get_reg(vcpu, KVM_ARM64_SYS_REG(SYS_PMCR_EL0));
+>  
+> 
+
+So what are you fixing here? A build failure? A semantic defect?
+Something else? What makes this a valid change?
+
+Frankly, I have no idea.
+
+But KVM definitely allows PMCR_EL0.N to be written from userspace, and
+that's not going to change.
+
+	M.
 
 -- 
-Pedro
+Without deviation from the norm, progress is not possible.
 
