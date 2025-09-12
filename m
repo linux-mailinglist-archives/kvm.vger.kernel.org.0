@@ -1,81 +1,88 @@
-Return-Path: <kvm+bounces-57422-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-57423-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 81CC2B55442
-	for <lists+kvm@lfdr.de>; Fri, 12 Sep 2025 17:59:52 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5FC9EB55499
+	for <lists+kvm@lfdr.de>; Fri, 12 Sep 2025 18:24:14 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2308B3BAF9E
-	for <lists+kvm@lfdr.de>; Fri, 12 Sep 2025 15:59:47 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0ED0C5A6C53
+	for <lists+kvm@lfdr.de>; Fri, 12 Sep 2025 16:24:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B165431987A;
-	Fri, 12 Sep 2025 15:59:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CCD9531A57E;
+	Fri, 12 Sep 2025 16:24:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (4096-bit key) header.d=alien8.de header.i=@alien8.de header.b="gsbdA/Oy"
+	dkim=pass (4096-bit key) header.d=alien8.de header.i=@alien8.de header.b="Q43uttwW"
 X-Original-To: kvm@vger.kernel.org
 Received: from mail.alien8.de (mail.alien8.de [65.109.113.108])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DB444188580;
-	Fri, 12 Sep 2025 15:59:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0E18C28DC4;
+	Fri, 12 Sep 2025 16:24:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=65.109.113.108
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757692770; cv=none; b=PP3yLMDV7wuouHW37F6GDwxgcF1JUvldSjtluGHd0D3WGHHG8/5aYUpzOaaUW6p5Kmzsyxn/W+HHX/73YsCS4CWPhsCpT7G9Np0xHqrb9hevHHL3EJ4cDJfo9mcziHah6kPZwJo0kQPFFatd8mWXPkWJous2fPEs9OsTI+qKe04=
+	t=1757694245; cv=none; b=j9hv5q2iUZGMUzFuAdsIoZN2ES9gaj6G5ybrNEy6lSVCL4ztMjT/Wj94kw29ZQoeaJ0tj5LhQWYxs7s4oGL2Er81vS3Ac5BsNLHcXsDU/9IrLNOlEQCOdDZf7Gjy5+uA6N497j3TR1BYneQJkA8L+I7cPQbNCBVt95gStT9KECE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757692770; c=relaxed/simple;
-	bh=GEBOk8PUOnHvSZXyPwd6N6SN/rdmFnYyQYQiSGsy8bE=;
+	s=arc-20240116; t=1757694245; c=relaxed/simple;
+	bh=uPjCX4B8cw30sYcQExQSofzpkbZlOFG5hXZ9CNzRQXg=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=mNqYZX0vFBcq/ZO9Gd8N3BheEy7vWqIADigjRyj3t8OkIbU+AmtTK3P626vqmLf68z2ci67mbSTAywrW6hXSTnMsB9rTP+cZGK9uabrXPg1NTyViwdy6ipwQXO9E/brmX9oZdffyKzt+YVIFM5oht3opAZY5YsiXY+3J3j4D5Ug=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=alien8.de; spf=pass smtp.mailfrom=alien8.de; dkim=pass (4096-bit key) header.d=alien8.de header.i=@alien8.de header.b=gsbdA/Oy; arc=none smtp.client-ip=65.109.113.108
+	 Content-Type:Content-Disposition:In-Reply-To; b=J0DTgfVUic4XjKwTRuDE6XtseNWhgG2c23Jt6kskZd64Fo3P1mQbRJPyZC8/P4VXqHQIeUW9jO/CHcODYyTcXu7XmY+h/EgyNh4suMxi5XQtrmcDlWXOVTS79gBQF5lh/iHraSaiBzRRA7my1A9P+ROnK1zvPvnXLlaPKhQv/0Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=alien8.de; spf=pass smtp.mailfrom=alien8.de; dkim=pass (4096-bit key) header.d=alien8.de header.i=@alien8.de header.b=Q43uttwW; arc=none smtp.client-ip=65.109.113.108
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=alien8.de
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=alien8.de
 Received: from localhost (localhost.localdomain [127.0.0.1])
-	by mail.alien8.de (SuperMail on ZX Spectrum 128k) with ESMTP id 2A48140E015C;
-	Fri, 12 Sep 2025 15:59:24 +0000 (UTC)
+	by mail.alien8.de (SuperMail on ZX Spectrum 128k) with ESMTP id 8E05D40E0140;
+	Fri, 12 Sep 2025 16:24:00 +0000 (UTC)
 X-Virus-Scanned: Debian amavisd-new at mail.alien8.de
 Authentication-Results: mail.alien8.de (amavisd-new); dkim=pass (4096-bit key)
 	header.d=alien8.de
 Received: from mail.alien8.de ([127.0.0.1])
 	by localhost (mail.alien8.de [127.0.0.1]) (amavisd-new, port 10026)
-	with ESMTP id mifj5-GIQUtb; Fri, 12 Sep 2025 15:59:19 +0000 (UTC)
+	with ESMTP id TYN4J7NBkPFB; Fri, 12 Sep 2025 16:23:57 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=alien8;
-	t=1757692758; bh=Q7C0QzXqcbpFCbjIXqNbLP6tXQLFqk1MBSz9ZcxW/ag=;
+	t=1757694236; bh=IGge7ZwhDSttMjah3YorSfFyUb93UYgumDQzLyVgR0A=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=gsbdA/OyMeaHLRBJCvpAZ2lYcfA+fT16HkNZShvgfymNgHta6fOp31XGfLoR4i2ij
-	 xi0rPSNAkwo7fvvVjiJ+7spgzg2oHvBaPTe0MsHXp/Ed/vRFBo2xENZezn25DgLfVh
-	 GbeS1KnDanVL0KeferUm19BagZi626XZ8GroPjWrc2CClpysWa00z+ChbEvrqsomzP
-	 FtWRQtoZC1o0KydH/WCfOB5nX0PVPLHxGvzJNWYnz5VAV7+KIP8fiPZhhs2k4+NXGG
-	 W+oXUFM84PA+1qciZS62ysQPhWcnKEt1e/WKIZ92AOIUMh+bfDGi4Fh5OcX03LTQ0E
-	 nSxW9g4Yuu5G8kxxOMDmsjFVrWwWh4+fOFcrzHVmFJBmFwTyG9e0AUtU9Qp3bhdu8F
-	 +L4gNQo0Y7jWT5YVRV8OyNWtJLDBZYwVDRsz725mpv8AzmDCaaUGsnKbi1tUyWitif
-	 SDhhaMJwo93yDt//a8jT5ghwZQONztKPe2dgaYikwOTo+r4+6mwkfBUQ7UP0I3Qnu0
-	 R+G0wZQPwUrI9pAW7WVz3RLFOvu8w7ZFHaxlL921I4HUzz0dCcBBMZ2WZiaozGIfql
-	 unPAvbmsN2Opc1jIFA4dlknstZMEko62GdxXK1kbk01IN47TzFdD1v6K0v4pEX93vu
-	 GwMabEI3lf+258cLMzN4Vwh0=
+	b=Q43uttwWC/BcYefv5oql8MncCbf5H7cDkOk3bTd9wvQXzlchFJILLtzThBqRqBi7r
+	 3OJZbVjZe0Yh80MwYl0XpCGg0guf/RfMEbD2mFqsFBR+IeQRRuOtq1R9d/3qYztvRF
+	 gpzHuaH/GrgMWj2MCdeD+UfZ3KjUjpzCzeRTgmG0V81wqWbo0dLlPwK+q9/6hByN05
+	 cAYT38I1XS1E2G0rINVM7D4V4eDVSHV63TWSGnz+LXih2Oqg7Pekjz/Oa3ESi1yzCR
+	 wFVW5jdVAAIEIwIP3oRrIiTDdijSbCkgGNFtJDMu6Q1r0uNqkZQBacT3nXlkikyP7v
+	 X1nxSJHne1UYPQHrmdyDr4rRSynIu8D5WGYZitSHZ/VVgnT5ms9EdGh2F3oHo7aptH
+	 +HA9y3LDHB2G2Wc1d6X4oE1R99Bgw3gcZe30yjHiD3W52bVybR7mJXXcFto2GU4siv
+	 uOaGzDMyzOSWietv1rENNpJgeyj1JA6FULKfYHDi11i92Zy03ttkUYL9jS+Azyr4eg
+	 oMjiyMhXdj7TY6zUJDPENJtDWBo/VBs6tsLozxEliKyK4IYhIj7l+F+dDH050V7hu7
+	 fg0t7SaJ3Lx0SLRkqEc9TpwaF0TjzbTaQV2kdqI+qiqiXMotyr8HtdB0Z9PmIZvMsi
+	 6AW7CuASA5iKdHUTy1zs2WLc=
 Received: from zn.tnic (p5de8ed27.dip0.t-ipconnect.de [93.232.237.39])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange ECDHE (P-256) server-signature ECDSA (P-256) server-digest SHA256)
 	(No client certificate requested)
-	by mail.alien8.de (SuperMail on ZX Spectrum 128k) with UTF8SMTPSA id 3032640E0140;
-	Fri, 12 Sep 2025 15:58:58 +0000 (UTC)
-Date: Fri, 12 Sep 2025 17:58:52 +0200
+	by mail.alien8.de (SuperMail on ZX Spectrum 128k) with UTF8SMTPSA id D528840E00DE;
+	Fri, 12 Sep 2025 16:23:35 +0000 (UTC)
+Date: Fri, 12 Sep 2025 18:23:28 +0200
 From: Borislav Petkov <bp@alien8.de>
-To: seanjc@google.com
-Cc: Ashish Kalra <Ashish.Kalra@amd.com>, tglx@linutronix.de,
-	mingo@redhat.com, dave.hansen@linux.intel.com, x86@kernel.org,
-	hpa@zytor.com, pbonzini@redhat.com, thomas.lendacky@amd.com,
-	herbert@gondor.apana.org.au, nikunj@amd.com, davem@davemloft.net,
-	aik@amd.com, ardb@kernel.org, john.allen@amd.com,
-	michael.roth@amd.com, Neeraj.Upadhyay@amd.com,
+To: K Prateek Nayak <kprateek.nayak@amd.com>
+Cc: Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>,
+	Dave Hansen <dave.hansen@linux.intel.com>,
+	Sean Christopherson <seanjc@google.com>,
+	Paolo Bonzini <pbonzini@redhat.com>,
+	Jonathan Corbet <corbet@lwn.net>, x86@kernel.org,
+	Naveen rao <naveen.rao@amd.com>, Sairaj Kodilkar <sarunkod@amd.com>,
+	"H. Peter Anvin" <hpa@zytor.com>,
+	"Peter Zijlstra (Intel)" <peterz@infradead.org>,
+	"Xin Li (Intel)" <xin@zytor.com>,
+	Pawan Gupta <pawan.kumar.gupta@linux.intel.com>,
 	linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-	linux-crypto@vger.kernel.org
-Subject: Re: [PATCH v4 1/3] x86/sev: Add new dump_rmp parameter to
- snp_leak_pages() API
-Message-ID: <20250912155852.GBaMRDPEhr2hbAXavs@fat_crate.local>
-References: <cover.1757543774.git.ashish.kalra@amd.com>
- <c6d2fbe31bd9e2638eaefaabe6d0ffc55f5886bd.1757543774.git.ashish.kalra@amd.com>
+	Mario Limonciello <mario.limonciello@amd.com>,
+	"Gautham R. Shenoy" <gautham.shenoy@amd.com>,
+	Babu Moger <babu.moger@amd.com>,
+	Suravee Suthikulpanit <suravee.suthikulpanit@amd.com>
+Subject: Re: [RFC PATCH v5 4/4] Documentation/x86/topology: Detail CPUID
+ leaves used for topology enumeration
+Message-ID: <20250912162328.GAaMRJADJyRGC_FgY0@fat_crate.local>
+References: <20250901170418.4314-1-kprateek.nayak@amd.com>
+ <20250901170418.4314-5-kprateek.nayak@amd.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -84,37 +91,179 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <c6d2fbe31bd9e2638eaefaabe6d0ffc55f5886bd.1757543774.git.ashish.kalra@amd.com>
+In-Reply-To: <20250901170418.4314-5-kprateek.nayak@amd.com>
 
-On Wed, Sep 10, 2025 at 10:55:24PM +0000, Ashish Kalra wrote:
-> From: Ashish Kalra <ashish.kalra@amd.com>
+On Mon, Sep 01, 2025 at 05:04:18PM +0000, K Prateek Nayak wrote:
+> Add a new section describing the different CPUID leaves and fields used
+> to parse topology on x86 systems.
 > 
-> When leaking certain page types, such as Hypervisor Fixed (HV_FIXED)
-> pages, it does not make sense to dump RMP contents for the 2MB range of
-> the page(s) being leaked. In the case of HV_FIXED pages, this is not an
-> error situation where the surrounding 2MB page RMP entries can provide
-> debug information.
-> 
-> Add new __snp_leak_pages() API with dump_rmp bool parameter to support
-> continue adding pages to the snp_leaked_pages_list but not issue
-> dump_rmpentry().
-> 
-> Make snp_leak_pages() a wrapper for the common case which also allows
-> existing users to continue to dump RMP entries.
-> 
-> Suggested-by: Thomas Lendacky <Thomas.Lendacky@amd.com>
-> Suggested-by: Sean Christopherson <seanjc@google.com>
-> Signed-off-by: Ashish Kalra <ashish.kalra@amd.com>
+> Suggested-by: Borislav Petkov <bp@alien8.de>
+> Signed-off-by: K Prateek Nayak <kprateek.nayak@amd.com>
 > ---
->  arch/x86/include/asm/sev.h | 8 +++++++-
->  arch/x86/virt/svm/sev.c    | 7 ++++---
->  2 files changed, 11 insertions(+), 4 deletions(-)
+> Changelog v4..v5:
+> 
+> o Added a nte about the NODE_ID_MSR on AMD platforms.
+> ---
+>  Documentation/arch/x86/topology.rst | 198 ++++++++++++++++++++++++++++
+>  1 file changed, 198 insertions(+)
 
-Sean, lemme know if I should carry this through tip.
+Some trivial simplifications and cleanups ontop:
 
-Or, if you wanna take it:
+---
 
-Acked-by: Borislav Petkov (AMD) <bp@alien8.de>
+diff --git a/Documentation/arch/x86/topology.rst b/Documentation/arch/x86/topology.rst
+index 4227eba65957..86bec8ac2c4d 100644
+--- a/Documentation/arch/x86/topology.rst
++++ b/Documentation/arch/x86/topology.rst
+@@ -143,76 +143,69 @@ Thread-related topology information in the kernel:
+ 
+ System topology enumeration
+ ===========================
++
+ The topology on x86 systems can be discovered using a combination of vendor
+-specific CPUID leaves introduced specifically to enumerate the processor
+-topology and the cache hierarchy.
++specific CPUID leaves which enumerate the processor topology and the cache
++hierarchy.
+ 
+ The CPUID leaves in their preferred order of parsing for each x86 vendor is as
+ follows:
+ 
+-1) AMD and Hygon
+-
+-   On AMD and Hygon platforms, the CPUID leaves that enumerate the processor
+-   topology are as follows:
++1) AMD
+ 
+    1) CPUID leaf 0x80000026 [Extended CPU Topology] (Core::X86::Cpuid::ExCpuTopology)
+ 
+       The extended CPUID leaf 0x80000026 is the extension of the CPUID leaf 0xB
+-      and provides the topology information of Core, Complex, CCD(Die), and
++      and provides the topology information of Core, Complex, CCD (Die), and
+       Socket in each level.
+ 
+-      The support for the leaf is expected to be discovered by checking if the
+-      supported extended CPUID level is >= 0x80000026 and then checking if
+-      `LogProcAtThisLevel` in `EBX[15:0]` at a particular level (starting from
+-      0) is non-zero.
++      Support for the leaf is discovered by checking if the maximum extended
++      CPUID level is >= 0x80000026 and then checking if `LogProcAtThisLevel`
++      in `EBX[15:0]` at a particular level (starting from 0) is non-zero.
+ 
+-      The `LevelType` in `ECX[15:8]` at the level provides the detail of the
+-      topology domain that the level describes - Core, Complex, CCD(Die), or
+-      the Socket.
++      The `LevelType` in `ECX[15:8]` at the level provides the topology domain
++      the level describes - Core, Complex, CCD(Die), or the Socket.
+ 
+       The kernel uses the `CoreMaskWidth` from `EAX[4:0]` to discover the
+-      number of bits that need to be right shifted from the
+-      `ExtendedLocalApicId` in `EDX[31:0]` to get a unique Topology ID for
+-      the topology level. CPUs with the same Topology ID share the resources
+-      at that level.
++      number of bits that need to be right-shifted from `ExtendedLocalApicId`
++      in `EDX[31:0]` in order to get a unique Topology ID for the topology 
++      level. CPUs with the same Topology ID share the resources at that level.
+ 
+-      CPUID leaf 0x80000026 also provides more information regarding the
+-      power and efficiency rankings, and about the core type on AMD
+-      processors with heterogeneous characteristics.
++      CPUID leaf 0x80000026 also provides more information regarding the power
++      and efficiency rankings, and about the core type on AMD processors with
++      heterogeneous characteristics.
+ 
+       If CPUID leaf 0x80000026 is supported, further parsing is not required.
+ 
+-
+    2) CPUID leaf 0x0000000B [Extended Topology Enumeration] (Core::X86::Cpuid::ExtTopEnum)
+ 
+       The extended CPUID leaf 0x0000000B is the predecessor on the extended
+       CPUID leaf 0x80000026 and only describes the core, and the socket domains
+       of the processor topology.
+ 
+-      The support for the leaf is expected to be discovered by checking if the
+-      supported CPUID level is >= 0xB and then checking if `EBX[31:0]` at a
+-      particular level (starting from 0) is non-zero.
++      The support for the leaf is discovered by checking if the maximum supported
++      CPUID level is >= 0xB and then if `EBX[31:0]` at a particular level
++      (starting from 0) is non-zero.
+ 
+-      The `LevelType` in `ECX[15:8]` at the level provides the detail of the
+-      topology domain that the level describes - Thread, or Processor (Socket).
++      The `LevelType` in `ECX[15:8]` at the level provides the topology domain
++      that the level describes - Thread, or Processor (Socket).
+ 
+       The kernel uses the `CoreMaskWidth` from `EAX[4:0]` to discover the
+-      number of bits that need to be right shifted from the
+-      `ExtendedLocalApicId` in `EDX[31:0]` to get a unique Topology ID for
+-      that topology level. CPUs sharing the Topology ID share the resources
+-      at that level.
++      number of bits that need to be right-shifted from the `ExtendedLocalApicId`
++      in `EDX[31:0]` to get a unique Topology ID for that topology level. CPUs
++      sharing the Topology ID share the resources at that level.
+ 
+       If CPUID leaf 0xB is supported, further parsing is not required.
+ 
+ 
+    3) CPUID leaf 0x80000008 ECX [Size Identifiers] (Core::X86::Cpuid::SizeId)
+ 
+-      If neither the CPUID leaf 0x80000026 or CPUID leaf 0xB is supported, the
+-      number of CPUs on the package is detected using the Size Identifier leaf
++      If neither the CPUID leaf 0x80000026 nor 0xB is supported, the number of
++      CPUs on the package is detected using the Size Identifier leaf
+       0x80000008 ECX.
+ 
+-      The support for the leaf is expected to be discovered by checking if the
+-      supported extended CPUID level is >= 0x80000008.
++      The support for the leaf is discovered by checking if the supported
++      extended CPUID level is >= 0x80000008.
+ 
+       The shifts from the APIC ID for the Socket ID is calculated from the
+       `ApicIdSize` field in `ECX[15:12]` if it is non-zero.
+@@ -251,8 +244,8 @@ follows:
+       `cu_id` (Compute Unit ID) to detect CPUs that share the compute units.
+ 
+ 
+-   All AMD and Hygon processors that support the `TopologyExtensions` feature
+-   stores the `NodeId` from the `ECX[7:0]` of CPUID leaf 0x8000001E
++   All AMD processors that support the `TopologyExtensions` feature store the
++   `NodeId` from the `ECX[7:0]` of CPUID leaf 0x8000001E 
+    (Core::X86::Cpuid::NodeId) as the per-CPU `node_id`. On older processors,
+    the `node_id` was discovered using MSR_FAM10H_NODE_ID MSR (MSR
+    0x0xc001_100c). The presence of the NODE_ID MSR was detected by checking
+@@ -271,13 +264,13 @@ follows:
+       the topology information of Core, Module, Tile, Die, DieGrp, and Socket
+       in each level.
+ 
+-      The support for the leaf is expected to be discovered by checking if
+-      the supported CPUID level is >= 0x1F and then `EBX[31:0]` at a
+-      particular level (starting from 0) is non-zero.
++      The support for the leaf is discovered by checking if the supported
++      CPUID level is >= 0x1F and then `EBX[31:0]` at a particular level
++      (starting from 0) is non-zero.
+ 
+-      The `Domain Type` in `ECX[15:8]` of the sub-leaf provides the detail of
+-      the topology domain that the level describes - Core, Module, Tile, Die,
+-      DieGrp, and Socket.
++      The `Domain Type` in `ECX[15:8]` of the sub-leaf provides the topology
++      domain that the level describes - Core, Module, Tile, Die, DieGrp, and
++      Socket.
+ 
+       The kernel uses the value from `EAX[4:0]` to discover the number of
+       bits that need to be right shifted from the `x2APIC ID` in `EDX[31:0]`
+@@ -293,9 +286,9 @@ follows:
+       Topology Enumeration Leaf 0x1F and only describes the core, and the
+       socket domains of the processor topology.
+ 
+-      The support for the leaf is expected to be discovered by checking if the
+-      supported CPUID level is >= 0xB and then checking if `EBX[31:0]` at a
+-      particular level (starting from 0) is non-zero.
++      The support for the leaf is iscovered by checking if the supported CPUID
++      level is >= 0xB and then checking if `EBX[31:0]` at a particular level
++      (starting from 0) is non-zero.
+ 
+       CPUID leaf 0x0000000B shares the same layout as CPUID leaf 0x1F and
+       should be enumerated in a similar manner.
 
 -- 
 Regards/Gruss,
