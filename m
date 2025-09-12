@@ -1,71 +1,71 @@
-Return-Path: <kvm+bounces-57474-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-57475-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0AD9BB55A39
-	for <lists+kvm@lfdr.de>; Sat, 13 Sep 2025 01:33:02 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id BD2DCB55A3C
+	for <lists+kvm@lfdr.de>; Sat, 13 Sep 2025 01:33:30 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 6B00D1D638C1
-	for <lists+kvm@lfdr.de>; Fri, 12 Sep 2025 23:33:23 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 43BE316C1A4
+	for <lists+kvm@lfdr.de>; Fri, 12 Sep 2025 23:33:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3DC0B28AB16;
-	Fri, 12 Sep 2025 23:24:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 38ECA2E3B0D;
+	Fri, 12 Sep 2025 23:24:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="wvyPZLhY"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="dleISosl"
 X-Original-To: kvm@vger.kernel.org
 Received: from mail-pl1-f202.google.com (mail-pl1-f202.google.com [209.85.214.202])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C79AB289E30
-	for <kvm@vger.kernel.org>; Fri, 12 Sep 2025 23:24:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 678ED2E1C6B
+	for <kvm@vger.kernel.org>; Fri, 12 Sep 2025 23:24:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757719463; cv=none; b=FlOmVVYD4/mSv6KIpxBlM46x3wjaCR/dg7NcIIgfn7pcFb+a2ciPqbetxNnD1z3dhsLwrc3lxaEwmYB/JHzWrTTnNBbxhHKci4NNgxyr2k4iePmeafmr+GPu2tpEu9nqEF/TwsLqeoMRaVvxbkVgJZmeQXIiRkakVTY839/QuWo=
+	t=1757719466; cv=none; b=eoX4PmyfggNnCsMkpMFwF1ccKcONPbnfChK/n8nt/Q5tQmKTOR+fJ8br60aI+zxQLXBDjNSpZpgOudKI+1LRXulvyzz87XWHsNL01huoJ/Rk3EC+YJWtiOfEy9MI7UxxwnhiInbgn0ex3pfy3SmUoKh/XRySvS/rhavJEUxe2Qs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757719463; c=relaxed/simple;
-	bh=ed/MzbF1y1avxTID6AP6DxCsceWdQmILphigoArAk0w=;
+	s=arc-20240116; t=1757719466; c=relaxed/simple;
+	bh=oqfxEduhxDr+EMb4NgJ6QjjX4Eln5KqTEXpKlxdlRLU=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=HwcLi0DrCYoDeyHQag1bf90XXeNYRmNr75swWOHH+Hr7McOtDT3aaPaET0532nJkGmkG7vDkRehptdmKPCISYtRxULtFYHk1JgGvXMjylE8PH2T5zbVWydy+UwsiQswuHdaCKPE4yKfgzBIFWbJ9dla84cmS18CZb35B8Jq1VBQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=wvyPZLhY; arc=none smtp.client-ip=209.85.214.202
+	 To:Cc:Content-Type; b=YMG7oh0zowiVr7hapaXssCOS+RPjGUysY5ECMfYpvcJtO4ucdLCMkBvb4iUALjp4dUXm9kzrt0p5BXH3ACCIjhNIHnyf/HFl0X6DyQAAA767cBxdBgdu+S75kZ7Zmb9Fe4Afpa1frZaD2uOMTpYZYe79U/jtMa58J9WDm3F7jT4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=dleISosl; arc=none smtp.client-ip=209.85.214.202
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pl1-f202.google.com with SMTP id d9443c01a7336-25bdf8126ceso45626115ad.3
-        for <kvm@vger.kernel.org>; Fri, 12 Sep 2025 16:24:21 -0700 (PDT)
+Received: by mail-pl1-f202.google.com with SMTP id d9443c01a7336-24ced7cfa07so26275125ad.1
+        for <kvm@vger.kernel.org>; Fri, 12 Sep 2025 16:24:23 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1757719461; x=1758324261; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1757719463; x=1758324263; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:reply-to:from:to:cc:subject:date:message-id:reply-to;
-        bh=KsdT1O+ZcgN98Gnhy5HR6tDkPGI+1EFI9KM4O6i9nrU=;
-        b=wvyPZLhY8HuF4E0cytQe1y0gAEX1yrHjlfEkxPuffCCmrGQLqzUlrX1BfHtWctf4uJ
-         GXe3vfhofL/5oprDxsNiq+ugHoumns7GvzmD840z2XW8h0kA28eNrhEJvSNHLARSRwVT
-         6wpV/UAXzHUMBwQhasL8gbfUR10OHmyJvyiadzokrG6mpMD/hxrn0ZMVIK+9B+LvDj8N
-         xs41wrPy8OiDDd3NXshzJcYGEy1Tkz6B50sOj1KTYg2b0+roYmURzb+huarhOsJQaKQO
-         HOKcBFY6Z8LDDiIoymSudVCjC32Q1R+Vbe5+gdPbXw4NwwBNHpzHBjzRpjVRPCysYgFl
-         3TgA==
+        bh=oN2KOTjTaXX7Mn3Y30lree8vkKri8RC5m3orTfrrrD0=;
+        b=dleISoslxIrA2H8b4AdUOHZCkSlLd8x6EvolG7fiRdfyavD5Y1198N7RitYQqiTH3Q
+         QXs/gfcMPXyVy8o6IEK81Fy0M7NTm0iv++YAse94/ZEpT3BfXizl8VT4HQmBtAfBbL1+
+         UheqbyoexQbjfpFquYAXytgVMAwHhlVA6dl6hOQvjQ/ed/SH/pd4DvebVaHJ1a2LSNBP
+         h15Xrre74e9wqQUbpOBPHQpj/PXV5eowRoeCbglw7LtfOdLQDUnXa7ptOLnX5hjbHlai
+         0hbLWCttwEDmiWiO4FkKIppGCk7mtRHcHdomNk1dNHc/chHLUzRl+5rGvWhar4hSuLsi
+         bbNA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1757719461; x=1758324261;
+        d=1e100.net; s=20230601; t=1757719463; x=1758324263;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:reply-to:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=KsdT1O+ZcgN98Gnhy5HR6tDkPGI+1EFI9KM4O6i9nrU=;
-        b=VVOcW4YxLUscwF3b6+Tx2VudbFSooxSGtak2MZLpO3YOi7FA3Nc/DDPUPlNJKCV6ux
-         JcuEax2T8pKFZATzog1trH70znC1mka02+nJmPqrFUd1lQP1/oIkAOY/ug3zjWKtVq1v
-         UdNnad8Iy1Fx7I15tkhZ8qv9hRUDjN8AxB0u2MXd2yb4DzeEWwi1Xn2QVYdz3qnJA8tS
-         hZIIWNYbnDU3NwcK0ln4tBRO5eiq0IJgOtdVqo7ZGCM+O6JNPeSJUDw5gq/GiQYhcQWP
-         IS6IeqUUwRVENhrKW0OEPaw599QNwztlqEK8jJDzsMtdUyzbMZ5L7VMmZOvTIPLzAz2U
-         Tq0g==
-X-Gm-Message-State: AOJu0YzJpEWXpJptMhIvSKaSMJYd2DKI7rNFSHBo7ocA8xJU63WD+Gd0
-	JvwkXyKNGKRxa1yPYgoFqMBaqR83V/K77lqp3cjg7hf0tkuiigpecespcz4ceiL53b5+G7GzMdv
-	N5rGT4g==
-X-Google-Smtp-Source: AGHT+IHbGZZ1h9nKu7SXm/xlanddL2SEeIpR7+u3oLOeRCfMGKdUZU3ia1PO0ZKO0TtOZ6bvKGOKSAasGww=
-X-Received: from pjcc4.prod.google.com ([2002:a17:90b:5744:b0:32d:dbd4:5ce8])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:902:e84d:b0:25c:e2c:6678
- with SMTP id d9443c01a7336-25d241005a4mr58801885ad.5.1757719461173; Fri, 12
- Sep 2025 16:24:21 -0700 (PDT)
+        bh=oN2KOTjTaXX7Mn3Y30lree8vkKri8RC5m3orTfrrrD0=;
+        b=PEfWaeAnH6cVsOEEygh5I659xA/v/Q63RXLintZTbptjotXKBmEid+nulDlIAb2Lqj
+         GNgDH7DE+ZgG5Z5YUxg5eBt0Pg7l5vxCoQsZ4hfWHM/1F8GnIu9e3ZoiPFtdbi8AU4MW
+         kCOEgwNIhhNl0KfpfFSgNU7MBmE6hDeA7sUvBmUz86Lem81abgaVUADdeaOO4Td0oPSd
+         CkBqFy2oYy5dA6oXbG3c9JwCfZ+1QGFrh9XMeqUsKqNQsVFvZgArlnAVaATOL7150Vki
+         Iig9mfJxPggK+DN5ajpjzHZCnULJiCvfz8fLTpnEUlSC8aq4i+wHr2OwKZdYqGzkO5TQ
+         T0Hg==
+X-Gm-Message-State: AOJu0YypbN/bW0Eek8wawPQrw57S2RByl1rQyLLl3OqktKCLxYoVIyd3
+	xU81P+85TiCi8pgWyzVo7t0pTejWtca88Tu6I1KAHzumFPcBXJcvK3KQlbI1fc8O1RUV6LxZop+
+	DeVM5JA==
+X-Google-Smtp-Source: AGHT+IF4ouXasakEIa4631sD0tHiSMgMdyeOf4Be425QMzhF4PkjL+dHALvyxn4cB9SRRLA42F0LmF5uaLw=
+X-Received: from plblf15.prod.google.com ([2002:a17:902:fb4f:b0:248:753f:cb3a])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:902:ea02:b0:248:e716:9892
+ with SMTP id d9443c01a7336-25d278284a6mr52818135ad.59.1757719462726; Fri, 12
+ Sep 2025 16:24:22 -0700 (PDT)
 Reply-To: Sean Christopherson <seanjc@google.com>
-Date: Fri, 12 Sep 2025 16:23:09 -0700
+Date: Fri, 12 Sep 2025 16:23:10 -0700
 In-Reply-To: <20250912232319.429659-1-seanjc@google.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
@@ -75,9 +75,8 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
 References: <20250912232319.429659-1-seanjc@google.com>
 X-Mailer: git-send-email 2.51.0.384.g4c02a37b29-goog
-Message-ID: <20250912232319.429659-32-seanjc@google.com>
-Subject: [PATCH v15 31/41] KVM: x86: Add human friendly formatting for #XM,
- and #VE
+Message-ID: <20250912232319.429659-33-seanjc@google.com>
+Subject: [PATCH v15 32/41] KVM: x86: Define Control Protection Exception (#CP) vector
 From: Sean Christopherson <seanjc@google.com>
 To: Paolo Bonzini <pbonzini@redhat.com>, Sean Christopherson <seanjc@google.com>
 Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
@@ -87,26 +86,37 @@ Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
 	Xiaoyao Li <xiaoyao.li@intel.com>, Zhang Yi Z <yi.z.zhang@linux.intel.com>
 Content-Type: text/plain; charset="UTF-8"
 
-Add XM_VECTOR and VE_VECTOR pretty-printing for
-trace_kvm_inj_exception().
+Add a CP_VECTOR definition for CET's Control Protection Exception (#CP),
+along with human friendly formatting for trace_kvm_inj_exception().
 
 Signed-off-by: Sean Christopherson <seanjc@google.com>
 ---
- arch/x86/kvm/trace.h | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+ arch/x86/include/uapi/asm/kvm.h | 1 +
+ arch/x86/kvm/trace.h            | 2 +-
+ 2 files changed, 2 insertions(+), 1 deletion(-)
 
+diff --git a/arch/x86/include/uapi/asm/kvm.h b/arch/x86/include/uapi/asm/kvm.h
+index 8cc79eca34b2..6faf0dcedf74 100644
+--- a/arch/x86/include/uapi/asm/kvm.h
++++ b/arch/x86/include/uapi/asm/kvm.h
+@@ -35,6 +35,7 @@
+ #define MC_VECTOR 18
+ #define XM_VECTOR 19
+ #define VE_VECTOR 20
++#define CP_VECTOR 21
+ 
+ /* Select x86 specific features in <linux/kvm.h> */
+ #define __KVM_HAVE_PIT
 diff --git a/arch/x86/kvm/trace.h b/arch/x86/kvm/trace.h
-index 57d79fd31df0..06da19b370c5 100644
+index 06da19b370c5..322913dda626 100644
 --- a/arch/x86/kvm/trace.h
 +++ b/arch/x86/kvm/trace.h
-@@ -461,8 +461,8 @@ TRACE_EVENT(kvm_inj_virq,
- 
+@@ -462,7 +462,7 @@ TRACE_EVENT(kvm_inj_virq,
  #define kvm_trace_sym_exc						\
  	EXS(DE), EXS(DB), EXS(BP), EXS(OF), EXS(BR), EXS(UD), EXS(NM),	\
--	EXS(DF), EXS(TS), EXS(NP), EXS(SS), EXS(GP), EXS(PF),		\
--	EXS(MF), EXS(AC), EXS(MC)
-+	EXS(DF), EXS(TS), EXS(NP), EXS(SS), EXS(GP), EXS(PF), EXS(MF),	\
-+	EXS(AC), EXS(MC), EXS(XM), EXS(VE)
+ 	EXS(DF), EXS(TS), EXS(NP), EXS(SS), EXS(GP), EXS(PF), EXS(MF),	\
+-	EXS(AC), EXS(MC), EXS(XM), EXS(VE)
++	EXS(AC), EXS(MC), EXS(XM), EXS(VE), EXS(CP)
  
  /*
   * Tracepoint for kvm interrupt injection:
