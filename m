@@ -1,48 +1,58 @@
-Return-Path: <kvm+bounces-57365-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-57366-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3A0E2B543F9
-	for <lists+kvm@lfdr.de>; Fri, 12 Sep 2025 09:34:21 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 00BDBB54430
+	for <lists+kvm@lfdr.de>; Fri, 12 Sep 2025 09:51:37 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 2E8204E15E3
-	for <lists+kvm@lfdr.de>; Fri, 12 Sep 2025 07:34:20 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D0D47480889
+	for <lists+kvm@lfdr.de>; Fri, 12 Sep 2025 07:51:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 290832C2369;
-	Fri, 12 Sep 2025 07:34:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D79A82D375D;
+	Fri, 12 Sep 2025 07:51:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=antgroup.com header.i=@antgroup.com header.b="YGVLbFd+"
 X-Original-To: kvm@vger.kernel.org
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8B6BA25F96D
-	for <kvm@vger.kernel.org>; Fri, 12 Sep 2025 07:34:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
+Received: from out28-147.mail.aliyun.com (out28-147.mail.aliyun.com [115.124.28.147])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4B6E82D29AA;
+	Fri, 12 Sep 2025 07:51:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.28.147
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757662454; cv=none; b=c+hf3i9VUocJoSGDc66yZOMGoG+qAcAIpRrDykia6/Cct54Wn7al/GDXL0iB0zlANJocPHRa1uU2TrIJjLSibsNGVNti8z6NLq+IR+EX7eIe7o0AeYhKEpeMKv7SUTjPo9gmeO/e/1Z8zrrBRXwXSD8IUeIiNtm5c+ENHTF/lzo=
+	t=1757663487; cv=none; b=gN24TU+7u05nEfWgQM+e/2FrjlH3YrC4bEZ+51Vl2qVhGMgp2ky2il1GfDAp4KBT21aB/OxEIaUIruvMjhzkaYtuLzZrLNeF/2jQaLBnUXxShJ9k8tgRIimIUcKKGGh0hyUvyR5zeg9/k71XY2vjYrSrrN+++hEoYI5tBH6qgos=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757662454; c=relaxed/simple;
-	bh=QpWLKBe0dAsw2cpDNFEzC2BDvmUf0cls2aPYrgkWR1s=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=GYeek88BMTpcpMANLzO/lvLM9YVoC6gkVRNFIxxDtoJVtKWBFfAHTb6QKrIsELzT1Qa1IdHanCAfYMpvzEu5iYkVnZkqvJbHmo6aP9g/vUimPg2qrydWozujdPkKCG9VSQF5s2GjqhESHNv8+8OsZ0Aol/AkiRWwtQzR3f1F5Iw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id A369D16A3;
-	Fri, 12 Sep 2025 00:34:03 -0700 (PDT)
-Received: from e122027.arm.com (unknown [10.57.4.234])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 4AC593F63F;
-	Fri, 12 Sep 2025 00:34:10 -0700 (PDT)
-From: Steven Price <steven.price@arm.com>
-To: Will Deacon <will@kernel.org>,
-	Julien Thierry <julien.thierry.kdev@gmail.com>
-Cc: kvm@vger.kernel.org,
-	Jean-Philippe Brucker <jean-philippe.brucker@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Steven Price <steven.price@arm.com>
-Subject: [PATCH kvmtool] net/uip: Avoid deadlock in uip_tcp_socket_free()
-Date: Fri, 12 Sep 2025 08:33:57 +0100
-Message-ID: <20250912073357.43316-1-steven.price@arm.com>
-X-Mailer: git-send-email 2.43.0
+	s=arc-20240116; t=1757663487; c=relaxed/simple;
+	bh=+7cuRViXLTexrEIEUZA2QAJ4I+5l6HYL3aEUlsCnhp4=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=UfWGrevKNtO+qHqnRB3CEZWss2dPeQSlqMhG/p5X6LAipMEtJ2k1Vwco0se8hH7KahIgBr6X2dX9/YM6dREdHjEz0/Afsx8VRTK2Tvjv2MUy/OBhPnnudi4yq7noFO0tQC7K3LpJVCFgKr7ssgw/8TR8cZzb04+7wD53jp7rllY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=antgroup.com; spf=pass smtp.mailfrom=antgroup.com; dkim=pass (1024-bit key) header.d=antgroup.com header.i=@antgroup.com header.b=YGVLbFd+; arc=none smtp.client-ip=115.124.28.147
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=antgroup.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=antgroup.com
+DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=antgroup.com; s=default;
+	t=1757663474; h=From:To:Subject:Date:Message-Id:MIME-Version;
+	bh=rgJcjAAgcEufnx4dvFsLoKLGeIBqnR126SH2k6vCfIE=;
+	b=YGVLbFd+w9edfr1p8Z8P1B2DanOHlqV+q79NiQ/ezNst+NS+UicNb2jIoB3Z7Is5+ygBts4fGsqYoSAUkl1qqOL58IUdPd2JhvKdtgmE4MEKAwcfe3Z0ldhbEUHaIfQQbSFMgsJfnjDd4RVBos//NFbBYPdry06hJa3lxSmLZMQ=
+Received: from localhost(mailfrom:houwenlong.hwl@antgroup.com fp:SMTPD_---.edPmhxg_1757662530 cluster:ay29)
+          by smtp.aliyun-inc.com;
+          Fri, 12 Sep 2025 15:35:30 +0800
+From: Hou Wenlong <houwenlong.hwl@antgroup.com>
+To: kvm@vger.kernel.org
+Cc: Sean Christopherson <seanjc@google.com>,
+	Paolo Bonzini <pbonzini@redhat.com>,
+	Thomas Gleixner <tglx@linutronix.de>,
+	Ingo Molnar <mingo@redhat.com>,
+	Borislav Petkov <bp@alien8.de>,
+	Dave Hansen <dave.hansen@linux.intel.com>,
+	x86@kernel.org,
+	"H. Peter Anvin" <hpa@zytor.com>,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH] KVM: x86: Remove outdated comments and code in kvm_on_user_return()
+Date: Fri, 12 Sep 2025 15:35:29 +0800
+Message-Id: <c10fb477105231e62da28f12c94c5452fa1eff74.1757662000.git.houwenlong.hwl@antgroup.com>
+X-Mailer: git-send-email 2.31.1
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -51,40 +61,47 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-The function uip_tcp_socket_free() is called with the sk lock held, but
-then goes on to call uip_tcp_socket_close() which attempts to aquire the
-lock a second time, triggering a deadlock if there are outstanding TCP
-connections.
+The commit a377ac1cd9d7b ("x86/entry: Move user return notifier out of
+loop") moved fire_user_return_notifiers() into the section with
+interrupts disabled, so the callback kvm_on_user_return() cannot be
+interrupted by kvm_arch_disable_virtualization_cpu() now. Therefore,
+remove the outdated comments and local_irq_save()/local_irq_restore()
+code in kvm_on_user_return().
 
-Rather than call uip_tcp_socket_close(), just do the cleanup directly in
-uip_tcp_socket_free().
-
-Fixes: d87b503f4d6e ("net/uip: Add exit function")
-Signed-off-by: Steven Price <steven.price@arm.com>
+Signed-off-by: Hou Wenlong <houwenlong.hwl@antgroup.com>
 ---
- net/uip/tcp.c | 8 ++++++--
- 1 file changed, 6 insertions(+), 2 deletions(-)
+ arch/x86/kvm/x86.c | 16 +++++-----------
+ 1 file changed, 5 insertions(+), 11 deletions(-)
 
-diff --git a/net/uip/tcp.c b/net/uip/tcp.c
-index 8e0ad5235240..2a6a8f5265d9 100644
---- a/net/uip/tcp.c
-+++ b/net/uip/tcp.c
-@@ -109,8 +109,12 @@ static void uip_tcp_socket_free(struct uip_tcp_socket *sk)
- 		pthread_join(sk->thread, NULL);
- 	}
- 
--	sk->write_done = sk->read_done = 1;
--	uip_tcp_socket_close(sk, SHUT_RDWR);
-+	shutdown(sk->fd, SHUT_RDWR);
-+	close(sk->fd);
-+	list_del(&sk->list);
+diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+index 33fba801b205..10afbacb1851 100644
+--- a/arch/x86/kvm/x86.c
++++ b/arch/x86/kvm/x86.c
+@@ -568,18 +568,12 @@ static void kvm_on_user_return(struct user_return_notifier *urn)
+ 	struct kvm_user_return_msrs *msrs
+ 		= container_of(urn, struct kvm_user_return_msrs, urn);
+ 	struct kvm_user_return_msr_values *values;
+-	unsigned long flags;
+
+-	/*
+-	 * Disabling irqs at this point since the following code could be
+-	 * interrupted and executed through kvm_arch_disable_virtualization_cpu()
+-	 */
+-	local_irq_save(flags);
+-	if (msrs->registered) {
+-		msrs->registered = false;
+-		user_return_notifier_unregister(urn);
+-	}
+-	local_irq_restore(flags);
++	lockdep_assert_irqs_disabled();
 +
-+	free(sk->buf);
-+	free(sk);
- }
- 
- static int uip_tcp_payload_send(struct uip_tcp_socket *sk, u8 flag, u16 payload_len)
--- 
-2.43.0
++	msrs->registered = false;
++	user_return_notifier_unregister(urn);
++
+ 	for (slot = 0; slot < kvm_nr_uret_msrs; ++slot) {
+ 		values = &msrs->values[slot];
+ 		if (values->host != values->curr) {
+--
+2.31.1
 
 
