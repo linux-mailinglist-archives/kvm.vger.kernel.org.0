@@ -1,71 +1,71 @@
-Return-Path: <kvm+bounces-57482-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-57483-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5B0C5B55A68
-	for <lists+kvm@lfdr.de>; Sat, 13 Sep 2025 01:38:01 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 96868B55A4A
+	for <lists+kvm@lfdr.de>; Sat, 13 Sep 2025 01:35:20 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id AB8EFBA32AC
-	for <lists+kvm@lfdr.de>; Fri, 12 Sep 2025 23:33:28 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C9679586E6A
+	for <lists+kvm@lfdr.de>; Fri, 12 Sep 2025 23:35:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1F2262E718E;
-	Fri, 12 Sep 2025 23:24:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B4E142E8E04;
+	Fri, 12 Sep 2025 23:24:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="UzdDs0Up"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="3mhunu8T"
 X-Original-To: kvm@vger.kernel.org
 Received: from mail-pg1-f201.google.com (mail-pg1-f201.google.com [209.85.215.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5A35E2E7BD1
-	for <kvm@vger.kernel.org>; Fri, 12 Sep 2025 23:24:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3CAF02900A8
+	for <kvm@vger.kernel.org>; Fri, 12 Sep 2025 23:24:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757719477; cv=none; b=RS2endYHWCY0EbSoji8NM1FuOciX/e6jv/wB1GdD4q2GOedm77JrJWTJoujdY4OMc/Q1atrPyn4LdKXheruVsf/GL8UhEc4/RJKTW0D+WNsnfL8Y87umh9V6bfsrAuahWDxGwjwrOJmR3ki9s6cRn/zj9ysGtps9aM935CFedQc=
+	t=1757719478; cv=none; b=LFC19GZUuLFF/jjPofk1SFYy57hCpgbdJcYWnaEQyldMX3IMxz19xBYQ1uow0Ortq2TSVit9wFQvelJegyhzWC2SqZGEUCP2FZ2kb+W3zPpX7X6/0YK76wC/kW8JdAnM8mx41U3fFHm2NZOxSOomLzLNH5qGv7mA20AmzYDf0e8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757719477; c=relaxed/simple;
-	bh=2wjGULkmS/6PwRSQm8osqaxXFXmRY0fiL5uBUNzOoGg=;
+	s=arc-20240116; t=1757719478; c=relaxed/simple;
+	bh=40dl71ECyFWFXfkSw+70ZDfPeD3+mlVMScAldWN2Rms=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=ZmLpDT3XqG2+nd7zXy+u6uhwTgRBoDUXQ5hVOnv0YQ9ZwbaoNLL7bBmQQl3NRdQRPIbGpdBLL+CfPvVCgIyslh0asnDqzluj1jQx2OY1iheCcRmnZ2K7Qow9r4UPa6RfMMb1bib70WRqFOevsvMP4w/dD3FJLQuoWAQIXXHeb7w=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=UzdDs0Up; arc=none smtp.client-ip=209.85.215.201
+	 To:Cc:Content-Type; b=SJerejL9mBTWdOiUfBcueiisnv0gTdQGCXURpy27A+qg+W14kYaqVNz1ABex5+fzJNweFPv5zeIIquY3VvVinMZUTAROMbOdG7XRjqZ8e7LxSkduLtLgg1aMgNe2KOGhk2DQtjosxyDqbaN6loM/9oCMusYnoVn6VhT0dxu4b+M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=3mhunu8T; arc=none smtp.client-ip=209.85.215.201
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pg1-f201.google.com with SMTP id 41be03b00d2f7-b54ac2658acso1040686a12.1
-        for <kvm@vger.kernel.org>; Fri, 12 Sep 2025 16:24:35 -0700 (PDT)
+Received: by mail-pg1-f201.google.com with SMTP id 41be03b00d2f7-b54b37ba2d9so650794a12.0
+        for <kvm@vger.kernel.org>; Fri, 12 Sep 2025 16:24:36 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1757719475; x=1758324275; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1757719476; x=1758324276; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:reply-to:from:to:cc:subject:date:message-id:reply-to;
-        bh=zRTuC+/aMJy18zeUD9dpYx1dSaF5QGiJuAN55i0w7BI=;
-        b=UzdDs0Uptb+D/xhaHbru0ON/EqdbgltGXbOqHkt7Zx08pQ9NGx0afOyZAhunYC3i2i
-         jQFrUj4O2lvox1CrS+VcRgoOPmTU8sdx4jT48DE6h/LbxuCrdeDe6EXWLfJ2x4MTB6fo
-         D73irkEBgoiyTel/sLT1UIXVj+idVGAjCW/TlxQ5N5DhX/UJDUVZkrP8X/XesTUJz9Po
-         wUhfJaEta91YpduGThwT/nulg41bIt73IZtIQrWSoSoVhgE9xgiM0pxyir06TM75wjTJ
-         F46mK4xCEiEZrXWZjcLlJuttrnhisxOgSqj44ie4jKaLeMgUxeXsfl9v3ErszLU9kXqc
-         +0CA==
+        bh=4jmux4W5u0jC39lKwSsyN7sb7Ko3HpaGxf4gpZSmOsw=;
+        b=3mhunu8T2K3siQmPTFmrVSrev6pslT/F3yvUHmeWNTVnF+I/bYXxpSHqsGYoMEhbXW
+         W0Iv09YZJFzlK/jKRMSVgsMBvwQvtSlP4qCzacMBQLfmuuiJCL/wCx+rjNX8XmK/roBI
+         6oz75xQDRexEMbfowNYhr3bEt4zDtLzsEDLvzTePpiQ0EpT8nQbHZlsk+kzpegbKqH5c
+         dpSr0gJEpsCq+zBUhMCZwJ+8dMFj59hu5FFnx253bfTaCWLEz1DD7PZBweVSdMdaEaxk
+         HLy8QRg2W+iGyQauZM3iFVCrnErKPyleTm37aFVasuG2G2MOBNRSsVP62HqFxcp1dOKW
+         lNcw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1757719475; x=1758324275;
+        d=1e100.net; s=20230601; t=1757719476; x=1758324276;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:reply-to:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=zRTuC+/aMJy18zeUD9dpYx1dSaF5QGiJuAN55i0w7BI=;
-        b=lcx+uNL2arXjNfXx/ISvF9xyy0tOsaGQWvbm4yGOIU7jFXhuXa+hNCXsyuBAGpS6aZ
-         7KwEQedF+cp1qUixA/c2CkXTa0Rw89qcOi3j3BHqOK6YkzAfcFu3pQ3Qa9VmN36KckWy
-         K3blaT69GbeCxkVBuuVU7MT75BZw2gsiBtJ6kdJS7ZLpSKmTfx4THKwPrByakTWYxIdy
-         I9J+PUWhZK0P9uCvJq444k8xpHGIRaV9cwe4h282LLvAGMzBTe4nCWXN1u9vbtw/1EEr
-         HvFxA5Y1npF/9fmoCy2AGS7KfXs1a4SmNpFVDMKrWX61ofjyrc+LgGlvbEsAZK0w2WhY
-         Wt2g==
-X-Gm-Message-State: AOJu0Yxvv5/ctRtkvMz0/Eo/uO3RoKInqA39r7M6sUTGDmemtgPP+Jub
-	US+++EwkxU4pUu6XlWjs2m/pBl3cxLAImolx5QJTDpKvnMolQuFWANiyBq0U90EcdglEuGTStRk
-	STPpPSQ==
-X-Google-Smtp-Source: AGHT+IGsu99kW011YxagBqZtOacoDUyKS0gh7c2D27eBAO6VPWe3gQBMghuflC0M7c+1GCHeLayGgWXbLRo=
-X-Received: from pgha19.prod.google.com ([2002:a63:d413:0:b0:b54:ace3:bd08])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a05:6a20:7d9f:b0:249:9c7a:7702
- with SMTP id adf61e73a8af0-2602c243603mr6351072637.36.1757719474660; Fri, 12
- Sep 2025 16:24:34 -0700 (PDT)
+        bh=4jmux4W5u0jC39lKwSsyN7sb7Ko3HpaGxf4gpZSmOsw=;
+        b=aqwwE0Lm/JSuiFCty0uPIfPMMADmSV2NKqwpwFedLjoiLVH6vtEesy5OV1KfKFI5T1
+         yt0NMsMB/H8rauu20SFhEmCuToaK0J/rPHI9CQF4/1tGDicyoTp0RDAKmovueSeb3flU
+         nqQggYPlUz92h5O0DGYOwH2Gqkt0GQ75tD02l/Oi0kur4B6cmJgZ/DgD1soPGvCzj+oJ
+         IsrzHTObpRbNaic5bLUAqEsKWJYfuaUSXx6XOc1dNi2X9cIYTeja4D4/xTVQJONfHJge
+         NdE3xLu3ObeyfY6XPEQ/aZWG43r/fikPhqy8nEreiMizrhR5e/ZmD9xhiqKA4C3KJGrw
+         Acyw==
+X-Gm-Message-State: AOJu0Ywka4zqYRVHVblpaq8V4v7kBbNXMy8bEgLfSyfAK1PSpP5ptjoz
+	CR4GRpwiPTUaA+NsjkoyeoznCc25vxwzgI3tB2avYxkkDmLx3iMjP7dLolnIVcMUxEW37aI/T5A
+	RoSjXeQ==
+X-Google-Smtp-Source: AGHT+IEncGKDA7ljh7ysYahjwxo7KpSwFokIz76a6WA8PrjcR8wVa/sRAtW8DiyFrY9OVvNiumSd5nTV54I=
+X-Received: from pjbsk9.prod.google.com ([2002:a17:90b:2dc9:b0:32d:bbf6:4b50])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:902:e750:b0:24d:34:b9e7
+ with SMTP id d9443c01a7336-25bae8f39c5mr90704225ad.29.1757719476420; Fri, 12
+ Sep 2025 16:24:36 -0700 (PDT)
 Reply-To: Sean Christopherson <seanjc@google.com>
-Date: Fri, 12 Sep 2025 16:23:17 -0700
+Date: Fri, 12 Sep 2025 16:23:18 -0700
 In-Reply-To: <20250912232319.429659-1-seanjc@google.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
@@ -75,9 +75,9 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
 References: <20250912232319.429659-1-seanjc@google.com>
 X-Mailer: git-send-email 2.51.0.384.g4c02a37b29-goog
-Message-ID: <20250912232319.429659-40-seanjc@google.com>
-Subject: [PATCH v15 39/41] KVM: selftests: Add coverate for KVM-defined
- registers in MSRs test
+Message-ID: <20250912232319.429659-41-seanjc@google.com>
+Subject: [PATCH v15 40/41] KVM: selftests: Verify MSRs are (not) in
+ save/restore list when (un)supported
 From: Sean Christopherson <seanjc@google.com>
 To: Paolo Bonzini <pbonzini@redhat.com>, Sean Christopherson <seanjc@google.com>
 Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
@@ -87,175 +87,53 @@ Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
 	Xiaoyao Li <xiaoyao.li@intel.com>, Zhang Yi Z <yi.z.zhang@linux.intel.com>
 Content-Type: text/plain; charset="UTF-8"
 
-Add test coverage for the KVM-defined GUEST_SSP "register" in the MSRs
-test.  While _KVM's_ goal is to not tie the uAPI of KVM-defined registers
-to any particular internal implementation, i.e. to not commit in uAPI to
-handling GUEST_SSP as an MSR, treating GUEST_SSP as an MSR for testing
-purposes is a-ok and is a naturally fit given the semantics of SSP.
+Add a check in the MSRs test to verify that KVM's reported support for
+MSRs with feature bits is consistent between KVM's MSR save/restore lists
+and KVM's supported CPUID.
+
+To deal with Intel's wonderful decision to bundle IBT and SHSTK under CET,
+track the "second" feature to avoid false failures when running on a CPU
+with only one of IBT or SHSTK.
 
 Signed-off-by: Sean Christopherson <seanjc@google.com>
 ---
- tools/testing/selftests/kvm/x86/msrs_test.c | 97 ++++++++++++++++++++-
- 1 file changed, 94 insertions(+), 3 deletions(-)
+ tools/testing/selftests/kvm/x86/msrs_test.c | 22 ++++++++++++++++++++-
+ 1 file changed, 21 insertions(+), 1 deletion(-)
 
 diff --git a/tools/testing/selftests/kvm/x86/msrs_test.c b/tools/testing/selftests/kvm/x86/msrs_test.c
-index 53e155ba15d4..6a956cfe0c65 100644
+index 6a956cfe0c65..442409e40da0 100644
 --- a/tools/testing/selftests/kvm/x86/msrs_test.c
 +++ b/tools/testing/selftests/kvm/x86/msrs_test.c
-@@ -17,9 +17,10 @@ struct kvm_msr {
- 	const u64 write_val;
- 	const u64 rsvd_val;
- 	const u32 index;
-+	const bool is_kvm_defined;
- };
- 
--#define ____MSR_TEST(msr, str, val, rsvd, reset, feat, f2)		\
-+#define ____MSR_TEST(msr, str, val, rsvd, reset, feat, f2, is_kvm)	\
- {									\
- 	.index = msr,							\
- 	.name = str,							\
-@@ -28,10 +29,11 @@ struct kvm_msr {
- 	.reset_val = reset,						\
- 	.feature = X86_FEATURE_ ##feat,					\
- 	.feature2 = X86_FEATURE_ ##f2,					\
-+	.is_kvm_defined = is_kvm,					\
- }
- 
- #define __MSR_TEST(msr, str, val, rsvd, reset, feat)			\
--	____MSR_TEST(msr, str, val, rsvd, reset, feat, feat)
-+	____MSR_TEST(msr, str, val, rsvd, reset, feat, feat, false)
- 
- #define MSR_TEST_NON_ZERO(msr, val, rsvd, reset, feat)			\
- 	__MSR_TEST(msr, #msr, val, rsvd, reset, feat)
-@@ -40,7 +42,7 @@ struct kvm_msr {
- 	__MSR_TEST(msr, #msr, val, rsvd, 0, feat)
- 
- #define MSR_TEST2(msr, val, rsvd, feat, f2)				\
--	____MSR_TEST(msr, #msr, val, rsvd, 0, feat, f2)
-+	____MSR_TEST(msr, #msr, val, rsvd, 0, feat, f2, false)
- 
- /*
-  * Note, use a page aligned value for the canonical value so that the value
-@@ -51,6 +53,9 @@ static const u64 canonical_val = 0x123456789000ull;
- #define MSR_TEST_CANONICAL(msr, feat)					\
- 	__MSR_TEST(msr, #msr, canonical_val, NONCANONICAL, 0, feat)
- 
-+#define MSR_TEST_KVM(msr, val, rsvd, feat)				\
-+	____MSR_TEST(KVM_REG_ ##msr, #msr, val, rsvd, 0, feat, feat, true)
-+
- /*
-  * The main struct must be scoped to a function due to the use of structures to
-  * define features.  For the global structure, allocate enough space for the
-@@ -156,6 +161,83 @@ static void guest_main(void)
- static bool has_one_reg;
- static bool use_one_reg;
- 
-+#define KVM_X86_MAX_NR_REGS	1
-+
-+static bool vcpu_has_reg(struct kvm_vcpu *vcpu, u64 reg)
-+{
-+	struct {
-+		struct kvm_reg_list list;
-+		u64 regs[KVM_X86_MAX_NR_REGS];
-+	} regs = {};
-+	int r, i;
-+
-+	/*
-+	 * If KVM_GET_REG_LIST succeeds with n=0, i.e. there are no supported
-+	 * regs, then the vCPU obviously doesn't support the reg.
-+	 */
-+	r = __vcpu_ioctl(vcpu, KVM_GET_REG_LIST, &regs.list.n);
-+	if (!r)
-+		return false;
-+
-+	TEST_ASSERT_EQ(errno, E2BIG);
-+
-+	/*
-+	 * KVM x86 is expected to support enumerating a relative small number
-+	 * of regs.  The majority of registers supported by KVM_{G,S}ET_ONE_REG
-+	 * are enumerated via other ioctls, e.g. KVM_GET_MSR_INDEX_LIST.  For
-+	 * simplicity, hardcode the maximum number of regs and manually update
-+	 * the test as necessary.
-+	 */
-+	TEST_ASSERT(regs.list.n <= KVM_X86_MAX_NR_REGS,
-+		    "KVM reports %llu regs, test expects at most %u regs, stale test?",
-+		    regs.list.n, KVM_X86_MAX_NR_REGS);
-+
-+	vcpu_ioctl(vcpu, KVM_GET_REG_LIST, &regs.list.n);
-+	for (i = 0; i < regs.list.n; i++) {
-+		if (regs.regs[i] == reg)
-+			return true;
-+	}
-+
-+	return false;
-+}
-+
-+static void host_test_kvm_reg(struct kvm_vcpu *vcpu)
-+{
-+	bool has_reg = vcpu_cpuid_has(vcpu, msrs[idx].feature);
-+	u64 reset_val = msrs[idx].reset_val;
-+	u64 write_val = msrs[idx].write_val;
-+	u64 rsvd_val = msrs[idx].rsvd_val;
-+	u32 reg = msrs[idx].index;
-+	u64 val;
-+	int r;
-+
-+	if (!use_one_reg)
-+		return;
-+
-+	TEST_ASSERT_EQ(vcpu_has_reg(vcpu, KVM_X86_REG_KVM(reg)), has_reg);
-+
-+	if (!has_reg) {
-+		r = __vcpu_get_reg(vcpu, KVM_X86_REG_KVM(reg), &val);
-+		TEST_ASSERT(r && errno == EINVAL,
-+			    "Expected failure on get_reg(0x%x)", reg);
-+		rsvd_val = 0;
-+		goto out;
-+	}
-+
-+	val = vcpu_get_reg(vcpu, KVM_X86_REG_KVM(reg));
-+	TEST_ASSERT(val == reset_val, "Wanted 0x%lx from get_reg(0x%x), got 0x%lx",
-+		    reset_val, reg, val);
-+
-+	vcpu_set_reg(vcpu, KVM_X86_REG_KVM(reg), write_val);
-+	val = vcpu_get_reg(vcpu, KVM_X86_REG_KVM(reg));
-+	TEST_ASSERT(val == write_val, "Wanted 0x%lx from get_reg(0x%x), got 0x%lx",
-+		    write_val, reg, val);
-+
-+out:
-+	r = __vcpu_set_reg(vcpu, KVM_X86_REG_KVM(reg), rsvd_val);
-+	TEST_ASSERT(r, "Expected failure on set_reg(0x%x, 0x%lx)", reg, rsvd_val);
-+}
-+
- static void host_test_msr(struct kvm_vcpu *vcpu, u64 guest_val)
- {
- 	u64 reset_val = msrs[idx].reset_val;
-@@ -265,6 +347,8 @@ static void test_msrs(void)
- 		MSR_TEST(MSR_IA32_PL2_SSP, canonical_val, canonical_val | 1, SHSTK),
- 		MSR_TEST_CANONICAL(MSR_IA32_PL3_SSP, SHSTK),
- 		MSR_TEST(MSR_IA32_PL3_SSP, canonical_val, canonical_val | 1, SHSTK),
-+
-+		MSR_TEST_KVM(GUEST_SSP, canonical_val, NONCANONICAL, SHSTK),
- 	};
- 
- 	const struct kvm_x86_cpu_feature feat_none = X86_FEATURE_NONE;
-@@ -280,6 +364,7 @@ static void test_msrs(void)
- 	const int NR_VCPUS = 3;
- 	struct kvm_vcpu *vcpus[NR_VCPUS];
- 	struct kvm_vm *vm;
-+	int i;
- 
- 	kvm_static_assert(sizeof(__msrs) <= sizeof(msrs));
- 	kvm_static_assert(ARRAY_SIZE(__msrs) <= ARRAY_SIZE(msrs));
-@@ -307,6 +392,12 @@ static void test_msrs(void)
+@@ -392,12 +392,32 @@ static void test_msrs(void)
  	}
  
  	for (idx = 0; idx < ARRAY_SIZE(__msrs); idx++) {
-+		if (msrs[idx].is_kvm_defined) {
-+			for (i = 0; i < NR_VCPUS; i++)
-+				host_test_kvm_reg(vcpus[i]);
-+			continue;
-+		}
+-		if (msrs[idx].is_kvm_defined) {
++		struct kvm_msr *msr = &msrs[idx];
++
++		if (msr->is_kvm_defined) {
+ 			for (i = 0; i < NR_VCPUS; i++)
+ 				host_test_kvm_reg(vcpus[i]);
+ 			continue;
+ 		}
+ 
++		/*
++		 * Verify KVM_GET_SUPPORTED_CPUID and KVM_GET_MSR_INDEX_LIST
++		 * are consistent with respect to MSRs whose existence is
++		 * enumerated via CPUID.  Note, using LM as a dummy feature
++		 * is a-ok here as well, as all MSRs that abuse LM should be
++		 * unconditionally reported in the save/restore list (and
++		 * selftests are 64-bit only).  Note #2, skip the check for
++		 * FS/GS.base MSRs, as they aren't reported in the save/restore
++		 * list since their state is managed via SREGS.
++		 */
++		TEST_ASSERT(msr->index == MSR_FS_BASE || msr->index == MSR_GS_BASE ||
++			    kvm_msr_is_in_save_restore_list(msr->index) ==
++			    (kvm_cpu_has(msr->feature) || kvm_cpu_has(msr->feature2)),
++			    "%s %s save/restore list, but %s according to CPUID", msr->name,
++			    kvm_msr_is_in_save_restore_list(msr->index) ? "is" : "isn't",
++			    (kvm_cpu_has(msr->feature) || kvm_cpu_has(msr->feature2)) ?
++			    "supported" : "unsupported");
 +
  		sync_global_to_guest(vm, idx);
  
