@@ -1,156 +1,240 @@
-Return-Path: <kvm+bounces-57372-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-57373-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id D58E7B545FD
-	for <lists+kvm@lfdr.de>; Fri, 12 Sep 2025 10:51:50 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 88DF6B546C3
+	for <lists+kvm@lfdr.de>; Fri, 12 Sep 2025 11:19:18 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0F76A17926E
-	for <lists+kvm@lfdr.de>; Fri, 12 Sep 2025 08:51:38 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 38279AC07A9
+	for <lists+kvm@lfdr.de>; Fri, 12 Sep 2025 09:18:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 07E24270EBF;
-	Fri, 12 Sep 2025 08:51:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9C013279DDB;
+	Fri, 12 Sep 2025 09:17:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="HevlWepv"
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="c70VdPsx"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AE2FB25D1FC
-	for <kvm@vger.kernel.org>; Fri, 12 Sep 2025 08:51:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 09FFB266B6F;
+	Fri, 12 Sep 2025 09:17:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757667079; cv=none; b=gUl25imDJrue+kiBmMhd3VvASx6dEO0cdf80YwXbjlGFb/HGfaytXRZIgU1wki2D7e056Mw5oAHSKkS9VrHf9sSU8nGzM/RSsxAzp5mKDrCMiFNjFiVmaeojml7dyRP3qcYytwFfEPjxJ/wDYSFnRf0BHPzqYEJsI7XPAyb0Qrs=
+	t=1757668646; cv=none; b=LHOtoO0m2Jiy5qRMvHD1ec8Q4/19XnZ7jQqv13coqdMlR2YiNyo5b0evySyqeFti4ncv9qXYXO+Xh30cvMWA4WhInxT+fyEfaKdrhUWKlV5JQ25D1kgA16r6RpOzQ4JzurzShjLX9+6mqSqLf8fvq0QfWsyJ/Q910aJD00Ojqpo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757667079; c=relaxed/simple;
-	bh=47vQnPYhJDC8oGXmWGPzVRbfS0hchpXRA0GG7BlSkd0=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=egmVojZkKXSpr59i4ti+VMN5HGo7fpgOqnRGLpmG5f1LorjbtLLq7tQD4RMdp8dskZZTkMA8yN2nqFFscTgxCgCuxhgs91J6Z8lPx+aYH7Oj/iI4ltqPj8KLhCT+EfJHnkBMjLuLWO0MGRdZw6N9X5EOG33UXst3KfTOo4lXK64=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=HevlWepv; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1757667075;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=8kMSCxiL40HDEAJ/S1kTvsHr28EdmEyCSrCl/4d+5lY=;
-	b=HevlWepvgxJ88W9Ts9BuIqyl6X6wjaMuG53WrjpKj1/I3Qc/UEXkHIuwyKVj6Qj+uUIvTW
-	W2JXDz/emA+hfvPRz/F0bAx+byGaNXUP7u/GRaPo0Z2W7sE084ti+4PJu8pogAKWVPdaXC
-	8TxulreLS5JfcTQPkglxc4WkFDLble0=
-Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
- [209.85.221.71]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-636-9GglbmP0PCa3sblRoYXapA-1; Fri, 12 Sep 2025 04:51:13 -0400
-X-MC-Unique: 9GglbmP0PCa3sblRoYXapA-1
-X-Mimecast-MFC-AGG-ID: 9GglbmP0PCa3sblRoYXapA_1757667073
-Received: by mail-wr1-f71.google.com with SMTP id ffacd0b85a97d-3e75fcdddbdso774776f8f.2
-        for <kvm@vger.kernel.org>; Fri, 12 Sep 2025 01:51:13 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1757667072; x=1758271872;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=8kMSCxiL40HDEAJ/S1kTvsHr28EdmEyCSrCl/4d+5lY=;
-        b=suKJtTNvtJ4vMKKsDiQVqgmq+bc5jnKwcOGv2Xqnf0JeiNppa/5NQa+z7aR+I4OGAD
-         Cs4c4BAVOKyHixf5QT93sfGhAoROjuK4XoOFCgFF+k68ZOmCREUF75RVWJvXu+2kwUZm
-         txrDOzWNrqFp1RLF8r5NCoK2GYm55zVfOXQiLV9yW1uBv4UdDnnA+zg/J+Ow6SNXsQ+D
-         WgAOvvkRbQNF/mNT9YPBl0hnvIHNsTlIx0ijFHkC6rZuKI/GWX7cPghk0BsbLMd7ZtM2
-         pRgXGsoGRIzUiDuC0Q2zeYszLekO8HRmeJfJbTV58L47e5RhCBqmb8q+KMNaQcHcVBe0
-         2KYA==
-X-Forwarded-Encrypted: i=1; AJvYcCWaWucG2YQ9/Neu3AkAhvKBIE2jujdeAWBg454pdxzLFgcRUvc22WEZ5pvf1aXd1WttK54=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxCD4rgQgWZVXC9MMYbhP7zJxMuYmAa25O/T/8lZrwDWQTetZ0L
-	GsG2QEsVj2PIXJElEWdfz0ZZ/ZvBTnMu+khlrG2tv9sV3cTRwH9rwIXGAOhAIVCepxWeUXbpdLT
-	++wEWeyjvL2xutoLJhGyLTQwPnBzdnUT6TJkwEHR1hMOFJrDeyJxSBw==
-X-Gm-Gg: ASbGncv7KsZekzmiZLPVfdGZFxkO5Oj5w1IBT3bWNxTDEbO0IIYyPzeYHACoz/5frlI
-	gC2InHxgJgaet4nmjcGIY4NP/VBzS1sgVSVmZHxreAn13mvbbuw07sxy0nhiqUidN8Ogg6FmVCM
-	YtLGrhL/rar+qDB6nP2rcagHHDrQQlUwlw9cw8pITnpDy0lXL2YhLo6EDYFva6qYOuK83BihtuB
-	0+a91KnsxtqL36VoZuNYhnA5+VfqWnK39jUdFQFJ32TbGjyx8dgY0/w9wuL4K8aMX57GggjUwDd
-	gf5oXX0xclWeVGHYSDYFF0I8EM7Yl/Cs
-X-Received: by 2002:a05:6000:2407:b0:3e3:24c3:6d71 with SMTP id ffacd0b85a97d-3e76559415fmr1647252f8f.1.1757667072451;
-        Fri, 12 Sep 2025 01:51:12 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IEZ2GT21YnVBh75Wd3k+yoprEvCJQn5G2Y8wrMGySDHgCshlINWqkn9hIrIH8egTbTA2leqKQ==
-X-Received: by 2002:a05:6000:2407:b0:3e3:24c3:6d71 with SMTP id ffacd0b85a97d-3e76559415fmr1647225f8f.1.1757667072042;
-        Fri, 12 Sep 2025 01:51:12 -0700 (PDT)
-Received: from redhat.com ([2a0d:6fc0:1536:c800:2952:74e:d261:8021])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-45e41b6dbdbsm40474885e9.22.2025.09.12.01.51.10
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 12 Sep 2025 01:51:11 -0700 (PDT)
-Date: Fri, 12 Sep 2025 04:51:08 -0400
-From: "Michael S. Tsirkin" <mst@redhat.com>
-To: Jason Wang <jasowang@redhat.com>
-Cc: eperezma@redhat.com, jonah.palmer@oracle.com, kuba@kernel.org,
-	jon@nutanix.com, kvm@vger.kernel.org,
-	virtualization@lists.linux.dev, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org, stable@vger.kernel.org
-Subject: Re: [PATCH net 1/2] vhost-net: unbreak busy polling
-Message-ID: <20250912045102-mutt-send-email-mst@kernel.org>
-References: <20250912082658.2262-1-jasowang@redhat.com>
+	s=arc-20240116; t=1757668646; c=relaxed/simple;
+	bh=ySVkdDkZzRpGICWC/20iAQUj0OLivT9bOrUFLk7KceU=;
+	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=iyU/viO+vi2tVYYnJpA44jO/CfvhVdJVuJDx0VuNIW9kJe+753bWOYHPwx/fVvG1dgKuaLGy7+R/1tu8XMQn2xi6PSqwKvkL4Sic1FwmWrInLZyl4M8EuAs+9m1Y51H7h771tGCqOrInGXxEewM61T8McX5snU5+qXZNFzmjoMM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=c70VdPsx; arc=none smtp.client-ip=148.163.158.5
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
+Received: from pps.filterd (m0360072.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 58C9E9Mv029522;
+	Fri, 12 Sep 2025 09:17:22 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
+	:content-transfer-encoding:content-type:date:from:in-reply-to
+	:message-id:mime-version:references:subject:to; s=pp1; bh=DIz8zw
+	WBiXd9ENx7h03p1liHdRY8uIjoVFM9etGbA7o=; b=c70VdPsxZqkArlfTbL+eaX
+	Rb1FstmeOwpKPXSjkw/spOYUMdbdoqAUFVKFdjpA/mLylJiOopaIXk1n75N2olzR
+	fUjObLcyB5vUyAwJBvAwblTo231IYbrf2Lz4gmuQiwGvj2YM4blRG5kcM/vGoQX+
+	mTED5u4Jlj7rnE75y6Pc0a+khtBK+a048skNnpq84z3Sj0UFJS06VAmF2LY8o3AZ
+	nDhB145qirB/RNz184QvFodN22wbqHDGeoil8D+uMCHIyfCOmYXwEVrqgAhUZ9K3
+	RiOf2mHIq6EVfpEN+YwfdCU8e7GDKIC5uB4CGwWo6hxwOO0R4yg9tdPC916bYzTQ
+	==
+Received: from ppma12.dal12v.mail.ibm.com (dc.9e.1632.ip4.static.sl-reverse.com [50.22.158.220])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 490ukexm69-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Fri, 12 Sep 2025 09:17:22 +0000 (GMT)
+Received: from pps.filterd (ppma12.dal12v.mail.ibm.com [127.0.0.1])
+	by ppma12.dal12v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 58C8PXAG011428;
+	Fri, 12 Sep 2025 09:17:08 GMT
+Received: from smtprelay07.fra02v.mail.ibm.com ([9.218.2.229])
+	by ppma12.dal12v.mail.ibm.com (PPS) with ESMTPS id 490y9uteq9-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Fri, 12 Sep 2025 09:17:08 +0000
+Received: from smtpav06.fra02v.mail.ibm.com (smtpav06.fra02v.mail.ibm.com [10.20.54.105])
+	by smtprelay07.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 58C9H42p50725220
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Fri, 12 Sep 2025 09:17:04 GMT
+Received: from smtpav06.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 8A22B20040;
+	Fri, 12 Sep 2025 09:17:04 +0000 (GMT)
+Received: from smtpav06.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id C0E5920049;
+	Fri, 12 Sep 2025 09:17:03 +0000 (GMT)
+Received: from li-978a334c-2cba-11b2-a85c-a0743a31b510.ibm.com (unknown [9.111.85.40])
+	by smtpav06.fra02v.mail.ibm.com (Postfix) with ESMTP;
+	Fri, 12 Sep 2025 09:17:03 +0000 (GMT)
+Message-ID: <267557ab6a061d55e4961312f4dc756bd4e0eaec.camel@linux.ibm.com>
+Subject: Re: [PATCH v2 03/20] KVM: s390: Add gmap_helper_set_unused()
+From: Nina Schoetterl-Glausch <nsg@linux.ibm.com>
+To: Claudio Imbrenda <imbrenda@linux.ibm.com>, kvm@vger.kernel.org
+Cc: linux-s390@vger.kernel.org, borntraeger@de.ibm.com, frankja@linux.ibm.com,
+        nrb@linux.ibm.com, seiden@linux.ibm.com, schlameuss@linux.ibm.com,
+        hca@linux.ibm.com, svens@linux.ibm.com, agordeev@linux.ibm.com,
+        david@redhat.com, gerald.schaefer@linux.ibm.com
+Date: Fri, 12 Sep 2025 11:17:02 +0200
+In-Reply-To: <20250910180746.125776-4-imbrenda@linux.ibm.com>
+References: <20250910180746.125776-1-imbrenda@linux.ibm.com>
+	 <20250910180746.125776-4-imbrenda@linux.ibm.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.56.2 (3.56.2-1.fc42) 
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250912082658.2262-1-jasowang@redhat.com>
+X-TM-AS-GCONF: 00
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUwOTA2MDE5NSBTYWx0ZWRfX9vod4ksvTBXZ
+ lXEEFKjjeWBG0T5MizFJ0fDJMzoOP5vQag6TKNAxhfISFTbNDAvl7jMbR43gjgrFEDupgFy72a6
+ Z/MhJp76zEFIiUasO84SmUGdyyDU9XQ+jN6r3U3oyb6U6WLTtKSIu5G8ZMH4peXLe2OxtiUSJqK
+ syDO3T/tmeC61tzAuY7DC6V77hpeVPOBoss6ZfXaTFS6JshsOOxMHhgaSwR1rzDwxmHmg5t3Amd
+ Uaq5Nq/SwiiJvH48lscBk7DwZZnacQwR2r4bAgxbZBBljhuHGm3TUpoMcqCr8XghxPYoZOhOrG5
+ MZJ4HpgYAlRyK2w77rf9V9DQ24WhmlCVeOSidtw9lK6jd9UCzop0cAbeyuHlreeFSg43WLxSCXV
+ pSAIVJFM
+X-Proofpoint-ORIG-GUID: y0Ll2Sz6P_Mm42B1st_zSz2mcQI1AQhg
+X-Proofpoint-GUID: y0Ll2Sz6P_Mm42B1st_zSz2mcQI1AQhg
+X-Authority-Analysis: v=2.4 cv=StCQ6OO0 c=1 sm=1 tr=0 ts=68c3e522 cx=c_pps
+ a=bLidbwmWQ0KltjZqbj+ezA==:117 a=bLidbwmWQ0KltjZqbj+ezA==:17
+ a=IkcTkHD0fZMA:10 a=yJojWOMRYYMA:10 a=VnNF1IyMAAAA:8 a=fI3iV-jTyyiWxqSZq_oA:9
+ a=QEXdDO2ut3YA:10
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1117,Hydra:6.1.9,FMLib:17.12.80.40
+ definitions=2025-09-12_03,2025-09-11_02,2025-03-28_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ spamscore=0 malwarescore=0 bulkscore=0 clxscore=1011 adultscore=0
+ suspectscore=0 priorityscore=1501 impostorscore=0 phishscore=0
+ classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
+ reason=mlx scancount=1 engine=8.19.0-2507300000 definitions=main-2509060195
 
-On Fri, Sep 12, 2025 at 04:26:57PM +0800, Jason Wang wrote:
-> Commit 67a873df0c41 ("vhost: basic in order support") pass the number
-> of used elem to vhost_net_rx_peek_head_len() to make sure it can
-> signal the used correctly before trying to do busy polling. But it
-> forgets to clear the count, this would cause the count run out of sync
-> with handle_rx() and break the busy polling.
-> 
-> Fixing this by passing the pointer of the count and clearing it after
-> the signaling the used.
-> 
-> Cc: stable@vger.kernel.org
-> Fixes: 67a873df0c41 ("vhost: basic in order support")
-> Signed-off-by: Jason Wang <jasowang@redhat.com>
+On Wed, 2025-09-10 at 20:07 +0200, Claudio Imbrenda wrote:
+> Add gmap_helper_set_unused() to mark userspace ptes as unused.
+>=20
+> Core mm code will use that information to discard unused pages instead
+> of attempting to swap them.
+>=20
+> Signed-off-by: Claudio Imbrenda <imbrenda@linux.ibm.com>
 
-Acked-by: Michael S. Tsirkin <mst@redhat.com>
-
+LGTM
 > ---
->  drivers/vhost/net.c | 7 ++++---
->  1 file changed, 4 insertions(+), 3 deletions(-)
-> 
-> diff --git a/drivers/vhost/net.c b/drivers/vhost/net.c
-> index c6508fe0d5c8..16e39f3ab956 100644
-> --- a/drivers/vhost/net.c
-> +++ b/drivers/vhost/net.c
-> @@ -1014,7 +1014,7 @@ static int peek_head_len(struct vhost_net_virtqueue *rvq, struct sock *sk)
+>  arch/s390/include/asm/gmap_helpers.h |  1 +
+>  arch/s390/mm/gmap_helpers.c          | 64 ++++++++++++++++++++++++++++
+>  2 files changed, 65 insertions(+)
+>=20
+> diff --git a/arch/s390/include/asm/gmap_helpers.h b/arch/s390/include/asm=
+/gmap_helpers.h
+> index 5356446a61c4..459bd39d0887 100644
+> --- a/arch/s390/include/asm/gmap_helpers.h
+> +++ b/arch/s390/include/asm/gmap_helpers.h
+> @@ -11,5 +11,6 @@
+>  void gmap_helper_zap_one_page(struct mm_struct *mm, unsigned long vmaddr=
+);
+>  void gmap_helper_discard(struct mm_struct *mm, unsigned long vmaddr, uns=
+igned long end);
+>  int gmap_helper_disable_cow_sharing(void);
+> +void gmap_helper_set_unused(struct mm_struct *mm, unsigned long vmaddr);
+> =20
+>  #endif /* _ASM_S390_GMAP_HELPERS_H */
+> diff --git a/arch/s390/mm/gmap_helpers.c b/arch/s390/mm/gmap_helpers.c
+> index a45d417ad951..69ffc0c6b654 100644
+> --- a/arch/s390/mm/gmap_helpers.c
+> +++ b/arch/s390/mm/gmap_helpers.c
+> @@ -91,6 +91,70 @@ void gmap_helper_discard(struct mm_struct *mm, unsigne=
+d long vmaddr, unsigned lo
 >  }
->  
->  static int vhost_net_rx_peek_head_len(struct vhost_net *net, struct sock *sk,
-> -				      bool *busyloop_intr, unsigned int count)
-> +				      bool *busyloop_intr, unsigned int *count)
->  {
->  	struct vhost_net_virtqueue *rnvq = &net->vqs[VHOST_NET_VQ_RX];
->  	struct vhost_net_virtqueue *tnvq = &net->vqs[VHOST_NET_VQ_TX];
-> @@ -1024,7 +1024,8 @@ static int vhost_net_rx_peek_head_len(struct vhost_net *net, struct sock *sk,
->  
->  	if (!len && rvq->busyloop_timeout) {
->  		/* Flush batched heads first */
-> -		vhost_net_signal_used(rnvq, count);
-> +		vhost_net_signal_used(rnvq, *count);
-> +		*count = 0;
->  		/* Both tx vq and rx socket were polled here */
->  		vhost_net_busy_poll(net, rvq, tvq, busyloop_intr, true);
->  
-> @@ -1180,7 +1181,7 @@ static void handle_rx(struct vhost_net *net)
->  
->  	do {
->  		sock_len = vhost_net_rx_peek_head_len(net, sock->sk,
-> -						      &busyloop_intr, count);
-> +						      &busyloop_intr, &count);
->  		if (!sock_len)
->  			break;
->  		sock_len += sock_hlen;
-> -- 
-> 2.34.1
+>  EXPORT_SYMBOL_GPL(gmap_helper_discard);
+> =20
+> +/**
+> + * gmap_helper_set_unused() - mark a pte entry as unused
+> + * @mm: the mm
+> + * @vmaddr: the userspace address whose pte is to be marked
+> + *
+> + * Mark the pte corresponding the given address as unused. This will cau=
+se
+> + * core mm code to just drop this page instead of swapping it.
+> + *
+> + * This function needs to be called with interrupts disabled (for exampl=
+e
+> + * while holding a spinlock), or while holding the mmap lock. Normally t=
+his
+> + * function is called as a result of an unmap operation, and thus KVM co=
+mmon
+> + * code will already hold kvm->mmu_lock in write mode.
+> + *
+> + * Context: Needs to be called while holding the mmap lock or with inter=
+rupts
+> + *          disabled.
+> + */
+> +void gmap_helper_set_unused(struct mm_struct *mm, unsigned long vmaddr)
 
+Can you give this a better name? E.g. gmap_helper_try_set_pte_unused
+
+> +{
+> +	pmd_t *pmdp, pmd, pmdval;
+> +	pud_t *pudp, pud;
+> +	p4d_t *p4dp, p4d;
+> +	pgd_t *pgdp, pgd;
+> +	spinlock_t *ptl;
+> +	pte_t *ptep;
+> +
+> +	pgdp =3D pgd_offset(mm, vmaddr);
+> +	pgd =3D pgdp_get(pgdp);
+> +	if (pgd_none(pgd) || !pgd_present(pgd))
+> +		return;
+> +
+> +	p4dp =3D p4d_offset(pgdp, vmaddr);
+> +	p4d =3D p4dp_get(p4dp);
+> +	if (p4d_none(p4d) || !p4d_present(p4d))
+> +		return;
+> +
+> +	pudp =3D pud_offset(p4dp, vmaddr);
+> +	pud =3D pudp_get(pudp);
+> +	if (pud_none(pud) || pud_leaf(pud) || !pud_present(pud))
+> +		return;
+> +
+> +	pmdp =3D pmd_offset(pudp, vmaddr);
+> +	pmd =3D pmdp_get_lockless(pmdp);
+> +	if (pmd_none(pmd) || pmd_leaf(pmd) || !pmd_present(pmd))
+> +		return;
+> +
+> +	ptep =3D pte_offset_map_rw_nolock(mm, pmdp, vmaddr, &pmdval, &ptl);
+> +	if (!ptep)
+> +		return;
+> +
+> +	if (spin_trylock(ptl)) {
+
+Missing the comment you promised :) about deadlock prevention.
+
+> +		/*
+> +		 * Make sure the pte we are touching is still the correct
+> +		 * one. In theory this check should not be needed, but
+
+Why should it not be needed? I.e. why should we be protected against modifi=
+cation?
+> +		 * better safe than sorry.
+> +		 */
+> +		if (likely(pmd_same(pmdval, pmdp_get_lockless(pmdp))))
+> +			__atomic64_or(_PAGE_UNUSED, (long *)ptep);
+> +		spin_unlock(ptl);
+> +	}
+> +
+> +	pte_unmap(ptep);
+> +}
+> +EXPORT_SYMBOL_GPL(gmap_helper_set_unused);
+> +
+>  static int find_zeropage_pte_entry(pte_t *pte, unsigned long addr,
+>  				   unsigned long end, struct mm_walk *walk)
+>  {
+
+--=20
+IBM Deutschland Research & Development GmbH
+Vorsitzender des Aufsichtsrats: Wolfgang Wendt
+Gesch=C3=A4ftsf=C3=BChrung: David Faller
+Sitz der Gesellschaft: B=C3=B6blingen / Registergericht: Amtsgericht Stuttg=
+art, HRB 243294
 
