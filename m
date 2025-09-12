@@ -1,172 +1,123 @@
-Return-Path: <kvm+bounces-57406-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-57407-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 43899B551FD
-	for <lists+kvm@lfdr.de>; Fri, 12 Sep 2025 16:42:07 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id B1F19B551FF
+	for <lists+kvm@lfdr.de>; Fri, 12 Sep 2025 16:42:24 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 440531D673ED
-	for <lists+kvm@lfdr.de>; Fri, 12 Sep 2025 14:38:50 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 75135188D410
+	for <lists+kvm@lfdr.de>; Fri, 12 Sep 2025 14:39:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E7EA91E1DFC;
-	Fri, 12 Sep 2025 14:37:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C82E13115BE;
+	Fri, 12 Sep 2025 14:37:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="LSl5xnXP"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="InIRgQGX"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pf1-f201.google.com (mail-pf1-f201.google.com [209.85.210.201])
+Received: from mail-pl1-f201.google.com (mail-pl1-f201.google.com [209.85.214.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AB82F19D8A3
-	for <kvm@vger.kernel.org>; Fri, 12 Sep 2025 14:37:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6D18C12FF69
+	for <kvm@vger.kernel.org>; Fri, 12 Sep 2025 14:37:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757687843; cv=none; b=KzDeU7USgI3WLbcB4BYU0fUGIzKjyiiH0gcYp52Ct3sYw6f10BN+JYFq9e00ROHNKb0neK9YwNKavS1LTBur53VVtmNdw/nTF8hkp6EFpaMy1lAVIH98C5hyryqhIeMg7aY0q36TUeFLps6bhhKMQqoOP9isU9AbJKLMBuK+rj4=
+	t=1757687877; cv=none; b=JqSCYZP0gH9YJcMqqOGZFGc32lIP6oQcJEyNPQzBJGPmi4QzTnm5gS3Q4VQmvXwsnxk8ehW/41nh95b2hAWqgnaOSEJFjvO4B08PyyWjq+b07sMhyGd76Q5lTEGcizw/42KG7CI7Se/zVoin0Q7ArjxSeePoj6GfNjT8lAISkmM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757687843; c=relaxed/simple;
-	bh=YpwgMyR671W9zCbxFcbCh8JUcv1uLLeYZ10agHNOyOM=;
+	s=arc-20240116; t=1757687877; c=relaxed/simple;
+	bh=MXoXYhIAI6PclC+dBNAPePesW/IoQ8aaRQWQp7X2Ri4=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=bWmcxajSchb9A+JkjubqK+lBWEDk81zlFU9BywIdVJJ6YRQJEHcbC1Wkc8xqMiSWOkrB/dn6oXnAsWJwZGCQhhzRZAmdcwsmtA4KAM4cMkL8QfGXnPhUEkqaTJO1Z8rNEUjEQDhZnxs9Ed/658+QmqeFUlPFD053wppyvTjy9jM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=LSl5xnXP; arc=none smtp.client-ip=209.85.210.201
+	 To:Cc:Content-Type; b=Jr5Egq8xPDN71ENtVqXw/wjWlM4odcYQBHJjdLmfjSiTyYpr70LR3GGTeAz5Q4jU2axHRVlMu+Y8vQNPfxStzA3QO8WCVLKZoFosd4PVz/ZXwwkzZe7ecxLl5VOzuUUkbYbNHYnI+3FVrfjfnxzIpFvtAqt9e/SOuUQJb4WJhPA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=InIRgQGX; arc=none smtp.client-ip=209.85.214.201
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pf1-f201.google.com with SMTP id d2e1a72fcca58-77283b2b5f7so3391349b3a.0
-        for <kvm@vger.kernel.org>; Fri, 12 Sep 2025 07:37:21 -0700 (PDT)
+Received: by mail-pl1-f201.google.com with SMTP id d9443c01a7336-2490768ee5fso15925965ad.3
+        for <kvm@vger.kernel.org>; Fri, 12 Sep 2025 07:37:56 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1757687841; x=1758292641; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1757687876; x=1758292676; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=2P+x88UUE2GDQfwUUdAyI+XxcaLbXssYKBKZgNEjDhg=;
-        b=LSl5xnXPdRRRTvR6liviTjzTRISzzyYOFRnotRqUjlP7f9HGHbiqwaXQb8LmBV4RLM
-         +Mrb8Y4afn+YM13mHgpoHI0E8JMaa4TUe2qL0Um0CAUYxInm8HuIJ7+aM6JaoaXEQ4Sa
-         9AsunfyIqnQIdhde2uz8ITxS7LdNOUwQ6Cclq7PFko6lWHIN/O28NDmehO3fvIBU0NCt
-         mBNsTSqyZLmUCs7FmiuHVpB48F9At0Lg94roxTT7NKEDCfb2otZZeGLMPsTmE6zSlTOO
-         rkZyrQKrDIQvKxEgohMceHb7gNb39P/64BH6KQv6hToXIi9U5xmRusRgjW+xw0g86fFD
-         cejA==
+        bh=4ChX4wJYplW5xDrGHdwPeybL6wYetaasFY+ssOzwgo4=;
+        b=InIRgQGXxnKdU57VqYOH/IUC0GfImZcpriyi7QaZMt98XVYV40exsoWB92Sd/XPFWz
+         MoZPmmnA4YYl14BvzWWSrZpZbFiCS5qIWQyKXF6cjnbPZb2DbhYhrQRNtvgJPQXLp0Qf
+         xzrD9eCCcIEHGbI8sVOLuiDNoUg/xerUkhmLuCMFVcLvk1GotpMiZp0c9GVh63635mp4
+         AM0cQdt3uVN6ybMHvJR9zC/54vweB9Ac1WoVIDU8r4RwXoBwqiobfq3unbFsRRY5dXE2
+         Uf0HUbVhR9x4mmY+ELwenPCQkG/xhm1U3W3PwE+h8LbsW1Go0V+8I8j2WGEMwNL68tFT
+         BCPg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1757687841; x=1758292641;
+        d=1e100.net; s=20230601; t=1757687876; x=1758292676;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=2P+x88UUE2GDQfwUUdAyI+XxcaLbXssYKBKZgNEjDhg=;
-        b=tkoSFVqK/sXf0CfKMr8KCgw9qb2noB6LbSO6bbWsAEzr2SAVAfWp0UtF+BpODtLh7V
-         UizsOEsUgGU5DzdmN4PBeCu8vfK3Hd9is/sRj1l2fkc98XAa4fzxp7ak6PvHYmT9uc+/
-         BfgjXm89zlV4UR9HNBJtyQ0B8YNckaGYMpNDn6cH2GcQwSU8P88Gc/A7ApLcRseFGffs
-         s+Zo3uPodbJ2T9TE0qmZKO1Hruo63VH5QyNEd4mhMGai6I4Ot4DMPLX/1/Qdnhv+7E32
-         WF5lXTCWxgqgzUPPGx2KBOo/kplhkd1jvkLdbNFcmE5ZoxM2DI99uxIXc9Heh9hJcM5R
-         ZUNw==
-X-Forwarded-Encrypted: i=1; AJvYcCWwHfhd1R/pcTop/2W1jj6U/hjlgAjSCHOy8QSYq+NFUQmHYwlvDs9CjrMdstK9ciewMuk=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxRf+XVLzgPp5gs20S9BZof5Y0fIPOySe9A3FFPda5QWjkjXAiS
-	0bk5xwXyIOJmA9/S7fhsUvdjZpUElzmIrcYp/h92cDLqOYYqY7FzoLVBtixsQqHu3jhGqXFepjS
-	Dl+Ky6g==
-X-Google-Smtp-Source: AGHT+IE1gQ7ivjZR8g0gLqSSuhwVcNqxUEvHF3Z4Hr5v0ExRBR0jo9zcuJja0j6DJ3NuA4KDhWRWN7Wyrms=
-X-Received: from pgno17.prod.google.com ([2002:a63:7e51:0:b0:b47:18b4:f5cb])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a05:6a20:7d86:b0:248:e0f7:1326
- with SMTP id adf61e73a8af0-26029eaa47dmr4203315637.2.1757687840892; Fri, 12
- Sep 2025 07:37:20 -0700 (PDT)
-Date: Fri, 12 Sep 2025 07:37:19 -0700
-In-Reply-To: <ac7eb055-a3a2-479c-8d21-4ebc262be93b@intel.com>
+        bh=4ChX4wJYplW5xDrGHdwPeybL6wYetaasFY+ssOzwgo4=;
+        b=US2RRf7d+DA2vS23rfVWMG7R2fldR3FFaHbiZvHNys+1h2Z9Vz2mbxwtlgNNZBKBR7
+         iPaeRMDhOB+WU4+yR8K21x1cmZ8Wuhxm2uICb7eBtT0OAvxIpRW2C571J46Ez8GN2HyF
+         J7zcprJ9ojS0NCrapcJdiZqTZ/sPdhTtUF67bcRSBdrT60FJaMtsza+m+zstfuqRLItn
+         U+7cqKIExBbEhOGFLGy3rKXJ5oRL0/J+JwpYIycZsGau7Sb0sPqsHWqejp+/eyHBnzWe
+         WfFZJD+dxb7b6MK13C3BxQzOEZI4Vi0Ki5/vg+X8F5DRNMe+phlLd0tf5h6N2OoSlQHd
+         NfuQ==
+X-Forwarded-Encrypted: i=1; AJvYcCUaNox+F9gCF5Pik2DRF9ctIbIibR0JwfY9dRNrA3DXovMjSocfD22K+pJqNoZnI33SMp4=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwBzIurt4PM51R5Pz3aM/voysf5zL0JiyVhJi3IXG9k+z5eSFc+
+	8GIlKqa64d1Mr41bQs4ytCrYw4hGYr7WIZVcwFg4kdL9c5/9OeFlxQbu9Qk6dpt8MmXQfkfuto8
+	J5e5Usg==
+X-Google-Smtp-Source: AGHT+IH4qD+Epm+gzLaj7UYu+Wr7KrKt0ZGH9dlBDVZ54WnTlDMtq+Yub+gzUIGlWKmhkE+sQU6AnhJqywA=
+X-Received: from pjbst15.prod.google.com ([2002:a17:90b:1fcf:b0:31e:c1fb:dbb2])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:903:2ec6:b0:25c:982e:2b22
+ with SMTP id d9443c01a7336-25d27134267mr32519415ad.61.1757687875731; Fri, 12
+ Sep 2025 07:37:55 -0700 (PDT)
+Date: Fri, 12 Sep 2025 07:37:54 -0700
+In-Reply-To: <20250626073459.12990-14-minipli@grsecurity.net>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
-References: <20250909093953.202028-1-chao.gao@intel.com> <20250909093953.202028-16-chao.gao@intel.com>
- <8121026d-aede-4f78-a081-b81186b96e9b@intel.com> <aMKniY+GguBPe8tK@intel.com> <ac7eb055-a3a2-479c-8d21-4ebc262be93b@intel.com>
-Message-ID: <aMQwH8UZQoU90LBr@google.com>
-Subject: Re: [PATCH v14 15/22] KVM: x86: Don't emulate instructions guarded by CET
+References: <20250626073459.12990-1-minipli@grsecurity.net> <20250626073459.12990-14-minipli@grsecurity.net>
+Message-ID: <aMQwQnGpNzutdr-q@google.com>
+Subject: Re: [kvm-unit-tests PATCH v2 13/13] x86: Avoid top-most page for
+ vmalloc on x86-64
 From: Sean Christopherson <seanjc@google.com>
-To: Xiaoyao Li <xiaoyao.li@intel.com>
-Cc: Chao Gao <chao.gao@intel.com>, kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	acme@redhat.com, bp@alien8.de, dave.hansen@linux.intel.com, hpa@zytor.com, 
-	john.allen@amd.com, mingo@kernel.org, mingo@redhat.com, 
-	minipli@grsecurity.net, mlevitsk@redhat.com, namhyung@kernel.org, 
-	pbonzini@redhat.com, prsampat@amd.com, rick.p.edgecombe@intel.com, 
-	shuah@kernel.org, tglx@linutronix.de, weijiang.yang@intel.com, x86@kernel.org, 
-	xin@zytor.com
+To: Mathias Krause <minipli@grsecurity.net>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, Chao Gao <chao.gao@intel.com>, kvm@vger.kernel.org
 Content-Type: text/plain; charset="us-ascii"
 
-On Fri, Sep 12, 2025, Xiaoyao Li wrote:
-> On 9/11/2025 6:42 PM, Chao Gao wrote:
-> > > > @@ -4941,6 +4947,24 @@ int x86_decode_insn(struct x86_emulate_ctxt *ctxt, void *insn, int insn_len, int
-> > > >    	if (ctxt->d == 0)
-> > > >    		return EMULATION_FAILED;
-> > > > +	if (ctxt->ops->get_cr(ctxt, 4) & X86_CR4_CET) {
-> > > > +		u64 u_cet, s_cet;
-> > > > +		bool stop_em;
-> > > > +
-> > > > +		if (ctxt->ops->get_msr(ctxt, MSR_IA32_U_CET, &u_cet) ||
-> > > > +		    ctxt->ops->get_msr(ctxt, MSR_IA32_S_CET, &s_cet))
-> > > > +			return EMULATION_FAILED;
-> > > > +
-> > > > +		stop_em = ((u_cet & CET_SHSTK_EN) || (s_cet & CET_SHSTK_EN)) &&
-> > > > +			  (opcode.flags & ShadowStack);
-> > > > +
-> > > > +		stop_em |= ((u_cet & CET_ENDBR_EN) || (s_cet & CET_ENDBR_EN)) &&
-> > > > +			   (opcode.flags & IndirBrnTrk);
-> > > 
-> > > Why don't check CPL here? Just for simplicity?
-> > 
-> > I think so. This is a corner case and we don't want to make it very precise
-
-Checking CPL here would not make the code more complex, e.g. naively it could be
-something like:
-
-		u64 cet;
-		int r;
-
-		if (ctxt->ops->cpl(ctxt) == 3)
-			r = ctxt->ops->get_msr(ctxt, MSR_IA32_U_CET, &cet);
-		else
-			r = ctxt->ops->get_msr(ctxt, MSR_IA32_S_CET, &cet);
-		if (r)
-			return EMULATION_FAILED;
-
-		if (cet & CET_SHSTK_EN && opcode.flags & ShadowStack)
-			  return EMULATION_FAILED;
-
-		if (cet & CET_ENDBR_EN && opcode.flags & IndirBrnTrk)
-			  return EMULATION_FAILED;
-
-> > (and thus complex). The reason is that no one had a strong opinion on whether
-> > to do the CPL check or not. I asked the same question before [*], but I don't
-> > have a strong opinion on this either.
+On Thu, Jun 26, 2025, Mathias Krause wrote:
+> The x86-64 implementation if setup_mmu() doesn't initialize 'vfree_top'
+> and leaves it at its zero-value. This isn't wrong per se, however, it
+> leads to odd configurations when the first vmalloc/vmap page gets
+> allocated. It'll be the very last page in the virtual address space --
+> which is an interesting corner case -- but its boundary will probably
+> wrap. It does so, for CET's shadow stack, at least, which loads the
+> shadow stack pointer with the base address of the mapped page plus its
+> size, i.e. 0xffffffff_fffff000 + 4096, which wraps to 0x0.
 > 
-> I'm OK with it.
+> The CPU seems to handle such configurations just fine. However, it feels
+> odd to set the shadow stack pointer to "NULL".
+> 
+> To avoid the wrapping, ignore the top most page by initializing
+> 'vfree_top' to just one page below.
+> 
+> Reviewed-by: Chao Gao <chao.gao@intel.com>
+> Signed-off-by: Mathias Krause <minipli@grsecurity.net>
+> ---
+> v2:
+> - change comment in x86/lam.c too
+> 
+>  lib/x86/vm.c |  2 ++
+>  x86/lam.c    | 10 +++++-----
+>  2 files changed, 7 insertions(+), 5 deletions(-)
+> 
+> diff --git a/lib/x86/vm.c b/lib/x86/vm.c
+> index 90f73fbb2dfd..27e7bb4004ef 100644
+> --- a/lib/x86/vm.c
+> +++ b/lib/x86/vm.c
+> @@ -191,6 +191,8 @@ void *setup_mmu(phys_addr_t end_of_memory, void *opt_mask)
+>          end_of_memory = (1ul << 32);  /* map mmio 1:1 */
+>  
+>      setup_mmu_range(cr3, 0, end_of_memory);
+> +    /* skip the last page for out-of-bound and wrap-around reasons */
+> +    init_alloc_vpage((void *)(~(PAGE_SIZE - 1)));
 
-I have a strong opinion.  :-)
-
-KVM must NOT check CPL, because inter-privilege level transfers could trigger
-CET emulation and both levels.  E.g. a FAR CALL will be affected by both shadow
-stacks and IBT at the target privilege level.
-
-So this need more than just a changelog blurb, it needs a comment.  The code
-can also be cleaned up and optimized.  Reading CR4 and two MSRs (via indirect
-calls, i.e. potential retpolines) is wasteful for the vast majority of instructions,
-and gathering "stop emulation" into a local variable when a positive test is fatal
-is pointless.
-
-	/*
-	 * Reject emulation if KVM might need to emulate shadow stack updates
-	 * and/or indirect branch tracking enforcement, which the emulator
-	 * doesn't support.  Deliberately don't check CPL as inter-privilege
-	 * level transfers can trigger emulation at both privilege levels, and
-	 * the expectation is that the guest will not require emulation of any
-	 * CET-affected instructions at any privilege level.
-	 */
-	if (opcode.flags & (ShadowStack | IndirBrnTrk) &&
-	    ctxt->ops->get_cr(ctxt, 4) & X86_CR4_CET) {
-		u64 u_cet, s_cet;
-
-		if (ctxt->ops->get_msr(ctxt, MSR_IA32_U_CET, &u_cet) ||
-		    ctxt->ops->get_msr(ctxt, MSR_IA32_S_CET, &s_cet))
-			return EMULATION_FAILED;
-
-		if ((u_cet | s_cet) & CET_SHSTK_EN && opcode.flags & ShadowStack)
-			  return EMULATION_FAILED;
-
-		if ((u_cet | s_cet) & CET_ENDBR_EN && opcode.flags & IndirBrnTrk)
-			  return EMULATION_FAILED;
-	}
+This breaks the eventinj test (leads to SHUTDOWN).  I haven't spent any time
+trying to figure out why.
 
