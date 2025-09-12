@@ -1,217 +1,176 @@
-Return-Path: <kvm+bounces-57429-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-57430-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 868DAB555AB
-	for <lists+kvm@lfdr.de>; Fri, 12 Sep 2025 19:56:19 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id BF427B55640
+	for <lists+kvm@lfdr.de>; Fri, 12 Sep 2025 20:34:26 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3BF305C0B10
-	for <lists+kvm@lfdr.de>; Fri, 12 Sep 2025 17:56:19 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 6729B7B2C0E
+	for <lists+kvm@lfdr.de>; Fri, 12 Sep 2025 18:32:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A41F0327A34;
-	Fri, 12 Sep 2025 17:56:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B4D1632F755;
+	Fri, 12 Sep 2025 18:34:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="C/iGDfI+"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="Ta+7Z07a"
 X-Original-To: kvm@vger.kernel.org
-Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pj1-f73.google.com (mail-pj1-f73.google.com [209.85.216.73])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 20F0030DED0;
-	Fri, 12 Sep 2025 17:56:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 06485285C98
+	for <kvm@vger.kernel.org>; Fri, 12 Sep 2025 18:34:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.73
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757699772; cv=none; b=MIvDkELPN1Wm8cczatUefyDYberg9cT75BXb94dzrtlI7Ol3+UcBHxKj8vxM9+jCDVGGaR4zEpeOLl3YMioz6kHvVaGqQK5ZWsbDCFZjzVlwIqzAHotSnzW7l+BG017ZB3qxw2o5wo5GPotzStjyI7oK43l1lZwSJxRzsTWhgs4=
+	t=1757702049; cv=none; b=CC5sOkqR5MUSdLWqH3GdL7bhtRIrwBd0/eoSv8r5D30YDIYcRRYZjGdEd3+ngCWdK8fuxIPDQNPywzTtK8odUGu6En52sYTojBmy9qwZLwygQHkVNh9WhSVVKV+OonopEKsdF0v7d/LyyUuq+OJW2VAc226I/m3omYzobqvbUg0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757699772; c=relaxed/simple;
-	bh=Y6YKJmEUZboYUT7iCS3yFYTfJT+GWTUOlJjJCx7HZSs=;
-	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=U1vbd6uj3tJR0ZrtvyZlp6M5uPWT3Bs5L+v077N0aCEHQ+wvGZVDWcwA8n0Ytr8WMP3j9YGcHGovAb0CePSwaljAaV6Mld0fo762NJw16zx0MzJx8/ETC2OVVc0hIIN0ipgjnYmlMLulFol2Z24Tnl4SA2qy1M1i1FJmo9Tt3c8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=C/iGDfI+; arc=none smtp.client-ip=148.163.158.5
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
-Received: from pps.filterd (m0360072.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 58C9XeGu005342;
-	Fri, 12 Sep 2025 17:56:09 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
-	:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=pp1; bh=ODvj8i
-	gC3COoXgKZG0KHGynGNntrtQmbpTrvJM/LuWQ=; b=C/iGDfI+bQWUoaAomE7/ri
-	/EPZYpt9PWljUmQOLbesUAxukxWzuL5zq99ONj46CfT9tNCQd+tluMIbjjVZmX8/
-	vVUT2KOxn+MA/PlOYh4/JNuaANmAj/yetdtQdWYmCdSb76K0qSHPrVGlJA/G125D
-	ojaB5v7X7vWiM3S1bZ+rcA1MnkS8KGyL1RbPifzOPhejThxwEybp8ulby+DII28d
-	DJawXh4ZqH5/QmOLE5Llwb8MbubK9nsoEfT7ztZhHf/rlW8v3wy8GGrmGkEnjHBx
-	UMRtvHNjirN50o6Hy57hSrzPJ6dzJUPZngC6FRaJ2d0i6q1+qloTHOqZGxYNvFhw
-	==
-Received: from ppma13.dal12v.mail.ibm.com (dd.9e.1632.ip4.static.sl-reverse.com [50.22.158.221])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 490ukf15gq-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Fri, 12 Sep 2025 17:56:08 +0000 (GMT)
-Received: from pps.filterd (ppma13.dal12v.mail.ibm.com [127.0.0.1])
-	by ppma13.dal12v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 58CErc84017227;
-	Fri, 12 Sep 2025 17:56:07 GMT
-Received: from smtprelay04.fra02v.mail.ibm.com ([9.218.2.228])
-	by ppma13.dal12v.mail.ibm.com (PPS) with ESMTPS id 4911gmv1uk-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Fri, 12 Sep 2025 17:56:07 +0000
-Received: from smtpav05.fra02v.mail.ibm.com (smtpav05.fra02v.mail.ibm.com [10.20.54.104])
-	by smtprelay04.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 58CHu4Ij17891838
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Fri, 12 Sep 2025 17:56:04 GMT
-Received: from smtpav05.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id EE00520043;
-	Fri, 12 Sep 2025 17:56:03 +0000 (GMT)
-Received: from smtpav05.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 61F4620040;
-	Fri, 12 Sep 2025 17:56:03 +0000 (GMT)
-Received: from li-978a334c-2cba-11b2-a85c-a0743a31b510.ibm.com (unknown [9.111.85.13])
-	by smtpav05.fra02v.mail.ibm.com (Postfix) with ESMTP;
-	Fri, 12 Sep 2025 17:56:03 +0000 (GMT)
-Message-ID: <92285479bc2b97b418b0efe8a52f0711a95cbf36.camel@linux.ibm.com>
-Subject: Re: [PATCH v2 05/20] KVM: s390: Add helper functions for fault
- handling
-From: Nina Schoetterl-Glausch <nsg@linux.ibm.com>
-To: Claudio Imbrenda <imbrenda@linux.ibm.com>, kvm@vger.kernel.org
-Cc: linux-s390@vger.kernel.org, borntraeger@de.ibm.com, frankja@linux.ibm.com,
-        nrb@linux.ibm.com, seiden@linux.ibm.com, schlameuss@linux.ibm.com,
-        hca@linux.ibm.com, svens@linux.ibm.com, agordeev@linux.ibm.com,
-        david@redhat.com, gerald.schaefer@linux.ibm.com
-Date: Fri, 12 Sep 2025 19:56:02 +0200
-In-Reply-To: <20250910180746.125776-6-imbrenda@linux.ibm.com>
-References: <20250910180746.125776-1-imbrenda@linux.ibm.com>
-	 <20250910180746.125776-6-imbrenda@linux.ibm.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.56.2 (3.56.2-1.fc42) 
+	s=arc-20240116; t=1757702049; c=relaxed/simple;
+	bh=v5FVcC8hgZ/p+a0lbHORb4niU4q1wCJsNavaGkYebHY=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=ciIxNFNlEOSTmd02Bw2l862k6XzFhDVDOHOt8uZppGj4yZy76nyNgrtdqHH0OOrwdoa5ziWKdk1PS255nSBqFiN/tgFT0BOqwgHTcMF16qYOX6OHbpR1+oRDp24JzX5ukvk7UsZIa6Dv70fMjz/7XaHLAIG31Pu/sIL671l5HyI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=Ta+7Z07a; arc=none smtp.client-ip=209.85.216.73
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+Received: by mail-pj1-f73.google.com with SMTP id 98e67ed59e1d1-323766e64d5so2831947a91.0
+        for <kvm@vger.kernel.org>; Fri, 12 Sep 2025 11:34:06 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1757702046; x=1758306846; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:from:subject:message-id:references
+         :mime-version:in-reply-to:date:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=tlhPWLmUue00CiOxFvUNznMlr4ctvmMFViLBjGFh5aE=;
+        b=Ta+7Z07aX/XmKlaS6kgQniPSXSSse7gK2/vyNkgTaWHah41wCHrEypIOaGH3StoYQR
+         4+Dv8bw+Vdbo70b0smLqk7DIxK2b0KDi95R4TIEC1cthWlKz61nW2fj0vvbcbvAauDby
+         vR8v2nj3YcNejqWmbIsu07JLa+WUtNiQIRsLo23bBAC5BUQSHfweiUFg8vHLwdo9x4sZ
+         weMWSl07D1p72GoDxRi626LBielC8B52iLRp0yNemMIkOzl6/ZeOvjKhDOEH/hNkwmDf
+         bJimQQst9X6jarSlcgRrDoTMwPllvsSoa21HH/6Nh3hkT4qBQAuIJI2HQsrvLCa2YGWU
+         dlFw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1757702046; x=1758306846;
+        h=content-transfer-encoding:cc:to:from:subject:message-id:references
+         :mime-version:in-reply-to:date:x-gm-message-state:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=tlhPWLmUue00CiOxFvUNznMlr4ctvmMFViLBjGFh5aE=;
+        b=eOmMMpVcbwub9rP9ubFIqD6+y4xe5QYhTKk1qTiBrZ91ICvgvMO0C2u0QKmCKgdYry
+         CvVfQ7T6abGjuoJX5ZzzHLGTDvtlRlJS7evdxvOd+FLMZoD2U7vAG7CNLtUknvPxcUvi
+         93Zii2Rhw9KSxu5gMGuhLQ+UuzPJqaKezBQdswVz4zlYrrzWuWGQFyaTEsODzgdD9sBt
+         L3ZPnkyL+L9dmDnNefBa00Hr/7kjIAHHL1KcViTT4kVg7D+PSvRwbUK0FsQpmk91RLah
+         xokxYFuh68wQt19jD71ZslYQDc6zRdLL8tDVMGwxbd38hQsbqDeHOHwOPI+n095gU8OC
+         0iUA==
+X-Forwarded-Encrypted: i=1; AJvYcCXiSGKabiDumP/xFwMzfQZtukVlTN64y/bZY4ca+epl+me9BRKrigGkTCbHBeBGVvJZUJs=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yzzs/K0JejraK//DjKmK62FMyF8LG+Lgs2lTFb98bE7O2gntdXx
+	0ClGU864i7GGjUlCHRVj3RVV9qWG2SPPlWP0M4W0cSDuUc6KJEyH4KM63I320uPKzpvzW8PS/AA
+	LFiWpPg==
+X-Google-Smtp-Source: AGHT+IFkjA4Yytqm3FFtm5CKt77K8SX2eP0ZGGmXPW8IcXnFSSTQ7TlT5fqN5rSSfLmzpZPc20T/4sMe+jo=
+X-Received: from pjbsu16.prod.google.com ([2002:a17:90b:5350:b0:32d:f25c:6a58])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:3851:b0:329:8520:cee7
+ with SMTP id 98e67ed59e1d1-32de4c44ae9mr4236965a91.14.1757702046207; Fri, 12
+ Sep 2025 11:34:06 -0700 (PDT)
+Date: Fri, 12 Sep 2025 11:34:04 -0700
+In-Reply-To: <c6d2fbe31bd9e2638eaefaabe6d0ffc55f5886bd.1757543774.git.ashish.kalra@amd.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-X-TM-AS-GCONF: 00
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUwOTA2MDE5NSBTYWx0ZWRfX+mrilySnSLKG
- TSsRHMuhp3Ct/5MJLYdW1cZOCuJF9XFrXTalJWz0K3+Ij1nw0DVeujZ7tFzHx5yIOqRJG1rlYeZ
- lVbhpBjlB+too7dT2ftNL8Y3BclULEfiZvI31DaOMpI5m1/8fjCFbQvPYxnKWc/wEZjyYzLOQjq
- J65NxCX4ohNZSfBQGsgsJ+li6GKYmjDOM6qQnChmksVDqG09Md6CZqmJK4hCO6T3IPUdx7DX4pg
- DkTwWdT/meLLLOFDuIPyOMy5kJbM0+0i0eZ7vjnTyWoLVp/gmUjy1UQqVu/KJjwJF5KVtnYWPev
- CM9lqv3z2ckJxIoTeW9aQJUtgKZIJWkys9rGEvfC1ckYt9QrkHa8pSzagCcg4aHqY/eXhyDDK0+
- 9C1x0IRm
-X-Proofpoint-ORIG-GUID: RkepuE5y3wT8jEHLKdA0jrtrVaWCVNHP
-X-Proofpoint-GUID: RkepuE5y3wT8jEHLKdA0jrtrVaWCVNHP
-X-Authority-Analysis: v=2.4 cv=StCQ6OO0 c=1 sm=1 tr=0 ts=68c45eb8 cx=c_pps
- a=AfN7/Ok6k8XGzOShvHwTGQ==:117 a=AfN7/Ok6k8XGzOShvHwTGQ==:17
- a=IkcTkHD0fZMA:10 a=yJojWOMRYYMA:10 a=VnNF1IyMAAAA:8 a=YNtB7HBByXDDIQ3sV5sA:9
- a=QEXdDO2ut3YA:10
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1117,Hydra:6.1.9,FMLib:17.12.80.40
- definitions=2025-09-12_06,2025-09-12_01,2025-03-28_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- spamscore=0 malwarescore=0 bulkscore=0 clxscore=1015 adultscore=0
- suspectscore=0 priorityscore=1501 impostorscore=0 phishscore=0
- classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
- reason=mlx scancount=1 engine=8.19.0-2507300000 definitions=main-2509060195
+Mime-Version: 1.0
+References: <cover.1757543774.git.ashish.kalra@amd.com> <c6d2fbe31bd9e2638eaefaabe6d0ffc55f5886bd.1757543774.git.ashish.kalra@amd.com>
+Message-ID: <aMRnnNVYBrasJnZF@google.com>
+Subject: Re: [PATCH v4 1/3] x86/sev: Add new dump_rmp parameter to
+ snp_leak_pages() API
+From: Sean Christopherson <seanjc@google.com>
+To: Ashish Kalra <Ashish.Kalra@amd.com>
+Cc: tglx@linutronix.de, mingo@redhat.com, bp@alien8.de, 
+	dave.hansen@linux.intel.com, x86@kernel.org, hpa@zytor.com, 
+	pbonzini@redhat.com, thomas.lendacky@amd.com, herbert@gondor.apana.org.au, 
+	nikunj@amd.com, davem@davemloft.net, aik@amd.com, ardb@kernel.org, 
+	john.allen@amd.com, michael.roth@amd.com, Neeraj.Upadhyay@amd.com, 
+	linux-kernel@vger.kernel.org, kvm@vger.kernel.org, 
+	linux-crypto@vger.kernel.org
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Wed, 2025-09-10 at 20:07 +0200, Claudio Imbrenda wrote:
-> Add some helper functions for handling multiple guest faults at the
-> same time.
->=20
-> This will be needed for VSIE, where a nested guest access also needs to
-> access all the page tables that map it.
->=20
-> Signed-off-by: Claudio Imbrenda <imbrenda@linux.ibm.com>
-> ---
->  arch/s390/kvm/gaccess.h  | 14 ++++++++++
->  arch/s390/kvm/kvm-s390.c | 44 +++++++++++++++++++++++++++++++
->  arch/s390/kvm/kvm-s390.h | 56 ++++++++++++++++++++++++++++++++++++++++
->  3 files changed, 114 insertions(+)
->=20
-[...]
-
-> diff --git a/arch/s390/kvm/kvm-s390.h b/arch/s390/kvm/kvm-s390.h
-> index c44fe0c3a097..dabcf65f58ff 100644
-> --- a/arch/s390/kvm/kvm-s390.h
-> +++ b/arch/s390/kvm/kvm-s390.h
-> @@ -22,6 +22,15 @@
->=20
-[...]
-
-> +static inline void release_faultin_multiple(struct kvm *kvm, struct gues=
-t_fault *guest_faults,
-> +					    int n, bool ignore)
-> +{
-> +	int i;
-> +
-> +	for (i =3D 0; i < n; i++) {
-> +		kvm_release_faultin_page(kvm, guest_faults[i].page, ignore,
-> +					 guest_faults[i].write_attempt);
-> +		guest_faults[i].page =3D NULL;
-> +	}
-> +}
-> +
-> +static inline bool __kvm_s390_multiple_faults_need_retry(struct kvm *kvm=
-, unsigned long seq,
-> +							 struct guest_fault *guest_faults, int n,
-> +							 bool unsafe)
-
-The name of the function does not at all suggest that it releases guest pag=
-es.
-Can you remove that and use
-
-if (__kvm_s390_fault_array_needs_retry(...))
-	release_faultin_array(...);
-
-in the caller?
-(I haven't yet looked at those)
-"needs_retry" isn't telling me much right now, either.
-What is being retried and why?
-Comments would not hurt :)
-
-> +{
-> +	int i;
-> +
-> +	for (i =3D 0; i < n; i++) {
-> +		if (!guest_faults[i].valid)
-> +			continue;
-> +		if ((unsafe && mmu_invalidate_retry_gfn_unsafe(kvm, seq, guest_faults[=
-i].gfn)) ||
-> +		    (!unsafe && mmu_invalidate_retry_gfn(kvm, seq, guest_faults[i].gfn=
-))) {
-> +			release_faultin_multiple(kvm, guest_faults, n, true);
-> +			return true;
-> +		}
-> +	}
-> +	return false;
-> +}
-> +
-> +static inline int __kvm_s390_faultin_gfn_range(struct kvm *kvm, struct g=
-uest_fault *guest_faults,
-> +					       gfn_t start, int n_pages, bool write_attempt)
-> +{
-> +	int i, rc =3D 0;
-> +
-> +	for (i =3D 0; !rc && i < n_pages; i++)
-> +		rc =3D __kvm_s390_faultin_gfn(kvm, guest_faults + i, start + i, write_=
-attempt);
-> +	return rc;
-> +}
-> +
-> +#define release_faultin_array(kvm, array, ignore) \
-> +	release_faultin_multiple(kvm, array, ARRAY_SIZE(array), ignore)
-> +
-> +#define __kvm_s390_fault_array_needs_retry(kvm, seq, array, unsafe) \
-> +	__kvm_s390_multiple_faults_need_retry(kvm, seq, array, ARRAY_SIZE(array=
-), unsafe)
-> +
->  /* implemented in diag.c */
->  int kvm_s390_handle_diag(struct kvm_vcpu *vcpu);
+On Wed, Sep 10, 2025, Ashish Kalra wrote:
+> diff --git a/arch/x86/include/asm/sev.h b/arch/x86/include/asm/sev.h
+> index 00475b814ac4..7a1ae990b15f 100644
+> --- a/arch/x86/include/asm/sev.h
+> +++ b/arch/x86/include/asm/sev.h
+> @@ -635,10 +635,15 @@ void snp_dump_hva_rmpentry(unsigned long address);
+>  int psmash(u64 pfn);
+>  int rmp_make_private(u64 pfn, u64 gpa, enum pg_level level, u32 asid, bo=
+ol immutable);
+>  int rmp_make_shared(u64 pfn, enum pg_level level);
+> -void snp_leak_pages(u64 pfn, unsigned int npages);
+> +void __snp_leak_pages(u64 pfn, unsigned int npages, bool dump_rmp);
+>  void kdump_sev_callback(void);
+>  void snp_fixup_e820_tables(void);
 > =20
+> +static inline void snp_leak_pages(u64 pfn, unsigned int pages)
+> +{
+> +	__snp_leak_pages(pfn, pages, true);
+> +}
+> +
+>  static inline void sev_evict_cache(void *va, int npages)
+>  {
+>  	volatile u8 val __always_unused;
+> @@ -668,6 +673,7 @@ static inline int rmp_make_private(u64 pfn, u64 gpa, =
+enum pg_level level, u32 as
+>  	return -ENODEV;
+>  }
+>  static inline int rmp_make_shared(u64 pfn, enum pg_level level) { return=
+ -ENODEV; }
+> +static inline void __snp_leak_pages(u64 pfn, unsigned int npages, bool d=
+ump_rmp) {}
 
---=20
-IBM Deutschland Research & Development GmbH
-Vorsitzender des Aufsichtsrats: Wolfgang Wendt
-Gesch=C3=A4ftsf=C3=BChrung: David Faller
-Sitz der Gesellschaft: B=C3=B6blingen / Registergericht: Amtsgericht Stuttg=
-art, HRB 243294
+This stub is unnecessary.  As pointed out elsewhere[*], I'm pretty sure all=
+ these
+stubs are unnecessary.
+
+Oof.  Even worse, the stubs appear to be actively hiding bugs.  The APIs ar=
+e
+guarded with CONFIG_KVM_AMD_SEV=3Dy, but **KVM** doesn't call any of these =
+outside
+of SEV code.  I.e. if *KVM* were the only user, the stubs would just be dea=
+d code.
+
+But the below build failures show that they aren't dead code, which means t=
+hat
+kernels with CONFIG_KVM_AMD_SEV=3Dn will silently (until something explodes=
+) do the
+wrong thing, because the stubs are hiding the missing dependencies.
+
+arch/x86/boot/startup/sev-shared.c: In function =E2=80=98pvalidate_4k_page=
+=E2=80=99:
+arch/x86/boot/startup/sev-shared.c:820:17: error: implicit declaration of f=
+unction =E2=80=98sev_evict_cache=E2=80=99 [-Wimplicit-function-declaration]
+  820 |                 sev_evict_cache((void *)vaddr, 1);
+      |                 ^~~~~~~~~~~~~~~
+  AR      arch/x86/realmode/built-in.a
+arch/x86/coco/sev/core.c: In function =E2=80=98pvalidate_pages=E2=80=99:
+arch/x86/coco/sev/core.c:386:25: error: implicit declaration of function =
+=E2=80=98sev_evict_cache=E2=80=99 [-Wimplicit-function-declaration]
+  386 |                         sev_evict_cache(pfn_to_kaddr(e->gfn), e->pa=
+gesize ? 512 : 1);
+      |                         ^~~~~~~~~~~~~~~
+arch/x86/mm/mem_encrypt.c: In function =E2=80=98mem_encrypt_setup_arch=E2=
+=80=99:
+arch/x86/mm/mem_encrypt.c:112:17: error: implicit declaration of function =
+=E2=80=98snp_fixup_e820_tables=E2=80=99 [-Wimplicit-function-declaration]
+  112 |                 snp_fixup_e820_tables();
+      |                 ^~~~~~~~~~~~~~~~~~~~~
+arch/x86/mm/fault.c: In function =E2=80=98show_fault_oops=E2=80=99:
+arch/x86/mm/fault.c:587:17: error: implicit declaration of function =E2=80=
+=98snp_dump_hva_rmpentry=E2=80=99 [-Wimplicit-function-declaration]
+  587 |                 snp_dump_hva_rmpentry(address);
+      |                 ^~~~~~~~~~~~~~~~~~~~~
+arch/x86/kernel/cpu/amd.c: In function =E2=80=98bsp_determine_snp=E2=80=99:
+arch/x86/kernel/cpu/amd.c:370:21: error: implicit declaration of function =
+=E2=80=98snp_probe_rmptable_info=E2=80=99 [-Wimplicit-function-declaration]
+  370 |                     snp_probe_rmptable_info()) {
+      |                     ^~~~~~~~~~~~~~~~~~~~~~~
+  AR      drivers/iommu/amd/built-in.a
+  AR      drivers/iommu/built-in.a
+  AR      drivers/built-in.a
+
+[*] https://lore.kernel.org/all/aMHP5EO-ucJGdHXz@google.com
 
