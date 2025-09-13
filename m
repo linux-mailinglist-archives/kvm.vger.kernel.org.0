@@ -1,153 +1,172 @@
-Return-Path: <kvm+bounces-57484-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-57485-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id D41C2B55A4C
-	for <lists+kvm@lfdr.de>; Sat, 13 Sep 2025 01:35:36 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 15811B55A96
+	for <lists+kvm@lfdr.de>; Sat, 13 Sep 2025 02:18:39 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 159625C461B
-	for <lists+kvm@lfdr.de>; Fri, 12 Sep 2025 23:35:36 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C3324AC0390
+	for <lists+kvm@lfdr.de>; Sat, 13 Sep 2025 00:18:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4DF982E9EB1;
-	Fri, 12 Sep 2025 23:24:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A47AD35962;
+	Sat, 13 Sep 2025 00:18:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="mRcSUT3X"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="bGYDJcYF"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pj1-f73.google.com (mail-pj1-f73.google.com [209.85.216.73])
+Received: from mail-pl1-f171.google.com (mail-pl1-f171.google.com [209.85.214.171])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 100BC2E8B99
-	for <kvm@vger.kernel.org>; Fri, 12 Sep 2025 23:24:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.73
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 64DA511CA9
+	for <kvm@vger.kernel.org>; Sat, 13 Sep 2025 00:18:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.171
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757719480; cv=none; b=QZBO9u200pQbGkOJAAQp70Usr/6z8TZXNqhNo9ZiTQCynOxo4Sq2zU7XmOaJyNHkJWlw2m6DUy6ezSadI0sVzsQJl3w5+txr4G+Wl8rBvExyocvuko6+SrniSLDJ6qfYIFQEaAhHGwjT1CXaGQg0slRVV7kBYOY+7HnpzjuibmQ=
+	t=1757722703; cv=none; b=CDa9nwIfJXZQrYekwsMr83OQHB/TpiAAdorJAsHjADXDy1c/tCLPQcc+qcP3ajmSzppCWh2fKF0vIulbzXXbJbJA8EG/WE31AtXh8VzeuaJ4HJsOR8ILCInNMzZBeLPmm3VUrqKIZlm2X1ttoXHkIwckkYX0j6CkSqJx+EKLV3s=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757719480; c=relaxed/simple;
-	bh=OWTTMi08oveLIrPuJqP45tpmsLGScshtxdeU8uIZNEk=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=N9qTQQlPZiJp1U8ZQgkX8yv+NkV+rRxRRFcakzjPxm9ITyHJxvELd+QyK8fLQ+OIQCnW+/sY6MaGw0q2D4ci4zWsl2iIuSy0NByLhrmzaPs8eB6yEqC+PtF+WSRxl9Q2UCGw0+PNOLlaf+251V++L0G4RqtRC6oNBkfg8QlYERw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=mRcSUT3X; arc=none smtp.client-ip=209.85.216.73
+	s=arc-20240116; t=1757722703; c=relaxed/simple;
+	bh=Mh6aGJrEoSKc8SjghJ9/lN7NlH7QvKqYibdt1arxBbY=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=tUlSTRQiKTvImmZAhJ0n35wXxfVs2duQf5QLSR5cw9s3C7LIgglj73QRHJ2vfw9/Ew5xn4CkXgYYvrxc4U0znFLZoV2fkbjhpKHHZQYgcsrSv4vnTqzP7SudTmuiOiCtfeBahWrc2xa5yO/R8GWpRTrqFR++LauZMX85PCKiovw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=bGYDJcYF; arc=none smtp.client-ip=209.85.214.171
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pj1-f73.google.com with SMTP id 98e67ed59e1d1-324e41e946eso4344207a91.0
-        for <kvm@vger.kernel.org>; Fri, 12 Sep 2025 16:24:38 -0700 (PDT)
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-pl1-f171.google.com with SMTP id d9443c01a7336-24b2d018f92so41555ad.1
+        for <kvm@vger.kernel.org>; Fri, 12 Sep 2025 17:18:20 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1757719478; x=1758324278; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:reply-to:from:to:cc:subject:date:message-id:reply-to;
-        bh=UalbFbYpbYP+6PV9nGy4JWWryNap6zGGgleYmZzrupU=;
-        b=mRcSUT3XjYXuFOSCPFJOpRTOY/36djqUjb1k4csghvVxYLpuyMmqz4KSRxzYreceli
-         gKnZO7qhPyCNMga3mtnC1dqG1z5QZYDrwRpgPiyaBxTQUBbrHj7TUQ5i9qMvYoiLdgeK
-         rshJaQltbKNg8/TmGHxvaNQBwo3k+XmtnAFndg+8TxcsXmb/KxW0vFXbRCtun8zI+3Mu
-         sfwbWxEDZe1WbB1leMbfCSK6dr4coLpOmwm5Zy7OZaXvAJpiV3YZK9xxRMkxTP7iP0dV
-         xvK5Aslkfv7VosHA0WYugNDXyWOyWo+95k4QY8+5li3qrDR4mdiKXLd2BGrhGr/j2Tes
-         CH8A==
+        d=google.com; s=20230601; t=1757722700; x=1758327500; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=oE3G8ORdwUU6jAQHJONdXUYaEO2BnYkTOmxj8OqkFn8=;
+        b=bGYDJcYFTB8L6n5vjTI6ouZqtNyQs6JGh00JjAaQv8Ed8aFEVz694UhhtOEkwYI8mV
+         6ASzX/HgppuN0Y4ZH3EbnD6hE5XBrTTLD/r1Wowp+0NpTVqfCVTLZdeIdGyoIeelpOJN
+         d2j+ZEvar4GAhtHSXlzIpsJysS8WFp6nWY8Vq6G6lZPFjJfD1GdXCvhQ0sRlMN9FTJRp
+         IDXhswjxb8OkVGl939tGbOFD92whrxIQTka0cNeUbi/Z3fjgDaVzkqsY92Qjmslt5fzm
+         4CTfX1cAqESLcn483nYWvdCReceUV6aB3ZzrJ8frEZeySS6bATxAskN+xj17BLzZjsWf
+         LwPQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1757719478; x=1758324278;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:reply-to:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=UalbFbYpbYP+6PV9nGy4JWWryNap6zGGgleYmZzrupU=;
-        b=SJWREPQb4lpeIgM85qSWBx/2cYPdexSbJvh5z/edv1BQjNW/4YbbTsPv/zPPnicolD
-         aP/djJlnwYLxuf+v1us/l06+cp6Rz8ksAm+CAKhodvjsA4nE8PhCQy2R2cmsFQ9XofIp
-         C7Faxcj/DE6KJ5n317nlg0pnUGEdQ28vvyDqr5qhx7/CfrZskDfxgx+iWXfk8VlHOCw/
-         2ZSper0h1BG8TwRJQxFQ2vbXyY9pcYe0zxKDgXu1E8uskvxyjUJNKkVEQpg/qFnW725N
-         nKQ3xoHCnxljoSNOV35g2gz0AtWOK9FyKsQIYeapS99qW5tE/sN+HBRlO+D9Dn30+gEE
-         INaA==
-X-Gm-Message-State: AOJu0YzWS+x0FQRSESTVX22PHhcFW8GIvUJERqGJNRBfDKuKl9HDHcn0
-	BtqXaCn4d6oJmTyrsYFdF6+pORKWEE0kuVyLQt8c7gyNm5gCw2yiPnvojr52uruH23AUy6Psxgj
-	AmxUiOQ==
-X-Google-Smtp-Source: AGHT+IHUuOlxNOMwEPAMe7F2+HYod0TA3wRiT968IXMC6hLEeFRUjBha/TOLMv9OfQI78AbJpZp4d3uWhq0=
-X-Received: from pjh8.prod.google.com ([2002:a17:90b:3f88:b0:329:d09b:a3f2])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:4c10:b0:32d:d8de:1929
- with SMTP id 98e67ed59e1d1-32de4e7e2ddmr5026221a91.2.1757719478303; Fri, 12
- Sep 2025 16:24:38 -0700 (PDT)
-Reply-To: Sean Christopherson <seanjc@google.com>
-Date: Fri, 12 Sep 2025 16:23:19 -0700
-In-Reply-To: <20250912232319.429659-1-seanjc@google.com>
+        d=1e100.net; s=20230601; t=1757722700; x=1758327500;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=oE3G8ORdwUU6jAQHJONdXUYaEO2BnYkTOmxj8OqkFn8=;
+        b=if4AZcVgFB4qienfOroSwTWPiGt21IiIAEAdMQ81oBVHY1Y7EKCZEIs6KHKW6nyWj8
+         Opx1EIIv0OGOhG/EiFstVEWeeFjVwvfPW+El1XRCy9BJDF9oGHLMmxcYw5IEuU1owNo7
+         W2uVvV/fNGA+T1HySogEagP6SPnbf/hyGeryC334Y22AtSq6cBur1jJEZMsWv2Fl16NI
+         8SCe5YMV0fv8PyK3s5MNatvTeLEE3MCjCf7eRKwxrtODCTCagFyTHjDzqUTT1rQK0HO+
+         tBdL6CaOHrQJhpKCuRc0k3AE0fMfMUwswBICae2ab4fY4U9bhzJxyPp8qFmJ2kkxv0ZO
+         Oegw==
+X-Forwarded-Encrypted: i=1; AJvYcCWO8UEJRCasUpVaDbn0MUedVWdIH9Qmc6B/WrLYNAu1Gk9wy96MmplRIh6lJnrXla84a7M=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwHLUz/6dqvxd9ATUcPHnTlz7l+0LWHzZus8s12UpTnidz1Pwdj
+	yjUbPFFtfyfBhmjJKL8DjU9ZKqW187U6+4cIdhfgSUPe3iQ9xOU/ksMDxziY/s88t9Lk/oCcoGQ
+	AqhQsE48NkbKtnQHi119RDdIsdc74/OEHhcWoaD5O
+X-Gm-Gg: ASbGncsi4WVGu+nWZLyyS5WmKQxJLAogU02ve9wKTlB5BrKhp6vSphUyha2qcu9MiXs
+	TQUZ+zj/i8JpfMeR+Ri0v5WNkS+XU3dsWZAMS5doYyiuRsigvEdbXn6+eaJLe3b+uzMOMB5KZCY
+	3yQsPsqE+3VlUGZTUJl+nb+cpuiyWq2vhdDqbCC8uIn4FvHlLXyrUwyYPySG229cVwHWNUdk1rj
+	aF406mDvrqEaxBLwtrLAVl0emqdVaOtxLEIAi2fDpoI
+X-Google-Smtp-Source: AGHT+IGzaRnKMgioFkIn9MZTAWIdQlLt1DnmIKhZcaFLkMy9Q3yssinqrzxX1g/AzMrr4tSaSGNncmZBKNCa8ms9HGE=
+X-Received: by 2002:a17:903:2343:b0:25b:fba3:afa7 with SMTP id
+ d9443c01a7336-260e5f7673cmr1151165ad.10.1757722699324; Fri, 12 Sep 2025
+ 17:18:19 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20250912232319.429659-1-seanjc@google.com>
-X-Mailer: git-send-email 2.51.0.384.g4c02a37b29-goog
-Message-ID: <20250912232319.429659-42-seanjc@google.com>
-Subject: [PATCH v15 41/41] KVM: VMX: Make CR4.CET a guest owned bit
-From: Sean Christopherson <seanjc@google.com>
-To: Paolo Bonzini <pbonzini@redhat.com>, Sean Christopherson <seanjc@google.com>
-Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	Tom Lendacky <thomas.lendacky@amd.com>, Mathias Krause <minipli@grsecurity.net>, 
-	John Allen <john.allen@amd.com>, Rick Edgecombe <rick.p.edgecombe@intel.com>, 
-	Chao Gao <chao.gao@intel.com>, Maxim Levitsky <mlevitsk@redhat.com>, 
-	Xiaoyao Li <xiaoyao.li@intel.com>, Zhang Yi Z <yi.z.zhang@linux.intel.com>
+MIME-Version: 1.0
+References: <20250902111951.58315-1-kalyazin@amazon.com> <20250902111951.58315-2-kalyazin@amazon.com>
+ <CADrL8HV8+dh4xPv6Da5CR+CwGJwg5uHyNmiVmHhWFJSwy8ChRw@mail.gmail.com>
+ <87d562a1-89fe-42a8-aa53-c052acf4c564@amazon.com> <8e55ba3a-e7ae-422a-9c79-11aa0e17eae9@redhat.com>
+ <bc26eaf1-9f01-4a65-87a6-1f73fcd00663@amazon.com> <55b727fc-8fd3-4e03-8143-1ed6dcab2781@redhat.com>
+In-Reply-To: <55b727fc-8fd3-4e03-8143-1ed6dcab2781@redhat.com>
+From: Vishal Annapurve <vannapurve@google.com>
+Date: Fri, 12 Sep 2025 17:18:06 -0700
+X-Gm-Features: Ac12FXw70ExrJvBQi4rgyWRbyc1xOL8CupFdmrDzb2GfYcck5L74n4hu4AFRWBE
+Message-ID: <CAGtprH8QjeuR90QJ7byxoAPfb30kmUEDhRhzqNZqSpR8y_+z9g@mail.gmail.com>
+Subject: Re: [PATCH v5 1/2] KVM: guest_memfd: add generic population via write
+To: David Hildenbrand <david@redhat.com>
+Cc: kalyazin@amazon.com, James Houghton <jthoughton@google.com>, 
+	"Kalyazin, Nikita" <kalyazin@amazon.co.uk>, "pbonzini@redhat.com" <pbonzini@redhat.com>, 
+	"shuah@kernel.org" <shuah@kernel.org>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>, 
+	"linux-kselftest@vger.kernel.org" <linux-kselftest@vger.kernel.org>, 
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, "michael.day@amd.com" <michael.day@amd.com>, 
+	"Roy, Patrick" <roypat@amazon.co.uk>, "Thomson, Jack" <jackabt@amazon.co.uk>, 
+	"Manwaring, Derek" <derekmn@amazon.com>, "Cali, Marco" <xmarcalx@amazon.co.uk>
 Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-From: Mathias Krause <minipli@grsecurity.net>
+On Fri, Sep 12, 2025 at 8:39=E2=80=AFAM David Hildenbrand <david@redhat.com=
+> wrote:
+>
+> >>>> What's meant to happen if we do use this for CoCo VMs? I would expec=
+t
+> >>>> write() to fail, but I don't see why it would (seems like we need/wa=
+nt
+> >>>> a check that we aren't write()ing to private memory).
+> >>>
+> >>> I am not so sure that write() should fail even in CoCo VMs if we acce=
+ss
+> >>> not-yet-prepared pages.  My understanding was that the CoCoisation of
+> >>> the memory occurs during "preparation".  But I may be wrong here.
+> >>
+> >> But how do you handle that a page is actually inaccessible and should
+> >> not be touched?
+> >>
+> >> IOW, with CXL you could crash the host.
+> >>
+> >> There is likely some state check missing, or it should be restricted t=
+o
+> >> VM types.
+> >
+> > Sorry, I'm missing the link between VM types and CXL.  How are they rel=
+ated?
+>
+> I think what you explain below clarifies it.
+>
+> >
+> > My thinking was it is a regular (accessible) page until it is "prepared=
+"
+> > by the CoCo hardware, which is currently tracked by the up-to-date flag=
+,
+> > so it is safe to assume that until it is "prepared", it is accessible
+> > because it was allocated by filemap_grab_folio() ->
+> > filemap_alloc_folio() and hasn't been taken over by the CoCo hardware.
+> > What scenario can you see where it doesn't apply as of now?
+>
+> Thanks for clarifying, see below.
+>
+> >
+> > I am aware of an attempt to remove preparation tracking from
+> > guest_memfd, but it is still at an RFC stage AFAIK [1].
+> >
+> >>
+> >> Do we know how this would interact with the direct-map removal?
+> >
+> > I'm using folio_test_uptodate() to determine if the page has been
+> > removed from the direct map as kvm_gmem_mark_prepared() is what
+> > currently removes the page from the direct map and marks it as
+> > up-to-date.  [2] is a Firecracker feature branch where the two work in
+> > combination.
+>
+> Ah, okay. Yes, I recalled [1] that we wanted to change these semantics
+> to be "uptodate: was zeroed", and that preparation handling would be
+> essentially handled by the arch backend.
 
-Make CR4.CET a guest-owned bit under VMX by extending
-KVM_POSSIBLE_CR4_GUEST_BITS accordingly.
+Yes, I think we should not be overloading uptodate flag to be an
+indicator of what is private for CoCo guests. Uptodate flag should
+just mean zeroed/fresh folio. It's possible that future allocator
+backing for huge pages already provides uptodate folios.
 
-There's no need to intercept changes to CR4.CET, as it's neither
-included in KVM's MMU role bits, nor does KVM specifically care about
-the actual value of a (nested) guest's CR4.CET value, beside for
-enforcing architectural constraints, i.e. make sure that CR0.WP=1 if
-CR4.CET=1.
+If there is no current use case for read/write for CoCo VMs, I think
+it makes sense to disable it for now by checking the VM type before
+adding further overloading of uptodate flags.
 
-Intercepting writes to CR4.CET is particularly bad for grsecurity
-kernels with KERNEXEC or, even worse, KERNSEAL enabled. These features
-heavily make use of read-only kernel objects and use a cpu-local CR0.WP
-toggle to override it, when needed. Under a CET-enabled kernel, this
-also requires toggling CR4.CET, hence the motivation to make it
-guest-owned.
-
-Using the old test from [1] gives the following runtime numbers (perf
-stat -r 5 ssdd 10 50000):
-
-* grsec guest on linux-6.16-rc5 + cet patches:
-  2.4647 +- 0.0706 seconds time elapsed  ( +-  2.86% )
-
-* grsec guest on linux-6.16-rc5 + cet patches + CR4.CET guest-owned:
-  1.5648 +- 0.0240 seconds time elapsed  ( +-  1.53% )
-
-Not only does not intercepting CR4.CET make the test run ~35% faster,
-it's also more stable with less fluctuation due to fewer VMEXITs.
-
-Therefore, make CR4.CET a guest-owned bit where possible.
-
-This change is VMX-specific, as SVM has no such fine-grained control
-register intercept control.
-
-If KVM's assumptions regarding MMU role handling wrt. a guest's CR4.CET
-value ever change, the BUILD_BUG_ON()s related to KVM_MMU_CR4_ROLE_BITS
-and KVM_POSSIBLE_CR4_GUEST_BITS will catch that early.
-
-Link: https://lore.kernel.org/kvm/20230322013731.102955-1-minipli@grsecurity.net/ [1]
-Reviewed-by: Chao Gao <chao.gao@intel.com>
-Signed-off-by: Mathias Krause <minipli@grsecurity.net>
-Signed-off-by: Sean Christopherson <seanjc@google.com>
----
- arch/x86/kvm/kvm_cache_regs.h | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
-
-diff --git a/arch/x86/kvm/kvm_cache_regs.h b/arch/x86/kvm/kvm_cache_regs.h
-index 36a8786db291..8ddb01191d6f 100644
---- a/arch/x86/kvm/kvm_cache_regs.h
-+++ b/arch/x86/kvm/kvm_cache_regs.h
-@@ -7,7 +7,8 @@
- #define KVM_POSSIBLE_CR0_GUEST_BITS	(X86_CR0_TS | X86_CR0_WP)
- #define KVM_POSSIBLE_CR4_GUEST_BITS				  \
- 	(X86_CR4_PVI | X86_CR4_DE | X86_CR4_PCE | X86_CR4_OSFXSR  \
--	 | X86_CR4_OSXMMEXCPT | X86_CR4_PGE | X86_CR4_TSD | X86_CR4_FSGSBASE)
-+	 | X86_CR4_OSXMMEXCPT | X86_CR4_PGE | X86_CR4_TSD | X86_CR4_FSGSBASE \
-+	 | X86_CR4_CET)
- 
- #define X86_CR0_PDPTR_BITS    (X86_CR0_CD | X86_CR0_NW | X86_CR0_PG)
- #define X86_CR4_TLBFLUSH_BITS (X86_CR4_PGE | X86_CR4_PCIDE | X86_CR4_PAE | X86_CR4_SMEP)
--- 
-2.51.0.384.g4c02a37b29-goog
-
+>
+> --
+> Cheers
+>
+> David / dhildenb
+>
+>
 
