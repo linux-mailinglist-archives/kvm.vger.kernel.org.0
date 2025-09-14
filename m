@@ -1,314 +1,389 @@
-Return-Path: <kvm+bounces-57500-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-57501-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0D09BB56438
-	for <lists+kvm@lfdr.de>; Sun, 14 Sep 2025 03:57:33 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7C0D5B56734
+	for <lists+kvm@lfdr.de>; Sun, 14 Sep 2025 09:36:16 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 4B8D91A22D17
-	for <lists+kvm@lfdr.de>; Sun, 14 Sep 2025 01:57:54 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 30F04480FB1
+	for <lists+kvm@lfdr.de>; Sun, 14 Sep 2025 07:36:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9AB3E23B62B;
-	Sun, 14 Sep 2025 01:57:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DECE5221FB8;
+	Sun, 14 Sep 2025 07:35:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Rm3eVyeW"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="KKfr8C/P"
 X-Original-To: kvm@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B7D1A1FDE39
-	for <kvm@vger.kernel.org>; Sun, 14 Sep 2025 01:57:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CFEC91F4CA4;
+	Sun, 14 Sep 2025 07:35:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757815041; cv=none; b=dVfvnBZ4J8dJs3p3JSxC2gsYgkmIGYFZX6DTJQqrTKU8T+HPbkmgjHlKTI3rArWOuVUH6iHVORBFMDmXYUi5449MEkUrVZ5oMlgpm0jrmlbp5/TKJ7Sni472/KYr6k4XlI5LVPH+0UjXmWq3ZMv57QFmb04u2tWNDDE82mpoe98=
+	t=1757835355; cv=none; b=rBWqtMpEvt1wnRYyhmRYS4ZcmyVq/uJX9OOrOKgF4+MxKd96betR99ahup1DathNgmBTf/lDi/2L55OElcX/M0IOPgK94g69DUqEVY/9kN0t6YgSBrKU8+iHhXhlsDePVPn5+XAJXTSs/wDJbooxQl7ntlO5RjGeazPnHDYZ3t0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757815041; c=relaxed/simple;
-	bh=2bA54a8XQO3oplu+GpK3brlzTVegVik1P3OTH4QDtaA=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=PTyLbGG75eXIW7u70JkZocPUNLT3Owootmtu5AgGwTCG1oieTHc70o+hbTGa5S0sKU5y92NapFKOdvHMLor+3dWiV+D3cX3JEl+WKeyfKNMNWAz7Flr1fF3iHmSRMkKTPbfnRp0BmsWYca0r8z6S126WLSCw3AtBiqke3WhXdyY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Rm3eVyeW; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6EF2CC4CEF7
-	for <kvm@vger.kernel.org>; Sun, 14 Sep 2025 01:57:21 +0000 (UTC)
+	s=arc-20240116; t=1757835355; c=relaxed/simple;
+	bh=vFnfGTkj5/KhQQ0QRoZ2pu4iIv0mM+KWgCa9F0xbdl0=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=WpglhYwD0lkKSPye87Yjr31hZww5y2gM/o6F0gu2j3FFRmjfMo32UvvEQuPhB07I8L8rf+kW/U+rXbeoelr9PzVmnlQqtG/RVtKK2lOGtHPRCz7d0OZa+lG0i8EW0CeS8yCIJidDnGiAjt+qX0QUmZmnAuD5RNOICWRNACB57Xs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=KKfr8C/P; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B99EBC4CEF1;
+	Sun, 14 Sep 2025 07:35:27 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1757815041;
-	bh=2bA54a8XQO3oplu+GpK3brlzTVegVik1P3OTH4QDtaA=;
-	h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
-	b=Rm3eVyeWLB90tjDfWg4cd/8Go+FYh4GNgJ1W6mCc90EgnEawb6rEmy85Gc2qk363q
-	 7fkERHY/yaKy0MFH3jz6eGDHtw2DW40CUoz7fqxmKVJ8xERjRWA4kDe862vX/bj7G1
-	 ynMp7dssLS3BO2so51EkIylPmSxKqIdytEiA3f9NihGSsLojIvukfGIYA126ZXvzZ4
-	 gJ3guL1jlqUTzll1FgnsMcUn+aPikz9M5Cb0UOrVQVSzLHlZcquIewKvgz9Sgs9ZNk
-	 rRMVUahfCoMFBLuf1UW3uEEdh/ClhwEMn/Y/179kr883A079sMr8yeCi8dtFmmGvYm
-	 HHNUaACLchAxA==
-Received: by mail-ej1-f54.google.com with SMTP id a640c23a62f3a-b079c13240eso501640966b.1
-        for <kvm@vger.kernel.org>; Sat, 13 Sep 2025 18:57:21 -0700 (PDT)
-X-Forwarded-Encrypted: i=1; AJvYcCU3qTubuFSuBdjx5WoPaRj/p+ObGhF5KRwU9Yar6sNq88HM8RD/qDaPeIU5+wrFm3U/tic=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yx0+GBCp8JVn1PA10MGZ+87ypqTImpgw3QkDq2qxQ7UbvW2g7S6
-	Bx0Y3oair+E+hYe64inBaGFhV9PBh0C3Eq09sdIvEDt4wUjI5gsuA2VjufjDsRHPJvUiX/5UU2l
-	FG+3La8UYAvNXOgX3WrRPFz1+OEOUrKw=
-X-Google-Smtp-Source: AGHT+IFfNmQmnqGZYX0ngUS0c2d+ly5r+Z8sFAk/gU9hnaLKvZrHmV0tDaiOU94759FUb8SGhbBwfAAm52QYlnu9vvg=
-X-Received: by 2002:a17:907:3e9f:b0:b04:a1ec:d06f with SMTP id
- a640c23a62f3a-b07c35bcc13mr854776466b.25.1757815039974; Sat, 13 Sep 2025
- 18:57:19 -0700 (PDT)
+	s=k20201202; t=1757835354;
+	bh=vFnfGTkj5/KhQQ0QRoZ2pu4iIv0mM+KWgCa9F0xbdl0=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=KKfr8C/PuOOvlqMXgt2nNqevFc6crDsLfQefigkMxEmHUQqKThFaSj7Kt7tgJN4Ql
+	 tqwGBz8U9I31FemsXLNBesItokumnSgVNDEzsAQrwzbqWwJwnQIDazhbA1Q/3KP+VP
+	 AQqh9YXlhPpv9/6VgKrt9NrHUMC2s8z6wl4SAPtpDk0BMTpCk+1VBM2F7dJPjMiCgx
+	 sOI4Dv09T0ldqRZdEnwtXoIPVkkM09/pR0S7gXJwMOp2kmZ/LcHM4PYRqtqXpfzW6h
+	 UcRqfaCUNbA3FMvl6sJbGdZ3ojqu1Nas1iYqlaPOanydB0APtSr/WcoEu4gvcaosEK
+	 LUw3//H6uFjmQ==
+Date: Sun, 14 Sep 2025 10:35:23 +0300
+From: Mike Rapoport <rppt@kernel.org>
+To: "Roy, Patrick" <roypat@amazon.co.uk>
+Cc: "Thomson, Jack" <jackabt@amazon.co.uk>,
+	"Kalyazin, Nikita" <kalyazin@amazon.co.uk>,
+	"Cali, Marco" <xmarcalx@amazon.co.uk>,
+	"derekmn@amazon.co.uk" <derekmn@amazon.co.uk>,
+	"willy@infradead.org" <willy@infradead.org>,
+	"corbet@lwn.net" <corbet@lwn.net>,
+	"pbonzini@redhat.com" <pbonzini@redhat.com>,
+	"maz@kernel.org" <maz@kernel.org>,
+	"oliver.upton@linux.dev" <oliver.upton@linux.dev>,
+	"joey.gouly@arm.com" <joey.gouly@arm.com>,
+	"suzuki.poulose@arm.com" <suzuki.poulose@arm.com>,
+	"yuzenghui@huawei.com" <yuzenghui@huawei.com>,
+	"catalin.marinas@arm.com" <catalin.marinas@arm.com>,
+	"will@kernel.org" <will@kernel.org>,
+	"chenhuacai@kernel.org" <chenhuacai@kernel.org>,
+	"kernel@xen0n.name" <kernel@xen0n.name>,
+	"paul.walmsley@sifive.com" <paul.walmsley@sifive.com>,
+	"palmer@dabbelt.com" <palmer@dabbelt.com>,
+	"aou@eecs.berkeley.edu" <aou@eecs.berkeley.edu>,
+	"alex@ghiti.fr" <alex@ghiti.fr>,
+	"agordeev@linux.ibm.com" <agordeev@linux.ibm.com>,
+	"gerald.schaefer@linux.ibm.com" <gerald.schaefer@linux.ibm.com>,
+	"hca@linux.ibm.com" <hca@linux.ibm.com>,
+	"gor@linux.ibm.com" <gor@linux.ibm.com>,
+	"borntraeger@linux.ibm.com" <borntraeger@linux.ibm.com>,
+	"svens@linux.ibm.com" <svens@linux.ibm.com>,
+	"dave.hansen@linux.intel.com" <dave.hansen@linux.intel.com>,
+	"luto@kernel.org" <luto@kernel.org>,
+	"peterz@infradead.org" <peterz@infradead.org>,
+	"tglx@linutronix.de" <tglx@linutronix.de>,
+	"mingo@redhat.com" <mingo@redhat.com>,
+	"bp@alien8.de" <bp@alien8.de>, "x86@kernel.org" <x86@kernel.org>,
+	"hpa@zytor.com" <hpa@zytor.com>,
+	"trondmy@kernel.org" <trondmy@kernel.org>,
+	"anna@kernel.org" <anna@kernel.org>,
+	"hubcap@omnibond.com" <hubcap@omnibond.com>,
+	"martin@omnibond.com" <martin@omnibond.com>,
+	"viro@zeniv.linux.org.uk" <viro@zeniv.linux.org.uk>,
+	"brauner@kernel.org" <brauner@kernel.org>,
+	"jack@suse.cz" <jack@suse.cz>,
+	"akpm@linux-foundation.org" <akpm@linux-foundation.org>,
+	"david@redhat.com" <david@redhat.com>,
+	"lorenzo.stoakes@oracle.com" <lorenzo.stoakes@oracle.com>,
+	"Liam.Howlett@oracle.com" <Liam.Howlett@oracle.com>,
+	"vbabka@suse.cz" <vbabka@suse.cz>,
+	"surenb@google.com" <surenb@google.com>,
+	"mhocko@suse.com" <mhocko@suse.com>,
+	"ast@kernel.org" <ast@kernel.org>,
+	"daniel@iogearbox.net" <daniel@iogearbox.net>,
+	"andrii@kernel.org" <andrii@kernel.org>,
+	"martin.lau@linux.dev" <martin.lau@linux.dev>,
+	"eddyz87@gmail.com" <eddyz87@gmail.com>,
+	"song@kernel.org" <song@kernel.org>,
+	"yonghong.song@linux.dev" <yonghong.song@linux.dev>,
+	"john.fastabend@gmail.com" <john.fastabend@gmail.com>,
+	"kpsingh@kernel.org" <kpsingh@kernel.org>,
+	"sdf@fomichev.me" <sdf@fomichev.me>,
+	"haoluo@google.com" <haoluo@google.com>,
+	"jolsa@kernel.org" <jolsa@kernel.org>,
+	"jgg@ziepe.ca" <jgg@ziepe.ca>,
+	"jhubbard@nvidia.com" <jhubbard@nvidia.com>,
+	"peterx@redhat.com" <peterx@redhat.com>,
+	"jannh@google.com" <jannh@google.com>,
+	"pfalcato@suse.de" <pfalcato@suse.de>,
+	"axelrasmussen@google.com" <axelrasmussen@google.com>,
+	"yuanchu@google.com" <yuanchu@google.com>,
+	"weixugc@google.com" <weixugc@google.com>,
+	"hannes@cmpxchg.org" <hannes@cmpxchg.org>,
+	"zhengqi.arch@bytedance.com" <zhengqi.arch@bytedance.com>,
+	"shakeel.butt@linux.dev" <shakeel.butt@linux.dev>,
+	"shuah@kernel.org" <shuah@kernel.org>,
+	"seanjc@google.com" <seanjc@google.com>,
+	"linux-fsdevel@vger.kernel.org" <linux-fsdevel@vger.kernel.org>,
+	"linux-doc@vger.kernel.org" <linux-doc@vger.kernel.org>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+	"kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+	"linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>,
+	"kvmarm@lists.linux.dev" <kvmarm@lists.linux.dev>,
+	"loongarch@lists.linux.dev" <loongarch@lists.linux.dev>,
+	"linux-riscv@lists.infradead.org" <linux-riscv@lists.infradead.org>,
+	"linux-s390@vger.kernel.org" <linux-s390@vger.kernel.org>,
+	"linux-nfs@vger.kernel.org" <linux-nfs@vger.kernel.org>,
+	"devel@lists.orangefs.org" <devel@lists.orangefs.org>,
+	"linux-mm@kvack.org" <linux-mm@kvack.org>,
+	"bpf@vger.kernel.org" <bpf@vger.kernel.org>,
+	"linux-kselftest@vger.kernel.org" <linux-kselftest@vger.kernel.org>
+Subject: Re: [PATCH v6 03/11] mm: introduce AS_NO_DIRECT_MAP
+Message-ID: <aMZwO8uR_JG3nr4X@kernel.org>
+References: <20250912091708.17502-1-roypat@amazon.co.uk>
+ <20250912091708.17502-4-roypat@amazon.co.uk>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250910071429.3925025-1-maobibo@loongson.cn>
-In-Reply-To: <20250910071429.3925025-1-maobibo@loongson.cn>
-From: Huacai Chen <chenhuacai@kernel.org>
-Date: Sun, 14 Sep 2025 09:57:08 +0800
-X-Gmail-Original-Message-ID: <CAAhV-H65H_iREuETGU_v9oZdaPFoQj1VZV46XSNTC8ppENXzuQ@mail.gmail.com>
-X-Gm-Features: Ac12FXzfN2bNWTNhJRbB-SLTolLXMjAH5r5IpQVt22wgOskPBdaWpLkZgPjmVEs
-Message-ID: <CAAhV-H65H_iREuETGU_v9oZdaPFoQj1VZV46XSNTC8ppENXzuQ@mail.gmail.com>
-Subject: Re: [PATCH] LoongArch: KVM: Fix VM migration failure with PTW enabled
-To: Bibo Mao <maobibo@loongson.cn>
-Cc: WANG Xuerui <kernel@xen0n.name>, kvm@vger.kernel.org, loongarch@lists.linux.dev, 
-	linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250912091708.17502-4-roypat@amazon.co.uk>
 
-Hi, Bibo,
+On Fri, Sep 12, 2025 at 09:17:34AM +0000, Roy, Patrick wrote:
+> Add AS_NO_DIRECT_MAP for mappings where direct map entries of folios are
+> set to not present . Currently, mappings that match this description are
+> secretmem mappings (memfd_secret()). Later, some guest_memfd
+> configurations will also fall into this category.
+> 
+> Reject this new type of mappings in all locations that currently reject
+> secretmem mappings, on the assumption that if secretmem mappings are
+> rejected somewhere, it is precisely because of an inability to deal with
+> folios without direct map entries, and then make memfd_secret() use
+> AS_NO_DIRECT_MAP on its address_space to drop its special
+> vma_is_secretmem()/secretmem_mapping() checks.
+> 
+> This drops a optimization in gup_fast_folio_allowed() where
+> secretmem_mapping() was only called if CONFIG_SECRETMEM=y. secretmem is
+> enabled by default since commit b758fe6df50d ("mm/secretmem: make it on
+> by default"), so the secretmem check did not actually end up elided in
+> most cases anymore anyway.
+> 
+> Use a new flag instead of overloading AS_INACCESSIBLE (which is already
+> set by guest_memfd) because not all guest_memfd mappings will end up
+> being direct map removed (e.g. in pKVM setups, parts of guest_memfd that
+> can be mapped to userspace should also be GUP-able, and generally not
+> have restrictions on who can access it).
+> 
+> Signed-off-by: Patrick Roy <roypat@amazon.co.uk>
 
-On Wed, Sep 10, 2025 at 3:14=E2=80=AFPM Bibo Mao <maobibo@loongson.cn> wrot=
-e:
->
-> With PTW disabled system, bit Dirty is HW bit for page writing, however
-> with PTW enabled system, bit Write is HW bit for page writing. Previously
-> bit Write is treated as SW bit to record page writable attribute for fast
-> page fault handling in the secondary MMU, however with PTW enabled machin=
-e,
-> this bit is used by HW already.
->
-> Here define KVM_PAGE_SOFT_WRITE with SW bit _PAGE_MODIFIED, so that it ca=
-n
-> work on both PTW disabled and enabled machines. And with HW write bit, bo=
-th
-> bit Dirty and Write is set or clear.
->
-> Signed-off-by: Bibo Mao <maobibo@loongson.cn>
+Acked-by: Mike Rapoport (Microsoft) <rppt@kernel.org>
+
 > ---
->  arch/loongarch/include/asm/kvm_mmu.h | 20 ++++++++++++++++----
->  arch/loongarch/kvm/mmu.c             |  8 ++++----
->  2 files changed, 20 insertions(+), 8 deletions(-)
->
-> diff --git a/arch/loongarch/include/asm/kvm_mmu.h b/arch/loongarch/includ=
-e/asm/kvm_mmu.h
-> index 099bafc6f797..efcd593c42b1 100644
-> --- a/arch/loongarch/include/asm/kvm_mmu.h
-> +++ b/arch/loongarch/include/asm/kvm_mmu.h
-> @@ -16,6 +16,13 @@
->   */
->  #define KVM_MMU_CACHE_MIN_PAGES        (CONFIG_PGTABLE_LEVELS - 1)
->
-> +/*
-> + * _PAGE_MODIFIED is SW pte bit, it records page ever written on host
-> + * kernel, on secondary MMU it records page writable in order to fast
-> + * path handling
-> + */
-> +#define KVM_PAGE_SOFT_WRITE    _PAGE_MODIFIED
-KVM_PAGE_WRITEABLE is more suitable.
-
-> +
->  #define _KVM_FLUSH_PGTABLE     0x1
->  #define _KVM_HAS_PGMASK                0x2
->  #define kvm_pfn_pte(pfn, prot) (((pfn) << PFN_PTE_SHIFT) | pgprot_val(pr=
-ot))
-> @@ -52,11 +59,16 @@ static inline void kvm_set_pte(kvm_pte_t *ptep, kvm_p=
-te_t val)
->         WRITE_ONCE(*ptep, val);
+>  include/linux/pagemap.h   | 16 ++++++++++++++++
+>  include/linux/secretmem.h | 18 ------------------
+>  lib/buildid.c             |  4 ++--
+>  mm/gup.c                  | 19 +++++--------------
+>  mm/mlock.c                |  2 +-
+>  mm/secretmem.c            |  8 ++------
+>  6 files changed, 26 insertions(+), 41 deletions(-)
+> 
+> diff --git a/include/linux/pagemap.h b/include/linux/pagemap.h
+> index 12a12dae727d..1f5739f6a9f5 100644
+> --- a/include/linux/pagemap.h
+> +++ b/include/linux/pagemap.h
+> @@ -211,6 +211,7 @@ enum mapping_flags {
+>  				   folio contents */
+>  	AS_INACCESSIBLE = 8,	/* Do not attempt direct R/W access to the mapping */
+>  	AS_WRITEBACK_MAY_DEADLOCK_ON_RECLAIM = 9,
+> +	AS_NO_DIRECT_MAP = 10,	/* Folios in the mapping are not in the direct map */
+>  	/* Bits 16-25 are used for FOLIO_ORDER */
+>  	AS_FOLIO_ORDER_BITS = 5,
+>  	AS_FOLIO_ORDER_MIN = 16,
+> @@ -346,6 +347,21 @@ static inline bool mapping_writeback_may_deadlock_on_reclaim(struct address_spac
+>  	return test_bit(AS_WRITEBACK_MAY_DEADLOCK_ON_RECLAIM, &mapping->flags);
 >  }
->
-> -static inline int kvm_pte_write(kvm_pte_t pte) { return pte & _PAGE_WRIT=
-E; }
-> -static inline int kvm_pte_dirty(kvm_pte_t pte) { return pte & _PAGE_DIRT=
-Y; }
-> +static inline int kvm_pte_soft_write(kvm_pte_t pte) { return pte & KVM_P=
-AGE_SOFT_WRITE; }
-The same, kvm_pte_mkwriteable() is more suitable.
-
-> +static inline int kvm_pte_dirty(kvm_pte_t pte) { return pte & __WRITEABL=
-E; }
-_PAGE_DIRTY and _PAGE_WRITE are always set/cleared at the same time,
-so the old version still works.
-
->  static inline int kvm_pte_young(kvm_pte_t pte) { return pte & _PAGE_ACCE=
-SSED; }
->  static inline int kvm_pte_huge(kvm_pte_t pte) { return pte & _PAGE_HUGE;=
- }
->
-> +static inline kvm_pte_t kvm_pte_mksoft_write(kvm_pte_t pte)
+>  
+> +static inline void mapping_set_no_direct_map(struct address_space *mapping)
 > +{
-> +       return pte | KVM_PAGE_SOFT_WRITE;
+> +	set_bit(AS_NO_DIRECT_MAP, &mapping->flags);
 > +}
 > +
->  static inline kvm_pte_t kvm_pte_mkyoung(kvm_pte_t pte)
+> +static inline bool mapping_no_direct_map(const struct address_space *mapping)
+> +{
+> +	return test_bit(AS_NO_DIRECT_MAP, &mapping->flags);
+> +}
+> +
+> +static inline bool vma_has_no_direct_map(const struct vm_area_struct *vma)
+> +{
+> +	return vma->vm_file && mapping_no_direct_map(vma->vm_file->f_mapping);
+> +}
+> +
+>  static inline gfp_t mapping_gfp_mask(struct address_space * mapping)
 >  {
->         return pte | _PAGE_ACCESSED;
-> @@ -69,12 +81,12 @@ static inline kvm_pte_t kvm_pte_mkold(kvm_pte_t pte)
->
->  static inline kvm_pte_t kvm_pte_mkdirty(kvm_pte_t pte)
+>  	return mapping->gfp_mask;
+> diff --git a/include/linux/secretmem.h b/include/linux/secretmem.h
+> index e918f96881f5..0ae1fb057b3d 100644
+> --- a/include/linux/secretmem.h
+> +++ b/include/linux/secretmem.h
+> @@ -4,28 +4,10 @@
+>  
+>  #ifdef CONFIG_SECRETMEM
+>  
+> -extern const struct address_space_operations secretmem_aops;
+> -
+> -static inline bool secretmem_mapping(struct address_space *mapping)
+> -{
+> -	return mapping->a_ops == &secretmem_aops;
+> -}
+> -
+> -bool vma_is_secretmem(struct vm_area_struct *vma);
+>  bool secretmem_active(void);
+>  
+>  #else
+>  
+> -static inline bool vma_is_secretmem(struct vm_area_struct *vma)
+> -{
+> -	return false;
+> -}
+> -
+> -static inline bool secretmem_mapping(struct address_space *mapping)
+> -{
+> -	return false;
+> -}
+> -
+>  static inline bool secretmem_active(void)
 >  {
-> -       return pte | _PAGE_DIRTY;
-> +       return pte | __WRITEABLE;
+>  	return false;
+> diff --git a/lib/buildid.c b/lib/buildid.c
+> index c4b0f376fb34..89e567954284 100644
+> --- a/lib/buildid.c
+> +++ b/lib/buildid.c
+> @@ -65,8 +65,8 @@ static int freader_get_folio(struct freader *r, loff_t file_off)
+>  
+>  	freader_put_folio(r);
+>  
+> -	/* reject secretmem folios created with memfd_secret() */
+> -	if (secretmem_mapping(r->file->f_mapping))
+> +	/* reject folios without direct map entries (e.g. from memfd_secret() or guest_memfd()) */
+> +	if (mapping_no_direct_map(r->file->f_mapping))
+>  		return -EFAULT;
+>  
+>  	r->folio = filemap_get_folio(r->file->f_mapping, file_off >> PAGE_SHIFT);
+> diff --git a/mm/gup.c b/mm/gup.c
+> index adffe663594d..75a0cffdf37d 100644
+> --- a/mm/gup.c
+> +++ b/mm/gup.c
+> @@ -11,7 +11,6 @@
+>  #include <linux/rmap.h>
+>  #include <linux/swap.h>
+>  #include <linux/swapops.h>
+> -#include <linux/secretmem.h>
+>  
+>  #include <linux/sched/signal.h>
+>  #include <linux/rwsem.h>
+> @@ -1234,7 +1233,7 @@ static int check_vma_flags(struct vm_area_struct *vma, unsigned long gup_flags)
+>  	if ((gup_flags & FOLL_SPLIT_PMD) && is_vm_hugetlb_page(vma))
+>  		return -EOPNOTSUPP;
+>  
+> -	if (vma_is_secretmem(vma))
+> +	if (vma_has_no_direct_map(vma))
+>  		return -EFAULT;
+>  
+>  	if (write) {
+> @@ -2736,7 +2735,7 @@ EXPORT_SYMBOL(get_user_pages_unlocked);
+>   * This call assumes the caller has pinned the folio, that the lowest page table
+>   * level still points to this folio, and that interrupts have been disabled.
+>   *
+> - * GUP-fast must reject all secretmem folios.
+> + * GUP-fast must reject all folios without direct map entries (such as secretmem).
+>   *
+>   * Writing to pinned file-backed dirty tracked folios is inherently problematic
+>   * (see comment describing the writable_file_mapping_allowed() function). We
+> @@ -2751,7 +2750,6 @@ static bool gup_fast_folio_allowed(struct folio *folio, unsigned int flags)
+>  {
+>  	bool reject_file_backed = false;
+>  	struct address_space *mapping;
+> -	bool check_secretmem = false;
+>  	unsigned long mapping_flags;
+>  
+>  	/*
+> @@ -2763,18 +2761,10 @@ static bool gup_fast_folio_allowed(struct folio *folio, unsigned int flags)
+>  		reject_file_backed = true;
+>  
+>  	/* We hold a folio reference, so we can safely access folio fields. */
+> -
+> -	/* secretmem folios are always order-0 folios. */
+> -	if (IS_ENABLED(CONFIG_SECRETMEM) && !folio_test_large(folio))
+> -		check_secretmem = true;
+> -
+> -	if (!reject_file_backed && !check_secretmem)
+> -		return true;
+> -
+>  	if (WARN_ON_ONCE(folio_test_slab(folio)))
+>  		return false;
+>  
+> -	/* hugetlb neither requires dirty-tracking nor can be secretmem. */
+> +	/* hugetlb neither requires dirty-tracking nor can be without direct map. */
+>  	if (folio_test_hugetlb(folio))
+>  		return true;
+>  
+> @@ -2812,8 +2802,9 @@ static bool gup_fast_folio_allowed(struct folio *folio, unsigned int flags)
+>  	 * At this point, we know the mapping is non-null and points to an
+>  	 * address_space object.
+>  	 */
+> -	if (check_secretmem && secretmem_mapping(mapping))
+> +	if (mapping_no_direct_map(mapping))
+>  		return false;
+> +
+>  	/* The only remaining allowed file system is shmem. */
+>  	return !reject_file_backed || shmem_mapping(mapping);
 >  }
->
->  static inline kvm_pte_t kvm_pte_mkclean(kvm_pte_t pte)
->  {
-> -       return pte & ~_PAGE_DIRTY;
-> +       return pte & ~__WRITEABLE;
+> diff --git a/mm/mlock.c b/mm/mlock.c
+> index a1d93ad33c6d..36f5e70faeb0 100644
+> --- a/mm/mlock.c
+> +++ b/mm/mlock.c
+> @@ -474,7 +474,7 @@ static int mlock_fixup(struct vma_iterator *vmi, struct vm_area_struct *vma,
+>  
+>  	if (newflags == oldflags || (oldflags & VM_SPECIAL) ||
+>  	    is_vm_hugetlb_page(vma) || vma == get_gate_vma(current->mm) ||
+> -	    vma_is_dax(vma) || vma_is_secretmem(vma) || (oldflags & VM_DROPPABLE))
+> +	    vma_is_dax(vma) || vma_has_no_direct_map(vma) || (oldflags & VM_DROPPABLE))
+>  		/* don't set VM_LOCKED or VM_LOCKONFAULT and don't count */
+>  		goto out;
+>  
+> diff --git a/mm/secretmem.c b/mm/secretmem.c
+> index 422dcaa32506..b5ce55079695 100644
+> --- a/mm/secretmem.c
+> +++ b/mm/secretmem.c
+> @@ -134,11 +134,6 @@ static int secretmem_mmap_prepare(struct vm_area_desc *desc)
+>  	return 0;
 >  }
->
->  static inline kvm_pte_t kvm_pte_mkhuge(kvm_pte_t pte)
-> diff --git a/arch/loongarch/kvm/mmu.c b/arch/loongarch/kvm/mmu.c
-> index ed956c5cf2cc..68749069290f 100644
-> --- a/arch/loongarch/kvm/mmu.c
-> +++ b/arch/loongarch/kvm/mmu.c
-> @@ -569,7 +569,7 @@ static int kvm_map_page_fast(struct kvm_vcpu *vcpu, u=
-nsigned long gpa, bool writ
->         /* Track access to pages marked old */
->         new =3D kvm_pte_mkyoung(*ptep);
->         if (write && !kvm_pte_dirty(new)) {
-> -               if (!kvm_pte_write(new)) {
-> +               if (!kvm_pte_soft_write(new)) {
->                         ret =3D -EFAULT;
->                         goto out;
->                 }
-> @@ -856,9 +856,9 @@ static int kvm_map_page(struct kvm_vcpu *vcpu, unsign=
-ed long gpa, bool write)
->                 prot_bits |=3D _CACHE_SUC;
->
->         if (writeable) {
-> -               prot_bits |=3D _PAGE_WRITE;
-> +               prot_bits =3D kvm_pte_mksoft_write(prot_bits);
->                 if (write)
-> -                       prot_bits |=3D __WRITEABLE;
-> +                       prot_bits =3D kvm_pte_mkdirty(prot_bits);
->         }
->
->         /* Disable dirty logging on HugePages */
-> @@ -904,7 +904,7 @@ static int kvm_map_page(struct kvm_vcpu *vcpu, unsign=
-ed long gpa, bool write)
->         kvm_release_faultin_page(kvm, page, false, writeable);
->         spin_unlock(&kvm->mmu_lock);
->
-> -       if (prot_bits & _PAGE_DIRTY)
-> +       if (kvm_pte_dirty(prot_bits))
->                 mark_page_dirty_in_slot(kvm, memslot, gfn);
->
->  out:
-To save time, I just change the whole patch like this, you can confirm
-whether it woks:
+>  
+> -bool vma_is_secretmem(struct vm_area_struct *vma)
+> -{
+> -	return vma->vm_ops == &secretmem_vm_ops;
+> -}
+> -
+>  static const struct file_operations secretmem_fops = {
+>  	.release	= secretmem_release,
+>  	.mmap_prepare	= secretmem_mmap_prepare,
+> @@ -157,7 +152,7 @@ static void secretmem_free_folio(struct address_space *mapping,
+>  	folio_zero_segment(folio, 0, folio_size(folio));
+>  }
+>  
+> -const struct address_space_operations secretmem_aops = {
+> +static const struct address_space_operations secretmem_aops = {
+>  	.dirty_folio	= noop_dirty_folio,
+>  	.free_folio	= secretmem_free_folio,
+>  	.migrate_folio	= secretmem_migrate_folio,
+> @@ -206,6 +201,7 @@ static struct file *secretmem_file_create(unsigned long flags)
+>  
+>  	mapping_set_gfp_mask(inode->i_mapping, GFP_HIGHUSER);
+>  	mapping_set_unevictable(inode->i_mapping);
+> +	mapping_set_no_direct_map(inode->i_mapping);
+>  
+>  	inode->i_op = &secretmem_iops;
+>  	inode->i_mapping->a_ops = &secretmem_aops;
+> -- 
+> 2.50.1
+> 
 
-diff --git a/arch/loongarch/include/asm/kvm_mmu.h
-b/arch/loongarch/include/asm/kvm_mmu.h
-index 099bafc6f797..882f60c72b46 100644
---- a/arch/loongarch/include/asm/kvm_mmu.h
-+++ b/arch/loongarch/include/asm/kvm_mmu.h
-@@ -16,6 +16,13 @@
-  */
- #define KVM_MMU_CACHE_MIN_PAGES        (CONFIG_PGTABLE_LEVELS - 1)
-
-+/*
-+ * _PAGE_MODIFIED is SW pte bit, it records page ever written on host
-+ * kernel, on secondary MMU it records page writable in order to fast
-+ * path handling
-+ */
-+#define KVM_PAGE_WRITEABLE     _PAGE_MODIFIED
-+
- #define _KVM_FLUSH_PGTABLE     0x1
- #define _KVM_HAS_PGMASK                0x2
- #define kvm_pfn_pte(pfn, prot) (((pfn) << PFN_PTE_SHIFT) |
-pgprot_val(prot))
-@@ -56,6 +63,7 @@ static inline int kvm_pte_write(kvm_pte_t pte) {
-return pte & _PAGE_WRITE; }
- static inline int kvm_pte_dirty(kvm_pte_t pte) { return pte &
-_PAGE_DIRTY; }
- static inline int kvm_pte_young(kvm_pte_t pte) { return pte &
-_PAGE_ACCESSED; }
- static inline int kvm_pte_huge(kvm_pte_t pte) { return pte &
-_PAGE_HUGE; }
-+static inline int kvm_pte_writeable(kvm_pte_t pte) { return pte &
-KVM_PAGE_WRITEABLE; }
-
- static inline kvm_pte_t kvm_pte_mkyoung(kvm_pte_t pte)
- {
-@@ -69,12 +77,12 @@ static inline kvm_pte_t kvm_pte_mkold(kvm_pte_t
-pte)
-
- static inline kvm_pte_t kvm_pte_mkdirty(kvm_pte_t pte)
- {
--       return pte | _PAGE_DIRTY;
-+       return pte | __WRITEABLE;
- }
-
- static inline kvm_pte_t kvm_pte_mkclean(kvm_pte_t pte)
- {
--       return pte & ~_PAGE_DIRTY;
-+       return pte & ~__WRITEABLE;
- }
-
- static inline kvm_pte_t kvm_pte_mkhuge(kvm_pte_t pte)
-@@ -87,6 +95,11 @@ static inline kvm_pte_t kvm_pte_mksmall(kvm_pte_t
-pte)
-        return pte & ~_PAGE_HUGE;
- }
-
-+static inline kvm_pte_t kvm_pte_mkwriteable(kvm_pte_t pte)
-+{
-+       return pte | KVM_PAGE_WRITEABLE;
-+}
-+
- static inline int kvm_need_flush(kvm_ptw_ctx *ctx)
- {
-        return ctx->flag & _KVM_FLUSH_PGTABLE;
-diff --git a/arch/loongarch/kvm/mmu.c b/arch/loongarch/kvm/mmu.c
-index ed956c5cf2cc..7c8143e79c12 100644
---- a/arch/loongarch/kvm/mmu.c
-+++ b/arch/loongarch/kvm/mmu.c
-@@ -569,7 +569,7 @@ static int kvm_map_page_fast(struct kvm_vcpu
-*vcpu, unsigned long gpa, bool writ
-        /* Track access to pages marked old */
-        new =3D kvm_pte_mkyoung(*ptep);
-        if (write && !kvm_pte_dirty(new)) {
--               if (!kvm_pte_write(new)) {
-+               if (!kvm_pte_writeable(new)) {
-                        ret =3D -EFAULT;
-                        goto out;
-                }
-@@ -856,9 +856,9 @@ static int kvm_map_page(struct kvm_vcpu *vcpu,
-unsigned long gpa, bool write)
-                prot_bits |=3D _CACHE_SUC;
-
-        if (writeable) {
--               prot_bits |=3D _PAGE_WRITE;
-+               prot_bits =3D kvm_pte_mkwriteable(prot_bits);
-                if (write)
--                       prot_bits |=3D __WRITEABLE;
-+                       prot_bits =3D kvm_pte_mkdirty(prot_bits);
-        }
-
-        /* Disable dirty logging on HugePages */
-@@ -904,7 +904,7 @@ static int kvm_map_page(struct kvm_vcpu *vcpu,
-unsigned long gpa, bool write)
-        kvm_release_faultin_page(kvm, page, false, writeable);
-        spin_unlock(&kvm->mmu_lock);
-
--       if (prot_bits & _PAGE_DIRTY)
-+       if (kvm_pte_dirty(prot_bits))
-                mark_page_dirty_in_slot(kvm, memslot, gfn);
-
- out:
-
-Huacai
-
->
-> base-commit: 9dd1835ecda5b96ac88c166f4a87386f3e727bd9
-> --
-> 2.39.3
->
->
+-- 
+Sincerely yours,
+Mike.
 
