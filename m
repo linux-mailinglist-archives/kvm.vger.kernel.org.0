@@ -1,54 +1,54 @@
-Return-Path: <kvm+bounces-57607-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-57608-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7C3D0B583EB
-	for <lists+kvm@lfdr.de>; Mon, 15 Sep 2025 19:46:29 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 01239B58427
+	for <lists+kvm@lfdr.de>; Mon, 15 Sep 2025 19:57:42 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id A469B1AA6279
-	for <lists+kvm@lfdr.de>; Mon, 15 Sep 2025 17:46:50 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id EE2012A4DD2
+	for <lists+kvm@lfdr.de>; Mon, 15 Sep 2025 17:57:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5F20528B407;
-	Mon, 15 Sep 2025 17:46:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 53BE22D0C96;
+	Mon, 15 Sep 2025 17:56:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=zytor.com header.i=@zytor.com header.b="Wa71D/gg"
+	dkim=pass (2048-bit key) header.d=zytor.com header.i=@zytor.com header.b="U39t6xhs"
 X-Original-To: kvm@vger.kernel.org
 Received: from mail.zytor.com (terminus.zytor.com [198.137.202.136])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9037E101F2;
-	Mon, 15 Sep 2025 17:46:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D749D2BD00C;
+	Mon, 15 Sep 2025 17:56:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.136
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757958378; cv=none; b=Fv3gV0JF6lbJ7MLmtlPuoG9sqxL0kmwJYfekNDoxRp/EST54X1vibm5/Ba8nHQ3cx6+VlEak92DllidoMloeaayOcMm+Zt067hcl8l4QpCJgzVKiBqA+PvfSDKvp+4Ur3xHWCBld6F76JVnQZA+zUpv8Vq9XVzwzieOvL/tx+yc=
+	t=1757958995; cv=none; b=GEY3ZmLbYKltJJaQawHt2y61gqp60Z2dNV1doynQ2HCpmtXdLuV1V3FToxyrH2QQdEPUoHuT5E366wLebn7P8EukL9KF/7lF9pwG85+nF1mXuBpLMe7REqbAv1pQjWQs/885DJnH/IirBxpmGJ8etRnyDnfSGc7WQ47hZNh/Cxk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757958378; c=relaxed/simple;
-	bh=3epPdnANQv7fz6EaSn/biBvqoVUJuIEawr3Lj6bTY3o=;
+	s=arc-20240116; t=1757958995; c=relaxed/simple;
+	bh=ys9yFrUqRDFjGI25D/xWgiKE58S54Np6C3gjAwS5gyM=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=B9iZLWLvCQe+IKWgxsEji8Etty+81P+h72czikTDuUH6M1Xky8+Cz9kT+0UmYqX92lrGQaIe4Fds+WanGEFsFk/TQ/aosQG4akDYxWa+CqSC5IKZOGncHUOqxFQcIHxqkLHkIhnz4J9QGG9mtvGfNWZkT5E5cDCH5cl/gMpwAOM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=zytor.com; spf=pass smtp.mailfrom=zytor.com; dkim=pass (2048-bit key) header.d=zytor.com header.i=@zytor.com header.b=Wa71D/gg; arc=none smtp.client-ip=198.137.202.136
+	 In-Reply-To:Content-Type; b=ArDIpC5LgL9XUJEx9HoCAFcfyreY+qCxJNgvTt3BOphSIjq1vL+++rUXKCBXekT2jpbdp2IEzMgzYHcdM19nvGXQYw1uGUWSkXhsvpVku5x6ceyTC5S/YuoO/d58TuSkno9YXuLdCZVZPS2yNz42HcGyyqvVYAvszVdmbEkvSxw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=zytor.com; spf=pass smtp.mailfrom=zytor.com; dkim=pass (2048-bit key) header.d=zytor.com header.i=@zytor.com header.b=U39t6xhs; arc=none smtp.client-ip=198.137.202.136
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=zytor.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=zytor.com
 Received: from [0.0.0.0] ([134.134.137.72])
 	(authenticated bits=0)
-	by mail.zytor.com (8.18.1/8.17.1) with ESMTPSA id 58FHk45h2831435
+	by mail.zytor.com (8.18.1/8.17.1) with ESMTPSA id 58FHuPQl2837407
 	(version=TLSv1.3 cipher=TLS_AES_128_GCM_SHA256 bits=128 verify=NO);
-	Mon, 15 Sep 2025 10:46:05 -0700
-DKIM-Filter: OpenDKIM Filter v2.11.0 mail.zytor.com 58FHk45h2831435
+	Mon, 15 Sep 2025 10:56:26 -0700
+DKIM-Filter: OpenDKIM Filter v2.11.0 mail.zytor.com 58FHuPQl2837407
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=zytor.com;
-	s=2025082201; t=1757958366;
-	bh=u58/nmqUuG+LnbtBgpVgICgzTVmlfywgwQRs9xbltlM=;
+	s=2025082201; t=1757958987;
+	bh=Oe9Eq2/Y/r/f3awg69ruaTqQHiTD0zSvvxuMrExYmx4=;
 	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=Wa71D/ggOHHYbjiIXLGdwQp6rTJfAUKnG7EwGaLcQRbdLnfdXI4CXARhuqiKD3lZz
-	 19PU9BNoJ0r0wqW+vy8AAW7sv4BRGCYtjvs3mLDm5O1ZmqRDo2k2UX6Pf+D+SEeAOa
-	 8e9+fiPnYeHgmdoF2VoflpvjKN5C5WBdKZbQCFEIXBqqYd3waLYiteIRKi4bCGFBbn
-	 6nSoTGOYdawDzuuFsEpYeYpMoQIh3QQzpJT1QmbQPckk/B7k1vSebGPc9rW2yq96Rx
-	 +3fmhGbRvtNY7ziKyjVjkS06/3Vir5L3Are762+kYHBXCjJcS65brMBeEIQBE4ck6N
-	 P7E0LtvUhu24w==
-Message-ID: <dcab546d-8a9a-42c5-ad7c-3484e505ffba@zytor.com>
-Date: Mon, 15 Sep 2025 10:45:59 -0700
+	b=U39t6xhs1sGju6RhmTzxmSKgITB7HlWkduIqaz3KFpwbK3g14MvBdjtxzcySTgDuS
+	 JjEMktPgnoCKf4ZorfxfpmO+Z4YsF1w/JzEaqbV/ICN9/DnsADJIqJgy+7SLBnP8uZ
+	 pUFQMhMB0Cf/2WF7ikAA+mwa5ZkG4YjztDt3/M0vNS6yVtIcFF2jLSi9g7DGeHTL2l
+	 jAiI0vTAIcGnjnMB9YXspTk1fS4/ExoJ5bTNp7FQp+0EqVFcoA81As5xCYXUcq+iY5
+	 omdWPdr1P1sZWzcZbvfWuk/Q67BiEZJhVDoFTrX043IX0KrsZGOw4NHtTb+esNH3jI
+	 RDwKRZCCF464w==
+Message-ID: <c6d81bac-8540-493d-8edd-18f5d52cf7ff@zytor.com>
+Date: Mon, 15 Sep 2025 10:56:20 -0700
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -56,8 +56,8 @@ List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v15 21/41] KVM: nVMX: Prepare for enabling CET support for
- nested guest
+Subject: Re: [PATCH v15 25/41] KVM: x86: SVM: Emulate reads and writes to
+ shadow stack MSRs
 To: Sean Christopherson <seanjc@google.com>,
         Paolo Bonzini <pbonzini@redhat.com>
 Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
@@ -66,10 +66,9 @@ Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
         John Allen <john.allen@amd.com>,
         Rick Edgecombe <rick.p.edgecombe@intel.com>,
         Chao Gao <chao.gao@intel.com>, Maxim Levitsky <mlevitsk@redhat.com>,
-        Xiaoyao Li <xiaoyao.li@intel.com>,
-        Zhang Yi Z <yi.z.zhang@linux.intel.com>
+        Xiaoyao Li <xiaoyao.li@intel.com>
 References: <20250912232319.429659-1-seanjc@google.com>
- <20250912232319.429659-22-seanjc@google.com>
+ <20250912232319.429659-26-seanjc@google.com>
 Content-Language: en-US
 From: Xin Li <xin@zytor.com>
 Autocrypt: addr=xin@zytor.com; keydata=
@@ -106,60 +105,21 @@ Autocrypt: addr=xin@zytor.com; keydata=
  PYbAkjBbm+tuJ/Sm+5Yp5T/BnKz21FoCS8uvTiziHj2H7Cuekn6F8EYhegONm+RVg3vikOpn
  gao85i4HwQTK9/D1wgJIQkdwWXVMZ6q/OALaBp82vQ2U9sjTyFXgDjglgh00VRAHP7u1Rcu4
  l75w1xInsg==
-In-Reply-To: <20250912232319.429659-22-seanjc@google.com>
+In-Reply-To: <20250912232319.429659-26-seanjc@google.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 
-On 9/12/2025 4:22 PM, Sean Christopherson wrote:
-> From: Yang Weijiang <weijiang.yang@intel.com>
+On 9/12/2025 4:23 PM, Sean Christopherson wrote:
+> From: John Allen <john.allen@amd.com>
 > 
-> Set up CET MSRs, related VM_ENTRY/EXIT control bits and fixed CR4 setting
-> to enable CET for nested VM.
+> Emulate shadow stack MSR access by reading and writing to the
+> corresponding fields in the VMCB.
 > 
-> vmcs12 and vmcs02 needs to be synced when L2 exits to L1 or when L1 wants
-> to resume L2, that way correct CET states can be observed by one another.
-> 
-> Please note that consistency checks regarding CET state during VM-Entry
-> will be added later to prevent this patch from becoming too large.
-> Advertising the new CET VM_ENTRY/EXIT control bits are also be deferred
-> until after the consistency checks are added.
-> 
-> Signed-off-by: Yang Weijiang <weijiang.yang@intel.com>
-> Tested-by: Mathias Krause <minipli@grsecurity.net>
-> Tested-by: John Allen <john.allen@amd.com>
-> Tested-by: Rick Edgecombe <rick.p.edgecombe@intel.com>
-> Signed-off-by: Chao Gao <chao.gao@intel.com>
+> Signed-off-by: John Allen <john.allen@amd.com>
+> [sean: mark VMCB_CET dirty/clean as appropriate]
 > Signed-off-by: Sean Christopherson <seanjc@google.com>
 
+For the shortlog, shouldn't we use "KVM: SVM:"?
 
-Reviewed-by: Xin Li (Intel) <xin@zytor.com>
-
-
-> diff --git a/arch/x86/kvm/vmx/nested.c b/arch/x86/kvm/vmx/nested.c
-> index 14f9822b611d..51d69f368689 100644
-> --- a/arch/x86/kvm/vmx/nested.c
-> +++ b/arch/x86/kvm/vmx/nested.c
-> @@ -4760,6 +4825,18 @@ static void load_vmcs12_host_state(struct kvm_vcpu *vcpu,
->   	if (vmcs12->vm_exit_controls & VM_EXIT_CLEAR_BNDCFGS)
->   		vmcs_write64(GUEST_BNDCFGS, 0);
->   
-> +	/*
-> +	 * Load CET state from host state if VM_EXIT_LOAD_CET_STATE is set.
-> +	 * otherwise CET state should be retained across VM-exit, i.e.,
-> +	 * guest values should be propagated from vmcs12 to vmcs01.
-> +	 */
-> +	if (vmcs12->vm_exit_controls & VM_EXIT_LOAD_CET_STATE)
-> +		vmcs_write_cet_state(vcpu, vmcs12->host_s_cet, vmcs12->host_ssp,
-> +				     vmcs12->host_ssp_tbl);
-> +	else
-> +		vmcs_write_cet_state(vcpu, vmcs12->guest_s_cet, vmcs12->guest_ssp,
-> +				     vmcs12->guest_ssp_tbl);
-> +
->   	if (vmcs12->vm_exit_controls & VM_EXIT_LOAD_IA32_PAT) {
->   		vmcs_write64(GUEST_IA32_PAT, vmcs12->host_ia32_pat);
->   		vcpu->arch.pat = vmcs12->host_ia32_pat;
-
-Also tested with VM exit load CET bit set and cleared, both passed, so
-
-Tested-by: Xin Li (Intel) <xin@zytor.com>
+I don't see any change to common x86 code in this patch.
 
