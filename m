@@ -1,51 +1,51 @@
-Return-Path: <kvm+bounces-57551-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-57553-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id F26AEB578C9
-	for <lists+kvm@lfdr.de>; Mon, 15 Sep 2025 13:45:24 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id CB49DB578D1
+	for <lists+kvm@lfdr.de>; Mon, 15 Sep 2025 13:46:36 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 8DAF37AEB2C
-	for <lists+kvm@lfdr.de>; Mon, 15 Sep 2025 11:43:44 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id AC8CF1A201C2
+	for <lists+kvm@lfdr.de>; Mon, 15 Sep 2025 11:46:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8EF3E3002AB;
-	Mon, 15 Sep 2025 11:44:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0838830148D;
+	Mon, 15 Sep 2025 11:45:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="M1JNFNv1"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="iGLKFNmr"
 X-Original-To: kvm@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8C4782FE07E;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 07E9D2FFDCB;
 	Mon, 15 Sep 2025 11:44:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757936697; cv=none; b=qEgGeXwC3G1NYVuUQoRmhKr6Hk8O41y3UQ1/Nv4Gm9pBQIoAsJBt8G8kqRENIYT+91vIvrDm6+JnX/ca9aO78YphJZAEZqU6T82Ac3Kgy7VPpQCTnmyl2ES/Xh4ycGGBvdAaTe6JtPtQMo/EGM/Zvraszt/1sK0T82UdXHB3vFE=
+	t=1757936698; cv=none; b=fKAELzMhmUAFaNQwxseHiptgAouERlGk70vyi+SE0tj6azgtUdsY5bTTY4a3kCZDndSECLUlKFykwoW71AKBl9NJ4908DixMMA2hanc80a6CMtChIHZ2AqUs2d9mYTPVW6wwlGe+mLBmk7SUarE3bl6fvW/59yj3dcr6NhFDMIY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757936697; c=relaxed/simple;
-	bh=mhZ8FtLw1uVJo63UYY9F46ru+KoRuwK839fahTJQtTk=;
+	s=arc-20240116; t=1757936698; c=relaxed/simple;
+	bh=YGO8iofCD9Klx/7xoZBjB3a2UwUyHWW5VkjpdU6mkSo=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=Oa3wy89SM8szkPL8EBY3+EdvkuqdBKV4i/YAlMEvdwn4yX649Q1qqbGKxFtr4LBkhnRQRL3QN2Wjy4YqY4niqZnpB9+QEZD7G4zTpY/KLAkvsnB9enNdFGeFGdDucq3muL6RTk31XMSwelHaCgeWd99uUspolBcrytvVMv7jfFs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=M1JNFNv1; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 46108C4CEFB;
+	 MIME-Version; b=Kzx9WzUeAl6/dFBRacCqvpMXVURFVs7q0/clsEhqTXaciV59YdJrY3c+8vMDx4JhLVJXPqsuFonyHJ6YaVAtxGF6cgCxdTgIZ7x24qIR6M1ll2Qjv6HyVHgBcEEef3RnDoYB/mVqa8DkX38HGub4G1na18Zh4Pkcu+qW0DWIYdg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=iGLKFNmr; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A4EB7C4CEF1;
 	Mon, 15 Sep 2025 11:44:57 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=k20201202; t=1757936697;
-	bh=mhZ8FtLw1uVJo63UYY9F46ru+KoRuwK839fahTJQtTk=;
+	bh=YGO8iofCD9Klx/7xoZBjB3a2UwUyHWW5VkjpdU6mkSo=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=M1JNFNv1yOD+9Ejj0uf4Re90iikorvz5K5ZfV+zYMWsfZNMeQ5ZbJTxeZ+hW6Lgz6
-	 4x1/EzPxBUjldVTa6N2bx4B8+Wanw5XAWauyxFF0DauyaMngXF9UiGJt1YRW87ZKCz
-	 NCJFJubmhlAWiy8A7+5s38JtArfzZXj8TnwvAUuAYgnTpz0TxhRaxKZZdi4By7S9uS
-	 V6bm/z8EnI2nHRP8nAY4U7K/AxtJ1ubIrglaMS/jKWrOgyxA+natg3Jlv8xGrOya/E
-	 ts5guoJ5ggf+TAB5UgnHipT2JhcTpEmNGD1veJvHfqe8HP9h/5igsxOGM6hTLFzXwK
-	 8qI1Ap1BQtx4Q==
+	b=iGLKFNmrU69yTiktOfzRLU3kbWpFoVwhEwehBIh7gmmzau6EdVdpz9YxurBHkFDXh
+	 KwYCgSexf7eMPgGmHDZoomfXhFntmNnFbugCGZGJtQxwCOOeEiPzJ2xdBGgHBdCEY/
+	 z6Z9dSvtF92sLWsUZZsCb4CCCgrheQT4ha09MzMYuVHf3Ptp9C9cl5Q1COXsuybc8L
+	 0IvdKqIfVEqL4UshJb97iAhiCr2bDQ+r57eBOIF9hI/ZJvawp+NDsh7Ozfwf4gbfEQ
+	 Ue9I1b+f+OXVOw9XGbO+OUGEH/k0q21QY1ILGbL6B8z2943U4Xsu5LGDrKrtnMeUI/
+	 E4nfOAVXl2UUw==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.98.2)
 	(envelope-from <maz@kernel.org>)
-	id 1uy7df-00000006MDw-29jP;
+	id 1uy7df-00000006MDw-2ygY;
 	Mon, 15 Sep 2025 11:44:55 +0000
 From: Marc Zyngier <maz@kernel.org>
 To: kvmarm@lists.linux.dev,
@@ -55,9 +55,9 @@ Cc: Joey Gouly <joey.gouly@arm.com>,
 	Suzuki K Poulose <suzuki.poulose@arm.com>,
 	Oliver Upton <oliver.upton@linux.dev>,
 	Zenghui Yu <yuzenghui@huawei.com>
-Subject: [PATCH v2 03/16] KVM: arm64: Compute 52bit TTBR address and alignment
-Date: Mon, 15 Sep 2025 12:44:38 +0100
-Message-Id: <20250915114451.660351-4-maz@kernel.org>
+Subject: [PATCH v2 04/16] KVM: arm64: Decouple output address from the PT descriptor
+Date: Mon, 15 Sep 2025 12:44:39 +0100
+Message-Id: <20250915114451.660351-5-maz@kernel.org>
 X-Mailer: git-send-email 2.39.2
 In-Reply-To: <20250915114451.660351-1-maz@kernel.org>
 References: <20250915114451.660351-1-maz@kernel.org>
@@ -73,44 +73,77 @@ X-SA-Exim-Rcpt-To: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-52bit addresses from TTBR need extra adjustment and alignment
-checks. Implement the requirements of the architecture.
+Add a helper converting the descriptor into a nicely formed OA,
+irrespective of the in-descriptor representation (< 52bit, LPA
+or LPA2).
 
 Signed-off-by: Marc Zyngier <maz@kernel.org>
 ---
- arch/arm64/kvm/at.c | 12 ++++++++++++
- 1 file changed, 12 insertions(+)
+ arch/arm64/kvm/at.c | 30 +++++++++++++++++++++++++++---
+ 1 file changed, 27 insertions(+), 3 deletions(-)
 
 diff --git a/arch/arm64/kvm/at.c b/arch/arm64/kvm/at.c
-index 96452fdc90e2b..e02e467fc2ccd 100644
+index e02e467fc2ccd..bdb2c3e22f248 100644
 --- a/arch/arm64/kvm/at.c
 +++ b/arch/arm64/kvm/at.c
-@@ -28,6 +28,8 @@ static int get_ia_size(struct s1_walk_info *wi)
- /* Return true if the IPA is out of the OA range */
- static bool check_output_size(u64 ipa, struct s1_walk_info *wi)
- {
-+	if (wi->pa52bit)
-+		return wi->max_oa_bits < 52 && (ipa & GENMASK_ULL(51, wi->max_oa_bits));
- 	return wi->max_oa_bits < 48 && (ipa & GENMASK_ULL(47, wi->max_oa_bits));
+@@ -56,6 +56,29 @@ static bool has_52bit_pa(struct kvm_vcpu *vcpu, struct s1_walk_info *wi, u64 tcr
+ 	return (tcr & (wi->regime == TR_EL2 ? TCR_EL2_DS : TCR_DS));
  }
  
-@@ -301,6 +303,16 @@ static int setup_s1_walk(struct kvm_vcpu *vcpu, struct s1_walk_info *wi,
- 	x = 3 + ia_bits - ((3 - wi->sl) * stride + wi->pgshift);
- 
- 	wi->baddr = ttbr & TTBRx_EL1_BADDR;
-+	if (wi->pa52bit) {
-+		/*
-+		 * Force the alignment on 64 bytes for top-level tables
-+		 * smaller than 8 entries, since TTBR.BADDR[5:2] are used to
-+		 * store bits [51:48] of the first level of lookup.
-+		 */
-+		x = max(x, 6);
++static u64 desc_to_oa(struct s1_walk_info *wi, u64 desc)
++{
++	u64 addr;
 +
-+		wi->baddr |= FIELD_GET(GENMASK_ULL(5, 2), ttbr) << 48;
++	if (!wi->pa52bit)
++		return desc & GENMASK_ULL(47, wi->pgshift);
++
++	switch (BIT(wi->pgshift)) {
++	case SZ_4K:
++	case SZ_16K:
++		addr = desc & GENMASK_ULL(49, wi->pgshift);
++		addr |= FIELD_GET(KVM_PTE_ADDR_51_50_LPA2, desc) << 50;
++		break;
++	case SZ_64K:
++	default:	    /* IMPDEF: treat any other value as 64k */
++		addr = desc & GENMASK_ULL(47, wi->pgshift);
++		addr |= FIELD_GET(KVM_PTE_ADDR_51_48, desc) << 48;
++		break;
 +	}
++
++	return addr;
++}
++
+ /* Return the translation regime that applies to an AT instruction */
+ static enum trans_regime compute_translation_regime(struct kvm_vcpu *vcpu, u32 op)
+ {
+@@ -402,7 +425,7 @@ static int walk_s1(struct kvm_vcpu *vcpu, struct s1_walk_info *wi,
+ 			wr->PXNTable |= FIELD_GET(PMD_TABLE_PXN, desc);
+ 		}
  
- 	/* R_VPBBF */
- 	if (check_output_size(wi->baddr, wi))
+-		baddr = desc & GENMASK_ULL(47, wi->pgshift);
++		baddr = desc_to_oa(wi, desc);
+ 
+ 		/* Check for out-of-range OA */
+ 		if (check_output_size(baddr, wi))
+@@ -431,7 +454,8 @@ static int walk_s1(struct kvm_vcpu *vcpu, struct s1_walk_info *wi,
+ 			goto transfault;
+ 	}
+ 
+-	if (check_output_size(desc & GENMASK(47, va_bottom), wi))
++	baddr = desc_to_oa(wi, desc);
++	if (check_output_size(baddr & GENMASK(52, va_bottom), wi))
+ 		goto addrsz;
+ 
+ 	if (!(desc & PTE_AF)) {
+@@ -444,7 +468,7 @@ static int walk_s1(struct kvm_vcpu *vcpu, struct s1_walk_info *wi,
+ 	wr->failed = false;
+ 	wr->level = level;
+ 	wr->desc = desc;
+-	wr->pa = desc & GENMASK(47, va_bottom);
++	wr->pa = baddr & GENMASK(52, va_bottom);
+ 	wr->pa |= va & GENMASK_ULL(va_bottom - 1, 0);
+ 
+ 	wr->nG = (wi->regime != TR_EL2) && (desc & PTE_NG);
 -- 
 2.39.2
 
