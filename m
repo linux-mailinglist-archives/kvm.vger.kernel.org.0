@@ -1,145 +1,117 @@
-Return-Path: <kvm+bounces-57637-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-57638-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id AF9FDB58733
-	for <lists+kvm@lfdr.de>; Tue, 16 Sep 2025 00:12:58 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7F295B5875E
+	for <lists+kvm@lfdr.de>; Tue, 16 Sep 2025 00:20:51 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 792654C0D58
-	for <lists+kvm@lfdr.de>; Mon, 15 Sep 2025 22:12:57 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 39F8E177CB8
+	for <lists+kvm@lfdr.de>; Mon, 15 Sep 2025 22:20:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E68B72C08B2;
-	Mon, 15 Sep 2025 22:12:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 14F9E2C11D5;
+	Mon, 15 Sep 2025 22:20:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=grsecurity.net header.i=@grsecurity.net header.b="NYTx1QMS"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ZDiSoLHO"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-qk1-f177.google.com (mail-qk1-f177.google.com [209.85.222.177])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 63516298CC4
-	for <kvm@vger.kernel.org>; Mon, 15 Sep 2025 22:12:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.177
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A57682C08AF
+	for <kvm@vger.kernel.org>; Mon, 15 Sep 2025 22:20:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757974372; cv=none; b=tQK249ZwN9BN9ei7Iu8od3aK5NV+XxDe3ZpfcoL+0BjEI5gGdUHSQbZ7DA/wOACiVWfKmZpdaJ0OXhOjcM7QksGVQEGzc6WwZE3NCuq7C6U+9d1Sj7WCuvk4MzkSKTZ9/piG20WEUHLAWFXIT1rHTUXZ3SFUMauv0b2RtpnfYdI=
+	t=1757974840; cv=none; b=f0ymJ3z13GHW4uKwcWRbNbcwqh82PVoLBUMnSEPloOPf3CZSkOb6wZkuxFasqbY+IyLpkcr4ul1T2iWvE1+9m/WUur9oLMyyu+4u9hoYbF6mHY57krxi3T+mieNZpMR+hthBNgMYYRCJM56VU8I8UNvxjlfW80pDFaxwm9/I174=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757974372; c=relaxed/simple;
-	bh=/C05Dz8CvCd47qVsLG0DV8Pd2esx5GaFIo68IV8cxMY=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=pzOZsSgOqdT+7iaNJcIL/USygnc/V6tKqYpDwqS3ru8vxoqt62ZIDJAh3NZfVViUWOjEdhddT4yZALShNk3MZZEC+4HmqAfOP/UErAdqMkgMQDBAwrdyYkNWTqEUi60+P5dL5ywUZvOJ+zJkRdRV1nHvgGXpjixgUJHRywGHTAg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=grsecurity.net; spf=pass smtp.mailfrom=opensrcsec.com; dkim=pass (2048-bit key) header.d=grsecurity.net header.i=@grsecurity.net header.b=NYTx1QMS; arc=none smtp.client-ip=209.85.222.177
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=grsecurity.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=opensrcsec.com
-Received: by mail-qk1-f177.google.com with SMTP id af79cd13be357-826fe3b3e2bso263694785a.0
-        for <kvm@vger.kernel.org>; Mon, 15 Sep 2025 15:12:50 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=grsecurity.net; s=grsec; t=1757974369; x=1758579169; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=gXBHWgp9kRn5Fgoqskj1RRTPYtPKKhSojJsMEkYFUT4=;
-        b=NYTx1QMSh2oz2gMjxTOHcmkKTONfA0zxFKgJN/2iW53631WN3+JOAosFSeFqRr4g9E
-         lIaLpFOVe0GEmPZdTxOgYKggX2TiC2isvQPZd3PVtCoxgt71iWMRHTZISMlcN+XkZOHf
-         ruPJBOjEetO2H6PALzJQmyuVdzA/uYSjWhRG62TXGwkIVz7JnFAqxkrHKqA293BpHpD6
-         fVkU6ppqfG75lJdPFftmlMcrtyfPOM5qdSmJvMxBRHR/bovKFPvHqrKxQAFSPRD55rh3
-         Od1nAM3zmY0O4tx7GoUhwn97eXL8DjVQwOf29qCazDwTn9VUMs9WZwwlGFTPOhghlDAA
-         ppyA==
+	s=arc-20240116; t=1757974840; c=relaxed/simple;
+	bh=d1A4ZSLlQNC4zFoOiM/19Q9nc4Ro68qdi9KXC/JTmwE=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=hhMk8x0zi0LpEPDs+ULuKDpNfG81haFOaCblmfIgrDaXygNuWi2hBujf8eYdXPYl7m4YTt9uEtm3uPIbn4fqsEvyS+iaNgP3xahm4A5kX9jWkntiAkloEE3zj4+SmC76qlsiq3nrul042/Vtp9t/dvVP2BwMbItayEKV2JZeTqk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=ZDiSoLHO; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1757974837;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=zNCvg1SlA5uujYmTpj5dnM2XRiOsxEhqFlXcwCOlTYU=;
+	b=ZDiSoLHOTqNlgzw/xbxj6lagsSDboUlV8dUy7tFWSfYp7rTZF3XEsYFLqsgl96slLs+s69
+	5g1zwavw3DLvwzQInhiNce6m4kTh23eS+E55rYZzK870I2MNTUIQBDASCNZT17XFs1dqsp
+	Oyd9Vz2k2MI0rP4fgu4L1AjDReG0tg0=
+Received: from mail-ej1-f72.google.com (mail-ej1-f72.google.com
+ [209.85.218.72]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-311-_Vs-p6nkPKajGotiUndgRg-1; Mon, 15 Sep 2025 18:20:36 -0400
+X-MC-Unique: _Vs-p6nkPKajGotiUndgRg-1
+X-Mimecast-MFC-AGG-ID: _Vs-p6nkPKajGotiUndgRg_1757974835
+Received: by mail-ej1-f72.google.com with SMTP id a640c23a62f3a-b046bb6caa0so53460066b.0
+        for <kvm@vger.kernel.org>; Mon, 15 Sep 2025 15:20:35 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1757974369; x=1758579169;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=gXBHWgp9kRn5Fgoqskj1RRTPYtPKKhSojJsMEkYFUT4=;
-        b=fE9+ipIBAS9jOXeGcA+UEqII5iAcwTSGmka4iY2oc20HjsokPxioMS4NeORG3ypccK
-         eWWTuXGgdN51hUaCXNmRXlTTGnstpxxv7jDoKHh1GbHPAAigAbH7aKuXyecAsf7o66tP
-         IWtaq8c+VNv8TIf/hbPkcqa5ADiApA6bVMqfCuSfRGGIS281mDAzjJUDPZWQLRa445lu
-         Md2exDO2QJAei7P6zZgWx9eVKaLae9AG0HFdqIvzSEcJT/29JU7wMYTEtQ4CfTsf4/lN
-         C6qBh4mGq91KyYEEqppnyt+awpzZflXbu2s0z72fvxRS4l1Fe2m4Skb6UbUWvgIVTYjj
-         gxtQ==
-X-Gm-Message-State: AOJu0Yw1UZS6RBkOwVD1cXX9/GOyYmVEkHpOkz1dDeSmqes4G3902DRI
-	xp/vJbZ8OIuj+nidWImC7GJN0eSwAAcpJC/m/fKHAuNzLPe3yox8ds0x82c9WzPMX/E=
-X-Gm-Gg: ASbGncvx8M6ZdIcTb69tgDRi4PF/aCbehWWe6XGMkxqojDgc23uspDpBwPFhktdPk5k
-	nLoTYI4PCVapj0F9nDvDx5e7LdYBvARAZNWP/EYma1SgCDuKDmJMwHoBpq0k0PMS3feb/Qg3m+M
-	RQz6fm7agyvmYSSzLWcw0RVgWRqSp86jK4ZNYp92PJN3bSVQHfcAs1WqmTt6z2e4ZcTMIOEMJ5C
-	+9VOYEvdc5vHFlo0EUMcDTIE4yoH0++7TBQxStNqw0fmWUmPK2HDvBt7XHr5H71nYTslbSIfXVj
-	KGjrwHloQQhyGs0IYAk5jzKEkCLD9CbhXBzA3Rxi2ELC4ijuJEIKtgQeX2tIzn6nt5mFVmo+rrz
-	t0IwYLRiFwUlF6pTBl/3oOVQ3PUh24C4Y/GOX4gAQ3oDyZZeBt0msNxAmTvq11T81clYV66oqIS
-	tQsIeXL8Rrmt1VnLngTw==
-X-Google-Smtp-Source: AGHT+IEDWA5q82L958u55I2l8XIdLyioaaTJQKQ5WXiI+MnAAGekhtuhSXFqSmAUlS0g26T7SSr1CA==
-X-Received: by 2002:a05:620a:288b:b0:829:fd97:e783 with SMTP id af79cd13be357-829fd97f3ddmr497902185a.19.1757974369129;
-        Mon, 15 Sep 2025 15:12:49 -0700 (PDT)
-Received: from bell.fritz.box (p200300faaf00da008e63e663d61a1504.dip0.t-ipconnect.de. [2003:fa:af00:da00:8e63:e663:d61a:1504])
-        by smtp.gmail.com with ESMTPSA id af79cd13be357-820c9845c47sm866190085a.28.2025.09.15.15.12.47
+        d=1e100.net; s=20230601; t=1757974835; x=1758579635;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=zNCvg1SlA5uujYmTpj5dnM2XRiOsxEhqFlXcwCOlTYU=;
+        b=CQvjiERSw1ZtTWz4Pkdx2Gy1kS0ls43h1vK/MNf8TusnzyL99Q+zh67zgV6gS71xZV
+         DbxfeZPWla5JQoLdrULiDOsk3v5yPQNN8iW2G+FuCsIA4AWOLM6+0gLxpAvPxRnSx2HI
+         2wsfvwsUgUEpArAt5LdniI7CVgYd/BgoshXpPqKkVV93iVTw0yJJJuztKoTBvPbH49zd
+         nKEsz+WmsSCc6zjWYCHjdiqhVrUgsHAiV2b1OGzkca2vMy3cv/1LyfuGXqrTeexD1JSg
+         bWv5BliPlGjKcaj7zLgcAy7KpGXBRZeHEqyIlesm9TCe8ARKx9TWMpyNHFK7pI+N3OWl
+         QW0Q==
+X-Forwarded-Encrypted: i=1; AJvYcCVXJBt4KuUdlzx4kG8Uchag4CseeNlLqjA/YZTpDB/MBPlSARKDjVIjW2+4F04HalhocYI=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwVVwVdhborwhPtUIMpzCRlnsF6lVI2oGiQYnlsnbs43jeUxOvj
+	YclXjJjuviMmk+GmFzmNBNHk2jzV6prxBmbanJWihZBA52w4QQBfNOuDxbDRDELr95GlYCJOFGx
+	JD1WzvpLwsHheIoHCFDCOIEQ6Hc7ge300N6xI5NXtJ+aQqB+CCO4THQ==
+X-Gm-Gg: ASbGnctTBkgLiqEm2iWye4hTKyR0TmYEyrf0Qa/mK6q9zYhi5BWbtCXGxN3ySWYSUAL
+	FI01dy3gyLBA7TWihrOSeRsFXF5aaez9XJbQcLulyOEau9BiWAf2K27Ew5/kzO+LwByeqgEQCzt
+	ugBPSwy3NJW5p+OSAfFukQm5r1I4eE5ICLzjQeD1fVZtmVOE0rwrI9LOHumOfAalbNmfrc2nt9U
+	CVxvQthjzwu3hS/JgiMvJAnKdBjHM8nIaUeGbGtrRlEzq4rXXOgT9xXBKYG2EeGtAsOmt+aWGAw
+	taoFdNmsrzeR/MOraKS0yqdhiggd
+X-Received: by 2002:a17:906:c146:b0:b13:bdf0:3b88 with SMTP id a640c23a62f3a-b13bdf03bc2mr340562666b.43.1757974834833;
+        Mon, 15 Sep 2025 15:20:34 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IGDMmlY+A7AncdQvX7lWK2y0LwK1/e2IwXHvw4zMrKcaIUHt6jUeNuT8DB6d4WnPa6JGwjHvQ==
+X-Received: by 2002:a17:906:c146:b0:b13:bdf0:3b88 with SMTP id a640c23a62f3a-b13bdf03bc2mr340560366b.43.1757974834411;
+        Mon, 15 Sep 2025 15:20:34 -0700 (PDT)
+Received: from redhat.com ([31.187.78.47])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-b07c2d043desm854739366b.40.2025.09.15.15.20.33
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 15 Sep 2025 15:12:48 -0700 (PDT)
-From: Mathias Krause <minipli@grsecurity.net>
-To: Andrew Jones <andrew.jones@linux.dev>,
-	Thomas Huth <thuth@redhat.com>,
-	Paolo Bonzini <pbonzini@redhat.com>
-Cc: kvm@vger.kernel.org,
-	Mathias Krause <minipli@grsecurity.net>
-Subject: [kvm-unit-tests PATCH] lib: make limits.h more Clang friendly
-Date: Tue, 16 Sep 2025 00:12:41 +0200
-Message-ID: <20250915221241.372800-1-minipli@grsecurity.net>
-X-Mailer: git-send-email 2.47.3
+        Mon, 15 Sep 2025 15:20:33 -0700 (PDT)
+Date: Mon, 15 Sep 2025 18:20:31 -0400
+From: "Michael S. Tsirkin" <mst@redhat.com>
+To: Sean Christopherson <seanjc@google.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, Jason Wang <jasowang@redhat.com>,
+	kvm@vger.kernel.org, virtualization@lists.linux.dev,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+	Sebastian Andrzej Siewior <bigeasy@linutronix.de>
+Subject: Re: [PATCH v2 0/3] vhost_task: Fix a bug where KVM wakes an exited
+ task
+Message-ID: <20250915182018-mutt-send-email-mst@kernel.org>
+References: <20250827194107.4142164-1-seanjc@google.com>
+ <aMh_BCLJqVKe-w7-@google.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <aMh_BCLJqVKe-w7-@google.com>
 
-Clang doesn't define the __${FOO}_WIDTH__ preprocessor defines, breaking
-the build for, at least, the ARM target.
+On Mon, Sep 15, 2025 at 02:03:00PM -0700, Sean Christopherson wrote:
+> On Wed, Aug 27, 2025, Sean Christopherson wrote:
+> > Michael,
+> > 
+> > Do you want to take this through the vhost tree?  It technically fixes a KVM
+> > bug, but this obviously touches far more vhost code than KVM code, and the
+> > patch that needs to go into 6.17 doesn't touch KVM at all.
+> 
+> Can this be squeezed into 6.17?  I know it's very late in the cycle, and that the
+> KVM bug is pre-existing, but the increased impact of the bug is new in 6.17 and I
+> don't want 6.17 to release without a fix.
 
-Switch over to use __SIZEOF_${FOO}__ instead which both, gcc and Clang
-do define accordingly.
-
-Signed-off-by: Mathias Krause <minipli@grsecurity.net>
----
- lib/limits.h | 10 +++++-----
- 1 file changed, 5 insertions(+), 5 deletions(-)
-
-diff --git a/lib/limits.h b/lib/limits.h
-index 650085c68e5d..5106e73dd5a2 100644
---- a/lib/limits.h
-+++ b/lib/limits.h
-@@ -12,29 +12,29 @@
- # endif
- #endif
- 
--#if __SHRT_WIDTH__ == 16
-+#if __SIZEOF_SHORT__ == 2
- # define SHRT_MAX	__INT16_MAX__
- # define SHRT_MIN	(-SHRT_MAX - 1)
- # define USHRT_MAX	__UINT16_MAX__
- #endif
- 
--#if __INT_WIDTH__ == 32
-+#if __SIZEOF_INT__ == 4
- # define INT_MAX	__INT32_MAX__
- # define INT_MIN	(-INT_MAX - 1)
- # define UINT_MAX	__UINT32_MAX__
- #endif
- 
--#if __LONG_WIDTH__ == 64
-+#if __SIZEOF_LONG__ == 8
- # define LONG_MAX	__INT64_MAX__
- # define LONG_MIN	(-LONG_MAX - 1)
- # define ULONG_MAX	__UINT64_MAX__
--#elif __LONG_WIDTH__ == 32
-+#elif __SIZEOF_LONG__ == 4
- # define LONG_MAX	__INT32_MAX__
- # define LONG_MIN	(-LONG_MAX - 1)
- # define ULONG_MAX	__UINT32_MAX__
- #endif
- 
--#if __LONG_LONG_WIDTH__ == 64
-+#if __SIZEOF_LONG_LONG__ == 8
- # define LLONG_MAX	__INT64_MAX__
- # define LLONG_MIN	(-LLONG_MAX - 1)
- # define ULLONG_MAX	__UINT64_MAX__
--- 
-2.47.3
+To clarify you just mean 1/3, yes?
 
 
