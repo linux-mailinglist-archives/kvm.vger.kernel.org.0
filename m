@@ -1,443 +1,259 @@
-Return-Path: <kvm+bounces-57530-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-57531-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id E098CB5740B
-	for <lists+kvm@lfdr.de>; Mon, 15 Sep 2025 11:06:12 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8EB41B57420
+	for <lists+kvm@lfdr.de>; Mon, 15 Sep 2025 11:09:29 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A559D20034A
-	for <lists+kvm@lfdr.de>; Mon, 15 Sep 2025 09:05:42 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 71FC47AF6BF
+	for <lists+kvm@lfdr.de>; Mon, 15 Sep 2025 09:06:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D482E2F5303;
-	Mon, 15 Sep 2025 09:00:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0BA8B2EAB83;
+	Mon, 15 Sep 2025 09:07:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="XPEV/VuB"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="S5vdT0XQ"
 X-Original-To: kvm@vger.kernel.org
-Received: from NAM12-DM6-obe.outbound.protection.outlook.com (mail-dm6nam12on2086.outbound.protection.outlook.com [40.107.243.86])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.16])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 21C48DDD2
-	for <kvm@vger.kernel.org>; Mon, 15 Sep 2025 09:00:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.243.86
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 538C84502A;
+	Mon, 15 Sep 2025 09:07:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=192.198.163.16
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757926835; cv=fail; b=n4Orn9WPKIMp3Gu9LISDqWyZvhu801qn5N6s2BilpKtwcmkp35kA0RKRU8sAp8mWKgDmDN6yOzEzKz4GV6K8g7X8tQfOSuHeopHO0qeq4IHHkZLu4T4KIXHjaaMzwXfq6DgdjCeSYtql8eDpksHJXbe7AkbAh8Hy9/8yc71cMwI=
+	t=1757927241; cv=fail; b=tWzVcmudbbQcNMwiQjlHGuVO7i1+V/nKpvE9koe+CgzrtYh3cSdXwSYEq0Gng4TvAGgRr0PFFjA4h32V0N0GkOcEgo1eOcpuqLuDz5jWlLihLvXxceMh0iDRg6URTPtB+MmZrH4QSfhX7KvKolwXqsohf/O69eY9pz1KJBK5XQ0=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757926835; c=relaxed/simple;
-	bh=CfZcysmIdt/9x+UTbay5VCbGRRUjypQzSh2PV1Im7Is=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=HcPJHpnT5ZTZoHP2I+ru1HPtt8KzWSs4EXl8ILAlPyjdwRTNwtIsgQM5gYqBSkr3QUaqw5dzUFkzsBkbj4iQeiZ6yaPA/Tz9mJI9MZh/I3oaVtWVab1GQz8RqHzIbX7Iw3YQPL4M+kMfpgaJv3lCQM4ZQKH1EODo31VTUBlSfiA=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=XPEV/VuB; arc=fail smtp.client-ip=40.107.243.86
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
+	s=arc-20240116; t=1757927241; c=relaxed/simple;
+	bh=ld9I8Ppthi64fCn4dSQQrIcYsrCWAjR02I9IVT7guq8=;
+	h=Date:From:To:CC:Subject:Message-ID:References:Content-Type:
+	 Content-Disposition:In-Reply-To:MIME-Version; b=iN2Ng6hjLmoBIldvSt1O0B2m673JBQVmjzVJL05hX7l02gK3u7XWM4ZRP/7AQVBdWuMVN1hC6eY1Lts59mmi6XZCtcxrz7LFEJsRhNpLRexM2Ft/nsoqvNOy0XLGIJLCqVPXXHMuJ4HptZhoy3hZy3hi25k/hpz1mNb5wbXcOEA=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=S5vdT0XQ; arc=fail smtp.client-ip=192.198.163.16
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1757927239; x=1789463239;
+  h=date:from:to:cc:subject:message-id:references:
+   in-reply-to:mime-version;
+  bh=ld9I8Ppthi64fCn4dSQQrIcYsrCWAjR02I9IVT7guq8=;
+  b=S5vdT0XQKdH5F4K9XJLmBgjR1+yxrxcwvg7FlAbbMqEdRatKo/IUybyb
+   sjreTwHZZ6qK97R1hhsH7uN4/5YeVHRt6XqsmcUG7lmlC1vOHkX0ApQff
+   kYpZ5rpGon1QCtiPOAiTz9n6jWE/NDBZMBHLCYMMKcdOvSIQp9ITuueUg
+   qUagAb+vupqzh8trY3ErazQ/sL6mNMhB0pGMUaMO5awGRoy9StG5LFyQF
+   NB0WpqH0wYtjTkSGq5yPPdHJUsAk+rY2IqvNJ9LGdpj1L+VHamYXno/cg
+   ovMukk+shG3T3+rn4jDzXdCZ4kiItTRqZBnpLrjt8uAkGM7CnwggZUeUJ
+   Q==;
+X-CSE-ConnectionGUID: 4eI6Z5dsTyqgOGFRjQhigA==
+X-CSE-MsgGUID: WTiQfjgjR52cmCu85+7PfA==
+X-IronPort-AV: E=McAfee;i="6800,10657,11553"; a="47743302"
+X-IronPort-AV: E=Sophos;i="6.18,265,1751266800"; 
+   d="scan'208";a="47743302"
+Received: from fmviesa007.fm.intel.com ([10.60.135.147])
+  by fmvoesa110.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 15 Sep 2025 02:07:15 -0700
+X-CSE-ConnectionGUID: 9UwOYGCiRtCxkfOrAl9PjA==
+X-CSE-MsgGUID: EqVw2oXxRhKJM8GM5KbzuA==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.18,265,1751266800"; 
+   d="scan'208";a="174166442"
+Received: from orsmsx901.amr.corp.intel.com ([10.22.229.23])
+  by fmviesa007.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 15 Sep 2025 02:07:15 -0700
+Received: from ORSMSX902.amr.corp.intel.com (10.22.229.24) by
+ ORSMSX901.amr.corp.intel.com (10.22.229.23) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.2562.17; Mon, 15 Sep 2025 02:07:14 -0700
+Received: from ORSEDG901.ED.cps.intel.com (10.7.248.11) by
+ ORSMSX902.amr.corp.intel.com (10.22.229.24) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.2562.17 via Frontend Transport; Mon, 15 Sep 2025 02:07:14 -0700
+Received: from NAM10-BN7-obe.outbound.protection.outlook.com (40.107.92.68) by
+ edgegateway.intel.com (134.134.137.111) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.2562.17; Mon, 15 Sep 2025 02:07:13 -0700
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=DhMxYvMsHnS+F65T8zpbYKzWdjVVePlGDeKu+Zydd/Z/Gq7EsZLjyX517aykXFEGyVwVxcVGJSs9r+BPqg9KAZUCghQXy1O/n9ogqC8GOCEgmCB4uWJlv2r7eoAmuIaFUOROi/q3b7yDX7MpNCamxExta+CV5+EiAxLkGg6SpWsPLeFNJ86nqFEyvTgYDzOdmFg5mbsXcPNPcgkfI9oH4hCmC77tjnnwXtB8I6Uc0iChTu2RzaWD0uipxW0EyHUOSiSHZfjiJJS4hiB1c6SkC10yRiL9dFgnQ2UWozoL7C5Lfy3uoQSShjAjFWw9muXOud6AosXSUN0uQ8gi6p+TZA==
+ b=KFnny2wOALRjJc0Acb4Q9V3yu76cPgfoLeeeajTgqhFZAR/ai3dh3q3dN4w305e9HauQY2K781Mq7TrDs+f6kaq28hx4SswOx8WiH7vTTd+BC/xYde5DgwQvq+bwI32zusUtZbE0mXENE89/M3gqchNajyEG1JAqwTPexTBvJclgdwjzxK+ynZgVoV5rVDAMYXbBy+dwmTqd3BVbPNmPgfXt2+pYr+G3VpF9UJMalLDJl0z3tEp11Kn1evdTQHwLKbT5NI53O2mRUKoJ+rLdaqLCjl2V/7bhOjFKZ0U7INU9+/DJqtObXTixCAJLAzeuyOH+Bi30GSRYq1BBgfqArw==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector10001;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=R/5Xreij1HV9qgMDR8BXfXpUj69w0Yb/T5blxke01YY=;
- b=g1hy44eRIkjKrGBWuIOeiw1a5AZakoM/bTxOf9BG2ewcE1KRa1EBaDN3MAyKK+54wkTL2uT5qdFt5+33k6r3LQg02Tf08CSyuzWIpedkTS/p2/r+KzU4KxUQKf8kuvAzy9GZ+cAd6ptA1bO2BZZinEqZEyOOULVp+hB1+vbC/O9+an0R0f/OxdksAfU983VanOw4z6TTpYORP45IjxVLEmCyza3a2QOhev9Xok9Vvj8KbyGw5Iof3BXZrW4M5xzNxZ4W8ZWxDX632Pu00SZQNMg22mhQhVmcXMhGNIncjHF5MGDoBTEw9gb3pEX7Ia3y+epnW/auebiiuIDfYJO4Ow==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 165.204.84.17) smtp.rcpttodomain=google.com smtp.mailfrom=amd.com; dmarc=pass
- (p=quarantine sp=quarantine pct=100) action=none header.from=amd.com;
- dkim=none (message not signed); arc=none (0)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=R/5Xreij1HV9qgMDR8BXfXpUj69w0Yb/T5blxke01YY=;
- b=XPEV/VuBtRVu4XwsQeMUnbVW30bniR3wMbenPPclndahEiD06AKOirHzUY/SIztTK27JxARF5lZIdvxjHIxs45OM2bI9NyRUAfIxDFEznSH7Ix7wDrs0comutF5Nr9b1G3yoqgnr13kqKPymAOvdA3UoquJD9s+YukLAuE6rkYU=
-Received: from SJ0P220CA0007.NAMP220.PROD.OUTLOOK.COM (2603:10b6:a03:41b::15)
- by LV8PR12MB9206.namprd12.prod.outlook.com (2603:10b6:408:186::21) with
+ bh=OYO+ev5M2sEN4vIbe0XRZSbWErFRaS/sTFwy8W8QxUw=;
+ b=yzbu8qFyAwedQDkpd/nVfLP+fk2ouhubh56qirS+7lnxHEsZGW7DYS/pIrqkiirGAjS2XOoTVlleVdHUncFUNuneURxYaIGxHNAsACfx0SXBwNMg5/0Npbu3EQmEUsWfs8v01l+8Bft1qWcLOIAot5a9mzELAlTCK0lPQ/9HOy5dbmt9SLzG0647kFbSlpxqgycIzXo9VEZBnQ8hv09h9JnWYuXqVDnpomXoaPz9hgJqJ4XVFKNAQX4bUY5F4TfcSyQmF9KRrJrsO3YfFqtX/9Q/hhScLx7x34I9k6MS8jkssLNe7oUCWQ4O78y0KNa6FvEN9PNQudjI24jMhUQDDQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+Received: from CH3PR11MB8660.namprd11.prod.outlook.com (2603:10b6:610:1ce::13)
+ by SJ0PR11MB4799.namprd11.prod.outlook.com (2603:10b6:a03:2ae::19) with
  Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9115.19; Mon, 15 Sep
- 2025 09:00:27 +0000
-Received: from CO1PEPF000075EE.namprd03.prod.outlook.com
- (2603:10b6:a03:41b:cafe::98) by SJ0P220CA0007.outlook.office365.com
- (2603:10b6:a03:41b::15) with Microsoft SMTP Server (version=TLS1_3,
- cipher=TLS_AES_256_GCM_SHA384) id 15.20.9115.21 via Frontend Transport; Mon,
- 15 Sep 2025 09:00:26 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
- smtp.mailfrom=amd.com; dkim=none (message not signed)
- header.d=none;dmarc=pass action=none header.from=amd.com;
-Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
- 165.204.84.17 as permitted sender) receiver=protection.outlook.com;
- client-ip=165.204.84.17; helo=satlexmb07.amd.com; pr=C
-Received: from satlexmb07.amd.com (165.204.84.17) by
- CO1PEPF000075EE.mail.protection.outlook.com (10.167.249.37) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.9137.12 via Frontend Transport; Mon, 15 Sep 2025 09:00:26 +0000
-Received: from gomati.amd.com (10.180.168.240) by satlexmb07.amd.com
- (10.181.42.216) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.17; Mon, 15 Sep
- 2025 02:00:08 -0700
-From: Nikunj A Dadhania <nikunj@amd.com>
-To: <seanjc@google.com>, <pbonzini@redhat.com>
-CC: <kvm@vger.kernel.org>, <thomas.lendacky@amd.com>,
-	<santosh.shukla@amd.com>, <bp@alien8.de>, <joao.m.martins@oracle.com>,
-	<nikunj@amd.com>, <kai.huang@intel.com>
-Subject: [PATCH v2 4/4] KVM: SVM: Add Page modification logging support
-Date: Mon, 15 Sep 2025 08:59:38 +0000
-Message-ID: <20250915085938.639049-5-nikunj@amd.com>
-X-Mailer: git-send-email 2.48.1
-In-Reply-To: <20250915085938.639049-1-nikunj@amd.com>
-References: <20250915085938.639049-1-nikunj@amd.com>
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9115.22; Mon, 15 Sep
+ 2025 09:07:11 +0000
+Received: from CH3PR11MB8660.namprd11.prod.outlook.com
+ ([fe80::cfad:add4:daad:fb9b]) by CH3PR11MB8660.namprd11.prod.outlook.com
+ ([fe80::cfad:add4:daad:fb9b%4]) with mapi id 15.20.9115.017; Mon, 15 Sep 2025
+ 09:07:10 +0000
+Date: Mon, 15 Sep 2025 17:07:00 +0800
+From: Chao Gao <chao.gao@intel.com>
+To: Sean Christopherson <seanjc@google.com>
+CC: Paolo Bonzini <pbonzini@redhat.com>, <kvm@vger.kernel.org>,
+	<linux-kernel@vger.kernel.org>, Tom Lendacky <thomas.lendacky@amd.com>,
+	Mathias Krause <minipli@grsecurity.net>, John Allen <john.allen@amd.com>,
+	Rick Edgecombe <rick.p.edgecombe@intel.com>, Maxim Levitsky
+	<mlevitsk@redhat.com>, Xiaoyao Li <xiaoyao.li@intel.com>, Zhang Yi Z
+	<yi.z.zhang@linux.intel.com>
+Subject: Re: [PATCH v15 34/41] KVM: selftests: Add ex_str() to print human
+ friendly name of exception vectors
+Message-ID: <aMfXNCHCRo4csOBL@intel.com>
+References: <20250912232319.429659-1-seanjc@google.com>
+ <20250912232319.429659-35-seanjc@google.com>
+Content-Type: text/plain; charset="us-ascii"
+Content-Disposition: inline
+In-Reply-To: <20250912232319.429659-35-seanjc@google.com>
+X-ClientProxiedBy: SG2PR02CA0109.apcprd02.prod.outlook.com
+ (2603:1096:4:92::25) To CH3PR11MB8660.namprd11.prod.outlook.com
+ (2603:10b6:610:1ce::13)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: satlexmb07.amd.com (10.181.42.216) To satlexmb07.amd.com
- (10.181.42.216)
-X-EOPAttributedMessage: 0
 X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: CO1PEPF000075EE:EE_|LV8PR12MB9206:EE_
-X-MS-Office365-Filtering-Correlation-Id: 4c99d564-8cb4-42a2-75eb-08ddf4365049
+X-MS-TrafficTypeDiagnostic: CH3PR11MB8660:EE_|SJ0PR11MB4799:EE_
+X-MS-Office365-Filtering-Correlation-Id: d90e6f38-a2a8-457d-03a3-08ddf43740c9
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|36860700013|82310400026|1800799024|376014;
-X-Microsoft-Antispam-Message-Info:
-	=?us-ascii?Q?i75pmoHL+apBLB1R2aea0p4nHSRBm9SRMEsETUna7psvmmHo8pCMDTFZE6Av?=
- =?us-ascii?Q?kZPN3amd7dQkCYr8fgwGm3MkmtkyxNPPzyUEom5n4IcoKkZLOAIIGo/3xRZU?=
- =?us-ascii?Q?TZbz+U4geWYo7lHlXBN7oIepBQtyu+x5CseUl6UUiU0TBdF0U5RLstRtLGv7?=
- =?us-ascii?Q?ZAZx5/TDKIR8WmNNMub7x1WuwlI1bcv86Qz0CO3xhrelKwIObUGMKq5tBMnU?=
- =?us-ascii?Q?bWFRGgdxry7Jy6AC9MOUF39NTzIlvZwAglduU9D+zlo6VIX9yIHPHAMQe/Av?=
- =?us-ascii?Q?7GlFI52oA9241QA2bd2sx9Jbh9A+5d7v6tHuief9j0AdWg51Ry8IrPN93Qjj?=
- =?us-ascii?Q?vDJa09ICSQWm0ckN2CtIxOHH4RdvPXntS/UQWtG8AvIX2KBCovnR2+rvSzgG?=
- =?us-ascii?Q?kYGQRX1btfT1wGny8iTt4J7gOL+CaI1VkBsCXvF6GPHOSjXQFHdznUHoSzIx?=
- =?us-ascii?Q?iJZCWi7Vevgh6RkqFue2/2DWtSsVXvfMqAoxxafFev9l2PSZfTzR1gc1tlyB?=
- =?us-ascii?Q?PEeH6ICCzBffes0ImtPu5PI52SVuKO+fWvO12w3H043OgHw2f2ZMTRkyQ4Hw?=
- =?us-ascii?Q?rdjZnBAfWMwRNj/nZ87sYpm7ZVNDXam7Ze51pOEt2dxD8QVIraFbT77GS2ED?=
- =?us-ascii?Q?CJV8w8R7j9YZSdunNIyl9YB4mkVMlojxyue0gch/6cvaYc8DgNcaOlLNRZmE?=
- =?us-ascii?Q?ieeJqYsYxZKSivrAiu8WuevXhA6LEvw+a1ocnn82jqHEUuak0//L4YRJ9cVy?=
- =?us-ascii?Q?A6wXe2cnWiWzH66h1RTY2th/6eR5XA7Kaou0bCnFhEU0DY7ggu/esifshjzQ?=
- =?us-ascii?Q?/74tYdGoz3cuB7E20GNgHC837zUuoAB1Xiepg7aWvUY8rdl3EeGWxQHva8oe?=
- =?us-ascii?Q?YDKtGAr5I758kDPFWIRIcv53oVwin1SvA8iui51a7u9m0Uix+epBsKXnSwp8?=
- =?us-ascii?Q?Sv/2fxWt4Wfzl5s+GsQregXoLxvUG8yTu8D+QgnEg4i0hTj68F+i8pjL2mXE?=
- =?us-ascii?Q?JnmKe7kkIuQzo1zgyZWPBRDPZsgMklxrtgG5+aE4dD/gY1Cz1khkCEfI//cn?=
- =?us-ascii?Q?pVB3/YDs5Scw65OoU7nPwv0i2iZfGzutfTC50azqsUeCpR3lB6Y2lucGOdIH?=
- =?us-ascii?Q?fRouSsrqonF/t93ndYzwORqoq0It/nn52ps3cpaTHY+AqK4YE4ufoocc+eKp?=
- =?us-ascii?Q?ronbgxThBnvvqxKMNkNxfJCjqetpUF2qrAlov82fDI+PC+HNLH1AWpbOalaz?=
- =?us-ascii?Q?z+IAfzuEM3tYZNgPrq+tqchYwws37KyUpqYWws831U/xLcOvw3zBCrbj5717?=
- =?us-ascii?Q?JmF2S7IMJk9bhv/g/kklEPeM41sDY9wvBewfzGFO8NilWwwDa7DgkAxCuUO4?=
- =?us-ascii?Q?UDP8kpoerKEaYI1lboMBf2Ujm3HePEfiWoXIrDF5tGWrGTorUX6Je4zQ5k4S?=
- =?us-ascii?Q?G1oXYnpGlHHJkvdxbnmO4YntHQSDO+Kc1WBsAVHoaK47oyo3ZmgKddHPXk5o?=
- =?us-ascii?Q?LxNUzlf/x8EgRBPl2Dmd32XbiKRLIcp8k0gb?=
-X-Forefront-Antispam-Report:
-	CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:satlexmb07.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230040)(36860700013)(82310400026)(1800799024)(376014);DIR:OUT;SFP:1101;
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 15 Sep 2025 09:00:26.7550
+X-Microsoft-Antispam: BCL:0;ARA:13230040|1800799024|366016|376014|7053199007;
+X-Microsoft-Antispam-Message-Info: =?us-ascii?Q?6yS8peMuO/OwLKdVVNBGmvRkxWq95vxK3bi1IzmbYViVm8xnCy327bVQjKXA?=
+ =?us-ascii?Q?z+vhKSjXI4rO8LKLCuS089cvT9qlRmm7jBGng7LcARHs/PthECUbaSOBheji?=
+ =?us-ascii?Q?CHnhd4rhRkM+KPsASAoZr3en2siQnAPyRrdm71boht6jeLvQLWg9b2bbnTwD?=
+ =?us-ascii?Q?sbGRuBEcFaEIMxoXyTQPCDqWhKM2R2Xf9OkcOZ+2SGtDu8A9OrF7ZjP2GevX?=
+ =?us-ascii?Q?GxzbQmuD9tzJLv1bWlq74D/KuBwxxG0WE9VfOwUzZFCGjjK5nRk7PwWwO3j+?=
+ =?us-ascii?Q?8GP3BJk0Ti5ZN1UQqU4AQ7z59+PWB7WHZ5zffGxHmnMh6LYPn9rXNqS1g+Q6?=
+ =?us-ascii?Q?VprIqApSKGJog8736r35sP3LXxLMilFrElmHMlBlWieuGgURoED3YpjeRJPr?=
+ =?us-ascii?Q?B7if/7oV4XObrzcp92g2RWjYd/t9hUEHaCp0c76q3zhOHXSaTLfqOgVYAUUv?=
+ =?us-ascii?Q?QXvS51EprLbzhO7YF2nqXeKP5WiSyI1JbGy8zUyTKh4s0RTfCWE0v2HvskE/?=
+ =?us-ascii?Q?NJYwFVkaGGQmEp3Mpi83HdQyMAmWxFfoTSvtZwSi04qedS0RoXdU7tkjRz3a?=
+ =?us-ascii?Q?qW76zDtFPML3tmI4RnbSVyu+KLFJgDJ9C4SmZzOhSCg4dOL/UE+qZwUnQmSS?=
+ =?us-ascii?Q?bReXU9X+Qt+N1/WRLKC9/d8K0zacvmCpX/DabtOJJ4DTp5xIX7sTSJvnNfi5?=
+ =?us-ascii?Q?n94R0i5PdP0sZq1GbIAgm2jp11w+l9FeEj9BFwWLJ0gqVp59C/8TCjBxJbS3?=
+ =?us-ascii?Q?90nrLmMHkI+v+C2xM1Ect6B//HWnGHrtS8W4ZTvMiWmdQr3r7rKane2fcKk5?=
+ =?us-ascii?Q?KauFWHhs53SUgEc0K39DNA1oCnMo4c43/JaDt7jZ3Guk0+oL+Zca4lb6mV2D?=
+ =?us-ascii?Q?jA7ANvLJaeTzfYkHeBFxxxrVo4nqmf8qHr88Oryp+WKA1DFx7B9NaeBkvvtc?=
+ =?us-ascii?Q?5Fv/e9H5iW9+sV5ZSj8RJQ9BZTMDepjjSuxGhmEblmA2CZJXDKnj/5cP4ZLf?=
+ =?us-ascii?Q?vQsFoo/d3rdlyWmsYrp3j+osMFA8JcwznaHR29PkvZrGo07wRJ1K0zStKxgo?=
+ =?us-ascii?Q?EVKTA/39GMcFp9097w0xX4MevuZ7MXK4Q1vEIIDhYTAdqRm+xydL4Y70Eh22?=
+ =?us-ascii?Q?E23t1VJbVBd9eE/kM+w3q6MfAxZ4uLIUpSwROyE91jcMKypAZ9oHERDUrySf?=
+ =?us-ascii?Q?kild3Ygh8GvjeeDTRIGeCz7MxrVl1GtYlSae0zLpjA1AWk5Sgk+AjNGZkjIt?=
+ =?us-ascii?Q?MrlDW6IREx+lWCi0FY6RH35VRF+Gt5GfKylshor9wq517XfXNn/37JmLVnUT?=
+ =?us-ascii?Q?X3sfq9m5xbbtulJAhZlZIz4XcYim/LfwfGawYg4g4J8rJfSRTv2v3c4N37hU?=
+ =?us-ascii?Q?5B/kjl7hYT+fFmosdRsuDQMOAesoRFVdRN40dZILn7a8QMXeMUrgZ67tKyUH?=
+ =?us-ascii?Q?aS3WFX6WWZk=3D?=
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CH3PR11MB8660.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(366016)(376014)(7053199007);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?kRyXfNV/vB1SQKb4tlh945sphvYjTE6amPcruUmJLT7XoBQClpgpqAyhesFs?=
+ =?us-ascii?Q?3nQ/Pkys8V3SLNAJFJ7tmGbmiiRFUMgJ4ameObbP8zqvhpYzok0vlVXBRhKg?=
+ =?us-ascii?Q?Jbx4Rg02D7iUQebhvr2im3L4Z7vz2xf9ch5LX+dTawIbmMUr84OUpsCEGcET?=
+ =?us-ascii?Q?rIqjzam11tpEmJT4DY/Vdt0cb3J5zeyIGbdeYVv1EYhzgSgC3h2OIx/hFpGx?=
+ =?us-ascii?Q?huiez7JscpfbTAoSdNyJ8Q8itsYCh/RHwZ+kLR1t3IzdPsx+EfCw49gmfv3o?=
+ =?us-ascii?Q?0BicxqBfHP9XIdRkTtr8KYur6BoZ3T+bFo0GbkyLpfvwrT9INz5gXk3fjRpX?=
+ =?us-ascii?Q?j5IoIW3k1EgCeWaMADfEbSC2i7gW/JFSa/QFsB1Smk8pW6/X1GFHXtSCKdlY?=
+ =?us-ascii?Q?YNf1SAuD2MB0loXAWu7ReioY1h3KkG2dZWhzNpMBghEaVvlMZVquFQafI/nn?=
+ =?us-ascii?Q?U7Pl5GF2US7Zhz4m8/LmIcDkofgl9yPAeuow9EmEGLtYa3krLeVQkXpso1VU?=
+ =?us-ascii?Q?i+iRvVyDcszC5FUIndnF2oA84xQdZF74VVa7hH51b7bnX0yudvdLpX8e4xIU?=
+ =?us-ascii?Q?1MXtk6XNiimg94CJLXtIUOoY5nwF2k/QVz+nqYjL2wjj7leeNx7A30q3F9yp?=
+ =?us-ascii?Q?EVKd0dENQNOE+1MnNxwj2n87gIM5OToHcHp07+Kj4zitaYjJxN0vVF6uGDt3?=
+ =?us-ascii?Q?86aQqf1HOODfya3UbkxGzenZ6TMtq7/QledIXC665m4z4sYZFX/xoG1+CxH0?=
+ =?us-ascii?Q?2F+CcFbj26v05oqvQNKBD4Ge2fxcIwKZwNq8AbCxurXN4XRyQjvLC6sKKXeS?=
+ =?us-ascii?Q?yzl4W7VmBkGJG2dw4vp2UFD7p02kKrXs0OVcVXdxS12ii5HHWhp9jFbTVC7l?=
+ =?us-ascii?Q?B8lUKVT8fwxgNTFK4cX6J2fihHya7X4PfgWPNIKEaR3HDHsHqTK31l9CAjWm?=
+ =?us-ascii?Q?lc4OohRQIdnj2tVt0583fCl/9azg+ghaNEw5PFGofcUqyTyyN08qOsjv2Snp?=
+ =?us-ascii?Q?vG0mdLpmb/94liaaLznbcWIyiyX33X96iVWNsv6o/0rvRlO5Vjj0PyOacIFu?=
+ =?us-ascii?Q?IbC/CrByCihZH77iwjlbklh6hyvOhYi9Ro1M3wgB4cTnH3nNM8gAu0sECFO1?=
+ =?us-ascii?Q?0mv3i0n4+5xPc1dIrYVj8V96ACMEZcNZ1dwAYFLVkAE8BIf0U14oLOEayWwj?=
+ =?us-ascii?Q?NUwXqTQ1nK3DQsdjnvXMOOIhTknVmTAgVsF6LtVp4Ad6mNy4JbtWJ+ZB3fk6?=
+ =?us-ascii?Q?Vbt/FEPdYTESd4w8FEiAbzsJLn4mcmUQ+w9uwdFkAZOoPu85Sd8V5e9T6JPl?=
+ =?us-ascii?Q?F97Bna31xrtsr4oeZ41DxwOhvin1Qf2xewXjVqaLF3RHNNBsOsVZ4afzYCac?=
+ =?us-ascii?Q?XZpQE+a46v4Q1J7evhKYkLDMrRX2pBdHgEj8PqQRX+vFks49I83zFjvi9OjL?=
+ =?us-ascii?Q?Uc2fWFwT4IQ1ESTAtSfCfVtblvJguFliT1UFAGXIo1qlpHfd865wr4GCAOh1?=
+ =?us-ascii?Q?zySb8Q/2Qg3hRyE/Pj3q9YQhlkzphbgTO1ohYEtLbVRcnQgIWmM6OzPe8gPm?=
+ =?us-ascii?Q?GwBjRe6qfk2nkiB+a9LqgefvPBvtrV/otF3iAjKM?=
+X-MS-Exchange-CrossTenant-Network-Message-Id: d90e6f38-a2a8-457d-03a3-08ddf43740c9
+X-MS-Exchange-CrossTenant-AuthSource: CH3PR11MB8660.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 15 Sep 2025 09:07:10.7691
  (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 4c99d564-8cb4-42a2-75eb-08ddf4365049
-X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[satlexmb07.amd.com]
-X-MS-Exchange-CrossTenant-AuthSource:
-	CO1PEPF000075EE.namprd03.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: LV8PR12MB9206
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: /8m7r0kr4QqWgpGRiUD1plBs7GEAtJcf5IGiilF8NGWfFFvIQbW8Aju8z3Qpy7rnlpPH3nT9APH0HIiexkpQtw==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SJ0PR11MB4799
+X-OriginatorOrg: intel.com
 
-Currently, dirty logging relies on write protecting guest memory and
-marking dirty GFNs during subsequent write faults. This method works but
-incurs overhead due to additional write faults for each dirty GFN.
+On Fri, Sep 12, 2025 at 04:23:12PM -0700, Sean Christopherson wrote:
+>Steal exception_mnemonic() from KVM-Unit-Tests as ex_str() (to keep line
+>lengths reasonable) and use it in assert messages that currently print the
+>raw vector number.
+>
+>Signed-off-by: Sean Christopherson <seanjc@google.com>
 
-Implement support for the Page Modification Logging (PML) feature, a
-hardware-assisted method for efficient dirty logging. PML automatically
-logs dirty GPA[51:12] to a 4K buffer when the CPU sets NPT D-bits. Two new
-VMCB fields are utilized: PML_ADDR and PML_INDEX. The PML_INDEX is
-initialized to 511 (8 bytes per GPA entry), and the CPU decreases the
-PML_INDEX after logging each GPA. When the PML buffer is full, a
-VMEXIT(PML_FULL) with exit code 0x407 is generated.
+There are two more assert messages still printing the raw numbers. Feel free to
+squash the below patch into yours.
 
-PML is enabled by default when supported and can be disabled via the 'pml'
-module parameter.
+assert_ucall_vector() in nested_exceptions_test.c could be converted as well but
+its use of FAKE_TRIPLE_FAULT_VECTOR makes me hesitant to do that (e.g., we need
+to assign a name to the faked vector in the common code).
 
-Signed-off-by: Nikunj A Dadhania <nikunj@amd.com>
+From 90c502e97be6acc37f84a086c50ecb180719ea46 Mon Sep 17 00:00:00 2001
+From: Chao Gao <chao.gao@intel.com>
+Date: Mon, 15 Sep 2025 01:41:03 -0700
+Subject: [PATCH] KVM: selftests: Use ex_str() to print human friendly name of
+ exception vectors
+
+Convert assert messages that are still printing the raw vector numbers to
+print human-friendly names.
+
+Signed-off-by: Chao Gao <chao.gao@intel.com>
 ---
- arch/x86/include/asm/svm.h      |  6 +-
- arch/x86/include/uapi/asm/svm.h |  2 +
- arch/x86/kvm/svm/sev.c          |  2 +-
- arch/x86/kvm/svm/svm.c          | 99 ++++++++++++++++++++++++++++++++-
- arch/x86/kvm/svm/svm.h          |  4 ++
- 5 files changed, 108 insertions(+), 5 deletions(-)
+ tools/testing/selftests/kvm/x86/monitor_mwait_test.c | 8 ++++----
+ tools/testing/selftests/kvm/x86/pmu_counters_test.c  | 4 ++--
+ 2 files changed, 6 insertions(+), 6 deletions(-)
 
-diff --git a/arch/x86/include/asm/svm.h b/arch/x86/include/asm/svm.h
-index ffc27f676243..9fbada95afd5 100644
---- a/arch/x86/include/asm/svm.h
-+++ b/arch/x86/include/asm/svm.h
-@@ -165,7 +165,10 @@ struct __attribute__ ((__packed__)) vmcb_control_area {
- 	u8 reserved_9[22];
- 	u64 allowed_sev_features;	/* Offset 0x138 */
- 	u64 guest_sev_features;		/* Offset 0x140 */
--	u8 reserved_10[664];
-+	u8 reserved_10[128];
-+	u64 pml_addr;			/* Offset 0x1c8 */
-+	u16 pml_index;			/* Offset 0x1d0 */
-+	u8 reserved_11[526];
- 	/*
- 	 * Offset 0x3e0, 32 bytes reserved
- 	 * for use by hypervisor/software.
-@@ -239,6 +242,7 @@ struct __attribute__ ((__packed__)) vmcb_control_area {
- #define SVM_NESTED_CTL_NP_ENABLE	BIT(0)
- #define SVM_NESTED_CTL_SEV_ENABLE	BIT(1)
- #define SVM_NESTED_CTL_SEV_ES_ENABLE	BIT(2)
-+#define SVM_NESTED_CTL_PML_ENABLE	BIT(11)
+diff --git a/tools/testing/selftests/kvm/x86/monitor_mwait_test.c b/tools/testing/selftests/kvm/x86/monitor_mwait_test.c
+index 0eb371c62ab8..e45c028d2a7e 100644
+--- a/tools/testing/selftests/kvm/x86/monitor_mwait_test.c
++++ b/tools/testing/selftests/kvm/x86/monitor_mwait_test.c
+@@ -30,12 +30,12 @@ do {									\
+									\
+	if (fault_wanted)						\
+		__GUEST_ASSERT((vector) == UD_VECTOR,			\
+-			       "Expected #UD on " insn " for testcase '0x%x', got '0x%x'", \
+-			       testcase, vector);			\
++			       "Expected #UD on " insn " for testcase '0x%x', got %s", \
++			       testcase, ex_str(vector));		\
+	else								\
+		__GUEST_ASSERT(!(vector),				\
+-			       "Expected success on " insn " for testcase '0x%x', got '0x%x'", \
+-			       testcase, vector);			\
++			       "Expected success on " insn " for testcase '0x%x', got %s", \
++			       testcase, ex_str(vector));		\
+ } while (0)
  
+ static void guest_monitor_wait(void *arg)
+diff --git a/tools/testing/selftests/kvm/x86/pmu_counters_test.c b/tools/testing/selftests/kvm/x86/pmu_counters_test.c
+index 8aaaf25b6111..36eb2658f891 100644
+--- a/tools/testing/selftests/kvm/x86/pmu_counters_test.c
++++ b/tools/testing/selftests/kvm/x86/pmu_counters_test.c
+@@ -344,8 +344,8 @@ static void test_arch_events(uint8_t pmu_version, uint64_t perf_capabilities,
  
- #define SVM_TSC_RATIO_RSVD	0xffffff0000000000ULL
-diff --git a/arch/x86/include/uapi/asm/svm.h b/arch/x86/include/uapi/asm/svm.h
-index 9c640a521a67..f329dca167de 100644
---- a/arch/x86/include/uapi/asm/svm.h
-+++ b/arch/x86/include/uapi/asm/svm.h
-@@ -101,6 +101,7 @@
- #define SVM_EXIT_AVIC_INCOMPLETE_IPI		0x401
- #define SVM_EXIT_AVIC_UNACCELERATED_ACCESS	0x402
- #define SVM_EXIT_VMGEXIT       0x403
-+#define SVM_EXIT_PML_FULL	0x407
+ #define GUEST_ASSERT_PMC_MSR_ACCESS(insn, msr, expect_gp, vector)		\
+ __GUEST_ASSERT(expect_gp ? vector == GP_VECTOR : !vector,			\
+-	       "Expected %s on " #insn "(0x%x), got vector %u",			\
+-	       expect_gp ? "#GP" : "no fault", msr, vector)			\
++	       "Expected %s on " #insn "(0x%x), got %s",			\
++	       expect_gp ? "#GP" : "no fault", msr, ex_str(vector))		\
  
- /* SEV-ES software-defined VMGEXIT events */
- #define SVM_VMGEXIT_MMIO_READ			0x80000001
-@@ -232,6 +233,7 @@
- 	{ SVM_EXIT_AVIC_INCOMPLETE_IPI,		"avic_incomplete_ipi" }, \
- 	{ SVM_EXIT_AVIC_UNACCELERATED_ACCESS,   "avic_unaccelerated_access" }, \
- 	{ SVM_EXIT_VMGEXIT,		"vmgexit" }, \
-+	{ SVM_EXIT_PML_FULL,		"pml_full" }, \
- 	{ SVM_VMGEXIT_MMIO_READ,	"vmgexit_mmio_read" }, \
- 	{ SVM_VMGEXIT_MMIO_WRITE,	"vmgexit_mmio_write" }, \
- 	{ SVM_VMGEXIT_NMI_COMPLETE,	"vmgexit_nmi_complete" }, \
-diff --git a/arch/x86/kvm/svm/sev.c b/arch/x86/kvm/svm/sev.c
-index 5bac4d20aec0..b179a0a2581a 100644
---- a/arch/x86/kvm/svm/sev.c
-+++ b/arch/x86/kvm/svm/sev.c
-@@ -4669,7 +4669,7 @@ struct page *snp_safe_alloc_page_node(int node, gfp_t gfp)
- 	 * Allocate an SNP-safe page to workaround the SNP erratum where
- 	 * the CPU will incorrectly signal an RMP violation #PF if a
- 	 * hugepage (2MB or 1GB) collides with the RMP entry of a
--	 * 2MB-aligned VMCB, VMSA, or AVIC backing page.
-+	 * 2MB-aligned VMCB, VMSA, PML or AVIC backing page.
- 	 *
- 	 * Allocate one extra page, choose a page which is not
- 	 * 2MB-aligned, and free the other.
-diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
-index 8a66e2e985a4..a44fd68e3e23 100644
---- a/arch/x86/kvm/svm/svm.c
-+++ b/arch/x86/kvm/svm/svm.c
-@@ -178,6 +178,9 @@ module_param(intercept_smi, bool, 0444);
- bool vnmi = true;
- module_param(vnmi, bool, 0444);
- 
-+bool pml = true;
-+module_param(pml, bool, 0444);
-+
- static bool svm_gp_erratum_intercept = true;
- 
- static u8 rsm_ins_bytes[] = "\x0f\xaa";
-@@ -1220,6 +1223,16 @@ static void init_vmcb(struct kvm_vcpu *vcpu)
- 	if (vcpu->kvm->arch.bus_lock_detection_enabled)
- 		svm_set_intercept(svm, INTERCEPT_BUSLOCK);
- 
-+	if (pml) {
-+		/*
-+		 * Populate the page address and index here, PML is enabled
-+		 * when dirty logging is enabled on the memslot through
-+		 * svm_update_cpu_dirty_logging()
-+		 */
-+		control->pml_addr = (u64)__sme_set(page_to_phys(vcpu->arch.pml_page));
-+		control->pml_index = PML_HEAD_INDEX;
-+	}
-+
- 	if (sev_guest(vcpu->kvm))
- 		sev_init_vmcb(svm);
- 
-@@ -1296,14 +1309,20 @@ static int svm_vcpu_create(struct kvm_vcpu *vcpu)
- 			goto error_free_vmcb_page;
- 	}
- 
-+	if (pml) {
-+		vcpu->arch.pml_page = snp_safe_alloc_page();
-+		if (!vcpu->arch.pml_page)
-+			goto error_free_vmsa_page;
-+	}
-+
- 	err = avic_init_vcpu(svm);
- 	if (err)
--		goto error_free_vmsa_page;
-+		goto error_free_pml_page;
- 
- 	svm->msrpm = svm_vcpu_alloc_msrpm();
- 	if (!svm->msrpm) {
- 		err = -ENOMEM;
--		goto error_free_vmsa_page;
-+		goto error_free_pml_page;
- 	}
- 
- 	svm->x2avic_msrs_intercepted = true;
-@@ -1319,6 +1338,9 @@ static int svm_vcpu_create(struct kvm_vcpu *vcpu)
- 
- 	return 0;
- 
-+error_free_pml_page:
-+	if (vcpu->arch.pml_page)
-+		__free_page(vcpu->arch.pml_page);
- error_free_vmsa_page:
- 	if (vmsa_page)
- 		__free_page(vmsa_page);
-@@ -1339,6 +1361,9 @@ static void svm_vcpu_free(struct kvm_vcpu *vcpu)
- 
- 	sev_free_vcpu(vcpu);
- 
-+	if (pml)
-+		__free_page(vcpu->arch.pml_page);
-+
- 	__free_page(__sme_pa_to_page(svm->vmcb01.pa));
- 	svm_vcpu_free_msrpm(svm->msrpm);
- }
-@@ -3206,6 +3231,53 @@ static int bus_lock_exit(struct kvm_vcpu *vcpu)
- 	return 0;
- }
- 
-+void svm_update_cpu_dirty_logging(struct kvm_vcpu *vcpu)
-+{
-+	struct vcpu_svm *svm = to_svm(vcpu);
-+
-+	if (WARN_ON_ONCE(!pml))
-+		return;
-+
-+	if (is_guest_mode(vcpu))
-+		return;
-+
-+	/*
-+	 * Note, nr_memslots_dirty_logging can be changed concurrently with this
-+	 * code, but in that case another update request will be made and so the
-+	 * guest will never run with a stale PML value.
-+	 */
-+	if (atomic_read(&vcpu->kvm->nr_memslots_dirty_logging))
-+		svm->vmcb->control.nested_ctl |= SVM_NESTED_CTL_PML_ENABLE;
-+	else
-+		svm->vmcb->control.nested_ctl &= ~SVM_NESTED_CTL_PML_ENABLE;
-+}
-+
-+static void svm_flush_pml_buffer(struct kvm_vcpu *vcpu)
-+{
-+	struct vcpu_svm *svm = to_svm(vcpu);
-+	struct vmcb_control_area *control = &svm->vmcb->control;
-+
-+	/* Do nothing if PML buffer is empty */
-+	if (control->pml_index == PML_HEAD_INDEX)
-+		return;
-+
-+	kvm_flush_pml_buffer(vcpu, control->pml_index);
-+
-+	/* Reset the PML index */
-+	control->pml_index = PML_HEAD_INDEX;
-+}
-+
-+static int pml_full_interception(struct kvm_vcpu *vcpu)
-+{
-+	trace_kvm_pml_full(vcpu->vcpu_id);
-+
-+	/*
-+	 * PML buffer is already flushed at the beginning of svm_handle_exit().
-+	 * Nothing to do here.
-+	 */
-+	return 1;
-+}
-+
- static int (*const svm_exit_handlers[])(struct kvm_vcpu *vcpu) = {
- 	[SVM_EXIT_READ_CR0]			= cr_interception,
- 	[SVM_EXIT_READ_CR3]			= cr_interception,
-@@ -3282,6 +3354,7 @@ static int (*const svm_exit_handlers[])(struct kvm_vcpu *vcpu) = {
- #ifdef CONFIG_KVM_AMD_SEV
- 	[SVM_EXIT_VMGEXIT]			= sev_handle_vmgexit,
- #endif
-+	[SVM_EXIT_PML_FULL]			= pml_full_interception,
- };
- 
- static void dump_vmcb(struct kvm_vcpu *vcpu)
-@@ -3330,8 +3403,10 @@ static void dump_vmcb(struct kvm_vcpu *vcpu)
- 	pr_err("%-20s%016llx\n", "exit_info2:", control->exit_info_2);
- 	pr_err("%-20s%08x\n", "exit_int_info:", control->exit_int_info);
- 	pr_err("%-20s%08x\n", "exit_int_info_err:", control->exit_int_info_err);
--	pr_err("%-20s%lld\n", "nested_ctl:", control->nested_ctl);
-+	pr_err("%-20s%llx\n", "nested_ctl:", control->nested_ctl);
- 	pr_err("%-20s%016llx\n", "nested_cr3:", control->nested_cr3);
-+	pr_err("%-20s%016llx\n", "pml_addr:", control->pml_addr);
-+	pr_err("%-20s%04x\n", "pml_index:", control->pml_index);
- 	pr_err("%-20s%016llx\n", "avic_vapic_bar:", control->avic_vapic_bar);
- 	pr_err("%-20s%016llx\n", "ghcb:", control->ghcb_gpa);
- 	pr_err("%-20s%08x\n", "event_inj:", control->event_inj);
-@@ -3562,6 +3637,15 @@ static int svm_handle_exit(struct kvm_vcpu *vcpu, fastpath_t exit_fastpath)
- 	struct kvm_run *kvm_run = vcpu->run;
- 	u32 exit_code = svm->vmcb->control.exit_code;
- 
-+	/*
-+	 * Opportunistically flush the PML buffer on VM exit. This keeps the
-+	 * dirty bitmap current by processing logged GPAs rather than waiting for
-+	 * PML_FULL exit.
-+	 */
-+	if (pml && !is_guest_mode(vcpu))
-+		svm_flush_pml_buffer(vcpu);
-+
-+
- 	/* SEV-ES guests must use the CR write traps to track CR registers. */
- 	if (!sev_es_guest(vcpu->kvm)) {
- 		if (!svm_is_intercept(svm, INTERCEPT_CR0_WRITE))
-@@ -5028,6 +5112,9 @@ static int svm_vm_init(struct kvm *kvm)
- 			return ret;
- 	}
- 
-+	if (pml)
-+		kvm->arch.cpu_dirty_log_size = PML_LOG_NR_ENTRIES;
-+
- 	svm_srso_vm_init();
- 	return 0;
- }
-@@ -5181,6 +5268,8 @@ static struct kvm_x86_ops svm_x86_ops __initdata = {
- 	.gmem_prepare = sev_gmem_prepare,
- 	.gmem_invalidate = sev_gmem_invalidate,
- 	.gmem_max_mapping_level = sev_gmem_max_mapping_level,
-+
-+	.update_cpu_dirty_logging = svm_update_cpu_dirty_logging,
- };
- 
- /*
-@@ -5382,6 +5471,10 @@ static __init int svm_hardware_setup(void)
- 
- 	nrips = nrips && boot_cpu_has(X86_FEATURE_NRIPS);
- 
-+	pml = pml && npt_enabled && cpu_feature_enabled(X86_FEATURE_PML);
-+	if (pml)
-+		pr_info("Page modification logging supported\n");
-+
- 	if (lbrv) {
- 		if (!boot_cpu_has(X86_FEATURE_LBRV))
- 			lbrv = false;
-diff --git a/arch/x86/kvm/svm/svm.h b/arch/x86/kvm/svm/svm.h
-index 70df7c6413cf..7e6ee4e80021 100644
---- a/arch/x86/kvm/svm/svm.h
-+++ b/arch/x86/kvm/svm/svm.h
-@@ -335,6 +335,8 @@ struct vcpu_svm {
- 
- 	/* Guest GIF value, used when vGIF is not enabled */
- 	bool guest_gif;
-+
-+	struct page *pml_page;
- };
- 
- struct svm_cpu_data {
-@@ -717,6 +719,8 @@ static inline void svm_enable_intercept_for_msr(struct kvm_vcpu *vcpu,
- 	svm_set_intercept_for_msr(vcpu, msr, type, true);
- }
- 
-+void svm_update_cpu_dirty_logging(struct kvm_vcpu *vcpu);
-+
- /* nested.c */
- 
- #define NESTED_EXIT_HOST	0	/* Exit handled on host level */
+ #define GUEST_ASSERT_PMC_VALUE(insn, msr, val, expected)			\
+	__GUEST_ASSERT(val == expected,					\
 -- 
-2.48.1
-
+2.47.3
 
