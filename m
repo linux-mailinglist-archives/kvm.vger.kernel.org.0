@@ -1,78 +1,78 @@
-Return-Path: <kvm+bounces-57634-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-57635-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id E2843B58702
-	for <lists+kvm@lfdr.de>; Mon, 15 Sep 2025 23:55:20 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0A6D0B58703
+	for <lists+kvm@lfdr.de>; Mon, 15 Sep 2025 23:55:26 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A53432083B0
-	for <lists+kvm@lfdr.de>; Mon, 15 Sep 2025 21:55:20 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B90A420837D
+	for <lists+kvm@lfdr.de>; Mon, 15 Sep 2025 21:55:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B0CB72C11EF;
-	Mon, 15 Sep 2025 21:54:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 160292C1581;
+	Mon, 15 Sep 2025 21:55:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=grsecurity.net header.i=@grsecurity.net header.b="T1eNs8Q7"
+	dkim=pass (2048-bit key) header.d=grsecurity.net header.i=@grsecurity.net header.b="jCQ9pax1"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-qv1-f51.google.com (mail-qv1-f51.google.com [209.85.219.51])
+Received: from mail-qv1-f43.google.com (mail-qv1-f43.google.com [209.85.219.43])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4B9572C08AC
-	for <kvm@vger.kernel.org>; Mon, 15 Sep 2025 21:54:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.51
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EF7052C1583
+	for <kvm@vger.kernel.org>; Mon, 15 Sep 2025 21:54:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.43
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757973297; cv=none; b=ku8XMT9h/1v/dD57hi05gtK8NMrDjA4nJh+twhpMUaRP/3/MHzcDuLkoxSpDbD77kZHeUMFK9CMRfObKgxSdPIYUdO5IgpwBZVYVlxz7I1LpzavH+DVtaA2tWeXqM+x0kQm+DSyALie6CYFhMnEXx0yyDxCIkWTByVjCZ6T7ACo=
+	t=1757973301; cv=none; b=MTNXFvE9A8eudNDZnaWSDnmdJuecbdFNZNtXwqPCXquHu1rREWeuqkM/+JRieJRZNTRtt4z72RijybqIrryFFc5sfT5TQskazsNZvK3zMVdbyzTPxFnjbl7fzKmrvYTh3veDoksBmIwFkg5Vp/5BcbL1b9iHe7yLjFUDYyLPbcQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757973297; c=relaxed/simple;
-	bh=PdHvRfevfRqxtXXEl7OhG5gE+ulxsfMQaWQYO3eysx4=;
+	s=arc-20240116; t=1757973301; c=relaxed/simple;
+	bh=4pFJ7PlEmesvXr3cQL2H05B7Cqj5Q/UV1hXOSPL7QWY=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=ZeUWqanVFJUHBsU9fRZoi+RYD9dy7daZ9xkpWvh9fzooGjHUD0vLE4fllNdIoaPBjgdFD42LH0A+HT8txqoCO872DcQmi5ugjUIlueLG6HgvWVE/XySxFCva48f6MBF5IA6mK4IJu9nUXcEj9fBQdzrFcNBJk0exFjDgNqBNQNQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=grsecurity.net; spf=pass smtp.mailfrom=opensrcsec.com; dkim=pass (2048-bit key) header.d=grsecurity.net header.i=@grsecurity.net header.b=T1eNs8Q7; arc=none smtp.client-ip=209.85.219.51
+	 MIME-Version; b=ky5GyOwYz2wINBz6XfBI13GhZ/1YsCMD4+ayNB1RRBXHRp9kQZcedgzNXLZS0zIqhXy+WgZalmLwkLR5iW6NXC3Eh1sN7STG7J3K/QwJPpTXOF5ppU4CpNPjM1n3EkQzzPR++FLIsZLwTtOkdbbnE9Kd+AaPMqv690YreaOTJx0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=grsecurity.net; spf=pass smtp.mailfrom=opensrcsec.com; dkim=pass (2048-bit key) header.d=grsecurity.net header.i=@grsecurity.net header.b=jCQ9pax1; arc=none smtp.client-ip=209.85.219.43
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=grsecurity.net
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=opensrcsec.com
-Received: by mail-qv1-f51.google.com with SMTP id 6a1803df08f44-78393b4490cso13986716d6.0
-        for <kvm@vger.kernel.org>; Mon, 15 Sep 2025 14:54:56 -0700 (PDT)
+Received: by mail-qv1-f43.google.com with SMTP id 6a1803df08f44-781fbbad816so11084326d6.1
+        for <kvm@vger.kernel.org>; Mon, 15 Sep 2025 14:54:58 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=grsecurity.net; s=grsec; t=1757973295; x=1758578095; darn=vger.kernel.org;
+        d=grsecurity.net; s=grsec; t=1757973298; x=1758578098; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=osV/NIjrIH3bFRop0adAnSBkm9yQEHuI7nZrGLeMdNc=;
-        b=T1eNs8Q7syESm4E7LXYAUhZ1OKSQSWJH3JEamLOrvdZWGh41jETIHd70wlUXvj+c8L
-         c6CR5geUh86iCPVwnLzI1NpHJ4lInNmce3iUfdXh8qnBu4Hc2MtVxZgylxlAXuDRybSm
-         oI6tntaUrKTmTT121/ykQY0C5kRlQVKfdo9Hpdjub4bT8qIwmETgw53l7vXLqM21/nsq
-         VoW5g+rztu8t/P3X98qlqdxCCupy93nZw8QSnlNW6YXOxXnRL6i+2a0OVe+RNZH+oS5E
-         uk6HUkAGilsQ7FVl939NbLaqUiE4f3BaPN9eoc5dlM2UAnuWWItrWADc0JWJaZLXdp4y
-         mxLg==
+        bh=89dl8JzAtkZ/mNSRMgjqLcxEDRNkD5DRSw13EhLsQUs=;
+        b=jCQ9pax1p+8GoCEhnpQPjAkSWkKccJbrouvzepAQZn0nZnn725vVedN2oC2NR6Rs98
+         rfaobUpfos0arwUk0Aink0zKWbEeU13qkfm9BpJGh7MNgna9WwaR/pFcmpTsnFSyVytG
+         aKAtxVgvIBGlcWD7AD5FTH/t1HZuNNE0D+EuxNa9RiQrBEL6bj6C3+B4RYD2L448ArF/
+         jN97JHWiYS1MWiW76R/W9YNyb5UdA/HqWoA8d4ktFkRRh6CZW7mbBf4s4Rxts8zUYYYm
+         ds8sSaj85hV9U58cJC0QM3dcgyYxeEkaaXc2auUurjMygDKC3bkUylLoAMLJOarpqfYz
+         U65A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1757973295; x=1758578095;
+        d=1e100.net; s=20230601; t=1757973298; x=1758578098;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=osV/NIjrIH3bFRop0adAnSBkm9yQEHuI7nZrGLeMdNc=;
-        b=WshwsuAGzNGlktj3CUW6kYun95T5C+zBHkOe7ufKu4zbuPhaJLAjmgQBz/PcxGwfZv
-         5H4gBFkOl0ZlZY7A52EqtGqGFe2ADn20gM7TZLWXK3BOteCjc5jc604gwqMBX3F/8Ody
-         5pV/jRn1gPMQDkGHA2xvxIFR8eHIpRHHv+Z1pwLqvYoFPM/xzkPOpgrgxOy0MMdRcz6r
-         T+EWjCU/mX61dJgMWRKgxL0GY3wGSOPApEApUqC+AT8GegnvUfq866Xp9mueXZufJjta
-         h39yayCyNTDz2P6dzIQ0s5LkbnNLF/e+ARyYjc2pu6T/D/0o8D5DkaI2Dj6NAd3WcDIv
-         5tDg==
-X-Gm-Message-State: AOJu0YxA/UFPCfjSgxUZ3HATKa5JIHcca30N86/r2v29rPkscnT98jD7
-	QrhYwPa62YKN9E6h2SCpL26r+QeksZqdwbUpOOYT7z5k8BSeK3O+DIMgz7cK7DYK1Is=
-X-Gm-Gg: ASbGncu5nwbrQeLMkx4MS6gT+2GCu1skx+5u3KhxbbUMnCrBYZZkv2lzAjfVvW/pC+S
-	UXJJB4NM5aGBQT0RDaYNuXjK+SjXEwBEH5Wd9WHHFCLtXUB02CqB4e7FFNgyACZjtnukt32S1+F
-	8NV699qqIvk20ayK9n/2UgKUwqdgk6JlRrH5ujqlEUe+j7Is1sskHsde7GvPO7JHSr6sbT5vJd9
-	+/cS33A/P/PNcyZncmdRctyV0x+5JG1LaecNXIcMzUsPZtKgN+WP5T1czhmdSyueghzs1H3r4dR
-	ErIgjK9pTE+fNSxMTKpcZq9+gdjvBcRJTUMZHVVvpPEf7Yk6Xux4tfGGb7Js876lEOLCcIA8enR
-	Q5KH9s8ohBbUHPN7+n7uMZvyBJ7M/GZ+eSA8Pf6J/rZqTWoWONtiJZjnMs6KaXZd/eVymEQ0PZ2
-	LLxsyrvq+5hLcS14wDpuCCVBj1QfbR
-X-Google-Smtp-Source: AGHT+IHFw5J+yWr+E/blgWAggycz6gvE13byABTAUgHBbzCSHqYp1RjFAsQBSWhl5BL4Ce51buVRAQ==
-X-Received: by 2002:a05:6214:1d23:b0:743:15ff:94dc with SMTP id 6a1803df08f44-767bb4acc69mr166749496d6.7.1757973295050;
-        Mon, 15 Sep 2025 14:54:55 -0700 (PDT)
+        bh=89dl8JzAtkZ/mNSRMgjqLcxEDRNkD5DRSw13EhLsQUs=;
+        b=hEDOzcRoM4BP0kl+WR8UltQ/I08g38ya388nkmVLqS4xEQWNQStTrN+z2U9jd4dU6x
+         r0SvdArUDGrecJaO4xVVUmqeaQKuxRJoKLy9gDEBnS7aThjCUPo64yRNtYoS86+2Ei5u
+         BpnVleFarK7dUdL5qFpPES2awJdJVKES9cfNItEN5F6KhYCb7q+987Lc4J66aDTOv4Hz
+         P2Mi74R7mDtrXhYs4dly0IiKDurIKQBvisbBvXh7581NEZm90st2kg89A00l3Cue/176
+         UYKqiWAbM05iRnEq+G1mKC0vpvNvWzVunUb/sU2HrLoKoLiNWqnQY2VnYwH7Yj7Eju5k
+         2/gg==
+X-Gm-Message-State: AOJu0YwteKWTGGF4G3WRAlCzhjR1dEi2VhunH1O34EwcjfEBTQa1jV2J
+	mRu9kbtXHgTMXTIdcbaoL/ofuHmSHtFYoaEZ7XjUbA08L3vJdb0zJ/HNl4EbZuX5FT8=
+X-Gm-Gg: ASbGncsS/8O/VS6s0lZMtZRHPXHaOcK8gZaKp7jIzHOGi9p4YBX80zdRJ7megTvXmxq
+	cPthsRSKB3T7Ti+rFXf9kJ4FDRJi6ZuetEkOqmI83Jxez2mnTT9Tl28+3gsepQUIfgia1Nr/mzp
+	dtyZv3SuEOoIe1ZSz3MpPctkHFyO+oTJ13wCrznQpy5a1x5fumcI+KP0BSImnnHx+SMrdWdX1sz
+	ftiGO54icy3Z0Qk2A/Ckxx3Mlr0HTwDcvDSePyvFfIrMAnmIzAUMjQLU8GyxRJJrygRB2Kx2Lit
+	qfA7x5z8h4HvgIgZvwTjI3svHmeJGdgYNr77DycPECKitGNjsY5pVsg8O6inJ7Zt8wWhv74bUVP
+	kIZpjJ2szELr2ZFCx9ZpfjFReOara0a2EdELRNASiH0Zs/SPgGbCk33fxpBJt/Lhqe8dqg94MtM
+	Lwv3lYY6OY22dQ5rs0/o/H03xAajIr
+X-Google-Smtp-Source: AGHT+IHUQeSFbd5uMK2kqS+/fPHkKVOSrTvADLumpaByKCM49cbxczNpu9T8V9R7sDVfxCx22JSMZQ==
+X-Received: by 2002:a05:6214:5009:b0:780:600d:b93a with SMTP id 6a1803df08f44-780600dbc1bmr63952606d6.41.1757973297685;
+        Mon, 15 Sep 2025 14:54:57 -0700 (PDT)
 Received: from bell.fritz.box (p200300faaf00da008e63e663d61a1504.dip0.t-ipconnect.de. [2003:fa:af00:da00:8e63:e663:d61a:1504])
-        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-783edc88db3sm25104796d6.66.2025.09.15.14.54.52
+        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-783edc88db3sm25104796d6.66.2025.09.15.14.54.55
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 15 Sep 2025 14:54:54 -0700 (PDT)
+        Mon, 15 Sep 2025 14:54:57 -0700 (PDT)
 From: Mathias Krause <minipli@grsecurity.net>
 To: Andrew Jones <andrew.jones@linux.dev>,
 	Alexandru Elisei <alexandru.elisei@arm.com>,
@@ -82,9 +82,9 @@ To: Andrew Jones <andrew.jones@linux.dev>,
 Cc: kvm@vger.kernel.org,
 	kvmarm@lists.linux.dev,
 	Mathias Krause <minipli@grsecurity.net>
-Subject: [kvm-unit-tests PATCH v2 3/4] arm64: Better backtraces for leaf functions
-Date: Mon, 15 Sep 2025 23:54:31 +0200
-Message-ID: <20250915215432.362444-4-minipli@grsecurity.net>
+Subject: [kvm-unit-tests PATCH v2 4/4] arm: Fix backtraces involving leaf functions
+Date: Mon, 15 Sep 2025 23:54:32 +0200
+Message-ID: <20250915215432.362444-5-minipli@grsecurity.net>
 X-Mailer: git-send-email 2.47.3
 In-Reply-To: <20250915215432.362444-1-minipli@grsecurity.net>
 References: <20250915215432.362444-1-minipli@grsecurity.net>
@@ -96,33 +96,87 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Similar to x86 before, ARM64 skips the stack frame setup for leaf
-functions, making backtraces miss frames.
+When backtracing starts in a leaf function, it'll cause the code to go
+off the rials as the stack frame for leaf functions is incomplete -- it
+lacks the return address, likely just causing recursive exception
+handling by trying to follow an invalid pointer chain.
 
-Fortunately, gcc supports forcing generating stack frames for these via
--mno-omit-leaf-frame-pointer.
+Unfortunately, -mno-omit-leaf-frame-pointer isn't supported for the ARM
+target as an easy fix. Make use of -mapcs-frame instead to force the
+generation of an APCS stack frame layout[1] that can be traversed
+reliably.
 
+As Clang doesn't support -mapcs-frame, make the stack walking code
+handle this by using the (old) more compact standard format as a
+fall-back.
+
+Link: https://developer.arm.com/documentation/dui0041/c/ARM-Procedure-Call-Standard/APCS-definition/The-stack-backtrace-data-structure [1]
 Signed-off-by: Mathias Krause <minipli@grsecurity.net>
----
- arm/Makefile.arm64 | 6 ++++++
- 1 file changed, 6 insertions(+)
 
-diff --git a/arm/Makefile.arm64 b/arm/Makefile.arm64
-index bf7ea2a36d3a..a40c830df20f 100644
---- a/arm/Makefile.arm64
-+++ b/arm/Makefile.arm64
-@@ -67,5 +67,11 @@ tests += $(TEST_DIR)/mte.$(exe)
+---
+I failed to build KUT with Clang for ARM for various reasons, the code
+is clearly lacking Clang support for ARM, so I doubt this fall-back will
+be needed / used anytime soon.
+
+ arm/Makefile.arm |  8 ++++++++
+ lib/arm/stack.c  | 18 ++++++++++++++++--
+ 2 files changed, 24 insertions(+), 2 deletions(-)
+
+diff --git a/arm/Makefile.arm b/arm/Makefile.arm
+index d6250b7fb686..7734e17fe583 100644
+--- a/arm/Makefile.arm
++++ b/arm/Makefile.arm
+@@ -39,4 +39,12 @@ tests =
  
  include $(SRCDIR)/$(TEST_DIR)/Makefile.common
  
 +ifneq ($(KEEP_FRAME_POINTER),)
-+# Force the generation of a regular stack frame even for leaf functions to make
-+# stack walking reliable.
-+LATE_CFLAGS += $(call cc-option, -mno-omit-leaf-frame-pointer, "")
++# Force the generation of an APCS stack frame layout to be able to reliably
++# walk the stack. Otherwise the compiler may omit saving LR on the stack for
++# leaf functions and, unfortunately, -mno-omit-leaf-frame-pointer isn't
++# supported on ARM :(
++LATE_CFLAGS += $(call cc-option, -mapcs-frame -DAPCS_FRAMES, "")
 +endif
 +
  arch_clean: arm_clean
- 	$(RM) lib/arm64/.*.d
+diff --git a/lib/arm/stack.c b/lib/arm/stack.c
+index 66d18b47ea53..b2384d8eb4c1 100644
+--- a/lib/arm/stack.c
++++ b/lib/arm/stack.c
+@@ -8,6 +8,20 @@
+ #include <libcflat.h>
+ #include <stack.h>
+ 
++/*
++ * APCS stack frames are generated by code like this:
++ * | mov  ip, sp
++ * | push {..., fp, ip, lr, pc}
++ * | sub  fp, ip, #4
++ */
++#ifdef APCS_FRAMES
++# define FP_IDX -3
++# define LR_IDX -1
++#else
++# define FP_IDX -1
++# define LR_IDX 0
++#endif
++
+ int arch_backtrace_frame(const void *frame, const void **return_addrs,
+ 			 int max_depth, bool current_frame)
+ {
+@@ -27,10 +41,10 @@ int arch_backtrace_frame(const void *frame, const void **return_addrs,
+ 	for (depth = 0; depth < max_depth; depth++) {
+ 		if (!fp)
+ 			break;
+-		return_addrs[depth] = (void *)fp[0];
++		return_addrs[depth] = (void *)fp[LR_IDX];
+ 		if (return_addrs[depth] == 0)
+ 			break;
+-		fp = (unsigned long *)fp[-1];
++		fp = (unsigned long *)fp[FP_IDX];
+ 	}
+ 
+ 	walking = 0;
 -- 
 2.47.3
 
