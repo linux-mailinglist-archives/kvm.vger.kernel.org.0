@@ -1,125 +1,118 @@
-Return-Path: <kvm+bounces-57608-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-57609-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 01239B58427
-	for <lists+kvm@lfdr.de>; Mon, 15 Sep 2025 19:57:42 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 79FBBB58428
+	for <lists+kvm@lfdr.de>; Mon, 15 Sep 2025 19:57:50 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id EE2012A4DD2
-	for <lists+kvm@lfdr.de>; Mon, 15 Sep 2025 17:57:10 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id B43C57ACB61
+	for <lists+kvm@lfdr.de>; Mon, 15 Sep 2025 17:56:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 53BE22D0C96;
-	Mon, 15 Sep 2025 17:56:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A2FBE2BD016;
+	Mon, 15 Sep 2025 17:57:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=zytor.com header.i=@zytor.com header.b="U39t6xhs"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="IswcfCo/"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail.zytor.com (terminus.zytor.com [198.137.202.136])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-lf1-f54.google.com (mail-lf1-f54.google.com [209.85.167.54])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D749D2BD00C;
-	Mon, 15 Sep 2025 17:56:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.136
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2621627442
+	for <kvm@vger.kernel.org>; Mon, 15 Sep 2025 17:57:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.54
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757958995; cv=none; b=GEY3ZmLbYKltJJaQawHt2y61gqp60Z2dNV1doynQ2HCpmtXdLuV1V3FToxyrH2QQdEPUoHuT5E366wLebn7P8EukL9KF/7lF9pwG85+nF1mXuBpLMe7REqbAv1pQjWQs/885DJnH/IirBxpmGJ8etRnyDnfSGc7WQ47hZNh/Cxk=
+	t=1757959061; cv=none; b=YG4q540dNeRJBwAKKW9Fe89mqlzInaQINoiD10P6zPTWJtMVkPyn0fXb1pjHz6n/asxR8mo1IGMVURpGBRF66XFEQUDZ7fjR7O3rzsyMS68Ooxhl+fQWKhPym75rkh3+l/FwkJavtOJ2IQW3MtWDBtUVxP7ToeUrjgDI7yjKC/I=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757958995; c=relaxed/simple;
-	bh=ys9yFrUqRDFjGI25D/xWgiKE58S54Np6C3gjAwS5gyM=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=ArDIpC5LgL9XUJEx9HoCAFcfyreY+qCxJNgvTt3BOphSIjq1vL+++rUXKCBXekT2jpbdp2IEzMgzYHcdM19nvGXQYw1uGUWSkXhsvpVku5x6ceyTC5S/YuoO/d58TuSkno9YXuLdCZVZPS2yNz42HcGyyqvVYAvszVdmbEkvSxw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=zytor.com; spf=pass smtp.mailfrom=zytor.com; dkim=pass (2048-bit key) header.d=zytor.com header.i=@zytor.com header.b=U39t6xhs; arc=none smtp.client-ip=198.137.202.136
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=zytor.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=zytor.com
-Received: from [0.0.0.0] ([134.134.137.72])
-	(authenticated bits=0)
-	by mail.zytor.com (8.18.1/8.17.1) with ESMTPSA id 58FHuPQl2837407
-	(version=TLSv1.3 cipher=TLS_AES_128_GCM_SHA256 bits=128 verify=NO);
-	Mon, 15 Sep 2025 10:56:26 -0700
-DKIM-Filter: OpenDKIM Filter v2.11.0 mail.zytor.com 58FHuPQl2837407
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=zytor.com;
-	s=2025082201; t=1757958987;
-	bh=Oe9Eq2/Y/r/f3awg69ruaTqQHiTD0zSvvxuMrExYmx4=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=U39t6xhs1sGju6RhmTzxmSKgITB7HlWkduIqaz3KFpwbK3g14MvBdjtxzcySTgDuS
-	 JjEMktPgnoCKf4ZorfxfpmO+Z4YsF1w/JzEaqbV/ICN9/DnsADJIqJgy+7SLBnP8uZ
-	 pUFQMhMB0Cf/2WF7ikAA+mwa5ZkG4YjztDt3/M0vNS6yVtIcFF2jLSi9g7DGeHTL2l
-	 jAiI0vTAIcGnjnMB9YXspTk1fS4/ExoJ5bTNp7FQp+0EqVFcoA81As5xCYXUcq+iY5
-	 omdWPdr1P1sZWzcZbvfWuk/Q67BiEZJhVDoFTrX043IX0KrsZGOw4NHtTb+esNH3jI
-	 RDwKRZCCF464w==
-Message-ID: <c6d81bac-8540-493d-8edd-18f5d52cf7ff@zytor.com>
-Date: Mon, 15 Sep 2025 10:56:20 -0700
+	s=arc-20240116; t=1757959061; c=relaxed/simple;
+	bh=e8KM16YH2muI1EfRuct8dQc9N+MXODzWZiWrNVYNekw=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=rxCq5Q2iZY0R3v3oaehheuKsGR8xpzDzaDG/0RjThJV34uLhESaKoWtY2rS5U5CQyw/igHC9BTi1lIvaIMbQancWtgdWY69VxPG+9cjIWuVD3AsDj93C27ldJl8PQ9oJ5ehcgVOcQme7gfoCjxyQrFRBY6jj5SgqqVPyKaDfPN0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=IswcfCo/; arc=none smtp.client-ip=209.85.167.54
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-lf1-f54.google.com with SMTP id 2adb3069b0e04-55f6f434c96so5079529e87.2
+        for <kvm@vger.kernel.org>; Mon, 15 Sep 2025 10:57:39 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1757959058; x=1758563858; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=4g5EqZH2g7Gd2bpnH6sjBqOWSmyCjDfXt5XJiq7SJuE=;
+        b=IswcfCo/5CP2HoqUHgUpBMfRNWCla+5spKh19BH7FfTlpBrc0kpWxtDWO0rq/sz6kK
+         J8tjHU4BSBf5R+tDsPKDN78slYuq9d+kkQA/YbzurxTVU6dnipLQrfLtq5JJn219pabp
+         ZtMDzuRfbJiL226330u9AwJJqoOI6xbUjebeS+6ewulpslXmvPqbNEvmtTZNxkqutEN6
+         wkSXTqi6FBHzipEQ9MVBP5638i8lLppqOh6pQbi/2KT6zg7FjxWLztY7PPJ0w8toyXd4
+         w6xFz9i/f8hckAi4TqanjKNspi1YGEGHaSka4t/IHpgrTqN+7IUwV1h2zVhtmVDXfnIa
+         6xVg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1757959058; x=1758563858;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=4g5EqZH2g7Gd2bpnH6sjBqOWSmyCjDfXt5XJiq7SJuE=;
+        b=RzbE0OzGddMnZB+U4CtZq5/6bwgDeKrMPVdJmPScaOce1/1jTOcG/NCJx+I+KnzWqi
+         hndZzVXrlTpE1vf2pidTobfZIRUGLF/YAuI+1xZApHfK9AjZowvf8u7c89RUzSmmu1Ra
+         /XvtJ9EPgr7/jMwjS0L5rannQQdRCeGbUSdvL/oRwKCZAqK3KAoEFr/9Zt97DReX1hKE
+         8we4BK8DeiztYAJXIEv6Dh0zuyxP6jClDIBJgmwiWwtx26KJW4QkU93M8O0WjqrIcEw7
+         gJ9868ThyyH+KsS23a7Hdz4U7HXyPoz67j/cH9/ABcKQhtgnulsTcgwAuyBgFbKqsmji
+         4CHA==
+X-Forwarded-Encrypted: i=1; AJvYcCXHWm1JxugbLTCvdiPjtqVBih3aQkbJEgULVsHdb5q2YYZFFc7lhXP5SKPWQ/804nr3Thk=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyyXYOHvxX78lUGf63Ot0YytNlZScNwGqlNRnHSzq0Wz/dDWF3O
+	3CmNHiBiT1Ecffm9pDIwqmlSdq27B2YPNKwvTzLO8OHmwK8bF2Gv3Mp3RXYic4JUsT/br2qfHPo
+	SB4IsOfRuBfZ4BMUlezV/49Qqcn9UEeaZlUBrhq/n
+X-Gm-Gg: ASbGncueSGBmNAuis1MLy8fuPVbVoiBPuuDlPAM3fUQ8GicdzLvQljsZGaFTl4SAzPo
+	8I6KxGaiNd3MAReugtO0TJ8olrHcPQOo5e2tsm3CD3dxt86YXS4iiyfdGut+JbXLK300ZWWxmvu
+	sGbG3wby9pHdOxKRFn5s+1WIvvStEN8XT9oEaxWvA4xQUS4enSU48PVT37MSwq8J+orHrzCluob
+	c0J/PVDEooYjA==
+X-Google-Smtp-Source: AGHT+IG7XuBOUF99pOsMzTEmuY+onO9zVaYoMU8lx7aRfbHGZI3ou7Ry7xA6KJQtNMG/3bvg8VLvzDwKkW7TyUfprHM=
+X-Received: by 2002:a05:651c:2112:b0:336:80e3:b1aa with SMTP id
+ 38308e7fff4ca-35140ba5748mr38215271fa.40.1757959057855; Mon, 15 Sep 2025
+ 10:57:37 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v15 25/41] KVM: x86: SVM: Emulate reads and writes to
- shadow stack MSRs
-To: Sean Christopherson <seanjc@google.com>,
-        Paolo Bonzini <pbonzini@redhat.com>
-Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Tom Lendacky <thomas.lendacky@amd.com>,
-        Mathias Krause <minipli@grsecurity.net>,
-        John Allen <john.allen@amd.com>,
-        Rick Edgecombe <rick.p.edgecombe@intel.com>,
-        Chao Gao <chao.gao@intel.com>, Maxim Levitsky <mlevitsk@redhat.com>,
-        Xiaoyao Li <xiaoyao.li@intel.com>
-References: <20250912232319.429659-1-seanjc@google.com>
- <20250912232319.429659-26-seanjc@google.com>
-Content-Language: en-US
-From: Xin Li <xin@zytor.com>
-Autocrypt: addr=xin@zytor.com; keydata=
- xsDNBGUPz1cBDACS/9yOJGojBFPxFt0OfTWuMl0uSgpwk37uRrFPTTLw4BaxhlFL0bjs6q+0
- 2OfG34R+a0ZCuj5c9vggUMoOLdDyA7yPVAJU0OX6lqpg6z/kyQg3t4jvajG6aCgwSDx5Kzg5
- Rj3AXl8k2wb0jdqRB4RvaOPFiHNGgXCs5Pkux/qr0laeFIpzMKMootGa4kfURgPhRzUaM1vy
- bsMsL8vpJtGUmitrSqe5dVNBH00whLtPFM7IbzKURPUOkRRiusFAsw0a1ztCgoFczq6VfAVu
- raTye0L/VXwZd+aGi401V2tLsAHxxckRi9p3mc0jExPc60joK+aZPy6amwSCy5kAJ/AboYtY
- VmKIGKx1yx8POy6m+1lZ8C0q9b8eJ8kWPAR78PgT37FQWKYS1uAroG2wLdK7FiIEpPhCD+zH
- wlslo2ETbdKjrLIPNehQCOWrT32k8vFNEMLP5G/mmjfNj5sEf3IOKgMTMVl9AFjsINLHcxEQ
- 6T8nGbX/n3msP6A36FDfdSEAEQEAAc0WWGluIExpIDx4aW5Aenl0b3IuY29tPsLBDQQTAQgA
- NxYhBIUq/WFSDTiOvUIqv2u9DlcdrjdRBQJlD89XBQkFo5qAAhsDBAsJCAcFFQgJCgsFFgID
- AQAACgkQa70OVx2uN1HUpgv/cM2fsFCQodLArMTX5nt9yqAWgA5t1srri6EgS8W3F+3Kitge
- tYTBKu6j5BXuXaX3vyfCm+zajDJN77JHuYnpcKKr13VcZi1Swv6Jx1u0II8DOmoDYLb1Q2ZW
- v83W55fOWJ2g72x/UjVJBQ0sVjAngazU3ckc0TeNQlkcpSVGa/qBIHLfZraWtdrNAQT4A1fa
- sWGuJrChBFhtKbYXbUCu9AoYmmbQnsx2EWoJy3h7OjtfFapJbPZql+no5AJ3Mk9eE5oWyLH+
- QWqtOeJM7kKvn/dBudokFSNhDUw06e7EoVPSJyUIMbYtUO7g2+Atu44G/EPP0yV0J4lRO6EA
- wYRXff7+I1jIWEHpj5EFVYO6SmBg7zF2illHEW31JAPtdDLDHYcZDfS41caEKOQIPsdzQkaQ
- oW2hchcjcMPAfyhhRzUpVHLPxLCetP8vrVhTvnaZUo0xaVYb3+wjP+D5j/3+hwblu2agPsaE
- vgVbZ8Fx3TUxUPCAdr/p73DGg57oHjgezsDNBGUPz1gBDAD4Mg7hMFRQqlzotcNSxatlAQNL
- MadLfUTFz8wUUa21LPLrHBkUwm8RujehJrzcVbPYwPXIO0uyL/F///CogMNx7Iwo6by43KOy
- g89wVFhyy237EY76j1lVfLzcMYmjBoTH95fJC/lVb5Whxil6KjSN/R/y3jfG1dPXfwAuZ/4N
- cMoOslWkfZKJeEut5aZTRepKKF54T5r49H9F7OFLyxrC/uI9UDttWqMxcWyCkHh0v1Di8176
- jjYRNTrGEfYfGxSp+3jYL3PoNceIMkqM9haXjjGl0W1B4BidK1LVYBNov0rTEzyr0a1riUrp
- Qk+6z/LHxCM9lFFXnqH7KWeToTOPQebD2B/Ah5CZlft41i8L6LOF/LCuDBuYlu/fI2nuCc8d
- m4wwtkou1Y/kIwbEsE/6RQwRXUZhzO6llfoN96Fczr/RwvPIK5SVMixqWq4QGFAyK0m/1ap4
- bhIRrdCLVQcgU4glo17vqfEaRcTW5SgX+pGs4KIPPBE5J/ABD6pBnUUAEQEAAcLA/AQYAQgA
- JhYhBIUq/WFSDTiOvUIqv2u9DlcdrjdRBQJlD89ZBQkFo5qAAhsMAAoJEGu9DlcdrjdR4C0L
- /RcjolEjoZW8VsyxWtXazQPnaRvzZ4vhmGOsCPr2BPtMlSwDzTlri8BBG1/3t/DNK4JLuwEj
- OAIE3fkkm+UG4Kjud6aNeraDI52DRVCSx6xff3bjmJsJJMb12mWglN6LjdF6K+PE+OTJUh2F
- dOhslN5C2kgl0dvUuevwMgQF3IljLmi/6APKYJHjkJpu1E6luZec/lRbetHuNFtbh3xgFIJx
- 2RpgVDP4xB3f8r0I+y6ua+p7fgOjDLyoFjubRGed0Be45JJQEn7A3CSb6Xu7NYobnxfkwAGZ
- Q81a2XtvNS7Aj6NWVoOQB5KbM4yosO5+Me1V1SkX2jlnn26JPEvbV3KRFcwV5RnDxm4OQTSk
- PYbAkjBbm+tuJ/Sm+5Yp5T/BnKz21FoCS8uvTiziHj2H7Cuekn6F8EYhegONm+RVg3vikOpn
- gao85i4HwQTK9/D1wgJIQkdwWXVMZ6q/OALaBp82vQ2U9sjTyFXgDjglgh00VRAHP7u1Rcu4
- l75w1xInsg==
-In-Reply-To: <20250912232319.429659-26-seanjc@google.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+References: <20250724213130.3374922-1-dmatlack@google.com>
+In-Reply-To: <20250724213130.3374922-1-dmatlack@google.com>
+From: David Matlack <dmatlack@google.com>
+Date: Mon, 15 Sep 2025 10:57:10 -0700
+X-Gm-Features: Ac12FXz0ngQllsFkcY9Lb9qtH-WfMt8gI_Pux-WPgE-EKqIoqUpZI15M5XAT0NU
+Message-ID: <CALzav=c0Wgcc60_dGJuYffS3f3vD9mpdSjFguaE00L1Zr-YcbA@mail.gmail.com>
+Subject: Re: [PATCH v2 0/2] KVM: selftests: Use $(SRCARCH) and share
+ definition with top-level Makefile
+To: Paolo Bonzini <pbonzini@redhat.com>
+Cc: Albert Ou <aou@eecs.berkeley.edu>, Alexandre Ghiti <alex@ghiti.fr>, kvm@vger.kernel.org, 
+	linux-riscv@lists.infradead.org, 
+	Muhammad Usama Anjum <usama.anjum@collabora.com>, Palmer Dabbelt <palmer@dabbelt.com>, 
+	Paul Walmsley <paul.walmsley@sifive.com>, Sean Christopherson <seanjc@google.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On 9/12/2025 4:23 PM, Sean Christopherson wrote:
-> From: John Allen <john.allen@amd.com>
-> 
-> Emulate shadow stack MSR access by reading and writing to the
-> corresponding fields in the VMCB.
-> 
-> Signed-off-by: John Allen <john.allen@amd.com>
-> [sean: mark VMCB_CET dirty/clean as appropriate]
-> Signed-off-by: Sean Christopherson <seanjc@google.com>
+On Thu, Jul 24, 2025 at 2:31=E2=80=AFPM David Matlack <dmatlack@google.com>=
+ wrote:
+>
+> This series switches the KVM selftests Makefile to use $(SRCARCH)
+> instead of $(ARCH) to fix a build issue when ARCH=3Dx86_64 is specified o=
+n
+> the command line.
+>
+> v1: https://lore.kernel.org/kvm/20250430224720.1882145-1-dmatlack@google.=
+com/
+>  - Split out the revert of commit 9af04539d474 ("KVM: selftests:
+>    Override ARCH for x86_64 instead of using ARCH_DIR") from the rename
+>    to SRCARCH
+>
+> David Matlack (2):
+>   Revert "KVM: selftests: Override ARCH for x86_64 instead of using
+>     ARCH_DIR"
+>   KVM: selftests: Rename $(ARCH_DIR) to $(SRCARCH)
 
-For the shortlog, shouldn't we use "KVM: SVM:"?
+Gentle ping. Paolo and Sean do you think this could get merged
+upstream at some point?
 
-I don't see any change to common x86 code in this patch.
+Google's kernel build tools unconditionally set ARCH=3Dx86_64 when
+building selftests, which causes the KVM selftests to fail to build.
 
