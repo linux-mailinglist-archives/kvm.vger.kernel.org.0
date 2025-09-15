@@ -1,52 +1,52 @@
-Return-Path: <kvm+bounces-57564-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-57563-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3A4BEB578D7
-	for <lists+kvm@lfdr.de>; Mon, 15 Sep 2025 13:46:55 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id B6CF7B578DF
+	for <lists+kvm@lfdr.de>; Mon, 15 Sep 2025 13:47:16 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C15A51603EB
-	for <lists+kvm@lfdr.de>; Mon, 15 Sep 2025 11:46:40 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 52CC2189F668
+	for <lists+kvm@lfdr.de>; Mon, 15 Sep 2025 11:47:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8507C302CD6;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 84F43302CCD;
 	Mon, 15 Sep 2025 11:45:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="J0Xq/kLB"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="jvGLBjuA"
 X-Original-To: kvm@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F3ED530147D;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F1669301477;
 	Mon, 15 Sep 2025 11:44:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757936700; cv=none; b=Bw7ZDbYNrVZ9pPwsYbne6R+rJPxfjlZiL3j9A4SxVlvKSQKo7k/eNU73dZNfhy+veC+QYWo44avbnzqGt27QF7q0K8EbjWrfhwr+VPUjJtKWs0x/c8LS2K8vqf00Q12SArWnUy8Icr/j3UVJ36jFPmVke3gNhK9YzwMFJ+7WS+o=
+	t=1757936700; cv=none; b=ATGCDPD4gHVnZgNY3QQXgAMNBwwnu2J2UaSJ4sw/8tSqVKS/1SM2fA2qO9ZL7XZ/pqh8d+/lCk4tOAncz9D08FfKR3EoU5LVWLANyuKPAWBz2RhR1pLzhBlDBiUJXUhscSXZ2gCppU8nPppo3dB4icN5LPgfZqeplWE9+YdUJzE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1757936700; c=relaxed/simple;
-	bh=z2QNt9RWN4zT8Ci51cyrFFeAAtDEFGBEVB1qDDNY7qw=;
+	bh=rlIhf/og2ExyGxY1kHGqS1t/0oTPguQPDGveZ54c0AU=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=DdSVp9/bKUBYbx43C8nO6ru6UZeO+t/5RduioXpcE/ZxwBvHf+cyRt/myKhN6DhKlOLERnvm8fD12LLG2z9Hi/oyOAfKnDr4jLLkghrpg2eafrdHgBd2gtMn/f1dWWAfi5ttrR4S983cjyJbIH0ySCF4To8aEBliRUo3AX+1SiM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=J0Xq/kLB; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A8320C4CEF5;
+	 MIME-Version; b=Leu+gzub4J66Y8joWepAXcQs6KFqB1o6grMRawuWV7blibHZ7pPiLwhD99KOWDqzZ/Bex7oO7mjT/74+bhmNaTWAoDjt1spY97FAys85vyfdlCZ5x6fqGlzCW72/Aq0+ZCZYLS8zJRrPy7XE5hxq21NxZUQZi5th7hXRTBE4P0o=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=jvGLBjuA; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id D55D6C4CEFB;
 	Mon, 15 Sep 2025 11:44:59 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=k20201202; t=1757936699;
-	bh=z2QNt9RWN4zT8Ci51cyrFFeAAtDEFGBEVB1qDDNY7qw=;
+	bh=rlIhf/og2ExyGxY1kHGqS1t/0oTPguQPDGveZ54c0AU=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=J0Xq/kLBiiv/ouO4uVwk2aqCB5U6PtbxQWGSwhfhR+MITR5M5Wq0R7ZKw0SqaUFzn
-	 9njR3osRvpNSKnQcUYEvd3Bfw/S3vD9okXHcflEVSGNZj9Tx+JhOpifwu2fg3pawZ5
-	 6OmH1mwxJdzECiGQGuWoRrp1bcXEnIY3iTdf0eBVODRssLICOCBYJTjw5ybTZBXlkx
-	 1kkT+x/CXfbunvRr/DQDYL/zIxVSmtDzdN+2CBAPRT80vqhjoU9IR553zbQ9emcDuz
-	 jUmIaUiEyFM65NyVBy1Hn+e+LAqW1aqLRyZyUKi1xCpVKMzK1yeUFpQXYNEkFf+J1q
-	 YZZ98a5e5JgEA==
+	b=jvGLBjuAY4ldoa501z4Q7tK7T00e8OlKKtR6Hxk+JYaD1dPXLr2U8j65XObmhL5dG
+	 EUj2LqzaltcmdmCBfLBHCftqIS9zcScoydImAngAjGPl81+FoJ4HyF2snpD/ZPD32/
+	 7Yw2h+Qzom58oFu38vCL+gLpg+e3j99KeQ9GRuBmum4KKvgAFoGiZYiUxB7EECsZFb
+	 7eNLsgluQiJBFM7v+fheAEJ97RvIqAV6YehpgohzhuLq4ydsWU63pT+sHlZohBNsN1
+	 EjxhP9JYQlzU8eGcsu73WA3X+n24dXODcI+m+kRuXp63GlOxd2q7tn3xxpu4+61KAB
+	 rCnbJ0xbjDIIw==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.98.2)
 	(envelope-from <maz@kernel.org>)
-	id 1uy7dh-00000006MDw-3r8g;
-	Mon, 15 Sep 2025 11:44:57 +0000
+	id 1uy7di-00000006MDw-0Qmq;
+	Mon, 15 Sep 2025 11:44:58 +0000
 From: Marc Zyngier <maz@kernel.org>
 To: kvmarm@lists.linux.dev,
 	linux-arm-kernel@lists.infradead.org,
@@ -55,9 +55,9 @@ Cc: Joey Gouly <joey.gouly@arm.com>,
 	Suzuki K Poulose <suzuki.poulose@arm.com>,
 	Oliver Upton <oliver.upton@linux.dev>,
 	Zenghui Yu <yuzenghui@huawei.com>
-Subject: [PATCH v2 15/16] KVM: arm64: Populate level on S1PTW SEA injection
-Date: Mon, 15 Sep 2025 12:44:50 +0100
-Message-Id: <20250915114451.660351-16-maz@kernel.org>
+Subject: [PATCH v2 16/16] KVM: arm64: selftest: Expand external_aborts test to look for TTW levels
+Date: Mon, 15 Sep 2025 12:44:51 +0100
+Message-Id: <20250915114451.660351-17-maz@kernel.org>
 X-Mailer: git-send-email 2.39.2
 In-Reply-To: <20250915114451.660351-1-maz@kernel.org>
 References: <20250915114451.660351-1-maz@kernel.org>
@@ -73,69 +73,136 @@ X-SA-Exim-Rcpt-To: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-Our fault injection mechanism is mildly primitive, and doesn't
-really implement the architecture when it comes to reporting
-the level of a failing S1 PTW (we blindly report a SEA outside
-of a PTW).
-
-Now that we can walk the S1 page tables and look for a particular
-IPA in the descriptors, it is pretty easy to improve the SEA
-injection code.
-
-Note that we only do it for AArch64 guests, and that 32bit guests
-are left to their own device (oddly enough, I don't fancy writing
-a 32bit PTW...).
+Add a basic test corrupting a level-2 table entry to check that
+the resulting abort is a SEA on a PTW at level-3.
 
 Signed-off-by: Marc Zyngier <maz@kernel.org>
 ---
- arch/arm64/kvm/inject_fault.c | 27 +++++++++++++++++++++++++--
- 1 file changed, 25 insertions(+), 2 deletions(-)
+ .../selftests/kvm/arm64/external_aborts.c     | 43 +++++++++++++++++++
+ .../selftests/kvm/include/arm64/processor.h   |  1 +
+ .../selftests/kvm/lib/arm64/processor.c       | 13 +++++-
+ 3 files changed, 56 insertions(+), 1 deletion(-)
 
-diff --git a/arch/arm64/kvm/inject_fault.c b/arch/arm64/kvm/inject_fault.c
-index 6745f38b64f9c..dfcd66c655179 100644
---- a/arch/arm64/kvm/inject_fault.c
-+++ b/arch/arm64/kvm/inject_fault.c
-@@ -106,7 +106,30 @@ static void inject_abt64(struct kvm_vcpu *vcpu, bool is_iabt, unsigned long addr
+diff --git a/tools/testing/selftests/kvm/arm64/external_aborts.c b/tools/testing/selftests/kvm/arm64/external_aborts.c
+index 062bf84cced13..acb32d0f27bbe 100644
+--- a/tools/testing/selftests/kvm/arm64/external_aborts.c
++++ b/tools/testing/selftests/kvm/arm64/external_aborts.c
+@@ -250,6 +250,48 @@ static void test_serror(void)
+ 	kvm_vm_free(vm);
+ }
+ 
++static void expect_sea_s1ptw_handler(struct ex_regs *regs)
++{
++	u64 esr = read_sysreg(esr_el1);
++
++
++	GUEST_ASSERT_EQ(regs->pc, expected_abort_pc);
++	GUEST_ASSERT_EQ(ESR_ELx_EC(esr), ESR_ELx_EC_DABT_CUR);
++	GUEST_ASSERT_EQ((esr & ESR_ELx_FSC), ESR_ELx_FSC_SEA_TTW(3));
++
++	GUEST_DONE();
++}
++
++static noinline void test_s1ptw_abort_guest(void)
++{
++	extern char test_s1ptw_abort_insn;
++
++	WRITE_ONCE(expected_abort_pc, (u64)&test_s1ptw_abort_insn);
++
++	asm volatile("test_s1ptw_abort_insn:\n\t"
++		     "ldr x0, [%0]\n\t"
++		     : : "r" (MMIO_ADDR) : "x0", "memory");
++
++	GUEST_FAIL("Load on S1PTW abort should not retire");
++}
++
++static void test_s1ptw_abort(void)
++{
++	struct kvm_vcpu *vcpu;
++	u64 *ptep, bad_pa;
++	struct kvm_vm *vm = vm_create_with_dabt_handler(&vcpu, test_s1ptw_abort_guest,
++							expect_sea_s1ptw_handler);
++
++	ptep = virt_get_pte_hva_at_level(vm, MMIO_ADDR, 2);
++	bad_pa = BIT(vm->pa_bits) - vm->page_size;
++
++	*ptep &= ~GENMASK(47, 12);
++	*ptep |= bad_pa;
++
++	vcpu_run_expect_done(vcpu);
++	kvm_vm_free(vm);
++}
++
+ static void test_serror_emulated_guest(void)
  {
- 	unsigned long cpsr = *vcpu_cpsr(vcpu);
- 	bool is_aarch32 = vcpu_mode_is_32bit(vcpu);
--	u64 esr = 0;
-+	u64 esr = 0, fsc;
-+	int level;
-+
-+	/*
-+	 * If injecting an abort from a failed S1PTW, rewalk the S1 PTs to
-+	 * find the failing level. If we can't find it, assume the error was
-+	 * transient and restart without changing the state.
-+	 */
-+	if (kvm_vcpu_abt_iss1tw(vcpu)) {
-+		u64 hpfar = kvm_vcpu_get_fault_ipa(vcpu);
-+		int ret;
-+
-+		if (hpfar == INVALID_GPA)
-+			return;
-+
-+		ret = __kvm_find_s1_desc_level(vcpu, addr, hpfar, &level);
-+		if (ret)
-+			return;
-+
-+		WARN_ON_ONCE(level < -1 || level > 3);
-+		fsc = ESR_ELx_FSC_SEA_TTW(level);
-+	} else {
-+		fsc = ESR_ELx_FSC_EXTABT;
-+	}
+ 	GUEST_ASSERT(!(read_sysreg(isr_el1) & ISR_EL1_A));
+@@ -327,4 +369,5 @@ int main(void)
+ 	test_serror_masked();
+ 	test_serror_emulated();
+ 	test_mmio_ease();
++	test_s1ptw_abort();
+ }
+diff --git a/tools/testing/selftests/kvm/include/arm64/processor.h b/tools/testing/selftests/kvm/include/arm64/processor.h
+index 255fed769a8a5..e3e916b1d9c4e 100644
+--- a/tools/testing/selftests/kvm/include/arm64/processor.h
++++ b/tools/testing/selftests/kvm/include/arm64/processor.h
+@@ -175,6 +175,7 @@ void vm_install_exception_handler(struct kvm_vm *vm,
+ void vm_install_sync_handler(struct kvm_vm *vm,
+ 		int vector, int ec, handler_fn handler);
  
- 	/* This delight is brought to you by FEAT_DoubleFault2. */
- 	if (effective_sctlr2_ease(vcpu))
-@@ -133,7 +156,7 @@ static void inject_abt64(struct kvm_vcpu *vcpu, bool is_iabt, unsigned long addr
- 	if (!is_iabt)
- 		esr |= ESR_ELx_EC_DABT_LOW << ESR_ELx_EC_SHIFT;
++uint64_t *virt_get_pte_hva_at_level(struct kvm_vm *vm, vm_vaddr_t gva, int level);
+ uint64_t *virt_get_pte_hva(struct kvm_vm *vm, vm_vaddr_t gva);
  
--	esr |= ESR_ELx_FSC_EXTABT;
-+	esr |= fsc;
+ static inline void cpu_relax(void)
+diff --git a/tools/testing/selftests/kvm/lib/arm64/processor.c b/tools/testing/selftests/kvm/lib/arm64/processor.c
+index eb115123d7411..bd7480a93f963 100644
+--- a/tools/testing/selftests/kvm/lib/arm64/processor.c
++++ b/tools/testing/selftests/kvm/lib/arm64/processor.c
+@@ -185,7 +185,7 @@ void virt_arch_pg_map(struct kvm_vm *vm, uint64_t vaddr, uint64_t paddr)
+ 	_virt_pg_map(vm, vaddr, paddr, attr_idx);
+ }
  
- 	vcpu_write_sys_reg(vcpu, addr, exception_far_elx(vcpu));
- 	vcpu_write_sys_reg(vcpu, esr, exception_esr_elx(vcpu));
+-uint64_t *virt_get_pte_hva(struct kvm_vm *vm, vm_vaddr_t gva)
++uint64_t *virt_get_pte_hva_at_level(struct kvm_vm *vm, vm_vaddr_t gva, int level)
+ {
+ 	uint64_t *ptep;
+ 
+@@ -195,17 +195,23 @@ uint64_t *virt_get_pte_hva(struct kvm_vm *vm, vm_vaddr_t gva)
+ 	ptep = addr_gpa2hva(vm, vm->pgd) + pgd_index(vm, gva) * 8;
+ 	if (!ptep)
+ 		goto unmapped_gva;
++	if (level == 0)
++		return ptep;
+ 
+ 	switch (vm->pgtable_levels) {
+ 	case 4:
+ 		ptep = addr_gpa2hva(vm, pte_addr(vm, *ptep)) + pud_index(vm, gva) * 8;
+ 		if (!ptep)
+ 			goto unmapped_gva;
++		if (level == 1)
++			break;
+ 		/* fall through */
+ 	case 3:
+ 		ptep = addr_gpa2hva(vm, pte_addr(vm, *ptep)) + pmd_index(vm, gva) * 8;
+ 		if (!ptep)
+ 			goto unmapped_gva;
++		if (level == 2)
++			break;
+ 		/* fall through */
+ 	case 2:
+ 		ptep = addr_gpa2hva(vm, pte_addr(vm, *ptep)) + pte_index(vm, gva) * 8;
+@@ -223,6 +229,11 @@ uint64_t *virt_get_pte_hva(struct kvm_vm *vm, vm_vaddr_t gva)
+ 	exit(EXIT_FAILURE);
+ }
+ 
++uint64_t *virt_get_pte_hva(struct kvm_vm *vm, vm_vaddr_t gva)
++{
++	return virt_get_pte_hva_at_level(vm, gva, 3);
++}
++
+ vm_paddr_t addr_arch_gva2gpa(struct kvm_vm *vm, vm_vaddr_t gva)
+ {
+ 	uint64_t *ptep = virt_get_pte_hva(vm, gva);
 -- 
 2.39.2
 
