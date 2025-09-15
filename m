@@ -1,103 +1,132 @@
-Return-Path: <kvm+bounces-57536-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-57537-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4D772B576CE
-	for <lists+kvm@lfdr.de>; Mon, 15 Sep 2025 12:42:33 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 2C400B57745
+	for <lists+kvm@lfdr.de>; Mon, 15 Sep 2025 12:55:44 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 155771A23D7D
-	for <lists+kvm@lfdr.de>; Mon, 15 Sep 2025 10:42:36 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 95647189E4A4
+	for <lists+kvm@lfdr.de>; Mon, 15 Sep 2025 10:56:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 528572F39AE;
-	Mon, 15 Sep 2025 10:41:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="FKXB17uS"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2317C2FDC28;
+	Mon, 15 Sep 2025 10:55:33 +0000 (UTC)
 X-Original-To: kvm@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 50EDD2FCC17;
-	Mon, 15 Sep 2025 10:41:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E592F2D77E4;
+	Mon, 15 Sep 2025 10:55:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757932918; cv=none; b=SpWXYBkySYFf1Ck5O4JgLaF1N34q4lnf40C1z3HBINds7OIhAkM4FS7oiHQ47ypcAjrORvFYT8grdaCObADmedCghUUpCFR/8Jwq0WmNBNWkoZfe6xIlNdLPaa1iinuUuGzovuL4jU00btPLf8VC4DP6FT92xroDuOS/yQFqFuU=
+	t=1757933732; cv=none; b=RzpXfDa5KGmbE+MdI254qF6p1xe6c5xn46skCHQ5ESPLm5VV+FeE2fqPAs+4WlBOMiFkPLZRX2uOYCe6RWNrqaloJDAqV91G6jvWTaoY2NoXtk40r4cC0+mJTzyJQnD34oKd7Ih0TVFs35j6h80E28fWyFnWsQlCn3MjiMbp7hg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757932918; c=relaxed/simple;
-	bh=4BjLepU4AwvkrI0d43q0aFDK1GjRHaIm4CkmokzQ9SI=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=T2vINUS+kVK4LHucbCYcX0G9vaYMvYBtDYBij7uYxOdwcBrnLuiYtx4imLDidEItqhWYAUVRUaebS3XPo0JBhW/8dLKhmHUdCJy/UKlC0xWx0YTHgcmfviMm5PF2N0rewxP6oADq/nGNbX2C3ae3aIjzfHP4yv3LLMtGCe8DIZ8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=FKXB17uS; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 91F74C4CEF1;
-	Mon, 15 Sep 2025 10:41:55 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1757932917;
-	bh=4BjLepU4AwvkrI0d43q0aFDK1GjRHaIm4CkmokzQ9SI=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=FKXB17uSwbZe+whIjd4zRzhq1ba+B4tNal7uYCuvuT/S8/7Sn8kRzxjdnJ+gtvsqK
-	 l546xMXwcEVDqPsuJETGL6e77trVb+5Z3GKXvfhYlgO3+s8FHLeRluR7Nr0abCJB7x
-	 /5d7O2U4kYzI0PIxAnvaJ1VLGj0xkcOQRQwVH3vORv+gBgYah0d7Z/JR5a+CMyAd8R
-	 wPV05buDYcw0i+Z4IWXpGg9zVIZxh4Nc9t/JObhE0YSv0Ozc+nZyVH4eSD65CNx4l9
-	 KHyqELQQiCrUtxxg8J7r0lBVLCiLdnTS2c61RWCVThb7jO+wL4FlUs5SCL7zrbEnji
-	 Td6YbrVMt3Rgw==
-Date: Mon, 15 Sep 2025 11:41:52 +0100
-From: Will Deacon <will@kernel.org>
-To: Paul Walmsley <pjw@kernel.org>
-Cc: Atish Patra <atishp@rivosinc.com>, Anup Patel <anup@brainfault.org>,
-	Mark Rutland <mark.rutland@arm.com>,
-	Paul Walmsley <paul.walmsley@sifive.com>,
-	Palmer Dabbelt <palmer@dabbelt.com>,
-	Mayuresh Chitale <mchitale@ventanamicro.com>,
-	linux-riscv@lists.infradead.org,
-	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
-	kvm@vger.kernel.org, kvm-riscv@lists.infradead.org,
-	Sean Christopherson <seanjc@google.com>
-Subject: Re: [PATCH v6 0/8] Add SBI v3.0 PMU enhancements
-Message-ID: <aMftcHLgBvH76erX@willie-the-truck>
-References: <20250909-pmu_event_info-v6-0-d8f80cacb884@rivosinc.com>
- <f740b716-6c8b-46a5-31ae-ecc37e766152@kernel.org>
+	s=arc-20240116; t=1757933732; c=relaxed/simple;
+	bh=b2mf4Z3CF2NmHVs2TZP+YQo6OPUtx5t0zbzVahIcsKk=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=bMSrZkYj2jwWP8a2d/vwsmVtQqlbr4dImrlQVhOWH1o2hdTkKwmWaWm+3HEdK8zCtvikYKQc5N9DsyL+D94P5ljQQ0ms5DvIEjq8wwLTaOmEgYfa9ifV0Rfjaw2pfNoAPpF3PvPHNoFnfvh6Il1zjhCEfdh9/MUDLaWEk3adKVs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 020F21BF7;
+	Mon, 15 Sep 2025 03:55:22 -0700 (PDT)
+Received: from [10.57.5.5] (unknown [10.57.5.5])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id E6C5D3F694;
+	Mon, 15 Sep 2025 03:55:24 -0700 (PDT)
+Message-ID: <bc17ddc9-ed9d-4d51-93f4-784a73036e7c@arm.com>
+Date: Mon, 15 Sep 2025 11:55:22 +0100
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <f740b716-6c8b-46a5-31ae-ecc37e766152@kernel.org>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v10 02/43] arm64: RME: Handle Granule Protection Faults
+ (GPFs)
+To: Catalin Marinas <catalin.marinas@arm.com>
+Cc: kvm@vger.kernel.org, kvmarm@lists.linux.dev, Marc Zyngier
+ <maz@kernel.org>, Will Deacon <will@kernel.org>,
+ James Morse <james.morse@arm.com>, Oliver Upton <oliver.upton@linux.dev>,
+ Suzuki K Poulose <suzuki.poulose@arm.com>, Zenghui Yu
+ <yuzenghui@huawei.com>, linux-arm-kernel@lists.infradead.org,
+ linux-kernel@vger.kernel.org, Joey Gouly <joey.gouly@arm.com>,
+ Alexandru Elisei <alexandru.elisei@arm.com>,
+ Christoffer Dall <christoffer.dall@arm.com>, Fuad Tabba <tabba@google.com>,
+ linux-coco@lists.linux.dev,
+ Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>,
+ Gavin Shan <gshan@redhat.com>, Shanker Donthineni <sdonthineni@nvidia.com>,
+ Alper Gun <alpergun@google.com>, "Aneesh Kumar K . V"
+ <aneesh.kumar@kernel.org>, Emi Kisanuki <fj0570is@fujitsu.com>,
+ Vishal Annapurve <vannapurve@google.com>
+References: <20250820145606.180644-1-steven.price@arm.com>
+ <20250820145606.180644-3-steven.price@arm.com> <aLGRNc5u1EPlCpyb@arm.com>
+From: Steven Price <steven.price@arm.com>
+Content-Language: en-GB
+In-Reply-To: <aLGRNc5u1EPlCpyb@arm.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-On Mon, Sep 15, 2025 at 12:25:52AM -0600, Paul Walmsley wrote:
-> On Tue, 9 Sep 2025, Atish Patra wrote:
+On 29/08/2025 12:38, Catalin Marinas wrote:
+> On Wed, Aug 20, 2025 at 03:55:22PM +0100, Steven Price wrote:
+>> If the host attempts to access granules that have been delegated for use
+>> in a realm these accesses will be caught and will trigger a Granule
+>> Protection Fault (GPF).
+>>
+>> A fault during a page walk signals a bug in the kernel and is handled by
+>> oopsing the kernel. A non-page walk fault could be caused by user space
+>> having access to a page which has been delegated to the kernel and will
+>> trigger a SIGBUS to allow debugging why user space is trying to access a
+>> delegated page.
+>>
+>> Reviewed-by: Suzuki K Poulose <suzuki.poulose@arm.com>
+>> Reviewed-by: Gavin Shan <gshan@redhat.com>
+>> Signed-off-by: Steven Price <steven.price@arm.com>
+>> ---
+>> Changes since v2:
+>>  * Include missing "Granule Protection Fault at level -1"
+>> ---
+>>  arch/arm64/mm/fault.c | 31 +++++++++++++++++++++++++------
+>>  1 file changed, 25 insertions(+), 6 deletions(-)
+>>
+>> diff --git a/arch/arm64/mm/fault.c b/arch/arm64/mm/fault.c
+>> index d816ff44faff..e4237637cd8f 100644
+>> --- a/arch/arm64/mm/fault.c
+>> +++ b/arch/arm64/mm/fault.c
+>> @@ -854,6 +854,25 @@ static int do_tag_check_fault(unsigned long far, unsigned long esr,
+>>  	return 0;
+>>  }
+>>  
+>> +static int do_gpf_ptw(unsigned long far, unsigned long esr, struct pt_regs *regs)
+>> +{
+>> +	const struct fault_info *inf = esr_to_fault_info(esr);
+>> +
+>> +	die_kernel_fault(inf->name, far, esr, regs);
+>> +	return 0;
+>> +}
 > 
-> > SBI v3.0 specification[1] added two new improvements to the PMU chaper.
-> > The SBI v3.0 specification is frozen and under public review phase as
-> > per the RISC-V International guidelines. 
-> > 
-> > 1. Added an additional get_event_info function to query event availablity
-> > in bulk instead of individual SBI calls for each event. This helps in
-> > improving the boot time.
-> > 
-> > 2. Raw event width allowed by the platform is widened to have 56 bits
-> > with RAW event v2 as per new clarification in the priv ISA[2].
-> > 
-> > Apart from implementing these new features, this series improves the gpa
-> > range check in KVM and updates the kvm SBI implementation to SBI v3.0.
-> > 
-> > The opensbi patches have been merged. This series can be found at [3].
-> > 
-> > [1] https://github.com/riscv-non-isa/riscv-sbi-doc/releases/download/v3.0-rc7/riscv-sbi.pdf 
-> > [2] https://github.com/riscv/riscv-isa-manual/issues/1578
-> > [3] https://github.com/atishp04/linux/tree/b4/pmu_event_info_v6
-> > 
-> > Signed-off-by: Atish Patra <atishp@rivosinc.com>
+> This is fine, it's irrelevant whether the fault happened at EL0 or EL1.
 > 
-> For the series:
+>> +static int do_gpf(unsigned long far, unsigned long esr, struct pt_regs *regs)
+>> +{
+>> +	const struct fault_info *inf = esr_to_fault_info(esr);
+>> +
+>> +	if (!is_el1_instruction_abort(esr) && fixup_exception(regs, esr))
+>> +		return 0;
+>> +
+>> +	arm64_notify_die(inf->name, regs, inf->sig, inf->code, far, esr);
+>> +	return 0;
+>> +}
 > 
-> Acked-by: Paul Walmsley <pjw@kernel.org>
+> The end result is somewhat similar but why not just return 1 and avoid
+> the arm64_notify_die() call? Let do_mem_abort() handle the oops vs user
+> signal. With die_kernel_fault() we print the "Unable to handle
+> kernel..." message and some more information.
+> 
 
-I was assuming this series would go via the Risc-V arch tree so please
-shout if you were expecting me to take it via drivers/perf/!
+Yes, that makes sense - something has gone very wrong if the kernel hits
+a GPF but that's no reason not to output a (more) useful message.
 
-Will
+Thanks,
+Steve
 
