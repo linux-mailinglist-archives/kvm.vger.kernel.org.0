@@ -1,190 +1,155 @@
-Return-Path: <kvm+bounces-57507-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-57508-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 071C7B56E75
-	for <lists+kvm@lfdr.de>; Mon, 15 Sep 2025 04:52:09 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 916A9B56FBE
+	for <lists+kvm@lfdr.de>; Mon, 15 Sep 2025 07:34:42 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 5FD441899CD3
-	for <lists+kvm@lfdr.de>; Mon, 15 Sep 2025 02:52:30 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 2A5A6189BAED
+	for <lists+kvm@lfdr.de>; Mon, 15 Sep 2025 05:35:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6E2B8223DD5;
-	Mon, 15 Sep 2025 02:51:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5344F2741C6;
+	Mon, 15 Sep 2025 05:34:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="QHLoIWMf"
+	dkim=pass (2048-bit key) header.d=sifive.com header.i=@sifive.com header.b="QEgbWh2S"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-qv1-f41.google.com (mail-qv1-f41.google.com [209.85.219.41])
+Received: from mail-pf1-f172.google.com (mail-pf1-f172.google.com [209.85.210.172])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EFE321DED5C
-	for <kvm@vger.kernel.org>; Mon, 15 Sep 2025 02:51:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.41
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DE6D24207F
+	for <kvm@vger.kernel.org>; Mon, 15 Sep 2025 05:34:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757904714; cv=none; b=ix/542c8Hd7SYxoA3BbNaNKYoLPfTJC/nOajTygiln/WxADVpuGKPOJs+MWTqx/PyAsQweH0OQPujWM+AkbpdHAvacyjsoKDqgF3TD8hJlFmm1W81rlPeXkHK9ks050S4TvGJNfDDpKUPTg+Fr9hZ148JH36Kf5904KlHdS27cU=
+	t=1757914475; cv=none; b=pUnWFEiuiZH8ffJS/VYCtziHwSjqKZgcLjUfIngt1OqZ4RjRE230C5PPfxIaxAVWaM72zPX4FrjJD0RgITGi/6xDG2/CnkQi9DD5gAsyDjdvj+O4EmC1JCz1vjkhk7BvF3A7tapLpQXDA9mt0lcpqdSfLh2d2zB99Xl5seYUE1c=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757904714; c=relaxed/simple;
-	bh=EHCSfQ2XnebCHi96Y4dD+dNrHULC6WpUjEi9/5mfeAs=;
-	h=MIME-Version:From:Date:Message-ID:Subject:To:Cc:Content-Type; b=dankivrtt8crbfrVOrFmdW4yeneOk0bQOzkXHFIAin2qqxC/vTg+Q4+72xkx6rIUuq7i31+q+dXSuBbbIDI6hHWymNxubW982xISveD4aoY/P7UJBTQEabRlfsmb7diKDs1Le542pVQbSfuYHs/6uujVECx0Fvkpm80OWr0Cq/I=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=QHLoIWMf; arc=none smtp.client-ip=209.85.219.41
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-qv1-f41.google.com with SMTP id 6a1803df08f44-76b8fd4ba2cso19648406d6.3
-        for <kvm@vger.kernel.org>; Sun, 14 Sep 2025 19:51:52 -0700 (PDT)
+	s=arc-20240116; t=1757914475; c=relaxed/simple;
+	bh=1MJFzf4pGz8DgaKAs7CKJL+eWNPRE7XZdof1TjvBwFw=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=MeAmSW/X48EnCr6ikgAdBHjXJz+6p9ivzRzTQq889Qive8TNivuCf2/+c5pJrJgfVlzwjRdGQuHRI1nBZQZhXDWqH/Lq8J2KfmsJhUcHPGKfvbvan+i3IcN8S+fO4TywAEZqo9z8xOr2T2FWPMovvE8CSFgBar2GAURjB3rLK30=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=sifive.com; spf=pass smtp.mailfrom=sifive.com; dkim=pass (2048-bit key) header.d=sifive.com header.i=@sifive.com header.b=QEgbWh2S; arc=none smtp.client-ip=209.85.210.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=sifive.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=sifive.com
+Received: by mail-pf1-f172.google.com with SMTP id d2e1a72fcca58-7726c7ff7e5so2995978b3a.3
+        for <kvm@vger.kernel.org>; Sun, 14 Sep 2025 22:34:33 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1757904712; x=1758509512; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:mime-version:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=EHCSfQ2XnebCHi96Y4dD+dNrHULC6WpUjEi9/5mfeAs=;
-        b=QHLoIWMfVplcun/lEerfYdg/bUv0X5hCUd/1WvfoqWyjD+DD7EByyKr9BIgS2w3tLu
-         cUa3eF/zO1fZQ45n4VsIojB9YAw0fnCzEtFaABgm1r5y2kDFy9VSe15779sgE3n4dj68
-         KxErNSoCdCdNt+2WRZOmVXAGuog9F2z44HJEoKq/qcN5+IzlaN7QU0aVjEmUZNsU8TL8
-         2F/P56uKAj/YcpNocJ8PYz2IjqVaNO5HXe5L1Mt9YB+GuBINAP6KV6UGpN1LhGG5QwkC
-         lWrTgXFGLwbq8JQmyl/t7sHPqGjk0JK84OJq3b8uzWzkcN/lhc8eNONutc3Sc3Rp1/rn
-         /HFA==
+        d=sifive.com; s=google; t=1757914473; x=1758519273; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=HcWOum1mNBViAIuGhSYHqBX6ni4rWoPSQnGJMRFhyRI=;
+        b=QEgbWh2SGvLVQ6+bLS6V0L28fPmCVKNNK/2Td7dLtaGbjDpmryKsaGt7kFbgvyyOSf
+         sA8XlWQrfscz7Zzniatf0LNv51nj6bjLy69KFwvL2WqhuSJeZyqYPPrvCAfv3KKFC9lG
+         1WEcugjX3/OAsT14fzov+ZNdoa7b0nHSdXmOfGWfVdmmczTNAWwsiIIbZdalqfJwZNPs
+         Vo3GRr7uWWzk/Yh4eaqLAHHKjBaeAWMtid0YbLSjJA0p03BZolej73suIWPFdydDpenz
+         fLS4hQUoW+enX77HgWGjBvDxJm9QwnTbwldMyO+9K6CYV+myFDusNtWaPa3dgC7n6yDA
+         8Daw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1757904712; x=1758509512;
-        h=cc:to:subject:message-id:date:from:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=EHCSfQ2XnebCHi96Y4dD+dNrHULC6WpUjEi9/5mfeAs=;
-        b=NwJvm3HoDpziUNeYdXI8ic1PhTjvJDgaQtT7fA7kHiIJ6l0uY/HpVhzEiL6wJe/Ny9
-         WzXAtPbMWdGeQ4Pdr+gWweh2/525gHsRGrGPBAy9UbExIDPDGuJYiyJlZpoHRNMOT0Z1
-         wH6qZ4nuvnTqN5CpDoy4LwE4P8vy+S70TOQK3AZWj3vaDGukHxhcxtQewALd7LKRmV+N
-         dIAMDrzhQ54Yx8mCBfBA5Cmcyq7kuSkoTDwhAL2v59mHGKOW0/i9T5Ygq+RrGKIDqmAZ
-         1Jo3k8h0Bct3El3B8t3epeauZlf+DxRebjMJv+014klw2xNeFh51duVYm981XC/5H1zS
-         lcWw==
-X-Forwarded-Encrypted: i=1; AJvYcCX6Ry0yUuDKyBchy09x3VCThQc0VH/jDAF2oqx6qEIIvODXGCaiWe4dS048lnfgD/zr8gU=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxBvF3FZO+E+0eCIIQoJPzPaMaceuz+mLY9sZ0o4f95k066RfN4
-	jbA99eEUiLZve8021Oz33dnVK+Sop/DsMc/xaHF4luZpmTan9XROdLSilcj7zhe7aUjQhOPNSQK
-	GW7TJagzKQsphmghywSiK3lxCb94jWtU=
-X-Gm-Gg: ASbGncuV2r1hgN+U6vKXjHMQKXbQ1E/hHwgPfJD0UCap02shII5hiTtyoNPuHg2c43M
-	VY2m007VZ5zZyugxc6ot1LhfubX5iiXWXBDjIFOqOJToQPgP7K1sjk3Bd9Q6v0+6sjCz5tJVFCZ
-	Lxs6o8o5w5IqLkKat4+7ajhKPxLeOIHeBoG8w/MCqQoq6SsCkVXjniIqfNhSdVMWh1RoT9lP4+S
-	Y+nFcmQ6C3bfAtYOdd3
-X-Google-Smtp-Source: AGHT+IFP8eaILsH9go5zyLSWkPywDlTf0zFbEuxeMo96jyMKBC6y8FwuOWf/q4q8WZnK3lNGYAepz88m6iC+xXZJxTk=
-X-Received: by 2002:a05:6214:5f81:b0:767:c73e:88d4 with SMTP id
- 6a1803df08f44-767c73e8a77mr124152186d6.8.1757904711760; Sun, 14 Sep 2025
- 19:51:51 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1757914473; x=1758519273;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=HcWOum1mNBViAIuGhSYHqBX6ni4rWoPSQnGJMRFhyRI=;
+        b=xPHJB5NXoJPe+Pwg39saX6am3uvOghvWiK83+OWMqgUzSI2ms/Qj85kc+z3YXeyi2k
+         kKWxMppa5RPFV1vOV8TKClDUMvIvc0FFnovnOdoIt79p7RA76S833yiCW94Uo+A+dzsB
+         dyFXzYnnAPzltb12ehTOLI8HXJrN/bAFmjy83Igkqfl8CAGDtO1gpX8Sh1J4g5MF1mMG
+         ocA48QhO6JzayHNS+KpsC4BDO7cq6+ZZwubfB8+pODtIu9TvxulfT0OGmQyz2NGutN1P
+         CcqnapqZvPspWTihQZY+6lZDnxG+WdgokDLRcwoeFS2dpj/X7tBYczv8QAvey1v2LVOu
+         ZZDQ==
+X-Forwarded-Encrypted: i=1; AJvYcCWgIa4M8YeJO1f6ufKdloefR29dcf7zIDYgR5V9k3FuFgatBtCAJKMOfxuuiTWsObqj3Bw=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzO/K0NZKt2NyXgf1VsGZl5AB9THdzKPCHWT4mq6ukcewE3n63c
+	ycHGd2BZH7d7gL71dqTzt6Bi1K0kvVGnfEfoLBXft7GJ6hfrM51aDRmjkoLSnUaMoOE=
+X-Gm-Gg: ASbGncugoe0o0BacU+zHoQkqThtH/SmSSYBbMV8cQTF93H1GYoURI8D0IzarCHtfJ1Y
+	sqynLSCK45hVciwjw0CO88YT5A9DqOKKEDH//Pw0okbRAUaOfxlHdjni/eAbIZH3++IpXiDmAAa
+	x5nhzQahHzIWy5NNPPW+MST7RtntR9hiMlusH7gySSrb1zvjP7b9dGxupNPK+GkrW1rqkIKCmKQ
+	ln1rOzEzRDQ4EtTEU9prkgL2CO7AAqm4dxLeJnVDooC45FZI9OQtrBsDz2lJI+QSPpOK1lbnUv6
+	ndCtlW3cZ9Yy9nfJg4EEIx/4nndSSQV7phmaaZKa+rdJhB3LVGH1yNdmhHQo/rLQ/FudF/iaZAL
+	BUmk9mgDAUmZd9ZsXUioGY9cNtxijhKM1eNUyKwrT3Pm/+ytG8FozUlY=
+X-Google-Smtp-Source: AGHT+IGjRSvNn9pjamHg0axHO24KuBYdd0ejvKhVmAXCjHWpKLeck8mQqMrFQreoUO1LGLwUqHHLQg==
+X-Received: by 2002:a05:6a21:999a:b0:262:d265:a3c with SMTP id adf61e73a8af0-262d2650de3mr5504416637.32.1757914473069;
+        Sun, 14 Sep 2025 22:34:33 -0700 (PDT)
+Received: from sw06.internal.sifive.com ([4.53.31.132])
+        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-b54a387cc21sm10604151a12.28.2025.09.14.22.34.32
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sun, 14 Sep 2025 22:34:32 -0700 (PDT)
+From: Samuel Holland <samuel.holland@sifive.com>
+To: Anup Patel <anup@brainfault.org>,
+	Atish Patra <atish.patra@linux.dev>,
+	kvm-riscv@lists.infradead.org
+Cc: Samuel Holland <samuel.holland@sifive.com>,
+	Albert Ou <aou@eecs.berkeley.edu>,
+	Alexandre Ghiti <alex@ghiti.fr>,
+	Palmer Dabbelt <palmer@dabbelt.com>,
+	Paul Walmsley <paul.walmsley@sifive.com>,
+	kvm@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	linux-riscv@lists.infradead.org
+Subject: [PATCH] RISC-V: KVM: Fix SBI_FWFT_POINTER_MASKING_PMLEN algorithm
+Date: Sun, 14 Sep 2025 22:34:20 -0700
+Message-ID: <20250915053431.1910941-1-samuel.holland@sifive.com>
+X-Mailer: git-send-email 2.47.2
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: =?UTF-8?B?6ZmI5Y2O5pit?= <lyican53@gmail.com>
-Date: Mon, 15 Sep 2025 10:51:38 +0800
-X-Gm-Features: AS18NWCYV1ejkfb-hhHGxKG9Jq-ZiN_AIhYVPE02h-fdGA1vS5JP9-9rQn3NWAQ
-Message-ID: <CAN53R8HxFvf9fAiF1vacCAdsx+m+Zcv1_vxEiq4CwoHLu17hNg@mail.gmail.com>
-Subject: [RFC] Fix potential undefined behavior in __builtin_clz usage with
- GCC 11.1.0
-To: linux-kernel@vger.kernel.org
-Cc: idryomov@gmail.com, xiubli@redhat.com, ceph-devel@vger.kernel.org, 
-	jejb@linux.ibm.com, martin.petersen@oracle.com, linux-scsi@vger.kernel.org, 
-	pbonzini@redhat.com, seanjc@google.com, kvm@vger.kernel.org, 
-	mturquette@baylibre.com, sboyd@kernel.org, linux-clk@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
 
-Hi all,
+The implementation of SBI_FWFT_POINTER_MASKING_PMLEN from commit
+aa04d131b88b ("RISC-V: KVM: Add support for SBI_FWFT_POINTER_MASKING_PMLEN")
+was based on a draft of the SBI 3.0 specification, and is not compliant
+with the ratified version.
 
-I've identified several instances in the Linux kernel where __builtin_clz()
-is used without proper zero-value checking, which may trigger undefined
-behavior when compiled with GCC 11.1.0 using -march=x86-64-v3 -O1 optimization.
+Update the algorithm to be compliant. Specifically, do not fall back to
+a pointer masking mode with a larger PMLEN if the mode with the
+requested PMLEN is unsupported by the hardware.
 
-PROBLEM DESCRIPTION:
-===================
-
-GCC bug 101175 (https://gcc.gnu.org/bugzilla/show_bug.cgi?id=101175) causes
-__builtin_clz() to generate BSR instructions without proper zero handling when
-compiled with specific optimization flags. The BSR instruction has undefined
-behavior when the source operand is zero, potentially causing incorrect results.
-
-The issue manifests when:
-- GCC version: 11.1.0 (potentially other versions)
-- Compilation flags: -march=x86-64-v3 -O1
-- Code pattern: __builtin_clz(value) where value might be 0
-
-AFFECTED LOCATIONS:
-==================
-
-1. HIGH RISK: net/ceph/crush/mapper.c:265
-Problem: __builtin_clz(x & 0x1FFFF) when (x & 0x1FFFF) could be 0
-Impact: CRUSH hash algorithm corruption in Ceph storage
-
-2. HIGH RISK: drivers/scsi/elx/libefc_sli/sli4.h:3796
-Problem: __builtin_clz(mask) in sli_convert_mask_to_count() with no zero check
-Impact: Incorrect count calculations in SCSI operations
-
-3. HIGH RISK: tools/testing/selftests/kvm/dirty_log_test.c:314
-Problem: Two __builtin_clz() calls without zero validation
-Impact: KVM selftest framework reliability
-
-4. MEDIUM RISK: drivers/clk/clk-versaclock7.c:322
-Problem: __builtin_clzll(den) but prior checks likely prevent den=0
-Impact: Clock driver calculations (lower risk due to existing checks)
-
-COMPARISON WITH SAFE PATTERNS:
-=============================
-
-The kernel already implements safe patterns in many places:
-
-// Safe pattern from include/asm-generic/bitops/builtin-fls.h
-return x ? sizeof(x) * 8 - __builtin_clz(x) : 0;
-
-// Safe pattern from arch/powerpc/lib/sstep.c
-op->val = (val ? __builtin_clz(val) : 32);
-
-PROPOSED FIXES:
-==============
-
-1. net/ceph/crush/mapper.c:
-- int bits = __builtin_clz(x & 0x1FFFF) - 16;
-+ u32 masked = x & 0x1FFFF;
-+ int bits = masked ? __builtin_clz(masked) - 16 : 16;
-
-2. drivers/scsi/elx/libefc_sli/sli4.h:
-if (method) {
-- count = 1 << (31 - __builtin_clz(mask));
-+ count = mask ? 1 << (31 - __builtin_clz(mask)) : 0;
-count *= 16;
-
-3. tools/testing/selftests/kvm/dirty_log_test.c:
-- limit = 1 << (31 - __builtin_clz(pages));
-- test_dirty_ring_count = 1 << (31 - __builtin_clz(test_dirty_ring_count));
-+ limit = pages ? 1 << (31 - __builtin_clz(pages)) : 1;
-+ test_dirty_ring_count = test_dirty_ring_count ?
-+ 1 << (31 - __builtin_clz(test_dirty_ring_count)) : 1;
-
-REPRODUCTION:
-============
-
-Based on the GCC bug report and analysis of the kernel code patterns, this
-issue can be reproduced by:
-
-1. Compiling affected code with: gcc -march=x86-64-v3 -O1
-2. Examining generated assembly for BSR instructions
-3. Triggering code paths where the __builtin_clz argument could be zero
-
-QUESTIONS:
-=========
-
-1. Should I prepare formal patches for each affected subsystem?
-2. Are there other instances I should investigate?
-3. Would adding a kernel-wide safe wrapper for __builtin_clz be appropriate?
-4. Would the maintainers like me to create a proof-of-concept test case?
-
-This analysis is based on static code review and comparison with the known
-GCC bug behavior. Further testing by the respective subsystem maintainers
-would be valuable to confirm the impact.
-
-Best regards,
-Huazhao Chen
-lyican53@gmail.com
-
+Fixes: aa04d131b88b ("RISC-V: KVM: Add support for SBI_FWFT_POINTER_MASKING_PMLEN")
+Signed-off-by: Samuel Holland <samuel.holland@sifive.com>
 ---
+I saw that the RFC version of this patch already made it into
+riscv_kvm_queue, but it needs an update for ratified SBI 3.0. Feel free
+to squash this into the original commit, or I can send a replacement v2
+patch if you prefer.
 
-This analysis affects multiple subsystems and should be addressed to ensure
-deterministic behavior across different GCC versions and optimization levels.
-I'm happy to assist with testing or patch development if the maintainers
-confirm this is indeed an issue worth addressing.
+ arch/riscv/kvm/vcpu_sbi_fwft.c | 17 +++++++++++++----
+ 1 file changed, 13 insertions(+), 4 deletions(-)
+
+diff --git a/arch/riscv/kvm/vcpu_sbi_fwft.c b/arch/riscv/kvm/vcpu_sbi_fwft.c
+index cacb3d4410a54..62cc9c3d57599 100644
+--- a/arch/riscv/kvm/vcpu_sbi_fwft.c
++++ b/arch/riscv/kvm/vcpu_sbi_fwft.c
+@@ -160,14 +160,23 @@ static long kvm_sbi_fwft_set_pointer_masking_pmlen(struct kvm_vcpu *vcpu,
+ 	struct kvm_sbi_fwft *fwft = vcpu_to_fwft(vcpu);
+ 	unsigned long pmm;
+ 
+-	if (value == 0)
++	switch (value) {
++	case 0:
+ 		pmm = ENVCFG_PMM_PMLEN_0;
+-	else if (value <= 7 && fwft->have_vs_pmlen_7)
++		break;
++	case 7:
++		if (!fwft->have_vs_pmlen_7)
++			return SBI_ERR_INVALID_PARAM;
+ 		pmm = ENVCFG_PMM_PMLEN_7;
+-	else if (value <= 16 && fwft->have_vs_pmlen_16)
++		break;
++	case 16:
++		if (!fwft->have_vs_pmlen_16)
++			return SBI_ERR_INVALID_PARAM;
+ 		pmm = ENVCFG_PMM_PMLEN_16;
+-	else
++		break;
++	default:
+ 		return SBI_ERR_INVALID_PARAM;
++	}
+ 
+ 	vcpu->arch.cfg.henvcfg &= ~ENVCFG_PMM;
+ 	vcpu->arch.cfg.henvcfg |= pmm;
+-- 
+2.47.2
+
+base-commit: 7835b892d1d9f52fb61537757aa446fb44984215
+branch: up/kvm-fwft-pmlen
 
