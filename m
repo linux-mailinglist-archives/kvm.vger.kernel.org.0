@@ -1,40 +1,40 @@
-Return-Path: <kvm+bounces-57538-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-57539-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 33E05B5774C
-	for <lists+kvm@lfdr.de>; Mon, 15 Sep 2025 12:57:09 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0D404B57747
+	for <lists+kvm@lfdr.de>; Mon, 15 Sep 2025 12:56:15 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 26FE43A6FD5
-	for <lists+kvm@lfdr.de>; Mon, 15 Sep 2025 10:55:55 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 3153D188A0EB
+	for <lists+kvm@lfdr.de>; Mon, 15 Sep 2025 10:56:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0EAB32FC009;
-	Mon, 15 Sep 2025 10:55:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 17E0F2FF140;
+	Mon, 15 Sep 2025 10:55:44 +0000 (UTC)
 X-Original-To: kvm@vger.kernel.org
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CEAB52FC004;
-	Mon, 15 Sep 2025 10:55:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CEA112FD7AE;
+	Mon, 15 Sep 2025 10:55:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757933738; cv=none; b=RKNd7gQRNQk3+NkwUR1BTFx0T9vvRiEaWIByXDwVXEWUBWBVAh7WfywafxipmHfXoTCIRgXpIG6FMOVHYMkRnLxjwOYovARt0NAve9o7wFokqPHT1rkVjxc7dcVr9AVRWdIU708A/KcOIuzcNl7o2oEt1XJSV4ELJ4D6q5ifo3g=
+	t=1757933743; cv=none; b=PgdDIc8RWgqNFT47Jr113BXdUP5hDjdsickLLOuUqwXde9IouZr7t3bwkpHB+PrbNEGOjopvogSVJBIaixP8c00yGER+mXLXk6gEcavplRRB99d+7ULJ9ZqgU0T6CVU/+ULRPdQVur5CcMEINx4Xng33HmW3d/iiPee9VEHdXCg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757933738; c=relaxed/simple;
-	bh=pTYdthdubs0S1+6tBjbV9QEGKj6TXdRtw87t+bd4hlw=;
+	s=arc-20240116; t=1757933743; c=relaxed/simple;
+	bh=j9nIETp/ySj+kPeJrGjnyazf55d6hgsJGarkgCP784I=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=YNENHtRP6kuy0UxSesr/lXJVvWhI0sX2JsKQ9v5m/JJPITXTMt/j8CDj5/XLS1v+C3BUBIg+skUiCar89NZcSgdj9zxROdxZKDQDP8ZNHHQRs0Yp8e4CKUwRvFbAxmOxMBtgcHNAXpG67OMEvkIoXRcQo8QG76Dk4Ds6WnE8Xa4=
+	 In-Reply-To:Content-Type; b=TfSYjGcsL6I+Z67piD6e578Z39HLCe0A4X/k1Qdw4ypcaqsw4v0RF3QS4W+cA2RlIpo8Uan/rnj07G5Bcwoo1+63Wb4h7FLQ36TXr9CosqsLFP3c5ArmTAKfsUtT5b2A4oSCE/GAdudWggG78v6ANxDjm+SDnC3aXt8KBBJSUS8=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id EC62D1424;
-	Mon, 15 Sep 2025 03:55:27 -0700 (PDT)
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 04ABD1424;
+	Mon, 15 Sep 2025 03:55:33 -0700 (PDT)
 Received: from [10.57.5.5] (unknown [10.57.5.5])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id EB5823F694;
-	Mon, 15 Sep 2025 03:55:30 -0700 (PDT)
-Message-ID: <28a237e2-5902-4445-a05a-4d1877863ece@arm.com>
-Date: Mon, 15 Sep 2025 11:55:26 +0100
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 9AFCE3F694;
+	Mon, 15 Sep 2025 03:55:36 -0700 (PDT)
+Message-ID: <cdcf1c3c-aca3-4a32-b4ca-ba1a4af5a321@arm.com>
+Date: Mon, 15 Sep 2025 11:55:28 +0100
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -42,7 +42,7 @@ List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v10 05/43] arm64: RME: Check for RME support at KVM init
+Subject: Re: [PATCH v10 00/43] arm64: Support for Arm CCA in KVM
 To: Gavin Shan <gshan@redhat.com>, kvm@vger.kernel.org, kvmarm@lists.linux.dev
 Cc: Catalin Marinas <catalin.marinas@arm.com>, Marc Zyngier <maz@kernel.org>,
  Will Deacon <will@kernel.org>, James Morse <james.morse@arm.com>,
@@ -58,188 +58,192 @@ Cc: Catalin Marinas <catalin.marinas@arm.com>, Marc Zyngier <maz@kernel.org>,
  <alpergun@google.com>, "Aneesh Kumar K . V" <aneesh.kumar@kernel.org>,
  Emi Kisanuki <fj0570is@fujitsu.com>, Vishal Annapurve <vannapurve@google.com>
 References: <20250820145606.180644-1-steven.price@arm.com>
- <20250820145606.180644-6-steven.price@arm.com>
- <0481109b-769f-464b-aa72-ad6e07bdfa78@redhat.com>
+ <2aa76e3c-1e97-46d8-a8b7-c13cbbf05e8b@redhat.com>
 From: Steven Price <steven.price@arm.com>
 Content-Language: en-GB
-In-Reply-To: <0481109b-769f-464b-aa72-ad6e07bdfa78@redhat.com>
+In-Reply-To: <2aa76e3c-1e97-46d8-a8b7-c13cbbf05e8b@redhat.com>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 
-On 03/09/2025 12:15, Gavin Shan wrote:
+On 04/09/2025 01:46, Gavin Shan wrote:
+> 
 > On 8/21/25 12:55 AM, Steven Price wrote:
->> Query the RMI version number and check if it is a compatible version. A
->> static key is also provided to signal that a supported RMM is available.
+>> This series adds support for running protected VMs using KVM under the
+>> Arm Confidential Compute Architecture (CCA).
 >>
->> Functions are provided to query if a VM or VCPU is a realm (or rec)
->> which currently will always return false.
+>> The related guest support was merged for v6.14-rc1 so you no longer need
+>> that separately.
 >>
->> Later patches make use of struct realm and the states as the ioctls
->> interfaces are added to support realm and REC creation and destruction.
+>> There are a few changes since v9, many thanks for the review
+>> comments. The highlights are below, and individual patches have a
+>> changelog.
 >>
->> Reviewed-by: Gavin Shan <gshan@redhat.com>
->> Reviewed-by: Suzuki K Poulose <suzuki.poulose@arm.com>
->> Signed-off-by: Steven Price <steven.price@arm.com>
->> ---
->> Changes since v8:
->>   * No need to guard kvm_init_rme() behind 'in_hyp_mode'.
->> Changes since v6:
->>   * Improved message for an unsupported RMI ABI version.
->> Changes since v5:
->>   * Reword "unsupported" message from "host supports" to "we want" to
->>     clarify that 'we' are the 'host'.
->> Changes since v2:
->>   * Drop return value from kvm_init_rme(), it was always 0.
->>   * Rely on the RMM return value to identify whether the RSI ABI is
->>     compatible.
->> ---
->>   arch/arm64/include/asm/kvm_emulate.h | 18 +++++++++
->>   arch/arm64/include/asm/kvm_host.h    |  4 ++
->>   arch/arm64/include/asm/kvm_rme.h     | 56 ++++++++++++++++++++++++++++
->>   arch/arm64/include/asm/virt.h        |  1 +
->>   arch/arm64/kvm/Makefile              |  2 +-
->>   arch/arm64/kvm/arm.c                 |  5 +++
->>   arch/arm64/kvm/rme.c                 | 56 ++++++++++++++++++++++++++++
->>   7 files changed, 141 insertions(+), 1 deletion(-)
->>   create mode 100644 arch/arm64/include/asm/kvm_rme.h
->>   create mode 100644 arch/arm64/kvm/rme.c
+>>   * Fix a potential issue where the host was walking the stage 2 page
+>> tables on
+>>     realm destruction. If the RMM didn't zero when undelegated (which
+>> it isn't
+>>     required to) then the kernel would attempt to work the junk values
+>> and crash.
+>>
+>>   * Avoid RCU stall warnings by correctly settign may_block in
+>>     kvm_free_stage2_pgd().
+>>
+>>   * Rebased onto v6.17-rc1.
+>>
+>> Things to note:
+>>
+>>   * The magic numbers for capabilities and ioctls have been updated. So
+>>     you'll need to update your VMM. See below for the updated kvmtool
+>> branch.
+>>
+>>   * This series doesn't attempt to integrate with the guest-memfd
+>> changes that
+>>     are being discussed (see below).
+>>
+>>   * Vishal raised an important question about what to do in the case of
+>>     undelegate failures (also see below).
 >>
 > 
 > [...]
 > 
->> diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
->> index 888f7c7abf54..76177c56f1ef 100644
->> --- a/arch/arm64/kvm/arm.c
->> +++ b/arch/arm64/kvm/arm.c
->> @@ -40,6 +40,7 @@
->>   #include <asm/kvm_nested.h>
->>   #include <asm/kvm_pkvm.h>
->>   #include <asm/kvm_ptrauth.h>
->> +#include <asm/kvm_rme.h>
->>   #include <asm/sections.h>
->>   
+> I tried to boot a guest using the following combinations, nothing
+> obvious went to
+> wrong except several long existing issues (described below). So feel
+> free to add:
 > 
-> Nit: The header file <asm/kvm_rme.h> has been included to <asm/
-> kvm_host.h> and
-> <linux/kvm_host.h>, which has been included to arm.c. So this explicit
-> inclusion
-> can be dropped.
+> Tested-by: Gavin Shan <gshan@redhat.com>
 
-While it's true that it could be dropped because of the indirect
-include, generally it's better to explicitly include a header file when
-you are using the definitions from it. That way the code can be
-refactored (e.g. if asm/kvm_host.h is changed to no longer needs the
-header it can then safely drop the header include).
+Thanks for testing!
 
-We have a similar situation with asm/kvm_asm.h being included both here
-and in asm/kvm_host.h (and probably many others, this was just the first
-I spotted).
-
->>   #include <kvm/arm_hypercalls.h>
->> @@ -59,6 +60,8 @@ enum kvm_wfx_trap_policy {
->>   static enum kvm_wfx_trap_policy kvm_wfi_trap_policy __read_mostly =
->> KVM_WFX_NOTRAP_SINGLE_TASK;
->>   static enum kvm_wfx_trap_policy kvm_wfe_trap_policy __read_mostly =
->> KVM_WFX_NOTRAP_SINGLE_TASK;
->>   +DEFINE_STATIC_KEY_FALSE(kvm_rme_is_available);
->> +
->>   DECLARE_KVM_HYP_PER_CPU(unsigned long, kvm_hyp_vector);
->>     DEFINE_PER_CPU(unsigned long, kvm_arm_hyp_stack_base);
->> @@ -2836,6 +2839,8 @@ static __init int kvm_arm_init(void)
->>         in_hyp_mode = is_kernel_in_hyp_mode();
->>   +    kvm_init_rme();
->> +
->>       if (cpus_have_final_cap(ARM64_WORKAROUND_DEVICE_LOAD_ACQUIRE) ||
->>           cpus_have_final_cap(ARM64_WORKAROUND_1508412))
->>           kvm_info("Guests without required CPU erratum workarounds
->> can deadlock system!\n" \
->> diff --git a/arch/arm64/kvm/rme.c b/arch/arm64/kvm/rme.c
->> new file mode 100644
->> index 000000000000..67cf2d94cb2d
->> --- /dev/null
->> +++ b/arch/arm64/kvm/rme.c
->> @@ -0,0 +1,56 @@
->> +// SPDX-License-Identifier: GPL-2.0
->> +/*
->> + * Copyright (C) 2023 ARM Ltd.
->> + */
->> +
->> +#include <linux/kvm_host.h>
->> +
->> +#include <asm/rmi_cmds.h>
->> +#include <asm/virt.h>
->> +
->> +static int rmi_check_version(void)
->> +{
->> +    struct arm_smccc_res res;
->> +    unsigned short version_major, version_minor;
->> +    unsigned long host_version = RMI_ABI_VERSION(RMI_ABI_MAJOR_VERSION,
->> +                             RMI_ABI_MINOR_VERSION);
->> +
->> +    arm_smccc_1_1_invoke(SMC_RMI_VERSION, host_version, &res);
->> +
->> +    if (res.a0 == SMCCC_RET_NOT_SUPPORTED)
->> +        return -ENXIO;
->> +
->> +    version_major = RMI_ABI_VERSION_GET_MAJOR(res.a1);
->> +    version_minor = RMI_ABI_VERSION_GET_MINOR(res.a1);
->> +
->> +    if (res.a0 != RMI_SUCCESS) {
->> +        unsigned short high_version_major, high_version_minor;
->> +
->> +        high_version_major = RMI_ABI_VERSION_GET_MAJOR(res.a2);
->> +        high_version_minor = RMI_ABI_VERSION_GET_MINOR(res.a2);
->> +
->> +        kvm_err("Unsupported RMI ABI (v%d.%d - v%d.%d) we want v%d.
->> %d\n",
->> +            version_major, version_minor,
->> +            high_version_major, high_version_minor,
->> +            RMI_ABI_MAJOR_VERSION,
->> +            RMI_ABI_MINOR_VERSION);
->> +        return -ENXIO;
->> +    }
->> +
->> +    kvm_info("RMI ABI version %d.%d\n", version_major, version_minor);
->> +
->> +    return 0;
->> +}
->> +
->> +void kvm_init_rme(void)
->> +{
->> +    if (PAGE_SIZE != SZ_4K)
->> +        /* Only 4k page size on the host is supported */
->> +        return;
-> 
-> Nit: The comment can be moved before the check, something like below.
-> Otherwise,
-> {} is needed here.
-> 
->     /* Only 4kB page size is supported */
->     if (PAGE_SIZE != SZ_4K)
->         return;
-> 
->> +
->> +    if (rmi_check_version())
->> +        /* Continue without realm support */
->> +        return;
-> 
-> Nit: same as above.
-
-Fair enough, I'm never sure what's best here - the comments are for the
-error path "Continue without realm support [if we can't agree on a
-version]", but it's a single statement so braces aren't needed. Still
-the first instance can easily be hoisted above without losing its
-meaning, and the second can be extended to clarify.
-
-Thanks,
+Regards,
 Steve
 
->> +
->> +    /* Future patch will enable static branch kvm_rme_is_available */
->> +}
+> 
+> Combination
+> ===========
+> host.tf-a        https://git.trustedfirmware.org/TF-A/trusted-firmware-
+> a.git      (v2.13-rc0)
+> host.tf-rmm      https://git.codelinaro.org/linaro/dcap/
+> rmm                       (cca/v8)
+> host.edk2        git@github.com:tianocore/
+> edk2.git                                (edk2-stable202411)
+> host.kernel      git@github.com:gwshan/
+> linux.git                                  (cca/host-v10) (this series)
+> host.qemu        https://git.qemu.org/git/
+> qemu.git                                (stable-9.2)
+> host.buildroot   https://github.com/buildroot/
+> buildroot                           (master)
+> guest.qemu       https://git.codelinaro.org/linaro/dcap/
+> qemu.git                  (cca/latest) (with linux-headers sync'ed)
+> guest.kvmtool    https://gitlab.arm.com/linux-arm/kvmtool-
+> cca                     (cca/latest)
+> guest.edk2       https://git.codelinaro.org/linaro/dcap/
+> edk2                      (cca/latest)
+> guest.kernel     git://git.kernel.org/pub/scm/linux/kernel/git/torvalds/
+> linux.git (v6.17.rc3)
+> guest.buildroot  https://github.com/buildroot/
+> buildroot                           (master)
+> 
+> Script to start the host
+> ========================
+> gshan@nvidia-grace-hopper-01:~/sandbox/qemu/host$ cat start.sh
+> #!/bin/sh
+> HOST_PATH=/home/gshan/sandbox/qemu/host
+> GUEST_PATH=/home/gshan/sandbox/qemu/guest
+> IF_UP_SCRIPT=/etc/qemu-ifup-gshan
+> IF_DOWN_SCRIPT=/etc/qemu-ifdown-gshan
+> 
+> sudo ${HOST_PATH}/qemu/build/qemu-system-aarch64                        \
+> -M virt,virtualization=on,secure=on,gic-version=3,acpi=off              \
+> -cpu max,x-rme=on -m 3G -smp 8                                          \
+> -serial mon:stdio -monitor none -nographic -nodefaults                  \
+> -bios ${HOST_PATH}/tf-a/flash.bin                                       \
+> -kernel ${HOST_PATH}/linux/arch/arm64/boot/Image                        \
+> -initrd ${HOST_PATH}/buildroot/output/images/rootfs.cpio.xz             \
+> -device pcie-root-port,bus=pcie.0,chassis=1,id=pcie.1                   \
+> -device pcie-root-port,bus=pcie.0,chassis=2,id=pcie.2                   \
+> -device pcie-root-port,bus=pcie.0,chassis=3,id=pcie.3                   \
+> -device pcie-root-port,bus=pcie.0,chassis=4,id=pcie.4                   \
+> -device virtio-9p-device,fsdev=shr0,mount_tag=shr0                      \
+> -fsdev local,security_model=none,path=${GUEST_PATH},id=shr0             \
+> -netdev tap,id=tap1,script=${IF_UP_SCRIPT},downscript=${IF_DOWN_SCRIPT} \
+> -device virtio-net-pci,bus=pcie.2,netdev=tap1,mac=b8:3f:d2:1d:3e:f1
+> 
+> Script to start the guest
+> =========================
+> gshan@nvidia-grace-hopper-01:~/sandbox/qemu/guest$ cat start_full.sh
+> #!/bin/sh
+> key="VGhlIHJlYWxtIGd1ZXN0IHBlcnNvbmFsaXphdGlvbiBrZXkgaW4gZm9ybWF0IG9mIGJhc2U2NCAgICAgICAgIA=="
+> IF_UP_SCRIPT=/etc/qemu-ifup
+> IF_DOWN_SCRIPT=/etc/qemu-ifdown
+> 
+> qemu-system-aarch64 -enable-kvm \
+> -object rme-guest,id=rme0,measurement-algorithm=sha512,personalization-
+> value=${key} \
+> -M virt,gic-version=3,confidential-guest-
+> support=rme0                               \
+> -cpu host -smp 4 -m 2G -boot
+> c                                                      \
+> -serial mon:stdio -monitor none -nographic -
+> nodefaults                              \
+> -bios /mnt/edk2/Build/ArmVirtQemu-AARCH64/RELEASE_GCC5/FV/
+> QEMU_EFI.fd               \
+> -device pcie-root-
+> port,bus=pcie.0,chassis=1,id=pcie.1                               \
+> -device pcie-root-
+> port,bus=pcie.0,chassis=2,id=pcie.2                               \
+> -drive file=/mnt/
+> rhel10.qcow2,if=none,id=drive0                                     \
+> -device virtio-blk-pci,id=virtblk0,bus=pcie.1,drive=drive0,num-
+> queues=4             \
+> -netdev
+> tap,id=tap0,script=${IF_UP_SCRIPT},downscript=${IF_DOWN_SCRIPT}             \
+> -device virtio-net-pci,bus=pcie.2,netdev=tap0,mac=b8:3f:d2:1d:3e:f9
+> 
+> Issues
+> ======
+> 1. virtio-iommu isn't supported by QEMU. The guest kernel becomes stuck
+> at IOMMU
+> probing time where the endpoint's capabilities is queried by sending
+> request over
+> virtio device's vring and the response is expected to be fed by QEMU.
+> The request
+> can't be seen by QEMU due to the wrong IOMMU address translation used in
+> QEMU as
+> virtio-iommu provides a different IOMMU address translation operations
+> to override
+> the platform one, leading the DMA address (in the shared space) can't be
+> properly
+> recognized. The information has been shared to Jean.
+> 
+> 2. 'reboot' command doesn't work in the guest. QEMU complains some
+> registers aren't
+> accessible from QEMU. I didn't sorted out a workaround for this.
+> 
+> 3. HMP command 'dump-guest-memory' causes QEMU to exit abnormally. The
+> cause is the
+> realm is reconfigured when the VM is resumed after the guest memory is
+> dumped. The
+> reconfiguration is rejected by the host, leading QEMU's abnormal exit.
+> The fix would
+> be to avoid the reconfiguration on the realm. The issue was originally
+> reported by
+> Fujitsu and all the information has been shared to Fujitsu.
+> 
+> 4. In QEMU, the CPU property 'kvm-no-adjvtime' can't be set to off.
+> Otherwise, QEMU
+> tries to access the timer registers, which have been hidden by the host.
+> So we need
+> to take the parameter (for QEMU) to by pass it: "-cpu host,kvm-no-
+> adjvtime=on".
+> 
+> 5. I didn't try virtio-mem and memory balloon, which isn't expected to
+> work, especially
+> when the guest memory is hot added or hot removed.
 > 
 > Thanks,
 > Gavin
+> 
 > 
 
 
