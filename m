@@ -1,154 +1,241 @@
-Return-Path: <kvm+bounces-57590-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-57591-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id E7111B58186
-	for <lists+kvm@lfdr.de>; Mon, 15 Sep 2025 18:05:07 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 81263B581C8
+	for <lists+kvm@lfdr.de>; Mon, 15 Sep 2025 18:15:29 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 70C92204BCF
-	for <lists+kvm@lfdr.de>; Mon, 15 Sep 2025 16:05:06 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id CC9033B1EE0
+	for <lists+kvm@lfdr.de>; Mon, 15 Sep 2025 16:15:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6C9ED26F471;
-	Mon, 15 Sep 2025 16:03:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 68ADE279DC9;
+	Mon, 15 Sep 2025 16:15:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="XWXu9U6b"
+	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="NVH0drK2"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from BL2PR02CU003.outbound.protection.outlook.com (mail-eastusazon11011003.outbound.protection.outlook.com [52.101.52.3])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2436226CE0F
-	for <kvm@vger.kernel.org>; Mon, 15 Sep 2025 16:03:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757952218; cv=none; b=Bei1W7pzCt5B9MR/7dGMWD2Cevkri85aqcE5LmEZZ5G+zYGOi/lYYjiZmBYYLThs4nqVJ62N6pb8fnH1QNLS1JvdWbeHADNgGpcotjHgyxYhxsOfNmcat+PwjPMcxdYDUXyLlz239kUmDM4od/rNRfQ13QTeErdYiyYLKvN9HWQ=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757952218; c=relaxed/simple;
-	bh=lz+21+pXWAdvl2nNDlkXW3ZFI2U/V3++gCtr1F/cu+k=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=LtvO/ilqxMjYJaPApfF/MdV4Qx6AXcxRHdnmulSQyyhlFqS6EEd5bCTOaDsioNX4d4rQ2fXZ5tAgKuu10mS9lRj7KPerjFQLgxWmRAi5ZtGFAKScAUQ7h/zopWGIN+3ynNzmdpP9FTF9JN6OJ5Jz9jY5T7tFzevltcjoK6ijdJs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=XWXu9U6b; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1757952216;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=zyjSpWLvfqnwtpmHwJJOxa1B89j7LM2tZ53OHGLbRxs=;
-	b=XWXu9U6bW2enupMkUM2bl9WOuePWzc5rRC7eQxF0xHUJCnrjrDtCdrkQgOFGeJ7/PjcQkD
-	7V1+rq6s0eeUzbImCanfbbKQvK30A7EbNCtmbvr+gC+rPyN1ad1rcbKKDrRiHy4A6Kdz7M
-	uyUws29aY2hOQMkMT4byl4e+T4EUSt4=
-Received: from mail-ej1-f70.google.com (mail-ej1-f70.google.com
- [209.85.218.70]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-588-hMtJl8PGP8Sy0MG_2IwJgw-1; Mon, 15 Sep 2025 12:03:32 -0400
-X-MC-Unique: hMtJl8PGP8Sy0MG_2IwJgw-1
-X-Mimecast-MFC-AGG-ID: hMtJl8PGP8Sy0MG_2IwJgw_1757952211
-Received: by mail-ej1-f70.google.com with SMTP id a640c23a62f3a-afcb72a8816so328123566b.0
-        for <kvm@vger.kernel.org>; Mon, 15 Sep 2025 09:03:32 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1757952211; x=1758557011;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=zyjSpWLvfqnwtpmHwJJOxa1B89j7LM2tZ53OHGLbRxs=;
-        b=USSjGU97gi8RHFTEaeFedB+95wfheylMFa6NLe2S/+kCg0sL+9VV0+5AJJXIkjF2OQ
-         idLN6praBNzVY1s3kV5NFX2lSNS9s+NyfA/0Gi1chyXi9w/iV4drHpNMh0DS7JpwZQZy
-         xKzAj5/z3NnQs/yF5ZImOMzZIJ4WI0c0JDcSIOJobavUXs7Qq9RSTFqsUFJOrLMmZLm0
-         jou3bn3HOLqbfUILRcfYyobFIK4KjfR0718rE0aYBBg+vDXyLYPqZw6yvf4FOz8O/aDR
-         b1cN23h06JOLPdN3P4X0XzjYRv3a3HzcgeAMkiyQ2NDOnyDyFV7sb/bm79gFoRMKrbCv
-         hwdw==
-X-Forwarded-Encrypted: i=1; AJvYcCWTLIdDbM3CHQiFVA3FupL44/wRqCb3JrgsUqPT0aiwq6t+mraCttGj33iY1FE42I8lkFs=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yw5ON6h5tPZAL94AMhV6g+mwyNaqrO6Ab6gvY/WFG/+ZNQhI5Bb
-	TgpIckkrGH1kMWsoIFex9J60AbDUuwW+jc3+Xv2KXhdAonilEMd3L3N/TnS1PQn8KtgjPYDVQpw
-	rdmXZoJlmanIivwNMn9gerGt+PaCaMUFI2usTvaEs4SHylr4DUaWMcQ==
-X-Gm-Gg: ASbGnctjmycYRgcSV3xm9CeuoIo6TRHkKcgxta1NtzvvDMnH/w9dEE9PYZJG2NaPcz5
-	AeMCtIf9l4nB6nUPFgNd24U/BYIBlUrQnK1VRlMbo/AKVci7OtEtZtV0v86/GLgDjww9vJlcrXS
-	pXx3mu0BOTDN4CTLcbYAAv0Sb/E7y4fOWvvxVqhObyLOyC7mzFrnR7SUqbh1FQX/yYarMNAYttb
-	XdEEQtnyit20NiiDZMGzF+IsE9N5Qh84nEgeEbSw2F8OXdJBq9GmlTPQf34Te4eooLEdKMbWDRc
-	ZhV5geKkNaDMGMgtUiopSF0Rx9sS
-X-Received: by 2002:a17:907:d16:b0:b04:3402:3940 with SMTP id a640c23a62f3a-b07c35d4d02mr1305642566b.27.1757952211047;
-        Mon, 15 Sep 2025 09:03:31 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IGNtSBH6QlKSIfQdtkhP6WbRqJLxZsgUpRv3jEYGQSqAMd7B74yXmlLS/60ot7X5iMC+KioIg==
-X-Received: by 2002:a17:907:d16:b0:b04:3402:3940 with SMTP id a640c23a62f3a-b07c35d4d02mr1305636166b.27.1757952210298;
-        Mon, 15 Sep 2025 09:03:30 -0700 (PDT)
-Received: from redhat.com ([31.187.78.47])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-b07b32dd413sm988048866b.71.2025.09.15.09.03.28
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 15 Sep 2025 09:03:29 -0700 (PDT)
-Date: Mon, 15 Sep 2025 12:03:27 -0400
-From: "Michael S. Tsirkin" <mst@redhat.com>
-To: linux-kernel@vger.kernel.org
-Cc: Jon Kohler <jon@nutanix.com>, netdev@vger.kernel.org,
-	stable@vger.kernel.org, Jason Wang <jasowang@redhat.com>,
-	Eugenio =?utf-8?B?UMOpcmV6?= <eperezma@redhat.com>,
-	Jakub Kicinski <kuba@kernel.org>, kvm@vger.kernel.org,
-	virtualization@lists.linux.dev
-Subject: [PATCH v3 3/3] vhost-net: flush batched before enabling notifications
-Message-ID: <7b0c9cf7c81e39a59897b3a76d159aa0580b2baa.1757952021.git.mst@redhat.com>
-References: <b93d3101a6c78f17a19bb0f883d72b30f66d1b54.1757952021.git.mst@redhat.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CBE28273805;
+	Mon, 15 Sep 2025 16:15:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.52.3
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1757952917; cv=fail; b=TXahGCFfV4re4qL16ssE5fAypPIib5s0dS6uWbOyrrR0f4/mxlyGzuCfoGlUZ8BzuD7K5LkLnWX0L7D5yVz5HKpb2/fDaSfMq/gn2cmF07UqaZoCsRzRm+OuX2yEeCpNiypr+ALRqeshXXga0GsIeh6goqtyr4lEBJykJHYHBcg=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1757952917; c=relaxed/simple;
+	bh=/MjOAnMRjCOsPN2Jq9gxBC8bBWwgRMknnIo8FHGQ890=;
+	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
+	 Content-Type:MIME-Version; b=lhhpWMSabl+8AB92vUGoQYTxsXaiXkFZKwS6h44wkBqnHZHQqWkRiyewFyflg8TjQiPPDzQp/0kjWvl+cDtH3/9dtP5Z7gJSaAWGlrK53XBdJpY+ewAG9IgvV5TlLZx/LS0ufPjLUzsLStr0RbKQwwLcY5WH+O9JPJWKwg5+kwQ=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=NVH0drK2; arc=fail smtp.client-ip=52.101.52.3
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=ppVolS6mGgF6jDq/R2RrJ35MVMsblaaeOZ6L2zwlorm3SXfk1dgqjt7jxs8ZkD7U5rib1MC1eihW5mMnxMdYIGNAzFGqjo1gnMtSyFiIy+Jc4mEXLjx9fsN4LWusK7i0yaqrwemmEfqw+oYXNHnG0LMUjuSa2BVg0JXvvN9XUNhZ8BGcca0ZOzproL9UI2EsFbM/6j9FKeSETRPlkNUuJTeOHSLGAc2Hq3fwOWUdvSdNd/uDKxyVsq0GiVCZvH1yZ1QokHYKzN/4oka5me/uuEaymOZWb7ljd8TZeFCplzXIiS2ucF9XXIC7phQMuFQdX7iLt7SFAO1PuO5sCPf+YA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=BvtLsLZ4Xq7GV/dK8ntl6oiGI4KEoM2jmeULsV/KDug=;
+ b=j8CmY+/FqMvy7Y1WS6eyPgbdRvrGgE+xAWiz30uYiFRJTuBRbDIYfDvbi7F0ZZOUN3bMbI9AQ1aQlQNnCnjUKY11eUUJ0jvlaPtvfT6aoUXNXgT6V0ojQME0J4mclbYhNT+j3AjEh3itCGh/pv+MFb5mqYZM8UFPX//nTH2ogNXh+1r+rlZNQA+iLdbol/JsPqPtqOHc7SgdxV8u+7RoH2eco5fBqOqDW+AgE4mPUA2F4iz7Jw/GtaOLG4nOVeSUyIGTbeRY1vccs1s9KwDnFcdw/+W9uGZEhDvy4qWMEdDaOzfV1s9+PXGA0mYABu8UO2KHu2atc8sD++jzND7ZRg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
+ header.d=amd.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=BvtLsLZ4Xq7GV/dK8ntl6oiGI4KEoM2jmeULsV/KDug=;
+ b=NVH0drK2QdaE0lvP30g9PkFjHx1s7YJ+iSMWJNew4yot6EM2SfrK7M3Fabs7KnbcS2w5KF38O4170OkpGuHQMbNlUuPrQmKCedjKzuIpaRXpzWeIlyQ4OZcvaSke9XkRdP1DUBODsAN9H85YGWL1YK8653zv6T1WPhLTLVIDGI0=
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=amd.com;
+Received: from DM4PR12MB5070.namprd12.prod.outlook.com (2603:10b6:5:389::22)
+ by CY5PR12MB6383.namprd12.prod.outlook.com (2603:10b6:930:3d::12) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9115.22; Mon, 15 Sep
+ 2025 16:15:11 +0000
+Received: from DM4PR12MB5070.namprd12.prod.outlook.com
+ ([fe80::20a9:919e:fd6b:5a6e]) by DM4PR12MB5070.namprd12.prod.outlook.com
+ ([fe80::20a9:919e:fd6b:5a6e%3]) with mapi id 15.20.9115.020; Mon, 15 Sep 2025
+ 16:15:11 +0000
+Message-ID: <72a65866-fecd-5106-17bc-115ba60e67ae@amd.com>
+Date: Mon, 15 Sep 2025 11:15:09 -0500
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.15.1
+Subject: Re: [PATCH v15 01/41] KVM: SEV: Rename kvm_ghcb_get_sw_exit_code() to
+ kvm_get_cached_sw_exit_code()
+To: Sean Christopherson <seanjc@google.com>,
+ Paolo Bonzini <pbonzini@redhat.com>
+Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+ Mathias Krause <minipli@grsecurity.net>, John Allen <john.allen@amd.com>,
+ Rick Edgecombe <rick.p.edgecombe@intel.com>, Chao Gao <chao.gao@intel.com>,
+ Maxim Levitsky <mlevitsk@redhat.com>, Xiaoyao Li <xiaoyao.li@intel.com>,
+ Zhang Yi Z <yi.z.zhang@linux.intel.com>
+References: <20250912232319.429659-1-seanjc@google.com>
+ <20250912232319.429659-2-seanjc@google.com>
+Content-Language: en-US
+From: Tom Lendacky <thomas.lendacky@amd.com>
+In-Reply-To: <20250912232319.429659-2-seanjc@google.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: CY8P220CA0002.NAMP220.PROD.OUTLOOK.COM
+ (2603:10b6:930:46::12) To DM4PR12MB5070.namprd12.prod.outlook.com
+ (2603:10b6:5:389::22)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <b93d3101a6c78f17a19bb0f883d72b30f66d1b54.1757952021.git.mst@redhat.com>
-X-Mailer: git-send-email 2.27.0.106.g8ac3dc51b1
-X-Mutt-Fcc: =sent
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: DM4PR12MB5070:EE_|CY5PR12MB6383:EE_
+X-MS-Office365-Filtering-Correlation-Id: 59979ac5-e584-4616-882c-08ddf4730b7a
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|366016|1800799024|7416014|376014|7053199007;
+X-Microsoft-Antispam-Message-Info:
+	=?utf-8?B?UDdmMVFyMmYzditHVEtoSm0xSUthYXFtNFVRNUI3amhZWEFmWEVadUVxWmJp?=
+ =?utf-8?B?WDN2Sk1FY1VXMmFhTlZmZDE5aXZob1huSFcyNy8xbGFseVIyWldlTm5yd3Jh?=
+ =?utf-8?B?ZXppT3hqbVo5Z083SUgvamJoSWZ3VjJGUkpBdFhLUVlUM2pSZHFIZ1p5NWFz?=
+ =?utf-8?B?ekNhWHJnTEZsYUdpclViTnE0aHJBZG5TdlMrb2dVeDREL1Jqd2pnWkRsSkpM?=
+ =?utf-8?B?WVVqdytyUXk1QVEzWGpwR0VNVU9WdmNJRVFmcmVYTEFDNXQyTElQNVVodjBs?=
+ =?utf-8?B?ZjlCTDVmeWNjNzd5Q3NxVkxIWHRzSnZ3TjVSR3VYcTlVMlQ2K1VyRzNMRlNU?=
+ =?utf-8?B?bzFnelk3MVBCU29SNmZzV05WSWJ5M2Q0cTNDdnFLcXB2aC9ENVZBN3BmYk92?=
+ =?utf-8?B?TFo0eVJWeFpIeWNYVVN5dnBoMGx4UEE2OHJITmdjT1pqRk5iSWRqbUJYL2lp?=
+ =?utf-8?B?azRhRmNSQXljYXR1RDJaaURVNllaMTAyUkZ1aG9JcktobUJqOVJnbjZCSnNM?=
+ =?utf-8?B?NU5zRDJmdk02ajNDZWZJcWhMNVVveUN2bFdkd3h3RWZOT05PQ3QxZW1UMnRW?=
+ =?utf-8?B?VTZEdUo3bGV1Yy9pVXJjakRnM1FxMVN0cEExS1B6Szk2S3VlMmdyZ3hjUEtT?=
+ =?utf-8?B?MC9CT1JZVHhKdHZIR1c0SzM0djkyRlUxUTBOQnZyQ1JMekdRdndYNEtaZGYv?=
+ =?utf-8?B?dFFXRjJnYzY1Nk9MZUpoanhlcUZ2aVRCSmZlRjFZb3ZoQ21XaTAzZVFrUHBV?=
+ =?utf-8?B?NEJuUVhqVVJZYVBOVitnS2U0ZnBWa0dKVXJpUitQa2lUOFZOYVc0ckp4cWdX?=
+ =?utf-8?B?NnNSZXJWaHJVMFhLK05CVk95UVRlUlhDNzJjdXJqbEZkR0czSzh1YnU0elpi?=
+ =?utf-8?B?eDd2cUExVVdyK1hYdHFNc0dscGk3RlU2WU9FbGxLRGc3ZUJlMlVveUxLZTg0?=
+ =?utf-8?B?OWI1d2Z1Ny9ESVE2Y2tSOGhmTHpKVnpmZjZaK1NBalZ6NTYrTmFPYlhUVzht?=
+ =?utf-8?B?VVJpK2k3Tmk1eXV5K2lreVA0UmU1SXZ1QTFualdsdUlKWlUzUFBQYUxlZjBz?=
+ =?utf-8?B?VGNZRkgrZy9uclhqTTA1MmFLU1RZbDVoVERQcUJVbGRVK2Q3V2dmUVFJK3Yv?=
+ =?utf-8?B?UXNpcm41RHU4YzFwVkdxeFpyNkVEaHQwclFmSFJMd1VtSGNjdW5ncDdBaFh5?=
+ =?utf-8?B?OEJ2OU5PUUNQdmp3YWJCYUFjdzdqL1owMVRXZlBWMFdXU0xDM2Y1RksrSmNs?=
+ =?utf-8?B?dExUV25hZjV5ekFvNUZqS1BLbVRuYlVMc1pzcGk3ZnNBUlFWZzhKVVl5NXda?=
+ =?utf-8?B?RGZvT3FyNmZYZktxZ2w1emY2ZWlqaXhmOGJiNW9vYXFoUjFQcVpXY1NYNzE0?=
+ =?utf-8?B?YmNzKytydzJ2RG1OaW1iM0JtSWo3R3hZVW1xVHNoRklCeU0yQmNMRXM1Uk81?=
+ =?utf-8?B?SURIWUFPRExIRkU3blBHVDNzSzhrbGRqMjZWc1BZWDFpeTFtREk0d0tiTWFD?=
+ =?utf-8?B?YThPajlVd3FWSUJzUmkyeVZjOGJnZ0pwZTBIOUJvc0VLNzV1cmY1ZEMzSTR1?=
+ =?utf-8?B?bWhSb0p0cDF0aWZiQU52d1AwckhhemFIOHBpM0h4U3BDQzNqNld6Uk81UXUz?=
+ =?utf-8?B?RkRhalpNdG1GOVVkUFJrWjN4Q0QrTUc2QytBNkRaK0RWLzROL3p4YTRnNEZV?=
+ =?utf-8?B?OXlFVlBCelZsaVJmbnRrQjVxRkJTb294RmErNWdSTGRXNmlPNm1zU2Y5akI2?=
+ =?utf-8?B?WWtxYzIvSmExV1VWbkROMzNmeXFSWDBxNGthbTVKUDNvMlJraGpQclR3aHdU?=
+ =?utf-8?B?dkVveVJGMWVhcTU2RkxYV0ovUitRenFjNkhDYlpXZW02dzVKZkhPOUxiYWZi?=
+ =?utf-8?B?YmRYamJKYmZLZlJMbEpiY2Q0NGk3bEZoSnY4MDRIYkU3UmRjQ1Eyb0JyZFpy?=
+ =?utf-8?Q?DLtTHlpaOuk=3D?=
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM4PR12MB5070.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(1800799024)(7416014)(376014)(7053199007);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?utf-8?B?QWE5VkhpSm9tOEUvUDhLa0JZd01LNnNxc0lIQ0w3bTdYeDZUVlF4ZGFGZkRy?=
+ =?utf-8?B?WnBVcDUxbEx5NTJSdGNCL2hvVjl4VkpabmJ2aG80cGhQVE03dkdWajExSEZ3?=
+ =?utf-8?B?dGlVYUhPbUZQUTdrZTVtY0lWMkY0WnVuZlhrcE9DVzE4QVhwOUswS1hiQ21k?=
+ =?utf-8?B?dDNsemZ0SW5WYXp6ZXo1NG9zRjh6WUFSSWNrZVRSWnN6allub3dvQU5TaENp?=
+ =?utf-8?B?cktkbThJYnZoT0p4SXo2TmtiMkRLZlJOWnBuQ2Y2TzJmM1lmR2ZtU1g2dVlI?=
+ =?utf-8?B?eGNZRUxPeXNMS2dUdHBUZjNQUmZZeUx6d0pUSitjazh3MnpCeDRaaDV6dzRm?=
+ =?utf-8?B?NzJ3M3A2cVgwdURXRElKUGY5TnVsSndIamNTTlIwb1N0TTdhOHdHVmRvclRB?=
+ =?utf-8?B?L0RZNHB5c20yb3M5OXF4TkI4QTBoMXB0L2dKTm9adkZQTXV1S0dianNvZ2Y0?=
+ =?utf-8?B?bEx0WWZpSnluSS9RajhZZEoxcHR4Umw3MWVxZTdYU3hoa1kxQVFDQ3BYajlU?=
+ =?utf-8?B?amExV0ovdHJGMzNVamlVa1dhbDFlTHkzSW9GWkFEREFGaXUya3lSWXl4Vi9M?=
+ =?utf-8?B?NVYxTmN6VXpvME9EeUlvdkxCalVzcUMvS0E5OWNURFczVlN6RzBsdnFSQ0pT?=
+ =?utf-8?B?QnY4eEp3TFc2NFhta255OWZjU0xkMmFFaFV1YlJZekw5Y1p2dXVTMDd4K2Y5?=
+ =?utf-8?B?bFJGdmhQMHBwd2hJaHlRMlNXUlhzTG9leGVGNXFwS3pFVitKSFdVcy83Lzhy?=
+ =?utf-8?B?YXp1VFNqR1o3eFVVNitWUndKQ1JEZDdJV3E0UDEweWgzT28zanczMTE4Q2Zv?=
+ =?utf-8?B?ejBvK0VoWFBNN25PV0I2TkI2YUllTWNDci9mcFpVMGNGN2pWd3VBdUtGTnNy?=
+ =?utf-8?B?SitBNS9sbGxNUjQ2UDc2K1hveG0rR3JOQWQ1dWVvT2xWYUwwQXVVYTBrNXIr?=
+ =?utf-8?B?WHVzelA1Yk1MTURIU3FxLzlGSzBnWnk5RDhJaGZZMXdYNmozcVI5OFJyNlho?=
+ =?utf-8?B?eEcrYlRvZ2tGb3BObSs3MVdJLzN3TEh4YXhyS2s4a1l1dFRJL09PeWZXRllE?=
+ =?utf-8?B?SjJqZS9rdEsrQ2t4TTdHeXMvZnBNY1YrQmNxOXh4WUY3YVVxdWdHeWZhWjlp?=
+ =?utf-8?B?L3hhK3NWalFNZVFsQ1BCbHhGaE1VSXR1RzhvaVg3TWpzamQweTFZN2htMVd3?=
+ =?utf-8?B?VTd3ejJoSVFkV3U2ZFdrY3RocHFiU1dqTnRzQkxJSWxEeW9MR1FDTHgrSWwy?=
+ =?utf-8?B?aUZqWWxsZlp3KzF0a05QZER1bzZCWDFNUlJFd0tKaHJQTmltWGNNOUY3T202?=
+ =?utf-8?B?emFCeE5hYUdIejl4ZFdkem9LMUgzT3dIeDF2ZFp1WG02WjNWZDdkbWtDbHZp?=
+ =?utf-8?B?MEYwQkVVeWFpK2dpTnN1enFPS1U4S1FMZ1NVdHZkVVZ3bTVuWCs4cldYQTNB?=
+ =?utf-8?B?bGllZlF3N1FpZHFmYkZKWWNONnFwL2N0WmJsTURSeVh3S2tuejAzNFdGUWEy?=
+ =?utf-8?B?QWxtd0Focjhna0o5T08zaUtoVEZOeVF4L0VZQ3dGOGNBaVZjd3pTMlZqN1Fn?=
+ =?utf-8?B?c3VDeVpvbVpEQld4c3NpZ3dGeG1Ra1dnek1hbEQzRWlMZXBQbEtIY3cxM0xq?=
+ =?utf-8?B?cE8waWlmcTA3dW1QWXcxcm02VVBzOEpkWTRUYnY0UXpkakt1d2c3d3AzZjE5?=
+ =?utf-8?B?aGJTK3BWcExxSyt3UE0zaWdLcFUxUW44cFd1SzBydzEyUldEU21XM0lMMC9z?=
+ =?utf-8?B?Ukk1VXBiVmVFV3c0ZDlMa0NzV2kzYVRla0xLa3R3V0dDTkZMaGF2anBDVllH?=
+ =?utf-8?B?VUZEV2dnL3h2WDFZcm9rN3puZ2d4TlpRNVVkTUNyNzk4Vy9vV0NIMGtDN0JG?=
+ =?utf-8?B?V25uNFg5bEtuZWpMcFpUL05oZ0N3MnNvWXUxSEsvakJUY2lEb3J3ZFViLzBv?=
+ =?utf-8?B?QXZneWlVM3BJdUNZSmZ6aXp6TGlndUFLQkY3T3h0RGdPRHZ2VWVpaGZIcDls?=
+ =?utf-8?B?Q0d5eGJDMU9iQW42UjJvcVpLRkhRSHM1UFp5VnVyQ0RkZ2VqZlcvRWd6dW1B?=
+ =?utf-8?B?UmNaOVJRQzBBRUFEYmJWdjd6dmxxblh0eUVha200ajd3MHBKR2Mvb3p1OUpv?=
+ =?utf-8?Q?NcJRadVeCZqCCifN1O9b0vkWW?=
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 59979ac5-e584-4616-882c-08ddf4730b7a
+X-MS-Exchange-CrossTenant-AuthSource: DM4PR12MB5070.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 15 Sep 2025 16:15:11.0595
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: qWwag3y0vRvKNaUiFbgyUU8sD9In7TdNlNzanBMhl9yYQbQDbD1tfC/eCpYGPkWtzIccDvOvw/ThFbAhAkAA8Q==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: CY5PR12MB6383
 
-Commit 8c2e6b26ffe2 ("vhost/net: Defer TX queue re-enable until after
-sendmsg") tries to defer the notification enabling by moving the logic
-out of the loop after the vhost_tx_batch() when nothing new is spotted.
-This caused unexpected side effects as the new logic is reused for
-several other error conditions.
+On 9/12/25 18:22, Sean Christopherson wrote:
+> Rename kvm_ghcb_get_sw_exit_code() to kvm_get_cached_sw_exit_code() to make
+> it clear that KVM is getting the cached value, not reading directly from
+> the guest-controlled GHCB.  More importantly, vacating
+> kvm_ghcb_get_sw_exit_code() will allow adding a KVM-specific macro-built
+> kvm_ghcb_get_##field() helper to read values from the GHCB.
+> 
+> No functional change intended.
+> 
+> Signed-off-by: Sean Christopherson <seanjc@google.com>
 
-A previous patch reverted 8c2e6b26ffe2. Now, bring the performance
-back up by flushing batched buffers before enabling notifications.
+Reviewed-by: Tom Lendacky <thomas.lendacky@amd.com>
 
-Link: https://lore.kernel.org/all/20250915024703.2206-2-jasowang@redhat.com
-Reported-by: Jon Kohler <jon@nutanix.com>
-Cc: stable@vger.kernel.org
-Fixes: 8c2e6b26ffe2 ("vhost/net: Defer TX queue re-enable until after sendmsg")
-Signed-off-by: Jason Wang <jasowang@redhat.com>
-Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
----
- drivers/vhost/net.c | 17 ++++++++++++-----
- 1 file changed, 12 insertions(+), 5 deletions(-)
+Makes me wonder if we want to create kvm_get_cached_sw_exit_info_{1,2}
+routines rather than referencing control->exit_info_{1,2} directly?
 
-diff --git a/drivers/vhost/net.c b/drivers/vhost/net.c
-index 57efd5c55f89..72ecb8691275 100644
---- a/drivers/vhost/net.c
-+++ b/drivers/vhost/net.c
-@@ -782,11 +782,18 @@ static void handle_tx_copy(struct vhost_net *net, struct socket *sock)
- 		if (head == vq->num) {
- 			if (unlikely(busyloop_intr)) {
- 				vhost_poll_queue(&vq->poll);
--			} else if (unlikely(vhost_enable_notify(&net->dev,
--								vq))) {
--				vhost_disable_notify(&net->dev, vq);
--				continue;
--			}
-+			} else {
-+				/* Flush batched packets before enabling
-+				 * virtqueue notifications to reduce
-+				 * unnecessary virtqueue kicks.
-+				 */
-+				vhost_tx_batch(net, nvq, sock, &msg);
-+
-+				if (unlikely(vhost_enable_notify(&net->dev,
-+								 vq))) {
-+					vhost_disable_notify(&net->dev, vq);
-+					continue;
-+				}
- 			break;
- 		}
- 
--- 
-MST
-
+> ---
+>  arch/x86/kvm/svm/sev.c | 8 ++++----
+>  1 file changed, 4 insertions(+), 4 deletions(-)
+> 
+> diff --git a/arch/x86/kvm/svm/sev.c b/arch/x86/kvm/svm/sev.c
+> index 2fdd2e478a97..fe8d148b76c0 100644
+> --- a/arch/x86/kvm/svm/sev.c
+> +++ b/arch/x86/kvm/svm/sev.c
+> @@ -3216,7 +3216,7 @@ void sev_free_vcpu(struct kvm_vcpu *vcpu)
+>  		kvfree(svm->sev_es.ghcb_sa);
+>  }
+>  
+> -static u64 kvm_ghcb_get_sw_exit_code(struct vmcb_control_area *control)
+> +static u64 kvm_get_cached_sw_exit_code(struct vmcb_control_area *control)
+>  {
+>  	return (((u64)control->exit_code_hi) << 32) | control->exit_code;
+>  }
+> @@ -3242,7 +3242,7 @@ static void dump_ghcb(struct vcpu_svm *svm)
+>  	 */
+>  	pr_err("GHCB (GPA=%016llx) snapshot:\n", svm->vmcb->control.ghcb_gpa);
+>  	pr_err("%-20s%016llx is_valid: %u\n", "sw_exit_code",
+> -	       kvm_ghcb_get_sw_exit_code(control), kvm_ghcb_sw_exit_code_is_valid(svm));
+> +	       kvm_get_cached_sw_exit_code(control), kvm_ghcb_sw_exit_code_is_valid(svm));
+>  	pr_err("%-20s%016llx is_valid: %u\n", "sw_exit_info_1",
+>  	       control->exit_info_1, kvm_ghcb_sw_exit_info_1_is_valid(svm));
+>  	pr_err("%-20s%016llx is_valid: %u\n", "sw_exit_info_2",
+> @@ -3331,7 +3331,7 @@ static int sev_es_validate_vmgexit(struct vcpu_svm *svm)
+>  	 * Retrieve the exit code now even though it may not be marked valid
+>  	 * as it could help with debugging.
+>  	 */
+> -	exit_code = kvm_ghcb_get_sw_exit_code(control);
+> +	exit_code = kvm_get_cached_sw_exit_code(control);
+>  
+>  	/* Only GHCB Usage code 0 is supported */
+>  	if (svm->sev_es.ghcb->ghcb_usage) {
+> @@ -4336,7 +4336,7 @@ int sev_handle_vmgexit(struct kvm_vcpu *vcpu)
+>  
+>  	svm_vmgexit_success(svm, 0);
+>  
+> -	exit_code = kvm_ghcb_get_sw_exit_code(control);
+> +	exit_code = kvm_get_cached_sw_exit_code(control);
+>  	switch (exit_code) {
+>  	case SVM_VMGEXIT_MMIO_READ:
+>  		ret = setup_vmgexit_scratch(svm, true, control->exit_info_2);
 
