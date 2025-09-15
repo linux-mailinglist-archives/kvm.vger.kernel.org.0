@@ -1,145 +1,123 @@
-Return-Path: <kvm+bounces-57568-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-57569-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id AA365B57999
-	for <lists+kvm@lfdr.de>; Mon, 15 Sep 2025 13:59:32 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 812CAB57AD5
+	for <lists+kvm@lfdr.de>; Mon, 15 Sep 2025 14:26:27 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C9898161A5E
-	for <lists+kvm@lfdr.de>; Mon, 15 Sep 2025 11:59:31 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E9D7A3AAE11
+	for <lists+kvm@lfdr.de>; Mon, 15 Sep 2025 12:26:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6BE56304BDD;
-	Mon, 15 Sep 2025 11:59:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CBABE30C347;
+	Mon, 15 Sep 2025 12:24:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=brainfault-org.20230601.gappssmtp.com header.i=@brainfault-org.20230601.gappssmtp.com header.b="ouPoUD8t"
+	dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b="chg9d1BB"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-io1-f52.google.com (mail-io1-f52.google.com [209.85.166.52])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from m16.mail.163.com (m16.mail.163.com [220.197.31.3])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E64333043DA
-	for <kvm@vger.kernel.org>; Mon, 15 Sep 2025 11:59:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.52
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3B1D430ACEE;
+	Mon, 15 Sep 2025 12:24:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=220.197.31.3
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757937545; cv=none; b=oaXXylqL/jHZjwXteTINX0sOJkia1NJ9FBGsQrwMDKxhUHo71YDPkO6dOi3wkH35d61taB46ISL4fO6T8Vk6L9wDqf3uz+813TYoQJ4SU73WTE+ryHPSR9sy665ovAx1UKPbrUZlomOCJq6jQRB3F/1Mm29QpS8IDR4djW2/gvk=
+	t=1757939083; cv=none; b=d2AvIQ2q/yrx7TIqYDBKqVS2nleG582HBg83LfCZTDwHhX6LLogzTqAopDufrVXgYASgar4MvFDG4P/j91SLe7F1BadtIaA4OLxU5WsPWDRA89N+NMa9C1gtitK56EeZxqDBws/yIdFJy10WskCr/+0wwdeLTKfgjhp4C2zCgXE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757937545; c=relaxed/simple;
-	bh=w+Wo4LOKOK6vQ7K4HYgfgfOSwUdpnB4dRYCTrPRiDio=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=o5LdXudEqNB0cXWkpT46utH6x2XmyzP9Yp8YffYLf3CAgWvoZeLSNPnGEbj5/hj/jeW3Bradsuk7nOS19vymRRHTGBhrtWIUtAKl2kvFq1pLeRSzolMv8S7rMTjwPJX3OhKDwIxsmKcb25lcCzdABHPhsi5B/OU2jt1evzAbguY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=brainfault.org; spf=none smtp.mailfrom=brainfault.org; dkim=pass (2048-bit key) header.d=brainfault-org.20230601.gappssmtp.com header.i=@brainfault-org.20230601.gappssmtp.com header.b=ouPoUD8t; arc=none smtp.client-ip=209.85.166.52
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=brainfault.org
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=brainfault.org
-Received: by mail-io1-f52.google.com with SMTP id ca18e2360f4ac-88f49be4c21so85005939f.1
-        for <kvm@vger.kernel.org>; Mon, 15 Sep 2025 04:59:02 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=brainfault-org.20230601.gappssmtp.com; s=20230601; t=1757937542; x=1758542342; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=w+Wo4LOKOK6vQ7K4HYgfgfOSwUdpnB4dRYCTrPRiDio=;
-        b=ouPoUD8tA6kbRYgZzX815/EDv1tqH0GGTgWVVb9mVyEUELXWr5F3WxRF0Nxf7VwaHB
-         eE3TzEF/H+Od07YPlvs6+HhxfaeQ4cWWoV4QEQfVfwMgiOUqHBrrt5P3ju1k8T+dT3VX
-         zeF53pPQ4+mpfp5k/FlzQjNVMZ+TMtFQNj7n3nIrziCjVkxziFl7YSHL23jkKN7U3spR
-         TpuGBQSt4Kflh+lDmQ/+4Wqgwog/0WnwKp4+PE/chr3z2ibwo8w0HJqYFi1tdwaYUzr7
-         a7lL/VViCFi58Qlozj5O1qPFie8Nf9WZINBdEKzE9VCqVOMMYyUEMaBLtdHuEf3IlO5/
-         Mvew==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1757937542; x=1758542342;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=w+Wo4LOKOK6vQ7K4HYgfgfOSwUdpnB4dRYCTrPRiDio=;
-        b=OGqEI9nPe+KVhnS2ew4MCTbmgbTWxeKRSZt6fGiZ4ygMRrGaXJVHDRYaOeVcQt58vp
-         qcBzEkB381IeMDp53BhUJVnbwjZ4Kq7nkYAAzuVDE1YGFEAxOQF35ngqtuvp4XpfXZV2
-         AJNI7FPpSxqcfmEMo8Y08xWnVpd/jcl4zn4B6myzFNoCBSx6RRXV2yhqCSdVOCNxzAHT
-         Ezo/4yyoEXdD130OvuniuMvG+c2B7/5GXMga3YupzOn/t3V0pmFDeXPQ60w73ZNzbQrE
-         gHBqwwm/38Z/BgMgrQnGwJnY/69OGj1sFMLdETpnnx1d9IhfU9pZ/7wsNNcrjH2cq/73
-         k4lw==
-X-Forwarded-Encrypted: i=1; AJvYcCUj7C/6sTh6eHc2pgjoKDj2MB289OnYje8vdUkU2IBaqi14ZDZzOMoJxO0SqM+YAy4bXCU=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyJWOmcpFo12BhxZc5OgQ81RIF7nEw6SA34gjQSYJjKux1hm6nh
-	CP0nlQZ0tLQmglHeyBcEDorvzmDfYzWB8SYavePJTb8I9oN0JgJFUHa9h4BeClxjtwiX+Q9J2VM
-	jZNwiZkQ5RTU7cDBwg6serDDUEyCSypIjhmd3cT5N0w==
-X-Gm-Gg: ASbGnctqtYKRQMCMBYh3rTuNLv9fFdeSnNjObqoDinZ3ggG115PJ6lbXlO4QpOX96cr
-	82sispVv2LpXi3KqU7N1pFSc0hsmjbqf6KlhUGNqqvKZhgYP2uSnMRYpejDqFraQViLOccSI2Vk
-	e5+rqd21Opolcda1fdNSVfRsvbmBeJe3+QvbYFIto5DPA/CeLW8STUjrWP82X7PMm4A3bB+feRn
-	zJpJGPhVQCTz+c+hMUd8PxKhAbq+SQM7lv9jg2Y
-X-Google-Smtp-Source: AGHT+IHTDrsD99f5SQM6r2xQgpJxH71mXjBKOGQCXs9gTx5sBfVD90LiO27Njr8hwWJISfU1lWc6TvRVPNc4XTqs0j4=
-X-Received: by 2002:a05:6e02:3312:b0:423:fd3b:ef72 with SMTP id
- e9e14a558f8ab-423fd3bf017mr46668695ab.0.1757937541951; Mon, 15 Sep 2025
- 04:59:01 -0700 (PDT)
+	s=arc-20240116; t=1757939083; c=relaxed/simple;
+	bh=XNZL1+d+Qc/BZHek/35MEzGZGMUx6EA9t85VdCwsxeY=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=nwidC6ABESU3zFO/I+agwQOJzJH3S5Bl4EwKBw1mZaPJDUy5G31DHIxW0Erw/hMvD8T5Su0n204cGrAJz39QSSPDvXaSADHv4USM05zif/zZM94wAn99H74KyHHRNXWUercYhhtr8YBXYRXkmj2lq/wSzSJrILp//YVcGtTjKCs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com; spf=pass smtp.mailfrom=163.com; dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b=chg9d1BB; arc=none smtp.client-ip=220.197.31.3
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=163.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=163.com;
+	s=s110527; h=From:To:Subject:Date:Message-ID:MIME-Version; bh=sj
+	SqrG5JGVjvm9XZFoJOiIfn6ve0j4UMsIKI6ctHudQ=; b=chg9d1BBpnn4ZrjdV0
+	WUky7UkIjXQoZESll/Y9skCu57lKq2VeA7G9TP4OzH6PxFJcCYj17HL7//VfXddT
+	hsemxghAV/vPoq5xTGyI4Zh7SwX4qKS8d5BF218UGMM2q7j89pffcYPEG8qMCHVe
+	G0ex2BOTUbyGgAIDZ8xWbDF/A=
+Received: from localhost.localdomain (unknown [])
+	by gzga-smtp-mtada-g1-3 (Coremail) with SMTP id _____wD3_2xJBchoOwBzBQ--.20956S2;
+	Mon, 15 Sep 2025 20:23:39 +0800 (CST)
+From: Jinyu Tang <tjytimi@163.com>
+To: Anup Patel <anup@brainfault.org>,
+	Atish Patra <atish.patra@linux.dev>,
+	Andrew Jones <ajones@ventanamicro.com>,
+	Conor Dooley <conor.dooley@microchip.com>,
+	Yong-Xuan Wang <yongxuan.wang@sifive.com>,
+	Paul Walmsley <paul.walmsley@sifive.com>,
+	Nutty Liu <nutty.liu@hotmail.com>,
+	Tianshun Sun <stsmail163@163.com>
+Cc: kvm@vger.kernel.org,
+	kvm-riscv@lists.infradead.org,
+	linux-riscv@lists.infradead.org,
+	linux-kernel@vger.kernel.org,
+	Jinyu Tang <tjytimi@163.com>
+Subject: [PATCH] KVM: riscv: Power on secondary vCPUs from migration
+Date: Mon, 15 Sep 2025 20:23:34 +0800
+Message-ID: <20250915122334.1351865-1-tjytimi@163.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250909-pmu_event_info-v6-0-d8f80cacb884@rivosinc.com>
- <f740b716-6c8b-46a5-31ae-ecc37e766152@kernel.org> <aMftcHLgBvH76erX@willie-the-truck>
-In-Reply-To: <aMftcHLgBvH76erX@willie-the-truck>
-From: Anup Patel <anup@brainfault.org>
-Date: Mon, 15 Sep 2025 17:28:48 +0530
-X-Gm-Features: AS18NWDM6MzdjjPsw0ij-OL-CWk_57B0_4S3ilJtO7cErapGgoLvo5MzWEvUv3s
-Message-ID: <CAAhSdy3wJd5uicJntf+WgTaLciiQsqT1QfUmrZ1Jk9qEONRgPw@mail.gmail.com>
-Subject: Re: [PATCH v6 0/8] Add SBI v3.0 PMU enhancements
-To: Will Deacon <will@kernel.org>
-Cc: Paul Walmsley <pjw@kernel.org>, Atish Patra <atishp@rivosinc.com>, 
-	Mark Rutland <mark.rutland@arm.com>, Paul Walmsley <paul.walmsley@sifive.com>, 
-	Palmer Dabbelt <palmer@dabbelt.com>, Mayuresh Chitale <mchitale@ventanamicro.com>, 
-	linux-riscv@lists.infradead.org, linux-arm-kernel@lists.infradead.org, 
-	linux-kernel@vger.kernel.org, kvm@vger.kernel.org, 
-	kvm-riscv@lists.infradead.org, Sean Christopherson <seanjc@google.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
+X-CM-TRANSID:_____wD3_2xJBchoOwBzBQ--.20956S2
+X-Coremail-Antispam: 1Uf129KBjvJXoW7tryDXF1UtryxXF4UXw48Xrb_yoW8CrWUpF
+	4jkrZY9395JFW7Gw4qyw4kuF4YyFsYg3WaqryDZryjyr4Ygw10yr4kKayjyF95Xrs5Zwna
+	vF4YyFy8Crn0ya7anT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+	9KBjDUYxBIdaVFxhVjvjDU0xZFpf9x0piHa0PUUUUU=
+X-CM-SenderInfo: xwm13xlpl6il2tof0z/1tbiTgTJeGjH+nKkeQABsA
 
-Hi Will,
+The current logic keeps all secondary VCPUs powered off on their
+first run in kvm_arch_vcpu_postcreate(), relying on the boot VCPU 
+to wake them up by sbi call. This is correct for a fresh VM start,
+where VCPUs begin execution at the bootaddress (0x80000000).
 
-On Mon, Sep 15, 2025 at 4:11=E2=80=AFPM Will Deacon <will@kernel.org> wrote=
-:
->
-> On Mon, Sep 15, 2025 at 12:25:52AM -0600, Paul Walmsley wrote:
-> > On Tue, 9 Sep 2025, Atish Patra wrote:
-> >
-> > > SBI v3.0 specification[1] added two new improvements to the PMU chape=
-r.
-> > > The SBI v3.0 specification is frozen and under public review phase as
-> > > per the RISC-V International guidelines.
-> > >
-> > > 1. Added an additional get_event_info function to query event availab=
-lity
-> > > in bulk instead of individual SBI calls for each event. This helps in
-> > > improving the boot time.
-> > >
-> > > 2. Raw event width allowed by the platform is widened to have 56 bits
-> > > with RAW event v2 as per new clarification in the priv ISA[2].
-> > >
-> > > Apart from implementing these new features, this series improves the =
-gpa
-> > > range check in KVM and updates the kvm SBI implementation to SBI v3.0=
-.
-> > >
-> > > The opensbi patches have been merged. This series can be found at [3]=
-.
-> > >
-> > > [1] https://github.com/riscv-non-isa/riscv-sbi-doc/releases/download/=
-v3.0-rc7/riscv-sbi.pdf
-> > > [2] https://github.com/riscv/riscv-isa-manual/issues/1578
-> > > [3] https://github.com/atishp04/linux/tree/b4/pmu_event_info_v6
-> > >
-> > > Signed-off-by: Atish Patra <atishp@rivosinc.com>
-> >
-> > For the series:
-> >
-> > Acked-by: Paul Walmsley <pjw@kernel.org>
->
-> I was assuming this series would go via the Risc-V arch tree so please
-> shout if you were expecting me to take it via drivers/perf/!
->
+However, this behavior is not suitable for VCPUs that are being
+restored from a state (e.g., during migration resume or snapshot
+load). These VCPUs have a saved program counter (sepc). Forcing
+them to wait for a wake-up from the boot VCPU, which may not
+happen or may happen incorrectly, leaves them in a stuck state
+when using Qemu to migration if smp is larger than one.
 
-Based on offline discussion with Paul, I will take this series
-through the KVM RISC-V tree.
+So check a cold start and a warm resumption by the value of the 
+guest's sepc register. If the VCPU is running for the first time 
+*and* its sepc is not the hardware boot address, it indicates a 
+resumed vCPU that must be powered on immediately to continue 
+execution from its saved context.
 
-Regards,
-Anup
+Signed-off-by: Jinyu Tang <tjytimi@163.com>
+Tested-by: Tianshun Sun <stsmail163@163.com>
+---
+ arch/riscv/kvm/vcpu.c | 10 +++++++++-
+ 1 file changed, 9 insertions(+), 1 deletion(-)
+
+diff --git a/arch/riscv/kvm/vcpu.c b/arch/riscv/kvm/vcpu.c
+index 3ebcfffaa..86aeba886 100644
+--- a/arch/riscv/kvm/vcpu.c
++++ b/arch/riscv/kvm/vcpu.c
+@@ -867,8 +867,16 @@ int kvm_arch_vcpu_ioctl_run(struct kvm_vcpu *vcpu)
+ 	struct kvm_cpu_trap trap;
+ 	struct kvm_run *run = vcpu->run;
+ 
+-	if (!vcpu->arch.ran_atleast_once)
++	if (!vcpu->arch.ran_atleast_once) {
+ 		kvm_riscv_vcpu_setup_config(vcpu);
++		/*
++		 * For VCPUs that are resuming (e.g., from migration)
++		 * and not starting from the boot address, explicitly
++		 * power them on.
++		 */
++		if (vcpu->arch.guest_context.sepc != 0x80000000)
++			kvm_riscv_vcpu_power_on(vcpu);
++	}
+ 
+ 	/* Mark this VCPU ran at least once */
+ 	vcpu->arch.ran_atleast_once = true;
+-- 
+2.43.0
+
 
