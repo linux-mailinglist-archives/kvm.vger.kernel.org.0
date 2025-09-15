@@ -1,62 +1,62 @@
-Return-Path: <kvm+bounces-57576-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-57577-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id DADE7B57EDC
-	for <lists+kvm@lfdr.de>; Mon, 15 Sep 2025 16:26:32 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 63ACCB57EDE
+	for <lists+kvm@lfdr.de>; Mon, 15 Sep 2025 16:26:46 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3F6F51774B9
-	for <lists+kvm@lfdr.de>; Mon, 15 Sep 2025 14:26:23 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id EA1ED161832
+	for <lists+kvm@lfdr.de>; Mon, 15 Sep 2025 14:26:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C0784324B1D;
-	Mon, 15 Sep 2025 14:26:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B0836326D65;
+	Mon, 15 Sep 2025 14:26:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="B7blHXjd"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ZyC3l+XO"
 X-Original-To: kvm@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E16561C860A
-	for <kvm@vger.kernel.org>; Mon, 15 Sep 2025 14:26:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D3B5430B507
+	for <kvm@vger.kernel.org>; Mon, 15 Sep 2025 14:26:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757946365; cv=none; b=cZP26DtW87dSW1lK5/14Xzrholdi5ZnHQ/+A4x6b3GDCaZddRFdxIeJuLc2NgzZwFWEceruTkP4jqbzP8irk5FukDUFNY0eTrq8q12hyCjlB52sLYkUFyvBse6VQ/+y6TUggrcW0S4VWe8OqnnjBfObQNsnn7o4ojAnQuC+CSC8=
+	t=1757946368; cv=none; b=LhS0JapPhpjFyvYDOtwuLkU/QqCcpvQ8C9JP6oMdHEsAnQhF4RjrWbJ/1dsYY6lOVo3LTFJxu3E+yRGl5dJBlnaOLoLeyUySDMNn4x63TmP7DWQUyuKcaSrzF10FoOYXFj8p7whtSqdHiKfwMbLZaYMiYr6DTq3Uj8c2VhgAGGw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757946365; c=relaxed/simple;
-	bh=24dqys0fGPAuHsnHo+RJdsFLUXemxSGL8lu7wQtIaI4=;
+	s=arc-20240116; t=1757946368; c=relaxed/simple;
+	bh=C2jK1UFUtb8LaJFNih+XJciK25lF0de4y5xAZpbInJc=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=TtIJz/xOP750KGPvSXubWeKUv7s2Ba83BH+yUgqiLTm3Zg/w/i8yFftDjPJGLfDDdP9keoZbdT1o39c62VlYAS/PFdSL8b+RlixEU5ux3V+7xPZOrBXB53EjRxqXFHdbTYuphV0e2BKCJ//0ZArfeN0z3gFF8YwtU3NwYub+V2U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=B7blHXjd; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8EC1EC4CEF9;
-	Mon, 15 Sep 2025 14:26:03 +0000 (UTC)
+	 Content-Type:Content-Disposition:In-Reply-To; b=spcDndPSzIbrIaVcDl1qEHZxa/wb7vXPDzGhU3F6p2G+525H/zkYz5P8+wvNhicczpwjF1l+Wapp2IdWNq3Pt0O7a15OBYyIp0V1g/YlbObfNhkhrwO6JXOG2/EPRxBSKfthkmJ4e4qJTKJ8hEHp1gAj8m9acn9fM1AVR7KaJ0I=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ZyC3l+XO; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id D4A03C4CEF1;
+	Mon, 15 Sep 2025 14:26:07 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1757946364;
-	bh=24dqys0fGPAuHsnHo+RJdsFLUXemxSGL8lu7wQtIaI4=;
+	s=k20201202; t=1757946368;
+	bh=C2jK1UFUtb8LaJFNih+XJciK25lF0de4y5xAZpbInJc=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=B7blHXjdIACd7YFT1d9V8xTcigIY6QrcPoZCzUaLmMJycVz0e9yklmad6qvaX8xQw
-	 0xPm4kDZXgUGbypK4/PcOZEcEIwqzH9cPIrUUYtTvqws/KRBkwj6ygts2p7+tAVScj
-	 cxrLOC+VZN6FL3W4gW4Aa3mlkrGxQJR+xLREAQWsYfbEm3VotZqHfI1E228OzkdhaW
-	 2xSQO6VtP9k/TdyDWzD8sPebnxaQLpRsFAdL6aDZlevnoIjDLen7TzbFIKMiwKDnyA
-	 dtNpQ3cmLq8QsU3qWiywNQgfliymDVdqLlHlzayR/cR5N0ASsbEcZLJHG3O96FYLbF
-	 SGSqpS3RMc/MQ==
-Date: Mon, 15 Sep 2025 19:49:48 +0530
+	b=ZyC3l+XOuZTNl7SgDwLRuzYJ+jj1PM30v55sUhInAzQllch8vOIGpgNXIjw1eoxgP
+	 y3U8A8nWTGBIP28CsserT4T6kq3ezLerT0SxpjaiZA7YlYFmY2i25m57QvbpiZskIN
+	 q8hB52T9bqTYq+rbFjqiebgJ9IIeBp/VBXFOPiVhd79P1ZUPgNoxyGtKqloFPcywqq
+	 0Zlk20/J8BnhQifvv6HQWVpzCAct21i31mwDPR70pfzpZTlLDx5fN+lHYJbZtldt6p
+	 C6oUiMtWh1LFu4Ge6vyx+tOEXoA6EAQ7kPAlRuhoYaPhc6d8u0HKbzxMegk/sWgM60
+	 /swHXglUau/2g==
+Date: Mon, 15 Sep 2025 19:55:02 +0530
 From: Naveen N Rao <naveen@kernel.org>
-To: Tom Lendacky <thomas.lendacky@amd.com>
+To: Markus Armbruster <armbru@redhat.com>
 Cc: Paolo Bonzini <pbonzini@redhat.com>, 
 	Sean Christopherson <seanjc@google.com>, qemu-devel <qemu-devel@nongnu.org>, kvm@vger.kernel.org, 
 	"Daniel P. Berrange" <berrange@redhat.com>, Eduardo Habkost <eduardo@habkost.net>, 
-	Eric Blake <eblake@redhat.com>, Markus Armbruster <armbru@redhat.com>, 
-	Marcelo Tosatti <mtosatti@redhat.com>, Zhao Liu <zhao1.liu@intel.com>, 
-	Nikunj A Dadhania <nikunj@amd.com>, Michael Roth <michael.roth@amd.com>, 
+	Eric Blake <eblake@redhat.com>, Marcelo Tosatti <mtosatti@redhat.com>, 
+	Zhao Liu <zhao1.liu@intel.com>, Nikunj A Dadhania <nikunj@amd.com>, 
+	Tom Lendacky <thomas.lendacky@amd.com>, Michael Roth <michael.roth@amd.com>, 
 	Neeraj Upadhyay <neeraj.upadhyay@amd.com>, Roy Hopkins <roy.hopkins@randomman.co.uk>
-Subject: Re: [RFC PATCH 1/7] target/i386: SEV: Consolidate SEV feature
- validation to common init path
-Message-ID: <p4ynaokjw42oafnmsmbmkxm52fo2mstf5padafddnqie4jnggv@wrntlc3sev7d>
+Subject: Re: [RFC PATCH 3/7] target/i386: SEV: Add support for enabling
+ debug-swap SEV feature
+Message-ID: <m5fnfafkzxqamg4iyc6xjun7jlxulcuufgugtrweap6myvmgov@5cmxu5n3pl2p>
 References: <cover.1757589490.git.naveen@kernel.org>
- <bd64baf06e483cf8df0f7b0f98cf5ad3dd5bff80.1757589490.git.naveen@kernel.org>
- <dd3672b6-5ee4-470f-9b61-f7ddef8bec72@amd.com>
+ <0a77cf472bc36fee7c1be78fc7d6d514d22bca9a.1757589490.git.naveen@kernel.org>
+ <87jz239at0.fsf@pond.sub.org>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -65,35 +65,72 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <dd3672b6-5ee4-470f-9b61-f7ddef8bec72@amd.com>
+In-Reply-To: <87jz239at0.fsf@pond.sub.org>
 
-Hi Tom,
+Hi Markus,
 
-On Fri, Sep 12, 2025 at 08:39:09AM -0500, Tom Lendacky wrote:
-> On 9/11/25 06:54, Naveen N Rao (AMD) wrote:
-> > Currently, check_sev_features() is called in multiple places when
-> > processing IGVM files: both when processing the initial VMSA SEV
-> > features from IGVM, as well as when validating the full contents of the
-> > VMSA. Move this to a single point in sev_common_kvm_init() to simplify
-> > the flow, as well as to re-use this function when VMSA SEV features are
-> > being set without using IGVM files.
-> > 
-> > Since check_sev_features() relies on SVM_SEV_FEAT_SNP_ACTIVE being set
-> > in VMSA SEV features depending on the guest type, set this flag by
-> > default when creating SEV-SNP guests. When using IGVM files, this field
-> > is anyway over-written so that validation in check_sev_features() is
-> > still relevant.
+On Fri, Sep 12, 2025 at 01:20:43PM +0200, Markus Armbruster wrote:
+> "Naveen N Rao (AMD)" <naveen@kernel.org> writes:
 > 
-> There seem to be multiple things going on in this patch and I wonder if it
-> would be best to split it up into separate smaller patches.
+> > Add support for enabling debug-swap VMSA SEV feature in SEV-ES and
+> > SEV-SNP guests through a new "debug-swap" boolean property on SEV guest
+> > objects. Though the boolean property is available for plain SEV guests,
+> > check_sev_features() will reject setting this for plain SEV guests.
 > 
-> You have setting of SVM_SEV_FEAT_SNP_ACTIVE in sev_features, you have a
-> new check for sev_features being set when using an IGVM file and you have
-> the consolidation.
+> Let's see whether I understand...
+> 
+> It's a property of sev-guest and sev-snp-guest objects.  These are the
+> "SEV guest objects".
+> 
+> I guess a sev-snp-guest object implies it's a SEV-SNP guest, and setting
+> @debug-swap on such an object just works.
+> 
+> With a sev-guest object, it's either a "plain SEV guest" or a "SEV-ES"
+> guest.
+> 
+> If it's the latter, setting @debug-swap just works.
+> 
+> If it's the former, and you set @debug-swap to true, then KVM
+> accelerator initialization will fail later on.  This might trigger
+> fallback to TCG.
+> 
+> Am I confused?
 
-Sure, I started with the premise of unifying the call to 
-check_sev_features() which necessitated the other changes. I will move 
-those as pre-req patches.
+You're spot on, except that in the last case above (plain old SEV 
+guest), qemu throws an error:
+	qemu-system-x86_64: check_sev_features: SEV features require either SEV-ES or SEV-SNP to be enabled
+
+> 
+> > Add helpers for setting and querying the VMSA SEV features so that they
+> > can be re-used for subsequent VMSA SEV features, and convert the
+> > existing SVM_SEV_FEAT_SNP_ACTIVE definition to use the BIT() macro for
+> > consistency with the new feature flag.
+> >
+> > Sample command-line:
+> >   -machine q35,confidential-guest-support=sev0 \
+> >   -object sev-snp-guest,id=sev0,cbitpos=51,reduced-phys-bits=1,debug-swap=on
+> >
+> > Signed-off-by: Naveen N Rao (AMD) <naveen@kernel.org>
+> 
+> [...]
+> 
+> > diff --git a/qapi/qom.json b/qapi/qom.json
+> > index 830cb2ffe781..71cd8ad588b5 100644
+> > --- a/qapi/qom.json
+> > +++ b/qapi/qom.json
+> > @@ -1010,13 +1010,17 @@
+> >  #     designated guest firmware page for measured boot with -kernel
+> >  #     (default: false) (since 6.2)
+> >  #
+> > +# @debug-swap: enable virtualization of debug registers (default: false)
+> > +#              (since 10.2)
+> 
+> Please indent like this:
+> 
+>    # @debug-swap: enable virtualization of debug registers
+>    #     (default: false) (since 10.2)
+
+Sure.
 
 Thanks for the review,
 - Naveen
