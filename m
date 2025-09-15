@@ -1,201 +1,239 @@
-Return-Path: <kvm+bounces-57573-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-57574-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id E0E79B57D83
-	for <lists+kvm@lfdr.de>; Mon, 15 Sep 2025 15:38:49 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 51EC7B57E55
+	for <lists+kvm@lfdr.de>; Mon, 15 Sep 2025 16:05:07 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 3FDB21883C1D
-	for <lists+kvm@lfdr.de>; Mon, 15 Sep 2025 13:39:11 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7229E3AC998
+	for <lists+kvm@lfdr.de>; Mon, 15 Sep 2025 14:02:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D441F319843;
-	Mon, 15 Sep 2025 13:38:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8C2A231B822;
+	Mon, 15 Sep 2025 14:02:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="P9B64z8N"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="zo3fbmFc"
 X-Original-To: kvm@vger.kernel.org
-Received: from BN8PR05CU002.outbound.protection.outlook.com (mail-eastus2azon11011004.outbound.protection.outlook.com [52.101.57.4])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pj1-f73.google.com (mail-pj1-f73.google.com [209.85.216.73])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4B94031326F;
-	Mon, 15 Sep 2025 13:38:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.57.4
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757943520; cv=fail; b=Eh9UNVQceeiVs7AluujoATWqHhfVQ2u/9YiwhlmZwIGp2r52g32Drbo+ulb6AXArRdC1XDqB4zGuceop5UFXU6nGkgAAufQUuwgpVZaM0OnFZX9ZEW2u8Zewp4c2sHmlGrkn3Mhx/yTCGUv2kWSRH3Y9xtbosC8pFMDzVzm0s2s=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757943520; c=relaxed/simple;
-	bh=WpEiEeTguTS9qcOzgCEeGMewRlPu0h95IwapVCb2jRY=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:Content-Type:
-	 Content-Disposition:In-Reply-To:MIME-Version; b=hGRALiS0FK1JmKMz1PWdyHaPwKiJNC31BhTax6NjemiH64KyAk/TQ4UZDMfKgL5PK7wyNzkkjyDLH0v9EtUl8M9eGKwrMiamP5Yx7ciBJhDjrDF7fG1AW/M5RuJOd10jySu8DSedkiAnwcO93nOecar/rs8uN/acCnhjtsdafZQ=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=P9B64z8N; arc=fail smtp.client-ip=52.101.57.4
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=XOnGa/GK53KzvJ7orCwr0o3lA178cGFrK9wP6ZQKkwoI1lbaOo+0fhDtHMmwArHybEHXtdoWGK/4ImTC/mmzes27Sse1GpJtvoFJG8gTSo2/H5kXeXfeNXBTXyr309psjHroyeIxjTmfK25hGiIzPRytBq9LbfIKD7w9dcd3ZhAanaVaG3wjhh0ZFzvNCndLnf8CbQRe7LrD3fipnwNuysoDAwPM78O8whRnDtX6AXDAgfaD2DeqNHRPjwJ+CyH+UaR96B+KcMNp+KclaiVMkUJCmbQUFvkZKl/MzY37wFsAyUDTpMzUGBdXy8w8edUwMOXowlXjnrwJArk3jBhJXg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=0qvFfWc/uJtsAdJBd529g2QnPiqXdmC2WmwrEHI06hM=;
- b=aGwPaG4nY13iSRsV3ykkGHWo6Ckt9jMaBYUDGJO1c2LZ9fd6nw2m8GV70WKm6Yr4OLPQE02hl/mKspw3ceuWOD4BYpV+/vA2c3qUu0+bn24lR352V6YBiQmm2WsEdxyhPII8TRKICe4lCzIbqe9/+H3IlWSRsAl4tfyKHkKBj3m24AbXQXWHhBpwo378h0cDhOExwJnHgUptTkx4TU5yYy+wogNlO7bhkyOziUP2/20BoPRsqeVYZoT3GzVIduRQBf9B67faLOE/9VsfouE/YAuT65CsimgPuELwJMTHXOPCHEGqL4Hn6Te/LpcgUaOlOqNlU6P5bXMyFW6kdUN76A==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
- dkim=pass header.d=nvidia.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=0qvFfWc/uJtsAdJBd529g2QnPiqXdmC2WmwrEHI06hM=;
- b=P9B64z8NLzOT/Wiq5G5fwZqgonRPO8MVLHIiSOfhiYJlLKN8Qtmu4fOQV6AV/Ddzp68Yiqp/SCjyID3mMARFsCWnHAMW9KHt8hG6AcOtJcPEEohv/y9XKsb6E66DypGqcpOlMGf8iFANz9b2MMwJNkwnAPBvztpU8nU95OM0fupPFl2N+THvPa5cL3jLlT0jRPVsn5PEfaBMGwJ9TsgWRDExuJKhX5uyP3H6aHhxPvxA7scJHxwkEGiPUSTATAIJXI2U+kd6iEOHcvzMX19iRcdE8jgbUUpRzpgdXzQCTyKiZn1QButZYUjj0D8CUqFLRMzsGSwQUguBcGfzPbVvJA==
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nvidia.com;
-Received: from PH7PR12MB5757.namprd12.prod.outlook.com (2603:10b6:510:1d0::13)
- by DM6PR12MB4283.namprd12.prod.outlook.com (2603:10b6:5:211::21) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9115.19; Mon, 15 Sep
- 2025 13:38:34 +0000
-Received: from PH7PR12MB5757.namprd12.prod.outlook.com
- ([fe80::f012:300c:6bf4:7632]) by PH7PR12MB5757.namprd12.prod.outlook.com
- ([fe80::f012:300c:6bf4:7632%2]) with mapi id 15.20.9115.020; Mon, 15 Sep 2025
- 13:38:34 +0000
-Date: Mon, 15 Sep 2025 10:38:32 -0300
-From: Jason Gunthorpe <jgg@nvidia.com>
-To: Donald Dutile <ddutile@redhat.com>
-Cc: Bjorn Helgaas <helgaas@kernel.org>, Bjorn Helgaas <bhelgaas@google.com>,
-	iommu@lists.linux.dev, Joerg Roedel <joro@8bytes.org>,
-	linux-pci@vger.kernel.org, Robin Murphy <robin.murphy@arm.com>,
-	Will Deacon <will@kernel.org>,
-	Alex Williamson <alex.williamson@redhat.com>,
-	Lu Baolu <baolu.lu@linux.intel.com>, galshalom@nvidia.com,
-	Joerg Roedel <jroedel@suse.de>, Kevin Tian <kevin.tian@intel.com>,
-	kvm@vger.kernel.org, maorg@nvidia.com, patches@lists.linux.dev,
-	tdave@nvidia.com, Tony Zhu <tony.zhu@intel.com>
-Subject: Re: [PATCH v3 05/11] PCI: Add pci_reachable_set()
-Message-ID: <20250915133832.GE922134@nvidia.com>
-References: <20250909210336.GA1507895@bhelgaas>
- <3d3f7b6c-5068-4bbc-afdb-13c5ceee1927@redhat.com>
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <3d3f7b6c-5068-4bbc-afdb-13c5ceee1927@redhat.com>
-X-ClientProxiedBy: YT4PR01CA0190.CANPRD01.PROD.OUTLOOK.COM
- (2603:10b6:b01:110::15) To PH7PR12MB5757.namprd12.prod.outlook.com
- (2603:10b6:510:1d0::13)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0CE9820B800
+	for <kvm@vger.kernel.org>; Mon, 15 Sep 2025 14:02:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.73
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1757944928; cv=none; b=NEbCmn7PAyKcxe+wZR5bDk+AkdEKUjbkD7fgMmwdzJZ0UgO4GvFTNAMB844Eu1ylF500xqAMfW9BaqyxKGU4mX2nf9PQdzKxMpTt9GeH4lAhMzh9oM5V15bcdjTAkLmVjr+uz2TpLm0cxVjOBhdkQdqSaea3/u4jLX5KLYRsMro=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1757944928; c=relaxed/simple;
+	bh=+Q3O4y2WBPEBJ57wa/R6DL7ZmuMwhkbQ43LHQdgjuIs=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=PIpGNVqajngoP5H/06IxTUmXBzXZlDHFSP09gYUq2Ubw/6gfhinX9/DvKJ+jLOBawEhIgxEXTSVPn5J9cqpKuoB/PlTnDeJpx0PlbXGwAy0C5qOaEMyxGIy1w41Ax3yO0rC3PLNxko0gh0Ga+TtEmb/eERyXV8sgysD3EignTTk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=zo3fbmFc; arc=none smtp.client-ip=209.85.216.73
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+Received: by mail-pj1-f73.google.com with SMTP id 98e67ed59e1d1-32e0b0014d9so1783274a91.1
+        for <kvm@vger.kernel.org>; Mon, 15 Sep 2025 07:02:06 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1757944926; x=1758549726; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:from:subject:message-id:references
+         :mime-version:in-reply-to:date:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=bb9kTddrcG1gYn0lmn1o+H87GYwOEccP+2QZchmvwOg=;
+        b=zo3fbmFcf2efimSk7k2eDIAZ6dl+Xd59BakIzZidnjdGP/iEbq88Sh6tpWPH9TGPzL
+         O6IlAehDkyQOPssxaSb5GlVpvwr/la3LW/rTEtwISE2T5T5qrpCUNOHX4DRWbmVW0wQV
+         /DUusrqA0DLcwdrNV31CHObXFKpvjXoWtrpruSrUuXuliz/qU//ff5G+wzrjYCmYf1xx
+         JrTuoO41BxxQobY3qhoo+MQG7yd0ZZuXbMN7g7iFTySoFVmWBSzjvUEmQzaKh1bokM3c
+         iC89lMug8Dgae9dLxWAol008eoj/eTG7Lhvr6/aq+mumRAS4BCmrvXhkUX/9spCbjlWk
+         CHKg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1757944926; x=1758549726;
+        h=content-transfer-encoding:cc:to:from:subject:message-id:references
+         :mime-version:in-reply-to:date:x-gm-message-state:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=bb9kTddrcG1gYn0lmn1o+H87GYwOEccP+2QZchmvwOg=;
+        b=OdQbor6NaNGlpaKnesTYBCH8XAsEXAIr2JsoiXMLWu94ZQATgi8g1Qi23D8hSm/kWq
+         gWckW95DHG8zG7PtA/skn4gEB84QfO+cotLAZ/Zw6TVEjykSpPefTLOc8ZeaG+Guo+ZH
+         lJbvRnOGfKatrJndLWxZuwEkOLc8gAivkhABiHNgi56ryNqp4Uiz6oyK3+UupbKdCyhd
+         UarlZtzXf28mOqw+VwmcRHC41mjFRRfYQp4feJv0rHnD/D5gcjTA/5ofMsoLKUUEB5+o
+         jxyaSg7FytL7FaoYlFih53nJI0eIQWZ/1kXcS1vposOTldHEbn+Q72jSYoM107Neh9r/
+         6/kQ==
+X-Forwarded-Encrypted: i=1; AJvYcCUkw6B0Rp/iAjsT/DcKM85gyfItLlr8IYl8+JM8bpr82jYo8iiB0fuOLp9oBOU/dEsn1iU=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwhDjLBeuanKQn3101+gZQNAl0RcUU3Ckvn3YfiBAuTcc3o7iUw
+	9iLXgeJGyqYVXh3uJI85+AVTEpQV2wZ6/jgsZnj9ramBlskKMPBKvJNRxD2J9wqRuEcOkMxXRLv
+	GfflQ5A==
+X-Google-Smtp-Source: AGHT+IF9VAl5yAYXme8hs+kHQJw7I6NLurDhLwOz+4NYmaOAMQ0rFyNNX/YVGnRr456xKTFFoiMubABtny4=
+X-Received: from pjhu33.prod.google.com ([2002:a17:90a:51a4:b0:32e:7439:c086])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:2dc4:b0:32d:f89f:9300
+ with SMTP id 98e67ed59e1d1-32df89fb457mr10300075a91.8.1757944926072; Mon, 15
+ Sep 2025 07:02:06 -0700 (PDT)
+Date: Mon, 15 Sep 2025 07:02:04 -0700
+In-Reply-To: <CAN53R8HxFvf9fAiF1vacCAdsx+m+Zcv1_vxEiq4CwoHLu17hNg@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: PH7PR12MB5757:EE_|DM6PR12MB4283:EE_
-X-MS-Office365-Filtering-Correlation-Id: f95f116e-8459-4657-92c6-08ddf45d2a75
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230040|1800799024|366016|7416014|376014;
-X-Microsoft-Antispam-Message-Info:
-	=?us-ascii?Q?ibga0iXI8VOknZxL5xoMbJDjJbRpUzmjFu5gMUsQY7UTx2Jw/lA3l87QvdVb?=
- =?us-ascii?Q?cM1FjGitwEcO4eoP0DahQx2N8XLKJt84Pkahk2sMub59fQjpL+ZL+K3nJhqQ?=
- =?us-ascii?Q?I4fPNEer2WVMcMFbaxkeBGdbJ1336wjbHtSrDQTZk+H+lVqO6OjWmu1mMBe5?=
- =?us-ascii?Q?/7RafihA9J8/eRIS2IiyUaBRD3MoRUD4MsL3DZEn4RxS0RuGYloam40BBOMg?=
- =?us-ascii?Q?dHlPaOFWSbyfCtJet4c4dwAnCCyMfAF5/TXE2zpX0t0/pZBJFJYJpl9Eq09H?=
- =?us-ascii?Q?2TnvWwLTX3IOlIvQRpGgYymG2zFW7HQKH/Vxd8hIFK69rzStkZ+zjVsc8T4N?=
- =?us-ascii?Q?Lb3ayLrLR88anJGrMQjumOa6ZzbtZTjt65ojIlQRButPSjK2BWs+wmI9mGW9?=
- =?us-ascii?Q?OEg/U+czB95QSCblhzp93zg/rxZvMZxx71ueJ8Dbq1mtkkTF1D/VGBfwRoy1?=
- =?us-ascii?Q?ZCShnf+P1Z4ARZih+4ybX1mAzhYpKykktYUSWvsXhR97sOAARERIffxja5Tf?=
- =?us-ascii?Q?oyy2HFDkdWnvxbS+XZxg9gl3x+DrkZBkNnmSxB9mfMml8mhse1Pa1zqSKy1O?=
- =?us-ascii?Q?irE0LcWbUWs/Wwp7O/6sHifpdwP4LJhVSyPQ5vqAPnL/W0fy05+inryc33RS?=
- =?us-ascii?Q?N10kyhC0oBWK9uhLjmwRcVy24K06YZ3LXkTT88AAWSbmdQKDbil5BHagSVP9?=
- =?us-ascii?Q?uuEG8Ng/ru57s2SlrsB2kkfp2HBwS0fEoo+8zGcRucbKywIKr6sgJgaZMEE2?=
- =?us-ascii?Q?Q9ct9ix54PRxmVpFeGp46aKj7Rx+sZcjnZTyvzJ5sAruA+ql+nHIQ7e6Z8uL?=
- =?us-ascii?Q?gyU7d4q1GtpIYuL7HMGMC9i0eFZHesnmHtmHS0DwDu6rW7fV+jNFaC79fVFO?=
- =?us-ascii?Q?a5BrVN4KY4sehpiVNS5N6VD8ElTq6UII9pz+MT3qj1YL3OIJiH6V6oUwXjY7?=
- =?us-ascii?Q?acQb16MS/vAO1lEgRTF4roRVSpNyZ4HiDH7FKEwV0e8xZjSFA37vKchwmXe1?=
- =?us-ascii?Q?cXs19unA35txPezp9HdXqDgSCmabH+zudQYmJgrNPjO5C4C+t/IMGkhjWxHQ?=
- =?us-ascii?Q?oBtvNfeyTjU5pxX8VT1d5EQcUnMtXjiJF/bIZETTQR4J6o+PuqdzjxvIX6b4?=
- =?us-ascii?Q?gR67fM4EU1N9Mfonb72gUl5REuPIjneBCOEyDbwtZ+CQpv2sDOjGHeZPNrEZ?=
- =?us-ascii?Q?4bzjyH+bx2cqxlPsGRSDKio4l7Di84/dMGitK8/soIkEfzj0LZkKS9Zcld6b?=
- =?us-ascii?Q?wkxoo/6vR7V9K1wLevF6HdbuHooz8192f4HCQeN7pIWWxzjkDGrewDnG277o?=
- =?us-ascii?Q?bg7CAvGcfaEWoPvuwlvr/zB15MDTsrYkLC0QjQg84UDZp04K+ia3Yku/82Yr?=
- =?us-ascii?Q?L3h/0dkHpfhYdYozK7JmoCxqnoYcq1ZvU3+iKW1YI803qfqHRURV+RbD71fT?=
- =?us-ascii?Q?GoJNZOpSO6w=3D?=
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PH7PR12MB5757.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(366016)(7416014)(376014);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?us-ascii?Q?LktUz4nqThIH4ZmAvrXcbNCGeWkG+wrxtB7cuDGm0So1R5PxS7HQGmlDV277?=
- =?us-ascii?Q?Mjuq4lr9/A3sa8YzlX2oj00nV1kSXIE9sqH+D9VXhIH4Q+tkL3lYi4r63YaZ?=
- =?us-ascii?Q?F8O+UnTAoXiJ1Nve4fEyoeRtgdqxC163ALjz8BqSM2MkJ4S3fIO+fGNfFUpV?=
- =?us-ascii?Q?byTy/o5chVBkIr87J3MbPx//VXJsdg/eLW4gRYwFagg8a1PjrkeGC/QWUxAm?=
- =?us-ascii?Q?ejfflJnhsMKzbV2DBarGYWsl1kgmJW/a3ajQ7Jv/SyUFYGe+iT3Jos+JkUNP?=
- =?us-ascii?Q?MMqoqT9gnt+mjAGKPK/rSed3ndj4qkzE7X2KB2rwzZfcuw0+pq8cppGs1tjz?=
- =?us-ascii?Q?1D3qbZPKZVff21a4YZVFZUiUCg0T7J+sM6/cQDSU9LahREEhVYdeoVSFY4gE?=
- =?us-ascii?Q?Z/wUP2ePR9klON1WeO9d0FkPsf7nZvUZwZhIn6YGMfu5NQCykXejqXFzQk31?=
- =?us-ascii?Q?y+/t3a+Pw6VohsVRuEXz8LH5NxCAdif4x+YwD6fKkjRRiabc5IkJpmcAjhfM?=
- =?us-ascii?Q?o3UeYVL/SCbB+QPsBEPtMyidPQS4THFhsISqwbUmGUsqo9BNu4YuISolUNMQ?=
- =?us-ascii?Q?D7JDG/ay86lIrVDHnD+jKZ6Y57xdPk2QQou+CMagaFSxDI4nWzsLA6TTa5AQ?=
- =?us-ascii?Q?xfQFWbDFfjjRWZuOV8tx0vwJqw5CkjGJLiqKt8Oj+ok6SufRPeY8VI7OHmib?=
- =?us-ascii?Q?11+dHLvTo3f4T/ibOfH3uizJXqPPvEdxWDn7bDK5onJX4IKpZLj6dtsLAjEo?=
- =?us-ascii?Q?UYNrwI48i+AQkU9pL58ct7R8Xhaw0jxZSw8qs9vgyfdCF06qsw8pnlQkCBQP?=
- =?us-ascii?Q?oQt1lFQE0Bx8XHz3gny23JJ1tiTg3YrNF1+7k2CUTq4AKg2J/Eip8o0AWyPN?=
- =?us-ascii?Q?Rys6oaajOe4Nszx3NS4aVCXrauNvGQzMNIcJU4ZjmD2Dp3vpl/3VegMQVRvX?=
- =?us-ascii?Q?qf9TyLf8vyzAlgEnn0JBJfHpfEn32Bbro6CZZ4sGumxPDotcncOb58r9j2Za?=
- =?us-ascii?Q?q0HI+MF9zjIszgMfgF3AfLHCloodbPCjew3NJMqDGk+C0dwpUbyO8ZJsAphG?=
- =?us-ascii?Q?oG3nQ5oTeHiBpUC6mfwTtotBIU35zxg8fvrjBuMn+Bf3Mcrty2d/+J90w1ar?=
- =?us-ascii?Q?W6fYKBjkloDYYcEA9M9PwT2vX8WC2h+ldFVZ8Dm9MOPdZINjWnNnO95zE3DO?=
- =?us-ascii?Q?nvqriUC145RgriFxs0ULGTI3PmqAmIdXwf4JqdBW4T6O8lRF0pUAo53uY5Qi?=
- =?us-ascii?Q?/A5/E8gbPaNyfWkbONbQkagQvOChqVBiO0rGI6c5K+Hhk+aH6hoIPHWrpYBu?=
- =?us-ascii?Q?al8q98jfKs79fRQlJ94J1OYBvzAQCLmRurvCQ9mS80yitboTKfJVPHtplsQd?=
- =?us-ascii?Q?Mda0Z/d0Kr4D8ZMlAvvrlOZVvCSwaCVazrOPnwQes0HdaiwLA4DaTV27sIEe?=
- =?us-ascii?Q?ov0A8qyRS9ebRpkpAK63FnOqcSX59chk1b0ULaSUzNd3nYPOu4RU2nVWplJx?=
- =?us-ascii?Q?hPtDI5Habrd6VWswgEMKaaGVydAEBSG5383DTk8OgoivJXRyX+oPHa7HWgpY?=
- =?us-ascii?Q?usKB6aCuNG2X/BRGjzw=3D?=
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: f95f116e-8459-4657-92c6-08ddf45d2a75
-X-MS-Exchange-CrossTenant-AuthSource: PH7PR12MB5757.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 15 Sep 2025 13:38:33.9828
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: lqT0ORxrmQZlBlWBTvJ0JWr3k0JCS+G8lTMnUV1XO8zyYd/JlDGZHJwisV+JtDo2
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM6PR12MB4283
+Mime-Version: 1.0
+References: <CAN53R8HxFvf9fAiF1vacCAdsx+m+Zcv1_vxEiq4CwoHLu17hNg@mail.gmail.com>
+Message-ID: <aMgcXJ3lbrTwOzzO@google.com>
+Subject: Re: [RFC] Fix potential undefined behavior in __builtin_clz usage
+ with GCC 11.1.0
+From: Sean Christopherson <seanjc@google.com>
+To: "=?utf-8?B?6ZmI5Y2O5pit?=" <lyican53@gmail.com>
+Cc: linux-kernel@vger.kernel.org, idryomov@gmail.com, xiubli@redhat.com, 
+	ceph-devel@vger.kernel.org, jejb@linux.ibm.com, martin.petersen@oracle.com, 
+	linux-scsi@vger.kernel.org, pbonzini@redhat.com, kvm@vger.kernel.org, 
+	mturquette@baylibre.com, sboyd@kernel.org, linux-clk@vger.kernel.org
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Thu, Sep 11, 2025 at 03:56:50PM -0400, Donald Dutile wrote:
++Yuri
 
-> Yes, and for clarify, I'd prefer the fcn name to be 'pci_reachable_bus_set()' so
-> it's clear it (or its callers) are performing an intra-bus reachable result,
-> and not doing inter-bus reachability checking, although returning a 256-bit
-> devfns without a domain prefix indirectly indicates it.
+On Mon, Sep 15, 2025, =E9=99=88=E5=8D=8E=E6=98=AD wrote:
+> Hi all,
+>=20
+> I've identified several instances in the Linux kernel where __builtin_clz=
+()
+> is used without proper zero-value checking, which may trigger undefined
+> behavior when compiled with GCC 11.1.0 using -march=3Dx86-64-v3 -O1 optim=
+ization.
+>=20
+> PROBLEM DESCRIPTION:
+> =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+>=20
+> GCC bug 101175 (https://gcc.gnu.org/bugzilla/show_bug.cgi?id=3D101175) ca=
+uses
+> __builtin_clz() to generate BSR instructions without proper zero handling=
+ when
+> compiled with specific optimization flags. The BSR instruction has undefi=
+ned
+> behavior when the source operand is zero, potentially causing incorrect r=
+esults.
+>=20
+> The issue manifests when:
+> - GCC version: 11.1.0 (potentially other versions)
+> - Compilation flags: -march=3Dx86-64-v3 -O1
+> - Code pattern: __builtin_clz(value) where value might be 0
+>=20
+> AFFECTED LOCATIONS:
+> =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+>=20
+> 1. HIGH RISK: net/ceph/crush/mapper.c:265
+> Problem: __builtin_clz(x & 0x1FFFF) when (x & 0x1FFFF) could be 0
+> Impact: CRUSH hash algorithm corruption in Ceph storage
+>=20
+> 2. HIGH RISK: drivers/scsi/elx/libefc_sli/sli4.h:3796
+> Problem: __builtin_clz(mask) in sli_convert_mask_to_count() with no zero =
+check
+> Impact: Incorrect count calculations in SCSI operations
+>=20
+> 3. HIGH RISK: tools/testing/selftests/kvm/dirty_log_test.c:314
+> Problem: Two __builtin_clz() calls without zero validation
+> Impact: KVM selftest framework reliability
 
-Sure:
+In practice, neither pages nor test_dirty_ring_count can be zero.   Pages i=
+s
+guaranteed to be a large-ish value, as vm->page shift is guaranteed to be a=
+t
+most 16, DIRTY_MEM_BITS is 30, and the guest/host adjustments just do minor
+tweaks.  Not to mention the test would fail miserably if pages were ever ze=
+ro.
 
-/**
- * pci_reachable_bus_set - Generate a bitmap of devices within a reachability set
- * @start: First device in the set
- * @devfns: Output set of devices on the bus reachable from start
- * @reachable: Callback to tell if two devices can reach each other
- *
- * Compute a bitmap @defvfns where every set bit is a device on the bus of
- * @start that is reachable from the @start device, including the start device.
- * Reachability between two devices is determined by a callback function.
- *
- * This is a non-recursive implementation that invokes the callback once per
- * pair. The callback must be commutative::
- *
- *    reachable(a, b) == reachable(b, a)
- *
- * reachable() can form a cyclic graph::
- *
- *    reachable(a,b) == reachable(b,c) == reachable(c,a) == true
- *
- * Since this function is limited to a single bus the largest set can be 256
- * devices large.
- */
-void pci_reachable_bus_set(struct pci_dev *start,
-			   struct pci_reachable_set *devfns,
-			   bool (*reachable)(struct pci_dev *deva,
-					     struct pci_dev *devb))
+	pages =3D (1ul << (DIRTY_MEM_BITS - vm->page_shift)) + 3;
+	pages =3D vm_adjust_num_guest_pages(vm->mode, pages);
+	if (vm->page_size < getpagesize())
+		pages =3D vm_num_host_pages(vm->mode, pages);
 
-Thanks,
-Jason
+The user could deliberately set test_dirty_ring_count to zero, but the test=
+ would
+crash due to a divide-by-zero before reaching this point.
+
+> 4. MEDIUM RISK: drivers/clk/clk-versaclock7.c:322
+> Problem: __builtin_clzll(den) but prior checks likely prevent den=3D0
+> Impact: Clock driver calculations (lower risk due to existing checks)
+>=20
+> COMPARISON WITH SAFE PATTERNS:
+> =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D
+>=20
+> The kernel already implements safe patterns in many places:
+>=20
+> // Safe pattern from include/asm-generic/bitops/builtin-fls.h
+> return x ? sizeof(x) * 8 - __builtin_clz(x) : 0;
+>=20
+> // Safe pattern from arch/powerpc/lib/sstep.c
+> op->val =3D (val ? __builtin_clz(val) : 32);
+>=20
+> PROPOSED FIXES:
+> =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+>=20
+> 1. net/ceph/crush/mapper.c:
+> - int bits =3D __builtin_clz(x & 0x1FFFF) - 16;
+> + u32 masked =3D x & 0x1FFFF;
+> + int bits =3D masked ? __builtin_clz(masked) - 16 : 16;
+>=20
+> 2. drivers/scsi/elx/libefc_sli/sli4.h:
+> if (method) {
+> - count =3D 1 << (31 - __builtin_clz(mask));
+> + count =3D mask ? 1 << (31 - __builtin_clz(mask)) : 0;
+> count *=3D 16;
+>=20
+> 3. tools/testing/selftests/kvm/dirty_log_test.c:
+> - limit =3D 1 << (31 - __builtin_clz(pages));
+> - test_dirty_ring_count =3D 1 << (31 - __builtin_clz(test_dirty_ring_coun=
+t));
+> + limit =3D pages ? 1 << (31 - __builtin_clz(pages)) : 1;
+> + test_dirty_ring_count =3D test_dirty_ring_count ?
+> + 1 << (31 - __builtin_clz(test_dirty_ring_count)) : 1;
+>=20
+> REPRODUCTION:
+> =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+>=20
+> Based on the GCC bug report and analysis of the kernel code patterns, thi=
+s
+> issue can be reproduced by:
+>=20
+> 1. Compiling affected code with: gcc -march=3Dx86-64-v3 -O1
+> 2. Examining generated assembly for BSR instructions
+> 3. Triggering code paths where the __builtin_clz argument could be zero
+>=20
+> QUESTIONS:
+> =3D=3D=3D=3D=3D=3D=3D=3D=3D
+>=20
+> 1. Should I prepare formal patches for each affected subsystem?
+
+Don't bother for the KVM selftest, it's not a problem in practice and check=
+ing
+for zero will only add confusion by incorrectly implying that pages and/or
+test_dirty_ring_count can ever be zero.
+
+> 2. Are there other instances I should investigate?
+> 3. Would adding a kernel-wide safe wrapper for __builtin_clz be appropria=
+te?
+
+Maybe?  At a glance, several of the calls to __builtin_clz() could be repla=
+ced
+with fls() or fls64(), or a fls8() or fls16() (which don't exist, yet).  Th=
+is is
+probably a question for the bitops maintainer, Yuri, now Cc'd.
+
+> 4. Would the maintainers like me to create a proof-of-concept test case?
+>=20
+> This analysis is based on static code review and comparison with the know=
+n
+> GCC bug behavior. Further testing by the respective subsystem maintainers
+> would be valuable to confirm the impact.
+>=20
+> Best regards,
+> Huazhao Chen
+> lyican53@gmail.com
+>=20
+> ---
+>=20
+> This analysis affects multiple subsystems and should be addressed to ensu=
+re
+> deterministic behavior across different GCC versions and optimization lev=
+els.
+> I'm happy to assist with testing or patch development if the maintainers
+> confirm this is indeed an issue worth addressing.
 
