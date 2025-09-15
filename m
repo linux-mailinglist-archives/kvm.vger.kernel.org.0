@@ -1,126 +1,75 @@
-Return-Path: <kvm+bounces-57544-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-57545-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2755EB57807
-	for <lists+kvm@lfdr.de>; Mon, 15 Sep 2025 13:26:31 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9C78CB5787D
+	for <lists+kvm@lfdr.de>; Mon, 15 Sep 2025 13:36:33 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 7850D7AD0FC
-	for <lists+kvm@lfdr.de>; Mon, 15 Sep 2025 11:24:51 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 09EF9188B9E7
+	for <lists+kvm@lfdr.de>; Mon, 15 Sep 2025 11:35:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B9C462FE05F;
-	Mon, 15 Sep 2025 11:26:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C5985303A3C;
+	Mon, 15 Sep 2025 11:30:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (4096-bit key) header.d=alien8.de header.i=@alien8.de header.b="h7V6iMvm"
+	dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b="nRes1P59"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail.alien8.de (mail.alien8.de [65.109.113.108])
+Received: from m16.mail.163.com (m16.mail.163.com [117.135.210.4])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5A4801D54D8;
-	Mon, 15 Sep 2025 11:26:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=65.109.113.108
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 27E5520C463;
+	Mon, 15 Sep 2025 11:30:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=117.135.210.4
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757935579; cv=none; b=uHyduihPEMS2sDjUx5HSAv/VksFqBpV+lZfTrmxoO9hpyyRQe8r48Z0f40IqjIiqqC3hYVCk/6GbFhdXpXN7oBA13Xjz+SymbWjzzYnGal+fppFTaBtDj2UjPRphTakTZxjpmCQNX7MLqlF3eqzz/V9vltqqC/O0GEfIIxMw8d4=
+	t=1757935849; cv=none; b=VOJHFiSKSxmJZZ8JVE76lB2gNI3FTQllQxCl/moNoCe0xLNz/V1+x51eMAhmgHR+1dJ8dRwWSxxK3TXHxvdGDGwZoCDa5dTkJLT2ApHP+ZYef0K8eP7GO5t/jGXd6pbbXt9OTo1I5aky6FNmL/FQ/37KbssIkY7R4IsiprDtpLY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757935579; c=relaxed/simple;
-	bh=EyCbsyd109jlA6dWKPGR31a04u6NZDtlezBFxPWAehg=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=dxPTAYy1Z5aunDKYfI3AjZDAPWjnESFO85nS1phmWde+yMUnaidXFhgvfjmXwk6pyC/AUrqt5LPoAEOu+NiAfiBfwevd+NtPGhye7ayJCRdq20TLR1rFyCkKht7y2uJ+MFxSI/0yCKgaxOt7lAJCF1hGNJ/IkUsfRH4nVtMyvhY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=alien8.de; spf=pass smtp.mailfrom=alien8.de; dkim=pass (4096-bit key) header.d=alien8.de header.i=@alien8.de header.b=h7V6iMvm; arc=none smtp.client-ip=65.109.113.108
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=alien8.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=alien8.de
-Received: from localhost (localhost.localdomain [127.0.0.1])
-	by mail.alien8.de (SuperMail on ZX Spectrum 128k) with ESMTP id 7B29E40E019E;
-	Mon, 15 Sep 2025 11:26:06 +0000 (UTC)
-X-Virus-Scanned: Debian amavisd-new at mail.alien8.de
-Authentication-Results: mail.alien8.de (amavisd-new); dkim=pass (4096-bit key)
-	header.d=alien8.de
-Received: from mail.alien8.de ([127.0.0.1])
-	by localhost (mail.alien8.de [127.0.0.1]) (amavisd-new, port 10026)
-	with ESMTP id Q_gETiq9zByM; Mon, 15 Sep 2025 11:26:00 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=alien8;
-	t=1757935560; bh=og5A2WyNgFf7VMif0EZi46Of8DzCnjQ3vDeonAI/acM=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=h7V6iMvmKJs5863dr5nkmFZiU3qP66keqlZx93dvM7YITmmnEqhBm2jC399/6c/X9
-	 eY9gbp2YoNgadnZBfoFQRnkRzlgBnuOUnHMozopc4WqAyEnde3RgQSU2ZKcSxtYueK
-	 mHx8p9+ZPwV8veJYk7A+Ck7xylMOptWVKSqdpjw+CpAxXm+Zs+I4P0DEsXZEWdyOvp
-	 FfA4vvdC86enrUgOLIYL8T0pgOiW0/24oqTiK1bYXdnsXGFT4DfZTIeaBOiEXLSiqi
-	 14CwdGeryMyaE5B0iUBHnuV2ThAOwslGsCZBipQvKxeOPCyjjuKV/KawE6Bd068WpV
-	 V2Bmjdk1ffPhdrPbv5wfJF2mfNiyDze3a2ZZvsxj9b+ENTDuF0to2nIWwssoxxCB38
-	 Hl3aF8O3sVyvsbRT0/tYpHLQbutKZZsgUt/Xc1Pq6Q2JwemjjmoLxp27NN+L00dRDk
-	 Tb6vyvnJPk0Og9cRuZCUqT2miGRJnyCefzZ+Ha36VFdJTV+DON9EhwTszRBOWBYALn
-	 gf4fZLpCRe+tzlMPeOR1JKGjJ49XwBOBF7SRmbBYa5220t3cwGd9t1ukJ1f8PX7Oyn
-	 9J0iMhzitSbc984GGwPNmzIiYzgWY5gidjaCJ/+iE41ptd6pIkWIrQaJLl/GHFpO+9
-	 Q0/zyASL+1qe81MtgrUGcbL8=
-Received: from zn.tnic (p5de8ed27.dip0.t-ipconnect.de [93.232.237.39])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange ECDHE (P-256) server-signature ECDSA (P-256) server-digest SHA256)
-	(No client certificate requested)
-	by mail.alien8.de (SuperMail on ZX Spectrum 128k) with UTF8SMTPSA id D3EBF40E01A3;
-	Mon, 15 Sep 2025 11:25:17 +0000 (UTC)
-Date: Mon, 15 Sep 2025 13:25:10 +0200
-From: Borislav Petkov <bp@alien8.de>
-To: Babu Moger <babu.moger@amd.com>
-Cc: corbet@lwn.net, tony.luck@intel.com, reinette.chatre@intel.com,
-	Dave.Martin@arm.com, james.morse@arm.com, tglx@linutronix.de,
-	mingo@redhat.com, dave.hansen@linux.intel.com, x86@kernel.org,
-	hpa@zytor.com, kas@kernel.org, rick.p.edgecombe@intel.com,
-	akpm@linux-foundation.org, paulmck@kernel.org, frederic@kernel.org,
-	pmladek@suse.com, rostedt@goodmis.org, kees@kernel.org,
-	arnd@arndb.de, fvdl@google.com, seanjc@google.com,
-	thomas.lendacky@amd.com, pawan.kumar.gupta@linux.intel.com,
-	perry.yuan@amd.com, manali.shukla@amd.com, sohil.mehta@intel.com,
-	xin@zytor.com, Neeraj.Upadhyay@amd.com, peterz@infradead.org,
-	tiala@microsoft.com, mario.limonciello@amd.com,
-	dapeng1.mi@linux.intel.com, michael.roth@amd.com,
-	chang.seok.bae@intel.com, linux-doc@vger.kernel.org,
-	linux-kernel@vger.kernel.org, linux-coco@lists.linux.dev,
-	kvm@vger.kernel.org, peternewman@google.com, eranian@google.com,
-	gautham.shenoy@amd.com
-Subject: Re: [PATCH v18 00/33] x86,fs/resctrl: Support AMD Assignable
- Bandwidth Monitoring Counters (ABMC)
-Message-ID: <20250915112510.GAaMf3lkd6Y1E_Oszg@fat_crate.local>
-References: <cover.1757108044.git.babu.moger@amd.com>
+	s=arc-20240116; t=1757935849; c=relaxed/simple;
+	bh=47DEQpj8HBSa+/TImW+5JCeuQeRkm5NMpJWZG3hSuFU=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=pL4XaJcp5iJ+R/Pd4JJJZiA4NRBrtDwwkxdWeWWU5x9zyM6aGq9VvzYJrS5IU7K8+W2F+q+fRwdPJMOwE701zUCEsVWLwHmWFBGGQ9yMumPO0CztNEWtL+CPJDl1PgXyJ+YJRo5PvFSDOfUFQZ+Xx6zFhXPP1xJGau0y1joi1AE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com; spf=pass smtp.mailfrom=163.com; dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b=nRes1P59; arc=none smtp.client-ip=117.135.210.4
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=163.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=163.com;
+	s=s110527; h=From:To:Subject:Date:Message-ID:MIME-Version; bh=47
+	DEQpj8HBSa+/TImW+5JCeuQeRkm5NMpJWZG3hSuFU=; b=nRes1P59wp9fYzplsx
+	a69S08t/AKtIEApSDM6L9sg6rHZThIp4j8kdRcCoV0YPdLPyi6hcQyrFakgyDVhS
+	VwzjFcKKSaGXf8tCiP9S2zqPuY455kKYPhr+nFCejc1NflGomvO0DcPnlBcyg6Xn
+	jhNoTgBLNeiSAMtE94e1x7o/4=
+Received: from localhost.localdomain (unknown [])
+	by gzsmtp3 (Coremail) with SMTP id PigvCgDnU+G4+MdomWZMDA--.15853S2;
+	Mon, 15 Sep 2025 19:30:01 +0800 (CST)
+From: Jinyu Tang <tjytimi@163.com>
+To: anup@brainfault.org
+Cc: ajones@ventanamicro.com,
+	atish.patra@linux.dev,
+	conor.dooley@microchip.com,
+	kvm-riscv@lists.infradead.org,
+	kvm@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	linux-riscv@lists.infradead.org,
+	nutty.liu@hotmail.com,
+	paul.walmsley@sifive.com,
+	tjytimi@163.com,
+	yongxuan.wang@sifive.com
+Subject: Re:Re: [PATCH v3] riscv: skip csr restore if vcpu preempted reload
+Date: Mon, 15 Sep 2025 19:29:59 +0800
+Message-ID: <20250915112959.1337857-1-tjytimi@163.com>
+X-Mailer: git-send-email 2.43.0
+In-Reply-To: <CAAhSdy27hnGS3HOazwnR4Y+SCk94RLnz5CA1kDkzsx7QH3dmwA@mail.gmail.com>
+References: <CAAhSdy27hnGS3HOazwnR4Y+SCk94RLnz5CA1kDkzsx7QH3dmwA@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <cover.1757108044.git.babu.moger@amd.com>
+Content-Transfer-Encoding: 8bit
+X-CM-TRANSID:PigvCgDnU+G4+MdomWZMDA--.15853S2
+X-Coremail-Antispam: 1Uf129KBjDUn29KB7ZKAUJUUUUU529EdanIXcx71UUUUU7v73
+	VFW2AGmfu7bjvjm3AaLaJ3UbIYCTnIWIevJa73UjIFyTuYvjfUjkucUUUUU
+X-CM-SenderInfo: xwm13xlpl6il2tof0z/1tbiThbJeGjH9Pex3wAAsr
 
-On Fri, Sep 05, 2025 at 04:33:59PM -0500, Babu Moger wrote:
->  .../admin-guide/kernel-parameters.txt         |    2 +-
->  Documentation/filesystems/resctrl.rst         |  325 ++++++
->  MAINTAINERS                                   |    1 +
->  arch/x86/include/asm/cpufeatures.h            |    1 +
->  arch/x86/include/asm/msr-index.h              |    2 +
->  arch/x86/include/asm/resctrl.h                |   16 -
->  arch/x86/kernel/cpu/resctrl/core.c            |   81 +-
->  arch/x86/kernel/cpu/resctrl/internal.h        |   56 +-
->  arch/x86/kernel/cpu/resctrl/monitor.c         |  248 +++-
->  arch/x86/kernel/cpu/scattered.c               |    1 +
->  fs/resctrl/ctrlmondata.c                      |   26 +-
->  fs/resctrl/internal.h                         |   58 +-
->  fs/resctrl/monitor.c                          | 1008 ++++++++++++++++-
->  fs/resctrl/rdtgroup.c                         |  252 ++++-
->  include/linux/resctrl.h                       |  148 ++-
->  include/linux/resctrl_types.h                 |   18 +-
->  16 files changed, 2019 insertions(+), 224 deletions(-)
 
-Ok, I've rebased and pushed out the pile into tip:x86/cache.
-
-Please run it one more time to make sure all is good.
-
-Thx.
-
--- 
-Regards/Gruss,
-    Boris.
-
-https://people.kernel.org/tglx/notes-about-netiquette
 
