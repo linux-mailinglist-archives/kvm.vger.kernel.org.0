@@ -1,75 +1,54 @@
-Return-Path: <kvm+bounces-57606-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-57607-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2EC80B583DF
-	for <lists+kvm@lfdr.de>; Mon, 15 Sep 2025 19:42:51 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7C3D0B583EB
+	for <lists+kvm@lfdr.de>; Mon, 15 Sep 2025 19:46:29 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7FE9C4882C8
-	for <lists+kvm@lfdr.de>; Mon, 15 Sep 2025 17:42:44 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id A469B1AA6279
+	for <lists+kvm@lfdr.de>; Mon, 15 Sep 2025 17:46:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AB8842C2341;
-	Mon, 15 Sep 2025 17:42:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5F20528B407;
+	Mon, 15 Sep 2025 17:46:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="iyJkapcs"
+	dkim=pass (2048-bit key) header.d=zytor.com header.i=@zytor.com header.b="Wa71D/gg"
 X-Original-To: kvm@vger.kernel.org
-Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+Received: from mail.zytor.com (terminus.zytor.com [198.137.202.136])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2790829BDBA;
-	Mon, 15 Sep 2025 17:42:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9037E101F2;
+	Mon, 15 Sep 2025 17:46:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.136
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757958144; cv=none; b=qGIqtfUxSo909GaHjYS2QD3svyRujWDv5HoDC9wrLQD9pXsWqlSGmWrBNMCZD84mwkSZLRWG+AiuSUp5mGpDio1zzCbmzP+aGpBlbm4GDAxVwpBcwre8qU4c3pNqPBD8YFQFbCI/8+mJ22QSQOczNhMGJesMaOa5bw7xA94zdio=
+	t=1757958378; cv=none; b=Fv3gV0JF6lbJ7MLmtlPuoG9sqxL0kmwJYfekNDoxRp/EST54X1vibm5/Ba8nHQ3cx6+VlEak92DllidoMloeaayOcMm+Zt067hcl8l4QpCJgzVKiBqA+PvfSDKvp+4Ur3xHWCBld6F76JVnQZA+zUpv8Vq9XVzwzieOvL/tx+yc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757958144; c=relaxed/simple;
-	bh=lveJTBhWcGibWV+U84fVnL1ymE572t9uInDOtZ3oLaM=;
+	s=arc-20240116; t=1757958378; c=relaxed/simple;
+	bh=3epPdnANQv7fz6EaSn/biBvqoVUJuIEawr3Lj6bTY3o=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=Bsb+N5p3c9SK8WOLUcSxHbmG8TEv7KshdngNFzsuW+nmaSaQ6I1Qxj9/Zbhm9vUkQsL3q3wpUCUYcFuO/GfBwtADEFxPjIqzA91AyUkuRTa/nyGhiQrECOfcZxjSi5Ws5HJjS5GDM1Dt6FTfcFgzWldTolCccaqM53AaaWFOVCs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=iyJkapcs; arc=none smtp.client-ip=148.163.158.5
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
-Received: from pps.filterd (m0356516.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 58F9AEAk031553;
-	Mon, 15 Sep 2025 17:42:19 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
-	:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=pp1; bh=JhXJu6
-	ir11KpT+sS/XSzhY+3oje8j9jfdBWs7PnkAQI=; b=iyJkapcsCW2e+yp/90Fvqi
-	WfextZ6fAoQVXdviaM9OfMmQq+cIkC5Jbg3R54bgcOgYRKHAsHgnRIocTWaZSvuQ
-	FXQmqywaY2FGrUnQ8DQiz1z4UzS3whXM1Lygfqya8UEuF23JWorOuWSfx0XvurOn
-	mQ6Z5N6d2Qlj9co2TCL9ZtdlOsMz1WKYKs3m+4zFZuvE4uljBajhIqglH3Gm2V1R
-	xrXMSb7YeFFfoGJvBKGzqniJjJxu1viyc6zvby9AQdaIh4YWQYpcIH6vTvOG+yRd
-	TpLA68hnthXwKrI0uf54U3+p+nO9Si33rPMFI60dWhdZk1S1V1OL1eUmg+nD+Geg
-	==
-Received: from ppma21.wdc07v.mail.ibm.com (5b.69.3da9.ip4.static.sl-reverse.com [169.61.105.91])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 494x1tbw94-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Mon, 15 Sep 2025 17:42:18 +0000 (GMT)
-Received: from pps.filterd (ppma21.wdc07v.mail.ibm.com [127.0.0.1])
-	by ppma21.wdc07v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 58FFAAKa022316;
-	Mon, 15 Sep 2025 17:42:18 GMT
-Received: from smtprelay02.dal12v.mail.ibm.com ([172.16.1.4])
-	by ppma21.wdc07v.mail.ibm.com (PPS) with ESMTPS id 495kxpfp00-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Mon, 15 Sep 2025 17:42:18 +0000
-Received: from smtpav02.wdc07v.mail.ibm.com (smtpav02.wdc07v.mail.ibm.com [10.39.53.229])
-	by smtprelay02.dal12v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 58FHgG3p18022992
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Mon, 15 Sep 2025 17:42:16 GMT
-Received: from smtpav02.wdc07v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 87EB85805C;
-	Mon, 15 Sep 2025 17:42:16 +0000 (GMT)
-Received: from smtpav02.wdc07v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id A88E95805B;
-	Mon, 15 Sep 2025 17:42:15 +0000 (GMT)
-Received: from [9.61.244.242] (unknown [9.61.244.242])
-	by smtpav02.wdc07v.mail.ibm.com (Postfix) with ESMTP;
-	Mon, 15 Sep 2025 17:42:15 +0000 (GMT)
-Message-ID: <f3a91866-3897-4872-8336-384bb8e568a4@linux.ibm.com>
-Date: Mon, 15 Sep 2025 10:42:12 -0700
+	 In-Reply-To:Content-Type; b=B9iZLWLvCQe+IKWgxsEji8Etty+81P+h72czikTDuUH6M1Xky8+Cz9kT+0UmYqX92lrGQaIe4Fds+WanGEFsFk/TQ/aosQG4akDYxWa+CqSC5IKZOGncHUOqxFQcIHxqkLHkIhnz4J9QGG9mtvGfNWZkT5E5cDCH5cl/gMpwAOM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=zytor.com; spf=pass smtp.mailfrom=zytor.com; dkim=pass (2048-bit key) header.d=zytor.com header.i=@zytor.com header.b=Wa71D/gg; arc=none smtp.client-ip=198.137.202.136
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=zytor.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=zytor.com
+Received: from [0.0.0.0] ([134.134.137.72])
+	(authenticated bits=0)
+	by mail.zytor.com (8.18.1/8.17.1) with ESMTPSA id 58FHk45h2831435
+	(version=TLSv1.3 cipher=TLS_AES_128_GCM_SHA256 bits=128 verify=NO);
+	Mon, 15 Sep 2025 10:46:05 -0700
+DKIM-Filter: OpenDKIM Filter v2.11.0 mail.zytor.com 58FHk45h2831435
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=zytor.com;
+	s=2025082201; t=1757958366;
+	bh=u58/nmqUuG+LnbtBgpVgICgzTVmlfywgwQRs9xbltlM=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=Wa71D/ggOHHYbjiIXLGdwQp6rTJfAUKnG7EwGaLcQRbdLnfdXI4CXARhuqiKD3lZz
+	 19PU9BNoJ0r0wqW+vy8AAW7sv4BRGCYtjvs3mLDm5O1ZmqRDo2k2UX6Pf+D+SEeAOa
+	 8e9+fiPnYeHgmdoF2VoflpvjKN5C5WBdKZbQCFEIXBqqYd3waLYiteIRKi4bCGFBbn
+	 6nSoTGOYdawDzuuFsEpYeYpMoQIh3QQzpJT1QmbQPckk/B7k1vSebGPc9rW2yq96Rx
+	 +3fmhGbRvtNY7ziKyjVjkS06/3Vir5L3Are762+kYHBXCjJcS65brMBeEIQBE4ck6N
+	 P7E0LtvUhu24w==
+Message-ID: <dcab546d-8a9a-42c5-ad7c-3484e505ffba@zytor.com>
+Date: Mon, 15 Sep 2025 10:45:59 -0700
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -77,155 +56,110 @@ List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v3 05/10] s390/pci: Restore IRQ unconditionally for the
- zPCI device
-To: Niklas Schnelle <schnelle@linux.ibm.com>, linux-s390@vger.kernel.org,
-        kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-pci@vger.kernel.org
-Cc: alex.williamson@redhat.com, helgaas@kernel.org, mjrosato@linux.ibm.com
-References: <20250911183307.1910-1-alifm@linux.ibm.com>
- <20250911183307.1910-6-alifm@linux.ibm.com>
- <d4ae1aede3a62ad60626e9706d11ed3c48f5a30a.camel@linux.ibm.com>
+Subject: Re: [PATCH v15 21/41] KVM: nVMX: Prepare for enabling CET support for
+ nested guest
+To: Sean Christopherson <seanjc@google.com>,
+        Paolo Bonzini <pbonzini@redhat.com>
+Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Tom Lendacky <thomas.lendacky@amd.com>,
+        Mathias Krause <minipli@grsecurity.net>,
+        John Allen <john.allen@amd.com>,
+        Rick Edgecombe <rick.p.edgecombe@intel.com>,
+        Chao Gao <chao.gao@intel.com>, Maxim Levitsky <mlevitsk@redhat.com>,
+        Xiaoyao Li <xiaoyao.li@intel.com>,
+        Zhang Yi Z <yi.z.zhang@linux.intel.com>
+References: <20250912232319.429659-1-seanjc@google.com>
+ <20250912232319.429659-22-seanjc@google.com>
 Content-Language: en-US
-From: Farhan Ali <alifm@linux.ibm.com>
-In-Reply-To: <d4ae1aede3a62ad60626e9706d11ed3c48f5a30a.camel@linux.ibm.com>
+From: Xin Li <xin@zytor.com>
+Autocrypt: addr=xin@zytor.com; keydata=
+ xsDNBGUPz1cBDACS/9yOJGojBFPxFt0OfTWuMl0uSgpwk37uRrFPTTLw4BaxhlFL0bjs6q+0
+ 2OfG34R+a0ZCuj5c9vggUMoOLdDyA7yPVAJU0OX6lqpg6z/kyQg3t4jvajG6aCgwSDx5Kzg5
+ Rj3AXl8k2wb0jdqRB4RvaOPFiHNGgXCs5Pkux/qr0laeFIpzMKMootGa4kfURgPhRzUaM1vy
+ bsMsL8vpJtGUmitrSqe5dVNBH00whLtPFM7IbzKURPUOkRRiusFAsw0a1ztCgoFczq6VfAVu
+ raTye0L/VXwZd+aGi401V2tLsAHxxckRi9p3mc0jExPc60joK+aZPy6amwSCy5kAJ/AboYtY
+ VmKIGKx1yx8POy6m+1lZ8C0q9b8eJ8kWPAR78PgT37FQWKYS1uAroG2wLdK7FiIEpPhCD+zH
+ wlslo2ETbdKjrLIPNehQCOWrT32k8vFNEMLP5G/mmjfNj5sEf3IOKgMTMVl9AFjsINLHcxEQ
+ 6T8nGbX/n3msP6A36FDfdSEAEQEAAc0WWGluIExpIDx4aW5Aenl0b3IuY29tPsLBDQQTAQgA
+ NxYhBIUq/WFSDTiOvUIqv2u9DlcdrjdRBQJlD89XBQkFo5qAAhsDBAsJCAcFFQgJCgsFFgID
+ AQAACgkQa70OVx2uN1HUpgv/cM2fsFCQodLArMTX5nt9yqAWgA5t1srri6EgS8W3F+3Kitge
+ tYTBKu6j5BXuXaX3vyfCm+zajDJN77JHuYnpcKKr13VcZi1Swv6Jx1u0II8DOmoDYLb1Q2ZW
+ v83W55fOWJ2g72x/UjVJBQ0sVjAngazU3ckc0TeNQlkcpSVGa/qBIHLfZraWtdrNAQT4A1fa
+ sWGuJrChBFhtKbYXbUCu9AoYmmbQnsx2EWoJy3h7OjtfFapJbPZql+no5AJ3Mk9eE5oWyLH+
+ QWqtOeJM7kKvn/dBudokFSNhDUw06e7EoVPSJyUIMbYtUO7g2+Atu44G/EPP0yV0J4lRO6EA
+ wYRXff7+I1jIWEHpj5EFVYO6SmBg7zF2illHEW31JAPtdDLDHYcZDfS41caEKOQIPsdzQkaQ
+ oW2hchcjcMPAfyhhRzUpVHLPxLCetP8vrVhTvnaZUo0xaVYb3+wjP+D5j/3+hwblu2agPsaE
+ vgVbZ8Fx3TUxUPCAdr/p73DGg57oHjgezsDNBGUPz1gBDAD4Mg7hMFRQqlzotcNSxatlAQNL
+ MadLfUTFz8wUUa21LPLrHBkUwm8RujehJrzcVbPYwPXIO0uyL/F///CogMNx7Iwo6by43KOy
+ g89wVFhyy237EY76j1lVfLzcMYmjBoTH95fJC/lVb5Whxil6KjSN/R/y3jfG1dPXfwAuZ/4N
+ cMoOslWkfZKJeEut5aZTRepKKF54T5r49H9F7OFLyxrC/uI9UDttWqMxcWyCkHh0v1Di8176
+ jjYRNTrGEfYfGxSp+3jYL3PoNceIMkqM9haXjjGl0W1B4BidK1LVYBNov0rTEzyr0a1riUrp
+ Qk+6z/LHxCM9lFFXnqH7KWeToTOPQebD2B/Ah5CZlft41i8L6LOF/LCuDBuYlu/fI2nuCc8d
+ m4wwtkou1Y/kIwbEsE/6RQwRXUZhzO6llfoN96Fczr/RwvPIK5SVMixqWq4QGFAyK0m/1ap4
+ bhIRrdCLVQcgU4glo17vqfEaRcTW5SgX+pGs4KIPPBE5J/ABD6pBnUUAEQEAAcLA/AQYAQgA
+ JhYhBIUq/WFSDTiOvUIqv2u9DlcdrjdRBQJlD89ZBQkFo5qAAhsMAAoJEGu9DlcdrjdR4C0L
+ /RcjolEjoZW8VsyxWtXazQPnaRvzZ4vhmGOsCPr2BPtMlSwDzTlri8BBG1/3t/DNK4JLuwEj
+ OAIE3fkkm+UG4Kjud6aNeraDI52DRVCSx6xff3bjmJsJJMb12mWglN6LjdF6K+PE+OTJUh2F
+ dOhslN5C2kgl0dvUuevwMgQF3IljLmi/6APKYJHjkJpu1E6luZec/lRbetHuNFtbh3xgFIJx
+ 2RpgVDP4xB3f8r0I+y6ua+p7fgOjDLyoFjubRGed0Be45JJQEn7A3CSb6Xu7NYobnxfkwAGZ
+ Q81a2XtvNS7Aj6NWVoOQB5KbM4yosO5+Me1V1SkX2jlnn26JPEvbV3KRFcwV5RnDxm4OQTSk
+ PYbAkjBbm+tuJ/Sm+5Yp5T/BnKz21FoCS8uvTiziHj2H7Cuekn6F8EYhegONm+RVg3vikOpn
+ gao85i4HwQTK9/D1wgJIQkdwWXVMZ6q/OALaBp82vQ2U9sjTyFXgDjglgh00VRAHP7u1Rcu4
+ l75w1xInsg==
+In-Reply-To: <20250912232319.429659-22-seanjc@google.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Authority-Analysis: v=2.4 cv=OMsn3TaB c=1 sm=1 tr=0 ts=68c84ffa cx=c_pps
- a=GFwsV6G8L6GxiO2Y/PsHdQ==:117 a=GFwsV6G8L6GxiO2Y/PsHdQ==:17
- a=IkcTkHD0fZMA:10 a=yJojWOMRYYMA:10 a=VwQbUJbxAAAA:8 a=VnNF1IyMAAAA:8
- a=PrEUJIRfXM-3lrLWsPsA:9 a=QEXdDO2ut3YA:10
-X-Proofpoint-ORIG-GUID: Xc40oTrlQ4S-hynvkJgcYdzArThsAIFb
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUwOTEzMDAwMSBTYWx0ZWRfX/aXsx08njwwt
- lt7YE/llYTwyZk6ueEUlxYsDFD0u0MF5ZGE446nuKqk5xLuNOuwMN+vAasRGmCTJEXwIjqrVKb4
- eS/LVTaRWLWYf2Gky/6r3gCBjoSGxWxaBAIPW04or4nMIP2ppdzILuagxcjt8TVRIOWZnFuH9nt
- XdIGD4zFWMBbK4Cuj3srVxIaiWgG2BDJCE14eaj9P0WT6X2Y6tmRrUSJ+XgmLgk8kWa6tlb8AnE
- e4IfOMgPmqbG2g3OD+3rg568CXaHjF9c/KsNM3fiV5+P6omeaaEoL9kPjV/n3tWRTgIgRKnbbop
- zOX1s4xTSfIBqSEIWvibkXWL92mclSEq0ClA7Phc7R5LQzxrfojg4KXTL7VzklYF8iyAVn6al0U
- PJFntxM9
-X-Proofpoint-GUID: Xc40oTrlQ4S-hynvkJgcYdzArThsAIFb
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1117,Hydra:6.1.9,FMLib:17.12.80.40
- definitions=2025-09-15_06,2025-09-12_01,2025-03-28_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- phishscore=0 suspectscore=0 spamscore=0 priorityscore=1501 adultscore=0
- impostorscore=0 clxscore=1015 malwarescore=0 bulkscore=0
- classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
- reason=mlx scancount=1 engine=8.19.0-2507300000 definitions=main-2509130001
+
+On 9/12/2025 4:22 PM, Sean Christopherson wrote:
+> From: Yang Weijiang <weijiang.yang@intel.com>
+> 
+> Set up CET MSRs, related VM_ENTRY/EXIT control bits and fixed CR4 setting
+> to enable CET for nested VM.
+> 
+> vmcs12 and vmcs02 needs to be synced when L2 exits to L1 or when L1 wants
+> to resume L2, that way correct CET states can be observed by one another.
+> 
+> Please note that consistency checks regarding CET state during VM-Entry
+> will be added later to prevent this patch from becoming too large.
+> Advertising the new CET VM_ENTRY/EXIT control bits are also be deferred
+> until after the consistency checks are added.
+> 
+> Signed-off-by: Yang Weijiang <weijiang.yang@intel.com>
+> Tested-by: Mathias Krause <minipli@grsecurity.net>
+> Tested-by: John Allen <john.allen@amd.com>
+> Tested-by: Rick Edgecombe <rick.p.edgecombe@intel.com>
+> Signed-off-by: Chao Gao <chao.gao@intel.com>
+> Signed-off-by: Sean Christopherson <seanjc@google.com>
 
 
-On 9/15/2025 1:39 AM, Niklas Schnelle wrote:
-> On Thu, 2025-09-11 at 11:33 -0700, Farhan Ali wrote:
->> Commit c1e18c17bda6 ("s390/pci: add zpci_set_irq()/zpci_clear_irq()"),
->> introduced the zpci_set_irq() and zpci_clear_irq(), to be used while
->> resetting a zPCI device.
->>
->> Commit da995d538d3a ("s390/pci: implement reset_slot for hotplug slot"),
->> mentions zpci_clear_irq() being called in the path for zpci_hot_reset_device().
->> But that is not the case anymore and these functions are not called
->> outside of this file.
-> If you're doing another version I think you could add a bit more
-> information on why this still works for existing recovery based on my
-> investigation in
-> https://lore.kernel.org/lkml/052ebdbb6f2d38025ca4345ee51e4857e19bb0e4.camel@linux.ibm.com/
->
-> Even if you don't add more explanations, I'd tend to just drop the
-> above paragraph as it doesn't seem relevant and sounds like
-> zpci_hot_reset_device() doesn't clear IRQs. As explained in the linked
-> mail there really is no need to call zpci_clear_irq() in
-> zpci_hot_reset_device() as the CLP disable does disable IRQs. It's
-> really only the state tracking that can get screwed up but is also fine
-> for drivers which end up doing the tear down.
-
-I referenced commit da995d538d3a as that commit introduced the 
-arch_restore_msi_irqs and describes the reasoning as to why we need it. 
-It also mentions about zpci_clear_irq being called by 
-zpci_hot_reset_device. IMHO the message was confusing as it took me my 
-down the path of trying to identify any commit that changed the behavior 
-since da995d538d3a. But that wasn't the case and it was an error in the 
-commit message. I want to keep a reference here to at least clarify that.
-
-I had tried to clarify that this only becomes an issue if a driver tries 
-restoring state through pci_restore_state(), in the paragraph below. But 
-should I change it to be more explicit about that it's not an issue for 
-driver doing setup and tear down through arch_msi_irq_setup and 
-arch_msi_irq_teardown functions?
-
->
->> However after a CLP disable/enable reset, the device's IRQ are
->> unregistered, but the flag zdev->irq_registered does not get cleared. It
->> creates an inconsistent state and so arch_restore_msi_irqs() doesn't
->> correctly restore the device's IRQ. This becomes a problem when a PCI
->> driver tries to restore the state of the device through
->> pci_restore_state(). Restore IRQ unconditionally for the device and remove
->> the irq_registered flag as its redundant.
-> s/its/it's/
-
-Thanks, will fix.
-
->
->> Signed-off-by: Farhan Ali <alifm@linux.ibm.com>
->> ---
->>   arch/s390/include/asm/pci.h | 1 -
->>   arch/s390/pci/pci_irq.c     | 9 +--------
->>   2 files changed, 1 insertion(+), 9 deletions(-)
->>
->> diff --git a/arch/s390/include/asm/pci.h b/arch/s390/include/asm/pci.h
->> index 41f900f693d9..aed19a1aa9d7 100644
->> --- a/arch/s390/include/asm/pci.h
->> +++ b/arch/s390/include/asm/pci.h
->> @@ -145,7 +145,6 @@ struct zpci_dev {
->>   	u8		has_resources	: 1;
->>   	u8		is_physfn	: 1;
->>   	u8		util_str_avail	: 1;
->> -	u8		irqs_registered	: 1;
->>   	u8		tid_avail	: 1;
->>   	u8		rtr_avail	: 1; /* Relaxed translation allowed */
->>   	unsigned int	devfn;		/* DEVFN part of the RID*/
->> diff --git a/arch/s390/pci/pci_irq.c b/arch/s390/pci/pci_irq.c
->> index 84482a921332..e73be96ce5fe 100644
->> --- a/arch/s390/pci/pci_irq.c
->> +++ b/arch/s390/pci/pci_irq.c
->> @@ -107,9 +107,6 @@ static int zpci_set_irq(struct zpci_dev *zdev)
->>   	else
->>   		rc = zpci_set_airq(zdev);
->>   
->> -	if (!rc)
->> -		zdev->irqs_registered = 1;
->> -
->>   	return rc;
->>   }
->>   
->> @@ -123,9 +120,6 @@ static int zpci_clear_irq(struct zpci_dev *zdev)
->>   	else
->>   		rc = zpci_clear_airq(zdev);
->>   
->> -	if (!rc)
->> -		zdev->irqs_registered = 0;
->> -
->>   	return rc;
->>   }
->>   
->> @@ -427,8 +421,7 @@ bool arch_restore_msi_irqs(struct pci_dev *pdev)
->>   {
->>   	struct zpci_dev *zdev = to_zpci(pdev);
->>   
->> -	if (!zdev->irqs_registered)
->> -		zpci_set_irq(zdev);
->> +	zpci_set_irq(zdev);
->>   	return true;
->>   }
->>   
-> Code looks good to me. With or without my suggestions for the commit
-> message:
->
-> Reviewed-by: Niklas Schnelle <schnelle@linux.ibm.com>
-
-Thanks for reviewing!
-
-Thanks
-Farhan
+Reviewed-by: Xin Li (Intel) <xin@zytor.com>
 
 
+> diff --git a/arch/x86/kvm/vmx/nested.c b/arch/x86/kvm/vmx/nested.c
+> index 14f9822b611d..51d69f368689 100644
+> --- a/arch/x86/kvm/vmx/nested.c
+> +++ b/arch/x86/kvm/vmx/nested.c
+> @@ -4760,6 +4825,18 @@ static void load_vmcs12_host_state(struct kvm_vcpu *vcpu,
+>   	if (vmcs12->vm_exit_controls & VM_EXIT_CLEAR_BNDCFGS)
+>   		vmcs_write64(GUEST_BNDCFGS, 0);
+>   
+> +	/*
+> +	 * Load CET state from host state if VM_EXIT_LOAD_CET_STATE is set.
+> +	 * otherwise CET state should be retained across VM-exit, i.e.,
+> +	 * guest values should be propagated from vmcs12 to vmcs01.
+> +	 */
+> +	if (vmcs12->vm_exit_controls & VM_EXIT_LOAD_CET_STATE)
+> +		vmcs_write_cet_state(vcpu, vmcs12->host_s_cet, vmcs12->host_ssp,
+> +				     vmcs12->host_ssp_tbl);
+> +	else
+> +		vmcs_write_cet_state(vcpu, vmcs12->guest_s_cet, vmcs12->guest_ssp,
+> +				     vmcs12->guest_ssp_tbl);
+> +
+>   	if (vmcs12->vm_exit_controls & VM_EXIT_LOAD_IA32_PAT) {
+>   		vmcs_write64(GUEST_IA32_PAT, vmcs12->host_ia32_pat);
+>   		vcpu->arch.pat = vmcs12->host_ia32_pat;
+
+Also tested with VM exit load CET bit set and cleared, both passed, so
+
+Tested-by: Xin Li (Intel) <xin@zytor.com>
 
