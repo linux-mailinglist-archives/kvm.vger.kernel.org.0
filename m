@@ -1,192 +1,126 @@
-Return-Path: <kvm+bounces-57543-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-57544-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5C225B5777C
-	for <lists+kvm@lfdr.de>; Mon, 15 Sep 2025 13:02:41 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 2755EB57807
+	for <lists+kvm@lfdr.de>; Mon, 15 Sep 2025 13:26:31 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 7C7227A81F6
-	for <lists+kvm@lfdr.de>; Mon, 15 Sep 2025 11:01:01 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 7850D7AD0FC
+	for <lists+kvm@lfdr.de>; Mon, 15 Sep 2025 11:24:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E3884301015;
-	Mon, 15 Sep 2025 11:01:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B9C462FE05F;
+	Mon, 15 Sep 2025 11:26:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=amazon.com header.i=@amazon.com header.b="s/gQstQr"
+	dkim=pass (4096-bit key) header.d=alien8.de header.i=@alien8.de header.b="h7V6iMvm"
 X-Original-To: kvm@vger.kernel.org
-Received: from fra-out-011.esa.eu-central-1.outbound.mail-perimeter.amazon.com (fra-out-011.esa.eu-central-1.outbound.mail-perimeter.amazon.com [52.28.197.132])
+Received: from mail.alien8.de (mail.alien8.de [65.109.113.108])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CCB442FDC58;
-	Mon, 15 Sep 2025 11:01:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=52.28.197.132
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5A4801D54D8;
+	Mon, 15 Sep 2025 11:26:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=65.109.113.108
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757934080; cv=none; b=rQYz/oCWC0ChzO5TLkNytb455rXBmMnM5vpq+aWEagXvpACeDMsg4jWHEv66RDugBTYxT72sD5rMEOaiTxrmJmsPFPvS039Ipi/tLl6YjotC0I9ncXL0hUUc6UTlLhpiHC6P53EbfGxvxo543AQQS1ko79vZpn6Wbkf3QFhPlfk=
+	t=1757935579; cv=none; b=uHyduihPEMS2sDjUx5HSAv/VksFqBpV+lZfTrmxoO9hpyyRQe8r48Z0f40IqjIiqqC3hYVCk/6GbFhdXpXN7oBA13Xjz+SymbWjzzYnGal+fppFTaBtDj2UjPRphTakTZxjpmCQNX7MLqlF3eqzz/V9vltqqC/O0GEfIIxMw8d4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757934080; c=relaxed/simple;
-	bh=xpAUPePhRWxhrO0/ae0lk1DKjdlzLHclKISJmCT6TBo=;
-	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
-	 In-Reply-To:Content-Type; b=hNv4DMo51Oxu3Ho97dvqWwkqy94BqA3PQ9LwsIT0rZOHmYRRssAxwhW011bO74pIpAKZikdjqwkpM8VTUWotdPfCf14EwNCFmJMcfCtbSouyLuCD2qtagErzp3tLoUbf6jY5EV8p1/97NBnXxZYXr4tBdqmakv5KoEuUjJVwZSw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.uk; dkim=pass (2048-bit key) header.d=amazon.com header.i=@amazon.com header.b=s/gQstQr; arc=none smtp.client-ip=52.28.197.132
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.uk
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazoncorp2;
-  t=1757934078; x=1789470078;
-  h=message-id:date:mime-version:reply-to:subject:to:cc:
-   references:from:in-reply-to:content-transfer-encoding;
-  bh=1Kwr4FzPi3FfskUj5Y/Y5lkZmxFcjq2K32+BQbpo/kE=;
-  b=s/gQstQraabAAF539bX3Q7Iv6KK1NgzAIfk/WKoi73rXX/DSzfcgCZsT
-   82tyINTKBqbGo+a6TfffbPA8qPO0/uhSlaL470rgseeDlFOGZ/wp1omLj
-   9fhNlECtfy1gwlvyfnlLmSAx3HV/lnoWsZpqvXyUAJGvJTZhzpyJgciK0
-   9iYvTqH36fI1WfpRDGfprbf1KJC4dMgRgDNMN1TJuc7wj5DOSf0d4seCl
-   PX8DHqHg4EThwXao857XYFkwDBoZ1QgTId7YQu7e09WPEAmRC16EQ2omb
-   dWMRnDgdaomEs6PFBDreyAsb2aXWVKUQi2SGGnPCcXlKKGPia4SbVcjX6
-   w==;
-X-CSE-ConnectionGUID: qythty/WSlCz4BOBKikTpA==
-X-CSE-MsgGUID: j12QYeiPQ9Kqf7MyLfzP3A==
-X-IronPort-AV: E=Sophos;i="6.18,266,1751241600"; 
-   d="scan'208";a="2010688"
-Received: from ip-10-6-3-216.eu-central-1.compute.internal (HELO smtpout.naws.eu-central-1.prod.farcaster.email.amazon.dev) ([10.6.3.216])
-  by internal-fra-out-011.esa.eu-central-1.outbound.mail-perimeter.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 15 Sep 2025 11:01:06 +0000
-Received: from EX19MTAEUC002.ant.amazon.com [54.240.197.228:6017]
- by smtpin.naws.eu-central-1.prod.farcaster.email.amazon.dev [10.0.39.25:2525] with esmtp (Farcaster)
- id cac95356-4c9f-4e37-bf25-376a937af6a4; Mon, 15 Sep 2025 11:01:06 +0000 (UTC)
-X-Farcaster-Flow-ID: cac95356-4c9f-4e37-bf25-376a937af6a4
-Received: from EX19D022EUC002.ant.amazon.com (10.252.51.137) by
- EX19MTAEUC002.ant.amazon.com (10.252.51.245) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.2562.20;
- Mon, 15 Sep 2025 11:01:06 +0000
-Received: from [192.168.5.30] (10.106.83.11) by EX19D022EUC002.ant.amazon.com
- (10.252.51.137) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.2562.20; Mon, 15 Sep 2025
- 11:01:05 +0000
-Message-ID: <3b56b4a0-ac52-4e1e-9f1b-7379af307292@amazon.com>
-Date: Mon, 15 Sep 2025 12:01:04 +0100
+	s=arc-20240116; t=1757935579; c=relaxed/simple;
+	bh=EyCbsyd109jlA6dWKPGR31a04u6NZDtlezBFxPWAehg=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=dxPTAYy1Z5aunDKYfI3AjZDAPWjnESFO85nS1phmWde+yMUnaidXFhgvfjmXwk6pyC/AUrqt5LPoAEOu+NiAfiBfwevd+NtPGhye7ayJCRdq20TLR1rFyCkKht7y2uJ+MFxSI/0yCKgaxOt7lAJCF1hGNJ/IkUsfRH4nVtMyvhY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=alien8.de; spf=pass smtp.mailfrom=alien8.de; dkim=pass (4096-bit key) header.d=alien8.de header.i=@alien8.de header.b=h7V6iMvm; arc=none smtp.client-ip=65.109.113.108
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=alien8.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=alien8.de
+Received: from localhost (localhost.localdomain [127.0.0.1])
+	by mail.alien8.de (SuperMail on ZX Spectrum 128k) with ESMTP id 7B29E40E019E;
+	Mon, 15 Sep 2025 11:26:06 +0000 (UTC)
+X-Virus-Scanned: Debian amavisd-new at mail.alien8.de
+Authentication-Results: mail.alien8.de (amavisd-new); dkim=pass (4096-bit key)
+	header.d=alien8.de
+Received: from mail.alien8.de ([127.0.0.1])
+	by localhost (mail.alien8.de [127.0.0.1]) (amavisd-new, port 10026)
+	with ESMTP id Q_gETiq9zByM; Mon, 15 Sep 2025 11:26:00 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=alien8;
+	t=1757935560; bh=og5A2WyNgFf7VMif0EZi46Of8DzCnjQ3vDeonAI/acM=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=h7V6iMvmKJs5863dr5nkmFZiU3qP66keqlZx93dvM7YITmmnEqhBm2jC399/6c/X9
+	 eY9gbp2YoNgadnZBfoFQRnkRzlgBnuOUnHMozopc4WqAyEnde3RgQSU2ZKcSxtYueK
+	 mHx8p9+ZPwV8veJYk7A+Ck7xylMOptWVKSqdpjw+CpAxXm+Zs+I4P0DEsXZEWdyOvp
+	 FfA4vvdC86enrUgOLIYL8T0pgOiW0/24oqTiK1bYXdnsXGFT4DfZTIeaBOiEXLSiqi
+	 14CwdGeryMyaE5B0iUBHnuV2ThAOwslGsCZBipQvKxeOPCyjjuKV/KawE6Bd068WpV
+	 V2Bmjdk1ffPhdrPbv5wfJF2mfNiyDze3a2ZZvsxj9b+ENTDuF0to2nIWwssoxxCB38
+	 Hl3aF8O3sVyvsbRT0/tYpHLQbutKZZsgUt/Xc1Pq6Q2JwemjjmoLxp27NN+L00dRDk
+	 Tb6vyvnJPk0Og9cRuZCUqT2miGRJnyCefzZ+Ha36VFdJTV+DON9EhwTszRBOWBYALn
+	 gf4fZLpCRe+tzlMPeOR1JKGjJ49XwBOBF7SRmbBYa5220t3cwGd9t1ukJ1f8PX7Oyn
+	 9J0iMhzitSbc984GGwPNmzIiYzgWY5gidjaCJ/+iE41ptd6pIkWIrQaJLl/GHFpO+9
+	 Q0/zyASL+1qe81MtgrUGcbL8=
+Received: from zn.tnic (p5de8ed27.dip0.t-ipconnect.de [93.232.237.39])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange ECDHE (P-256) server-signature ECDSA (P-256) server-digest SHA256)
+	(No client certificate requested)
+	by mail.alien8.de (SuperMail on ZX Spectrum 128k) with UTF8SMTPSA id D3EBF40E01A3;
+	Mon, 15 Sep 2025 11:25:17 +0000 (UTC)
+Date: Mon, 15 Sep 2025 13:25:10 +0200
+From: Borislav Petkov <bp@alien8.de>
+To: Babu Moger <babu.moger@amd.com>
+Cc: corbet@lwn.net, tony.luck@intel.com, reinette.chatre@intel.com,
+	Dave.Martin@arm.com, james.morse@arm.com, tglx@linutronix.de,
+	mingo@redhat.com, dave.hansen@linux.intel.com, x86@kernel.org,
+	hpa@zytor.com, kas@kernel.org, rick.p.edgecombe@intel.com,
+	akpm@linux-foundation.org, paulmck@kernel.org, frederic@kernel.org,
+	pmladek@suse.com, rostedt@goodmis.org, kees@kernel.org,
+	arnd@arndb.de, fvdl@google.com, seanjc@google.com,
+	thomas.lendacky@amd.com, pawan.kumar.gupta@linux.intel.com,
+	perry.yuan@amd.com, manali.shukla@amd.com, sohil.mehta@intel.com,
+	xin@zytor.com, Neeraj.Upadhyay@amd.com, peterz@infradead.org,
+	tiala@microsoft.com, mario.limonciello@amd.com,
+	dapeng1.mi@linux.intel.com, michael.roth@amd.com,
+	chang.seok.bae@intel.com, linux-doc@vger.kernel.org,
+	linux-kernel@vger.kernel.org, linux-coco@lists.linux.dev,
+	kvm@vger.kernel.org, peternewman@google.com, eranian@google.com,
+	gautham.shenoy@amd.com
+Subject: Re: [PATCH v18 00/33] x86,fs/resctrl: Support AMD Assignable
+ Bandwidth Monitoring Counters (ABMC)
+Message-ID: <20250915112510.GAaMf3lkd6Y1E_Oszg@fat_crate.local>
+References: <cover.1757108044.git.babu.moger@amd.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Reply-To: <kalyazin@amazon.com>
-Subject: Re: [PATCH v5 1/2] KVM: guest_memfd: add generic population via write
-To: Vishal Annapurve <vannapurve@google.com>, David Hildenbrand
-	<david@redhat.com>
-CC: James Houghton <jthoughton@google.com>, "Kalyazin, Nikita"
-	<kalyazin@amazon.co.uk>, "pbonzini@redhat.com" <pbonzini@redhat.com>,
-	"shuah@kernel.org" <shuah@kernel.org>, "kvm@vger.kernel.org"
-	<kvm@vger.kernel.org>, "linux-kselftest@vger.kernel.org"
-	<linux-kselftest@vger.kernel.org>, "linux-kernel@vger.kernel.org"
-	<linux-kernel@vger.kernel.org>, "michael.day@amd.com" <michael.day@amd.com>,
-	"Roy, Patrick" <roypat@amazon.co.uk>, "Thomson, Jack" <jackabt@amazon.co.uk>,
-	"Manwaring, Derek" <derekmn@amazon.com>, "Cali, Marco"
-	<xmarcalx@amazon.co.uk>
-References: <20250902111951.58315-1-kalyazin@amazon.com>
- <20250902111951.58315-2-kalyazin@amazon.com>
- <CADrL8HV8+dh4xPv6Da5CR+CwGJwg5uHyNmiVmHhWFJSwy8ChRw@mail.gmail.com>
- <87d562a1-89fe-42a8-aa53-c052acf4c564@amazon.com>
- <8e55ba3a-e7ae-422a-9c79-11aa0e17eae9@redhat.com>
- <bc26eaf1-9f01-4a65-87a6-1f73fcd00663@amazon.com>
- <55b727fc-8fd3-4e03-8143-1ed6dcab2781@redhat.com>
- <CAGtprH8QjeuR90QJ7byxoAPfb30kmUEDhRhzqNZqSpR8y_+z9g@mail.gmail.com>
-Content-Language: en-US
-From: Nikita Kalyazin <kalyazin@amazon.com>
-Autocrypt: addr=kalyazin@amazon.com; keydata=
- xjMEY+ZIvRYJKwYBBAHaRw8BAQdA9FwYskD/5BFmiiTgktstviS9svHeszG2JfIkUqjxf+/N
- JU5pa2l0YSBLYWx5YXppbiA8a2FseWF6aW5AYW1hem9uLmNvbT7CjwQTFggANxYhBGhhGDEy
- BjLQwD9FsK+SyiCpmmTzBQJnrNfABQkFps9DAhsDBAsJCAcFFQgJCgsFFgIDAQAACgkQr5LK
- IKmaZPOpfgD/exazh4C2Z8fNEz54YLJ6tuFEgQrVQPX6nQ/PfQi2+dwBAMGTpZcj9Z9NvSe1
- CmmKYnYjhzGxzjBs8itSUvWIcMsFzjgEY+ZIvRIKKwYBBAGXVQEFAQEHQCqd7/nb2tb36vZt
- ubg1iBLCSDctMlKHsQTp7wCnEc4RAwEIB8J+BBgWCAAmFiEEaGEYMTIGMtDAP0Wwr5LKIKma
- ZPMFAmes18AFCQWmz0MCGwwACgkQr5LKIKmaZPNTlQEA+q+rGFn7273rOAg+rxPty0M8lJbT
- i2kGo8RmPPLu650A/1kWgz1AnenQUYzTAFnZrKSsXAw5WoHaDLBz9kiO5pAK
-In-Reply-To: <CAGtprH8QjeuR90QJ7byxoAPfb30kmUEDhRhzqNZqSpR8y_+z9g@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
-Content-Transfer-Encoding: 8bit
-X-ClientProxiedBy: EX19D014EUC002.ant.amazon.com (10.252.51.161) To
- EX19D022EUC002.ant.amazon.com (10.252.51.137)
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <cover.1757108044.git.babu.moger@amd.com>
 
+On Fri, Sep 05, 2025 at 04:33:59PM -0500, Babu Moger wrote:
+>  .../admin-guide/kernel-parameters.txt         |    2 +-
+>  Documentation/filesystems/resctrl.rst         |  325 ++++++
+>  MAINTAINERS                                   |    1 +
+>  arch/x86/include/asm/cpufeatures.h            |    1 +
+>  arch/x86/include/asm/msr-index.h              |    2 +
+>  arch/x86/include/asm/resctrl.h                |   16 -
+>  arch/x86/kernel/cpu/resctrl/core.c            |   81 +-
+>  arch/x86/kernel/cpu/resctrl/internal.h        |   56 +-
+>  arch/x86/kernel/cpu/resctrl/monitor.c         |  248 +++-
+>  arch/x86/kernel/cpu/scattered.c               |    1 +
+>  fs/resctrl/ctrlmondata.c                      |   26 +-
+>  fs/resctrl/internal.h                         |   58 +-
+>  fs/resctrl/monitor.c                          | 1008 ++++++++++++++++-
+>  fs/resctrl/rdtgroup.c                         |  252 ++++-
+>  include/linux/resctrl.h                       |  148 ++-
+>  include/linux/resctrl_types.h                 |   18 +-
+>  16 files changed, 2019 insertions(+), 224 deletions(-)
 
+Ok, I've rebased and pushed out the pile into tip:x86/cache.
 
-On 13/09/2025 01:18, Vishal Annapurve wrote:
-> On Fri, Sep 12, 2025 at 8:39 AM David Hildenbrand <david@redhat.com> wrote:
->>
->>>>>> What's meant to happen if we do use this for CoCo VMs? I would expect
->>>>>> write() to fail, but I don't see why it would (seems like we need/want
->>>>>> a check that we aren't write()ing to private memory).
->>>>>
->>>>> I am not so sure that write() should fail even in CoCo VMs if we access
->>>>> not-yet-prepared pages.  My understanding was that the CoCoisation of
->>>>> the memory occurs during "preparation".  But I may be wrong here.
->>>>
->>>> But how do you handle that a page is actually inaccessible and should
->>>> not be touched?
->>>>
->>>> IOW, with CXL you could crash the host.
->>>>
->>>> There is likely some state check missing, or it should be restricted to
->>>> VM types.
->>>
->>> Sorry, I'm missing the link between VM types and CXL.  How are they related?
->>
->> I think what you explain below clarifies it.
->>
->>>
->>> My thinking was it is a regular (accessible) page until it is "prepared"
->>> by the CoCo hardware, which is currently tracked by the up-to-date flag,
->>> so it is safe to assume that until it is "prepared", it is accessible
->>> because it was allocated by filemap_grab_folio() ->
->>> filemap_alloc_folio() and hasn't been taken over by the CoCo hardware.
->>> What scenario can you see where it doesn't apply as of now?
->>
->> Thanks for clarifying, see below.
->>
->>>
->>> I am aware of an attempt to remove preparation tracking from
->>> guest_memfd, but it is still at an RFC stage AFAIK [1].
->>>
->>>>
->>>> Do we know how this would interact with the direct-map removal?
->>>
->>> I'm using folio_test_uptodate() to determine if the page has been
->>> removed from the direct map as kvm_gmem_mark_prepared() is what
->>> currently removes the page from the direct map and marks it as
->>> up-to-date.  [2] is a Firecracker feature branch where the two work in
->>> combination.
->>
->> Ah, okay. Yes, I recalled [1] that we wanted to change these semantics
->> to be "uptodate: was zeroed", and that preparation handling would be
->> essentially handled by the arch backend.
-> 
-> Yes, I think we should not be overloading uptodate flag to be an
-> indicator of what is private for CoCo guests. Uptodate flag should
-> just mean zeroed/fresh folio. It's possible that future allocator
-> backing for huge pages already provides uptodate folios.
+Please run it one more time to make sure all is good.
 
-Good point, thanks for sharing.
+Thx.
 
-> 
-> If there is no current use case for read/write for CoCo VMs, I think
-> it makes sense to disable it for now by checking the VM type before
-> adding further overloading of uptodate flags.
+-- 
+Regards/Gruss,
+    Boris.
 
-Sounds fair.  I can add a check for the VM type and only allow it for 
-KVM_X86_SW_PROTECTED_VM on x86.  When ARM CCA support [1] is added we 
-should also check for KVM_VM_TYPE_ARM_NORMAL on ARM.
-
-[1]: 
-https://lore.kernel.org/kvm/20250820145606.180644-1-steven.price@arm.com
-
-> 
->>
->> --
->> Cheers
->>
->> David / dhildenb
->>
->>
-
+https://people.kernel.org/tglx/notes-about-netiquette
 
