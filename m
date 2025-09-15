@@ -1,80 +1,81 @@
-Return-Path: <kvm+bounces-57616-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-57617-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 592C6B585A8
-	for <lists+kvm@lfdr.de>; Mon, 15 Sep 2025 21:59:51 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 72E58B585AE
+	for <lists+kvm@lfdr.de>; Mon, 15 Sep 2025 22:05:06 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 135C93A4325
-	for <lists+kvm@lfdr.de>; Mon, 15 Sep 2025 19:59:50 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 29CA13AB897
+	for <lists+kvm@lfdr.de>; Mon, 15 Sep 2025 20:05:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B7B732874EA;
-	Mon, 15 Sep 2025 19:59:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B01AB285CBC;
+	Mon, 15 Sep 2025 20:05:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="Ex1p2K4H"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="ZDfquvbU"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pl1-f202.google.com (mail-pl1-f202.google.com [209.85.214.202])
+Received: from mail-pl1-f201.google.com (mail-pl1-f201.google.com [209.85.214.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8B4EF1E9B1C
-	for <kvm@vger.kernel.org>; Mon, 15 Sep 2025 19:59:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7E7271F3D56
+	for <kvm@vger.kernel.org>; Mon, 15 Sep 2025 20:04:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757966383; cv=none; b=H2FnWy3TLrVtokDcLS2qrBGJhqkr/AzOjjcV/Bwa5Rz4CuYX+Oe04VkGyUy2LcCvnoC4YDifOU0tJT0ubgxS8ek0JIhgFS+fyAw1/Qr9RzRTruX8jVS9oeMFHyxFqdcwduClGgsGurIbs7/wjlwkPG9OMe6mPb4Teap6LAKdXeQ=
+	t=1757966699; cv=none; b=bRrD5+z5c8wR2qJWIjQTULjmmP6g9nJME3HQLIFmo1RHBlE8IfXZ3utaKL2XocCikrrl6nsD5PBW7zJ/uTV5IxbmDrnjg//nWsq3qHrvbAJufcE5kXM7Oaoa4hDEE2QpXvX9+llzE01T8Pdd++AR3fEBN4laaHKIj0Koi+wnnBM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757966383; c=relaxed/simple;
-	bh=TwEjtrkYLFvkJ7xB60thdV7Pvcy58zg1Y+Tnxn4xxm0=;
+	s=arc-20240116; t=1757966699; c=relaxed/simple;
+	bh=cxprLMyeiYsYZYFhwOsc81Wj2lgtfio7iO5nBM3TpAw=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=rLneuDWThVZtK/96QUof3AvYdq96IlADShOcjFf7tQ5WX8cMfhnpw938Zzd/bRmjwDfcvTlXCrxXynFWwkX+qpC8q804FjWFdsl2jqCwOVRLjOmC+V1Pa6xvlkPe+IpF6OZVWBfL9u99lmde6+tt9wvghjPmDjvEZFq1bi74tv4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=Ex1p2K4H; arc=none smtp.client-ip=209.85.214.202
+	 To:Cc:Content-Type; b=Elq3QZ9+sp2/fF7aX766ugD27gCpwYT6J3F+w/1Kd5GBgguxlvrKLlS5jcS85fa0ZiR4vc5S6lbs/CEdTipuPsdK06jpLL6lxwilAmUSDXOJQAjKSd9/JS9g43rejCBQuXmXUgAwh120v7uymf1xs0403u553OQsUe8+bDmTvv8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=ZDfquvbU; arc=none smtp.client-ip=209.85.214.201
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pl1-f202.google.com with SMTP id d9443c01a7336-2675d9ad876so14602725ad.1
-        for <kvm@vger.kernel.org>; Mon, 15 Sep 2025 12:59:42 -0700 (PDT)
+Received: by mail-pl1-f201.google.com with SMTP id d9443c01a7336-244582bc5e4so55406415ad.2
+        for <kvm@vger.kernel.org>; Mon, 15 Sep 2025 13:04:58 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1757966382; x=1758571182; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1757966698; x=1758571498; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=snJLcy8LDYOL3DOWrAlxceQ+Sxh1E7IKuFPFIMhsvUU=;
-        b=Ex1p2K4H9V1Ly+NrqoV6eaz9YnlAE6yiQ3nZ9edJ+k8Ov9Hm9pjis0zRGzn1wC/C/o
-         CBYu/I06S0cWY8doB3HonTixuNc4Pm+ERCNo9UrHRWrtf/2C7Oo6qFVkyxsghVHmuhpU
-         5V61JxnAucWg4nu5FODl9DU2FZaj5A3WGNkATWPxwwqbGQjr3F43Q0GlGSgbMTC5T7a4
-         q25aQN2ZuBkKZVWxLGlsUX/67VNFx7aGJc1IJ7tCKePavJJq3ingc1EkLWz+62tDTtbd
-         jI+4hwMDe8a9JQRlaeRGNL42+COUvZm8ZEfDaALMRHXlcX+Fgu6bsbu+11eUALQWBJau
-         hCBg==
+        bh=PWxlF/glqD1PuEILI4g+VJGULYpEgKXJq0w7ElXZiVs=;
+        b=ZDfquvbUitzO4E3M6L1wy4TRUxjp14/Kn+rwNxT0JLjPZxV21/4e65M3mYJgzHvmzE
+         wT4we4n43yWp58FyiSUsTyJD5TqC1Q63RlvUrQ/LV7UbdK5Ks2uocEqpTS6Jnmj996k5
+         ceXLQru5ChAnyNbxp9/MEsIilXklNmVDWXXHftSjM9MTbg9By4Z241JdVExSgL729tLK
+         t2N0LkOKEjou52mfxJJKsZtacuIHTuXTL9tBxuRDgTeukDukibmbNBgmVfzOz0YmSwZ3
+         JpNdFiUTHpA69EdeN+sKmai4Z32zpm5ZSl2v//ZDOlidKoM82VzIOIZBpGKhi0wtMS+w
+         CT+Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1757966382; x=1758571182;
+        d=1e100.net; s=20230601; t=1757966698; x=1758571498;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=snJLcy8LDYOL3DOWrAlxceQ+Sxh1E7IKuFPFIMhsvUU=;
-        b=BU56Hi62BxYdaiM8RF5ZxwTAHXGV7RJkbqg3IUypMZwxRzoyqLhscoQVoiXuKFAII1
-         fgQyG0neHgUIprRsZIzlev4uQmg5CiQ6IhIpL1rdaK+5Turu4DgOTYgsWmIcsvfB47lf
-         2PmdiD8Kd8FU3XQIgIm73pQUo/nWa87YK4dc17uK0+EU4+zVNcbBaPQYDcWbqE7j8gWg
-         nBJ/ogG7kxks22vaMGHp3QdQa1ZgLX9rrYgA99Rkh5tPGX2sV9kfq8bCCINyqSZ+QJH6
-         t2GAbFzK/D6SIUD1ePcymymeT8rCrwiSUsgXvTU2pjO4c3/hyDe3IBbV5HeQe7fu2N4P
-         cSBQ==
-X-Forwarded-Encrypted: i=1; AJvYcCWXnb9sy0+jo8xmBYVLQmmMwoAtCygJidiHzx0ctcFdsq+fWD0INLFDpdxN4dYcaAHeDvU=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxrkBcsAvHjeEySOJLyDr0tpB7msO2K69AMEokQxFUwi3zZyZ5r
-	8aYqiCokAn00b3eCjy+c9+W8lCAcC5OiQdpM3aDfBNXnfO09B3g8N5oWaez+LpKb5OoTwU4EQnB
-	tzmwCRw==
-X-Google-Smtp-Source: AGHT+IFO1UlVm0v6LLk9j9pmLODl0QfWf0J1aVSdH5Gxe2iugeHtAJoWNAIRD/T4T1I07FI2vHYj80AKJXw=
-X-Received: from pjuw14.prod.google.com ([2002:a17:90a:d60e:b0:32b:95bb:dbc])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:903:1aa3:b0:246:2b29:71c7
- with SMTP id d9443c01a7336-25d2607a10amr162771615ad.25.1757966381932; Mon, 15
- Sep 2025 12:59:41 -0700 (PDT)
-Date: Mon, 15 Sep 2025 12:59:40 -0700
-In-Reply-To: <aa7c82543158f6ac27c7aff8feaf6c7830236894.1756993734.git.naveen@kernel.org>
+        bh=PWxlF/glqD1PuEILI4g+VJGULYpEgKXJq0w7ElXZiVs=;
+        b=TFk4Pq6rRZrSRSS7Dzmdyox1mdv5tSKe47V8NJAkMuccRyAhwlseVjjapTJ1N2Qk2g
+         c/+TtZu31Kbl+KTWsWQ6kviM1GK7NUPLtaD9o1EGBWqS2kQdL5qobdfU4HKx0p5J6krN
+         T1aJe+mwemXWUi8zEaki6rC4HDM+n6sQHOt55CAxGL0vFSj+c4er+j09wsufgNbTHStf
+         BiYIPWvyVmF3LKmGdnF19VXtoGcQlM+3ViFOX7uwIaIvzIlIBFkwdMc08yb2ECCYxkC/
+         rO47V6XzW83F0alJqbjdvJU6rxKWRJmEiOurkwgy3BhkWtjU3wQC4rxKn4ks1Ui1SLWF
+         yzdg==
+X-Forwarded-Encrypted: i=1; AJvYcCUADF9H4BV1CNCxQDb9Ay1DjwvS6FFrEdfVLrjLfwU6uil6Rp2y0xMSxuFy13uqMScfAAk=@vger.kernel.org
+X-Gm-Message-State: AOJu0YysRoExaJUpG2p4TklnIVCwuYItRDdEJQnKDeIqERHDUElrl7kd
+	nWmYbWXjv0ITtkbCH/POXs72zWE9BItBgMIWFk4ST85+ybtpo2+GLYtOr0Nxfo5FzjRoT34yhII
+	7Lrevpw==
+X-Google-Smtp-Source: AGHT+IFfbA5oWzYDc2B1zY4OiwhxLSitTeiVQqc6S8Wr9/dcBpgJGIqh8IJTIPOYOCme1CRKCtr0SKBNct0=
+X-Received: from pjbqo13.prod.google.com ([2002:a17:90b:3dcd:b0:32e:8ba7:b496])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:903:4405:b0:267:b1d6:9605
+ with SMTP id d9443c01a7336-267b1d6a44emr24950755ad.10.1757966697765; Mon, 15
+ Sep 2025 13:04:57 -0700 (PDT)
+Date: Mon, 15 Sep 2025 13:04:56 -0700
+In-Reply-To: <62c338a17fe5127215efbfd8f7c5322b7b49a294.1756993734.git.naveen@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
-References: <cover.1756993734.git.naveen@kernel.org> <aa7c82543158f6ac27c7aff8feaf6c7830236894.1756993734.git.naveen@kernel.org>
-Message-ID: <aMhwLGxyEipwu-SE@google.com>
-Subject: Re: [RFC PATCH v2 3/5] KVM: SVM: Move all AVIC setup to avic_hardware_setup()
+References: <cover.1756993734.git.naveen@kernel.org> <62c338a17fe5127215efbfd8f7c5322b7b49a294.1756993734.git.naveen@kernel.org>
+Message-ID: <aMhxaAh6a3Eps_NJ@google.com>
+Subject: Re: [RFC PATCH v2 1/5] KVM: SVM: Stop warning if x2AVIC feature bit
+ alone is enabled
 From: Sean Christopherson <seanjc@google.com>
 To: "Naveen N Rao (AMD)" <naveen@kernel.org>
 Cc: Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org, 
@@ -86,43 +87,42 @@ Cc: Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org,
 Content-Type: text/plain; charset="us-ascii"
 
 On Thu, Sep 04, 2025, Naveen N Rao (AMD) wrote:
-> diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
-> index cb4f81be0024..d5854e0bc799 100644
-> --- a/arch/x86/kvm/svm/svm.c
-> +++ b/arch/x86/kvm/svm/svm.c
-> @@ -162,7 +162,7 @@ module_param(tsc_scaling, int, 0444);
->   * enable / disable AVIC.  Because the defaults differ for APICv
->   * support between VMX and SVM we cannot use module_param_named.
->   */
-> -static bool avic;
-> +bool avic;
-
-I'm all for consolidating module params and globals, but they should be grouped
-by "area", i.e. the AVIC variables/params should grouped be in avic.c, not in svm.c.
-
->  module_param(avic, bool, 0444);
->  module_param(enable_ipiv, bool, 0444);
+> A platform can choose to disable AVIC by turning off the AVIC CPUID
+> feature bit, while keeping x2AVIC CPUID feature bit enabled to indicate
+> AVIC support for the x2APIC MSR interface. Since this is a valid
+> configuration, stop printing a warning.
+> 
+> Signed-off-by: Naveen N Rao (AMD) <naveen@kernel.org>
+> ---
+>  arch/x86/kvm/svm/avic.c | 8 +-------
+>  1 file changed, 1 insertion(+), 7 deletions(-)
+> 
+> diff --git a/arch/x86/kvm/svm/avic.c b/arch/x86/kvm/svm/avic.c
+> index a34c5c3b164e..346cd23a43a9 100644
+> --- a/arch/x86/kvm/svm/avic.c
+> +++ b/arch/x86/kvm/svm/avic.c
+> @@ -1101,14 +1101,8 @@ bool avic_hardware_setup(void)
+>  	if (!npt_enabled)
+>  		return false;
 >  
-> @@ -5406,7 +5406,7 @@ static __init int svm_hardware_setup(void)
->  			goto err;
->  	}
+> -	/* AVIC is a prerequisite for x2AVIC. */
+> -	if (!boot_cpu_has(X86_FEATURE_AVIC) && !force_avic) {
+> -		if (boot_cpu_has(X86_FEATURE_X2AVIC)) {
+> -			pr_warn(FW_BUG "Cannot support x2AVIC due to AVIC is disabled");
+> -			pr_warn(FW_BUG "Try enable AVIC using force_avic option");
+
+I agree with the existing code, KVM should treat this as a firmware bug, where
+"firmware" could also be the host VMM.  AIUI, x2AVIC can't actualy work without
+AVIC support, so enumerating x2AVIC without AVIC is pointless and unexpected.
+
+> -		}
+> +	if (!boot_cpu_has(X86_FEATURE_AVIC) && !force_avic)
+>  		return false;
+> -	}
 >  
-> -	enable_apicv = avic = avic && avic_hardware_setup();
-> +	avic_hardware_setup();
-
-
-I would prefer to keep a mix of the old and new: move "avic" into avic.c, but
-have avic_hardware_setup() return true/false and use it to set enable_apicv.
-
-enable_apicv is tied to kvm.ko, and so I find it helpful to have it be set by
-svm_hardware_setup(), e.g. so that when reading code in common x86, it's easier
-to find where/when/how a global variable is configured by vendor code.  More
-importantly, I don't want to create a hidden dependency between avic_hardware_setup()
-setting enable_apicv and this code reading enable_apicv.
-
-Alternatively, we could have avic_hardware_setup() clear the svm_x86_ops hooks,
-but I wouldn't want to do that without having avic_hardware_setup() also _set_
-the hooks, and I think doing that would be a big net negative since it would
-make it harder to see the vcpu_(un)blocking = avic_vcpu_(un)blocking connection
-for the soon-to-be-common case of AVIC being enabled.
+>  	if (cc_platform_has(CC_ATTR_HOST_SEV_SNP) &&
+>  	    !boot_cpu_has(X86_FEATURE_HV_INUSE_WR_ALLOWED)) {
+> -- 
+> 2.50.1
+> 
 
