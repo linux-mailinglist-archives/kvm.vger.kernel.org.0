@@ -1,276 +1,223 @@
-Return-Path: <kvm+bounces-57628-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-57629-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7C46BB586B2
-	for <lists+kvm@lfdr.de>; Mon, 15 Sep 2025 23:26:28 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5431AB586C1
+	for <lists+kvm@lfdr.de>; Mon, 15 Sep 2025 23:28:17 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 34D634C2748
-	for <lists+kvm@lfdr.de>; Mon, 15 Sep 2025 21:26:27 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id B71A41B24C89
+	for <lists+kvm@lfdr.de>; Mon, 15 Sep 2025 21:28:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 283352C08AA;
-	Mon, 15 Sep 2025 21:26:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2F5752C08B2;
+	Mon, 15 Sep 2025 21:28:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="VqL9b1NW"
+	dkim=pass (2048-bit key) header.d=grsecurity.net header.i=@grsecurity.net header.b="AgckZhTH"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qk1-f176.google.com (mail-qk1-f176.google.com [209.85.222.176])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2B3A52BFC70
-	for <kvm@vger.kernel.org>; Mon, 15 Sep 2025 21:26:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7DA7A2DC78E
+	for <kvm@vger.kernel.org>; Mon, 15 Sep 2025 21:28:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.176
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757971576; cv=none; b=Sv2rJejsxR3Iz7lNsdFBkYStrantkbX0ERZpEQXXgUUJkuGzigIfMDaVQkPmBuk0NDr2rBie2LJwqx6SPO33Unxm+LSRKGq7bilKBIXYIb+cbPSs6T0+IdR13r6CyNbp79RXishxESWIumtyh8oRBhemACGZESNd0UyEHh/PtQQ=
+	t=1757971682; cv=none; b=pFPfUMNVWgceOKfIX9nWi3XfLzXDXBvRIPQFbHwMiyfpexo7vrbhjCvMj0FFUluC++eFwoSWcNva1jOL30my5dRrX2rZ2Keqz4jzBzf+Z6yDEhnTC5COWoVosYgYXAtE8ZABi30eCpFFIWYPOpF3SW7Q04I6TfxS91wcACajZZ4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757971576; c=relaxed/simple;
-	bh=1sOTIRHTFzvVsuFrLFr5SOKUlmErsLY3WO0d1tNp5Eg=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=A/vi+hx4725LcdmU6vZWqD8eERx2thCcEDg9DsNhdc4Wt6xJrRVICkliSvzNA69dTDcb9uYEPKqiMcNab8BPls5RoOGsku7MDoxsRzUEjRxi5GBYlVkpxGr5GrjnBFMWgMG2wmfFXnc2FQiZ1bVGRujwXrwLv1lFS76QvvmmDz0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=VqL9b1NW; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1757971573;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=KM4RQD/H6XgF3hQHay54Rz4wcT8Td67zLaIIGzgIOjc=;
-	b=VqL9b1NWQ0WussgNB3M6/5DEeTKPkt2riW+ZEDXT1eWDrs8Co9WiZO5mgZmuD+OobVNULa
-	zTdWRX7VTFzfTJT5uAcvGiVNxfUJ5Tb2ga7RbP13+oMIz8hEmjidkNjVhZlQGMowQPIOxg
-	yry0S9DoDx5MBN/ypLIuIE2yswCuKoE=
-Received: from mail-qv1-f69.google.com (mail-qv1-f69.google.com
- [209.85.219.69]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-140-I3TG5MtWNM6cYP50_r7EfA-1; Mon, 15 Sep 2025 17:26:12 -0400
-X-MC-Unique: I3TG5MtWNM6cYP50_r7EfA-1
-X-Mimecast-MFC-AGG-ID: I3TG5MtWNM6cYP50_r7EfA_1757971571
-Received: by mail-qv1-f69.google.com with SMTP id 6a1803df08f44-77ccfa8079cso36306946d6.1
-        for <kvm@vger.kernel.org>; Mon, 15 Sep 2025 14:26:12 -0700 (PDT)
+	s=arc-20240116; t=1757971682; c=relaxed/simple;
+	bh=mQQi0fS0R+8Vt2hbFe7zaxA2tzgvMhMA24l6r7fpyJQ=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=uxH5XPxuwXFOqxp8eICCXO4egq0vN97c6Siluio1c+HWJtL4WHcML3dJbhZxSLOtMy029b828IEyQc8r7OaOuY6ivAoXG2/DooN9VuiDOzgyGogu0nudgjlr1w2ROaIyBbtAEFDP3t+SFxbTuD2MRzLjUJtM2en98pa7/DOuvqc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=grsecurity.net; spf=pass smtp.mailfrom=opensrcsec.com; dkim=pass (2048-bit key) header.d=grsecurity.net header.i=@grsecurity.net header.b=AgckZhTH; arc=none smtp.client-ip=209.85.222.176
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=grsecurity.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=opensrcsec.com
+Received: by mail-qk1-f176.google.com with SMTP id af79cd13be357-8127215a4c6so545156885a.0
+        for <kvm@vger.kernel.org>; Mon, 15 Sep 2025 14:28:00 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=grsecurity.net; s=grsec; t=1757971679; x=1758576479; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:autocrypt:from
+         :content-language:references:cc:to:subject:user-agent:mime-version
+         :date:message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=g27UvLX7c9aw4EkAViSdQBn8kI2gbwfS7+nl0qMM/Wk=;
+        b=AgckZhTHm4eJjnQnF8+B3qbk2c+AHMD2d8S4GuoWwzZasnl9jZS6LDwXkBd8XQecdb
+         o51805fwcvFxkSUmIWJIoU5sSF1oisGXAUn/OzgwSb3LICOexue7U7JqjC2HloCXVWY2
+         +5KrTMnNmjgPw/wwZecQFZDMmKAsZQiYr8ghanMAvI8ymB99vvcnaDbO7OgUwRjB/hi2
+         wfAt4luf7FDvPr8PCIwADPK4SKW1RzbbU3cnEWJHYYyAmCbITy/pQlxYfJ+57a5UdCAN
+         yGvtKdiqqf8T0Ll8j5J8foQId9krL6gD0gwmCK4gqpEKJEeFZH676JhkLsX99i4QcvTO
+         YEsw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1757971571; x=1758576371;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+        d=1e100.net; s=20230601; t=1757971679; x=1758576479;
+        h=content-transfer-encoding:in-reply-to:autocrypt:from
+         :content-language:references:cc:to:subject:user-agent:mime-version
+         :date:message-id:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=KM4RQD/H6XgF3hQHay54Rz4wcT8Td67zLaIIGzgIOjc=;
-        b=U1N532ask8fZoaG5rGSIyqbCQk1a8d/s+9SmfUsOUCLDOhm6+ThNbRXQro20ijIH3W
-         fznnQMHl4NuKPwwRtsZ7yFAkupCiVSkFbLZ0HUrD4CQm8kjMv21tlY9m9w5uqtsX2pnx
-         isrEviDl+LnWq/hFIOgy3idS0Cg6VUXdTj8JJHdtjPXliCgJIqTbjReegsdyKDnnWeyh
-         91FOuYI6GHB8IuQbs4kNv/h0yPEAypZLCwsdXFx1kZjWGK2/Se+xzvAGG6K82c1JJi6k
-         gpTR9nrKx1BRWgK1fZn7gA5DCT9RMIqGJ7Jdd8L8jr0XTjxP532fRFc1SGe9K5nep1d3
-         aSIg==
-X-Forwarded-Encrypted: i=1; AJvYcCWENlLbHoiAtb0yVS/cvjZI7KzhpvAqsoDHnkdkBkz85O7wKgdqScZvAU533U55UWF14IY=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzltzuIiWrl2ZCUpM1BF6AjtRbJTRtq1CR8OrF3DrTpsnC6ylxm
-	AAkcqaUmcUCMy25aFwpOaa/yewBdaY6u1r3iZiG9XoTS9mSpEkwofpHIPeaEszUTC2oBHGHsI/m
-	lskugts38zWLNXQZUdwmHKgcSdO9kAAEh+XgSZsa3CfD93xEVG21n1SGABgkgXw==
-X-Gm-Gg: ASbGnctO4Y/A6nW2guBJQzZWfJ9CO2cpduUDs8pl13am9R2/Em8CyKZTCu/qZxaLwxx
-	bmXWvJpZr8hlw3wcbVDEl9QxahWp/8kabwSKAriK/tohyisymA4eyKuk1a2cRScWg+bTPawcpAA
-	kchdValvFQOKuLCKcxKCW+0j1tBdPTpnUrTUXwue6bCVEwlJA85FI7/yX111xpOV+BEQX3sGuAu
-	l6EGwD8ogd4DOyq/VeA9GsA65Vbtvuy1tBujktGxNFp+ziVBiJN9jf0Po3D2xt+cLnJKdHCLpXW
-	sZYFDIMLzEK5NVNwjGaJctQOxcXb38Mp
-X-Received: by 2002:a05:6214:3c85:b0:769:cd09:9d77 with SMTP id 6a1803df08f44-769cd099fafmr170285186d6.4.1757971571188;
-        Mon, 15 Sep 2025 14:26:11 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IFkORZIzaSeYsztcwaPnCJ3V7jNeNP5xXWbRprE054mUcehDj+b7ToSI1uNg2GLUniMgON4ow==
-X-Received: by 2002:a05:6214:3c85:b0:769:cd09:9d77 with SMTP id 6a1803df08f44-769cd099fafmr170284896d6.4.1757971570738;
-        Mon, 15 Sep 2025 14:26:10 -0700 (PDT)
-Received: from x1.local ([174.89.135.121])
-        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-76e576ee0fcsm60107386d6.69.2025.09.15.14.26.08
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 15 Sep 2025 14:26:10 -0700 (PDT)
-Date: Mon, 15 Sep 2025 17:25:57 -0400
-From: Peter Xu <peterx@redhat.com>
-To: "Kalyazin, Nikita" <kalyazin@amazon.co.uk>
-Cc: "akpm@linux-foundation.org" <akpm@linux-foundation.org>,
-	"david@redhat.com" <david@redhat.com>,
-	"pbonzini@redhat.com" <pbonzini@redhat.com>,
-	"seanjc@google.com" <seanjc@google.com>,
-	"viro@zeniv.linux.org.uk" <viro@zeniv.linux.org.uk>,
-	"brauner@kernel.org" <brauner@kernel.org>,
-	"lorenzo.stoakes@oracle.com" <lorenzo.stoakes@oracle.com>,
-	"Liam.Howlett@oracle.com" <Liam.Howlett@oracle.com>,
-	"willy@infradead.org" <willy@infradead.org>,
-	"vbabka@suse.cz" <vbabka@suse.cz>,
-	"rppt@kernel.org" <rppt@kernel.org>,
-	"surenb@google.com" <surenb@google.com>,
-	"mhocko@suse.com" <mhocko@suse.com>, "jack@suse.cz" <jack@suse.cz>,
-	"linux-mm@kvack.org" <linux-mm@kvack.org>,
-	"kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-	"linux-fsdevel@vger.kernel.org" <linux-fsdevel@vger.kernel.org>,
-	"jthoughton@google.com" <jthoughton@google.com>,
-	"tabba@google.com" <tabba@google.com>,
-	"vannapurve@google.com" <vannapurve@google.com>,
-	"Roy, Patrick" <roypat@amazon.co.uk>,
-	"Thomson, Jack" <jackabt@amazon.co.uk>,
-	"Manwaring, Derek" <derekmn@amazon.com>,
-	"Cali, Marco" <xmarcalx@amazon.co.uk>
-Subject: Re: [RFC PATCH v6 0/2] mm: Refactor KVM guest_memfd to introduce
- guestmem library
-Message-ID: <aMiEZfkx5sRMU7it@x1.local>
-References: <20250915161815.40729-1-kalyazin@amazon.com>
+        bh=g27UvLX7c9aw4EkAViSdQBn8kI2gbwfS7+nl0qMM/Wk=;
+        b=GdIopcIjUb+u5b8f5vAm58yNeQbzzSdw4C+VlIgBUkhZkE4U9up6lTf1KewhE0X/z4
+         KDgsEBAfohQ/Ib2B0YtQaSBuNr1P7vLls+YEnjTvYmUZCy8eNgZfSFfDdHRt7hZshd1x
+         QndJ1w9DK/G9YCSlbVHkEFtIYUUbFEj2y+iFzQMTndNxdyZ8pg4DYR3pOjrYPk5Mfkag
+         DW+4XLPGc/SqqbzKdDU5M20JyJpbMqUnqrrMaQ/0NP6PmeDeTWjulT6lMFtyOgaFiuH+
+         sYF7xpQHbB9eMxkMPxtWQItE+pQjRGn4dESLets+EijysF3PKhQPGTS8BxrMrBYnOYBb
+         amIA==
+X-Forwarded-Encrypted: i=1; AJvYcCXDPuv4Hy/6IUiCLk9+2RoOrsobPOZPWm1pMQ+HK0HYeB34B1EHUZlFDzZvxIIgFrmjbbo=@vger.kernel.org
+X-Gm-Message-State: AOJu0Ywpd8E7e6MxSvWwLBZmERi3y/FJ0MJvRWf2yXlI+F1ld3kcW3M6
+	bbpd0wjqWA7SI7Ha8Xa2Nv7b7DW238SufAL1SR7rsTs6jXIFG4Cg9r68FfxbqX0TlYjLGduueOI
+	rM/ZL
+X-Gm-Gg: ASbGncs1koACrfL6OPc1qpiVOU3HWpAdJBXwrBVPnwZhq2BC8yVK/TGV0n2ir6u3fgA
+	QF10JUSdjmiv68LR8Yk5xbwiETlDhtXtBRs/116xoeSVPFzA2LA+OyojnFh/6OVO240kRjEnRER
+	GVDSbh7zECnKhNeEVrMw3iDFRNGAJkZf+fIYcNEHdLQYKILQf+T1+dV+wP7Rs7n3CbSll7sAvvD
+	mItnaqgMpcK/qlHCte/Y1bCSmQ9J36j/ieZAiHpR7bS2g/8CipYAK97rANNLWbe+Xx7obCui/mu
+	QvsZr2VRtrqZBqiFHvhC0VklypSDIC2CPd5l+qBvWNwlJC0VzOIK+ISK57jWPxzh/DvgaPpsrcX
+	2+QYtHg8fdw4QYunkeI17qgljxvIFmMa3DeA9aMAUt440cDSi0NCLZLFnkAE8H15+0DuIGZZ6Ai
+	8ZzlkjtwW+G4N52R4FaRh7ZMY60g8RjmTiUoVF8IVbGrgQtb0+AqjX8n7s/AsLzjChIhVN
+X-Google-Smtp-Source: AGHT+IHsVF/oMAjFgcI11wCwhMY7SS79YEfgjGXyOoC4YQh3NTo7eFqhXCeCo23EiBgprd6+6b0+vQ==
+X-Received: by 2002:a05:622a:2997:b0:4b7:9b27:6599 with SMTP id d75a77b69052e-4b79b276977mr91089121cf.27.1757971679312;
+        Mon, 15 Sep 2025 14:27:59 -0700 (PDT)
+Received: from ?IPV6:2003:fa:af00:da00:8e63:e663:d61a:1504? (p200300faaf00da008e63e663d61a1504.dip0.t-ipconnect.de. [2003:fa:af00:da00:8e63:e663:d61a:1504])
+        by smtp.gmail.com with ESMTPSA id d75a77b69052e-4b639dad799sm75539131cf.28.2025.09.15.14.27.57
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 15 Sep 2025 14:27:58 -0700 (PDT)
+Message-ID: <bad630f8-3223-4f58-a128-30761207f3d1@grsecurity.net>
+Date: Mon, 15 Sep 2025 23:27:56 +0200
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20250915161815.40729-1-kalyazin@amazon.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [kvm-unit-tests PATCH] Better backtraces for leaf functions
+To: Andrew Jones <andrew.jones@linux.dev>
+Cc: Thomas Huth <thuth@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>,
+ kvm@vger.kernel.org
+References: <20250724181759.1974692-1-minipli@grsecurity.net>
+ <20250908-c34647c9836098b0484b7430@orel>
+Content-Language: en-US, de-DE
+From: Mathias Krause <minipli@grsecurity.net>
+Autocrypt: addr=minipli@grsecurity.net; keydata=
+ xsDNBF4u6F8BDAC1kCIyATzlCiDBMrbHoxLywJSUJT9pTbH9MIQIUW8K1m2Ney7a0MTKWQXp
+ 64/YTQNzekOmta1eZFQ3jqv+iSzfPR/xrDrOKSPrw710nVLC8WL993DrCfG9tm4z3faBPHjp
+ zfXBIOuVxObXqhFGvH12vUAAgbPvCp9wwynS1QD6RNUNjnnAxh3SNMxLJbMofyyq5bWK/FVX
+ 897HLrg9bs12d9b48DkzAQYxcRUNfL9VZlKq1fRbMY9jAhXTV6lcgKxGEJAVqXqOxN8DgZdU
+ aj7sMH8GKf3zqYLDvndTDgqqmQe/RF/hAYO+pg7yY1UXpXRlVWcWP7swp8OnfwcJ+PiuNc7E
+ gyK2QEY3z5luqFfyQ7308bsawvQcFjiwg+0aPgWawJ422WG8bILV5ylC8y6xqYUeSKv/KTM1
+ 4zq2vq3Wow63Cd/qyWo6S4IVaEdfdGKVkUFn6FihJD/GxnDJkYJThwBYJpFAqJLj7FtDEiFz
+ LXAkv0VBedKwHeBaOAVH6QEAEQEAAc0nTWF0aGlhcyBLcmF1c2UgPG1pbmlwbGlAZ3JzZWN1
+ cml0eS5uZXQ+wsERBBMBCgA7AhsDBQsJCAcCBhUKCQgLAgQWAgMBAh4BAheAFiEEd7J359B9
+ wKgGsB94J4hPxYYBGYYFAmBbH/cCGQEACgkQJ4hPxYYBGYaX/gv/WYhaehD88XjpEO+yC6x7
+ bNWQbk7ea+m82fU2x/x6A9L4DN/BXIxqlONzk3ehvW3wt1hcHeF43q1M/z6IthtxSRi059RO
+ SarzX3xfXC1pc5YMgCozgE0VRkxH4KXcijLyFFjanXe0HzlnmpIJB6zTT2jgI70q0FvbRpgc
+ rs3VKSFb+yud17KSSN/ir1W2LZPK6er6actK03L92A+jaw+F8fJ9kJZfhWDbXNtEE0+94bMa
+ cdDWTaZfy6XJviO3ymVe3vBnSDakVE0HwLyIKvfAEok+YzuSYm1Nbd2T0UxgSUZHYlrUUH0y
+ tVxjEFyA+iJRSdm0rbAvzpwau5FOgxRQDa9GXH6ie6/ke2EuZc3STNS6EBciJm1qJ7xb2DTf
+ SNyOiWdvop+eQZoznJJte931pxkRaGwV+JXDM10jGTfyV7KT9751xdn6b6QjQANTgNnGP3qs
+ TO5oU3KukRHgDcivzp6CWb0X/WtKy0Y/54bTJvI0e5KsAz/0iwH19IB0vpYLzsDNBF4u6F8B
+ DADwcu4TPgD5aRHLuyGtNUdhP9fqhXxUBA7MMeQIY1kLYshkleBpuOpgTO/ikkQiFdg13yIv
+ q69q/feicsjaveIEe7hUI9lbWcB9HKgVXW3SCLXBMjhCGCNLsWQsw26gRxDy62UXRCTCT3iR
+ qHP82dxPdNwXuOFG7IzoGBMm3vZbBeKn0pYYWz2MbTeyRHn+ZubNHqM0cv5gh0FWsQxrg1ss
+ pnhcd+qgoynfuWAhrPD2YtNB7s1Vyfk3OzmL7DkSDI4+SzS56cnl9Q4mmnsVh9eyae74pv5w
+ kJXy3grazD1lLp+Fq60Iilc09FtWKOg/2JlGD6ZreSnECLrawMPTnHQZEIBHx/VLsoyCFMmO
+ 5P6gU0a9sQWG3F2MLwjnQ5yDPS4IRvLB0aCu+zRfx6mz1zYbcVToVxQqWsz2HTqlP2ZE5cdy
+ BGrQZUkKkNH7oQYXAQyZh42WJo6UFesaRAPc3KCOCFAsDXz19cc9l6uvHnSo/OAazf/RKtTE
+ 0xGB6mQN34UAEQEAAcLA9gQYAQoAIAIbDBYhBHeyd+fQfcCoBrAfeCeIT8WGARmGBQJeORkW
+ AAoJECeIT8WGARmGXtgL/jM4NXaPxaIptPG6XnVWxhAocjk4GyoUx14nhqxHmFi84DmHUpMz
+ 8P0AEACQ8eJb3MwfkGIiauoBLGMX2NroXcBQTi8gwT/4u4Gsmtv6P27Isn0hrY7hu7AfgvnK
+ owfBV796EQo4i26ZgfSPng6w7hzCR+6V2ypdzdW8xXZlvA1D+gLHr1VGFA/ZCXvVcN1lQvIo
+ S9yXo17bgy+/Xxi2YZGXf9AZ9C+g/EvPgmKrUPuKi7ATNqloBaN7S2UBJH6nhv618bsPgPqR
+ SV11brVF8s5yMiG67WsogYl/gC2XCj5qDVjQhs1uGgSc9LLVdiKHaTMuft5gSR9hS5sMb/cL
+ zz3lozuC5nsm1nIbY62mR25Kikx7N6uL7TAZQWazURzVRe1xq2MqcF+18JTDdjzn53PEbg7L
+ VeNDGqQ5lJk+rATW2VAy8zasP2/aqCPmSjlCogC6vgCot9mj+lmMkRUxspxCHDEms13K41tH
+ RzDVkdgPJkL/NFTKZHo5foFXNi89kA==
+In-Reply-To: <20250908-c34647c9836098b0484b7430@orel>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-Hello, Nikita,
+Am 08.09.25 um 20:35 schrieb Andrew Jones:
+> On Thu, Jul 24, 2025 at 08:17:59PM +0200, Mathias Krause wrote:
+>> Leaf functions are problematic for backtraces as they lack the frame
+>> pointer setup epilogue. If such a function causes a fault, the original
+>> caller won't be part of the backtrace. That's problematic if, for
+>> example, memcpy() is failing because it got passed a bad pointer. The
+>> generated backtrace will look like this, providing no clue what the
+>> issue may be:
+>> [...]
 
-On Mon, Sep 15, 2025 at 04:18:16PM +0000, Kalyazin, Nikita wrote:
-> This is a revival of the guestmem library patch series originated from
-> Elliot [1].  The reason I am bringing it up now is it would help
-> implement UserfaultFD support minor mode in guest_memfd.
-> 
-> Background
-> 
-> We are building a Firecracker version that uses guest_memfd to back
-> guest memory [2].  The main objective is to use guest_memfd to remove
-> guest memory from host kernel's direct map to reduce the surface for
-> Spectre-style transient execution issues [3].  Currently, Firecracker
-> supports restoring VMs from snapshots using UserfaultFD [4], which is
-> similar to the postcopy phase of live migration.  During restoration,
-> while we rely on a separate mechanism to handle stage-2 faults in
-> guest_memfd [5], UserfaultFD support in guest_memfd is still required to
-> handle faults caused either by the VMM itself or by MMIO access handling
-> on x86.
-> 
-> The major problem in implementing UserfaultFD for guest_memfd is that
-> the MM code (UserfaultFD) needs to call KVM-specific interfaces.
-> Particularly for the minor mode, these are 1) determining the type of
-> the VMA (eg is_vma_guest_memfd()) and 2) obtaining a folio (ie
-> kvm_gmem_get_folio()).  Those may not be always available as KVM can be
-> compiled as a module.  Peter attempted to approach it via exposing an
-> ops structure where modules (such as KVM) could provide their own
-> callbacks, but it was not deemed to be sufficiently safe as it opens up
-> an unrestricted interface for all modules and may leave MM in an
-> inconsistent state [6].
-
-I apologize when I was replying to your offlist email that I'll pick it up,
-but I didn't.. I moved on with other things after the long off which was
-more urgent, then I never got the chance to go back..  I will do it this
-week.
-
-I don't think it's a real safety issue.  Frankly, I still think that latest
-patchset, as-is, is the best we should come up with userfaultfd.  If people
-worry about uffdio_copy(), it's fine, we can drop it.  It's not a huge deal
-at least for now.
-
-Btw, thanks for help pinging that thread, and sorry I didn't yet get back
-to it.  I'll read the discussions (I didn't yet, after back to work for
-weeks), but I will.
-
-> 
-> An alternative way to make these interfaces available to the UserfaultFD
-> code is extracting generic-MM guest_memfd parts into a library
-> (guestmem) under MM where they can be safely consumed by the UserfaultFD
-> code.  As far as I know, the original guestmem library series was
-> motivated by adding guest_memfd support in Gunyah hypervisor [7].
-> 
-> This RFC
-> 
-> I took Elliot's v5 (the latest) and rebased it on top of the guest_memfd
-> preview branch [8] because I also wanted to see how it would work with
-> direct map removal [3] and write syscall [9], which are building blocks
-> for the guest_memfd-based Firecracker version.  On top of it I added a
-> patch that implements UserfaultFD support for guest_memfd using
-> interfaces provided by the guestmem library to illustrate the complete
-> idea.
-
-I hope patch 2 exactly illustrated on why the uffd modulization effort is
-still worthwhile (to not keep attaching "if"s all over the places).  Would
-you agree?
-
-If you agree, we'll need to review the library work as a separate effort
-from userfaultfd.
+>> +ifneq ($(KEEP_FRAME_POINTER),)
+>> +# Fake profiling to force the compiler to emit a frame pointer setup also in
+>> +# leaf function (-mno-omit-leaf-frame-pointer doesn't work, unfortunately).
+>> +#
+>> +# Note:
+>> +# We need to defer the cc-option test until -fno-pic or -no-pie have been
+>> +# added to CFLAGS as -mnop-mcount needs it. The lazy evaluation of CFLAGS
+>> +# during compilation makes this do "The Right Thing."
+>> +fomit_frame_pointer += $(call cc-option, -pg -mnop-mcount, "")
+>> +endif
+>> +
 
 > 
-> I made the following modifications along the way:
->  - Followed by a comment from Sean, converted invalidate_begin()
->    callback back to void as it cannot fail in KVM, and the related
->    Gunyah requirement is unknown to me
->  - Extended the guestmem_ops structure with the supports_mmap() callback
->    to provide conditional mmap support in guestmem
->  - Extended the guestmem library interface with guestmem_allocate(),
->    guestmem_test_no_direct_map(), guestmem_mark_prepared(),
->    guestmem_mmap(), and guestmem_vma_is_guestmem()
->  - Made (kvm_gmem)/(guestmem)_test_no_direct_map() use
->    mapping_no_direct_map() instead of KVM-specific flag
->    GUEST_MEMFD_FLAG_NO_DIRECT_MAP to make it KVM-independent
+> My riscv cross compiler doesn't seem to need this, i.e. we already get
+> memcpy() in the trace with just -fno-omit-frame-pointer.
+
+Yeah, noticing the same here. Apparently, RISCV has a debug-friendly
+default stack frame epilogue.
+
 > 
-> Feedback that I would like to receive:
->  - Is this the right solution to the "UserfaultFD in guest_memfd"
->    problem?
+> Also, while arm doesn't currently have memcpy() in the trace, adding
+> -mno-omit-leaf-frame-pointer works for the cross compiler I'm using
+> for it.
 
-Yes it's always a fair question to ask.  I shared my two cents above.  We
-can definitely also hear about how others think.
+Hmm, actually, ARM is failing hard on me, causing recursive faults,
+because of the truncated stack frame setup in leaf functions that lacks
+saving the return address on the stack, making the code follow "wild"
+pointers:
 
-I hope I'll keep my words this time on reposting.
+| Unhandled exception 4 (dabt)
+| Exception frame registers:
+| pc : [<40012614>]    lr : [<40010414>]    psr: 200001d3
+| sp : 4013fd94  ip : f4523f20  fp : 4013fd94
+| r10: 00000000  r9 : 00000000  r8 : 00000000
+| r7 : 00000000  r6 : 00000000  r5 : 40140000  r4 : 00000000
+| r3 : deadbeee  r2 : 00000029  r1 : deadbf18  r0 : f4523f21
+| Flags: nzCv  IRQs off  FIQs off  Mode SVC_32
+| Control: 00c50078  Table: 00000000  DAC: 00000000
+| DFAR: deadbeef    DFSR: 00000008
+| Unhandled exception 4 (dabt)
+| Exception frame registers:
+| pc : [<4001318c>]    lr : [<40117400>]    psr: 200001d3
+| sp : 4013fcd8  ip : ea000670  fp : 4013fcdc
+| r10: 00000000  r9 : 00000000  r8 : 00000000
+| r7 : 00000000  r6 : 4013fd94  r5 : 00000004  r4 : 4013fd48
+| r3 : e1a04000  r2 : 00000013  r1 : 4013fce8  r0 : 00000002
+| Flags: nzCv  IRQs off  FIQs off  Mode SVC_32
+| Control: 00c50078  Table: 00000000  DAC: 00000000
+| DFAR: ea000670    DFSR: 00000008
+| RECURSIVE STACK WALK!!!
+|   STACK: @4001318c
+| 0x4001318c: arch_backtrace_frame at lib/arm/stack.c:44
+|                   break;
+|       >       return_addrs[depth] = (void *)fp[0];
+|               if (return_addrs[depth] == 0)
+
+Note the "RECURSIVE STACK WALK!!!" above.
+
+I'm using "arm-linux-gnueabi-gcc (Debian 14.2.0-19) 14.2.0" here.
+
+Also, -mno-omit-leaf-frame-pointer isn't supported for ARM but only
+AArch64. However, there it fixes the backtraces, indeed.
+
+> 
+> And, neither the riscv nor the arm cross compilers I'm using have
+> -mnop-mcount.
+> 
+> So, I think something like this should be put in arch-specific makefiles.
+
+I added it on purpose to the top-level Makefile, willingly knowing that
+-mnop-mcount is an x86-specific option. However, arch Makefiles get
+included early, so the -fno-pic / -no-pie flags won't be in CFLAGS by
+the time of the test, nor would be the $(cc-option ...) helper be
+available. But yes, it's kinda ugly and, apparently, other architectures
+need fixing too, so I bit the bullet and did a different hack^W^W proper
+fix for em all (will post it in a few).
 
 Thanks,
-
->  - What requirements from other hypervisors than KVM do we need to
->    consider at this point?
->  - Does the line between generic-MM and KVM-specific guest_memfd parts
->    look sensible?
-> 
-> Previous iterations of UserfaultFD support in guest_memfd patches:
-> v3:
->  - https://lore.kernel.org/kvm/20250404154352.23078-1-kalyazin@amazon.com
->  - minor changes to address review comments (James)
-> v2:
->  - https://lore.kernel.org/kvm/20250402160721.97596-1-kalyazin@amazon.com
->  - implement a full minor trap instead of hybrid missing/minor trap
->    (James/Peter)
->  - make UFFDIO_CONTINUE implementation generic calling vm_ops->fault()
-> v1:
->  - https://lore.kernel.org/kvm/20250303133011.44095-1-kalyazin@amazon.com
-> 
-> Nikita
-> 
-> [1]: https://lore.kernel.org/kvm/20241122-guestmem-library-v5-2-450e92951a15@quicinc.com
-> [2]: https://github.com/firecracker-microvm/firecracker/tree/feature/secret-hiding
-> [3]: https://lore.kernel.org/kvm/20250912091708.17502-1-roypat@amazon.co.uk
-> [4]: https://github.com/firecracker-microvm/firecracker/blob/main/docs/snapshotting/handling-page-faults-on-snapshot-resume.md
-> [5]: https://lore.kernel.org/kvm/20250618042424.330664-1-jthoughton@google.com
-> [6]: https://lore.kernel.org/linux-mm/20250627154655.2085903-1-peterx@redhat.com
-> [7]: https://lore.kernel.org/lkml/20240222-gunyah-v17-0-1e9da6763d38@quicinc.com
-> [8]: https://git.kernel.org/pub/scm/linux/kernel/git/david/linux.git/log/?h=guestmemfd-preview
-> [9]: https://lore.kernel.org/kvm/20250902111951.58315-1-kalyazin@amazon.com
-> 
-> Nikita Kalyazin (2):
->   mm: guestmem: introduce guestmem library
->   userfaulfd: add minor mode for guestmem
-> 
->  Documentation/admin-guide/mm/userfaultfd.rst |   4 +-
->  MAINTAINERS                                  |   2 +
->  fs/userfaultfd.c                             |   3 +-
->  include/linux/guestmem.h                     |  46 +++
->  include/linux/userfaultfd_k.h                |   8 +-
->  include/uapi/linux/userfaultfd.h             |   8 +-
->  mm/Kconfig                                   |   3 +
->  mm/Makefile                                  |   1 +
->  mm/guestmem.c                                | 380 +++++++++++++++++++
->  mm/userfaultfd.c                             |  14 +-
->  virt/kvm/Kconfig                             |   1 +
->  virt/kvm/guest_memfd.c                       | 303 ++-------------
->  12 files changed, 493 insertions(+), 280 deletions(-)
->  create mode 100644 include/linux/guestmem.h
->  create mode 100644 mm/guestmem.c
-> 
-> 
-> base-commit: 911634bac3107b237dcd8fdcb6ac91a22741cbe7
-> -- 
-> 2.50.1
-> 
-> 
-> 
-
--- 
-Peter Xu
-
+Mathias
 
