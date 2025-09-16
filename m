@@ -1,73 +1,73 @@
-Return-Path: <kvm+bounces-57739-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-57758-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 95582B59D96
-	for <lists+kvm@lfdr.de>; Tue, 16 Sep 2025 18:27:45 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id AC0FAB59E33
+	for <lists+kvm@lfdr.de>; Tue, 16 Sep 2025 18:49:05 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 6E20D7B436E
-	for <lists+kvm@lfdr.de>; Tue, 16 Sep 2025 16:25:55 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 25012580C2F
+	for <lists+kvm@lfdr.de>; Tue, 16 Sep 2025 16:47:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5109E374279;
-	Tue, 16 Sep 2025 16:27:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 16EB53016E8;
+	Tue, 16 Sep 2025 16:47:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="mgFQN0/W"
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="l4GGmeFZ"
 X-Original-To: kvm@vger.kernel.org
 Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E392332857E;
-	Tue, 16 Sep 2025 16:27:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8FDFF2F260A;
+	Tue, 16 Sep 2025 16:47:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758040030; cv=none; b=cPgGadRNb7ud9r/3d7eB6xwutv5LRQ+Cuqmrw69iafnzbxlZoxUc+qVQz/i3QzthcJ/pJc/uWIlibNe6GgdWB7jtiCoTV+k4i99KakVhHmWgcHC9soQ0nz0CHoOtGrROPWHDV08Ik/Vxk+BQw8U02QfLvBcwYwF9ApL6w09BWrY=
+	t=1758041268; cv=none; b=Cu9zr4/XZXsHQQEWOU2Ea1vUWUjwYGcdx82tAMubIAbiEW2KXCoJ0qghIb/Ha+tHN3UE7NEdw2pFGCmEEcIi2rNV+oI3xxqZPKbVIBDK86YOaYKXFUl9j323VvaC9p/ShwZHtgQ0nrEfHJM6TCoHPrNG7xuuBhcjGYLyBXe8nZo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758040030; c=relaxed/simple;
-	bh=+IHHJ85mV9n4ih3baS4Nlb34cpe1kvfb0oPy78kAAbc=;
+	s=arc-20240116; t=1758041268; c=relaxed/simple;
+	bh=fj0IVPb/SwPHuOK8W79P/MytQ8xewjyteJZ6se+YbsA=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=CWpUfoPW3cKdYX4FulEzV3lmq1ZtcVagO/ITR2NaGgXRYZt7zmBqaBkCOpmRHCk7y4VTO595cLIgoQnx0GBTtVbu6+ft5da13ezCoY3fb5NUnLDVDMK1kJJHLfuUhXc5lmuEDiSJB7qz7XO2KJ1UZko7r17GHrqIy+BBz8X81lk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=mgFQN0/W; arc=none smtp.client-ip=148.163.156.1
+	 Content-Type:Content-Disposition:In-Reply-To; b=EAWDJlB4xM+swJ/bv0iENUtGGgYgGCOksLsmJsQkoROOKgfnpdX94UM8VmzqVmU46/GkzWpK/ZtintvaFf1bF709uKfkKWOpTMDLungVc1F88eiReQJbEnBZ3G3RlZpted6pzLbnbMEyz0C9UjXwuLpBZxYvkKig5/V6zBUUeAg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=l4GGmeFZ; arc=none smtp.client-ip=148.163.156.1
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
 Received: from pps.filterd (m0353729.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 58G9HP2u019518;
-	Tue, 16 Sep 2025 16:27:00 GMT
+	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 58GEW7aZ008844;
+	Tue, 16 Sep 2025 16:47:39 GMT
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
 	:content-type:date:from:in-reply-to:message-id:mime-version
-	:references:subject:to; s=pp1; bh=r7jy0bwQkssbZt2/w8JUPytH4KiBGn
-	5jehL374/xelI=; b=mgFQN0/W41a2qPOMt3zrODy57xO4762MwxIbcF1N3YQe3Q
-	Y52OEmWSL7PLB0U6KlzlTXC8aE4HRuOvTF3kJzcyZeH99tgeHgwjqb5zWDG22EzG
-	aFRaAbFPAK2U2IzLfRoLZWfRoIkL/7D4qWVcNbSg4F/4v8jnE1rjVV1l5yfkfO7O
-	lWQn5NStAHHrzXi0AXHLUudz4S+hvQc9Vno5Bdndh2QlNsuDO1WqzUXe4g7IohMd
-	a1aqJB0ouiMHNMbDLJ4xrb7xkn5OjA2SdE52Yn3FAoMwJnE7hFwmR3oxgbypMtFR
-	tYlBj1Xy6opxXBHcTqX7PaSvGcJefXJvcvrBsCBQ==
-Received: from ppma23.wdc07v.mail.ibm.com (5d.69.3da9.ip4.static.sl-reverse.com [169.61.105.93])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 49509yam5t-1
+	:references:subject:to; s=pp1; bh=udpsgbYJheIjhUUrXdzl0U6zrZ59HY
+	dqlINwbgYQ0OQ=; b=l4GGmeFZ+Q6oLOl+kAauBuJFUzmlyF3IePlLh0UD97Tlvw
+	HYCk1slJQM1HBGDFTi7lABizEVTjK35zOY5vm+p0nZcxQBMlyEDNZwRCJ2/pEIW5
+	OAgM0EBWZKgfzYvi8MlOhJ4NKtHLTr+ZibjwGQ9vWjtCC33WLQmw1gneBo2yAeeV
+	pmJY6nOsHYj67tJt1d2LQHpP62zZFTppiP1H1vsnDjnKEScrogDXIaZ1U+e1q4O+
+	6wA9QymARku5YEDflA3CsAWRIB7N9LuvMMNpXjA/gY7umwz6C0pNOPrw3oSnYQkC
+	Z/dZ7Qdt4Rk05j/UTVP3GqoYYkLGkiXuWb+75AFQ==
+Received: from ppma22.wdc07v.mail.ibm.com (5c.69.3da9.ip4.static.sl-reverse.com [169.61.105.92])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 49509yarau-1
 	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Tue, 16 Sep 2025 16:27:00 +0000 (GMT)
-Received: from pps.filterd (ppma23.wdc07v.mail.ibm.com [127.0.0.1])
-	by ppma23.wdc07v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 58GEX5YQ027308;
-	Tue, 16 Sep 2025 16:26:59 GMT
-Received: from smtprelay07.fra02v.mail.ibm.com ([9.218.2.229])
-	by ppma23.wdc07v.mail.ibm.com (PPS) with ESMTPS id 495men4skf-1
+	Tue, 16 Sep 2025 16:47:38 +0000 (GMT)
+Received: from pps.filterd (ppma22.wdc07v.mail.ibm.com [127.0.0.1])
+	by ppma22.wdc07v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 58GDvl4P029817;
+	Tue, 16 Sep 2025 16:47:37 GMT
+Received: from smtprelay05.fra02v.mail.ibm.com ([9.218.2.225])
+	by ppma22.wdc07v.mail.ibm.com (PPS) with ESMTPS id 495kb0w4bd-1
 	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Tue, 16 Sep 2025 16:26:59 +0000
-Received: from smtpav05.fra02v.mail.ibm.com (smtpav05.fra02v.mail.ibm.com [10.20.54.104])
-	by smtprelay07.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 58GGQtTx48693608
+	Tue, 16 Sep 2025 16:47:37 +0000
+Received: from smtpav04.fra02v.mail.ibm.com (smtpav04.fra02v.mail.ibm.com [10.20.54.103])
+	by smtprelay05.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 58GGlXgi55640432
 	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Tue, 16 Sep 2025 16:26:55 GMT
-Received: from smtpav05.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 34A6720043;
-	Tue, 16 Sep 2025 16:26:55 +0000 (GMT)
-Received: from smtpav05.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 9C45F20040;
-	Tue, 16 Sep 2025 16:26:54 +0000 (GMT)
+	Tue, 16 Sep 2025 16:47:33 GMT
+Received: from smtpav04.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 51E9C2004B;
+	Tue, 16 Sep 2025 16:47:33 +0000 (GMT)
+Received: from smtpav04.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id BABF42004D;
+	Tue, 16 Sep 2025 16:47:32 +0000 (GMT)
 Received: from osiris (unknown [9.111.88.139])
-	by smtpav05.fra02v.mail.ibm.com (Postfix) with ESMTPS;
-	Tue, 16 Sep 2025 16:26:54 +0000 (GMT)
-Date: Tue, 16 Sep 2025 18:26:53 +0200
+	by smtpav04.fra02v.mail.ibm.com (Postfix) with ESMTPS;
+	Tue, 16 Sep 2025 16:47:32 +0000 (GMT)
+Date: Tue, 16 Sep 2025 18:47:31 +0200
 From: Heiko Carstens <hca@linux.ibm.com>
 To: Claudio Imbrenda <imbrenda@linux.ibm.com>
 Cc: kvm@vger.kernel.org, linux-s390@vger.kernel.org, borntraeger@de.ibm.com,
@@ -75,11 +75,11 @@ Cc: kvm@vger.kernel.org, linux-s390@vger.kernel.org, borntraeger@de.ibm.com,
         seiden@linux.ibm.com, schlameuss@linux.ibm.com, svens@linux.ibm.com,
         agordeev@linux.ibm.com, david@redhat.com,
         gerald.schaefer@linux.ibm.com
-Subject: Re: [PATCH v2 08/20] KVM: s390: KVM page table management functions:
- allocation
-Message-ID: <20250916162653.27229G04-hca@linux.ibm.com>
+Subject: Re: [PATCH v2 09/20] KVM: s390: KVM page table management functions:
+ clear and replace
+Message-ID: <20250916164731.27229Haa-hca@linux.ibm.com>
 References: <20250910180746.125776-1-imbrenda@linux.ibm.com>
- <20250910180746.125776-9-imbrenda@linux.ibm.com>
+ <20250910180746.125776-10-imbrenda@linux.ibm.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -88,21 +88,21 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20250910180746.125776-9-imbrenda@linux.ibm.com>
+In-Reply-To: <20250910180746.125776-10-imbrenda@linux.ibm.com>
 X-TM-AS-GCONF: 00
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUwOTEzMDAyMCBTYWx0ZWRfXwb5JXHcJWA+B
- TDa9q7yJ/A7M+huwP6j59ht3Nc0oItv5hMZey5X+aYaIUDM+xMqmn0oFKs3HpKEQDjEZFjiobMB
- XbRz1aOc2AyDgOHsDd1IPBMEKvtaoUkxm1yJedJkpuYnQgzBFNHU8Shm3vBGxyV90h+u/k0MDrB
- Zr30GYqHB0kPAMWEyEUt5h8oXmFeYf+4n3/ClkFija7EXDTvtSMWrZ3vKbSKFXhc5zye8c1XWeZ
- Yi2Fcl05yKqDV32brOf0cduDWyMZHEw7lq8FgXyZTrwU7bC7YZUkUNG5LmpYD9/YvLoDT5XuXVn
- RdAL9MpUV6Xiw43cRSHbxRztnPTGIC+siLt+bispGnfySa5TOYS4xorGueU6jSQq6pY4tSKL1zm
- zDX/m8Cn
-X-Authority-Analysis: v=2.4 cv=OPYn3TaB c=1 sm=1 tr=0 ts=68c98fd4 cx=c_pps
- a=3Bg1Hr4SwmMryq2xdFQyZA==:117 a=3Bg1Hr4SwmMryq2xdFQyZA==:17
- a=kj9zAlcOel0A:10 a=yJojWOMRYYMA:10 a=VnNF1IyMAAAA:8 a=7565BKuWIPA_-WLTj0wA:9
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUwOTEzMDAyMCBTYWx0ZWRfX8SOCkxV4vj3I
+ ed/b7pgMwgVuzjogvqv8P/5mS2fy23kUePvHx9FadGt5pmzhoHcOZMm8nxPvK3UJpF+86DIMovU
+ 0A753zMxCcm6mFrD59e/HHFeIUn3D1/C/P9enDZWhNmKuz8NLomLaDz4WAC4WxfAmrSwoeNgnt0
+ OJECEJAv2+Q+8vjRzaHpEHE2ZEBXooNcVCJnU0W2FBfW3/TLJskSJhN3IawmIiSvOIyAvEqudME
+ lS6tBm7ODftEJC4ZeOKtULeUGQysEFjwfLHtX2dEcxnu4IVQT+47WOz8Nrww3T9aM6tuCqQHKm3
+ 5ZLhNgMKlViqjwPjxJwH/O5K/u+Plg8fswQWugN6R3tJf603p39hMoKmCdvPAj8yNGxOBObVpB/
+ CWedwYaf
+X-Authority-Analysis: v=2.4 cv=OPYn3TaB c=1 sm=1 tr=0 ts=68c994aa cx=c_pps
+ a=5BHTudwdYE3Te8bg5FgnPg==:117 a=5BHTudwdYE3Te8bg5FgnPg==:17
+ a=kj9zAlcOel0A:10 a=yJojWOMRYYMA:10 a=VnNF1IyMAAAA:8 a=MAvXTjdga-6Jqg6AyVUA:9
  a=CjuIK1q_8ugA:10
-X-Proofpoint-GUID: IoNE6rkFtes35lBIAODcau2IStM6ujaM
-X-Proofpoint-ORIG-GUID: IoNE6rkFtes35lBIAODcau2IStM6ujaM
+X-Proofpoint-GUID: J2fe9z77Z-S93UXGnE6H8ee-kglnbUZ-
+X-Proofpoint-ORIG-GUID: J2fe9z77Z-S93UXGnE6H8ee-kglnbUZ-
 X-Proofpoint-Virus-Version: vendor=baseguard
  engine=ICAP:2.0.293,Aquarius:18.0.1117,Hydra:6.1.9,FMLib:17.12.80.40
  definitions=2025-09-16_02,2025-09-12_01,2025-03-28_01
@@ -112,41 +112,31 @@ X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
  classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
  reason=mlx scancount=1 engine=8.19.0-2507300000 definitions=main-2509130020
 
-On Wed, Sep 10, 2025 at 08:07:34PM +0200, Claudio Imbrenda wrote:
+On Wed, Sep 10, 2025 at 08:07:35PM +0200, Claudio Imbrenda wrote:
 > Add page table management functions to be used for KVM guest (gmap)
 > page tables.
 > 
-> This patch adds the boilerplate and functions for the allocation and
-> deallocation of DAT tables.
+> This patch adds functions to clear, replace or exchange DAT table
+> entries.
 > 
 > Signed-off-by: Claudio Imbrenda <imbrenda@linux.ibm.com>
 > ---
->  arch/s390/kvm/Makefile     |  1 +
->  arch/s390/kvm/dat.c        | 91 ++++++++++++++++++++++++++++++++++++++
->  arch/s390/kvm/dat.h        |  4 ++
->  arch/s390/mm/page-states.c |  1 +
->  4 files changed, 97 insertions(+)
->  create mode 100644 arch/s390/kvm/dat.c
+>  arch/s390/kvm/dat.c | 120 ++++++++++++++++++++++++++++++++++++++++++++
+>  arch/s390/kvm/dat.h |  40 +++++++++++++++
+>  2 files changed, 160 insertions(+)
 
 ...
 
-> +static inline struct page_table *dat_alloc_pt_noinit(void)
+> +bool dat_crstep_xchg_atomic(union crste *crstep, union crste old, union crste new, gfn_t gfn,
+> +			    union asce asce)
 > +{
-> +	struct page *page;
-> +	void *virt;
-> +
-> +	page = alloc_pages(GFP_ATOMIC, 0);
-> +	if (!page)
-> +		return NULL;
-> +
-> +	virt = page_to_virt(page);
-> +	__arch_set_page_dat(virt, 1);
-> +	return virt;
-> +}
+> +	if (old.h.i)
+> +		return arch_try_cmpxchg((long *)crstep, &old.val, new.val);
+> +	if (cpu_has_edat2())
+> +		return crdte_crste(crstep, old, new, gfn, asce);
+> +	if (cpu_has_idte())
+> +		return cspg_crste(crstep, old, new);
 
-Is GFP_ATOMIC a typo, and this should have been GFP_KERNEL?
-
-Otherwise I would guess this will cause problems in the future when
-under memory pressure allocating guest page tables fails easily,
-while before this change such allocations never failed.
+FWIW, CSPG is present if EDAT1 is installed. So this should be
+cpu_has_edat1() instead, I would guess.
 
