@@ -1,138 +1,119 @@
-Return-Path: <kvm+bounces-57683-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-57684-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id C16DDB58EE1
-	for <lists+kvm@lfdr.de>; Tue, 16 Sep 2025 09:12:53 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1C14FB58EFB
+	for <lists+kvm@lfdr.de>; Tue, 16 Sep 2025 09:19:20 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5ECD952379A
-	for <lists+kvm@lfdr.de>; Tue, 16 Sep 2025 07:12:51 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6257B2A8477
+	for <lists+kvm@lfdr.de>; Tue, 16 Sep 2025 07:19:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5E3392E5429;
-	Tue, 16 Sep 2025 07:12:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C3843280CC9;
+	Tue, 16 Sep 2025 07:19:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="NOqEFT0h"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="sgUqG7d2"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.11])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F0F522E11B0;
-	Tue, 16 Sep 2025 07:12:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.11
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DDC8319D08F
+	for <kvm@vger.kernel.org>; Tue, 16 Sep 2025 07:19:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758006764; cv=none; b=H4NEeCYBhj0qPaXa93ANIyO/EMAuOChMb13XfkCn44hoMemNvySKjuLaH8Jvgs8A/FTr7X4QuqzjWbVdPEp1KAgRGg+hu0FXJRubceY6HWBg89bx2w+58qTlW/dXLzw/wmogBsUYXa2ruSFszJo3+tKIoXqhw4DfxRMM4EcZSiU=
+	t=1758007153; cv=none; b=tkgZDlDy5HjFW3RISVaAL86Kr/RUQIU8MdQrta1FHvUS8ND7NsHbw7DKGhr1dcQ8lLk59mlnu1XPEuu+ZFKy6u1ocRNYdmpgs88fCo8G5mmwqKKkQgH3THX4WRYBnTBU6eSJOe+3cdhrjXe2aJ05v6R7qLXDndob43HIDpMfKc8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758006764; c=relaxed/simple;
-	bh=s95beaMcaffmyAeVE0mYN7MSCkKmMJwMmOYNqz3JrNE=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=sgml9leRdAASLICo1eI4bQCru5KyJirLnfF7nvRX7DgfsvjZegaHqNObDXCt835jgjCk62l5rS+HoqUDuEE3q6gPlKh74lUXpZ9Kzk2cAKVpb+HBOY78hq7UZ0STGKWVniuOI3VF+7pwLe3xAPYkHfiudW44QDpR/6edCcrrh1g=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=NOqEFT0h; arc=none smtp.client-ip=198.175.65.11
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1758006763; x=1789542763;
-  h=message-id:date:mime-version:subject:to:cc:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=s95beaMcaffmyAeVE0mYN7MSCkKmMJwMmOYNqz3JrNE=;
-  b=NOqEFT0hST83bWiWd5Nzil7A9ZASv0/aXXB8ijq2IMHrT0IXO9lK3jKc
-   MkThR0F+1/XUifEJ/Bwsa90mnzXPno/PtqwNyV+aiKiuDJvl0FKmeJ7XW
-   lNYpiGdEJx4X1w0ZZv3oyAOFfdXMUZfCFusX7uMmoGoPeGkYElr6elLP5
-   eqv/oV+hOcaVHslQdcTVpEOH4zS48lb6xaOlv10cpA7MT+yDyzPzB02+9
-   GVN161ssN8Fo7a5c9O3VfzObTCpAxNN9oe51HE0ip4CKr+DhS+VJEjsTC
-   qF9AG4y+XhDwMYM4+6445Nu+cdeJoUAACeq4UO8YcL6vEKY/FomRFIGau
-   A==;
-X-CSE-ConnectionGUID: ts77xjOcT7qnX7ic9vZ3sQ==
-X-CSE-MsgGUID: xb0o6BDSSsaSDG4FW/vE+Q==
-X-IronPort-AV: E=McAfee;i="6800,10657,11554"; a="70526493"
-X-IronPort-AV: E=Sophos;i="6.18,268,1751266800"; 
-   d="scan'208";a="70526493"
-Received: from fmviesa010.fm.intel.com ([10.60.135.150])
-  by orvoesa103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 16 Sep 2025 00:12:43 -0700
-X-CSE-ConnectionGUID: oMyjekWTTgGplDC4lDzylg==
-X-CSE-MsgGUID: 02/409JsSDGe3zVVV41UOA==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.18,268,1751266800"; 
-   d="scan'208";a="175650122"
-Received: from unknown (HELO [10.238.0.107]) ([10.238.0.107])
-  by fmviesa010-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 16 Sep 2025 00:12:39 -0700
-Message-ID: <28a6fa6f-26ab-458d-9f63-547d51dd6aa9@linux.intel.com>
-Date: Tue, 16 Sep 2025 15:12:37 +0800
+	s=arc-20240116; t=1758007153; c=relaxed/simple;
+	bh=9HUBnkRSgd7KOU47UVEXNzjWxBgXt1pt1Pg+ZCfY+wI=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=hDoacZQbciiKs3mohT+amty8uWFenn7vkKwn1/WN3CTuy0j5Z+Frde70RHRWDao04rWGsac5G840Te/9i/80nmrGItOlk7ViozwY5FTwheSp7l7dULyqKlqXyhQYEEERYsMpN09j7NK/7Hiwkq6PkxfAMDeT0myizwVTmXlVAqI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=sgUqG7d2; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7279BC4CEF7;
+	Tue, 16 Sep 2025 07:19:11 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1758007152;
+	bh=9HUBnkRSgd7KOU47UVEXNzjWxBgXt1pt1Pg+ZCfY+wI=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=sgUqG7d2uCc8wgLt3QiA7+KFToUhN2AH3C6ay7tqf3WPd0P4dqbecScUR9REIp1ph
+	 siB4Oj8hjUgW/8gNSsHX26jdCW240rLU9S2Qtwg/YeCUGd0NyPHLk12G3sv3Pr3tRE
+	 W872y5iSiL3FPJ37j2wIWTlPY4djCBFDHBBw5SnPvR8sAjiv59LJiVgFwsXmWhK/P3
+	 8XeRqfFiuMueuGlFnGAYy8oHeGk+ErGWl0Ptk2BkkzAZSDvf9N2VsK6SQQDCDBjqsi
+	 Qb+wrIjQOGsGz0yr39fmNwTxjiqDBAMMJ0ME2le42RwgwuxFr6WsDcd8DqhLaaBIV1
+	 DiEMQw5XOc8yQ==
+Date: Tue, 16 Sep 2025 12:44:37 +0530
+From: Naveen N Rao <naveen@kernel.org>
+To: Sean Christopherson <seanjc@google.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org, 
+	Jim Mattson <jmattson@google.com>, Maxim Levitsky <mlevitsk@redhat.com>, 
+	Vasant Hegde <vasant.hegde@amd.com>, Suravee Suthikulpanit <suravee.suthikulpanit@amd.com>, 
+	Nikunj A Dadhania <nikunj@amd.com>, Alejandro Jimenez <alejandro.j.jimenez@oracle.com>, 
+	Joao Martins <joao.m.martins@oracle.com>, "Maciej S. Szmigiero" <maciej.szmigiero@oracle.com>, 
+	Mario Limonciello <superm1@kernel.org>
+Subject: Re: [RFC PATCH v2 1/5] KVM: SVM: Stop warning if x2AVIC feature bit
+ alone is enabled
+Message-ID: <wo2sfg7sxkpnemiznpjtjou4xc6alad2muewkjulqk2wr2lc5q@vlb7m34ez2il>
+References: <cover.1756993734.git.naveen@kernel.org>
+ <62c338a17fe5127215efbfd8f7c5322b7b49a294.1756993734.git.naveen@kernel.org>
+ <aMhxaAh6a3Eps_NJ@google.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v15 05/41] KVM: x86: Report XSS as to-be-saved if there
- are supported features
-To: Sean Christopherson <seanjc@google.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org,
- linux-kernel@vger.kernel.org, Tom Lendacky <thomas.lendacky@amd.com>,
- Mathias Krause <minipli@grsecurity.net>, John Allen <john.allen@amd.com>,
- Rick Edgecombe <rick.p.edgecombe@intel.com>, Chao Gao <chao.gao@intel.com>,
- Maxim Levitsky <mlevitsk@redhat.com>, Xiaoyao Li <xiaoyao.li@intel.com>,
- Zhang Yi Z <yi.z.zhang@linux.intel.com>
-References: <20250912232319.429659-1-seanjc@google.com>
- <20250912232319.429659-6-seanjc@google.com>
-Content-Language: en-US
-From: Binbin Wu <binbin.wu@linux.intel.com>
-In-Reply-To: <20250912232319.429659-6-seanjc@google.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <aMhxaAh6a3Eps_NJ@google.com>
+
+On Mon, Sep 15, 2025 at 01:04:56PM -0700, Sean Christopherson wrote:
+> On Thu, Sep 04, 2025, Naveen N Rao (AMD) wrote:
+> > A platform can choose to disable AVIC by turning off the AVIC CPUID
+> > feature bit, while keeping x2AVIC CPUID feature bit enabled to indicate
+> > AVIC support for the x2APIC MSR interface. Since this is a valid
+> > configuration, stop printing a warning.
+> > 
+> > Signed-off-by: Naveen N Rao (AMD) <naveen@kernel.org>
+> > ---
+> >  arch/x86/kvm/svm/avic.c | 8 +-------
+> >  1 file changed, 1 insertion(+), 7 deletions(-)
+> > 
+> > diff --git a/arch/x86/kvm/svm/avic.c b/arch/x86/kvm/svm/avic.c
+> > index a34c5c3b164e..346cd23a43a9 100644
+> > --- a/arch/x86/kvm/svm/avic.c
+> > +++ b/arch/x86/kvm/svm/avic.c
+> > @@ -1101,14 +1101,8 @@ bool avic_hardware_setup(void)
+> >  	if (!npt_enabled)
+> >  		return false;
+> >  
+> > -	/* AVIC is a prerequisite for x2AVIC. */
+> > -	if (!boot_cpu_has(X86_FEATURE_AVIC) && !force_avic) {
+> > -		if (boot_cpu_has(X86_FEATURE_X2AVIC)) {
+> > -			pr_warn(FW_BUG "Cannot support x2AVIC due to AVIC is disabled");
+> > -			pr_warn(FW_BUG "Try enable AVIC using force_avic option");
+> 
+> I agree with the existing code, KVM should treat this as a firmware bug, where
+> "firmware" could also be the host VMM.  AIUI, x2AVIC can't actualy work without
+> AVIC support, so enumerating x2AVIC without AVIC is pointless and unexpected.
+
+There are platforms where this is the case though:
+
+$ cpuid -1 -l 0x8000000A | grep -i avic
+      AVIC: AMD virtual interrupt controller  = false
+      X2AVIC: virtualized X2APIC              = true
+      extended LVT AVIC access changes        = true
+
+The above is from Zen 4 (Phoenix), and my primary concern is that we 
+will start printing a warning by default. Besides, there isn't much a 
+user can do here (except start using force_avic, which will taint the 
+kernel). Maybe we can warn only if AVIC is being explicitly enabled?
+
+There is another aspect to this: if we are force-enabling AVIC, then 
+this can serve as a way to discover support for x2AVIC mode (this is 
+what we do currently).  Otherwise, we may want to force-enable x2AVIC 
+based on cpu family/model.
 
 
-
-On 9/13/2025 7:22 AM, Sean Christopherson wrote:
-> Add MSR_IA32_XSS to list of MSRs reported to userspace if supported_xss
-> is non-zero, i.e. KVM supports at least one XSS based feature.
->
-> Before enabling CET virtualization series, guest IA32_MSR_XSS is
-> guaranteed to be 0, i.e., XSAVES/XRSTORS is executed in non-root mode
-> with XSS == 0, which equals to the effect of XSAVE/XRSTOR.
->
-> Signed-off-by: Yang Weijiang <weijiang.yang@intel.com>
-> Reviewed-by: Maxim Levitsky <mlevitsk@redhat.com>
-> Reviewed-by: Chao Gao <chao.gao@intel.com>
-> Tested-by: Mathias Krause <minipli@grsecurity.net>
-> Tested-by: John Allen <john.allen@amd.com>
-> Tested-by: Rick Edgecombe <rick.p.edgecombe@intel.com>
-> Reviewed-by: Xiaoyao Li <xiaoyao.li@intel.com>
-> Signed-off-by: Chao Gao <chao.gao@intel.com>
-> Signed-off-by: Sean Christopherson <seanjc@google.com>
-
-Reviewed-by: Binbin Wu <binbin.wu@linux.intel.com>
-
-> ---
->   arch/x86/kvm/x86.c | 6 +++++-
->   1 file changed, 5 insertions(+), 1 deletion(-)
->
-> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-> index 771b7c883c66..3b4258b38ad8 100644
-> --- a/arch/x86/kvm/x86.c
-> +++ b/arch/x86/kvm/x86.c
-> @@ -332,7 +332,7 @@ static const u32 msrs_to_save_base[] = {
->   	MSR_IA32_RTIT_ADDR3_A, MSR_IA32_RTIT_ADDR3_B,
->   	MSR_IA32_UMWAIT_CONTROL,
->   
-> -	MSR_IA32_XFD, MSR_IA32_XFD_ERR,
-> +	MSR_IA32_XFD, MSR_IA32_XFD_ERR, MSR_IA32_XSS,
->   };
->   
->   static const u32 msrs_to_save_pmu[] = {
-> @@ -7499,6 +7499,10 @@ static void kvm_probe_msr_to_save(u32 msr_index)
->   		if (!(kvm_get_arch_capabilities() & ARCH_CAP_TSX_CTRL_MSR))
->   			return;
->   		break;
-> +	case MSR_IA32_XSS:
-> +		if (!kvm_caps.supported_xss)
-> +			return;
-> +		break;
->   	default:
->   		break;
->   	}
+- Naveen
 
 
