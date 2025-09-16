@@ -1,119 +1,193 @@
-Return-Path: <kvm+bounces-57782-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-57784-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id B596CB5A1B6
-	for <lists+kvm@lfdr.de>; Tue, 16 Sep 2025 21:59:48 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 82EFAB5A1C0
+	for <lists+kvm@lfdr.de>; Tue, 16 Sep 2025 22:02:28 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id BD10A7AA0F9
-	for <lists+kvm@lfdr.de>; Tue, 16 Sep 2025 19:58:08 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5E0AB4851DC
+	for <lists+kvm@lfdr.de>; Tue, 16 Sep 2025 20:01:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D9DE22E424F;
-	Tue, 16 Sep 2025 19:59:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 96B132E8B85;
+	Tue, 16 Sep 2025 20:00:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="u7lPfXRJ"
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="qalxXyue"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pg1-f202.google.com (mail-pg1-f202.google.com [209.85.215.202])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A8D772773F4
-	for <kvm@vger.kernel.org>; Tue, 16 Sep 2025 19:59:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0F3912356B9;
+	Tue, 16 Sep 2025 20:00:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758052777; cv=none; b=QgdRgNdmFNq0HhKWvNaAneFYPPj7RMogiyzV5PvXYdExBAWRYcHx7A1pY36Ymd7v+YO+XT5ZFF7SofLiEr9Hf5e0Bh+OLbi0aV+lq5pqvdBZe83PmAoTHMkpXmg8Y26mTyvKmZa+BjvgtqpUBHzMbetatTSWVvWk33+aaU5Ic1E=
+	t=1758052856; cv=none; b=nGVqfiMYy6eMXw4qhheqAdC2uKrMjql1RYMLK1CqVcaX2YhRjTRi0sHahwPHD7V+YL7LEnbpJyQSyr1fXiKxS0ikY/Vnb/NRwxjlJgLZ0allFEB5YlTWS24wG/9PaM7g3wnhrmNgtCLzt48VDPUnh/nvGRVXpOmzn4otxpjsuUk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758052777; c=relaxed/simple;
-	bh=Vdu1BZwep+6IsmxierDdcJvK3W/IMo/wNXpYCrdmdRM=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=fuYy3+ByZcgN7m/8H6+h4engzMtW8ZIFE5wadSqoZxNpzvuKJoLKOGVtQ+m9y3dk4JXKLFzawD2ze+xActoJYFffQCts19ZnUbzpKc1RVqxTNQp9QmfYSZgua8hKx3WPRhZ1B4/wxvaeDxw2W1+3FABakc97PiLbvw786WNJwd0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=u7lPfXRJ; arc=none smtp.client-ip=209.85.215.202
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pg1-f202.google.com with SMTP id 41be03b00d2f7-b522c35db5fso3882314a12.0
-        for <kvm@vger.kernel.org>; Tue, 16 Sep 2025 12:59:35 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1758052775; x=1758657575; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=fTTCcsDBpjW/mF3lSMHNghy/htFIT4NWUYSMKsa6IZY=;
-        b=u7lPfXRJYT4xiNYWh0IS4nTB+M+0k/kuv92dLVKYvwabDWJDkCPkfq6PMk8NV7+Vce
-         FmEEf0D4UOqhDzIIzyhEHfYhOzdgmIdDYdW3tQBIrF3BdX0LygeWW4oSdEF29uNOBsWp
-         BVNCUfEiaxm7cMIZ7Ldnbgci2pHO3CkjlZnMqH95oC4gD7QTMsaqw46/I3QHYgWw53h4
-         fd3R6m/rJLRO46xPakwvwN5a/TcbR+MSfMbbGHEVwz83rdfvVmffoCxeZdlVW4Jav3Yw
-         ntwVieIfJalsfS2i4P9gQozkEefHaRpriPS0QLfBOhb/j5x97RO7SDkh2DCkJymAuiol
-         SyZA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1758052775; x=1758657575;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=fTTCcsDBpjW/mF3lSMHNghy/htFIT4NWUYSMKsa6IZY=;
-        b=aNanpZ9/7b1fd5yzh8qVE543WslPX0ImUOByjhQNyLEG9mzmN6jDWgR40dyGC3495D
-         1n+vsMQWoX4lpR+nug5z9FpMEBVuEciwAmKc1U3h60CJ7aRAVKCWe07iUNgVzsbQlbbP
-         DqGIHZRTBcygkiA301LWth0nG55Y7yd/CWA14NofR9vOUAlVlvcMRS4epVImnBFJHwaw
-         M9L2Em7eDwUzjlZV3mESExc81QT9mQ2G3kCgojy43cPe2VEE87/3CkQ5SvcJRV/CvEBz
-         HtV0AdvndnOQGVAXei+OMC2dG4u0Snm467pKXiV/2mlWhbYJwoX1zqry1US7AGpT5tah
-         nXmA==
-X-Forwarded-Encrypted: i=1; AJvYcCWuwAKYiwXNqa37Oo4r0t+MF+sIpkPuSKBirJe7q+ObbhaztAjd5TTFzwNoA/YLMGheC2Q=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yz5SjD3ratuNDpsp+i4O0yAZLdnZofpZkt0X8ICQoAJWXwht1P8
-	+1mU3+DQnK/beWZ/2mE3QpZ+1K/KD4LYepkMoiULY/8WzHQHgvgzMcZEmxT3jNf+pbYRJGS2o2X
-	99GU1yA==
-X-Google-Smtp-Source: AGHT+IEeOCLimp7Ef9XmIJDiwc7xsmOvJEWyAAUZvqolTLhCOh3V/BzP6YzcM++J0XFW+IbDbzqAEX2zdus=
-X-Received: from pjbdb3.prod.google.com ([2002:a17:90a:d643:b0:329:6ac4:ea2e])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a05:6a20:430d:b0:250:f80d:b334
- with SMTP id adf61e73a8af0-26027c13362mr22964220637.0.1758052774975; Tue, 16
- Sep 2025 12:59:34 -0700 (PDT)
-Date: Tue, 16 Sep 2025 12:59:33 -0700
-In-Reply-To: <2e0b5ee6-deae-4eba-89dc-4abfd63b1578@intel.com>
+	s=arc-20240116; t=1758052856; c=relaxed/simple;
+	bh=zXiOIHy9ejwvJSdfc0MFDmV+apcwnc62XAPntiwORCM=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=XXrYk2U4eO4A3VGg3XzLs9LBkqFNb21Ng9a3R2DFKWF6oVxkDVteBzR0gTRbmTZK8I/szlZPC+i86niRZttBfvHxQetSL3uLx1ISTUedvbuziMF4S0vTPr3ikwMtpLTnC8FquTrsNOZ5MV9N+mzyvgKbadzR5thL69gCONzqpyw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=qalxXyue; arc=none smtp.client-ip=148.163.158.5
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
+Received: from pps.filterd (m0356516.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 58GCdVDu003190;
+	Tue, 16 Sep 2025 20:00:38 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
+	:content-transfer-encoding:content-type:date:from:in-reply-to
+	:message-id:mime-version:references:subject:to; s=pp1; bh=pxX+MR
+	PFQ/scwamhTyYekj06Xy9jwdu0NhB/orGkvK0=; b=qalxXyue805dp8sROeXMEv
+	feA9/IMHLIo0dnUctyHVgKkmbXlL921E/qMtMm8iITBJioeXkRFaP+7cMF4t9Lii
+	hldMPJ22mSIpJE0Nb5GBr2Z/X3y0V3KNV6dt7L90xKy1PEVcUsywVZ6sWPXRqzOV
+	dhetIeWkbtyMEaDpHY4CD3B+XZWjgcCQ6RlkHEe8NF6uA5SkSm/SViyMUCBxDht1
+	64EMmIqFteOVsLzsfFQeiLjBEana64IhysAGt/uJ4Toar9XKygA9cqTMR9YLMhCX
+	ExHGw+qXwcnVL8AQJszfAV621BJ7KSdilLayxDy8mhoRTRnsIrJEpFRlvvuHD7Fw
+	==
+Received: from ppma23.wdc07v.mail.ibm.com (5d.69.3da9.ip4.static.sl-reverse.com [169.61.105.93])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 494x1tjmc9-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Tue, 16 Sep 2025 20:00:37 +0000 (GMT)
+Received: from pps.filterd (ppma23.wdc07v.mail.ibm.com [127.0.0.1])
+	by ppma23.wdc07v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 58GHkGYh027308;
+	Tue, 16 Sep 2025 20:00:37 GMT
+Received: from smtprelay01.wdc07v.mail.ibm.com ([172.16.1.68])
+	by ppma23.wdc07v.mail.ibm.com (PPS) with ESMTPS id 495men5nxm-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Tue, 16 Sep 2025 20:00:37 +0000
+Received: from smtpav01.wdc07v.mail.ibm.com (smtpav01.wdc07v.mail.ibm.com [10.39.53.228])
+	by smtprelay01.wdc07v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 58GK0Z8i30867826
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Tue, 16 Sep 2025 20:00:35 GMT
+Received: from smtpav01.wdc07v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id B90805804B;
+	Tue, 16 Sep 2025 20:00:35 +0000 (GMT)
+Received: from smtpav01.wdc07v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id DF9AD58065;
+	Tue, 16 Sep 2025 20:00:34 +0000 (GMT)
+Received: from [9.61.248.85] (unknown [9.61.248.85])
+	by smtpav01.wdc07v.mail.ibm.com (Postfix) with ESMTP;
+	Tue, 16 Sep 2025 20:00:34 +0000 (GMT)
+Message-ID: <d6655c44-ca97-4527-8788-94be2644c049@linux.ibm.com>
+Date: Tue, 16 Sep 2025 13:00:30 -0700
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20250827011726.2451115-1-sagis@google.com> <175798193779.623026.2646711972824495792.b4-ty@google.com>
- <2e0b5ee6-deae-4eba-89dc-4abfd63b1578@intel.com>
-Message-ID: <aMnBpRnI4fNx390T@google.com>
-Subject: Re: [PATCH v2] KVM: TDX: Force split irqchip for TDX at irqchip
- creation time
-From: Sean Christopherson <seanjc@google.com>
-To: Xiaoyao Li <xiaoyao.li@intel.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, Thomas Gleixner <tglx@linutronix.de>, 
-	Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>, 
-	Dave Hansen <dave.hansen@linux.intel.com>, Binbin Wu <binbin.wu@linux.intel.com>, 
-	Ira Weiny <ira.weiny@intel.com>, "H. Peter Anvin" <hpa@zytor.com>, Sagi Shahar <sagis@google.com>, 
-	linux-kernel@vger.kernel.org, kvm@vger.kernel.org, x86@kernel.org
-Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v3 01/10] PCI: Avoid saving error values for config space
+To: Bjorn Helgaas <helgaas@kernel.org>
+Cc: linux-s390@vger.kernel.org, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org, linux-pci@vger.kernel.org,
+        alex.williamson@redhat.com, schnelle@linux.ibm.com,
+        mjrosato@linux.ibm.com
+References: <20250916180958.GA1797871@bhelgaas>
+Content-Language: en-US
+From: Farhan Ali <alifm@linux.ibm.com>
+In-Reply-To: <20250916180958.GA1797871@bhelgaas>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Authority-Analysis: v=2.4 cv=OMsn3TaB c=1 sm=1 tr=0 ts=68c9c1e5 cx=c_pps
+ a=3Bg1Hr4SwmMryq2xdFQyZA==:117 a=3Bg1Hr4SwmMryq2xdFQyZA==:17
+ a=IkcTkHD0fZMA:10 a=yJojWOMRYYMA:10 a=VwQbUJbxAAAA:8 a=20KFwNOVAAAA:8
+ a=VnNF1IyMAAAA:8 a=mDscfjHxmXLP5G7XJkoA:9 a=QEXdDO2ut3YA:10
+X-Proofpoint-ORIG-GUID: t1caYAftEQESRlrEzyWB9245QaQMwIUY
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUwOTEzMDAwMSBTYWx0ZWRfX7uy6lqZco1w+
+ t1kZYAYu0+hYrVc26mwhBiCdLOhuiK5LfTEc/F9t0xXll+UUqB2yCEiqdOqVBddVHMheJiusVpn
+ TmIQkJ2hYe2H6xJeghrRYTppvt2eDDNKJu/hqlvN6ih7oYvnap5ZqGgBwkMAj6KgOU3tUToDBJk
+ j16XLwtC1aAtP+N9MSoALqvEO7UZJd0MRro+703/AUDws13NyUmkN2nnNMJ1wWbhc9EYPc2+RsO
+ ySt7E3jAtzj80gYOwsQX+I7am3ColXMkmr7dqbxpYPaHjpFw+la8afr6Drgn2vlpiYxXlpT89G3
+ cSV37zi+uCgtMyEfJohd/V9NNMQZ+KJKeoiaCWpJQMYEGwyUbDGMp5C4e+wApznKiiMazPJ9R0P
+ yUhslYd1
+X-Proofpoint-GUID: t1caYAftEQESRlrEzyWB9245QaQMwIUY
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1117,Hydra:6.1.9,FMLib:17.12.80.40
+ definitions=2025-09-16_02,2025-09-16_01,2025-03-28_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ phishscore=0 suspectscore=0 spamscore=0 priorityscore=1501 adultscore=0
+ impostorscore=0 clxscore=1015 malwarescore=0 bulkscore=0
+ classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
+ reason=mlx scancount=1 engine=8.19.0-2507300000 definitions=main-2509130001
 
-On Tue, Sep 16, 2025, Xiaoyao Li wrote:
-> On 9/16/2025 8:25 AM, Sean Christopherson wrote:
-> > On Tue, 26 Aug 2025 18:17:26 -0700, Sagi Shahar wrote:
-> > > TDX module protects the EOI-bitmap which prevents the use of in-kernel
-> > > I/O APIC. See more details in the original patch [1]
-> > > 
-> > > The current implementation already enforces the use of split irqchip for
-> > > TDX but it does so at the vCPU creation time which is generally to late
-> > > to fallback to split irqchip.
-> > > 
-> > > [...]
-> > 
-> > Applied to kvm-x86 misc, thanks!
-> 
-> The latest one of this patch is v4:
-> 
-> https://lore.kernel.org/all/20250904062007.622530-1-sagis@google.com/
 
-Yeah, I had applied v2 quite some time ago, just took me a while to do final
-testing and send the "thank you".
+On 9/16/2025 11:09 AM, Bjorn Helgaas wrote:
+> On Thu, Sep 11, 2025 at 11:32:58AM -0700, Farhan Ali wrote:
+>> The current reset process saves the device's config space state before
+>> reset and restores it afterward. However, when a device is in an error
+>> state before reset, config space reads may return error values instead of
+>> valid data. This results in saving corrupted values that get written back
+>> to the device during state restoration.
+>>
+>> Avoid saving the state of the config space when the device is in error.
+>> While restoring we only restorei the state that can be restored through
+>> kernel data such as BARs or doesn't depend on the saved state.
+>>
+>> Signed-off-by: Farhan Ali <alifm@linux.ibm.com>
+>> ---
+>>   drivers/pci/pci.c      | 29 ++++++++++++++++++++++++++---
+>>   drivers/pci/pcie/aer.c |  5 +++++
+>>   drivers/pci/pcie/dpc.c |  5 +++++
+>>   drivers/pci/pcie/ptm.c |  5 +++++
+>>   drivers/pci/tph.c      |  5 +++++
+>>   drivers/pci/vc.c       |  5 +++++
+>>   6 files changed, 51 insertions(+), 3 deletions(-)
+>>
+>> diff --git a/drivers/pci/pci.c b/drivers/pci/pci.c
+>> index b0f4d98036cd..4b67d22faf0a 100644
+>> --- a/drivers/pci/pci.c
+>> +++ b/drivers/pci/pci.c
+>> @@ -1720,6 +1720,11 @@ static void pci_restore_pcie_state(struct pci_dev *dev)
+>>   	struct pci_cap_saved_state *save_state;
+>>   	u16 *cap;
+>>   
+>> +	if (!dev->state_saved) {
+>> +		pci_warn(dev, "Not restoring pcie state, no saved state");
+>> +		return;
+Hi Bjorn
 
-> > [1/1] KVM: TDX: Force split irqchip for TDX at irqchip creation time
-> >        https://github.com/kvm-x86/linux/commit/2569c8c5767b
-> 
-> What got queued, added a superfluous new line in tdx_vm_init()
+Thanks for taking a look.
 
-Drat.  I force pushed to fix that goof, and added Kai's Acked-by in the process.
+> Seems like a lot of messages.  If we want to warn about this, why
+> don't we do it once in pci_restore_state()?
 
-[1/1] KVM: TDX: Reject fully in-kernel irqchip if EOIs are protected, i.e. for TDX VMs
-      https://github.com/kvm-x86/linux/commit/b3a37bff8daf
+I thought providing messages about which state is not restored would be 
+better and meaningful as we try to restore some of the state. But if the 
+preference is to just have a single warn message in pci_restore_state 
+then I can update it. (would also like to hear if Alex has any 
+objections to that)
+
+>
+> I guess you're making some judgment about what things can be restored
+> even when !dev->state_saved.  That seems kind of hard to maintain in
+> the future as other capabilities are added.
+>
+> Also seems sort of questionable if we restore partial state and keep
+> using the device as if all is well.  Won't the device be in some kind
+> of inconsistent, unpredictable state then?
+>
+> Bjorn
+
+I tried to avoid restoring state that explicitly needed to save the 
+state. For some of the other capabilities, that didn't explicitly store 
+the state, I tried to keep the same behavior. This is based on the 
+discussion with Alex 
+(https://lore.kernel.org/all/20250826094845.517e0fa7.alex.williamson@redhat.com/). 
+Also AFAIU currently the dev->state_saved is set to true as long as we 
+save the first 64 bytes of config space (pci_save_state), so we could 
+for example fail to save the PCIe state, but while restoring can 
+continue to restore other capabilities like pasid.
+
+At the very least I would like to avoid corrupting the BAR registers and 
+restore msix (arch_restore_msi_irqs) to get devices into a functional 
+state after a reset. I am open to suggestions on how we can do this.
+
+Would also like to get your feedback on patch 3 and the approach there 
+of having a new flag in struct pci_slot.
+
+Thanks
+Farhan
+
 
