@@ -1,139 +1,119 @@
-Return-Path: <kvm+bounces-57781-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-57782-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 03D95B5A1B1
-	for <lists+kvm@lfdr.de>; Tue, 16 Sep 2025 21:54:15 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id B596CB5A1B6
+	for <lists+kvm@lfdr.de>; Tue, 16 Sep 2025 21:59:48 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id BBE2617997B
-	for <lists+kvm@lfdr.de>; Tue, 16 Sep 2025 19:54:14 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id BD10A7AA0F9
+	for <lists+kvm@lfdr.de>; Tue, 16 Sep 2025 19:58:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 51C3D2E54B9;
-	Tue, 16 Sep 2025 19:54:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D9DE22E424F;
+	Tue, 16 Sep 2025 19:59:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="HsgD5jbk"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="u7lPfXRJ"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pj1-f73.google.com (mail-pj1-f73.google.com [209.85.216.73])
+Received: from mail-pg1-f202.google.com (mail-pg1-f202.google.com [209.85.215.202])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 02D7F19F40A
-	for <kvm@vger.kernel.org>; Tue, 16 Sep 2025 19:54:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.73
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A8D772773F4
+	for <kvm@vger.kernel.org>; Tue, 16 Sep 2025 19:59:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758052443; cv=none; b=KWZ/IRu3SsvPcVHYxWx5JEt25jTI06Qb3MLDZGUGrIvD97dtB6Z2/Gm3JKWvSwudpASTA1LFChTAy2VX+Y1P5eTiJshXJ/VugnZQkSp6APLTryyt+ZXSWQmJKACEay1/y1m4RH7fr8JZkj/Mc0qrG0eWy4WpWq8dJVlr1pvefIE=
+	t=1758052777; cv=none; b=QgdRgNdmFNq0HhKWvNaAneFYPPj7RMogiyzV5PvXYdExBAWRYcHx7A1pY36Ymd7v+YO+XT5ZFF7SofLiEr9Hf5e0Bh+OLbi0aV+lq5pqvdBZe83PmAoTHMkpXmg8Y26mTyvKmZa+BjvgtqpUBHzMbetatTSWVvWk33+aaU5Ic1E=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758052443; c=relaxed/simple;
-	bh=K42TrTHCprp/z96FHfYhNr0g4AcPAvf8SJ9hfIxuUlY=;
+	s=arc-20240116; t=1758052777; c=relaxed/simple;
+	bh=Vdu1BZwep+6IsmxierDdcJvK3W/IMo/wNXpYCrdmdRM=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=N34nZMAzIPZBjj2VGb2qBZ7o5YgbUhz+ze+qhMmvB4MEve8vMjY9mTQ4E8FUBTTpN2EYDqsjmT3WIcJ+yK30bDWUuwY+jUIL7fiDPS5ADRYH3YIWAxGMwNs2nbgfPhqTWYNC73HzldWxV7QCwVLOBREM4fi5lwUEkmmCrdxE+FM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=HsgD5jbk; arc=none smtp.client-ip=209.85.216.73
+	 To:Cc:Content-Type; b=fuYy3+ByZcgN7m/8H6+h4engzMtW8ZIFE5wadSqoZxNpzvuKJoLKOGVtQ+m9y3dk4JXKLFzawD2ze+xActoJYFffQCts19ZnUbzpKc1RVqxTNQp9QmfYSZgua8hKx3WPRhZ1B4/wxvaeDxw2W1+3FABakc97PiLbvw786WNJwd0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=u7lPfXRJ; arc=none smtp.client-ip=209.85.215.202
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pj1-f73.google.com with SMTP id 98e67ed59e1d1-32ec2211659so611896a91.0
-        for <kvm@vger.kernel.org>; Tue, 16 Sep 2025 12:54:00 -0700 (PDT)
+Received: by mail-pg1-f202.google.com with SMTP id 41be03b00d2f7-b522c35db5fso3882314a12.0
+        for <kvm@vger.kernel.org>; Tue, 16 Sep 2025 12:59:35 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1758052440; x=1758657240; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1758052775; x=1758657575; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=ypCkSV2j4XpnxIOH+Xa4yIgQz4o/rWKDyEIeCFtvkq4=;
-        b=HsgD5jbknGT83Tm4s3Z05jNWWI229EOEl1zn9+LSzWXCXomR9N/rjMEkn8CI+JuJm/
-         Ku8wWLHb73zHZ8T9SVGkkezaWcdzKpQpa0sdIbjAf9AB+UrjMCSJWmrvhBXA6k0y4b7/
-         sfQaVxWiEBbtSzVwH5txF+rLq1OMMhE7unEhFgSFr1W7d7NyOFh8I/bSKKtfzzhOxnKE
-         uOmhFUEkz5PBP+XJ+Z2cCouNeeKCSpTNgEP8Sb5zOgVcujSBwizx7ccDT0K9E5V9oeOb
-         9mxdW1oNBz+tFa4A/ShLRgLsHuQFpl4lfHVkfSrrI8sYqHNjm6veVYziY2x+goqipnz1
-         eICg==
+        bh=fTTCcsDBpjW/mF3lSMHNghy/htFIT4NWUYSMKsa6IZY=;
+        b=u7lPfXRJYT4xiNYWh0IS4nTB+M+0k/kuv92dLVKYvwabDWJDkCPkfq6PMk8NV7+Vce
+         FmEEf0D4UOqhDzIIzyhEHfYhOzdgmIdDYdW3tQBIrF3BdX0LygeWW4oSdEF29uNOBsWp
+         BVNCUfEiaxm7cMIZ7Ldnbgci2pHO3CkjlZnMqH95oC4gD7QTMsaqw46/I3QHYgWw53h4
+         fd3R6m/rJLRO46xPakwvwN5a/TcbR+MSfMbbGHEVwz83rdfvVmffoCxeZdlVW4Jav3Yw
+         ntwVieIfJalsfS2i4P9gQozkEefHaRpriPS0QLfBOhb/j5x97RO7SDkh2DCkJymAuiol
+         SyZA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1758052440; x=1758657240;
+        d=1e100.net; s=20230601; t=1758052775; x=1758657575;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=ypCkSV2j4XpnxIOH+Xa4yIgQz4o/rWKDyEIeCFtvkq4=;
-        b=WpVEuh6I8GeqKnDiUfzW2nvbA/IMHDH59TaVJ2+TH9EWv9wIqTnKco+0BdmV7kyPca
-         edJ9s4fHWSm4Gom3ZIVlwxdXf3+DMD28G1gYMnUs7rwHWhy6GVGsQ1R22axhN3o+vvwD
-         jZzXD/5Db9ryhwAQnrPud02kQHrjavnW5Oq2jLlQYZxcBbqegEQAxjrUyWmJX6eSHKiZ
-         zS1ATNvNZw72Hl1XvfXcGcaJZ/VNvwTQAREjHhveQB4Tp0JTbV5ah7lris0ndW/ZoFLk
-         Hg0xdo/mIA6l4hM0LbuY30o0zLL3X6+nin05gD6rBHPkz5JoLL1jVIkSh46qNWNI4OtP
-         LcDA==
-X-Forwarded-Encrypted: i=1; AJvYcCV2L9HSh6Giq7XfhD/pN1jlv4EB0sg7PlI9yJVDOTgaEZYDnDrYZf2cJQE4A77kQd/zVII=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzTLFUhc+jQHCeC7cvNHAtj0yzN1VaKToo00qH3Li3z6X6+eTLN
-	1QLcAESQqnskVQTaWw6Haj1PqJmavIEF4k2dPk3Itx7/8qpYGxAOkG65AspNWVRU67sUewfsQdF
-	3rWxigA==
-X-Google-Smtp-Source: AGHT+IF7V5/RFWKziMu7+PnjJdaAV3vmh8rDnydpSEaIMymcODcxVrmX+z/O7AjuUkm0xOVeP/MX9RaLbHg=
-X-Received: from pjbqi2.prod.google.com ([2002:a17:90b:2742:b0:32d:def7:e60f])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:1810:b0:32b:d8af:b636
- with SMTP id 98e67ed59e1d1-32de4f87766mr22838318a91.19.1758052440244; Tue, 16
- Sep 2025 12:54:00 -0700 (PDT)
-Date: Tue, 16 Sep 2025 12:53:58 -0700
-In-Reply-To: <aMmynhOnU/VkcXwI@AUSJOHALLEN.amd.com>
+        bh=fTTCcsDBpjW/mF3lSMHNghy/htFIT4NWUYSMKsa6IZY=;
+        b=aNanpZ9/7b1fd5yzh8qVE543WslPX0ImUOByjhQNyLEG9mzmN6jDWgR40dyGC3495D
+         1n+vsMQWoX4lpR+nug5z9FpMEBVuEciwAmKc1U3h60CJ7aRAVKCWe07iUNgVzsbQlbbP
+         DqGIHZRTBcygkiA301LWth0nG55Y7yd/CWA14NofR9vOUAlVlvcMRS4epVImnBFJHwaw
+         M9L2Em7eDwUzjlZV3mESExc81QT9mQ2G3kCgojy43cPe2VEE87/3CkQ5SvcJRV/CvEBz
+         HtV0AdvndnOQGVAXei+OMC2dG4u0Snm467pKXiV/2mlWhbYJwoX1zqry1US7AGpT5tah
+         nXmA==
+X-Forwarded-Encrypted: i=1; AJvYcCWuwAKYiwXNqa37Oo4r0t+MF+sIpkPuSKBirJe7q+ObbhaztAjd5TTFzwNoA/YLMGheC2Q=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yz5SjD3ratuNDpsp+i4O0yAZLdnZofpZkt0X8ICQoAJWXwht1P8
+	+1mU3+DQnK/beWZ/2mE3QpZ+1K/KD4LYepkMoiULY/8WzHQHgvgzMcZEmxT3jNf+pbYRJGS2o2X
+	99GU1yA==
+X-Google-Smtp-Source: AGHT+IEeOCLimp7Ef9XmIJDiwc7xsmOvJEWyAAUZvqolTLhCOh3V/BzP6YzcM++J0XFW+IbDbzqAEX2zdus=
+X-Received: from pjbdb3.prod.google.com ([2002:a17:90a:d643:b0:329:6ac4:ea2e])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a05:6a20:430d:b0:250:f80d:b334
+ with SMTP id adf61e73a8af0-26027c13362mr22964220637.0.1758052774975; Tue, 16
+ Sep 2025 12:59:34 -0700 (PDT)
+Date: Tue, 16 Sep 2025 12:59:33 -0700
+In-Reply-To: <2e0b5ee6-deae-4eba-89dc-4abfd63b1578@intel.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
-References: <20250912232319.429659-1-seanjc@google.com> <20250912232319.429659-30-seanjc@google.com>
- <aMmynhOnU/VkcXwI@AUSJOHALLEN.amd.com>
-Message-ID: <aMnAVtWhxQipw9Er@google.com>
-Subject: Re: [PATCH v15 29/41] KVM: SEV: Synchronize MSR_IA32_XSS from the
- GHCB when it's valid
+References: <20250827011726.2451115-1-sagis@google.com> <175798193779.623026.2646711972824495792.b4-ty@google.com>
+ <2e0b5ee6-deae-4eba-89dc-4abfd63b1578@intel.com>
+Message-ID: <aMnBpRnI4fNx390T@google.com>
+Subject: Re: [PATCH v2] KVM: TDX: Force split irqchip for TDX at irqchip
+ creation time
 From: Sean Christopherson <seanjc@google.com>
-To: John Allen <john.allen@amd.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	Tom Lendacky <thomas.lendacky@amd.com>, Mathias Krause <minipli@grsecurity.net>, 
-	Rick Edgecombe <rick.p.edgecombe@intel.com>, Chao Gao <chao.gao@intel.com>, 
-	Maxim Levitsky <mlevitsk@redhat.com>, Xiaoyao Li <xiaoyao.li@intel.com>, 
-	Zhang Yi Z <yi.z.zhang@linux.intel.com>
+To: Xiaoyao Li <xiaoyao.li@intel.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, Thomas Gleixner <tglx@linutronix.de>, 
+	Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>, 
+	Dave Hansen <dave.hansen@linux.intel.com>, Binbin Wu <binbin.wu@linux.intel.com>, 
+	Ira Weiny <ira.weiny@intel.com>, "H. Peter Anvin" <hpa@zytor.com>, Sagi Shahar <sagis@google.com>, 
+	linux-kernel@vger.kernel.org, kvm@vger.kernel.org, x86@kernel.org
 Content-Type: text/plain; charset="us-ascii"
 
-On Tue, Sep 16, 2025, John Allen wrote:
-> On Fri, Sep 12, 2025 at 04:23:07PM -0700, Sean Christopherson wrote:
-> > Synchronize XSS from the GHCB to KVM's internal tracking if the guest
-> > marks XSS as valid on a #VMGEXIT.  Like XCR0, KVM needs an up-to-date copy
-> > of XSS in order to compute the required XSTATE size when emulating
-> > CPUID.0xD.0x1 for the guest.
+On Tue, Sep 16, 2025, Xiaoyao Li wrote:
+> On 9/16/2025 8:25 AM, Sean Christopherson wrote:
+> > On Tue, 26 Aug 2025 18:17:26 -0700, Sagi Shahar wrote:
+> > > TDX module protects the EOI-bitmap which prevents the use of in-kernel
+> > > I/O APIC. See more details in the original patch [1]
+> > > 
+> > > The current implementation already enforces the use of split irqchip for
+> > > TDX but it does so at the vCPU creation time which is generally to late
+> > > to fallback to split irqchip.
+> > > 
+> > > [...]
 > > 
-> > Treat the incoming XSS change as an emulated write, i.e. validatate the
-> > guest-provided value, to avoid letting the guest load garbage into KVM's
-> > tracking.  Simply ignore bad values, as either the guest managed to get an
-> > unsupported value into hardware, or the guest is misbehaving and providing
-> > pure garbage.  In either case, KVM can't fix the broken guest.
-> > 
-> > Note, emulating the change as an MSR write also takes care of side effects,
-> > e.g. marking dynamic CPUID bits as dirty.
-> > 
-> > Suggested-by: John Allen <john.allen@amd.com>
-> > Signed-off-by: Sean Christopherson <seanjc@google.com>
-> > ---
-> >  arch/x86/kvm/svm/sev.c | 3 +++
-> >  arch/x86/kvm/svm/svm.h | 1 +
-> >  2 files changed, 4 insertions(+)
-> > 
-> > diff --git a/arch/x86/kvm/svm/sev.c b/arch/x86/kvm/svm/sev.c
-> > index 0cd77a87dd84..0cd32df7b9b6 100644
-> > --- a/arch/x86/kvm/svm/sev.c
-> > +++ b/arch/x86/kvm/svm/sev.c
-> > @@ -3306,6 +3306,9 @@ static void sev_es_sync_from_ghcb(struct vcpu_svm *svm)
-> >  	if (kvm_ghcb_xcr0_is_valid(svm))
-> >  		__kvm_set_xcr(vcpu, 0, kvm_ghcb_get_xcr0(ghcb));
-> >  
-> > +	if (kvm_ghcb_xss_is_valid(svm))
-> > +		__kvm_emulate_msr_write(vcpu, MSR_IA32_XSS, kvm_ghcb_get_xss(ghcb));
-> > +
+> > Applied to kvm-x86 misc, thanks!
 > 
-> It looks like this is the change that caused the selftest regression
-> with sev-es. It's not yet clear to me what the problem is though.
+> The latest one of this patch is v4:
+> 
+> https://lore.kernel.org/all/20250904062007.622530-1-sagis@google.com/
 
-Do you see any WARNs in the guest kernel log?
+Yeah, I had applied v2 quite some time ago, just took me a while to do final
+testing and send the "thank you".
 
-The most obvious potential bug is that KVM is missing a CPUID update, e.g. due
-to dropping an XSS write, consuming stale data, not setting cpuid_dynamic_bits_dirty,
-etc.  But AFAICT, CPUID.0xD.1.EBX (only thing that consumes the current XSS) is
-only used by init_xstate_size(), and I would expect the guest kernel's sanity
-checks in paranoid_xstate_size_valid() to yell if KVM botches CPUID emulation.
+> > [1/1] KVM: TDX: Force split irqchip for TDX at irqchip creation time
+> >        https://github.com/kvm-x86/linux/commit/2569c8c5767b
+> 
+> What got queued, added a superfluous new line in tdx_vm_init()
 
-Another possibility is that unconditionally setting cpuid_dynamic_bits_dirty
-was masking a pre-existing (or just different) bug, and that "fixing" that flaw
-by eliding cpuid_dynamic_bits_dirty when "vcpu->arch.ia32_xss == data" exposed
-the bug.
+Drat.  I force pushed to fix that goof, and added Kai's Acked-by in the process.
+
+[1/1] KVM: TDX: Reject fully in-kernel irqchip if EOIs are protected, i.e. for TDX VMs
+      https://github.com/kvm-x86/linux/commit/b3a37bff8daf
 
