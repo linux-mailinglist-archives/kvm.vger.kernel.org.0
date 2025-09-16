@@ -1,84 +1,84 @@
-Return-Path: <kvm+bounces-57748-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-57751-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id A173FB59E0A
-	for <lists+kvm@lfdr.de>; Tue, 16 Sep 2025 18:45:49 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9B904B59E0C
+	for <lists+kvm@lfdr.de>; Tue, 16 Sep 2025 18:46:02 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id D553A1C02D09
-	for <lists+kvm@lfdr.de>; Tue, 16 Sep 2025 16:46:10 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8193732851B
+	for <lists+kvm@lfdr.de>; Tue, 16 Sep 2025 16:46:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 94951301717;
-	Tue, 16 Sep 2025 16:45:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9F73D31E8BF;
+	Tue, 16 Sep 2025 16:45:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=nutanix.com header.i=@nutanix.com header.b="nADFfkEe";
-	dkim=pass (2048-bit key) header.d=nutanix.com header.i=@nutanix.com header.b="yzG9C/XJ"
+	dkim=pass (2048-bit key) header.d=nutanix.com header.i=@nutanix.com header.b="AvsJymcE";
+	dkim=pass (2048-bit key) header.d=nutanix.com header.i=@nutanix.com header.b="qpFqIgjc"
 X-Original-To: kvm@vger.kernel.org
 Received: from mx0a-002c1b01.pphosted.com (mx0a-002c1b01.pphosted.com [148.163.151.68])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7D7B82F2605
-	for <kvm@vger.kernel.org>; Tue, 16 Sep 2025 16:44:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3F3BB27FD6E
+	for <kvm@vger.kernel.org>; Tue, 16 Sep 2025 16:45:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=148.163.151.68
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758041100; cv=fail; b=TDuNJElr6V/gTmSzvCh4jcNwwM2nPlPAGgjdagBe6ZASnfVS93Tl3dcg0jfH9L16BAbCVzlXUXOgkdg7CFIVeQt484aBB1PVH6rZkPPeJnz36tufVP61jC75he3khJD+VdCfJcqfcH87YEqpH37wsl8vniInqZbI9YdVMu1WBaE=
+	t=1758041103; cv=fail; b=Fh/a1G1uKNcwV//cy3Ljw+TWNvX/PwKqqQXfN2GLHj3ibbmBrS3T38HhopJ+lnORBrbj2XkEmAqHW15XFhajEFc4wrRUU/FZSiyBYzV13F0YEpYoB5pUEn0L5tDdXFkjPB5/2OjFAqjSgDedcwSMCAz775ZJ1j29nYyWbnLSyQg=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758041100; c=relaxed/simple;
-	bh=92Is2Z7xD83mNu6eUOeGc1C4082y2BBqhruxK5MBuWg=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=nMpR2pz7QSNK1H+0mWaC2Cm2eOB6bqIKvKugvvnZqm/EfNN5pI+/PedsRKmNo4xU0Gknp5jba3w3g86q3mWWaDIKftJjTn5pnei9xPbMGA+j46AiTmZYDZsLsjcaDxMkLlOoh5cyo01sSIJ5641Kgbda/m4w742JuKkLdo6BD9I=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nutanix.com; spf=pass smtp.mailfrom=nutanix.com; dkim=pass (2048-bit key) header.d=nutanix.com header.i=@nutanix.com header.b=nADFfkEe; dkim=pass (2048-bit key) header.d=nutanix.com header.i=@nutanix.com header.b=yzG9C/XJ; arc=fail smtp.client-ip=148.163.151.68
+	s=arc-20240116; t=1758041103; c=relaxed/simple;
+	bh=eJPPjqFqMNyXRwI6ZV4XwQt/aLItXw4hdnJjtz9bQjk=;
+	h=From:To:Subject:Date:Message-ID:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=qr2P+QaDx3vuPLPDl+jRbOrpfiSynQhBDnhXtkmgt1SE2cc9AhyFfl2Ue+L7aIut05mqqS+whTrZR9J0lhwi1X10KMaQVrp0HNmIc58LGWfRbq5vM3hOdSdbK+pPbL8R9dZC4OLmL6AKl7xO+AnDhreQlfJ2XWj6tpPgu6WDZE0=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nutanix.com; spf=pass smtp.mailfrom=nutanix.com; dkim=pass (2048-bit key) header.d=nutanix.com header.i=@nutanix.com header.b=AvsJymcE; dkim=pass (2048-bit key) header.d=nutanix.com header.i=@nutanix.com header.b=qpFqIgjc; arc=fail smtp.client-ip=148.163.151.68
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nutanix.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=nutanix.com
-Received: from pps.filterd (m0127840.ppops.net [127.0.0.1])
-	by mx0a-002c1b01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 58GGEKKC3512374;
-	Tue, 16 Sep 2025 09:44:49 -0700
+Received: from pps.filterd (m0127839.ppops.net [127.0.0.1])
+	by mx0a-002c1b01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 58GG8wdq3523588;
+	Tue, 16 Sep 2025 09:44:51 -0700
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nutanix.com; h=
-	cc:content-transfer-encoding:content-type:date:from:in-reply-to
+	content-transfer-encoding:content-type:date:from:in-reply-to
 	:message-id:mime-version:references:subject:to; s=
-	proofpoint20171006; bh=S2VIduQjeWHkO/dx3t+yFZ6HUK7FBR9c/AyjpdO4k
-	/g=; b=nADFfkEe6smdj/UjNTsS0mlnsYfYUOtbNew91sgqNc+WRR/T44/Kd02JK
-	HyD5JLnZTOgL8ZXmlG5jsLCs/ty4wF5bCMDlfzxVVDWZ7vUh5Ax4cXazvZCU71IF
-	J9zBadbr/8bd++7lmOC15ykTYQUhGNHpkfCrd5AmghaD+GHXCxnG+n+klpQsF6Fj
-	ygnAst7qIEbIh3nYGQJ6wY4mdo8gyOh2oYLLh3Q1hsYSU5XQI81bpHx9rEPjGYaB
-	aHp7pxy91/5aOE44N1mW5OYUBLZSXYqWYwXazyC/seRgPEDTcofhSra7RMbNE2ky
-	M9sJroW8xw5yqh2t8mxYceyGW2ALA==
-Received: from ph8pr06cu001.outbound.protection.outlook.com (mail-westus3azon11022085.outbound.protection.outlook.com [40.107.209.85])
-	by mx0a-002c1b01.pphosted.com (PPS) with ESMTPS id 496hywbjks-1
+	proofpoint20171006; bh=+s4E3cnoAxwS0DqVLWz4LKsucNAFw6CZnMEvagtSX
+	/I=; b=AvsJymcEaUVIQ1cGsqolo+pAjnrtmRrc8S+7ABMo7CXSPtJ7UTeG912r4
+	8I44Jut/57VyUZNELAchcOcfwMZfjKlKJuioyA5LSJFC62qrtZpn5gXaNMqeomoT
+	23qE5vfPkKrKXPN2KfqZhQ9NL7eoI+HsXacKxJIiYZE1bLZVhpXVb8VDy1S3D6FU
+	TOKnfHDhWSraqtAHcKazSarGG0wU7OeU2lYqudZcw4QoKrTx0/g8kLrB/Xb8VtH8
+	3rVP0AIaHp+Z/4ijnK6ICQXMPLOc0W2GcK0BIKqo3NDmw4st9smplaaTsjzU/f7S
+	nVUdKiXSnsdPVFqQ9qfn0xkxBo76w==
+Received: from ph8pr06cu001.outbound.protection.outlook.com (mail-westus3azon11022113.outbound.protection.outlook.com [40.107.209.113])
+	by mx0a-002c1b01.pphosted.com (PPS) with ESMTPS id 496pwxtsdt-1
 	(version=TLSv1.3 cipher=TLS_AES_256_GCM_SHA384 bits=256 verify=NOT);
-	Tue, 16 Sep 2025 09:44:49 -0700 (PDT)
+	Tue, 16 Sep 2025 09:44:51 -0700 (PDT)
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=T+cWC8HpDInJfl+9Qq4cZgwablu+9ZiwZlBAPFzLNaiZUrD5dHYZnsbeKstehNClD//wo5wbgaqQAitGWZFixM5rHmgYE9D+AckM7y5IJ4y6C4xed7Y+yzXUHFpQORBdTes2ACE6A0IhUvcYC+LN17zJxfYH3klhLJyenQydSnF8ZqQ6QENDXYDMi59NmOgwtAGjXPODRYq0ZC3QaJcNDq9iJ9e6Qj+Kga0X9lbbDXgWGPEMuZh+JNUbxNeB96S3V1sUyJvr/4gDSYrDxUm9ZnJIx+VgN002zq7itWN6SNU7HLnB6yYxANYHUtIKAXycM22o8N3U9ori8/4mpr6XPA==
+ b=VjGYyD2RAB3gg8uvBvmpecDZL92Wsn3D80gR5IhH0oUsiYvwKN36ypjsgmcWwjTwNZ500vw8oXoZw1YSMLZAzHxIz+OXJ6QlprG/B4RwPHLKnFaR3IK4qlrik3JfHi/jj98vg+IIPF/CsDrxCmdM2lRCkjWDrKnNpOJ1SGFVji7rcpiGIWpYbLmcrTtJ6QlKFVCTl1EyxhmbWNqYlZgt56pLVCZFz4b+BcDwOwDA6jxLebYGzEkjZztLTWauNr+/Pc1lNx7aR827ePk4D5F4jLDvSzV47cewNnwK6fAyOR21lECNaBYPbBQ0j67ihg296batMSKnf/qygKdloStumQ==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector10001;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=S2VIduQjeWHkO/dx3t+yFZ6HUK7FBR9c/AyjpdO4k/g=;
- b=L4QQpGsLGiN9DVRbN8m3cr/ls9dk6RIpDdevcWikfG3vB5r3B6eSzXMrOqJCf4ccozsKlBLjxU+LCmxnNZZIVNH5TSPGHmcrJiK8fA5wABFrlWR9hLUdOCaETWIhGbc/AcZUOsMDbu/mdF4KlYV2q4WxwDfQl5DenZnywFfcHFSsqGfqKJO/CfBIqb4KsOkDRn5s3tLmfzABoOZQsadKYPnBCm4tJ2cuxOEbj80DUIzcMZ5pm+Cr1qcQvE4QsNW/G6fVQnixjJefx1ieRH2q/g6Mlbr9H9bgpIBAjjL9WB3a87YB5V7tNsH+YEvyDtqfbcfTqe6FbBDZmZpRMVmzIA==
+ bh=+s4E3cnoAxwS0DqVLWz4LKsucNAFw6CZnMEvagtSX/I=;
+ b=NDgCvQCar8C9hFa6MpQIHdbJGpA+mtkSIY1mY8TVS1PJu9392pQbrwqB1Jnj4pZgC6pVxEu4ztf9rdimM2mfZmYomURxRuuhphPEmTHXVIhVS4Si3dwhptT7CqSyKLtGgx3zIEuK5ydvZoVTlYYOQxXKbwLRTucAmir4HTM4hyFtzubQvarCNSmN10fX6ftsXAyawS+o70DVMheDChuVFDMiml4hlxXNN5FEiqigvP11A97lJ7hqFR0Bsk0gsDES2QV0GpqHlzDkiEM3Vgves8CDhKHvx/Fk9Vq8kAnLL82qHlxocA93DlCMhdOVkZdxUYGUD6+VjYLCmFzU7qykhQ==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
  smtp.mailfrom=nutanix.com; dmarc=pass action=none header.from=nutanix.com;
  dkim=pass header.d=nutanix.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nutanix.com;
  s=selector1;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=S2VIduQjeWHkO/dx3t+yFZ6HUK7FBR9c/AyjpdO4k/g=;
- b=yzG9C/XJdZgFhwGAR7w5XUZPnFcDl2UfojrMyN+LoOR3HgFntk9PeS4ucUh9U4oFOAOHX/uDDiXUvslHpOllpGGl+ofY4nLNq9F+yb0fDJYQPnJYyumEHel0wGzWedvRwQXTD4UQHKrVONaa8xZTCYMOD8WOrSccEd/hj8F7Cuyqnez0D7afkFffXWdjZr/Q5+w96dVLwpMKVkZ91y3Xpjb8N2XUP7mut7tDRwIRTGt+d+tEPupqRZV4UdiR3K08Ctob+bGUgq5yNwhfCBkQri1pGoX4hs/KgJ3YN3gQs/JpSLlVMD4bAkieVnWacwZMzr8l7APbJ4QcnjjjpMxQBQ==
+ bh=+s4E3cnoAxwS0DqVLWz4LKsucNAFw6CZnMEvagtSX/I=;
+ b=qpFqIgjcmCHD1mkZe9Jr5uR+cfVsGx4ZHdpV/9X8veBc4mWBX6rXIdGIXcPsW4d+QMN3g8J2ZUcKPIg4ep0sHw0w+ceQB8nTOfqxsEblW2EB2KPKhcXOI8HvHmmtSXteZlzWbwDRTTZMay4j84BAriFKBtriXxbt0VBr/Pxv5/JmkJT28bxZt7in+6WpMOLjg2DCvtCTH73V8ITeam1D6d6DcprMmf8QN33XkFN3O7I1yt0n3MvrxTc3Bn2lUdW+3NxnxOBUkbWPSQSrb/GNArrxFudUoek+NSXZTQJ71VtN6QK/JSoILyOlxXHyLbQDoO/Tw8IKQkj2xzakOIUWYA==
 Received: from LV8PR02MB10287.namprd02.prod.outlook.com
  (2603:10b6:408:1fa::10) by DS0PR02MB9620.namprd02.prod.outlook.com
  (2603:10b6:8:f7::16) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9115.22; Tue, 16 Sep
- 2025 16:44:48 +0000
+ 2025 16:44:49 +0000
 Received: from LV8PR02MB10287.namprd02.prod.outlook.com
  ([fe80::b769:6234:fd94:5054]) by LV8PR02MB10287.namprd02.prod.outlook.com
  ([fe80::b769:6234:fd94:5054%5]) with mapi id 15.20.9115.022; Tue, 16 Sep 2025
- 16:44:48 +0000
+ 16:44:49 +0000
 From: Jon Kohler <jon@nutanix.com>
-To: seanjc@google.com, pbonzini@redhat.com, kvm@vger.kernel.org
-Cc: Jon Kohler <jon@nutanix.com>
-Subject: [kvm-unit-tests PATCH 09/17] x86/vmx: switch to new vmx.h EPT capability and memory type defs
-Date: Tue, 16 Sep 2025 10:22:38 -0700
-Message-ID: <20250916172247.610021-10-jon@nutanix.com>
+To: seanjc@google.com, pbonzini@redhat.com, kvm@vger.kernel.org,
+        Jon Kohler <jon@nutanix.com>
+Subject: [kvm-unit-tests PATCH 10/17] x86/vmx: switch to new vmx.h primary processor-based VM-execution controls
+Date: Tue, 16 Sep 2025 10:22:39 -0700
+Message-ID: <20250916172247.610021-11-jon@nutanix.com>
 X-Mailer: git-send-email 2.43.0
 In-Reply-To: <20250916172247.610021-1-jon@nutanix.com>
 References: <20250916172247.610021-1-jon@nutanix.com>
@@ -95,312 +95,662 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 X-MS-PublicTrafficType: Email
 X-MS-TrafficTypeDiagnostic: LV8PR02MB10287:EE_|DS0PR02MB9620:EE_
-X-MS-Office365-Filtering-Correlation-Id: ee5bac64-3825-4716-5f3e-08ddf540592d
+X-MS-Office365-Filtering-Correlation-Id: 5fc8f8c5-74de-43f4-d4fd-08ddf54059c7
 x-proofpoint-crosstenant: true
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam:
 	BCL:0;ARA:13230040|366016|1800799024|52116014|376014|38350700014;
 X-Microsoft-Antispam-Message-Info:
-	=?us-ascii?Q?QA9KADhcVoRXcUzIDaxzf7IvsZrAhO1s69MlwqP9dnEYSOPGit8hP38VS/ez?=
- =?us-ascii?Q?Ox/+Q4jbZAo1rSIhAVKLF5BZ1Pm331rR2rEdVT65k5mLxXfcF14E7x1msVdM?=
- =?us-ascii?Q?l+LHbE2FN4h9W5l9jIbSzNHriLSfkZpS6Mcjiuce5YpAgskUgZPpsmKLzvfu?=
- =?us-ascii?Q?nSKWMDKwFpWhQfbv9AjXiPe3SiCvgHf3ERKSAfsJh5jPVjYNjj26Bo1bCvBr?=
- =?us-ascii?Q?31R1M9lWH24kYe754k6akoMx0OTBr4fieXBJbl2Ur1Q0dNmCBTvGb+3c1i0J?=
- =?us-ascii?Q?1ndiLMhTI29FXjEAgnI9HJQd7cwDF3s+CVd62tdDI6OcJFhnbhCgYuihnzGy?=
- =?us-ascii?Q?C/d+H6tllLoM88K7zi+FgjM1p9SwG8gc3gkgIZ4gF/Lh6es68hTqCzTlP3NK?=
- =?us-ascii?Q?v1UfckSyk/DPeJkGVzoYJAp3lMnTHY3d0Dd1RH24hYzcImKxw6RkgAVsvzDz?=
- =?us-ascii?Q?X+WIppUsgQcC4TZySNRH+/hhCw2YRyBJPHw7WzPWKQVsKI7Fb5VNN5xoZUTh?=
- =?us-ascii?Q?KCk4gAK4+iVw5/L7g8vfHzhqwHmM/Oory8lNsaZhWADGECX6923l9pqbc927?=
- =?us-ascii?Q?IFqqLOkyHYRX8wvJY0F9C2NABN0/xF3XIgfKJClk50WiGWHBL1vtkQpVtApw?=
- =?us-ascii?Q?Ne+7xv4HI+yFC8TqTv3NwYWrSca2EdvLYM+Eset9D++EkUFmuGsbIUJxLZ02?=
- =?us-ascii?Q?Av3bZXoDifNHEysJrbbaglbb9o6Z2Hc1sf5pkOLG4+53pSMxcp7O/MPxL2U1?=
- =?us-ascii?Q?v/vzCF2CXNVFDW0+eBc3nzuZJ8r+9IhB85v/0Jir3jKbu9TcsifGub299RY3?=
- =?us-ascii?Q?Av6NyJkZuibmodZ7Zz1t7BSky9H0UFluzacThW6ArM4/gExMpk2Q/QitdoAy?=
- =?us-ascii?Q?uSkVxWkh0YOUMQTD1yJKek+Ut5Ql4HrXpqM7ip0OmvgThJ6Dmst9U9vraBKW?=
- =?us-ascii?Q?CaLyzeusmM8ATYb+PWbZFUJm6PrurmMeiN7oQFPhIgKuAc/P7uYlNbzV3liD?=
- =?us-ascii?Q?MeRIRIBUtyRQWxKhf53LA0AHajf9DK0G4Qf7z8R1cK3EeX4RnDpCZabc9RBH?=
- =?us-ascii?Q?lZRjZFoZmCo3nR9iJiGNB0fSd5oSG992pZwDheimrQyiJU7UIVk5PiIc3Ckm?=
- =?us-ascii?Q?f+HAAuMQt3ZVS2/OKkPIkBlnFJtJQMHfHgJoLYSr43BZxHhg/vWhvLG2pCJ1?=
- =?us-ascii?Q?d59RYbaGI1/O5ScXeMhEILs1D6Ogrg2yof5WMPAZeBlxKTpkRL8agyPxazlG?=
- =?us-ascii?Q?cs4Op3m8GC/1yEMRRtRtmZW9eLwRNhemMeXGD8CMDzKtxX3mPBhnacq5kBSb?=
- =?us-ascii?Q?f454KV/tY928ECazP6FnEhpL5XdeZKEX51La9soiTI6W2SuZdS6JYewXvCVd?=
- =?us-ascii?Q?LdEP/RB2tOT7ysRmDkKCNULG7SGazfA7/NS5iz/iZBD4WLqFV6Pr0H/nBlXk?=
- =?us-ascii?Q?/ohHXXQf/LoMwqmyhhU35iMQPfHJrUdJEcmvhhIgOv2vsonpjzrpMw=3D=3D?=
+	=?us-ascii?Q?ncQvLQljt989Hd8i7qxg3G4FpHudMIFzZ2qdGU8pRVAbBSPM+YT70iRgSrnt?=
+ =?us-ascii?Q?onRQVFTk77rUylnDUQ5nwz50r22ZMaV6PEZ63cIVpQtSHki4GW/JIbdvnx8+?=
+ =?us-ascii?Q?DGuLCLbEOtDhwT9gN6dws/HKdc3cb7doXtf17TPXBAtTQIonwGqjsJ3BSW7u?=
+ =?us-ascii?Q?LLM5G67LC9Ae/4gh6G8W2pNVz921G+YKa1H0Vk9KpUJrM621Gry+YCGc5bE5?=
+ =?us-ascii?Q?KDwXRWuirpoUAGE5RKdYzZvUFQ3kPPNnlLCgX7Rg7OSn8pQsmkDpSGXtNF/0?=
+ =?us-ascii?Q?HiOCG1OGMHD9y1PuGrGLnFtLAWzcqDi2kFuhCpUlLkuhPgMCS6inozAr5Y0r?=
+ =?us-ascii?Q?olF4nAHk5FqFbodS9sJUGn2zruIgbBBHRDlD3g5oeKPg1aR2n9q6vGYPuchW?=
+ =?us-ascii?Q?ZVzo1YcRzM9n+CpI9MODsnjll6JXGLeCDtKU1ZyzpbQs6gfHp5HRofqKpqzc?=
+ =?us-ascii?Q?gFTy+2pEnJucGWzL1jXh3jZMPwtm2qB6zy1o7UGqwbxWbRTXn8FJ0+srik44?=
+ =?us-ascii?Q?jBx0QiRLVPGZZ7nSZqghsB5rEbar+muRCD8d50WKfGEUyjpow2EthF2I6yCE?=
+ =?us-ascii?Q?fzNl234/SZyIsb8BVTFjG+5fnoGUlRbx4V8ZMjcgdeZP0t7UoqcqLzfptP01?=
+ =?us-ascii?Q?sh15AaoNrbfNL7H2f+k+bRE7pkfQBdndMOkmWsqcPbueeUDm3B2lxw7E6MJ7?=
+ =?us-ascii?Q?4kI4fjDZWnpXOMjZ2hH0dlU1moLD2EGyCU9N49qsUj2wr5tWHLg0nj6Y/eMD?=
+ =?us-ascii?Q?Rp+H+Yz1iCgZ0hEbZZozMY3mc/WzDlBrtrcJGhcqkvGM6ZEXGRzmv98Aj9uH?=
+ =?us-ascii?Q?JEg8MvWhXDKTJCjGizRCdi4bpK9XsriquYKmbGXOaNZJBWRdYQamthvLlrBV?=
+ =?us-ascii?Q?dJkzUTj9QQ+ji16RbHBl63FuO0K0yAxTD8HBduBYP7v7FbRUHqFUBawPkwuO?=
+ =?us-ascii?Q?hTxUIQeVeBt5z5mztdVGzfMm0FyBMov8yB3VCts4Nx7by2JpHacYIC6zBd0f?=
+ =?us-ascii?Q?HLbBlzpBUXXdbKT2x4mQOFbvJNF1CsjEYpReQ54GU2WM84wwiTj7UCHjUFyQ?=
+ =?us-ascii?Q?VPHieCrZtPKTEpN58VkZatLu8ZCfYstBh+w7ZgUrgIb4Xh0JB5L57ZAgQAm+?=
+ =?us-ascii?Q?tAHMYWAJHbF27lxmvdCa2bVJsZiPChis/eFvTEgCtQj34LCXUqttqtkJeX1Q?=
+ =?us-ascii?Q?JCXelhY2ZR1MAkxp/Eznv31+DpMf4cccSB8Sfy/6qERvuyD2NNaV+LiMQfYU?=
+ =?us-ascii?Q?7B2wIyyI9oB2gSCGb/UoRzUi+zf/4l0ZyMtMLaRNf66x4U91HKJ7wuMF6YI6?=
+ =?us-ascii?Q?eQH70tskysCg/AizBFmgSccmR3r0A4d7UtOcCAiCKllFwDNmKdkN51iISpUo?=
+ =?us-ascii?Q?pFaO9atv2Kq+C0QBWxZzszgeyUEesj3CBLlDZ8f2MZ3aRRb8/R59J4oBrMCw?=
+ =?us-ascii?Q?x/v4bKn5Nvw9oDB+I3WgWNM8Y98OhSdkmErG8JerBvBQFOOtVQ8FaQ=3D=3D?=
 X-Forefront-Antispam-Report:
 	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:LV8PR02MB10287.namprd02.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(1800799024)(52116014)(376014)(38350700014);DIR:OUT;SFP:1102;
 X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
 X-MS-Exchange-AntiSpam-MessageData-0:
-	=?us-ascii?Q?VKKS8GxySB80uuUz1ObxxxpGrKAsqhVYazQhZMRh4Oib6WMfJ10iis2iS48/?=
- =?us-ascii?Q?XjZvB3r5kYcBolywPybKPRJzGykuPfieCswyeR64VNArTNJuJVil4Z/fS4a5?=
- =?us-ascii?Q?dhNP50TNKtrzZdysJEWowgxf3ueur9nPVc9bvhqubNIt5p6t80HczHoZmNzj?=
- =?us-ascii?Q?C3uDJE7ITMOza9P/JG6jbPnIP+ZN0Kz1BPrtkVxJ6jPzJ46bRSWNecFkH/b1?=
- =?us-ascii?Q?/6gf/hE9tfT9+mklwibTv3vaHjaBs0sm5pVbBDgiLI+tjH0Bn6k97Fg3xxUd?=
- =?us-ascii?Q?jfoe21kpURpToLlpIBuq2t/KspAjRpRGpxO5Xx9+D7D/OksiXE22faqn/h/5?=
- =?us-ascii?Q?dqDbUqhyUxmBYJGF2NGU3TaFevvBl3diu/EBkxzDj7RCXOu7U3RFF0LVE5n5?=
- =?us-ascii?Q?K8YgR2t0HTfCLZVM6ut+SzURyixP7FhBjCInIMh2rQXlQytddw0EwjnVPyJx?=
- =?us-ascii?Q?6a4IWZKWKdksacVkyFV8ywwLTCe+urhHHOL4uCTu0RRA5yobCi/6VEBgCTFR?=
- =?us-ascii?Q?8CXieDspucxkmulXO4yIYcYjG3cy+rmtchRuglOJiT7XgNFw/I2WYGby0Tah?=
- =?us-ascii?Q?adLyj3E1uH43bPM8r4A9WffNO++AnkHrFgDhzKstZhIrSAaWQJELer+NwGvN?=
- =?us-ascii?Q?W9ZZqz4hDopmxP4yTaPRXYE7vfUiX08UeiA3LucyI+2nY65+k4LiUgeYKAD3?=
- =?us-ascii?Q?AQWbeHavnw5B/arecEWGECbTLbyeaY4FI/e0oB8mN3HtHRiH8qZSMlwpGLwj?=
- =?us-ascii?Q?wS4TlO9yQ5PqoNu8sld94s0fqZqtNTUf/IQmynSgCG13I8b/m46OEnZcXpwZ?=
- =?us-ascii?Q?rezEXeB0bsNwtJbVoP9mp7TBSWo0S/d0i7BGEGqetM0GueclK+VaBIs0w3LZ?=
- =?us-ascii?Q?v/GRH3/SmVqaTAjSOdTqoJCpIntsOLjmYMMYHMzLasRxEndTVTY5MB8AGKgg?=
- =?us-ascii?Q?MzncaJa1nU2HMEehC5FARMi9/n2yQjvYHbHUvabkvDp5ioA4vWLbxEWv0H+h?=
- =?us-ascii?Q?nz51xUmQLndMWRh9CfiC9lSiZRvyiJCABdrEJ17P+CCt1I06P5eNY8XftSNQ?=
- =?us-ascii?Q?UdvBUYW77KQrmK1dZSTdtL4t9oSaREjwMBkwyGxFq4cnqRd8pB+MpDRyIc7X?=
- =?us-ascii?Q?vWtgnqxWUAModEWfOrkdVIvC4xJ63nYi0lJwpgIyF7IHZa0WitVyTnFfNJQt?=
- =?us-ascii?Q?+ZcSYPYnJdKTHHNR1cZIxmxuol8SW5mg5tahjPNBRoKHJ8Xhk2ZyCcJN5wu5?=
- =?us-ascii?Q?d88Wkc5/wqou0vNSaMvSqHPpN/aqcrgHFAxBHTyMSpMOdXzlWIyd7y7ahiHE?=
- =?us-ascii?Q?whKUOGAX28qrIcozERnPTF1wv9GdMuYBLHp0g7TwhOBK8JjzyRwHCi/ToQPr?=
- =?us-ascii?Q?8aFwteXxt5r44QiMJuBqIdIyNm27pHoHBAmHzk9DXshbzY7bP90M4KlBPH+o?=
- =?us-ascii?Q?u/NEsA4Rj6LuUtCbBz1GRzJKy+dmVNA/PDcmKwCnzCMXBVWMo2NbPvJW5GSc?=
- =?us-ascii?Q?dxhkNZ8lQxOTzM7HKmAx0+kzs+iQm7Ogn2R8ANObvbtzoCdUrHAO/T3jKdhJ?=
- =?us-ascii?Q?6amgDBftkSpR8FymPNCB4CKs7N5nANpwI9e0FnAi5NjNLHbDvtDdCvqhkmo0?=
- =?us-ascii?Q?iA=3D=3D?=
+	=?us-ascii?Q?EfjhjYdl/wSNCC3wNJFND/D6gLrctLIv6tWTmLNiNddS1LCZPbyycQ5M2mSw?=
+ =?us-ascii?Q?Awp30x4GgIgFzv7BSbpFDI7b8xMuUxQJybjPIYI9B26pt3wDgCfNJcGeXVLh?=
+ =?us-ascii?Q?OLGh7LojV1Vg3Rz2vW7jwi+7NXTMnJ362HKkk++TWLhra2MUmDl7VmamaL0n?=
+ =?us-ascii?Q?3URn/+Z2SIWVM9hSP29WEHVyqORQLMUnEnNuWQ3AzDTc+R8lb4LrF+9Mrysj?=
+ =?us-ascii?Q?wwREocdTLjQSatbN5Ckot/k3wL3MZd7AHHOwqWqWlWU8ZfiFIOTiyI4X/4BM?=
+ =?us-ascii?Q?kwhXA+yflqSGAZB4frAgWhBMHSBmjHo2E5+f3eZF6fe9opOSOBX2rD1HK2lj?=
+ =?us-ascii?Q?GiXM1woJnWy9FO6AKAwmJwLVMxF09Xja9LGuybsmtWsiiCPtg4Vlf77XTFZF?=
+ =?us-ascii?Q?6YZRMjsehUl9405JaAlZDSkejmuHaDYG8KMYjTQsBoEMvZFSYpUzsjJ+56Q4?=
+ =?us-ascii?Q?MLSOAjbvLbIKNPVxn4ucanNOLntxNqD9Y4yTFUTFa9sYAtgQKxYP6ZSpe8/1?=
+ =?us-ascii?Q?96DbtCkY4kuN3dnDRRkoMf15LM1PaaneWCwgOoEU8hY3vb6tS5rl5EAzqhvY?=
+ =?us-ascii?Q?l6DzYvQ6zzBQd7GKEoM6lgc7A7fDYQk7e0ARinMrw+pvPrAqhQQad4SvJvSa?=
+ =?us-ascii?Q?QQhJTkzdyPCtTKld0AgC6rW0KpNGIA6RDX/FdVZGC2SkZH/dA6rRQv7wJgxR?=
+ =?us-ascii?Q?W7NQVa4esNYQpC2GRI7NvYzfR0o/3nWGlKQ7CGbGeBnzPOHTtrG+SxZfCf33?=
+ =?us-ascii?Q?OuZ4md2+zRN2cfVbgePjUHyabF4siA7St0LI8qNhG1CDbgrx4M4Wt3mfJX6D?=
+ =?us-ascii?Q?s4jnHRVdCb+Sx+eWy3xIsvoetw/aRRd4/3CQkwSCkUp5rrYF/rR1zs7cm6+M?=
+ =?us-ascii?Q?viB377SoOLcVD2KOFnNn1qw286o7Et4OlDgbvgbySRjKGxc208OJAUH/l+0I?=
+ =?us-ascii?Q?p58R1+NgWz0D7EorXgfuyLv4Z3rrQMu6JUm7N4/LlrK6TGo4WzcTc+q4JzqP?=
+ =?us-ascii?Q?Div+PxCdzq9RfHoSVRtbDTzMkzVT2BlGnXzH4YOP3XldHCfLHqKRgWWDX5nN?=
+ =?us-ascii?Q?rbZk0U7PS9B7pfDhmUeJXahQ9vssBbpRfNh3o2Rn/9ytScb7sw/udTyvNebO?=
+ =?us-ascii?Q?S1TaaFVT/WOCJU8HzvUJBWFZ7TfmtbY5T36gcw3Hm4BkjNGz17qhq+RTCC9s?=
+ =?us-ascii?Q?UJfoSd8bWX38EtH98AK0RjXdIZ6OW9TcmKyJXlGOd6K1VEU9dy3Sp8pNROZ1?=
+ =?us-ascii?Q?TCYz8mxmZWdUUEuQq83jYVZ7xo688Jp+apY6pPCAEKZ/t9QEe3Nj/dJrPhvK?=
+ =?us-ascii?Q?7cZaUUSbzovLvP9MnxXLyePLSygXRw215babmB+5mZaqk/yGvS4QDPyr44a+?=
+ =?us-ascii?Q?k76JdF0ymdGh1HVEfS0pI+8ZAKGhiScodAz84swrHfBgFJJZ9loeTVzMNJH6?=
+ =?us-ascii?Q?onfqiKT6VSRY5Ekcpk8/Z7ErT7BncwGavKMwLQSDZ2ufd0EBZ/j3Ezb3+5Yd?=
+ =?us-ascii?Q?HBCrlQYaevYggypj5YwP3uCSZDGnItlROeX7XgcAQiudBp/v9mkRnCly+/8V?=
+ =?us-ascii?Q?XaFlPvYMweE6SY9+ArexanxnuFW4/CgNm2b6SQTgcNqydBjFAd79hVHSgq+Y?=
+ =?us-ascii?Q?sQ=3D=3D?=
 X-OriginatorOrg: nutanix.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: ee5bac64-3825-4716-5f3e-08ddf540592d
+X-MS-Exchange-CrossTenant-Network-Message-Id: 5fc8f8c5-74de-43f4-d4fd-08ddf54059c7
 X-MS-Exchange-CrossTenant-AuthSource: LV8PR02MB10287.namprd02.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 16 Sep 2025 16:44:48.1036
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 16 Sep 2025 16:44:49.2076
  (UTC)
 X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
 X-MS-Exchange-CrossTenant-Id: bb047546-786f-4de1-bd75-24e5b6f79043
 X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: pSazwUZJro66OsTd+7G53FqlHtz7aX4vzBuDwcsSJn5zRm3GtXl00Llwl7r4BZY/dAYLCy6TjdFwgqSDYRYT8uwRdyxS8guRETBZs/1grk0=
+X-MS-Exchange-CrossTenant-UserPrincipalName: kfb2F7eY5JGxEeBm1GNkbKQ9V3a1b49sZUNsWnz9/7PVAsmQjHrWzdv/2kDURRorPA4bvgb3doIt/FovgbKapqKFehkmedjUkkiXStEa6e0=
 X-MS-Exchange-Transport-CrossTenantHeadersStamped: DS0PR02MB9620
-X-Proofpoint-ORIG-GUID: 0poZPPOhR1FVxVw46uOPOCpW0BYd8aSY
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUwOTE2MDE1NSBTYWx0ZWRfX40P5SEXKre2x
- G/NMYbWm5PwDzdM7sx/9YOarH/6x1947FmhcLQFdeFmqRHIaeGT2hi9FqDIXumY+fIjDcchuYzr
- pf/UwaS4BTfOpou6yWTOzPy/jAvZZWcAjyRB5o5hj3JBNsFivpwRMxmboe0Ys0sAf/GnKhHn5nC
- 7f8l3fy7I2igDd6E4GN1rH/wEG9cC9msTrsF4HnHlnSnLpOdXS/3rvRNXAXWBZXk9BnM0g0Dbs3
- kNui9ilpkqfR+49JK7w1MEllXDSfidl+aN0mFzW+IvooxvIEOdox93qFGxVfeY3n/KxxvT6nSCW
- bnX7hT+/F0UwSb0fFfAQjghyqAYdAI7bKA8CGTS2XpSYYtzc2XLtW2jiX6a43Q=
-X-Authority-Analysis: v=2.4 cv=BOuzrEQG c=1 sm=1 tr=0 ts=68c99401 cx=c_pps
- a=eu4xXFuXQ3Ojp8lTxhUiOw==:117 a=6eWqkTHjU83fiwn7nKZWdM+Sl24=:19
+X-Authority-Analysis: v=2.4 cv=WeUMa1hX c=1 sm=1 tr=0 ts=68c99403 cx=c_pps
+ a=PAagVXhlguM9sGT4qHQNdg==:117 a=6eWqkTHjU83fiwn7nKZWdM+Sl24=:19
  a=z/mQ4Ysz8XfWz/Q5cLBRGdckG28=:19 a=lCpzRmAYbLLaTzLvsPZ7Mbvzbb8=:19
  a=wKuvFiaSGQ0qltdbU6+NXLB8nM8=:19 a=Ol13hO9ccFRV9qXi2t6ftBPywas=:19
  a=xqWC_Br6kY4A:10 a=yJojWOMRYYMA:10 a=0kUYKlekyDsA:10 a=64Cc0HZtAAAA:8
- a=S5tkz1ZVFAcnwdvYPYMA:9
-X-Proofpoint-GUID: 0poZPPOhR1FVxVw46uOPOCpW0BYd8aSY
+ a=vznkB1AJNERqbbTUGssA:9
+X-Proofpoint-ORIG-GUID: Fl-knJYFm-imAo8jnFBA6lRYfrWFYGLA
+X-Proofpoint-GUID: Fl-knJYFm-imAo8jnFBA6lRYfrWFYGLA
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUwOTE2MDE1NSBTYWx0ZWRfXw/lAgKqcJkCS
+ jeH7223nb3d6+ZQbiG7qrHRY2T2XfBzGHNaTu4n6yG8/IR6tGqzx/5P2k4lNLkU8s2+YJFTlWcY
+ bm0OouXcxoGVEzYKzvKXA8dRBIVH2MunNNRFWh7SUFHSqDXmz2VPeN59eNZqc7VpslL+6yZwYF6
+ 4WSfgzAR4rfmxOnTH+9EohrB3hHAPoUc/QwEVoufOikzbiqJfLXOPQeXQiVGaBZ7EOuwkoIAdfF
+ F+6edybkfSjsxlN8nJW2P3ivwZvQlN6W5DAdLftQGI/TWPgyrm/dcFtHHgSi1dM0rOZD8y5sg/d
+ gdkHG8o5/Ap0Hr2oVPoOmDHEIf1J2bkSQOeKYUkUwFxiO0XZVI8QHDu0e7ZEMg=
 X-Proofpoint-Virus-Version: vendor=baseguard
  engine=ICAP:2.0.293,Aquarius:18.0.1117,Hydra:6.1.9,FMLib:17.12.80.40
  definitions=2025-09-16_02,2025-09-12_01,2025-03-28_01
 X-Proofpoint-Spam-Reason: safe
 
-Migrate to new vmx.h's EPT definitions for capability and memory type,
+Migrate to new vmx.h's primary processor-based VM-execution controls,
 which makes it easier to grok from one code base to another.
 
-Pickup new lib/x86/msr.h definitions for memory types, from:
-e7e80b6 ("x86/cpu: KVM: Add common defines for architectural memory types (PAT, MTRRs, etc.)")
+Save secondary execution controls bit 31 for the next patch.
 
 No functional change intended.
 
 Signed-off-by: Jon Kohler <jon@nutanix.com>
 
 ---
- lib/x86/msr.h   | 14 ++++++++++++++
- x86/vmx.c       | 18 +++++++++---------
- x86/vmx.h       | 33 ++++++++++-----------------------
- x86/vmx_tests.c | 14 +++++++-------
- 4 files changed, 40 insertions(+), 39 deletions(-)
+ lib/linux/vmx.h |   1 +
+ x86/vmx.c       |   2 +-
+ x86/vmx.h       |  19 ------
+ x86/vmx_tests.c | 157 ++++++++++++++++++++++++++----------------------
+ 4 files changed, 87 insertions(+), 92 deletions(-)
 
-diff --git a/lib/x86/msr.h b/lib/x86/msr.h
-index cc4cb855..06a3b34a 100644
---- a/lib/x86/msr.h
-+++ b/lib/x86/msr.h
-@@ -31,6 +31,20 @@
- #define EFER_LMSLE		(1<<_EFER_LMSLE)
- #define EFER_FFXSR		(1<<_EFER_FFXSR)
+diff --git a/lib/linux/vmx.h b/lib/linux/vmx.h
+index 5973bd86..f3c2aacc 100644
+--- a/lib/linux/vmx.h
++++ b/lib/linux/vmx.h
+@@ -16,6 +16,7 @@
+ #include "libcflat.h"
+ #include "trapnr.h"
+ #include "util.h"
++#include "vmxfeatures.h"
  
-+/*
-+ * Architectural memory types that are common to MTRRs, PAT, VMX MSRs, etc.
-+ * Most MSRs support/allow only a subset of memory types, but the values
-+ * themselves are common across all relevant MSRs.
-+ */
-+#define X86_MEMTYPE_UC		0ull	/* Uncacheable, a.k.a. Strong Uncacheable */
-+#define X86_MEMTYPE_WC		1ull	/* Write Combining */
-+/* RESERVED			2 */
-+/* RESERVED			3 */
-+#define X86_MEMTYPE_WT		4ull	/* Write Through */
-+#define X86_MEMTYPE_WP		5ull	/* Write Protected */
-+#define X86_MEMTYPE_WB		6ull	/* Write Back */
-+#define X86_MEMTYPE_UC_MINUS	7ull	/* Weak Uncacheabled (PAT only) */
-+
- /* Intel MSRs. Some also available on other CPUs */
- #define MSR_IA32_SPEC_CTRL		0x00000048
- #define SPEC_CTRL_IBRS			BIT(0)
+ #define VMCS_CONTROL_BIT(x)	BIT(VMX_FEATURE_##x & 0x1f)
+ 
 diff --git a/x86/vmx.c b/x86/vmx.c
-index a3c6c60b..df9a23c7 100644
+index df9a23c7..c1845cea 100644
 --- a/x86/vmx.c
 +++ b/x86/vmx.c
-@@ -1641,15 +1641,15 @@ static void test_vmx_caps(void)
- 	       "MSR_IA32_VMX_VMCS_ENUM");
+@@ -1258,7 +1258,7 @@ int init_vmcs(struct vmcs **vmcs)
+ 	ctrl_exit = EXI_LOAD_EFER | EXI_HOST_64 | EXI_LOAD_PAT;
+ 	ctrl_enter = (ENT_LOAD_EFER | ENT_GUEST_64);
+ 	/* DIsable IO instruction VMEXIT now */
+-	ctrl_cpu[0] &= (~(CPU_IO | CPU_IO_BITMAP));
++	ctrl_cpu[0] &= (~(CPU_BASED_UNCOND_IO_EXITING | CPU_BASED_USE_IO_BITMAPS));
+ 	ctrl_cpu[1] = 0;
  
- 	fixed0 = -1ull;
--	fixed0 &= ~(EPT_CAP_EXEC_ONLY |
--		    EPT_CAP_PWL4 |
--		    EPT_CAP_PWL5 |
--		    EPT_CAP_UC |
--		    EPT_CAP_WB |
--		    EPT_CAP_2M_PAGE |
--		    EPT_CAP_1G_PAGE |
--		    EPT_CAP_INVEPT |
--		    EPT_CAP_AD_FLAG |
-+	fixed0 &= ~(VMX_EPT_EXECUTE_ONLY_BIT |
-+		    VMX_EPT_PAGE_WALK_4_BIT |
-+		    VMX_EPT_PAGE_WALK_5_BIT |
-+		    VMX_EPTP_UC_BIT |
-+		    VMX_EPTP_WB_BIT |
-+		    VMX_EPT_2MB_PAGE_BIT |
-+		    VMX_EPT_1GB_PAGE_BIT |
-+		    VMX_EPT_INVEPT_BIT |
-+		    VMX_EPT_AD_BIT |
- 		    EPT_CAP_ADV_EPT_INFO |
- 		    EPT_CAP_INVEPT_SINGLE |
- 		    EPT_CAP_INVEPT_ALL |
+ 	ctrl_pin = (ctrl_pin | ctrl_pin_rev.set) & ctrl_pin_rev.clr;
 diff --git a/x86/vmx.h b/x86/vmx.h
-index 65012e0e..4d13ad91 100644
+index 4d13ad91..a83d08b8 100644
 --- a/x86/vmx.h
 +++ b/x86/vmx.h
-@@ -571,27 +571,14 @@ enum Intr_type {
- #define EPTP_RESERV_BITS_MASK	0x1ful
- #define EPTP_RESERV_BITS_SHIFT	0x7ul
+@@ -436,25 +436,6 @@ enum Ctrl_pin {
+ };
  
--#define EPT_MEM_TYPE_UC		0ul
- #define EPT_MEM_TYPE_WC		1ul
- #define EPT_MEM_TYPE_WT		4ul
- #define EPT_MEM_TYPE_WP		5ul
--#define EPT_MEM_TYPE_WB		6ul
+ enum Ctrl0 {
+-	CPU_INTR_WINDOW		= 1ul << 2,
+-	CPU_USE_TSC_OFFSET	= 1ul << 3,
+-	CPU_HLT			= 1ul << 7,
+-	CPU_INVLPG		= 1ul << 9,
+-	CPU_MWAIT		= 1ul << 10,
+-	CPU_RDPMC		= 1ul << 11,
+-	CPU_RDTSC		= 1ul << 12,
+-	CPU_CR3_LOAD		= 1ul << 15,
+-	CPU_CR3_STORE		= 1ul << 16,
+-	CPU_CR8_LOAD		= 1ul << 19,
+-	CPU_CR8_STORE		= 1ul << 20,
+-	CPU_TPR_SHADOW		= 1ul << 21,
+-	CPU_NMI_WINDOW		= 1ul << 22,
+-	CPU_IO			= 1ul << 24,
+-	CPU_IO_BITMAP		= 1ul << 25,
+-	CPU_MTF			= 1ul << 27,
+-	CPU_MSR_BITMAP		= 1ul << 28,
+-	CPU_MONITOR		= 1ul << 29,
+-	CPU_PAUSE		= 1ul << 30,
+ 	CPU_SECONDARY		= 1ul << 31,
+ };
  
- #define EPT_LARGE_PAGE		(1ul << 7)
--#define EPT_MEM_TYPE_SHIFT	3ul
--#define EPT_MEM_TYPE_MASK	0x7ul
- #define EPT_IGNORE_PAT		(1ul << 6)
- #define EPT_SUPPRESS_VE		(1ull << 63)
- 
--#define EPT_CAP_EXEC_ONLY	(1ull << 0)
--#define EPT_CAP_PWL4		(1ull << 6)
--#define EPT_CAP_PWL5		(1ull << 7)
--#define EPT_CAP_UC		(1ull << 8)
--#define EPT_CAP_WB		(1ull << 14)
--#define EPT_CAP_2M_PAGE		(1ull << 16)
--#define EPT_CAP_1G_PAGE		(1ull << 17)
--#define EPT_CAP_INVEPT		(1ull << 20)
--#define EPT_CAP_AD_FLAG		(1ull << 21)
- #define EPT_CAP_ADV_EPT_INFO	(1ull << 22)
- #define EPT_CAP_INVEPT_SINGLE	(1ull << 25)
- #define EPT_CAP_INVEPT_ALL	(1ull << 26)
-@@ -662,12 +649,12 @@ extern union vmx_ept_vpid  ept_vpid;
- 
- static inline bool ept_2m_supported(void)
- {
--	return ept_vpid.val & EPT_CAP_2M_PAGE;
-+	return ept_vpid.val & VMX_EPT_2MB_PAGE_BIT;
- }
- 
- static inline bool ept_1g_supported(void)
- {
--	return ept_vpid.val & EPT_CAP_1G_PAGE;
-+	return ept_vpid.val & VMX_EPT_1GB_PAGE_BIT;
- }
- 
- static inline bool ept_huge_pages_supported(int level)
-@@ -682,31 +669,31 @@ static inline bool ept_huge_pages_supported(int level)
- 
- static inline bool ept_execute_only_supported(void)
- {
--	return ept_vpid.val & EPT_CAP_EXEC_ONLY;
-+	return ept_vpid.val & VMX_EPT_EXECUTE_ONLY_BIT;
- }
- 
- static inline bool ept_ad_bits_supported(void)
- {
--	return ept_vpid.val & EPT_CAP_AD_FLAG;
-+	return ept_vpid.val & VMX_EPT_AD_BIT;
- }
- 
- static inline bool is_4_level_ept_supported(void)
- {
--	return ept_vpid.val & EPT_CAP_PWL4;
-+	return ept_vpid.val & VMX_EPT_PAGE_WALK_4_BIT;
- }
- 
- static inline bool is_5_level_ept_supported(void)
- {
--	return ept_vpid.val & EPT_CAP_PWL5;
-+	return ept_vpid.val & VMX_EPT_PAGE_WALK_5_BIT;
- }
- 
- static inline bool is_ept_memtype_supported(int type)
- {
--	if (type == EPT_MEM_TYPE_UC)
--		return ept_vpid.val & EPT_CAP_UC;
-+	if (type == VMX_EPTP_MT_UC)
-+		return ept_vpid.val & VMX_EPTP_UC_BIT;
- 
--	if (type == EPT_MEM_TYPE_WB)
--		return ept_vpid.val & EPT_CAP_WB;
-+	if (type == VMX_EPTP_MT_WB)
-+		return ept_vpid.val & VMX_EPTP_WB_BIT;
- 
- 	return false;
- }
 diff --git a/x86/vmx_tests.c b/x86/vmx_tests.c
-index f7ea411f..5ca4b79b 100644
+index 5ca4b79b..55d151a4 100644
 --- a/x86/vmx_tests.c
 +++ b/x86/vmx_tests.c
-@@ -1050,7 +1050,7 @@ static int __setup_ept(u64 hpa, bool enable_ad)
- 		printf("\tEPT is not supported\n");
- 		return 1;
- 	}
--	if (!is_ept_memtype_supported(EPT_MEM_TYPE_WB)) {
-+	if (!is_ept_memtype_supported(VMX_EPTP_MT_WB)) {
- 		printf("\tWB memtype for EPT walks not supported\n");
- 		return 1;
- 	}
-@@ -1062,7 +1062,7 @@ static int __setup_ept(u64 hpa, bool enable_ad)
- 		return 1;
+@@ -266,7 +266,7 @@ static void msr_bmp_init(void)
+ 
+ 	msr_bitmap = alloc_page();
+ 	ctrl_cpu0 = vmcs_read(CPU_EXEC_CTRL0);
+-	ctrl_cpu0 |= CPU_MSR_BITMAP;
++	ctrl_cpu0 |= CPU_BASED_USE_MSR_BITMAPS;
+ 	vmcs_write(CPU_EXEC_CTRL0, ctrl_cpu0);
+ 	vmcs_write(MSR_BITMAP, (u64)msr_bitmap);
+ }
+@@ -275,13 +275,13 @@ static void *get_msr_bitmap(void)
+ {
+ 	void *msr_bitmap;
+ 
+-	if (vmcs_read(CPU_EXEC_CTRL0) & CPU_MSR_BITMAP) {
++	if (vmcs_read(CPU_EXEC_CTRL0) & CPU_BASED_USE_MSR_BITMAPS) {
+ 		msr_bitmap = (void *)vmcs_read(MSR_BITMAP);
+ 	} else {
+ 		msr_bitmap = alloc_page();
+ 		memset(msr_bitmap, 0xff, PAGE_SIZE);
+ 		vmcs_write(MSR_BITMAP, (u64)msr_bitmap);
+-		vmcs_set_bits(CPU_EXEC_CTRL0, CPU_MSR_BITMAP);
++		vmcs_set_bits(CPU_EXEC_CTRL0, CPU_BASED_USE_MSR_BITMAPS);
  	}
  
--	eptp = EPT_MEM_TYPE_WB;
-+	eptp = VMX_EPTP_MT_WB;
- 	eptp |= (3 << EPTP_PG_WALK_LEN_SHIFT);
- 	eptp |= hpa;
- 	if (enable_ad)
-@@ -1385,7 +1385,7 @@ static int ept_exit_handler_common(union exit_reason exit_reason, bool have_ad)
- 				    VMX_EPT_READABLE_MASK |
- 				    VMX_EPT_WRITABLE_MASK |
- 				    VMX_EPT_EXECUTABLE_MASK |
--				    (2 << EPT_MEM_TYPE_SHIFT));
-+				    (2 << VMX_EPT_MT_EPTE_SHIFT));
- 			invept(INVEPT_SINGLE, eptp);
+ 	return msr_bitmap;
+@@ -643,8 +643,8 @@ static int iobmp_init(struct vmcs *vmcs)
+ 	io_bitmap_a = alloc_page();
+ 	io_bitmap_b = alloc_page();
+ 	ctrl_cpu0 = vmcs_read(CPU_EXEC_CTRL0);
+-	ctrl_cpu0 |= CPU_IO_BITMAP;
+-	ctrl_cpu0 &= (~CPU_IO);
++	ctrl_cpu0 |= CPU_BASED_USE_IO_BITMAPS;
++	ctrl_cpu0 &= (~CPU_BASED_UNCOND_IO_EXITING);
+ 	vmcs_write(CPU_EXEC_CTRL0, ctrl_cpu0);
+ 	vmcs_write(IO_BITMAP_A, (u64)io_bitmap_a);
+ 	vmcs_write(IO_BITMAP_B, (u64)io_bitmap_b);
+@@ -754,7 +754,8 @@ static int iobmp_exit_handler(union exit_reason exit_reason)
+ 		case 9:
+ 		case 10:
+ 			ctrl_cpu0 = vmcs_read(CPU_EXEC_CTRL0);
+-			vmcs_write(CPU_EXEC_CTRL0, ctrl_cpu0 & ~CPU_IO);
++			vmcs_write(CPU_EXEC_CTRL0,
++				   ctrl_cpu0 & ~CPU_BASED_UNCOND_IO_EXITING);
+ 			vmx_inc_test_stage();
  			break;
- 		case 3:
-@@ -4838,10 +4838,10 @@ static void test_ept_eptp(void)
- 	eptp = vmcs_read(EPTP);
+ 		default:
+@@ -770,12 +771,14 @@ static int iobmp_exit_handler(union exit_reason exit_reason)
+ 		switch (vmx_get_test_stage()) {
+ 		case 9:
+ 			ctrl_cpu0 = vmcs_read(CPU_EXEC_CTRL0);
+-			ctrl_cpu0 |= CPU_IO | CPU_IO_BITMAP;
++			ctrl_cpu0 |= CPU_BASED_UNCOND_IO_EXITING |
++				     CPU_BASED_USE_IO_BITMAPS;
+ 			vmcs_write(CPU_EXEC_CTRL0, ctrl_cpu0);
+ 			break;
+ 		case 10:
+ 			ctrl_cpu0 = vmcs_read(CPU_EXEC_CTRL0);
+-			ctrl_cpu0 = (ctrl_cpu0 & ~CPU_IO_BITMAP) | CPU_IO;
++			ctrl_cpu0 = (ctrl_cpu0 & ~CPU_BASED_USE_IO_BITMAPS) |
++						 CPU_BASED_UNCOND_IO_EXITING;
+ 			vmcs_write(CPU_EXEC_CTRL0, ctrl_cpu0);
+ 			break;
+ 		default:
+@@ -886,22 +889,25 @@ struct insn_table {
+  */
+ static struct insn_table insn_table[] = {
+ 	// Flags for Primary Processor-Based VM-Execution Controls
+-	{"HLT",  CPU_HLT, insn_hlt, INSN_CPU0, 12, 0, 0, 0},
+-	{"INVLPG", CPU_INVLPG, insn_invlpg, INSN_CPU0, 14,
++	{"HLT",  CPU_BASED_HLT_EXITING, insn_hlt, INSN_CPU0, 12, 0, 0, 0},
++	{"INVLPG", CPU_BASED_INVLPG_EXITING, insn_invlpg, INSN_CPU0, 14,
+ 		0x12345678, 0, FIELD_EXIT_QUAL},
+-	{"MWAIT", CPU_MWAIT, insn_mwait, INSN_CPU0, 36, 0, 0, 0, this_cpu_has_mwait},
+-	{"RDPMC", CPU_RDPMC, insn_rdpmc, INSN_CPU0, 15, 0, 0, 0, this_cpu_has_pmu},
+-	{"RDTSC", CPU_RDTSC, insn_rdtsc, INSN_CPU0, 16, 0, 0, 0},
+-	{"CR3 load", CPU_CR3_LOAD, insn_cr3_load, INSN_CPU0, 28, 0x3, 0,
+-		FIELD_EXIT_QUAL},
+-	{"CR3 store", CPU_CR3_STORE, insn_cr3_store, INSN_CPU0, 28, 0x13, 0,
+-		FIELD_EXIT_QUAL},
+-	{"CR8 load", CPU_CR8_LOAD, insn_cr8_load, INSN_CPU0, 28, 0x8, 0,
+-		FIELD_EXIT_QUAL},
+-	{"CR8 store", CPU_CR8_STORE, insn_cr8_store, INSN_CPU0, 28, 0x18, 0,
+-		FIELD_EXIT_QUAL},
+-	{"MONITOR", CPU_MONITOR, insn_monitor, INSN_CPU0, 39, 0, 0, 0, this_cpu_has_mwait},
+-	{"PAUSE", CPU_PAUSE, insn_pause, INSN_CPU0, 40, 0, 0, 0},
++	{"MWAIT", CPU_BASED_MWAIT_EXITING, insn_mwait, INSN_CPU0, 36, 0, 0, 0,
++		this_cpu_has_mwait},
++	{"RDPMC", CPU_BASED_RDPMC_EXITING, insn_rdpmc, INSN_CPU0, 15, 0, 0, 0,
++		this_cpu_has_pmu},
++	{"RDTSC", CPU_BASED_RDTSC_EXITING, insn_rdtsc, INSN_CPU0, 16, 0, 0, 0},
++	{"CR3 load", CPU_BASED_CR3_LOAD_EXITING, insn_cr3_load, INSN_CPU0, 28,
++		0x3, 0, FIELD_EXIT_QUAL},
++	{"CR3 store", CPU_BASED_CR3_STORE_EXITING, insn_cr3_store, INSN_CPU0,
++		28, 0x13, 0, FIELD_EXIT_QUAL},
++	{"CR8 load", CPU_BASED_CR8_LOAD_EXITING, insn_cr8_load, INSN_CPU0, 28,
++		0x8, 0,	FIELD_EXIT_QUAL},
++	{"CR8 store", CPU_BASED_CR8_STORE_EXITING, insn_cr8_store, INSN_CPU0,
++		28, 0x18, 0, FIELD_EXIT_QUAL},
++	{"MONITOR", CPU_BASED_MONITOR_TRAP_FLAG, insn_monitor, INSN_CPU0, 39,
++		0, 0, 0, this_cpu_has_mwait},
++	{"PAUSE", CPU_BASED_PAUSE_EXITING, insn_pause, INSN_CPU0, 40, 0, 0, 0},
+ 	// Flags for Secondary Processor-Based VM-Execution Controls
+ 	{"WBINVD", CPU_WBINVD, insn_wbinvd, INSN_CPU1, 54, 0, 0, 0},
+ 	{"DESC_TABLE (SGDT)", CPU_DESC_TABLE, insn_sgdt, INSN_CPU1, 46, 0, 0, 0},
+@@ -3814,10 +3820,10 @@ static void test_vmcs_addr_reference(u32 control_bit, enum Encoding field,
+  */
+ static void test_io_bitmaps(void)
+ {
+-	test_vmcs_addr_reference(CPU_IO_BITMAP, IO_BITMAP_A,
++	test_vmcs_addr_reference(CPU_BASED_USE_IO_BITMAPS, IO_BITMAP_A,
+ 				 "I/O bitmap A", "Use I/O bitmaps",
+ 				 PAGE_SIZE, false, true);
+-	test_vmcs_addr_reference(CPU_IO_BITMAP, IO_BITMAP_B,
++	test_vmcs_addr_reference(CPU_BASED_USE_IO_BITMAPS, IO_BITMAP_B,
+ 				 "I/O bitmap B", "Use I/O bitmaps",
+ 				 PAGE_SIZE, false, true);
+ }
+@@ -3830,7 +3836,7 @@ static void test_io_bitmaps(void)
+  */
+ static void test_msr_bitmap(void)
+ {
+-	test_vmcs_addr_reference(CPU_MSR_BITMAP, MSR_BITMAP,
++	test_vmcs_addr_reference(CPU_BASED_USE_MSR_BITMAPS, MSR_BITMAP,
+ 				 "MSR bitmap", "Use MSR bitmaps",
+ 				 PAGE_SIZE, false, true);
+ }
+@@ -3851,8 +3857,9 @@ static void test_apic_virt_addr(void)
+ 	 * what we're trying to achieve and fails vmentry.
+ 	 */
+ 	u32 cpu_ctrls0 = vmcs_read(CPU_EXEC_CTRL0);
+-	vmcs_write(CPU_EXEC_CTRL0, cpu_ctrls0 | CPU_CR8_LOAD | CPU_CR8_STORE);
+-	test_vmcs_addr_reference(CPU_TPR_SHADOW, APIC_VIRT_ADDR,
++	vmcs_write(CPU_EXEC_CTRL0, cpu_ctrls0 | CPU_BASED_CR8_LOAD_EXITING |
++		   CPU_BASED_CR8_STORE_EXITING);
++	test_vmcs_addr_reference(CPU_BASED_TPR_SHADOW, APIC_VIRT_ADDR,
+ 				 "virtual-APIC address", "Use TPR shadow",
+ 				 PAGE_SIZE, false, true);
+ 	vmcs_write(CPU_EXEC_CTRL0, cpu_ctrls0);
+@@ -3924,18 +3931,18 @@ static void test_apic_virtual_ctls(void)
+ 	/*
+ 	 * First test
+ 	 */
+-	if (!((ctrl_cpu_rev[0].clr & (CPU_SECONDARY | CPU_TPR_SHADOW)) ==
+-	    (CPU_SECONDARY | CPU_TPR_SHADOW)))
++	if (!((ctrl_cpu_rev[0].clr & (CPU_SECONDARY | CPU_BASED_TPR_SHADOW)) ==
++	    (CPU_SECONDARY | CPU_BASED_TPR_SHADOW)))
+ 		return;
  
- 	for (i = 0; i < 8; i++) {
--		eptp = (eptp & ~EPT_MEM_TYPE_MASK) | i;
-+		eptp = (eptp & ~VMX_EPTP_MT_MASK) | i;
- 		vmcs_write(EPTP, eptp);
--		report_prefix_pushf("Enable-EPT enabled; EPT memory type %lu",
--		    eptp & EPT_MEM_TYPE_MASK);
-+		report_prefix_pushf("Enable-EPT enabled; EPT memory type %llu",
-+				    eptp & VMX_EPTP_MT_MASK);
- 		if (is_ept_memtype_supported(i))
- 			test_vmx_valid_controls();
- 		else
-@@ -4849,7 +4849,7 @@ static void test_ept_eptp(void)
+ 	primary |= CPU_SECONDARY;
+-	primary &= ~CPU_TPR_SHADOW;
++	primary &= ~CPU_BASED_TPR_SHADOW;
+ 	vmcs_write(CPU_EXEC_CTRL0, primary);
+ 
+ 	while (1) {
+ 		for (j = 1; j < 8; j++) {
+ 			secondary &= ~(CPU_VIRT_X2APIC | CPU_APIC_REG_VIRT | CPU_VINTD);
+-			if (primary & CPU_TPR_SHADOW) {
++			if (primary & CPU_BASED_TPR_SHADOW) {
+ 				is_ctrl_valid = true;
+ 			} else {
+ 				if (! set_bit_pattern(j, &secondary))
+@@ -3958,7 +3965,7 @@ static void test_apic_virtual_ctls(void)
+ 			break;
+ 		i++;
+ 
+-		primary |= CPU_TPR_SHADOW;
++		primary |= CPU_BASED_TPR_SHADOW;
+ 		vmcs_write(CPU_EXEC_CTRL0, primary);
+ 		strcpy(str, "enabled");
+ 	}
+@@ -4017,7 +4024,8 @@ static void test_virtual_intr_ctls(void)
+ 	    (ctrl_pin_rev.clr & PIN_EXTINT)))
+ 		return;
+ 
+-	vmcs_write(CPU_EXEC_CTRL0, primary | CPU_SECONDARY | CPU_TPR_SHADOW);
++	vmcs_write(CPU_EXEC_CTRL0, primary | CPU_SECONDARY |
++		   CPU_BASED_TPR_SHADOW);
+ 	vmcs_write(CPU_EXEC_CTRL1, secondary & ~CPU_VINTD);
+ 	vmcs_write(PIN_CONTROLS, pin & ~PIN_EXTINT);
+ 	report_prefix_pushf("Virtualize interrupt-delivery disabled; external-interrupt exiting disabled");
+@@ -4086,7 +4094,8 @@ static void test_posted_intr(void)
+ 	    (ctrl_exit_rev.clr & EXI_INTA)))
+ 		return;
+ 
+-	vmcs_write(CPU_EXEC_CTRL0, primary | CPU_SECONDARY | CPU_TPR_SHADOW);
++	vmcs_write(CPU_EXEC_CTRL0, primary | CPU_SECONDARY |
++		   CPU_BASED_TPR_SHADOW);
+ 
+ 	/*
+ 	 * Test virtual-interrupt-delivery and acknowledge-interrupt-on-exit
+@@ -4237,7 +4246,7 @@ static void try_tpr_threshold_and_vtpr(unsigned threshold, unsigned vtpr)
+ 	u32 primary = vmcs_read(CPU_EXEC_CTRL0);
+ 	u32 secondary = vmcs_read(CPU_EXEC_CTRL1);
+ 
+-	if ((primary & CPU_TPR_SHADOW) &&
++	if ((primary & CPU_BASED_TPR_SHADOW) &&
+ 	    (!(primary & CPU_SECONDARY) ||
+ 	     !(secondary & (CPU_VINTD | CPU_VIRT_APIC_ACCESSES))))
+ 		valid = (threshold & 0xf) <= ((vtpr >> 4) & 0xf);
+@@ -4571,7 +4580,7 @@ static void try_tpr_threshold(unsigned threshold)
+ 	u32 primary = vmcs_read(CPU_EXEC_CTRL0);
+ 	u32 secondary = vmcs_read(CPU_EXEC_CTRL1);
+ 
+-	if ((primary & CPU_TPR_SHADOW) && !((primary & CPU_SECONDARY) &&
++	if ((primary & CPU_BASED_TPR_SHADOW) && !((primary & CPU_SECONDARY) &&
+ 	    (secondary & CPU_VINTD)))
+ 		valid = !(threshold >> 4);
+ 
+@@ -4627,18 +4636,20 @@ static void test_tpr_threshold(void)
+ 	u64 threshold = vmcs_read(TPR_THRESHOLD);
+ 	void *virtual_apic_page;
+ 
+-	if (!(ctrl_cpu_rev[0].clr & CPU_TPR_SHADOW))
++	if (!(ctrl_cpu_rev[0].clr & CPU_BASED_TPR_SHADOW))
+ 		return;
+ 
+ 	virtual_apic_page = alloc_page();
+ 	memset(virtual_apic_page, 0xff, PAGE_SIZE);
+ 	vmcs_write(APIC_VIRT_ADDR, virt_to_phys(virtual_apic_page));
+ 
+-	vmcs_write(CPU_EXEC_CTRL0, primary & ~(CPU_TPR_SHADOW | CPU_SECONDARY));
++	vmcs_write(CPU_EXEC_CTRL0, primary & ~(CPU_BASED_TPR_SHADOW |
++		   CPU_SECONDARY));
+ 	report_prefix_pushf("Use TPR shadow disabled, secondary controls disabled");
+ 	test_tpr_threshold_values();
+ 	report_prefix_pop();
+-	vmcs_write(CPU_EXEC_CTRL0, vmcs_read(CPU_EXEC_CTRL0) | CPU_TPR_SHADOW);
++	vmcs_write(CPU_EXEC_CTRL0, vmcs_read(CPU_EXEC_CTRL0) |
++		   CPU_BASED_TPR_SHADOW);
+ 	report_prefix_pushf("Use TPR shadow enabled, secondary controls disabled");
+ 	test_tpr_threshold_values();
+ 	report_prefix_pop();
+@@ -4727,7 +4738,7 @@ static void test_nmi_ctrls(void)
+ 	cpu_ctrls0 = vmcs_read(CPU_EXEC_CTRL0);
+ 
+ 	test_pin_ctrls = pin_ctrls & ~(PIN_NMI | PIN_VIRT_NMI);
+-	test_cpu_ctrls0 = cpu_ctrls0 & ~CPU_NMI_WINDOW;
++	test_cpu_ctrls0 = cpu_ctrls0 & ~CPU_BASED_NMI_WINDOW_EXITING;
+ 
+ 	vmcs_write(PIN_CONTROLS, test_pin_ctrls);
+ 	report_prefix_pushf("NMI-exiting disabled, virtual-NMIs disabled");
+@@ -4749,13 +4760,14 @@ static void test_nmi_ctrls(void)
+ 	test_vmx_valid_controls();
+ 	report_prefix_pop();
+ 
+-	if (!(ctrl_cpu_rev[0].clr & CPU_NMI_WINDOW)) {
++	if (!(ctrl_cpu_rev[0].clr & CPU_BASED_NMI_WINDOW_EXITING)) {
+ 		report_info("NMI-window exiting is not supported, skipping...");
+ 		goto done;
+ 	}
+ 
+ 	vmcs_write(PIN_CONTROLS, test_pin_ctrls);
+-	vmcs_write(CPU_EXEC_CTRL0, test_cpu_ctrls0 | CPU_NMI_WINDOW);
++	vmcs_write(CPU_EXEC_CTRL0, test_cpu_ctrls0 |
++		   CPU_BASED_NMI_WINDOW_EXITING);
+ 	report_prefix_pushf("Virtual-NMIs disabled, NMI-window-exiting enabled");
+ 	test_vmx_invalid_controls();
+ 	report_prefix_pop();
+@@ -4767,7 +4779,8 @@ static void test_nmi_ctrls(void)
+ 	report_prefix_pop();
+ 
+ 	vmcs_write(PIN_CONTROLS, test_pin_ctrls | (PIN_NMI | PIN_VIRT_NMI));
+-	vmcs_write(CPU_EXEC_CTRL0, test_cpu_ctrls0 | CPU_NMI_WINDOW);
++	vmcs_write(CPU_EXEC_CTRL0, test_cpu_ctrls0 |
++		   CPU_BASED_NMI_WINDOW_EXITING);
+ 	report_prefix_pushf("Virtual-NMIs enabled, NMI-window-exiting enabled");
+ 	test_vmx_valid_controls();
+ 	report_prefix_pop();
+@@ -5121,14 +5134,14 @@ static void enable_mtf(void)
+ {
+ 	u32 ctrl0 = vmcs_read(CPU_EXEC_CTRL0);
+ 
+-	vmcs_write(CPU_EXEC_CTRL0, ctrl0 | CPU_MTF);
++	vmcs_write(CPU_EXEC_CTRL0, ctrl0 | CPU_BASED_MONITOR_TRAP_FLAG);
+ }
+ 
+ static void disable_mtf(void)
+ {
+ 	u32 ctrl0 = vmcs_read(CPU_EXEC_CTRL0);
+ 
+-	vmcs_write(CPU_EXEC_CTRL0, ctrl0 & ~CPU_MTF);
++	vmcs_write(CPU_EXEC_CTRL0, ctrl0 & ~CPU_BASED_MONITOR_TRAP_FLAG);
+ }
+ 
+ static void enable_tf(void)
+@@ -5159,7 +5172,7 @@ static void vmx_mtf_test(void)
+ 	unsigned long pending_dbg;
+ 	handler old_gp, old_db;
+ 
+-	if (!(ctrl_cpu_rev[0].clr & CPU_MTF)) {
++	if (!(ctrl_cpu_rev[0].clr & CPU_BASED_MONITOR_TRAP_FLAG)) {
+ 		report_skip("%s : \"Monitor trap flag\" exec control not supported", __func__);
+ 		return;
+ 	}
+@@ -5262,7 +5275,7 @@ static void vmx_mtf_pdpte_test(void)
+ 	if (setup_ept(false))
+ 		return;
+ 
+-	if (!(ctrl_cpu_rev[0].clr & CPU_MTF)) {
++	if (!(ctrl_cpu_rev[0].clr & CPU_BASED_MONITOR_TRAP_FLAG)) {
+ 		report_skip("%s : \"Monitor trap flag\" exec control not supported", __func__);
+ 		return;
+ 	}
+@@ -6185,13 +6198,13 @@ static enum Config_type configure_apic_reg_virt_test(
+ 	}
+ 
+ 	if (apic_reg_virt_config->use_tpr_shadow) {
+-		if (!(ctrl_cpu_rev[0].clr & CPU_TPR_SHADOW)) {
++		if (!(ctrl_cpu_rev[0].clr & CPU_BASED_TPR_SHADOW)) {
+ 			printf("VM-execution control \"use TPR shadow\" NOT supported.\n");
+ 			return CONFIG_TYPE_UNSUPPORTED;
+ 		}
+-		cpu_exec_ctrl0 |= CPU_TPR_SHADOW;
++		cpu_exec_ctrl0 |= CPU_BASED_TPR_SHADOW;
+ 	} else {
+-		cpu_exec_ctrl0 &= ~CPU_TPR_SHADOW;
++		cpu_exec_ctrl0 &= ~CPU_BASED_TPR_SHADOW;
+ 	}
+ 
+ 	if (apic_reg_virt_config->apic_register_virtualization) {
+@@ -6968,9 +6981,9 @@ static enum Config_type configure_virt_x2apic_mode_test(
+ 	/* x2apic-specific VMCS config */
+ 	if (virt_x2apic_mode_config->use_msr_bitmaps) {
+ 		/* virt_x2apic_mode_test() checks for MSR bitmaps support */
+-		cpu_exec_ctrl0 |= CPU_MSR_BITMAP;
++		cpu_exec_ctrl0 |= CPU_BASED_USE_MSR_BITMAPS;
+ 	} else {
+-		cpu_exec_ctrl0 &= ~CPU_MSR_BITMAP;
++		cpu_exec_ctrl0 &= ~CPU_BASED_USE_MSR_BITMAPS;
+ 	}
+ 
+ 	if (virt_x2apic_mode_config->virtual_interrupt_delivery) {
+@@ -7035,10 +7048,10 @@ static void virt_x2apic_mode_test(void)
+ 	 *   - "Virtual-APIC address", indicated by "use TPR shadow"
+ 	 *   - "MSR-bitmap address", indicated by "use MSR bitmaps"
+ 	 */
+-	if (!(ctrl_cpu_rev[0].clr & CPU_TPR_SHADOW)) {
++	if (!(ctrl_cpu_rev[0].clr & CPU_BASED_TPR_SHADOW)) {
+ 		report_skip("%s : \"Use TPR shadow\" exec control not supported", __func__);
+ 		return;
+-	} else if (!(ctrl_cpu_rev[0].clr & CPU_MSR_BITMAP)) {
++	} else if (!(ctrl_cpu_rev[0].clr & CPU_BASED_USE_MSR_BITMAPS)) {
+ 		report_skip("%s : \"Use MSR bitmaps\" exec control not supported", __func__);
+ 		return;
+ 	}
+@@ -8673,7 +8686,7 @@ static void vmx_nmi_window_test(void)
+ 		return;
+ 	}
+ 
+-	if (!(ctrl_cpu_rev[0].clr & CPU_NMI_WINDOW)) {
++	if (!(ctrl_cpu_rev[0].clr & CPU_BASED_NMI_WINDOW_EXITING)) {
+ 		report_skip("%s : \"NMI-window exiting\" exec control not supported", __func__);
+ 		return;
+ 	}
+@@ -8692,7 +8705,7 @@ static void vmx_nmi_window_test(void)
+ 	 * RIP will not advance.
+ 	 */
+ 	report_prefix_push("active, no blocking");
+-	vmcs_set_bits(CPU_EXEC_CTRL0, CPU_NMI_WINDOW);
++	vmcs_set_bits(CPU_EXEC_CTRL0, CPU_BASED_NMI_WINDOW_EXITING);
+ 	enter_guest();
+ 	verify_nmi_window_exit(nop_addr);
+ 	report_prefix_pop();
+@@ -8764,7 +8777,7 @@ static void vmx_nmi_window_test(void)
  		report_prefix_pop();
  	}
  
--	eptp = (eptp & ~EPT_MEM_TYPE_MASK) | 6ul;
-+	eptp = (eptp & ~VMX_EPTP_MT_MASK) | 6ul;
+-	vmcs_clear_bits(CPU_EXEC_CTRL0, CPU_NMI_WINDOW);
++	vmcs_clear_bits(CPU_EXEC_CTRL0, CPU_BASED_NMI_WINDOW_EXITING);
+ 	enter_guest();
+ 	report_prefix_pop();
+ }
+@@ -8804,7 +8817,7 @@ static void vmx_intr_window_test(void)
+ 	unsigned int orig_db_gate_type;
+ 	void *db_fault_addr = get_idt_addr(&boot_idt[DB_VECTOR]);
+ 
+-	if (!(ctrl_cpu_rev[0].clr & CPU_INTR_WINDOW)) {
++	if (!(ctrl_cpu_rev[0].clr & CPU_BASED_INTR_WINDOW_EXITING)) {
+ 		report_skip("%s : \"Interrupt-window exiting\" exec control not supported", __func__);
+ 		return;
+ 	}
+@@ -8830,7 +8843,7 @@ static void vmx_intr_window_test(void)
+ 	 * point to the vmcall instruction.
+ 	 */
+ 	report_prefix_push("active, no blocking, RFLAGS.IF=1");
+-	vmcs_set_bits(CPU_EXEC_CTRL0, CPU_INTR_WINDOW);
++	vmcs_set_bits(CPU_EXEC_CTRL0, CPU_BASED_INTR_WINDOW_EXITING);
+ 	vmcs_write(GUEST_RFLAGS, X86_EFLAGS_FIXED | X86_EFLAGS_IF);
+ 	enter_guest();
+ 	verify_intr_window_exit(vmcall_addr);
+@@ -8857,11 +8870,11 @@ static void vmx_intr_window_test(void)
+ 	 * VM-exits. Then, advance past the VMCALL and set the
+ 	 * "interrupt-window exiting" VM-execution control again.
+ 	 */
+-	vmcs_clear_bits(CPU_EXEC_CTRL0, CPU_INTR_WINDOW);
++	vmcs_clear_bits(CPU_EXEC_CTRL0, CPU_BASED_INTR_WINDOW_EXITING);
+ 	enter_guest();
+ 	skip_exit_vmcall();
+ 	nop_addr = vmcs_read(GUEST_RIP);
+-	vmcs_set_bits(CPU_EXEC_CTRL0, CPU_INTR_WINDOW);
++	vmcs_set_bits(CPU_EXEC_CTRL0, CPU_BASED_INTR_WINDOW_EXITING);
  
  	/*
- 	 * Page walk length (bits 5:3).  Note, the value in VMCS.EPTP "is 1
+ 	 * Ask for "interrupt-window exiting" in a MOV-SS shadow with
+@@ -8932,7 +8945,7 @@ static void vmx_intr_window_test(void)
+ 	}
+ 
+ 	boot_idt[DB_VECTOR].type = orig_db_gate_type;
+-	vmcs_clear_bits(CPU_EXEC_CTRL0, CPU_INTR_WINDOW);
++	vmcs_clear_bits(CPU_EXEC_CTRL0, CPU_BASED_INTR_WINDOW_EXITING);
+ 	enter_guest();
+ 	report_prefix_pop();
+ }
+@@ -8956,14 +8969,14 @@ static void vmx_store_tsc_test(void)
+ 	struct vmx_msr_entry msr_entry = { .index = MSR_IA32_TSC };
+ 	u64 low, high;
+ 
+-	if (!(ctrl_cpu_rev[0].clr & CPU_USE_TSC_OFFSET)) {
++	if (!(ctrl_cpu_rev[0].clr & CPU_BASED_USE_TSC_OFFSETTING)) {
+ 		report_skip("%s : \"Use TSC offsetting\" exec control not supported", __func__);
+ 		return;
+ 	}
+ 
+ 	test_set_guest(vmx_store_tsc_test_guest);
+ 
+-	vmcs_set_bits(CPU_EXEC_CTRL0, CPU_USE_TSC_OFFSET);
++	vmcs_set_bits(CPU_EXEC_CTRL0, CPU_BASED_USE_TSC_OFFSETTING);
+ 	vmcs_write(EXI_MSR_ST_CNT, 1);
+ 	vmcs_write(EXIT_MSR_ST_ADDR, virt_to_phys(&msr_entry));
+ 	vmcs_write(TSC_OFFSET, GUEST_TSC_OFFSET);
+@@ -9506,7 +9519,7 @@ static void enable_vid(void)
+ 	vmcs_write(EOI_EXIT_BITMAP2, 0x0);
+ 	vmcs_write(EOI_EXIT_BITMAP3, 0x0);
+ 
+-	vmcs_set_bits(CPU_EXEC_CTRL0, CPU_SECONDARY | CPU_TPR_SHADOW);
++	vmcs_set_bits(CPU_EXEC_CTRL0, CPU_SECONDARY | CPU_BASED_TPR_SHADOW);
+ 	vmcs_set_bits(CPU_EXEC_CTRL1, CPU_VINTD | CPU_VIRT_X2APIC);
+ }
+ 
+@@ -10388,7 +10401,7 @@ static void vmx_vmcs_shadow_test(void)
+ 	shadow->hdr.shadow_vmcs = 1;
+ 	TEST_ASSERT(!vmcs_clear(shadow));
+ 
+-	vmcs_clear_bits(CPU_EXEC_CTRL0, CPU_RDTSC);
++	vmcs_clear_bits(CPU_EXEC_CTRL0, CPU_BASED_RDTSC_EXITING);
+ 	vmcs_set_bits(CPU_EXEC_CTRL0, CPU_SECONDARY);
+ 	vmcs_set_bits(CPU_EXEC_CTRL1, CPU_SHADOW_VMCS);
+ 
+@@ -10423,7 +10436,7 @@ static void vmx_vmcs_shadow_test(void)
+  */
+ static void reset_guest_tsc_to_zero(void)
+ {
+-	vmcs_set_bits(CPU_EXEC_CTRL0, CPU_USE_TSC_OFFSET);
++	vmcs_set_bits(CPU_EXEC_CTRL0, CPU_BASED_USE_TSC_OFFSETTING);
+ 	vmcs_write(TSC_OFFSET, -rdtsc());
+ }
+ 
+@@ -10446,7 +10459,7 @@ static unsigned long long host_time_to_guest_time(unsigned long long t)
+ 	TEST_ASSERT(!(ctrl_cpu_rev[0].clr & CPU_SECONDARY) ||
+ 		    !(vmcs_read(CPU_EXEC_CTRL1) & CPU_USE_TSC_SCALING));
+ 
+-	if (vmcs_read(CPU_EXEC_CTRL0) & CPU_USE_TSC_OFFSET)
++	if (vmcs_read(CPU_EXEC_CTRL0) & CPU_BASED_USE_TSC_OFFSETTING)
+ 		t += vmcs_read(TSC_OFFSET);
+ 
+ 	return t;
+@@ -10470,7 +10483,7 @@ static void rdtsc_vmexit_diff_test(void)
+ 	int fail = 0;
+ 	int i;
+ 
+-	if (!(ctrl_cpu_rev[0].clr & CPU_USE_TSC_OFFSET))
++	if (!(ctrl_cpu_rev[0].clr & CPU_BASED_USE_TSC_OFFSETTING))
+ 		test_skip("CPU doesn't support the 'use TSC offsetting' processor-based VM-execution control.\n");
+ 
+ 	test_set_guest(rdtsc_vmexit_diff_test_guest);
+@@ -10691,9 +10704,9 @@ static void __vmx_pf_exception_test(invalidate_tlb_t inv_fn, void *data,
+ 
+ 	/* Intercept INVLPG when to perform TLB invalidation from L1 (this). */
+ 	if (inv_fn)
+-		vmcs_set_bits(CPU_EXEC_CTRL0, CPU_INVLPG);
++		vmcs_set_bits(CPU_EXEC_CTRL0, CPU_BASED_INVLPG_EXITING);
+ 	else
+-		vmcs_clear_bits(CPU_EXEC_CTRL0, CPU_INVLPG);
++		vmcs_clear_bits(CPU_EXEC_CTRL0, CPU_BASED_INVLPG_EXITING);
+ 
+ 	enter_guest();
+ 
 -- 
 2.43.0
 
