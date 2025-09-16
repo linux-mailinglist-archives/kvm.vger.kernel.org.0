@@ -1,104 +1,132 @@
-Return-Path: <kvm+bounces-57690-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-57695-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id EB6E5B58F51
-	for <lists+kvm@lfdr.de>; Tue, 16 Sep 2025 09:38:31 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id C50B6B58F9D
+	for <lists+kvm@lfdr.de>; Tue, 16 Sep 2025 09:49:27 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D299E3A5A40
-	for <lists+kvm@lfdr.de>; Tue, 16 Sep 2025 07:38:29 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7BF59178F2D
+	for <lists+kvm@lfdr.de>; Tue, 16 Sep 2025 07:49:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 936232E9ECE;
-	Tue, 16 Sep 2025 07:38:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B0956257848;
+	Tue, 16 Sep 2025 07:49:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="bOPTnE6K"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="uxSynEpG"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.7])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CEAD3DDC3;
-	Tue, 16 Sep 2025 07:38:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.7
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D3FAB14658D
+	for <kvm@vger.kernel.org>; Tue, 16 Sep 2025 07:49:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758008302; cv=none; b=XKprv4gAYYneC05YUViDMiWGO5zZ/x3lTQlzQZ8DID/gXY8pUygw8+3aB3LTVc3o2Wc+ZZ92DnMiQ/mPYCXkS2c29kdgiz7iirYE/7AmLX+yRazw7X+tdESjzXuV7BJjehVf42tyBjUxZAPLMrqCvtIdDXqYrq2ri6l0wSU8DmM=
+	t=1758008950; cv=none; b=N0oHNMiReiRL8lPysiB9o1RKVE6qn7H+nh71jAVO62TwUEUyb9on/rE/IX52BL+07kgbLBexhWcFrp/41SsDkJ8tmzzhErLVKCRMnxYz3noywQSIiVE/I91CbhLn6dFZpWagGMukveMnvGs5ZvoeaBylYGGJjiFfQuItKuiydSc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758008302; c=relaxed/simple;
-	bh=ntW9cv/diewtJoXEs+ayKjjq8OIScxKxcqsED+U4jF8=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=jx6bebd2h9KLcwVmI7z0yedzW2+wyEwP/uplp5NArNlH+91rXuOs7OealyAEUd4h6vWtyMlyDZPAStd0vKgCQshlWi+olIRdb4enp06tbQRZPHG2iEldMMfKtZaDxrF6Jj+vU+q7ggRm/ITpRhs4CD1isAE+6Dp92cburP3qqks=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=bOPTnE6K; arc=none smtp.client-ip=192.198.163.7
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1758008301; x=1789544301;
-  h=message-id:date:mime-version:subject:to:cc:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=ntW9cv/diewtJoXEs+ayKjjq8OIScxKxcqsED+U4jF8=;
-  b=bOPTnE6KNJ5CF0GSuSj/5c5ypz7qD+BMy4TlMZnbdKveEVlhwyUWhXd7
-   sZ1ZWF3FnNmvDbLxBgVa5WuB9eYr3/j9SNC/z8x+3ewwt9147jF9f+JEu
-   LEoHegaN5N9U6azkfgj144qPoDGjLlGFBRDO0qTIOu3TYMRD03P/1hZyF
-   lXcu++bOaS2ExQARKrBKXNJVzySte2skR7OmDdE8ECeXcChWgD/CF6ypf
-   Jbq4QHx4n/pgen/cnCpEH/KCacepQ7eJs9bhJIVC/uvH1N4Bn2bK3tJzx
-   NQub66USestdlYEzMTlHI4WyRfV6Vy/77eo2gmL5xKMb1LwBraIzjYWlx
-   Q==;
-X-CSE-ConnectionGUID: dYvD9fxMS6qQ/jXyjDkMwg==
-X-CSE-MsgGUID: LVZam2qSSJe2w8R80hCDlA==
-X-IronPort-AV: E=McAfee;i="6800,10657,11554"; a="85715357"
-X-IronPort-AV: E=Sophos;i="6.18,268,1751266800"; 
-   d="scan'208";a="85715357"
-Received: from fmviesa010.fm.intel.com ([10.60.135.150])
-  by fmvoesa101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 16 Sep 2025 00:37:49 -0700
-X-CSE-ConnectionGUID: ffj9HxvcSGmkUdbzltIiXQ==
-X-CSE-MsgGUID: peUc4/7TT4aw1Ib2clPOFw==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.18,268,1751266800"; 
-   d="scan'208";a="175653312"
-Received: from junlongf-mobl.ccr.corp.intel.com (HELO [10.238.1.52]) ([10.238.1.52])
-  by fmviesa010-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 16 Sep 2025 00:37:46 -0700
-Message-ID: <455f690d-6720-406f-a83f-dc98ce3b7ab3@intel.com>
-Date: Tue, 16 Sep 2025 15:37:43 +0800
+	s=arc-20240116; t=1758008950; c=relaxed/simple;
+	bh=mHB2VC5Df3IVyWAs4VbL6UEKMN4Z24QesNj0rfLy1Pk=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=AweFkTT4qsGlASepP65/wOzFY0vpr0WIedjRw5mfH9NrICqj3cF+yxyv/jvnC+cQbV/NDO1GRxBLcjXzflqw79qhLKC02GYg6WQKUUdzasob0DC3J+/evvwnGoFFuIts8u77aK4ieqMJN7xYRkFh2vvy+s/E6KeFBrJAFgyGSds=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=uxSynEpG; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id C7C1BC4CEEB;
+	Tue, 16 Sep 2025 07:49:09 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1758008950;
+	bh=mHB2VC5Df3IVyWAs4VbL6UEKMN4Z24QesNj0rfLy1Pk=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=uxSynEpGZT8JCzIB+BgzSfJCcMjz9b1Aa2FUbNw8h3KLztK+Nkd/m58hPBeHnUeDs
+	 EQp/I9TZbIb0VnTKdqB8goSmiDXUmOsGpGq9o+5IctZNgq6YG9198XBP6CyVwL9mua
+	 T323mSDv+F5mC0cPr/ZrYikT3Vr9g9vt5F50/qP7n/u0kSNy2oVuoPYefcOkgb3W27
+	 IhrMu5fiqU9tP1A3TvWaVg247mDeXIlQvMAA3DT+U1d23N8zEfC/lnIwgBqA9BD3Fm
+	 vBvVjMSqbBim8510tLbPEdX/lKkhiUzKn0Vf473A0lkz9X2PdLlm/sJH9SAgwXyNe9
+	 z8yfJp3MJn92w==
+Date: Tue, 16 Sep 2025 13:09:14 +0530
+From: Naveen N Rao <naveen@kernel.org>
+To: Sean Christopherson <seanjc@google.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org, 
+	Jim Mattson <jmattson@google.com>, Maxim Levitsky <mlevitsk@redhat.com>, 
+	Vasant Hegde <vasant.hegde@amd.com>, Suravee Suthikulpanit <suravee.suthikulpanit@amd.com>, 
+	Nikunj A Dadhania <nikunj@amd.com>, Alejandro Jimenez <alejandro.j.jimenez@oracle.com>, 
+	Joao Martins <joao.m.martins@oracle.com>, "Maciej S. Szmigiero" <maciej.szmigiero@oracle.com>
+Subject: Re: [RFC PATCH v2 5/5] KVM: SVM: Enable AVIC by default from Zen 4
+Message-ID: <p4gvfidvfrfpwy6p6cmua3pnm7efigjrbwipsoga7swpz3nmyl@t3ojdu4qx3w6>
+References: <cover.1756993734.git.naveen@kernel.org>
+ <46b11506a6cf566fd55d3427020c0efea13bfc6a.1756993734.git.naveen@kernel.org>
+ <aMiY3nfsxlJb2TiD@google.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v15 15/41] KVM: x86: Save and reload SSP to/from SMRAM
-To: Sean Christopherson <seanjc@google.com>,
- Paolo Bonzini <pbonzini@redhat.com>
-Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
- Tom Lendacky <thomas.lendacky@amd.com>,
- Mathias Krause <minipli@grsecurity.net>, John Allen <john.allen@amd.com>,
- Rick Edgecombe <rick.p.edgecombe@intel.com>, Chao Gao <chao.gao@intel.com>,
- Maxim Levitsky <mlevitsk@redhat.com>, Zhang Yi Z <yi.z.zhang@linux.intel.com>
-References: <20250912232319.429659-1-seanjc@google.com>
- <20250912232319.429659-16-seanjc@google.com>
-Content-Language: en-US
-From: Xiaoyao Li <xiaoyao.li@intel.com>
-In-Reply-To: <20250912232319.429659-16-seanjc@google.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <aMiY3nfsxlJb2TiD@google.com>
 
-On 9/13/2025 7:22 AM, Sean Christopherson wrote:
-> From: Yang Weijiang <weijiang.yang@intel.com>
+On Mon, Sep 15, 2025 at 03:53:18PM -0700, Sean Christopherson wrote:
+> On Thu, Sep 04, 2025, Naveen N Rao (AMD) wrote:
+> > AVIC and x2AVIC are fully functional since Zen 4, with no known hardware
+> > errata. Enable it by default on those processors, but allow users to
+> > continue passing 'avic' module parameter to explicitly enable/disable
+> > AVIC.
+> > 
+> > Convert 'avic' to an integer to be able to identify if the user has
+> > asked to explicitly enable or disable AVIC. By default, 'avic' is
+> > initialized to -1 and AVIC is enabled if Zen 4+ processor is detected
+> > (and other dependencies are satisfied).
+> > 
+> > So as not to break existing usage of 'avic' which was a boolean, switch
+> > to using module_param_cb() and use existing callbacks which expose this
+> > field as a boolean (so users can still continue to pass 'avic=on' or
+> > 'avic=off') but sets an integer value.
+> > 
+> > Finally, stop warning about missing HvInUseWrAllowed on SNP-enabled
+> > systems if trying to enable AVIC by default so as not to spam the kernel
+> > log.
 > 
-> Save CET SSP to SMRAM on SMI and reload it on RSM. KVM emulates HW arch
-> behavior when guest enters/leaves SMM mode,i.e., save registers to SMRAM
-> at the entry of SMM and reload them at the exit to SMM. Per SDM, SSP is
-> one of such registers on 64-bit Arch, and add the support for SSP.
-> 
-> Suggested-by: Sean Christopherson <seanjc@google.com>
-> Signed-off-by: Yang Weijiang <weijiang.yang@intel.com>
-> Tested-by: Mathias Krause <minipli@grsecurity.net>
-> Tested-by: John Allen <john.allen@amd.com>
-> Tested-by: Rick Edgecombe <rick.p.edgecombe@intel.com>
-> Signed-off-by: Chao Gao <chao.gao@intel.com>
-> Signed-off-by: Sean Christopherson <seanjc@google.com>
+> Printing once on a module load isn't spam.
 
-Reviewed-by: Xiaoyao Li <xiaoyao.li@intel.com>
+D'uh, :facepalm: - you're right.
+
+> 
+> > Users who specifically care about AVIC
+> 
+> Which we're trying to make "everyone" by enabling AVIC by default (even though
+> it's conditional).  The only thing that should care about the "auto" behavior is
+> the code that needs to resolve "auto", everything else should act as if "avic" is
+> a pure boolean.
+
+This was again about preventing a warning in the default case since 
+there is nothing that the user can do here. I think this will trigger on 
+most Zen 4 systems if SNP is enabled.
+
+By "users who specifically care about AVIC", I mean those users who want 
+to ensure it is enabled and have been loading kvm_amd with "avic=on".  
+For them, it is important to print a warning if there are missing 
+dependencies. For everyone else, I am not sure it is useful to print a 
+warning since there is nothing they can do.
+
+> 
+> > diff --git a/arch/x86/kvm/svm/avic.c b/arch/x86/kvm/svm/avic.c
+> > index 9fe1fd709458..6bd5079a01f1 100644
+> > --- a/arch/x86/kvm/svm/avic.c
+> > +++ b/arch/x86/kvm/svm/avic.c
+> > @@ -1095,8 +1095,13 @@ void avic_vcpu_unblocking(struct kvm_vcpu *vcpu)
+> >   */
+> >  void avic_hardware_setup(bool force_avic)
+> >  {
+> > +	bool default_avic = (avic == -1);
+> 
+> We should treat any negative value as "auto", otherwise I think the semantics get
+> a bit weird, e.g. -1 == auto, but -2 == on, which isn't very intuitive.
+
+Agree. The reason I hard-coded the check to -1 is because 'avic' is 
+being exposed as a boolean and there is no way for a user to set it to a 
+negative value.
+
+
+Thanks,
+Naveen
 
 
