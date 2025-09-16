@@ -1,114 +1,151 @@
-Return-Path: <kvm+bounces-57720-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-57721-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5AFE4B596E7
-	for <lists+kvm@lfdr.de>; Tue, 16 Sep 2025 15:05:11 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6CB76B59726
+	for <lists+kvm@lfdr.de>; Tue, 16 Sep 2025 15:14:02 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2E4973AECFF
-	for <lists+kvm@lfdr.de>; Tue, 16 Sep 2025 13:04:57 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8EB06320669
+	for <lists+kvm@lfdr.de>; Tue, 16 Sep 2025 13:13:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AF71A21FF36;
-	Tue, 16 Sep 2025 13:04:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D8B1E29ACEE;
+	Tue, 16 Sep 2025 13:12:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="lhKgI2f2"
+	dkim=fail reason="signature verification failed" (4096-bit key) header.d=alien8.de header.i=@alien8.de header.b="gmjf/lXN"
 X-Original-To: kvm@vger.kernel.org
-Received: from out-174.mta1.migadu.com (out-174.mta1.migadu.com [95.215.58.174])
+Received: from mail.alien8.de (mail.alien8.de [65.109.113.108])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2F31A21D5B0
-	for <kvm@vger.kernel.org>; Tue, 16 Sep 2025 13:04:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.174
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 579132DC32C;
+	Tue, 16 Sep 2025 13:12:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=65.109.113.108
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758027890; cv=none; b=FyNmO68PxNM+5lr2BRiro/HzbvII+SwOwzZjM8UynCJyyO0nDlwOf7MJXRpA8CoCPV0nOvU+bG0SkSHK/ruT4Y73zKBM4oVzdIeu7oo4D7wAh9b9P13olAznMHWHHebcd8HS4vVqKxHkNldFpgrUv8dfdzy26IaaUxnddYcWFMQ=
+	t=1758028379; cv=none; b=CBMkfvA+fHTy0csEHT7QbuOLpa4Sa1o5nwo/lCQGhzC+/F3axBYFHLa4DnRG+aQmJSdpy+P1YfFPUH3TbBJS5cGC9Ut/fuUjx5xuOusj+qnS0sTsXWCa59C2IU+6fwbV//AOP3caSZ5JIJ7Rt9dNtr98RFjrwlUisBvFSJuOv5I=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758027890; c=relaxed/simple;
-	bh=IclkClmNYuPrsM1evye5YOrVaiJ2idHg+P+9S29U8RI=;
+	s=arc-20240116; t=1758028379; c=relaxed/simple;
+	bh=ik/Ise1iswo7LmVkd0oG8YoqIncJ668v/g3g8ti6nAI=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=K7A20EsuBLiail0r/2ljU/A70Wy4Qn3tZVrYsKkD4F4ZP/sB8EIaswMzIJksUxDh1bqXs1Bsxp2JYDdAB8Vr7mjhMgyY4bBhLXljiuGgvYhczYSOad0iW4aBrcP9LBhLUNkNtUsn5c+GOVyO2g7P0+QGfft2uOdHPJSuNTE+giY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=lhKgI2f2; arc=none smtp.client-ip=95.215.58.174
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Date: Tue, 16 Sep 2025 08:04:31 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1758027877;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=/0wMpeo7+HuzXTCk6SZr1DvI6hGSc5rxKcjPuH42CqM=;
-	b=lhKgI2f240r2xWTG3lgdUooyhxt1bwBwWYgm4Fxbk7YPbv6zhZHCH6gQmd02oXsz09cTUq
-	LhznMFzGj/UXS7PhFwWihE+wErC9pBVMS5IEt0TuOavm0DMFF+e/BUoQd9Yr1ZfOUxvHJA
-	lVt306BPn5RiE8X6gGm/Ni6Bu/UZD84=
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Andrew Jones <andrew.jones@linux.dev>
-To: Mathias Krause <minipli@grsecurity.net>
-Cc: Alexandru Elisei <alexandru.elisei@arm.com>, 
-	Eric Auger <eric.auger@redhat.com>, Thomas Huth <thuth@redhat.com>, 
-	Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org, kvmarm@lists.linux.dev
-Subject: Re: [kvm-unit-tests PATCH v2 0/4] Better backtraces for leaf
- functions
-Message-ID: <20250916-47e5c9b9db5514de4d27a37c@orel>
-References: <20250915215432.362444-1-minipli@grsecurity.net>
+	 Content-Type:Content-Disposition:In-Reply-To; b=ekzN1S1bl/rGFrsOdr7g6DlfS808jh22/qyTPUzajUYqO86ZcJsiogE1ccLB5N9Ob7o+1AqMrMe/4yG1HNhA56UGnRB+IVMXytLUYp/ahLyr06Ee5HvfeWNczkLsf4Nl0b4obHV+iiFqZrawgvX63efZdnNweHKRUPluZi6npzY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=alien8.de; spf=pass smtp.mailfrom=alien8.de; dkim=fail (4096-bit key) header.d=alien8.de header.i=@alien8.de header.b=gmjf/lXN reason="signature verification failed"; arc=none smtp.client-ip=65.109.113.108
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=alien8.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=alien8.de
+Received: from localhost (localhost.localdomain [127.0.0.1])
+	by mail.alien8.de (SuperMail on ZX Spectrum 128k) with ESMTP id 5ACC740E01A2;
+	Tue, 16 Sep 2025 13:12:52 +0000 (UTC)
+X-Virus-Scanned: Debian amavisd-new at mail.alien8.de
+Authentication-Results: mail.alien8.de (amavisd-new); dkim=fail (4096-bit key)
+	reason="fail (body has been altered)" header.d=alien8.de
+Received: from mail.alien8.de ([127.0.0.1])
+	by localhost (mail.alien8.de [127.0.0.1]) (amavisd-new, port 10026)
+	with ESMTP id ttVk2Mn4Jhig; Tue, 16 Sep 2025 13:12:49 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=alien8;
+	t=1758028368; bh=NnBsyV+YEsnQMd6sc1QNEhxEPfHuUEo9ekvsKqyRBYs=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=gmjf/lXNIcIJDLPQtdWfx1fRSmvkzzEwQ8vP/zezZ0107I0vRCVnG8vzblIbimzMR
+	 X8ETN1ek9FNo+qVkh+/2kent5aIyRKV/zWvBbCrNCBDoB1AXeGBkOIlpUivWdiRLXj
+	 iUP+ygZFwUqH5m9N4GvEUDckKHUleCf6g7oaOUN6gmKJSrxOI9YeLtPZBZvl6j/EX6
+	 yNJtQXvYC84ewbNYlQYYrU1d0VptsrTwFY9MRkbqFBzPYcmbcX8cvfm8ssVzo1k7BK
+	 RykS64aDoG7iOgzYnx4AbOpH7vos50ko+AmHylvqYhjmM6iEqTlvh/B29arKI4r8gu
+	 Wqk2frZPZ1r0Wru0/phS3SK5BpjpaRerTe8cGME0SVAyfFxg44RbdZu8O3lB4TLQe5
+	 idvZGgm4/qG6c1RzzI7Ut2C7gX0/INOEnYVQhs7MSsv7ICThwyxa4lXvtWVyrqLUW8
+	 YffMmMXAVKXLfk7e7fOFb4p5LEAvEKi10B+cZz7Tpcwrhl3ko4vgmPgeb2fkwzhEiP
+	 0MaTLQ2cBd6+uVUfY66JBtSf/ezJEqLFQb78Mk0BBQ/yHE6hgSupPxKmCUmllpJJza
+	 RRQU/O1S0Tbod9G5uXfYCvXO2jcypjQIDUaUAiVuU+os+ZfYfLdSMJ/LEZS9b4YatR
+	 2sAel0TbLh/0/kKOVDBUSZjk=
+Received: from zn.tnic (p5de8ed27.dip0.t-ipconnect.de [93.232.237.39])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange ECDHE (P-256) server-signature ECDSA (P-256) server-digest SHA256)
+	(No client certificate requested)
+	by mail.alien8.de (SuperMail on ZX Spectrum 128k) with UTF8SMTPSA id 3E68F40E00DD;
+	Tue, 16 Sep 2025 13:12:28 +0000 (UTC)
+Date: Tue, 16 Sep 2025 15:12:21 +0200
+From: Borislav Petkov <bp@alien8.de>
+To: Ashish Kalra <Ashish.Kalra@amd.com>
+Cc: tglx@linutronix.de, mingo@redhat.com, dave.hansen@linux.intel.com,
+	x86@kernel.org, hpa@zytor.com, seanjc@google.com,
+	pbonzini@redhat.com, thomas.lendacky@amd.com,
+	herbert@gondor.apana.org.au, nikunj@amd.com, davem@davemloft.net,
+	aik@amd.com, ardb@kernel.org, john.allen@amd.com,
+	michael.roth@amd.com, Neeraj.Upadhyay@amd.com,
+	linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+	linux-crypto@vger.kernel.org
+Subject: Re: [PATCH v5 1/3] x86/sev: Add new dump_rmp parameter to
+ snp_leak_pages() API
+Message-ID: <20250916131221.GCaMliNe3NVmOwzHEN@fat_crate.local>
+References: <cover.1757969371.git.ashish.kalra@amd.com>
+ <18ddcc5f41fb718820cf6324dc0f1ace2df683aa.1757969371.git.ashish.kalra@amd.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20250915215432.362444-1-minipli@grsecurity.net>
-X-Migadu-Flow: FLOW_OUT
+In-Reply-To: <18ddcc5f41fb718820cf6324dc0f1ace2df683aa.1757969371.git.ashish.kalra@amd.com>
+Content-Transfer-Encoding: quoted-printable
 
-On Mon, Sep 15, 2025 at 11:54:28PM +0200, Mathias Krause wrote:
-> This is v2 of [1], trying to enhance backtraces involving leaf
-> functions.
-> 
-> This version fixes backtraces on ARM and ARM64 as well, as ARM currently
-> fails hard for leaf functions lacking a proper stack frame setup, making
-> it dereference invalid pointers. ARM64 just skips frames, much like x86
-> does.
+On Mon, Sep 15, 2025 at 09:21:58PM +0000, Ashish Kalra wrote:
+> @@ -668,6 +673,7 @@ static inline int rmp_make_private(u64 pfn, u64 gpa=
+, enum pg_level level, u32 as
+>  	return -ENODEV;
+>  }
+>  static inline int rmp_make_shared(u64 pfn, enum pg_level level) { retu=
+rn -ENODEV; }
+> +static inline void __snp_leak_pages(u64 pfn, unsigned int npages, bool=
+ dump_rmp) {}
+>  static inline void snp_leak_pages(u64 pfn, unsigned int npages) {}
 
-Hi Mathias,
+I basically don't even have to build your patch to see that this can't bu=
+ild.
+See below.
 
-Thank you for the arm/arm64 fixes!
+When your patch touches code behind different CONFIG_ items, you must mak=
+e
+sure it builds with both settings of each CONFIG_ item.
 
-For the arm/arm64 patches
+In file included from arch/x86/boot/startup/gdt_idt.c:9:
+./arch/x86/include/asm/sev.h:679:20: error: redefinition of =E2=80=98snp_=
+leak_pages=E2=80=99
+  679 | static inline void snp_leak_pages(u64 pfn, unsigned int pages)
+      |                    ^~~~~~~~~~~~~~
+./arch/x86/include/asm/sev.h:673:20: note: previous definition of =E2=80=98=
+snp_leak_pages=E2=80=99 with type =E2=80=98void(u64,  unsigned int)=E2=80=
+=99 {aka =E2=80=98void(long long unsigned int,  unsigned int)=E2=80=99}
+  673 | static inline void snp_leak_pages(u64 pfn, unsigned int npages) {=
+}
+      |                    ^~~~~~~~~~~~~~
+make[4]: *** [scripts/Makefile.build:287: arch/x86/boot/startup/gdt_idt.o=
+] Error 1
+make[3]: *** [scripts/Makefile.build:556: arch/x86/boot/startup] Error 2
+make[2]: *** [scripts/Makefile.build:556: arch/x86] Error 2
+make[2]: *** Waiting for unfinished jobs....
+In file included from drivers/iommu/amd/init.c:32:
+./arch/x86/include/asm/sev.h:679:20: error: redefinition of =E2=80=98snp_=
+leak_pages=E2=80=99
+  679 | static inline void snp_leak_pages(u64 pfn, unsigned int pages)
+      |                    ^~~~~~~~~~~~~~
+./arch/x86/include/asm/sev.h:673:20: note: previous definition of =E2=80=98=
+snp_leak_pages=E2=80=99 with type =E2=80=98void(u64,  unsigned int)=E2=80=
+=99 {aka =E2=80=98void(long long unsigned int,  unsigned int)=E2=80=99}
+  673 | static inline void snp_leak_pages(u64 pfn, unsigned int npages) {=
+}
+      |                    ^~~~~~~~~~~~~~
+make[5]: *** [scripts/Makefile.build:287: drivers/iommu/amd/init.o] Error=
+ 1
+make[4]: *** [scripts/Makefile.build:556: drivers/iommu/amd] Error 2
+make[4]: *** Waiting for unfinished jobs....
+make[3]: *** [scripts/Makefile.build:556: drivers/iommu] Error 2
+make[3]: *** Waiting for unfinished jobs....
+make[2]: *** [scripts/Makefile.build:556: drivers] Error 2
+make[1]: *** [/mnt/kernel/kernel/linux/Makefile:2011: .] Error 2
+make: *** [Makefile:248: __sub-make] Error 2
 
-Reviewed-by: Andrew Jones <andrew.jones@linux.dev>
-Tested-by: Andrew Jones <andrew.jones@linux.dev>
+--=20
+Regards/Gruss,
+    Boris.
 
-Thanks,
-drew
-
-> 
-> v2 fixes this by introducing the concept of "late CFLAGS" that get
-> evaluated in the top-level Makefile once all other optional flags have
-> been added to $(CFLAGS), which is needed for x86's version at least.
-> 
-> Please apply!
-> 
-> Thanks,
-> Mathias
-> 
-> [1] https://lore.kernel.org/kvm/20250724181759.1974692-1-minipli@grsecurity.net/
-> 
-> Mathias Krause (4):
->   Makefile: Provide a concept of late CFLAGS
->   x86: Better backtraces for leaf functions
->   arm64: Better backtraces for leaf functions
->   arm: Fix backtraces involving leaf functions
-> 
->  Makefile            |  4 ++++
->  arm/Makefile.arm    |  8 ++++++++
->  arm/Makefile.arm64  |  6 ++++++
->  x86/Makefile.common | 11 +++++++++++
->  lib/arm/stack.c     | 18 ++++++++++++++++--
->  5 files changed, 45 insertions(+), 2 deletions(-)
-> 
-> -- 
-> 2.47.3
-> 
+https://people.kernel.org/tglx/notes-about-netiquette
 
