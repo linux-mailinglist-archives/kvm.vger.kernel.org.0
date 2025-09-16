@@ -1,185 +1,193 @@
-Return-Path: <kvm+bounces-57702-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-57703-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id BC261B59206
-	for <lists+kvm@lfdr.de>; Tue, 16 Sep 2025 11:22:52 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id C54D7B59211
+	for <lists+kvm@lfdr.de>; Tue, 16 Sep 2025 11:24:51 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 1F8821897647
-	for <lists+kvm@lfdr.de>; Tue, 16 Sep 2025 09:23:05 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id E909A189B41C
+	for <lists+kvm@lfdr.de>; Tue, 16 Sep 2025 09:25:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6711A299A82;
-	Tue, 16 Sep 2025 09:22:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2114229AB11;
+	Tue, 16 Sep 2025 09:24:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=shutemov.name header.i=@shutemov.name header.b="oW/O5h38";
-	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="RB5svWqQ"
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="HcYlV+dZ"
 X-Original-To: kvm@vger.kernel.org
-Received: from flow-a2-smtp.messagingengine.com (flow-a2-smtp.messagingengine.com [103.168.172.137])
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 406B328AAEE;
-	Tue, 16 Sep 2025 09:22:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=103.168.172.137
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BD95629898B;
+	Tue, 16 Sep 2025 09:24:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758014553; cv=none; b=K3THq7n/fMnElE9mdliH7667jaXILBf0kg/4HsbdSlyGLzTupQqkbRWa9bk9s4hduhTlWBmaVI4rrT3W9TCCgNeMxRKQA3TMMQC3snLhCJvc3b0Dek9rHF6KEdFrIugg3YXn3v8rLJr5pcGk2eBvWAKo1pz+VsLnrN4G4dWDnoM=
+	t=1758014679; cv=none; b=U2sefE2Hes33YaW4kCLbztjxiuDvAyq26FvLNJ+o3Klz97SycQdxro80YAOxDgGND9D2SRwzWSnmwFZfbQLzmdKgf66XRKHwF5zJinTrR/02xSovXNSho3bvdkHnX67t8OarzrqMh95E5/82dXuKVvdg7Nl7XhT5wZ8lu46wqno=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758014553; c=relaxed/simple;
-	bh=uDFP1Elkv6seivo+LIxr0JIvmVyfvOaAlFK/sYvsAvc=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=EANqhV0ttg5F7ULLT9R+QQd85IsohnXdsxL51WFl2qUnMbTe+qFuNs8Qg3SCUsa6Zsusvr2WYFmsuQOYG8BA8m9AKRQGFR1z/nZwgwcbmo3j+Zs4O0IKkBUrq497HoRIBt49TBmwqH/bix8T5EFvTf8ckbkaqzZwerUWZyHiQIY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=shutemov.name; spf=pass smtp.mailfrom=shutemov.name; dkim=pass (2048-bit key) header.d=shutemov.name header.i=@shutemov.name header.b=oW/O5h38; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=RB5svWqQ; arc=none smtp.client-ip=103.168.172.137
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=shutemov.name
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=shutemov.name
-Received: from phl-compute-05.internal (phl-compute-05.internal [10.202.2.45])
-	by mailflow.phl.internal (Postfix) with ESMTP id 440D41380341;
-	Tue, 16 Sep 2025 05:22:30 -0400 (EDT)
-Received: from phl-mailfrontend-02 ([10.202.2.163])
-  by phl-compute-05.internal (MEProxy); Tue, 16 Sep 2025 05:22:30 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=shutemov.name;
-	 h=cc:cc:content-type:content-type:date:date:from:from
-	:in-reply-to:in-reply-to:message-id:mime-version:references
-	:reply-to:subject:subject:to:to; s=fm3; t=1758014550; x=
-	1758021750; bh=4+KQ3+PwUEQhtf+X1G7fk/FknoUQqoDfKqod06UBKZY=; b=o
-	W/O5h38vUjYtcHCAUJJdLFHPaiY1GD1kabJHh/AKQZ/kLfRom/mRou6mGioDcHzB
-	6ePoJmJOhuYVN3nWEYB1JeVZaZgEvsD96Ghyly8JDUz68lINHPjCzUpEGIYAUk8t
-	/FZjbNQxyDfVkLSg/M2BZgHfHB0PeMxb6f4jUVhjwoCLt6recB8DmCSZCk/gBGoD
-	ZbAJm84tIEG0pWbMehD6dORvzwkYMJtTF/SYuhQMnnbLste3ULLYdBHTFoOBaV5S
-	JYhi/Oo5EnAUsvosvZKznVu8yxh0wB+CVj64AgnWflOFLfe2rjcCWWNx9mp1wSog
-	k3KRgC1osZIWyb4W0y1sA==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-	messagingengine.com; h=cc:cc:content-type:content-type:date:date
-	:feedback-id:feedback-id:from:from:in-reply-to:in-reply-to
-	:message-id:mime-version:references:reply-to:subject:subject:to
-	:to:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=fm1; t=
-	1758014550; x=1758021750; bh=4+KQ3+PwUEQhtf+X1G7fk/FknoUQqoDfKqo
-	d06UBKZY=; b=RB5svWqQ90YJVks1r1cw97+W9YtRY6WreVqQVg+RHn6uQaU5e/9
-	4ajcON/phqEEdkuL6D6/YzYxVdrtUHkG3bi6XWOy80U5fzOAQqcyCCK6bqwmZg0h
-	SFlpsiDqwAbClt0FygWKlgD+PlV7rvo81NgqMiRXP1sFL0TlaynjKrYy1eSUvgC7
-	Mg0/kdis0AaGFLcMOko9ozxBT2d3s0PE8+oa0BYy9ALtOH2E+NW8q5DDAzg/WPT+
-	VxT5EDNd093gZfUEl4G93xHZjDGKLqL+5Wk0OoU4xBy1uE9VAZKH7hm9EiweRSDR
-	tlRCfSVBtY0g4BUQF5g03PrQyVjfu4r3apw==
-X-ME-Sender: <xms:VSzJaDQJKAiOPEQ1mJaM0njFJPrysk_rvLV7mJ1iF-FZRK4YM-BT1w>
-    <xme:VSzJaPk0edTXIjbjSa3aVyOzjzkAQM0NxMpsDCN3P3hzFMckLv7YClMpAAYA5UHfi
-    vDmEE7kQH5qmC05LsQ>
-X-ME-Received: <xmr:VSzJaHEQ5_JfGR-IhrUd0hnTxRGeu_eecL0RAMRzazPCyxAYcYpwyJGRmkB6Vw>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeeffedrtdeggdegtddvtdcutefuodetggdotefrod
-    ftvfcurfhrohhfihhlvgemucfhrghsthforghilhdpuffrtefokffrpgfnqfghnecuuegr
-    ihhlohhuthemuceftddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmdenucfjug
-    hrpeffhffvvefukfhfgggtuggjsehttdfstddttddvnecuhfhrohhmpefmihhrhihlucfu
-    hhhuthhsvghmrghuuceokhhirhhilhhlsehshhhuthgvmhhovhdrnhgrmhgvqeenucggtf
-    frrghtthgvrhhnpeegfeehleevvdetffeluefftdffledvgfetheegieevtefgfefhieej
-    heevkeeigeenucffohhmrghinhepkhgvrhhnvghlrdhorhhgnecuvehluhhsthgvrhfuih
-    iivgeptdenucfrrghrrghmpehmrghilhhfrhhomhepkhhirhhilhhlsehshhhuthgvmhho
-    vhdrnhgrmhgvpdhnsggprhgtphhtthhopeefvddpmhhouggvpehsmhhtphhouhhtpdhrtg
-    hpthhtoheprhhitghkrdhprdgvughgvggtohhmsggvsehinhhtvghlrdgtohhmpdhrtghp
-    thhtohepkhhirhhilhhlrdhshhhuthgvmhhovheslhhinhhugidrihhnthgvlhdrtghomh
-    dprhgtphhtthhopehpsghonhiiihhnihesrhgvughhrghtrdgtohhmpdhrtghpthhtohep
-    shgvrghnjhgtsehgohhoghhlvgdrtghomhdprhgtphhtthhopegurghvvgdrhhgrnhhsvg
-    hnsehlihhnuhigrdhinhhtvghlrdgtohhmpdhrtghpthhtoheptghhrghordhgrghosehi
-    nhhtvghlrdgtohhmpdhrtghpthhtohepsghpsegrlhhivghnkedruggvpdhrtghpthhtoh
-    epkhgrihdrhhhurghnghesihhnthgvlhdrtghomhdprhgtphhtthhopeigkeeisehkvghr
-    nhgvlhdrohhrgh
-X-ME-Proxy: <xmx:VSzJaCk-OzVNIZ8vFX7FoaPBHi9k8zpyWN5vLhPKUZAEAfKU-Ba5Mg>
-    <xmx:VSzJaGTObaOODpAZYInvhW9rXVKQqYVoyAPxGk9U0ypdJqOJ6bx4jg>
-    <xmx:VSzJaH4DPUS4icMHfGuU_op6OAcjUtOY6G9AaqqvSkFiCwVFFgsG5g>
-    <xmx:VSzJaNHMmhi6QhN8Sk9NoTuJEWPY7qji05lyAjFvyRrwV1XuESADSw>
-    <xmx:VizJaBm1O3K8VuCU37NtTdh6Jnj2lqU54QaxZCUdojXFn7vHZc5Ep8Ia>
-Feedback-ID: ie3994620:Fastmail
-Received: by mail.messagingengine.com (Postfix) with ESMTPA; Tue,
- 16 Sep 2025 05:22:29 -0400 (EDT)
-Date: Tue, 16 Sep 2025 10:22:26 +0100
-From: Kiryl Shutsemau <kirill@shutemov.name>
-To: "Edgecombe, Rick P" <rick.p.edgecombe@intel.com>
-Cc: "kirill.shutemov@linux.intel.com" <kirill.shutemov@linux.intel.com>, 
-	"pbonzini@redhat.com" <pbonzini@redhat.com>, "seanjc@google.com" <seanjc@google.com>, 
-	"dave.hansen@linux.intel.com" <dave.hansen@linux.intel.com>, "Gao, Chao" <chao.gao@intel.com>, "bp@alien8.de" <bp@alien8.de>, 
-	"Huang, Kai" <kai.huang@intel.com>, "x86@kernel.org" <x86@kernel.org>, 
-	"mingo@redhat.com" <mingo@redhat.com>, "Zhao, Yan Y" <yan.y.zhao@intel.com>, 
-	"tglx@linutronix.de" <tglx@linutronix.de>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>, 
-	"linux-coco@lists.linux.dev" <linux-coco@lists.linux.dev>, "Yamahata, Isaku" <isaku.yamahata@intel.com>, 
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
-Subject: Re: [PATCHv2 04/12] x86/virt/tdx: Add tdx_alloc/free_page() helpers
-Message-ID: <bfaswqmlsyycr3alibn6f422cjtpd6ybssjekvrrz4zdwgwfcz@pxy25ra4sln2>
-References: <20250609191340.2051741-1-kirill.shutemov@linux.intel.com>
- <20250609191340.2051741-5-kirill.shutemov@linux.intel.com>
- <6c545c841afcd23e1b3a4fcb47573ee3a178d6e1.camel@intel.com>
+	s=arc-20240116; t=1758014679; c=relaxed/simple;
+	bh=lcgW+5ROBPO0QpX7ggPIJKPO+dlkPW76ft8W7CrSM70=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=XJnloK80ZuJqP6i07tShSOKFIj3pTl7UqvRmiuuCjaQ2rpbQRahxa2oELrSBQT80EuwfAFCsih/tUhCBWULhUk7qujWDWekgx7P29AFY0fFd7swfxSPtCMi5vDVvDQcFsFEcW7v5iDTrzqr4VdKt/2F9V1X3NsOfkeiIK/MqTyI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=HcYlV+dZ; arc=none smtp.client-ip=148.163.156.1
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
+Received: from pps.filterd (m0360083.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 58G2nih6019175;
+	Tue, 16 Sep 2025 09:24:33 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
+	:content-transfer-encoding:content-type:date:from:in-reply-to
+	:message-id:mime-version:references:subject:to; s=pp1; bh=cpKZz4
+	XYlZyX7UVdnlJ55i8LjnpWTWiMKmZRFBrbocI=; b=HcYlV+dZGiACToUX4GkcaZ
+	w3Dspd93j22x83DW9dnwNHpXYkMrIEzjMBijW6b+A8dK9A++aT6ftk4bjbgs6qjA
+	4QFDjnpc8hCpa0WQ+jthJWz0sBQgE5Ia4kRkrnYoi/9DmsgXnQp5B/UN+yQJ8hA7
+	J0puldJ9dShbXYfhfLHZiu4VCebYmPS6DN9rp4wL0hwyi+FfJsAFDR0n5UNkQNta
+	fKCXrg/3jSPconK8sBnEmY2e0fUiJzR5duggGpbk6cugKlLA4LEZJwpTvo+gu1pb
+	7ssy4oJj5jCPwIuRzQI706VRaMdcypTTKEOKq8zkpRvRj5bhe4tvwbLUPuS5gD8Q
+	==
+Received: from ppma23.wdc07v.mail.ibm.com (5d.69.3da9.ip4.static.sl-reverse.com [169.61.105.93])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 496gat6jth-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Tue, 16 Sep 2025 09:24:32 +0000 (GMT)
+Received: from pps.filterd (ppma23.wdc07v.mail.ibm.com [127.0.0.1])
+	by ppma23.wdc07v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 58G7BqwK027349;
+	Tue, 16 Sep 2025 09:24:31 GMT
+Received: from smtprelay06.fra02v.mail.ibm.com ([9.218.2.230])
+	by ppma23.wdc07v.mail.ibm.com (PPS) with ESMTPS id 495men332b-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Tue, 16 Sep 2025 09:24:31 +0000
+Received: from smtpav05.fra02v.mail.ibm.com (smtpav05.fra02v.mail.ibm.com [10.20.54.104])
+	by smtprelay06.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 58G9ORt830933472
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Tue, 16 Sep 2025 09:24:27 GMT
+Received: from smtpav05.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id BF91120043;
+	Tue, 16 Sep 2025 09:24:27 +0000 (GMT)
+Received: from smtpav05.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 80A4F20040;
+	Tue, 16 Sep 2025 09:24:27 +0000 (GMT)
+Received: from p-imbrenda (unknown [9.152.224.66])
+	by smtpav05.fra02v.mail.ibm.com (Postfix) with ESMTP;
+	Tue, 16 Sep 2025 09:24:27 +0000 (GMT)
+Date: Tue, 16 Sep 2025 11:24:25 +0200
+From: Claudio Imbrenda <imbrenda@linux.ibm.com>
+To: Steffen Eiden <seiden@linux.ibm.com>
+Cc: kvm@vger.kernel.org, linux-s390@vger.kernel.org, borntraeger@de.ibm.com,
+        frankja@linux.ibm.com, nsg@linux.ibm.com, nrb@linux.ibm.com,
+        schlameuss@linux.ibm.com, hca@linux.ibm.com, svens@linux.ibm.com,
+        agordeev@linux.ibm.com, david@redhat.com,
+        gerald.schaefer@linux.ibm.com
+Subject: Re: [PATCH v2 18/20] KVM: S390: Remove PGSTE code from linux/s390
+ mm
+Message-ID: <20250916112425.0b0d65b8@p-imbrenda>
+In-Reply-To: <20250916073038.68862-A-seiden@linux.ibm.com>
+References: <20250910180746.125776-1-imbrenda@linux.ibm.com>
+	<20250910180746.125776-19-imbrenda@linux.ibm.com>
+	<20250916073038.68862-A-seiden@linux.ibm.com>
+Organization: IBM
+X-Mailer: Claws Mail 4.3.1 (GTK 3.24.49; x86_64-redhat-linux-gnu)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <6c545c841afcd23e1b3a4fcb47573ee3a178d6e1.camel@intel.com>
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Authority-Analysis: v=2.4 cv=BKWzrEQG c=1 sm=1 tr=0 ts=68c92cd1 cx=c_pps
+ a=3Bg1Hr4SwmMryq2xdFQyZA==:117 a=3Bg1Hr4SwmMryq2xdFQyZA==:17
+ a=kj9zAlcOel0A:10 a=yJojWOMRYYMA:10 a=VnNF1IyMAAAA:8 a=l1XlMsZtLEffUVEgH-4A:9
+ a=CjuIK1q_8ugA:10
+X-Proofpoint-GUID: gvK3LA3av5HPHuLa81xv9NR7nM0gEkCc
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUwOTE1MDA4NiBTYWx0ZWRfX7Nxqjiip2a3k
+ L++PCNw11n6Sz8n2a8EMxBonlndONZ+t0YYx2+HvaBv45182NYh0jJDdroO0NFAyvJRL5WZ2ERz
+ iYFMqRvyqqy5Eole3LLQaofGH+lyhP8OpX7m9tNIf0MCPvCFdjh7GXL5TLRsWIU3RuoQE1mH1ee
+ LdlQkJB3U0Xh0wySYmIBmTzBW4X8tw1MfSAZG4CY6NJVRcpG/jdm/D+wdSK+ZMAfWCqHSrRnB+S
+ JA5zY2xdGWkhKhQqEEzRJ9jKoZlDeV0EY3CcAxS3x6CueuUmYrnIMDHQPZ3Jf61mnXfcjdSRCGc
+ V8hOwOJEZCqpjUc6Fx0pW4mMix5+FBn5iNY7k7AZpLGaLOK4LJkPe1INY0BQa/giJtndvO8BJUu
+ mRmrT7r7
+X-Proofpoint-ORIG-GUID: gvK3LA3av5HPHuLa81xv9NR7nM0gEkCc
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1117,Hydra:6.1.9,FMLib:17.12.80.40
+ definitions=2025-09-16_02,2025-09-12_01,2025-03-28_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ spamscore=0 clxscore=1015 malwarescore=0 priorityscore=1501 adultscore=0
+ suspectscore=0 impostorscore=0 bulkscore=0 phishscore=0
+ classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
+ reason=mlx scancount=1 engine=8.19.0-2507300000 definitions=main-2509150086
 
-On Tue, Sep 16, 2025 at 12:03:26AM +0000, Edgecombe, Rick P wrote:
-> On Mon, 2025-06-09 at 22:13 +0300, Kirill A. Shutemov wrote:
-> > +
-> > +static int tdx_pamt_add(atomic_t *pamt_refcount, unsigned long hpa,
-> > +			struct list_head *pamt_pages)
-> > +{
-> > +	u64 err;
-> > +
-> > +	guard(spinlock)(&pamt_lock);
-> > +
-> > +	hpa = ALIGN_DOWN(hpa, PMD_SIZE);
-> > +
-> > +	/* Lost race to other tdx_pamt_add() */
-> > +	if (atomic_read(pamt_refcount) != 0) {
-> > +		atomic_inc(pamt_refcount);
-> > +		return 1;
-> > +	}
-> > +
-> > +	err = tdh_phymem_pamt_add(hpa | TDX_PS_2M, pamt_pages);
-> > +
-> > +	/*
-> > +	 * tdx_hpa_range_not_free() is true if current task won race
-> > +	 * against tdx_pamt_put().
-> > +	 */
-> > +	if (err && !tdx_hpa_range_not_free(err)) {
-> > +		pr_err("TDH_PHYMEM_PAMT_ADD failed: %#llx\n", err);
-> > +		return -EIO;
-> > +	}
-> > +
-> > +	atomic_set(pamt_refcount, 1);
-> > +
-> > +	if (tdx_hpa_range_not_free(err))
-> > +		return 1;
+On Tue, 16 Sep 2025 09:30:38 +0200
+Steffen Eiden <seiden@linux.ibm.com> wrote:
+
+> On Wed, Sep 10, 2025 at 08:07:44PM +0200, Claudio Imbrenda wrote:
+> > Remove the PGSTE config option.
+> > Remove all code from linux/s390 mm that involves PGSTEs.
+> > 
+> > Signed-off-by: Claudio Imbrenda <imbrenda@linux.ibm.com>
+> > ---
+> >  arch/s390/Kconfig               |   3 -
+> >  arch/s390/include/asm/mmu.h     |  13 -
+> >  arch/s390/include/asm/page.h    |   4 -
+> >  arch/s390/include/asm/pgalloc.h |   2 -
+> >  arch/s390/include/asm/pgtable.h |  99 +---
+> >  arch/s390/mm/hugetlbpage.c      |  24 -
+> >  arch/s390/mm/pgalloc.c          |  29 --
+> >  arch/s390/mm/pgtable.c          | 827 +-------------------------------
+> >  mm/khugepaged.c                 |   9 -
+> >  9 files changed, 14 insertions(+), 996 deletions(-)
+> >   
 > 
-> Hey Kirill,
+> ...
 > 
-> I couldn't figure out how this tdx_hpa_range_not_free() check helps. We are
-> already inside the lock also taken by any operation that might affect PAMT
-> state. Can you explain more about this? Otherwise I'm going to drop it for
-> inability to explain.
+> >  #define INIT_MM_CONTEXT(name)						   \
+> > diff --git a/arch/s390/include/asm/page.h b/arch/s390/include/asm/page.h
+> > index 4e5dbabdf202..b4fb4d7adff4 100644
+> > --- a/arch/s390/include/asm/page.h
+> > +++ b/arch/s390/include/asm/page.h
+> > @@ -78,7 +78,6 @@ static inline void copy_page(void *to, void *from)
+> >  #ifdef STRICT_MM_TYPECHECKS
+> >  
+> >  typedef struct { unsigned long pgprot; } pgprot_t;
+> > -typedef struct { unsigned long pgste; } pgste_t;
+> >  typedef struct { unsigned long pte; } pte_t;
+> >  typedef struct { unsigned long pmd; } pmd_t;
+> >  typedef struct { unsigned long pud; } pud_t;
+> > @@ -94,7 +93,6 @@ static __always_inline unsigned long name ## _val(name ## _t name)	\
+> >  #else /* STRICT_MM_TYPECHECKS */
+> >  
+> >  typedef unsigned long pgprot_t;
+> > -typedef unsigned long pgste_t;
+> >  typedef unsigned long pte_t;
+> >  typedef unsigned long pmd_t;
+> >  typedef unsigned long pud_t;
+> > @@ -110,7 +108,6 @@ static __always_inline unsigned long name ## _val(name ## _t name)	\
+> >  #endif /* STRICT_MM_TYPECHECKS */
+> >  
+> >  DEFINE_PGVAL_FUNC(pgprot)
+> > -DEFINE_PGVAL_FUNC(pgste)
+> >  DEFINE_PGVAL_FUNC(pte)
+> >  DEFINE_PGVAL_FUNC(pmd)
+> >  DEFINE_PGVAL_FUNC(pud)
+> > @@ -120,7 +117,6 @@ DEFINE_PGVAL_FUNC(pgd)
+> >  typedef pte_t *pgtable_t;
+> >  
+> >  #define __pgprot(x)	((pgprot_t) { (x) } )
+> > -#define __pgste(x)	((pgste_t) { (x) } )
+> >  #define __pte(x)        ((pte_t) { (x) } )
+> >  #define __pmd(x)        ((pmd_t) { (x) } )
+> >  #define __pud(x)	((pud_t) { (x) } )  
+> 
+> 
+> You missed to remove the PGSTE_*_BIT{,S} and _PGSTE_GPS_* definitions in
+> arch/s390/include/asm/pgtable.h
+> (I found them at line 417.. (based on 6.16 with your patches applied))
+> 
+> Or are they kept on purpose? I could not find any usage after your patches.
+> 
+> Steffen
 
-My git has comment for the check:
+I do use PGSTE_IN_BIT, PGSTE_PCL_BIT and PGSTE_UC_BIT, but I should
+probably move those to dat.h, and remove all the other unused
+PGSTE_*_BIT and _PGSTE_GPS_* macros from page.h
 
-https://git.kernel.org/pub/scm/linux/kernel/git/kas/linux.git/tree/arch/x86/virt/vmx/tdx/tdx.c?h=tdx/dpamt&id=375706fe73a8499dbdddb22c13d19d7286280ad6#n2160
-
-Consider the following scenario
-
-		CPU0					CPU1
-tdx_pamt_put()
-  atomic_dec_and_test() == true
-  					tdx_pamt_get()
-					  atomic_inc_not_zero() == false
-					  tdx_pamt_add()
-					    <takes pamt_lock>
-					    // CPU0 never removed PAMT memory
-					    tdh_phymem_pamt_add() == HPA_RANGE_NOT_FREE
-					    atomic_set(1);
-					    <drops pamt_lock>
-  <takes pamt_lock>
-  // Lost the race to CPU1
-  atomic_read() > 0
-  <drop pamt_lock>
-
-Does it make sense?
-
--- 
-  Kiryl Shutsemau / Kirill A. Shutemov
 
