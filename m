@@ -1,267 +1,242 @@
-Return-Path: <kvm+bounces-57675-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-57676-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 12AAAB58E58
-	for <lists+kvm@lfdr.de>; Tue, 16 Sep 2025 08:18:27 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id BC961B58E6D
+	for <lists+kvm@lfdr.de>; Tue, 16 Sep 2025 08:23:47 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 7EA071B23435
-	for <lists+kvm@lfdr.de>; Tue, 16 Sep 2025 06:18:48 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3D9E216F418
+	for <lists+kvm@lfdr.de>; Tue, 16 Sep 2025 06:23:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CCF8D2C11EC;
-	Tue, 16 Sep 2025 06:18:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A47B42E040D;
+	Tue, 16 Sep 2025 06:23:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="BqugnTqz"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="lv6xc298"
 X-Original-To: kvm@vger.kernel.org
-Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yw1-f170.google.com (mail-yw1-f170.google.com [209.85.128.170])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3BDF213B293
-	for <kvm@vger.kernel.org>; Tue, 16 Sep 2025 06:18:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EBDC22DE704
+	for <kvm@vger.kernel.org>; Tue, 16 Sep 2025 06:23:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.170
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758003500; cv=none; b=eJOXvXlR/O3dwt697ycoskVZvyy1eUv3HFvKRfAK1An4MXtNDEEBtCTwb/FvNCjbE/z8XhsiR3gZ7Pk+LvEpghlluO3hwkxjEbAbXVZhF/1vQdycMkN06OXpJvqcfihqxPw+eldZCGEW+DqZvf8hXkFgecFSpKSSYcQHUGXSfMg=
+	t=1758003809; cv=none; b=cdVCy/zsZCEuMs/BRJiuGR5KJ5w7ggVp8QPMGsK6ZltE45GNSDRbhJ5o8IYgugvZVcqnpjRJ4DVXhGJOisjNlMMHEilTE8w0BAoD52vSE9Hj08+ZRNYz8SesBRE000ZvX6BqQ/mamEq7NvSPwkWsHcr0jDrP5H+x9tdIh9Vt1e8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758003500; c=relaxed/simple;
-	bh=uFWGhlA3mDZh9/MHGNabuAyDeWGAel/nv/BBh5Mcq2k=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=jvhzxnoOwXvJjN+xgi+KQVxyi+9F+kfBfWOkSL8B1dtDyCBXi+blYklwIaMIa+30CMa64nNDGpXJHKmHwP1hARW6wTaVOYd/roYqDSYU5vfiYgq+tMXrR70CkMh1z6oBDdvs6UlMO0+S6RxvB2rqj+sCXW6x8w+YtENDEMEUKdM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=BqugnTqz; arc=none smtp.client-ip=148.163.158.5
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
-Received: from pps.filterd (m0356516.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 58G5VsGD031553;
-	Tue, 16 Sep 2025 06:18:07 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
-	:content-transfer-encoding:date:from:message-id:mime-version
-	:subject:to; s=pp1; bh=o8FvyA884sDbTFyfaccM/3oCnolBTd6Hw/6ZhdXs+
-	2k=; b=BqugnTqzjwH2CFMM7quItzy20XfOLSV9RMm/ik2iVgW0CZOQRQFaL36Vz
-	gZOmsA5uoxi/GUOARTjN/mu2bgd1ljPY72U532R5/4sl3O1Xj4hy+GRjrVHFRhwV
-	L/kui5yZGas5n8/yU8sMLkBXF1GqNo+1Lgycibj3S7MfZppxcNq17/sQQo7cknPP
-	Yj93eO+pdD3TRDhyzo9U2eplnos1G6JQ0HmjmANZvE/ufV4xLj7cP07h5MGtYlei
-	VNifZTdyeARQclTcPfH+3wXQRwf26foDZiP10nqrBkj9aAjjOyKGhFd2tk97dDhC
-	Dl2m/iY/jgmcoXFCPQaH6vG8PtM8A==
-Received: from pps.reinject (localhost [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 494x1tenug-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Tue, 16 Sep 2025 06:18:07 +0000 (GMT)
-Received: from m0356516.ppops.net (m0356516.ppops.net [127.0.0.1])
-	by pps.reinject (8.18.1.12/8.18.0.8) with ESMTP id 58G6FDQK007283;
-	Tue, 16 Sep 2025 06:18:07 GMT
-Received: from ppma23.wdc07v.mail.ibm.com (5d.69.3da9.ip4.static.sl-reverse.com [169.61.105.93])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 494x1tenuf-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Tue, 16 Sep 2025 06:18:07 +0000 (GMT)
-Received: from pps.filterd (ppma23.wdc07v.mail.ibm.com [127.0.0.1])
-	by ppma23.wdc07v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 58G3BkFc027358;
-	Tue, 16 Sep 2025 06:18:06 GMT
-Received: from smtprelay07.fra02v.mail.ibm.com ([9.218.2.229])
-	by ppma23.wdc07v.mail.ibm.com (PPS) with ESMTPS id 495men2ck1-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Tue, 16 Sep 2025 06:18:06 +0000
-Received: from smtpav05.fra02v.mail.ibm.com (smtpav05.fra02v.mail.ibm.com [10.20.54.104])
-	by smtprelay07.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 58G6I2kQ48365832
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Tue, 16 Sep 2025 06:18:02 GMT
-Received: from smtpav05.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 5D6CE20043;
-	Tue, 16 Sep 2025 06:18:02 +0000 (GMT)
-Received: from smtpav05.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id C8CA02004B;
-	Tue, 16 Sep 2025 06:17:59 +0000 (GMT)
-Received: from mac.in.ibm.com (unknown [9.109.215.35])
-	by smtpav05.fra02v.mail.ibm.com (Postfix) with ESMTP;
-	Tue, 16 Sep 2025 06:17:59 +0000 (GMT)
-From: Gautam Menghani <gautam@linux.ibm.com>
-To: harshpb@linux.ibm.com, vaibhav@linux.ibm.com, nicholas@linux.ibm.com,
-        rathc@linux.ibm.com, npiggin@gmail.com, pbonzini@redhat.com
-Cc: Gautam Menghani <gautam@linux.ibm.com>, qemu-ppc@nongnu.org,
-        qemu-devel@nongnu.org, kvm@vger.kernel.org
-Subject: [PATCH v4] hw/ppc/spapr_hcall: Return host mitigation characteristics in KVM mode
-Date: Tue, 16 Sep 2025 11:47:53 +0530
-Message-Id: <20250916061753.20517-1-gautam@linux.ibm.com>
-X-Mailer: git-send-email 2.39.5 (Apple Git-154)
+	s=arc-20240116; t=1758003809; c=relaxed/simple;
+	bh=ATPz90HRMzTO45UePY5i8G0/KGUUiD+EHn3zGHoMIzU=;
+	h=Date:From:To:cc:Subject:In-Reply-To:Message-ID:References:
+	 MIME-Version:Content-Type; b=Q2AWA3Sy9xPzgYHNhBaiIzpGyxZZ3Q7nlUUayePYemAn6QsSWnk43FNtn0idSqr7YtJbRCiNcsbbdY38H+JeO/6YVkGVlBcdk3QdGN9ObR0rxC7nd2ufaPhub1xG1/Gyc97yL4oX4queD6t/xWXiA8A+8ZiRZ+bjnwIDlRLq+jM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=lv6xc298; arc=none smtp.client-ip=209.85.128.170
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-yw1-f170.google.com with SMTP id 00721157ae682-71d603a9cfaso38840477b3.1
+        for <kvm@vger.kernel.org>; Mon, 15 Sep 2025 23:23:26 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1758003806; x=1758608606; darn=vger.kernel.org;
+        h=mime-version:references:message-id:in-reply-to:subject:cc:to:from
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=jzwxSCgUK/3UElXn+qMCVZOXd6lLimgLpQ+KrGfwqaU=;
+        b=lv6xc298WRJweENer27hHOnZy0J1mSXlDgmMJ1XczXvig9lmT8IYSsn9wC0mwdfdj5
+         e2gtCB9JxtDJOurDvlfbaUzHHwKflOORnpiA5dc+y3kvu3dZCX6i4KBcdxZ17sleigYY
+         gBLX12DMTlSLsrsCCJObjFN4QNvzBCd1Yo26iwrOOeADEc9m77h2TsFWtfwIWY+BUdtD
+         rM2niwRROy03NsATXmlmhT+G43nmno+aSv1AGiF9uvqWiSCfynDgsiD1YkFSoa7d2HNT
+         SCfpVm1fDymRq5fAGHZUjmuj3fXsdACYAKt95DiS0JTGHYdbT0Ib95o1aC3W0qV7NcSh
+         KIEA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1758003806; x=1758608606;
+        h=mime-version:references:message-id:in-reply-to:subject:cc:to:from
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=jzwxSCgUK/3UElXn+qMCVZOXd6lLimgLpQ+KrGfwqaU=;
+        b=paxkuczCtZdj8N+ub0QQSYCOfRr/spa8bTXgISGRSHHioK7DayNddZNd1b2Rv6nVNk
+         QO1c6RiQgRL+pepIKFd2K6BRrV2ofkqVtBRy0OCU2Hgg7A5FS4a3On2UdeK2r1Vok6Xt
+         lf5YErevjPqqXV8dQ/UJdhvGMZtPjN4U6Zqqr713BBtJdaLMnQEhjUX7QzeA1lMUBLBT
+         KUQodnZo1hfgeCn7ofdXsPL9s5n7Jy3xPlYimF5WTeeZ+XpxbdGEX2qtYWP2h2+5ut25
+         v0diDnzW7O/Akg+GS5da+/M5IPPUnq7iMVOX0f4GbltiKTGX88NGD8BbPOGB88r4PuVI
+         Jvrg==
+X-Forwarded-Encrypted: i=1; AJvYcCVnR1miw+TDl2NE/ZmAVNpfsMRaDIZHGh8I8Y7JxhJbv0MX70Som6ca42JarVSYPocvBWU=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxlLqCpQ+gOuNrXEb2TAur8ZPYPMlrP9YTfxzZ+5i3iQIkzEPzs
+	aL9jV6AMWz6B28qPgL2wguazN6I1+kiRgw1aG855+/U2Pn8Yy9CCEwdvDmQkB+2qew==
+X-Gm-Gg: ASbGnctxi9PqfU8zMed8ZEPwERqzRJ0teG25Xfe+4WFG8LTsRf9Cl8pATGsz7x3CJTN
+	h17JflqtigzWnz1xk51IpfB13U0VyZRS8s129F1PcTmHcmTnpz/1CQwAwLxEXUrkmPjx1jfGEzo
+	Grl6JOX/RiS0/WjEC+3jv6LZd4mvaoDOeQY6XMwmRo9qqhIHZastbaxWibMD+064s099LfDYGIS
+	eHN9y9EWlCX4HrZEFg/ulg6ztILlQNAMobOrJKSr8eqGSMCO9traeBk7ZfPQTKY72nw2lxcxj/T
+	J20IR4pzYlqnmjAlWMG9oUeUcn+Cpf7UtgVLtKUFnX55haGpoJSwWBZoyU8DMW0q1P+w9yosU3t
+	QFnf3cs1uTsTCAYrbKOplDyV4BXvClK+jrmV/S/yKF16eQsQwt3rymdAFGXHLgq44fGypbhv1oT
+	Q9t+0wHZKb8eSp2Q==
+X-Google-Smtp-Source: AGHT+IFYH7nKR98YSl0bgd4j6elLmVBr5qc5bTleI6LMDXL64/KgQAEWWcRI4ClTxXA+31LnE3T7pA==
+X-Received: by 2002:a05:690c:b13:b0:71f:eb2b:83e0 with SMTP id 00721157ae682-73062ca43c8mr138095197b3.13.1758003805348;
+        Mon, 15 Sep 2025 23:23:25 -0700 (PDT)
+Received: from darker.attlocal.net (172-10-233-147.lightspeed.sntcca.sbcglobal.net. [172.10.233.147])
+        by smtp.gmail.com with ESMTPSA id 00721157ae682-72f7683148dsm38488107b3.23.2025.09.15.23.23.18
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 15 Sep 2025 23:23:24 -0700 (PDT)
+Date: Mon, 15 Sep 2025 23:23:17 -0700 (PDT)
+From: Hugh Dickins <hughd@google.com>
+To: "Roy, Patrick" <roypat@amazon.co.uk>
+cc: "Thomson, Jack" <jackabt@amazon.co.uk>, 
+    "Kalyazin, Nikita" <kalyazin@amazon.co.uk>, 
+    "Cali, Marco" <xmarcalx@amazon.co.uk>, 
+    "derekmn@amazon.co.uk" <derekmn@amazon.co.uk>, 
+    Elliot Berman <quic_eberman@quicinc.com>, 
+    "willy@infradead.org" <willy@infradead.org>, 
+    "corbet@lwn.net" <corbet@lwn.net>, 
+    "pbonzini@redhat.com" <pbonzini@redhat.com>, 
+    "maz@kernel.org" <maz@kernel.org>, 
+    "oliver.upton@linux.dev" <oliver.upton@linux.dev>, 
+    "joey.gouly@arm.com" <joey.gouly@arm.com>, 
+    "suzuki.poulose@arm.com" <suzuki.poulose@arm.com>, 
+    "yuzenghui@huawei.com" <yuzenghui@huawei.com>, 
+    "catalin.marinas@arm.com" <catalin.marinas@arm.com>, 
+    "will@kernel.org" <will@kernel.org>, 
+    "chenhuacai@kernel.org" <chenhuacai@kernel.org>, 
+    "kernel@xen0n.name" <kernel@xen0n.name>, 
+    "paul.walmsley@sifive.com" <paul.walmsley@sifive.com>, 
+    "palmer@dabbelt.com" <palmer@dabbelt.com>, 
+    "aou@eecs.berkeley.edu" <aou@eecs.berkeley.edu>, 
+    "alex@ghiti.fr" <alex@ghiti.fr>, 
+    "agordeev@linux.ibm.com" <agordeev@linux.ibm.com>, 
+    "gerald.schaefer@linux.ibm.com" <gerald.schaefer@linux.ibm.com>, 
+    "hca@linux.ibm.com" <hca@linux.ibm.com>, 
+    "gor@linux.ibm.com" <gor@linux.ibm.com>, 
+    "borntraeger@linux.ibm.com" <borntraeger@linux.ibm.com>, 
+    "svens@linux.ibm.com" <svens@linux.ibm.com>, 
+    "dave.hansen@linux.intel.com" <dave.hansen@linux.intel.com>, 
+    "luto@kernel.org" <luto@kernel.org>, 
+    "peterz@infradead.org" <peterz@infradead.org>, 
+    "tglx@linutronix.de" <tglx@linutronix.de>, 
+    "mingo@redhat.com" <mingo@redhat.com>, "bp@alien8.de" <bp@alien8.de>, 
+    "x86@kernel.org" <x86@kernel.org>, "hpa@zytor.com" <hpa@zytor.com>, 
+    "trondmy@kernel.org" <trondmy@kernel.org>, 
+    "anna@kernel.org" <anna@kernel.org>, 
+    "hubcap@omnibond.com" <hubcap@omnibond.com>, 
+    "martin@omnibond.com" <martin@omnibond.com>, 
+    "viro@zeniv.linux.org.uk" <viro@zeniv.linux.org.uk>, 
+    "brauner@kernel.org" <brauner@kernel.org>, "jack@suse.cz" <jack@suse.cz>, 
+    "akpm@linux-foundation.org" <akpm@linux-foundation.org>, 
+    "david@redhat.com" <david@redhat.com>, 
+    "lorenzo.stoakes@oracle.com" <lorenzo.stoakes@oracle.com>, 
+    "Liam.Howlett@oracle.com" <Liam.Howlett@oracle.com>, 
+    "vbabka@suse.cz" <vbabka@suse.cz>, "rppt@kernel.org" <rppt@kernel.org>, 
+    "surenb@google.com" <surenb@google.com>, 
+    "mhocko@suse.com" <mhocko@suse.com>, "ast@kernel.org" <ast@kernel.org>, 
+    "daniel@iogearbox.net" <daniel@iogearbox.net>, 
+    "andrii@kernel.org" <andrii@kernel.org>, 
+    "martin.lau@linux.dev" <martin.lau@linux.dev>, 
+    "eddyz87@gmail.com" <eddyz87@gmail.com>, 
+    "song@kernel.org" <song@kernel.org>, 
+    "yonghong.song@linux.dev" <yonghong.song@linux.dev>, 
+    "john.fastabend@gmail.com" <john.fastabend@gmail.com>, 
+    "kpsingh@kernel.org" <kpsingh@kernel.org>, 
+    "sdf@fomichev.me" <sdf@fomichev.me>, 
+    "haoluo@google.com" <haoluo@google.com>, 
+    "jolsa@kernel.org" <jolsa@kernel.org>, "jgg@ziepe.ca" <jgg@ziepe.ca>, 
+    "jhubbard@nvidia.com" <jhubbard@nvidia.com>, 
+    "peterx@redhat.com" <peterx@redhat.com>, 
+    "jannh@google.com" <jannh@google.com>, 
+    "pfalcato@suse.de" <pfalcato@suse.de>, 
+    "axelrasmussen@google.com" <axelrasmussen@google.com>, 
+    "yuanchu@google.com" <yuanchu@google.com>, 
+    "weixugc@google.com" <weixugc@google.com>, 
+    "hannes@cmpxchg.org" <hannes@cmpxchg.org>, 
+    "zhengqi.arch@bytedance.com" <zhengqi.arch@bytedance.com>, 
+    "shakeel.butt@linux.dev" <shakeel.butt@linux.dev>, 
+    "shuah@kernel.org" <shuah@kernel.org>, 
+    "seanjc@google.com" <seanjc@google.com>, 
+    "linux-fsdevel@vger.kernel.org" <linux-fsdevel@vger.kernel.org>, 
+    "linux-doc@vger.kernel.org" <linux-doc@vger.kernel.org>, 
+    "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, 
+    "kvm@vger.kernel.org" <kvm@vger.kernel.org>, 
+    "linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>, 
+    "kvmarm@lists.linux.dev" <kvmarm@lists.linux.dev>, 
+    "loongarch@lists.linux.dev" <loongarch@lists.linux.dev>, 
+    "linux-riscv@lists.infradead.org" <linux-riscv@lists.infradead.org>, 
+    "linux-s390@vger.kernel.org" <linux-s390@vger.kernel.org>, 
+    "linux-nfs@vger.kernel.org" <linux-nfs@vger.kernel.org>, 
+    "devel@lists.orangefs.org" <devel@lists.orangefs.org>, 
+    "linux-mm@kvack.org" <linux-mm@kvack.org>, 
+    "bpf@vger.kernel.org" <bpf@vger.kernel.org>, 
+    "linux-kselftest@vger.kernel.org" <linux-kselftest@vger.kernel.org>
+Subject: Re: [PATCH v6 01/11] filemap: Pass address_space mapping to
+ ->free_folio()
+In-Reply-To: <20250912091708.17502-2-roypat@amazon.co.uk>
+Message-ID: <7c2677e1-daf7-3b49-0a04-1efdf451379a@google.com>
+References: <20250912091708.17502-1-roypat@amazon.co.uk> <20250912091708.17502-2-roypat@amazon.co.uk>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-X-Authority-Analysis: v=2.4 cv=OMsn3TaB c=1 sm=1 tr=0 ts=68c9011f cx=c_pps
- a=3Bg1Hr4SwmMryq2xdFQyZA==:117 a=3Bg1Hr4SwmMryq2xdFQyZA==:17
- a=yJojWOMRYYMA:10 a=voM4FWlXAAAA:8 a=VnNF1IyMAAAA:8 a=TfJWrzbei0Lz0DVUvboA:9
- a=IC2XNlieTeVoXbcui8wp:22
-X-Proofpoint-ORIG-GUID: sZ0cQy4fzVJ7D2SdVJxLYBghDOIlUj--
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUwOTEzMDAwMSBTYWx0ZWRfX82wY3QhDOETz
- w7RdLwgenkAL/2dDIqYf2nfEi7xQHOy/SfiGSgFy6EzvVwxX7LEq09dZ+1NBzGJ51iCBatgzLR3
- uSkCAOkKzp0wzxZZtfh8JJp/7Forl3XPRSjo4gr/SxPEWLbccV33MFmK6ZdQf9ALfEfVy3ai55y
- hmYZp8pRkUSr3IJq6cvi0iPFDAxe7HB3R9b2Wf4tYdMUnS7FPeozc11/AcNz4MRrpPbHVfhzLFt
- NRFXjhgOo3Khd6R4d51B7s0ZPeC/AGAn9hipPOtNbtxJE1Tq2Gpa2bQhq8yDClAuTf30r0v+/jc
- BZ1GTPaujDM1c6Ru8+61R5JAwPMdFR30Ayo+MTLU/rmgm1vfwfvMtvcq7d4dVE3cBuEMsbwaTE7
- N+BHffhb
-X-Proofpoint-GUID: VkLv9Z2maXFr-SK59hw8ERgRF1MbbAbW
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1117,Hydra:6.1.9,FMLib:17.12.80.40
- definitions=2025-09-16_01,2025-09-12_01,2025-03-28_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- phishscore=0 suspectscore=0 spamscore=0 priorityscore=1501 adultscore=0
- impostorscore=0 clxscore=1015 malwarescore=0 bulkscore=0
- classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
- reason=mlx scancount=1 engine=8.19.0-2507300000 definitions=main-2509130001
+Content-Type: text/plain; charset=US-ASCII
 
-Currently, on a P10 KVM guest, the mitigations seen in the output of
-"lscpu" command are different from the host. The reason for this
-behaviour is that when the KVM guest makes the "h_get_cpu_characteristics"
-hcall, QEMU does not consider the data it received from the host via the
-KVM_PPC_GET_CPU_CHAR ioctl, and just uses the values present in
-spapr->eff.caps[], which in turn just contain the default values set in
-spapr_machine_class_init().
+On Fri, 12 Sep 2025, Roy, Patrick wrote:
 
-Fix this behaviour by making sure that h_get_cpu_characteristics()
-returns the data received from the KVM ioctl for a KVM guest.
+> From: Elliot Berman <quic_eberman@quicinc.com>
+> 
+> When guest_memfd removes memory from the host kernel's direct map,
+> direct map entries must be restored before the memory is freed again. To
+> do so, ->free_folio() needs to know whether a gmem folio was direct map
+> removed in the first place though. While possible to keep track of this
+> information on each individual folio (e.g. via page flags), direct map
+> removal is an all-or-nothing property of the entire guest_memfd, so it
+> is less error prone to just check the flag stored in the gmem inode's
+> private data.  However, by the time ->free_folio() is called,
+> folio->mapping might be cleared. To still allow access to the address
+> space from which the folio was just removed, pass it in as an additional
+> argument to ->free_folio, as the mapping is well-known to all callers.
+> 
+> Link: https://lore.kernel.org/all/15f665b4-2d33-41ca-ac50-fafe24ade32f@redhat.com/
+> Suggested-by: David Hildenbrand <david@redhat.com>
+> Acked-by: David Hildenbrand <david@redhat.com>
+> Signed-off-by: Elliot Berman <quic_eberman@quicinc.com>
+> [patrick: rewrite shortlog for new usecase]
+> Signed-off-by: Patrick Roy <roypat@amazon.co.uk>
+> ---
+>  Documentation/filesystems/locking.rst |  2 +-
+>  fs/nfs/dir.c                          | 11 ++++++-----
+>  fs/orangefs/inode.c                   |  3 ++-
+>  include/linux/fs.h                    |  2 +-
+>  mm/filemap.c                          |  9 +++++----
+>  mm/secretmem.c                        |  3 ++-
+>  mm/vmscan.c                           |  4 ++--
+>  virt/kvm/guest_memfd.c                |  3 ++-
+>  8 files changed, 21 insertions(+), 16 deletions(-)
+> 
+> diff --git a/Documentation/filesystems/locking.rst b/Documentation/filesystems/locking.rst
+> index aa287ccdac2f..74c97287ec40 100644
+> --- a/Documentation/filesystems/locking.rst
+> +++ b/Documentation/filesystems/locking.rst
+> @@ -262,7 +262,7 @@ prototypes::
+>  	sector_t (*bmap)(struct address_space *, sector_t);
+>  	void (*invalidate_folio) (struct folio *, size_t start, size_t len);
+>  	bool (*release_folio)(struct folio *, gfp_t);
+> -	void (*free_folio)(struct folio *);
+> +	void (*free_folio)(struct address_space *, struct folio *);
+>  	int (*direct_IO)(struct kiocb *, struct iov_iter *iter);
+>  	int (*migrate_folio)(struct address_space *, struct folio *dst,
+>  			struct folio *src, enum migrate_mode);
 
-Mitigation status seen in lscpu output:
-1. P10 LPAR (host)
-$ lscpu | grep -i mitigation
-Vulnerability Spectre v1:             Mitigation; __user pointer sanitization, ori31 speculation barrier enabled
-Vulnerability Spectre v2:             Mitigation; Software count cache flush (hardware accelerated), Software link stack flush
+Beware, that is against the intent of free_folio().
 
-2. KVM guest on P10 LPAR with upstream QEMU
-$ lscpu | grep -i mitig
-Vulnerability L1tf:                   Mitigation; RFI Flush, L1D private per thread
-Vulnerability Meltdown:               Mitigation; RFI Flush, L1D private per thread
-Vulnerability Spec store bypass:      Mitigation; Kernel entry/exit barrier (eieio)
-Vulnerability Spectre v1:             Mitigation; __user pointer sanitization
-Vulnerability Spectre v2:             Mitigation; Software count cache flush (hardware accelerated), Software link stack flush
+Since its 2.6.37 origin in 6072d13c4293 ("Call the filesystem back
+whenever a page is removed from the page cache"), freepage() or
+free_folio() has intentionally NOT taken a struct address_space *mapping,
+because that structure may already be freed by the time free_folio() is
+called, if the last folio holding it has now been freed.
 
-3. KVM guest on P10 LPAR (this patch applied)
-$ lscpu | grep -i mitigation
-Vulnerability Spectre v1:             Mitigation; __user pointer sanitization, ori31 speculation barrier enabled
-Vulnerability Spectre v2:             Mitigation; Software count cache flush (hardware accelerated), Software link stack flush
+Maybe something has changed since then, or maybe it happens to be safe
+just in the context in which you want to use it; but it is against the
+principle of free_folio().  (Maybe an rcu_read_lock() could be added
+in __remove_mapping() to make it safe nowadays? maybe not welcome.)
 
-Perf impact:
-With null syscall benchmark[1], ~45% improvement is observed.
+See Documentation/filesystems/vfs.rst:
+free_folio is called once the folio is no longer visible in the
+page cache in order to allow the cleanup of any private data.
+Since it may be called by the memory reclaimer, it should not
+assume that the original address_space mapping still exists, and
+it should not block.
 
-1. Vanilla QEMU
-$ ./null_syscall
-132.19 ns     456.54 cycles
-
-2. With this patch
-$ ./null_syscall
-91.18 ns     314.57 cycles
-
-[1]: https://ozlabs.org/~anton/junkcode/null_syscall.c
-
-Signed-off-by: Gautam Menghani <gautam@linux.ibm.com>
----
-v1 -> v2:
-Handle the case where KVM_PPC_GET_CPU_CHAR ioctl fails
-
-v2 -> v3:
-Add the lscpu output in the patch description
-
-v3 -> v4:
-Fix QEMU CI build failure
-
- hw/ppc/spapr_hcall.c | 10 ++++++++++
- target/ppc/kvm.c     | 27 +++++++++++++++++++--------
- target/ppc/kvm_ppc.h |  1 +
- 3 files changed, 30 insertions(+), 8 deletions(-)
-
-diff --git a/hw/ppc/spapr_hcall.c b/hw/ppc/spapr_hcall.c
-index 1e936f35e4..7d695ffc93 100644
---- a/hw/ppc/spapr_hcall.c
-+++ b/hw/ppc/spapr_hcall.c
-@@ -1415,6 +1415,16 @@ static target_ulong h_get_cpu_characteristics(PowerPCCPU *cpu,
-     uint8_t count_cache_flush_assist = spapr_get_cap(spapr,
-                                                      SPAPR_CAP_CCF_ASSIST);
- 
-+    #ifdef CONFIG_KVM
-+    struct kvm_ppc_cpu_char c = kvmppc_get_cpu_chars();
-+
-+    if (kvm_enabled() && c.character) {
-+        args[0] = c.character;
-+        args[1] = c.behaviour;
-+        return H_SUCCESS;
-+    }
-+    #endif
-+
-     switch (safe_cache) {
-     case SPAPR_CAP_WORKAROUND:
-         characteristics |= H_CPU_CHAR_L1D_FLUSH_ORI30;
-diff --git a/target/ppc/kvm.c b/target/ppc/kvm.c
-index 015658049e..28dcf62f58 100644
---- a/target/ppc/kvm.c
-+++ b/target/ppc/kvm.c
-@@ -93,6 +93,7 @@ static int cap_fwnmi;
- static int cap_rpt_invalidate;
- static int cap_ail_mode_3;
- static int cap_dawr1;
-+static struct kvm_ppc_cpu_char cpu_chars = {0};
- 
- #ifdef CONFIG_PSERIES
- static int cap_papr;
-@@ -2515,7 +2516,6 @@ bool kvmppc_has_cap_xive(void)
- 
- static void kvmppc_get_cpu_characteristics(KVMState *s)
- {
--    struct kvm_ppc_cpu_char c;
-     int ret;
- 
-     /* Assume broken */
-@@ -2525,18 +2525,29 @@ static void kvmppc_get_cpu_characteristics(KVMState *s)
- 
-     ret = kvm_vm_check_extension(s, KVM_CAP_PPC_GET_CPU_CHAR);
-     if (!ret) {
--        return;
-+        goto err;
-     }
--    ret = kvm_vm_ioctl(s, KVM_PPC_GET_CPU_CHAR, &c);
-+    ret = kvm_vm_ioctl(s, KVM_PPC_GET_CPU_CHAR, &cpu_chars);
-     if (ret < 0) {
--        return;
-+        goto err;
-     }
- 
--    cap_ppc_safe_cache = parse_cap_ppc_safe_cache(c);
--    cap_ppc_safe_bounds_check = parse_cap_ppc_safe_bounds_check(c);
--    cap_ppc_safe_indirect_branch = parse_cap_ppc_safe_indirect_branch(c);
-+    cap_ppc_safe_cache = parse_cap_ppc_safe_cache(cpu_chars);
-+    cap_ppc_safe_bounds_check = parse_cap_ppc_safe_bounds_check(cpu_chars);
-+    cap_ppc_safe_indirect_branch =
-+        parse_cap_ppc_safe_indirect_branch(cpu_chars);
-     cap_ppc_count_cache_flush_assist =
--        parse_cap_ppc_count_cache_flush_assist(c);
-+        parse_cap_ppc_count_cache_flush_assist(cpu_chars);
-+
-+    return;
-+
-+err:
-+    memset(&cpu_chars, 0, sizeof(struct kvm_ppc_cpu_char));
-+}
-+
-+struct kvm_ppc_cpu_char kvmppc_get_cpu_chars(void)
-+{
-+    return cpu_chars;
- }
- 
- int kvmppc_get_cap_safe_cache(void)
-diff --git a/target/ppc/kvm_ppc.h b/target/ppc/kvm_ppc.h
-index a1d9ce9f9a..51c1c7d1a0 100644
---- a/target/ppc/kvm_ppc.h
-+++ b/target/ppc/kvm_ppc.h
-@@ -87,6 +87,7 @@ void kvmppc_check_papr_resize_hpt(Error **errp);
- int kvmppc_resize_hpt_prepare(PowerPCCPU *cpu, target_ulong flags, int shift);
- int kvmppc_resize_hpt_commit(PowerPCCPU *cpu, target_ulong flags, int shift);
- bool kvmppc_pvr_workaround_required(PowerPCCPU *cpu);
-+struct kvm_ppc_cpu_char kvmppc_get_cpu_chars(void);
- 
- bool kvmppc_hpt_needs_host_contiguous_pages(void);
- void kvm_check_mmu(PowerPCCPU *cpu, Error **errp);
--- 
-2.39.5 (Apple Git-154)
-
+Hugh
 
