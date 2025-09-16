@@ -1,143 +1,297 @@
-Return-Path: <kvm+bounces-57800-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-57801-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6E782B7DE23
-	for <lists+kvm@lfdr.de>; Wed, 17 Sep 2025 14:36:29 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id D81F6B7E1E4
+	for <lists+kvm@lfdr.de>; Wed, 17 Sep 2025 14:42:15 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7F1DB32511A
-	for <lists+kvm@lfdr.de>; Tue, 16 Sep 2025 23:39:58 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6968B325E66
+	for <lists+kvm@lfdr.de>; Tue, 16 Sep 2025 23:44:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7D7BC2D3ED2;
-	Tue, 16 Sep 2025 23:39:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 81EC32D7DDA;
+	Tue, 16 Sep 2025 23:43:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redadmin.org header.i=@redadmin.org header.b="oz5GUvGS"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ia9AFCKj"
 X-Original-To: kvm@vger.kernel.org
-Received: from www.redadmin.org (ag129037.ppp.asahi-net.or.jp [157.107.129.37])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pf1-f172.google.com (mail-pf1-f172.google.com [209.85.210.172])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A1D481F4701;
-	Tue, 16 Sep 2025 23:39:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=157.107.129.37
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758065986; cv=pass; b=tE/7gNqdDxwSz0ZOYnY9zj6d5foFgDgviBBSKaF2nixnHqj4O+Eell3pZ42TOUmClYSuAI/sR1nrumqG/dwSmvvjTAQ98shwulJKfvS020WXEn8G4AP8lroIxTFQNLHsJc3ba/VUk116nzS6UMfmvAceKstkBsuaxmNLRkkNKgs=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758065986; c=relaxed/simple;
-	bh=PFsoJQKsPOMTHBjFZPpV9hcgwDa9sL0vhxEZilWRMgo=;
-	h=MIME-Version:Date:From:To:Cc:Subject:In-Reply-To:References:
-	 Message-ID:Content-Type; b=YOa7hlvMrijBaT1bJ4XUEufJx21/cxEBVpZN7+8tkVC4HhNF+1XXRTYT4xWcA0pWETWqwKOwPrWYoD7kvPS/pC8XSr2MMSF5aJUiLThv5MPEztEQHaW7nEdDeL5TUsW77t9cw8OXskt+nCAIyi10+NyVOQ02ZQXE7KMG76GZk30=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redadmin.org; spf=pass smtp.mailfrom=redadmin.org; dkim=pass (1024-bit key) header.d=redadmin.org header.i=@redadmin.org header.b=oz5GUvGS; arc=pass smtp.client-ip=157.107.129.37
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redadmin.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redadmin.org
-Received: from localhost (localhost [127.0.0.1])
-	by www.redadmin.org (Postfix) with ESMTP id 92B6E10A40A15;
-	Wed, 17 Sep 2025 08:39:34 +0900 (JST)
-X-Virus-Scanned: amavis at redadmin.org
-Received: from www.redadmin.org ([127.0.0.1])
- by localhost (redadmin.org [127.0.0.1]) (amavis, port 10024) with ESMTP
- id X-ez8NUZDHzX; Wed, 17 Sep 2025 08:39:30 +0900 (JST)
-Received: from webmail.redadmin.org (redadmin.org [192.168.11.50])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature ECDSA (P-256) server-digest SHA256)
-	(Client did not present a certificate)
-	(Authenticated sender: weibu@redadmin.org)
-	by www.redadmin.org (Postfix) with ESMTPSA id 05504109D55C5;
-	Wed, 17 Sep 2025 08:39:30 +0900 (JST)
-DMARC-Filter: OpenDMARC Filter v1.4.2 www.redadmin.org 05504109D55C5
-Authentication-Results: www.redadmin.org; arc=none smtp.remote-ip=192.168.11.50
-ARC-Seal: i=1; a=rsa-sha256; d=redadmin.org; s=20231208space; t=1758065970;
-	cv=none; b=bjCczSjfmxObxUTNgqjEpei+4R0BahKXFWqYiHqPxtg3P09QX/Dhcu+4vKFUle226yrGfD0UBJlLanxyqroq+L7UkaZtRoXUmjzEk3zFyA3ub5Us7tD8eC8wjMkusBxin5KkXNbWLYrKEaw4vA1rglDmnFZOzGOSXW1CoEbdHJk=
-ARC-Message-Signature: i=1; a=rsa-sha256; d=redadmin.org; s=20231208space;
-	t=1758065970; c=relaxed/relaxed;
-	bh=3rQK+DBBPyMcARL0z/kIhvopLlplPjKFYeDcfVSaDYQ=;
-	h=DKIM-Filter:DKIM-Signature:MIME-Version:Date:From:To:Cc:Subject:
-	 In-Reply-To:References:Message-ID:X-Sender:Content-Type:
-	 Content-Transfer-Encoding; b=TuddA/DzD2XRk7S/9SVAFkU72zvEdct+WWLb0lmzbRpO0FgPFcFfue2pPrtOwmsCdC/SDDeNlRsEkD4XvkdpwMSVAycT7SWbcR4NY1zziAPRfc7sMwqW2sSwsxouxfMF9qjV1/agxCzjEVjp9BJVydI54LEVu/G5az0RG9F2BaY=
-ARC-Authentication-Results: i=1; www.redadmin.org
-DKIM-Filter: OpenDKIM Filter v2.11.0 www.redadmin.org 05504109D55C5
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redadmin.org;
-	s=20231208space; t=1758065970;
-	bh=3rQK+DBBPyMcARL0z/kIhvopLlplPjKFYeDcfVSaDYQ=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=oz5GUvGSH/48oSZeUxsnrbB8+YuPEXKeqxhuRJLfbh821RcFQesENUjaJBThqmtAs
-	 NvRDuX46a5Tlraa3jCPWB6ahyiOJLNxtrB+gRb0wxarker8pDdMW/AprzkdFtVAAr2
-	 5YXf9pIv3XwW3l0YeuM7fpT3XWmnhqzls4g3jVR4=
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9C48D2D3A9B
+	for <kvm@vger.kernel.org>; Tue, 16 Sep 2025 23:43:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.172
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1758066233; cv=none; b=lwiZvacvJulFs/70aOX87mXRo9R4jfgGj4olDN+OjIzOYRtavJZ54jRbRoupDzhEGFLR2XmoTzB3NQk5zQvsjPJikXUyLw87srJhny1lZx/Oqw1XssGfKlJd0pj+Pa+HeqcODzjvmdiZz1AWpkyRqA9VX3TB21clSLCd10xtcuE=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1758066233; c=relaxed/simple;
+	bh=tDbd/upvHR/xtlA/nTwN/G43iDlA1JrzjfApfEaGGJU=;
+	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:Cc; b=aMUNs+yiYHZEKzF37emJjxVBIJyVrIAbaZF+XAQiIiTx5x9StZ8WVz27/WCa9BGSVTWaCgP8AUV4l4JG/2EWXtxPR9QdPJ9m6qvwMgqxZeL+lf968LU0hlYJrgsQJI4zxPejSZEKIPJ2fgxWU3PEJVoUfPq2WTlKQfQ+MlDHAcc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ia9AFCKj; arc=none smtp.client-ip=209.85.210.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pf1-f172.google.com with SMTP id d2e1a72fcca58-77459bc5d18so4694545b3a.2
+        for <kvm@vger.kernel.org>; Tue, 16 Sep 2025 16:43:51 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1758066231; x=1758671031; darn=vger.kernel.org;
+        h=cc:to:content-transfer-encoding:mime-version:message-id:date
+         :subject:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=CHl5WqeMYUkPQ1EC4mALAYkWrMfI/glTDyOoveTOmK8=;
+        b=ia9AFCKjbl7D/YuKv9NIOwWfq205YgLlZ8U3tdvwUpEWQ/ue1DAfScrTHDqswdgAna
+         122p44VCZxYphtrAJ7mtpzzvZBiQAYj/hoEwDzCtTO5MqtwujIAeIxecv6wd5ZlNDpU0
+         lOYLT0VyM7xNIyO4/CGv0PeZ2zmKCoAgGTZ0IO5hxXdKsyTmdiifUP3p6vquCoHXzB0M
+         fKQv6OvL1CmR37cWpUHVcdzWrciNxznnN/HYdDk3c138rSgPmTrYJL4KEM+J/acOOpLa
+         1TN9hyIzc/bR3po7lJr3obPjRMuPs44mRLpQHyURW8Irn44PUNyfd36ncahTx512bwIp
+         PJJQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1758066231; x=1758671031;
+        h=cc:to:content-transfer-encoding:mime-version:message-id:date
+         :subject:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=CHl5WqeMYUkPQ1EC4mALAYkWrMfI/glTDyOoveTOmK8=;
+        b=U2nHg7UWLHRdLJ3H64mUyW5hcUjXoSHS3vFyfhU+P/rWRDN+BafyUGEZZjjnn12Qra
+         zW/Z0HA0GiVXNhNHNzpWqYpVDbrAsCzXsvMgq+aeTV0KjeKD30MDo1R7WiU+UowKZ/J4
+         Lq5oFf/sISlYQVssmgFZFs5Ev65r2hXUo2XxVCeOpmntRzYytJ8pE3GSASbFrfGsmg0n
+         5iQunVt9knKdycviNN5hZCPfAnJwZaT/1SXF/XBlv44yjyPX2nnl79YJxE7rvIS7cNCt
+         MorPP7l3OA0hiOT24riJQ7dqj4SqZtheEye3j31Bu7I9ji4rGwatMVp+A9cNXUPBE/J8
+         eXGg==
+X-Forwarded-Encrypted: i=1; AJvYcCVK3mPoyr+KamfJVwPh3f9p96Z6Ef6NseCJTj7CdODFuCZv6ddGQnLc8lf1A1XEr8P5mGw=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwIeqroUFIQkRcwgRYMeTnqPk/lXMQtV2nDB3CEqbbW6sQ4XgXE
+	CRWJXrgoM89Wmv8zGooZE5pWqgk5FASGZUOcoq63Cmxt3HLGBHYLL4dfDgPBBXYY
+X-Gm-Gg: ASbGncv11hHG3qhPLLI+tDYn97i76t/YHTY08UeeUmGGr5Dlrc/FdBZJRaA1cncc7M5
+	TcJbkFax6YMJPPJf2Pw4jn8a4lmwixHT9/k0+P+FgebJIQtvzgl77sFyDlWbZ6BTl858gImf5/s
+	QDvvLf0SkMov5OQwj7LkVpZ8zyRNPq2NHhtbAP9/S9WlKAvmigiTkr+soPpdVWiNcN+AZl4U9PC
+	RsUbkru8/raKMbG1Oj+RGAQQx1YhfHAMDnxNvsuGz0ZZPRbTpWcH9lWTYVU67Zy6mOfYVi1ppAy
+	sEsBinr3E3hTJYkZc4RcnA2/A0opYFruYw++12nqCnNWePuKiGEKkPky/546KoOC4gxNcsSKF72
+	HPhb2L5Z1sn00GysvZ288
+X-Google-Smtp-Source: AGHT+IGZVED2rSAsJWXkVcB5IVcGYR1SeW/vsl8TxNbaoSEzfPQ4U64w5sr+Q2Xqz4mlv9BaVkDfPw==
+X-Received: by 2002:a17:902:da8c:b0:240:3b9e:dd65 with SMTP id d9443c01a7336-26813902fc2mr821225ad.38.1758066230710;
+        Tue, 16 Sep 2025 16:43:50 -0700 (PDT)
+Received: from localhost ([2a03:2880:2ff:45::])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2680971b4fbsm2750045ad.104.2025.09.16.16.43.49
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 16 Sep 2025 16:43:49 -0700 (PDT)
+From: Bobby Eshleman <bobbyeshleman@gmail.com>
+Subject: [PATCH net-next v6 0/9] vsock: add namespace support to
+ vhost-vsock
+Date: Tue, 16 Sep 2025 16:43:44 -0700
+Message-Id: <20250916-vsock-vmtest-v6-0-064d2eb0c89d@meta.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Date: Wed, 17 Sep 2025 08:39:29 +0900
-From: weibu@redadmin.org
-To: Jonathan Corbet <corbet@lwn.net>
-Cc: kvm@vger.kernel.org, pbonzini@redhat.com, linux-doc@vger.kernel.org,
- linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] docs: wmi: lenovo-wmi-gamezone: fix typo in frequency
-In-Reply-To: <877bxyfkw7.fsf@trenco.lwn.net>
-References: <20250913173845.951982-1-weibu@redadmin.org>
- <877bxyfkw7.fsf@trenco.lwn.net>
-Message-ID: <a88c47e98139a6264670879407fb09a3@redadmin.org>
-X-Sender: weibu@redadmin.org
-Content-Type: text/plain; charset=UTF-8;
- format=flowed
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 8bit
+X-B4-Tracking: v=1; b=H4sIADH2yWgC/23QwWrDMAyA4VcpPtfDkiPH2anvMXaQHaU1W5KRh
+ NBR+u4zYdDM3dGIT7/RTc0yJZnV6+GmJlnTnMYhP9zxoOKFh7Po1Oa3QoNkLJJe5zF+6LVfZF5
+ 0sIzQIhiMqDL5mqRL123dmxpk0YNcF/WeJ5c0L+P0vXVW2ObbygrM35UraNCdJfbQcmh8PJ17T
+ p8vcey3RSvucV1gzNg2Bhhra0F8ie0Ooy+wzRg8cOfA2c5KiasHJlOWq4ydIDc1Ooyt2+Hj7/m
+ 8oSdktKFGIgEHADj1svAjSLsg2MJSDlZSU6y4oijhvyDWTygHA5M3QVqhUATdPlh+1uVgwx3Ea
+ DDf2OzPc7/ffwDXULXLSwIAAA==
+To: Stefano Garzarella <sgarzare@redhat.com>, Shuah Khan <shuah@kernel.org>, 
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+ Simon Horman <horms@kernel.org>, Stefan Hajnoczi <stefanha@redhat.com>, 
+ "Michael S. Tsirkin" <mst@redhat.com>, Jason Wang <jasowang@redhat.com>, 
+ Xuan Zhuo <xuanzhuo@linux.alibaba.com>, 
+ =?utf-8?q?Eugenio_P=C3=A9rez?= <eperezma@redhat.com>, 
+ "K. Y. Srinivasan" <kys@microsoft.com>, 
+ Haiyang Zhang <haiyangz@microsoft.com>, Wei Liu <wei.liu@kernel.org>, 
+ Dexuan Cui <decui@microsoft.com>, Bryan Tan <bryan-bt.tan@broadcom.com>, 
+ Vishnu Dasa <vishnu.dasa@broadcom.com>, 
+ Broadcom internal kernel review list <bcm-kernel-feedback-list@broadcom.com>
+Cc: virtualization@lists.linux.dev, netdev@vger.kernel.org, 
+ linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org, 
+ kvm@vger.kernel.org, linux-hyperv@vger.kernel.org, 
+ Bobby Eshleman <bobbyeshleman@gmail.com>, berrange@redhat.com, 
+ Bobby Eshleman <bobbyeshleman@meta.com>
+X-Mailer: b4 0.13.0
 
-Hi Jon,
+This series adds namespace support to vhost-vsock and loopback. It does
+not add namespaces to any of the other guest transports (virtio-vsock,
+hyperv, or vmci).
 
-You’re right — that block is a verbatim MOF listing decoded by bmfdec, 
-and the misspelling comes from the vendor-provided Description string. 
-So this isn’t an editing error in the docs.
+The current revision supports two modes: local and global. Local
+mode is complete isolation of namespaces, while global mode is complete
+sharing between namespaces of CIDs (the original behavior).
 
-I’ll drop this patch. If it helps future readers, I can send a follow-up 
-that adds a short note saying the MOF listing is verbatim and typos are 
-preserved.
+The mode is set using /proc/sys/net/vsock/ns_mode.
 
-Thanks for the careful review!
+Modes are per-netns and write-once. This allows a system to configure
+namespaces independently (some may share CIDs, others are completely
+isolated). This also supports future possible mixed use cases, where
+there may be namespaces in global mode spinning up VMs while there are
+mixed mode namespaces that provide services to the VMs, but are not
+allowed to allocate from the global CID pool (this mode not implemented
+in this series).
 
-Akiyoshi
+If a socket or VM is created when a namespace is global but the
+namespace changes to local, the socket or VM will continue working
+normally. That is, the socket or VM assumes the mode behavior of the
+namespace at the time the socket/VM was created. The original mode is
+captured in vsock_create() and so occurs at the time of socket(2) and
+accept(2) for sockets and open(2) on /dev/vhost-vsock for VMs. This
+prevents a socket/VM connection from suddenly breaking due to a
+namespace mode change. Any new sockets/VMs created after the mode change
+will adopt the new mode's behavior.
 
-2025-09-17 00:59 に Jonathan Corbet さんは書きました:
-> Akiyoshi Kurita <weibu@redadmin.org> writes:
-> 
->> Fix a spelling mistake in lenovo-wmi-gamezone.rst
->> ("freqency" -> "frequency").
->> 
->> No functional change.
->> 
->> Signed-off-by: Akiyoshi Kurita <weibu@redadmin.org>
->> ---
->>  Documentation/wmi/devices/lenovo-wmi-gamezone.rst | 2 +-
->>  1 file changed, 1 insertion(+), 1 deletion(-)
->> 
->> diff --git a/Documentation/wmi/devices/lenovo-wmi-gamezone.rst 
->> b/Documentation/wmi/devices/lenovo-wmi-gamezone.rst
->> index 997263e51a7d..167548929ac2 100644
->> --- a/Documentation/wmi/devices/lenovo-wmi-gamezone.rst
->> +++ b/Documentation/wmi/devices/lenovo-wmi-gamezone.rst
->> @@ -153,7 +153,7 @@ data using the `bmfdec 
->> <https://github.com/pali/bmfdec>`_ utility:
->>      [WmiDataId(1), read, Description("P-State ID.")] uint32 PStateID;
->>      [WmiDataId(2), read, Description("CLOCK ID.")] uint32 ClockID;
->>      [WmiDataId(3), read, Description("Default value.")] uint32 
->> defaultvalue;
->> -    [WmiDataId(4), read, Description("OC Offset freqency.")] uint32 
->> OCOffsetFreq;
->> +    [WmiDataId(4), read, Description("OC Offset frequency")] uint32 
->> OCOffsetFreq;
->>      [WmiDataId(5), read, Description("OC Min offset value.")] uint32 
->> OCMinOffset;
-> 
-> I don't have the device in question and can't test this ... but the 
-> text
-> in question has the appearance of being literal output from the bmfdec
-> utility.  Do we know that this is some sort of editing error rather 
-> than
-> an accurate reflection of what the tool prints?
-> 
-> Thanks,
-> 
-> jon
+Additionally, added tests for the new namespace features:
+
+tools/testing/selftests/vsock/vmtest.sh
+1..22
+ok 1 vm_server_host_client
+ok 2 vm_client_host_server
+ok 3 vm_loopback
+ok 4 host_vsock_ns_mode_ok
+ok 5 host_vsock_ns_mode_write_once_ok
+ok 6 global_same_cid_fails
+ok 7 local_same_cid_ok
+ok 8 global_local_same_cid_ok
+ok 9 local_global_same_cid_ok
+ok 10 diff_ns_global_host_connect_to_global_vm_ok
+ok 11 diff_ns_global_host_connect_to_local_vm_fails
+ok 12 diff_ns_global_vm_connect_to_global_host_ok
+ok 13 diff_ns_global_vm_connect_to_local_host_fails
+ok 14 diff_ns_local_host_connect_to_local_vm_fails
+ok 15 diff_ns_local_vm_connect_to_local_host_fails
+ok 16 diff_ns_global_to_local_loopback_local_fails
+ok 17 diff_ns_local_to_global_loopback_fails
+ok 18 diff_ns_local_to_local_loopback_fails
+ok 19 diff_ns_global_to_global_loopback_ok
+ok 20 same_ns_local_loopback_ok
+ok 21 same_ns_local_host_connect_to_local_vm_ok
+ok 22 same_ns_local_vm_connect_to_local_host_ok
+SUMMARY: PASS=22 SKIP=0 FAIL=0
+Log: /tmp/vsock_vmtest_OQC4.log
+
+Thanks again for everyone's help and reviews!
+
+Signed-off-by: Bobby Eshleman <bobbyeshleman@gmail.com>
+To: Stefano Garzarella <sgarzare@redhat.com>
+To: Shuah Khan <shuah@kernel.org>
+To: David S. Miller <davem@davemloft.net>
+To: Eric Dumazet <edumazet@google.com>
+To: Jakub Kicinski <kuba@kernel.org>
+To: Paolo Abeni <pabeni@redhat.com>
+To: Simon Horman <horms@kernel.org>
+To: Stefan Hajnoczi <stefanha@redhat.com>
+To: Michael S. Tsirkin <mst@redhat.com>
+To: Jason Wang <jasowang@redhat.com>
+To: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
+To: Eugenio Pérez <eperezma@redhat.com>
+To: K. Y. Srinivasan <kys@microsoft.com>
+To: Haiyang Zhang <haiyangz@microsoft.com>
+To: Wei Liu <wei.liu@kernel.org>
+To: Dexuan Cui <decui@microsoft.com>
+To: Bryan Tan <bryan-bt.tan@broadcom.com>
+To: Vishnu Dasa <vishnu.dasa@broadcom.com>
+To: Broadcom internal kernel review list <bcm-kernel-feedback-list@broadcom.com>
+Cc: virtualization@lists.linux.dev
+Cc: netdev@vger.kernel.org
+Cc: linux-kselftest@vger.kernel.org
+Cc: linux-kernel@vger.kernel.org
+Cc: kvm@vger.kernel.org
+Cc: linux-hyperv@vger.kernel.org
+Cc: berrange@redhat.com
+
+Changes in v6:
+- define behavior when mode changes to local while socket/VM is alive
+- af_vsock: clarify description of CID behavior
+- af_vsock: use stronger langauge around CID rules (dont use "may")
+- af_vsock: improve naming of buf/buffer
+- af_vsock: improve string length checking on proc writes
+- vsock_loopback: add space in struct to clarify lock protection
+- vsock_loopback: do proper cleanup/unregister on vsock_loopback_exit()
+- vsock_loopback: use virtio_vsock_skb_net() instead of sock_net()
+- vsock_loopback: set loopback to NULL after kfree()
+- vsock_loopback: use pernet_operations and remove callback mechanism
+- vsock_loopback: add macros for "global" and "local"
+- vsock_loopback: fix length checking
+- vmtest.sh: check for namespace support in vmtest.sh
+- Link to v5: https://lore.kernel.org/r/20250827-vsock-vmtest-v5-0-0ba580bede5b@meta.com
+
+Changes in v5:
+- /proc/net/vsock_ns_mode -> /proc/sys/net/vsock/ns_mode
+- vsock_global_net -> vsock_global_dummy_net
+- fix netns lookup in vhost_vsock to respect pid namespaces
+- add callbacks for vsock_loopback to avoid circular dependency
+- vmtest.sh loads vsock_loopback module
+- remove vsock_net_mode_can_set()
+- change vsock_net_write_mode() to return true/false based on success
+- make vsock_net_mode enum instead of u8
+- Link to v4: https://lore.kernel.org/r/20250805-vsock-vmtest-v4-0-059ec51ab111@meta.com
+
+Changes in v4:
+- removed RFC tag
+- implemented loopback support
+- renamed new tests to better reflect behavior
+- completed suite of tests with permutations of ns modes and vsock_test
+  as guest/host
+- simplified socat bridging with unix socket instead of tcp + veth
+- only use vsock_test for success case, socat for failure case (context
+  in commit message)
+- lots of cleanup
+
+Changes in v3:
+- add notion of "modes"
+- add procfs /proc/net/vsock_ns_mode
+- local and global modes only
+- no /dev/vhost-vsock-netns
+- vmtest.sh already merged, so new patch just adds new tests for NS
+- Link to v2:
+  https://lore.kernel.org/kvm/20250312-vsock-netns-v2-0-84bffa1aa97a@gmail.com
+
+Changes in v2:
+- only support vhost-vsock namespaces
+- all g2h namespaces retain old behavior, only common API changes
+  impacted by vhost-vsock changes
+- add /dev/vhost-vsock-netns for "opt-in"
+- leave /dev/vhost-vsock to old behavior
+- removed netns module param
+- Link to v1:
+  https://lore.kernel.org/r/20200116172428.311437-1-sgarzare@redhat.com
+
+Changes in v1:
+- added 'netns' module param to vsock.ko to enable the
+  network namespace support (disabled by default)
+- added 'vsock_net_eq()' to check the "net" assigned to a socket
+  only when 'netns' support is enabled
+- Link to RFC: https://patchwork.ozlabs.org/cover/1202235/
+
+---
+Bobby Eshleman (9):
+      vsock: a per-net vsock NS mode state
+      vsock: add net to vsock skb cb
+      vsock: add netns to vsock core
+      vsock/loopback: add netns support
+      vsock/virtio: add netns to virtio transport common
+      vhost/vsock: add netns support
+      selftests/vsock: improve logging in vmtest.sh
+      selftests/vsock: invoke vsock_test through helpers
+      selftests/vsock: add namespace tests
+
+ MAINTAINERS                             |    1 +
+ drivers/vhost/vsock.c                   |   78 ++-
+ include/linux/virtio_vsock.h            |   24 +
+ include/net/af_vsock.h                  |   71 +-
+ include/net/net_namespace.h             |    4 +
+ include/net/netns/vsock.h               |   26 +
+ net/vmw_vsock/af_vsock.c                |  219 +++++-
+ net/vmw_vsock/hyperv_transport.c        |    2 +-
+ net/vmw_vsock/virtio_transport.c        |    6 +-
+ net/vmw_vsock/virtio_transport_common.c |   18 +-
+ net/vmw_vsock/vmci_transport.c          |    6 +-
+ net/vmw_vsock/vsock_loopback.c          |  102 ++-
+ tools/testing/selftests/vsock/vmtest.sh | 1133 +++++++++++++++++++++++++++----
+ 13 files changed, 1501 insertions(+), 189 deletions(-)
+---
+base-commit: 949ddfb774fe527cebfa3f769804344940f7ed2e
+change-id: 20250325-vsock-vmtest-b3a21d2102c2
+
+Best regards,
+-- 
+Bobby Eshleman <bobbyeshleman@meta.com>
+
 
