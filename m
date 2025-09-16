@@ -1,180 +1,132 @@
-Return-Path: <kvm+bounces-57779-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-57780-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id D0ECAB5A169
-	for <lists+kvm@lfdr.de>; Tue, 16 Sep 2025 21:26:34 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0DF51B5A195
+	for <lists+kvm@lfdr.de>; Tue, 16 Sep 2025 21:45:08 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 832EC166DBA
-	for <lists+kvm@lfdr.de>; Tue, 16 Sep 2025 19:26:31 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 0189E7A6FBD
+	for <lists+kvm@lfdr.de>; Tue, 16 Sep 2025 19:43:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 259D931E895;
-	Tue, 16 Sep 2025 19:26:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1BC0F2E0415;
+	Tue, 16 Sep 2025 19:44:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="meoOMH4h"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="vAzFDOVG"
 X-Original-To: kvm@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pj1-f74.google.com (mail-pj1-f74.google.com [209.85.216.74])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 47D862DE707
-	for <kvm@vger.kernel.org>; Tue, 16 Sep 2025 19:26:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D90722DE6F4
+	for <kvm@vger.kernel.org>; Tue, 16 Sep 2025 19:44:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.74
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758050783; cv=none; b=nqLUpCkNoLRQveRfDqNMSEcVxSEp5Ddg/zs25A7j2mOrVRrZkDcXtk7do+cPpPRMkRrDjD4cuqlzw2BgrEvI5lRPChR3r3ilFvTSImtFTuD1zJSsX2WwUNLB4zmPNV5XwWQ59ZWjS0hkn85na3S4J70l0raKTE/BxUun2r9a13E=
+	t=1758051888; cv=none; b=bQ8ujaC+UCG4hRA6zMR98h4DOLizs+Oxcalclz90tUgbqTh8Pepf/eccrAJ6JFg31/0/0qLL65TfmEuo4W6D8KFxP+LpzXeO7InXL/M7fOys9tFTrZfl1oSNdOyYgxRJp79HOum46twWrg6D/qRGu9CSRgE8132PgZeocpZRfBA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758050783; c=relaxed/simple;
-	bh=+QYDaiEM2KG21MiXx/+wdmt5lXglM/W/LVWxjswsAt0=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=OSMhrCsFNnUZP7lDbaWu16LzOE+gI/BUXAM3m9tn8GxbeDUBmJuUIRkm5KI0UsbgXFIj3tF/mEWr3mRagYjpdYiQwwbmNYyV5bk62hrvSA/w3/Ubbxyknvb0pBVisDry7OMqU5pLqsSeYRlvBSGlRseK84GgsUCD7u7sc4lByDQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=meoOMH4h; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 43CD8C4CEEB;
-	Tue, 16 Sep 2025 19:26:22 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1758050783;
-	bh=+QYDaiEM2KG21MiXx/+wdmt5lXglM/W/LVWxjswsAt0=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=meoOMH4h+VQ4HH0jQtpdXelt1Q0BKdo3e0+i8xNpxvjnTMhHkgmoHdz6bRkVLAdE4
-	 ra4uVKBzNymnLe8Ac477HEYw5E+DtbMKmmOqy0ruppmnv/pNzzY0bnerwKStO92v/l
-	 7hyf3+PQ5AgIlVT4goLDPFKz4oEhR5bsZe0nnjVh5c/AWerRo3AAeYsRGoLA4ImOL/
-	 oNlz5yTM61h1f401dKpim8lWZRH2LiavpXUvFjuEBDktftwj4A15rTo2coW8kDBopl
-	 9bITvgRS7qhiy3/rNtiHV7yEKwGIe5diVs4dOJGvc3hMOrhpuuSRUdTaZ3qSNamtrI
-	 REvQrQiTyPsiw==
-Message-ID: <fa63be53-8769-4761-b878-556f20e1fbfc@kernel.org>
-Date: Tue, 16 Sep 2025 14:26:21 -0500
+	s=arc-20240116; t=1758051888; c=relaxed/simple;
+	bh=Bj5UJz56fZYcozZfKjnd0X0pC7phusQmPamMJPmrBCs=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=lzZNwM+l99GcIU5U9yjXPIxcjmi9ptyvOs9ds4W3Rn/dh35I97ip6FpsmT4h7Ztw0A61uAQzTT7jwzGgfBXjFzpiNXNAAHixmObfiAyR00ERlfem/OD/0We/M4pOLYyk/dTISvsnEZUQ5tBqju1eD5rHH/agqwvxTGByrfesGdM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=vAzFDOVG; arc=none smtp.client-ip=209.85.216.74
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+Received: by mail-pj1-f74.google.com with SMTP id 98e67ed59e1d1-32ec2211659so606162a91.0
+        for <kvm@vger.kernel.org>; Tue, 16 Sep 2025 12:44:46 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1758051886; x=1758656686; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=blJ1+eWWzlJEt2GGVDQEpISmZA9TNH9W/hvuPdFhLSk=;
+        b=vAzFDOVGNO3CDwgF4Co1OPkuXz3ExM75Y7slKHIRHgi4TBGZzAG7Ev2Uf1h3w6FGsY
+         B1ihqw7K+zraKVpFvpC976E5le28F7nYpQtrqyE63kkl+Ms8ZLNP7Taz6mHa1lU1Omqh
+         YBUIQMfNh1PPXmqDWGf2+vFuLmcVXFSwhFwpWe/xFDu2/UvF2i3wD3scOAZ3Y+KAqbnL
+         lAaM8/rK1PE7zzL09CMJgL3g1kX5n8bg2IbLjNrSQ0JT4rhALd3daI/XIYAYFXHy3EMR
+         fNx1800puSQbBjSwKVkS62qnuicQhSE10y4DTseIzhH2tu+jLpYqUHJR7b/qJ1rLgQ1U
+         /Xzw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1758051886; x=1758656686;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=blJ1+eWWzlJEt2GGVDQEpISmZA9TNH9W/hvuPdFhLSk=;
+        b=vwhGgPz1lMMn/vEgkiPAmQwnFVIQUYQkmBFGleQ2482CXWy7DJsx+eEgXCZ/n0FHOi
+         ZLw2KEtzaVQ4cTXBLZMOKoVbR7sAe/4de1Z8GsIEgwRIJ/9zMIjkHmuktexMIqw8y7hB
+         VecLp6Q2ybVvDtzBLQaMuVOXS9kiPdsSolFErS8FZwywg+td+zs/4jc0w51Vi68Uej7L
+         0X/ETOuCs33AsBef+vXTqCruRI0M8sCJrjmsFOIxNEnRytC7VhMvee6esd4WavSfdkoK
+         u1XaXvlGCQCiWagRQOSXsrUlblD3s4mjr+aZmE4ghJCpoGJMOsn22f/h9S1fABlL4Bxi
+         8OHg==
+X-Forwarded-Encrypted: i=1; AJvYcCXy1pydS9j/81Qyv+JAgsyrMBseqJlpilHr3amf71bToM/rDb1UucH3m9nssWuzRScX7hk=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzAGGXMZ9klZQ7TSi7g/ACMYtRSl/tNGVXR54RiI0Bt99CPSKuD
+	d7xtsdHkfqRCE2BieVc8QcCt/yZb9G2/kMVECgBUuCRXlzZjRnMmIO/QCmyZ1O5+N8/aEviHA/R
+	ol2tbWA==
+X-Google-Smtp-Source: AGHT+IEPKdyex7jz8in5XFqN4DYJcVLlKPHGMJXbamUaBHBfxWZpWsWJt7RliMxdJnu3mE2/a/pWQBJaGPY=
+X-Received: from pjv14.prod.google.com ([2002:a17:90b:564e:b0:32d:69b3:b7b0])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:3904:b0:32e:7123:7076
+ with SMTP id 98e67ed59e1d1-32e712371d6mr9405723a91.11.1758051886069; Tue, 16
+ Sep 2025 12:44:46 -0700 (PDT)
+Date: Tue, 16 Sep 2025 12:44:44 -0700
+In-Reply-To: <797c84fe-aec7-3e29-a581-d6d1a3878aaa@amd.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [RFC PATCH v2 1/5] KVM: SVM: Stop warning if x2AVIC feature bit
- alone is enabled
-To: Naveen N Rao <naveen@kernel.org>, Sean Christopherson <seanjc@google.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org,
- Jim Mattson <jmattson@google.com>, Maxim Levitsky <mlevitsk@redhat.com>,
- Vasant Hegde <vasant.hegde@amd.com>,
- Suravee Suthikulpanit <suravee.suthikulpanit@amd.com>,
- Nikunj A Dadhania <nikunj@amd.com>,
- Alejandro Jimenez <alejandro.j.jimenez@oracle.com>,
- Joao Martins <joao.m.martins@oracle.com>,
- "Maciej S. Szmigiero" <maciej.szmigiero@oracle.com>
-References: <cover.1756993734.git.naveen@kernel.org>
- <62c338a17fe5127215efbfd8f7c5322b7b49a294.1756993734.git.naveen@kernel.org>
- <aMhxaAh6a3Eps_NJ@google.com>
- <wo2sfg7sxkpnemiznpjtjou4xc6alad2muewkjulqk2wr2lc5q@vlb7m34ez2il>
- <f9d43ba5-0655-4a4e-b911-30b11615361d@kernel.org>
- <aMlrewJeXm-_ierH@google.com>
- <villgy3ehps5puo3grrs2zoknbr7oyuy3jikr2cvikm4xrdgtd@ftkyxrfmptsl>
-Content-Language: en-US
-From: Mario Limonciello <superm1@kernel.org>
-In-Reply-To: <villgy3ehps5puo3grrs2zoknbr7oyuy3jikr2cvikm4xrdgtd@ftkyxrfmptsl>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Mime-Version: 1.0
+References: <20250908202034.98854-1-john.allen@amd.com> <20250908202034.98854-3-john.allen@amd.com>
+ <797c84fe-aec7-3e29-a581-d6d1a3878aaa@amd.com>
+Message-ID: <aMm-LMjCeXguOhay@google.com>
+Subject: Re: [PATCH v2 2/2] x86/sev-es: Include XSS value in GHCB CPUID request
+From: Sean Christopherson <seanjc@google.com>
+To: Tom Lendacky <thomas.lendacky@amd.com>
+Cc: John Allen <john.allen@amd.com>, kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	x86@kernel.org, pbonzini@redhat.com, dave.hansen@intel.com, 
+	rick.p.edgecombe@intel.com, mlevitsk@redhat.com, weijiang.yang@intel.com, 
+	chao.gao@intel.com, bp@alien8.de, dave.hansen@linux.intel.com, hpa@zytor.com, 
+	mingo@redhat.com, tglx@linutronix.de
+Content-Type: text/plain; charset="us-ascii"
 
-On 9/16/25 1:37 PM, Naveen N Rao wrote:
-> On Tue, Sep 16, 2025 at 06:51:55AM -0700, Sean Christopherson wrote:
->> On Tue, Sep 16, 2025, Mario Limonciello wrote:
->>> On 9/16/25 2:14 AM, Naveen N Rao wrote:
->>>> On Mon, Sep 15, 2025 at 01:04:56PM -0700, Sean Christopherson wrote:
->>>>> On Thu, Sep 04, 2025, Naveen N Rao (AMD) wrote:
->>>>>> A platform can choose to disable AVIC by turning off the AVIC CPUID
->>>>>> feature bit, while keeping x2AVIC CPUID feature bit enabled to indicate
->>>>>> AVIC support for the x2APIC MSR interface. Since this is a valid
->>>>>> configuration, stop printing a warning.
->>>>>>
->>>>>> Signed-off-by: Naveen N Rao (AMD) <naveen@kernel.org>
->>>>>> ---
->>>>>>    arch/x86/kvm/svm/avic.c | 8 +-------
->>>>>>    1 file changed, 1 insertion(+), 7 deletions(-)
->>>>>>
->>>>>> diff --git a/arch/x86/kvm/svm/avic.c b/arch/x86/kvm/svm/avic.c
->>>>>> index a34c5c3b164e..346cd23a43a9 100644
->>>>>> --- a/arch/x86/kvm/svm/avic.c
->>>>>> +++ b/arch/x86/kvm/svm/avic.c
->>>>>> @@ -1101,14 +1101,8 @@ bool avic_hardware_setup(void)
->>>>>>    	if (!npt_enabled)
->>>>>>    		return false;
->>>>>> -	/* AVIC is a prerequisite for x2AVIC. */
->>>>>> -	if (!boot_cpu_has(X86_FEATURE_AVIC) && !force_avic) {
->>>>>> -		if (boot_cpu_has(X86_FEATURE_X2AVIC)) {
->>>>>> -			pr_warn(FW_BUG "Cannot support x2AVIC due to AVIC is disabled");
->>>>>> -			pr_warn(FW_BUG "Try enable AVIC using force_avic option");
->>>>>
->>>>> I agree with the existing code, KVM should treat this as a firmware bug, where
->>>>> "firmware" could also be the host VMM.  AIUI, x2AVIC can't actualy work without
->>>>> AVIC support, so enumerating x2AVIC without AVIC is pointless and unexpected.
->>>>
->>>> There are platforms where this is the case though:
->>>>
->>>> $ cpuid -1 -l 0x8000000A | grep -i avic
->>>>         AVIC: AMD virtual interrupt controller  = false
->>>>         X2AVIC: virtualized X2APIC              = true
->>>>         extended LVT AVIC access changes        = true
->>>>
->>>> The above is from Zen 4 (Phoenix), and my primary concern is that we
->>>> will start printing a warning by default. Besides, there isn't much a
->>>> user can do here (except start using force_avic, which will taint the
->>>> kernel). Maybe we can warn only if AVIC is being explicitly enabled?
->>
->> Uh, get that platform to not ship with a broken setup?
->>
->>> I'd say if you need to say something downgrade it to info instead and not
->>> mark it as firmware bug.
->>
->> How is the above not a "firmware" bug?
-> 
-> Ok, looking at AVIC-related CPUID feature bits:
-> 1. Fn8000_000A_EDX[AVIC] (bit 13) representing core AVIC support
-> 2. Fn8000_000A_EDX[x2AVIC] (bit 18) for x2APIC MSR support
-> 3. Fn8000_000A_EDX[ExtLvtAvicAccessChg] (bit 27) for change to AVIC
-> handling of eLVT registers
-> 4. Fn8000_000A_ECX[x2AVIC_EXT] (bit 6) for x2AVIC 4k vCPU support
-> 
-> The latter three are dependent on the first feature being enabled. If a
-> platform wants to disable AVIC for whatever reason, it could:
-> - disable (1), and leave the rest of the three feature bits on as a way
->    to advertise support for those (OR)
-> - disable all the four CPUID feature bits above
-> 
-> I think you are saying that the former is wrong and the right way to
-> disable AVIC would be to turn off all the four CPUID feature bits above?
-> 
-> I don't know enough about x86/CPUIDs to argue about that ;)
-> 
-> However, it appears to me that the former approach of only disabling the
-> base AVIC CPUID feature bit is helpful in advertising the platform
-> capabilities.
-> 
-> Assuming AVIC was disabled due to a harware erratum, those who are _not_
-> affected by the erratum can meaningfully force-enable AVIC and also have
-> x2AVIC (and other related AVIC features and extensions) get enabled
-> automatically.  If all AVIC related CPUID feature bits were to be
-> disabled, then force_avic will serve a limited role unless it is
-> extended.
-> 
-> I don't know if there is precedence for this, or if it is at all ok,
-> just that it may be helpful.
-> 
-> Also, those platforms are unlikely to be fixed (client/desktop systems
-> that are unlikely to receive updates).
-> 
-> The current warning suggests passing force_avic, but that will just
-> taint the kernel and potentially break more things assuming AVIC was
-> turned off for a good reason. Or, users can start explicitly disabling
-> AVIC by passing "avic=0" if they want to turn off the warning. Both of
-> these don't seem helpful, especially on client platforms.
-> 
-> So, if you still think that we should retain that warning, should we
-> tweak it not to suggest force_avic?
-> 
-> 
-> - Naveen
-> 
+On Tue, Sep 09, 2025, Tom Lendacky wrote:
+> On 9/8/25 15:20, John Allen wrote:
+> > When a guest issues a cpuid instruction for Fn0000000D_{x00,x01}, the
+> > hypervisor will be intercepting the CPUID instruction and will need to access
+> > the guest XSS value. For SEV-ES, the XSS value is encrypted and needs to be
+> > included in the GHCB to be visible to the hypervisor.
+> > 
+> > Reviewed-by: Tom Lendacky <thomas.lendacky@amd.com>
+> > Signed-off-by: John Allen <john.allen@amd.com>
+> > ---
+> >  arch/x86/coco/sev/vc-shared.c | 11 +++++++++++
+> >  arch/x86/include/asm/svm.h    |  1 +
+> >  2 files changed, 12 insertions(+)
+> > 
+> > diff --git a/arch/x86/coco/sev/vc-shared.c b/arch/x86/coco/sev/vc-shared.c
+> > index 2c0ab0fdc060..079fffdb12c0 100644
+> > --- a/arch/x86/coco/sev/vc-shared.c
+> > +++ b/arch/x86/coco/sev/vc-shared.c
+> > @@ -1,5 +1,9 @@
+> >  // SPDX-License-Identifier: GPL-2.0
+> >  
+> > +#ifndef __BOOT_COMPRESSED
+> > +#define has_cpuflag(f)                  boot_cpu_has(f)
+> > +#endif
+> > +
+> >  static enum es_result vc_check_opcode_bytes(struct es_em_ctxt *ctxt,
+> >  					    unsigned long exit_code)
+> >  {
+> > @@ -452,6 +456,13 @@ static enum es_result vc_handle_cpuid(struct ghcb *ghcb,
+> >  		/* xgetbv will cause #GP - use reset value for xcr0 */
+> >  		ghcb_set_xcr0(ghcb, 1);
+> >  
+> > +	if (has_cpuflag(X86_FEATURE_SHSTK) && regs->ax == 0xd && regs->cx <= 1) {
 
-I suppose another alternative is to just clear X86_FEATURE_X2AVIC if 
-X86_FEATURE_AVIC is not set and force_avic isn't set.
+Only CPUID.0xD.1 consumes XSS.  CPUID.0xD.0 only consumes XCR0.  I.e. this could
+be "&& regs->cx == 1".
 
+> Just a nit, but I wonder if we should be generic here and just do
+> has_cpuflag(X86_FEATURE_XSAVES) since that should be set if shadow stack
+> is enabled, right? And when X86_FEATURE_XSAVES is set, we don't
+> intercept XSS access (see sev_es_recalc_msr_intercepts()).
+
+On the other hand, by exposing XSS to the host only on CPUID #VCs, you've already
+"optimized" this code based on presumed usage of XSS by the hypervisor.
 
