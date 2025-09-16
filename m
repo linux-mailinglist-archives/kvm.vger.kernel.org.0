@@ -1,186 +1,88 @@
-Return-Path: <kvm+bounces-57717-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-57718-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id F329AB595E2
-	for <lists+kvm@lfdr.de>; Tue, 16 Sep 2025 14:17:51 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id D21E5B5963D
+	for <lists+kvm@lfdr.de>; Tue, 16 Sep 2025 14:31:56 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1A68A4E5DD8
-	for <lists+kvm@lfdr.de>; Tue, 16 Sep 2025 12:17:50 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E99AD2A277D
+	for <lists+kvm@lfdr.de>; Tue, 16 Sep 2025 12:31:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E803D30C37E;
-	Tue, 16 Sep 2025 12:17:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E8C3D306B21;
+	Tue, 16 Sep 2025 12:31:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="P0d/Dj5o"
 X-Original-To: kvm@vger.kernel.org
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 94EDA30BF71
-	for <kvm@vger.kernel.org>; Tue, 16 Sep 2025 12:17:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 070991EDA2C;
+	Tue, 16 Sep 2025 12:31:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758025058; cv=none; b=hL/keIniLN/mmReydvfUHIvIYKWVMjTo2BplNhNzDUelhOavKAn4eIioVkeGZmtSX73/zKIqZbp8Ve0xzc9CjX1aF1MAzG/+HHR4sarCy4JPvd7vNm11vKfrCYsH5KsE8d1dEOKHIOgyApGMkPojvRw2e/TgA2oDbrM+67zlPLs=
+	t=1758025902; cv=none; b=rcK6rUutC1Jnkmg9LTFzJ2y1XQwuqiMrFBF0NtKLBghZ4hWfbAl1bRXiSwC/7HkvVBtKIp0w2ZAdWJ27W7eGNGpfL4o+o+PHYYeuxlJ19t6omptcuKRgYLLmT7MOZerj4dI3nozVo2rJBpv/a4XeLlwZBqvvBQGEDoVGKgkihKk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758025058; c=relaxed/simple;
-	bh=+Rt1OQ5f0XIuXvWrYdebVWJbfK3U2I/naiin5OO7UHQ=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=gfIP4S6t2is7h3yHm2/iR2gKBj6+fzz/UfNYDe2qQEjSS2Zw+f/MCv2eSnsattps1OFuE2efnkcek1rMoqLpU4FpbyoV+/y0b07FsPrPwUGc3j0xZ7oVSXhtp28XHobzUu+IE4Z0VZ6Bd+qt4cE10RnBluf+6rmhwBwjqwwYcZE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id BA73512FC;
-	Tue, 16 Sep 2025 05:17:27 -0700 (PDT)
-Received: from donnerap (usa-sjc-imap-foss1.foss.arm.com [10.121.207.14])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id EEA753F673;
-	Tue, 16 Sep 2025 05:17:34 -0700 (PDT)
-Date: Tue, 16 Sep 2025 13:17:32 +0100
-From: Andre Przywara <andre.przywara@arm.com>
-To: Alexandru Elisei <alexandru.elisei@arm.com>
-Cc: Will Deacon <will@kernel.org>, Julien Thierry
- <julien.thierry.kdev@gmail.com>, Marc Zyngier <maz@kernel.org>,
- <kvm@vger.kernel.org>, <kvmarm@lists.linux.dev>
-Subject: Re: [PATCH kvmtool v3 4/6] arm64: add counter offset control
-Message-ID: <20250916131732.499ffe22@donnerap>
-In-Reply-To: <aJDHbClG5MagCCy5@raptor>
-References: <20250729095745.3148294-1-andre.przywara@arm.com>
-	<20250729095745.3148294-5-andre.przywara@arm.com>
-	<aJDHbClG5MagCCy5@raptor>
-Organization: ARM
-X-Mailer: Claws Mail 3.18.0 (GTK+ 2.24.32; aarch64-unknown-linux-gnu)
+	s=arc-20240116; t=1758025902; c=relaxed/simple;
+	bh=AvnnFeLhqa+1N7BjqrcIXNBRXqWXQHi29E1hGGjkXRE=;
+	h=From:To:Cc:In-Reply-To:References:Subject:Message-Id:Date:
+	 MIME-Version:Content-Type; b=EQhf6u24y4wbm+b5X39cr2OgyXgMFP1r5Od1q4AUEPu4pg1p1LvBsp/nEKxmGX06suCLiVKzs+IwcO9qqECe39ozvDRKgQFH9ytgrww710AyV6yrhNsSjxUdsoHkF/+mRoZ2mUS5CoTAvct5bTmozIM2j5nzdMcND/BVHQRvvOI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=P0d/Dj5o; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 50F9FC4CEEB;
+	Tue, 16 Sep 2025 12:31:39 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1758025901;
+	bh=AvnnFeLhqa+1N7BjqrcIXNBRXqWXQHi29E1hGGjkXRE=;
+	h=From:To:Cc:In-Reply-To:References:Subject:Date:From;
+	b=P0d/Dj5oRlUj845mYfjKZ7ng1gm7rIXqPdU+u9b31iZhME+rs9C71GZZpLgHYxn6y
+	 9puhWpjl36fzXN654GNREQI6cxnY28F49FElwXS3Z5/QgVQEbnuEg0KhcpOZPPcugQ
+	 Hr8MPAE2+SqMpSLBtf4o5E9LKaX1PRIsbCldX2zc+bBTnzdXHHnCUq92b7IaDplx/e
+	 8uzxxsAdcdKpEcnFr4g8E3y9d9bFcWKR2I/ABFomxlDgZ/vLtuI6L9hQccv/92sN7x
+	 DkA27NRhwK50x6mDctSm6HKXaVPRXFGj8oJw//6Aro6Skcy8jK5U03rNa90Ml/IQOR
+	 gswxS2axnp1qw==
+From: Lee Jones <lee@kernel.org>
+To: Chanwoo Choi <cw00.choi@samsung.com>, 
+ Krzysztof Kozlowski <krzk@kernel.org>, Lee Jones <lee@kernel.org>, 
+ "Kirill A. Shutemov" <kas@kernel.org>, 
+ Dave Hansen <dave.hansen@linux.intel.com>, 
+ Rick Edgecombe <rick.p.edgecombe@intel.com>, 
+ Dzmitry Sankouski <dsankouski@gmail.com>
+Cc: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>, 
+ linux-kernel@vger.kernel.org, x86@kernel.org, linux-coco@lists.linux.dev, 
+ kvm@vger.kernel.org
+In-Reply-To: <20250909-max77705-fix_interrupt_handling-v3-1-233c5a1a20b5@gmail.com>
+References: <20250909-max77705-fix_interrupt_handling-v3-1-233c5a1a20b5@gmail.com>
+Subject: Re: (subset) [PATCH v3] mfd: max77705: rework interrupts
+Message-Id: <175802589907.3682989.11860525884258012047.b4-ty@kernel.org>
+Date: Tue, 16 Sep 2025 13:31:39 +0100
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 8bit
+X-Mailer: b4 0.15-dev-c81fc
 
-On Mon, 4 Aug 2025 15:45:00 +0100
-Alexandru Elisei <alexandru.elisei@arm.com> wrote:
-
-Hi Alex,
-
-> You might want to capitalize the first letter of the subject line (add->Add).
+On Tue, 09 Sep 2025 21:23:07 +0300, Dzmitry Sankouski wrote:
+> Current implementation describes only MFD's own topsys interrupts.
+> However, max77705 has a register which indicates interrupt source, i.e.
+> it acts as an interrupt controller. There's 4 interrupt sources in
+> max77705: topsys, charger, fuelgauge, usb type-c manager.
 > 
-> On Tue, Jul 29, 2025 at 10:57:43AM +0100, Andre Przywara wrote:
-> > From: Marc Zyngier <maz@kernel.org>
-> > 
-> > KVM allows the offsetting of the global counter in order to help with
-> > migration of a VM. This offset applies cumulatively with the offsets
-> > provided by the architecture.
-> > 
-> > Although kvmtool doesn't provide a way to migrate a VM, controlling
-> > this offset is useful to test the timer subsystem.
-> > 
-> > Add the command line option --counter-offset to allow setting this value
-> > when creating a VM.  
+> Setup max77705 MFD parent as an interrupt controller. Delete topsys
+> interrupts because currently unused.
 > 
-> Out of curiosity, how is this related to nested virtualization?
-> 
-> > 
-> > Signed-off-by: Marc Zyngier <maz@kernel.org>
-> > Signed-off-by: Andre Przywara <andre.przywara@arm.com>
-> > ---
-> >  arm64/include/kvm/kvm-config-arch.h |  3 +++
-> >  arm64/kvm.c                         | 17 +++++++++++++++++
-> >  2 files changed, 20 insertions(+)
-> > 
-> > diff --git a/arm64/include/kvm/kvm-config-arch.h b/arm64/include/kvm/kvm-config-arch.h
-> > index a1dac28e6..44c43367b 100644
-> > --- a/arm64/include/kvm/kvm-config-arch.h
-> > +++ b/arm64/include/kvm/kvm-config-arch.h
-> > @@ -14,6 +14,7 @@ struct kvm_config_arch {
-> >  	u64		kaslr_seed;
-> >  	enum irqchip_type irqchip;
-> >  	u64		fw_addr;
-> > +	u64		counter_offset;
-> >  	unsigned int	sve_max_vq;
-> >  	bool		no_pvtime;
-> >  };
-> > @@ -59,6 +60,8 @@ int sve_vl_parser(const struct option *opt, const char *arg, int unset);
-> >  		     irqchip_parser, NULL),					\
-> >  	OPT_U64('\0', "firmware-address", &(cfg)->fw_addr,			\
-> >  		"Address where firmware should be loaded"),			\
-> > +	OPT_U64('\0', "counter-offset", &(cfg)->counter_offset,			\
-> > +		"Specify the counter offset, defaulting to 0"),			\  
-> 
-> I'm having a hard time parsing this - if it's zero, then kvmtool leaves it
-> unset, how is the default value 0? Maybe you want to say that if left unset,
-> the counters behaves as if the global offset is zero.
+> [...]
 
-That's a much longer wording for something meant to be a very concise
-description of the option, with the same meaning. So while "defaulting to
-0" might not be 100% correct when it comes to how it's *implemented*, from
-the user's point of view the effect is the same. And this is a user facing
-message.
+Applied, thanks!
 
-> >  	OPT_BOOLEAN('\0', "nested", &(cfg)->nested_virt,			\
-> >  		    "Start VCPUs in EL2 (for nested virt)"),
-> >  
-> > diff --git a/arm64/kvm.c b/arm64/kvm.c
-> > index 23b4dab1f..6e971dd78 100644
-> > --- a/arm64/kvm.c
-> > +++ b/arm64/kvm.c
-> > @@ -119,6 +119,22 @@ static void kvm__arch_enable_mte(struct kvm *kvm)
-> >  	pr_debug("MTE capability enabled");
-> >  }
-> >  
-> > +static void kvm__arch_set_counter_offset(struct kvm *kvm)
-> > +{
-> > +	struct kvm_arm_counter_offset offset = {
-> > +		.counter_offset = kvm->cfg.arch.counter_offset,
-> > +	};
-> > +
-> > +	if (!kvm->cfg.arch.counter_offset)
-> > +		return;
-> > +
-> > +	if (!kvm__supports_extension(kvm, KVM_CAP_COUNTER_OFFSET))
-> > +		die("No support for global counter offset");  
-> 
-> What happens when the user sets --counter-offset 0 and KVM doesn't support
-> the capability? Looks to me like instead of getting an error, kvmtool is happy
-> to proceed without actually setting the counter offset to 0. User might then be
-> fooled into thinking that KVM supports KVM_CAP_COUNTER_OFFSET, and when the same
-> user does --counter-offset x, they will get an error saying that there's no
-> support for it in KVM. I would be extremely confused by that.
+[1/1] mfd: max77705: rework interrupts
+      commit: e3f56377ff69b0944da8780f2c5a14f10de71c13
 
-On the other hand rejecting "--counter-offset 0" even when it's the
-default behaviour and would work is even more cumbersome, I'd say. And I'd
-argue that in general "offset 0" being a special case is well understood,
-so I wouldn't be too confused about that.
-
-If you really feel that needs detailed explanation, maybe we should add
-that to the documentation?
-
-Cheers,
-Andre
-
-> If this is something that you want to address, you can do it similar to
-> ram_addr: initialize the offset to something unreasonable before parsing the
-> command line parameters, and then bail early in kvm__arch_set_counter_offset().
-> 
-> Thanks,
-> Alex
-> 
-> > +
-> > +	if (ioctl(kvm->vm_fd, KVM_ARM_SET_COUNTER_OFFSET, &offset))
-> > +		die_perror("KVM_ARM_SET_COUNTER_OFFSET");
-> > +}
-> > +
-> >  void kvm__arch_init(struct kvm *kvm)
-> >  {
-> >  	/* Create the virtual GIC. */
-> > @@ -126,6 +142,7 @@ void kvm__arch_init(struct kvm *kvm)
-> >  		die("Failed to create virtual GIC");
-> >  
-> >  	kvm__arch_enable_mte(kvm);
-> > +	kvm__arch_set_counter_offset(kvm);
-> >  }
-> >  
-> >  static u64 kvm__arch_get_payload_region_size(struct kvm *kvm)
-> > -- 
-> > 2.25.1
-> >   
+--
+Lee Jones [李琼斯]
 
 
