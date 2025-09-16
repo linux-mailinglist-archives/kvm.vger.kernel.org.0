@@ -1,176 +1,116 @@
-Return-Path: <kvm+bounces-57664-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-57665-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 256FEB58AD3
-	for <lists+kvm@lfdr.de>; Tue, 16 Sep 2025 03:09:04 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 10070B58B2B
+	for <lists+kvm@lfdr.de>; Tue, 16 Sep 2025 03:30:21 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B90273B34E7
-	for <lists+kvm@lfdr.de>; Tue, 16 Sep 2025 01:09:02 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 428041B2443E
+	for <lists+kvm@lfdr.de>; Tue, 16 Sep 2025 01:30:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 976501E3DCD;
-	Tue, 16 Sep 2025 01:08:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="Pch4TApz"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 96AC3220F5C;
+	Tue, 16 Sep 2025 01:30:11 +0000 (UTC)
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pl1-f173.google.com (mail-pl1-f173.google.com [209.85.214.173])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 50FC82A1AA
-	for <kvm@vger.kernel.org>; Tue, 16 Sep 2025 01:08:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.173
+Received: from mail.loongson.cn (mail.loongson.cn [114.242.206.163])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 677141DF265;
+	Tue, 16 Sep 2025 01:30:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=114.242.206.163
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757984934; cv=none; b=B5ftMmwULfHRauWRKrAr+UZr17q79sN7yY0XOfQek9+Fcd+zdYo0Z3eMSzyc2F+p7PoVftM1KAuOrMnuiTTjngJNnTAwbhdrq0rsYVh3kndepkLUeolUvUWl6a0/2MeJJ3aHzExZnfb2P8LiX8WgeE/MtC1notE8ADXrdoWbrf0=
+	t=1757986211; cv=none; b=QiavSt2pbrwrEByiMAgAYg9eM3vs8icCyYOOLIJsgmenIl58O3nRNWKqPy3KDr/Vp/AFsUS+5Y0NyxYonL/Gb8PohVwxQCfs6i/msDtxUNaGMoSkyfAbQiEgNPs34m4b1BkTs2hsK6snnVmpQPLtdpNVnjQlkQcYqhPYF1IZwDw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757984934; c=relaxed/simple;
-	bh=RLxHq+ieXY28lD11U/kgpTTtUvpefKc4mYLbzO1KbPE=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=gZbL2GBVa+c2SXmzS6f3sdVWdwJJULiEY8cJ0BNLnOXs9h+QbvYxLV9UzRaDYuLqythpgs7Duyg/dyiiiXdSnLTAoaDvwTNFyWNjtPVhlLNBXcpyF+jPtXY+hBj0NuWh5B7unAeo1gMUhtfPMKQTYJzbmssFVUSc5WyHBuxxHV8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=Pch4TApz; arc=none smtp.client-ip=209.85.214.173
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-pl1-f173.google.com with SMTP id d9443c01a7336-265f460ae7bso91875ad.0
-        for <kvm@vger.kernel.org>; Mon, 15 Sep 2025 18:08:53 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1757984932; x=1758589732; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=nPfnnggT2ndL938eIChQLKvTB/FFnYYq61IMlRsGnh4=;
-        b=Pch4TApzu1Zm/kTnaazdaLRFgUN4HlTabOTg/0Af/Ic9x8PfkdA7r/xYrg1FwxcTV8
-         hc7E0ACMQxmmqrN7rW/HCZOMXKdjv89vd4pva7jTI//F1CwqT6hI9wZnqy6v0gx+Mjec
-         KfM8F2xDRyU6uzWAeViww+ZUTuq3NHU0zG/A4c2y4Mo2WDHN2OtL2Qev8QRWCrKVIvFe
-         TTewqrE6HuFP39IP+XsNRLJldz7ZXP4e3nFtsrNYhbryLWSVhW3iOOPhA1ALNyKTlEZl
-         dcucesS6tOvjKSchZvEWxQedeakzWMCw1/VCtECYDidp3aXSbhZPJN3ir1A1QVWTt04N
-         4WsQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1757984932; x=1758589732;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=nPfnnggT2ndL938eIChQLKvTB/FFnYYq61IMlRsGnh4=;
-        b=Pwlk7Yx+s6FUjvMZdQxxF319WS2gec39OZtD2pcXIQAnmRkpODlZiWuDw+5p09zaRX
-         DR90FfEDxqcTzyAMEnkBvVsISxv1zG+Rse6IfT8OAR5bKrLIEI7NDTjWG1Q82ePFqFAy
-         2ubW9y/s3opQM1BPbVLuajxr7dmatIleSqc6okkCtMUh3FT9/ZQ0fH7ZIhSuPYd23gKk
-         Net3H8WYLmxN7YnT/o0v9J5r5MnAFjuxwmOA7at1lGhp4iPqfX2owGQvrBekoofH8KYK
-         i4gKPq4dVcJg8AAO5EKmvas7ZtqlK+V7HdeKchSuyDYLzV7FGAKq5kLsc8SjFZ+9p/oZ
-         8mmg==
-X-Forwarded-Encrypted: i=1; AJvYcCX1SZj6NKcm/dBvEHWfJPFqae2u++fOpmSK4OuzVTqTkgMSvjt90LBskmLVjSEH2WdYsuo=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxVMhvio7dcQuzuYPdLzwox/noquIX1T5+SVUL2iVukr67+o4gv
-	ZMBYp3wHPH7sNL9lbgsrgrViWRkSNU67BuXruLNXtGJ95cjkZXR9taLpGGxMsPKzpq/nlHJLiac
-	5H162Qn0LhyZgeykLdqzKFuRzjNiFu8mTGxi5IMr0
-X-Gm-Gg: ASbGncvLTaa84EctjkVTpl1l0n90j3E51KrWczESmwGNun5EHG5FkmvnbIXI0Fo/aP3
-	jpdL9HTNZssl5YhM88t/E/UOQRIIKfK6bvdTPxCjVnSnMCR6ubalYKvtu71FUryFNIFyxtLwnkj
-	tfZb7OLbZxQotE4pfdfBlazqKA265sAFgXHLKRfkpHoX7+gm5oPpSS6r9qtJ3g2sqyM9jrvh1RP
-	QqfTyCaXItxeh63UciHg+3fUMZaRU9cMYobRoDN8ZwAYbg=
-X-Google-Smtp-Source: AGHT+IFJAwHXee6Yr2rlSgFzR1W6KmuFM2AmQV7u+C+LW88ZIxPQ1NthTP/QNnO6EiXNfW/zo3fYwDpWfY06zM6keSU=
-X-Received: by 2002:a17:902:ea0f:b0:24b:131c:48b4 with SMTP id
- d9443c01a7336-267ca0ea180mr1360815ad.5.1757984932255; Mon, 15 Sep 2025
- 18:08:52 -0700 (PDT)
+	s=arc-20240116; t=1757986211; c=relaxed/simple;
+	bh=Rm0gHAfk+FjEIZWY7YKRbPW4JOwxvHlJnH3iKfsrlHY=;
+	h=Subject:To:References:From:Message-ID:Date:MIME-Version:
+	 In-Reply-To:Content-Type; b=CkuZ0cO3xhJrM9skK4Ged5yMsIiYddUUTGFf0yFZrpgzF/PGL7sCX0PXZ/CKHUxsP5WIMpPxJhH+CSi163LDbtYo0Wixq3n1TfEh7K6cl+oNo1n5m7rvu4eFWxnmwi8vPU8Sm71EdYUx5aHx2Kp0Ooef1KglET/1wb7/mZImxAo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=loongson.cn; spf=pass smtp.mailfrom=loongson.cn; arc=none smtp.client-ip=114.242.206.163
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=loongson.cn
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=loongson.cn
+Received: from loongson.cn (unknown [10.20.42.62])
+	by gateway (Coremail) with SMTP id _____8CxaNGXvcho2cUKAA--.23230S3;
+	Tue, 16 Sep 2025 09:29:59 +0800 (CST)
+Received: from [10.20.42.62] (unknown [10.20.42.62])
+	by front1 (Coremail) with SMTP id qMiowJAxvsGVvcho7lSYAA--.49454S3;
+	Tue, 16 Sep 2025 09:29:59 +0800 (CST)
+Subject: Re: [PATCH] LoongArch: KVM: rework pch_pic_update_batch_irqs()
+To: "Yury Norov (NVIDIA)" <yury.norov@gmail.com>,
+ Tianrui Zhao <zhaotianrui@loongson.cn>, Huacai Chen <chenhuacai@kernel.org>,
+ WANG Xuerui <kernel@xen0n.name>, Xianglai Li <lixianglai@loongson.cn>,
+ kvm@vger.kernel.org, loongarch@lists.linux.dev, linux-kernel@vger.kernel.org
+References: <20250913002907.69703-1-yury.norov@gmail.com>
+From: Bibo Mao <maobibo@loongson.cn>
+Message-ID: <0e330fc0-1200-6a02-7b21-78064fc63a2e@loongson.cn>
+Date: Tue, 16 Sep 2025 09:27:51 +0800
+User-Agent: Mozilla/5.0 (X11; Linux loongarch64; rv:68.0) Gecko/20100101
+ Thunderbird/68.7.0
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250902111951.58315-1-kalyazin@amazon.com> <20250902111951.58315-2-kalyazin@amazon.com>
- <CADrL8HV8+dh4xPv6Da5CR+CwGJwg5uHyNmiVmHhWFJSwy8ChRw@mail.gmail.com>
- <87d562a1-89fe-42a8-aa53-c052acf4c564@amazon.com> <CADrL8HUObfEd80sr783dB3dPWGSX7H5=0HCp9OjiL6D_Sp+2Ww@mail.gmail.com>
- <CAGtprH_LF+F9q=wLGCp9bXNWhoVXH36q2o2YM-VbF1OT64Qcpg@mail.gmail.com> <b325fb38-d34d-45e1-a5cb-eaf2b8c59549@amazon.com>
-In-Reply-To: <b325fb38-d34d-45e1-a5cb-eaf2b8c59549@amazon.com>
-From: Vishal Annapurve <vannapurve@google.com>
-Date: Mon, 15 Sep 2025 18:08:39 -0700
-X-Gm-Features: Ac12FXzyKYuqCZZsxxrtjECaM8gnlnpPAkbnGEzt2I2OQ5pY2bh2gNnFAoMROiY
-Message-ID: <CAGtprH8PJa-hV6DsfUKevZQs=73CUf8ow9i2-sdxbj555De9Aw@mail.gmail.com>
-Subject: Re: [PATCH v5 1/2] KVM: guest_memfd: add generic population via write
-To: kalyazin@amazon.com
-Cc: James Houghton <jthoughton@google.com>, "Kalyazin, Nikita" <kalyazin@amazon.co.uk>, 
-	"pbonzini@redhat.com" <pbonzini@redhat.com>, "shuah@kernel.org" <shuah@kernel.org>, 
-	"kvm@vger.kernel.org" <kvm@vger.kernel.org>, 
-	"linux-kselftest@vger.kernel.org" <linux-kselftest@vger.kernel.org>, 
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, "michael.day@amd.com" <michael.day@amd.com>, 
-	"david@redhat.com" <david@redhat.com>, "Roy, Patrick" <roypat@amazon.co.uk>, 
-	"Thomson, Jack" <jackabt@amazon.co.uk>, "Manwaring, Derek" <derekmn@amazon.com>, 
-	"Cali, Marco" <xmarcalx@amazon.co.uk>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+In-Reply-To: <20250913002907.69703-1-yury.norov@gmail.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+X-CM-TRANSID:qMiowJAxvsGVvcho7lSYAA--.49454S3
+X-CM-SenderInfo: xpdruxter6z05rqj20fqof0/
+X-Coremail-Antispam: 1Uk129KBj93XoW7CF1DGFW5AF47WFyDtr4UJrc_yoW8GF1UpF
+	W5uanIkFs5Gr1DXFy8uayUtF4ayrnrtr1SgF9F934xKrnxtr1FvF1kGrWkX3W5K393GF4I
+	vrs3tr1Sqa47AacCm3ZEXasCq-sJn29KB7ZKAUJUUUU8529EdanIXcx71UUUUU7KY7ZEXa
+	sCq-sGcSsGvfJ3Ic02F40EFcxC0VAKzVAqx4xG6I80ebIjqfuFe4nvWSU5nxnvy29KBjDU
+	0xBIdaVrnRJUUUvYb4IE77IF4wAFF20E14v26r1j6r4UM7CY07I20VC2zVCF04k26cxKx2
+	IYs7xG6rWj6s0DM7CIcVAFz4kK6r1Y6r17M28lY4IEw2IIxxk0rwA2F7IY1VAKz4vEj48v
+	e4kI8wA2z4x0Y4vE2Ix0cI8IcVAFwI0_Gr0_Xr1l84ACjcxK6xIIjxv20xvEc7CjxVAFwI
+	0_Gr0_Cr1l84ACjcxK6I8E87Iv67AKxVWxJr0_GcWl84ACjcxK6I8E87Iv6xkF7I0E14v2
+	6F4UJVW0owAS0I0E0xvYzxvE52x082IY62kv0487Mc804VCY07AIYIkI8VC2zVCFFI0UMc
+	02F40EFcxC0VAKzVAqx4xG6I80ewAv7VC0I7IYx2IY67AKxVWUGVWUXwAv7VC2z280aVAF
+	wI0_Jr0_Gr1lOx8S6xCaFVCjc4AY6r1j6r4UM4x0Y48IcVAKI48JMxk0xIA0c2IEe2xFo4
+	CEbIxvr21l42xK82IYc2Ij64vIr41l4I8I3I0E4IkC6x0Yz7v_Jr0_Gr1lx2IqxVAqx4xG
+	67AKxVWUJVWUGwC20s026x8GjcxK67AKxVWUGVWUWwC2zVAF1VAY17CE14v26r1q6r43MI
+	IYrxkI7VAKI48JMIIF0xvE2Ix0cI8IcVAFwI0_Jr0_JF4lIxAIcVC0I7IYx2IY6xkF7I0E
+	14v26r1j6r4UMIIF0xvE42xK8VAvwI8IcIk0rVWUJVWUCwCI42IY6I8E87Iv67AKxVWUJV
+	W8JwCI42IY6I8E87Iv6xkF7I0E14v26r1j6r4UYxBIdaVFxhVjvjDU0xZFpf9x07jUsqXU
+	UUUU=
 
-On Mon, Sep 15, 2025 at 4:01=E2=80=AFAM Nikita Kalyazin <kalyazin@amazon.co=
-m> wrote:
->
-> On 13/09/2025 01:32, Vishal Annapurve wrote:
-> > On Fri, Sep 12, 2025 at 3:35=E2=80=AFPM James Houghton <jthoughton@goog=
-le.com> wrote:
-> >>
-> >>>>> +
-> >>>>> +       if (folio_test_uptodate(folio)) {
-> >>>>> +               folio_unlock(folio);
-> >>>>> +               folio_put(folio);
-> >>>>> +               return -ENOSPC;
-> >>>>
-> >>>> Does it actually matter for the folio not to be uptodate? It seems
-> >>>> unnecessarily restrictive not to be able to overwrite data if we're
-> >>>> saying that this is only usable for unencrypted memory anyway.
-> >>>
-> >>> In the context of direct map removal [1] it does actually because whe=
-n
-> >>> we mark a folio as prepared, we remove it from the direct map making =
-it
-> >>> inaccessible to the way write() performs the copy.  It does not matte=
-r
-> >>> if direct map removal isn't enabled though.  Do you think it should b=
-e
-> >>> conditional?
-> >>
-> >> Oh, good point. It's simpler (both to implement and to describe) to
-> >> disallow a second write() call in all cases (no matter if the direct
-> >> map for the page has been removed or if the contents have been
-> >> encrypted), so I'm all for leaving it unconditional like you have now.
-> >> Thanks!
-> >
-> > Are we deviating from the way read/write semantics work for the other
-> > filesystems? I don't think other filesystems carry this restriction of
-> > one-time-write only. Do we strictly need the differing semantics?
->
-> Yes, I believe we are deviating from other "regular" filesystems, but I
-> don't think what we propose is too uncommon as in "special" filesystems
-> such as sysfs subsequent calls to attributes like "remove" will likely
-> fail as well (not due to up-to-date flag though).
->
-> > Maybe it would be simpler to not overload uptodate flag and just not
-> > allow read/write if folio is not mapped in the direct map for non-conf
-> > VMs (assuming there could be other ways to deduce that information).
->
-> The only such interface I'm aware of is kernel_page_present() so the
-> check may look like:
->
->         for (i =3D 0; i < folio_nr_pages(folio); i++) {
->                 struct page *page =3D folio_page(folio, i);
->                 if (!kernel_page_present(page)) {
->                         folio_unlock(folio);
->                         folio_put(folio);
->                         return -ENOSPC;
->                 }
->         }
->
-> However, kernel_page_present() is not currently exported to modules.
 
-I think it should be exposed if there is no cleaner way to deduce if a
-folio is mapped in the direct map. That being said, we should probably
-cleanly separate the series to add write population support and the
-series for removal from direct map [1] and figure out the order in
-which they need to be merged upstream.  I would still vote for not
-overloading folio_test_uptodate() in either series.
 
-Ackerley and Fuad are planning to post a series just for supporting
-in-place conversion for 4K pages which is going to introduce a maple
-tree for storing private/shared-ness of ranges. We could possibly
-augment the support to track directmap removal there. RFC version [2]
-is a good reference for now.
+On 2025/9/13 上午8:29, Yury Norov (NVIDIA) wrote:
+> Use proper bitmap API and drop all the housekeeping code.
+> 
+> Signed-off-by: Yury Norov (NVIDIA) <yury.norov@gmail.com>
+> ---
+>   arch/loongarch/kvm/intc/pch_pic.c | 11 +++--------
+>   1 file changed, 3 insertions(+), 8 deletions(-)
+> 
+> diff --git a/arch/loongarch/kvm/intc/pch_pic.c b/arch/loongarch/kvm/intc/pch_pic.c
+> index 119290bcea79..57e13ae51d24 100644
+> --- a/arch/loongarch/kvm/intc/pch_pic.c
+> +++ b/arch/loongarch/kvm/intc/pch_pic.c
+> @@ -35,16 +35,11 @@ static void pch_pic_update_irq(struct loongarch_pch_pic *s, int irq, int level)
+>   /* update batch irqs, the irq_mask is a bitmap of irqs */
+>   static void pch_pic_update_batch_irqs(struct loongarch_pch_pic *s, u64 irq_mask, int level)
+>   {
+> -	int irq, bits;
+> +	DECLARE_BITMAP(irqs, 64) = { BITMAP_FROM_U64(irq_mask) };
+> +	unsigned int irq;
+>   
+> -	/* find each irq by irqs bitmap and update each irq */
+> -	bits = sizeof(irq_mask) * 8;
+> -	irq = find_first_bit((void *)&irq_mask, bits);
+> -	while (irq < bits) {
+> +	for_each_set_bit(irq, irqs, 64)
+>   		pch_pic_update_irq(s, irq, level);
+> -		bitmap_clear((void *)&irq_mask, irq, 1);
+> -		irq = find_first_bit((void *)&irq_mask, bits);
+> -	}
+>   }
+>   
+>   /* called when a irq is triggered in pch pic */
+> 
+Thanks for doing this.
 
-[1] https://lore.kernel.org/kvm/20250912091708.17502-1-roypat@amazon.co.uk/
-[2] https://lore.kernel.org/kvm/d3832fd95a03aad562705872cbda5b3d248ca321.17=
-47264138.git.ackerleytng@google.com/#t
+Reviewed-by: Bibo Mao <maobibo@loongson.cn>
+
 
