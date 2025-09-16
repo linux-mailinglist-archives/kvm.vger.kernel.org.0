@@ -1,181 +1,418 @@
-Return-Path: <kvm+bounces-57794-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-57795-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id CF852B5A415
-	for <lists+kvm@lfdr.de>; Tue, 16 Sep 2025 23:39:10 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 51E40B7DE57
+	for <lists+kvm@lfdr.de>; Wed, 17 Sep 2025 14:36:33 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id A645D7ABB37
-	for <lists+kvm@lfdr.de>; Tue, 16 Sep 2025 21:37:27 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id CE436462CAF
+	for <lists+kvm@lfdr.de>; Tue, 16 Sep 2025 22:29:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D4E382DE707;
-	Tue, 16 Sep 2025 21:38:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C327030C620;
+	Tue, 16 Sep 2025 22:29:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="wpjpdlV2"
+	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="dO05iMKn"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pj1-f73.google.com (mail-pj1-f73.google.com [209.85.216.73])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from PH8PR06CU001.outbound.protection.outlook.com (mail-westus3azon11012006.outbound.protection.outlook.com [40.107.209.6])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8A3E931BCBB
-	for <kvm@vger.kernel.org>; Tue, 16 Sep 2025 21:38:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.73
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758058736; cv=none; b=XeUzE3F1QSyR5W/EEyJVTRmMLuBBfFNbA3HITX3tdUbNUNI75Acemv2LTko1g/3rN8U9oXCfma94VarAmJdXHeh5QNVZvnwsYKxTkr+D0zOFRruKc4KxRptDIxjNModxX7ajYAB7QlX7zr6xvA0llxLLl0eI37tuPReUvoY4kF0=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758058736; c=relaxed/simple;
-	bh=ry7qkTB0pJG0crn45IaGPPnZtArUza62ClgAt7diaKQ=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=an73S5ygLC1ibUf3ckve98FF/XyJppS8lxd+RdoOxK77LqlhgvxtNVYkDffIozeMDjADQhyF3fznknKTD0QnX4Hljm6RM0CUgQ4+cEPZsWbhw9/VJtjfRjfprc5rw0AlQboN3Xqsh5o7Ynk7dafjTsFOiXzTEav0b03vE0xNW3k=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=wpjpdlV2; arc=none smtp.client-ip=209.85.216.73
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pj1-f73.google.com with SMTP id 98e67ed59e1d1-32ec2211659so678378a91.0
-        for <kvm@vger.kernel.org>; Tue, 16 Sep 2025 14:38:54 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1758058734; x=1758663534; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=N3b3Tk/l8MqsriYm3Qf+JFhCnUPMjiU2DQ5fPBKzlm4=;
-        b=wpjpdlV2GhQTD91Ta5eX5siWUFbN7US6sLSpp8857mx0hm+AGZEskIQEoWrtzSaHsj
-         3YS4Rt3/1BSguL9dIPA6PEZ0FhiCeTVHX28kqcaBH6Z8s84FZKVVrNiMRbWGrjZDMCj6
-         uc9LfK09Ff0968zxpYpp22Fg3aohyMIaRM8zbeEIW+OXFy/Z8zWNfvbVYnlTzkixWY7b
-         HdTMnuPplklppuPadcOZJ0Mtk0O+uwTeLJZbOkZbQ67DGEQ3Sm04KDTdUTkXByDIE8P4
-         CGFBdt1ZTeDJezKTygsKU3sIBkytXfPTSNR6jPbsgjcfoXR3soBRKdkf2x+h7HI71zna
-         UnpA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1758058734; x=1758663534;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=N3b3Tk/l8MqsriYm3Qf+JFhCnUPMjiU2DQ5fPBKzlm4=;
-        b=iiwQX9f+3ElaOacSmwpbKdU0WJeskhfz8MJUfk9HkR/06/OD3Mg5vQX9iiRni8Nkkz
-         J9UZSe8fmHEgcqeYjMAbJ634EYA7ulpNIHRSnn/E5cuW8SedbX5Z0vlVxWjP0RiPqbu8
-         v4CQGa5+hViWkpKDfqxU2WbNcluPHwXlTrf4Tdl3pSzKS+a0S5HavqRG7cvGR4nRRQNP
-         WKQntKXFovmtWffIkIqF725ixWUUg1Z81MkjS33hCx1YFziQLYllTpcjDF3mvT7o9WqM
-         qAnsXVG0EZo7lo0NIGU6hX93vgjJQkjtG5QeumGKlud59O6nMZ4oelSHV74ynEyPPqWS
-         91Eg==
-X-Forwarded-Encrypted: i=1; AJvYcCVPenYQFUu0uIw7DaaRtfbXQ20JUytZ2iRe6c/b3EZpYs7dXGFZ6FjjLvwRxLbvDjFuWBo=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzVTdzVoqXMzfKm0EOJPkd/FK7pF9USHdFawC9ZIjWGAEDLHZE9
-	irmQ4C7+wVa0kaqmZUSRu/RTqC3KTEvVRbamnHbtqliJgETsmyLnT2qZ5u43lFgj0cSkcdZB7pc
-	/gakYjQ==
-X-Google-Smtp-Source: AGHT+IFpPyFP3pZHDiGP08zKKpUK8E7Uz0NLVkZDtHl1SG5g6WnVLCUlyN3v3omtp5YZLceLqn/eINYnI94=
-X-Received: from pjbsq6.prod.google.com ([2002:a17:90b:5306:b0:32e:834b:ea49])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:4c43:b0:32b:6cf2:a2cf
- with SMTP id 98e67ed59e1d1-32de4ecfef6mr20983631a91.14.1758058733733; Tue, 16
- Sep 2025 14:38:53 -0700 (PDT)
-Date: Tue, 16 Sep 2025 14:38:52 -0700
-In-Reply-To: <aMnJYWKf63Ay+pIA@AUSJOHALLEN.amd.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E0FEE32B482;
+	Tue, 16 Sep 2025 22:28:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.209.6
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1758061741; cv=fail; b=A6mEolzVkIZkCrcBruD1zMdaGF6RfgXa6xCAG/V06TI7tj1LhvjMI1WACU6xjGVnVTwe/T03/Ese3pHrMHeK5Q0EbNmr7/cjKOYvFJtvul50DWewDzzodumAlyC46MPcmZ7KM4MHgZheP+1YT4oiNVPBBADKcQturITiktnTZec=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1758061741; c=relaxed/simple;
+	bh=qTCh42ngBeCZzyvlTNlHxY0dKX0rnYI3vO2J2JardWU=;
+	h=Date:From:To:CC:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=T/1sRG4Bw/w9tCfllpHhbJvkl4VEjZFyECviAjgxgBzmA5pF/KWcinkUtT+xB5qZHs+nEKy/WfDCplDhfgRH93HYmnGRbPLeDchR+hp15Anm7c7u24C4EKr0PXFfVRRen2fb6kvIq1np+T4PxHBd92RyS9JPXhww7wfwUYYPXh0=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=dO05iMKn; arc=fail smtp.client-ip=40.107.209.6
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=DhJZWOAkvsKT5wpsuoFI7lEsbm4K7WKZzCX/8v2foQWY0kjMa++np8y3PVIWFdygrY+l8dISDKFJHs8PyF0Tb0FDL3AZKYniXnKy5WRewM+rfPdb7ASYeFpnp6rG35qlQF/c3LggQaI6iqp9p79a+sNLc56J1hChLaaIydzEok3RsdKRlHf2yXQj2aIwMTRwiVSmD6oziZlBrAkPbtt6gp6f3FKs9QdQJ7Lmx1lPiGXakqor7d98e90X3m4ab6ho+vGGAk1pHHz3x0qJ1QtN/N+tggjo9iE3xxszlnAPjkIL2AIQts36MeE1NiutegcVgLnpqPbwtGgEORVb6i5DKA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=vRvJqB1cYjNMQq+zrXuIgQhoZgiwGntkhPflEykCBbE=;
+ b=tYB8r9hmyNejQMCv0vy/gqzP3uXAN8EvqDvrOS2RVDAbUy0TJfP4k70YTMCBmjyVFZs1DMtZ6txA2q22lwE2y0pMnGTxsDoS7nmo53ZRX8E8x8izOJ975ilXqIt5Uet6SeE55a03AutQIGB1EEuYkpZqMYML6FmWrFjAz7keRSeoNYjYEZnyHjILsTWfJyEEUBpUPqyzZZE/to1pIp2ek8NcgVd+MUxanftdaOPNCw2xCVu5VG72xGh2fsDbyDix26uEbgE67/tnj///0CokM9PFo4YuFje71/cz7werkppNnLS3eAuSAnKxhlQJxlj6sA7WNh3TkYYan9/d6K939g==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 165.204.84.17) smtp.rcpttodomain=google.com smtp.mailfrom=amd.com; dmarc=pass
+ (p=quarantine sp=quarantine pct=100) action=none header.from=amd.com;
+ dkim=none (message not signed); arc=none (0)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=vRvJqB1cYjNMQq+zrXuIgQhoZgiwGntkhPflEykCBbE=;
+ b=dO05iMKn0mE+BBJrxmKKSKvF9qrlIdnbfuaF9tJkIpjI1p7SOxiGMbbFTRGLkwLzt4q7ZcdcoT8PVaqdQ5zy5MVX57IHLGubzA2ATN8DEj+8vsn6uTjhSZGOzRm7vHFJm8WKwEmP87IWiz6fvBvDVGrarNy7AB11WF/2BxW9LMk=
+Received: from DS7PR05CA0014.namprd05.prod.outlook.com (2603:10b6:5:3b9::19)
+ by PH7PR12MB6417.namprd12.prod.outlook.com (2603:10b6:510:1ff::14) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9115.21; Tue, 16 Sep
+ 2025 22:28:51 +0000
+Received: from DS2PEPF00003443.namprd04.prod.outlook.com
+ (2603:10b6:5:3b9:cafe::9a) by DS7PR05CA0014.outlook.office365.com
+ (2603:10b6:5:3b9::19) with Microsoft SMTP Server (version=TLS1_3,
+ cipher=TLS_AES_256_GCM_SHA384) id 15.20.9137.12 via Frontend Transport; Tue,
+ 16 Sep 2025 22:28:50 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
+ smtp.mailfrom=amd.com; dkim=none (message not signed)
+ header.d=none;dmarc=pass action=none header.from=amd.com;
+Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
+ 165.204.84.17 as permitted sender) receiver=protection.outlook.com;
+ client-ip=165.204.84.17; helo=satlexmb07.amd.com; pr=C
+Received: from satlexmb07.amd.com (165.204.84.17) by
+ DS2PEPF00003443.mail.protection.outlook.com (10.167.17.70) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.9137.12 via Frontend Transport; Tue, 16 Sep 2025 22:28:50 +0000
+Received: from localhost (10.180.168.240) by satlexmb07.amd.com
+ (10.181.42.216) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.17; Tue, 16 Sep
+ 2025 15:28:50 -0700
+Date: Tue, 16 Sep 2025 17:28:01 -0500
+From: Michael Roth <michael.roth@amd.com>
+To: Ackerley Tng <ackerleytng@google.com>
+CC: <kvm@vger.kernel.org>, <linux-mm@kvack.org>,
+	<linux-kernel@vger.kernel.org>, <x86@kernel.org>,
+	<linux-fsdevel@vger.kernel.org>, <aik@amd.com>, <ajones@ventanamicro.com>,
+	<akpm@linux-foundation.org>, <amoorthy@google.com>,
+	<anthony.yznaga@oracle.com>, <anup@brainfault.org>, <aou@eecs.berkeley.edu>,
+	<bfoster@redhat.com>, <binbin.wu@linux.intel.com>, <brauner@kernel.org>,
+	<catalin.marinas@arm.com>, <chao.p.peng@intel.com>, <chenhuacai@kernel.org>,
+	<dave.hansen@intel.com>, <david@redhat.com>, <dmatlack@google.com>,
+	<dwmw@amazon.co.uk>, <erdemaktas@google.com>, <fan.du@intel.com>,
+	<fvdl@google.com>, <graf@amazon.com>, <haibo1.xu@intel.com>,
+	<hch@infradead.org>, <hughd@google.com>, <ira.weiny@intel.com>,
+	<isaku.yamahata@intel.com>, <jack@suse.cz>, <james.morse@arm.com>,
+	<jarkko@kernel.org>, <jgg@ziepe.ca>, <jgowans@amazon.com>,
+	<jhubbard@nvidia.com>, <jroedel@suse.de>, <jthoughton@google.com>,
+	<jun.miao@intel.com>, <kai.huang@intel.com>, <keirf@google.com>,
+	<kent.overstreet@linux.dev>, <kirill.shutemov@intel.com>,
+	<liam.merwick@oracle.com>, <maciej.wieczor-retman@intel.com>,
+	<mail@maciej.szmigiero.name>, <maz@kernel.org>, <mic@digikod.net>,
+	<mpe@ellerman.id.au>, <muchun.song@linux.dev>, <nikunj@amd.com>,
+	<nsaenz@amazon.es>, <oliver.upton@linux.dev>, <palmer@dabbelt.com>,
+	<pankaj.gupta@amd.com>, <paul.walmsley@sifive.com>, <pbonzini@redhat.com>,
+	<pdurrant@amazon.co.uk>, <peterx@redhat.com>, <pgonda@google.com>,
+	<pvorel@suse.cz>, <qperret@google.com>, <quic_cvanscha@quicinc.com>,
+	<quic_eberman@quicinc.com>, <quic_mnalajal@quicinc.com>,
+	<quic_pderrin@quicinc.com>, <quic_pheragu@quicinc.com>,
+	<quic_svaddagi@quicinc.com>, <quic_tsoni@quicinc.com>,
+	<richard.weiyang@gmail.com>, <rick.p.edgecombe@intel.com>,
+	<rientjes@google.com>, <roypat@amazon.co.uk>, <rppt@kernel.org>,
+	<seanjc@google.com>, <shuah@kernel.org>, <steven.price@arm.com>,
+	<steven.sistare@oracle.com>, <suzuki.poulose@arm.com>, <tabba@google.com>,
+	<thomas.lendacky@amd.com>, <usama.arif@bytedance.com>,
+	<vannapurve@google.com>, <vbabka@suse.cz>, <viro@zeniv.linux.org.uk>,
+	<vkuznets@redhat.com>, <wei.w.wang@intel.com>, <will@kernel.org>,
+	<willy@infradead.org>, <xiaoyao.li@intel.com>, <yan.y.zhao@intel.com>,
+	<yilun.xu@intel.com>, <yuzenghui@huawei.com>, <zhiquan1.li@intel.com>
+Subject: Re: [RFC PATCH v2 35/51] mm: guestmem_hugetlb: Add support for
+ splitting and merging pages
+Message-ID: <20250916222801.dlew6mq7kog2q5ni@amd.com>
+References: <cover.1747264138.git.ackerleytng@google.com>
+ <2ae41e0d80339da2b57011622ac2288fed65cd01.1747264138.git.ackerleytng@google.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20250912232319.429659-1-seanjc@google.com> <20250912232319.429659-30-seanjc@google.com>
- <aMmynhOnU/VkcXwI@AUSJOHALLEN.amd.com> <aMnAVtWhxQipw9Er@google.com> <aMnJYWKf63Ay+pIA@AUSJOHALLEN.amd.com>
-Message-ID: <aMnY7NqhhnMYqu7m@google.com>
-Subject: Re: [PATCH v15 29/41] KVM: SEV: Synchronize MSR_IA32_XSS from the
- GHCB when it's valid
-From: Sean Christopherson <seanjc@google.com>
-To: John Allen <john.allen@amd.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	Tom Lendacky <thomas.lendacky@amd.com>, Mathias Krause <minipli@grsecurity.net>, 
-	Rick Edgecombe <rick.p.edgecombe@intel.com>, Chao Gao <chao.gao@intel.com>, 
-	Maxim Levitsky <mlevitsk@redhat.com>, Xiaoyao Li <xiaoyao.li@intel.com>
+MIME-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
+Content-Disposition: inline
+In-Reply-To: <2ae41e0d80339da2b57011622ac2288fed65cd01.1747264138.git.ackerleytng@google.com>
+X-ClientProxiedBy: satlexmb07.amd.com (10.181.42.216) To satlexmb07.amd.com
+ (10.181.42.216)
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: DS2PEPF00003443:EE_|PH7PR12MB6417:EE_
+X-MS-Office365-Filtering-Correlation-Id: f5420751-3700-49e2-3634-08ddf570694b
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|1800799024|36860700013|376014|7416014|82310400026|7053199007|13003099007;
+X-Microsoft-Antispam-Message-Info:
+	=?us-ascii?Q?qlOpVWPqD3Xy81rnCePzadVbU5FaOEsYEEYnDWxQAM8U1TBT/8cqVHiftwo3?=
+ =?us-ascii?Q?AikbNWAmzRZVcgIeBJ+KJ4xgf3ITSHdFd4NCbD206aJPoDQAq6UfpG/ouo6z?=
+ =?us-ascii?Q?5sl925dCBBJ/GpZvaDUbdjeACOXhdZORa5+gDktl+6NeNODyrjbDQ+NxW1mc?=
+ =?us-ascii?Q?LUhw+3bIz0nOypIIb/RmCJ51hEN7QQmpgXcG+2SQa5+NVpR4fgFAVLhqfxwd?=
+ =?us-ascii?Q?PVZZP7Ny+P4IBBO2GbctTZXJVp8/gtae7zOKs0+6rBFkEpO0hAkVC6QjBOTN?=
+ =?us-ascii?Q?ZDft8Hd/mwRFxQrFccy03T5KhCzcxNER+eVf0QUbYzmySINK4S+P3qvkqxaA?=
+ =?us-ascii?Q?tR5hpW/BBRBq4iExnSTGE1rrB6/5jpzyV8PCLaeDjh0yAaDpke8w9dYNY3lx?=
+ =?us-ascii?Q?RU+nrvi8JPyUM8MO1w3T5iUDbqPMmQvHvlLYAHZCJduZdQ9IDbAEsZzxRuAH?=
+ =?us-ascii?Q?wG5BZJl4caaaHuS1EHmNvHMxfujeDGF1mfBNlEodcO9j3emlX/afXkw7/tli?=
+ =?us-ascii?Q?amgw6vyX2VScPC2II5fMh91gDb8O9N7O0M5ZwndOs9EMju8OXC9e7GpoIfrX?=
+ =?us-ascii?Q?4xOyjyZ5SUe69R+f4xX3hV+tV7T1x8GlrvmsxP2Uj3YalMofANEwuAuyFY3A?=
+ =?us-ascii?Q?LX9/o18J9icOFwgH/sCEtuN7fKvDRs/fTy7ciPG8BPn306hi/WcAuyD2gnAB?=
+ =?us-ascii?Q?H/HihwX+17Ezp5l3lJPr/b4cp1E42Aj5w4aJdT/tdftWTnnzdOZ2ywNA0bS0?=
+ =?us-ascii?Q?z2Zmk9IxjWXLLx5172Xgph4GOybj7mHCCpd+phA8uo+EgkDyjhLaqmDVjeSb?=
+ =?us-ascii?Q?MqbSgnGLWEme6zkPnOt6KToNHf+OGhyhaafB1uX/kN3W7tvc7JKHp3iSX6ml?=
+ =?us-ascii?Q?gqGRrhDrMSfQfanAltT/LLsVAe35/FsKYVt6kZtD+2xaw5EAe0Y94VmWZvzX?=
+ =?us-ascii?Q?4oWoVhR/gr1eUX9FqY5HwmgCVXvMxJ+oDDArUqFGJ227j96pgutJbDM5q+t4?=
+ =?us-ascii?Q?kphCfbAX40O8DwOtWnPd85yo7gErf7hT/RjDdOpPpHHBk9xT1KVJHx0DDGI9?=
+ =?us-ascii?Q?+XrCirBEtYI9oVfrG08qQjnLYtPtxzPhkSQLMJJawgAmdNOa7e2hr9khk71i?=
+ =?us-ascii?Q?DJJKMyFH8Arcjehw8e1YHFuJeWugxpCwCitUStt8qpb+5MxF6gjwvbfgbknV?=
+ =?us-ascii?Q?ek0q4jiOmWaNrkXJzxj96UindF+WoO+GRhltOTL7ZMMi+e27wglOut3bBRQa?=
+ =?us-ascii?Q?jtU091ZqtBbRSk3YJdENHwqXzFhUeFDofBU798QxIlIPP9EFGiqC2QBuvsXP?=
+ =?us-ascii?Q?V8yyJp0TzYRaisXlA+NthqsUxJIgrjRzJmQzSzZYDoZbtAgGni5UXP7ggtFB?=
+ =?us-ascii?Q?YNsxP8zVvs/PcGo4WUaUhn5E2z0mol9QC57AKoEBAJKQB9Pk2EEMPfArTYrJ?=
+ =?us-ascii?Q?vdntjkG08aLW7NF6uXm/+1TBTKX7iBG6VjD7POhwZyJo9nuDQhXffSweFV8j?=
+ =?us-ascii?Q?Q60RFK10k6V3FKjaa5Dwa4UkJEnAU/C5asqW92SCdX0Ez47Z2bhAYy8snw?=
+ =?us-ascii?Q?=3D=3D?=
+X-Forefront-Antispam-Report:
+	CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:satlexmb07.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230040)(1800799024)(36860700013)(376014)(7416014)(82310400026)(7053199007)(13003099007);DIR:OUT;SFP:1101;
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 16 Sep 2025 22:28:50.7362
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: f5420751-3700-49e2-3634-08ddf570694b
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[satlexmb07.amd.com]
+X-MS-Exchange-CrossTenant-AuthSource:
+	DS2PEPF00003443.namprd04.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH7PR12MB6417
 
-On Tue, Sep 16, 2025, John Allen wrote:
-> On Tue, Sep 16, 2025 at 12:53:58PM -0700, Sean Christopherson wrote:
-> > On Tue, Sep 16, 2025, John Allen wrote:
-> > > On Fri, Sep 12, 2025 at 04:23:07PM -0700, Sean Christopherson wrote:
-> > > > diff --git a/arch/x86/kvm/svm/sev.c b/arch/x86/kvm/svm/sev.c
-> > > > index 0cd77a87dd84..0cd32df7b9b6 100644
-> > > > --- a/arch/x86/kvm/svm/sev.c
-> > > > +++ b/arch/x86/kvm/svm/sev.c
-> > > > @@ -3306,6 +3306,9 @@ static void sev_es_sync_from_ghcb(struct vcpu_svm *svm)
-> > > >  	if (kvm_ghcb_xcr0_is_valid(svm))
-> > > >  		__kvm_set_xcr(vcpu, 0, kvm_ghcb_get_xcr0(ghcb));
-> > > >  
-> > > > +	if (kvm_ghcb_xss_is_valid(svm))
-> > > > +		__kvm_emulate_msr_write(vcpu, MSR_IA32_XSS, kvm_ghcb_get_xss(ghcb));
-> > > > +
-> > > 
-> > > It looks like this is the change that caused the selftest regression
-> > > with sev-es. It's not yet clear to me what the problem is though.
-> > 
-> > Do you see any WARNs in the guest kernel log?
-> > 
-> > The most obvious potential bug is that KVM is missing a CPUID update, e.g. due
-> > to dropping an XSS write, consuming stale data, not setting cpuid_dynamic_bits_dirty,
-> > etc.  But AFAICT, CPUID.0xD.1.EBX (only thing that consumes the current XSS) is
-> > only used by init_xstate_size(), and I would expect the guest kernel's sanity
-> > checks in paranoid_xstate_size_valid() to yell if KVM botches CPUID emulation.
+On Wed, May 14, 2025 at 04:42:14PM -0700, Ackerley Tng wrote:
+> These functions allow guest_memfd to split and merge HugeTLB pages,
+> and clean them up on freeing the page.
 > 
-> Yes, actually that looks to be the case:
+> For merging and splitting pages on conversion, guestmem_hugetlb
+> expects the refcount on the pages to already be 0. The caller must
+> ensure that.
 > 
-> [    0.463504] ------------[ cut here ]------------
-> [    0.464443] XSAVE consistency problem: size 880 != kernel_size 840
-> [    0.465445] WARNING: CPU: 0 PID: 0 at arch/x86/kernel/fpu/xstate.c:638 paranoid_xstate_size_valid+0x101/0x140
+> For conversions, guest_memfd ensures that the refcounts are already 0
+> by checking that there are no unexpected refcounts, and then freezing
+> the expected refcounts away. On unexpected refcounts, guest_memfd will
+> return an error to userspace.
+> 
+> For truncation, on unexpected refcounts, guest_memfd will return an
+> error to userspace.
+> 
+> For truncation on closing, guest_memfd will just remove its own
+> refcounts (the filemap refcounts) and mark split pages with
+> PGTY_guestmem_hugetlb.
+> 
+> The presence of PGTY_guestmem_hugetlb will trigger the folio_put()
+> callback to handle further cleanup. This cleanup process will merge
+> pages (with refcount 0, since cleanup is triggered from folio_put())
+> before returning the pages to HugeTLB.
+> 
+> Since the merging process is long, it is deferred to a worker thread
+> since folio_put() could be called from atomic context.
+> 
+> Change-Id: Ib04a3236f1e7250fd9af827630c334d40fb09d40
+> Signed-off-by: Ackerley Tng <ackerleytng@google.com>
+> Co-developed-by: Vishal Annapurve <vannapurve@google.com>
+> Signed-off-by: Vishal Annapurve <vannapurve@google.com>
+> ---
+>  include/linux/guestmem.h |   3 +
+>  mm/guestmem_hugetlb.c    | 349 ++++++++++++++++++++++++++++++++++++++-
+>  2 files changed, 347 insertions(+), 5 deletions(-)
+> 
+> diff --git a/include/linux/guestmem.h b/include/linux/guestmem.h
+> index 4b2d820274d9..3ee816d1dd34 100644
+> --- a/include/linux/guestmem.h
+> +++ b/include/linux/guestmem.h
+> @@ -8,6 +8,9 @@ struct guestmem_allocator_operations {
+>  	void *(*inode_setup)(size_t size, u64 flags);
+>  	void (*inode_teardown)(void *private, size_t inode_size);
+>  	struct folio *(*alloc_folio)(void *private);
+> +	int (*split_folio)(struct folio *folio);
+> +	void (*merge_folio)(struct folio *folio);
+> +	void (*free_folio)(struct folio *folio);
+>  	/*
+>  	 * Returns the number of PAGE_SIZE pages in a page that this guestmem
+>  	 * allocator provides.
+> diff --git a/mm/guestmem_hugetlb.c b/mm/guestmem_hugetlb.c
+> index ec5a188ca2a7..8727598cf18e 100644
+> --- a/mm/guestmem_hugetlb.c
+> +++ b/mm/guestmem_hugetlb.c
+> @@ -11,15 +11,12 @@
+>  #include <linux/mm.h>
+>  #include <linux/mm_types.h>
+>  #include <linux/pagemap.h>
+> +#include <linux/xarray.h>
+>  
+>  #include <uapi/linux/guestmem.h>
+>  
+>  #include "guestmem_hugetlb.h"
+> -
+> -void guestmem_hugetlb_handle_folio_put(struct folio *folio)
+> -{
+> -	WARN_ONCE(1, "A placeholder that shouldn't trigger. Work in progress.");
+> -}
+> +#include "hugetlb_vmemmap.h"
+>  
+>  struct guestmem_hugetlb_private {
+>  	struct hstate *h;
+> @@ -34,6 +31,339 @@ static size_t guestmem_hugetlb_nr_pages_in_folio(void *priv)
+>  	return pages_per_huge_page(private->h);
+>  }
+>  
+> +static DEFINE_XARRAY(guestmem_hugetlb_stash);
+> +
+> +struct guestmem_hugetlb_metadata {
+> +	void *_hugetlb_subpool;
+> +	void *_hugetlb_cgroup;
+> +	void *_hugetlb_hwpoison;
+> +	void *private;
+> +};
+> +
+> +struct guestmem_hugetlb_stash_item {
+> +	struct guestmem_hugetlb_metadata hugetlb_metadata;
+> +	/* hstate tracks the original size of this folio. */
+> +	struct hstate *h;
+> +	/* Count of split pages, individually freed, waiting to be merged. */
+> +	atomic_t nr_pages_waiting_to_be_merged;
+> +};
+> +
+> +struct workqueue_struct *guestmem_hugetlb_wq __ro_after_init;
+> +static struct work_struct guestmem_hugetlb_cleanup_work;
+> +static LLIST_HEAD(guestmem_hugetlb_cleanup_list);
+> +
+> +static inline void guestmem_hugetlb_register_folio_put_callback(struct folio *folio)
+> +{
+> +	__folio_set_guestmem_hugetlb(folio);
+> +}
+> +
+> +static inline void guestmem_hugetlb_unregister_folio_put_callback(struct folio *folio)
+> +{
+> +	__folio_clear_guestmem_hugetlb(folio);
+> +}
+> +
+> +static inline void guestmem_hugetlb_defer_cleanup(struct folio *folio)
+> +{
+> +	struct llist_node *node;
+> +
+> +	/*
+> +	 * Reuse the folio->mapping pointer as a struct llist_node, since
+> +	 * folio->mapping is NULL at this point.
+> +	 */
+> +	BUILD_BUG_ON(sizeof(folio->mapping) != sizeof(struct llist_node));
+> +	node = (struct llist_node *)&folio->mapping;
+> +
+> +	/*
+> +	 * Only schedule work if list is previously empty. Otherwise,
+> +	 * schedule_work() had been called but the workfn hasn't retrieved the
+> +	 * list yet.
+> +	 */
+> +	if (llist_add(node, &guestmem_hugetlb_cleanup_list))
+> +		queue_work(guestmem_hugetlb_wq, &guestmem_hugetlb_cleanup_work);
+> +}
+> +
+> +void guestmem_hugetlb_handle_folio_put(struct folio *folio)
+> +{
+> +	guestmem_hugetlb_unregister_folio_put_callback(folio);
+> +
+> +	/*
+> +	 * folio_put() can be called in interrupt context, hence do the work
+> +	 * outside of interrupt context
+> +	 */
+> +	guestmem_hugetlb_defer_cleanup(folio);
+> +}
+> +
+> +/*
+> + * Stash existing hugetlb metadata. Use this function just before splitting a
+> + * hugetlb page.
+> + */
+> +static inline void
+> +__guestmem_hugetlb_stash_metadata(struct guestmem_hugetlb_metadata *metadata,
+> +				  struct folio *folio)
+> +{
+> +	/*
+> +	 * (folio->page + 1) doesn't have to be stashed since those fields are
+> +	 * known on split/reconstruct and will be reinitialized anyway.
+> +	 */
+> +
+> +	/*
+> +	 * subpool is created for every guest_memfd inode, but the folios will
+> +	 * outlive the inode, hence we store the subpool here.
+> +	 */
+> +	metadata->_hugetlb_subpool = folio->_hugetlb_subpool;
+> +	/*
+> +	 * _hugetlb_cgroup has to be stored for freeing
+> +	 * later. _hugetlb_cgroup_rsvd does not, since it is NULL for
+> +	 * guest_memfd folios anyway. guest_memfd reservations are handled in
+> +	 * the inode.
+> +	 */
+> +	metadata->_hugetlb_cgroup = folio->_hugetlb_cgroup;
+> +	metadata->_hugetlb_hwpoison = folio->_hugetlb_hwpoison;
+> +
+> +	/*
+> +	 * HugeTLB flags are stored in folio->private. stash so that ->private
+> +	 * can be used by core-mm.
+> +	 */
+> +	metadata->private = folio->private;
+> +}
+> +
+> +static int guestmem_hugetlb_stash_metadata(struct folio *folio)
+> +{
+> +	XA_STATE(xas, &guestmem_hugetlb_stash, 0);
+> +	struct guestmem_hugetlb_stash_item *stash;
+> +	void *entry;
+> +
+> +	stash = kzalloc(sizeof(*stash), 1);
+> +	if (!stash)
+> +		return -ENOMEM;
+> +
+> +	stash->h = folio_hstate(folio);
+> +	__guestmem_hugetlb_stash_metadata(&stash->hugetlb_metadata, folio);
+> +
+> +	xas_set_order(&xas, folio_pfn(folio), folio_order(folio));
+> +
+> +	xas_lock(&xas);
+> +	entry = xas_store(&xas, stash);
+> +	xas_unlock(&xas);
+> +
+> +	if (xa_is_err(entry)) {
+> +		kfree(stash);
+> +		return xa_err(entry);
+> +	}
+> +
+> +	return 0;
+> +}
+> +
+> +static inline void
+> +__guestmem_hugetlb_unstash_metadata(struct guestmem_hugetlb_metadata *metadata,
+> +				    struct folio *folio)
+> +{
+> +	folio->_hugetlb_subpool = metadata->_hugetlb_subpool;
+> +	folio->_hugetlb_cgroup = metadata->_hugetlb_cgroup;
+> +	folio->_hugetlb_cgroup_rsvd = NULL;
+> +	folio->_hugetlb_hwpoison = metadata->_hugetlb_hwpoison;
+> +
+> +	folio_change_private(folio, metadata->private);
 
-Can you run with the below printk tracing in the host (and optionally tracing in
-the guest for its updates)?  Compile tested only.
+Hi Ackerley,
 
-There should be very few XSS updates, so this _shouldn't_ spam/crash your host :-)
+We've been doing some testing with this series on top of David's
+guestmemfd-preview branch with some SNP enablement[1][2] to exercise
+this code along with the NUMA support from Shivank (BTW, I know you
+have v3 in the works so let me know if we can help with testing that
+as well).
 
----
- arch/x86/kvm/svm/sev.c |  6 ++++--
- arch/x86/kvm/x86.c     | 15 ++++++++++++---
- 2 files changed, 16 insertions(+), 5 deletions(-)
+One issue we hit is if you do a split->merge sequence the unstash of the
+private data will result in folio_test_hugetlb_vmemmap_optimized() reporting
+true even though the hugetlb_vmemmap_optimize_folio() call hasn't been
+performed yet, and when that does get called it will be skipped, so some HVO
+optimization can be lost in this way.
 
-diff --git a/arch/x86/kvm/svm/sev.c b/arch/x86/kvm/svm/sev.c
-index 0cd32df7b9b6..8ac87d623767 100644
---- a/arch/x86/kvm/svm/sev.c
-+++ b/arch/x86/kvm/svm/sev.c
-@@ -3306,8 +3306,10 @@ static void sev_es_sync_from_ghcb(struct vcpu_svm *svm)
- 	if (kvm_ghcb_xcr0_is_valid(svm))
- 		__kvm_set_xcr(vcpu, 0, kvm_ghcb_get_xcr0(ghcb));
- 
--	if (kvm_ghcb_xss_is_valid(svm))
--		__kvm_emulate_msr_write(vcpu, MSR_IA32_XSS, kvm_ghcb_get_xss(ghcb));
-+	if (kvm_ghcb_xss_is_valid(svm)) {
-+		if (__kvm_emulate_msr_write(vcpu, MSR_IA32_XSS, kvm_ghcb_get_xss(ghcb));
-+			pr_warn("Dropped XSS update, val = %llx\n", data);
-+	}
- 
- 	/* Copy the GHCB exit information into the VMCB fields */
- 	exit_code = kvm_ghcb_get_sw_exit_code(ghcb);
-diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-index c78acab2ff3f..a846ed69ce2c 100644
---- a/arch/x86/kvm/x86.c
-+++ b/arch/x86/kvm/x86.c
-@@ -4118,13 +4118,22 @@ int kvm_set_msr_common(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
- 		}
- 		break;
- 	case MSR_IA32_XSS:
--		if (!guest_cpuid_has(vcpu, X86_FEATURE_XSAVES))
-+		if (!guest_cpuid_has(vcpu, X86_FEATURE_XSAVES)) {
-+			pr_warn("Guest CPUID doesn't have XSAVES\n");
- 			return KVM_MSR_RET_UNSUPPORTED;
-+		}
- 
--		if (data & ~vcpu->arch.guest_supported_xss)
-+		if (data & ~vcpu->arch.guest_supported_xss) {
-+			pr_warn("Invalid XSS: supported = %llx, val = %llx\n",
-+				vcpu->arch.guest_supported_xss, data);
- 			return 1;
--		if (vcpu->arch.ia32_xss == data)
-+		}
-+		if (vcpu->arch.ia32_xss == data) {
-+			pr_warn("XSS already set to val = %llx, eliding updates\n", data);
- 			break;
-+		}
-+
-+		pr_warn("XSS updated to val = %llx, marking CPUID dirty\n", data);
- 		vcpu->arch.ia32_xss = data;
- 		vcpu->arch.cpuid_dynamic_bits_dirty = true;
- 		break;
+More troublesome however is if you later split the folio again,
+hugetlb_vmemmap_restore_folio() may cause a BUG_ON() since the flags are in a
+state that's not consistent with the state of the folio/vmemmap.
 
-base-commit: 14298d819d5a6b7180a4089e7d2121ca3551dc6c
---
+The following patch seems to resolve the issue but I'm not sure what the
+best approach would be:
+
+  https://github.com/AMDESE/linux/commit/b1f25956f18d32730b8d4ded6d77e980091eb4d3
+
+Thanks,
+
+Mike
+
+[1] https://github.com/AMDESE/linux/commits/snp-hugetlb-v2-wip0/
+[2] https://github.com/AMDESE/qemu/tree/snp-hugetlb-dev-wip0
+
 
