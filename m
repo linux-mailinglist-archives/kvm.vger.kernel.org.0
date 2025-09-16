@@ -1,264 +1,179 @@
-Return-Path: <kvm+bounces-57761-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-57762-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id ED973B59EC1
-	for <lists+kvm@lfdr.de>; Tue, 16 Sep 2025 19:04:50 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5C2BBB59EB8
+	for <lists+kvm@lfdr.de>; Tue, 16 Sep 2025 19:03:39 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D16B7583898
-	for <lists+kvm@lfdr.de>; Tue, 16 Sep 2025 17:02:01 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 0D4B0188EC82
+	for <lists+kvm@lfdr.de>; Tue, 16 Sep 2025 17:02:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6FD60313D6B;
-	Tue, 16 Sep 2025 17:00:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B3F8332D5B1;
+	Tue, 16 Sep 2025 17:01:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="00RFeLYP"
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="rrZXaxbh"
 X-Original-To: kvm@vger.kernel.org
-Received: from CH5PR02CU005.outbound.protection.outlook.com (mail-northcentralusazon11012001.outbound.protection.outlook.com [40.107.200.1])
+Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C6C3D2EA14E;
-	Tue, 16 Sep 2025 17:00:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.200.1
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758042023; cv=fail; b=DziwT1xkfO57ObgpnKVkySQ5v/L2dx+M+i83N+TC1zlU+pXgQO6tITJeUual1e4x3JZ+pH3MBDgBEhBG+J7kDz+AkdJWHZ7+LkpDQpZ0GODu5lCWfmvKzWTsmxZzyC6kVt1tYXJzjeNgQLJ272/Q2jGaRdvm/SeJDy6WQX/dBdA=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758042023; c=relaxed/simple;
-	bh=eMQ0GGTCG34ghU3nnWIYJ3aocsPugND7zQzaa0TkZW8=;
-	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
-	 Content-Type:MIME-Version; b=UdOfkTigxTWhEt7rStf8YFd0rN++q9MkyQKz/w3UntErsIpeEycC5C0f0yMTZkfiNqILZBSDpbvSad81BQcVPI2qBFxwyT0/zsduKJ97GwAd/pHzALIIoMTUFo0R+tZGsoZYEmirodwsaqYKzp6up/6GJWEA8ziPsauFol2b2zA=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=00RFeLYP; arc=fail smtp.client-ip=40.107.200.1
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=DluI7QCtZXNHICt1KdMyIBM21i7LueHms9Tb14EbAlZNaQmj0LQiyM+aayNCAHOMpUiIrjEQdM++cPiv4SZ0t0jK6axs8b/tvbolGj8Pk5a8TeMCfxvSZJ4oxLhw3DhJNizzlIyekxBBIEY8C5kdaDRLK+qhnr0qKKXaSQhgvVsufyvKfV/gZ7+LeQMGWnqCUy1gzEYTZuQu9q29HQZ0ekRVpPW89EbOr9fFjlOrFt/SN8OCt1H3gCvHNSRcofoqZRHMBfVw/g4o6rMN4Pt/cM0rSo9DoDzGMhmJL0YAPI7t/g1Bin1kM1Hh4oMWHm7VdWM1O53fDPmGfG1jWiupfQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=e+a/GigxunrtI4ye1O9xa7y+2+4q6mL0AKpmWQDp5hc=;
- b=V3YlNmbdmzGpe7syutUkpLdsEJTOWEln6q4acGj5u+jn1f5hfFQnyZl6AFWBLx88txm1Y2PF+B1m4dIPmnVvVPtEE945A9N6Dl+Y9B7FOZ0rZz24wNHtiNOxXSeLdTNrdNTIlpm/O88OQw2Ky25LwiiJX09KHCnv6l18qpiG2mIHrTmErgD3VUK3tY4MyUIRsU3CUkVS7rYUtB+SH5O2u2uUJ6vnjB9v63hnCxFPpUeP78Qn/WMENCPDh49u9EEYfcnWzOqBA3OOMYl19ZW0CtkZaVXG+ni414To2G/F19zygow++nnYbaCKCIO+n+uEjWvffkcBbY+IO8vuk5l++g==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
- header.d=amd.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=e+a/GigxunrtI4ye1O9xa7y+2+4q6mL0AKpmWQDp5hc=;
- b=00RFeLYPVcqbzk5EpcLnFNnLspJsWsdReSLO82TbYUFAZZQrDwmMA85+mRxbMKBjwSuZ6hKtNc/xSIExA5u5umnTUH9ECK2BsHy0RlYhuaWEuzmqjQqWQJqLiMFB/y++OkZN0TiH45rzvYRseGTkXsrV7h76TAbKT+LwpObefd8=
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=amd.com;
-Received: from IA0PPF9A76BB3A6.namprd12.prod.outlook.com
- (2603:10b6:20f:fc04::bdc) by BL3PR12MB6593.namprd12.prod.outlook.com
- (2603:10b6:208:38c::14) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9115.22; Tue, 16 Sep
- 2025 17:00:14 +0000
-Received: from IA0PPF9A76BB3A6.namprd12.prod.outlook.com
- ([fe80::8d61:56ca:a8ea:b2eb]) by IA0PPF9A76BB3A6.namprd12.prod.outlook.com
- ([fe80::8d61:56ca:a8ea:b2eb%8]) with mapi id 15.20.9115.018; Tue, 16 Sep 2025
- 17:00:14 +0000
-Message-ID: <be1db2e1-b6e2-425c-81b0-00c8227b298d@amd.com>
-Date: Tue, 16 Sep 2025 12:00:10 -0500
-User-Agent: Mozilla Thunderbird
-Reply-To: babu.moger@amd.com
-Subject: Re: [PATCH v18 00/33] x86,fs/resctrl: Support AMD Assignable
- Bandwidth Monitoring Counters (ABMC)
-To: Reinette Chatre <reinette.chatre@intel.com>,
- Borislav Petkov <bp@alien8.de>
-Cc: corbet@lwn.net, tony.luck@intel.com, Dave.Martin@arm.com,
- james.morse@arm.com, tglx@linutronix.de, mingo@redhat.com,
- dave.hansen@linux.intel.com, x86@kernel.org, hpa@zytor.com, kas@kernel.org,
- rick.p.edgecombe@intel.com, akpm@linux-foundation.org, paulmck@kernel.org,
- frederic@kernel.org, pmladek@suse.com, rostedt@goodmis.org, kees@kernel.org,
- arnd@arndb.de, fvdl@google.com, seanjc@google.com, thomas.lendacky@amd.com,
- pawan.kumar.gupta@linux.intel.com, perry.yuan@amd.com,
- manali.shukla@amd.com, sohil.mehta@intel.com, xin@zytor.com,
- Neeraj.Upadhyay@amd.com, peterz@infradead.org, tiala@microsoft.com,
- mario.limonciello@amd.com, dapeng1.mi@linux.intel.com, michael.roth@amd.com,
- chang.seok.bae@intel.com, linux-doc@vger.kernel.org,
- linux-kernel@vger.kernel.org, linux-coco@lists.linux.dev,
- kvm@vger.kernel.org, peternewman@google.com, eranian@google.com,
- gautham.shenoy@amd.com
-References: <cover.1757108044.git.babu.moger@amd.com>
- <20250915112510.GAaMf3lkd6Y1E_Oszg@fat_crate.local>
- <b56757b8-3055-455d-b31b-28094dd46231@intel.com>
-Content-Language: en-US
-From: "Moger, Babu" <babu.moger@amd.com>
-In-Reply-To: <b56757b8-3055-455d-b31b-28094dd46231@intel.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-X-ClientProxiedBy: SA0PR11CA0036.namprd11.prod.outlook.com
- (2603:10b6:806:d0::11) To IA0PPF9A76BB3A6.namprd12.prod.outlook.com
- (2603:10b6:20f:fc04::bdc)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 972D432D5A6;
+	Tue, 16 Sep 2025 17:01:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1758042081; cv=none; b=BnfnWscYFBGdprPk0YQDPEU3ZOeo66tLNBZ8YrpamyNgucH8/dcRVTCKVBV+zQM/iKu+rQYfjqUAigUEsCoUWhCDS4T5WM7Le7HypKivMxAhhaS/ZreexqK9Zq/Hu8znKHTo8pIsZuNIx9h+BrF5K73tA7ZPQaojngLPwgkAPHU=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1758042081; c=relaxed/simple;
+	bh=c08ULWhSovFzkjR4MIDYzLxTq2VIaUbRfgWrKgXFAR4=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=h6M1AlnQcImUASll9+QZy2xEoAyCcB0FhB3e9xjBNMj2e6touQOTCDI4y0tigpsuJtT8ErnM/6Tet++JVc4a1zZuBuJSIALngzlPOYjxLNIZLOBt/frscI++MBJjFNhim53wndNz+5hWb5TqBTjbm7wqj7cI1YGZin1k1wTMWYo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=de.ibm.com; spf=pass smtp.mailfrom=de.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=rrZXaxbh; arc=none smtp.client-ip=148.163.158.5
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=de.ibm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=de.ibm.com
+Received: from pps.filterd (m0360072.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 58GEsp6B021118;
+	Tue, 16 Sep 2025 17:01:17 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
+	:content-transfer-encoding:content-type:date:from:in-reply-to
+	:message-id:mime-version:references:subject:to; s=pp1; bh=oGk4a7
+	Ji2TuIkeJ53r1UylgprJi5w3cLiXou3eLMb4E=; b=rrZXaxbhtDPTykbIvIJeIs
+	2tObsAaIyehC/qidbn944tlojDMod3C9+p9reeyKpTMqOEEGy9tjo7uyba9fcfED
+	b51+hEMMP0NfkKwUg4nReonhTBSNYvLHRm6BvlDCvMv4dumPMXzDnc/Ann2jLCMZ
+	362Zn2fbPNma2nyD7ZVjPQEuDTZoZvZ+IBLEzfF2hQ9iaoshx8uYkHkRwuGU/hYk
+	ggDD93ON7KImdm1j5wUbaFAvpFY7UToanLLIv5ykeG197FIjjShTF4HTmau795Gr
+	IbOZu32NR6iYLfr4YaNnXgs6hOLn35ubc8hvzTCvuhz4uc2dNlIlfLYw3RypZvFA
+	==
+Received: from ppma23.wdc07v.mail.ibm.com (5d.69.3da9.ip4.static.sl-reverse.com [169.61.105.93])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 496g538k9r-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Tue, 16 Sep 2025 17:01:16 +0000 (GMT)
+Received: from pps.filterd (ppma23.wdc07v.mail.ibm.com [127.0.0.1])
+	by ppma23.wdc07v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 58GEZdeo027268;
+	Tue, 16 Sep 2025 17:01:16 GMT
+Received: from smtprelay02.fra02v.mail.ibm.com ([9.218.2.226])
+	by ppma23.wdc07v.mail.ibm.com (PPS) with ESMTPS id 495men4xuq-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Tue, 16 Sep 2025 17:01:16 +0000
+Received: from smtpav07.fra02v.mail.ibm.com (smtpav07.fra02v.mail.ibm.com [10.20.54.106])
+	by smtprelay02.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 58GH1Cca51380568
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Tue, 16 Sep 2025 17:01:12 GMT
+Received: from smtpav07.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 468212004B;
+	Tue, 16 Sep 2025 17:01:12 +0000 (GMT)
+Received: from smtpav07.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 83E3D20040;
+	Tue, 16 Sep 2025 17:01:11 +0000 (GMT)
+Received: from [9.87.138.242] (unknown [9.87.138.242])
+	by smtpav07.fra02v.mail.ibm.com (Postfix) with ESMTP;
+	Tue, 16 Sep 2025 17:01:11 +0000 (GMT)
+Message-ID: <63e8c905-28b1-4e1f-be77-e0789bd75692@de.ibm.com>
+Date: Tue, 16 Sep 2025 19:01:11 +0200
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: IA0PPF9A76BB3A6:EE_|BL3PR12MB6593:EE_
-X-MS-Office365-Filtering-Correlation-Id: 80c1af16-6420-4727-a784-08ddf542813f
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230040|1800799024|366016|376014|7416014;
-X-Microsoft-Antispam-Message-Info:
-	=?utf-8?B?NVlVNi94R0tvQ21DV3pMOEZUYjVIZUJQZEFKRWs4SGh1QWpnKzdqZUZ1WTR2?=
- =?utf-8?B?WGRRTEsreGZlMDNIaFlJQWpQNWVrV1gzWlM3c0lJZGpCNm9kWlFlMDduQ0NT?=
- =?utf-8?B?b05mZTUyQjVOY2tPQkY0NTRwNklZWUJHdGpDRkRlNGhKMlBzeHJpMEhBcDdk?=
- =?utf-8?B?eUFwOGR4cFMrL2Vab2ZSRTg5MHovMm42VlM3Znl6SDl6ZDdwQkhwTUtKWTBC?=
- =?utf-8?B?eEdSMFVGekpXQ0EvOEZxcFg2RUpJRTNZL0NpSitCbisvZVJ3Sit6QmFPSjZL?=
- =?utf-8?B?TjBFTUY5NU1qZk53KzcwdWFhdXZ2ZXcvUGtFc3FxOUtjUmpDbVBNMGxaZDd3?=
- =?utf-8?B?Q1BucVNHQ09PSDM1elJmKy9UWHQwM3VPUXd4UlprOGpzakFpOS9ndTlNYUxK?=
- =?utf-8?B?cnI4ZWhLaEJ1aWw1dUF4dEFNWHlFeTZuU3BWdEhXcFpydVVJYkI0VXJTcjgx?=
- =?utf-8?B?SWc3Z1JSRUFvVFpIZE1GZkJHMkdkNEViazJ4L1pGem5ScEFUZ3pSNzdvOVFx?=
- =?utf-8?B?SnNQSjhhbnQwa2NFQ3JTVVNWYmJqNW9EdDYvczlOOXo0MjhteXBSbkEybGR4?=
- =?utf-8?B?R1NVbVNZb1FoNXhqSzlwV2ptZGRKaXhqTmc3enBSeDJ5L3JpbHh1Nk51NEdV?=
- =?utf-8?B?R2JRa3dqbW55NTNQNDUyR0xCSTBhcmI5ZmVYMUJJMUl5TUtmL1V3RXhuclVM?=
- =?utf-8?B?TjN4TXNFQUQ0cktVL0p1T2pIUDdpVU5Zak5oOXRkN1FQbGZOVnFRWEdzTitO?=
- =?utf-8?B?ZGhRNTY4MDRsUjdyZmx1UFhISzNZaFhiTngyU2NSU0hkZGc1dWZKRDlMcXF5?=
- =?utf-8?B?T0dFRUNpMEFsem16cXRWclVzdHBzcVArRXdqZGdsMXNjZmpsTkNDQjllaVVD?=
- =?utf-8?B?Mit0aFcwZzlMcXNtMTlnSHdhWmlVL2tZOGRuS1dJcjBVajFRZERKc3FET0Ir?=
- =?utf-8?B?RjBYNFZOYXJYRGJtZjUyVVZOYTdzUWdaeTRtbGZSVXpaSUNBUFcxZVhKTXNx?=
- =?utf-8?B?OVJRSVFpaGNRMzR1UGZVRFNqL1JpNS9Xcnk3Y0VMQitQN1gzT1FRL3ZTa2t6?=
- =?utf-8?B?UDdOZVdQbXAxUm9WMitYalVKSlpaNkVnL2RwQ3E5YU85U1pGLzFuTHRKSytH?=
- =?utf-8?B?L2JsWWRMMnNLNVpjankvQkNmSXNZUW1jdVIzVUd5ZDVuV3NLTEthNTdoTWJo?=
- =?utf-8?B?bXNURklaSmduWmprSnAvdGl0TjI1Y1hBUG5xeFVGR3hMQ0NDWjBTWDNVUlR2?=
- =?utf-8?B?WGVRcGhHOTd0Uk9jNTUrVStnZHVSMGlSb3M2S3NiWk1pNk9BL3hEajdLTHVV?=
- =?utf-8?B?cmJlMCt3UUh0aXNBalVQWmNUc2sxVkx0SmtvNHcvVkVsNU0xQ2hJWXpnWUtO?=
- =?utf-8?B?aDJnN3Jqbzd3QWVFcTEycVFZaUloZHhqb0JCU25DUlJlaGFaZVUvN3Ywb1JO?=
- =?utf-8?B?QSs3MURGNk9aOUdPTE15WnV2dk4zUUFPWjkzZGZNY3h4WmQ5ZTEzaHQwZHgx?=
- =?utf-8?B?NkdUZnN4M1IyWDU5VXpyMGJoM05UbEZWUllSVWhCTXhnMWdPQURGcTR1SFdp?=
- =?utf-8?B?ajJMYXhMV2p5U3FGV3ZXT2lPZXJicVZLOU5ZR0YwWngwSERRQW9PV2tyb2FB?=
- =?utf-8?B?eFNMYVIyeU1pMWZqSUp0MlpMZzJRdFhzalQ4ajllcGVsVUdHTXhnU1MrQ1ds?=
- =?utf-8?B?a05CQXpDT2hVblpoNm5ZOEZPQUlWUzhXUmdBb080KzNERk9HZEZXUTFqYnVN?=
- =?utf-8?B?QVVUWk5yc0xwTUVxQXA4ZGRpYzV5M2ZxcytGU0w0bFpmQkVldHRoT013N2R2?=
- =?utf-8?B?eFNLcm9oaWhMRkdjNzRqU0lCQ0hRQWJXME9pc0FibEtEYlNKN09VSEIxMklW?=
- =?utf-8?B?b0wyditldkJCKzNURWhZRE9nYWN3L3ppTk9zMEtLaCtwWUxBVjlBMVBZMW9i?=
- =?utf-8?Q?QkizgE2Cqbk=3D?=
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:IA0PPF9A76BB3A6.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(366016)(376014)(7416014);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?utf-8?B?UjB2Rk5BTUhnY3ExdmhvR2xVQm1OZnZKaUhCcmlmR2E0OFl2S2NDV0JVQkxI?=
- =?utf-8?B?eVZaNC9mNU9aQkd0RzV2cEwxRGh4N2ZDTVpvQUJRTGNQdWxlRkFqYmZTMkda?=
- =?utf-8?B?RjRpRXNqWGNVNThIMkEzQTR4RTU2VTd4S01xZHVwajM0YmY4Uy93bTBpTTJm?=
- =?utf-8?B?b2hXWFdqNUo4V2V6NE1la1pVai82NzdtTHNUQWI3WlNpbGNJN1c4dkdGdlpQ?=
- =?utf-8?B?Sk1wKzZGcEJBaHh2ckRaNUh5aElkQVF1L0JzNC9KS1h1WmZUUkFLazFEamRO?=
- =?utf-8?B?b0ZpRkY0R0I5aVl0REZ3WXE0VCtRR0pmb1hseW9xd0JySkxOREtjUlc4OGlx?=
- =?utf-8?B?VFliMHRRa0M3U3ZweUxVL3ZkL0ZKUW1MTWFSOUErOUlBZ2p6eE5EZEw0OFdh?=
- =?utf-8?B?VDk1Q3JudkxITGtSZVU3T2xUdHNzNjFLVlJHUlpLdVlQMWFZaUt4alMvVVo4?=
- =?utf-8?B?alVic3BnSWhjQWZJWFByN0t0b1pXSUtzMzhwdjhxbU5xazYxemNBdXkvMWxl?=
- =?utf-8?B?YllJeU9Yb01halc3MEtyS0grWmRZM3RMdFN3K3FBMUFQSVNXVUdORVcwd3V3?=
- =?utf-8?B?aFNrVHRNcHFqcG5za1dtbEd4eFlYZDlwTHh5V01oUFRKdVk4d3ZNOW1tYlBZ?=
- =?utf-8?B?aTFlNVFaNVJ6ZHhVNWN2T3QrZkh1WXlaUXVjMnpsSFRuY0VKelhuNCtBSnRQ?=
- =?utf-8?B?RUdnWmpXZ0JZSXlZMVFXem9hSjZsUHdwRk1RcG1jVjhwbzZCekphcFBwVksy?=
- =?utf-8?B?MXByVTlQT09KUWx4SHJvckMrR1pTV0phUW5Fb0ZGbFcyUWNGUDc1RitEOGNS?=
- =?utf-8?B?RUtsQlZWQUdyRmZMdmJCa1UwbmxudHRzOTZWQzFLRUE3WEoxaEdPQ0dtZFZF?=
- =?utf-8?B?SExmQnZkUyt4Z3c4NFZGTUdzdXpSMUZxZ2xaRnNZRnJKVFpZb1E2d0tQK2lz?=
- =?utf-8?B?QjMvaUp0aWkvL0dtSFJEU3dCOE9mRStoQzFUWU93WGw2VWtiS2VGQmoyUGJS?=
- =?utf-8?B?b0gxS1piNzFNS05xTE11RXhoM05WbndPZzFnWERLNGpqeWREQ3NSSjNmZk4y?=
- =?utf-8?B?UXlESjVEVDVOMXRvQ2xNUnh2T2RLb2hSelFrTmlUV0RPMi9WMlZwV3RQT3Ux?=
- =?utf-8?B?cWZBdThJRUJNMmRQbjhKSndGN09LbmZiRHViN2d0bndQTFgybkVBL3lwNmVX?=
- =?utf-8?B?ZjlVaGVuNkFIZHlYVEVZWkhUSVRpdVpTOFdVQ29od1lZemo0SGZWOUZ1TEZv?=
- =?utf-8?B?eC9qKzNvUU1XZWRCWkhlK1hyclVNcFR5VFRpS3RRSHpmTUJWdGNIajBkbUlk?=
- =?utf-8?B?VVo2YzdzL0k4ZHJBM2NraFplR3FQSTBwa0pnRnpYYm5OUU4vVEZzazlvUkV3?=
- =?utf-8?B?bDJCNlQwcEg5WnRScjJlV0VqdG5jR1czWGpqZXFBZGVKWVFFS1FhSHg4MlFY?=
- =?utf-8?B?Umk5ckNFZ1lGOGxqV0JYS0ZSakZKaUgzdnJUeW5hQmJHS2MyZnFpZFBOZExN?=
- =?utf-8?B?WjZuN0hLR0lBTjMyTFBzUWo2Z21lNnljSzltUWs1TmZhekJIZ2U2TTNJaHBU?=
- =?utf-8?B?bTZmWHZqUlhRcnJUU05uazFna1dEaFdUUVFGaXhPTFd5aGI4T0l2T0NoSnhG?=
- =?utf-8?B?b1hQUU1hRlpOM2k3ZjJyWVRXaEM3dURsUlB2YjVGQ3kxUTF6MDVDbGUyQ1By?=
- =?utf-8?B?d2tURFNmN0hwL1BTbEpodGQxQmFHeFlWZjZ4UWQvZlh3VE1zcktKUmVtK3RT?=
- =?utf-8?B?TXBPWVoxZlJlaDkzR3FtRkhHS1JCS0dxbFJCVlNMOURUYy9GaUtkZEJuL2hn?=
- =?utf-8?B?TDhDRC9NeTgrZDM2RU9yUFpuc1M4cnpFTmpCajByazYwczJHSThOTkpJTVpQ?=
- =?utf-8?B?d0xpMzk4K0g5RmhmakpqR3hDZVpKTWZZU09yN3ppNnJ6cnR4V290UVFpV21i?=
- =?utf-8?B?ZlhUNlNOdWhkQmJNRDJyVDkySXRDdi9MWkY0SUNjOCsrelpQVzRJQmpQcEMv?=
- =?utf-8?B?bWtDSkNjbHpwazlQOE81S05yZVZRYUMwQ0JMRks0M0dOWTJmNTJIa3FNNDlu?=
- =?utf-8?B?dlZ5c0ZJU2N5cUdBY012V3BqSk9KUUxwdUw4NlY4a2FBcFZBYXFqc29RdnMy?=
- =?utf-8?Q?U5r8=3D?=
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 80c1af16-6420-4727-a784-08ddf542813f
-X-MS-Exchange-CrossTenant-AuthSource: IA0PPF9A76BB3A6.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 16 Sep 2025 17:00:14.3760
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: 50SgQXHP7Ex5KxdScIDNRxr+2LH7gSWIeeVys6Lj/wIEexGCmhfsYAXzxr+lZuPA
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: BL3PR12MB6593
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v2 08/20] KVM: s390: KVM page table management functions:
+ allocation
+To: Claudio Imbrenda <imbrenda@linux.ibm.com>,
+        Heiko Carstens <hca@linux.ibm.com>
+Cc: kvm@vger.kernel.org, linux-s390@vger.kernel.org, frankja@linux.ibm.com,
+        nsg@linux.ibm.com, nrb@linux.ibm.com, seiden@linux.ibm.com,
+        schlameuss@linux.ibm.com, svens@linux.ibm.com, agordeev@linux.ibm.com,
+        david@redhat.com, gerald.schaefer@linux.ibm.com
+References: <20250910180746.125776-1-imbrenda@linux.ibm.com>
+ <20250910180746.125776-9-imbrenda@linux.ibm.com>
+ <20250916162653.27229G04-hca@linux.ibm.com>
+ <20250916184737.47224f56@p-imbrenda>
+Content-Language: en-US
+From: Christian Borntraeger <borntraeger@de.ibm.com>
+In-Reply-To: <20250916184737.47224f56@p-imbrenda>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: 5iZiNEjYuIpTO32MKe93rztYjBrOJVik
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUwOTE1MDA4NiBTYWx0ZWRfX19/9WI1ywN4R
+ CtucutniOcfyTauGOcmDYamq7RjK1yA+skluYWC68DmQVqg08tDJf8WjxeMtsVlyoidglOhUh1Y
+ DYpkL3yL/Nz0w0FOfBCAZleoZ5Y7ay9Xzvl3zjt3hq8iV4L8mlsCfSqmqkFaBm4LruJylZKT9Hb
+ RhiC40m01mzJtpcozVYAMBsz4O5USvGrjBVuDdAXJ4ZfFg2Y1Ws8wX8APGgw6KAfdAh+ue8JRWP
+ 0lulvNMO5Uux3tdEUsrkCPg2a6RI5jgTS05RkowDiENuB26fFamruYGixD0rt2WGzqk15mq6QaI
+ cJiwgG06h2dxcf6entaQc2SvzOLKXK6ejR6SuwJkcsLD0yv0zZkUFsVs1+Lwq0fczF4k0TiOZXH
+ x6LEtMQx
+X-Proofpoint-ORIG-GUID: 5iZiNEjYuIpTO32MKe93rztYjBrOJVik
+X-Authority-Analysis: v=2.4 cv=UJ7dHDfy c=1 sm=1 tr=0 ts=68c997dd cx=c_pps
+ a=3Bg1Hr4SwmMryq2xdFQyZA==:117 a=3Bg1Hr4SwmMryq2xdFQyZA==:17
+ a=IkcTkHD0fZMA:10 a=yJojWOMRYYMA:10 a=VnNF1IyMAAAA:8 a=opiTKE2Bby9siTmdRhEA:9
+ a=QEXdDO2ut3YA:10
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1117,Hydra:6.1.9,FMLib:17.12.80.40
+ definitions=2025-09-16_02,2025-09-12_01,2025-03-28_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ adultscore=0 bulkscore=0 impostorscore=0 spamscore=0 priorityscore=1501
+ clxscore=1015 suspectscore=0 phishscore=0 malwarescore=0
+ classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
+ reason=mlx scancount=1 engine=8.19.0-2507300000 definitions=main-2509150086
 
-Hi Boris/Reinette,
 
-On 9/15/25 16:07, Reinette Chatre wrote:
-> Hi Boris,
+
+Am 16.09.25 um 18:47 schrieb Claudio Imbrenda:
+> On Tue, 16 Sep 2025 18:26:53 +0200
+> Heiko Carstens <hca@linux.ibm.com> wrote:
 > 
-> On 9/15/25 4:25 AM, Borislav Petkov wrote:
->> On Fri, Sep 05, 2025 at 04:33:59PM -0500, Babu Moger wrote:
->>>  .../admin-guide/kernel-parameters.txt         |    2 +-
->>>  Documentation/filesystems/resctrl.rst         |  325 ++++++
->>>  MAINTAINERS                                   |    1 +
->>>  arch/x86/include/asm/cpufeatures.h            |    1 +
->>>  arch/x86/include/asm/msr-index.h              |    2 +
->>>  arch/x86/include/asm/resctrl.h                |   16 -
->>>  arch/x86/kernel/cpu/resctrl/core.c            |   81 +-
->>>  arch/x86/kernel/cpu/resctrl/internal.h        |   56 +-
->>>  arch/x86/kernel/cpu/resctrl/monitor.c         |  248 +++-
->>>  arch/x86/kernel/cpu/scattered.c               |    1 +
->>>  fs/resctrl/ctrlmondata.c                      |   26 +-
->>>  fs/resctrl/internal.h                         |   58 +-
->>>  fs/resctrl/monitor.c                          | 1008 ++++++++++++++++-
->>>  fs/resctrl/rdtgroup.c                         |  252 ++++-
->>>  include/linux/resctrl.h                       |  148 ++-
->>>  include/linux/resctrl_types.h                 |   18 +-
->>>  16 files changed, 2019 insertions(+), 224 deletions(-)
+>> On Wed, Sep 10, 2025 at 08:07:34PM +0200, Claudio Imbrenda wrote:
+>>> Add page table management functions to be used for KVM guest (gmap)
+>>> page tables.
+>>>
+>>> This patch adds the boilerplate and functions for the allocation and
+>>> deallocation of DAT tables.
+>>>
+>>> Signed-off-by: Claudio Imbrenda <imbrenda@linux.ibm.com>
+>>> ---
+>>>   arch/s390/kvm/Makefile     |  1 +
+>>>   arch/s390/kvm/dat.c        | 91 ++++++++++++++++++++++++++++++++++++++
+>>>   arch/s390/kvm/dat.h        |  4 ++
+>>>   arch/s390/mm/page-states.c |  1 +
+>>>   4 files changed, 97 insertions(+)
+>>>   create mode 100644 arch/s390/kvm/dat.c
 >>
->> Ok, I've rebased and pushed out the pile into tip:x86/cache.
+>> ...
 >>
->> Please run it one more time to make sure all is good.
+>>> +static inline struct page_table *dat_alloc_pt_noinit(void)
+>>> +{
+>>> +	struct page *page;
+>>> +	void *virt;
+>>> +
+>>> +	page = alloc_pages(GFP_ATOMIC, 0);
+>>> +	if (!page)
+>>> +		return NULL;
+>>> +
+>>> +	virt = page_to_virt(page);
+>>> +	__arch_set_page_dat(virt, 1);
+>>> +	return virt;
+>>> +}
+>>
+>> Is GFP_ATOMIC a typo, and this should have been GFP_KERNEL?
+>>
+>> Otherwise I would guess this will cause problems in the future when
+>> under memory pressure allocating guest page tables fails easily,
+>> while before this change such allocations never failed.
 > 
-> Thank you very much.
+> how so? the documentation in gfp_types.h says:
 > 
-> I successfully completed as much testing as I can do without the hardware that has
-> the feature. Will leave the actual feature sanity check to Babu.
+>   * %GFP_ATOMIC users can not sleep and need the allocation to succeed. A lower
+>   * watermark is applied to allow access to "atomic reserves".
+>   * The current implementation doesn't support NMI and few other strict
+>   * non-preemptive contexts (e.g. raw_spin_lock). The same applies to %GFP_NOWAIT.
+>   *
+>   * %GFP_KERNEL is typical for kernel-internal allocations. The caller requires
+>   * %ZONE_NORMAL or a lower zone for direct access but can direct reclaim.
+> 
+> 
+> I think GFP_ATOMIC actually gives more guarantees?
 
-I’ve completed the overnight test runs, and everything is working as expected.
-
-However, I discovered an issue with automatic counter assignment that I
-introduced during the v17 → v18 rebase. This is my bad. The automatic
-merge mistakenly placed the code snippet in rdtgroup_unassign_cntrs()
-instead of under mbm_assign_on_mkdir.
-
-Here is the patch snippet. Will send the fix patch separately.
-
- diff --git a/fs/resctrl/monitor.c b/fs/resctrl/monitor.c
-index 50c24460d992..4076336fbba6 100644
---- a/fs/resctrl/monitor.c
-+++ b/fs/resctrl/monitor.c
-@@ -1200,7 +1200,8 @@ void rdtgroup_assign_cntrs(struct rdtgroup *rdtgrp)
- {
- 	struct rdt_resource *r = resctrl_arch_get_resource(RDT_RESOURCE_L3);
-
--	if (!r->mon_capable || !resctrl_arch_mbm_cntr_assign_enabled(r))
-+	if (!r->mon_capable || !resctrl_arch_mbm_cntr_assign_enabled(r) ||
-+	    !r->mon.mbm_assign_on_mkdir)
- 		return;
-
- 	if (resctrl_is_mon_event_enabled(QOS_L3_MBM_TOTAL_EVENT_ID))
-@@ -1258,8 +1259,7 @@ void rdtgroup_unassign_cntrs(struct rdtgroup *rdtgrp)
- {
- 	struct rdt_resource *r = resctrl_arch_get_resource(RDT_RESOURCE_L3);
-
--	if (!r->mon_capable || !resctrl_arch_mbm_cntr_assign_enabled(r) ||
--	    !r->mon.mbm_assign_on_mkdir)
-+	if (!r->mon_capable || !resctrl_arch_mbm_cntr_assign_enabled(r))
- 		return;
-
- 	if (resctrl_is_mon_event_enabled(QOS_L3_MBM_TOTAL_EVENT_ID))
--- 
-2.34.1
-
--- 
-Thanks
-Babu Moger
-
+In real life GFP_ATOMIC can fail, GFP_KERNEL does not.All gfp allocation failures
+are usually the atomic ones.
 
