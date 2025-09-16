@@ -1,307 +1,201 @@
-Return-Path: <kvm+bounces-57704-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-57705-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7CBB1B59270
-	for <lists+kvm@lfdr.de>; Tue, 16 Sep 2025 11:39:34 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 05367B59303
+	for <lists+kvm@lfdr.de>; Tue, 16 Sep 2025 12:11:16 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 350AD3201B3
-	for <lists+kvm@lfdr.de>; Tue, 16 Sep 2025 09:39:34 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 03F101BC22F7
+	for <lists+kvm@lfdr.de>; Tue, 16 Sep 2025 10:11:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EAF2D283FFB;
-	Tue, 16 Sep 2025 09:39:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2110E2F83D6;
+	Tue, 16 Sep 2025 10:10:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="NBHHF8LO"
+	dkim=pass (2048-bit key) header.d=grsecurity.net header.i=@grsecurity.net header.b="Xyp0Hq6g"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qk1-f171.google.com (mail-qk1-f171.google.com [209.85.222.171])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 206EF29A9C3
-	for <kvm@vger.kernel.org>; Tue, 16 Sep 2025 09:39:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5A2302F3C13
+	for <kvm@vger.kernel.org>; Tue, 16 Sep 2025 10:10:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.171
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758015564; cv=none; b=GnohV0pqCTVQasR5WT43Ny3RRmD4HCTfsaKmPlY/k0vKbLOysVmRkUjJmyYk2oPWcJ+PdMXc+yVGeJikcw/wwZoxx73TTrx3ApCG4LttWlqKPi7Nuf+v8xY9Il1WIczWt9P/XESbcjgIfC2mhwvE5hu8DDNZUtFklk8tjjfDTWs=
+	t=1758017452; cv=none; b=r7iLeO4JPwf7vikvFo6EX87NfRda3CfMo/TBiePNE5VnygpzFTX4sn9FURNWBaJszzHpdCdKOwr7Pyo3RniIrLUuwS4kYiJR9dAQ7xriSYGPjrnyo0gD2Pyy2qd5xG+uUXHYHTkXeh5EDFSH6tL5phd/E4+wwIl6V3kINxDEe+o=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758015564; c=relaxed/simple;
-	bh=6DRYBwPSDQW1jpjkTq0DHNAJkPr8od/IdlP5PW4dxXM=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=lz2kWdHhDc+2RT+ZxZLA+ESVOBxaXoVh+AMID1DT7YXoGJanVKxnVe3yrm4h7IbfMmyTMipEHkvWHfR61Vt8O1fOMae8Q1n35VXqsHHl31wnheutdi9Qxk5VulfQRVwcyIu/6JiJ/twmW9HmzU3McUASG0MzrwWKrNTnGgrBZsM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=NBHHF8LO; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1758015561;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=Mg7T0kQEdQ7FBfapeuxsmVNYMds4ObzbW92Zj/OuxmU=;
-	b=NBHHF8LOgZYrF2Isw57EY668PWDN1+2tlT2QctciD/xR0U8MNG6VEISxRi91ilr74rJfdR
-	eE5zZG4H66AeFqLnnQaMon4zTSgssYlCk27gPWRCeLOogAWrwej6ZAtSZx43bwFaMydVDS
-	ir5z+nUl1xMrrvRjuvOHPMdgj69qyb8=
-Received: from mail-ej1-f71.google.com (mail-ej1-f71.google.com
- [209.85.218.71]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-562-lB2OueZ6NauepY05YNdEgg-1; Tue, 16 Sep 2025 05:39:18 -0400
-X-MC-Unique: lB2OueZ6NauepY05YNdEgg-1
-X-Mimecast-MFC-AGG-ID: lB2OueZ6NauepY05YNdEgg_1758015557
-Received: by mail-ej1-f71.google.com with SMTP id a640c23a62f3a-b0ea66f6811so222459066b.1
-        for <kvm@vger.kernel.org>; Tue, 16 Sep 2025 02:39:18 -0700 (PDT)
+	s=arc-20240116; t=1758017452; c=relaxed/simple;
+	bh=c1NaLiU5BSXjpyvWvtJ+IA3Hfgdcc1CkUa6L4X6MUFs=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=OmH6vNVYc7Mx/iBJKCkkb5YgV32z8Vn7ZmOksuzGn+o/2EyACaxq8JRksikNuhM/PcXxn1Ed3474QZe1P17vAH/sYEa2x88ddkAfstAgUZlPdCxUKD0oSatip7wO4muzcN8YQ38ETWUASXRinwT0fIUId41uUZIX/KhkQ7KUBR8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=grsecurity.net; spf=pass smtp.mailfrom=opensrcsec.com; dkim=pass (2048-bit key) header.d=grsecurity.net header.i=@grsecurity.net header.b=Xyp0Hq6g; arc=none smtp.client-ip=209.85.222.171
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=grsecurity.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=opensrcsec.com
+Received: by mail-qk1-f171.google.com with SMTP id af79cd13be357-8117aef2476so532452485a.1
+        for <kvm@vger.kernel.org>; Tue, 16 Sep 2025 03:10:50 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=grsecurity.net; s=grsec; t=1758017449; x=1758622249; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:autocrypt:from
+         :content-language:references:cc:to:subject:user-agent:mime-version
+         :date:message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=MHR5RzJiQlOpTm5+EwWgakXK9pfUv3hqYa5tSy9/H24=;
+        b=Xyp0Hq6g9qwWC1tHXpd8Z4wG1oI5ismmqo7l7mfY1SvcxRIyfejr+iOXRRfUJGDMBf
+         xnoCuEGUVmTmqKX1F9LKn/X8P+c+r/uA69TfTckTskfzpl7HVDBAqQFW6mmZWwca6a3u
+         uF4UNxX03jEhBWU7WzdXYohAQndqv+OkGE2CO0vowk07IEnBxQHbEqQ4ZH0FNqOlxX2f
+         Qb3grK4oRHyPt1e4aWd6PAQ6lQpzVRJHZu1oWVJ6P10UyAoN1+NL+bhmnaGQTg0PHiYs
+         v6y9MWJBNSzSqDV2Pu8THnGYZC2fAS8uPIsKvnJLnlL0HVg8S3TxozJMb2Z0JpZxVQ63
+         n2Ng==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1758015557; x=1758620357;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=Mg7T0kQEdQ7FBfapeuxsmVNYMds4ObzbW92Zj/OuxmU=;
-        b=GJm6oyA9CUN/gpCqzPFsrZbbbFms5ba8PXuk8bzmDGhZDob3SvqmzgyrgG28Uko6F8
-         eb3N9ZaUy5T7KRkTEiWM9dkxr0j3Nhts5z77e9cSe/KZgHa8nAbmG/5IB8df6Hi2u8H4
-         JUmTDyejSawfy0wZcPmr7vEPgu9X6WYB/bZpEx4m/JPYJUJ3Jv0NRW4usNRRT/pe1Hid
-         40MQXCEcptgsFh9P7PQEFAiGJM/e+9tYgNyztpxDg5wl3SSGwtl7PUax+d9Dj3qVB3hO
-         0tYwR0iSItw6gtVgqZzMrwiTkMF/gQy/3U9kdBDzQ88DokX6gdI0sL9SyTxAyhW/QTxo
-         UnQA==
-X-Forwarded-Encrypted: i=1; AJvYcCXVfFwJhib9XeKmRFI9240Q4iuFARBtsoRzNQn9Ogi4JEehIft0M5apfHVUpW0SpqMGiz8=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwGD4d9L1QdPyhKUUay8HWApwaDInoi60gd3wRRgplEwLwoP8Lw
-	mW0YPO0ZdOC5TGIQrhH2RrIV03fDlvUbxxMher6EPdsL9Eb5XWv5PK9D5jmyOHpsd0WkFPFxiE5
-	0zAOAq1INPTQJv/z6EXhebYgw9eAobkpXgmAhXslspuCDJ4AHZXrkow==
-X-Gm-Gg: ASbGnctriIbdiNfGfxnMQqE9k9Kyw9/5PYHkQktnhLEAgvdwYJZf/0i+AbMpbeAwv7n
-	/J7flCekuJWoCYQ6ZV38UUjB0y/wMO991NSq30Yqe6+/BGcOgOKVHalujgJ/RNgVuKKplrsQ26p
-	g2h/LFs0OJTg41/yJudNYdIXI4bvzOdDtwXFvJ+c8lq9uMbQBxWHv38LCnme5qBRimAstjbItnm
-	LtopHWDBkhzD7UkA0pk+OXCHpw4py+REqsDVnykAbXWg9Q4iZF8c3OLlKd17/VfA5GzCOu7hhXS
-	q0mOiFyFXpUuGzGTL0Vr8TLkI1X5
-X-Received: by 2002:a17:907:7e84:b0:b04:3302:d7a8 with SMTP id a640c23a62f3a-b07c3a77ef1mr1835871266b.58.1758015556784;
-        Tue, 16 Sep 2025 02:39:16 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IEL9xm1d3rRrWqvJve/PLiCDKmVMyNZWdCqpuRPm8Fk1iVgEX6WsHMd5ecb9Pr8TQ5Xn3WbGQ==
-X-Received: by 2002:a17:907:7e84:b0:b04:3302:d7a8 with SMTP id a640c23a62f3a-b07c3a77ef1mr1835869266b.58.1758015556348;
-        Tue, 16 Sep 2025 02:39:16 -0700 (PDT)
-Received: from redhat.com ([31.187.78.47])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-b08cab32303sm687037066b.72.2025.09.16.02.39.14
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 16 Sep 2025 02:39:15 -0700 (PDT)
-Date: Tue, 16 Sep 2025 05:39:13 -0400
-From: "Michael S. Tsirkin" <mst@redhat.com>
-To: Jason Wang <jasowang@redhat.com>
-Cc: eperezma@redhat.com, jonah.palmer@oracle.com, kuba@kernel.org,
-	jon@nutanix.com, kvm@vger.kernel.org,
-	virtualization@lists.linux.dev, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org, stable@vger.kernel.org
-Subject: Re: [PATCH net 2/2] vhost-net: correctly flush batched packet before
- enabling notification
-Message-ID: <20250916053418-mutt-send-email-mst@kernel.org>
-References: <20250912082658.2262-1-jasowang@redhat.com>
- <20250912082658.2262-2-jasowang@redhat.com>
- <20250915120210-mutt-send-email-mst@kernel.org>
- <CACGkMEufUAL1tBrfZVMQCEBmBZ=Z+aPqUtP=RzOQhjtG9jn7UA@mail.gmail.com>
- <20250916011733-mutt-send-email-mst@kernel.org>
- <CACGkMEu_p-ouLbEq26vMTJmeGs1hw5JHOk1qLt8mLLPOMLDbaQ@mail.gmail.com>
- <20250916030549-mutt-send-email-mst@kernel.org>
- <CACGkMEt2fAkCb_nC4QwR+3Jq+fS8=7bx=T3AEzPP1KGLErbSBA@mail.gmail.com>
+        d=1e100.net; s=20230601; t=1758017449; x=1758622249;
+        h=content-transfer-encoding:in-reply-to:autocrypt:from
+         :content-language:references:cc:to:subject:user-agent:mime-version
+         :date:message-id:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=MHR5RzJiQlOpTm5+EwWgakXK9pfUv3hqYa5tSy9/H24=;
+        b=qu6FwsLRGwlP2zI6eUqp/AkgqwnO3kb7BhvUMG6LpvJJJWrOKRuLeivz5yzXoro10K
+         hgfP8qDBazTSZiJK94HqlpIL4NbQ474hRzWXKYYU1lPA+yJU0mRx2tXOCIJwh2HSxU9C
+         3A+8N4xTevEkJGLcINzTIMLe4TteE8T1pqH1PalFYneBRPadCBYzXZQemJOWzezofeHX
+         cpZYearywPeYVVUHoBYUx+3qVvbR/GfXkco58TuoBNazG7qU9cBrnEmUl3VvoMwlqw/1
+         oJdS8IbUYneDtyWXbWBwn1Oo920gVT4dB0PFjq6qlpnVuJYlNdpjBdFi3gmVibdO84J5
+         V5BQ==
+X-Forwarded-Encrypted: i=1; AJvYcCVlqWlehJn6mJ6+40DISRCIUqBXFlXqE6UxPEG39IRvcEbaAe/e/X4BdXkvYDqEpl0JkIo=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyJFCvNA2yp6S+KFBtSAMGwfchMN96/+Xu8I3M11ALiQMJhGsIX
+	bTXluc0/JDl+4vdlJj90aCUulK7GObFA2KdALQwYKcA22Y0ITX9Aqha4UDgViYN8s+Y=
+X-Gm-Gg: ASbGnctwKXba8Gr2M/XrECS/scjtbWDby9Et0jFJgI4dnUQ1bbpMa9IPHaZYSLmg2VR
+	QtFsqvqJBjizVIvOAxaN+6+/2nxe0/tNv6FWiq9t+JVdZSevRDECZCesH1/q3SAX3VorgNeGgiv
+	j9fPbPvSrTvLcGVl08iD73Ns0utKjS1NgWkmT5dJ8hfH8qkJwYI/m+0+llAR8IAScR+7z5iPVBy
+	MTyCssWkXKcfHzVhojLf2QcUqj9NuL7akeYUoM4MuuBQUEGgsJHlLvt+nf3zesvN5EIubetBqqI
+	aZYF6c5C7WiLnMEUcaD+NIbPLyiNq/2J+2TPU75gPeqMXUsYek/YIcfS+e9Rhk4DKKZ26V4+0yK
+	neIcciCjriKpEERnrBA6bw9p1Lnu8m/beUs0Ipy6J52djdwYEz7Q1QXxGuX/s2aij932vdwzlEp
+	tm38+2DjBVznuK4ifuvb2kWhtMT1AQNd6nrWctY6bL+dQyxPYpv960za7evQ==
+X-Google-Smtp-Source: AGHT+IGZ0YonfmrKwetM2Jrdfgt1qWeC6ADbrp2AYjJ1+SgKfeyYvlu0xIDOAMe4zfhpa+l2Hfxf3Q==
+X-Received: by 2002:a05:620a:371e:b0:80f:74f2:4a57 with SMTP id af79cd13be357-824030c19c3mr1510309785a.82.1758017449231;
+        Tue, 16 Sep 2025 03:10:49 -0700 (PDT)
+Received: from ?IPV6:2003:fa:af00:da00:8e63:e663:d61a:1504? (p200300faaf00da008e63e663d61a1504.dip0.t-ipconnect.de. [2003:fa:af00:da00:8e63:e663:d61a:1504])
+        by smtp.gmail.com with ESMTPSA id d75a77b69052e-4b639daba5dsm81787221cf.31.2025.09.16.03.10.47
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 16 Sep 2025 03:10:48 -0700 (PDT)
+Message-ID: <a8c4d415-a23b-46f6-89fc-28facaba0a44@grsecurity.net>
+Date: Tue, 16 Sep 2025 12:10:46 +0200
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <CACGkMEt2fAkCb_nC4QwR+3Jq+fS8=7bx=T3AEzPP1KGLErbSBA@mail.gmail.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 1/2] x86/eventinj: Use global asm label for nested NMI IP
+ address verification
+To: Chao Gao <chao.gao@intel.com>, kvm@vger.kernel.org
+Cc: pbonzini@redhat.com, seanjc@google.com
+References: <20250915144936.113996-1-chao.gao@intel.com>
+ <20250915144936.113996-2-chao.gao@intel.com>
+Content-Language: en-US, de-DE
+From: Mathias Krause <minipli@grsecurity.net>
+Autocrypt: addr=minipli@grsecurity.net; keydata=
+ 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
+ RzDVkdgPJkL/NFTKZHo5foFXNi89kA==
+In-Reply-To: <20250915144936.113996-2-chao.gao@intel.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-On Tue, Sep 16, 2025 at 03:20:36PM +0800, Jason Wang wrote:
-> On Tue, Sep 16, 2025 at 3:08 PM Michael S. Tsirkin <mst@redhat.com> wrote:
-> >
-> > On Tue, Sep 16, 2025 at 02:24:22PM +0800, Jason Wang wrote:
-> > > On Tue, Sep 16, 2025 at 1:19 PM Michael S. Tsirkin <mst@redhat.com> wrote:
-> > > >
-> > > > On Tue, Sep 16, 2025 at 10:37:35AM +0800, Jason Wang wrote:
-> > > > > On Tue, Sep 16, 2025 at 12:03 AM Michael S. Tsirkin <mst@redhat.com> wrote:
-> > > > > >
-> > > > > > On Fri, Sep 12, 2025 at 04:26:58PM +0800, Jason Wang wrote:
-> > > > > > > Commit 8c2e6b26ffe2 ("vhost/net: Defer TX queue re-enable until after
-> > > > > > > sendmsg") tries to defer the notification enabling by moving the logic
-> > > > > > > out of the loop after the vhost_tx_batch() when nothing new is
-> > > > > > > spotted. This will bring side effects as the new logic would be reused
-> > > > > > > for several other error conditions.
-> > > > > > >
-> > > > > > > One example is the IOTLB: when there's an IOTLB miss, get_tx_bufs()
-> > > > > > > might return -EAGAIN and exit the loop and see there's still available
-> > > > > > > buffers, so it will queue the tx work again until userspace feed the
-> > > > > > > IOTLB entry correctly. This will slowdown the tx processing and may
-> > > > > > > trigger the TX watchdog in the guest.
-> > > > > > >
-> > > > > > > Fixing this by stick the notificaiton enabling logic inside the loop
-> > > > > > > when nothing new is spotted and flush the batched before.
-> > > > > > >
-> > > > > > > Reported-by: Jon Kohler <jon@nutanix.com>
-> > > > > > > Cc: stable@vger.kernel.org
-> > > > > > > Fixes: 8c2e6b26ffe2 ("vhost/net: Defer TX queue re-enable until after sendmsg")
-> > > > > > > Signed-off-by: Jason Wang <jasowang@redhat.com>
-> > > > > > > ---
-> > > > > > >  drivers/vhost/net.c | 33 +++++++++++++--------------------
-> > > > > > >  1 file changed, 13 insertions(+), 20 deletions(-)
-> > > > > > >
-> > > > > > > diff --git a/drivers/vhost/net.c b/drivers/vhost/net.c
-> > > > > > > index 16e39f3ab956..3611b7537932 100644
-> > > > > > > --- a/drivers/vhost/net.c
-> > > > > > > +++ b/drivers/vhost/net.c
-> > > > > > > @@ -765,11 +765,11 @@ static void handle_tx_copy(struct vhost_net *net, struct socket *sock)
-> > > > > > >       int err;
-> > > > > > >       int sent_pkts = 0;
-> > > > > > >       bool sock_can_batch = (sock->sk->sk_sndbuf == INT_MAX);
-> > > > > > > -     bool busyloop_intr;
-> > > > > > >       bool in_order = vhost_has_feature(vq, VIRTIO_F_IN_ORDER);
-> > > > > > >
-> > > > > > >       do {
-> > > > > > > -             busyloop_intr = false;
-> > > > > > > +             bool busyloop_intr = false;
-> > > > > > > +
-> > > > > > >               if (nvq->done_idx == VHOST_NET_BATCH)
-> > > > > > >                       vhost_tx_batch(net, nvq, sock, &msg);
-> > > > > > >
-> > > > > > > @@ -780,10 +780,18 @@ static void handle_tx_copy(struct vhost_net *net, struct socket *sock)
-> > > > > > >                       break;
-> > > > > > >               /* Nothing new?  Wait for eventfd to tell us they refilled. */
-> > > > > > >               if (head == vq->num) {
-> > > > > > > -                     /* Kicks are disabled at this point, break loop and
-> > > > > > > -                      * process any remaining batched packets. Queue will
-> > > > > > > -                      * be re-enabled afterwards.
-> > > > > > > +                     /* Flush batched packets before enabling
-> > > > > > > +                      * virqtueue notification to reduce
-> > > > > > > +                      * unnecssary virtqueue kicks.
-> > > > > > >                        */
-> > > > > > > +                     vhost_tx_batch(net, nvq, sock, &msg);
-> > > > > >
-> > > > > > So why don't we do this in the "else" branch"? If we are busy polling
-> > > > > > then we are not enabling kicks, so is there a reason to flush?
-> > > > >
-> > > > > It should be functional equivalent:
-> > > > >
-> > > > > do {
-> > > > >     if (head == vq->num) {
-> > > > >         vhost_tx_batch();
-> > > > >         if (unlikely(busyloop_intr)) {
-> > > > >             vhost_poll_queue()
-> > > > >         } else if () {
-> > > > >             vhost_disable_notify(&net->dev, vq);
-> > > > >             continue;
-> > > > >         }
-> > > > >         return;
-> > > > > }
-> > > > >
-> > > > > vs
-> > > > >
-> > > > > do {
-> > > > >     if (head == vq->num) {
-> > > > >         if (unlikely(busyloop_intr)) {
-> > > > >             vhost_poll_queue()
-> > > > >         } else if () {
-> > > > >             vhost_tx_batch();
-> > > > >             vhost_disable_notify(&net->dev, vq);
-> > > > >             continue;
-> > > > >         }
-> > > > >         break;
-> > > > > }
-> > > > >
-> > > > > vhost_tx_batch();
-> > > > > return;
-> > > > >
-> > > > > Thanks
-> > > > >
-> > > >
-> > > > But this is not what the code comment says:
-> > > >
-> > > >                      /* Flush batched packets before enabling
-> > > >                       * virqtueue notification to reduce
-> > > >                       * unnecssary virtqueue kicks.
-> > > >
-> > > >
-> > > > So I ask - of we queued more polling, why do we need
-> > > > to flush batched packets? We might get more in the next
-> > > > polling round, this is what polling is designed to do.
-> > >
-> > > The reason is there could be a rx work when busyloop_intr is true, so
-> > > we need to flush.
-> > >
-> > > Thanks
-> >
-> > Then you need to update the comment to explain.
-> > Want to post your version of this patchset?
+Am 15.09.25 um 16:49 schrieb Chao Gao:
+> Use a global asm label to get the expected IP address for nested NMI
+> interception instead of reading a hardcoded offset from the stack.
 > 
-> I'm fine if you wish. Just want to make sure, do you prefer a patch
-> for your vhost tree or net?
+> the NMI test in eventinj.c verifies that a nested NMI occurs immediately at
+> the return address (IP register) in the IRET frame, as IRET opens the
+> NMI window. Currently, nested_nmi_iret_isr() reads the return address
+> using a magic offset (iret_stack[-3]), which is unclear and may break if
+> more values are pushed to the "iret_stack".
 > 
-> For net, I would stick to 2 patches as if we go for 3, the last patch
-> that brings back flush looks more like an optimization.
+> To improve readability, add a global 'ip_after_iret' label for the expected
+> return address, push it to the IRET frame, and verify it matches the
+> interrupted address in the nested NMI handler.
+> 
+> Signed-off-by: Chao Gao <chao.gao@intel.com>
+> ---
+>  x86/eventinj.c | 11 +++++++----
+>  1 file changed, 7 insertions(+), 4 deletions(-)
+> 
+> diff --git a/x86/eventinj.c b/x86/eventinj.c
+> index 6fbb2d0f..ec8a5ef1 100644
+> --- a/x86/eventinj.c
+> +++ b/x86/eventinj.c
+> @@ -127,12 +127,13 @@ static void nmi_isr(struct ex_regs *r)
+>  }
+>  
+>  unsigned long *iret_stack;
+> +extern char ip_after_iret[];
+>  
+>  static void nested_nmi_iret_isr(struct ex_regs *r)
+>  {
+>  	printf("Nested NMI isr running rip=%lx\n", r->rip);
+>  
+> -	if (r->rip == iret_stack[-3])
+> +	if (r->rip == (unsigned long)ip_after_iret)
 
-Jason it does not matter how it looks. We do not need to sneak in
-features - if the right thing is to add patch 3 in net then
-it is, just add an explanation why in the cover letter.
-And if it is not then it is not and squashing it with a revert
-is not a good idea.
+This change basically eliminates the need for the global
+'ip_after_iret', it can be local to nmi_iret_isr() now.
 
-> For vhost, I can go with 3 patches, but I see that your series has been queued.
->
-> And the build of the current vhost tree is broken by:
-> 
-> commit 41bafbdcd27bf5ce8cd866a9b68daeb28f3ef12b (HEAD)
-> Author: Michael S. Tsirkin <mst@redhat.com>
-> Date:   Mon Sep 15 10:47:03 2025 +0800
-> 
->     vhost-net: flush batched before enabling notifications
-> 
-> It looks like it misses a brace.
-> 
-> Thanks
-
-Ugh forgot to commit :(
-I guess this is what happens when one tries to code past midnight.
-Dropped now pls do proceed.
-
-> >
-> >
-> > > >
-> > > >
-> > > > >
-> > > > > >
-> > > > > >
-> > > > > > > +                     if (unlikely(busyloop_intr)) {
-> > > > > > > +                             vhost_poll_queue(&vq->poll);
-> > > > > > > +                     } else if (unlikely(vhost_enable_notify(&net->dev,
-> > > > > > > +                                                             vq))) {
-> > > > > > > +                             vhost_disable_notify(&net->dev, vq);
-> > > > > > > +                             continue;
-> > > > > > > +                     }
-> > > > > > >                       break;
-> > > > > > >               }
-> > > > > > >
-> > > > > > > @@ -839,22 +847,7 @@ static void handle_tx_copy(struct vhost_net *net, struct socket *sock)
-> > > > > > >               ++nvq->done_idx;
-> > > > > > >       } while (likely(!vhost_exceeds_weight(vq, ++sent_pkts, total_len)));
-> > > > > > >
-> > > > > > > -     /* Kicks are still disabled, dispatch any remaining batched msgs. */
-> > > > > > >       vhost_tx_batch(net, nvq, sock, &msg);
-> > > > > > > -
-> > > > > > > -     if (unlikely(busyloop_intr))
-> > > > > > > -             /* If interrupted while doing busy polling, requeue the
-> > > > > > > -              * handler to be fair handle_rx as well as other tasks
-> > > > > > > -              * waiting on cpu.
-> > > > > > > -              */
-> > > > > > > -             vhost_poll_queue(&vq->poll);
-> > > > > > > -     else
-> > > > > > > -             /* All of our work has been completed; however, before
-> > > > > > > -              * leaving the TX handler, do one last check for work,
-> > > > > > > -              * and requeue handler if necessary. If there is no work,
-> > > > > > > -              * queue will be reenabled.
-> > > > > > > -              */
-> > > > > > > -             vhost_net_busy_poll_try_queue(net, vq);
-> > > > > > >  }
-> > > > > > >
-> > > > > > >  static void handle_tx_zerocopy(struct vhost_net *net, struct socket *sock)
-> > > > > > > --
-> > > > > > > 2.34.1
-> > > > > >
-> > > >
-> >
+>  		test_count++;
+>  }
+>  
+> @@ -156,11 +157,11 @@ asm("do_iret:"
+>  	"mov %cs, %ecx \n\t"
+>  	"push"W" %"R "cx \n\t"
+>  #ifndef __x86_64__
+> -	"push"W" $2f \n\t"
+> +	"push"W" $ip_after_iret \n\t"
+>  
+>  	"cmpb $0, no_test_device\n\t"	// see if need to flush
+>  #else
+> -	"leaq 2f(%rip), %rbx \n\t"
+> +	"leaq ip_after_iret(%rip), %rbx \n\t"
+>  	"pushq %rbx \n\t"
+>  
+>  	"mov no_test_device(%rip), %bl \n\t"
+> @@ -170,7 +171,9 @@ asm("do_iret:"
+>  	"outl %eax, $0xe4 \n\t"		// flush page
+>  	"1: \n\t"
+>  	"iret"W" \n\t"
+> -	"2: xchg %"R "dx, %"R "sp \n\t"	// point to old stack
+> +	".global ip_after_iret \n\t"
+> +	"ip_after_iret: \n\t"
+> +	"xchg %"R "dx, %"R "sp \n\t"	// point to old stack
+>  	"ret\n\t"
+>     );
+>  
 
 
