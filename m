@@ -1,204 +1,185 @@
-Return-Path: <kvm+bounces-57701-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-57702-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9EFBEB59179
-	for <lists+kvm@lfdr.de>; Tue, 16 Sep 2025 11:01:12 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id BC261B59206
+	for <lists+kvm@lfdr.de>; Tue, 16 Sep 2025 11:22:52 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 899D97AC444
-	for <lists+kvm@lfdr.de>; Tue, 16 Sep 2025 08:59:32 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 1F8821897647
+	for <lists+kvm@lfdr.de>; Tue, 16 Sep 2025 09:23:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9EFE128D8F4;
-	Tue, 16 Sep 2025 09:01:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6711A299A82;
+	Tue, 16 Sep 2025 09:22:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="K3Zo5m4D"
+	dkim=pass (2048-bit key) header.d=shutemov.name header.i=@shutemov.name header.b="oW/O5h38";
+	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="RB5svWqQ"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.15])
+Received: from flow-a2-smtp.messagingengine.com (flow-a2-smtp.messagingengine.com [103.168.172.137])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E0A60222566;
-	Tue, 16 Sep 2025 09:00:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.15
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 406B328AAEE;
+	Tue, 16 Sep 2025 09:22:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=103.168.172.137
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758013261; cv=none; b=Y9RzpPiUsXniLGHLu3p9al0RGw4YKgMcoiseeNPNAyKwlKDzaEo7J1Hgo0P6Ud4W1BAVldRGX6GpFthPOkV+4mS0EjdgCOjg+w71u9iFAFJJu9Z2utBtQquFpQiyMpGq6G6iKDCVRNAVHRLJNb5JGFwY3aw3G5ywRDvCvWjOQpU=
+	t=1758014553; cv=none; b=K3THq7n/fMnElE9mdliH7667jaXILBf0kg/4HsbdSlyGLzTupQqkbRWa9bk9s4hduhTlWBmaVI4rrT3W9TCCgNeMxRKQA3TMMQC3snLhCJvc3b0Dek9rHF6KEdFrIugg3YXn3v8rLJr5pcGk2eBvWAKo1pz+VsLnrN4G4dWDnoM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758013261; c=relaxed/simple;
-	bh=VaPGPN4sNkzZCieQe1ppVzBXnQbc0jSLL06ZRxkEbSQ=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=pn3OY2rnHAXI1G2GoHd0uHmu5S1sDRAMBNfp26eMEI4pmswd1uPhIpkWbaIkPSS0bXSREj0UOETduNzYFcUd5p/kBooTRlKxQzTgbUF1XuXowbt2zNfPCcjh161MUanXB6XLeL+trVwof9igkfVFm1GQLmIGfbkz6ncCGuLeIFM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=K3Zo5m4D; arc=none smtp.client-ip=198.175.65.15
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1758013260; x=1789549260;
-  h=message-id:date:mime-version:subject:to:cc:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=VaPGPN4sNkzZCieQe1ppVzBXnQbc0jSLL06ZRxkEbSQ=;
-  b=K3Zo5m4D0+myzZykUIpEjHRP/s37A1j6f2lHP8/eiswzAIil/VMYLjmg
-   seytsXXTZDareP5+U1c3jsraay71oEDu4LZ8jAI+lSUYs9lG/80Qm5tdq
-   1+hO9nolxLKc9IySjDBRVrKd1aJbwH+OJ/Cfi4WEXZerY1qkn5YM6BOfA
-   3X+BhrI0uzYqBiCY+q8lrwDEAKEHNKKwgpNCOemoRB2ldFscU7Ri1d8GH
-   la8cnT1A9MIJOXSXNZGNJm9MzjTmKsQzb7lRsAr4ULPZxtGVkp/lBHyNU
-   YBOp7YvPeQ+zILJRS0j2fug1nI5/BaZQizMCGvHrYL/y+GN2OSgiS43Mg
-   g==;
-X-CSE-ConnectionGUID: wJsT6TJyRrCqKSY+R0Kjcg==
-X-CSE-MsgGUID: lUORnVfxQiWOgAHZQ3IQ2Q==
-X-IronPort-AV: E=McAfee;i="6800,10657,11554"; a="63918574"
-X-IronPort-AV: E=Sophos;i="6.18,268,1751266800"; 
-   d="scan'208";a="63918574"
-Received: from fmviesa008.fm.intel.com ([10.60.135.148])
-  by orvoesa107.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 16 Sep 2025 02:00:59 -0700
-X-CSE-ConnectionGUID: doz86orBSxGGmFrsT2JHDQ==
-X-CSE-MsgGUID: WDZmb+ePTSuLs8kbY+lU/A==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.18,268,1751266800"; 
-   d="scan'208";a="175302937"
-Received: from unknown (HELO [10.238.0.107]) ([10.238.0.107])
-  by fmviesa008-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 16 Sep 2025 02:00:56 -0700
-Message-ID: <48a597f9-a1eb-400b-81ae-244b6b1f76a3@linux.intel.com>
-Date: Tue, 16 Sep 2025 17:00:54 +0800
+	s=arc-20240116; t=1758014553; c=relaxed/simple;
+	bh=uDFP1Elkv6seivo+LIxr0JIvmVyfvOaAlFK/sYvsAvc=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=EANqhV0ttg5F7ULLT9R+QQd85IsohnXdsxL51WFl2qUnMbTe+qFuNs8Qg3SCUsa6Zsusvr2WYFmsuQOYG8BA8m9AKRQGFR1z/nZwgwcbmo3j+Zs4O0IKkBUrq497HoRIBt49TBmwqH/bix8T5EFvTf8ckbkaqzZwerUWZyHiQIY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=shutemov.name; spf=pass smtp.mailfrom=shutemov.name; dkim=pass (2048-bit key) header.d=shutemov.name header.i=@shutemov.name header.b=oW/O5h38; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=RB5svWqQ; arc=none smtp.client-ip=103.168.172.137
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=shutemov.name
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=shutemov.name
+Received: from phl-compute-05.internal (phl-compute-05.internal [10.202.2.45])
+	by mailflow.phl.internal (Postfix) with ESMTP id 440D41380341;
+	Tue, 16 Sep 2025 05:22:30 -0400 (EDT)
+Received: from phl-mailfrontend-02 ([10.202.2.163])
+  by phl-compute-05.internal (MEProxy); Tue, 16 Sep 2025 05:22:30 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=shutemov.name;
+	 h=cc:cc:content-type:content-type:date:date:from:from
+	:in-reply-to:in-reply-to:message-id:mime-version:references
+	:reply-to:subject:subject:to:to; s=fm3; t=1758014550; x=
+	1758021750; bh=4+KQ3+PwUEQhtf+X1G7fk/FknoUQqoDfKqod06UBKZY=; b=o
+	W/O5h38vUjYtcHCAUJJdLFHPaiY1GD1kabJHh/AKQZ/kLfRom/mRou6mGioDcHzB
+	6ePoJmJOhuYVN3nWEYB1JeVZaZgEvsD96Ghyly8JDUz68lINHPjCzUpEGIYAUk8t
+	/FZjbNQxyDfVkLSg/M2BZgHfHB0PeMxb6f4jUVhjwoCLt6recB8DmCSZCk/gBGoD
+	ZbAJm84tIEG0pWbMehD6dORvzwkYMJtTF/SYuhQMnnbLste3ULLYdBHTFoOBaV5S
+	JYhi/Oo5EnAUsvosvZKznVu8yxh0wB+CVj64AgnWflOFLfe2rjcCWWNx9mp1wSog
+	k3KRgC1osZIWyb4W0y1sA==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+	messagingengine.com; h=cc:cc:content-type:content-type:date:date
+	:feedback-id:feedback-id:from:from:in-reply-to:in-reply-to
+	:message-id:mime-version:references:reply-to:subject:subject:to
+	:to:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=fm1; t=
+	1758014550; x=1758021750; bh=4+KQ3+PwUEQhtf+X1G7fk/FknoUQqoDfKqo
+	d06UBKZY=; b=RB5svWqQ90YJVks1r1cw97+W9YtRY6WreVqQVg+RHn6uQaU5e/9
+	4ajcON/phqEEdkuL6D6/YzYxVdrtUHkG3bi6XWOy80U5fzOAQqcyCCK6bqwmZg0h
+	SFlpsiDqwAbClt0FygWKlgD+PlV7rvo81NgqMiRXP1sFL0TlaynjKrYy1eSUvgC7
+	Mg0/kdis0AaGFLcMOko9ozxBT2d3s0PE8+oa0BYy9ALtOH2E+NW8q5DDAzg/WPT+
+	VxT5EDNd093gZfUEl4G93xHZjDGKLqL+5Wk0OoU4xBy1uE9VAZKH7hm9EiweRSDR
+	tlRCfSVBtY0g4BUQF5g03PrQyVjfu4r3apw==
+X-ME-Sender: <xms:VSzJaDQJKAiOPEQ1mJaM0njFJPrysk_rvLV7mJ1iF-FZRK4YM-BT1w>
+    <xme:VSzJaPk0edTXIjbjSa3aVyOzjzkAQM0NxMpsDCN3P3hzFMckLv7YClMpAAYA5UHfi
+    vDmEE7kQH5qmC05LsQ>
+X-ME-Received: <xmr:VSzJaHEQ5_JfGR-IhrUd0hnTxRGeu_eecL0RAMRzazPCyxAYcYpwyJGRmkB6Vw>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeeffedrtdeggdegtddvtdcutefuodetggdotefrod
+    ftvfcurfhrohhfihhlvgemucfhrghsthforghilhdpuffrtefokffrpgfnqfghnecuuegr
+    ihhlohhuthemuceftddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmdenucfjug
+    hrpeffhffvvefukfhfgggtuggjsehttdfstddttddvnecuhfhrohhmpefmihhrhihlucfu
+    hhhuthhsvghmrghuuceokhhirhhilhhlsehshhhuthgvmhhovhdrnhgrmhgvqeenucggtf
+    frrghtthgvrhhnpeegfeehleevvdetffeluefftdffledvgfetheegieevtefgfefhieej
+    heevkeeigeenucffohhmrghinhepkhgvrhhnvghlrdhorhhgnecuvehluhhsthgvrhfuih
+    iivgeptdenucfrrghrrghmpehmrghilhhfrhhomhepkhhirhhilhhlsehshhhuthgvmhho
+    vhdrnhgrmhgvpdhnsggprhgtphhtthhopeefvddpmhhouggvpehsmhhtphhouhhtpdhrtg
+    hpthhtoheprhhitghkrdhprdgvughgvggtohhmsggvsehinhhtvghlrdgtohhmpdhrtghp
+    thhtohepkhhirhhilhhlrdhshhhuthgvmhhovheslhhinhhugidrihhnthgvlhdrtghomh
+    dprhgtphhtthhopehpsghonhiiihhnihesrhgvughhrghtrdgtohhmpdhrtghpthhtohep
+    shgvrghnjhgtsehgohhoghhlvgdrtghomhdprhgtphhtthhopegurghvvgdrhhgrnhhsvg
+    hnsehlihhnuhigrdhinhhtvghlrdgtohhmpdhrtghpthhtoheptghhrghordhgrghosehi
+    nhhtvghlrdgtohhmpdhrtghpthhtohepsghpsegrlhhivghnkedruggvpdhrtghpthhtoh
+    epkhgrihdrhhhurghnghesihhnthgvlhdrtghomhdprhgtphhtthhopeigkeeisehkvghr
+    nhgvlhdrohhrgh
+X-ME-Proxy: <xmx:VSzJaCk-OzVNIZ8vFX7FoaPBHi9k8zpyWN5vLhPKUZAEAfKU-Ba5Mg>
+    <xmx:VSzJaGTObaOODpAZYInvhW9rXVKQqYVoyAPxGk9U0ypdJqOJ6bx4jg>
+    <xmx:VSzJaH4DPUS4icMHfGuU_op6OAcjUtOY6G9AaqqvSkFiCwVFFgsG5g>
+    <xmx:VSzJaNHMmhi6QhN8Sk9NoTuJEWPY7qji05lyAjFvyRrwV1XuESADSw>
+    <xmx:VizJaBm1O3K8VuCU37NtTdh6Jnj2lqU54QaxZCUdojXFn7vHZc5Ep8Ia>
+Feedback-ID: ie3994620:Fastmail
+Received: by mail.messagingengine.com (Postfix) with ESMTPA; Tue,
+ 16 Sep 2025 05:22:29 -0400 (EDT)
+Date: Tue, 16 Sep 2025 10:22:26 +0100
+From: Kiryl Shutsemau <kirill@shutemov.name>
+To: "Edgecombe, Rick P" <rick.p.edgecombe@intel.com>
+Cc: "kirill.shutemov@linux.intel.com" <kirill.shutemov@linux.intel.com>, 
+	"pbonzini@redhat.com" <pbonzini@redhat.com>, "seanjc@google.com" <seanjc@google.com>, 
+	"dave.hansen@linux.intel.com" <dave.hansen@linux.intel.com>, "Gao, Chao" <chao.gao@intel.com>, "bp@alien8.de" <bp@alien8.de>, 
+	"Huang, Kai" <kai.huang@intel.com>, "x86@kernel.org" <x86@kernel.org>, 
+	"mingo@redhat.com" <mingo@redhat.com>, "Zhao, Yan Y" <yan.y.zhao@intel.com>, 
+	"tglx@linutronix.de" <tglx@linutronix.de>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>, 
+	"linux-coco@lists.linux.dev" <linux-coco@lists.linux.dev>, "Yamahata, Isaku" <isaku.yamahata@intel.com>, 
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
+Subject: Re: [PATCHv2 04/12] x86/virt/tdx: Add tdx_alloc/free_page() helpers
+Message-ID: <bfaswqmlsyycr3alibn6f422cjtpd6ybssjekvrrz4zdwgwfcz@pxy25ra4sln2>
+References: <20250609191340.2051741-1-kirill.shutemov@linux.intel.com>
+ <20250609191340.2051741-5-kirill.shutemov@linux.intel.com>
+ <6c545c841afcd23e1b3a4fcb47573ee3a178d6e1.camel@intel.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v15 12/41] KVM: VMX: Introduce CET VMCS fields and control
- bits
-To: Sean Christopherson <seanjc@google.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org,
- linux-kernel@vger.kernel.org, Tom Lendacky <thomas.lendacky@amd.com>,
- Mathias Krause <minipli@grsecurity.net>, John Allen <john.allen@amd.com>,
- Rick Edgecombe <rick.p.edgecombe@intel.com>, Chao Gao <chao.gao@intel.com>,
- Maxim Levitsky <mlevitsk@redhat.com>, Xiaoyao Li <xiaoyao.li@intel.com>,
- Zhang Yi Z <yi.z.zhang@linux.intel.com>
-References: <20250912232319.429659-1-seanjc@google.com>
- <20250912232319.429659-13-seanjc@google.com>
-Content-Language: en-US
-From: Binbin Wu <binbin.wu@linux.intel.com>
-In-Reply-To: <20250912232319.429659-13-seanjc@google.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <6c545c841afcd23e1b3a4fcb47573ee3a178d6e1.camel@intel.com>
 
+On Tue, Sep 16, 2025 at 12:03:26AM +0000, Edgecombe, Rick P wrote:
+> On Mon, 2025-06-09 at 22:13 +0300, Kirill A. Shutemov wrote:
+> > +
+> > +static int tdx_pamt_add(atomic_t *pamt_refcount, unsigned long hpa,
+> > +			struct list_head *pamt_pages)
+> > +{
+> > +	u64 err;
+> > +
+> > +	guard(spinlock)(&pamt_lock);
+> > +
+> > +	hpa = ALIGN_DOWN(hpa, PMD_SIZE);
+> > +
+> > +	/* Lost race to other tdx_pamt_add() */
+> > +	if (atomic_read(pamt_refcount) != 0) {
+> > +		atomic_inc(pamt_refcount);
+> > +		return 1;
+> > +	}
+> > +
+> > +	err = tdh_phymem_pamt_add(hpa | TDX_PS_2M, pamt_pages);
+> > +
+> > +	/*
+> > +	 * tdx_hpa_range_not_free() is true if current task won race
+> > +	 * against tdx_pamt_put().
+> > +	 */
+> > +	if (err && !tdx_hpa_range_not_free(err)) {
+> > +		pr_err("TDH_PHYMEM_PAMT_ADD failed: %#llx\n", err);
+> > +		return -EIO;
+> > +	}
+> > +
+> > +	atomic_set(pamt_refcount, 1);
+> > +
+> > +	if (tdx_hpa_range_not_free(err))
+> > +		return 1;
+> 
+> Hey Kirill,
+> 
+> I couldn't figure out how this tdx_hpa_range_not_free() check helps. We are
+> already inside the lock also taken by any operation that might affect PAMT
+> state. Can you explain more about this? Otherwise I'm going to drop it for
+> inability to explain.
 
+My git has comment for the check:
 
-On 9/13/2025 7:22 AM, Sean Christopherson wrote:
-> From: Yang Weijiang <weijiang.yang@intel.com>
->
-> Control-flow Enforcement Technology (CET) is a kind of CPU feature used
-> to prevent Return/CALL/Jump-Oriented Programming (ROP/COP/JOP) attacks.
-> It provides two sub-features(SHSTK,IBT) to defend against ROP/COP/JOP
-> style control-flow subversion attacks.
->
-> Shadow Stack (SHSTK):
->    A shadow stack is a second stack used exclusively for control transfer
->    operations. The shadow stack is separate from the data/normal stack and
->    can be enabled individually in user and kernel mode. When shadow stack
->    is enabled, CALL pushes the return address on both the data and shadow
->    stack. RET pops the return address from both stacks and compares them.
->    If the return addresses from the two stacks do not match, the processor
->    generates a #CP.
->
-> Indirect Branch Tracking (IBT):
->    IBT introduces instruction(ENDBRANCH)to mark valid target addresses of
->    indirect branches (CALL, JMP etc...). If an indirect branch is executed
->    and the next instruction is _not_ an ENDBRANCH, the processor generates
->    a #CP. These instruction behaves as a NOP on platforms that have no CET.
+https://git.kernel.org/pub/scm/linux/kernel/git/kas/linux.git/tree/arch/x86/virt/vmx/tdx/tdx.c?h=tdx/dpamt&id=375706fe73a8499dbdddb22c13d19d7286280ad6#n2160
 
-These -> The
+Consider the following scenario
 
->
-> Several new CET MSRs are defined to support CET:
->    MSR_IA32_{U,S}_CET: CET settings for {user,supervisor} CET respectively.
->
->    MSR_IA32_PL{0,1,2,3}_SSP: SHSTK pointer linear address for CPL{0,1,2,3}.
->
->    MSR_IA32_INT_SSP_TAB: Linear address of SHSTK pointer table, whose entry
-> 			is indexed by IST of interrupt gate desc.
->
-> Two XSAVES state bits are introduced for CET:
->    IA32_XSS:[bit 11]: Control saving/restoring user mode CET states
->    IA32_XSS:[bit 12]: Control saving/restoring supervisor mode CET states.
->
-> Six VMCS fields are introduced for CET:
->    {HOST,GUEST}_S_CET: Stores CET settings for kernel mode.
->    {HOST,GUEST}_SSP: Stores current active SSP.
->    {HOST,GUEST}_INTR_SSP_TABLE: Stores current active MSR_IA32_INT_SSP_TAB.
->
-> On Intel platforms, two additional bits are defined in VM_EXIT and VM_ENTRY
-> control fields:
-> If VM_EXIT_LOAD_CET_STATE = 1, host CET states are loaded from following
-> VMCS fields at VM-Exit:
->    HOST_S_CET
->    HOST_SSP
->    HOST_INTR_SSP_TABLE
->
-> If VM_ENTRY_LOAD_CET_STATE = 1, guest CET states are loaded from following
-> VMCS fields at VM-Entry:
->    GUEST_S_CET
->    GUEST_SSP
->    GUEST_INTR_SSP_TABLE
->
-> Co-developed-by: Zhang Yi Z <yi.z.zhang@linux.intel.com>
-> Signed-off-by: Zhang Yi Z <yi.z.zhang@linux.intel.com>
-> Signed-off-by: Yang Weijiang <weijiang.yang@intel.com>
-> Reviewed-by: Chao Gao <chao.gao@intel.com>
-> Reviewed-by: Maxim Levitsky <mlevitsk@redhat.com>
-> Tested-by: Mathias Krause <minipli@grsecurity.net>
-> Tested-by: John Allen <john.allen@amd.com>
-> Tested-by: Rick Edgecombe <rick.p.edgecombe@intel.com>
-> Signed-off-by: Chao Gao <chao.gao@intel.com>
-> Signed-off-by: Sean Christopherson <seanjc@google.com>
+		CPU0					CPU1
+tdx_pamt_put()
+  atomic_dec_and_test() == true
+  					tdx_pamt_get()
+					  atomic_inc_not_zero() == false
+					  tdx_pamt_add()
+					    <takes pamt_lock>
+					    // CPU0 never removed PAMT memory
+					    tdh_phymem_pamt_add() == HPA_RANGE_NOT_FREE
+					    atomic_set(1);
+					    <drops pamt_lock>
+  <takes pamt_lock>
+  // Lost the race to CPU1
+  atomic_read() > 0
+  <drop pamt_lock>
 
-Reviewed-by: Binbin Wu <binbin.wu@linux.intel.com>
+Does it make sense?
 
-> ---
->   arch/x86/include/asm/vmx.h | 8 ++++++++
->   1 file changed, 8 insertions(+)
->
-> diff --git a/arch/x86/include/asm/vmx.h b/arch/x86/include/asm/vmx.h
-> index cca7d6641287..ce10a7e2d3d9 100644
-> --- a/arch/x86/include/asm/vmx.h
-> +++ b/arch/x86/include/asm/vmx.h
-> @@ -106,6 +106,7 @@
->   #define VM_EXIT_CLEAR_BNDCFGS                   0x00800000
->   #define VM_EXIT_PT_CONCEAL_PIP			0x01000000
->   #define VM_EXIT_CLEAR_IA32_RTIT_CTL		0x02000000
-> +#define VM_EXIT_LOAD_CET_STATE                  0x10000000
->   
->   #define VM_EXIT_ALWAYSON_WITHOUT_TRUE_MSR	0x00036dff
->   
-> @@ -119,6 +120,7 @@
->   #define VM_ENTRY_LOAD_BNDCFGS                   0x00010000
->   #define VM_ENTRY_PT_CONCEAL_PIP			0x00020000
->   #define VM_ENTRY_LOAD_IA32_RTIT_CTL		0x00040000
-> +#define VM_ENTRY_LOAD_CET_STATE                 0x00100000
->   
->   #define VM_ENTRY_ALWAYSON_WITHOUT_TRUE_MSR	0x000011ff
->   
-> @@ -369,6 +371,9 @@ enum vmcs_field {
->   	GUEST_PENDING_DBG_EXCEPTIONS    = 0x00006822,
->   	GUEST_SYSENTER_ESP              = 0x00006824,
->   	GUEST_SYSENTER_EIP              = 0x00006826,
-> +	GUEST_S_CET                     = 0x00006828,
-> +	GUEST_SSP                       = 0x0000682a,
-> +	GUEST_INTR_SSP_TABLE            = 0x0000682c,
->   	HOST_CR0                        = 0x00006c00,
->   	HOST_CR3                        = 0x00006c02,
->   	HOST_CR4                        = 0x00006c04,
-> @@ -381,6 +386,9 @@ enum vmcs_field {
->   	HOST_IA32_SYSENTER_EIP          = 0x00006c12,
->   	HOST_RSP                        = 0x00006c14,
->   	HOST_RIP                        = 0x00006c16,
-> +	HOST_S_CET                      = 0x00006c18,
-> +	HOST_SSP                        = 0x00006c1a,
-> +	HOST_INTR_SSP_TABLE             = 0x00006c1c
->   };
->   
->   /*
-
+-- 
+  Kiryl Shutsemau / Kirill A. Shutemov
 
