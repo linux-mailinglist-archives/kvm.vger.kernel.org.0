@@ -1,164 +1,186 @@
-Return-Path: <kvm+bounces-57671-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-57672-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 650E7B58DF3
-	for <lists+kvm@lfdr.de>; Tue, 16 Sep 2025 07:38:48 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 88B35B58E21
+	for <lists+kvm@lfdr.de>; Tue, 16 Sep 2025 07:52:54 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id E526E1BC432E
-	for <lists+kvm@lfdr.de>; Tue, 16 Sep 2025 05:39:09 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3EC84487DA8
+	for <lists+kvm@lfdr.de>; Tue, 16 Sep 2025 05:52:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 05B382D0616;
-	Tue, 16 Sep 2025 05:38:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3BC6C2DE714;
+	Tue, 16 Sep 2025 05:52:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=brainfault-org.20230601.gappssmtp.com header.i=@brainfault-org.20230601.gappssmtp.com header.b="OQMWBI5E"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="QMdHxslb"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-il1-f179.google.com (mail-il1-f179.google.com [209.85.166.179])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.9])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 88AF6266B40
-	for <kvm@vger.kernel.org>; Tue, 16 Sep 2025 05:38:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.179
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A65391E9B12;
+	Tue, 16 Sep 2025 05:52:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.9
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758001115; cv=none; b=mHob5bQOWIGdwLQp0GqYbfq3AgmC0BQd6reeNwX4bZ+uf6n9nljOs0UMNvE63zFF/7j5rRnppMeb+LoTxq/hn4SNf+B0tL4G1ombdyFE+JWVbzjJJ4uct70uZANrdINmr42xDxEZUp2YoQOOdnp9HxnmyzFFhE6Va0WwfAgYum4=
+	t=1758001964; cv=none; b=rkzeZuaiF781fUYpKvXE6MoiVecirrf3yEn4dMQmG6G9T5PxLWNkXr7taG/flr1tRihEmqj1eYftnb0STgNjPHe+u40ANGqG4M9qzhqK92xUBFbH4irfGtIUJdE1gH5kSFcPQhZQT0b7pQCk/x9o3Jdtt1ZAlmrouBCHRAzFJ9A=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758001115; c=relaxed/simple;
-	bh=elFH2RTS4MKhtWQfI9FXcnozyv3M6+q7/HcBhns8DiY=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=AddLr0vtVLpwK+Ww9aFxY99AzvS1JDBavwF71Pv28dQ8MHxMFuPu0Nfa3urqieoJt4gkeOg9aAY4dDHPizFYXh7di1UAIxdlNkyJ0Rt6+omreoty0+FkcVryy/7mKL+geQdWnMiaagdB0uqZxHKxRmAHhKR5lXWM3BXyDFV2SZw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=brainfault.org; spf=none smtp.mailfrom=brainfault.org; dkim=pass (2048-bit key) header.d=brainfault-org.20230601.gappssmtp.com header.i=@brainfault-org.20230601.gappssmtp.com header.b=OQMWBI5E; arc=none smtp.client-ip=209.85.166.179
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=brainfault.org
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=brainfault.org
-Received: by mail-il1-f179.google.com with SMTP id e9e14a558f8ab-4224482d45eso14298895ab.1
-        for <kvm@vger.kernel.org>; Mon, 15 Sep 2025 22:38:32 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=brainfault-org.20230601.gappssmtp.com; s=20230601; t=1758001111; x=1758605911; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=l+WY6S8XVjX9ojiFBX/w421kmUHPYta2U/tJO3CWfRQ=;
-        b=OQMWBI5ELyJPS/7v+XYF55o4HJLTS2/9kYg6fViLGXQjczyLbAQNZ47SSigQaj3P4Z
-         LWVw4ctzppabfcj/JFQfDhHgnhTjVjiDDd/HOzws87QUYrMyeckFtI4LUuFGQ+5IYxKY
-         yzeOmciZtpY7sbcsEBQKxK+cepD+ZdaCgxIxq1iuRKxso8F7gR/3Iptucd0Kw4rXiTD/
-         YTllpqU0OXIhmXTNQ1amSXyKbhC4PXrdyKCKm596vvD7Kiohl5pUA11ARB+D3J9+hx3C
-         QRcNkZvMwcQeEiv/aZAKiL0tc3I0bnWJcraEndaSVYptvTfVoXxNZ2wExiBho+gTv9o6
-         3adw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1758001111; x=1758605911;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=l+WY6S8XVjX9ojiFBX/w421kmUHPYta2U/tJO3CWfRQ=;
-        b=ctRjr0Jlmq27VwEE4KHwZzUKeuYCr1THJjx9RX6By/DdNE+hD2jw1lOKrvq54bZLO1
-         poK56gCUxWv765BVF8SBi14qzWKgfajS9goQVsyLqnHgeJDnCfon78+4s4cL196LnnGx
-         7MFUhlJMHvsAMynRfbztegfeswInElpx7S5IgIjlxUc4+jVF6K7m2tfkZkafpOVPYgKJ
-         gDzIbFJgR+uncIBu+q/agK0mT3qosUm9BEpRNlXgjsPPqxID416Zu5/CWMEVLTRzIe4P
-         HFfEZiM0ItRKGh7fifjmqUmzXE99q+He24K2BcjBluB8hP0hfJLp6KcYSgyksncoPxce
-         vBDg==
-X-Forwarded-Encrypted: i=1; AJvYcCWa8cLtNDBmhB8tZjNFhOvpo/X9QLNUsvtD/hyR66z5sxxTnOrA0GrZHdz0u33OxXnTCzU=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzKubSZcmIA1hRfdkfOlX3S88C5ghWYbx/S5ZraumM8LWC3wEF1
-	U9Ia2qdbTVUTBIynvHn3kuFzqi5rQT8X6+VNjxDVByeiEXExwostiNJe/3le6Ei4aapoZZes0FK
-	DzlTA9N1bxmkWiUhaUk3gcr09f3ZZWCfHiMW6MrQLmg==
-X-Gm-Gg: ASbGncsLs1te7/q4wN6XuzDqOlPDV7CmUb+kNm7zErMLb/pGSz7732hXL6G0LS2Jm6y
-	Ybpb3Vs0VKmf2IgUGNGSKZ4JHElTeMKKQ0AHBeXbNpl6vY7WqnMSx19sZ7PJQnQ6jprhEgmFr/n
-	DhN0KoTXFSkFX54rvu9lR3s4XhfK/GtvBojooaw3iISo88j/LQRTWvyW8LUyLWiXBmA00fAL6cq
-	mj66amOjGGtLfsQ7AHO9XlDxRgDVYQ3PKl3Xg2fHmKh1jHqITM=
-X-Google-Smtp-Source: AGHT+IHEt+IV7wo/STForhbe+5Ighy2VX2akKFvAUd+sccpOkUTGCayf1IFAZQMilDDqxxtkhwZJapH5I41ohgtHAys=
-X-Received: by 2002:a05:6e02:19ce:b0:412:fa25:dd4e with SMTP id
- e9e14a558f8ab-4209d40ff57mr142917585ab.1.1758001111530; Mon, 15 Sep 2025
- 22:38:31 -0700 (PDT)
+	s=arc-20240116; t=1758001964; c=relaxed/simple;
+	bh=H/YPUdnUnEI/UdRxVPLVDcuWuPFJCqxFolqeBXJ/mgM=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=QZjSbs98vkonnTVmkEyyK0w6+JD5Ozivw2NPBf1cRTqBSXTxyPSKIHlp+ByO8kMKjl4Mmj2+3E0/4NStBRGjGNoVfG6fKu1cp8+zFSINWAZAGlcUrkI/UP1RyfCIUnFXoh5qUYio60qyExu5hZuifB5Dr25Ws5ezRC1vatEVgdc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=QMdHxslb; arc=none smtp.client-ip=198.175.65.9
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1758001963; x=1789537963;
+  h=message-id:date:mime-version:subject:to:cc:references:
+   from:in-reply-to:content-transfer-encoding;
+  bh=H/YPUdnUnEI/UdRxVPLVDcuWuPFJCqxFolqeBXJ/mgM=;
+  b=QMdHxslbeW2JWsCUog5u0+UIHLef3t7Lj2CaLWYmo0Y9kPiTl2VCfb2W
+   Ci8LdtvONmO6fbKC+aFNkWjeax2DyLzRODt5kfghZS/L3GIZpD2fUmWa1
+   FdGH6w6pFAs1WUBDO+6kM4ZXzW2N8MODABbuN+zJJqB/IwoX5+6rYZvQq
+   krX9EaZskjxQhYcNICkaiuiYI8nNqWUL+9cgRHv/8+eKb9km6iRBssgax
+   vAGXI0XyfLQpkFaIKSI+KQm1xMrj8H+UGwtcdHpm6KkF+wUMfJocy1cNM
+   221FZyeKbfZfPB3qL3Ymo19+kLoBKCaJHmEtbINl8kdObeXx6OH5s+na3
+   w==;
+X-CSE-ConnectionGUID: RmIphdViRwysmR2581ctKA==
+X-CSE-MsgGUID: RIu9NhNXRO6RmCEfVfMuLQ==
+X-IronPort-AV: E=McAfee;i="6800,10657,11554"; a="82866294"
+X-IronPort-AV: E=Sophos;i="6.18,268,1751266800"; 
+   d="scan'208";a="82866294"
+Received: from fmviesa006.fm.intel.com ([10.60.135.146])
+  by orvoesa101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 15 Sep 2025 22:52:42 -0700
+X-CSE-ConnectionGUID: d905ExmrSaew3FdMmXNsnw==
+X-CSE-MsgGUID: XtBJ7krpT1G97wGjsmhK9g==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.18,268,1751266800"; 
+   d="scan'208";a="174776240"
+Received: from junlongf-mobl.ccr.corp.intel.com (HELO [10.238.1.52]) ([10.238.1.52])
+  by fmviesa006-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 15 Sep 2025 22:52:38 -0700
+Message-ID: <d1bfb652-19ff-434f-bd51-b990543d14d6@intel.com>
+Date: Tue, 16 Sep 2025 13:52:36 +0800
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250915053431.1910941-1-samuel.holland@sifive.com>
-In-Reply-To: <20250915053431.1910941-1-samuel.holland@sifive.com>
-From: Anup Patel <anup@brainfault.org>
-Date: Tue, 16 Sep 2025 11:08:18 +0530
-X-Gm-Features: AS18NWBBYp29jcrefVqIqieCZ6Bs58izD3mGRcYk8wb5X3Ucta-UItSPTxLvHGw
-Message-ID: <CAAhSdy1Gg+k5U8WoFGkJvv+0TSg9mrSVCj4JTHay29uUc1_exA@mail.gmail.com>
-Subject: Re: [PATCH] RISC-V: KVM: Fix SBI_FWFT_POINTER_MASKING_PMLEN algorithm
-To: Samuel Holland <samuel.holland@sifive.com>
-Cc: Atish Patra <atish.patra@linux.dev>, kvm-riscv@lists.infradead.org, 
-	Albert Ou <aou@eecs.berkeley.edu>, Alexandre Ghiti <alex@ghiti.fr>, 
-	Palmer Dabbelt <palmer@dabbelt.com>, Paul Walmsley <paul.walmsley@sifive.com>, kvm@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, linux-riscv@lists.infradead.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v15 13/41] KVM: x86: Enable guest SSP read/write interface
+ with new uAPIs
+To: Sean Christopherson <seanjc@google.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org,
+ linux-kernel@vger.kernel.org, Tom Lendacky <thomas.lendacky@amd.com>,
+ Mathias Krause <minipli@grsecurity.net>, John Allen <john.allen@amd.com>,
+ Rick Edgecombe <rick.p.edgecombe@intel.com>, Chao Gao <chao.gao@intel.com>,
+ Maxim Levitsky <mlevitsk@redhat.com>, Zhang Yi Z <yi.z.zhang@linux.intel.com>
+References: <20250912232319.429659-1-seanjc@google.com>
+ <20250912232319.429659-14-seanjc@google.com>
+ <aca9d389-f11e-4811-90cf-d98e345a5cc2@intel.com>
+ <aMiPTEu_WfmEZiqT@google.com>
+Content-Language: en-US
+From: Xiaoyao Li <xiaoyao.li@intel.com>
+In-Reply-To: <aMiPTEu_WfmEZiqT@google.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-On Mon, Sep 15, 2025 at 11:04=E2=80=AFAM Samuel Holland
-<samuel.holland@sifive.com> wrote:
->
-> The implementation of SBI_FWFT_POINTER_MASKING_PMLEN from commit
-> aa04d131b88b ("RISC-V: KVM: Add support for SBI_FWFT_POINTER_MASKING_PMLE=
-N")
-> was based on a draft of the SBI 3.0 specification, and is not compliant
-> with the ratified version.
->
-> Update the algorithm to be compliant. Specifically, do not fall back to
-> a pointer masking mode with a larger PMLEN if the mode with the
-> requested PMLEN is unsupported by the hardware.
->
-> Fixes: aa04d131b88b ("RISC-V: KVM: Add support for SBI_FWFT_POINTER_MASKI=
-NG_PMLEN")
-> Signed-off-by: Samuel Holland <samuel.holland@sifive.com>
-> ---
-> I saw that the RFC version of this patch already made it into
-> riscv_kvm_queue, but it needs an update for ratified SBI 3.0. Feel free
-> to squash this into the original commit, or I can send a replacement v2
-> patch if you prefer.
+On 9/16/2025 6:12 AM, Sean Christopherson wrote:
+> On Mon, Sep 15, 2025, Xiaoyao Li wrote:
+>> On 9/13/2025 7:22 AM, Sean Christopherson wrote:
+>>> @@ -6097,11 +6105,22 @@ static int kvm_get_set_one_reg(struct kvm_vcpu *vcpu, unsigned int ioctl,
+>>>    static int kvm_get_reg_list(struct kvm_vcpu *vcpu,
+>>>    			    struct kvm_reg_list __user *user_list)
+>>>    {
+>>> -	u64 nr_regs = 0;
+>>> +	u64 nr_regs = guest_cpu_cap_has(vcpu, X86_FEATURE_SHSTK) ? 1 : 0;
+>>
+>> I wonder what's the semantic of KVM returning KVM_REG_GUEST_SSP on
+>> KVM_GET_REG_LIST. Does it ensure KVM_{G,S}ET_ONE_REG returns -EINVAL on
+>> KVM_REG_GUEST_SSP when it's not enumerated by KVM_GET_REG_LIST?
+>>
+>> If so, but KVM_{G,S}ET_ONE_REG can succeed on GUEST_SSP even if
+>> !guest_cpu_cap_has() when @ignore_msrs is true.
+> 
+> Ugh, great catch.  Too many knobs.  The best idea I've got it to to exempt KVM-
+> internal MSRs from ignore_msrs and report_ignored_msrs on host-initiated writes.
+> That's unfortunately still a userspace visible change, and would continue to be
+> userspace-visible, e.g. if we wanted to change the magic value for
+> MSR_KVM_INTERNAL_GUEST_SSP.
+> 
+> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+> index c78acab2ff3f..6a50261d1c5c 100644
+> --- a/arch/x86/kvm/x86.c
+> +++ b/arch/x86/kvm/x86.c
+> @@ -511,6 +511,11 @@ static bool kvm_is_advertised_msr(u32 msr_index)
+>          return false;
+>   }
+>   
+> +static bool kvm_is_internal_msr(u32 msr)
+> +{
+> +       return msr == MSR_KVM_INTERNAL_GUEST_SSP;
+> +}
+> +
+>   typedef int (*msr_access_t)(struct kvm_vcpu *vcpu, u32 index, u64 *data,
+>                              bool host_initiated);
+>   
+> @@ -544,6 +549,9 @@ static __always_inline int kvm_do_msr_access(struct kvm_vcpu *vcpu, u32 msr,
+>          if (host_initiated && !*data && kvm_is_advertised_msr(msr))
+>                  return 0;
+>   
+> +       if (host_initiated && kvm_is_internal_msr(msr))
+> +               return ret;
+> +
+>          if (!ignore_msrs) {
+>                  kvm_debug_ratelimited("unhandled %s: 0x%x data 0x%llx\n",
+>                                        op, msr, *data);
+> 
+> Alternatively, simply exempt host writes from ignore_msrs.  Aha!  And KVM even
+> documents that as the behavior:
+> 
+> 	kvm.ignore_msrs=[KVM] Ignore guest accesses to unhandled MSRs.
+> 			Default is 0 (don't ignore, but inject #GP)
+> 
+> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+> index c78acab2ff3f..177253e75b41 100644
+> --- a/arch/x86/kvm/x86.c
+> +++ b/arch/x86/kvm/x86.c
+> @@ -544,7 +544,7 @@ static __always_inline int kvm_do_msr_access(struct kvm_vcpu *vcpu, u32 msr,
+>          if (host_initiated && !*data && kvm_is_advertised_msr(msr))
+>                  return 0;
+>   
+> -       if (!ignore_msrs) {
+> +       if (host_initiated || !ignore_msrs) {
+>                  kvm_debug_ratelimited("unhandled %s: 0x%x data 0x%llx\n",
+>                                        op, msr, *data);
+>                  return ret;
+> 
+> So while it's technically an ABI change (arguable since it's guarded by an
+> off-by-default param), I suspect we can get away with it.  Hmm, commit 6abe9c1386e5
+> ("KVM: X86: Move ignore_msrs handling upper the stack") exempted KVM-internal
+> MSR accesses from ignore_msrs, but doesn't provide much in the way of justification
+> for _why_ that's desirable.
+> 
+> Argh, and that same mini-series extended the behavior to feature MSRs, again
+> without seeming to consider whether or not it's actually desirable to suppress
+> bad VMM accesses.  Even worse, that decision likely generated an absurd amount
+> of churn and noise due to splattering helpers and variants all over the place. :-(
+> 
+> commit 12bc2132b15e0a969b3f455d90a5f215ef239eff
+> Author:     Peter Xu <peterx@redhat.com>
+> AuthorDate: Mon Jun 22 18:04:42 2020 -0400
+> Commit:     Paolo Bonzini <pbonzini@redhat.com>
+> CommitDate: Wed Jul 8 16:21:40 2020 -0400
+> 
+>      KVM: X86: Do the same ignore_msrs check for feature msrs
+>      
+>      Logically the ignore_msrs and report_ignored_msrs should also apply to feature
+>      MSRs.  Add them in.
+> 
+> For 6.18, I think the safe play is to go with the first path (exempt KVM-internal
+> MSRs), and then try to go for the second approach (exempt all host accesses) for
+> 6.19.  KVM's ABI for ignore_msrs=true is already all kinds of messed up, so I'm
+> not terribly concerned about temporarily making it marginally worse.
 
-Since this is fixing a commit in riscv_kvm_queue, I have squashed this
-patch into the respective commit along with Drew's Reviewed-by.
-
-Thanks,
-Anup
-
->
->  arch/riscv/kvm/vcpu_sbi_fwft.c | 17 +++++++++++++----
->  1 file changed, 13 insertions(+), 4 deletions(-)
->
-> diff --git a/arch/riscv/kvm/vcpu_sbi_fwft.c b/arch/riscv/kvm/vcpu_sbi_fwf=
-t.c
-> index cacb3d4410a54..62cc9c3d57599 100644
-> --- a/arch/riscv/kvm/vcpu_sbi_fwft.c
-> +++ b/arch/riscv/kvm/vcpu_sbi_fwft.c
-> @@ -160,14 +160,23 @@ static long kvm_sbi_fwft_set_pointer_masking_pmlen(=
-struct kvm_vcpu *vcpu,
->         struct kvm_sbi_fwft *fwft =3D vcpu_to_fwft(vcpu);
->         unsigned long pmm;
->
-> -       if (value =3D=3D 0)
-> +       switch (value) {
-> +       case 0:
->                 pmm =3D ENVCFG_PMM_PMLEN_0;
-> -       else if (value <=3D 7 && fwft->have_vs_pmlen_7)
-> +               break;
-> +       case 7:
-> +               if (!fwft->have_vs_pmlen_7)
-> +                       return SBI_ERR_INVALID_PARAM;
->                 pmm =3D ENVCFG_PMM_PMLEN_7;
-> -       else if (value <=3D 16 && fwft->have_vs_pmlen_16)
-> +               break;
-> +       case 16:
-> +               if (!fwft->have_vs_pmlen_16)
-> +                       return SBI_ERR_INVALID_PARAM;
->                 pmm =3D ENVCFG_PMM_PMLEN_16;
-> -       else
-> +               break;
-> +       default:
->                 return SBI_ERR_INVALID_PARAM;
-> +       }
->
->         vcpu->arch.cfg.henvcfg &=3D ~ENVCFG_PMM;
->         vcpu->arch.cfg.henvcfg |=3D pmm;
-> --
-> 2.47.2
->
-> base-commit: 7835b892d1d9f52fb61537757aa446fb44984215
-> branch: up/kvm-fwft-pmlen
+Looks OK to me.
 
