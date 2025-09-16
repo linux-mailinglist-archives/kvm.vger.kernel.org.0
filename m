@@ -1,96 +1,108 @@
-Return-Path: <kvm+bounces-57772-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-57774-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 78455B59FD6
-	for <lists+kvm@lfdr.de>; Tue, 16 Sep 2025 19:57:02 +0200 (CEST)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2CD3FB5A03E
+	for <lists+kvm@lfdr.de>; Tue, 16 Sep 2025 20:10:13 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0B842580C91
-	for <lists+kvm@lfdr.de>; Tue, 16 Sep 2025 17:56:58 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 205574E27F3
+	for <lists+kvm@lfdr.de>; Tue, 16 Sep 2025 18:10:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 24B8A2C0F61;
-	Tue, 16 Sep 2025 17:56:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 238492C3770;
+	Tue, 16 Sep 2025 18:10:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="DYjTiYHR"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="j5tkEZKU"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pl1-f202.google.com (mail-pl1-f202.google.com [209.85.214.202])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 018812750E1
-	for <kvm@vger.kernel.org>; Tue, 16 Sep 2025 17:56:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2FC3032D5B5;
+	Tue, 16 Sep 2025 18:09:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758045398; cv=none; b=DK51yhymv/GK2VYPZ7dKOPiYyyXZHakTvcIDhC7b+r1k4HNY7ldyrx6CshZm0NLIp6qUMnaC3Vi+Cu0QR511FT82M3BWTA6t750JftrMGm1Z2ZbAteVryld5KZA7uJdnjrONXVlR0lhknB4QDcM9vfZRPou6C91yxX6COI2j0Lw=
+	t=1758046200; cv=none; b=B7RkDltw4k1lwCbB+eN364+9ljV8YuHSYsc/HqEqEN4gsL5n4/OcPCApTChomTgns6ycOjGjNQTioyUoUvWxWbFsSttIy6D1DtUlSiZBbba8cpzPEMb7rZ1mCdD7q5bt4bNLXfWBWuWA9Lp5Wdx6fGAAXJCM+scVcE+v7nuSJOc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758045398; c=relaxed/simple;
-	bh=MSicL3mF2LDPj9K1Dr5cIfPilYm5d1g/0kAnPclSKn4=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=IAeKE2jTyrnhtKG4ljaK+y8MXRZGLey8tZSepDpZzE+juHzfneE1Hsh0uErUR2n6EKKWFJJOS0Y12h1BI6MwkPKcE34QtnkhJv8JruznRPJkqkXv0Rrexmmwhsjsj98naSJMY1X0vegGbunwqOCm5QQcuKN/048w9FvUSz/MDdI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=DYjTiYHR; arc=none smtp.client-ip=209.85.214.202
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pl1-f202.google.com with SMTP id d9443c01a7336-2641084fb5aso30553315ad.0
-        for <kvm@vger.kernel.org>; Tue, 16 Sep 2025 10:56:36 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1758045396; x=1758650196; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=T8se0Qtiueaxkhq1BXHRNd0a/VQqDJMZQCkyk1YyNA8=;
-        b=DYjTiYHRoIam6SNbmhqy3xJpy57sCL3HpOUt/uxPTzycIlPqQkEz03Iiki2Cn2px3z
-         QR+dIYJCh0S5RsGsY4X0v36d0DZysD5nWUzPrDp5cJL5y8042oyBanQKO/rlPP+fcHJr
-         MF0WfG6JVImQzRuf27LbnN2HZjdM8ihbWABX6nGxaZWkBWVGCsMtBGMOiGO0cUjQO194
-         6RFLOkD4eFsOXfd2n5sK1VcysXBHSNJA5QC9WxgVNQ9aU3jU8dEycz4+s1f5naUtSLjP
-         6ztAmr1vP78AAeDOgmGd0hEjEYq7Dg59RsanUmhNQGrHxYulg6CFHYnZNyZ/asYfmQQj
-         ZjtQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1758045396; x=1758650196;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=T8se0Qtiueaxkhq1BXHRNd0a/VQqDJMZQCkyk1YyNA8=;
-        b=Oxej1Ym7hemS6eAcw23HqmzOscR1rfZjZ2JLnVYECJmzYZFcH4zhoO89MJX9GAGTFE
-         H1dxx9hzAoNe2ddx/nUjozL3lvLk5VnZ8sOMH7zr8hICLie1oHrPUrWNcWRg89frDaC2
-         r/Tmx6AtTeLIft1V+9Mi8HlIyZA3RPfdaqmw4rZWzcEHIF8ncZS5PqSOgWUbZC0dyYLd
-         JFB6++/DhrSpgINFoXZKYvb8DmLzZ9I1g1BFfIywh7p2KzAZurJou6ZzuOP3B7Yymfz5
-         osAxyIKdBYaeUlDWz0Q+M+qt89GF7JkYb/x2yzHoSWbugccehuVfcx/Bgq2ZxucRPhhm
-         JoKw==
-X-Forwarded-Encrypted: i=1; AJvYcCUWklmqUPypvoFCF6rScivIVB0cZglIGug8RrKwc+E5QNUNQhRkUY0xxAT+FjwQIctIpfs=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyryoP/FaIBWdybgSslYuqJO/GFaG400kv1TsKcqOtdqKo+Qeur
-	N3s6ymKdf194CkYDQauRn87bTuy779QZBow2B+A14fFXYItRzTJVfNfcz/4wHbVOA1ytN/T3fLU
-	M14r6wA==
-X-Google-Smtp-Source: AGHT+IHX97aKh/O5efbD/RijuE1Ev8nPZtcrQ+o4OPDVMwfBtYOs0+ySd/jGWF3rPylA60gNXsyN3zspzrA=
-X-Received: from pjbst15.prod.google.com ([2002:a17:90b:1fcf:b0:327:b430:11ad])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:903:3d0e:b0:267:9aa5:f6a6
- with SMTP id d9443c01a7336-2679aa61619mr92516245ad.19.1758045396152; Tue, 16
- Sep 2025 10:56:36 -0700 (PDT)
-Date: Tue, 16 Sep 2025 10:56:34 -0700
-In-Reply-To: <20250909182828.1542362-6-xin@zytor.com>
+	s=arc-20240116; t=1758046200; c=relaxed/simple;
+	bh=m6QCS+P9YxrpdZ57DX6UqOO6VhSgbr2yZ4pXMyKZ084=;
+	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
+	 Content-Disposition:In-Reply-To; b=fyd4yJW2VTY41X3L+/HoS+ZDTOrLPVzU/br6Hrfwf4jK2Z3vNGbdMnTDNF/hwIhdrE+d+WUQCopBOG/QGr4WLu96tSabBRlcB/LFXz8msIuF/wQyoajliKpOkPgcoXjLx/IOcNEwhbo+Tr7Gkb4iW2xIkSV+2i9vX/na7P8Y42Q=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=j5tkEZKU; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 87B7EC4CEEB;
+	Tue, 16 Sep 2025 18:09:59 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1758046199;
+	bh=m6QCS+P9YxrpdZ57DX6UqOO6VhSgbr2yZ4pXMyKZ084=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:From;
+	b=j5tkEZKULkLrmweXNKv11lM/CpL3BnmoV7wggD67l6FdeZKCCZyUufO2UVOOlbsWb
+	 zLx6Dp2BB2O914sMRl+9olsMfiQdErBLovDUuFc7ThY5jFoJR6wlYL/nv9c+748bRj
+	 Wi1IS0iplCuM2l19mCD3ZiBDd3agSW2xRDPmD4OCI/RzUWtafaMliL9JIB6bON8fJW
+	 5oOzHZHH8V/BOAouZeJbz5WQRiIO69objOg90STjUHOzEMPcDURvqeBD+myI2omNcF
+	 VQ2lRE+tdWO5qB5dwLxEn0U8NgsM9E75hI1SMCrH2m4f3ZW69OiY6eQ8d86cPQARAY
+	 bL2Z1N9igSspw==
+Date: Tue, 16 Sep 2025 13:09:58 -0500
+From: Bjorn Helgaas <helgaas@kernel.org>
+To: Farhan Ali <alifm@linux.ibm.com>
+Cc: linux-s390@vger.kernel.org, kvm@vger.kernel.org,
+	linux-kernel@vger.kernel.org, linux-pci@vger.kernel.org,
+	alex.williamson@redhat.com, schnelle@linux.ibm.com,
+	mjrosato@linux.ibm.com
+Subject: Re: [PATCH v3 01/10] PCI: Avoid saving error values for config space
+Message-ID: <20250916180958.GA1797871@bhelgaas>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20250909182828.1542362-1-xin@zytor.com> <20250909182828.1542362-6-xin@zytor.com>
-Message-ID: <aMmk0lUJ8gs7OBw-@google.com>
-Subject: Re: [RFC PATCH v1 5/5] KVM: Remove kvm_rebooting and its references
-From: Sean Christopherson <seanjc@google.com>
-To: "Xin Li (Intel)" <xin@zytor.com>
-Cc: linux-kernel@vger.kernel.org, kvm@vger.kernel.org, 
-	linux-pm@vger.kernel.org, pbonzini@redhat.com, tglx@linutronix.de, 
-	mingo@redhat.com, bp@alien8.de, dave.hansen@linux.intel.com, x86@kernel.org, 
-	hpa@zytor.com, rafael@kernel.org, pavel@kernel.org, brgerst@gmail.com, 
-	david.kaplan@amd.com, peterz@infradead.org, andrew.cooper3@citrix.com, 
-	kprateek.nayak@amd.com, arjan@linux.intel.com, chao.gao@intel.com, 
-	rick.p.edgecombe@intel.com, dan.j.williams@intel.com
-Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250911183307.1910-2-alifm@linux.ibm.com>
 
-On Tue, Sep 09, 2025, Xin Li (Intel) wrote:
-> Drop kvm_rebooting and all related uses.  Virtualization is now disabled
-> immediately before a CPU shuts down, eliminating any chance of executing
-> virtualization instructions during reboot.
+On Thu, Sep 11, 2025 at 11:32:58AM -0700, Farhan Ali wrote:
+> The current reset process saves the device's config space state before
+> reset and restores it afterward. However, when a device is in an error
+> state before reset, config space reads may return error values instead of
+> valid data. This results in saving corrupted values that get written back
+> to the device during state restoration.
+> 
+> Avoid saving the state of the config space when the device is in error.
+> While restoring we only restorei the state that can be restored through
+> kernel data such as BARs or doesn't depend on the saved state.
+> 
+> Signed-off-by: Farhan Ali <alifm@linux.ibm.com>
+> ---
+>  drivers/pci/pci.c      | 29 ++++++++++++++++++++++++++---
+>  drivers/pci/pcie/aer.c |  5 +++++
+>  drivers/pci/pcie/dpc.c |  5 +++++
+>  drivers/pci/pcie/ptm.c |  5 +++++
+>  drivers/pci/tph.c      |  5 +++++
+>  drivers/pci/vc.c       |  5 +++++
+>  6 files changed, 51 insertions(+), 3 deletions(-)
+> 
+> diff --git a/drivers/pci/pci.c b/drivers/pci/pci.c
+> index b0f4d98036cd..4b67d22faf0a 100644
+> --- a/drivers/pci/pci.c
+> +++ b/drivers/pci/pci.c
+> @@ -1720,6 +1720,11 @@ static void pci_restore_pcie_state(struct pci_dev *dev)
+>  	struct pci_cap_saved_state *save_state;
+>  	u16 *cap;
+>  
+> +	if (!dev->state_saved) {
+> +		pci_warn(dev, "Not restoring pcie state, no saved state");
+> +		return;
 
-Wrong.  KVM clears EFER.SVME in reponse to kvm_shutdown(), and thus can trip
-#UDs on e.g. VMRUN.
+Seems like a lot of messages.  If we want to warn about this, why
+don't we do it once in pci_restore_state()?
+
+I guess you're making some judgment about what things can be restored
+even when !dev->state_saved.  That seems kind of hard to maintain in
+the future as other capabilities are added.
+
+Also seems sort of questionable if we restore partial state and keep
+using the device as if all is well.  Won't the device be in some kind
+of inconsistent, unpredictable state then?
+
+Bjorn
 
