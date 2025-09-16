@@ -1,101 +1,107 @@
-Return-Path: <kvm+bounces-57785-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-57786-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8A2E1B5A1BF
-	for <lists+kvm@lfdr.de>; Tue, 16 Sep 2025 22:02:03 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id D434DB5A1C5
+	for <lists+kvm@lfdr.de>; Tue, 16 Sep 2025 22:03:08 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 51B9F2A7AF8
-	for <lists+kvm@lfdr.de>; Tue, 16 Sep 2025 20:02:03 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 65AEB3B809F
+	for <lists+kvm@lfdr.de>; Tue, 16 Sep 2025 20:02:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6AFDF2E54A3;
-	Tue, 16 Sep 2025 20:01:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AEF0F23BCFD;
+	Tue, 16 Sep 2025 20:02:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="HQ/mEYRh"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="UEMcJ3Gv"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pj1-f74.google.com (mail-pj1-f74.google.com [209.85.216.74])
+Received: from mail-pf1-f201.google.com (mail-pf1-f201.google.com [209.85.210.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 465C32356B9
-	for <kvm@vger.kernel.org>; Tue, 16 Sep 2025 20:01:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.74
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9442B18C03F
+	for <kvm@vger.kernel.org>; Tue, 16 Sep 2025 20:02:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758052914; cv=none; b=MDIJZTIBS8tperXXWWvD703KqxicTVSoZJ2RpGAiSvMgTXfeBGptT/DHIELv0PFy7igCDMHisMwHdpjpQYysqgpQE5UtTW2Au5KsM/ODY+LAOvpgNk3tw2GuMW2Ir5XT282AGqjS9TJFNs55cstwS2DNqIFc+mTWS63VNku8wQc=
+	t=1758052961; cv=none; b=JXOZW5djsnGQx00XhBNGlGvcOykh3W/OVT1RsN3tp8qV23Lh0f0KxXD9knmnilGhJjr3Hm79ttZiuzO14UJ/rYRNjdxojuT84/xfsNDh/7/NyE5QUMfKg91Yqt0VdXEljkX06Jo34TKCvUwY3MhksN3cWJ3hkDJooYuuKssqLLw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758052914; c=relaxed/simple;
-	bh=ORY2R+nyYLlhpUC+2xMlNWbFZKMrBgMXQ0ha6+zfUwo=;
+	s=arc-20240116; t=1758052961; c=relaxed/simple;
+	bh=LLu1AACh5q522Nr37rB3izBpVJgz0C5vXI0RUs0TrRM=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Content-Type; b=ULBUByRYKa8ZPEPE1tuu2S2D9CU9T+UV9NgE64BlRHPfoC2uuCXnhTq0vwAy20/6RHJc8LTLdW1y6JK/Y3lg12CgJtsINUVYT7gIvZUu3+6aBnhjtdCDEf87PKlyegnFEoXFMOT3O+GBlD+F98EvLWREmUZoKth0P1BmmRnJzJg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=HQ/mEYRh; arc=none smtp.client-ip=209.85.216.74
+	 To:Cc:Content-Type; b=nkc6nFCkt14yw6PMZNWsi+zb12fp+LeS88kMTEZPAlZ906PSea7QvDbqHX2Xz2rHIsLEUb98Aj+u2QAQPOHVB5dtE9GhYUvKPs4P70KWEwnszP3rS68uiMZuT2Tr1DRku/7ny8RAvUEusVjo4TuOPZnOoBjZgMDmFPhuB6Uv9rY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=UEMcJ3Gv; arc=none smtp.client-ip=209.85.210.201
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pj1-f74.google.com with SMTP id 98e67ed59e1d1-32dd9854282so9326443a91.1
-        for <kvm@vger.kernel.org>; Tue, 16 Sep 2025 13:01:53 -0700 (PDT)
+Received: by mail-pf1-f201.google.com with SMTP id d2e1a72fcca58-77621c54731so4806028b3a.3
+        for <kvm@vger.kernel.org>; Tue, 16 Sep 2025 13:02:40 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1758052913; x=1758657713; darn=vger.kernel.org;
-        h=to:from:subject:message-id:references:mime-version:in-reply-to:date
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=M0gfbjH4A2acdS03HXdgPmM2zx4rBDxyf8JBJExJVLs=;
-        b=HQ/mEYRhtjGYCsoxJ681AACvcELbOLucyUkHu7QK71Y9Zt4mbYLr5EN5bDeGQrplep
-         dbykSxMjUy9xR70RtFBGIX7iPakw/SK54yc8vl4O/nECGythqq8/fLz0r5Wc6WHIdLCt
-         DOsWpEETWiDDMi5kvR6N5/fL9lEjp43C5LNVlSDO34sAIFmbqqqGvUVrUZq/wUY3cuwU
-         TFSEKXAzuo/fgxHjbzQdsJg4PUm+4xxDvpHF3ILuHTc/hNcKRwLVEeXO4SRlU+Tehc9Y
-         v2o4+9agcecz+0Uyif1gDQpfFKSfMhy1+ItR0WF5V8LMXKL+wj07KNBW8YHc973lprDk
-         jgpw==
+        d=google.com; s=20230601; t=1758052960; x=1758657760; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=NDPBVUVtayrtvgwZw5aJFImyZz5WI+omxTmlAGFmthM=;
+        b=UEMcJ3Gv8MCrq59TL9IGgRgfgdDGsPhA7PuLSJRWF9HzRLAn7rgZyryJadY13sEfZN
+         STNUANu1N2y0q2N5FlEuc0/NWWVyhwz5uuJnMZm8QKGl06IoA3p5VW/zVusoN29y4Vr8
+         mo4gHYBDM6Q89bbL90VqZJ367Aj+OaMxjApK2YP8y28Z1yymUam2z+1yy95XbtNrIejO
+         ChzIxxFechftu/U5U/wBDT0gVEP2oKlxwxnZ60hDmIh8CoIilAkFWUO68io3OwG8HaIf
+         h+fMmPkDJIMBKuv9K1eKiHLTJXQRsJtL1xOOhtZtUC26DKRPRI+Qg8o83Un9LebCwswz
+         uqPQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1758052913; x=1758657713;
-        h=to:from:subject:message-id:references:mime-version:in-reply-to:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=M0gfbjH4A2acdS03HXdgPmM2zx4rBDxyf8JBJExJVLs=;
-        b=OiM/ASqSE2EFiKMXDzPYYgJWqrEvgJI8amg0xbddjisa9rvtJxUx6nj4waCmcIMo5C
-         IbGnOZMZP/a7LWdg2mZmrhNf8+v5pbghBdvnLN++R7UxN7UOkz3Uddr+Nnh/e0bFeawi
-         AWy2z3Turur3CJNPQCgTW616JtXc/JQXTpYtxJ2Be9LO52LL7kFQqRZ2KIpohrnUqcEf
-         Rklh0jtUbm/uj1KI6vbTZfNV/KNQmN55iegovlTKhtj6pFV3LdeOLTHrC3IRFnhoUQxT
-         JnTIKJ1uI2mxCz3Q34wjOP9VmW2rFvM4sfvYM/2VodkYFmo8Srj2JCtQvy1PpTDEIwqR
-         L2cA==
-X-Forwarded-Encrypted: i=1; AJvYcCUFoKlOJwBH16KMvpuveaigE60eifqYurgT0cxAnoT7A8LS7rWt99PHUz9JXQRG0cuiJ4c=@vger.kernel.org
-X-Gm-Message-State: AOJu0Ywnyh8c8klzq+Lz53k+isOC5LBWQ3cd4z3JWYfEwMVVLevJfUjJ
-	afY6ykWIfP5TMKvtEg9jI19s8SiHDLY9N/jQoPtyCKhBoQNQZgw92aPED1WbEBNHGqfs9h6UpLn
-	TGjW3xg==
-X-Google-Smtp-Source: AGHT+IFYFfM/6Ka1HXDuIekePMOv329MNcJFQsMEhleOmjrL4bcMCw8Y8Cxbz02ln+iEi1nLUg4TwngiA14=
-X-Received: from pjx12.prod.google.com ([2002:a17:90b:568c:b0:329:ccdd:e725])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90a:e18d:b0:32b:65e6:ec48
- with SMTP id 98e67ed59e1d1-32de4e5bd79mr19311585a91.8.1758052912699; Tue, 16
- Sep 2025 13:01:52 -0700 (PDT)
-Date: Tue, 16 Sep 2025 13:01:51 -0700
-In-Reply-To: <175798207153.624508.1085968130364515751.b4-ty@google.com>
+        d=1e100.net; s=20230601; t=1758052960; x=1758657760;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=NDPBVUVtayrtvgwZw5aJFImyZz5WI+omxTmlAGFmthM=;
+        b=F9D5SEMnOcOsDNirPWYXRnCI5tWwhv5KbK/zuEvOzNzH653kXAckBUhvhLJtqw/NlR
+         s3yyeQHD6G7Mk7ah9t1p9Ysd9HHZ4yQCQ3JCzKOlOF/f6HIBlPicCEOQHDW7OPl8nI4V
+         lzFP7+C1PhV8YozH+NU5symhZYWMVO7xYjNoMQmDXAFUSfLvr4njxZXZyJgugPwUy6ew
+         8k5oYV6pC//p+piGh4Y2/OJMuJb3KPqQQntIqx7UByP9VNePxsVKQTsvGLbezkR6OF2Z
+         j+GWdnOSTMuJpv553AQfhaC6n2p5P2hluaJ9ldoE1Kcss9EzyfEDSZlP0Dc8DI8UkT0Q
+         +kRQ==
+X-Forwarded-Encrypted: i=1; AJvYcCU6V9U+qhCyz6r6LQ0CHOD3Gn9Kc06OrPCULbQNzzIEwFeWCizfe16cozK/wiU/48geWwA=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yxy637ADnJRGwITVWUlDfY9sprSblYhsx3h2mvqbMCeb+Qrb9uf
+	GsF/YtqVyg+iMiGpv9kwbe5QZX3/qCWnW9o+bD91Fc74jvbYlD98V07NyGDUG27bfXgvTlTjzvf
+	gARtZuQ==
+X-Google-Smtp-Source: AGHT+IHdkoO+jtZEzBO26MNHdXNyLDVSTI0DQhxv9z5DC0syuYZZVtivfQ02s4S5Te6oVnTkomW1LaOYVFU=
+X-Received: from pjboh4.prod.google.com ([2002:a17:90b:3a44:b0:327:dc48:1406])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a05:6a20:72a0:b0:262:c083:bb38
+ with SMTP id adf61e73a8af0-262c083bc6dmr15435648637.0.1758052959908; Tue, 16
+ Sep 2025 13:02:39 -0700 (PDT)
+Date: Tue, 16 Sep 2025 13:02:38 -0700
+In-Reply-To: <175798208800.624836.165612810420047605.b4-ty@google.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
-References: <20250901131604.646415-1-liaoyuanhong@vivo.com> <175798207153.624508.1085968130364515751.b4-ty@google.com>
-Message-ID: <aMnCL3SdKcQP0ZUO@google.com>
-Subject: Re: [PATCH] KVM: x86: hyper-v: Use guard() instead of mutex_lock() to
- simplify code
+References: <00378f4c-ac64-459d-a990-6246a29c0ced@infradead.org>
+ <20250905174736.260694-1-r772577952@gmail.com> <175798208800.624836.165612810420047605.b4-ty@google.com>
+Message-ID: <aMnCXgLWN4xX6hjM@google.com>
+Subject: Re: [PATCH v2] Documentation: KVM: Add reference specs for PIT and
+ LAPIC ioctls
 From: Sean Christopherson <seanjc@google.com>
-To: Vitaly Kuznetsov <vkuznets@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, 
-	Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>, 
-	Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org, 
-	"H. Peter Anvin" <hpa@zytor.com>, kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	Liao Yuanhong <liaoyuanhong@vivo.com>
+To: rdunlap@infradead.org, Jiaming Zhang <r772577952@gmail.com>
+Cc: corbet@lwn.net, kvm@vger.kernel.org, linux-doc@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, pbonzini@redhat.com
 Content-Type: text/plain; charset="us-ascii"
 
 On Mon, Sep 15, 2025, Sean Christopherson wrote:
-> On Mon, 01 Sep 2025 21:16:04 +0800, Liao Yuanhong wrote:
-> > Using guard(mutex) instead of mutex_lock/mutex_unlock pair. Simplifies the
-> > error handling to just return in case of error. No need for the
-> > 'out_unlock' label anymore so remove it.
+> On Sat, 06 Sep 2025 01:47:36 +0800, Jiaming Zhang wrote:
+> > Thanks for your feedback! I have fixed the grammar and put the full URL on a single line.
+> > 
+> > Please let me know if any other changes are needed.
+> > 
+> > Thanks,
+> > Jiaming Zhang
+> > 
+> > [...]
 > 
-> Applied to kvm-x86 misc, thanks!
-> 
-> [1/1] KVM: x86: hyper-v: Use guard() instead of mutex_lock() to simplify code
->       https://github.com/kvm-x86/linux/commit/864384e97981
+> Applied to kvm-x86 misc, but only for the PIT documentation update.
 
-This one also got affected by the force push for an unrelated commit, new hash:
+...
 
-      https://github.com/kvm-x86/linux/commit/cbd860293d13
+> [1/1] Documentation: KVM: Add reference specs for PIT and LAPIC ioctls
+>       https://github.com/kvm-x86/linux/commit/3f0bb03b9db7
+
+I force pushed to fixup an unrelated commit, new hash:
+
+      https://github.com/kvm-x86/linux/commit/5b5133e6a55b
 
