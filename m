@@ -1,184 +1,82 @@
-Return-Path: <kvm+bounces-57927-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-57928-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 94300B8161F
-	for <lists+kvm@lfdr.de>; Wed, 17 Sep 2025 20:44:41 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 87CDBB81B38
+	for <lists+kvm@lfdr.de>; Wed, 17 Sep 2025 22:00:50 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 49398525728
-	for <lists+kvm@lfdr.de>; Wed, 17 Sep 2025 18:44:40 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E801C587688
+	for <lists+kvm@lfdr.de>; Wed, 17 Sep 2025 20:00:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AD94C303A29;
-	Wed, 17 Sep 2025 18:44:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 00DDB314D18;
+	Wed, 17 Sep 2025 19:58:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="f8PqONEN"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="dgSwnH+4"
 X-Original-To: kvm@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from out-183.mta0.migadu.com (out-183.mta0.migadu.com [91.218.175.183])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BEDA127C178;
-	Wed, 17 Sep 2025 18:44:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CF80230CB2B
+	for <kvm@vger.kernel.org>; Wed, 17 Sep 2025 19:58:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.183
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758134669; cv=none; b=DG7O2IIvUMw2zhWA3N8enBBRWS7mtd2nOhoV3XfLBIZoRa7krVYHnO4GP5Jd6i7WtsmN5gBvCau/6LuEPA1FrXrm5Ha+uPdwwytLRbePhXWtzHZRsmYgGGELa+WwwLQEfBmNu1+9Hdlp9HWTglVu356nJ5unnvfdMYVAZwf1DR0=
+	t=1758139108; cv=none; b=pnM1EGnFLOWQ+62eyyx77bKFwoMYsLnPTfE+v0ra1KLf+vWiqbuI4I5TnjezazRrfUbCs8Id1HRPzWRPqrWTUXEYYChVUf07DNqKeqs4z7V/E+xgFHFDoaAN/DrZndEREWFRyYTy0vCfhU93Edah3TR+bYI5cE2lNbmZOwvCyiw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758134669; c=relaxed/simple;
-	bh=OLoxa48QuwEBcofnDByK3uh1SCi2Z/yYPHdY5JEg1PI=;
-	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=mse3c3iHbPPRDQ6dWpZDLr42c9ZT1alileM1bTUxshysMdhAEWRs74ZVW57+Sjro4DQ0t5DyWOFNQ7Hf4VqMyos0mBY9sjBOGbi+aS1JtPgAx17B0Z4MBOY4PwP5KohntzW0z69g7nSQ7A4/3rUnfV/SE6YCbT3GVUGR4YiccM4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=f8PqONEN; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 33005C4CEE7;
-	Wed, 17 Sep 2025 18:44:28 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1758134668;
-	bh=OLoxa48QuwEBcofnDByK3uh1SCi2Z/yYPHdY5JEg1PI=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=f8PqONENfOsX3iVnNu8gzDMdRStH7GoSN2gCmJumNxzU3dDXCWnKNl4/l6kfWb4LF
-	 tMPEko7Uxgu1oKN9QLzKTPw3vzijJvwTniwwi1XZdP9ocASlZFr6Xv5fP2btY8LA1m
-	 08UDfu7ijq2Vcndt64HGPL6kxN573aML1YCymlHCdtJmkqdb16Kvz1DoDVXDJv0f0n
-	 xqqKHWVaim5WsMbsY/6tS6/0VpPFmbkMNYj8aYyZAqvlUooCSpwv6gyUzjsjlLHXSp
-	 1W8KCDyXYPB33CHdXqrE9EgkeAw6/Dkh2S3gpiOdgXY8Q/Un712FbTj7PGc7comhQi
-	 kqT+zU22sKBBg==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.98.2)
-	(envelope-from <maz@kernel.org>)
-	id 1uyx8j-00000007Bv9-3g4d;
-	Wed, 17 Sep 2025 18:44:25 +0000
-Date: Wed, 17 Sep 2025 19:44:25 +0100
-Message-ID: <86ms6s2a2e.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: Itaru Kitayama <itaru.kitayama@linux.dev>
-Cc: Oliver Upton <oliver.upton@linux.dev>,
-	Joey Gouly <joey.gouly@arm.com>,
-	K Poulose Suzuki <suzuki.poulose@arm.com>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	Paolo Bonzini <pbonzini@redhat.com>,
-	Shuah Khan <shuah@kernel.org>,
-	linux-arm-kernel@lists.infradead.org,
-	kvmarm@lists.linux.dev,
-	kvm@vger.kernel.org,
-	linux-kselftest@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Itaru Kitayama <itaru.kitayama@fujitsu.com>
-Subject: Re: [PATCH] PMCR_EL0.N is RAZ/WI. At least a build failes in Ubuntu 22.04 LTS. Remove the set function.
-In-Reply-To: <0524084A-9E82-408A-9F22-369ED25E42E9@linux.dev>
-References: <867by4c4v1.wl-maz@kernel.org>
-	<3FEB4D87-EEAF-4A21-BCBC-291A4A7C2230@gmail.com>
-	<86348rdg5o.wl-maz@kernel.org>
-	<0524084A-9E82-408A-9F22-369ED25E42E9@linux.dev>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+	s=arc-20240116; t=1758139108; c=relaxed/simple;
+	bh=++K/PDu6ONEBVfix9bUP26opRV7k3zTICh/JJM19N6c=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=QTgDzyhen9EpTMrRqcNQQ0GbeSfGJe8HqF4HARr4y7Iq1xvjem207lHx4molzS6729bn3BXs6sbLObScKBDM4J7OOlGsaz3q6rcKrKaRJHvsxDT8trpa33NjpywHvRM/dyYlxbKSejBpDXAplArfe/DrQNBZuY25PANfMeBdOpk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=dgSwnH+4; arc=none smtp.client-ip=91.218.175.183
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+Date: Wed, 17 Sep 2025 12:58:07 -0700
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1758139094;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=axLM7SM1M1gPLHiJS2eIg7jyFvifPlO5uWh3xMQYZJo=;
+	b=dgSwnH+4+f66Ikzk19q0rR8cQttfhSzJBLlDvZVLXoIeeIYeyUrkcu6d0szkPvlao4PIIH
+	T4ziSwS062uU2fW0RG+BF4CPQC05hTjfFywCMS5aCLAabZ7z+U26nouF+8Zk9ay2nIJit3
+	DdUFC2UC4FyQ0BbtOpjEcfOILkuhTeg=
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Oliver Upton <oliver.upton@linux.dev>
+To: Paolo Bonzini <pbonzini@redhat.com>
+Cc: Marc Zyngier <maz@kernel.org>, kvmarm@lists.linux.dev,
+	kvm@vger.kernel.org
+Subject: Re: [GIT PULL] KVM/arm64 changes for 6.17, round #3
+Message-ID: <aMsSz9YUcd4Qf0ND@linux.dev>
+References: <aMHepH8Md9gSu2ix@linux.dev>
+ <6e598aec-f55c-467a-abef-6d183bb9cfca@redhat.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: itaru.kitayama@linux.dev, oliver.upton@linux.dev, joey.gouly@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, pbonzini@redhat.com, shuah@kernel.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, kvm@vger.kernel.org, linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org, itaru.kitayama@fujitsu.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <6e598aec-f55c-467a-abef-6d183bb9cfca@redhat.com>
+X-Migadu-Flow: FLOW_OUT
 
-On Mon, 15 Sep 2025 22:31:31 +0100,
-Itaru Kitayama <itaru.kitayama@linux.dev> wrote:
->=20
->=20
->=20
-> > On Sep 12, 2025, at 21:11, Marc Zyngier <maz@kernel.org> wrote:
-> >=20
-> > On Fri, 12 Sep 2025 12:33:39 +0100,
-> > Itaru Kitayama <itaru.kitayama@gmail.com> wrote:
-> >>=20
-> >>=20
-> >>=20
-> >>> On Sep 12, 2025, at 20:01, Marc Zyngier <maz@kernel.org> wrote:
-> >>>=20
-> >>> =EF=BB=BFOn Fri, 12 Sep 2025 09:27:40 +0100,
-> >>> Itaru Kitayama <itaru.kitayama@linux.dev> wrote:
-> >>>>=20
-> >>>> Signed-off-by: Itaru Kitayama <itaru.kitayama@fujitsu.com>
-> >>>=20
-> >>> This isn't an acceptable commit message.
-> >>>=20
-> >>>> ---
-> >>>> Seen a build failure with old Ubuntu 22.04 LTS, while the latest rel=
-ease
-> >>>> has no build issue, a write to the bit fields is RAZ/WI, remove the
-> >>>> function.
-> >>>> ---
-> >>>> tools/testing/selftests/kvm/arm64/vpmu_counter_access.c | 6 ------
-> >>>> 1 file changed, 6 deletions(-)
-> >>>>=20
-> >>>> diff --git a/tools/testing/selftests/kvm/arm64/vpmu_counter_access.c=
- b/tools/testing/selftests/kvm/arm64/vpmu_counter_access.c
-> >>>> index f16b3b27e32ed7ca57481f27d689d47783aa0345..56214a4430be90b3e1d8=
-40f2719b22dd44f0b49b 100644
-> >>>> --- a/tools/testing/selftests/kvm/arm64/vpmu_counter_access.c
-> >>>> +++ b/tools/testing/selftests/kvm/arm64/vpmu_counter_access.c
-> >>>> @@ -45,11 +45,6 @@ static uint64_t get_pmcr_n(uint64_t pmcr)
-> >>>>   return FIELD_GET(ARMV8_PMU_PMCR_N, pmcr);
-> >>>> }
-> >>>>=20
-> >>>> -static void set_pmcr_n(uint64_t *pmcr, uint64_t pmcr_n)
-> >>>> -{
-> >>>> -    u64p_replace_bits((__u64 *) pmcr, pmcr_n, ARMV8_PMU_PMCR_N);
-> >>>> -}
-> >>>> -
-> >>>> static uint64_t get_counters_mask(uint64_t n)
-> >>>> {
-> >>>>   uint64_t mask =3D BIT(ARMV8_PMU_CYCLE_IDX);
-> >>>> @@ -490,7 +485,6 @@ static void test_create_vpmu_vm_with_pmcr_n(uint=
-64_t pmcr_n, bool expect_fail)
-> >>>>    * Setting a larger value of PMCR.N should not modify the field, a=
-nd
-> >>>>    * return a success.
-> >>>>    */
-> >>>> -    set_pmcr_n(&pmcr, pmcr_n);
-> >>>>   vcpu_set_reg(vcpu, KVM_ARM64_SYS_REG(SYS_PMCR_EL0), pmcr);
-> >>>>   pmcr =3D vcpu_get_reg(vcpu, KVM_ARM64_SYS_REG(SYS_PMCR_EL0));
-> >>>>=20
-> >>>>=20
-> >>>=20
-> >>> So what are you fixing here? A build failure? A semantic defect?
-> >>> Something else? What makes this a valid change?
-> >>>=20
-> >>> Frankly, I have no idea.
-> >>>=20
-> >>> But KVM definitely allows PMCR_EL0.N to be written from userspace, and
-> >>> that's not going to change.
-> >>>=20
-> >>=20
-> >> Then I=E2=80=99ll drop this patch.
-> >=20
-> > I'm not asking you to drop it, I'm asking you to explain. If you found
-> > a problem, let's discuss it and fix it. But as it stands, you're not
-> > giving me much to go on.
-> >=20
->=20
-> You are right, while the bit fields are write ignored, to be
-> consistent with the handling of other bit fields of the register,
-> I=E2=80=99m fully convinced that checking the write operation in the
-> vpmu_counter_access.c file should be kept.
+On Wed, Sep 17, 2025 at 07:56:15PM +0200, Paolo Bonzini wrote:
+> On 9/10/25 22:25, Oliver Upton wrote:
+> > Hi Paolo,
+> > 
+> > This is most likely the final set of KVM/arm64 fixes for 6.17.
+> > 
+> > Of note, I reverted a couple of fixes we took in 6.17 for RCU stalls when
+> > destroying a stage-2 page table. There appears to be some nasty refcounting /
+> > UAF issues lurking in those patches and the band-aid we tried to apply didn't
+> > hold.
+> 
+> Thanks for pointing this out, I will put a note about reverts in my own tag.
 
-The bit field is *not* ignored when written from userspace. That's how
-we configure the PMU if the guest runs at EL1.
+Appreciated, seems to have been an unintentional omission from my own
+tag.
 
-> The build error I=E2=80=99ve seen with Ubuntu 22.04 LTS is below:
-
-[snip]
-
-Can you please detail what compiler version this is? I'm unlikely to
-install an ancient version of Ubuntu, but I can pick the corresponding
-compiler version.
-
-	M.
-
---=20
-Without deviation from the norm, progress is not possible.
+Best,
+Oliver
 
