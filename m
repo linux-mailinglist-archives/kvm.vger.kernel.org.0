@@ -1,160 +1,146 @@
-Return-Path: <kvm+bounces-57846-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-57847-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id B4352B7E8A7
-	for <lists+kvm@lfdr.de>; Wed, 17 Sep 2025 14:52:38 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id D3FADB7EB1A
+	for <lists+kvm@lfdr.de>; Wed, 17 Sep 2025 14:58:03 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D1608482D0F
-	for <lists+kvm@lfdr.de>; Wed, 17 Sep 2025 12:48:55 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 61C474629AD
+	for <lists+kvm@lfdr.de>; Wed, 17 Sep 2025 12:53:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6AAC4328998;
-	Wed, 17 Sep 2025 12:47:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4426732896D;
+	Wed, 17 Sep 2025 12:52:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="eqPcO/cH"
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="FKs0E6nk"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pl1-f201.google.com (mail-pl1-f201.google.com [209.85.214.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3042430CB52
-	for <kvm@vger.kernel.org>; Wed, 17 Sep 2025 12:47:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C8DAA29B76F;
+	Wed, 17 Sep 2025 12:52:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758113275; cv=none; b=H54mPj/FCl31FG7dvaMRBozwLnzcdjoH0lygAP7XHkl7tIWYCn0nBTIe23Nlr+pK+C3ZtaD/IKzAhUZjrt+cwR2jMWdpcLJNA1uIc0L3nXJtxT3fKTNV0Lp9kvlZM/lrxmyiJ4iHoNMckWgyaJrM+tEeSX2bm9drBNPI/PeRWtU=
+	t=1758113522; cv=none; b=SFj/gAiAUiMqwcGtdLvxy3GmvZ3PJL8jWULirAfqrlHK5V/44hLErMq+jjX+PBVvaSq134GD/L3vS2SAyi+H1xo1govYNe8rtlqIIk3sn+ytw8eKEweDovLUZR0/3JLzUmc9IiElVM0lwml6OZzIKKJaTqinFqFX7q/QvbE+wW8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758113275; c=relaxed/simple;
-	bh=RQINUxGsJC4fFGW9Pga0A1D4M8TL6sYnSYVhtigYag8=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=bEMEiCGuUxhe69ZEFoRCY1ckV9HYwoQjVvo0XjVUcdXnf6LDf9ynlsyNHeLSzxMm2P6DYzDsfnkWcntDuclpyIkz3G+zEPEKJ+ixCLp2Y7U2Ks72TE2cdWBXroVwv+7S2L2o7VqsX/hT6RrRDCXjVTfpkeBrsEODSHkP/DLw54s=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=eqPcO/cH; arc=none smtp.client-ip=209.85.214.201
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pl1-f201.google.com with SMTP id d9443c01a7336-24457ef983fso119634025ad.0
-        for <kvm@vger.kernel.org>; Wed, 17 Sep 2025 05:47:54 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1758113273; x=1758718073; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=hhI+ZLb55QOi22SZbshrFRw3Xyx04NRrqgLS645MTmk=;
-        b=eqPcO/cHXAGggYBHwZa3SOXFPA7g/R2o/g31T02no00DMewtGvJiN+jPWEJVqq2eTH
-         d7iwScULz59ascoz3pmUqiBPuZZ4LIbbL2VrTMqlgzJ2hg5ILkxrAgtxuJAvArx2Uf8f
-         EVlUGi/ZTI6GQVUs5W+94hwZwpKI4zAMaVJE83HJXZ8cfa/qaBFYdpepToGkHuKo0v7a
-         NlgD2rXSuYCP9nqTbCi9lIFSq1wvPmrdolHfaPPmeeiFel0psZRocWYDktshAPZNn4ff
-         RV5NYtRygn6X3fsK9x50fpwxAyovzfvVSRCZ5lR+8Fad9haQBAifPe1XokHElewbv7CP
-         YqyA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1758113273; x=1758718073;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=hhI+ZLb55QOi22SZbshrFRw3Xyx04NRrqgLS645MTmk=;
-        b=nCjJP2S22GnzuhgSW0eGnf9WRt0hgx2XVsRGtgOoZgrTkP541BS3os76ETlMhPNgmQ
-         ImnHGM9iRlgVLdZ1VxlfL3FzVrm44qbocEy0bHF7DTYVqXWUL3o6GCgkcwcgdr9dgN5t
-         VbpiiIxqGGVZDyYN2Spj22A3tENbbk6oRZM1Y43eh+AKRou+Y/8J/6Ym6aEOn4I6xteT
-         wNuxld6TfPMV2AAWjbMTj5wgPDbQD62rQYFUc1hD/e+szeJK/3yB+dnrnxxn0NH9oaG6
-         ZUWJI2D+E7sIk3HHC71gd74lA6teYZwkt6eikLoizom88GUtvNFQzbDqTaUstJn9jlmC
-         zRfw==
-X-Forwarded-Encrypted: i=1; AJvYcCXPf+6tirtTLm/FGciNJGh6+AxbfqdpjuqJwX5DMLxE/GeCuHQL/hJrcQFFLPo6tRWWAcU=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yw9hPN81MCWHhgLG1j9OBwIqoO2oLqG8osnLpE/VDCfVNDPuGu5
-	9UYy9bUcwyhwoIdoAUVj2Z1IwFO0rZaj+jPv59FUhXbU1er0sOome9Ad9dTh9HvYTrbXeQudpA+
-	C5y5vYQ==
-X-Google-Smtp-Source: AGHT+IGZMZLBQ8oPAPbG5AROKZBqoW5d8+AhwGK8pLbbX+9Eioaxg8jtAuHu8IyLmAYtzzOu/Q9PRNGhYEc=
-X-Received: from pjbph15.prod.google.com ([2002:a17:90b:3bcf:b0:32d:df7e:66c2])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:903:4b03:b0:251:3d1c:81f4
- with SMTP id d9443c01a7336-26813cf3339mr29737275ad.54.1758113267744; Wed, 17
- Sep 2025 05:47:47 -0700 (PDT)
-Date: Wed, 17 Sep 2025 05:47:45 -0700
-In-Reply-To: <c4b9d87b-fddc-420b-ac86-7da48a42610f@linux.intel.com>
+	s=arc-20240116; t=1758113522; c=relaxed/simple;
+	bh=EYyukG4hL5ZsjhQVNbRXyPJJVDil0rQq7t6BadTNwgc=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=UV3YfJ0792Y7P4akHAqHKy1Y4/U2gCgKv/DHKk6l/lM3du01LPVmLqxpIn3scQxxDNzAFL7uTFLN2BNOknYerLIu8uFKND+YqkYgFOzhOFNyrFcTsMUCsiMiVD4cK/BSBXOGV9ePvJURJH8PgGdodJGcKmaad4arITKGWWK0sPk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=FKs0E6nk; arc=none smtp.client-ip=148.163.156.1
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
+Received: from pps.filterd (m0353729.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 58H9QaBA003223;
+	Wed, 17 Sep 2025 12:51:58 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
+	:content-transfer-encoding:content-type:date:from:in-reply-to
+	:message-id:mime-version:references:subject:to; s=pp1; bh=Uo/fSy
+	w5fpkYvgmvJIJMhCwCnZ73bhp6FrdpiBVMGNU=; b=FKs0E6nkJJ4Q76cF2hKR8T
+	b6X7FxQ4346A4xu9jTyuRl039dw7drzmlP/wvtTwR/CtcVqd4SD8FWnUlfaoCNh3
+	Uxlma1pc2AjuRS7lJuHw73RoJxVWrYQ4TAHjAchjUIG30BQAvKH+2aLv6aFi2CIK
+	tfSrHMhCtWhHENW+Rd4WsuS2LA86mpsDGM/Jm3OTuBs4waA9x2xVY/X6slKrbSkB
+	jeAcNP4oJAEXEP3VXcSg39wf/jWQkU06uGx1U8tCmakRxiwcnlkDYaev6Tjy8kki
+	vwgBhZt3W0FNN4LBU/ojrFHW3YbGob/3DMpTJyQ4jR7fYbTbQIrPFp0bbrijgKZw
+	==
+Received: from ppma13.dal12v.mail.ibm.com (dd.9e.1632.ip4.static.sl-reverse.com [50.22.158.221])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 497g4hkr2t-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Wed, 17 Sep 2025 12:51:57 +0000 (GMT)
+Received: from pps.filterd (ppma13.dal12v.mail.ibm.com [127.0.0.1])
+	by ppma13.dal12v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 58HBA6bq018632;
+	Wed, 17 Sep 2025 12:51:57 GMT
+Received: from smtprelay07.fra02v.mail.ibm.com ([9.218.2.229])
+	by ppma13.dal12v.mail.ibm.com (PPS) with ESMTPS id 495n5mh2d7-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Wed, 17 Sep 2025 12:51:56 +0000
+Received: from smtpav02.fra02v.mail.ibm.com (smtpav02.fra02v.mail.ibm.com [10.20.54.101])
+	by smtprelay07.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 58HCprCP46268710
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Wed, 17 Sep 2025 12:51:53 GMT
+Received: from smtpav02.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 3710920040;
+	Wed, 17 Sep 2025 12:51:53 +0000 (GMT)
+Received: from smtpav02.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 03DE120043;
+	Wed, 17 Sep 2025 12:51:53 +0000 (GMT)
+Received: from p-imbrenda (unknown [9.152.224.66])
+	by smtpav02.fra02v.mail.ibm.com (Postfix) with ESMTP;
+	Wed, 17 Sep 2025 12:51:52 +0000 (GMT)
+Date: Wed, 17 Sep 2025 14:51:51 +0200
+From: Claudio Imbrenda <imbrenda@linux.ibm.com>
+To: Heiko Carstens <hca@linux.ibm.com>
+Cc: kvm@vger.kernel.org, linux-s390@vger.kernel.org, borntraeger@de.ibm.com,
+        frankja@linux.ibm.com, nsg@linux.ibm.com, nrb@linux.ibm.com,
+        seiden@linux.ibm.com, schlameuss@linux.ibm.com, svens@linux.ibm.com,
+        agordeev@linux.ibm.com, david@redhat.com,
+        gerald.schaefer@linux.ibm.com
+Subject: Re: [PATCH v2 07/20] KVM: s390: KVM-specific bitfields and helper
+ functions
+Message-ID: <20250917145151.76f9b57d@p-imbrenda>
+In-Reply-To: <20250917121822.7515B42-hca@linux.ibm.com>
+References: <20250910180746.125776-1-imbrenda@linux.ibm.com>
+	<20250910180746.125776-8-imbrenda@linux.ibm.com>
+	<20250917121822.7515B42-hca@linux.ibm.com>
+Organization: IBM
+X-Mailer: Claws Mail 4.3.1 (GTK 3.24.49; x86_64-redhat-linux-gnu)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20250912232319.429659-1-seanjc@google.com> <20250912232319.429659-10-seanjc@google.com>
- <c4b9d87b-fddc-420b-ac86-7da48a42610f@linux.intel.com>
-Message-ID: <aMqt46hxeKxCxkmq@google.com>
-Subject: Re: [PATCH v15 09/41] KVM: x86: Load guest FPU state when access
- XSAVE-managed MSRs
-From: Sean Christopherson <seanjc@google.com>
-To: Binbin Wu <binbin.wu@linux.intel.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	Tom Lendacky <thomas.lendacky@amd.com>, Mathias Krause <minipli@grsecurity.net>, 
-	John Allen <john.allen@amd.com>, Rick Edgecombe <rick.p.edgecombe@intel.com>, 
-	Chao Gao <chao.gao@intel.com>, Maxim Levitsky <mlevitsk@redhat.com>, 
-	Xiaoyao Li <xiaoyao.li@intel.com>, Zhang Yi Z <yi.z.zhang@linux.intel.com>
-Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-ORIG-GUID: JFMSZ5FSUluAFQBM4TeE231t6GlZzlfz
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUwOTE2MDIwNCBTYWx0ZWRfX6cMJ3jxcKa2o
+ G0PIo8kimdxHf/q65z+QNZEqgRQBRQrw+yEtF67V76PMnxyJHV3F+l5Q7k4kiwaWjoGxZV9ujHl
+ 3CxpfpQkTxa5v/qZA51V12ODmEhyFr7q0F9Thc+77WpYR5iOq4Vzfl9VTZDiIrlAl14Pn+Zl47R
+ KTFbV49cpoZvYZS3D6uteeiHvq5LyAI+So7p8K7Dfbuy1zLS/qUqeyX0OnaLuzRhErZ2R3btBfy
+ AK7eDqSJXOLuUnMHh5Qwygf2gYXN+aDwbr0yl1fIEJ/GoFJSpr0Ep9FYGbfKSnzW5EFNd/3+Vt6
+ +dvhrc6K7wZ3uFh8rq3iZXngmOcYPWbG2rBjeAtd7q3+8OWOghJvwFA5V4qXXRC3cer5k4riphB
+ oBqbM1/2
+X-Proofpoint-GUID: JFMSZ5FSUluAFQBM4TeE231t6GlZzlfz
+X-Authority-Analysis: v=2.4 cv=co2bk04i c=1 sm=1 tr=0 ts=68caaeed cx=c_pps
+ a=AfN7/Ok6k8XGzOShvHwTGQ==:117 a=AfN7/Ok6k8XGzOShvHwTGQ==:17
+ a=kj9zAlcOel0A:10 a=yJojWOMRYYMA:10 a=VnNF1IyMAAAA:8 a=fBYi-ClNYaykXQuJeRMA:9
+ a=CjuIK1q_8ugA:10
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1117,Hydra:6.1.9,FMLib:17.12.80.40
+ definitions=2025-09-17_01,2025-09-17_02,2025-03-28_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ clxscore=1015 impostorscore=0 priorityscore=1501 suspectscore=0 adultscore=0
+ phishscore=0 malwarescore=0 spamscore=0 bulkscore=0 classifier=typeunknown
+ authscore=0 authtc= authcc= route=outbound adjust=0 reason=mlx scancount=1
+ engine=8.19.0-2507300000 definitions=main-2509160204
 
-On Tue, Sep 16, 2025, Binbin Wu wrote:
-> > +/*
-> > + * Lock and/or reload guest FPU and access xstate MSRs. For accesses initiated
+On Wed, 17 Sep 2025 14:18:22 +0200
+Heiko Carstens <hca@linux.ibm.com> wrote:
+
+> On Wed, Sep 10, 2025 at 08:07:33PM +0200, Claudio Imbrenda wrote:
+> > Add KVM-s390 specific bitfields and helper functions to manipulate DAT
+> > tables.
+> > 
+> > Signed-off-by: Claudio Imbrenda <imbrenda@linux.ibm.com>
+> > ---
+> >  arch/s390/kvm/dat.h | 693 ++++++++++++++++++++++++++++++++++++++++++++
+> >  1 file changed, 693 insertions(+)
+> >  create mode 100644 arch/s390/kvm/dat.h  
 > 
+> ...
 > 
-> Lock is unconditional and reload is conditional.
-> "and/or" seems not accurate?
-
-Agreed.  This?
-
-/*
- * Lock andr (re)load guest FPU and access xstate MSRs. For accesses initiated
- * by host, guest FPU is loaded in __msr_io(). For accesses initiated by guest,
- * guest FPU should have been loaded already.
- */
-
-> 
-> > + * by host, guest FPU is loaded in __msr_io(). For accesses initiated by guest,
-> > + * guest FPU should have been loaded already.
-> > + */
-> > +static __always_inline void kvm_access_xstate_msr(struct kvm_vcpu *vcpu,
-> > +						  struct msr_data *msr_info,
-> > +						  int access)
+> > +static inline struct page_table *dat_alloc_empty_pt(void)
 > > +{
-> > +	BUILD_BUG_ON(access != MSR_TYPE_R && access != MSR_TYPE_W);
-> > +
-> > +	KVM_BUG_ON(!is_xstate_managed_msr(vcpu, msr_info->index), vcpu->kvm);
-> > +	KVM_BUG_ON(!vcpu->arch.guest_fpu.fpstate->in_use, vcpu->kvm);
-> > +
-> > +	kvm_fpu_get();
-> > +	if (access == MSR_TYPE_R)
-> > +		rdmsrq(msr_info->index, msr_info->data);
-> > +	else
-> > +		wrmsrq(msr_info->index, msr_info->data);
-> > +	kvm_fpu_put();
-> > +}
-> > +
-> > +static __maybe_unused void kvm_set_xstate_msr(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
-> > +{
-> > +	kvm_access_xstate_msr(vcpu, msr_info, MSR_TYPE_W);
-> > +}
-> > +
-> > +static __maybe_unused void kvm_get_xstate_msr(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
-> > +{
-> > +	kvm_access_xstate_msr(vcpu, msr_info, MSR_TYPE_R);
-> > +}
-> > +
-> >   int kvm_set_msr_common(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
-> >   {
-> >   	u32 msr = msr_info->index;
-> > @@ -4551,11 +4614,25 @@ static int __msr_io(struct kvm_vcpu *vcpu, struct kvm_msrs *msrs,
-> >   		    int (*do_msr)(struct kvm_vcpu *vcpu,
-> >   				  unsigned index, u64 *data))
-> >   {
-> > +	bool fpu_loaded = false;
-> >   	int i;
-> > -	for (i = 0; i < msrs->nmsrs; ++i)
-> > +	for (i = 0; i < msrs->nmsrs; ++i) {
-> > +		/*
-> > +		 * If userspace is accessing one or more XSTATE-managed MSRs,
-> > +		 * temporarily load the guest's FPU state so that the guest's
-> > +		 * MSR value(s) is resident in hardware, i.e. so that KVM can
+> > +	return dat_alloc_pt(_PAGE_INVALID, 0);
+> > +}  
 > 
-> Using "i.e." and "so that" together feels repetitive.[...]
+> This is calling a function which get's introduced with a later
+> patch. It is not harmful, since all of this code is still unused, but
+> still odd.
 
-		/*
-		 * If userspace is accessing one or more XSTATE-managed MSRs,
-		 * temporarily load the guest's FPU state so that the guest's
-		 * MSR value(s) is resident in hardware and thus can be accessed
-		 * via RDMSR/WRMSR.
-		 */
+yeah but this should not be here, I'll move it to the appropriate patch
+
+thanks for spotting this
 
