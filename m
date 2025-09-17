@@ -1,55 +1,55 @@
-Return-Path: <kvm+bounces-57881-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-57878-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6D619B7F229
-	for <lists+kvm@lfdr.de>; Wed, 17 Sep 2025 15:19:23 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 84C1DB7F21D
+	for <lists+kvm@lfdr.de>; Wed, 17 Sep 2025 15:18:48 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id D78E4188894C
-	for <lists+kvm@lfdr.de>; Wed, 17 Sep 2025 13:12:58 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 537A7188D4E7
+	for <lists+kvm@lfdr.de>; Wed, 17 Sep 2025 13:12:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A9234333A99;
-	Wed, 17 Sep 2025 13:05:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E485632BC0E;
+	Wed, 17 Sep 2025 13:05:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="key not found in DNS" (0-bit key) header.d=rsg.ci.i.u-tokyo.ac.jp header.i=@rsg.ci.i.u-tokyo.ac.jp header.b="goSPsWuW"
+	dkim=fail reason="key not found in DNS" (0-bit key) header.d=rsg.ci.i.u-tokyo.ac.jp header.i=@rsg.ci.i.u-tokyo.ac.jp header.b="wEKO9sNx"
 X-Original-To: kvm@vger.kernel.org
 Received: from www3579.sakura.ne.jp (www3579.sakura.ne.jp [49.212.243.89])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 16049333A90
-	for <kvm@vger.kernel.org>; Wed, 17 Sep 2025 13:05:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 43BF131960D
+	for <kvm@vger.kernel.org>; Wed, 17 Sep 2025 13:05:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=49.212.243.89
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758114337; cv=none; b=oAiARbuBqP+5suHHXeOgsPAY3njeRHIwkXOAeaBliffIifM6ahD5oYAaEPDXB3hICZD/GdCrfWwDjuY7TDafRb1SMFAlXF9sKKONLghpaDtq1dB/2cptptOqw/QqDrT2dw8pYdtd/EV/RpOcSgRoKOV3V9vC4KZXKqdlsMIxXOY=
+	t=1758114319; cv=none; b=XdvazMBkAW+2uNLokgyfnmNo80xgSWtxdWSkQIjwniQznhgGvGOwCQAKQJpp36Wh0VbZ8gtFwbXQdvBTSwNJiKcOQGbT4fsf0PzyHGv0otqNoOhhS8DAIQh3pQxvNCagYHFvJ2ucYfnFV4saIS/hAa0kp1zCmKqh2OHBme4TMvE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758114337; c=relaxed/simple;
-	bh=T3VSFRMLCleGAVgDjJs3c0T3PRn9YFU8m0VdcOXl9iw=;
+	s=arc-20240116; t=1758114319; c=relaxed/simple;
+	bh=kmBG/9qtlFvKjd58yyTRn7VgQyMpUqXmndENU5lET2w=;
 	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=e2pKkbaYV17L5bsAcRhZDzTKy44+XK/M/lD+hQRuaO8vwMcGzZTs3peDCvW51iWTKZoyQ7ifMSLB0SSSWYrIFcpaANBZ/F7cq5dn451FIZSRHSI7Lnn5AdyPQ+hmXm+vd8nvlReMD/dY/g0qgH3TEA0KCbpuh38FExRr+c6u+IE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=rsg.ci.i.u-tokyo.ac.jp; spf=pass smtp.mailfrom=rsg.ci.i.u-tokyo.ac.jp; dkim=fail (0-bit key) header.d=rsg.ci.i.u-tokyo.ac.jp header.i=@rsg.ci.i.u-tokyo.ac.jp header.b=goSPsWuW reason="key not found in DNS"; arc=none smtp.client-ip=49.212.243.89
+	 In-Reply-To:To:Cc; b=pkQDJ+1RsyRq3dn8EzgINs9abPaX3PV6gJKPfSVKeiRL/2WLITmGfuTD50P2YOhI9ks4D3G9f+Yd/EBo86HcFMlHPMntkbfW+81jNVV1fPmkSOWQi1Qn7s9CtUaHn3d6pnUgKp8DrzUnjs6JWonA2Hkm9FteT2C7PqwzTEFmHYE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=rsg.ci.i.u-tokyo.ac.jp; spf=pass smtp.mailfrom=rsg.ci.i.u-tokyo.ac.jp; dkim=fail (0-bit key) header.d=rsg.ci.i.u-tokyo.ac.jp header.i=@rsg.ci.i.u-tokyo.ac.jp header.b=wEKO9sNx reason="key not found in DNS"; arc=none smtp.client-ip=49.212.243.89
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=rsg.ci.i.u-tokyo.ac.jp
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=rsg.ci.i.u-tokyo.ac.jp
 Received: from h205.csg.ci.i.u-tokyo.ac.jp (h205.csg.ci.i.u-tokyo.ac.jp [133.11.54.205])
 	(authenticated bits=0)
-	by www3579.sakura.ne.jp (8.16.1/8.16.1) with ESMTPSA id 58HCuN6v008967
+	by www3579.sakura.ne.jp (8.16.1/8.16.1) with ESMTPSA id 58HCuN6w008967
 	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NO);
-	Wed, 17 Sep 2025 21:56:45 +0900 (JST)
+	Wed, 17 Sep 2025 21:56:46 +0900 (JST)
 	(envelope-from odaki@rsg.ci.i.u-tokyo.ac.jp)
-DKIM-Signature: a=rsa-sha256; bh=yCjTOSOzxNJD5tmMZUwxklHNpokb7XYrU7eEhj5X1Iw=;
+DKIM-Signature: a=rsa-sha256; bh=5Zk0Ocd+QwOh+s35lDkbenDI0KEEnwyHPaEenyfugGE=;
         c=relaxed/relaxed; d=rsg.ci.i.u-tokyo.ac.jp;
         h=From:Date:Subject:Message-Id:To;
-        s=rs20250326; t=1758113805; v=1;
-        b=goSPsWuW9Jj92+Df4/yOaL+2mBbccLanyC5vTRtnIUxTOrzpx7c2JKj3BDVgBxnW
-         xMUACCiXN6RtiFkxp3kel2Dw9mb+UOs8qbI9DIx0f7bN49eXmTkZHHILSUJ5UpeL
-         fislhEzAdtQ9BljxNbp181vYL7ouDdHy+KNin8gOvSch1nlREyHc/eanNkaPD1i4
-         tKNaBHfLTG0MINVZLpOw7EJDitJt4dJorhJ+WLMiDLYjAkp/NprL7sl+Hu9SC+s9
-         RdxSj4+ywrD25EoQDA+iSura1pyexWC31pVOzrr/lrJgTB/FzXEpMaOaGV9SE59+
-         lT98kkQS3fqxLFGj4/NHOQ==
+        s=rs20250326; t=1758113806; v=1;
+        b=wEKO9sNxGPBX8w4kyKsEykeTFzHjov4MPkIsIUG+KOHhBAyrzgfFwYHAPOu7U1Cv
+         2Dgx0JTk3yFxQ3KaPQDheJ13tPZUF30uml5QbOlwSEYBqiXXy5JbJf5ldcewt+gJ
+         IDVoHgHf46gpPx5ljbUvIaQFqITzsSFJYXrnRh0EzlANvUFX8Zx54KQAycMG0c7d
+         G4cVcmDIQoYIuvSSd2zbaI+0ALgVK0AMVk22SC0laW9jQ51s7WZ0RVMrnqHMzWvs
+         c+FometxxqeREWqQdNxlHHQvNWJg2wDbPap/ggFBwRwh1YLAky7uY4/TMmL23BUO
+         yAwStcwFUKmjixKxuNJqUg==
 From: Akihiko Odaki <odaki@rsg.ci.i.u-tokyo.ac.jp>
-Date: Wed, 17 Sep 2025 21:56:29 +0900
-Subject: [PATCH 17/35] hw/pci: QOM-ify AddressSpace
+Date: Wed, 17 Sep 2025 21:56:30 +0900
+Subject: [PATCH 18/35] hw/pci-host: QOM-ify AddressSpace
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -58,7 +58,7 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Message-Id: <20250917-qom-v1-17-7262db7b0a84@rsg.ci.i.u-tokyo.ac.jp>
+Message-Id: <20250917-qom-v1-18-7262db7b0a84@rsg.ci.i.u-tokyo.ac.jp>
 References: <20250917-qom-v1-0-7262db7b0a84@rsg.ci.i.u-tokyo.ac.jp>
 In-Reply-To: <20250917-qom-v1-0-7262db7b0a84@rsg.ci.i.u-tokyo.ac.jp>
 To: qemu-devel@nongnu.org
@@ -134,66 +134,150 @@ concise and also avoid conflicts with other properties.
 
 Signed-off-by: Akihiko Odaki <odaki@rsg.ci.i.u-tokyo.ac.jp>
 ---
- hw/pci/pci.c        |  6 +++---
- hw/pci/pci_bridge.c | 11 +++++------
- 2 files changed, 8 insertions(+), 9 deletions(-)
+ hw/pci-host/astro.c       | 3 +--
+ hw/pci-host/designware.c  | 5 ++---
+ hw/pci-host/dino.c        | 4 ++--
+ hw/pci-host/gt64120.c     | 2 +-
+ hw/pci-host/pnv_phb3.c    | 4 ++--
+ hw/pci-host/pnv_phb4.c    | 4 ++--
+ hw/pci-host/ppc440_pcix.c | 2 +-
+ hw/pci-host/ppce500.c     | 2 +-
+ hw/pci-host/raven.c       | 2 +-
+ 9 files changed, 13 insertions(+), 15 deletions(-)
 
-diff --git a/hw/pci/pci.c b/hw/pci/pci.c
-index 340384a8876a..7ab93df2969d 100644
---- a/hw/pci/pci.c
-+++ b/hw/pci/pci.c
-@@ -1188,7 +1188,7 @@ static void do_pci_unregister_device(PCIDevice *pci_dev)
-     if (xen_mode == XEN_EMULATE) {
-         xen_evtchn_remove_pci_device(pci_dev);
-     }
--    address_space_destroy(&pci_dev->bus_master_as);
-+    object_unparent(OBJECT(&pci_dev->bus_master_as));
+diff --git a/hw/pci-host/astro.c b/hw/pci-host/astro.c
+index bb6b7d05582f..19f6a7ac88f4 100644
+--- a/hw/pci-host/astro.c
++++ b/hw/pci-host/astro.c
+@@ -835,8 +835,7 @@ static void astro_realize(DeviceState *obj, Error **errp)
+     memory_region_init_iommu(&s->iommu, sizeof(s->iommu),
+                              TYPE_ASTRO_IOMMU_MEMORY_REGION, OBJECT(s),
+                              "iommu-astro", UINT64_MAX);
+-    address_space_init(&s->iommu_as, NULL, MEMORY_REGION(&s->iommu),
+-                       "bm-pci");
++    address_space_init(&s->iommu_as, OBJECT(s), MEMORY_REGION(&s->iommu), "as");
+ 
+     /* Create Elroys (PCI host bus chips).  */
+     for (i = 0; i < ELROY_NUM; i++) {
+diff --git a/hw/pci-host/designware.c b/hw/pci-host/designware.c
+index d67211c9bc74..a542f6e9b1b1 100644
+--- a/hw/pci-host/designware.c
++++ b/hw/pci-host/designware.c
+@@ -706,9 +706,8 @@ static void designware_pcie_host_realize(DeviceState *dev, Error **errp)
+                        UINT64_MAX);
+     memory_region_add_subregion(&s->pci.address_space_root,
+                                 0x0, &s->pci.memory);
+-    address_space_init(&s->pci.address_space, NULL,
+-                       &s->pci.address_space_root,
+-                       "pcie-bus-address-space");
++    address_space_init(&s->pci.address_space, OBJECT(s),
++                       &s->pci.address_space_root, "as");
+     pci_setup_iommu(pci->bus, &designware_iommu_ops, s);
+ 
+     qdev_realize(DEVICE(&s->root), BUS(pci->bus), &error_fatal);
+diff --git a/hw/pci-host/dino.c b/hw/pci-host/dino.c
+index b78167fd2fcd..d213478c86ce 100644
+--- a/hw/pci-host/dino.c
++++ b/hw/pci-host/dino.c
+@@ -434,14 +434,14 @@ static void dino_pcihost_realize(DeviceState *dev, Error **errp)
+     memory_region_add_subregion(&s->bm, 0xfff00000,
+                                 &s->bm_cpu_alias);
+ 
+-    address_space_init(&s->bm_as, NULL, &s->bm, "pci-bm");
++    address_space_init(&s->bm_as, OBJECT(s), &s->bm, "as");
  }
  
- /* Extract PCIReqIDCache into BDF format */
-@@ -1359,8 +1359,8 @@ static PCIDevice *do_pci_register_device(PCIDevice *pci_dev,
+ static void dino_pcihost_unrealize(DeviceState *dev)
+ {
+     DinoState *s = DINO_PCI_HOST_BRIDGE(dev);
  
-     memory_region_init(&pci_dev->bus_master_container_region, OBJECT(pci_dev),
-                        "bus master container", UINT64_MAX);
--    address_space_init(&pci_dev->bus_master_as, NULL,
--                       &pci_dev->bus_master_container_region, pci_dev->name);
-+    address_space_init(&pci_dev->bus_master_as, OBJECT(pci_dev),
-+                       &pci_dev->bus_master_container_region, "bus-master-as");
-     pci_dev->bus_master_as.max_bounce_buffer_size =
-         pci_dev->max_bounce_buffer_size;
+-    address_space_destroy(&s->bm_as);
++    object_unparent(OBJECT(&s->bm_as));
+ }
  
-diff --git a/hw/pci/pci_bridge.c b/hw/pci/pci_bridge.c
-index 94b61b907ea2..fd74622edb9f 100644
---- a/hw/pci/pci_bridge.c
-+++ b/hw/pci/pci_bridge.c
-@@ -388,13 +388,12 @@ void pci_bridge_initfn(PCIDevice *dev, const char *typename)
-     sec_bus->map_irq = br->map_irq ? br->map_irq : pci_swizzle_map_irq_fn;
-     sec_bus->address_space_mem = &br->address_space_mem;
-     memory_region_init(&br->address_space_mem, OBJECT(br), "pci_bridge_pci", UINT64_MAX);
--    address_space_init(&br->as_mem, NULL, &br->address_space_mem,
--                       "pci_bridge_pci_mem");
-+    address_space_init(&br->as_mem, OBJECT(br), &br->address_space_mem,
-+                       "mem-as");
-     sec_bus->address_space_io = &br->address_space_io;
-     memory_region_init(&br->address_space_io, OBJECT(br), "pci_bridge_io",
-                        4 * GiB);
--    address_space_init(&br->as_io, NULL, &br->address_space_io,
--                       "pci_bridge_pci_io");
-+    address_space_init(&br->as_io, OBJECT(br), &br->address_space_io, "io-as");
-     pci_bridge_region_update(br, true);
-     QLIST_INIT(&sec_bus->child);
-     QLIST_INSERT_HEAD(&parent->child, sec_bus, sibling);
-@@ -411,8 +410,8 @@ void pci_bridge_exitfn(PCIDevice *pci_dev)
-     PCIBridge *s = PCI_BRIDGE(pci_dev);
-     assert(QLIST_EMPTY(&s->sec_bus.child));
-     QLIST_REMOVE(&s->sec_bus, sibling);
--    address_space_destroy(&s->as_mem);
--    address_space_destroy(&s->as_io);
-+    object_unparent(OBJECT(&s->as_mem));
-+    object_unparent(OBJECT(&s->as_io));
-     pci_bridge_region_del(s, &s->windows);
-     pci_bridge_region_cleanup(s, &s->windows);
-     /* object_unparent() is called automatically during device deletion */
+ static void dino_pcihost_init(Object *obj)
+diff --git a/hw/pci-host/gt64120.c b/hw/pci-host/gt64120.c
+index 68ad885edbe4..89c4cf0bd5f8 100644
+--- a/hw/pci-host/gt64120.c
++++ b/hw/pci-host/gt64120.c
+@@ -1198,7 +1198,7 @@ static void gt64120_realize(DeviceState *dev, Error **errp)
+     memory_region_init_io(&s->ISD_mem, OBJECT(dev), &isd_mem_ops, s,
+                           "gt64120-isd", 0x1000);
+     memory_region_init(&s->pci0_mem, OBJECT(dev), "pci0-mem", 4 * GiB);
+-    address_space_init(&s->pci0_mem_as, NULL, &s->pci0_mem, "pci0-mem");
++    address_space_init(&s->pci0_mem_as, OBJECT(s), &s->pci0_mem, "as");
+     phb->bus = pci_root_bus_new(dev, "pci",
+                                 &s->pci0_mem,
+                                 get_system_io(),
+diff --git a/hw/pci-host/pnv_phb3.c b/hw/pci-host/pnv_phb3.c
+index 73592c9cbd3d..554ad034b6f4 100644
+--- a/hw/pci-host/pnv_phb3.c
++++ b/hw/pci-host/pnv_phb3.c
+@@ -956,8 +956,8 @@ static AddressSpace *pnv_phb3_dma_iommu(PCIBus *bus, void *opaque, int devfn)
+         memory_region_init_iommu(&ds->dma_mr, sizeof(ds->dma_mr),
+                                  TYPE_PNV_PHB3_IOMMU_MEMORY_REGION,
+                                  OBJECT(phb), "phb3_iommu", UINT64_MAX);
+-        address_space_init(&ds->dma_as, NULL, MEMORY_REGION(&ds->dma_mr),
+-                           "phb3_iommu");
++        address_space_init(&ds->dma_as, OBJECT(phb), MEMORY_REGION(&ds->dma_mr),
++                           "as");
+         memory_region_init_io(&ds->msi32_mr, OBJECT(phb), &pnv_phb3_msi_ops,
+                               ds, "msi32", 0x10000);
+         memory_region_init_io(&ds->msi64_mr, OBJECT(phb), &pnv_phb3_msi_ops,
+diff --git a/hw/pci-host/pnv_phb4.c b/hw/pci-host/pnv_phb4.c
+index 9db9268358d1..0d7643e36036 100644
+--- a/hw/pci-host/pnv_phb4.c
++++ b/hw/pci-host/pnv_phb4.c
+@@ -1469,8 +1469,8 @@ static AddressSpace *pnv_phb4_dma_iommu(PCIBus *bus, void *opaque, int devfn)
+         memory_region_init_iommu(&ds->dma_mr, sizeof(ds->dma_mr),
+                                  TYPE_PNV_PHB4_IOMMU_MEMORY_REGION,
+                                  OBJECT(phb), name, UINT64_MAX);
+-        address_space_init(&ds->dma_as, NULL, MEMORY_REGION(&ds->dma_mr),
+-                           name);
++        address_space_init(&ds->dma_as, OBJECT(phb), MEMORY_REGION(&ds->dma_mr),
++                           "as");
+         memory_region_init_io(&ds->msi32_mr, OBJECT(phb), &pnv_phb4_msi_ops,
+                               ds, "msi32", 0x10000);
+         memory_region_init_io(&ds->msi64_mr, OBJECT(phb), &pnv_phb4_msi_ops,
+diff --git a/hw/pci-host/ppc440_pcix.c b/hw/pci-host/ppc440_pcix.c
+index 3fe24d70ac30..6500871f48ae 100644
+--- a/hw/pci-host/ppc440_pcix.c
++++ b/hw/pci-host/ppc440_pcix.c
+@@ -502,7 +502,7 @@ static void ppc440_pcix_realize(DeviceState *dev, Error **errp)
+ 
+     memory_region_init(&s->bm, OBJECT(s), "bm-ppc440-pcix", UINT64_MAX);
+     memory_region_add_subregion(&s->bm, 0x0, &s->busmem);
+-    address_space_init(&s->bm_as, NULL, &s->bm, "pci-bm");
++    address_space_init(&s->bm_as, OBJECT(s), &s->bm, "as");
+     pci_setup_iommu(h->bus, &ppc440_iommu_ops, s);
+ 
+     memory_region_init(&s->container, OBJECT(s), "pci-container", PCI_ALL_SIZE);
+diff --git a/hw/pci-host/ppce500.c b/hw/pci-host/ppce500.c
+index eda168fb5955..94d5c53f328a 100644
+--- a/hw/pci-host/ppce500.c
++++ b/hw/pci-host/ppce500.c
+@@ -470,7 +470,7 @@ static void e500_pcihost_realize(DeviceState *dev, Error **errp)
+     /* Set up PCI view of memory */
+     memory_region_init(&s->bm, OBJECT(s), "bm-e500", UINT64_MAX);
+     memory_region_add_subregion(&s->bm, 0x0, &s->busmem);
+-    address_space_init(&s->bm_as, NULL, &s->bm, "pci-bm");
++    address_space_init(&s->bm_as, OBJECT(s), &s->bm, "as");
+     pci_setup_iommu(b, &ppce500_iommu_ops, s);
+ 
+     pci_create_simple(b, 0, TYPE_PPC_E500_PCI_BRIDGE);
+diff --git a/hw/pci-host/raven.c b/hw/pci-host/raven.c
+index 5564b51d6755..5bf87bdffa26 100644
+--- a/hw/pci-host/raven.c
++++ b/hw/pci-host/raven.c
+@@ -214,7 +214,7 @@ static void raven_pcihost_realize(DeviceState *d, Error **errp)
+     memory_region_init_alias(mr, o, "bm-system", get_system_memory(),
+                              0, 0x80000000);
+     memory_region_add_subregion(bm, 0x80000000, mr);
+-    address_space_init(&s->bm_as, NULL, bm, "raven-bm-as");
++    address_space_init(&s->bm_as, o, bm, "as");
+     pci_setup_iommu(h->bus, &raven_iommu_ops, s);
+ }
+ 
 
 -- 
 2.51.0
