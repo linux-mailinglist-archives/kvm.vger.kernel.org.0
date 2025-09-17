@@ -1,75 +1,54 @@
-Return-Path: <kvm+bounces-57918-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-57919-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 60DA0B81283
-	for <lists+kvm@lfdr.de>; Wed, 17 Sep 2025 19:23:11 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 60D2EB812D6
+	for <lists+kvm@lfdr.de>; Wed, 17 Sep 2025 19:31:32 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A9526175572
-	for <lists+kvm@lfdr.de>; Wed, 17 Sep 2025 17:23:09 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id E4EF81C05ED9
+	for <lists+kvm@lfdr.de>; Wed, 17 Sep 2025 17:31:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AE01E2FD7DE;
-	Wed, 17 Sep 2025 17:22:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 063D62FC875;
+	Wed, 17 Sep 2025 17:31:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="DbjFiY/p"
+	dkim=pass (2048-bit key) header.d=zytor.com header.i=@zytor.com header.b="NIUKOpyX"
 X-Original-To: kvm@vger.kernel.org
-Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+Received: from mail.zytor.com (terminus.zytor.com [198.137.202.136])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CA8612FB0BD;
-	Wed, 17 Sep 2025 17:22:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1E1C1533D6;
+	Wed, 17 Sep 2025 17:31:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.136
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758129778; cv=none; b=dyEopMp9ErSiy91VWyE4Ggvj+EsF1TVEDSI2rDzpEo70uYUwrdPHxdYZd1bF0kLtig7N4+JJtvO5qnzAlIZ4Pb4OnyXmipVSxTNz+G87mwERrnPNelscnvXAw1u3nHseETPRNNzQFOVwy7HO/kYus3ENR68GFulljXK15ktlCus=
+	t=1758130281; cv=none; b=jCYcTdoRnfCzfVH3ucxJ+n6jYIgyBTJSFp8mHlKJigGsN9YvvZ7A1s8b/4O5tQcHsh2aT62OG46egLto5jW6I2EZlEbLxCriwfdUKeCRIYpz4r8h7V+P8GaMhHTtydb3wRwDSPDCbmK5ZCTrRyXb0s5diEWgIVn1JHRb1Yve9sY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758129778; c=relaxed/simple;
-	bh=6u5yCDpxgZcRpHUP/o01jDSAR/oGcHsCFMjWoUic5aU=;
+	s=arc-20240116; t=1758130281; c=relaxed/simple;
+	bh=O/BoVsg3dFQqJJiPyV0KD/FrOE4b9haumLKJNAFUYVA=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=MrhSds+4qJyByv9N29b9BcOGLL5Guy81fc/0hq3ny4+ErM1qpCmxr31c0NaE9Z7Ok0udKJ3c8f+0xaCaYTf+/QLRX1vsWIMiSiAopH3XAu61/vbtbMtSVYUQNMU8Fq8f9EfEBkBkl9Wapt8jjXR8UiK6qwuPFlwNVRgW2mk021E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=DbjFiY/p; arc=none smtp.client-ip=148.163.158.5
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
-Received: from pps.filterd (m0356516.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 58HApUho024725;
-	Wed, 17 Sep 2025 17:22:46 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
-	:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=pp1; bh=E0yeZg
-	eyKldbjjNHfOTs/54fnst08q29uA1nwy+ZVjY=; b=DbjFiY/ppWVpYBrrkPFUAR
-	UTvnNEUiq51O6Ja+bd5ZyMpcHnMQySOzXAB+QbDfXaMyg+979MlNPizBNXiV3x6S
-	wAa04FEJMByeINYq5zK/SyjsWmjMez8h4KJgAIv6zBxfc5nXlLcYfskDXNAbeo8P
-	v6kUZuGQbQ7A7jL6SwUydgaTO81E4Hj51MzXm2Hdlfa2htvAIb0g/rHouBgNW20H
-	bpN5qwqK2oHdsEtzqPGLER1tkSWobEx8dNeRmoyU0tsJg1sVOpTdhdzmWhC+W6ds
-	5mJtohrGFiAIwyS+h5LxcQfVM8Zum8IUfzVh2Zt5pLqlyX+LlAPJDEKIRxTH/qQA
-	==
-Received: from ppma11.dal12v.mail.ibm.com (db.9e.1632.ip4.static.sl-reverse.com [50.22.158.219])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 497g4qmyau-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Wed, 17 Sep 2025 17:22:45 +0000 (GMT)
-Received: from pps.filterd (ppma11.dal12v.mail.ibm.com [127.0.0.1])
-	by ppma11.dal12v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 58HFSYva009363;
-	Wed, 17 Sep 2025 17:22:44 GMT
-Received: from smtprelay04.dal12v.mail.ibm.com ([172.16.1.6])
-	by ppma11.dal12v.mail.ibm.com (PPS) with ESMTPS id 495nn3j3xs-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Wed, 17 Sep 2025 17:22:44 +0000
-Received: from smtpav02.dal12v.mail.ibm.com (smtpav02.dal12v.mail.ibm.com [10.241.53.101])
-	by smtprelay04.dal12v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 58HHMhW231720100
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Wed, 17 Sep 2025 17:22:43 GMT
-Received: from smtpav02.dal12v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 94A685805F;
-	Wed, 17 Sep 2025 17:22:43 +0000 (GMT)
-Received: from smtpav02.dal12v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 0389E5805A;
-	Wed, 17 Sep 2025 17:22:42 +0000 (GMT)
-Received: from [9.61.250.96] (unknown [9.61.250.96])
-	by smtpav02.dal12v.mail.ibm.com (Postfix) with ESMTP;
-	Wed, 17 Sep 2025 17:22:41 +0000 (GMT)
-Message-ID: <cf65139b-4141-439f-ad9f-3ef9d01a63ee@linux.ibm.com>
-Date: Wed, 17 Sep 2025 10:22:36 -0700
+	 In-Reply-To:Content-Type; b=ogg6ss/AV/jwBfmawXxB/astlxdxLXDNfLfEu6ntLDPwDPpwKHu/T4WeBN7QXmeMidP2u0bp62x0tq5Os7/UP9/ugrQDNOCc3HQEJ3bmocuFxir7gRdMvXL3tEuhKZwuJt0LoJvNppCgJ5CRHsx8aOyLCHBOyeDCt7Vd9nbLdqA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=zytor.com; spf=pass smtp.mailfrom=zytor.com; dkim=pass (2048-bit key) header.d=zytor.com header.i=@zytor.com header.b=NIUKOpyX; arc=none smtp.client-ip=198.137.202.136
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=zytor.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=zytor.com
+Received: from [0.0.0.0] ([134.134.139.75])
+	(authenticated bits=0)
+	by mail.zytor.com (8.18.1/8.17.1) with ESMTPSA id 58HHUarm2428029
+	(version=TLSv1.3 cipher=TLS_AES_128_GCM_SHA256 bits=128 verify=NO);
+	Wed, 17 Sep 2025 10:30:37 -0700
+DKIM-Filter: OpenDKIM Filter v2.11.0 mail.zytor.com 58HHUarm2428029
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=zytor.com;
+	s=2025082201; t=1758130239;
+	bh=nGr7w88ouYlRzd9FYKvTf6O4gCs8sXXy40bKMufJTU0=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=NIUKOpyXetlWfcS5MaJVH7FMhEgy0os19VGvtca8x7nSHttYy01UIOy5exxthJIAn
+	 XPUHPcKgSPdm5AcCIfWmYKMQsTeNmAbzaaGv7sj2efcyjKWUMMD4X8+R+fOI6TSkhu
+	 fP1qwvGuY7fPaI1RCfhsWVQkkUI2aRfkIwNlGRUA9I3x/BWz/5B6J6bCB6zirik7XH
+	 NDBJzGwBLRr+KBqGMG9K/Au7sR7uMAle6VkWpDbvM+Vh8iH3qTCjgiEnB019h4aouB
+	 5o0Ey5X2MOtA9nTBUcu2g/5IeLCD3jzDa+RxNPrHGPdS1Tuucd9j4wOjO8kVk6XrW5
+	 77LyZhzIgy+gw==
+Message-ID: <f533d3a4-183e-4b3d-9b3a-95defb1876e0@zytor.com>
+Date: Wed, 17 Sep 2025 10:30:31 -0700
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -77,181 +56,228 @@ List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v3 04/10] s390/pci: Add architecture specific resource/bus
- address translation
-To: Niklas Schnelle <schnelle@linux.ibm.com>, linux-s390@vger.kernel.org,
-        kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-pci@vger.kernel.org
-Cc: alex.williamson@redhat.com, helgaas@kernel.org, mjrosato@linux.ibm.com
-References: <20250911183307.1910-1-alifm@linux.ibm.com>
- <20250911183307.1910-5-alifm@linux.ibm.com>
- <f60b86d08a4ad0feef32dc8e478f3bd3a8d26019.camel@linux.ibm.com>
+Subject: Re: [RFC PATCH v1 0/5] x86/boot, KVM: Move VMXON/VMXOFF handling from
+ KVM to CPU lifecycle
+To: Sean Christopherson <seanjc@google.com>,
+        Arjan van de Ven <arjan@linux.intel.com>
+Cc: linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        linux-pm@vger.kernel.org, pbonzini@redhat.com, tglx@linutronix.de,
+        mingo@redhat.com, bp@alien8.de, dave.hansen@linux.intel.com,
+        x86@kernel.org, hpa@zytor.com, rafael@kernel.org, pavel@kernel.org,
+        brgerst@gmail.com, david.kaplan@amd.com, peterz@infradead.org,
+        andrew.cooper3@citrix.com, kprateek.nayak@amd.com, chao.gao@intel.com,
+        rick.p.edgecombe@intel.com, dan.j.williams@intel.com,
+        "adrian.hunter@intel.com" <adrian.hunter@intel.com>
+References: <20250909182828.1542362-1-xin@zytor.com>
+ <aMLakCwFW1YEWFG4@google.com>
+ <0387b08a-a8b0-4632-abfc-6b8189ded6b4@linux.intel.com>
+ <aMmkZlWl4TiS2qm8@google.com>
 Content-Language: en-US
-From: Farhan Ali <alifm@linux.ibm.com>
-In-Reply-To: <f60b86d08a4ad0feef32dc8e478f3bd3a8d26019.camel@linux.ibm.com>
+From: Xin Li <xin@zytor.com>
+Autocrypt: addr=xin@zytor.com; keydata=
+ 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
+ l75w1xInsg==
+In-Reply-To: <aMmkZlWl4TiS2qm8@google.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: zZnedLKpgbsinD-hxbTZ_JWEvYFxqaMg
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUwOTE2MDIwNCBTYWx0ZWRfXzxNSGewR7n0u
- kgC1uBT9Pd8vwoYvfTgQUFaX0S1qJcFO9kpKQb2qQ15+uNSmAzVHw9Apmx3YKr/GPSZMi0RvU26
- 3BEfrWJQS9/nTPyFLaorKMe0uHwgHFEzMLGOvFczh70rvIWTuGQEVMw+vhqNDkUgKe114WTsDxJ
- xPp+cbC+gcj9x6veoVgVs/LXe0NSFmogE2GvHc60/lGUA7fn2//LDsF+/jkE57iVnHfY8yNKjdD
- 7knL2ZyqlSEQVPyvEY8MLzKIUWzVIAj8gHy5g8Bq7YS2/kqQjP7JPUjUn+L/yKO+zlbJ1Cft4ZH
- DaSdGGNMQpkOuMhUwO/PDiVO8O87ulc24ytwjZlkJivpE5+wzhf5bACeJIlMyVkdPGbdn2ubfV7
- t9k6MKzW
-X-Authority-Analysis: v=2.4 cv=R8oDGcRX c=1 sm=1 tr=0 ts=68caee65 cx=c_pps
- a=aDMHemPKRhS1OARIsFnwRA==:117 a=aDMHemPKRhS1OARIsFnwRA==:17
- a=IkcTkHD0fZMA:10 a=yJojWOMRYYMA:10 a=VnNF1IyMAAAA:8 a=PeAeElh3kjYzBj7VUaQA:9
- a=QEXdDO2ut3YA:10
-X-Proofpoint-GUID: zZnedLKpgbsinD-hxbTZ_JWEvYFxqaMg
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1117,Hydra:6.1.9,FMLib:17.12.80.40
- definitions=2025-09-17_01,2025-09-17_02,2025-03-28_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- clxscore=1015 suspectscore=0 malwarescore=0 bulkscore=0 spamscore=0
- adultscore=0 impostorscore=0 priorityscore=1501 phishscore=0
- classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
- reason=mlx scancount=1 engine=8.19.0-2507300000 definitions=main-2509160204
 
-
-On 9/17/2025 7:48 AM, Niklas Schnelle wrote:
-> On Thu, 2025-09-11 at 11:33 -0700, Farhan Ali wrote:
->> On s390 today we overwrite the PCI BAR resource address to either an
->> artificial cookie address or MIO address. However this address is different
->> from the bus address of the BARs programmed by firmware. The artificial
->> cookie address was created to index into an array of function handles
->> (zpci_iomap_start). The MIO (mapped I/O) addresses are provided by firmware
->> but maybe different from the bus address. This creates an issue when trying
->> to convert the BAR resource address to bus address using the generic
->> pcibios_resource_to_bus.
+On 9/16/2025 10:54 AM, Sean Christopherson wrote:
+> On Thu, Sep 11, 2025, Arjan van de Ven wrote:
+>> Hi,
+>>> I also want to keep the code as a module, both to avoid doing VMXON unconditionally,
 >>
-> Nit: I'd prefer referring to functions with e.g.
-> pcibios_resource_to_bus() to make them easier to distinguish. Same also
-> below.
->
->> Implement an architecture specific pcibios_resource_to_bus function to
->> correctly translate PCI BAR resource address to bus address for s390.
-> Nit: I'd use the plural "addresses" above as we're dealing with a whole
-> range.
->
->> Similarly add architecture specific pcibios_bus_to_resource function to do
->> the reverse translation.
->>
->> Signed-off-by: Farhan Ali <alifm@linux.ibm.com>
->> ---
->>   arch/s390/pci/pci.c       | 73 +++++++++++++++++++++++++++++++++++++++
->>   drivers/pci/host-bridge.c |  4 +--
->>   2 files changed, 75 insertions(+), 2 deletions(-)
->>
->> diff --git a/arch/s390/pci/pci.c b/arch/s390/pci/pci.c
->> index cd6676c2d602..5baeb5f6f674 100644
->> --- a/arch/s390/pci/pci.c
->> +++ b/arch/s390/pci/pci.c
->> @@ -264,6 +264,79 @@ resource_size_t pcibios_align_resource(void *data, const struct resource *res,
->>   	return 0;
->>   }
->>   
->> +void pcibios_resource_to_bus(struct pci_bus *bus, struct pci_bus_region *region,
->> +			     struct resource *res)
->> +{
->> +	struct zpci_bus *zbus = bus->sysdata;
->> +	struct zpci_bar_struct *zbar;
->> +	struct zpci_dev *zdev;
->> +
->> +	region->start = res->start;
->> +	region->end = res->end;
->> +
->> +	for (int i = 0; i < ZPCI_FUNCTIONS_PER_BUS; i++) {
->> +		int j = 0;
->> +
->> +		zbar = NULL;
->> +		zdev = zbus->function[i];
->> +		if (!zdev)
->> +			continue;
->> +
->> +		for (j = 0; j < PCI_STD_NUM_BARS; j++) {
->> +			if (zdev->bars[j].res->start == res->start &&
->> +			    zdev->bars[j].res->end == res->end) {
->> +				zbar = &zdev->bars[j];
->> +				break;
->> +			}
->> +		}
->> +
->> +		if (zbar) {
->> +			/* only MMIO is supported */
-> Should the code that sets zbar check IORESOURCE_MEM on the res->flags
-> to ensure the above comment? Though zpci_setup_bus_resources() only
-> creates IORESOURCE_MEM resources so this would only be relevant if
-> someone uses a resource from some other source.
-
-I don't think it hurts to add the check. I don't think we support any 
-PCI devices on the platform with IORESOURCE_IO.
+>> can you expand on what the problem is with having VMXON unconditionally enabled?
+> 
+> Unlike say EFER.SVME, VMXON fundamentally changes CPU behavior.  E.g. blocks INIT,
+> activates VMCS caches (which aren't cleared by VMXOFF on pre-SPR CPUs, and AFAIK
+> Intel hasn't even publicly committed to that behavior for SPR+), restricts allowed
+> CR0 and CR4 values, raises questions about ucode patch updates, triggers unique
+> flows in SMI/RSM, prevents Intel PT from tracing on certain CPUs, and probably a
+> few other things I'm forgetting.
 
 
->
->> +			region->start = zbar->val & PCI_BASE_ADDRESS_MEM_MASK;
->> +			if (zbar->val & PCI_BASE_ADDRESS_MEM_TYPE_64)
->> +				region->start |= (u64)zdev->bars[j + 1].val << 32;
->> +
->> +			region->end = region->start + (1UL << zbar->size) - 1;
->> +			return;
->> +		}
->> +	}
->> +}
->> +
->> +void pcibios_bus_to_resource(struct pci_bus *bus, struct resource *res,
->> +			     struct pci_bus_region *region)
->> +{
->> +	struct zpci_bus *zbus = bus->sysdata;
->> +	struct zpci_dev *zdev;
->> +	resource_size_t start, end;
->> +
->> +	res->start = region->start;
->> +	res->end = region->end;
->> +
->> +	for (int i = 0; i < ZPCI_FUNCTIONS_PER_BUS; i++) {
->> +		zdev = zbus->function[i];
->> +		if (!zdev || !zdev->has_resources)
->> +			continue;
->> +
->> +		for (int j = 0; j < PCI_STD_NUM_BARS; j++) {
->> +			if (!zdev->bars[j].val && !zdev->bars[j].size)
->> +				continue;
-> Shouldn't the above be '||'? I think both a 0 size and an unset bars
-> value would indicate invalid. zpci_setup_bus_resources() only checks 0
-> size so I think that would be enoug, no?
+Regarding Intel PT, if VMXON/VMXOFF are moved to CPU startup/shutdown, as
+Intel PT is initialized during arch_initcall() stage, entering and leaving
+VMX operation no longer happen while Intel PT is _active_, thus
+intel_pt_handle_vmx() no longer needs to "handles" VMX state transitions.
 
-Right, architecturally both size 0 and unset BAR value would indicate 
-invalid and this check was meant for that. But I think just changing 
-this to !zdev->bars[j].size should also be enough, as we already handle 
-the 64bit BAR case below. Will change this.
+Thus, the function's purpose is simplified to signaling Intel pt not to
+write to IA32_RTIT_CTL during VMX operation if the processor supports Intel
+PT but disallows its use in VMX operation, indicated by IA32_VMX_MISC[14]
+being cleared.  Otherwise, it does nothing and leaves pt_ctx.vmx_on as 0.
 
-Thanks Farhan
+If the following patch is correct, it's more of a simplification then :)
 
->
->> +
->> +			/* only MMIO is supported */
->> +			start = zdev->bars[j].val & PCI_BASE_ADDRESS_MEM_MASK;
->> +			if (zdev->bars[j].val & PCI_BASE_ADDRESS_MEM_TYPE_64)
->> +				start |= (u64)zdev->bars[j + 1].val << 32;
->> +
->> +			end = start + (1UL << zdev->bars[j].size) - 1;
->> +
->> +			if (start == region->start && end == region->end) {
->> +				res->start = zdev->bars[j].res->start;
->> +				res->end = zdev->bars[j].res->end;
->> +				return;
->> +			}
->> +		}
->> +	}
->> +}
->> +
->>
-> Overall the code makes sense to me. I think this hasn't caused issues
-> so far only because firmware has usually already set up the BAR
-> addresses for us.
->
-> Thanks,
-> Niklas
+diff --git a/arch/x86/events/intel/pt.c b/arch/x86/events/intel/pt.c
+index e8cf29d2b10c..8325a824700a 100644
+--- a/arch/x86/events/intel/pt.c
++++ b/arch/x86/events/intel/pt.c
+@@ -225,17 +225,6 @@ static int __init pt_pmu_hw_init(void)
+  		break;
+  	}
+
+-	if (boot_cpu_has(X86_FEATURE_VMX)) {
+-		/*
+-		 * Intel SDM, 36.5 "Tracing post-VMXON" says that
+-		 * "IA32_VMX_MISC[bit 14]" being 1 means PT can trace
+-		 * post-VMXON.
+-		 */
+-		rdmsrq(MSR_IA32_VMX_MISC, reg);
+-		if (reg & BIT(14))
+-			pt_pmu.vmx = true;
+-	}
+-
+  	for (i = 0; i < PT_CPUID_LEAVES; i++) {
+  		cpuid_count(20, i,
+  			    &pt_pmu.caps[CPUID_EAX + i*PT_CPUID_REGS_NUM],
+@@ -1556,41 +1545,39 @@ void intel_pt_interrupt(void)
+  	}
+  }
+
+-void intel_pt_handle_vmx(int on)
++/*
++ * VMXON is done in the CPU startup phase, thus pt is initialized later.
++ *
++ * Signal pt to not write IA32_RTIT_CTL while in VMX operation if the
++ * processor supports Intel PT but does not allow it to be used in VMX
++ * operation, i.e. IA32_VMX_MISC[bit 14] is cleared.
++ *
++ * Note: If IA32_VMX_MISC[bit 14] is set, vmx_on in pt_ctx remains 0.
++ */
++void intel_pt_set_vmx(int on)
+  {
+  	struct pt *pt = this_cpu_ptr(&pt_ctx);
+-	struct perf_event *event;
+-	unsigned long flags;
++	int cpu = raw_smp_processor_id();
++
++	if (!cpu && cpu_feature_enabled(X86_FEATURE_VMX)) {
++		u64 misc;
++
++		/*
++		 * Intel SDM, 36.5 "Tracing post-VMXON" says that
++		 * "IA32_VMX_MISC[bit 14]" being 1 means PT can trace
++		 * post-VMXON.
++		 */
++		rdmsrq(MSR_IA32_VMX_MISC, misc);
++		if (misc & BIT(14))
++			pt_pmu.vmx = true;
++	}
+
+  	/* PT plays nice with VMX, do nothing */
+  	if (pt_pmu.vmx)
+  		return;
+
+-	/*
+-	 * VMXON will clear RTIT_CTL.TraceEn; we need to make
+-	 * sure to not try to set it while VMX is on. Disable
+-	 * interrupts to avoid racing with pmu callbacks;
+-	 * concurrent PMI should be handled fine.
+-	 */
+-	local_irq_save(flags);
+  	WRITE_ONCE(pt->vmx_on, on);
+-
+-	/*
+-	 * If an AUX transaction is in progress, it will contain
+-	 * gap(s), so flag it PARTIAL to inform the user.
+-	 */
+-	event = pt->handle.event;
+-	if (event)
+-		perf_aux_output_flag(&pt->handle,
+-		                     PERF_AUX_FLAG_PARTIAL);
+-
+-	/* Turn PTs back on */
+-	if (!on && event)
+-		wrmsrq(MSR_IA32_RTIT_CTL, event->hw.aux_config);
+-
+-	local_irq_restore(flags);
+  }
+-EXPORT_SYMBOL_GPL(intel_pt_handle_vmx);
+
+  /*
+   * PMU callbacks
+diff --git a/arch/x86/include/asm/perf_event.h 
+b/arch/x86/include/asm/perf_event.h
+index 70d1d94aca7e..9140796e6268 100644
+--- a/arch/x86/include/asm/perf_event.h
++++ b/arch/x86/include/asm/perf_event.h
+@@ -659,12 +659,9 @@ static inline void x86_perf_get_lbr(struct x86_pmu_lbr 
+*lbr)
+  #endif
+
+  #ifdef CONFIG_CPU_SUP_INTEL
+- extern void intel_pt_handle_vmx(int on);
++extern void intel_pt_set_vmx(int on);
+  #else
+-static inline void intel_pt_handle_vmx(int on)
+-{
+-
+-}
++static inline void intel_pt_set_vmx(int on) { }
+  #endif
+
+  #if defined(CONFIG_PERF_EVENTS) && defined(CONFIG_CPU_SUP_AMD)
+diff --git a/arch/x86/kernel/cpu/common.c b/arch/x86/kernel/cpu/common.c
+index 03b28fa2e91e..9dad23c86152 100644
+--- a/arch/x86/kernel/cpu/common.c
++++ b/arch/x86/kernel/cpu/common.c
+@@ -2009,7 +2009,7 @@ void cpu_enable_virtualization(void)
+  	rdmsrq(MSR_IA32_VMX_BASIC, basic_msr);
+  	this_cpu_ptr(&vmxon_vmcs)->hdr.revision_id = 
+vmx_basic_vmcs_revision_id(basic_msr);
+
+-	intel_pt_handle_vmx(1);
++	intel_pt_set_vmx(1);
+
+  	cr4_set_bits(X86_CR4_VMXE);
+
+@@ -2023,7 +2023,7 @@ void cpu_enable_virtualization(void)
+  fault:
+  	pr_err("VMXON faulted on CPU%d\n", cpu);
+  	cr4_clear_bits(X86_CR4_VMXE);
+-	intel_pt_handle_vmx(0);
++	intel_pt_set_vmx(0);
+  }
+
+  /*
+@@ -2055,7 +2055,7 @@ void cpu_disable_virtualization(void)
+
+  exit:
+  	cr4_clear_bits(X86_CR4_VMXE);
+-	intel_pt_handle_vmx(0);
++	intel_pt_set_vmx(0);
+  	return;
+
+  fault:
 
