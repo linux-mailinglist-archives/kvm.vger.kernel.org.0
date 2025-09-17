@@ -1,55 +1,55 @@
-Return-Path: <kvm+bounces-57870-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-57854-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0A6A7B7F350
-	for <lists+kvm@lfdr.de>; Wed, 17 Sep 2025 15:24:49 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id CAB30B7EE33
+	for <lists+kvm@lfdr.de>; Wed, 17 Sep 2025 15:05:26 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5AF212A16C3
-	for <lists+kvm@lfdr.de>; Wed, 17 Sep 2025 13:11:04 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 5C88A7B60D1
+	for <lists+kvm@lfdr.de>; Wed, 17 Sep 2025 13:03:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3425F332A43;
-	Wed, 17 Sep 2025 13:04:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8B179333A89;
+	Wed, 17 Sep 2025 12:59:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="key not found in DNS" (0-bit key) header.d=rsg.ci.i.u-tokyo.ac.jp header.i=@rsg.ci.i.u-tokyo.ac.jp header.b="DUSefoHX"
+	dkim=fail reason="key not found in DNS" (0-bit key) header.d=rsg.ci.i.u-tokyo.ac.jp header.i=@rsg.ci.i.u-tokyo.ac.jp header.b="MuGDuLxI"
 X-Original-To: kvm@vger.kernel.org
 Received: from www3579.sakura.ne.jp (www3579.sakura.ne.jp [49.212.243.89])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A8FE7332A35
-	for <kvm@vger.kernel.org>; Wed, 17 Sep 2025 13:03:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CF5E337C0FC
+	for <kvm@vger.kernel.org>; Wed, 17 Sep 2025 12:59:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=49.212.243.89
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758114241; cv=none; b=R82OBzWX07M7ueCqpagP/TVzzvrWNnFhI11rQ2BAVxcbtekzc/IV1phuoIO+2gKEM4SyDkQtGaU59EyXAOT0Jl1Spkl0nM7K+n4Qelzye2a4//gvdZrPqOhSNA2VA3NHl9Cibs7syizm0xSkrbfjLd6FYwWZ4y5pjCtguc1aFec=
+	t=1758113978; cv=none; b=hwBcT2sM+EnEj0JXycQA8xRkKYQRoL7AcI52S1cFkb4tP5RaR9XbwCeM1QYrWDoQnpRFrXORyRLQaCb1X4NegmC9bQI/t8mUMOppH2nLWaKsF0q6ZGPrfN0k80DMMMmICw/F1qgzJlG9S6/ONd6AiAYVLSqLoz+/eVeO3QqZbOk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758114241; c=relaxed/simple;
-	bh=jm1YsbFzxkREYxDGmYSKlngq5Gj/Gjcfwpv6Cw/Htkw=;
+	s=arc-20240116; t=1758113978; c=relaxed/simple;
+	bh=qeduKdsE3iSVaFcocGE/MZOrYOFR8cly5YrCML/kMkc=;
 	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=aRWwmy0lsOwinfxVuE/xzh4UZcNhQhRia4G4Ln8uX6686gZFKVt8ieu1wQw8w5fW7mwOxGmsfe/ld/Kc0iCxzLDeB1uzBpDNqFvMx9RCG8ZJtE8SNgb+Glm3PcI6yMhDPWV5fq3eiDpVBrVuM4AQbP2u85kZQTLmx6HtMa1+Wnw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=rsg.ci.i.u-tokyo.ac.jp; spf=pass smtp.mailfrom=rsg.ci.i.u-tokyo.ac.jp; dkim=fail (0-bit key) header.d=rsg.ci.i.u-tokyo.ac.jp header.i=@rsg.ci.i.u-tokyo.ac.jp header.b=DUSefoHX reason="key not found in DNS"; arc=none smtp.client-ip=49.212.243.89
+	 In-Reply-To:To:Cc; b=UA5v6PpyW9fuvlG9+tXsU/4WEfi7g6CFGobQ5DVSqXpd3oeSrGmgbrzLwOlfs6bDxlt8gbknwuWQj9DRmnXi0ky7Dm7GHyyl82MYtx9eOJItatZdWrEBjLsr6mpU6Cgxf/NMCG26rsie7IinZuudkaBaFecSzeL+8CFEhz5+E9E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=rsg.ci.i.u-tokyo.ac.jp; spf=pass smtp.mailfrom=rsg.ci.i.u-tokyo.ac.jp; dkim=fail (0-bit key) header.d=rsg.ci.i.u-tokyo.ac.jp header.i=@rsg.ci.i.u-tokyo.ac.jp header.b=MuGDuLxI reason="key not found in DNS"; arc=none smtp.client-ip=49.212.243.89
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=rsg.ci.i.u-tokyo.ac.jp
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=rsg.ci.i.u-tokyo.ac.jp
 Received: from h205.csg.ci.i.u-tokyo.ac.jp (h205.csg.ci.i.u-tokyo.ac.jp [133.11.54.205])
 	(authenticated bits=0)
-	by www3579.sakura.ne.jp (8.16.1/8.16.1) with ESMTPSA id 58HCuN6j008967
+	by www3579.sakura.ne.jp (8.16.1/8.16.1) with ESMTPSA id 58HCuN6k008967
 	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NO);
-	Wed, 17 Sep 2025 21:56:35 +0900 (JST)
+	Wed, 17 Sep 2025 21:56:36 +0900 (JST)
 	(envelope-from odaki@rsg.ci.i.u-tokyo.ac.jp)
-DKIM-Signature: a=rsa-sha256; bh=SN54eqMpyxZn5t52ldVheDzKEoBDUBkvg/chu4l0yTs=;
+DKIM-Signature: a=rsa-sha256; bh=t7gZYZry7+AY7F/ztLeWkPizR8T5wkzF6no/b+Jg/94=;
         c=relaxed/relaxed; d=rsg.ci.i.u-tokyo.ac.jp;
         h=From:Date:Subject:Message-Id:To;
-        s=rs20250326; t=1758113796; v=1;
-        b=DUSefoHX+5AQ41jKoyMQZ/520KnWRg3PTuzflX+/GPXZq3riyQSurxvuJq6Y+xeA
-         sc0QE5yEaHKX31nXhL9x1HMWA8aCw1Kd//xPmJ1dS9TuYPRYEBUV3wIEZhunNBJy
-         KSkDKTovU4HxAGab/4PCRKGMY+wWz4sLV/SxfhbPFp4A9F+HbrufBwEu6zktI+9n
-         37l8Va3KoDIqMDlZsWOzKy4/48ABx7OARe8Nt0FjkxJ7uloAMGpNVwmyed0owEJw
-         5AyPLLiP+X0+9IMBiwGrNzhPbldNRxURcOfovreIznCLAPrtI/DRx+W457D9g07k
-         PFKYTh6R/xZXDBSuQAmfDQ==
+        s=rs20250326; t=1758113797; v=1;
+        b=MuGDuLxI/Nk2Quxviz5Ui5dtxnTGbK8mjPe2jODrn4AsztRYEvQj1jJLdTuUg03f
+         HTJSt00FKZ7lY3Lo9hOfvxbXCr46OLfp6LkI9N8LTlxkSaKru3qI7wVC08JaXZNR
+         EZ+gTuihaQZVohfX41xVaits6xxS/VoncImwZkDTqvxg82wtLangPnWLXVK4hxzM
+         wJUKHr0ygxllEtOusH0TbikQNDdlJ1oOpQaxMqthDk9jpfiZCradiiHS2qbl+6EJ
+         HLwA/vNRVzKK3hQ3kv4Uxmfx4vUy3+yUoGpNjgaeJ9X4WUfHuilOyAd6VhAPplj0
+         NS6jwsLpje/k5RyMWH9KjQ==
 From: Akihiko Odaki <odaki@rsg.ci.i.u-tokyo.ac.jp>
-Date: Wed, 17 Sep 2025 21:56:17 +0900
-Subject: [PATCH 05/35] hw/arm: QOM-ify AddressSpace
+Date: Wed, 17 Sep 2025 21:56:18 +0900
+Subject: [PATCH 06/35] hw/display: QOM-ify AddressSpace
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -58,7 +58,7 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Message-Id: <20250917-qom-v1-5-7262db7b0a84@rsg.ci.i.u-tokyo.ac.jp>
+Message-Id: <20250917-qom-v1-6-7262db7b0a84@rsg.ci.i.u-tokyo.ac.jp>
 References: <20250917-qom-v1-0-7262db7b0a84@rsg.ci.i.u-tokyo.ac.jp>
 In-Reply-To: <20250917-qom-v1-0-7262db7b0a84@rsg.ci.i.u-tokyo.ac.jp>
 To: qemu-devel@nongnu.org
@@ -134,60 +134,36 @@ concise and also avoid conflicts with other properties.
 
 Signed-off-by: Akihiko Odaki <odaki@rsg.ci.i.u-tokyo.ac.jp>
 ---
- hw/arm/armv7m.c         | 2 +-
- hw/arm/aspeed_ast27x0.c | 2 +-
- hw/arm/smmu-common.c    | 5 +++--
- 3 files changed, 5 insertions(+), 4 deletions(-)
+ hw/display/artist.c     | 2 +-
+ hw/display/bcm2835_fb.c | 2 +-
+ 2 files changed, 2 insertions(+), 2 deletions(-)
 
-diff --git a/hw/arm/armv7m.c b/hw/arm/armv7m.c
-index 7fa854bc14df..54d0d9f78207 100644
---- a/hw/arm/armv7m.c
-+++ b/hw/arm/armv7m.c
-@@ -117,7 +117,7 @@ static void bitband_realize(DeviceState *dev, Error **errp)
-         return;
+diff --git a/hw/display/artist.c b/hw/display/artist.c
+index 42905563ad49..b47ca875f93a 100644
+--- a/hw/display/artist.c
++++ b/hw/display/artist.c
+@@ -1391,7 +1391,7 @@ static void artist_realizefn(DeviceState *dev, Error **errp)
      }
  
--    address_space_init(&s->source_as, NULL, s->source_memory, "bitband-source");
-+    address_space_init(&s->source_as, OBJECT(s), s->source_memory, "as");
- }
+     memory_region_init(&s->mem_as_root, OBJECT(dev), "artist", ~0ull);
+-    address_space_init(&s->as, NULL, &s->mem_as_root, "artist");
++    address_space_init(&s->as, OBJECT(s), &s->mem_as_root, "as");
  
- /* Board init.  */
-diff --git a/hw/arm/aspeed_ast27x0.c b/hw/arm/aspeed_ast27x0.c
-index f8c0ac5f87df..7fe097ad3f11 100644
---- a/hw/arm/aspeed_ast27x0.c
-+++ b/hw/arm/aspeed_ast27x0.c
-@@ -387,7 +387,7 @@ static bool aspeed_soc_ast2700_dram_init(DeviceState *dev, Error **errp)
-     memory_region_init(&s->dram_container, OBJECT(s), "ram-container",
-                        ram_size);
-     memory_region_add_subregion(&s->dram_container, 0, s->dram_mr);
--    address_space_init(&s->dram_as, NULL, s->dram_mr, "dram");
-+    address_space_init(&s->dram_as, OBJECT(s), s->dram_mr, "dram-as");
+     artist_create_buffer(s, "cmap", &offset, ARTIST_BUFFER_CMAP, 2048, 4);
+     artist_create_buffer(s, "ap", &offset, ARTIST_BUFFER_AP,
+diff --git a/hw/display/bcm2835_fb.c b/hw/display/bcm2835_fb.c
+index c6710bdc0700..cc1567895522 100644
+--- a/hw/display/bcm2835_fb.c
++++ b/hw/display/bcm2835_fb.c
+@@ -421,7 +421,7 @@ static void bcm2835_fb_realize(DeviceState *dev, Error **errp)
+     s->initial_config.base = s->vcram_base + BCM2835_FB_OFFSET;
  
-     /*
-      * Add a memory region beyond the RAM region to emulate
-diff --git a/hw/arm/smmu-common.c b/hw/arm/smmu-common.c
-index 081c50750947..7c1648165b9f 100644
---- a/hw/arm/smmu-common.c
-+++ b/hw/arm/smmu-common.c
-@@ -863,6 +863,7 @@ static AddressSpace *smmu_find_add_as(PCIBus *bus, void *opaque, int devfn)
-     sdev = sbus->pbdev[devfn];
-     if (!sdev) {
-         char *name = g_strdup_printf("%s-%d-%d", s->mrtypename, devfn, index++);
-+        g_autofree char *as_name = g_strconcat(name, "-as", NULL);
+     s->dma_mr = MEMORY_REGION(obj);
+-    address_space_init(&s->dma_as, NULL, s->dma_mr, TYPE_BCM2835_FB "-memory");
++    address_space_init(&s->dma_as, OBJECT(s), s->dma_mr, "as");
  
-         sdev = sbus->pbdev[devfn] = g_new0(SMMUDevice, 1);
+     bcm2835_fb_reset(dev);
  
-@@ -873,8 +874,8 @@ static AddressSpace *smmu_find_add_as(PCIBus *bus, void *opaque, int devfn)
-         memory_region_init_iommu(&sdev->iommu, sizeof(sdev->iommu),
-                                  s->mrtypename,
-                                  OBJECT(s), name, UINT64_MAX);
--        address_space_init(&sdev->as, NULL,
--                           MEMORY_REGION(&sdev->iommu), name);
-+        address_space_init(&sdev->as, OBJECT(s),
-+                           MEMORY_REGION(&sdev->iommu), as_name);
-         trace_smmu_add_mr(name);
-         g_free(name);
-     }
 
 -- 
 2.51.0
