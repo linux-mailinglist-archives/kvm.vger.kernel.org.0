@@ -1,55 +1,55 @@
-Return-Path: <kvm+bounces-57880-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-57867-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 77F73B7F2F2
-	for <lists+kvm@lfdr.de>; Wed, 17 Sep 2025 15:23:53 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 79981B7F1DB
+	for <lists+kvm@lfdr.de>; Wed, 17 Sep 2025 15:17:16 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id CC75A5417A8
-	for <lists+kvm@lfdr.de>; Wed, 17 Sep 2025 13:12:30 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 786DC6257E1
+	for <lists+kvm@lfdr.de>; Wed, 17 Sep 2025 13:10:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B989D337EB8;
-	Wed, 17 Sep 2025 13:05:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 00D5B29BDA3;
+	Wed, 17 Sep 2025 13:03:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="key not found in DNS" (0-bit key) header.d=rsg.ci.i.u-tokyo.ac.jp header.i=@rsg.ci.i.u-tokyo.ac.jp header.b="SCh8XN/n"
+	dkim=fail reason="key not found in DNS" (0-bit key) header.d=rsg.ci.i.u-tokyo.ac.jp header.i=@rsg.ci.i.u-tokyo.ac.jp header.b="NxB92lql"
 X-Original-To: kvm@vger.kernel.org
 Received: from www3579.sakura.ne.jp (www3579.sakura.ne.jp [49.212.243.89])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3763B33595A
-	for <kvm@vger.kernel.org>; Wed, 17 Sep 2025 13:05:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6532D3294FF
+	for <kvm@vger.kernel.org>; Wed, 17 Sep 2025 13:03:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=49.212.243.89
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758114324; cv=none; b=f0SPtSaiVcLk1jH5edxHqVxt8og78MTZEwBfmQCUq3/l65Sz1UjDSPh/jqiLS/cB2jMgTPBCQ+DmLpNkCBTysPy+jzNlxP87xxJGSqkwLF7068Rgo1Gb1WYMAWJSrj7bALrmlYeXQiykSU55E25rU+ibWRUsz1YuE3lSEseRWoU=
+	t=1758114236; cv=none; b=qcku52UczArew7EC9xVls6VtZSpGrFfDOEvXfubZOoIymsTy9/U1etQmuTsqrQfvG8bIp+w4F1qK4npSa1Oams69meaGV/8js0pFRp5ylMsz2hT3vIUAyqH/XBifg5i8lxQtlBPBFhaxABBr044CMTwDy5s61ZC0kKZtOAVd5cc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758114324; c=relaxed/simple;
-	bh=5LMdWoFBchBluAwKNimU/oQd2LQ/IZZBz/t28OiMx8g=;
+	s=arc-20240116; t=1758114236; c=relaxed/simple;
+	bh=A+NcEtToGjOIeTAsvn1LTadqV334eZ1/RWShJ41ewBg=;
 	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=WDOoq2FN2tUbeclNmtjo23CmYDTNU0H6M/GK7UiXGWofddI8/D3X/ru2VLTKdjuTTS/hjncczqgXcPEGm6yyg6xthTqxSpklJMc3l3Etrt+zyyw/Tsd+nywtKYv/l75Uo2HO6X6OwOC1lSYW6oHWkjnIgPYQ0YRf4CrmpSaL8qA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=rsg.ci.i.u-tokyo.ac.jp; spf=pass smtp.mailfrom=rsg.ci.i.u-tokyo.ac.jp; dkim=fail (0-bit key) header.d=rsg.ci.i.u-tokyo.ac.jp header.i=@rsg.ci.i.u-tokyo.ac.jp header.b=SCh8XN/n reason="key not found in DNS"; arc=none smtp.client-ip=49.212.243.89
+	 In-Reply-To:To:Cc; b=RtagdRl9MMPwsFnGKk9wNluuJ/N6hocWJRUoqHYfT0yZuSZLAOzzDvNMiF5eerbIZyqF6TfnJ+jUQnqaaOkGje8zcR1oY6CN5246MyhTZtJ5H0dYlQTIBt90wp4Qcn4dxjAUz4FEJL9ENkK4v8dVvoJ5xIuX3N+WWcDhw8WmfCY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=rsg.ci.i.u-tokyo.ac.jp; spf=pass smtp.mailfrom=rsg.ci.i.u-tokyo.ac.jp; dkim=fail (0-bit key) header.d=rsg.ci.i.u-tokyo.ac.jp header.i=@rsg.ci.i.u-tokyo.ac.jp header.b=NxB92lql reason="key not found in DNS"; arc=none smtp.client-ip=49.212.243.89
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=rsg.ci.i.u-tokyo.ac.jp
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=rsg.ci.i.u-tokyo.ac.jp
 Received: from h205.csg.ci.i.u-tokyo.ac.jp (h205.csg.ci.i.u-tokyo.ac.jp [133.11.54.205])
 	(authenticated bits=0)
-	by www3579.sakura.ne.jp (8.16.1/8.16.1) with ESMTPSA id 58HCuN77008967
+	by www3579.sakura.ne.jp (8.16.1/8.16.1) with ESMTPSA id 58HCuN78008967
 	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NO);
-	Wed, 17 Sep 2025 21:56:53 +0900 (JST)
+	Wed, 17 Sep 2025 21:56:54 +0900 (JST)
 	(envelope-from odaki@rsg.ci.i.u-tokyo.ac.jp)
-DKIM-Signature: a=rsa-sha256; bh=Witqg4euz72gJVNcE3mUvK5CJdr7+JNxJuLdasfgINU=;
+DKIM-Signature: a=rsa-sha256; bh=4T6cua/ceJXKjoKjlSdgfNfccmS9PxWepKSnlV1jo2Q=;
         c=relaxed/relaxed; d=rsg.ci.i.u-tokyo.ac.jp;
         h=From:Date:Subject:Message-Id:To;
         s=rs20250326; t=1758113814; v=1;
-        b=SCh8XN/nCLxU5fHXTVagu9E0pX58n1PCt1W7DPI7Z+3pZZaKe47wPuLr4+FhMPxT
-         VvcHaLgLgAwf5XYNa0sZW5RnegAPdNarwgAImdwJ7e5xrzgJO4b2KoiRVbB2QS2B
-         49l+l66EdLzLynWTuycrRtZh6R3joTlDhwjZl44PlV0bmHHAK/ms0kYQz1XF7dBI
-         DCRMmJ+NpbQMPH/eaIDMtT1c5t5E6f9rPBugyxzh5Dc722veBxj+kn9xRqo67LwF
-         Q5svqJuQCrzjGdjKhDxNHLcVqaSXGB1HCAnK4TJFoTystRqFLTMBpetD8Pocp2EK
-         bWaCd/kop+GFmKK2xx2W+g==
+        b=NxB92lqlM7UlYIZnp2CZQ14z/01KsSvCZWaHPX26Ve+FM9zsSX6WpwiBM8kwCpyI
+         QdahEdz6xFWxufXHPQ4wrFEpzsMQVV6/wfxfypAxoeEGdP9kQQpPdKkRqsQoEmIf
+         ReJnT8BeSl3xmcrb5l+UTgeRv9tJW6pigOwG1RF20SUv/xz/YbM0ZKnPjlJeach1
+         ND9O5B+U6BgSL85TkxDc1kcPN0eC0H8zwAxeI4RrDtXGH1WjGp5MqsMsmSEuKfEc
+         7e3zqYdnRU51XLfeLQII3lDFy2bTa+SMl82kz4R7X7OYsyYBHo8OCyEV7IojfJdG
+         lsg+aKiszZ3aquOYkE/sMg==
 From: Akihiko Odaki <odaki@rsg.ci.i.u-tokyo.ac.jp>
-Date: Wed, 17 Sep 2025 21:56:39 +0900
-Subject: [PATCH 27/35] hw/ssi: QOM-ify AddressSpace
+Date: Wed, 17 Sep 2025 21:56:40 +0900
+Subject: [PATCH 28/35] hw/usb: QOM-ify AddressSpace
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -58,7 +58,7 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Message-Id: <20250917-qom-v1-27-7262db7b0a84@rsg.ci.i.u-tokyo.ac.jp>
+Message-Id: <20250917-qom-v1-28-7262db7b0a84@rsg.ci.i.u-tokyo.ac.jp>
 References: <20250917-qom-v1-0-7262db7b0a84@rsg.ci.i.u-tokyo.ac.jp>
 In-Reply-To: <20250917-qom-v1-0-7262db7b0a84@rsg.ci.i.u-tokyo.ac.jp>
 To: qemu-devel@nongnu.org
@@ -134,26 +134,22 @@ concise and also avoid conflicts with other properties.
 
 Signed-off-by: Akihiko Odaki <odaki@rsg.ci.i.u-tokyo.ac.jp>
 ---
- hw/ssi/aspeed_smc.c | 6 ++----
- 1 file changed, 2 insertions(+), 4 deletions(-)
+ hw/usb/hcd-dwc2.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/hw/ssi/aspeed_smc.c b/hw/ssi/aspeed_smc.c
-index 7e41d4210330..73b8f0e81ff0 100644
---- a/hw/ssi/aspeed_smc.c
-+++ b/hw/ssi/aspeed_smc.c
-@@ -1191,10 +1191,8 @@ static void aspeed_smc_dma_setup(AspeedSMCState *s, Error **errp)
-         return;
-     }
+diff --git a/hw/usb/hcd-dwc2.c b/hw/usb/hcd-dwc2.c
+index 8aaa696dd4de..156cfb4263e3 100644
+--- a/hw/usb/hcd-dwc2.c
++++ b/hw/usb/hcd-dwc2.c
+@@ -1351,7 +1351,7 @@ static void dwc2_realize(DeviceState *dev, Error **errp)
+     obj = object_property_get_link(OBJECT(dev), "dma-mr", &error_abort);
  
--    address_space_init(&s->flash_as, NULL, &s->mmio_flash,
--                       TYPE_ASPEED_SMC ".dma-flash");
--    address_space_init(&s->dram_as, NULL, s->dram_mr,
--                       TYPE_ASPEED_SMC ".dma-dram");
-+    address_space_init(&s->flash_as, OBJECT(s), &s->mmio_flash, "flash-as");
-+    address_space_init(&s->dram_as, OBJECT(s), s->dram_mr, "dram-as");
- }
+     s->dma_mr = MEMORY_REGION(obj);
+-    address_space_init(&s->dma_as, NULL, s->dma_mr, "dwc2");
++    address_space_init(&s->dma_as, OBJECT(s), s->dma_mr, "as");
  
- static void aspeed_smc_realize(DeviceState *dev, Error **errp)
+     usb_bus_new(&s->bus, sizeof(s->bus), &dwc2_bus_ops, dev);
+     usb_register_port(&s->bus, &s->uport, s, 0, &dwc2_port_ops,
 
 -- 
 2.51.0
