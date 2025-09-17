@@ -1,47 +1,47 @@
-Return-Path: <kvm+bounces-57938-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-57939-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9669DB81EF2
-	for <lists+kvm@lfdr.de>; Wed, 17 Sep 2025 23:22:05 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 253D0B81EF5
+	for <lists+kvm@lfdr.de>; Wed, 17 Sep 2025 23:22:07 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 37CCE4A4300
-	for <lists+kvm@lfdr.de>; Wed, 17 Sep 2025 21:22:00 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id C91341C06DD4
+	for <lists+kvm@lfdr.de>; Wed, 17 Sep 2025 21:22:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8112130147D;
-	Wed, 17 Sep 2025 21:21:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 734F3304BB9;
+	Wed, 17 Sep 2025 21:21:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="C+9i/VCs"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="LhtXKQxy"
 X-Original-To: kvm@vger.kernel.org
-Received: from out-188.mta1.migadu.com (out-188.mta1.migadu.com [95.215.58.188])
+Received: from out-183.mta1.migadu.com (out-183.mta1.migadu.com [95.215.58.183])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E4DA830AD1A
-	for <kvm@vger.kernel.org>; Wed, 17 Sep 2025 21:21:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.188
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CCA7F30B52A
+	for <kvm@vger.kernel.org>; Wed, 17 Sep 2025 21:21:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.183
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758144102; cv=none; b=WfKP/ed1b9pzMfdsfSWZIWFfLFmh7jFNNOHNEWrhapZ0gyr5Bk4BR1SEAcFoF3WLSsW7DD8wLVnYhQGkToKQvfe8VN9ZMD5uJ5WqjfXOhkTpYFVzn+u0FDZ9rNy9XHAWC9pdzo3VMbWYvurIeIM+lItcpL3AnF3mbKFY+hD6nS4=
+	t=1758144105; cv=none; b=p9vLsfPRIVFZrR6mbD0mNXKey+Tc1NRtQ4ci+X/bSRMmxyU6wcbknr5LtmvE+YOnH2Aw0QFaIdHffzSHI7WC+PxLvoX8uZaf6fLkNQ/C7Fc/vt6CUoQbKVB0/9ji0oITPFP/fD2UnDbLugmvHUbPCpAC7rXfTbr4AifsTF0roCc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758144102; c=relaxed/simple;
-	bh=zyDL8cpkBb5/eWK95k21DDwRPtzFV3U7jYgMacBjpvU=;
+	s=arc-20240116; t=1758144105; c=relaxed/simple;
+	bh=sOGBGwS3uSUAnE7CAR3aObmoouAimZ/hpNjSSo3+nJE=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=sFg0YEfW5oVLcVCSv6TzSTPeSwdMmnjCY/xmAf4a9RXAjKemJTQMq2DWtGsFLXYq+TKKnOXNkYI5TkZDfpDdSwxUaT9DE7E5dz5RGKqlYv9Z8QOXc7LvI8wDFBEDBzcA1seaHaZKRoujcEHsDCsEJ60EwcUjk35O6IiMoczXh4o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=C+9i/VCs; arc=none smtp.client-ip=95.215.58.188
+	 MIME-Version; b=uYYALsXgkoA/ZMewS4vTYk5LYteehTwVRVAeIPwcSSqikQl/FQVEk37f2fCyTpxFrr86C5WUWpb9YoaryMVfGlmCM/8Ssp9+XpMGHUeM3SqTR+Fz014QsUV+SlAoryougaOk346MWlNU+Wj6ZVwi4JdTNq8OyBOGN9NLBsCHgW8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=LhtXKQxy; arc=none smtp.client-ip=95.215.58.183
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1758144099;
+	t=1758144102;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=V7mQY3qdCR3hvy95CDRctskrJV5Xhnq7AFeZGsJQX4o=;
-	b=C+9i/VCsWpAwC29BijvaMaRZY8BDN8RoD1Jf0fHZrKGgoUW/G4mz5nTbMmdXIBFgh835/5
-	7csE2vGh4ValXeKKYVLM/68mC7ERszZ8/6Z/yGJh/04csuS+kdGczT9ugnDJc23YoIEGXK
-	Ase1WRq/DBJu+TCfjNhRJwC2fg3Ib/8=
+	bh=heQb+iYD8jR8m/89CClYw8LjpM8o65KodnM7TACOfHw=;
+	b=LhtXKQxygwRr6p80+WV16dRNpdzx6/AueMYGQg8fwzM98mzk+48gYIM2korn6AarU7T/pZ
+	rbPXAHQsr0y5aYuuNary7mcK107C5eO0VODxtcrZsERoxXwCassFYXqv+6a+r3DG+4N020
+	SOnwk1JThiZdjkGZI+aN2hRWmK1XI5A=
 From: Oliver Upton <oliver.upton@linux.dev>
 To: kvmarm@lists.linux.dev
 Cc: Marc Zyngier <maz@kernel.org>,
@@ -57,9 +57,9 @@ Cc: Marc Zyngier <maz@kernel.org>,
 	linux-arm-kernel@lists.infradead.org,
 	kvm@vger.kernel.org,
 	Oliver Upton <oliver.upton@linux.dev>
-Subject: [PATCH 08/13] KVM: arm64: selftests: Select SMCCC conduit based on current EL
-Date: Wed, 17 Sep 2025 14:20:38 -0700
-Message-ID: <20250917212044.294760-9-oliver.upton@linux.dev>
+Subject: [PATCH 09/13] KVM: arm64: selftests: Use hyp timer IRQs when test runs at EL2
+Date: Wed, 17 Sep 2025 14:20:39 -0700
+Message-ID: <20250917212044.294760-10-oliver.upton@linux.dev>
 In-Reply-To: <20250917212044.294760-1-oliver.upton@linux.dev>
 References: <20250917212044.294760-1-oliver.upton@linux.dev>
 Precedence: bulk
@@ -71,128 +71,85 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-Migadu-Flow: FLOW_OUT
 
-HVCs are taken within the VM when EL2 is in use. Ensure tests use the
-SMC instruction when running at EL2 to interact with the host.
+Arch timer registers are redirected to their hypervisor counterparts
+when running in VHE EL2. This is great, except for the fact that the
+hypervisor timers use different PPIs. Use the correct INTIDs when that
+is the case.
 
 Signed-off-by: Oliver Upton <oliver.upton@linux.dev>
 ---
- tools/testing/selftests/kvm/arm64/hypercalls.c      |  2 +-
- tools/testing/selftests/kvm/arm64/kvm-uuid.c        |  2 +-
- tools/testing/selftests/kvm/arm64/psci_test.c       | 10 +++++-----
- .../testing/selftests/kvm/include/arm64/processor.h | 13 +++++++++++++
- tools/testing/selftests/kvm/steal_time.c            |  2 +-
- 5 files changed, 21 insertions(+), 8 deletions(-)
+ .../testing/selftests/kvm/arm64/arch_timer.c  |  6 ++---
+ .../kvm/arm64/arch_timer_edge_cases.c         |  6 ++---
+ .../selftests/kvm/include/arm64/arch_timer.h  | 24 +++++++++++++++++++
+ 3 files changed, 28 insertions(+), 8 deletions(-)
 
-diff --git a/tools/testing/selftests/kvm/arm64/hypercalls.c b/tools/testing/selftests/kvm/arm64/hypercalls.c
-index 44cfcf8a7f46..bf038a0371f4 100644
---- a/tools/testing/selftests/kvm/arm64/hypercalls.c
-+++ b/tools/testing/selftests/kvm/arm64/hypercalls.c
-@@ -108,7 +108,7 @@ static void guest_test_hvc(const struct test_hvc_info *hc_info)
- 
- 	for (i = 0; i < hvc_info_arr_sz; i++, hc_info++) {
- 		memset(&res, 0, sizeof(res));
--		smccc_hvc(hc_info->func_id, hc_info->arg1, 0, 0, 0, 0, 0, 0, &res);
-+		do_smccc(hc_info->func_id, hc_info->arg1, 0, 0, 0, 0, 0, 0, &res);
- 
- 		switch (stage) {
- 		case TEST_STAGE_HVC_IFACE_FEAT_DISABLED:
-diff --git a/tools/testing/selftests/kvm/arm64/kvm-uuid.c b/tools/testing/selftests/kvm/arm64/kvm-uuid.c
-index af9581b860f1..b5be9133535a 100644
---- a/tools/testing/selftests/kvm/arm64/kvm-uuid.c
-+++ b/tools/testing/selftests/kvm/arm64/kvm-uuid.c
-@@ -25,7 +25,7 @@ static void guest_code(void)
+diff --git a/tools/testing/selftests/kvm/arm64/arch_timer.c b/tools/testing/selftests/kvm/arm64/arch_timer.c
+index c753013319bc..d592a4515399 100644
+--- a/tools/testing/selftests/kvm/arm64/arch_timer.c
++++ b/tools/testing/selftests/kvm/arm64/arch_timer.c
+@@ -165,10 +165,8 @@ static void guest_code(void)
+ static void test_init_timer_irq(struct kvm_vm *vm)
  {
- 	struct arm_smccc_res res = {};
+ 	/* Timer initid should be same for all the vCPUs, so query only vCPU-0 */
+-	vcpu_device_attr_get(vcpus[0], KVM_ARM_VCPU_TIMER_CTRL,
+-			     KVM_ARM_VCPU_TIMER_IRQ_PTIMER, &ptimer_irq);
+-	vcpu_device_attr_get(vcpus[0], KVM_ARM_VCPU_TIMER_CTRL,
+-			     KVM_ARM_VCPU_TIMER_IRQ_VTIMER, &vtimer_irq);
++	ptimer_irq = vcpu_get_ptimer_irq(vcpus[0]);
++	vtimer_irq = vcpu_get_vtimer_irq(vcpus[0]);
  
--	smccc_hvc(ARM_SMCCC_VENDOR_HYP_CALL_UID_FUNC_ID, 0, 0, 0, 0, 0, 0, 0, &res);
-+	do_smccc(ARM_SMCCC_VENDOR_HYP_CALL_UID_FUNC_ID, 0, 0, 0, 0, 0, 0, 0, &res);
+ 	sync_global_to_guest(vm, ptimer_irq);
+ 	sync_global_to_guest(vm, vtimer_irq);
+diff --git a/tools/testing/selftests/kvm/arm64/arch_timer_edge_cases.c b/tools/testing/selftests/kvm/arm64/arch_timer_edge_cases.c
+index 5c60262f4c2e..91906414a474 100644
+--- a/tools/testing/selftests/kvm/arm64/arch_timer_edge_cases.c
++++ b/tools/testing/selftests/kvm/arm64/arch_timer_edge_cases.c
+@@ -924,10 +924,8 @@ static void test_run(struct kvm_vm *vm, struct kvm_vcpu *vcpu)
  
- 	__GUEST_ASSERT(res.a0 == ARM_SMCCC_VENDOR_HYP_UID_KVM_REG_0 &&
- 		       res.a1 == ARM_SMCCC_VENDOR_HYP_UID_KVM_REG_1 &&
-diff --git a/tools/testing/selftests/kvm/arm64/psci_test.c b/tools/testing/selftests/kvm/arm64/psci_test.c
-index 0d4680da66d1..98e49f710aef 100644
---- a/tools/testing/selftests/kvm/arm64/psci_test.c
-+++ b/tools/testing/selftests/kvm/arm64/psci_test.c
-@@ -27,7 +27,7 @@ static uint64_t psci_cpu_on(uint64_t target_cpu, uint64_t entry_addr,
+ static void test_init_timer_irq(struct kvm_vm *vm, struct kvm_vcpu *vcpu)
  {
- 	struct arm_smccc_res res;
+-	vcpu_device_attr_get(vcpu, KVM_ARM_VCPU_TIMER_CTRL,
+-			     KVM_ARM_VCPU_TIMER_IRQ_PTIMER, &ptimer_irq);
+-	vcpu_device_attr_get(vcpu, KVM_ARM_VCPU_TIMER_CTRL,
+-			     KVM_ARM_VCPU_TIMER_IRQ_VTIMER, &vtimer_irq);
++	ptimer_irq = vcpu_get_ptimer_irq(vcpu);
++	vtimer_irq = vcpu_get_vtimer_irq(vcpu);
  
--	smccc_hvc(PSCI_0_2_FN64_CPU_ON, target_cpu, entry_addr, context_id,
-+	do_smccc(PSCI_0_2_FN64_CPU_ON, target_cpu, entry_addr, context_id,
- 		  0, 0, 0, 0, &res);
- 
- 	return res.a0;
-@@ -38,7 +38,7 @@ static uint64_t psci_affinity_info(uint64_t target_affinity,
- {
- 	struct arm_smccc_res res;
- 
--	smccc_hvc(PSCI_0_2_FN64_AFFINITY_INFO, target_affinity, lowest_affinity_level,
-+	do_smccc(PSCI_0_2_FN64_AFFINITY_INFO, target_affinity, lowest_affinity_level,
- 		  0, 0, 0, 0, 0, &res);
- 
- 	return res.a0;
-@@ -48,7 +48,7 @@ static uint64_t psci_system_suspend(uint64_t entry_addr, uint64_t context_id)
- {
- 	struct arm_smccc_res res;
- 
--	smccc_hvc(PSCI_1_0_FN64_SYSTEM_SUSPEND, entry_addr, context_id,
-+	do_smccc(PSCI_1_0_FN64_SYSTEM_SUSPEND, entry_addr, context_id,
- 		  0, 0, 0, 0, 0, &res);
- 
- 	return res.a0;
-@@ -58,7 +58,7 @@ static uint64_t psci_system_off2(uint64_t type, uint64_t cookie)
- {
- 	struct arm_smccc_res res;
- 
--	smccc_hvc(PSCI_1_3_FN64_SYSTEM_OFF2, type, cookie, 0, 0, 0, 0, 0, &res);
-+	do_smccc(PSCI_1_3_FN64_SYSTEM_OFF2, type, cookie, 0, 0, 0, 0, 0, &res);
- 
- 	return res.a0;
+ 	sync_global_to_guest(vm, ptimer_irq);
+ 	sync_global_to_guest(vm, vtimer_irq);
+diff --git a/tools/testing/selftests/kvm/include/arm64/arch_timer.h b/tools/testing/selftests/kvm/include/arm64/arch_timer.h
+index bf461de34785..e2c4e9f0010f 100644
+--- a/tools/testing/selftests/kvm/include/arm64/arch_timer.h
++++ b/tools/testing/selftests/kvm/include/arm64/arch_timer.h
+@@ -155,4 +155,28 @@ static inline void timer_set_next_tval_ms(enum arch_timer timer, uint32_t msec)
+ 	timer_set_tval(timer, msec_to_cycles(msec));
  }
-@@ -67,7 +67,7 @@ static uint64_t psci_features(uint32_t func_id)
- {
- 	struct arm_smccc_res res;
  
--	smccc_hvc(PSCI_1_0_FN_PSCI_FEATURES, func_id, 0, 0, 0, 0, 0, 0, &res);
-+	do_smccc(PSCI_1_0_FN_PSCI_FEATURES, func_id, 0, 0, 0, 0, 0, 0, &res);
- 
- 	return res.a0;
- }
-diff --git a/tools/testing/selftests/kvm/include/arm64/processor.h b/tools/testing/selftests/kvm/include/arm64/processor.h
-index 87f50efed720..f037c1bb8e63 100644
---- a/tools/testing/selftests/kvm/include/arm64/processor.h
-+++ b/tools/testing/selftests/kvm/include/arm64/processor.h
-@@ -359,4 +359,17 @@ static __always_inline u64 ctxt_reg_alias(struct kvm_vcpu *vcpu, u32 encoding)
- 
- void kvm_get_default_vcpu_target(struct kvm_vm *vm, struct kvm_vcpu_init *init);
- 
-+static inline unsigned int get_current_el(void)
++static inline u32 vcpu_get_vtimer_irq(struct kvm_vcpu *vcpu)
 +{
-+	return (read_sysreg(CurrentEL) >> 2) & 0x3;
++	u32 intid;
++	u64 attr;
++
++	attr = vcpu_has_el2(vcpu) ? KVM_ARM_VCPU_TIMER_IRQ_HVTIMER :
++				    KVM_ARM_VCPU_TIMER_IRQ_VTIMER;
++	vcpu_device_attr_get(vcpu, KVM_ARM_VCPU_TIMER_CTRL, attr, &intid);
++
++	return intid;
 +}
 +
-+#define do_smccc(...)				\
-+do {						\
-+	if (get_current_el() == 2)		\
-+		smccc_smc(__VA_ARGS__);		\
-+	else					\
-+		smccc_hvc(__VA_ARGS__);		\
-+} while (0)
++static inline u32 vcpu_get_ptimer_irq(struct kvm_vcpu *vcpu)
++{
++	u32 intid;
++	u64 attr;
 +
- #endif /* SELFTEST_KVM_PROCESSOR_H */
-diff --git a/tools/testing/selftests/kvm/steal_time.c b/tools/testing/selftests/kvm/steal_time.c
-index cce2520af720..8edc1fca345b 100644
---- a/tools/testing/selftests/kvm/steal_time.c
-+++ b/tools/testing/selftests/kvm/steal_time.c
-@@ -118,7 +118,7 @@ static int64_t smccc(uint32_t func, uint64_t arg)
- {
- 	struct arm_smccc_res res;
- 
--	smccc_hvc(func, arg, 0, 0, 0, 0, 0, 0, &res);
-+	do_smccc(func, arg, 0, 0, 0, 0, 0, 0, &res);
- 	return res.a0;
- }
- 
++	attr = vcpu_has_el2(vcpu) ? KVM_ARM_VCPU_TIMER_IRQ_HPTIMER :
++				    KVM_ARM_VCPU_TIMER_IRQ_PTIMER;
++	vcpu_device_attr_get(vcpu, KVM_ARM_VCPU_TIMER_CTRL, attr, &intid);
++
++	return intid;
++}
++
+ #endif /* SELFTEST_KVM_ARCH_TIMER_H */
 -- 
 2.47.3
 
