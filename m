@@ -1,346 +1,164 @@
-Return-Path: <kvm+bounces-57812-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-57813-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8CC14B80122
-	for <lists+kvm@lfdr.de>; Wed, 17 Sep 2025 16:38:14 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id B0CADB7D312
+	for <lists+kvm@lfdr.de>; Wed, 17 Sep 2025 14:21:12 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 7876C1C02E22
-	for <lists+kvm@lfdr.de>; Wed, 17 Sep 2025 01:13:12 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 8B9BD1B26922
+	for <lists+kvm@lfdr.de>; Wed, 17 Sep 2025 02:52:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 97DF0278753;
-	Wed, 17 Sep 2025 01:11:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9B5202F3C02;
+	Wed, 17 Sep 2025 02:51:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="WFDs8zQ7"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail.loongson.cn (mail.loongson.cn [114.242.206.163])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 435F3224B09;
-	Wed, 17 Sep 2025 01:10:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=114.242.206.163
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.14])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3979721578F;
+	Wed, 17 Sep 2025 02:51:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.14
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758071461; cv=none; b=YHZlrM4JvtfjwDKu9XLABQJzycjY/uKCS9NU9UmcDyZ9+8lBdrP3DDPOA0f/DEImiRkAGtnLsfd/cZvzHERTSYOBCjYyyTh5rZbLB5FuzdXyrZqK2RKHiF9cPIcBSkn3FAkhmmhZhKj+ly/x9p3I7/4aolE0KJdIobkHCouL57k=
+	t=1758077515; cv=none; b=YTnu4hihV4PuYvcZycI5qRYBGWp9TPv8ER4OXmrNta8P5RWuup5xKZRQkRUhiuWiv07GH+9Hm1LVPVvBWJY9qjfwVZPbv9pyH6WPmujmwavWVxwa8GhyZqslMMaQiuAalKsnBLBTz9aNpd7WxrRxUa48EJ4w3NxMAR7eywCROi0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758071461; c=relaxed/simple;
-	bh=p5MOrxNALnPdLniwGLdUchd89/VDK3rKO1Ya3OOUR2g=;
-	h=Subject:To:Cc:References:From:Message-ID:Date:MIME-Version:
-	 In-Reply-To:Content-Type; b=FTqJHeOhFc7uwoJWb6sslQFhVzRSlytkUGWKYHu4H4Fi4hT8Zhz/jQAmFID83ZEzDRWCWWEY4TO2DFEoOlknM2p8QlKZL1zA+n6Jaw2o672RbJ3m/EaHWhiDq7Rw5Jb80NQkuLRqI37Im1Wl2bAYXt0jPJq09PXFmBG3TAnAPqI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=loongson.cn; spf=pass smtp.mailfrom=loongson.cn; arc=none smtp.client-ip=114.242.206.163
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=loongson.cn
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=loongson.cn
-Received: from loongson.cn (unknown [10.20.42.62])
-	by gateway (Coremail) with SMTP id _____8BxndKhCsposi4LAA--.23751S3;
-	Wed, 17 Sep 2025 09:10:57 +0800 (CST)
-Received: from [10.20.42.62] (unknown [10.20.42.62])
-	by front1 (Coremail) with SMTP id qMiowJAxVOSeCspoamSaAA--.36958S3;
-	Wed, 17 Sep 2025 09:10:57 +0800 (CST)
-Subject: Re: [PATCH] LoongArch: KVM: Fix VM migration failure with PTW enabled
-To: Huacai Chen <chenhuacai@kernel.org>
-Cc: WANG Xuerui <kernel@xen0n.name>, kvm@vger.kernel.org,
- loongarch@lists.linux.dev, linux-kernel@vger.kernel.org
-References: <20250910071429.3925025-1-maobibo@loongson.cn>
- <CAAhV-H65H_iREuETGU_v9oZdaPFoQj1VZV46XSNTC8ppENXzuQ@mail.gmail.com>
- <3d3a72c2-7c91-7640-5f0b-7b95bd5f0d2e@loongson.cn>
- <CAAhV-H4bEyeV7WkfSNBJnicMhhnSwj3PEr9K4ZpXwto1=JyWUw@mail.gmail.com>
-From: Bibo Mao <maobibo@loongson.cn>
-Message-ID: <ff12ec30-b0df-aedd-a713-4fb77a4e092a@loongson.cn>
-Date: Wed, 17 Sep 2025 09:08:49 +0800
-User-Agent: Mozilla/5.0 (X11; Linux loongarch64; rv:68.0) Gecko/20100101
- Thunderbird/68.7.0
+	s=arc-20240116; t=1758077515; c=relaxed/simple;
+	bh=rMqi48YwWFVnRsqh0GVjp34vpoJ2wbyzH02XVtdHUms=;
+	h=Message-ID:Date:MIME-Version:Subject:From:To:Cc:References:
+	 In-Reply-To:Content-Type; b=t1P8lfwF82SOo6r1hTBgNqavnbjGWJH7J/yPerIefxb7NiBaLwbZc0gJ17V52v1EgXFnELW56w76fXbTpA5L6sMJGrggwAlpE8y+6i3+YnP7ZOdheOQ4NW4g//KIglIwiYfRUhthvmWiv25+XW5UoLOzc3jRj0bOQuzI9+zo7xg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=WFDs8zQ7; arc=none smtp.client-ip=198.175.65.14
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1758077514; x=1789613514;
+  h=message-id:date:mime-version:subject:from:to:cc:
+   references:in-reply-to:content-transfer-encoding;
+  bh=rMqi48YwWFVnRsqh0GVjp34vpoJ2wbyzH02XVtdHUms=;
+  b=WFDs8zQ7WNzaCLl66cI6qbF6HPJeayvKYexBJztphDmr7GXTHTplxmtX
+   Hbx6YRIh8ZYJp6oP/TeIJUSfjA9LIevbRa0H277aL268ANDj5nBZOdtl6
+   XoHCwviKqpj/X2PMpyO44IE3+W/vtnqBd19CuQWRWzrdF0GkO9PYg++A+
+   40bdxSeb42q1leJTFNdtm+57970zu/MLSJgSB2B2/cPI5RlKLbkrWE1aJ
+   Ui1kuedVaz/3lTYHt2MSyGi62emIa62cbY82ReuEcdnlAWvHmqa9w1jfG
+   mGmm+ewbxFvvJf1e76naNba1vi5CQ/bCgWvso4VRIXsobEiSgsJSTuhCU
+   g==;
+X-CSE-ConnectionGUID: EM+8V7sMT1+V+qX6lobqtw==
+X-CSE-MsgGUID: AlhIBc3bQ6SauzfHIcOhfw==
+X-IronPort-AV: E=McAfee;i="6800,10657,11531"; a="64174913"
+X-IronPort-AV: E=Sophos;i="6.17,312,1747724400"; 
+   d="scan'208";a="64174913"
+Received: from fmviesa004.fm.intel.com ([10.60.135.144])
+  by orvoesa106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 16 Sep 2025 19:51:53 -0700
+X-CSE-ConnectionGUID: 3od9O47pQ/OSIVzcVaLEDw==
+X-CSE-MsgGUID: D5YljDkZRaq5WWFl+NI17w==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.18,270,1751266800"; 
+   d="scan'208";a="180378268"
+Received: from unknown (HELO [10.238.0.107]) ([10.238.0.107])
+  by fmviesa004-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 16 Sep 2025 19:51:51 -0700
+Message-ID: <3800f472-025b-4d44-ad4a-a5bb1f9841d2@linux.intel.com>
+Date: Wed, 17 Sep 2025 10:51:48 +0800
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <CAAhV-H4bEyeV7WkfSNBJnicMhhnSwj3PEr9K4ZpXwto1=JyWUw@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v15 09/41] KVM: x86: Load guest FPU state when access
+ XSAVE-managed MSRs
+From: Binbin Wu <binbin.wu@linux.intel.com>
+To: Sean Christopherson <seanjc@google.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org,
+ linux-kernel@vger.kernel.org, Tom Lendacky <thomas.lendacky@amd.com>,
+ Mathias Krause <minipli@grsecurity.net>, John Allen <john.allen@amd.com>,
+ Rick Edgecombe <rick.p.edgecombe@intel.com>, Chao Gao <chao.gao@intel.com>,
+ Maxim Levitsky <mlevitsk@redhat.com>, Xiaoyao Li <xiaoyao.li@intel.com>,
+ Zhang Yi Z <yi.z.zhang@linux.intel.com>
+References: <20250912232319.429659-1-seanjc@google.com>
+ <20250912232319.429659-10-seanjc@google.com>
+ <c4b9d87b-fddc-420b-ac86-7da48a42610f@linux.intel.com>
 Content-Language: en-US
+In-Reply-To: <c4b9d87b-fddc-420b-ac86-7da48a42610f@linux.intel.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:qMiowJAxVOSeCspoamSaAA--.36958S3
-X-CM-SenderInfo: xpdruxter6z05rqj20fqof0/
-X-Coremail-Antispam: 1Uk129KBj93XoW3Wry3JFW8Cr1rAF15AF1UurX_yoWftF1xpF
-	WkGF4DAr48tr17GrW2g3Z0qr9FkrsrKF1xXF1UKw1UGF1DtryUuF18WrWY9F18A348G3W7
-	XF4rtry3u3y3tabCm3ZEXasCq-sJn29KB7ZKAUJUUUU8529EdanIXcx71UUUUU7KY7ZEXa
-	sCq-sGcSsGvfJ3Ic02F40EFcxC0VAKzVAqx4xG6I80ebIjqfuFe4nvWSU5nxnvy29KBjDU
-	0xBIdaVrnRJUUUv0b4IE77IF4wAFF20E14v26r1j6r4UM7CY07I20VC2zVCF04k26cxKx2
-	IYs7xG6rWj6s0DM7CIcVAFz4kK6r1Y6r17M28lY4IEw2IIxxk0rwA2F7IY1VAKz4vEj48v
-	e4kI8wA2z4x0Y4vE2Ix0cI8IcVAFwI0_Ar0_tr1l84ACjcxK6xIIjxv20xvEc7CjxVAFwI
-	0_Cr0_Gr1UM28EF7xvwVC2z280aVAFwI0_GcCE3s1l84ACjcxK6I8E87Iv6xkF7I0E14v2
-	6rxl6s0DM2AIxVAIcxkEcVAq07x20xvEncxIr21l57IF6xkI12xvs2x26I8E6xACxx1l5I
-	8CrVACY4xI64kE6c02F40Ex7xfMcIj6xIIjxv20xvE14v26r106r15McIj6I8E87Iv67AK
-	xVWUJVW8JwAm72CE4IkC6x0Yz7v_Jr0_Gr1lF7xvr2IY64vIr41lc7I2V7IY0VAS07AlzV
-	AYIcxG8wCF04k20xvY0x0EwIxGrwCFx2IqxVCFs4IE7xkEbVWUJVW8JwC20s026c02F40E
-	14v26r1j6r18MI8I3I0E7480Y4vE14v26r106r1rMI8E67AF67kF1VAFwI0_JF0_Jw1lIx
-	kGc2Ij64vIr41lIxAIcVC0I7IYx2IY67AKxVWUJVWUCwCI42IY6xIIjxv20xvEc7CjxVAF
-	wI0_Jr0_Gr1lIxAIcVCF04k26cxKx2IYs7xG6r1j6r1xMIIF0xvEx4A2jsIE14v26r1j6r
-	4UMIIF0xvEx4A2jsIEc7CjxVAFwI0_Jr0_GrUvcSsGvfC2KfnxnUUI43ZEXa7IU8j-e5UU
-	UUU==
 
 
 
-On 2025/9/16 下午10:21, Huacai Chen wrote:
-> On Mon, Sep 15, 2025 at 9:22 AM Bibo Mao <maobibo@loongson.cn> wrote:
+On 9/16/2025 4:28 PM, Binbin Wu wrote:
+>
+>
+> On 9/13/2025 7:22 AM, Sean Christopherson wrote:
+>> Load the guest's FPU state if userspace is accessing MSRs whose values
+>> are managed by XSAVES. Introduce two helpers, kvm_{get,set}_xstate_msr(),
+>> to facilitate access to such kind of MSRs.
 >>
+>> If MSRs supported in kvm_caps.supported_xss are passed through to guest,
+>> the guest MSRs are swapped with host's before vCPU exits to userspace and
+>> after it reenters kernel before next VM-entry.
 >>
+>> Because the modified code is also used for the KVM_GET_MSRS device ioctl(),
+>> explicitly check @vcpu is non-null before attempting to load guest state.
+>> The XSAVE-managed MSRs cannot be retrieved via the device ioctl() without
+>> loading guest FPU state (which doesn't exist).
 >>
->> On 2025/9/14 上午9:57, Huacai Chen wrote:
->>> Hi, Bibo,
->>>
->>> On Wed, Sep 10, 2025 at 3:14 PM Bibo Mao <maobibo@loongson.cn> wrote:
->>>>
->>>> With PTW disabled system, bit Dirty is HW bit for page writing, however
->>>> with PTW enabled system, bit Write is HW bit for page writing. Previously
->>>> bit Write is treated as SW bit to record page writable attribute for fast
->>>> page fault handling in the secondary MMU, however with PTW enabled machine,
->>>> this bit is used by HW already.
->>>>
->>>> Here define KVM_PAGE_SOFT_WRITE with SW bit _PAGE_MODIFIED, so that it can
->>>> work on both PTW disabled and enabled machines. And with HW write bit, both
->>>> bit Dirty and Write is set or clear.
->>>>
->>>> Signed-off-by: Bibo Mao <maobibo@loongson.cn>
->>>> ---
->>>>    arch/loongarch/include/asm/kvm_mmu.h | 20 ++++++++++++++++----
->>>>    arch/loongarch/kvm/mmu.c             |  8 ++++----
->>>>    2 files changed, 20 insertions(+), 8 deletions(-)
->>>>
->>>> diff --git a/arch/loongarch/include/asm/kvm_mmu.h b/arch/loongarch/include/asm/kvm_mmu.h
->>>> index 099bafc6f797..efcd593c42b1 100644
->>>> --- a/arch/loongarch/include/asm/kvm_mmu.h
->>>> +++ b/arch/loongarch/include/asm/kvm_mmu.h
->>>> @@ -16,6 +16,13 @@
->>>>     */
->>>>    #define KVM_MMU_CACHE_MIN_PAGES        (CONFIG_PGTABLE_LEVELS - 1)
->>>>
->>>> +/*
->>>> + * _PAGE_MODIFIED is SW pte bit, it records page ever written on host
->>>> + * kernel, on secondary MMU it records page writable in order to fast
->>>> + * path handling
->>>> + */
->>>> +#define KVM_PAGE_SOFT_WRITE    _PAGE_MODIFIED
->>> KVM_PAGE_WRITEABLE is more suitable.
->> both are ok for me.
->>>
->>>> +
->>>>    #define _KVM_FLUSH_PGTABLE     0x1
->>>>    #define _KVM_HAS_PGMASK                0x2
->>>>    #define kvm_pfn_pte(pfn, prot) (((pfn) << PFN_PTE_SHIFT) | pgprot_val(prot))
->>>> @@ -52,11 +59,16 @@ static inline void kvm_set_pte(kvm_pte_t *ptep, kvm_pte_t val)
->>>>           WRITE_ONCE(*ptep, val);
->>>>    }
->>>>
->>>> -static inline int kvm_pte_write(kvm_pte_t pte) { return pte & _PAGE_WRITE; }
->>>> -static inline int kvm_pte_dirty(kvm_pte_t pte) { return pte & _PAGE_DIRTY; }
->>>> +static inline int kvm_pte_soft_write(kvm_pte_t pte) { return pte & KVM_PAGE_SOFT_WRITE; }
->>> The same, kvm_pte_mkwriteable() is more suitable.
->> kvm_pte_writable()  here ?  and kvm_pte_mkwriteable() for the bellowing
->> sentense.
+>> Note that guest_cpuid_has() is not queried as host userspace is allowed to
+>> access MSRs that have not been exposed to the guest, e.g. it might do
+>> KVM_SET_MSRS prior to KVM_SET_CPUID2.
 >>
->> If so, that is ok, both are ok for me.
-> Yes.
-> 
->>>
->>>> +static inline int kvm_pte_dirty(kvm_pte_t pte) { return pte & __WRITEABLE; }
->>> _PAGE_DIRTY and _PAGE_WRITE are always set/cleared at the same time,
->>> so the old version still works.
->> Although it is workable, I still want to remove single bit _PAGE_DIRTY
->> checking here.
-> I want to check a single bit because "kvm_pte_write() return
-> _PAGE_WRITE and kvm_pte_dirty() return _PAGE_DIRTY" looks more
-> natural.
-kvm_pte_write() is not needed any more and removed here. This is only
-kvm_pte_writable() to check software writable bit, kvm_pte_dirty() to 
-check HW write bit.
+>> The two helpers are put here in order to manifest accessing xsave-managed
+>> MSRs requires special check and handling to guarantee the correctness of
+>> read/write to the MSRs.
+>>
+>> Co-developed-by: Yang Weijiang <weijiang.yang@intel.com>
+>> Signed-off-by: Yang Weijiang <weijiang.yang@intel.com>
+>> Reviewed-by: Maxim Levitsky <mlevitsk@redhat.com>
+>> Tested-by: Mathias Krause <minipli@grsecurity.net>
+>> Tested-by: John Allen <john.allen@amd.com>
+>> Tested-by: Rick Edgecombe <rick.p.edgecombe@intel.com>
+>> Signed-off-by: Chao Gao <chao.gao@intel.com>
+>> [sean: drop S_CET, add big comment, move accessors to x86.c]
+>> Signed-off-by: Sean Christopherson <seanjc@google.com>
+>
+> Reviewed-by: Binbin Wu <binbin.wu@linux.intel.com>
+>
+> Two nits below.
+>
+>> ---
+>>   arch/x86/kvm/x86.c | 86 +++++++++++++++++++++++++++++++++++++++++++++-
+>>   1 file changed, 85 insertions(+), 1 deletion(-)
+>>
+>> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+>> index c5e38d6943fe..a95ca2fbd3a9 100644
+>> --- a/arch/x86/kvm/x86.c
+>> +++ b/arch/x86/kvm/x86.c
+>> @@ -136,6 +136,9 @@ static int __set_sregs2(struct kvm_vcpu *vcpu, struct kvm_sregs2 *sregs2);
+>>   static void __get_sregs2(struct kvm_vcpu *vcpu, struct kvm_sregs2 *sregs2);
+>>     static DEFINE_MUTEX(vendor_module_lock);
+>> +static void kvm_load_guest_fpu(struct kvm_vcpu *vcpu);
+>> +static void kvm_put_guest_fpu(struct kvm_vcpu *vcpu);
+>> +
+>>   struct kvm_x86_ops kvm_x86_ops __read_mostly;
+>>     #define KVM_X86_OP(func)                         \
+>> @@ -3801,6 +3804,66 @@ static void record_steal_time(struct kvm_vcpu *vcpu)
+>>       mark_page_dirty_in_slot(vcpu->kvm, ghc->memslot, gpa_to_gfn(ghc->gpa));
+>>   }
+>>   +/*
+>> + * Returns true if the MSR in question is managed via XSTATE, i.e. is context
+>> + * switched with the rest of guest FPU state.  Note!  S_CET is _not_ context
+>> + * switched via XSTATE even though it _is_ saved/restored via XSAVES/XRSTORS.
+>> + * Because S_CET is loaded on VM-Enter and VM-Exit via dedicated VMCS fields,
+>> + * the value saved/restored via XSTATE is always the host's value.  That detail
+>> + * is _extremely_ important, as the guest's S_CET must _never_ be resident in
+>> + * hardware while executing in the host.  Loading guest values for U_CET and
+>> + * PL[0-3]_SSP while executing in the kernel is safe, as U_CET is specific to
+>> + * userspace, and PL[0-3]_SSP are only consumed when transitioning to lower
+>> + * privilegel levels, i.e. are effectively only consumed by userspace as well.
+>> + */
 
-There is no reason to check single bit with _PAGE_WRITE or _PAGE_DIRTY, 
-since there is different meaning on machines with/without HW PTW.
+privilegel -> privilege
 
-Regards
-Bibo Mao
-> 
-> You may argue that kvm_pte_mkdirty() set both _PAGE_WRITE and
-> _PAGE_DIRTY so kvm_pte_dirty() should also return both. But I think
-> kvm_pte_mkdirty() in this patch is just a "reasonable optimization".
-> Because strictly speaking, we need both kvm_pte_mkdirty() and
-> kvm_pte_mkwrite() and call the pair when needed.
-> 
-> Huacai
-> 
->>
->> Regards
->> Bibo Mao
->>>
->>>>    static inline int kvm_pte_young(kvm_pte_t pte) { return pte & _PAGE_ACCESSED; }
->>>>    static inline int kvm_pte_huge(kvm_pte_t pte) { return pte & _PAGE_HUGE; }
->>>>
->>>> +static inline kvm_pte_t kvm_pte_mksoft_write(kvm_pte_t pte)
->>>> +{
->>>> +       return pte | KVM_PAGE_SOFT_WRITE;
->>>> +}
->>>> +
->>>>    static inline kvm_pte_t kvm_pte_mkyoung(kvm_pte_t pte)
->>>>    {
->>>>           return pte | _PAGE_ACCESSED;
->>>> @@ -69,12 +81,12 @@ static inline kvm_pte_t kvm_pte_mkold(kvm_pte_t pte)
->>>>
->>>>    static inline kvm_pte_t kvm_pte_mkdirty(kvm_pte_t pte)
->>>>    {
->>>> -       return pte | _PAGE_DIRTY;
->>>> +       return pte | __WRITEABLE;
->>>>    }
->>>>
->>>>    static inline kvm_pte_t kvm_pte_mkclean(kvm_pte_t pte)
->>>>    {
->>>> -       return pte & ~_PAGE_DIRTY;
->>>> +       return pte & ~__WRITEABLE;
->>>>    }
->>>>
->>>>    static inline kvm_pte_t kvm_pte_mkhuge(kvm_pte_t pte)
->>>> diff --git a/arch/loongarch/kvm/mmu.c b/arch/loongarch/kvm/mmu.c
->>>> index ed956c5cf2cc..68749069290f 100644
->>>> --- a/arch/loongarch/kvm/mmu.c
->>>> +++ b/arch/loongarch/kvm/mmu.c
->>>> @@ -569,7 +569,7 @@ static int kvm_map_page_fast(struct kvm_vcpu *vcpu, unsigned long gpa, bool writ
->>>>           /* Track access to pages marked old */
->>>>           new = kvm_pte_mkyoung(*ptep);
->>>>           if (write && !kvm_pte_dirty(new)) {
->>>> -               if (!kvm_pte_write(new)) {
->>>> +               if (!kvm_pte_soft_write(new)) {
->>>>                           ret = -EFAULT;
->>>>                           goto out;
->>>>                   }
->>>> @@ -856,9 +856,9 @@ static int kvm_map_page(struct kvm_vcpu *vcpu, unsigned long gpa, bool write)
->>>>                   prot_bits |= _CACHE_SUC;
->>>>
->>>>           if (writeable) {
->>>> -               prot_bits |= _PAGE_WRITE;
->>>> +               prot_bits = kvm_pte_mksoft_write(prot_bits);
->>>>                   if (write)
->>>> -                       prot_bits |= __WRITEABLE;
->>>> +                       prot_bits = kvm_pte_mkdirty(prot_bits);
->>>>           }
->>>>
->>>>           /* Disable dirty logging on HugePages */
->>>> @@ -904,7 +904,7 @@ static int kvm_map_page(struct kvm_vcpu *vcpu, unsigned long gpa, bool write)
->>>>           kvm_release_faultin_page(kvm, page, false, writeable);
->>>>           spin_unlock(&kvm->mmu_lock);
->>>>
->>>> -       if (prot_bits & _PAGE_DIRTY)
->>>> +       if (kvm_pte_dirty(prot_bits))
->>>>                   mark_page_dirty_in_slot(kvm, memslot, gfn);
->>>>
->>>>    out:
->>> To save time, I just change the whole patch like this, you can confirm
->>> whether it woks:
->>>
->>> diff --git a/arch/loongarch/include/asm/kvm_mmu.h
->>> b/arch/loongarch/include/asm/kvm_mmu.h
->>> index 099bafc6f797..882f60c72b46 100644
->>> --- a/arch/loongarch/include/asm/kvm_mmu.h
->>> +++ b/arch/loongarch/include/asm/kvm_mmu.h
->>> @@ -16,6 +16,13 @@
->>>     */
->>>    #define KVM_MMU_CACHE_MIN_PAGES        (CONFIG_PGTABLE_LEVELS - 1)
->>>
->>> +/*
->>> + * _PAGE_MODIFIED is SW pte bit, it records page ever written on host
->>> + * kernel, on secondary MMU it records page writable in order to fast
->>> + * path handling
->>> + */
->>> +#define KVM_PAGE_WRITEABLE     _PAGE_MODIFIED
->>> +
->>>    #define _KVM_FLUSH_PGTABLE     0x1
->>>    #define _KVM_HAS_PGMASK                0x2
->>>    #define kvm_pfn_pte(pfn, prot) (((pfn) << PFN_PTE_SHIFT) |
->>> pgprot_val(prot))
->>> @@ -56,6 +63,7 @@ static inline int kvm_pte_write(kvm_pte_t pte) {
->>> return pte & _PAGE_WRITE; }
->>>    static inline int kvm_pte_dirty(kvm_pte_t pte) { return pte &
->>> _PAGE_DIRTY; }
->>>    static inline int kvm_pte_young(kvm_pte_t pte) { return pte &
->>> _PAGE_ACCESSED; }
->>>    static inline int kvm_pte_huge(kvm_pte_t pte) { return pte &
->>> _PAGE_HUGE; }
->>> +static inline int kvm_pte_writeable(kvm_pte_t pte) { return pte &
->>> KVM_PAGE_WRITEABLE; }
->>>
->>>    static inline kvm_pte_t kvm_pte_mkyoung(kvm_pte_t pte)
->>>    {
->>> @@ -69,12 +77,12 @@ static inline kvm_pte_t kvm_pte_mkold(kvm_pte_t
->>> pte)
->>>
->>>    static inline kvm_pte_t kvm_pte_mkdirty(kvm_pte_t pte)
->>>    {
->>> -       return pte | _PAGE_DIRTY;
->>> +       return pte | __WRITEABLE;
->>>    }
->>>
->>>    static inline kvm_pte_t kvm_pte_mkclean(kvm_pte_t pte)
->>>    {
->>> -       return pte & ~_PAGE_DIRTY;
->>> +       return pte & ~__WRITEABLE;
->>>    }
->>>
->>>    static inline kvm_pte_t kvm_pte_mkhuge(kvm_pte_t pte)
->>> @@ -87,6 +95,11 @@ static inline kvm_pte_t kvm_pte_mksmall(kvm_pte_t
->>> pte)
->>>           return pte & ~_PAGE_HUGE;
->>>    }
->>>
->>> +static inline kvm_pte_t kvm_pte_mkwriteable(kvm_pte_t pte)
->>> +{
->>> +       return pte | KVM_PAGE_WRITEABLE;
->>> +}
->>> +
->>>    static inline int kvm_need_flush(kvm_ptw_ctx *ctx)
->>>    {
->>>           return ctx->flag & _KVM_FLUSH_PGTABLE;
->>> diff --git a/arch/loongarch/kvm/mmu.c b/arch/loongarch/kvm/mmu.c
->>> index ed956c5cf2cc..7c8143e79c12 100644
->>> --- a/arch/loongarch/kvm/mmu.c
->>> +++ b/arch/loongarch/kvm/mmu.c
->>> @@ -569,7 +569,7 @@ static int kvm_map_page_fast(struct kvm_vcpu
->>> *vcpu, unsigned long gpa, bool writ
->>>           /* Track access to pages marked old */
->>>           new = kvm_pte_mkyoung(*ptep);
->>>           if (write && !kvm_pte_dirty(new)) {
->>> -               if (!kvm_pte_write(new)) {
->>> +               if (!kvm_pte_writeable(new)) {
->>>                           ret = -EFAULT;
->>>                           goto out;
->>>                   }
->>> @@ -856,9 +856,9 @@ static int kvm_map_page(struct kvm_vcpu *vcpu,
->>> unsigned long gpa, bool write)
->>>                   prot_bits |= _CACHE_SUC;
->>>
->>>           if (writeable) {
->>> -               prot_bits |= _PAGE_WRITE;
->>> +               prot_bits = kvm_pte_mkwriteable(prot_bits);
->>>                   if (write)
->>> -                       prot_bits |= __WRITEABLE;
->>> +                       prot_bits = kvm_pte_mkdirty(prot_bits);
->>>           }
->>>
->>>           /* Disable dirty logging on HugePages */
->>> @@ -904,7 +904,7 @@ static int kvm_map_page(struct kvm_vcpu *vcpu,
->>> unsigned long gpa, bool write)
->>>           kvm_release_faultin_page(kvm, page, false, writeable);
->>>           spin_unlock(&kvm->mmu_lock);
->>>
->>> -       if (prot_bits & _PAGE_DIRTY)
->>> +       if (kvm_pte_dirty(prot_bits))
->>>                   mark_page_dirty_in_slot(kvm, memslot, gfn);
->>>
->>>    out:
->>>
->>> Huacai
->>>
->>>>
->>>> base-commit: 9dd1835ecda5b96ac88c166f4a87386f3e727bd9
->>>> --
->>>> 2.39.3
->>>>
->>>>
->>
 
 
