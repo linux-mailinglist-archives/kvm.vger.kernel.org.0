@@ -1,88 +1,85 @@
-Return-Path: <kvm+bounces-57905-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-57909-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 201FEB80469
-	for <lists+kvm@lfdr.de>; Wed, 17 Sep 2025 16:53:52 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7E715B806B5
+	for <lists+kvm@lfdr.de>; Wed, 17 Sep 2025 17:12:14 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0DAE4542D9C
-	for <lists+kvm@lfdr.de>; Wed, 17 Sep 2025 14:53:51 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 6B4771C844AF
+	for <lists+kvm@lfdr.de>; Wed, 17 Sep 2025 15:05:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3F066333A92;
-	Wed, 17 Sep 2025 14:52:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 92DBC335957;
+	Wed, 17 Sep 2025 15:02:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="eN5q4+Bp"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="blDTTlyN"
 X-Original-To: kvm@vger.kernel.org
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0F0A2330D5E
-	for <kvm@vger.kernel.org>; Wed, 17 Sep 2025 14:52:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 19024332A5E
+	for <kvm@vger.kernel.org>; Wed, 17 Sep 2025 15:02:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758120774; cv=none; b=OBUPx/SwCPVukLzYWQx/l7xT8hpI66BkmaibIaK4A5OdgATMtykcgDPlje7FcHO2Qfp62BXAS5e+XGIDAoQXz+IPrjwJwUdvY30XgXVS2Nbu1rgnDn5+wT3jC/g1R7LfPWbR1YeueMHFuo6M4R/1aOS7RegnaNZqpArKaqDUpAk=
+	t=1758121363; cv=none; b=DuWo4QGVCgTUzlgIK5gom1i+af9uyMdeG6wJUW4Fr0D9hW7fcXma0YN5D+ptPIm2erspQUHpdvmBRShBHAHWPwomnSpkZuDosKJWq7xQ5WAqPTe36y99HG9YSD+o7toXmVxNe6RanF2L3dbZ5SoOPUqqc50PlmD+N+yPU8Rt3oM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758120774; c=relaxed/simple;
-	bh=5epPT/yF5ySKt5yJiiDB0pyPwiJwOtudKK0nsTblkcQ=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=KjLiMs+3LsSnCMdMT0xcB82Oh48GazxkbXfhtQmAFR0QdSO6jxq+BLKQ0S7fHnJq2GTlMlwlKwUkkC6dw6NgV+AuV6yDaWmBrbW2hnC/Usw2bRcEnlWm+e7aP+MRoMPmZ53FD36TsgxM/VsGoRNcDYc/+SbnnbrocN+xAzphZtE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=eN5q4+Bp; arc=none smtp.client-ip=170.10.129.124
+	s=arc-20240116; t=1758121363; c=relaxed/simple;
+	bh=ETwcmm8JSn0BgJbSlKE3RKnZqCQXSERLDynaqBiXOuw=;
+	h=Message-ID:Date:MIME-Version:From:To:Subject:Content-Type; b=n73Hx+WEm9djGJhzreStFpky17GZmDCTAj+dQ8SxPX7bw0qHViUBMbJ9cp2cGJyNYa8E3ZZ4G1x9DqA4btoFoUWep1d1OjrBKp8d8Lu/aCVwWa+ZdQVPmCnTcRZF7Ed06pvASRpNDYsA/I/iZHS1VqCL4b5kjxzugguanXGpQSM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=blDTTlyN; arc=none smtp.client-ip=170.10.129.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1758120771;
+	s=mimecast20190719; t=1758121360;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-	bh=gDs3CUgjimStalCZ6Y06kSWDcmRW5MkZeDVBa3itpks=;
-	b=eN5q4+Bpicko9qmcG1/d4J8qKwcOW7JMNWQ0c0Du9G63tKmdz4Ljcy+HDP+cCufPoAj5Ny
-	vwwmX3Z0s45gwzts9VP0v9fYdBmrX6cIkXzxQs0iZ7XznE66z5dWfQLe3XUO4tGQRdHLLr
-	u44PJxNnzs25rMrDZh7CE9qCzpvH9Mg=
-Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
- [209.85.128.69]) by relay.mimecast.com with ESMTP with STARTTLS
+	 to:to:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:autocrypt:autocrypt;
+	bh=YYhCdI4Q9hUzoKgBgYNuwcWvhIZyQUxhaAtXakv2Ac0=;
+	b=blDTTlyNlUxbMENrvHb6X3XzzDTvfrtfAw32cXjuJifA7hjLi+fdKuHz99GjO6QZAg8VBO
+	urUVZpzjrTfwi1BIxGLrGN+WhOzS2KYKleSyP9SPC9WW8GEkqht2S0I5ZXDVUB/C1/diYU
+	ufZQeCH/mS+siGGGxZEP/0wZeL4qUmI=
+Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
+ [209.85.128.70]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-673-aer8omGjNfWGikpxwiZP5g-1; Wed, 17 Sep 2025 10:52:49 -0400
-X-MC-Unique: aer8omGjNfWGikpxwiZP5g-1
-X-Mimecast-MFC-AGG-ID: aer8omGjNfWGikpxwiZP5g_1758120768
-Received: by mail-wm1-f69.google.com with SMTP id 5b1f17b1804b1-45e05ff0b36so4834525e9.0
-        for <kvm@vger.kernel.org>; Wed, 17 Sep 2025 07:52:48 -0700 (PDT)
+ us-mta-265-bLRdLIYhPZuDAqcnyMdH7w-1; Wed, 17 Sep 2025 11:02:38 -0400
+X-MC-Unique: bLRdLIYhPZuDAqcnyMdH7w-1
+X-Mimecast-MFC-AGG-ID: bLRdLIYhPZuDAqcnyMdH7w_1758121357
+Received: by mail-wm1-f70.google.com with SMTP id 5b1f17b1804b1-45ceeae0513so42343955e9.0
+        for <kvm@vger.kernel.org>; Wed, 17 Sep 2025 08:02:37 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1758120767; x=1758725567;
-        h=content-transfer-encoding:in-reply-to:autocrypt:content-language
-         :from:references:cc:to:subject:user-agent:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=gDs3CUgjimStalCZ6Y06kSWDcmRW5MkZeDVBa3itpks=;
-        b=g9gDzVmFu/+mEpW7hH5NLiUmh+YE90sVTzx0RygqhpJ5M18jZSpHGzXzbD2+Ygqhj1
-         ejqHYAoKh3aDi9dKOLQMTQ6TwFnuwlqsy3EIqCykkvYWGHnw9RrTWbs8EEieUJjaiuf9
-         wWbRdtJ+N2wtfWFfzWAMngDmeeJB7EXnctvKAXuDxOaTDN3rD0fxYUl1tkNk7QczUDD9
-         Lt/LlRjkhuMTiCpHAs/ju6zHFCzgMrA3YncMMQ0bm/gPa9cygh3S5krDHd3Asp3/dTKL
-         yQkljYhIJyC2hVlD1PktCZIgq9D/+82nbWlvxOMEW1wrWvmIu4FAoUM6sm/6Y2Dlk3Op
-         QWXQ==
-X-Forwarded-Encrypted: i=1; AJvYcCWbPKMA0sPgJ0V+AyKzIyx+2NObsaXchWnNDkdr7PxroKVbH9B7KPwtBzI9IHs+jOgO3co=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyoAQ/lVx5yY+wKJ50hBAZ1p1bsWq4AQn+gvZyvATqTzQwnuoGQ
-	RBKVkALd4N984CH3RU1Y5lybbCIl3OFgD1UuYECQsfDi+rCdghN6DoILXx0TRMl8ZPLEMw3MG5a
-	13mbgg51f5X10x5+D/pgQLMDXEmKiStJrxnzCtfwAvT4usk8EHipLPQ==
-X-Gm-Gg: ASbGncsDw93sLLVZapS1d0QebUD41yZLrbHTpioIU2dDY7+y7KHvmjLutTgw3rgXzFs
-	uByKKrktMONAX2LDLZxBTGW8XOawT7QE9rmj+NmnNmrt9Vgglh54mDUIdi2WJxjkoXiBQyPabb6
-	D3vk6RABE/11KcA7xpzSlyOsv4VwKTHsBKnR45LFuEzqYr3SWRd+aArcO3i6JDY3qzzllTzvqSQ
-	b+QVq7gCFIYeNAsLhsfwIm0Zx7gU2Y3tu6e8Ut3ng5eIbhRtyLu+q9uzcn9bvvxI/K5y96rkEMr
-	/5XEhmrSJaEZIDYMwhfXGQ/rE852QXBh6pMc45T5BrtXwB+IhIi58Ad4+em9hIWfeGFgnOAFLUE
-	8no5Ke3izqXoLrU45jkY+PhWlucA+1w/CWg703WoWvCbO7TIJHZz15KqCwxY/cYIX
-X-Received: by 2002:a5d:584d:0:b0:3ea:d634:1493 with SMTP id ffacd0b85a97d-3ec9d70e1aemr6331353f8f.3.1758120767141;
-        Wed, 17 Sep 2025 07:52:47 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IHCVwA2whdJvJ6k0SNSXVgRVBCXXeS7K5H+4SZxMmaPtCI7Uv2obWcxbuvE8IbcU5jjC+Gugg==
-X-Received: by 2002:a5d:584d:0:b0:3ea:d634:1493 with SMTP id ffacd0b85a97d-3ec9d70e1aemr6331269f8f.3.1758120766367;
-        Wed, 17 Sep 2025 07:52:46 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1758121357; x=1758726157;
+        h=content-transfer-encoding:autocrypt:subject:to:content-language
+         :from:user-agent:mime-version:date:message-id:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=YYhCdI4Q9hUzoKgBgYNuwcWvhIZyQUxhaAtXakv2Ac0=;
+        b=sTNpg4HSAxXJezZFZBwx+tc6J+Dqz7gNGnhbdovhc6z7pA49yZPSEPXhqxBcco7xlO
+         uCDcVKAwvPCCY/A4hHYwcyUptdDmG5Y5gzdz2lSJszk2YlW3c6G70CqHFK6GYIFoddWE
+         g1iXWLkzkn7d7lSkWVXveMMPJ5I6mL1k7XcMRR3vdMpvN9gRnnjdnC3xQS4ErtGxb2Bz
+         mqu2Vvcp3fRmHJaPEPd8Lw5p20jRA3TG4ePNTTxFqEwmKbBxTBru11cHCk2+I2HLRj7w
+         AqzqHqQ7MqQaXQjfOxxymFZg3x2fwUjetq0lQVnxRAN7ftf3wztCzbPKjlWN/O/O+6m2
+         WYXg==
+X-Forwarded-Encrypted: i=1; AJvYcCXLwP1chzlfz+Z4NXCIjmgY5c39ZKb1NNIQw9KQtpNE6bGDjtlM/BGI/vs7VIX1mGF8z74=@vger.kernel.org
+X-Gm-Message-State: AOJu0YybZVQN2qPDPq/dmUS4S4WQUAqIl11SryO7+XzuS6INp33VmuVB
+	QLc9XJZZRPjdPABybB4Lk0QTNmG5b6KgRtQgSA7xPSgVreNFwhvtrn9yUoCwcnBactQW0NrcsBi
+	6qUuJLVrPrbxgGp+in44FmdPulJlughf4tjlu7SwEY2SClX/bvl08dg==
+X-Gm-Gg: ASbGnctgbkO3VPVTWDDs6eLCP801rt6YlN7LcDmcKhIhbIgVgp/DYLJ32YI4BYWbLtL
+	lWgdD3YBsp4iFQCwYVeWmv9tszjApcKCvAnI7Vb8WXEpvtWzlzwqwndwKW6ogb4GCIip9Duxi1s
+	R894cXOwD7XXQDefYkAjRDj/3HDF5nY0C+Hy5PTyIRceJ88x7Hdh2lyb/QiU+I3FMvEybMXP+OU
+	F+uLyjXeYE5Mx7vdjedTa5sVtAIcOfYWcdYx0m6yuK3BPHwd8Iv95mkgvrmKaKsSLrEPMFbFXxo
+	9flC1KkjHCUccEI4TT3a0YaZp+Fu1a+n0GIkW1JzzGKJ+BlTFwi5+p+qGQ67H0eRtgbhEDUOCrm
+	zBAWa4XTBIA0yiawE6WvziH/jx/1kqxaSK7FBOJWgKH7hhZPaqXkKltGtxwm/CCYx
+X-Received: by 2002:a05:600c:4f03:b0:45f:bef7:670b with SMTP id 5b1f17b1804b1-463699748c5mr11533305e9.3.1758121356151;
+        Wed, 17 Sep 2025 08:02:36 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IENQagQHTk2oT9ysMwgYVh+So5rsFAoYrcTyucKX1OXr6gl3RPWUZl+VDYfCpD1fI5KhTXxfw==
+X-Received: by 2002:a05:600c:4f03:b0:45f:bef7:670b with SMTP id 5b1f17b1804b1-463699748c5mr11531555e9.3.1758121353883;
+        Wed, 17 Sep 2025 08:02:33 -0700 (PDT)
 Received: from ?IPV6:2003:d8:2f27:6d00:7b96:afc9:83d0:5bd? (p200300d82f276d007b96afc983d005bd.dip0.t-ipconnect.de. [2003:d8:2f27:6d00:7b96:afc9:83d0:5bd])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4613f3c69d5sm39701795e9.24.2025.09.17.07.52.41
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3e98b439442sm15671180f8f.38.2025.09.17.08.02.31
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 17 Sep 2025 07:52:45 -0700 (PDT)
-Message-ID: <e30627e5-f30f-4494-934c-58e4a427a476@redhat.com>
-Date: Wed, 17 Sep 2025 16:52:40 +0200
+        Wed, 17 Sep 2025 08:02:32 -0700 (PDT)
+Message-ID: <46bc189b-911e-4dfe-bafa-43ffb9200427@redhat.com>
+Date: Wed, 17 Sep 2025 17:02:31 +0200
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -90,92 +87,11 @@ List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v6 01/11] filemap: Pass address_space mapping to
- ->free_folio()
-To: Hugh Dickins <hughd@google.com>, "Roy, Patrick" <roypat@amazon.co.uk>
-Cc: "Thomson, Jack" <jackabt@amazon.co.uk>,
- "Kalyazin, Nikita" <kalyazin@amazon.co.uk>,
- "Cali, Marco" <xmarcalx@amazon.co.uk>,
- "derekmn@amazon.co.uk" <derekmn@amazon.co.uk>,
- Elliot Berman <quic_eberman@quicinc.com>,
- "willy@infradead.org" <willy@infradead.org>, "corbet@lwn.net"
- <corbet@lwn.net>, "pbonzini@redhat.com" <pbonzini@redhat.com>,
- "maz@kernel.org" <maz@kernel.org>,
- "oliver.upton@linux.dev" <oliver.upton@linux.dev>,
- "joey.gouly@arm.com" <joey.gouly@arm.com>,
- "suzuki.poulose@arm.com" <suzuki.poulose@arm.com>,
- "yuzenghui@huawei.com" <yuzenghui@huawei.com>,
- "catalin.marinas@arm.com" <catalin.marinas@arm.com>,
- "will@kernel.org" <will@kernel.org>,
- "chenhuacai@kernel.org" <chenhuacai@kernel.org>,
- "kernel@xen0n.name" <kernel@xen0n.name>,
- "paul.walmsley@sifive.com" <paul.walmsley@sifive.com>,
- "palmer@dabbelt.com" <palmer@dabbelt.com>,
- "aou@eecs.berkeley.edu" <aou@eecs.berkeley.edu>,
- "alex@ghiti.fr" <alex@ghiti.fr>,
- "agordeev@linux.ibm.com" <agordeev@linux.ibm.com>,
- "gerald.schaefer@linux.ibm.com" <gerald.schaefer@linux.ibm.com>,
- "hca@linux.ibm.com" <hca@linux.ibm.com>,
- "gor@linux.ibm.com" <gor@linux.ibm.com>,
- "borntraeger@linux.ibm.com" <borntraeger@linux.ibm.com>,
- "svens@linux.ibm.com" <svens@linux.ibm.com>,
- "dave.hansen@linux.intel.com" <dave.hansen@linux.intel.com>,
- "luto@kernel.org" <luto@kernel.org>,
- "peterz@infradead.org" <peterz@infradead.org>,
- "tglx@linutronix.de" <tglx@linutronix.de>,
- "mingo@redhat.com" <mingo@redhat.com>, "bp@alien8.de" <bp@alien8.de>,
- "x86@kernel.org" <x86@kernel.org>, "hpa@zytor.com" <hpa@zytor.com>,
- "trondmy@kernel.org" <trondmy@kernel.org>, "anna@kernel.org"
- <anna@kernel.org>, "hubcap@omnibond.com" <hubcap@omnibond.com>,
- "martin@omnibond.com" <martin@omnibond.com>,
- "viro@zeniv.linux.org.uk" <viro@zeniv.linux.org.uk>,
- "brauner@kernel.org" <brauner@kernel.org>, "jack@suse.cz" <jack@suse.cz>,
- "akpm@linux-foundation.org" <akpm@linux-foundation.org>,
- "lorenzo.stoakes@oracle.com" <lorenzo.stoakes@oracle.com>,
- "Liam.Howlett@oracle.com" <Liam.Howlett@oracle.com>,
- "vbabka@suse.cz" <vbabka@suse.cz>, "rppt@kernel.org" <rppt@kernel.org>,
- "surenb@google.com" <surenb@google.com>, "mhocko@suse.com"
- <mhocko@suse.com>, "ast@kernel.org" <ast@kernel.org>,
- "daniel@iogearbox.net" <daniel@iogearbox.net>,
- "andrii@kernel.org" <andrii@kernel.org>,
- "martin.lau@linux.dev" <martin.lau@linux.dev>,
- "eddyz87@gmail.com" <eddyz87@gmail.com>, "song@kernel.org"
- <song@kernel.org>, "yonghong.song@linux.dev" <yonghong.song@linux.dev>,
- "john.fastabend@gmail.com" <john.fastabend@gmail.com>,
- "kpsingh@kernel.org" <kpsingh@kernel.org>, "sdf@fomichev.me"
- <sdf@fomichev.me>, "haoluo@google.com" <haoluo@google.com>,
- "jolsa@kernel.org" <jolsa@kernel.org>, "jgg@ziepe.ca" <jgg@ziepe.ca>,
- "jhubbard@nvidia.com" <jhubbard@nvidia.com>,
- "peterx@redhat.com" <peterx@redhat.com>, "jannh@google.com"
- <jannh@google.com>, "pfalcato@suse.de" <pfalcato@suse.de>,
- "axelrasmussen@google.com" <axelrasmussen@google.com>,
- "yuanchu@google.com" <yuanchu@google.com>,
- "weixugc@google.com" <weixugc@google.com>,
- "hannes@cmpxchg.org" <hannes@cmpxchg.org>,
- "zhengqi.arch@bytedance.com" <zhengqi.arch@bytedance.com>,
- "shakeel.butt@linux.dev" <shakeel.butt@linux.dev>,
- "shuah@kernel.org" <shuah@kernel.org>, "seanjc@google.com"
- <seanjc@google.com>,
- "linux-fsdevel@vger.kernel.org" <linux-fsdevel@vger.kernel.org>,
- "linux-doc@vger.kernel.org" <linux-doc@vger.kernel.org>,
- "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
- "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
- "linux-arm-kernel@lists.infradead.org"
- <linux-arm-kernel@lists.infradead.org>,
- "kvmarm@lists.linux.dev" <kvmarm@lists.linux.dev>,
- "loongarch@lists.linux.dev" <loongarch@lists.linux.dev>,
- "linux-riscv@lists.infradead.org" <linux-riscv@lists.infradead.org>,
- "linux-s390@vger.kernel.org" <linux-s390@vger.kernel.org>,
- "linux-nfs@vger.kernel.org" <linux-nfs@vger.kernel.org>,
- "devel@lists.orangefs.org" <devel@lists.orangefs.org>,
- "linux-mm@kvack.org" <linux-mm@kvack.org>,
- "bpf@vger.kernel.org" <bpf@vger.kernel.org>,
- "linux-kselftest@vger.kernel.org" <linux-kselftest@vger.kernel.org>
-References: <20250912091708.17502-1-roypat@amazon.co.uk>
- <20250912091708.17502-2-roypat@amazon.co.uk>
- <7c2677e1-daf7-3b49-0a04-1efdf451379a@google.com>
 From: David Hildenbrand <david@redhat.com>
 Content-Language: en-US
+To: "linux-coco@lists.linux.dev" <linux-coco@lists.linux.dev>,
+ "linux-mm@kvack.org" <linux-mm@kvack.org>, KVM <kvm@vger.kernel.org>
+Subject: [Invitation] bi-weekly guest_memfd upstream call on 2025-09-18
 Autocrypt: addr=david@redhat.com; keydata=
  xsFNBFXLn5EBEAC+zYvAFJxCBY9Tr1xZgcESmxVNI/0ffzE/ZQOiHJl6mGkmA1R7/uUpiCjJ
  dBrn+lhhOYjjNefFQou6478faXE6o2AhmebqT4KiQoUQFV4R7y1KMEKoSyy8hQaK1umALTdL
@@ -220,117 +136,43 @@ Autocrypt: addr=david@redhat.com; keydata=
  3iyY2Nsd7JxfKu1PRhCGwXzRw5TlfEsoRI7V9A8isUCoqE2Dzh3FvYHVeX4Us+bRL/oqareJ
  CIFqgYMyvHj7Q06kTKmauOe4Nf0l0qEkIuIzfoLJ3qr5UyXc2hLtWyT9Ir+lYlX9efqh7mOY
  qIws/H2t
-In-Reply-To: <7c2677e1-daf7-3b49-0a04-1efdf451379a@google.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 
-On 16.09.25 08:23, Hugh Dickins wrote:
-> On Fri, 12 Sep 2025, Roy, Patrick wrote:
-> 
->> From: Elliot Berman <quic_eberman@quicinc.com>
->>
->> When guest_memfd removes memory from the host kernel's direct map,
->> direct map entries must be restored before the memory is freed again. To
->> do so, ->free_folio() needs to know whether a gmem folio was direct map
->> removed in the first place though. While possible to keep track of this
->> information on each individual folio (e.g. via page flags), direct map
->> removal is an all-or-nothing property of the entire guest_memfd, so it
->> is less error prone to just check the flag stored in the gmem inode's
->> private data.  However, by the time ->free_folio() is called,
->> folio->mapping might be cleared. To still allow access to the address
->> space from which the folio was just removed, pass it in as an additional
->> argument to ->free_folio, as the mapping is well-known to all callers.
->>
->> Link: https://lore.kernel.org/all/15f665b4-2d33-41ca-ac50-fafe24ade32f@redhat.com/
->> Suggested-by: David Hildenbrand <david@redhat.com>
->> Acked-by: David Hildenbrand <david@redhat.com>
->> Signed-off-by: Elliot Berman <quic_eberman@quicinc.com>
->> [patrick: rewrite shortlog for new usecase]
->> Signed-off-by: Patrick Roy <roypat@amazon.co.uk>
->> ---
->>   Documentation/filesystems/locking.rst |  2 +-
->>   fs/nfs/dir.c                          | 11 ++++++-----
->>   fs/orangefs/inode.c                   |  3 ++-
->>   include/linux/fs.h                    |  2 +-
->>   mm/filemap.c                          |  9 +++++----
->>   mm/secretmem.c                        |  3 ++-
->>   mm/vmscan.c                           |  4 ++--
->>   virt/kvm/guest_memfd.c                |  3 ++-
->>   8 files changed, 21 insertions(+), 16 deletions(-)
->>
->> diff --git a/Documentation/filesystems/locking.rst b/Documentation/filesystems/locking.rst
->> index aa287ccdac2f..74c97287ec40 100644
->> --- a/Documentation/filesystems/locking.rst
->> +++ b/Documentation/filesystems/locking.rst
->> @@ -262,7 +262,7 @@ prototypes::
->>   	sector_t (*bmap)(struct address_space *, sector_t);
->>   	void (*invalidate_folio) (struct folio *, size_t start, size_t len);
->>   	bool (*release_folio)(struct folio *, gfp_t);
->> -	void (*free_folio)(struct folio *);
->> +	void (*free_folio)(struct address_space *, struct folio *);
->>   	int (*direct_IO)(struct kiocb *, struct iov_iter *iter);
->>   	int (*migrate_folio)(struct address_space *, struct folio *dst,
->>   			struct folio *src, enum migrate_mode);
-> 
-> Beware, that is against the intent of free_folio().
-> 
-> Since its 2.6.37 origin in 6072d13c4293 ("Call the filesystem back
-> whenever a page is removed from the page cache"), freepage() or
-> free_folio() has intentionally NOT taken a struct address_space *mapping,
-> because that structure may already be freed by the time free_folio() is
-> called, if the last folio holding it has now been freed.
+Hi everybody,
 
-Thanks for noticing that Hugh, very good point!
+Our next guest_memfd upstream call is scheduled for tomorrow, Thursday,
+2025-09-18 at 8:00 - 9:00am (GMT-07:00) Pacific Time - Vancouver.
 
-> 
-> Maybe something has changed since then, or maybe it happens to be safe
-> just in the context in which you want to use it; but it is against the
-> principle of free_folio().  (Maybe an rcu_read_lock() could be added
-> in __remove_mapping() to make it safe nowadays? maybe not welcome.)
+We'll be using the following Google meet:
+http://meet.google.com/wxp-wtju-jzw
 
-Let me dig into the callers:
+The meeting notes can be found at [1], where we also link recordings and
+collect current guest_memfd upstream proposals. If you want an google
+calendar invitation that also covers all future meetings, just write me
+a mail.
+
+I suspect that we will talk about
+
+(1) direct-map-removal support (folio_free callback making our life
+     harder than it should :) )
+
+(2) the future of preparedness tracking
+
+(3) discussions around "stage 2" and whatever comes after that
+
+To put something to discuss onto the agenda, reply to this mail or add
+them to the "Topics/questions for next meeting(s)" section in the
+meeting notes as a comment.
+
+[1]
+https://docs.google.com/document/d/1M6766BzdY1Lhk7LiR5IqVR8B8mG3cr-cxTxOrAosPOk/edit?usp=sharing
+
+--
+Cheers,
+
+David
 
 
-1) filemap_free_folio()
-
-filemap_free_folio() looks up the callback through 
-mapping->a_ops->free_folio. Nothing happens in-between that lookup and 
-the callback so we should be good.
-
-
-2) replace_page_cache_folio()
-
-replace_page_cache_folio() similarly looks up the callback through
-mapping->a_ops->free_folio. We do some operations afterwards, but 
-essentially store the new folio in the page cache and remove the old one.
-
-The only caller is fuse_try_move_folio(), and IIUC both folios are 
-locked, preventing concurrent truncation and the mapping going away.
-
-
-3) __remove_mapping()
-
-__remove_mapping() also looks up the callback through 
-mapping->a_ops->free_folio.
-
-Before we call free_folio() we remove the folio from the pagecache 
-(__filemap_remove_folio) to then drop locks and call free_folio().
-
-We're only holding the folio lock at that point.
-
-So yes I agree, truncate_inode_pages_final() could be racing with
-__remove_mapping().c That's probably exactly what the docs describe 
-regarding reclaim.
-
-
-rcu_read_lock() should indeed work, or some other mechanism that keeps 
-truncate_inode_pages_final() from succeeding in this racy situation.
-
-Alternatively I guess we would have to use another callback.
-
--- 
-Cheers
-
-David / dhildenb
 
 
