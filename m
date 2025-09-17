@@ -1,176 +1,120 @@
-Return-Path: <kvm+bounces-57896-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-57897-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 79713B7F9AC
-	for <lists+kvm@lfdr.de>; Wed, 17 Sep 2025 15:55:34 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9F69BB7FA30
+	for <lists+kvm@lfdr.de>; Wed, 17 Sep 2025 15:58:37 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1263F4A3AD5
-	for <lists+kvm@lfdr.de>; Wed, 17 Sep 2025 13:51:23 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 0714D1C06E5E
+	for <lists+kvm@lfdr.de>; Wed, 17 Sep 2025 13:54:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C31FE32340D;
-	Wed, 17 Sep 2025 13:44:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D3D953397DE;
+	Wed, 17 Sep 2025 13:48:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="hpu5usbN"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="PaKh6p2E"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pg1-f201.google.com (mail-pg1-f201.google.com [209.85.215.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.17])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 55A893233F8
-	for <kvm@vger.kernel.org>; Wed, 17 Sep 2025 13:44:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2094132BC16;
+	Wed, 17 Sep 2025 13:48:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.17
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758116681; cv=none; b=b+AnNRFm7Kn6MvH1BnZJihLRYPi1+rfgWfiHSxeiIUfoT17joUMUY+BhX4A7lu1RMJ3u2RoYy9Z6vusLJrcYZ9Uq83LNl9iho/CfKm1D86emXWQXkz/IUhASadlO0XXHGVoe9DlWr4rihsRoy9Hl1RovWSqtGBlwG9sDoy48JJY=
+	t=1758116911; cv=none; b=B32WwM+SMDx/4aYbKhHfwgkoJvN8iZhgyhvcp10GcXqmpr6IFc/z248C4Sfec6bfSgCcFaq+cF8939OhXkkTDwCAzJuzGhaaWq6R9MDerymU4lOGBgJSPhLuZFYL22HyMgE4EgtU+iiQ8cXJPVbeFHBV+aOk3j6sddyb9oxaJio=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758116681; c=relaxed/simple;
-	bh=ZJi7tdLPjgYbZFKjMGd/qK5hFXM6pG4kVFcidSClXdU=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=qop1X8A4/pE3H+R1JhpAdjhyRnZwimvIYqexalmR7uh4WU6IW3YAHgj9oAXVGZCZDkQkL8BIlUJVEx7/ws+raMwi4wN2ujaa4jjHsMN2qd4AUEhEajcUKU3nqYgaUAc7aJhNeVgnakSYYShclZbhgCxItLznwg4FG4NXVUz/H4M=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=hpu5usbN; arc=none smtp.client-ip=209.85.215.201
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pg1-f201.google.com with SMTP id 41be03b00d2f7-b54fd63ecb9so124774a12.1
-        for <kvm@vger.kernel.org>; Wed, 17 Sep 2025 06:44:40 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1758116679; x=1758721479; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=5UH8viusCcDJDonuj7qTEeANJ2KzlVzvu/LxOGcZpS0=;
-        b=hpu5usbNbjYjcz14Td1kYjMn8K/9P21WwiRRbHlNHhp+KQM+C0oSzN/y7cV8Ij4pgv
-         GicgxeTgr6YIKHIJ9loVIY9dp975lUs+o8AtOJ7EK1aRxwqAZ+SuXq64OTawsHz59vTJ
-         9w9FDtzAYIU3DF1LvqIgY7OFhbQWRSHBdTiU8tAPef7ofePxAWem4sC8fMF2fxJTp3/g
-         l06BPANKu7hdxyH6MDZHs4e1QHdeah4zZShzHJQYSWSGQMv6buR9RJgKnEdDDn6KpVpU
-         09yP6/ITgRQomMRL1W8h/0cy5/PDZLF0ApojszG+EspP3Cd4oSxX+AojmeEtmv5yZgvd
-         FeOQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1758116679; x=1758721479;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=5UH8viusCcDJDonuj7qTEeANJ2KzlVzvu/LxOGcZpS0=;
-        b=fGfZAWXWRA4CbrZzmB0fE/u1aneA35CezC+hrCkNh7v3fpCXUHEW30LyRrpY5NP7xe
-         5DNxW5zBd8/9dWlZ51GrhuKhPpSTvQ6N4E3mGKMy1VomV0+Rah6yituLM3jpkuS7vZaY
-         4wj5FgTwYzGF39TcB45d2u/goNLX26Zo8m7bHPmPQo8sKh7dt8qlsiLhYjvmTpp0PpaV
-         0H0HwJSCAb9VgBI+g95nMrGFF5ya+5udGBt+DP87/gGgqdhNEGOBMKgo6cKdUYYKdnRP
-         8CkekWpkveEKQV2XzAdrZPQjdUsIYTh1PbsExfDQNl4ag8V4laYuoEe8IpLQKpPzOvN+
-         3Z/Q==
-X-Forwarded-Encrypted: i=1; AJvYcCXpMlj1RTwjnB/lAWvtb+E47joMIxtqtricgeG40ldpEXHqWgEGfkuEWDxUGDX8IzeZ9jo=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyD3T7ZXm1UWwDt/uls3qwFcv5ZhLhv5g9H4axyhw/ICASVvGty
-	e+fTs02ld1QDqbgnlrHzHOlXhOifg/4fwKtzL9yInWwpJXGGf7UaOfPnKjBDfas+O62pKJh6JCL
-	Hd5EgPA==
-X-Google-Smtp-Source: AGHT+IGhehI8LJgcP8zwkG2TeOHjRw58cboMOoOVQPKm4GebZDbEptszXX70rPMnZZtPIWQQz7TjslWvf4U=
-X-Received: from pjbqi4.prod.google.com ([2002:a17:90b:2744:b0:327:50fa:eff9])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a05:6a20:9189:b0:263:57a:bb52
- with SMTP id adf61e73a8af0-27aab860c10mr3156731637.53.1758116679338; Wed, 17
- Sep 2025 06:44:39 -0700 (PDT)
-Date: Wed, 17 Sep 2025 06:44:37 -0700
-In-Reply-To: <52cc9795-970e-4940-80d1-490daed636c4@linux.intel.com>
+	s=arc-20240116; t=1758116911; c=relaxed/simple;
+	bh=SEe5+uZs6+q18rVODuGjO9ywt5qG9ngtyXTRJAArBo0=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=pqORC7a0LwfLD2bOH3c99+ypeY8+gsfWz1fhym7dC5wIApm3NfYDsL4J0OvC8c64Uj2YjZoyvEYz1rzvK3T30Z01jw21H4n+4Hu5IorOKg2eJH7N0rRAoi4/BhTc3kYge2J5GXRMxlNXXDlxvFadN829QwCImSMC+jTLo6UPj0k=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=PaKh6p2E; arc=none smtp.client-ip=198.175.65.17
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1758116909; x=1789652909;
+  h=message-id:date:mime-version:subject:to:cc:references:
+   from:in-reply-to:content-transfer-encoding;
+  bh=SEe5+uZs6+q18rVODuGjO9ywt5qG9ngtyXTRJAArBo0=;
+  b=PaKh6p2EagQQNuDFHLSwOajGZ8qREpncWuPYFzbu0YGJ92RhCP5R/guL
+   N0W1B35CE8G+qOHg8zyEF5BqpsatJdQhXMbHxdmhY+vpEV7+8snh9hmH0
+   85+ogXKgPTUW/Ki9GfPscStgYpDTJ4NfR/CvsoN5obKx45e+rgdEoMCWH
+   l9tClxzVgdNzujirLvkysGTXTz+/cyysfN6Y6HTy8fOiR0LTvjm/KvBD5
+   ieaAfFZKc0HuZeDQSJGA6UJKS4VP6BvNXrf+C3u67Z1rNs2e9HfSm5h+N
+   04u99S+1RdXuiSeBr22GgVhJhvVEWoZtDsSp8gvK1svBKP1HqSSxBMtcW
+   A==;
+X-CSE-ConnectionGUID: nTCTfvPzQbWc6Jb8y9NqOQ==
+X-CSE-MsgGUID: WcgDSBjqSHe4ijD3sHHaVA==
+X-IronPort-AV: E=McAfee;i="6800,10657,11531"; a="60373260"
+X-IronPort-AV: E=Sophos;i="6.17,312,1747724400"; 
+   d="scan'208";a="60373260"
+Received: from fmviesa008.fm.intel.com ([10.60.135.148])
+  by orvoesa109.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 17 Sep 2025 06:48:28 -0700
+X-CSE-ConnectionGUID: az/vML4+RtWr+ehkYnJVaQ==
+X-CSE-MsgGUID: SgUMY2tCSciovAZon0AKpg==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.18,272,1751266800"; 
+   d="scan'208";a="175662374"
+Received: from alorchar-mobl.amr.corp.intel.com (HELO [10.125.81.45]) ([10.125.81.45])
+  by fmviesa008-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 17 Sep 2025 06:48:23 -0700
+Message-ID: <5036681a-57ed-4fa2-ac0a-bfe235a17e2a@linux.intel.com>
+Date: Wed, 17 Sep 2025 06:48:18 -0700
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20250912232319.429659-1-seanjc@google.com> <20250912232319.429659-17-seanjc@google.com>
- <52cc9795-970e-4940-80d1-490daed636c4@linux.intel.com>
-Message-ID: <aMq7RTmfPhfhDCtI@google.com>
-Subject: Re: [PATCH v15 16/41] KVM: VMX: Set up interception for CET MSRs
-From: Sean Christopherson <seanjc@google.com>
-To: Binbin Wu <binbin.wu@linux.intel.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	Tom Lendacky <thomas.lendacky@amd.com>, Mathias Krause <minipli@grsecurity.net>, 
-	John Allen <john.allen@amd.com>, Rick Edgecombe <rick.p.edgecombe@intel.com>, 
-	Chao Gao <chao.gao@intel.com>, Maxim Levitsky <mlevitsk@redhat.com>, 
-	Xiaoyao Li <xiaoyao.li@intel.com>, Zhang Yi Z <yi.z.zhang@linux.intel.com>
-Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [RFC PATCH v1 0/5] x86/boot, KVM: Move VMXON/VMXOFF handling from
+ KVM to CPU lifecycle
+To: Sean Christopherson <seanjc@google.com>
+Cc: "Xin Li (Intel)" <xin@zytor.com>, linux-kernel@vger.kernel.org,
+ kvm@vger.kernel.org, linux-pm@vger.kernel.org, pbonzini@redhat.com,
+ tglx@linutronix.de, mingo@redhat.com, bp@alien8.de,
+ dave.hansen@linux.intel.com, x86@kernel.org, hpa@zytor.com,
+ rafael@kernel.org, pavel@kernel.org, brgerst@gmail.com,
+ david.kaplan@amd.com, peterz@infradead.org, andrew.cooper3@citrix.com,
+ kprateek.nayak@amd.com, chao.gao@intel.com, rick.p.edgecombe@intel.com,
+ dan.j.williams@intel.com
+References: <20250909182828.1542362-1-xin@zytor.com>
+ <aMLakCwFW1YEWFG4@google.com>
+ <0387b08a-a8b0-4632-abfc-6b8189ded6b4@linux.intel.com>
+ <aMmkZlWl4TiS2qm8@google.com>
+Content-Language: en-US
+From: Arjan van de Ven <arjan@linux.intel.com>
+In-Reply-To: <aMmkZlWl4TiS2qm8@google.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-On Wed, Sep 17, 2025, Binbin Wu wrote:
+On 9/16/2025 10:54 AM, Sean Christopherson wrote:
+  what the problem is with having VMXON unconditionally enabled?
 > 
-> 
-> On 9/13/2025 7:22 AM, Sean Christopherson wrote:
-> > From: Yang Weijiang <weijiang.yang@intel.com>
-> > 
-> > Enable/disable CET MSRs interception per associated feature configuration.
-> > 
-> > Pass through CET MSRs that are managed by XSAVE, as they cannot be
-> > intercepted without also intercepting XSAVE. However, intercepting XSAVE
-> > would likely cause unacceptable performance overhead.
-> Here may be a bit confusing about the description of "managed by XSAVE" because
-> KVM has a function is_xstate_managed_msr(), and MSR_IA32_S_CET is not xstate
-> managed in it.
+> Unlike say EFER.SVME, VMXON fundamentally changes CPU behavior.  E.g. blocks INIT,
 
-Ooh, yeah, definitely confusing.  And the XSAVE part is also misleading to some
-extent, because strictly speaking it's XSAVES/XRSTORS.  And performance isn't
-the main concern, it's the complexity of emulating XSAVES/XRSTORS that's the
-non-starter.  I think it's also worth calling out that the code intentionally
-doesn't check XSAVES support.
+blocking INIT is clearly a thing, and both KVM and this patch series deal with that by vmxoff before offline/kexec/etc cases
 
-  Disable interception for CET MSRs that can be accessed ia vXSAVES/XRSTORS,
-  as accesses through XSTATE aren't subject to MSR interception checks, i.e.
-  cannot be intercepted without intercepting and emulating XSAVES/XRSTORS,
-  and KVM doesn't support emulating XSAVE/XRSTOR instructions.
+> activates VMCS caches (which aren't cleared by VMXOFF on pre-SPR CPUs, and AFAIK
+> Intel hasn't even publicly committed to that behavior for SPR+),
 
-  Don't condition interception on the guest actually having XSAVES as there
-  is no benefit to intercepting the accesses.  The MSRs in question are
-  either context switched by the CPU on VM-Enter/VM-Exit or by KVM via
-  XSAVES/XRSTORS (KVM requires XSAVES to virtualization SHSTK), i.e. KVM is
-  going to load guest values into hardware irrespective of XSAVES support.
+the VMCS caches aren't great for sure -- which is why the behavior of having vmx on all the time and only
+vmxoff at a "fatal to execution" point (offline, kexec, ..) is making life simpler, by not dealing
+with this at runtime
 
-> Otherwise,
-> Reviewed-by: Binbin Wu <binbin.wu@linux.intel.com>
-> 
-> > MSR_IA32_INT_SSP_TAB is not managed by XSAVE, so it is intercepted.
-> > 
-> > Note, this MSR design introduced an architectural limitation of SHSTK and
-> > IBT control for guest, i.e., when SHSTK is exposed, IBT is also available
-> > to guest from architectural perspective since IBT relies on subset of SHSTK
-> > relevant MSRs.
-> > 
-> > Suggested-by: Sean Christopherson <seanjc@google.com>
-> > Signed-off-by: Yang Weijiang <weijiang.yang@intel.com>
-> > Tested-by: Mathias Krause <minipli@grsecurity.net>
-> > Tested-by: John Allen <john.allen@amd.com>
-> > Tested-by: Rick Edgecombe <rick.p.edgecombe@intel.com>
-> > Signed-off-by: Chao Gao <chao.gao@intel.com>
-> > Signed-off-by: Sean Christopherson <seanjc@google.com>
-> > ---
-> >   arch/x86/kvm/vmx/vmx.c | 19 +++++++++++++++++++
-> >   1 file changed, 19 insertions(+)
-> > 
-> > diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
-> > index 4fc1dbba2eb0..adf5af30e537 100644
-> > --- a/arch/x86/kvm/vmx/vmx.c
-> > +++ b/arch/x86/kvm/vmx/vmx.c
-> > @@ -4101,6 +4101,8 @@ void pt_update_intercept_for_msr(struct kvm_vcpu *vcpu)
-> >   void vmx_recalc_msr_intercepts(struct kvm_vcpu *vcpu)
-> >   {
-> > +	bool intercept;
-> > +
-> >   	if (!cpu_has_vmx_msr_bitmap())
-> >   		return;
-> > @@ -4146,6 +4148,23 @@ void vmx_recalc_msr_intercepts(struct kvm_vcpu *vcpu)
-> >   		vmx_set_intercept_for_msr(vcpu, MSR_IA32_FLUSH_CMD, MSR_TYPE_W,
-> >   					  !guest_cpu_cap_has(vcpu, X86_FEATURE_FLUSH_L1D));
-> > +	if (kvm_cpu_cap_has(X86_FEATURE_SHSTK)) {
-> > +		intercept = !guest_cpu_cap_has(vcpu, X86_FEATURE_SHSTK);
-> > +
-> > +		vmx_set_intercept_for_msr(vcpu, MSR_IA32_PL0_SSP, MSR_TYPE_RW, intercept);
-> > +		vmx_set_intercept_for_msr(vcpu, MSR_IA32_PL1_SSP, MSR_TYPE_RW, intercept);
-> > +		vmx_set_intercept_for_msr(vcpu, MSR_IA32_PL2_SSP, MSR_TYPE_RW, intercept);
-> > +		vmx_set_intercept_for_msr(vcpu, MSR_IA32_PL3_SSP, MSR_TYPE_RW, intercept);
-> > +	}
-> > +
-> > +	if (kvm_cpu_cap_has(X86_FEATURE_SHSTK) || kvm_cpu_cap_has(X86_FEATURE_IBT)) {
-> > +		intercept = !guest_cpu_cap_has(vcpu, X86_FEATURE_IBT) &&
-> > +			    !guest_cpu_cap_has(vcpu, X86_FEATURE_SHSTK);
-> > +
-> > +		vmx_set_intercept_for_msr(vcpu, MSR_IA32_U_CET, MSR_TYPE_RW, intercept);
-> > +		vmx_set_intercept_for_msr(vcpu, MSR_IA32_S_CET, MSR_TYPE_RW, intercept);
-> > +	}
-> > +
-> >   	/*
-> >   	 * x2APIC and LBR MSR intercepts are modified on-demand and cannot be
-> >   	 * filtered by userspace.
-> 
+
+ > restricts allowed> CR0 and CR4 values, raises questions about ucode patch updates, triggers unique
+> flows in SMI/RSM, prevents Intel PT from tracing on certain CPUs, and probably a
+> few other things I'm forgetting.
+
+I went through a similar mental list and my conclusion was a bit different.
+The behavior changes are minor at best ..
+And yes there are a few things different in microcode -- but the reality is that every day millions of
+servers and laptops/etc all run with vmxon (by virtue of running KVM or other virtualization)
+all day long, day in day out -- and it is not causing any issues at all.
+
+An argument that any supposed behavior change is unacceptable also implies virtualization
+itself would run into that same argument... and a LOT of the world runs virtualized.
+
+
 
