@@ -1,103 +1,121 @@
-Return-Path: <kvm+bounces-57912-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-57913-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 53791B80F1E
-	for <lists+kvm@lfdr.de>; Wed, 17 Sep 2025 18:21:32 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0BCFAB80FCD
+	for <lists+kvm@lfdr.de>; Wed, 17 Sep 2025 18:28:33 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 828183A667F
-	for <lists+kvm@lfdr.de>; Wed, 17 Sep 2025 16:20:21 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C2DA6320664
+	for <lists+kvm@lfdr.de>; Wed, 17 Sep 2025 16:23:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 08D302C235A;
-	Wed, 17 Sep 2025 16:19:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D749634BA55;
+	Wed, 17 Sep 2025 16:23:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="aWb2Nks2"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Kfzj1gnh"
 X-Original-To: kvm@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0258B34BA34;
-	Wed, 17 Sep 2025 16:19:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D99EF34BA21;
+	Wed, 17 Sep 2025 16:23:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758125976; cv=none; b=q6pKgZBz68605YXVQDVFRzOtS55izyh+MIHfEd2Hxb92GVWD6QLy2Zm8/ymFPqAjQE9b73LYYglMnBtdCxTV9r60IdGb2faDTEdsB+q99B7CvpjQLnpB/0+JZMqo68VVT7Sv2n19FCg34SlY96vHAh4FQi4iaegcdXmsb6ktdwM=
+	t=1758126192; cv=none; b=NpYwiB8dct36TYMDxfxwZtOLBNi3PNERRJKkTcRlumWc4kcTZHAuBDxSX6MtLAGDV8pVVFKhyIXhZqvDwI0y9IRqzw3+eKeu/+bA3bYMW1QnO0etkkopJk1zwv6tUBcMXg+S0i3k5aI+f8GCfUYR4fuvfBETGqAcUvZaveJ6Nlc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758125976; c=relaxed/simple;
-	bh=KfbeK80H5Y9LffAIOXluY2vfgoEGJRjwY72RgtAxAT0=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Jqtd0DEEblA3uJZdnBynI0BbWsHjJM3m1DvxM0QcrvXBV1t1+QXG/841LqhQUCfbn5WFC8jNeATenFzwoFztvymhSQsUoqpoasJUDxAagel1nAZRsq+rH38zgW1xWg5A8cdrPttt1zKRjrA/h4qMpUkUI4w821vAKyCyHj32KK0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=aWb2Nks2; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B9F40C4CEE7;
-	Wed, 17 Sep 2025 16:19:30 +0000 (UTC)
+	s=arc-20240116; t=1758126192; c=relaxed/simple;
+	bh=9WSFumWUM+iDYPWeZ4g7rzOwgg3/uhk4ULpV1IZjzl0=;
+	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=Pq7bWJ5urgYPa9xswjhKBud9X5GWKWia3I0z1p/k/W2B9lOEUI3IKi31cuAslkAALlezchjtSKFPcdtRn+XaUH+3sSZlrVBUXCtXMwLqZwsXCGJl+8nB7kF9Y7HClLsnRX9dhnyZDvlQ7CojsPrjiMbYeHWnryv7F8akovLNOTI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Kfzj1gnh; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 65058C4CEE7;
+	Wed, 17 Sep 2025 16:23:11 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1758125975;
-	bh=KfbeK80H5Y9LffAIOXluY2vfgoEGJRjwY72RgtAxAT0=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=aWb2Nks2coYtIafEU2uyaJpd1scrX/JVLeYBEygX6FHTySf5AH9stfpZ00LqGyCgi
-	 KmcoccWAGSZj7Kkan+ohlqjUFYSv5fI78MujSSd/JuIYas8CudQoj6gtYLa9CsGvTr
-	 JFhKZAwSeqd1Wh79kHmyB2JplqxOc//XBRfxnFBQi/6zCrRhDvyJ8h9jCcehHl+dLR
-	 XYupBBeeozaq/t+yGj6i0nowDraIL4DQjPnhPK9hCPHB2gJlmRgl8gjFBWRkEnNbiH
-	 EnRSGQKOTIXePC9+rS1O0uW2jVBKmcRAFuuFT+RVBUYoQ/g67/o5kPwsoGOGYERtjR
-	 JJ81Kw81nCVVQ==
-Date: Wed, 17 Sep 2025 17:19:28 +0100
-From: Simon Horman <horms@kernel.org>
-To: Bobby Eshleman <bobbyeshleman@gmail.com>
-Cc: Stefano Garzarella <sgarzare@redhat.com>, Shuah Khan <shuah@kernel.org>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Stefan Hajnoczi <stefanha@redhat.com>,
-	"Michael S. Tsirkin" <mst@redhat.com>,
-	Jason Wang <jasowang@redhat.com>,
-	Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
-	Eugenio =?utf-8?B?UMOpcmV6?= <eperezma@redhat.com>,
-	"K. Y. Srinivasan" <kys@microsoft.com>,
-	Haiyang Zhang <haiyangz@microsoft.com>,
-	Wei Liu <wei.liu@kernel.org>, Dexuan Cui <decui@microsoft.com>,
-	Bryan Tan <bryan-bt.tan@broadcom.com>,
-	Vishnu Dasa <vishnu.dasa@broadcom.com>,
-	Broadcom internal kernel review list <bcm-kernel-feedback-list@broadcom.com>,
-	virtualization@lists.linux.dev, netdev@vger.kernel.org,
-	linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org,
-	kvm@vger.kernel.org, linux-hyperv@vger.kernel.org,
-	berrange@redhat.com, Bobby Eshleman <bobbyeshleman@meta.com>
-Subject: Re: [PATCH net-next v6 0/9] vsock: add namespace support to
- vhost-vsock
-Message-ID: <20250917161928.GR394836@horms.kernel.org>
-References: <20250916-vsock-vmtest-v6-0-064d2eb0c89d@meta.com>
+	s=k20201202; t=1758126191;
+	bh=9WSFumWUM+iDYPWeZ4g7rzOwgg3/uhk4ULpV1IZjzl0=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=Kfzj1gnhpIZIlSPLY/n2BOgor5Q8F4ztJr6k1ThhlxR+9gsvxo33Its/rk0lxWDEa
+	 kQMdfrnrLDl4nFOaB8Rp1etdML05U2P1DIxf8tbpfbCHL7R5d7R9ZFVsR8H0uV7JhE
+	 BH+95ZqPe7PISfmGarbuBioxBTAXfUP7jg5saw4yLgYpNB6RwTgNaOYux39yx7hB3e
+	 FET/o+5vB5i3A9XWDEqsUualCOk6gxTzumiLMP1GbDQ9+6LOekeCvcQCOIXWug3AlP
+	 D6nvLVHTS0IJadn4FFX/GbvGR63mT/jj+VNRCG6b0DA1DZHMZh8lFc3v/K9PX4QOYa
+	 ALNAw4EYVBjPA==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.98.2)
+	(envelope-from <maz@kernel.org>)
+	id 1uyuw1-000000079gN-05oW;
+	Wed, 17 Sep 2025 16:23:09 +0000
+Date: Wed, 17 Sep 2025 17:23:08 +0100
+Message-ID: <86o6r9121f.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Sascha Bischoff <Sascha.Bischoff@arm.com>
+Cc: "linux-arm-kernel@lists.infradead.org"
+	<linux-arm-kernel@lists.infradead.org>,
+	"kvmarm@lists.linux.dev"
+	<kvmarm@lists.linux.dev>,
+	"linux-kernel@vger.kernel.org"
+	<linux-kernel@vger.kernel.org>,
+	"kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+	nd <nd@arm.com>,
+	"oliver.upton@linux.dev" <oliver.upton@linux.dev>,
+	Joey Gouly
+	<Joey.Gouly@arm.com>,
+	Suzuki Poulose <Suzuki.Poulose@arm.com>,
+	"yuzenghui@huawei.com" <yuzenghui@huawei.com>,
+	"will@kernel.org"
+	<will@kernel.org>,
+	"tglx@linutronix.de" <tglx@linutronix.de>,
+	"lpieralisi@kernel.org" <lpieralisi@kernel.org>,
+	Timothy Hayes
+	<Timothy.Hayes@arm.com>
+Subject: Re: [PATCH 1/5] KVM: arm64: Allow ICC_SRE_EL2 accesses on a GICv5 host
+In-Reply-To: <20250828105925.3865158-2-sascha.bischoff@arm.com>
+References: <20250828105925.3865158-1-sascha.bischoff@arm.com>
+	<20250828105925.3865158-2-sascha.bischoff@arm.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20250916-vsock-vmtest-v6-0-064d2eb0c89d@meta.com>
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: Sascha.Bischoff@arm.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, linux-kernel@vger.kernel.org, kvm@vger.kernel.org, nd@arm.com, oliver.upton@linux.dev, Joey.Gouly@arm.com, Suzuki.Poulose@arm.com, yuzenghui@huawei.com, will@kernel.org, tglx@linutronix.de, lpieralisi@kernel.org, Timothy.Hayes@arm.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Tue, Sep 16, 2025 at 04:43:44PM -0700, Bobby Eshleman wrote:
+On Thu, 28 Aug 2025 11:59:42 +0100,
+Sascha Bischoff <Sascha.Bischoff@arm.com> wrote:
+> 
+> The bet0 release of the GICv5 specification didn't include the
+> ICC_SRE_EL2 register as part of FEAT_GCIE_LEGACY. This was an
+> oversight, and support for this register has been added as of the bet1
+> release of the specification.
+> 
+> Remove the guarding in the vGICv3 code that skipped the ICC_SRE_EL2
+> accesses for a GICv5 host. As a result of this change, it now becomes
+> possible to use nested virtualisation on a GICv5 host when running
+> legacy GICv3-based VMs.
+> 
+> Signed-off-by: Sascha Bischoff <sascha.bischoff@arm.com>
 
-...
+I just remembered my promise from almost 3 weeks ago, and just posted
+this:
 
-> base-commit: 949ddfb774fe527cebfa3f769804344940f7ed2e
+https://lore.kernel.org/r/20250917161935.1630908-1-maz@kernel.org
 
-Hi Bobby,
+which kills two birds with one stone. I'll take it as a prefix to this
+series.
 
-This series does not seem to compile when applied to the commit above.
-Likewise when applied to current net-next (which is now slightly newer).
+Thanks,
 
-hyperv_transport.c: In function ‘hvs_open_connection’:
-hyperv_transport.c:316:14: error: too few arguments to function ‘vsock_find_bound_socket’
-  316 |         sk = vsock_find_bound_socket(&addr, vsock_global_dummy_net());
-      |              ^~~~~~~~~~~~~~~~~~~~~~~
-In file included from hyperv_transport.c:15:
-/home/horms/projects/linux/linux/include/net/af_vsock.h:218:14: note: declared here
-  218 | struct sock *vsock_find_bound_socket(struct sockaddr_vm *addr, struct net *net,
-      |              ^~~~~~~~~~~~~~~~~~~~~~~
+	M.
 
 -- 
-pw-bot: changes-requested
+Without deviation from the norm, progress is not possible.
 
