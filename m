@@ -1,82 +1,74 @@
-Return-Path: <kvm+bounces-57925-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-57926-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 07EDFB815D1
-	for <lists+kvm@lfdr.de>; Wed, 17 Sep 2025 20:39:02 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 71CC2B815F2
+	for <lists+kvm@lfdr.de>; Wed, 17 Sep 2025 20:41:15 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 4060A1C25CB6
-	for <lists+kvm@lfdr.de>; Wed, 17 Sep 2025 18:39:22 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8B579468544
+	for <lists+kvm@lfdr.de>; Wed, 17 Sep 2025 18:41:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9E569301497;
-	Wed, 17 Sep 2025 18:38:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5B7863090E0;
+	Wed, 17 Sep 2025 18:41:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (4096-bit key) header.d=alien8.de header.i=@alien8.de header.b="BV2wsGOB"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="YEovyDBd"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail.alien8.de (mail.alien8.de [65.109.113.108])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 838CA26D4C4;
-	Wed, 17 Sep 2025 18:38:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=65.109.113.108
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6D2DE2FFDFE;
+	Wed, 17 Sep 2025 18:41:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758134329; cv=none; b=XorcweviEGSsIh/ruCfXS04vcXTw69bN+JrNtUjxBlycJ/LBqRqGxgIFSvnXocl1e7GOKzVUYKMMwGBvFVurlFfeSj3b2q7VZMc+7LIwfVtaOiRAu52GwKRKUh9aVDE23vAGm+XKR4veeferjYeXZx/HjIcGF8Kn7Dx3xF9+TxU=
+	t=1758134461; cv=none; b=MvIn+T7jHA0PLuWgqG7C8aX0WJzePrcDxD9vGERg/fSsPAuc5DP7U7gmW0WpTyz+qzRHEArVKYnRmkZgsyw8hLM/5m0MY2vBEuUptpsdO8GAy+Ig3xYQIqeolPR8+cJfhjY38gfZWPaKnbppIlLLLC2m0slfrl5Cukg1i64zaHk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758134329; c=relaxed/simple;
-	bh=TqE3A9l2moOt53Rhn4bLDHNCQxyxQLB0PPQkFw6K+aM=;
+	s=arc-20240116; t=1758134461; c=relaxed/simple;
+	bh=v5a8HDMTWo9UE7JwWuCAP2Rrqh4yWlt5INN+qU7/k9Y=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=hgpky+HnV6/DL2ioCU1CVgPmvgOHUp/nD5EZTGkPiy7iBtgZdyYBh6Lzqxzqyh/TEHxkvmJpbt75iPqkkMEKbIFrouIq8srH9hqVP2qO6+c7w9K0p7sIdxRlv3XevIRmojwvtChg9XTSaAQTXpSFq7kBVXqnTo/coMFW/LkH2pY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=alien8.de; spf=pass smtp.mailfrom=alien8.de; dkim=pass (4096-bit key) header.d=alien8.de header.i=@alien8.de header.b=BV2wsGOB; arc=none smtp.client-ip=65.109.113.108
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=alien8.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=alien8.de
-Received: from localhost (localhost.localdomain [127.0.0.1])
-	by mail.alien8.de (SuperMail on ZX Spectrum 128k) with ESMTP id 132B940E01A3;
-	Wed, 17 Sep 2025 18:38:43 +0000 (UTC)
-X-Virus-Scanned: Debian amavisd-new at mail.alien8.de
-Authentication-Results: mail.alien8.de (amavisd-new); dkim=pass (4096-bit key)
-	header.d=alien8.de
-Received: from mail.alien8.de ([127.0.0.1])
-	by localhost (mail.alien8.de [127.0.0.1]) (amavisd-new, port 10026)
-	with ESMTP id pXxv3NKnGAaa; Wed, 17 Sep 2025 18:38:39 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=alien8;
-	t=1758134319; bh=lz6EW2NlhQyAUDO56c2jj9Z9w8ykktjlbRhP7nmvwnw=;
+	 Content-Type:Content-Disposition:In-Reply-To; b=pU33ezDuJbo2YyvcUzqqD9r1D8X8yxvo1xYW/XdpwoGMa0S22j4lyIHSls1pUDDrLqTbM76MYxOSNXwXXynJUb5vgIpjSRFXo9HXM5GM36qL2GL5iq5LezORdSDpvlnxfy2gg+sNCTVpFQUkWvGBz5dydFNkxa0EVKvev7rMk1U=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=YEovyDBd; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 11FE7C4CEE7;
+	Wed, 17 Sep 2025 18:40:55 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1758134460;
+	bh=v5a8HDMTWo9UE7JwWuCAP2Rrqh4yWlt5INN+qU7/k9Y=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=BV2wsGOBWx4hOvrDqeKBl2gXzCktne4YARKbnnjBrPQ2wPq2rOwK8Eso1B2mtKBt8
-	 bvAmijJl2FiJE9YATb/mkyN6sptLLotr0CBx+tELaPbYOjXUeFKEHeHY9tpute2bkh
-	 PyHB8gGWTXFRwo6jeqn0c6RQMPbJFvUarwt9CKFFzd5Z6glyKWFnYqqjzENXmm+RpS
-	 ZmygFc1OpgRk4pGGOzfg8I9b7kmnqai+nDbSHpsV2YzaNGDWLjla6ouFOvfci0heV8
-	 KSwfCVpWWzK7ZGA3RaBx/py22mrCmhNiM3VVd9ZxeYoylWRQ24VV+rFVS7grOlZh23
-	 eUHlqw9qyjdtcLWEcSYalx5rZY+kfUdtYg5OXtCofnUGhSm0f/j0MAKbi4GahxuUkX
-	 AHnEQotXFjVQ112PqM0u63cqd1sPU1EL/DDd6DQwzzvRKeoxkNGhL3pwwmAXmI3kxD
-	 6cSduszUliareX7IXQgtBZEadvY10iPOAhi/6JSlAZXcBb86duqnjJCxePGoEzXgOC
-	 up7GEaeNnph8pShUgdGWbmM3WuAplXK5BGzzwEJfPr1JePz3yfNw5o/ocU4G4ojWvd
-	 enQg9OSv77vZJOyJi6b2OD9vSO/ghSzL+M/zQBrenI1icUMkC0OxrNePAb4k/Uj5XI
-	 VaJG4gBrf2GPs7nzQB7IrM10=
-Received: from zn.tnic (p5de8ed27.dip0.t-ipconnect.de [93.232.237.39])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange ECDHE (P-256) server-signature ECDSA (P-256) server-digest SHA256)
-	(No client certificate requested)
-	by mail.alien8.de (SuperMail on ZX Spectrum 128k) with UTF8SMTPSA id DE51440E019E;
-	Wed, 17 Sep 2025 18:38:27 +0000 (UTC)
-Date: Wed, 17 Sep 2025 20:38:21 +0200
-From: Borislav Petkov <bp@alien8.de>
-To: Alexey Kardashevskiy <aik@amd.com>
-Cc: linux-pci@vger.kernel.org, linux-kernel@vger.kernel.org,
-	Bjorn Helgaas <bhelgaas@google.com>,
-	David Woodhouse <dwmw@amazon.co.uk>,
-	Kai-Heng Feng <kai.heng.feng@canonical.com>,
-	Paolo Bonzini <pbonzini@redhat.com>,
-	Sean Christopherson <seanjc@google.com>,
-	Santosh Shukla <santosh.shukla@amd.com>,
-	"Nikunj A. Dadhania" <nikunj@amd.com>,
-	"kvm@vger.kernel.org" <kvm@vger.kernel.org>
-Subject: Re: [RFC PATCH] PCI: Add quirk to always map ivshmem as write-back
-Message-ID: <20250917183821.GDaMsAHa7kVPBt5HAV@fat_crate.local>
-References: <20250612082233.3008318-1-aik@amd.com>
- <20250912164957.GCaMRPNf7P60wqBud9@fat_crate.local>
- <c6e09d1e-c950-4ba7-8773-2062e0c62068@amd.com>
+	b=YEovyDBdAidm++9nE0MUACQWUj04x3i0Ti0RfsJxCYJ/A/Bh9kp/NLbQewbyVy9x6
+	 bG2fy1bnO0c9Z9UrKN1cVoWN6cC2aKk8DcZyLgs+cTEk2CRheotZ/Odnj1mY6ZrT3b
+	 BuUH1ydBNossTwdmb5SUjrluU98XRUxhNSiZi15s9kj/1f47j4sCHxpq3jte2+AmUB
+	 UeRdrUU6hOOlQ0IRdsT8cAtJEyNs9LtTLJTVa1rKrw74CGocsJS5/YBOPWXae5Shev
+	 c818Zgw3Vm9RnlLt2UFWwqZPbzDKMwxtPRdinyciOq29FgoFpiHKDNqVu1zmJhceK7
+	 vQaU+hJE99pvg==
+Date: Wed, 17 Sep 2025 19:40:53 +0100
+From: Simon Horman <horms@kernel.org>
+To: Bobby Eshleman <bobbyeshleman@gmail.com>
+Cc: Stefano Garzarella <sgarzare@redhat.com>, Shuah Khan <shuah@kernel.org>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Stefan Hajnoczi <stefanha@redhat.com>,
+	"Michael S. Tsirkin" <mst@redhat.com>,
+	Jason Wang <jasowang@redhat.com>,
+	Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
+	Eugenio =?utf-8?B?UMOpcmV6?= <eperezma@redhat.com>,
+	"K. Y. Srinivasan" <kys@microsoft.com>,
+	Haiyang Zhang <haiyangz@microsoft.com>,
+	Wei Liu <wei.liu@kernel.org>, Dexuan Cui <decui@microsoft.com>,
+	Bryan Tan <bryan-bt.tan@broadcom.com>,
+	Vishnu Dasa <vishnu.dasa@broadcom.com>,
+	Broadcom internal kernel review list <bcm-kernel-feedback-list@broadcom.com>,
+	virtualization@lists.linux.dev, netdev@vger.kernel.org,
+	linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org,
+	kvm@vger.kernel.org, linux-hyperv@vger.kernel.org,
+	berrange@redhat.com, Bobby Eshleman <bobbyeshleman@meta.com>
+Subject: Re: [PATCH net-next v6 0/9] vsock: add namespace support to
+ vhost-vsock
+Message-ID: <20250917184053.GV394836@horms.kernel.org>
+References: <20250916-vsock-vmtest-v6-0-064d2eb0c89d@meta.com>
+ <20250917161928.GR394836@horms.kernel.org>
+ <aMri5apAxBpHtZbJ@devvm11784.nha0.facebook.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -85,38 +77,38 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <c6e09d1e-c950-4ba7-8773-2062e0c62068@amd.com>
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <aMri5apAxBpHtZbJ@devvm11784.nha0.facebook.com>
 
-On Mon, Sep 15, 2025 at 05:43:33PM +1000, Alexey Kardashevskiy wrote:
-> yeah, sadly, there is one - people are actually using it, for, like,
-> a decade, and not exactly keen on changing those user space tools :) Hence
-> "RFC".
-
-Then this commit message needs a lot more explanation as it is something the
-kernel should support apparently when running as a guest...
-
-But then, if it has been used for a decade already, why do you need that quirk
-now? No one has noticed in 10 years time...?
-
-> > >   	else
-> > > +	else if (!(pci_resource_flags(pdev, bar) & IORESOURCE_CACHEABLE))
-> > 	^^^^^^
+On Wed, Sep 17, 2025 at 09:33:41AM -0700, Bobby Eshleman wrote:
+> On Wed, Sep 17, 2025 at 05:19:28PM +0100, Simon Horman wrote:
+> > On Tue, Sep 16, 2025 at 04:43:44PM -0700, Bobby Eshleman wrote:
 > > 
-> > This can't build.
+> > ...
+> > 
+> > > base-commit: 949ddfb774fe527cebfa3f769804344940f7ed2e
+> > 
+> > Hi Bobby,
+> > 
+> > This series does not seem to compile when applied to the commit above.
+> > Likewise when applied to current net-next (which is now slightly newer).
+> > 
+> > hyperv_transport.c: In function ‘hvs_open_connection’:
+> > hyperv_transport.c:316:14: error: too few arguments to function ‘vsock_find_bound_socket’
+> >   316 |         sk = vsock_find_bound_socket(&addr, vsock_global_dummy_net());
+> >       |              ^~~~~~~~~~~~~~~~~~~~~~~
+> > In file included from hyperv_transport.c:15:
+> > /home/horms/projects/linux/linux/include/net/af_vsock.h:218:14: note: declared here
+> >   218 | struct sock *vsock_find_bound_socket(struct sockaddr_vm *addr, struct net *net,
+> >       |              ^~~~~~~~~~~~~~~~~~~~~~~
+> > 
+> > -- 
+> > pw-bot: changes-requested
 > 
-> Why? Compiles and works just fine.
+> Ah dang it, looks like I had hvc disabled when I build tested it.
+> 
+> Thanks for the catch, I'll fix this in the next rev.
 
-Here's a more detailed explanation:
-
-https://lore.kernel.org/r/202506131608.QlkxUPnI-lkp@intel.com
-
-You haven't replaced the "else" with "else if" but left it there.
-
-Thx.
-
--- 
-Regards/Gruss,
-    Boris.
-
-https://people.kernel.org/tglx/notes-about-netiquette
+Thanks, that would explain things.
+Stuff happens :)
 
