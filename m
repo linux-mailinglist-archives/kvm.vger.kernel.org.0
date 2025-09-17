@@ -1,260 +1,114 @@
-Return-Path: <kvm+bounces-57950-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-57951-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 801ABB82087
-	for <lists+kvm@lfdr.de>; Wed, 17 Sep 2025 23:52:16 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2635FB820CF
+	for <lists+kvm@lfdr.de>; Wed, 17 Sep 2025 23:56:42 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 6BE801C24751
-	for <lists+kvm@lfdr.de>; Wed, 17 Sep 2025 21:52:33 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5C97B322B4E
+	for <lists+kvm@lfdr.de>; Wed, 17 Sep 2025 21:56:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2938230FC25;
-	Wed, 17 Sep 2025 21:51:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 25ACA30CB58;
+	Wed, 17 Sep 2025 21:56:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="zf/F+8ac"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="cLILqsL6"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pl1-f202.google.com (mail-pl1-f202.google.com [209.85.214.202])
+Received: from mail-pj1-f74.google.com (mail-pj1-f74.google.com [209.85.216.74])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C0E7B30DECA
-	for <kvm@vger.kernel.org>; Wed, 17 Sep 2025 21:51:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 103EF261B70
+	for <kvm@vger.kernel.org>; Wed, 17 Sep 2025 21:56:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.74
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758145878; cv=none; b=untcregLH0dPBuS4onRcRP9ALxRK207RIv1RWRJcAzDVcPuStPcHmrjJluEsSvWPd9lQm0rGnxcuV1B/IK39SNdct5Bif1R44PI2PN2L1xyvvP1zZsI+mqd+RCyBM7qr3PxorxlkCmkYpKNSX8Ob97Wv3fl7haxVy1FdS+DnwjY=
+	t=1758146189; cv=none; b=NBj+Kg9DX0TkAV82Edo1aQ3r2w4B2y4O0tiwyky3CEQ6vM9RXKT3jffOk3vhlOWbfM5+AnKHFFcbg4Hl+BzXiuTHaASWo5fcdcFXxbTA4Xh7Am8SzLMxgyBoc2poUwHPYi+F7W37afqt2nvRBrRUWI2hmYOr3OJrOG1khAgJVJQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758145878; c=relaxed/simple;
-	bh=ZHa0B2RyRZZWLlneOhPUdWjyzFgnqipxJK7LB4AWbX0=;
+	s=arc-20240116; t=1758146189; c=relaxed/simple;
+	bh=ISMK7DM43Nk4mIV0A/GH5D71wvjF9kfvLj8iGbNKtas=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=fuZrLuzvH27FbjpU0O3zkqg/ztB7DnFi0S9lbmqi8kgpLb4Uh83fCnkYaYQRKmIVW+ze9qim6xkFWxBDoO+N1m6MRpmwzdVRmVHhk2JgvZPLlsJj4pKXbjn5WTdjDo2L5le8uz2MZM6Kj21+Ena0R9cR/tliF0WKPw9uhGi6CZY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--jmattson.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=zf/F+8ac; arc=none smtp.client-ip=209.85.214.202
+	 To:Cc:Content-Type; b=UkkT/4S684yt/KgZjezU82c5fBJTLNPWcQDZ0/X01JCdAJ6pq0BJ8SGha3fbXqS7cCrO1CL0MoXk5F72kbepgQBQmi1lggJaDwn9DA0lGd1mm3qr9mMzIp1ZXZmfxakH4FQriAsIagWYWvgCazrLXg7IM7BYLipYCvKPIMMa8Lk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=cLILqsL6; arc=none smtp.client-ip=209.85.216.74
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--jmattson.bounces.google.com
-Received: by mail-pl1-f202.google.com with SMTP id d9443c01a7336-24458274406so4672675ad.3
-        for <kvm@vger.kernel.org>; Wed, 17 Sep 2025 14:51:16 -0700 (PDT)
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+Received: by mail-pj1-f74.google.com with SMTP id 98e67ed59e1d1-329cb4c3f78so165598a91.2
+        for <kvm@vger.kernel.org>; Wed, 17 Sep 2025 14:56:27 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1758145876; x=1758750676; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1758146187; x=1758750987; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=5LPrk/XrebsawKeQuGZAG8oqG4rtdkfDSdLwnedRBtY=;
-        b=zf/F+8acakUrGVvkPqJBm09jHumox5HWGxK10QenjcFR/HEOUrItbbDXG1FbHQF2LU
-         Yn42WGuivoJ8Es0aFhzM9LBGBXfEiSv8gs6D0/SwxsP9Ds9Q1wtpr5+r3eQ6BJkdHiLV
-         62ySUy9of21fXeKV1pM3tnbIM32f66Gs4D/kyek5iLdvvN4Y+M9Yzu+wfawFA/ly7Tei
-         MLcE/1AWMpNpCMUX51n+FN7afZln7UdVf5qDezlx91VPrq9VwQZ2ndPdhjWigze1wFVl
-         wp7N3gyZG44e5EKUer5rqcnpjNeySjSO0ZfpFslaLNvcq/6MqiYl1CZ9aBw/fFLpH550
-         ZGTw==
+        bh=nEBSWYKD+SqnMEh1+pQSHNZcrfb8li51aiqDJLMcodY=;
+        b=cLILqsL6p1LsctF5I8ga5NcvgrJs4o0v3v2cyNFUtLb75StqKG/cJ8NsiEOfsASRLW
+         uzTHzFReXaT2ImvmpIkPpOPuJPh2Sr9yAW947OQ6ccSYmTNAPbmIs9MjgcXeOp0EPRf0
+         8YgX4Zgxjirv77Exe41hXPF7cyif9d7EsGsF9VwLXl0FbPRlaFt03sCZiF6BwP8BodEH
+         nieYtdB4B6As2pKMpCWz9xXo84nWW0dB6Hy81hoIp/RhsBk5CZC/y9/sSZSebW0vN6n7
+         oC0DaFWxHQG0XqNuObxEBNGEKhlraXYlZpVPVPLG4zW8X6SbVBKLlVV3pTaSfkcmkakJ
+         5Pww==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1758145876; x=1758750676;
+        d=1e100.net; s=20230601; t=1758146187; x=1758750987;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=5LPrk/XrebsawKeQuGZAG8oqG4rtdkfDSdLwnedRBtY=;
-        b=CL4FvV5RH8zSOun7GTJSCdP6NPQwqufQiOrCDdaM8oOA/J7L3O9T82EXzWXBG/oks2
-         RBVZlnrJ8+MNQv/Z0Q9NZGNYgee5fr1AKitjNU07PW+TjuUyL5cLaMqFcH24UPQJBsca
-         ioex8haJSmlCRN3+lf7DvM8o5EHMvntTrccFHMbojVACfbFhjS5/htQrKnHdrfGNmf+u
-         2vDEkUqyFKRLRrnuuf4JHn/IYRvAs9OJKWSzOmEwzECLOs0W1fgVaBQtcIEeP8N9CIHI
-         w6SzmCgI2q9mxmzvllKPtOl+uS+8JZ+soGJIjNYyC44Tp2NwW1MWvLwSnNUGHcdbuGdk
-         y3/w==
-X-Forwarded-Encrypted: i=1; AJvYcCVrwqyq1lUPXAqNBunxLJdBpe407QJuLaOSz2itkLxmtmPiLB7cvpH87bXRv2nMFuyHH+w=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyjQt60d6NSgxybq5mOfOdxMckozMs7Ij9EShSINl551zF1N8Qe
-	l87l7vzEzRHQ3fkaL128+yogORf25VVfZth7O2DkB7vuA0f3YMU6bVZQkLmEisAS6t2J+fyqxLz
-	+Acbisy+Mn2twhA==
-X-Google-Smtp-Source: AGHT+IFoisWsHyss64Oz8zIvxNbXaBwzLk0hgbLNl+OnOjuMwsVc60SyjmWex22OLqE66ILVy9fzMQNhZRGkuA==
-X-Received: from pjwx7.prod.google.com ([2002:a17:90a:c2c7:b0:327:d54a:8c93])
- (user=jmattson job=prod-delivery.src-stubby-dispatcher) by
- 2002:a17:903:38c7:b0:264:3519:80d0 with SMTP id d9443c01a7336-268137f8405mr45310735ad.33.1758145875970;
- Wed, 17 Sep 2025 14:51:15 -0700 (PDT)
-Date: Wed, 17 Sep 2025 14:48:40 -0700
-In-Reply-To: <20250917215031.2567566-1-jmattson@google.com>
+        bh=nEBSWYKD+SqnMEh1+pQSHNZcrfb8li51aiqDJLMcodY=;
+        b=J/UioILSNx2rxJX7iICnvFWMV9Wpgp64KNSzocLU/wOFBD5v59EEW7sLOx5cjZifdk
+         KKCAwjBdKdb0IUeSWi7fkEKBg+4IkM6vnVQSKDftlB0bHf1EwCqn5l33vHLMp0OdNQ30
+         z7dGDlhkxzRKQeapR3HL6zRrXtIDz6mbGOC2bndnLQHg0mdl9IDOx+SNmkvA46cvCqEi
+         LaDQ+t/EC//XH0S7U1L/URytYjFbTHY+LVggVJcWKntfi1PlYFV4SCCt7j3o4zN5RIW3
+         DXQqJQaUMBavh5URi+gG+Ozr3wipyYNTMQjR84pKNqOaHo2ZVY00eipb4h8RwIm1oydZ
+         5bCw==
+X-Forwarded-Encrypted: i=1; AJvYcCWQtiBygdNpoMDNIrW9pDpGjxXX/sb5IqM4My9ZYRLZPCuGQWBRoOOVD7DJqrpL/GHJZhA=@vger.kernel.org
+X-Gm-Message-State: AOJu0YydTex+GOLeUi4pT2EZhEBUvcmpgCm5PFU+5bB7dK/FbWussDlO
+	+5y66JRNf93bwBKokcvsjAVWXjYlGr5dINdBjhAgjfj2YkRlpgUtDQW+12mVHmGg5ZE+FnvUR/e
+	oBmvbkA==
+X-Google-Smtp-Source: AGHT+IHOXqIQmTAugf15BrDiV6HcY4fQ6ZvPzwSIXYUDhSteM2Wo5XdQ+I1dxHg6x0puKwyQc7KGqYKDSZo=
+X-Received: from pjbnb15.prod.google.com ([2002:a17:90b:35cf:b0:328:116e:273])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:390a:b0:329:f670:2624
+ with SMTP id 98e67ed59e1d1-32ee3f2488dmr4339532a91.30.1758146187259; Wed, 17
+ Sep 2025 14:56:27 -0700 (PDT)
+Date: Wed, 17 Sep 2025 14:56:25 -0700
+In-Reply-To: <aMqt46hxeKxCxkmq@google.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
-References: <20250917215031.2567566-1-jmattson@google.com>
-X-Mailer: git-send-email 2.51.0.470.ga7dc726c21-goog
-Message-ID: <20250917215031.2567566-5-jmattson@google.com>
-Subject: [PATCH 4/4] KVM: selftests: Add a VMX test for LA57 nested state
-From: Jim Mattson <jmattson@google.com>
-To: Paolo Bonzini <pbonzini@redhat.com>, Shuah Khan <shuah@kernel.org>, 
-	Sean Christopherson <seanjc@google.com>, Bibo Mao <maobibo@loongson.cn>, 
-	Huacai Chen <chenhuacai@kernel.org>, Andrew Jones <ajones@ventanamicro.com>, 
-	Claudio Imbrenda <imbrenda@linux.ibm.com>, "Pratik R. Sampat" <prsampat@amd.com>, 
-	Kai Huang <kai.huang@intel.com>, Eric Auger <eric.auger@redhat.com>, 
-	linux-kernel@vger.kernel.org, kvm@vger.kernel.org, 
-	linux-kselftest@vger.kernel.org
-Cc: Jim Mattson <jmattson@google.com>
-Content-Type: text/plain; charset="UTF-8"
+References: <20250912232319.429659-1-seanjc@google.com> <20250912232319.429659-10-seanjc@google.com>
+ <c4b9d87b-fddc-420b-ac86-7da48a42610f@linux.intel.com> <aMqt46hxeKxCxkmq@google.com>
+Message-ID: <aMsuiTIUlulepJly@google.com>
+Subject: Re: [PATCH v15 09/41] KVM: x86: Load guest FPU state when access
+ XSAVE-managed MSRs
+From: Sean Christopherson <seanjc@google.com>
+To: Binbin Wu <binbin.wu@linux.intel.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	Tom Lendacky <thomas.lendacky@amd.com>, Mathias Krause <minipli@grsecurity.net>, 
+	John Allen <john.allen@amd.com>, Rick Edgecombe <rick.p.edgecombe@intel.com>, 
+	Chao Gao <chao.gao@intel.com>, Maxim Levitsky <mlevitsk@redhat.com>, 
+	Xiaoyao Li <xiaoyao.li@intel.com>, Zhang Yi Z <yi.z.zhang@linux.intel.com>
+Content-Type: text/plain; charset="us-ascii"
 
-Add a selftest that verifies KVM's ability to save and restore
-nested state when the L1 guest is using 5-level paging and the L2
-guest is using 4-level paging. Specifically, canonicality tests of
-the VMCS12 host-state fields should accept 57-bit virtual addresses.
+On Wed, Sep 17, 2025, Sean Christopherson wrote:
+> On Tue, Sep 16, 2025, Binbin Wu wrote:
+> > > +/*
+> > > + * Lock and/or reload guest FPU and access xstate MSRs. For accesses initiated
+> > 
+> > 
+> > Lock is unconditional and reload is conditional.
+> > "and/or" seems not accurate?
+> 
+> Agreed.  This?
+> 
+> /*
+>  * Lock andr (re)load guest FPU and access xstate MSRs. For accesses initiated
+>  * by host, guest FPU is loaded in __msr_io(). For accesses initiated by guest,
+>  * guest FPU should have been loaded already.
+>  */
 
-Signed-off-by: Jim Mattson <jmattson@google.com>
----
- tools/testing/selftests/kvm/Makefile.kvm      |   1 +
- .../kvm/x86/vmx_la57_nested_state_test.c      | 137 ++++++++++++++++++
- 2 files changed, 138 insertions(+)
- create mode 100644 tools/testing/selftests/kvm/x86/vmx_la57_nested_state_test.c
+That's not very good either.
 
-diff --git a/tools/testing/selftests/kvm/Makefile.kvm b/tools/testing/selftests/kvm/Makefile.kvm
-index 41b40c676d7f..f1958b88ec59 100644
---- a/tools/testing/selftests/kvm/Makefile.kvm
-+++ b/tools/testing/selftests/kvm/Makefile.kvm
-@@ -116,6 +116,7 @@ TEST_GEN_PROGS_x86 += x86/vmx_exception_with_invalid_guest_state
- TEST_GEN_PROGS_x86 += x86/vmx_msrs_test
- TEST_GEN_PROGS_x86 += x86/vmx_invalid_nested_guest_state
- TEST_GEN_PROGS_x86 += x86/vmx_set_nested_state_test
-+TEST_GEN_PROGS_x86 += x86/vmx_la57_nested_state_test
- TEST_GEN_PROGS_x86 += x86/vmx_tsc_adjust_test
- TEST_GEN_PROGS_x86 += x86/vmx_nested_tsc_scaling_test
- TEST_GEN_PROGS_x86 += x86/apic_bus_clock_test
-diff --git a/tools/testing/selftests/kvm/x86/vmx_la57_nested_state_test.c b/tools/testing/selftests/kvm/x86/vmx_la57_nested_state_test.c
-new file mode 100644
-index 000000000000..7c3c4c1c17f6
---- /dev/null
-+++ b/tools/testing/selftests/kvm/x86/vmx_la57_nested_state_test.c
-@@ -0,0 +1,137 @@
-+// SPDX-License-Identifier: GPL-2.0-only
-+/*
-+ * vmx_la57_nested_state_test
-+ *
-+ * Copyright (C) 2025, Google LLC.
-+ *
-+ * Test KVM's ability to save and restore nested state when the L1 guest
-+ * is using 5-level paging and the L2 guest is using 4-level paging.
-+ *
-+ * This test would have failed prior to commit 9245fd6b8531 ("KVM: x86:
-+ * model canonical checks more precisely").
-+ */
-+#include "test_util.h"
-+#include "kvm_util.h"
-+#include "processor.h"
-+#include "vmx.h"
-+
-+#define LA57_GS_BASE 0xff2bc0311fb00000ull
-+
-+static void l2_guest_code(void)
-+{
-+	/*
-+	 * Sync with L0 to trigger save/restore.  After
-+	 * resuming, execute VMCALL to exit back to L1.
-+	 */
-+	GUEST_SYNC(1);
-+	vmcall();
-+}
-+
-+static void l1_guest_code(struct vmx_pages *vmx_pages)
-+{
-+#define L2_GUEST_STACK_SIZE 64
-+	unsigned long l2_guest_stack[L2_GUEST_STACK_SIZE];
-+	u64 guest_cr4;
-+	vm_paddr_t pml5_pa, pml4_pa;
-+	u64 *pml5;
-+	u64 exit_reason;
-+
-+	/* Set GS_BASE to a value that is only canonical with LA57. */
-+	wrmsr(MSR_GS_BASE, LA57_GS_BASE);
-+	GUEST_ASSERT(rdmsr(MSR_GS_BASE) == LA57_GS_BASE);
-+
-+	GUEST_ASSERT(vmx_pages->vmcs_gpa);
-+	GUEST_ASSERT(prepare_for_vmx_operation(vmx_pages));
-+	GUEST_ASSERT(load_vmcs(vmx_pages));
-+
-+	prepare_vmcs(vmx_pages, l2_guest_code,
-+		     &l2_guest_stack[L2_GUEST_STACK_SIZE]);
-+
-+	/*
-+	 * Set up L2 with a 4-level page table by pointing its CR3 to L1's
-+	 * PML4 table and clearing CR4.LA57. This creates the CR4.LA57
-+	 * mismatch that exercises the bug.
-+	 */
-+	pml5_pa = get_cr3() & PHYSICAL_PAGE_MASK;
-+	pml5 = (u64 *)pml5_pa;
-+	pml4_pa = pml5[0] & PHYSICAL_PAGE_MASK;
-+	vmwrite(GUEST_CR3, pml4_pa);
-+
-+	guest_cr4 = vmreadz(GUEST_CR4);
-+	guest_cr4 &= ~X86_CR4_LA57;
-+	vmwrite(GUEST_CR4, guest_cr4);
-+
-+	GUEST_ASSERT(!vmlaunch());
-+
-+	exit_reason = vmreadz(VM_EXIT_REASON);
-+	GUEST_ASSERT(exit_reason == EXIT_REASON_VMCALL);
-+}
-+
-+void guest_code(struct vmx_pages *vmx_pages)
-+{
-+	if (vmx_pages)
-+		l1_guest_code(vmx_pages);
-+
-+	GUEST_DONE();
-+}
-+
-+int main(int argc, char *argv[])
-+{
-+	vm_vaddr_t vmx_pages_gva = 0;
-+	struct kvm_vm *vm;
-+	struct kvm_vcpu *vcpu;
-+	struct kvm_x86_state *state;
-+	struct ucall uc;
-+	int stage;
-+
-+	TEST_REQUIRE(kvm_cpu_has(X86_FEATURE_VMX));
-+	TEST_REQUIRE(kvm_cpu_has(X86_FEATURE_LA57));
-+	TEST_REQUIRE(kvm_has_cap(KVM_CAP_NESTED_STATE));
-+
-+	vm = vm_create_shape_with_one_vcpu(VM_SHAPE(VM_MODE_PXXV57_4K), &vcpu,
-+					   guest_code);
-+
-+	/*
-+	 * L1 needs to read its own PML5 table to set up L2. Identity map
-+	 * the PML5 table to facilitate this.
-+	 */
-+	virt_map(vm, vm->pgd, vm->pgd, 1);
-+
-+	vcpu_alloc_vmx(vm, &vmx_pages_gva);
-+	vcpu_args_set(vcpu, 1, vmx_pages_gva);
-+
-+	for (stage = 1;; stage++) {
-+		vcpu_run(vcpu);
-+		TEST_ASSERT_KVM_EXIT_REASON(vcpu, KVM_EXIT_IO);
-+
-+		switch (get_ucall(vcpu, &uc)) {
-+		case UCALL_ABORT:
-+			REPORT_GUEST_ASSERT(uc);
-+			/* NOT REACHED */
-+		case UCALL_SYNC:
-+			break;
-+		case UCALL_DONE:
-+			goto done;
-+		default:
-+			TEST_FAIL("Unknown ucall %lu", uc.cmd);
-+		}
-+
-+		TEST_ASSERT(uc.args[1] == stage,
-+			    "Expected stage %d, got stage %lu", stage, (ulong)uc.args[1]);
-+		if (stage == 1) {
-+			pr_info("L2 is active; performing save/restore.\n");
-+			state = vcpu_save_state(vcpu);
-+
-+			kvm_vm_release(vm);
-+
-+			/* Restore state in a new VM. */
-+			vcpu = vm_recreate_with_one_vcpu(vm);
-+			vcpu_load_state(vcpu, state);
-+			kvm_x86_state_cleanup(state);
-+		}
-+	}
-+
-+done:
-+	kvm_vm_free(vm);
-+	return 0;
-+}
--- 
-2.51.0.470.ga7dc726c21-goog
-
+/*
+ * Lock (and if necessary, re-load) the guest FPU, i.e. XSTATE, and access an
+ * MSR that is managed via XSTATE.  Note, the caller is responsible for doing
+ * the initial FPU load, this helper only ensures that guest state is resident
+ * in hardware (the kernel can load its FPU state in IRQ context).
+ */
 
