@@ -1,118 +1,131 @@
-Return-Path: <kvm+bounces-57915-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-57916-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5B4F6B81111
-	for <lists+kvm@lfdr.de>; Wed, 17 Sep 2025 18:42:39 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 155C2B8115C
+	for <lists+kvm@lfdr.de>; Wed, 17 Sep 2025 18:53:04 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 0676A1C220FB
-	for <lists+kvm@lfdr.de>; Wed, 17 Sep 2025 16:43:01 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 6F1887B1C8E
+	for <lists+kvm@lfdr.de>; Wed, 17 Sep 2025 16:51:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4280D2FAC07;
-	Wed, 17 Sep 2025 16:42:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B516B2FB0A6;
+	Wed, 17 Sep 2025 16:52:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Twr6BXe3"
+	dkim=pass (2048-bit key) header.d=zytor.com header.i=@zytor.com header.b="V/LDiHD5"
 X-Original-To: kvm@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mail.zytor.com (terminus.zytor.com [198.137.202.136])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5BA302F3C3A;
-	Wed, 17 Sep 2025 16:42:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CF4E22F25F4;
+	Wed, 17 Sep 2025 16:52:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.136
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758127348; cv=none; b=YScKqKgQtJs5IoxvIMD0JS4kus07WAxOiRRyolc1fijocMai6DK1By15d8fmZQJPp1Y9MpDKORElokSBb+InQz2x11i6aVDRd/4sYD12FVL+6oBxKJmdN6EqfYitLE/N7S+KwH8clPSZ0fN24Vznb9RfWuS0wqlJKE5Lz5Z2sFo=
+	t=1758127969; cv=none; b=O/mH2JsOKr3kwkj89QfUNE1/Fo2gEtsM5gcX2HpRI/dcZLSDbPv9eIJyzgBgMBIaUzGMetBdhI7rd7u+sK94l/vOBMJBRNFTBPLWWHBdIjaG/kaiTKrwKF5g8brDSYvFvu2FY83Ye8x26XBgAtxavjNcUYk1xdIbijhW0Perl28=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758127348; c=relaxed/simple;
-	bh=sDmYzAVvLUWz02x4KttZh7bEAnkvy0jlE24JN3RphD8=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=OBe2Q+cXSX0NUBpOuqCJZxwGmkGzdZUQIRDlcaqlNdlqHJ33ZcMe3EU20UQfe4c1v2hx0vkr3xiLdcaPtE2+V2lkDp7qJ0nrWgfbllj3xf+oDaC+vJb44cYNUhoR8FvoSgRO05FY9tcxRovzXbnQNMVEjrDEp1edcvMT1m4dX4M=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Twr6BXe3; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id CF2B3C4CEE7;
-	Wed, 17 Sep 2025 16:42:27 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1758127347;
-	bh=sDmYzAVvLUWz02x4KttZh7bEAnkvy0jlE24JN3RphD8=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=Twr6BXe3WCu6jxGVx+sQE0MdQCydPBXeCkRNwPm12DNUXpQgMsaGRxeN242HdBfgs
-	 g5Fc7Zeg1VQtAVbgNwwk2772RbCSoxsfZZdbZFfOPACoyNPdH7A8Ysfmy1eADzPC/w
-	 LwJ8UEs0ozzRt3lK/0HWqqBWc3iVQ26KVHDKMjHpYuq7rwt29UP0OkpV7xHhfWExA7
-	 qxSRIGuo0PYJovFKeV0vwa6+xkUUwMEcXpXZsRfrpvqmu7QZ8TT3XGM0kizlwsL5Vq
-	 HmvvP6BqSZryj+7MnGKRW8OJmcZTvVb/820BXM4US5UL5uF/Tj1TI2A/2/X+gkN3ft
-	 4Z117DwucYWoQ==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.98.2)
-	(envelope-from <maz@kernel.org>)
-	id 1uyvEf-00000007ACT-1qGd;
-	Wed, 17 Sep 2025 16:42:25 +0000
-From: Marc Zyngier <maz@kernel.org>
-To: linux-arm-kernel@lists.infradead.org,
-	kvmarm@lists.linux.dev,
-	linux-kernel@vger.kernel.org,
-	kvm@vger.kernel.org,
-	Sascha Bischoff <Sascha.Bischoff@arm.com>
-Cc: nd <nd@arm.com>,
-	oliver.upton@linux.dev,
-	Joey Gouly <Joey.Gouly@arm.com>,
-	Suzuki Poulose <Suzuki.Poulose@arm.com>,
-	yuzenghui@huawei.com,
-	will@kernel.org,
-	tglx@linutronix.de,
-	lpieralisi@kernel.org,
-	Timothy Hayes <Timothy.Hayes@arm.com>
-Subject: Re: [PATCH 0/5] KVM: arm64: GICv5 legacy (GCIE_LEGACY) NV enablement and cleanup
-Date: Wed, 17 Sep 2025 17:42:21 +0100
-Message-Id: <175812733344.1632579.17001899303582807634.b4-ty@kernel.org>
-X-Mailer: git-send-email 2.39.2
-In-Reply-To: <20250828105925.3865158-1-sascha.bischoff@arm.com>
-References: <20250828105925.3865158-1-sascha.bischoff@arm.com>
+	s=arc-20240116; t=1758127969; c=relaxed/simple;
+	bh=9ZuIhxb7j89AL3MoU7yuTqHNkjqkJwhrbEz4OeA/DGg=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=YDGCtWGKVa/6QX+mcGyk/IxzTqE7WCrdzN9hJ/kkwc5QNZuPV/iRSGKm4a8ARylmDmqctqgr9kIc5uwx2qi5Slh6BiK5+zQ3Zje+sbnoThtXE3760v0IFCsvz9/YJHQdf9NZahwCbOo5P9CQoHttLZJ4n3Vi+CWncwSjlWta2Rw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=zytor.com; spf=pass smtp.mailfrom=zytor.com; dkim=pass (2048-bit key) header.d=zytor.com header.i=@zytor.com header.b=V/LDiHD5; arc=none smtp.client-ip=198.137.202.136
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=zytor.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=zytor.com
+Received: from [0.0.0.0] ([134.134.139.75])
+	(authenticated bits=0)
+	by mail.zytor.com (8.18.1/8.17.1) with ESMTPSA id 58HGpYZn2409694
+	(version=TLSv1.3 cipher=TLS_AES_128_GCM_SHA256 bits=128 verify=NO);
+	Wed, 17 Sep 2025 09:51:35 -0700
+DKIM-Filter: OpenDKIM Filter v2.11.0 mail.zytor.com 58HGpYZn2409694
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=zytor.com;
+	s=2025082201; t=1758127897;
+	bh=75+BjUw+9gU0MekRd3BMbsTFQce4HYaUBo14zvUMfuA=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=V/LDiHD5kB599xzhqiSbqt2KQ36sG3F2s/T+fdwDNVVSlfl6LIVnffivj32U3d4fp
+	 XEkXSrcUYePnD0g8S2c5hQqjyvgt1HhN1DDbvBAvdjCTt9jtA1FUn3Q6CWAS3N3scm
+	 A3qaYPp5m9sRjtj0DI3FgZ07lF3iSD2M2CQ7RGJwdxSPIWeSctQIYKbetjUS+DCgSS
+	 BYpWmZP5fSpJWN2nuBJsBDVlIam9uvxwatiNsTf7Lr29P9AvFlqlJSCOqfRgR/3tUB
+	 Klww7aW6Ls92bP/qVHo+3YkJW4b1Wv0PVDCe/avKmbe1d0jWPyodsNmLqcKLAayH4o
+	 mM/9ubxfVILQQ==
+Message-ID: <e0ce7a92-f8e4-406c-a7dd-c59c8d541d0b@zytor.com>
+Date: Wed, 17 Sep 2025 09:51:29 -0700
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 8bit
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, linux-kernel@vger.kernel.org, kvm@vger.kernel.org, Sascha.Bischoff@arm.com, nd@arm.com, oliver.upton@linux.dev, Joey.Gouly@arm.com, Suzuki.Poulose@arm.com, yuzenghui@huawei.com, will@kernel.org, tglx@linutronix.de, lpieralisi@kernel.org, Timothy.Hayes@arm.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+User-Agent: Mozilla Thunderbird
+Subject: Re: [RFC PATCH v1 5/5] KVM: Remove kvm_rebooting and its references
+To: Sean Christopherson <seanjc@google.com>
+Cc: linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        linux-pm@vger.kernel.org, pbonzini@redhat.com, tglx@linutronix.de,
+        mingo@redhat.com, bp@alien8.de, dave.hansen@linux.intel.com,
+        x86@kernel.org, hpa@zytor.com, rafael@kernel.org, pavel@kernel.org,
+        brgerst@gmail.com, david.kaplan@amd.com, peterz@infradead.org,
+        andrew.cooper3@citrix.com, kprateek.nayak@amd.com,
+        arjan@linux.intel.com, chao.gao@intel.com, rick.p.edgecombe@intel.com,
+        dan.j.williams@intel.com
+References: <20250909182828.1542362-1-xin@zytor.com>
+ <20250909182828.1542362-6-xin@zytor.com> <aMmk0lUJ8gs7OBw-@google.com>
+Content-Language: en-US
+From: Xin Li <xin@zytor.com>
+Autocrypt: addr=xin@zytor.com; keydata=
+ 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
+ l75w1xInsg==
+In-Reply-To: <aMmk0lUJ8gs7OBw-@google.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-On Thu, 28 Aug 2025 10:59:41 +0000, Sascha Bischoff wrote:
-> This series enables nested virtualization for GICv3-based VMs on GICv5
-> hosts (w/ FEAT_GCIE_LEGACY) in KVM/arm64. In addition, it adds a CPU
-> capability to track support for FEAT_GCIE_LEGACY across all CPUs.
+On 9/16/2025 10:56 AM, Sean Christopherson wrote:
+> On Tue, Sep 09, 2025, Xin Li (Intel) wrote:
+>> Drop kvm_rebooting and all related uses.  Virtualization is now disabled
+>> immediately before a CPU shuts down, eliminating any chance of executing
+>> virtualization instructions during reboot.
 > 
-> The series fixes ICC_SRE_EL2 access handling for GICv5 hosts (to match
-> the updated bet1+ specification [1]), and extends nested
-> virtualization support to vGICv3 guests running on compatible GICv5
-> systems. With these changes, it becomes possible to run with
-> kvm-arm.mode=nested, and these changes have been tested with three
-> levels of nesting on simulated hardware (Arm FVP).
+> Wrong.  KVM clears EFER.SVME in reponse to kvm_shutdown(), and thus can trip
+> #UDs on e.g. VMRUN.
 > 
-> [...]
 
-Applied to next, thanks!
+This patch assumes that AMD SVM enable/disable has been moved to the CPU
+startup and shutdown routines.  Accordingly, kvm_shutdown() no longer 
+clears EFER.SVME, and the patch demonstrates the resulting simplification 
+from removing kvm_rebooting.  However, as noted in the cover letter, no 
+actual modifications were made to AMD SVM.
 
-[1/5] KVM: arm64: Allow ICC_SRE_EL2 accesses on a GICv5 host
-      (no commit info)
-[2/5] KVM: arm64: Enable nested for GICv5 host with FEAT_GCIE_LEGACY
-      commit: d5a012af348d4d84287267547eb8637b937545af
-[3/5] arm64: cpucaps: Add GICv5 Legacy vCPU interface (GCIE_LEGACY) capability
-      commit: 7847f51189343b29a24ca7edafb60a9032d5acf8
-[4/5] KVM: arm64: Use ARM64_HAS_GICV5_LEGACY for GICv5 probing
-      commit: 754e43b09561f59dd04e0b8aafe4f5c9a71a4d1f
-[5/5] irqchip/gic-v5: Drop has_gcie_v3_compat from gic_kvm_info
-      commit: 5c5db9efe323dd0b0d7917dbe5b9c0999c95e79e
+Is this what seems wrong to you?
 
-Cheers,
-
-	M.
--- 
-Without deviation from the norm, progress is not possible.
-
-
+Thanks!
+     Xin
 
