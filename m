@@ -1,134 +1,171 @@
-Return-Path: <kvm+bounces-57830-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-57831-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 729DCB7FF90
-	for <lists+kvm@lfdr.de>; Wed, 17 Sep 2025 16:28:22 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 383B5B7C3EE
+	for <lists+kvm@lfdr.de>; Wed, 17 Sep 2025 13:56:33 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 63B457B47A0
-	for <lists+kvm@lfdr.de>; Wed, 17 Sep 2025 08:47:25 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3E818463E9C
+	for <lists+kvm@lfdr.de>; Wed, 17 Sep 2025 09:29:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4AC113093BD;
-	Wed, 17 Sep 2025 08:48:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A644F30C63A;
+	Wed, 17 Sep 2025 09:28:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="cL9TFGmG"
+	dkim=pass (2048-bit key) header.d=smartx-com.20230601.gappssmtp.com header.i=@smartx-com.20230601.gappssmtp.com header.b="qqO+9jS1"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.7])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f174.google.com (mail-pl1-f174.google.com [209.85.214.174])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CD5D4263F36;
-	Wed, 17 Sep 2025 08:48:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.7
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 66187309F0C
+	for <kvm@vger.kernel.org>; Wed, 17 Sep 2025 09:28:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.174
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758098934; cv=none; b=AHTnDNdyHFHucDaU8Us34MgW7eQLiQXLZmGh76QlLy8LVSoH/V/SIsMxlnG47qiifj0lPNwJ2OLNZcy+/LFuK2QTnF6ZO0uIE3TKGh1MpTT/cuU3kiZ5j/aDNd23n9CcnonzZdc2Vqn1/Dugm8wUBzQ1K55+35jvv9p4Z1Wwphg=
+	t=1758101316; cv=none; b=U7UlZQayiWqMom5gh7n6St3CYKoicM9NFmEKXez/byHmXbsGfywscu1v6nhPsj+qYu24gTy1sLdEPfMsGVZ4931RzmFSI6LiHKFsVomMnEhAEZ1LKmPqOtjLbzrQo2I9DKPSc2E0mm6nrtq+aDi9IYSExhwA2USRaM5oTzVP+4o=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758098934; c=relaxed/simple;
-	bh=rixibAhmB5Hqa79X5mnqGdoJxY6e/ufoNf8xrZo5teA=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=IO0jNJ0DGBVEEvbF1dVTsEgeNikUX2FVwuVWquN1zuVfoJgdcCeTjcImCPFhxDUr7rU4b6224cnhf5o2us/QzEyJlnpFzXAdcw5J70ySX3fXpnnlPKUJIoU0hLTxA4KwGF0HvCeKUY2xWmykrialTQR9Ia9Iq6sd9sLf7xMJYOQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=cL9TFGmG; arc=none smtp.client-ip=192.198.163.7
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1758098933; x=1789634933;
-  h=message-id:date:mime-version:subject:to:cc:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=rixibAhmB5Hqa79X5mnqGdoJxY6e/ufoNf8xrZo5teA=;
-  b=cL9TFGmGAPkheCAq0euWf8yQBT6k/1HryIJQ1+G9WvPbsQpZFVc2jl+F
-   /7Y++aKc8VBrncJFfUIIY/VXrD4kCHsSX2xj2V73qmKfcjZTk0CdXbPUY
-   QBH8TaKicnHRiefOFZ2jXp4YALr4F7nRlqkceQ/nEOgx0bAMmAenR9dlB
-   H7Rv63U4xEwD11OiVpqZTEJMiZ8NRzWvjBm2k9kU9Nj6AMO6m7i33wjJA
-   lCTRpdM6B0hAmBWlZr7H2PrJvKLXyLGLJfNWU4QuTNkN31H9laAUWeIBH
-   glqEJlduGz2AopKFC2wghG694XScDCcnXv+I+u0g+tC1z4pmciRK71Zdb
-   w==;
-X-CSE-ConnectionGUID: 5QmGd1BTSIa3IZjH4DqpIg==
-X-CSE-MsgGUID: p5OFSj/jS4yadhy/gozWkQ==
-X-IronPort-AV: E=McAfee;i="6800,10657,11555"; a="85836791"
-X-IronPort-AV: E=Sophos;i="6.18,271,1751266800"; 
-   d="scan'208";a="85836791"
-Received: from fmviesa008.fm.intel.com ([10.60.135.148])
-  by fmvoesa101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 17 Sep 2025 01:48:52 -0700
-X-CSE-ConnectionGUID: kkSxahJ5Qca8dagxZK2XGA==
-X-CSE-MsgGUID: XgMjX2QjQFaifMFquYyRhg==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.18,271,1751266800"; 
-   d="scan'208";a="175583667"
-Received: from xiaoyaol-hp-g830.ccr.corp.intel.com (HELO [10.124.238.14]) ([10.124.238.14])
-  by fmviesa008-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 17 Sep 2025 01:48:49 -0700
-Message-ID: <65465d1e-a7bd-4eac-a0ba-8c6cce85e3ed@intel.com>
-Date: Wed, 17 Sep 2025 16:48:47 +0800
+	s=arc-20240116; t=1758101316; c=relaxed/simple;
+	bh=S0Oe46tsoZZQQ29GDYRq7t5r8AFIzm0CHvummlNxQQQ=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=Y64eM5VzK7d43J0KEQlyK2WT+Z/owodvjD4zSARruf28TrdZLcmnhWn46md26j904Txuhj9xOEO++FGoo4qfKXXp6o/0wbJrOSjBlz1gqkLkDOKrssRna4nmtuYhqmEafhxy+i7iD7RjqoDAQ/wmBW9D8z9k/PuW8C3PYADwl2Q=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=smartx.com; spf=pass smtp.mailfrom=smartx.com; dkim=pass (2048-bit key) header.d=smartx-com.20230601.gappssmtp.com header.i=@smartx-com.20230601.gappssmtp.com header.b=qqO+9jS1; arc=none smtp.client-ip=209.85.214.174
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=smartx.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=smartx.com
+Received: by mail-pl1-f174.google.com with SMTP id d9443c01a7336-24cde6c65d1so56387185ad.3
+        for <kvm@vger.kernel.org>; Wed, 17 Sep 2025 02:28:34 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=smartx-com.20230601.gappssmtp.com; s=20230601; t=1758101313; x=1758706113; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=qEv+391m/JkY9kaqE3gl8eXIZOO7uG0r/XVqxW+72wE=;
+        b=qqO+9jS18WyS5DjTAqTeCYlTmetT+jIq9JQ1M2munm6Wzg7o9cYhZ4g5OJ+ZmL4To0
+         U7SlOQ+/+E5QIwLEcT9I84OHXy8zz65ZgkJuSRvjlhKxqNOS38rBEnipFg43UYWzv9+1
+         C+G1Z1HqzlcBmDUdMTc1+ysRbnsgT3QYpBowtOxCLti2cFq0OYcrTpGDm5kOCRPm5vvb
+         nftMn1iOgfJiJTDuk29ln863U+UXJQHPZmXCPQNjasBEfWQQJJ/Ybrt+QfjeDqSSH225
+         v9gf6nVazi4ZMBUYN0wahZNTjbyElIklHAqDH7oj10pWg00toZGldjhey/lZ8qwCMEth
+         Tbng==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1758101313; x=1758706113;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=qEv+391m/JkY9kaqE3gl8eXIZOO7uG0r/XVqxW+72wE=;
+        b=I1Z8meOtlSvv5nIkY/zvZ2OdZWOpoFvKXVd5u7e2Sb4e7m+b8du4gN/WqOE84pwhb6
+         Hfl7zWXGvR0YdQVG118cAeP7g/iVD/yj4s8ua61K+JmG8Y9/nI6FTqMxvilXYAwU6QeI
+         IMl6u0VkPEAkkWqX4U7hBO3YQhRAhBa1YzVxtdQWKxbqEY0R2wLKU5gDbgI4YOyeigvb
+         HhWWHQAbLFjTJe3jzfrm7rwrBiCkMLYkeFjvSgGeILz1AhlDCAXVXhSHIzwYb5zwaHft
+         ZAVHn707TjKLlDgtGvpBRaVJ06Pwr68AMP6nW2BlnyaGeQYT3UBhjbqJGmZGLgfXHcFd
+         glWA==
+X-Gm-Message-State: AOJu0YwxHqLhotX4C6cw8jGo5KhrBo1s6RJXaIvwQPxe8eP9yn1BnIRz
+	we14H7gGUqZk5ZgDPiMpPhIypOBzU7ON5EN9RnXNTQnIXSY32h+/woHK83I2UAP+foA=
+X-Gm-Gg: ASbGnct6ZwcgIV9NApcJM7EiRq+3PqcRbs9tD3EeLv9+QxNdlYV5EmLj4TUowS1r9wy
+	fyg7ZCGaHz8L+RdeGo2xxq/mLUrMz9ccjf4CUrpnw4MiqteCTy0faLsQ5v3MlPgp5ITO078KRUm
+	jrEJUscyHw9RhNU/7kFXoqzMwE5hy7Yl9HElaB1tn0erNR/x4oIIL7n887RSoLePir8YVqe/zoL
+	sooO/gN26nhfClfDkOKlgfo300o4BYpADG0ghKo9wDFwMOLb1IItoyY9g6HwONEWLtQ2QSjG9GA
+	XoqwoMyTMqjBi3pg7+i9lD6FCn5NGlebeJL8c5UbGERukOTq6kMvu1uEzN/yZkRMR4tkdTu7D/E
+	WTV5n2ZL39U910IlvngHhQkdCbQDCkREjeZsRG65i8BztL2Xcp6I=
+X-Google-Smtp-Source: AGHT+IHhbsgB2Q3Kh5WyQVZOJDD1xHNwQPX/mtP3TCwpKgY/yR9ATV1q0YKkCnNjtrFK1Y6/JhyJeA==
+X-Received: by 2002:a17:903:2f87:b0:262:4878:9dff with SMTP id d9443c01a7336-268118a5cb9mr19386995ad.12.1758101312823;
+        Wed, 17 Sep 2025 02:28:32 -0700 (PDT)
+Received: from localhost.localdomain ([193.246.161.124])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-25f4935db09sm137047885ad.61.2025.09.17.02.28.28
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 17 Sep 2025 02:28:32 -0700 (PDT)
+From: Lei Chen <lei.chen@smartx.com>
+To: Sean Christopherson <seanjc@google.com>,
+	Paolo Bonzini <pbonzini@redhat.com>,
+	Thomas Gleixner <tglx@linutronix.de>,
+	Ingo Molnar <mingo@redhat.com>,
+	Borislav Petkov <bp@alien8.de>,
+	Dave Hansen <dave.hansen@linux.intel.com>,
+	x86@kernel.org,
+	"H. Peter Anvin" <hpa@zytor.com>
+Cc: kvm@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH RESEND v1 0/3] kvm:x86: simplify kvmclock update logic
+Date: Wed, 17 Sep 2025 17:28:21 +0800
+Message-ID: <20250917092824.4070217-1-lei.chen@smartx.com>
+X-Mailer: git-send-email 2.44.0
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v15 17/41] KVM: VMX: Set host constant supervisor states
- to VMCS fields
-To: Sean Christopherson <seanjc@google.com>,
- Paolo Bonzini <pbonzini@redhat.com>
-Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
- Tom Lendacky <thomas.lendacky@amd.com>,
- Mathias Krause <minipli@grsecurity.net>, John Allen <john.allen@amd.com>,
- Rick Edgecombe <rick.p.edgecombe@intel.com>, Chao Gao <chao.gao@intel.com>,
- Maxim Levitsky <mlevitsk@redhat.com>, Zhang Yi Z <yi.z.zhang@linux.intel.com>
-References: <20250912232319.429659-1-seanjc@google.com>
- <20250912232319.429659-18-seanjc@google.com>
-Content-Language: en-US
-From: Xiaoyao Li <xiaoyao.li@intel.com>
-In-Reply-To: <20250912232319.429659-18-seanjc@google.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 
-On 9/13/2025 7:22 AM, Sean Christopherson wrote:
-...
-> +static inline bool cpu_has_load_cet_ctrl(void)
-> +{
-> +	return (vmcs_config.vmentry_ctrl & VM_ENTRY_LOAD_CET_STATE);
-> +}
 
-When looking at the patch 19, I realize that
+This patch series simplifies kvmclock updating logic by reverting
+related commits.
 
-   { VM_ENTRY_LOAD_CET_STATE,		VM_EXIT_LOAD_CET_STATE }
+Now we have three requests about time updating:
 
-is added into vmcs_entry_exit_pairs[] there.
+1. KVM_REQ_CLOCK_UPDATE:
+The function kvm_guest_time_update gathers info from  master clock
+or host.rdtsc() and update vcpu->arch.hvclock, and then kvmclock or hyperv
+reference counter.
 
-So ...
+2. KVM_REQ_MASTERCLOCK_UPDATE: 
+The function kvm_update_masterclock updates kvm->arch from
+pvclock_gtod_data(a global var updated by timekeeping subsystem), and
+then make KVM_REQ_CLOCK_UPDATE request for each vcpu.
 
->   static inline bool cpu_has_vmx_mpx(void)
->   {
->   	return vmcs_config.vmentry_ctrl & VM_ENTRY_LOAD_BNDCFGS;
-> diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
-> index adf5af30e537..e8155635cb42 100644
-> --- a/arch/x86/kvm/vmx/vmx.c
-> +++ b/arch/x86/kvm/vmx/vmx.c
-> @@ -4320,6 +4320,21 @@ void vmx_set_constant_host_state(struct vcpu_vmx *vmx)
->   
->   	if (cpu_has_load_ia32_efer())
->   		vmcs_write64(HOST_IA32_EFER, kvm_host.efer);
-> +
-> +	/*
-> +	 * Supervisor shadow stack is not enabled on host side, i.e.,
-> +	 * host IA32_S_CET.SHSTK_EN bit is guaranteed to 0 now, per SDM
-> +	 * description(RDSSP instruction), SSP is not readable in CPL0,
-> +	 * so resetting the two registers to 0s at VM-Exit does no harm
-> +	 * to kernel execution. When execution flow exits to userspace,
-> +	 * SSP is reloaded from IA32_PL3_SSP. Check SDM Vol.2A/B Chapter
-> +	 * 3 and 4 for details.
-> +	 */
-> +	if (cpu_has_load_cet_ctrl()) {
+3. KVM_REQ_GLOBAL_CLOCK_UPDATE:
+The function kvm_gen_kvmclock_update makes KVM_REQ_CLOCK_UPDATE
+request for each vcpu.
 
-... cpu_has_load_cet_ctrl() cannot ensure the existence of host CET 
-fields, unless we change it to check vmcs_config.vmexit_ctrl or add CET 
-entry_exit pair into the vmcs_entry_exit_pairs[] in this patch.
+In the early implementation, functions mentioned above were
+synchronous. But things got complicated since the following commits.
 
-> +		vmcs_writel(HOST_S_CET, kvm_host.s_cet);
-> +		vmcs_writel(HOST_SSP, 0);
-> +		vmcs_writel(HOST_INTR_SSP_TABLE, 0);
-> +	}
->   }
+1. Commit 7e44e4495a39 ("x86: kvm: rate-limit global clock updates")
+intends to use kvmclock_update_work to sync ntp corretion
+across all vcpus kvmclock, which is based on commit 0061d53daf26f
+("KVM: x86: limit difference between kvmclock updates")
+
+
+2. Commit 332967a3eac0 ("x86: kvm: introduce periodic global clock
+updates") introduced a 300s-interval work to periodically sync
+ntp corrections across all vcpus.
+
+I think those commits could be reverted because:
+1. Since commit 53fafdbb8b21 ("KVM: x86: switch KVMCLOCK base to
+monotonic raw clock"), kvmclock switched to mono raw clock,
+Those two commits could be reverted.
+
+2. the periodic work introduced from commit 332967a3eac0 ("x86:
+kvm: introduce periodic global clock updates") always does 
+nothing for normal scenarios. If some exceptions happen,
+the corresponding logic makes right CLOCK_UPDATE request for right vcpus.
+The following shows what exceptions might happen and how they are
+handled.
+(1). cpu_tsc_khz changed
+   __kvmclock_cpufreq_notifier makes KVM_REQ_CLOCK_UPDATE request
+(2). use/unuse master clock 
+   kvm_track_tsc_matching makes KVM_REQ_MASTERCLOCK_UPDATE, which means
+   KVM_REQ_CLOCK_UPDATE for each vcpu.
+(3). guest writes MSR_IA32_TSC
+   kvm_synchronize_tsc will handle it and finally call
+   kvm_track_tsc_matching to make everything well.
+(4). enable/disable tsc_catchup
+   kvm_arch_vcpu_load and bottom half of vcpu_enter_guest makes
+   KVM_REQ_CLOCK_UPDATE request
+
+Really happy for your comments, thanks.
+
+Related links:
+https://lkml.indiana.edu/hypermail/linux/kernel/2310.0/04217.html
+https://patchew.org/linux/20240522001817.619072-1-dwmw2@infradead.org/20240522001817.619072-20-dwmw2@infradead.org/
+
+
+Lei Chen (3):
+  Revert "x86: kvm: introduce periodic global clock updates"
+  Revert "x86: kvm: rate-limit global clock updates"
+  KVM: x86: remove comment about ntp correction sync for
+
+ arch/x86/include/asm/kvm_host.h |  2 --
+ arch/x86/kvm/x86.c              | 58 +++------------------------------
+ 2 files changed, 5 insertions(+), 55 deletions(-)
+
+-- 
+2.44.0
+
 
