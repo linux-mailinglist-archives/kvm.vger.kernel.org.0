@@ -1,55 +1,55 @@
-Return-Path: <kvm+bounces-57869-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-57877-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4D7C9B7F33A
-	for <lists+kvm@lfdr.de>; Wed, 17 Sep 2025 15:24:32 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 61DD8B7F22F
+	for <lists+kvm@lfdr.de>; Wed, 17 Sep 2025 15:19:27 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 53BCE2A5062
-	for <lists+kvm@lfdr.de>; Wed, 17 Sep 2025 13:10:58 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A523F4A6596
+	for <lists+kvm@lfdr.de>; Wed, 17 Sep 2025 13:12:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4DD9E332A34;
-	Wed, 17 Sep 2025 13:04:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CC5CC32E75E;
+	Wed, 17 Sep 2025 13:05:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="key not found in DNS" (0-bit key) header.d=rsg.ci.i.u-tokyo.ac.jp header.i=@rsg.ci.i.u-tokyo.ac.jp header.b="KheEbi1D"
+	dkim=fail reason="key not found in DNS" (0-bit key) header.d=rsg.ci.i.u-tokyo.ac.jp header.i=@rsg.ci.i.u-tokyo.ac.jp header.b="u0e4qWkR"
 X-Original-To: kvm@vger.kernel.org
 Received: from www3579.sakura.ne.jp (www3579.sakura.ne.jp [49.212.243.89])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9F45832BC14
-	for <kvm@vger.kernel.org>; Wed, 17 Sep 2025 13:03:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1C0C4316185
+	for <kvm@vger.kernel.org>; Wed, 17 Sep 2025 13:05:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=49.212.243.89
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758114239; cv=none; b=sTiJ947DnhGmQxaM+NmchpsLWm8Pk/AfP+MHx1yU6igL2xkC8i/g0YpI3E1qNteJpbLStNgzx1UrGG1/1rc9gGkKDE9DgR8moHicG53RMfvfLcpWhdF5v1fZoEQ9vLP8g1q9tNvBcQb1FWw5R/XgsYd7AoMfT8i+uwX60R6ClYY=
+	t=1758114317; cv=none; b=ORfMivjliJ3nXbnLx9M9MtK5M5gmNwH++W4GRMocu0vgo3ezDiS01yO4XrIy9I3ZkYsj4n+WeNmtX7Dbuplq3it3FZ0Tnsaz8Z9kuY5YXmhzWxIwzMQQkOKlFmf6lcciMFW2lwf4R705EuSHBfs56sc6H/R58sRZKwrwHGj2TxA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758114239; c=relaxed/simple;
-	bh=XbK4hB8xnqGYdd0Jr5nBzp/Z7wR+DK2AGPitBHnrX6s=;
+	s=arc-20240116; t=1758114317; c=relaxed/simple;
+	bh=9VvSuqkjjFsmGF0DAl2yNR3104BHwusZkM/BdiDFInw=;
 	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=Ed5MbSQySDSS6ABJZN2Xtrg41fQpqhUKtNJSR2q9Gm/rMQ1re1/NGoh0lequ2qL5DU5/aThzucZgNAuOVvSuTjRkY5dzxkVWbw6FuY3lQo4VOVPitErQERuGwx49Ivbrioeoc7xmfBblyNXtj9l9y9iMjHUaYwSr6edELlRDz8c=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=rsg.ci.i.u-tokyo.ac.jp; spf=pass smtp.mailfrom=rsg.ci.i.u-tokyo.ac.jp; dkim=fail (0-bit key) header.d=rsg.ci.i.u-tokyo.ac.jp header.i=@rsg.ci.i.u-tokyo.ac.jp header.b=KheEbi1D reason="key not found in DNS"; arc=none smtp.client-ip=49.212.243.89
+	 In-Reply-To:To:Cc; b=uQ0EUaidAOVSJQ6NIO/yH+giZ1QeiG7xsOOqUpOZAHUXvRvS/ddRgZ6oeWr0q5dh/30LpwBYhaa2BsOrPsJyJdZYqVpC15Jxd3W3mQu/RZzSNZ/lVaVek8uvrBDau+XnvIJtlrrP7Ah1sfdF0HPXT69/P5nWaPYPJ83xLsjZSPk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=rsg.ci.i.u-tokyo.ac.jp; spf=pass smtp.mailfrom=rsg.ci.i.u-tokyo.ac.jp; dkim=fail (0-bit key) header.d=rsg.ci.i.u-tokyo.ac.jp header.i=@rsg.ci.i.u-tokyo.ac.jp header.b=u0e4qWkR reason="key not found in DNS"; arc=none smtp.client-ip=49.212.243.89
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=rsg.ci.i.u-tokyo.ac.jp
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=rsg.ci.i.u-tokyo.ac.jp
 Received: from h205.csg.ci.i.u-tokyo.ac.jp (h205.csg.ci.i.u-tokyo.ac.jp [133.11.54.205])
 	(authenticated bits=0)
-	by www3579.sakura.ne.jp (8.16.1/8.16.1) with ESMTPSA id 58HCuN6r008967
+	by www3579.sakura.ne.jp (8.16.1/8.16.1) with ESMTPSA id 58HCuN6s008967
 	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NO);
-	Wed, 17 Sep 2025 21:56:41 +0900 (JST)
+	Wed, 17 Sep 2025 21:56:42 +0900 (JST)
 	(envelope-from odaki@rsg.ci.i.u-tokyo.ac.jp)
-DKIM-Signature: a=rsa-sha256; bh=TGbrQM/McNBrLXG5VfeAkh7HnxBCj04Y3QHaSSNnZfI=;
+DKIM-Signature: a=rsa-sha256; bh=xplWx0T3pH95kfYhsL6HObR0v1/371FsGPZ7likh5Eo=;
         c=relaxed/relaxed; d=rsg.ci.i.u-tokyo.ac.jp;
         h=From:Date:Subject:Message-Id:To;
-        s=rs20250326; t=1758113802; v=1;
-        b=KheEbi1DHbpSY1QMbJ+q1rYvx7VsHKkiS8/9RjIZiRXMxAyctZqTc0JFtwBvh8PW
-         2lKENHULJa8wpzYIeWYz2UROsL+SnDsw7kwGSPlXu9/XzqJKBb1rCwX0ICOzKLFN
-         +bu/6ujnuSSLfrn4qTLWAnGGdVIArkbeyzz/ERp0RLdum5ZGDcwG1f7AerWpDS1Z
-         eT/ItWkzHgUstvQj7m354JJwf41b5mNhUpi/++mCjMFvFlFs4SP8knmmtBCbZ+A9
-         +toIb6vhywCtSILmojmMqKTjF38LQiZl7pw+tcUMM/YYSs4bJsu/2qyrxZEa1CkQ
-         LAYO+Em9E6LfJazNVBAXJA==
+        s=rs20250326; t=1758113803; v=1;
+        b=u0e4qWkRUJ30ZFxZupPVEGVLpoAX0qgZl3mczzMZJ6ciKmH26JvBI2UbGVLoLb/l
+         RCWQDqjNSH/BwyDKf5oVnYhPptBdNepbPjoI0kDyafZJyT9skmz8F851N3fq4QF9
+         TGKnQMQYKRm/zCzAjv+WncnP7a7Ja9j2Jx5R9iInHH3UQKlmb7TsQ0Xkrrwsha1G
+         oKI+4Gf5Z06GaycO3NgiwqIk5ZG3pw1l4umaK+XFIuchSh7SJ14vQczC3BZ0qvTr
+         s5OI5nrZMLby0g7zMYdJEeXj+cEcnJEFWSJCS4bnT56F1d6cCIhpZ3CbYNkpCYzZ
+         ORZTrQ9dCXZq58Fkzi59BQ==
 From: Akihiko Odaki <odaki@rsg.ci.i.u-tokyo.ac.jp>
-Date: Wed, 17 Sep 2025 21:56:25 +0900
-Subject: [PATCH 13/35] hw/mem: QOM-ify AddressSpace
+Date: Wed, 17 Sep 2025 21:56:26 +0900
+Subject: [PATCH 14/35] hw/misc: QOM-ify AddressSpace
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -58,7 +58,7 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Message-Id: <20250917-qom-v1-13-7262db7b0a84@rsg.ci.i.u-tokyo.ac.jp>
+Message-Id: <20250917-qom-v1-14-7262db7b0a84@rsg.ci.i.u-tokyo.ac.jp>
 References: <20250917-qom-v1-0-7262db7b0a84@rsg.ci.i.u-tokyo.ac.jp>
 In-Reply-To: <20250917-qom-v1-0-7262db7b0a84@rsg.ci.i.u-tokyo.ac.jp>
 To: qemu-devel@nongnu.org
@@ -134,143 +134,138 @@ concise and also avoid conflicts with other properties.
 
 Signed-off-by: Akihiko Odaki <odaki@rsg.ci.i.u-tokyo.ac.jp>
 ---
- hw/mem/cxl_type3.c     | 44 ++++++++++++--------------------------------
- hw/mem/memory-device.c |  4 ++--
- 2 files changed, 14 insertions(+), 34 deletions(-)
+ hw/misc/aspeed_hace.c      | 2 +-
+ hw/misc/auxbus.c           | 2 +-
+ hw/misc/bcm2835_mbox.c     | 3 +--
+ hw/misc/bcm2835_property.c | 3 +--
+ hw/misc/max78000_gcr.c     | 2 +-
+ hw/misc/tz-mpc.c           | 6 ++----
+ hw/misc/tz-msc.c           | 2 +-
+ hw/misc/tz-ppc.c           | 5 ++++-
+ 8 files changed, 12 insertions(+), 13 deletions(-)
 
-diff --git a/hw/mem/cxl_type3.c b/hw/mem/cxl_type3.c
-index 1a726b834b02..968594ae65e2 100644
---- a/hw/mem/cxl_type3.c
-+++ b/hw/mem/cxl_type3.c
-@@ -727,8 +727,6 @@ static void cxl_destroy_dc_regions(CXLType3Dev *ct3d)
+diff --git a/hw/misc/aspeed_hace.c b/hw/misc/aspeed_hace.c
+index 198363fd64fa..a8a4a91afac8 100644
+--- a/hw/misc/aspeed_hace.c
++++ b/hw/misc/aspeed_hace.c
+@@ -603,7 +603,7 @@ static void aspeed_hace_realize(DeviceState *dev, Error **errp)
+         return;
+     }
  
- static bool cxl_setup_memory(CXLType3Dev *ct3d, Error **errp)
+-    address_space_init(&s->dram_as, NULL, s->dram_mr, "dram");
++    address_space_init(&s->dram_as, OBJECT(s), s->dram_mr, "as");
+ 
+     sysbus_init_mmio(sbd, &s->iomem);
+ }
+diff --git a/hw/misc/auxbus.c b/hw/misc/auxbus.c
+index e5448ef3cc60..d20dd8789ae6 100644
+--- a/hw/misc/auxbus.c
++++ b/hw/misc/auxbus.c
+@@ -74,7 +74,7 @@ AUXBus *aux_bus_init(DeviceState *parent, const char *name)
+     /* Memory related. */
+     bus->aux_io = g_malloc(sizeof(*bus->aux_io));
+     memory_region_init(bus->aux_io, OBJECT(bus), "aux-io", 1 * MiB);
+-    address_space_init(&bus->aux_addr_space, NULL, bus->aux_io, "aux-io");
++    address_space_init(&bus->aux_addr_space, OBJECT(bus), bus->aux_io, "as");
+     return bus;
+ }
+ 
+diff --git a/hw/misc/bcm2835_mbox.c b/hw/misc/bcm2835_mbox.c
+index 4bf3c59a40a1..f26aa39ca4e5 100644
+--- a/hw/misc/bcm2835_mbox.c
++++ b/hw/misc/bcm2835_mbox.c
+@@ -310,8 +310,7 @@ static void bcm2835_mbox_realize(DeviceState *dev, Error **errp)
+ 
+     obj = object_property_get_link(OBJECT(dev), "mbox-mr", &error_abort);
+     s->mbox_mr = MEMORY_REGION(obj);
+-    address_space_init(&s->mbox_as, NULL, s->mbox_mr,
+-                       TYPE_BCM2835_MBOX "-memory");
++    address_space_init(&s->mbox_as, OBJECT(s), s->mbox_mr, "as");
+     bcm2835_mbox_reset(dev);
+ }
+ 
+diff --git a/hw/misc/bcm2835_property.c b/hw/misc/bcm2835_property.c
+index 8bdde2d248b5..e86d001f17fb 100644
+--- a/hw/misc/bcm2835_property.c
++++ b/hw/misc/bcm2835_property.c
+@@ -540,8 +540,7 @@ static void bcm2835_property_realize(DeviceState *dev, Error **errp)
+ 
+     obj = object_property_get_link(OBJECT(dev), "dma-mr", &error_abort);
+     s->dma_mr = MEMORY_REGION(obj);
+-    address_space_init(&s->dma_as, NULL, s->dma_mr,
+-                       TYPE_BCM2835_PROPERTY "-memory");
++    address_space_init(&s->dma_as, OBJECT(s), s->dma_mr, "as");
+ 
+     obj = object_property_get_link(OBJECT(dev), "otp", &error_abort);
+     s->otp = BCM2835_OTP(obj);
+diff --git a/hw/misc/max78000_gcr.c b/hw/misc/max78000_gcr.c
+index 0a0692c7cffe..048b265be348 100644
+--- a/hw/misc/max78000_gcr.c
++++ b/hw/misc/max78000_gcr.c
+@@ -320,7 +320,7 @@ static void max78000_gcr_realize(DeviceState *dev, Error **errp)
  {
--    DeviceState *ds = DEVICE(ct3d);
--
-     if (!ct3d->hostmem && !ct3d->hostvmem && !ct3d->hostpmem
-         && !ct3d->dc.num_regions) {
-         error_setg(errp, "at least one memdev property must be set");
-@@ -750,7 +748,6 @@ static bool cxl_setup_memory(CXLType3Dev *ct3d, Error **errp)
+     Max78000GcrState *s = MAX78000_GCR(dev);
  
-     if (ct3d->hostvmem) {
-         MemoryRegion *vmr;
--        char *v_name;
- 
-         vmr = host_memory_backend_get_memory(ct3d->hostvmem);
-         if (!vmr) {
-@@ -765,20 +762,14 @@ static bool cxl_setup_memory(CXLType3Dev *ct3d, Error **errp)
-         memory_region_set_nonvolatile(vmr, false);
-         memory_region_set_enabled(vmr, true);
-         host_memory_backend_set_mapped(ct3d->hostvmem, true);
--        if (ds->id) {
--            v_name = g_strdup_printf("cxl-type3-dpa-vmem-space:%s", ds->id);
--        } else {
--            v_name = g_strdup("cxl-type3-dpa-vmem-space");
--        }
--        address_space_init(&ct3d->hostvmem_as, NULL, vmr, v_name);
-+        address_space_init(&ct3d->hostvmem_as, OBJECT(ct3d), vmr,
-+                           "volatile-as");
-         ct3d->cxl_dstate.vmem_size = memory_region_size(vmr);
-         ct3d->cxl_dstate.static_mem_size += memory_region_size(vmr);
--        g_free(v_name);
-     }
- 
-     if (ct3d->hostpmem) {
-         MemoryRegion *pmr;
--        char *p_name;
- 
-         pmr = host_memory_backend_get_memory(ct3d->hostpmem);
-         if (!pmr) {
-@@ -793,21 +784,15 @@ static bool cxl_setup_memory(CXLType3Dev *ct3d, Error **errp)
-         memory_region_set_nonvolatile(pmr, true);
-         memory_region_set_enabled(pmr, true);
-         host_memory_backend_set_mapped(ct3d->hostpmem, true);
--        if (ds->id) {
--            p_name = g_strdup_printf("cxl-type3-dpa-pmem-space:%s", ds->id);
--        } else {
--            p_name = g_strdup("cxl-type3-dpa-pmem-space");
--        }
--        address_space_init(&ct3d->hostpmem_as, NULL, pmr, p_name);
-+        address_space_init(&ct3d->hostpmem_as, OBJECT(ct3d), pmr,
-+                           "persistent-as");
-         ct3d->cxl_dstate.pmem_size = memory_region_size(pmr);
-         ct3d->cxl_dstate.static_mem_size += memory_region_size(pmr);
--        g_free(p_name);
-     }
- 
-     ct3d->dc.total_capacity = 0;
-     if (ct3d->dc.num_regions > 0) {
-         MemoryRegion *dc_mr;
--        char *dc_name;
- 
-         if (!ct3d->dc.host_dc) {
-             error_setg(errp, "dynamic capacity must have a backing device");
-@@ -832,13 +817,8 @@ static bool cxl_setup_memory(CXLType3Dev *ct3d, Error **errp)
-         memory_region_set_nonvolatile(dc_mr, false);
-         memory_region_set_enabled(dc_mr, true);
-         host_memory_backend_set_mapped(ct3d->dc.host_dc, true);
--        if (ds->id) {
--            dc_name = g_strdup_printf("cxl-dcd-dpa-dc-space:%s", ds->id);
--        } else {
--            dc_name = g_strdup("cxl-dcd-dpa-dc-space");
--        }
--        address_space_init(&ct3d->dc.host_dc_as, NULL, dc_mr, dc_name);
--        g_free(dc_name);
-+        address_space_init(&ct3d->dc.host_dc_as, OBJECT(ct3d), dc_mr,
-+                           "volatile-dc-as");
- 
-         if (!cxl_create_dc_regions(ct3d, errp)) {
-             error_append_hint(errp, "setup DC regions failed");
-@@ -974,13 +954,13 @@ err_free_special_ops:
-     g_free(regs->special_ops);
-     if (ct3d->dc.host_dc) {
-         cxl_destroy_dc_regions(ct3d);
--        address_space_destroy(&ct3d->dc.host_dc_as);
-+        object_unparent(OBJECT(&ct3d->dc.host_dc_as));
-     }
-     if (ct3d->hostpmem) {
--        address_space_destroy(&ct3d->hostpmem_as);
-+        object_unparent(OBJECT(&ct3d->hostpmem_as));
-     }
-     if (ct3d->hostvmem) {
--        address_space_destroy(&ct3d->hostvmem_as);
-+        object_unparent(OBJECT(&ct3d->hostvmem_as));
-     }
+-    address_space_init(&s->sram_as, NULL, s->sram, "sram");
++    address_space_init(&s->sram_as, OBJECT(s), s->sram, "as");
  }
  
-@@ -997,13 +977,13 @@ static void ct3_exit(PCIDevice *pci_dev)
-     cxl_destroy_cci(&ct3d->cci);
-     if (ct3d->dc.host_dc) {
-         cxl_destroy_dc_regions(ct3d);
--        address_space_destroy(&ct3d->dc.host_dc_as);
-+        object_unparent(OBJECT(&ct3d->dc.host_dc_as));
-     }
-     if (ct3d->hostpmem) {
--        address_space_destroy(&ct3d->hostpmem_as);
-+        object_unparent(OBJECT(&ct3d->hostpmem_as));
-     }
-     if (ct3d->hostvmem) {
--        address_space_destroy(&ct3d->hostvmem_as);
-+        object_unparent(OBJECT(&ct3d->hostvmem_as));
-     }
+ static void max78000_gcr_class_init(ObjectClass *klass, const void *data)
+diff --git a/hw/misc/tz-mpc.c b/hw/misc/tz-mpc.c
+index b8be234630e3..b5415d46feae 100644
+--- a/hw/misc/tz-mpc.c
++++ b/hw/misc/tz-mpc.c
+@@ -550,10 +550,8 @@ static void tz_mpc_realize(DeviceState *dev, Error **errp)
+     memory_region_init_io(&s->blocked_io, obj, &tz_mpc_mem_blocked_ops,
+                           s, "tz-mpc-blocked-io", size);
+ 
+-    address_space_init(&s->downstream_as, NULL, s->downstream,
+-                       "tz-mpc-downstream");
+-    address_space_init(&s->blocked_io_as, NULL, &s->blocked_io,
+-                       "tz-mpc-blocked-io");
++    address_space_init(&s->downstream_as, obj, s->downstream, "downstream-as");
++    address_space_init(&s->blocked_io_as, obj, &s->blocked_io, "blocked-io-as");
+ 
+     s->blk_lut = g_new0(uint32_t, s->blk_max);
  }
+diff --git a/hw/misc/tz-msc.c b/hw/misc/tz-msc.c
+index ed1c95e2e9fa..07a8a5137d22 100644
+--- a/hw/misc/tz-msc.c
++++ b/hw/misc/tz-msc.c
+@@ -260,7 +260,7 @@ static void tz_msc_realize(DeviceState *dev, Error **errp)
+     }
  
-diff --git a/hw/mem/memory-device.c b/hw/mem/memory-device.c
-index a4a8efdd869b..165866f10b25 100644
---- a/hw/mem/memory-device.c
-+++ b/hw/mem/memory-device.c
-@@ -535,8 +535,8 @@ void machine_memory_devices_init(MachineState *ms, hwaddr base, uint64_t size)
+     size = memory_region_size(s->downstream);
+-    address_space_init(&s->downstream_as, NULL, s->downstream, name);
++    address_space_init(&s->downstream_as, obj, s->downstream, "as");
+     memory_region_init_io(&s->upstream, obj, &tz_msc_ops, s, name, size);
+     sysbus_init_mmio(sbd, &s->upstream);
+ }
+diff --git a/hw/misc/tz-ppc.c b/hw/misc/tz-ppc.c
+index 28a1c27aa3cc..ac928accec2d 100644
+--- a/hw/misc/tz-ppc.c
++++ b/hw/misc/tz-ppc.c
+@@ -257,6 +257,7 @@ static void tz_ppc_realize(DeviceState *dev, Error **errp)
+     for (i = 0; i <= max_port; i++) {
+         TZPPCPort *port = &s->port[i];
+         char *name;
++        g_autofree char *as_name = NULL;
+         uint64_t size;
  
-     memory_region_init(&ms->device_memory->mr, OBJECT(ms), "device-memory",
-                        size);
--    address_space_init(&ms->device_memory->as, NULL, &ms->device_memory->mr,
--                       "device-memory");
-+    address_space_init(&ms->device_memory->as, OBJECT(ms),
-+                       &ms->device_memory->mr, "device-memory-as");
-     memory_region_add_subregion(get_system_memory(), ms->device_memory->base,
-                                 &ms->device_memory->mr);
+         if (!port->downstream) {
+@@ -274,9 +275,11 @@ static void tz_ppc_realize(DeviceState *dev, Error **errp)
+         }
  
+         name = g_strdup_printf("tz-ppc-port[%d]", i);
++        as_name = g_strconcat(name, "-as", NULL);
+ 
+         port->ppc = s;
+-        address_space_init(&port->downstream_as, NULL, port->downstream, name);
++        address_space_init(&port->downstream_as, obj, port->downstream,
++                           as_name);
+ 
+         size = memory_region_size(port->downstream);
+         memory_region_init_io(&port->upstream, obj, &tz_ppc_ops,
 
 -- 
 2.51.0
