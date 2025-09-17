@@ -1,55 +1,55 @@
-Return-Path: <kvm+bounces-57872-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-57871-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id DDB1BB7F217
-	for <lists+kvm@lfdr.de>; Wed, 17 Sep 2025 15:18:27 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6DF94B7F054
+	for <lists+kvm@lfdr.de>; Wed, 17 Sep 2025 15:11:13 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 50F4848260E
-	for <lists+kvm@lfdr.de>; Wed, 17 Sep 2025 13:11:15 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 905047B0BAA
+	for <lists+kvm@lfdr.de>; Wed, 17 Sep 2025 13:09:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1F67232E72F;
-	Wed, 17 Sep 2025 13:04:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D21E032E728;
+	Wed, 17 Sep 2025 13:04:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="key not found in DNS" (0-bit key) header.d=rsg.ci.i.u-tokyo.ac.jp header.i=@rsg.ci.i.u-tokyo.ac.jp header.b="RaCvs2pC"
+	dkim=fail reason="key not found in DNS" (0-bit key) header.d=rsg.ci.i.u-tokyo.ac.jp header.i=@rsg.ci.i.u-tokyo.ac.jp header.b="e1Ob/piS"
 X-Original-To: kvm@vger.kernel.org
 Received: from www3579.sakura.ne.jp (www3579.sakura.ne.jp [49.212.243.89])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5DD5D32BC1A
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5DCDC3195E6
 	for <kvm@vger.kernel.org>; Wed, 17 Sep 2025 13:04:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=49.212.243.89
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758114250; cv=none; b=GJUMHGwkjL5QuGnanM37JTuzzarFBg/QAUH8JJc02hNAwvvxH0+qpe0PylWDaDX7zylHxBE5qwjrT2sXwiXdT66loj7jiVLfx81kiyHZfvB/qsaGxrv6aQPXWTxBjuRBHgk5KpRd2wC1dV/WnESd7bUw3ndIahoNCQ9BSR0cKt8=
+	t=1758114249; cv=none; b=ZR77opqMtgU/2nYgc38dV6RJqh9/4+nKEsfXKyTjhEcRdWNjDBArLmosL1wgYYMmBmA0/XL6rO3WTcXaDclVYUq+vkj+C02OJOREq0bO6bvCggdrNGUU10mc17zpowv0sMMKuXsKis8Hd61sn01nLMzWTZon9LlNUWCD/1pj/4Y=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758114250; c=relaxed/simple;
-	bh=ms1JXDoMRYAzj6NoK/nEe4EsFavXXgUPSIhMkT+JsyA=;
+	s=arc-20240116; t=1758114249; c=relaxed/simple;
+	bh=wSxLhgSQr1ps27o2qI/lhcXqoQPZ/ElMS+PZiewRqsA=;
 	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=Q4j1fYm9FttF8I5C1FdiJ0FJ1Y82TzA9jwPfWGmKQfNh4CJEtdOD1VHOWtM15FVSy3wE5XnOE7mg4lOIVJ5LGADBJd8Tzv+pqWzbCIr7x7LB3pnNx0LB6L1xpbSm+vI01r1qZD9tf99kyq1Bn/9ZOCBYCLGNw+LKTkwMtkxoPNQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=rsg.ci.i.u-tokyo.ac.jp; spf=pass smtp.mailfrom=rsg.ci.i.u-tokyo.ac.jp; dkim=fail (0-bit key) header.d=rsg.ci.i.u-tokyo.ac.jp header.i=@rsg.ci.i.u-tokyo.ac.jp header.b=RaCvs2pC reason="key not found in DNS"; arc=none smtp.client-ip=49.212.243.89
+	 In-Reply-To:To:Cc; b=A/BcpFpvtFxKhk+Y3Q1DofoyBP/4MD203dF2QAY2/cNZ1BNyEVRxXb/KAYYiaW3vbIMPgjIBydVJNFSH0Wa4nHArzckXBbiHESXsnpRLLY3v6Vd7+d0JiwYiIBJx49Rox12Ymuwaa0RAPfdHci5c5RJqzNzT/1sDRlJYoEB8crw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=rsg.ci.i.u-tokyo.ac.jp; spf=pass smtp.mailfrom=rsg.ci.i.u-tokyo.ac.jp; dkim=fail (0-bit key) header.d=rsg.ci.i.u-tokyo.ac.jp header.i=@rsg.ci.i.u-tokyo.ac.jp header.b=e1Ob/piS reason="key not found in DNS"; arc=none smtp.client-ip=49.212.243.89
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=rsg.ci.i.u-tokyo.ac.jp
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=rsg.ci.i.u-tokyo.ac.jp
 Received: from h205.csg.ci.i.u-tokyo.ac.jp (h205.csg.ci.i.u-tokyo.ac.jp [133.11.54.205])
 	(authenticated bits=0)
-	by www3579.sakura.ne.jp (8.16.1/8.16.1) with ESMTPSA id 58HCuN70008967
+	by www3579.sakura.ne.jp (8.16.1/8.16.1) with ESMTPSA id 58HCuN71008967
 	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NO);
-	Wed, 17 Sep 2025 21:56:47 +0900 (JST)
+	Wed, 17 Sep 2025 21:56:48 +0900 (JST)
 	(envelope-from odaki@rsg.ci.i.u-tokyo.ac.jp)
-DKIM-Signature: a=rsa-sha256; bh=IeYVbNa9ewH8X0AMzPHwbB1bovCCW1XINUrS833KFLU=;
+DKIM-Signature: a=rsa-sha256; bh=GOQKVqefPAJmBrPvNMsFbTKEyGldKAyJfG+hCf+5Ixc=;
         c=relaxed/relaxed; d=rsg.ci.i.u-tokyo.ac.jp;
         h=From:Date:Subject:Message-Id:To;
-        s=rs20250326; t=1758113808; v=1;
-        b=RaCvs2pC4/oFYc/lwHEOZmzgDc8bmeoHZZOSvm4cn4lA7ojwDk6bZGqre9/Sk8p9
-         9Yx79ItQGLJwc6hNE3Iy88Gr/Js2OAkqcafa6FPKGzaHCWUbzhDjliw9QU9P1wio
-         OyvpFayXqX9th2ut3T54cvwQNbpXusK7b4RNYpjZ02vM2/PP1H4jLqx6vISedT8k
-         QOW3pS/INVZUcLck6cZ30TO3AaQIi9GGa8LYlB6kxAtsSNKlmUF1an/wtFjeVpBa
-         8iRmUJUoUxg0CLdGTiJILaNd7W8l0tlwCwuZYAnPgsabs+O2Ze12VHrBRtaNYfS/
-         qrZ1xfTkg8Fz9asUWZ3Cpw==
+        s=rs20250326; t=1758113809; v=1;
+        b=e1Ob/piSj7cxEtTEojTvIjLvvXI1f4M9y8dhT54XWq2NNAJK9e2AYRl2yqkukXIJ
+         WNBaTiUjkp5ztkR7CHz3BNA978TDmZeQy5pc3yl62Vzt/0Js1cT0LcXU4FGcwqRg
+         dRxW9VdL6bphyt4odv6HmfTX2+QpMhY89N+CyVoZn2mvzcV3M/keLZcktZ+IdaHU
+         MJwsw33Awyb1v5g3OtTceF/ilc4az8tU3oVjdJYtf3Yige5Yi+G9ohT4ViEiNIUW
+         Fal/pEC7t79R1ra38eeCEkawlu+TqatE52yndj1zYLalrJPWSKG6MimIXorWBWTv
+         T6W+nb8n8IZMLJpu20ftXg==
 From: Akihiko Odaki <odaki@rsg.ci.i.u-tokyo.ac.jp>
-Date: Wed, 17 Sep 2025 21:56:32 +0900
-Subject: [PATCH 20/35] hw/remote: QOM-ify AddressSpace
+Date: Wed, 17 Sep 2025 21:56:33 +0900
+Subject: [PATCH 21/35] hw/riscv: QOM-ify AddressSpace
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -58,7 +58,7 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Message-Id: <20250917-qom-v1-20-7262db7b0a84@rsg.ci.i.u-tokyo.ac.jp>
+Message-Id: <20250917-qom-v1-21-7262db7b0a84@rsg.ci.i.u-tokyo.ac.jp>
 References: <20250917-qom-v1-0-7262db7b0a84@rsg.ci.i.u-tokyo.ac.jp>
 In-Reply-To: <20250917-qom-v1-0-7262db7b0a84@rsg.ci.i.u-tokyo.ac.jp>
 To: qemu-devel@nongnu.org
@@ -134,31 +134,44 @@ concise and also avoid conflicts with other properties.
 
 Signed-off-by: Akihiko Odaki <odaki@rsg.ci.i.u-tokyo.ac.jp>
 ---
- hw/remote/iommu.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+ hw/riscv/riscv-iommu.c | 10 +++++-----
+ 1 file changed, 5 insertions(+), 5 deletions(-)
 
-diff --git a/hw/remote/iommu.c b/hw/remote/iommu.c
-index aac5c178ec81..89d79e9480da 100644
---- a/hw/remote/iommu.c
-+++ b/hw/remote/iommu.c
-@@ -54,7 +54,7 @@ static AddressSpace *remote_iommu_find_add_as(PCIBus *pci_bus,
-     if (!elem->mr) {
-         elem->mr = MEMORY_REGION(object_new(TYPE_MEMORY_REGION));
-         memory_region_set_size(elem->mr, UINT64_MAX);
--        address_space_init(&elem->as, NULL, elem->mr, NULL);
-+        address_space_init(&elem->as, OBJECT(iommu), elem->mr, "as");
-     }
+diff --git a/hw/riscv/riscv-iommu.c b/hw/riscv/riscv-iommu.c
+index aed84d87a823..6e2962f8331b 100644
+--- a/hw/riscv/riscv-iommu.c
++++ b/hw/riscv/riscv-iommu.c
+@@ -1221,8 +1221,8 @@ static AddressSpace *riscv_iommu_space(RISCVIOMMUState *s, uint32_t devid)
+         memory_region_init_iommu(&as->iova_mr, sizeof(as->iova_mr),
+             TYPE_RISCV_IOMMU_MEMORY_REGION,
+             OBJECT(as), "riscv_iommu", UINT64_MAX);
+-        address_space_init(&as->iova_as, NULL, MEMORY_REGION(&as->iova_mr),
+-                           name);
++        address_space_init(&as->iova_as, OBJECT(s), MEMORY_REGION(&as->iova_mr),
++                           "iova-as");
  
-     qemu_mutex_unlock(&iommu->lock);
-@@ -73,7 +73,7 @@ void remote_iommu_unplug_dev(PCIDevice *pci_dev)
+         QLIST_INSERT_HEAD(&s->spaces, as, list);
  
-     elem = container_of(as, RemoteIommuElem, as);
+@@ -2427,8 +2427,8 @@ static void riscv_iommu_realize(DeviceState *dev, Error **errp)
+     /* Memory region for downstream access, if specified. */
+     if (s->target_mr) {
+         s->target_as = g_new0(AddressSpace, 1);
+-        address_space_init(s->target_as, NULL, s->target_mr,
+-            "riscv-iommu-downstream");
++        address_space_init(s->target_as, OBJECT(s), s->target_mr,
++                           "downstream-as");
+     } else {
+         /* Fallback to global system memory. */
+         s->target_as = &address_space_memory;
+@@ -2437,7 +2437,7 @@ static void riscv_iommu_realize(DeviceState *dev, Error **errp)
+     /* Memory region for untranslated MRIF/MSI writes */
+     memory_region_init_io(&s->trap_mr, OBJECT(dev), &riscv_iommu_trap_ops, s,
+             "riscv-iommu-trap", ~0ULL);
+-    address_space_init(&s->trap_as, NULL, &s->trap_mr, "riscv-iommu-trap-as");
++    address_space_init(&s->trap_as, OBJECT(s), &s->trap_mr, "trap-as");
  
--    address_space_destroy(&elem->as);
-+    object_unparent(OBJECT(&elem->as));
- 
-     object_unref(elem->mr);
- 
+     if (s->cap & RISCV_IOMMU_CAP_HPM) {
+         s->hpm_timer =
 
 -- 
 2.51.0
