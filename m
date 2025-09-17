@@ -1,183 +1,346 @@
-Return-Path: <kvm+bounces-57811-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-57812-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id B222AB7DBD1
-	for <lists+kvm@lfdr.de>; Wed, 17 Sep 2025 14:34:02 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8CC14B80122
+	for <lists+kvm@lfdr.de>; Wed, 17 Sep 2025 16:38:14 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id EE47B32740D
-	for <lists+kvm@lfdr.de>; Wed, 17 Sep 2025 00:44:58 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 7876C1C02E22
+	for <lists+kvm@lfdr.de>; Wed, 17 Sep 2025 01:13:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BF16D1F9F70;
-	Wed, 17 Sep 2025 00:44:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="Hcrw+VPV"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 97DF0278753;
+	Wed, 17 Sep 2025 01:11:02 +0000 (UTC)
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pj1-f73.google.com (mail-pj1-f73.google.com [209.85.216.73])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 72E3D1F582A
-	for <kvm@vger.kernel.org>; Wed, 17 Sep 2025 00:44:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.73
+Received: from mail.loongson.cn (mail.loongson.cn [114.242.206.163])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 435F3224B09;
+	Wed, 17 Sep 2025 01:10:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=114.242.206.163
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758069891; cv=none; b=GeLV01Q49HCT4NrKk6ZEU3B9X+NY4zxtyH5jco05MTbWWKN53LaVDLQq6ZidRixRzfJzBDcLhHvgcZwuMKvcL7pihPyElJ7fsfC8l9T21fux0PJlcqcqK9wF4Z8p93hgNgenin2Rxhtvea02roYMTl42RyOFJortJQmP+V48tEQ=
+	t=1758071461; cv=none; b=YHZlrM4JvtfjwDKu9XLABQJzycjY/uKCS9NU9UmcDyZ9+8lBdrP3DDPOA0f/DEImiRkAGtnLsfd/cZvzHERTSYOBCjYyyTh5rZbLB5FuzdXyrZqK2RKHiF9cPIcBSkn3FAkhmmhZhKj+ly/x9p3I7/4aolE0KJdIobkHCouL57k=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758069891; c=relaxed/simple;
-	bh=wnCfF1Pq7qMApkqSvVsfUpw6VTCZD2Uh7l+XHVS47BQ=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=A5/c1kSBYOh/N5CyPxTX3gwv99VOXMyg2TKhVgj/KuNEYQh7p6sPnUNAnmc4jxDTPPjsaWo3H7cWtZM+WySiOvUL2xa7bDLvdwJB4Iy+M5ddzIvu6vO0ZKmKuOtIuaqJPNcoLvs2M2u6lI6Gk1uTplUY7rvU+/ZHNCt8fmwMzf4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=Hcrw+VPV; arc=none smtp.client-ip=209.85.216.73
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pj1-f73.google.com with SMTP id 98e67ed59e1d1-32ee4998c50so34847a91.3
-        for <kvm@vger.kernel.org>; Tue, 16 Sep 2025 17:44:50 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1758069890; x=1758674690; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=v/hswYf7lVvCWOohdPLUi8yVfXTjuoy2lk/q+DzDdos=;
-        b=Hcrw+VPVmZwRghTgszmv/q6jgMCPPzQf+AWkt182O2/nIqeBtI4hifCT2cQP6D0NfN
-         9n6W9H/m1y8LyA+P4eNf6iVvu6ERuyFvyUetirEchszdic5ZD+bt5onrrN4mJCcU48Cq
-         OxQDfP1ATyr6KodWJdNv/dzAaz2tu8jCGbhQQKUK18oJQpAIY8F23k+JsVFrT9MH9tEq
-         lJuhlHe++Hm2T0lMPK2/NUwSKST8IxGPWU+BTIyNWZxSZRdygHB1rVdEc+A1GSGClww4
-         ajP5N4UlnyOe08Ijg8A9bqWFQk7BAlFOjszC8neMl/JJwzyXepV3Y6aqmu5Ej1+FDTl/
-         PVhw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1758069890; x=1758674690;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=v/hswYf7lVvCWOohdPLUi8yVfXTjuoy2lk/q+DzDdos=;
-        b=bXSXjn7dggNhpgg4CYbs3z0YuPnAaW5ccAtQDKbiXVIf8DNP0toaANtTE2BhFnhEkw
-         OLfyRY0J68VSCu7Fusz5TjhHpmqycsSV9AaDn24Gt2aMGmUQnr1u8uoThUTPf7oopV8/
-         HUtyRCcH36EyD8mf63fQhC7gEW7PCflWyngjK6ckKG+YgnCAGVYQio+wY+jLTKFMrPqa
-         AueFYrEEuql4uAHeJMlUwpcxccvTTZg39da5HMUX2W27JwBSBocVB42Kc9IW4JioLvF0
-         O7Wzzmat41dO2NrMaOJq3IXynC9wj3QOw0MuibufNxd0Zcbfzmsi8/R439L8ZlYQyhrf
-         +gug==
-X-Forwarded-Encrypted: i=1; AJvYcCUNnQqoIafx4eonEGfVjYcYG8LyovG3S6pEoM6jq+g2Ovv0zIErvkVU0Znh0f8E7kYFGd4=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yw5LHUHNxrrVU9BmjFstYRwH0KG+WPn4hoGvVP4Il+gYhMGZEJ8
-	/n4FdFjiEmKYAbYr1vcvo8tY0ke4RfCRTkoO79ZYrx0dg8iQvBVP0saS/W1rE5ZOmGrCzye2cfF
-	hdssWqg==
-X-Google-Smtp-Source: AGHT+IFsjL/8hjgK+SlOUP1KxLet5e59olC6UPdkGZJl/+EpswwUkD/EtMLcMiG57Gwu8VdNgrGo7PVX/LU=
-X-Received: from pjuj4.prod.google.com ([2002:a17:90a:d004:b0:32d:57a8:8ae6])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:33c2:b0:32e:a3bf:e606
- with SMTP id 98e67ed59e1d1-32ee3f8df4cmr318291a91.28.1758069889599; Tue, 16
- Sep 2025 17:44:49 -0700 (PDT)
-Date: Tue, 16 Sep 2025 17:44:48 -0700
-In-Reply-To: <fa63be53-8769-4761-b878-556f20e1fbfc@kernel.org>
+	s=arc-20240116; t=1758071461; c=relaxed/simple;
+	bh=p5MOrxNALnPdLniwGLdUchd89/VDK3rKO1Ya3OOUR2g=;
+	h=Subject:To:Cc:References:From:Message-ID:Date:MIME-Version:
+	 In-Reply-To:Content-Type; b=FTqJHeOhFc7uwoJWb6sslQFhVzRSlytkUGWKYHu4H4Fi4hT8Zhz/jQAmFID83ZEzDRWCWWEY4TO2DFEoOlknM2p8QlKZL1zA+n6Jaw2o672RbJ3m/EaHWhiDq7Rw5Jb80NQkuLRqI37Im1Wl2bAYXt0jPJq09PXFmBG3TAnAPqI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=loongson.cn; spf=pass smtp.mailfrom=loongson.cn; arc=none smtp.client-ip=114.242.206.163
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=loongson.cn
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=loongson.cn
+Received: from loongson.cn (unknown [10.20.42.62])
+	by gateway (Coremail) with SMTP id _____8BxndKhCsposi4LAA--.23751S3;
+	Wed, 17 Sep 2025 09:10:57 +0800 (CST)
+Received: from [10.20.42.62] (unknown [10.20.42.62])
+	by front1 (Coremail) with SMTP id qMiowJAxVOSeCspoamSaAA--.36958S3;
+	Wed, 17 Sep 2025 09:10:57 +0800 (CST)
+Subject: Re: [PATCH] LoongArch: KVM: Fix VM migration failure with PTW enabled
+To: Huacai Chen <chenhuacai@kernel.org>
+Cc: WANG Xuerui <kernel@xen0n.name>, kvm@vger.kernel.org,
+ loongarch@lists.linux.dev, linux-kernel@vger.kernel.org
+References: <20250910071429.3925025-1-maobibo@loongson.cn>
+ <CAAhV-H65H_iREuETGU_v9oZdaPFoQj1VZV46XSNTC8ppENXzuQ@mail.gmail.com>
+ <3d3a72c2-7c91-7640-5f0b-7b95bd5f0d2e@loongson.cn>
+ <CAAhV-H4bEyeV7WkfSNBJnicMhhnSwj3PEr9K4ZpXwto1=JyWUw@mail.gmail.com>
+From: Bibo Mao <maobibo@loongson.cn>
+Message-ID: <ff12ec30-b0df-aedd-a713-4fb77a4e092a@loongson.cn>
+Date: Wed, 17 Sep 2025 09:08:49 +0800
+User-Agent: Mozilla/5.0 (X11; Linux loongarch64; rv:68.0) Gecko/20100101
+ Thunderbird/68.7.0
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <cover.1756993734.git.naveen@kernel.org> <62c338a17fe5127215efbfd8f7c5322b7b49a294.1756993734.git.naveen@kernel.org>
- <aMhxaAh6a3Eps_NJ@google.com> <wo2sfg7sxkpnemiznpjtjou4xc6alad2muewkjulqk2wr2lc5q@vlb7m34ez2il>
- <f9d43ba5-0655-4a4e-b911-30b11615361d@kernel.org> <aMlrewJeXm-_ierH@google.com>
- <villgy3ehps5puo3grrs2zoknbr7oyuy3jikr2cvikm4xrdgtd@ftkyxrfmptsl> <fa63be53-8769-4761-b878-556f20e1fbfc@kernel.org>
-Message-ID: <aMoEgKQsfkIfL_wz@google.com>
-Subject: Re: [RFC PATCH v2 1/5] KVM: SVM: Stop warning if x2AVIC feature bit
- alone is enabled
-From: Sean Christopherson <seanjc@google.com>
-To: Mario Limonciello <superm1@kernel.org>
-Cc: Naveen N Rao <naveen@kernel.org>, Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org, 
-	Jim Mattson <jmattson@google.com>, Maxim Levitsky <mlevitsk@redhat.com>, 
-	Vasant Hegde <vasant.hegde@amd.com>, 
-	Suravee Suthikulpanit <suravee.suthikulpanit@amd.com>, Nikunj A Dadhania <nikunj@amd.com>, 
-	Alejandro Jimenez <alejandro.j.jimenez@oracle.com>, Joao Martins <joao.m.martins@oracle.com>, 
-	"Maciej S. Szmigiero" <maciej.szmigiero@oracle.com>
-Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+In-Reply-To: <CAAhV-H4bEyeV7WkfSNBJnicMhhnSwj3PEr9K4ZpXwto1=JyWUw@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+X-CM-TRANSID:qMiowJAxVOSeCspoamSaAA--.36958S3
+X-CM-SenderInfo: xpdruxter6z05rqj20fqof0/
+X-Coremail-Antispam: 1Uk129KBj93XoW3Wry3JFW8Cr1rAF15AF1UurX_yoWftF1xpF
+	WkGF4DAr48tr17GrW2g3Z0qr9FkrsrKF1xXF1UKw1UGF1DtryUuF18WrWY9F18A348G3W7
+	XF4rtry3u3y3tabCm3ZEXasCq-sJn29KB7ZKAUJUUUU8529EdanIXcx71UUUUU7KY7ZEXa
+	sCq-sGcSsGvfJ3Ic02F40EFcxC0VAKzVAqx4xG6I80ebIjqfuFe4nvWSU5nxnvy29KBjDU
+	0xBIdaVrnRJUUUv0b4IE77IF4wAFF20E14v26r1j6r4UM7CY07I20VC2zVCF04k26cxKx2
+	IYs7xG6rWj6s0DM7CIcVAFz4kK6r1Y6r17M28lY4IEw2IIxxk0rwA2F7IY1VAKz4vEj48v
+	e4kI8wA2z4x0Y4vE2Ix0cI8IcVAFwI0_Ar0_tr1l84ACjcxK6xIIjxv20xvEc7CjxVAFwI
+	0_Cr0_Gr1UM28EF7xvwVC2z280aVAFwI0_GcCE3s1l84ACjcxK6I8E87Iv6xkF7I0E14v2
+	6rxl6s0DM2AIxVAIcxkEcVAq07x20xvEncxIr21l57IF6xkI12xvs2x26I8E6xACxx1l5I
+	8CrVACY4xI64kE6c02F40Ex7xfMcIj6xIIjxv20xvE14v26r106r15McIj6I8E87Iv67AK
+	xVWUJVW8JwAm72CE4IkC6x0Yz7v_Jr0_Gr1lF7xvr2IY64vIr41lc7I2V7IY0VAS07AlzV
+	AYIcxG8wCF04k20xvY0x0EwIxGrwCFx2IqxVCFs4IE7xkEbVWUJVW8JwC20s026c02F40E
+	14v26r1j6r18MI8I3I0E7480Y4vE14v26r106r1rMI8E67AF67kF1VAFwI0_JF0_Jw1lIx
+	kGc2Ij64vIr41lIxAIcVC0I7IYx2IY67AKxVWUJVWUCwCI42IY6xIIjxv20xvEc7CjxVAF
+	wI0_Jr0_Gr1lIxAIcVCF04k26cxKx2IYs7xG6r1j6r1xMIIF0xvEx4A2jsIE14v26r1j6r
+	4UMIIF0xvEx4A2jsIEc7CjxVAFwI0_Jr0_GrUvcSsGvfC2KfnxnUUI43ZEXa7IU8j-e5UU
+	UUU==
 
-On Tue, Sep 16, 2025, Mario Limonciello wrote:
-> On 9/16/25 1:37 PM, Naveen N Rao wrote:
-> > On Tue, Sep 16, 2025 at 06:51:55AM -0700, Sean Christopherson wrote:
-> > > On Tue, Sep 16, 2025, Mario Limonciello wrote:
-> > > > On 9/16/25 2:14 AM, Naveen N Rao wrote:
-> > > > > On Mon, Sep 15, 2025 at 01:04:56PM -0700, Sean Christopherson wrote:
-> > > > > > On Thu, Sep 04, 2025, Naveen N Rao (AMD) wrote:
-> > > > > There are platforms where this is the case though:
-> > > > > 
-> > > > > $ cpuid -1 -l 0x8000000A | grep -i avic
-> > > > >         AVIC: AMD virtual interrupt controller  = false
-> > > > >         X2AVIC: virtualized X2APIC              = true
-> > > > >         extended LVT AVIC access changes        = true
-> > > > > 
-> > > > > The above is from Zen 4 (Phoenix), and my primary concern is that we
-> > > > > will start printing a warning by default. Besides, there isn't much a
-> > > > > user can do here (except start using force_avic, which will taint the
-> > > > > kernel). Maybe we can warn only if AVIC is being explicitly enabled?
-> > > 
-> > > Uh, get that platform to not ship with a broken setup?
-> > > 
-> > > > I'd say if you need to say something downgrade it to info instead and not
-> > > > mark it as firmware bug.
-> > > 
-> > > How is the above not a "firmware" bug?
-> > 
-> > Ok, looking at AVIC-related CPUID feature bits:
-> > 1. Fn8000_000A_EDX[AVIC] (bit 13) representing core AVIC support
-> > 2. Fn8000_000A_EDX[x2AVIC] (bit 18) for x2APIC MSR support
-> > 3. Fn8000_000A_EDX[ExtLvtAvicAccessChg] (bit 27) for change to AVIC
-> > handling of eLVT registers
-> > 4. Fn8000_000A_ECX[x2AVIC_EXT] (bit 6) for x2AVIC 4k vCPU support
-> > 
-> > The latter three are dependent on the first feature being enabled. If a
-> > platform wants to disable AVIC for whatever reason, it could:
-> > - disable (1), and leave the rest of the three feature bits on as a way
-> >    to advertise support for those (OR)
-> > - disable all the four CPUID feature bits above
-> > 
-> > I think you are saying that the former is wrong and the right way to
-> > disable AVIC would be to turn off all the four CPUID feature bits above?
 
-Yes.
 
-> > I don't know enough about x86/CPUIDs to argue about that ;)
-> > 
-> > However, it appears to me that the former approach of only disabling the
-> > base AVIC CPUID feature bit is helpful in advertising the platform
-> > capabilities.
+On 2025/9/16 下午10:21, Huacai Chen wrote:
+> On Mon, Sep 15, 2025 at 9:22 AM Bibo Mao <maobibo@loongson.cn> wrote:
+>>
+>>
+>>
+>> On 2025/9/14 上午9:57, Huacai Chen wrote:
+>>> Hi, Bibo,
+>>>
+>>> On Wed, Sep 10, 2025 at 3:14 PM Bibo Mao <maobibo@loongson.cn> wrote:
+>>>>
+>>>> With PTW disabled system, bit Dirty is HW bit for page writing, however
+>>>> with PTW enabled system, bit Write is HW bit for page writing. Previously
+>>>> bit Write is treated as SW bit to record page writable attribute for fast
+>>>> page fault handling in the secondary MMU, however with PTW enabled machine,
+>>>> this bit is used by HW already.
+>>>>
+>>>> Here define KVM_PAGE_SOFT_WRITE with SW bit _PAGE_MODIFIED, so that it can
+>>>> work on both PTW disabled and enabled machines. And with HW write bit, both
+>>>> bit Dirty and Write is set or clear.
+>>>>
+>>>> Signed-off-by: Bibo Mao <maobibo@loongson.cn>
+>>>> ---
+>>>>    arch/loongarch/include/asm/kvm_mmu.h | 20 ++++++++++++++++----
+>>>>    arch/loongarch/kvm/mmu.c             |  8 ++++----
+>>>>    2 files changed, 20 insertions(+), 8 deletions(-)
+>>>>
+>>>> diff --git a/arch/loongarch/include/asm/kvm_mmu.h b/arch/loongarch/include/asm/kvm_mmu.h
+>>>> index 099bafc6f797..efcd593c42b1 100644
+>>>> --- a/arch/loongarch/include/asm/kvm_mmu.h
+>>>> +++ b/arch/loongarch/include/asm/kvm_mmu.h
+>>>> @@ -16,6 +16,13 @@
+>>>>     */
+>>>>    #define KVM_MMU_CACHE_MIN_PAGES        (CONFIG_PGTABLE_LEVELS - 1)
+>>>>
+>>>> +/*
+>>>> + * _PAGE_MODIFIED is SW pte bit, it records page ever written on host
+>>>> + * kernel, on secondary MMU it records page writable in order to fast
+>>>> + * path handling
+>>>> + */
+>>>> +#define KVM_PAGE_SOFT_WRITE    _PAGE_MODIFIED
+>>> KVM_PAGE_WRITEABLE is more suitable.
+>> both are ok for me.
+>>>
+>>>> +
+>>>>    #define _KVM_FLUSH_PGTABLE     0x1
+>>>>    #define _KVM_HAS_PGMASK                0x2
+>>>>    #define kvm_pfn_pte(pfn, prot) (((pfn) << PFN_PTE_SHIFT) | pgprot_val(prot))
+>>>> @@ -52,11 +59,16 @@ static inline void kvm_set_pte(kvm_pte_t *ptep, kvm_pte_t val)
+>>>>           WRITE_ONCE(*ptep, val);
+>>>>    }
+>>>>
+>>>> -static inline int kvm_pte_write(kvm_pte_t pte) { return pte & _PAGE_WRITE; }
+>>>> -static inline int kvm_pte_dirty(kvm_pte_t pte) { return pte & _PAGE_DIRTY; }
+>>>> +static inline int kvm_pte_soft_write(kvm_pte_t pte) { return pte & KVM_PAGE_SOFT_WRITE; }
+>>> The same, kvm_pte_mkwriteable() is more suitable.
+>> kvm_pte_writable()  here ?  and kvm_pte_mkwriteable() for the bellowing
+>> sentense.
+>>
+>> If so, that is ok, both are ok for me.
+> Yes.
+> 
+>>>
+>>>> +static inline int kvm_pte_dirty(kvm_pte_t pte) { return pte & __WRITEABLE; }
+>>> _PAGE_DIRTY and _PAGE_WRITE are always set/cleared at the same time,
+>>> so the old version still works.
+>> Although it is workable, I still want to remove single bit _PAGE_DIRTY
+>> checking here.
+> I want to check a single bit because "kvm_pte_write() return
+> _PAGE_WRITE and kvm_pte_dirty() return _PAGE_DIRTY" looks more
+> natural.
+kvm_pte_write() is not needed any more and removed here. This is only
+kvm_pte_writable() to check software writable bit, kvm_pte_dirty() to 
+check HW write bit.
 
-My objection to that approach is that by disabling AVIC, the platform is no longer
-capable of x2AVIC.  There are other situations where firmware can disable a feature
-that is reported as support in CPUID, e.g. VMX vs. FEATURE_CONTROL on Intel, but
-in those cases, the disabling is visible to software in something other than CPUID,
-i.e. it's obvious to software that firmware has disabled (or maybe just not enabled)
-the related feature.
+There is no reason to check single bit with _PAGE_WRITE or _PAGE_DIRTY, 
+since there is different meaning on machines with/without HW PTW.
 
-For me, this is different.  It won't be at all obvious to the vast majority of
-users, myself included, that firmware is even capable of manipulating CPUID in
-this way.
+Regards
+Bibo Mao
+> 
+> You may argue that kvm_pte_mkdirty() set both _PAGE_WRITE and
+> _PAGE_DIRTY so kvm_pte_dirty() should also return both. But I think
+> kvm_pte_mkdirty() in this patch is just a "reasonable optimization".
+> Because strictly speaking, we need both kvm_pte_mkdirty() and
+> kvm_pte_mkwrite() and call the pair when needed.
+> 
+> Huacai
+> 
+>>
+>> Regards
+>> Bibo Mao
+>>>
+>>>>    static inline int kvm_pte_young(kvm_pte_t pte) { return pte & _PAGE_ACCESSED; }
+>>>>    static inline int kvm_pte_huge(kvm_pte_t pte) { return pte & _PAGE_HUGE; }
+>>>>
+>>>> +static inline kvm_pte_t kvm_pte_mksoft_write(kvm_pte_t pte)
+>>>> +{
+>>>> +       return pte | KVM_PAGE_SOFT_WRITE;
+>>>> +}
+>>>> +
+>>>>    static inline kvm_pte_t kvm_pte_mkyoung(kvm_pte_t pte)
+>>>>    {
+>>>>           return pte | _PAGE_ACCESSED;
+>>>> @@ -69,12 +81,12 @@ static inline kvm_pte_t kvm_pte_mkold(kvm_pte_t pte)
+>>>>
+>>>>    static inline kvm_pte_t kvm_pte_mkdirty(kvm_pte_t pte)
+>>>>    {
+>>>> -       return pte | _PAGE_DIRTY;
+>>>> +       return pte | __WRITEABLE;
+>>>>    }
+>>>>
+>>>>    static inline kvm_pte_t kvm_pte_mkclean(kvm_pte_t pte)
+>>>>    {
+>>>> -       return pte & ~_PAGE_DIRTY;
+>>>> +       return pte & ~__WRITEABLE;
+>>>>    }
+>>>>
+>>>>    static inline kvm_pte_t kvm_pte_mkhuge(kvm_pte_t pte)
+>>>> diff --git a/arch/loongarch/kvm/mmu.c b/arch/loongarch/kvm/mmu.c
+>>>> index ed956c5cf2cc..68749069290f 100644
+>>>> --- a/arch/loongarch/kvm/mmu.c
+>>>> +++ b/arch/loongarch/kvm/mmu.c
+>>>> @@ -569,7 +569,7 @@ static int kvm_map_page_fast(struct kvm_vcpu *vcpu, unsigned long gpa, bool writ
+>>>>           /* Track access to pages marked old */
+>>>>           new = kvm_pte_mkyoung(*ptep);
+>>>>           if (write && !kvm_pte_dirty(new)) {
+>>>> -               if (!kvm_pte_write(new)) {
+>>>> +               if (!kvm_pte_soft_write(new)) {
+>>>>                           ret = -EFAULT;
+>>>>                           goto out;
+>>>>                   }
+>>>> @@ -856,9 +856,9 @@ static int kvm_map_page(struct kvm_vcpu *vcpu, unsigned long gpa, bool write)
+>>>>                   prot_bits |= _CACHE_SUC;
+>>>>
+>>>>           if (writeable) {
+>>>> -               prot_bits |= _PAGE_WRITE;
+>>>> +               prot_bits = kvm_pte_mksoft_write(prot_bits);
+>>>>                   if (write)
+>>>> -                       prot_bits |= __WRITEABLE;
+>>>> +                       prot_bits = kvm_pte_mkdirty(prot_bits);
+>>>>           }
+>>>>
+>>>>           /* Disable dirty logging on HugePages */
+>>>> @@ -904,7 +904,7 @@ static int kvm_map_page(struct kvm_vcpu *vcpu, unsigned long gpa, bool write)
+>>>>           kvm_release_faultin_page(kvm, page, false, writeable);
+>>>>           spin_unlock(&kvm->mmu_lock);
+>>>>
+>>>> -       if (prot_bits & _PAGE_DIRTY)
+>>>> +       if (kvm_pte_dirty(prot_bits))
+>>>>                   mark_page_dirty_in_slot(kvm, memslot, gfn);
+>>>>
+>>>>    out:
+>>> To save time, I just change the whole patch like this, you can confirm
+>>> whether it woks:
+>>>
+>>> diff --git a/arch/loongarch/include/asm/kvm_mmu.h
+>>> b/arch/loongarch/include/asm/kvm_mmu.h
+>>> index 099bafc6f797..882f60c72b46 100644
+>>> --- a/arch/loongarch/include/asm/kvm_mmu.h
+>>> +++ b/arch/loongarch/include/asm/kvm_mmu.h
+>>> @@ -16,6 +16,13 @@
+>>>     */
+>>>    #define KVM_MMU_CACHE_MIN_PAGES        (CONFIG_PGTABLE_LEVELS - 1)
+>>>
+>>> +/*
+>>> + * _PAGE_MODIFIED is SW pte bit, it records page ever written on host
+>>> + * kernel, on secondary MMU it records page writable in order to fast
+>>> + * path handling
+>>> + */
+>>> +#define KVM_PAGE_WRITEABLE     _PAGE_MODIFIED
+>>> +
+>>>    #define _KVM_FLUSH_PGTABLE     0x1
+>>>    #define _KVM_HAS_PGMASK                0x2
+>>>    #define kvm_pfn_pte(pfn, prot) (((pfn) << PFN_PTE_SHIFT) |
+>>> pgprot_val(prot))
+>>> @@ -56,6 +63,7 @@ static inline int kvm_pte_write(kvm_pte_t pte) {
+>>> return pte & _PAGE_WRITE; }
+>>>    static inline int kvm_pte_dirty(kvm_pte_t pte) { return pte &
+>>> _PAGE_DIRTY; }
+>>>    static inline int kvm_pte_young(kvm_pte_t pte) { return pte &
+>>> _PAGE_ACCESSED; }
+>>>    static inline int kvm_pte_huge(kvm_pte_t pte) { return pte &
+>>> _PAGE_HUGE; }
+>>> +static inline int kvm_pte_writeable(kvm_pte_t pte) { return pte &
+>>> KVM_PAGE_WRITEABLE; }
+>>>
+>>>    static inline kvm_pte_t kvm_pte_mkyoung(kvm_pte_t pte)
+>>>    {
+>>> @@ -69,12 +77,12 @@ static inline kvm_pte_t kvm_pte_mkold(kvm_pte_t
+>>> pte)
+>>>
+>>>    static inline kvm_pte_t kvm_pte_mkdirty(kvm_pte_t pte)
+>>>    {
+>>> -       return pte | _PAGE_DIRTY;
+>>> +       return pte | __WRITEABLE;
+>>>    }
+>>>
+>>>    static inline kvm_pte_t kvm_pte_mkclean(kvm_pte_t pte)
+>>>    {
+>>> -       return pte & ~_PAGE_DIRTY;
+>>> +       return pte & ~__WRITEABLE;
+>>>    }
+>>>
+>>>    static inline kvm_pte_t kvm_pte_mkhuge(kvm_pte_t pte)
+>>> @@ -87,6 +95,11 @@ static inline kvm_pte_t kvm_pte_mksmall(kvm_pte_t
+>>> pte)
+>>>           return pte & ~_PAGE_HUGE;
+>>>    }
+>>>
+>>> +static inline kvm_pte_t kvm_pte_mkwriteable(kvm_pte_t pte)
+>>> +{
+>>> +       return pte | KVM_PAGE_WRITEABLE;
+>>> +}
+>>> +
+>>>    static inline int kvm_need_flush(kvm_ptw_ctx *ctx)
+>>>    {
+>>>           return ctx->flag & _KVM_FLUSH_PGTABLE;
+>>> diff --git a/arch/loongarch/kvm/mmu.c b/arch/loongarch/kvm/mmu.c
+>>> index ed956c5cf2cc..7c8143e79c12 100644
+>>> --- a/arch/loongarch/kvm/mmu.c
+>>> +++ b/arch/loongarch/kvm/mmu.c
+>>> @@ -569,7 +569,7 @@ static int kvm_map_page_fast(struct kvm_vcpu
+>>> *vcpu, unsigned long gpa, bool writ
+>>>           /* Track access to pages marked old */
+>>>           new = kvm_pte_mkyoung(*ptep);
+>>>           if (write && !kvm_pte_dirty(new)) {
+>>> -               if (!kvm_pte_write(new)) {
+>>> +               if (!kvm_pte_writeable(new)) {
+>>>                           ret = -EFAULT;
+>>>                           goto out;
+>>>                   }
+>>> @@ -856,9 +856,9 @@ static int kvm_map_page(struct kvm_vcpu *vcpu,
+>>> unsigned long gpa, bool write)
+>>>                   prot_bits |= _CACHE_SUC;
+>>>
+>>>           if (writeable) {
+>>> -               prot_bits |= _PAGE_WRITE;
+>>> +               prot_bits = kvm_pte_mkwriteable(prot_bits);
+>>>                   if (write)
+>>> -                       prot_bits |= __WRITEABLE;
+>>> +                       prot_bits = kvm_pte_mkdirty(prot_bits);
+>>>           }
+>>>
+>>>           /* Disable dirty logging on HugePages */
+>>> @@ -904,7 +904,7 @@ static int kvm_map_page(struct kvm_vcpu *vcpu,
+>>> unsigned long gpa, bool write)
+>>>           kvm_release_faultin_page(kvm, page, false, writeable);
+>>>           spin_unlock(&kvm->mmu_lock);
+>>>
+>>> -       if (prot_bits & _PAGE_DIRTY)
+>>> +       if (kvm_pte_dirty(prot_bits))
+>>>                   mark_page_dirty_in_slot(kvm, memslot, gfn);
+>>>
+>>>    out:
+>>>
+>>> Huacai
+>>>
+>>>>
+>>>> base-commit: 9dd1835ecda5b96ac88c166f4a87386f3e727bd9
+>>>> --
+>>>> 2.39.3
+>>>>
+>>>>
+>>
 
-> > Assuming AVIC was disabled due to a harware erratum, those who are _not_
-> > affected by the erratum can meaningfully force-enable AVIC and also have
-> > x2AVIC (and other related AVIC features and extensions) get enabled
-> > automatically.  If all AVIC related CPUID feature bits were to be
-> > disabled, then force_avic will serve a limited role unless it is
-> > extended.
-> > 
-> > I don't know if there is precedence for this, or if it is at all ok,
-> > just that it may be helpful.
-> > 
-> > Also, those platforms are unlikely to be fixed (client/desktop systems
-> > that are unlikely to receive updates).
-
-I know, but IMO it's not KVM's responsibility to hide the existence of what appears
-buggy firmware.  With my user hat on, I would be very frustrated if I had to post
-to the KVM mailing and wait for someone in the loop to explain that my firmware is
-buggy.
-
-> > The current warning suggests passing force_avic, but that will just
-> > taint the kernel and potentially break more things assuming AVIC was
-> > turned off for a good reason. Or, users can start explicitly disabling
-> > AVIC by passing "avic=0" if they want to turn off the warning. Both of
-> > these don't seem helpful, especially on client platforms.
-> > 
-> > So, if you still think that we should retain that warning, should we
-> > tweak it not to suggest force_avic?
-
-Hmm, yeah, I agree.  Suggesting random users to enable force_avic by default is
-borderline irresponsible.  Even suggesting it to anyone that enables AVIC manually
-is a bit sketchy...
 
