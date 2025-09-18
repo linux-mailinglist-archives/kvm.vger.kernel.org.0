@@ -1,177 +1,207 @@
-Return-Path: <kvm+bounces-57989-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-57990-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id B9D59B835FB
-	for <lists+kvm@lfdr.de>; Thu, 18 Sep 2025 09:42:45 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 544EDB83CBD
+	for <lists+kvm@lfdr.de>; Thu, 18 Sep 2025 11:29:42 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 3AC731C80B3B
-	for <lists+kvm@lfdr.de>; Thu, 18 Sep 2025 07:42:30 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 4CC3B188DF11
+	for <lists+kvm@lfdr.de>; Thu, 18 Sep 2025 09:29:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4179E2ECD28;
-	Thu, 18 Sep 2025 07:40:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 845B33019A7;
+	Thu, 18 Sep 2025 09:29:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="lBXYlN5M"
 X-Original-To: kvm@vger.kernel.org
-Received: from cstnet.cn (smtp84.cstnet.cn [159.226.251.84])
-	(using TLSv1.2 with cipher DHE-RSA-AES256-SHA (256/256 bits))
+Received: from mail-pj1-f74.google.com (mail-pj1-f74.google.com [209.85.216.74])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 010C92EAD0A;
-	Thu, 18 Sep 2025 07:40:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=159.226.251.84
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1892B3002D4
+	for <kvm@vger.kernel.org>; Thu, 18 Sep 2025 09:29:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.74
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758181205; cv=none; b=fBBkb1bmDoEKq57x0niQ0eVUKRSwMViThtaldnj6IMjqg2XK/4/t+dbW3TEqyH5JGChM45+O30JTZX3bJHd//dx3IpKZtIEZJqEgRz4EAkX0BqqUI40teWbm6r1s/JICCO0Gn+okTAvyU35x4lTganxoUiARdBjO9DGbTS4TK8s=
+	t=1758187757; cv=none; b=o6KqxJdCU8SViC9YX1B2L7MI7yJHEtGfWq9MjZhP6Q3XB6htkvndr8LdxN6utQvsrm7kWLOaf546KN0d7FTjkxDOQiBVsEBH71WMg+jMq4zY6t/LhRFqDheYRSHIH8fbyeEi9pmwgGDmMIjNalbP+1jATddophBLBHtce1wUklc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758181205; c=relaxed/simple;
-	bh=czA3Q5d93APggFE6yfrJXoPL0H7UP+NlCjnVDYPdXcM=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=DI4Q+Ioeld4264gQ1qeVkKYPi08F3S5ICis/QbVeE3uvchX1H7SRlx3sqh4waS8E3DN2nKLRWft9hYlbzANhhsGbtZ/s7uU1RRAegt/56hThBg4BLagZu9Xbat7gDwXIBio++1Jcjo68s8IJT8swjHWIobg95fgX192Z921T5hA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iscas.ac.cn; spf=pass smtp.mailfrom=iscas.ac.cn; arc=none smtp.client-ip=159.226.251.84
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iscas.ac.cn
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iscas.ac.cn
-Received: from qiao.. (unknown [210.73.43.101])
-	by APP-05 (Coremail) with SMTP id zQCowADHaBI+t8toBKqGAw--.13402S2;
-	Thu, 18 Sep 2025 15:39:43 +0800 (CST)
-From: Zhe Qiao <qiaozhe@iscas.ac.cn>
-To: anup@brainfault.org,
-	atish.patra@linux.dev,
-	paul.walmsley@sifive.com,
-	palmer@dabbelt.com,
-	aou@eecs.berkeley.edu,
-	alex@ghiti.fr,
-	qiaozhe@iscas.ac.cn
-Cc: linux-riscv@lists.infradead.org,
-	kvm-riscv@lists.infradead.org,
-	linux-kernel@vger.kernel.org,
-	kvm@vger.kernel.org
-Subject: [PATCH] RISCV: KVM: Add support for userspace to suspend a vCPU
-Date: Thu, 18 Sep 2025 15:39:27 +0800
-Message-ID: <20250918073927.403410-1-qiaozhe@iscas.ac.cn>
-X-Mailer: git-send-email 2.43.0
+	s=arc-20240116; t=1758187757; c=relaxed/simple;
+	bh=lbPL2i1Afubcw+Qs5zLSUx0wWtcDGsQ1FaY6PcJdGfE=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=joijt7DRBAT1M8fTOA036cml839ObW4fd2LEfvZpR5sPEmdUfEYd//D/UVcmmnb5ho3EoIiNFalP5rXZ6KAqLOQd2qsR4zqrFHpu9XWGlBIzwcYClMBhY8Zz8B1g+HWIITzbKQABH02IO6GBcaNlopkovGKpd0nZ/d3UBTrslsk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--ackerleytng.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=lBXYlN5M; arc=none smtp.client-ip=209.85.216.74
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--ackerleytng.bounces.google.com
+Received: by mail-pj1-f74.google.com with SMTP id 98e67ed59e1d1-32eaa47c7c8so731173a91.3
+        for <kvm@vger.kernel.org>; Thu, 18 Sep 2025 02:29:15 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1758187755; x=1758792555; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=xQDo9EaQ2w3t78/otIEPi+dSfFPSjpELcLYcaQVq7QY=;
+        b=lBXYlN5MG+q3dWJM0VkQiBPi5cQe3+28kH+ay7MViy+cjh3HyXgENW1GP2v9Q3rwgO
+         sumv7tV6tlSMQ+D4OWWkrrBN1p39Eolhq0ektHh39dIRbY0VCnfj9/NCC1n1Bk8Tz5WX
+         hcKEKN7Zp1yhoSIDtJHxHway6/GhZ6VEEgCv+ehiC19ea5T1Yfman6A9icFkFV+ZInT6
+         oVZ3ym+w1gCKuWyvy8nlfHzrL9hQkb1PYYq/VlBxBQOOj0xVUZjbp1rVulumW+viu9OP
+         yDhdYfDEXqyS6E4Tdgi4EchK5TBoxO+RMWt7zbOtD9kl0k66bCY1XQdpfyyQVHZdJEah
+         X80g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1758187755; x=1758792555;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=xQDo9EaQ2w3t78/otIEPi+dSfFPSjpELcLYcaQVq7QY=;
+        b=DTPkbfhhWxuI5u2pygCXkbf7e2ajaYlaA0J13/bL8tb6zZfcAmwrriHRrfKmceJs4j
+         rbzQ1j3MfJIbqGNJ7b7h8PSQG+XxUevqPaBD0AoMB8WmpgNl10FtXE0sUUTPwF2IlrU5
+         cPaUdlzXRJIDeln7iy6QrQiZzCORd15IHOZlqy4SIqU+PH5dN/r0TFxXNnIkx6iQOTnV
+         fNr+D4RQOkhk9FupQMqgkArZqKWCuPCaKNTVjFtbgWmcVw7SoAcvNpsXVkaLURIEuqqB
+         +ZqDImwFAvRDG3g2IDrYUvpqv8AtKigJm/t6zszVIRklC7bVeUDXlkvqG/sR42mtoc2j
+         si0A==
+X-Gm-Message-State: AOJu0Yz4yhc3bnPLQf1hhd+tcRsZJbo5Iifv4dAkL1mgPsrc7v65psTA
+	KuW589EWaSUP09ixRR0rf60Awq7UXZRKgIag5iVc56/MftmarZ5+d3gcK48VpkrMR0v4fdic+BQ
+	R9VP1glKo6bT/vvaWcfxxn2STeQ==
+X-Google-Smtp-Source: AGHT+IFUQkgkuqmfWUG7HDKnuWEBjj0flQA10iJkOzbHKdrj3MYRDVrEP3z7SCj5p8m6zzJiYkILKbi/G2n6kH7QHg==
+X-Received: from pjbsi16.prod.google.com ([2002:a17:90b:5290:b0:32e:8ff7:495])
+ (user=ackerleytng job=prod-delivery.src-stubby-dispatcher) by
+ 2002:a17:90b:1b12:b0:330:6d5e:f17e with SMTP id 98e67ed59e1d1-3306d5ef3f6mr1962826a91.24.1758187755343;
+ Thu, 18 Sep 2025 02:29:15 -0700 (PDT)
+Date: Thu, 18 Sep 2025 09:29:14 +0000
+In-Reply-To: <diqzcy7op5wg.fsf@google.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:zQCowADHaBI+t8toBKqGAw--.13402S2
-X-Coremail-Antispam: 1UD129KBjvJXoWxWw4rCr1fKw1rJFyfJw1fWFg_yoW5ZFy7pF
-	sFkrs09w4rGryxCw13J3yDur15WrsYgrnxury29rW5Gr45KrWrAr4v9rW5JF1UJFW8XF1I
-	yFn8K3WUC3W5twUanT9S1TB71UUUUUDqnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-	9KBjDU0xBIdaVrnRJUUU9K14x267AKxVW8JVW5JwAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
-	rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2ocxC64kIII0Yj41l84x0c7CEw4AK67xGY2AK02
-	1l84ACjcxK6xIIjxv20xvE14v26r4j6ryUM28EF7xvwVC0I7IYx2IY6xkF7I0E14v26r4j
-	6F4UM28EF7xvwVC2z280aVAFwI0_Cr1j6rxdM28EF7xvwVC2z280aVCY1x0267AKxVW0oV
-	Cq3wAS0I0E0xvYzxvE52x082IY62kv0487Mc02F40EFcxC0VAKzVAqx4xG6I80ewAv7VC0
-	I7IYx2IY67AKxVWUXVWUAwAv7VC2z280aVAFwI0_Gr0_Cr1lOx8S6xCaFVCjc4AY6r1j6r
-	4UM4x0Y48IcxkI7VAKI48JM4x0x7Aq67IIx4CEVc8vx2IErcIFxwACI402YVCY1x02628v
-	n2kIc2xKxwCY1x0262kKe7AKxVWUtVW8ZwCY02Avz4vE14v_GF4l42xK82IYc2Ij64vIr4
-	1l4I8I3I0E4IkC6x0Yz7v_Jr0_Gr1lx2IqxVAqx4xG67AKxVWUJVWUGwC20s026x8GjcxK
-	67AKxVWUGVWUWwC2zVAF1VAY17CE14v26r1q6r43MIIYrxkI7VAKI48JMIIF0xvE2Ix0cI
-	8IcVAFwI0_Jr0_JF4lIxAIcVC0I7IYx2IY6xkF7I0E14v26r4j6F4UMIIF0xvE42xK8VAv
-	wI8IcIk0rVWUJVWUCwCI42IY6I8E87Iv67AKxVWUJVW8JwCI42IY6I8E87Iv6xkF7I0E14
-	v26r4j6r4UJbIYCTnIWIevJa73UjIFyTuYvjfUeJ5rDUUUU
-X-CM-SenderInfo: ptld061kh6x2xfdvhtffof0/
+Mime-Version: 1.0
+References: <20250613005400.3694904-1-michael.roth@amd.com>
+ <20250613005400.3694904-2-michael.roth@amd.com> <diqztt1vf198.fsf@google.com>
+ <20250916233335.wv2lf4fiejlw53o2@amd.com> <diqzo6r8p90a.fsf@google.com> <diqzcy7op5wg.fsf@google.com>
+Message-ID: <diqza52sp0r9.fsf@google.com>
+Subject: Re: [PATCH RFC v1 1/5] KVM: guest_memfd: Remove preparation tracking
+From: Ackerley Tng <ackerleytng@google.com>
+To: Michael Roth <michael.roth@amd.com>
+Cc: kvm@vger.kernel.org, linux-coco@lists.linux.dev, linux-mm@kvack.org, 
+	linux-kernel@vger.kernel.org, david@redhat.com, tabba@google.com, 
+	vannapurve@google.com, ira.weiny@intel.com, thomas.lendacky@amd.com, 
+	pbonzini@redhat.com, seanjc@google.com, vbabka@suse.cz, joro@8bytes.org, 
+	pratikrajesh.sampat@amd.com, liam.merwick@oracle.com, yan.y.zhao@intel.com, 
+	aik@amd.com
+Content-Type: text/plain; charset="UTF-8"
 
-Add RISC-V architecture support for the KVM_MP_STATE_SUSPENDED vCPU
-state, indicating that a vCPU is in suspended mode. While suspended,
-the vCPU will block execution until a wakeup event is detected.
+Ackerley Tng <ackerleytng@google.com> writes:
 
-Introduce a new system event type, KVM_SYSTEM_EVENT_WAKEUP, to notify
-userspace when KVM has recognized such a wakeup event. It is then
-userspace’s responsibility to either make the vCPU runnable again or
-keep it suspended until the next wakeup event occurs.
+> Ackerley Tng <ackerleytng@google.com> writes:
+>
+>> Michael Roth <michael.roth@amd.com> writes:
+>>
+>>> On Mon, Aug 25, 2025 at 04:08:19PM -0700, Ackerley Tng wrote:
+>>>> Michael Roth <michael.roth@amd.com> writes:
+>>>> 
+>>>> 
+>>>> [...snip...]
+>>>> 
+>>>> > @@ -435,13 +430,7 @@ static inline void kvm_gmem_mark_prepared(struct folio *folio)
+>>>> >  static int kvm_gmem_prepare_folio(struct kvm *kvm, struct kvm_memory_slot *slot,
+>>>> >  				  gfn_t gfn, struct folio *folio)
+>>>> >  {
+>>>> > -	unsigned long nr_pages, i;
+>>>> >  	pgoff_t index;
+>>>> > -	int r;
+>>>> > -
+>>>> > -	nr_pages = folio_nr_pages(folio);
+>>>> > -	for (i = 0; i < nr_pages; i++)
+>>>> > -		clear_highpage(folio_page(folio, i));
+>>>> >  
+>>>> >  	/*
+>>>> >  	 * Preparing huge folios should always be safe, since it should
+>>>> > @@ -459,11 +448,8 @@ static int kvm_gmem_prepare_folio(struct kvm *kvm, struct kvm_memory_slot *slot,
+>>>> 
+>>>> While working on HugeTLB support for guest_memfd, I added a test that
+>>>> tries to map a non-huge-page-aligned gmem.pgoff to a huge-page aligned
+>>>> gfn.
+>>>> 
+>>>> I understand that config would destroy the performance advantages of
+>>>> huge pages, but I think the test is necessary since Yan brought up the
+>>>> use case here [1].
+>>>> 
+>>>> The conclusion in that thread, I believe, was to allow binding of
+>>>> unaligned GFNs to offsets, but disallow large pages in that case. The
+>>>> next series for guest_memfd HugeTLB support will include a fix similar
+>>>> to this [2].
+>>>> 
+>>>> While testing, I hit this WARN_ON with a non-huge-page-aligned
+>>>> gmem.pgoff.
+>>>> 
+>>>> >  	WARN_ON(!IS_ALIGNED(slot->gmem.pgoff, 1 << folio_order(folio)));
+>>>> 
+>>>> Do you all think this WARN_ON can be removed?
+>>>
+>>> I think so.. I actually ended up dropping this WARN_ON() for a similar
+>>> reason:
+>>>
+>>
+>> Thanks for confirming!
+>>
+>
+> Dropping this WARN_ON() actually further highlights the importance of
+> separating preparedness from folio flags (and the folio).
+>
+> With huge pages being supported in guest_memfd, it's possible for just
+> part of a folio to be mapped into the stage 2 page tables. One example
+> of this is if userspace were to request populating just 2M in a 1G
+> page. If preparedness were recorded in folio flags, then the entire 1G
+> would be considered prepared even though only 2M of that page was
+> prepared (updated in RMP tables).
+>
+> So I do support making the uptodate flag only mean zeroed, and taking
+> preparedness out of the picture.
+>
+> With this change, kvm_gmem_prepare_folio() and
+> __kvm_gmem_prepare_folio() seems to be a misnomer, since conceptually
+> we're not preparing a folio, we can't assume that we're always preparing
+> a whole folio once huge pages are in the picture.
+>
+> What do you all think of taking this even further? Instead of keeping
+> kvm_gmem_prepare_folio() within guest_memfd, what if we
+>
+> 1. Focus on preparing pfn ranges (retaining kvm_arch_gmem_prepare() is
+>    good) and not folios
+>    
+> 2. More clearly and directly associate preparing pfns with mapping
+>    (rather than with getting a folio to be mapped) into stage 2 page
+>    tables
+>
 
-Signed-off-by: Zhe Qiao <qiaozhe@iscas.ac.cn>
----
- arch/riscv/include/asm/kvm_host.h |  2 ++
- arch/riscv/kvm/vcpu.c             | 37 +++++++++++++++++++++++++++++++
- 2 files changed, 39 insertions(+)
+Thought about this a little more and maybe this is not quite accurate
+either. On a conversion, for SNP, does the memory actually need to be
+unmapped from the NPTs, or would it be possible to just flip the C bit?
 
-diff --git a/arch/riscv/include/asm/kvm_host.h b/arch/riscv/include/asm/kvm_host.h
-index d71d3299a335..dbc6391407ae 100644
---- a/arch/riscv/include/asm/kvm_host.h
-+++ b/arch/riscv/include/asm/kvm_host.h
-@@ -43,6 +43,8 @@
- #define KVM_REQ_HFENCE			\
- 	KVM_ARCH_REQ_FLAGS(5, KVM_REQUEST_WAIT | KVM_REQUEST_NO_WAKEUP)
- #define KVM_REQ_STEAL_UPDATE		KVM_ARCH_REQ(6)
-+#define KVM_REQ_SUSPEND		\
-+	KVM_ARCH_REQ_FLAGS(7, KVM_REQUEST_WAIT | KVM_REQUEST_NO_WAKEUP)
- 
- #define __KVM_HAVE_ARCH_FLUSH_REMOTE_TLBS_RANGE
- 
-diff --git a/arch/riscv/kvm/vcpu.c b/arch/riscv/kvm/vcpu.c
-index 3ebcfffaa978..0881c78476b1 100644
---- a/arch/riscv/kvm/vcpu.c
-+++ b/arch/riscv/kvm/vcpu.c
-@@ -496,6 +496,18 @@ int kvm_arch_vcpu_ioctl_get_mpstate(struct kvm_vcpu *vcpu,
- 	return 0;
- }
- 
-+static void kvm_riscv_vcpu_suspend(struct kvm_vcpu *vcpu)
-+{
-+	WRITE_ONCE(vcpu->arch.mp_state.mp_state, KVM_MP_STATE_SUSPENDED);
-+	kvm_make_request(KVM_REQ_SUSPEND, vcpu);
-+	kvm_vcpu_kick(vcpu);
-+}
-+
-+static bool kvm_riscv_vcpu_suspended(struct kvm_vcpu *vcpu)
-+{
-+	return READ_ONCE(vcpu->arch.mp_state.mp_state) == KVM_MP_STATE_SUSPENDED;
-+}
-+
- int kvm_arch_vcpu_ioctl_set_mpstate(struct kvm_vcpu *vcpu,
- 				    struct kvm_mp_state *mp_state)
- {
-@@ -516,6 +528,9 @@ int kvm_arch_vcpu_ioctl_set_mpstate(struct kvm_vcpu *vcpu,
- 		else
- 			ret = -EINVAL;
- 		break;
-+	case KVM_MP_STATE_SUSPENDED:
-+		kvm_riscv_vcpu_suspend(vcpu);
-+		break;
- 	default:
- 		ret = -EINVAL;
- 	}
-@@ -682,6 +697,25 @@ void kvm_arch_vcpu_put(struct kvm_vcpu *vcpu)
- 	}
- }
- 
-+static int kvm_riscv_handle_suspend(struct kvm_vcpu *vcpu)
-+{
-+	if (!kvm_riscv_vcpu_suspended(vcpu))
-+		return 1;
-+
-+	kvm_riscv_vcpu_wfi(vcpu);
-+
-+	kvm_make_request(KVM_REQ_SUSPEND, vcpu);
-+
-+	if (kvm_arch_vcpu_runnable(vcpu)) {
-+		memset(&vcpu->run->system_event, 0, sizeof(vcpu->run->system_event));
-+		vcpu->run->system_event.type = KVM_SYSTEM_EVENT_WAKEUP;
-+		vcpu->run->exit_reason = KVM_EXIT_SYSTEM_EVENT;
-+		return 0;
-+	}
-+
-+	return 1;
-+}
-+
- /**
-  * kvm_riscv_check_vcpu_requests - check and handle pending vCPU requests
-  * @vcpu:	the VCPU pointer
-@@ -731,6 +765,9 @@ static int kvm_riscv_check_vcpu_requests(struct kvm_vcpu *vcpu)
- 		if (kvm_check_request(KVM_REQ_STEAL_UPDATE, vcpu))
- 			kvm_riscv_vcpu_record_steal_time(vcpu);
- 
-+		if (kvm_check_request(KVM_REQ_SUSPEND, vcpu))
-+			kvm_riscv_handle_suspend(vcpu);
-+
- 		if (kvm_dirty_ring_check_request(vcpu))
- 			return 0;
- 	}
--- 
-2.43.0
+If conversion only involves flipping the C bit and updating RMP tables,
+then perhaps preparation and invalidation shouldn't be associated with
+mapping, but directly with conversions, or setting page private/shared
+state.
 
+
+> What I have in mind for (2) is to update kvm_tdp_mmu_map() to do an
+> arch-specific call, when fault->is_private, to call
+> kvm_arch_gmem_prepare() just before mapping the pfns and when the
+> mapping level is known.
+>
+> The cleanup counterpart would then be to call kvm_arch_gmem_invalidate()
+> somewhere in tdp_mmu_zap_leafs().
+>
+> kvm_arch_gmem_prepare() and kvm_arch_gmem_invalidate() would then drop
+> out of guest_memfd and be moved back into the core of KVM.
+>
+> Technically these two functions don't even need to have gmem in the name
+> since any memory can be prepared in the SNP sense, though for the
+> foreseeable future gmem is the only memory supported for private memory
+> in CoCo VMs.
+>
+> Also, to push this along a little, I feel that this series does a few
+> things. What do you all think of re-focusing this series (or a part of
+> this series) as "Separating SNP preparation from guest_memfd" or
+> "Separating arch-specific preparation from guest_memfd"?
+>
+>>> 
+>>> [...snip...]
+>>> 
 
