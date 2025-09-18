@@ -1,148 +1,101 @@
-Return-Path: <kvm+bounces-58071-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-58072-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id E9638B87604
-	for <lists+kvm@lfdr.de>; Fri, 19 Sep 2025 01:27:10 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id B9C1CB8761C
+	for <lists+kvm@lfdr.de>; Fri, 19 Sep 2025 01:28:13 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id BF8E9171737
-	for <lists+kvm@lfdr.de>; Thu, 18 Sep 2025 23:27:06 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id C4CA11C85C90
+	for <lists+kvm@lfdr.de>; Thu, 18 Sep 2025 23:28:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id ECA3A3218CC;
-	Thu, 18 Sep 2025 23:23:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C57C42F7AC7;
+	Thu, 18 Sep 2025 23:24:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="JQM1e73s"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="bItQv63o"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.16])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 23B7331E8AD;
-	Thu, 18 Sep 2025 23:23:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.16
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BB60A2F3632;
+	Thu, 18 Sep 2025 23:24:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758237794; cv=none; b=lyT9hf3op0MrAMdKI/smJ04PdtbSP22Lg4VTBBnaEhtWhOinWMZXgRmSrqe7CuTTMzq94m2hDgZOumsHDtMz6Yv7vsT9il4dhavhDPXDTFrLAiJptN5RTct+rr4xDeOEOXKrOs+/MfHBNIHAjvz8m7C94xgU7GW1ImLecBSo9t0=
+	t=1758237897; cv=none; b=tYHWrNDZWVXpSBFmoPrxN+zot/X078hIBkigReWbarFun09Ud7hG0zGc2nekwa4PYGYmtubvC41fKXbUgtuaYjK542HfoQBsIoDBkih9ujiOTD0I1UdbqEfn+M9UpnKGEinkWaViEl6wuGCHpp5Qn38d7J8VjI5Fq/+XQkx/q94=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758237794; c=relaxed/simple;
-	bh=x1kfSJSD+ZsZVDmROQy13II+aAyWoHke/JipsQ6+0Tw=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=p0VkOKCEemUbLBeov3GgRZkQg4+RUlqu7vov04Lw/Xe/bpqYOJ4yCkx1LcQkgimJ7nHYkqBR9GAHBc2eGhK6yUBTxIuNrZpqEyvd5R6nNn9BaaHGE1mvTZvt2LvVthmkqYZNUj1Sh6C4QFzyoVHpLXT3YeYy2fTU+r14wHQPpec=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=JQM1e73s; arc=none smtp.client-ip=198.175.65.16
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1758237792; x=1789773792;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=x1kfSJSD+ZsZVDmROQy13II+aAyWoHke/JipsQ6+0Tw=;
-  b=JQM1e73snDC/8rJjPvFgem8CRzI1+g8kE3ieYbKuNsRTRbIUt4wzT/99
-   vqnhlQlNV0gWXMKTUgaqmpFwipaoEEJXcer1HZC9dnebm6COv7xEzwBYY
-   emhh7a22uXUQGirYzFXJ/aHOQoE568VjvphAvLJlM4xykgPl8yu8jh3ic
-   tJbj6Z/v8kEfnQbk0Z8/4AY+pi0cIxbbz90VKc050Y+DmGiYYDYRE+W0A
-   LUXArHI6msXZP7PkdGMZ1+awGgmiCKD6xaJaaFLiB00Pdqv5oYzhAdofj
-   s8KZDWcZ/c/M6EY2dBc9NNJYKWH+tMYQ5D9T4tBppP91+6SoJ6Cbp0IiV
-   Q==;
-X-CSE-ConnectionGUID: xiX8CaiPSQK6oKTqbg2mPA==
-X-CSE-MsgGUID: D1Fc9f7rTo6I69O5nH0pEg==
-X-IronPort-AV: E=McAfee;i="6800,10657,11557"; a="60735480"
-X-IronPort-AV: E=Sophos;i="6.18,276,1751266800"; 
-   d="scan'208";a="60735480"
-Received: from fmviesa010.fm.intel.com ([10.60.135.150])
-  by orvoesa108.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 18 Sep 2025 16:23:08 -0700
-X-CSE-ConnectionGUID: PcYxYFTjQVqHLOTcVtY++g==
-X-CSE-MsgGUID: 7oI4sD50TVK8yQ1mWtZEjA==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.18,276,1751266800"; 
-   d="scan'208";a="176491483"
-Received: from rpedgeco-desk.jf.intel.com ([10.88.27.139])
-  by fmviesa010-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 18 Sep 2025 16:23:07 -0700
-From: Rick Edgecombe <rick.p.edgecombe@intel.com>
-To: kas@kernel.org,
-	bp@alien8.de,
-	chao.gao@intel.com,
-	dave.hansen@linux.intel.com,
-	isaku.yamahata@intel.com,
-	kai.huang@intel.com,
-	kvm@vger.kernel.org,
-	linux-coco@lists.linux.dev,
-	linux-kernel@vger.kernel.org,
-	mingo@redhat.com,
-	pbonzini@redhat.com,
-	seanjc@google.com,
-	tglx@linutronix.de,
-	x86@kernel.org,
-	yan.y.zhao@intel.com,
-	vannapurve@google.com
-Cc: rick.p.edgecombe@intel.com,
-	"Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>
-Subject: [PATCH v3 16/16] Documentation/x86: Add documentation for TDX's Dynamic PAMT
-Date: Thu, 18 Sep 2025 16:22:24 -0700
-Message-ID: <20250918232224.2202592-17-rick.p.edgecombe@intel.com>
-X-Mailer: git-send-email 2.51.0
-In-Reply-To: <20250918232224.2202592-1-rick.p.edgecombe@intel.com>
-References: <20250918232224.2202592-1-rick.p.edgecombe@intel.com>
+	s=arc-20240116; t=1758237897; c=relaxed/simple;
+	bh=QjWO+sp7P2+gDbJSVfkTtfrmPWYzC27O/isUi8PmKdk=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=tqUEmrC6ZGLnl9lrul/15OgOwOL0BRTjDQogZh2Ky1rLhRY7neD8TDXYa4CMAMlNizdsLy5QdR5+Nk4uBSDsgZRZqvSQxrs7eovXkyyFpXBzBRSZPWbgx/yESIuPPGpRwnlGZfyARzNWfOlCoPWV3WvzWkbbZCBRphUhs6oh9j0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=bItQv63o; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 79A31C4CEE7;
+	Thu, 18 Sep 2025 23:24:56 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1758237897;
+	bh=QjWO+sp7P2+gDbJSVfkTtfrmPWYzC27O/isUi8PmKdk=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=bItQv63oair35nB+Eb5I0sTnTHtx5/GeJOKOUfjz2CiAO16KMm0FaoG2JV2Ys8Koy
+	 wSQt7Ql80FplZ90kr8NONnhANcoy7gG7SjjZKeYTEvArhG1mpc/75bz3JnykVjx5y6
+	 LsDQiVcSmbrBPEDeZlEs7MqpjePa5qNYLFbb2f3E5YWuyLAEQYgQrKfCV+NjaLjViz
+	 Pz0UMQI/iir9J8ZdF/CmUIjHq1+K1nA3KbUqUtsB6r6wyyx7lLPT6ApyTvidKvZPWZ
+	 +HdT4+O7q2qJ9pUkXD1DUEekXfxsNrS518oZ6qM99fBhJa+NZ5Sr83TNyZWEHCKXqc
+	 7ORC87j3xGleA==
+Date: Thu, 18 Sep 2025 17:24:54 -0600
+From: Keith Busch <kbusch@kernel.org>
+To: Jason Gunthorpe <jgg@ziepe.ca>
+Cc: Alex Mastro <amastro@fb.com>,
+	Alex Williamson <alex.williamson@redhat.com>,
+	Kevin Tian <kevin.tian@intel.com>,
+	Bjorn Helgaas <bhelgaas@google.com>, David Reiss <dreiss@meta.com>,
+	Joerg Roedel <joro@8bytes.org>, Leon Romanovsky <leon@kernel.org>,
+	Li Zhe <lizhe.67@bytedance.com>, Mahmoud Adam <mngyadam@amazon.de>,
+	Philipp Stanner <pstanner@redhat.com>,
+	Robin Murphy <robin.murphy@arm.com>,
+	Vivek Kasireddy <vivek.kasireddy@intel.com>,
+	Will Deacon <will@kernel.org>, Yunxiang Li <Yunxiang.Li@amd.com>,
+	linux-kernel@vger.kernel.org, iommu@lists.linux.dev,
+	kvm@vger.kernel.org
+Subject: Re: [TECH TOPIC] vfio, iommufd: Enabling user space drivers to vend
+ more granular access to client processes
+Message-ID: <aMyUxqSEBHeHAPIn@kbusch-mbp>
+References: <20250918214425.2677057-1-amastro@fb.com>
+ <20250918225739.GS1326709@ziepe.ca>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250918225739.GS1326709@ziepe.ca>
 
-From: "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>
+On Thu, Sep 18, 2025 at 07:57:39PM -0300, Jason Gunthorpe wrote:
+> On Thu, Sep 18, 2025 at 02:44:07PM -0700, Alex Mastro wrote:
+> 
+> > We anticipate a growing need to provide more granular access to device resources
+> > beyond what the kernel currently affords to user space drivers similar to our
+> > model.
+> 
+> I'm having a somewhat hard time wrapping my head around the security
+> model that says your trust your related processes not use DMA in a way
+> that is hostile their peers, but you don't trust them not to issue
+> hostile ioctls..
 
-Expand TDX documentation to include information on the Dynamic PAMT
-feature.
-
-The new section explains PAMT support in the TDX module and how Dynamic
-PAMT affects the kernel memory use.
-
-Signed-off-by: Kirill A. Shutemov <kirill.shutemov@linux.intel.com>
-[Add feedback, update log]
-Signed-off-by: Rick Edgecombe <rick.p.edgecombe@intel.com>
----
-v3:
- - Trim down docs to be about things that user cares about, instead
-   of development history and other details like this.
----
- Documentation/arch/x86/tdx.rst | 21 +++++++++++++++++++++
- 1 file changed, 21 insertions(+)
-
-diff --git a/Documentation/arch/x86/tdx.rst b/Documentation/arch/x86/tdx.rst
-index 719043cd8b46..d07132c99cc6 100644
---- a/Documentation/arch/x86/tdx.rst
-+++ b/Documentation/arch/x86/tdx.rst
-@@ -99,6 +99,27 @@ initialize::
+I read this as more about having the granularity to automatically
+release resources associated with a client process when it dies (as
+mentioned below) rather than relying on the bootstrapping process to
+manage it all. Not really about hostile ioctls, but that an ungraceful
+ending of some client workload doesn't even send them.
  
-   [..] virt/tdx: module initialization failed ...
- 
-+Dynamic PAMT
-+------------
-+
-+PAMT is memory that the TDX module needs to keep data about each page
-+(think like struct page). It needs to handed to the TDX module for its
-+exclusive use. For normal PAMT, this is installed when the TDX module
-+is first loaded and comes to about 0.4% of system memory.
-+
-+Dynamic PAMT is a TDX feature that allows VMM to allocate part of the
-+PAMT as needed (the parts for tracking 4KB size pages). The other page
-+sizes (1GB and 2MB) are still allocated statically at the time of
-+TDX module initialization. This reduces the amount of memory that TDX
-+uses while TDs are not in use.
-+
-+When Dynamic PAMT is in use, dmesg shows it like:
-+  [..] virt/tdx: Enable Dynamic PAMT
-+  [..] virt/tdx: 10092 KB allocated for PAMT
-+  [..] virt/tdx: module initialized
-+
-+Dynamic PAMT is enabled automatically if supported.
-+
- TDX Interaction to Other Kernel Components
- ------------------------------------------
- 
--- 
-2.51.0
+> > - It would be nice if mappings created with the restricted IOMMU fd were
+> >   automatically freed when the underlying kernel object was freed (if the client
+> >   process were to exit ungracefully without explicitly performing unmap cleanup
+> >   after itself).
+> 
+> Maybe the BPF could trigger an eventfd or something when the FD closes?
 
+I wouldn't have considered a BPF dependency for this. I'll need to think
+about that one for a moment.
 
