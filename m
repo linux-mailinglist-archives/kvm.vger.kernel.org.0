@@ -1,117 +1,126 @@
-Return-Path: <kvm+bounces-58037-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-58038-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id C2FA2B8656F
-	for <lists+kvm@lfdr.de>; Thu, 18 Sep 2025 19:58:13 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0D2F3B86578
+	for <lists+kvm@lfdr.de>; Thu, 18 Sep 2025 19:58:32 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 367CFB616F1
-	for <lists+kvm@lfdr.de>; Thu, 18 Sep 2025 17:56:28 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C06113B8B0F
+	for <lists+kvm@lfdr.de>; Thu, 18 Sep 2025 17:58:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BAB0C286430;
-	Thu, 18 Sep 2025 17:57:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D8FAE2882CF;
+	Thu, 18 Sep 2025 17:58:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="UPlLuA/1"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="v5HgG66H"
 X-Original-To: kvm@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pg1-f201.google.com (mail-pg1-f201.google.com [209.85.215.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D08BC283FD6;
-	Thu, 18 Sep 2025 17:57:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 945182848BE
+	for <kvm@vger.kernel.org>; Thu, 18 Sep 2025 17:58:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758218273; cv=none; b=b8UORS9ot/I52SYqXLxw+XXEV3gfspCz5lmIDxVzsaiJEFxLavvux4vd+kXhSam2Sr+D05QuEsIf+0cZGfSQa8n35xQYqxnn4wAwxv0CR5+Rhn/684KxMbW/5+/jQlL6S3my/2kInNMAvd2C0VSulC1A/1IjgWUvC8KYtLtHA7E=
+	t=1758218292; cv=none; b=C1o3m5NyBvU/qsH39j2Frl7XS8GoNHorvhAp1S1l8DjrgdZvACgU2O8VYItcNgfe+SQ0JJQbKr54Dgv9qdqUv+ZMfT0jqOYX8wQinBDgDB0jh1AWSEjg3+pLHKKwfgAt7SF6QtC5ImHiB512AzWL5VX/hsPWF2s5chaocl940gM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758218273; c=relaxed/simple;
-	bh=4pw2A6YDxLmBSVcnB2iHeL3gyvvav/DPCrUGQzUCrMA=;
-	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
-	 Content-Disposition; b=kmjgu0kTCV1ASVMZbSyi1CJi3ZBwzkoKjTXTLujTtTimTxpTWFqNnqLE61fKjszsIfsn0zl8chm57hDn97qwc2OGz55C6zWX6a/qzXj7GlB1pmoV1Znm+H1rX16N6XGHk3EqhmljkWYExqzhjQiSLL/89l0CVzmNiGUBrIvA2t4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=UPlLuA/1; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A45C3C4CEE7;
-	Thu, 18 Sep 2025 17:57:51 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1758218273;
-	bh=4pw2A6YDxLmBSVcnB2iHeL3gyvvav/DPCrUGQzUCrMA=;
-	h=Date:From:To:Cc:Subject:From;
-	b=UPlLuA/1GPIU30NRIU+gOkzOv8pUErGSYbIyCe2FALK+e7LsZS/TgdvMOV93ru/X+
-	 1lTmxafaSIru/hndnLAPtiMyADy/Eb4cuHG9pN5mpiP9IM3IaHtiNk8/ANzIvyyM16
-	 0U7A8akKcq9pgWlAgYUK6oZdKf8MSc0dtmZJ1vf5ZsnXKZnT9YdqjaUuoF0zLOIlzA
-	 WRGsouaEh6YnWYl/bN/J0DKh7y95sbLk5EetORgDTLZ5rsiQhumjZtUezYbjyaXEnY
-	 jNV+QO6dUF8hlsES2SfW6PISwVEGs8ipmWCJjx97pjnLapuE/Qm+Sz1TrYZ3QaQL4j
-	 uUl10N6IXgcmQ==
-Date: Thu, 18 Sep 2025 18:57:48 +0100
-From: Mark Brown <broonie@kernel.org>
-To: Paolo Bonzini <pbonzini@redhat.com>, KVM <kvm@vger.kernel.org>
-Cc: Fuad Tabba <tabba@google.com>,
-	Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-	Linux Next Mailing List <linux-next@vger.kernel.org>,
-	Oliver Upton <oliver.upton@linux.dev>,
-	Sean Christopherson <seanjc@google.com>,
-	Wei-Lin Chang <r09922117@csie.ntu.edu.tw>
-Subject: linux-next: manual merge of the kvm tree with the kvm-fixes tree
-Message-ID: <aMxIHORf_QtgwyCj@sirena.org.uk>
+	s=arc-20240116; t=1758218292; c=relaxed/simple;
+	bh=VmpW7OnEYoEyc5lIRNLt2u7dmN2rs111BQgn9ACktVE=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=P0zY99W6fF/8Uy0uw/Tw8rhhf9NxNpOkDb/bKIPHFuxztedRncK+RVA564e4lpV7aGuJ8KuMBaQ9S0ceqZ0W0cdzBwCV3oiXFk204Lryke3D9hhXZs2dg6HCltdEC1rllmEMhVjgpFy3VjTaQ8P5NyAzDFJ94fGzNcvMIaeLu9o=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=v5HgG66H; arc=none smtp.client-ip=209.85.215.201
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+Received: by mail-pg1-f201.google.com with SMTP id 41be03b00d2f7-b5515a1f5b8so206034a12.1
+        for <kvm@vger.kernel.org>; Thu, 18 Sep 2025 10:58:10 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1758218290; x=1758823090; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=b/M1FEowV3diJ/eMdBsk6hJ8wec8W1gdfm/YaaJ0QnQ=;
+        b=v5HgG66HfnGaf/B8J4h2XvEzvVZgHsfmOLrcuB5AwL4ASlJdQbQ/0FicCXdWt05wjY
+         vwcrKQg3Cz41acGB1XBD+Kh17hKRewCQejtVl8zo2R3fZ6KGw/rlqrLQEJ+DQgk4jW1s
+         AgIH9SLAvcYOVGbwQJz66yXvvzGYcssKjhCiWA+meDczePw/RtGbAF532XzMf3xghlwv
+         R4nuTO8QeKH0/Hcu21GkbqM7YXsBvgFPdPO823L1Bwq9TRNbmXaFZ/tDNkhExL7SZaSv
+         I2sisbhU0CtL8IudQ0+dXFGuIizCqv6SDUelVopX6cikFQxAK9PeDmXXojie6MmNiwet
+         ULyQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1758218290; x=1758823090;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=b/M1FEowV3diJ/eMdBsk6hJ8wec8W1gdfm/YaaJ0QnQ=;
+        b=mZG6+FSSNYYiDv4PX++RKylIyeHpLOTqwYPlQvZFs6MbzJ0vMm/Bm19JXexdK+/E0i
+         mA06bsLDCr1wFVGEhM3nDXRR0Xd/Yy9BJMDk2W6GBXiYil76+N0iZ7WJlLefsHYtbDA7
+         gmYaZd+wlv0SpYttCI/oMOzc+0DrPsCXxun/g3OFwHrinyqs2adNpIAaYMIoEAsK1FU0
+         lwDcvPHf0YUNzZdDMkguGWkuSO3ZDuWj2TIhUeAxRxAYpaYAcY05wXCaMUUDDYtEjicn
+         cihgbt/vRtlMvuLh8tz9zgZuKlFvXfAWZN1BAJL8uv7yP+z6aJMOS5gOh1F0mjmTZdI/
+         8hYw==
+X-Forwarded-Encrypted: i=1; AJvYcCVS0dsmaxH3mj19oomUGDShNLEXaI4wi0ZlYD5ZDZDTDxc7t/MPEOYk3KDNO6kfxx6CAFY=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwtSubShU089OoZhHfhYaEy3Qx8MA+zM3Tr9rfREDmekIRoginZ
+	0tXXUyjIVXMAoVLLXlygzYzcHwAaP4uvW4h4j8bal9tBNJWtPXQssZppnv5v8Q0sOG+3Q0KBgF+
+	23jrFCg==
+X-Google-Smtp-Source: AGHT+IHFOysq+TUFP9EvRmUcELUaug1GgnM47ZAa/SK6gIEhQbX64NyajJHdrY4fLWC0UBAHJ5CzHUj9VNc=
+X-Received: from pjbkl14.prod.google.com ([2002:a17:90b:498e:b0:31f:2a78:943])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90a:ec83:b0:32e:8c14:5d09
+ with SMTP id 98e67ed59e1d1-33097fef587mr345549a91.7.1758218290023; Thu, 18
+ Sep 2025 10:58:10 -0700 (PDT)
+Date: Thu, 18 Sep 2025 10:58:08 -0700
+In-Reply-To: <20250918133938-mutt-send-email-mst@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="98i5RO1+y+Bu5kYh"
-Content-Disposition: inline
+Mime-Version: 1.0
+References: <20250827194107.4142164-1-seanjc@google.com> <20250827201059.EmmdDFB_@linutronix.de>
+ <20250918110828-mutt-send-email-mst@kernel.org> <20250918154826.oUc0cW0Y@linutronix.de>
+ <aMwtd40q44q5uqwr@google.com> <20250918120658-mutt-send-email-mst@kernel.org>
+ <aMw4wx5ENt-odhYS@google.com> <20250918133938-mutt-send-email-mst@kernel.org>
+Message-ID: <aMxIMADtzYrJg6Pb@google.com>
+Subject: Re: [PATCH v2 0/3] vhost_task: Fix a bug where KVM wakes an exited task
+From: Sean Christopherson <seanjc@google.com>
+To: "Michael S. Tsirkin" <mst@redhat.com>
+Cc: Sebastian Andrzej Siewior <bigeasy@linutronix.de>, Paolo Bonzini <pbonzini@redhat.com>, 
+	Jason Wang <jasowang@redhat.com>, kvm@vger.kernel.org, virtualization@lists.linux.dev, 
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="us-ascii"
 
+On Thu, Sep 18, 2025, Michael S. Tsirkin wrote:
+> On Thu, Sep 18, 2025 at 09:52:19AM -0700, Sean Christopherson wrote:
+> > On Thu, Sep 18, 2025, Michael S. Tsirkin wrote:
+> > > On Thu, Sep 18, 2025 at 09:04:07AM -0700, Sean Christopherson wrote:
+> > > > On Thu, Sep 18, 2025, Sebastian Andrzej Siewior wrote:
+> > > > > On 2025-09-18 11:09:05 [-0400], Michael S. Tsirkin wrote:
+> > > > > > So how about switching to this approach then?
+> > > > > > Instead of piling up fixes like we seem to do now ...
+> > > > 
+> > > > I don't have a strong preference for 6.17, beyond landing a fix of some kind.
+> > > > I think there are three options for 6.17, in order of "least like to break
+> > > > something":
+> > > > 
+> > > >  1. Sebastian's get_task_struct() fix
+> > > 
+> > > 
+> > > I am just a bit apprehensive that we don't create a situation
+> > > where we leak the task struct somehow, given the limited
+> > > testing time. Can you help me get convinced that risk is 0?
+> > 
+> > I doubt it, I share same similar concerns about lack of testing.  So I guess
+> > thinking about this again, #2 is probably safer since it'd only impact KVM?
+> 
+> I can't say I understand completely how we get that state though?
+> Why did the warning trigger if it's not a UAF?
 
---98i5RO1+y+Bu5kYh
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+It's purely a flaw in the sanity check itself due to the ordering in vhost_task_fn().
 
-Hi all,
+As is, vhost_task_fn() marks the task KILLED before invoking ->handle_sigkill(),
+i.e. before vhost_worker_killed() is guaranteed to complete, and thus before
+worker->killed is set.  As a result, vhost can keep waking workers that have
+KILLED set, but haven't actually exited.  That's perfectly fine as UAF won't
+occur until do_exit() is called, and that won't happen until ->handle_sigkill()
+completes.
 
-Today's linux-next merge of the kvm tree got a conflict in:
-
-  arch/arm64/kvm/mmu.c
-
-between commit:
-
-  51d165e92a701 ("KVM: arm64: Remove stage 2 read fault check")
-
-=66rom the kvm-fixes tree and commit:
-
-  638ea79669f8a ("KVM: arm64: Refactor user_mem_abort()")
-
-=66rom the kvm tree.
-
-I fixed it up (see below) and can carry the fix as necessary. This
-is now fixed as far as linux-next is concerned, but any non trivial
-conflicts should be mentioned to your upstream maintainer when your tree
-is submitted for merging.  You may also want to consider cooperating
-with the maintainer of the conflicting tree to minimise any particularly
-complex conflicts.
-
-diff --cc arch/arm64/kvm/mmu.c
-index 7363942925038,a36426ccd9b5e..0000000000000
---- a/arch/arm64/kvm/mmu.c
-+++ b/arch/arm64/kvm/mmu.c
-
-(used the version from kvm)
-
---98i5RO1+y+Bu5kYh
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAABCgAdFiEEreZoqmdXGLWf4p/qJNaLcl1Uh9AFAmjMSBwACgkQJNaLcl1U
-h9AOjQf8Clc+Dc889W4qluq7/Z3Uzo6nrRk+n7rezBDWhjTsh4YkndeApQxBGpRE
-FqVRozpV6l37ENq5veGQSeEgQAxKXWwYsxynQvbJMBtIwQuiBNtwvUppsfxxIYWc
-Spg2FrbC74N9SBeEjYIDCR4SlGfkLgd7uLGzhXzSdEYkMKeCSb2kzIWdeMzJmlFT
-bb65lZDORLWIeN3bJCAUJAm9FXJOt6BUazruFqYHgJrm9ehL3dSf9tWHC27ZlzGN
-jxAK7eO/RRC8hq9MihnNNldHIZyTmer/Z9EYvMto7YOdyPC8C1YjuLU1oChHVtn6
-MeUsZjDbE5UyJaIzWKfdr6JRk5hE+A==
-=X3Tg
------END PGP SIGNATURE-----
-
---98i5RO1+y+Bu5kYh--
+> > > >  2. This series, without the KILLED sanity check in __vhost_task_wake()
+> > > >  3. This series, with my fixup (with which syzbot was happy)
+> 
 
