@@ -1,92 +1,156 @@
-Return-Path: <kvm+bounces-58003-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-58005-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4FF55B844C4
-	for <lists+kvm@lfdr.de>; Thu, 18 Sep 2025 13:08:50 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7AF9AB848F0
+	for <lists+kvm@lfdr.de>; Thu, 18 Sep 2025 14:22:04 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 26F394A04C7
-	for <lists+kvm@lfdr.de>; Thu, 18 Sep 2025 11:07:56 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9BED83B3CA9
+	for <lists+kvm@lfdr.de>; Thu, 18 Sep 2025 12:22:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B5567303A08;
-	Thu, 18 Sep 2025 11:07:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F0A522E0902;
+	Thu, 18 Sep 2025 12:21:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="G0khHQlQ"
+	dkim=fail reason="key not found in DNS" (0-bit key) header.d=rsg.ci.i.u-tokyo.ac.jp header.i=@rsg.ci.i.u-tokyo.ac.jp header.b="ncih+7Z+"
 X-Original-To: kvm@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from www3579.sakura.ne.jp (www3579.sakura.ne.jp [49.212.243.89])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DC65D2FB603
-	for <kvm@vger.kernel.org>; Thu, 18 Sep 2025 11:07:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DCABA34BA28
+	for <kvm@vger.kernel.org>; Thu, 18 Sep 2025 12:21:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=49.212.243.89
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758193622; cv=none; b=CE4SEPgPvVAtqRizCZ7KUfeA9ZdV4Gnh+5m8n0xg62D33AoPAisTEf6kkdAJQP0nuW8lJSENcxlWbEJMoTFHQNRQSaX/uOp0pXbNSfmxCETq5moG14yiDcVSptpaqdXgFTg3mat1gN4Cfqu2CJXtasxUGtMlXPWL/9KYWawGczE=
+	t=1758198117; cv=none; b=AoJt32o56filgKrlIJBMC2kim4m4Y6LDf+HBz469xgvDzBF91kS/u/AUNPHVxkccR9IT+kXsZ3Z+uLaodCi4Q6uOVQIsH1+1Clf+Yich28ZWJ449AHGM808qGCUXtDxpVDUXo82Hpkso91LEMSyzPjWhrCMFutlFBWv18Md5qI4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758193622; c=relaxed/simple;
-	bh=8zoQyk7ZIHU3R0yvj0JLc7j/O+kQ2j21k4jH1agLrIs=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=mbehHwnXRiuBrlbstWeVOyHesHnYvPef3zV/57OwfVKZvbhZR2iAP5M3eglGujZMC3LCX19SfrhnI0kXarvUJoW3SLuj0eLKonWEd0w/IasXTYIS3nnIEPDEIc9n8SOhzQiXnaBTJD2+8+45SEf3rtdJlP7MP3am/0v6vCPfQc4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=G0khHQlQ; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id D497DC4CEFB;
-	Thu, 18 Sep 2025 11:06:59 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1758193621;
-	bh=8zoQyk7ZIHU3R0yvj0JLc7j/O+kQ2j21k4jH1agLrIs=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=G0khHQlQEVYMsOPFNE6r++aXJt3GsOtojCI3lUaN9LoOrCOjknoOyMmrSGE8sBqEw
-	 BOl1q9PQpXbT/QI+wRXDmflagwjMwc8Z4giOf/KjEqx62U+GYB+bDsgEQONRoe0E7G
-	 LaLERXZ0emvKNBqZxvHZmRmIylZlWbEbP/WvX/7f4569i8IFIBDd4tfF7Jo14v1ggd
-	 Sm3E4UE0c9XgiTtUAQwwIFqAJpCIcwbTEX1W3f79KCEeAjTdYzsuuQZhqBQojGigXJ
-	 NOkb3L26Gx4T0JbYUtW7LRjOqYI48Xq0vblIkH171Co/xWMWPzHonT88Eh5zZvw4sZ
-	 DXFPfzL+VP2nA==
-From: Will Deacon <will@kernel.org>
-To: Julien Thierry <julien.thierry.kdev@gmail.com>,
-	Steven Price <steven.price@arm.com>
-Cc: catalin.marinas@arm.com,
-	kernel-team@android.com,
-	Will Deacon <will@kernel.org>,
-	kvm@vger.kernel.org,
-	Jean-Philippe Brucker <jean-philippe.brucker@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>
-Subject: Re: [PATCH kvmtool v2] net/uip: Avoid deadlock in uip_tcp_socket_free()
-Date: Thu, 18 Sep 2025 12:06:37 +0100
-Message-Id: <175819216846.1966959.14006241285843545065.b4-ty@kernel.org>
-X-Mailer: git-send-email 2.39.5
-In-Reply-To: <20250917134414.63621-1-steven.price@arm.com>
-References: <20250917134414.63621-1-steven.price@arm.com>
+	s=arc-20240116; t=1758198117; c=relaxed/simple;
+	bh=yQN4Ex0/3FLqMZwCGNRTF46u2kK8avLbUJVaAxbTMRQ=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=u5KTzIgseQtCqjMK89xXCTmvhlY8bC/qIge+MUG4YzKlnNcyQ25K2dzPYjTEfqbdeofJLtQsD/+jDbSQIdw9m5KvwquQbOTtS4TnbuY4Ya74KxPFnxXNMvvi5UDJd+vIK5q18knc3UXlmpjUO/mhNiPseIF48rmoBlQRfjEIxg4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=rsg.ci.i.u-tokyo.ac.jp; spf=pass smtp.mailfrom=rsg.ci.i.u-tokyo.ac.jp; dkim=fail (0-bit key) header.d=rsg.ci.i.u-tokyo.ac.jp header.i=@rsg.ci.i.u-tokyo.ac.jp header.b=ncih+7Z+ reason="key not found in DNS"; arc=none smtp.client-ip=49.212.243.89
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=rsg.ci.i.u-tokyo.ac.jp
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=rsg.ci.i.u-tokyo.ac.jp
+Received: from [133.11.54.205] (h205.csg.ci.i.u-tokyo.ac.jp [133.11.54.205])
+	(authenticated bits=0)
+	by www3579.sakura.ne.jp (8.16.1/8.16.1) with ESMTPSA id 58ICGpZG015138
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NO);
+	Thu, 18 Sep 2025 21:16:51 +0900 (JST)
+	(envelope-from odaki@rsg.ci.i.u-tokyo.ac.jp)
+DKIM-Signature: a=rsa-sha256; bh=3gRH8iNZdxrVCMmHBiEB8svHVHUJgh9SBiCdxh/rErs=;
+        c=relaxed/relaxed; d=rsg.ci.i.u-tokyo.ac.jp;
+        h=Message-ID:Date:Subject:To:From;
+        s=rs20250326; t=1758197812; v=1;
+        b=ncih+7Z+Iq77ZtsPGIxVnHq3UyoofFR20q9ukLu6ggyhvkeM45o26pRuiRlZ1ygh
+         bvqO9pqoDi51Bf469GDustGnkMvrOEYx4wq8iBHvNa3HVx7dKZYyAnOf1hAOhiZ0
+         az4UCk701ZUURs8HqyU+Z0Y9TPDhCGVp08jn/fEGcCYTn+FZFPz5Elk6K/jRsBiL
+         osyUPH7CV8Rke50bdhKV1bwJxrKeDaiy3Sh9hDX+K1T8ORUPQi3kiDCUYviJNCSY
+         pAj32hWZ36YLEvwHNuKual9bk3SHAzSByqEF72lW1YRUpFE4CjJn3yUuSdJZniJ7
+         O6E2XhUYZW2FNZ+4108QOg==
+Message-ID: <819cdc32-23f4-4517-bc67-600d3ecce133@rsg.ci.i.u-tokyo.ac.jp>
+Date: Thu, 18 Sep 2025 21:16:51 +0900
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 8bit
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 10/35] hw/i386: QOM-ify AddressSpace
+To: CLEMENT MATHIEU--DRIF <clement.mathieu--drif@eviden.com>,
+        "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+Cc: Richard Henderson <richard.henderson@linaro.org>,
+        Peter Maydell <peter.maydell@linaro.org>,
+        =?UTF-8?Q?C=C3=A9dric_Le_Goater?=
+ <clg@kaod.org>,
+        Steven Lee <steven_lee@aspeedtech.com>, Troy Lee <leetroy@gmail.com>,
+        Jamin Lin <jamin_lin@aspeedtech.com>,
+        Andrew Jeffery <andrew@codeconstruct.com.au>,
+        Joel Stanley <joel@jms.id.au>, Eric Auger <eric.auger@redhat.com>,
+        Helge Deller <deller@gmx.de>,
+        =?UTF-8?Q?Philippe_Mathieu-Daud=C3=A9?= <philmd@linaro.org>,
+        =?UTF-8?Q?Herv=C3=A9_Poussineau?= <hpoussin@reactos.org>,
+        Aleksandar Rikalo <arikalo@gmail.com>,
+        "Edgar E. Iglesias" <edgar.iglesias@gmail.com>,
+        Alistair Francis <alistair@alistair23.me>,
+        Ninad Palsule <ninad@linux.ibm.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Eduardo Habkost <eduardo@habkost.net>,
+        "Michael S. Tsirkin"
+ <mst@redhat.com>,
+        Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
+        Jason Wang <jasowang@redhat.com>, Yi Liu <yi.l.liu@intel.com>,
+        Nicholas Piggin <npiggin@gmail.com>,
+        Aditya Gupta <adityag@linux.ibm.com>,
+        Gautam Menghani <gautam@linux.ibm.com>, Song Gao <gaosong@loongson.cn>,
+        Bibo Mao <maobibo@loongson.cn>, Jiaxun Yang <jiaxun.yang@flygoat.com>,
+        Jonathan Cameron <jonathan.cameron@huawei.com>,
+        Fan Ni <fan.ni@samsung.com>, David Hildenbrand <david@redhat.com>,
+        Igor Mammedov <imammedo@redhat.com>,
+        Xiao Guangrong <xiaoguangrong.eric@gmail.com>,
+        Beniamino Galvani <b.galvani@gmail.com>,
+        Strahinja Jankovic <strahinja.p.jankovic@gmail.com>,
+        Subbaraya Sundeep <sundeep.lkml@gmail.com>,
+        Jan Kiszka <jan.kiszka@web.de>, Laurent Vivier <laurent@vivier.eu>,
+        Andrey Smirnov
+ <andrew.smirnov@gmail.com>,
+        Aurelien Jarno <aurelien@aurel32.net>,
+        BALATON Zoltan <balaton@eik.bme.hu>,
+        Bernhard Beschow <shentey@gmail.com>,
+        Harsh Prateek Bora <harshpb@linux.ibm.com>,
+        Elena Ufimtseva <elena.ufimtseva@oracle.com>,
+        Jagannathan Raman <jag.raman@oracle.com>,
+        Palmer Dabbelt
+ <palmer@dabbelt.com>, Weiwei Li <liwei1518@gmail.com>,
+        Daniel Henrique Barboza <dbarboza@ventanamicro.com>,
+        Liu Zhiwei <zhiwei_liu@linux.alibaba.com>,
+        Matthew Rosato <mjrosato@linux.ibm.com>,
+        Eric Farman <farman@linux.ibm.com>, Thomas Huth <thuth@redhat.com>,
+        Halil Pasic <pasic@linux.ibm.com>,
+        Christian Borntraeger <borntraeger@linux.ibm.com>,
+        Ilya Leoshkevich <iii@linux.ibm.com>, Fam Zheng <fam@euphon.net>,
+        Bin Meng <bmeng.cn@gmail.com>,
+        Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>,
+        Artyom Tarasenko <atar4qemu@gmail.com>, Peter Xu <peterx@redhat.com>,
+        Marcelo Tosatti <mtosatti@redhat.com>,
+        Max Filippov <jcmvbkbc@gmail.com>,
+        "qemu-arm@nongnu.org" <qemu-arm@nongnu.org>,
+        "qemu-ppc@nongnu.org" <qemu-ppc@nongnu.org>,
+        "qemu-riscv@nongnu.org" <qemu-riscv@nongnu.org>,
+        "qemu-s390x@nongnu.org" <qemu-s390x@nongnu.org>,
+        "qemu-block@nongnu.org" <qemu-block@nongnu.org>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        Alex Williamson <alex.williamson@redhat.com>,
+        =?UTF-8?Q?C=C3=A9dric_Le_Goater?= <clg@redhat.com>,
+        Stefano Garzarella <sgarzare@redhat.com>,
+        Alistair Francis <alistair.francis@wdc.com>
+References: <20250917-qom-v1-0-7262db7b0a84@rsg.ci.i.u-tokyo.ac.jp>
+ <20250917-qom-v1-10-7262db7b0a84@rsg.ci.i.u-tokyo.ac.jp>
+ <d571d1aa47ddbf466e9e8edf1cbb7d29f3bb0a83.camel@eviden.com>
+Content-Language: en-US
+From: Akihiko Odaki <odaki@rsg.ci.i.u-tokyo.ac.jp>
+In-Reply-To: <d571d1aa47ddbf466e9e8edf1cbb7d29f3bb0a83.camel@eviden.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-On Wed, 17 Sep 2025 14:44:14 +0100, Steven Price wrote:
-> The function uip_tcp_socket_free() is called with the sk lock held, but
-> then goes on to call uip_tcp_socket_close() which attempts to aquire the
-> lock a second time, triggering a deadlock if there are outstanding TCP
-> connections.
+On 2025/09/18 14:53, CLEMENT MATHIEU--DRIF wrote:
+> Hi Akihiko,
 > 
-> Rename the existing uip_tcp_socket_close() to a _locked variety and
-> removing the locking from it. Add a new uip_tcp_socket_close() which
-> takes the lock and calls the _locked variety.
+> Why do we change the naming scheme in amd-vi?
+> Did you have any issue with the old one?
+
+QOM-ifying AddressSpaces moves the responsibility to create distinct 
+identifiers for debug outputs from the callers of address_space_init() 
+to AddressSpaces. QOM-ified AddressSpaces can create unique, unambigous 
+identifiers by inspecting the QOM hierarchy and cover all devices, not 
+just amd-iommu.
+
 > 
-> [...]
+> If we decide not to stick to the old one, maybe splitting the slot and function would be convenient.
 
-Applied to kvmtool (master), thanks!
+Strictly speaking such a change is an out-of-scope of this patch, but it 
+won't hurt to have it. I'll make the change with the next version.
 
-[1/1] net/uip: Avoid deadlock in uip_tcp_socket_free()
-      https://git.kernel.org/will/kvmtool/c/7ad32e5514ac
-
-Cheers,
--- 
-Will
-
-https://fixes.arm64.dev
-https://next.arm64.dev
-https://will.arm64.dev
+Regards,
+Akihiko Odaki
 
