@@ -1,116 +1,150 @@
-Return-Path: <kvm+bounces-57962-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-57963-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id E4720B82A7B
-	for <lists+kvm@lfdr.de>; Thu, 18 Sep 2025 04:28:05 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 89E9EB82AF0
+	for <lists+kvm@lfdr.de>; Thu, 18 Sep 2025 04:46:36 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id B395E7AFA39
-	for <lists+kvm@lfdr.de>; Thu, 18 Sep 2025 02:26:25 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id DC9BD6254D0
+	for <lists+kvm@lfdr.de>; Thu, 18 Sep 2025 02:46:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B0237238C03;
-	Thu, 18 Sep 2025 02:27:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CB1C523F431;
+	Thu, 18 Sep 2025 02:45:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="GApQrjC5"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="FCRiRDav"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.19])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.12])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 308ED25761;
-	Thu, 18 Sep 2025 02:27:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.19
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 644C51A262A;
+	Thu, 18 Sep 2025 02:45:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.12
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758162476; cv=none; b=Cn/sV+VopHM322FXiK7xkf7kg4xK8jUyJDaev2VI4dmqxn52aDVQ20Bd6qCC52oQV9FeS2aX9ZMz5KC7dvZ7icvRs59nc6nGW+7GBKKpo9WrnS3XLpr8o5MCzo8XHcxaZhVvJV1Y06y8Gcxy5RInd/XaTcgbMeOm2ZHtAVvckzU=
+	t=1758163557; cv=none; b=LuvBOUZrbrTbzYIE07KAj64oioRpXVWY3u6QVkGh2rYhROEGupVXSPdqO6zDrzF68LG+xRV+FT/sVa4xaKkzSkT1xOH0eZHsGUFfsm4TIQfmX412pRYnJzpivxKwyzKCmFeXW2GuNLjyQToiQPJXxPMCHLpTf4Gr4g7XcA8Uh7k=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758162476; c=relaxed/simple;
-	bh=py1ye7UcWQnNNC2kBpDm+JZuVxmAhYWxWDYmxnXr1OE=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=mZYEfWbtz9BVwbd/DHva/XVoevqnAiRajT7an4o/i9rISnK1GZ0k0EoQLarvNM7eaAjmwMk5Ts3zi1s7ZsBYslsGDV4ffga5zAReVYmVug0Mh8bVTPaZnrRGAYBFsvqChDX3aVJxd//DRODV7YMBhIIumrzRXFi/Q/BqGoptufc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=GApQrjC5; arc=none smtp.client-ip=198.175.65.19
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
+	s=arc-20240116; t=1758163557; c=relaxed/simple;
+	bh=MGtmbYJr4izzxh9Q5fjjfxZ6vSiqc+Pmx0sDfZpsERU=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=YNd5U6TlVal/d/m5SKuhxmWjVoWbrF6120YlpbjrbjGSXDjydn8pOb1SbkmZT9g8uVmDQpa64l+BSVjrQBwZx3pNZ9ioripDZQYbezBLLGVAr8gAUD48IqI1mNdQySIT3oDIlketOurlz+0/xlkjLVP3s+9JNH1fU0Da2v1W1mU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=FCRiRDav; arc=none smtp.client-ip=198.175.65.12
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1758162475; x=1789698475;
-  h=message-id:date:mime-version:subject:to:cc:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=py1ye7UcWQnNNC2kBpDm+JZuVxmAhYWxWDYmxnXr1OE=;
-  b=GApQrjC5wOs96UMn2VB3S5a9p17Q1TK74jy4eUOVHlFrSH057jPmr0uJ
-   E2XCc3p1SlZ6WbaMQts9MGwLeyPhOs6P5o+LpTaYr3yRQlngzyxYvJNzb
-   Wq5Atq3Cd0j8HpP+Y3tmFA7YqOfl5s1/KW0HYGLdHfJqn/T+CXX5hVuSR
-   ImVFznQ9jB16Hdv325nkE7jI92f/GLIdkp6Rgas+hvD9oGry7h6/pyxp2
-   C2BDEQgANuAXF8Gvd0WLlt8V3H4IotinpHbk7+JyvW7pNu3vQiw6Cn5OJ
-   RPqo/+TnnWugjIWC/ZeHSfsgTeiXnty1lWaUQsvT8D5k5h9P89UVXWPJL
-   A==;
-X-CSE-ConnectionGUID: l5d6DpvGQj6MRVXiTQ8izw==
-X-CSE-MsgGUID: akx+3pSCRh+nDHBsMlio7Q==
-X-IronPort-AV: E=McAfee;i="6800,10657,11556"; a="60369209"
+  t=1758163557; x=1789699557;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=MGtmbYJr4izzxh9Q5fjjfxZ6vSiqc+Pmx0sDfZpsERU=;
+  b=FCRiRDavXTfO8xtmZP9ucyArldgmtS3NaHk4u9TFUTFKDlrVAg2/WZFT
+   i2fx/vo66oGXQhTFc2TzBldo5tHsooUeTBHKoDtmbbXHMdH/zMRl4EIA1
+   Jt72iGvDAEM0+MDphbLwOD3OKyXEd9TFOhGY7o99lHZKWP3qU4lOZmBbO
+   +uE+niNN/WoUkHsFhWmfNHEPfv+1cQ3dXYBUzgT2Pm1BOkZyHaaMpv0P+
+   UeI8ueUYU8Xmbm3VqPekBR7qCRpNfUtQcd7/F7Pv0TykxO9d63G9WK+u/
+   r5TuZTdx89Nv8HobiRChkD4vJ+PG6coC/nMQkKv1kDf/KjAFQd92PPPCR
+   g==;
+X-CSE-ConnectionGUID: YZnMUvQoRxmLGRjJTT2WwQ==
+X-CSE-MsgGUID: xOOkeYytSr6C6b66QVCh6A==
+X-IronPort-AV: E=McAfee;i="6800,10657,11556"; a="71908147"
 X-IronPort-AV: E=Sophos;i="6.18,273,1751266800"; 
-   d="scan'208";a="60369209"
-Received: from fmviesa004.fm.intel.com ([10.60.135.144])
-  by orvoesa111.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 17 Sep 2025 19:27:55 -0700
-X-CSE-ConnectionGUID: 0mbqQlEjSS2qwe0/PSTsWg==
-X-CSE-MsgGUID: VKbBcGukR5e1wzaUw2Fp1g==
+   d="scan'208";a="71908147"
+Received: from fmviesa007.fm.intel.com ([10.60.135.147])
+  by orvoesa104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 17 Sep 2025 19:45:56 -0700
+X-CSE-ConnectionGUID: BKE0jq5BSkG7P9Qe24Ll7w==
+X-CSE-MsgGUID: 9xb6ixm/TWyg48SGy4T1TA==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.18,273,1751266800"; 
-   d="scan'208";a="180690148"
-Received: from unknown (HELO [10.238.0.107]) ([10.238.0.107])
-  by fmviesa004-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 17 Sep 2025 19:27:51 -0700
-Message-ID: <22b922ba-c1ec-46c8-94f4-c65fc84ee9fe@linux.intel.com>
-Date: Thu, 18 Sep 2025 10:27:49 +0800
+   d="scan'208";a="175012948"
+Received: from lkp-server01.sh.intel.com (HELO 84a20bd60769) ([10.239.97.150])
+  by fmviesa007.fm.intel.com with ESMTP; 17 Sep 2025 19:45:50 -0700
+Received: from kbuild by 84a20bd60769 with local (Exim 4.96)
+	(envelope-from <lkp@intel.com>)
+	id 1uz4ea-0002f9-0T;
+	Thu, 18 Sep 2025 02:45:48 +0000
+Date: Thu, 18 Sep 2025 10:45:17 +0800
+From: kernel test robot <lkp@intel.com>
+To: Juergen Gross <jgross@suse.com>, linux-kernel@vger.kernel.org,
+	x86@kernel.org, linux-hyperv@vger.kernel.org,
+	virtualization@lists.linux.dev, kvm@vger.kernel.org
+Cc: llvm@lists.linux.dev, oe-kbuild-all@lists.linux.dev,
+	Juergen Gross <jgross@suse.com>,
+	"K. Y. Srinivasan" <kys@microsoft.com>,
+	Haiyang Zhang <haiyangz@microsoft.com>,
+	Wei Liu <wei.liu@kernel.org>, Dexuan Cui <decui@microsoft.com>,
+	Thomas Gleixner <tglx@linutronix.de>,
+	Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+	Dave Hansen <dave.hansen@linux.intel.com>,
+	"H. Peter Anvin" <hpa@zytor.com>,
+	Ajay Kaher <ajay.kaher@broadcom.com>,
+	Alexey Makhalov <alexey.makhalov@broadcom.com>,
+	Broadcom internal kernel review list <bcm-kernel-feedback-list@broadcom.com>,
+	Paolo Bonzini <pbonzini@redhat.com>,
+	Vitaly Kuznetsov <vkuznets@redhat.com>,
+	Boris Ostrovsky <boris.ostrovsky@oracle.com>,
+	Josh Poimboeuf <jpoimboe@kernel.org>,
+	xen-devel@lists.xenproject.org
+Subject: Re: [PATCH v2 21/21] x86/pvlocks: Move paravirt spinlock functions
+ into own header
+Message-ID: <202509181008.MoLd2u4e-lkp@intel.com>
+References: <20250917145220.31064-22-jgross@suse.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v15 20/41] KVM: nVMX: Virtualize NO_HW_ERROR_CODE_CC for
- L1 event injection to L2
-To: Sean Christopherson <seanjc@google.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org,
- linux-kernel@vger.kernel.org, Tom Lendacky <thomas.lendacky@amd.com>,
- Mathias Krause <minipli@grsecurity.net>, John Allen <john.allen@amd.com>,
- Rick Edgecombe <rick.p.edgecombe@intel.com>, Chao Gao <chao.gao@intel.com>,
- Maxim Levitsky <mlevitsk@redhat.com>, Xiaoyao Li <xiaoyao.li@intel.com>,
- Zhang Yi Z <yi.z.zhang@linux.intel.com>
-References: <20250912232319.429659-1-seanjc@google.com>
- <20250912232319.429659-21-seanjc@google.com>
-Content-Language: en-US
-From: Binbin Wu <binbin.wu@linux.intel.com>
-In-Reply-To: <20250912232319.429659-21-seanjc@google.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250917145220.31064-22-jgross@suse.com>
+
+Hi Juergen,
+
+kernel test robot noticed the following build warnings:
+
+[auto build test WARNING on tip/sched/core]
+[also build test WARNING on kvm/queue kvm/next linus/master v6.17-rc6 next-20250917]
+[cannot apply to tip/x86/core kvm/linux-next]
+[If your patch is applied to the wrong git tree, kindly drop us a note.
+And when submitting patch, we suggest to use '--base' as documented in
+https://git-scm.com/docs/git-format-patch#_base_tree_information]
+
+url:    https://github.com/intel-lab-lkp/linux/commits/Juergen-Gross/x86-paravirt-Remove-not-needed-includes-of-paravirt-h/20250917-230321
+base:   tip/sched/core
+patch link:    https://lore.kernel.org/r/20250917145220.31064-22-jgross%40suse.com
+patch subject: [PATCH v2 21/21] x86/pvlocks: Move paravirt spinlock functions into own header
+config: x86_64-randconfig-003-20250918 (https://download.01.org/0day-ci/archive/20250918/202509181008.MoLd2u4e-lkp@intel.com/config)
+compiler: clang version 20.1.8 (https://github.com/llvm/llvm-project 87f0227cb60147a26a1eeb4fb06e3b505e9c7261)
+reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20250918/202509181008.MoLd2u4e-lkp@intel.com/reproduce)
+
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202509181008.MoLd2u4e-lkp@intel.com/
+
+All warnings (new ones prefixed by >>):
+
+>> arch/x86/kernel/paravirt-spinlocks.c:13:13: warning: no previous prototype for function 'native_pv_lock_init' [-Wmissing-prototypes]
+      13 | void __init native_pv_lock_init(void)
+         |             ^
+   arch/x86/kernel/paravirt-spinlocks.c:13:1: note: declare 'static' if the function is not intended to be used outside of this translation unit
+      13 | void __init native_pv_lock_init(void)
+         | ^
+         | static 
+   1 warning generated.
 
 
+vim +/native_pv_lock_init +13 arch/x86/kernel/paravirt-spinlocks.c
 
-On 9/13/2025 7:22 AM, Sean Christopherson wrote:
-> From: Yang Weijiang <weijiang.yang@intel.com>
->
-> Per SDM description(Vol.3D, Appendix A.1):
-> "If bit 56 is read as 1, software can use VM entry to deliver a hardware
-> exception with or without an error code, regardless of vector"
->
-> Modify has_error_code check before inject events to nested guest. Only
-                                       ^
-                                    injecting
-> enforce the check when guest is in real mode, the exception is not hard
-> exception and the platform doesn't enumerate bit56 in VMX_BASIC, in all
-> other case ignore the check to make the logic consistent with SDM.
-        ^
-       cases
->
-> Signed-off-by: Yang Weijiang <weijiang.yang@intel.com>
-> Reviewed-by: Maxim Levitsky <mlevitsk@redhat.com>
-> Reviewed-by: Chao Gao <chao.gao@intel.com>
-> Tested-by: Mathias Krause <minipli@grsecurity.net>
-> Tested-by: John Allen <john.allen@amd.com>
-> Tested-by: Rick Edgecombe <rick.p.edgecombe@intel.com>
-> Signed-off-by: Chao Gao <chao.gao@intel.com>
-> Signed-off-by: Sean Christopherson <seanjc@google.com>
+    12	
+  > 13	void __init native_pv_lock_init(void)
+    14	{
+    15		if (boot_cpu_has(X86_FEATURE_HYPERVISOR))
+    16			static_branch_enable(&virt_spin_lock_key);
+    17	}
+    18	
 
-Reviewed-by: Binbin Wu <binbin.wu@linux.intel.com>
-
+-- 
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
 
