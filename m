@@ -1,248 +1,204 @@
-Return-Path: <kvm+bounces-57984-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-57985-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 17D20B83254
-	for <lists+kvm@lfdr.de>; Thu, 18 Sep 2025 08:31:19 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id AD533B832AA
+	for <lists+kvm@lfdr.de>; Thu, 18 Sep 2025 08:38:33 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 831A11B20C2F
-	for <lists+kvm@lfdr.de>; Thu, 18 Sep 2025 06:31:40 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 4E75C1C8019C
+	for <lists+kvm@lfdr.de>; Thu, 18 Sep 2025 06:38:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BC7E92D877E;
-	Thu, 18 Sep 2025 06:31:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8E3482DA762;
+	Thu, 18 Sep 2025 06:38:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="CCAYw/BK"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="rKdUgwVB"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pj1-f74.google.com (mail-pj1-f74.google.com [209.85.216.74])
+Received: from mail-pg1-f202.google.com (mail-pg1-f202.google.com [209.85.215.202])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 35A48265630
-	for <kvm@vger.kernel.org>; Thu, 18 Sep 2025 06:31:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.74
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 50A012D7DE0
+	for <kvm@vger.kernel.org>; Thu, 18 Sep 2025 06:38:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758177066; cv=none; b=V0eW0hOBhPDJ7Vd6Pns2Q0Pwfzs5D3f9vduvxj1CsRhmd8r6chkebqJcxkeOH0pro4zfX+zmqFbSKZetkCFrSO911FE29YmmsrUPGIYkWyZ/NrJri6kpOtlNKr6W6IOJjoXKk7wq9BLu9cUKpHP+F0uGiewBJdL6pPET/tI0AvA=
+	t=1758177499; cv=none; b=F1ArqziTlpu26A5migTyLX5zfzdPBViMdeuVkHJ/Gf2OPFlDga+XU5h9NVxhk8vjeIZGYXSB3I9F+6LYW5tzlw6BCq+OUJZ5DkDpclicVu5UgwF6AOqsLJv2wzzs/i1CSmcBduK6R6rbQxwrqGVJ30sC11XvU+HIqK8klF4tyFw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758177066; c=relaxed/simple;
-	bh=1ESgdimDNbdXFB+WfS9IWJsgtjPJ0aG5/dKUvYiS78w=;
+	s=arc-20240116; t=1758177499; c=relaxed/simple;
+	bh=oEAkMPokEPthqy/sYUaxWKjhNDV64NNbfnLb9g0p/f0=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=F5K+g7Fcm8gPwruQ+8R6LmS+aaF+Q+zmzcd1/8Kxxxdb4jV1fLm1Qwjt9jGJ5a42egGoEZnA0NDgqioD6/ZCg7het90YWaUfdbsgqnmykhXFFnTD1/xDAMZCptDqzRi/Uruahj4NttALLtat6mwfnt6he1olL/0LfMcS3CwS7yY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--ackerleytng.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=CCAYw/BK; arc=none smtp.client-ip=209.85.216.74
+	 To:Cc:Content-Type; b=QeaNtsAnEzOQ+BGd675X+WX6QVTsoldI9NzsKsYwmYeUZqH+OgGkVVFGRLo1pKBp243IXap4VD+adPDF50znNOAVRquOp5TxFWVhVZHG0UHmXSBYi8SptVpyaht1GmUyswyYSBwMoXOeUVMMT9Ji3MUbLO6eIF/trd1X8jDzhTU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--ackerleytng.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=rKdUgwVB; arc=none smtp.client-ip=209.85.215.202
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--ackerleytng.bounces.google.com
-Received: by mail-pj1-f74.google.com with SMTP id 98e67ed59e1d1-32eaa47c7c8so579907a91.3
-        for <kvm@vger.kernel.org>; Wed, 17 Sep 2025 23:31:04 -0700 (PDT)
+Received: by mail-pg1-f202.google.com with SMTP id 41be03b00d2f7-b4f8e079bc1so439425a12.3
+        for <kvm@vger.kernel.org>; Wed, 17 Sep 2025 23:38:18 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1758177063; x=1758781863; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1758177497; x=1758782297; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=zYw7ATyO+FbNb+44lQoltDz9PEwp1UWJIGjKMOTdpb4=;
-        b=CCAYw/BKzSAVfP411cx+fhiXGYmztinxkoWQCOnq7oiv31cG0BIytvmrE4lVt3Z9mT
-         JekBHqpJ+ih8LY2US9ytszgGIo2WJTXYNNYfW4Mbcm3s69kbTZqNe9pOZSejx2XuFIFn
-         fVQsP+NzYoxYxzxrZlygOxZncW8WJelqcv370T5RSm1cQTK1KZUAy6C2jcYdq6Knrf5h
-         87o/qHyMOcY0qzSi8du1UDY/c9dQTxdFMveLALTDIbNHdp+zNK0hNdF9fHRAoSP6ctk5
-         JNM6rmEaVX5g+ltNBf86FOxPiQkhCCHeU/zml4QDDOvBBc1X5RwSuI6GbzKKA/ABHSnZ
-         Wg6w==
+        bh=EhQgZCX3g/hqgKkVAO2ALoNMZAYeb5CdIihGIJQ0jtk=;
+        b=rKdUgwVBnpccRrpAHjyXiHImQVzf7FSNM4xbGaDma+o794KqHyzY9KS4FkbUm1nnM8
+         ctY86EL1vQoId5pHHxCGJ3RDhIk5Jz3rgg9JzDx76XFsLn8fhDMeY33foRU3MxWf9uwX
+         XfGFqwbeDPcPcYPiUDAO5y9G+g38CHy5cDEFWVf3W6NtB3sgCS2QRO7fcfWS2v5ZMl0n
+         pYqELeu/x7u5JamfNRrM79eoFW5OlwGOrULAd4pUo4gH7fvh04jJ/6bEmoMEFz85uJEn
+         cHHGObIs0Hxim88EulbnA0t6kIcqJaI2mwbg5ipSSXhTvlCszDQLC45kG7+IUF/SuPn9
+         fksg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1758177063; x=1758781863;
+        d=1e100.net; s=20230601; t=1758177497; x=1758782297;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=zYw7ATyO+FbNb+44lQoltDz9PEwp1UWJIGjKMOTdpb4=;
-        b=kAtE+qxSAW9CKVYS/hwTm1XYhyCiyZ3erHfs+sjhGCCIeuTx+aQJhH+IekWXc1P1UD
-         fVw2jTXJ/ZnrzTkdFPOdymsALFXLj3rfRGkaVEgtYGcCPZTekx/OaBmq2abmYr2ZzK7l
-         P69GxEjODVb0ZmKb9IP0JBYB1wy0L+BLV45kYcOAk9BlWuTqnwf7PPpTKan6txmjPINd
-         TBwU27+owbSANXo6AXreupwuxwUtH0WAgwujZHYyzsjleU5LoCCm9shL+scbD3FNecfR
-         13zDv2G2K+OzAv75McbICOmTCRkYBJqdByftWNPnF4PLGIo2kyat933BxyRxRjkZfMx+
-         OEGQ==
-X-Gm-Message-State: AOJu0Yw0/mj5SBWddYa1slPdQ8IONeBa8zgVmbU2P7nPuZWHdjFeAbr/
-	Hy7KZiB2y826mAr6g6jwim+JojcZqi44WVC2Kope56YxFAU2av/BT0YdLLc5VQkxLeCug+ODj9B
-	8r0y3M4HpqIGJ0FBYgem8V2FvOw==
-X-Google-Smtp-Source: AGHT+IG8r6Hh7ieBZNhEHWEonWxugVqZ2GsgcsPqQV0BbYfLkp6mgTeqw5ZShceR0hVG0T5MXwZgGvkkREJdhdBrSQ==
-X-Received: from pjvv5.prod.google.com ([2002:a17:90b:5885:b0:32b:58d1:a610])
+        bh=EhQgZCX3g/hqgKkVAO2ALoNMZAYeb5CdIihGIJQ0jtk=;
+        b=LYuyVDB54YVYw9Z+shI7yFJ2HbbkJQn6FgJuj+U7zKUnBO94nw4xqYTbHRT7tC/S5r
+         kbBjtukCJqWlEaJqopAvNj8RXzFfCxlJIryDBywF415GwJbrlPDqkF7xUAMy9Q4egg0q
+         0+qyy0uwksqTk2I/U2lxgnyUTPsh/R6rSolCWUHU4MUZVgE3CgQUliev8mUAbiZy4Zo+
+         FH2wu1tk0y8APudiKY3BR358h+kTCi1y7EdHq4fEkoloWqYzPaYd34H9ZbfO11+wChJT
+         C8WU9oqYx+1i0Yuf17CEMW2OCGh68Pv64BwJLn4nh5EOnfh4MqCOVqYk6U/PUVaWUYEx
+         rYHg==
+X-Gm-Message-State: AOJu0Ywu16tmV0XJp9ttujlrkDHlgdAVWF9WTeOw1LwWvNAiZJddmV2j
+	JIDcaO7LC8nLfID8ShcELhF941uFNLXxr/3LzzzHb7oJOksTKedCBj3uThFwJmh10NA2v5g1OrR
+	DAQ5GBErQchq7Wdq5dhxhPQqsyw==
+X-Google-Smtp-Source: AGHT+IHY8aUBQSPecvIOlTBaO7WQ/oRvPgoE9Oznnfm9prH3oA8ybxcIs1MwL4W0ClARcwmzZJztakkHVEY0YIHinA==
+X-Received: from pjbpw5.prod.google.com ([2002:a17:90b:2785:b0:330:7dd8:2dc2])
  (user=ackerleytng job=prod-delivery.src-stubby-dispatcher) by
- 2002:a17:90b:5788:b0:32d:dffc:7ad6 with SMTP id 98e67ed59e1d1-32ee3f8c588mr6178959a91.33.1758177063484;
- Wed, 17 Sep 2025 23:31:03 -0700 (PDT)
-Date: Thu, 18 Sep 2025 06:31:01 +0000
-In-Reply-To: <20250916233335.wv2lf4fiejlw53o2@amd.com>
+ 2002:a17:90b:2c8c:b0:324:e96a:2ada with SMTP id 98e67ed59e1d1-32ee3f2ffefmr5352489a91.21.1758177497343;
+ Wed, 17 Sep 2025 23:38:17 -0700 (PDT)
+Date: Thu, 18 Sep 2025 06:38:16 +0000
+In-Reply-To: <20250916225528.iycrfgf4nz6bcdce@amd.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
-References: <20250613005400.3694904-1-michael.roth@amd.com>
- <20250613005400.3694904-2-michael.roth@amd.com> <diqztt1vf198.fsf@google.com> <20250916233335.wv2lf4fiejlw53o2@amd.com>
-Message-ID: <diqzo6r8p90a.fsf@google.com>
-Subject: Re: [PATCH RFC v1 1/5] KVM: guest_memfd: Remove preparation tracking
+References: <cover.1747264138.git.ackerleytng@google.com> <b3c2da681c5bf139e2eaf0ea82c7422f972f6288.1747264138.git.ackerleytng@google.com>
+ <20250916225528.iycrfgf4nz6bcdce@amd.com>
+Message-ID: <diqzjz1wp8o7.fsf@google.com>
+Subject: Re: [RFC PATCH v2 29/51] mm: guestmem_hugetlb: Wrap HugeTLB as an
+ allocator for guest_memfd
 From: Ackerley Tng <ackerleytng@google.com>
 To: Michael Roth <michael.roth@amd.com>
-Cc: kvm@vger.kernel.org, linux-coco@lists.linux.dev, linux-mm@kvack.org, 
-	linux-kernel@vger.kernel.org, david@redhat.com, tabba@google.com, 
-	vannapurve@google.com, ira.weiny@intel.com, thomas.lendacky@amd.com, 
-	pbonzini@redhat.com, seanjc@google.com, vbabka@suse.cz, joro@8bytes.org, 
-	pratikrajesh.sampat@amd.com, liam.merwick@oracle.com, yan.y.zhao@intel.com, 
-	aik@amd.com
+Cc: kvm@vger.kernel.org, linux-mm@kvack.org, linux-kernel@vger.kernel.org, 
+	x86@kernel.org, linux-fsdevel@vger.kernel.org, aik@amd.com, 
+	ajones@ventanamicro.com, akpm@linux-foundation.org, amoorthy@google.com, 
+	anthony.yznaga@oracle.com, anup@brainfault.org, aou@eecs.berkeley.edu, 
+	bfoster@redhat.com, binbin.wu@linux.intel.com, brauner@kernel.org, 
+	catalin.marinas@arm.com, chao.p.peng@intel.com, chenhuacai@kernel.org, 
+	dave.hansen@intel.com, david@redhat.com, dmatlack@google.com, 
+	dwmw@amazon.co.uk, erdemaktas@google.com, fan.du@intel.com, fvdl@google.com, 
+	graf@amazon.com, haibo1.xu@intel.com, hch@infradead.org, hughd@google.com, 
+	ira.weiny@intel.com, isaku.yamahata@intel.com, jack@suse.cz, 
+	james.morse@arm.com, jarkko@kernel.org, jgg@ziepe.ca, jgowans@amazon.com, 
+	jhubbard@nvidia.com, jroedel@suse.de, jthoughton@google.com, 
+	jun.miao@intel.com, kai.huang@intel.com, keirf@google.com, 
+	kent.overstreet@linux.dev, kirill.shutemov@intel.com, liam.merwick@oracle.com, 
+	maciej.wieczor-retman@intel.com, mail@maciej.szmigiero.name, maz@kernel.org, 
+	mic@digikod.net, mpe@ellerman.id.au, muchun.song@linux.dev, nikunj@amd.com, 
+	nsaenz@amazon.es, oliver.upton@linux.dev, palmer@dabbelt.com, 
+	pankaj.gupta@amd.com, paul.walmsley@sifive.com, pbonzini@redhat.com, 
+	pdurrant@amazon.co.uk, peterx@redhat.com, pgonda@google.com, pvorel@suse.cz, 
+	qperret@google.com, quic_cvanscha@quicinc.com, quic_eberman@quicinc.com, 
+	quic_mnalajal@quicinc.com, quic_pderrin@quicinc.com, quic_pheragu@quicinc.com, 
+	quic_svaddagi@quicinc.com, quic_tsoni@quicinc.com, richard.weiyang@gmail.com, 
+	rick.p.edgecombe@intel.com, rientjes@google.com, roypat@amazon.co.uk, 
+	rppt@kernel.org, seanjc@google.com, shuah@kernel.org, steven.price@arm.com, 
+	steven.sistare@oracle.com, suzuki.poulose@arm.com, tabba@google.com, 
+	thomas.lendacky@amd.com, usama.arif@bytedance.com, vannapurve@google.com, 
+	vbabka@suse.cz, viro@zeniv.linux.org.uk, vkuznets@redhat.com, 
+	wei.w.wang@intel.com, will@kernel.org, willy@infradead.org, 
+	xiaoyao.li@intel.com, yan.y.zhao@intel.com, yilun.xu@intel.com, 
+	yuzenghui@huawei.com, zhiquan1.li@intel.com
 Content-Type: text/plain; charset="UTF-8"
 
 Michael Roth <michael.roth@amd.com> writes:
 
-> On Mon, Aug 25, 2025 at 04:08:19PM -0700, Ackerley Tng wrote:
->> Michael Roth <michael.roth@amd.com> writes:
+> On Wed, May 14, 2025 at 04:42:08PM -0700, Ackerley Tng wrote:
 >> 
->> > guest_memfd currently uses the folio uptodate flag to track:
->> >
->> >   1) whether or not a page had been cleared before initial usage
->> >   2) whether or not the architecture hooks have been issued to put the
->> >      page in a private state as defined by the architecture
->> >
->> > In practice, 2) is only actually being tracked for SEV-SNP VMs, and
->> > there do not seem to be any plans/reasons that would suggest this will
->> > change in the future, so this additional tracking/complexity is not
->> > really providing any general benefit to guest_memfd users. Future plans
->> > around in-place conversion and hugepage support, where the per-folio
->> > uptodate flag is planned to be used purely to track the initial clearing
->> > of folios, whereas conversion operations could trigger multiple
->> > transitions between 'prepared' and 'unprepared' and thus need separate
->> > tracking, will make the burden of tracking this information within
->> > guest_memfd even more complex, since preparation generally happens
->> > during fault time, on the "read-side" of any global locks that might
->> > protect state tracked by guest_memfd, and so may require more complex
->> > locking schemes to allow for concurrent handling of page faults for
->> > multiple vCPUs where the "preparedness" state tracked by guest_memfd
->> > might need to be updated as part of handling the fault.
->> >
->> > Instead of keeping this current/future complexity within guest_memfd for
->> > what is essentially just SEV-SNP, just drop the tracking for 2) and have
->> > the arch-specific preparation hooks get triggered unconditionally on
->> > every fault so the arch-specific hooks can check the preparation state
->> > directly and decide whether or not a folio still needs additional
->> > preparation. In the case of SEV-SNP, the preparation state is already
->> > checked again via the preparation hooks to avoid double-preparation, so
->> > nothing extra needs to be done to update the handling of things there.
->> >
->> > Signed-off-by: Michael Roth <michael.roth@amd.com>
->> > ---
->> >  virt/kvm/guest_memfd.c | 47 ++++++++++++++----------------------------
->> >  1 file changed, 15 insertions(+), 32 deletions(-)
->> >
->> > diff --git a/virt/kvm/guest_memfd.c b/virt/kvm/guest_memfd.c
->> > index 35f94a288e52..cc93c502b5d8 100644
->> > --- a/virt/kvm/guest_memfd.c
->> > +++ b/virt/kvm/guest_memfd.c
->> > @@ -421,11 +421,6 @@ static int __kvm_gmem_prepare_folio(struct kvm *kvm, struct kvm_memory_slot *slo
->> >  	return 0;
->> >  }
->> >  
->> > -static inline void kvm_gmem_mark_prepared(struct folio *folio)
->> > -{
->> > -	folio_mark_uptodate(folio);
->> > -}
->> > -
->> >  /*
->> >   * Process @folio, which contains @gfn, so that the guest can use it.
->> >   * The folio must be locked and the gfn must be contained in @slot.
->> > @@ -435,13 +430,7 @@ static inline void kvm_gmem_mark_prepared(struct folio *folio)
->> >  static int kvm_gmem_prepare_folio(struct kvm *kvm, struct kvm_memory_slot *slot,
->> >  				  gfn_t gfn, struct folio *folio)
->> >  {
->> > -	unsigned long nr_pages, i;
->> >  	pgoff_t index;
->> > -	int r;
->> > -
->> > -	nr_pages = folio_nr_pages(folio);
->> > -	for (i = 0; i < nr_pages; i++)
->> > -		clear_highpage(folio_page(folio, i));
->> >  
->> >  	/*
->> >  	 * Preparing huge folios should always be safe, since it should
->> > @@ -459,11 +448,8 @@ static int kvm_gmem_prepare_folio(struct kvm *kvm, struct kvm_memory_slot *slot,
+>> [...snip...]
 >> 
->> While working on HugeTLB support for guest_memfd, I added a test that
->> tries to map a non-huge-page-aligned gmem.pgoff to a huge-page aligned
->> gfn.
->> 
->> I understand that config would destroy the performance advantages of
->> huge pages, but I think the test is necessary since Yan brought up the
->> use case here [1].
->> 
->> The conclusion in that thread, I believe, was to allow binding of
->> unaligned GFNs to offsets, but disallow large pages in that case. The
->> next series for guest_memfd HugeTLB support will include a fix similar
->> to this [2].
->> 
->> While testing, I hit this WARN_ON with a non-huge-page-aligned
->> gmem.pgoff.
->> 
->> >  	WARN_ON(!IS_ALIGNED(slot->gmem.pgoff, 1 << folio_order(folio)));
->> 
->> Do you all think this WARN_ON can be removed?
+>> +static void *guestmem_hugetlb_setup(size_t size, u64 flags)
+>> +
+>> +{
+>> +	struct guestmem_hugetlb_private *private;
+>> +	struct hugetlb_cgroup *h_cg_rsvd = NULL;
+>> +	struct hugepage_subpool *spool;
+>> +	unsigned long nr_pages;
+>> +	int page_size_log;
+>> +	struct hstate *h;
+>> +	long hpages;
+>> +	int idx;
+>> +	int ret;
+>> +
+>> +	page_size_log = (flags >> GUESTMEM_HUGETLB_FLAG_SHIFT) &
+>> +			GUESTMEM_HUGETLB_FLAG_MASK;
+>> +	h = hstate_sizelog(page_size_log);
+>> +	if (!h)
+>> +		return ERR_PTR(-EINVAL);
+>> +
+>> +	/*
+>> +	 * Check against h because page_size_log could be 0 to request default
+>> +	 * HugeTLB page size.
+>> +	 */
+>> +	if (!IS_ALIGNED(size, huge_page_size(h)))
+>> +		return ERR_PTR(-EINVAL);
 >
-> I think so.. I actually ended up dropping this WARN_ON() for a similar
-> reason:
+> For SNP testing we ended up needing to relax this to play along a little
+> easier with QEMU/etc. and instead just round the size up via:
 >
-
-Thanks for confirming!
-
->   https://github.com/AMDESE/linux/commit/c654cd144ad0d823f4db8793ebf9b43a3e8a7c48
+>   size = round_up(size, huge_page_size(h));
 >
-> but in that case it was to deal with memslots where most of the GPA
-> ranges are huge-page aligned to the gmemfd, and it's just that the start/end
-> GPA ranges have been split up and associated with other memslots. In that case
-> I still try to allow hugepages but force order 0 in kvm_gmem_get_pfn()
-> for the start/end ranges.
+> The thinking is that since, presumably, the size would span beyond what
+> we actually bind to any memslots, that KVM will simply map them as 4K
+> in nested page table, and userspace already causes 4K split and inode
+> size doesn't change as part of this adjustment so the extra pages would
+> remain inaccessible.
 >
-> I haven't really considered the case where entire GPA range is misaligned
-> with gmemfd hugepage offsets but the proposed handling seems reasonable
-> to me... I need to take a closer look at whether the above-mentioned
-> logic is at odds with what is/will be implemented in
-> kvm_alloc_memslot_metadata() however as that seems a bit more restrictive.
+> The accounting might get a little weird but it's probably fair to
+> document that non-hugepage-aligned gmemfd sizes can result in wasted memory
+> if userspace wants to fine tune around that.
+
+Is there a specific use case where the userspace VMM must allocate some
+guest_memfd file size that isn't huge_page_size(h) aligned?
+
+Rounding up silently feels like it would be hiding errors, and feels a
+little especially when we're doing so much work to save memory,
+retaining HVO, removing double allocation and all.
+
 >
-
-Does this help? [1] (from a WIP patch series).
-
-KVM already checks that the guest base address (base_gfn) and the
-userspace virtual address (userspace_addr) are aligned relative to each
-other for each large page level. If they are not, large pages are
-disabled for the entire memory slot.
-
-[1] extends that same check for slot->base_gfn and
-slot->gmem.pgoff. Hence, guest_memfd is letting KVM manage the
-mapping. guest_memfd reports max_order based on what it knows (folio
-size, and folio size is also determined by shareability), and KVM
-manages the mapping after taking account lpage_info in addition to
-max_order.
-
-[1] https://github.com/googleprodkernel/linux-cc/commit/371ed9281e0c9ba41cfdc20b48a6c5566f61a7df
-
-> Thanks,
+> -Mike
 >
-> Mike
->
+>> +
+>> +	private = kzalloc(sizeof(*private), GFP_KERNEL);
+>> +	if (!private)
+>> +		return ERR_PTR(-ENOMEM);
+>> +
+>> +	/* Creating a subpool makes reservations, hence charge for them now. */
+>> +	idx = hstate_index(h);
+>> +	nr_pages = size >> PAGE_SHIFT;
+>> +	ret = hugetlb_cgroup_charge_cgroup_rsvd(idx, nr_pages, &h_cg_rsvd);
+>> +	if (ret)
+>> +		goto err_free;
+>> +
+>> +	hpages = size >> huge_page_shift(h);
+>> +	spool = hugepage_new_subpool(h, hpages, hpages, false);
+>> +	if (!spool)
+>> +		goto err_uncharge;
+>> +
+>> +	private->h = h;
+>> +	private->spool = spool;
+>> +	private->h_cg_rsvd = h_cg_rsvd;
+>> +
+>> +	return private;
+>> +
+>> +err_uncharge:
+>> +	ret = -ENOMEM;
+>> +	hugetlb_cgroup_uncharge_cgroup_rsvd(idx, nr_pages, h_cg_rsvd);
+>> +err_free:
+>> +	kfree(private);
+>> +	return ERR_PTR(ret);
+>> +}
+>> +
 >> 
->> Also, do you think kvm_gmem_prepare_folio()s interface should perhaps be
->> changed to take pfn, gfn, nr_pages (PAGE_SIZE pages) and level?
->> 
->> I think taking a folio is kind of awkward since we're not really setting
->> up the folio, we're setting up something mapping-related for the
->> folio. Also, kvm_gmem_invalidate() doesn't take folios, which is more
->> aligned with invalidating mappings rather than something folio-related.
->> 
->> [1] https://lore.kernel.org/all/aA7UXI0NB7oQQrL2@yzhao56-desk.sh.intel.com/
->> [2] https://github.com/googleprodkernel/linux-cc/commit/371ed9281e0c9ba41cfdc20b48a6c5566f61a7df
->> 
->> >  	index = gfn - slot->base_gfn + slot->gmem.pgoff;
->> >  	index = ALIGN_DOWN(index, 1 << folio_order(folio));
->> > -	r = __kvm_gmem_prepare_folio(kvm, slot, index, folio);
->> > -	if (!r)
->> > -		kvm_gmem_mark_prepared(folio);
->> >  
->> > -	return r;
->> > +	return __kvm_gmem_prepare_folio(kvm, slot, index, folio);
->> >  }
->> >  
->> > 
->> > [...snip...]
->> > 
+>> [...snip...]
 >> 
 
