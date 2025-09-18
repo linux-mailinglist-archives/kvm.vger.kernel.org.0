@@ -1,270 +1,248 @@
-Return-Path: <kvm+bounces-57983-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-57984-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id D510AB831A8
-	for <lists+kvm@lfdr.de>; Thu, 18 Sep 2025 08:13:10 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 17D20B83254
+	for <lists+kvm@lfdr.de>; Thu, 18 Sep 2025 08:31:19 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 87EEC4A2058
-	for <lists+kvm@lfdr.de>; Thu, 18 Sep 2025 06:13:10 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 831A11B20C2F
+	for <lists+kvm@lfdr.de>; Thu, 18 Sep 2025 06:31:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CE8C42D77FF;
-	Thu, 18 Sep 2025 06:13:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BC7E92D877E;
+	Thu, 18 Sep 2025 06:31:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="2lkBJUbE"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="CCAYw/BK"
 X-Original-To: kvm@vger.kernel.org
-Received: from CH1PR05CU001.outbound.protection.outlook.com (mail-northcentralusazon11010044.outbound.protection.outlook.com [52.101.193.44])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pj1-f74.google.com (mail-pj1-f74.google.com [209.85.216.74])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D7042284899
-	for <kvm@vger.kernel.org>; Thu, 18 Sep 2025 06:13:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.193.44
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758175984; cv=fail; b=pmODBv+fyFClRwVGTdEKxipmJhUgiGCSgnmch/UW6PtR16kTg6KOiT3yLsfxSCwltsAl7YWI8XXHh2zu/77vwPp3aoFJkHWHsOBIr3ZN4MzOY7MMib2JNNVqT0ARI8qxmBeO/STlkM8bIU98VkaFPiBrJWVLTsAPD8gsmlVgZg8=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758175984; c=relaxed/simple;
-	bh=gmTyaWjnLd1ZDYXaXlh16VAloXbRngggaopUVSAtk1c=;
-	h=From:To:CC:Subject:In-Reply-To:References:Date:Message-ID:
-	 MIME-Version:Content-Type; b=gKD62dViFR+EuXljTq90HTnIunSaWbqVQwtkp/7nYgs4AcO7kl1T/vhdIOUfJ0+9gYkVMIQPyjiWis/9QMeEgOp3wxS3m8rSny2pGNisBLeqdxnlK2TPaL6KNWR753vR9WJoBytIkP+ZEfzXiXjBvgnQMcRLWZi8IRXYtBJVD/M=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=2lkBJUbE; arc=fail smtp.client-ip=52.101.193.44
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=a35gTDIjxBHOTXmbw3OAuLxi5yC4UY2xBUxbO+SEn8WYA7oFNSK/IlBKLtkT+Yz4u9/LklOoAcGRroVaBI5YjYSiiSGa39CQLjf/IgkwTwg0/hCRWLnqaIewm8k8vqOoXmxfAPGe+rc1i1NQ+RrWLkky6r6ObtkxYC0S/3APt17weF/TtEoqUrobrODubYueYERR001Hn7M+V8gtQyDFd3wk1bj4VJkLlsijE8xqBzdCw/YpbekLoBA/hn+ROIarH2AYzqw5BHSaWCBSuUC64BhmNO3e12F+Mm1tnCcb88DootzyjAEhh7xQqKpIHHMIfnsUK5uFtKo8MICSnrLS4g==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=J/8UGC9RbihPDEbOtcs90uzgEo2b8NuEolww1eV7paQ=;
- b=Wep37LFCZyA5U7jBbHz5nsNaaYUT8V4dqS3qd+NOJTAc83gYQV7L3XPehXxEPsu/Dwsh8Y1mvd196y46sCed5/9WTja9UspmuIn9aX6HiXlf9gyhgNXcEZoIbMlvCrv8UuTulj52PRYZm0KRrYvhQiFqa5ifN23jbHjzV7TP9CgbitKWgEdY8F+ssmCmBaGJ8OMQpdcOFxqXjyySy5NCi8rtRcww26+1n7gj/fz0f4vZnG0YAsEST8pnJjvL3BUWoU8v+FBSFI12N5C5JgNh9IACYuJWDQE5h7JCFHkD++NIJ1RkA2iLwuttn9FxzVv7v1kT3ckeu4QnLi3RzB8p/g==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 165.204.84.17) smtp.rcpttodomain=alien8.de smtp.mailfrom=amd.com; dmarc=pass
- (p=quarantine sp=quarantine pct=100) action=none header.from=amd.com;
- dkim=none (message not signed); arc=none (0)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=J/8UGC9RbihPDEbOtcs90uzgEo2b8NuEolww1eV7paQ=;
- b=2lkBJUbE9vi9SxO0Ou3m02/KAFMXJ0Rjtj5LgoDYo6jUrncJTxtJH0+GbSUQUQzT/3jDqmBfs/otqYk9kIRvKclH4IutyeQVn5xdWx2yMP6bpgEEY8kFK8Klnz75vuu0hurddnGLhC4RK/vOAgWyWTeA52aZzsuSMxh1YxI/9r0=
-Received: from CH3P221CA0004.NAMP221.PROD.OUTLOOK.COM (2603:10b6:610:1e7::35)
- by MN2PR12MB4405.namprd12.prod.outlook.com (2603:10b6:208:26d::17) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9137.13; Thu, 18 Sep
- 2025 06:12:58 +0000
-Received: from CH2PEPF00000140.namprd02.prod.outlook.com
- (2603:10b6:610:1e7:cafe::62) by CH3P221CA0004.outlook.office365.com
- (2603:10b6:610:1e7::35) with Microsoft SMTP Server (version=TLS1_3,
- cipher=TLS_AES_256_GCM_SHA384) id 15.20.9137.14 via Frontend Transport; Thu,
- 18 Sep 2025 06:12:58 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
- smtp.mailfrom=amd.com; dkim=none (message not signed)
- header.d=none;dmarc=pass action=none header.from=amd.com;
-Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
- 165.204.84.17 as permitted sender) receiver=protection.outlook.com;
- client-ip=165.204.84.17; helo=satlexmb07.amd.com; pr=C
-Received: from satlexmb07.amd.com (165.204.84.17) by
- CH2PEPF00000140.mail.protection.outlook.com (10.167.244.72) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.9137.12 via Frontend Transport; Thu, 18 Sep 2025 06:12:57 +0000
-Received: from BLR-L1-NDADHANI (10.180.168.240) by satlexmb07.amd.com
- (10.181.42.216) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.17; Wed, 17 Sep
- 2025 23:12:53 -0700
-From: Nikunj A Dadhania <nikunj@amd.com>
-To: "Huang, Kai" <kai.huang@intel.com>, "pbonzini@redhat.com"
-	<pbonzini@redhat.com>, "seanjc@google.com" <seanjc@google.com>
-CC: "thomas.lendacky@amd.com" <thomas.lendacky@amd.com>, "kvm@vger.kernel.org"
-	<kvm@vger.kernel.org>, "joao.m.martins@oracle.com"
-	<joao.m.martins@oracle.com>, "santosh.shukla@amd.com"
-	<santosh.shukla@amd.com>, "bp@alien8.de" <bp@alien8.de>
-Subject: Re: [PATCH v2 4/4] KVM: SVM: Add Page modification logging support
-In-Reply-To: <4c9e02133992661190b644d93a393f5f2d6bb32c.camel@intel.com>
-References: <20250915085938.639049-1-nikunj@amd.com>
- <20250915085938.639049-5-nikunj@amd.com>
- <4c9e02133992661190b644d93a393f5f2d6bb32c.camel@intel.com>
-Date: Thu, 18 Sep 2025 06:12:50 +0000
-Message-ID: <85ecs4nva5.fsf@amd.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 35A48265630
+	for <kvm@vger.kernel.org>; Thu, 18 Sep 2025 06:31:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.74
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1758177066; cv=none; b=V0eW0hOBhPDJ7Vd6Pns2Q0Pwfzs5D3f9vduvxj1CsRhmd8r6chkebqJcxkeOH0pro4zfX+zmqFbSKZetkCFrSO911FE29YmmsrUPGIYkWyZ/NrJri6kpOtlNKr6W6IOJjoXKk7wq9BLu9cUKpHP+F0uGiewBJdL6pPET/tI0AvA=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1758177066; c=relaxed/simple;
+	bh=1ESgdimDNbdXFB+WfS9IWJsgtjPJ0aG5/dKUvYiS78w=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=F5K+g7Fcm8gPwruQ+8R6LmS+aaF+Q+zmzcd1/8Kxxxdb4jV1fLm1Qwjt9jGJ5a42egGoEZnA0NDgqioD6/ZCg7het90YWaUfdbsgqnmykhXFFnTD1/xDAMZCptDqzRi/Uruahj4NttALLtat6mwfnt6he1olL/0LfMcS3CwS7yY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--ackerleytng.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=CCAYw/BK; arc=none smtp.client-ip=209.85.216.74
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--ackerleytng.bounces.google.com
+Received: by mail-pj1-f74.google.com with SMTP id 98e67ed59e1d1-32eaa47c7c8so579907a91.3
+        for <kvm@vger.kernel.org>; Wed, 17 Sep 2025 23:31:04 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1758177063; x=1758781863; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=zYw7ATyO+FbNb+44lQoltDz9PEwp1UWJIGjKMOTdpb4=;
+        b=CCAYw/BKzSAVfP411cx+fhiXGYmztinxkoWQCOnq7oiv31cG0BIytvmrE4lVt3Z9mT
+         JekBHqpJ+ih8LY2US9ytszgGIo2WJTXYNNYfW4Mbcm3s69kbTZqNe9pOZSejx2XuFIFn
+         fVQsP+NzYoxYxzxrZlygOxZncW8WJelqcv370T5RSm1cQTK1KZUAy6C2jcYdq6Knrf5h
+         87o/qHyMOcY0qzSi8du1UDY/c9dQTxdFMveLALTDIbNHdp+zNK0hNdF9fHRAoSP6ctk5
+         JNM6rmEaVX5g+ltNBf86FOxPiQkhCCHeU/zml4QDDOvBBc1X5RwSuI6GbzKKA/ABHSnZ
+         Wg6w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1758177063; x=1758781863;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=zYw7ATyO+FbNb+44lQoltDz9PEwp1UWJIGjKMOTdpb4=;
+        b=kAtE+qxSAW9CKVYS/hwTm1XYhyCiyZ3erHfs+sjhGCCIeuTx+aQJhH+IekWXc1P1UD
+         fVw2jTXJ/ZnrzTkdFPOdymsALFXLj3rfRGkaVEgtYGcCPZTekx/OaBmq2abmYr2ZzK7l
+         P69GxEjODVb0ZmKb9IP0JBYB1wy0L+BLV45kYcOAk9BlWuTqnwf7PPpTKan6txmjPINd
+         TBwU27+owbSANXo6AXreupwuxwUtH0WAgwujZHYyzsjleU5LoCCm9shL+scbD3FNecfR
+         13zDv2G2K+OzAv75McbICOmTCRkYBJqdByftWNPnF4PLGIo2kyat933BxyRxRjkZfMx+
+         OEGQ==
+X-Gm-Message-State: AOJu0Yw0/mj5SBWddYa1slPdQ8IONeBa8zgVmbU2P7nPuZWHdjFeAbr/
+	Hy7KZiB2y826mAr6g6jwim+JojcZqi44WVC2Kope56YxFAU2av/BT0YdLLc5VQkxLeCug+ODj9B
+	8r0y3M4HpqIGJ0FBYgem8V2FvOw==
+X-Google-Smtp-Source: AGHT+IG8r6Hh7ieBZNhEHWEonWxugVqZ2GsgcsPqQV0BbYfLkp6mgTeqw5ZShceR0hVG0T5MXwZgGvkkREJdhdBrSQ==
+X-Received: from pjvv5.prod.google.com ([2002:a17:90b:5885:b0:32b:58d1:a610])
+ (user=ackerleytng job=prod-delivery.src-stubby-dispatcher) by
+ 2002:a17:90b:5788:b0:32d:dffc:7ad6 with SMTP id 98e67ed59e1d1-32ee3f8c588mr6178959a91.33.1758177063484;
+ Wed, 17 Sep 2025 23:31:03 -0700 (PDT)
+Date: Thu, 18 Sep 2025 06:31:01 +0000
+In-Reply-To: <20250916233335.wv2lf4fiejlw53o2@amd.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-X-ClientProxiedBy: satlexmb08.amd.com (10.181.42.217) To satlexmb07.amd.com
- (10.181.42.216)
-X-EOPAttributedMessage: 0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: CH2PEPF00000140:EE_|MN2PR12MB4405:EE_
-X-MS-Office365-Filtering-Correlation-Id: c7e020bd-7fcb-4268-0ba5-08ddf67a69c8
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|376014|1800799024|82310400026|36860700013;
-X-Microsoft-Antispam-Message-Info:
-	=?utf-8?B?V2RHVUloU2RIVEVrUGE5ZjlmaDgva3lvQjZkYnR3TGZoaXo3aGNhelhNMCtY?=
- =?utf-8?B?cmcwY3VOOVV2d3pHNFlZZ3lGQ1lqazFnanRaRHU4T3h4WWljOSsreHY1ZGE1?=
- =?utf-8?B?SUVHZUNwVWQ3S2tRWGdzbXo0UjZYYXVCeFlZOGxnNnptWUVWVUQvU1pDb0VP?=
- =?utf-8?B?RkhkRG02N2VWS2F2TlQ1RnArQzhkMmhhTk9BOEtFWVRWNGw2OENiaTVoNmVD?=
- =?utf-8?B?dktrMHhvRUpROEtHZUwyMXBHWFYvMm5URDVVZVRFdUI2cWtzdWhwemJPZTQ3?=
- =?utf-8?B?dDhwY2FZcitXTTJTMkVWTTgydVA0Qm9DeElhWjE2QVJZakx2eklTOFpmdFdu?=
- =?utf-8?B?QWdvZUxYY2VQZENjYWhLbUN6Tm00cXdCRlNpVE5uU3JsM2JqUDdLTzJhcytQ?=
- =?utf-8?B?TU5CbzNqcUFyaGpxY2s4TUgrWFVDcVlZeWJCVHNiRDJGajFHVUlLTEFkbTNq?=
- =?utf-8?B?UUQ1NlE3bUZLYkl1NElBT2ZuWEtHTDlhQytiaHZoRXhpbFRJWlMzeVVSNkYv?=
- =?utf-8?B?ejZxNi91SFZpbFNLMCs0cFJML2NlYUlIM1FXb2N4aG5pU2dlOHNGaktOSlRH?=
- =?utf-8?B?aG1OUVNaWnR3TGdhdkJyTTRxeGJ6Yy9yR2ZLdXFwV2pSWnRNUXNDaXNDUWcw?=
- =?utf-8?B?eDllQXV6SEFmRThVU3lkdkFnR1NINTJBQTRHQVJEZ2E3UDhBN2JpTlVzSHpl?=
- =?utf-8?B?SzA2T0l2NG95Z1VNbEMyZzU3dkduWWVrN0tDRDJWb0ZyWGlKUnMzaUgySmJX?=
- =?utf-8?B?bEFLU2hrVE1NUGN0RjZOM1gxT1NjRko3aHd0R05yMitYdzM0ZmRvdjlZelhI?=
- =?utf-8?B?aHA4eGZGay9SZk5DYmxHM2pzblo2WFA4MEt3eHBMMFcvcitQSDFEYUJnUHBz?=
- =?utf-8?B?YkFFTUlFRVQwRjJJbW55VGhZQVVMV2k4L3NRREpvWnlONFBYS01YZ3MzN2o4?=
- =?utf-8?B?N0V1bU51QlFXcXg1YjQvWE9icXN2UWlyT3lPTzl0RzVVOEZzeVNlZm9Tbk54?=
- =?utf-8?B?bGtMTHhZSEgwdW04bmQrZGJYQ3VsNWkyU25yWTdxQ2R4ZHpKOG1MTm5tQzVC?=
- =?utf-8?B?VDErTXlXeXJnMTFrV2RkN0hTM3YvNTZLVW1TZTRMam1HVmh5QzMrY2o3MnNN?=
- =?utf-8?B?eDRLYWFEdmVzVGM4T1Vra1I0S3IzQzRKam14amc1L1FGalVhcjBJS0hLb1VU?=
- =?utf-8?B?eThBVkVzUW1KRVczNWpIa1pBMWpVUzhDYXlmRmswd0pnMUR2M2pZd3ZITGUr?=
- =?utf-8?B?a2VRbWo2QkJUOHcwQzA1OXZDd09KRFFOeDdSdEhTWDh1dDR3cjJiejgzaFQ1?=
- =?utf-8?B?VlNySGRQOUtRaWJhTXp5UEFGS2dxZmVRTGdrUEwzVWxnWm5kZ21uOUdFWGQ3?=
- =?utf-8?B?WFBXZThVQXZKa2tWQlI2RE9LNmZyL24wZ3VkMm1qSDFnWmRRVkhZK0N2MllF?=
- =?utf-8?B?a0UzbXJyWi80UmhmUnE1dFRKcmlHNjdmS2VtMFk4dmJxRWdmbjFIdzBNeDJQ?=
- =?utf-8?B?L2E3ZUIvRGg1V215WWlTRGhOQ0JtcGFKSEdaM2JpSnhLUDhuVlQyMjFIcXdK?=
- =?utf-8?B?RlRZUlBaSjRPWWx6VEpzOGRpTjR2c2txNXRodkI2bzA0eUhZLzVDdE5pa0ZO?=
- =?utf-8?B?ak9nbjdrV3d2Z3N5ZHdpUHVVaWxoUWozemxKVXdZSFVqSXMyVVI2WTB6NXcy?=
- =?utf-8?B?Sk96S3M5dEhvd25xUUMxNjJ3b1dTenJZbXpHbHlyMC9pYjJaTVpZa1dBNGwr?=
- =?utf-8?B?SHJNYzBSQzk0ejJUL2ltRFlEY3RVRWJEdEIwdnJCZ1NCNk44aHpKT0lITWU3?=
- =?utf-8?B?d1V6ZzRuK1dUUTdLSm9EZVM1L1ExbUkzZUtwUW0yVkxIMXBFWjNsazNRSkI3?=
- =?utf-8?B?UGNZcHFBVWJLN2MvaGNJUmttMStRd2pXSnZjRjI0aVAxMFBkSEJIMFVFM3FK?=
- =?utf-8?B?SVVsN0N2YXRDNVdnVHZ0OWRlTlY3aVZKM0dNb2s2S0txajZ4QXIzSmVCNFM0?=
- =?utf-8?B?ckdqTDl5NmhkOVpWWnp0WjhXOWNVRExnWEJaOXd0QzR5VEk5ZU5sd29IYjlU?=
- =?utf-8?Q?A07Xej?=
-X-Forefront-Antispam-Report:
-	CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:satlexmb07.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230040)(376014)(1800799024)(82310400026)(36860700013);DIR:OUT;SFP:1101;
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 18 Sep 2025 06:12:57.7106
- (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: c7e020bd-7fcb-4268-0ba5-08ddf67a69c8
-X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[satlexmb07.amd.com]
-X-MS-Exchange-CrossTenant-AuthSource:
-	CH2PEPF00000140.namprd02.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: MN2PR12MB4405
+Mime-Version: 1.0
+References: <20250613005400.3694904-1-michael.roth@amd.com>
+ <20250613005400.3694904-2-michael.roth@amd.com> <diqztt1vf198.fsf@google.com> <20250916233335.wv2lf4fiejlw53o2@amd.com>
+Message-ID: <diqzo6r8p90a.fsf@google.com>
+Subject: Re: [PATCH RFC v1 1/5] KVM: guest_memfd: Remove preparation tracking
+From: Ackerley Tng <ackerleytng@google.com>
+To: Michael Roth <michael.roth@amd.com>
+Cc: kvm@vger.kernel.org, linux-coco@lists.linux.dev, linux-mm@kvack.org, 
+	linux-kernel@vger.kernel.org, david@redhat.com, tabba@google.com, 
+	vannapurve@google.com, ira.weiny@intel.com, thomas.lendacky@amd.com, 
+	pbonzini@redhat.com, seanjc@google.com, vbabka@suse.cz, joro@8bytes.org, 
+	pratikrajesh.sampat@amd.com, liam.merwick@oracle.com, yan.y.zhao@intel.com, 
+	aik@amd.com
+Content-Type: text/plain; charset="UTF-8"
 
-"Huang, Kai" <kai.huang@intel.com> writes:
+Michael Roth <michael.roth@amd.com> writes:
 
-> On Mon, 2025-09-15 at 08:59 +0000, Nikunj A Dadhania wrote:
->> Currently, dirty logging relies on write protecting guest memory and
->> marking dirty GFNs during subsequent write faults.=C2=A0
->>=20
+> On Mon, Aug 25, 2025 at 04:08:19PM -0700, Ackerley Tng wrote:
+>> Michael Roth <michael.roth@amd.com> writes:
+>> 
+>> > guest_memfd currently uses the folio uptodate flag to track:
+>> >
+>> >   1) whether or not a page had been cleared before initial usage
+>> >   2) whether or not the architecture hooks have been issued to put the
+>> >      page in a private state as defined by the architecture
+>> >
+>> > In practice, 2) is only actually being tracked for SEV-SNP VMs, and
+>> > there do not seem to be any plans/reasons that would suggest this will
+>> > change in the future, so this additional tracking/complexity is not
+>> > really providing any general benefit to guest_memfd users. Future plans
+>> > around in-place conversion and hugepage support, where the per-folio
+>> > uptodate flag is planned to be used purely to track the initial clearing
+>> > of folios, whereas conversion operations could trigger multiple
+>> > transitions between 'prepared' and 'unprepared' and thus need separate
+>> > tracking, will make the burden of tracking this information within
+>> > guest_memfd even more complex, since preparation generally happens
+>> > during fault time, on the "read-side" of any global locks that might
+>> > protect state tracked by guest_memfd, and so may require more complex
+>> > locking schemes to allow for concurrent handling of page faults for
+>> > multiple vCPUs where the "preparedness" state tracked by guest_memfd
+>> > might need to be updated as part of handling the fault.
+>> >
+>> > Instead of keeping this current/future complexity within guest_memfd for
+>> > what is essentially just SEV-SNP, just drop the tracking for 2) and have
+>> > the arch-specific preparation hooks get triggered unconditionally on
+>> > every fault so the arch-specific hooks can check the preparation state
+>> > directly and decide whether or not a folio still needs additional
+>> > preparation. In the case of SEV-SNP, the preparation state is already
+>> > checked again via the preparation hooks to avoid double-preparation, so
+>> > nothing extra needs to be done to update the handling of things there.
+>> >
+>> > Signed-off-by: Michael Roth <michael.roth@amd.com>
+>> > ---
+>> >  virt/kvm/guest_memfd.c | 47 ++++++++++++++----------------------------
+>> >  1 file changed, 15 insertions(+), 32 deletions(-)
+>> >
+>> > diff --git a/virt/kvm/guest_memfd.c b/virt/kvm/guest_memfd.c
+>> > index 35f94a288e52..cc93c502b5d8 100644
+>> > --- a/virt/kvm/guest_memfd.c
+>> > +++ b/virt/kvm/guest_memfd.c
+>> > @@ -421,11 +421,6 @@ static int __kvm_gmem_prepare_folio(struct kvm *kvm, struct kvm_memory_slot *slo
+>> >  	return 0;
+>> >  }
+>> >  
+>> > -static inline void kvm_gmem_mark_prepared(struct folio *folio)
+>> > -{
+>> > -	folio_mark_uptodate(folio);
+>> > -}
+>> > -
+>> >  /*
+>> >   * Process @folio, which contains @gfn, so that the guest can use it.
+>> >   * The folio must be locked and the gfn must be contained in @slot.
+>> > @@ -435,13 +430,7 @@ static inline void kvm_gmem_mark_prepared(struct folio *folio)
+>> >  static int kvm_gmem_prepare_folio(struct kvm *kvm, struct kvm_memory_slot *slot,
+>> >  				  gfn_t gfn, struct folio *folio)
+>> >  {
+>> > -	unsigned long nr_pages, i;
+>> >  	pgoff_t index;
+>> > -	int r;
+>> > -
+>> > -	nr_pages = folio_nr_pages(folio);
+>> > -	for (i = 0; i < nr_pages; i++)
+>> > -		clear_highpage(folio_page(folio, i));
+>> >  
+>> >  	/*
+>> >  	 * Preparing huge folios should always be safe, since it should
+>> > @@ -459,11 +448,8 @@ static int kvm_gmem_prepare_folio(struct kvm *kvm, struct kvm_memory_slot *slot,
+>> 
+>> While working on HugeTLB support for guest_memfd, I added a test that
+>> tries to map a non-huge-page-aligned gmem.pgoff to a huge-page aligned
+>> gfn.
+>> 
+>> I understand that config would destroy the performance advantages of
+>> huge pages, but I think the test is necessary since Yan brought up the
+>> use case here [1].
+>> 
+>> The conclusion in that thread, I believe, was to allow binding of
+>> unaligned GFNs to offsets, but disallow large pages in that case. The
+>> next series for guest_memfd HugeTLB support will include a fix similar
+>> to this [2].
+>> 
+>> While testing, I hit this WARN_ON with a non-huge-page-aligned
+>> gmem.pgoff.
+>> 
+>> >  	WARN_ON(!IS_ALIGNED(slot->gmem.pgoff, 1 << folio_order(folio)));
+>> 
+>> Do you all think this WARN_ON can be removed?
 >
-> Better to point out "On AMD platforms only".
+> I think so.. I actually ended up dropping this WARN_ON() for a similar
+> reason:
+>
 
-Subject being "KVM: SVM: ", this seems redundant to me.
+Thanks for confirming!
 
+>   https://github.com/AMDESE/linux/commit/c654cd144ad0d823f4db8793ebf9b43a3e8a7c48
 >
->> This method works but
->> incurs overhead due to additional write faults for each dirty GFN.
->>=20
->> Implement support for the Page Modification Logging (PML) feature, a
->> hardware-assisted method for efficient dirty logging. PML automatically
->> logs dirty GPA[51:12] to a 4K buffer when the CPU sets NPT D-bits. Two n=
-ew
->> VMCB fields are utilized: PML_ADDR and PML_INDEX. The PML_INDEX is
->> initialized to 511 (8 bytes per GPA entry), and the CPU decreases the
->> PML_INDEX after logging each GPA. When the PML buffer is full, a
->> VMEXIT(PML_FULL) with exit code 0x407 is generated.
->>=20
->> PML is enabled by default when supported and can be disabled via the 'pm=
-l'
->> module parameter.
+> but in that case it was to deal with memslots where most of the GPA
+> ranges are huge-page aligned to the gmemfd, and it's just that the start/end
+> GPA ranges have been split up and associated with other memslots. In that case
+> I still try to allow hugepages but force order 0 in kvm_gmem_get_pfn()
+> for the start/end ranges.
 >
-> This changelog mentions nothing about interaction between PML vs nested.
+> I haven't really considered the case where entire GPA range is misaligned
+> with gmemfd hugepage offsets but the proposed handling seems reasonable
+> to me... I need to take a closer look at whether the above-mentioned
+> logic is at odds with what is/will be implemented in
+> kvm_alloc_memslot_metadata() however as that seems a bit more restrictive.
 >
-> On VMX, PML is emulated for L2 (for nested EPT) but is never enabled in
-> hardware when CPU runs in L2, so:
->
-> 1) PML is exposed to L1 (for nested EPT).
-> 2) PML needs to be turned off when CPU runs in L2 otherwise L2's GPA=C2=A0
->    could be logged, and turned on again after CPU leaves L2 (and restore
->    PML buffer/index of VMCS01).
 
-I get your point and I see that when nested VM entry, PML is set in
-the nested_ctl for L2.
+Does this help? [1] (from a WIP patch series).
 
-I am trying to create this scenario, and couldnt get the L2 GPA's.
+KVM already checks that the guest base address (base_gfn) and the
+userspace virtual address (userspace_addr) are aligned relative to each
+other for each large page level. If they are not, large pages are
+disabled for the entire memory slot.
 
->
-> It doesn't seem this series supports emulating PML for L2 (for nested
-> NPT), because AMD's PML is also enumerated via a CPUID bit (while VMX
-> doesn't) and it's not exposed to guest, so we don't need to handle nested
-> PML_FULL VMEXIT etc.
->
-> This is fine I think, and we can support this in the future if needed.
->
-> But 2) is also needed anyway for AMD's PML AFAICT, regardless of whether
-> 1) is supported or not ?
+[1] extends that same check for slot->base_gfn and
+slot->gmem.pgoff. Hence, guest_memfd is letting KVM manage the
+mapping. guest_memfd reports max_order based on what it knows (folio
+size, and folio size is also determined by shareability), and KVM
+manages the mapping after taking account lpage_info in addition to
+max_order.
 
-I see your point, we will need to disable PML for L2.
+[1] https://github.com/googleprodkernel/linux-cc/commit/371ed9281e0c9ba41cfdc20b48a6c5566f61a7df
 
+> Thanks,
 >
-> If so, could we add some text to clarify all of these in the changelog?
+> Mike
 >
->
-> [...]
->
->>=20=20
->> +void svm_update_cpu_dirty_logging(struct kvm_vcpu *vcpu)
->> +{
->> +	struct vcpu_svm *svm =3D to_svm(vcpu);
->> +
->> +	if (WARN_ON_ONCE(!pml))
->> +		return;
->> +
->> +	if (is_guest_mode(vcpu))
->> +		return;
->
-> VMX has a vmx->nested.update_vmcs01_cpu_dirty_logging boolean.  It's set
-> here to indicate PML enabling is not updated for L2 here, but later when
-> switching to run in L1, the PML enabling needs to updated.
->
-> Shouldn't SVM have similar handling?
-
-Sure, will get back to you on this.
-
->
->> +
->> +	/*
->> +	 * Note, nr_memslots_dirty_logging can be changed concurrently with th=
-is
->> +	 * code, but in that case another update request will be made and so t=
-he
->> +	 * guest will never run with a stale PML value.
->> +	 */
->> +	if (atomic_read(&vcpu->kvm->nr_memslots_dirty_logging))
->> +		svm->vmcb->control.nested_ctl |=3D SVM_NESTED_CTL_PML_ENABLE;
->> +	else
->> +		svm->vmcb->control.nested_ctl &=3D ~SVM_NESTED_CTL_PML_ENABLE;
->> +}
->> +
->>=20
-> [...]
->
->> --- a/arch/x86/kvm/svm/svm.h
->> +++ b/arch/x86/kvm/svm/svm.h
->> @@ -335,6 +335,8 @@ struct vcpu_svm {
->>=20=20
->>  	/* Guest GIF value, used when vGIF is not enabled */
->>  	bool guest_gif;
->> +
->> +	struct page *pml_page;
->>  };
->
-> This seems to be a leftover.
-
-Sure.
-
-Regards
-Nikunj
+>> 
+>> Also, do you think kvm_gmem_prepare_folio()s interface should perhaps be
+>> changed to take pfn, gfn, nr_pages (PAGE_SIZE pages) and level?
+>> 
+>> I think taking a folio is kind of awkward since we're not really setting
+>> up the folio, we're setting up something mapping-related for the
+>> folio. Also, kvm_gmem_invalidate() doesn't take folios, which is more
+>> aligned with invalidating mappings rather than something folio-related.
+>> 
+>> [1] https://lore.kernel.org/all/aA7UXI0NB7oQQrL2@yzhao56-desk.sh.intel.com/
+>> [2] https://github.com/googleprodkernel/linux-cc/commit/371ed9281e0c9ba41cfdc20b48a6c5566f61a7df
+>> 
+>> >  	index = gfn - slot->base_gfn + slot->gmem.pgoff;
+>> >  	index = ALIGN_DOWN(index, 1 << folio_order(folio));
+>> > -	r = __kvm_gmem_prepare_folio(kvm, slot, index, folio);
+>> > -	if (!r)
+>> > -		kvm_gmem_mark_prepared(folio);
+>> >  
+>> > -	return r;
+>> > +	return __kvm_gmem_prepare_folio(kvm, slot, index, folio);
+>> >  }
+>> >  
+>> > 
+>> > [...snip...]
+>> > 
+>> 
 
