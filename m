@@ -1,156 +1,140 @@
-Return-Path: <kvm+bounces-58005-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-58004-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7AF9AB848F0
-	for <lists+kvm@lfdr.de>; Thu, 18 Sep 2025 14:22:04 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 288D9B848C6
+	for <lists+kvm@lfdr.de>; Thu, 18 Sep 2025 14:19:54 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9BED83B3CA9
-	for <lists+kvm@lfdr.de>; Thu, 18 Sep 2025 12:22:02 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 147E11C27FD6
+	for <lists+kvm@lfdr.de>; Thu, 18 Sep 2025 12:20:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F0A522E0902;
-	Thu, 18 Sep 2025 12:21:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 75CD82D0602;
+	Thu, 18 Sep 2025 12:19:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="key not found in DNS" (0-bit key) header.d=rsg.ci.i.u-tokyo.ac.jp header.i=@rsg.ci.i.u-tokyo.ac.jp header.b="ncih+7Z+"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="R6yE+2r6"
 X-Original-To: kvm@vger.kernel.org
-Received: from www3579.sakura.ne.jp (www3579.sakura.ne.jp [49.212.243.89])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DCABA34BA28
-	for <kvm@vger.kernel.org>; Thu, 18 Sep 2025 12:21:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=49.212.243.89
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C113A256C9F
+	for <kvm@vger.kernel.org>; Thu, 18 Sep 2025 12:19:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758198117; cv=none; b=AoJt32o56filgKrlIJBMC2kim4m4Y6LDf+HBz469xgvDzBF91kS/u/AUNPHVxkccR9IT+kXsZ3Z+uLaodCi4Q6uOVQIsH1+1Clf+Yich28ZWJ449AHGM808qGCUXtDxpVDUXo82Hpkso91LEMSyzPjWhrCMFutlFBWv18Md5qI4=
+	t=1758197980; cv=none; b=eZJDgD0ymHRN+l48gvqlhxrpjsWrmNF4YnTLyG1+sLeUMSIKMq4toTPeKBcQyIT4NJeiOYly3cNxXOBs7PJTFG7UpK0dPVu9MeQAU2q9JB8V/5e9M4N/yUMgOg3r7m9nGP8Ctl2lOwrCZWKIYJRJRxTamULhGpQiN58NQMLW9sM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758198117; c=relaxed/simple;
-	bh=yQN4Ex0/3FLqMZwCGNRTF46u2kK8avLbUJVaAxbTMRQ=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=u5KTzIgseQtCqjMK89xXCTmvhlY8bC/qIge+MUG4YzKlnNcyQ25K2dzPYjTEfqbdeofJLtQsD/+jDbSQIdw9m5KvwquQbOTtS4TnbuY4Ya74KxPFnxXNMvvi5UDJd+vIK5q18knc3UXlmpjUO/mhNiPseIF48rmoBlQRfjEIxg4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=rsg.ci.i.u-tokyo.ac.jp; spf=pass smtp.mailfrom=rsg.ci.i.u-tokyo.ac.jp; dkim=fail (0-bit key) header.d=rsg.ci.i.u-tokyo.ac.jp header.i=@rsg.ci.i.u-tokyo.ac.jp header.b=ncih+7Z+ reason="key not found in DNS"; arc=none smtp.client-ip=49.212.243.89
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=rsg.ci.i.u-tokyo.ac.jp
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=rsg.ci.i.u-tokyo.ac.jp
-Received: from [133.11.54.205] (h205.csg.ci.i.u-tokyo.ac.jp [133.11.54.205])
-	(authenticated bits=0)
-	by www3579.sakura.ne.jp (8.16.1/8.16.1) with ESMTPSA id 58ICGpZG015138
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NO);
-	Thu, 18 Sep 2025 21:16:51 +0900 (JST)
-	(envelope-from odaki@rsg.ci.i.u-tokyo.ac.jp)
-DKIM-Signature: a=rsa-sha256; bh=3gRH8iNZdxrVCMmHBiEB8svHVHUJgh9SBiCdxh/rErs=;
-        c=relaxed/relaxed; d=rsg.ci.i.u-tokyo.ac.jp;
-        h=Message-ID:Date:Subject:To:From;
-        s=rs20250326; t=1758197812; v=1;
-        b=ncih+7Z+Iq77ZtsPGIxVnHq3UyoofFR20q9ukLu6ggyhvkeM45o26pRuiRlZ1ygh
-         bvqO9pqoDi51Bf469GDustGnkMvrOEYx4wq8iBHvNa3HVx7dKZYyAnOf1hAOhiZ0
-         az4UCk701ZUURs8HqyU+Z0Y9TPDhCGVp08jn/fEGcCYTn+FZFPz5Elk6K/jRsBiL
-         osyUPH7CV8Rke50bdhKV1bwJxrKeDaiy3Sh9hDX+K1T8ORUPQi3kiDCUYviJNCSY
-         pAj32hWZ36YLEvwHNuKual9bk3SHAzSByqEF72lW1YRUpFE4CjJn3yUuSdJZniJ7
-         O6E2XhUYZW2FNZ+4108QOg==
-Message-ID: <819cdc32-23f4-4517-bc67-600d3ecce133@rsg.ci.i.u-tokyo.ac.jp>
-Date: Thu, 18 Sep 2025 21:16:51 +0900
+	s=arc-20240116; t=1758197980; c=relaxed/simple;
+	bh=OaCB53Z5SxqHSpEbGWruf27ccEnxMfEFjrfpUpX4zs8=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=MYjJDxlB49xCRNOErMqHgE2+KiCmHugRGQJZNtCaZ8aXTcQF9pQHPDDpCwqAa7hRqVarg+zhvwb6XTLRLXY9l4dnpDzLaU8RSJjI26CgiIczfTdFhVQLFvznOes5cLGgNgb7+tF+Wm3Ec1riEkAdV9T20BaT3d+WT/Xv76su0c0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=R6yE+2r6; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1758197976;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=oLHeVQ1V5+rlFvLH0NK0a8N3VCQk3wWRUgjhebQLwJ0=;
+	b=R6yE+2r6dgfB60lJotB9aAjjzCOTl1lEWVelvXW1R/54eGsJJJnm/4ud65qLhJLP3uoOF0
+	l6f3OvCInHXwT6mRF2c39Wdq3EkBqKp+QuYRr0C1ptgwbxsXpyKMa1sW97XsFoWjv78ei/
+	JTqFiPl7iwVgb8FIeg7Z3aM1zGaQKzA=
+Received: from mx-prod-mc-03.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-496-GLAfXEgDNni5Jft2awUMDw-1; Thu,
+ 18 Sep 2025 08:19:33 -0400
+X-MC-Unique: GLAfXEgDNni5Jft2awUMDw-1
+X-Mimecast-MFC-AGG-ID: GLAfXEgDNni5Jft2awUMDw_1758197972
+Received: from mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.17])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 64ADD1955F0E;
+	Thu, 18 Sep 2025 12:19:32 +0000 (UTC)
+Received: from corto.redhat.com (unknown [10.45.224.90])
+	by mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id B75711955F19;
+	Thu, 18 Sep 2025 12:19:30 +0000 (UTC)
+From: =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@redhat.com>
+To: Alex Williamson <alex.williamson@redhat.com>
+Cc: kvm@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	=?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@redhat.com>
+Subject: [PATCH] vfio: Dump migration features under debugfs
+Date: Thu, 18 Sep 2025 14:19:28 +0200
+Message-ID: <20250918121928.1921871-1-clg@redhat.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 10/35] hw/i386: QOM-ify AddressSpace
-To: CLEMENT MATHIEU--DRIF <clement.mathieu--drif@eviden.com>,
-        "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
-Cc: Richard Henderson <richard.henderson@linaro.org>,
-        Peter Maydell <peter.maydell@linaro.org>,
-        =?UTF-8?Q?C=C3=A9dric_Le_Goater?=
- <clg@kaod.org>,
-        Steven Lee <steven_lee@aspeedtech.com>, Troy Lee <leetroy@gmail.com>,
-        Jamin Lin <jamin_lin@aspeedtech.com>,
-        Andrew Jeffery <andrew@codeconstruct.com.au>,
-        Joel Stanley <joel@jms.id.au>, Eric Auger <eric.auger@redhat.com>,
-        Helge Deller <deller@gmx.de>,
-        =?UTF-8?Q?Philippe_Mathieu-Daud=C3=A9?= <philmd@linaro.org>,
-        =?UTF-8?Q?Herv=C3=A9_Poussineau?= <hpoussin@reactos.org>,
-        Aleksandar Rikalo <arikalo@gmail.com>,
-        "Edgar E. Iglesias" <edgar.iglesias@gmail.com>,
-        Alistair Francis <alistair@alistair23.me>,
-        Ninad Palsule <ninad@linux.ibm.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Eduardo Habkost <eduardo@habkost.net>,
-        "Michael S. Tsirkin"
- <mst@redhat.com>,
-        Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
-        Jason Wang <jasowang@redhat.com>, Yi Liu <yi.l.liu@intel.com>,
-        Nicholas Piggin <npiggin@gmail.com>,
-        Aditya Gupta <adityag@linux.ibm.com>,
-        Gautam Menghani <gautam@linux.ibm.com>, Song Gao <gaosong@loongson.cn>,
-        Bibo Mao <maobibo@loongson.cn>, Jiaxun Yang <jiaxun.yang@flygoat.com>,
-        Jonathan Cameron <jonathan.cameron@huawei.com>,
-        Fan Ni <fan.ni@samsung.com>, David Hildenbrand <david@redhat.com>,
-        Igor Mammedov <imammedo@redhat.com>,
-        Xiao Guangrong <xiaoguangrong.eric@gmail.com>,
-        Beniamino Galvani <b.galvani@gmail.com>,
-        Strahinja Jankovic <strahinja.p.jankovic@gmail.com>,
-        Subbaraya Sundeep <sundeep.lkml@gmail.com>,
-        Jan Kiszka <jan.kiszka@web.de>, Laurent Vivier <laurent@vivier.eu>,
-        Andrey Smirnov
- <andrew.smirnov@gmail.com>,
-        Aurelien Jarno <aurelien@aurel32.net>,
-        BALATON Zoltan <balaton@eik.bme.hu>,
-        Bernhard Beschow <shentey@gmail.com>,
-        Harsh Prateek Bora <harshpb@linux.ibm.com>,
-        Elena Ufimtseva <elena.ufimtseva@oracle.com>,
-        Jagannathan Raman <jag.raman@oracle.com>,
-        Palmer Dabbelt
- <palmer@dabbelt.com>, Weiwei Li <liwei1518@gmail.com>,
-        Daniel Henrique Barboza <dbarboza@ventanamicro.com>,
-        Liu Zhiwei <zhiwei_liu@linux.alibaba.com>,
-        Matthew Rosato <mjrosato@linux.ibm.com>,
-        Eric Farman <farman@linux.ibm.com>, Thomas Huth <thuth@redhat.com>,
-        Halil Pasic <pasic@linux.ibm.com>,
-        Christian Borntraeger <borntraeger@linux.ibm.com>,
-        Ilya Leoshkevich <iii@linux.ibm.com>, Fam Zheng <fam@euphon.net>,
-        Bin Meng <bmeng.cn@gmail.com>,
-        Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>,
-        Artyom Tarasenko <atar4qemu@gmail.com>, Peter Xu <peterx@redhat.com>,
-        Marcelo Tosatti <mtosatti@redhat.com>,
-        Max Filippov <jcmvbkbc@gmail.com>,
-        "qemu-arm@nongnu.org" <qemu-arm@nongnu.org>,
-        "qemu-ppc@nongnu.org" <qemu-ppc@nongnu.org>,
-        "qemu-riscv@nongnu.org" <qemu-riscv@nongnu.org>,
-        "qemu-s390x@nongnu.org" <qemu-s390x@nongnu.org>,
-        "qemu-block@nongnu.org" <qemu-block@nongnu.org>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        Alex Williamson <alex.williamson@redhat.com>,
-        =?UTF-8?Q?C=C3=A9dric_Le_Goater?= <clg@redhat.com>,
-        Stefano Garzarella <sgarzare@redhat.com>,
-        Alistair Francis <alistair.francis@wdc.com>
-References: <20250917-qom-v1-0-7262db7b0a84@rsg.ci.i.u-tokyo.ac.jp>
- <20250917-qom-v1-10-7262db7b0a84@rsg.ci.i.u-tokyo.ac.jp>
- <d571d1aa47ddbf466e9e8edf1cbb7d29f3bb0a83.camel@eviden.com>
-Content-Language: en-US
-From: Akihiko Odaki <odaki@rsg.ci.i.u-tokyo.ac.jp>
-In-Reply-To: <d571d1aa47ddbf466e9e8edf1cbb7d29f3bb0a83.camel@eviden.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 3.0 on 10.30.177.17
 
-On 2025/09/18 14:53, CLEMENT MATHIEU--DRIF wrote:
-> Hi Akihiko,
-> 
-> Why do we change the naming scheme in amd-vi?
-> Did you have any issue with the old one?
+A debugfs directory was recently added for VFIO devices. Add a new
+"features" file under the migration sub-directory to expose which
+features the device supports.
 
-QOM-ifying AddressSpaces moves the responsibility to create distinct 
-identifiers for debug outputs from the callers of address_space_init() 
-to AddressSpaces. QOM-ified AddressSpaces can create unique, unambigous 
-identifiers by inspecting the QOM hierarchy and cover all devices, not 
-just amd-iommu.
+Signed-off-by: Cédric Le Goater <clg@redhat.com>
+---
+ drivers/vfio/debugfs.c                 | 19 +++++++++++++++++++
+ Documentation/ABI/testing/debugfs-vfio |  6 ++++++
+ 2 files changed, 25 insertions(+)
 
-> 
-> If we decide not to stick to the old one, maybe splitting the slot and function would be convenient.
+diff --git a/drivers/vfio/debugfs.c b/drivers/vfio/debugfs.c
+index 298bd866f15766b50e342511d8a83f0621cb4f55..8b0ca7a09064072b3d489dab8072dbb1a2871d10 100644
+--- a/drivers/vfio/debugfs.c
++++ b/drivers/vfio/debugfs.c
+@@ -58,6 +58,23 @@ static int vfio_device_state_read(struct seq_file *seq, void *data)
+ 	return 0;
+ }
+ 
++static int vfio_device_features_read(struct seq_file *seq, void *data)
++{
++	struct device *vf_dev = seq->private;
++	struct vfio_device *vdev = container_of(vf_dev, struct vfio_device, device);
++
++	if (vdev->migration_flags & VFIO_MIGRATION_STOP_COPY)
++		seq_puts(seq, "stop-copy\n");
++	if (vdev->migration_flags & VFIO_MIGRATION_P2P)
++		seq_puts(seq, "p2p\n");
++	if (vdev->migration_flags & VFIO_MIGRATION_PRE_COPY)
++		seq_puts(seq, "pre-copy\n");
++	if (vdev->log_ops)
++		seq_puts(seq, "dirty-tracking\n");
++
++	return 0;
++}
++
+ void vfio_device_debugfs_init(struct vfio_device *vdev)
+ {
+ 	struct device *dev = &vdev->device;
+@@ -72,6 +89,8 @@ void vfio_device_debugfs_init(struct vfio_device *vdev)
+ 							vdev->debug_root);
+ 		debugfs_create_devm_seqfile(dev, "state", vfio_dev_migration,
+ 					    vfio_device_state_read);
++		debugfs_create_devm_seqfile(dev, "features", vfio_dev_migration,
++					    vfio_device_features_read);
+ 	}
+ }
+ 
+diff --git a/Documentation/ABI/testing/debugfs-vfio b/Documentation/ABI/testing/debugfs-vfio
+index 90f7c262f591306bdb99295ab4e857ca0e0b537a..70ec2d454686290e13380340dfd6a5a67a642533 100644
+--- a/Documentation/ABI/testing/debugfs-vfio
++++ b/Documentation/ABI/testing/debugfs-vfio
+@@ -23,3 +23,9 @@ Contact:	Longfang Liu <liulongfang@huawei.com>
+ Description:	Read the live migration status of the vfio device.
+ 		The contents of the state file reflects the migration state
+ 		relative to those defined in the vfio_device_mig_state enum
++
++What:		/sys/kernel/debug/vfio/<device>/migration/features
++Date:		Oct 2025
++KernelVersion:	6.18
++Contact:	Cédric Le Goater <clg@redhat.com>
++Description:	Read the migration features of the vfio device.
+-- 
+2.51.0
 
-Strictly speaking such a change is an out-of-scope of this patch, but it 
-won't hurt to have it. I'll make the change with the next version.
-
-Regards,
-Akihiko Odaki
 
