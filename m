@@ -1,238 +1,212 @@
-Return-Path: <kvm+bounces-58051-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-58052-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3B1ABB872C7
-	for <lists+kvm@lfdr.de>; Thu, 18 Sep 2025 23:45:40 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6F9A9B8734F
+	for <lists+kvm@lfdr.de>; Fri, 19 Sep 2025 00:12:31 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id E858D1C873AA
-	for <lists+kvm@lfdr.de>; Thu, 18 Sep 2025 21:46:01 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 297FE62001C
+	for <lists+kvm@lfdr.de>; Thu, 18 Sep 2025 22:12:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4FB592FD7CE;
-	Thu, 18 Sep 2025 21:45:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5BFF52FD7A0;
+	Thu, 18 Sep 2025 22:12:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=fb.com header.i=@fb.com header.b="zBQb7SCY"
+	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="y3mWQVNa"
 X-Original-To: kvm@vger.kernel.org
-Received: from mx0a-00082601.pphosted.com (mx0b-00082601.pphosted.com [67.231.153.30])
+Received: from SN4PR2101CU001.outbound.protection.outlook.com (mail-southcentralusazon11012025.outbound.protection.outlook.com [40.93.195.25])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A4F102BEC2A;
-	Thu, 18 Sep 2025 21:45:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=67.231.153.30
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758231931; cv=none; b=iiN//OVtaPX0XB0znb0F5et61FJoxkSqtM1vNp+/aaOR7d7G9AYb3miRuQtQMloHC688UR5Z4BGaoqP/bIPWckB/+67SORT+AYSt36hZFW29KcBdkNOVCjpRGEWDd4gHEDAgTRyvMDuRCG4blKF68neLGyGFJfjdWEJdM004AWE=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758231931; c=relaxed/simple;
-	bh=UdenWNTPD8z38LLdeVYNODy2qm2sB45jEaWygA5uVnk=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=TNRKinAMtg4GQDROyAyoXoFuD0MDpL7cOnqUIp6S6cryWxg49rJQOaALRSqtgIG7X+kOFmrY+kSIocewKbKe697PjgIW8XuwkaBRqlkn1eTWPgxsGQ3O0tyeSJOnmEhZpuJBn8nKZjrQ3zH0m0mBQtiVI/z2N3YxUZX+0Zvlcqw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fb.com; spf=pass smtp.mailfrom=meta.com; dkim=pass (2048-bit key) header.d=fb.com header.i=@fb.com header.b=zBQb7SCY; arc=none smtp.client-ip=67.231.153.30
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fb.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=meta.com
-Received: from pps.filterd (m0001303.ppops.net [127.0.0.1])
-	by m0001303.ppops.net (8.18.1.11/8.18.1.11) with ESMTP id 58ILEuwp407805;
-	Thu, 18 Sep 2025 14:45:01 -0700
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=fb.com; h=cc
-	:content-transfer-encoding:content-type:date:from:message-id
-	:mime-version:subject:to; s=s2048-2025-q2; bh=bMo3hezyytSvwDq2dx
-	t0/0pQ5nUHXn3qBtN4ZaZSRXw=; b=zBQb7SCY+4tbpwPT0f5CqxY1yaSKQWfd/p
-	MHbjnQY9szlTiCybfYxRBrJhTwBKhmtvIIDhvkZI+xD+QchOG3RCtflnkVdMGrTf
-	ebwsq7JQzILNYmJby9oEuzGzv8Nu2L+soqdp1l4jinlWOu1U9cxFe0w65Kxs8sXq
-	eduorASnpDBTJsoNkxah5xOAuC8R+Xqvy0iIHWMTX/E/xyYOcGzf//3HEmcKSKg/
-	MdwUrUTI+lPV/cAkSrpSJcNlQmiJGibTUpVC0osIvyy6IzEn06STG91OAK/RHbE2
-	4SAISObSiB6rXKJHNTQIWI7x5hM1GirYLAkW0DN1ulkdOeXCiBZQ==
-Received: from mail.thefacebook.com ([163.114.134.16])
-	by m0001303.ppops.net (PPS) with ESMTPS id 498q90smej-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128 verify=NOT);
-	Thu, 18 Sep 2025 14:45:01 -0700 (PDT)
-Received: from devgpu015.cco6.facebook.com (2620:10d:c085:108::4) by
- mail.thefacebook.com (2620:10d:c08b:78::c78f) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.2.2562.20; Thu, 18 Sep 2025 21:44:59 +0000
-From: Alex Mastro <amastro@fb.com>
-To: Alex Williamson <alex.williamson@redhat.com>,
-        Jason Gunthorpe
-	<jgg@ziepe.ca>, Kevin Tian <kevin.tian@intel.com>
-CC: Bjorn Helgaas <bhelgaas@google.com>, David Reiss <dreiss@meta.com>,
-        "Joerg
- Roedel" <joro@8bytes.org>, Keith Busch <kbusch@kernel.org>,
-        Leon Romanovsky
-	<leon@kernel.org>, Li Zhe <lizhe.67@bytedance.com>,
-        Mahmoud Adam
-	<mngyadam@amazon.de>,
-        Philipp Stanner <pstanner@redhat.com>,
-        Robin Murphy
-	<robin.murphy@arm.com>,
-        Vivek Kasireddy <vivek.kasireddy@intel.com>,
-        "Will
- Deacon" <will@kernel.org>, Yunxiang Li <Yunxiang.Li@amd.com>,
-        <linux-kernel@vger.kernel.org>, <iommu@lists.linux.dev>,
-        <kvm@vger.kernel.org>
-Subject: [TECH TOPIC] vfio, iommufd: Enabling user space drivers to vend more granular access to client processes
-Date: Thu, 18 Sep 2025 14:44:07 -0700
-Message-ID: <20250918214425.2677057-1-amastro@fb.com>
-X-Mailer: git-send-email 2.47.3
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 947822C0280
+	for <kvm@vger.kernel.org>; Thu, 18 Sep 2025 22:12:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.93.195.25
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1758233544; cv=fail; b=FXbDCSpUNcBY5Nzc2Wwyc2j2NJ5OmELQSwSYw8lWAQpQ6s+BJ2Pu3z2Slz/YxPbex2rkYNoirQC+goueYpOit1Xw5V2DKeHyRmdutoFFqV3Dp/WPHTAvTzdO3uahVLbkarwd8wylD2qj9tyLZqqx/zUdcgU2izbK9HXuvltrWgY=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1758233544; c=relaxed/simple;
+	bh=vHXTbBLcHEyefgsuDOuwM35b9UG9e56Rj1vgRzke4Nk=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=A6c2bbqm9h1BiKg6+97JiwkkrzkvNCfQX0TDkJ2EprLobPgO5mb50jHwwadWztq0hF2Aoy9CEoK4Caa9558RCsdwKU+V0bMZRwOG3egL72xdZzWU4jEI1SprhOBCKUtscBKRkVBnzrtVPTVgSeBfsmOGQl5BjpERo39n9KqEjko=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=y3mWQVNa; arc=fail smtp.client-ip=40.93.195.25
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=ngOGox4mL9C45QzfoamUwtwfVSLjYgBDnIOcxD8Uo1IKnqB3ils0B1rwx4TvrZlqgVBt46H/hUSBoWfh9o29294Z1nF5T5dGTm1wsOQBkPM5MrUf6A0eo1ubu5zaqBL+NAXvquwx2ZJ1k4iuzO9qCDgJvRuE3ju9ANlaqyEujKldhPafaHNkDFTEO1JjHRdskLG00wlwSwW+zfqg7/2wpempmySBEoyUtEI3Dp0eXOBEw3QHqVU5+wLhz3cqcLQWdX/Wti+HMvu62ozD2zoOMHKYQC4QZHUX8LqNIxFMHtqhGg1VeTXAWlDmoNVAc+wYvOYXA0VNnTfnIC4T6Yp3Kg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=CvPNNl9Uy092Wcy1DyFBMKz43zkQY92/ci19FMEkdeg=;
+ b=zUkG7nGeCR9SaZtFfZMakGBWzYf5NMJnycEb11zn5yIwrUENjhfoy5jquJPLgWGV3mKNUMPP0BWcwNyRADYMGkKLG1hagFEcissqpvAZ7N3FDhBr1j4404wLZUe9kkB/705/rTAayds0stxL+2hhEk2Zu31jyN174R++sp6iPBgjRp4gXLB5Uq3RmImfzZIUxSivbQNjXqMeuCvKH0EuWtaT0fvAggkSfGwfw9DBBydTdFwdyYHMgBrXSIiszFSUlyECDWB3eg0uwshdIk+55002ppaMEOR9O27iPf1qm1YFYX5Tv71A96/fHzLkSYSLdOVCa4RNTNXyeYLvdzZ+bQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 165.204.84.17) smtp.rcpttodomain=redhat.com smtp.mailfrom=amd.com; dmarc=pass
+ (p=quarantine sp=quarantine pct=100) action=none header.from=amd.com;
+ dkim=none (message not signed); arc=none (0)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=CvPNNl9Uy092Wcy1DyFBMKz43zkQY92/ci19FMEkdeg=;
+ b=y3mWQVNa+UZqyphRlwrVVLj9+lJWmtC8OTC9LN7WpbSRCKadsodGP9EjAn8kP6lTWIz4pNBfe/atH0RoCGxttrPiNBTd5vNQbUDKP54hp4tk4oUmE0Wvv722T+aIZFO7QsdO1duElb0gKp4QO+jVu0MjMjn5fD9V7+mUtQ/j1j4=
+Received: from SJ0PR03CA0274.namprd03.prod.outlook.com (2603:10b6:a03:39e::9)
+ by DS0PR12MB7927.namprd12.prod.outlook.com (2603:10b6:8:147::11) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9137.14; Thu, 18 Sep
+ 2025 22:12:19 +0000
+Received: from CO1PEPF000044EE.namprd05.prod.outlook.com
+ (2603:10b6:a03:39e:cafe::92) by SJ0PR03CA0274.outlook.office365.com
+ (2603:10b6:a03:39e::9) with Microsoft SMTP Server (version=TLS1_3,
+ cipher=TLS_AES_256_GCM_SHA384) id 15.20.9137.14 via Frontend Transport; Thu,
+ 18 Sep 2025 22:12:19 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
+ smtp.mailfrom=amd.com; dkim=none (message not signed)
+ header.d=none;dmarc=pass action=none header.from=amd.com;
+Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
+ 165.204.84.17 as permitted sender) receiver=protection.outlook.com;
+ client-ip=165.204.84.17; helo=satlexmb07.amd.com; pr=C
+Received: from satlexmb07.amd.com (165.204.84.17) by
+ CO1PEPF000044EE.mail.protection.outlook.com (10.167.241.68) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.9137.12 via Frontend Transport; Thu, 18 Sep 2025 22:12:18 +0000
+Received: from ethanolx7e2ehost.amd.com (10.180.168.240) by satlexmb07.amd.com
+ (10.181.42.216) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.17; Thu, 18 Sep
+ 2025 15:12:17 -0700
+From: Ashish Kalra <Ashish.Kalra@amd.com>
+To: <pbonzini@redhat.com>
+CC: <kvm@vger.kernel.org>, <qemu-devel@nongnu.org>
+Subject: [PATCH] accel/kvm: Fix kvm_convert_memory calls crossing memory regions
+Date: Thu, 18 Sep 2025 22:12:07 +0000
+Message-ID: <20250918221207.42209-1-Ashish.Kalra@amd.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: 8bit
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUwOTE4MDE5NSBTYWx0ZWRfX6AAYxKQMwZLw
- aZViUqQxptfvd13AUHO0wDgCyvEEG4g3l09hqrAHyDxcQ+EU4slwZk5HPlBQ3+P9+Wm6uxqo3zs
- ipT/D/u8UDONUD/4MUiiJgarCqdu5Hbh/0yHvgo1BnrkJ68GK5hLHFzBOpf7PyTkVeYuEF0hMv7
- Iy5LjglKeQ2mFiHC9j3T7eRJG4ELOqNwGtCxyfVmTF8k+TTOAE+5XO4MgQmywQaI8CxLlXrpJ5p
- z+CyQUqpc+ensulQmQ3/Y70ur7i/1cpB6CQeZgY7TWeVkaImen/RYMaGaZL044/eZDUfFficXa/
- 8j5vcthb3AamomjDsMT4ZS2X3iavkRjfFEpLcNyKSbuS1cONIEc1NvZGUcnh08=
-X-Proofpoint-ORIG-GUID: xbXU6eezAkjiegZWUCOl0aCn3m571zgk
-X-Proofpoint-GUID: xbXU6eezAkjiegZWUCOl0aCn3m571zgk
-X-Authority-Analysis: v=2.4 cv=YZC95xRf c=1 sm=1 tr=0 ts=68cc7d5d cx=c_pps
- a=CB4LiSf2rd0gKozIdrpkBw==:117 a=CB4LiSf2rd0gKozIdrpkBw==:17
- a=IkcTkHD0fZMA:10 a=yJojWOMRYYMA:10 a=VwQbUJbxAAAA:8 a=968KyxNXAAAA:8
- a=rDkzsZ3yvGrXTgFfqF4A:9 a=3ZKOabzyN94A:10 a=QEXdDO2ut3YA:10
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1117,Hydra:6.1.9,FMLib:17.12.80.40
- definitions=2025-09-18_03,2025-09-18_02,2025-03-28_01
+Content-Type: text/plain
+X-ClientProxiedBy: satlexmb07.amd.com (10.181.42.216) To satlexmb07.amd.com
+ (10.181.42.216)
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: CO1PEPF000044EE:EE_|DS0PR12MB7927:EE_
+X-MS-Office365-Filtering-Correlation-Id: 123b661f-1fc1-4f8b-dd3e-08ddf7006ecf
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|82310400026|376014|36860700013|1800799024;
+X-Microsoft-Antispam-Message-Info:
+	=?us-ascii?Q?1e+ZnUi3bfkji3Le0oym5TlFFQOFLc/TJQLtwGL7aPDp2JJ3Tukjl31Zl8Sb?=
+ =?us-ascii?Q?CdolayYJ6y4ur638F+pxhI356r72HaZMMHT4rQkF8yL8C+mePOz4Um9jcYw1?=
+ =?us-ascii?Q?egbohkxUFWzyxqsWZac3oQqgANPvCgLf7JSEG2Bx8NCNjR1Qles5USD5JN9k?=
+ =?us-ascii?Q?XgsGO2stCQBwqX6tZdnLUx4CzjeKRwtSpgyKwT89+pPuLtITgarZcrLlP3bK?=
+ =?us-ascii?Q?XNvNfBFRD+eMDSVjZKmBj8XyTxpgUxDxf1X1iaMIkUj2lp3N5/YZgAbpjGlq?=
+ =?us-ascii?Q?UfJiz5ETffgpoeHQyIBK4ETNbyF3in1rC8n80GFoWBOtiF3vtJUjRJi7wNPl?=
+ =?us-ascii?Q?EYnlkGZErQeY6LSIqo7Oe5Z3N256TvjZM+Gd9KBR2fojeqzlHoOFOUpdPeqh?=
+ =?us-ascii?Q?eUKHp9Ap3mTEkHd76lONrFktXUA2Vo2g+s2UpLn231rwO5vYeBI0RaeXu7oQ?=
+ =?us-ascii?Q?YN0jU1JwVn7kr54YZpfgaoUIfbreJ2JzT6xuinE3PqnApDWmAeIVzvSZ/Jop?=
+ =?us-ascii?Q?HwokpsTLjCcam0nSzI8ccYfZjBVFyh71DJEmuUO7B5H9YrT78VPOwp5vUuiU?=
+ =?us-ascii?Q?ZDhCgBE94IDkAlMkXjdCvVnp/wMdvPvE+PpVqOtcKl1mKLsQUQ19KO7ZHjdP?=
+ =?us-ascii?Q?vC7vbQRK10PJ6cjbDr8Lcf9i9wQbBkUefLSKbR9D8WzX6zT2PBhoJiBMzY5D?=
+ =?us-ascii?Q?QmtU3rNFk1p0WuHq9/wcMzm3NTS+0ETaRePpv7IO9eFYgxmFQiLJqvmsL5ms?=
+ =?us-ascii?Q?j6uwoAdCp7mGO+uyq0+z7Kh6qzBLtStdc97i3IVc24BTrjOhgfwH2sDhltUj?=
+ =?us-ascii?Q?hWEGfsS284it4AtuZBb8WCZecRhXP44XrSQ0LbAVr+fuIUOjVKeHQ81DH3HF?=
+ =?us-ascii?Q?bKl6jJDoc8yUXSi7MGLEbdI2t83bFYY+U4ofq7Y8ypBquTj37VyKZ1kNwhHY?=
+ =?us-ascii?Q?kZuljEZta488WokUFw6cCfSfkMxsi3KZN5eKVvW8/Y7WQRhXdwunQoUNqEa+?=
+ =?us-ascii?Q?auWgohb4JqEUoQX8G9XZ3bDCilIg1nI+KZym7nCEAl4c7Z4q19OZTGlBV7HK?=
+ =?us-ascii?Q?EnnV8GyEtJKVvuRCAPxufRZP++GKpV+TRdLih+S5xXHqIUgFXhE58SuULmGe?=
+ =?us-ascii?Q?dkbbtyhfzRY07uH8FeBeFYX76KJF0OVodsp0Ot1PhxzmXBkMCNH0l8ESesnq?=
+ =?us-ascii?Q?OiO8cgvnN8Kju5PR8i+/pphkIJqKzAQvEF/xZvqReyOplKo+gLtDdgFwxIua?=
+ =?us-ascii?Q?XUo3QTkVgLbyJ1J+CJC4c2xhEQHLlughVnk9+dwwGzbEekCSLVJfYmT2+FE1?=
+ =?us-ascii?Q?/7EIAevyyxv/qdA+tkUrBVN+a3yLTyO9sf+p1AMIVXHRrEXcSFraAIBqy6V/?=
+ =?us-ascii?Q?cxT41E7rbWPGFuGDVCRRaEl0J7ZqgFbQqNkGoiWS+RyaBTztNIb+BY3hyWwE?=
+ =?us-ascii?Q?hJkiFdLc3dWXoZxW3Y5/wznmyg6rubxgYv6wlMQ6E/gVrRaiKa74oPgI7FJ5?=
+ =?us-ascii?Q?dEAe4x2HL4Ri+QQakVW0PSZLsngg0a5PMzAD?=
+X-Forefront-Antispam-Report:
+	CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:satlexmb07.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230040)(82310400026)(376014)(36860700013)(1800799024);DIR:OUT;SFP:1101;
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 18 Sep 2025 22:12:18.6313
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: 123b661f-1fc1-4f8b-dd3e-08ddf7006ecf
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[satlexmb07.amd.com]
+X-MS-Exchange-CrossTenant-AuthSource:
+	CO1PEPF000044EE.namprd05.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DS0PR12MB7927
 
-Hello,
+From: Ashish Kalra <ashish.kalra@amd.com>
 
-We've been running user space drivers (USD) in production built on top of VFIO,
-and have come to value the operational and development benefits of being able to
-deploy updates to device policy by simply shipping user space binaries.
+Page conversion call can span multiple memory regions, potentially
+resulting in a conversion failure if the memory range being converted
+extends beyond the boundaries of the referenced memory region.
 
-In our architecture, a long-running USD process bootstraps and manages
-background device operations related to supporting client process workloads.
-Client processes communicate with the USD over Unix domain sockets to acquire
-the device resources necessary to dispatch work to the device.
+Handle the case of page conversion call straddling across memory
+regions.
 
-We anticipate a growing need to provide more granular access to device resources
-beyond what the kernel currently affords to user space drivers similar to our
-model.
+Signed-off-by: Ashish Kalra <ashish.kalra@amd.com>
+---
+ accel/kvm/kvm-all.c | 23 ++++++++++++++++++++---
+ 1 file changed, 20 insertions(+), 3 deletions(-)
 
-The purpose of this email is to:
-- Gauge the extent to which ongoing work in VFIO and IOMMUFD can meet those
-  needs.
-- Seek guidance from VFIO and IOMMUFD maintainers about whether there is a path
-  to supporting the remaining pieces across the VFIO and IOMMUFD UAPIs.
-- Describe our current approach and get feedback on whether there are existing
-  solutions that we've missed.
-- Figure out the most useful places we can help contribute.
+diff --git a/accel/kvm/kvm-all.c b/accel/kvm/kvm-all.c
+index 9060599cd7..54034a0568 100644
+--- a/accel/kvm/kvm-all.c
++++ b/accel/kvm/kvm-all.c
+@@ -3054,6 +3054,8 @@ static void kvm_eat_signals(CPUState *cpu)
+ int kvm_convert_memory(hwaddr start, hwaddr size, bool to_private)
+ {
+     MemoryRegionSection section;
++    hwaddr convert_start;
++    hwaddr convert_size;
+     ram_addr_t offset;
+     MemoryRegion *mr;
+     RAMBlock *rb;
+@@ -3071,6 +3073,11 @@ int kvm_convert_memory(hwaddr start, hwaddr size, bool to_private)
+         return ret;
+     }
+ 
++    /*
++     * Page conversions can span multiple memory regions, for example, if two
++     * memory backends are added to support two different NUMA nodes/policies.
++     */
++next_memory_region:
+     section = memory_region_find(get_system_memory(), start, size);
+     mr = section.mr;
+     if (!mr) {
+@@ -3121,8 +3128,12 @@ int kvm_convert_memory(hwaddr start, hwaddr size, bool to_private)
+     addr = memory_region_get_ram_ptr(mr) + section.offset_within_region;
+     rb = qemu_ram_block_from_host(addr, false, &offset);
+ 
++    convert_start = section.offset_within_region;
++    convert_size = (convert_start + size > mr->size) ?
++                   mr->size - convert_start : size;
++
+     ret = ram_block_attributes_state_change(RAM_BLOCK_ATTRIBUTES(mr->rdm),
+-                                            offset, size, to_private);
++                                            offset, convert_size, to_private);
+     if (ret) {
+         error_report("Failed to notify the listener the state change of "
+                      "(0x%"HWADDR_PRIx" + 0x%"HWADDR_PRIx") to %s",
+@@ -3138,9 +3149,15 @@ int kvm_convert_memory(hwaddr start, hwaddr size, bool to_private)
+              */
+             goto out_unref;
+         }
+-        ret = ram_block_discard_range(rb, offset, size);
++        ret = ram_block_discard_range(rb, offset, convert_size);
+     } else {
+-        ret = ram_block_discard_guest_memfd_range(rb, offset, size);
++        ret = ram_block_discard_guest_memfd_range(rb, offset, convert_size);
++    }
++
++    if (size - convert_size) {
++        start += convert_size;
++        size -= convert_size;
++        goto next_memory_region;
+     }
+ 
+ out_unref:
+-- 
+2.34.1
 
-Inter-process communication latency (between client processes and USD) is
-prohibitively slow to support hot-path communication between the client and
-device, which targets round-trip times on the order of microseconds. To address
-this, we need to allow client processes and the device to access each other's
-memory directly, bypassing IPC with the USD and kernel syscalls.
-a) For host-initiated access into device memory, this means mmap-ing BAR
-   sub-regions into the client process.
-b) For device-initiated access into host memory, it means establishing IOMMU
-   mappings to memory underlying the client process address space.
-
-Such things are more straightforward for in-kernel device drivers to accomplish:
-they are free to define customized semantics for their associated fds and
-syscall handlers. Today, user space driver processes have fewer tools at their
-disposal for controlling these types of access.
-
-----------
-BAR Access
-----------
-
-To achieve (a), the USD sends the VFIO device fd to the client over Unix domain
-sockets using SCM_RIGHTS, along with descriptions of which device regions are
-for what. While this allows the client to mmap BARs into its address space,
-it comes at the cost of exposing more access to device BAR regions than is
-necessary or appropriate. In our use case, we don't need to contend with
-adversarial client processes, so the current situation is tenable, but not
-ideal.
-
-Ongoing efforts to add dma-buf exporting to VFIO [1] seem relevant here. Though
-its current intent is around enabling peer-to-peer access, the fact that only
-a subset of device regions are bound to this fd could be useful for controlling
-access granularity to device regions.
-
-Instead of vending the VFIO device fd to the client process, the USD could bind
-the necessary BAR regions to a dma-buf fd and share that with the client. If
-VFIO supported dma_buf_ops.mmap, the client could mmap those into its address
-space.
-
-Adding such capability would mean that there would be two paths for mmap-ing
-device regions: VFIO device fd and dma-buf fd. I imagine this could be
-contentious; people may not like that there are two ways to achieve the same
-thing. It also seems complicated by the fact that there are ongoing discussions
-about how to extend the VFIO device fd UAPI to support features like write
-combining [2]. It would feel incomplete for such features to be available
-through one mmap-ing modality but not the other. This would have implications
-for how the “special regions” should be communicated across the UAPI.
-
-The VFIO dma-buf UAPI currently being proposed [3] takes a region_index and an
-array of (offset, length) intervals within the region to assign to the dma-buf.
-From what I can tell, that seems coherent with the latest direction from [2],
-which will enable the creation of new region indices with special properties,
-which are aliases to the default BAR regions. The USD could theoretically create
-a dma-buf backed by "the region index corresponding to write-combined BAR 4" to
-share with the client.
-
-Given some of the considerations above, would there be line of sight for adding
-support for dma_buf_ops.mmap to VFIO?
-
--------------
-IOMMU Mapping
--------------
-
-To achieve (b), we have been using the (now legacy) VFIO container interface
-to manage access to the IOMMU. We understand that new feature development has
-moved to IOMMUFD, and intend to migrate to using it when it's ready (we have
-some use cases that require P2P). We are not expecting to add features to VFIO
-containers. I will describe what we are doing today first.
-
-In order to enable a device to access memory in multiple processes, we also
-share the VFIO container fd using SCM_RIGHTS between the USD and client
-processes. In this scheme, we partition the I/O address space (IOAS) for a
-given device's container to be used cooperatively amongst each process. The
-only enforcement of the partitioning convention is that each process only
-VFIO_IOMMU_{MAP,UNMAP}_DMA's to the IOVA ranges which have been assigned to it.
-
-When the USD detects that the client process has exited, it is able to unmap any
-leftover dirty mappings with VFIO_IOMMU_UNMAP_DMA. This became possible after
-[4], which allowed one process to free the mappings created by another process.
-That patch's intent was to enable QEMU live update use cases, but benefited our
-use case as well.
-
-Again, we don't have to contend with adversarial client processes, so this has
-been OK, but not ideal for now.
-
-We are interested in the following incremental capabilities:
-- We want the USD to be able to create and vend fds which provide restricted
-  mapping access to the device's IOAS to the client, while preserving
-  the ability of the USD to revoke device access to client memory via
-  VFIO_IOMMU_UNMAP_DMA (or IOMMUFD_CMD_IOAS_UNMAP for IOMMUFD). Alternatively,
-  to forcefully invalidate the entire restricted IOMMU fd, including mappings.
-- It would be nice if mappings created with the restricted IOMMU fd were
-  automatically freed when the underlying kernel object was freed (if the client
-  process were to exit ungracefully without explicitly performing unmap cleanup
-  after itself).
-
-Some of those things sound very similar to the direction of vIOMMU, but it is
-difficult to tell if that could meet our needs exactly. The kinds of features
-I think we want should be achievable purely in software without any dedicated
-hardware support.
-
-This is an area we are less familiar with, since we haven't been living on the
-IOMMUFD UAPI or following its development as closely yet. Perhaps we have missed
-something more obvious?
-
-Overall, I'm curious to hear feedback on this. Allowing user space drivers
-to vend more granular device access would certainly benefit our use case, and
-perhaps others as well.
-
-[1] https://lore.kernel.org/all/cover.1754311439.git.leon@kernel.org/
-[2] https://lore.kernel.org/all/20250804104012.87915-1-mngyadam@amazon.de/
-[3] https://lore.kernel.org/all/5e043d8b95627441db6156e7f15e6e1658e9d537.1754311439.git.leon@kernel.org/
-[4] https://lore.kernel.org/all/20220627035109.73745-1-lizhe.67@bytedance.com/
-
-Thanks,
-Alex
 
