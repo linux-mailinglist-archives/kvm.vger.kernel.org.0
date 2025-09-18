@@ -1,314 +1,267 @@
-Return-Path: <kvm+bounces-58021-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-58022-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id D251FB85849
-	for <lists+kvm@lfdr.de>; Thu, 18 Sep 2025 17:19:35 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id E0969B8599F
+	for <lists+kvm@lfdr.de>; Thu, 18 Sep 2025 17:30:24 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 988C3B61DEB
-	for <lists+kvm@lfdr.de>; Thu, 18 Sep 2025 15:11:12 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id AC3E03BDCB0
+	for <lists+kvm@lfdr.de>; Thu, 18 Sep 2025 15:26:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4A4A930EF7F;
-	Thu, 18 Sep 2025 15:11:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B8F9630FF1D;
+	Thu, 18 Sep 2025 15:26:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="KWkN9jMS"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="OIzt2isU"
 X-Original-To: kvm@vger.kernel.org
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A37612F0696;
-	Thu, 18 Sep 2025 15:10:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2E74A30CDB4
+	for <kvm@vger.kernel.org>; Thu, 18 Sep 2025 15:26:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758208261; cv=none; b=BbFwMmDJQxYcRZ7FmEv68S+4raBBBs4EM1VpRAYnPjIjrnCAXqogzhy0/dlatWbuKfctfVYuTrTW0q1mKPe0ynRFQxP3GBGL3/bielkKXWOtD0uFm4ah35P97UQWwaQtPsFHB4Gufgc/Zy7lMu2YGK2AaQ2aZosBgi4NKKdzRno=
+	t=1758209176; cv=none; b=kuy/q9Hn5JY75rcbRb50EGTKXugqs5FkEsxotidNqs89F32h6vNcokvYXgco/Q0UEQoKOjWMTR51M2WgleyE4bT6Z++EOnvOlUkKxsa7hETv1YRkMa1unrJvltx4q57VFPu5g2wrYQyfzCDHLIgfr9lZqwz5NAB7MoKszqmqPCk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758208261; c=relaxed/simple;
-	bh=WvJwG4hGSpfnujhbixrBtFoUMnKvpf1dKRjUUETZB2k=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=C6QTgAdBuCYFIKevvpXcv9xEnUrypu9r/mNPIWJVCvN3hvydXn/3irViTKBNFDxSqAhbuBGJyo9h+Araf9OKhQ2gZzHUHkhcmZxCt+KrdxwsFe1ZPoLz0XGBdl6xp0grW6zk7II2iyhH4L/BteHDEDEsUkUPEsCqorsvNF1sWxE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=KWkN9jMS; arc=none smtp.client-ip=148.163.156.1
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
-Received: from pps.filterd (m0360083.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 58IELYY9027553;
-	Thu, 18 Sep 2025 15:10:57 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
-	:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=pp1; bh=RHAL+d
-	ImsWt0QpnrSATejkoRHXQECYzPAtpGQ5lVysE=; b=KWkN9jMSOJXBg0f9o2xAph
-	YskYaHwMIpO11X28qvoDit7xpUNFt5b0pkEdo/FDDh4SzLGDDiKeyTx07y0yMga3
-	tVG54PpwJ7SnjjDdH6gkzERDJDfMsGdshjtiSx374VznQoAemen5EZBudTRYwXl3
-	e+yCPVWgW0nYl/Euo9l7CU9GeNpe8R19IW7BY5fJ/wc9aBFIPRQl1+QAzHy6fx6e
-	wLRy59dnITOn4LpQQ0Bkq0fuMAE3AyDnVrDCMv4NQWUXRhcHypyPA/5GkjAfrLfq
-	+GA0eUnSovRFRv2veaSajvNZqt7Rg12FG2BOHGVW8f92st0roi3Bqm73UEWNexog
-	==
-Received: from ppma13.dal12v.mail.ibm.com (dd.9e.1632.ip4.static.sl-reverse.com [50.22.158.221])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 497g4pb4nx-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 18 Sep 2025 15:10:56 +0000 (GMT)
-Received: from pps.filterd (ppma13.dal12v.mail.ibm.com [127.0.0.1])
-	by ppma13.dal12v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 58IF9W5F018620;
-	Thu, 18 Sep 2025 15:10:55 GMT
-Received: from smtprelay01.fra02v.mail.ibm.com ([9.218.2.227])
-	by ppma13.dal12v.mail.ibm.com (PPS) with ESMTPS id 495n5mq1p8-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 18 Sep 2025 15:10:55 +0000
-Received: from smtpav05.fra02v.mail.ibm.com (smtpav05.fra02v.mail.ibm.com [10.20.54.104])
-	by smtprelay01.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 58IFAqGH54329648
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Thu, 18 Sep 2025 15:10:52 GMT
-Received: from smtpav05.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 27F6B2004B;
-	Thu, 18 Sep 2025 15:10:52 +0000 (GMT)
-Received: from smtpav05.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id DCFBB20040;
-	Thu, 18 Sep 2025 15:10:51 +0000 (GMT)
-Received: from p-imbrenda (unknown [9.152.224.66])
-	by smtpav05.fra02v.mail.ibm.com (Postfix) with ESMTP;
-	Thu, 18 Sep 2025 15:10:51 +0000 (GMT)
-Date: Thu, 18 Sep 2025 17:10:50 +0200
-From: Claudio Imbrenda <imbrenda@linux.ibm.com>
-To: Alexander Gordeev <agordeev@linux.ibm.com>
-Cc: kvm@vger.kernel.org, linux-s390@vger.kernel.org, borntraeger@de.ibm.com,
-        frankja@linux.ibm.com, nsg@linux.ibm.com, nrb@linux.ibm.com,
-        seiden@linux.ibm.com, schlameuss@linux.ibm.com, hca@linux.ibm.com,
-        svens@linux.ibm.com, david@redhat.com, gerald.schaefer@linux.ibm.com
-Subject: Re: [PATCH v2 05/20] KVM: s390: Add helper functions for fault
- handling
-Message-ID: <20250918171050.7781b83d@p-imbrenda>
-In-Reply-To: <4b67fe70-efc7-46cb-a160-51e4fc1bc54c-agordeev@linux.ibm.com>
-References: <20250910180746.125776-1-imbrenda@linux.ibm.com>
-	<20250910180746.125776-6-imbrenda@linux.ibm.com>
-	<4b67fe70-efc7-46cb-a160-51e4fc1bc54c-agordeev@linux.ibm.com>
-Organization: IBM
-X-Mailer: Claws Mail 4.3.1 (GTK 3.24.49; x86_64-redhat-linux-gnu)
+	s=arc-20240116; t=1758209176; c=relaxed/simple;
+	bh=HgnLRXSsOYU8XaC5uGv31qfbb+RBOgrHm6h1I0Q3eXE=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=geRBzSDrJSQABeGd+RuYnxXxYY+kcEU0j4Eskkms3pkOSHHT7wrGxoqc7u4tWHaZekZqn80Plc94qDfAy3vjpuMHtJiZ1Y7PwYLjT3mXvC/PqdD1dXCANNj6LzkAyz+js+6AYunxoFv33p2b/H0FV5xmMOGvC/VTN8pI9Y+Y7X0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=OIzt2isU; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1758209173;
+	h=from:from:reply-to:reply-to:subject:subject:date:date:
+	 message-id:message-id:to:to:cc:cc:mime-version:mime-version:
+	 content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=60bh1/8KDe5Bli2xGeThDg2WbIb0AYpA+zhbjhLgDGc=;
+	b=OIzt2isUWwmhcfhr+BWBSwUPxL9rZuITIDtFOnbXscBriX3wP+86GEJujZaCKKe6w8VTCQ
+	UgZcxrmtomTuaMozN7uohMxSwMeAW0QglKgRWom5/hItTh3Z/UVBEHa4uCuQdBsdrfwMwQ
+	QZSqFFEIEDjm0HiW94W2ALGPX0Acxy0=
+Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
+ [209.85.128.71]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-626-QbOdf-5ONnC50p74zcdoVQ-1; Thu, 18 Sep 2025 11:26:11 -0400
+X-MC-Unique: QbOdf-5ONnC50p74zcdoVQ-1
+X-Mimecast-MFC-AGG-ID: QbOdf-5ONnC50p74zcdoVQ_1758209170
+Received: by mail-wm1-f71.google.com with SMTP id 5b1f17b1804b1-45f2f15003aso7147265e9.0
+        for <kvm@vger.kernel.org>; Thu, 18 Sep 2025 08:26:11 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1758209169; x=1758813969;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:reply-to:user-agent:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=60bh1/8KDe5Bli2xGeThDg2WbIb0AYpA+zhbjhLgDGc=;
+        b=M8mqnnlkt6mLdteS9NVIwxm3IwFwWXmARfymmMzpfLLjYW215Y1avdqehTlsw6R6pu
+         V4N9P1i9hKOl6BtYKmVxrUXZRTzTeVF+EUOTP2ROJs7ZiHFLlSHHWqKIPDVTUHcJJnGs
+         SyE7nyKe16LHGFcTi8rCi+uwLdsUNNY9YcUXkaB6LLXSUjsCp2HXIEMdcTnLSp2o/acc
+         rJ1D0FKYqnozksA0IbZ9NUXL2gwXk8ftNJstfWOMCjCRzG5Pam4AaCG4wifGUHZlYa0g
+         YoMXe7zo9NL8A6Dkdnyz1pkj3fTjZ+hyhkmiJuBzJs8CzEemZjOiiLJBPjioJx/vezPD
+         NHGg==
+X-Forwarded-Encrypted: i=1; AJvYcCWrzyrd+GYnCCD2FHVBqH+rHkAN7EfKa5T2P1DtqILU37TVTTHcKaD7cKAqgI0t9cO437M=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yx9T1M7c7wOCn4F2WzcZBDWOSbJNwvehA41TViQQWAB3Aukzfwu
+	KFrhMaTdtza62cRzByhdXg8NN25o650repHb10HgUxZTi4E+M3cIV4ef2XhA8aPXfnrssuofTl6
+	OXr7PLPQBMn8DMS6FVu6l1775lpr8IjZ02/YciLfbQLTOTPUHcPdApA==
+X-Gm-Gg: ASbGncvfo0q9BqeBmGQW3kJhVNZhDmyXdE0TZB26z7Jkz82frCOHoYqfoeEp21yJKKM
+	+EuGEyrPQenOHYWQawu+WwNk0yKcjApX4VoYhPot3KqaOomwlKwDhBmaxw8ukZgkSJ0Iy5d2lRw
+	nXgzNe0gUmWkSbAzWWIRexebIM2L1CybRXU1513mEkhmt1ohaP03reAiRZvKPvoS1UbSYuRLoge
+	I7mXw3yfF1ARyt6IJALPhmVczPpfapsfw5nGVcOX72lYXLe5YgykT3jmo5WDNQc1JUbAbPYNsYs
+	4WKZNkMBFGeaLbKF0TZ0Up2Llcm7cNxpMbbrYMrvctWjb3t/T6utLZG08NW2Gq6os82wF8fqoTM
+	eGeRBDiRFl6M=
+X-Received: by 2002:a05:600c:4eca:b0:45b:79fd:cb3d with SMTP id 5b1f17b1804b1-4634c528acamr48192825e9.36.1758209168700;
+        Thu, 18 Sep 2025 08:26:08 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IGEtQw7Ad4RC9Ve+flPRrpO5OIZ1reWlCMCoXq69hJMRKQIk5PW42Rnui+NeQkSFExCkaGLOA==
+X-Received: by 2002:a05:600c:4eca:b0:45b:79fd:cb3d with SMTP id 5b1f17b1804b1-4634c528acamr48192565e9.36.1758209168259;
+        Thu, 18 Sep 2025 08:26:08 -0700 (PDT)
+Received: from ?IPV6:2a01:e0a:f0e:9070:527b:9dff:feef:3874? ([2a01:e0a:f0e:9070:527b:9dff:feef:3874])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-464f5d053f2sm46067075e9.20.2025.09.18.08.26.07
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 18 Sep 2025 08:26:07 -0700 (PDT)
+Message-ID: <22caf6ef-e1ba-4465-b587-baffb3ce4618@redhat.com>
+Date: Thu, 18 Sep 2025 17:26:06 +0200
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+User-Agent: Mozilla Thunderbird
+Reply-To: eric.auger@redhat.com
+Subject: Re: [PATCH 2/2] target/arm/kvm: add kvm-psci-version vcpu property
+Content-Language: en-US
+To: Sebastian Ott <sebott@redhat.com>,
+ Peter Maydell <peter.maydell@linaro.org>, Paolo Bonzini <pbonzini@redhat.com>
+Cc: qemu-arm@nongnu.org, qemu-devel@nongnu.org, kvm@vger.kernel.org,
+ kvmarm@lists.linux.dev
+References: <20250911144923.24259-1-sebott@redhat.com>
+ <20250911144923.24259-3-sebott@redhat.com>
+From: Eric Auger <eric.auger@redhat.com>
+In-Reply-To: <20250911144923.24259-3-sebott@redhat.com>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUwOTE2MDIwNCBTYWx0ZWRfX+7ryP7mr8bVO
- cAz6tebHOXKR3Ers+Xi8TwRuu2qnYkdJFZOLhKeavZO1w8Qn8dxOX/5Mg23mzhOtM1oplzb+FEv
- NrpkKWrsLi3kyDWRCGVBBDpBWd56yHCDB5I8MXJ642Si8peTAENz5joplmhf3dPLtrc80maAbTe
- s6tzYNdhyjer04Xcg5yNvYGPXrFrofvH+xKNuoW+rYg/DAd/BXQRtZxjdZUKW8rToDD8QRICYss
- yRGcWASFRLX58FBJ8ngJe3N7Te2jKMKsqKgKbbxhNF7laQc/QMgSs/6LqLZNQ2g/ACSZLwAAAIl
- lmYIlKtPiGFU4WGvf/vKJo5VtjmGXtAdLFKUj/kkKSm7AkyqOn6MS/RX1HoW+bdlUHVvurc4QM4
- PN6Z3PnT
-X-Proofpoint-ORIG-GUID: MukzTGIW-nq1Ra4e0PjGjt2m0Ol2Et-S
-X-Proofpoint-GUID: MukzTGIW-nq1Ra4e0PjGjt2m0Ol2Et-S
-X-Authority-Analysis: v=2.4 cv=cNzgskeN c=1 sm=1 tr=0 ts=68cc2100 cx=c_pps
- a=AfN7/Ok6k8XGzOShvHwTGQ==:117 a=AfN7/Ok6k8XGzOShvHwTGQ==:17
- a=kj9zAlcOel0A:10 a=yJojWOMRYYMA:10 a=VnNF1IyMAAAA:8 a=Ng-rhDX6q2cXs-WuGloA:9
- a=CjuIK1q_8ugA:10
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1117,Hydra:6.1.9,FMLib:17.12.80.40
- definitions=2025-09-18_01,2025-09-18_02,2025-03-28_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- suspectscore=0 clxscore=1015 spamscore=0 bulkscore=0 malwarescore=0
- adultscore=0 priorityscore=1501 impostorscore=0 phishscore=0
- classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
- reason=mlx scancount=1 engine=8.19.0-2507300000 definitions=main-2509160204
 
-On Thu, 18 Sep 2025 16:41:56 +0200
-Alexander Gordeev <agordeev@linux.ibm.com> wrote:
+Hi Sebastian,
 
-> On Wed, Sep 10, 2025 at 08:07:31PM +0200, Claudio Imbrenda wrote:
-> > Add some helper functions for handling multiple guest faults at the
-> > same time.
-> > 
-> > This will be needed for VSIE, where a nested guest access also needs to
-> > access all the page tables that map it.
-> > 
-> > Signed-off-by: Claudio Imbrenda <imbrenda@linux.ibm.com>
-> > ---
-> >  arch/s390/kvm/gaccess.h  | 14 ++++++++++
-> >  arch/s390/kvm/kvm-s390.c | 44 +++++++++++++++++++++++++++++++
-> >  arch/s390/kvm/kvm-s390.h | 56 ++++++++++++++++++++++++++++++++++++++++
-> >  3 files changed, 114 insertions(+)
-> > 
-> > diff --git a/arch/s390/kvm/gaccess.h b/arch/s390/kvm/gaccess.h
-> > index 3fde45a151f2..9c82f7460821 100644
-> > --- a/arch/s390/kvm/gaccess.h
-> > +++ b/arch/s390/kvm/gaccess.h
-> > @@ -457,4 +457,18 @@ int kvm_s390_check_low_addr_prot_real(struct kvm_vcpu *vcpu, unsigned long gra);
-> >  int kvm_s390_shadow_fault(struct kvm_vcpu *vcpu, struct gmap *shadow,
-> >  			  unsigned long saddr, unsigned long *datptr);
-> >  
-> > +static inline int __kvm_s390_faultin_read_gpa(struct kvm *kvm, struct guest_fault *f, gpa_t gaddr,
-> > +					      unsigned long *val)
-> > +{
-> > +	phys_addr_t phys_addr;
-> > +	int rc;
-> > +
-> > +	rc = __kvm_s390_faultin_gfn(kvm, f, gpa_to_gfn(gaddr), false);  
-> 
-> Why not a "typical" flow (below)?
-> 
-> > +	if (!rc) {
-> > +		phys_addr = PFN_PHYS(f->pfn) | offset_in_page(gaddr);
-> > +		*val = *(unsigned long *)phys_to_virt(phys_addr);
-> > +	}
-> > +	return rc;  
-> 
-> 	if (rc)
-> 		return rc;
-> 
-> 	phys_addr = pfn_to_phys(f->pfn) | offset_in_page(gaddr);
-> 	*val = *(unsigned long *)phys_to_virt(phys_addr);
-> 
-> 	return 0;
-> 
+On 9/11/25 4:49 PM, Sebastian Ott wrote:
+> Provide a kvm specific vcpu property to override the default
+> (as of kernel v6.13 that would be PSCI v1.3) PSCI version emulated
+> by kvm. Current valid values are: 0.1, 0.2, 1.0, 1.1, 1.2, and 1.3
+>
+> Signed-off-by: Sebastian Ott <sebott@redhat.com>
+> ---
+>  docs/system/arm/cpu-features.rst |  5 +++
+>  target/arm/cpu.h                 |  6 +++
+>  target/arm/kvm.c                 | 70 +++++++++++++++++++++++++++++++-
+>  3 files changed, 80 insertions(+), 1 deletion(-)
+>
+> diff --git a/docs/system/arm/cpu-features.rst b/docs/system/arm/cpu-features.rst
+> index 37d5dfd15b..1d32ce0fee 100644
+> --- a/docs/system/arm/cpu-features.rst
+> +++ b/docs/system/arm/cpu-features.rst
+> @@ -204,6 +204,11 @@ the list of KVM VCPU features and their descriptions.
+>    the guest scheduler behavior and/or be exposed to the guest
+>    userspace.
+>  
+> +``kvm-psci-version``
+> +  Override the default (as of kernel v6.13 that would be PSCI v1.3)
+> +  PSCI version emulated by the kernel. Current valid values are:
+> +  0.1, 0.2, 1.0, 1.1, 1.2, and 1.3
+> +
+>  TCG VCPU Features
+>  =================
+>  
+> diff --git a/target/arm/cpu.h b/target/arm/cpu.h
+> index c15d79a106..44292aab32 100644
+> --- a/target/arm/cpu.h
+> +++ b/target/arm/cpu.h
+> @@ -974,6 +974,12 @@ struct ArchCPU {
+>       */
+>      uint32_t psci_version;
+>  
+> +    /*
+> +     * Intermediate value used during property parsing.
+> +     * Once finalized, the value should be read from psci_version.
+> +     */
+> +    uint32_t prop_psci_version;
+> +
+>      /* Current power state, access guarded by BQL */
+>      ARMPSCIState power_state;
+>  
+> diff --git a/target/arm/kvm.c b/target/arm/kvm.c
+> index 6672344855..bc6073f395 100644
+> --- a/target/arm/kvm.c
+> +++ b/target/arm/kvm.c
+> @@ -483,6 +483,59 @@ static void kvm_steal_time_set(Object *obj, bool value, Error **errp)
+>      ARM_CPU(obj)->kvm_steal_time = value ? ON_OFF_AUTO_ON : ON_OFF_AUTO_OFF;
+>  }
+>  
+> +static char *kvm_get_psci_version(Object *obj, Error **errp)
+> +{
+> +    ARMCPU *cpu = ARM_CPU(obj);
+> +    const char *val;
+> +
+> +    switch (cpu->prop_psci_version) {
+> +    case QEMU_PSCI_VERSION_0_1:
+> +        val = "0.1";
+> +        break;
+> +    case QEMU_PSCI_VERSION_0_2:
+> +        val = "0.2";
+> +        break;
+> +    case QEMU_PSCI_VERSION_1_0:
+> +        val = "1.0";
+> +        break;
+> +    case QEMU_PSCI_VERSION_1_1:
+> +        val = "1.1";
+> +        break;
+> +    case QEMU_PSCI_VERSION_1_2:
+> +        val = "1.2";
+> +        break;
+> +    case QEMU_PSCI_VERSION_1_3:
+> +        val = "1.3";
+> +        break;
+> +    default:
+> +        val = "0.2";
+can you explain why you return 0.2 by default? Shouldn't we report the
+default value exposed by KVM?
+> +        break;
+> +    }
+> +    return g_strdup(val);
+> +}
+> +
+> +static void kvm_set_psci_version(Object *obj, const char *value, Error **errp)
+> +{
+> +    ARMCPU *cpu = ARM_CPU(obj);
+> +
+> +    if (!strcmp(value, "0.1")) {
+> +        cpu->prop_psci_version = QEMU_PSCI_VERSION_0_1;
+> +    } else if (!strcmp(value, "0.2")) {
+> +        cpu->prop_psci_version = QEMU_PSCI_VERSION_0_2;
+> +    } else if (!strcmp(value, "1.0")) {
+> +        cpu->prop_psci_version = QEMU_PSCI_VERSION_1_0;
+> +    } else if (!strcmp(value, "1.1")) {
+> +        cpu->prop_psci_version = QEMU_PSCI_VERSION_1_1;
+> +    } else if (!strcmp(value, "1.2")) {
+> +        cpu->prop_psci_version = QEMU_PSCI_VERSION_1_2;
+> +    } else if (!strcmp(value, "1.3")) {
+> +        cpu->prop_psci_version = QEMU_PSCI_VERSION_1_3;
+> +    } else {
+> +        error_setg(errp, "Invalid PSCI-version value");
+> +        error_append_hint(errp, "Valid values are 0.1, 0.2, 1.0, 1.1, 1.2, 1.3\n");
+> +    }
+> +}
+> +
+>  /* KVM VCPU properties should be prefixed with "kvm-". */
+>  void kvm_arm_add_vcpu_properties(ARMCPU *cpu)
+>  {
+> @@ -504,6 +557,12 @@ void kvm_arm_add_vcpu_properties(ARMCPU *cpu)
+>                               kvm_steal_time_set);
+>      object_property_set_description(obj, "kvm-steal-time",
+>                                      "Set off to disable KVM steal time.");
+> +
+> +    object_property_add_str(obj, "kvm-psci-version", kvm_get_psci_version,
+> +                            kvm_set_psci_version);
+> +    object_property_set_description(obj, "kvm-psci-version",
+> +                                    "Set PSCI version. "
+> +                                    "Valid values are 0.1, 0.2, 1.0, 1.1, 1.2, 1.3");
+>  }
+>  
+>  bool kvm_arm_pmu_supported(void)
+> @@ -1883,7 +1942,8 @@ int kvm_arch_init_vcpu(CPUState *cs)
+>      if (cs->start_powered_off) {
+>          cpu->kvm_init_features[0] |= 1 << KVM_ARM_VCPU_POWER_OFF;
+>      }
+> -    if (kvm_check_extension(cs->kvm_state, KVM_CAP_ARM_PSCI_0_2)) {
+> +    if (cpu->prop_psci_version != QEMU_PSCI_VERSION_0_1 &&
+> +        kvm_check_extension(cs->kvm_state, KVM_CAP_ARM_PSCI_0_2)) {
+I don't get why this change is needed. Please can you explain?
 
-I swear, at some point it made more sense in the way I had written it :D
 
-I'll fix it
+>          cpu->psci_version = QEMU_PSCI_VERSION_0_2;
+>          cpu->kvm_init_features[0] |= 1 << KVM_ARM_VCPU_PSCI_0_2;
+>      }
+> @@ -1922,6 +1982,14 @@ int kvm_arch_init_vcpu(CPUState *cs)
+>          }
+>      }
+>  
+> +    if (cpu->prop_psci_version) {
+> +        psciver = cpu->prop_psci_version;
+> +        ret = kvm_set_one_reg(cs, KVM_REG_ARM_PSCI_VERSION, &psciver);
+> +        if (ret) {
+> +            error_report("PSCI version %lx is not supported by KVM", psciver);
+don't you need a PRIx64 here?
+> +            return ret;
+> +        }
+> +    }
+>      /*
+>       * KVM reports the exact PSCI version it is implementing via a
+>       * special sysreg. If it is present, use its contents to determine
+Thanks
 
-> > +}
-> > +
-> >  #endif /* __KVM_S390_GACCESS_H */
-> > diff --git a/arch/s390/kvm/kvm-s390.c b/arch/s390/kvm/kvm-s390.c
-> > index 61aa64886c36..af8a62abec48 100644
-> > --- a/arch/s390/kvm/kvm-s390.c
-> > +++ b/arch/s390/kvm/kvm-s390.c
-> > @@ -4858,6 +4858,50 @@ static void kvm_s390_assert_primary_as(struct kvm_vcpu *vcpu)
-> >  		current->thread.gmap_int_code, current->thread.gmap_teid.val);
-> >  }
-> >  
-> > +/**
-> > + * __kvm_s390_faultin_gfn() - fault in and pin a guest address
-> > + * @kvm: the guest
-> > + * @guest_fault: will be filled with information on the pin operation
-> > + * @gfn: guest frame
-> > + * @wr: if true indicates a write access
-> > + *
-> > + * Fault in and pin a guest address using absolute addressing, and without
-> > + * marking the page referenced.
-> > + *
-> > + * Context: Called with mm->mmap_lock in read mode.
-> > + *
-> > + * Return:
-> > + * * 0 in case of success,
-> > + * * -EFAULT if reading using the virtual address failed,
-> > + * * -EINTR if a signal is pending,
-> > + * * -EAGAIN if FOLL_NOWAIT was specified, but IO is needed
-> > + * * PGM_ADDRESSING if the guest address lies outside of guest memory.
-> > + */
-> > +int __kvm_s390_faultin_gfn(struct kvm *kvm, struct guest_fault *guest_fault, gfn_t gfn, bool wr)
-> > +{
-> > +	struct kvm_memory_slot *slot;
-> > +	kvm_pfn_t pfn;
-> > +	int foll;
-> > +
-> > +	foll = wr ? FOLL_WRITE : 0;
-> > +	slot = gfn_to_memslot(kvm, gfn);
-> > +	pfn = __kvm_faultin_pfn(slot, gfn, foll, &guest_fault->writable, &guest_fault->page);
-> > +	if (is_noslot_pfn(pfn))
-> > +		return PGM_ADDRESSING;
-> > +	if (is_sigpending_pfn(pfn))
-> > +		return -EINTR;
-> > +	if (pfn == KVM_PFN_ERR_NEEDS_IO)
-> > +		return -EAGAIN;
-> > +	if (is_error_pfn(pfn))
-> > +		return -EFAULT;
-> > +
-> > +	guest_fault->pfn = pfn;
-> > +	guest_fault->gfn = gfn;
-> > +	guest_fault->write_attempt = wr;
-> > +	guest_fault->valid = true;
-> > +	return 0;
-> > +}
-> > +
-> >  /*
-> >   * __kvm_s390_handle_dat_fault() - handle a dat fault for the gmap of a vcpu
-> >   * @vcpu: the vCPU whose gmap is to be fixed up
-> > diff --git a/arch/s390/kvm/kvm-s390.h b/arch/s390/kvm/kvm-s390.h
-> > index c44fe0c3a097..dabcf65f58ff 100644
-> > --- a/arch/s390/kvm/kvm-s390.h
-> > +++ b/arch/s390/kvm/kvm-s390.h
-> > @@ -22,6 +22,15 @@
-> >  
-> >  #define KVM_S390_UCONTROL_MEMSLOT (KVM_USER_MEM_SLOTS + 0)
-> >  
-> > +struct guest_fault {
-> > +	gfn_t gfn;		/* Guest frame */
-> > +	kvm_pfn_t pfn;		/* Host PFN */
-> > +	struct page *page;	/* Host page */
-> > +	bool writable;		/* Mapping is writable */
-> > +	bool write_attempt;	/* Write access attempted */
-> > +	bool valid;		/* This entry contains valid data */
-> > +};
-> > +
-> >  static inline void kvm_s390_fpu_store(struct kvm_run *run)
-> >  {
-> >  	fpu_stfpc(&run->s.regs.fpc);
-> > @@ -464,12 +473,59 @@ int kvm_s390_cpus_from_pv(struct kvm *kvm, u16 *rc, u16 *rrc);
-> >  int __kvm_s390_handle_dat_fault(struct kvm_vcpu *vcpu, gfn_t gfn, gpa_t gaddr, unsigned int flags);
-> >  int __kvm_s390_mprotect_many(struct gmap *gmap, gpa_t gpa, u8 npages, unsigned int prot,
-> >  			     unsigned long bits);
-> > +int __kvm_s390_faultin_gfn(struct kvm *kvm, struct guest_fault *f, gfn_t gfn, bool wr);
-> >  
-> >  static inline int kvm_s390_handle_dat_fault(struct kvm_vcpu *vcpu, gpa_t gaddr, unsigned int flags)
-> >  {
-> >  	return __kvm_s390_handle_dat_fault(vcpu, gpa_to_gfn(gaddr), gaddr, flags);
-> >  }
-> >  
-> > +static inline void release_faultin_multiple(struct kvm *kvm, struct guest_fault *guest_faults,
-> > +					    int n, bool ignore)
-> > +{
-> > +	int i;
-> > +
-> > +	for (i = 0; i < n; i++) {
-> > +		kvm_release_faultin_page(kvm, guest_faults[i].page, ignore,
-> > +					 guest_faults[i].write_attempt);
-> > +		guest_faults[i].page = NULL;
-> > +	}
-> > +}
-> > +
-> > +static inline bool __kvm_s390_multiple_faults_need_retry(struct kvm *kvm, unsigned long seq,
-> > +							 struct guest_fault *guest_faults, int n,
-> > +							 bool unsafe)
-> > +{
-> > +	int i;
-> > +
-> > +	for (i = 0; i < n; i++) {
-> > +		if (!guest_faults[i].valid)
-> > +			continue;
-> > +		if ((unsafe && mmu_invalidate_retry_gfn_unsafe(kvm, seq, guest_faults[i].gfn)) ||
-> > +		    (!unsafe && mmu_invalidate_retry_gfn(kvm, seq, guest_faults[i].gfn))) {
-> > +			release_faultin_multiple(kvm, guest_faults, n, true);
-> > +			return true;
-> > +		}
-> > +	}
-> > +	return false;
-> > +}
-> > +
-> > +static inline int __kvm_s390_faultin_gfn_range(struct kvm *kvm, struct guest_fault *guest_faults,
-> > +					       gfn_t start, int n_pages, bool write_attempt)
-> > +{
-> > +	int i, rc = 0;
-> > +
-> > +	for (i = 0; !rc && i < n_pages; i++)
-> > +		rc = __kvm_s390_faultin_gfn(kvm, guest_faults + i, start + i, write_attempt);
-> > +	return rc;
-> > +}
-> > +
-> > +#define release_faultin_array(kvm, array, ignore) \
-> > +	release_faultin_multiple(kvm, array, ARRAY_SIZE(array), ignore)
-> > +
-> > +#define __kvm_s390_fault_array_needs_retry(kvm, seq, array, unsafe) \
-> > +	__kvm_s390_multiple_faults_need_retry(kvm, seq, array, ARRAY_SIZE(array), unsafe)
-> > +
-> >  /* implemented in diag.c */
-> >  int kvm_s390_handle_diag(struct kvm_vcpu *vcpu);
-> >  
-> > -- 
-> > 2.51.0
-> >   
+Eric
 
 
