@@ -1,213 +1,162 @@
-Return-Path: <kvm+bounces-58014-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-58015-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2ACA6B85533
-	for <lists+kvm@lfdr.de>; Thu, 18 Sep 2025 16:47:45 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 32449B855C9
+	for <lists+kvm@lfdr.de>; Thu, 18 Sep 2025 16:52:51 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C34C07C3914
-	for <lists+kvm@lfdr.de>; Thu, 18 Sep 2025 14:46:41 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id E7E447A4481
+	for <lists+kvm@lfdr.de>; Thu, 18 Sep 2025 14:51:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5DF0E30C34D;
-	Thu, 18 Sep 2025 14:46:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D473030CB4C;
+	Thu, 18 Sep 2025 14:52:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="O0acwUBn"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="jVvuEHXy"
 X-Original-To: kvm@vger.kernel.org
-Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DE1E21DDE9;
-	Thu, 18 Sep 2025 14:46:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5B2DC28467D
+	for <kvm@vger.kernel.org>; Thu, 18 Sep 2025 14:52:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758206778; cv=none; b=cDMd9VZLMT0enXQ7/DLI4U4Dreo5CzLZQy+jJDaKzVkzB/q+vckayet+WlP6W73ZRBpTX5tHDKfs7DzJC42y5QueJOHZ13HvshVD2GD+ZjoUBP3FN84OUr4nLemDFX6x8bqqxwo+YjU3dP7kuNu0O7+eb38tSpetuv8YDZQjHps=
+	t=1758207151; cv=none; b=szMLEuZWOfN+H4N2zIvYqmxuq7sMJo0ksGaIS1sNUcxjGi+3JW/7DrukXgoBuEcPPQS7VS6exWsvts9zi4bJLeg1xLPr1BcOiU9spsE+iTdaTFPjMe67MrRlwG9QZHnObVPNw8Y/5Z1gt0+GK0w1ezvjzAQFnI1eavnkCQzpdnI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758206778; c=relaxed/simple;
-	bh=xe79pSoF9y0bB17+vkfuQpx+knEpBqts0YHwJGy2W9s=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=gqBA7so/hX/oCExXWx9fj+7cPZITDTnMtctdYnCnPhtIv448P1vbMtew7jcvGaW9NkQBV2ZphS+SQn17BhdD2TMGlNQnTQTjJNzP5aVD7uqSEMzvr3t/IFzt0Aqvyj01zZfkCdEzs1k9xNyOLpHXTNaARso7rw7CNrEj2V8TLaE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=O0acwUBn; arc=none smtp.client-ip=148.163.158.5
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
-Received: from pps.filterd (m0360072.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 58IDE8SX011481;
-	Thu, 18 Sep 2025 14:46:14 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
-	:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=pp1; bh=OmArRh
-	ClilBwFaEQygfNvpGmfBd776L04dQ3MR/AJ1Y=; b=O0acwUBn+pFjROW9e6gU3q
-	InED+aoMo4QKAkGQSCSUmB84PDVj4jU/IxQQDUYcKu9x7yLxeX8vjCY3aXiJhT/N
-	q09I6x75X9g0J3STyumTJqidnwrPjBwNyWtOkt8XcbVzj9KuFw8BiqcovqOhqHSh
-	of40BZoT06WIUFROFbnUe6v5Dtvh7dLfpfckkpd7AB8SS0BzdQy+PZKut0/J5qzP
-	M6quv+mtJRFGIvariQtrg2CSEP1pInmFU4BH1+ETL7zmMsTgPlSrjloUshBCn9i5
-	jQ0fx9yEXTBWm+hJPkI3PC2wGzZ3qO3uQM5x4OPvSLCItYfQWE5GT7lV5LTWfzQw
-	==
-Received: from ppma22.wdc07v.mail.ibm.com (5c.69.3da9.ip4.static.sl-reverse.com [169.61.105.92])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 497g4njfqs-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 18 Sep 2025 14:46:14 +0000 (GMT)
-Received: from pps.filterd (ppma22.wdc07v.mail.ibm.com [127.0.0.1])
-	by ppma22.wdc07v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 58ID8a0N029468;
-	Thu, 18 Sep 2025 14:46:13 GMT
-Received: from smtprelay04.fra02v.mail.ibm.com ([9.218.2.228])
-	by ppma22.wdc07v.mail.ibm.com (PPS) with ESMTPS id 495kb179sr-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 18 Sep 2025 14:46:13 +0000
-Received: from smtpav02.fra02v.mail.ibm.com (smtpav02.fra02v.mail.ibm.com [10.20.54.101])
-	by smtprelay04.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 58IEk9n431654436
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Thu, 18 Sep 2025 14:46:09 GMT
-Received: from smtpav02.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 7A8212004B;
-	Thu, 18 Sep 2025 14:46:09 +0000 (GMT)
-Received: from smtpav02.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 325B920043;
-	Thu, 18 Sep 2025 14:46:09 +0000 (GMT)
-Received: from p-imbrenda (unknown [9.152.224.66])
-	by smtpav02.fra02v.mail.ibm.com (Postfix) with ESMTP;
-	Thu, 18 Sep 2025 14:46:09 +0000 (GMT)
-Date: Thu, 18 Sep 2025 16:46:06 +0200
-From: Claudio Imbrenda <imbrenda@linux.ibm.com>
-To: Alexander Gordeev <agordeev@linux.ibm.com>
-Cc: kvm@vger.kernel.org, linux-s390@vger.kernel.org, borntraeger@de.ibm.com,
-        frankja@linux.ibm.com, nsg@linux.ibm.com, nrb@linux.ibm.com,
-        seiden@linux.ibm.com, schlameuss@linux.ibm.com, hca@linux.ibm.com,
-        svens@linux.ibm.com, david@redhat.com, gerald.schaefer@linux.ibm.com
-Subject: Re: [PATCH v2 05/20] KVM: s390: Add helper functions for fault
- handling
-Message-ID: <20250918164606.6617b516@p-imbrenda>
-In-Reply-To: <a4998d82-223f-4894-888d-bf97ef8c78d0-agordeev@linux.ibm.com>
-References: <20250910180746.125776-1-imbrenda@linux.ibm.com>
-	<20250910180746.125776-6-imbrenda@linux.ibm.com>
-	<a4998d82-223f-4894-888d-bf97ef8c78d0-agordeev@linux.ibm.com>
-Organization: IBM
-X-Mailer: Claws Mail 4.3.1 (GTK 3.24.49; x86_64-redhat-linux-gnu)
+	s=arc-20240116; t=1758207151; c=relaxed/simple;
+	bh=877fy4JwCj6Yt7dwkYYuI8E/1ziIUPjIl8VIeeaY+04=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Cx7/0+dFlo2vrn7tBM/UPg3Tpy3/BtUYVWbyaof7TcHJmhUSoi+6qCA8/VBMfXnIbp5hVAYf29gV855ZJkuojlPGjcQGPpfxnni+gdOsYGqcpyzpjx8SGc3Q3RucaRuOMlZAOhxyiyWCSk0AXvcSUP+HvDE4TmMdKMTA4ag8k0g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=jVvuEHXy; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1758207149;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=o4xuHLo8yzB0A9DafNx4LR5vIcuDhtQe+LRGJvMc0Qw=;
+	b=jVvuEHXyyx2qRRl9+A8XcdWiFUC36jVy3Glzrc7VCHOMFIF700KlwkzHADd8FzKXHehWOE
+	fH3SyKpjNf4y3VNMXsWBwa66EYZtWhp9J0FHaTVdffoCuyTAHfylPVU8brrwinyiCHHUny
+	eA1AJ9rmMf03cJU8dyP6zJIMkaP9/vA=
+Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
+ [209.85.221.70]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-578-pvdo4PpNPWS_fyulE5vxtw-1; Thu, 18 Sep 2025 10:52:28 -0400
+X-MC-Unique: pvdo4PpNPWS_fyulE5vxtw-1
+X-Mimecast-MFC-AGG-ID: pvdo4PpNPWS_fyulE5vxtw_1758207147
+Received: by mail-wr1-f70.google.com with SMTP id ffacd0b85a97d-3ee1365964cso570706f8f.2
+        for <kvm@vger.kernel.org>; Thu, 18 Sep 2025 07:52:27 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1758207147; x=1758811947;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=o4xuHLo8yzB0A9DafNx4LR5vIcuDhtQe+LRGJvMc0Qw=;
+        b=jwXoQjYoq5d0DzTlr1DpvQkT9KS+M60NPNpKOSYV5VMdWGE8I4zAkKBCfMo0O48Y9f
+         K5WSzRwwkOzj8lBZ9Ij/CJxR5/P/Kp2zHGYkrJqqLjwpLGISKVg1u5CyOZXkoQ04PzeL
+         AU0k5n5Fx/4pxh2ZrTd9ka0/FEYxsyrlfQtS1pR4GC4H0kneWBxemh4CuzyQDi3/XKjO
+         PujmFSSA0nJEIsU8jat7Det15q3iPSEzZVEiIcQKtN2fxW9p5K0PXRALh1sb1oE05HQM
+         F8YYx7eciE9ObP9j/dOvu/mupDg7SDizfxAm/P8GKwQ72Ebu2cs7O98qpmqpSQADgjpW
+         d/zw==
+X-Forwarded-Encrypted: i=1; AJvYcCUaVyJM8jenIWLqSISgBTbtRTPxvxwFZTT4VKjWn6K26lQ5fcymRqoTpAJkt5BliXvenR0=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzAu7/uMdiAyo0r4r49DpbY7vFllp7XOERIbVv6QjrVbbfSJIxi
+	6L2rDPxlS2Sb9vpyJzO7PzXxkNJlflidhzMNsy4jek1u7ZbP4Z1peXjkWNCVzU61M11+T8M1Sqp
+	OLPQadQ4pqHzO/KSZpRcA9mg5gfRuiQoBdw4lEpRUG+LPACGvaHjfyQ==
+X-Gm-Gg: ASbGncs3TI5SWcI1CabIYuQGCHisXsmyaIhsVbsIVGaUVBfrOWfNaIIbkGuruGs2gQT
+	Lrwd7bPVbWLZdu6n8dpNbDzWhgA1iNelMoUIuLiAXKH117j7AcLCt72kEBptta4KaWiZYBDwYHP
+	eZg3YAU85Iqn/uouqRrlR0AuIliZIEBxVtdWGy0nXgsndR8FoTmRSvr0W66azRUnL/TXAmGz6Hc
+	475gYqNDChNztnmPpiL93hQsOn57x58uDhI8UsiscIg7ieaeBW24csO6s/NgYVIlqykDFLQVPvH
+	6fascuuB7W8htWWblYJZtYJ3FaUudNaO/WA=
+X-Received: by 2002:a05:6000:430c:b0:3e2:4a3e:d3e5 with SMTP id ffacd0b85a97d-3ecdf9bbb14mr6283925f8f.22.1758207146763;
+        Thu, 18 Sep 2025 07:52:26 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IFqwMRBHuFFqMWYMrzOGs/Y1LvHSUdwEyMMdSeQZSTNEKri6ViSDAyQsaqS+nlL7xHwrs2MhA==
+X-Received: by 2002:a05:6000:430c:b0:3e2:4a3e:d3e5 with SMTP id ffacd0b85a97d-3ecdf9bbb14mr6283908f8f.22.1758207146339;
+        Thu, 18 Sep 2025 07:52:26 -0700 (PDT)
+Received: from redhat.com ([2a06:c701:73e7:4d00:2294:2331:c6cf:2fde])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-45f32083729sm61479685e9.0.2025.09.18.07.52.25
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 18 Sep 2025 07:52:25 -0700 (PDT)
+Date: Thu, 18 Sep 2025 10:52:23 -0400
+From: "Michael S. Tsirkin" <mst@redhat.com>
+To: Jason Wang <jasowang@redhat.com>
+Cc: eperezma@redhat.com, jonah.palmer@oracle.com, kuba@kernel.org,
+	jon@nutanix.com, kvm@vger.kernel.org,
+	virtualization@lists.linux.dev, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org, stable@vger.kernel.org
+Subject: Re: [PATCH vhost 1/3] vhost-net: unbreak busy polling
+Message-ID: <20250918105037-mutt-send-email-mst@kernel.org>
+References: <20250917063045.2042-1-jasowang@redhat.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Authority-Analysis: v=2.4 cv=MN5gmNZl c=1 sm=1 tr=0 ts=68cc1b36 cx=c_pps
- a=5BHTudwdYE3Te8bg5FgnPg==:117 a=5BHTudwdYE3Te8bg5FgnPg==:17
- a=kj9zAlcOel0A:10 a=yJojWOMRYYMA:10 a=VnNF1IyMAAAA:8 a=JjYjCPlhS_3ndGKMAXYA:9
- a=CjuIK1q_8ugA:10
-X-Proofpoint-GUID: u5Pp93egEHxSFYrnwFDPT1yjD7460Hvz
-X-Proofpoint-ORIG-GUID: u5Pp93egEHxSFYrnwFDPT1yjD7460Hvz
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUwOTE2MDIwNCBTYWx0ZWRfX4Ea3hYiEq0Tc
- D3XD/2o/uCmctJ7PZMmex7wucMuBR86XEezC3xsznpkY2tiwiPD7hObytcovrgNiE0fUGHEttoV
- LdnkNryIf7mSYAc6KoTvkUBcaWduB+DHtml6FFgoADlgCA8mUS0S3AvItQG6pr3Hx6t4EXOqei7
- vto1pl33z8eJmLZKfWdnzpXeWy3DX7K0kxh3Z706egQz0EsTxBjNkryE5oFcjCCxnS9ZnnhpPlG
- FYiN95j+wm0RIkyrkhADMznNucBy+lI6LXpP8QhsVehdgSLPmcuoAaVq5LGHPdU1zIqhSvDKDyE
- MKc8j/ftkHJYpYxq9dRfxH5p6ZGOzj+OOL3LdZ0rEQbUWxn6iKBZGe9+6Djzyl2lg6qqtudxCmk
- h4q5VWpG
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1117,Hydra:6.1.9,FMLib:17.12.80.40
- definitions=2025-09-18_01,2025-09-18_02,2025-03-28_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- clxscore=1015 spamscore=0 priorityscore=1501 bulkscore=0 impostorscore=0
- malwarescore=0 adultscore=0 phishscore=0 suspectscore=0
- classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
- reason=mlx scancount=1 engine=8.19.0-2507300000 definitions=main-2509160204
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250917063045.2042-1-jasowang@redhat.com>
 
-On Thu, 18 Sep 2025 16:19:07 +0200
-Alexander Gordeev <agordeev@linux.ibm.com> wrote:
+On Wed, Sep 17, 2025 at 02:30:43PM +0800, Jason Wang wrote:
+> Commit 67a873df0c41 ("vhost: basic in order support") pass the number
+> of used elem to vhost_net_rx_peek_head_len() to make sure it can
+> signal the used correctly before trying to do busy polling. But it
+> forgets to clear the count, this would cause the count run out of sync
+> with handle_rx() and break the busy polling.
+> 
+> Fixing this by passing the pointer of the count and clearing it after
+> the signaling the used.
+> 
+> Acked-by: Michael S. Tsirkin <mst@redhat.com>
+> Cc: stable@vger.kernel.org
+> Fixes: 67a873df0c41 ("vhost: basic in order support")
+> Signed-off-by: Jason Wang <jasowang@redhat.com>
 
-> On Wed, Sep 10, 2025 at 08:07:31PM +0200, Claudio Imbrenda wrote:
-> > +static inline int __kvm_s390_faultin_read_gpa(struct kvm *kvm, struct guest_fault *f, gpa_t gaddr,
-> > +					      unsigned long *val)
-> > +{
-> > +	phys_addr_t phys_addr;
-> > +	int rc;
-> > +
-> > +	rc = __kvm_s390_faultin_gfn(kvm, f, gpa_to_gfn(gaddr), false);
-> > +	if (!rc) {
-> > +		phys_addr = PFN_PHYS(f->pfn) | offset_in_page(gaddr);  
-> 
->                             pfn_to_phys() is more consistent with the phys_to_virt() below ;)
-> 
-> > +		*val = *(unsigned long *)phys_to_virt(phys_addr);
-> > +	}
-> > +	return rc;
-> > +}
-> > +
-> >  #endif /* __KVM_S390_GACCESS_H */  
-> ...
-> > +static inline void release_faultin_multiple(struct kvm *kvm, struct guest_fault *guest_faults,
-> > +					    int n, bool ignore)
-> > +{
-> > +	int i;
-> > +
-> > +	for (i = 0; i < n; i++) {
-> > +		kvm_release_faultin_page(kvm, guest_faults[i].page, ignore,
-> > +					 guest_faults[i].write_attempt);
-> > +		guest_faults[i].page = NULL;
-> > +	}
-> > +}
-> > +
-> > +static inline bool __kvm_s390_multiple_faults_need_retry(struct kvm *kvm, unsigned long seq,
-> > +							 struct guest_fault *guest_faults, int n,
-> > +							 bool unsafe)
-> > +{
-> > +	int i;
-> > +
-> > +	for (i = 0; i < n; i++) {
-> > +		if (!guest_faults[i].valid)
-> > +			continue;
-> > +		if ((unsafe && mmu_invalidate_retry_gfn_unsafe(kvm, seq, guest_faults[i].gfn)) ||
-> > +		    (!unsafe && mmu_invalidate_retry_gfn(kvm, seq, guest_faults[i].gfn))) {
-> > +			release_faultin_multiple(kvm, guest_faults, n, true);  
-> 
-> 
-> Calling release_faultin_multiple() on the whole range, before all gfns invalidated?
+I queued this but no promises this gets into this release - depending
+on whether there is another rc or no. I had the console revert which
+I wanted in this release and don't want it to be held up.
 
-nothing is getting invalidated here, only a check whether the gfns
-(may) already been invalidated. in which case we give up and release
-the whole range
+for the future, I expect either a cover letter explaining
+what unites the patchset, or just separate patches.
 
-kvm_release_faultin_page() will return and do nothing if the struct
-page * is NULL
-
-I guess the name of the function in common code is misleading, I will
-add some comments to explain what's going on here
-
-> Tolerate invalidation of entries that are (!guest_faults[i].valid)? But then why the
-> continue above?
+> ---
+>  drivers/vhost/net.c | 7 ++++---
+>  1 file changed, 4 insertions(+), 3 deletions(-)
 > 
-> This function is a mistery to me, but that is - I am sure - due to my KVM ignorance...
-> 
-> > +			return true;
-> > +		}
-> > +	}
-> > +	return false;
-> > +}
-> > +
-> > +static inline int __kvm_s390_faultin_gfn_range(struct kvm *kvm, struct guest_fault *guest_faults,
-> > +					       gfn_t start, int n_pages, bool write_attempt)
-> > +{
-> > +	int i, rc = 0;
-> > +
-> > +	for (i = 0; !rc && i < n_pages; i++)  
-> 
-> Unless n_pages could ever be zero, the below reads better.
-> 
-> > +		rc = __kvm_s390_faultin_gfn(kvm, guest_faults + i, start + i, write_attempt);  
-> 
-> 		if (rc)
-> 			break;
-
-yeah I guess it's more readable that way
-
-> 
-> > +	return rc;
-> > +}  
-> ...
-> 
-> Thanks!
+> diff --git a/drivers/vhost/net.c b/drivers/vhost/net.c
+> index c6508fe0d5c8..16e39f3ab956 100644
+> --- a/drivers/vhost/net.c
+> +++ b/drivers/vhost/net.c
+> @@ -1014,7 +1014,7 @@ static int peek_head_len(struct vhost_net_virtqueue *rvq, struct sock *sk)
+>  }
+>  
+>  static int vhost_net_rx_peek_head_len(struct vhost_net *net, struct sock *sk,
+> -				      bool *busyloop_intr, unsigned int count)
+> +				      bool *busyloop_intr, unsigned int *count)
+>  {
+>  	struct vhost_net_virtqueue *rnvq = &net->vqs[VHOST_NET_VQ_RX];
+>  	struct vhost_net_virtqueue *tnvq = &net->vqs[VHOST_NET_VQ_TX];
+> @@ -1024,7 +1024,8 @@ static int vhost_net_rx_peek_head_len(struct vhost_net *net, struct sock *sk,
+>  
+>  	if (!len && rvq->busyloop_timeout) {
+>  		/* Flush batched heads first */
+> -		vhost_net_signal_used(rnvq, count);
+> +		vhost_net_signal_used(rnvq, *count);
+> +		*count = 0;
+>  		/* Both tx vq and rx socket were polled here */
+>  		vhost_net_busy_poll(net, rvq, tvq, busyloop_intr, true);
+>  
+> @@ -1180,7 +1181,7 @@ static void handle_rx(struct vhost_net *net)
+>  
+>  	do {
+>  		sock_len = vhost_net_rx_peek_head_len(net, sock->sk,
+> -						      &busyloop_intr, count);
+> +						      &busyloop_intr, &count);
+>  		if (!sock_len)
+>  			break;
+>  		sock_len += sock_hlen;
+> -- 
+> 2.34.1
 
 
