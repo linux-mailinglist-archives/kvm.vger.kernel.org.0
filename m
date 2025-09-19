@@ -1,186 +1,192 @@
-Return-Path: <kvm+bounces-58177-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-58178-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 096A2B8B016
-	for <lists+kvm@lfdr.de>; Fri, 19 Sep 2025 20:56:24 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id EBDAFB8B04A
+	for <lists+kvm@lfdr.de>; Fri, 19 Sep 2025 21:00:49 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id BB598166310
-	for <lists+kvm@lfdr.de>; Fri, 19 Sep 2025 18:56:23 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 69BD11CC4DD9
+	for <lists+kvm@lfdr.de>; Fri, 19 Sep 2025 19:01:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 418FC2765D0;
-	Fri, 19 Sep 2025 18:56:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A12FF27B359;
+	Fri, 19 Sep 2025 19:00:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="dIB9OBQ0"
+	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="aVbcWJdh"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from MW6PR02CU001.outbound.protection.outlook.com (mail-westus2azon11012058.outbound.protection.outlook.com [52.101.48.58])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CB71426AA98
-	for <kvm@vger.kernel.org>; Fri, 19 Sep 2025 18:56:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758308177; cv=none; b=k2s97vR4A7G0+sNtqFQcNJ5jVHAEaOft1bTDhiOvEgr5dchvvVcuEOHopPbtd2edyOzCZTSRuDgyOccGXXjQGFDvhwjQ4uWpHsjo8am94TUJ+Yft/CkjXz5BIPRjSX7LC4ee0yyguXaf040u1JJC4+hiW7YZsYPHRne9h4y0ETE=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758308177; c=relaxed/simple;
-	bh=NMGs53ZmxWLAUCYOcr0I463+j+D0J4KWS6lwxbrHf8c=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=DdGEaiuyV9ZXrI9wdZGfk2gepHPNS8AXd9PK/G5NZl/5BXYuRB/buxhfkmBoOxflOh9pAecsmKmpw1yEDxQtzcAYw+1IuwZfzttG3fcmkyxsO1CIoECjRFXrJU1Lnd6wS6XAnkSNBTioCOpyOz5yKaHuw89pP0Eyad4yrIl+yMY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=dIB9OBQ0; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1758308175;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=lVj38TV6NFlRJUveEKKnf4vw+DN0Kar28r+mnlIexw0=;
-	b=dIB9OBQ07EX3BPwIKmZZ9XeRFtE8UKDtLyKd3THchO5RdGdM1VnGqEGj2bqRPp/xJmIwA/
-	DheWlEhHDdkHpB1I/a0TnQVrbaLlTWeBIiMNZW0oZuI8YeIxVteEWkkj9oVI0szV7bDIKa
-	+A1siXp15900XaGjzpDybvJpUQ1L9h8=
-Received: from mail-il1-f197.google.com (mail-il1-f197.google.com
- [209.85.166.197]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-336-2dbEiSfUPrOZzVcnnirBNw-1; Fri, 19 Sep 2025 14:56:07 -0400
-X-MC-Unique: 2dbEiSfUPrOZzVcnnirBNw-1
-X-Mimecast-MFC-AGG-ID: 2dbEiSfUPrOZzVcnnirBNw_1758308166
-Received: by mail-il1-f197.google.com with SMTP id e9e14a558f8ab-4248bfd20faso40205ab.2
-        for <kvm@vger.kernel.org>; Fri, 19 Sep 2025 11:56:07 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1758308166; x=1758912966;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=lVj38TV6NFlRJUveEKKnf4vw+DN0Kar28r+mnlIexw0=;
-        b=VCznSlbVXv+ZSYLr/mm3Z97CMpQYJNiCwX1oEztXZnbbt/W5s4i16yLDSbLrqiEuXj
-         6QLXkV37CZ6RBZC1jLdA5XOKo/N0tr0+DHVcNl8IJ1315U/celMUT5MmqZc4QnQ+PxTs
-         Nxefc3DlZGB4m601I5lH/9fRHJ9FuQ8t5oKlWNQm3upfxBSRmTsOdLgD3EnQa/+sJx4L
-         xWgI4k3y71ziJl78elvmVNoD/4Fb429TcUATsa3NPLRgQlowZmRQmnqCs0TpfGdMhugF
-         kCiOaD88Wo+p9mWWqwWF2zcVNuelE1h4MxewWJ7Fo4bekP0aHyUUw4lYItJvf54PlkvV
-         hnzg==
-X-Gm-Message-State: AOJu0YwR+92kC5bAc0jooOj9p5fAlzId0CFzTT55VJNkkJjDMgEAhtz2
-	G0IuO2Hq0hxDTsoCV6WjahvTCJbHCGKde2YSs6l/1Hun9PAQj2dJwiiNrNADabVwFS85hGpNUgU
-	73Pc+LnmywvGNaHbpWiayRkaiYGiaT+n14mCx2kTlth9e1EN9p8GmnA==
-X-Gm-Gg: ASbGncuW0TOf2T5bNtINdqFbKPDxrOoq5z1rogRjMJx4FKwDtLfKkcbR7FSr+1nNdUY
-	TWTaCvhM9Cxfn+VgI0wO+wpOS8DiBKPpYIDMwnpGwHe9mt++69b6TKKHWIAywblIVJkxvPydB8L
-	MbXjt/IzE/kIqNT8URVrBWsT/wklqkRQHqHu2s+3/zD9Ql7HskTogU+nZjOUc+c8LVvFYCtlMOf
-	b7pf+pAxC4NdRd0NCGto5Kurgeq5VhuvsXwYm3hWVeFf/KbM8dHLTBd5Ayed02yG4p07KPB5pWG
-	oi0xVsHj72apTiHuO5sZDXn8XBqYC6fueoyJi+Ab/1A=
-X-Received: by 2002:a92:c24a:0:b0:419:de32:2d01 with SMTP id e9e14a558f8ab-42481989234mr25313785ab.4.1758308166445;
-        Fri, 19 Sep 2025 11:56:06 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IHeRMlVVwJSn2J+eoiOVihrmI8BY3L8aB3kwLEGCqd+cR5IVXI2iK+bf/xhrrP0TTZWi378yA==
-X-Received: by 2002:a92:c24a:0:b0:419:de32:2d01 with SMTP id e9e14a558f8ab-42481989234mr25313645ab.4.1758308165944;
-        Fri, 19 Sep 2025 11:56:05 -0700 (PDT)
-Received: from redhat.com ([38.15.36.11])
-        by smtp.gmail.com with ESMTPSA id 8926c6da1cb9f-53d539906dfsm2442600173.56.2025.09.19.11.56.04
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 19 Sep 2025 11:56:05 -0700 (PDT)
-Date: Fri, 19 Sep 2025 12:56:03 -0600
-From: Alex Williamson <alex.williamson@redhat.com>
-To: Timothy Pearson <tpearson@raptorengineering.com>
-Cc: kvm <kvm@vger.kernel.org>, linuxppc-dev <linuxppc-dev@lists.ozlabs.org>
-Subject: Re: [PATCH] vfio/pci: Fix INTx handling on legacy DisINTx- PCI
- devices
-Message-ID: <20250919125603.08f600ac.alex.williamson@redhat.com>
-In-Reply-To: <663798478.1707537.1757450926706.JavaMail.zimbra@raptorengineeringinc.com>
-References: <663798478.1707537.1757450926706.JavaMail.zimbra@raptorengineeringinc.com>
-X-Mailer: Claws Mail 4.3.1 (GTK 3.24.43; x86_64-redhat-linux-gnu)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 11BC6264A77;
+	Fri, 19 Sep 2025 19:00:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.48.58
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1758308435; cv=fail; b=FWeOiorukT6xIkrSKyp3crgMy8aAhXusrv0gOxMu5Apw1qkrDgzzlwVSuX8SlIZl+Lj9wLoemtvmt7fRtnNSCyzS6Nq042DJpEMYlvyQ7vh5Jw60usiwp93FRuyC/XzCx9AjbjmnCM6o4aiyHfkZqI6Os2mZexy1XzyuWVjN8K4=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1758308435; c=relaxed/simple;
+	bh=upSg6pwjnP4CS774hzPNOGR7FXO2eEgl6OiAEG7PXlo=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=ih4GcacCWT1GsMXcSM/jHA5p3eebYg/ha9PM6OnnqR38eCtk+dWp6SpUntxmkr5XSFSiVRlFLfYdAOTAbStwbzc1K5LC+kWUER8zrjyaD+Df2NzY4GpbfTJXtETJRnrnOC+cE3quTQx9IKtGwAhqfzKAwzVXi6/gbvfaHDNio8s=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=aVbcWJdh; arc=fail smtp.client-ip=52.101.48.58
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=v3tMP0hxVCT39PDwxo6J4NrMkYXoRQJAIW9TU/SUH38c2rlsFOrLdXxFBrr93cP33wCIwi0VI4aUzdmXUJvXExrJwTcG/9lDQVMRcfuG7GOhMXprD1MVIxpKockWH/Jwq6EPO70hLlT5+00UHhvs8+5/M2AzloLmCiap4rBKLAykya4290eYcj3g5PKoZNhJAsSwhwfhylgBlhZ9dennRyM3FzC7rjNcVpzcEQ1VMP0Q8xXaudrRKeeGLdR+GWTOICDxNtDLCclCJ0vBSTqvItkSn0FKSHKxE0wiGYqLKRCjPGByMaiu3oyB6V6ddF2R/3W03x5mh+sQNectm5CvLg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=1ye/PJIWY5XzKEsOgTVKe4p/MRURmQEjRGz/mlgDzFg=;
+ b=PXx2HMwjy/9CvVkeAu9kDGZDpp9Giqm1GS1WWbpLJ2vJaDvjmNymzRmQiOG6c3EtlBJa+XH/eKBoKMRJfXdmbMDt/lVeqpXGWqsE31yoctRQE+pF4+3mjTWzGe7Z81Wo4/lGPHmiKT7ozQu+RUQvWoCl4bXTZ7+6CK0eBF58qN7mu6iD5hi/hwXePuXkf25AExaVPmev+jiqhDX8G7T2f9ReCUBvDnc5Ba7/HPHJ7QBBM9DMG9aCsm5rl+oxqgYcQrRdYcFIAjRhWE65n+1eahSN8Ac3oErdPsrPmNLvvkvL4Dta0034m3hrJipA1F9Tg+7NmP1i6E2TbgcFgPgC5A==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 165.204.84.17) smtp.rcpttodomain=vger.kernel.org smtp.mailfrom=amd.com;
+ dmarc=pass (p=quarantine sp=quarantine pct=100) action=none
+ header.from=amd.com; dkim=none (message not signed); arc=none (0)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=1ye/PJIWY5XzKEsOgTVKe4p/MRURmQEjRGz/mlgDzFg=;
+ b=aVbcWJdhZw+onQgD8mr8cv9p8OJ8JnW140XNS69vLm7OQSRHKIJ7txL8QJyMPNZleb1R1LJxTFIbaXw2arhtoHsNSiXckR1s87TJ4d54PEbkwi8UvrZ5FJjU4G8KRvyuvmVPV9xYkMuIm+YKVTzd+F+6KiF6XZdQ9oyH592a5GA=
+Received: from MW4PR04CA0386.namprd04.prod.outlook.com (2603:10b6:303:81::31)
+ by LV2PR12MB5774.namprd12.prod.outlook.com (2603:10b6:408:17a::14) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9137.16; Fri, 19 Sep
+ 2025 19:00:30 +0000
+Received: from CO1PEPF000044F6.namprd21.prod.outlook.com
+ (2603:10b6:303:81:cafe::dd) by MW4PR04CA0386.outlook.office365.com
+ (2603:10b6:303:81::31) with Microsoft SMTP Server (version=TLS1_3,
+ cipher=TLS_AES_256_GCM_SHA384) id 15.20.9137.15 via Frontend Transport; Fri,
+ 19 Sep 2025 19:00:29 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
+ smtp.mailfrom=amd.com; dkim=none (message not signed)
+ header.d=none;dmarc=pass action=none header.from=amd.com;
+Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
+ 165.204.84.17 as permitted sender) receiver=protection.outlook.com;
+ client-ip=165.204.84.17; helo=satlexmb07.amd.com; pr=C
+Received: from satlexmb07.amd.com (165.204.84.17) by
+ CO1PEPF000044F6.mail.protection.outlook.com (10.167.241.196) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.9182.0 via Frontend Transport; Fri, 19 Sep 2025 19:00:29 +0000
+Received: from tlendack-t1.amd.com (10.180.168.240) by satlexmb07.amd.com
+ (10.181.42.216) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.17; Fri, 19 Sep
+ 2025 12:00:27 -0700
+From: Tom Lendacky <thomas.lendacky@amd.com>
+To: <kvm@vger.kernel.org>, <linux-kernel@vger.kernel.org>, <x86@kernel.org>,
+	<linux-crypto@vger.kernel.org>
+CC: Paolo Bonzini <pbonzini@redhat.com>, Sean Christopherson
+	<seanjc@google.com>, Borislav Petkov <bp@alien8.de>, Dave Hansen
+	<dave.hansen@linux.intel.com>, Ingo Molnar <mingo@redhat.com>, "Thomas
+ Gleixner" <tglx@linutronix.de>, Michael Roth <michael.roth@amd.com>, "Ashish
+ Kalra" <ashish.kalra@amd.com>, Herbert Xu <herbert@gondor.apana.org.au>,
+	"David Miller" <davem@davemloft.net>
+Subject: [RFC PATCH v2 0/4] SEV-SNP guest policy bit support updates
+Date: Fri, 19 Sep 2025 14:00:04 -0500
+Message-ID: <cover.1758308408.git.thomas.lendacky@amd.com>
+X-Mailer: git-send-email 2.46.2
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: satlexmb08.amd.com (10.181.42.217) To satlexmb07.amd.com
+ (10.181.42.216)
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: CO1PEPF000044F6:EE_|LV2PR12MB5774:EE_
+X-MS-Office365-Filtering-Correlation-Id: b928cd83-af38-4072-39c5-08ddf7aecd69
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|82310400026|36860700013|7416014|376014|1800799024;
+X-Microsoft-Antispam-Message-Info:
+	=?us-ascii?Q?pCO+cOA7u+7ecSOuhJNyn43dqNzQv6VMp+Mmzn8dbFfLlf2IgKRj7dnXSNXW?=
+ =?us-ascii?Q?/NWjtN0/3uyvzW+yItii3Lx953uoiLFSOI1Ix7RaUQuMPYJtoZDyTRY/AgwL?=
+ =?us-ascii?Q?w8N7J41909i1T+LpKiVriBiiB0E5OMmZsnbrXWfXOHieoHQI7YAp8kpWXEJ3?=
+ =?us-ascii?Q?zdM+4HOqHYbmR7cfEsHFXgL3/cYGrlAQSWxIQLi74mmBzeej06ZMnQQKR4XN?=
+ =?us-ascii?Q?8Aps4r2QE3fafN4srglwJq8tZzWhfUNSmam8hDCO6LHXWA5ZdVWN7YWC4gFq?=
+ =?us-ascii?Q?tgbQU0pLhUPSysbqCx6FjeHEc5ibrH82CHNtccBrgItwkuH+4Rvs/mEvBlUN?=
+ =?us-ascii?Q?fhZ0m0np/apeImBK5BSBRBVNhODzvKDk2r+1dQb2nRN7VlmwchGibmev99XG?=
+ =?us-ascii?Q?FGaZcil08xQqhreLJbpx0pPe00EeEA3RRXrVu0tUn6tP6TpwmZabPh2dZ25A?=
+ =?us-ascii?Q?HSZomxnOy0Rha1uqCz4bIae17MlyVhFA7Qx1KIQFro1W8AjYFZRzFL3XuPKK?=
+ =?us-ascii?Q?rpNmTw9zm+KLPyq948lSaQaxUKmDskKaXQnru8A+749yxlD2MDPT0rZX1Cy7?=
+ =?us-ascii?Q?VNoLIH890OIQGtx5BibC5GoLdD1qH+/Kg1f7vYlxcTJ4Dwcr7llNRcioZiIA?=
+ =?us-ascii?Q?7vk0SuLa7knNIdjcfF61YTxe9d/d38tkZZ0vMbNCNC5uPgP/w5EbMBv7T8rw?=
+ =?us-ascii?Q?YSbshB23kdUDfUzSjTIVICNDNWmBQl5sqNApSSQvnxmqYdWnapYjjRMdBvdq?=
+ =?us-ascii?Q?QTzDZCqRmEHFROI2D25muJ8xBGzxMunmlrhqn1LIyh704Pae8+hVYP0PV9bY?=
+ =?us-ascii?Q?/BXrSmDeUn2pROIVPKUfXXYLaP4PziBhyOYTIxpH/kzsHPN0IxW4lJtjsbNg?=
+ =?us-ascii?Q?zLVzi21YgIwUTWpnzmUlLiNBMlp7d8Gh/4E3jpbzz0nVBtnPF1ob0xYKgT9B?=
+ =?us-ascii?Q?t5A1bPgJvB/PtZniSqfyJB0KHqLJHzzpVrZsRwZ9e14DAa06N7CuJe3001RK?=
+ =?us-ascii?Q?IUrhaDcsTej/6lI71GY34DjVCJV96lBfGVD5EabqMoPj0yTK4Z0TvtjsNkLz?=
+ =?us-ascii?Q?d182LI9UiHq/By2r8MTLhSMg1VseNTc5XEK6HySnMuRiEWfby+zS8UHXkXU1?=
+ =?us-ascii?Q?f9dD7pNQzCmWvSVBzWIWP70qM0z/YddbeCCaeM8hxH2xtESwsha9a00H4yH+?=
+ =?us-ascii?Q?giKXsXCP1VnSsP5GXgWlxzo6SvbhsPzwG/tsbrOkqrUf3IfrnbVTIYniW8hK?=
+ =?us-ascii?Q?kRFDfe5MYm0OEQVJxc4LogWlYHvuaIILltGmRwJlHUtq1GTe5HIA+udQzRT8?=
+ =?us-ascii?Q?pNcBnU/PEj1Uj3JxZdZ1gOZPQNrXqtQcKXiP1NhqBrZclsLGyPUB1SqolgG8?=
+ =?us-ascii?Q?nkmJUatGfZJkYVh5ILtEBp7FyufmLnCAQvla/RKQVsvdBZTnGNoU1UW0yo3E?=
+ =?us-ascii?Q?xKFE/yGYUBVXKBQ7g8X1RcVAUesQPo+eEehU0IlZBeh7C/Ou0lkqje4dXmwT?=
+ =?us-ascii?Q?WN8HFXsIRFUwR2Q=3D?=
+X-Forefront-Antispam-Report:
+	CIP:165.204.84.17;CTRY:;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:satlexmb07.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230040)(82310400026)(36860700013)(7416014)(376014)(1800799024);DIR:OUT;SFP:1101;
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 19 Sep 2025 19:00:29.7731
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: b928cd83-af38-4072-39c5-08ddf7aecd69
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[satlexmb07.amd.com]
+X-MS-Exchange-CrossTenant-AuthSource:
+	CO1PEPF000044F6.namprd21.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: LV2PR12MB5774
 
-On Tue, 9 Sep 2025 15:48:46 -0500 (CDT)
-Timothy Pearson <tpearson@raptorengineering.com> wrote:
+This series aims to allow more flexibility in specifying SEV-SNP policy
+bits by improving discoverability of supported policy bits from userspace
+and enabling support for newer policy bits.
 
-> PCI devices prior to PCI 2.3 both use level interrupts and do not support
-> interrupt masking, leading to a failure when passed through to a KVM guest on
-> at least the ppc64 platform, which does not utilize the resample IRQFD. This
-> failure manifests as receiving and acknowledging a single interrupt in the guest
-> while leaving the host physical device VFIO IRQ pending.
-> 
-> Level interrupts in general require special handling due to their inherently
-> asynchronous nature; both the host and guest interrupt controller need to
-> remain in synchronization in order to coordinate mask and unmask operations.
-> When lazy IRQ masking is used on DisINTx- hardware, the following sequence
-> occurs:
->
->  * Level IRQ assertion on host
->  * IRQ trigger within host interrupt controller, routed to VFIO driver
->  * Host EOI with hardware level IRQ still asserted
->  * Software mask of interrupt source by VFIO driver
->  * Generation of event and IRQ trigger in KVM guest interrupt controller
->  * Level IRQ deassertion on host
->  * Guest EOI
->  * Guest IRQ level deassertion
->  * Removal of software mask by VFIO driver
-> 
-> Note that no actual state change occurs within the host interrupt controller,
-> unlike what would happen with either DisINTx+ hardware or message interrupts.
-> The host EOI is not fired with the hardware level IRQ deasserted, and the
-> level interrupt is not re-armed within the host interrupt controller, leading
-> to an unrecoverable stall of the device.
-> 
-> Work around this by disabling lazy IRQ masking for DisINTx- INTx devices.
+- The first patch adds a new KVM_X86_GRP_SEV attribute group,
+  KVM_X86_SNP_POLICY_BITS, that can be used to return the supported
+  SEV-SNP policy bits. The initial support for this attribute will return
+  the current KVM supported policy bitmask.
 
-I'm not really following here.  It's claimed above that no actual state
-change occurs within the host interrupt controller, but that's exactly
-what disable_irq_nosync() intends to do, mask the interrupt line at the
-controller.  The lazy optimization that's being proposed here should
-only change the behavior such that the interrupt is masked at the call
-to disable_irq_nosync() rather than at a subsequent re-assertion of the
-interrupt.  In any case, enable_irq() should mark the line enabled and
-reenable the controller if necessary.
+- The next 3 patches provide for adding to the known SEV-SNP policy
+  bits. Since some policy bits are dependent on specific levels of SEV
+  firmware support, the CCP driver is updated to provide an API to return
+  the supported policy bits.
 
-Also, contrary to above, when a device supports DisINT+ we're not
-manipulating the host controller.  We're able to mask the interrupt at
-the device.  MSI is edge triggered, we don't mask it, so it's not
-relevant to this discussion afaict.
+  The supported policy bits bitmask used by KVM is generated by taking the
+  policy bitmask returned by the CCP driver and ANDing it with the KVM
+  supported policy bits. KVM supported policy bits are policy bits that
+  do not require any specific implementation support from KVM to allow.
 
-There may be good reason to disable the lazy masking behavior as you're
-proposing, but I'm not able to glean it from this discussion of the
-issue.
+This series has a prereq against the ciphertext hiding patches and so
+it is based on the ciphertext branch of the kvm-x86 repo.
 
-> 
-> ---
->  drivers/vfio/pci/vfio_pci_intrs.c | 5 +++++
->  1 file changed, 5 insertions(+)
-> 
-> diff --git a/drivers/vfio/pci/vfio_pci_intrs.c b/drivers/vfio/pci/vfio_pci_intrs.c
-> index 123298a4dc8f..011169ca7a34 100644
-> --- a/drivers/vfio/pci/vfio_pci_intrs.c
-> +++ b/drivers/vfio/pci/vfio_pci_intrs.c
-> @@ -304,6 +304,9 @@ static int vfio_intx_enable(struct vfio_pci_core_device *vdev,
->  
->  	vdev->irq_type = VFIO_PCI_INTX_IRQ_INDEX;
->  
-> +	if (is_intx(vdev) && !vdev->pci_2_3)
+The series is based off of:
+  https://github.com/kvm-x86/linux.git ciphertext
 
-We just set irq_type, which is what is_intx() tests, how could it be
-anything other?  Thanks,
+---
 
-Alex
+Changes for v2:
+  - Marked the KVM supported policy bits as read-only after init.
 
-> +		irq_set_status_flags(pdev->irq, IRQ_DISABLE_UNLAZY);
-> +
->  	ret = request_irq(pdev->irq, vfio_intx_handler,
->  			  irqflags, ctx->name, ctx);
->  	if (ret) {
-> @@ -351,6 +354,8 @@ static void vfio_intx_disable(struct vfio_pci_core_device *vdev)
->  	if (ctx) {
->  		vfio_virqfd_disable(&ctx->unmask);
->  		vfio_virqfd_disable(&ctx->mask);
-> +		if (!vdev->pci_2_3)
-> +			irq_clear_status_flags(pdev->irq, IRQ_DISABLE_UNLAZY);
->  		free_irq(pdev->irq, ctx);
->  		if (ctx->trigger)
->  			eventfd_ctx_put(ctx->trigger);
+Tom Lendacky (4):
+  KVM: SEV: Publish supported SEV-SNP policy bits
+  KVM: SEV: Consolidate the SEV policy bits in a single header file
+  crypto: ccp - Add an API to return the supported SEV-SNP policy bits
+  KVM: SEV: Add known supported SEV-SNP policy bits
+
+ arch/x86/include/uapi/asm/kvm.h |  1 +
+ arch/x86/kvm/svm/sev.c          | 45 ++++++++++++++++++++-------------
+ arch/x86/kvm/svm/svm.h          |  3 ---
+ drivers/crypto/ccp/sev-dev.c    | 37 +++++++++++++++++++++++++++
+ include/linux/psp-sev.h         | 39 ++++++++++++++++++++++++++++
+ 5 files changed, 105 insertions(+), 20 deletions(-)
+
+
+base-commit: 6c7c620585c6537dd5dcc75f972b875caf00f773
+-- 
+2.46.2
 
 
