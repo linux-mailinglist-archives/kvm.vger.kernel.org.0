@@ -1,238 +1,364 @@
-Return-Path: <kvm+bounces-58108-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-58109-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id BD04EB87997
-	for <lists+kvm@lfdr.de>; Fri, 19 Sep 2025 03:29:56 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 23256B879F9
+	for <lists+kvm@lfdr.de>; Fri, 19 Sep 2025 03:40:08 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 731FB7E08F3
-	for <lists+kvm@lfdr.de>; Fri, 19 Sep 2025 01:29:55 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D31DC7E6E8F
+	for <lists+kvm@lfdr.de>; Fri, 19 Sep 2025 01:40:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B4A0522069A;
-	Fri, 19 Sep 2025 01:29:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="MiOxtf4H"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 71BFF247284;
+	Fri, 19 Sep 2025 01:40:03 +0000 (UTC)
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.19])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5FB6921FF26;
-	Fri, 19 Sep 2025 01:29:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=192.198.163.19
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758245385; cv=fail; b=iybs7E/Xa8KBaPyaltrZScoMWVOYTdA+Ju5t0828viC3LvKz6/BB0LOQYbSxQnD/b3mPofak8eQIykvoGXdKD+NxOGs8tQiOKr9FJqm60iuaPSHGd/FPauJfAE0A2Tti0A3ii2j/ibKOUgeNvJzVEZ9MH09VXrmbdQT7/9gnuBw=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758245385; c=relaxed/simple;
-	bh=0A+1kv9UwNyzPvcc75b/iePgeoGxDYzQxIynyLIZ7aI=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=DlEzKDE/ZKBwQVDiC/WG0FFm16j/o0XAR9dtlWwOmXxEPGPMaUBHdPes3hFI5X7w1PxKBIzlE8MW+DxxI3XMASP8CYyiTru4YkH75UqP9zd0Ed8L7qyK6oUE47l5UqiRItzaYY3joJL0BoRQ+4H72mPn9N6MYEY9yg/pGKO0gv8=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=MiOxtf4H; arc=fail smtp.client-ip=192.198.163.19
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1758245384; x=1789781384;
-  h=from:to:cc:subject:date:message-id:references:
-   in-reply-to:content-id:content-transfer-encoding:
-   mime-version;
-  bh=0A+1kv9UwNyzPvcc75b/iePgeoGxDYzQxIynyLIZ7aI=;
-  b=MiOxtf4H+Vww4W1+WPtmiJq1GS5JpIEe9fOwIB1w+WfTXq3w8Jr2HY5r
-   lsb4INFuJSPY0W+fnkxJ3i/5aXbbrjptUNycLjHqT2bK67rP0LeHBPi4Y
-   J2ir7JT+vfk2pOhlJIe0ipbkywcx+iuKlZ1Kw1Bn2fr0w92VOYG1GBFEi
-   5Z/7vD9Raudr/xXkWIdj9QVAqWuIAoej+SwB6qJcUGd4Gjb242L2niLrD
-   qkb++Trht+hXq76Yfd1X09Zpm0dNyTp8ZfRFkLjwQBxcileWrxUpJhaki
-   AyUF9mspjzkOokrlDx0aK7uzhdP8T7TAYqvREPYpHVaASIj/4G+7Sbk/e
-   w==;
-X-CSE-ConnectionGUID: b/AQenkgQ16ymyFf8edhDQ==
-X-CSE-MsgGUID: wcc2J66+QUisxKgOehEVWQ==
-X-IronPort-AV: E=McAfee;i="6800,10657,11557"; a="59630171"
-X-IronPort-AV: E=Sophos;i="6.18,276,1751266800"; 
-   d="scan'208";a="59630171"
-Received: from orviesa008.jf.intel.com ([10.64.159.148])
-  by fmvoesa113.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 18 Sep 2025 18:29:44 -0700
-X-CSE-ConnectionGUID: DpwqCzESSdup0W9JT3J3/w==
-X-CSE-MsgGUID: FDw6ubGFSG6v3MGSeTttZw==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.18,276,1751266800"; 
-   d="scan'208";a="175764861"
-Received: from orsmsx901.amr.corp.intel.com ([10.22.229.23])
-  by orviesa008.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 18 Sep 2025 18:29:43 -0700
-Received: from ORSMSX901.amr.corp.intel.com (10.22.229.23) by
- ORSMSX901.amr.corp.intel.com (10.22.229.23) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.17; Thu, 18 Sep 2025 18:29:43 -0700
-Received: from ORSEDG903.ED.cps.intel.com (10.7.248.13) by
- ORSMSX901.amr.corp.intel.com (10.22.229.23) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.17 via Frontend Transport; Thu, 18 Sep 2025 18:29:43 -0700
-Received: from DM5PR21CU001.outbound.protection.outlook.com (52.101.62.4) by
- edgegateway.intel.com (134.134.137.113) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.17; Thu, 18 Sep 2025 18:29:42 -0700
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=B2SuOV7c+NJwhDCmi/LXcUA5geno3dn/OwyVekVGnYWlu61z6gm1/QgRbssj2PNCzj0qqa4zW8BRgOTlXYDvSy+Skg01CtL3GTUC1BhDzO6mJoKNc7R7gIH2r5n25rsYjgg1I2vmhwCq7+zlKT2gv3koJrSsbZrXtObkP/S1hJSyrV2czfHCuYqg2EzmZcJjdZhYrybukATWqo6/3gdWfmSpaCYojMO8Jnb7udkM0LBtP2hMGPAdH4FN0uOf8lZQBSelxFXGNKNmmCOk69n5wAReVyg34kyJ+9rczJwccEuSj43HozDuTLIy5BaxihUqUtea6gn+o7MvFHPTWAi94Q==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=0A+1kv9UwNyzPvcc75b/iePgeoGxDYzQxIynyLIZ7aI=;
- b=BhbUBb7E8A6hnKuMAFteX11tfarugPkhIUKA2veTqF3EbycwfaxjKfl0Q3SszvInTbIfhvkQ1bGrJEWH5T6gVzUQxXFA2QMYdD+8BZPxcO3qM0LfjO3UGZnfFbNNXpvipt3+VnoyAxwRsa7E1eRgC5wR66wd54ngjEGPJzkfGqEIBIDQATRvI97gJzc9oMACK/iv0WHeDG6WW5/R4nABVIPZmMMmc7iFYwzXyOcBpadV5WNBsR4aBc1N/XFObA4BiRsPrMX3plSUHsAoan3mG+YNfvMIp9hKoMD0XBHcjkhHKzQU8l9eFVBw5GJJKPFIgS5eNfxMaxcIN0b+PXLvKw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Received: from BL1PR11MB5525.namprd11.prod.outlook.com (2603:10b6:208:31f::10)
- by CH8PR11MB9508.namprd11.prod.outlook.com (2603:10b6:610:2bc::18) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9115.18; Fri, 19 Sep
- 2025 01:29:38 +0000
-Received: from BL1PR11MB5525.namprd11.prod.outlook.com
- ([fe80::1a2f:c489:24a5:da66]) by BL1PR11MB5525.namprd11.prod.outlook.com
- ([fe80::1a2f:c489:24a5:da66%6]) with mapi id 15.20.9137.015; Fri, 19 Sep 2025
- 01:29:38 +0000
-From: "Huang, Kai" <kai.huang@intel.com>
-To: "kvm@vger.kernel.org" <kvm@vger.kernel.org>, "linux-coco@lists.linux.dev"
-	<linux-coco@lists.linux.dev>, "Zhao, Yan Y" <yan.y.zhao@intel.com>,
-	"dave.hansen@linux.intel.com" <dave.hansen@linux.intel.com>, "kas@kernel.org"
-	<kas@kernel.org>, "seanjc@google.com" <seanjc@google.com>, "mingo@redhat.com"
-	<mingo@redhat.com>, "linux-kernel@vger.kernel.org"
-	<linux-kernel@vger.kernel.org>, "pbonzini@redhat.com" <pbonzini@redhat.com>,
-	"Yamahata, Isaku" <isaku.yamahata@intel.com>, "tglx@linutronix.de"
-	<tglx@linutronix.de>, "Annapurve, Vishal" <vannapurve@google.com>, "Gao,
- Chao" <chao.gao@intel.com>, "Edgecombe, Rick P" <rick.p.edgecombe@intel.com>,
-	"bp@alien8.de" <bp@alien8.de>, "x86@kernel.org" <x86@kernel.org>
-CC: "kirill.shutemov@linux.intel.com" <kirill.shutemov@linux.intel.com>
-Subject: Re: [PATCH v3 01/16] x86/tdx: Move all TDX error defines into
- <asm/shared/tdx_errno.h>
-Thread-Topic: [PATCH v3 01/16] x86/tdx: Move all TDX error defines into
- <asm/shared/tdx_errno.h>
-Thread-Index: AQHcKPMxZM5D8fzz+UCC7ed8PEA7hrSZt88A
-Date: Fri, 19 Sep 2025 01:29:38 +0000
-Message-ID: <56c3ac5d2b691e3c9aaaa9a8e2127d367e1bfd02.camel@intel.com>
-References: <20250918232224.2202592-1-rick.p.edgecombe@intel.com>
-	 <20250918232224.2202592-2-rick.p.edgecombe@intel.com>
-In-Reply-To: <20250918232224.2202592-2-rick.p.edgecombe@intel.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-user-agent: Evolution 3.56.2 (3.56.2-2.fc42) 
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: BL1PR11MB5525:EE_|CH8PR11MB9508:EE_
-x-ms-office365-filtering-correlation-id: 5e84d095-77fe-4583-e499-08ddf71bffa9
-x-ld-processed: 46c98d88-e344-4ed4-8496-4ed7712e255d,ExtAddr
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;ARA:13230040|1800799024|366016|7416014|376014|921020|38070700021;
-x-microsoft-antispam-message-info: =?utf-8?B?RG5oRm1KZFVsaFFlQTNtVmxSSjhEYUdJeGtPZWcrQXovVFFINEc3NmxhdGo0?=
- =?utf-8?B?NGpta2s2Mms4U25qMGkxTlpiQXI0NlRNSWg0enExMlJCQ0dST0R6ZkxjTmtN?=
- =?utf-8?B?SS9sOUlTci9oN0kwUngwQVA1VmppbTVSZUFnaDRoZ3gveDdJTGdwZTBCZnYr?=
- =?utf-8?B?MlFBeG5rZUVWN2YyWmVqdG0yZFV1Mlcwdy9URy9vN2M2SnBLS3N1UTN1UW5R?=
- =?utf-8?B?NVFDV01LSi9hcDVqSUFwU0xIcVlhY0Q0M2lpZmRWVTJWZUVGYkwxVG1hR20v?=
- =?utf-8?B?L1EzM085cjVDUVdnMWs4TzBGNndEVWRlaEVmQ3llZDRRRVErQlVxYWxUTmZI?=
- =?utf-8?B?U2dDUGxteGlXY2JuK0h0VThVY2hzNnBPenBCZUtrQWlyOHRDVEUyVEpuenRS?=
- =?utf-8?B?Rmg3c3JpNUFGWGlWbGpVdmMvRHF5Q0hheU5OWWwweWk2bXAzaXlvZXJrdlU3?=
- =?utf-8?B?ZzUrb3V3V3IzWGw4djVNQWR3MlJFdWlNNFMwSGdIS0ovcjlFZ0xtdGZtM3pC?=
- =?utf-8?B?SEo0L0ovdlYxeTBYRmN3TVFURytaM0xJZW05L2pGYlI1RXNPajdpOG10YWp2?=
- =?utf-8?B?QkFNQ21Ody9ETENNeGozTmVBQ2xIN2w1aEJ3SUpOTFJqV0VuV2F6Z215aHhG?=
- =?utf-8?B?YjlIZHFyaGpiY0hiQlR6NittVnV4UXlqR0pMc0MrTXFMblNyK2E3NSs3T2l4?=
- =?utf-8?B?OVMxYTAyNVMzbkVsR3hWWCtpOW9aOUcrVzQ4aDh2V1J6bzJjU3hhbURROG5Z?=
- =?utf-8?B?YnZha0dPUC9JM1lMb2dsaUlwQVl0SVRTWW5yUXVHdy9vWkRzUkRBVFdSWjhB?=
- =?utf-8?B?NEI3YVBNaVZQeWJZNGMvYXRYVFptRjRWSFI2bTI0a2I2M2pSNDVwZDg2QmNn?=
- =?utf-8?B?OU1DcVJyOTVsZkdYcU90cDNMVUxWdnk0R1ZyMXFhbk9WeFRDdmpyejMvYUMv?=
- =?utf-8?B?QkNoRm5WM0NqV0RqSHhFSGdqVS90R1dYZnZOVXlCWnE1cWt6OGEyT0VJUDlo?=
- =?utf-8?B?eExHY09NME5Od3ZPNmwydFBlMC9SYXBvcXF3UHhUTDNPd3ZZcmtMbUdjeEpS?=
- =?utf-8?B?c1hiVlJaZ0hvY0cyY0hSNVV2ZDdGbnJMblNJcEhDOGNGdzkxb2N2djMyUFRB?=
- =?utf-8?B?ektlVmU2WW9NTGdqVFNqSzF5djE0dlZWVk5IZWlPTk5GYXVyeGhpQmVNc2hT?=
- =?utf-8?B?d2g1a0d4dWFNajVVMVRkZDhBNTZqVkNldDliMU5KR1l5a3F1cHdQTW03SjhH?=
- =?utf-8?B?N1hTY0U3ODBaSEpFYmgrZ25CM3ZVVEYralhoeFV5OHBlcmE3Ymh6Z3NySkd5?=
- =?utf-8?B?SGIxOWpGRmtpaW42aFlyb3JBQjVaMHBpKzFwc25CeXdaZk1ScUVCWGV3U2NP?=
- =?utf-8?B?Vk9aQ1JGb1ZOMEQwaDZiQm5yWHBjWUsxOWVYTllQOTlwQzR0SGNwQkE1djRN?=
- =?utf-8?B?Um8xSHdSaUpsN1BjMGZZMTBPYXNranFwUkdTNDBRRndMdjc5eUt2V3F5NWgz?=
- =?utf-8?B?QnZoTkV0OFcyMWRBVHRuZEllaXE5WVE0RGd5d0NiY1pvM3dyb2JadHlGWnV5?=
- =?utf-8?B?VHBoSzdNTVpNcWhUWVdmeUVjZENUZXRDSk05dEpRWU9adHNKaStaQy9lRGpM?=
- =?utf-8?B?aEtSTitXVGhiaHIwSjdqVVZ2NWk1TWdBOXJydUVReVhRVjkrQk51VDVzdzRT?=
- =?utf-8?B?amlEVk52NjVXbzEwSDRucExJRVNaR2MwUnV4RWpqeUxrYUx6VDNCZ214bUIw?=
- =?utf-8?B?SUF0ZmxuMWx0SXlFS1Z6SEYrRG5mR1ZHbXhZd2JLZGlFVjBvQWo1MlJ4eDd2?=
- =?utf-8?B?Rk5pLzg1UURKUkdSa0p1SjlNNkUyeDlmcXlGYjhOOFhpTkFybVgya0pMTnhR?=
- =?utf-8?B?ZWwwVkh3czFhY09hVUMzcmJPbW5SQVJBbmNmSTlGTmZmWDh3WTBNYnY3MUl5?=
- =?utf-8?B?MGhhMW5JOVBaZnAwQzluOUxRYklEa1ZqU2JHb1NhcUVqUG1hd0NYRWNXWGQ4?=
- =?utf-8?Q?/i2PzebZJC3BYkvcrp8/XCraCvMoHs=3D?=
-x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BL1PR11MB5525.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(366016)(7416014)(376014)(921020)(38070700021);DIR:OUT;SFP:1101;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0: =?utf-8?B?U3ovT0J4WHI1cE9haXRwYllxWWVYVGhaZTFPOTdpem02c2NRNVE5NmMrQWw2?=
- =?utf-8?B?VVRvYnMrcm1Hd1Y1czFWZkZrTjV4M0Q3QVJLeHpidEhLdkdMMElzV1JCdTRM?=
- =?utf-8?B?SkhOTmc5SC9hQ2hEVDNBalA0eUEyc2t2VHNUQkNwMmE0MHp3RUpSblh6K21G?=
- =?utf-8?B?Snp0cGNTSkxXT1BzckpwSHJmRzN1MHNuanNucWFaTHJvR0hFOTlXb3l5Rmky?=
- =?utf-8?B?MjlpUGhpY1ovZ0xpcXhNdFVMLzBrYUdyV3paWkk4N295cjdtc3NLaWQ2SUYr?=
- =?utf-8?B?aXR3MVVWVUFRUHB6VFJ0K0RKYWFJS0ZSZmVJREJpaWJla0RJZXRtaS8zWmow?=
- =?utf-8?B?VmhwbzlCbDJObzZyamRJRW4xZUM1cG1MNjVTcW1VbWJkc2NhVlU3LzlLTS96?=
- =?utf-8?B?UlRFK1JRR1dqVG03NEFNTDQzTjZSMk9JeEN6UGdMaWoxSmtkTVJNZnR4ZWFj?=
- =?utf-8?B?ekEwQXdDSkxvejZkYXlrazVKWFJoSTRGS005Zi9pM1l4d0FJcU9YdUVwbWFz?=
- =?utf-8?B?WVA2WlpVVFk5RWxRUE16TkQvL09RU0RKeHNwU1hEdi9vcnE2TnJUM3FabmZn?=
- =?utf-8?B?ZDU3UEQ3K1ZybVVhWDF3ZzNFSU5VcjhSVGd1eGxTdWoydzJ5VUJFVGtDSXdn?=
- =?utf-8?B?MDJqSE9MNkRDRVNzVnhzNWs2aGZNLzArOFFkOHNHZWRFUUwwdGxyMXZDSHNK?=
- =?utf-8?B?cms3czBJV3crdHRDekZJV3MrWTNGQkQ2bVg1Zi81a0hxNGJiUmFRV2l3L3hP?=
- =?utf-8?B?eUdoUUdYRnFmS3lTa3JuSzZlOFVzNVZId0x2K053dDJISStKc3BaK01VUUow?=
- =?utf-8?B?cTRBZGhPZjVrZExadWd3OUkxVDR5elRoUlh1WmsyK29ZMVd4U2swMXhYdWEx?=
- =?utf-8?B?MEdTWCsramVMS1NUenQzcFcxVDcweFIyNTRhczZsYzZ1Rmp3ZG1QQm1icSs4?=
- =?utf-8?B?V3UrcncxcnpYSm1kdy9jbXdndVpxbWtmYXJzTlRRaXlWWmNVTXJvTzUrMHdz?=
- =?utf-8?B?a2FzYXYwU3ZNa0Y4aU0yUFBBRlFkVjJTU0x3b0U0UnhpZDZtVEZzRDNTUWxk?=
- =?utf-8?B?aTZPaGtnd2Y0alkrc0R4eGt2RWIvRzN1YUUySTJ4VEVZa3k2U3pUSm5lMkQr?=
- =?utf-8?B?NlpSZm5BRHRpbVJhZTNZTnR2RkxVOXdqTFhFZUxpRWFNbDBzc3ZZN2FMYnRF?=
- =?utf-8?B?TlUwTzVYeSttWFRQVHZia2FzdkdhT1pQVSsrS0FjakdKVEtVODQySFVnZTJB?=
- =?utf-8?B?TzdQMXFiRVRjQVBmRmVmc2JQYUhieXdDOGxKOTJMZ3JmaWMxQ1hmKzBqcjk0?=
- =?utf-8?B?aHBwdUI3OGwxeDRCM2M3UXp0MGx2cENxQnJhVGQrYnFkbTlaU054NkFuNWxy?=
- =?utf-8?B?UEpZL1lNU0lrWGlWNnlkN1ZjenFDckd0WTJ4ZnlObURMeUE5OUZjdmtjNnMw?=
- =?utf-8?B?TW9KeW1HbE5SV3V5em5VY04vSDZFcTN2MEhsS0VkeGVSOXZCYmc1KzJYMWc2?=
- =?utf-8?B?cDhoR3NFdTh1WTFPOURnSTJZZ1FCV1NmbkttMjJSQ0pKcWwyZXJrOFdFY3pp?=
- =?utf-8?B?LzBjZXZTT3JzdjUwNHY5U3NXSXkrK3VCRi9DcE1BRmZ0WDYvU0cwbVljTGU5?=
- =?utf-8?B?dW9PWWpFSEw2TGtHL2lYcGVveTlZU3VxclRYMDdUN2M5OHNsSnhEM2VDWG95?=
- =?utf-8?B?YUI0VytHOWhoRWFNZFhuVUNHdm9OR0VMN2pkUTNyM1hGWlE5NjVvVG9ZVVZQ?=
- =?utf-8?B?RnhwQXgwdGRGQTVvNDgzRnJlWmVkc28yTHYyMGhNQjI5SzdWRkk3ZXlaK1Bq?=
- =?utf-8?B?SU5Zc2R0djVkNmNyNGtWMHFJKzZNR3NkdURNRVRTZnRQS2hGQWFsU2w0eVVi?=
- =?utf-8?B?b2kvWDFhcmM1TTlSVDFid2JnZEp0OGpGbDhVQS9hS1RqeWNxTU16L2p6U0Zp?=
- =?utf-8?B?TGIzUytIOUtYQ2oyK3Vka0dKRDVuRGpBcThOKzc0STY2Z3F3b2RNenpmN0lI?=
- =?utf-8?B?bEFYRjJiZUZNUFNHV2xsSCtLQUdJcHdGS3NVSk1qVXphdWdEZG5MTXBWcEJ0?=
- =?utf-8?B?RWVqd2s4Y0Y4UzRjK0t1TThsbVhOOXdnK2hvbWUzaldFVGw3b3FTb3VxeE90?=
- =?utf-8?Q?aET+BfqG/ZP9mJDkmdRE7PEsH?=
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <E1EF154EF738E249BD0750277A0B009C@namprd11.prod.outlook.com>
-Content-Transfer-Encoding: base64
+Received: from mail.loongson.cn (mail.loongson.cn [114.242.206.163])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AB55E34BA29;
+	Fri, 19 Sep 2025 01:39:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=114.242.206.163
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1758246002; cv=none; b=T5YMHkZWK3TMBDJRxRMQxDTX3If8eIdd2f6XuOdYedGTXpNt/HXCSMENhHhQSQZivizn0CDXVOQb7impUrHRlSMk4MhdI1H4iCvL4VvCqbXHn8cK3kkx2Eq9tkY2gsT4eP5skoOjb3l42exgdWHMlQM6jm687R6JrTKTyaZ0tU0=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1758246002; c=relaxed/simple;
+	bh=QkVwto4FoSVDUqJ7/ZjcZwZ0G2bU4P9E42N+ULx1FxQ=;
+	h=Subject:To:Cc:References:From:Message-ID:Date:MIME-Version:
+	 In-Reply-To:Content-Type; b=D17rmAoKrdv2vrJCvuPrArdEp/8xxMssG1Yvx3ieA9vTMexaiiCoywJ/p92YTAmZ4x9x2byF79jO0XSWg0X6IGwBTiizijQlT99LvlRnKPCSw7jpW795JYYwv0xWrCrTg+IYFwf0BPnvT8uzAlfMslmHZ52eFTs0/tD9Gj2spkQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=loongson.cn; spf=pass smtp.mailfrom=loongson.cn; arc=none smtp.client-ip=114.242.206.163
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=loongson.cn
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=loongson.cn
+Received: from loongson.cn (unknown [10.20.42.62])
+	by gateway (Coremail) with SMTP id _____8BxE9BktMxoMREMAA--.25550S3;
+	Fri, 19 Sep 2025 09:39:48 +0800 (CST)
+Received: from [10.20.42.62] (unknown [10.20.42.62])
+	by front1 (Coremail) with SMTP id qMiowJDxrcFgtMxoxb2eAA--.23502S3;
+	Fri, 19 Sep 2025 09:39:46 +0800 (CST)
+Subject: Re: [PATCH] LoongArch: KVM: Fix VM migration failure with PTW enabled
+To: Huacai Chen <chenhuacai@kernel.org>
+Cc: WANG Xuerui <kernel@xen0n.name>, kvm@vger.kernel.org,
+ loongarch@lists.linux.dev, linux-kernel@vger.kernel.org
+References: <20250910071429.3925025-1-maobibo@loongson.cn>
+ <CAAhV-H65H_iREuETGU_v9oZdaPFoQj1VZV46XSNTC8ppENXzuQ@mail.gmail.com>
+ <3d3a72c2-7c91-7640-5f0b-7b95bd5f0d2e@loongson.cn>
+ <CAAhV-H4bEyeV7WkfSNBJnicMhhnSwj3PEr9K4ZpXwto1=JyWUw@mail.gmail.com>
+ <ff12ec30-b0df-aedd-a713-4fb77a4e092a@loongson.cn>
+ <CAAhV-H7AhUijxaW5oS6s4hCtWyEOgx8iaku2KhbK_6mZbRHYHQ@mail.gmail.com>
+From: Bibo Mao <maobibo@loongson.cn>
+Message-ID: <dc654dc5-e00a-9599-2238-40366942cc9c@loongson.cn>
+Date: Fri, 19 Sep 2025 09:37:37 +0800
+User-Agent: Mozilla/5.0 (X11; Linux loongarch64; rv:68.0) Gecko/20100101
+ Thunderbird/68.7.0
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: BL1PR11MB5525.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 5e84d095-77fe-4583-e499-08ddf71bffa9
-X-MS-Exchange-CrossTenant-originalarrivaltime: 19 Sep 2025 01:29:38.1771
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: fciSVJcwl2hrd4jdreS2BUcp98Pv59jDuxDNAz3sCBkuNy7z2J9SOBkTIn+qe4bOUa8QsAJS6sXRKJLGCSFRMg==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: CH8PR11MB9508
-X-OriginatorOrg: intel.com
+In-Reply-To: <CAAhV-H7AhUijxaW5oS6s4hCtWyEOgx8iaku2KhbK_6mZbRHYHQ@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+X-CM-TRANSID:qMiowJDxrcFgtMxoxb2eAA--.23502S3
+X-CM-SenderInfo: xpdruxter6z05rqj20fqof0/
+X-Coremail-Antispam: 1Uk129KBj93XoW3ZF1rAFW8Zr1xXw15Gr1xWFX_yoWDur47pF
+	W8GF4UAr48Jr17GrW2g3WqqrnrtrsrKF1xXF1UKw1UGF1Dtr1UZF18WrWY9F18J348G3W7
+	XF45Jry3W3y3tabCm3ZEXasCq-sJn29KB7ZKAUJUUUU8529EdanIXcx71UUUUU7KY7ZEXa
+	sCq-sGcSsGvfJ3Ic02F40EFcxC0VAKzVAqx4xG6I80ebIjqfuFe4nvWSU5nxnvy29KBjDU
+	0xBIdaVrnRJUUUvjb4IE77IF4wAFF20E14v26r1j6r4UM7CY07I20VC2zVCF04k26cxKx2
+	IYs7xG6rWj6s0DM7CIcVAFz4kK6r106r15M28lY4IEw2IIxxk0rwA2F7IY1VAKz4vEj48v
+	e4kI8wA2z4x0Y4vE2Ix0cI8IcVAFwI0_Xr0_Ar1l84ACjcxK6xIIjxv20xvEc7CjxVAFwI
+	0_Gr0_Cr1l84ACjcxK6I8E87Iv67AKxVW0oVCq3wA2z4x0Y4vEx4A2jsIEc7CjxVAFwI0_
+	GcCE3s1le2I262IYc4CY6c8Ij28IcVAaY2xG8wAqjxCEc2xF0cIa020Ex4CE44I27wAqx4
+	xG64xvF2IEw4CE5I8CrVC2j2WlYx0E2Ix0cI8IcVAFwI0_Jr0_Jr4lYx0Ex4A2jsIE14v2
+	6r1j6r4UMcvjeVCFs4IE7xkEbVWUJVW8JwACjcxG0xvEwIxGrwCYjI0SjxkI62AI1cAE67
+	vIY487MxAIw28IcxkI7VAKI48JMxC20s026xCaFVCjc4AY6r1j6r4UMI8I3I0E5I8CrVAF
+	wI0_Jr0_Jr4lx2IqxVCjr7xvwVAFwI0_JrI_JrWlx4CE17CEb7AF67AKxVWUAVWUtwCIc4
+	0Y0x0EwIxGrwCI42IY6xIIjxv20xvE14v26r1j6r1xMIIF0xvE2Ix0cI8IcVCY1x0267AK
+	xVWUJVW8JwCI42IY6xAIw20EY4v20xvaj40_Jr0_JF4lIxAIcVC2z280aVAFwI0_Jr0_Gr
+	1lIxAIcVC2z280aVCY1x0267AKxVWUJVW8JbIYCTnIWIevJa73UjIFyTuYvjxU25EfUUUU
+	U
 
-T24gVGh1LCAyMDI1LTA5LTE4IGF0IDE2OjIyIC0wNzAwLCBSaWNrIEVkZ2Vjb21iZSB3cm90ZToN
-Cj4gRnJvbTogIktpcmlsbCBBLiBTaHV0ZW1vdiIgPGtpcmlsbC5zaHV0ZW1vdkBsaW51eC5pbnRl
-bC5jb20+DQo+IA0KPiBUb2RheSB0aGVyZSBhcmUgdHdvIHNlcGFyYXRlIGxvY2F0aW9ucyB3aGVy
-ZSBURFggZXJyb3IgY29kZXMgYXJlIGRlZmluZWQ6DQo+ICAgICAgICAgIGFyY2gveDg2L2luY2x1
-ZGUvYXNtL3RkeC5oDQo+ICAgICAgICAgIGFyY2gveDg2L2t2bS92bXgvdGR4LmgNCj4gDQo+IFRo
-ZXkgaGF2ZSBzb21lIG92ZXJsYXAgdGhhdCBpcyBhbHJlYWR5IGRlZmluZWQgc2ltaWxhcmx5LiBS
-ZWR1Y2UgdGhlDQo+IGR1cGxpY2F0aW9uIGFuZCBwcmVwYXJlIHRvIGludHJvZHVjZSBzb21lIGhl
-bHBlcnMgZm9yIHRoZXNlIGVycm9yIGNvZGVzIGluDQo+IHRoZSBjZW50cmFsIHBsYWNlIGJ5IHVu
-aWZ5aW5nIHRoZW0uIEpvaW4gdGhlbSBhdDoNCj4gICAgICAgICBhc20vc2hhcmVkL3RkeF9lcnJu
-by5oDQo+IC4uLmFuZCB1cGRhdGUgdGhlIGhlYWRlcnMgdGhhdCBjb250YWluZWQgdGhlIGR1cGxp
-Y2F0ZWQgZGVmaW5pdGlvbnMgdG8NCj4gaW5jbHVkZSB0aGUgbmV3IHVuaWZpZWQgaGVhZGVyLg0K
-DQpUaGUgZXhpc3RpbmcgYXNtL3NoYXJlZC90ZHguaCBpcyB1c2VkIGZvciBzaGFyaW5nIFREWCBj
-b2RlIGJldHdlZW4gdGhlDQplYXJseSBjb21wcmVzc2VkIGNvZGUgYW5kIHRoZSBub3JtYWwga2Vy
-bmVsIGNvZGUgYWZ0ZXIgdGhhdCwgaS5lLiwgaXQncw0Kbm90IGZvciBzaGFyaW5nIGJldHdlZW4g
-VERYIGd1ZXN0IGFuZCBob3N0Lg0KDQpBbnkgcmVhc29uIHRvIHB1dCB0aGUgbmV3IHRkeF9lcnJu
-by5oIHVuZGVyIGFzbS9zaGFyZWQvID8NCg==
+
+
+On 2025/9/18 下午6:54, Huacai Chen wrote:
+> On Wed, Sep 17, 2025 at 9:11 AM Bibo Mao <maobibo@loongson.cn> wrote:
+>>
+>>
+>>
+>> On 2025/9/16 下午10:21, Huacai Chen wrote:
+>>> On Mon, Sep 15, 2025 at 9:22 AM Bibo Mao <maobibo@loongson.cn> wrote:
+>>>>
+>>>>
+>>>>
+>>>> On 2025/9/14 上午9:57, Huacai Chen wrote:
+>>>>> Hi, Bibo,
+>>>>>
+>>>>> On Wed, Sep 10, 2025 at 3:14 PM Bibo Mao <maobibo@loongson.cn> wrote:
+>>>>>>
+>>>>>> With PTW disabled system, bit Dirty is HW bit for page writing, however
+>>>>>> with PTW enabled system, bit Write is HW bit for page writing. Previously
+>>>>>> bit Write is treated as SW bit to record page writable attribute for fast
+>>>>>> page fault handling in the secondary MMU, however with PTW enabled machine,
+>>>>>> this bit is used by HW already.
+>>>>>>
+>>>>>> Here define KVM_PAGE_SOFT_WRITE with SW bit _PAGE_MODIFIED, so that it can
+>>>>>> work on both PTW disabled and enabled machines. And with HW write bit, both
+>>>>>> bit Dirty and Write is set or clear.
+>>>>>>
+>>>>>> Signed-off-by: Bibo Mao <maobibo@loongson.cn>
+>>>>>> ---
+>>>>>>     arch/loongarch/include/asm/kvm_mmu.h | 20 ++++++++++++++++----
+>>>>>>     arch/loongarch/kvm/mmu.c             |  8 ++++----
+>>>>>>     2 files changed, 20 insertions(+), 8 deletions(-)
+>>>>>>
+>>>>>> diff --git a/arch/loongarch/include/asm/kvm_mmu.h b/arch/loongarch/include/asm/kvm_mmu.h
+>>>>>> index 099bafc6f797..efcd593c42b1 100644
+>>>>>> --- a/arch/loongarch/include/asm/kvm_mmu.h
+>>>>>> +++ b/arch/loongarch/include/asm/kvm_mmu.h
+>>>>>> @@ -16,6 +16,13 @@
+>>>>>>      */
+>>>>>>     #define KVM_MMU_CACHE_MIN_PAGES        (CONFIG_PGTABLE_LEVELS - 1)
+>>>>>>
+>>>>>> +/*
+>>>>>> + * _PAGE_MODIFIED is SW pte bit, it records page ever written on host
+>>>>>> + * kernel, on secondary MMU it records page writable in order to fast
+>>>>>> + * path handling
+>>>>>> + */
+>>>>>> +#define KVM_PAGE_SOFT_WRITE    _PAGE_MODIFIED
+>>>>> KVM_PAGE_WRITEABLE is more suitable.
+>>>> both are ok for me.
+>>>>>
+>>>>>> +
+>>>>>>     #define _KVM_FLUSH_PGTABLE     0x1
+>>>>>>     #define _KVM_HAS_PGMASK                0x2
+>>>>>>     #define kvm_pfn_pte(pfn, prot) (((pfn) << PFN_PTE_SHIFT) | pgprot_val(prot))
+>>>>>> @@ -52,11 +59,16 @@ static inline void kvm_set_pte(kvm_pte_t *ptep, kvm_pte_t val)
+>>>>>>            WRITE_ONCE(*ptep, val);
+>>>>>>     }
+>>>>>>
+>>>>>> -static inline int kvm_pte_write(kvm_pte_t pte) { return pte & _PAGE_WRITE; }
+>>>>>> -static inline int kvm_pte_dirty(kvm_pte_t pte) { return pte & _PAGE_DIRTY; }
+>>>>>> +static inline int kvm_pte_soft_write(kvm_pte_t pte) { return pte & KVM_PAGE_SOFT_WRITE; }
+>>>>> The same, kvm_pte_mkwriteable() is more suitable.
+>>>> kvm_pte_writable()  here ?  and kvm_pte_mkwriteable() for the bellowing
+>>>> sentense.
+>>>>
+>>>> If so, that is ok, both are ok for me.
+>>> Yes.
+>>>
+>>>>>
+>>>>>> +static inline int kvm_pte_dirty(kvm_pte_t pte) { return pte & __WRITEABLE; }
+>>>>> _PAGE_DIRTY and _PAGE_WRITE are always set/cleared at the same time,
+>>>>> so the old version still works.
+>>>> Although it is workable, I still want to remove single bit _PAGE_DIRTY
+>>>> checking here.
+>>> I want to check a single bit because "kvm_pte_write() return
+>>> _PAGE_WRITE and kvm_pte_dirty() return _PAGE_DIRTY" looks more
+>>> natural.
+>> kvm_pte_write() is not needed any more and removed here. This is only
+>> kvm_pte_writable() to check software writable bit, kvm_pte_dirty() to
+>> check HW write bit.
+>>
+>> There is no reason to check single bit with _PAGE_WRITE or _PAGE_DIRTY,
+>> since there is different meaning on machines with/without HW PTW.
+> Applied together with other patches, you can test it.
+> https://git.kernel.org/pub/scm/linux/kernel/git/chenhuacai/linux-loongson.git/log/?h=loongarch-next
+yes, this branch passes to migrate on PTW enabled machines such as 3C6000.
+
+Regards
+Bibo Mao
+> 
+> Huacai
+> 
+>>
+>> Regards
+>> Bibo Mao
+>>>
+>>> You may argue that kvm_pte_mkdirty() set both _PAGE_WRITE and
+>>> _PAGE_DIRTY so kvm_pte_dirty() should also return both. But I think
+>>> kvm_pte_mkdirty() in this patch is just a "reasonable optimization".
+>>> Because strictly speaking, we need both kvm_pte_mkdirty() and
+>>> kvm_pte_mkwrite() and call the pair when needed.
+>>>
+>>> Huacai
+>>>
+>>>>
+>>>> Regards
+>>>> Bibo Mao
+>>>>>
+>>>>>>     static inline int kvm_pte_young(kvm_pte_t pte) { return pte & _PAGE_ACCESSED; }
+>>>>>>     static inline int kvm_pte_huge(kvm_pte_t pte) { return pte & _PAGE_HUGE; }
+>>>>>>
+>>>>>> +static inline kvm_pte_t kvm_pte_mksoft_write(kvm_pte_t pte)
+>>>>>> +{
+>>>>>> +       return pte | KVM_PAGE_SOFT_WRITE;
+>>>>>> +}
+>>>>>> +
+>>>>>>     static inline kvm_pte_t kvm_pte_mkyoung(kvm_pte_t pte)
+>>>>>>     {
+>>>>>>            return pte | _PAGE_ACCESSED;
+>>>>>> @@ -69,12 +81,12 @@ static inline kvm_pte_t kvm_pte_mkold(kvm_pte_t pte)
+>>>>>>
+>>>>>>     static inline kvm_pte_t kvm_pte_mkdirty(kvm_pte_t pte)
+>>>>>>     {
+>>>>>> -       return pte | _PAGE_DIRTY;
+>>>>>> +       return pte | __WRITEABLE;
+>>>>>>     }
+>>>>>>
+>>>>>>     static inline kvm_pte_t kvm_pte_mkclean(kvm_pte_t pte)
+>>>>>>     {
+>>>>>> -       return pte & ~_PAGE_DIRTY;
+>>>>>> +       return pte & ~__WRITEABLE;
+>>>>>>     }
+>>>>>>
+>>>>>>     static inline kvm_pte_t kvm_pte_mkhuge(kvm_pte_t pte)
+>>>>>> diff --git a/arch/loongarch/kvm/mmu.c b/arch/loongarch/kvm/mmu.c
+>>>>>> index ed956c5cf2cc..68749069290f 100644
+>>>>>> --- a/arch/loongarch/kvm/mmu.c
+>>>>>> +++ b/arch/loongarch/kvm/mmu.c
+>>>>>> @@ -569,7 +569,7 @@ static int kvm_map_page_fast(struct kvm_vcpu *vcpu, unsigned long gpa, bool writ
+>>>>>>            /* Track access to pages marked old */
+>>>>>>            new = kvm_pte_mkyoung(*ptep);
+>>>>>>            if (write && !kvm_pte_dirty(new)) {
+>>>>>> -               if (!kvm_pte_write(new)) {
+>>>>>> +               if (!kvm_pte_soft_write(new)) {
+>>>>>>                            ret = -EFAULT;
+>>>>>>                            goto out;
+>>>>>>                    }
+>>>>>> @@ -856,9 +856,9 @@ static int kvm_map_page(struct kvm_vcpu *vcpu, unsigned long gpa, bool write)
+>>>>>>                    prot_bits |= _CACHE_SUC;
+>>>>>>
+>>>>>>            if (writeable) {
+>>>>>> -               prot_bits |= _PAGE_WRITE;
+>>>>>> +               prot_bits = kvm_pte_mksoft_write(prot_bits);
+>>>>>>                    if (write)
+>>>>>> -                       prot_bits |= __WRITEABLE;
+>>>>>> +                       prot_bits = kvm_pte_mkdirty(prot_bits);
+>>>>>>            }
+>>>>>>
+>>>>>>            /* Disable dirty logging on HugePages */
+>>>>>> @@ -904,7 +904,7 @@ static int kvm_map_page(struct kvm_vcpu *vcpu, unsigned long gpa, bool write)
+>>>>>>            kvm_release_faultin_page(kvm, page, false, writeable);
+>>>>>>            spin_unlock(&kvm->mmu_lock);
+>>>>>>
+>>>>>> -       if (prot_bits & _PAGE_DIRTY)
+>>>>>> +       if (kvm_pte_dirty(prot_bits))
+>>>>>>                    mark_page_dirty_in_slot(kvm, memslot, gfn);
+>>>>>>
+>>>>>>     out:
+>>>>> To save time, I just change the whole patch like this, you can confirm
+>>>>> whether it woks:
+>>>>>
+>>>>> diff --git a/arch/loongarch/include/asm/kvm_mmu.h
+>>>>> b/arch/loongarch/include/asm/kvm_mmu.h
+>>>>> index 099bafc6f797..882f60c72b46 100644
+>>>>> --- a/arch/loongarch/include/asm/kvm_mmu.h
+>>>>> +++ b/arch/loongarch/include/asm/kvm_mmu.h
+>>>>> @@ -16,6 +16,13 @@
+>>>>>      */
+>>>>>     #define KVM_MMU_CACHE_MIN_PAGES        (CONFIG_PGTABLE_LEVELS - 1)
+>>>>>
+>>>>> +/*
+>>>>> + * _PAGE_MODIFIED is SW pte bit, it records page ever written on host
+>>>>> + * kernel, on secondary MMU it records page writable in order to fast
+>>>>> + * path handling
+>>>>> + */
+>>>>> +#define KVM_PAGE_WRITEABLE     _PAGE_MODIFIED
+>>>>> +
+>>>>>     #define _KVM_FLUSH_PGTABLE     0x1
+>>>>>     #define _KVM_HAS_PGMASK                0x2
+>>>>>     #define kvm_pfn_pte(pfn, prot) (((pfn) << PFN_PTE_SHIFT) |
+>>>>> pgprot_val(prot))
+>>>>> @@ -56,6 +63,7 @@ static inline int kvm_pte_write(kvm_pte_t pte) {
+>>>>> return pte & _PAGE_WRITE; }
+>>>>>     static inline int kvm_pte_dirty(kvm_pte_t pte) { return pte &
+>>>>> _PAGE_DIRTY; }
+>>>>>     static inline int kvm_pte_young(kvm_pte_t pte) { return pte &
+>>>>> _PAGE_ACCESSED; }
+>>>>>     static inline int kvm_pte_huge(kvm_pte_t pte) { return pte &
+>>>>> _PAGE_HUGE; }
+>>>>> +static inline int kvm_pte_writeable(kvm_pte_t pte) { return pte &
+>>>>> KVM_PAGE_WRITEABLE; }
+>>>>>
+>>>>>     static inline kvm_pte_t kvm_pte_mkyoung(kvm_pte_t pte)
+>>>>>     {
+>>>>> @@ -69,12 +77,12 @@ static inline kvm_pte_t kvm_pte_mkold(kvm_pte_t
+>>>>> pte)
+>>>>>
+>>>>>     static inline kvm_pte_t kvm_pte_mkdirty(kvm_pte_t pte)
+>>>>>     {
+>>>>> -       return pte | _PAGE_DIRTY;
+>>>>> +       return pte | __WRITEABLE;
+>>>>>     }
+>>>>>
+>>>>>     static inline kvm_pte_t kvm_pte_mkclean(kvm_pte_t pte)
+>>>>>     {
+>>>>> -       return pte & ~_PAGE_DIRTY;
+>>>>> +       return pte & ~__WRITEABLE;
+>>>>>     }
+>>>>>
+>>>>>     static inline kvm_pte_t kvm_pte_mkhuge(kvm_pte_t pte)
+>>>>> @@ -87,6 +95,11 @@ static inline kvm_pte_t kvm_pte_mksmall(kvm_pte_t
+>>>>> pte)
+>>>>>            return pte & ~_PAGE_HUGE;
+>>>>>     }
+>>>>>
+>>>>> +static inline kvm_pte_t kvm_pte_mkwriteable(kvm_pte_t pte)
+>>>>> +{
+>>>>> +       return pte | KVM_PAGE_WRITEABLE;
+>>>>> +}
+>>>>> +
+>>>>>     static inline int kvm_need_flush(kvm_ptw_ctx *ctx)
+>>>>>     {
+>>>>>            return ctx->flag & _KVM_FLUSH_PGTABLE;
+>>>>> diff --git a/arch/loongarch/kvm/mmu.c b/arch/loongarch/kvm/mmu.c
+>>>>> index ed956c5cf2cc..7c8143e79c12 100644
+>>>>> --- a/arch/loongarch/kvm/mmu.c
+>>>>> +++ b/arch/loongarch/kvm/mmu.c
+>>>>> @@ -569,7 +569,7 @@ static int kvm_map_page_fast(struct kvm_vcpu
+>>>>> *vcpu, unsigned long gpa, bool writ
+>>>>>            /* Track access to pages marked old */
+>>>>>            new = kvm_pte_mkyoung(*ptep);
+>>>>>            if (write && !kvm_pte_dirty(new)) {
+>>>>> -               if (!kvm_pte_write(new)) {
+>>>>> +               if (!kvm_pte_writeable(new)) {
+>>>>>                            ret = -EFAULT;
+>>>>>                            goto out;
+>>>>>                    }
+>>>>> @@ -856,9 +856,9 @@ static int kvm_map_page(struct kvm_vcpu *vcpu,
+>>>>> unsigned long gpa, bool write)
+>>>>>                    prot_bits |= _CACHE_SUC;
+>>>>>
+>>>>>            if (writeable) {
+>>>>> -               prot_bits |= _PAGE_WRITE;
+>>>>> +               prot_bits = kvm_pte_mkwriteable(prot_bits);
+>>>>>                    if (write)
+>>>>> -                       prot_bits |= __WRITEABLE;
+>>>>> +                       prot_bits = kvm_pte_mkdirty(prot_bits);
+>>>>>            }
+>>>>>
+>>>>>            /* Disable dirty logging on HugePages */
+>>>>> @@ -904,7 +904,7 @@ static int kvm_map_page(struct kvm_vcpu *vcpu,
+>>>>> unsigned long gpa, bool write)
+>>>>>            kvm_release_faultin_page(kvm, page, false, writeable);
+>>>>>            spin_unlock(&kvm->mmu_lock);
+>>>>>
+>>>>> -       if (prot_bits & _PAGE_DIRTY)
+>>>>> +       if (kvm_pte_dirty(prot_bits))
+>>>>>                    mark_page_dirty_in_slot(kvm, memslot, gfn);
+>>>>>
+>>>>>     out:
+>>>>>
+>>>>> Huacai
+>>>>>
+>>>>>>
+>>>>>> base-commit: 9dd1835ecda5b96ac88c166f4a87386f3e727bd9
+>>>>>> --
+>>>>>> 2.39.3
+>>>>>>
+>>>>>>
+>>>>
+>>
+>>
+
 
