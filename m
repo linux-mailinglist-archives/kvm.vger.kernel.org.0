@@ -1,174 +1,119 @@
-Return-Path: <kvm+bounces-58150-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-58151-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id CC79AB89DE2
-	for <lists+kvm@lfdr.de>; Fri, 19 Sep 2025 16:22:02 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 99F42B89ECC
+	for <lists+kvm@lfdr.de>; Fri, 19 Sep 2025 16:26:24 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 001CE189ADC0
-	for <lists+kvm@lfdr.de>; Fri, 19 Sep 2025 14:22:23 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 9E4771B2425C
+	for <lists+kvm@lfdr.de>; Fri, 19 Sep 2025 14:26:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7B6C030F94F;
-	Fri, 19 Sep 2025 14:21:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0E4AB314B62;
+	Fri, 19 Sep 2025 14:25:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="f6gI4Ftw"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="siktNYbf"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pj1-f74.google.com (mail-pj1-f74.google.com [209.85.216.74])
+Received: from mail-pg1-f201.google.com (mail-pg1-f201.google.com [209.85.215.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1ECA9304BD7
-	for <kvm@vger.kernel.org>; Fri, 19 Sep 2025 14:21:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.74
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AE6B63148A6
+	for <kvm@vger.kernel.org>; Fri, 19 Sep 2025 14:25:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758291712; cv=none; b=Mioa0CZautzlNespBl2e1cppNQ5C3pLKV1SAyr9PtoxaAWnq02DRFUqsX2zT+b4tXk4vm32d5Z99fFFv3xXXLPbPYnpZCOt/v9OCog2itQe0EqUzWd0uxHOAhbZySD/9Q3XUYRF1txFxz0QO3YJzHv81xgxyyLaJmW/xMy0JTrA=
+	t=1758291922; cv=none; b=Ud4PyBafzkpD3CkWqXNI13JyEkavdTYGcDUrP1DwDKTRvfzyFBDveGkH6OuIsPcKKdHfw85IEGsqKrIvnAoMIylJIXrKuqZ8Wrm8tqIm8hTuWliJBRF71YbzQ3aFtkSZIKBwoRnaVZIQAB2kQogNumU0vLaYTNjMq6yYM9qk2VM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758291712; c=relaxed/simple;
-	bh=2enupyLx6F97KhRTrAfwg8Fz0mcQGLhYQ0KBpTHeq4I=;
+	s=arc-20240116; t=1758291922; c=relaxed/simple;
+	bh=7W9wumr16Wg3vvyAELbNqNIP362OxWQp2AoZc56V6Nc=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=gDMcJSMGDu7OZQIrCXxw6wfZvETHL/ienwr072ZpqdrbyN6UXEcB3WF+6ADwtjOWcdrsPOVbheBryPvYjt2fzVgYsSdIbgnV9Hugz1EpxAW1JGz/2G5TqpCqjFRyzHY8lVxiR3QAUZRhJ1QbWXtcYSvwH1NURlx1tkcUsesSRP8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=f6gI4Ftw; arc=none smtp.client-ip=209.85.216.74
+	 To:Cc:Content-Type; b=LdNeC6Jyv38MRmwN5n8GZ7X+KrCjetXfzRVGH7keMBOXFholwB97TBnmMEvr4XLnGYnuHXXc53c5CiJHGT1oaVYAp94/N4Q17SBOpdXBL1hTmeqTMTS2d93u48t6xhnuahQO0XFOyBWqvDULkqgiFED7jcXmWG1kVC6rPm5nQKs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=siktNYbf; arc=none smtp.client-ip=209.85.215.201
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pj1-f74.google.com with SMTP id 98e67ed59e1d1-32ee4998c4aso2116771a91.1
-        for <kvm@vger.kernel.org>; Fri, 19 Sep 2025 07:21:50 -0700 (PDT)
+Received: by mail-pg1-f201.google.com with SMTP id 41be03b00d2f7-b550fab38e9so1175219a12.0
+        for <kvm@vger.kernel.org>; Fri, 19 Sep 2025 07:25:20 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1758291710; x=1758896510; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1758291920; x=1758896720; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=V/uLHhxqIz3m8Vu42q2Oa1AvnZOlqtDYHdgC57Vb9XU=;
-        b=f6gI4FtwkVZ0ujdMpBFjSY0HmKeSV/JjK944DIg9d+3QUQkwUYmcJ0nK/q9Rq6wnsA
-         /u0kfAocrisJDS3zvcrcuO4TbHRMqZAcq9Ro+vxrw6FfPb9Kil72hp/iOSbSlT8nsde6
-         fw5TL2XTGPq1QSkXjnVxGfnGrPfEOtggD4fD0901ko9joB2XP7sLMpWy5A8U1c5jZ9ta
-         XjTezV6TlAeEk60OSB8GlJT1jzNBkcQ0Q6kgp2pJyMejc2W/JeNEdQBekrxmvcJzqJeT
-         rJ4jZ+o9dfnPpKR49Gc3yogC/kAzZDowCZKjphRrKFb6SVCMV/TmufS58AZSaRYGVP0D
-         9tSw==
+        bh=Es4wbZQJbCTMrRymYAsVRRwPE+x7eh/fwfma+fUrYSQ=;
+        b=siktNYbfmSuPcOljG1/TcozWlHTVO5loOaAYMt6qcc+gQcQSqyognOLwdqMahOCHsO
+         sHafcSYF6sp68CEgsHln6cl8hDwripNzPcSQnZGRfV1gjWOrv7945oc4TNNZg9tz6KBB
+         I/rVplr2FF/oUvrsS7tsYkmn4dhDITNC9A5plVVRixYZxDYoRGidWJFP+ELWrsO2nb59
+         E5mMY5NSRPAS4QWNt/BgZOJxsFXMf0bzmV1duYH+RHUF2kprSJkaXuxsCUl75TIUDNcn
+         v+rG/pIEV1LKLyr/E4NR+f2vdo22Qf9Hp6k9vbWVq2QmtlKZp+OW9BmfUZnibE3QpDqK
+         Z5mg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1758291710; x=1758896510;
+        d=1e100.net; s=20230601; t=1758291920; x=1758896720;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=V/uLHhxqIz3m8Vu42q2Oa1AvnZOlqtDYHdgC57Vb9XU=;
-        b=BKGHEZ13YFaEdb3GQddqcaT2tCDkEKTnGiATRktTkonpM17JhlTWZjgaRhEYCEOIZ+
-         PsKsjH6a+Ew/VCxZvxaafbB4AERIkhAl0c9YmWw0Hmr+YI42x/lcBogInIoTI7wA9lQw
-         SUlX51rY+B7jddNKVv90ueei/K93tBAin2AiqgTPFHoxOhBPdsJ0bcBJMsLLNEOxLZ2+
-         0YGy/qcUqNXUvUMWRyWzqxd9Wxe87G3MCT7O+gYUA2Z8Y9YL2y015NvBeqLzy4/48ROD
-         TWt2Yo12bda+L93laD11rC5e2CUwGO2hn0XdtF4jvr+U2O1+aOro+h2vYrnJl+hkOLop
-         u2pA==
-X-Forwarded-Encrypted: i=1; AJvYcCWODPTWRH3F2UAnQqFMP35bOEf+xkRIfl9U3FkYU8fwcRPhMNQ+373VJ8PgT9CFS/+nzS0=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzMg/xqh/dvZnzwl85aHubAh27na1yUpx/YX+Je9gwa4cNGK+AP
-	qzql7Dw5Nw1wSpodzPtO8zamA7X0OnLoc8jdWCXbGYZuqaiaPNgtl+tFKy5OXr9TDOkBhQ1fH5H
-	zvpmrJw==
-X-Google-Smtp-Source: AGHT+IHeBhJRfXhX1utSR8FjMcRgOkPNwY6NH5APDiYqEBsMttZnRUvgdZ5oli+OY4U49DKENaA5x4J3i7A=
-X-Received: from pjbsq12.prod.google.com ([2002:a17:90b:530c:b0:32e:cc38:a694])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:3f48:b0:32e:2059:ee88
- with SMTP id 98e67ed59e1d1-33097fd0ec5mr4556569a91.6.1758291710340; Fri, 19
- Sep 2025 07:21:50 -0700 (PDT)
-Date: Fri, 19 Sep 2025 07:21:49 -0700
-In-Reply-To: <i4znbv2qka5nswuirlbm6ycjmeqmxtfflz6rbukzsdpfte7p3e@wez3k34xsrqa>
+        bh=Es4wbZQJbCTMrRymYAsVRRwPE+x7eh/fwfma+fUrYSQ=;
+        b=PhXlo3G1mESmVenidNGaDeD4viAJY6Oz82nxpYNqPlWk0FiP/+X/qP63zDHU1kFuMK
+         DXOwLC+qht1JpOysf/0L4s23ow6dmQ31rp0VgI49UErkfnV7cbXFZ/oRA/5jmTnm0/9W
+         7tzrTlWephxto1G9MG+qxqGihBYunNCFXNyQ0iD8JBKY6NFqW5acjbIqSWu5pS7ovP36
+         n+UGrOnyZj7hV09d72sPNGpiCFpOuHxE56It5WXz5U9ErQBboatsq5NRmARSKj3eHqU0
+         FARVfytmbkFDkQgo7HsMxqW+yRYYKE8wklcZFm6at1a2tlI1EXrWZCbKHOU2DcAt03IQ
+         oNLw==
+X-Forwarded-Encrypted: i=1; AJvYcCXx8U3jSNMz5Q2K1CzEy6jS3FSM41Cv8h37WaAaW1zk/746rjZ+oCNhQvbob8PLkV1B6MQ=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwAq8k0xnEV6fKTbGLxbmSioD/GpMCUTuWx3PqElk/4ZWPaa/f9
+	X5EVumBXJYdaHmgskaPHE+iTJo6rrn71hOXokRncOdjyR1f+B7Jfpm2xvyiciypTb1u1CaW/XZv
+	O6RZF8w==
+X-Google-Smtp-Source: AGHT+IFkOCaOupHcOkaXlHgn3Y4agoGfsg6u9VbIjaB+GyxpgmVATWVgXTBSwUQQUyL8VMUgJ9cUfq4k9rs=
+X-Received: from pjoo3.prod.google.com ([2002:a17:90b:5823:b0:32d:a0b1:2b03])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a05:6a20:9150:b0:246:682:83f1
+ with SMTP id adf61e73a8af0-29271ee19e2mr5659020637.43.1758291919771; Fri, 19
+ Sep 2025 07:25:19 -0700 (PDT)
+Date: Fri, 19 Sep 2025 07:25:18 -0700
+In-Reply-To: <9cedb525-a4a7-4a84-b07f-c6d9b793d9db@intel.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
-References: <20250919002136.1349663-1-seanjc@google.com> <20250919002136.1349663-3-seanjc@google.com>
- <i4znbv2qka5nswuirlbm6ycjmeqmxtfflz6rbukzsdpfte7p3e@wez3k34xsrqa>
-Message-ID: <aM1mVMXptK-sko3f@google.com>
-Subject: Re: [PATCH v3 2/6] KVM: SVM: Update "APICv in x2APIC without x2AVIC"
- in avic.c, not svm.c
+References: <20250912232319.429659-1-seanjc@google.com> <20250912232319.429659-20-seanjc@google.com>
+ <c140cdd4-b2cf-45d3-bb6a-b51954b78568@linux.intel.com> <aMxKA8toSFQ6hCTc@google.com>
+ <9cedb525-a4a7-4a84-b07f-c6d9b793d9db@intel.com>
+Message-ID: <aM1nzrldhASNKqOn@google.com>
+Subject: Re: [PATCH v15 19/41] KVM: x86: Enable CET virtualization for VMX and
+ advertise to userspace
 From: Sean Christopherson <seanjc@google.com>
-To: Naveen N Rao <naveen@kernel.org>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	Rick Edgecombe <rick.p.edgecombe@intel.com>, Chao Gao <chao.gao@intel.com>, Xin Li <xin@zytor.com>, 
-	Xiaoyao Li <xiaoyao.li@intel.com>, Binbin Wu <binbin.wu@linux.intel.com>, 
-	Yan Zhao <yan.y.zhao@intel.com>
+To: Xiaoyao Li <xiaoyao.li@intel.com>
+Cc: Binbin Wu <binbin.wu@linux.intel.com>, Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, Tom Lendacky <thomas.lendacky@amd.com>, 
+	Mathias Krause <minipli@grsecurity.net>, John Allen <john.allen@amd.com>, 
+	Rick Edgecombe <rick.p.edgecombe@intel.com>, Chao Gao <chao.gao@intel.com>, 
+	Maxim Levitsky <mlevitsk@redhat.com>, Zhang Yi Z <yi.z.zhang@linux.intel.com>
 Content-Type: text/plain; charset="us-ascii"
 
-+Intel folks (question at the bottom regarding vt_x86_ops)
-
-On Fri, Sep 19, 2025, Naveen N Rao wrote:
-> On Thu, Sep 18, 2025 at 05:21:32PM -0700, Sean Christopherson wrote:
-> > Set the "allow_apicv_in_x2apic_without_x2apic_virtualization" flag as part
-> > of avic_hardware_setup() instead of handling in svm_hardware_setup(), and
-> > make x2avic_enabled local to avic.c (setting the flag was the only use in
-> > svm.c).
+On Fri, Sep 19, 2025, Xiaoyao Li wrote:
+> On 9/19/2025 2:05 AM, Sean Christopherson wrote:
+> > On Thu, Sep 18, 2025, Binbin Wu wrote:
+> > > On 9/13/2025 7:22 AM, Sean Christopherson wrote:
+> > > [...]
+> > > > +static inline bool cpu_has_vmx_basic_no_hw_errcode(void)
+> > > > +{
+> > > > +	return	vmcs_config.basic & VMX_BASIC_NO_HW_ERROR_CODE_CC;
+> > > > +}
+> > > > +
+> > > 
+> > > I think "_cc" should be appended to the function name, although it would make
+> > > the function name longer. Without "_cc", the meaning is different and confusing.
 > > 
-> > Opportunistically tag avic_hardware_setup() with __init to make it clear
-> > that nothing untoward is happening with svm_x86_ops.
-> > 
-> > No functional change intended (aside from the side effects of tagging
-> > avic_hardware_setup() with __init).
-> > 
-> > Signed-off-by: Sean Christopherson <seanjc@google.com>
-> > ---
-> >  arch/x86/kvm/svm/avic.c | 6 ++++--
-> >  arch/x86/kvm/svm/svm.c  | 4 +---
-> >  arch/x86/kvm/svm/svm.h  | 3 +--
-> >  3 files changed, 6 insertions(+), 7 deletions(-)
-> > 
-> > diff --git a/arch/x86/kvm/svm/avic.c b/arch/x86/kvm/svm/avic.c
-> > index 478a18208a76..683411442476 100644
-> > --- a/arch/x86/kvm/svm/avic.c
-> > +++ b/arch/x86/kvm/svm/avic.c
-> > @@ -77,7 +77,7 @@ static DEFINE_HASHTABLE(svm_vm_data_hash, SVM_VM_DATA_HASH_BITS);
-> >  static u32 next_vm_id = 0;
-> >  static bool next_vm_id_wrapped = 0;
-> >  static DEFINE_SPINLOCK(svm_vm_data_hash_lock);
-> > -bool x2avic_enabled;
-> > +static bool x2avic_enabled;
-> >  
-> >  
-> >  static void avic_set_x2apic_msr_interception(struct vcpu_svm *svm,
-> > @@ -1147,7 +1147,7 @@ void avic_vcpu_unblocking(struct kvm_vcpu *vcpu)
-> >   * - Hypervisor can support both xAVIC and x2AVIC in the same guest.
-> >   * - The mode can be switched at run-time.
-> >   */
-> > -bool avic_hardware_setup(void)
-> > +bool __init avic_hardware_setup(struct kvm_x86_ops *svm_ops)
-> >  {
-> >  	if (!npt_enabled)
-> >  		return false;
-> > @@ -1182,6 +1182,8 @@ bool avic_hardware_setup(void)
-> >  	x2avic_enabled = boot_cpu_has(X86_FEATURE_X2AVIC);
-> >  	if (x2avic_enabled)
-> >  		pr_info("x2AVIC enabled\n");
-> > +	else
-> > +		svm_ops->allow_apicv_in_x2apic_without_x2apic_virtualization = true;
+> > +1, got it fixed up.
 > 
-> I'm not entirely convinced that this is better since svm_x86_ops fields 
-> are now being updated outside of svm.c.
+> May I ask what the 'CC' means?
 
-That doesn't bother me, e.g. the pmu_ops buried in svm_x86_ops come from
-arch/x86/kvm/svm/pmu.c.  Eww, and arch/x86/kvm/svm/svm_onhyperv.h already accesses
-svm_x86_ops, but in the grossest way possible.
+Consistency Check.  It's obviously a bit terse in this context, but it's a well-
+established acronym in KVM, so I think/hope someone that really wanted to figure
+out what it means could so with a bit of searching.
 
-FWIW, I don't love splitting the APIC virtualization updates between
-svm_hardware_setup() and avic_hardware_setup(), but overall I do think that's the
-best balance between bundling all code together and making it easy(ish) for
-readers to figure out what's going on.
+$ git grep -w CC | grep define
+svm/nested.c:#define CC KVM_NESTED_VMENTER_CONSISTENCY_CHECK
+vmx/hyperv.c:#define CC KVM_NESTED_VMENTER_CONSISTENCY_CHECK
+vmx/nested.c:#define CC KVM_NESTED_VMENTER_CONSISTENCY_CHECK
 
-> But, I do see your point about  limiting x2avic_enabled to avic.c
-> 
-> Would it be better to name this field as svm_x86_ops here too, so it is 
-> at least easy to grep and find?
-
-I didn't want to create a potential variable shadowing "problem".  The alternative
-would be to expose svm_x86_ops via svm.h.  That's not my first choice, but it's
-the route that was taken for the TDX vs. VMX split (vt_init_ops and vt_x86_ops
-are globally visible, even though they _could_ have been explicitly passed in
-as parameters to {tdx,vmx}_hardware_setup()).
-
-Question then.  Does anyone have a preference/opinion between explicitly passing
-in ops to vendor specific helpers, vs. making {svm,vt}_x86_ops globally visible?
-
-I don't love creating "hidden" dependencies, in quotes because in this case it's
-relatively easy to establish that the setup() helpers modify {svm,vt}_x86_ops,
-i.e. surprises should be rare.
-
-On the other hand, I do agree it's helpful to be able to see exactly where
-{svm,vt}_x86_ops are updated.
-
-And most importantly, I want to be consistent between VMX and SVM, i.e. I want
-to pick one and stick with it.
+$ git grep -w CC | wc -l
+156
 
