@@ -1,71 +1,71 @@
-Return-Path: <kvm+bounces-58092-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-58093-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 29033B8787B
-	for <lists+kvm@lfdr.de>; Fri, 19 Sep 2025 02:46:21 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 94DC3B8787E
+	for <lists+kvm@lfdr.de>; Fri, 19 Sep 2025 02:46:33 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id AC59C5650ED
-	for <lists+kvm@lfdr.de>; Fri, 19 Sep 2025 00:46:12 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C0F19564568
+	for <lists+kvm@lfdr.de>; Fri, 19 Sep 2025 00:46:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D46FB258EEF;
-	Fri, 19 Sep 2025 00:45:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 526E025A62E;
+	Fri, 19 Sep 2025 00:45:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="HqA7K8aD"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="y46bmjHf"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pj1-f73.google.com (mail-pj1-f73.google.com [209.85.216.73])
+Received: from mail-pl1-f201.google.com (mail-pl1-f201.google.com [209.85.214.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2A1272566D2
-	for <kvm@vger.kernel.org>; Fri, 19 Sep 2025 00:45:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.73
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B6699257852
+	for <kvm@vger.kernel.org>; Fri, 19 Sep 2025 00:45:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758242724; cv=none; b=C3AhUwHCx0K63S8mJnlvEsDPjbX6ColEw1ZUYeRfbRb+c0IB9i2NgACbs2+HVpJAuqJ+XvkMuJd3DgWIrUqZAHqmg8j471j+Sx58vI0GAfU4SPfUyEWKAd5/ruhcp85SgBFNkiVripM+JHqOrj8NquLmw7UbmmL2lErmhhpNX+M=
+	t=1758242725; cv=none; b=q/x3fuDxtXLnJywo80RUJzB2xaaOvhkCzstHFuhVc7Dq9aBg0dlaShsjERSbxaQ4nGBiax+nEee3xmSVDLQt3ROZj7tviBdfBsd5/odKFrbfGIdzpNOgLGLRKqCRDBCZmVhY8sbCb7zIZUI74Jpeex9JJuSLA/bkEiGR7WOHhdY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758242724; c=relaxed/simple;
-	bh=y/seMVy+n2WKrkuRdFkuPjRdrwjTyV6rxc7KmBNyaEc=;
+	s=arc-20240116; t=1758242725; c=relaxed/simple;
+	bh=pu5kp6pYW+tq5sBpPFCMOucqNiW0W1L/AzTSZAL567I=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=Cm0FI9MteZSxA3Q94Fz/hUzWFLkMGdDGxsJO9zp9HpZDoG+HXQhGwHauqtAs2sWqOmpL8w2/Tn8OBHaMv0f2eEW7itx/KH6yQxJxXIieCWQSDvuMcqStkzHsYZGoExdTFIekklsdO4zHJaNqIP76x5hZHKa/TQnWPwPtLgg1l5E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=HqA7K8aD; arc=none smtp.client-ip=209.85.216.73
+	 To:Cc:Content-Type; b=T05WzK82RTjks4BzP3MBTGO21hL8zjJ3weqvmxg4NFuqHmGr1WWsRvjLAn3DBBV+jHBOHwpf9IKQgVDfu/usesUp/HDB2npW9ePke8KbLHPEDrV2ztJYfl5/rP4EK3xZkFj9LOgJRYhJI7gCMDMR9j/DxmXxC08scXRZbQgx+5s=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=y46bmjHf; arc=none smtp.client-ip=209.85.214.201
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pj1-f73.google.com with SMTP id 98e67ed59e1d1-324e41e946eso2425863a91.0
-        for <kvm@vger.kernel.org>; Thu, 18 Sep 2025 17:45:21 -0700 (PDT)
+Received: by mail-pl1-f201.google.com with SMTP id d9443c01a7336-267fa90a2fbso28384895ad.1
+        for <kvm@vger.kernel.org>; Thu, 18 Sep 2025 17:45:23 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1758242721; x=1758847521; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1758242723; x=1758847523; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:reply-to:from:to:cc:subject:date:message-id:reply-to;
-        bh=8XWRINSrfIHcCfIWgI9zyBD2U4gnpJ5y2a7/S7VF5Jc=;
-        b=HqA7K8aDCuCDuIc5Hqn0PvTcF63u7dl7zHYy9PGcekkdgle6B1JeZTPR3E3JG0tzgm
-         Il8UHSdZPCmVJzF97B/OH79wp1a9Fk6b8vIdE5i7mDcyHQOlyEpyFpk1oDjRr4Lg0844
-         uwzISz0Ij4Cults8VpbcVwtlHaDKyFjcapekKX+HvasQmW/n6mTeU35/jDgfJa770cwS
-         y+VRleKW3njkK/sWILD+i0oKhZRfzrXcOxNphZRIXKYlLyBZpwBmysl2t+DUAl3Dcjb+
-         QMxhOW7rq0fW7gbg3eEtPAx4+yGQbdqf+V339SCiARZlqNRsn1f6bvjjmPVMS2J+gbyH
-         N/bQ==
+        bh=K3g1+aaL01ByoZzXTzpQww+Yiuz3bE8C4orevXKBlGM=;
+        b=y46bmjHfNM//N+tnuverzhAUKh6zhEwq0lyGxA+JraXRyV67jZIKPW8RToW6/UtZ9+
+         IPkAxHDOvAgNoeDosvObbOI6L8fZ5evd4JoBaGH+nUKZqPhGv+8lPyEhXaq8N+oDld1v
+         sRt4S26YqC1iESf9ySvyAcOdyOiecfm+qyjLselma9jrttbIYUQsemTI62f8RUEambHF
+         G4sDSrIwb6TB0L0I3Cfc1V9SwQuyYC2vF+Jb4Trxk3w07XKi6cmivhB7fJ2UGYtkiHeh
+         dWEoDJicnIroXMj/K1D6vkQ9kEYe54efJkaTWZzz5AAu0XrbZW+pw4apR7tgVZW46wv8
+         ciWg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1758242721; x=1758847521;
+        d=1e100.net; s=20230601; t=1758242723; x=1758847523;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:reply-to:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=8XWRINSrfIHcCfIWgI9zyBD2U4gnpJ5y2a7/S7VF5Jc=;
-        b=CuF/jsnSUi2AWGJbWdgzrYU46RD0K1/0CSJNxoaclhZeXb20Ovpst+v4YsjmJERyus
-         qQY9VcZtzkbgLqTnTnN+lYGKDNedW2GJXOMlAhTR+QQWQh7cqxNABUiv16PM2fDU9nOu
-         b4UzLzt9C7NvNlG3MdBvRbhBHHyxixcNc0s5igFzTfYZdjpbnHcqyL2YLSjsZGMyRH1m
-         HAQ8sxscBQTN2nUMENOG7pZvkd4Kp+xwsmoa6I+iwucW/4anwzcgJhUqhXaoG3WgQRKP
-         nMwfcltptyukkD33nxonX0bH3ommJybbP90ASebghDYQ0P/taOGa+lT3WCFPnTCfYvHS
-         vsZA==
-X-Gm-Message-State: AOJu0YwI0QjSs9vVKJWD2RMm5GkL22z7TnWOla/TDNyLLYpaAn5ZOWOq
-	WNpD8PgehluDUDbO7MSGpUzgR96hepuj+ZgFRqDLdkvhXm5dTIFhY25tqtGfmX9u+AQ6bGCbWkW
-	jKXO8qQ==
-X-Google-Smtp-Source: AGHT+IFlqFSE78I8H6DoSdEJHGBpeUjI/fKspB93yw3fdiNtIsVir90ZwUjXmIvbS26m1ju3QrxoTab4tXE=
-X-Received: from pjbpq15.prod.google.com ([2002:a17:90b:3d8f:b0:32e:d03b:ade9])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:164d:b0:32e:e150:8937
- with SMTP id 98e67ed59e1d1-33097fd4137mr1950022a91.6.1758242721467; Thu, 18
- Sep 2025 17:45:21 -0700 (PDT)
+        bh=K3g1+aaL01ByoZzXTzpQww+Yiuz3bE8C4orevXKBlGM=;
+        b=CBDRYKeX0GiCfRYf3R7d1bVPEs1XwZpvu+q6UC36of5KSS1XtThYCKBxwgCyEDEHiL
+         nSk9gd27NjnB5sVWYqgT2Lul+H8i7376wzJ5SeFt7OO9F3ZNjAOI4iavTyPwdwH3wMSW
+         oLb3bMd+x+SekqoX92NCjXzsIJAKxH14xGM2SkxzH0+X/WzERj0Cfxgzwc6sYNpZJyf0
+         Z13TniVhHgx+qsQbToA2WwHwl++5ZX625+OMOWw8cB0izFicExAoapBky/In5Bq/m+ws
+         mwLvTdCJ+SWWpGS990KhOS16o42uWgiD5G0LpHfrrstZrYhmx0DQD8ljNNAre9A0VzIZ
+         Nw0Q==
+X-Gm-Message-State: AOJu0YzGRc4r4UhuR5+F36n85z+PNn2cihxsm19QaYgTInQ4DwlFWhnx
+	F+VCtBO1SITit+xVFrO0J2rV3JGoaCYg+S7a01VyYPSnS77zj18dTS0uuK13oYSzZHMLMdT9Sus
+	dmABCyA==
+X-Google-Smtp-Source: AGHT+IFR49E4UblXd44Lqj4iHyLUQu+gME1thr5lLZEYp1+FSVWGE5J7nHz78BmbEwgwpc2lagPA2VtxBbY=
+X-Received: from pjbnw4.prod.google.com ([2002:a17:90b:2544:b0:32b:65c6:661a])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:902:e547:b0:251:a3b3:1572
+ with SMTP id d9443c01a7336-2697c815446mr66755475ad.9.1758242723280; Thu, 18
+ Sep 2025 17:45:23 -0700 (PDT)
 Reply-To: Sean Christopherson <seanjc@google.com>
-Date: Thu, 18 Sep 2025 17:45:11 -0700
+Date: Thu, 18 Sep 2025 17:45:12 -0700
 In-Reply-To: <20250919004512.1359828-1-seanjc@google.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
@@ -75,8 +75,9 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
 References: <20250919004512.1359828-1-seanjc@google.com>
 X-Mailer: git-send-email 2.51.0.470.ga7dc726c21-goog
-Message-ID: <20250919004512.1359828-5-seanjc@google.com>
-Subject: [PATCH v3 4/5] KVM: selftests: Validate more arch-events in pmu_counters_test
+Message-ID: <20250919004512.1359828-6-seanjc@google.com>
+Subject: [PATCH v3 5/5] KVM: selftests: Handle Intel Atom errata that leads to
+ PMU event overcount
 From: Sean Christopherson <seanjc@google.com>
 To: Sean Christopherson <seanjc@google.com>, Paolo Bonzini <pbonzini@redhat.com>
 Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
@@ -84,122 +85,203 @@ Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
 	dongsheng <dongsheng.x.zhang@intel.com>
 Content-Type: text/plain; charset="UTF-8"
 
-From: Dapeng Mi <dapeng1.mi@linux.intel.com>
+From: dongsheng <dongsheng.x.zhang@intel.com>
 
-Add support for 5 new architectural events (4 topdown level 1 metrics
-events and LBR inserts event) that will first show up in Intel's
-Clearwater Forest CPUs.  Detailed info about the new events can be found
-in SDM section 21.2.7 "Pre-defined Architectural  Performance Events".
+Add a PMU errata framework and use it to relax precise event counts on
+Atom platforms that overcount "Instruction Retired" and "Branch Instruction
+Retired" events, as the overcount issues on VM-Exit/VM-Entry are impossible
+to prevent from userspace, e.g. the test can't prevent host IRQs.
 
+Setup errata during early initialization and automatically sync the mask
+to VMs so that tests can check for errata without having to manually
+manage host=>guest variables.
+
+For Intel Atom CPUs, the PMU events "Instruction Retired" or
+"Branch Instruction Retired" may be overcounted for some certain
+instructions, like FAR CALL/JMP, RETF, IRET, VMENTRY/VMEXIT/VMPTRLD
+and complex SGX/SMX/CSTATE instructions/flows.
+
+The detailed information can be found in the errata (section SRF7):
+https://edc.intel.com/content/www/us/en/design/products-and-solutions/processors-and-chipsets/sierra-forest/xeon-6700-series-processor-with-e-cores-specification-update/errata-details/
+
+For the Atom platforms before Sierra Forest (including Sierra Forest),
+Both 2 events "Instruction Retired" and "Branch Instruction Retired" would
+be overcounted on these certain instructions, but for Clearwater Forest
+only "Instruction Retired" event is overcounted on these instructions.
+
+Signed-off-by: dongsheng <dongsheng.x.zhang@intel.com>
+Co-developed-by: Dapeng Mi <dapeng1.mi@linux.intel.com>
 Signed-off-by: Dapeng Mi <dapeng1.mi@linux.intel.com>
 Tested-by: Yi Lai <yi1.lai@intel.com>
-[sean: drop "unavailable_mask" changes]
+Co-developed-by: Sean Christopherson <seanjc@google.com>
 Signed-off-by: Sean Christopherson <seanjc@google.com>
 ---
- tools/testing/selftests/kvm/include/x86/pmu.h       | 10 ++++++++++
- tools/testing/selftests/kvm/include/x86/processor.h |  7 ++++++-
- tools/testing/selftests/kvm/lib/x86/pmu.c           |  5 +++++
- tools/testing/selftests/kvm/x86/pmu_counters_test.c |  8 ++++++++
- 4 files changed, 29 insertions(+), 1 deletion(-)
+ tools/testing/selftests/kvm/include/x86/pmu.h | 14 ++++++
+ tools/testing/selftests/kvm/lib/x86/pmu.c     | 44 +++++++++++++++++++
+ .../testing/selftests/kvm/lib/x86/processor.c |  4 ++
+ .../selftests/kvm/x86/pmu_counters_test.c     | 12 ++++-
+ .../selftests/kvm/x86/pmu_event_filter_test.c |  4 +-
+ 5 files changed, 75 insertions(+), 3 deletions(-)
 
 diff --git a/tools/testing/selftests/kvm/include/x86/pmu.h b/tools/testing/selftests/kvm/include/x86/pmu.h
-index 3c10c4dc0ae8..2aabda2da002 100644
+index 2aabda2da002..25d2b476daf4 100644
 --- a/tools/testing/selftests/kvm/include/x86/pmu.h
 +++ b/tools/testing/selftests/kvm/include/x86/pmu.h
-@@ -61,6 +61,11 @@
- #define	INTEL_ARCH_BRANCHES_RETIRED		RAW_EVENT(0xc4, 0x00)
- #define	INTEL_ARCH_BRANCHES_MISPREDICTED	RAW_EVENT(0xc5, 0x00)
- #define	INTEL_ARCH_TOPDOWN_SLOTS		RAW_EVENT(0xa4, 0x01)
-+#define	INTEL_ARCH_TOPDOWN_BE_BOUND		RAW_EVENT(0xa4, 0x02)
-+#define	INTEL_ARCH_TOPDOWN_BAD_SPEC		RAW_EVENT(0x73, 0x00)
-+#define	INTEL_ARCH_TOPDOWN_FE_BOUND		RAW_EVENT(0x9c, 0x01)
-+#define	INTEL_ARCH_TOPDOWN_RETIRING		RAW_EVENT(0xc2, 0x02)
-+#define	INTEL_ARCH_LBR_INSERTS			RAW_EVENT(0xe4, 0x01)
+@@ -5,6 +5,7 @@
+ #ifndef SELFTEST_KVM_PMU_H
+ #define SELFTEST_KVM_PMU_H
  
- #define	AMD_ZEN_CORE_CYCLES			RAW_EVENT(0x76, 0x00)
- #define	AMD_ZEN_INSTRUCTIONS_RETIRED		RAW_EVENT(0xc0, 0x00)
-@@ -80,6 +85,11 @@ enum intel_pmu_architectural_events {
- 	INTEL_ARCH_BRANCHES_RETIRED_INDEX,
- 	INTEL_ARCH_BRANCHES_MISPREDICTED_INDEX,
- 	INTEL_ARCH_TOPDOWN_SLOTS_INDEX,
-+	INTEL_ARCH_TOPDOWN_BE_BOUND_INDEX,
-+	INTEL_ARCH_TOPDOWN_BAD_SPEC_INDEX,
-+	INTEL_ARCH_TOPDOWN_FE_BOUND_INDEX,
-+	INTEL_ARCH_TOPDOWN_RETIRING_INDEX,
-+	INTEL_ARCH_LBR_INSERTS_INDEX,
- 	NR_INTEL_ARCH_EVENTS,
- };
++#include <stdbool.h>
+ #include <stdint.h>
  
-diff --git a/tools/testing/selftests/kvm/include/x86/processor.h b/tools/testing/selftests/kvm/include/x86/processor.h
-index efcc4b1de523..e8bad89fbb7f 100644
---- a/tools/testing/selftests/kvm/include/x86/processor.h
-+++ b/tools/testing/selftests/kvm/include/x86/processor.h
-@@ -265,7 +265,7 @@ struct kvm_x86_cpu_property {
- #define X86_PROPERTY_PMU_NR_GP_COUNTERS		KVM_X86_CPU_PROPERTY(0xa, 0, EAX, 8, 15)
- #define X86_PROPERTY_PMU_GP_COUNTERS_BIT_WIDTH	KVM_X86_CPU_PROPERTY(0xa, 0, EAX, 16, 23)
- #define X86_PROPERTY_PMU_EBX_BIT_VECTOR_LENGTH	KVM_X86_CPU_PROPERTY(0xa, 0, EAX, 24, 31)
--#define X86_PROPERTY_PMU_EVENTS_MASK		KVM_X86_CPU_PROPERTY(0xa, 0, EBX, 0, 7)
-+#define X86_PROPERTY_PMU_EVENTS_MASK		KVM_X86_CPU_PROPERTY(0xa, 0, EBX, 0, 12)
- #define X86_PROPERTY_PMU_FIXED_COUNTERS_BITMASK	KVM_X86_CPU_PROPERTY(0xa, 0, ECX, 0, 31)
- #define X86_PROPERTY_PMU_NR_FIXED_COUNTERS	KVM_X86_CPU_PROPERTY(0xa, 0, EDX, 0, 4)
- #define X86_PROPERTY_PMU_FIXED_COUNTERS_BIT_WIDTH	KVM_X86_CPU_PROPERTY(0xa, 0, EDX, 5, 12)
-@@ -332,6 +332,11 @@ struct kvm_x86_pmu_feature {
- #define X86_PMU_FEATURE_BRANCH_INSNS_RETIRED		KVM_X86_PMU_FEATURE(EBX, 5)
- #define X86_PMU_FEATURE_BRANCHES_MISPREDICTED		KVM_X86_PMU_FEATURE(EBX, 6)
- #define X86_PMU_FEATURE_TOPDOWN_SLOTS			KVM_X86_PMU_FEATURE(EBX, 7)
-+#define X86_PMU_FEATURE_TOPDOWN_BE_BOUND		KVM_X86_PMU_FEATURE(EBX, 8)
-+#define X86_PMU_FEATURE_TOPDOWN_BAD_SPEC		KVM_X86_PMU_FEATURE(EBX, 9)
-+#define X86_PMU_FEATURE_TOPDOWN_FE_BOUND		KVM_X86_PMU_FEATURE(EBX, 10)
-+#define X86_PMU_FEATURE_TOPDOWN_RETIRING		KVM_X86_PMU_FEATURE(EBX, 11)
-+#define X86_PMU_FEATURE_LBR_INSERTS			KVM_X86_PMU_FEATURE(EBX, 12)
+ #define KVM_PMU_EVENT_FILTER_MAX_EVENTS			300
+@@ -104,4 +105,17 @@ enum amd_pmu_zen_events {
+ extern const uint64_t intel_pmu_arch_events[];
+ extern const uint64_t amd_pmu_zen_events[];
  
- #define X86_PMU_FEATURE_INSNS_RETIRED_FIXED		KVM_X86_PMU_FEATURE(ECX, 0)
- #define X86_PMU_FEATURE_CPU_CYCLES_FIXED		KVM_X86_PMU_FEATURE(ECX, 1)
++enum pmu_errata {
++	INSTRUCTIONS_RETIRED_OVERCOUNT,
++	BRANCHES_RETIRED_OVERCOUNT,
++};
++extern uint64_t pmu_errata_mask;
++
++void kvm_init_pmu_errata(void);
++
++static inline bool this_pmu_has_errata(enum pmu_errata errata)
++{
++	return pmu_errata_mask & errata;
++}
++
+ #endif /* SELFTEST_KVM_PMU_H */
 diff --git a/tools/testing/selftests/kvm/lib/x86/pmu.c b/tools/testing/selftests/kvm/lib/x86/pmu.c
-index f31f0427c17c..5ab44bf54773 100644
+index 5ab44bf54773..34cb57d1d671 100644
 --- a/tools/testing/selftests/kvm/lib/x86/pmu.c
 +++ b/tools/testing/selftests/kvm/lib/x86/pmu.c
-@@ -19,6 +19,11 @@ const uint64_t intel_pmu_arch_events[] = {
- 	INTEL_ARCH_BRANCHES_RETIRED,
- 	INTEL_ARCH_BRANCHES_MISPREDICTED,
- 	INTEL_ARCH_TOPDOWN_SLOTS,
-+	INTEL_ARCH_TOPDOWN_BE_BOUND,
-+	INTEL_ARCH_TOPDOWN_BAD_SPEC,
-+	INTEL_ARCH_TOPDOWN_FE_BOUND,
-+	INTEL_ARCH_TOPDOWN_RETIRING,
-+	INTEL_ARCH_LBR_INSERTS,
- };
- kvm_static_assert(ARRAY_SIZE(intel_pmu_arch_events) == NR_INTEL_ARCH_EVENTS);
+@@ -8,6 +8,7 @@
+ #include <linux/kernel.h>
  
+ #include "kvm_util.h"
++#include "processor.h"
+ #include "pmu.h"
+ 
+ const uint64_t intel_pmu_arch_events[] = {
+@@ -34,3 +35,46 @@ const uint64_t amd_pmu_zen_events[] = {
+ 	AMD_ZEN_BRANCHES_MISPREDICTED,
+ };
+ kvm_static_assert(ARRAY_SIZE(amd_pmu_zen_events) == NR_AMD_ZEN_EVENTS);
++
++/*
++ * For Intel Atom CPUs, the PMU events "Instruction Retired" or
++ * "Branch Instruction Retired" may be overcounted for some certain
++ * instructions, like FAR CALL/JMP, RETF, IRET, VMENTRY/VMEXIT/VMPTRLD
++ * and complex SGX/SMX/CSTATE instructions/flows.
++ *
++ * The detailed information can be found in the errata (section SRF7):
++ * https://edc.intel.com/content/www/us/en/design/products-and-solutions/processors-and-chipsets/sierra-forest/xeon-6700-series-processor-with-e-cores-specification-update/errata-details/
++ *
++ * For the Atom platforms before Sierra Forest (including Sierra Forest),
++ * Both 2 events "Instruction Retired" and "Branch Instruction Retired" would
++ * be overcounted on these certain instructions, but for Clearwater Forest
++ * only "Instruction Retired" event is overcounted on these instructions.
++ */
++static uint64_t get_pmu_errata(void)
++{
++	if (!this_cpu_is_intel())
++		return 0;
++
++	if (this_cpu_family() != 0x6)
++		return 0;
++
++	switch (this_cpu_model()) {
++	case 0xDD: /* Clearwater Forest */
++		return BIT_ULL(INSTRUCTIONS_RETIRED_OVERCOUNT);
++	case 0xAF: /* Sierra Forest */
++	case 0x4D: /* Avaton, Rangely */
++	case 0x5F: /* Denverton */
++	case 0x86: /* Jacobsville */
++		return BIT_ULL(INSTRUCTIONS_RETIRED_OVERCOUNT) |
++		       BIT_ULL(BRANCHES_RETIRED_OVERCOUNT);
++	default:
++		return 0;
++	}
++}
++
++uint64_t pmu_errata_mask;
++
++void kvm_init_pmu_errata(void)
++{
++	pmu_errata_mask = get_pmu_errata();
++}
+diff --git a/tools/testing/selftests/kvm/lib/x86/processor.c b/tools/testing/selftests/kvm/lib/x86/processor.c
+index 3b63c99f7b96..4402d2e1ea69 100644
+--- a/tools/testing/selftests/kvm/lib/x86/processor.c
++++ b/tools/testing/selftests/kvm/lib/x86/processor.c
+@@ -6,6 +6,7 @@
+ #include "linux/bitmap.h"
+ #include "test_util.h"
+ #include "kvm_util.h"
++#include "pmu.h"
+ #include "processor.h"
+ #include "sev.h"
+ 
+@@ -638,6 +639,7 @@ void kvm_arch_vm_post_create(struct kvm_vm *vm)
+ 	sync_global_to_guest(vm, host_cpu_is_intel);
+ 	sync_global_to_guest(vm, host_cpu_is_amd);
+ 	sync_global_to_guest(vm, is_forced_emulation_enabled);
++	sync_global_to_guest(vm, pmu_errata_mask);
+ 
+ 	if (is_sev_vm(vm)) {
+ 		struct kvm_sev_init init = { 0 };
+@@ -1269,6 +1271,8 @@ void kvm_selftest_arch_init(void)
+ 	host_cpu_is_intel = this_cpu_is_intel();
+ 	host_cpu_is_amd = this_cpu_is_amd();
+ 	is_forced_emulation_enabled = kvm_is_forced_emulation_enabled();
++
++	kvm_init_pmu_errata();
+ }
+ 
+ bool sys_clocksource_is_based_on_tsc(void)
 diff --git a/tools/testing/selftests/kvm/x86/pmu_counters_test.c b/tools/testing/selftests/kvm/x86/pmu_counters_test.c
-index e805882bc306..baa7b8a2d459 100644
+index baa7b8a2d459..acb5a5c37296 100644
 --- a/tools/testing/selftests/kvm/x86/pmu_counters_test.c
 +++ b/tools/testing/selftests/kvm/x86/pmu_counters_test.c
-@@ -75,6 +75,11 @@ static struct kvm_intel_pmu_event intel_event_to_feature(uint8_t idx)
- 		[INTEL_ARCH_BRANCHES_RETIRED_INDEX]	 = { X86_PMU_FEATURE_BRANCH_INSNS_RETIRED, X86_PMU_FEATURE_NULL },
- 		[INTEL_ARCH_BRANCHES_MISPREDICTED_INDEX] = { X86_PMU_FEATURE_BRANCHES_MISPREDICTED, X86_PMU_FEATURE_NULL },
- 		[INTEL_ARCH_TOPDOWN_SLOTS_INDEX]	 = { X86_PMU_FEATURE_TOPDOWN_SLOTS, X86_PMU_FEATURE_TOPDOWN_SLOTS_FIXED },
-+		[INTEL_ARCH_TOPDOWN_BE_BOUND_INDEX]	 = { X86_PMU_FEATURE_TOPDOWN_BE_BOUND, X86_PMU_FEATURE_NULL },
-+		[INTEL_ARCH_TOPDOWN_BAD_SPEC_INDEX]	 = { X86_PMU_FEATURE_TOPDOWN_BAD_SPEC, X86_PMU_FEATURE_NULL },
-+		[INTEL_ARCH_TOPDOWN_FE_BOUND_INDEX]	 = { X86_PMU_FEATURE_TOPDOWN_FE_BOUND, X86_PMU_FEATURE_NULL },
-+		[INTEL_ARCH_TOPDOWN_RETIRING_INDEX]	 = { X86_PMU_FEATURE_TOPDOWN_RETIRING, X86_PMU_FEATURE_NULL },
-+		[INTEL_ARCH_LBR_INSERTS_INDEX]		 = { X86_PMU_FEATURE_LBR_INSERTS, X86_PMU_FEATURE_NULL },
- 	};
+@@ -163,10 +163,18 @@ static void guest_assert_event_count(uint8_t idx, uint32_t pmc, uint32_t pmc_msr
  
- 	kvm_static_assert(ARRAY_SIZE(__intel_event_to_feature) == NR_INTEL_ARCH_EVENTS);
-@@ -171,9 +176,12 @@ static void guest_assert_event_count(uint8_t idx, uint32_t pmc, uint32_t pmc_msr
- 		fallthrough;
- 	case INTEL_ARCH_CPU_CYCLES_INDEX:
- 	case INTEL_ARCH_REFERENCE_CYCLES_INDEX:
-+	case INTEL_ARCH_TOPDOWN_BE_BOUND_INDEX:
-+	case INTEL_ARCH_TOPDOWN_FE_BOUND_INDEX:
- 		GUEST_ASSERT_NE(count, 0);
+ 	switch (idx) {
+ 	case INTEL_ARCH_INSTRUCTIONS_RETIRED_INDEX:
+-		GUEST_ASSERT_EQ(count, NUM_INSNS_RETIRED);
++		/* Relax precise count check due to VM-EXIT/VM-ENTRY overcount issue */
++		if (this_pmu_has_errata(INSTRUCTIONS_RETIRED_OVERCOUNT))
++			GUEST_ASSERT(count >= NUM_INSNS_RETIRED);
++		else
++			GUEST_ASSERT_EQ(count, NUM_INSNS_RETIRED);
  		break;
- 	case INTEL_ARCH_TOPDOWN_SLOTS_INDEX:
-+	case INTEL_ARCH_TOPDOWN_RETIRING_INDEX:
- 		__GUEST_ASSERT(count >= NUM_INSNS_RETIRED,
- 			       "Expected top-down slots >= %u, got count = %lu",
- 			       NUM_INSNS_RETIRED, count);
+ 	case INTEL_ARCH_BRANCHES_RETIRED_INDEX:
+-		GUEST_ASSERT_EQ(count, NUM_BRANCH_INSNS_RETIRED);
++		/* Relax precise count check due to VM-EXIT/VM-ENTRY overcount issue */
++		if (this_pmu_has_errata(BRANCHES_RETIRED_OVERCOUNT))
++			GUEST_ASSERT(count >= NUM_BRANCH_INSNS_RETIRED);
++		else
++			GUEST_ASSERT_EQ(count, NUM_BRANCH_INSNS_RETIRED);
+ 		break;
+ 	case INTEL_ARCH_LLC_REFERENCES_INDEX:
+ 	case INTEL_ARCH_LLC_MISSES_INDEX:
+diff --git a/tools/testing/selftests/kvm/x86/pmu_event_filter_test.c b/tools/testing/selftests/kvm/x86/pmu_event_filter_test.c
+index c15513cd74d1..1c5b7611db24 100644
+--- a/tools/testing/selftests/kvm/x86/pmu_event_filter_test.c
++++ b/tools/testing/selftests/kvm/x86/pmu_event_filter_test.c
+@@ -214,8 +214,10 @@ static void remove_event(struct __kvm_pmu_event_filter *f, uint64_t event)
+ do {											\
+ 	uint64_t br = pmc_results.branches_retired;					\
+ 	uint64_t ir = pmc_results.instructions_retired;					\
++	bool br_matched = this_pmu_has_errata(BRANCHES_RETIRED_OVERCOUNT) ?		\
++			  br >= NUM_BRANCHES : br == NUM_BRANCHES;			\
+ 											\
+-	if (br && br != NUM_BRANCHES)							\
++	if (br && !br_matched)								\
+ 		pr_info("%s: Branch instructions retired = %lu (expected %u)\n",	\
+ 			__func__, br, NUM_BRANCHES);					\
+ 	TEST_ASSERT(br, "%s: Branch instructions retired = %lu (expected > 0)",		\
 -- 
 2.51.0.470.ga7dc726c21-goog
 
