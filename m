@@ -1,119 +1,132 @@
-Return-Path: <kvm+bounces-58157-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-58158-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 678D9B8A6EF
-	for <lists+kvm@lfdr.de>; Fri, 19 Sep 2025 17:53:23 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 89171B8A740
+	for <lists+kvm@lfdr.de>; Fri, 19 Sep 2025 17:58:14 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6D05217193E
-	for <lists+kvm@lfdr.de>; Fri, 19 Sep 2025 15:53:21 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id A755C7A90E4
+	for <lists+kvm@lfdr.de>; Fri, 19 Sep 2025 15:56:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 97D4E31E0FB;
-	Fri, 19 Sep 2025 15:53:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 186DF31E0FB;
+	Fri, 19 Sep 2025 15:57:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="aOV8MwTf"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="bgYk9M9j"
 X-Original-To: kvm@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A51AE2C21F8;
-	Fri, 19 Sep 2025 15:53:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C492F31A55C
+	for <kvm@vger.kernel.org>; Fri, 19 Sep 2025 15:57:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758297191; cv=none; b=AzI3f0YUDB9kLk3xhHmLtSwMpfmXlnsYgF3Zy123OW5MrIzXWvPtk6SESFp4O3p0zicRUiJ0k00i4iEoepGFeuQsh0YaqzixTxOkS8qHYsj0ZP8IZnrK8S6bsVXkSnd/mAiUFvqlWR5y/yT6qUET/M4VRDfXVCDb68zFqxKp5kM=
+	t=1758297473; cv=none; b=XebjEu5dGCTwTzBqce7xlTT35DI4QISi7xegUNsKZKOyLhcuyPvQbTLg/tvatMJ68CmPJyA5K2satYai+s0+0AlEricWOv2r/dvsLi3bsILXrnVwjJmFxO6Kll2ce4wsMw4DOAhF1vYt/7d5ifmBGrdm6kif9rt4Fh/Tx11oGUU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758297191; c=relaxed/simple;
-	bh=LY8UCU+64dez0iKU9byrdE3xtr9uB9iMyeO1oDOL/3o=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=MvBbwZGfXxhCV87uszwgaTr94SFnHK/JckYQLs8pGpFNqxXTFJfW+DQkm6s0Y5uNJuC/uK5Z6lyq0X0+KqfR0+Vw9dbR0Y5OwcsL+NuDTEvmJeQ0pOJOyjM40tP9qONQmU0wVSN9lcLnboONKm9ip0KB7A/nX1o0YDivUvO6fko=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=aOV8MwTf; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B428BC4CEF0;
-	Fri, 19 Sep 2025 15:53:07 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1758297191;
-	bh=LY8UCU+64dez0iKU9byrdE3xtr9uB9iMyeO1oDOL/3o=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=aOV8MwTfLG18DZwwAPFD7Rm3sJbkyFo6QukFWydz9vWeSc3v1IRTSVl/a7ocNxvwc
-	 wMqEh/9o0j5TxAusXbyoSzPbete1PUJjByFf64KM1Z4oeTbiDTV+gYibMfkkeQMBwS
-	 qbaBJOFWiRtx2AmG8a80m2G8+8EZ/dlJyp+QcYLrP3ReF30/gSvI0anIRYts6wkj/S
-	 LM95N3RzmWzVm4wpTF4ARgK/7l+X4l7di8KcnVlEbS5A5ZBFw+umfAduBXS0e57DoH
-	 dtEz7AaZT1SUQ3IYanPM99hXRfIAgGz3ZCkxozn+1RPQf91a4fmhmeZtmw1CJ6MWDM
-	 j1kIgvB2pty8g==
-Date: Fri, 19 Sep 2025 16:53:04 +0100
-From: Mark Brown <broonie@kernel.org>
-To: Marc Zyngier <maz@kernel.org>
-Cc: Oliver Upton <oliver.upton@linux.dev>, Joey Gouly <joey.gouly@arm.com>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Will Deacon <will@kernel.org>, Paolo Bonzini <pbonzini@redhat.com>,
-	Jonathan Corbet <corbet@lwn.net>, Shuah Khan <shuah@kernel.org>,
-	Dave Martin <Dave.Martin@arm.com>, Fuad Tabba <tabba@google.com>,
-	Mark Rutland <mark.rutland@arm.com>,
-	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
-	linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-	linux-doc@vger.kernel.org, linux-kselftest@vger.kernel.org,
-	Peter Maydell <peter.maydell@linaro.org>,
-	Eric Auger <eric.auger@redhat.com>
-Subject: Re: [PATCH v8 06/29] KVM: arm64: Introduce non-UNDEF FGT control
-Message-ID: <d27a1c5a-9173-465b-90f9-fec528181ba7@sirena.org.uk>
-References: <20250902-kvm-arm64-sme-v8-0-2cb2199c656c@kernel.org>
- <20250902-kvm-arm64-sme-v8-6-2cb2199c656c@kernel.org>
- <87zfaqxymu.wl-maz@kernel.org>
+	s=arc-20240116; t=1758297473; c=relaxed/simple;
+	bh=jcgRaanW9qH9mr+Sv4w77DNE6nNUSLNEVq5bL0EhAq0=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=tc939oeEYYJ+cESUU+HUGfYtqbJqMYglm1Lo/ypPcVPHsz9Ps0AHMG8LKnbZw3xZ+HkRjQAQRIk6YDQoujaA+epPFaYxjalmLabgEMcen+oAtvWQ01ToXlHpV2J6htNQYnopVXFedIMj8BRZguy1CJAqNzRh06rtadymoLgIJt4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=bgYk9M9j; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1758297470;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=aM1my6NJjtlki0BZEqbhHHnBmfD25BQlwJZ8Tn+vp3c=;
+	b=bgYk9M9jCwH1OYireHeYOLy07C7Y624+Gdw9bETendXzEEwzQ4ScTb0eW43lFx7IOJ/KLV
+	wgtP2nmyD7x5R7tC8bRLPTMl423PZsou+9J9MpNmZACBuDgEwISwEtCVZCPHziT5lOpSSs
+	kJJvYqVW1WnNVkOr/Y/rSizYcGSGL2E=
+Received: from mail-il1-f200.google.com (mail-il1-f200.google.com
+ [209.85.166.200]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-5-vyGk4XS2OSStYqcsIQKh1w-1; Fri, 19 Sep 2025 11:57:49 -0400
+X-MC-Unique: vyGk4XS2OSStYqcsIQKh1w-1
+X-Mimecast-MFC-AGG-ID: vyGk4XS2OSStYqcsIQKh1w_1758297469
+Received: by mail-il1-f200.google.com with SMTP id e9e14a558f8ab-4247de28df5so4323505ab.2
+        for <kvm@vger.kernel.org>; Fri, 19 Sep 2025 08:57:49 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1758297469; x=1758902269;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=aM1my6NJjtlki0BZEqbhHHnBmfD25BQlwJZ8Tn+vp3c=;
+        b=QagJakvscYnw30dSy40a1c11sX+ohb8KMJ9p1BuLeN9qwKcqhrRkUahEb81qfyvVxy
+         RQ5pybEshmtZ51Ivg5fPxPKPL4zafFPioVByRPzKlrHiR7+orM8Atqbjx+RqqfhcAnJu
+         x70tYeZAQntsGwvrcaRiWTVG0pfnB2r1EeschexRlGjFa947A9QjHpHoKRbUDQo4ni7o
+         JUdgT4NH/VZPaHk5ybXomnYRo6Rlfy0kpLNACQld6Y2d/hXNDy0koTWbqu+iSR+0BoBZ
+         dIqv0V+1oAz2zL74+ExsYqe4k3EZdOSgl9IPUlGGC2h+Wn6+rHZW/5mFLUVHR8YuDxlq
+         NkXA==
+X-Forwarded-Encrypted: i=1; AJvYcCVQG4Jv/4F0J71fskRRESa2hkcOgueMuaMrGUUHKU9NKQkt8mMv7H+OQARss8vWm6gOIXA=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxKOfUN3L5SD+bP1mjd4/4GbhayyFZpncv1+6VhBhQK62pIbgtb
+	djacWlHfk+K7TmwYrWX8AZGIBvprqCt9DGZ+YK+xTOWOkLiem7AH8VaKPJ8HiMDBS5VJD0qAVtP
+	5U25RcE5kFuG8fnjEZveTTnRWQrK920eQ8RmJtK4gfyeaJ1jRjJJIgA==
+X-Gm-Gg: ASbGncuBULvYJ0nH+xMkiCg2kDD81nGArm9BBBwYL59tqq3M6MnCtkDpJ80mzGy0OZq
+	/y7G2cNb8+iSz8mFHm40HGDAdYF+xpiDus+xLR2nFijhsZdH+0ia+7+BvweygfFUcWtORRsqiqB
+	DAaVwWxj9kFmoOPx/qls3xxn0H3G3cv7QkrYjIL+l7DaSNiIhs4yqyHQRgxoQQDTvha33GiG5hI
+	SvXR5jNQiuThoNeB333R4Bn1mR02NUv5ujEDh86G+XywX4PRbyfr9hObCDB1WXtdn83tx6vMx3d
+	6FHe3kYN1mrHNEDjn4GXkWpd8BQM2MXRkAff7GxA9Sw=
+X-Received: by 2002:a05:6e02:1845:b0:423:fea2:584a with SMTP id e9e14a558f8ab-42481979b04mr21894815ab.3.1758297467360;
+        Fri, 19 Sep 2025 08:57:47 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IG3kKvBSX9JHZGnWAdCW/3QH1TzYJQzZYSAISEqZ847cNL+IsLLiA4SVKmwkv0UjgNX2yNcRA==
+X-Received: by 2002:a05:6e02:1845:b0:423:fea2:584a with SMTP id e9e14a558f8ab-42481979b04mr21894495ab.3.1758297466785;
+        Fri, 19 Sep 2025 08:57:46 -0700 (PDT)
+Received: from redhat.com ([38.15.36.11])
+        by smtp.gmail.com with ESMTPSA id e9e14a558f8ab-4244a36b076sm23232495ab.1.2025.09.19.08.57.45
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 19 Sep 2025 08:57:45 -0700 (PDT)
+Date: Fri, 19 Sep 2025 09:57:43 -0600
+From: Alex Williamson <alex.williamson@redhat.com>
+To: Jason Gunthorpe <jgg@ziepe.ca>
+Cc: Alex Mastro <amastro@fb.com>, Kevin Tian <kevin.tian@intel.com>, Bjorn
+ Helgaas <bhelgaas@google.com>, David Reiss <dreiss@meta.com>, Joerg Roedel
+ <joro@8bytes.org>, Keith Busch <kbusch@kernel.org>, Leon Romanovsky
+ <leon@kernel.org>, Li Zhe <lizhe.67@bytedance.com>, Mahmoud Adam
+ <mngyadam@amazon.de>, Philipp Stanner <pstanner@redhat.com>, Robin Murphy
+ <robin.murphy@arm.com>, Vivek Kasireddy <vivek.kasireddy@intel.com>, Will
+ Deacon <will@kernel.org>, Yunxiang Li <Yunxiang.Li@amd.com>,
+ linux-kernel@vger.kernel.org, iommu@lists.linux.dev, kvm@vger.kernel.org
+Subject: Re: [TECH TOPIC] vfio, iommufd: Enabling user space drivers to vend
+ more granular access to client processes
+Message-ID: <20250919095743.482a00cd.alex.williamson@redhat.com>
+In-Reply-To: <20250918225739.GS1326709@ziepe.ca>
+References: <20250918214425.2677057-1-amastro@fb.com>
+	<20250918225739.GS1326709@ziepe.ca>
+X-Mailer: Claws Mail 4.3.1 (GTK 3.24.43; x86_64-redhat-linux-gnu)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="vZXtN3VZj3O/Y/5x"
-Content-Disposition: inline
-In-Reply-To: <87zfaqxymu.wl-maz@kernel.org>
-X-Cookie: Don't read everything you believe.
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
+On Thu, 18 Sep 2025 19:57:39 -0300
+Jason Gunthorpe <jgg@ziepe.ca> wrote:
+> 
+> What I've been thinking is if the vending process could "dup" the FD
+> and permanently attach a BPF program to the new FD that sits right
+> after ioctl. The BPF program would inspect each ioctl when it is
+> issued and enforce whatever policy the vending process wants.
 
---vZXtN3VZj3O/Y/5x
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+Promising idea.
 
-On Fri, Sep 19, 2025 at 04:14:49PM +0100, Marc Zyngier wrote:
+> What would give me alot of pause is your proposal where we effectively
+> have the kernel enforce some arbitary policy, and I know from
+> experience there will be endless asks for more and more policy
+> options.
 
-> FGUs are uniform, because when something doesn't exist on a vcpu, it
-> doesn't exist on *any* vcpu. Non-FGU use of FGTs, however, has to be
-> more flexible because that's part of the emulation, and is actually
-> pretty rare that we want to trap something at all times, on all vcpus.
+Definitely.  Also, is this at all considering the work that's gone into
+vfio-user?  The long running USD sounds a lot like a vfio-user server,
+where if we're using vfio-user's socket interface we'd have a lot of
+opportunity to implement policy there and dma-bufs might be a means to
+expose direct, restricted access.  Thanks,
 
-> For the same reason, conflating the R and W registers doesn't work
-> either. For the above example, I want to be able to trap write
-> accesses to MDSCR_EL1, and not reads, just like the Ampere
-> brain-damage.
+Alex
 
-> So please make this per-vcpu, decouple R and W FGTs, and convert the
-> Ampere horror to this scheme.
-
-OK, that makes more sense - it was a bit confusing that all the FGT
-handling was done per VM not per vCPU without even any provision for
-per-vCPU or distinct R/W stuff, it seemed strange.  Since the SME
-requirement also ends up being per VM anyway I just tried to fit in with
-what was there but if we don't want that behaviour it's certainly more
-obvious to make it per-vCPU and to split read and write.
-
---vZXtN3VZj3O/Y/5x
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAABCgAdFiEEreZoqmdXGLWf4p/qJNaLcl1Uh9AFAmjNfGAACgkQJNaLcl1U
-h9DpYwf9GkvMEDYrTVm6kitHOpS+F99swSxSDy+9IjuOkcqkQIm18C2AoZe1iD0A
-ZOB8PfTlFDFJGW4gxWHcWHk5prOp89I4xC2kXlguPQYe3T8QHfcsDDAJFxwhX7Xb
-C0ICRPJQC6+q1td6A51wmqsCQ+N7cWd5oBz4A02evYJBcQ/7ZGlF3ykFUZTRhW+1
-c5HGNIW9RSsbdoFLFtSAJYzFmXfMSgDdJB/5AG6BJ1wdY9CF4cdRzNI9TyhmAWti
-qh/oncDSwLMg6VU1rkNhaibL7vRbtKI/7D3RldFVPyXuf+gqRjp7rC991dMcSgh7
-iXujfThG7ZrCubxYhsccwtS4pIR5Jw==
-=0qCo
------END PGP SIGNATURE-----
-
---vZXtN3VZj3O/Y/5x--
 
