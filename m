@@ -1,71 +1,71 @@
-Return-Path: <kvm+bounces-58268-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-58269-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id D4C28B8B887
-	for <lists+kvm@lfdr.de>; Sat, 20 Sep 2025 00:44:02 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id CC1CEB8B88D
+	for <lists+kvm@lfdr.de>; Sat, 20 Sep 2025 00:44:17 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id BF3751CC1FC8
-	for <lists+kvm@lfdr.de>; Fri, 19 Sep 2025 22:44:24 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id B66E21CC25FF
+	for <lists+kvm@lfdr.de>; Fri, 19 Sep 2025 22:44:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 74340321F27;
-	Fri, 19 Sep 2025 22:34:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 04B8A2D97A6;
+	Fri, 19 Sep 2025 22:34:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="v1+IY7lD"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="m2ZhzMXN"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pf1-f201.google.com (mail-pf1-f201.google.com [209.85.210.201])
+Received: from mail-pj1-f74.google.com (mail-pj1-f74.google.com [209.85.216.74])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 12C3B314B89
-	for <kvm@vger.kernel.org>; Fri, 19 Sep 2025 22:34:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6C0333064A0
+	for <kvm@vger.kernel.org>; Fri, 19 Sep 2025 22:34:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.74
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758321259; cv=none; b=XkxK3l70zSXN8yfwWzsNoED09NpQiVRXgYBUeIiSGuZxYsxRvNqoan3wFsWZ43wwCb7pKVLUSzjdXB+SDeNlGJIp16CTBR95U10nSHCAlwlgfRpIIwCwbRLGp0R65EpjzQwsRWOF9tOVrBPmY3YRcpgedh0J3mWi785DZmNnffE=
+	t=1758321261; cv=none; b=GcSXRbmqTl8Gmj3Jp9hkXudryI1XHb7YJtTY+r5Zu21anevNOn1ctyo8vIrlTaRGN7GbbXFJFVsVMOjBsjYl6lZ5aFqLtu81fkiUmJjZK+N/xyAs/YguiqhEujnB0H813MzZZPBJuN/jWyqb3QMIfA7aH1daLXCeBMw5voxhIZg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758321259; c=relaxed/simple;
-	bh=YWutoHj6w4COgn2+/X6HQXHVNZltIoT7LPB1tDxHCkY=;
+	s=arc-20240116; t=1758321261; c=relaxed/simple;
+	bh=CYruM6/nLA6BHSIVAXqcCI2n0dhqEb8nlIv2iRzLL/I=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=Em4A5lutTEqJoxpC2QmRXVN9PMCHWUrmXpKJZQ2QSMDvviaGFp3XDnk9NOG4DQHz9ullOCnUQ2kF1G0FrpBJPGCdyzc8Zwo2sm3+nFM/1061jq4wKKJsQiIvdDUtbU6TJ5djuwPk3TaAMLy/8n3znszfK60dpd9BJUnnqNUnaTc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=v1+IY7lD; arc=none smtp.client-ip=209.85.210.201
+	 To:Cc:Content-Type; b=RzKd+Kmekv0SMME7IbEaEalF34u5AN5VXEitU3EJ6XomBxHkR27wUd8kmN7ZZqe8Fd+X8kO5MgEfdreIoIn9vrUJHn3ofFufqAXPpNASf7wHBBM7gBoK0nX0GSjW/9Oa2EAzQBvigXI/YtevafOedAGMGDlXyOqaTYCvj8VtQvQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=m2ZhzMXN; arc=none smtp.client-ip=209.85.216.74
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pf1-f201.google.com with SMTP id d2e1a72fcca58-77c3fca2db2so2662942b3a.3
-        for <kvm@vger.kernel.org>; Fri, 19 Sep 2025 15:34:17 -0700 (PDT)
+Received: by mail-pj1-f74.google.com with SMTP id 98e67ed59e1d1-32edda89a37so2552256a91.1
+        for <kvm@vger.kernel.org>; Fri, 19 Sep 2025 15:34:19 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1758321257; x=1758926057; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1758321259; x=1758926059; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:reply-to:from:to:cc:subject:date:message-id:reply-to;
-        bh=VYZLHKF8pF5KDs3SsZEerHn8ojDfpKPYyWB28d/RJk8=;
-        b=v1+IY7lDiteZ7bMd0KONkBV5/52n6suxCbwybR9Op3oDqAC+bPCL47bDOVWCNfpzeY
-         zFsSFm/DF15uhD0QX0UaHfMCXgNQSndZCpTOBNvD5E38PZPqwjz92UNMO7pobMlULKXY
-         3Ory0Qi+tOx0QvUrAcp4SWl/goSjDWgrLM7bfHFhvxs2exz7Zuvcsu2QpVzzqhOyj86s
-         gE2BRMCJsGW3R3D3mV6iYIY0nJtMoAijmAaidxfFOiOdUd+x8oio73el2UN2KMMjuPsQ
-         gTp56EUzT8xIWkYsz3vdkrkbbPy4M7Vv/dQeK/SQsx6io3I++01XaEipcNa6T16LD+xO
-         4JrA==
+        bh=v3/gIRcH16msBI7YOF0B/Y3P7fFolZGAQR2AF4CuYpQ=;
+        b=m2ZhzMXNaXXOdK2+NX/JSpzmFGLN+8Uqlfv1yF9MSRs9/se4Ewft4HfPCpFx/TOo+W
+         HLCJKjBtUoMPiMlpb7U2mvO7jkNNsbGmdg628kOMxfjC1ZZJFtWoNRRsAQ/ejfq+oBGJ
+         PxDwKeTRi3o3GOJOdgaYsaUnSIH+xzt/U6PRtH0RVc+zktSLyyRTxlQjaPqPxTE0dmvu
+         iNn6OPn0PZuW9sJyshWBNKjW2vbO/fNrUNEV6H7rfIZ4Vx0QUzHLyrHyWKgPqI5gVzB1
+         uTrQy7qBejjQ6Qrj8HSeDwqSDu24HQQGzXd3LrWREOeUjPhGzblnFtO7zFsTdMM+eo4d
+         9w9A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1758321257; x=1758926057;
+        d=1e100.net; s=20230601; t=1758321259; x=1758926059;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:reply-to:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=VYZLHKF8pF5KDs3SsZEerHn8ojDfpKPYyWB28d/RJk8=;
-        b=IKjxSvNr69IpaWMuePNrSHfWNFhTZFXyO5xkUWZZV+vyMRpgFdP+azQe9gude0hAnR
-         F/axZBaJIkXdHokPRosiL3c8dpLx07rIy/MDw7b1jvNRWGiTQpfsd+dZCz8/2lUEv2m7
-         /fVS2ptnH98gAPwo1TGOWxkIML2kV+HnmHat7NE9bAJm7iSPIZeUkG2Y3hbYwF/yHHnN
-         zN3UrRasFnts1yI/P0ec+SHdjQPOQStXO4w3JUfTHM3b2TpPeVkpGp9oTHh/Tpev6Yhk
-         Ff5ncV42vlkyICPIYIADaaeSBVTxoqobL8and3g5Dh0ApLf52fV8nnslb/VAXRk2Kkq+
-         PUUA==
-X-Gm-Message-State: AOJu0Yxa8it1FEKOKYzff2u88kj6BgZ0HP4K5Q3Wh6Cc5HZcubX9yVFa
-	22SyzegJz8uWCzTG3Va5DTRhBoAXHInBtgQGpimq3xrnNjxyPHCu3Q8WqIJMNJkttqFEaLDjcLb
-	9PXO2VQ==
-X-Google-Smtp-Source: AGHT+IHtxklkKMMTcCO+WLaxD30r3xUhNsd0DkrdB/jDO3hy+P4nkad/sYddyvamMtLnm9uHw94OGdFNKz4=
-X-Received: from pfbg17.prod.google.com ([2002:a05:6a00:ae11:b0:77f:138f:8b8f])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a05:6a00:3e13:b0:77c:ddd1:749e
- with SMTP id d2e1a72fcca58-77e4eab77fdmr5276946b3a.19.1758321257328; Fri, 19
- Sep 2025 15:34:17 -0700 (PDT)
+        bh=v3/gIRcH16msBI7YOF0B/Y3P7fFolZGAQR2AF4CuYpQ=;
+        b=w1+85AuNDMqww2DOhzsmP7OAntQulUcL8DWJKKZ5aYo++cKJHXGiPsSgC4fltjx37s
+         agHrj+bvC6inaN54Lto7MS5UFSY6s7uGnP0tJ3nlsPzCN6nJq3lr8dKippE9XyxhVhR3
+         P2HGMgoT2S/C37W97OeRYY6YeFN+5wNR8l9xlcN4iqHWic4Y1Gy1nJh0tlGvBNZssV/c
+         cGGPdgvH269sk4UYXIy+6QsTX/DEjLkrvBZXR0n1h73ukTkNji/kWopqrZfrq4lnTan1
+         cwAHSChXWLZJSfCufZ2zdslvHzm08/c5M5gopo8BrHg636lSNPSBiwYOx+vgYit43Enp
+         WjQQ==
+X-Gm-Message-State: AOJu0Yzs7935kBeA0fp/bQYGZBuXFGU5KRCA6clHjdX092340hoNSU5I
+	+8ZORqnH/X1xwfLD3eD6UxoK95Izbb02D06CiwEqz01ymcpZTCu4VTB1GYE/TFo1FMOvscsdlrp
+	IyYUtZw==
+X-Google-Smtp-Source: AGHT+IEpSlLooVqKUswOjccVv6JWUDP6SUs5HYzHzopl1fOGKza6IACwwFb/k/4itYpqFLBy5elmXgRTGmw=
+X-Received: from pjes22.prod.google.com ([2002:a17:90a:756:b0:330:acc9:302c])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:3dc7:b0:32e:5cba:ae11
+ with SMTP id 98e67ed59e1d1-3309836d2cemr5015556a91.28.1758321258948; Fri, 19
+ Sep 2025 15:34:18 -0700 (PDT)
 Reply-To: Sean Christopherson <seanjc@google.com>
-Date: Fri, 19 Sep 2025 15:32:47 -0700
+Date: Fri, 19 Sep 2025 15:32:48 -0700
 In-Reply-To: <20250919223258.1604852-1-seanjc@google.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
@@ -75,8 +75,9 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
 References: <20250919223258.1604852-1-seanjc@google.com>
 X-Mailer: git-send-email 2.51.0.470.ga7dc726c21-goog
-Message-ID: <20250919223258.1604852-41-seanjc@google.com>
-Subject: [PATCH v16 40/51] KVM: SVM: Enable shadow stack virtualization for SVM
+Message-ID: <20250919223258.1604852-42-seanjc@google.com>
+Subject: [PATCH v16 41/51] KVM: x86: Add human friendly formatting for #XM,
+ and #VE
 From: Sean Christopherson <seanjc@google.com>
 To: Paolo Bonzini <pbonzini@redhat.com>, Sean Christopherson <seanjc@google.com>
 Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
@@ -87,32 +88,29 @@ Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
 	Zhang Yi Z <yi.z.zhang@linux.intel.com>, Xin Li <xin@zytor.com>
 Content-Type: text/plain; charset="UTF-8"
 
-From: John Allen <john.allen@amd.com>
+Add XM_VECTOR and VE_VECTOR pretty-printing for
+trace_kvm_inj_exception().
 
-Remove the explicit clearing of shadow stack CPU capabilities.
-
-Reviewed-by: Chao Gao <chao.gao@intel.com>
-Signed-off-by: John Allen <john.allen@amd.com>
 Signed-off-by: Sean Christopherson <seanjc@google.com>
 ---
- arch/x86/kvm/svm/svm.c | 3 ---
- 1 file changed, 3 deletions(-)
+ arch/x86/kvm/trace.h | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
-index d48bf20c865b..54ca0ec5ea57 100644
---- a/arch/x86/kvm/svm/svm.c
-+++ b/arch/x86/kvm/svm/svm.c
-@@ -5262,10 +5262,7 @@ static __init void svm_set_cpu_caps(void)
- 	kvm_set_cpu_caps();
+diff --git a/arch/x86/kvm/trace.h b/arch/x86/kvm/trace.h
+index 57d79fd31df0..06da19b370c5 100644
+--- a/arch/x86/kvm/trace.h
++++ b/arch/x86/kvm/trace.h
+@@ -461,8 +461,8 @@ TRACE_EVENT(kvm_inj_virq,
  
- 	kvm_caps.supported_perf_cap = 0;
--	kvm_caps.supported_xss = 0;
+ #define kvm_trace_sym_exc						\
+ 	EXS(DE), EXS(DB), EXS(BP), EXS(OF), EXS(BR), EXS(UD), EXS(NM),	\
+-	EXS(DF), EXS(TS), EXS(NP), EXS(SS), EXS(GP), EXS(PF),		\
+-	EXS(MF), EXS(AC), EXS(MC)
++	EXS(DF), EXS(TS), EXS(NP), EXS(SS), EXS(GP), EXS(PF), EXS(MF),	\
++	EXS(AC), EXS(MC), EXS(XM), EXS(VE)
  
--	/* KVM doesn't yet support CET virtualization for SVM. */
--	kvm_cpu_cap_clear(X86_FEATURE_SHSTK);
- 	kvm_cpu_cap_clear(X86_FEATURE_IBT);
- 
- 	/* CPUID 0x80000001 and 0x8000000A (SVM features) */
+ /*
+  * Tracepoint for kvm interrupt injection:
 -- 
 2.51.0.470.ga7dc726c21-goog
 
