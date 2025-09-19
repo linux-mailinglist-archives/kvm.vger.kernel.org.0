@@ -1,78 +1,82 @@
-Return-Path: <kvm+bounces-58088-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-58089-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id E6176B87863
-	for <lists+kvm@lfdr.de>; Fri, 19 Sep 2025 02:45:26 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 277B7B87869
+	for <lists+kvm@lfdr.de>; Fri, 19 Sep 2025 02:45:36 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 1256C7B620B
-	for <lists+kvm@lfdr.de>; Fri, 19 Sep 2025 00:43:45 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id F05F417A840
+	for <lists+kvm@lfdr.de>; Fri, 19 Sep 2025 00:45:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E0E7923F40C;
-	Fri, 19 Sep 2025 00:45:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CE40E24DCF6;
+	Fri, 19 Sep 2025 00:45:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="s1vB3FFw"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="f9+makWz"
 X-Original-To: kvm@vger.kernel.org
 Received: from mail-pj1-f74.google.com (mail-pj1-f74.google.com [209.85.216.74])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8196A246789
-	for <kvm@vger.kernel.org>; Fri, 19 Sep 2025 00:45:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 691191A9F93
+	for <kvm@vger.kernel.org>; Fri, 19 Sep 2025 00:45:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.74
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758242717; cv=none; b=SluYRAANDrDBXWjkN/ZjgosdoSCmBPSJyQSw35Irc/Rc8OvoySbMcyWl1uZA9U2l69w411n4NY+FGZ5hqZaTBEskIlIbJ/BFgWVBJmh85UmfL3m4+ExSfPBbw69uqI/LFQE87Ezk4XwL0csBwvz34k6wB5ItFLeyVJQ5cyngT7k=
+	t=1758242718; cv=none; b=T02zHne5y3bdjLtSa0PSZY1vesw06yVOfL1t08/prqAROAYiW5qno+8IAdScOsQ5j6mqDA9jRfxTq/+T82LkdkzJGnyTlp31b3gNE3Sw0tt/pjQ92TNVbFmGpdQq/+kKVkCUuG8m8zS1oxf8YNL45/ZVQLE6zHGeXfk6fbbjbOo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758242717; c=relaxed/simple;
-	bh=bsV77/bMuqebcjiVVvZ5gDl+9q4dLc4oVxblBiG8n+M=;
-	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=td08eG0BcG5t0IFzjXBCrLAdVxx/PJKF5d0X52muVK1eXn2E8CWu6b8BxACDcFCN/riQlYoXYrxAgFhheBPsey57L899FNtLTwTpDlBt4aA6YGfwE3JmMI3Ihl4LJRCtNL1Ojt5QLIKL0dmU39s51Ctj6FVsu2kv5aQieiYN408=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=s1vB3FFw; arc=none smtp.client-ip=209.85.216.74
+	s=arc-20240116; t=1758242718; c=relaxed/simple;
+	bh=GHMlzr2FhTOv+c4T5nvr/lgKTQoMQ7IduiCxorVExs4=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=ZfuTNtsyPkkfOIgU/5N2Rn3fCpveZnqwWPuRwPPnqFl7jU48Zuh2+hn/yJLqyO+RLxQGHfKvw67hyqnh36asXTmucv0FaW4kwFXgObAoAfXlCDC7dbZx5nlgeqrrr81EO0xOgKnNpAb45PVfY0hETNYdk51OknE8h0LF+h7IE14=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=f9+makWz; arc=none smtp.client-ip=209.85.216.74
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pj1-f74.google.com with SMTP id 98e67ed59e1d1-32ecab3865dso2106517a91.1
-        for <kvm@vger.kernel.org>; Thu, 18 Sep 2025 17:45:15 -0700 (PDT)
+Received: by mail-pj1-f74.google.com with SMTP id 98e67ed59e1d1-32eb2b284e4so2743454a91.1
+        for <kvm@vger.kernel.org>; Thu, 18 Sep 2025 17:45:17 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1758242715; x=1758847515; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:mime-version:date:reply-to:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=7RIKbCZfNFdayGXGxAhpCXDfU3xbJOGgRgNJzlXobZI=;
-        b=s1vB3FFwkFGOEAk+bt4cfY42VK0/caVp6N8aC3bp+Fpz7qF04M6PwFIiZLmVjXBiF7
-         PnxiQe8/1ZLIy7G38dCHzoVvgjIHf1RYNDmu14NKxSwg7lEoM/l5UclU2AoCSVUac24g
-         5DZ6VobsN1ODwFoaTQknSIFmVMwKGGkIjM0/pdO+kvJm2F/oeKAU1eFpLhOyo1OVfq3y
-         5Lp3vM4UU+qVC4pJWJQVdNzgxe3qNQuYywKwE3UYQrrVxadp0B+7dsN6zFf+ulD2H8Pc
-         wHwXe9CTN8Njan6Gf7oQXdPwIeuz9cA2NF0Xgp7BC2wTchaGMqsO+PEZS3MiEfaJ7lOJ
-         eDJA==
+        d=google.com; s=20230601; t=1758242716; x=1758847516; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:reply-to:from:to:cc:subject:date:message-id:reply-to;
+        bh=R7qTTFNHE+fMvr5BObVOavYnDFvgMV9D5f5f8nLVk4s=;
+        b=f9+makWzCdMkti9MCyPqhd6NaBrYljckLQvbfVSPi4EIfFyldWCd9LnxGDaV9f9gCA
+         8C3EM3YUXCFY/ntWrW4uTfY78aEOuTs+CJfANbtNKOoX/blB4RZCU7zsz3r58FJdmFuf
+         lV5wZI+yenJO4DpOIMiZWTRLwSLa0JrpxU8KFRQyEziuMKTTUXs2jal5KYz7AVi8du54
+         qrDsuNAQ94o9RRd/ALigIKFa3STsRuXTN8DuLv3qlGswOZUDbQJFmYT/jdwaxTNzT+vo
+         tVsILbbAbhF3CVpsh9mko1EeAEfgCIoELZJeXHN+FIJ51+MgJYWf+r6oxicBK8vzHjkh
+         Batg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1758242715; x=1758847515;
-        h=cc:to:from:subject:message-id:mime-version:date:reply-to
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=7RIKbCZfNFdayGXGxAhpCXDfU3xbJOGgRgNJzlXobZI=;
-        b=oIgaR+5OYmZXOvlTz2rK34AxEYYqHYwMUktPdNR9jSAKoaSB611MVyVqWEPJ5eFnEB
-         1mk7ptczBlj1mIGb9IRa6+8WqyICVFc3E/YDML/WjGNSK3WBm5XO2WLrcYJyho3vV7Uo
-         qPVHF4OI5NFA/3Y6jlDODkPhmC4OUPY9bz+bCaUnjAFHothv6DKTqklSnWvNdOyxEqiu
-         mWbBfW2NpJGVDLBniosto7MsR3ypTsHRLG7eQUuZ9ZX4AHM1ZyImsVBfTAAmY6Bn7pn2
-         bPvu4dhprZE1uFQ8WZmiZyrRIFUUoWK+mGli0K9Ux1Skfscjm62u9pMP0OxgPm+9sZP5
-         wL1A==
-X-Gm-Message-State: AOJu0YxA1PleVAlZoq74PKFxSwLacK5MPekqpaYUn/LCn6J9zBh0KsyA
-	uVFNdljPA6CoXm47xhkexCSM0VNTR44q90ZCSpAr7G9KRr1gw+vofkzwuI39n5F3y4DBVQkvPRS
-	QMYWjPQ==
-X-Google-Smtp-Source: AGHT+IEJX0cGT7ZG0MLkxlnzGuBapT8OTD8Bz86/0A7NTTY2S5UCxJ9fTew6oKc6bJGnhytklRA8oUSqYiw=
-X-Received: from pjbsc11.prod.google.com ([2002:a17:90b:510b:b0:32e:7282:b66])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90a:d60c:b0:32e:7bbc:bf13
- with SMTP id 98e67ed59e1d1-3309838d043mr1526033a91.34.1758242714742; Thu, 18
- Sep 2025 17:45:14 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1758242716; x=1758847516;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:reply-to:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=R7qTTFNHE+fMvr5BObVOavYnDFvgMV9D5f5f8nLVk4s=;
+        b=j4U0Gp50XYst7NH62bZoxalZA4MZl41Bw0qJt196yzbXWkR9XX4uflkvJUzL5u01O8
+         NOA1L8qP0cRSdp3/wndP5nEaDuRCBXnp8ECgVv6pXW2aZ7wByys7TU5SfvCAmqPgXNgv
+         hGdqUDT3Uiwsh9oXGPaqd+UUb/eT+G9cE5n4bZWgIdj4s7AG6Op6g65M28/EVIZgjhES
+         aLSmOm3mDJUzeXnwGaMmFkvTRxZRDOoaLJVu/hmet6CiTGkjzolTBaSx/xhqyTwCF6Zk
+         tM7atnKZCvX83BX+28wmgoqqeum+qxOvbXMBmwm9vReaA/aZOoOeGPzZ8qVPapLAhSDp
+         vjwg==
+X-Gm-Message-State: AOJu0YyqP8/cpt9jrHpj1tsZNPJsHeq7bW7OoPQkJQxr1iQZYh4XCBzm
+	+2C+Ww3V+BI0qeUFpFy/N1CryVsRcfaQOty/gQlYPOwb8MjJ2qZ7GbqjOMrwKRYPK0dMJYt37yH
+	QAMQJbQ==
+X-Google-Smtp-Source: AGHT+IEEQlj+6vJmW7RI1wxr1KK79HNPPL0eXn3RaPBcrhTf3Zc0J6v5CiAnOUQURMTOOtmxXlInkuLtiJk=
+X-Received: from pjbhl16.prod.google.com ([2002:a17:90b:1350:b0:32d:a0b1:2b03])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:5408:b0:32b:9506:1780
+ with SMTP id 98e67ed59e1d1-33097ff640dmr1633505a91.9.1758242716558; Thu, 18
+ Sep 2025 17:45:16 -0700 (PDT)
 Reply-To: Sean Christopherson <seanjc@google.com>
-Date: Thu, 18 Sep 2025 17:45:07 -0700
+Date: Thu, 18 Sep 2025 17:45:08 -0700
+In-Reply-To: <20250919004512.1359828-1-seanjc@google.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
+References: <20250919004512.1359828-1-seanjc@google.com>
 X-Mailer: git-send-email 2.51.0.470.ga7dc726c21-goog
-Message-ID: <20250919004512.1359828-1-seanjc@google.com>
-Subject: [PATCH v3 0/5] KVM: selftests: PMU fixes for GNR/SRF/CWF
+Message-ID: <20250919004512.1359828-2-seanjc@google.com>
+Subject: [PATCH v3 1/5] KVM: selftests: Add timing_info bit support in vmx_pmu_caps_test
 From: Sean Christopherson <seanjc@google.com>
 To: Sean Christopherson <seanjc@google.com>, Paolo Bonzini <pbonzini@redhat.com>
 Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
@@ -80,47 +84,50 @@ Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
 	dongsheng <dongsheng.x.zhang@intel.com>
 Content-Type: text/plain; charset="UTF-8"
 
-Fixes KVM PMU selftests errors encountered on Granite Rapids (GNR),
-Sierra Forest (SRF) and Clearwater Forest (CWF).
+From: Dapeng Mi <dapeng1.mi@linux.intel.com>
 
-The cover letter from v2 has gory details, as do the patches.
+A new bit PERF_CAPABILITIES[17] called "PEBS_TIMING_INFO" bit is added
+to indicated if PEBS supports to record timing information in a new
+"Retried Latency" field.
+
+Since KVM requires user can only set host consistent PEBS capabilities,
+otherwise the PERF_CAPABILITIES setting would fail, add pebs_timing_info
+into the "immutable_caps" to block host inconsistent PEBS configuration
+and cause errors.
+
+Opportunistically drop the anythread_deprecated bit.  It isn't and likely
+never was a PERF_CAPABILITIES flag, the test's definition snuck in when
+the union was copy+pasted from the kernel's definition.
+
+Signed-off-by: Dapeng Mi <dapeng1.mi@linux.intel.com>
+Tested-by: Yi Lai <yi1.lai@intel.com>
+[sean: call out anythread_deprecated change]
+Signed-off-by: Sean Christopherson <seanjc@google.com>
+---
+ tools/testing/selftests/kvm/x86/vmx_pmu_caps_test.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
+
+diff --git a/tools/testing/selftests/kvm/x86/vmx_pmu_caps_test.c b/tools/testing/selftests/kvm/x86/vmx_pmu_caps_test.c
+index a1f5ff45d518..f8deea220156 100644
+--- a/tools/testing/selftests/kvm/x86/vmx_pmu_caps_test.c
++++ b/tools/testing/selftests/kvm/x86/vmx_pmu_caps_test.c
+@@ -29,7 +29,7 @@ static union perf_capabilities {
+ 		u64 pebs_baseline:1;
+ 		u64	perf_metrics:1;
+ 		u64	pebs_output_pt_available:1;
+-		u64	anythread_deprecated:1;
++		u64	pebs_timing_info:1;
+ 	};
+ 	u64	capabilities;
+ } host_cap;
+@@ -44,6 +44,7 @@ static const union perf_capabilities immutable_caps = {
+ 	.pebs_arch_reg = 1,
+ 	.pebs_format = -1,
+ 	.pebs_baseline = 1,
++	.pebs_timing_info = 1,
+ };
  
-v3: 
- - Make PMU errata available to all tests by default.
- - Redo testing of "unavailable PMU events" to drastically reduce the number
-   of testcases.
-
-v2:
- - https://lore.kernel.org/all/20250718001905.196989-1-dapeng1.mi@linux.intel.com 
- - Add error fix for vmx_pmu_caps_test on GNR/SRF (patch 2/5).
- - Opportunistically fix a typo (patch 1/5).
-
-v1: https://lore.kernel.org/all/20250712172522.187414-1-dapeng1.mi@linux.intel.com
-
-Dapeng Mi (2):
-  KVM: selftests: Add timing_info bit support in vmx_pmu_caps_test
-  KVM: selftests: Validate more arch-events in pmu_counters_test
-
-Sean Christopherson (2):
-  KVM: selftests: Track unavailable_mask for PMU events as 32-bit value
-  KVM: selftests: Reduce number of "unavailable PMU events" combos
-    tested
-
-dongsheng (1):
-  KVM: selftests: Handle Intel Atom errata that leads to PMU event
-    overcount
-
- tools/testing/selftests/kvm/include/x86/pmu.h | 24 +++++++
- .../selftests/kvm/include/x86/processor.h     |  7 ++-
- tools/testing/selftests/kvm/lib/x86/pmu.c     | 49 +++++++++++++++
- .../testing/selftests/kvm/lib/x86/processor.c |  4 ++
- .../selftests/kvm/x86/pmu_counters_test.c     | 63 +++++++++++++------
- .../selftests/kvm/x86/pmu_event_filter_test.c |  4 +-
- .../selftests/kvm/x86/vmx_pmu_caps_test.c     |  3 +-
- 7 files changed, 133 insertions(+), 21 deletions(-)
-
-
-base-commit: c8fbf7ceb2ae3f64b0c377c8c21f6df577a13eb4
+ static const union perf_capabilities format_caps = {
 -- 
 2.51.0.470.ga7dc726c21-goog
 
