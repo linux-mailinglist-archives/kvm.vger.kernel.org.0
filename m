@@ -1,71 +1,71 @@
-Return-Path: <kvm+bounces-58076-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-58077-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id D0595B8775C
-	for <lists+kvm@lfdr.de>; Fri, 19 Sep 2025 02:22:11 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 99BABB8775F
+	for <lists+kvm@lfdr.de>; Fri, 19 Sep 2025 02:22:15 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B98D61766E3
-	for <lists+kvm@lfdr.de>; Fri, 19 Sep 2025 00:22:03 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4BC9F3AE496
+	for <lists+kvm@lfdr.de>; Fri, 19 Sep 2025 00:22:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D421024166E;
-	Fri, 19 Sep 2025 00:21:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 861712451F0;
+	Fri, 19 Sep 2025 00:21:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="Co6YmxRO"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="FSI2/Q3V"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pf1-f201.google.com (mail-pf1-f201.google.com [209.85.210.201])
+Received: from mail-pj1-f74.google.com (mail-pj1-f74.google.com [209.85.216.74])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5E9901F8723
-	for <kvm@vger.kernel.org>; Fri, 19 Sep 2025 00:21:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 36BC723D7E8
+	for <kvm@vger.kernel.org>; Fri, 19 Sep 2025 00:21:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.74
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758241302; cv=none; b=iMUlCP8XRYyRD0NI0hhoUpg/TXszsJGz/JHQ5ELAf2/Q8aMtmuFio/mJavCT8S3+50BDDSjJdFoo9nSyBIj0x3V1DWctZBymPrxAPzX1BNkA0QwxFbAepMQ1vWgPrBRrTCYTSEyQCqKfkDvixIN8im6ERO3W+iyDwZ5fy5sV16U=
+	t=1758241304; cv=none; b=rV8vBxtreAaf8CnDgk/ItSxtcEWKvtE8CNN0eto0DAU9cTXHR1oDK6hiZl1FOXTznCyr6YFHcsat5x5Ms57e1yKsaxD37r7erKXc9uUZXuOF53A+uChqnLU31WllFeAmIR/hJmdHVizM4kPmZNvlYRiyDoemGV+BBMjIUQi5skc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758241302; c=relaxed/simple;
-	bh=/XQgV9lw0lISZp958KTVvYPoycL/V0iemplIXqSLSwE=;
+	s=arc-20240116; t=1758241304; c=relaxed/simple;
+	bh=MYfyfCmqFxyCHS2O4BBURQ582kXjzfTNP4cFC+xONbY=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=eRb33iJOdX6rAg0vHyfDa460QAJzaVU8/GAO6QIKypIf9oB7khafiyrMlvzxICr61v+xfLCTbuhsVLq68k6KH1UIHuRA5OrEPlgumgw1MejqvTb9Ckt4vtmVuGvoXcreCoGZkZB56eEgK0LbRb4e3XJTaUeHSLHD7BzktqtQHJM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=Co6YmxRO; arc=none smtp.client-ip=209.85.210.201
+	 To:Cc:Content-Type; b=d0XOpVIfjTAx3RDwYINj5KI+enIuWiMy9E79yf1jowYL0UHNYHIrlxIKhptZ2Gv93PeGQRQaHYWFKagAMeyckj7GDuKYdQN2bQ2o67cpueYkiYJeouSGYpeCKsjT6R0x4eZT8VMoNVFfwt7YCD9EGt5t9M8uHvnJqSfvN2MEAa0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=FSI2/Q3V; arc=none smtp.client-ip=209.85.216.74
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pf1-f201.google.com with SMTP id d2e1a72fcca58-7779219ccc2so1772035b3a.1
-        for <kvm@vger.kernel.org>; Thu, 18 Sep 2025 17:21:41 -0700 (PDT)
+Received: by mail-pj1-f74.google.com with SMTP id 98e67ed59e1d1-32eaeba9abaso2052206a91.3
+        for <kvm@vger.kernel.org>; Thu, 18 Sep 2025 17:21:43 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1758241301; x=1758846101; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1758241302; x=1758846102; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:reply-to:from:to:cc:subject:date:message-id:reply-to;
-        bh=VT6pMOa7Bss0kSmnUFjjTDbwGWcOEihwse0RPF9AM0Y=;
-        b=Co6YmxRO17XWkuLfGIGOHZ7J1p0ePfyrSXkyNe0UWxQmtAxUfpDILJX0lEg+yPq4GQ
-         UZx9S86+qdGWpUJRxP4OwMeqT2zO2b4VOZMIhtI3KGF0LhLe5CJPbH8zwYrL5ZoP9zKB
-         jbPOAlg/il5XQ096PrRoXKBJ16xCC456AmfcO1OZAr5ilw7ERbkr0inN/YHGoKtqs1kk
-         L/VBSn5N+UyTVN4vO6QukHC+qdUVFg4NdCXzD4CnfRxSlR0/nSaJS21OxN88JGJKR7f7
-         UtHKWY9W8SUZPj0ISJLBo0yMlJeb73ecZx/gtMyoGxvPLWnQ4AZbkxDSVMSfA54ZeJRD
-         Fz7Q==
+        bh=V6NR6hJNo39Ak194/iehCX8ivlJpJKQaL0LT6dsFNE4=;
+        b=FSI2/Q3VD1im0Fy77i9QuczDnXKyID+S6TA1b4Nk4yEiCnaJcpKrkGPSLqDYcvH0W+
+         Oms5qkf5IthRXm5SM2XZWvrVUO7k5I1rAHqI/bS/N5AdqnwIy/qllUZbJeQqcbOmsBl7
+         ORzpOaHUWC2TIm3Pb6i9HS37K99thepZ8Ne+c9/Pn8SSWXaqcGL8ElthCyCTkR+jYcgg
+         M4e3YxXh/IdAjKdZ+O6TgMtifeiGfh/6CzRYtF6F5Kv2f6rBh+F+vWOmnNGMfzjQOO6G
+         80sKO4h0t94EYJc9mlZ47VS30++qmfBGcKdzYgSIqf+Z0P/+ObhC4sJ2zYJ3+2AhFCDH
+         D4iw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1758241301; x=1758846101;
+        d=1e100.net; s=20230601; t=1758241302; x=1758846102;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:reply-to:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=VT6pMOa7Bss0kSmnUFjjTDbwGWcOEihwse0RPF9AM0Y=;
-        b=M7T7+BFBokn09oqHCSHgIm+tzpdXJWw0uccHLNoyj8fzBcxM93Jkngl8//JG3zJHqd
-         DtCx30q+GxLURe6wCRJospsi23vMXzSeYdYAyuskelyI1CC2cPDd222bmoXrxblaIWUi
-         i8WnatV9pq8WfahQdi4kWeyNPqXu601gMmLB1D4yyaTVzEEKLMgNdDJtZVFChlaEjKhA
-         nt1sAnvnBi9GALG65Ra7vfu/FM80IorargQRnD+hzh5awoPYLy5rPXxLGucD9lCYtSwU
-         wR7dHeG6w5ax3S3wvCXI4DUlHHn/0mAwtg5l8I0m4H3WpZzhcChwbzW0/B19kmfP8oL5
-         WYKw==
-X-Gm-Message-State: AOJu0YzXvBaQ72YhsoG3p1d+p09STK+ULAUI0oolNIqDl8CBGjBLPnYX
-	OsBoP7go4I9g5hWPwXB2FA1BPAL0IT28DiMSImExgiND/Ba/6HGT5CgPFtgzrfmys1VvD5vXPdr
-	L6sXS4w==
-X-Google-Smtp-Source: AGHT+IGrCgRfUl52q+9Dm1SUPPCGRTzb2repp5WB05Y7Tt3MOB2S+vnmenaNajU41khUfolPBUODsZW1t3U=
-X-Received: from pjl5.prod.google.com ([2002:a17:90b:2f85:b0:32e:2405:c7ab])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a05:6a20:914d:b0:27b:dcba:a8f3
- with SMTP id adf61e73a8af0-2925f76be25mr2050578637.15.1758241300709; Thu, 18
- Sep 2025 17:21:40 -0700 (PDT)
+        bh=V6NR6hJNo39Ak194/iehCX8ivlJpJKQaL0LT6dsFNE4=;
+        b=S+h3f5EX4gu/sB5a2cbTIPh0ruFvsWdZPNqepGKGXY/G1Vy4alN3iuO+f2BSGVu6bI
+         Qikjcr76PNgIjSFkySfYFmCcLpjQCNkPpC+tt5mkuC9x/XWS+flzjL70iFF8WGOnQ1j/
+         ITXWlK1OVD5CE55UOCx7MZJqZFgaHocDJIH6RyN/NFp6Yhyi/rRqvUNQTDbUkc7RFiIs
+         aFh9S6OxNvNkCpFJXDtjE/1x/jBU8Y0c1MgTPHovUkgvf6NwqhXF9bNQthIfnE+RSob3
+         YlgozkX04yQl4KPgaH7pKhdgqk7zw+PWMg885BJlIa9+t21rfLFpXk4fccOxtHhH7lu6
+         l2YQ==
+X-Gm-Message-State: AOJu0YzU+GWPE9SzDkyD2yuUrMJ8YudHYzMcF2cUVc1mX3QSwrSd0nL0
+	13Bl7rm0NRaOv/AqDqJSJahDAxDUNeospb3MeaNRARfxhHjLcDcYKzOwi/fLnWmq/IkN23DFcMi
+	nnQKdSA==
+X-Google-Smtp-Source: AGHT+IHT5D+RL1x9PZ0uSxi9CCmhcDhe9AetnWo73QWXpTR8epuroZH8jxE7cx4SFGVKQG3EeEHkob8mz+8=
+X-Received: from pjn16.prod.google.com ([2002:a17:90b:5710:b0:32d:d956:20fb])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:4cd2:b0:32e:7270:949c
+ with SMTP id 98e67ed59e1d1-3309838d098mr2017873a91.35.1758241302585; Thu, 18
+ Sep 2025 17:21:42 -0700 (PDT)
 Reply-To: Sean Christopherson <seanjc@google.com>
-Date: Thu, 18 Sep 2025 17:21:31 -0700
+Date: Thu, 18 Sep 2025 17:21:32 -0700
 In-Reply-To: <20250919002136.1349663-1-seanjc@google.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
@@ -75,191 +75,106 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
 References: <20250919002136.1349663-1-seanjc@google.com>
 X-Mailer: git-send-email 2.51.0.470.ga7dc726c21-goog
-Message-ID: <20250919002136.1349663-2-seanjc@google.com>
-Subject: [PATCH v3 1/6] KVM: SVM: Move x2AVIC MSR interception helper to avic.c
+Message-ID: <20250919002136.1349663-3-seanjc@google.com>
+Subject: [PATCH v3 2/6] KVM: SVM: Update "APICv in x2APIC without x2AVIC" in
+ avic.c, not svm.c
 From: Sean Christopherson <seanjc@google.com>
 To: Sean Christopherson <seanjc@google.com>, Paolo Bonzini <pbonzini@redhat.com>
 Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
 	Naveen N Rao <naveen@kernel.org>
 Content-Type: text/plain; charset="UTF-8"
 
-Move svm_set_x2apic_msr_interception() to avic.c as it's only relevant
-when x2AVIC is enabled/supported and only called by AVIC code.  In
-addition to scoping AVIC code to avic.c, this will allow burying the
-global x2avic_enabled variable in avic.
+Set the "allow_apicv_in_x2apic_without_x2apic_virtualization" flag as part
+of avic_hardware_setup() instead of handling in svm_hardware_setup(), and
+make x2avic_enabled local to avic.c (setting the flag was the only use in
+svm.c).
 
-Opportunistically rename the helper to explicitly scope it to "avic".
+Opportunistically tag avic_hardware_setup() with __init to make it clear
+that nothing untoward is happening with svm_x86_ops.
 
-No functional change intended.
+No functional change intended (aside from the side effects of tagging
+avic_hardware_setup() with __init).
 
 Signed-off-by: Sean Christopherson <seanjc@google.com>
 ---
- arch/x86/kvm/svm/avic.c | 57 ++++++++++++++++++++++++++++++++++++++---
- arch/x86/kvm/svm/svm.c  | 49 -----------------------------------
- arch/x86/kvm/svm/svm.h  |  1 -
- 3 files changed, 54 insertions(+), 53 deletions(-)
+ arch/x86/kvm/svm/avic.c | 6 ++++--
+ arch/x86/kvm/svm/svm.c  | 4 +---
+ arch/x86/kvm/svm/svm.h  | 3 +--
+ 3 files changed, 6 insertions(+), 7 deletions(-)
 
 diff --git a/arch/x86/kvm/svm/avic.c b/arch/x86/kvm/svm/avic.c
-index a34c5c3b164e..478a18208a76 100644
+index 478a18208a76..683411442476 100644
 --- a/arch/x86/kvm/svm/avic.c
 +++ b/arch/x86/kvm/svm/avic.c
-@@ -79,6 +79,57 @@ static bool next_vm_id_wrapped = 0;
+@@ -77,7 +77,7 @@ static DEFINE_HASHTABLE(svm_vm_data_hash, SVM_VM_DATA_HASH_BITS);
+ static u32 next_vm_id = 0;
+ static bool next_vm_id_wrapped = 0;
  static DEFINE_SPINLOCK(svm_vm_data_hash_lock);
- bool x2avic_enabled;
+-bool x2avic_enabled;
++static bool x2avic_enabled;
  
-+
-+static void avic_set_x2apic_msr_interception(struct vcpu_svm *svm,
-+					     bool intercept)
-+{
-+	static const u32 x2avic_passthrough_msrs[] = {
-+		X2APIC_MSR(APIC_ID),
-+		X2APIC_MSR(APIC_LVR),
-+		X2APIC_MSR(APIC_TASKPRI),
-+		X2APIC_MSR(APIC_ARBPRI),
-+		X2APIC_MSR(APIC_PROCPRI),
-+		X2APIC_MSR(APIC_EOI),
-+		X2APIC_MSR(APIC_RRR),
-+		X2APIC_MSR(APIC_LDR),
-+		X2APIC_MSR(APIC_DFR),
-+		X2APIC_MSR(APIC_SPIV),
-+		X2APIC_MSR(APIC_ISR),
-+		X2APIC_MSR(APIC_TMR),
-+		X2APIC_MSR(APIC_IRR),
-+		X2APIC_MSR(APIC_ESR),
-+		X2APIC_MSR(APIC_ICR),
-+		X2APIC_MSR(APIC_ICR2),
-+
-+		/*
-+		 * Note!  Always intercept LVTT, as TSC-deadline timer mode
-+		 * isn't virtualized by hardware, and the CPU will generate a
-+		 * #GP instead of a #VMEXIT.
-+		 */
-+		X2APIC_MSR(APIC_LVTTHMR),
-+		X2APIC_MSR(APIC_LVTPC),
-+		X2APIC_MSR(APIC_LVT0),
-+		X2APIC_MSR(APIC_LVT1),
-+		X2APIC_MSR(APIC_LVTERR),
-+		X2APIC_MSR(APIC_TMICT),
-+		X2APIC_MSR(APIC_TMCCT),
-+		X2APIC_MSR(APIC_TDCR),
-+	};
-+	int i;
-+
-+	if (intercept == svm->x2avic_msrs_intercepted)
-+		return;
-+
-+	if (!x2avic_enabled)
-+		return;
-+
-+	for (i = 0; i < ARRAY_SIZE(x2avic_passthrough_msrs); i++)
-+		svm_set_intercept_for_msr(&svm->vcpu, x2avic_passthrough_msrs[i],
-+					  MSR_TYPE_RW, intercept);
-+
-+	svm->x2avic_msrs_intercepted = intercept;
-+}
-+
- static void avic_activate_vmcb(struct vcpu_svm *svm)
+ 
+ static void avic_set_x2apic_msr_interception(struct vcpu_svm *svm,
+@@ -1147,7 +1147,7 @@ void avic_vcpu_unblocking(struct kvm_vcpu *vcpu)
+  * - Hypervisor can support both xAVIC and x2AVIC in the same guest.
+  * - The mode can be switched at run-time.
+  */
+-bool avic_hardware_setup(void)
++bool __init avic_hardware_setup(struct kvm_x86_ops *svm_ops)
  {
- 	struct vmcb *vmcb = svm->vmcb01.ptr;
-@@ -99,7 +150,7 @@ static void avic_activate_vmcb(struct vcpu_svm *svm)
- 		vmcb->control.int_ctl |= X2APIC_MODE_MASK;
- 		vmcb->control.avic_physical_id |= X2AVIC_MAX_PHYSICAL_ID;
- 		/* Disabling MSR intercept for x2APIC registers */
--		svm_set_x2apic_msr_interception(svm, false);
-+		avic_set_x2apic_msr_interception(svm, false);
- 	} else {
- 		/*
- 		 * Flush the TLB, the guest may have inserted a non-APIC
-@@ -110,7 +161,7 @@ static void avic_activate_vmcb(struct vcpu_svm *svm)
- 		/* For xAVIC and hybrid-xAVIC modes */
- 		vmcb->control.avic_physical_id |= AVIC_MAX_PHYSICAL_ID;
- 		/* Enabling MSR intercept for x2APIC registers */
--		svm_set_x2apic_msr_interception(svm, true);
-+		avic_set_x2apic_msr_interception(svm, true);
- 	}
- }
+ 	if (!npt_enabled)
+ 		return false;
+@@ -1182,6 +1182,8 @@ bool avic_hardware_setup(void)
+ 	x2avic_enabled = boot_cpu_has(X86_FEATURE_X2AVIC);
+ 	if (x2avic_enabled)
+ 		pr_info("x2AVIC enabled\n");
++	else
++		svm_ops->allow_apicv_in_x2apic_without_x2apic_virtualization = true;
  
-@@ -130,7 +181,7 @@ static void avic_deactivate_vmcb(struct vcpu_svm *svm)
- 		return;
- 
- 	/* Enabling MSR intercept for x2APIC registers */
--	svm_set_x2apic_msr_interception(svm, true);
-+	avic_set_x2apic_msr_interception(svm, true);
- }
- 
- /* Note:
+ 	/*
+ 	 * Disable IPI virtualization for AMD Family 17h CPUs (Zen1 and Zen2)
 diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
-index 67f4eed01526..3bcb88b2e617 100644
+index 3bcb88b2e617..d4643dce7c91 100644
 --- a/arch/x86/kvm/svm/svm.c
 +++ b/arch/x86/kvm/svm/svm.c
-@@ -736,55 +736,6 @@ static void svm_recalc_lbr_msr_intercepts(struct kvm_vcpu *vcpu)
- 		svm_set_intercept_for_msr(vcpu, MSR_IA32_DEBUGCTLMSR, MSR_TYPE_RW, intercept);
- }
+@@ -5354,15 +5354,13 @@ static __init int svm_hardware_setup(void)
+ 			goto err;
+ 	}
  
--void svm_set_x2apic_msr_interception(struct vcpu_svm *svm, bool intercept)
--{
--	static const u32 x2avic_passthrough_msrs[] = {
--		X2APIC_MSR(APIC_ID),
--		X2APIC_MSR(APIC_LVR),
--		X2APIC_MSR(APIC_TASKPRI),
--		X2APIC_MSR(APIC_ARBPRI),
--		X2APIC_MSR(APIC_PROCPRI),
--		X2APIC_MSR(APIC_EOI),
--		X2APIC_MSR(APIC_RRR),
--		X2APIC_MSR(APIC_LDR),
--		X2APIC_MSR(APIC_DFR),
--		X2APIC_MSR(APIC_SPIV),
--		X2APIC_MSR(APIC_ISR),
--		X2APIC_MSR(APIC_TMR),
--		X2APIC_MSR(APIC_IRR),
--		X2APIC_MSR(APIC_ESR),
--		X2APIC_MSR(APIC_ICR),
--		X2APIC_MSR(APIC_ICR2),
--
--		/*
--		 * Note!  Always intercept LVTT, as TSC-deadline timer mode
--		 * isn't virtualized by hardware, and the CPU will generate a
--		 * #GP instead of a #VMEXIT.
--		 */
--		X2APIC_MSR(APIC_LVTTHMR),
--		X2APIC_MSR(APIC_LVTPC),
--		X2APIC_MSR(APIC_LVT0),
--		X2APIC_MSR(APIC_LVT1),
--		X2APIC_MSR(APIC_LVTERR),
--		X2APIC_MSR(APIC_TMICT),
--		X2APIC_MSR(APIC_TMCCT),
--		X2APIC_MSR(APIC_TDCR),
--	};
--	int i;
--
--	if (intercept == svm->x2avic_msrs_intercepted)
--		return;
--
--	if (!x2avic_enabled)
--		return;
--
--	for (i = 0; i < ARRAY_SIZE(x2avic_passthrough_msrs); i++)
--		svm_set_intercept_for_msr(&svm->vcpu, x2avic_passthrough_msrs[i],
--					  MSR_TYPE_RW, intercept);
--
--	svm->x2avic_msrs_intercepted = intercept;
--}
--
- void svm_vcpu_free_msrpm(void *msrpm)
- {
- 	__free_pages(virt_to_page(msrpm), get_order(MSRPM_SIZE));
+-	enable_apicv = avic = avic && avic_hardware_setup();
++	enable_apicv = avic = avic && avic_hardware_setup(&svm_x86_ops);
+ 
+ 	if (!enable_apicv) {
+ 		enable_ipiv = false;
+ 		svm_x86_ops.vcpu_blocking = NULL;
+ 		svm_x86_ops.vcpu_unblocking = NULL;
+ 		svm_x86_ops.vcpu_get_apicv_inhibit_reasons = NULL;
+-	} else if (!x2avic_enabled) {
+-		svm_x86_ops.allow_apicv_in_x2apic_without_x2apic_virtualization = true;
+ 	}
+ 
+ 	if (vls) {
 diff --git a/arch/x86/kvm/svm/svm.h b/arch/x86/kvm/svm/svm.h
-index 5d39c0b17988..1e612bbfd36d 100644
+index 1e612bbfd36d..811513c8b566 100644
 --- a/arch/x86/kvm/svm/svm.h
 +++ b/arch/x86/kvm/svm/svm.h
-@@ -699,7 +699,6 @@ void svm_set_gif(struct vcpu_svm *svm, bool value);
- int svm_invoke_exit_handler(struct kvm_vcpu *vcpu, u64 exit_code);
- void set_msr_interception(struct kvm_vcpu *vcpu, u32 *msrpm, u32 msr,
- 			  int read, int write);
--void svm_set_x2apic_msr_interception(struct vcpu_svm *svm, bool disable);
- void svm_complete_interrupt_delivery(struct kvm_vcpu *vcpu, int delivery_mode,
- 				     int trig_mode, int vec);
+@@ -48,7 +48,6 @@ extern bool npt_enabled;
+ extern int nrips;
+ extern int vgif;
+ extern bool intercept_smi;
+-extern bool x2avic_enabled;
+ extern bool vnmi;
+ extern int lbrv;
  
+@@ -800,7 +799,7 @@ extern struct kvm_x86_nested_ops svm_nested_ops;
+ 	BIT(APICV_INHIBIT_REASON_PHYSICAL_ID_TOO_BIG)	\
+ )
+ 
+-bool avic_hardware_setup(void);
++bool __init avic_hardware_setup(struct kvm_x86_ops *svm_ops);
+ int avic_ga_log_notifier(u32 ga_tag);
+ void avic_vm_destroy(struct kvm *kvm);
+ int avic_vm_init(struct kvm *kvm);
 -- 
 2.51.0.470.ga7dc726c21-goog
 
