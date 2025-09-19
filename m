@@ -1,71 +1,71 @@
-Return-Path: <kvm+bounces-58238-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-58239-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id F176AB8B7CF
-	for <lists+kvm@lfdr.de>; Sat, 20 Sep 2025 00:36:23 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 84C66B8B7F0
+	for <lists+kvm@lfdr.de>; Sat, 20 Sep 2025 00:37:47 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id D0AB3189EF4B
-	for <lists+kvm@lfdr.de>; Fri, 19 Sep 2025 22:36:38 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id B35477BD07F
+	for <lists+kvm@lfdr.de>; Fri, 19 Sep 2025 22:35:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4F2A12DF6F7;
-	Fri, 19 Sep 2025 22:33:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0E3342E717D;
+	Fri, 19 Sep 2025 22:33:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="FkIrvUcM"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="1CdpEbhi"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pj1-f73.google.com (mail-pj1-f73.google.com [209.85.216.73])
+Received: from mail-pl1-f202.google.com (mail-pl1-f202.google.com [209.85.214.202])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E399E2E11AE
-	for <kvm@vger.kernel.org>; Fri, 19 Sep 2025 22:33:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.73
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C136D2E2DCB
+	for <kvm@vger.kernel.org>; Fri, 19 Sep 2025 22:33:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758321202; cv=none; b=MGOkWU60LFW6MvI0xF5ARnumW9dnZb98XMIVJGsBeavuOH0ByYdzrqEsnSzumpDWWgotvCsN+mvtKIaroNdVfQDfe4xyCYDg7PEP+hMTL44AXlBsEBGfA2Mx4KRaDTDlXk/WXLpVPGGd2JTO26BYtTMOHOrtk5xCzlS/0znZnIg=
+	t=1758321205; cv=none; b=Y76i+B8iJ4vIZ0x8iBNtQEcYslYxHYuv30lPUHyCr1nm+tGfpo8e8HBtSyOSqv3FnTWFAHRrepVzMpSNdQrgDLjHAwoEHG8o+vRLC75meHFGOEVrHdzy3I4KwJrGBjZMOX138esj+9YOLEAALbDAWb6pBqorvYNtp1SNBFebqGw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758321202; c=relaxed/simple;
-	bh=ez4a0EvjjtyHc093VLzuQLspYqBK0zm6wW8jLJdW4u0=;
+	s=arc-20240116; t=1758321205; c=relaxed/simple;
+	bh=XDTQ3tmfi6PZrBtBwIXn39EFZb7wdac6Jspf4/pSmcQ=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=HkMR8JGd19iUetEkaXhStySuSz9hxtn+RhGUEien7x6XtRbA+oEHgtkgCKJ0xSCUw7/Ww7K9jksBEfM4rr33YGYRjG1J27622KjfMNwQ8vFM2MeY+PmIZngfWJzEWVuYTH2ARgPmi9PXtKedDG7ASsQjruPdG6dpyqMSgqXRSXg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=FkIrvUcM; arc=none smtp.client-ip=209.85.216.73
+	 To:Cc:Content-Type; b=ijKAyPz2E8r8JoESNihh4rMfU0Wqgxc74A1+QvkLMk+1+QvnK8rqBMWVEw1umbjOn13tX+fHJfEp3CwR+SRgs3JdYjyJ8fjFFISyG1O2b4RiJl6HtGGAvuh2+eZj7aO49ywb6gXzj0xfaJCmi4tBIo5JxiWjvaWb8W9bi+EpJVw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=1CdpEbhi; arc=none smtp.client-ip=209.85.214.202
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pj1-f73.google.com with SMTP id 98e67ed59e1d1-32eaa47c7c8so2578602a91.3
-        for <kvm@vger.kernel.org>; Fri, 19 Sep 2025 15:33:20 -0700 (PDT)
+Received: by mail-pl1-f202.google.com with SMTP id d9443c01a7336-24457ef983fso47227305ad.0
+        for <kvm@vger.kernel.org>; Fri, 19 Sep 2025 15:33:22 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1758321200; x=1758926000; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1758321202; x=1758926002; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:reply-to:from:to:cc:subject:date:message-id:reply-to;
-        bh=pOmn1hzdWZ666uhIyCKCS3d5Tvi+EBzamfmIdMDGoZg=;
-        b=FkIrvUcMMOlDvaHz4TtYYg+OqZ6bGIjIfGA06RdlWDaX3OAwlZVrNCkFTfo/YGPakm
-         3617E8eDGx2DJyFdMBZWmi2giukJVytur129LjAjIT1swneau721DWCQ05OLmpkDfJoH
-         M/o9SNMuOtMm0eH9fZfAk/HeQZy8EH0D4uPNy0Wv+v8TMHUqA5xNpD/8TofuBHNHPoQW
-         BctppUFp7WxOxwZQ2grS8FZmPm6I+4gtXmwVuaAROPLJIuoONJvW6hxmBJqkUIcaDYYk
-         xq5FQpPHDnT7d6wSrQoBKStVN5d9+tgB7v7aoPnYfhZ0MlWkPAP8qjD9IGwZExUwy/P6
-         XceA==
+        bh=vK7f/VGUWllVW7AxxNHDM2H0xPEmsYVTGx9qq6v/NuQ=;
+        b=1CdpEbhiHsg9OTTHfstT6+UN5y9TLvg1ijYKBgZ6nV61eQVLxWAOf/sr+00+TfCEZi
+         tjFY/GPtjUHU+48xAxzkICRE9xthzCuu58MprnBnbgEgHUYywExRJg2XtMquL3xj0T0k
+         EPXeyK6kbSITJzk8oaXWJ+BSZQTPXe62B+ficmHFvmTBcpQ3HkVNiAHxGui2eCnOmOqO
+         ABHJ+18Fv8m9DP9Ph/PCBaosE2YA7wl9qXtCtmuqvK2fTc/65zianMyKhDAbPyl0cQ/l
+         EwqN2EZWi91Rnf+fenrNJ51MyhpfMUbtpuNcGp+HtRE/oWacYxSIGqPguZV2BQaXuTKB
+         eiUA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1758321200; x=1758926000;
+        d=1e100.net; s=20230601; t=1758321202; x=1758926002;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:reply-to:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=pOmn1hzdWZ666uhIyCKCS3d5Tvi+EBzamfmIdMDGoZg=;
-        b=cySMFyB8Uh3fz6hSq8zG6RJlMs8oHS0DetfZ/gfdEEFxrnAkDvajo/1iHK+l2wSK07
-         YPmeEGQDsImqMXjYMFRzpHFzVn3AYYI8L8gWT0I7Jc+bSw+7l16nCOP1q4DzFMz9M4Rz
-         GM5ATkqnD+E/bWR6OvPGgnu/rRFY2ipZvDTn1j8/ljecN2wdoDc/7YKRUxZNqImpcynq
-         MmWU6tjOmXKwThu8BmhBZatjXYogrznlJJYC9V0uctzn34QIe5KhA1rgC1Whs0A8bkp9
-         DKvOUdrM7q/aoErLuEFLNkLYLba4vT7jCILBAtmhIE7mPgV3B/tvKL2swSN8I71XMlGo
-         /xwg==
-X-Gm-Message-State: AOJu0YyVjt6c4mcVYcjW8kP/K3rNDQT7NIk2/zPgQhPonH1kDdMq4XDa
-	3In3ndyTx0OoWwCwOLyQJG6vklwRSLjtPojhk9og/z4+9ETI2beirA1EWuyIMkc1wsB8O2YN6U4
-	U+cQLeA==
-X-Google-Smtp-Source: AGHT+IHPp+EMEqqepgMRLXkmh2NAYmJDXHdpPXFvlA0cxdH2fcNuhXSpiI6o1vBaj4gvOZIsi3vnHYEIRwA=
-X-Received: from pjbmf16.prod.google.com ([2002:a17:90b:1850:b0:32b:95bb:dbc])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90a:e703:b0:30a:4874:5397
- with SMTP id 98e67ed59e1d1-3309800134amr5713441a91.9.1758321200242; Fri, 19
- Sep 2025 15:33:20 -0700 (PDT)
+        bh=vK7f/VGUWllVW7AxxNHDM2H0xPEmsYVTGx9qq6v/NuQ=;
+        b=ccFGai4JRe8lN4i3HIxTvIOulTdc2M/7aGQ1Sv56iVg6zDDDtZTvv+0RE1e9t0E9IX
+         oLddbWrbwbauL8tBZOefe2h9Zm8WRg8WJ4GcwtDDx8DRG2PDGzt5z7fQ6spwJntguFR4
+         xYZiRuFdq/YdSIXD4Y3dCfsJYndJCg1Epjrsdp6SJ0C2AgsugXufCeOSIkdUawCoXPyA
+         ynCrM9g3C66A171eMwYEZK3frFzNiiHajeMKekP4BsdassKlbEAsM2t8zcGFnk7TpMgp
+         h6BVyF7LWqbHR5WLLgT229ct5iNboRP/4t0kjAdx6aeV2hZu0+87YNw68ILIoSps7b1L
+         QSdw==
+X-Gm-Message-State: AOJu0Yw0hYObc3KJX0CGXhpNuWDH7hYXev7BKiKdXQW8P7BWuS9ylDpe
+	VCauZ0sJUocmRggd81cqTXjnOGLx2g5Fl7PzxUMugKJJ0MK66myDNb7Iazur7orqaLQvIB9zNYH
+	ZzO86Lg==
+X-Google-Smtp-Source: AGHT+IEhLi+5mQCpDa2G+QupkEqfe8Hp43V+hOTG8T+hU1K21FndSGDLtWyQBh5uTqjUPG6FYD52vqx9Sh8=
+X-Received: from plcz20.prod.google.com ([2002:a17:903:4094:b0:24c:cd65:485c])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:903:2f8d:b0:269:6c70:ee2
+ with SMTP id d9443c01a7336-269ba5455b6mr73260355ad.52.1758321201946; Fri, 19
+ Sep 2025 15:33:21 -0700 (PDT)
 Reply-To: Sean Christopherson <seanjc@google.com>
-Date: Fri, 19 Sep 2025 15:32:17 -0700
+Date: Fri, 19 Sep 2025 15:32:18 -0700
 In-Reply-To: <20250919223258.1604852-1-seanjc@google.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
@@ -75,8 +75,8 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
 References: <20250919223258.1604852-1-seanjc@google.com>
 X-Mailer: git-send-email 2.51.0.470.ga7dc726c21-goog
-Message-ID: <20250919223258.1604852-11-seanjc@google.com>
-Subject: [PATCH v16 10/51] KVM: x86: Add fault checks for guest CR4.CET setting
+Message-ID: <20250919223258.1604852-12-seanjc@google.com>
+Subject: [PATCH v16 11/51] KVM: x86: Report KVM supported CET MSRs as to-be-saved
 From: Sean Christopherson <seanjc@google.com>
 To: Paolo Bonzini <pbonzini@redhat.com>, Sean Christopherson <seanjc@google.com>
 Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
@@ -89,49 +89,58 @@ Content-Type: text/plain; charset="UTF-8"
 
 From: Yang Weijiang <weijiang.yang@intel.com>
 
-Check potential faults for CR4.CET setting per Intel SDM requirements.
-CET can be enabled if and only if CR0.WP == 1, i.e. setting CR4.CET ==
-1 faults if CR0.WP == 0 and setting CR0.WP == 0 fails if CR4.CET == 1.
+Add CET MSRs to the list of MSRs reported to userspace if the feature,
+i.e. IBT or SHSTK, associated with the MSRs is supported by KVM.
 
+Suggested-by: Chao Gao <chao.gao@intel.com>
 Signed-off-by: Yang Weijiang <weijiang.yang@intel.com>
-Reviewed-by: Chao Gao <chao.gao@intel.com>
-Reviewed-by: Maxim Levitsky <mlevitsk@redhat.com>
-Reviewed-by: Xiaoyao Li <xiaoyao.li@intel.com>
 Tested-by: Mathias Krause <minipli@grsecurity.net>
 Tested-by: John Allen <john.allen@amd.com>
 Tested-by: Rick Edgecombe <rick.p.edgecombe@intel.com>
 Signed-off-by: Chao Gao <chao.gao@intel.com>
 Reviewed-by: Binbin Wu <binbin.wu@linux.intel.com>
-Co-developed-by: Sean Christopherson <seanjc@google.com>
+Reviewed-by: Xiaoyao Li <xiaoyao.li@intel.com>
 Signed-off-by: Sean Christopherson <seanjc@google.com>
 ---
- arch/x86/kvm/x86.c | 6 ++++++
- 1 file changed, 6 insertions(+)
+ arch/x86/kvm/x86.c | 18 ++++++++++++++++++
+ 1 file changed, 18 insertions(+)
 
 diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-index ae402463f991..d748b1ce1e81 100644
+index d748b1ce1e81..5245b21168cb 100644
 --- a/arch/x86/kvm/x86.c
 +++ b/arch/x86/kvm/x86.c
-@@ -1176,6 +1176,9 @@ int kvm_set_cr0(struct kvm_vcpu *vcpu, unsigned long cr0)
- 	    (is_64_bit_mode(vcpu) || kvm_is_cr4_bit_set(vcpu, X86_CR4_PCIDE)))
- 		return 1;
+@@ -344,6 +344,10 @@ static const u32 msrs_to_save_base[] = {
+ 	MSR_IA32_UMWAIT_CONTROL,
  
-+	if (!(cr0 & X86_CR0_WP) && kvm_is_cr4_bit_set(vcpu, X86_CR4_CET))
-+		return 1;
+ 	MSR_IA32_XFD, MSR_IA32_XFD_ERR, MSR_IA32_XSS,
 +
- 	kvm_x86_call(set_cr0)(vcpu, cr0);
++	MSR_IA32_U_CET, MSR_IA32_S_CET,
++	MSR_IA32_PL0_SSP, MSR_IA32_PL1_SSP, MSR_IA32_PL2_SSP,
++	MSR_IA32_PL3_SSP, MSR_IA32_INT_SSP_TAB,
+ };
  
- 	kvm_post_set_cr0(vcpu, old_cr0, cr0);
-@@ -1376,6 +1379,9 @@ int kvm_set_cr4(struct kvm_vcpu *vcpu, unsigned long cr4)
- 			return 1;
+ static const u32 msrs_to_save_pmu[] = {
+@@ -7603,6 +7607,20 @@ static void kvm_probe_msr_to_save(u32 msr_index)
+ 		if (!kvm_caps.supported_xss)
+ 			return;
+ 		break;
++	case MSR_IA32_U_CET:
++	case MSR_IA32_S_CET:
++		if (!kvm_cpu_cap_has(X86_FEATURE_SHSTK) &&
++		    !kvm_cpu_cap_has(X86_FEATURE_IBT))
++			return;
++		break;
++	case MSR_IA32_INT_SSP_TAB:
++		if (!kvm_cpu_cap_has(X86_FEATURE_LM))
++			return;
++		fallthrough;
++	case MSR_IA32_PL0_SSP ... MSR_IA32_PL3_SSP:
++		if (!kvm_cpu_cap_has(X86_FEATURE_SHSTK))
++			return;
++		break;
+ 	default:
+ 		break;
  	}
- 
-+	if ((cr4 & X86_CR4_CET) && !kvm_is_cr0_bit_set(vcpu, X86_CR0_WP))
-+		return 1;
-+
- 	kvm_x86_call(set_cr4)(vcpu, cr4);
- 
- 	kvm_post_set_cr4(vcpu, old_cr4, cr4);
 -- 
 2.51.0.470.ga7dc726c21-goog
 
