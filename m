@@ -1,152 +1,159 @@
-Return-Path: <kvm+bounces-58154-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-58155-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 50CB6B8A1B5
-	for <lists+kvm@lfdr.de>; Fri, 19 Sep 2025 16:55:25 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2D517B8A38E
+	for <lists+kvm@lfdr.de>; Fri, 19 Sep 2025 17:15:35 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 7D2F118876E0
-	for <lists+kvm@lfdr.de>; Fri, 19 Sep 2025 14:55:45 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 61EEB1886BE5
+	for <lists+kvm@lfdr.de>; Fri, 19 Sep 2025 15:15:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E71B73112C2;
-	Fri, 19 Sep 2025 14:55:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 943DF3161B7;
+	Fri, 19 Sep 2025 15:14:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="Zh7bio4X"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Eg4JKZQO"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pl1-f201.google.com (mail-pl1-f201.google.com [209.85.214.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A98A61F3FEC
-	for <kvm@vger.kernel.org>; Fri, 19 Sep 2025 14:55:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A2BB03148D7;
+	Fri, 19 Sep 2025 15:14:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758293713; cv=none; b=pIJ8OpM7ePdZ/kI/4TyXSyq5ogIa9idLTZzniyluIJj1xNLD6SCZY2Oj/LFd+MdNz2kvQUeOXYqbOC5RKcOhyqXnncoj6Y9ELbEFOEmO3jyNNQFxd6WIjhLhFGNXeOUY/Du7bayi51mFAaEugnPDqgtDgUIYWKMXoCQaqtWAqg8=
+	t=1758294893; cv=none; b=Ra0MF0e+RA7SYkM+WkYlB9+ngXrDdVCLU4YSbWxsVvZaPLjndl+7NDwogt4mXIfwgdMykKcU8zSu5v0bYsuN8miWA/mzhMRQfgP0JoBcr9T4xMb0+mwAOpLF6Hf9bGoe5fv0vokXh5uvLypqc6g1BlGPHSS6DqzAcMyrjo8sCFs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758293713; c=relaxed/simple;
-	bh=AcD69okMOpEbxEQkwsqp0PT3CELtBK6EsZ3jJIbiM+U=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=lCC17GWYHI1gQM2ObIJKhAiPC+Z9j+lIU4Gq/+6AE7bQ0qfOIXTFI/cW2x8llR80s6L5Yph3voS8v/NIrGaP5Jw9aHQ5dv4Fm6AoLe/+iRWM1btFGaoXnBveP5a4iw8R3rLbInFhI9UW72NVrrc2BSAcmqdHqg1sA0DVbY2mBY4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=Zh7bio4X; arc=none smtp.client-ip=209.85.214.201
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pl1-f201.google.com with SMTP id d9443c01a7336-268141f759aso23445505ad.2
-        for <kvm@vger.kernel.org>; Fri, 19 Sep 2025 07:55:11 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1758293711; x=1758898511; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:from:subject:message-id:references
-         :mime-version:in-reply-to:date:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=ukxipGRfsdTkRjH+xOeneAls5BFz/ZvVQ9NXnmVWsy4=;
-        b=Zh7bio4XtLI0vHUKFeV9Ag3i2wJrvcfCh1Fzdhy+mTXdm4YzYTzE2SoVyVpuyEEI4u
-         eUTka+yykyzLhWlE7buVbAZueOhcqpP1JMHDkUrrQobBpG/YmL/ycnaWue1Eeeb0rLxo
-         URb/Gxfb/hUHCBRRS2z0Z4Xn9RDpaRADHLmYCIkAKj3DzE9iSbeCztpwr2DRpKkrkLzJ
-         Y2VBgyoRI/yAPhB3BiTnhtUuVX21bUf8ShaG2egT5V4qbGsNNXg2ZmczypC3IJqUYG3D
-         t28SR+3HFONtadSYSKVpparHdLFvnPMrL2AiuMoUVO9jt457k9a4XU7gIR3DA2siiPaM
-         Zo3w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1758293711; x=1758898511;
-        h=content-transfer-encoding:cc:to:from:subject:message-id:references
-         :mime-version:in-reply-to:date:x-gm-message-state:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=ukxipGRfsdTkRjH+xOeneAls5BFz/ZvVQ9NXnmVWsy4=;
-        b=EvgPhAjlwZ5DFcXOAMychx0UDeM77bOMVhXy/eLpesViHUrY0x/bHCtEFsOBGZ+V9a
-         lMKJel/b2tveH0z93VM1niYgL3rWpsTL/PYSnuMheT5QOkqBogYDmxTD6xyNXbsKxpcN
-         UDOz2XJwj8c7qOP0ddoTcBnzbWzVvoVuYi1wsAvDaAaL48Br78nWsa6X4LIYzMcTa/mX
-         Xx8ZO95VIHSEjLebh2NU9yyQBbTIpSexgfkK3hcltwb+dID9YbaenSGTlXoOVaO/QKuj
-         ugstXVUOEj8oSYTPkIYa4XueO0kT/yxZfLGPzHL8r/i+ZqeZUGPGrTOQo9G9V4sZiqTQ
-         UIEQ==
-X-Forwarded-Encrypted: i=1; AJvYcCXpJfYN4dW3LdN3DQY9kTPQW4p9apzaB3aTmVzhE2RwJXcExUaoZP2wf5D2o3SIjrX5R1k=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yw7YH990pEfQ9YBGSIf1K4n2h2KO/3x9LHhbLUU+4CCdmgKoDOe
-	Qm+iz0N6QpNuxyqSaez5jQ2VUK5Tv4aV1gaRQ3lKUVstkvftlixKNZ3mw8xNgTN4NkZVgjtSh2d
-	im2mW8Q==
-X-Google-Smtp-Source: AGHT+IEPv+dMGHlbROIguDvWPOh2MSP4wIEpD1hQevdkOddIgSAniwuj5qvJ5S/5KY6sgA6Wv/GK8O6BCmY=
-X-Received: from pjbnc8.prod.google.com ([2002:a17:90b:37c8:b0:32e:bcc3:ea8e])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:903:46d0:b0:24f:fb79:e25f
- with SMTP id d9443c01a7336-269ba544991mr49200515ad.46.1758293710936; Fri, 19
- Sep 2025 07:55:10 -0700 (PDT)
-Date: Fri, 19 Sep 2025 07:55:09 -0700
-In-Reply-To: <dd2d2e23-083e-46cf-b0bd-7dfb3198d403@linux.intel.com>
+	s=arc-20240116; t=1758294893; c=relaxed/simple;
+	bh=NNpcBJB4jVrgHcageJLDdkxE2rXZt7r2rrDsKSC+D9I=;
+	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=heQzel7A5h5fiVP3dufdJDE2HrutfUFYulz+2MU643RUGqoqOW2kDq4LUXUhGsTOJXvqT68fBqu8iDV3b81AnCYpJtXpBCNVGKMA8kdyR7spmcNjmEX2BEm3PM9lQ15ro444SW5/JZp+3iYf68S2yR9VoTwwyaBIfpki1P3PoeI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Eg4JKZQO; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1D2CAC4CEF0;
+	Fri, 19 Sep 2025 15:14:53 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1758294893;
+	bh=NNpcBJB4jVrgHcageJLDdkxE2rXZt7r2rrDsKSC+D9I=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=Eg4JKZQOCeE8iQvdN+xzthu0malVpcqAn0K+LiPgASso6UWuMIahP8/vuL5Db7Emp
+	 KPSeSEMTwefKp+sQCDJi0DuCii2L1du0M3dAWHrgaJBt4zPfAXrHYyy67gvjIjERRz
+	 tj1rbbnelqbucGoG7/6yVqjB8Rgx8QIdB/xvn2AsXqqgFPKb9kg3+oR9+Yeavhd5V2
+	 pvW8A0RgP4ZeMdERb6nPXfzTdfn0ROHkrp37kn3VWetHLFALyiOLxnVEjQG3XQgldV
+	 XYK7lQ+cv/HgUX+q39HLhNdPzpidVAOswo0VJCb2577KR+MbrZ16P1IzVmVt6qJi0E
+	 YTmssBMmAHYDw==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=lobster-girl.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.98.2)
+	(envelope-from <maz@kernel.org>)
+	id 1uzcp0-00000007oto-3G9H;
+	Fri, 19 Sep 2025 15:14:50 +0000
+Date: Fri, 19 Sep 2025 16:14:49 +0100
+Message-ID: <87zfaqxymu.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Mark Brown <broonie@kernel.org>
+Cc: Oliver Upton <oliver.upton@linux.dev>,
+	Joey Gouly <joey.gouly@arm.com>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Will Deacon <will@kernel.org>,
+	Paolo Bonzini <pbonzini@redhat.com>,
+	Jonathan Corbet <corbet@lwn.net>,
+	Shuah Khan <shuah@kernel.org>,
+	Dave Martin <Dave.Martin@arm.com>,
+	Fuad Tabba <tabba@google.com>,
+	Mark Rutland <mark.rutland@arm.com>,
+	linux-arm-kernel@lists.infradead.org,
+	kvmarm@lists.linux.dev,
+	linux-kernel@vger.kernel.org,
+	kvm@vger.kernel.org,
+	linux-doc@vger.kernel.org,
+	linux-kselftest@vger.kernel.org,
+	Peter Maydell <peter.maydell@linaro.org>,
+	Eric Auger <eric.auger@redhat.com>
+Subject: Re: [PATCH v8 06/29] KVM: arm64: Introduce non-UNDEF FGT control
+In-Reply-To: <20250902-kvm-arm64-sme-v8-6-2cb2199c656c@kernel.org>
+References: <20250902-kvm-arm64-sme-v8-0-2cb2199c656c@kernel.org>
+	<20250902-kvm-arm64-sme-v8-6-2cb2199c656c@kernel.org>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20250919004512.1359828-1-seanjc@google.com> <20250919004512.1359828-6-seanjc@google.com>
- <dd2d2e23-083e-46cf-b0bd-7dfb3198d403@linux.intel.com>
-Message-ID: <aM1uzfweXxoaaLpt@google.com>
-Subject: Re: [PATCH v3 5/5] KVM: selftests: Handle Intel Atom errata that
- leads to PMU event overcount
-From: Sean Christopherson <seanjc@google.com>
-To: Dapeng Mi <dapeng1.mi@linux.intel.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	Yi Lai <yi1.lai@intel.com>, dongsheng <dongsheng.x.zhang@intel.com>
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: broonie@kernel.org, oliver.upton@linux.dev, joey.gouly@arm.com, catalin.marinas@arm.com, suzuki.poulose@arm.com, will@kernel.org, pbonzini@redhat.com, corbet@lwn.net, shuah@kernel.org, Dave.Martin@arm.com, tabba@google.com, mark.rutland@arm.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, linux-kernel@vger.kernel.org, kvm@vger.kernel.org, linux-doc@vger.kernel.org, linux-kselftest@vger.kernel.org, peter.maydell@linaro.org, eric.auger@redhat.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Fri, Sep 19, 2025, Dapeng Mi wrote:
->=20
-> On 9/19/2025 8:45 AM, Sean Christopherson wrote:
-> > diff --git a/tools/testing/selftests/kvm/x86/pmu_counters_test.c b/tool=
-s/testing/selftests/kvm/x86/pmu_counters_test.c
-> > index baa7b8a2d459..acb5a5c37296 100644
-> > --- a/tools/testing/selftests/kvm/x86/pmu_counters_test.c
-> > +++ b/tools/testing/selftests/kvm/x86/pmu_counters_test.c
-> > @@ -163,10 +163,18 @@ static void guest_assert_event_count(uint8_t idx,=
- uint32_t pmc, uint32_t pmc_msr
-> > =20
-> >  	switch (idx) {
-> >  	case INTEL_ARCH_INSTRUCTIONS_RETIRED_INDEX:
-> > -		GUEST_ASSERT_EQ(count, NUM_INSNS_RETIRED);
-> > +		/* Relax precise count check due to VM-EXIT/VM-ENTRY overcount issue=
- */
-> > +		if (this_pmu_has_errata(INSTRUCTIONS_RETIRED_OVERCOUNT))
->=20
-> The pmu_errata_mask is a bitmap, so the argument should be
-> BIT_ULL(INSTRUCTIONS_RETIRED_OVERCOUNT) instead of
-> INSTRUCTIONS_RETIRED_OVERCOUNT?
+On Tue, 02 Sep 2025 12:36:09 +0100,
+Mark Brown <broonie@kernel.org> wrote:
+> 
+> We have support for determining a set of fine grained traps to enable for
+> the guest which is tied to the support for injecting UNDEFs for undefined
+> features. This means that we can't use the mechanism for system registers
+> which should be present but need emulation, such as SMPRI_EL1 which should
+> be accessible when SME is present but if SME priority support is absent
+> SMPRI_EL1.Priority should be RAZ.
+> 
+> Add an additional set of fine grained traps fgt, mirroring the existing fgu
+> array. We use the same format where we always set the bit for the trap in
+> the array as for FGU. This makes it clear what is being explicitly managed
+> and keeps the code consistent.
+> 
+> We do not convert the handling of ARM_WORKAROUND_AMPERE_ACO3_CPU_38 to this
+> mechanism since this only enables a write trap and when implementing the
+> existing UNDEF that we would share the read and write trap enablement (this
+> being the overwhelmingly common case).
+> 
+> Signed-off-by: Mark Brown <broonie@kernel.org>
+> ---
+>  arch/arm64/include/asm/kvm_host.h       | 6 ++++++
+>  arch/arm64/kvm/hyp/include/hyp/switch.h | 7 ++++---
+>  2 files changed, 10 insertions(+), 3 deletions(-)
+> 
+> diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+> index 2f2394cce24e..b501c2880ba2 100644
+> --- a/arch/arm64/include/asm/kvm_host.h
+> +++ b/arch/arm64/include/asm/kvm_host.h
+> @@ -302,6 +302,12 @@ struct kvm_arch {
+>  	 */
+>  	u64 fgu[__NR_FGT_GROUP_IDS__];
+>  
+> +	/*
+> +	 * Additional FGTs to enable for the guests, eg. for emulated
+> +	 * registers,
+> +	 */
+> +	u64 fgt[__NR_FGT_GROUP_IDS__];
+> +
 
-Gah, I just forgot to use BIT_ULL() in this_pmu_has_errata().
+Conceptually, this serves the same role as the existing control
+registers (HCR_EL2, HCRX_EL2, MDCR_EL2), which are obviously
+per-vcpu. So having this on a per-VM basis doesn't really work,
+because we definitely don't expect this to be uniform (see
+20250917203125.283116-3-oliver.upton@linux.dev for an example of why
+this is not the case).
 
-diff --git a/tools/testing/selftests/kvm/include/x86/pmu.h b/tools/testing/=
-selftests/kvm/include/x86/pmu.h
-index 25d2b476daf4..308c9f6f0d57 100644
---- a/tools/testing/selftests/kvm/include/x86/pmu.h
-+++ b/tools/testing/selftests/kvm/include/x86/pmu.h
-@@ -115,7 +115,7 @@ void kvm_init_pmu_errata(void);
-=20
- static inline bool this_pmu_has_errata(enum pmu_errata errata)
- {
--       return pmu_errata_mask & errata;
-+       return pmu_errata_mask & BIT_ULL(errata);
- }
-=20
- #endif /* SELFTEST_KVM_PMU_H */
+FGUs are uniform, because when something doesn't exist on a vcpu, it
+doesn't exist on *any* vcpu. Non-FGU use of FGTs, however, has to be
+more flexible because that's part of the emulation, and is actually
+pretty rare that we want to trap something at all times, on all vcpus.
 
+For the same reason, conflating the R and W registers doesn't work
+either. For the above example, I want to be able to trap write
+accesses to MDSCR_EL1, and not reads, just like the Ampere
+brain-damage.
 
->=20
-> Or better, directly define INSTRUCTIONS_RETIRED_OVERCOUNT as a bitmap, li=
-ke
-> this.
->=20
-> diff --git a/tools/testing/selftests/kvm/include/x86/pmu.h
-> b/tools/testing/selftests/kvm/include/x86/pmu.h
-> index 25d2b476daf4..9af448129597 100644
-> --- a/tools/testing/selftests/kvm/include/x86/pmu.h
-> +++ b/tools/testing/selftests/kvm/include/x86/pmu.h
-> @@ -106,8 +106,8 @@ extern const uint64_t intel_pmu_arch_events[];
-> =C2=A0extern const uint64_t amd_pmu_zen_events[];
->=20
-> =C2=A0enum pmu_errata {
-> -=C2=A0 =C2=A0 =C2=A0 =C2=A0INSTRUCTIONS_RETIRED_OVERCOUNT,
-> -=C2=A0 =C2=A0 =C2=A0 =C2=A0BRANCHES_RETIRED_OVERCOUNT,
-> +=C2=A0 =C2=A0 =C2=A0 =C2=A0INSTRUCTIONS_RETIRED_OVERCOUNT =3D (1 << 0),
-> +=C2=A0 =C2=A0 =C2=A0 =C2=A0BRANCHES_RETIRED_OVERCOUNT=C2=A0 =C2=A0 =C2=
-=A0=3D (1 << 1),
+So please make this per-vcpu, decouple R and W FGTs, and convert the
+Ampere horror to this scheme.
 
-I want to utilize the auto-incrementing behavior of enums, without having t=
-o
-resort to double-defines or anything.=20
+Thanks,
+
+	M.
+
+-- 
+Jazz isn't dead. It just smells funny.
 
