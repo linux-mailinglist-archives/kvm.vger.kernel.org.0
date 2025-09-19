@@ -1,71 +1,71 @@
-Return-Path: <kvm+bounces-58253-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-58254-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id CBAF6B8B829
-	for <lists+kvm@lfdr.de>; Sat, 20 Sep 2025 00:40:26 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id BF5BDB8B826
+	for <lists+kvm@lfdr.de>; Sat, 20 Sep 2025 00:40:25 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id BDC203B01C9
-	for <lists+kvm@lfdr.de>; Fri, 19 Sep 2025 22:40:16 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7C460179B16
+	for <lists+kvm@lfdr.de>; Fri, 19 Sep 2025 22:40:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6B3782FBDF3;
-	Fri, 19 Sep 2025 22:33:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2063B2FC014;
+	Fri, 19 Sep 2025 22:33:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="qf6XfOFd"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="fOK0S79l"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pg1-f202.google.com (mail-pg1-f202.google.com [209.85.215.202])
+Received: from mail-pl1-f201.google.com (mail-pl1-f201.google.com [209.85.214.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CF6972F83A7
-	for <kvm@vger.kernel.org>; Fri, 19 Sep 2025 22:33:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C185D2FB0BF
+	for <kvm@vger.kernel.org>; Fri, 19 Sep 2025 22:33:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758321232; cv=none; b=JyFJLlduKZeVciOHT3EHeS87lgWXZDwVU+4eld4QNAq9pojPUBkQBFJeDzqQkWjpe40Prb7FeSyCDx7w2Jx2MRp+FQx6YRWCQu8dsV4FUGZLnzgVCEJXKJF672/okZmtBBpSHqdNpZvCEGExdEOSZunQcdXdVdhhCCr8k3momV0=
+	t=1758321233; cv=none; b=TDY0V75tvMihUnrvvIO2r9oF1IBQ5NTae5r8yALHHjD5Up4gNKLO9hTB67opw1dKpg/XZI2ylD0mRZTMqsPkG6eCB7zAolPhlt8oPguq8ZrEGKCLjKZufemceW1PYw7R8heabfjU9Hg/DoQLjcFpmL5OM5L312ZpUryZxGnXqQE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758321232; c=relaxed/simple;
-	bh=wv7lXNgVXI4fQTSq3s9gMycF70a9TxUw41cJRljoKaw=;
+	s=arc-20240116; t=1758321233; c=relaxed/simple;
+	bh=/tqPBTeDuMrFe1AL4FE5D/cKrgiWfqZL6tyxrCfO6SU=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=IRMLwvBg3OY/0L5sujWhtH7PWNQxA6N346pSVxtKTsFyj4swsTOr7FFxdlABPJG/ml0l8oPGtxR8tySIJqHcufp7ipyZmLGEfrSnrshCdXzlIPz76uJh5oJxoIjCxc3bAsDu5q2mHMN4kSiWX49yP9PJpKlOxArSCRtip68ar4I=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=qf6XfOFd; arc=none smtp.client-ip=209.85.215.202
+	 To:Cc:Content-Type; b=m9fnw8b55Ba7CMtE5OATsKq4FdWX8FvRu8ZBBH324gQ+0VRmnG1Qt3Qrg+y5ZyFt7Afa3DNNmehY1qF4C4iGnvMs5wx/wwJLfJ5M9HIi0NllSJgkJzvN509fkN2j6v0jhLESYTqwEdFo7nGINX1+BJtKYr5+Voyx9QNVB2QC4lg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=fOK0S79l; arc=none smtp.client-ip=209.85.214.201
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pg1-f202.google.com with SMTP id 41be03b00d2f7-b4f8e079bc1so1801694a12.3
-        for <kvm@vger.kernel.org>; Fri, 19 Sep 2025 15:33:49 -0700 (PDT)
+Received: by mail-pl1-f201.google.com with SMTP id d9443c01a7336-244570600a1so31399525ad.1
+        for <kvm@vger.kernel.org>; Fri, 19 Sep 2025 15:33:51 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1758321229; x=1758926029; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1758321231; x=1758926031; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:reply-to:from:to:cc:subject:date:message-id:reply-to;
-        bh=w/iGcLBCIDmuuGH4TifEpczWER6MZ2hzrzutZDTwD2M=;
-        b=qf6XfOFdvKE4Eh41F71fXqatOU8VOjVv/1ycwd83DbGY97LsCUWCNSOuANGzBJPhBa
-         GXufSlfjk7Rq0IGdRPJm9cDDyaOE92orl3QJdVimqgLvdUT+9MdE8+xefBMsp+z0dpRa
-         M2755SNZRlzUTYSJsK+wPHPoYyfYuaCKqFgUhblEL16LJ/KIctXT8vLJA1dIOYuGwXU8
-         5GUxgaVt1xn6J0C7zvqExr6ida+nIdVpYaYFd6ejwG2SK5EbEMHp7D8L7ZZ3z+VMm8Gh
-         n6H/RIaVknlNFw0qNINwuBoeNL1uAQkx7dTGuOjbZTukPDDlN/HqdZSZfpjQ5IUrZRig
-         qH7A==
+        bh=HedB0vqjCe4vRRpTggbdQsycmWfrhYSfaZmK+vmSq88=;
+        b=fOK0S79l7H4WA0EbcTcovTJcXBa49hpS1Wv3uL0TCmgk9opC+S0z8AEMnaCnhFRppp
+         onmPslFCJ0MLZDZ9Whpoxw8/gZ3iHL4hFEhYFKW/9pIGj/ruq10gNIYXrk24Vr+u32z0
+         MRVuMlX/IKx80+nhdLmd/v5gces8fbRgZJinAXVpzzRzGtsQmYRJcklirdgh8wDH4eWn
+         ViWdW+hx0OqzqGw9nmWtK6pQn4//unZNqsl02pLgB/aT4PUguupPQosgBhuAbaSUqEL1
+         NdvkPTz3im3ProQD4aNTnokbiLzL53+k3Yo/zr7mTuYe5ti1tYUh8fKTM2f4nnqJ+C3u
+         MqYA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1758321229; x=1758926029;
+        d=1e100.net; s=20230601; t=1758321231; x=1758926031;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:reply-to:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=w/iGcLBCIDmuuGH4TifEpczWER6MZ2hzrzutZDTwD2M=;
-        b=ZzMRTX8427SKfQQjAYvJ949kMll++TXo8KPOAgJR5WWjYpb/3Gdi7DmbgAYbbmAlom
-         6lva+oYQM1rV36qaXW5dtzSzRERGhlCJMS6RoK3P93d1Lv7LvyMRiTIqFo5g70Mgxmxe
-         Yb1sKjTQdDYXygPvouxxtYTwZaBtTtfTVCt6xtMB/lby6Srd8PCsb+PPcY/kghCjTWOn
-         yKBc80Zn81ti0RJAGEed/jjpwljjK+PIal6neAuYyYekMDEo+HGqi3yEuDQwJyDPdJqO
-         clK/6Fm4GjJk0RW7APSi2TfbM+tbk3P109RqTHQxTsFNRCzYGsGQ58B7JBcQB9Ixyi78
-         ZaEw==
-X-Gm-Message-State: AOJu0Yyko79bctsMmuvH4V1rqsRsLAGbYcefIhPMKkUaZbccAbn/NSMr
-	rPHKgWyzCFtZjKzJ3DDCpFlO4X9gJxcFoi8Oha1GhaJqusMqy6x/q0uLgc9hvV8yLU+zjhaVaMw
-	63A8xEw==
-X-Google-Smtp-Source: AGHT+IFLpZ19sMUVPW7XTee4GCwUM+fUepgiPmhknZvL7FVi33FmwxD0JTaLQPmdhcW+I9E7s5Uh5DAQkxc=
-X-Received: from pjbqx3.prod.google.com ([2002:a17:90b:3e43:b0:330:793a:2e77])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a05:6a20:7347:b0:243:78a:82bd
- with SMTP id adf61e73a8af0-292764cd565mr7126926637.55.1758321229259; Fri, 19
- Sep 2025 15:33:49 -0700 (PDT)
+        bh=HedB0vqjCe4vRRpTggbdQsycmWfrhYSfaZmK+vmSq88=;
+        b=EIV751poS00ffAJtWPaVQ3BdDByg/KmSRhoFLlsoygu0S3Sf4O+3HGrRwgaYg+rC8d
+         KRsreTHCn9HAU55IaQpWh/msXlVlQ9CdynVaGb/y02dWZSOfEhpLQjPq8KTxoKji49U9
+         jtdxVlPY3BygHQzQZoGQ1sLcWmnyGm2aFGRzAzm7OhGQrVTJ5d9PE8zEh/+C+uedo00h
+         8XL64KU9nWoMMZqEHQSpZvgAY02H0BeiGhIXWyeoQb22FZbjt7JxFeVB1zqVc5G2asTs
+         ZHe3pyOVRVbeNkr2EI8shWN/f4YgfoIUFvrTilhwps68gVPyoSzyWqcuJgaWV63YtTG5
+         X20w==
+X-Gm-Message-State: AOJu0Yz3ux1crTsjLXa4MpMm5aHU+EUph84KT4ULumfLvxxUALZoxzu0
+	gjKabR0aiKgF/JNK13OVJcB4EGqDFReIYRAv30Xgmt5ylHOseF8pGyInF8t9pKtn7QKFa4GTBWu
+	PLTuxcQ==
+X-Google-Smtp-Source: AGHT+IEljnIzRoy1UyE5BtCbUU4Z9ZtjJtcURZf7n7UmCN9hEURvx8fd1jTPH7oZwx5u199EJlJyB4GvKnY=
+X-Received: from pjbsw8.prod.google.com ([2002:a17:90b:2c88:b0:32e:e155:ee48])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:902:cec8:b0:267:99be:628e
+ with SMTP id d9443c01a7336-2697c7ea3c2mr109901915ad.2.1758321231052; Fri, 19
+ Sep 2025 15:33:51 -0700 (PDT)
 Reply-To: Sean Christopherson <seanjc@google.com>
-Date: Fri, 19 Sep 2025 15:32:32 -0700
+Date: Fri, 19 Sep 2025 15:32:33 -0700
 In-Reply-To: <20250919223258.1604852-1-seanjc@google.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
@@ -75,8 +75,9 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
 References: <20250919223258.1604852-1-seanjc@google.com>
 X-Mailer: git-send-email 2.51.0.470.ga7dc726c21-goog
-Message-ID: <20250919223258.1604852-26-seanjc@google.com>
-Subject: [PATCH v16 25/51] KVM: x86: Add XSS support for CET_KERNEL and CET_USER
+Message-ID: <20250919223258.1604852-27-seanjc@google.com>
+Subject: [PATCH v16 26/51] KVM: x86: Disable support for Shadow Stacks if TDP
+ is disabled
 From: Sean Christopherson <seanjc@google.com>
 To: Paolo Bonzini <pbonzini@redhat.com>, Sean Christopherson <seanjc@google.com>
 Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
@@ -87,84 +88,37 @@ Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
 	Zhang Yi Z <yi.z.zhang@linux.intel.com>, Xin Li <xin@zytor.com>
 Content-Type: text/plain; charset="UTF-8"
 
-From: Yang Weijiang <weijiang.yang@intel.com>
+Make TDP a hard requirement for Shadow Stacks, as there are no plans to
+add Shadow Stack support to the Shadow MMU.  E.g. KVM hasn't been taught
+to understand the magic Writable=0,Dirty=0 combination that is required
+for Shadow Stack accesses, and so enabling Shadow Stacks when using
+shadow paging will put the guest into an infinite #PF loop (KVM thinks the
+shadow page tables have a valid mapping, hardware says otherwise).
 
-Add CET_KERNEL and CET_USER to KVM's set of supported XSS bits when IBT
-*or* SHSTK is supported.  Like CR4.CET, XFEATURE support for IBT and SHSTK
-are bundle together under the CET umbrella, and thus prone to
-virtualization holes if KVM or the guest supports only one of IBT or SHSTK,
-but hardware supports both.  However, again like CR4.CET, such
-virtualization holes are benign from the host's perspective so long as KVM
-takes care to always honor the "or" logic.
-
-Require CET_KERNEL and CET_USER to come as a pair, and refuse to support
-IBT or SHSTK if one (or both) features is missing, as the (host) kernel
-expects them to come as a pair, i.e. may get confused and corrupt state if
-only one of CET_KERNEL or CET_USER is supported.
-
-Signed-off-by: Yang Weijiang <weijiang.yang@intel.com>
-Signed-off-by: Mathias Krause <minipli@grsecurity.net>
-Tested-by: Mathias Krause <minipli@grsecurity.net>
-Tested-by: John Allen <john.allen@amd.com>
-Tested-by: Rick Edgecombe <rick.p.edgecombe@intel.com>
-Signed-off-by: Chao Gao <chao.gao@intel.com>
-[sean: split to separate patch, write changelog, add XFEATURE_MASK_CET_ALL]
 Signed-off-by: Sean Christopherson <seanjc@google.com>
 ---
- arch/x86/kvm/x86.c | 18 +++++++++++++++---
- 1 file changed, 15 insertions(+), 3 deletions(-)
+ arch/x86/kvm/cpuid.c | 8 ++++++++
+ 1 file changed, 8 insertions(+)
 
-diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-index 40596fc5142e..4a0ff0403bb2 100644
---- a/arch/x86/kvm/x86.c
-+++ b/arch/x86/kvm/x86.c
-@@ -220,13 +220,14 @@ static struct kvm_user_return_msrs __percpu *user_return_msrs;
- 				| XFEATURE_MASK_BNDCSR | XFEATURE_MASK_AVX512 \
- 				| XFEATURE_MASK_PKRU | XFEATURE_MASK_XTILE)
+diff --git a/arch/x86/kvm/cpuid.c b/arch/x86/kvm/cpuid.c
+index 32fde9e80c28..499c86bd457e 100644
+--- a/arch/x86/kvm/cpuid.c
++++ b/arch/x86/kvm/cpuid.c
+@@ -955,6 +955,14 @@ void kvm_set_cpu_caps(void)
+ 	if (!tdp_enabled || !boot_cpu_has(X86_FEATURE_OSPKE))
+ 		kvm_cpu_cap_clear(X86_FEATURE_PKU);
  
-+#define XFEATURE_MASK_CET_ALL	(XFEATURE_MASK_CET_USER | XFEATURE_MASK_CET_KERNEL)
- /*
-  * Note, KVM supports exposing PT to the guest, but does not support context
-  * switching PT via XSTATE (KVM's PT virtualization relies on perf; swapping
-  * PT via guest XSTATE would clobber perf state), i.e. KVM doesn't support
-  * IA32_XSS[bit 8] (guests can/must use RDMSR/WRMSR to save/restore PT MSRs).
-  */
--#define KVM_SUPPORTED_XSS     0
-+#define KVM_SUPPORTED_XSS	(XFEATURE_MASK_CET_ALL)
- 
- bool __read_mostly allow_smaller_maxphyaddr = 0;
- EXPORT_SYMBOL_GPL(allow_smaller_maxphyaddr);
-@@ -10104,6 +10105,16 @@ int kvm_x86_vendor_init(struct kvm_x86_init_ops *ops)
- 	if (!kvm_cpu_cap_has(X86_FEATURE_XSAVES))
- 		kvm_caps.supported_xss = 0;
- 
-+	if (!kvm_cpu_cap_has(X86_FEATURE_SHSTK) &&
-+	    !kvm_cpu_cap_has(X86_FEATURE_IBT))
-+		kvm_caps.supported_xss &= ~XFEATURE_MASK_CET_ALL;
-+
-+	if ((kvm_caps.supported_xss & XFEATURE_MASK_CET_ALL) != XFEATURE_MASK_CET_ALL) {
++	/*
++	 * Shadow Stacks aren't implemented in the Shadow MMU.  Shadow Stack
++	 * accesses require "magic" Writable=0,Dirty=1 protection, which KVM
++	 * doesn't know how to emulate or map.
++	 */
++	if (!tdp_enabled)
 +		kvm_cpu_cap_clear(X86_FEATURE_SHSTK);
-+		kvm_cpu_cap_clear(X86_FEATURE_IBT);
-+		kvm_caps.supported_xss &= ~XFEATURE_MASK_CET_ALL;
-+	}
 +
- 	if (kvm_caps.has_tsc_control) {
- 		/*
- 		 * Make sure the user can only configure tsc_khz values that
-@@ -12775,10 +12786,11 @@ static void kvm_xstate_reset(struct kvm_vcpu *vcpu, bool init_event)
- 	/*
- 	 * On INIT, only select XSTATE components are zeroed, most components
- 	 * are unchanged.  Currently, the only components that are zeroed and
--	 * supported by KVM are MPX related.
-+	 * supported by KVM are MPX and CET related.
- 	 */
- 	xfeatures_mask = (kvm_caps.supported_xcr0 | kvm_caps.supported_xss) &
--			 (XFEATURE_MASK_BNDREGS | XFEATURE_MASK_BNDCSR);
-+			 (XFEATURE_MASK_BNDREGS | XFEATURE_MASK_BNDCSR |
-+			  XFEATURE_MASK_CET_ALL);
- 	if (!xfeatures_mask)
- 		return;
- 
+ 	kvm_cpu_cap_init(CPUID_7_EDX,
+ 		F(AVX512_4VNNIW),
+ 		F(AVX512_4FMAPS),
 -- 
 2.51.0.470.ga7dc726c21-goog
 
