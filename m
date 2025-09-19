@@ -1,71 +1,71 @@
-Return-Path: <kvm+bounces-58098-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-58099-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id A4C5EB878D2
-	for <lists+kvm@lfdr.de>; Fri, 19 Sep 2025 03:00:40 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4D26EB878D8
+	for <lists+kvm@lfdr.de>; Fri, 19 Sep 2025 03:01:11 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6EC91581748
-	for <lists+kvm@lfdr.de>; Fri, 19 Sep 2025 01:00:40 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C56126229E3
+	for <lists+kvm@lfdr.de>; Fri, 19 Sep 2025 01:00:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0A48D248F6F;
-	Fri, 19 Sep 2025 01:00:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4CE71251793;
+	Fri, 19 Sep 2025 01:00:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="IXo3+5uU"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="aPCkW+R5"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pf1-f202.google.com (mail-pf1-f202.google.com [209.85.210.202])
+Received: from mail-pl1-f201.google.com (mail-pl1-f201.google.com [209.85.214.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7D52B244693
-	for <kvm@vger.kernel.org>; Fri, 19 Sep 2025 01:00:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0388724DFF4
+	for <kvm@vger.kernel.org>; Fri, 19 Sep 2025 01:00:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758243603; cv=none; b=ls4YIoONJAHoNykx9Ucznqr91VwS1UdRmGFmtIuTy4kyiCrVpzf8yJG3g73SbFz+1wIbh+3PEI23Xw4IWvsGmDCa4Bo1NGnGMFFHzqXRRkXWhu36Il75kHNhrvzZXVBYW219dcd7L9OK1QcELXJ6m44NEKTIpaUmbTaozu9TDHM=
+	t=1758243604; cv=none; b=lmuah0m03yx1CMB1Haeof/MafA45YjwFqqgFyDyZZ0UQNpJ/gahkfgf++APshSX9F0ABQcb9ySNb6nLxNi+DiDiIYFEa0xqgxD0cDi1VcAz57+yyjjW1CkiPuit+WNB/I21bArcU1EsdINCrcuGPsCGvCYu9EcOOffrrf0Eprl4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758243603; c=relaxed/simple;
-	bh=KtmjwUQKEDaGma8aD7fkjztjTOgXgTDisEJmE5V5YC0=;
+	s=arc-20240116; t=1758243604; c=relaxed/simple;
+	bh=YmO5ZhLn3vGz8lgRuFa6XK7iRPoUAovIdCgjt6bcB3k=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=fHLnHD9SkRabHxaLWYyqnoLlpdnRLl3nr891yMvMQ5zzpoQzsS3oK7mhR+jlTcWLT1VJX29AZ/g3tf2mlTYUlxMm7rVzlYC0NBGJP+vH9o/8M8bYZCHJzlOgXBJPaR+vzoIUcnFzD7EKzhZSUVk3vWJgD/HztoY3K7MSXCo1jug=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=IXo3+5uU; arc=none smtp.client-ip=209.85.210.202
+	 To:Cc:Content-Type; b=PR+MwWcD7yWoZRRDxTv/uC3TiSKxaidrN24YyhKx425YsR1CT8LPL3mAZuLOVK74XdKfD0qsxMlqIrkpwDdhzTM8ubgPRBQ7hFVJq+m+ECIz2sQqOUJFPEnaVT6mjBgAOW9um5I3rRS/Q/aMVpfaFfYX00A5J7FUYDOa1wSoURo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=aPCkW+R5; arc=none smtp.client-ip=209.85.214.201
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pf1-f202.google.com with SMTP id d2e1a72fcca58-77e4aeb8a58so318359b3a.2
-        for <kvm@vger.kernel.org>; Thu, 18 Sep 2025 18:00:01 -0700 (PDT)
+Received: by mail-pl1-f201.google.com with SMTP id d9443c01a7336-26776d064e7so18625125ad.2
+        for <kvm@vger.kernel.org>; Thu, 18 Sep 2025 18:00:02 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1758243601; x=1758848401; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1758243602; x=1758848402; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:reply-to:from:to:cc:subject:date:message-id:reply-to;
-        bh=UWy3i2fp1q6nRdPbeRuCID8VdI7QyY4h6hWBylbyQSw=;
-        b=IXo3+5uUYMbJkGwxfullqYznBYsGxp2pkMJENqwMov6kkdpHc37kAghpKXvCT4BxQ2
-         wgG+Y3ZGJ4W3Z+1q38ngQ2J0ZTWN+erqt791Tm2O+J8jAtsOWZFZqZeVoS+lzMnFZoSg
-         tTdK5JSzOoCTUigqCVDNL40f4zjtIMgFuzPQsvWazDppGgZA767C8W8O5NaQu6Xaovg/
-         QGmIcfSemJqNP4yJPtLituXdmSXv0Nxp4TH1IXWyhaTC3xL+prJwktFubuVEKJCKyvgG
-         BZ6TXMeX2r1TK3THhJZZHO/Ahgna1mE3DtTonk0QbRX0fTQdecbxCLynssQDWYixElqo
-         S34Q==
+        bh=lH98c26oi0iG7hKKc9Hul2ePNiDjTOk5eR1Ays5VvX8=;
+        b=aPCkW+R5esZpJH+em8tEcdjH1VdXpzHoc2g9Bhn9Z3jrCP8L80e5BqFb/ZrTsi8jB2
+         bSDxCTpfU0XzTjvIXggX83SostRHoktEwdLdhXJK52LjyVMBojilv2xkPmuRbc/7L7NO
+         E1yWJ7gPq161V9rmiLfCYghdtOasTK3noYcI5bBLog9gI2fjalu9Y60UWhNAmOZI3gRu
+         xmMgR9mkCzFg4MbVwHFwTwzvvN18h4F9DMPSVLum65Y5QIxHAodMrMhx1Cs752RaS6bJ
+         oUsZFE0cmSs55zAtAvCmC4DNg5v6/Ntwn5JjgAUlqUMdEQ42KeHBRAVk6dmCp9SjElSj
+         BuSQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1758243601; x=1758848401;
+        d=1e100.net; s=20230601; t=1758243602; x=1758848402;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:reply-to:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=UWy3i2fp1q6nRdPbeRuCID8VdI7QyY4h6hWBylbyQSw=;
-        b=oh+6iuEvCQJwGUK2xeDhXqvsVvps028+YeXT7XS3XrHPdsKKrFLjDIQbdageX5pDDj
-         RMDSrOJlo2h5GdyDOyt9InzdP9c1u5c726wDIfwbEZdqpzkOSz8Ot/Cwea1xsqtKI1bb
-         fC6cPma8VajCtnZcs6vjiJXpn1WPeMVsZ4NRPrUUSTU4EHGVGgKmRsNRaTpjXQmLm8xY
-         epv2qkvmoG+HWoZ2xwqAGsnQu6iplSgslk3QpphqmPrk4YNXXw5lAm0Og6/ZZ90AG+aj
-         HKGH+N/mMVsf9cc2v8O4zv8faGV1rP7jlaMMSuksVJEhXY8T2cMiBehR+AJPLhCzfn94
-         jp/Q==
-X-Gm-Message-State: AOJu0Yx6dAD8dz3ak80TuOIAY8QMYfVyWixk5PGs5pT/7S2chhgqXgM9
-	3vMrHuKx7GXDtJi3W0z13JB+/S+Dr/omVwiy4URNzUNwi1dEjr4MmeXtuan77ZPzBMy21ytsFMn
-	ftC2DqA==
-X-Google-Smtp-Source: AGHT+IFnWENHzvN/NcFf/IxWJBYR1Ml2tRSnK0NlBzCXck73s2Te+54DEYFubEJyD7rnzsffuRVAm7qyw50=
-X-Received: from pjbnw4.prod.google.com ([2002:a17:90b:2544:b0:32b:65c6:661a])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a05:6a21:e082:b0:243:97c7:a013
- with SMTP id adf61e73a8af0-2926e379d27mr1860284637.34.1758243600810; Thu, 18
- Sep 2025 18:00:00 -0700 (PDT)
+        bh=lH98c26oi0iG7hKKc9Hul2ePNiDjTOk5eR1Ays5VvX8=;
+        b=aZOfdwsxfrfB8Uh2twMxvK9bBzmZ3IcjA4pLDvK6W8I3R65lg64kW0EXGDreVwUrg1
+         /z1GFTZH49WrSYdWQi1phII4/q27fzUccv5pnWuBR8bAI3O1ZZjpAV2pJQR57dR98siY
+         8UAurgfF1EB9F7Z9weIRaVGL8eoY2Oa1TZ0n4T1mpB+btkaypEKiuYIOoBSEApjQIYZ1
+         S377a7yvQ25bwSdBRiT3n9O6Bftm89hYDevt8czLpqCwGRvnDXRKNAK4WpfuI6tFfN7k
+         iYp3XvpewCXN49tm5ICaRc+3v86emsJ2W6HKhLNEGh+3mTUC4iDMhevahyg2rUm7gLxX
+         YxGw==
+X-Gm-Message-State: AOJu0Yw9mv14oKoyC1R8cRJ9MEX/B94cxfb6lGLwbUVkKXvgyqIik6tY
+	bxE9YDht7PxK3BptHMXq+0JzsH+7mXP/w1NADQk0TVvI0O0ym7wV2J87/D7QjZWpy0XgpMQTqMb
+	z9ngwYQ==
+X-Google-Smtp-Source: AGHT+IEVhfZo+VuCff+zD2U0D2h648aLSOlkoBvlJxDLxKHMbodux6YoSgiIo14EdAHAY8tP2J5+PU7+TcY=
+X-Received: from pjac15.prod.google.com ([2002:a17:90a:108f:b0:32e:e4e6:ecfe])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:903:b07:b0:264:f3ed:ee2d
+ with SMTP id d9443c01a7336-269ba48383cmr16975795ad.27.1758243602373; Thu, 18
+ Sep 2025 18:00:02 -0700 (PDT)
 Reply-To: Sean Christopherson <seanjc@google.com>
-Date: Thu, 18 Sep 2025 17:59:48 -0700
+Date: Thu, 18 Sep 2025 17:59:49 -0700
 In-Reply-To: <20250919005955.1366256-1-seanjc@google.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
@@ -75,77 +75,68 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
 References: <20250919005955.1366256-1-seanjc@google.com>
 X-Mailer: git-send-email 2.51.0.470.ga7dc726c21-goog
-Message-ID: <20250919005955.1366256-3-seanjc@google.com>
-Subject: [PATCH 2/9] KVM: nVMX: Hardcode dummy EPTP used for early nested
- consistency checks
+Message-ID: <20250919005955.1366256-4-seanjc@google.com>
+Subject: [PATCH 3/9] KVM: x86/mmu: Move "dummy root" helpers to spte.h
 From: Sean Christopherson <seanjc@google.com>
 To: Sean Christopherson <seanjc@google.com>, Paolo Bonzini <pbonzini@redhat.com>
 Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
 
-Hardcode the dummy EPTP used for "early" consistency checks as there's no
-need to use 5-level EPT based on the guest.MAXPHYADDR (the EPTP just needs
-to be valid, it's never truly consumed).
+Move the helpers to get/query a dummy root from mmu_internal.h to spte.h
+so that VMX can detect and handle dummy roots when constructing EPTPs.
+This will allow using the root's role to build the EPTP instead of pulling
+equivalent information out of the vCPU structure.
 
-This will allow breaking construct_eptp()'s dependency on having access to
-the vCPU, which in turn will (much further in the future) allow for eliding
-per-root TLB flushes when a vCPU is migrated between pCPUs (a flush is
-need if and only if that particular pCPU hasn't already flushed the vCPU's
-roots).
+No functional change intended.
 
 Signed-off-by: Sean Christopherson <seanjc@google.com>
 ---
- arch/x86/kvm/vmx/nested.c | 8 +++-----
- arch/x86/kvm/vmx/vmx.c    | 2 +-
- arch/x86/kvm/vmx/vmx.h    | 1 -
- 3 files changed, 4 insertions(+), 7 deletions(-)
+ arch/x86/kvm/mmu/mmu_internal.h | 10 ----------
+ arch/x86/kvm/mmu/spte.h         | 10 ++++++++++
+ 2 files changed, 10 insertions(+), 10 deletions(-)
 
-diff --git a/arch/x86/kvm/vmx/nested.c b/arch/x86/kvm/vmx/nested.c
-index 2156c9a854f4..253e93ced9dc 100644
---- a/arch/x86/kvm/vmx/nested.c
-+++ b/arch/x86/kvm/vmx/nested.c
-@@ -2278,13 +2278,11 @@ static void prepare_vmcs02_constant_state(struct vcpu_vmx *vmx)
- 	vmx->nested.vmcs02_initialized = true;
+diff --git a/arch/x86/kvm/mmu/mmu_internal.h b/arch/x86/kvm/mmu/mmu_internal.h
+index ed5c01df21ba..73cdcbccc89e 100644
+--- a/arch/x86/kvm/mmu/mmu_internal.h
++++ b/arch/x86/kvm/mmu/mmu_internal.h
+@@ -39,16 +39,6 @@
+ #define INVALID_PAE_ROOT	0
+ #define IS_VALID_PAE_ROOT(x)	(!!(x))
  
- 	/*
--	 * We don't care what the EPTP value is we just need to guarantee
--	 * it's valid so we don't get a false positive when doing early
--	 * consistency checks.
-+	 * If early consistency checks are enabled, stuff the EPT Pointer with
-+	 * a dummy *legal* value to avoid false positives on bad control state.
- 	 */
- 	if (enable_ept && nested_early_check)
--		vmcs_write64(EPT_POINTER,
--			     construct_eptp(&vmx->vcpu, 0, PT64_ROOT_4LEVEL));
-+		vmcs_write64(EPT_POINTER, VMX_EPTP_MT_WB | VMX_EPTP_PWL_4);
+-static inline hpa_t kvm_mmu_get_dummy_root(void)
+-{
+-	return my_zero_pfn(0) << PAGE_SHIFT;
+-}
+-
+-static inline bool kvm_mmu_is_dummy_root(hpa_t shadow_page)
+-{
+-	return is_zero_pfn(shadow_page >> PAGE_SHIFT);
+-}
+-
+ typedef u64 __rcu *tdp_ptep_t;
  
- 	if (vmx->ve_info)
- 		vmcs_write64(VE_INFORMATION_ADDRESS, __pa(vmx->ve_info));
-diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
-index 3c622c91cbc5..74dba9f1d098 100644
---- a/arch/x86/kvm/vmx/vmx.c
-+++ b/arch/x86/kvm/vmx/vmx.c
-@@ -3201,7 +3201,7 @@ static inline int vmx_get_current_vpid(struct kvm_vcpu *vcpu)
- 	return to_vmx(vcpu)->vpid;
- }
+ struct kvm_mmu_page {
+diff --git a/arch/x86/kvm/mmu/spte.h b/arch/x86/kvm/mmu/spte.h
+index 3133f066927e..91ce29fd6f1b 100644
+--- a/arch/x86/kvm/mmu/spte.h
++++ b/arch/x86/kvm/mmu/spte.h
+@@ -246,6 +246,16 @@ static inline int spte_index(u64 *sptep)
+  */
+ extern u64 __read_mostly shadow_nonpresent_or_rsvd_lower_gfn_mask;
  
--u64 construct_eptp(struct kvm_vcpu *vcpu, hpa_t root_hpa, int root_level)
-+static u64 construct_eptp(struct kvm_vcpu *vcpu, hpa_t root_hpa, int root_level)
++static inline hpa_t kvm_mmu_get_dummy_root(void)
++{
++	return my_zero_pfn(0) << PAGE_SHIFT;
++}
++
++static inline bool kvm_mmu_is_dummy_root(hpa_t shadow_page)
++{
++	return is_zero_pfn(shadow_page >> PAGE_SHIFT);
++}
++
+ static inline struct kvm_mmu_page *to_shadow_page(hpa_t shadow_page)
  {
- 	u64 eptp = VMX_EPTP_MT_WB;
- 
-diff --git a/arch/x86/kvm/vmx/vmx.h b/arch/x86/kvm/vmx/vmx.h
-index 23d6e89b96f2..e912a82a1d14 100644
---- a/arch/x86/kvm/vmx/vmx.h
-+++ b/arch/x86/kvm/vmx/vmx.h
-@@ -366,7 +366,6 @@ void set_cr4_guest_host_mask(struct vcpu_vmx *vmx);
- void ept_save_pdptrs(struct kvm_vcpu *vcpu);
- void vmx_get_segment(struct kvm_vcpu *vcpu, struct kvm_segment *var, int seg);
- void __vmx_set_segment(struct kvm_vcpu *vcpu, struct kvm_segment *var, int seg);
--u64 construct_eptp(struct kvm_vcpu *vcpu, hpa_t root_hpa, int root_level);
- 
- bool vmx_guest_inject_ac(struct kvm_vcpu *vcpu);
- void vmx_update_exception_bitmap(struct kvm_vcpu *vcpu);
+ 	struct page *page = pfn_to_page((shadow_page) >> PAGE_SHIFT);
 -- 
 2.51.0.470.ga7dc726c21-goog
 
