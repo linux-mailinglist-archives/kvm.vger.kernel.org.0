@@ -1,158 +1,237 @@
-Return-Path: <kvm+bounces-58224-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-58225-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4606AB8B750
-	for <lists+kvm@lfdr.de>; Sat, 20 Sep 2025 00:14:14 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5AE4BB8B77B
+	for <lists+kvm@lfdr.de>; Sat, 20 Sep 2025 00:27:41 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 041711C244B8
-	for <lists+kvm@lfdr.de>; Fri, 19 Sep 2025 22:14:36 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 1EEA31C273C7
+	for <lists+kvm@lfdr.de>; Fri, 19 Sep 2025 22:28:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DAF092C3278;
-	Fri, 19 Sep 2025 22:14:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D18F72D3EC7;
+	Fri, 19 Sep 2025 22:27:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="CVNFSSzb"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="eqQP/kpP"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 14A6C36B
-	for <kvm@vger.kernel.org>; Fri, 19 Sep 2025 22:14:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1D76125BEF1
+	for <kvm@vger.kernel.org>; Fri, 19 Sep 2025 22:27:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758320046; cv=none; b=s/76NMpL+s8gOxM/xp6+qv05dfXBuqQIqwXaTxW6rSE80J1aCpkPo34lyJ6p79AYwuftw749Qs8xp5YS7MHQeXcguybJM/GPfYsnc6WcKRKLydxnXyOOlFcshYNp/2x5f05jZPhAYKtnMIbIHR88Hyp5KVnyViFjSB/rQkP8m5Y=
+	t=1758320852; cv=none; b=Z9kYm4xrp1irjyNe4dneqY44trbHf2UALIrvqLxvPr8B3SLCLeB3Wt1IkP1jw5bLHIibKFZMoXleZPZgUPvyryltyedeGfXPyTeVIdqbh7/AXME+4LEAkrOVyQJ5dyfA/yGzf2cR1cTjdmk/jFbKPWSafVT699viOu9+NpnauzM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758320046; c=relaxed/simple;
-	bh=W5b00jG9cpnQdZZ0siUFuEik0xREa3J4El0y3yw8L1k=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=uWwODs22mJje9ICaRicHvTx4n1G0DQbi1RTh/dy+jzFMjcz038lh7lg/RWMzH9i3VKVkl5XuiujtR3yPTv46X3b8k0r/9CyWWeIkXl0c5CWzisBf+DsstmP7vCeqqS7cJONGDa3NpK4Nje8gdRCZDlkmGY5U55aN1YbDhs0f5zs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=CVNFSSzb; arc=none smtp.client-ip=170.10.133.124
+	s=arc-20240116; t=1758320852; c=relaxed/simple;
+	bh=iRQ8OAT4Wccv0jwiRU4Y03yMsi2yeVveN8n5ETpUfdE=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=eXo7/nUGHpOkV3aoPeGweELCgip5tO42YKJHpMfLQXuMrzH9jaFxhYY03KuJcy0emSDUtg9qWmhdlWfus5Nl7Jx+gRknWsephfFyyJAwU++QcUTFvdSvlq5O8Dm3WIPPapXBK/tbyUFoHPpTkg/duy7ZIXgNKhfMobgFO/55jnc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=eqQP/kpP; arc=none smtp.client-ip=170.10.129.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1758320042;
+	s=mimecast20190719; t=1758320849;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=4Su/V4OUywtko7FbjZzoOIfFvGsKNTgMz+rLEULE8lk=;
-	b=CVNFSSzbsSQjRgl/gDGDwdVo/hl9NLsDw0foMvO1Yahr2X53ZxZdrVMwG2XEp1bgLloL4t
-	iJGyy+ExnIjG4IgM4FoXtVlGcB+CqPKkdNkwFm5alSkcxZPSKMWVsZ7krNWmFNaUG8D5F0
-	cQNNHtLDgx8X7R7mLni9My10pWIDWSs=
-Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
- [209.85.128.72]) by relay.mimecast.com with ESMTP with STARTTLS
+	bh=S7zBUG1B6Yjuv09cr614NdKH1148t7ceSZe3oMRHpm0=;
+	b=eqQP/kpPXCWHyTozxFbc/uK9IRK7xbOC6XFPNKw/GEnFDbguyKTEGnomIDTMF8hrsKYv1b
+	Zo7K3olRZ2VoM2+d5Wb0mDi14W6YPd91JVmufX07pTObwuy1gMMyXs4s9FGR1gOhJK4zmK
+	6ZOdjuTDCWP3+bcBziFZ94ZyNUYPrsE=
+Received: from mail-il1-f197.google.com (mail-il1-f197.google.com
+ [209.85.166.197]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-74-PmMfWreKM_meOWvihV2kGw-1; Fri, 19 Sep 2025 18:14:01 -0400
-X-MC-Unique: PmMfWreKM_meOWvihV2kGw-1
-X-Mimecast-MFC-AGG-ID: PmMfWreKM_meOWvihV2kGw_1758320040
-Received: by mail-wm1-f72.google.com with SMTP id 5b1f17b1804b1-45deddf34b9so25530785e9.1
-        for <kvm@vger.kernel.org>; Fri, 19 Sep 2025 15:14:01 -0700 (PDT)
+ us-mta-651-ax0gLDZIMVqqOvbwyUuewg-1; Fri, 19 Sep 2025 18:27:27 -0400
+X-MC-Unique: ax0gLDZIMVqqOvbwyUuewg-1
+X-Mimecast-MFC-AGG-ID: ax0gLDZIMVqqOvbwyUuewg_1758320847
+Received: by mail-il1-f197.google.com with SMTP id e9e14a558f8ab-40b911746f0so6108635ab.0
+        for <kvm@vger.kernel.org>; Fri, 19 Sep 2025 15:27:27 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1758320040; x=1758924840;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=4Su/V4OUywtko7FbjZzoOIfFvGsKNTgMz+rLEULE8lk=;
-        b=ppUhFWpr0jWMMp63+V9bjXCQW5KhmMhO/4n0JPBDYg+a3dB8/5zV332Hos3NIwz0ER
-         2cMgbBf6uhSR6CxBclzLsmwDT1NbBfB+Zsucx7gwO3WLOMqeqhCkdoviLxWB8Jfk0VnW
-         yjt50AobE0+t7VZGK1u4FdYRpGkonLZtM7rw+2rqyca6idNUVcDzrDLRe6PpnP0o5npc
-         KuYJ3mH7ok4Txkb4w2fYEE/0HjFERd00mLht2ujRL2l/gkL8lW2C/CIqwRUlGmwtQ+md
-         7fQxeVTvDeCB0QMUmUIcNtAZsSVtI6JuU+qyjB9Rw72s8oY0ZGdNhspISD6+GAzD2/BU
-         getA==
-X-Forwarded-Encrypted: i=1; AJvYcCVJkNwwTbR1sdBtDscndD2PYUIg8tIfjoqzoTjDXcx5R6ECd7y0VuokB6qc1gduaNinFKQ=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzYMsjglYPWBN8kSfNGDRDpEfsyV0OfbQiDc+GaXXJkji1ClIOD
-	aqSi/wkt6n0Yaec9irT8EB39l7sVcys7lG1JdnJYsdvWaGV/kOBFNCIH2qbH/1tpp5SaoVtKQ+6
-	hAoPnT0RQFwlZA6YWdLewkheKzIF791F1YQGUoL75BBhPi5OMtpLnHYcijoAlexujV44u13MxpR
-	w77WOviNcYd1hL4EsZSmacwgMCg5OA
-X-Gm-Gg: ASbGncsy/3FGu0PT6X+23pg1lnRw7hAK0nrzad6kUKbNy0WDfTT8fAUL3hFp479YGsI
-	f8B6d2nIvgIEd5EYZ2NK8hBCaqdTvt2ERq/6JuwLMRG36yG8F8vf9ppXwUdHOnQTPcUcTHRoE7y
-	aIA0vTNvkg3mhzS512O13/qeSaVhvjRpLXaKLBbUVFK0qly2ilKQCu79YNcittfOSKtrMc2Saqs
-	93CSR72ikfZNq5wN8O1D4BA
-X-Received: by 2002:a05:6000:186f:b0:3d3:b30:4cf2 with SMTP id ffacd0b85a97d-3ee194eed65mr4271619f8f.19.1758320040187;
-        Fri, 19 Sep 2025 15:14:00 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IFP9qB7G3gKgYKe7whmDc86HxwaJfsP7eYHbgCEprc/xA4t463cWDmhbzW7+5Jy1Sfx+cvbbDp17osk3TiEixQ=
-X-Received: by 2002:a05:6000:186f:b0:3d3:b30:4cf2 with SMTP id
- ffacd0b85a97d-3ee194eed65mr4271606f8f.19.1758320039753; Fri, 19 Sep 2025
- 15:13:59 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1758320846; x=1758925646;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=S7zBUG1B6Yjuv09cr614NdKH1148t7ceSZe3oMRHpm0=;
+        b=ZyQkeQbWNKZkBqPdiT5zHhkOI+e+U506eVwk4Cbb5aGwakr1o1dj5NqYM2FIt7NuT1
+         Z+xwiuKnRVvRfmP3NlQPSId+V1lmBbMISGpIthASzDtniECRm/MYNLPJbANXW2BON5VI
+         RoCi9mjBb86EzG4aSk16qEHaelcBnBzNyWB9I1nMCVexG8x1fF+DLA3Ezg8jA1Rj0X8V
+         /4RU0NjuENIPjOg2EW+wgfAug2gNnh8/4+BsazdmDvJ61iMjOTsKGsNjG1OnaSrvDQ1a
+         DNrED6xlGpGpv/Nlk3plWs1RZjVtut5I7X/akAgszE79tSl9+U39opymYmEM9yD0BFSa
+         F2VQ==
+X-Gm-Message-State: AOJu0YyWumtVZn13JyFYsgyyLE3YdLocDhfE1WejDe4erny1Eumndxn7
+	aph8XUg+UguqKNVJi+oWi5z9F1CZCZgEPtgwDM++66Fuamnwc3FUaCy9q+qt6BG17/zB09OPsqO
+	sJjc33EdGBfCVnN/Vj1UwqBzRwOe5/OWtUCZO+sYbnDzlhp420yENgfjJEa/z2g==
+X-Gm-Gg: ASbGncscab1EO6RECrGVROvHdtbLrWQ8hNbfpG+IGuKn738IoihUst7hQbV7i7YVmEm
+	Wcclga2198wR902iZGGA5iLFUaAo8hjzg19dGZdfA3TgBvkOErsUMuGX/VPoCbLUWQ/gOk2xs4A
+	IputkUJnsQUxs20fUmGwhUJEgHlMknvjVMEMA5tmszRxo7rkLnWMm80eLzPwVo5V7/92HqrW3eK
+	7+K88ogevexzKDyrbFdX5UvAItopBHQbYFPS2WqPu22/pTREHp180+rLGQSqi+q/Cirt9CIR9sv
+	bKUr5KtImZlYZUmzeVetd5PkHhEBRvIzoxUGRmS5zaY=
+X-Received: by 2002:a05:6602:14cb:b0:894:6ff:6e9c with SMTP id ca18e2360f4ac-8add2201482mr326049039f.2.1758320846085;
+        Fri, 19 Sep 2025 15:27:26 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IFtDrsXG22gNdOlTCT+B9j0NR/HkZuw2s4Yo+7xf+eh3MKB+/pJmRKobcMjuP7PoFW+Ahwupw==
+X-Received: by 2002:a05:6602:14cb:b0:894:6ff:6e9c with SMTP id ca18e2360f4ac-8add2201482mr326047839f.2.1758320845689;
+        Fri, 19 Sep 2025 15:27:25 -0700 (PDT)
+Received: from redhat.com ([38.15.36.11])
+        by smtp.gmail.com with ESMTPSA id 8926c6da1cb9f-53d58fc4ef4sm2641196173.83.2025.09.19.15.27.24
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 19 Sep 2025 15:27:25 -0700 (PDT)
+Date: Fri, 19 Sep 2025 16:27:21 -0600
+From: Alex Williamson <alex.williamson@redhat.com>
+To: Timothy Pearson <tpearson@raptorengineering.com>
+Cc: kvm <kvm@vger.kernel.org>, linuxppc-dev <linuxppc-dev@lists.ozlabs.org>
+Subject: Re: [PATCH] vfio/pci: Fix INTx handling on legacy DisINTx- PCI
+ devices
+Message-ID: <20250919162721.7a38d3e2.alex.williamson@redhat.com>
+In-Reply-To: <1916735949.1739694.1758315074669.JavaMail.zimbra@raptorengineeringinc.com>
+References: <663798478.1707537.1757450926706.JavaMail.zimbra@raptorengineeringinc.com>
+	<20250919125603.08f600ac.alex.williamson@redhat.com>
+	<1916735949.1739694.1758315074669.JavaMail.zimbra@raptorengineeringinc.com>
+X-Mailer: Claws Mail 4.3.1 (GTK 3.24.43; x86_64-redhat-linux-gnu)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <f388d4de-4a16-4ba2-80ff-5aa9797d89ca@intel.com>
-In-Reply-To: <f388d4de-4a16-4ba2-80ff-5aa9797d89ca@intel.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Date: Sat, 20 Sep 2025 00:13:47 +0200
-X-Gm-Features: AS18NWApfhVRHYyiyFGPoqBE1E6ncVDteleEI1Lst5Z8fmSDcoO7aChQu8oE5qc
-Message-ID: <CABgObfaHp9bH783Kdwm_tMBHZk5zWCxD7R+RroB_Q_o5NWBVZg@mail.gmail.com>
-Subject: Re: [Discussion] x86: Guest Support for APX
-To: "Chang S. Bae" <chang.seok.bae@intel.com>
-Cc: Sean Christopherson <seanjc@google.com>, kvm <kvm@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-On Fri, Sep 19, 2025, 22:16 Chang S. Bae <chang.seok.bae@intel.com> wrote:
-> Dear KVM maintainers,
->
-> Since APX introduces new general-purpose registers (GPRs), legacy
-> instructions are extended to access them, which may lead to associated
-> VM exits. For example, MOV may now reference these registers in MMIO
-> operations for emulated devices. The spec [3] lists other instructions
-> that may similarly exit.
+On Fri, 19 Sep 2025 15:51:14 -0500 (CDT)
+Timothy Pearson <tpearson@raptorengineering.com> wrote:
 
-You're right that gets very complicated quickly, while most cases of
-MMIO emulation are for legacy devices and R16-R31 are unlikely to
-appear in MMIO instructions for these legacy devices.
+> ----- Original Message -----
+> > From: "Alex Williamson" <alex.williamson@redhat.com>
+> > To: "Timothy Pearson" <tpearson@raptorengineering.com>
+> > Cc: "kvm" <kvm@vger.kernel.org>, "linuxppc-dev" <linuxppc-dev@lists.ozlabs.org>
+> > Sent: Friday, September 19, 2025 1:56:03 PM
+> > Subject: Re: [PATCH] vfio/pci: Fix INTx handling on legacy DisINTx- PCI devices  
+> 
+> > On Tue, 9 Sep 2025 15:48:46 -0500 (CDT)
+> > Timothy Pearson <tpearson@raptorengineering.com> wrote:
+> >   
+> >> PCI devices prior to PCI 2.3 both use level interrupts and do not support
+> >> interrupt masking, leading to a failure when passed through to a KVM guest on
+> >> at least the ppc64 platform, which does not utilize the resample IRQFD. This
+> >> failure manifests as receiving and acknowledging a single interrupt in the guest
+> >> while leaving the host physical device VFIO IRQ pending.
+> >> 
+> >> Level interrupts in general require special handling due to their inherently
+> >> asynchronous nature; both the host and guest interrupt controller need to
+> >> remain in synchronization in order to coordinate mask and unmask operations.
+> >> When lazy IRQ masking is used on DisINTx- hardware, the following sequence
+> >> occurs:
+> >>
+> >>  * Level IRQ assertion on host
+> >>  * IRQ trigger within host interrupt controller, routed to VFIO driver
+> >>  * Host EOI with hardware level IRQ still asserted
+> >>  * Software mask of interrupt source by VFIO driver
+> >>  * Generation of event and IRQ trigger in KVM guest interrupt controller
+> >>  * Level IRQ deassertion on host
+> >>  * Guest EOI
+> >>  * Guest IRQ level deassertion
+> >>  * Removal of software mask by VFIO driver
+> >> 
+> >> Note that no actual state change occurs within the host interrupt controller,
+> >> unlike what would happen with either DisINTx+ hardware or message interrupts.
+> >> The host EOI is not fired with the hardware level IRQ deasserted, and the
+> >> level interrupt is not re-armed within the host interrupt controller, leading
+> >> to an unrecoverable stall of the device.
+> >> 
+> >> Work around this by disabling lazy IRQ masking for DisINTx- INTx devices.  
+> > 
+> > I'm not really following here.  It's claimed above that no actual state
+> > change occurs within the host interrupt controller, but that's exactly
+> > what disable_irq_nosync() intends to do, mask the interrupt line at the
+> > controller.  
+> 
+> While it seems that way on the surface (and this tripped me up
+> originally), the actual call chain is:
+> 
+> disable_irq_nosync()
+> __disable_irq_nosync()
+> __disable_irq()
+> irq_disable()
+> 
+> Inside void irq_disable(), __irq_disable() is gated on
+> irq_settings_disable_unlazy().  The lazy disable is intended to *not*
+> touch the interrupt controller itself, instead lazy mode masks the
+> interrupt at the device level (DisINT+ registers).  If the IRQ is set
+> up to run in lazy mode, the interrupt is not disabled at the actual
+> interrupt controller by disable_irq_nosync().
 
-However, at least MOVs should be extended to support APX registers as
-source or destination operands, and there should also be support for
-base and index in the addresses. This means you have to parse REX2,
-but EVEX shouldn't be needed as these instructions are in "legacy map
-0" (aka one-byte).
+What chip handler are you using?  The comment above irq_disable
+reiterates the behavior, yes if the chip doesn't support irq_disable it
+marks the interrupt masked but leaves the hardware unmasked.  It does
+not describe using DisINTx to mask the device, which would be at a
+different level from the chip.  In this case __irq_disable() just calls
+irq_state_set_disabled().  Only with the change proposed here would we
+also call mask_irq().
+ 
+> > The lazy optimization that's being proposed here should
+> > only change the behavior such that the interrupt is masked at the
+> > call to disable_irq_nosync() rather than at a subsequent
+> > re-assertion of the interrupt.  In any case, enable_irq() should
+> > mark the line enabled and reenable the controller if necessary.  
+> 
+> If the interrupt was not disabled at the controller, then reenabling
+> a level interrupt is not guaranteed to actually do anything (although
+> it *might*).  The hardware in the interrupt controller will still
+> "see" an active level assert for which it fired an interrupt without
+> a prior acknowledge (or disable/enable cycle) from software, and can
+> then decide to not re-raise the IRQ on a platform-specific basis.
+> 
+> The key here is that the interrupt controllers differ somewhat in
+> behavior across various architectures.  On POWER, the controller will
+> only raise the external processor interrupt once for each level
+> interrupt when that interrupt changes state to asserted, and will
+> only re-raise the external processor interrupt once an acknowledge
+> for that interrupt has been sent to the interrupt controller hardware
+> while the level interrupt is deasserted.  As a result, if the
+> interrupt handler executes (acknowledging the interrupt), but does
+> not first clear the interrupt on the device itself, the interrupt
+> controller will never re-raise that interrupt -- from its
+> perspective, it has issued another IRQ (because the device level
+> interrupt was left asserted) and the associated handler has never
+> completed.  Disabling the interrupt causes the controller to reassert
+> the interrupt if the level interrupt is still asserted when the
+> interrupt is reenabled at the controller level.
 
-At this point, singling out MOVs is not useful and you might as well
-implement REX2 for all instructions.  EVEX adds a lot of extra cases
-including three operand integer instructions and no flag update, but
-REX2 is relatively simple.
+This sounds a lot more like the problem than the previous description.
+Is the actual scenario something like the irq is marked disabled, the
+eventfd is delivered to userspace, userspace handles the device, the
+interrupt is de-asserted at the device, but then the device re-asserts
+the interrupt before the unmask ioctl, causing the interrupt chip to
+mask the interrupt, then enable_irq() from the unmask ioctl doesn't
+reassert the interrupt?
 
-> In summary, we'd like to clarify:
->
->    * Should we target complete emulation coverage for all APX-induced
->      exits (from the start)?
->
->    * Or is a narrower scope (e.g., only MOV) practically a considerable
->      option, given the limited likelihood of other exits?
+> On other platforms the external processor interrupt itself is
+> disabled until the interrupt handler has finished, and the controller
+> doesn't auto-mask the level interrupts at the hardware level;
+> instead, it will happily re-assert the processor interrupt if the
+> interrupt was not cleared at the device level after IRQ acknowledge.
+> I suspect on those platforms this bug may be masked at the expense of
+> a bunch of "spurious" / unwanted interrupts if the interrupt handler
+> hasn't acked the interrupt at the device level; as long as the guest
+> interrupt handler is able to somewhat rapidly clear the device
+> interrupt, performance won't be impacted too much by the extra
+> interrupt load, further hiding the bug on these platforms.
 
-See above. I hope it answers both questions.
+It seems this is the trade off the lazy handling makes intentionally,
+we risk some spurious interrupts while the line is disabled to avoid
+poking the hardware.  So long as we're not triggering the spurious
+interrupt handler to permanently disabling the interrupt line, this is a
+valid choice.
 
->    * Alternatively, can we even consider a pragmatic path like MOVDIR* --
->      supporting only when practically useful?
+That's also a consideration for this patch, we're slowing down all
+non-PCI2.3 INTx handling for the behavior of this platform.  Is there
+some behavior of the interrupt controller we can query to know which
+path to use?  Can this issue be seen with the irqfd INTx handling
+disabled on other architectures?  Do we actually care whether we're
+making old INTx devices slower?  Thanks,
 
-I think pragmatic is fine, but in some cases too restrictive makes it
-harder to track what is implemented and what isn't. Again, see the
-above comment about implementing REX2 fully while limiting EVEX
-support to the minimum (or hopefully leaving it out altogether).
-
-> [4] The MOVDIR64 opcode is "66 0F 38 F8 ..." but opcode_table[] in
->      emulate.c looks currently missing it:
->
->          /* 0x60 - 0x67 */
->          I(ImplicitOps | Stack | No64, em_pusha),
->          I(ImplicitOps | Stack | No64, em_popa),
->          N, MD(ModRM, &mode_dual_63),
->          N, N, N, N,
-
-0x66 is a prefix so you have to look at F8 in the table for the 0F 38
-three-byte opcodes (opcode_map_0f_38) and add a new
-three_byte_0f_38_f8 table.
-
-MOVDIR* and many other instructions are not implemented because they
-are pretty much never used with emulated (legacy) MMIO such as VGA
-framebuffers. By the way MOVDIR* is not a REX2-accepted instruction,
-so you would have to implement EVEX in order to support it for APX
-registers.
-
-Paolo
+Alex
 
 
