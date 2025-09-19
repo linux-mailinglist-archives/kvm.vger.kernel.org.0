@@ -1,101 +1,102 @@
-Return-Path: <kvm+bounces-58145-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-58146-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id CAF32B89545
-	for <lists+kvm@lfdr.de>; Fri, 19 Sep 2025 13:57:14 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 88846B89560
+	for <lists+kvm@lfdr.de>; Fri, 19 Sep 2025 13:58:22 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B58BD567634
-	for <lists+kvm@lfdr.de>; Fri, 19 Sep 2025 11:57:01 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2FF0117932D
+	for <lists+kvm@lfdr.de>; Fri, 19 Sep 2025 11:58:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 58DC730DEC6;
-	Fri, 19 Sep 2025 11:56:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5799C30E820;
+	Fri, 19 Sep 2025 11:58:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ziepe.ca header.i=@ziepe.ca header.b="YtXz7lXE"
+	dkim=pass (2048-bit key) header.d=ziepe.ca header.i=@ziepe.ca header.b="cJ5CvvFi"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-qv1-f45.google.com (mail-qv1-f45.google.com [209.85.219.45])
+Received: from mail-qt1-f173.google.com (mail-qt1-f173.google.com [209.85.160.173])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E18B530CB48
-	for <kvm@vger.kernel.org>; Fri, 19 Sep 2025 11:56:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.45
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E4C7530DD39
+	for <kvm@vger.kernel.org>; Fri, 19 Sep 2025 11:58:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.173
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758283014; cv=none; b=R4V4zqXtM6/eSIExVeSPsvfeLwsvQenooABMdaC2E56Tx4Z/yQPf9y0pCh680uEX15q7XqCYyy0B8Ka3CRHUtMGJheSb7YQdjbz06FK4hOiH+sTjrXBSYQiH+HbQxtRYfUaCNzQzzhlgc6QDExIGTf/sroVNqZmCJGwtPnl3jtU=
+	t=1758283090; cv=none; b=jHWlzHscrj30qBGdwP4HFAl3MJoADsTAMfryuI8YbA/JmHMWoFr51sHv6gwEw0vRVbtyeXZWyD1IWnxxLQi4IkmRpjaDJo/LJm8fRg3QUVwzoiDp6fG+lMVU4fIVgRkGa5LD7a+7zgnRq33nUzhGd2bjuCVuXG3tkhWFlNkovVQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758283014; c=relaxed/simple;
-	bh=nVhwZwqjhePDpn3hIqHifRon6Z2bn7ZMu+Qm0ssc/jY=;
+	s=arc-20240116; t=1758283090; c=relaxed/simple;
+	bh=z76f63pK7iULjhkDPA2cDB1JEhtZUbriGGo8ro5LyIM=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=MhrsjWPRWnioH3tojGq0fo3MbTsbcEVNTM9ioBxZtpzgohaVo6Dks3t8F9JPQMND6E+KN1h+MhyRMh3iSlIbD3uO40FIac8UPTxHmnGwrGWzWw98SaWXvARFpRTlYz0tH24RnVrpiyHG/QMx8VupAVX9C+7Lz8YGJvdq6tu2+CI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ziepe.ca; spf=pass smtp.mailfrom=ziepe.ca; dkim=pass (2048-bit key) header.d=ziepe.ca header.i=@ziepe.ca header.b=YtXz7lXE; arc=none smtp.client-ip=209.85.219.45
+	 Content-Type:Content-Disposition:In-Reply-To; b=KUOPBu9EFPVJj9wB2vqG5CY9DSNcEf9nFDIEvOUWTRk+NWwgXQYrWVIsrJCGBH9u+pK/JMZrCgTam5TcurL/4/6f28VMFrqbq0iNaz9cCmjMDrV6u1fFTUsreCIpAKef8JatZ5/UDQ13J7lTfTlCHF/kBrCA1agBXJGlWlqmHss=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ziepe.ca; spf=pass smtp.mailfrom=ziepe.ca; dkim=pass (2048-bit key) header.d=ziepe.ca header.i=@ziepe.ca header.b=cJ5CvvFi; arc=none smtp.client-ip=209.85.160.173
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ziepe.ca
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ziepe.ca
-Received: by mail-qv1-f45.google.com with SMTP id 6a1803df08f44-79390b83c7dso16757106d6.1
-        for <kvm@vger.kernel.org>; Fri, 19 Sep 2025 04:56:52 -0700 (PDT)
+Received: by mail-qt1-f173.google.com with SMTP id d75a77b69052e-4b3d3f6360cso19329011cf.0
+        for <kvm@vger.kernel.org>; Fri, 19 Sep 2025 04:58:08 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=ziepe.ca; s=google; t=1758283012; x=1758887812; darn=vger.kernel.org;
+        d=ziepe.ca; s=google; t=1758283088; x=1758887888; darn=vger.kernel.org;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=VuUmQ3adky/B0QCA1sMQ2Ao6Tuz3Fbnr+xuaWjpQ1Bo=;
-        b=YtXz7lXErKOixL9lZnfianefYxnRSYSkpF4dAeSgXlSS/jhyjIk2SY4yYbcezDyQ3x
-         FwDO8MgSmR+bNeyO2t0xfXauSkND/yoIk21FcQSfWajlAwinkLAjno/DMMZg6FKEHf4b
-         pW5tofpw/3giwRZ79QAU7PmwfgTlbfjLb2jTF46seWUaHdVmkjDRAbwkeA0XjoE5i+D4
-         ludgQpc65SUVUG6BbN9vee/kZy3c0/Lq0oIf99SbYF8FPT+bOzj5V3eHWzpL9XHFZj5h
-         vzfpZ+lc0zDS2QzixsUoFIj6IUhaO1vzi8+Yz2PtJ0XxEZ1OV22spRLFbbvzzY05nurM
-         mEVA==
+        bh=XqkzJ715IFhAdPqz34JG4QrSrgL1I3NolvpeVSTSpSM=;
+        b=cJ5CvvFi4Ux+0g+c5NdMmNIvSoh9f0ftQC7qisliChqhhYmJADWMtZsVY6vpSY7DLj
+         TBgjaYj/OnvG9ksqbX3WS86N8ABjCPYhprhE4/XH21TFNY9E43PpuILUj9GnbrN0KYdy
+         ipUrG6JPg7GuZqbgRRadQfXMX9723oLaKMWW1vkyKhQ3MYvb2x8ETUrPgV69g/CHkk3+
+         LnIDz9f7/C6qPMAthQ4jSeIleIvcDdbG3J3V2hcRB1Wvcc8inf13L5DBxq8QX0lrc1zp
+         CSlkrOeh/Ky2FQoWjbOIYFUV2p6+ChCrFzm1zCxV6q2QEe4EIiIkZPtMuVSD9EN7d9Xi
+         bgoA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1758283012; x=1758887812;
+        d=1e100.net; s=20230601; t=1758283088; x=1758887888;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=VuUmQ3adky/B0QCA1sMQ2Ao6Tuz3Fbnr+xuaWjpQ1Bo=;
-        b=jUl8XNUZJt90qB3d8aDdGfJsHbPqZ8gX7xubTV0fys87g1PbbiJ4Mxn4CiK1uNix08
-         2BFWE2ufW3XCvrAxWtJxYaz5BNV0deIrycTLtlHjf08D0wr21tKdl8ZurpQ7OZ4/2yyB
-         W55QBXOh489KFJXIHfSo3soBE6xm9p0+eeVXvY1VrUxjbEXFx1uTd3HxOE76/LtwXlOU
-         kQEEmvgiFxIdw3Ir57AXGD/WnWrnFL4U+HNwDEzwdQ8Pd80mlIIH/dR6MYWlqE+BspNn
-         wvVfnU5LyBa2FH+7MXtT8Uw/hRypDl5IJ3KJlRGu85tLCNV1j+AZ0pJG24NL+urfWqMR
-         yTnw==
-X-Forwarded-Encrypted: i=1; AJvYcCUhBGkKyRN+/ohyUVdKBNJ+Gy+KhQprenfeeQDUlxh69DO6aD0rLjE92ydlJLvKseWA7NA=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyK1IPTnf+/szU1bcWcC4lVI3c9FIF5yvke2JxY693Mk1F48Pa0
-	kVkc/tuzFBYfMNFFChNMnqlGVOGkJWikmUCeveNKayxGbqqC1vtoTVx7SzoWm9pHpkc=
-X-Gm-Gg: ASbGncujUAqtK8rush9HsHhz6uAmup6OkKrmV9RgIH42TzSFkIKu23/N12NxHAx7pOR
-	0b0qpmJmNEpDSbzxPD/zp4tWRMq8cnxFck+NZb30fMD1aR+Xv6Q9gZFAhizboOWmNhCuOlkpYq5
-	dmaY6A9z8Kn1YvGzx5cGY6wAZalhjffKBqkSsa3g0bVFbibCmXjed8HSC/KFJ9t7EkC8Fzt6zZb
-	V5CcdAMg6RawneOXKl+cl1v47zAWY4kunwG6MT3I7E+KfL4/C2LK7t80wEbhmQ7dFR2A/d8Zc/i
-	kl8hWbUcjGw/RPEJYaTYXQPoP9d/ldistY+J9hMCN0kvoN84PqtE8lpYI+O5ucli+bbP5IO5
-X-Google-Smtp-Source: AGHT+IEoljyrBkccAFYLb8MBbUlKdAn3Qg4zbFh0M7v+yWUepkG0OFhXgg8yQQRY7r/ed8cRG3kFFg==
-X-Received: by 2002:a05:6214:dac:b0:719:50da:4a08 with SMTP id 6a1803df08f44-7991cbb2d82mr33802106d6.45.1758283011689;
-        Fri, 19 Sep 2025 04:56:51 -0700 (PDT)
+        bh=XqkzJ715IFhAdPqz34JG4QrSrgL1I3NolvpeVSTSpSM=;
+        b=qIWgq8spI7RihFBf20LboK7jtRfw9aF5zkN342iwiYf+fvD1eii6Fo8TOEeOjXmNKZ
+         /lfeBOpmf/Bplxs9DepvwmNfWPGUTgULDxZOSYlfi3ednupj1wKxWip3MHbaKRkER1Wg
+         dQIABf8+T9iypsUn5840ZNYXwddUu+eCQgVWxGpA+/Q5eGTZ34neYJ0/SX9rCAEsefRp
+         /Rp6p3sy2G7knBgk9iYZbkQOpLEtVhJsd/VQmiQbUGqprvqNjyIL/xCfJcyMQNjBy6Cc
+         VRSMcOjXC5KZw5kxa8fBIJAHEQ9F4nzZZ8p6pVVr044swEqk8yO6sXSobno/sYc9lpNm
+         CSaA==
+X-Forwarded-Encrypted: i=1; AJvYcCUxNfeCiwxeI9+86sI9qfq152Nonb+8cnwcSyfFcEyYbULV6C0qsvyfw2kpgllW/NvEfy8=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxSlB8q9ZWvyeQ1fg4WTV4zFfNoaiAU9NL4l2CfxKEavwhQ2GoL
+	XlG9fOQGZtKzSAaFrxVu1Euij31+FDY8/U14wr1MrRrQnGS7oLW49EDVMSjlnCBA8j4=
+X-Gm-Gg: ASbGncsriKNP9F7Zl4LA6C1Icr/4gmQLhI+jscKeVj8KqUD57s3kHF3Mmrqdo/S+PZp
+	0alMsyyvaR2I4Eq5VxCtrHlUhHZK9NM9H8yu3APreRwbR2IIPpAgA2B3wzBOjsQn9uPD+Qad4/a
+	gdOZymdOc6A3gS3lkUwYVCH1mEhlYKVDCvtQa28BOHS1T4UDW9iDsh29WLovr3G28xb/+Itena0
+	P4y50eH4YBchJ0XuhcLVg48qKeDwIpsBNmVWVURDb3C81oJqXpSXY2RgdWNj0SF4HbqnsZEIWCl
+	iyXwTpOIGKWSylwvmzyeI564Vo6XdRq/R1u4i7S2lAuvZOdW4En8a3yDuaPv5Wfy7mXLbttO
+X-Google-Smtp-Source: AGHT+IHAUUCTifYO3tvHTIggD1bty3WA1tAmCInvXz11D2JOt+J25vVYjGygxn7PDvPC0VZaaS2K+Q==
+X-Received: by 2002:ac8:594d:0:b0:4b2:cf75:bf10 with SMTP id d75a77b69052e-4c06cbe95ebmr27476741cf.17.1758283087738;
+        Fri, 19 Sep 2025 04:58:07 -0700 (PDT)
 Received: from ziepe.ca ([130.41.10.202])
-        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-793516d729csm28635246d6.43.2025.09.19.04.56.50
+        by smtp.gmail.com with ESMTPSA id af79cd13be357-8363198ad41sm325729185a.46.2025.09.19.04.58.06
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 19 Sep 2025 04:56:51 -0700 (PDT)
+        Fri, 19 Sep 2025 04:58:06 -0700 (PDT)
 Received: from jgg by wakko with local (Exim 4.97)
 	(envelope-from <jgg@ziepe.ca>)
-	id 1uzZjO-000000097bU-19eX;
-	Fri, 19 Sep 2025 08:56:50 -0300
-Date: Fri, 19 Sep 2025 08:56:50 -0300
+	id 1uzZkb-000000097c5-40qZ;
+	Fri, 19 Sep 2025 08:58:05 -0300
+Date: Fri, 19 Sep 2025 08:58:05 -0300
 From: Jason Gunthorpe <jgg@ziepe.ca>
-To: Keith Busch <kbusch@kernel.org>
-Cc: Alex Mastro <amastro@fb.com>,
+To: "Tian, Kevin" <kevin.tian@intel.com>
+Cc: Keith Busch <kbusch@kernel.org>, Alex Mastro <amastro@fb.com>,
 	Alex Williamson <alex.williamson@redhat.com>,
-	Kevin Tian <kevin.tian@intel.com>,
 	Bjorn Helgaas <bhelgaas@google.com>, David Reiss <dreiss@meta.com>,
 	Joerg Roedel <joro@8bytes.org>, Leon Romanovsky <leon@kernel.org>,
 	Li Zhe <lizhe.67@bytedance.com>, Mahmoud Adam <mngyadam@amazon.de>,
 	Philipp Stanner <pstanner@redhat.com>,
 	Robin Murphy <robin.murphy@arm.com>,
-	Vivek Kasireddy <vivek.kasireddy@intel.com>,
+	"Kasireddy, Vivek" <vivek.kasireddy@intel.com>,
 	Will Deacon <will@kernel.org>, Yunxiang Li <Yunxiang.Li@amd.com>,
-	linux-kernel@vger.kernel.org, iommu@lists.linux.dev,
-	kvm@vger.kernel.org
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+	"iommu@lists.linux.dev" <iommu@lists.linux.dev>,
+	"kvm@vger.kernel.org" <kvm@vger.kernel.org>
 Subject: Re: [TECH TOPIC] vfio, iommufd: Enabling user space drivers to vend
  more granular access to client processes
-Message-ID: <20250919115650.GT1326709@ziepe.ca>
+Message-ID: <20250919115805.GU1326709@ziepe.ca>
 References: <20250918214425.2677057-1-amastro@fb.com>
  <20250918225739.GS1326709@ziepe.ca>
  <aMyUxqSEBHeHAPIn@kbusch-mbp>
+ <BN9PR11MB5276D7D2BF13374EEA2C788F8C11A@BN9PR11MB5276.namprd11.prod.outlook.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -104,33 +105,15 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <aMyUxqSEBHeHAPIn@kbusch-mbp>
+In-Reply-To: <BN9PR11MB5276D7D2BF13374EEA2C788F8C11A@BN9PR11MB5276.namprd11.prod.outlook.com>
 
-On Thu, Sep 18, 2025 at 05:24:54PM -0600, Keith Busch wrote:
-> I read this as more about having the granularity to automatically
-> release resources associated with a client process when it dies (as
-> mentioned below) rather than relying on the bootstrapping process to
-> manage it all. Not really about hostile ioctls, but that an ungraceful
-> ending of some client workload doesn't even send them.
+On Fri, Sep 19, 2025 at 07:00:04AM +0000, Tian, Kevin wrote:
+> memory of other clients and the USD... there is no hw isolation 
+> within a partitioned IOAS unless the device supports PASID then 
+> each client can be associated to its own IOAS space.
 
-You could achieve this between co-operating processes by monitoring
-the child with a pidfd, or handing it a pipe and watching for the pipe
-to close..
+If the device does support pasid then both of the suggestions make
+a lot more security sense..
 
-> > > - It would be nice if mappings created with the restricted IOMMU fd were
-> > >   automatically freed when the underlying kernel object was freed (if the client
-> > >   process were to exit ungracefully without explicitly performing unmap cleanup
-> > >   after itself).
-> > 
-> > Maybe the BPF could trigger an eventfd or something when the FD closes?
-> 
-> I wouldn't have considered a BPF dependency for this. I'll need to think
-> about that one for a moment.
-
-Well, if you are going to be using BPF for policy then may as well use
-it for all policy. It would not be hard to also invoke the BPF duing
-the file descriptor close and presumably it can somehow to signal the
-vendor process in some easy BPF way?
-
-Jason
+Jsaon
 
