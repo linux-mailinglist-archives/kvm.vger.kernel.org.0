@@ -1,44 +1,44 @@
-Return-Path: <kvm+bounces-58309-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-58310-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6BF90B8C9EE
-	for <lists+kvm@lfdr.de>; Sat, 20 Sep 2025 16:03:56 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 65072B8C9F4
+	for <lists+kvm@lfdr.de>; Sat, 20 Sep 2025 16:04:02 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 31B4E58408E
-	for <lists+kvm@lfdr.de>; Sat, 20 Sep 2025 14:03:56 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2A558584357
+	for <lists+kvm@lfdr.de>; Sat, 20 Sep 2025 14:04:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DEEB42FDC50;
-	Sat, 20 Sep 2025 14:03:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DF14B301716;
+	Sat, 20 Sep 2025 14:03:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=unpredictable.fr header.i=@unpredictable.fr header.b="MtzGnu+k"
+	dkim=pass (2048-bit key) header.d=unpredictable.fr header.i=@unpredictable.fr header.b="MPprHi67"
 X-Original-To: kvm@vger.kernel.org
-Received: from outbound.qs.icloud.com (p-east3-cluster5-host4-snip4-10.eps.apple.com [57.103.86.171])
+Received: from outbound.qs.icloud.com (p-east3-cluster2-host9-snip4-4.eps.apple.com [57.103.87.215])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7B56A2AD22
-	for <kvm@vger.kernel.org>; Sat, 20 Sep 2025 14:03:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=57.103.86.171
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8F4472F5A19
+	for <kvm@vger.kernel.org>; Sat, 20 Sep 2025 14:03:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=57.103.87.215
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758376993; cv=none; b=V9TEZpdAosB4pDVXpyY93i2/nFNrJywdmMZRXgOtYfvmWrR8qBPht4qtu4YlKyDIqSvsAoL35AeaF5akkypiNTpHgOwF1dPbYcNFjsFzQIAFtu/a7Dpq20ONZiAY7ymXv7a6JEOlqR+Yh4dCd3teyB/iVczIPND889KGc5mlKyE=
+	t=1758376997; cv=none; b=NWR0eKGlE2YVJSeoAru+Jmlmw7vxYMT4Rd++8xout4KDVdUZSQuix4GrCLy2pjDlydXMDHSg9rEd2NHdccPkPNw8zzszeMlYPvCd6GmIM7QgV3HAALKUzQ3dyhCnAiQtGs1RBrsM3CeOOdiTlM9mp+l/136gZgyRxoIgSY1F1ks=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758376993; c=relaxed/simple;
-	bh=4a6GTR5Lxc1XBnnx4v25FUrVjCJe2qwlUz7nOhOmI6I=;
+	s=arc-20240116; t=1758376997; c=relaxed/simple;
+	bh=HiSu1elAGfUw6kIKxwZTf612rmqWGvJZ72lVukmsNOk=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=PcsjHEjQ9vZy3jx9pKwrDlmJTYghSV4+V11hQsFNETDGZrCGTO4xDzn04TFkjmvdMDpq/DEzWzKh91JXwJIXk66FUmEAv6kj6apYzaX/xwWFxGFJdTSYYcfhtf30vKuyV+ho9hSb1QgFk4D577qZRuhNR3St72Aj2vobdbDVkOw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=unpredictable.fr; spf=pass smtp.mailfrom=unpredictable.fr; dkim=pass (2048-bit key) header.d=unpredictable.fr header.i=@unpredictable.fr header.b=MtzGnu+k; arc=none smtp.client-ip=57.103.86.171
+	 MIME-Version; b=kqzrzJ3RWeUWTG2MobU8tKHw+io/QRlSaDbbDiEfuKDpc784El8a3Ij1QGNyOQpsQ5aIa6/UlVBc/Te133iMOu8xiteadBEX1pud7140Cj7SA73msU5dbIcT+lgzJVWjF8v2PSJFFxYtOcVUc9tdBGcjcCs1aGQW8wahFat2V54=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=unpredictable.fr; spf=pass smtp.mailfrom=unpredictable.fr; dkim=pass (2048-bit key) header.d=unpredictable.fr header.i=@unpredictable.fr header.b=MPprHi67; arc=none smtp.client-ip=57.103.87.215
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=unpredictable.fr
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=unpredictable.fr
 Received: from outbound.qs.icloud.com (unknown [127.0.0.2])
-	by p00-icloudmta-asmtp-us-east-2d-100-percent-3 (Postfix) with ESMTPS id EBC0E181722C;
-	Sat, 20 Sep 2025 14:03:06 +0000 (UTC)
-Dkim-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=unpredictable.fr; s=sig1; bh=qHgEAm0T48qcnuuyvEGL0jYZIN/Qj9qDonPyqKnSW5o=; h=From:To:Subject:Date:Message-ID:MIME-Version:x-icloud-hme; b=MtzGnu+kCzFJnQ47hOLw+4LWUtk2XOfmPEEejEPpXr8EzdEEMVWYj7y0BUfEB/PQ4YZVioAr22u8Pp3BXdWGInXRnH+ja0dvrpRDoXGSFZZD/ZFjAgBVNJBwLI3FqFyP1u0IJDakZiva7hiecPIevaXpolOhm15tbylGJVgMRxbnNo4myjrNYkCW0sA+a62bJ9X8w2UotyDWEnnhF1qIB1t5w7xXOZgUpUVSYuvEqJgY8ehVAWZV5TQmLWl0btSq3+etIpNNtYcPi8EpyGSMxQy6LfRxEmQa+Y/5ckSK0wy8k4ISyowNhr4sCBgJkVW4xVRAm8icelSiJNm8bt714Q==
+	by p00-icloudmta-asmtp-us-east-2d-100-percent-3 (Postfix) with ESMTPS id 8BCB11817345;
+	Sat, 20 Sep 2025 14:03:10 +0000 (UTC)
+Dkim-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=unpredictable.fr; s=sig1; bh=IHjqdFZlYtMJa8HRC4VnZhdX5Q0ePonZlOFVwjjZYxU=; h=From:To:Subject:Date:Message-ID:MIME-Version:x-icloud-hme; b=MPprHi67MiijYc3XhExjP2RuAVq+X9gmjes6ynzZaqHt+RY91GaILhgMrTQpZZaUnUe5mBkHvsngN3eXX4A9IQeVuKx/NBQFjzyras/latoD/9UBnWe5QOSGBGe0GmO+L82Yc6EWRrMf4NqVBCJ2bCYfiDlDs+2nlsQBzBb98yiGZsa3IJjmo3/Ov7FM6mRuFlLrC3La+BRCYJ/i2pRaxEw0DHEQzeee2aJghYoRNKO/7wqkXKBupao8XW5nafJbwI7I+OpZ25XNz6C9mMkrasUb62PxYii/PzRSA64KN06/7uRzkbMHCAot7wO5ZTmYlNLVgafCu9CSD0xfSJjhsA==
 mail-alias-created-date: 1752046281608
 Received: from localhost.localdomain (qs-asmtp-me-k8s.p00.prod.me.com [17.57.155.37])
-	by p00-icloudmta-asmtp-us-east-2d-100-percent-3 (Postfix) with ESMTPSA id AB17A18170B6;
-	Sat, 20 Sep 2025 14:02:26 +0000 (UTC)
+	by p00-icloudmta-asmtp-us-east-2d-100-percent-3 (Postfix) with ESMTPSA id 896521817098;
+	Sat, 20 Sep 2025 14:02:29 +0000 (UTC)
 From: Mohamed Mediouni <mohamed@unpredictable.fr>
 To: qemu-devel@nongnu.org
 Cc: Shannon Zhao <shannon.zhaosl@gmail.com>,
@@ -65,9 +65,9 @@ Cc: Shannon Zhao <shannon.zhaosl@gmail.com>,
 	Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
 	Mohamed Mediouni <mohamed@unpredictable.fr>,
 	Peter Maydell <peter.maydell@linaro.org>
-Subject: [PATCH v6 20/23] whpx: enable arm64 builds
-Date: Sat, 20 Sep 2025 16:01:21 +0200
-Message-ID: <20250920140124.63046-21-mohamed@unpredictable.fr>
+Subject: [PATCH v6 21/23] MAINTAINERS: update maintainers for WHPX
+Date: Sat, 20 Sep 2025 16:01:22 +0200
+Message-ID: <20250920140124.63046-22-mohamed@unpredictable.fr>
 X-Mailer: git-send-email 2.50.1
 In-Reply-To: <20250920140124.63046-1-mohamed@unpredictable.fr>
 References: <20250920140124.63046-1-mohamed@unpredictable.fr>
@@ -78,68 +78,54 @@ List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Proofpoint-ORIG-GUID: fHfNnrj4DjiPpriNYLihesMCbT9QAhYs
-X-Proofpoint-GUID: fHfNnrj4DjiPpriNYLihesMCbT9QAhYs
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUwOTIwMDEzNiBTYWx0ZWRfXzCvWheqLsfm2
- H4weXvftQEBpsctey7OgoqA1CLUZDFT1abME1rB5dnYmfNiCLgFgjfiAfKB2uUF6jwclPL/TC3P
- rJnRM8XZwSkc2mIWz9221p+217zUK4uYG0roDjP9GlzSagIZexA0WGKurXCemuhPLuGkZ5SGQfL
- GU/lsTa2Bo/b8Lgwho12JVhlv34HAKviPfYCA5thTQRASyBrpf5ZwHtGCdDo/iAE226YdZYhZYp
- JY5FHHlsaucY2stmf7gLReKKS+bYw1D3FxngTZZSsmsr1+FSG6VRMpQ7eBwi2PZuML5vqK2z0=
+X-Proofpoint-ORIG-GUID: 4_XIPZW8Gs1LJTl1yb4x8Cmj5FvYJ9kW
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUwOTIwMDEzNiBTYWx0ZWRfXzNkOaFQADvwR
+ Itqd7fri4VQJfZtSL+sWesK/+mgrlylaJ0L+47HqotwgRZRsYcSDF74yXqJPydM+UTG8Y60qNwj
+ z1IaocwzSe2SpZuAK4pGzQ/9Pw2zKVK9zwttgw/yBuyBYIPXi7pyoOc6NsfyBu9Xx0rHt4ZsRyw
+ hu//JcmjSXvDZWBpzyJaMi0CtLjc3l5Azqn8XWEP6+K+8JalTldlLwdeCXTvPYp0Odlz/n0J1xQ
+ tKu5Ho9FlgSWsgF2/Zg++/eNX/Y+lYcAH1UC7ac7HJy/YiC8RRutiYWQxem6DwLG7ud7+A+i0=
+X-Proofpoint-GUID: 4_XIPZW8Gs1LJTl1yb4x8Cmj5FvYJ9kW
 X-Proofpoint-Virus-Version: vendor=baseguard
  engine=ICAP:2.0.293,Aquarius:18.0.1117,Hydra:6.1.9,FMLib:17.12.80.40
  definitions=2025-09-20_05,2025-09-19_01,2025-03-28_01
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 adultscore=0
- mlxlogscore=797 mlxscore=0 spamscore=0 phishscore=0 suspectscore=0
- bulkscore=0 malwarescore=0 clxscore=1030 classifier=spam adjust=0 reason=mlx
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=0
+ adultscore=0 clxscore=1030 phishscore=0 malwarescore=0 bulkscore=0
+ mlxlogscore=886 spamscore=0 mlxscore=0 classifier=spam adjust=0 reason=mlx
  scancount=1 engine=8.22.0-2506270000 definitions=main-2509200136
-X-JNJ: AAAAAAAB79Z/XZi5MOK8TKrJWDv2jh5CCZ34gC0VTOC8jxc6nuOGCkHtBdTgcHPlPasYSHQkvLBRS7pVPJpjulLNx1qwqUBTstBAhsUXGD/tgNBWVp6NCVi9rhS/ijud6jg90fhNpB8dSDVfHdTWalmG0CJ2wBqRf2PYKcp5Oe3Al+VTRKrXSzU4amucvk2NldN3+4TCWrZW1ep9UxkM3MaDVcnhm0akzt389gzeS/UQBz4Dl8j0Y5+KYhLxccbvvBlnSadoIYWjmrubrMBKlR8qc8etRK17MlMUbzHflzI3mX4Rgd3oqJX+cG+zxhTFR8idFw6Y9nknC7BKD93lX38vImKQqgpzN03L1YDQ45FfelSgu4u0TRK6U4yeug6wCvXP6Uk/Aa54EtaatZewxc5ZPORPJGPfLCcXPNwsyCRt9yPkRbYv+1eHp1yZTfZaXdeVIo1F2lp7T/zj8Dx6FE5C2u295JL99AYEnpjuMCGp6dYZ0szJkIrcxbHauTHWmqKIIjC04rhVPVO9RcxgMg9gSSXD3IAfiwEqADZRjnhFqELpipH8/qBZKz1Mij3y9W8Gx6rULVieUtFhWav+SnDE6rcUvamST5tFZHc4a99Qh2tvMWDk2o9gV6VWEGWNBO88IwZFKzerl1a4/3TdXAogdwKEm0Z4PDZtPAJMYxDN69X9TVLKeUrpKtS40tTUPPOjXugpPlMDn5y77WthxEBSrfuUYMENTywGGWiEE9f1UPt1o3uoABoL1V6KUqeJj7/uafIuf/FBEms8R2UUquDK3P+Kr9UWGlaiDZr7EMAt8L4MLoU52iRuqEtjkGqIsvDRabwNQyBNebMHWOs6U199m7Xg8e3G
+X-JNJ: AAAAAAAB8FHS6JMIfcy7qo0KxEd26QpUFCC230Xv14XNDw4qRsHHjR8zhMv5KhP/v1+ENOuP41Z7k4OMyonbHQOGwlqjxDXss4hXe3rFz+ooGOlHO/Of/wjJlj5OADsO/R4qX+8zSU4VTAGc5Be1rTiETKLlcoFM7GiB1ZCYAurnbe+I/piujsLm1hpsmhmds/B0S1BHA8K8l9WPxporxSO26B4FvLhYZJgTmKdC8cQEHhGVEx8V/ubT2tBmjEnuqLGEvS5ZKeRUZYDDLPXm0gJ2uL9vKWdB/3uND6oMfN0DSbS5gG3/6Nom8/4B6jGFoK4e/KwzbINxbWhGn4LiPcNbpUnsvS3fSN9OwMom42HZDhTGRbBG/o4pN2fry7NNHqTfr+wFMZnehGhJ4nLp1NxFQxtNLBtNoKegQ3jn0ZbhEzQiNam+58DG/hrRauki7oTNTEGvaTgSH+hYgj1fCTS84CsiIzy9vxP7LqfzjjPzaTj9BGZH6dzQSRxdybMqkI3aINFHNqBBSASeFDZNFlp0qmJ6CFnM5bmCrK9Um6niOFxidBasCXn/VppbNf+OqIlYw2wsP+HabUi2OYd2F9hE0eXl2wHHFKEY7rc953ep8kIKg1XML0z0GheC4eR/G0uTW1vRfbnNOV+1DSF9Pqx4Dh73msS0UAxLiIKedhT+KJu6XV/verI2eLEZdKBbWqV6EI1pHgbfQ2CXmt3AkYh+ktAExt6Xgy6c6b63k4LMndAR10IM/5se2u7lyN6sNC5+LXr/Pv89PjFBHUl6xXy7BE7TSls8gMO4Bwh1PeE2E7hYcZI+250iYMlx/lAQM6ysJs4+FZ45FY9J01Wjd43T9mYyQMrQ6/TkN7M6BV+W8CT8vZZeB7HZrw==
+
+And add arm64 files.
+
+From Pedro Barbuda (on Teams):
+
+> we meant to have that switched a while back. you can add me as the maintainer. Pedro Barbuda (pbarbuda@microsoft.com)
 
 Signed-off-by: Mohamed Mediouni <mohamed@unpredictable.fr>
 ---
- meson.build | 21 ++++++++++++++-------
- 1 file changed, 14 insertions(+), 7 deletions(-)
+ MAINTAINERS | 7 +++++--
+ 1 file changed, 5 insertions(+), 2 deletions(-)
 
-diff --git a/meson.build b/meson.build
-index 72da97829a..ca333a35e4 100644
---- a/meson.build
-+++ b/meson.build
-@@ -327,7 +327,8 @@ accelerator_targets += { 'CONFIG_XEN': xen_targets }
+diff --git a/MAINTAINERS b/MAINTAINERS
+index 466ebe703a..e123abcfd6 100644
+--- a/MAINTAINERS
++++ b/MAINTAINERS
+@@ -544,11 +544,14 @@ F: accel/stubs/hvf-stub.c
+ F: include/system/hvf.h
+ F: include/system/hvf_int.h
  
- if cpu == 'aarch64'
-   accelerator_targets += {
--    'CONFIG_HVF': ['aarch64-softmmu']
-+    'CONFIG_HVF': ['aarch64-softmmu'],
-+    'CONFIG_WHPX': ['aarch64-softmmu']
-   }
- elif cpu == 'x86_64'
-   accelerator_targets += {
-@@ -880,14 +881,20 @@ accelerators = []
- if get_option('kvm').allowed() and host_os == 'linux'
-   accelerators += 'CONFIG_KVM'
- endif
-+
- if get_option('whpx').allowed() and host_os == 'windows'
--  if get_option('whpx').enabled() and host_machine.cpu() != 'x86_64'
--    error('WHPX requires 64-bit host')
--  elif cc.has_header('winhvplatform.h', required: get_option('whpx')) and \
--       cc.has_header('winhvemulation.h', required: get_option('whpx'))
--    accelerators += 'CONFIG_WHPX'
-+  if cpu == 'i386'
-+    if get_option('whpx').enabled()
-+     error('WHPX requires 64-bit host')
-+    endif
-+   # Leave CONFIG_WHPX disabled
-+  else
-+    if cc.has_header('winhvplatform.h', required: get_option('whpx')) and \
-+      cc.has_header('winhvemulation.h', required: get_option('whpx'))
-+      accelerators += 'CONFIG_WHPX'
-+    endif
-   endif
--endif
-+ endif
- 
- hvf = not_found
- if get_option('hvf').allowed()
+-WHPX CPUs
+-M: Sunil Muthuswamy <sunilmut@microsoft.com>
++WHPX
++M: Pedro Barbuda <pbarbuda@microsoft.com>
++M: Mohamed Mediouni <mohamed@unpredictable.fr>
+ S: Supported
+ F: accel/whpx/
+ F: target/i386/whpx/
++F: target/arm/whpx_arm.h
++F: target/arm/whpx/
+ F: accel/stubs/whpx-stub.c
+ F: include/system/whpx.h
+ F: include/system/whpx-accel-ops.h
 -- 
 2.50.1 (Apple Git-155)
 
