@@ -1,153 +1,136 @@
-Return-Path: <kvm+bounces-58282-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-58283-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 59FA4B8B98A
-	for <lists+kvm@lfdr.de>; Sat, 20 Sep 2025 00:58:05 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 03DBDB8BB37
+	for <lists+kvm@lfdr.de>; Sat, 20 Sep 2025 02:46:57 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4D5C87E73AE
-	for <lists+kvm@lfdr.de>; Fri, 19 Sep 2025 22:58:03 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 609607C5971
+	for <lists+kvm@lfdr.de>; Sat, 20 Sep 2025 00:46:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 25B2C2D24BA;
-	Fri, 19 Sep 2025 22:57:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 68ACF442C;
+	Sat, 20 Sep 2025 00:46:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="HqSQJ9VC"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="h+lGoWwP"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pl1-f202.google.com (mail-pl1-f202.google.com [209.85.214.202])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.20])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C948E27B359
-	for <kvm@vger.kernel.org>; Fri, 19 Sep 2025 22:57:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E7576191;
+	Sat, 20 Sep 2025 00:46:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.20
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758322673; cv=none; b=CM+VRbRYte77bzZUZBvvfCiDsNQwZyiLRHvvI7HG2mnsT4uywG4L9TDMpXcXU3WiBhCGgy5sDtVXLSDVj4IdKqRk26TjPZKo7AO8IWtsakhurYSfeVmXOtekFlFeXZ92IxzYcOpV9it8DOOEOELqEjW27wmhO0rAqeXDvF1IwEA=
+	t=1758329207; cv=none; b=CzqPun61ldkmpEND0YP6vJ/F6g1tDvGrg6c+JQXDTFBIo0pMTEd3PJVAr3vA6laUrsohoWLQl86GaKb66dPek2cnTzi3jF6LdH4/bYM9PsX5RaFyaM4QzwOm+2yTxGB8khCy3rrQ7U/Th7jfHpn3Ot8GhzCTzUX2azhYFzdYoUU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758322673; c=relaxed/simple;
-	bh=w0n0oT4AEY8eEke71r8eB5cNddQs2dgmAUHaPww1Rw4=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=ouHXqrTvkZBsRTwRSy3ppnLAm+o/zLcei86XhcAFVL8Pfg95Ih4NR3uIxnOESjyADeG8sJvi9F9kJlUZqI1BLNVX7r/RNeagJo1+9b6y1DBFGsyBwFaniEDsiqU0IK0BjlX2Yok8tGhJxj9dDcg/KoogbHwJkX6gFsRCZO4Oty0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=HqSQJ9VC; arc=none smtp.client-ip=209.85.214.202
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pl1-f202.google.com with SMTP id d9443c01a7336-244581ce13aso49132645ad.2
-        for <kvm@vger.kernel.org>; Fri, 19 Sep 2025 15:57:51 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1758322671; x=1758927471; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=k1nL2sHZaVwxxO8gmb5F84AIaQWW4Mnos7VRIHq3uu8=;
-        b=HqSQJ9VCcS6h1Iyb4PEARseHyJ9In8kdbhvPM3lx6qV/PGltmu5giY8fCwhA3ObgSy
-         e9pcoR85X146M/tSyk87AFIacSy6RDy55F6g7lk0rPlV4Hm0OFpDENHWohdfL/ousbc+
-         WtbGhppSBLcgFRS4kWDYV/x95YDasGeKytmus9ZVCg5cNJyFZAH5a81zp4HoPTsy2Quv
-         opbmc+4TenVZ4I30rztSPR9KOvg08wTunycYNRKRvnj3PUzRLUrZEWnMERx/I+E1N7F7
-         6TotlF3bhiRFPpOXwOaJ+nC0a7b7FVSiNJ8JXzMBWaBfEUW/b7mqHr3CxTZ/XROj1rBD
-         z0Yg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1758322671; x=1758927471;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=k1nL2sHZaVwxxO8gmb5F84AIaQWW4Mnos7VRIHq3uu8=;
-        b=TK8d/4OhKJr9t3ywPslvP30j2EFE3mi4N7VMOfgRfnSAEtVgqj3+Tmn8swoNIR0nKO
-         ygangu8yIsrskDt0mUv1B1yEk1c+yG9b3+ir7s5BdVhUZylCuRswwAf+8Fzb++prSaNl
-         c2Ioxt0yZp3wrFPwmy2iz1AOIBnai8DCY2knr7M3hC38YIICaVZs+Xf+56+nbgdgejln
-         3Jv4iVEuohoGcLM9pjKFh4l9FgWEq9VW3NcJRlPsPsAsqkKnh5E5wWm3XeK8zVDdNxLe
-         Y6s1MbUcQNc6bGO3ayRAKUPRM7OOXwfWcElc7oBF0YgC+EwaNKoV3DAAddYioGz5C92h
-         feVQ==
-X-Forwarded-Encrypted: i=1; AJvYcCVeLQxXqTeGa0x1J+d6FyMHnBtlaw1+9QtL66Ud49tFCPtgTUPUfrEBzq+/Atk4lpiIZOM=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yzzh00Y6YudtMdl3Wa/ET+Ink3h1l14U79Ei7ilm859o4Rpz9WV
-	j48+25UGI1+yf5TiYUHnGA/u732fN6G4d+ST1mZhMY9UdWn7Z5Jun9P0g76PCgZZTfp/A7y9klk
-	I7fk0Ng==
-X-Google-Smtp-Source: AGHT+IFqogJhM5Mui7Rp4qxU0fl/m/BHClbKB37c6LI0q4FxFPT8FIRihkRWutMLOjMrfLVHId/GfrdfgSc=
-X-Received: from pjuw15.prod.google.com ([2002:a17:90a:d60f:b0:330:8c66:4984])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:902:ecd1:b0:269:6052:3536
- with SMTP id d9443c01a7336-269ba5347camr65655375ad.45.1758322671102; Fri, 19
- Sep 2025 15:57:51 -0700 (PDT)
-Date: Fri, 19 Sep 2025 15:57:49 -0700
-In-Reply-To: <d3459026-c935-4738-8b28-49492e88e113@linux.intel.com>
+	s=arc-20240116; t=1758329207; c=relaxed/simple;
+	bh=obzQh0t/PU5wuTYcn2Iscy4Z9TWyA/duh5twkZ/V3f0=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=VTteqnVatNiTASpnRst0Ntf0QCkCr0mEV2mu0GasW3GrgvM7PWamBVmeoMB7sq9BfMOM/p+RcSaoGps+05bXCA+Fg93ZSStS+2uQ0JMs6ARAvhLSt1pPUfnfsj8eJFw+hqydMPpA5ukT7AYIJSb6FqAVqH5RcwOjIK/2opEX+9A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=pass smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=h+lGoWwP; arc=none smtp.client-ip=198.175.65.20
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1758329205; x=1789865205;
+  h=message-id:date:mime-version:subject:to:cc:references:
+   from:in-reply-to:content-transfer-encoding;
+  bh=obzQh0t/PU5wuTYcn2Iscy4Z9TWyA/duh5twkZ/V3f0=;
+  b=h+lGoWwPjOG/hktMtZkPE+V1YfNhsWfoxovCFK4lj/NriIOAjyRDG4ft
+   VNHejoigrmZ3oDc4is5+mdeOgsyvFE6qgdyspTGyaorBKnWD4UyDVLOR8
+   IpnXPkQoamfTt0VXmw+PXUdCL7eECXu/6rIGNpCGXtxxcbXYVTRehqEdA
+   M+nxfLhh6RQY202Jcnnrj5zai9msz9G+L6anzYjTO3XXBPBX6MKpVzITS
+   hg7kTjgXHfVUYzbRrwhQw5OrE8DiY7JxcbEqfnV37iHd7xET6GAAMiM5Z
+   H8m/++7K2pVA3r8g5t5L35/4vMzzGBpPZcs0kQSECtvbyPD4nbRlKhVg0
+   Q==;
+X-CSE-ConnectionGUID: i06ez/J3TT+RvGswAH+7qw==
+X-CSE-MsgGUID: wC6rWJlMQemIXT4jqAaIZg==
+X-IronPort-AV: E=McAfee;i="6800,10657,11558"; a="60373107"
+X-IronPort-AV: E=Sophos;i="6.18,279,1751266800"; 
+   d="scan'208";a="60373107"
+Received: from fmviesa009.fm.intel.com ([10.60.135.149])
+  by orvoesa112.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 19 Sep 2025 17:46:45 -0700
+X-CSE-ConnectionGUID: h1aZW+QlRZ6j3q0T20QHnQ==
+X-CSE-MsgGUID: L9mSR7O8QrWcnNPUzrTQ1A==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.18,279,1751266800"; 
+   d="scan'208";a="176402323"
+Received: from dapengmi-mobl1.ccr.corp.intel.com (HELO [10.124.233.177]) ([10.124.233.177])
+  by fmviesa009-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 19 Sep 2025 17:46:43 -0700
+Message-ID: <99c6cb2f-1377-4c5b-b1d6-d1c384195cf0@linux.intel.com>
+Date: Sat, 20 Sep 2025 08:46:40 +0800
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20250912232319.429659-1-seanjc@google.com> <20250912232319.429659-20-seanjc@google.com>
- <d3459026-c935-4738-8b28-49492e88e113@linux.intel.com>
-Message-ID: <aM3f7cwjmSYMYq-K@google.com>
-Subject: Re: [PATCH v15 19/41] KVM: x86: Enable CET virtualization for VMX and
- advertise to userspace
-From: Sean Christopherson <seanjc@google.com>
-To: Binbin Wu <binbin.wu@linux.intel.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	Tom Lendacky <thomas.lendacky@amd.com>, Mathias Krause <minipli@grsecurity.net>, 
-	John Allen <john.allen@amd.com>, Rick Edgecombe <rick.p.edgecombe@intel.com>, 
-	Chao Gao <chao.gao@intel.com>, Maxim Levitsky <mlevitsk@redhat.com>, 
-	Xiaoyao Li <xiaoyao.li@intel.com>, Zhang Yi Z <yi.z.zhang@linux.intel.com>
-Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v4 2/5] KVM: selftests: Track unavailable_mask for PMU
+ events as 32-bit value
+To: Sean Christopherson <seanjc@google.com>,
+ Paolo Bonzini <pbonzini@redhat.com>
+Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+ Yi Lai <yi1.lai@intel.com>
+References: <20250919214648.1585683-1-seanjc@google.com>
+ <20250919214648.1585683-3-seanjc@google.com>
+Content-Language: en-US
+From: "Mi, Dapeng" <dapeng1.mi@linux.intel.com>
+In-Reply-To: <20250919214648.1585683-3-seanjc@google.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-On Thu, Sep 18, 2025, Binbin Wu wrote:
-> 
-> 
-> On 9/13/2025 7:22 AM, Sean Christopherson wrote:
-> > From: Yang Weijiang <weijiang.yang@intel.com>
-> > 
-> > Expose CET features to guest if KVM/host can support them, clear CPUID
-> > feature bits if KVM/host cannot support.
-> > 
-> > Set CPUID feature bits so that CET features are available in guest CPUID.
-> > Add CR4.CET bit support in order to allow guest set CET master control
-> > bit.
-> > 
-> > Disable KVM CET feature if unrestricted_guest is unsupported/disabled as
-> > KVM does not support emulating CET.
-> > 
-> > The CET load-bits in VM_ENTRY/VM_EXIT control fields should be set to make
-> > guest CET xstates isolated from host's.
-> > 
-> > On platforms with VMX_BASIC[bit56] == 0, inject #CP at VMX entry with error
-> > code will fail, and if VMX_BASIC[bit56] == 1, #CP injection with or without
-> > error code is allowed. Disable CET feature bits if the MSR bit is cleared
-> > so that nested VMM can inject #CP if and only if VMX_BASIC[bit56] == 1.
-> > 
-> > Don't expose CET feature if either of {U,S}_CET xstate bits is cleared
-> > in host XSS or if XSAVES isn't supported.
-> > 
-> > CET MSRs are reset to 0s after RESET, power-up and INIT, clear guest CET
-> > xsave-area fields so that guest CET MSRs are reset to 0s after the events.
-> > 
-> > Meanwhile explicitly disable SHSTK and IBT for SVM because CET KVM enabling
-> > for SVM is not ready.
-> > 
-> > Signed-off-by: Yang Weijiang <weijiang.yang@intel.com>
-> > Signed-off-by: Mathias Krause <minipli@grsecurity.net>
-> > Tested-by: Mathias Krause <minipli@grsecurity.net>
-> > Tested-by: John Allen <john.allen@amd.com>
-> > Tested-by: Rick Edgecombe <rick.p.edgecombe@intel.com>
-> > Signed-off-by: Chao Gao <chao.gao@intel.com>
-> > Signed-off-by: Sean Christopherson <seanjc@google.com>
-> 
-> Reviewed-by: Binbin Wu <binbin.wu@linux.intel.com>
-> 
-> One nit below.
-> 
-> [...]
-> > 			\
-> > diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-> > index 15f208c44cbd..c78acab2ff3f 100644
-> > --- a/arch/x86/kvm/x86.c
-> > +++ b/arch/x86/kvm/x86.c
-> > @@ -226,7 +226,8 @@ static struct kvm_user_return_msrs __percpu *user_return_msrs;
-> >    * PT via guest XSTATE would clobber perf state), i.e. KVM doesn't support
-> >    * IA32_XSS[bit 8] (guests can/must use RDMSR/WRMSR to save/restore PT MSRs).
-> >    */
-> > -#define KVM_SUPPORTED_XSS     0
-> > +#define KVM_SUPPORTED_XSS	(XFEATURE_MASK_CET_USER | \
-> > +				 XFEATURE_MASK_CET_KERNEL)
-> 
-> Since XFEATURE_MASK_CET_USER and XFEATURE_MASK_CET_KERNEL are always checked or
-> set together, does it make sense to use a macro for the two bits?
 
-Good call.  I was going to say "eh, we can do that later", but it's a massive
-improvement for readability.
+On 9/20/2025 5:46 AM, Sean Christopherson wrote:
+> Track the mask of "unavailable" PMU events as a 32-bit value.  While bits
+> 31:9 are currently reserved, silently truncating those bits is unnecessary
+> and asking for missed coverage.  To avoid running afoul of the sanity check
+> in vcpu_set_cpuid_property(), explicitly adjust the mask based on the
+> non-reserved bits as reported by KVM's supported CPUID.
+>
+> Opportunistically update the "all ones" testcase to pass -1u instead of
+> 0xff.
+>
+> Signed-off-by: Sean Christopherson <seanjc@google.com>
+> ---
+>  tools/testing/selftests/kvm/x86/pmu_counters_test.c | 7 +++++--
+>  1 file changed, 5 insertions(+), 2 deletions(-)
+>
+> diff --git a/tools/testing/selftests/kvm/x86/pmu_counters_test.c b/tools/testing/selftests/kvm/x86/pmu_counters_test.c
+> index 8aaaf25b6111..1ef038c4c73f 100644
+> --- a/tools/testing/selftests/kvm/x86/pmu_counters_test.c
+> +++ b/tools/testing/selftests/kvm/x86/pmu_counters_test.c
+> @@ -311,7 +311,7 @@ static void guest_test_arch_events(void)
+>  }
+>  
+>  static void test_arch_events(uint8_t pmu_version, uint64_t perf_capabilities,
+> -			     uint8_t length, uint8_t unavailable_mask)
+> +			     uint8_t length, uint32_t unavailable_mask)
+>  {
+>  	struct kvm_vcpu *vcpu;
+>  	struct kvm_vm *vm;
+> @@ -320,6 +320,9 @@ static void test_arch_events(uint8_t pmu_version, uint64_t perf_capabilities,
+>  	if (!pmu_version)
+>  		return;
+>  
+> +	unavailable_mask &= GENMASK(X86_PROPERTY_PMU_EVENTS_MASK.hi_bit,
+> +				    X86_PROPERTY_PMU_EVENTS_MASK.lo_bit);
+> +
+>  	vm = pmu_vm_create_with_one_vcpu(&vcpu, guest_test_arch_events,
+>  					 pmu_version, perf_capabilities);
+>  
+> @@ -630,7 +633,7 @@ static void test_intel_counters(void)
+>  			 */
+>  			for (j = 0; j <= NR_INTEL_ARCH_EVENTS + 1; j++) {
+>  				test_arch_events(v, perf_caps[i], j, 0);
+> -				test_arch_events(v, perf_caps[i], j, 0xff);
+> +				test_arch_events(v, perf_caps[i], j, -1u);
+>  
+>  				for (k = 0; k < NR_INTEL_ARCH_EVENTS; k++)
+>  					test_arch_events(v, perf_caps[i], j, BIT(k));
+
+Reviewed-by: Dapeng Mi <dapeng1.mi@linux.intel.com>
+
+
 
