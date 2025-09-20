@@ -1,281 +1,192 @@
-Return-Path: <kvm+bounces-58286-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-58287-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9A9BCB8C13F
-	for <lists+kvm@lfdr.de>; Sat, 20 Sep 2025 08:53:03 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id D9B2DB8C461
+	for <lists+kvm@lfdr.de>; Sat, 20 Sep 2025 11:24:42 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 4F40A1BC1FAE
-	for <lists+kvm@lfdr.de>; Sat, 20 Sep 2025 06:53:20 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 83ACB7E53EF
+	for <lists+kvm@lfdr.de>; Sat, 20 Sep 2025 09:24:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3D0A02EB5B5;
-	Sat, 20 Sep 2025 06:52:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C3AE429992A;
+	Sat, 20 Sep 2025 09:24:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=antgroup.com header.i=@antgroup.com header.b="HHH5TPQU"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Wgche74h"
 X-Original-To: kvm@vger.kernel.org
-Received: from out28-51.mail.aliyun.com (out28-51.mail.aliyun.com [115.124.28.51])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2D95A1F09A5;
-	Sat, 20 Sep 2025 06:52:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.28.51
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CD314244671;
+	Sat, 20 Sep 2025 09:24:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758351168; cv=none; b=BkjrcnsXZMES2RSbjPWy080Bdi6ZKJG12MVmZAu3RYxInh6PlE8bRAb8eImfaxP7Fw/x6NSYfLx01LEBFYvmstGtGf68D9iDw5QFHM5vGqFxSbukmbZq6mOyaJSVurVp6G9wCMBS3hx94nuMMf2xUHG+L6RMgJl9xXSZib6XCeU=
+	t=1758360275; cv=none; b=JY3SEdyyftigrj5CBN+DOJTDAZLRenV2gprg/8/rr/3c+Th5dFKzKcyvYeMs04J4WtCTmcOYlqU/u/BDDnt0v+yXL0sZ+WXCJgK2ZK9hsHLHOEj0Lr73kPfn5mQOLNKWiRpUGcuqxwAcAmC/vry7UC5WO6Fg9+uI5ZPpbxqAcH4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758351168; c=relaxed/simple;
-	bh=fnb/zxd71rqI2UFUVI9iXzUfKPPCRzK8bXijM1GASc0=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=lwhshRrZvE3jLfb0LihOSm0Vh5ju9dkLbUqo2XbrfMAlL3IT4YCi+mc/l4WYu0MGFLVa1xj3bwofvzetvbwYk3TTlvCvyE5j65qtOyUtlRjJbw2Rxq128KjlTR0xgJy9AIsbG6mgbex7jxg160gHZu3BuvuNd8ceUvlz1HBopUc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=antgroup.com; spf=pass smtp.mailfrom=antgroup.com; dkim=pass (1024-bit key) header.d=antgroup.com header.i=@antgroup.com header.b=HHH5TPQU; arc=none smtp.client-ip=115.124.28.51
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=antgroup.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=antgroup.com
-DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=antgroup.com; s=default;
-	t=1758351154; h=Date:From:To:Subject:Message-ID:MIME-Version:Content-Type;
-	bh=m1yLKs765q27aYv4Da+INz4B+7chhtyioEysvoSOx8E=;
-	b=HHH5TPQUKsl4scUxIDXcKG0mnoGCTtIwDaeg16ZT/tCDAwgi5P+iVCHqjYbKO0ne08qIzOy1nZzJhVEcDn517WXsZg4XsAfuP4mt14eWxO1x2Q1KE5eB/AEk6VLQiWeks+K6QqhvMt9F/DW/bQoJfjnl8Qepdo4Mb142Hi1howk=
-Received: from localhost(mailfrom:houwenlong.hwl@antgroup.com fp:SMTPD_---.ejMJ8-W_1758351153 cluster:ay29)
-          by smtp.aliyun-inc.com;
-          Sat, 20 Sep 2025 14:52:33 +0800
-Date: Sat, 20 Sep 2025 14:52:33 +0800
-From: Hou Wenlong <houwenlong.hwl@antgroup.com>
-To: Sean Christopherson <seanjc@google.com>
-Cc: Tom Lendacky <thomas.lendacky@amd.com>, kvm@vger.kernel.org,
-	Lai Jiangshan <jiangshan.ljs@antgroup.com>,
-	Paolo Bonzini <pbonzini@redhat.com>,
-	Thomas Gleixner <tglx@linutronix.de>,
-	Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-	Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org,
-	"H. Peter Anvin" <hpa@zytor.com>, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH 2/2] KVM: SVM: Use cached value as restore value of
- TSC_AUX for SEV-ES guest
-Message-ID: <20250920065233.GA48402@k08j02272.eu95sqa>
-References: <05a018a6997407080b3b7921ba692aa69a720f07.1758166596.git.houwenlong.hwl@antgroup.com>
- <9da5eb48ccf403e1173484195d3d7d96978125b7.1758166596.git.houwenlong.hwl@antgroup.com>
- <9991df11-fe7c-41e1-9890-f0c38adc8137@amd.com>
- <20250919131535.GA73646@k08j02272.eu95sqa>
- <aM2Dfu0n-JyYttaH@google.com>
+	s=arc-20240116; t=1758360275; c=relaxed/simple;
+	bh=mtx+2aOc+imRlM4qvyqennhOHihAEgTe8xpMW833+EI=;
+	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=cMN5auYQXxuXRC42w4VI2ACUyrAAkBVjIzjg6lFyIGQaLp5yD4Kefanr0yTPoIsKp7fCiiXj+h5ChzUUh/u8t2Bzv90hpxBNosfDg6GlAED6MVTyGE4JFgIkKQ7Js64PG1ms6qRmLU/5N564kQAxaSkOFBl8YGXOX+LFnklL7pQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Wgche74h; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4ED36C4CEEB;
+	Sat, 20 Sep 2025 09:24:35 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1758360275;
+	bh=mtx+2aOc+imRlM4qvyqennhOHihAEgTe8xpMW833+EI=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=Wgche74hLBfRIqS/VriSj0bB1STo1mBL4iL7u87yX9H3GqGjh2VdP8lUy4lYptFX4
+	 jcuPgrQN4B4JKW4MPDHhXXTgUP7bqLOX4Nok/3tW30wUJUYN+VrXT5q7uM+VMqnyaB
+	 MG+5rBCa5K4LBdOsmWiH0w0c0Ls4fLtDNpHbY6/tq3tCeY51opScInWi+pXLMWaPmQ
+	 R2dGbIVuCIKWuUrcxP2v9k2dkJgNsJwnuW7w6EKAi/mY52J6nCq6RbBlKqR3a7zBjd
+	 ygpJO3XVgPcni5lFXj+isBVErToeSJieVUZe5ln+6x/MQL0i4xVIgJ9CJ/dEryGosS
+	 2CGnj97IVagjw==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=lobster-girl.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.98.2)
+	(envelope-from <maz@kernel.org>)
+	id 1uztpZ-00000007zsj-067o;
+	Sat, 20 Sep 2025 09:24:33 +0000
+Date: Sat, 20 Sep 2025 10:24:32 +0100
+Message-ID: <87tt0xxyr3.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Oliver Upton <oliver.upton@linux.dev>
+Cc: kvmarm@lists.linux.dev,
+	linux-arm-kernel@lists.infradead.org,
+	kvm@vger.kernel.org,
+	Joey Gouly <joey.gouly@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Zenghui Yu <yuzenghui@huawei.com>
+Subject: Re: [PATCH v2 10/16] KVM: arm64: Allow use of S1 PTW for non-NV vcpus
+In-Reply-To: <aM3Y6DcAqhGJJer7@linux.dev>
+References: <20250915114451.660351-1-maz@kernel.org>
+	<20250915114451.660351-11-maz@kernel.org>
+	<aM3Y6DcAqhGJJer7@linux.dev>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <aM2Dfu0n-JyYttaH@google.com>
-User-Agent: Mutt/1.5.21 (2010-09-15)
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: oliver.upton@linux.dev, kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, joey.gouly@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Fri, Sep 19, 2025 at 09:23:26AM -0700, Sean Christopherson wrote:
-> On Fri, Sep 19, 2025, Hou Wenlong wrote:
-> > On Thu, Sep 18, 2025 at 01:47:06PM -0500, Tom Lendacky wrote:
-> > > On 9/17/25 22:38, Hou Wenlong wrote:
-> > > > The commit 916e3e5f26ab ("KVM: SVM: Do not use user return MSR support
-> > > > for virtualized TSC_AUX") assumes that TSC_AUX is not changed by Linux
-> > > > post-boot, so it always restores the initial host value on #VMEXIT.
-> > > > However, this is not true in KVM, as it can be modified by user return
-> > > > MSR support for normal guests. If an SEV-ES guest always restores the
-> > > > initial host value on #VMEXIT, this may result in the cached value in
-> > > > user return MSR being different from the hardware value if the previous
-> > > > vCPU was a non-SEV-ES guest that had called kvm_set_user_return_msr().
-> > > > Consequently, this may pose a problem when switching back to that vCPU,
-> > > > as kvm_set_user_return_msr() would not update the hardware value because
-> > > > the cached value matches the target value. Unlike the TDX case, the
-> > > > SEV-ES guest has the ability to set the restore value in the host save
-> > > > area, and the cached value in the user return MSR is always the current
-> > > > hardware value. Therefore, the cached value could be used directly
-> > > > without RDMSR in svm_prepare_switch_to_guest(), making this change
-> > > > minimal.
-> > > 
-> > > I'm not sure I follow. If Linux never changes the value of TSC_AUX once it
-> > > has set it, then how can it ever be different? Have you seen this issue?
-> > > 
-> > > Thanks,
-> > > Tom
-> > >
-> > Hi, Tom.
+On Fri, 19 Sep 2025 23:27:52 +0100,
+Oliver Upton <oliver.upton@linux.dev> wrote:
+> 
+> On Mon, Sep 15, 2025 at 12:44:45PM +0100, Marc Zyngier wrote:
+> > As we are about to use the S1 PTW in non-NV contexts, we must make
+> > sure that we don't evaluate the EL2 state when dealing with the EL1&0
+> > translation regime.
 > > 
-> > IIUD, the normal guest still uses the user return MSR to load the guest
-> > TSC_AUX value into the hardware when TSC_AUX virtualization is
-> > supported.  However, the user return MSR only restores the host value
-> > when returning to userspace, rather than when the vCPU is scheduled out.
-> > This may lead to an issue during vCPU switching on a single pCPU, which
-> > appears as follows:
+> > Signed-off-by: Marc Zyngier <maz@kernel.org>
+> > ---
+> >  arch/arm64/kvm/at.c | 21 ++++++++++++++-------
+> >  1 file changed, 14 insertions(+), 7 deletions(-)
 > > 
-> >        normal vCPU -> SEV-ES vCPU -> normal vCPU
-> > 
-> > When the normal vCPU switches to the SEV-ES vCPU, the hardware TSC_AUX
-> > value remains as the guest value set in kvm_set_user_return_msr() by the
-> > normal vCPU.  After the #VMEXIT from the SEV-ES vCPU, the hardware value
-> > becomes the host value. However, the cached TSC_AUX value in the user
-> > return MSR remains the guest value of previous normal vCPU. Therefore,
-> > when switching back to that normal vCPU, kvm_set_user_return_msr() does
-> > not perform a WRMSR to load the guest value into the hardware, because
-> > the cached value matches the target value. As a result, during the
-> > execution of the normal vCPU, the normal vCPU would get an incorrect
-> > TSC_AUX value for RDTSCP/RDPID.
-> > 
-> > I didn't find the available description of TSC_AUX virtualization in
-> > APM; all my analysis is based on the current KVM code.
+> > diff --git a/arch/arm64/kvm/at.c b/arch/arm64/kvm/at.c
+> > index 1230907d0aa0a..4f6686f59d1c4 100644
+> > --- a/arch/arm64/kvm/at.c
+> > +++ b/arch/arm64/kvm/at.c
+> > @@ -108,8 +108,9 @@ static bool s1pie_enabled(struct kvm_vcpu *vcpu, enum trans_regime regime)
+> >  	case TR_EL20:
+> >  		return vcpu_read_sys_reg(vcpu, TCR2_EL2) & TCR2_EL2_PIE;
+> >  	case TR_EL10:
+> > -		return  (__vcpu_sys_reg(vcpu, HCRX_EL2) & HCRX_EL2_TCR2En) &&
+> > -			(__vcpu_sys_reg(vcpu, TCR2_EL1) & TCR2_EL1_PIE);
+> > +		return ((!vcpu_has_nv(vcpu) ||
+> > +			 (__vcpu_sys_reg(vcpu, HCRX_EL2) & HCRX_EL2_TCR2En)) &&
+> > +			(__vcpu_sys_reg(vcpu, TCR2_EL1) & TCR2_EL1_PIE));
 > 
-> I'm guessing TSC_AUX virtualization works like SEV-ES, where hardware context
-> switches the MSR on VMRUN/#VMEXIT.
+> Hmm, dealing with the effectiveness of bits gated by HCRX_EL2.xEN is a
+> pain. Rather than open-coding this everywhere:
 > 
-> > Am I missing something?
+> static bool __effective_tcr2_bit(struct kvm_vcpu *vcpu, enum trans_regime regime,
+> 				 unsigned int idx)
+> {
+> 	bool bit;
 > 
-> Nope, I don't think so.  I also found the changelog a bit confusing though.  I
-> would say omit the details about Linux not changing the value, and instead focus
-> on the need to re-load the current hardware value.  That should be intuitive for
-> all readers, and is correct regradless of what/whose value is currently in hardware.
+> 	if (tr != TR_EL10)
+> 		return vcpu_read_sys_reg(vcpu, TCR2_EL2) & BIT(idx);
 > 
-> I also think we should handle setting hostsa->tsc_aux in
-> sev_es_prepare_switch_to_guest().  That obviously requires duplicating some of
-> logic related to SEV-ES and TSC_AUX, but I think I prefer that to splitting the
-> handling of the host save area.
+> 	bit = __vcpu_read_sys_reg(vcpu, TCR2_EL1) & BIT(idx);
+> 	if (vcpu_has_nv(vcpu))
+> 		bit &= (__vcpu_sys_reg(vcpu, HCRX_EL2) & HCRX_EL2_TCR2En);
 > 
-> How's this look? (compile tested only)
->
+> 	return bit;
+> }
+> 
+> static bool s1pie_enabled(struct kvm_vcpu *vcpu, enum trans_regime regime)
+> {
+> 	return __effective_tcr2_bit(vcpu, regime, TCR2_EL1_PIE_SHIFT);
+> }
+> 
+> static void compute_s1poe(struct kvm_vcpu *vcpu, struct s1_walk_info *wi)
+> {
+> 	if (!kvm_has_s1poe(vcpu->kvm)) {
+> 		wi->poe = wi->e0poe = false;
+> 		return;
+> 	}
+> 
+> 	wi->poe = __effective_tcr2_bit(vcpu, wi->regime, TCR2_EL1_POE_SHIFT);
+> 	if (wi->regime != TR_EL2)
+> 		wi->poe = __effective_tcr2_bit(vcpu, wi->regime, TCR2_EL1_E0POE_SHIFT);
+> }
+> 
+> Thoughts?
 
-I'm fine with it. Thanks for your fixup; I think I need to improve my
-changlog next time. :)
+I quite like the idea, except for passing individual bit numbers to
+the helper (I'd rather get the full value or 0, depending on TCR2En).
+Based on this, I ended up with this:
 
-Thanks!
+static u64 effective_tcr2(struct kvm_vcpu *vcpu, enum trans_regime regime)
+{
+	if (regime == TR_EL10) {
+		if (vcpu_has_nv(vcpu) &&
+		    !(__vcpu_sys_reg(vcpu, HCRX_EL2) & HCRX_EL2_TCR2En))
+			return 0;
 
-> --
-> Subject: [PATCH] KVM: SVM: Re-load current, not host, TSC_AUX on #VMEXIT from
->  SEV-ES guest
-> 
-> Prior to running an SEV-ES guest, set TSC_AUX in the host save area to the
-> current value in hardware, as tracked by the user return infrastructure,
-> instead of always loading the host's desired value for the CPU.  If the
-> pCPU is also running a non-SEV-ES vCPU, loading the hosts value on #VMEXIT
-> could clobber the other vCPU's value, e.g. if the SEV-ES vCPU preempted
-> the non-SEV-ES vCPU.
-> 
-> Note, unlike TDX, which blindly _zeroes_ TSC_AUX on exit, SEV-ES CPUs
-> can load an arbitrary value.  Stuff the current value in the host save
-> area instead of refreshing the user return cache so that KVM doesn't need
-> to track whether or not the vCPU actually enterred the guest and thus
-> loaded TSC_AUX from the host save area.
-> 
-> Fixes: 916e3e5f26ab ("KVM: SVM: Do not use user return MSR support for virtualized TSC_AUX")
-> Cc: stable@vger.kernel.org
-> Suggested-by: Lai Jiangshan <jiangshan.ljs@antgroup.com>
-> Signed-off-by: Hou Wenlong <houwenlong.hwl@antgroup.com>
-> [sean: handle the SEV-ES case in sev_es_prepare_switch_to_guest()]
-> Signed-off-by: Sean Christopherson <seanjc@google.com>
-> ---
->  arch/x86/kvm/svm/sev.c | 14 +++++++++++++-
->  arch/x86/kvm/svm/svm.c | 26 +++++++-------------------
->  arch/x86/kvm/svm/svm.h |  4 +++-
->  3 files changed, 23 insertions(+), 21 deletions(-)
-> 
-> diff --git a/arch/x86/kvm/svm/sev.c b/arch/x86/kvm/svm/sev.c
-> index cce48fff2e6c..95767b9d0d55 100644
-> --- a/arch/x86/kvm/svm/sev.c
-> +++ b/arch/x86/kvm/svm/sev.c
-> @@ -4664,7 +4664,9 @@ int sev_vcpu_create(struct kvm_vcpu *vcpu)
->  	return 0;
->  }
->  
-> -void sev_es_prepare_switch_to_guest(struct vcpu_svm *svm, struct sev_es_save_area *hostsa)
-> +void sev_es_prepare_switch_to_guest(struct vcpu_svm *svm,
-> +				    struct sev_es_save_area *hostsa,
-> +				    int tsc_aux_uret_slot)
->  {
->  	struct kvm *kvm = svm->vcpu.kvm;
->  
-> @@ -4712,6 +4714,16 @@ void sev_es_prepare_switch_to_guest(struct vcpu_svm *svm, struct sev_es_save_are
->  		hostsa->dr2_addr_mask = amd_get_dr_addr_mask(2);
->  		hostsa->dr3_addr_mask = amd_get_dr_addr_mask(3);
->  	}
-> +
-> +	/*
-> +	 * TSC_AUX is always virtualized for SEV-ES guests when the feature is
-> +	 * available, i.e. TSC_AUX is loaded on #VMEXIT from the host save area.
-> +	 * Set the save area to the current hardware value, i.e. the current
-> +	 * user return value, so that the correct value is restored on #VMEXIT.
-> +	 */
-> +	if (cpu_feature_enabled(X86_FEATURE_V_TSC_AUX) &&
-> +	    !WARN_ON_ONCE(tsc_aux_uret_slot < 0))
-> +		hostsa->tsc_aux = kvm_get_user_return_msr(tsc_aux_uret_slot);
->  }
->  
->  void sev_vcpu_deliver_sipi_vector(struct kvm_vcpu *vcpu, u8 vector)
-> diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
-> index 67f4eed01526..662cf680faf7 100644
-> --- a/arch/x86/kvm/svm/svm.c
-> +++ b/arch/x86/kvm/svm/svm.c
-> @@ -577,18 +577,6 @@ static int svm_enable_virtualization_cpu(void)
->  
->  	amd_pmu_enable_virt();
->  
-> -	/*
-> -	 * If TSC_AUX virtualization is supported, TSC_AUX becomes a swap type
-> -	 * "B" field (see sev_es_prepare_switch_to_guest()) for SEV-ES guests.
-> -	 * Since Linux does not change the value of TSC_AUX once set, prime the
-> -	 * TSC_AUX field now to avoid a RDMSR on every vCPU run.
-> -	 */
-> -	if (boot_cpu_has(X86_FEATURE_V_TSC_AUX)) {
-> -		u32 __maybe_unused msr_hi;
-> -
-> -		rdmsr(MSR_TSC_AUX, sev_es_host_save_area(sd)->tsc_aux, msr_hi);
-> -	}
-> -
->  	return 0;
->  }
->  
-> @@ -1400,16 +1388,17 @@ static void svm_prepare_switch_to_guest(struct kvm_vcpu *vcpu)
->  	 */
->  	vmsave(sd->save_area_pa);
->  	if (sev_es_guest(vcpu->kvm))
-> -		sev_es_prepare_switch_to_guest(svm, sev_es_host_save_area(sd));
-> +		sev_es_prepare_switch_to_guest(svm, sev_es_host_save_area(sd),
-> +					       tsc_aux_uret_slot);
->  
->  	if (tsc_scaling)
->  		__svm_write_tsc_multiplier(vcpu->arch.tsc_scaling_ratio);
->  
->  	/*
-> -	 * TSC_AUX is always virtualized for SEV-ES guests when the feature is
-> -	 * available. The user return MSR support is not required in this case
-> -	 * because TSC_AUX is restored on #VMEXIT from the host save area
-> -	 * (which has been initialized in svm_enable_virtualization_cpu()).
-> +	 * TSC_AUX is always virtualized (context switched by hardware) for
-> +	 * SEV-ES guests when the feature is available.  For non-SEV-ES guests,
-> +	 * context switch TSC_AUX via the user_return MSR infrastructure (not
-> +	 * all CPUs support TSC_AUX virtualization).
->  	 */
->  	if (likely(tsc_aux_uret_slot >= 0) &&
->  	    (!boot_cpu_has(X86_FEATURE_V_TSC_AUX) || !sev_es_guest(vcpu->kvm)))
-> @@ -3004,8 +2993,7 @@ static int svm_set_msr(struct kvm_vcpu *vcpu, struct msr_data *msr)
->  		 * TSC_AUX is always virtualized for SEV-ES guests when the
->  		 * feature is available. The user return MSR support is not
->  		 * required in this case because TSC_AUX is restored on #VMEXIT
-> -		 * from the host save area (which has been initialized in
-> -		 * svm_enable_virtualization_cpu()).
-> +		 * from the host save area.
->  		 */
->  		if (boot_cpu_has(X86_FEATURE_V_TSC_AUX) && sev_es_guest(vcpu->kvm))
->  			break;
-> diff --git a/arch/x86/kvm/svm/svm.h b/arch/x86/kvm/svm/svm.h
-> index 5d39c0b17988..4fda677e8ab3 100644
-> --- a/arch/x86/kvm/svm/svm.h
-> +++ b/arch/x86/kvm/svm/svm.h
-> @@ -831,7 +831,9 @@ void sev_vcpu_after_set_cpuid(struct vcpu_svm *svm);
->  int sev_es_string_io(struct vcpu_svm *svm, int size, unsigned int port, int in);
->  void sev_es_recalc_msr_intercepts(struct kvm_vcpu *vcpu);
->  void sev_vcpu_deliver_sipi_vector(struct kvm_vcpu *vcpu, u8 vector);
-> -void sev_es_prepare_switch_to_guest(struct vcpu_svm *svm, struct sev_es_save_area *hostsa);
-> +void sev_es_prepare_switch_to_guest(struct vcpu_svm *svm,
-> +				    struct sev_es_save_area *hostsa,
-> +				    int tsc_aux_uret_slot);
->  void sev_es_unmap_ghcb(struct vcpu_svm *svm);
->  
->  #ifdef CONFIG_KVM_AMD_SEV
-> 
-> base-commit: 60e396349c19320485a249005256d1fafee60290
-> --
+		return __vcpu_read_sys_reg(vcpu, TCR2_EL1);
+	}
+
+	return vcpu_read_sys_reg(vcpu, TCR2_EL2);
+}
+
+static bool s1pie_enabled(struct kvm_vcpu *vcpu, enum trans_regime regime)
+{
+	if (!kvm_has_s1pie(vcpu->kvm))
+		return false;
+
+	/* Abuse TCR2_EL1_PIE and use it for EL2 as well */
+	return effective_tcr2(vcpu, regime) & TCR2_EL1_PIE;
+}
+
+static void compute_s1poe(struct kvm_vcpu *vcpu, struct s1_walk_info *wi)
+{
+	u64 val;
+
+	if (!kvm_has_s1poe(vcpu->kvm)) {
+		wi->poe = wi->e0poe = false;
+		return;
+	}
+
+	val = effective_tcr2(vcpu, wi->regime);
+
+	/* Abuse TCR2_EL1_* for EL2 */
+	wi->poe = val & TCR2_EL1_POE;
+	wi->e0poe = (wi->regime != TR_EL2) && (val & TCR2_EL1_E0POE);
+}
+
+Thanks,
+
+	M.
+
+-- 
+Jazz isn't dead. It just smells funny.
 
