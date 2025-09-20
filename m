@@ -1,44 +1,44 @@
-Return-Path: <kvm+bounces-58311-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-58312-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id B60A8B8C9F7
-	for <lists+kvm@lfdr.de>; Sat, 20 Sep 2025 16:04:07 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 03726B8CA00
+	for <lists+kvm@lfdr.de>; Sat, 20 Sep 2025 16:04:13 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6BACE628B08
-	for <lists+kvm@lfdr.de>; Sat, 20 Sep 2025 14:04:06 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id AED3E1B289E5
+	for <lists+kvm@lfdr.de>; Sat, 20 Sep 2025 14:04:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 48BF22FB975;
-	Sat, 20 Sep 2025 14:03:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B10B62FF64E;
+	Sat, 20 Sep 2025 14:03:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=unpredictable.fr header.i=@unpredictable.fr header.b="Yal54Mo2"
+	dkim=pass (2048-bit key) header.d=unpredictable.fr header.i=@unpredictable.fr header.b="B64izZL1"
 X-Original-To: kvm@vger.kernel.org
-Received: from outbound.qs.icloud.com (p-east3-cluster2-host2-snip4-6.eps.apple.com [57.103.87.147])
+Received: from outbound.qs.icloud.com (p-east3-cluster7-host3-snip4-10.eps.apple.com [57.103.84.161])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E3FF52FF65A
-	for <kvm@vger.kernel.org>; Sat, 20 Sep 2025 14:03:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=57.103.87.147
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 26A902FB97B
+	for <kvm@vger.kernel.org>; Sat, 20 Sep 2025 14:03:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=57.103.84.161
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758377001; cv=none; b=OyBqVxwG9xAoJLBUZ3HwLjqcQXlPOy59MxIQDnNgur8iQS9koRE8HL3FOLdqckJXj/IheyLAKDiH4yZNxNVUNwJ422QDoyqhgUqMafo7w0uzbKQMVs43FlRyEDO+bMgrtSv/sGzkOExjA7CV8pUXlSPx3KGu36o08/wBJlrVxdU=
+	t=1758377007; cv=none; b=GGSGFRCT7NULWexHTdJg6+SaQ9HubjtIgwMc2VUMFGiu6EbOjKO5bRWMwt589IPmUmeK4e5PWHCAUxYe2f6KxhQ8S8DwNp42qMmTJuqp/orBG+v3egJmBfOtnj6udnEb76T5sUkhPsqcXn2Gkq2heysiLLJ7l/MIEqmfyiB084c=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758377001; c=relaxed/simple;
-	bh=6ZaNiIwiQUIZ7j9JsDb98c7LB17UaCXZZO63e3L0rdg=;
+	s=arc-20240116; t=1758377007; c=relaxed/simple;
+	bh=Tq5oT/7lJ7fbEbEaKEBzQ0nPDynLLXkeqa6sBcGH/4o=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=ZHlDkdKWiD2Ti1ZmRIi47VjjoNZ1gHWmKjeFSLS5dFhXLCB2LT2ih3aImCPgV4KVpb3IbDs5U3CsnLyQgWcpO6wFvszTPxI2bslOnzBSf3LxnN9YnvKhss0ZiqPD6cImSImdCMKKXAlx3tY2YkYeR1KA4yTod/N9qwQeAdkYihI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=unpredictable.fr; spf=pass smtp.mailfrom=unpredictable.fr; dkim=pass (2048-bit key) header.d=unpredictable.fr header.i=@unpredictable.fr header.b=Yal54Mo2; arc=none smtp.client-ip=57.103.87.147
+	 MIME-Version; b=jcM0gye0nMDGFlPCCzUEQl82EPIkyOWAUMv0lJVrmOnCJhAkSMSMk4PC7Pr9xNe9lShEXHDlUL1ymYF25wyydM9E/mBp8ZdGafbOAjtFEZfDBpewbged7Cy5+sphyrjuorl8zarLdHi0qFPPRw0eSbmBE9xCQ3VKjYi2mYUrro4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=unpredictable.fr; spf=pass smtp.mailfrom=unpredictable.fr; dkim=pass (2048-bit key) header.d=unpredictable.fr header.i=@unpredictable.fr header.b=B64izZL1; arc=none smtp.client-ip=57.103.84.161
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=unpredictable.fr
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=unpredictable.fr
 Received: from outbound.qs.icloud.com (unknown [127.0.0.2])
-	by p00-icloudmta-asmtp-us-east-2d-100-percent-3 (Postfix) with ESMTPS id DEA2918170A5;
-	Sat, 20 Sep 2025 14:03:14 +0000 (UTC)
-Dkim-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=unpredictable.fr; s=sig1; bh=6QHLe7sI/ta/TpnlofGbhZSXfY72nxkqv2tu61id1Xw=; h=From:To:Subject:Date:Message-ID:MIME-Version:x-icloud-hme; b=Yal54Mo2j/1B9TAxD6hgWtXOuoivd6GsUp5UlECkI1Ozv6iPJNFfADPRumTtZ4CvlZlpNBa1DET98Z1YPij8W9En4/7tLwoyzKm/3oZgMqL2AHz9jkzox23eECMKGJ7F2UmKfV5mdLG3MdyxwpilYwdXGGL76A7iGv/TI2fYzQ0RPBUyRFKwNfHW4PMmuhR7xOIEAkNSXIy0x2NJHaL2zuR7sC3cacvEv4TTrSDy4grI6U15t6zqxGi03uS/EkAu8biN+MrQv5SOtAUoopjT8gGqB8UEupvRPilCp5lLwaqG52/EXMSknMJM05sROdNcbH1z0NrXh3JIAyMzwCYEoA==
+	by p00-icloudmta-asmtp-us-east-2d-100-percent-3 (Postfix) with ESMTPS id 51D041817344;
+	Sat, 20 Sep 2025 14:03:19 +0000 (UTC)
+Dkim-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=unpredictable.fr; s=sig1; bh=c/5rsUrStdeRorYSqBu3+Q8xyENsD0DokCuHFqMkrGk=; h=From:To:Subject:Date:Message-ID:MIME-Version:x-icloud-hme; b=B64izZL1vTxTRxZdn12k8FBC3jD9Eu5bv9kzu+z9fxmEjgO+8zzKPtDuMebzIY/2JrgiV/FKVbNlihiSDDc2t0sxrja3m9mRAvkfrSD2/QttuNVqimylam5rcdUBZMvwo7dB+D0McyDYH8sI3Z+UpEQYhCpVc6MutWygV2ZsDJUH4OCQx7utswBC4fWkDSFEtaz39triYg0a3XEx1RwqpVMbWSmIFSMm8ny1RZ0xkg5DphIdS+REyg+jhG8Rmnzk+idvdQ8k3JPe5Y8+yrPhI4an/aeIKoPURifIuxrier2hYcmXtK8087Q0qxcF5A9A6ksz4plv8/R6tPrihB8mUA==
 mail-alias-created-date: 1752046281608
 Received: from localhost.localdomain (qs-asmtp-me-k8s.p00.prod.me.com [17.57.155.37])
-	by p00-icloudmta-asmtp-us-east-2d-100-percent-3 (Postfix) with ESMTPSA id 691F71817268;
-	Sat, 20 Sep 2025 14:02:32 +0000 (UTC)
+	by p00-icloudmta-asmtp-us-east-2d-100-percent-3 (Postfix) with ESMTPSA id 4746018172C7;
+	Sat, 20 Sep 2025 14:02:35 +0000 (UTC)
 From: Mohamed Mediouni <mohamed@unpredictable.fr>
 To: qemu-devel@nongnu.org
 Cc: Shannon Zhao <shannon.zhaosl@gmail.com>,
@@ -65,9 +65,9 @@ Cc: Shannon Zhao <shannon.zhaosl@gmail.com>,
 	Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
 	Mohamed Mediouni <mohamed@unpredictable.fr>,
 	Peter Maydell <peter.maydell@linaro.org>
-Subject: [PATCH v6 22/23] docs: arm: update virt machine model description
-Date: Sat, 20 Sep 2025 16:01:23 +0200
-Message-ID: <20250920140124.63046-23-mohamed@unpredictable.fr>
+Subject: [PATCH v6 23/23] whpx: apic: use non-deprecated APIs to control interrupt controller state
+Date: Sat, 20 Sep 2025 16:01:24 +0200
+Message-ID: <20250920140124.63046-24-mohamed@unpredictable.fr>
 X-Mailer: git-send-email 2.50.1
 In-Reply-To: <20250920140124.63046-1-mohamed@unpredictable.fr>
 References: <20250920140124.63046-1-mohamed@unpredictable.fr>
@@ -78,60 +78,122 @@ List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Proofpoint-ORIG-GUID: ojLL6QodVQ17wDK9HHqj0FwWgh6Q8daA
-X-Proofpoint-GUID: ojLL6QodVQ17wDK9HHqj0FwWgh6Q8daA
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUwOTIwMDEzNiBTYWx0ZWRfX25h+Oy3H7yiS
- yt9rk8Wty6XF48La1pCM3v9VeSEHWEXpAp6eHstyw2qPEoBHEJWJkJukxeJ8RL5rzBtm4jhgvlb
- mNFsLe3F15Y1SHee+YZhYBzAGp37q+yIthkM8R07Swf+Z4Lsm/Dx35pGEOB4whFhYaErp3ALYR2
- 0rFLvXXIBAipso3jrQO7F/k2CmaZj616P0JfpjfWjl/vq9ecLKt0YXw/EpNK+4hxByYZ83HLpch
- mC2gS7VlTQE8LW+fqcWJn2M0ayboU33aZwYE7vlKQohTjNFUYYIY8TZrQsEyEA6jgv0tcdQWQ=
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUwOTIwMDEzNiBTYWx0ZWRfX9z6N3cyeSVux
+ +RrFvjrsbkKKcWyfTpBMoj/2bnC//IYiCJxi/U5ewhwymsheKn+sqk5LxwfMyxL4inO9XnYJuKP
+ 4eXhjyw46jwHKhhR6EM/1YROvB5Fu2xmt0JflCpiAJETk+Ra3CCMhnXW2PGieGDcRC6kU+3XQ+4
+ 9cILwuLeWBTQsevw5C2ziSJizQk/f6kazF4YPGvkcD5Tg5IFshQ2pLJJgXCGLwuZ5TA7QIIyvKN
+ 8ksbpcyC1VWOegRd55ZvjxJ15FPr6dCwu3suXwGSyhzZsvRKUdFCKsxnN8oqHX1sK7eFS3qIY=
+X-Proofpoint-GUID: c83yXiQoG0AGIGpW8wmiFxYHfBhemJTi
+X-Proofpoint-ORIG-GUID: c83yXiQoG0AGIGpW8wmiFxYHfBhemJTi
 X-Proofpoint-Virus-Version: vendor=baseguard
  engine=ICAP:2.0.293,Aquarius:18.0.1117,Hydra:6.1.9,FMLib:17.12.80.40
  definitions=2025-09-20_05,2025-09-19_01,2025-03-28_01
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 spamscore=0
- adultscore=0 phishscore=0 mlxscore=0 suspectscore=0 bulkscore=0
- malwarescore=0 mlxlogscore=999 clxscore=1030 classifier=spam adjust=0
- reason=mlx scancount=1 engine=8.22.0-2506270000 definitions=main-2509200136
-X-JNJ: AAAAAAABzBXNo6aD0xhHNo9zDDLKtbsGIdEu9Jzv0TkCWRLkBC7HbJwcYHwcB7cJdKBi6rFM4zCP286YCrzFBoQDYCRGYSCIS5FuHpcLeFsu5aLATorotIsTuv3e3aDWeuoKokRJw1AZ7e2Ae/8eBbp2YMJE5De1oidpSO3aB4DtyXUGcfsiUaB2ULR1DJ1d94E2ieHzNeTYJW1/KtsA/aaPRTJS8ifZewz+Q5i+WZaw1qHmGsWumTQVWwkR/lNJSX8O6nPrkZWW4M5R0fUJXUshLJ7sFwRjaI4KhrkfrFtLIovtPJG0VoKb7xXFHX2xS0ylGm1pk0zXQ2YeJ0q2qiCq0SFIeivSn6Sti3KnXDXj6igcFy9iirRMe4j1AChxwd5MqXVxsRHnd9rvteZft2kZk0NzFH5WpRsY6/Z7+X4/htMXkaTgi73+/B6pHZZacyS8cEj4fUO5strUtRYL9Ldz6PGyAxYWHUAZSVC8yuCQO/KXEs/dZ0kPF4uLq+0bCXxLFkOy7NDFOp2Xd4+IaVF1fLz4OP77W9BEumjILfNkIehV3b0pbqiZr0i+4D+MTVagYA1Jnd/2loyQsx/b4CmNvpZbvx0vGxTbqc0ztFwDDRlExj2hjlMyoWVeTS6M7BbJxuJHbtXJ2WlPajKEEaBt6vQUIaLeJbX3QiTmThqyH3QkpdWP5/rSDmHeH9RBL9I8flt8Z+zubrVh6s6ZhB7TQ50bk08XEYDig3+zjUd5g5zSlODKPUIkVzWEnhM7ETyf8ye9/YM1A01hWlJok4LiJYicG2jYZi/xJShXP0jJkkV4DSKoZTSDfap3iqUkY8Waf7p6vJSfJiGq6PVGGBB6OvMovwfCJvlq/VYNt/hn72/tAvzzb8oDBcprBl1ESg==
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 bulkscore=0
+ mlxlogscore=818 clxscore=1030 suspectscore=0 adultscore=0 phishscore=0
+ spamscore=0 malwarescore=0 mlxscore=0 classifier=spam adjust=0 reason=mlx
+ scancount=1 engine=8.22.0-2506270000 definitions=main-2509200136
+X-JNJ: AAAAAAABmrj6QRYIKNB2jjK68fLx1j8Ye4m2/dogagyZ06LY5SdiO0gKY3szkKLV6wZbdP6RmoPxsv/pQmJqRVLNkmGCPeLH7eW5KBSvwdZ73lbaDbHyGc64iPkGbWLcdMkkjCM0eE1uFnkK+uwAraaw91y4pUueOCX4MGrRjAIxd9/QecvttWiApxr1dIIpHLcy2HJqkG5Cx66zN2l+xKkPoErE24iXBaIXjJDgIQCeP0YfcwbhFmlG4qAI7ZYeoZy0Y6lrNLDcGqm2PT3RiHjUuzRtVzCoePpCz7TMsavb3TFMN+6Ima69FpY0i4cbj8cVyZHPV9yOvhpO5WEUsiocs1G0ymOO0+r/aCX477x+X1L88XXYsgTyBwimk77hnN4qKIy0Weo6d+p3WzbnhhRcY3r4qF3iQYPRCCears/rw19Fv5+mupNMrgvxT8TtKX7gBe5tQh/uMjnzw2nF5kwGTUpjC1chgIUcT/T3vQM7vBvf14znv78dOYdh3yY5AoU44O3AYR6GsMRUftetGF11KUOO9UroMORpW1bcQR569yPrwI7E0DEvwbEsSQc8ZEmcP66Qe6ysQcwDC2/3INBqFEqrEfQp3Qs1Ni8J//M0JGCbO86JRlWOnOrqMTEIw7OJzixq9KgeNeTyeMBQUx8F+ZxV0FPs99kZ8btYAHpqEc3s1mGjWF/nC+5SEqHK7g5G02Sk+bacw8VWKnrDZp4+IJqol4FGkOtFviymSWzPwbMFnrpnXBoMRdIQdz/zRXdJBtvdZhLV3U45NF3WFN15+Y1B3BlakJSUQ6XPR+4qvljaluwLz/YAwnl8ryCsQowHNHbLuDp9RIWVImxSnrfuEU6fcdR/zpRViefMeOhkhzQKT8ms/y8EvWP/I1q+qQ==
 
-Update the documentation to match current QEMU.
+WHvGetVirtualProcessorInterruptControllerState2 and
+WHvSetVirtualProcessorInterruptControllerState2 are
+deprecated since Windows 10 version 2004.
 
-Remove the mention of pre-2.7 machine models as those aren't provided
-anymore.
+Use the non-deprecated WHvGetVirtualProcessorState and
+WHvSetVirtualProcessorState when available.
 
 Signed-off-by: Mohamed Mediouni <mohamed@unpredictable.fr>
 ---
- docs/system/arm/virt.rst | 10 +++++-----
- 1 file changed, 5 insertions(+), 5 deletions(-)
+ include/system/whpx-internal.h |  9 +++++++
+ target/i386/whpx/whpx-apic.c   | 46 +++++++++++++++++++++++++---------
+ 2 files changed, 43 insertions(+), 12 deletions(-)
 
-diff --git a/docs/system/arm/virt.rst b/docs/system/arm/virt.rst
-index 10cbffc8a7..fe95be991e 100644
---- a/docs/system/arm/virt.rst
-+++ b/docs/system/arm/virt.rst
-@@ -40,9 +40,10 @@ The virt board supports:
- - An optional SMMUv3 IOMMU
- - hotpluggable DIMMs
- - hotpluggable NVDIMMs
--- An MSI controller (GICv2M or ITS). GICv2M is selected by default along
--  with GICv2. ITS is selected by default with GICv3 (>= virt-2.7). Note
--  that ITS is not modeled in TCG mode.
-+- An MSI controller (GICv2m or ITS).
-+  - When using a GICv3, ITS is selected by default when available on the platform.
-+  - If using a GICv2 or when ITS is not available, a GICv2m is provided by default instead.
-+  - Before virt-10.2, a GICv2m is not provided when the ITS is disabled.
- - 32 virtio-mmio transport devices
- - running guests using the KVM accelerator on aarch64 hardware
- - large amounts of RAM (at least 255GB, and more if using highmem)
-@@ -167,8 +168,7 @@ gic-version
-     ``4`` if ``virtualization`` is ``on``, but this may change in future)
+diff --git a/include/system/whpx-internal.h b/include/system/whpx-internal.h
+index 366bc525a3..b87d35cf1b 100644
+--- a/include/system/whpx-internal.h
++++ b/include/system/whpx-internal.h
+@@ -84,6 +84,15 @@ void whpx_apic_get(DeviceState *s);
+   X(HRESULT, WHvSetVirtualProcessorInterruptControllerState2, \
+         (WHV_PARTITION_HANDLE Partition, UINT32 VpIndex, PVOID State, \
+          UINT32 StateSize)) \
++  X(HRESULT, WHvGetVirtualProcessorState, \
++        (WHV_PARTITION_HANDLE Partition, UINT32 VpIndex, \
++        WHV_VIRTUAL_PROCESSOR_STATE_TYPE StateType, PVOID Buffer, \
++        UINT32 BufferSizeInBytes, UINT32 *BytesWritten)) \
++  X(HRESULT, WHvSetVirtualProcessorState, \
++        (WHV_PARTITION_HANDLE Partition, UINT32 VpIndex, \
++        WHV_VIRTUAL_PROCESSOR_STATE_TYPE StateType, PVOID Buffer, \
++        UINT32 BufferSizeInBytes)) \
++
  
- its
--  Set ``on``/``off`` to enable/disable ITS instantiation. The default is ``on``
--  for machine types later than ``virt-2.7``.
-+  Set ``on``/``off``/``auto`` to control ITS instantiation. The default is ``auto``.
+ #define LIST_WINHVEMULATION_FUNCTIONS(X) \
+   X(HRESULT, WHvEmulatorCreateEmulator, (const WHV_EMULATOR_CALLBACKS* Callbacks, WHV_EMULATOR_HANDLE* Emulator)) \
+diff --git a/target/i386/whpx/whpx-apic.c b/target/i386/whpx/whpx-apic.c
+index badb404b63..285ca28ba2 100644
+--- a/target/i386/whpx/whpx-apic.c
++++ b/target/i386/whpx/whpx-apic.c
+@@ -137,11 +137,21 @@ static void whpx_apic_put(CPUState *cs, run_on_cpu_data data)
+     whpx_put_apic_base(CPU(s->cpu), s->apicbase);
+     whpx_put_apic_state(s, &kapic);
  
- iommu
-   Set the IOMMU type to create for the guest. Valid values are:
+-    hr = whp_dispatch.WHvSetVirtualProcessorInterruptControllerState2(
+-        whpx_global.partition,
+-        cs->cpu_index,
+-        &kapic,
+-        sizeof(kapic));
++    if (whp_dispatch.WHvSetVirtualProcessorState) {
++        hr = whp_dispatch.WHvSetVirtualProcessorState(
++            whpx_global.partition,
++            cs->cpu_index,
++            WHvVirtualProcessorStateTypeInterruptControllerState2,
++            &kapic,
++            sizeof(kapic));
++    } else {
++        hr = whp_dispatch.WHvSetVirtualProcessorInterruptControllerState2(
++            whpx_global.partition,
++            cs->cpu_index,
++            &kapic,
++            sizeof(kapic));
++    }
++
+     if (FAILED(hr)) {
+         fprintf(stderr,
+             "WHvSetVirtualProcessorInterruptControllerState failed: %08lx\n",
+@@ -156,16 +166,28 @@ void whpx_apic_get(DeviceState *dev)
+     APICCommonState *s = APIC_COMMON(dev);
+     CPUState *cpu = CPU(s->cpu);
+     struct whpx_lapic_state kapic;
++    HRESULT hr;
++
++    if (whp_dispatch.WHvGetVirtualProcessorState) {
++        hr = whp_dispatch.WHvGetVirtualProcessorState(
++            whpx_global.partition,
++            cpu->cpu_index,
++            WHvVirtualProcessorStateTypeInterruptControllerState2,
++            &kapic,
++            sizeof(kapic),
++            NULL);
++    } else {
++        hr = whp_dispatch.WHvGetVirtualProcessorInterruptControllerState2(
++            whpx_global.partition,
++            cpu->cpu_index,
++            &kapic,
++            sizeof(kapic),
++            NULL);
++    }
+ 
+-    HRESULT hr = whp_dispatch.WHvGetVirtualProcessorInterruptControllerState2(
+-        whpx_global.partition,
+-        cpu->cpu_index,
+-        &kapic,
+-        sizeof(kapic),
+-        NULL);
+     if (FAILED(hr)) {
+         fprintf(stderr,
+-            "WHvSetVirtualProcessorInterruptControllerState failed: %08lx\n",
++            "WHvGetVirtualProcessorInterruptControllerState failed: %08lx\n",
+             hr);
+ 
+         abort();
 -- 
 2.50.1 (Apple Git-155)
 
