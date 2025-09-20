@@ -1,44 +1,44 @@
-Return-Path: <kvm+bounces-58310-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-58311-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 65072B8C9F4
-	for <lists+kvm@lfdr.de>; Sat, 20 Sep 2025 16:04:02 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id B60A8B8C9F7
+	for <lists+kvm@lfdr.de>; Sat, 20 Sep 2025 16:04:07 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2A558584357
-	for <lists+kvm@lfdr.de>; Sat, 20 Sep 2025 14:04:02 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6BACE628B08
+	for <lists+kvm@lfdr.de>; Sat, 20 Sep 2025 14:04:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DF14B301716;
-	Sat, 20 Sep 2025 14:03:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 48BF22FB975;
+	Sat, 20 Sep 2025 14:03:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=unpredictable.fr header.i=@unpredictable.fr header.b="MPprHi67"
+	dkim=pass (2048-bit key) header.d=unpredictable.fr header.i=@unpredictable.fr header.b="Yal54Mo2"
 X-Original-To: kvm@vger.kernel.org
-Received: from outbound.qs.icloud.com (p-east3-cluster2-host9-snip4-4.eps.apple.com [57.103.87.215])
+Received: from outbound.qs.icloud.com (p-east3-cluster2-host2-snip4-6.eps.apple.com [57.103.87.147])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8F4472F5A19
-	for <kvm@vger.kernel.org>; Sat, 20 Sep 2025 14:03:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=57.103.87.215
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E3FF52FF65A
+	for <kvm@vger.kernel.org>; Sat, 20 Sep 2025 14:03:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=57.103.87.147
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758376997; cv=none; b=NWR0eKGlE2YVJSeoAru+Jmlmw7vxYMT4Rd++8xout4KDVdUZSQuix4GrCLy2pjDlydXMDHSg9rEd2NHdccPkPNw8zzszeMlYPvCd6GmIM7QgV3HAALKUzQ3dyhCnAiQtGs1RBrsM3CeOOdiTlM9mp+l/136gZgyRxoIgSY1F1ks=
+	t=1758377001; cv=none; b=OyBqVxwG9xAoJLBUZ3HwLjqcQXlPOy59MxIQDnNgur8iQS9koRE8HL3FOLdqckJXj/IheyLAKDiH4yZNxNVUNwJ422QDoyqhgUqMafo7w0uzbKQMVs43FlRyEDO+bMgrtSv/sGzkOExjA7CV8pUXlSPx3KGu36o08/wBJlrVxdU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758376997; c=relaxed/simple;
-	bh=HiSu1elAGfUw6kIKxwZTf612rmqWGvJZ72lVukmsNOk=;
+	s=arc-20240116; t=1758377001; c=relaxed/simple;
+	bh=6ZaNiIwiQUIZ7j9JsDb98c7LB17UaCXZZO63e3L0rdg=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=kqzrzJ3RWeUWTG2MobU8tKHw+io/QRlSaDbbDiEfuKDpc784El8a3Ij1QGNyOQpsQ5aIa6/UlVBc/Te133iMOu8xiteadBEX1pud7140Cj7SA73msU5dbIcT+lgzJVWjF8v2PSJFFxYtOcVUc9tdBGcjcCs1aGQW8wahFat2V54=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=unpredictable.fr; spf=pass smtp.mailfrom=unpredictable.fr; dkim=pass (2048-bit key) header.d=unpredictable.fr header.i=@unpredictable.fr header.b=MPprHi67; arc=none smtp.client-ip=57.103.87.215
+	 MIME-Version; b=ZHlDkdKWiD2Ti1ZmRIi47VjjoNZ1gHWmKjeFSLS5dFhXLCB2LT2ih3aImCPgV4KVpb3IbDs5U3CsnLyQgWcpO6wFvszTPxI2bslOnzBSf3LxnN9YnvKhss0ZiqPD6cImSImdCMKKXAlx3tY2YkYeR1KA4yTod/N9qwQeAdkYihI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=unpredictable.fr; spf=pass smtp.mailfrom=unpredictable.fr; dkim=pass (2048-bit key) header.d=unpredictable.fr header.i=@unpredictable.fr header.b=Yal54Mo2; arc=none smtp.client-ip=57.103.87.147
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=unpredictable.fr
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=unpredictable.fr
 Received: from outbound.qs.icloud.com (unknown [127.0.0.2])
-	by p00-icloudmta-asmtp-us-east-2d-100-percent-3 (Postfix) with ESMTPS id 8BCB11817345;
-	Sat, 20 Sep 2025 14:03:10 +0000 (UTC)
-Dkim-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=unpredictable.fr; s=sig1; bh=IHjqdFZlYtMJa8HRC4VnZhdX5Q0ePonZlOFVwjjZYxU=; h=From:To:Subject:Date:Message-ID:MIME-Version:x-icloud-hme; b=MPprHi67MiijYc3XhExjP2RuAVq+X9gmjes6ynzZaqHt+RY91GaILhgMrTQpZZaUnUe5mBkHvsngN3eXX4A9IQeVuKx/NBQFjzyras/latoD/9UBnWe5QOSGBGe0GmO+L82Yc6EWRrMf4NqVBCJ2bCYfiDlDs+2nlsQBzBb98yiGZsa3IJjmo3/Ov7FM6mRuFlLrC3La+BRCYJ/i2pRaxEw0DHEQzeee2aJghYoRNKO/7wqkXKBupao8XW5nafJbwI7I+OpZ25XNz6C9mMkrasUb62PxYii/PzRSA64KN06/7uRzkbMHCAot7wO5ZTmYlNLVgafCu9CSD0xfSJjhsA==
+	by p00-icloudmta-asmtp-us-east-2d-100-percent-3 (Postfix) with ESMTPS id DEA2918170A5;
+	Sat, 20 Sep 2025 14:03:14 +0000 (UTC)
+Dkim-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=unpredictable.fr; s=sig1; bh=6QHLe7sI/ta/TpnlofGbhZSXfY72nxkqv2tu61id1Xw=; h=From:To:Subject:Date:Message-ID:MIME-Version:x-icloud-hme; b=Yal54Mo2j/1B9TAxD6hgWtXOuoivd6GsUp5UlECkI1Ozv6iPJNFfADPRumTtZ4CvlZlpNBa1DET98Z1YPij8W9En4/7tLwoyzKm/3oZgMqL2AHz9jkzox23eECMKGJ7F2UmKfV5mdLG3MdyxwpilYwdXGGL76A7iGv/TI2fYzQ0RPBUyRFKwNfHW4PMmuhR7xOIEAkNSXIy0x2NJHaL2zuR7sC3cacvEv4TTrSDy4grI6U15t6zqxGi03uS/EkAu8biN+MrQv5SOtAUoopjT8gGqB8UEupvRPilCp5lLwaqG52/EXMSknMJM05sROdNcbH1z0NrXh3JIAyMzwCYEoA==
 mail-alias-created-date: 1752046281608
 Received: from localhost.localdomain (qs-asmtp-me-k8s.p00.prod.me.com [17.57.155.37])
-	by p00-icloudmta-asmtp-us-east-2d-100-percent-3 (Postfix) with ESMTPSA id 896521817098;
-	Sat, 20 Sep 2025 14:02:29 +0000 (UTC)
+	by p00-icloudmta-asmtp-us-east-2d-100-percent-3 (Postfix) with ESMTPSA id 691F71817268;
+	Sat, 20 Sep 2025 14:02:32 +0000 (UTC)
 From: Mohamed Mediouni <mohamed@unpredictable.fr>
 To: qemu-devel@nongnu.org
 Cc: Shannon Zhao <shannon.zhaosl@gmail.com>,
@@ -65,9 +65,9 @@ Cc: Shannon Zhao <shannon.zhaosl@gmail.com>,
 	Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
 	Mohamed Mediouni <mohamed@unpredictable.fr>,
 	Peter Maydell <peter.maydell@linaro.org>
-Subject: [PATCH v6 21/23] MAINTAINERS: update maintainers for WHPX
-Date: Sat, 20 Sep 2025 16:01:22 +0200
-Message-ID: <20250920140124.63046-22-mohamed@unpredictable.fr>
+Subject: [PATCH v6 22/23] docs: arm: update virt machine model description
+Date: Sat, 20 Sep 2025 16:01:23 +0200
+Message-ID: <20250920140124.63046-23-mohamed@unpredictable.fr>
 X-Mailer: git-send-email 2.50.1
 In-Reply-To: <20250920140124.63046-1-mohamed@unpredictable.fr>
 References: <20250920140124.63046-1-mohamed@unpredictable.fr>
@@ -78,54 +78,60 @@ List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Proofpoint-ORIG-GUID: 4_XIPZW8Gs1LJTl1yb4x8Cmj5FvYJ9kW
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUwOTIwMDEzNiBTYWx0ZWRfXzNkOaFQADvwR
- Itqd7fri4VQJfZtSL+sWesK/+mgrlylaJ0L+47HqotwgRZRsYcSDF74yXqJPydM+UTG8Y60qNwj
- z1IaocwzSe2SpZuAK4pGzQ/9Pw2zKVK9zwttgw/yBuyBYIPXi7pyoOc6NsfyBu9Xx0rHt4ZsRyw
- hu//JcmjSXvDZWBpzyJaMi0CtLjc3l5Azqn8XWEP6+K+8JalTldlLwdeCXTvPYp0Odlz/n0J1xQ
- tKu5Ho9FlgSWsgF2/Zg++/eNX/Y+lYcAH1UC7ac7HJy/YiC8RRutiYWQxem6DwLG7ud7+A+i0=
-X-Proofpoint-GUID: 4_XIPZW8Gs1LJTl1yb4x8Cmj5FvYJ9kW
+X-Proofpoint-ORIG-GUID: ojLL6QodVQ17wDK9HHqj0FwWgh6Q8daA
+X-Proofpoint-GUID: ojLL6QodVQ17wDK9HHqj0FwWgh6Q8daA
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUwOTIwMDEzNiBTYWx0ZWRfX25h+Oy3H7yiS
+ yt9rk8Wty6XF48La1pCM3v9VeSEHWEXpAp6eHstyw2qPEoBHEJWJkJukxeJ8RL5rzBtm4jhgvlb
+ mNFsLe3F15Y1SHee+YZhYBzAGp37q+yIthkM8R07Swf+Z4Lsm/Dx35pGEOB4whFhYaErp3ALYR2
+ 0rFLvXXIBAipso3jrQO7F/k2CmaZj616P0JfpjfWjl/vq9ecLKt0YXw/EpNK+4hxByYZ83HLpch
+ mC2gS7VlTQE8LW+fqcWJn2M0ayboU33aZwYE7vlKQohTjNFUYYIY8TZrQsEyEA6jgv0tcdQWQ=
 X-Proofpoint-Virus-Version: vendor=baseguard
  engine=ICAP:2.0.293,Aquarius:18.0.1117,Hydra:6.1.9,FMLib:17.12.80.40
  definitions=2025-09-20_05,2025-09-19_01,2025-03-28_01
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=0
- adultscore=0 clxscore=1030 phishscore=0 malwarescore=0 bulkscore=0
- mlxlogscore=886 spamscore=0 mlxscore=0 classifier=spam adjust=0 reason=mlx
- scancount=1 engine=8.22.0-2506270000 definitions=main-2509200136
-X-JNJ: AAAAAAAB8FHS6JMIfcy7qo0KxEd26QpUFCC230Xv14XNDw4qRsHHjR8zhMv5KhP/v1+ENOuP41Z7k4OMyonbHQOGwlqjxDXss4hXe3rFz+ooGOlHO/Of/wjJlj5OADsO/R4qX+8zSU4VTAGc5Be1rTiETKLlcoFM7GiB1ZCYAurnbe+I/piujsLm1hpsmhmds/B0S1BHA8K8l9WPxporxSO26B4FvLhYZJgTmKdC8cQEHhGVEx8V/ubT2tBmjEnuqLGEvS5ZKeRUZYDDLPXm0gJ2uL9vKWdB/3uND6oMfN0DSbS5gG3/6Nom8/4B6jGFoK4e/KwzbINxbWhGn4LiPcNbpUnsvS3fSN9OwMom42HZDhTGRbBG/o4pN2fry7NNHqTfr+wFMZnehGhJ4nLp1NxFQxtNLBtNoKegQ3jn0ZbhEzQiNam+58DG/hrRauki7oTNTEGvaTgSH+hYgj1fCTS84CsiIzy9vxP7LqfzjjPzaTj9BGZH6dzQSRxdybMqkI3aINFHNqBBSASeFDZNFlp0qmJ6CFnM5bmCrK9Um6niOFxidBasCXn/VppbNf+OqIlYw2wsP+HabUi2OYd2F9hE0eXl2wHHFKEY7rc953ep8kIKg1XML0z0GheC4eR/G0uTW1vRfbnNOV+1DSF9Pqx4Dh73msS0UAxLiIKedhT+KJu6XV/verI2eLEZdKBbWqV6EI1pHgbfQ2CXmt3AkYh+ktAExt6Xgy6c6b63k4LMndAR10IM/5se2u7lyN6sNC5+LXr/Pv89PjFBHUl6xXy7BE7TSls8gMO4Bwh1PeE2E7hYcZI+250iYMlx/lAQM6ysJs4+FZ45FY9J01Wjd43T9mYyQMrQ6/TkN7M6BV+W8CT8vZZeB7HZrw==
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 spamscore=0
+ adultscore=0 phishscore=0 mlxscore=0 suspectscore=0 bulkscore=0
+ malwarescore=0 mlxlogscore=999 clxscore=1030 classifier=spam adjust=0
+ reason=mlx scancount=1 engine=8.22.0-2506270000 definitions=main-2509200136
+X-JNJ: AAAAAAABzBXNo6aD0xhHNo9zDDLKtbsGIdEu9Jzv0TkCWRLkBC7HbJwcYHwcB7cJdKBi6rFM4zCP286YCrzFBoQDYCRGYSCIS5FuHpcLeFsu5aLATorotIsTuv3e3aDWeuoKokRJw1AZ7e2Ae/8eBbp2YMJE5De1oidpSO3aB4DtyXUGcfsiUaB2ULR1DJ1d94E2ieHzNeTYJW1/KtsA/aaPRTJS8ifZewz+Q5i+WZaw1qHmGsWumTQVWwkR/lNJSX8O6nPrkZWW4M5R0fUJXUshLJ7sFwRjaI4KhrkfrFtLIovtPJG0VoKb7xXFHX2xS0ylGm1pk0zXQ2YeJ0q2qiCq0SFIeivSn6Sti3KnXDXj6igcFy9iirRMe4j1AChxwd5MqXVxsRHnd9rvteZft2kZk0NzFH5WpRsY6/Z7+X4/htMXkaTgi73+/B6pHZZacyS8cEj4fUO5strUtRYL9Ldz6PGyAxYWHUAZSVC8yuCQO/KXEs/dZ0kPF4uLq+0bCXxLFkOy7NDFOp2Xd4+IaVF1fLz4OP77W9BEumjILfNkIehV3b0pbqiZr0i+4D+MTVagYA1Jnd/2loyQsx/b4CmNvpZbvx0vGxTbqc0ztFwDDRlExj2hjlMyoWVeTS6M7BbJxuJHbtXJ2WlPajKEEaBt6vQUIaLeJbX3QiTmThqyH3QkpdWP5/rSDmHeH9RBL9I8flt8Z+zubrVh6s6ZhB7TQ50bk08XEYDig3+zjUd5g5zSlODKPUIkVzWEnhM7ETyf8ye9/YM1A01hWlJok4LiJYicG2jYZi/xJShXP0jJkkV4DSKoZTSDfap3iqUkY8Waf7p6vJSfJiGq6PVGGBB6OvMovwfCJvlq/VYNt/hn72/tAvzzb8oDBcprBl1ESg==
 
-And add arm64 files.
+Update the documentation to match current QEMU.
 
-From Pedro Barbuda (on Teams):
-
-> we meant to have that switched a while back. you can add me as the maintainer. Pedro Barbuda (pbarbuda@microsoft.com)
+Remove the mention of pre-2.7 machine models as those aren't provided
+anymore.
 
 Signed-off-by: Mohamed Mediouni <mohamed@unpredictable.fr>
 ---
- MAINTAINERS | 7 +++++--
- 1 file changed, 5 insertions(+), 2 deletions(-)
+ docs/system/arm/virt.rst | 10 +++++-----
+ 1 file changed, 5 insertions(+), 5 deletions(-)
 
-diff --git a/MAINTAINERS b/MAINTAINERS
-index 466ebe703a..e123abcfd6 100644
---- a/MAINTAINERS
-+++ b/MAINTAINERS
-@@ -544,11 +544,14 @@ F: accel/stubs/hvf-stub.c
- F: include/system/hvf.h
- F: include/system/hvf_int.h
+diff --git a/docs/system/arm/virt.rst b/docs/system/arm/virt.rst
+index 10cbffc8a7..fe95be991e 100644
+--- a/docs/system/arm/virt.rst
++++ b/docs/system/arm/virt.rst
+@@ -40,9 +40,10 @@ The virt board supports:
+ - An optional SMMUv3 IOMMU
+ - hotpluggable DIMMs
+ - hotpluggable NVDIMMs
+-- An MSI controller (GICv2M or ITS). GICv2M is selected by default along
+-  with GICv2. ITS is selected by default with GICv3 (>= virt-2.7). Note
+-  that ITS is not modeled in TCG mode.
++- An MSI controller (GICv2m or ITS).
++  - When using a GICv3, ITS is selected by default when available on the platform.
++  - If using a GICv2 or when ITS is not available, a GICv2m is provided by default instead.
++  - Before virt-10.2, a GICv2m is not provided when the ITS is disabled.
+ - 32 virtio-mmio transport devices
+ - running guests using the KVM accelerator on aarch64 hardware
+ - large amounts of RAM (at least 255GB, and more if using highmem)
+@@ -167,8 +168,7 @@ gic-version
+     ``4`` if ``virtualization`` is ``on``, but this may change in future)
  
--WHPX CPUs
--M: Sunil Muthuswamy <sunilmut@microsoft.com>
-+WHPX
-+M: Pedro Barbuda <pbarbuda@microsoft.com>
-+M: Mohamed Mediouni <mohamed@unpredictable.fr>
- S: Supported
- F: accel/whpx/
- F: target/i386/whpx/
-+F: target/arm/whpx_arm.h
-+F: target/arm/whpx/
- F: accel/stubs/whpx-stub.c
- F: include/system/whpx.h
- F: include/system/whpx-accel-ops.h
+ its
+-  Set ``on``/``off`` to enable/disable ITS instantiation. The default is ``on``
+-  for machine types later than ``virt-2.7``.
++  Set ``on``/``off``/``auto`` to control ITS instantiation. The default is ``auto``.
+ 
+ iommu
+   Set the IOMMU type to create for the guest. Valid values are:
 -- 
 2.50.1 (Apple Git-155)
 
