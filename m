@@ -1,97 +1,101 @@
-Return-Path: <kvm+bounces-58343-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-58344-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 795D4B8E646
-	for <lists+kvm@lfdr.de>; Sun, 21 Sep 2025 23:31:52 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3ACEEB8E68B
+	for <lists+kvm@lfdr.de>; Sun, 21 Sep 2025 23:40:21 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4B97116DAE8
-	for <lists+kvm@lfdr.de>; Sun, 21 Sep 2025 21:31:47 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id F32B2189A47E
+	for <lists+kvm@lfdr.de>; Sun, 21 Sep 2025 21:40:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B3608248F66;
-	Sun, 21 Sep 2025 21:31:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F04352C2348;
+	Sun, 21 Sep 2025 21:40:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="cJ9+T1Pk"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="fmbX3g0L"
 X-Original-To: kvm@vger.kernel.org
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4A3C418BBAE
-	for <kvm@vger.kernel.org>; Sun, 21 Sep 2025 21:31:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 635CE23E334
+	for <kvm@vger.kernel.org>; Sun, 21 Sep 2025 21:40:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758490300; cv=none; b=n6MEaes+jT3Kg4s4JaO9rLHVV6TyAoNQiHV/IvOzl2rHUKyU+ZQNJt+IX6sNB/41DYNqiZ1tfB6tkOmiNs/+aX6B4OyVix+n8DiFc38saQZB74k53BZpgvrDMJT7FRjpy92j8MD9VaV8xZB7iogYl/3OOrd2WTawF9WS1A9ZyRU=
+	t=1758490816; cv=none; b=X9E7MDc78CRWVjoi4nJqxxgfuBU+wltMj+FY+5QfICVtkqxSNjYtrsHzql8MxMsZjZEOBeSkzf2uBc2LVrFD7xLyas1ayw7wtGm0Kz31rLxKz5y/4JbbDEK3B4bCI8/FVoMBy1w3THDS39A6lxdIkykn2SwN67NColJttAZnOik=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758490300; c=relaxed/simple;
-	bh=zqT1TnahnRM17p1/i8bRil1o0nqomS89t3+MM6Zthw0=;
+	s=arc-20240116; t=1758490816; c=relaxed/simple;
+	bh=mYlu1Cb8XJxVfGYYbOwNf+5SlCKDDhSJhlXNvH2HuoY=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=uZ5LBSWsAJe+pzhgGQtjVBDEONgqIuDZGj+nGWoMg5HESJwru2xc+j+kpPGQF8MeNsqfZVMVMnrdXyC9y4WVe1RMKhzFGh7xbtZXoGJRQfO5sOZs4PSnfoVsNFCeWhT1eWfgXB4CDYw5XMw1LHbKvOusHVidye41bdeAabAbPQc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=cJ9+T1Pk; arc=none smtp.client-ip=170.10.133.124
+	 Content-Type:Content-Disposition:In-Reply-To; b=f8IEXj25llkALzb1Afq0biXEdDAbLKWbzcWgWPcUB1UDJqgDy+FNpSt5HTQEeGxjwoSSrv8joYX/7QP55NU+3Tl0as2yE4OwB5I0WJivLoQIiuy8YStLPOfaLSq8cKeeH4tqKL71ZARHUKZq5bCGU25Kpa3q0anpvS4xp81Kir8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=fmbX3g0L; arc=none smtp.client-ip=170.10.133.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1758490298;
+	s=mimecast20190719; t=1758490813;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 in-reply-to:in-reply-to:references:references;
-	bh=vMzJv7FtrWlT5/pOKIu9OWpMHtet5A15OykeYCUitfw=;
-	b=cJ9+T1PkJBAoX5+ZxiY2mqjdupbesqD52UdfxaJ1M764Bk9LJ+pkVtQEGnVM+NSFFd7SwV
-	SQSCPU325iUvSQnEXDR5MeBA63Hu4m11rynEXZoQ5/cDieHVFz6S2cB2iekgi/dpYedluZ
-	t+ocY53W7HOKIy/ZY6x4RwUpyDoQa8U=
-Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
- [209.85.128.70]) by relay.mimecast.com with ESMTP with STARTTLS
+	bh=mjWDsw8BL0wSRiGtGTApSm/QghMD5iCMDJieH5fCE5Y=;
+	b=fmbX3g0LYVdj3LODXZsP6RKTR71SmSyQrGorhCOS7HNBnvgqsulaEE27n6GMFkI2qib+Qw
+	nVtQYdLI8VngIZqQP7FQD6HQ3XIu5oKcERZY50VrOH4w8qXH+6spi0gn/T1koi/MsYPtoC
+	GjUa4YUa9aUuwIDG6Yp3I/oXc1t7q2s=
+Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
+ [209.85.221.70]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-564-hXrECI4yMlq9-c0KvIIcRQ-1; Sun, 21 Sep 2025 17:31:30 -0400
-X-MC-Unique: hXrECI4yMlq9-c0KvIIcRQ-1
-X-Mimecast-MFC-AGG-ID: hXrECI4yMlq9-c0KvIIcRQ_1758490290
-Received: by mail-wm1-f70.google.com with SMTP id 5b1f17b1804b1-45b98de0e34so33494215e9.0
-        for <kvm@vger.kernel.org>; Sun, 21 Sep 2025 14:31:30 -0700 (PDT)
+ us-mta-474-6AvESm-ONsm-Fq6IALhWWg-1; Sun, 21 Sep 2025 17:40:05 -0400
+X-MC-Unique: 6AvESm-ONsm-Fq6IALhWWg-1
+X-Mimecast-MFC-AGG-ID: 6AvESm-ONsm-Fq6IALhWWg_1758490805
+Received: by mail-wr1-f70.google.com with SMTP id ffacd0b85a97d-3efe4fcc9ccso1419068f8f.3
+        for <kvm@vger.kernel.org>; Sun, 21 Sep 2025 14:40:05 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1758490289; x=1759095089;
+        d=1e100.net; s=20230601; t=1758490804; x=1759095604;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=vMzJv7FtrWlT5/pOKIu9OWpMHtet5A15OykeYCUitfw=;
-        b=jsfJQZA8SCWmA4R/vt816hJ9gz2zRepInzj+qgRnxOjDycTt3uUocr7VuEoepYqQdK
-         WHkB4UkNSWJwU7H02Az5VKUIIgJG/F92UT/qDsdyNce78BaqEaE520/6MuDieWiNdccM
-         zPRCludNprN0nt1DjzWXgVTX+3M4Rwss2HikoyxAc2GQ4/49kZRGQhlo6qDBnaQwQ5NM
-         d1NOyKiemtNqUCpCeOpDutAcpd8PuaqdCjDNdt8lJn1ozGuCh3C6CIutrAfGfyh+uo6D
-         ZS3ApEpC6UoPQtkY3kQ51pJ3Jh/oQ/de215OGTLSAdOZtKBsZh1GzFpzRNsNxaT1MmlK
-         sS1g==
-X-Forwarded-Encrypted: i=1; AJvYcCXi8Bg0JPOj6HHU2MSk/RXHqBHyRkva5uoKFW4HRkTc8nFBjiRf0mvBC+nN0x8lQoD+c8c=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yxc96tIbQ+PWd75btJxvpokeGptHM5oZBk11CVPUhwCeMJ5CFKD
-	K9nKlJ6BBDG8aqohqeRnDwOOcgAf1TEyIGB39jVTER+z9ghqwNOpvaOjs6ssJ+r9WS1wDa5tZvM
-	xPCPQOam0jNkq9FpgVVZrqgV8ZfgxsJFB2jw9UNbzKApqXrQokudxJOoiG14c+g==
-X-Gm-Gg: ASbGncsmKfnpwMib6F1Fi8rFhpXmsfkaT0GMc+sAUp+fRTQ5QOCPxzArC/OLD5P8ugt
-	KJERIQ5swhw8cExGqUn++7C5wUhK1AHNzmQIJ5tCtoheEk5EE/LkgWhMwpnWnls8l73rLBeTSmh
-	ee/ep2KY6+j8oCKWbP9tO9iRTmE6yVV8ZOAuLl5S4uqD1sFiFqUXSikbNs3wzCNE6umjEE9GetJ
-	xlAybl7Ffd3yf+WuNcWwitKwBUYIg4hNim7+KMB7UN+fjAzVNe3xBw5Mw5ZKoICOEngMpUeICPo
-	Mggm3fw1KvjjBN0acm4dAkBWzg2uc78sExs=
-X-Received: by 2002:a05:600c:a43:b0:45d:f7cb:70f4 with SMTP id 5b1f17b1804b1-467e6f37f06mr92245425e9.13.1758490289245;
-        Sun, 21 Sep 2025 14:31:29 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IGnBRTWDkC6y2pA+1GqSrUmiizkLbPjFI1ya/MytaZ7T1ocVq1gR43EQYG+wvlvwojzYCFD3w==
-X-Received: by 2002:a05:600c:a43:b0:45d:f7cb:70f4 with SMTP id 5b1f17b1804b1-467e6f37f06mr92245285e9.13.1758490288758;
-        Sun, 21 Sep 2025 14:31:28 -0700 (PDT)
+        bh=mjWDsw8BL0wSRiGtGTApSm/QghMD5iCMDJieH5fCE5Y=;
+        b=mrDbX9TSuocOAibVmdxUuocku6MwwrxIGVtlNlQ5kDX5QBr2g9yGJwHPa6dGxFOkaS
+         OH1wQvs0JqFqi1Ov/mCY+qvv4edLXE89zhP/NkIorn2+x7WnFSJUcShTsEZau74RPeW0
+         g5GTUPm6gITHQBKpEklrlzRey9uXSScgHs6w6Lh4uTx1X6ofw9TscLYsKvH2MGS5hm/O
+         wx7oJwur+5DZy3qFxe/lgwXexAZoSSHupCDnrDH//yqScWbRvKDY87U13Q3MhoVjaqBd
+         FY62mBnDUQ8d6Geb7M1WDEbx7jatrsEI5Cstg8hBgUsT/Rt7cK4aj6B9ENku0qIvuJ97
+         GmbQ==
+X-Forwarded-Encrypted: i=1; AJvYcCXvUQErn4B9PbnWUIh79crE/wKuYd09Z5BEEGkUXXUbJE5DLvziffU9mM2iysXGQm69jpA=@vger.kernel.org
+X-Gm-Message-State: AOJu0YynxkNC2s2s+ei/8DsfJGuSpkELALeSwd5Ys8PgDNsY8o3kMznk
+	rRM51GcTTfQUXPqgKYApHVFDq4I+c3TG8ct2NkuPHEB+AfqfzN1yr4qSQOwZkJpdD2esHQNF/mO
+	hsVcb9VFWkVrOJeELFA4srzsFmyLcQkEBBjbnEgpgrnuhKCPSPBzMSQ==
+X-Gm-Gg: ASbGncsPKSmMfKHc349EgvO1RbE5yYGvGFkn4lyqWEY0sDLLmKXE53hr/tm7Cxw+/y7
+	DuRTtqUQkV9KpeN8F/jL38Mzw5JYRSS3DhP3kJMpVDYXljkB2PnhNCWOLdcdcMN8AlrusgIW1kA
+	F02l4rVIGJAqY1+cLOnep7lAWwiG/nFcnbG8YbIUEdhyx6Z2qNTBm27SsX1Ybjm+R+P+z7fD36y
+	cmBQ2GoMad9atPIB2NeB2mN2sQaO0CFY/bUIW3QbTPZKK31+Tjt4BIy6nNX4WKAYlKfzPJkaGmc
+	yvrJ/InvWubZjwzS6vnOn606DAjHpROW5IA=
+X-Received: by 2002:a05:6000:2285:b0:3ed:a43b:f173 with SMTP id ffacd0b85a97d-3ee8585e3d7mr9640220f8f.42.1758490804607;
+        Sun, 21 Sep 2025 14:40:04 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IFW4yYuHu/iRIBuAiq3TYquYa/BUUV5VnlAcln8dUtQI5Bcq9TDf+qyoforvTHvt2Z+XzLrWw==
+X-Received: by 2002:a05:6000:2285:b0:3ed:a43b:f173 with SMTP id ffacd0b85a97d-3ee8585e3d7mr9640208f8f.42.1758490804220;
+        Sun, 21 Sep 2025 14:40:04 -0700 (PDT)
 Received: from redhat.com ([2a06:c701:73ea:f900:52ee:df2b:4811:77e0])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-46138695223sm217767975e9.5.2025.09.21.14.31.27
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3ee0fbfedd6sm17304749f8f.60.2025.09.21.14.40.02
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 21 Sep 2025 14:31:28 -0700 (PDT)
-Date: Sun, 21 Sep 2025 17:31:25 -0400
+        Sun, 21 Sep 2025 14:40:03 -0700 (PDT)
+Date: Sun, 21 Sep 2025 17:40:01 -0400
 From: "Michael S. Tsirkin" <mst@redhat.com>
-To: kernel test robot <lkp@intel.com>
-Cc: Eugenio =?iso-8859-1?Q?P=E9rez?= <eperezma@redhat.com>,
-	llvm@lists.linux.dev, oe-kbuild-all@lists.linux.dev,
-	kvm@vger.kernel.org, virtualization@lists.linux-foundation.org,
-	netdev@vger.kernel.org
-Subject: Re: [mst-vhost:vhost 41/44] drivers/vdpa/pds/vdpa_dev.c:590:19:
- error: incompatible function pointer types initializing 's64 (*)(struct
- vdpa_device *, u16)' (aka 'long long (*)(struct vdpa_device *, unsigned
- short)') with an expression of type 'u32 (struct vdpa_device *, u16)' (aka
- ...
-Message-ID: <20250921173047-mutt-send-email-mst@kernel.org>
-References: <202509202256.zVt4MifB-lkp@intel.com>
+To: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
+Cc: Sean Christopherson <seanjc@google.com>,
+	Paolo Bonzini <pbonzini@redhat.com>,
+	Jason Wang <jasowang@redhat.com>, kvm@vger.kernel.org,
+	virtualization@lists.linux.dev, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] vhost: Take a reference on the task that is reference in
+ struct vhost_task.
+Message-ID: <20250921173934-mutt-send-email-mst@kernel.org>
+References: <20250827194107.4142164-1-seanjc@google.com>
+ <20250827201059.EmmdDFB_@linutronix.de>
+ <20250918110828-mutt-send-email-mst@kernel.org>
+ <20250918154826.oUc0cW0Y@linutronix.de>
+ <20250918120607-mutt-send-email-mst@kernel.org>
+ <20250918181144.Ygo8BZ-R@linutronix.de>
+ <20250921165538-mutt-send-email-mst@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -100,77 +104,57 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <202509202256.zVt4MifB-lkp@intel.com>
+In-Reply-To: <20250921165538-mutt-send-email-mst@kernel.org>
 
-On Sat, Sep 20, 2025 at 10:41:40PM +0800, kernel test robot wrote:
-> tree:   https://git.kernel.org/pub/scm/linux/kernel/git/mst/vhost.git vhost
-> head:   877102ca14b3ee9b5343d71f6420f036baf8a9fc
-> commit: 2951c77700c3944ecd991ede7ee77e31f47f24ab [41/44] vduse: add vq group support
-> config: loongarch-randconfig-001-20250920 (https://download.01.org/0day-ci/archive/20250920/202509202256.zVt4MifB-lkp@intel.com/config)
-> compiler: clang version 22.0.0git (https://github.com/llvm/llvm-project 7c861bcedf61607b6c087380ac711eb7ff918ca6)
-> reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20250920/202509202256.zVt4MifB-lkp@intel.com/reproduce)
-> 
-> If you fix the issue in a separate patch/commit (i.e. not just a new version of
-> the same patch/commit), kindly add following tags
-> | Reported-by: kernel test robot <lkp@intel.com>
-> | Closes: https://lore.kernel.org/oe-kbuild-all/202509202256.zVt4MifB-lkp@intel.com/
-> 
-> All errors (new ones prefixed by >>):
-> 
-> >> drivers/vdpa/pds/vdpa_dev.c:590:19: error: incompatible function pointer types initializing 's64 (*)(struct vdpa_device *, u16)' (aka 'long long (*)(struct vdpa_device *, unsigned short)') with an expression of type 'u32 (struct vdpa_device *, u16)' (aka 'unsigned int (struct vdpa_device *, unsigned short)') [-Wincompatible-function-pointer-types]
->      590 |         .get_vq_group           = pds_vdpa_get_vq_group,
->          |                                   ^~~~~~~~~~~~~~~~~~~~~
->    1 error generated.
-> 
+On Sun, Sep 21, 2025 at 04:56:20PM -0400, Michael S. Tsirkin wrote:
+> Subject: that is reference -> that is referenced
 
-Eugenio, just making sure you see this. I can not merge patches that
-break build.
+to note i fixed it for now. just dropped "that is referenced"
+completely. shorter.
 
-> vim +590 drivers/vdpa/pds/vdpa_dev.c
-> 
-> 151cc834f3ddafe Shannon Nelson 2023-05-19  577  
-> 151cc834f3ddafe Shannon Nelson 2023-05-19  578  static const struct vdpa_config_ops pds_vdpa_ops = {
-> 151cc834f3ddafe Shannon Nelson 2023-05-19  579  	.set_vq_address		= pds_vdpa_set_vq_address,
-> 151cc834f3ddafe Shannon Nelson 2023-05-19  580  	.set_vq_num		= pds_vdpa_set_vq_num,
-> 151cc834f3ddafe Shannon Nelson 2023-05-19  581  	.kick_vq		= pds_vdpa_kick_vq,
-> 151cc834f3ddafe Shannon Nelson 2023-05-19  582  	.set_vq_cb		= pds_vdpa_set_vq_cb,
-> 151cc834f3ddafe Shannon Nelson 2023-05-19  583  	.set_vq_ready		= pds_vdpa_set_vq_ready,
-> 151cc834f3ddafe Shannon Nelson 2023-05-19  584  	.get_vq_ready		= pds_vdpa_get_vq_ready,
-> 151cc834f3ddafe Shannon Nelson 2023-05-19  585  	.set_vq_state		= pds_vdpa_set_vq_state,
-> 151cc834f3ddafe Shannon Nelson 2023-05-19  586  	.get_vq_state		= pds_vdpa_get_vq_state,
-> 151cc834f3ddafe Shannon Nelson 2023-05-19  587  	.get_vq_notification	= pds_vdpa_get_vq_notification,
-> 151cc834f3ddafe Shannon Nelson 2023-05-19  588  	.get_vq_irq		= pds_vdpa_get_vq_irq,
-> 151cc834f3ddafe Shannon Nelson 2023-05-19  589  	.get_vq_align		= pds_vdpa_get_vq_align,
-> 151cc834f3ddafe Shannon Nelson 2023-05-19 @590  	.get_vq_group		= pds_vdpa_get_vq_group,
-> 151cc834f3ddafe Shannon Nelson 2023-05-19  591  
-> 151cc834f3ddafe Shannon Nelson 2023-05-19  592  	.get_device_features	= pds_vdpa_get_device_features,
-> 151cc834f3ddafe Shannon Nelson 2023-05-19  593  	.set_driver_features	= pds_vdpa_set_driver_features,
-> 151cc834f3ddafe Shannon Nelson 2023-05-19  594  	.get_driver_features	= pds_vdpa_get_driver_features,
-> 151cc834f3ddafe Shannon Nelson 2023-05-19  595  	.set_config_cb		= pds_vdpa_set_config_cb,
-> 151cc834f3ddafe Shannon Nelson 2023-05-19  596  	.get_vq_num_max		= pds_vdpa_get_vq_num_max,
-> 151cc834f3ddafe Shannon Nelson 2023-05-19  597  	.get_device_id		= pds_vdpa_get_device_id,
-> 151cc834f3ddafe Shannon Nelson 2023-05-19  598  	.get_vendor_id		= pds_vdpa_get_vendor_id,
-> 151cc834f3ddafe Shannon Nelson 2023-05-19  599  	.get_status		= pds_vdpa_get_status,
-> 151cc834f3ddafe Shannon Nelson 2023-05-19  600  	.set_status		= pds_vdpa_set_status,
-> 151cc834f3ddafe Shannon Nelson 2023-05-19  601  	.reset			= pds_vdpa_reset,
-> 151cc834f3ddafe Shannon Nelson 2023-05-19  602  	.get_config_size	= pds_vdpa_get_config_size,
-> 151cc834f3ddafe Shannon Nelson 2023-05-19  603  	.get_config		= pds_vdpa_get_config,
-> 151cc834f3ddafe Shannon Nelson 2023-05-19  604  	.set_config		= pds_vdpa_set_config,
-> 151cc834f3ddafe Shannon Nelson 2023-05-19  605  };
-> 25d1270b6e9ea89 Shannon Nelson 2023-05-19  606  static struct virtio_device_id pds_vdpa_id_table[] = {
-> 25d1270b6e9ea89 Shannon Nelson 2023-05-19  607  	{VIRTIO_ID_NET, VIRTIO_DEV_ANY_ID},
-> 25d1270b6e9ea89 Shannon Nelson 2023-05-19  608  	{0},
-> 25d1270b6e9ea89 Shannon Nelson 2023-05-19  609  };
-> 25d1270b6e9ea89 Shannon Nelson 2023-05-19  610  
-> 
-> :::::: The code at line 590 was first introduced by commit
-> :::::: 151cc834f3ddafec869269fe48036460d920d08a pds_vdpa: add support for vdpa and vdpamgmt interfaces
-> 
-> :::::: TO: Shannon Nelson <shannon.nelson@amd.com>
-> :::::: CC: Michael S. Tsirkin <mst@redhat.com>
-> 
-> -- 
-> 0-DAY CI Kernel Test Service
-> https://github.com/intel/lkp-tests/wiki
+> On Thu, Sep 18, 2025 at 08:11:44PM +0200, Sebastian Andrzej Siewior wrote:
+> > vhost_task_create() creates a task and keeps a reference to its
+> > task_struct. That task may exit early via a signal and its task_struct
+> > will be released.
+> > A pending vhost_task_wake() will then attempt to wake the task and
+> > access a task_struct which is no longer there.
+> > 
+> > Acquire a reference on the task_struct while creating the thread and
+> > release the reference while the struct vhost_task itself is removed.
+> > If the task exits early due to a signal, then the vhost_task_wake() will
+> > still access a valid task_struct. The wake is safe and will be skipped
+> > in this case.
+> > 
+> > Fixes: f9010dbdce911 ("fork, vhost: Use CLONE_THREAD to fix freezer/ps regression")
+> > Reported-by: Sean Christopherson <seanjc@google.com>
+> > Closes: https://lore.kernel.org/all/aKkLEtoDXKxAAWju@google.com/
+> > Signed-off-by: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
+> > ---
+> >  kernel/vhost_task.c | 3 ++-
+> >  1 file changed, 2 insertions(+), 1 deletion(-)
+> > 
+> > diff --git a/kernel/vhost_task.c b/kernel/vhost_task.c
+> > index bc738fa90c1d6..27107dcc1cbfe 100644
+> > --- a/kernel/vhost_task.c
+> > +++ b/kernel/vhost_task.c
+> > @@ -100,6 +100,7 @@ void vhost_task_stop(struct vhost_task *vtsk)
+> >  	 * freeing it below.
+> >  	 */
+> >  	wait_for_completion(&vtsk->exited);
+> > +	put_task_struct(vtsk->task);
+> >  	kfree(vtsk);
+> >  }
+> >  EXPORT_SYMBOL_GPL(vhost_task_stop);
+> > @@ -148,7 +149,7 @@ struct vhost_task *vhost_task_create(bool (*fn)(void *),
+> >  		return ERR_CAST(tsk);
+> >  	}
+> >  
+> > -	vtsk->task = tsk;
+> > +	vtsk->task = get_task_struct(tsk);
+> >  	return vtsk;
+> >  }
+> >  EXPORT_SYMBOL_GPL(vhost_task_create);
+> > -- 
+> > 2.51.0
 
 
