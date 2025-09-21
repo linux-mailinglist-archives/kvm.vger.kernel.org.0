@@ -1,100 +1,92 @@
-Return-Path: <kvm+bounces-58341-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-58342-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 948F6B8E5B5
-	for <lists+kvm@lfdr.de>; Sun, 21 Sep 2025 22:56:37 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id CE93EB8E5CA
+	for <lists+kvm@lfdr.de>; Sun, 21 Sep 2025 23:00:09 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id A4853189B344
-	for <lists+kvm@lfdr.de>; Sun, 21 Sep 2025 20:56:58 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id DD19E189A57A
+	for <lists+kvm@lfdr.de>; Sun, 21 Sep 2025 21:00:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BAA5D2951A7;
-	Sun, 21 Sep 2025 20:56:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CD82E299952;
+	Sun, 21 Sep 2025 20:59:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="GAslvgJG"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Gi7E5twF"
 X-Original-To: kvm@vger.kernel.org
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4F1E12264B2
-	for <kvm@vger.kernel.org>; Sun, 21 Sep 2025 20:56:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 79CC82951A7
+	for <kvm@vger.kernel.org>; Sun, 21 Sep 2025 20:59:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758488185; cv=none; b=UsNo7Ccsh3CJ+AMX+ic18T9fqfz6U79iKxnhxpfOyobahGniE7x0IQtGqTsa8fiOjGCYTsQLsV9pVK+bbZOwMwaNh68i85+USe0UE2WoTVeQOFADW2cHBwBHk9xLaI8sNo7vbNfsscGm04WBvxjzEqiHM3eqMKhEs5dFxtRe694=
+	t=1758488384; cv=none; b=qbG+OgDM9nlrB2+woTWhjgIErs4I6GjUd2r6fzZIXt5chIReyfYxa683873etmn90WEf8UvPjMPrIuAYdnXwkCfkXUw9FX6jUOxwUMkTVKRTwFJpBMsM3MZ7/uJm7E8bZc6Ffe+CSYjTIQz74/kayQ0yfwVUdVEqFXe0uTrTB90=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758488185; c=relaxed/simple;
-	bh=vcRE+eOSUt9r7QlljmvLF/beKVSKoUFncXZuFjVkhlU=;
+	s=arc-20240116; t=1758488384; c=relaxed/simple;
+	bh=i7pW9HwRwP2c7GQu7cmSv4/uxHxGCvk/Ta/jaDGnmYQ=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=QPl8R2AxHBrEFoPzZB2cLPUsj0MyfkNVftNH80VPRQy92/QcoYhcTsC0ccU5OFviJu8DlNkW9JrLtrtUaN2s20xUFEhSMPJQqbMI2TEftasA0nuNiNC4ycAMS7UtzZtC3TU2LIyjj2zsSbjbd2I5ZJ6UdvdJNJdid24UkFZvDd0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=GAslvgJG; arc=none smtp.client-ip=170.10.129.124
+	 Content-Type:Content-Disposition:In-Reply-To; b=kuSD7Z7P5R21SKDDr1bRNN75ezMXdbclk7V4VSQNg9wDRoYXYEF/du7GXnyRRj9XbS228xZFPffAq3pD3i0Bwddld4HDhRxXnH2Qum4PWieP0sYYbGdRk3GIFtvuNknoXFrya8XZ3435b7TFdbUz7FIBQWQawb/XjtVz+MGXhCY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Gi7E5twF; arc=none smtp.client-ip=170.10.129.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1758488183;
+	s=mimecast20190719; t=1758488381;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 in-reply-to:in-reply-to:references:references;
-	bh=YZa+gvlnzJbu0CdEMidkqaQp0dZ4QxQQFlF/kZd1gcw=;
-	b=GAslvgJGUAlX1NEgbQWj2UGtjOrgCTZ9QeJySs8CrmzjcAIVmWKhpytKreeuyy/m/Xftve
-	Ek/GQLUjOd6pE3e7QMvIqPxEPQuxdb58smWEW3CmGwEX5JxS1vMpTVh4PPuwE/nTgOoUr+
-	rB5/Ee15RdCVI4F1TPNgduscIPg2NKM=
-Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
- [209.85.128.70]) by relay.mimecast.com with ESMTP with STARTTLS
+	bh=cccTVUHrijNSX4z+x7tgOWrfdy/5n+8UzzmA9bxQJ4s=;
+	b=Gi7E5twFr0IBWN+VLty9bS+FiEinGc+stbf+XFEgJv8RJnKf/U3rWf4XUCr/nqtad3Oer/
+	17H1XDvFoG8YCH/dhJvt97pAJjIcahPHtvFHoVYedyJEy1aDNMoKWWy5HIrVH//CFm+1o/
+	TdLlYHfDLtNBwh8CZ59EiTd9S9SEcwY=
+Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
+ [209.85.128.71]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-397-TFoI1kTZPgupS_tdoLYBZg-1; Sun, 21 Sep 2025 16:56:21 -0400
-X-MC-Unique: TFoI1kTZPgupS_tdoLYBZg-1
-X-Mimecast-MFC-AGG-ID: TFoI1kTZPgupS_tdoLYBZg_1758488180
-Received: by mail-wm1-f70.google.com with SMTP id 5b1f17b1804b1-45f2b0eba08so22765595e9.3
-        for <kvm@vger.kernel.org>; Sun, 21 Sep 2025 13:56:21 -0700 (PDT)
+ us-mta-449-bLoho5KrMFGeogJiHtSMkg-1; Sun, 21 Sep 2025 16:59:37 -0400
+X-MC-Unique: bLoho5KrMFGeogJiHtSMkg-1
+X-Mimecast-MFC-AGG-ID: bLoho5KrMFGeogJiHtSMkg_1758488376
+Received: by mail-wm1-f71.google.com with SMTP id 5b1f17b1804b1-45df9e11fc6so22285895e9.3
+        for <kvm@vger.kernel.org>; Sun, 21 Sep 2025 13:59:37 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1758488180; x=1759092980;
+        d=1e100.net; s=20230601; t=1758488376; x=1759093176;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=YZa+gvlnzJbu0CdEMidkqaQp0dZ4QxQQFlF/kZd1gcw=;
-        b=Ez1R88jYihm2Y3kAHQIr9A5s1IH8LuZ1hU7EZZalMdVe/ICjTPdH71NL1dyqVti5KV
-         NyU6YFvYDFR1Nl2R+IcRnw/hiAYQT+Z5HcnueCdhOxGmenpdET1CKF92azCAK9gRNN2m
-         y1V6Dd6DNgtojNAedQKovjm2toTnlgMf5yf3NYLtiVsEqzu1L6po36P6tgqq2/Ou34+f
-         Cq1Qw2OjlDsiBQinwImA75SZ9gjfEC2jzOG4sBZTWIWq/z9ulOHe5F0xgc13TpZ4ZBE8
-         ek4Gl5sRP7l6phQ3awHzlQgHdEb5OL+oGLILzueEllT5wPbhLOUgiCteKK22kHltbTVk
-         F+OQ==
-X-Forwarded-Encrypted: i=1; AJvYcCX7ZgPrKkGrCOPSgnFU7XE4McV7F8h/wqKMGgbjYu09evN5h8WB3U00E0qA46MSe9FkYao=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyjlRCYTaZHW+Sa1SCGG+dFYhJBHIHCg3seVrNQaUw0DWrG/zBU
-	+IUQiXeC+0z89P8VVrzWKaU+JLueIcB5YooIX5+VjJlWY4P+9WIUT4bg2K69/RnXrjcf62azeam
-	upxqD/KID5wACI7SlhpO9n6ku769eY3lS5dLTt1QAPL+GnDKnD/Bhqg==
-X-Gm-Gg: ASbGncu0xZy66szCSTyLMK5ZDL62ONoPgKwVtFs8CEpOsdyoQFeMULb1JONs7pHyzRY
-	avw3E9Snqo6zwXz5S+HaSyvPnRl/b44bU0CPMkXfzlZUyzKOrSU/eBCuf/8ce14FMd5Y8+d1De5
-	aB2m8tIYVa0M8lAYxKnSXgeEzczxKVsvnnnx9uV8cVfJuV5ryjIuRWxdZkyuL9GWCoVWxDaS0dc
-	KKJE+EDVCgIQtu19391GfdA0V842dshQv4oBRTTC1lYR/XN/g/iDq9K9opoYcmBNcdmb8ZmMK4u
-	PPV98WT9TQ2dgzyzoN++JD4mOjUZj+56zoE=
-X-Received: by 2002:a05:600c:9a5:b0:46c:e3df:529e with SMTP id 5b1f17b1804b1-46ce3df54dfmr9206415e9.19.1758488180275;
-        Sun, 21 Sep 2025 13:56:20 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IEnqwMssDCjhijdZ/zRsJjF/aux8aMPTu3vT6tEWO8ityPhOqzUTeSFi2aStyrPs+FMZNaF1Q==
-X-Received: by 2002:a05:600c:9a5:b0:46c:e3df:529e with SMTP id 5b1f17b1804b1-46ce3df54dfmr9206345e9.19.1758488179887;
-        Sun, 21 Sep 2025 13:56:19 -0700 (PDT)
+        bh=cccTVUHrijNSX4z+x7tgOWrfdy/5n+8UzzmA9bxQJ4s=;
+        b=lWGxseVNLv4RJ9okWznwKSHvtqDrdn5NN1KUn9S/G+S9XsTo1M8DJwgDaH+LG/b6Z1
+         Fc6VoIzoiHxC3ajjxS1KkbuihumJBFMsxmbMUs/GlPpT2ytChlRPa0vxPWTMFvYOn2LT
+         7mLEcsFlbVW682Rl/rWaCDjeq+0brlKtEHPGu55L3UWjTKvcpSiEj5umsC/TKydgjgj9
+         xHoTFQWv+F+RUK0FHxDvKwwM+xYWu/fDffB8aSPYAbsNMipY5FcoWjXp7Z3HEuXuFA2n
+         npxQTJTUEGqYFVeDpm2PDh9fz0ILDFQw4TBkub7SzI9VeCAm92VhJLdX2m/0KXHCFpoI
+         HKiw==
+X-Forwarded-Encrypted: i=1; AJvYcCWzgFTPePKW4prlbKb1Ezw4i4bOEWW6PnjpULGQ2h03XiuNuRxuVz5NooQ1dmxdkam9EYA=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwO0jVmZRWFER7Sv5+mUbighZDcpruqgj1V8giq5aMX7IWNWPB7
+	LMHyHPDDVKHt2WoB+fgDFHGCMalZBwx72Tebr9zYV4RnRdpD0A+WZQInfa9cc38JLN9Lxt/issI
+	CpNOr0HnMEFM6lYZcrFCHXftjevHz3HQKX6Smb3EH2pXIGoM3KhCpTA==
+X-Gm-Gg: ASbGncsk4veTSmuUG5ZaNU2u6q8q4EQmDLoyGKv1M3Dedt148B8uwUbrOr8ciQx0aQF
+	tVVbOCWTyxWuL06SXBK/48xBCv/LT62jNPvUYi7YyyknydOAlx7mDdcWtIlBJhJH5b8rqescGRP
+	bA6OrVfNVwUMUiq7STmbYx402ZU+WQomc2q9hmKd8yCIh506HZswHdImBTY1iY2XhwVpaRHf12P
+	l9zl4eMnPP1J32NzEkHqcHY8l83+DNfrlK7qboadtk7ISqfe1Qqoz91zjhHZxW1+KxjUfH2gR0T
+	X6FdysqAfDG27JS17fuZrBdeeIji/5ukwuE=
+X-Received: by 2002:a05:600c:3b20:b0:45f:2805:91df with SMTP id 5b1f17b1804b1-467efb044f0mr75179825e9.20.1758488376290;
+        Sun, 21 Sep 2025 13:59:36 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IH+9gyh4b7Pe6vwSysrkjuIQgt/cb1zE0T12QzGBFLzTc0cFE1MvWmSWaHwMUzYdnnxQL7Ozw==
+X-Received: by 2002:a05:600c:3b20:b0:45f:2805:91df with SMTP id 5b1f17b1804b1-467efb044f0mr75179775e9.20.1758488375860;
+        Sun, 21 Sep 2025 13:59:35 -0700 (PDT)
 Received: from redhat.com ([2a06:c701:73ea:f900:52ee:df2b:4811:77e0])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-45f321032a1sm131335005e9.2.2025.09.21.13.56.18
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3fa9e584309sm3897012f8f.49.2025.09.21.13.59.33
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 21 Sep 2025 13:56:19 -0700 (PDT)
-Date: Sun, 21 Sep 2025 16:56:16 -0400
+        Sun, 21 Sep 2025 13:59:34 -0700 (PDT)
+Date: Sun, 21 Sep 2025 16:59:31 -0400
 From: "Michael S. Tsirkin" <mst@redhat.com>
-To: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
-Cc: Sean Christopherson <seanjc@google.com>,
-	Paolo Bonzini <pbonzini@redhat.com>,
-	Jason Wang <jasowang@redhat.com>, kvm@vger.kernel.org,
+To: zhangjiao2 <zhangjiao2@cmss.chinamobile.com>
+Cc: jasowang@redhat.com, eperezma@redhat.com, kvm@vger.kernel.org,
 	virtualization@lists.linux.dev, netdev@vger.kernel.org,
 	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] vhost: Take a reference on the task that is reference in
- struct vhost_task.
-Message-ID: <20250921165538-mutt-send-email-mst@kernel.org>
-References: <20250827194107.4142164-1-seanjc@google.com>
- <20250827201059.EmmdDFB_@linutronix.de>
- <20250918110828-mutt-send-email-mst@kernel.org>
- <20250918154826.oUc0cW0Y@linutronix.de>
- <20250918120607-mutt-send-email-mst@kernel.org>
- <20250918181144.Ygo8BZ-R@linutronix.de>
+Subject: Re: [PATCH] vhost: vringh: Modify the return value check
+Message-ID: <20250921165746-mutt-send-email-mst@kernel.org>
+References: <20250910091739.2999-1-zhangjiao2@cmss.chinamobile.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -103,53 +95,59 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20250918181144.Ygo8BZ-R@linutronix.de>
+In-Reply-To: <20250910091739.2999-1-zhangjiao2@cmss.chinamobile.com>
 
-Subject: that is reference -> that is referenced
+On Wed, Sep 10, 2025 at 05:17:38PM +0800, zhangjiao2 wrote:
+> From: zhang jiao <zhangjiao2@cmss.chinamobile.com>
+> 
+> The return value of copy_from_iter and copy_to_iter can't be negative,
+> check whether the copied lengths are equal.
+> 
+> Signed-off-by: zhang jiao <zhangjiao2@cmss.chinamobile.com>
 
-On Thu, Sep 18, 2025 at 08:11:44PM +0200, Sebastian Andrzej Siewior wrote:
-> vhost_task_create() creates a task and keeps a reference to its
-> task_struct. That task may exit early via a signal and its task_struct
-> will be released.
-> A pending vhost_task_wake() will then attempt to wake the task and
-> access a task_struct which is no longer there.
-> 
-> Acquire a reference on the task_struct while creating the thread and
-> release the reference while the struct vhost_task itself is removed.
-> If the task exits early due to a signal, then the vhost_task_wake() will
-> still access a valid task_struct. The wake is safe and will be skipped
-> in this case.
-> 
-> Fixes: f9010dbdce911 ("fork, vhost: Use CLONE_THREAD to fix freezer/ps regression")
-> Reported-by: Sean Christopherson <seanjc@google.com>
-> Closes: https://lore.kernel.org/all/aKkLEtoDXKxAAWju@google.com/
-> Signed-off-by: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
+Well I don't see a fix for copy_to_iter here.
+
+
+                ret = copy_to_iter(src, translated, &iter);
+                if (ret < 0)
+                        return ret;
+
+
+
+
+
 > ---
->  kernel/vhost_task.c | 3 ++-
->  1 file changed, 2 insertions(+), 1 deletion(-)
+>  drivers/vhost/vringh.c | 7 ++++---
+>  1 file changed, 4 insertions(+), 3 deletions(-)
 > 
-> diff --git a/kernel/vhost_task.c b/kernel/vhost_task.c
-> index bc738fa90c1d6..27107dcc1cbfe 100644
-> --- a/kernel/vhost_task.c
-> +++ b/kernel/vhost_task.c
-> @@ -100,6 +100,7 @@ void vhost_task_stop(struct vhost_task *vtsk)
->  	 * freeing it below.
->  	 */
->  	wait_for_completion(&vtsk->exited);
-> +	put_task_struct(vtsk->task);
->  	kfree(vtsk);
->  }
->  EXPORT_SYMBOL_GPL(vhost_task_stop);
-> @@ -148,7 +149,7 @@ struct vhost_task *vhost_task_create(bool (*fn)(void *),
->  		return ERR_CAST(tsk);
->  	}
+> diff --git a/drivers/vhost/vringh.c b/drivers/vhost/vringh.c
+> index 9f27c3f6091b..0c8a17cbb22e 100644
+> --- a/drivers/vhost/vringh.c
+> +++ b/drivers/vhost/vringh.c
+> @@ -1115,6 +1115,7 @@ static inline int copy_from_iotlb(const struct vringh *vrh, void *dst,
+>  		struct iov_iter iter;
+>  		u64 translated;
+>  		int ret;
+> +		size_t size;
 >  
-> -	vtsk->task = tsk;
-> +	vtsk->task = get_task_struct(tsk);
->  	return vtsk;
->  }
->  EXPORT_SYMBOL_GPL(vhost_task_create);
+>  		ret = iotlb_translate(vrh, (u64)(uintptr_t)src,
+>  				      len - total_translated, &translated,
+> @@ -1132,9 +1133,9 @@ static inline int copy_from_iotlb(const struct vringh *vrh, void *dst,
+>  				      translated);
+>  		}
+>  
+> -		ret = copy_from_iter(dst, translated, &iter);
+> -		if (ret < 0)
+> -			return ret;
+> +		size = copy_from_iter(dst, translated, &iter);
+> +		if (size != translated)
+> +			return -EFAULT;
+>  
+>  		src += translated;
+>  		dst += translated;
 > -- 
-> 2.51.0
+> 2.33.0
+> 
+> 
 
 
