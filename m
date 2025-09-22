@@ -1,140 +1,131 @@
-Return-Path: <kvm+bounces-58363-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-58364-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 74D2AB8F556
-	for <lists+kvm@lfdr.de>; Mon, 22 Sep 2025 09:46:56 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 26612B8F59B
+	for <lists+kvm@lfdr.de>; Mon, 22 Sep 2025 09:55:03 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2F5803AC555
-	for <lists+kvm@lfdr.de>; Mon, 22 Sep 2025 07:46:55 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A78DE420961
+	for <lists+kvm@lfdr.de>; Mon, 22 Sep 2025 07:54:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F00042F60C2;
-	Mon, 22 Sep 2025 07:46:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0C8D32F9982;
+	Mon, 22 Sep 2025 07:54:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="I2flsy/b"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="B53g+eii"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.15])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f171.google.com (mail-pl1-f171.google.com [209.85.214.171])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2EE37182B4;
-	Mon, 22 Sep 2025 07:46:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.15
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C54DF2F7AAD
+	for <kvm@vger.kernel.org>; Mon, 22 Sep 2025 07:54:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.171
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758527206; cv=none; b=ebJ6H6hY6uwXXXJZRM8q9B8QNH8n6FVpOO3XETQrNuAHCrLQ0iogs90AbdJgZH79FJP5kQOt4XdxoI3SzEdACEo8PcGqg8aqSE250VrpFQrIbK+yikDM33r523NDluVcxs04H8WzutvCCd4jG8WzRgs6XyK5K0T1LByAOQmzg1w=
+	t=1758527681; cv=none; b=DdWrMeOPAf4aQtN+uEaJ/LH6RyIudN2YZk7l4iQIQzbOWhcK/KD+48+EacOUsNGLlulmo+hQSuPjw/bMLNZ9Ic5y9gXdSZmE0vRzW0CeJjeotzcPhu7TU+eQDkXz1/10211B6RQZR5+JRCvjZz7qd5G0mkTs/CNHC8Gxemh59gE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758527206; c=relaxed/simple;
-	bh=OsMg3MN5TISzpxmH61wHFj+M6YuHHWi4M2vXXj+Sy7c=;
-	h=Message-ID:Date:MIME-Version:Subject:From:To:Cc:References:
-	 In-Reply-To:Content-Type; b=hbYFrec/6YuFI+SVlNuOUykUrlyirViuLe4uLMtkGLGXhpekFP2wR/l3v9Z1iORiSZu3xTS0kxS8vc8b4K76EwOqoRrYdyX5jByJlHkeLDfaERATZpyf2ZvFWlD8QNl12o5RlbXpPbwATFyEgSqyVBDKJ16g1UFj3I5F1uyOoI4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=pass smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=I2flsy/b; arc=none smtp.client-ip=192.198.163.15
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1758527204; x=1790063204;
-  h=message-id:date:mime-version:subject:from:to:cc:
-   references:in-reply-to:content-transfer-encoding;
-  bh=OsMg3MN5TISzpxmH61wHFj+M6YuHHWi4M2vXXj+Sy7c=;
-  b=I2flsy/bcXOw5AOw7+MPIzTY4M1BkoEungAeitmPKbbssjBsF88drOjs
-   kZkdrWOO/z4jiNwiXvr6ShPmiKnA1jx1TRllsclgi8hwmVIKp0WT67ThK
-   YzZNHVn6KfbCgX+RaZtNdUzYsKFO8wAg7yrat378eemZhUUiIjybJ/gIU
-   WOGM/Wz91TsI5n+xLLf83kTflnIcqiLVvyEPSK1OscHUHky4pS8QfFKzl
-   JbtcFKueDt3/GZdCERziOc9g6cSlQDkMDZe8AphYaFANb08McfL9KsqHb
-   Rim4/zevS/lEymZA0xzY01mcRdeLTJUKvyAiGxmlizJESgYDiGXoRcZy6
-   g==;
-X-CSE-ConnectionGUID: uR3ONqPSSgupAvUnM3oFdg==
-X-CSE-MsgGUID: iiwYixXRSDS2b0IPXVR6Aw==
-X-IronPort-AV: E=McAfee;i="6800,10657,11560"; a="60900963"
-X-IronPort-AV: E=Sophos;i="6.18,284,1751266800"; 
-   d="scan'208";a="60900963"
-Received: from orviesa006.jf.intel.com ([10.64.159.146])
-  by fmvoesa109.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 22 Sep 2025 00:46:43 -0700
-X-CSE-ConnectionGUID: HxVEPtk8Sx6g+4KrqgZMUQ==
-X-CSE-MsgGUID: U7wrw6ylT8GsugZel8EpFg==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.18,284,1751266800"; 
-   d="scan'208";a="175540003"
-Received: from unknown (HELO [10.238.0.107]) ([10.238.0.107])
-  by orviesa006-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 22 Sep 2025 00:46:41 -0700
-Message-ID: <b12cac74-5a08-4338-bbab-510860e11a30@linux.intel.com>
-Date: Mon, 22 Sep 2025 15:46:37 +0800
+	s=arc-20240116; t=1758527681; c=relaxed/simple;
+	bh=wHhXbBUv8sLtLk6ZtdozUkZSGPHqvYUTRhRTVOMPPw4=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=liN/ePV5wjrvCHzCzD1ukmEKCsy7K8UYBxD4Wr0e8HrQ26y1nSZLARgAThVoIP6HzfBGyPnSxkP2goeCLnZH/Lv9zCG3uKw47Fiv7wC35bNZii93EVRacPn5WTgFsaMdmyzWre08TQ4vHylgxwlmaaJ9gfWBu/L72hge8U1dNes=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=B53g+eii; arc=none smtp.client-ip=209.85.214.171
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pl1-f171.google.com with SMTP id d9443c01a7336-2698384978dso34075805ad.0
+        for <kvm@vger.kernel.org>; Mon, 22 Sep 2025 00:54:39 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1758527679; x=1759132479; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=wHhXbBUv8sLtLk6ZtdozUkZSGPHqvYUTRhRTVOMPPw4=;
+        b=B53g+eiiTb5GDiKWZd/72tvC2vLjAUOqGrQYYHn2hP6zqCOPWTErNP9eJU1q4+a/Qt
+         nL2Vs9X5i9mVdn1Pyxy8caliAFbGYzbaF7JFqNAg1lNiOr3b5sq3uBRtzxY4DtbA2Nge
+         lZPVjDf9YW9iKP6TBSRl3pKL4xYTUIju3wH9Pb7IAagjLzpGzB9R/deQZsblrDLnw4tZ
+         48iOLBZlT6ZK+DwHPH8ZRpmUFCzPRzbAqu5ux2Cn6gw6LAUdDKHFSXtE/h3lkJosoJwr
+         LkRD09lFr9kXwu453ADEQaTiKiuozO6aJpudEqSfRiUnSk1qUAxKi8t2ptYTix8/TUBx
+         bpPg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1758527679; x=1759132479;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=wHhXbBUv8sLtLk6ZtdozUkZSGPHqvYUTRhRTVOMPPw4=;
+        b=qN3mJZpMozUP315dzCZ4Z7mGjCx3xo2lCF9qETXrpG4RDn0WvEL9QXWacm3NxhLOGd
+         jsRwzQPO28E5QvvssINX5AYxJtovS4Q57743B11lstgV72GePR0DT8Vq7V+rpL94lHVH
+         9QPzsKO1vr63PrFuQBOmmUvyhtSUVe/0V/2KlvEGDegO54YrzEuJL+GEGB0Kvp2eq7fg
+         2y9UeE08hfVXqVhGPdZGPbk/UeocXJjLCoK4orQIgkxhtt2X3dRt1kTZlBvnTMX802L5
+         q85y10U3IjFPR5i84rnswIQeCYawc0WCuCp3wBbkhkiHq5QgK1jiOvHJC2FxmqNehe3I
+         eBuQ==
+X-Forwarded-Encrypted: i=1; AJvYcCXNLJPonH3GVAP+0tkrAToxzg07gMdnkGrNiKrby0ZGQkqsywiSbpJVzpNxwT/JAxUfXC0=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzGih/UwSkZzH4OIb7Zd1f7ZHVmAr7pNzT50YQoLiL3ZJRGHo+A
+	+D2Dy6ryBWi3s8jQ/hURoW1J0o+2ZFvQt1o3No18/tXvg+omtcjyVaBC
+X-Gm-Gg: ASbGnctDTbOPqeeav8+3oEwcaC/ABg5NRPgluk0ufFLoJnFDjitONnNqOd27vxFl25H
+	HPU2zzGuawX66fcbwtqA08q0zHm3zWN0TAnbU+DnfyPzmUp6kOsRwmMKwMxLPA5owPcdOz1eRZH
+	Y+ouXscSfg1gSN0I8fOzwcMpye4O5t7dDxBw9PyOfCWZYvvMaqkS/ynjY16udSMk6jlrdSPR/1i
+	az4Jy65qwSjfcadat8Fd5NiCG+FiAVrdCrzb3ENx6Lh41ZjvpHz6phJyfphAKvImi2/npxoM+kC
+	vEnUOj7jichhUlfI3B+6zq/wl2rEG1crQmF7h4lJT4jeAm/BRex7T55e+Oggfm8VkaKObdTCkn/
+	bS8PEyfEizi3rfyRIo1yuew==
+X-Google-Smtp-Source: AGHT+IHz3wNSWldGNXV3xlynWhX7Cr9eYZtSb12u2x27WnJQYglboQKton+MwFy1y4rS6oR/rbqndg==
+X-Received: by 2002:a17:903:3846:b0:267:c984:8d9f with SMTP id d9443c01a7336-269ba45919fmr182012075ad.24.1758527678869;
+        Mon, 22 Sep 2025 00:54:38 -0700 (PDT)
+Received: from archie.me ([103.124.138.155])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-26e2046788dsm71684115ad.72.2025.09.22.00.54.37
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 22 Sep 2025 00:54:37 -0700 (PDT)
+Received: by archie.me (Postfix, from userid 1000)
+	id D26144220596; Mon, 22 Sep 2025 14:54:30 +0700 (WIB)
+Date: Mon, 22 Sep 2025 14:54:30 +0700
+From: Bagas Sanjaya <bagasdotme@gmail.com>
+To: Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+	Linux KVM <kvm@vger.kernel.org>,
+	Linux Documentation <linux-doc@vger.kernel.org>,
+	Sean Christopherson <seanjc@google.com>,
+	Paolo Bonzini <pbonzini@redhat.com>
+Cc: Jonathan Corbet <corbet@lwn.net>, Wanpeng Li <wanpengli@tencent.com>
+Subject: Re: [PATCH] KVM: x86: Fix hypercalls docs section number order
+Message-ID: <aNEAtqQXyrXUPPLc@archie.me>
+References: <20250909003952.10314-1-bagasdotme@gmail.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v16 21/51] KVM: x86/mmu: WARN on attempt to check
- permissions for Shadow Stack #PF
-From: Binbin Wu <binbin.wu@linux.intel.com>
-To: Sean Christopherson <seanjc@google.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org,
- linux-kernel@vger.kernel.org, Tom Lendacky <thomas.lendacky@amd.com>,
- Mathias Krause <minipli@grsecurity.net>, John Allen <john.allen@amd.com>,
- Rick Edgecombe <rick.p.edgecombe@intel.com>, Chao Gao <chao.gao@intel.com>,
- Xiaoyao Li <xiaoyao.li@intel.com>, Maxim Levitsky <mlevitsk@redhat.com>,
- Zhang Yi Z <yi.z.zhang@linux.intel.com>, Xin Li <xin@zytor.com>
-References: <20250919223258.1604852-1-seanjc@google.com>
- <20250919223258.1604852-22-seanjc@google.com>
- <8b91ca86-6301-4645-a9c2-c2de3a16327c@linux.intel.com>
-Content-Language: en-US
-In-Reply-To: <8b91ca86-6301-4645-a9c2-c2de3a16327c@linux.intel.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="6Hw9PxwxK+FTyenQ"
+Content-Disposition: inline
+In-Reply-To: <20250909003952.10314-1-bagasdotme@gmail.com>
 
 
+--6Hw9PxwxK+FTyenQ
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-On 9/22/2025 3:17 PM, Binbin Wu wrote:
->
->
-> On 9/20/2025 6:32 AM, Sean Christopherson wrote:
->> Add PFERR_SS_MASK, a.k.a. Shadow Stack access, and WARN if KVM attempts to
->> check permissions for a Shadow Stack access as KVM hasn't been taught to
->> understand the magic Writable=0,Dirty=0 combination that is required for
-Typo:
+On Tue, Sep 09, 2025 at 07:39:52AM +0700, Bagas Sanjaya wrote:
+> Commit 4180bf1b655a79 ("KVM: X86: Implement "send IPI" hypercall")
+> documents KVM_HC_SEND_IPI hypercall, yet its section number duplicates
+> KVM_HC_CLOCK_PAIRING one (which both are 6th). Fix the numbering order
+> so that the former should be 7th.
 
-Writable=0,Dirty=0 -> Writable=0,Dirty=1
+Paolo, Sean, would you like to apply this patch on KVM tree or let Jon
+handle it through docs-next?
 
->> Shadow Stack accesses, and likely will never learn.  There are no plans to
->> support Shadow Stacks with the Shadow MMU, and the emulator rejects all
->> instructions that affect Shadow Stacks, i.e. it should be impossible for
->> KVM to observe a #PF due to a shadow stack access.
->>
->> Signed-off-by: Sean Christopherson <seanjc@google.com>
->
-> Reviewed-by: Binbin Wu <binbin.wu@linux.intel.com>
->
->> ---
->>   arch/x86/include/asm/kvm_host.h | 1 +
->>   arch/x86/kvm/mmu.h              | 2 +-
->>   2 files changed, 2 insertions(+), 1 deletion(-)
->>
->> diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
->> index 7a7e6356a8dd..554d83ff6135 100644
->> --- a/arch/x86/include/asm/kvm_host.h
->> +++ b/arch/x86/include/asm/kvm_host.h
->> @@ -267,6 +267,7 @@ enum x86_intercept_stage;
->>   #define PFERR_RSVD_MASK        BIT(3)
->>   #define PFERR_FETCH_MASK    BIT(4)
->>   #define PFERR_PK_MASK        BIT(5)
->> +#define PFERR_SS_MASK        BIT(6)
->>   #define PFERR_SGX_MASK        BIT(15)
->>   #define PFERR_GUEST_RMP_MASK    BIT_ULL(31)
->>   #define PFERR_GUEST_FINAL_MASK    BIT_ULL(32)
->> diff --git a/arch/x86/kvm/mmu.h b/arch/x86/kvm/mmu.h
->> index b4b6860ab971..f63074048ec6 100644
->> --- a/arch/x86/kvm/mmu.h
->> +++ b/arch/x86/kvm/mmu.h
->> @@ -212,7 +212,7 @@ static inline u8 permission_fault(struct kvm_vcpu *vcpu, struct kvm_mmu *mmu,
->>         fault = (mmu->permissions[index] >> pte_access) & 1;
->>   -    WARN_ON(pfec & (PFERR_PK_MASK | PFERR_RSVD_MASK));
->> +    WARN_ON_ONCE(pfec & (PFERR_PK_MASK | PFERR_SS_MASK | PFERR_RSVD_MASK));
->>       if (unlikely(mmu->pkru_mask)) {
->>           u32 pkru_bits, offset;
->
->
+Thanks.
 
+--=20
+An old man doll... just what I always wanted! - Clara
+
+--6Hw9PxwxK+FTyenQ
+Content-Type: application/pgp-signature; name=signature.asc
+
+-----BEGIN PGP SIGNATURE-----
+
+iHUEABYKAB0WIQSSYQ6Cy7oyFNCHrUH2uYlJVVFOowUCaNEAtgAKCRD2uYlJVVFO
+o3wKAQCS3n6Xj/tW8RTpqqfFhRw/RaeX1a+0H1vnroXuIBgyAgD/d3RMhZPFm9JN
+FhRV0MeuKVEwYkg2livKKUt+Jgs+lgY=
+=b9qT
+-----END PGP SIGNATURE-----
+
+--6Hw9PxwxK+FTyenQ--
 
