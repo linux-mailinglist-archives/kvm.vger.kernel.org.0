@@ -1,125 +1,169 @@
-Return-Path: <kvm+bounces-58392-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-58393-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 361F4B92426
-	for <lists+kvm@lfdr.de>; Mon, 22 Sep 2025 18:41:27 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4C5FEB924B0
+	for <lists+kvm@lfdr.de>; Mon, 22 Sep 2025 18:47:18 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E4A53444BBB
-	for <lists+kvm@lfdr.de>; Mon, 22 Sep 2025 16:41:25 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 2812919056B6
+	for <lists+kvm@lfdr.de>; Mon, 22 Sep 2025 16:47:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BA34F3126BB;
-	Mon, 22 Sep 2025 16:41:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2BDC63112DC;
+	Mon, 22 Sep 2025 16:47:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="o3+oNtS1"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="WQyqN8Pu"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pg1-f202.google.com (mail-pg1-f202.google.com [209.85.215.202])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1D07C31197D
-	for <kvm@vger.kernel.org>; Mon, 22 Sep 2025 16:41:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A71011F5838
+	for <kvm@vger.kernel.org>; Mon, 22 Sep 2025 16:47:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758559271; cv=none; b=Hm0wXod9Tm5f99HsKwId+O58Xw99b5kgqdTISN378SbqzXoXhnDRGi7Decqt+4cFccKaFSNFM7bpmDpLGQAq+HnF8UumER1ndTpBWaZqjuCPT58527gdj/72Lsix6U273C53eaM7oVIGCoHIqs2ZifvY6Qr8/gpliSR2AtMKw7o=
+	t=1758559629; cv=none; b=VbPIJcEcC8WwGRcKrT0xVpWUFzPEXg5Dis+B6xZXcSkwwtcFo7bHOuWYM2yyhq+DDgRIyrUMWQq9tWqFVfocP+fc5aRAR/UWo6qte3f/supM7v1oLhvXimNSwjQQh7IoVIxgUncIZAlB029F9ljNc0+zpMGPyRfB6uSA94QO4iA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758559271; c=relaxed/simple;
-	bh=cgRpOeV/h8eXSJgC9yPwO6bTk7jVPQzl+0xil1ELsMo=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=BgZM975GIxTn5Ybw5N0fjLP5Qzplwh+qbsz53daaploPKe1malQ6LvGh7jYKkYYQTGELU8XW6OZBvpg081MNIAL5bCwpgUZJ7eWVC3g3HedEDDUix6sEWHjA8oj/P0ZLmZxjH0f6UM5JofyGeI3rtvsL9p108goFWAwv+3fV8+g=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=o3+oNtS1; arc=none smtp.client-ip=209.85.215.202
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pg1-f202.google.com with SMTP id 41be03b00d2f7-b5508cb189cso5941079a12.2
-        for <kvm@vger.kernel.org>; Mon, 22 Sep 2025 09:41:09 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1758559269; x=1759164069; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=mTfqCdokW+X8HtLwVeSE+IdGBuVQNPlKza47DCX1dCM=;
-        b=o3+oNtS1a2m5574eM/5RS1PDtlXpQUW5EnAefoHiRPaE7A7jpE0kZj/jQZEL9+G3aX
-         rXY7SIgnoI0kPMy5otzT0gP6cL0UT2Hxn3vUpHWS2rEm5npMgfqS0ZEKpGiz1IkBJfFq
-         a6CLnnidM6R8Hy20KJu68Nyr272CG7qFFCQULTPPzEQs9eIJbakjpXIIvqBrum4fCRwM
-         h2eLVozsgvdkGgaan5PzBxM6vQo9ho7xgbx6DIzCVfrhwklEk2N4017PeKTGxFhyfJPJ
-         mfaouWXZaRk+WdrEaJBpRlLtr9XplihsDNFpzN5UTi7xqmeXTDErCm+j4D36Aogo3mJ7
-         EWfg==
+	s=arc-20240116; t=1758559629; c=relaxed/simple;
+	bh=x8lJJ4dWPxSAQeyR5eYQziX7CtVYqXNpoJSz6KwAtMw=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=Q/5gzJUnbxHCy4vAxqDU4C1CBhh7GJDCa25TP6rBPZn+1B1B01sVTUcVqLbUoTS+KbZ/CfLFJc1MGTC7Ka7tRrHoPhuDHydvlnqk9jDPgJ/0j2Tu4cRW+ytxuda7rQGgDnHQEH3KJGsZDUD6b6dat3B2Pbv4wpIH5mY8jzZAJGQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=WQyqN8Pu; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1758559626;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=fRdA7nsQf+ROdRRV/X8F80rPVzMRc7WYaZxeLJaoIjA=;
+	b=WQyqN8Pu8wwVGF+Br9m/jPVBT0EuVuxXw56L7AFItOeGtNQaKfrIyd6n3QdC5aZPZ8EsUB
+	CjBZusBNhsi85c9tLh8Gew6Jk3XE3uBfMIXxRhDy6pMr8U0RkcOaC96D1L6tqGA+JPeP09
+	Gb8L7VDg7K5l7ONkK3tb1oT+6ZS/ZAE=
+Received: from mail-io1-f70.google.com (mail-io1-f70.google.com
+ [209.85.166.70]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-594-XjdSvOvwNPORtBOyIdMEQg-1; Mon, 22 Sep 2025 12:47:03 -0400
+X-MC-Unique: XjdSvOvwNPORtBOyIdMEQg-1
+X-Mimecast-MFC-AGG-ID: XjdSvOvwNPORtBOyIdMEQg_1758559623
+Received: by mail-io1-f70.google.com with SMTP id ca18e2360f4ac-8935214d60bso106419939f.1
+        for <kvm@vger.kernel.org>; Mon, 22 Sep 2025 09:47:03 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1758559269; x=1759164069;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=mTfqCdokW+X8HtLwVeSE+IdGBuVQNPlKza47DCX1dCM=;
-        b=VlH/yM/u5h0HXa2LjF6eiLXJeey3CLmMNFsmgbJpRaBDkYzt7MPzs0zJ200kxLzbbz
-         y32RQbsoz6Rj2rmGstZMwVeb8Sx3XbTZAsweqlyYkIzQauk9nVndNFCyutcKu0CQqAx8
-         o66Nosu7nbepN0sAfORzoVDODaYtBckUpDbvIe9HxOXxYM+PUNorkmZpzj4H/FS3WFMN
-         LqchG3ivS67g7x3NSiq4qEBL6M2qEGX+7pp+5RPkYnnPqdjgVJ40AaBseCPMAx/LLhX0
-         X/ouPGesi5ReiFEsIvGCxjvLlQ2HHcHLFzWgrqYVMhQATGp1qzZqIkwnAaGwhgjwayHO
-         2CJg==
-X-Forwarded-Encrypted: i=1; AJvYcCVAYsLGo04Y4NafXKu6S4o4L2cl7cVdPFe1hcVk8OdLVm9ShxirbdWuyyadAKa3c0Vk4og=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxGzygXQ8NiyTlbjfedjVTkFWoL9RPt+835ZRQ0PIB508RoqwuZ
-	fphFV4tlWYQc/bNl9H/FXqh/skUSKdruGCbjesB2IU3OorP5XupYEX0GrNM1C2ZvI4Y9jQPoO/T
-	hJGdTfA==
-X-Google-Smtp-Source: AGHT+IGx+vF97ASb9/nxfiDDS7HQfaF+ctUmw4CeMoTHspSFjuxuZ2UWCEgDSadB8xY7RzjrLjcoo2AEKD0=
-X-Received: from pfbfj7.prod.google.com ([2002:a05:6a00:3a07:b0:772:5ec0:9124])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a05:6a20:3d88:b0:262:e0d4:6a9
- with SMTP id adf61e73a8af0-2927031a2e0mr21298385637.34.1758559269308; Mon, 22
- Sep 2025 09:41:09 -0700 (PDT)
-Date: Mon, 22 Sep 2025 09:41:08 -0700
-In-Reply-To: <4570dfa1-1e8d-40e9-9341-4836205f5501@linux.intel.com>
+        d=1e100.net; s=20230601; t=1758559622; x=1759164422;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=fRdA7nsQf+ROdRRV/X8F80rPVzMRc7WYaZxeLJaoIjA=;
+        b=Fjx5U889jNFEcvZlfMGtrYA0bo6M8Mo/OiR3lOwzmZSNfw+9agMOwvpCaEPZpDYyxJ
+         /gyxrPtIRY6Uwphuo4LxcUKzFQ+m51aObKacG2l+3Hr6GrSMjT7H6NbKzFewbOft5fAk
+         +K+6q2DHrngxDsTpVGSVZRErIKnGtzxV/dPU33dg3WDYYx/Gx8Bi5ItGTh2zUrT+LFwr
+         Fsy5umgyQecRl8cV14cvKBofUrwbQHSqI9aT8tsHHhT4C4HnAGhmZmxZ61c1e/HDXHKy
+         BY4CfsT0SMnPXvPRjGM7/e+mBV2bDvNyTjdiwe7yFBoQID4P1voVAQNG0t1b0l02/2Rn
+         3/hg==
+X-Gm-Message-State: AOJu0YwYbWkZiId4F6dTkY08mTMthucM9S3Uz/zej+cMZtDSLzke9mDL
+	S6ABUK1YoIWPJLSCWDLzSvvDvkaqC4LAWci0Lbtr316aUlJFodmxZJYuVkTRYiagrrN4B0DxJrs
+	vR4D/XCcZPtlF3BhT1QmUQoROXCZ4inmEoBHgZXQeVYEb0wlYTshgbZ30+yY7Nw==
+X-Gm-Gg: ASbGnctd1GPLYlhzYUSNZ2x+dB+unCKXtdIhGdA+u+Sc8jymCsH+7ElshjloNDVc+jk
+	q/ePiMAu1tS9t4seH+IOjgTgfdTk9h2DGDYFNirOduqIxkJ35wD7oLif96Hctr64Ahw33Qn8Xea
+	hI52uCk9l2o4BzAKkNFssKaQiperGV9lX9GJ1gaqkPUTuIiwqCsAehB2z42zlnLGDSi2kORxkV0
+	25rc+5dNvlTSGW2+ZoSndDiExUSt82x9peb74dNgbCOePHxu0v7KQ6W9wwdU6gGkIQlZdiu9AQm
+	mEJtuRM0CpOcZw8RFb9COISXQgCQM4KZQtzLiN4+dWw=
+X-Received: by 2002:a05:6602:1492:b0:886:b1ad:5926 with SMTP id ca18e2360f4ac-8ade85dce23mr773714439f.4.1758559622326;
+        Mon, 22 Sep 2025 09:47:02 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IEkFiz0OlFYWl2yJOU/iZB/JsOzK1cROcUGrsewO7Eh+2ZzvoGxAdaxPxrlYTqdudrZ2m5WLA==
+X-Received: by 2002:a05:6602:1492:b0:886:b1ad:5926 with SMTP id ca18e2360f4ac-8ade85dce23mr773711839f.4.1758559621755;
+        Mon, 22 Sep 2025 09:47:01 -0700 (PDT)
+Received: from redhat.com ([38.15.36.11])
+        by smtp.gmail.com with ESMTPSA id ca18e2360f4ac-8a483230f4dsm467144739f.25.2025.09.22.09.47.00
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 22 Sep 2025 09:47:01 -0700 (PDT)
+Date: Mon, 22 Sep 2025 10:46:58 -0600
+From: Alex Williamson <alex.williamson@redhat.com>
+To: Timothy Pearson <tpearson@raptorengineering.com>
+Cc: kvm <kvm@vger.kernel.org>, linuxppc-dev <linuxppc-dev@lists.ozlabs.org>
+Subject: Re: [PATCH] vfio/pci: Fix INTx handling on legacy DisINTx- PCI
+ devices
+Message-ID: <20250922104658.7c2b775e.alex.williamson@redhat.com>
+In-Reply-To: <456215532.1742889.1758558863369.JavaMail.zimbra@raptorengineeringinc.com>
+References: <663798478.1707537.1757450926706.JavaMail.zimbra@raptorengineeringinc.com>
+	<20250919125603.08f600ac.alex.williamson@redhat.com>
+	<1916735949.1739694.1758315074669.JavaMail.zimbra@raptorengineeringinc.com>
+	<20250919162721.7a38d3e2.alex.williamson@redhat.com>
+	<537354829.1740670.1758396303861.JavaMail.zimbra@raptorengineeringinc.com>
+	<20250922100143.1397e28b.alex.williamson@redhat.com>
+	<456215532.1742889.1758558863369.JavaMail.zimbra@raptorengineeringinc.com>
+X-Mailer: Claws Mail 4.3.1 (GTK 3.24.43; x86_64-redhat-linux-gnu)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20250919223258.1604852-1-seanjc@google.com> <20250919223258.1604852-10-seanjc@google.com>
- <4570dfa1-1e8d-40e9-9341-4836205f5501@linux.intel.com>
-Message-ID: <aNF8JMN71Bibp24U@google.com>
-Subject: Re: [PATCH v16 09/51] KVM: x86: Load guest FPU state when access
- XSAVE-managed MSRs
-From: Sean Christopherson <seanjc@google.com>
-To: Binbin Wu <binbin.wu@linux.intel.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	Tom Lendacky <thomas.lendacky@amd.com>, Mathias Krause <minipli@grsecurity.net>, 
-	John Allen <john.allen@amd.com>, Rick Edgecombe <rick.p.edgecombe@intel.com>, 
-	Chao Gao <chao.gao@intel.com>, Xiaoyao Li <xiaoyao.li@intel.com>, 
-	Maxim Levitsky <mlevitsk@redhat.com>, Zhang Yi Z <yi.z.zhang@linux.intel.com>, Xin Li <xin@zytor.com>
-Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-On Mon, Sep 22, 2025, Binbin Wu wrote:
+On Mon, 22 Sep 2025 11:34:23 -0500 (CDT)
+Timothy Pearson <tpearson@raptorengineering.com> wrote:
+
+> ----- Original Message -----
+> > From: "Alex Williamson" <alex.williamson@redhat.com>
+> > To: "Timothy Pearson" <tpearson@raptorengineering.com>
+> > Cc: "kvm" <kvm@vger.kernel.org>, "linuxppc-dev" <linuxppc-dev@lists.ozlabs.org>
+> > Sent: Monday, September 22, 2025 11:01:43 AM
+> > Subject: Re: [PATCH] vfio/pci: Fix INTx handling on legacy DisINTx- PCI devices  
 > 
-> 
-> On 9/20/2025 6:32 AM, Sean Christopherson wrote:
-> [...]
+> > On Sat, 20 Sep 2025 14:25:03 -0500 (CDT)
+> > Timothy Pearson <tpearson@raptorengineering.com> wrote:  
+> >> Personally, I'd argue that such old devices were intended to work
+> >> with much slower host systems, therefore the slowdown probably
+> >> doesn't matter vs. being more correct in terms of interrupt handling.
+> >>  In terms of general kernel design, my understanding has always been
+> >> is that best practice is to always mask, disable, or clear a level
+> >> interrupt before exiting the associated IRQ handler, and the current
+> >> design seems to violate that rule.  In that context, I'd personally
+> >> want to see an argument as to why echewing this traditional IRQ
+> >> handler design is beneficial enough to justify making the VFIO driver
+> >> dependent on platform-specific behavior.  
 > > 
-> > diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-> > index 3e66d8c5000a..ae402463f991 100644
-> > --- a/arch/x86/kvm/x86.c
-> > +++ b/arch/x86/kvm/x86.c
-> > @@ -136,6 +136,9 @@ static int __set_sregs2(struct kvm_vcpu *vcpu, struct kvm_sregs2 *sregs2);
-> >   static void __get_sregs2(struct kvm_vcpu *vcpu, struct kvm_sregs2 *sregs2);
-> >   static DEFINE_MUTEX(vendor_module_lock);
-> > +static void kvm_load_guest_fpu(struct kvm_vcpu *vcpu);
-> > +static void kvm_put_guest_fpu(struct kvm_vcpu *vcpu);
-> > +
-> >   struct kvm_x86_ops kvm_x86_ops __read_mostly;
-> >   #define KVM_X86_OP(func)					     \
-> > @@ -3801,6 +3804,67 @@ static void record_steal_time(struct kvm_vcpu *vcpu)
-> >   	mark_page_dirty_in_slot(vcpu->kvm, ghc->memslot, gpa_to_gfn(ghc->gpa));
-> >   }
-> > +/*
-> > + * Returns true if the MSR in question is managed via XSTATE, i.e. is context
-> > + * switched with the rest of guest FPU state.  Note!  S_CET is _not_ context
-> > + * switched via XSTATE even though it _is_ saved/restored via XSAVES/XRSTORS.
-> > + * Because S_CET is loaded on VM-Enter and VM-Exit via dedicated VMCS fields,
-> > + * the value saved/restored via XSTATE is always the host's value.  That detail
-> > + * is _extremely_ important, as the guest's S_CET must _never_ be resident in
-> > + * hardware while executing in the host.  Loading guest values for U_CET and
-> > + * PL[0-3]_SSP while executing in the kernel is safe, as U_CET is specific to
-> > + * userspace, and PL[0-3]_SSP are only consumed when transitioning to lower
-> > + * privilegel levels, i.e. are effectively only consumed by userspace as well.
+> > Yep, I kind of agree.  The unlazy flag seems to provide the more
+> > intended behavior.  It moves the irq chip masking into the fast path,
+> > whereas it would have been asynchronous on a subsequent interrupt
+> > previously, but the impact is only to ancient devices operating in INTx
+> > mode, so as long as we can verify those still work on both ppc and x86,
+> > I don't think it's worth complicating the code to make setting the
+> > unlazy flag conditional on anything other than the device support.
+> > 
+> > Care to send out a new version documenting the actual sequence fixed by
+> > this change and updating the code based on this thread?  Note that we
+> > can test non-pci2.3 mode for any device/driver that supports INTx using
+> > the nointxmask=1 option for vfio-pci and booting a linux guest with
+> > pci=nomsi.  Thanks,
+> > 
+> > Alex  
 > 
-> s/privilegel/privilege[...]
+> Sure, I can update the commit message easily enough, but I must have
+> missed something in regard to a needed code update.  The existing
+> patch only sets unlazy for non-PCI 2.3 INTX devices, and as I
+> understand it that's the behavior we have both agreed on at this
+> point?
 
-Fixed up, thanks!
+I had commented[1] that testing the interrupt type immediately after
+setting the interrupt type is redundant.  Also, looking again, if we
+set the flag before request_irq, it seems logical that we'd clear the
+flag after free_irq.  I think there are also some unaccounted error
+paths where we can set the flag without clearing it that need to be
+considered.
+
+> I've tested this on ppc64el and it works quite well, repairing the
+> broken behavior where the guest would receive exactly one interrupt
+> on the legacy PCI device per boot.  I don't have amd64 systems
+> available to test on, however.
+
+Noted, I'll incorporate some targeted testing here.  Thanks,
+
+Alex
+
+[1]https://lore.kernel.org/all/20250919125603.08f600ac.alex.williamson@redhat.com/
+
 
