@@ -1,123 +1,149 @@
-Return-Path: <kvm+bounces-58389-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-58390-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 85BE0B923E4
-	for <lists+kvm@lfdr.de>; Mon, 22 Sep 2025 18:34:44 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 95FDDB923ED
+	for <lists+kvm@lfdr.de>; Mon, 22 Sep 2025 18:35:51 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1749E3AD753
-	for <lists+kvm@lfdr.de>; Mon, 22 Sep 2025 16:34:43 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 88A691901EDF
+	for <lists+kvm@lfdr.de>; Mon, 22 Sep 2025 16:36:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B53FE311940;
-	Mon, 22 Sep 2025 16:34:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A52A831076D;
+	Mon, 22 Sep 2025 16:35:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=raptorengineering.com header.i=@raptorengineering.com header.b="tQDwZCWH"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="csBwoL7/"
 X-Original-To: kvm@vger.kernel.org
-Received: from raptorengineering.com (mail.raptorengineering.com [23.155.224.40])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pj1-f74.google.com (mail-pj1-f74.google.com [209.85.216.74])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A5B6931076D
-	for <kvm@vger.kernel.org>; Mon, 22 Sep 2025 16:34:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=23.155.224.40
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 440B93112C6
+	for <kvm@vger.kernel.org>; Mon, 22 Sep 2025 16:35:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.74
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758558877; cv=none; b=oq2EBUvDw81qFWopSUsOR5edk2vPaIElQnCxnPt9cPkNDovXXRrvFBhA43nglHW2IIlDsXpclHi9JnLAQpvDm5c6BxBI//wBA0GvKcApGvy9jneSza/ubMsMFt3g7s4hLWQl1mfOiBoYsEDV/vtyB9TYAHVfs5XpxdaKwB54wYE=
+	t=1758558942; cv=none; b=bSkgj6O8qFN+/8q7qkusqqpIUNiEOX4M06r5tKkwPoNPviMIhcEK7umEqTHGh1nStriVXgFKdHuZabYlU3tBFQ2haiFFE+AbtMNhX95Dy1pTc3EjUgcQoX0lp/t15SYMXfLMeaH3KOp/btE9gzQ7mPtQ+XpAwIIZ9a1h5jqx1bc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758558877; c=relaxed/simple;
-	bh=hjdnJzdKSt8NGbwPqkHmAQsngHX58c3MRvMnp4o9Dk0=;
-	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
-	 MIME-Version:Content-Type; b=nR5iXAkBYwOzSFmcxtSL9isgbTMFB96rhgChRoxThLr2BgVyOIEcL6tqEiLRljVR2bGOBTcLMqyCYMWzSG/MBTGTeb5FvnFhGV/kUquPBqxJOCUIy64eD+FBsztBKmgQ9+NCzXS0xjPnY+a76ymH8OdK4VF4LuKS7qg7d7y24aI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=raptorengineering.com; spf=pass smtp.mailfrom=raptorengineering.com; dkim=pass (1024-bit key) header.d=raptorengineering.com header.i=@raptorengineering.com header.b=tQDwZCWH; arc=none smtp.client-ip=23.155.224.40
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=raptorengineering.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=raptorengineering.com
-Received: from localhost (localhost [127.0.0.1])
-	by mail.rptsys.com (Postfix) with ESMTP id 098098288B69;
-	Mon, 22 Sep 2025 11:34:27 -0500 (CDT)
-Received: from mail.rptsys.com ([127.0.0.1])
-	by localhost (vali.starlink.edu [127.0.0.1]) (amavisd-new, port 10032)
-	with ESMTP id oD4Q81DzPA_R; Mon, 22 Sep 2025 11:34:26 -0500 (CDT)
-Received: from localhost (localhost [127.0.0.1])
-	by mail.rptsys.com (Postfix) with ESMTP id 26F418288E8C;
-	Mon, 22 Sep 2025 11:34:26 -0500 (CDT)
-DKIM-Filter: OpenDKIM Filter v2.10.3 mail.rptsys.com 26F418288E8C
+	s=arc-20240116; t=1758558942; c=relaxed/simple;
+	bh=5vgMcmSa6/stHBv9njEn9/fmRr97vtkLUdC85MjkScI=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=JU+OKNyNtGDr+F382qlIwDSFtqfdRnC8QtEpliV0KtND/ygv3pMwaViqmN421pAC/4QxT5BIrPL2ypXkvuofxS7vXoLePmD+wi4L5GlnkkAjjw/Ot8WJdFliFCTdJ+wL0TTKBT5drJavqx+k07qkWSnhJENzOjGXtBsQy2YySnk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=csBwoL7/; arc=none smtp.client-ip=209.85.216.74
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+Received: by mail-pj1-f74.google.com with SMTP id 98e67ed59e1d1-32ee62ed6beso6289017a91.2
+        for <kvm@vger.kernel.org>; Mon, 22 Sep 2025 09:35:41 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=raptorengineering.com; s=B8E824E6-0BE2-11E6-931D-288C65937AAD;
-	t=1758558866; bh=oh6ToL73ZIttgcBjSxTRevOJAHtVa1GDM5kUqX1ToS8=;
-	h=Date:From:To:Message-ID:MIME-Version;
-	b=tQDwZCWHuxMYtZdafLa6Cu+lqnsEMdqWJImPr32Nj5WgSz8uaQAofsbVosLn4REnv
-	 D9gJqy8+mJ7LwRMeQbnNUYw9OfBom9dPdd2PM2/N/mBABRvUu2t2sUjBDcZJNF9INA
-	 sIlTTyIXaYgrXQoj9wWPf33dyaL+IiZhvZR8Ce78=
-X-Virus-Scanned: amavisd-new at rptsys.com
-Received: from mail.rptsys.com ([127.0.0.1])
-	by localhost (vali.starlink.edu [127.0.0.1]) (amavisd-new, port 10026)
-	with ESMTP id lju9L-zpfO1L; Mon, 22 Sep 2025 11:34:26 -0500 (CDT)
-Received: from vali.starlink.edu (localhost [127.0.0.1])
-	by mail.rptsys.com (Postfix) with ESMTP id EFE838288B69;
-	Mon, 22 Sep 2025 11:34:25 -0500 (CDT)
-Date: Mon, 22 Sep 2025 11:34:23 -0500 (CDT)
-From: Timothy Pearson <tpearson@raptorengineering.com>
-To: Alex Williamson <alex.williamson@redhat.com>
-Cc: Timothy Pearson <tpearson@raptorengineering.com>, kvm <kvm@vger.kernel.org>, 
-	linuxppc-dev <linuxppc-dev@lists.ozlabs.org>
-Message-ID: <456215532.1742889.1758558863369.JavaMail.zimbra@raptorengineeringinc.com>
-In-Reply-To: <20250922100143.1397e28b.alex.williamson@redhat.com>
-References: <663798478.1707537.1757450926706.JavaMail.zimbra@raptorengineeringinc.com> <20250919125603.08f600ac.alex.williamson@redhat.com> <1916735949.1739694.1758315074669.JavaMail.zimbra@raptorengineeringinc.com> <20250919162721.7a38d3e2.alex.williamson@redhat.com> <537354829.1740670.1758396303861.JavaMail.zimbra@raptorengineeringinc.com> <20250922100143.1397e28b.alex.williamson@redhat.com>
-Subject: Re: [PATCH] vfio/pci: Fix INTx handling on legacy DisINTx- PCI
- devices
+        d=google.com; s=20230601; t=1758558940; x=1759163740; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:from:subject:message-id:references
+         :mime-version:in-reply-to:date:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=/L6eoZpM1VPVhp3LcIdJtF+77mJVWtKzfwXAMS2FaZE=;
+        b=csBwoL7/a+uoZ8YOTusBF7HHVg3bxgyM/ao+z4BBhVJp/SxZ6FqmXB21fkbIxnHRzZ
+         m+FeJuTTmKMNNP6ZP3UJwdFW65Gexzd72OvHov6h9WoiyEIkNxQM/X2C9tnTrzTQjgrc
+         hxzD7HDiyWGcIOBrmS8Jy3Jj+qlWZupQqQsCZ+IbqoR/67SxQB/qaBQLTPdjR8DLKqx+
+         ufnodQ9LFZd9UXT9PB/Yt+ZBRBHMi40lGkVpMwo6ARrDM/6d3qBwsyBunssimwKEEAA5
+         WjLqUmu0WW+EJ80Poqbm3JyDNNVWewfOwoe9pGeVDyoMctVTieddW44hERzndVq/Rt4s
+         DlNg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1758558940; x=1759163740;
+        h=content-transfer-encoding:cc:to:from:subject:message-id:references
+         :mime-version:in-reply-to:date:x-gm-message-state:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=/L6eoZpM1VPVhp3LcIdJtF+77mJVWtKzfwXAMS2FaZE=;
+        b=D0N1n1/TiR+6FTurF1SrQSyFx970I9Xezh9RJIwksTOY6SOrnkoVIwo5XYxhYXUxI1
+         /1rLbGXDVHAv/Sa1lICY0WFH0rZJgvqobcrGeD/XUN0YQMIW4lyuMPsH786EQA2aGHAf
+         F/NlFhMMYGtdM0FprwfIOvOFGsBqgwdhc23VgNXLH9Q2S9M9f2uPbW5M90JzCgM6Hnod
+         niAltaHYifZMt3jxuOXEtn6uU1cqhI5avHgu7LOdEF0UKoeLhk9opQPtQXX+U1Cs7H9C
+         brEW51lSnxSfKTUVKoaME5ymsBdS0+HAJiVDh2eEM9lt1Lwn2tyHeZ8kcMiZ0ukrNoED
+         mIHQ==
+X-Forwarded-Encrypted: i=1; AJvYcCXbSYwGDpxk+JagpK8H7o3NtrgSOTaeBPbbJkBtp6BszqyUAXkOpVhIfRtoR3oKbVUue+s=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwRw1zJRjAZMkiIFtg1NBzqEBOv7xsr/GHJ3ZkMqo7IRaaNIy/m
+	v2iGAYE4gjILdSH7lGcPWu5f5r0OAaamn1ZXv4P0Nhh/9gDFQt3TzfQv/0tic4PeYdP5Nt2n7Cd
+	g406XPw==
+X-Google-Smtp-Source: AGHT+IFxZmHXxGe1VF4kRpoNHxCAb/9eKuC/xMhUWpWpUydlcsJ5ERtJaV7+/sSJoOAwKktN1cSskOa7EdE=
+X-Received: from pjbqn7.prod.google.com ([2002:a17:90b:3d47:b0:330:49f5:c0b1])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:288b:b0:330:88d7:961f
+ with SMTP id 98e67ed59e1d1-33097ff703fmr17125592a91.14.1758558940555; Mon, 22
+ Sep 2025 09:35:40 -0700 (PDT)
+Date: Mon, 22 Sep 2025 09:35:39 -0700
+In-Reply-To: <4f59ec69-15fd-4463-86c9-17491afd8eca@linux.intel.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
-X-Mailer: Zimbra 8.5.0_GA_3042 (ZimbraWebClient - GC139 (Linux)/8.5.0_GA_3042)
-Thread-Topic: vfio/pci: Fix INTx handling on legacy DisINTx- PCI devices
-Thread-Index: vhXA6uJOAuHvEGJHjXX23Z2oDpkEew==
+Mime-Version: 1.0
+References: <20250919223258.1604852-1-seanjc@google.com> <20250919223258.1604852-34-seanjc@google.com>
+ <4f59ec69-15fd-4463-86c9-17491afd8eca@linux.intel.com>
+Message-ID: <aNF62zmnuXTETlKv@google.com>
+Subject: Re: [PATCH v16 33/51] KVM: nVMX: Add consistency checks for CET states
+From: Sean Christopherson <seanjc@google.com>
+To: Binbin Wu <binbin.wu@linux.intel.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	Tom Lendacky <thomas.lendacky@amd.com>, Mathias Krause <minipli@grsecurity.net>, 
+	John Allen <john.allen@amd.com>, Rick Edgecombe <rick.p.edgecombe@intel.com>, 
+	Chao Gao <chao.gao@intel.com>, Xiaoyao Li <xiaoyao.li@intel.com>, 
+	Maxim Levitsky <mlevitsk@redhat.com>, Zhang Yi Z <yi.z.zhang@linux.intel.com>, Xin Li <xin@zytor.com>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
 
+On Mon, Sep 22, 2025, Binbin Wu wrote:
+> On 9/20/2025 6:32 AM, Sean Christopherson wrote:
+> Is the following simpler?
 
+Yeah.  I was going to say that separating checks in cases like this is some=
+times
+"better" when each statement deals with different state.  But in this case,=
+ SSP
+is bundled with S_CET, but not SSP_TBL, and so the whole thing is rather od=
+d.
 
------ Original Message -----
-> From: "Alex Williamson" <alex.williamson@redhat.com>
-> To: "Timothy Pearson" <tpearson@raptorengineering.com>
-> Cc: "kvm" <kvm@vger.kernel.org>, "linuxppc-dev" <linuxppc-dev@lists.ozlabs.org>
-> Sent: Monday, September 22, 2025 11:01:43 AM
-> Subject: Re: [PATCH] vfio/pci: Fix INTx handling on legacy DisINTx- PCI devices
+> index a8a421a8e766..17ba37c2bbfc 100644
+> --- a/arch/x86/kvm/vmx/nested.c
+> +++ b/arch/x86/kvm/vmx/nested.c
+> @@ -3102,13 +3102,8 @@ static bool is_l1_noncanonical_address_on_vmexit(u=
+64 la, struct vmcs12 *vmcs12)
+>=20
+> =C2=A0static bool is_valid_cet_state(struct kvm_vcpu *vcpu, u64 s_cet, u6=
+4 ssp, u64 ssp_tbl)
+> =C2=A0{
+> -=C2=A0 =C2=A0 =C2=A0 =C2=A0if (!kvm_is_valid_u_s_cet(vcpu, s_cet) || !IS=
+_ALIGNED(ssp, 4))
+> -=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0return false;
+> -
+> -=C2=A0 =C2=A0 =C2=A0 =C2=A0if (is_noncanonical_msr_address(ssp_tbl, vcpu=
+))
+> -=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0return false;
+> -
+> -=C2=A0 =C2=A0 =C2=A0 =C2=A0return true;
+> +=C2=A0 =C2=A0 =C2=A0 =C2=A0return (kvm_is_valid_u_s_cet(vcpu, s_cet) && =
+IS_ALIGNED(ssp, 4) &&
+> +=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0!is_noncanonical_=
+msr_address(ssp_tbl, vcpu));
 
-> On Sat, 20 Sep 2025 14:25:03 -0500 (CDT)
-> Timothy Pearson <tpearson@raptorengineering.com> wrote:
->> Personally, I'd argue that such old devices were intended to work
->> with much slower host systems, therefore the slowdown probably
->> doesn't matter vs. being more correct in terms of interrupt handling.
->>  In terms of general kernel design, my understanding has always been
->> is that best practice is to always mask, disable, or clear a level
->> interrupt before exiting the associated IRQ handler, and the current
->> design seems to violate that rule.  In that context, I'd personally
->> want to see an argument as to why echewing this traditional IRQ
->> handler design is beneficial enough to justify making the VFIO driver
->> dependent on platform-specific behavior.
-> 
-> Yep, I kind of agree.  The unlazy flag seems to provide the more
-> intended behavior.  It moves the irq chip masking into the fast path,
-> whereas it would have been asynchronous on a subsequent interrupt
-> previously, but the impact is only to ancient devices operating in INTx
-> mode, so as long as we can verify those still work on both ppc and x86,
-> I don't think it's worth complicating the code to make setting the
-> unlazy flag conditional on anything other than the device support.
-> 
-> Care to send out a new version documenting the actual sequence fixed by
-> this change and updating the code based on this thread?  Note that we
-> can test non-pci2.3 mode for any device/driver that supports INTx using
-> the nointxmask=1 option for vfio-pci and booting a linux guest with
-> pci=nomsi.  Thanks,
-> 
-> Alex
+Parantheses are unnecessary.
 
-Sure, I can update the commit message easily enough, but I must have missed something in regard to a needed code update.  The existing patch only sets unlazy for non-PCI 2.3 INTX devices, and as I understand it that's the behavior we have both agreed on at this point?
+But looking at this again, is_valid_cet_state() is a misleading name.  In i=
+solation,
+it would be very easy to assume the helper checks _all_ CET state, but that=
+'s not
+the case.  And the other flaw is that the CC() tracepoint won't identify ex=
+actly
+which check failed.
 
-I've tested this on ppc64el and it works quite well, repairing the broken behavior where the guest would receive exactly one interrupt on the legacy PCI device per boot.  I don't have amd64 systems available to test on, however.
+Completely untested, but assuming I didn't fat-finger something, I'll fixup=
+ to
+this:
 
-Thanks!
+static int nested_vmx_check_cet_state_common(struct kvm_vcpu *vcpu, u64 s_c=
+et,
+					     u64 ssp, u64 ssp_tbl)
+{
+	if (CC(!kvm_is_valid_u_s_cet(vcpu, s_cet)) || CC(!IS_ALIGNED(ssp, 4)) ||
+	    CC(is_noncanonical_msr_address(ssp_tbl, vcpu)))
+		return -EINVAL;
+
+	return 0;
+}
 
