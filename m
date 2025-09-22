@@ -1,117 +1,179 @@
-Return-Path: <kvm+bounces-58425-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-58426-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id F09D7B937BB
-	for <lists+kvm@lfdr.de>; Tue, 23 Sep 2025 00:29:21 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 93606B937CD
+	for <lists+kvm@lfdr.de>; Tue, 23 Sep 2025 00:32:18 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 185271906891
-	for <lists+kvm@lfdr.de>; Mon, 22 Sep 2025 22:29:44 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id AD81D1907BC8
+	for <lists+kvm@lfdr.de>; Mon, 22 Sep 2025 22:32:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 622F13148AE;
-	Mon, 22 Sep 2025 22:29:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DD39230171C;
+	Mon, 22 Sep 2025 22:32:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="IX5E30KV"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="YHkJJIg9"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pg1-f173.google.com (mail-pg1-f173.google.com [209.85.215.173])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 38E3E28B415
-	for <kvm@vger.kernel.org>; Mon, 22 Sep 2025 22:29:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.173
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 52FE21DE2A7
+	for <kvm@vger.kernel.org>; Mon, 22 Sep 2025 22:32:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758580144; cv=none; b=RUYYH1PjH3wGG0V6JTpwcnbBaIrAxpojQSfDG8JEN1xgOFkLMBIF6c4968qUNz5wRQv0+tX2+JASOUbi878n/ewQVVYqvzQwTdzciYppKMha3plglc7GgNo2NHwJrbp7Xx0o+tCqSFmWj6E9HBbfVmkvYIxv0pq4zbr/K3bsNgs=
+	t=1758580330; cv=none; b=Ez6S66gMwEgpsIrHjycCdFEsyYYdX70oUq4L6lXgrKT7ZnGJGKBiZjuLqsUz8LDObVtUoQL/0LSYjlXNmQULdh0aZtX99buRijCbgmd4p3V8YeavFaqBrTAFtzCH92hpxQBVsNsQYpDRHhiIvIu74eoMaYk50zDeiX2jhfPdK48=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758580144; c=relaxed/simple;
-	bh=bnoVvW7A4MZboCUWUp3uJoL/5QHRg63EHvbJEX0C48k=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=Dw0H2BIgqgnc1h5J+/YcEB7TbmppKyY4FcwQlaReTjuKHm4z+/H4JLoTUfrprB8cUvMy1rd3xXRszCzUcOO7bx7vS8oJLIi/cVoRpXo9339zORp/NTXuUqRA1ZwN8Gvh+LKPWP/QkQG+x9wWNpGTXx+wjn7jzZb01K3ajUiMrPs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=IX5E30KV; arc=none smtp.client-ip=209.85.215.173
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pg1-f173.google.com with SMTP id 41be03b00d2f7-b555ed30c1cso376777a12.1
-        for <kvm@vger.kernel.org>; Mon, 22 Sep 2025 15:29:02 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1758580141; x=1759184941; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=BtoT7lETDiyBBBUdd6zpmqK1Q4j9ahP216sTNQ0nsxM=;
-        b=IX5E30KVxgFPJ6p2dHUpUxJRlT0Z0s83563QpBj3WbExEofAH4EUzOd3Sa4/OvtHdI
-         pz0DWgou/hhLEq0Y+bU/L4UEJ/8CWpNBYtOpE7Zx7MIm+7jScXnD8OqztbfRm3QMA/63
-         +oxrnjL7NNyg/wXArhqBEgm61tsTA0dGcRDFCZC9bSB3BFjKISIcx12mhZmrpZkBMCWf
-         IW/ZVCumH3zDLWz0kVZG9DjWmrOQSM0A4m5cFKzNF2Z3DzNOx8ydCWeNKfgdOrS76iAB
-         YH87T9V1nLB2NVBQ0ORRQNcsAwnWaRPmGshhNrDMtRldhPUF91VQlOh/YYdLRASXc6hP
-         O6UA==
+	s=arc-20240116; t=1758580330; c=relaxed/simple;
+	bh=tGsUKlZfH22Kkdt+rXlTfFHGLqAHCVSokUZMQlqwc6Y=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=qjevvH4FSLRU3SiDUVelhM0DMl8P1HOxRUhnhLJL5FPankTMRjfbkz/NZ8UyDTv/PVUuaJotSTqmIlaMnV1MG36xCn0LlnIz797mkUcuv5w++PQldlMnm1fTtk2UTo++U59LwrSFpXkz1uufAZEK4Fv0AAueymU7NWtQuiozRN4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=YHkJJIg9; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1758580327;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=WrM/zxhwv4klqtoRkgBDgOYK9tDXhnKZzT4SJVNV1Qg=;
+	b=YHkJJIg9piSWBZ6j2clBLYX91lXPcvTl6/cqX7K/5zNg5XA1wugi1pJjRoZXHc6TZbs7Ye
+	fnE5tPjzCKJlfK/rlwichoZymdOCD8xx2jMPyl+blzwKbzlWNWvmvCUTJzTue2zT+JTS7g
+	j81LVpXj9kTuO8aqkQsfL31Po/MLCXY=
+Received: from mail-io1-f71.google.com (mail-io1-f71.google.com
+ [209.85.166.71]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-462-gsVXxPO4NxucKpNzf4A2zA-1; Mon, 22 Sep 2025 18:32:05 -0400
+X-MC-Unique: gsVXxPO4NxucKpNzf4A2zA-1
+X-Mimecast-MFC-AGG-ID: gsVXxPO4NxucKpNzf4A2zA_1758580325
+Received: by mail-io1-f71.google.com with SMTP id ca18e2360f4ac-8935214d60bso113617839f.1
+        for <kvm@vger.kernel.org>; Mon, 22 Sep 2025 15:32:05 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1758580141; x=1759184941;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=BtoT7lETDiyBBBUdd6zpmqK1Q4j9ahP216sTNQ0nsxM=;
-        b=pXJXWCnZJ7TZ1OQL+Z2Jr4V3/IgNFJoODuE0rGl1W62scuWOBngZIKrs4bncjN44O7
-         BIaJwxLmzgKjAamOfaBn8s980B0yUtJKLaIUVXOxcYiGJr9vqFNtY6BvO0QxGF3XKXl6
-         iFDvm16cXmanHEGTZzorrcpbifuJ2Uz0ljzsHKhKndyYNnienNtoI9EokhKKkG42S4Ck
-         oR3bqNalv9J0KCLP01IRD5OeBlcMTEec516pAk2OZfOV+k4nA6IU8FDk5jfSeYowk70X
-         zRXtGegygAPN9E/FfJkN0a+/Gx47s03h27Oi2gsytIMPc3M4RYlyOcyH1eM36/oo5gax
-         sF6g==
-X-Forwarded-Encrypted: i=1; AJvYcCX+j2lbhFkaw54WSsLSZVZxXNCqUWBDLjhp1/B/ZQMOM8mTrzkUO4ZiPrbezXzmu0BsEi4=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyITOfAJ/bJT9q8BpGs0cjGT3X+a63XzN2kluHie0yZ5/vHOz8C
-	siKgFKQg4JsdpJMXVK5kUdN3h2VBOpcyWXGmEX+ID9KHwcJwIUtvRk5H
-X-Gm-Gg: ASbGnctR57TZdQ2wOd86vgO7ft0Ybozh7Kch+lvNpHlMb/RgMOALTze/vzaklivgfQk
-	yv93pJ8UjMnH0cRh5gKDdvhutvrjKsMoub5G0LjvE9Ad+XDQwUoybDmdnBHef77XIFbgLIUZ7hb
-	QtXWhJ2Ezulu+Gt4ss7GRxRsxkdDwi2xKQXLXgYOqkoq9ZtWMmD6wjTBhFAQKfyRU8QeTYL2HrK
-	jAPvuyyjovvcqemkNz1w9VDR3uVhjuRs2CZbHqhmRO4FzXhhEGE5P5Q5nvCMLCZ4IhcgZNsBZXS
-	vKJEsBK1lJ02KGT75tJ8IexB0R+LCiC/GC6DvAC//0H4ZogAI3M+JMLWC8AAEWP/rruntmSUFuD
-	fc3sXkS2hvRXczunLO9l9N8hXyhluJA==
-X-Google-Smtp-Source: AGHT+IEr9MnnfuaOnEgl5Ok6lmMqyEMDd1YwFlpFnduveoNyqRB+X6CgKFY+fvDTCnEk46JVsmmqkQ==
-X-Received: by 2002:a17:90b:3a8c:b0:32d:f352:f764 with SMTP id 98e67ed59e1d1-332a9542d69mr564005a91.2.1758580141402;
-        Mon, 22 Sep 2025 15:29:01 -0700 (PDT)
-Received: from [192.168.0.150] ([103.124.138.155])
-        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-b551518480asm10765908a12.28.2025.09.22.15.28.59
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 22 Sep 2025 15:29:00 -0700 (PDT)
-Message-ID: <864b1042-9494-44da-b87e-d4cd8aa1ec11@gmail.com>
-Date: Tue, 23 Sep 2025 05:28:57 +0700
+        d=1e100.net; s=20230601; t=1758580325; x=1759185125;
+        h=content-transfer-encoding:mime-version:organization:references
+         :in-reply-to:message-id:subject:cc:to:from:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=WrM/zxhwv4klqtoRkgBDgOYK9tDXhnKZzT4SJVNV1Qg=;
+        b=pGwySpsmAQlTvWAL6dwM/8BAy49UNDdf3YXvNm++ugWT76WJrsl9rUlMJPrZU8E7NZ
+         pj4KXGdWsWsUD7LPRRFzKwdgu2BpE+J6tH2RA5JOc+dJ2pGkCogqr+6uG3jfnq//+L7A
+         WGj4wtc2gNfUPlNVmW02gTPLYTMnGzF7iBuF91LbEm4D8l/iAHrfqUXVFIFAX4taQ5FK
+         BDpw0BCeEOdOtCS43KIqSGP4KDFNqDkx7usQgNvjYyKmfuCyU4AMA2FSYYMDuicel7HO
+         g5OESXPB6lOWICy+c9WkatkoBBe9BJ1+zyCOuayGf447J8+Dw+UzaXNH8RZIAi822Iln
+         9qZA==
+X-Forwarded-Encrypted: i=1; AJvYcCUWUCDvITra/vjpphGsYhc+l1rB5VGogahDpNFyRtGJoAWSNhqvfCEK4kzcesksglTIAeo=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwQmiGuMbdyi+lzNkHlgESnSYdc6OfKNr/DbXdoo2290jW8UwPX
+	k+vwbTcv28UzYf4U8X4cG9wiD1RhXr5M/9UW0DUntomdOnamRudbEb0LnbJlDn3O0vgs+yHvTsn
+	MczWgJQ/uk6CagrsY+kjg4Ek5mZZ5fjXkrbINnka5CTkBbWSkQADiyA==
+X-Gm-Gg: ASbGncs5iTuqCkRBiCBQQ6bkrS3KL7BL38I11GAQAlU0TPyqG9njG+vdmvfEcR7GkSO
+	I+cfTcji63Brf/Z+LiML37rUQh17Cyg7wN11Q8cLUJtgZ8RIROUe9VqZFD+jEAtJT0vIXo3FY6Q
+	GaMpg1IpcMiCo6ltI7b0G1RMyDKrrJQHi8soKLM1dj7JAOTkwdJk4J+KGytTPLd4s1Yr6iydiKd
+	RwmI41NMRmZLJZSjwCvBiVyOw5Q8A+YnV3itF1EIhqVFMRkmuswKKEXfxURSNKLon9/rFP6WW1E
+	Pk8HU18fmM6jRkvJQ7A+BiJiyU+CBz52kSaqs0Gjl2c=
+X-Received: by 2002:a05:6e02:164d:b0:400:7d06:dd6d with SMTP id e9e14a558f8ab-42581e09c50mr3117415ab.1.1758580325075;
+        Mon, 22 Sep 2025 15:32:05 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IFJEglC1l9HK0trhwS8TUhgMjco7KnQFggHDZoCeb4hUnb+WHFtfyngwGswerl1XqO2iXxTzA==
+X-Received: by 2002:a05:6e02:164d:b0:400:7d06:dd6d with SMTP id e9e14a558f8ab-42581e09c50mr3117245ab.1.1758580324618;
+        Mon, 22 Sep 2025 15:32:04 -0700 (PDT)
+Received: from redhat.com ([38.15.36.11])
+        by smtp.gmail.com with ESMTPSA id 8926c6da1cb9f-53d50aa460bsm6196930173.52.2025.09.22.15.32.03
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 22 Sep 2025 15:32:03 -0700 (PDT)
+Date: Mon, 22 Sep 2025 16:32:00 -0600
+From: Alex Williamson <alex.williamson@redhat.com>
+To: Jason Gunthorpe <jgg@nvidia.com>
+Cc: Donald Dutile <ddutile@redhat.com>, Bjorn Helgaas <bhelgaas@google.com>,
+ iommu@lists.linux.dev, Joerg Roedel <joro@8bytes.org>,
+ linux-pci@vger.kernel.org, Robin Murphy <robin.murphy@arm.com>, Will Deacon
+ <will@kernel.org>, Lu Baolu <baolu.lu@linux.intel.com>,
+ galshalom@nvidia.com, Joerg Roedel <jroedel@suse.de>, Kevin Tian
+ <kevin.tian@intel.com>, kvm@vger.kernel.org, maorg@nvidia.com,
+ patches@lists.linux.dev, tdave@nvidia.com, Tony Zhu <tony.zhu@intel.com>
+Subject: Re: [PATCH 03/11] iommu: Compute iommu_groups properly for PCIe
+ switches
+Message-ID: <20250922163200.14025a41.alex.williamson@redhat.com>
+In-Reply-To: <20250718133259.GD2250220@nvidia.com>
+References: <0-v1-74184c5043c6+195-pcie_switch_groups_jgg@nvidia.com>
+	<3-v1-74184c5043c6+195-pcie_switch_groups_jgg@nvidia.com>
+	<20250701132905.67d29191.alex.williamson@redhat.com>
+	<20250702010407.GB1051729@nvidia.com>
+	<c05104a1-7c8e-4ce9-bfa3-bcbc8c9e0ef5@redhat.com>
+	<20250717202744.GA2250220@nvidia.com>
+	<2cb00715-bfa8-427a-a785-fa36667f91f9@redhat.com>
+	<20250718133259.GD2250220@nvidia.com>
+Organization: Red Hat
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] KVM: x86: Fix hypercalls docs section number order
-To: Sean Christopherson <seanjc@google.com>
-Cc: Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
- Linux KVM <kvm@vger.kernel.org>,
- Linux Documentation <linux-doc@vger.kernel.org>,
- Paolo Bonzini <pbonzini@redhat.com>, Jonathan Corbet <corbet@lwn.net>,
- Wanpeng Li <wanpengli@tencent.com>
-References: <20250909003952.10314-1-bagasdotme@gmail.com>
- <aNEAtqQXyrXUPPLc@archie.me> <aNFYL2Os3rbfMbh6@google.com>
-Content-Language: en-US
-From: Bagas Sanjaya <bagasdotme@gmail.com>
-In-Reply-To: <aNFYL2Os3rbfMbh6@google.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 
-On 9/22/25 21:07, Sean Christopherson wrote:
-> On Mon, Sep 22, 2025, Bagas Sanjaya wrote:
->> On Tue, Sep 09, 2025 at 07:39:52AM +0700, Bagas Sanjaya wrote:
->>> Commit 4180bf1b655a79 ("KVM: X86: Implement "send IPI" hypercall")
->>> documents KVM_HC_SEND_IPI hypercall, yet its section number duplicates
->>> KVM_HC_CLOCK_PAIRING one (which both are 6th). Fix the numbering order
->>> so that the former should be 7th.
->>
->> Paolo, Sean, would you like to apply this patch on KVM tree or let Jon
->> handle it through docs-next?
+On Fri, 18 Jul 2025 10:32:59 -0300
+Jason Gunthorpe <jgg@nvidia.com> wrote:
+
+> On Thu, Jul 17, 2025 at 10:31:42PM -0400, Donald Dutile wrote:
+>  
+> > > > If no (optional) ACS P2P Egress control, and no other ACS control, then I read/decode
+> > > > the spec to mean no p2p btwn functions is possible, b/c if it is possible, by spec,
+> > > > it must have an ACS cap to control it; ergo, no ACS cap, no p2p capability/routing.  
+> > > 
+> > > Where did you see this? Linux has never worked this way, we have
+> > > extensive ACS quirks specifically because we've assumed no ACS cap
+> > > means P2P is possible and not controllable.
+> > >   
+> > e.g., Section 6.12.1.2 ACS Functions in SR-IOV, SIOV, and Multi-Function Devices
+> >  ...
+> >  ACS P2P Request Redirect: must be implemented by Functions that support peer-to-peer traffic with other Functions.
+> >                            ^^^^
+> > 
+> > It's been noted/stated/admitted that MFDs have not followed the ACS
+> > rules, and thus the quirks may/are needed.
+> > 
+> > Linux default code should not be opposite of the spec, i.e., if no
+> > ACS, then P2P is possible, thus all fcns are part of an IOMMU group.
+> > The spec states that ACS support must be provided if p2p traffic
+> > with other functions is supported.  
 > 
-> I'll take it.
+> Linux is definately the opposite of this.
+> 
+> Alex would you agree to reverse this logic for MFDs? If the MFD does
+> not have ACS cap then the MFD does not do internal loopback P2P?
+> 
+> I think that solves all the MFD related problems.
 
-OK, thanks!
+Sorry, I'm way, way late to responding to this, but I interpret this to
+mean that if a multifunction device implements an ACS capability, it
+must implement ACS P2P RR if it supports P2P between functions.  If the
+ACS capability does not implement ACS P2P RR then we can assume that the
+device does not support P2P between functions, but if the device does
+not implement an ACS capability at all, we cannot assume anything.
 
--- 
-An old man doll... just what I always wanted! - Clara
+This is effectively why NIC vendors like Intel started implementing an
+empty ACS capability, such that we can infer that there is no P2P
+between functions.
+
+I'm just catching up from some extended PTO, but this statement in the
+cover of the new series is setting off red flags for me:
+
+  For multi-function-devices, a PCIe topology like:
+
+                    -- MFD 00:1f.0 ACS not supported
+    Root 00:00.00 --|- MFD 00:1f.2 ACS not supported
+                    |- MFD 00:1f.6 ACS = REQ_ACS_FLAGS
+
+  Will group [1f.0, 1f.2] and 1f.6 gets a single device group. However from
+  a spec perspective each device should get its own group, because ACS not
+  supported can assume no loopback is possible by spec.
+
+The ACS capability was only introduced in PCIe 2.0 and vendors have
+only become more diligent about implementing it as it's become
+important for device isolation and assignment.  IMO, we can't assume
+anything at all about a multifunction device that does not implement
+ACS.  Thanks,
+
+Alex
+
 
