@@ -1,134 +1,158 @@
-Return-Path: <kvm+bounces-58372-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-58373-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6F212B8FA4E
-	for <lists+kvm@lfdr.de>; Mon, 22 Sep 2025 10:48:05 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id E282DB8FB4B
+	for <lists+kvm@lfdr.de>; Mon, 22 Sep 2025 11:14:42 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id BC3497AF882
-	for <lists+kvm@lfdr.de>; Mon, 22 Sep 2025 08:46:08 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id AA65C16B9FE
+	for <lists+kvm@lfdr.de>; Mon, 22 Sep 2025 09:14:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E30E9283FDC;
-	Mon, 22 Sep 2025 08:47:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E0B5228725A;
+	Mon, 22 Sep 2025 09:14:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="NQI7vfj1"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="1ZpdRARG"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.15])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f47.google.com (mail-wm1-f47.google.com [209.85.128.47])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E5FDA280318;
-	Mon, 22 Sep 2025 08:47:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.15
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 62D65264FB5
+	for <kvm@vger.kernel.org>; Mon, 22 Sep 2025 09:14:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.47
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758530850; cv=none; b=mWuqeXhLWcxdkCYkfwoptO8SXnOR7nYQcAHhpJVEXtX197zci4KazkUtJhgnoILUX1hSsNb1IkEJYnCgjg/ejGDADvAzV7hcXzMktxWRkzl710yDM99caKogo7PcIWj+jbatxaAsUMrNf2QvJytTnquiqSMb0V7NkKV39IkWkXA=
+	t=1758532472; cv=none; b=k6h3WPphbY4mHOP2AsBCA57pJUdyp1dAknR1htcfJ8PAOZB6MYvd2dubyanDEPjSM1IIiaPHTYx6FeDeB/g9xS9Ha42WPkzPNOsDz5lzX9vuREsvkTDjY5eeJ4uEN9mTmFru3Uz+vBidjKL3SZZNyOtmYkXS7WS0X9g2uradE7A=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758530850; c=relaxed/simple;
-	bh=xK0IKlfmQV4KqP/ONXLLmX2l7B4IM2yv3wbTFnma9xE=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=nYpcNls6CrQmJcOpV3lWc8MWO94cTRRWNKFSgG7CoxwRrn+r+MH5M6UOgW1SMt/wpseSTZtR47rF8i2dlbPHxaxF577J3Qxzj5IWg2ZXXDgEzAlGy5jkB+3KeQPqXNmIkEfE79fj1MmdCB7xwCAOsFcKzxCegjAY4VQZcJ+1OLg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=pass smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=NQI7vfj1; arc=none smtp.client-ip=192.198.163.15
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1758530848; x=1790066848;
-  h=message-id:date:mime-version:subject:to:cc:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=xK0IKlfmQV4KqP/ONXLLmX2l7B4IM2yv3wbTFnma9xE=;
-  b=NQI7vfj1hOWW1ydJuhHu/P6dbPU1e0qKi+TbNYWckTu4MfNxUTJGwdvk
-   10WLYZO9zNNct8XaGGgCQ+Nuh4ngoVq3IXZimogFkkmV8Pwoeli06QevD
-   WTLi6JXhIR7+DNLHuiDLqfMo1WnyAmLlYZHHQxbGgRmpSJE3HA5yKtSqf
-   u+xHhcrK7m0FRjH/3Wln/mwvBtYQkthNraVHuyp7W5etAkRgXxUYwdiy6
-   StNleTzbCCCOR5j0ppNdv/RT4MxgTOIgTdn1jX6n8iQH1H+WtqYB3FALq
-   U1hUJqiXpGE31JdI4KR3oc2iwnUzfeOwGw46hku3fHuJfAqLmIUxMq/Za
-   g==;
-X-CSE-ConnectionGUID: 66Umf0ffSCez03hc2P7fEw==
-X-CSE-MsgGUID: dAbgTQuRTt6j0nDx5CXj1g==
-X-IronPort-AV: E=McAfee;i="6800,10657,11560"; a="60905617"
-X-IronPort-AV: E=Sophos;i="6.18,284,1751266800"; 
-   d="scan'208";a="60905617"
-Received: from orviesa006.jf.intel.com ([10.64.159.146])
-  by fmvoesa109.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 22 Sep 2025 01:47:27 -0700
-X-CSE-ConnectionGUID: Dtz3/7uUQyyNAPOwcMeeHg==
-X-CSE-MsgGUID: qYg3TEY6TSmJuaULv0UDsA==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.18,284,1751266800"; 
-   d="scan'208";a="175558701"
-Received: from unknown (HELO [10.238.0.107]) ([10.238.0.107])
-  by orviesa006-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 22 Sep 2025 01:47:24 -0700
-Message-ID: <f06fe1c9-7042-4373-93b1-6a51acc4316b@linux.intel.com>
-Date: Mon, 22 Sep 2025 16:47:21 +0800
+	s=arc-20240116; t=1758532472; c=relaxed/simple;
+	bh=PWZIHxNO9F6b5mRaqczR3GeKYl1D6LdC4n5HIjFGDFY=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=hTRHVcWlrNym6oGeVpsuwjgf+Y9qv0DAaQyEOUY5n3LW0L3+JwIEKVQfioV8qHFtI/8EuTNIRkc6ZnSrE+zRoWBX0aiPnIzlixuu5DK8o+3M4H8HYzSt/0gU73Q66+TPIzviC4oHgHhA03SLmrBXaJ7Y1+2+Ifksi9t/aXar5VA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=1ZpdRARG; arc=none smtp.client-ip=209.85.128.47
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-wm1-f47.google.com with SMTP id 5b1f17b1804b1-46d72711971so30855e9.0
+        for <kvm@vger.kernel.org>; Mon, 22 Sep 2025 02:14:30 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1758532469; x=1759137269; darn=vger.kernel.org;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=wgArYQu+cHNbaIGGgNnr3ySxE/Az/B6v/bHyH6zdSV4=;
+        b=1ZpdRARGYER41O1923opmMPvG9X5f/TwG3kjJGNY8/Qm/ndvfUEjo4wnbDuVy84c2x
+         JMq6kyVCpj2t/3munw/mJB5EW+jZMXpmwh6YjMb8LofcbHqe2hsyRdI1RExhC+I/vZOT
+         EIzpMLj4WOQEMBTa0wu6vd3jGn+Viw6NMmP9yTXJubfHtCMXGScyEQtX7sqqbflLO87d
+         1UqKL9zBAdlbmeexqy6kBnQRMCGelsoi6+R0wFtgEHdFH/CBdKekkgWrhTSaodjyI+EK
+         NLBbCNECv7g6QhauxhXuHGb2ogeu/2KbqG91ZYHpr00nQo9tA31+I/cJcGs57lalW6nj
+         Wlhw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1758532469; x=1759137269;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=wgArYQu+cHNbaIGGgNnr3ySxE/Az/B6v/bHyH6zdSV4=;
+        b=LXVApmkIjkWObuTuVFLRan3Krwx+GR0xN9mYL6Rzh1xpzhsQKYprBLnslEFT+Ozhr4
+         /jVugW8bmSkf/Q8zOuVtNCSyNDFO00+o+j6ckvomGzw/oPqmnVmvTNU+C5KTLeGLxIcJ
+         wosRKzzISgxpx+WKrtfeFoJu+FjEcGnVwZFPJ0XzfbuiHYdzI55bfZ+ZXEXX0kigR60U
+         TJR015TEIkP/fiMppaE50jrGiTLzIF+20TX6MJ8iMzaXWDgoCykiXcvvKt1dGBtOwV/w
+         qWYd58Bkf8muuAvMyjoDVP8S1XaEu+T8ecdvQ8r70bxbE9gVznAPt0R+revRmfpJaYpK
+         cgsg==
+X-Forwarded-Encrypted: i=1; AJvYcCVPXYqG+td/3smGE0kz8Yxx7QMKS5sHUarjh2NYlRyg8kdJ1mSaMNyFH06UQzWBXzOFwCs=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwbEuafc+THSJ85W+HMsC80TgnwmnY/LGa4qeWVnJe2qv2lW5+e
+	NWUD23xpZqJfbT64TxlpZdKrJqJfc82p6/n0l/t/9WNuPTM895NnT20fjsD37IHfBQ==
+X-Gm-Gg: ASbGncs2mAnSuINWh+e58I5UDK9FyHVsEb/1qTp1+1Q0gMrDeUartSgcA/9UnX/NPH6
+	kAVLWHpcyBvldISj7J9os85VhvjRxWsoQ0LBdw/ZE2iELBvH/jXPiG1RELNwCdspzUUzNr9Ey63
+	Sak6Jb4EdjQk60u80zl5nkIAv6km0TP8jzhV7oMvb3AVgZOsze4aYVpj+rEwTeq+vregNvta1kh
+	YRiubVle+0hXejZNttd9ADse5VEIqLWlMz1qaP6/WKx4Co8DIlbWGLBbx8f39TDtM1LSYgFl98B
+	gPzE/oybR6rZOibk0hDf1kjHIhIUhkIbjFFPqrVwg4TtLG6nQTzSFqrIT4PYE6o24MRD/oIFLqj
+	OA11Cwg8au0tHbNTSlJwZ1PQ2OIUEvCkUPj8Avmx0YH3VBQmlFj+kKBW+vaF+JxU=
+X-Google-Smtp-Source: AGHT+IHzWY/BU+tZg/uSMYwHsohYz2u6un9Jyb5wJfEWQ7iDRJk2kEB7VjW0B+HU5Afwed6ytoIPQw==
+X-Received: by 2002:a05:600c:190e:b0:45f:2e6d:ca01 with SMTP id 5b1f17b1804b1-46154878d4bmr11295375e9.4.1758532468571;
+        Mon, 22 Sep 2025 02:14:28 -0700 (PDT)
+Received: from google.com (157.24.148.146.bc.googleusercontent.com. [146.148.24.157])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3f829e01a15sm7769744f8f.57.2025.09.22.02.14.27
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 22 Sep 2025 02:14:28 -0700 (PDT)
+Date: Mon, 22 Sep 2025 09:14:24 +0000
+From: Mostafa Saleh <smostafa@google.com>
+To: "Tian, Kevin" <kevin.tian@intel.com>
+Cc: Keith Busch <kbusch@kernel.org>, Jason Gunthorpe <jgg@ziepe.ca>,
+	Alex Mastro <amastro@fb.com>,
+	Alex Williamson <alex.williamson@redhat.com>,
+	Bjorn Helgaas <bhelgaas@google.com>, David Reiss <dreiss@meta.com>,
+	Joerg Roedel <joro@8bytes.org>, Leon Romanovsky <leon@kernel.org>,
+	Li Zhe <lizhe.67@bytedance.com>, Mahmoud Adam <mngyadam@amazon.de>,
+	Philipp Stanner <pstanner@redhat.com>,
+	Robin Murphy <robin.murphy@arm.com>,
+	"Kasireddy, Vivek" <vivek.kasireddy@intel.com>,
+	Will Deacon <will@kernel.org>, Yunxiang Li <Yunxiang.Li@amd.com>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+	"iommu@lists.linux.dev" <iommu@lists.linux.dev>,
+	"kvm@vger.kernel.org" <kvm@vger.kernel.org>
+Subject: Re: [TECH TOPIC] vfio, iommufd: Enabling user space drivers to vend
+ more granular access to client processes
+Message-ID: <aNETcPELm72zlkwR@google.com>
+References: <20250918214425.2677057-1-amastro@fb.com>
+ <20250918225739.GS1326709@ziepe.ca>
+ <aMyUxqSEBHeHAPIn@kbusch-mbp>
+ <BN9PR11MB5276D7D2BF13374EEA2C788F8C11A@BN9PR11MB5276.namprd11.prod.outlook.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v16 32/51] KVM: nVMX: Add consistency checks for CR0.WP
- and CR4.CET
-To: Sean Christopherson <seanjc@google.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org,
- linux-kernel@vger.kernel.org, Tom Lendacky <thomas.lendacky@amd.com>,
- Mathias Krause <minipli@grsecurity.net>, John Allen <john.allen@amd.com>,
- Rick Edgecombe <rick.p.edgecombe@intel.com>, Chao Gao <chao.gao@intel.com>,
- Xiaoyao Li <xiaoyao.li@intel.com>, Maxim Levitsky <mlevitsk@redhat.com>,
- Zhang Yi Z <yi.z.zhang@linux.intel.com>, Xin Li <xin@zytor.com>
-References: <20250919223258.1604852-1-seanjc@google.com>
- <20250919223258.1604852-33-seanjc@google.com>
-Content-Language: en-US
-From: Binbin Wu <binbin.wu@linux.intel.com>
-In-Reply-To: <20250919223258.1604852-33-seanjc@google.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <BN9PR11MB5276D7D2BF13374EEA2C788F8C11A@BN9PR11MB5276.namprd11.prod.outlook.com>
 
+On Fri, Sep 19, 2025 at 07:00:04AM +0000, Tian, Kevin wrote:
+> > From: Keith Busch <kbusch@kernel.org>
+> > Sent: Friday, September 19, 2025 7:25 AM
+> > 
+> > On Thu, Sep 18, 2025 at 07:57:39PM -0300, Jason Gunthorpe wrote:
+> > > On Thu, Sep 18, 2025 at 02:44:07PM -0700, Alex Mastro wrote:
+> > >
+> > > > We anticipate a growing need to provide more granular access to device
+> > resources
+> > > > beyond what the kernel currently affords to user space drivers similar to
+> > our
+> > > > model.
+> > >
+> > > I'm having a somewhat hard time wrapping my head around the security
+> > > model that says your trust your related processes not use DMA in a way
+> > > that is hostile their peers, but you don't trust them not to issue
+> > > hostile ioctls..
+> > 
+> > I read this as more about having the granularity to automatically
+> > release resources associated with a client process when it dies (as
+> > mentioned below) rather than relying on the bootstrapping process to
+> > manage it all. Not really about hostile ioctls, but that an ungraceful
+> > ending of some client workload doesn't even send them.
+> > 
+> 
+> the proposal includes two parts: BAR access and IOMMU mapping. For
+> the latter looks the intention is more around releasing resource. But
+> the former sounds more like a security enhancement - instead of
+> granting the client full access to the entire device it aims to expose
+> only a region of BAR resource necessary into guest. Then as Jason
+> questioned what is the value of doing so when one client can program
+> arbitrary DMA address into the exposed BAR region to attack mapped
+> memory of other clients and the USD... there is no hw isolation 
+> within a partitioned IOAS unless the device supports PASID then 
+> each client can be associated to its own IOAS space.
 
+That’s also my opinion, it seems that PASIDs are not supported in
+that case, that’s why the clients share the same IOVA address space,
+instead of each one having their own.
+In that case I think as all of this is cooperative and can’t be enforced,
+one process can corrupt another process memory that is mapped the IOMMU.
 
-On 9/20/2025 6:32 AM, Sean Christopherson wrote:
-> From: Chao Gao <chao.gao@intel.com>
->
-> Add consistency checks for CR4.CET and CR0.WP in guest-state or host-state
-> area in the VMCS12. This ensures that configurations with CR4.CET set and
-> CR0.WP not set result in VM-entry failure, aligning with architectural
-> behavior.
->
-> Tested-by: Mathias Krause <minipli@grsecurity.net>
-> Tested-by: John Allen <john.allen@amd.com>
-> Tested-by: Rick Edgecombe <rick.p.edgecombe@intel.com>
-> Signed-off-by: Chao Gao <chao.gao@intel.com>
-> Signed-off-by: Sean Christopherson <seanjc@google.com>
+It seems to me that any memory mapped in the IOMMU is that situation
+has to be explicitly shared between processes first through the kernel,
+so such memory can be accessed both by CPU and DMA by both processes.
 
-Reviewed-by: Binbin Wu <binbin.wu@linux.intel.com>
-
-> ---
->   arch/x86/kvm/vmx/nested.c | 6 ++++++
->   1 file changed, 6 insertions(+)
->
-> diff --git a/arch/x86/kvm/vmx/nested.c b/arch/x86/kvm/vmx/nested.c
-> index 11e5d3569933..51c50ce9e011 100644
-> --- a/arch/x86/kvm/vmx/nested.c
-> +++ b/arch/x86/kvm/vmx/nested.c
-> @@ -3110,6 +3110,9 @@ static int nested_vmx_check_host_state(struct kvm_vcpu *vcpu,
->   	    CC(!kvm_vcpu_is_legal_cr3(vcpu, vmcs12->host_cr3)))
->   		return -EINVAL;
->   
-> +	if (CC(vmcs12->host_cr4 & X86_CR4_CET && !(vmcs12->host_cr0 & X86_CR0_WP)))
-> +		return -EINVAL;
-> +
->   	if (CC(is_noncanonical_msr_address(vmcs12->host_ia32_sysenter_esp, vcpu)) ||
->   	    CC(is_noncanonical_msr_address(vmcs12->host_ia32_sysenter_eip, vcpu)))
->   		return -EINVAL;
-> @@ -3224,6 +3227,9 @@ static int nested_vmx_check_guest_state(struct kvm_vcpu *vcpu,
->   	    CC(!nested_guest_cr4_valid(vcpu, vmcs12->guest_cr4)))
->   		return -EINVAL;
->   
-> +	if (CC(vmcs12->guest_cr4 & X86_CR4_CET && !(vmcs12->guest_cr0 & X86_CR0_WP)))
-> +		return -EINVAL;
-> +
->   	if ((vmcs12->vm_entry_controls & VM_ENTRY_LOAD_DEBUG_CONTROLS) &&
->   	    (CC(!kvm_dr7_valid(vmcs12->guest_dr7)) ||
->   	     CC(!vmx_is_valid_debugctl(vcpu, vmcs12->guest_ia32_debugctl, false))))
-
+Thanks,
+Mostafa
 
