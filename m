@@ -1,171 +1,176 @@
-Return-Path: <kvm+bounces-58374-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-58375-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4EA46B8FBB2
-	for <lists+kvm@lfdr.de>; Mon, 22 Sep 2025 11:21:08 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0DBA3B8FBDF
+	for <lists+kvm@lfdr.de>; Mon, 22 Sep 2025 11:23:53 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 119867AA377
-	for <lists+kvm@lfdr.de>; Mon, 22 Sep 2025 09:19:07 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C9B9417F69C
+	for <lists+kvm@lfdr.de>; Mon, 22 Sep 2025 09:23:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D2E0E287273;
-	Mon, 22 Sep 2025 09:19:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8CE2D2877F6;
+	Mon, 22 Sep 2025 09:23:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="pm7qG2F/"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="cGuj6X8q"
 X-Original-To: kvm@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.14])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 028CE286D70
-	for <kvm@vger.kernel.org>; Mon, 22 Sep 2025 09:19:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C9FF2287244;
+	Mon, 22 Sep 2025 09:23:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.14
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758532780; cv=none; b=agiNYWpzQIpcbS70ivOorOpNKj8ddWi2G00+fBvAWI7ddcHvvA5PyF9ne/Q4Z6u3pex7SQ7trjlmKzQtvcmFyL9TraPsA0SGpJIjbQfVewYr8RPmXXctpDpTqlzoEh1AbvM7h69u+dPitCZB8C4coRmcIGKXRdRopjnpfGNbD/c=
+	t=1758533016; cv=none; b=j3+GETnQMqqaqIkItPY8pv3IvXm5U8rTeMLPz51x+tUqTJIDxRlSk8es+fUkbxhSQSb6ZDL5qcfoVZNun6MsT29TsMfXrc+rIRoiTVpEyLjI97Z0fniJHnBCELu6qxPy0HNPLEX1O1OT6qplEz9/YSfCZ1JF0f2Ufx/jYBcDi6c=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758532780; c=relaxed/simple;
-	bh=mINGhUbFUw/UX9P3RSUq9mI62lRnSA0nxH723eCJjfU=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=U6gOPtRcpFCudvaaox6mh04xWPJzo7sfEmGE+Cmb0N6UGXiI2+aeagHVibGm+4HppEdk8DdfLSbgFbcDRJFD6XcxaYtUA6SsMRO1vjiqYyDtZegRzuFaKixzOka9jX2ppOAEk4xwvaABsSG6gZ6mC4aApmVIM4IRj1Y3f0A9GkU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=pm7qG2F/; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 32522C4CEF5;
-	Mon, 22 Sep 2025 09:19:39 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1758532779;
-	bh=mINGhUbFUw/UX9P3RSUq9mI62lRnSA0nxH723eCJjfU=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=pm7qG2F/ZTdpoKosKUufxtf7uavh5Bmvm9MHXCfzdQh1LdY23bSycQFMkpbihUDaw
-	 PeN/xXjTfVVt4Za2Djx9eTvlh/yIbre5uf6Jeixww+wGGqdUoH1OcDi4eQ9yN5WsVH
-	 DUPHX7oApQZNoI1P5FImyAHSJIbTJNim7BavteLpRR0lpo9rRFGMw4ZmU8CgkH+keK
-	 VSYqMd+kci2TW6XOqIETHaSCaZqZG0b2A/iUI05Ng+qlwwjXXB3MF1IT+J2u67Ae3a
-	 vPBAlaH+5g/lFBsUT5DYU7KRMiw1Knjwi1zZpRciMi3yPHcFv+0nNbruC6O1QnSjED
-	 k/BbU92pmTYiw==
-Received: from phl-compute-06.internal (phl-compute-06.internal [10.202.2.46])
-	by mailfauth.phl.internal (Postfix) with ESMTP id 31CCAF40066;
-	Mon, 22 Sep 2025 05:19:38 -0400 (EDT)
-Received: from phl-mailfrontend-02 ([10.202.2.163])
-  by phl-compute-06.internal (MEProxy); Mon, 22 Sep 2025 05:19:38 -0400
-X-ME-Sender: <xms:qhTRaJ126p4Yc6YNRcAVyKBG7A222hAachBICdVph9lu6BDr0JbM_A>
-    <xme:qhTRaL_O3hf1aXez-o6Pc2OwwEqBaf2CUI49A32_W4hmXBN3GROjQ1mnYcQCy_w_x
-    hrJKmDA4RU6Uy9oLjw>
-X-ME-Received: <xmr:qhTRaCuyjQMnpRjlQJpM2RXAzltTFBBPAfQeV8iGYWAoPL9MBSdn74N1DvWGVw>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeeffedrtdeggdehjeegjecutefuodetggdotefrod
-    ftvfcurfhrohhfihhlvgemucfhrghsthforghilhdpuffrtefokffrpgfnqfghnecuuegr
-    ihhlohhuthemuceftddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmdenucfjug
-    hrpeffhffvvefukfhfgggtuggjsehttdfstddttddvnecuhfhrohhmpefmihhrhihlucfu
-    hhhuthhsvghmrghuuceokhgrsheskhgvrhhnvghlrdhorhhgqeenucggtffrrghtthgvrh
-    hnpefhieekteelledugefhffekfffgjedtveevgffgjeeffeegvdekteetudeggefgkeen
-    ucffohhmrghinhepkhgvrhhnvghlrdhorhhgnecuvehluhhsthgvrhfuihiivgeptdenuc
-    frrghrrghmpehmrghilhhfrhhomhepkhhirhhilhhlodhmvghsmhhtphgruhhthhhpvghr
-    shhonhgrlhhithihqdduieduudeivdeiheehqddvkeeggeegjedvkedqkhgrsheppehkvg
-    hrnhgvlhdrohhrghesshhhuhhtvghmohhvrdhnrghmvgdpnhgspghrtghpthhtohepvdeg
-    pdhmohguvgepshhmthhpohhuthdprhgtphhtthhopehnvggvrhgrjhdruhhprgguhhihrg
-    ihsegrmhgurdgtohhmpdhrtghpthhtoheprhhitghkrdhprdgvughgvggtohhmsggvsehi
-    nhhtvghlrdgtohhmpdhrtghpthhtohepthhhohhmrghsrdhlvghnuggrtghkhiesrghmug
-    drtghomhdprhgtphhtthhopehjohhhnhdrrghllhgvnhesrghmugdrtghomhdprhgtphht
-    thhopegthhgrohdrghgrohesihhnthgvlhdrtghomhdprhgtphhtthhopehsvggrnhhjtg
-    esghhoohhglhgvrdgtohhmpdhrtghpthhtohepgihirghohigrohdrlhhisehinhhtvghl
-    rdgtohhmpdhrtghpthhtoheplhhinhhugidqkhgvrhhnvghlsehvghgvrhdrkhgvrhhnvg
-    hlrdhorhhgpdhrtghpthhtohepmhhinhhiphhlihesghhrshgvtghurhhithihrdhnvght
-X-ME-Proxy: <xmx:qhTRaPrQ0ykqtC-eguqLLVGJC66Xo9d61rcTi1qxSrZGd9R4WrA_Xw>
-    <xmx:qhTRaFGosY7WaY-f_0e7ak2Ieqj5vX2fYgQPIHGX9OUsHCe7sMpKHw>
-    <xmx:qhTRaK6Wehey6yNTfsUKAh5E-8BU6GQQz604sy83cbq7tpercYUb4w>
-    <xmx:qhTRaACrnEdnUl8fMaD8syC2yLr-Qw9jdj2aBnRLIhlsL0aY3yLLhA>
-    <xmx:qhTRaFQboQs5bWdo0Y6kL6kMPr-4Sthrse2PJPKwlzECDRBkQWbNqc_p>
-Feedback-ID: i10464835:Fastmail
-Received: by mail.messagingengine.com (Postfix) with ESMTPA; Mon,
- 22 Sep 2025 05:19:37 -0400 (EDT)
-Date: Mon, 22 Sep 2025 10:19:35 +0100
-From: Kiryl Shutsemau <kas@kernel.org>
-To: Neeraj Upadhyay <Neeraj.Upadhyay@amd.com>, 
-	"Edgecombe, Rick P" <rick.p.edgecombe@intel.com>
-Cc: "thomas.lendacky@amd.com" <thomas.lendacky@amd.com>, 
-	"john.allen@amd.com" <john.allen@amd.com>, "Gao, Chao" <chao.gao@intel.com>, 
-	"seanjc@google.com" <seanjc@google.com>, "Li, Xiaoyao" <xiaoyao.li@intel.com>, 
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, "minipli@grsecurity.net" <minipli@grsecurity.net>, 
-	"mlevitsk@redhat.com" <mlevitsk@redhat.com>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>, 
-	"pbonzini@redhat.com" <pbonzini@redhat.com>
-Subject: Re: [PATCH v15 29/41] KVM: SEV: Synchronize MSR_IA32_XSS from the
- GHCB when it's valid
-Message-ID: <7ds23x6ifdvpagt3h2to3z5gmmfb356au5emokdny7bcuivvql@3yl3frlj7ecb>
-References: <aMnq5ceM3l340UPH@AUSJOHALLEN.amd.com>
- <aMxiIRrDzIqNj2Do@AUSJOHALLEN.amd.com>
- <aMxs2taghfiOQkTU@google.com>
- <aMxvHbhsRn40x-4g@google.com>
- <aMx4TwOLS62ccHTQ@AUSJOHALLEN.amd.com>
- <c64a667d9bcb35a7ffee07391b04334f16892305.camel@intel.com>
- <aMyFIDwbHV3UQUrx@AUSJOHALLEN.amd.com>
- <2661794f-748d-422a-b381-6577ee2729ee@amd.com>
- <bb3256d7c5ee2e84e26d71570db25b05ada8a59f.camel@intel.com>
- <ecaaef65cf1cd90eb8f83e6a53d9689c8b0b9a22.camel@intel.com>
+	s=arc-20240116; t=1758533016; c=relaxed/simple;
+	bh=lZH1GR3SVwh/Vbb9I019CLouzGZxVHUPSKq2vlxMm3s=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=E55+NYWR2tkCNXkBKI4JHC03X0nN7fy/iOGg6TpJu54rW39yP4wU6rx/4J99TJud6GWVdLIXhklVL56iKfqmgkrS63iMbm0nvhsn10dp2PmjsLmAdIskfRPSYUYjd1ZA7GkUwlYO/28m9v2x/7JcIta9luSsNeyR+Qj2q02tNlA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=pass smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=cGuj6X8q; arc=none smtp.client-ip=198.175.65.14
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1758533015; x=1790069015;
+  h=message-id:date:mime-version:subject:to:cc:references:
+   from:in-reply-to:content-transfer-encoding;
+  bh=lZH1GR3SVwh/Vbb9I019CLouzGZxVHUPSKq2vlxMm3s=;
+  b=cGuj6X8qYYbtU4LDdqvMOzToypQLu74xw0sBA97TwHvievhMCos/+Irj
+   +p75g930g8QMq5NA6u4jkYusrzM2xrqf0v+MDVlCkqXxc5aZdj626BHay
+   WbDAk2Rs4rL9ld1248xhJ20GYacpAfa18SLIiw+QSi3mtlHAq/zbNOF6W
+   1XUFbs03c82B1gqxvh5zfHDR4KDEz8LDe7VccsANX7Ilp7S5BPoWdUQge
+   9SD7m3CviJ9wEROR1i5qqsoG/rNTMATP9yrycy73hgkR+EP1Cfq0CekOo
+   cJmTcWLr4XoNWNO82VSLDY2j1Lz33DZZEmYcV/XqAuzlVBW2SQVe6h3rT
+   w==;
+X-CSE-ConnectionGUID: ndhlF0ENRr2b3KfObWBs7w==
+X-CSE-MsgGUID: JeBPd2HNR5a923VK9qYJ6w==
+X-IronPort-AV: E=McAfee;i="6800,10657,11531"; a="64594712"
+X-IronPort-AV: E=Sophos;i="6.17,312,1747724400"; 
+   d="scan'208";a="64594712"
+Received: from orviesa006.jf.intel.com ([10.64.159.146])
+  by orvoesa106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 22 Sep 2025 02:23:34 -0700
+X-CSE-ConnectionGUID: BH/ghJKXTFGb4OfhA0JrQg==
+X-CSE-MsgGUID: 8wx/DjSgQ4mmpW08CHHK8w==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.18,284,1751266800"; 
+   d="scan'208";a="175568862"
+Received: from unknown (HELO [10.238.0.107]) ([10.238.0.107])
+  by orviesa006-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 22 Sep 2025 02:23:31 -0700
+Message-ID: <4f59ec69-15fd-4463-86c9-17491afd8eca@linux.intel.com>
+Date: Mon, 22 Sep 2025 17:23:28 +0800
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <ecaaef65cf1cd90eb8f83e6a53d9689c8b0b9a22.camel@intel.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v16 33/51] KVM: nVMX: Add consistency checks for CET
+ states
+To: Sean Christopherson <seanjc@google.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org,
+ linux-kernel@vger.kernel.org, Tom Lendacky <thomas.lendacky@amd.com>,
+ Mathias Krause <minipli@grsecurity.net>, John Allen <john.allen@amd.com>,
+ Rick Edgecombe <rick.p.edgecombe@intel.com>, Chao Gao <chao.gao@intel.com>,
+ Xiaoyao Li <xiaoyao.li@intel.com>, Maxim Levitsky <mlevitsk@redhat.com>,
+ Zhang Yi Z <yi.z.zhang@linux.intel.com>, Xin Li <xin@zytor.com>
+References: <20250919223258.1604852-1-seanjc@google.com>
+ <20250919223258.1604852-34-seanjc@google.com>
+Content-Language: en-US
+From: Binbin Wu <binbin.wu@linux.intel.com>
+In-Reply-To: <20250919223258.1604852-34-seanjc@google.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 
-On Fri, Sep 19, 2025 at 08:58:45PM +0000, Edgecombe, Rick P wrote:
-> +Kiryl, a CET selftest that does int80 fails on SEV-ES.
-> 
-> On Fri, 2025-09-19 at 10:29 -0700, Rick Edgecombe wrote:
-> > PS, we don't support CET on TDX currently even though it doesn't require
-> > everything in this series, but I just remembered (forehead slap) that on the way
-> > upstream the extra CET-TDX exclusion got pulled out. After this series, it would
-> > be allowed in TDX guests as well. So we need to do the same testing in TDX. Let
-> > me see how the test goes in TDX and get back to you.
-> 
-> The test passes on a TDX guest:
-> 
-> [INFO]	new_ssp = 7f8c8d7ffff8, *new_ssp = 7f8c8d800001
-> [INFO]	changing ssp from 7f8c8e1ffff0 to 7f8c8d7ffff8
-> [INFO]	ssp is now 7f8c8d800000
-> [OK]	Shadow stack pivot
-> [OK]	Shadow stack faults
-> [INFO]	Corrupting shadow stack
-> [INFO]	Generated shadow stack violation successfully
-> [OK]	Shadow stack violation test
-> [INFO]	Gup read -> shstk access success
-> [INFO]	Gup write -> shstk access success
-> [INFO]	Violation from normal write
-> [INFO]	Gup read -> write access success
-> [INFO]	Violation from normal write
-> [INFO]	Gup write -> write access success
-> [INFO]	Cow gup write -> write access success
-> [OK]	Shadow gup test
-> [INFO]	Violation from shstk access
-> [OK]	mprotect() test
-> [OK]	Userfaultfd test
-> [OK]	Guard gap test, other mapping's gaps
-> [OK]	Guard gap test, placement mapping's gaps
-> [OK]	Ptrace test
-> [OK]	32 bit test
-> [OK]	Uretprobe test
-> 
-> 
-> I guess int 80 was re-enabled for TDX, after being disabled for both coco
-> families. See commits starting back from f4116bfc4462 ("x86/tdx: Allow 32-bit
-> emulation by default"). Not sure why it was done that way. If there is some way
-> to re-enable int80 for SEV-ES too, we can leave the test as is. But if you
-> decide to disable the 32 bit test to resolve this, please leave it working for
-> TDX.
 
-In TDX case, VAPIC state is protected VMM. It covers ISR, so guest can
-safely check ISR to detect if the exception is external or internal.
 
-IIUC, VAPIC state is controlled by VMM in SEV case and ISR is not
-reliable.
+On 9/20/2025 6:32 AM, Sean Christopherson wrote:
+> From: Chao Gao <chao.gao@intel.com>
+>
+> Introduce consistency checks for CET states during nested VM-entry.
+>
+> A VMCS contains both guest and host CET states, each comprising the
+> IA32_S_CET MSR, SSP, and IA32_INTERRUPT_SSP_TABLE_ADDR MSR. Various
+> checks are applied to CET states during VM-entry as documented in SDM
+> Vol3 Chapter "VM ENTRIES". Implement all these checks during nested
+> VM-entry to emulate the architectural behavior.
+>
+> In summary, there are three kinds of checks on guest/host CET states
+> during VM-entry:
+>
+> A. Checks applied to both guest states and host states:
+>
+>   * The IA32_S_CET field must not set any reserved bits; bits 10 (SUPPRESS)
+>     and 11 (TRACKER) cannot both be set.
+>   * SSP should not have bits 1:0 set.
+>   * The IA32_INTERRUPT_SSP_TABLE_ADDR field must be canonical.
+>
+> B. Checks applied to host states only
+>
+>   * IA32_S_CET MSR and SSP must be canonical if the CPU enters 64-bit mode
+>     after VM-exit. Otherwise, IA32_S_CET and SSP must have their higher 32
+>     bits cleared.
+>
+> C. Checks applied to guest states only:
+>
+>   * IA32_S_CET MSR and SSP are not required to be canonical (i.e., 63:N-1
+>     are identical, where N is the CPU's maximum linear-address width). But,
+>     bits 63:N of SSP must be identical.
+>
+> Tested-by: Mathias Krause <minipli@grsecurity.net>
+> Tested-by: John Allen <john.allen@amd.com>
+> Tested-by: Rick Edgecombe <rick.p.edgecombe@intel.com>
+> Signed-off-by: Chao Gao <chao.gao@intel.com>
+> Signed-off-by: Sean Christopherson <seanjc@google.com>
 
-I am not sure if Secure AVIC[1] changes the situation for AMD.
+Reviewed-by: Binbin Wu <binbin.wu@linux.intel.com>
 
-Neeraj?
+One nit below.
 
-[1] https://lore.kernel.org/all/20250811094444.203161-1-Neeraj.Upadhyay@amd.com/
+> ---
+>   arch/x86/kvm/vmx/nested.c | 47 +++++++++++++++++++++++++++++++++++++++
+>   1 file changed, 47 insertions(+)
+>
+> diff --git a/arch/x86/kvm/vmx/nested.c b/arch/x86/kvm/vmx/nested.c
+> index 51c50ce9e011..024bfb4d3a72 100644
+> --- a/arch/x86/kvm/vmx/nested.c
+> +++ b/arch/x86/kvm/vmx/nested.c
+> @@ -3100,6 +3100,17 @@ static bool is_l1_noncanonical_address_on_vmexit(u64 la, struct vmcs12 *vmcs12)
+>   	return !__is_canonical_address(la, l1_address_bits_on_exit);
+>   }
+>   
+> +static bool is_valid_cet_state(struct kvm_vcpu *vcpu, u64 s_cet, u64 ssp, u64 ssp_tbl)
+> +{
+> +	if (!kvm_is_valid_u_s_cet(vcpu, s_cet) || !IS_ALIGNED(ssp, 4))
+> +		return false;
+> +
+> +	if (is_noncanonical_msr_address(ssp_tbl, vcpu))
+> +		return false;
+> +
+> +	return true;
+> +}
 
--- 
-  Kiryl Shutsemau / Kirill A. Shutemov
+Nit:
+
+Is the following simpler?
+
+index a8a421a8e766..17ba37c2bbfc 100644
+--- a/arch/x86/kvm/vmx/nested.c
++++ b/arch/x86/kvm/vmx/nested.c
+@@ -3102,13 +3102,8 @@ static bool is_l1_noncanonical_address_on_vmexit(u64 la, struct vmcs12 *vmcs12)
+
+  static bool is_valid_cet_state(struct kvm_vcpu *vcpu, u64 s_cet, u64 ssp, u64 ssp_tbl)
+  {
+-       if (!kvm_is_valid_u_s_cet(vcpu, s_cet) || !IS_ALIGNED(ssp, 4))
+-               return false;
+-
+-       if (is_noncanonical_msr_address(ssp_tbl, vcpu))
+-               return false;
+-
+-       return true;
++       return (kvm_is_valid_u_s_cet(vcpu, s_cet) && IS_ALIGNED(ssp, 4) &&
++               !is_noncanonical_msr_address(ssp_tbl, vcpu));
+  }
 
