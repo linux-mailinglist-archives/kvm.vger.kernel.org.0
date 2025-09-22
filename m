@@ -1,285 +1,278 @@
-Return-Path: <kvm+bounces-58414-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-58415-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id 183ACB93658
-	for <lists+kvm@lfdr.de>; Mon, 22 Sep 2025 23:39:25 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 485A3B9366D
+	for <lists+kvm@lfdr.de>; Mon, 22 Sep 2025 23:51:26 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id B07DE4E2A5A
-	for <lists+kvm@lfdr.de>; Mon, 22 Sep 2025 21:39:23 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 019C617D019
+	for <lists+kvm@lfdr.de>; Mon, 22 Sep 2025 21:51:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0DB2E306494;
-	Mon, 22 Sep 2025 21:39:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7D2362EE5FC;
+	Mon, 22 Sep 2025 21:51:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="Ix5JQQNG"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="vvmpTMs9"
 X-Original-To: kvm@vger.kernel.org
-Received: from MW6PR02CU001.outbound.protection.outlook.com (mail-westus2azon11012017.outbound.protection.outlook.com [52.101.48.17])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pj1-f74.google.com (mail-pj1-f74.google.com [209.85.216.74])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 62CE42C21EA;
-	Mon, 22 Sep 2025 21:39:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.48.17
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758577153; cv=fail; b=UsuAJ7sz7dx+a2nU2e1QKsah3UnW5VmnY89AkONUYoS99OEjFx+NxI06ft0w5gJ+u0gBLjRus65BeFrIvlOy9Aj21+8J2J1305Q5+c65U/FzNGKbkoj8dcaNzfUN4uzpIx5yDMWl7awAxiHn4eWao7fyK3vem2rhoDvEMfJ/Py0=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758577153; c=relaxed/simple;
-	bh=ILeuUndL2PspeHNOOKkjWaTuaNRtrctBRUv3bDsfcBk=;
-	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
-	 Content-Type:MIME-Version; b=La4KRUnH91+rSeSSi52+kSh+dernOQmXn4UqveV2gkcX+yBSr1QIlcV9l/io/Af5KdoDpWVYmkw9gHWpi64u/PChMWR4edESoO/vazfgokx/QsKMXXdFTBvCDkj48YUvehKkSxEefLVzw0PGoK2lyy11HT2jl7m7e9ne5oh52Sk=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=Ix5JQQNG; arc=fail smtp.client-ip=52.101.48.17
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=lJ9XqHweNH/eFzP4ebq0cq0Su98Rmv/ofg3tR51sR3OkgjFF5DCfzWJzjUTeroK2KvPa49u/Eq2icD4WBfXHMaZ29iplln3QmcBiaypTlFz513WGlLs5GRHfhgqR1kqi9AK6uX4NtIVwUzxREC9lk0kZz76RjoCFyG00c9bzuelkxgXs6kTgjpkzmgCHZ9d5SDU22Ib36hbRD2x3aUB6aIbGS6+yMYc+mmbQUcG0Fm0dAyOo4cVTwfmf4n4ZRn+YMyDJx+EPMBcrKC8DoogMSDbQGm34voMI8mZGKRWCXjQSxIHYbEJ9+Or22MqT1rAVU0LvdymSSOfgsZhSD/jyoA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=yXE/AQtwkboV/bD7Phr719mPQyvNarHWkGZOYpQ9oog=;
- b=ZL8OViEeYQkpRFLnzrQ+6cKbJ0Hi9elD2D4mkkG1xenSjRqzrEnN4ZaTsLJ/mHQnndmjBuzqAxwFvA2VEpTGcUx8WVUG1eRLiYaAa942tawFvKDomEOWtv4HbwKEchR8juHm3fKq9nLyzuFR5LVhTJ1mON6gaYIOWNows+kyCzUcIWRfZ9nhYEdXNo0nyLrU1tBPXNj048F5cJBh9X/8T34fJpno9b3x4d3+9Y5iX8kl2nYgJEUkKZBepk2H6XupQDSDefHpiA7ftaRKZw6CTZKxDirGS4UVuur0JSXD8x3iVvIeThkrcPWYsYXw6QaSFpHXHbkSstCMMddwwEC7LA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
- header.d=amd.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=yXE/AQtwkboV/bD7Phr719mPQyvNarHWkGZOYpQ9oog=;
- b=Ix5JQQNGLkm6yHHsm5EdjSXAZluHlaLpFLIda+35Gzt979SX4jgAsYbJIWyctaueR5WPPcd2aTAf3BEtPvYmzvAzpvCUcwDCLAwu+bbUFRTXcCKQWS8vM802+QWIxNErEWTAmjm3EoS9F/5yc+SGQqtZ3VT66f8ybllQEPHiLk4=
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=amd.com;
-Received: from BL1PR12MB5062.namprd12.prod.outlook.com (2603:10b6:208:313::6)
- by MN0PR12MB6003.namprd12.prod.outlook.com (2603:10b6:208:37f::17) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9137.19; Mon, 22 Sep
- 2025 21:39:07 +0000
-Received: from BL1PR12MB5062.namprd12.prod.outlook.com
- ([fe80::fe03:ef1f:3fee:9d4a]) by BL1PR12MB5062.namprd12.prod.outlook.com
- ([fe80::fe03:ef1f:3fee:9d4a%4]) with mapi id 15.20.9137.018; Mon, 22 Sep 2025
- 21:39:07 +0000
-Message-ID: <1637f279-9c89-e367-19e6-d2aae2bcd4fb@amd.com>
-Date: Mon, 22 Sep 2025 16:39:04 -0500
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.15.1
-Subject: Re: [PATCH v16 02/51] KVM: SEV: Read save fields from GHCB exactly
- once
-Content-Language: en-US
-To: Sean Christopherson <seanjc@google.com>,
- Paolo Bonzini <pbonzini@redhat.com>
-Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
- Mathias Krause <minipli@grsecurity.net>, John Allen <john.allen@amd.com>,
- Rick Edgecombe <rick.p.edgecombe@intel.com>, Chao Gao <chao.gao@intel.com>,
- Binbin Wu <binbin.wu@linux.intel.com>, Xiaoyao Li <xiaoyao.li@intel.com>,
- Maxim Levitsky <mlevitsk@redhat.com>, Zhang Yi Z
- <yi.z.zhang@linux.intel.com>, Xin Li <xin@zytor.com>
-References: <20250919223258.1604852-1-seanjc@google.com>
- <20250919223258.1604852-3-seanjc@google.com>
-From: Tom Lendacky <thomas.lendacky@amd.com>
-In-Reply-To: <20250919223258.1604852-3-seanjc@google.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: SA1PR04CA0008.namprd04.prod.outlook.com
- (2603:10b6:806:2ce::13) To BL1PR12MB5062.namprd12.prod.outlook.com
- (2603:10b6:208:313::6)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F415828A3EF
+	for <kvm@vger.kernel.org>; Mon, 22 Sep 2025 21:51:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.74
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1758577878; cv=none; b=LzG41VKHKXHfZ3TzFPPWWzR0RXUGnMTVbiYmJwHitVJD1MsaZKMEO98AKCrotvmzM02KkShhy2QeU86kiPaxTLqFmVMsB7icp+Xnj0BcY4porB14VJAvCEJiDN8U9ew28EAnyONS+3B+ultb/BzZbBT07oJkSvTDPgm/xdSfWQI=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1758577878; c=relaxed/simple;
+	bh=4gTCxkmFt7LbJAKduGir9q8RFZ8lBqIzBigYw0KLi0U=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=I9fXBpFBqHzvQs2qqXnw9LBPJ702VWaujcY1T6cEZDyCZqSdeM4lqjOv+zsVN3+4+R3Bcjh49LCu7pB2F2hDiHw66xUb/3yT11OaYuiB6VhGjZxkjBlS69HViGSR4XmX1wWI3beHcXwDnPmXpTZ2FqLQzcPhsGVvufh+wTE9uAQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=vvmpTMs9; arc=none smtp.client-ip=209.85.216.74
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+Received: by mail-pj1-f74.google.com with SMTP id 98e67ed59e1d1-329c76f70cbso4160445a91.0
+        for <kvm@vger.kernel.org>; Mon, 22 Sep 2025 14:51:15 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1758577875; x=1759182675; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=SQ89xwcUbdPfzaNC8pLCecb224L4f7AvU3SVssm464k=;
+        b=vvmpTMs9gx03PX3XjdV5g1G+VWIdNT1tjxJz8tmT1qh66vcz4MweEhuUJ+lm9tt/9d
+         qdCDih+Th8mniYOoB25QwRPewyV+gGxNk7gMyvO/jOuRAMqF5eHJjnyTkeCsFU9letic
+         JaPyEhHVuA7IzGtx8lYdxnT/NDeHB4kmQLFRf678i2A1P6DnDnIf4QEuXmILpjoI28yZ
+         wJKsTgxtzV2lEx7mf5g8yaSUykTpWWMPmTYmSZSGs3P7b0NB71f7KyICQuDhbwhWBJNd
+         AyXxt68jPzcnvbU/k67BkIcGAu+p0GJRebm/Rjls2VPStbRv2kcE9lFA40KN+klEXXAQ
+         VKzQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1758577875; x=1759182675;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=SQ89xwcUbdPfzaNC8pLCecb224L4f7AvU3SVssm464k=;
+        b=IR8449pY0GrF5vfenzqz5XOSHUaRzruyO+7bv9kVsq4hF0J3wYwoXnImMXZzMc1W4v
+         A0zkeIgETzeYHnNux2mXqmzFWodcSzPpUc4xh9Ygear9Aygbtm57j3oD+HT5nO1DeAvG
+         Xwlhi0TrwWjyKJolruKXn0BqBfInQ6x/GC2dWEluAl0KKFt0P/mHwv6JJtnzfZRGJXYZ
+         v+TtRXkB/kG/3nWjnVZcBJqt5KJTzlUHFIdbtsJU4aY9Xk7Ak9imOYCJ3lHe1tEqS7qo
+         HUcI5/ONIolRUIMELVOUhMGCqy+Bxme89pRIYrX+CJSJwN1THeJCUsoHYg/VYKEZSuof
+         AB4Q==
+X-Forwarded-Encrypted: i=1; AJvYcCVVxDumYwpauFZkD5NDvHfI2vTnojlWRs8FL456q/lZuUmxpxFDTT5P0o3mwxvorSVjgjM=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yw/WAWL3ye5yyutaFvFdaqGu52TEkLUeNBIUtKbfXoOjfF18U33
+	yfC0r7q+3dzXyBaCvDRZM9N+rqLSD3bpZvFYY2ZhHCRlBr0wFKbgpFsm/Od2I5enaSduwUSQw/y
+	qvvsbvg==
+X-Google-Smtp-Source: AGHT+IHsV39PUiM8jSMXJ1TFDCv7QgcTSMXBPnSyUL+WNYqfnqN++rRnXbYTiLp3Hl+CdJgodqXHnVoKFpU=
+X-Received: from pjff6.prod.google.com ([2002:a17:90b:5626:b0:329:7dfc:f4e1])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:4a42:b0:32d:d408:e86
+ with SMTP id 98e67ed59e1d1-332a94f5f80mr552161a91.7.1758577875232; Mon, 22
+ Sep 2025 14:51:15 -0700 (PDT)
+Date: Mon, 22 Sep 2025 14:51:13 -0700
+In-Reply-To: <20250918162529.640943-1-jon@nutanix.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: BL1PR12MB5062:EE_|MN0PR12MB6003:EE_
-X-MS-Office365-Filtering-Correlation-Id: 261e7ba8-2471-4231-0001-08ddfa20750d
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|366016|1800799024|376014|7416014|7053199007;
-X-Microsoft-Antispam-Message-Info:
-	=?utf-8?B?cGN1VjVUeFFoZWVjdnF3MGpaVU11TllYUVVqb3dmaERnck1kSk9Sc24rWlJI?=
- =?utf-8?B?WFY5Rm5MREE2SldYcmtCZWZrL1JiaXNNYndJR3gxbU8xem1zbHkwT3dXcmdz?=
- =?utf-8?B?aFpQQkhJUkFISFRmVCswSXhBNG1OV1IraXZaR3h2YWpweEM3SVBsNnZ3REty?=
- =?utf-8?B?SXBjRjFzV1lldFJzN2FoQ1FDOXBmN2tubHp6L3pmYzJHbW5YMW00VWtIVjZP?=
- =?utf-8?B?V0o5cGhGemhOSEI1SmNyL2lvbGNmUXBXNjVydXBIRUtDT2xvbE50RlVvS05P?=
- =?utf-8?B?MklZUkk1YVRjS0Jmd3VoOTVuMlFrbEVmemZjYmxnaVFaWkUrZjF0ai9LUnh1?=
- =?utf-8?B?K2JhKzNPQzEwNHlzYW8wOTE1N3NFTkV6VE5JSmtsa1UvZFFYbkpCNkdnQWZG?=
- =?utf-8?B?VlZma1dQc1lvRkZzRmF5MTlncXYyQk9BL2dkQzJZcHI1Tzl5TG1GWWsxY1lk?=
- =?utf-8?B?RVh2VnJLaEkzSHhKcE5hRlFMaGNUaThab0NsTkhoYXJydU9MVXkvMzh2R0Fj?=
- =?utf-8?B?TDc3Y21JSjREWTd5V3Q3eXZBOGxZWkl4L2NUblZ4djJzSEEwOUVhN2pKZWtU?=
- =?utf-8?B?R0JEVEVsYXFGMTJ4eEJ1d29zZ2toN09RUDVkcXlMQlZaVTVGa1JDYVVFK1Js?=
- =?utf-8?B?bnJ3UlVSWWJUKzVpZmlOVmU5TXdBVU1iM0xHRzl0dHRVYkRIcXQvN2FaSXl3?=
- =?utf-8?B?M3pjelZrMFJCUjkyWGd4Q1U3UmZGM1U1L2RpNmo4UUtIanpXNkdSR3Y5QXFk?=
- =?utf-8?B?QW1QTjBWWmNobWkrOVRLZmlXZzAycm1WejFTQVZlZUhZQW5BMUVsWmZteVBt?=
- =?utf-8?B?RnMvS1JhNys1eWRxNFU4b0xueGtZSXVSWE5FaVVIQlR3L0Z6Zm1hNC82U3I4?=
- =?utf-8?B?c2dwbzBLRXo1WmwzSjRiUEJMbEYvTlBnUzZ6cU80a2hEZ1A0RE1BRTk1MWo0?=
- =?utf-8?B?QUdjTHVoZmZnVks4SStPVFJIKzhVUlZJbWZBN0lvZE9PYlYxYlhhTkhSZ3o5?=
- =?utf-8?B?cW1xRmtwQmxPd1JHRU95cklGdmJReEFnTGQvaGZFeTNNRVVZV0crdlZpdXli?=
- =?utf-8?B?QkFsV2ZEQkxXekYrR1o0QlRoVW1SK2FuQ3UzaElJQ2ZCaXA0eFhpRDR0Nm5U?=
- =?utf-8?B?S21Hek1HWTRKWHNLbm5pWkJJZjcxbkozNzh5K3hqSzRXdkduMjkvZUVvTkVS?=
- =?utf-8?B?eGlYa3ltdmxWdm11SWVWUDJoL0hobnNqRDlPQVNwcDF3VE1RS0N1a3FLbmlU?=
- =?utf-8?B?ZFVpbFk2LzNwNXhLaEdCS1pxMS8xaWxuVnEyMFdXR0diWmkyNCtiQXZObFRV?=
- =?utf-8?B?M0xCbEt2UVQrQUMycGlpR3BMK1BhWjFScURsRExGc0lobVZvQ2c0K3ZRai9E?=
- =?utf-8?B?VXhwaTNrMkJsQlh0b3k2ZVo1NkZqNC84TTFIUjVPMFJLWlVCeDE4UmdDRG8z?=
- =?utf-8?B?ZE9ML0dLYk9nT21WSVNaNEU4UGUrYVYrUm53UTN5Y1ZpQmpnbDBpRU5pR1RI?=
- =?utf-8?B?NS9QVjFiMU40R0VHZWhFY0l1M2NGU0JiblZwY1dsV0ZLeVhZRkNVamg2M0RR?=
- =?utf-8?B?eVpjUmZESnVFdTk3MUJZeFFqaWVTcUlqWDVmU1ZvV04waXU1c01neVI0bVV5?=
- =?utf-8?B?VkJOdGQ0NnREeWN2Rk9DVHJ1ZSt4MFAwWWpCMmdwTUh1Y3N1ZHk5R3hlKzIw?=
- =?utf-8?B?cTQwSkRoT3lzSS96cGwxRUxyUGllTElzKzIzS2NEelBWQjJtQ1dWR0xwZERk?=
- =?utf-8?B?T1NOSHdMOThMak5TeTJYZDdacTJmc2p0ekpRNTVLNVNwWW1UYnBPQXFZdXRG?=
- =?utf-8?B?VkU4RHMwamVWMXk5NHlheEJ6YXVwRkxmc3pWOG82MVZlbWpGTm1helAxd1A3?=
- =?utf-8?B?OGNaa05Ic3FIODd3dkNaWkp1TS9DRGlQUUsycWV0Y0YydXhrQjlCYy9XYlYv?=
- =?utf-8?Q?dvr63YEQUdQ=3D?=
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BL1PR12MB5062.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(1800799024)(376014)(7416014)(7053199007);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?utf-8?B?emxSQUZOYTB0bzNkb0Qvd1FoZlRlWXB2V3AxN0czZFdmRmNnWXpWd2RXTTFv?=
- =?utf-8?B?bGRiMW42RDh6bm9MdTFIM1AzRDBvTHpTNWFUaHJDNUplcG9vOGZqNUVzZUVx?=
- =?utf-8?B?dXlSaTZQQWYreGJCUkM5V2c3c3FLSnFtQVRBcGEzUzJBYm5EOVZWQlhLVnFE?=
- =?utf-8?B?SUlZUzkzZklpR1ZkYmNjdjQ1YmoyaWNzT0xOSTZGdGNicnpxYzQyWCs1Q2ZS?=
- =?utf-8?B?WktmR29OZDFlTm9tT3kwTllMb2d1a3pIeFRtclNRYUhWY0I0RmZsWUl6MFZR?=
- =?utf-8?B?alFBVFoxUkpYdkNyT1c4TVV6SHQrYlRvRzBXTmV1MlJuQWx4bmMrNWdJN002?=
- =?utf-8?B?WXJWbGQyYzF0YTE0QXEvMUZKNE01cmZJclh6NGIzdE9XKzE5cjBpQkh1V01V?=
- =?utf-8?B?Mk5XWGNYdFRCdzlrUFVyWllPem1vSExGUTV0ODZwL1RKRFJWNE8rdHVhZkVQ?=
- =?utf-8?B?ZTVsRFMxWmZIblJqcWFMWmtQVzQ5c2hublRxcy9MMVgvRC9Zcm1TOVMxbGpF?=
- =?utf-8?B?TnQ3RkpjZjdHQzJ0Qnh4cDl1bzYrV041R1FxNndvRFFzZVlwRmZPRkxOSFdz?=
- =?utf-8?B?dkRsMUtzeUFyNE5mcnJPUW56RUJuM1h6WnRFOUhDZDMwOFQvYUpKaS9TaGdV?=
- =?utf-8?B?RXJlNzNQR1pxU3N2SUFXU3EwWXY5NSthOXFFUmc4YUFUV056amp2NEJrOUUv?=
- =?utf-8?B?NWYyOXZrUTkyanlsUSsyVXUxWDJiOE9KZG0xdXBod05ZTzBTZytMZkJaSldn?=
- =?utf-8?B?VmJoZlhhMkFSblhmd1hFYWg5VGc3eXcrK1NCUlhBYm8rbUZIL1FpRVRzdTUy?=
- =?utf-8?B?ZWk5TjFmYVNaRktFaEp5U1B0T2R6bGJZQlNEWEdYVFlKUm1FVjRxTUk0dTZ4?=
- =?utf-8?B?TjFXR0JPTWhDU1RMR2JKbkRvTFg2T2NWQ1RCWGd2NmZEckFCRTQwNkk2Y0cw?=
- =?utf-8?B?Nmh0b2F3eVpEYURLeVo3TVdMUDF4K3JPZmxydnR6UTh2ekR1YUFUY1VoS290?=
- =?utf-8?B?dkNMUzF4S2F0SGg3Y21NZ0F1UzdqWXFXRUxjMGNVSGcyWlhUdEtrU0k5QUJH?=
- =?utf-8?B?QVpObW5rOWV2VXhWUVZreFZ5WjBWZUhrZzEydjdCaWJmS1lUZ0VXdVFqUG9X?=
- =?utf-8?B?aEhYZEJMZUZ5aFZacTd1SWJJY0pNek9TWklqQy95cWNTNUM4bTNHeWN6bVJC?=
- =?utf-8?B?bEdodm5oc08vN2Y0Ulp1RWI1ZEc0by9Lekk0KzR6NXR6SFRmOTRNOG1CZDlX?=
- =?utf-8?B?OHZadVd5QjVIVXY2bGkyVGdtT2xYV1dlN2tQYm5MNysvbmM2NGZvVVZPVXNQ?=
- =?utf-8?B?VXJ1K1RJY1VGVGJoREw2OHhYdC92SHQyM3k2R3c5Y2diVFpiOFJLZFBZLyt2?=
- =?utf-8?B?SVluOTBGNkpjbDBySkJQWU9JOUkxZzBVZ05wZlR2YnpsUUp0V0FQeUQwa01s?=
- =?utf-8?B?YUdEemV2K2ROeTZiUDdCbzh6TEFRQVZvalZQa282Kzl3ODF4bm84ZVhDSkli?=
- =?utf-8?B?dUF1WDB6blgwR0RLS0RYSUxZcW5jcmVuV3lNcTRxcXB6UDBjK0dhQTRIWlM4?=
- =?utf-8?B?NmNJTWYvcXVWTnZ0RkoyclVEaTJjdHh2azhrblBSWFpSNlJ0WTJMa0VLRWVk?=
- =?utf-8?B?clUxdmtOYWtaV2ZJb0lCd0d1RzRrOW5FVFhhOERaSE5JQjE2UkI4bm1JeGxu?=
- =?utf-8?B?cjZaL0ZCNGFQTVdWek5OWm5HK1h4RDh6Y3lvbnNreGkxNWY1NkZrNmljNWdF?=
- =?utf-8?B?VjNWRnYrK1dOQXB3Y1J6c0RoV0F2S1FONE5FVzg1eUV1Z2NlUEUxMmZaYjBv?=
- =?utf-8?B?cmVyL0pxNkIrKzlhMlFvUjJQRHJjbFJJaHZORy9hZ1JoN1VQZkdFUlBWRXR2?=
- =?utf-8?B?OGJPdTFaeEhINkZ6Y2dBMTNPcWY5VFcxT2FSME5iYmdvMnB2ZWFVWFg5eEdC?=
- =?utf-8?B?a0UwbUptUnFMVnVmRzE4VUxuMmF5cE1LQWFuNU9vTWdMaFBvVnNCRnhxd2J5?=
- =?utf-8?B?M1hVcEJUUGJRTGM1NGlVOVk2d0pOTWNCNUNiQ0JUTFZNemZLV05nQ0p3dnd1?=
- =?utf-8?B?RDBwSFJaRjJFVHJmaDYwYjNYS1VNS0dYcnFtOG95aVozMm5wZ1FvNFVmQjJB?=
- =?utf-8?Q?ZRfeGJeQWoDn6bsLA0LS0QxGa?=
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 261e7ba8-2471-4231-0001-08ddfa20750d
-X-MS-Exchange-CrossTenant-AuthSource: BL1PR12MB5062.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 22 Sep 2025 21:39:06.9742
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: JukMdwpUBqc8L3Wi3RitaLLnLxpvw+NjNYkhry28TO84LFanYdoHjrVwZBl0v05TUSd9XFi/9hGtw8cLlpDNIw==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: MN0PR12MB6003
+Mime-Version: 1.0
+References: <20250918162529.640943-1-jon@nutanix.com>
+Message-ID: <aNHE0U3qxEOniXqO@google.com>
+Subject: Re: [PATCH] KVM: x86: skip userspace IOAPIC EOI exit when Directed
+ EOI is enabled
+From: Sean Christopherson <seanjc@google.com>
+To: Jon Kohler <jon@nutanix.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, Thomas Gleixner <tglx@linutronix.de>, 
+	Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>, 
+	Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org, 
+	"H. Peter Anvin" <hpa@zytor.com>, kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	Khushit Shah <khushit.shah@nutanix.com>
+Content-Type: text/plain; charset="us-ascii"
 
-On 9/19/25 17:32, Sean Christopherson wrote:
-> Wrap all reads of GHCB save fields with READ_ONCE() via a KVM-specific
-> GHCB get() utility to help guard against TOCTOU bugs.  Using READ_ONCE()
-> doesn't completely prevent such bugs, e.g. doesn't prevent KVM from
-> redoing get() after checking the initial value, but at least addresses
-> all potential TOCTOU issues in the current KVM code base.
-> 
-> To prevent unintentional use of the generic helpers, take only @svm for
-> the kvm_ghcb_get_xxx() helpers and retrieve the ghcb instead of explicitly
-> passing it in.
-> 
-> Opportunistically reduce the indentation of the macro-defined helpers and
-> clean up the alignment.
-> 
-> Fixes: 4e15a0ddc3ff ("KVM: SEV: snapshot the GHCB before accessing it")
-> Cc: Tom Lendacky <thomas.lendacky@amd.com>
-> Signed-off-by: Sean Christopherson <seanjc@google.com>
+It'd be super helpful for downstream folks to mention "split IRQCHIP" somewhere
+in the shortlog, e.g.
 
-Reviewed-by: Tom Lendacky <thomas.lendacky@amd.com>
+  KVM: x86: Suppress EOI broadcasts with split IRQCHIP if Directed EOI is enabled
 
+On Thu, Sep 18, 2025, Jon Kohler wrote:
+> From: Khushit Shah <khushit.shah@nutanix.com>
+> 
+> Problem:
+
+Please read Documentation/process/maintainer-kvm-x86.rst.  I'll die on the hill
+that leading with a problem statement results in a less efficient changelog.
+
+And nowhere in the changelog does it state what change is actually being made.
+The shortlog calls it out, but the shortlog isn't always visible, e.g. when
+reviewing the initial patch email.
+
+> We observed Windows w/ HyperV getting stuck during boot because of
+
+No "we".  Over time, who "we" is can become unclear.
+
+> level triggered interrupt storm. This is because KVM currently
+> does not respect Directed EOI bit set by guest in split-irqchip
+> mode.
+>
+> We observed the following ACTUAL sequence on Windows guests with
+
+Uber nit, generally speaking, use asterisks or underscores to emphasive a word.
+Using all caps suggests there is special meaning to the word, e.g. that it's an
+acronym or something.  I am guilty of using ALL CAPS, but I'm pretty sure only
+for "do NOT", where I think/hope the intent is clear.  For whatever reason, I
+kept doing double-takes when reading this sentence.
+
+Though to be honest, I would omit the whole "actual" part.  There's an assumption
+that everyone is acting in good faith, i.e. that contributors aren't fabricating
+a bug report or making things up.
+
+> Directed EOI enabled:
+>   1. Guest issues an APIC EOI.
+>   2. The interrupt is injected into L2 and serviced.
+>   3. Guest issues an IOAPIC EOI.
+> 
+> But, with the current behavior in split-irqchip mode:
+>   1. Guest issues an APIC EOI.
+>   2. KVM exits to userspace and QEMU's ioapic_service reasserts the
+>      interrupt because the line is not yet deasserted.
+>   3. Steps 1 and 2 keeps looping, and hence no progress is made.
+> (logs at the bug linked below).
+
+Eh, for the logs, there's a bug report, just use Closes.  And honestly, I would
+shorten all of the above.  This is a fairly straightforward bug, providing a
+super detailed play-by-play actually makes it _harder_ to understand what's
+
+> This is because in split-irqchip mode, KVM requests a userspace IOAPIC
+
+Please don't use QEMU's terminology when describing KVM bugs.
+
+> EOI exit on every APIC EOI.
+
+This is wrong.  Every *intercepted* EOI, but not all EOIs are intercepted.
+
+> However, if the guest sets the Directed EOI bit in the APIC Spurious
+> Interrupt Vector Register (SPIV, bit 12), per the x2APIC specification,
+
+There is no singular x2APIC specification.  x2APIC is defined by both Intel's SDM
+and AMD's APM.  Usually the Intel and AMD specs are compatible, key word "usually".
+Case in point, I can't find anything in the APM that suggests AMD CPUs support
+"Suppress EOI Broadcasts".
+
+Of course, that could just be an APM documentation bug, since the bit appears
+writable on Turin (though not on Milan).
+
+> the APIC does not broadcast EOIs to the IOAPIC.  In this case, it is the
+> guest's responsibility to explicitly EOI the IOAPIC by writing to its EOI
+> register.
+> 
+> kernel-irqchip mode already handles this similarly in
+> kvm_ioapic_update_eoi_one().
+
+Hmm, I'm pretty sure that's dead code since commit 0bcc3fb95b97 ("KVM: lapic: stop
+advertising DIRECTED_EOI when in-kernel IOAPIC is in use").
+
+And Fudge with a capital 'F', because I'm pretty sure we're going to need at least
+a new CAP, and probably a quirk too.
+
+As per the aforementioned commit, advertising DIRECTED_EOI without an I/O APIC
+that emulates the EOI register will make for a very sad guest.  So simply fixing
+KVM will break existing setups, even though it's unequivocally the correct behavior.
+And unfortunately, I _know_ there is at least one VMM in production that doesn't
+support EOIs in the I/O APIC.
+
+> Link: https://lore.kernel.org/kvm/7D497EF1-607D-4D37-98E7-DAF95F099342@nutanix.com/
+
+As above, this should be Closes, not Link.
+
+  Closes: https://lore.kernel.org/kvm/7D497EF1-607D-4D37-98E7-DAF95F099342@nutanix.com
+
+This also needs:
+
+  Fixes: 7543a635aa09 ("KVM: x86: Add KVM exit for IOAPIC EOIs")
+  Cc: stable@vger.kernel.org
+
+> Signed-off-by: Khushit Shah <khushit.shah@nutanix.com>
 > ---
->  arch/x86/kvm/svm/sev.c | 22 +++++++++++-----------
->  arch/x86/kvm/svm/svm.h | 25 +++++++++++++++----------
->  2 files changed, 26 insertions(+), 21 deletions(-)
+>  arch/x86/kvm/lapic.c | 4 ++++
+>  1 file changed, 4 insertions(+)
 > 
-> diff --git a/arch/x86/kvm/svm/sev.c b/arch/x86/kvm/svm/sev.c
-> index f046a587ecaf..8d057dbd8a71 100644
-> --- a/arch/x86/kvm/svm/sev.c
-> +++ b/arch/x86/kvm/svm/sev.c
-> @@ -3343,26 +3343,26 @@ static void sev_es_sync_from_ghcb(struct vcpu_svm *svm)
->  	BUILD_BUG_ON(sizeof(svm->sev_es.valid_bitmap) != sizeof(ghcb->save.valid_bitmap));
->  	memcpy(&svm->sev_es.valid_bitmap, &ghcb->save.valid_bitmap, sizeof(ghcb->save.valid_bitmap));
+> diff --git a/arch/x86/kvm/lapic.c b/arch/x86/kvm/lapic.c
+> index 0725d2cae742..a81e71ad5bda 100644
+> --- a/arch/x86/kvm/lapic.c
+> +++ b/arch/x86/kvm/lapic.c
+> @@ -1473,6 +1473,10 @@ static void kvm_ioapic_send_eoi(struct kvm_lapic *apic, int vector)
 >  
-> -	vcpu->arch.regs[VCPU_REGS_RAX] = kvm_ghcb_get_rax_if_valid(svm, ghcb);
-> -	vcpu->arch.regs[VCPU_REGS_RBX] = kvm_ghcb_get_rbx_if_valid(svm, ghcb);
-> -	vcpu->arch.regs[VCPU_REGS_RCX] = kvm_ghcb_get_rcx_if_valid(svm, ghcb);
-> -	vcpu->arch.regs[VCPU_REGS_RDX] = kvm_ghcb_get_rdx_if_valid(svm, ghcb);
-> -	vcpu->arch.regs[VCPU_REGS_RSI] = kvm_ghcb_get_rsi_if_valid(svm, ghcb);
-> +	vcpu->arch.regs[VCPU_REGS_RAX] = kvm_ghcb_get_rax_if_valid(svm);
-> +	vcpu->arch.regs[VCPU_REGS_RBX] = kvm_ghcb_get_rbx_if_valid(svm);
-> +	vcpu->arch.regs[VCPU_REGS_RCX] = kvm_ghcb_get_rcx_if_valid(svm);
-> +	vcpu->arch.regs[VCPU_REGS_RDX] = kvm_ghcb_get_rdx_if_valid(svm);
-> +	vcpu->arch.regs[VCPU_REGS_RSI] = kvm_ghcb_get_rsi_if_valid(svm);
->  
-> -	svm->vmcb->save.cpl = kvm_ghcb_get_cpl_if_valid(svm, ghcb);
-> +	svm->vmcb->save.cpl = kvm_ghcb_get_cpl_if_valid(svm);
->  
->  	if (kvm_ghcb_xcr0_is_valid(svm)) {
-> -		vcpu->arch.xcr0 = ghcb_get_xcr0(ghcb);
-> +		vcpu->arch.xcr0 = kvm_ghcb_get_xcr0(svm);
->  		vcpu->arch.cpuid_dynamic_bits_dirty = true;
->  	}
->  
->  	/* Copy the GHCB exit information into the VMCB fields */
-> -	exit_code = ghcb_get_sw_exit_code(ghcb);
-> +	exit_code = kvm_ghcb_get_sw_exit_code(svm);
->  	control->exit_code = lower_32_bits(exit_code);
->  	control->exit_code_hi = upper_32_bits(exit_code);
-> -	control->exit_info_1 = ghcb_get_sw_exit_info_1(ghcb);
-> -	control->exit_info_2 = ghcb_get_sw_exit_info_2(ghcb);
-> -	svm->sev_es.sw_scratch = kvm_ghcb_get_sw_scratch_if_valid(svm, ghcb);
-> +	control->exit_info_1 = kvm_ghcb_get_sw_exit_info_1(svm);
-> +	control->exit_info_2 = kvm_ghcb_get_sw_exit_info_2(svm);
-> +	svm->sev_es.sw_scratch = kvm_ghcb_get_sw_scratch_if_valid(svm);
->  
->  	/* Clear the valid entries fields */
->  	memset(ghcb->save.valid_bitmap, 0, sizeof(ghcb->save.valid_bitmap));
-> diff --git a/arch/x86/kvm/svm/svm.h b/arch/x86/kvm/svm/svm.h
-> index 5d39c0b17988..5365984e82e5 100644
-> --- a/arch/x86/kvm/svm/svm.h
-> +++ b/arch/x86/kvm/svm/svm.h
-> @@ -913,16 +913,21 @@ void __svm_sev_es_vcpu_run(struct vcpu_svm *svm, bool spec_ctrl_intercepted,
->  void __svm_vcpu_run(struct vcpu_svm *svm, bool spec_ctrl_intercepted);
->  
->  #define DEFINE_KVM_GHCB_ACCESSORS(field)						\
-> -	static __always_inline bool kvm_ghcb_##field##_is_valid(const struct vcpu_svm *svm) \
-> -	{									\
-> -		return test_bit(GHCB_BITMAP_IDX(field),				\
-> -				(unsigned long *)&svm->sev_es.valid_bitmap);	\
-> -	}									\
-> -										\
-> -	static __always_inline u64 kvm_ghcb_get_##field##_if_valid(struct vcpu_svm *svm, struct ghcb *ghcb) \
-> -	{									\
-> -		return kvm_ghcb_##field##_is_valid(svm) ? ghcb->save.field : 0;	\
-> -	}									\
-> +static __always_inline u64 kvm_ghcb_get_##field(struct vcpu_svm *svm)			\
-> +{											\
-> +	return READ_ONCE(svm->sev_es.ghcb->save.field);					\
-> +}											\
-> +											\
-> +static __always_inline bool kvm_ghcb_##field##_is_valid(const struct vcpu_svm *svm)	\
-> +{											\
-> +	return test_bit(GHCB_BITMAP_IDX(field),						\
-> +			(unsigned long *)&svm->sev_es.valid_bitmap);			\
-> +}											\
-> +											\
-> +static __always_inline u64 kvm_ghcb_get_##field##_if_valid(struct vcpu_svm *svm)	\
-> +{											\
-> +	return kvm_ghcb_##field##_is_valid(svm) ? kvm_ghcb_get_##field(svm) : 0;	\
-> +}
->  
->  DEFINE_KVM_GHCB_ACCESSORS(cpl)
->  DEFINE_KVM_GHCB_ACCESSORS(rax)
+>  	/* Request a KVM exit to inform the userspace IOAPIC. */
+>  	if (irqchip_split(apic->vcpu->kvm)) {
+> +		/* EOI the ioapic only if the Directed EOI is disabled. */
+
+Capitalize I/O APIC (ugh, the above uses IOAPIC, and further above uses ioapic).
+I'd just avoid mentioning I/O APIC at this point, it should be super obvious
+what's happening.
+
+"the Directed EOI" doesn't parse.  Directed EOI is a feature, not a "thing".
+
+"the ioapic" is also wrong in the sense that KVM has no idea how many I/O APICs
+are being emulated by userspace.  Could be 1, could be 0 or 2.
+
+Don't bother sending a v2, at least not yet.  I'll follow-up with various folks
+to try and figure out the least awful way to get out of this mess, and will
+probably post a v2 with a CAP and/or quirk.
+
+In the meantime, I have the below sitting in a local branch:
+
+--
+From: Khushit Shah <khushit.shah@nutanix.com>
+Date: Thu, 18 Sep 2025 09:25:28 -0700
+Subject: [PATCH] KVM: x86: Suppress EOI broadcasts with split IRQCHIP if
+ Directed EOI is enabled
+
+Do not generate a KVM_EXIT_IOAPIC_EOI exit to userspace when handling EOIs
+for a split IRQCHIP and the vCPU has enabled Directed EOIs in its local
+APIC, i.e. if the guest has set "Suppress EOI Broadcasts" in Intel
+parlance.
+
+Incorrectly broadcasting EOIs can lead to a potentially fatal interrupt
+storm if the IRQ line is still asserted and userspace reacts to the EOI by
+re-injecting the IRQ.  E.g. Windows with Hyper-V enabled gets stuck during
+boot when running under QEMU with a split IRQCHIP.
+
+Note, Suppress EOI Broadcasts is defined only in Intel's SDM, not in AMD's
+APM.  But the bit is writable on some AMD CPUs, e.g. Turin, and KVM's ABI
+is to support Directed EOI (KVM's name) irrespective of guest CPU vendor.
+
+Note #2, KVM doesn't support Directed EOIs for its in-kernel I/O APIC.
+See commit 0bcc3fb95b97 ("KVM: lapic: stop advertising DIRECTED_EOI when
+in-kernel IOAPIC is in use").
+
+Fixes: 7543a635aa09 ("KVM: x86: Add KVM exit for IOAPIC EOIs")
+Cc: stable@vger.kernel.org
+Closes: https://lore.kernel.org/kvm/7D497EF1-607D-4D37-98E7-DAF95F099342@nutanix.com
+Signed-off-by: Khushit Shah <khushit.shah@nutanix.com>
+Link: https://lore.kernel.org/r/20250918162529.640943-1-jon@nutanix.com
+[sean: rewrite changelog and comment]
+Signed-off-by: Sean Christopherson <seanjc@google.com>
+---
+ arch/x86/kvm/lapic.c | 9 +++++++++
+ 1 file changed, 9 insertions(+)
+
+diff --git a/arch/x86/kvm/lapic.c b/arch/x86/kvm/lapic.c
+index 5fc437341e03..4d77112b887d 100644
+--- a/arch/x86/kvm/lapic.c
++++ b/arch/x86/kvm/lapic.c
+@@ -1429,6 +1429,15 @@ static void kvm_ioapic_send_eoi(struct kvm_lapic *apic, int vector)
+ 
+ 	/* Request a KVM exit to inform the userspace IOAPIC. */
+ 	if (irqchip_split(apic->vcpu->kvm)) {
++		/*
++		 * Don't exit to userspace if the guest has enabled Directed
++		 * EOI, a.k.a. Suppress EOI Broadcasts, in which the local APIC
++		 * doesn't broadcast EOIs (the the guest must EOI the target
++		 * I/O APIC(s) directly).
++		 */
++		if (kvm_lapic_get_reg(apic, APIC_SPIV) & APIC_SPIV_DIRECTED_EOI)
++			return;
++
+ 		apic->vcpu->arch.pending_ioapic_eoi = vector;
+ 		kvm_make_request(KVM_REQ_IOAPIC_EOI_EXIT, apic->vcpu);
+ 		return;
+
+base-commit: 07e27ad16399afcd693be20211b0dfae63e0615f
+--
 
