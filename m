@@ -1,145 +1,240 @@
-Return-Path: <kvm+bounces-58529-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-58530-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 26E1BB960C1
-	for <lists+kvm@lfdr.de>; Tue, 23 Sep 2025 15:40:49 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id CB3CFB96192
+	for <lists+kvm@lfdr.de>; Tue, 23 Sep 2025 15:55:51 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D668B3BA8B3
-	for <lists+kvm@lfdr.de>; Tue, 23 Sep 2025 13:40:47 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 588413AC9F8
+	for <lists+kvm@lfdr.de>; Tue, 23 Sep 2025 13:55:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5F267327A16;
-	Tue, 23 Sep 2025 13:40:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 648662036ED;
+	Tue, 23 Sep 2025 13:55:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="OzjpRXqc"
+	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="eN2qW44h"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pl1-f201.google.com (mail-pl1-f201.google.com [209.85.214.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from SA9PR02CU001.outbound.protection.outlook.com (mail-southcentralusazon11013025.outbound.protection.outlook.com [40.93.196.25])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0C462327A00
-	for <kvm@vger.kernel.org>; Tue, 23 Sep 2025 13:40:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.201
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758634841; cv=none; b=fqoavlKv9Rhi6rF3bOaGlfpIVL0c2xt74DrGd1Jj4brCRvrT5APf/sLXYpQhvVzEm8vYPoKutSFZZhvMN4jM4vzck7uqERv8sRoajaEALp4EFml3LrY9OCFiJBqJwZDyFDa5U5uWMAnlCnlxuSqdQe7pjlCUt5do7zrqWABcMXQ=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758634841; c=relaxed/simple;
-	bh=jqiBUK9/mj3MBAI+kIAnz+rD1nKORVX6srf0Jf+a4hQ=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=uiRjmfCYy6ImIAlpk1HKO6u9TMypKw+9KbYQJE8EtXqXHW3X23WlZ0dHECZxk38d6uhfAqXwT2O2xO8+vWDcoqpU4zklLuMpvxIT5a1xSIGDbB14Q8MfohhURIW1+XetUnB/9GGOr15oRwmpsjuPIChkOpYqhugWHwItcA3Vvk0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=OzjpRXqc; arc=none smtp.client-ip=209.85.214.201
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pl1-f201.google.com with SMTP id d9443c01a7336-27c62320f16so14398945ad.1
-        for <kvm@vger.kernel.org>; Tue, 23 Sep 2025 06:40:39 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1758634839; x=1759239639; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=Q+q1ANiVdqE4PLX6BxhbC6Ed2UomSL/7PeR7UsDBlsI=;
-        b=OzjpRXqc+wPLui+uUjQxvQB/9bwrdmKQacZx4bg0CSx3kGi4sjkfejeoNg+CCUENSw
-         PCSMQG1bVF9z1N0wjWWQF5bSJSjNHXtm4EkAVVwsPXcmuJt/oIygLyr52pJVoGIe7awL
-         Foqr+5mTaJpipjOn0FND84xXDFnFEx2h6/hmYOVET1QXywopXUsIT4weOZJGePSDJRCH
-         y32XhQJIfTnMa+YebFgU8D2mMEhlLt5+T87YMAtBvXo2nq8Gm6HAYp5bmzUxvGEgv7Tv
-         IANGPZ6buFMf43hKQYuJRwHgO26BzqUhYf9Ef0RYVaUiSu3DmYia9hd0iBpWa6mseq84
-         +0Hg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1758634839; x=1759239639;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=Q+q1ANiVdqE4PLX6BxhbC6Ed2UomSL/7PeR7UsDBlsI=;
-        b=QGRmXLOUPdm99Bvf779dpET5gOFbmlnYwyDdV4VyEjPerqNMhZO76v1PnbotQO9D78
-         db22l7wo2gZTqMv+Vanv/ZWF6KQjrf8TysK81G+mg+PjVUWEBgEojGhAoFc/tiCA5Yak
-         DPaGRdf+9ax9KmMnmkARXzU5n4snOWiVcH2DmFzswlTWFGvgZH78Un5crIfmBQxFKCvc
-         2MCBdik/2VPGsAoOCr96t9XRV1TOeVOjuCf9zXZk8tKrmXCMM3c0BuzhzX/rEhGehtas
-         Duq5GQa//MCMtrklnhOXnAGPZsnPqtHHmpgPXsuZIebTkrrh94PSxi31EGSrJaYtU/Oe
-         KosA==
-X-Forwarded-Encrypted: i=1; AJvYcCXnUuvmcaez85yq7JXPbWn9ilWwtyVEem7JzXLUVgRbfyKYVy47cxvjutXHBWHXUgKL+9s=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwOHH/YXR9B4aCApm1lzouy/Csvq9mRe90fT7W4FCng9KV+hk83
-	lwvpwe4mS59crJ/xYdnzowG17x9wfozO+Pf1BZtpbpdbaV0klNKp8Fn5kgBpO7r9Z2hI1fAu3RJ
-	8G0eghA==
-X-Google-Smtp-Source: AGHT+IH1umU0hviOHL6mfJrfC/KblA1ofkjZSfEzaisGwPHRVVBGNbnvXRYWg5KI7SU4qrTt9g98pjrjG4g=
-X-Received: from pjbnd17.prod.google.com ([2002:a17:90b:4cd1:b0:32e:b34b:92eb])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:903:2446:b0:275:2328:5d3e
- with SMTP id d9443c01a7336-27cc3eee458mr34116465ad.18.1758634839306; Tue, 23
- Sep 2025 06:40:39 -0700 (PDT)
-Date: Tue, 23 Sep 2025 06:40:36 -0700
-In-Reply-To: <20250923012738.GA4102030@ax162>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D89B21FDE01;
+	Tue, 23 Sep 2025 13:55:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.93.196.25
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1758635738; cv=fail; b=uZrrvKQAcWk1pYDz0bcZneJy7hzBXIfpGesXXkBnD8kRmZ5+Z0Jd4z0+CzYiCsOSF99eULpm1NasJO2D6NgUuIadaz5u5B+LMVXmePQ1WYI8PdRZq2ZwPwVVxpIDDObK5v1GSfqL1mvzvcDnkq31Io6rGwUfnk6Iur4FwmH6mR0=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1758635738; c=relaxed/simple;
+	bh=vE9wAHrfQeFVzDErQBqkpA3piNvoxOi8uhSde2Ck6D0=;
+	h=Message-ID:Date:To:Cc:References:From:Subject:In-Reply-To:
+	 Content-Type:MIME-Version; b=TCuvELMU4xJtrRqcjHsupuEjbJ1NvlIK039Y7S1qmkYLzR0USTDGuciB3s9e2rYxLmPHvTdUDJ17RcWYClrMaFcvA/fedxrBHnzzURSbnh5neMNVtnC1i6Whtihg+2qIQD1An5GXt1NjGPUZ4J2APHpBviorPaGBM50kW+8cNZ0=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=eN2qW44h; arc=fail smtp.client-ip=40.93.196.25
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=hSdyoB9Bpgb8uCnyyDr1mWjW2ojqLrWWZqFw6JsgplvmPyBKDFfnc+HdHV3bTKl6N7FsGSSMrHUy3eCkmWNo/T8Fse0eCVM+6X0oG6eHxejMY22iNv6cq4G1gtC3SooSgeInFClNGpU9nR35bfYdkq54ymbag6+Vs7CihAdT0VQnoh8HskPRNTi6TO80ZMNLEo45LJBMMcjeOvy52u6UofP5ig8vAT36rK013XRXtJc4Gv795N36jap4n8o1bqybSWlMUXDyCVn1OOrH7bE+Bv56USbGLTqCgNahjEnIO0n+GZkKVW2g1Mqbj3y5Shlb4sAQv6Hp1G6TM4wrMkA2ug==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=i0B39goFhWNZfNASQjG0gzgbTecj0gYZtkzI0VJkq6o=;
+ b=W0mobvrUEk6QsOLbzLymgBS9utopWvViGIrjm6jsRmlmjiLduo3RTE6oAPR2fWqfq0mRCGYRBmPoL9bIOezC6enrZG8tVciyhDGs6Za/sEn1BKZf+P7LuWE+E9/05DETt4dfwNr+Gua0nHLWJT6/yyq1m32I5pA3+s7iT7GV+cXqy6MZ7XYrYdk9DUacsN2tD6LrQYzefGl7LJ17LfS2k17CMG2woVNmPP9Tg+KRiU5NSa84FGzTjegKMEAk4e16aS0ne5dGrIYpW/YnoHP8DrbKOKQkA2lFZopqvTI2mY5Gc1gxSciGxfyCu4yq8c+W/uiPeRmZiL03B6jUFSThBg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
+ header.d=amd.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=i0B39goFhWNZfNASQjG0gzgbTecj0gYZtkzI0VJkq6o=;
+ b=eN2qW44hPqCStcu38xn/kpUHyf7UsxIzMxA3YRR6Zig5uK59HOZUqBZgWrow58wti3GX4xEiRSZdhw1Cb0RbHoiM5cKElPDMpOU47D0yACf5wHTlGYelGxaoxr3J4iUFabJUXfddJh+cEegl8LTI00+rwYSF9b26izzqpXeqQnA=
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=amd.com;
+Received: from DM4PR12MB5070.namprd12.prod.outlook.com (2603:10b6:5:389::22)
+ by SA1PR12MB9515.namprd12.prod.outlook.com (2603:10b6:806:45a::20) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9137.20; Tue, 23 Sep
+ 2025 13:55:34 +0000
+Received: from DM4PR12MB5070.namprd12.prod.outlook.com
+ ([fe80::20a9:919e:fd6b:5a6e]) by DM4PR12MB5070.namprd12.prod.outlook.com
+ ([fe80::20a9:919e:fd6b:5a6e%4]) with mapi id 15.20.9137.018; Tue, 23 Sep 2025
+ 13:55:34 +0000
+Message-ID: <82e85267-460e-39d5-98aa-427dd31cfadc@amd.com>
+Date: Tue, 23 Sep 2025 08:55:31 -0500
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.15.1
+Content-Language: en-US
+To: Neeraj Upadhyay <Neeraj.Upadhyay@amd.com>, kvm@vger.kernel.org,
+ seanjc@google.com, pbonzini@redhat.com
+Cc: linux-kernel@vger.kernel.org, nikunj@amd.com, Santosh.Shukla@amd.com,
+ Vasant.Hegde@amd.com, Suravee.Suthikulpanit@amd.com, bp@alien8.de,
+ David.Kaplan@amd.com, huibo.wang@amd.com, naveen.rao@amd.com,
+ tiala@microsoft.com
+References: <20250923050317.205482-1-Neeraj.Upadhyay@amd.com>
+ <20250923050317.205482-6-Neeraj.Upadhyay@amd.com>
+From: Tom Lendacky <thomas.lendacky@amd.com>
+Subject: Re: [RFC PATCH v2 05/17] KVM: SVM: Do not intercept
+ SECURE_AVIC_CONTROL MSR for SAVIC guests
+In-Reply-To: <20250923050317.205482-6-Neeraj.Upadhyay@amd.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: SA9PR10CA0006.namprd10.prod.outlook.com
+ (2603:10b6:806:a7::11) To DM4PR12MB5070.namprd12.prod.outlook.com
+ (2603:10b6:5:389::22)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20250919003303.1355064-1-seanjc@google.com> <20250919003303.1355064-3-seanjc@google.com>
- <20250923012738.GA4102030@ax162>
-Message-ID: <aNKjVLpajXCKfqr_@google.com>
-Subject: Re: [PATCH v2 2/5] KVM: Export KVM-internal symbols for sub-modules only
-From: Sean Christopherson <seanjc@google.com>
-To: Nathan Chancellor <nathan@kernel.org>
-Cc: Madhavan Srinivasan <maddy@linux.ibm.com>, Christian Borntraeger <borntraeger@linux.ibm.com>, 
-	Janosch Frank <frankja@linux.ibm.com>, Claudio Imbrenda <imbrenda@linux.ibm.com>, 
-	Paolo Bonzini <pbonzini@redhat.com>, Vitaly Kuznetsov <vkuznets@redhat.com>, 
-	Tony Krowiak <akrowiak@linux.ibm.com>, Halil Pasic <pasic@linux.ibm.com>, 
-	Jason Herne <jjherne@linux.ibm.com>, Harald Freudenberger <freude@linux.ibm.com>, 
-	Holger Dengler <dengler@linux.ibm.com>, linuxppc-dev@lists.ozlabs.org, kvm@vger.kernel.org, 
-	linux-s390@vger.kernel.org, linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: DM4PR12MB5070:EE_|SA1PR12MB9515:EE_
+X-MS-Office365-Filtering-Correlation-Id: 2bc90738-94fb-4f05-7a84-08ddfaa8dd95
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;ARA:13230040|376014|1800799024|366016;
+X-Microsoft-Antispam-Message-Info:
+	=?utf-8?B?d2pZY1VUY1E4M2N5Y2lId3RMdjBJUFk2a3JWT2hhZnBOZjdpZVV3akI4SDB6?=
+ =?utf-8?B?TlJGT3RQKzBhN0p1anR3N0ZYdEFXTlhLSkcranp4YUFzM3FNODJyTS9IRXpQ?=
+ =?utf-8?B?Q0IzQnlaU0VieExjSVVjZE5PeGZqNDZZUjNQQUtnbFFWbTRPOWNMbWtEZUk0?=
+ =?utf-8?B?aXg3VjNnTkNsUE5zS29TeStUUzhsRFhyOVJ2RE5nVENma2RmK2U4NlBOZlZl?=
+ =?utf-8?B?cEpNK1NuWTJhSUxxVjRIR2ovanY3VFlhM2JzUGRzemtOak9DWDJ1cnkrS1Qv?=
+ =?utf-8?B?VnBHSGZZN1dFNU9rR1RMc0ZHcjBkT0wrQkdqcy84aDdXalR6cnJYcWZHc2Jz?=
+ =?utf-8?B?V2tqeHJQVHNTaFA0VzdpSjVObXAwcnRGbTByZmE2SXdCQVB0VVZiMWxhM25V?=
+ =?utf-8?B?YmVSMEQxQ1JPRUg5Z3pKOENVUnU2dUllTFFCNUtXNlZ6YXlMVXVORS9LTGE4?=
+ =?utf-8?B?ZlhTMVA5ZzJTRHhySlRDYXppNXQ2b2l6V25rSVp3R3FQbjQxcUJpeU95RXlQ?=
+ =?utf-8?B?QmY0WW4zRmNnZm1GTElpOGMyL28rNC9BajFuNGN0N2xNb2dqVXN0RVJMSUkx?=
+ =?utf-8?B?WDhxL3E5U3RYZCt4bC93dHcwZTNVdlY0NDYzcENUYzJOcGxpVGtKQTF4WSs5?=
+ =?utf-8?B?MHZkR2ZxVVg3dlk5THNrY1FwOUtUMzMrd254V0hmb3I4bmF6S3o1MlZybC9u?=
+ =?utf-8?B?cks1QUxheTViVG5XWnpuUU9oVmZQOHBrNERkanVMekdNbXduMFBDZ1BrdFo1?=
+ =?utf-8?B?NTR4Nm8ra2I5dzJmaFQ2QmVCM3hvdmlzM2ZTTFg1cDF0SzMvSUVxR21YUXlh?=
+ =?utf-8?B?aTk4T29XbnNleUpPaGwvc0sxVHJmVHRpZ3N1d21iaVJJZmhnZjZoQVVQaFdh?=
+ =?utf-8?B?TGlMSVFleGhkZThXNWRZeXJVcjJBMkIvS0E2Q29WbkY2VjB6b3IzaWwvYjZC?=
+ =?utf-8?B?eitpdUhJNDNFa25YNVB4U1hNUmlsdDlFUXo3UUZoWnhlNnNHUW1FOVl6MGd2?=
+ =?utf-8?B?QmpydWY1ZHRId0k3L295VGNCYnYrMzNud0luV01uak5YdWNNRlB1NGlZWnIz?=
+ =?utf-8?B?QWF1K1F5MFFOMURCdHRMTk9nV2YzazhJcitvV3U1SzQrQ0orSXMyMWJmeWl6?=
+ =?utf-8?B?UkJVUXpiY053Uk1XMmwyV1FvZ283YVNKR2lBZ0pyMXVOWGJPWUxvYVdsbndo?=
+ =?utf-8?B?SmhnREJQNldBWWM2UUJZbUVvSks3NUVBZUhHV1NYSkhsbEMzSTlSZWJsbXdL?=
+ =?utf-8?B?OUdZUndWMHQ0RzFBWUVsN21kT0lTRmpTWHUwWENCRmJBRDVocTM2cVdoOWVP?=
+ =?utf-8?B?R21ocGFlY01GTHpVclVFRWk1SzNhRTV2d0hnVk4xQTVXd21TMWtoT0dpMG1w?=
+ =?utf-8?B?S29nTjZWTW9GaGtRLzZDaFpOUUlVS2RRK0t3aGZhc2R5M21aaHZuMXltOHZW?=
+ =?utf-8?B?SHVoWWxVRlRndzJSUWcwS05ra3dkNDBSN2tMYUFralRjUzczWEhMeXVHa2Fl?=
+ =?utf-8?B?YUgxODlRTWhyMSt4cXJoVzNkUXZVR1dVTTRwdFpZTEFhTlZ5emFwOUZoTGR2?=
+ =?utf-8?B?NzJQSFVvRVdncTFFU2RrRVVlbVZzKzBhMDBtcG5qY1pyMGZ4STdkNkd5TW9r?=
+ =?utf-8?B?YXZPVW1TSE5SU3kyaDM4dzlDME01cVIvUE5SdEV1OXZkL1lPMUF2aXZ5a1pa?=
+ =?utf-8?B?SFpEVGx6OW5CbU9XRHpnTXRtSnV1dXl4MS9GRHhtTmJvcFZHNG43ZVRIUU9Y?=
+ =?utf-8?B?RDFTcUdtMmp1ZUNHbXhSMExiV3hKQ1gxYnk3UGxZMEJ5NUpvdERnVE10bkxn?=
+ =?utf-8?B?ckttODYrbm0xajNhd0JDR2dFWE1zSjhxQUVrckRiVUN0MEpKLzArTlp5K3BH?=
+ =?utf-8?B?YU8yUTJqSkhadVdkbjl3ZmF3c2VNQURxaHdQT3dyS1M2bGRWTUR1UHEwWEtB?=
+ =?utf-8?Q?7+DlNNA9tAM=3D?=
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM4PR12MB5070.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(376014)(1800799024)(366016);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?utf-8?B?bUhKZ3pObks3dk5ERjR2Vms4cTB2V1N1OWFESE1rMk9nYVh0ZXRtR3MxQTFi?=
+ =?utf-8?B?Ym1GejcraElRZ0pJQk93OFBlZGhTMWFKQ1BWZk9QQTFHYWVlN3Z4anVkTnNF?=
+ =?utf-8?B?NldueWxnVGFOdlo3YjB5VEthN2xXOS9ybEVUbDRXeXd0SDIyTXlVZnBYTzZh?=
+ =?utf-8?B?N01VekdiRVhpYk9PTXpXSTN1Q1BWVXB5NVVmT0tUaW1uMHREQ3FvRzA0c2ZK?=
+ =?utf-8?B?OU5tRXhhNFo2OU9pRWxhc1FiUnZGMnVPT0ZhaDllRUM2Z0JBNHU3ZTlRWGRu?=
+ =?utf-8?B?S0lwL04wd29WajRaNW9MQjB2NmhGb2Q1citDaWtabUo4dnN4VXN6cUhwMTBK?=
+ =?utf-8?B?c3ZHc2U4YUdxU0ZxVkZueW03bHEzTnVvdldOZE1qdGJkYXNNdjBTaU5Sb1J4?=
+ =?utf-8?B?N2tzTXVUdnVGTnNKU1RpWmhUNEJ1RWtUWmp1YzVNN3pBSVVGNmJXWmNkY0R1?=
+ =?utf-8?B?V29uOUV4ZUM0K1BYSkYrQ3NDMFgvNmJpeDRXV2xlOTlzdHB2cWl3bmxNdFI0?=
+ =?utf-8?B?NXRrZlBIV1RFWVQ4Tk9iMmZtWGNYaXdNMFFvZ1NidFhxM29lL0tibzNHZ1lm?=
+ =?utf-8?B?dmxQNGNCOVE1RTJyUldIRWRBTWNnNjFOODZ2dTRNRHcvOWxTOEw4MVNCVWVm?=
+ =?utf-8?B?dVlCNFVCaHZ0YUU0WXhJcGIzTStmTVlmVzdTVjVadjk5Y1RuQkM3TkpSL3dO?=
+ =?utf-8?B?RnpkejJVNGE4VWdwaVQyaXFUL2VBNVFjbGVSeEhkQUMxbWlLdW1rL2grQzNz?=
+ =?utf-8?B?bnFaaGNOTWxEZ2RoRmpNbXB4ZFpvZm1XdkowajdiYkY5L3N5bzJsV1VxV1pi?=
+ =?utf-8?B?NnRnOVQrNStkSkVsRlppd3B6S0t1TnZkWjN6RGFtRnJOT1graXpTQ1ZmZkdI?=
+ =?utf-8?B?Qi9oOTFaaWxHbkFSWEI5VzN6aTZyWXUyL0dZRytySmMrRnhlU1dPOGpzTWZW?=
+ =?utf-8?B?L2JmQWdCUkFDK3p0ZjQycXcvSU9vcDB5d0hPeGdGNFJhVHRDZEh2bGY2LzRR?=
+ =?utf-8?B?dFdrSUxCRTRLT0pRMjNWamJFMi8xNzdUdEl1bmVoaTE5MU8xTU0zeS8ybkRm?=
+ =?utf-8?B?NGhpQlRDcVJtUHJoRllUSlZrNGpFZFlEbG5wZ3Nud3l5cWlCSmxsQ1N3NjJY?=
+ =?utf-8?B?a1ZKOVZpTlFEaHhjOFBBdG1mK1ZXMTFhdkNZcjBCVi9hZm1HN3lCNTJ6REMy?=
+ =?utf-8?B?RnhoaUdiZk9IQjZIQzBybTFIQ1duT3NZblA3TXhQS0RPMDhPMDhXc01QemM3?=
+ =?utf-8?B?Vlgzczl5aFUvZHF3MmpPcVJZb3NqM3Bqa3pHWjhtL09sNTdieDF3MUYvVjBH?=
+ =?utf-8?B?N2QzaUhOMlk5MlAyTU1RZTBFaHQyRlBNVmdNR3VjZVRHci9PTmkwZ3V6cTVT?=
+ =?utf-8?B?ZEEzMFk0M0lWSTVzdGNGZlkyajdzcWEwaUN6U29JQ2VYZzcva1QzaTNNQXFC?=
+ =?utf-8?B?MWNnazRlcVpxUEVXSmc2R3BuNVFCRDVHZVVUblovQmxyeGhsa25HckVaRUpD?=
+ =?utf-8?B?T3hrNVI2MFhsbm5mV2NUbXkwM3Yrazc4cHE2SFc0LytGdklLTWZlWVlIczJF?=
+ =?utf-8?B?ZkpLOVZWU2NVQ2dtcXRpYnNxemNSdmltMmRwbDROVlFlQzhEK0loWnFndTZw?=
+ =?utf-8?B?dmhOdDRCVXBmVDJXYWpBUHR3TGVTVDFMbXNqeUUvaDlBeXZIaXl1MjFPSitI?=
+ =?utf-8?B?QU1DY1pWZmlGQlEwbitwaE9UQVM5YlJsODgrV2JWaDlOS2FtTXYzNlR1VVl5?=
+ =?utf-8?B?QVVqRUFRa2xXSy9LY3BzY2lsSEs5Um8rcDdZck5KOVVpSjc4Y1dvbk5MUHN1?=
+ =?utf-8?B?aEg3bDdoRnA0QTBnV1Bhbzg0Q1NHNXZIZ2Q5L083aVVKdjJ4RGxEYWhMS09z?=
+ =?utf-8?B?enZueXg2NGhQRVMwbGltUlZLQUQyN0RBbFNabytJanBRWEVYbFJ6am42V0Jl?=
+ =?utf-8?B?RFlOL1hHbFZNdVlMV09pNldLdzZqZUVRNVVVdnhmV1lSMTNrakh4QjNpY3d2?=
+ =?utf-8?B?T1YrYVVhR3JNWVZUTzdMcG1DbUhBODR5LytQUDlLeEc1V2wrQ3cvdlkwZDRm?=
+ =?utf-8?B?Z2p5VGQyM2h4ZFJOUWswYnAxSnVaejJ3NW5leWJ6UDBjWkxMMmVacEpWbzFj?=
+ =?utf-8?Q?wwNWIwQC44WPDb2unveh6qqhC?=
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 2bc90738-94fb-4f05-7a84-08ddfaa8dd95
+X-MS-Exchange-CrossTenant-AuthSource: DM4PR12MB5070.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 23 Sep 2025 13:55:33.7944
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: +G8ALPTw7f1m2ha3ypjg+nCVB5BzBV55xJSmfZr+wiDDSYHgBAGlzwDkCOfE/ILdd5kzS0Ko3gI9hQVtHKm4QQ==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA1PR12MB9515
 
-On Mon, Sep 22, 2025, Nathan Chancellor wrote:
-> Hi Sean,
-> 
-> On Thu, Sep 18, 2025 at 05:33:00PM -0700, Sean Christopherson wrote:
-> > diff --git a/arch/powerpc/include/asm/kvm_types.h b/arch/powerpc/include/asm/kvm_types.h
-> > new file mode 100644
-> > index 000000000000..656b498ed3b6
-> > --- /dev/null
-> > +++ b/arch/powerpc/include/asm/kvm_types.h
-> > @@ -0,0 +1,15 @@
-> > +/* SPDX-License-Identifier: GPL-2.0 */
-> > +#ifndef _ASM_PPC_KVM_TYPES_H
-> > +#define _ASM_PPC_KVM_TYPES_H
-> > +
-> > +#if IS_MODULE(CONFIG_KVM_BOOK3S_64_PR) && IS_MODULE(CONFIG_KVM_BOOK3S_64_HV)
-> > +#define KVM_SUB_MODULES kvm-pr,kvm-hv
-> > +#elif IS_MODULE(CONFIG_KVM_BOOK3S_64_PR)
-> > +#define KVM_SUB_MODULES kvm-pr
-> > +#elif IS_MODULE(CONFIG_KVM_INTEL)
-> 
-> Typo :) which obviously breaks the ppc64_guest_defconfig build.
-> Changing that to CONFIG_KVM_BOOK3S_64_HV fixes it.
+On 9/23/25 00:03, Neeraj Upadhyay wrote:
+> Disable interception for SECURE_AVIC_CONTROL MSR for Secure AVIC
+> enabled guests. The SECURE_AVIC_CONTROL MSR holds the GPA of the
+> guest APIC backing page and bitfields to control enablement of Secure
+> AVIC and whether the guest allows NMIs to be injected by the hypervisor.
+> This MSR is populated by the guest and can be read by the guest to get
+> the GPA of the APIC backing page. The MSR can only be accessed in Secure
+> AVIC mode; accessing it when not in Secure AVIC mode results in #GP. So,
+> KVM should not intercept it.
 
-Argh, so many flavors of PPC KVM (says the x86 person :-D).
+The reason KVM should not intercept the MSR access is that the guest
+would not be able to actually set the MSR if it is intercepted.
 
-> > +#define KVM_SUB_MODULES kvm-hv
-> > +#else
-> > +#undef KVM_SUB_MODULES
-> > +#endif
-> > +
-> > +#endif
-> 
-> Also, you'll want to drop kvm_types.h from generic-y to avoid
-> 
->   scripts/Makefile.asm-headers:39: redundant generic-y found in arch/powerpc/include/asm/Kbuild: kvm_types.h
-> 
-> diff --git a/arch/powerpc/include/asm/Kbuild b/arch/powerpc/include/asm/Kbuild
-> index e5fdc336c9b2..2e23533b67e3 100644
-> --- a/arch/powerpc/include/asm/Kbuild
-> +++ b/arch/powerpc/include/asm/Kbuild
-> @@ -3,7 +3,6 @@ generated-y += syscall_table_32.h
->  generated-y += syscall_table_64.h
->  generated-y += syscall_table_spu.h
->  generic-y += agp.h
-> -generic-y += kvm_types.h
+Thanks,
+Tom
 
-Thanks much!
-
->  generic-y += mcs_spinlock.h
->  generic-y += qrwlock.h
->  generic-y += early_ioremap.h
-> --
 > 
-> Cheers,
-> Nathan
+> Co-developed-by: Kishon Vijay Abraham I <kvijayab@amd.com>
+> Signed-off-by: Kishon Vijay Abraham I <kvijayab@amd.com>
+> Signed-off-by: Neeraj Upadhyay <Neeraj.Upadhyay@amd.com>
+> ---
+>  arch/x86/include/asm/msr-index.h | 1 +
+>  arch/x86/kvm/svm/sev.c           | 6 +++++-
+>  2 files changed, 6 insertions(+), 1 deletion(-)
+> 
+> diff --git a/arch/x86/include/asm/msr-index.h b/arch/x86/include/asm/msr-index.h
+> index b65c3ba5fa14..9f16030dd849 100644
+> --- a/arch/x86/include/asm/msr-index.h
+> +++ b/arch/x86/include/asm/msr-index.h
+> @@ -707,6 +707,7 @@
+>  #define MSR_AMD64_SEG_RMP_ENABLED_BIT	0
+>  #define MSR_AMD64_SEG_RMP_ENABLED	BIT_ULL(MSR_AMD64_SEG_RMP_ENABLED_BIT)
+>  #define MSR_AMD64_RMP_SEGMENT_SHIFT(x)	(((x) & GENMASK_ULL(13, 8)) >> 8)
+> +#define MSR_AMD64_SAVIC_CONTROL		0xc0010138
+>  
+>  #define MSR_SVSM_CAA			0xc001f000
+>  
+> diff --git a/arch/x86/kvm/svm/sev.c b/arch/x86/kvm/svm/sev.c
+> index b2eae102681c..afe4127a1918 100644
+> --- a/arch/x86/kvm/svm/sev.c
+> +++ b/arch/x86/kvm/svm/sev.c
+> @@ -4487,7 +4487,8 @@ void sev_vcpu_after_set_cpuid(struct vcpu_svm *svm)
+>  
+>  static void sev_es_init_vmcb(struct vcpu_svm *svm)
+>  {
+> -	struct kvm_sev_info *sev = to_kvm_sev_info(svm->vcpu.kvm);
+> +	struct kvm_vcpu *vcpu = &svm->vcpu;
+> +	struct kvm_sev_info *sev = to_kvm_sev_info(vcpu->kvm);
+>  	struct vmcb *vmcb = svm->vmcb01.ptr;
+>  
+>  	svm->vmcb->control.nested_ctl |= SVM_NESTED_CTL_SEV_ES_ENABLE;
+> @@ -4546,6 +4547,9 @@ static void sev_es_init_vmcb(struct vcpu_svm *svm)
+>  
+>  	/* Can't intercept XSETBV, HV can't modify XCR0 directly */
+>  	svm_clr_intercept(svm, INTERCEPT_XSETBV);
+> +
+> +	if (sev_savic_active(vcpu->kvm))
+> +		svm_set_intercept_for_msr(vcpu, MSR_AMD64_SAVIC_CONTROL, MSR_TYPE_RW, false);
+>  }
+>  
+>  void sev_init_vmcb(struct vcpu_svm *svm)
 
