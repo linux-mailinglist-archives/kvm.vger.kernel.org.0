@@ -1,489 +1,186 @@
-Return-Path: <kvm+bounces-58541-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-58542-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9856EB96705
-	for <lists+kvm@lfdr.de>; Tue, 23 Sep 2025 16:54:05 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id BEBC8B966F3
+	for <lists+kvm@lfdr.de>; Tue, 23 Sep 2025 16:53:32 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id EE8CF3B4C63
-	for <lists+kvm@lfdr.de>; Tue, 23 Sep 2025 14:48:33 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 8D33219C46D8
+	for <lists+kvm@lfdr.de>; Tue, 23 Sep 2025 14:49:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7AD602561AB;
-	Tue, 23 Sep 2025 14:47:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 50ED025A340;
+	Tue, 23 Sep 2025 14:48:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="BdVcUy0K"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="HqUxqali"
 X-Original-To: kvm@vger.kernel.org
-Received: from BL0PR03CU003.outbound.protection.outlook.com (mail-eastusazon11012056.outbound.protection.outlook.com [52.101.53.56])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6582924A063;
-	Tue, 23 Sep 2025 14:47:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.53.56
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758638846; cv=fail; b=pAwIYrPs0qtiDgL4aAMkOabXxrYcaDnDDsoJqWfOhmyNIprfoCxe3iisrC2UyPlsosfueB1Lln2LW2+E86F8P0noLY91KhiGZKxnr2HArcnnjvfVtIvlgRMm8drVnZDpPN7M9P0m0KO6U+ryd9j3zTVSPbfvX+zgxCKBuLw4ppQ=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758638846; c=relaxed/simple;
-	bh=E1KZcPf+tssnAt494KK7pRrErwvHGkZUh8erQgPIGpk=;
-	h=Message-ID:Date:To:Cc:References:From:Subject:In-Reply-To:
-	 Content-Type:MIME-Version; b=g+BjW3kKBnV67NSVJlJ5nxKAQeNVwwKVJMY1kqA6AwavimiRaXPcqLVGf6Eg1XssufBCY7enlA5xjccscNB+hlcnPto30RW1c2L+lCa+dme5h3jzacTP6s6/U9stP3P2Br9MkF/372JmAQr/6H18FDxkz9oWiimj0nhIHIe0iBo=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=BdVcUy0K; arc=fail smtp.client-ip=52.101.53.56
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=hm8kRW+tjq+v/tj9P24Jfl5RBQXpJ1gv2CAYIMCoxcEqTQmUqNsgYVzFUXYH8AMNHR9eAC0zvw2H59y34PGp0/3MIv6juBAGzT6Sr4mTdYp7+OQ0LrrT6aOXtp5vzSP4j1bioZsUDpWDGbQVVNzKVP/659RP8nRMCcs5gGZVAcdCBfCWMArRnrT3jn6clCxbr28JMdypOEZrVXEd6ocfiAzaXOXLvCfAhmffSK3AJUqSlGs6EgPynVii5UMI/h1F3twUdIKr8POdoAi8HGwpYdjS2DP/0FblSFsukvZTWwaSo6unOrVY2JmToFl7bizkK7NHkErQVBLbF1EEm6wLbg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=rqo8bs2BN2qsn+QmgeLnfPkG9c7PSDESd0r0AifiaHo=;
- b=DTMxHmamDNGt63MNG12WWN1s/27g2/hCK8s/fr3bLURUp1oWVt2u8XnsYEV7pujWPE0Qn89Z/vUf20HOMSGlkkyPKnwt3mf52ydgkk3BqfYdrd/zYg7C/lGqGImhZws+zlOoODjz5cCBWkvlC8OogzllpvnciOeJ3YIDqvj+dD35qboNV1oNEAPdsBBFLChPRCGnOXbGZTaxiRO2b4hGvWIEMwmbvWi1Mbxjb646qsDq4FHdk2HtYjsZ+ujxDc2FbnbgIKVKh44sGu1tMg3nb05L5R5svH9tlpo5T0Ce2T3xBOhjuaBYo5Im9M69DM7B6i8rNvkkoP50i/tZze3lFA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
- header.d=amd.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=rqo8bs2BN2qsn+QmgeLnfPkG9c7PSDESd0r0AifiaHo=;
- b=BdVcUy0K7T6KB8Lym+DPnnLeDFA044H9adiR6tD8QrBDVhWGPoMp/LAlETdK7y1JJG158YaKmEbUMDYNUYdgsKJ+3dFFaMKN7Uxf9jbf8LhPq5/Gs87marsJwt8eKCJdBbPWkVw3snwvZQgZSEOTbQv8sQMEbVgXjxMnY8mNB+0=
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=amd.com;
-Received: from DM4PR12MB5070.namprd12.prod.outlook.com (2603:10b6:5:389::22)
- by SA3PR12MB7904.namprd12.prod.outlook.com (2603:10b6:806:320::17) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9137.20; Tue, 23 Sep
- 2025 14:47:21 +0000
-Received: from DM4PR12MB5070.namprd12.prod.outlook.com
- ([fe80::20a9:919e:fd6b:5a6e]) by DM4PR12MB5070.namprd12.prod.outlook.com
- ([fe80::20a9:919e:fd6b:5a6e%4]) with mapi id 15.20.9137.018; Tue, 23 Sep 2025
- 14:47:21 +0000
-Message-ID: <10d91fe6-c5b7-fbdb-f956-bce7b2e77221@amd.com>
-Date: Tue, 23 Sep 2025 09:47:11 -0500
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.15.1
-Content-Language: en-US
-To: Neeraj Upadhyay <Neeraj.Upadhyay@amd.com>, kvm@vger.kernel.org,
- seanjc@google.com, pbonzini@redhat.com
-Cc: linux-kernel@vger.kernel.org, nikunj@amd.com, Santosh.Shukla@amd.com,
- Vasant.Hegde@amd.com, Suravee.Suthikulpanit@amd.com, bp@alien8.de,
- David.Kaplan@amd.com, huibo.wang@amd.com, naveen.rao@amd.com,
- tiala@microsoft.com
-References: <20250923050317.205482-1-Neeraj.Upadhyay@amd.com>
- <20250923050317.205482-7-Neeraj.Upadhyay@amd.com>
-From: Tom Lendacky <thomas.lendacky@amd.com>
-Subject: Re: [RFC PATCH v2 06/17] KVM: SVM: Implement interrupt injection for
- Secure AVIC
-In-Reply-To: <20250923050317.205482-7-Neeraj.Upadhyay@amd.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: CPYP284CA0042.BRAP284.PROD.OUTLOOK.COM
- (2603:10d6:103:81::11) To DM4PR12MB5070.namprd12.prod.outlook.com
- (2603:10b6:5:389::22)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9CD06244685
+	for <kvm@vger.kernel.org>; Tue, 23 Sep 2025 14:47:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1758638882; cv=none; b=kXT4j5Cb2GioshFzpsGJtgfOEq3uSn+CWTQ6aW0MOEXlmotzz4kgyYpDcRI/SZ2jJBDqcoTmuwn21tBrGlJEMAEZ6hHBg0e3aUDBbxZGfN/O/F6PuO1D069DgrmCpz/a2jllfO19Vs+QcQGs7CGYyP02uxh+7SJTPPn/1NeaIww=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1758638882; c=relaxed/simple;
+	bh=KeqE1HEyB8QFnK2pN1rXqm6q+uT9Q0dbCDWcjv2Nc1M=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=n34JkwFGUND1FLybu/D+8KZVVg0ySbAdnVFZxik4Zgo0cw7TsBaxKE+jeaEPF7snymKFm1SbBHTX5bnvDjaIK7HcslJX6fe2iCfVsnHYa2TalkWDGRj8A5bf4kHqo4l58rXzWJuvJhaP/iqakIsqKbxBQVDV/n5boWem7RjtfBA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=HqUxqali; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1758638878;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=lGsm6H7P2q74l6MeTkSvpQNEFLpHSBIxi1h0StSUMNY=;
+	b=HqUxqalit4ylNklbXO2dF3Q4PV+nAEN4XjrUomQ4Sd2auRZvD9oNNYqJFoTqy1gy1alT4C
+	+Zo2SdoxuQ9nTSDPCHWiF8Uc4H1YWCq5BmtMKHX6uP4hh8OXKLivkBX329Ln5qMU/wa1o6
+	aNPvUnB2NSSx0fEEpWtVoUQnB1ydJwc=
+Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
+ [209.85.221.70]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-359-YFEcmEa7Nem0omnBtZqplg-1; Tue, 23 Sep 2025 10:47:57 -0400
+X-MC-Unique: YFEcmEa7Nem0omnBtZqplg-1
+X-Mimecast-MFC-AGG-ID: YFEcmEa7Nem0omnBtZqplg_1758638876
+Received: by mail-wr1-f70.google.com with SMTP id ffacd0b85a97d-3f42b54d159so3196544f8f.2
+        for <kvm@vger.kernel.org>; Tue, 23 Sep 2025 07:47:56 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1758638876; x=1759243676;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=lGsm6H7P2q74l6MeTkSvpQNEFLpHSBIxi1h0StSUMNY=;
+        b=vhCmbYbrzw6Mhb4zEpmOiLJ1oW9yg0u1MZwJOqFcWI1qggTm6PIey/kLvvTG09xNm/
+         fQURqeNed4J9zIl1wYmDKTo056/xBi4cVQ1N9NPyaqepuLP5++xGuh4HDcmSDyGBaeVb
+         CmaPuNr4u7vasiCzBnqn9S4fJGEzDE1XcXEw2ReA04XG6qkCoVVP8hiQ3iorLX+50ylh
+         6l+GF/54h8zPPmxkmsDCqsv/p1u+ojcUXv11KA06nGBtN8AMVHszMy69nn0kNaj8WWbI
+         A61API8Yozd0lMgKFchgHxgyUwSUV0pt10An7Up7myGTQ9Ho2BOyfDc+BDuyt9AlQqRv
+         U9/w==
+X-Forwarded-Encrypted: i=1; AJvYcCUDnvOUPCL3Uw8FKrAt+4JrV/bc94gR/bei6MpZLejCdSBADeEkDFYX7Nvek7oBbtBKbqg=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyHExlLH7Z3MvBgIDO5u9cbdCgtdjGadlEOK4ht9RoTuxouxhWD
+	ZbDBmHGA5IdMRasRNiwPVrfokDp1V+lwK/ERvSldm0y+v1h/3E9QLK3dVxh6kqk1HerK1WLb3f5
+	hYDZQQvHXrtl/j+sUiGYGJcegyRHflZihZDxOiDBrd4Axlc94Ufdyxw==
+X-Gm-Gg: ASbGncuytR4kn+R9ea7tehFqJvMpAhI62HvsNKYAYcRhM36u0yqk5izzVAFiCTFp1zH
+	BSjnd2ClSu35+YpcEaKsg9ZwRosOs4IjpeJ/pltGYfFvOjhFBNvLqNLgH3a9yiovzHKzJp0rq8A
+	LkB3vg/K8CGqEQcks0ANd691ea87IoGCUVhFTeWDnU3qr+Hni82NpHPfmOFKQh5RsowqIRhdIUh
+	zPFReIGtxRIuVcW7RuCM4M9OLnTWFUBd683ezM2bkHSVtHM580zdvWCyXNSWYMFL0Z3SKVa6Tct
+	m/Un6BMj+h04p/6mS0sMALMZkyuMAcBMUu4=
+X-Received: by 2002:a05:6000:220c:b0:3f3:88e1:9e30 with SMTP id ffacd0b85a97d-405c5bd85e9mr2624048f8f.15.1758638875916;
+        Tue, 23 Sep 2025 07:47:55 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IFVQW7wtomtpR1qDlFcvwbCRqGqsve/Ts8yCwjgDlTYhRUQTsERWyfPd2452H8Z8mCijph+Xg==
+X-Received: by 2002:a05:6000:220c:b0:3f3:88e1:9e30 with SMTP id ffacd0b85a97d-405c5bd85e9mr2624025f8f.15.1758638875505;
+        Tue, 23 Sep 2025 07:47:55 -0700 (PDT)
+Received: from redhat.com ([2a06:c701:73ea:f900:52ee:df2b:4811:77e0])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3f61703b206sm14087074f8f.6.2025.09.23.07.47.54
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 23 Sep 2025 07:47:55 -0700 (PDT)
+Date: Tue, 23 Sep 2025 10:47:52 -0400
+From: "Michael S. Tsirkin" <mst@redhat.com>
+To: Simon Schippers <simon.schippers@tu-dortmund.de>
+Cc: willemdebruijn.kernel@gmail.com, jasowang@redhat.com,
+	eperezma@redhat.com, stephen@networkplumber.org, leiyang@redhat.com,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+	virtualization@lists.linux.dev, kvm@vger.kernel.org,
+	Tim Gebauer <tim.gebauer@tu-dortmund.de>
+Subject: Re: [PATCH net-next v5 3/8] TUN, TAP & vhost_net: Stop netdev queue
+ before reaching a full ptr_ring
+Message-ID: <20250923104348-mutt-send-email-mst@kernel.org>
+References: <20250922221553.47802-1-simon.schippers@tu-dortmund.de>
+ <20250922221553.47802-4-simon.schippers@tu-dortmund.de>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: DM4PR12MB5070:EE_|SA3PR12MB7904:EE_
-X-MS-Office365-Filtering-Correlation-Id: 86d1c680-a737-4d17-cbce-08ddfab019df
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230040|366016|1800799024|376014;
-X-Microsoft-Antispam-Message-Info:
-	=?utf-8?B?TlFlRGJieDl3dFBmN3RFaVZqd2x5cTUrSmRTWWVRQmwvemN2SXBmdHNnUFpO?=
- =?utf-8?B?NjVWanRVZXVxODdTalBQYXBGcUl6U1Fmblc4UFRGcHFtV2JvN1NIbFExeTl5?=
- =?utf-8?B?cGRsUmx6bU5pNU9ZWFIxTDhtUElyeVlhMHkxb0wvR0lIM3NFTDFvSXQ5c1Yx?=
- =?utf-8?B?Rk82ejVYZEpiUHFjRFNsYWtTWG1NTm9EempkT2dVbFoyaTh1eUJ0Q1dkVHk4?=
- =?utf-8?B?dTdpMW9id1ExdVdMNWhTTUxNalFkVWJ0QU9BOHVYOVc0YVVCN1AxZlZmRmly?=
- =?utf-8?B?NXJENnB4c2ptVFpFbjBlbVBqQnJTU0kxbUVFOFIxRWkxUi9kN1hiZElidzZK?=
- =?utf-8?B?R05DM3FBK25lSjFGQjlnL1pXM2J5b3hFMVJSSldFSnJHWHNzbko5NUFuNE9F?=
- =?utf-8?B?bW55TGt2QXlpcitaMFhRWnpxRERlV2UyUytDS3ZMdnBHOXVoQWo1b2lOblNJ?=
- =?utf-8?B?SkIyT0FTbXR4QnpIZWM2bWg3S3ZXeE1SdUIyeERhN09LTlRzcHh4NTQ3K2Nj?=
- =?utf-8?B?RGE1am1CWDcrbHRkVGs1M04xTjI0VmFLMFFZUGdIZlF4eUlPOWdEY3UvRTVW?=
- =?utf-8?B?SXBIU05IRUdTUllHR3M3bHJVaFlOOHBYbGdFVjBYWXlsVkIwVGxCTjBiaUg4?=
- =?utf-8?B?NjlHaUtRRU1HMUdpNlArOUJnVTd2azZsZVlPT1lDR2d4anM4VEhETW10TmY1?=
- =?utf-8?B?WCtZR00wSzhENG54ZmRYeFhxeE4yWXZzb2FNYlNkY3ZQMlZaeGwzOWxFdnRO?=
- =?utf-8?B?U2crRkplSUh6YUgvc1Y4Wk5zV1dtUVU3MW1WUkJ0NXh0NWVHMDlFWlBUSXdw?=
- =?utf-8?B?R002OGhkYTBDN0VOSW9idDk4dXZ1MSt4MEJKMWFQb2VpeklhSW1Bb1FRWEt3?=
- =?utf-8?B?SStlR016dFl5T1lQNDlzMFZqSHlCNDRjczVtUlp0bmFxaWJKQ1VjU051RzE5?=
- =?utf-8?B?S0dpSVJIV0ZLalVBcmx3cDdYQ2JkNlFvRkdXRjR2VXAzeUZ5K3FUd25QaThm?=
- =?utf-8?B?OUQ5ckdRUHA1TnBvQWpEZ2hDcGh4bU94SUFHUzM1RGFjOTB3dWJRRTFqVmpa?=
- =?utf-8?B?bmpkeEhCKzFnc3M0cjhjQ3VjTkh5T3BZYkVzbzkwNE5QVm5VV2JScDcwOGpI?=
- =?utf-8?B?Ym8zNGVaMHBGOEJKSTR6cE1UUnpqdng0Rm1KTjZGOGpqS2JZUjNjRDdodWJy?=
- =?utf-8?B?Y1M2UGpuSkdYTnR0YVBXeDVEMFZSQlVLSmNVc0Z4ME9KMmdiQ0Yrc3RQTjgz?=
- =?utf-8?B?SU54TGxMT2Y5SG13N2d1UFdGeVVCTnZvVzhWNjBaTFhFMkpCZEVpaFRsRmlZ?=
- =?utf-8?B?NEo0V1B6ZFBNUCsvSnRCaFF5dmtvWWpFb0NhdVZJY2tDbmYvaWNRRWZhYVZn?=
- =?utf-8?B?eUh1SWhTQnZlL0RGTkU3MFJwZDNkeUxHQ3FFUWRxNzgyNjBLQnhITGxZQ0Y4?=
- =?utf-8?B?bTgwTkVySE0yYmMzeldrVXU3SWpYS1FhSDZNN1p3MFRlKzQ3cDVxLzRUTHVW?=
- =?utf-8?B?enk4bHMwWTdPTHNNRVdYUWJWV0grL1R1aUE3Wm1Id1dKNFhLNHpFQVdjZjR4?=
- =?utf-8?B?VGJGR3hjNDg4WVVjb0U2VENVZ3JuZDVOdWJuMWJZQ1RmbzBZSXZSdk5aSXFq?=
- =?utf-8?B?aHNGa2UrRjg2dzhhS3Rod0lCVGFScFpwbUNhVjZVeTdDNGtDMXdza0tpT2hn?=
- =?utf-8?B?blB3MUdRUmxhR3hMQ3RUUHhMU2xscTM4bTBmSWZ5MHZaMW9jTTVsV3dsb1lT?=
- =?utf-8?B?cXJxaEhMVWtoSkptQzhBQWx5cC9sUFBLRW9SVCtFUE5Md0FhTUtyUnY4OU5S?=
- =?utf-8?B?M1luVkVIMkc2M2tVeXFsTXdOQW55K01DWFZnbWxCa1Q5cjg3ZWx4QzZML0FZ?=
- =?utf-8?B?dHpTbnJwenBQVk40S1NtdTZCRDU4N01qc1Bwd1RPTHF3Yld6U2FSMVM2U3ln?=
- =?utf-8?Q?LhJxilhZfZ4=3D?=
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM4PR12MB5070.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(1800799024)(376014);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?utf-8?B?RkZGazBYRktCbFVxa3RvYUh5dTRyNitLcWJQcHVGYlZHV0R5YWN5S2x0ekdT?=
- =?utf-8?B?VnF0TStBK3dIYkJOWUJGUjhhbXNHblptTU80ZWRnN2w5dXdyOUdTeHo2Zm9t?=
- =?utf-8?B?em1CRWhqRmZVNGtyZVN4aTJWZ2tuWWNnTVJIbE00blhCUjZnVFN6UW12cmkx?=
- =?utf-8?B?TW1iaGQ3eStyaERnY0hjNUZJRHdjSnp1U2tWRVBkR3krVVQweDlyMEtsN3Ir?=
- =?utf-8?B?aG8wTzQ1SDJXOXdldjV0eWg5RTV5cTJmTzhvWVV2TFc1VEJxOHVTMVk1Q3Z0?=
- =?utf-8?B?RWxwVXN1TlNmeHJ2VnoxdlcxYTRwYlNEdGRLczE0V0lEMFQvL0R6ZGZKNklG?=
- =?utf-8?B?Nm5Tb05XWXdqZTdmK3IwNzdpQmgyZGI0WWJjS0c0ZjZ4SVlEdDNONjhWV0VE?=
- =?utf-8?B?ZEN1Qjd2dTN1UCtUOEF1RTZkRzBXai9TZXNMbjJaOUVJSWkwcHpQSFAyWTVO?=
- =?utf-8?B?eWlYNzFTUzEwK2ZUaytHU1JCOS9VVWU5aUx5RndKeFEvbDVnTGhDM3NVQ0xj?=
- =?utf-8?B?Sjk1ZUF3UFlZOEx6c2FLV3R2cTFvbXFYRldDZ3Iyb1hBdnArUDdObmYwbzBm?=
- =?utf-8?B?WjVjOVc3ZHdVQmozdE95OUJjN0JtNkt5ZzJOaUI2S1g1ekVmaG1saE40NzJZ?=
- =?utf-8?B?R25tUGxSeG4rMUJwMkw1SXVMcEZ3L0dIK2xkZXl1TEd2VTd2K2p5ZWpTK2Za?=
- =?utf-8?B?SGlMVmRrdFkwaW9rRlRteFhycTNSVTBqVUl2MDYxc3dWM0VrKy9pbk5IdUR2?=
- =?utf-8?B?UnhRYnNqY04zRE5kQ3RjWGVQblZva1ZUdlNZS0VKVnVkM1JNeVZZUlU1UlAw?=
- =?utf-8?B?VllhcFpINUd1a1ozdTVjOG5zWW1yeHhsNHA1TXhnWmx1TDhxS2RJUC9kRUsy?=
- =?utf-8?B?dXJzbGFUYXNnRzZ2Qlg4bmJEYmNEa2I0TGpVYTRTdSsvdWFhYmJIRHZQOUZF?=
- =?utf-8?B?elQvTFdWMG9DL21mbUZYMENsQWNWWmdmMTZQdjNOdHBnTEtZTFAzbXlUNlc3?=
- =?utf-8?B?NXRWYXppSnlxUTZRME56aGw1K2pVS3JGMkZuTkxRR3JVL0JUTzJWeDI5N3Fp?=
- =?utf-8?B?THFaWi9JS1hXeFZxMjFLU3haM2JVSklvcFhSa0NFdW56VDFnK3YxU1NsV1BD?=
- =?utf-8?B?QytFM3hYdWQwL0ZJWnJLakQweDZrdWx1aVhGcUc2elpMOHFZZk9DdDUxZS9s?=
- =?utf-8?B?RE9BYzNjekhjUjQ1eVhEYWFYL0V3NTFaMkxSL0FrZytpWS9TYzBZV2E5MHpk?=
- =?utf-8?B?akdlbXpaaE9rekJzbStHSE9kM1ZTdkthdUFFOHBhMWEyc2lkTU5NMUNEUTFr?=
- =?utf-8?B?QXlzQ0RZK1VmTkFjampSVzQ0ZEZWbGtQQnp3aTlTQVFxcHJrOHdNcE9lRnlt?=
- =?utf-8?B?S1B5bFhFTXRWdGx1czczU3lyNDREVFV3em9nS0tkeis5blhkcjkzdmIrdXF6?=
- =?utf-8?B?VGVNUEloQ1p1TldDQTJickNTUTJSMlByNkZGaUJGdktBcEFIQXVUT1Bab05B?=
- =?utf-8?B?bHdUQ0tWV1Q4MU8zazVTODJqMVRzbmlNTm03bXJaKzM5SlRoL1d0L2NIUjVo?=
- =?utf-8?B?NzM5ZU9SeGxVckRlN2RJM3lwYk9UMU5tYzFNcXpwRTJKaUVEdzQvYmx6OGl5?=
- =?utf-8?B?L1E4WW0zZVRqZFI4a3N1eFBWWG5WT2psWlMyUDdSbGNoOXZaSkJpS25BTXNU?=
- =?utf-8?B?dUczRWRlWGZkUGZSbUsvbWhpNlYxNDcwdDJ6Tmt4d00xbERnTEVacVFQVEFz?=
- =?utf-8?B?eU5OYmpCcXNwOXRZN1Q1VTVGQUtCZS9vMk9vUVlsS1MzbzJsSnRRNHdLODdu?=
- =?utf-8?B?L21mZ0tGMHBrRi9WUkpjTTh2M3E0VXJWS0JDdi9CN29ObE1VVlYzclc4cHli?=
- =?utf-8?B?cEdZZlMxZUlzY21GY2NnNlFCRjhkaVM5ZTd4QlZCN1NuK1VvZjVuSERBUmFB?=
- =?utf-8?B?ODhHL3VzOWJuRmRwUUIya1hLWnQwakpiWWhsd05tYXpGR0J3YWxUdElvMWV1?=
- =?utf-8?B?MS9haERjSzVFUTBpTTJwSUpQTTV0bVpyRUJOa0diZTd2ZWtpT09PM2Z2NG0r?=
- =?utf-8?B?cHBtNUdtLzJzQVo1N1plNldZZ1g4NTlRZExJR3k1ejVUUGFibWxjRHJTLzNt?=
- =?utf-8?Q?yilg8DpxCwqb5BnYma0J1HHA4?=
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 86d1c680-a737-4d17-cbce-08ddfab019df
-X-MS-Exchange-CrossTenant-AuthSource: DM4PR12MB5070.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 23 Sep 2025 14:47:21.3815
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: P85EJGLvjSdqeO5YbWObtMLGmUvhwlW5DCxI/PGwy+GqGnXKD7RLlBaWRqhVzSk4DgaTtLJBHxOzHFjZTl7ChA==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA3PR12MB7904
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250922221553.47802-4-simon.schippers@tu-dortmund.de>
 
-On 9/23/25 00:03, Neeraj Upadhyay wrote:
-> For AMD SEV-SNP guests with Secure AVIC, the virtual APIC state is
-> not visible to KVM and managed by the hardware. This renders the
-> traditional interrupt injection mechanism, which directly modifies
-> guest state, unusable. Instead, interrupt delivery must be mediated
-> through a new interface in the VMCB. Implement support for this
-> mechanism.
+On Tue, Sep 23, 2025 at 12:15:48AM +0200, Simon Schippers wrote:
+> Stop the netdev queue ahead of __ptr_ring_produce when
+> __ptr_ring_full_next signals the ring is about to fill. Due to the
+> smp_wmb() of __ptr_ring_produce the consumer is guaranteed to be able to
+> notice the stopped netdev queue after seeing the new ptr_ring entry. As
+> both __ptr_ring_full_next and __ptr_ring_produce need the producer_lock,
+> the lock is held during the execution of both methods.
 > 
-> First, new VMCB control fields, requested_irr and update_irr, are
-> defined to allow KVM to communicate pending interrupts to the hardware
-> before VMRUN.
+> dev->lltx is disabled to ensure that tun_net_xmit is not called even
+> though the netdev queue is stopped (which happened in my testing,
+> resulting in rare packet drops). Consequently, the update of trans_start
+> in tun_net_xmit is also removed.
 > 
-> Hook the core interrupt injection path, svm_inject_irq(). Instead of
-> injecting directly, transfer pending interrupts from KVM's software
-> IRR to the new requested_irr VMCB field and delegate final delivery
-> to the hardware.
-> 
-> Since the hardware is now responsible for the timing and delivery of
-> interrupts to the guest (including managing the guest's RFLAGS.IF and
-> vAPIC state), bypass the standard KVM interrupt window checks in
-> svm_interrupt_allowed() and svm_enable_irq_window(). Similarly, interrupt
-> re-injection is handled by the hardware and requires no explicit KVM
-> involvement.
-> 
-> Finally, update the logic for detecting pending interrupts. Add the
-> vendor op, protected_apic_has_interrupt(), to check only KVM's software
-> vAPIC IRR state.
-> 
-> Co-developed-by: Kishon Vijay Abraham I <kvijayab@amd.com>
-> Signed-off-by: Kishon Vijay Abraham I <kvijayab@amd.com>
-> Signed-off-by: Neeraj Upadhyay <Neeraj.Upadhyay@amd.com>
+> Co-developed-by: Tim Gebauer <tim.gebauer@tu-dortmund.de>
+> Signed-off-by: Tim Gebauer <tim.gebauer@tu-dortmund.de>
+> Signed-off-by: Simon Schippers <simon.schippers@tu-dortmund.de>
 > ---
->  arch/x86/include/asm/svm.h |  8 +++++--
->  arch/x86/kvm/lapic.c       | 17 ++++++++++++---
->  arch/x86/kvm/svm/sev.c     | 44 ++++++++++++++++++++++++++++++++++++++
->  arch/x86/kvm/svm/svm.c     | 13 +++++++++++
->  arch/x86/kvm/svm/svm.h     |  4 ++++
->  arch/x86/kvm/x86.c         | 15 ++++++++++++-
->  6 files changed, 95 insertions(+), 6 deletions(-)
+>  drivers/net/tun.c | 16 ++++++++++------
+>  1 file changed, 10 insertions(+), 6 deletions(-)
 > 
-> diff --git a/arch/x86/include/asm/svm.h b/arch/x86/include/asm/svm.h
-> index ab3d55654c77..0faf262f9f9f 100644
-> --- a/arch/x86/include/asm/svm.h
-> +++ b/arch/x86/include/asm/svm.h
-> @@ -162,10 +162,14 @@ struct __attribute__ ((__packed__)) vmcb_control_area {
->  	u64 vmsa_pa;		/* Used for an SEV-ES guest */
->  	u8 reserved_8[16];
->  	u16 bus_lock_counter;		/* Offset 0x120 */
-> -	u8 reserved_9[22];
-> +	u8 reserved_9[18];
-> +	u8 update_irr;			/* Offset 0x134 */
-
-The APM has this as a 4 byte field.
-
-> +	u8 reserved_10[3];
->  	u64 allowed_sev_features;	/* Offset 0x138 */
->  	u64 guest_sev_features;		/* Offset 0x140 */
-> -	u8 reserved_10[664];
-> +	u8 reserved_11[8];
-> +	u32 requested_irr[8];		/* Offset 0x150 */
-> +	u8 reserved_12[624];
->  	/*
->  	 * Offset 0x3e0, 32 bytes reserved
->  	 * for use by hypervisor/software.
-> diff --git a/arch/x86/kvm/lapic.c b/arch/x86/kvm/lapic.c
-> index 5fc437341e03..3199c7c6db05 100644
-> --- a/arch/x86/kvm/lapic.c
-> +++ b/arch/x86/kvm/lapic.c
-> @@ -2938,11 +2938,22 @@ int kvm_apic_has_interrupt(struct kvm_vcpu *vcpu)
->  	if (!kvm_apic_present(vcpu))
->  		return -1;
+> diff --git a/drivers/net/tun.c b/drivers/net/tun.c
+> index 86a9e927d0ff..c6b22af9bae8 100644
+> --- a/drivers/net/tun.c
+> +++ b/drivers/net/tun.c
+> @@ -931,7 +931,7 @@ static int tun_net_init(struct net_device *dev)
+>  	dev->vlan_features = dev->features &
+>  			     ~(NETIF_F_HW_VLAN_CTAG_TX |
+>  			       NETIF_F_HW_VLAN_STAG_TX);
+> -	dev->lltx = true;
+> +	dev->lltx = false;
 >  
-> -	if (apic->guest_apic_protected)
-> +	if (!apic->guest_apic_protected) {
-> +		__apic_update_ppr(apic, &ppr);
-> +		return apic_has_interrupt_for_ppr(apic, ppr);
-> +	}
+>  	tun->flags = (tun->flags & ~TUN_FEATURES) |
+>  		      (ifr->ifr_flags & TUN_FEATURES);
+> @@ -1060,14 +1060,18 @@ static netdev_tx_t tun_net_xmit(struct sk_buff *skb, struct net_device *dev)
+>  
+>  	nf_reset_ct(skb);
+>  
+> -	if (ptr_ring_produce(&tfile->tx_ring, skb)) {
+> +	queue = netdev_get_tx_queue(dev, txq);
 > +
-> +	if (!apic->prot_apic_intr_inject)
->  		return -1;
->  
-> -	__apic_update_ppr(apic, &ppr);
-> -	return apic_has_interrupt_for_ppr(apic, ppr);
-> +	/*
-> +	 * For guest-protected virtual APIC, hardware manages the virtual
-> +	 * PPR and interrupt delivery to the guest. So, checking the KVM
-> +	 * managed virtual APIC's APIC_IRR state for any pending vectors
-> +	 * is the only thing required here.
-> +	 */
-> +	return apic_search_irr(apic);
-
-Just a though, but I wonder if this would look cleaner by doing:
-
-	if (apic->guest_apic_protected) {
-		if (!apic->prot_apic_intr_inject)
-			return -1;
-
-		/*
-		 * For guest-protected ...
-		 */
-		return apic_search_irr(apic);
-	}
-
-	__apic_update_ppr(apic, &ppr);
-	return apic_has_interrupt_for_ppr(apic, ppr);
-
+> +	spin_lock(&tfile->tx_ring.producer_lock);
+> +	if (__ptr_ring_full_next(&tfile->tx_ring))
+> +		netif_tx_stop_queue(queue);
 > +
->  }
->  EXPORT_SYMBOL_GPL(kvm_apic_has_interrupt);
+> +	if (unlikely(__ptr_ring_produce(&tfile->tx_ring, skb))) {
+> +		spin_unlock(&tfile->tx_ring.producer_lock);
+>  		drop_reason = SKB_DROP_REASON_FULL_RING;
+>  		goto drop;
+>  	}
+
+The comment makes it sound like you always keep one slot free
+in the queue but that is not the case - you just
+check before calling __ptr_ring_produce.
+
+
+But it is racy isn't it? So first of all I suspect you
+are missing an mb before netif_tx_stop_queue.
+
+Second it's racy because more entries can get freed
+afterwards. Which maybe is ok in this instance?
+But it really should be explained in more detail, if so.
+
+
+
+Now - why not just check ring full *after* __ptr_ring_produce?
+Why do we need all these new APIs, and we can
+use existing ones which at least are not so hard to understand.
+
+
+
+
+> -
+> -	/* dev->lltx requires to do our own update of trans_start */
+> -	queue = netdev_get_tx_queue(dev, txq);
+> -	txq_trans_cond_update(queue);
+> +	spin_unlock(&tfile->tx_ring.producer_lock);
 >  
-> diff --git a/arch/x86/kvm/svm/sev.c b/arch/x86/kvm/svm/sev.c
-> index afe4127a1918..78cefc14a2ee 100644
-> --- a/arch/x86/kvm/svm/sev.c
-> +++ b/arch/x86/kvm/svm/sev.c
-> @@ -28,6 +28,7 @@
->  #include <asm/debugreg.h>
->  #include <asm/msr.h>
->  #include <asm/sev.h>
-> +#include <asm/apic.h>
->  
->  #include "mmu.h"
->  #include "x86.h"
-> @@ -35,6 +36,7 @@
->  #include "svm_ops.h"
->  #include "cpuid.h"
->  #include "trace.h"
-> +#include "lapic.h"
->  
->  #define GHCB_VERSION_MAX	2ULL
->  #define GHCB_VERSION_DEFAULT	2ULL
-> @@ -5064,3 +5066,45 @@ void sev_free_decrypted_vmsa(struct kvm_vcpu *vcpu, struct vmcb_save_area *vmsa)
->  
->  	free_page((unsigned long)vmsa);
->  }
-> +
-> +void sev_savic_set_requested_irr(struct vcpu_svm *svm, bool reinjected)
-> +{
-> +	unsigned int i, vec, vec_pos, vec_start;
-> +	struct kvm_lapic *apic;
-> +	bool has_interrupts;
-> +	u32 val;
-> +
-> +	/* Secure AVIC HW takes care of re-injection */
-> +	if (reinjected)
-> +		return;
-> +
-> +	apic = svm->vcpu.arch.apic;
-> +	has_interrupts = false;
-> +
-> +	for (i = 0; i < ARRAY_SIZE(svm->vmcb->control.requested_irr); i++) {
-> +		val = apic_get_reg(apic->regs, APIC_IRR + i * 0x10);
-> +		if (!val)
-> +			continue;
+>  	/* Notify and wake up reader process */
+>  	if (tfile->flags & TUN_FASYNC)
+> -- 
+> 2.43.0
 
-Add a blank line here.
-
-> +		has_interrupts = true;
-> +		svm->vmcb->control.requested_irr[i] |= val;
-
-Add a blank line here.
-
-> +		vec_start = i * 32;
-
-Move this line to just below the comment.
-
-> +		/*
-> +		 * Clear each vector one by one to avoid race with concurrent
-> +		 * APIC_IRR updates from the deliver_interrupt() path.
-> +		 */
-> +		do {
-> +			vec_pos = __ffs(val);
-> +			vec = vec_start + vec_pos;
-> +			apic_clear_vector(vec, apic->regs + APIC_IRR);
-> +			val = val & ~BIT(vec_pos);
-> +		} while (val);
-
-Would the following be cleaner?
-
-for_each_set_bit(vec_pos, &val, 32)
-	apic_clear_vector(vec_start + vec_pos, apic->regs + APIC_IRR);
-
-Might have to make "val" an unsigned long, though, and not sure how that
-affects OR'ing it into requested_irr.
-
-> +	}
-> +
-> +	if (has_interrupts)
-> +		svm->vmcb->control.update_irr |= BIT(0);
-> +}
-> +
-> +bool sev_savic_has_pending_interrupt(struct kvm_vcpu *vcpu)
-> +{
-> +	return kvm_apic_has_interrupt(vcpu) != -1;
-> +}
-> diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
-> index 064ec98d7e67..7811a87bc111 100644
-> --- a/arch/x86/kvm/svm/svm.c
-> +++ b/arch/x86/kvm/svm/svm.c
-> @@ -52,6 +52,8 @@
->  #include "svm.h"
->  #include "svm_ops.h"
->  
-> +#include "lapic.h"
-
-Is this include really needed?
-
-> +
->  #include "kvm_onhyperv.h"
->  #include "svm_onhyperv.h"
->  
-> @@ -3689,6 +3691,9 @@ static void svm_inject_irq(struct kvm_vcpu *vcpu, bool reinjected)
->  	struct vcpu_svm *svm = to_svm(vcpu);
->  	u32 type;
->  
-> +	if (sev_savic_active(vcpu->kvm))
-> +		return sev_savic_set_requested_irr(svm, reinjected);
-> +
->  	if (vcpu->arch.interrupt.soft) {
->  		if (svm_update_soft_interrupt_rip(vcpu))
->  			return;
-> @@ -3870,6 +3875,9 @@ static int svm_interrupt_allowed(struct kvm_vcpu *vcpu, bool for_injection)
->  {
->  	struct vcpu_svm *svm = to_svm(vcpu);
->  
-> +	if (sev_savic_active(vcpu->kvm))
-> +		return 1;
-
-Maybe just add a comment above this about why you always return 1 for
-Secure AVIC.
-
-> +
->  	if (svm->nested.nested_run_pending)
->  		return -EBUSY;
->  
-> @@ -3890,6 +3898,9 @@ static void svm_enable_irq_window(struct kvm_vcpu *vcpu)
->  {
->  	struct vcpu_svm *svm = to_svm(vcpu);
->  
-> +	if (sev_savic_active(vcpu->kvm))
-> +		return;
-
-Ditto here on the comment.
-
-> +
->  	/*
->  	 * In case GIF=0 we can't rely on the CPU to tell us when GIF becomes
->  	 * 1, because that's a separate STGI/VMRUN intercept.  The next time we
-> @@ -5132,6 +5143,8 @@ static struct kvm_x86_ops svm_x86_ops __initdata = {
->  	.apicv_post_state_restore = avic_apicv_post_state_restore,
->  	.required_apicv_inhibits = AVIC_REQUIRED_APICV_INHIBITS,
->  
-> +	.protected_apic_has_interrupt = sev_savic_has_pending_interrupt,
-> +
->  	.get_exit_info = svm_get_exit_info,
->  	.get_entry_info = svm_get_entry_info,
->  
-> diff --git a/arch/x86/kvm/svm/svm.h b/arch/x86/kvm/svm/svm.h
-> index 1090a48adeda..60dc424d62c4 100644
-> --- a/arch/x86/kvm/svm/svm.h
-> +++ b/arch/x86/kvm/svm/svm.h
-> @@ -873,6 +873,8 @@ static inline bool sev_savic_active(struct kvm *kvm)
->  {
->  	return to_kvm_sev_info(kvm)->vmsa_features & SVM_SEV_FEAT_SECURE_AVIC;
->  }
-> +void sev_savic_set_requested_irr(struct vcpu_svm *svm, bool reinjected);
-> +bool sev_savic_has_pending_interrupt(struct kvm_vcpu *vcpu);
->  #else
->  static inline struct page *snp_safe_alloc_page_node(int node, gfp_t gfp)
->  {
-> @@ -910,6 +912,8 @@ static inline struct vmcb_save_area *sev_decrypt_vmsa(struct kvm_vcpu *vcpu)
->  	return NULL;
->  }
->  static inline void sev_free_decrypted_vmsa(struct kvm_vcpu *vcpu, struct vmcb_save_area *vmsa) {}
-> +static inline void sev_savic_set_requested_irr(struct vcpu_svm *svm, bool reinjected) {}
-> +static inline bool sev_savic_has_pending_interrupt(struct kvm_vcpu *vcpu) { return false; }
->  #endif
->  
->  /* vmenter.S */
-> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-> index 33fba801b205..65ebdc6deb92 100644
-> --- a/arch/x86/kvm/x86.c
-> +++ b/arch/x86/kvm/x86.c
-> @@ -10369,7 +10369,20 @@ static int kvm_check_and_inject_events(struct kvm_vcpu *vcpu,
->  		if (r < 0)
->  			goto out;
->  		if (r) {
-> -			int irq = kvm_cpu_get_interrupt(vcpu);
-> +			int irq;
-> +
-> +			/*
-> +			 * Do not ack the interrupt here for guest-protected VAPIC
-> +			 * which requires interrupt injection to the guest.
-
-Maybe a bit more detail about why you don't want to do the ACK?
-
-Thanks,
-Tom
-
-> +			 *
-> +			 * ->inject_irq reads the KVM's VAPIC's APIC_IRR state and
-> +			 * clears it.
-> +			 */
-> +			if (vcpu->arch.apic->guest_apic_protected &&
-> +			    vcpu->arch.apic->prot_apic_intr_inject)
-> +				irq = kvm_apic_has_interrupt(vcpu);
-> +			else
-> +				irq = kvm_cpu_get_interrupt(vcpu);
->  
->  			if (!WARN_ON_ONCE(irq == -1)) {
->  				kvm_queue_interrupt(vcpu, irq, false);
 
