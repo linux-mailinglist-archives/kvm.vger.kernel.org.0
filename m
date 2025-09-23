@@ -1,217 +1,162 @@
-Return-Path: <kvm+bounces-58592-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-58593-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9A650B97293
-	for <lists+kvm@lfdr.de>; Tue, 23 Sep 2025 20:04:52 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 802EDB972BA
+	for <lists+kvm@lfdr.de>; Tue, 23 Sep 2025 20:09:59 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 566444A6E89
-	for <lists+kvm@lfdr.de>; Tue, 23 Sep 2025 18:04:51 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 34370320A4C
+	for <lists+kvm@lfdr.de>; Tue, 23 Sep 2025 18:09:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CA13E2F6198;
-	Tue, 23 Sep 2025 18:04:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8DA462FB97F;
+	Tue, 23 Sep 2025 18:09:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ziepe.ca header.i=@ziepe.ca header.b="WQYAWiKt"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="WgwCqdwX"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-ot1-f53.google.com (mail-ot1-f53.google.com [209.85.210.53])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 06316207DE2
-	for <kvm@vger.kernel.org>; Tue, 23 Sep 2025 18:04:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.53
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 33F562F7453
+	for <kvm@vger.kernel.org>; Tue, 23 Sep 2025 18:09:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758650685; cv=none; b=cNAJqi6bmziDXQVQRq5t0nl9irWRYoYxEQLbmYxe/+rjjC62yO3DLxplWbV+LFUKQHo6dZ1yz4LUMEuFC4gJLWLmGe+FPQwkkXrdhPNRbKLMWSz6zGJ/Jykjwa1FG5R6o1Fil/4rL1OVgLeBIkSheGFgC1HBmF14Zd4dHBqzZbg=
+	t=1758650980; cv=none; b=doHthaEr5gTFxTInF0wGSyhTyT9SPgQKEQcxcnpmQZjH7bfK0XM066pbg6gtgTVpM/0pdUhboGhY0q1h/a/uIZLbzgwYRb93LdcNchTD9NxbYGhIwK0rWd7xjBLGyOega9PfD0UEV+NUjTTvRS9T/gVhVF3XNNWdbVl8mK9Uzeg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758650685; c=relaxed/simple;
-	bh=eacR98dkSUBbCzoaapJbuctQKrT9ktzzxDR7sXHJeA4=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=E7CmGM0GPe2ryj8FrTteeIjhrTh/0SxjVSqfjiRHV2Bk6dkwBNczzhK1NW+jM/Y4aw1962YFBEbT/vAIfYfx2ofhxdGruA8/JZicrAvNKl5jw6f+Z7QDjKlLMrC0MY36ACFRbsxfqKHBIT9Do/1YYShOmdWmISE7b+uHUQWCNUs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ziepe.ca; spf=pass smtp.mailfrom=ziepe.ca; dkim=pass (2048-bit key) header.d=ziepe.ca header.i=@ziepe.ca header.b=WQYAWiKt; arc=none smtp.client-ip=209.85.210.53
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ziepe.ca
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ziepe.ca
-Received: by mail-ot1-f53.google.com with SMTP id 46e09a7af769-793ef18e8a3so112813a34.0
-        for <kvm@vger.kernel.org>; Tue, 23 Sep 2025 11:04:42 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=ziepe.ca; s=google; t=1758650682; x=1759255482; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=fef98T7bnQVGONe9Wy0sE6xnXuSuMBBSdC/MAFgn2wI=;
-        b=WQYAWiKt3Upk+fF1y9izJUMxx+Z8o3VV8ZVC5IjfLfKv59BtESSQq6kApDobd98MS3
-         vFqvaR7LwPt+eB71zbIUBbdrwcEqHRzK00aoyglb9mMBQ87+vvimZWgjmWZom97Bh70z
-         TVEmRQFrQOeSlwRqMtOXGLuH6wfw72aMZq7dfrx3n8memoPNUG0o2SuEalnnTCuWWKh1
-         8jlFjkymsGnKG7qKzuId7U6prL+71SBDn0CXRk4ix/T+UbvSurU3LMI+arzIaxJz2XKz
-         CrDGC5Aa1tk+vGJJ0OqkpnXvhnBMBcamO+wtAg5uliKU2EfR7TVYaHmdYZLDFiP8H/Pg
-         Tt3Q==
+	s=arc-20240116; t=1758650980; c=relaxed/simple;
+	bh=heNGPwMdoK/TojT+3JCMQol9WuwGJyrL7m6JFryZsqs=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=RNdkzczb5zPjoYwGYsb/WP7r+TE98wdW9rA7O9GD3en33+k8jr4vN32FA+/eFich2y1k/7HunvTQCP4eaR/2YhVLwCbkh1wdQfSQXSDB1nWQVb9AQfXNx4rECemJaw0NGNp4kXXTEBjZ/auEVmKnrNGDm7BKTLwwXMigNLXliU0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=WgwCqdwX; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1758650977;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=mQIcre9d/GLURHCzSftYDLgKY/Tx/WICcqQ2djA+XCg=;
+	b=WgwCqdwXaYN3Trerny7CPtN4SBPyc/HSKDsoex+YwLeP0gtV+SgGmQ/UMR1Tnh+RpS1iuO
+	dKdFLD77MyzuEVG8CFDFv4XOzWcgUlIqjirngbu1iFBv2/dvCPe/VCFzCfuVa2FsZewXG7
+	8xEDTJQxTKTkD4GB86sD0clhH88n8/Y=
+Received: from mail-io1-f69.google.com (mail-io1-f69.google.com
+ [209.85.166.69]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-695-vtblccmoPQKs45UYtUPMnQ-1; Tue, 23 Sep 2025 14:09:36 -0400
+X-MC-Unique: vtblccmoPQKs45UYtUPMnQ-1
+X-Mimecast-MFC-AGG-ID: vtblccmoPQKs45UYtUPMnQ_1758650976
+Received: by mail-io1-f69.google.com with SMTP id ca18e2360f4ac-8c24aa3f7f5so37544439f.3
+        for <kvm@vger.kernel.org>; Tue, 23 Sep 2025 11:09:36 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1758650682; x=1759255482;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=fef98T7bnQVGONe9Wy0sE6xnXuSuMBBSdC/MAFgn2wI=;
-        b=NbQIwuhkfRDJGMisiDxS2hGb3H79Pk0G0zofqlvW0VbNSTZMh95x3ZxuPquHHUJigw
-         t/ZMRKU2vzCNSE1a6PxzRBITMBR7tJ5+2l3AyTyZ9fCg4oAax1qmerc36kOtlYZ4sN/v
-         28HLuwsxNqNSDqJeolSlObxThsfyC/gkJ6HvQb4V5kItbNVSjvcYP+KO2c7OMLqct3WS
-         0UEGgOis2ltdHxjf4hKKpNwNd1rG1adNDDHzuMPYKJ454iGOahzBYHxP6FywahTo4Oiw
-         JUnt83G1If7NmzLd1M61GIrw+VL2SjPGjAjvhmpJO5Bp1KKfpQzeUr+ZPQMDm9rjv89g
-         gvkQ==
-X-Forwarded-Encrypted: i=1; AJvYcCWYaIaHLx+OlYwVD/bwHtsVeVPr7pU8q2IhE3Q1YICcH6bTzOr5WP7A3UwZRv2FBRMvpxQ=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyQXyRmqprmS6PIyNES4p0ZpLAlMR405DMSPeKQZT1sor+04uSl
-	pEtyVB3Vi4UZDNmkYsgWb916c46cLBMe0jMtTvc+QndFrEoTxx+F/ssaQ1tSjM5XWY0=
-X-Gm-Gg: ASbGncs/gyK538wpIuFV4xPk1eeXcr+cPyTLtJ6aIhE1WJCvE0g0Q0i3SJNuzPDwgKP
-	MVBo4aNhSL2hQ4/bJj47VLPZT2OdsULyvQT4DdkZSwyv3itufPDW9SPvVjBtBjZq1A44BCh9MY/
-	OhK4QvzHve+Pu4M4mdk00Uy1Z5ozYRJyVgC53cdy3FQX7P5iaW/RQvlxPNhm32GsyHTfDP/zmM7
-	l7LAsEets3z4CC9+d94fQi0spwi1s2jIYrNLx5V/tjOl/W1Mjzf7fUz2gwgpnwYnEWPC9P+VHZW
-	35ppbOh7n2Xfd9V1pOnf4P7XWPn/1vVNTewqIXU6beJQrxoYQB+PkrDFsyL8Bg6aCLWATeub
-X-Google-Smtp-Source: AGHT+IF+0AOQOruq7bU6S/hoPn5x7ZCPYOkcXl/6V5elBa8VsAnFdyCH65bQxGi3os6/QzwpW2LcVQ==
-X-Received: by 2002:a9d:4786:0:b0:757:1398:fbe2 with SMTP id 46e09a7af769-791647dea14mr1495970a34.16.1758650681894;
-        Tue, 23 Sep 2025 11:04:41 -0700 (PDT)
-Received: from ziepe.ca ([130.41.10.202])
-        by smtp.gmail.com with ESMTPSA id 006d021491bc7-625d881f9c4sm5075096eaf.5.2025.09.23.11.04.41
+        d=1e100.net; s=20230601; t=1758650975; x=1759255775;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=mQIcre9d/GLURHCzSftYDLgKY/Tx/WICcqQ2djA+XCg=;
+        b=L6NQw2VjeQ6kDIJ1udyX9YZNzJ1ovpt49yFLQVEwqjN0ikvz0/tdOksPerqoptDOX3
+         4yros6C4xmanfBHqDQR7V8T6FnLWFHbegMjU5zjgYqjHnN6bqI9q7gvkXuJLu+qzy7og
+         VTdC0OhTbJq0GmD/Rj71kGmkXFz5+0tmwRcRelDAG4GZX0zw6EFAKhvnSOhEV4zloty0
+         gu4rUFm9vaTSZmft+n4UO04EpwK611HsB/ruWtCwhC+mrAcj7I1L6DVod3if0mZumweF
+         qXHKZAB/QGVWlTn9XujLGsujdtvBX+80yzJ/n63hfM3+0m3n0026/2MR1utn7m/3uUZH
+         LY5g==
+X-Forwarded-Encrypted: i=1; AJvYcCWSPkYk+Hm4it6J8T76JfgwEDz7GR+qvFT2VWVFCE6cmOFU4jThEtYdTIo9SwnGrT8hKpg=@vger.kernel.org
+X-Gm-Message-State: AOJu0Ywi+7BFyadNLXRl2IgIcbkPQuWuBhr0f+DgGIG5Mj/CaNNPKXWH
+	6aI381mKuGg8o0ZVpbtUllXY8QYgVstctv41ZBasrlg4gNHnDpLNd+HnDkKUcGHxgg6ZdB+96sf
+	/Vw86dCxOInHhXnfW75DXMSXz9NDqSKl5Bepmrd6ObuQr4i8Qd3TJbMdtDi0gzA==
+X-Gm-Gg: ASbGncv3Bdf6IH3dgErXhdGTt9vU8Cc+vVluWgy9aL2qy6aQfYC7TBhGMKIBR0nnura
+	85ZqTXC+2k6pDiB1/WTsjx+6kg2mcumU+ooSSiO5xqMDTvmvRTxz3u2bOlu95hnPsYjCqespA9n
+	YE8+vg6rXXU8RVb9/ffA3VQaDR4bMYBipyCZOHEr+Tvrg5Bzr26VhflSHDeat+f8noOfAhmN2vt
+	CmHxJgSagPavsUPBUECigYNi9lygCrWkt0SkEdsCiOHTmApMTr3/31lIglBEaVy/jMHvHxvhgvp
+	0KksKg406qa5KtyEGcdeVMqpTR5vC4tu2wBkjBKqUhg=
+X-Received: by 2002:a05:6e02:1528:b0:412:5782:c7c1 with SMTP id e9e14a558f8ab-42581ea129fmr20080575ab.5.1758650975104;
+        Tue, 23 Sep 2025 11:09:35 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IFq8NLMhZ8QXjx/u5jq96UNETG/D0tlVJnMFlvqXnog3t1PaipQH1rILjZIuw/YRGMbPtKiFQ==
+X-Received: by 2002:a05:6e02:1528:b0:412:5782:c7c1 with SMTP id e9e14a558f8ab-42581ea129fmr20080265ab.5.1758650974546;
+        Tue, 23 Sep 2025 11:09:34 -0700 (PDT)
+Received: from redhat.com ([38.15.36.11])
+        by smtp.gmail.com with ESMTPSA id 8926c6da1cb9f-54f69c6262esm5209728173.79.2025.09.23.11.09.33
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 23 Sep 2025 11:04:41 -0700 (PDT)
-Received: from jgg by wakko with local (Exim 4.97)
-	(envelope-from <jgg@ziepe.ca>)
-	id 1v17NX-0000000Az64-1Lwe;
-	Tue, 23 Sep 2025 15:04:39 -0300
-Date: Tue, 23 Sep 2025 15:04:39 -0300
-From: Jason Gunthorpe <jgg@ziepe.ca>
-To: Wathsala Vithanage <wathsala.vithanage@arm.com>
-Cc: alex.williamson@redhat.com, pstanner@redhat.com, jeremy.linton@arm.com,
-	kvm@vger.kernel.org
-Subject: Re: [RFC PATCH v3 1/1] vfio/pci: add PCIe TPH device ioctl
-Message-ID: <20250923180439.GG2547959@ziepe.ca>
-References: <20250916175626.698384-1-wathsala.vithanage@arm.com>
+        Tue, 23 Sep 2025 11:09:33 -0700 (PDT)
+Date: Tue, 23 Sep 2025 12:09:32 -0600
+From: Alex Williamson <alex.williamson@redhat.com>
+To: Jason Gunthorpe <jgg@nvidia.com>
+Cc: Leon Romanovsky <leon@kernel.org>, Leon Romanovsky <leonro@nvidia.com>,
+ Andrew Morton <akpm@linux-foundation.org>, Bjorn Helgaas
+ <bhelgaas@google.com>, Christian =?UTF-8?B?S8O2bmln?=
+ <christian.koenig@amd.com>, dri-devel@lists.freedesktop.org,
+ iommu@lists.linux.dev, Jens Axboe <axboe@kernel.dk>, Joerg Roedel
+ <joro@8bytes.org>, kvm@vger.kernel.org, linaro-mm-sig@lists.linaro.org,
+ linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+ linux-media@vger.kernel.org, linux-mm@kvack.org, linux-pci@vger.kernel.org,
+ Logan Gunthorpe <logang@deltatee.com>, Marek Szyprowski
+ <m.szyprowski@samsung.com>, Robin Murphy <robin.murphy@arm.com>, Sumit
+ Semwal <sumit.semwal@linaro.org>, Vivek Kasireddy
+ <vivek.kasireddy@intel.com>, Will Deacon <will@kernel.org>
+Subject: Re: [PATCH v2 03/10] PCI/P2PDMA: Refactor to separate core P2P
+ functionality from memory allocation
+Message-ID: <20250923120932.47df57b2.alex.williamson@redhat.com>
+In-Reply-To: <20250923174333.GE2608121@nvidia.com>
+References: <cover.1757589589.git.leon@kernel.org>
+	<1e2cb89ea76a92949d06a804e3ab97478e7cacbb.1757589589.git.leon@kernel.org>
+	<20250922150032.3e3da410.alex.williamson@redhat.com>
+	<20250923150414.GA2608121@nvidia.com>
+	<20250923113041.38bee711.alex.williamson@redhat.com>
+	<20250923174333.GE2608121@nvidia.com>
+X-Mailer: Claws Mail 4.3.1 (GTK 3.24.43; x86_64-redhat-linux-gnu)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250916175626.698384-1-wathsala.vithanage@arm.com>
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-On Tue, Sep 16, 2025 at 05:56:26PM +0000, Wathsala Vithanage wrote:
-> +
-> +static int vfio_pci_tph_get_st(struct vfio_pci_core_device *vdev,
-> +			       struct vfio_pci_tph_entry *ents, int count)
-> +{
-> +	int i, mtype, err = 0;
-> +	u32 cpu_uid;
-> +
-> +	for (i = 0; i < count && !err; i++) {
-> +		if (ents[i].cpu_id >= nr_cpu_ids || !cpu_present(ents[i].cpu_id)) {
-> +			err = -EINVAL;
-> +			break;
-> +		}
-> +
-> +		cpu_uid = topology_core_id(ents[i].cpu_id);
+On Tue, 23 Sep 2025 14:43:33 -0300
+Jason Gunthorpe <jgg@nvidia.com> wrote:
 
-This should check the process has access to the given CPU:
+> On Tue, Sep 23, 2025 at 11:30:41AM -0600, Alex Williamson wrote:
+> > On Tue, 23 Sep 2025 12:04:14 -0300
+> > Jason Gunthorpe <jgg@nvidia.com> wrote:
+> >   
+> > > On Mon, Sep 22, 2025 at 03:00:32PM -0600, Alex Williamson wrote:  
+> > > > But then later in patch 8/ and again in 10/ why exactly do we cache
+> > > > the provider on the vfio_pci_core_device rather than ask for it on
+> > > > demand from the p2pdma?    
+> > > 
+> > > It makes the most sense if the P2P is activated once during probe(),
+> > > it is just a cheap memory allocation, so no reason not to.
+> > > 
+> > > If you try to do it on-demand then it will require more locking.  
+> > 
+> > I'm only wondering about splitting to an "initialize/setup" function
+> > where providers for each BAR are setup, and a "get provider" interface,
+> > which doesn't really seem to be a hot path anyway.  Batching could
+> > still be done to setup all BAR providers at once.  
+> 
+> I agree it is a weird interface, but it is close to the existing weird
+> interface :\
 
-                if (!cpumask_test_cpu(cpu_id, current->cpus_ptr)) {
+Seems like it would help if we just positioned it as a "get provider
+for BAR" function that happens to initialize all the providers on the
+first call, rather than an "enable" function with some strange BAR
+argument and provider return.  pcim_p2pdma_provider(pdev, bar)?
 
-> +		mtype = (ents[i].flags & VFIO_TPH_MEM_TYPE_MASK) >>
-> +			VFIO_TPH_MEM_TYPE_SHIFT;
+It would at least make sense to me then to store the provider on the
+vfio_pci_dma_buf object at the time of the get feature call rather than
+vfio_pci_core_init_dev() though.  That would eliminate patch 08/ and
+the inline #ifdefs.
 
-Why this weird encoding with flags? Just give it a normal member.
+> > However, the setup isn't really once per probe(), even in the case of a
+> > new driver probing we re-use the previously setup providers.    
+> 
+> It uses devm to call pci_p2pdma_release() which NULL's pdev->p2pdma.
 
-> +/**
-> + * VFIO_DEVICE_PCI_TPH	- _IO(VFIO_TYPE, VFIO_BASE + 22)
-> + *
-> + * This command is used to control PCIe TLP Processing Hints (TPH)
-> + * capability in a PCIe device.
-> + * It supports following operations on a PCIe device with respect to TPH
-> + * capability.
-> + *
-> + * - Enabling/disabling TPH capability in a PCIe device.
-> + *
-> + *   Setting VFIO_DEVICE_TPH_ENABLE flag enables TPH in no-steering-tag,
-> + *   interrupt-vector, or device-specific mode defined in the PCIe specficiation
-> + *   when feature flags TPH_ST_NS_MODE, TPH_ST_IV_MODE, and TPH_ST_DS_MODE are
-> + *   set respectively. TPH_ST_xx_MODE macros are defined in
-> + *   uapi/linux/pci_regs.h.
-> + *
-> + *   VFIO_DEVICE_TPH_DISABLE disables PCIe TPH on the device.
-> + *
-> + * - Writing STs to MSI-X or ST table in a PCIe device.
-> + *
-> + *   VFIO_DEVICE_TPH_SET_ST flag set steering tags on a device at an index in
-> + *   MSI-X or ST-table depending on the VFIO_TPH_ST_x_MODE flag used and
-> + *   returns the programmed steering tag values. The caller can set one or more
-> + *   steering tags by passing an array of vfio_pci_tph_entry objects containing
-> + *   cpu_id, cache_level, and MSI-X/ST-table index. The caller can also set the
-> + *   intended memory type and the processing hint by setting VFIO_TPH_MEM_TYPE_x
-> + *   and VFIO_TPH_HINT_x flags, respectively.
+Ah, right.  So the /* PCI device was "rebound" to the driver */ comment
+is further misleading, a new probe would do a new setup.  Thanks,
 
-I'm not sure if the MSI-X mode is really safe to expose to
-userspace.. I thought the hack was sort of OK if it was used with a
-co-operating driver that didn't try to concurrently manipulate the
-steering tags.
+Alex
 
-> + * - Reading Steering Tags (ST) from the host platform.
-> + *
-> + *   VFIO_DEVICE_TPH_GET_ST flags returns steering tags to the caller. Caller
-> + *   can request one or more steering tags by passing an array of
-> + *   vfio_pci_tph_entry objects. Steering Tag for each request is returned via
-> + *   the st field in vfio_pci_tph_entry.
-> + */
-> +struct vfio_pci_tph_entry {
-> +	/* in */
-> +	__u32 cpu_id;			/* CPU logical ID */
-> +	__u32 cache_level;		/* Cache level. L1 D= 0, L2D = 2, ...*/
-
-Nothing reads cache_level ?
-
-> +	__u8  flags;
-> +#define VFIO_TPH_MEM_TYPE_MASK		0x1
-> +#define VFIO_TPH_MEM_TYPE_SHIFT		0
-> +#define VFIO_TPH_MEM_TYPE_VMEM		0   /* Request volatile memory ST */
-> +#define VFIO_TPH_MEM_TYPE_PMEM		1   /* Request persistent memory ST */
-> +
-> +#define VFIO_TPH_HINT_SHIFT		1
-> +#define VFIO_TPH_HINT_MASK		(0x3 << VFIO_TPH_HINT_SHIFT)
-> +#define VFIO_TPH_HINT_BIDIR		0
-> +#define VFIO_TPH_HINT_REQSTR		(1 << VFIO_TPH_HINT_SHIFT)
-> +#define VFIO_TPH_HINT_TARGET		(2 << VFIO_TPH_HINT_SHIFT)
-> +#define VFIO_TPH_HINT_TARGET_PRIO	(3 << VFIO_TPH_HINT_SHIFT)
-> +	__u8  pad0;
-> +	__u16 index;			/* MSI-X/ST-table index to set ST */
-> +	/* out */
-> +	__u16 st;			/* Steering-Tag */
-
-I don't know if we should leak the HW steering tag to userspace??
-
-> +	__u8  ph_ignore;		/* Platform ignored the Processing */
-> +	__u8  pad1;
-> +};
-> +
-> +struct vfio_pci_tph {
-> +	__u32 argsz;			/* Size of vfio_pci_tph and ents[] */
-> +	__u32 flags;
-> +#define VFIO_TPH_ST_MODE_MASK		0x7
-> +
-> +#define VFIO_DEVICE_TPH_OP_SHIFT	3
-> +#define VFIO_DEVICE_TPH_OP_MASK		(0x7 << VFIO_DEVICE_TPH_OP_SHIFT)
-> +/* Enable TPH on device */
-> +#define VFIO_DEVICE_TPH_ENABLE		0
-> +/* Disable TPH on device */
-> +#define VFIO_DEVICE_TPH_DISABLE		(1 << VFIO_DEVICE_TPH_OP_SHIFT)
-> +/* Get steering-tags */
-> +#define VFIO_DEVICE_TPH_GET_ST		(2 << VFIO_DEVICE_TPH_OP_SHIFT)
-> +/* Set steering-tags */
-> +#define VFIO_DEVICE_TPH_SET_ST		(4 << VFIO_DEVICE_TPH_OP_SHIFT)
-
-Don't multiplex operations on flags, give it an op member if this is
-the design.
-
-> +	__u32 count;			/* Number of entries in ents[] */
-> +	struct vfio_pci_tph_entry ents[];
-
-This effectively makes vfio_pci_tph_entry extendable, you should try
-to avoid that..
-
-Jason
 
