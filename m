@@ -1,199 +1,112 @@
-Return-Path: <kvm+bounces-58594-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-58595-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id D1455B972D2
-	for <lists+kvm@lfdr.de>; Tue, 23 Sep 2025 20:16:32 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7EE1FB97405
+	for <lists+kvm@lfdr.de>; Tue, 23 Sep 2025 20:55:57 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6525F4A6C61
-	for <lists+kvm@lfdr.de>; Tue, 23 Sep 2025 18:16:31 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B693E32088F
+	for <lists+kvm@lfdr.de>; Tue, 23 Sep 2025 18:55:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8CC272FE05D;
-	Tue, 23 Sep 2025 18:16:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D6803302172;
+	Tue, 23 Sep 2025 18:55:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="V1lmKDaX"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="xpM08QLW"
 X-Original-To: kvm@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pf1-f202.google.com (mail-pf1-f202.google.com [209.85.210.202])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9B0CE2FC877;
-	Tue, 23 Sep 2025 18:16:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 95C832D59F7
+	for <kvm@vger.kernel.org>; Tue, 23 Sep 2025 18:55:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758651383; cv=none; b=YUaW/IO8O6P6msT1a1dyaN9Q+fYi/XtRT3FcNWJvkUR4UCavTs+mXJZKZcJDmNz/KUf77w2rUy+Lvd7siobqmYLg05sZTeXhvRHKaqORIg/DOrlaM2lOgVk/Gm5iwgvOi4mEeReZSfIO6m01RwYSMeZBpZs3ar1Ql001qu7m1wY=
+	t=1758653748; cv=none; b=SARCLPQUHnuCMDtf4R+99tuZmwmL5WW5PbaALvqpTU3FO2J+rHMlEg5YGOajok9PTU/bac0u78DkaRP/h/822zTXNdrw3RwcV0h9mQwUsIL8IN8UHEOUin94PgdMC2tyqe8GEP9nnljQM7019/NYIdUjA1mixC1l77M8nUu4J80=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758651383; c=relaxed/simple;
-	bh=Op45FIln0XInlMXBvv2H3cKSqbdarkfKeQxO2UM2iNc=;
-	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=sGAym4WCpZlFXWb+pmHmWJATn70sI+WsEhUN1Ff8BF8e7E6gngGH43LthZlXNE9m7df6ixwUP4sC2AK0i7LE6me+iBL22DEALYLCV3N+OzgNnTzCbN7AM7HF6VE1VYubJTXUnE9chsykmB0+h0aI5zNZ4aINS/DxvvuaV1Xe/Zg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=V1lmKDaX; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1E8B4C4CEF5;
-	Tue, 23 Sep 2025 18:16:22 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1758651382;
-	bh=Op45FIln0XInlMXBvv2H3cKSqbdarkfKeQxO2UM2iNc=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=V1lmKDaXCunudBIzuWeAlBDhzh8PB+3No2BTExFT7GfrtccilLtoom4+FZU6uDrOa
-	 72d4I9NLuQGb3w0HIip3WctOKGBR9Dangmy0KPP8Tv+B74cFnc/++8B3fQWetFrI91
-	 ZxLhaR6TxR+Btn1mfHNLeE6mWBVUN6jT45nEhj8zIftxFN3dDJNwm+zY71ELH3oueE
-	 rJ4AchN0p99N4VBuQRCuUoQGryLXoYLHXr+iiULThF3UjqzdpdNpuYzBcQI8+iGTwS
-	 DIhneTkxY1dy6tER0YhJabVoLclqIHkBQbbA5oSG5ppl1QIQq3QSpE34917pDv9E0/
-	 1LiHvnDtesf6A==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.98.2)
-	(envelope-from <maz@kernel.org>)
-	id 1v17Yp-00000008oDv-2lq3;
-	Tue, 23 Sep 2025 18:16:19 +0000
-Date: Tue, 23 Sep 2025 19:16:19 +0100
-Message-ID: <86bjn111cc.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: Andre Przywara <andre.przywara@arm.com>
-Cc: Alexandru Elisei <alexandru.elisei@arm.com>,
-	Will Deacon <will@kernel.org>,
-	Julien Thierry
- <julien.thierry.kdev@gmail.com>,
-	<kvm@vger.kernel.org>,
-	<kvmarm@lists.linux.dev>
-Subject: Re: [PATCH kvmtool v3 6/6] arm64: Generate HYP timer interrupt specifiers
-In-Reply-To: <20250923172115.4a739ac5@donnerap.manchester.arm.com>
-References: <20250729095745.3148294-1-andre.przywara@arm.com>
-	<20250729095745.3148294-7-andre.przywara@arm.com>
-	<aJDIG8cJQjzbwj3w@raptor>
-	<20250923172115.4a739ac5@donnerap.manchester.arm.com>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+	s=arc-20240116; t=1758653748; c=relaxed/simple;
+	bh=LLCA3eHwgHle6/iRRGE9AMFJM0Dss9KsHSuojAzEvug=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=HZkWFNIe+1wAPTZrgVMMA3l9jC3T9BpMCmB5+IHvofkGQRakYx11dwsdJvoz18+4oR0QfCIdYm6Z+g+ayxaWd9ECpgz584lAw/eME4f06/nPTHNa9xn5vHucz/9IaxV6BZ/ZUgHfDFnkUTip/jLAU7t/OeNGqJOMwp41zoJdG9c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=xpM08QLW; arc=none smtp.client-ip=209.85.210.202
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+Received: by mail-pf1-f202.google.com with SMTP id d2e1a72fcca58-77f3998c607so3601575b3a.1
+        for <kvm@vger.kernel.org>; Tue, 23 Sep 2025 11:55:46 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1758653746; x=1759258546; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=64Tb0UtRymHWNSKcGNGEibZRf7V4wY076R1Uryq0wJc=;
+        b=xpM08QLWKR3WosjhTNW2j/+2wJRZIxDOEt8TaCwdbuYpVwH68W+QovUo/re87VyRL7
+         P20BhiM4eG2SMdqh56k2N9qwRuESagWTcuKECMW/RvNigpBcszP2T15e1bKiT55WTjU/
+         Fbl3kbspGEnt3qZY9jX8ZGeohUqZ0vHUtIz1ATu15aOK4IO8fMLhXvd2EKMlcCHLYWSv
+         6+ENZfYgO5hug57smLkWPB9L/SXH1vfJNxDbGZ0JOgx4sb5NV7SURfu07nnIe4zupKFK
+         WeImqOC14E94fabD9mdUU5CzowSx3p0AADmsQWWClIvM4vDDwim5nCBGxEweQ+iEq5O8
+         /gDA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1758653746; x=1759258546;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=64Tb0UtRymHWNSKcGNGEibZRf7V4wY076R1Uryq0wJc=;
+        b=Bq6kN5DWmsX4ZSK0moQIfkzmleftbp6ArpvK5iDNy5JLppHHkhkEUA1PbsWoo6fo5v
+         RIFp3PGcc+uf2nDX1NXILk4a1D0zUiPMpC5HRt08H0JQQYkUgDPr6HQe/WwFgCElvswH
+         BBX0POot4iN5m2sMcDLVVAYI3BQAv4NxxEzPWn22IqQpteC5jpBQ0iBtzpxdEDY3nmRx
+         R2pUyzvysKokO/iedrPh1BH7UR+rDpDi4kMshZPM4bIxXyXssN8D0Ch6Ixe8esMy+wui
+         jJf60fFk3og1EfQdlepybV6byA/qrFWqshPK2OWsozEC7fvwb74fg33H9/5expuewwf2
+         vzYg==
+X-Forwarded-Encrypted: i=1; AJvYcCUnR2yomcEYrSoYoWXVCregeXf16y/zPS8MZrpyO3cEUYJCF4hznUiQ+mX57akFzxjqIrQ=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yxp+OH5U8w2GvUh1xsvgku3JLqssCaERSR/Xf6vlBR54qCBBMVn
+	fPKDYBGJiJ0dP1o4MeifhGA7mz4eSQmMevKG24glgEw5lm5o5EvYrc/rRSqD+bYxC4KbdJwmVCa
+	2ZcUNnw==
+X-Google-Smtp-Source: AGHT+IEFKoTMqW3ZBSUC+7xU7rgYcYoI8KIAc0Yfk0u7tAjRZkaYdY7PJy/a8RlEIz3To4VwcxJe702x0pQ=
+X-Received: from pfbld22.prod.google.com ([2002:a05:6a00:4f96:b0:771:ea87:e37d])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a05:6a00:3d10:b0:76b:e868:eedd
+ with SMTP id d2e1a72fcca58-77f53a77620mr5273284b3a.24.1758653745928; Tue, 23
+ Sep 2025 11:55:45 -0700 (PDT)
+Date: Tue, 23 Sep 2025 11:55:44 -0700
+In-Reply-To: <7c7a5a75-a786-4a05-a836-4368582ca4c2@redhat.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: andre.przywara@arm.com, alexandru.elisei@arm.com, will@kernel.org, julien.thierry.kdev@gmail.com, kvm@vger.kernel.org, kvmarm@lists.linux.dev
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+Mime-Version: 1.0
+References: <20250813192313.132431-1-mlevitsk@redhat.com> <20250813192313.132431-3-mlevitsk@redhat.com>
+ <7c7a5a75-a786-4a05-a836-4368582ca4c2@redhat.com>
+Message-ID: <aNLtMC-k95pIYfeq@google.com>
+Subject: Re: [PATCH 2/3] KVM: x86: Fix a semi theoretical bug in kvm_arch_async_page_present_queued
+From: Sean Christopherson <seanjc@google.com>
+To: Paolo Bonzini <pbonzini@redhat.com>
+Cc: Maxim Levitsky <mlevitsk@redhat.com>, kvm@vger.kernel.org, 
+	Dave Hansen <dave.hansen@linux.intel.com>, "H. Peter Anvin" <hpa@zytor.com>, 
+	Ingo Molnar <mingo@redhat.com>, Thomas Gleixner <tglx@linutronix.de>, x86@kernel.org, 
+	Borislav Petkov <bp@alien8.de>, linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="us-ascii"
 
-On Tue, 23 Sep 2025 17:21:15 +0100,
-Andre Przywara <andre.przywara@arm.com> wrote:
+On Tue, Sep 23, 2025, Paolo Bonzini wrote:
+> On 8/13/25 21:23, Maxim Levitsky wrote:
+> > diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+> > index 9018d56b4b0a..3d45a4cd08a4 100644
+> > --- a/arch/x86/kvm/x86.c
+> > +++ b/arch/x86/kvm/x86.c
+> > @@ -13459,9 +13459,14 @@ void kvm_arch_async_page_present(struct kvm_vcpu *vcpu,
+> >   void kvm_arch_async_page_present_queued(struct kvm_vcpu *vcpu)
+> >   {
+> > -	kvm_make_request(KVM_REQ_APF_READY, vcpu);
+> > -	if (!vcpu->arch.apf.pageready_pending)
+> > +	/* Pairs with smp_store_release in vcpu_enter_guest. */
+> > +	bool in_guest_mode = (smp_load_acquire(&vcpu->mode) == IN_GUEST_MODE);
+> > +	bool page_ready_pending = READ_ONCE(vcpu->arch.apf.pageready_pending);
+> > +
+> > +	if (!in_guest_mode || !page_ready_pending) {
+> > +		kvm_make_request(KVM_REQ_APF_READY, vcpu);
+> >   		kvm_vcpu_kick(vcpu);
+> > +	}
 > 
-> On Mon, 4 Aug 2025 15:47:55 +0100
-> Alexandru Elisei <alexandru.elisei@arm.com> wrote:
-> 
-> Hi,
-> 
-> > On Tue, Jul 29, 2025 at 10:57:45AM +0100, Andre Przywara wrote:
-> > > From: Marc Zyngier <maz@kernel.org>
-> > > 
-> > > FEAT_VHE introduced a non-secure EL2 virtual timer, along with its
-> > > interrupt line. Consequently the arch timer DT binding introduced a fifth
-> > > interrupt to communicate this interrupt number.
-> > > 
-> > > Refactor the interrupts property generation code to deal with a variable
-> > > number of interrupts, and forward five interrupts instead of four in case
-> > > nested virt is enabled.
-> > > 
-> > > Signed-off-by: Marc Zyngier <maz@kernel.org>
-> > > Signed-off-by: Andre Przywara <andre.przywara@arm.com>
-> > > ---
-> > >  arm64/arm-cpu.c           |  4 +---
-> > >  arm64/include/kvm/timer.h |  2 +-
-> > >  arm64/timer.c             | 29 ++++++++++++-----------------
-> > >  3 files changed, 14 insertions(+), 21 deletions(-)
-> > > 
-> > > diff --git a/arm64/arm-cpu.c b/arm64/arm-cpu.c
-> > > index 1e456f2c6..abdd6324f 100644
-> > > --- a/arm64/arm-cpu.c
-> > > +++ b/arm64/arm-cpu.c
-> > > @@ -12,11 +12,9 @@
-> > >  
-> > >  static void generate_fdt_nodes(void *fdt, struct kvm *kvm)
-> > >  {
-> > > -	int timer_interrupts[4] = {13, 14, 11, 10};
-> > > -
-> > >  	gic__generate_fdt_nodes(fdt, kvm->cfg.arch.irqchip,
-> > >  				kvm->cfg.arch.nested_virt);
-> > > -	timer__generate_fdt_nodes(fdt, kvm, timer_interrupts);
-> > > +	timer__generate_fdt_nodes(fdt, kvm);
-> > >  	pmu__generate_fdt_nodes(fdt, kvm);
-> > >  }
-> > >  
-> > > diff --git a/arm64/include/kvm/timer.h b/arm64/include/kvm/timer.h
-> > > index 928e9ea7a..81e093e46 100644
-> > > --- a/arm64/include/kvm/timer.h
-> > > +++ b/arm64/include/kvm/timer.h
-> > > @@ -1,6 +1,6 @@
-> > >  #ifndef ARM_COMMON__TIMER_H
-> > >  #define ARM_COMMON__TIMER_H
-> > >  
-> > > -void timer__generate_fdt_nodes(void *fdt, struct kvm *kvm, int *irqs);
-> > > +void timer__generate_fdt_nodes(void *fdt, struct kvm *kvm);
-> > >  
-> > >  #endif /* ARM_COMMON__TIMER_H */
-> > > diff --git a/arm64/timer.c b/arm64/timer.c
-> > > index 861f2d994..2ac6144f9 100644
-> > > --- a/arm64/timer.c
-> > > +++ b/arm64/timer.c
-> > > @@ -5,31 +5,26 @@
-> > >  #include "kvm/timer.h"
-> > >  #include "kvm/util.h"
-> > >  
-> > > -void timer__generate_fdt_nodes(void *fdt, struct kvm *kvm, int *irqs)
-> > > +void timer__generate_fdt_nodes(void *fdt, struct kvm *kvm)
-> > >  {
-> > >  	const char compatible[] = "arm,armv8-timer\0arm,armv7-timer";
-> > >  	u32 cpu_mask = gic__get_fdt_irq_cpumask(kvm);
-> > > -	u32 irq_prop[] = {
-> > > -		cpu_to_fdt32(GIC_FDT_IRQ_TYPE_PPI),
-> > > -		cpu_to_fdt32(irqs[0]),
-> > > -		cpu_to_fdt32(cpu_mask | IRQ_TYPE_LEVEL_LOW),
-> > > +	int irqs[5] = {13, 14, 11, 10, 12};
-> > > +	int nr = ARRAY_SIZE(irqs);
-> > > +	u32 irq_prop[nr * 3];
-> > >  
-> > > -		cpu_to_fdt32(GIC_FDT_IRQ_TYPE_PPI),
-> > > -		cpu_to_fdt32(irqs[1]),
-> > > -		cpu_to_fdt32(cpu_mask | IRQ_TYPE_LEVEL_LOW),
-> > > +	if (!kvm->cfg.arch.nested_virt)
-> > > +		nr--;  
-> > 
-> > I'm confused.
-> > 
-> > FEAT_VHE introduced the EL2 virtual timer, and my interpretation of the Arm ARM
-> > is that the EL2 virtual timer is present if an only if FEAT_VHE:
-> > 
-> > "In an implementation of the Generic Timer that includes EL3, if EL3 can use
-> > AArch64, the following timers are implemented:
-> > [..]
-> > * When FEAT_VHE is implemented, a Non-secure EL2 virtual timer."
-> > 
-> > Is my interpretation correct?
-> > 
-> > KVM doesn't allow FEAT_VHE and FEAT_E2H0 to coexist (in
-> > nested.c::limit_nv_id_reg()), to force E2H to be RES0. Assuming my interpretion
-> > is correct, shouldn't the check be:
-> 
-> Even at the risk of going even deeper into that nitpicking rabbit hole:
-> "If FEAT_E2H0 is implemented, then FEAT_VHE is implemented."
+> Unlike Sean, I think the race exists in abstract and is not benign
 
-This is written as such not to make ARMv8.0 illegal, as E2H is RES0
-there. Yes, this is odd, but there is a logic behind it.
-
-> So we have that timer, regardless of FEAT_E2H0, and regardless of whether
-> HCR_EL2.E2H is actually 0 or 1?
-> And indeed the configuration stanza and the pseudocode in "D24.10.9
-> CNTHV_CTL_EL2, Counter-timer Virtual Timer Control Register (EL2)" do not
-> mention SCR_EL2.E2H0 at all, just FEAT_VHE.
-
-That's mostly a KVM bug. If we want to pretend we don't have VHE, then
-CNTHV_*_EL2 must UNDEF, which isn't a big deal.
-
-	M.
-
--- 
-Without deviation from the norm, progress is not possible.
+How is it not benign?  I never said the race doesn't exist, I said that consuming
+a stale vcpu->arch.apf.pageready_pending in kvm_arch_async_page_present_queued()
+is benign.
 
