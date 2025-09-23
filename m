@@ -1,184 +1,151 @@
-Return-Path: <kvm+bounces-58585-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-58586-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 34F4CB96E77
-	for <lists+kvm@lfdr.de>; Tue, 23 Sep 2025 19:05:11 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9C1BAB96F96
+	for <lists+kvm@lfdr.de>; Tue, 23 Sep 2025 19:12:52 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id DC4523B0D05
-	for <lists+kvm@lfdr.de>; Tue, 23 Sep 2025 17:05:09 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 276FE321712
+	for <lists+kvm@lfdr.de>; Tue, 23 Sep 2025 17:12:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9E1D6270551;
-	Tue, 23 Sep 2025 17:05:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 86DF92777F1;
+	Tue, 23 Sep 2025 17:12:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=raptorengineering.com header.i=@raptorengineering.com header.b="lKyrQNJc"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="flQS1hBB"
 X-Original-To: kvm@vger.kernel.org
-Received: from raptorengineering.com (mail.raptorengineering.com [23.155.224.40])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C2F402264CB
-	for <kvm@vger.kernel.org>; Tue, 23 Sep 2025 17:05:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=23.155.224.40
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 81A9E1E8332;
+	Tue, 23 Sep 2025 17:12:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758647103; cv=none; b=heo9WgbUm2SjcoUgaZCbJ9TQkMdwiB/Vak8fR+dybHhD/DzI8LyHg+3rTB+sYmVC/gHqRl+7jkZYX7ol1vF0LCgAJJdwnQl7KRyQ4Kf9zIO62Buvbi6KHKcKTIqgAGyBkdQUpCw4JqFVi9YFCTSkAMlqMXSNl2i8bC0WEdY8FtI=
+	t=1758647554; cv=none; b=jg703fRmWkIwCL/JzybOhSzJ11OI+r224M+eHcEVLE9BqZidHCSk1NEevujcg9os+uZIHPS80dtjZDz/wJfTcbsKgCTuB+PGiCRnqct5DxGyVug6Pa5NiOzebOc+kvoEgOuaILpMin9Q2trOyjibJ5DD+h9Kl9uQcyonkAzFO+s=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758647103; c=relaxed/simple;
-	bh=nikcktD4X8XZYHIolmnKChTnQDclTMk/gm8XlTdhIsI=;
-	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
-	 MIME-Version:Content-Type; b=jjQqCxaLUalGtpU3dh4avQeDqc7AoeZYnFb2CPsbKluE1dewZCOXEOP65iW6IbNAzCc4K0pYymDofS6tIEmMs3tRTMU1WDYRsDYfJtoY2hEtNWZVMwzp226o+F53wO6F9tAkR631qj1aBCm0gcEqgKbtx5yMLtLKnrGXMXbC9pg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=raptorengineering.com; spf=pass smtp.mailfrom=raptorengineering.com; dkim=pass (1024-bit key) header.d=raptorengineering.com header.i=@raptorengineering.com header.b=lKyrQNJc; arc=none smtp.client-ip=23.155.224.40
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=raptorengineering.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=raptorengineering.com
-Received: from localhost (localhost [127.0.0.1])
-	by mail.rptsys.com (Postfix) with ESMTP id 9E9BD82889AD;
-	Tue, 23 Sep 2025 12:05:00 -0500 (CDT)
-Received: from mail.rptsys.com ([127.0.0.1])
-	by localhost (vali.starlink.edu [127.0.0.1]) (amavisd-new, port 10032)
-	with ESMTP id d9e047lrAft2; Tue, 23 Sep 2025 12:04:59 -0500 (CDT)
-Received: from localhost (localhost [127.0.0.1])
-	by mail.rptsys.com (Postfix) with ESMTP id BBAAB8288A28;
-	Tue, 23 Sep 2025 12:04:59 -0500 (CDT)
-DKIM-Filter: OpenDKIM Filter v2.10.3 mail.rptsys.com BBAAB8288A28
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=raptorengineering.com; s=B8E824E6-0BE2-11E6-931D-288C65937AAD;
-	t=1758647099; bh=uiKso95qBPnK4Z1Hg7XgeEAffq/fOvfPfWhOzqHY6Kg=;
-	h=Date:From:To:Message-ID:MIME-Version;
-	b=lKyrQNJcBmJXbSNSVoipCAlDcwkQL65ofdw9ZVFAwa6hC4S2SKbKiu2teeCob8o5P
-	 BbwOq1+8q7aKmWetD66BpdM8KJ+ucy5ke+Q4C4kvE5Xv6/4Meu1ofu3btdALWI24fK
-	 5T+cUwQgoj/TqaMNTu8CDwCufurPX4fPhO8ntSpo=
-X-Virus-Scanned: amavisd-new at rptsys.com
-Received: from mail.rptsys.com ([127.0.0.1])
-	by localhost (vali.starlink.edu [127.0.0.1]) (amavisd-new, port 10026)
-	with ESMTP id sHDU-96RXM5r; Tue, 23 Sep 2025 12:04:59 -0500 (CDT)
-Received: from vali.starlink.edu (localhost [127.0.0.1])
-	by mail.rptsys.com (Postfix) with ESMTP id 962B682889AD;
-	Tue, 23 Sep 2025 12:04:59 -0500 (CDT)
-Date: Tue, 23 Sep 2025 12:04:58 -0500 (CDT)
-From: Timothy Pearson <tpearson@raptorengineering.com>
-To: =?utf-8?Q?C=C3=A9dric?= Le Goater <clg@redhat.com>
-Cc: kvm <kvm@vger.kernel.org>, linuxppc-dev <linuxppc-dev@lists.ozlabs.org>, 
-	Alex Williamson <alex.williamson@redhat.com>
-Message-ID: <679370091.1744465.1758647098815.JavaMail.zimbra@raptorengineeringinc.com>
-In-Reply-To: <b1813fed-1dbe-40ad-a6e9-a5c86aea996c@redhat.com>
-References: <1293210747.1743219.1758565305521.JavaMail.zimbra@raptorengineeringinc.com> <b1813fed-1dbe-40ad-a6e9-a5c86aea996c@redhat.com>
-Subject: Re: [PATCH v3] vfio/pci: Fix INTx handling on legacy non-PCI 2.3
- devices
+	s=arc-20240116; t=1758647554; c=relaxed/simple;
+	bh=gmK1CGGOGWIE5mxCSSz01jl9806+Hkknw/PF7Rft5eg=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=fdnOhhDea0rILejYKVh6xD+enTdpmCIrqiWQlLH7L/dTPeXcK0m/x039phcl97D8Hbmf0Ooytn9kGT0bUVMitQfqRmQCYoaS7XRZPONGj6nH08rh8YgAnS2277z5kvPXx0nIPfxVqMJJuihabZ9voe8T1CNgJcR0JHQtwC3InGM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=flQS1hBB; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A7895C4CEF5;
+	Tue, 23 Sep 2025 17:12:33 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1758647554;
+	bh=gmK1CGGOGWIE5mxCSSz01jl9806+Hkknw/PF7Rft5eg=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=flQS1hBBI4YVkOhHIOLPDHNMtlCkyfUNIFD9Y3j56A129eJQ7ulgbOQABWCzap9Hj
+	 rl/VZtmwxWaxs1PMRUvTjPUNwlEZn88V/RLG5Kuc+XdNGA5TeIjqOIi+B4X9/FCt4c
+	 Qx+OujTVF/ZwyQKONCRLVjz52uX0o7GV547cRdBjsiAgj+ycng1QAEkqJ6m+YLzWAq
+	 DCNZoSbiGk6YER29JJC0HRMAOqBwNSUqMZUTv1sjBpzIQQgtNOUDKZTBiXF4eLwe8A
+	 xvmArCpm9L4VMxDuuM+3Hd13ks3PqY62OM41EKtcVNBQBVyEfRahPW/H/CtiWATpbl
+	 ddW7gMC2jEh9A==
+Date: Tue, 23 Sep 2025 20:12:28 +0300
+From: Leon Romanovsky <leon@kernel.org>
+To: Alex Williamson <alex.williamson@redhat.com>
+Cc: Jason Gunthorpe <jgg@nvidia.com>,
+	Andrew Morton <akpm@linux-foundation.org>,
+	Bjorn Helgaas <bhelgaas@google.com>,
+	Christian =?iso-8859-1?Q?K=F6nig?= <christian.koenig@amd.com>,
+	dri-devel@lists.freedesktop.org, iommu@lists.linux.dev,
+	Jens Axboe <axboe@kernel.dk>, Joerg Roedel <joro@8bytes.org>,
+	kvm@vger.kernel.org, linaro-mm-sig@lists.linaro.org,
+	linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-media@vger.kernel.org, linux-mm@kvack.org,
+	linux-pci@vger.kernel.org, Logan Gunthorpe <logang@deltatee.com>,
+	Marek Szyprowski <m.szyprowski@samsung.com>,
+	Robin Murphy <robin.murphy@arm.com>,
+	Sumit Semwal <sumit.semwal@linaro.org>,
+	Vivek Kasireddy <vivek.kasireddy@intel.com>,
+	Will Deacon <will@kernel.org>
+Subject: Re: [PATCH v2 03/10] PCI/P2PDMA: Refactor to separate core P2P
+ functionality from memory allocation
+Message-ID: <20250923171228.GL10800@unreal>
+References: <cover.1757589589.git.leon@kernel.org>
+ <1e2cb89ea76a92949d06a804e3ab97478e7cacbb.1757589589.git.leon@kernel.org>
+ <20250922150032.3e3da410.alex.williamson@redhat.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-X-Mailer: Zimbra 8.5.0_GA_3042 (ZimbraWebClient - GC140 (Linux)/8.5.0_GA_3042)
-Thread-Topic: vfio/pci: Fix INTx handling on legacy non-PCI 2.3 devices
-Thread-Index: GCGh9b79dXGiPSR4Qi5bHgbosGEqDQ==
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250922150032.3e3da410.alex.williamson@redhat.com>
 
-Apologies, resent.
+On Mon, Sep 22, 2025 at 03:00:32PM -0600, Alex Williamson wrote:
+> On Thu, 11 Sep 2025 14:33:07 +0300
+> Leon Romanovsky <leon@kernel.org> wrote:
+> 
+> > From: Leon Romanovsky <leonro@nvidia.com>
+> > 
+> > Refactor the PCI P2PDMA subsystem to separate the core peer-to-peer DMA
+> > functionality from the optional memory allocation layer. This creates a
+> > two-tier architecture:
+> > 
+> > The core layer provides P2P mapping functionality for physical addresses
+> > based on PCI device MMIO BARs and integrates with the DMA API for
+> > mapping operations. This layer is required for all P2PDMA users.
+> > 
+> > The optional upper layer provides memory allocation capabilities
+> > including gen_pool allocator, struct page support, and sysfs interface
+> > for user space access.
+> > 
+> > This separation allows subsystems like VFIO to use only the core P2P
+> > mapping functionality without the overhead of memory allocation features
+> > they don't need. The core functionality is now available through the
+> > new pci_p2pdma_enable() function that returns a p2pdma_provider
+> > structure.
+> > 
+> > Signed-off-by: Leon Romanovsky <leonro@nvidia.com>
+> > ---
+> >  drivers/pci/p2pdma.c       | 129 +++++++++++++++++++++++++++----------
+> >  include/linux/pci-p2pdma.h |   5 ++
+> >  2 files changed, 100 insertions(+), 34 deletions(-)
 
------ Original Message -----
-> From: "C=C3=A9dric Le Goater" <clg@redhat.com>
-> To: "Timothy Pearson" <tpearson@raptorengineering.com>, "kvm" <kvm@vger.k=
-ernel.org>
-> Cc: "linuxppc-dev" <linuxppc-dev@lists.ozlabs.org>, "Alex Williamson" <al=
-ex.williamson@redhat.com>
-> Sent: Tuesday, September 23, 2025 12:02:12 PM
-> Subject: Re: [PATCH v3] vfio/pci: Fix INTx handling on legacy non-PCI 2.3=
- devices
+<...>
 
-> On 9/22/25 20:21, Timothy Pearson wrote:
->> PCI devices prior to PCI 2.3 both use level interrupts and do not suppor=
-t
->> interrupt masking, leading to a failure when passed through to a KVM gue=
-st on
->> at least the ppc64 platform. This failure manifests as receiving and
->> acknowledging a single interrupt in the guest, while the device continue=
-s to
->> assert the level interrupt indicating a need for further servicing.
->>=20
->> When lazy IRQ masking is used on DisINTx- (non-PCI 2.3) hardware, the fo=
-llowing
->> sequence occurs:
->>=20
->>   * Level IRQ assertion on device
->>   * IRQ marked disabled in kernel
->>   * Host interrupt handler exits without clearing the interrupt on the d=
-evice
->>   * Eventfd is delivered to userspace
->>   * Guest processes IRQ and clears device interrupt
->>   * Device de-asserts INTx, then re-asserts INTx while the interrupt is =
-masked
->>   * Newly asserted interrupt acknowledged by kernel VMM without being ha=
-ndled
->>   * Software mask removed by VFIO driver
->>   * Device INTx still asserted, host controller does not see new edge af=
-ter EOI
->>=20
->> The behavior is now platform-dependent.  Some platforms (amd64) will con=
-tinue
->> to spew IRQs for as long as the INTX line remains asserted, therefore th=
-e IRQ
->> will be handled by the host as soon as the mask is dropped.  Others (ppc=
-64) will
->> only send the one request, and if it is not handled no further interrupt=
-s will
->> be sent.  The former behavior theoretically leaves the system vulnerable=
- to
->> interrupt storm, and the latter will result in the device stalling after
->> receiving exactly one interrupt in the guest.
->>=20
->> Work around this by disabling lazy IRQ masking for DisINTx- INTx devices=
-.
->=20
-> Timothy,
->=20
-> This changes lacks your SoB.
->=20
-> Thanks,
->=20
-> C.
->=20
->=20
->=20
->=20
->> ---
->>   drivers/vfio/pci/vfio_pci_intrs.c | 7 +++++++
->>   1 file changed, 7 insertions(+)
->>=20
->> diff --git a/drivers/vfio/pci/vfio_pci_intrs.c
->> b/drivers/vfio/pci/vfio_pci_intrs.c
->> index 123298a4dc8f..61d29f6b3730 100644
->> --- a/drivers/vfio/pci/vfio_pci_intrs.c
->> +++ b/drivers/vfio/pci/vfio_pci_intrs.c
->> @@ -304,9 +304,14 @@ static int vfio_intx_enable(struct vfio_pci_core_de=
-vice
->> *vdev,
->>  =20
->>   =09vdev->irq_type =3D VFIO_PCI_INTX_IRQ_INDEX;
->>  =20
->> +=09if (!vdev->pci_2_3)
->> +=09=09irq_set_status_flags(pdev->irq, IRQ_DISABLE_UNLAZY);
->> +
->>   =09ret =3D request_irq(pdev->irq, vfio_intx_handler,
->>   =09=09=09  irqflags, ctx->name, ctx);
->>   =09if (ret) {
->> +=09=09if (!vdev->pci_2_3)
->> +=09=09=09irq_clear_status_flags(pdev->irq, IRQ_DISABLE_UNLAZY);
->>   =09=09vdev->irq_type =3D VFIO_PCI_NUM_IRQS;
->>   =09=09kfree(name);
->>   =09=09vfio_irq_ctx_free(vdev, ctx, 0);
->> @@ -352,6 +357,8 @@ static void vfio_intx_disable(struct vfio_pci_core_d=
-evice
->> *vdev)
->>   =09=09vfio_virqfd_disable(&ctx->unmask);
->>   =09=09vfio_virqfd_disable(&ctx->mask);
->>   =09=09free_irq(pdev->irq, ctx);
->> +=09=09if (!vdev->pci_2_3)
->> +=09=09=09irq_clear_status_flags(pdev->irq, IRQ_DISABLE_UNLAZY);
->>   =09=09if (ctx->trigger)
->>   =09=09=09eventfd_ctx_put(ctx->trigger);
-> >   =09=09kfree(ctx->name);
+> > -static int pci_p2pdma_setup(struct pci_dev *pdev)
+> > +/**
+> > + * pcim_p2pdma_enable - Enable peer-to-peer DMA support for a PCI device
+> > + * @pdev: The PCI device to enable P2PDMA for
+> > + * @bar: BAR index to get provider
+> > + *
+> > + * This function initializes the peer-to-peer DMA infrastructure for a PCI
+> > + * device. It allocates and sets up the necessary data structures to support
+> > + * P2PDMA operations, including mapping type tracking.
+> > + */
+> > +struct p2pdma_provider *pcim_p2pdma_enable(struct pci_dev *pdev, int bar)
+> >  {
+> > -	int error = -ENOMEM;
+> >  	struct pci_p2pdma *p2p;
+> > +	int i, ret;
+> > +
+> > +	p2p = rcu_dereference_protected(pdev->p2pdma, 1);
+> > +	if (p2p)
+> > +		/* PCI device was "rebound" to the driver */
+> > +		return &p2p->mem[bar];
+> >  
+> 
+> This seems like two separate functions rolled into one, an 'initialize
+> providers' and a 'get provider for BAR'.  The comment above even makes
+> it sound like only a driver re-probing a device would encounter this
+> branch, but the use case later in vfio-pci shows it to be the common
+> case to iterate BARs for a device.
+> 
+> But then later in patch 8/ and again in 10/ why exactly do we cache
+> the provider on the vfio_pci_core_device rather than ask for it on
+> demand from the p2pdma?
+
+In addition to what Jason said about locking. The whole p2pdma.c is
+written with assumption that "pdev->p2pdma" pointer is assigned only
+once during PCI device lifetime. For example, see how sysfs files
+are exposed and accessed in p2pdma.c.
+
+Once you initialize p2pdma, it is much easier to initialize all BARs at
+the same time.
+
+Thanks
 
