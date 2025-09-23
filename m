@@ -1,189 +1,221 @@
-Return-Path: <kvm+bounces-58596-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-58597-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id F3401B97566
-	for <lists+kvm@lfdr.de>; Tue, 23 Sep 2025 21:29:12 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 28795B9772B
+	for <lists+kvm@lfdr.de>; Tue, 23 Sep 2025 22:07:49 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id AA98E442417
-	for <lists+kvm@lfdr.de>; Tue, 23 Sep 2025 19:29:11 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 189A71B230DE
+	for <lists+kvm@lfdr.de>; Tue, 23 Sep 2025 20:08:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B36433043B9;
-	Tue, 23 Sep 2025 19:29:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2E4FE30AAC8;
+	Tue, 23 Sep 2025 20:07:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="gptIDx1O"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ZLFqnU6d"
 X-Original-To: kvm@vger.kernel.org
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 66BE7253B40
-	for <kvm@vger.kernel.org>; Tue, 23 Sep 2025 19:29:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 85D592F3620
+	for <kvm@vger.kernel.org>; Tue, 23 Sep 2025 20:07:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758655744; cv=none; b=lnKNYmxkz+4zljQ3CNNrq4p4qJ/6G0NPvDZgRBleJWVxaDvmyGG9Q7RiSHTjrsJbrreB5RXejF921+OXo1KuXdNgiKfu3A0GjIc+VVTpj7vzTLyjddflKJ+oiqeWa02PKQ2yHDXB8isEeapTX/YNkxGAbXlfG3bX7BUNonjqL1U=
+	t=1758658053; cv=none; b=HbDbLhnz53qi/XDZJcbiS70UBXFOAKxsT1IJSGPP10j5xWnZqft+rX5OJgJ03JTHBjUhCowq5IQ0X/lK6APN/uoFQyVYHaFZ8GfDi0X+tcu0ReQAOwVUpJjE9FCh4/OtWneKTZmeCIz6P1yBmOf3TkIaiQfjsgrjaPAnEOcQcfc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758655744; c=relaxed/simple;
-	bh=sd6VAObrBzzzEowZBcw8e4ug303YzqZT+i/Pp2dtH0Q=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=Spwgb6JhSYjydNLUTdOVwIpHzyov/Y5NXuzg2zBQ9+YjUnovKoDct4DpqROGE0pHgd2Es0cjPtE9MdvwItQdsAmBDyIBxETP2qZ4G7LmODgCrb6lfm+u8BBgqI3Rf2LFueRKBcjpER+f7k3ir1jXI5GkQTc0ZTZAr2gN5bDbk+Q=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=gptIDx1O; arc=none smtp.client-ip=170.10.129.124
+	s=arc-20240116; t=1758658053; c=relaxed/simple;
+	bh=/cNMCmhs2+2GgzKjW2K7MV1lRjCXVMAS8z1dlxsrJ7Y=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=LFHtCmunNjDPdRP/dgaiHu9fsbkOH4h7u3KWNnjXWwD98O4+lIf3AZt1IlIPi/bjLXTjsKHixKW6Zm03tLs6N5pkloAlvy3fftmHJTDJg8VTClVVfgsEJ2aaqnFqWJl3dGoY5vXM+GVqysDOdpzwQeFBOGx8Ob41iK0sRKojBBY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=ZLFqnU6d; arc=none smtp.client-ip=170.10.129.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1758655742;
+	s=mimecast20190719; t=1758658050;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-	bh=TNQtlDw4FEjV9R6iQt9meK1BGnFS2n1mV6dUS+jU7Uo=;
-	b=gptIDx1OcmWLjcufQbPe75pUHp9hIt8rYNe6IWt0kEtQ50UX6tZUpYaKsuIvg2iMVXcflB
-	W9gAF1yE1+XKFFOk7zdymWguZt3G/GrgQL1xnMU4NrUl9Rj19aooLo4F8EsG7tRdSArIxo
-	JIltMahpSxoGpU4pcT4p7Xh/RX6LeFc=
-Received: from mail-ej1-f70.google.com (mail-ej1-f70.google.com
- [209.85.218.70]) by relay.mimecast.com with ESMTP with STARTTLS
+	 in-reply-to:in-reply-to:references:references;
+	bh=TkF/1TIVCdQ8I35UWInq/5XGtjT7LO6t3DfocUuGzJk=;
+	b=ZLFqnU6d+6znjZm1pAwJ06tM7mu3sevqZlUrT8MjnxwlkXnkTcyAXiAA6TG2ugWnXotjoI
+	TdSoPOFUBZUupSa72gNvmK6pOUe++iUCJ2LAaZQ+ZbW03xt+Z/3dlVMHZjvF6jguJV9+zY
+	anHh/hhO8vGM/0FtG3uQIIO8IH4Ytj4=
+Received: from mail-il1-f197.google.com (mail-il1-f197.google.com
+ [209.85.166.197]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-167-ZixMHssaNl2u6KH2OJhcMA-1; Tue, 23 Sep 2025 15:29:00 -0400
-X-MC-Unique: ZixMHssaNl2u6KH2OJhcMA-1
-X-Mimecast-MFC-AGG-ID: ZixMHssaNl2u6KH2OJhcMA_1758655739
-Received: by mail-ej1-f70.google.com with SMTP id a640c23a62f3a-b25f63db20bso20719466b.0
-        for <kvm@vger.kernel.org>; Tue, 23 Sep 2025 12:29:00 -0700 (PDT)
+ us-mta-353-6JT9l2TKNNyozqVJ-pJhxA-1; Tue, 23 Sep 2025 16:07:29 -0400
+X-MC-Unique: 6JT9l2TKNNyozqVJ-pJhxA-1
+X-Mimecast-MFC-AGG-ID: 6JT9l2TKNNyozqVJ-pJhxA_1758658048
+Received: by mail-il1-f197.google.com with SMTP id e9e14a558f8ab-4258981d664so852235ab.3
+        for <kvm@vger.kernel.org>; Tue, 23 Sep 2025 13:07:28 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1758655739; x=1759260539;
-        h=content-transfer-encoding:in-reply-to:autocrypt:content-language
-         :from:references:cc:to:subject:user-agent:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=TNQtlDw4FEjV9R6iQt9meK1BGnFS2n1mV6dUS+jU7Uo=;
-        b=mGxKCVpXhOtb4XTMn9XPaQ09/nPPH4pk73diH8/5qnuN/jGTkv3EV5MBCbk1lCWlDg
-         TcmAPH2VQo89bT//eAOvxh3v9TrqcRk6vJpSBaw7yi4TUYI4zNKk8Vu/pUJlkn26LrTj
-         7AWHPWJa5QXbQBc3QgDZ0vHTUsLUsTYvlDVylsdM+aTeDslfBp6PAjeiIrYKIPf9xqy+
-         AXAm9gxd70S38Fw94lV5iiByYVMHcnreB1fsQBXpDsC/XtW2JaJj0NaskfM/WdugPxga
-         VEgIcOaZ4G/qILyPj72erMV4z7BGCQBpQaWmlFDusS+eoqGaOJrq5gU2od5+fKb+FoLW
-         cZTw==
-X-Forwarded-Encrypted: i=1; AJvYcCWt7u/uaX/zbmrwiFZVr8SQq5jAayfhSEhs8Z3AGQXX/sEhaRssMIzrPEtkHa5kXbmAh9s=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzRHp04mACYfIrGbFTkkH4KgpVaNGQ0M3jr3nFgToHNy+t+cAc2
-	nm4YQmkcNBO5R9QCwk493itHRYf/56+3me0uHtxmXngSJdj99hphyfg1iRwUAcxxU0XUybon8HS
-	sIN7N6zO/fwq/9J/qT/OtbMXeaKCrLLoRDkInu1IqUglHlCMgNxgN+A==
-X-Gm-Gg: ASbGncsPk6zrE3O8TqKrbCRb0I9dEpJFeQk6l5906JSdBcKWyDzNmBjZ4uG248wMjgV
-	kwXd9KtX5epqMXF0lqisO7yLRUR+syzwrpuSROLmIGMXv7MJjAVCMn2WV050NYM9qtHQXD1bc8e
-	GdJZjOYwRhOvcKu0rFwPovS0/NHUOYdjGgCpXBPD+CF+bxMD1qNpy5E9sb++OBEAbdHFYIFbPBR
-	40NZCCg9FmLF4+o273wE2kWQFIGxk21/HamTWBbYk1/IbSEEFSBBbQER4FDikGkAONgarTYHqHY
-	vmdv2JJptlbwgRZDpY2bnJRWJwPJYDk6uosrHj82VQUa3bqGi/ZH6JZtW8xe53Wp0agEx4u0luG
-	qbMd9azDt2cWvPRTgdB2fzY0ku5NqIl6wDBbEHLBm4+W81g==
-X-Received: by 2002:a17:907:6d1f:b0:b04:7eba:1b55 with SMTP id a640c23a62f3a-b301c949952mr378892766b.19.1758655739436;
-        Tue, 23 Sep 2025 12:28:59 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IEwgK+9y2tnAvcbijCMOsN1/IJbEuP6rc+Zd9Nsg0/Zt/SIt7mt984i4E7/P5V+usRO7zCuRA==
-X-Received: by 2002:a17:907:6d1f:b0:b04:7eba:1b55 with SMTP id a640c23a62f3a-b301c949952mr378890466b.19.1758655739062;
-        Tue, 23 Sep 2025 12:28:59 -0700 (PDT)
-Received: from [192.168.10.48] ([176.206.127.188])
-        by smtp.googlemail.com with ESMTPSA id a640c23a62f3a-b2adc17af3asm676542166b.6.2025.09.23.12.28.58
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 23 Sep 2025 12:28:58 -0700 (PDT)
-Message-ID: <23f11dc1-4fd1-4286-a69a-3892a869ed33@redhat.com>
-Date: Tue, 23 Sep 2025 21:28:57 +0200
+        d=1e100.net; s=20230601; t=1758658048; x=1759262848;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=TkF/1TIVCdQ8I35UWInq/5XGtjT7LO6t3DfocUuGzJk=;
+        b=tAFPndUYLLg4CcsNmm18JXHPyDhUCAaWHTd5LMHPqjy60mkKBMw/kKcghZQYDciepH
+         4oJn9At1yFP/46sS/Ii5gMvT0m+FAGWkufoEbjm//uSPWhfrtIO8P/Aqo4EAxHjiyqhn
+         BhEpI+qv/qG4b3phfJH0DH1LArMHgX/B53dGrehpBxhs+MKsLm8MlWL8q74UcZ75FOpT
+         gj9Wr1/gKZJx3dzHVei2j32Uw6rxGly0aAMTcUL9FY/h4dOWkTQW0TgzDnuD8p48OxMf
+         yxhT45bn/PFSPCVaHeImCWo7mIXQFX7d80H92XHN1TW+jDRuyV542dcIYqHJUIPOKGkn
+         yi7g==
+X-Forwarded-Encrypted: i=1; AJvYcCW+sKy1a8edD5HlC5wzjFO8/oaJnhGb2Xd/3zRwWoAIJpsYXHY3AxcGe+/ZFor/8BtsfiQ=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwhVkQVQrptn88y6huJUaZOxb5DLeKJ8caRvxaXebAWq8FCRVUz
+	wsVoAJ3L7teupDquVn+TyeAvct6Pa5d4iyHIkNIzNfoAToXyi3dK0MRoNYcb5Qb6hT70+t+Pbkp
+	gZRKfOa/McNvlaxAmM1qpiDzOhzscbLoke4BrubuLDktEp84MJhvc/w==
+X-Gm-Gg: ASbGncvGtpz9ZiKlVYXp3zIupZJCk8rT2azPzsvhV3j8QMTuB83eEB7Jd379r56O/h2
+	ApkrOZ/FZUU2NvAZB0GAsjMhPql7XRIFGm9thpcE0jE2MdebnPL64EUBJkpZM4l5t7zf2sbYpqS
+	YLWdt6YhM0w29oOSszRqseFnrhynk282YpdlLmgit458GqUIgNEmjOUiSfEP7JuIwjMJqEkvmJG
+	/nNvYvVsjcK5oIQGg+h1D/1RYsmhXLdQWTRqDUtAoifxPy6UJCr1wLk1SJaf71CySOxe2v5155y
+	FT/RLk5ujBqAgu1EpHcU/l5BSYQTkr2YV0eCB455NQY=
+X-Received: by 2002:a05:6e02:b27:b0:423:fd07:d3fe with SMTP id e9e14a558f8ab-42581e0924amr21638585ab.2.1758658048119;
+        Tue, 23 Sep 2025 13:07:28 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IEmMxIqHNMDHwq6jPuldjwSxK84807XGPUliuEF5qCvF8SuPWmF0LqQLkrDELCWNHqAt6pi1g==
+X-Received: by 2002:a05:6e02:b27:b0:423:fd07:d3fe with SMTP id e9e14a558f8ab-42581e0924amr21638385ab.2.1758658047638;
+        Tue, 23 Sep 2025 13:07:27 -0700 (PDT)
+Received: from redhat.com ([38.15.36.11])
+        by smtp.gmail.com with ESMTPSA id e9e14a558f8ab-425813f3053sm15141865ab.21.2025.09.23.13.07.25
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 23 Sep 2025 13:07:26 -0700 (PDT)
+Date: Tue, 23 Sep 2025 14:07:23 -0600
+From: Alex Williamson <alex.williamson@redhat.com>
+To: Leon Romanovsky <leon@kernel.org>
+Cc: Jason Gunthorpe <jgg@nvidia.com>, Andrew Morton
+ <akpm@linux-foundation.org>, Bjorn Helgaas <bhelgaas@google.com>, Christian
+ =?UTF-8?B?S8O2bmln?= <christian.koenig@amd.com>,
+ dri-devel@lists.freedesktop.org, iommu@lists.linux.dev, Jens Axboe
+ <axboe@kernel.dk>, Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
+ linaro-mm-sig@lists.linaro.org, linux-block@vger.kernel.org,
+ linux-kernel@vger.kernel.org, linux-media@vger.kernel.org,
+ linux-mm@kvack.org, linux-pci@vger.kernel.org, Logan Gunthorpe
+ <logang@deltatee.com>, Marek Szyprowski <m.szyprowski@samsung.com>, Robin
+ Murphy <robin.murphy@arm.com>, Sumit Semwal <sumit.semwal@linaro.org>,
+ Vivek Kasireddy <vivek.kasireddy@intel.com>, Will Deacon <will@kernel.org>
+Subject: Re: [PATCH v2 03/10] PCI/P2PDMA: Refactor to separate core P2P
+ functionality from memory allocation
+Message-ID: <20250923140723.14c63741.alex.williamson@redhat.com>
+In-Reply-To: <20250923171228.GL10800@unreal>
+References: <cover.1757589589.git.leon@kernel.org>
+	<1e2cb89ea76a92949d06a804e3ab97478e7cacbb.1757589589.git.leon@kernel.org>
+	<20250922150032.3e3da410.alex.williamson@redhat.com>
+	<20250923171228.GL10800@unreal>
+X-Mailer: Claws Mail 4.3.1 (GTK 3.24.43; x86_64-redhat-linux-gnu)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 2/3] KVM: x86: Fix a semi theoretical bug in
- kvm_arch_async_page_present_queued
-To: Sean Christopherson <seanjc@google.com>
-Cc: Maxim Levitsky <mlevitsk@redhat.com>, kvm@vger.kernel.org,
- Dave Hansen <dave.hansen@linux.intel.com>, "H. Peter Anvin" <hpa@zytor.com>,
- Ingo Molnar <mingo@redhat.com>, Thomas Gleixner <tglx@linutronix.de>,
- x86@kernel.org, Borislav Petkov <bp@alien8.de>, linux-kernel@vger.kernel.org
-References: <20250813192313.132431-1-mlevitsk@redhat.com>
- <20250813192313.132431-3-mlevitsk@redhat.com>
- <7c7a5a75-a786-4a05-a836-4368582ca4c2@redhat.com>
- <aNLtMC-k95pIYfeq@google.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Content-Language: en-US
-Autocrypt: addr=pbonzini@redhat.com; keydata=
- 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
-In-Reply-To: <aNLtMC-k95pIYfeq@google.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 
-On 9/23/25 20:55, Sean Christopherson wrote:
-> On Tue, Sep 23, 2025, Paolo Bonzini wrote:
->> On 8/13/25 21:23, Maxim Levitsky wrote:
->>> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
->>> index 9018d56b4b0a..3d45a4cd08a4 100644
->>> --- a/arch/x86/kvm/x86.c
->>> +++ b/arch/x86/kvm/x86.c
->>> @@ -13459,9 +13459,14 @@ void kvm_arch_async_page_present(struct kvm_vcpu *vcpu,
->>>    void kvm_arch_async_page_present_queued(struct kvm_vcpu *vcpu)
->>>    {
->>> -	kvm_make_request(KVM_REQ_APF_READY, vcpu);
->>> -	if (!vcpu->arch.apf.pageready_pending)
->>> +	/* Pairs with smp_store_release in vcpu_enter_guest. */
->>> +	bool in_guest_mode = (smp_load_acquire(&vcpu->mode) == IN_GUEST_MODE);
->>> +	bool page_ready_pending = READ_ONCE(vcpu->arch.apf.pageready_pending);
->>> +
->>> +	if (!in_guest_mode || !page_ready_pending) {
->>> +		kvm_make_request(KVM_REQ_APF_READY, vcpu);
->>>    		kvm_vcpu_kick(vcpu);
->>> +	}
->>
->> Unlike Sean, I think the race exists in abstract and is not benign
+On Tue, 23 Sep 2025 20:12:28 +0300
+Leon Romanovsky <leon@kernel.org> wrote:
+
+> On Mon, Sep 22, 2025 at 03:00:32PM -0600, Alex Williamson wrote:
+> > On Thu, 11 Sep 2025 14:33:07 +0300
+> > Leon Romanovsky <leon@kernel.org> wrote:
+> >   
+> > > From: Leon Romanovsky <leonro@nvidia.com>
+> > > 
+> > > Refactor the PCI P2PDMA subsystem to separate the core peer-to-peer DMA
+> > > functionality from the optional memory allocation layer. This creates a
+> > > two-tier architecture:
+> > > 
+> > > The core layer provides P2P mapping functionality for physical addresses
+> > > based on PCI device MMIO BARs and integrates with the DMA API for
+> > > mapping operations. This layer is required for all P2PDMA users.
+> > > 
+> > > The optional upper layer provides memory allocation capabilities
+> > > including gen_pool allocator, struct page support, and sysfs interface
+> > > for user space access.
+> > > 
+> > > This separation allows subsystems like VFIO to use only the core P2P
+> > > mapping functionality without the overhead of memory allocation features
+> > > they don't need. The core functionality is now available through the
+> > > new pci_p2pdma_enable() function that returns a p2pdma_provider
+> > > structure.
+> > > 
+> > > Signed-off-by: Leon Romanovsky <leonro@nvidia.com>
+> > > ---
+> > >  drivers/pci/p2pdma.c       | 129 +++++++++++++++++++++++++++----------
+> > >  include/linux/pci-p2pdma.h |   5 ++
+> > >  2 files changed, 100 insertions(+), 34 deletions(-)  
 > 
-> How is it not benign?  I never said the race doesn't exist, I said that consuming
-> a stale vcpu->arch.apf.pageready_pending in kvm_arch_async_page_present_queued()
-> is benign.
+> <...>
+> 
+> > > -static int pci_p2pdma_setup(struct pci_dev *pdev)
+> > > +/**
+> > > + * pcim_p2pdma_enable - Enable peer-to-peer DMA support for a PCI device
+> > > + * @pdev: The PCI device to enable P2PDMA for
+> > > + * @bar: BAR index to get provider
+> > > + *
+> > > + * This function initializes the peer-to-peer DMA infrastructure for a PCI
+> > > + * device. It allocates and sets up the necessary data structures to support
+> > > + * P2PDMA operations, including mapping type tracking.
+> > > + */
+> > > +struct p2pdma_provider *pcim_p2pdma_enable(struct pci_dev *pdev, int bar)
+> > >  {
+> > > -	int error = -ENOMEM;
+> > >  	struct pci_p2pdma *p2p;
+> > > +	int i, ret;
+> > > +
+> > > +	p2p = rcu_dereference_protected(pdev->p2pdma, 1);
+> > > +	if (p2p)
+> > > +		/* PCI device was "rebound" to the driver */
+> > > +		return &p2p->mem[bar];
+> > >    
+> > 
+> > This seems like two separate functions rolled into one, an 'initialize
+> > providers' and a 'get provider for BAR'.  The comment above even makes
+> > it sound like only a driver re-probing a device would encounter this
+> > branch, but the use case later in vfio-pci shows it to be the common
+> > case to iterate BARs for a device.
+> > 
+> > But then later in patch 8/ and again in 10/ why exactly do we cache
+> > the provider on the vfio_pci_core_device rather than ask for it on
+> > demand from the p2pdma?  
+> 
+> In addition to what Jason said about locking. The whole p2pdma.c is
+> written with assumption that "pdev->p2pdma" pointer is assigned only
+> once during PCI device lifetime. For example, see how sysfs files
+> are exposed and accessed in p2pdma.c.
 
-In principle there is a possibility that a KVM_REQ_APF_READY is missed. 
-Just by the reading of the specs, without a smp__mb_after_atomic() this 
-is broken:
+Except as Jason identifies in the other thread, the p2pdma is a devm
+object, so it's assigned once during the lifetime of the driver, not
+the device.  It seems that to get the sysfs attributes exposed, a
+driver would need to call pci_p2pdma_add_resource() to setup a pool,
+but that pool setup is only done if pci_p2pdma_add_resource() itself
+calls pcim_p2pdma_enable():
 
-	kvm_make_request(KVM_REQ_APF_READY, vcpu);
-	if (!vcpu->arch.apf.pageready_pending)
-    		kvm_vcpu_kick(vcpu);
+        p2pdma = rcu_dereference_protected(pdev->p2pdma, 1);
+        if (!p2pdma) {
+                mem = pcim_p2pdma_enable(pdev, bar);
+                if (IS_ERR(mem))
+                        return PTR_ERR(mem);
 
-It won't happen because set_bit() is written with asm("memory"), because 
-x86 set_bit() does prevent reordering at the processor level, etc.
+                error = pci_p2pdma_setup_pool(pdev);
+		...
+        } else
+                mem = &p2pdma->mem[bar];
 
-In other words the race is only avoided by the fact that compiler 
-reorderings are prevented even in cases that memory-barriers.txt does 
-not promise.
+Therefore as proposed here a device bound to vfio-pci would never have
+these sysfs attributes.
 
-Paolo
+> Once you initialize p2pdma, it is much easier to initialize all BARs at
+> the same time.
+
+I didn't phrase my question above well.  We can setup all the providers
+on the p2pdma at once, that's fine.  My comment is related to the
+awkward API we're creating and what seems to be gratuitously caching
+the providers on the vfio_pci_core_device when it seems much more
+logical to get the provider for a specific dmabuf and cache it on the
+vfio_pci_dma_buf object in the device feature ioctl.  We could also
+validate the provider at that point rather than the ad-hoc, parallel
+checks for MMIO BARs.  Thanks,
+
+Alex
 
 
