@@ -1,180 +1,142 @@
-Return-Path: <kvm+bounces-58583-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-58584-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 083E5B96E6A
-	for <lists+kvm@lfdr.de>; Tue, 23 Sep 2025 19:03:11 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6312BB96E73
+	for <lists+kvm@lfdr.de>; Tue, 23 Sep 2025 19:04:53 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id E19D5188DE8C
-	for <lists+kvm@lfdr.de>; Tue, 23 Sep 2025 17:03:32 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 24F0C17C087
+	for <lists+kvm@lfdr.de>; Tue, 23 Sep 2025 17:04:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A071B2737FB;
-	Tue, 23 Sep 2025 17:03:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 37F0325EFBC;
+	Tue, 23 Sep 2025 17:04:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="E4CcZL9s"
+	dkim=pass (1024-bit key) header.d=raptorengineering.com header.i=@raptorengineering.com header.b="u6BocjFx"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pg1-f202.google.com (mail-pg1-f202.google.com [209.85.215.202])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from raptorengineering.com (mail.raptorengineering.com [23.155.224.40])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5564114AD20
-	for <kvm@vger.kernel.org>; Tue, 23 Sep 2025 17:02:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 698FB2236E8
+	for <kvm@vger.kernel.org>; Tue, 23 Sep 2025 17:04:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=23.155.224.40
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758646980; cv=none; b=rDn6w5iSdcLRLDQ6l6i907GdydA+OrTofETjevUvZZJFTy+9dbMwborieiN2EkgEhxdWCRpNY5F+JA2VzyaSSol0UHXTSzzHhs1367OM6TMySMAf7iSUYHTiA+8Lm9k7CHXHwdKq6sv7vaiVdmXTNZaOB0WAurJDgYNz5JK9rz0=
+	t=1758647086; cv=none; b=FbsbbwtpOd1gidkAZhANru0zWHaTDCgEJghQCgug++FAhnfref2+0l1+xmTU5BEazgKxyA/MGFY9JAqmgh5t4ad8rhcBjKrIxUHEUUHetEGh3m6rbw0EBi8sQ/iM9BDIe1F2qwRMXFH7NRjvm3T8mUqkDazt+0kOic+dYxaLcEE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758646980; c=relaxed/simple;
-	bh=GIlHRf5XTE0COSH//hN6Zg+nEBdSq3ma/xn77n3FOg8=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=T4Ov3Zcl71OVYdwt2GZe8onZZA1RUBj5AsNRfDrgy40ESIcGdFb3lFmqVZTN27+yZv4PqWr/YEk9EMfc5D0bGR6e/lJUNPafMlecsb2CVIGFA04GbUZ3aIAdiE9ltxvx83KynX6ySwSfZOtPRNYEOkGXNUDOAc4tjCdSIZyxsPk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=E4CcZL9s; arc=none smtp.client-ip=209.85.215.202
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pg1-f202.google.com with SMTP id 41be03b00d2f7-b55443b4110so58098a12.1
-        for <kvm@vger.kernel.org>; Tue, 23 Sep 2025 10:02:59 -0700 (PDT)
+	s=arc-20240116; t=1758647086; c=relaxed/simple;
+	bh=/xUhxJYBgqN7CnmtMqjsQwmZu6+nxbPQJGFksvLTRPc=;
+	h=Date:From:To:Cc:Message-ID:Subject:MIME-Version:Content-Type; b=gik83/Q/hIPurD4uP+OVlG5pKeHcZh3itdGQrhbALbhTzrFNpUfTGXJZY1PBO/ZxeyXfUIXKk4M00roSpUd+iW6ygjCNDAGiFw6zfoLylO20n9slvzJRZ5X4Yj7kpWgzsAwwHTMIqTWMzaCmXucUtjrIWPQDsEtIjQ9AZe4D0kg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=raptorengineering.com; spf=pass smtp.mailfrom=raptorengineering.com; dkim=pass (1024-bit key) header.d=raptorengineering.com header.i=@raptorengineering.com header.b=u6BocjFx; arc=none smtp.client-ip=23.155.224.40
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=raptorengineering.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=raptorengineering.com
+Received: from localhost (localhost [127.0.0.1])
+	by mail.rptsys.com (Postfix) with ESMTP id 9D65B82889AD;
+	Tue, 23 Sep 2025 12:04:34 -0500 (CDT)
+Received: from mail.rptsys.com ([127.0.0.1])
+	by localhost (vali.starlink.edu [127.0.0.1]) (amavisd-new, port 10032)
+	with ESMTP id cbeJ3-IlNVw4; Tue, 23 Sep 2025 12:04:33 -0500 (CDT)
+Received: from localhost (localhost [127.0.0.1])
+	by mail.rptsys.com (Postfix) with ESMTP id A87378288A28;
+	Tue, 23 Sep 2025 12:04:33 -0500 (CDT)
+DKIM-Filter: OpenDKIM Filter v2.10.3 mail.rptsys.com A87378288A28
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1758646978; x=1759251778; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=JXBGihq8A78t9Z1IiEI/Iicy+K3MCt/5X5iumq5Le3w=;
-        b=E4CcZL9sygo3ZPDaX03CmzmdJgtrlguLOMFeqz38vx7dlpDjAIjJsiO8+ir2YRK8FN
-         72fpCqANBuc1Tu1NWyFcWAKS3HmxryYspXXf9gkkU5Q/crrUrhZmW/OPOrzepqbVhfQn
-         35wCemIWWqtJFAbIt2BGqeu1NTlOhi9lfja9LCn7I2Ba4pT2sfefMZ7KtUqEtspaqD7A
-         p7lTd7LcW6+NTJtuTJgE44Lxdb2p4nOPKDKo50NC4mrunHIm6p3o18bDywaN4om3b3rC
-         XjbU/ePIPPZhF/c5yoUUI3xHseCaI+AUQ/x7NT/p6XULeB/Mzn2/+3qiTnW11l2jV1ic
-         dZiA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1758646978; x=1759251778;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=JXBGihq8A78t9Z1IiEI/Iicy+K3MCt/5X5iumq5Le3w=;
-        b=XmGQb0z/9tXLnaAHBzL+YRn7JAGsQOHWMqvBn5RMhA8zLoV56WSwmjX5v0x8O3fNCW
-         JD9tmyWBY1nmrcj3gOcg2l5uMuM0pyHOWhOvl9KvRT5JAdDq/e51nR1YpaXXx3dnY2ZQ
-         mau/4voQ8CuMouZZcbQ7H5PRG7y76DM4v+8s38H6iZEaM7CRfyM7toh3e2fm2muQVHD4
-         UDxCyngQ2Uw7wXO0P6t541NuBcYGeXdEtcykUDZdnKJkSOrAaG4W5WCUVOg1MSQXftQi
-         jwReh2fMdX5RaGjzsOrdSb93ruI/aEioJnWNp257SbHqL7koSkM050anUCZQPoA/BKKe
-         U+QQ==
-X-Forwarded-Encrypted: i=1; AJvYcCVztPVv0MlhHBZX/Hx8IYDJWWobjDBdvm0mlm2YMXf/btUAmjU0aUaBLlTWKFXQNlOG2WU=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzkM4K/d4iVoaSjEvXM4aeVpL830nKkFSPpksg5s7/SxRr/m0Hs
-	MLVW8mc3bPPusPH8hKxy+1DyQQ9r5ZTyMPbCxD+k8rRoJBzDiW//jRTAbjSlnR6tuZqo3nXp+xB
-	1s5oswQ==
-X-Google-Smtp-Source: AGHT+IH4Kskgmch7JegC5v+NUo5paOR/XhwhXs3EqsmT9/QyBt92yY6pX0mhWpbs9SQZBDrzTmU7nahdad8=
-X-Received: from pgbds10.prod.google.com ([2002:a05:6a02:430a:b0:b47:34d0:d386])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a05:6a20:a111:b0:240:1e4a:64cc
- with SMTP id adf61e73a8af0-2d10f57e829mr4372465637.12.1758646978582; Tue, 23
- Sep 2025 10:02:58 -0700 (PDT)
-Date: Tue, 23 Sep 2025 10:02:57 -0700
-In-Reply-To: <aNJCNMGLIIVlyC/p@intel.com>
+	d=raptorengineering.com; s=B8E824E6-0BE2-11E6-931D-288C65937AAD;
+	t=1758647073; bh=XsHXAr26uFmYtgxTEGLWtr8ER0vhVE7qa73NnCyYLIA=;
+	h=Date:From:To:Message-ID:MIME-Version;
+	b=u6BocjFxh6gHY9s10Dy0DmzkDWpBeJjKC3jyk4QcUHfqN+1N0wG7RLxCvnH6NQ7IW
+	 10aOmBhx+OXRyEkPiEwv2wvWS7UP59Z+tMzHTg1lXO11bTYqPuR0Bzb4jb5J98uO6D
+	 jwOrI3PwXmUvaBIPi2fb7/vm3QxS2JYJNG75T70w=
+X-Virus-Scanned: amavisd-new at rptsys.com
+Received: from mail.rptsys.com ([127.0.0.1])
+	by localhost (vali.starlink.edu [127.0.0.1]) (amavisd-new, port 10026)
+	with ESMTP id kG_iOPuhvPfI; Tue, 23 Sep 2025 12:04:33 -0500 (CDT)
+Received: from vali.starlink.edu (localhost [127.0.0.1])
+	by mail.rptsys.com (Postfix) with ESMTP id 77FEF82889AD;
+	Tue, 23 Sep 2025 12:04:33 -0500 (CDT)
+Date: Tue, 23 Sep 2025 12:04:33 -0500 (CDT)
+From: Timothy Pearson <tpearson@raptorengineering.com>
+To: kvm <kvm@vger.kernel.org>
+Cc: linuxppc-dev <linuxppc-dev@lists.ozlabs.org>, 
+	Alex Williamson <alex.williamson@redhat.com>, 
+	=?utf-8?Q?C=C3=A9dric?= Le Goater <clg@redhat.com>
+Message-ID: <333803015.1744464.1758647073336.JavaMail.zimbra@raptorengineeringinc.com>
+Subject: [PATCH v4] vfio/pci: Fix INTx handling on legacy non-PCI 2.3
+ devices
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20250919223258.1604852-1-seanjc@google.com> <20250919223258.1604852-51-seanjc@google.com>
- <aNJCNMGLIIVlyC/p@intel.com>
-Message-ID: <aNLSwWM98jzs8NZh@google.com>
-Subject: Re: [PATCH v16 50/51] KVM: selftests: Verify MSRs are (not) in
- save/restore list when (un)supported
-From: Sean Christopherson <seanjc@google.com>
-To: Chao Gao <chao.gao@intel.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	Tom Lendacky <thomas.lendacky@amd.com>, Mathias Krause <minipli@grsecurity.net>, 
-	John Allen <john.allen@amd.com>, Rick Edgecombe <rick.p.edgecombe@intel.com>, 
-	Binbin Wu <binbin.wu@linux.intel.com>, Xiaoyao Li <xiaoyao.li@intel.com>, 
-	Maxim Levitsky <mlevitsk@redhat.com>, Zhang Yi Z <yi.z.zhang@linux.intel.com>, Xin Li <xin@zytor.com>
-Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 7bit
+X-Mailer: Zimbra 8.5.0_GA_3042 (ZimbraWebClient - GC140 (Linux)/8.5.0_GA_3042)
+Thread-Index: W8Zeg2QdRz9DmmY8boDuhMyhWXGeBA==
+Thread-Topic: vfio/pci: Fix INTx handling on legacy non-PCI 2.3 devices
 
-On Tue, Sep 23, 2025, Chao Gao wrote:
-> On Fri, Sep 19, 2025 at 03:32:57PM -0700, Sean Christopherson wrote:
-> >Add a check in the MSRs test to verify that KVM's reported support for
-> >MSRs with feature bits is consistent between KVM's MSR save/restore lists
-> >and KVM's supported CPUID.
-> >
-> 
-> >To deal with Intel's wonderful decision to bundle IBT and SHSTK under CET,
-> >track the "second" feature to avoid false failures when running on a CPU
-> >with only one of IBT or SHSTK.
-> 
-> is this paragraph related to this patch? the tracking is done in a previous
-> patch instead of this patch. So maybe just drop this paragraph.
-> 
-> >
-> >Signed-off-by: Sean Christopherson <seanjc@google.com>
-> >---
-> > tools/testing/selftests/kvm/x86/msrs_test.c | 22 ++++++++++++++++++++-
-> > 1 file changed, 21 insertions(+), 1 deletion(-)
-> >
-> >diff --git a/tools/testing/selftests/kvm/x86/msrs_test.c b/tools/testing/selftests/kvm/x86/msrs_test.c
-> >index 7c6d846e42dd..91dc66bfdac2 100644
-> >--- a/tools/testing/selftests/kvm/x86/msrs_test.c
-> >+++ b/tools/testing/selftests/kvm/x86/msrs_test.c
-> >@@ -437,12 +437,32 @@ static void test_msrs(void)
-> > 	}
-> > 
-> > 	for (idx = 0; idx < ARRAY_SIZE(__msrs); idx++) {
-> >-		if (msrs[idx].is_kvm_defined) {
-> >+		struct kvm_msr *msr = &msrs[idx];
-> >+
-> >+		if (msr->is_kvm_defined) {
-> > 			for (i = 0; i < NR_VCPUS; i++)
-> > 				host_test_kvm_reg(vcpus[i]);
-> > 			continue;
-> > 		}
-> > 
-> >+		/*
-> >+		 * Verify KVM_GET_SUPPORTED_CPUID and KVM_GET_MSR_INDEX_LIST
-> >+		 * are consistent with respect to MSRs whose existence is
-> >+		 * enumerated via CPUID.  Note, using LM as a dummy feature
-> >+		 * is a-ok here as well, as all MSRs that abuse LM should be
-> >+		 * unconditionally reported in the save/restore list (and
-> 
-> I am not sure why LM is mentioned here. Is it a leftover from one of your
-> previous attempts?
+PCI devices prior to PCI 2.3 both use level interrupts and do not support
+interrupt masking, leading to a failure when passed through to a KVM guest on
+at least the ppc64 platform. This failure manifests as receiving and
+acknowledging a single interrupt in the guest, while the device continues to
+assert the level interrupt indicating a need for further servicing.
 
-Yeah, at one point I was using LM as the NONE feature.  I'll delete the entire
-sentence.
+When lazy IRQ masking is used on DisINTx- (non-PCI 2.3) hardware, the following
+sequence occurs:
 
-> 
-> >+		 * selftests are 64-bit only).  Note #2, skip the check for
-> >+		 * FS/GS.base MSRs, as they aren't reported in the save/restore
-> >+		 * list since their state is managed via SREGS.
-> >+		 */
-> >+		TEST_ASSERT(msr->index == MSR_FS_BASE || msr->index == MSR_GS_BASE ||
-> >+			    kvm_msr_is_in_save_restore_list(msr->index) ==
-> >+			    (kvm_cpu_has(msr->feature) || kvm_cpu_has(msr->feature2)),
-> >+			    "%s %s save/restore list, but %s according to CPUID", msr->name,
-> 
-> 				  ^ an "in" is missing here.
+ * Level IRQ assertion on device
+ * IRQ marked disabled in kernel
+ * Host interrupt handler exits without clearing the interrupt on the device
+ * Eventfd is delivered to userspace
+ * Guest processes IRQ and clears device interrupt
+ * Device de-asserts INTx, then re-asserts INTx while the interrupt is masked
+ * Newly asserted interrupt acknowledged by kernel VMM without being handled
+ * Software mask removed by VFIO driver
+ * Device INTx still asserted, host controller does not see new edge after EOI
 
-Heh, I had added this in a local version when debugging, but forgot to push the
-fix.  Added now. 
+The behavior is now platform-dependent.  Some platforms (amd64) will continue
+to spew IRQs for as long as the INTX line remains asserted, therefore the IRQ
+will be handled by the host as soon as the mask is dropped.  Others (ppc64) will
+only send the one request, and if it is not handled no further interrupts will
+be sent.  The former behavior theoretically leaves the system vulnerable to
+interrupt storm, and the latter will result in the device stalling after
+receiving exactly one interrupt in the guest.
 
-diff --git a/tools/testing/selftests/kvm/x86/msrs_test.c b/tools/testing/selftests/kvm/x86/msrs_test.c
-index c2ab75e5d9ea..40d918aedce6 100644
---- a/tools/testing/selftests/kvm/x86/msrs_test.c
-+++ b/tools/testing/selftests/kvm/x86/msrs_test.c
-@@ -455,17 +455,14 @@ static void test_msrs(void)
-                /*
-                 * Verify KVM_GET_SUPPORTED_CPUID and KVM_GET_MSR_INDEX_LIST
-                 * are consistent with respect to MSRs whose existence is
--                * enumerated via CPUID.  Note, using LM as a dummy feature
--                * is a-ok here as well, as all MSRs that abuse LM should be
--                * unconditionally reported in the save/restore list (and
--                * selftests are 64-bit only).  Note #2, skip the check for
--                * FS/GS.base MSRs, as they aren't reported in the save/restore
--                * list since their state is managed via SREGS.
-+                * enumerated via CPUID.  Skip the check for FS/GS.base MSRs,
-+                * as they aren't reported in the save/restore list since their
-+                * state is managed via SREGS.
-                 */
-                TEST_ASSERT(msr->index == MSR_FS_BASE || msr->index == MSR_GS_BASE ||
-                            kvm_msr_is_in_save_restore_list(msr->index) ==
-                            (kvm_cpu_has(msr->feature) || kvm_cpu_has(msr->feature2)),
--                           "%s %s save/restore list, but %s according to CPUID", msr->name,
-+                           "%s %s in save/restore list, but %s according to CPUID", msr->name,
-                            kvm_msr_is_in_save_restore_list(msr->index) ? "is" : "isn't",
-                            (kvm_cpu_has(msr->feature) || kvm_cpu_has(msr->feature2)) ?
-                            "supported" : "unsupported");
+Work around this by disabling lazy IRQ masking for DisINTx- INTx devices.
+
+Signed-off-by: Timothy Pearson <tpearson@raptorengineering.com>
+---
+ drivers/vfio/pci/vfio_pci_intrs.c | 7 +++++++
+ 1 file changed, 7 insertions(+)
+
+diff --git a/drivers/vfio/pci/vfio_pci_intrs.c b/drivers/vfio/pci/vfio_pci_intrs.c
+index 123298a4dc8f..61d29f6b3730 100644
+--- a/drivers/vfio/pci/vfio_pci_intrs.c
++++ b/drivers/vfio/pci/vfio_pci_intrs.c
+@@ -304,9 +304,14 @@ static int vfio_intx_enable(struct vfio_pci_core_device *vdev,
+ 
+ 	vdev->irq_type = VFIO_PCI_INTX_IRQ_INDEX;
+ 
++	if (!vdev->pci_2_3)
++		irq_set_status_flags(pdev->irq, IRQ_DISABLE_UNLAZY);
++
+ 	ret = request_irq(pdev->irq, vfio_intx_handler,
+ 			  irqflags, ctx->name, ctx);
+ 	if (ret) {
++		if (!vdev->pci_2_3)
++			irq_clear_status_flags(pdev->irq, IRQ_DISABLE_UNLAZY);
+ 		vdev->irq_type = VFIO_PCI_NUM_IRQS;
+ 		kfree(name);
+ 		vfio_irq_ctx_free(vdev, ctx, 0);
+@@ -352,6 +357,8 @@ static void vfio_intx_disable(struct vfio_pci_core_device *vdev)
+ 		vfio_virqfd_disable(&ctx->unmask);
+ 		vfio_virqfd_disable(&ctx->mask);
+ 		free_irq(pdev->irq, ctx);
++		if (!vdev->pci_2_3)
++			irq_clear_status_flags(pdev->irq, IRQ_DISABLE_UNLAZY);
+ 		if (ctx->trigger)
+ 			eventfd_ctx_put(ctx->trigger);
+ 		kfree(ctx->name);
+-- 
+2.39.5
 
