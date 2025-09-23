@@ -1,214 +1,124 @@
-Return-Path: <kvm+bounces-58547-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-58548-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id AE416B96768
-	for <lists+kvm@lfdr.de>; Tue, 23 Sep 2025 16:59:03 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 50089B96780
+	for <lists+kvm@lfdr.de>; Tue, 23 Sep 2025 16:59:56 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1B7BC3B6FAC
-	for <lists+kvm@lfdr.de>; Tue, 23 Sep 2025 14:56:34 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id F15D7162705
+	for <lists+kvm@lfdr.de>; Tue, 23 Sep 2025 14:57:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8BDC725BF13;
-	Tue, 23 Sep 2025 14:56:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B4523246BA4;
+	Tue, 23 Sep 2025 14:56:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="TbjMbsk7"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="dbqiApKS"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.9])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 647BD248F59
-	for <kvm@vger.kernel.org>; Tue, 23 Sep 2025 14:56:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3D36814A0BC;
+	Tue, 23 Sep 2025 14:56:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.9
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758639369; cv=none; b=boNWX1e3TAdeABK6a3v3LntDqhNZqvnM0mXeDkfqJSm0aFshUoDrq+x/pIMF5nIVPjHaIH8jCyYrnwrAhP3I4eawOGLjcyZ9U25Bo+3bEzIWGnRGw3Sw0BrreVUOVql6oWIZdggskN//8sZpuc3WnBgqx0drzA309O6hUN1TJwk=
+	t=1758639418; cv=none; b=MbSgfpfz1fa1bgsT7nTrzYDXMyvTfxUEyaZhPcR8cxUynWM/59kiHXh3lW3ldQOxhKG3b9oo5nSNBWpSZLO1PvYG5TzHitfPzl/jsvDcGIhdNnV82JgxBsq2VNdt0qJy6ucilFbJIH2xsI+qCm5514ugQLIul3pzfi6v45SyIXI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758639369; c=relaxed/simple;
-	bh=Fb1uhC1Ro6yKwWQ8B7TuxwJriFbcuxwlarRa5XRvPXQ=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=uwUUDwuWpuUNJxVmJ6Uj3nvOhdNlpUwmSKfG4yel11IpSlL0LfpQzDdXyf8Bcz/VZS41r6cCH92bpltQ14H+qc3NAziELN5Z872RePib6OoOTEkHYSP00whRcZHzXNxg1n0DWpDaueoxmYUIDHZhNGPucQzv4yPci8bSBm6ijns=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=TbjMbsk7; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1758639365;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=5fPi7xAaBYq3WsMqtUZHvUEGBGO+Ny8pTqCXAU3RHGc=;
-	b=TbjMbsk7UvkwLM4i9UIRBq2K9Xx9MBbSBJjeUIkEmft35+NpXy4s9vC9I8ys7wkPHeTB+l
-	HqUrdlYpJ8PGgtZ1gBJS9+fwsY45CmhXIF7yg/AKX4n3YsDVqiUfrY5wRDOoc7pM+BYjZU
-	Gr3g8OXi81YB3R1GQxyBZ+9+/7HfVXg=
-Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
- [209.85.221.70]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-618-a3BUDUylPQeUaO3QoZsXmw-1; Tue, 23 Sep 2025 10:56:03 -0400
-X-MC-Unique: a3BUDUylPQeUaO3QoZsXmw-1
-X-Mimecast-MFC-AGG-ID: a3BUDUylPQeUaO3QoZsXmw_1758639363
-Received: by mail-wr1-f70.google.com with SMTP id ffacd0b85a97d-3f93db57449so1721682f8f.2
-        for <kvm@vger.kernel.org>; Tue, 23 Sep 2025 07:56:03 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1758639362; x=1759244162;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=5fPi7xAaBYq3WsMqtUZHvUEGBGO+Ny8pTqCXAU3RHGc=;
-        b=c21WaXwJcpsy8u1BtmFlrWj06C3XfE3PKAXSYz8v0BJcTXAiXmPg4sU3So3rtedEr7
-         hGJRW94S0/xMSViGd153gojpbdeigyCM9ELQdX7mOcqUF5hbkDo5w3CcQgMsgSd/dRA3
-         o06XnlQ0kLgx4jvhz6ZoaFvhPWFcbI4FCSwCV4VnsZyLbgF2/Q0e7Ml71NtxRQQYvzb6
-         rwRXkIhfjlI2ihBSLWUj5FHhwRSB1773+6Y0MKOB0ur2Ejhx2bqdllx4kySs10C7Uuej
-         7VWHzatqhFT6J6Mhbf4ZTVwMS9+/e9HH9F7ZZx615HdsH7+tt/DH2UWm5jnsWPfMYsSQ
-         WzHQ==
-X-Forwarded-Encrypted: i=1; AJvYcCWhOKZrGplqxRBigaLgRghitLrROMfeV9D0hIeEfrRsYrxegbufHsrAPRwZUjF65oLMM+A=@vger.kernel.org
-X-Gm-Message-State: AOJu0YysHbo/yS3PnHoe3TY8ShsO+vhPohG8Ofp7UR6ppzK5b9PghsYO
-	nSZvt9XVvJ4lJ2uJntH+/8lWRniS9WXVTgshjlILgQdGYyX+YbTt4gP8nkibxmjnjbLNXtJpaP/
-	P7jyJJDVqGXnANjJZ7hVzyoWBnVAC6Cruh/Cbk4FyM4zUlQHNku8S9A==
-X-Gm-Gg: ASbGncv1xRkuWAWrvH0K6k7zNuKeR+XOC4Col43e4nCsVV62ea90CdE4twKM/EGpddC
-	dkU7VQxQkyepNJZkFb6Oz4SfRzuJdLbQb37oEjG33+6B+tDBRV0qKflAbduKkzdtph2QhiIIA4I
-	M1dW7vBeQJtdmRPBIdIyFsF3wkrwcKRIOUii0e2TvZn0ZbsmbUadz1fA08n3LTfF97/3M7sFjGJ
-	Lt63sfoepRR2drXVa5GRRgH4zfCn/ZGsHc2PbvF2gXFJrnYXiAmWGbLU9AF6tm5vEiEwGHI1zc3
-	agwJ4ekQPc9AY09Ei5dgl4U+lI2FvyhAFbQ=
-X-Received: by 2002:a05:6000:2512:b0:3de:b99d:d43 with SMTP id ffacd0b85a97d-405c4e69165mr1936100f8f.19.1758639362492;
-        Tue, 23 Sep 2025 07:56:02 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IHI608jmUOJxqolkRThwXGIz6WcWPRm1xMW7bb+S6ovrbmwhS1tKBnhb5RWOn1sd8hG+adswQ==
-X-Received: by 2002:a05:6000:2512:b0:3de:b99d:d43 with SMTP id ffacd0b85a97d-405c4e69165mr1936076f8f.19.1758639361944;
-        Tue, 23 Sep 2025 07:56:01 -0700 (PDT)
-Received: from redhat.com ([2a06:c701:73ea:f900:52ee:df2b:4811:77e0])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-464f0d8a2bfsm257593255e9.2.2025.09.23.07.56.00
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 23 Sep 2025 07:56:01 -0700 (PDT)
-Date: Tue, 23 Sep 2025 10:55:58 -0400
-From: "Michael S. Tsirkin" <mst@redhat.com>
-To: Simon Schippers <simon.schippers@tu-dortmund.de>
-Cc: willemdebruijn.kernel@gmail.com, jasowang@redhat.com,
-	eperezma@redhat.com, stephen@networkplumber.org, leiyang@redhat.com,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-	virtualization@lists.linux.dev, kvm@vger.kernel.org
-Subject: Re: [PATCH net-next v5 0/8] TUN/TAP & vhost_net: netdev queue flow
- control to avoid ptr_ring tail drop
-Message-ID: <20250923105531-mutt-send-email-mst@kernel.org>
-References: <20250922221553.47802-1-simon.schippers@tu-dortmund.de>
+	s=arc-20240116; t=1758639418; c=relaxed/simple;
+	bh=nI4rWRfZtvQYN5NakqVwjaQ3OUxNgN9iPKmZBer+On8=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=Ags4l6STkMrSPwe3xPuSoJ8s8wOGcHJsIIAO9VKRT94kQLnwkGV69TGXNr2Hg5pcImI60wy0nzJyEmpsmEDNG1JQZriBeTTpb70zROa9Gsr0qURsxnACLvaelDgfF16KeXJZhhXXbweA4oHxsHxI3DXaQ4mzD1Rg9e4ryd+pOWg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=dbqiApKS; arc=none smtp.client-ip=192.198.163.9
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1758639417; x=1790175417;
+  h=message-id:date:mime-version:subject:to:cc:references:
+   from:in-reply-to:content-transfer-encoding;
+  bh=nI4rWRfZtvQYN5NakqVwjaQ3OUxNgN9iPKmZBer+On8=;
+  b=dbqiApKSHIN6hN2Y/mHDkHUX2DlME38wjkRzPIBsdYoW8EU188J6cLfL
+   pN5SefrtnYSUGB45hNtxvxqHwf5n8bHGpEJKZrK3c9wUctrR0zInlHIPE
+   1Q625dS2xwxmKKYcdKHFzheF+u9YH3ocZCRJB+ImTyDHNGynhlU7cJHOy
+   uVyyiH7a3aRumpc//Mc5ERLdohBRB2yaIhVvWnBjaMHC25q+yu64GRJ/Y
+   G04Z1KEFXeR07UdvSY5RnL1y3NDRZaGY21IW+bfRI5a0VWe36kZbwNbpW
+   wPTl2hO5Z/1f0Sml/BgbfddxkksOwAcJChPzs4GgnpcderPznFxHGiCvF
+   Q==;
+X-CSE-ConnectionGUID: MJMwINTeTye15IuzKLKxLw==
+X-CSE-MsgGUID: noukLTDjSNKVYywjsEcQUQ==
+X-IronPort-AV: E=McAfee;i="6800,10657,11561"; a="71593570"
+X-IronPort-AV: E=Sophos;i="6.18,288,1751266800"; 
+   d="scan'208";a="71593570"
+Received: from orviesa003.jf.intel.com ([10.64.159.143])
+  by fmvoesa103.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 23 Sep 2025 07:56:56 -0700
+X-CSE-ConnectionGUID: nnGWmcTCQBORqzHzD5ARyg==
+X-CSE-MsgGUID: ezUHpW+6RhmmSB/LfVq2Qg==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.18,288,1751266800"; 
+   d="scan'208";a="180775880"
+Received: from xiaoyaol-hp-g830.ccr.corp.intel.com (HELO [10.124.238.14]) ([10.124.238.14])
+  by ORVIESA003-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 23 Sep 2025 07:56:51 -0700
+Message-ID: <5cb515e7-3d29-4b75-b581-f3e126d8b1c3@intel.com>
+Date: Tue, 23 Sep 2025 22:56:47 +0800
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250922221553.47802-1-simon.schippers@tu-dortmund.de>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v16 26/51] KVM: x86: Disable support for Shadow Stacks if
+ TDP is disabled
+To: Sean Christopherson <seanjc@google.com>,
+ Paolo Bonzini <pbonzini@redhat.com>
+Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+ Tom Lendacky <thomas.lendacky@amd.com>,
+ Mathias Krause <minipli@grsecurity.net>, John Allen <john.allen@amd.com>,
+ Rick Edgecombe <rick.p.edgecombe@intel.com>, Chao Gao <chao.gao@intel.com>,
+ Binbin Wu <binbin.wu@linux.intel.com>, Maxim Levitsky <mlevitsk@redhat.com>,
+ Zhang Yi Z <yi.z.zhang@linux.intel.com>, Xin Li <xin@zytor.com>
+References: <20250919223258.1604852-1-seanjc@google.com>
+ <20250919223258.1604852-27-seanjc@google.com>
+Content-Language: en-US
+From: Xiaoyao Li <xiaoyao.li@intel.com>
+In-Reply-To: <20250919223258.1604852-27-seanjc@google.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-On Tue, Sep 23, 2025 at 12:15:45AM +0200, Simon Schippers wrote:
-> This patch series deals with TUN, TAP and vhost_net which drop incoming 
-> SKBs whenever their internal ptr_ring buffer is full. Instead, with this 
-> patch series, the associated netdev queue is stopped before this happens. 
-> This allows the connected qdisc to function correctly as reported by [1] 
-> and improves application-layer performance, see our paper [2]. Meanwhile 
-> the theoretical performance differs only slightly:
+On 9/20/2025 6:32 AM, Sean Christopherson wrote:
+> Make TDP a hard requirement for Shadow Stacks, as there are no plans to
+> add Shadow Stack support to the Shadow MMU.  E.g. KVM hasn't been taught
+> to understand the magic Writable=0,Dirty=0 combination that is required
+> for Shadow Stack accesses, and so enabling Shadow Stacks when using
+> shadow paging will put the guest into an infinite #PF loop (KVM thinks the
+> shadow page tables have a valid mapping, hardware says otherwise).
 > 
-> +------------------------+----------+----------+
-> | pktgen benchmarks      | Stock    | Patched  |
-> | i5 6300HQ, 20M packets |          |          |
-> +------------------------+----------+----------+
-> | TAP                    | 2.10Mpps | 1.99Mpps |
-> +------------------------+----------+----------+
-> | TAP+vhost_net          | 6.05Mpps | 6.14Mpps |
-> +------------------------+----------+----------+
-> | Note: Patched had no TX drops at all,        |
-> | while stock suffered numerous drops.         |
-> +----------------------------------------------+
-> 
-> This patch series includes TUN, TAP, and vhost_net because they share 
-> logic. Adjusting only one of them would break the others. Therefore, the 
-> patch series is structured as follows:
-> 1+2: New ptr_ring helpers for 3 & 4
-> 3: TUN & TAP: Stop netdev queue upon reaching a full ptr_ring
+> Signed-off-by: Sean Christopherson <seanjc@google.com>
 
+Reviewed-by: Xiaoyao Li <xiaoyao.li@intel.com>
 
-so what happens if you only apply patches 1-3?
-
-> 4: TUN & TAP: Wake netdev queue after consuming an entry
-> 5+6+7: TUN & TAP: ptr_ring wrappers and other helpers to be called by 
-> vhost_net
-> 8: vhost_net: Call the wrappers & helpers
+> ---
+>   arch/x86/kvm/cpuid.c | 8 ++++++++
+>   1 file changed, 8 insertions(+)
 > 
-> Possible future work:
-> - Introduction of Byte Queue Limits as suggested by Stephen Hemminger
-> - Adaption of the netdev queue flow control for ipvtap & macvtap
-> 
-> [1] Link: 
-> https://unix.stackexchange.com/questions/762935/traffic-shaping-ineffective-on-tun-device
-> [2] Link: 
-> https://cni.etit.tu-dortmund.de/storages/cni-etit/r/Research/Publications/2025/Gebauer_2025_VTCFall/Gebauer_VTCFall2025_AuthorsVersion.pdf
-> 
-> Links to previous versions:
-> V4: 
-> https://lore.kernel.org/netdev/20250902080957.47265-1-simon.schippers@tu-dortmund.de/T/#u
-> V3: 
-> https://lore.kernel.org/netdev/20250825211832.84901-1-simon.schippers@tu-dortmund.de/T/#u
-> V2: 
-> https://lore.kernel.org/netdev/20250811220430.14063-1-simon.schippers@tu-dortmund.de/T/#u
-> V1: 
-> https://lore.kernel.org/netdev/20250808153721.261334-1-simon.schippers@tu-dortmund.de/T/#u
-> 
-> Changelog:
-> V4 -> V5:
-> - Stop the netdev queue prior to producing the final fitting ptr_ring entry
-> -> Ensures the consumer has the latest netdev queue state, making it safe 
-> to wake the queue
-> -> Resolves an issue in vhost_net where the netdev queue could remain 
-> stopped despite being empty
-> -> For TUN/TAP, the netdev queue no longer needs to be woken in the 
-> blocking loop
-> -> Introduces new helpers __ptr_ring_full_next and 
-> __ptr_ring_will_invalidate for this purpose
-> 
-> - vhost_net now uses wrappers of TUN/TAP for ptr_ring consumption rather 
-> than maintaining its own rx_ring pointer
-> 
-> V3 -> V4:
-> - Target net-next instead of net
-> - Changed to patch series instead of single patch
-> - Changed to new title from old title
-> "TUN/TAP: Improving throughput and latency by avoiding SKB drops"
-> - Wake netdev queue with new helpers wake_netdev_queue when there is any 
-> spare capacity in the ptr_ring instead of waiting for it to be empty
-> - Use tun_file instead of tun_struct in tun_ring_recv as a more consistent 
-> logic
-> - Use smp_wmb() and smp_rmb() barrier pair, which avoids any packet drops 
-> that happened rarely before
-> - Use safer logic for vhost_net using RCU read locks to access TUN/TAP data
-> 
-> V2 -> V3: Added support for TAP and TAP+vhost_net.
-> 
-> V1 -> V2: Removed NETDEV_TX_BUSY return case in tun_net_xmit and removed 
-> unnecessary netif_tx_wake_queue in tun_ring_recv.
-> 
-> Thanks,
-> Simon :)
-> 
-> Simon Schippers (8):
->   __ptr_ring_full_next: Returns if ring will be full after next
->     insertion
->   Move the decision of invalidation out of __ptr_ring_discard_one
->   TUN, TAP & vhost_net: Stop netdev queue before reaching a full
->     ptr_ring
->   TUN & TAP: Wake netdev queue after consuming an entry
->   TUN & TAP: Provide ptr_ring_consume_batched wrappers for vhost_net
->   TUN & TAP: Provide ptr_ring_unconsume wrappers for vhost_net
->   TUN & TAP: Methods to determine whether file is TUN/TAP for vhost_net
->   vhost_net: Replace rx_ring with calls of TUN/TAP wrappers
-> 
->  drivers/net/tap.c        | 115 +++++++++++++++++++++++++++++++--
->  drivers/net/tun.c        | 136 +++++++++++++++++++++++++++++++++++----
->  drivers/vhost/net.c      |  90 +++++++++++++++++---------
->  include/linux/if_tap.h   |  15 +++++
->  include/linux/if_tun.h   |  18 ++++++
->  include/linux/ptr_ring.h |  54 +++++++++++++---
->  6 files changed, 367 insertions(+), 61 deletions(-)
-> 
-> -- 
-> 2.43.0
+> diff --git a/arch/x86/kvm/cpuid.c b/arch/x86/kvm/cpuid.c
+> index 32fde9e80c28..499c86bd457e 100644
+> --- a/arch/x86/kvm/cpuid.c
+> +++ b/arch/x86/kvm/cpuid.c
+> @@ -955,6 +955,14 @@ void kvm_set_cpu_caps(void)
+>   	if (!tdp_enabled || !boot_cpu_has(X86_FEATURE_OSPKE))
+>   		kvm_cpu_cap_clear(X86_FEATURE_PKU);
+>   
+> +	/*
+> +	 * Shadow Stacks aren't implemented in the Shadow MMU.  Shadow Stack
+> +	 * accesses require "magic" Writable=0,Dirty=1 protection, which KVM
+> +	 * doesn't know how to emulate or map.
+> +	 */
+> +	if (!tdp_enabled)
+> +		kvm_cpu_cap_clear(X86_FEATURE_SHSTK);
+> +
+>   	kvm_cpu_cap_init(CPUID_7_EDX,
+>   		F(AVX512_4VNNIW),
+>   		F(AVX512_4FMAPS),
 
 
