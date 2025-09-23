@@ -1,106 +1,165 @@
-Return-Path: <kvm+bounces-58504-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-58505-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 96A67B946E7
-	for <lists+kvm@lfdr.de>; Tue, 23 Sep 2025 07:39:48 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id D4972B94792
+	for <lists+kvm@lfdr.de>; Tue, 23 Sep 2025 07:49:36 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 134B64827B0
-	for <lists+kvm@lfdr.de>; Tue, 23 Sep 2025 05:39:44 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 87EB12A60B5
+	for <lists+kvm@lfdr.de>; Tue, 23 Sep 2025 05:49:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 87EA330E844;
-	Tue, 23 Sep 2025 05:39:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4D2F130CDA6;
+	Tue, 23 Sep 2025 05:49:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=lanxincomputing-com.20200927.dkim.feishu.cn header.i=@lanxincomputing-com.20200927.dkim.feishu.cn header.b="GC/kLNBI"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="P1BjAtYV"
 X-Original-To: kvm@vger.kernel.org
-Received: from sg-1-36.ptr.blmpb.com (sg-1-36.ptr.blmpb.com [118.26.132.36])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.19])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4C7B62701CE
-	for <kvm@vger.kernel.org>; Tue, 23 Sep 2025 05:39:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=118.26.132.36
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C8DF1214A9B;
+	Tue, 23 Sep 2025 05:49:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.19
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758605973; cv=none; b=gIntHS/pgzRc2YRIR6pOdA4vzxLMeFa+ltbotNPgtH8Tp7QvdKPj2Y6LPJJ1GZWGe14Bea0Bvikis+jZQb94Q76IhIHbHBzxXfaKZwtG3WJUzvW65j9MySjl1739xemErwc2GEl55HCMPcvL+me1G1UpQNibwqzNUfsTg67vy+o=
+	t=1758606566; cv=none; b=MdnGO+pUDBkWhC/++8PECTAcT3aE1bHu8K0+FWn4q9yetOgni36uKu9/kvza2TDa9IZ/mLJLyZJL6+YRe1ofr9AWM2Plp0I75lbI5xMVp1SviPRmNRY8K6aZSaeHMJEfbSJO3EEad9EhZ8o76Hb+qcQJdE9zf1DfyebgCvIc3Js=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758605973; c=relaxed/simple;
-	bh=K2FxbZCGR0cFvo7MSbhK9cYtNVv6G5VQcag2HZyy8so=;
-	h=To:Subject:Date:Content-Type:From:Mime-Version:Cc:Message-Id; b=jqpU0aNNyZp3MSGYOpPgiqS1mDDXbgGAKmi34fDhEqPF+WemqGSD7Vo0SrkxoXlf4+R29zw6E6IokPBey8/z8oNlksib/NEmjRl/AZa152LMihRSDJyPAcEVcomri7SNMFufFAGQBljQZJxo7wRKlc299Vt0+pQ+Nd12qxjw1ok=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=lanxincomputing.com; spf=pass smtp.mailfrom=lanxincomputing.com; dkim=pass (2048-bit key) header.d=lanxincomputing-com.20200927.dkim.feishu.cn header.i=@lanxincomputing-com.20200927.dkim.feishu.cn header.b=GC/kLNBI; arc=none smtp.client-ip=118.26.132.36
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=lanxincomputing.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lanxincomputing.com
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
- s=s1; d=lanxincomputing-com.20200927.dkim.feishu.cn; t=1758605953;
-  h=from:subject:mime-version:from:date:message-id:subject:to:cc:
- reply-to:content-type:mime-version:in-reply-to:message-id;
- bh=3gmQ2zoxSsM9TQ/jV7QWiBGtZ/AlH7UzJQwrMEBoGjY=;
- b=GC/kLNBITSmfkcfO9WZhuD+p1gcAboL26Ola/dB47QIZJyGrQetTiT2396L4tz38J27lYj
- u8tATudUDLq2iDESeNEpLYOADAhfuJVwiAXWrwi0BVq/RKJ08DIji/1WhX3zlxrmrlp2GD
- edNQVwJxqfot4tV8TirBcD6+oF504v/unfXZc8RBPdqEV+B48ABwmPosWWir1pF0xmQuCh
- fR480yW0AwYqJWDEzEYQt1acCcsPf7F+b394IVhA3sj2D+KO9NxDbJl6Y2zkkwc4IVjtbt
- sfYwfi7hqjOM8K+u8+UW9bSAtc/pV1yrr6JGG6WBDCtY0QqyVqMkCMHPUn91fQ==
-To: <anup@brainfault.org>
-Subject: [PATCH v2] RISC-V: KVM: Introduce KVM_EXIT_FAIL_ENTRY_NO_VSFILE
-Date: Tue, 23 Sep 2025 13:38:51 +0800
-X-Original-From: BillXiang <xiangwencheng@lanxincomputing.com>
-X-Mailer: git-send-email 2.43.0
-Content-Type: text/plain; charset=UTF-8
-From: "BillXiang" <xiangwencheng@lanxincomputing.com>
+	s=arc-20240116; t=1758606566; c=relaxed/simple;
+	bh=9KhHhKpIuAcrrNcmvN9l1vjy6d5T0ju3oNA6kv8u3Wo=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=ZvPVVhBuTTYHiRHKXga/1PB8sT2ItGE12ye5vE4xp0U759IW2WOhy5vTyaJlO6S0awaYt+Dp2KnzaKy2mG5jxhWP3euCR8KJpJGQG/RTLF9T/vH5rJcukCMeCELsAaiILv+Nqe+Aqv95UZJ68JOhaKKYjGbSKPR6ltjh0j25B48=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=pass smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=P1BjAtYV; arc=none smtp.client-ip=198.175.65.19
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1758606565; x=1790142565;
+  h=message-id:date:mime-version:subject:to:cc:references:
+   from:in-reply-to:content-transfer-encoding;
+  bh=9KhHhKpIuAcrrNcmvN9l1vjy6d5T0ju3oNA6kv8u3Wo=;
+  b=P1BjAtYVS78EhWKPGpm5qTMwVzMm95OldsO8Q5gUnAIp0qk2QjVRn8Cs
+   Zo0j1mFIXaNo4qFcFLetmUOBCiK5G7mJ6Pp5CxkP9J6zJQwxGkO4sHi+R
+   tgoVeG6mfJnl/R/erQ5CdZooIKjk6f9jLktIftJDNR3WQC3lH9glZhjEP
+   RLkkwqt2hUjDFQYCZx24tDcKCdPrRYFLCD3cvTAL9cfI2m002HiXaNJPa
+   NhKAd+LUgHEtBKcJyLLAgXndHOdpgLu8R89LPMg+zj4QKH4K4HfI5vYvH
+   D5Qg82z6732/JXDu73nOD07uSQesQmi3Gg720Lkh+y7s2/pu5/A9fQ3c7
+   Q==;
+X-CSE-ConnectionGUID: mYgMsQ1vS6mBAoDpjhD4mQ==
+X-CSE-MsgGUID: ZIsyNa58Q++sE9ZQF6NWgQ==
+X-IronPort-AV: E=McAfee;i="6800,10657,11561"; a="60766055"
+X-IronPort-AV: E=Sophos;i="6.18,287,1751266800"; 
+   d="scan'208";a="60766055"
+Received: from orviesa010.jf.intel.com ([10.64.159.150])
+  by orvoesa111.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 22 Sep 2025 22:49:25 -0700
+X-CSE-ConnectionGUID: YDt2itetQvejjsKkPHBLtg==
+X-CSE-MsgGUID: 9GicGyx7R6yDu7xj6bStzw==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.18,287,1751266800"; 
+   d="scan'208";a="175961800"
+Received: from unknown (HELO [10.238.0.107]) ([10.238.0.107])
+  by orviesa010-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 22 Sep 2025 22:49:21 -0700
+Message-ID: <76019bfc-cd06-4a03-9e1e-721cf63637c4@linux.intel.com>
+Date: Tue, 23 Sep 2025 13:49:18 +0800
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-X-Lms-Return-Path: <lba+268d2327f+e8c879+vger.kernel.org+xiangwencheng@lanxincomputing.com>
+MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v3 01/16] x86/tdx: Move all TDX error defines into
+ <asm/shared/tdx_errno.h>
+To: Rick Edgecombe <rick.p.edgecombe@intel.com>
+Cc: kas@kernel.org, bp@alien8.de, chao.gao@intel.com,
+ dave.hansen@linux.intel.com, isaku.yamahata@intel.com, kai.huang@intel.com,
+ kvm@vger.kernel.org, linux-coco@lists.linux.dev,
+ linux-kernel@vger.kernel.org, mingo@redhat.com, pbonzini@redhat.com,
+ seanjc@google.com, tglx@linutronix.de, x86@kernel.org, yan.y.zhao@intel.com,
+ vannapurve@google.com, "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>
+References: <20250918232224.2202592-1-rick.p.edgecombe@intel.com>
+ <20250918232224.2202592-2-rick.p.edgecombe@intel.com>
+Content-Language: en-US
+From: Binbin Wu <binbin.wu@linux.intel.com>
+In-Reply-To: <20250918232224.2202592-2-rick.p.edgecombe@intel.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
-Cc: <kvm-riscv@lists.infradead.org>, <kvm@vger.kernel.org>, 
-	<linux-riscv@lists.infradead.org>, <linux-kernel@vger.kernel.org>, 
-	<paul.walmsley@sifive.com>, <palmer@dabbelt.com>, 
-	<aou@eecs.berkeley.edu>, <alex@ghiti.fr>, <atish.patra@linux.dev>, 
-	<ajones@ventanamicro.com>, 
-	"BillXiang" <xiangwencheng@lanxincomputing.com>
-Message-Id: <20250923053851.32863-1-xiangwencheng@lanxincomputing.com>
-Received: from Bill.localdomain ([222.128.9.250]) by smtp.feishu.cn with ESMTP; Tue, 23 Sep 2025 13:39:10 +0800
 
-Currently, we return CSR_HSTATUS as hardware_entry_failure_reason when
-kvm_riscv_aia_alloc_hgei failed in KVM_DEV_RISCV_AIA_MODE_HWACCEL
-mode, which is vague so it is better to return a well defined value
-KVM_EXIT_FAIL_ENTRY_NO_VSFILE provided via uapi/asm/kvm.h.
 
-Signed-off-by: BillXiang <xiangwencheng@lanxincomputing.com>
----
- arch/riscv/include/uapi/asm/kvm.h | 2 ++
- arch/riscv/kvm/aia_imsic.c        | 2 +-
- 2 files changed, 3 insertions(+), 1 deletion(-)
 
-diff --git a/arch/riscv/include/uapi/asm/kvm.h b/arch/riscv/include/uapi/asm/kvm.h
-index ef27d4289da1..068d4d9cff7b 100644
---- a/arch/riscv/include/uapi/asm/kvm.h
-+++ b/arch/riscv/include/uapi/asm/kvm.h
-@@ -23,6 +23,8 @@
- #define KVM_INTERRUPT_SET	-1U
- #define KVM_INTERRUPT_UNSET	-2U
- 
-+#define KVM_EXIT_FAIL_ENTRY_NO_VSFILE	(1ULL << 0)
-+
- /* for KVM_GET_REGS and KVM_SET_REGS */
- struct kvm_regs {
- };
-diff --git a/arch/riscv/kvm/aia_imsic.c b/arch/riscv/kvm/aia_imsic.c
-index fda0346f0ea1..937963fb46c5 100644
---- a/arch/riscv/kvm/aia_imsic.c
-+++ b/arch/riscv/kvm/aia_imsic.c
-@@ -802,7 +802,7 @@ int kvm_riscv_vcpu_aia_imsic_update(struct kvm_vcpu *vcpu)
- 		/* For HW acceleration mode, we can't continue */
- 		if (kvm->arch.aia.mode == KVM_DEV_RISCV_AIA_MODE_HWACCEL) {
- 			run->fail_entry.hardware_entry_failure_reason =
--								CSR_HSTATUS;
-+								KVM_EXIT_FAIL_ENTRY_NO_VSFILE;
- 			run->fail_entry.cpu = vcpu->cpu;
- 			run->exit_reason = KVM_EXIT_FAIL_ENTRY;
- 			return 0;
--- 
-2.43.0
+On 9/19/2025 7:22 AM, Rick Edgecombe wrote:
+[...]
+> +/*
+> + * SW-defined error codes.
+> + *
+> + * Bits 47:40 == 0xFF indicate Reserved status code class that never used by
+> + * TDX module.
+> + */
+> +#define TDX_ERROR			_BITULL(63)
+> +#define TDX_NON_RECOVERABLE		_BITULL(62)
+
+TDX_ERROR and TDX_NON_RECOVERABLE are defined in TDX spec as the classes of TDX
+Interface Functions Completion Status.
+
+For clarity, is it better to move the two before the "SW-defined error codes"
+comment?
+
+> +#define TDX_SW_ERROR			(TDX_ERROR | GENMASK_ULL(47, 40))
+> +#define TDX_SEAMCALL_VMFAILINVALID	(TDX_SW_ERROR | _ULL(0xFFFF0000))
+> +
+> +#define TDX_SEAMCALL_GP			(TDX_SW_ERROR | X86_TRAP_GP)
+> +#define TDX_SEAMCALL_UD			(TDX_SW_ERROR | X86_TRAP_UD)
+> +
+>   /*
+>    * TDX module operand ID, appears in 31:0 part of error code as
+>    * detail information
+> @@ -37,4 +52,4 @@
+>   #define TDX_OPERAND_ID_SEPT			0x92
+>   #define TDX_OPERAND_ID_TD_EPOCH			0xa9
+>   
+> -#endif /* __KVM_X86_TDX_ERRNO_H */
+> +#endif /* _X86_SHARED_TDX_ERRNO_H */
+> diff --git a/arch/x86/include/asm/tdx.h b/arch/x86/include/asm/tdx.h
+> index 7ddef3a69866..0e795e7c0b22 100644
+> --- a/arch/x86/include/asm/tdx.h
+> +++ b/arch/x86/include/asm/tdx.h
+> @@ -12,26 +12,6 @@
+>   #include <asm/trapnr.h>
+>   #include <asm/shared/tdx.h>
+>   
+> -/*
+> - * SW-defined error codes.
+> - *
+> - * Bits 47:40 == 0xFF indicate Reserved status code class that never used by
+> - * TDX module.
+> - */
+> -#define TDX_ERROR			_BITUL(63)
+> -#define TDX_NON_RECOVERABLE		_BITUL(62)
+> -#define TDX_SW_ERROR			(TDX_ERROR | GENMASK_ULL(47, 40))
+> -#define TDX_SEAMCALL_VMFAILINVALID	(TDX_SW_ERROR | _UL(0xFFFF0000))
+> -
+> -#define TDX_SEAMCALL_GP			(TDX_SW_ERROR | X86_TRAP_GP)
+> -#define TDX_SEAMCALL_UD			(TDX_SW_ERROR | X86_TRAP_UD)
+> -
+> -/*
+> - * TDX module SEAMCALL leaf function error codes
+> - */
+> -#define TDX_SUCCESS		0ULL
+> -#define TDX_RND_NO_ENTROPY	0x8000020300000000ULL
+> -
+>   #ifndef __ASSEMBLER__
+>   
+>   #include <uapi/asm/mce.h>
+> diff --git a/arch/x86/kvm/vmx/tdx.h b/arch/x86/kvm/vmx/tdx.h
+> index ca39a9391db1..f4e609a745ee 100644
+> --- a/arch/x86/kvm/vmx/tdx.h
+> +++ b/arch/x86/kvm/vmx/tdx.h
+> @@ -3,7 +3,6 @@
+>   #define __KVM_X86_VMX_TDX_H
+>   
+>   #include "tdx_arch.h"
+> -#include "tdx_errno.h"
+>   
+>   #ifdef CONFIG_KVM_INTEL_TDX
+>   #include "common.h"
+
 
