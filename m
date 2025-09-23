@@ -1,154 +1,120 @@
-Return-Path: <kvm+bounces-58558-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-58559-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 91E16B969D5
-	for <lists+kvm@lfdr.de>; Tue, 23 Sep 2025 17:37:45 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1C326B969DB
+	for <lists+kvm@lfdr.de>; Tue, 23 Sep 2025 17:37:59 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 971AF189F522
-	for <lists+kvm@lfdr.de>; Tue, 23 Sep 2025 15:38:06 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3FCC03237F1
+	for <lists+kvm@lfdr.de>; Tue, 23 Sep 2025 15:37:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6C9D6238D54;
-	Tue, 23 Sep 2025 15:37:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 98BAD24EF8C;
+	Tue, 23 Sep 2025 15:37:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ventanamicro.com header.i=@ventanamicro.com header.b="QYL8no54"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="pRsKPOEM"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-yb1-f171.google.com (mail-yb1-f171.google.com [209.85.219.171])
+Received: from mail-pf1-f202.google.com (mail-pf1-f202.google.com [209.85.210.202])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0ABE11C4A17
-	for <kvm@vger.kernel.org>; Tue, 23 Sep 2025 15:37:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.171
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 573161B4248
+	for <kvm@vger.kernel.org>; Tue, 23 Sep 2025 15:37:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758641854; cv=none; b=S6xlREkg0oqQ8ZZsEcR86h6JlRxlLxR9hiQW6P+G1932mN25rgQEyyC6HZwXHKtu9BF4jqGRST3pU7TL2b69EFMJvKbD3rrtmAIMNSIDkOiVjvtE/vj9jfuMvyVeYkfQNhEskf/XHNn2HbCR4NwABbR+1sMFYaRzzb3r5PDgRHQ=
+	t=1758641863; cv=none; b=MbEl9V8bON29p1u7cZxqQfmCO4fZ8Kx5scNRuZCv75yPa5o2y8rXEFLYs9Xnf7HWU4kwP5UKu+z5kHQQr+ME9F+vz+Ob9/HwjA/Pyw+c20dZ2Cpo8GEPMxUE2ttI2SwAhuqr1bfBgiZrTZmSqr8Q5h8jMnMzJd5LmG4II4OGoBA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758641854; c=relaxed/simple;
-	bh=VPsPP97J7NiYsQImvFBzCd/NUWkzwiH5aWFfTBKY7ns=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=g7wt8z/qZqJ2XOiGLho3DMr2D1DfrmyV4hDInTmaJSoZxfSHqL0EdcIt7mngae+9ikpatqtUedhXFLEYTLRqTs5xHOZAUYH77OBr+VzjrG4gm9Ta6wR21Jd+irpGz33rZYCk45X0A0nb+qnWl4DNDBozJN343g910fj9I7DAShU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ventanamicro.com; spf=pass smtp.mailfrom=ventanamicro.com; dkim=pass (2048-bit key) header.d=ventanamicro.com header.i=@ventanamicro.com header.b=QYL8no54; arc=none smtp.client-ip=209.85.219.171
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ventanamicro.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ventanamicro.com
-Received: by mail-yb1-f171.google.com with SMTP id 3f1490d57ef6-eb3671a7db4so12956276.0
-        for <kvm@vger.kernel.org>; Tue, 23 Sep 2025 08:37:32 -0700 (PDT)
+	s=arc-20240116; t=1758641863; c=relaxed/simple;
+	bh=kbAehCgUqodMp9rgJOuYJZ1txmGjosQohfqNc9YOHn8=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=I0E+6AB/YWAmNhPcHZ6q6HksvydbU2YnJ+1mKMydt9/H4oEs7hF0QYpZbxZDyULhCVAi6Ozh24lfs3CH14QUdKe1bvSuaCrEpa67SokB6/32SavZMsJb/XJ1SItMhLgm3lOiJbOIMg9DB8WDUvNzYAZ8ZjIerWLtDTil5If2FJc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=pRsKPOEM; arc=none smtp.client-ip=209.85.210.202
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+Received: by mail-pf1-f202.google.com with SMTP id d2e1a72fcca58-77df7f0d7a3so4716480b3a.2
+        for <kvm@vger.kernel.org>; Tue, 23 Sep 2025 08:37:42 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=ventanamicro.com; s=google; t=1758641852; x=1759246652; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=wa5b2Ox9cKpFtfieebnhk7CueJ3gddY86USQDYphg/s=;
-        b=QYL8no544a9aasSptURayciMEqmX1gfPc6FXP5EPQr5zlyBcAwocQfTAxJpyWgVJnz
-         VZiZZ9zj9uoq71tUJd0wYfFnKwIgYzGJ9yfzv58+6R3pHjk+XRAN32I/hF7bmOEfX3JK
-         MdZyLoaPD6SUzuudvP8QJuJv9iPdkre4o6olZR4c8xa3dKPQHd3jdOYC4vjAq/nRujs2
-         9ol21MWNB+WpIFX9po+zB80WlJs7OhtQFJxGt6R8a5kFNpFm1Cc0osEcF71KcBxUOeBt
-         GCavLFtsY4s/leUcjp+GSke2dyRR491WddKoq3tUiw0fKc1ylD3OR4+V71MAZOgLYtu1
-         E8yw==
+        d=google.com; s=20230601; t=1758641862; x=1759246662; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:mime-version:date:reply-to:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=aPSnXDgTwBFFZSA2g+9Z8hmqmEgoZt1YklKuT8li5Ck=;
+        b=pRsKPOEM/72ahMSpAofXv9VFP62zFmqznV7NNo4Y0dr+jO3LOWVoO7ySUqrA7QKGVl
+         ewzLb3iW8QWmRK01gOCd3aAkVxQefvTkXe/u4waqGvbx3Xpal8DRRV+fWJweZSOtE8MT
+         vysRUirwCSlY39DjoqZolMN4iY+PcPUSc1vxD3KbIvsXAv6u0nQBO8jSqj0409NNP+4n
+         WN96EIlirVe6XIuAYK/S9QwYfHOur1kQieWpF6oLSXptQk12HiYrXSVjibeO9kmWKzs9
+         4OW2cE1iIMbQcD9kGlqh0eqQ/THzFfMz1mu0likff3ruK4lwBofNh1713MLaTqU3c773
+         ZPVA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1758641852; x=1759246652;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=wa5b2Ox9cKpFtfieebnhk7CueJ3gddY86USQDYphg/s=;
-        b=cXa3pWjVKx5IQaUY7rFi0Ip1f4slC8WoyTQM50qxvQr8JNIuSmefuhu8y7dV2I6j+L
-         dNmnptWtbuCwyle5smlu3hmJ5hvodPoyU3OznFK614cf/0EbstwcFgTT1irBca2XY037
-         CkMz0QE7Vdm99uQXCV0R315nEwARjQfCLrsMsEkyZqqZ6MivrvKzlgu4lULoEEwAA7rm
-         gSSGkVmI7hGCX5Jq42pk9pCWrHp1B/v3pGPdwF3Ra3v/Wh8MjZaBAZwg05IVEhDDc9GH
-         yikbatu3k1ciKnRCmlzlQLfW14AnfJj1trSk0un6//jVRDpSTVMZZ5Ci0pHxRbbEMMPx
-         L6oA==
-X-Forwarded-Encrypted: i=1; AJvYcCVpD5Y1nxJzyxVGyZf3PoyoRKGLvSJM5/80YiNQE8FioEQuwX5G8V9ReMGDkSacdtjOe8c=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwIKvU1LYthpwT/qIc7kpDDLcEvYXlx5kQ2zlvW7aWuZ6pD+0lf
-	nl8rcFdUmg+HbWQmuh3gGqrWQm+FAEbh2s5YBXqasLtSxeRfGDyoDmBqrmFM0xDUwtk=
-X-Gm-Gg: ASbGncsCbNUInM+B/EvzeKV0gHl77zaIHd8jVXAMkqohhOTwVN2hkjJVuPGlNvd1P02
-	8IjovdtqtKdoX8ZIwfn+x3MY0W28MTvFjVKsxo42VYQChtqx3HHJX8axk35tuumxkLxwFTtCQX5
-	fG0V1A0hKp4oWx9iwMhjwIp8EkUUsi8KuDgKqfI6Mbvg22HDxrvbwYW4o4vUUFIuhy/xeHdyNkh
-	gSX+1Cqkx6MyoCSgZLr77nuO+MS/Ra6T+aEd6VqaXr4/+CpKLqlS6nlI5vRLrFPfRPn/uxhrYRz
-	N5O+4uQJ+PhYNjUNCmjXaMvvXFLRUnqJMnX46s/KruzxU9cOXGioRk2EKn+ft9iW3MZ0jRxM906
-	jcOEpVU8OsJ4b1ACzriWWPDa+
-X-Google-Smtp-Source: AGHT+IEg1iVUs6leKP9cHj2cx58SzsL13TI+csDZL0P1k6w1OJijHfrbcJXnEnD/4J+xBKVTIxDONg==
-X-Received: by 2002:a05:6902:1381:b0:eb3:6e74:dd0c with SMTP id 3f1490d57ef6-eb36e74defcmr792195276.24.1758641851831;
-        Tue, 23 Sep 2025 08:37:31 -0700 (PDT)
-Received: from localhost ([140.82.166.162])
-        by smtp.gmail.com with ESMTPSA id 3f1490d57ef6-ea5ce854f57sm5087789276.22.2025.09.23.08.37.31
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 23 Sep 2025 08:37:31 -0700 (PDT)
-Date: Tue, 23 Sep 2025 10:37:30 -0500
-From: Andrew Jones <ajones@ventanamicro.com>
-To: Jason Gunthorpe <jgg@nvidia.com>
-Cc: Thomas Gleixner <tglx@linutronix.de>, iommu@lists.linux.dev, 
-	kvm-riscv@lists.infradead.org, kvm@vger.kernel.org, linux-riscv@lists.infradead.org, 
-	linux-kernel@vger.kernel.org, zong.li@sifive.com, tjeznach@rivosinc.com, joro@8bytes.org, 
-	will@kernel.org, robin.murphy@arm.com, anup@brainfault.org, atish.patra@linux.dev, 
-	alex.williamson@redhat.com, paul.walmsley@sifive.com, palmer@dabbelt.com, alex@ghiti.fr
-Subject: Re: [RFC PATCH v2 08/18] iommu/riscv: Use MSI table to enable IMSIC
- access
-Message-ID: <20250923-54e8e0f39d672845e2979286@orel>
-References: <20250920203851.2205115-20-ajones@ventanamicro.com>
- <20250920203851.2205115-28-ajones@ventanamicro.com>
- <20250922184336.GD1391379@nvidia.com>
- <20250922-50372a07397db3155fec49c9@orel>
- <20250922235651.GG1391379@nvidia.com>
- <87ecrx4guz.ffs@tglx>
- <20250923-de370be816db3ec12b3ae5d4@orel>
- <20250923145251.GP1391379@nvidia.com>
+        d=1e100.net; s=20230601; t=1758641862; x=1759246662;
+        h=cc:to:from:subject:message-id:mime-version:date:reply-to
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=aPSnXDgTwBFFZSA2g+9Z8hmqmEgoZt1YklKuT8li5Ck=;
+        b=mu1HxxnVI1GUuK1aeWOaN3VHtdKCIwP0EF8gHR6GJ2CccdFbG2b7gO8RzqZoPok5cq
+         Tgp2ViL4D4svmEdVgNnstdX+pr/JhGm2l68xr+Vau7oUgtN+6isAFKoOCbUazgAJOQpE
+         UwDebVDU3f1t8VtVN4GUdknU0cLgLlMycTjC9BJWkfbkqpwLt0A5HiP/zF7n1p6fDWua
+         RJxzr4zhulRpYQmH3683om0MwjfgxuWyiMbMkKlPM4gjiW2V4Yk9Dz97uXHFI5r8tgiR
+         DnuA9Lur/q9blrHk4dxs1OkJO4Zixgi6uGx2LUaZc5u9E1QyM19nBq0bT5Z2pTZWG2/Z
+         pGHg==
+X-Gm-Message-State: AOJu0YyHxKp/xrzMgtdkbGnGHXFsNQ4NI+e62ZUk3eHbMlN5YII/CiKP
+	tm0A2XY9mgdst8WDvrnFXRfDMXoPtLi9bjRH+kfar91xN+q2T8bgedZ9VBD/AswIou+A3MrQixP
+	i9h1YqA==
+X-Google-Smtp-Source: AGHT+IH7hRrsrk0Rhbnod8BSQcKkiS7sbqT63RG9AzLphPusQzpwDuq24pErC23eKbIq89uVlZYpSTBgqO0=
+X-Received: from pjv6.prod.google.com ([2002:a17:90b:5646:b0:330:6e2a:9844])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a05:6a20:6a0c:b0:2cd:a43f:78fb
+ with SMTP id adf61e73a8af0-2cffd79af47mr4299206637.48.1758641861700; Tue, 23
+ Sep 2025 08:37:41 -0700 (PDT)
+Reply-To: Sean Christopherson <seanjc@google.com>
+Date: Tue, 23 Sep 2025 08:37:36 -0700
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250923145251.GP1391379@nvidia.com>
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.51.0.534.gc79095c0ca-goog
+Message-ID: <20250923153738.1875174-1-seanjc@google.com>
+Subject: [PATCH v3 0/2] KVM: SVM: Fix a bug where TSC_AUX can get clobbered
+From: Sean Christopherson <seanjc@google.com>
+To: Sean Christopherson <seanjc@google.com>, Paolo Bonzini <pbonzini@redhat.com>
+Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	Hou Wenlong <houwenlong.hwl@antgroup.com>, Xiaoyao Li <xiaoyao.li@intel.com>, 
+	Lai Jiangshan <jiangshan.ljs@antgroup.com>
+Content-Type: text/plain; charset="UTF-8"
 
-On Tue, Sep 23, 2025 at 11:52:51AM -0300, Jason Gunthorpe wrote:
-> On Tue, Sep 23, 2025 at 09:37:31AM -0500, Andrew Jones wrote:
-> > undergoes a specified translation into an index of the MSI table. For the
-> > non-virt use case we skip the "composes a new address/data pair, which
-> > points at the remap table entry" step since we just forward the original
-> > with an identity mapping. For the virt case we do write a new addr,data
-> > pair (Patch15) since we need to map guest addresses to host addresses (but
-> > data is still just forwarded since the RISC-V IOMMU doesn't support data
-> > remapping). 
-> 
-> You should banish thinking of non-virt/virt from your lexicon. Linux
-> doesn't work that way, and trying to force it too is a loosing battle.
+Fix a bug where an SEV-ES vCPU running on the same pCPU as a non-SEV-ES vCPU
+could clobber TSC_AUX due to loading the host's TSC_AUX on #VMEXIT, as opposed
+to restoring whatever was in hardware at the time of VMRUN.
 
-Well, we need to consider virt when the hardware has virt-specific
-features that we want to control. We also need to consider virt when
-additional address translations to go from guest space to host space
-are needed, as in this case.
+v3:
+ - Collect reviews. [Xiaoyao]
+ - Make tsc_aux_uret_slot globally visible instead of passing it as a param.
+   [Xiaoyao]
+ - Mark tsc_aux_uret_slot __ro_after_init.
 
-> 
-> If you have a remap domain then it should always be remapping. There
-> is no such idea in Linux as a conditional IRQ domain dependent on
-> external factors (like how the IOMMU is configured, if the device is
-> "virt" or not, etc).
+v2:
+ - https://lore.kernel.org/all/20250919213806.1582673-1-seanjc@google.com
+ - Drop "cache" from the user_return API.
+ - Handle the SEV-ES case in SEV-ES code.
+ - Tag everything for stable@.
+ - Massage changelog to avoid talking about the host's value and instead
+   focus on failing to restore what KVM thinks is in hardware.
 
-The remap domain is created when the platform supports MSIs and always
-does remapping when the IOMMU supports the MSI table. It could even do
-remapping when the IOMMU doesn't support the MSI table since it could
-use the DMA table instead, but that's left for a later patch series if
-hardware actually shows up like that.
+v1: https://lore.kernel.org/all/05a018a6997407080b3b7921ba692aa69a720f07.1758166596.git.houwenlong.hwl@antgroup.com
 
-The difference between virt and non-virt is what addresses get remapped
-for the remapping. For virt, guest addresses get remapped, for non-virt,
-we don't remap guest addresses. And, since we don't remap guest addresses
-for non-virt, then, rather than invent some new, arbitrary address, we
-just use the host address. Remapping is still in use, but, as I said
-above, it's an identity mapping.
+Hou Wenlong (2):
+  KVM: x86: Add helper to retrieve current value of user return MSR
+  KVM: SVM: Re-load current, not host, TSC_AUX on #VMEXIT from SEV-ES
+    guest
 
-(Note, for the current riscv iommu, "remapping" for the non-virt case just
-means keeping the set of IMSICs that a device may reach limited to just
-what it should be allowed to reach.)
+ arch/x86/include/asm/kvm_host.h |  1 +
+ arch/x86/kvm/svm/sev.c          | 10 ++++++++++
+ arch/x86/kvm/svm/svm.c          | 25 ++++++-------------------
+ arch/x86/kvm/svm/svm.h          |  2 ++
+ arch/x86/kvm/x86.c              |  6 ++++++
+ 5 files changed, 25 insertions(+), 19 deletions(-)
 
-> 
-> Be specific what you mean.
 
-I'm always happy to clarify when asked. I'm not sure what I said that
-would lead to thinking remapping was disabled for the non-virt case,
-but hopefully what I wrote now clarifies that it is not.
+base-commit: c8fbf7ceb2ae3f64b0c377c8c21f6df577a13eb4
+-- 
+2.51.0.534.gc79095c0ca-goog
 
-Thanks,
-drew
 
