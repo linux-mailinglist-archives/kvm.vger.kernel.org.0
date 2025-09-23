@@ -1,151 +1,120 @@
-Return-Path: <kvm+bounces-58533-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-58534-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id B43F3B962AC
-	for <lists+kvm@lfdr.de>; Tue, 23 Sep 2025 16:15:05 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9CDABB962C2
+	for <lists+kvm@lfdr.de>; Tue, 23 Sep 2025 16:17:21 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id CBFEE4A261E
-	for <lists+kvm@lfdr.de>; Tue, 23 Sep 2025 14:15:00 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 79BA918A06D2
+	for <lists+kvm@lfdr.de>; Tue, 23 Sep 2025 14:17:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5B8B5238C08;
-	Tue, 23 Sep 2025 14:14:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5617F233722;
+	Tue, 23 Sep 2025 14:17:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="Ww+7q0V/"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="aR+AoqiP"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.7])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E755F2036ED;
-	Tue, 23 Sep 2025 14:14:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.7
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AB88921019C;
+	Tue, 23 Sep 2025 14:17:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758636890; cv=none; b=ZeUcswWPIZruAS6f2r7O04n7AFRgoDGKMZNW6g+mRwXlZN2lXc1sRUcfV46fTnge7G0p4Z1TleLSaaY1L7BdJWYzvWCOLbEVs07QuYs2jEvgB4oie/thH8TbjGZZK2TehWNQ5qEYTD07SdHGUBuk52vkel5k4qF/yFMd8e/Di4s=
+	t=1758637026; cv=none; b=Grz+il3vUYWeDlr7MfLOmaj2euuC0mbqedV0uER+WOBHvAyThANoOvwCYuiejFfqVk4WT7TOfQQNNEXgXenbSGoABOX7j/SA70ePoIKt5RF7K07JANjaZVZ8uQ/+VF9d52QOXeCpwU08s5/7ge2zrZJcGQVsGCx7rp8ND3cpxik=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758636890; c=relaxed/simple;
-	bh=+H9zJ9ZnJh5XdjSEpBwdWNCOzZuIf/K/RLNBOxUxrx0=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=IjnpKZUhTfaqHS+3E/X36ZDm5d77hFwd0bVPg1PUdujPfbHzSMN3FwnxFG6Q7vl1ZVf8tP78a4157dYDVxkdh9Q5xnnkuTIv9dsSkuHwmfWtIpGeLMXtvL36guuoEU2Kgu0kQs9is6JXAIUwD0N/PvAaMt3P5YJJhNUOd6cdEGI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=Ww+7q0V/; arc=none smtp.client-ip=192.198.163.7
+	s=arc-20240116; t=1758637026; c=relaxed/simple;
+	bh=HhfQ8qFnuoue9N89ZUhfgvfqB9CtjDf8lF3wfCaFCP4=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=AaVczR8X/i3hGCszHHiuKogLV7UuD7OsqkTvmFKp5LuNCe9BrLS9TmXqP7uwa+BnclpvE40TCwkaLYoSAgpmhWmFeb9xER0I+03KUhFICzEREf3HlFSTtYUfsrq9RfTwyqOkkmqz27mtItkHYiGV+bPHQ1aa7UVt2QvyEJhJnss=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=aR+AoqiP; arc=none smtp.client-ip=198.175.65.18
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1758636889; x=1790172889;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=+H9zJ9ZnJh5XdjSEpBwdWNCOzZuIf/K/RLNBOxUxrx0=;
-  b=Ww+7q0V/UUe+4zKbAIwk745wJ/rtlZi59yq0UYa5M+VghJ76KFnnU025
-   ihWhnJTANpICEi8dp8lDh6+baGTr3kXtPEABbEawt3Y+rS9aFZb0Dm+q8
-   ul1zqRcz/RjcwyOvgmdDIRCx+zmZyrOmPaM72Z5ML9/JeiR4B8oWFT0fO
-   v/KDlXHM2QKcSTgKRCb/FrXEEJi23BSWOHKVVlMpfD1kHBLhsnoQLuhrx
-   WH0wmouJuZjG0s3ihtomZ2EDX97gk4O5CBCDkE/iXezzXfB707JZy3Iwz
-   e3ILve4l/4Z69ruhdGVoZOU6CGniRNuMblzyxaKGnhP5vvEWhKN8kouUK
-   A==;
-X-CSE-ConnectionGUID: JRB6lzdeQLGcwAfAz1SRWQ==
-X-CSE-MsgGUID: fAp0oqWDTBeOOOJsO/RWVQ==
-X-IronPort-AV: E=McAfee;i="6800,10657,11561"; a="86353231"
-X-IronPort-AV: E=Sophos;i="6.18,288,1751266800"; 
-   d="scan'208";a="86353231"
-Received: from fmviesa007.fm.intel.com ([10.60.135.147])
-  by fmvoesa101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 23 Sep 2025 07:14:21 -0700
-X-CSE-ConnectionGUID: hi4LmZPgTA2uLR2Pk1F+Zg==
-X-CSE-MsgGUID: h4fxs8c9Q++r6fENoG5wpw==
+  t=1758637025; x=1790173025;
+  h=message-id:date:mime-version:subject:to:cc:references:
+   from:in-reply-to:content-transfer-encoding;
+  bh=HhfQ8qFnuoue9N89ZUhfgvfqB9CtjDf8lF3wfCaFCP4=;
+  b=aR+AoqiPRMvUaxvUL/EAN7Vdj1KudpN3DjgM8Gw+U+YpSqFm4x4AfJ9o
+   fQ6uyu8rqd1v2WOjI62ZHYNnVgZBGu95+BK0hLk4IoS5GPemUtHePNq5d
+   yHHttqfiJV63JcvO+Hx8lLLzxhvmWw4Y03CsYkshEExHxG3FhAsr1zVR5
+   /Ah5S4j1znY/LyAuuZplbyePuTMaD3Ab12+4+meW7V5ii5b1dH3P9IVtv
+   fouhrm0OEPHpaiv2D2Cz1lJ4Q27Qh+pm+kwG3YyK6EIcpFqtKSHCDpF1n
+   QSYvpLFVaQYnVeHV2mvPliQZ4Cjctervu34mY7fyXGhBmNoKjWGB83FMe
+   g==;
+X-CSE-ConnectionGUID: 9UlBbuPPSeW0WH7ZuJuWXQ==
+X-CSE-MsgGUID: hzqP2crLSNCNZekEn4Q2Tg==
+X-IronPort-AV: E=McAfee;i="6800,10657,11531"; a="60968568"
+X-IronPort-AV: E=Sophos;i="6.17,312,1747724400"; 
+   d="scan'208";a="60968568"
+Received: from orviesa002.jf.intel.com ([10.64.159.142])
+  by orvoesa110.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 23 Sep 2025 07:17:04 -0700
+X-CSE-ConnectionGUID: G5N869BDQt2GFauEQX/Rwg==
+X-CSE-MsgGUID: HicRN2vSSlS+9cE/bZiUcQ==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.18,288,1751266800"; 
-   d="scan'208";a="176369709"
-Received: from lkp-server02.sh.intel.com (HELO 84c55410ccf6) ([10.239.97.151])
-  by fmviesa007.fm.intel.com with ESMTP; 23 Sep 2025 07:14:18 -0700
-Received: from kbuild by 84c55410ccf6 with local (Exim 4.96)
-	(envelope-from <lkp@intel.com>)
-	id 1v13ma-0003Av-0n;
-	Tue, 23 Sep 2025 14:14:16 +0000
-Date: Tue, 23 Sep 2025 22:14:05 +0800
-From: kernel test robot <lkp@intel.com>
-To: Simon Schippers <simon.schippers@tu-dortmund.de>,
-	willemdebruijn.kernel@gmail.com, jasowang@redhat.com,
-	mst@redhat.com, eperezma@redhat.com, stephen@networkplumber.org,
-	leiyang@redhat.com, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org, virtualization@lists.linux.dev,
-	kvm@vger.kernel.org
-Cc: llvm@lists.linux.dev, oe-kbuild-all@lists.linux.dev,
-	Simon Schippers <simon.schippers@tu-dortmund.de>,
-	Tim Gebauer <tim.gebauer@tu-dortmund.de>
-Subject: Re: [PATCH net-next v5 8/8] vhost_net: Replace rx_ring with calls of
- TUN/TAP wrappers
-Message-ID: <202509232113.Z0qRJQHs-lkp@intel.com>
-References: <20250922221553.47802-9-simon.schippers@tu-dortmund.de>
+   d="scan'208";a="207532883"
+Received: from xiaoyaol-hp-g830.ccr.corp.intel.com (HELO [10.124.238.14]) ([10.124.238.14])
+  by orviesa002-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 23 Sep 2025 07:17:01 -0700
+Message-ID: <c93438be-642b-47f1-b4ff-9551b9192471@intel.com>
+Date: Tue, 23 Sep 2025 22:16:57 +0800
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250922221553.47802-9-simon.schippers@tu-dortmund.de>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v16 19/51] KVM: x86: Don't emulate task switches when IBT
+ or SHSTK is enabled
+To: Sean Christopherson <seanjc@google.com>,
+ Binbin Wu <binbin.wu@linux.intel.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org,
+ linux-kernel@vger.kernel.org, Tom Lendacky <thomas.lendacky@amd.com>,
+ Mathias Krause <minipli@grsecurity.net>, John Allen <john.allen@amd.com>,
+ Rick Edgecombe <rick.p.edgecombe@intel.com>, Chao Gao <chao.gao@intel.com>,
+ Maxim Levitsky <mlevitsk@redhat.com>, Zhang Yi Z
+ <yi.z.zhang@linux.intel.com>, Xin Li <xin@zytor.com>
+References: <20250919223258.1604852-1-seanjc@google.com>
+ <20250919223258.1604852-20-seanjc@google.com>
+ <b89600a2-c3ae-4bb6-8c91-ea9a1dd507fb@linux.intel.com>
+ <aNGGKm0Yzjvn3YVv@google.com>
+Content-Language: en-US
+From: Xiaoyao Li <xiaoyao.li@intel.com>
+In-Reply-To: <aNGGKm0Yzjvn3YVv@google.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-Hi Simon,
+On 9/23/2025 1:23 AM, Sean Christopherson wrote:
+> On Mon, Sep 22, 2025, Binbin Wu wrote:
+>>
+>>
+>> On 9/20/2025 6:32 AM, Sean Christopherson wrote:
+>>> Exit to userspace with KVM_INTERNAL_ERROR_EMULATION if the guest triggers
+>>> task switch emulation with Indirect Branch Tracking or Shadow Stacks
+>>> enabled,
+>>
+>> The code just does it when shadow stack is enabled.
+> 
+> Doh.  Fixed that and the EMULATION_FAILED typo Chao pointed out:
+> 
+> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+> index 8b31dfcb1de9..06a88a2b08d7 100644
+> --- a/arch/x86/kvm/x86.c
+> +++ b/arch/x86/kvm/x86.c
+> @@ -12194,9 +12194,9 @@ int kvm_task_switch(struct kvm_vcpu *vcpu, u16 tss_selector, int idt_index,
+>                   */
+>                  if (__kvm_emulate_msr_read(vcpu, MSR_IA32_U_CET, &u_cet) ||
+>                      __kvm_emulate_msr_read(vcpu, MSR_IA32_S_CET, &s_cet))
+> -                       return EMULATION_FAILED;
+> +                       goto unhandled_task_switch;
+>   
+> -               if ((u_cet | s_cet) & CET_SHSTK_EN)
+> +               if ((u_cet | s_cet) & (CET_ENDBR_EN | CET_SHSTK_EN))
+>                          goto unhandled_task_switch;
+>          }
 
-kernel test robot noticed the following build errors:
-
-[auto build test ERROR on net-next/main]
-
-url:    https://github.com/intel-lab-lkp/linux/commits/Simon-Schippers/__ptr_ring_full_next-Returns-if-ring-will-be-full-after-next-insertion/20250923-062130
-base:   net-next/main
-patch link:    https://lore.kernel.org/r/20250922221553.47802-9-simon.schippers%40tu-dortmund.de
-patch subject: [PATCH net-next v5 8/8] vhost_net: Replace rx_ring with calls of TUN/TAP wrappers
-config: i386-buildonly-randconfig-003-20250923 (https://download.01.org/0day-ci/archive/20250923/202509232113.Z0qRJQHs-lkp@intel.com/config)
-compiler: clang version 20.1.8 (https://github.com/llvm/llvm-project 87f0227cb60147a26a1eeb4fb06e3b505e9c7261)
-reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20250923/202509232113.Z0qRJQHs-lkp@intel.com/reproduce)
-
-If you fix the issue in a separate patch/commit (i.e. not just a new version of
-the same patch/commit), kindly add following tags
-| Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202509232113.Z0qRJQHs-lkp@intel.com/
-
-All errors (new ones prefixed by >>):
-
->> drivers/vhost/net.c:197:3: error: expected expression
-     197 |                 WARN_ON_ONCE();
-         |                 ^
-   include/asm-generic/bug.h:111:34: note: expanded from macro 'WARN_ON_ONCE'
-     111 |         int __ret_warn_on = !!(condition);                      \
-         |                                         ^
-   1 error generated.
-
-
-vim +197 drivers/vhost/net.c
-
-   178	
-   179	static int vhost_net_buf_produce(struct vhost_net_virtqueue *nvq,
-   180			struct sock *sk)
-   181	{
-   182		struct file *file = sk->sk_socket->file;
-   183		struct vhost_net_buf *rxq = &nvq->rxq;
-   184	
-   185		rxq->head = 0;
-   186	
-   187		switch (nvq->type) {
-   188		case TUN:
-   189			rxq->tail = tun_ring_consume_batched(file,
-   190					rxq->queue, VHOST_NET_BATCH);
-   191			break;
-   192		case TAP:
-   193			rxq->tail = tap_ring_consume_batched(file,
-   194					rxq->queue, VHOST_NET_BATCH);
-   195			break;
-   196		case IF_NONE:
- > 197			WARN_ON_ONCE();
-   198		}
-   199	
-   200		return rxq->tail;
-   201	}
-   202	
-
--- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
+Reviewed-by: Xiaoyao Li <xiaoyao.li@intel.com>
 
