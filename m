@@ -1,217 +1,295 @@
-Return-Path: <kvm+bounces-58441-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-58442-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id C5DC5B9403F
-	for <lists+kvm@lfdr.de>; Tue, 23 Sep 2025 04:38:19 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 0A2ECB94091
+	for <lists+kvm@lfdr.de>; Tue, 23 Sep 2025 04:42:53 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id AAE3318A701D
-	for <lists+kvm@lfdr.de>; Tue, 23 Sep 2025 02:38:41 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id EB1D318A717A
+	for <lists+kvm@lfdr.de>; Tue, 23 Sep 2025 02:43:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id ACBB027055F;
-	Tue, 23 Sep 2025 02:38:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D88A5273D8A;
+	Tue, 23 Sep 2025 02:42:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="lEGefzqA"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="IjLsk/tI"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.13])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 17A19148850;
-	Tue, 23 Sep 2025 02:38:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=192.198.163.13
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758595089; cv=fail; b=bN9Dvnkcp1bSdysKvzWZcIHzYo1LSxQzYGsjfZCkKo9Mxxd07wVK+RQyD8qGYaczbkghGYs1LAokL3OPwJSnPdKJARyw5l4j4gl2lKgLbRbv12vjIepiJ035d965TaLUKzGFhU2hCj2LFNw5EhaFCclPgD/UzQ0Iowd2hM4svX0=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758595089; c=relaxed/simple;
-	bh=J9EcYoe0pWmRcEFH2MD88/PO+z0OOx9N/FRVjzOhNso=;
-	h=Date:From:To:CC:Subject:Message-ID:References:Content-Type:
-	 Content-Disposition:In-Reply-To:MIME-Version; b=DFTrS7wUncBLQRqdvQSObSO+lhtdxHr6J2MDn1aXzufzcFWtpp/+bg+e2yXzkLR56c/k2TRX6/izUi5glp3HMuzAnmJuiHvcM2qXPH+MrgDEQ60w/7yH6jdPCnpwM/w6AUr6JKbUVhdhUH8opXPpCGt6yg/PPAzGEUG9PAvTq80=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=lEGefzqA; arc=fail smtp.client-ip=192.198.163.13
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1758595088; x=1790131088;
-  h=date:from:to:cc:subject:message-id:references:
-   in-reply-to:mime-version;
-  bh=J9EcYoe0pWmRcEFH2MD88/PO+z0OOx9N/FRVjzOhNso=;
-  b=lEGefzqArUHOOkqM/nlu2rUetTpRjOVGlTPQlfbCu8BfuNU7d1UkWLUc
-   TQUZVMiqqxpvPWPcT013qk5lGsbblZ+e+z0ToPtpC+T5Zvzb5siqtA1Z9
-   8bI/0IVXHvqs1esHqFeSaWqBEoJaA5/tcZJF0A9klRXXM5FV7TREjUy+/
-   59QyAVFLWUAisdfO1cSA9WacKAbtJbMlc6qlimW/FJXvtdZ6uB3GbC8MY
-   98dn5oweAAVkrwi1bI8VhviIuIXeYYJUTfhmQ/y3Dba6z8tEn3Ul+cnAS
-   2s5cX/BordGSa8G/zRuwtPsTb4xQB61omda9bC7syVuJo/+8SXCETS0OS
-   g==;
-X-CSE-ConnectionGUID: o/qyHH0/Q+a2Q7h/vtLeaw==
-X-CSE-MsgGUID: ATkGSRltSWuE7WpOisET9A==
-X-IronPort-AV: E=McAfee;i="6800,10657,11561"; a="63496753"
-X-IronPort-AV: E=Sophos;i="6.18,286,1751266800"; 
-   d="scan'208";a="63496753"
-Received: from fmviesa005.fm.intel.com ([10.60.135.145])
-  by fmvoesa107.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 22 Sep 2025 19:38:07 -0700
-X-CSE-ConnectionGUID: bAIkJRmES5GlgzT6f9RLKA==
-X-CSE-MsgGUID: WQuXaMbZQFKYKzvCv3b3bA==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.18,286,1751266800"; 
-   d="scan'208";a="181025088"
-Received: from fmsmsx901.amr.corp.intel.com ([10.18.126.90])
-  by fmviesa005.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 22 Sep 2025 19:38:07 -0700
-Received: from FMSMSX902.amr.corp.intel.com (10.18.126.91) by
- fmsmsx901.amr.corp.intel.com (10.18.126.90) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.17; Mon, 22 Sep 2025 19:38:06 -0700
-Received: from fmsedg903.ED.cps.intel.com (10.1.192.145) by
- FMSMSX902.amr.corp.intel.com (10.18.126.91) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.17 via Frontend Transport; Mon, 22 Sep 2025 19:38:06 -0700
-Received: from DM5PR21CU001.outbound.protection.outlook.com (52.101.62.12) by
- edgegateway.intel.com (192.55.55.83) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.17; Mon, 22 Sep 2025 19:38:04 -0700
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=MQb+2Hu4cH4fPEvbB+Si6TcN/8xk4QGOLo6eTVASF4rE4fy0e+eLBSol5rKWIC0kgXY5F9dF/1rllGRYYCYnoSuQ82kr6IoOY8/n+5B3fBAWam3Y2DCdsQLpkRsh0tZL5ztkMXal4SSNLuWNRueHhcrgNqvSbhkn2mEGb6aYGXjLBMz//m3A/y7wUQBMjbBa2LqCT25xmJZoRZq56IS4fNwtFzDQklvgiH1yg8kJnL9oTLe45oHMy/EGEpevSksKgqxKZ6OemcWYs1cx5OUQzL+XijP+mHTVsfwj5qlFAgsfIn1scP2zDahUQqGtHbT+fLETdfQLTqlf0wUykEOLxA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=u4yX5BVGH4ezk/6mT/zMtS1HOtNp4PEnVhbXx/7ypPw=;
- b=j+LeNoSGu1kQGIKIU9LdCmKjvHy+JQyjxVk25Tv30X4Mo0fnlFt7kP972r/Od6SSKvnebR9jeSTQcPprurUq0tq68/Z1IW5gkYeTk+svC141PWQTW3QHCEYa8xBlJppfa/jI24j1iK5mbUkb+43G0D+KsPs3uScqGG8Ta/tSkt0kebgE/Pnai6M/s6bg2bieu788CsCYu0oEFvoLkuu3NbDEPa5i93b66ek2pU7y4JCHysXZk4ug54DQfRncvtOp+yJ/smCne5jstMIpCgDg7tsnQ+l9xq7b9ZWQiUb9M8aAAGJr/HtZlBUO7e6xIvVmtVtUDzz8lRcnXSdoO7xeCw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-Received: from CH3PR11MB8660.namprd11.prod.outlook.com (2603:10b6:610:1ce::13)
- by SA3PR11MB7414.namprd11.prod.outlook.com (2603:10b6:806:31c::19) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9137.19; Tue, 23 Sep
- 2025 02:38:02 +0000
-Received: from CH3PR11MB8660.namprd11.prod.outlook.com
- ([fe80::cfad:add4:daad:fb9b]) by CH3PR11MB8660.namprd11.prod.outlook.com
- ([fe80::cfad:add4:daad:fb9b%3]) with mapi id 15.20.9137.018; Tue, 23 Sep 2025
- 02:38:01 +0000
-Date: Tue, 23 Sep 2025 10:37:50 +0800
-From: Chao Gao <chao.gao@intel.com>
-To: Sean Christopherson <seanjc@google.com>
-CC: Paolo Bonzini <pbonzini@redhat.com>, <kvm@vger.kernel.org>,
-	<linux-kernel@vger.kernel.org>, Tom Lendacky <thomas.lendacky@amd.com>,
-	Mathias Krause <minipli@grsecurity.net>, John Allen <john.allen@amd.com>,
-	Rick Edgecombe <rick.p.edgecombe@intel.com>, Binbin Wu
-	<binbin.wu@linux.intel.com>, Xiaoyao Li <xiaoyao.li@intel.com>, "Maxim
- Levitsky" <mlevitsk@redhat.com>, Zhang Yi Z <yi.z.zhang@linux.intel.com>,
-	"Xin Li" <xin@zytor.com>
-Subject: Re: [PATCH v16 29/51] KVM: VMX: Configure nested capabilities after
- CPU capabilities
-Message-ID: <aNIH/ozYmopOuCui@intel.com>
-References: <20250919223258.1604852-1-seanjc@google.com>
- <20250919223258.1604852-30-seanjc@google.com>
-Content-Type: text/plain; charset="us-ascii"
-Content-Disposition: inline
-In-Reply-To: <20250919223258.1604852-30-seanjc@google.com>
-X-ClientProxiedBy: SG2P153CA0013.APCP153.PROD.OUTLOOK.COM (2603:1096::23) To
- CH3PR11MB8660.namprd11.prod.outlook.com (2603:10b6:610:1ce::13)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3CB8526E6F3
+	for <kvm@vger.kernel.org>; Tue, 23 Sep 2025 02:42:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1758595365; cv=none; b=MBULVYBy3k0Sl3q8GiB7r2JG8+Y+LdTnN25Ln7iUCqWAVzgZkv2k27SG4+gzX3BTltF5IcnwhA7mYcAn5xOtWbHlSAMsotl959SxBE6KPsSkTECyI0/MunIMwTGLTXobKMNNNo3XzbaDqhT6tmUqMq1qVcoLhzM9mY57t5RK9Jw=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1758595365; c=relaxed/simple;
+	bh=U8BfRIfWRxGPkTZ8ZlsPBJ0ty1yw0P2zFNdvUm5eF80=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=G3v63nVSoDt7+ziwh2YHV+pGBtaJ2u+HVT+Ifh/11B7NFq4azJDILGCmlvMJy/PRhlIwxnvex5tgsC5mPQ9S0bCs+3YmF33V9roi70hHpyGjnDUoRyw00h81Wsl81NkzDuO78ET0+4AUnyPqXxGjkWQTLEsaplBsNU0BgVOfim8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=IjLsk/tI; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1758595362;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=ovRbpMfovzcRmf0L4bDDYQZTgg4Svx+RqRpiV3ItuuI=;
+	b=IjLsk/tI6cAqcKH4E4HECvlScD9Y3y6zR7kONlVcrh6BoFikfekF/WwKpLVkZitOAUn5cS
+	QY52KKAoGTi7snDGpbP2e2k4fj/uUqx67ZBGuES+kGaYX2D7RQ8lfWpZlXa1Vq8/05dmXt
+	pf+bhzaS7TkXIH/ATAk4IAH52NUqW3A=
+Received: from mail-qk1-f198.google.com (mail-qk1-f198.google.com
+ [209.85.222.198]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-391-x5VkiKLbNUWNQX2x8-ibIg-1; Mon, 22 Sep 2025 22:42:40 -0400
+X-MC-Unique: x5VkiKLbNUWNQX2x8-ibIg-1
+X-Mimecast-MFC-AGG-ID: x5VkiKLbNUWNQX2x8-ibIg_1758595360
+Received: by mail-qk1-f198.google.com with SMTP id af79cd13be357-828bd08624aso1048592885a.1
+        for <kvm@vger.kernel.org>; Mon, 22 Sep 2025 19:42:40 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1758595360; x=1759200160;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=ovRbpMfovzcRmf0L4bDDYQZTgg4Svx+RqRpiV3ItuuI=;
+        b=sjzdNjcHIdtwS8/YuMTpIt+jSWiv8K+3VxpLlqZ1PcRt5Lb8SgVkiHp1C0HntOmiA9
+         E5hI8nm372KFUyjkaSfPFqbPpD7VFPuVjJ8fj7SkfJNCb9Ve83rfzEVQq+uI4AS4+ZLq
+         Wz0yvq2ncpK0rar8+Lrn4AdkovY2ZtJws9nq1XsQnnL1Uot+/2+GtEgbiPOW7wnpfjyV
+         IKkn8VV6m04CGh8RnZKd+9/0CWOnh0UjUFb64KtJ2+dt0YJ/bc+74GVlysLdWpV0kwBZ
+         S8gkFmKF83YUHxu9ORpgkPkqw0ejtamsQvg+7zBCXuKTvHyCRpdeLPAPakYQ/X4cixZ1
+         Dgvg==
+X-Forwarded-Encrypted: i=1; AJvYcCXhrcgphDpPs5Qkp1FATVy/iMbEaDUI5Fq+1o8zpn+eS1ZLXJ9QcCIr1ysz3P6kAZkareM=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yx6TSmrLaiNccp3zPvtiaVe60sj0xogJmFGLerZ9WqoTvnmWQBO
+	2SOEZxR/75k8lnAt3QU7LA0EDe/PG5+q+TXOD5yMQyzXP7XCmK6WWk6P0adu0+pEAVu9sZQCphm
+	KkQJrpGBJarZWgxa3HdCxcn5GzqJrQnwz732i8SxVKa8slJ4O+FxPMw==
+X-Gm-Gg: ASbGncuG6J/tYvvZXPwVL+gQ8631NRIawnRlJp2f0t/OU+lzPGjNuvsBs6aAtZsq3ar
+	G+Pjvq0Wtc3h1stCOVcLUW3ZZC0k5dWqPjJ2FX6NDSl+C/mUlZIOhZpMnWkAPd3qjXzJabp4h1/
+	Y2Y4iCTOYjxwgZJdYSg4IndXoL+lpnTnvNG6g/rd32aV11LR5YKrWEepnL1isgupZ/yetUj1cqY
+	kEdT5s54Zlh3rHz58GGRqbiBCjqxkxoBGhaMTS45kdAwz5J+T07Uvc9MAe0Jqbcx+tOIPHj0qOL
+	wcjmZEfPU7URJiWqHmtIooxRaiemXDpdA0hHRS9Y
+X-Received: by 2002:a05:620a:1912:b0:811:33d6:1aca with SMTP id af79cd13be357-851691163acmr151324785a.1.1758595360127;
+        Mon, 22 Sep 2025 19:42:40 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IHx86NaRHJS5fRx0oc5vlKW3pGIJTq3UlFlPY31i7XkkxTNEwNFeSs9bG+4eASgNFJ24f848A==
+X-Received: by 2002:a05:620a:1912:b0:811:33d6:1aca with SMTP id af79cd13be357-851691163acmr151323285a.1.1758595359707;
+        Mon, 22 Sep 2025 19:42:39 -0700 (PDT)
+Received: from [192.168.40.164] ([70.105.235.240])
+        by smtp.gmail.com with ESMTPSA id af79cd13be357-852847b70f4sm19413785a.15.2025.09.22.19.42.38
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 22 Sep 2025 19:42:39 -0700 (PDT)
+Message-ID: <0eb2e721-8b9c-40d0-afe7-c81c6b765f49@redhat.com>
+Date: Mon, 22 Sep 2025 22:42:37 -0400
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: CH3PR11MB8660:EE_|SA3PR11MB7414:EE_
-X-MS-Office365-Filtering-Correlation-Id: b7b8c829-8d59-4d5f-1fab-08ddfa4a3703
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230040|7416014|376014|366016|1800799024|7053199007;
-X-Microsoft-Antispam-Message-Info: =?us-ascii?Q?LkthGEV11YwpvzipkwK4jGChnNdCjQFphRPfzq1zKSTedJAGzOvDi7KlCgFB?=
- =?us-ascii?Q?ZyCKM/xpT79yMmQAUMzLEFaMWxht9hOvh860/Z1FZYY14ZdEgVJPQn6d18qV?=
- =?us-ascii?Q?KDSxoDOxMpEJM5K5hzWTEkx5w8Y96ZpH86wVxS+qNomh57Sz/+JRcZS0KJLz?=
- =?us-ascii?Q?394wyqvx1RFCQhz5+FA7dnGnJhtxbTWHamLXMi4dgcs+hOecGqJQAtSumgtz?=
- =?us-ascii?Q?KxKSf28jl0PGoOSj5Q77hKfKh4NcEsavahmEHgCa9D/ZhPad11OAjSQw1Ef3?=
- =?us-ascii?Q?ASfpjpIZlmuInCHn0K1yMHqhRkBFQMsjHIiuZeyHSVv8zUniwl+XF6xItcM7?=
- =?us-ascii?Q?PUcZH+DXd5Tw7ZO4lQEdNkHxQXSBqBv6NjfIBFaBIYsgkhqXmP9Q7HWA87qL?=
- =?us-ascii?Q?99H5IkZ8PleAychEl4bGUt+Q2LwzribY6wLtT4pk8hfDx0tgVShdMXl4jhF4?=
- =?us-ascii?Q?ZUQOaBMayaJEtlE7GsNCnUiLiwYqTltyP4wvzCmNAobGjKiJennPY32m6d9U?=
- =?us-ascii?Q?JQIkmAZICJ3ap75aST7Ha2T33hDy6CAdMjbl1UmjWzzpSfXypm8bvvNUcJee?=
- =?us-ascii?Q?pcTEs+b9PVS/D1W6uwIjhgGFUUsso6pzuqupiUNbcvD1XErYFAXULQ216mXR?=
- =?us-ascii?Q?ed8rk4cTJY6ktLYT2ugNSFVSsrRVPTXxrEUpW5rjUs0hfIkpcHrUtO+7dYzq?=
- =?us-ascii?Q?UGdVYRbUmEvH3YpjmtIu0Si7ffiYV75D/DR7QO/glV6R/Q1ur6f2OxfTxRt0?=
- =?us-ascii?Q?xrdWYh2zmL9udiJb7wo+NTfawgDGKc94eMWj/55l5BmTLR2xOMARPJwFSMup?=
- =?us-ascii?Q?XophK4uAhII5k1QbWyWGTjgor7rJyuw8QjAs8vjITcH3ugPIFZFN+wkEWAGz?=
- =?us-ascii?Q?WrrDMjTdnFlsf2FiBszImWypA8ZppnJmgnSKOEbfTRI/BKxckIkOqhbizlnC?=
- =?us-ascii?Q?XxkKkyF+FEuYxo0/C/8RdBtPLQwKcg/P+v3VMsWTFVtKLGMMXdDCxk90C7YR?=
- =?us-ascii?Q?aOns/uH/p/CHKdpGBkJraDN0btwgowgQp7mCYNKNoxykdv++1Dow0eMh88vb?=
- =?us-ascii?Q?bfIO25BkQw+WrY/kkeABwhaj6pBv83dBRj+mJpk/50GXavfX01yF2W0VVE5X?=
- =?us-ascii?Q?5WAd5GYuLa++yshkR8GW5qCRrzjhlPdWqmzQEm1c6/HtqYiyrDSf31eOL0Qo?=
- =?us-ascii?Q?2KKMMMgiRl/XOor6CFNf3yjaTCR5rvd9iMo8CK1IKMuzpzB1U0Kfqx7MqWDW?=
- =?us-ascii?Q?y7/ZS144N1bAahuqnGpnNqqkELQTs1jmepo5uEtBdFy4qKfDjUnW5eT5mHXk?=
- =?us-ascii?Q?XDCEJf2DWEt1XKtTEsA8jxc56K0EVGCKeCC49PZ0ZrimNxLp0+Ufk15OP9rk?=
- =?us-ascii?Q?OC1b/je3Imz83QqWdypA8Xm29yrZ?=
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CH3PR11MB8660.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(7416014)(376014)(366016)(1800799024)(7053199007);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?Y1Kjh2w6kPGcA0flpkJSXfwBGVNIg5R1yadAZQWb+UzH4jW/oM3r+ymOaU+n?=
- =?us-ascii?Q?p79C+n9CGeo8Q2oNhqg7oZIhOY1E292qST00jUANLnlpce08PQJooRc2EfD1?=
- =?us-ascii?Q?odFrcyfB5Gf3LxZcD7xw+YYKdi/9Eyy9SC7rWqF/x0WptSe7E1ZsMiRN7sJ6?=
- =?us-ascii?Q?Ra7OxfRiFl//56Qo3rwy/T3KCgkC+XXIAqamEwu/R1RkBfQWyKPThCFmax6q?=
- =?us-ascii?Q?MTHWmJL5Piypyp5IaajPoWrsSoR57T4FUx63yAS9wE3eVsxZVAaVB0QDrlgv?=
- =?us-ascii?Q?0Zdgdj797wjqq2iueUswgRynoyEEdkpp+1I7QvzJRvyj7h6NJzsyqBf8vsw+?=
- =?us-ascii?Q?jjaM3B71nuxLLoTvhN0a3vpyVxIdCLlDGSzdh1WXdRbUvYAijPY8rd3Dp3Gf?=
- =?us-ascii?Q?aSe2CikcnkdWH5meiJT5FbPNegjfJq2dPlbAKn0blIvepsGJeLeIXNtw7eVa?=
- =?us-ascii?Q?OmQH3hbP6smFBFwdG2+W05Nw45RqW80JUw44HpuYBcYUhiwUBpWWKhLW4Jhk?=
- =?us-ascii?Q?1GKwaHCSWvEk1zS9snt0btcNBZxttwHivZlmGzeyIMItrHocX4jmF1+7E3bK?=
- =?us-ascii?Q?X1hSHlC6iXLcAyXjwBltzAxzWwpUDNXrgwd5K8Dp/aGyQsnXDsoJbuiFOD6j?=
- =?us-ascii?Q?hp3iIwJ7SWtXs4ffrTd+qCX29yphSaLlM66bJzZMTYdBBTBR5L0UnAUQwe5L?=
- =?us-ascii?Q?LO2lAshZigWT75Dwd/Fj0rEXfywxP1ngu5QB6Hq9+wRX6ZqXnKyagyBpOJoC?=
- =?us-ascii?Q?i32VA3zio3tMJvYEc2xyEtay9+Y+j0qiKYVeZZ/CP4LI5EKAvzRrMunX0LSm?=
- =?us-ascii?Q?7JOaS6s7rxcUhkKEV9OULQn0bNZbd+AC5WCttL+aoDpvcl6c6qz1e/mUoa6b?=
- =?us-ascii?Q?0sg1TTRN7vwLJUhqNdyI7PtlrfO4BRyYVcDcMjUpjp8v+XQGZN42gmaA4fJQ?=
- =?us-ascii?Q?EWhIKvxsMIz9KAvT66gITG+7zX9dzDZCnXLpAg8N7UFRCqA2xFbylGPqJrg9?=
- =?us-ascii?Q?IIvcpjm5Z5Eqbo7aQ3HpUyHWrQ6175pvc5x6sYhmzhvCxjRFU31BZ+YHUC2L?=
- =?us-ascii?Q?HnzsEFNqqc2T9wqOUE8DVv76p3pMPXH7DUKGIikOoSfkav2A2UD8MlvTPnXo?=
- =?us-ascii?Q?rtNGUGZcJ4Ag/olG0asBZ+p6lRWeEbIvZKNzNMCCB8TW9cpFWsLOTpuUJBb+?=
- =?us-ascii?Q?RjoJqJjaE3ZGHi/eOYqmJtumyQtH/0BLdo/0xsBmauIATYEpfymds+9DtA30?=
- =?us-ascii?Q?5c/tqq6GD+VIUmZNJ2RiurroUdn1z3bsYnCEb7FXDFYROLzMS0OqDQ7cO+D3?=
- =?us-ascii?Q?woHPLPRRCsU9vrip+aj11gZ9B8uMqPAr4NGarpasyE2rEyj5BCcAED9WjPNh?=
- =?us-ascii?Q?tBfNp4LfCXbtC+7sUiSgOwV+mTjZHp1xNfJjddpLBbXmgGNoPA0Vbjr7iB5Y?=
- =?us-ascii?Q?m+H6eDbws+7hjWbn+4iDpAvw1ByQ4+rW9ZD9gf2PdQnaWlzo1MjKfdQGHp24?=
- =?us-ascii?Q?oLX6bMRQA58627iObBLYXl/BFkn8Ob1HRkRD/VJ0DvzOy2a/KfBeRe39wfdy?=
- =?us-ascii?Q?J9gdJAl3Livz4oD8zWW27l4T95L3+uGumlrbAF62?=
-X-MS-Exchange-CrossTenant-Network-Message-Id: b7b8c829-8d59-4d5f-1fab-08ddfa4a3703
-X-MS-Exchange-CrossTenant-AuthSource: CH3PR11MB8660.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 23 Sep 2025 02:38:01.7225
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: CUOQQCEv4xZbseYFCAJKMKDuW6A19soS9UDkIeB6dPv0sC33+GH/CseBsRVuiLnPmTRfP6tt7O0wRQ1TUWAFgw==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA3PR11MB7414
-X-OriginatorOrg: intel.com
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v3 00/11] Fix incorrect iommu_groups with PCIe ACS
+Content-Language: en-US
+To: Alex Williamson <alex.williamson@redhat.com>
+Cc: Jason Gunthorpe <jgg@nvidia.com>, Bjorn Helgaas <bhelgaas@google.com>,
+ iommu@lists.linux.dev, Joerg Roedel <joro@8bytes.org>,
+ linux-pci@vger.kernel.org, Robin Murphy <robin.murphy@arm.com>,
+ Will Deacon <will@kernel.org>, Lu Baolu <baolu.lu@linux.intel.com>,
+ galshalom@nvidia.com, Joerg Roedel <jroedel@suse.de>,
+ Kevin Tian <kevin.tian@intel.com>, kvm@vger.kernel.org, maorg@nvidia.com,
+ patches@lists.linux.dev, tdave@nvidia.com, Tony Zhu <tony.zhu@intel.com>
+References: <0-v3-8827cc7fc4e0+23f-pcie_switch_groups_jgg@nvidia.com>
+ <20250922163947.5a8304d4.alex.williamson@redhat.com>
+ <e9d4f76a-5355-4068-a322-a6d5c081e406@redhat.com>
+ <20250922200654.1d4ff8b8.alex.williamson@redhat.com>
+From: Donald Dutile <ddutile@redhat.com>
+In-Reply-To: <20250922200654.1d4ff8b8.alex.williamson@redhat.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-On Fri, Sep 19, 2025 at 03:32:36PM -0700, Sean Christopherson wrote:
->Swap the order between configuring nested VMX capabilities and base CPU
->capabilities, so that nested VMX support can be conditioned on core KVM
->support, e.g. to allow conditioning support for LOAD_CET_STATE on the
->presence of IBT or SHSTK.  Because the sanity checks on nested VMX config
->performed by vmx_check_processor_compat() run _after_ vmx_hardware_setup(),
->any use of kvm_cpu_cap_has() when configuring nested VMX support will lead
->to failures in vmx_check_processor_compat().
->
->While swapping the order of two (or more) configuration flows can lead to
->a game of whack-a-mole, in this case nested support inarguably should be
->done after base support.  KVM should never condition base support on nested
->support, because nested support is fully optional, while obviously it's
->desirable to condition nested support on base support.  And there's zero
->evidence the current ordering was intentional, e.g. commit 66a6950f9995
->("KVM: x86: Introduce kvm_cpu_caps to replace runtime CPUID masking")
->likely placed the call to kvm_set_cpu_caps() after nested setup because it
->looked pretty.
->
->Signed-off-by: Sean Christopherson <seanjc@google.com>
 
-Reviewed-by: Chao Gao <chao.gao@intel.com>
 
-I had a feeling I'd seen this patch before :). After some searching in lore, I
-tracked it down:
-https://lore.kernel.org/kvm/20241001050110.3643764-22-xin@zytor.com/
+On 9/22/25 10:06 PM, Alex Williamson wrote:
+> On Mon, 22 Sep 2025 21:44:27 -0400
+> Donald Dutile <ddutile@redhat.com> wrote:
+> 
+>> On 9/22/25 6:39 PM, Alex Williamson wrote:
+>>> On Fri,  5 Sep 2025 15:06:15 -0300
+>>> Jason Gunthorpe <jgg@nvidia.com> wrote:
+>>>    
+>>>> The series patches have extensive descriptions as to the problem and
+>>>> solution, but in short the ACS flags are not analyzed according to the
+>>>> spec to form the iommu_groups that VFIO is expecting for security.
+>>>>
+>>>> ACS is an egress control only. For a path the ACS flags on each hop only
+>>>> effect what other devices the TLP is allowed to reach. It does not prevent
+>>>> other devices from reaching into this path.
+>>>>
+>>>> For VFIO if device A is permitted to access device B's MMIO then A and B
+>>>> must be grouped together. This says that even if a path has isolating ACS
+>>>> flags on each hop, off-path devices with non-isolating ACS can still reach
+>>>> into that path and must be grouped gother.
+>>>>
+>>>> For switches, a PCIe topology like:
+>>>>
+>>>>                                  -- DSP 02:00.0 -> End Point A
+>>>>    Root 00:00.0 -> USP 01:00.0 --|
+>>>>                                  -- DSP 02:03.0 -> End Point B
+>>>>
+>>>> Will generate unique single device groups for every device even if ACS is
+>>>> not enabled on the two DSP ports. It should at least group A/B together
+>>>> because no ACS means A can reach the MMIO of B. This is a serious failure
+>>>> for the VFIO security model.
+>>>>
+>>>> For multi-function-devices, a PCIe topology like:
+>>>>
+>>>>                     -- MFD 00:1f.0 ACS not supported
+>>>>     Root 00:00.00 --|- MFD 00:1f.2 ACS not supported
+>>>>                     |- MFD 00:1f.6 ACS = REQ_ACS_FLAGS
+>>>>
+>>>> Will group [1f.0, 1f.2] and 1f.6 gets a single device group. However from
+>>>> a spec perspective each device should get its own group, because ACS not
+>>>> supported can assume no loopback is possible by spec.
+>>>
+>>> I just dug through the thread with Don that I think tries to justify
+>>> this, but I have a lot of concerns about this.  I think the "must be
+>>> implemented by Functions that support peer-to-peer traffic with other
+>>> Functions" language is specifying that IF the device implements an ACS
+>>> capability AND does not implement the specific ACS P2P flag being
+>>> described, then and only then can we assume that form of P2P is not
+>>> supported.  OTOH, we cannot assume anything regarding internal P2P of an
+>>> MFD that does not implement an ACS capability at all.
+>>>    
+>> The first, non-IF'd, non-AND'd req in PCIe spec 7.0, section 6.12.1.2 is:
+>> "ACS P2P Request Redirect: must be implemented by Functions that
+>> support peer-to-peer traffic with other Functions. This includes
+>> SR-IOV Virtual Functions (VFs)." There is not further statement about
+>> control of peer-to-peer traffic, just the ability to do so, or not.
+>>
+>> Note: ACS P2P Request Redirect.
+>>
+>> Later in that section it says:
+>> ACS P2P Completion Redirect: must be implemented by Functions that
+>> implement ACS P2P Request Redirect.
+>>
+>> That can be read as an 'IF Request-Redirect is implemented, than ACS
+>> Completion Request must be implemented. IOW, the Completion Direct
+>> control is required if Request Redirect is implemented, and not
+>> necessary if Request Redirect is omitted.
+>>
+>> If ACS P2P Require Redirect isn't implemented, than per the first
+>> requirement for MFDs, the PCIe device does not support peer-to-peer
+>> traffic amongst its function or virtual functions.
+>>
+>> It goes on...
+>> ACS Direct Translated P2P: must be implemented if the Function
+>> supports Address Translation Services (ATS) and also peer-to-peer
+>> traffic with other Functions.
+>>
+>> If an MFD does not do peer-to-peer, and P2P Request Redirect would be
+>> implemented if it did, than this ACS control does not have to be
+>> implemented either.
+>>
+>> Egress control structures are either optional or dependent on Request
+>> Redirect &/or Direct Translated P2P control, which have been
+>> addressed above as not needed if on peer-to-peer btwn functions in an
+>> MFD (and their VFs).
+>>
+>>
+>> Now, if previous PCIe spec versions (which I didn't read & re-read &
+>> re-read like the 6.12 section of PCIe spec 7.0) had more IF and ANDs,
+>> than that could be cause for less than clear specmanship enabling
+>> vendors of MFDs to yield a non-PCIe-7.0 conformant MFD wrt ACS
+>> structures. I searched section 6.12.1.2 for if/IF and AND/and, and
+>> did not yield any conditions not stated above.
+> 
+> Back up to 6.12.1:
+> 
+>    ACS functionality is reported and managed via ACS Extended Capability
+>    structures. PCI Express components are permitted to implement ACS
+>    Extended Capability structures in some, none, or all of their
+>    applicable Functions. The extent of what is implemented is
+>    communicated through capability bits in each ACS Extended Capability
+>    structure. A given Function with an ACS Extended Capability structure
+>    may be required or forbidden to implement certain capabilities,
+>    depending upon the specific type of the Function and whether it is
+>    part of a Multi-Function Device.
+> 
+Right, depending on type of function or part of MFD.
+Maybe I mis-understood your point, or vice-versa:
+section 6.12.1.2 is for MFDs, and I was only discussing MFD ACS structs.
+I did not mean to imply the sections I was quoting was for anything but an MFD.
+
+> What you're quoting are the requirements for the individual p2p
+> capabilities IF the ACS extended capability is implemented.
+> 
+No, I'm not.  I'm quoting 6.12.1.2, which is MFD-specific.
+
+> Section 6.12.1.1 describing ACS for downstream ports begins:
+> 
+>    This section applies to Root Ports and Switch Downstream Ports that
+>    implement an ACS Extended Capability structure.
+> 
+> Section 6.12.1.2 for SR-IOV, SIOV and MFDs begins:
+> 
+>    This section applies to Multi-Function Device ACS Functions, with the
+>    exception of Downstream Port Functions, which are covered in the
+>    preceding section.
+> 
+Right.  I wasn't discussing Downstream port functions.
+
+> While not as explicit, what is a Multi-Function Device ACS Function if
+> not a function of a MFD that implements ACS?
+> 
+I think you are inferring too much into that less-than-optimally worded section.
+
+>>> I believe we even reached agreement with some NIC vendors in the
+>>> early days of IOMMU groups that they needed to implement an "empty"
+>>> ACS capability on their multifunction NICs such that they could
+>>> describe in this way that internal P2P is not supported by the
+>>> device.  Thanks,
+>> In the early days -- gen1->gen3 (2009->2015) I could see that
+>> happening. I think time (a decade) has closed those defaults to
+>> less-common quirks. If 'empty ACS' is how they liked to do it back
+>> than, sure. [A definition of empty ACS may be needed to fully
+>> appreciate that statement, though.] If this patch series needs to
+>> support an 'empty ACS' for this older case, let's add it now, or
+>> follow-up with another fix.
+> 
+> An "empty" ACS capability is an ACS extended capability where the ACS
+> capability register reads as zero, precisely to match the spec in
+> indicating that the device does not support p2p.  Again, I don't see
+> how time passing plays a role here.  A MFD must implement ACS to infer
+> anything about internal p2p behavior.
+>   
+Again, I don't read the 'must' in the spec.
+Although I'll agree that your definition of an empty ACS makes it unambiguous.
+
+>> In summary, I still haven't found the IF and AND you refer to in
+>> section 6.12.1.2 for MFDs, so if you want to quote those sections I
+>> mis-read, or mis-interpreted their (subtle?) existence, than I'm not
+>> immovable on the spec interpretation.
+> 
+> As above, I think it's covered by 6.12.1 and the introductory sentence
+> of 6.12.1.2 defining the requirements for ACS functions.  Thanks,
+> 
+6.12.1 is not specific enough about what MFDs must or must not support;
+it's a broad description of ACS in different PCIe functions.
+As for 6.12.1.2, I stand by the statement that ACS P2P Request Redirect
+must be implemented if peer-to-peer is implemented in an MFD.
+It's not inferred, it's not unambiguous.
+You are intepreting the first sentence in 6.12.1.2 as indirectly saying
+that the reqs only apply to an MFD with ACS.  The title of the section is:
+"ACS Functions in SR-IOV, SIOV, and Multi-Function Devices"  not
+ACS requirements for ACS-controlled SR-IOV, SIOV, and Multi-Function Devices",
+in which case, I could agree with the interpretation you gave of that first sentence.
+
+I think it's time to reach out to the PCI-SIG, and the authors of this section
+to dissect these interpretations and get some clarity.
+
+- Don
+
+> Alex
+> 
+
 
