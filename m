@@ -1,187 +1,297 @@
-Return-Path: <kvm+bounces-58544-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-58545-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id BE168B9673E
-	for <lists+kvm@lfdr.de>; Tue, 23 Sep 2025 16:57:16 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id CC66CB9674A
+	for <lists+kvm@lfdr.de>; Tue, 23 Sep 2025 16:57:52 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 34B01164551
-	for <lists+kvm@lfdr.de>; Tue, 23 Sep 2025 14:53:07 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 26B68166FA0
+	for <lists+kvm@lfdr.de>; Tue, 23 Sep 2025 14:54:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D9913246BC6;
-	Tue, 23 Sep 2025 14:52:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1B5DD248F59;
+	Tue, 23 Sep 2025 14:54:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="MBWtCqyH"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="FLUus4Ph"
 X-Original-To: kvm@vger.kernel.org
-Received: from MW6PR02CU001.outbound.protection.outlook.com (mail-westus2azon11012068.outbound.protection.outlook.com [52.101.48.68])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 677941DF994;
-	Tue, 23 Sep 2025 14:52:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.48.68
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758639177; cv=fail; b=nI3Zk9r8dyVD6/7o9XiJ9LlqPNpeMfKAXqs7ezF91WAWOYMz0Q3jXRVLyIvcQgiM3tE45VPoVahv88jSsJluxOdNWe9HtZqDY3xlRTL3GXytwVbjlLU9a58RYWnKEL1LUUxQv/33d2dBkyQEOG2kUdFQaf4SWZKq/XgUhztD9Ng=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758639177; c=relaxed/simple;
-	bh=dVSbWC5zGgIq1D3j2h5S3+F+rcjctVx/vIpPJThBJjU=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:Content-Type:
-	 Content-Disposition:In-Reply-To:MIME-Version; b=rqGBYnW4Js4jPQ5HKeDrlyDcf1ZVyeMQnpTDRVG8BkG6qOx9fzuYIG4Sx8Cioh9Q8Co+KcnrjgGgwOej3TMEQ536J2DoHL4GtBvv0EonCjRk8cQFepw6RanRT4j7jk05F1k0jZPZE50v9Fzgftw+JlnVnSkvPTrp3jVPzYhhRJU=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=MBWtCqyH; arc=fail smtp.client-ip=52.101.48.68
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=X+P0YcKnCMkHE0zz7MxcMP1EKeXGfY9GtRvIU8XnmeoXytucqVKugXi4Kjeg7yocAe+FY3JG9qAwXDDkukrY9K6dmIvebRq/hqABk1OshAP5LlKVgoQuTbFrUystOPLnxM0tajpQh8gOpNRdIULsh+bHo8TdEoE08pNDwroifsKFILAHiuVCwLdTaZG1Xh7JdJlryfaT2GEtrjVFADxoCEHyR483fVdKwipAcPKNJnsLs0THwQh9qYsWhnK63TVzQFIMqDPvLpLe1LRsEyn3/yFJvJBzzHGHH0fzSf45wjRcHjhgBufMfFxUZIzHVw8YXw5ZCaBdMdBv5BVxy4ChWQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=z4tMvp1U6TKNNPa65VgapzPpbYOIxAws0E7Yrw7W08s=;
- b=jQ08odjMDkLhSgB+xusdj8lRfe+LSCSYDREYEVfWm0kLHToanooERkUeB5BMaQL3+69diopsJtS/WgFN3jnKyl9w9DADzoQECHhXSPpybhGmH5Gm/Wa+BzcoLZCQel4syv84pP5DSUalARMkQHmzdsVnGzxAbiPP0uLBfLqcX42HiBrZdBGZjfukXuvHX8vkGtQed6BoR0vsk9c2V6KtHWhR9Wm47I0gKeqBEJ2c/NI1r9VH6Zp9WRS12grjGIIYcWr79AhK5BUQG8npkbdj8kTyTuD0iOsWbn4ljaSywEEvE6WCMzurKdMFpX1RQrxcy8TtYSIuNbSBJlQORNOxQQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
- dkim=pass header.d=nvidia.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=z4tMvp1U6TKNNPa65VgapzPpbYOIxAws0E7Yrw7W08s=;
- b=MBWtCqyHvBLyTK3uXkHSyUApaPTm/iNtwDNbYjKU7s1VOATOIZgRjt2yCupWBC1auUCe7+mAL5HstyANENT3J3WNXnO7XB2fJxOl/790Q8Z2YCljD3T4d9IGASHOpQkbQ6Uwm5Tn/WX//7xGg5uXYFAciNOg+gRGuDxechgVLeppME8DOOdhnu8S8s23nunpbi3v6rnO7g4cmd5nHrpLVYQTnODgqfz0zMGB5VhqfV4eNjml1thyZwCCXnBRKENrefJL7nTdCfYWs2jREJ+qPRT376FtebB2qZW/zjPgVnvDY9rB4ReOJWMqXfYSfiMrmJeVyvT6ASSUxHoHiiiafA==
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nvidia.com;
-Received: from PH7PR12MB5757.namprd12.prod.outlook.com (2603:10b6:510:1d0::13)
- by SN7PR12MB8169.namprd12.prod.outlook.com (2603:10b6:806:32f::6) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9137.19; Tue, 23 Sep
- 2025 14:52:54 +0000
-Received: from PH7PR12MB5757.namprd12.prod.outlook.com
- ([fe80::f012:300c:6bf4:7632]) by PH7PR12MB5757.namprd12.prod.outlook.com
- ([fe80::f012:300c:6bf4:7632%2]) with mapi id 15.20.9137.018; Tue, 23 Sep 2025
- 14:52:53 +0000
-Date: Tue, 23 Sep 2025 11:52:51 -0300
-From: Jason Gunthorpe <jgg@nvidia.com>
-To: Andrew Jones <ajones@ventanamicro.com>
-Cc: Thomas Gleixner <tglx@linutronix.de>, iommu@lists.linux.dev,
-	kvm-riscv@lists.infradead.org, kvm@vger.kernel.org,
-	linux-riscv@lists.infradead.org, linux-kernel@vger.kernel.org,
-	zong.li@sifive.com, tjeznach@rivosinc.com, joro@8bytes.org,
-	will@kernel.org, robin.murphy@arm.com, anup@brainfault.org,
-	atish.patra@linux.dev, alex.williamson@redhat.com,
-	paul.walmsley@sifive.com, palmer@dabbelt.com, alex@ghiti.fr
-Subject: Re: [RFC PATCH v2 08/18] iommu/riscv: Use MSI table to enable IMSIC
- access
-Message-ID: <20250923145251.GP1391379@nvidia.com>
-References: <20250920203851.2205115-20-ajones@ventanamicro.com>
- <20250920203851.2205115-28-ajones@ventanamicro.com>
- <20250922184336.GD1391379@nvidia.com>
- <20250922-50372a07397db3155fec49c9@orel>
- <20250922235651.GG1391379@nvidia.com>
- <87ecrx4guz.ffs@tglx>
- <20250923-de370be816db3ec12b3ae5d4@orel>
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250923-de370be816db3ec12b3ae5d4@orel>
-X-ClientProxiedBy: SJ0PR05CA0103.namprd05.prod.outlook.com
- (2603:10b6:a03:334::18) To PH7PR12MB5757.namprd12.prod.outlook.com
- (2603:10b6:510:1d0::13)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 21DF41DF994
+	for <kvm@vger.kernel.org>; Tue, 23 Sep 2025 14:54:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1758639284; cv=none; b=mvrid/8mSnHpfR7aO6jDMAU1+0tbNtJ7qQ3Oq11GbJhNofYTy04SmMYHeeRnxX4ZX6vAVpUZ7rhASSm6SIuzwHMO9hyX4m18aYMpDLt4shhvdM9wD2P5xfzTrJOv1EnWYPxJG9/X5pBmvy7jLdih1zfIHIbMXbqJJp8BC1iudvw=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1758639284; c=relaxed/simple;
+	bh=yLJ8trcIeN87cTM37Qp7/z/or3KwICs4V/zFq2dp/xY=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=s6I5BuQXi35HTpuQy50LenXNVrRHDIKsIikluwc1FJf4zGO8ZC19rvx9n/YJo4Jl02nzhC/0Ll4KNoo2ca6F28H/dniv6qoMpldx3pKe/XbYe+pA2ZVp51ntFYunJ1+6dYieoQCTeLuKcHI9l5gAUsdSrkBSy453WML5IJSlBvI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=FLUus4Ph; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1758639281;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=GlTGS/oUq6qr4tFK7p920ZEocw8mB7yDznWqUIeSU/0=;
+	b=FLUus4PhA1JD+T3k8ndtD0IW63i7t8c0OvuYjykz66fRKReLtKf+ehlMkyl8cbxQbqOhkV
+	cysZsWu6EjZDNl9v0/ZWfbcU3svKmQhr8SUVvnk4RLFfgujMsiWKOTwHPmsPDUJHiS1cRE
+	4ZlxkyjQSxWQ/cOU3vBnX+Ybz6JCCNM=
+Received: from mail-ej1-f70.google.com (mail-ej1-f70.google.com
+ [209.85.218.70]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-518-DUJIFkbaMsOSFc8Z6Ex9rA-1; Tue, 23 Sep 2025 10:54:39 -0400
+X-MC-Unique: DUJIFkbaMsOSFc8Z6Ex9rA-1
+X-Mimecast-MFC-AGG-ID: DUJIFkbaMsOSFc8Z6Ex9rA_1758639279
+Received: by mail-ej1-f70.google.com with SMTP id a640c23a62f3a-b2e6b2bb443so176686266b.2
+        for <kvm@vger.kernel.org>; Tue, 23 Sep 2025 07:54:39 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1758639278; x=1759244078;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=GlTGS/oUq6qr4tFK7p920ZEocw8mB7yDznWqUIeSU/0=;
+        b=eyy3ET685XwCUqFGuRTbdmTitrssPHhw4Kjw8pkyfXArvpcl96mBj+bbfcl2Wvtgbw
+         JwZFU/5SpyH5QDsGHQCPrpBhPWS7+I0QX57TTOguLsyZvb32CjV0olLxDJHcuEi1xC7y
+         B4sQkG8Hy7IZV+Ql8dj7o69Bap8roC92IRlMD0chJtWn/TidXrpOPBydIYLz2sQL4NUr
+         RS1MmP32HvC8GVaIUfBB8t//I6mPMZ53hTB8BYPS1a0psS0CxYlHrw8DLp1xc1TdwTFi
+         i/Xf17dOxd+e9Rx3w56be2bq2KAsnRtUs9l1+TnXRrTJhxMa6iSP/DpgaFfs6/EdVO+E
+         Mq/g==
+X-Forwarded-Encrypted: i=1; AJvYcCXzCjIwXUEag4wRndOxSZTY31HCwY4kwo/h/QCd/3HT2CbIQ1qXEQjCMf9yVureYZF7Dv0=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yzscx9fbvBTIopQusRVRStDYnFcNrPXboz5bw8EasFpiwvBLk2z
+	accA6qvS6h60Og0YIrESzCgKPD/fKzrvo8AKYTkOmWcs9Ev3UOFmjHLOtlvVNyu5FqFwsZtyCWw
+	ILiuEUjpnuCBXRxi5TVAm2s4mZtJF7maqisPfwxxZjk8/NF6AltYBWw==
+X-Gm-Gg: ASbGncvsvhI9WLJhS5+0T4+PGT0ynk7R3FoHnH1+ZHLWGtFglNSAgagLEsSr/oC+rLz
+	vQpRgvzAX/60c7rwwmAT2qFZrqxtjvUuWi5w3KxAJGntMjUMHXChCPl/WxfrZ3dVpdKW55qIh9F
+	zv8DfB8tDv5I8rVwvC+KNZx+ACCmrv81jpbqVJavpuLlknhgLaVCAzXpND+BFeY5i1m/t2n6Is7
+	O0qjlMiGpFLaycUTz9ISP93Kh9k7bJU80FYOoFqQVkjQc5TpcilyqMsGgCr6Kq8Myh0O30BgPYY
+	z2C8vidxd0eljl9iNekY31EPF/qb5q9L7RY=
+X-Received: by 2002:a17:906:4fca:b0:ae3:b2b7:7f2f with SMTP id a640c23a62f3a-b302a36d276mr320841966b.40.1758639278594;
+        Tue, 23 Sep 2025 07:54:38 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IH0UY1L8jdF7RbmRM0SmnKrV7GJclLjE5bXJYDHMS+tHgb236lYdm0fYPTKRoEBIL9oZfqX0g==
+X-Received: by 2002:a17:906:4fca:b0:ae3:b2b7:7f2f with SMTP id a640c23a62f3a-b302a36d276mr320838666b.40.1758639278088;
+        Tue, 23 Sep 2025 07:54:38 -0700 (PDT)
+Received: from redhat.com ([2a06:c701:73ea:f900:52ee:df2b:4811:77e0])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-b2dd7bab2e6sm392363866b.41.2025.09.23.07.54.36
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 23 Sep 2025 07:54:37 -0700 (PDT)
+Date: Tue, 23 Sep 2025 10:54:34 -0400
+From: "Michael S. Tsirkin" <mst@redhat.com>
+To: Simon Schippers <simon.schippers@tu-dortmund.de>
+Cc: willemdebruijn.kernel@gmail.com, jasowang@redhat.com,
+	eperezma@redhat.com, stephen@networkplumber.org, leiyang@redhat.com,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+	virtualization@lists.linux.dev, kvm@vger.kernel.org,
+	Tim Gebauer <tim.gebauer@tu-dortmund.de>
+Subject: Re: [PATCH net-next v5 4/8] TUN & TAP: Wake netdev queue after
+ consuming an entry
+Message-ID: <20250923104818-mutt-send-email-mst@kernel.org>
+References: <20250922221553.47802-1-simon.schippers@tu-dortmund.de>
+ <20250922221553.47802-5-simon.schippers@tu-dortmund.de>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: PH7PR12MB5757:EE_|SN7PR12MB8169:EE_
-X-MS-Office365-Filtering-Correlation-Id: ebedd93e-4671-4809-f035-08ddfab0e00f
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230040|366016|1800799024|7416014|376014;
-X-Microsoft-Antispam-Message-Info:
-	=?us-ascii?Q?iIHZ/YPTFkVpTAFzsinVviVglnl4MclsmsGp82KYXH/R5h7fLJZhzqbg9LXw?=
- =?us-ascii?Q?rD7L10VOnkXu5h3t5aIurByHlccSKV8+vLlUahGW2EwVk0ShcSSQ97DSWCyX?=
- =?us-ascii?Q?jrqwNp+1mz81V8x+O+J4xui6AB1ECSHKGSKuDbYAA1ezgL9LfuIjOXOHwWav?=
- =?us-ascii?Q?ogq96ObgLhSFBrcLdH8tLKpnM9lnqumbARxYPeQWpHfj68AAUhQ3mnEcUiCQ?=
- =?us-ascii?Q?Fc0hDDao+XJ95yWdJEt9n4rIjVKpht0Tsg/H4wP8P9YHelQ+UAxlLu90kTR6?=
- =?us-ascii?Q?66zgOXx/5tQehn+9pU4pdg8ULqvtjCiOKujnXejlfHSWtqpPq/nZTtZWRwDZ?=
- =?us-ascii?Q?G7wKp7wf6ouuu9cVYrv9FQhktvJitwzipJ+Ak7lxxDj+ee3vrqTgZiqMUQKe?=
- =?us-ascii?Q?RdFojMre3v293ej5DMB+kD2Coq4thFQvjc6VJDUwdkJmuigX3tujtd+//AQc?=
- =?us-ascii?Q?+6hXOmW2JiG3RAyHTTwdljElKVwoaJfVd54upzsTAgIOxTHL3kNmBsHZ45ec?=
- =?us-ascii?Q?Co8QEHjELGSM6hZ9yAXOQQFktG1YUWu6LakEc1Veq+B9C1vM12yyqcTAl597?=
- =?us-ascii?Q?9oETNbQFDAXKmLU/tNDdeiOIjbLMXZ0VI3OFmdfLSWQ3JtQLSb7rrx/6pZyZ?=
- =?us-ascii?Q?rkHXpYHEDx89DV2fnTbfOaBEZXBAzA6wSx2sCFw+rw7M9SGDCfdD9dSSaJQc?=
- =?us-ascii?Q?4kJ4ywK57CUT0bt0/bDe+mZ4bKQp3Xb75T7LqRBbgLNIMmg5oZeNGFxsYnqR?=
- =?us-ascii?Q?preBgwM+DDMUD9lm5yRXq8ofCyrzmQ+lgm5XAMWtAuWAF1g/LW9qqUsRunCR?=
- =?us-ascii?Q?klO7qDL1cpeDxF6QFXaGQmvA20Og2LmuoGkeSpcpFwNrHYMWRFBG3q9N42/G?=
- =?us-ascii?Q?D93zo9oZfGkQFUmLwckpmOV9jUBWzQL1zuBDKmFd4oY/jN875JZICqeNfWZ+?=
- =?us-ascii?Q?/ZNW/U/3/bTC0ut+lJtttAiai7ics/bxcGgVP5CICdQxa0khPQXHzNWbKySv?=
- =?us-ascii?Q?GBKzI2YPsoqU6D+wm3gKW+orqWSzJKlJpdSyPIfPQqYYPfKOadPG7VqQIadu?=
- =?us-ascii?Q?3Kx0lWCuXAPSjCjcwZVMusCy43jQuWpHDcDQJ0IKDkutfWAjnvlbQHEubnkO?=
- =?us-ascii?Q?8K4ieA3S3NxA9jrLDAhCNw6HQLVEBz2vPjJhBzfvTc4knTHymR8Q1NPNooHC?=
- =?us-ascii?Q?MAvywnuMRicap/kwQJ8eq8YyZsnju90zSrX+lhjN+jmy0NxnwMawO4kHGgmz?=
- =?us-ascii?Q?KYlEWtc19tGg9VMqBMLvL9gtTwnhuQ5CZJ3ihLRKS20CeBTV942rneFBSu43?=
- =?us-ascii?Q?p2S1B7pnNUjbSqumdvzwm363jLkB5HjgDh0Isy8wEBq4PCCoEViu9ptjnuu9?=
- =?us-ascii?Q?gAKloRd5sm3R6CtVRMr3b4N05UGxqg5r/RXdBj3cE2FGBvduoD4nURmVJXNf?=
- =?us-ascii?Q?KZav8V9X6bA=3D?=
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PH7PR12MB5757.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(1800799024)(7416014)(376014);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?us-ascii?Q?Rj2g0oMIfbIMLUSmdswAH4d+lV9Yxoy3u33B7OhUOYg6z+jjlSnQMxkd32k2?=
- =?us-ascii?Q?l6SOodSCfhlhjTVb3nUSKu9yQYC5+xpfQiXDyh8LK07sQudbXWZE1qVA1zg4?=
- =?us-ascii?Q?X52kDmmUAQvAUeBdSajmBJVdZ7seCHO2EhLYLjref4pQ5n1FGYf4dfejfoJi?=
- =?us-ascii?Q?PUZ3mrENxgDDF3utcg3XjxlOxOSJZ5aIR1xsolwke+8fwJIWYvrxIRiSSOIs?=
- =?us-ascii?Q?4ThQY28fkrNTPPWJsCnyFPe+PqSZym7vwAa+Hq3eCU1SmtQUlAJlyNOcjMUS?=
- =?us-ascii?Q?nUq3iRoSyeQIz3DzmENnbNESB/OQTMEDfiRSBxy+Ha4fn8HqTe2HpGeuFBQW?=
- =?us-ascii?Q?4eBlEAFkyDmIt+t/HQGtCmTyib/yZ65uDku2hk8Nxzj6DWb3SwJYiepTYHIt?=
- =?us-ascii?Q?DpUmaoS3nKE9E/5J8B6XZ5Ct4hdNfqqDPxjlaitcJO/jZOwOV6I/iW1Cr4wk?=
- =?us-ascii?Q?fvxVuBfR1FDwv9NHdq89raDe5CJL8mU3FjmWU4XI3yzUEGgAEkyzLTA7QSEc?=
- =?us-ascii?Q?0v6RmavRAZ2DzCJt5tpj9Ppe/FfgTLUhMNc4yAg4mXh1DvY5vHBv/mKCm7Sk?=
- =?us-ascii?Q?iU35p72dNO+nNlzq3lPLTSorIuo2dxTg7CiZvmDY3+8vNmPmt+5/ymkP83l0?=
- =?us-ascii?Q?N7dGQ1V28NMcKqDRuyZkBrk1y7NBWEnjIN9d+CBvD/hOXi2psW4DJ+Xt12Y1?=
- =?us-ascii?Q?kyiOT4cXgjyNT8Rh2utr1eBFnO9OXLd0qt2aBsNiP0pwQ9ax9C9FOr5+1STW?=
- =?us-ascii?Q?Afzh64C2zxFux1ny2Nz4gUlgSU6FoJTTCh94hGwvIKyLq9mO37pRnp6dlOwQ?=
- =?us-ascii?Q?nc1CeGmIuQZWLDRE1zIijSRPhaU9sFuSUONh3THLT6UVcE/F5IoK+L76pxjc?=
- =?us-ascii?Q?Qz61Fd0TnTP5pAvayf1MZJz2gKiCUO8ez+kshf6oWvHJ83pWJEbZynQckNNj?=
- =?us-ascii?Q?6bSK9poXq1B886L7LmnJPTD9UvQahpcZEuZvtnxY8H+bKi7vKb5aICmpi4x0?=
- =?us-ascii?Q?ZPBLotgG4yxEKAy5Cs/ZE+jf8n28aG3MbNzCyUgR6rQE05dyWtueP0SVilit?=
- =?us-ascii?Q?PCAdiPVUZcapPCNqOhITkAYihdXijzfAd7WmNoY47iv0G5k7Ln77YYIV2wWj?=
- =?us-ascii?Q?ZEackG9E1b323QHD0ndenO15Mfcs91rhlwH3uE92n3xHijx0OvaqWhFL87jd?=
- =?us-ascii?Q?Fc8097oHF/V0gAuvPfZMwqf0NHCpCwjeJUe15BzJySEyptgr5rcn8v6HNlRs?=
- =?us-ascii?Q?MNfv/OBFxoXIU9w8vJLw+4HwttaVKh0PtSHOdl+1ZazPblN4G2dp21YFOHq/?=
- =?us-ascii?Q?Agh9Ieo6Y3PKJcQ8+5y6xVgGCL4gkodC6SZ/ebWx2aJLRvKESt9pYl6AOEOu?=
- =?us-ascii?Q?DWYQ2AfQu5vkyLuYP3zm8YMScpww9nBiXQodaOjb1b645NqcuvK38cIBcW2X?=
- =?us-ascii?Q?wdNoywGy7k1IoNtHLe5mtxuwbS/y0FvLQY3+IR/sFRqXJjZVBO8kqYXefzRY?=
- =?us-ascii?Q?GyT1ueFkknOsKbjyYTGJ4RwquCYnqK85QWZbMg3BCneVziQq79Tp6rcJx/2X?=
- =?us-ascii?Q?Jg2vp/Vrpi/oicYuQEQjuiqMIQ7zmuE5KNopfn/a?=
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: ebedd93e-4671-4809-f035-08ddfab0e00f
-X-MS-Exchange-CrossTenant-AuthSource: PH7PR12MB5757.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 23 Sep 2025 14:52:53.8930
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: 6+4DGr4oc6GccENxHyIsmue0uXQqiw9huPi4cYjWX6ec2AjdB60z+f62YgC6KI1d
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SN7PR12MB8169
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250922221553.47802-5-simon.schippers@tu-dortmund.de>
 
-On Tue, Sep 23, 2025 at 09:37:31AM -0500, Andrew Jones wrote:
-> undergoes a specified translation into an index of the MSI table. For the
-> non-virt use case we skip the "composes a new address/data pair, which
-> points at the remap table entry" step since we just forward the original
-> with an identity mapping. For the virt case we do write a new addr,data
-> pair (Patch15) since we need to map guest addresses to host addresses (but
-> data is still just forwarded since the RISC-V IOMMU doesn't support data
-> remapping). 
+On Tue, Sep 23, 2025 at 12:15:49AM +0200, Simon Schippers wrote:
+> The new wrappers tun_ring_consume/tap_ring_consume deal with consuming an
+> entry of the ptr_ring and then waking the netdev queue when entries got
+> invalidated to be used again by the producer.
+> To avoid waking the netdev queue when the ptr_ring is full, it is checked
+> if the netdev queue is stopped before invalidating entries. Like that the
+> netdev queue can be safely woken after invalidating entries.
+> 
+> The READ_ONCE in __ptr_ring_peek, paired with the smp_wmb() in
+> __ptr_ring_produce within tun_net_xmit guarantees that the information
+> about the netdev queue being stopped is visible after __ptr_ring_peek is
+> called.
+> 
+> The netdev queue is also woken after resizing the ptr_ring.
+> 
+> Co-developed-by: Tim Gebauer <tim.gebauer@tu-dortmund.de>
+> Signed-off-by: Tim Gebauer <tim.gebauer@tu-dortmund.de>
+> Signed-off-by: Simon Schippers <simon.schippers@tu-dortmund.de>
 
-You should banish thinking of non-virt/virt from your lexicon. Linux
-doesn't work that way, and trying to force it too is a loosing battle.
 
-If you have a remap domain then it should always be remapping. There
-is no such idea in Linux as a conditional IRQ domain dependent on
-external factors (like how the IOMMU is configured, if the device is
-"virt" or not, etc).
+Sounds like there is subtle interplay here between queue stopped bit and
+ring full status, all lockless with fancy ordering tricks.  I have to
+say this is fragile. I'd like to see much more documentation.
 
-Be specific what you mean.
 
-Jason
+Or alternatively, I ask myself if, after detecting flow control
+issues, it is possible to just use a spinlock to synchronize,
+somehow.
+
+
+> ---
+>  drivers/net/tap.c | 44 +++++++++++++++++++++++++++++++++++++++++++-
+>  drivers/net/tun.c | 47 +++++++++++++++++++++++++++++++++++++++++++++--
+>  2 files changed, 88 insertions(+), 3 deletions(-)
+> 
+> diff --git a/drivers/net/tap.c b/drivers/net/tap.c
+> index 1197f245e873..f8292721a9d6 100644
+> --- a/drivers/net/tap.c
+> +++ b/drivers/net/tap.c
+> @@ -753,6 +753,46 @@ static ssize_t tap_put_user(struct tap_queue *q,
+>  	return ret ? ret : total;
+>  }
+>  
+> +static struct sk_buff *tap_ring_consume(struct tap_queue *q)
+> +{
+> +	struct netdev_queue *txq;
+> +	struct net_device *dev;
+> +	bool will_invalidate;
+> +	bool stopped;
+> +	void *ptr;
+> +
+> +	spin_lock(&q->ring.consumer_lock);
+> +	ptr = __ptr_ring_peek(&q->ring);
+> +	if (!ptr) {
+> +		spin_unlock(&q->ring.consumer_lock);
+> +		return ptr;
+> +	}
+> +
+> +	/* Check if the queue stopped before zeroing out, so no ptr get
+> +	 * produced in the meantime, because this could result in waking
+> +	 * even though the ptr_ring is full. The order of the operations
+
+which operations, I don't get it? it's unusual for barrier()
+to be effective. are you trying to order the read in netif_tx_queue_stopped
+versus the read in __ptr_ring_discard_one?
+Then that would seem to need smp_rmb and accordingly smp_wmb in the
+producing side.
+
+
+> +	 * is ensured by barrier().
+> +	 */
+> +	will_invalidate = __ptr_ring_will_invalidate(&q->ring);
+> +	if (unlikely(will_invalidate)) {
+> +		rcu_read_lock();
+> +		dev = rcu_dereference(q->tap)->dev;
+> +		txq = netdev_get_tx_queue(dev, q->queue_index);
+> +		stopped = netif_tx_queue_stopped(txq);
+> +	}
+> +	barrier();
+> +	__ptr_ring_discard_one(&q->ring, will_invalidate);
+> +
+> +	if (unlikely(will_invalidate)) {
+> +		if (stopped)
+> +			netif_tx_wake_queue(txq);
+> +		rcu_read_unlock();
+> +	}
+> +	spin_unlock(&q->ring.consumer_lock);
+> +
+> +	return ptr;
+> +}
+> +
+>  static ssize_t tap_do_read(struct tap_queue *q,
+>  			   struct iov_iter *to,
+>  			   int noblock, struct sk_buff *skb)
+> @@ -774,7 +814,7 @@ static ssize_t tap_do_read(struct tap_queue *q,
+>  					TASK_INTERRUPTIBLE);
+>  
+>  		/* Read frames from the queue */
+> -		skb = ptr_ring_consume(&q->ring);
+> +		skb = tap_ring_consume(q);
+>  		if (skb)
+>  			break;
+>  		if (noblock) {
+> @@ -1207,6 +1247,8 @@ int tap_queue_resize(struct tap_dev *tap)
+>  	ret = ptr_ring_resize_multiple_bh(rings, n,
+>  					  dev->tx_queue_len, GFP_KERNEL,
+>  					  __skb_array_destroy_skb);
+> +	if (netif_running(dev))
+> +		netif_tx_wake_all_queues(dev);
+>  
+>  	kfree(rings);
+>  	return ret;
+> diff --git a/drivers/net/tun.c b/drivers/net/tun.c
+> index c6b22af9bae8..682df8157b55 100644
+> --- a/drivers/net/tun.c
+> +++ b/drivers/net/tun.c
+> @@ -2114,13 +2114,53 @@ static ssize_t tun_put_user(struct tun_struct *tun,
+>  	return total;
+>  }
+>  
+> +static void *tun_ring_consume(struct tun_file *tfile)
+> +{
+> +	struct netdev_queue *txq;
+> +	struct net_device *dev;
+> +	bool will_invalidate;
+> +	bool stopped;
+> +	void *ptr;
+> +
+> +	spin_lock(&tfile->tx_ring.consumer_lock);
+> +	ptr = __ptr_ring_peek(&tfile->tx_ring);
+> +	if (!ptr) {
+> +		spin_unlock(&tfile->tx_ring.consumer_lock);
+> +		return ptr;
+> +	}
+> +
+> +	/* Check if the queue stopped before zeroing out, so no ptr get
+> +	 * produced in the meantime, because this could result in waking
+> +	 * even though the ptr_ring is full. The order of the operations
+> +	 * is ensured by barrier().
+> +	 */
+> +	will_invalidate = __ptr_ring_will_invalidate(&tfile->tx_ring);
+> +	if (unlikely(will_invalidate)) {
+> +		rcu_read_lock();
+> +		dev = rcu_dereference(tfile->tun)->dev;
+> +		txq = netdev_get_tx_queue(dev, tfile->queue_index);
+> +		stopped = netif_tx_queue_stopped(txq);
+> +	}
+> +	barrier();
+> +	__ptr_ring_discard_one(&tfile->tx_ring, will_invalidate);
+> +
+> +	if (unlikely(will_invalidate)) {
+> +		if (stopped)
+> +			netif_tx_wake_queue(txq);
+> +		rcu_read_unlock();
+> +	}
+> +	spin_unlock(&tfile->tx_ring.consumer_lock);
+> +
+> +	return ptr;
+> +}
+> +
+>  static void *tun_ring_recv(struct tun_file *tfile, int noblock, int *err)
+>  {
+>  	DECLARE_WAITQUEUE(wait, current);
+>  	void *ptr = NULL;
+>  	int error = 0;
+>  
+> -	ptr = ptr_ring_consume(&tfile->tx_ring);
+> +	ptr = tun_ring_consume(tfile);
+>  	if (ptr)
+>  		goto out;
+>  	if (noblock) {
+> @@ -2132,7 +2172,7 @@ static void *tun_ring_recv(struct tun_file *tfile, int noblock, int *err)
+>  
+>  	while (1) {
+>  		set_current_state(TASK_INTERRUPTIBLE);
+> -		ptr = ptr_ring_consume(&tfile->tx_ring);
+> +		ptr = tun_ring_consume(tfile);
+>  		if (ptr)
+>  			break;
+>  		if (signal_pending(current)) {
+> @@ -3621,6 +3661,9 @@ static int tun_queue_resize(struct tun_struct *tun)
+>  					  dev->tx_queue_len, GFP_KERNEL,
+>  					  tun_ptr_free);
+>  
+> +	if (netif_running(dev))
+> +		netif_tx_wake_all_queues(dev);
+> +
+>  	kfree(rings);
+>  	return ret;
+>  }
+> -- 
+> 2.43.0
+
 
