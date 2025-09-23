@@ -1,261 +1,142 @@
-Return-Path: <kvm+bounces-58537-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-58538-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2EE3BB9657C
-	for <lists+kvm@lfdr.de>; Tue, 23 Sep 2025 16:42:10 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id B1314B9665D
+	for <lists+kvm@lfdr.de>; Tue, 23 Sep 2025 16:49:30 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 78F393B4CB0
-	for <lists+kvm@lfdr.de>; Tue, 23 Sep 2025 14:37:44 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D233D175244
+	for <lists+kvm@lfdr.de>; Tue, 23 Sep 2025 14:44:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 111FA233722;
-	Tue, 23 Sep 2025 14:37:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C5EE019E7E2;
+	Tue, 23 Sep 2025 14:44:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ventanamicro.com header.i=@ventanamicro.com header.b="U7bTVO4k"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="KTHYIt9j"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-yb1-f180.google.com (mail-yb1-f180.google.com [209.85.219.180])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.7])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5440318E20
-	for <kvm@vger.kernel.org>; Tue, 23 Sep 2025 14:37:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.180
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6F0873D544;
+	Tue, 23 Sep 2025 14:44:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.7
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758638256; cv=none; b=kMPihWheeGF4P56EMzxV8EQ74gK/5fNAwxvOij0UGXqC3kPZCsu9JlcOtC90oYeI16UouW6evuf6wL6R6xizOjgmap2Xp4pP/eggBSZKuQqCh/gpXgkEMrAIZWI7QmsSchCXm5ryoX6j93as4bCOai95ImVkLLVJRp+LgLSZk0U=
+	t=1758638689; cv=none; b=f5QrxRhnfqDBjBNwAB+Lx1I8V7wYC/yCOV4dk1zbZ2DvpAS8D4+wCqikV2GsEd2opkJ6Zn+srxPqkXiIUKzu2b9kqmhK4WAAj6yQKiKq3q/515PxWBw0MTk+Hcb1UcSnTF16duFy0DFykwY9qLMx5hLg7Xgh5p7BMmfntDlVrTQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758638256; c=relaxed/simple;
-	bh=ii1yBZfzr5XAbkH9gYhRzHJnpG6GM5PNn2gR+ygqg1M=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=jC7wvEh8CxiccHk7aJZ8d8Bm9Sas14az/cffnnxyvvqaQYLrchlopaFS5nbuheS06XWxubL7uNa+I2PDvpsqK7V6YckOc8sth52RsjuAdwdB214ERs4t7axk0viHNvsWkKP/8nHYtEdNlzngJwAmcF6e0s12N9lQrWhOp/mVA6s=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ventanamicro.com; spf=pass smtp.mailfrom=ventanamicro.com; dkim=pass (2048-bit key) header.d=ventanamicro.com header.i=@ventanamicro.com header.b=U7bTVO4k; arc=none smtp.client-ip=209.85.219.180
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ventanamicro.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ventanamicro.com
-Received: by mail-yb1-f180.google.com with SMTP id 3f1490d57ef6-ea3c51e4cffso4682262276.3
-        for <kvm@vger.kernel.org>; Tue, 23 Sep 2025 07:37:34 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=ventanamicro.com; s=google; t=1758638253; x=1759243053; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=utNQQqbrP26idrrirG5tFnz3mQu8N8BuujOARL7p3YA=;
-        b=U7bTVO4kz+A/IsC72vaAnX3zybMrDxrmvOnc8zUTIm0G4rY520mHJWc1smf9P75C3E
-         7V00C07MHDu1KslMYSOAbiM2MqtNF1/QQt33fRb121q9sPX2ZowSMtAzka4WE8iyDjOh
-         L0wADyluWfN3wW3RI16Qtu2kIOF7XyLOvKuYLeYbbwNapKwM0hMD/kgP/NmY97+9mKgm
-         phFBSy2jwh7TvCML8H46vMCF+AW57aBAwiCVPVnchkAhHQI7abTSqmF/m7KDnriDNmJ+
-         aA16ZICvT79/IeByhjXal0Xih8TSfHvA+HQNomB0O/S876Te+JqNap4qirLNMznsjMY+
-         jz8g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1758638253; x=1759243053;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=utNQQqbrP26idrrirG5tFnz3mQu8N8BuujOARL7p3YA=;
-        b=BJg5gnbuk77kv9ka+c6CUE+ONwn5Sk5SSJIRYPf2Z2dl4fzGiyoWOYABCWkoR/dhYb
-         56UpTmzOxsJGprb3BNTzbxIb4SSa+q8b2UfcVlPzZ9jrMW022jNXAl8Wh8F2njdAOKnC
-         mU297sKix4hzQ8aJeXtBbZ78MlwYMmkZf33WIDms3uZD/+eKrN/+3RoA+rpMRP91ZMWv
-         NL4eNpVPHnW6ikkL0zxQCrYvc8fq08Ld8guuCtyCFuKGwsTBaNKOjmRc4dSmF9/7QGPR
-         3DOKsSOgLvbP9/1hT7mgDuBQnz9oI0iSqTOAZkBHNO/FbTyc4h1QAWY+tuo/zLM5Xoo2
-         IchQ==
-X-Forwarded-Encrypted: i=1; AJvYcCVJxRqSx3cXCZvwPLug5cqCBpkQP6yhybCZ5yc+d0ukLYKdIaaCZkWEt9D+VBErQj1Sj4o=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyPDLoQpFj09r4anHK98uSdhgpgW+CA96c7PGeYj1biABTtHr09
-	7bKjF9d1wChbpaYujzvdncawLVwVXXz7hI8hLymRBppAQyWMB4D8nTVnf8xFjFYbVGg=
-X-Gm-Gg: ASbGncsn2j9Wv1TvTpfYEQHtK7oIJfS7uBeYGxqEYa95Dm29UZsifVs92XZWB3jzybW
-	sPoJi95XsRUIG+mhScof8qN6twGMSDYuVtPIQZwsT6YLv++kArq5G2DQCKGluhV8esJozriruxI
-	7HyRMkKz3cos3VdFpthwEKUPi7vKlQwp7tScDmJnzU56pWpywb9ab66lzfuCNboCL6CW3tDh1dL
-	/3rMyXhes/iRZAcvpzkjx14Qr5t4Wt8etyP5d6yiNXx0629h6sok6NjC7Y8HmZz2kMH2QtX7CLh
-	T3mp1N77+mK9DoKBTmfOcEL4belNTy4m+HdLB+YoMqSgUxjB1OuZvguKQK5OfbhVeC9cLSfUWvp
-	LCc6sZfyuNHvd6l3nscMxTHrG
-X-Google-Smtp-Source: AGHT+IHeqNbXj2cbwtsFZh/rWKxPR18F6VpXKZlRUUIrCTojwS6cSA2iuN5fMmUzLR1S4qkiXUoGiQ==
-X-Received: by 2002:a05:690e:2512:20b0:605:f6ea:1261 with SMTP id 956f58d0204a3-636046fe14cmr2120960d50.23.1758638252833;
-        Tue, 23 Sep 2025 07:37:32 -0700 (PDT)
-Received: from localhost ([140.82.166.162])
-        by smtp.gmail.com with ESMTPSA id 00721157ae682-7438ac593ebsm28158097b3.55.2025.09.23.07.37.32
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 23 Sep 2025 07:37:32 -0700 (PDT)
-Date: Tue, 23 Sep 2025 09:37:31 -0500
-From: Andrew Jones <ajones@ventanamicro.com>
-To: Thomas Gleixner <tglx@linutronix.de>
-Cc: Jason Gunthorpe <jgg@nvidia.com>, iommu@lists.linux.dev, 
-	kvm-riscv@lists.infradead.org, kvm@vger.kernel.org, linux-riscv@lists.infradead.org, 
-	linux-kernel@vger.kernel.org, zong.li@sifive.com, tjeznach@rivosinc.com, joro@8bytes.org, 
-	will@kernel.org, robin.murphy@arm.com, anup@brainfault.org, atish.patra@linux.dev, 
-	alex.williamson@redhat.com, paul.walmsley@sifive.com, palmer@dabbelt.com, alex@ghiti.fr
-Subject: Re: [RFC PATCH v2 08/18] iommu/riscv: Use MSI table to enable IMSIC
- access
-Message-ID: <20250923-de370be816db3ec12b3ae5d4@orel>
-References: <20250920203851.2205115-20-ajones@ventanamicro.com>
- <20250920203851.2205115-28-ajones@ventanamicro.com>
- <20250922184336.GD1391379@nvidia.com>
- <20250922-50372a07397db3155fec49c9@orel>
- <20250922235651.GG1391379@nvidia.com>
- <87ecrx4guz.ffs@tglx>
+	s=arc-20240116; t=1758638689; c=relaxed/simple;
+	bh=hIW2FclH1g5vA9b4dxlT9n1UH4vYHvNGgdlk6GKis/E=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=VlX3bX7hXdoR2EY1GVuCcAogWOrLzUtfOM+wR5TJ52HV1l+HRC+wYm+LhibbBnZ5iZSO7TedAxSBwq/6VZxJfzNc9EA76tozNun2WY/MhjrY6DQQmPEHWfKtQh/8AAGvXvlD059AZqVgOg6H3Av4+W43325O9oeP85tRM55cwJY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=KTHYIt9j; arc=none smtp.client-ip=192.198.163.7
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1758638688; x=1790174688;
+  h=message-id:date:mime-version:subject:to:cc:references:
+   from:in-reply-to:content-transfer-encoding;
+  bh=hIW2FclH1g5vA9b4dxlT9n1UH4vYHvNGgdlk6GKis/E=;
+  b=KTHYIt9jD19FDX6ekFPQROdg8P950vA1wmTj1K2uIe37oVVQhe9SEPTF
+   2viJhR+XZ1ckQsjcJBAc364W+fd3oO9ec8RUZwVbS8CbPgRyPdCoHdjXV
+   x1St5V4W0WLrXLxSWZaC0eiYkPWYIXgR9O0C4IeOGd5egMjWFFp9i98me
+   SBuH74GuG5JDLXdu2jMM0EtVjIQLxxU3GYZ8VfnRx3TBN1jT6CoMxpc1p
+   m3aw1KusN0Qtb06tFmC7T9FRQRR2SphFH5sI0A0s7Cz2ch87AnBm2Ofxj
+   VeXgiaXNTq3Pd5oFHhIL7d7EBcgtOiZAo284TV5t4X5SXHSexKQTew+Vg
+   w==;
+X-CSE-ConnectionGUID: Vo5+DFQfRV2lVUnjH/SIRw==
+X-CSE-MsgGUID: GDpibQFKScav3mZiq4sDGA==
+X-IronPort-AV: E=McAfee;i="6800,10657,11561"; a="86360198"
+X-IronPort-AV: E=Sophos;i="6.18,288,1751266800"; 
+   d="scan'208";a="86360198"
+Received: from fmviesa008.fm.intel.com ([10.60.135.148])
+  by fmvoesa101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 23 Sep 2025 07:44:47 -0700
+X-CSE-ConnectionGUID: dIlySU0eQaaanhxNWFbn+A==
+X-CSE-MsgGUID: qE4KwowJRUqTHnGoR0HEkQ==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.18,288,1751266800"; 
+   d="scan'208";a="177157139"
+Received: from xiaoyaol-hp-g830.ccr.corp.intel.com (HELO [10.124.238.14]) ([10.124.238.14])
+  by fmviesa008-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 23 Sep 2025 07:44:41 -0700
+Message-ID: <5dbc1100-6685-4eac-aa04-07f5621d3979@intel.com>
+Date: Tue, 23 Sep 2025 22:44:38 +0800
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <87ecrx4guz.ffs@tglx>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v16 27/51] KVM: x86: Disable support for IBT and SHSTK if
+ allow_smaller_maxphyaddr is true
+To: Sean Christopherson <seanjc@google.com>,
+ Paolo Bonzini <pbonzini@redhat.com>
+Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+ Tom Lendacky <thomas.lendacky@amd.com>,
+ Mathias Krause <minipli@grsecurity.net>, John Allen <john.allen@amd.com>,
+ Rick Edgecombe <rick.p.edgecombe@intel.com>, Chao Gao <chao.gao@intel.com>,
+ Binbin Wu <binbin.wu@linux.intel.com>, Maxim Levitsky <mlevitsk@redhat.com>,
+ Zhang Yi Z <yi.z.zhang@linux.intel.com>, Xin Li <xin@zytor.com>
+References: <20250919223258.1604852-1-seanjc@google.com>
+ <20250919223258.1604852-28-seanjc@google.com>
+Content-Language: en-US
+From: Xiaoyao Li <xiaoyao.li@intel.com>
+In-Reply-To: <20250919223258.1604852-28-seanjc@google.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-On Tue, Sep 23, 2025 at 12:12:52PM +0200, Thomas Gleixner wrote:
-> On Mon, Sep 22 2025 at 20:56, Jason Gunthorpe wrote:
-> > On Mon, Sep 22, 2025 at 04:20:43PM -0500, Andrew Jones wrote:
-> >> > It has to do with each PCI BDF having a unique set of
-> >> > validation/mapping tables for MSIs that are granular to the interrupt
-> >> > number.
-> >> 
-> >> Interrupt numbers (MSI data) aren't used by the RISC-V IOMMU in any way.
-> >
-> > Interrupt number is a Linux concept, HW decodes the addr/data pair and
-> > delivers it to some Linux interrupt. Linux doesn't care how the HW
-> > treats the addr/data pair, it can ignore data if it wants.
+On 9/20/2025 6:32 AM, Sean Christopherson wrote:
+> Make IBT and SHSTK virtualization mutually exclusive with "officially"
+> supporting setups with guest.MAXPHYADDR < host.MAXPHYADDR, i.e. if the
+> allow_smaller_maxphyaddr module param is set.  Running a guest with a
+> smaller MAXPHYADDR requires intercepting #PF, and can also trigger
+> emulation of arbitrary instructions.  Intercepting and reacting to #PFs
+> doesn't play nice with SHSTK, as KVM's MMU hasn't been taught to handle
+> Shadow Stack accesses, and emulating arbitrary instructions doesn't play
+> nice with IBT or SHSTK, as KVM's emulator doesn't handle the various side
+> effects, e.g. doesn't enforce end-branch markers or model Shadow Stack
+> updates.
 > 
-> Let me explain this a bit deeper.
-> 
-> As you said, the interrupt number is a pure kernel software construct,
-> which is mapped to a hardware interrupt source.
-> 
-> The interrupt domain, which is associated to a hardware interrupt
-> source, creates the mapping and supplies the resulting configuration to
-> the hardware, so that the hardware is able to raise an interrupt in the
-> CPU.
-> 
-> In case of MSI, this configuration is the MSI message (address,
-> data). That's composed by the domain according to the requirements of
-> the underlying CPU hardware resource. This underlying hardware resource
-> can be the CPUs interrupt controller itself or some intermediary
-> hardware entity.
-> 
-> The kernel reflects this in the interrupt domain hierarchy. The simplest
-> case for MSI is:
-> 
->      [ CPU domain ] --- [ MSI domain ] -- device
-> 
-> The flow is as follows:
-> 
->    device driver allocates an MSI interrupt in the MSI domain
-> 
->    MSI domain allocates an interrupt in the CPU domain
-> 
->    CPU domain allocates an interrupt vector and composes the
->    address/data pair. If @data is written to @address, the interrupt is
->    raised in the CPU
-> 
->    MSI domain converts the address/data pair into device format and
->    writes it into the device.
-> 
->    When the device fires an interrupt it writes @data to @address, which
->    raises the interrupt in the CPU at the allocated CPU vector.  That
->    vector is then translated to the Linux interrupt number in the
->    interrupt handling entry code by looking it up in the CPU domain.
-> 
-> With a remapping domain intermediary this looks like this:
-> 
->      [ CPU domain ] --- [ Remap domain] --- [ MSI domain ] -- device
->  
->    device driver allocates an MSI interrupt in the MSI domain
-> 
->    MSI domain allocates an interrupt in the Remap domain
-> 
->    Remap domain allocates a resource in the remap space, e.g. an entry
->    in the remap translation table and then allocates an interrupt in the
->    CPU domain.
-> 
->    CPU domain allocates an interrupt vector and composes the
->    address/data pair. If @data is written to @address, the interrupt is
->    raised in the CPU
-> 
->    Remap domain converts the CPU address/data pair to remap table format
->    and writes it to the alloacted entry in that table. It then composes
->    a new address/data pair, which points at the remap table entry.
-> 
->    MSI domain converts the remap address/data pair into device format
->    and writes it into the device.
-> 
->    So when the device fires an interrupt it writes @data to @address,
->    which triggers the remap unit. The remap unit validates that the
->    address/data pair is valid for the device and if so it writes the CPU
->    address/data pair, which raises the interrupt in the CPU at the
->    allocated vector. That vector is then translated to the Linux
->    interrupt number in the interrupt handling entry code by looking it
->    up in the CPU domain.
-> 
-> So from a kernel POV, the address/data pairs are just opaque
-> configuration values, which are written into the remap table and the
-> device. Whether the content of @data is relevant or not, is a hardware
-> implementation detail. That implementation detail is only relevant for
-> the interrupt domain code, which handle a specific part of the
-> hierarchy.
-> 
-> The MSI domain does not need to know anything about the content and the
-> meaning of @address and @data. It just cares about converting that into
-> the device specific storage format.
-> 
-> The Remap domain does not need to know anything about the content and
-> the meaning of the CPU domain provided @address and @data. It just cares
-> about converting that into the remap table specific format.
-> 
-> The hardware entities do not know about the Linux interrupt number at
-> all. That relationship is purely software managed as a mapping from the
-> allocated CPU vector to the Linux interrupt number.
-> 
-> Hope that helps.
->
+> Note, hiding IBT and SHSTK based solely on allow_smaller_maxphyaddr is
+> overkill, as allow_smaller_maxphyaddr is only problematic if the guest is
+> actually configured to have a smaller MAXPHYADDR.  However, KVM's ABI
+> doesn't provide a way to express that IBT and SHSTK may break if enabled
+> in conjunction with guest.MAXPHYADDR < host.MAXPHYADDR.  I.e. the
+> alternative is to do nothing in KVM and instead update documentation and
+> hope KVM users are thorough readers.  
 
-Thanks, Thomas! I always appreciate these types of detailed design
-descriptions which certainly help pull all the pieces together.
+KVM_SET_CPUID* can return error to userspace. So KVM can return -EINVAL 
+when userspace sets a smaller maxphyaddr with SHSTK/IBT enabled.
 
-So, I think I got this right, as Patch4 adds the Remap domain, creating
-this hierarchy
+> Go with the conservative-but-correct
+> approach; worst case scenario, this restriction can be dropped if there's
+> a strong use case for enabling CET on hosts with allow_smaller_maxphyaddr.
+> 
+> Signed-off-by: Sean Christopherson <seanjc@google.com>
+> ---
+>   arch/x86/kvm/cpuid.c | 10 ++++++++++
+>   1 file changed, 10 insertions(+)
+> 
+> diff --git a/arch/x86/kvm/cpuid.c b/arch/x86/kvm/cpuid.c
+> index 499c86bd457e..b5c4cb13630c 100644
+> --- a/arch/x86/kvm/cpuid.c
+> +++ b/arch/x86/kvm/cpuid.c
+> @@ -963,6 +963,16 @@ void kvm_set_cpu_caps(void)
+>   	if (!tdp_enabled)
+>   		kvm_cpu_cap_clear(X86_FEATURE_SHSTK);
+>   
+> +	/*
+> +	 * Disable support for IBT and SHSTK if KVM is configured to emulate
+> +	 * accesses to reserved GPAs, as KVM's emulator doesn't support IBT or
+> +	 * SHSTK, nor does KVM handle Shadow Stack #PFs (see above).
+> +	 */
+> +	if (allow_smaller_maxphyaddr) {
+> +		kvm_cpu_cap_clear(X86_FEATURE_SHSTK);
+> +		kvm_cpu_cap_clear(X86_FEATURE_IBT);
+> +	}
+> +
+>   	kvm_cpu_cap_init(CPUID_7_EDX,
+>   		F(AVX512_4VNNIW),
+>   		F(AVX512_4FMAPS),
 
-name:   IR-PCI-MSIX-0000:00:01.0-12
- size:   0
- mapped: 3
- flags:  0x00000213
-            IRQ_DOMAIN_FLAG_HIERARCHY
-            IRQ_DOMAIN_NAME_ALLOCATED
-            IRQ_DOMAIN_FLAG_MSI
-            IRQ_DOMAIN_FLAG_MSI_DEVICE
- parent: IOMMU-IR-0000:00:01.0-17
-    name:   IOMMU-IR-0000:00:01.0-17
-     size:   0
-     mapped: 3
-     flags:  0x00000123
-                IRQ_DOMAIN_FLAG_HIERARCHY
-                IRQ_DOMAIN_NAME_ALLOCATED
-                IRQ_DOMAIN_FLAG_ISOLATED_MSI
-                IRQ_DOMAIN_FLAG_MSI_PARENT
-     parent: :soc:interrupt-controller@28000000-5
-        name:   :soc:interrupt-controller@28000000-5
-         size:   0
-         mapped: 16
-         flags:  0x00000103
-                    IRQ_DOMAIN_FLAG_HIERARCHY
-                    IRQ_DOMAIN_NAME_ALLOCATED
-                    IRQ_DOMAIN_FLAG_MSI_PARENT
-
-
-But, Patch4 only introduces the irqdomain, the functionality is added with
-Patch8. Patch8 introduces riscv_iommu_ir_get_msipte_idx_from_target()
-which "converts the CPU address/data pair to remap table format". For the
-RISC-V IOMMU, the data part of the pair is not used and the address
-undergoes a specified translation into an index of the MSI table. For the
-non-virt use case we skip the "composes a new address/data pair, which
-points at the remap table entry" step since we just forward the original
-with an identity mapping. For the virt case we do write a new addr,data
-pair (Patch15) since we need to map guest addresses to host addresses (but
-data is still just forwarded since the RISC-V IOMMU doesn't support data
-remapping). The lack of data remapping is unfortunate, since the part of
-the design where "The remap unit validates that the address/data pair is
-valid for the device and if so it writes the CPU address/data pair" is
-only half true for riscv (since the remap unit always forwards data so we
-can't change it in order to implement validation of it). If we can't set
-IRQ_DOMAIN_FLAG_ISOLATED_MSI without data validation, then we'll need to
-try to fast-track an IOMMU extension for it before we can use VFIO without
-having to set allow_unsafe_interrupts.
-
-Thanks,
-drew
 
