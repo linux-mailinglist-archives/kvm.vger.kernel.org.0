@@ -1,221 +1,228 @@
-Return-Path: <kvm+bounces-58531-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-58532-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id E671BB96264
-	for <lists+kvm@lfdr.de>; Tue, 23 Sep 2025 16:07:17 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1B0B7B96291
+	for <lists+kvm@lfdr.de>; Tue, 23 Sep 2025 16:13:14 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 5D79A7B3033
-	for <lists+kvm@lfdr.de>; Tue, 23 Sep 2025 14:05:26 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id EAE7B189BCF0
+	for <lists+kvm@lfdr.de>; Tue, 23 Sep 2025 14:13:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7A80122759C;
-	Tue, 23 Sep 2025 14:06:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A43CF22AE5D;
+	Tue, 23 Sep 2025 14:13:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="rF1I5CBt"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="UUXXb9Sd"
 X-Original-To: kvm@vger.kernel.org
-Received: from PH7PR06CU001.outbound.protection.outlook.com (mail-westus3azon11010048.outbound.protection.outlook.com [52.101.201.48])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.16])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 161A021C9F4;
-	Tue, 23 Sep 2025 14:06:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.201.48
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758636415; cv=fail; b=reBf/0viPlmYyTgn45iYUSPmDN8UGpNEfA0M/bVaGhzYPyhkNDRhu3FNRRau7v57ryyssJGl1rP4MpIi4TWI3c7ck2TmhJFF+YULaQ6VgfVCKkixnxE+I/cmNxCsupfindaC5/fqQCQpFRL1lKWQaPuQQT8/8cB8ZRRI8jX82lA=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758636415; c=relaxed/simple;
-	bh=fsMesOOhDAIPPIO+mhOllpcRadV0mK7BcdfPH2WYLLQ=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:Content-Type:
-	 Content-Disposition:In-Reply-To:MIME-Version; b=CY9xgkKCzPJkdTL23KCgWA7t5FZ180Ee/lDsTuWfjgI8oZ5hcBAfFM4Q1/Mmg+Hyq5b6pvHdX87VIouXkBtEOCFdejq3pO7Hhxqg+PDl3F2OXj+N5J9tslwMu/U6UStOLS2tzXesMBZR9ue8bR4IjWLOTsrmI+7/uyclKedaFjA=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=rF1I5CBt; arc=fail smtp.client-ip=52.101.201.48
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=LvfjTdxfpk/yBh/K7m6B81tPX9QmpEVlC7vEJ6c3PX+SPCEwxD1DIn0Efa6YQQ8aMSwRrJX9VQxxcAiRM2yfwYyp30jQEGDhbpAoDbppKe1iyjBa3FksFOK2h3aAvPXvzc2t6ikRtKI2ROQqqR2yscABgJGRrdcVPXiGk0YLJnJMTwz+letBv1puUc+bMzagJBNEqw9glj+kwLf1Jx1LNf6g+GS3TuIVa1LX042g4KCsAFM8XrYE/b87P0EZ8E2x6oJK8S1kWx/n2FYQEra/jwxxyJsvlY4uUxl90miA3O+DV6kBrfc/0dKGDV+2GwG94SXwXRDv7M4kY8HZRrGELg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=dU8KG8TBt8VeNziA73m48MhcMtB5VIZ0N/0CxyFeAtQ=;
- b=p/StxvgIiobUd99U0LYlKrHpA45kDqgvq52k2nSZFfLN3K9ywGmTQgujWvcqBg+x9++ZcoEDvgfdqH0Krg2OPF6ory+oaYmCBLfdKWz9wmkhB06Cjob25SWq4DH8Xu9Et0RDD1t0LwFtVB7/bepLoVNQku2/PbsMhy3vRgtI1UYGZboqjN1wCtRTqWcqm6zIyT3rTenoXFow617wj+WIrfYaDqLXTeYqwEVq9w0uOw37MUxL9Rqe8AkPJllvprH6y+uImVsI9z5Ov6TZudzPyiKcbJATFBOz6Jg45p0K9M3o7d0dycZGPYy9juGP/HhUS9voV1mCxswtV6oSwfB5GQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
- dkim=pass header.d=nvidia.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=dU8KG8TBt8VeNziA73m48MhcMtB5VIZ0N/0CxyFeAtQ=;
- b=rF1I5CBteYdjJRJQGFOLxyhBr3fqEGZl3mILc8q93+OHKE0OYU0cOczjP5uCJrtZKiRlGbyM8wMEwipj5l9+p8HEtgov6QAa0ZLQ6D0jcdt39SkgZ2QUDlsnyQPH4YZcY0d34gb9+SJ8Dgsg9Jjw/telyyGyEdsOGI+G5ZohJYMU/JSXK3Kw6EZbvXMPGoKHa/UyDOewSSBTtofj7xPz20FdVYM+PxADZ6fBEh9a7ZHEkr20t7aKdqM9Jr4z03mRQA82VKgnrkeeylzm1yPjhgOtF0bJ/s3u9Dz93U78+Vi6HkjiNatmUruyRDfv/tyhH4/93s1euGwf9tr2EPz9Rg==
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nvidia.com;
-Received: from PH7PR12MB5757.namprd12.prod.outlook.com (2603:10b6:510:1d0::13)
- by PH7PR12MB7305.namprd12.prod.outlook.com (2603:10b6:510:209::21) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9160.9; Tue, 23 Sep
- 2025 14:06:49 +0000
-Received: from PH7PR12MB5757.namprd12.prod.outlook.com
- ([fe80::f012:300c:6bf4:7632]) by PH7PR12MB5757.namprd12.prod.outlook.com
- ([fe80::f012:300c:6bf4:7632%2]) with mapi id 15.20.9137.018; Tue, 23 Sep 2025
- 14:06:48 +0000
-Date: Tue, 23 Sep 2025 11:06:46 -0300
-From: Jason Gunthorpe <jgg@nvidia.com>
-To: Thomas Gleixner <tglx@linutronix.de>
-Cc: Andrew Jones <ajones@ventanamicro.com>, iommu@lists.linux.dev,
-	kvm-riscv@lists.infradead.org, kvm@vger.kernel.org,
-	linux-riscv@lists.infradead.org, linux-kernel@vger.kernel.org,
-	zong.li@sifive.com, tjeznach@rivosinc.com, joro@8bytes.org,
-	will@kernel.org, robin.murphy@arm.com, anup@brainfault.org,
-	atish.patra@linux.dev, alex.williamson@redhat.com,
-	paul.walmsley@sifive.com, palmer@dabbelt.com, alex@ghiti.fr
-Subject: Re: [RFC PATCH v2 08/18] iommu/riscv: Use MSI table to enable IMSIC
- access
-Message-ID: <20250923140646.GM1391379@nvidia.com>
-References: <20250920203851.2205115-20-ajones@ventanamicro.com>
- <20250920203851.2205115-28-ajones@ventanamicro.com>
- <20250922184336.GD1391379@nvidia.com>
- <20250922-50372a07397db3155fec49c9@orel>
- <20250922235651.GG1391379@nvidia.com>
- <87ecrx4guz.ffs@tglx>
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <87ecrx4guz.ffs@tglx>
-X-ClientProxiedBy: BL1PR13CA0255.namprd13.prod.outlook.com
- (2603:10b6:208:2ba::20) To PH7PR12MB5757.namprd12.prod.outlook.com
- (2603:10b6:510:1d0::13)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 83AFB2C18A;
+	Tue, 23 Sep 2025 14:13:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.16
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1758636785; cv=none; b=j5k/TPs9CHggHvVwUKFudGNqmypncrgkfcqlHy0Sv+INcDzC4gXZdtcbHurHaaDFnnp5ssYUaV2VE1x3PuEpSbc4xr89bZz8uDgM7DtsjvWMrttWCt/sOY87Rz/zSJvG5YyEuNgn2Y9hn1sONjOyPkzhnE0XfT53L84d4oHl3WI=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1758636785; c=relaxed/simple;
+	bh=hUTIfU8L5AUcG2pw9OBQy9QONqALNtj3I6ZR7ay12JA=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=sxKBL7cWAKTYaffQSUOvU0xMmjG7aZvG/7YZSSEoULzcnQqg+sxSGdyIEGp9HHl9A25GaLUQWoOw1ZV6SStaoMp7gb+R/Okw5WdAouRV9zBbWE+vc3D0AzQUSIVpdjCzWsQMUfpqkHKGusInBO2ylZN75b9elYfrefTXUryDqo0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=UUXXb9Sd; arc=none smtp.client-ip=198.175.65.16
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1758636782; x=1790172782;
+  h=message-id:date:mime-version:subject:to:cc:references:
+   from:in-reply-to:content-transfer-encoding;
+  bh=hUTIfU8L5AUcG2pw9OBQy9QONqALNtj3I6ZR7ay12JA=;
+  b=UUXXb9Sd70zJC9nI3EwTeg3o5oLcPcuyHaMfcD/gYzRGeU5E4zrMXGLY
+   V4FgmvFQVF9za/Wo+RvTIUHtxQHBcmLnxXP/46li+HQrOgRtebfmabspm
+   UpUZSVai/Cs2JRSPjvg3J52t+aO10UxjY6MKhbU/980O482fKxbacYHtn
+   vxRZ8JZ/Rf0dAssgKiOIcyn7I9vmP0SHWokqJ8FJ3jfW7/kEme2oRMa0S
+   LppJK+L+jEYXZHIRg5srxHIMJ+cFCzspPq21s94z+wgZg87Ep2YLswtCE
+   HRtou7CSdmUalme8fAhpY7tRx/iEvm/hIoevMmEtE4Ih9jnQUXcnHVD1F
+   g==;
+X-CSE-ConnectionGUID: qmMdGaZATTGQL5ixjNuQvQ==
+X-CSE-MsgGUID: jeNs9YjYT0uB1PyVJ0bPHg==
+X-IronPort-AV: E=McAfee;i="6800,10657,11561"; a="61087386"
+X-IronPort-AV: E=Sophos;i="6.18,288,1751266800"; 
+   d="scan'208";a="61087386"
+Received: from orviesa001.jf.intel.com ([10.64.159.141])
+  by orvoesa108.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 23 Sep 2025 07:13:01 -0700
+X-CSE-ConnectionGUID: EF0SHR9YSqOb7GrucgJMAQ==
+X-CSE-MsgGUID: 4KcYWrUfTGesRAGt0tWwFw==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.18,288,1751266800"; 
+   d="scan'208";a="213919731"
+Received: from xiaoyaol-hp-g830.ccr.corp.intel.com (HELO [10.124.238.14]) ([10.124.238.14])
+  by smtpauth.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 23 Sep 2025 07:12:57 -0700
+Message-ID: <287c2195-740c-4f2e-a545-c886962fc542@intel.com>
+Date: Tue, 23 Sep 2025 22:12:53 +0800
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: PH7PR12MB5757:EE_|PH7PR12MB7305:EE_
-X-MS-Office365-Filtering-Correlation-Id: 1f4b83fb-74cf-4098-ca23-08ddfaaa7008
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230040|366016|1800799024|376014|7416014;
-X-Microsoft-Antispam-Message-Info:
-	=?us-ascii?Q?6LUnmU4F31tWAVX0wmyJHkuSDeWyk8tHIv3uvIANe+NBBcZ0LCI0uCBVPr7n?=
- =?us-ascii?Q?FWQvE0YjDCjn1xU8k/32TqXSnBBv0HVnjyjl9tR8CYMRAV/n0OvdK+yEICTY?=
- =?us-ascii?Q?weHfMpsitRmnNlj2s4UbD8ldoHUSQTz4gQan5IvFWGtZFrj1rVLWqjwmgGpm?=
- =?us-ascii?Q?1yY1sXwfwLFMn+9k7NMkc0FinU0OV0gEJht94EJh8eEohlhZnfQ2e7Nsa8/V?=
- =?us-ascii?Q?RJZ29TO0UmR/xZMfFVqV6mVBk0Dy9fRUyurJkKuO41WFeRVCCYid8UQt9Xdw?=
- =?us-ascii?Q?K2l0CnXRRG/qa1bmDq7jphMtJ+vZr0aHXMnZu+okzNYuNKThJlpap9rHLdSb?=
- =?us-ascii?Q?5PxyP7XeScaLB9R/V3kAxkGfRskQZv+AWEg1/y7OqQG4qHfV+z2xEOX6T28Z?=
- =?us-ascii?Q?I0Ep5z72YDt3DKVlStXv8FeHBXuXWGKpwXef1qbhc/PsaVGL6BCqaHCGyiIY?=
- =?us-ascii?Q?wG1yOeDiaOVIV3Aoo2QJ0ezJpwdBjPXvI6jyiK1RmcLotBAVjSF2ZvWnGgeD?=
- =?us-ascii?Q?8l5BPD4ztaWZu78loZ4usfZqWsX7q8IywZhQBsP+0Nrz2yfNCIIY5952B60g?=
- =?us-ascii?Q?MU9PSt371qhGmjo/sjF5gq12dJb2Cmn/rI3I+V9fZEoq8X4/Xxw+l54dNlA5?=
- =?us-ascii?Q?5pLnlTYbT1c6Ucl87MYp+ar5O0cjTvr9NR6C8KZaTpZbQIbg/EKE6bqy46pd?=
- =?us-ascii?Q?4pXK3I0JPFUlBAbqjyUVw3sHug3dBcfQ2W1LlXfsM2mEjtuNP6aR0vGdxwfI?=
- =?us-ascii?Q?C9UEwwesIMcLBwjQCfF1jSB9QgVZ1nK4ID/vAgMr40A/w+FF1PTBkubraF5T?=
- =?us-ascii?Q?9cmIUPznQn8lOmAGQ1El3dJUdTVC1d2ucxyaQasKen5O4Hvr5RCNYrNlqh1v?=
- =?us-ascii?Q?8Oacz7pxlqV3BURooJgEzg76t9SrugFcOKKFUpokiaO7vWiogro0jxoowngF?=
- =?us-ascii?Q?kbA2wlLHQ+OGsIkSGpw659tRbhxEXOjnrCj4gIcW7jX9/fyjMU1mR5+HDcGX?=
- =?us-ascii?Q?7fOD7M4vQcPIilz8Mz7mLPr1Pf1X5Wxj0vQASRDbC3uH3tfqSFSmom5fimes?=
- =?us-ascii?Q?uGTxAcmRtx0r+U9vKkAclQCnVhG/sLKYzNIj3LigK8GtFOesUfcHLV6ScTtT?=
- =?us-ascii?Q?/XUse/FXnAd2nnvtiQU47W+JAhfv7Ur3chUIkACeU4AukutdoYZccNx5Ylhk?=
- =?us-ascii?Q?mqa1ux2IdGyjthTEyL+il0QNrA3ZWiA7iaLh3cp+agleCQtoLVQ2/LSWFHjp?=
- =?us-ascii?Q?sJNk/9I8XIumRn16a6e/EcxjJOLLRsKi5aJcA+S9tqASqSxaXG/tD5eHrrYC?=
- =?us-ascii?Q?U86Egwd97QOnhtt0oJxhCeI6Lj2JuJZvNh7L1SbpLzmj4WjsGTV5Q5+OaUYl?=
- =?us-ascii?Q?h8m+vYUokdwzrTnABl8GGqKfqWOEC2Th7f3I91vGVa3ldGL+ZpG1rHy6uU+Z?=
- =?us-ascii?Q?qcAiCER6T08=3D?=
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PH7PR12MB5757.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(1800799024)(376014)(7416014);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?us-ascii?Q?AhD6g4c6U+Ik2ZzHJc/5QhNVtXbtvnGfWZXuzl2nfIGKAG7XPk6VVJFdj1Fo?=
- =?us-ascii?Q?72N4FQY0NLdSieLtofAgxMdFXGsQsCqSIYeP1CYIrttz8y46Fdq/5AlSDsNk?=
- =?us-ascii?Q?bZrIjGaiDZr7FY0vRAO4BKt1FC0EMTcu3uJOFDtnDt02fiA31IBZc2bVB62d?=
- =?us-ascii?Q?MyzItw+3SO8sOlPqy7HXhmZHnPuiF0bgDJy6+xu9M0De3o+BGNOFsbTj/q7s?=
- =?us-ascii?Q?AgtnTBnz4wU9J1uWa6XQFRXQju+iKYhlEVLmhctheXRT98hJTh/opcY9KFKt?=
- =?us-ascii?Q?MVCednDBhiuJihJoJAaj2GqalZ6cLpyVTYiUSbiGZ3LwKFK4sFpqkmmYhL1n?=
- =?us-ascii?Q?TnBzf2KIpVC4nOM9xpn5SmFiO6pNiUtUzxZXOWxXx8ySVRRGdI9tQvRQYFi0?=
- =?us-ascii?Q?6tVt+Sxg06PsMAZwTaDn/51pjW4V79Gu4+4QuQophP8RDIXuI1nZK7vWzx+U?=
- =?us-ascii?Q?Iop6PQwqa1gQkBOx2MOoqNSenLexqfIGwEsDPGDk6EWALts1HNmamNk2yVVv?=
- =?us-ascii?Q?OKT2BO25QJjKAOAtyndg4zSachoeW9jPRrRhacWLdbPXfUUYFbT8d7mdfpXY?=
- =?us-ascii?Q?juYrAuxgUfn3XHV2nosP2jWUqxuZHGBfNPREtdXHKfwHURaSUCuzlieeIPWw?=
- =?us-ascii?Q?8DguEdemMuHTjYRhs7EuU+VtCPyVxmIMKl2RlNWku27s9v5M9GP6TuaLZBqU?=
- =?us-ascii?Q?SEoSliPdbp7BPm2ME3fKz7qsj6pkErbwfwH5f6XzGoaMIuU33S0zmoJv7sUz?=
- =?us-ascii?Q?AuW2uj52FDtoClPkqLTC75kkCbwrpQCFgDUMukiLSuVfAhZxr/T4S/SxKHHY?=
- =?us-ascii?Q?g8eXLd0R84e0qfWqO+4hUIWcJYMWdKwjNMfNNP68vvDed0JTkXOBYHBy+Bdi?=
- =?us-ascii?Q?VitFbfd0okkSckQnzAknpxN6sDhuWYzvvZAlciEjPUAfpfm7R6oDff4xMFRf?=
- =?us-ascii?Q?FXgkwEfrAMt2NruxK64GQ8wpP0p5sH8LrbFBE3oSYsdd9GRUz985sXtSolop?=
- =?us-ascii?Q?LDZ5zlZx0jZUVwv5BUYKpQ5BTvYNPyqny/MdWaNDRoRGzNR3UulPQhMCW28R?=
- =?us-ascii?Q?76V7VbBMGxclN80qbxf3nQjl7CON4d6Vo7bRqxCQzBRhatiJTXGK8r1a8rD8?=
- =?us-ascii?Q?q5KFR1eP6e6Z6s5C6Vu2vYhJl5KaXN2S+bi1TeZUWTvPqjHYygFvxW8O6hWv?=
- =?us-ascii?Q?ErZD/Lsxfw8rB1zVaNFxGaN0qBobaYf7pzqeQwdnOeEEfKyw6Ue1ditd67wv?=
- =?us-ascii?Q?pf0UAnV7smpHp4Fl8Qv1WZcCqoTLJDnhPD5BHB9kTouEwQ1ptHFGlSlB5cV3?=
- =?us-ascii?Q?FXP4Wt2tILBQvBjuTNpkkM8bPqTZsVVEFyCiyqo827bnuBvE8KXGWLv1+qHC?=
- =?us-ascii?Q?yZWCqwG2MyEgnZg5sjLBCh3wWT6ol5mFsD5MtxHlovSfbgc3S+a32qqZYg+W?=
- =?us-ascii?Q?B87V9GPJDa0rEsiz678SuQMs1lv1W/l2n/uxIGs/R/fW2MmhQ7YNANGOYdn5?=
- =?us-ascii?Q?Witf8E0uwhA7QMzo5oUA8SwFHEREAhB8QdmqXHN5n9IbU0fgxDf4TLiJVQME?=
- =?us-ascii?Q?FlEarxAK0Jo6biqYaKLEIdd5GSPpmY/C6Ymjf66P?=
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 1f4b83fb-74cf-4098-ca23-08ddfaaa7008
-X-MS-Exchange-CrossTenant-AuthSource: PH7PR12MB5757.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 23 Sep 2025 14:06:48.9050
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: gkQ0ErG0wzG352s0T7LMQpQEo09+RV700Qvpxc42Okx4Tsz3hIU3sXRmNlpacncj
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH7PR12MB7305
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v16 18/51] KVM: x86: Don't emulate instructions affected
+ by CET features
+To: Sean Christopherson <seanjc@google.com>, Chao Gao <chao.gao@intel.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org,
+ linux-kernel@vger.kernel.org, Tom Lendacky <thomas.lendacky@amd.com>,
+ Mathias Krause <minipli@grsecurity.net>, John Allen <john.allen@amd.com>,
+ Rick Edgecombe <rick.p.edgecombe@intel.com>,
+ Binbin Wu <binbin.wu@linux.intel.com>, Maxim Levitsky <mlevitsk@redhat.com>,
+ Zhang Yi Z <yi.z.zhang@linux.intel.com>, Xin Li <xin@zytor.com>
+References: <20250919223258.1604852-1-seanjc@google.com>
+ <20250919223258.1604852-19-seanjc@google.com> <aNEkrlv1bdoRitoU@intel.com>
+ <aNGrwzoYRC_a6d5D@google.com>
+Content-Language: en-US
+From: Xiaoyao Li <xiaoyao.li@intel.com>
+In-Reply-To: <aNGrwzoYRC_a6d5D@google.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-On Tue, Sep 23, 2025 at 12:12:52PM +0200, Thomas Gleixner wrote:
-> With a remapping domain intermediary this looks like this:
+On 9/23/2025 4:04 AM, Sean Christopherson wrote:
+> From: Sean Christopherson<seanjc@google.com>
+> Date: Fri, 19 Sep 2025 15:32:25 -0700
+> Subject: [PATCH] KVM: x86: Don't emulate instructions affected by CET features
 > 
->      [ CPU domain ] --- [ Remap domain] --- [ MSI domain ] -- device
->  
->    device driver allocates an MSI interrupt in the MSI domain
+> Don't emulate branch instructions, e.g. CALL/RET/JMP etc., that are
+> affected by Shadow Stacks and/or Indirect Branch Tracking when said
+> features are enabled in the guest, as fully emulating CET would require
+> significant complexity for no practical benefit (KVM shouldn't need to
+> emulate branch instructions on modern hosts).  Simply doing nothing isn't
+> an option as that would allow a malicious entity to subvert CET
+> protections via the emulator.
 > 
->    MSI domain allocates an interrupt in the Remap domain
+> To detect instructions that are subject to IBT or affect IBT state, use
+> the existing IsBranch flag along with the source operand type to detect
+> indirect branches, and the existing NearBranch flag to detect far JMPs
+> and CALLs, all of which are effectively indirect.  Explicitly check for
+> emulation of IRET, FAR RET (IMM), and SYSEXIT (the ret-like far branches)
+> instead of adding another flag, e.g. IsRet, as it's unlikely the emulator
+> will ever need to check for return-like instructions outside of this one
+> specific flow.  Use an allow-list instead of a deny-list because (a) it's
+> a shorter list and (b) so that a missed entry gets a false positive, not a
+> false negative (i.e. reject emulation instead of clobbering CET state).
 > 
->    Remap domain allocates a resource in the remap space, e.g. an entry
->    in the remap translation table and then allocates an interrupt in the
->    CPU domain.
+> For Shadow Stacks, explicitly track instructions that directly affect the
+> current SSP, as KVM's emulator doesn't have existing flags that can be
+> used to precisely detect such instructions.  Alternatively, the em_xxx()
+> helpers could directly check for ShadowStack interactions, but using a
+> dedicated flag is arguably easier to audit, and allows for handling both
+> IBT and SHSTK in one fell swoop.
+> 
+> Note!  On far transfers, do NOT consult the current privilege level and
+> instead treat SHSTK/IBT as being enabled if they're enabled for User*or*
+> Supervisor mode.  On inter-privilege level far transfers, SHSTK and IBT
+> can be in play for the target privilege level, i.e. checking the current
+> privilege could get a false negative, and KVM doesn't know the target
+> privilege level until emulation gets under way.
+> 
+> Note #2, FAR JMP from 64-bit mode to compatibility mode interacts with
+> the current SSP, but only to ensure SSP[63:32] == 0.  Don't tag FAR JMP
+> as SHSTK, which would be rather confusing and would result in FAR JMP
+> being rejected unnecessarily the vast majority of the time (ignoring that
+> it's unlikely to ever be emulated).  A future commit will add the #GP(0)
+> check for the specific FAR JMP scenario.
+> 
+> Note #3, task switches also modify SSP and so need to be rejected.  That
+> too will be addressed in a future commit.
+> 
+> Suggested-by: Chao Gao<chao.gao@intel.com>
+> Originally-by: Yang Weijiang<weijiang.yang@intel.com>
+> Cc: Mathias Krause<minipli@grsecurity.net>
+> Cc: John Allen<john.allen@amd.com>
+> Cc: Rick Edgecombe<rick.p.edgecombe@intel.com>
+> Reviewed-by: Chao Gao<chao.gao@intel.com>
+> Reviewed-by: Binbin Wu<binbin.wu@linux.intel.com>
 
-Thanks!
+Reviewed-by: Xiaoyao Li <xiaoyao.li@intel.com>
 
-And to be very crystal clear here, the meaning of
-IRQ_DOMAIN_FLAG_ISOLATED_MSI is that the remap domain has a security
-feature such that the device can only trigger CPU domain interrupts
-that have been explicitly allocated in the remap domain for that
-device. The device can never go through the remap domain and trigger
-some other device's interrupt.
+Two nits besides,
+> Link:https://lore.kernel.org/r/20250919223258.1604852-19-seanjc@google.com
+> Signed-off-by: Sean Christopherson<seanjc@google.com>
+> ---
+>   arch/x86/kvm/emulate.c | 117 ++++++++++++++++++++++++++++++++++++-----
+>   1 file changed, 103 insertions(+), 14 deletions(-)
+> 
+> diff --git a/arch/x86/kvm/emulate.c b/arch/x86/kvm/emulate.c
+> index 23929151a5b8..a7683dc18405 100644
+> --- a/arch/x86/kvm/emulate.c
+> +++ b/arch/x86/kvm/emulate.c
+> @@ -178,6 +178,7 @@
+>   #define IncSP       ((u64)1 << 54)  /* SP is incremented before ModRM calc */
+>   #define TwoMemOp    ((u64)1 << 55)  /* Instruction has two memory operand */
+>   #define IsBranch    ((u64)1 << 56)  /* Instruction is considered a branch. */
+> +#define ShadowStack ((u64)1 << 57)  /* Instruction affects Shadow Stacks. */
+>   
+>   #define DstXacc     (DstAccLo | SrcAccHi | SrcWrite)
+>   
+> @@ -4068,9 +4069,9 @@ static const struct opcode group4[] = {
+>   static const struct opcode group5[] = {
+>   	F(DstMem | SrcNone | Lock,		em_inc),
+>   	F(DstMem | SrcNone | Lock,		em_dec),
+> -	I(SrcMem | NearBranch | IsBranch,       em_call_near_abs),
+> -	I(SrcMemFAddr | ImplicitOps | IsBranch, em_call_far),
+> -	I(SrcMem | NearBranch | IsBranch,       em_jmp_abs),
+> +	I(SrcMem | NearBranch | IsBranch | ShadowStack, em_call_near_abs),
+> +	I(SrcMemFAddr | ImplicitOps | IsBranch | ShadowStack, em_call_far),
+> +	I(SrcMem | NearBranch | IsBranch, em_jmp_abs),
 
-This is usally done by having the remap domain's HW take in the
-Addr/Data pair, do a per-BDF table lookup and then completely replace
-the Addr/Data pair with the "remapped" version. By fully replacing the
-remap domain prevents the device from generating a disallowed
-addr/data pair toward the CPU domain.
+The change of this line is unexpected, since it only changes the 
+indentation of 'em_jmp_abs'
+>   static unsigned imm_size(struct x86_emulate_ctxt *ctxt)
+>   {
+>   	unsigned size;
+> @@ -4943,6 +4998,40 @@ int x86_decode_insn(struct x86_emulate_ctxt *ctxt, void *insn, int insn_len, int
+>   
+>   	ctxt->execute = opcode.u.execute;
+>   
+> +	/*
+> +	 * Reject emulation if KVM might need to emulate shadow stack updates
+> +	 * and/or indirect branch tracking enforcement, which the emulator
+> +	 * doesn't support.
+> +	 */
+> +	if ((is_ibt_instruction(ctxt) || is_shstk_instruction(ctxt)) &&
+> +	    ctxt->ops->get_cr(ctxt, 4) & X86_CR4_CET) {
+> +		u64 u_cet = 0, s_cet = 0;
+> +
+> +		/*
+> +		 * Check both User and Supervisor on far transfers as inter-
+> +		 * privilege level transfers are impacted by CET at the target
+> +		 * privilege level, and that is not known at this time.  The
+> +		 * the expectation is that the guest will not require emulation
 
-It fundamentally must be done by having the HW do a per-RID/BDF table
-lookup based on the incoming MSI addr/data and fully sanitize the
-resulting output.
+Dobule 'the'
 
-There is some legacy history here. When MSI was first invented the
-goal was to make interrupts scalable by removing any state from the
-CPU side. The device would be told what Addr/Data to send to the CPU
-and the CPU would just take some encoded information in that pair as a
-delivery instruction. No state on the CPU side per interrupt.
+> +		 * of any CET-affected instructions at any privilege level.
+> +		 */
+> +		if (!(ctxt->d & NearBranch))
+> +			u_cet = s_cet = CET_SHSTK_EN | CET_ENDBR_EN;
+> +		else if (ctxt->ops->cpl(ctxt) == 3)
+> +			u_cet = CET_SHSTK_EN | CET_ENDBR_EN;
+> +		else
+> +			s_cet = CET_SHSTK_EN | CET_ENDBR_EN;
+> +
+> +		if ((u_cet && ctxt->ops->get_msr(ctxt, MSR_IA32_U_CET, &u_cet)) ||
+> +		    (s_cet && ctxt->ops->get_msr(ctxt, MSR_IA32_S_CET, &s_cet)))
+> +			return EMULATION_FAILED;
+> +
+> +		if ((u_cet | s_cet) & CET_SHSTK_EN && is_shstk_instruction(ctxt))
+> +			return EMULATION_FAILED;
+> +
+> +		if ((u_cet | s_cet) & CET_ENDBR_EN && is_ibt_instruction(ctxt))
+> +			return EMULATION_FAILED;
+> +	}
+> +
+>   	if (unlikely(emulation_type & EMULTYPE_TRAP_UD) &&
+>   	    likely(!(ctxt->d & EmulateOnUD)))
+>   		return EMULATION_FAILED;
+> 
+> base-commit: 88539a6a25bc7a7ed96952775152e0c3331fdcaf
 
-In the world of virtualization it was realized this is not secure, so
-the archs undid the core principal of MSI and the CPU HW has some kind
-of state/table entry for every single device interrupt source.
-
-x86/AMD did this by having per-device remapping tables in their IOMMU
-device context that are selected by incomming RID and effectively
-completely rewrite the addr/data pair before it reaches the APIC. The
-remap table alone now basically specifies where the interrupt is
-delivered.
-
-ARM doesn't do remapping, instead the interrupt controller itself has
-a table that converts (BDF,Data) into a delivery instruction. It is
-inherently secure.
-
-That flag has nothing to do with affinity.
-
-Jason
 
