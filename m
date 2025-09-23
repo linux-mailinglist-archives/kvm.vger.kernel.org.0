@@ -1,223 +1,180 @@
-Return-Path: <kvm+bounces-58582-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-58583-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 09611B96E5E
-	for <lists+kvm@lfdr.de>; Tue, 23 Sep 2025 19:02:29 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 083E5B96E6A
+	for <lists+kvm@lfdr.de>; Tue, 23 Sep 2025 19:03:11 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B300A3ABB07
-	for <lists+kvm@lfdr.de>; Tue, 23 Sep 2025 17:02:27 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id E19D5188DE8C
+	for <lists+kvm@lfdr.de>; Tue, 23 Sep 2025 17:03:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 38D1E2512DE;
-	Tue, 23 Sep 2025 17:02:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A071B2737FB;
+	Tue, 23 Sep 2025 17:03:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="eMfoSAm5"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="E4CcZL9s"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pg1-f202.google.com (mail-pg1-f202.google.com [209.85.215.202])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 704151D5CEA
-	for <kvm@vger.kernel.org>; Tue, 23 Sep 2025 17:02:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5564114AD20
+	for <kvm@vger.kernel.org>; Tue, 23 Sep 2025 17:02:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758646940; cv=none; b=bOSD/yn69GZwkeZm1SfY8zIK2PaE7sXqEVLtOf/SLlF0Hnm3A4Y1VkhEZiL5HHNtUlbN/53YbwdAtTQI7Htqn8y9jhPQ5Y0tRlDTnszKHtu1B8nf/7nnENM3lVKVWpt7nQ/dmnpA2npNNHSk/WyayeOa1EpVCw3rDwogbKHJzWs=
+	t=1758646980; cv=none; b=rDn6w5iSdcLRLDQ6l6i907GdydA+OrTofETjevUvZZJFTy+9dbMwborieiN2EkgEhxdWCRpNY5F+JA2VzyaSSol0UHXTSzzHhs1367OM6TMySMAf7iSUYHTiA+8Lm9k7CHXHwdKq6sv7vaiVdmXTNZaOB0WAurJDgYNz5JK9rz0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758646940; c=relaxed/simple;
-	bh=zPyve496OIR6DHrhycPdyFEAG18J/s9aaIMEttgoXw0=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=f6Xu905Oer4UDP9n6ybnPB/qpidbIVDGbgQg7UJEh6GtAzwYp8tp/43tJpFy/s6cHZoYHwkJ0VDiicNrqcRVaYWQLKGrxMJX8C7zICCIAekZfOP7ztaen/jjvX/q9jrsyAZpECHW9cvkiSxrwrfHmCvTboO3spjRd63svqrxMyI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=eMfoSAm5; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1758646937;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-	bh=+yVsTQAlBVDvjynp3S3KHSHcOn+gzz2S8kJWQRrsb8k=;
-	b=eMfoSAm5iCp64B7cBDh0AO/057Y8KYw7c1F/3XQwhA4rxUP58S+6AVp3S16a3mdOywMo92
-	mSYsUsc4pM0+u2hA+La01jSuk9GEVJ4AMI3R63jgdb2Cojw1pMwNhDx69EKI7rjTiJOVE5
-	4HO+zYPO8kjSkdAm4ZaS3DmMg8Ohfgs=
-Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
- [209.85.221.72]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-153-FE3azLYkML6bfwHni412Wg-1; Tue, 23 Sep 2025 13:02:15 -0400
-X-MC-Unique: FE3azLYkML6bfwHni412Wg-1
-X-Mimecast-MFC-AGG-ID: FE3azLYkML6bfwHni412Wg_1758646934
-Received: by mail-wr1-f72.google.com with SMTP id ffacd0b85a97d-3ee10a24246so3989008f8f.3
-        for <kvm@vger.kernel.org>; Tue, 23 Sep 2025 10:02:15 -0700 (PDT)
+	s=arc-20240116; t=1758646980; c=relaxed/simple;
+	bh=GIlHRf5XTE0COSH//hN6Zg+nEBdSq3ma/xn77n3FOg8=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=T4Ov3Zcl71OVYdwt2GZe8onZZA1RUBj5AsNRfDrgy40ESIcGdFb3lFmqVZTN27+yZv4PqWr/YEk9EMfc5D0bGR6e/lJUNPafMlecsb2CVIGFA04GbUZ3aIAdiE9ltxvx83KynX6ySwSfZOtPRNYEOkGXNUDOAc4tjCdSIZyxsPk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=E4CcZL9s; arc=none smtp.client-ip=209.85.215.202
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+Received: by mail-pg1-f202.google.com with SMTP id 41be03b00d2f7-b55443b4110so58098a12.1
+        for <kvm@vger.kernel.org>; Tue, 23 Sep 2025 10:02:59 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1758646978; x=1759251778; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=JXBGihq8A78t9Z1IiEI/Iicy+K3MCt/5X5iumq5Le3w=;
+        b=E4CcZL9sygo3ZPDaX03CmzmdJgtrlguLOMFeqz38vx7dlpDjAIjJsiO8+ir2YRK8FN
+         72fpCqANBuc1Tu1NWyFcWAKS3HmxryYspXXf9gkkU5Q/crrUrhZmW/OPOrzepqbVhfQn
+         35wCemIWWqtJFAbIt2BGqeu1NTlOhi9lfja9LCn7I2Ba4pT2sfefMZ7KtUqEtspaqD7A
+         p7lTd7LcW6+NTJtuTJgE44Lxdb2p4nOPKDKo50NC4mrunHIm6p3o18bDywaN4om3b3rC
+         XjbU/ePIPPZhF/c5yoUUI3xHseCaI+AUQ/x7NT/p6XULeB/Mzn2/+3qiTnW11l2jV1ic
+         dZiA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1758646934; x=1759251734;
-        h=content-transfer-encoding:in-reply-to:autocrypt:content-language
-         :from:references:cc:to:subject:user-agent:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=+yVsTQAlBVDvjynp3S3KHSHcOn+gzz2S8kJWQRrsb8k=;
-        b=Rt+ncQBj1pv57WC/Pw1eHC2iMDXxv+I/kna3bai6I6WSGARSDhLSP7fa80bLIJ3ro3
-         h0IJpSOl/9tIcoMxbH0E3JUCG+7F/FYkyTPjwcU4qNNVDZOVUV+PyScSVimnLha2UCDV
-         MWD7iHJbUZviam9t9ZxAtOm0IESt8fWd8PYPbi+Wd3ule7k/Oz4oXnxN1qaUzwy/+Nww
-         4eVC5NSacvdsvttb30kmPRTlMDXk34qL4LjX4SUarcSAkoANKIbiS9zz0J+X9xmBcfnD
-         vHVytePjYtfE6xMWfssWjphkYWQowurhlvPQ3aRMkBYiJ/7g4KdoWESlV6tX0+E6sGGB
-         Pb9Q==
-X-Forwarded-Encrypted: i=1; AJvYcCUl2UJoGymWqCl16FcHxPi/DOBWY1syHAYVuohSBTshRbC7hDG+heMHAnGuMsXMJbusObE=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxEaubFnTAzjIfY/ANMOxh99qLD0BiXYdOgOm35rxTfeEPM00U4
-	jV2kqD5TAXnHqIyodF94pBcPs32k17nu0itcdQd0G6TgfEnw9y4wMSWVYGbtHxEyb9uWBVa5TRs
-	MkYmHKJQuaySEGXam1HVksyuGqSmKP7S31VBYMfiRsZ3w70ARuHnTZQ==
-X-Gm-Gg: ASbGncs5JRr23dk81FYs2w3PCSA3CDZKwClAuj0pacdmFa9BvddRKIEXeK3n9NZr9k8
-	H+9X303ZnpFIVnAnUAwdNFZpVWMle+u4rUkBXcMjk58VcpCLtdV3R8GSIbpwYLWLgiTTs9XNtmp
-	N6TXCD2Vc0JQ06P+vGkDJhYPegdEPJY0eISFzZ/j/WPWDK/vs/hVPxFDB2mkighpFSdYppt2Okh
-	YD+ZbeZ7/oBnU7iVy49pMLJ575ZzMYjYjoNP8OFBJuBw8Oz8Mxb70YXBgFsBgJsc1L46l+xJJ6c
-	BajA861fpPlyB760x7Hg5RKcU79fmbsCQkTLQ46tk0DeC8tPhKWuTGdGZUljdVuh/30xPQuiyWZ
-	g4G4=
-X-Received: by 2002:a05:6000:184f:b0:3ee:1492:aeac with SMTP id ffacd0b85a97d-405ca95972dmr3593627f8f.38.1758646934227;
-        Tue, 23 Sep 2025 10:02:14 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IGk1FKJIA+oRLLUZLl85pUi0Wj5cslafO5JrAxW6RScXu4bROYWAr/9CVSMPLqkzQDlLQNw7g==
-X-Received: by 2002:a05:6000:184f:b0:3ee:1492:aeac with SMTP id ffacd0b85a97d-405ca95972dmr3593596f8f.38.1758646933712;
-        Tue, 23 Sep 2025 10:02:13 -0700 (PDT)
-Received: from ?IPV6:2a01:e0a:280:24f0:576b:abc6:6396:ed4a? ([2a01:e0a:280:24f0:576b:abc6:6396:ed4a])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3f70b47ca57sm14207316f8f.0.2025.09.23.10.02.13
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 23 Sep 2025 10:02:13 -0700 (PDT)
-Message-ID: <b1813fed-1dbe-40ad-a6e9-a5c86aea996c@redhat.com>
-Date: Tue, 23 Sep 2025 19:02:12 +0200
+        d=1e100.net; s=20230601; t=1758646978; x=1759251778;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=JXBGihq8A78t9Z1IiEI/Iicy+K3MCt/5X5iumq5Le3w=;
+        b=XmGQb0z/9tXLnaAHBzL+YRn7JAGsQOHWMqvBn5RMhA8zLoV56WSwmjX5v0x8O3fNCW
+         JD9tmyWBY1nmrcj3gOcg2l5uMuM0pyHOWhOvl9KvRT5JAdDq/e51nR1YpaXXx3dnY2ZQ
+         mau/4voQ8CuMouZZcbQ7H5PRG7y76DM4v+8s38H6iZEaM7CRfyM7toh3e2fm2muQVHD4
+         UDxCyngQ2Uw7wXO0P6t541NuBcYGeXdEtcykUDZdnKJkSOrAaG4W5WCUVOg1MSQXftQi
+         jwReh2fMdX5RaGjzsOrdSb93ruI/aEioJnWNp257SbHqL7koSkM050anUCZQPoA/BKKe
+         U+QQ==
+X-Forwarded-Encrypted: i=1; AJvYcCVztPVv0MlhHBZX/Hx8IYDJWWobjDBdvm0mlm2YMXf/btUAmjU0aUaBLlTWKFXQNlOG2WU=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzkM4K/d4iVoaSjEvXM4aeVpL830nKkFSPpksg5s7/SxRr/m0Hs
+	MLVW8mc3bPPusPH8hKxy+1DyQQ9r5ZTyMPbCxD+k8rRoJBzDiW//jRTAbjSlnR6tuZqo3nXp+xB
+	1s5oswQ==
+X-Google-Smtp-Source: AGHT+IH4Kskgmch7JegC5v+NUo5paOR/XhwhXs3EqsmT9/QyBt92yY6pX0mhWpbs9SQZBDrzTmU7nahdad8=
+X-Received: from pgbds10.prod.google.com ([2002:a05:6a02:430a:b0:b47:34d0:d386])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a05:6a20:a111:b0:240:1e4a:64cc
+ with SMTP id adf61e73a8af0-2d10f57e829mr4372465637.12.1758646978582; Tue, 23
+ Sep 2025 10:02:58 -0700 (PDT)
+Date: Tue, 23 Sep 2025 10:02:57 -0700
+In-Reply-To: <aNJCNMGLIIVlyC/p@intel.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v3] vfio/pci: Fix INTx handling on legacy non-PCI 2.3
- devices
-To: Timothy Pearson <tpearson@raptorengineering.com>,
- kvm <kvm@vger.kernel.org>
-Cc: linuxppc-dev <linuxppc-dev@lists.ozlabs.org>,
- Alex Williamson <alex.williamson@redhat.com>
-References: <1293210747.1743219.1758565305521.JavaMail.zimbra@raptorengineeringinc.com>
-From: =?UTF-8?Q?C=C3=A9dric_Le_Goater?= <clg@redhat.com>
-Content-Language: en-US, fr
-Autocrypt: addr=clg@redhat.com; keydata=
- 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
- uVKe8BVz4atMOoktmt0GWTOC8P4=
-In-Reply-To: <1293210747.1743219.1758565305521.JavaMail.zimbra@raptorengineeringinc.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Mime-Version: 1.0
+References: <20250919223258.1604852-1-seanjc@google.com> <20250919223258.1604852-51-seanjc@google.com>
+ <aNJCNMGLIIVlyC/p@intel.com>
+Message-ID: <aNLSwWM98jzs8NZh@google.com>
+Subject: Re: [PATCH v16 50/51] KVM: selftests: Verify MSRs are (not) in
+ save/restore list when (un)supported
+From: Sean Christopherson <seanjc@google.com>
+To: Chao Gao <chao.gao@intel.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	Tom Lendacky <thomas.lendacky@amd.com>, Mathias Krause <minipli@grsecurity.net>, 
+	John Allen <john.allen@amd.com>, Rick Edgecombe <rick.p.edgecombe@intel.com>, 
+	Binbin Wu <binbin.wu@linux.intel.com>, Xiaoyao Li <xiaoyao.li@intel.com>, 
+	Maxim Levitsky <mlevitsk@redhat.com>, Zhang Yi Z <yi.z.zhang@linux.intel.com>, Xin Li <xin@zytor.com>
+Content-Type: text/plain; charset="us-ascii"
 
-On 9/22/25 20:21, Timothy Pearson wrote:
-> PCI devices prior to PCI 2.3 both use level interrupts and do not support
-> interrupt masking, leading to a failure when passed through to a KVM guest on
-> at least the ppc64 platform. This failure manifests as receiving and
-> acknowledging a single interrupt in the guest, while the device continues to
-> assert the level interrupt indicating a need for further servicing.
+On Tue, Sep 23, 2025, Chao Gao wrote:
+> On Fri, Sep 19, 2025 at 03:32:57PM -0700, Sean Christopherson wrote:
+> >Add a check in the MSRs test to verify that KVM's reported support for
+> >MSRs with feature bits is consistent between KVM's MSR save/restore lists
+> >and KVM's supported CPUID.
+> >
 > 
-> When lazy IRQ masking is used on DisINTx- (non-PCI 2.3) hardware, the following
-> sequence occurs:
+> >To deal with Intel's wonderful decision to bundle IBT and SHSTK under CET,
+> >track the "second" feature to avoid false failures when running on a CPU
+> >with only one of IBT or SHSTK.
 > 
->   * Level IRQ assertion on device
->   * IRQ marked disabled in kernel
->   * Host interrupt handler exits without clearing the interrupt on the device
->   * Eventfd is delivered to userspace
->   * Guest processes IRQ and clears device interrupt
->   * Device de-asserts INTx, then re-asserts INTx while the interrupt is masked
->   * Newly asserted interrupt acknowledged by kernel VMM without being handled
->   * Software mask removed by VFIO driver
->   * Device INTx still asserted, host controller does not see new edge after EOI
+> is this paragraph related to this patch? the tracking is done in a previous
+> patch instead of this patch. So maybe just drop this paragraph.
 > 
-> The behavior is now platform-dependent.  Some platforms (amd64) will continue
-> to spew IRQs for as long as the INTX line remains asserted, therefore the IRQ
-> will be handled by the host as soon as the mask is dropped.  Others (ppc64) will
-> only send the one request, and if it is not handled no further interrupts will
-> be sent.  The former behavior theoretically leaves the system vulnerable to
-> interrupt storm, and the latter will result in the device stalling after
-> receiving exactly one interrupt in the guest.
+> >
+> >Signed-off-by: Sean Christopherson <seanjc@google.com>
+> >---
+> > tools/testing/selftests/kvm/x86/msrs_test.c | 22 ++++++++++++++++++++-
+> > 1 file changed, 21 insertions(+), 1 deletion(-)
+> >
+> >diff --git a/tools/testing/selftests/kvm/x86/msrs_test.c b/tools/testing/selftests/kvm/x86/msrs_test.c
+> >index 7c6d846e42dd..91dc66bfdac2 100644
+> >--- a/tools/testing/selftests/kvm/x86/msrs_test.c
+> >+++ b/tools/testing/selftests/kvm/x86/msrs_test.c
+> >@@ -437,12 +437,32 @@ static void test_msrs(void)
+> > 	}
+> > 
+> > 	for (idx = 0; idx < ARRAY_SIZE(__msrs); idx++) {
+> >-		if (msrs[idx].is_kvm_defined) {
+> >+		struct kvm_msr *msr = &msrs[idx];
+> >+
+> >+		if (msr->is_kvm_defined) {
+> > 			for (i = 0; i < NR_VCPUS; i++)
+> > 				host_test_kvm_reg(vcpus[i]);
+> > 			continue;
+> > 		}
+> > 
+> >+		/*
+> >+		 * Verify KVM_GET_SUPPORTED_CPUID and KVM_GET_MSR_INDEX_LIST
+> >+		 * are consistent with respect to MSRs whose existence is
+> >+		 * enumerated via CPUID.  Note, using LM as a dummy feature
+> >+		 * is a-ok here as well, as all MSRs that abuse LM should be
+> >+		 * unconditionally reported in the save/restore list (and
 > 
-> Work around this by disabling lazy IRQ masking for DisINTx- INTx devices.
+> I am not sure why LM is mentioned here. Is it a leftover from one of your
+> previous attempts?
 
-Timothy,
+Yeah, at one point I was using LM as the NONE feature.  I'll delete the entire
+sentence.
 
-This changes lacks your SoB.
-
-Thanks,
-
-C.
-
-
-
-
-> ---
->   drivers/vfio/pci/vfio_pci_intrs.c | 7 +++++++
->   1 file changed, 7 insertions(+)
 > 
-> diff --git a/drivers/vfio/pci/vfio_pci_intrs.c b/drivers/vfio/pci/vfio_pci_intrs.c
-> index 123298a4dc8f..61d29f6b3730 100644
-> --- a/drivers/vfio/pci/vfio_pci_intrs.c
-> +++ b/drivers/vfio/pci/vfio_pci_intrs.c
-> @@ -304,9 +304,14 @@ static int vfio_intx_enable(struct vfio_pci_core_device *vdev,
->   
->   	vdev->irq_type = VFIO_PCI_INTX_IRQ_INDEX;
->   
-> +	if (!vdev->pci_2_3)
-> +		irq_set_status_flags(pdev->irq, IRQ_DISABLE_UNLAZY);
-> +
->   	ret = request_irq(pdev->irq, vfio_intx_handler,
->   			  irqflags, ctx->name, ctx);
->   	if (ret) {
-> +		if (!vdev->pci_2_3)
-> +			irq_clear_status_flags(pdev->irq, IRQ_DISABLE_UNLAZY);
->   		vdev->irq_type = VFIO_PCI_NUM_IRQS;
->   		kfree(name);
->   		vfio_irq_ctx_free(vdev, ctx, 0);
-> @@ -352,6 +357,8 @@ static void vfio_intx_disable(struct vfio_pci_core_device *vdev)
->   		vfio_virqfd_disable(&ctx->unmask);
->   		vfio_virqfd_disable(&ctx->mask);
->   		free_irq(pdev->irq, ctx);
-> +		if (!vdev->pci_2_3)
-> +			irq_clear_status_flags(pdev->irq, IRQ_DISABLE_UNLAZY);
->   		if (ctx->trigger)
->   			eventfd_ctx_put(ctx->trigger);
->   		kfree(ctx->name);
+> >+		 * selftests are 64-bit only).  Note #2, skip the check for
+> >+		 * FS/GS.base MSRs, as they aren't reported in the save/restore
+> >+		 * list since their state is managed via SREGS.
+> >+		 */
+> >+		TEST_ASSERT(msr->index == MSR_FS_BASE || msr->index == MSR_GS_BASE ||
+> >+			    kvm_msr_is_in_save_restore_list(msr->index) ==
+> >+			    (kvm_cpu_has(msr->feature) || kvm_cpu_has(msr->feature2)),
+> >+			    "%s %s save/restore list, but %s according to CPUID", msr->name,
+> 
+> 				  ^ an "in" is missing here.
 
+Heh, I had added this in a local version when debugging, but forgot to push the
+fix.  Added now. 
+
+diff --git a/tools/testing/selftests/kvm/x86/msrs_test.c b/tools/testing/selftests/kvm/x86/msrs_test.c
+index c2ab75e5d9ea..40d918aedce6 100644
+--- a/tools/testing/selftests/kvm/x86/msrs_test.c
++++ b/tools/testing/selftests/kvm/x86/msrs_test.c
+@@ -455,17 +455,14 @@ static void test_msrs(void)
+                /*
+                 * Verify KVM_GET_SUPPORTED_CPUID and KVM_GET_MSR_INDEX_LIST
+                 * are consistent with respect to MSRs whose existence is
+-                * enumerated via CPUID.  Note, using LM as a dummy feature
+-                * is a-ok here as well, as all MSRs that abuse LM should be
+-                * unconditionally reported in the save/restore list (and
+-                * selftests are 64-bit only).  Note #2, skip the check for
+-                * FS/GS.base MSRs, as they aren't reported in the save/restore
+-                * list since their state is managed via SREGS.
++                * enumerated via CPUID.  Skip the check for FS/GS.base MSRs,
++                * as they aren't reported in the save/restore list since their
++                * state is managed via SREGS.
+                 */
+                TEST_ASSERT(msr->index == MSR_FS_BASE || msr->index == MSR_GS_BASE ||
+                            kvm_msr_is_in_save_restore_list(msr->index) ==
+                            (kvm_cpu_has(msr->feature) || kvm_cpu_has(msr->feature2)),
+-                           "%s %s save/restore list, but %s according to CPUID", msr->name,
++                           "%s %s in save/restore list, but %s according to CPUID", msr->name,
+                            kvm_msr_is_in_save_restore_list(msr->index) ? "is" : "isn't",
+                            (kvm_cpu_has(msr->feature) || kvm_cpu_has(msr->feature2)) ?
+                            "supported" : "unsupported");
 
