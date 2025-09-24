@@ -1,226 +1,251 @@
-Return-Path: <kvm+bounces-58611-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-58612-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id E2FA2B985AC
-	for <lists+kvm@lfdr.de>; Wed, 24 Sep 2025 08:12:41 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 76835B985D7
+	for <lists+kvm@lfdr.de>; Wed, 24 Sep 2025 08:15:30 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D15F517A83C
-	for <lists+kvm@lfdr.de>; Wed, 24 Sep 2025 06:12:38 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 39A1F17A0C5
+	for <lists+kvm@lfdr.de>; Wed, 24 Sep 2025 06:15:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9469E2405F8;
-	Wed, 24 Sep 2025 06:12:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C0DF523AB8B;
+	Wed, 24 Sep 2025 06:15:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="InNExGvC"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="IIiO1ezR"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.10])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0367B20DD75
-	for <kvm@vger.kernel.org>; Wed, 24 Sep 2025 06:12:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BF7B31990D9;
+	Wed, 24 Sep 2025 06:15:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.10
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758694340; cv=none; b=ZN2NAAZw2RiXuybMm6ctNqxLwJ2yXQkDZoEJ6KQ8zz5T1vso7msV6wwtkIvoy0TAulJy+N7uTHQfZvSNkFLuWNRYaFuBDzy8npRR5fh5u5UU3uhFaafFfukHc1Uhg4UIf2TwIX+B2q/iefAUbRFyjxarag/Ri8be2J/yVd5ZlYY=
+	t=1758694520; cv=none; b=bPeKDU7Ubrouq8O7Tl0CkV0ldfXXiTaRoKZPOddogOQ2mZvQrBqdu9TyOGRHqAGR6/+gQPixy4ZbsifCP6m0u741qqCyPzrKAEo56+AQCNqC+ia2vbS4NI8hdTLcmsw5gOiEnvLJlxp7Sa7apB67nxvcejNCnO7I1EKDl1wF3g4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758694340; c=relaxed/simple;
-	bh=tIcasXDl46eE1lOkzHTMDyroUWBMIep3XH8fWV0+2/w=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=XmFienjuni9Zy8TTVj2r05akNfptlY5o8ZwyXfVfc9y/5+qYQVtM3tcgY+ugpUFM/VI7s142bWnLSN0e6eJT138kYkgaC4Wb17PqgWHFmG5WNfTP3k0j7QQHItTPjyeMH2DueyAKencA/DbhY2IeaSotqxIHra3XDxIcDAdrXZI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=InNExGvC; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1758694338;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=obyq5KB9uhio1ASM5ols63AORGaXYSesuJnW+grgIYU=;
-	b=InNExGvC9Cae1GGFrXXr0yGGOJprsUV/89JF3heS8oLAN4Z4mBlmZJ/RpVU1Izmji9qJ/v
-	UfnJ8sTJ9fTmRyM/COf4q6lQisnhim1kcPInzDrqP8fEQW30Z/ItXO/MPTwQKconNZT+S1
-	27YMlUwQq/eD9ccTVUwMSJc6xCW/ytw=
-Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
- [209.85.221.72]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-656-SW_EOb6KPySkOeIyzcD85A-1; Wed, 24 Sep 2025 02:12:09 -0400
-X-MC-Unique: SW_EOb6KPySkOeIyzcD85A-1
-X-Mimecast-MFC-AGG-ID: SW_EOb6KPySkOeIyzcD85A_1758694328
-Received: by mail-wr1-f72.google.com with SMTP id ffacd0b85a97d-3ee12ab7f33so2628921f8f.2
-        for <kvm@vger.kernel.org>; Tue, 23 Sep 2025 23:12:09 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1758694328; x=1759299128;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=obyq5KB9uhio1ASM5ols63AORGaXYSesuJnW+grgIYU=;
-        b=QuraUKapzcY76LHq/MSkvNp8hCWKcawUZW5/uqHeOlkXg+6za122rhZkTSsNN6exrD
-         amm77KuVtJpk8YKbtcWUmIoY5EoMPlX94CdHH0l+Vi9rKPvaxMl80YYUpOK4fP3X9k26
-         tH7bCvqOomt4MWQvARgT/v3XR/ZT5K4b2/FOMC/rbalGAEQAYPBejOc/RVRoe77cVSLf
-         hJLGIPcpSbHJ7RgtRU+Dkkz4gwPSB3GHNlTJ4m/jA7T5Z8BHWrZGp+5K8BXQKcaR+PvA
-         F5TW5x+67OP3ij/KswNhxtKaLA2XPmcVybDnvhiWJgSDHQrq8M7dTkDQJ2TzOS4X0c6A
-         joNg==
-X-Forwarded-Encrypted: i=1; AJvYcCWdtsAg2A+B7AGaGWuVBrqA8ZQLWs8iQeG940rqUdnTBSPdzmZ/0hJwo58LdOIER6FQTTw=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzKI5G9kve3VKwVpTZkZVjc3RxrxNy5usEywHHgZAmYSjgOj0Ru
-	UhpHU0v1yl2Lp6jdZaWI6qZRMG0Yk3kVojk01QYvHMkVyuROHYCLOwZFSObDnsgxZ5DELAsmjD9
-	MavHHo7V4MOWG7JRHNYyoPlrT5voLGbmu7c3Mej8+Qh+CadDC0hpS3w==
-X-Gm-Gg: ASbGncvKyix/IDKxLfhCr2t6T5GMVj3NkemSKAIkfN7eDisYLBx67388JtxX0QWGc24
-	9eA7JaNzvioClaXA+FzOh0GlxqzahG+AKh0/+po/OOHgveDGh5WEv74X+RlY8nuO650EGzZI+8V
-	P0e6bndprg6JTS9Jww6P0npxjtwKHqmjw0UKAwt9O9WZpEJKGq6C+iHTlwbAHDyuVGsJM7YJ25T
-	i7eDtk2NmwHZaSF25Pis0oburAfo5yzLOBWX3DIo5hzNm4JkpPYIwEohwDE58qRWaouiTUUhmE9
-	2zYbW7DZGS7PckGMQzc4df4b1CuX8w9Dfps=
-X-Received: by 2002:a5d:5f55:0:b0:3ec:dc7e:70fa with SMTP id ffacd0b85a97d-405ba7d6567mr4766536f8f.0.1758694327779;
-        Tue, 23 Sep 2025 23:12:07 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IFca+XaxCw9iqPFFTMP7I//RvLhGYWDWxxA+SGx262mLacNJmAVtIf5acFtemYSr0M8g8O0pA==
-X-Received: by 2002:a5d:5f55:0:b0:3ec:dc7e:70fa with SMTP id ffacd0b85a97d-405ba7d6567mr4766504f8f.0.1758694327222;
-        Tue, 23 Sep 2025 23:12:07 -0700 (PDT)
-Received: from redhat.com ([2a06:c701:73ea:f900:52ee:df2b:4811:77e0])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3ee0740841dsm26641949f8f.23.2025.09.23.23.12.05
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 23 Sep 2025 23:12:06 -0700 (PDT)
-Date: Wed, 24 Sep 2025 02:12:04 -0400
-From: "Michael S. Tsirkin" <mst@redhat.com>
-To: Simon Schippers <simon.schippers@tu-dortmund.de>
-Cc: willemdebruijn.kernel@gmail.com, jasowang@redhat.com,
-	eperezma@redhat.com, stephen@networkplumber.org, leiyang@redhat.com,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-	virtualization@lists.linux.dev, kvm@vger.kernel.org
-Subject: Re: [PATCH net-next v5 0/8] TUN/TAP & vhost_net: netdev queue flow
- control to avoid ptr_ring tail drop
-Message-ID: <20250924021145-mutt-send-email-mst@kernel.org>
-References: <20250922221553.47802-1-simon.schippers@tu-dortmund.de>
- <20250923105531-mutt-send-email-mst@kernel.org>
- <96058e18-bb1e-46d1-99aa-9fdffb965e44@tu-dortmund.de>
+	s=arc-20240116; t=1758694520; c=relaxed/simple;
+	bh=UQKOU4aOyyJuEOQGOD3vHgI8e0kGhF/WCbFuBJ3fxps=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=Cuy51Q4r0Ku6+76GwQsyEvDdJRz8dDRoUCIwW8VKYy77DIM1md5/8UCQhhCNtPtTXqFzTze6JO0XnGUfR/EB0xjOoXTRLqcGegfVd7lmmhT4KNqSCGNbLpF2eAyYp17ap4jf4iUK+si6thsW6qaldIqhWe4UkLKgwxeIax3wBdc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=pass smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=IIiO1ezR; arc=none smtp.client-ip=198.175.65.10
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1758694519; x=1790230519;
+  h=message-id:date:mime-version:subject:to:cc:references:
+   from:in-reply-to:content-transfer-encoding;
+  bh=UQKOU4aOyyJuEOQGOD3vHgI8e0kGhF/WCbFuBJ3fxps=;
+  b=IIiO1ezRy2Y6xoOEYmJQSuTzz22oXtnam4DhuglYKiB8z3nvqcAodol8
+   dtIm/7zxJjaAu44NDvYtV4SHH8dd3MWtHnYRdSWp/KdrHKYPicZ7PY80/
+   HrN9i3UHDAlImtdEXKEaXbUu1yQ1SZ/J1+dZGc0Fqn0HcGwuOwu6fv2w+
+   gT/eF6/k3WlzRzf0QNURE6fMdr9LkDo12YABesEvdvuho0V0WAYCy+qa7
+   c6auBbbgYiujzUoQQXhBGuHrG+3ARDuAF3Y1VUZASa4idVxBVfrlCw2DK
+   49aiucVvurX423pEVoH5+Ck0FWb4OPDEDcQxGQlevZw29rQg3g84BU3PJ
+   A==;
+X-CSE-ConnectionGUID: hBh4tlIyTr+JctSIShhdhQ==
+X-CSE-MsgGUID: Gy1fe/6cRFOPqHSaghiDCg==
+X-IronPort-AV: E=McAfee;i="6800,10657,11561"; a="78420765"
+X-IronPort-AV: E=Sophos;i="6.18,290,1751266800"; 
+   d="scan'208";a="78420765"
+Received: from fmviesa003.fm.intel.com ([10.60.135.143])
+  by orvoesa102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 23 Sep 2025 23:15:18 -0700
+X-CSE-ConnectionGUID: BwNK/+FdQIap4yTcPLbJDw==
+X-CSE-MsgGUID: j5m87MtgSauJ+9GwEE8sxg==
+X-ExtLoop1: 1
+Received: from unknown (HELO [10.238.0.107]) ([10.238.0.107])
+  by fmviesa003-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 23 Sep 2025 23:15:13 -0700
+Message-ID: <86ab9923-624d-4950-abea-46780e94c6ce@linux.intel.com>
+Date: Wed, 24 Sep 2025 14:15:11 +0800
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <96058e18-bb1e-46d1-99aa-9fdffb965e44@tu-dortmund.de>
-
-On Wed, Sep 24, 2025 at 07:59:46AM +0200, Simon Schippers wrote:
-> On 23.09.25 16:55, Michael S. Tsirkin wrote:
-> > On Tue, Sep 23, 2025 at 12:15:45AM +0200, Simon Schippers wrote:
-> >> This patch series deals with TUN, TAP and vhost_net which drop incoming 
-> >> SKBs whenever their internal ptr_ring buffer is full. Instead, with this 
-> >> patch series, the associated netdev queue is stopped before this happens. 
-> >> This allows the connected qdisc to function correctly as reported by [1] 
-> >> and improves application-layer performance, see our paper [2]. Meanwhile 
-> >> the theoretical performance differs only slightly:
-> >>
-> >> +------------------------+----------+----------+
-> >> | pktgen benchmarks      | Stock    | Patched  |
-> >> | i5 6300HQ, 20M packets |          |          |
-> >> +------------------------+----------+----------+
-> >> | TAP                    | 2.10Mpps | 1.99Mpps |
-> >> +------------------------+----------+----------+
-> >> | TAP+vhost_net          | 6.05Mpps | 6.14Mpps |
-> >> +------------------------+----------+----------+
-> >> | Note: Patched had no TX drops at all,        |
-> >> | while stock suffered numerous drops.         |
-> >> +----------------------------------------------+
-> >>
-> >> This patch series includes TUN, TAP, and vhost_net because they share 
-> >> logic. Adjusting only one of them would break the others. Therefore, the 
-> >> patch series is structured as follows:
-> >> 1+2: New ptr_ring helpers for 3 & 4
-> >> 3: TUN & TAP: Stop netdev queue upon reaching a full ptr_ring
-> > 
-> > 
-> > so what happens if you only apply patches 1-3?
-> > 
-> 
-> The netdev queue of vhost_net would be stopped by tun_net_xmit but will
-> never be woken again.
-
-So this breaks bisect. Don't split patches like this please.
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v3 08/16] x86/virt/tdx: Optimize tdx_alloc/free_page()
+ helpers
+To: Rick Edgecombe <rick.p.edgecombe@intel.com>
+Cc: kas@kernel.org, bp@alien8.de, chao.gao@intel.com,
+ dave.hansen@linux.intel.com, isaku.yamahata@intel.com, kai.huang@intel.com,
+ kvm@vger.kernel.org, linux-coco@lists.linux.dev,
+ linux-kernel@vger.kernel.org, mingo@redhat.com, pbonzini@redhat.com,
+ seanjc@google.com, tglx@linutronix.de, x86@kernel.org, yan.y.zhao@intel.com,
+ vannapurve@google.com, "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>
+References: <20250918232224.2202592-1-rick.p.edgecombe@intel.com>
+ <20250918232224.2202592-9-rick.p.edgecombe@intel.com>
+Content-Language: en-US
+From: Binbin Wu <binbin.wu@linux.intel.com>
+In-Reply-To: <20250918232224.2202592-9-rick.p.edgecombe@intel.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 
 
-> >> 4: TUN & TAP: Wake netdev queue after consuming an entry
-> >> 5+6+7: TUN & TAP: ptr_ring wrappers and other helpers to be called by 
-> >> vhost_net
-> >> 8: vhost_net: Call the wrappers & helpers
-> >>
-> >> Possible future work:
-> >> - Introduction of Byte Queue Limits as suggested by Stephen Hemminger
-> >> - Adaption of the netdev queue flow control for ipvtap & macvtap
-> >>
-> >> [1] Link: 
-> >> https://unix.stackexchange.com/questions/762935/traffic-shaping-ineffective-on-tun-device
-> >> [2] Link: 
-> >> https://cni.etit.tu-dortmund.de/storages/cni-etit/r/Research/Publications/2025/Gebauer_2025_VTCFall/Gebauer_VTCFall2025_AuthorsVersion.pdf
-> >>
-> >> Links to previous versions:
-> >> V4: 
-> >> https://lore.kernel.org/netdev/20250902080957.47265-1-simon.schippers@tu-dortmund.de/T/#u
-> >> V3: 
-> >> https://lore.kernel.org/netdev/20250825211832.84901-1-simon.schippers@tu-dortmund.de/T/#u
-> >> V2: 
-> >> https://lore.kernel.org/netdev/20250811220430.14063-1-simon.schippers@tu-dortmund.de/T/#u
-> >> V1: 
-> >> https://lore.kernel.org/netdev/20250808153721.261334-1-simon.schippers@tu-dortmund.de/T/#u
-> >>
-> >> Changelog:
-> >> V4 -> V5:
-> >> - Stop the netdev queue prior to producing the final fitting ptr_ring entry
-> >> -> Ensures the consumer has the latest netdev queue state, making it safe 
-> >> to wake the queue
-> >> -> Resolves an issue in vhost_net where the netdev queue could remain 
-> >> stopped despite being empty
-> >> -> For TUN/TAP, the netdev queue no longer needs to be woken in the 
-> >> blocking loop
-> >> -> Introduces new helpers __ptr_ring_full_next and 
-> >> __ptr_ring_will_invalidate for this purpose
-> >>
-> >> - vhost_net now uses wrappers of TUN/TAP for ptr_ring consumption rather 
-> >> than maintaining its own rx_ring pointer
-> >>
-> >> V3 -> V4:
-> >> - Target net-next instead of net
-> >> - Changed to patch series instead of single patch
-> >> - Changed to new title from old title
-> >> "TUN/TAP: Improving throughput and latency by avoiding SKB drops"
-> >> - Wake netdev queue with new helpers wake_netdev_queue when there is any 
-> >> spare capacity in the ptr_ring instead of waiting for it to be empty
-> >> - Use tun_file instead of tun_struct in tun_ring_recv as a more consistent 
-> >> logic
-> >> - Use smp_wmb() and smp_rmb() barrier pair, which avoids any packet drops 
-> >> that happened rarely before
-> >> - Use safer logic for vhost_net using RCU read locks to access TUN/TAP data
-> >>
-> >> V2 -> V3: Added support for TAP and TAP+vhost_net.
-> >>
-> >> V1 -> V2: Removed NETDEV_TX_BUSY return case in tun_net_xmit and removed 
-> >> unnecessary netif_tx_wake_queue in tun_ring_recv.
-> >>
-> >> Thanks,
-> >> Simon :)
-> >>
-> >> Simon Schippers (8):
-> >>   __ptr_ring_full_next: Returns if ring will be full after next
-> >>     insertion
-> >>   Move the decision of invalidation out of __ptr_ring_discard_one
-> >>   TUN, TAP & vhost_net: Stop netdev queue before reaching a full
-> >>     ptr_ring
-> >>   TUN & TAP: Wake netdev queue after consuming an entry
-> >>   TUN & TAP: Provide ptr_ring_consume_batched wrappers for vhost_net
-> >>   TUN & TAP: Provide ptr_ring_unconsume wrappers for vhost_net
-> >>   TUN & TAP: Methods to determine whether file is TUN/TAP for vhost_net
-> >>   vhost_net: Replace rx_ring with calls of TUN/TAP wrappers
-> >>
-> >>  drivers/net/tap.c        | 115 +++++++++++++++++++++++++++++++--
-> >>  drivers/net/tun.c        | 136 +++++++++++++++++++++++++++++++++++----
-> >>  drivers/vhost/net.c      |  90 +++++++++++++++++---------
-> >>  include/linux/if_tap.h   |  15 +++++
-> >>  include/linux/if_tun.h   |  18 ++++++
-> >>  include/linux/ptr_ring.h |  54 +++++++++++++---
-> >>  6 files changed, 367 insertions(+), 61 deletions(-)
-> >>
-> >> -- 
-> >> 2.43.0
-> > 
+
+On 9/19/2025 7:22 AM, Rick Edgecombe wrote:
+> From: "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>
+>
+> Optimize the PAMT alloc/free helpers to avoid taking the global lock when
+> possible.
+>
+> The recently introduced PAMT alloc/free helpers maintain a refcount to
+> keep track of when it is ok to reclaim and free a 4KB PAMT page. This
+> refcount is protected by a global lock in order to guarantee that races
+> don’t result in the PAMT getting freed while another caller requests it
+> be mapped. But a global lock is a bit heavyweight, especially since the
+> refcounts can be (already are) updated atomically.
+>
+> A simple approach would be to increment/decrement the refcount outside of
+> the lock before actually adjusting the PAMT, and only adjust the PAMT if
+> the refcount transitions from/to 0. This would correctly allocate and free
+> the PAMT page without getting out of sync. But there it leaves a race
+> where a simultaneous caller could see the refcount already incremented and
+> return before it is actually mapped.
+>
+> So treat the refcount 0->1 case as a special case. On add, if the refcount
+> is zero *don’t* increment the refcount outside the lock (to 1). Always
+> take the lock in that case and only set the refcount to 1 after the PAMT
+> is actually added. This way simultaneous adders, when PAMT is not
+> installed yet, will take the slow lock path.
+>
+> On the 1->0 case, it is ok to return from tdx_pamt_put() when the DPAMT is
+> not actually freed yet, so the basic approach works. Just decrement the
+> refcount before  taking the lock. Only do the lock and removal of the PAMT
+> when the refcount goes to zero.
+>
+> There is an asymmetry between tdx_pamt_get() and tdx_pamt_put() in that
+> tdx_pamt_put() goes 1->0 outside the lock, but tdx_pamt_put() does 0-1
+                                                      ^
+                                                 tdx_pamt_get() ?
+> inside the lock. Because of this, there is a special race where
+> tdx_pamt_put() could decrement the refcount to zero before the PAMT is
+> actually removed, and tdx_pamt_get() could try to do a PAMT.ADD when the
+> page is already mapped. Luckily the TDX module will tell return a special
+> error that tells us we hit this case. So handle it specially by looking
+> for the error code.
+>
+> The optimization is a little special, so make the code extra commented
+> and verbose.
+>
+> Signed-off-by: Kirill A. Shutemov <kirill.shutemov@linux.intel.com>
+> [Clean up code, update log]
+> Signed-off-by: Rick Edgecombe <rick.p.edgecombe@intel.com>
+> ---
+> v3:
+>   - Split out optimization from “x86/virt/tdx: Add tdx_alloc/free_page() helpers”
+>   - Remove edge case handling that I could not find a reason for
+>   - Write log
+> ---
+>   arch/x86/include/asm/shared/tdx_errno.h |  2 ++
+>   arch/x86/virt/vmx/tdx/tdx.c             | 46 +++++++++++++++++++++----
+>   2 files changed, 42 insertions(+), 6 deletions(-)
+>
+> diff --git a/arch/x86/include/asm/shared/tdx_errno.h b/arch/x86/include/asm/shared/tdx_errno.h
+> index 49ab7ecc7d54..4bc0b9c9e82b 100644
+> --- a/arch/x86/include/asm/shared/tdx_errno.h
+> +++ b/arch/x86/include/asm/shared/tdx_errno.h
+> @@ -21,6 +21,7 @@
+>   #define TDX_PREVIOUS_TLB_EPOCH_BUSY		0x8000020100000000ULL
+>   #define TDX_RND_NO_ENTROPY			0x8000020300000000ULL
+>   #define TDX_PAGE_METADATA_INCORRECT		0xC000030000000000ULL
+> +#define TDX_HPA_RANGE_NOT_FREE			0xC000030400000000ULL
+>   #define TDX_VCPU_NOT_ASSOCIATED			0x8000070200000000ULL
+>   #define TDX_KEY_GENERATION_FAILED		0x8000080000000000ULL
+>   #define TDX_KEY_STATE_INCORRECT			0xC000081100000000ULL
+> @@ -100,6 +101,7 @@ DEFINE_TDX_ERRNO_HELPER(TDX_SUCCESS);
+>   DEFINE_TDX_ERRNO_HELPER(TDX_RND_NO_ENTROPY);
+>   DEFINE_TDX_ERRNO_HELPER(TDX_OPERAND_INVALID);
+>   DEFINE_TDX_ERRNO_HELPER(TDX_OPERAND_BUSY);
+> +DEFINE_TDX_ERRNO_HELPER(TDX_HPA_RANGE_NOT_FREE);
+>   DEFINE_TDX_ERRNO_HELPER(TDX_VCPU_NOT_ASSOCIATED);
+>   DEFINE_TDX_ERRNO_HELPER(TDX_FLUSHVP_NOT_DONE);
+>   
+> diff --git a/arch/x86/virt/vmx/tdx/tdx.c b/arch/x86/virt/vmx/tdx/tdx.c
+> index af73b6c2e917..c25e238931a7 100644
+> --- a/arch/x86/virt/vmx/tdx/tdx.c
+> +++ b/arch/x86/virt/vmx/tdx/tdx.c
+> @@ -2117,7 +2117,7 @@ int tdx_pamt_get(struct page *page)
+>   	u64 pamt_pa_array[MAX_DPAMT_ARG_SIZE];
+>   	atomic_t *pamt_refcount;
+>   	u64 tdx_status;
+> -	int ret;
+> +	int ret = 0;
+>   
+>   	if (!tdx_supports_dynamic_pamt(&tdx_sysinfo))
+>   		return 0;
+> @@ -2128,14 +2128,40 @@ int tdx_pamt_get(struct page *page)
+>   
+>   	pamt_refcount = tdx_find_pamt_refcount(hpa);
+>   
+> +	if (atomic_inc_not_zero(pamt_refcount))
+> +		goto out_free;
+> +
+>   	scoped_guard(spinlock, &pamt_lock) {
+> -		if (atomic_read(pamt_refcount))
+> +		/*
+> +		 * Lost race to other tdx_pamt_add(). Other task has already allocated
+> +		 * PAMT memory for the HPA.
+> +		 */
+> +		if (atomic_read(pamt_refcount)) {
+> +			atomic_inc(pamt_refcount);
+>   			goto out_free;
+> +		}
+>   
+>   		tdx_status = tdh_phymem_pamt_add(hpa | TDX_PS_2M, pamt_pa_array);
+>   
+>   		if (IS_TDX_SUCCESS(tdx_status)) {
+> +			/*
+> +			 * The refcount is zero, and this locked path is the only way to
+> +			 * increase it from 0-1. If the PAMT.ADD was successful, set it
+> +			 * to 1 (obviously).
+> +			 */
+> +			atomic_set(pamt_refcount, 1);
+> +		} else if (IS_TDX_HPA_RANGE_NOT_FREE(tdx_status)) {
+> +			/*
+> +			 * Less obviously, another CPU's call to tdx_pamt_put() could have
+> +			 * decremented the refcount before entering its lock section.
+> +			 * In this case, the PAMT is not actually removed yet. Luckily
+> +			 * TDX module tells about this case, so increment the refcount
+> +			 * 0-1, so tdx_pamt_put() skips its pending PAMT.REMOVE.
+> +			 *
+> +			 * The call didn't need the pages though, so free them.
+> +			 */
+>   			atomic_inc(pamt_refcount);
+> +			goto out_free;
+>   		} else {
+>   			pr_err("TDH_PHYMEM_PAMT_ADD failed: %#llx\n", tdx_status);
+>   			goto out_free;
+> @@ -2167,15 +2193,23 @@ void tdx_pamt_put(struct page *page)
+>   
+>   	pamt_refcount = tdx_find_pamt_refcount(hpa);
+>   
+> +	/*
+> +	 * Unlike the paired call in tdx_pamt_get(), decrement the refcount
+> +	 * outside the lock even if it's not the special 0<->1 transition.
+it's not -> it's ?
+
+> +	 * See special logic around HPA_RANGE_NOT_FREE in tdx_pamt_get().
+> +	 */
+> +	if (!atomic_dec_and_test(pamt_refcount))
+> +		return;
+> +
+>   	scoped_guard(spinlock, &pamt_lock) {
+> -		if (!atomic_read(pamt_refcount))
+> +		/* Lost race with tdx_pamt_get() */
+> +		if (atomic_read(pamt_refcount))
+>   			return;
+>   
+>   		tdx_status = tdh_phymem_pamt_remove(hpa | TDX_PS_2M, pamt_pa_array);
+>   
+> -		if (IS_TDX_SUCCESS(tdx_status)) {
+> -			atomic_dec(pamt_refcount);
+> -		} else {
+> +		if (!IS_TDX_SUCCESS(tdx_status)) {
+> +			atomic_inc(pamt_refcount);
+>   			pr_err("TDH_PHYMEM_PAMT_REMOVE failed: %#llx\n", tdx_status);
+>   			return;
+>   		}
 
 
