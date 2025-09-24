@@ -1,158 +1,127 @@
-Return-Path: <kvm+bounces-58623-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-58624-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id E1946B98C41
-	for <lists+kvm@lfdr.de>; Wed, 24 Sep 2025 10:10:13 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1F82CB98C65
+	for <lists+kvm@lfdr.de>; Wed, 24 Sep 2025 10:13:55 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6BDD63B5C67
-	for <lists+kvm@lfdr.de>; Wed, 24 Sep 2025 08:10:11 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id DC6C819C13A3
+	for <lists+kvm@lfdr.de>; Wed, 24 Sep 2025 08:14:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9C11428136B;
-	Wed, 24 Sep 2025 08:10:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="PIaKNLU5"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 62ABF281503;
+	Wed, 24 Sep 2025 08:13:46 +0000 (UTC)
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3107528031C
-	for <kvm@vger.kernel.org>; Wed, 24 Sep 2025 08:09:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+Received: from mail.loongson.cn (mail.loongson.cn [114.242.206.163])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E4A2C5FDA7;
+	Wed, 24 Sep 2025 08:13:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=114.242.206.163
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758701400; cv=none; b=KgRc2dqinZXgNWEc0OG1DLr+foHDpz7rK2CPKDo2Ff5/26aMOYHiC3sjy7DeiZg84x6V9zbPTO3cyJr0BW1IqArAPEA90uiA4WdQjUZCOy/uJi3KpCHqCJEFzDVLH7sZP1TdG2hgZ+oVuGzA41L2g14dtRhASngydRZ7DN5RFlY=
+	t=1758701625; cv=none; b=QV/xKKuHPwtx6E4OPZctqu3P5f+aCUyXipr3Oao6qomJEWN+y2T9DHHT22SK/9Mrpeiph6qVjqjWSoShJEAci8neyqdhkaa/Sxe3Og015NjQxTSToCDXvIWbst8j9bXKL6O6untvjWKkhpdpDIjR/QVz9PP3M1j9qAe89jofCpA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758701400; c=relaxed/simple;
-	bh=iyV5w9cbgt6ZgVOTxo8iAQ4w6DBDgBjEsyMsIZQh/kU=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=EOowvhTsIEEuvgPXvlY9KtRD8Rw4YbFm0m+ewS+D5o5OcWzOMVlR8YfeQ+TM1n8Uo0adyh65Qu3j1SD+mUJ7241MuPZSW1IBLjt5iRlyn/mlkZHcVG4Lf/3wVKEdNr6YoS/RiVaQ+97CPajWekBGHrudmFPLiR+13Z6QeVcg7dc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=PIaKNLU5; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1758701398;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=CkM4oXRVV4nD2vjM2JL+8uqwWZZi2+21i3PZycL5UHY=;
-	b=PIaKNLU5Anfh732lj7csOM1LaofINFbc6I4L4Oe0GG6CLB9C8aYy8BXk58JAHurJA7nNWP
-	HqudR35Cf7km8ENtqyDtRUw6+emaVNuTrKURA8aXlGY7FqamhM1csDAh6Uv2LTA1mH0Mli
-	hgCYyNIqyuO/+9/NsU8MY8F0v83yinY=
-Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
- [209.85.128.71]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-321-mj5cBJk8N_OxQ4J1zjOsnQ-1; Wed, 24 Sep 2025 04:09:56 -0400
-X-MC-Unique: mj5cBJk8N_OxQ4J1zjOsnQ-1
-X-Mimecast-MFC-AGG-ID: mj5cBJk8N_OxQ4J1zjOsnQ_1758701395
-Received: by mail-wm1-f71.google.com with SMTP id 5b1f17b1804b1-45b990eb77cso4376815e9.0
-        for <kvm@vger.kernel.org>; Wed, 24 Sep 2025 01:09:56 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1758701395; x=1759306195;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=CkM4oXRVV4nD2vjM2JL+8uqwWZZi2+21i3PZycL5UHY=;
-        b=mfzP4df1WcKpchK0KrfFbRZB3qjv9Y/D+uXKDNlxwETXTGDxB6LI5bbljA0RM8HhvW
-         Y5Mg2XdQ0BqxKzt9iH3n/LXoF0HaQM6Du79aqNQqvOmTgZxiAHxpUd27xYX7cKlI+CGm
-         CJbwnJEiVLIC0e1B9u7orKhthQpm3s3AXc4/6/rtlfcvN8KHJOGxn2HaMPLky6x/31h5
-         qRB5MsfRCEo3AKc5JVZvEgZ+8OxEhs2FsPLT4TknTfN7AhZkm37oLREUIb4Jk8dOI7cK
-         HK28vHgVWtxmq8vTEpUb3W83LuCKgNOD1f6ZVELlpE+qag7n/UwSRjRHfDi0q68T8F5B
-         TmwA==
-X-Forwarded-Encrypted: i=1; AJvYcCVpj4B0MmYhkmUGcn2WeAFKJrdlspLWBLtDoIhZYMRasHR9ZorW41uhAXMkJP6O481AC5M=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxjYi5k4guLrbIlwomZ3+Aje9hqrhIp1XXivL3TFyBo8dolCLND
-	uuLC6Q+fJNC/uJ0s2Slt9rGPmF2YlK8qB+V7GMhhWD0KU+foVv29cHmtUmgkAslOymTcoaXfaYm
-	mTLpTbrGZy1K5pfmV6OKpyk3GyWHkOKbCZQDzDBXQ3tKWXVN2AQc9dA==
-X-Gm-Gg: ASbGncuAzte0qSPxVRmJkDf2LmHnS+aUEN7b38T88DzJiv9Kl7of0668tCH7WaVjN9Z
-	VlMQMzXQQI4J2o6ZSoe2ea2KCNtQUO7kYuYmAtrBUYc2RUe76Ddw2qzAcPtSeQRbgJZKZMr03Sg
-	JwU6+/G4wr9b6pyG89ak/ujtDNxcE9z3bMbPYBssr5fi7KXRiXzWLbzDTssvhjDNBTHlFhT4xE6
-	89T+2q+6ZngfHKWHjbyBrvCMj93rG+IZSkkC7g96Qd3fpmvoebtcLetuBUwsU8M/6eJmtL15wLF
-	oEygJ+rXQkMNHvzqdO+502u0WKE8BH5SZeY=
-X-Received: by 2002:a05:600c:540b:b0:46e:28cc:e56f with SMTP id 5b1f17b1804b1-46e2b539770mr14433285e9.6.1758701395308;
-        Wed, 24 Sep 2025 01:09:55 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IG2isQpxZ6pAJzr2vpEkZfoKb5tx8a+WdsYfEl5CDZPv35AgMoMJYvNF0tcDqDtm8H3UIV5Gg==
-X-Received: by 2002:a05:600c:540b:b0:46e:28cc:e56f with SMTP id 5b1f17b1804b1-46e2b539770mr14432985e9.6.1758701394926;
-        Wed, 24 Sep 2025 01:09:54 -0700 (PDT)
-Received: from redhat.com ([2a06:c701:73ea:f900:52ee:df2b:4811:77e0])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-46e2ab31bdesm20213965e9.11.2025.09.24.01.09.53
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 24 Sep 2025 01:09:54 -0700 (PDT)
-Date: Wed, 24 Sep 2025 04:09:51 -0400
-From: "Michael S. Tsirkin" <mst@redhat.com>
-To: Jason Wang <jasowang@redhat.com>
-Cc: Simon Schippers <simon.schippers@tu-dortmund.de>,
-	willemdebruijn.kernel@gmail.com, eperezma@redhat.com,
-	stephen@networkplumber.org, leiyang@redhat.com,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-	virtualization@lists.linux.dev, kvm@vger.kernel.org
-Subject: Re: [PATCH net-next v5 0/8] TUN/TAP & vhost_net: netdev queue flow
- control to avoid ptr_ring tail drop
-Message-ID: <20250924040915-mutt-send-email-mst@kernel.org>
-References: <20250922221553.47802-1-simon.schippers@tu-dortmund.de>
- <20250924031105-mutt-send-email-mst@kernel.org>
- <CACGkMEuriTgw4+bFPiPU-1ptipt-WKvHdavM53ANwkr=iSvYYg@mail.gmail.com>
- <20250924034112-mutt-send-email-mst@kernel.org>
- <CACGkMEtdQ8j0AXttjLyPNSKq9-s0tSJPzRtKcWhXTF3M_PkVLQ@mail.gmail.com>
+	s=arc-20240116; t=1758701625; c=relaxed/simple;
+	bh=RU9nU4TgrkuZsnJ7uuoI3e4j3dHjMdpU+wa0jq7caDM=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=LPQEd/tojXi3twLrVXBYlf780oefLo7Urvb/xuSSi9WcFHTGeo0PcVt94AZ7Kd+Xig0fUwzSqysIKY/NixIlRocd/FwL0vZNtqRW/bt0iXWXiK9nuQVQ9f6SWfedr0OXqTmmwFHYuLiyQL8+DIikOvpwNFPHg/YLfZaEPC9Z9LM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=loongson.cn; spf=pass smtp.mailfrom=loongson.cn; arc=none smtp.client-ip=114.242.206.163
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=loongson.cn
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=loongson.cn
+Received: from loongson.cn (unknown [223.64.68.198])
+	by gateway (Coremail) with SMTP id _____8CxK9IvqNNonP8NAA--.28736S3;
+	Wed, 24 Sep 2025 16:13:35 +0800 (CST)
+Received: from localhost.localdomain (unknown [223.64.68.198])
+	by front1 (Coremail) with SMTP id qMiowJAx_8EcqNNorvaqAA--.46292S2;
+	Wed, 24 Sep 2025 16:13:27 +0800 (CST)
+From: Huacai Chen <chenhuacai@loongson.cn>
+To: Paolo Bonzini <pbonzini@redhat.com>,
+	Huacai Chen <chenhuacai@kernel.org>,
+	Tianrui Zhao <zhaotianrui@loongson.cn>,
+	Bibo Mao <maobibo@loongson.cn>
+Cc: kvm@vger.kernel.org,
+	loongarch@lists.linux.dev,
+	linux-kernel@vger.kernel.org,
+	Xuerui Wang <kernel@xen0n.name>,
+	Jiaxun Yang <jiaxun.yang@flygoat.com>,
+	Huacai Chen <chenhuacai@loongson.cn>
+Subject: [GIT PULL] LoongArch KVM changes for v6.18
+Date: Wed, 24 Sep 2025 16:13:05 +0800
+Message-ID: <20250924081305.3068787-1-chenhuacai@loongson.cn>
+X-Mailer: git-send-email 2.47.3
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <CACGkMEtdQ8j0AXttjLyPNSKq9-s0tSJPzRtKcWhXTF3M_PkVLQ@mail.gmail.com>
+X-CM-TRANSID:qMiowJAx_8EcqNNorvaqAA--.46292S2
+X-CM-SenderInfo: hfkh0x5xdftxo6or00hjvr0hdfq/
+X-Coremail-Antispam: 1Uk129KBj93XoW7tw4fZFWfJF4UJw17Aw43Arc_yoW8uFW5pF
+	13urnrCr4rJrW7Xry8X343WrnrAF1xGryaqF45Kw48CF1DAFyjgryUXr95ZFyjka93Jr10
+	qw1rGw1jvF1UAagCm3ZEXasCq-sJn29KB7ZKAUJUUUUr529EdanIXcx71UUUUU7KY7ZEXa
+	sCq-sGcSsGvfJ3Ic02F40EFcxC0VAKzVAqx4xG6I80ebIjqfuFe4nvWSU5nxnvy29KBjDU
+	0xBIdaVrnRJUUUvEb4IE77IF4wAFF20E14v26r1j6r4UM7CY07I20VC2zVCF04k26cxKx2
+	IYs7xG6rWj6s0DM7CIcVAFz4kK6r1Y6r17M28lY4IEw2IIxxk0rwA2F7IY1VAKz4vEj48v
+	e4kI8wA2z4x0Y4vE2Ix0cI8IcVAFwI0_Ar0_tr1l84ACjcxK6xIIjxv20xvEc7CjxVAFwI
+	0_Cr0_Gr1UM28EF7xvwVC2z280aVAFwI0_GcCE3s1l84ACjcxK6I8E87Iv6xkF7I0E14v2
+	6rxl6s0DM2kKe7AKxVWUXVWUAwAS0I0E0xvYzxvE52x082IY62kv0487Mc804VCY07AIYI
+	kI8VC2zVCFFI0UMc02F40EFcxC0VAKzVAqx4xG6I80ewAv7VC0I7IYx2IY67AKxVWUXVWU
+	AwAv7VC2z280aVAFwI0_Gr0_Cr1lOx8S6xCaFVCjc4AY6r1j6r4UM4x0Y48IcxkI7VAKI4
+	8JMxAIw28IcxkI7VAKI48JMxC20s026xCaFVCjc4AY6r1j6r4UMxCIbckI1I0E14v26r1Y
+	6r17MI8I3I0E5I8CrVAFwI0_Jr0_Jr4lx2IqxVCjr7xvwVAFwI0_JrI_JrWlx4CE17CEb7
+	AF67AKxVWUtVW8ZwCIc40Y0x0EwIxGrwCI42IY6xIIjxv20xvE14v26r1j6r1xMIIF0xvE
+	2Ix0cI8IcVCY1x0267AKxVWUJVW8JwCI42IY6xAIw20EY4v20xvaj40_Jr0_JF4lIxAIcV
+	C2z280aVAFwI0_Jr0_Gr1lIxAIcVC2z280aVCY1x0267AKxVWUJVW8JbIYCTnIWIevJa73
+	UjIFyTuYvjxU4s2-UUUUU
 
-On Wed, Sep 24, 2025 at 04:08:33PM +0800, Jason Wang wrote:
-> On Wed, Sep 24, 2025 at 3:42 PM Michael S. Tsirkin <mst@redhat.com> wrote:
-> >
-> > On Wed, Sep 24, 2025 at 03:33:08PM +0800, Jason Wang wrote:
-> > > On Wed, Sep 24, 2025 at 3:18 PM Michael S. Tsirkin <mst@redhat.com> wrote:
-> > > >
-> > > > On Tue, Sep 23, 2025 at 12:15:45AM +0200, Simon Schippers wrote:
-> > > > > This patch series deals with TUN, TAP and vhost_net which drop incoming
-> > > > > SKBs whenever their internal ptr_ring buffer is full. Instead, with this
-> > > > > patch series, the associated netdev queue is stopped before this happens.
-> > > > > This allows the connected qdisc to function correctly as reported by [1]
-> > > > > and improves application-layer performance, see our paper [2]. Meanwhile
-> > > > > the theoretical performance differs only slightly:
-> > > >
-> > > >
-> > > > About this whole approach.
-> > > > What if userspace is not consuming packets?
-> > > > Won't the watchdog warnings appear?
-> > > > Is it safe to allow userspace to block a tx queue
-> > > > indefinitely?
-> > >
-> > > I think it's safe as it's a userspace device, there's no way to
-> > > guarantee the userspace can process the packet in time (so no watchdog
-> > > for TUN).
-> > >
-> > > Thanks
-> >
-> > Hmm. Anyway, I guess if we ever want to enable timeout for tun,
-> > we can worry about it then.
-> 
-> The problem is that the skb is freed until userspace calls recvmsg(),
-> so it would be tricky to implement a watchdog. (Or if we can do, we
-> can do BQL as well).
+The following changes since commit 07e27ad16399afcd693be20211b0dfae63e0615f:
 
-I thought the watchdog generally watches queues not individual skbs?
+  Linux 6.17-rc7 (2025-09-21 15:08:52 -0700)
 
-> > Does not need to block this patchset.
-> 
-> Yes.
-> 
-> Thanks
-> 
-> >
-> > > >
-> > > > --
-> > > > MST
-> > > >
-> >
+are available in the Git repository at:
+
+  git://git.kernel.org/pub/scm/linux/kernel/git/chenhuacai/linux-loongson.git tags/loongarch-kvm-6.18
+
+for you to fetch changes up to 66e2d96b1c5875122bfb94239989d832ccf51477:
+
+  LoongArch: KVM: Move kvm_iocsr tracepoint out of generic code (2025-09-23 23:37:26 +0800)
+
+----------------------------------------------------------------
+LoongArch KVM changes for v6.18
+
+1. Add PTW feature detection on new hardware.
+2. Add sign extension with kernel MMIO/IOCSR emulation.
+3. Improve in-kernel IPI emulation.
+4. Improve in-kernel PCH-PIC emulation.
+5. Move kvm_iocsr tracepoint out of generic code.
+
+----------------------------------------------------------------
+Bibo Mao (9):
+      LoongArch: KVM: Add PTW feature detection on new hardware
+      LoongArch: KVM: Add sign extension with kernel MMIO read emulation
+      LoongArch: KVM: Add sign extension with kernel IOCSR read emulation
+      LoongArch: KVM: Add implementation with IOCSR_IPI_SET
+      LoongArch: KVM: Access mailbox directly in mail_send()
+      LoongArch: KVM: Set version information at initial stage
+      LoongArch: KVM: Add IRR and ISR register read emulation
+      LoongArch: KVM: Add different length support in loongarch_pch_pic_read()
+      LoongArch: KVM: Add different length support in loongarch_pch_pic_write()
+
+Steven Rostedt (1):
+      LoongArch: KVM: Move kvm_iocsr tracepoint out of generic code
+
+Yury Norov (NVIDIA) (1):
+      LoongArch: KVM: Rework pch_pic_update_batch_irqs()
+
+ arch/loongarch/include/asm/kvm_pch_pic.h |  15 +-
+ arch/loongarch/include/uapi/asm/kvm.h    |   1 +
+ arch/loongarch/kvm/exit.c                |  19 +--
+ arch/loongarch/kvm/intc/ipi.c            |  80 ++++++-----
+ arch/loongarch/kvm/intc/pch_pic.c        | 239 +++++++++++++------------------
+ arch/loongarch/kvm/trace.h               |  35 +++++
+ arch/loongarch/kvm/vcpu.c                |   2 +
+ arch/loongarch/kvm/vm.c                  |   4 +
+ include/trace/events/kvm.h               |  35 -----
+ 9 files changed, 211 insertions(+), 219 deletions(-)
 
 
