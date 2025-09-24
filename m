@@ -1,80 +1,80 @@
-Return-Path: <kvm+bounces-58680-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-58682-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id CD69DB9B03E
-	for <lists+kvm@lfdr.de>; Wed, 24 Sep 2025 19:18:15 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2196DB9B053
+	for <lists+kvm@lfdr.de>; Wed, 24 Sep 2025 19:18:44 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id CB77F1BC055A
-	for <lists+kvm@lfdr.de>; Wed, 24 Sep 2025 17:18:37 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id BE5884C7D58
+	for <lists+kvm@lfdr.de>; Wed, 24 Sep 2025 17:18:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 21AD431B82E;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AFAEB31CA7F;
 	Wed, 24 Sep 2025 17:16:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="mE2cliMf"
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="scCu2Ntu"
 X-Original-To: kvm@vger.kernel.org
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8615931A549;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0B02531A7FE;
 	Wed, 24 Sep 2025 17:16:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758734207; cv=none; b=ViDxDzU/V3K7zcH7I0Ds01xa0LA/X0Z8QEbyYP/o5f93nX3eq3tWS0Urmobl0M3i45mGqIZGHaKHoJSBsfwSnErxxevz66Lwxn/apX0djvmTu6uIQuk5OT8oVzlSrDMxexwwPjdOOP2enZNaZ6S2qZDF1XjFi2MfEAyEBpT+gGo=
+	t=1758734207; cv=none; b=YSR13kv+NtoPDkGDHwdsQsVDt2RtvJndstkvloOczO+XrhgJactlAMVhYD1kaUPHD3/lne6fQ12w5Et+j8fwoOFjUrZu/IzvI6fma5Asd73QY/0YuHFLzlWgdyLjAOjY/3JQdp81UDrMY6h+gJCqJgj+DWdv892+TSUhM7+d18o=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1758734207; c=relaxed/simple;
-	bh=1RXASWL+I3J3u2dKE3vN+USAb0FAaslxVixQNgxLNAY=;
+	bh=7f1tPgGaOdUema3daP0tIwh/qEBb+lZsUgVn6G7qQIk=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=iTC/lbR9LAKcSX9V9YLg7FRSF4BrP17fzp75EY+yU9Uws8Bpz+SMtknq7fBf6iWLu23BEd8z8+SDARM2BXAWo0iQdwJM/AYxgU7si/xQvE01EIZVnujI8u4NOL3c1D+DTHUcvBEbM/Vp/S1I2UEsXvinQWuUgBSsCiRKz/aEEIo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=mE2cliMf; arc=none smtp.client-ip=148.163.156.1
+	 MIME-Version; b=pTLDM0i3DxXTAAOhKgzdJOfRFALH9qGp7JqAMkIFW82PLjh8IHUw1ohoH5fVmFbejsp7Muuk6hm0g5iQ9cfhvKB4+hmZ4ErHVCA2a3C80jfmCjNODMGyA2h9SkYON2xkLMFsWXQeymDSORv3TfJke4GS/b7uXx3CVYigNEP3fPk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=scCu2Ntu; arc=none smtp.client-ip=148.163.158.5
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
-Received: from pps.filterd (m0356517.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 58OBExXn027471;
+Received: from pps.filterd (m0353725.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 58OC0iLU025570;
 	Wed, 24 Sep 2025 17:16:41 GMT
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
 	:content-transfer-encoding:date:from:in-reply-to:message-id
-	:mime-version:references:subject:to; s=pp1; bh=j8MbEgg7bHm6AdxqF
-	MAtAs4Vl5MT9RULDEAjlayd9KM=; b=mE2cliMf3svjhuLnELwCZq2bLk0qwJ3fk
-	sVYHxhTwYytbr/er5gZyhrR5EtBvQyFdQYBy7ka4+Tf9eta6Q01qYnx2eVsTAWNX
-	0o2Jp5wwUxAO4YK/icnGp8geZlpxtXVo/mPq1cQzoKIlLk+VrdRhd8QZ5wwqXM79
-	A8oabkHYCw21rfzld3klemFmjfg9DJjaj2VJCtWIfdPSoR1ot2NyVXidA39Z7Ji+
-	KZ6i+0jKVM1YLUJzBv4qwmpTBK5BcDyAudO3m9EZEAII2lR7BilPn7oaEGGB88/b
-	T05x3Smhr3CQZuTvdowYskKUeS+1QMW1Kqvurp6HpJqGTZtFC0Y6A==
-Received: from ppma23.wdc07v.mail.ibm.com (5d.69.3da9.ip4.static.sl-reverse.com [169.61.105.93])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 499n0jru5j-1
+	:mime-version:references:subject:to; s=pp1; bh=OZlRmUsoVE25Fkj72
+	3JgZQlQAimm2Ubmq5yCrK6J0m0=; b=scCu2Ntu1nc1ku4e3jOARspkMWax3VgFx
+	GDinmUFCB8wE32/UjwSpzVSAw/CrhqbIXmOxbMYAlQd4ihcqRkc1Zo/R2qTUmG+P
+	nYorzhRKHRW7SZ8lGME7oqW6WRShczZ2S+lA7QXkruHFz9kqeW6+lJJ5OIAHl3KX
+	r8N28V7LcU8XxPv4G27CYZmBvxNWqyfBA3a1o5AQXNSdvYV7cGD/77W2yVfuS2py
+	XyBtOYwMCajTvcbTjrUroaTTtVSWWJNGEec2Ite0ykHsgIlu8a00It0AkCm24lBI
+	uy0L0cLhcqGU1fzflyLeZaAeS2CSZQnasTvU8YVEcHXuvhpxXWz4A==
+Received: from ppma11.dal12v.mail.ibm.com (db.9e.1632.ip4.static.sl-reverse.com [50.22.158.219])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 499jpkgb41-1
 	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
 	Wed, 24 Sep 2025 17:16:41 +0000 (GMT)
-Received: from pps.filterd (ppma23.wdc07v.mail.ibm.com [127.0.0.1])
-	by ppma23.wdc07v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 58OE4Z6d019671;
-	Wed, 24 Sep 2025 17:16:38 GMT
-Received: from smtprelay03.wdc07v.mail.ibm.com ([172.16.1.70])
-	by ppma23.wdc07v.mail.ibm.com (PPS) with ESMTPS id 49a83k9mk8-1
+Received: from pps.filterd (ppma11.dal12v.mail.ibm.com [127.0.0.1])
+	by ppma11.dal12v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 58OEm7ha030336;
+	Wed, 24 Sep 2025 17:16:40 GMT
+Received: from smtprelay04.wdc07v.mail.ibm.com ([172.16.1.71])
+	by ppma11.dal12v.mail.ibm.com (PPS) with ESMTPS id 49a9a19f4s-1
 	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Wed, 24 Sep 2025 17:16:38 +0000
+	Wed, 24 Sep 2025 17:16:40 +0000
 Received: from smtpav03.dal12v.mail.ibm.com (smtpav03.dal12v.mail.ibm.com [10.241.53.102])
-	by smtprelay03.wdc07v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 58OHGQkJ3080786
+	by smtprelay04.wdc07v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 58OHGc6k54133046
 	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Wed, 24 Sep 2025 17:16:27 GMT
+	Wed, 24 Sep 2025 17:16:38 GMT
 Received: from smtpav03.dal12v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 5460F5803F;
+	by IMSVA (Postfix) with ESMTP id 35E5858063;
+	Wed, 24 Sep 2025 17:16:38 +0000 (GMT)
+Received: from smtpav03.dal12v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 7116F58056;
 	Wed, 24 Sep 2025 17:16:37 +0000 (GMT)
-Received: from smtpav03.dal12v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 9C68E58064;
-	Wed, 24 Sep 2025 17:16:36 +0000 (GMT)
 Received: from IBM-D32RQW3.ibm.com (unknown [9.61.252.148])
 	by smtpav03.dal12v.mail.ibm.com (Postfix) with ESMTP;
-	Wed, 24 Sep 2025 17:16:36 +0000 (GMT)
+	Wed, 24 Sep 2025 17:16:37 +0000 (GMT)
 From: Farhan Ali <alifm@linux.ibm.com>
 To: linux-s390@vger.kernel.org, kvm@vger.kernel.org,
         linux-kernel@vger.kernel.org, linux-pci@vger.kernel.org
 Cc: alex.williamson@redhat.com, helgaas@kernel.org, clg@redhat.com,
         alifm@linux.ibm.com, schnelle@linux.ibm.com, mjrosato@linux.ibm.com
-Subject: [PATCH v4 05/10] s390/pci: Restore IRQ unconditionally for the zPCI device
-Date: Wed, 24 Sep 2025 10:16:23 -0700
-Message-ID: <20250924171628.826-6-alifm@linux.ibm.com>
+Subject: [PATCH v4 06/10] s390/pci: Update the logic for detecting passthrough device
+Date: Wed, 24 Sep 2025 10:16:24 -0700
+Message-ID: <20250924171628.826-7-alifm@linux.ibm.com>
 X-Mailer: git-send-email 2.43.0
 In-Reply-To: <20250924171628.826-1-alifm@linux.ibm.com>
 References: <20250924171628.826-1-alifm@linux.ibm.com>
@@ -86,99 +86,120 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-TM-AS-GCONF: 00
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUwOTIwMDAzMyBTYWx0ZWRfX5WyEbxE/Wp6k
- 6Nnp87qg51apiXHQRL7P9wzwcpjdv+GfrYldmQuugams+LkDcCUbAP2W2dngs0HkazRbuMe0gMW
- lGoHwD8Dl2BAMyVXLuo5NTAW/DXb+oDWYxD7ENzld+b2wxgJSfGcVkMPQLjsRzzhbxKstdSzgJN
- Ear775yoLZFtIVnMAbIzNYZB/DzJFnhsloPGiMTr10O0GMC6QH7mHeSxadNO3yhB3hJ5fKFipkE
- aGNrXJLYK3VyJUmFOBFNhlx8L63xg4xNUqbm+Dj3n0OiDxqEmGJjEmBQu8U3eQbwCxECdseQILP
- pw6Q7ud9WARQIQ+39jB3k4Ij/IpalpaPFhDmqrg2WmhKrjxaWzESjY85GIZcXFmVibcw33tFBzg
- NyICYRAS
-X-Authority-Analysis: v=2.4 cv=TOlFS0la c=1 sm=1 tr=0 ts=68d42779 cx=c_pps
- a=3Bg1Hr4SwmMryq2xdFQyZA==:117 a=3Bg1Hr4SwmMryq2xdFQyZA==:17
- a=yJojWOMRYYMA:10 a=VnNF1IyMAAAA:8 a=ove13Onh8FEOJJhcmoIA:9
-X-Proofpoint-ORIG-GUID: 2Kd3CNY_2zXrPRlixjk8Fr9ItOmlQFpK
-X-Proofpoint-GUID: 2Kd3CNY_2zXrPRlixjk8Fr9ItOmlQFpK
+X-Authority-Analysis: v=2.4 cv=L50dQ/T8 c=1 sm=1 tr=0 ts=68d42779 cx=c_pps
+ a=aDMHemPKRhS1OARIsFnwRA==:117 a=aDMHemPKRhS1OARIsFnwRA==:17
+ a=yJojWOMRYYMA:10 a=VnNF1IyMAAAA:8 a=MtaQWmmsotiDqj5H3ecA:9
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUwOTIwMDAxMCBTYWx0ZWRfX7eql0a1R+kyt
+ MMu2Roq5/CXaQdzLnLb4U4Icprod3C7n2BczXY8su2Gpbfw9cuOO6WyKztFWqL3KSgMwK2sMyRj
+ f6psg33/x0Gx38dzXW75G5xlzDIpKO3HULGechliq43IRHY/MsRTuDsADmlJ851cLIgjzUbJnY+
+ ELIcSD7uIiCdil+xnkJEycQqOllJsEDyBvLoHvLUahnKqvmxOsR3LMHRMzzlDd+UUsIRA1zLutP
+ Zs3yNqaIig/aPxevHCn2AzfEyWEJKR/MgjLwPW94Ll8sYH8ZLb6eEpXjwdpysFUzNrR44GpaFLJ
+ ApngdQ5FOFNkm26m4p7easdmjATlux0lPQQKILL4qAA7VX4g0yDqgRvuKulh70r9gU67BNOsqlH
+ VZpRNaQr
+X-Proofpoint-ORIG-GUID: 3vei9bZDTqjT46VOIIaOSgfcA2qWBcsy
+X-Proofpoint-GUID: 3vei9bZDTqjT46VOIIaOSgfcA2qWBcsy
 X-Proofpoint-Virus-Version: vendor=baseguard
  engine=ICAP:2.0.293,Aquarius:18.0.1117,Hydra:6.1.9,FMLib:17.12.80.40
  definitions=2025-09-24_04,2025-09-24_01,2025-03-28_01
 X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- clxscore=1015 priorityscore=1501 phishscore=0 impostorscore=0 adultscore=0
- suspectscore=0 spamscore=0 bulkscore=0 malwarescore=0 classifier=typeunknown
- authscore=0 authtc= authcc= route=outbound adjust=0 reason=mlx scancount=1
- engine=8.19.0-2507300000 definitions=main-2509200033
+ malwarescore=0 adultscore=0 phishscore=0 impostorscore=0 spamscore=0
+ priorityscore=1501 suspectscore=0 clxscore=1015 bulkscore=0
+ classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
+ reason=mlx scancount=1 engine=8.19.0-2507300000 definitions=main-2509200010
 
-Commit c1e18c17bda6 ("s390/pci: add zpci_set_irq()/zpci_clear_irq()"),
-introduced the zpci_set_irq() and zpci_clear_irq(), to be used while
-resetting a zPCI device.
-
-Commit da995d538d3a ("s390/pci: implement reset_slot for hotplug slot"),
-mentions zpci_clear_irq() being called in the path for zpci_hot_reset_device().
-But that is not the case anymore and these functions are not called
-outside of this file. Instead zpci_hot_reset_device() relies on
-zpci_disable_device() also clearing the IRQs, but misses to reset the
-zdev->irqs_registered flag.
-
-However after a CLP disable/enable reset, the device's IRQ are
-unregistered, but the flag zdev->irq_registered does not get cleared. It
-creates an inconsistent state and so arch_restore_msi_irqs() doesn't
-correctly restore the device's IRQ. This becomes a problem when a PCI
-driver tries to restore the state of the device through
-pci_restore_state(). Restore IRQ unconditionally for the device and remove
-the irq_registered flag as its redundant.
+We can now have userspace drivers (vfio-pci based) on s390x. The userspace
+drivers will not have any KVM fd and so no kzdev associated with them. So
+we need to update the logic for detecting passthrough devices to not depend
+on struct kvm_zdev.
 
 Signed-off-by: Farhan Ali <alifm@linux.ibm.com>
 Reviewed-by: Niklas Schnelle <schnelle@linux.ibm.com>
 ---
- arch/s390/include/asm/pci.h | 1 -
- arch/s390/pci/pci_irq.c     | 9 +--------
- 2 files changed, 1 insertion(+), 9 deletions(-)
+ arch/s390/include/asm/pci.h      |  1 +
+ arch/s390/pci/pci_event.c        | 14 ++++----------
+ drivers/vfio/pci/vfio_pci_zdev.c |  9 ++++++++-
+ 3 files changed, 13 insertions(+), 11 deletions(-)
 
 diff --git a/arch/s390/include/asm/pci.h b/arch/s390/include/asm/pci.h
-index 41f900f693d9..aed19a1aa9d7 100644
+index aed19a1aa9d7..f47f62fc3bfd 100644
 --- a/arch/s390/include/asm/pci.h
 +++ b/arch/s390/include/asm/pci.h
-@@ -145,7 +145,6 @@ struct zpci_dev {
- 	u8		has_resources	: 1;
- 	u8		is_physfn	: 1;
- 	u8		util_str_avail	: 1;
--	u8		irqs_registered	: 1;
- 	u8		tid_avail	: 1;
- 	u8		rtr_avail	: 1; /* Relaxed translation allowed */
- 	unsigned int	devfn;		/* DEVFN part of the RID*/
-diff --git a/arch/s390/pci/pci_irq.c b/arch/s390/pci/pci_irq.c
-index 84482a921332..e73be96ce5fe 100644
---- a/arch/s390/pci/pci_irq.c
-+++ b/arch/s390/pci/pci_irq.c
-@@ -107,9 +107,6 @@ static int zpci_set_irq(struct zpci_dev *zdev)
- 	else
- 		rc = zpci_set_airq(zdev);
+@@ -169,6 +169,7 @@ struct zpci_dev {
  
--	if (!rc)
--		zdev->irqs_registered = 1;
--
- 	return rc;
+ 	char res_name[16];
+ 	bool mio_capable;
++	bool mediated_recovery;
+ 	struct zpci_bar_struct bars[PCI_STD_NUM_BARS];
+ 
+ 	u64		start_dma;	/* Start of available DMA addresses */
+diff --git a/arch/s390/pci/pci_event.c b/arch/s390/pci/pci_event.c
+index d930416d4c90..541d536be052 100644
+--- a/arch/s390/pci/pci_event.c
++++ b/arch/s390/pci/pci_event.c
+@@ -61,16 +61,10 @@ static inline bool ers_result_indicates_abort(pci_ers_result_t ers_res)
+ 	}
  }
  
-@@ -123,9 +120,6 @@ static int zpci_clear_irq(struct zpci_dev *zdev)
- 	else
- 		rc = zpci_clear_airq(zdev);
- 
--	if (!rc)
--		zdev->irqs_registered = 0;
--
- 	return rc;
- }
- 
-@@ -427,8 +421,7 @@ bool arch_restore_msi_irqs(struct pci_dev *pdev)
+-static bool is_passed_through(struct pci_dev *pdev)
++static bool needs_mediated_recovery(struct pci_dev *pdev)
  {
  	struct zpci_dev *zdev = to_zpci(pdev);
- 
--	if (!zdev->irqs_registered)
--		zpci_set_irq(zdev);
-+	zpci_set_irq(zdev);
- 	return true;
+-	bool ret;
+-
+-	mutex_lock(&zdev->kzdev_lock);
+-	ret = !!zdev->kzdev;
+-	mutex_unlock(&zdev->kzdev_lock);
+-
+-	return ret;
++	return zdev->mediated_recovery;
  }
  
+ static bool is_driver_supported(struct pci_driver *driver)
+@@ -194,7 +188,7 @@ static pci_ers_result_t zpci_event_attempt_error_recovery(struct pci_dev *pdev)
+ 	}
+ 	pdev->error_state = pci_channel_io_frozen;
+ 
+-	if (is_passed_through(pdev)) {
++	if (needs_mediated_recovery(pdev)) {
+ 		pr_info("%s: Cannot be recovered in the host because it is a pass-through device\n",
+ 			pci_name(pdev));
+ 		status_str = "failed (pass-through)";
+@@ -277,7 +271,7 @@ static void zpci_event_io_failure(struct pci_dev *pdev, pci_channel_state_t es)
+ 	 * we will inject the error event and let the guest recover the device
+ 	 * itself.
+ 	 */
+-	if (is_passed_through(pdev))
++	if (needs_mediated_recovery(pdev))
+ 		goto out;
+ 	driver = to_pci_driver(pdev->dev.driver);
+ 	if (driver && driver->err_handler && driver->err_handler->error_detected)
+diff --git a/drivers/vfio/pci/vfio_pci_zdev.c b/drivers/vfio/pci/vfio_pci_zdev.c
+index 0990fdb146b7..a7bc23ce8483 100644
+--- a/drivers/vfio/pci/vfio_pci_zdev.c
++++ b/drivers/vfio/pci/vfio_pci_zdev.c
+@@ -148,6 +148,8 @@ int vfio_pci_zdev_open_device(struct vfio_pci_core_device *vdev)
+ 	if (!zdev)
+ 		return -ENODEV;
+ 
++	zdev->mediated_recovery = true;
++
+ 	if (!vdev->vdev.kvm)
+ 		return 0;
+ 
+@@ -161,7 +163,12 @@ void vfio_pci_zdev_close_device(struct vfio_pci_core_device *vdev)
+ {
+ 	struct zpci_dev *zdev = to_zpci(vdev->pdev);
+ 
+-	if (!zdev || !vdev->vdev.kvm)
++	if (!zdev)
++		return;
++
++	zdev->mediated_recovery = false;
++
++	if (!vdev->vdev.kvm)
+ 		return;
+ 
+ 	if (zpci_kvm_hook.kvm_unregister)
 -- 
 2.43.0
 
