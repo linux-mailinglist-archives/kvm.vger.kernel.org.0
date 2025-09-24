@@ -1,106 +1,118 @@
-Return-Path: <kvm+bounces-58699-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-58700-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id D433CB9B8F5
-	for <lists+kvm@lfdr.de>; Wed, 24 Sep 2025 20:45:33 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 94F2CB9B8FB
+	for <lists+kvm@lfdr.de>; Wed, 24 Sep 2025 20:45:43 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 93C063B2815
-	for <lists+kvm@lfdr.de>; Wed, 24 Sep 2025 18:45:29 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id D00B3188C8E1
+	for <lists+kvm@lfdr.de>; Wed, 24 Sep 2025 18:46:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8491A319843;
-	Wed, 24 Sep 2025 18:45:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 40DFE3191D7;
+	Wed, 24 Sep 2025 18:45:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="RU4anlX0"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="htg/smbd"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pl1-f201.google.com (mail-pl1-f201.google.com [209.85.214.201])
+Received: from mail-pj1-f73.google.com (mail-pj1-f73.google.com [209.85.216.73])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 520BF524F
-	for <kvm@vger.kernel.org>; Wed, 24 Sep 2025 18:45:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 104ED229B16
+	for <kvm@vger.kernel.org>; Wed, 24 Sep 2025 18:45:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.73
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758739523; cv=none; b=AerBKNe8sPswpwVi3T5NkwIyasG5Ggt5F3O23Di2L0+QTL6jS+0v0iKEGyazHz6J7S8ayzyAoyVmpgBl1JC2SXFWGfNOykddL2JT3PDt+xPPQV2O0JDUY3LboLI9hNetUkIUtQJ5Zx5pQoUPWPEIJ4HD7komQ2rCRzSonv1zZf8=
+	t=1758739535; cv=none; b=se3MfOgCOqQxEqd7CvoSgto4ww5lqfZGjMyx2K2mLRqYKgOIPyfEz5s59Ekl5EAxde/r7LvDyfishFkC7TNRIpiay7LhG4BYNtI/IPkf4gLG1JO3AO7vlec2hw/Ro0eUrcH9E60EiG+M8wH1T2PQiEP80+CAnodIMFwYIfhq6Co=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758739523; c=relaxed/simple;
-	bh=Lux3sbRLdDVcfZqDHkK5B3VxvEzuH7zstz9HCkeka+8=;
+	s=arc-20240116; t=1758739535; c=relaxed/simple;
+	bh=vrPS3FrZXCObU9xbj2Kr1lt01FSI3RQMF3JUALQpUqI=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=sV2fa8Fwpyhh/UFaZge56jEJJdwxjdE3GF8zhl+RPILS6mSTb00Mf7LwWXoIfh0DixaYLSvj0A6qFt8TuhmiTG9R46PMbFBbzcIG6KTgu2kVxvnp49WAOLYxpKQAqgQGyTVfY4ciP/rdeDP49GQYbcwHQGgsG4Tb18h3hY65oFk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=RU4anlX0; arc=none smtp.client-ip=209.85.214.201
+	 To:Cc:Content-Type; b=TxNdHl1R2YsJ40ufMHGZAMMh1I7tk9jwMvaCmuls99f5HGDjYQZZedcqg1tAg8Q8OF3Twhfw36rw6d99YNgaYFs4eXEA6Fii3rGdfffFA6jzeC1UbwlVIX59f3XDLUTMBj7EiXnARVcXcjVxS0xrU7d0/+yxKMqE6UkAS14ifc4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=htg/smbd; arc=none smtp.client-ip=209.85.216.73
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pl1-f201.google.com with SMTP id d9443c01a7336-272b7bdf41fso1302155ad.0
-        for <kvm@vger.kernel.org>; Wed, 24 Sep 2025 11:45:22 -0700 (PDT)
+Received: by mail-pj1-f73.google.com with SMTP id 98e67ed59e1d1-32ee4998c4aso137333a91.1
+        for <kvm@vger.kernel.org>; Wed, 24 Sep 2025 11:45:33 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1758739521; x=1759344321; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1758739533; x=1759344333; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=PuRg6SNsqixaTOVmmK3uOTfxD/fSeqR6sejXpJN0UP0=;
-        b=RU4anlX07u3t0wT9zF2yA18TBUbRmrS5iQ11g/kU/AkGY7TextMWSlI03OyyEgX4+Q
-         yIFtrZ+qGziIJFHvkc9Dl28wldYlRMTSuWvQPjUPTBzO6E4fjUpRM1lbzNvdPd4T2mLk
-         O8LGR/9ICeu//v+aSRMbxlM8BEZnG6XpL8cygS+rCIj1PkyUkfkhY1xHZb6CcMZ9LcXq
-         4dDYOdP+2Qvs+VR6+pOzIjgl12JsR9xrM8E2AXblcb0G7Sm1Hxd9bbyAufVXA7JelZiI
-         x0h5ForbFv+5t7yGaj9chRO69ucHV+WGMCJ3yr+COd4yKkblHVHanvgB6usYFMWRWU12
-         Golg==
+        bh=hB5Y4r4rf1lehr6FQtEOmozlH00Twktr9vU7PqamHQU=;
+        b=htg/smbdWD9z611RaEZrKg44EJNy6NpeaIB/P1lDiWORJ/EkHofZtKjQyLd5kAkUwR
+         lxpwvnC7r+cpnmrcn/4TbztCCKRf82xNoHE365PCuFnSl1aDZy2d9ZM+ET/wZnlI1Xb2
+         nxdtdA2rKUi4O1+a4mTPxh4ugxt7uSGe3Hh9KfaWjg8YdvkkU1ZG63Gm6XRQQDgzek1b
+         WGk/H3W/5UyUt3f/xV4DJJpeTNVoLsulsqJu63dnSUIEQqPDWkRXPZIbiO45Ck7tOwkz
+         K058tuk+XnxREd9xOHjLkrrm3Mzicj49fRk7E+76n6rnh7cvSrquNfMyOhPHFS8rGo94
+         u1qA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1758739521; x=1759344321;
+        d=1e100.net; s=20230601; t=1758739533; x=1759344333;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=PuRg6SNsqixaTOVmmK3uOTfxD/fSeqR6sejXpJN0UP0=;
-        b=wR8zJAFO7je4mr3M3NGutKNIurSiI5k5huW+uDziaOba2kUfmjLJyTqqOb2k9YSz4m
-         +evuPi+7XVDzRJEKq6FSZEtZIz+Ce/FMnum8EM4PXgcdCErYVgvtjPqhJ19p3Vj+F5eA
-         UOooFJQS+q9z1TtVKAjRJy2YWBEdyfbUFp/bsY3kbFmho2c6ua0yuRbRfFVGasXC6ujC
-         NZ0wVvRfvAuHV9zrmhbwP5QMglVBShcJiJhkprdjld53QKFCxMfAi7eO1AD6SRcLeFGS
-         KgXSevmvCSXZz5N4+8yIQOQKn7WfArQZVD3NIbYzRI1W75MnEC/3NY19GgDoGkpk3r4x
-         dzkg==
-X-Gm-Message-State: AOJu0YxEfingjA0OIaghjuXOBd4HJQyUeGfnEsUKisB0vtATQ6AYfyxL
-	ag0fRG2PSjUnsGx9SUcG+P5EvEazjPCotVrl0sMnvZEqvyLyARuzj/pXXgxMx4cAyaQn6NCkQyQ
-	QS4+55w==
-X-Google-Smtp-Source: AGHT+IFKjoeIQvU+5qMuE3xLff/oP/JCX0j8XzLHJgmDk8X1MKu15hv5mG7VqGvTSem8tEiUa9GMntO5xhI=
-X-Received: from pllb17.prod.google.com ([2002:a17:902:e951:b0:269:7051:8e4a])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:902:ebd1:b0:267:cdb8:c682
- with SMTP id d9443c01a7336-27ed4a315ccmr8753205ad.30.1758739521650; Wed, 24
- Sep 2025 11:45:21 -0700 (PDT)
-Date: Wed, 24 Sep 2025 11:07:43 -0700
-In-Reply-To: <20250923153738.1875174-1-seanjc@google.com>
+        bh=hB5Y4r4rf1lehr6FQtEOmozlH00Twktr9vU7PqamHQU=;
+        b=Yi8ARZmNAfE2QRj5k7lRtrw/B1r6pqRdnQTUpK/+wAk9lmvxV+YHQ23iWxANi2WZ/6
+         u2epwwQNBvnc70IYDdUiF2bZpDIWudqlPLjAdboR3CUXN+WyUepcu19S7lWH2kBopS/z
+         HYjZ/lvelCUx49ZLbidH/oMVPle2MWsC2kLRk39GnFvQU8NIlRAfQlLe3B4D6411KXT8
+         oc0OrgYz9JpI+X40VPl4I+VIYNIfdcGjvhbSr0SBiylrIJSfU93zn7W15o4i7+yiX0kT
+         zoxRGc9k+n+NSYoQOWzKWigynvKWrnXnyH1HQPJ3vu6C+JCguOjlHZO+Aw1GpACCk3GA
+         4EgA==
+X-Gm-Message-State: AOJu0YxbS8CMwgYpA6LpIbVxPf/9M60Glp8GAFO1SzlorsW2nyjOdKw6
+	4RtD/rlsVv8yHfVO5mLPXpaQ3AjrR2awIKYFmiVbeB5yzzwtWEDYPME00gxGc5z1AVjPGESv4Kg
+	LsNvFjA==
+X-Google-Smtp-Source: AGHT+IEh0mqwW4Zok+OWIvmwE7+RJDlDgyy+51Q9hwEsOLuS9L6xhBhguqHptFn2ySqV6wYcmNX8Bvzg728=
+X-Received: from pjyf4.prod.google.com ([2002:a17:90a:ec84:b0:32e:aa46:d9ab])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90a:e7c1:b0:32e:7340:a7f7
+ with SMTP id 98e67ed59e1d1-3342a272c3cmr621593a91.2.1758739533283; Wed, 24
+ Sep 2025 11:45:33 -0700 (PDT)
+Date: Wed, 24 Sep 2025 11:07:45 -0700
+In-Reply-To: <20250919215934.1590410-1-seanjc@google.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
-References: <20250923153738.1875174-1-seanjc@google.com>
+References: <20250919215934.1590410-1-seanjc@google.com>
 X-Mailer: git-send-email 2.51.0.536.g15c5d4f767-goog
-Message-ID: <175873605243.2144113.4486198413338077399.b4-ty@google.com>
-Subject: Re: [PATCH v3 0/2] KVM: SVM: Fix a bug where TSC_AUX can get clobbered
+Message-ID: <175873642529.2146862.15667445717361040728.b4-ty@google.com>
+Subject: Re: [PATCH v4 0/7] KVM: SVM: Enable AVIC for Zen4+ (if x2AVIC)
 From: Sean Christopherson <seanjc@google.com>
-To: Sean Christopherson <seanjc@google.com>, Paolo Bonzini <pbonzini@redhat.com>
+To: Sean Christopherson <seanjc@google.com>, Paolo Bonzini <pbonzini@redhat.com>, 
+	Vitaly Kuznetsov <vkuznets@redhat.com>
 Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	Hou Wenlong <houwenlong.hwl@antgroup.com>, Xiaoyao Li <xiaoyao.li@intel.com>, 
-	Lai Jiangshan <jiangshan.ljs@antgroup.com>
+	Naveen N Rao <naveen@kernel.org>
 Content-Type: text/plain; charset="utf-8"
 
-On Tue, 23 Sep 2025 08:37:36 -0700, Sean Christopherson wrote:
-> Fix a bug where an SEV-ES vCPU running on the same pCPU as a non-SEV-ES vCPU
-> could clobber TSC_AUX due to loading the host's TSC_AUX on #VMEXIT, as opposed
-> to restoring whatever was in hardware at the time of VMRUN.
+On Fri, 19 Sep 2025 14:59:27 -0700, Sean Christopherson wrote:
+> Enable AVIC by default for Zen4+, so long as x2AVIC is supported (which should
+> be the case if AVIC is supported).
 > 
-> v3:
->  - Collect reviews. [Xiaoyao]
->  - Make tsc_aux_uret_slot globally visible instead of passing it as a param.
->    [Xiaoyao]
->  - Mark tsc_aux_uret_slot __ro_after_init.
+> v4:
+>  - Collect tags. [Naveen]
+>  - Add missing "(AMD)" for Naveen's attribution. [Naveen]
+>  - Make svm_x86_ops globally visible, to match TDX, instead of passing in
+>    the struct as parameter to avic_hardware_setup(). [Naveen]
+>  - s/avic_want_avic_enabled/avic_want_enabled. [Naveen]
+>  - Print "AVIC enabled" in avic_harware_setup() so that it's close to the
+>    "x2AVIC enabled" message. [Naveen]
 > 
 > [...]
 
 Applied to kvm-x86 svm, thanks!
 
-[1/2] KVM: x86: Add helper to retrieve current value of user return MSR
-      https://github.com/kvm-x86/linux/commit/9bc366350734
-[2/2] KVM: SVM: Re-load current, not host, TSC_AUX on #VMEXIT from SEV-ES guest
-      https://github.com/kvm-x86/linux/commit/29da8c823abf
+[1/7] KVM: SVM: Make svm_x86_ops globally visible, clean up on-HyperV usage
+      https://github.com/kvm-x86/linux/commit/44bfe1f0490d
+[2/7] KVM: SVM: Move x2AVIC MSR interception helper to avic.c
+      https://github.com/kvm-x86/linux/commit/eb44ea6a7aac
+[3/7] KVM: SVM: Update "APICv in x2APIC without x2AVIC" in avic.c, not svm.c
+      https://github.com/kvm-x86/linux/commit/a9095e4fc436
+[4/7] KVM: SVM: Always print "AVIC enabled" separately, even when force enabled
+      https://github.com/kvm-x86/linux/commit/ce4253e21fa8
+[5/7] KVM: SVM: Don't advise the user to do force_avic=y (when x2AVIC is detected)
+      https://github.com/kvm-x86/linux/commit/ad65dca2ca4c
+[6/7] KVM: SVM: Move global "avic" variable to avic.c
+      https://github.com/kvm-x86/linux/commit/b14665353162
+[7/7] KVM: SVM: Enable AVIC by default for Zen4+ if x2AVIC is support
+      https://github.com/kvm-x86/linux/commit/ca2967de5a5b
 
 --
 https://github.com/kvm-x86/linux/tree/next
