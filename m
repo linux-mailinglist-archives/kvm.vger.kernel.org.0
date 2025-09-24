@@ -1,222 +1,106 @@
-Return-Path: <kvm+bounces-58673-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-58674-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 68612B9ABEE
-	for <lists+kvm@lfdr.de>; Wed, 24 Sep 2025 17:43:08 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 87260B9AD2D
+	for <lists+kvm@lfdr.de>; Wed, 24 Sep 2025 18:15:34 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3684A1730A8
-	for <lists+kvm@lfdr.de>; Wed, 24 Sep 2025 15:41:18 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 45EC319C210A
+	for <lists+kvm@lfdr.de>; Wed, 24 Sep 2025 16:15:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4FB8F3126D0;
-	Wed, 24 Sep 2025 15:39:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0C8393128AD;
+	Wed, 24 Sep 2025 16:15:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="DesiKDyt"
+	dkim=pass (2048-bit key) header.d=amazon.de header.i=@amazon.de header.b="BCtY3ZkV"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from fra-out-010.esa.eu-central-1.outbound.mail-perimeter.amazon.com (fra-out-010.esa.eu-central-1.outbound.mail-perimeter.amazon.com [63.178.143.178])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C1A5D30FF32
-	for <kvm@vger.kernel.org>; Wed, 24 Sep 2025 15:39:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 24039312838;
+	Wed, 24 Sep 2025 16:15:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=63.178.143.178
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758728349; cv=none; b=h/OSzZmYm8NuHWDrYBBVxefDalEMd2VTvVwYCAMZKYRcc0ciqduinWKtcm3yjM2olEekcHMaDELuR/gNCvSZsCYBWqwR7WRsc/HMMOE4NNaHury9LWW23PBtlAHgpkQR7OiVyrr35ByFCexGryxb7VyRunNVaTcKyxcYr/GHmEE=
+	t=1758730524; cv=none; b=GQ+3GqIc8eXcjsgkwPG/EDL2msgDA+szXlXshi+jE/yYy4fsZgcZal5skik/yH+FZ5BFRcF2+ONjbvF6Wd0hxNZYn0fSao0Ori1URkRJbakljD/fw2hHNKOf8C9lYKcVsfID6ZmAytMzSSTKKPTonFxM6X51h6bnf5slv/uwSkI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758728349; c=relaxed/simple;
-	bh=UsXqmKWvjG6h1YBmLwPbbkwWjuTwnzGRTj5iHBI5Ud0=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=NyfsGOQgQJex6zn+X0hz1yjQlBaeGT6tJ/C65CmhHtA73PhgC9JKdz5kA9Gyr4fks/cIKHNhvzcmnueZX9/japYMQOFuTWAQw4f3wLKX8dVcHeufVKpNq9kkfgIl0b3DU/23an2pG5Ll1EP+ZtnL5FZq7IU89h23a7MPLLZb8fI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=DesiKDyt; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1758728346;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-	bh=I3hnbNQr+CMB/T5Lrt4+Z4OuC6HJ7S7MgiA4J3LQveE=;
-	b=DesiKDythzfEMsXjJKtkdWWRYVRFEV0zlaruMTJpFUIVSQlf+Zw5ZlAU7P1Y601p+YHdOk
-	3cGieETkTrcphGxihJUmQwA7B39pM14RgTzSkvi8+p/nYTGfSqvFdED3+JeWclsbfAj6l5
-	p3kYLzGcLg8LkOk+0+ZX+HEtRsykevA=
-Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
- [209.85.221.70]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-621-XH79fZ2vPaeV8dxJOVEDrQ-1; Wed, 24 Sep 2025 11:39:04 -0400
-X-MC-Unique: XH79fZ2vPaeV8dxJOVEDrQ-1
-X-Mimecast-MFC-AGG-ID: XH79fZ2vPaeV8dxJOVEDrQ_1758728344
-Received: by mail-wr1-f70.google.com with SMTP id ffacd0b85a97d-3ee13baf21dso16852f8f.0
-        for <kvm@vger.kernel.org>; Wed, 24 Sep 2025 08:39:04 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1758728343; x=1759333143;
-        h=content-transfer-encoding:in-reply-to:autocrypt:content-language
-         :from:references:cc:to:subject:user-agent:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=I3hnbNQr+CMB/T5Lrt4+Z4OuC6HJ7S7MgiA4J3LQveE=;
-        b=QAgGUAa6XesTuBUupe96GYG7kMvHWTZFbhJPF4A/1AZfiJRH3h1ioaJbTne94t7Qv8
-         41j9sYhCoN5ba9K8v4HoWkRlViys1pgQn+6uSo9j/+Wn2XW+TJEyHkIBPy1MQ9dXEghn
-         53ZkhCdsyLTdrgfTRs9hmGI7LEO+134yjgrX8HIAA6evs+ZH7dQrX8p1b4R4rkm72EVo
-         lxh/IdfBciJuj0nO5HTfwWPl7EWIwe4QxUJQos6QLx1aBYnSuSv1wZQjsemptcDEyjnu
-         hY1CQACxhEkbvfu3uB24kRdOIzzgSfQH6X+4dgPs23rKDG1AQdJdw/cw4Z3Vu6xuTz/D
-         hEHg==
-X-Forwarded-Encrypted: i=1; AJvYcCUM/rDymaQav4of2hdUNd7wQdpvOQHMSAuWrCLLhK9R/00XWc3BrZodwQ7rmY4CjCQKvg0=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxQ35igOjR1/XgBI9MDk3+0VDciSmtHh65DvjNp53E5okr3LqO7
-	9O94MuRmUgjF+M51FX/2pnL9Zt/O604L2xqRVOcVLveBDBco5nyKQRAg5GXQ/ctozBJkOdp5GUs
-	cUS8DWIqLNQo6nGhj74HVz7eZc1ReSusPouUDSQdkipHFZ3FM3IgIAA==
-X-Gm-Gg: ASbGncsjOFyy1kLYw0n9ulkcEBeioNSpS5/KSGGuArx/mr8hgsMsaKpcnGmqNhJ+V/O
-	EW4bCiwbCGFY2ZZuGX8RNLYOZACbDothAT5SzlLBwNW5HThAwlVBeYmLC1eKcCDIaIrda++vFwW
-	/0CWMMBp3ymmXsI/cibIvEBGc0ll8wM9u9/iOHeRDb/rrR2dDr++D8D29pKg6upVQNxlvIoWsXn
-	pijfhFqfAMcKWolvdlY4crPEGjJB3IpLCeAUzswX/roxSKnNxyyGfnfTLHfP6xnp52bpfNOeH3D
-	nkFgY9rJviarxyq0teKYh13t1oEc3XJDqOcM2lSKAdK1xf9DFoedpGYygapyPQSIUKG6hJnPZvW
-	3DhEOG4CTLYL5TNKZwzIPqtST/hqkHWpp6wMPbigRnW5llvoGj4RqfjrNYZHHqvy6Bg==
-X-Received: by 2002:a05:6000:3102:b0:405:3028:1bce with SMTP id ffacd0b85a97d-40e4886dea7mr389132f8f.32.1758728343230;
-        Wed, 24 Sep 2025 08:39:03 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IHgd4QFIbHl+KGwltRD/ttCSG+TyRobItnmS8e1jCrWLoT42l4oEjJc1CeO+4N34B2hOAK5lg==
-X-Received: by 2002:a05:6000:3102:b0:405:3028:1bce with SMTP id ffacd0b85a97d-40e4886dea7mr389052f8f.32.1758728342727;
-        Wed, 24 Sep 2025 08:39:02 -0700 (PDT)
-Received: from ?IPV6:2003:d8:2f14:2400:afc:9797:137c:a25b? (p200300d82f1424000afc9797137ca25b.dip0.t-ipconnect.de. [2003:d8:2f14:2400:afc:9797:137c:a25b])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3ee073f3d68sm28588947f8f.10.2025.09.24.08.38.59
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 24 Sep 2025 08:39:02 -0700 (PDT)
-Message-ID: <be77e0e7-4cb6-4a10-86f2-50e8d001fd84@redhat.com>
-Date: Wed, 24 Sep 2025 17:38:58 +0200
+	s=arc-20240116; t=1758730524; c=relaxed/simple;
+	bh=gAs4jsrpHAQu2tuTZq0JaEc/iHjRGcabUu8W4Wjib6c=;
+	h=From:To:CC:Subject:In-Reply-To:References:Date:Message-ID:
+	 MIME-Version:Content-Type; b=XGvHX+/9UMcwiKvbakX7/0+W5KZWFO3vH4ytayuxgKOnlfOokwTMrFyyNVnKgJ6ArhHHslvlbhWRQqhTuIxEF9dtUa8IlWeiMurxpnhvnkU9D1XVm1JzMCjipjNqcmBIEThwSnMYPYKiIbcbsQV8doE95bZDz35qWi1IEppjOvA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.de; spf=pass smtp.mailfrom=amazon.de; dkim=pass (2048-bit key) header.d=amazon.de header.i=@amazon.de header.b=BCtY3ZkV; arc=none smtp.client-ip=63.178.143.178
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.de
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+  d=amazon.de; i=@amazon.de; q=dns/txt; s=amazoncorp2;
+  t=1758730522; x=1790266522;
+  h=from:to:cc:subject:in-reply-to:references:date:
+   message-id:mime-version;
+  bh=gAs4jsrpHAQu2tuTZq0JaEc/iHjRGcabUu8W4Wjib6c=;
+  b=BCtY3ZkVoegiWR7W+uxYZ30wQjoECTM1FlBFN8MHaOKJc9017GtFgEy5
+   OyNkTvMGiOlvJ1deixbHaqbXsUwoK3Z6Kx9qkmQNI9FF2JU14iu3BSm4Q
+   M6ZZAfffNX/eR0+sbZ2ZdWHOlZ79TubFb/gH/fLxphMHADcY1KYiCvAPG
+   3sdY8S77k/gAOISbjgh5HIL2pWR+f8jW2GEhBWgEJ2iGM5yv1rLdrFrrW
+   u2KhBs1xK/Tnk2iIHzPO2DMr0W/YmFYJAA0iyo8SXwtn+SjjuUN2fcKpO
+   9vPBwxFAvTZrONaMfUOnNaWNtZ6Get5lWpG+py+y32gciMLTgjan3OkiJ
+   g==;
+X-CSE-ConnectionGUID: b1x+cZfDT7OjE/HiZgeAOA==
+X-CSE-MsgGUID: GnzEbFGYTkWNN4F82VCqjg==
+X-IronPort-AV: E=Sophos;i="6.18,290,1751241600"; 
+   d="scan'208";a="2516126"
+Received: from ip-10-6-3-216.eu-central-1.compute.internal (HELO smtpout.naws.eu-central-1.prod.farcaster.email.amazon.dev) ([10.6.3.216])
+  by internal-fra-out-010.esa.eu-central-1.outbound.mail-perimeter.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 24 Sep 2025 16:15:11 +0000
+Received: from EX19MTAEUB002.ant.amazon.com [54.240.197.232:30853]
+ by smtpin.naws.eu-central-1.prod.farcaster.email.amazon.dev [10.0.33.43:2525] with esmtp (Farcaster)
+ id 01638588-c3c8-4e5f-8145-cf6f65b4dd3e; Wed, 24 Sep 2025 16:15:11 +0000 (UTC)
+X-Farcaster-Flow-ID: 01638588-c3c8-4e5f-8145-cf6f65b4dd3e
+Received: from EX19D039EUC004.ant.amazon.com (10.252.61.190) by
+ EX19MTAEUB002.ant.amazon.com (10.252.51.79) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.2562.20;
+ Wed, 24 Sep 2025 16:15:10 +0000
+Received: from dev-dsk-mngyadam-1c-cb3f7548.eu-west-1.amazon.com.amazon.de
+ (10.253.107.175) by EX19D039EUC004.ant.amazon.com (10.252.61.190) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.2562.20; Wed, 24 Sep 2025
+ 16:15:07 +0000
+From: Mahmoud Nagy Adam <mngyadam@amazon.de>
+To: <kvm@vger.kernel.org>
+CC: <alex.williamson@redhat.com>, <jgg@ziepe.ca>, <kbusch@kernel.org>,
+	<benh@kernel.crashing.org>, David Woodhouse <dwmw@amazon.co.uk>,
+	<pravkmr@amazon.de>, <nagy@khwaternagy.com>, <linux-kernel@vger.kernel.org>
+Subject: Re: [RFC PATCH 3/7] vfio/pci: add RCU locking for regions access
+In-Reply-To: <20250924141018.80202-4-mngyadam@amazon.de> (Mahmoud Adam's
+	message of "Wed, 24 Sep 2025 16:09:54 +0200")
+References: <20250924141018.80202-1-mngyadam@amazon.de>
+	<20250924141018.80202-4-mngyadam@amazon.de>
+Date: Wed, 24 Sep 2025 18:15:03 +0200
+Message-ID: <lrkyqldm3zv20.fsf@dev-dsk-mngyadam-1c-cb3f7548.eu-west-1.amazon.com>
+User-Agent: Gnus/5.13 (Gnus v5.13)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v7 00/12] Direct Map Removal Support for guest_memfd
-To: "Roy, Patrick" <roypat@amazon.co.uk>,
- "patrick.roy@campus.lmu.de" <patrick.roy@campus.lmu.de>
-Cc: "Liam.Howlett@oracle.com" <Liam.Howlett@oracle.com>,
- "ackerleytng@google.com" <ackerleytng@google.com>,
- "akpm@linux-foundation.org" <akpm@linux-foundation.org>,
- "andrii@kernel.org" <andrii@kernel.org>, "ast@kernel.org" <ast@kernel.org>,
- "bp@alien8.de" <bp@alien8.de>, "bpf@vger.kernel.org" <bpf@vger.kernel.org>,
- "catalin.marinas@arm.com" <catalin.marinas@arm.com>,
- "corbet@lwn.net" <corbet@lwn.net>,
- "daniel@iogearbox.net" <daniel@iogearbox.net>,
- "dave.hansen@linux.intel.com" <dave.hansen@linux.intel.com>,
- "derekmn@amazon.co.uk" <derekmn@amazon.co.uk>,
- "eddyz87@gmail.com" <eddyz87@gmail.com>,
- "haoluo@google.com" <haoluo@google.com>, "hpa@zytor.com" <hpa@zytor.com>,
- "Thomson, Jack" <jackabt@amazon.co.uk>, "jannh@google.com"
- <jannh@google.com>, "jgg@ziepe.ca" <jgg@ziepe.ca>,
- "jhubbard@nvidia.com" <jhubbard@nvidia.com>,
- "joey.gouly@arm.com" <joey.gouly@arm.com>,
- "john.fastabend@gmail.com" <john.fastabend@gmail.com>,
- "jolsa@kernel.org" <jolsa@kernel.org>,
- "Kalyazin, Nikita" <kalyazin@amazon.co.uk>,
- "kpsingh@kernel.org" <kpsingh@kernel.org>,
- "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
- "kvmarm@lists.linux.dev" <kvmarm@lists.linux.dev>,
- "linux-arm-kernel@lists.infradead.org"
- <linux-arm-kernel@lists.infradead.org>,
- "linux-doc@vger.kernel.org" <linux-doc@vger.kernel.org>,
- "linux-fsdevel@vger.kernel.org" <linux-fsdevel@vger.kernel.org>,
- "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
- "linux-kselftest@vger.kernel.org" <linux-kselftest@vger.kernel.org>,
- "linux-mm@kvack.org" <linux-mm@kvack.org>,
- "lorenzo.stoakes@oracle.com" <lorenzo.stoakes@oracle.com>,
- "luto@kernel.org" <luto@kernel.org>,
- "martin.lau@linux.dev" <martin.lau@linux.dev>,
- "maz@kernel.org" <maz@kernel.org>, "mhocko@suse.com" <mhocko@suse.com>,
- "mingo@redhat.com" <mingo@redhat.com>,
- "oliver.upton@linux.dev" <oliver.upton@linux.dev>,
- "pbonzini@redhat.com" <pbonzini@redhat.com>,
- "peterx@redhat.com" <peterx@redhat.com>,
- "peterz@infradead.org" <peterz@infradead.org>,
- "pfalcato@suse.de" <pfalcato@suse.de>, "rppt@kernel.org" <rppt@kernel.org>,
- "sdf@fomichev.me" <sdf@fomichev.me>, "seanjc@google.com"
- <seanjc@google.com>, "shuah@kernel.org" <shuah@kernel.org>,
- "song@kernel.org" <song@kernel.org>, "surenb@google.com"
- <surenb@google.com>, "suzuki.poulose@arm.com" <suzuki.poulose@arm.com>,
- "tabba@google.com" <tabba@google.com>,
- "tglx@linutronix.de" <tglx@linutronix.de>, "vbabka@suse.cz"
- <vbabka@suse.cz>, "will@kernel.org" <will@kernel.org>,
- "willy@infradead.org" <willy@infradead.org>, "x86@kernel.org"
- <x86@kernel.org>, "Cali, Marco" <xmarcalx@amazon.co.uk>,
- "yonghong.song@linux.dev" <yonghong.song@linux.dev>,
- "yuzenghui@huawei.com" <yuzenghui@huawei.com>
-References: <20250924151101.2225820-1-patrick.roy@campus.lmu.de>
- <20250924152912.11563-1-roypat@amazon.co.uk>
-From: David Hildenbrand <david@redhat.com>
-Content-Language: en-US
-Autocrypt: addr=david@redhat.com; keydata=
- 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
- qIws/H2t
-In-Reply-To: <20250924152912.11563-1-roypat@amazon.co.uk>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain
+X-ClientProxiedBy: EX19D037UWC002.ant.amazon.com (10.13.139.250) To
+ EX19D039EUC004.ant.amazon.com (10.252.61.190)
 
-On 24.09.25 17:29, Roy, Patrick wrote:
-> _sigh_
 
-Happens to the best of us :)
+..Having a second look on the rcu read sections. Some of these read
+sections could sleep/block. simple RCU with these sections will not
+work. Need to fix this on the next send.
 
-> 
-> I tried to submit this iteration from a personal email, because amazon's mail
-> server was scrambling the "From" header and I couldn't figure out why (and also
-> because I am leaving Amazon next month and wanted replies to go into an inbox
-> to which I'll continue to have access). And then after posting the first 4
-> emails I hit "daily mail quota exceeded", and had to submit the rest of the
-> patch series from the amazon email anyway. Sorry about the resulting mess (i
-> think the threading got slightly messed up as a result of this). I'll something
-> else out for the next iteration.
+-MNAdam
 
-I had luck recovering from temporary mail server issues in the past by 
-sending the remainder as "--in-reply-to=" with message-id of cover 
-letter and using "--no-thread" IIRC.
 
--- 
-Cheers
 
-David / dhildenb
+Amazon Web Services Development Center Germany GmbH
+Tamara-Danz-Str. 13
+10243 Berlin
+Geschaeftsfuehrung: Christian Schlaeger
+Eingetragen am Amtsgericht Charlottenburg unter HRB 257764 B
+Sitz: Berlin
+Ust-ID: DE 365 538 597
 
 
