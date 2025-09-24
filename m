@@ -1,102 +1,106 @@
-Return-Path: <kvm+bounces-58698-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-58699-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 97FD8B9B8E9
-	for <lists+kvm@lfdr.de>; Wed, 24 Sep 2025 20:44:54 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id D433CB9B8F5
+	for <lists+kvm@lfdr.de>; Wed, 24 Sep 2025 20:45:33 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id BD35B1BC1FD3
-	for <lists+kvm@lfdr.de>; Wed, 24 Sep 2025 18:45:16 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 93C063B2815
+	for <lists+kvm@lfdr.de>; Wed, 24 Sep 2025 18:45:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C339731771B;
-	Wed, 24 Sep 2025 18:44:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8491A319843;
+	Wed, 24 Sep 2025 18:45:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="Fx6/HPyy"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="RU4anlX0"
 X-Original-To: kvm@vger.kernel.org
 Received: from mail-pl1-f201.google.com (mail-pl1-f201.google.com [209.85.214.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 66E2F313D45
-	for <kvm@vger.kernel.org>; Wed, 24 Sep 2025 18:44:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 520BF524F
+	for <kvm@vger.kernel.org>; Wed, 24 Sep 2025 18:45:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758739487; cv=none; b=Zz/3RdZVmEMvo1iHNZS7XkoOiqqOfEKvgf2cgAbQhLzXyUuu01aId+azm5+wxgY+uAbVabvNB32TfheNkR2m2C8/70+dKhfJnXdQt91RmpYPjZ0lTdlrWLM52ykSn5kUQsx+uHn8AVVHnzkKAiEfFXINT2PitJmuE7UegXpi2Os=
+	t=1758739523; cv=none; b=AerBKNe8sPswpwVi3T5NkwIyasG5Ggt5F3O23Di2L0+QTL6jS+0v0iKEGyazHz6J7S8ayzyAoyVmpgBl1JC2SXFWGfNOykddL2JT3PDt+xPPQV2O0JDUY3LboLI9hNetUkIUtQJ5Zx5pQoUPWPEIJ4HD7komQ2rCRzSonv1zZf8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758739487; c=relaxed/simple;
-	bh=XrKYdpCzTJitBfTH7h3tMpzc9gUATsq6f2r027mR+Fw=;
+	s=arc-20240116; t=1758739523; c=relaxed/simple;
+	bh=Lux3sbRLdDVcfZqDHkK5B3VxvEzuH7zstz9HCkeka+8=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=itxWZrpD7sESHB7srDeYIG1ZxCqApPUBm7MlnlRaVmuK3reJVbZZxYSdqUW78WwtR7wzMntKBuRaqd7rNcNWPD7F93IFDJ//dtmnby/KR0UjNLMf2nmYTmJcgiKImXrgfJqnXFboeHFlkfRel/tALHZOZrSdP+G6tN3oQ99zInE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=Fx6/HPyy; arc=none smtp.client-ip=209.85.214.201
+	 To:Cc:Content-Type; b=sV2fa8Fwpyhh/UFaZge56jEJJdwxjdE3GF8zhl+RPILS6mSTb00Mf7LwWXoIfh0DixaYLSvj0A6qFt8TuhmiTG9R46PMbFBbzcIG6KTgu2kVxvnp49WAOLYxpKQAqgQGyTVfY4ciP/rdeDP49GQYbcwHQGgsG4Tb18h3hY65oFk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=RU4anlX0; arc=none smtp.client-ip=209.85.214.201
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pl1-f201.google.com with SMTP id d9443c01a7336-27eca7298d9so2247145ad.0
-        for <kvm@vger.kernel.org>; Wed, 24 Sep 2025 11:44:46 -0700 (PDT)
+Received: by mail-pl1-f201.google.com with SMTP id d9443c01a7336-272b7bdf41fso1302155ad.0
+        for <kvm@vger.kernel.org>; Wed, 24 Sep 2025 11:45:22 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1758739486; x=1759344286; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1758739521; x=1759344321; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=L4wsQZfmoQA8Yf+bei6HdCOLaw6MvQvAF54nH254qZc=;
-        b=Fx6/HPyyUpLi6odSFMy4Pt7HL+rCrPAsw9jD/NCC4YbA8ISl4/8HBww6Fjbzw2NKvK
-         aCOZKZwvRcCNIc3Q8OWEebEDx7/da1ukqghYk6E/F77HJhb/n4SWwi8fug2MSmkkuuA6
-         v7Duervm2Zk8mV9erm0yPCsTtK6vO3OeV7HNoWUlPfQHlPuquihNczNnuNT23tY9ljkP
-         e70cdlJi6KXpBQJPa7lFcERGFong9ldIZmtWKYz1RIKbPZHffTDSp++qS6aGOLxPqi04
-         nMbnlvfWpnY4eVvuILdEIO5+LGFpIxpX+APq7jcJVAW4wSrgQPu2fhGCsf7DK7yGHcIX
-         96FQ==
+        bh=PuRg6SNsqixaTOVmmK3uOTfxD/fSeqR6sejXpJN0UP0=;
+        b=RU4anlX07u3t0wT9zF2yA18TBUbRmrS5iQ11g/kU/AkGY7TextMWSlI03OyyEgX4+Q
+         yIFtrZ+qGziIJFHvkc9Dl28wldYlRMTSuWvQPjUPTBzO6E4fjUpRM1lbzNvdPd4T2mLk
+         O8LGR/9ICeu//v+aSRMbxlM8BEZnG6XpL8cygS+rCIj1PkyUkfkhY1xHZb6CcMZ9LcXq
+         4dDYOdP+2Qvs+VR6+pOzIjgl12JsR9xrM8E2AXblcb0G7Sm1Hxd9bbyAufVXA7JelZiI
+         x0h5ForbFv+5t7yGaj9chRO69ucHV+WGMCJ3yr+COd4yKkblHVHanvgB6usYFMWRWU12
+         Golg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1758739486; x=1759344286;
+        d=1e100.net; s=20230601; t=1758739521; x=1759344321;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=L4wsQZfmoQA8Yf+bei6HdCOLaw6MvQvAF54nH254qZc=;
-        b=ZVtCCZ2syOF386dMBEOs03oQGp6pN7ZsDONZJ+aZZFG7N+Pia0ahG1GXV2pEwoSx+L
-         H4LFcZ34DMLts2MCOPtGjTY3xbcv7QHVDXOZjFsj6RkVlvITgV7XAbbo2Bw2z1m/g+80
-         YkZnexD8v8VKQUoxdN0WF5ql8QXq4GthqEuau5IlnmqgTVdnjrHxKV4etczpAeJqz7GG
-         X4lZ6f29jOPO8SEyBW4vO1kcrHExgjA1fF/SVFL8hOkiY/ZZ4wtPfM9wocQQeLbs3KxZ
-         MHsOlyjre0BlET/9XLSBQoPzvezqef67acI0LeK1+9eZ3t48JOvrxbgj2bOidASFRE8y
-         jNGw==
-X-Gm-Message-State: AOJu0YyxOYHJzikZvEU6zegH4PI8+CTUFsOquUJO5FE+eivOn74jvWSe
-	CKPF5KQl+4087vYmQLcf7cb638ElpvU9YOOJKbSP7OW0KHY2krclIpdJP7cSgF63wH7rgo7wD7a
-	Pd9W79g==
-X-Google-Smtp-Source: AGHT+IGKhkRu8Tnpm5tsgJtAbgTyL1XLOvAwUGapjYL4K8zGN7RqMAnR/PaO0GD5m9zp6FYgrHnhaRE7GZ0=
-X-Received: from plbkw4.prod.google.com ([2002:a17:902:f904:b0:269:ad1c:3698])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:903:1209:b0:267:44e6:11d3
- with SMTP id d9443c01a7336-27ed49d2bf5mr7779945ad.21.1758739485753; Wed, 24
- Sep 2025 11:44:45 -0700 (PDT)
-Date: Wed, 24 Sep 2025 11:07:41 -0700
-In-Reply-To: <20250919211649.1575654-1-seanjc@google.com>
+        bh=PuRg6SNsqixaTOVmmK3uOTfxD/fSeqR6sejXpJN0UP0=;
+        b=wR8zJAFO7je4mr3M3NGutKNIurSiI5k5huW+uDziaOba2kUfmjLJyTqqOb2k9YSz4m
+         +evuPi+7XVDzRJEKq6FSZEtZIz+Ce/FMnum8EM4PXgcdCErYVgvtjPqhJ19p3Vj+F5eA
+         UOooFJQS+q9z1TtVKAjRJy2YWBEdyfbUFp/bsY3kbFmho2c6ua0yuRbRfFVGasXC6ujC
+         NZ0wVvRfvAuHV9zrmhbwP5QMglVBShcJiJhkprdjld53QKFCxMfAi7eO1AD6SRcLeFGS
+         KgXSevmvCSXZz5N4+8yIQOQKn7WfArQZVD3NIbYzRI1W75MnEC/3NY19GgDoGkpk3r4x
+         dzkg==
+X-Gm-Message-State: AOJu0YxEfingjA0OIaghjuXOBd4HJQyUeGfnEsUKisB0vtATQ6AYfyxL
+	ag0fRG2PSjUnsGx9SUcG+P5EvEazjPCotVrl0sMnvZEqvyLyARuzj/pXXgxMx4cAyaQn6NCkQyQ
+	QS4+55w==
+X-Google-Smtp-Source: AGHT+IFKjoeIQvU+5qMuE3xLff/oP/JCX0j8XzLHJgmDk8X1MKu15hv5mG7VqGvTSem8tEiUa9GMntO5xhI=
+X-Received: from pllb17.prod.google.com ([2002:a17:902:e951:b0:269:7051:8e4a])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:902:ebd1:b0:267:cdb8:c682
+ with SMTP id d9443c01a7336-27ed4a315ccmr8753205ad.30.1758739521650; Wed, 24
+ Sep 2025 11:45:21 -0700 (PDT)
+Date: Wed, 24 Sep 2025 11:07:43 -0700
+In-Reply-To: <20250923153738.1875174-1-seanjc@google.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
-References: <20250919211649.1575654-1-seanjc@google.com>
+References: <20250923153738.1875174-1-seanjc@google.com>
 X-Mailer: git-send-email 2.51.0.536.g15c5d4f767-goog
-Message-ID: <175873636645.2146220.17008570618264199146.b4-ty@google.com>
-Subject: Re: [PATCH v2] KVM: SEV: Reject non-positive effective lengths during LAUNCH_UPDATE
+Message-ID: <175873605243.2144113.4486198413338077399.b4-ty@google.com>
+Subject: Re: [PATCH v3 0/2] KVM: SVM: Fix a bug where TSC_AUX can get clobbered
 From: Sean Christopherson <seanjc@google.com>
 To: Sean Christopherson <seanjc@google.com>, Paolo Bonzini <pbonzini@redhat.com>
 Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	Thomas Lendacky <thomas.lendacky@amd.com>, Michael Roth <michael.roth@amd.com>
+	Hou Wenlong <houwenlong.hwl@antgroup.com>, Xiaoyao Li <xiaoyao.li@intel.com>, 
+	Lai Jiangshan <jiangshan.ljs@antgroup.com>
 Content-Type: text/plain; charset="utf-8"
 
-On Fri, 19 Sep 2025 14:16:49 -0700, Sean Christopherson wrote:
-> Check for an invalid length during LAUNCH_UPDATE at the start of
-> snp_launch_update() instead of subtly relying on kvm_gmem_populate() to
-> detect the bad state.  Code that directly handles userspace input
-> absolutely should sanitize those inputs; failure to do so is asking for
-> bugs where KVM consumes an invalid "npages".
+On Tue, 23 Sep 2025 08:37:36 -0700, Sean Christopherson wrote:
+> Fix a bug where an SEV-ES vCPU running on the same pCPU as a non-SEV-ES vCPU
+> could clobber TSC_AUX due to loading the host's TSC_AUX on #VMEXIT, as opposed
+> to restoring whatever was in hardware at the time of VMRUN.
 > 
-> Keep the check in gmem, but wrap it in a WARN to flag any bad usage by
-> the caller.
+> v3:
+>  - Collect reviews. [Xiaoyao]
+>  - Make tsc_aux_uret_slot globally visible instead of passing it as a param.
+>    [Xiaoyao]
+>  - Mark tsc_aux_uret_slot __ro_after_init.
 > 
 > [...]
 
 Applied to kvm-x86 svm, thanks!
 
-[1/1] KVM: SEV: Reject non-positive effective lengths during LAUNCH_UPDATE
-      https://github.com/kvm-x86/linux/commit/5b66e335ead6
+[1/2] KVM: x86: Add helper to retrieve current value of user return MSR
+      https://github.com/kvm-x86/linux/commit/9bc366350734
+[2/2] KVM: SVM: Re-load current, not host, TSC_AUX on #VMEXIT from SEV-ES guest
+      https://github.com/kvm-x86/linux/commit/29da8c823abf
 
 --
 https://github.com/kvm-x86/linux/tree/next
