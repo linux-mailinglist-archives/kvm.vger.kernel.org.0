@@ -1,38 +1,38 @@
-Return-Path: <kvm+bounces-58644-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-58645-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 21D15B9A197
-	for <lists+kvm@lfdr.de>; Wed, 24 Sep 2025 15:46:27 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 13EF8B9A19A
+	for <lists+kvm@lfdr.de>; Wed, 24 Sep 2025 15:46:37 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 0CC951B265FF
-	for <lists+kvm@lfdr.de>; Wed, 24 Sep 2025 13:46:28 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id CC4694C6C79
+	for <lists+kvm@lfdr.de>; Wed, 24 Sep 2025 13:46:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 04ADF3064AF;
-	Wed, 24 Sep 2025 13:45:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8F8B8304971;
+	Wed, 24 Sep 2025 13:45:32 +0000 (UTC)
 X-Original-To: kvm@vger.kernel.org
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BD7D5305E1B
-	for <kvm@vger.kernel.org>; Wed, 24 Sep 2025 13:45:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F2AD43054E5
+	for <kvm@vger.kernel.org>; Wed, 24 Sep 2025 13:45:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758721530; cv=none; b=Xi3vsOysNq12MwYNIaKngMkkhx5uS5E2EISNDYT+8XN01G4r8Vo8n5zjC0g3lK+MRkZ+GZBO6iSULN1zWRN3ytcMk8kF6bHXVPsN9JzSqrOkjBBG1p3zkgQxlwFv6tUjz1c8d5W4RIrX4lnU68dGpPKNQH2guUbSnFiUEQEsipo=
+	t=1758721532; cv=none; b=ladrVKHsCwSs0/CySPPcHTC2IzF9sn52ZZ31luUQWo0jpjYFCfBAyHJxDiOncRIIFRAJdyAUB1H+qdE/DfTp1vhHX//dKvV2hEiETo/cbqGZqKT4RTsfvN1YOmF/ubn7lOybt3HAAu1LU7I9bHjnh3pgpOSY65lwdruwY/Py8is=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758721530; c=relaxed/simple;
-	bh=Cpso67FU36zzst0YVL6XmLZdKfDGZy8KngJOpF2Fry4=;
+	s=arc-20240116; t=1758721532; c=relaxed/simple;
+	bh=2mN9XbW7hJTizXzXLHOkcHcxjAwDiWUZNQ85HD/JFA8=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=psNNqznmWD3hFjJa3yVvSekp5lrFZ4uAcDs+teUwKR5/taw31isj0ylEIy0Wozjwoqeo03wBjNWWZXRKTLVkLpdSKoLFcw1R5hVsZpj2qjEyXn0FlzADsd/Y/56/dyQELaUMXwZGtZHHUKurnoNC7/kW6Hw4adwKeFdNvcw6xDI=
+	 MIME-Version; b=kMVGpcsK5nIQu1zqAbevMcawQlUAncy2H8srACJXRImIpYNGDI1UCl/lA2Dycj4whO5pDPa1OF/qTKQ2ToMo0VgnxhGeyWpuSMVJvSlvefAAMvtg3A4YQjAJ13Mxyfu1IZZe3zGRehI5nybDP3DZYM0A4zLySm0qPDxZmhjkeMM=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 65EE1106F;
-	Wed, 24 Sep 2025 06:45:20 -0700 (PDT)
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 995801CE0;
+	Wed, 24 Sep 2025 06:45:21 -0700 (PDT)
 Received: from donnerap.arm.com (donnerap.manchester.arm.com [10.33.8.67])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 8B52C3F5A1;
-	Wed, 24 Sep 2025 06:45:27 -0700 (PDT)
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id BF5E43F5A1;
+	Wed, 24 Sep 2025 06:45:28 -0700 (PDT)
 From: Andre Przywara <andre.przywara@arm.com>
 To: Will Deacon <will@kernel.org>,
 	Julien Thierry <julien.thierry.kdev@gmail.com>
@@ -40,9 +40,9 @@ Cc: Marc Zyngier <maz@kernel.org>,
 	kvm@vger.kernel.org,
 	kvmarm@lists.linux.dev,
 	Alexandru Elisei <alexandru.elisei@arm.com>
-Subject: [PATCH kvmtool v4 6/7] arm64: Generate HYP timer interrupt specifiers
-Date: Wed, 24 Sep 2025 14:45:10 +0100
-Message-Id: <20250924134511.4109935-7-andre.przywara@arm.com>
+Subject: [PATCH kvmtool v4 7/7] arm64: Handle virtio endianness reset when running nested
+Date: Wed, 24 Sep 2025 14:45:11 +0100
+Message-Id: <20250924134511.4109935-8-andre.przywara@arm.com>
 X-Mailer: git-send-email 2.25.1
 In-Reply-To: <20250924134511.4109935-1-andre.przywara@arm.com>
 References: <20250924134511.4109935-1-andre.przywara@arm.com>
@@ -56,98 +56,115 @@ Content-Transfer-Encoding: 8bit
 
 From: Marc Zyngier <maz@kernel.org>
 
-FEAT_VHE introduced a non-secure EL2 virtual timer, along with its
-interrupt line. Consequently the arch timer DT binding introduced a fifth
-interrupt to communicate this interrupt number.
-
-Refactor the interrupts property generation code to deal with a variable
-number of interrupts, and forward five interrupts instead of four in case
-nested virt is enabled.
+When running an EL2 guest, we need to make sure we don't sample
+SCTLR_EL1 to work out the virtio endianness, as this is likely
+to be a bit random.
 
 Signed-off-by: Marc Zyngier <maz@kernel.org>
 Signed-off-by: Andre Przywara <andre.przywara@arm.com>
 ---
- arm64/arm-cpu.c           |  4 +---
- arm64/include/kvm/timer.h |  2 +-
- arm64/timer.c             | 29 ++++++++++++-----------------
- 3 files changed, 14 insertions(+), 21 deletions(-)
+ arm64/include/kvm/kvm-cpu-arch.h |  5 ++--
+ arm64/kvm-cpu.c                  | 47 +++++++++++++++++++++++++-------
+ 2 files changed, 40 insertions(+), 12 deletions(-)
 
-diff --git a/arm64/arm-cpu.c b/arm64/arm-cpu.c
-index 0843ac051..5b5484d8b 100644
---- a/arm64/arm-cpu.c
-+++ b/arm64/arm-cpu.c
-@@ -12,10 +12,8 @@
+diff --git a/arm64/include/kvm/kvm-cpu-arch.h b/arm64/include/kvm/kvm-cpu-arch.h
+index 1af394aa3..85646ad4c 100644
+--- a/arm64/include/kvm/kvm-cpu-arch.h
++++ b/arm64/include/kvm/kvm-cpu-arch.h
+@@ -10,8 +10,9 @@
+ #define ARM_MPIDR_HWID_BITMASK	0xFF00FFFFFFUL
+ #define ARM_CPU_ID		3, 0, 0, 0
+ #define ARM_CPU_ID_MPIDR	5
+-#define ARM_CPU_CTRL		3, 0, 1, 0
+-#define ARM_CPU_CTRL_SCTLR_EL1	0
++#define SYS_SCTLR_EL1		3, 4, 1, 0, 0
++#define SYS_SCTLR_EL2		3, 4, 1, 0, 0
++#define SYS_HCR_EL2		3, 4, 1, 1, 0
  
- static void generate_fdt_nodes(void *fdt, struct kvm *kvm)
+ struct kvm_cpu {
+ 	pthread_t	thread;
+diff --git a/arm64/kvm-cpu.c b/arm64/kvm-cpu.c
+index 5e4f3a7dd..35e1c6396 100644
+--- a/arm64/kvm-cpu.c
++++ b/arm64/kvm-cpu.c
+@@ -12,6 +12,7 @@
+ 
+ #define SCTLR_EL1_E0E_MASK	(1 << 24)
+ #define SCTLR_EL1_EE_MASK	(1 << 25)
++#define HCR_EL2_TGE		(1 << 27)
+ 
+ static int debug_fd;
+ 
+@@ -408,7 +409,8 @@ int kvm_cpu__get_endianness(struct kvm_cpu *vcpu)
  {
--	int timer_interrupts[4] = {13, 14, 11, 10};
--
- 	gic__generate_fdt_nodes(fdt, kvm);
--	timer__generate_fdt_nodes(fdt, kvm, timer_interrupts);
-+	timer__generate_fdt_nodes(fdt, kvm);
- 	pmu__generate_fdt_nodes(fdt, kvm);
+ 	struct kvm_one_reg reg;
+ 	u64 psr;
+-	u64 sctlr;
++	u64 sctlr, bit;
++	u64 hcr = 0;
+ 
+ 	/*
+ 	 * Quoting the definition given by Peter Maydell:
+@@ -419,8 +421,9 @@ int kvm_cpu__get_endianness(struct kvm_cpu *vcpu)
+ 	 * We first check for an AArch32 guest: its endianness can
+ 	 * change when using SETEND, which affects the CPSR.E bit.
+ 	 *
+-	 * If we're AArch64, use SCTLR_EL1.E0E if access comes from
+-	 * EL0, and SCTLR_EL1.EE if access comes from EL1.
++	 * If we're AArch64, determine which SCTLR register to use,
++	 * depending on NV being used or not. Then use either the E0E
++	 * bit for EL0, or the EE bit for EL1/EL2.
+ 	 */
+ 	reg.id = ARM64_CORE_REG(regs.pstate);
+ 	reg.addr = (u64)&psr;
+@@ -430,16 +433,40 @@ int kvm_cpu__get_endianness(struct kvm_cpu *vcpu)
+ 	if (psr & PSR_MODE32_BIT)
+ 		return (psr & COMPAT_PSR_E_BIT) ? VIRTIO_ENDIAN_BE : VIRTIO_ENDIAN_LE;
+ 
+-	reg.id = ARM64_SYS_REG(ARM_CPU_CTRL, ARM_CPU_CTRL_SCTLR_EL1);
++	if (vcpu->kvm->cfg.arch.nested_virt) {
++		reg.id = ARM64_SYS_REG(SYS_HCR_EL2);
++		reg.addr = (u64)&hcr;
++		if (ioctl(vcpu->vcpu_fd, KVM_GET_ONE_REG, &reg) < 0)
++			die("KVM_GET_ONE_REG failed (HCR_EL2)");
++	}
++
++	switch (psr & PSR_MODE_MASK) {
++	case PSR_MODE_EL0t:
++		if (hcr & HCR_EL2_TGE)
++			reg.id = ARM64_SYS_REG(SYS_SCTLR_EL2);
++		else
++			reg.id = ARM64_SYS_REG(SYS_SCTLR_EL1);
++		bit = SCTLR_EL1_E0E_MASK;
++		break;
++	case PSR_MODE_EL1t:
++	case PSR_MODE_EL1h:
++		reg.id = ARM64_SYS_REG(SYS_SCTLR_EL1);
++		bit = SCTLR_EL1_EE_MASK;
++		break;
++	case PSR_MODE_EL2t:
++	case PSR_MODE_EL2h:
++		reg.id = ARM64_SYS_REG(SYS_SCTLR_EL2);
++		bit = SCTLR_EL1_EE_MASK;
++		break;
++	default:
++		die("What's that mode???\n");
++	}
++
+ 	reg.addr = (u64)&sctlr;
+ 	if (ioctl(vcpu->vcpu_fd, KVM_GET_ONE_REG, &reg) < 0)
+-		die("KVM_GET_ONE_REG failed (SCTLR_EL1)");
++		die("KVM_GET_ONE_REG failed (SCTLR_ELx)");
+ 
+-	if ((psr & PSR_MODE_MASK) == PSR_MODE_EL0t)
+-		sctlr &= SCTLR_EL1_E0E_MASK;
+-	else
+-		sctlr &= SCTLR_EL1_EE_MASK;
+-	return sctlr ? VIRTIO_ENDIAN_BE : VIRTIO_ENDIAN_LE;
++	return (sctlr & bit) ? VIRTIO_ENDIAN_BE : VIRTIO_ENDIAN_LE;
  }
  
-diff --git a/arm64/include/kvm/timer.h b/arm64/include/kvm/timer.h
-index 928e9ea7a..81e093e46 100644
---- a/arm64/include/kvm/timer.h
-+++ b/arm64/include/kvm/timer.h
-@@ -1,6 +1,6 @@
- #ifndef ARM_COMMON__TIMER_H
- #define ARM_COMMON__TIMER_H
- 
--void timer__generate_fdt_nodes(void *fdt, struct kvm *kvm, int *irqs);
-+void timer__generate_fdt_nodes(void *fdt, struct kvm *kvm);
- 
- #endif /* ARM_COMMON__TIMER_H */
-diff --git a/arm64/timer.c b/arm64/timer.c
-index 861f2d994..2ac6144f9 100644
---- a/arm64/timer.c
-+++ b/arm64/timer.c
-@@ -5,31 +5,26 @@
- #include "kvm/timer.h"
- #include "kvm/util.h"
- 
--void timer__generate_fdt_nodes(void *fdt, struct kvm *kvm, int *irqs)
-+void timer__generate_fdt_nodes(void *fdt, struct kvm *kvm)
- {
- 	const char compatible[] = "arm,armv8-timer\0arm,armv7-timer";
- 	u32 cpu_mask = gic__get_fdt_irq_cpumask(kvm);
--	u32 irq_prop[] = {
--		cpu_to_fdt32(GIC_FDT_IRQ_TYPE_PPI),
--		cpu_to_fdt32(irqs[0]),
--		cpu_to_fdt32(cpu_mask | IRQ_TYPE_LEVEL_LOW),
-+	int irqs[5] = {13, 14, 11, 10, 12};
-+	int nr = ARRAY_SIZE(irqs);
-+	u32 irq_prop[nr * 3];
- 
--		cpu_to_fdt32(GIC_FDT_IRQ_TYPE_PPI),
--		cpu_to_fdt32(irqs[1]),
--		cpu_to_fdt32(cpu_mask | IRQ_TYPE_LEVEL_LOW),
-+	if (!kvm->cfg.arch.nested_virt)
-+		nr--;
- 
--		cpu_to_fdt32(GIC_FDT_IRQ_TYPE_PPI),
--		cpu_to_fdt32(irqs[2]),
--		cpu_to_fdt32(cpu_mask | IRQ_TYPE_LEVEL_LOW),
--
--		cpu_to_fdt32(GIC_FDT_IRQ_TYPE_PPI),
--		cpu_to_fdt32(irqs[3]),
--		cpu_to_fdt32(cpu_mask | IRQ_TYPE_LEVEL_LOW),
--	};
-+	for (int i = 0; i < nr; i++) {
-+		irq_prop[i * 3 + 0] = cpu_to_fdt32(GIC_FDT_IRQ_TYPE_PPI);
-+		irq_prop[i * 3 + 1] = cpu_to_fdt32(irqs[i]);
-+		irq_prop[i * 3 + 2] = cpu_to_fdt32(cpu_mask | IRQ_TYPE_LEVEL_LOW);
-+	}
- 
- 	_FDT(fdt_begin_node(fdt, "timer"));
- 	_FDT(fdt_property(fdt, "compatible", compatible, sizeof(compatible)));
--	_FDT(fdt_property(fdt, "interrupts", irq_prop, sizeof(irq_prop)));
-+	_FDT(fdt_property(fdt, "interrupts", irq_prop, nr * 3 * sizeof(irq_prop[0])));
- 	_FDT(fdt_property(fdt, "always-on", NULL, 0));
- 	if (kvm->cfg.arch.force_cntfrq > 0)
- 		_FDT(fdt_property_cell(fdt, "clock-frequency", kvm->cfg.arch.force_cntfrq));
+ void kvm_cpu__show_code(struct kvm_cpu *vcpu)
 -- 
 2.25.1
 
