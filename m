@@ -1,59 +1,129 @@
-Return-Path: <kvm+bounces-58658-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-58662-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 011ABB9A6A4
-	for <lists+kvm@lfdr.de>; Wed, 24 Sep 2025 16:59:11 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7BA0CB9A916
+	for <lists+kvm@lfdr.de>; Wed, 24 Sep 2025 17:18:31 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id EBB07188DEDD
-	for <lists+kvm@lfdr.de>; Wed, 24 Sep 2025 14:59:32 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6DCE33AE0F2
+	for <lists+kvm@lfdr.de>; Wed, 24 Sep 2025 15:18:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5052530BB8D;
-	Wed, 24 Sep 2025 14:55:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5073930F554;
+	Wed, 24 Sep 2025 15:17:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=zytor.com header.i=@zytor.com header.b="Wh5kzIr2"
+	dkim=pass (2048-bit key) header.d=lmu.de header.i=@campus.lmu.de header.b="hVFE+7S8"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail.zytor.com (terminus.zytor.com [198.137.202.136])
+Received: from postout2.mail.lrz.de (postout2.mail.lrz.de [129.187.255.138])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8A00F1F5F6;
-	Wed, 24 Sep 2025 14:54:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.136
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0D44C309DB5;
+	Wed, 24 Sep 2025 15:17:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=129.187.255.138
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758725701; cv=none; b=eqdNN6YoJx1Ed0EQ2urVz8nWIGDZCV+exLT/et9G7l3neoekGapLsYIAAmkGyBrSRdQ67fEuy7XiQzy0iBBcVfv/OT0MOeXg5TMt6h816HJIkNVee/e0BTlWnc43ZwLu0cGWNgrd/7UlfJyksn4ZjmRv3rCfzmni0QPNrKkI27k=
+	t=1758727071; cv=none; b=ROeTEiEq11g7ZX/aV7NJUak4jbe8EIqtNAKu4CX/lrKB2SHa1Yperar8+ONCTX7fLRHI5cwidtZaWgLt1kTu0Tm1Us/4JPuBFZm4axe9B5YiH/mchnM8snRcVIn+QqNAfUuAs6FtyMup26XQvZu3NJGGvMtdIqS6KcQhQLuq0p8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758725701; c=relaxed/simple;
-	bh=ums5rCpligBaqIOr1iJYvoJi/ipeeOOcZh64vXTzvD4=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=n9Z6GIDikx88oJ//7YF5CzdPwAmZF/KURsrlKAj73COz+Hgw2MT8uX3PBqDN5EE0FcO6OqJ9XfknJthSVjGFPaCrcXYSBSuvGKhkBcqEqqdF8LJGMOFIA++az+SPamnRxphVRZbfrF4DRwCrQ+kglDj4txohI8U4JruBegIuI7Y=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=zytor.com; spf=pass smtp.mailfrom=zytor.com; dkim=pass (2048-bit key) header.d=zytor.com header.i=@zytor.com header.b=Wh5kzIr2; arc=none smtp.client-ip=198.137.202.136
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=zytor.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=zytor.com
-Received: from terminus.zytor.com (terminus.zytor.com [IPv6:2607:7c80:54:3:0:0:0:136])
-	(authenticated bits=0)
-	by mail.zytor.com (8.18.1/8.17.1) with ESMTPSA id 58OEsLMt2046832
-	(version=TLSv1.3 cipher=TLS_AES_256_GCM_SHA384 bits=256 verify=NO);
-	Wed, 24 Sep 2025 07:54:25 -0700
-DKIM-Filter: OpenDKIM Filter v2.11.0 mail.zytor.com 58OEsLMt2046832
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=zytor.com;
-	s=2025092201; t=1758725665;
-	bh=3fdycQ/ZLjLpUaLy9CBDdIIoh4ke95VnoYcdcc/EbPw=;
-	h=From:To:Cc:Subject:Date:From;
-	b=Wh5kzIr2z6Wp4F58tFAaz70gI4SIH7VBJl/HvraSIDJrmM8BhZw42VQ8k3JbskvyA
-	 OoVfBRYBiqFlGYBzEvliypqTcTr5/AQN1woF1oaGXJc07OuN+u/yU95q2bvHxBsJ5O
-	 YxHW18gd75h0fynGCdege3UY+B3yFZHmTYARketbD+Ll/DqvfGfwPatTU5rHnR6pOg
-	 s1Z3BWKInFAWCnBl2nnC9Y93t2fV/5U+EqGd+ClpH6d+z+bgqOXJovxWgwju61vtgY
-	 RuUWRE58AaJNaL6FqGADs3t+YmIhcR1fldWHFo0MvRLHp1ZhQlUQcGZi3z0H2WHPpW
-	 2vqCBQInnCBXA==
-From: "Xin Li (Intel)" <xin@zytor.com>
-To: linux-kernel@vger.kernel.org, kvm@vger.kernel.org
-Cc: seanjc@google.com, pbonzini@redhat.com, tglx@linutronix.de,
-        mingo@redhat.com, bp@alien8.de, dave.hansen@linux.intel.com,
-        x86@kernel.org, hpa@zytor.com, xin@zytor.com, chao.gao@intel.com
-Subject: [PATCH v1] KVM: nVMX: Use vcpu instead of vmx->vcpu when vcpu is available
-Date: Wed, 24 Sep 2025 07:54:21 -0700
-Message-ID: <20250924145421.2046822-1-xin@zytor.com>
+	s=arc-20240116; t=1758727071; c=relaxed/simple;
+	bh=qHJFbsYgS91YYDoS3pNiLv0mtvxMAELdSxOXkcm25+4=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=YlAdYo7LAvOzhUuPe6Op4rqXxTAoL7Jg6hHd9BRhgSOZTsMBJeQBxRftugFC6wS7HqFNQaBgFXvjfKm/l0kLNFkYXds7CvW+jyWCg69mkyUk8kIo4Ny/XyCZy7AeChfwB+pSagndSkG1f/R6gdjPVUHmeLbCgkFDQPq7WU55pac=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=campus.lmu.de; spf=pass smtp.mailfrom=campus.lmu.de; dkim=pass (2048-bit key) header.d=lmu.de header.i=@campus.lmu.de header.b=hVFE+7S8; arc=none smtp.client-ip=129.187.255.138
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=campus.lmu.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=campus.lmu.de
+Received: from lxmhs52.srv.lrz.de (localhost [127.0.0.1])
+	by postout2.mail.lrz.de (Postfix) with ESMTP id 4cX0fy3FrjzySk;
+	Wed, 24 Sep 2025 17:11:22 +0200 (CEST)
+Authentication-Results: postout.lrz.de (amavis); dkim=pass (2048-bit key)
+ reason="pass (just generated, assumed good)" header.d=lmu.de
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=lmu.de; h=
+	content-transfer-encoding:mime-version:x-mailer:message-id:date
+	:date:subject:subject:from:from:received:received; s=
+	lm-postout21; i=@campus.lmu.de; t=1758726681; bh=T6LxtLsJSjh5VFa
+	qIEo/5wr5RrqvMX416qBvYTVfg0E=; b=hVFE+7S8Fn4/3XjSufKRyxWHwW1bTtz
+	VmlF6g1t4TlmQrUK2g6F6vLFlU40czoRwEq0RsFT/3IH7GMQ5G2Ibu8haG+BFOfJ
+	8zZe76T3pWxXCby+AgHbP88DGrWGP+ho9qz0miGx/2adAFJYmk7+vs2VjMqiu7Xh
+	yASlcM7coWzhItLtC4rvkK5u/f1ktq9yjN1Sax5zRaIXtvfODBmowx5M8OtnLBnM
+	79T3dgWtXp1eUoF/g2u9tss/ucgkyjOiwJdjoUojvziOhDN9PlPFzEFrj0M3Pn5p
+	JmU6RCdR9hpgfd6nTab7IgTRGw3ihak6ss8Sxi5Aq73ihDT6fW4jgKA==
+X-Virus-Scanned: by amavisd-new at lrz.de in lxmhs52.srv.lrz.de
+X-Spam-Flag: NO
+X-Spam-Score: -2.886
+X-Spam-Level:
+Received: from postout2.mail.lrz.de ([127.0.0.1])
+ by lxmhs52.srv.lrz.de (lxmhs52.srv.lrz.de [127.0.0.1]) (amavis, port 20024)
+ with LMTP id zUqMeowYmgiG; Wed, 24 Sep 2025 17:11:21 +0200 (CEST)
+Received: from spacestation.cable.virginm.net (oxfd-27-b2-v4wan-164230-cust474.vm42.cable.virginm.net [86.22.133.219])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(Client did not present a certificate)
+	by postout2.mail.lrz.de (Postfix) with ESMTPSA id 4cX0fr09PgzyS8;
+	Wed, 24 Sep 2025 17:11:15 +0200 (CEST)
+From: Patrick Roy <patrick.roy@campus.lmu.de>
+To: 
+Cc: Patrick Roy <roypat@amazon.co.uk>,
+	pbonzini@redhat.com,
+	corbet@lwn.net,
+	maz@kernel.org,
+	oliver.upton@linux.dev,
+	joey.gouly@arm.com,
+	suzuki.poulose@arm.com,
+	yuzenghui@huawei.com,
+	catalin.marinas@arm.com,
+	will@kernel.org,
+	tglx@linutronix.de,
+	mingo@redhat.com,
+	bp@alien8.de,
+	dave.hansen@linux.intel.com,
+	x86@kernel.org,
+	hpa@zytor.com,
+	luto@kernel.org,
+	peterz@infradead.org,
+	willy@infradead.org,
+	akpm@linux-foundation.org,
+	david@redhat.com,
+	lorenzo.stoakes@oracle.com,
+	Liam.Howlett@oracle.com,
+	vbabka@suse.cz,
+	rppt@kernel.org,
+	surenb@google.com,
+	mhocko@suse.com,
+	song@kernel.org,
+	jolsa@kernel.org,
+	ast@kernel.org,
+	daniel@iogearbox.net,
+	andrii@kernel.org,
+	martin.lau@linux.dev,
+	eddyz87@gmail.com,
+	yonghong.song@linux.dev,
+	john.fastabend@gmail.com,
+	kpsingh@kernel.org,
+	sdf@fomichev.me,
+	haoluo@google.com,
+	jgg@ziepe.ca,
+	jhubbard@nvidia.com,
+	peterx@redhat.com,
+	jannh@google.com,
+	pfalcato@suse.de,
+	shuah@kernel.org,
+	seanjc@google.com,
+	kvm@vger.kernel.org,
+	linux-doc@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org,
+	kvmarm@lists.linux.dev,
+	linux-fsdevel@vger.kernel.org,
+	linux-mm@kvack.org,
+	bpf@vger.kernel.org,
+	linux-kselftest@vger.kernel.org,
+	xmarcalx@amazon.co.uk,
+	kalyazin@amazon.co.uk,
+	jackabt@amazon.co.uk,
+	derekmn@amazon.co.uk,
+	tabba@google.com,
+	ackerleytng@google.com
+Subject: [PATCH v7 00/12] Direct Map Removal Support for guest_memfd
+Date: Wed, 24 Sep 2025 16:10:40 +0100
+Message-ID: <20250924151101.2225820-1-patrick.roy@campus.lmu.de>
 X-Mailer: git-send-email 2.51.0
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
@@ -61,58 +131,104 @@ List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Transfer-Encoding: 7bit
 
-Prefer using vcpu directly when available, instead of accessing it
-through vmx->vcpu.
+From: Patrick Roy <roypat@amazon.co.uk>
 
-Signed-off-by: Xin Li (Intel) <xin@zytor.com>
----
- arch/x86/kvm/vmx/nested.c | 8 ++++----
- 1 file changed, 4 insertions(+), 4 deletions(-)
+[ based on kvm/next ]
 
-diff --git a/arch/x86/kvm/vmx/nested.c b/arch/x86/kvm/vmx/nested.c
-index 76271962cb70..3fca63a261f5 100644
---- a/arch/x86/kvm/vmx/nested.c
-+++ b/arch/x86/kvm/vmx/nested.c
-@@ -761,7 +761,7 @@ static void nested_cache_shadow_vmcs12(struct kvm_vcpu *vcpu,
- 				      vmcs12->vmcs_link_pointer, VMCS12_SIZE))
- 		return;
- 
--	kvm_read_guest_cached(vmx->vcpu.kvm, ghc, get_shadow_vmcs12(vcpu),
-+	kvm_read_guest_cached(vcpu->kvm, ghc, get_shadow_vmcs12(vcpu),
- 			      VMCS12_SIZE);
- }
- 
-@@ -780,7 +780,7 @@ static void nested_flush_cached_shadow_vmcs12(struct kvm_vcpu *vcpu,
- 				      vmcs12->vmcs_link_pointer, VMCS12_SIZE))
- 		return;
- 
--	kvm_write_guest_cached(vmx->vcpu.kvm, ghc, get_shadow_vmcs12(vcpu),
-+	kvm_write_guest_cached(vcpu->kvm, ghc, get_shadow_vmcs12(vcpu),
- 			       VMCS12_SIZE);
- }
- 
-@@ -2749,7 +2749,7 @@ static int prepare_vmcs02(struct kvm_vcpu *vcpu, struct vmcs12 *vmcs12,
- 		vmcs_write64(GUEST_IA32_PAT, vmcs12->guest_ia32_pat);
- 		vcpu->arch.pat = vmcs12->guest_ia32_pat;
- 	} else if (vmcs_config.vmentry_ctrl & VM_ENTRY_LOAD_IA32_PAT) {
--		vmcs_write64(GUEST_IA32_PAT, vmx->vcpu.arch.pat);
-+		vmcs_write64(GUEST_IA32_PAT, vcpu->arch.pat);
- 	}
- 
- 	vcpu->arch.tsc_offset = kvm_calc_nested_tsc_offset(
-@@ -3880,7 +3880,7 @@ static int nested_vmx_run(struct kvm_vcpu *vcpu, bool launch)
- 		goto vmentry_failed;
- 
- 	/* Hide L1D cache contents from the nested guest.  */
--	vmx->vcpu.arch.l1tf_flush_l1d = true;
-+	vcpu->arch.l1tf_flush_l1d = true;
- 
- 	/*
- 	 * Must happen outside of nested_vmx_enter_non_root_mode() as it will
+Unmapping virtual machine guest memory from the host kernel's direct map is a
+successful mitigation against Spectre-style transient execution issues: If the
+kernel page tables do not contain entries pointing to guest memory, then any
+attempted speculative read through the direct map will necessarily be blocked
+by the MMU before any observable microarchitectural side-effects happen. This
+means that Spectre-gadgets and similar cannot be used to target virtual machine
+memory. Roughly 60% of speculative execution issues fall into this category [1,
+Table 1].
 
-base-commit: 325fbe689e121ba11c16096f452750614767c31e
+This patch series extends guest_memfd with the ability to remove its memory
+from the host kernel's direct map, to be able to attain the above protection
+for KVM guests running inside guest_memfd.
+
+Additionally, a Firecracker branch with support for these VMs can be found on
+GitHub [2].
+
+For more details, please refer to the v5 cover letter [v5]. No
+substantial changes in design have taken place since.
+
+=== Changes Since v6 ===
+
+- Drop patch for passing struct address_space to ->free_folio(), due to
+  possible races with freeing of the address_space. (Hugh)
+- Stop using PG_uptodate / gmem preparedness tracking to keep track of
+  direct map state.  Instead, use the lowest bit of folio->private. (Mike, David)
+- Do direct map removal when establishing mapping of gmem folio instead
+  of at allocation time, due to impossibility of handling direct map
+  removal errors in kvm_gmem_populate(). (Patrick)
+- Do TLB flushes after direct map removal, and provide a module
+  parameter to opt out from them, and a new patch to export
+  flush_tlb_kernel_range() to KVM. (Will)
+
+[1]: https://download.vusec.net/papers/quarantine_raid23.pdf
+[2]: https://github.com/firecracker-microvm/firecracker/tree/feature/secret-hiding
+[RFCv1]: https://lore.kernel.org/kvm/20240709132041.3625501-1-roypat@amazon.co.uk/
+[RFCv2]: https://lore.kernel.org/kvm/20240910163038.1298452-1-roypat@amazon.co.uk/
+[RFCv3]: https://lore.kernel.org/kvm/20241030134912.515725-1-roypat@amazon.co.uk/
+[v4]: https://lore.kernel.org/kvm/20250221160728.1584559-1-roypat@amazon.co.uk/
+[v5]: https://lore.kernel.org/kvm/20250828093902.2719-1-roypat@amazon.co.uk/
+[v6]: https://lore.kernel.org/kvm/20250912091708.17502-1-roypat@amazon.co.uk/
+
+
+Patrick Roy (12):
+  arch: export set_direct_map_valid_noflush to KVM module
+  x86/tlb: export flush_tlb_kernel_range to KVM module
+  mm: introduce AS_NO_DIRECT_MAP
+  KVM: guest_memfd: Add stub for kvm_arch_gmem_invalidate
+  KVM: guest_memfd: Add flag to remove from direct map
+  KVM: guest_memfd: add module param for disabling TLB flushing
+  KVM: selftests: load elf via bounce buffer
+  KVM: selftests: set KVM_MEM_GUEST_MEMFD in vm_mem_add() if guest_memfd
+    != -1
+  KVM: selftests: Add guest_memfd based vm_mem_backing_src_types
+  KVM: selftests: cover GUEST_MEMFD_FLAG_NO_DIRECT_MAP in existing
+    selftests
+  KVM: selftests: stuff vm_mem_backing_src_type into vm_shape
+  KVM: selftests: Test guest execution from direct map removed gmem
+
+ Documentation/virt/kvm/api.rst                |  5 ++
+ arch/arm64/include/asm/kvm_host.h             | 12 ++++
+ arch/arm64/mm/pageattr.c                      |  1 +
+ arch/loongarch/mm/pageattr.c                  |  1 +
+ arch/riscv/mm/pageattr.c                      |  1 +
+ arch/s390/mm/pageattr.c                       |  1 +
+ arch/x86/include/asm/tlbflush.h               |  3 +-
+ arch/x86/mm/pat/set_memory.c                  |  1 +
+ arch/x86/mm/tlb.c                             |  1 +
+ include/linux/kvm_host.h                      |  9 +++
+ include/linux/pagemap.h                       | 16 +++++
+ include/linux/secretmem.h                     | 18 -----
+ include/uapi/linux/kvm.h                      |  2 +
+ lib/buildid.c                                 |  4 +-
+ mm/gup.c                                      | 19 ++----
+ mm/mlock.c                                    |  2 +-
+ mm/secretmem.c                                |  8 +--
+ .../testing/selftests/kvm/guest_memfd_test.c  |  2 +
+ .../testing/selftests/kvm/include/kvm_util.h  | 37 ++++++++---
+ .../testing/selftests/kvm/include/test_util.h |  8 +++
+ tools/testing/selftests/kvm/lib/elf.c         |  8 +--
+ tools/testing/selftests/kvm/lib/io.c          | 23 +++++++
+ tools/testing/selftests/kvm/lib/kvm_util.c    | 61 +++++++++--------
+ tools/testing/selftests/kvm/lib/test_util.c   |  8 +++
+ tools/testing/selftests/kvm/lib/x86/sev.c     |  1 +
+ .../selftests/kvm/pre_fault_memory_test.c     |  1 +
+ .../selftests/kvm/set_memory_region_test.c    | 50 ++++++++++++--
+ .../kvm/x86/private_mem_conversions_test.c    |  7 +-
+ virt/kvm/guest_memfd.c                        | 66 +++++++++++++++++--
+ virt/kvm/kvm_main.c                           |  8 +++
+ 30 files changed, 290 insertions(+), 94 deletions(-)
+
+
+base-commit: a6ad54137af92535cfe32e19e5f3bc1bb7dbd383
 -- 
 2.51.0
 
