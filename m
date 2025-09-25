@@ -1,292 +1,465 @@
-Return-Path: <kvm+bounces-58718-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-58719-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 51449B9E1AA
-	for <lists+kvm@lfdr.de>; Thu, 25 Sep 2025 10:45:10 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 6A5FFB9E2D3
+	for <lists+kvm@lfdr.de>; Thu, 25 Sep 2025 11:02:14 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id F1BEE16AFA0
-	for <lists+kvm@lfdr.de>; Thu, 25 Sep 2025 08:45:09 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8FDF816EAFE
+	for <lists+kvm@lfdr.de>; Thu, 25 Sep 2025 09:02:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B8E52277026;
-	Thu, 25 Sep 2025 08:45:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 04CA6289E36;
+	Thu, 25 Sep 2025 09:01:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="Xa2YNm5q"
+	dkim=pass (2048-bit key) header.d=amazon.de header.i=@amazon.de header.b="OjiMrsYR"
 X-Original-To: kvm@vger.kernel.org
-Received: from casper.infradead.org (casper.infradead.org [90.155.50.34])
+Received: from fra-out-006.esa.eu-central-1.outbound.mail-perimeter.amazon.com (fra-out-006.esa.eu-central-1.outbound.mail-perimeter.amazon.com [18.197.217.180])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6517025EF97
-	for <kvm@vger.kernel.org>; Thu, 25 Sep 2025 08:44:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=90.155.50.34
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 60D3226A0EB;
+	Thu, 25 Sep 2025 09:01:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=18.197.217.180
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758789902; cv=none; b=g0TrW9REC9YvE9gkHIp0Y1IHtGxxRAPh3hclHjW8or5g+rPEjGZFwiev7Pflyv5bhD+VP4HQ9n6EQOlcEQglSmjX+VmfR0/Sk8d5hG0d6O4OjuYQ7HigqCxW8yrtbLuwW0LfOTYEiW1euNapkyPpdL16VVwupkfymG++xUMeCbo=
+	t=1758790905; cv=none; b=PQ5jg6dY1/gYK6xSU1XopTPZTu2FtRbKXibRJj7Dm0X3C3r8jCSlT5y4YiuVTqWykN/u83vhz4X2u4L280si/+8LP3m6gqoRCt0i6C/YjSGmzDO7s2J+qNSm7mNMt2dzXKphWGMI57sLbg8OiELAwjYDWX/Vr7uM3lpyIiGJkPA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758789902; c=relaxed/simple;
-	bh=M9u8mUKPAfSDyBXsKc1oLFsIrFGjSYqd9GDM3NLoJFg=;
-	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=n3lUI/knXALuodJpUJK+F/ATEbFTWDfXJv81J/ZvDZHWZlNAMqmM8uzMfvUPcjuaPNjesFvq7N+HKA4iFdudE6yMh0YfHhaWoC8A2ZYkAa0UjFKoSi5nD/mnSIjh93tx100Bh0VfNbAR388eEuiaKTVhPPrbwvehxiC+tuGGIkU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=casper.srs.infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=Xa2YNm5q; arc=none smtp.client-ip=90.155.50.34
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=casper.srs.infradead.org
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=infradead.org; s=casper.20170209; h=MIME-Version:Content-Type:References:
-	In-Reply-To:Date:Cc:To:From:Subject:Message-ID:Sender:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description;
-	bh=M9u8mUKPAfSDyBXsKc1oLFsIrFGjSYqd9GDM3NLoJFg=; b=Xa2YNm5qEFdSwu7EBEEXgm74/F
-	wFf4dqIbEnqbGZ1oE7lDjj+jyJaJ6b7ZDCSC1I7alkfGN8lVhMMm1f9bxneFTmXEu5fsAL27HX/0b
-	puTVFJCda8zw/YwaqN+wZ+mn1JLJKZ1BlrOmbyYI3oz86/pLkHMNfM7UKeWWrbuqyvUzLdjcqGeKy
-	95MZ3qN4lPH4iJdqmIEYx5C5qAfeUIuN1Axe65zR8qSxIWnN5f+YtQnZEhkOOaB4m/W/s2y1hZt6B
-	lcSDfJIXnXH3Rg1557j1y0YsZCVHNxOdYwokoMzo6MeL7zskffUWpqtE9/Ro6HyaiUl5kWAoqUlKY
-	liHnrzAQ==;
-Received: from [172.31.31.148] (helo=u09cd745991455d.lumleys.internal)
-	by casper.infradead.org with esmtpsa (Exim 4.98.2 #2 (Red Hat Linux))
-	id 1v1hav-00000000GyT-2pV9;
-	Thu, 25 Sep 2025 08:44:54 +0000
-Message-ID: <acca55a49bad023fad30625fc81e19ef1c3d0ed8.camel@infradead.org>
-Subject: Re: Should QEMU (accel=kvm) kvm-clock/guest_tsc stop counting
- during downtime blackout?
-From: David Woodhouse <dwmw2@infradead.org>
-To: Dongli Zhang <dongli.zhang@oracle.com>, qemu-devel@nongnu.org
-Cc: kvm@vger.kernel.org
-Date: Thu, 25 Sep 2025 09:44:54 +0100
-In-Reply-To: <2cf13be8-cd27-4bfb-af8e-ef33286d633b@oracle.com>
-References: <2d375ec3-a071-4ae3-b03a-05a823c48016@oracle.com>
-	 <3d30b662b8cdb2d25d9b4c5bae98af1c45fac306.camel@infradead.org>
-	 <1e9f9c64-af03-466b-8212-ce5c828aac6e@oracle.com>
-	 <c1ceaa4e68b9264fc1c811c1ad0b60628d7fd9cd.camel@infradead.org>
-	 <7d91b34c-36fe-44ee-8a2a-fb00eaebddd8@oracle.com>
-	 <71b79d3819b5f5435b7bc7d8c451be0d276e02db.camel@infradead.org>
-	 <bbadb98b-964c-4eaa-8826-441a28e08100@oracle.com>
-	 <2e958c58d1d1f0107475b3d91f7a6f2a28da13de.camel@infradead.org>
-	 <2cf13be8-cd27-4bfb-af8e-ef33286d633b@oracle.com>
-Content-Type: multipart/signed; micalg="sha-256"; protocol="application/pkcs7-signature";
-	boundary="=-8mqoIiVtnlclBKnvEqXL"
-User-Agent: Evolution 3.52.3-0ubuntu1 
+	s=arc-20240116; t=1758790905; c=relaxed/simple;
+	bh=wH0V9L4HTAytSlhGMf8/mWvHFkJs/uy3bUfR1VwxUaw=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=puWQOX44/FW5xKZtyFCTxsWXFGk06UVsPcSMl6OkQt0xMZBmAx/FmxlxnVvVHyeoSQN1PYrlfZQz4mJrEWR+2CDJBjLay7dtpFgtT0KyJ9eZ/m8iWTWVOdpTbMF7I3hrZjL4AeV3W/YQU07Qj2lq/AWmwvq4gBE1Wq0mhMLURhA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.de; spf=pass smtp.mailfrom=amazon.de; dkim=pass (2048-bit key) header.d=amazon.de header.i=@amazon.de header.b=OjiMrsYR; arc=none smtp.client-ip=18.197.217.180
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.de
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+  d=amazon.de; i=@amazon.de; q=dns/txt; s=amazoncorp2;
+  t=1758790902; x=1790326902;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=arzVRhcfGNvrujNspcMcohO7D+1CiaSxpV1EYAPjoLY=;
+  b=OjiMrsYRm19WHYi2WszO3bQtrdCJWnFnOFwrv4XGXFa4G6fQn3EMui6V
+   YhxfgXceDge+rPZxmsGgx2k6apYjdXxqmYfCEMiVQbIu4TZJsbnMU7WS2
+   SMo+Aeu5HsWsOMDd2DJdMj0NmuyTTu4EPYykzbnbhM6uenZF4DSFQrrM7
+   eqCzInabSUnFuqC/4VU8row46gGVKoyAbf8yifuSUOCkouEI8qJ7B9Y0f
+   u6qtIMjkGfnoFnTmonol40eMdNa9Qm4vae7Cc3WDZd3NqJ31hszktOfEL
+   CAlyScl83w9gWGMdmuM4+tNZc2LCUnKyhmeUzfY4xjW4Qka6EdmRmNxwA
+   A==;
+X-CSE-ConnectionGUID: V0XLSrSDQwiAnaQDrrWKDQ==
+X-CSE-MsgGUID: //mnf7PMQSGyzgjJ2HITug==
+X-IronPort-AV: E=Sophos;i="6.18,292,1751241600"; 
+   d="scan'208";a="2652043"
+Received: from ip-10-6-6-97.eu-central-1.compute.internal (HELO smtpout.naws.eu-central-1.prod.farcaster.email.amazon.dev) ([10.6.6.97])
+  by internal-fra-out-006.esa.eu-central-1.outbound.mail-perimeter.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 25 Sep 2025 09:01:31 +0000
+Received: from EX19MTAEUC001.ant.amazon.com [54.240.197.225:31100]
+ by smtpin.naws.eu-central-1.prod.farcaster.email.amazon.dev [10.0.38.97:2525] with esmtp (Farcaster)
+ id 42bcdf63-1af6-489b-b701-b4265b51e108; Thu, 25 Sep 2025 09:01:31 +0000 (UTC)
+X-Farcaster-Flow-ID: 42bcdf63-1af6-489b-b701-b4265b51e108
+Received: from EX19D016EUA001.ant.amazon.com (10.252.50.245) by
+ EX19MTAEUC001.ant.amazon.com (10.252.51.155) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.2562.20;
+ Thu, 25 Sep 2025 09:01:29 +0000
+Received: from amazon.com (10.1.213.21) by EX19D016EUA001.ant.amazon.com
+ (10.252.50.245) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.2562.20; Thu, 25 Sep 2025
+ 09:01:26 +0000
+From: Maximilian Dittgen <mdittgen@amazon.de>
+To: <maz@kernel.org>, <oliver.upton@linux.dev>
+CC: <pbonzini@redhat.com>, <shuah@kernel.org>,
+	<linux-arm-kernel@lists.infradead.org>, <kvmarm@lists.linux.dev>,
+	<linux-kselftest@vger.kernel.org>, <kvm@vger.kernel.org>,
+	<mdittgen@amazon.de>
+Subject: [PATCH] kvm, selftests: ioctl to handle MSIs injected from userspace as software-bypassing vLPIs
+Date: Thu, 25 Sep 2025 11:01:16 +0200
+Message-ID: <20250925090116.27575-1-mdittgen@amazon.de>
+X-Mailer: git-send-email 2.50.1
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-SRS-Rewrite: SMTP reverse-path rewritten from <dwmw2@infradead.org> by casper.infradead.org. See http://www.infradead.org/rpr.html
+X-ClientProxiedBy: EX19D036UWB004.ant.amazon.com (10.13.139.170) To
+ EX19D016EUA001.ant.amazon.com (10.252.50.245)
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+
+From: Maximilian Dittgen <mdittgen@amazon.de>
+
+At the moment, all MSIs injected from userspace using KVM_SIGNAL_MSI are
+processed as LPIs in software with a hypervisor trap and exit. To
+properly test GICv4 direct vLPI injection from KVM selftests, we write a
+KVM_DEBUG_GIC_MSI_SETUP ioctl that manually creates an IRQ routing table
+entry for the specified MSI, and populates ITS structures (device,
+collection, and interrupt translation table entries) to map the MSI to a
+vLPI. We then call GICv4 kvm_vgic_v4_set_forwarding to let the vLPI bypass
+hypervisor traps and inject directly to the vCPU.
+
+To demonstrate the use of this ioctl, we implement a -D flag to the
+vgic_lpi_stress.c selftest that runs the stress test using direct vLPI
+injection rather than software-emulated LPI handling.
+
+Signed-off-by: Maximilian Dittgen <mdittgen@amazon.de>
+---
+ arch/arm64/kvm/arm.c                          |  37 +++++
+ arch/arm64/kvm/vgic/vgic-its.c                | 133 ++++++++++++++++++
+ arch/arm64/kvm/vgic/vgic.h                    |   2 +
+ include/linux/irqchip/arm-gic-v3.h            |   1 +
+ include/uapi/linux/kvm.h                      |  15 ++
+ .../selftests/kvm/arm64/vgic_lpi_stress.c     |  52 ++++++-
+ 6 files changed, 238 insertions(+), 2 deletions(-)
+
+diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
+index 5bf101c869c9..e18f5ff68274 100644
+--- a/arch/arm64/kvm/arm.c
++++ b/arch/arm64/kvm/arm.c
+@@ -46,6 +46,8 @@
+ #include <kvm/arm_pmu.h>
+ #include <kvm/arm_psci.h>
+ 
++#include <vgic/vgic.h>
++
+ #include "sys_regs.h"
+ 
+ static enum kvm_mode kvm_mode = KVM_MODE_DEFAULT;
+@@ -1927,6 +1929,41 @@ int kvm_arch_vm_ioctl(struct file *filp, unsigned int ioctl, unsigned long arg)
+ 			return -EFAULT;
+ 		return kvm_vm_ioctl_get_reg_writable_masks(kvm, &range);
+ 	}
++	case KVM_DEBUG_GIC_MSI_SETUP: {
++		/* Define interrupt ID boundaries for input validation */
++		#define GIC_LPI_OFFSET    8192
++		#define GIC_LPI_MAX       65535
++		#define SPI_INTID_MIN     32
++		#define SPI_INTID_MAX     1019
++
++		struct kvm_debug_gic_msi_setup params;
++		struct kvm_vcpu *vcpu;
++
++		if (copy_from_user(&params, argp, sizeof(params)))
++			return -EFAULT;
++
++		/* validate vcpu_id is in range and exists */
++		if (params.vcpu_id >= atomic_read(&kvm->online_vcpus))
++			return -EINVAL;
++
++		vcpu = kvm_get_vcpu(kvm, params.vcpu_id);
++		if (!vcpu)
++			return -EINVAL;
++
++		/* validate vintid is in LPI range */
++		if (params.vintid < GIC_LPI_OFFSET || params.vintid > GIC_LPI_MAX)
++			return -EINVAL;
++
++		/*
++		 * Validate host_irq is in safe range -- we use SPI range since
++		 * selftests guests will have no shared peripheral devices
++		 */
++		if (params.host_irq < SPI_INTID_MIN || params.host_irq > SPI_INTID_MAX)
++			return -EINVAL;
++
++		/* Mock single MSI for testing */
++		return debug_gic_msi_setup_mock_msi(kvm, &params);
++	}
+ 	default:
+ 		return -EINVAL;
+ 	}
+diff --git a/arch/arm64/kvm/vgic/vgic-its.c b/arch/arm64/kvm/vgic/vgic-its.c
+index 7368c13f16b7..46153ef5efcb 100644
+--- a/arch/arm64/kvm/vgic/vgic-its.c
++++ b/arch/arm64/kvm/vgic/vgic-its.c
+@@ -2816,3 +2816,136 @@ int kvm_vgic_register_its_device(void)
+ 	return kvm_register_device_ops(&kvm_arm_vgic_its_ops,
+ 				       KVM_DEV_TYPE_ARM_VGIC_ITS);
+ }
++
++static struct vgic_its *vgic_get_its(struct kvm *kvm,
++				     struct kvm_kernel_irq_routing_entry *irq_entry)
++{
++	struct kvm_msi msi  = (struct kvm_msi) {
++		.address_lo	= irq_entry->msi.address_lo,
++		.address_hi	= irq_entry->msi.address_hi,
++		.data		= irq_entry->msi.data,
++		.flags		= irq_entry->msi.flags,
++		.devid		= irq_entry->msi.devid,
++	};
++
++	return vgic_msi_to_its(kvm, &msi);
++}
++
++/*
++ * debug_gic_msi_setup_mock_msi - manually set up vLPI direct injection infrastructure
++ * for an MSI upon userspace request. Used for testing vLPIs from selftests.
++ *
++ * Creates an IRQ routing entry mapping the specified MSI signature to a mock
++ * host IRQ, then populates ITS structures (device, collection, ITE) to establish
++ * the DevID/EventID to LPI translation. Finally enables GICv4 vLPI forwarding
++ * to bypass software emulation and inject interrupts directly to the vCPU.
++ *
++ * This function is intended solely for KVM selftests via KVM_DEBUG_GIC_MSI_SETUP.
++ * It uses mock host IRQs in the SPI range assuming no real hardware devices are
++ * present on a selftest guest. Using this interface in production will corrupt the
++ * IRQ routing table.
++ */
++int debug_gic_msi_setup_mock_msi(struct kvm *kvm, struct kvm_debug_gic_msi_setup *params)
++{
++	struct kvm_irq_routing_entry user_entry;
++	struct kvm_kernel_irq_routing_entry entry;
++	struct vgic_its *its;
++	struct its_device *device;
++	struct its_collection *collection;
++	struct its_ite *ite;
++	struct vgic_irq *irq;
++	struct kvm_vcpu *vcpu;
++	u64 doorbell_addr = GITS_BASE_GPA + GITS_TRANSLATER;
++	u32 device_id = params->device_id;
++	u32 event_id = params->event_id;
++	u32 coll_id = params->vcpu_id;
++	u32 lpi_nr = params->vintid;
++	gpa_t itt_addr = params->itt_addr;
++	int ret;
++	int host_irq = params->host_irq;
++
++	// Unmap any existing vLPI on the mock host IRQ (remnants from prior mocks)
++	kvm_vgic_v4_unset_forwarding(kvm, host_irq);
++
++	/* Create mock user IRQ routing entry using kvm_set_routing_entry function */
++	memset(&user_entry, 0, sizeof(user_entry));
++	user_entry.gsi = host_irq;
++	user_entry.type = KVM_IRQ_ROUTING_MSI;
++	user_entry.u.msi.address_lo = doorbell_addr & 0xFFFFFFFF;
++	user_entry.u.msi.address_hi = doorbell_addr >> 32;
++	user_entry.u.msi.data = event_id;
++	user_entry.u.msi.devid = device_id;
++	user_entry.flags = KVM_MSI_VALID_DEVID;
++
++	/* Initialize kernel routing entry */
++	memset(&entry, 0, sizeof(entry));
++
++	/* Use vgic-irqfd.c function to create entry */
++	ret = kvm_set_routing_entry(kvm, &entry, &user_entry);
++	if (ret)
++		return ret;
++
++	/* Now that we created an MSI -> ITS mapping, we can populate the ITS for this MSI */
++
++	/* Get ITS instance */
++	its = vgic_get_its(kvm, &entry);
++	if (IS_ERR(its))
++		return PTR_ERR(its);
++
++	/* Enable ITS manually for testing, normally done by guest writing to GITS_CTLR register */
++	its->enabled = true;
++
++	/* Get target vCPU */
++	vcpu = kvm_get_vcpu(kvm, params->vcpu_id);
++	if (!vcpu)
++		return -EINVAL;
++
++	/*
++	 * Enable this vLPIs for this vCPU manually for testing, normally
++	 * done by guest writing GICR_CTLR
++	 */
++	atomic_set(&vcpu->arch.vgic_cpu.ctlr, GICR_CTLR_ENABLE_LPIS);
++
++	mutex_lock(&its->its_lock);
++
++	/* Create ITS device */
++	device = vgic_its_alloc_device(its, device_id, itt_addr, 8);
++	if (IS_ERR(device)) {
++		ret = PTR_ERR(device);
++		goto unlock;
++	}
++
++	/* Create collection mapped to inputted vcpu */
++	ret = vgic_its_alloc_collection(its, &collection, coll_id);
++	if (ret)
++		goto unlock;
++
++	collection->target_addr = params->vcpu_id;  // Map to specified vcpu
++
++	/* Create ITE */
++	ite = vgic_its_alloc_ite(device, collection, event_id);
++	if (IS_ERR(ite)) {
++		ret = PTR_ERR(ite);
++		vgic_its_free_collection(its, coll_id);
++		goto unlock;
++	}
++
++	/* Create LPI */
++	irq = vgic_add_lpi(kvm, lpi_nr, vcpu);
++	if (IS_ERR(irq)) {
++		ret = PTR_ERR(irq);
++		its_free_ite(kvm, ite);
++		vgic_its_free_collection(its, coll_id);
++		goto unlock;
++	}
++
++	ite->irq = irq;
++	mutex_unlock(&its->its_lock);
++
++	/* Now that routing entry is initialized, call v4 forwarding setup */
++	return kvm_vgic_v4_set_forwarding(kvm, host_irq, &entry);
++
++unlock:
++	mutex_unlock(&its->its_lock);
++	return ret;
++}
+diff --git a/arch/arm64/kvm/vgic/vgic.h b/arch/arm64/kvm/vgic/vgic.h
+index de1c1d3261c3..8c8f1e963884 100644
+--- a/arch/arm64/kvm/vgic/vgic.h
++++ b/arch/arm64/kvm/vgic/vgic.h
+@@ -432,4 +432,6 @@ static inline bool vgic_is_v3(struct kvm *kvm)
+ int vgic_its_debug_init(struct kvm_device *dev);
+ void vgic_its_debug_destroy(struct kvm_device *dev);
+ 
++int debug_gic_msi_setup_mock_msi(struct kvm *kvm, struct kvm_debug_gic_msi_setup *params);
++
+ #endif
+diff --git a/include/linux/irqchip/arm-gic-v3.h b/include/linux/irqchip/arm-gic-v3.h
+index 70c0948f978e..76beac55cb69 100644
+--- a/include/linux/irqchip/arm-gic-v3.h
++++ b/include/linux/irqchip/arm-gic-v3.h
+@@ -378,6 +378,7 @@
+ #define GITS_CIDR3			0xfffc
+ 
+ #define GITS_TRANSLATER			0x10040
++#define GITS_BASE_GPA           0x8000000ULL
+ 
+ #define GITS_SGIR			0x20020
+ 
+diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
+index f0f0d49d2544..a655bbb70e99 100644
+--- a/include/uapi/linux/kvm.h
++++ b/include/uapi/linux/kvm.h
+@@ -1440,6 +1440,21 @@ struct kvm_enc_region {
+ #define KVM_GET_SREGS2             _IOR(KVMIO,  0xcc, struct kvm_sregs2)
+ #define KVM_SET_SREGS2             _IOW(KVMIO,  0xcd, struct kvm_sregs2)
+ 
++/*
++ * Generate an IRQ routing entry and vLPI tables for userspace-sourced
++ * MSI, enabling direct vLPI injection testing from selftests
++ */
++#define KVM_DEBUG_GIC_MSI_SETUP    _IOW(KVMIO, 0xf0, struct kvm_debug_gic_msi_setup)
++
++struct kvm_debug_gic_msi_setup {
++	__u32 device_id;
++	__u32 event_id;
++	__u32 vcpu_id;
++	__u32 vintid;
++	__u32 host_irq;
++	__u64 itt_addr;
++};
++
+ #define KVM_DIRTY_LOG_MANUAL_PROTECT_ENABLE    (1 << 0)
+ #define KVM_DIRTY_LOG_INITIALLY_SET            (1 << 1)
+ 
+diff --git a/tools/testing/selftests/kvm/arm64/vgic_lpi_stress.c b/tools/testing/selftests/kvm/arm64/vgic_lpi_stress.c
+index fc4fe52fb6f8..8350665d9bdc 100644
+--- a/tools/testing/selftests/kvm/arm64/vgic_lpi_stress.c
++++ b/tools/testing/selftests/kvm/arm64/vgic_lpi_stress.c
+@@ -18,10 +18,14 @@
+ #include "ucall.h"
+ #include "vgic.h"
+ 
++#define KVM_DEBUG_GIC_MSI_SETUP    _IOW(KVMIO, 0xf0, struct kvm_debug_gic_msi_setup)
++
+ #define TEST_MEMSLOT_INDEX	1
+ 
+ #define GIC_LPI_OFFSET	8192
+ 
++static bool vlpi_enabled;
++
+ static size_t nr_iterations = 1000;
+ static vm_paddr_t gpa_base;
+ 
+@@ -220,6 +224,21 @@ static void setup_gic(void)
+ 	its_fd = vgic_its_setup(vm);
+ }
+ 
++static int enable_msi_vlpi_injection(u32 device_id, u32 event_id,
++		u32 vcpu_id, u32 vintid, u32 host_irq)
++{
++	struct kvm_debug_gic_msi_setup params = {
++		.device_id	= device_id,
++		.event_id	= event_id,
++		.vcpu_id	= vcpu_id,
++		.vintid		= vintid,
++		.host_irq	= host_irq,
++		.itt_addr	= test_data.itt_tables + (device_id * SZ_64K)
++	};
++
++	return __vm_ioctl(vm, KVM_DEBUG_GIC_MSI_SETUP, &params);
++}
++
+ static void signal_lpi(u32 device_id, u32 event_id)
+ {
+ 	vm_paddr_t db_addr = GITS_BASE_GPA + GITS_TRANSLATER;
+@@ -267,6 +286,30 @@ static void *vcpu_worker_thread(void *data)
+ 
+ 		switch (get_ucall(vcpu, &uc)) {
+ 		case UCALL_SYNC:
++			/* if flag is set, set direct injection mappings for MSIs */
++			if (vlpi_enabled) {
++				u32 intid = GIC_LPI_OFFSET;
++
++				for (u32 device_id = 0; device_id < test_data.nr_devices;
++						device_id++) {
++					for (u32 event_id = 0; event_id < test_data.nr_event_ids;
++							event_id++) {
++
++						/* we mock host_irqs in the SPI interrupt range of
++						 * 100-1020 since selftest guests have no hardware
++						 * devices
++						 */
++						int ret = enable_msi_vlpi_injection(device_id,
++								event_id, vcpu->id, intid,
++								intid - GIC_LPI_OFFSET + 100);
++						TEST_ASSERT(ret == 0, "KVM_DEBUG_GIC_MSI_SETUP failed: %d",
++								ret);
++
++						intid++;
++					}
++				}
++			}
++
+ 			pthread_barrier_wait(&test_setup_barrier);
+ 			continue;
+ 		case UCALL_DONE:
+@@ -362,7 +405,9 @@ static void destroy_vm(void)
+ 
+ static void pr_usage(const char *name)
+ {
+-	pr_info("%s [-v NR_VCPUS] [-d NR_DEVICES] [-e NR_EVENTS] [-i ITERS] -h\n", name);
++	pr_info("%s -D [-v NR_VCPUS] [-d NR_DEVICES] [-e NR_EVENTS] [-i ITERS] -h\n", name);
++	pr_info("  -D:\tenable direct vLPI injection (default: %s)\n",
++			vlpi_enabled ? "true" : "false");
+ 	pr_info("  -v:\tnumber of vCPUs (default: %u)\n", test_data.nr_cpus);
+ 	pr_info("  -d:\tnumber of devices (default: %u)\n", test_data.nr_devices);
+ 	pr_info("  -e:\tnumber of event IDs per device (default: %u)\n", test_data.nr_event_ids);
+@@ -374,8 +419,11 @@ int main(int argc, char **argv)
+ 	u32 nr_threads;
+ 	int c;
+ 
+-	while ((c = getopt(argc, argv, "hv:d:e:i:")) != -1) {
++	while ((c = getopt(argc, argv, "hDv:d:e:i:")) != -1) {
+ 		switch (c) {
++		case 'D':
++			vlpi_enabled = true;
++			break;
+ 		case 'v':
+ 			test_data.nr_cpus = atoi(optarg);
+ 			break;
+-- 
+2.50.1 (Apple Git-155)
 
 
---=-8mqoIiVtnlclBKnvEqXL
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-
-On Wed, 2025-09-24 at 13:53 -0700, Dongli Zhang wrote:
->=20
->=20
-> On 9/23/25 10:47 AM, David Woodhouse wrote:
-> > On Tue, 2025-09-23 at 10:25 -0700, Dongli Zhang wrote:
-> > >=20
-> > >=20
-> > > On 9/23/25 9:26 AM, David Woodhouse wrote:
-> > > > On Mon, 2025-09-22 at 12:37 -0700, Dongli Zhang wrote:
-> > > > > On 9/22/25 11:16 AM, David Woodhouse wrote:
-> > >=20
-> > > [snip]
-> > >=20
-> > > > > >=20
-> > > > > > >=20
-> > > > > > > As demonstrated in my test, currently guest_tsc doesn't stop =
-counting during
-> > > > > > > blackout because of the lack of "MSR_IA32_TSC put" at
-> > > > > > > kvmclock_vm_state_change(). Per my understanding, it is a bug=
- and we may need to
-> > > > > > > fix it.
-> > > > > > >=20
-> > > > > > > BTW, kvmclock_vm_state_change() already utilizes KVM_SET_CLOC=
-K to re-configure
-> > > > > > > kvm-clock before continuing the guest VM.
-> > > >=20
-> > > > Yeah, right now it's probably just introducing errors for a stop/st=
-art
-> > > > of the VM.
-> > >=20
-> > > But that help can meet the expectation?
-> > >=20
-> > > Thanks to KVM_GET_CLOCK and KVM_SET_CLOCK, QEMU saves the clock with
-> > > KVM_GET_CLOCK when the VM is stopped, and restores it with KVM_SET_CL=
-OCK when
-> > > the VM is continued.
-> >=20
-> > It saves the actual *value* of the clock. I would prefer to phrase that
-> > as "it makes the clock jump backwards to the time at which the guest
-> > was paused".
-> >=20
-> > > This ensures that the clock value itself does not change between stop=
- and cont.
-> > >=20
-> > > However, QEMU does not adjust the TSC offset via MSR_IA32_TSC during =
-stop.
-> > >=20
-> > > As a result, when execution resumes, the guest TSC suddenly jumps for=
-ward.
-> >=20
-> > Oh wow, that seems really broken. If we're going to make it experience
-> > a time warp, we should at least be *consistent*.
-> >=20
-> > So a guest which uses the TSC for timekeeping should be mostly
-> > unaffected by this and its wallclock should still be accurate. A guest
-> > which uses the KVM clock will be hosed by it.
-> >=20
-> > I think we should fix this so that the KVM clock is unaffected too.
->=20
-> From my understanding of your reply, the kvm-clock/tsc should always be a=
-djusted
-> whenever a QEMU VM is paused and then resumed (i.e. via stop/cont).
-
-I think I agree, except I still hate the way you use the word
-'adjusted'.
-
-If I look at my clock, and then go to sleep for a while and look at the
-clock again, nobody *adjusts* it. It just keeps running.
-
-That's the effect we should always strive for, and that's how we should
-think about it and talk about it.
-
-It's difficult to talk about clocks because what does it mean for a
-clock to be "unchanged"? Does it mean that it should return the same
-time value? Or that it should continue to count consistently? I would
-argue that we should *always* use language which assumes the latter.
-
-Turning to physics for a clumsy analogy, it's about the frame of
-reference. We're all on a moving train. I look at you in the seat
-opposite me, I go to sleep for a while, and I wake up and you're still
-there. Nobody has "adjusted" your position to accommodate for the
-movement of the train while I was asleep.
 
 
+Amazon Web Services Development Center Germany GmbH
+Tamara-Danz-Str. 13
+10243 Berlin
+Geschaeftsfuehrung: Christian Schlaeger
+Eingetragen am Amtsgericht Charlottenburg unter HRB 257764 B
+Sitz: Berlin
+Ust-ID: DE 365 538 597
 
-
-> This applies to:
->=20
-> - stop / cont
-> - savevm / loadvm
-> - live migration
-> - cpr
->=20
-> It is a bug if the clock jumps backwards to the time at which the guest w=
-as paused.
->=20
-> The time elapsed while the VM is paused should always be accounted for an=
-d
-> reflected in kvm-clock/tsc once the VM resumes.
-
-In particular, in *all* but the live migration case, there should be
-basically nothing to do. No addition, no subtraction. Only restoring
-the *existing* relationships, precisely as they were before. That is
-the TSC *offset* value, and the precise TSC=E2=86=92kvmclock parameters, al=
-l
-bitwise *exactly* the same as before.
-
-And the only thing that changes on live migration is that you have to
-set the TSC offset such that the guest sees the values it *would* have
-seen on the original host at any given moment in time... and doesn't
-know it was kidnapped and moved onto a different train while it was
-sleeping...?
-
-
---=-8mqoIiVtnlclBKnvEqXL
-Content-Type: application/pkcs7-signature; name="smime.p7s"
-Content-Disposition: attachment; filename="smime.p7s"
-Content-Transfer-Encoding: base64
-
-MIAGCSqGSIb3DQEHAqCAMIACAQExDzANBglghkgBZQMEAgEFADCABgkqhkiG9w0BBwEAAKCCD9Aw
-ggSOMIIDdqADAgECAhAOmiw0ECVD4cWj5DqVrT9PMA0GCSqGSIb3DQEBCwUAMGUxCzAJBgNVBAYT
-AlVTMRUwEwYDVQQKEwxEaWdpQ2VydCBJbmMxGTAXBgNVBAsTEHd3dy5kaWdpY2VydC5jb20xJDAi
-BgNVBAMTG0RpZ2lDZXJ0IEFzc3VyZWQgSUQgUm9vdCBDQTAeFw0yNDAxMzAwMDAwMDBaFw0zMTEx
-MDkyMzU5NTlaMEExCzAJBgNVBAYTAkFVMRAwDgYDVQQKEwdWZXJva2V5MSAwHgYDVQQDExdWZXJv
-a2V5IFNlY3VyZSBFbWFpbCBHMjCCASIwDQYJKoZIhvcNAQEBBQADggEPADCCAQoCggEBAMjvgLKj
-jfhCFqxYyRiW8g3cNFAvltDbK5AzcOaR7yVzVGadr4YcCVxjKrEJOgi7WEOH8rUgCNB5cTD8N/Et
-GfZI+LGqSv0YtNa54T9D1AWJy08ZKkWvfGGIXN9UFAPMJ6OLLH/UUEgFa+7KlrEvMUupDFGnnR06
-aDJAwtycb8yXtILj+TvfhLFhafxroXrflspavejQkEiHjNjtHnwbZ+o43g0/yxjwnarGI3kgcak7
-nnI9/8Lqpq79tLHYwLajotwLiGTB71AGN5xK+tzB+D4eN9lXayrjcszgbOv2ZCgzExQUAIt98mre
-8EggKs9mwtEuKAhYBIP/0K6WsoMnQCcCAwEAAaOCAVwwggFYMBIGA1UdEwEB/wQIMAYBAf8CAQAw
-HQYDVR0OBBYEFIlICOogTndrhuWByNfhjWSEf/xwMB8GA1UdIwQYMBaAFEXroq/0ksuCMS1Ri6en
-IZ3zbcgPMA4GA1UdDwEB/wQEAwIBhjAdBgNVHSUEFjAUBggrBgEFBQcDBAYIKwYBBQUHAwIweQYI
-KwYBBQUHAQEEbTBrMCQGCCsGAQUFBzABhhhodHRwOi8vb2NzcC5kaWdpY2VydC5jb20wQwYIKwYB
-BQUHMAKGN2h0dHA6Ly9jYWNlcnRzLmRpZ2ljZXJ0LmNvbS9EaWdpQ2VydEFzc3VyZWRJRFJvb3RD
-QS5jcnQwRQYDVR0fBD4wPDA6oDigNoY0aHR0cDovL2NybDMuZGlnaWNlcnQuY29tL0RpZ2lDZXJ0
-QXNzdXJlZElEUm9vdENBLmNybDARBgNVHSAECjAIMAYGBFUdIAAwDQYJKoZIhvcNAQELBQADggEB
-ACiagCqvNVxOfSd0uYfJMiZsOEBXAKIR/kpqRp2YCfrP4Tz7fJogYN4fxNAw7iy/bPZcvpVCfe/H
-/CCcp3alXL0I8M/rnEnRlv8ItY4MEF+2T/MkdXI3u1vHy3ua8SxBM8eT9LBQokHZxGUX51cE0kwa
-uEOZ+PonVIOnMjuLp29kcNOVnzf8DGKiek+cT51FvGRjV6LbaxXOm2P47/aiaXrDD5O0RF5SiPo6
-xD1/ClkCETyyEAE5LRJlXtx288R598koyFcwCSXijeVcRvBB1cNOLEbg7RMSw1AGq14fNe2cH1HG
-W7xyduY/ydQt6gv5r21mDOQ5SaZSWC/ZRfLDuEYwggWbMIIEg6ADAgECAhAH5JEPagNRXYDiRPdl
-c1vgMA0GCSqGSIb3DQEBCwUAMEExCzAJBgNVBAYTAkFVMRAwDgYDVQQKEwdWZXJva2V5MSAwHgYD
-VQQDExdWZXJva2V5IFNlY3VyZSBFbWFpbCBHMjAeFw0yNDEyMzAwMDAwMDBaFw0yODAxMDQyMzU5
-NTlaMB4xHDAaBgNVBAMME2R3bXcyQGluZnJhZGVhZC5vcmcwggIiMA0GCSqGSIb3DQEBAQUAA4IC
-DwAwggIKAoICAQDali7HveR1thexYXx/W7oMk/3Wpyppl62zJ8+RmTQH4yZeYAS/SRV6zmfXlXaZ
-sNOE6emg8WXLRS6BA70liot+u0O0oPnIvnx+CsMH0PD4tCKSCsdp+XphIJ2zkC9S7/yHDYnqegqt
-w4smkqUqf0WX/ggH1Dckh0vHlpoS1OoxqUg+ocU6WCsnuz5q5rzFsHxhD1qGpgFdZEk2/c//ZvUN
-i12vPWipk8TcJwHw9zoZ/ZrVNybpMCC0THsJ/UEVyuyszPtNYeYZAhOJ41vav1RhZJzYan4a1gU0
-kKBPQklcpQEhq48woEu15isvwWh9/+5jjh0L+YNaN0I//nHSp6U9COUG9Z0cvnO8FM6PTqsnSbcc
-0j+GchwOHRC7aP2t5v2stVx3KbptaYEzi4MQHxm/0+HQpMEVLLUiizJqS4PWPU6zfQTOMZ9uLQRR
-ci+c5xhtMEBszlQDOvEQcyEG+hc++fH47K+MmZz21bFNfoBxLP6bjR6xtPXtREF5lLXxp+CJ6KKS
-blPKeVRg/UtyJHeFKAZXO8Zeco7TZUMVHmK0ZZ1EpnZbnAhKE19Z+FJrQPQrlR0gO3lBzuyPPArV
-hvWxjlO7S4DmaEhLzarWi/ze7EGwWSuI2eEa/8zU0INUsGI4ywe7vepQz7IqaAovAX0d+f1YjbmC
-VsAwjhLmveFjNwIDAQABo4IBsDCCAawwHwYDVR0jBBgwFoAUiUgI6iBOd2uG5YHI1+GNZIR//HAw
-HQYDVR0OBBYEFFxiGptwbOfWOtMk5loHw7uqWUOnMDAGA1UdEQQpMCeBE2R3bXcyQGluZnJhZGVh
-ZC5vcmeBEGRhdmlkQHdvb2Rob3Uuc2UwFAYDVR0gBA0wCzAJBgdngQwBBQEBMA4GA1UdDwEB/wQE
-AwIF4DAdBgNVHSUEFjAUBggrBgEFBQcDAgYIKwYBBQUHAwQwewYDVR0fBHQwcjA3oDWgM4YxaHR0
-cDovL2NybDMuZGlnaWNlcnQuY29tL1Zlcm9rZXlTZWN1cmVFbWFpbEcyLmNybDA3oDWgM4YxaHR0
-cDovL2NybDQuZGlnaWNlcnQuY29tL1Zlcm9rZXlTZWN1cmVFbWFpbEcyLmNybDB2BggrBgEFBQcB
-AQRqMGgwJAYIKwYBBQUHMAGGGGh0dHA6Ly9vY3NwLmRpZ2ljZXJ0LmNvbTBABggrBgEFBQcwAoY0
-aHR0cDovL2NhY2VydHMuZGlnaWNlcnQuY29tL1Zlcm9rZXlTZWN1cmVFbWFpbEcyLmNydDANBgkq
-hkiG9w0BAQsFAAOCAQEAQXc4FPiPLRnTDvmOABEzkIumojfZAe5SlnuQoeFUfi+LsWCKiB8Uextv
-iBAvboKhLuN6eG/NC6WOzOCppn4mkQxRkOdLNThwMHW0d19jrZFEKtEG/epZ/hw/DdScTuZ2m7im
-8ppItAT6GXD3aPhXkXnJpC/zTs85uNSQR64cEcBFjjoQDuSsTeJ5DAWf8EMyhMuD8pcbqx5kRvyt
-JPsWBQzv1Dsdv2LDPLNd/JUKhHSgr7nbUr4+aAP2PHTXGcEBh8lTeYea9p4d5k969pe0OHYMV5aL
-xERqTagmSetuIwolkAuBCzA9vulg8Y49Nz2zrpUGfKGOD0FMqenYxdJHgDCCBZswggSDoAMCAQIC
-EAfkkQ9qA1FdgOJE92VzW+AwDQYJKoZIhvcNAQELBQAwQTELMAkGA1UEBhMCQVUxEDAOBgNVBAoT
-B1Zlcm9rZXkxIDAeBgNVBAMTF1Zlcm9rZXkgU2VjdXJlIEVtYWlsIEcyMB4XDTI0MTIzMDAwMDAw
-MFoXDTI4MDEwNDIzNTk1OVowHjEcMBoGA1UEAwwTZHdtdzJAaW5mcmFkZWFkLm9yZzCCAiIwDQYJ
-KoZIhvcNAQEBBQADggIPADCCAgoCggIBANqWLse95HW2F7FhfH9bugyT/danKmmXrbMnz5GZNAfj
-Jl5gBL9JFXrOZ9eVdpmw04Tp6aDxZctFLoEDvSWKi367Q7Sg+ci+fH4KwwfQ8Pi0IpIKx2n5emEg
-nbOQL1Lv/IcNiep6Cq3DiyaSpSp/RZf+CAfUNySHS8eWmhLU6jGpSD6hxTpYKye7PmrmvMWwfGEP
-WoamAV1kSTb9z/9m9Q2LXa89aKmTxNwnAfD3Ohn9mtU3JukwILRMewn9QRXK7KzM+01h5hkCE4nj
-W9q/VGFknNhqfhrWBTSQoE9CSVylASGrjzCgS7XmKy/BaH3/7mOOHQv5g1o3Qj/+cdKnpT0I5Qb1
-nRy+c7wUzo9OqydJtxzSP4ZyHA4dELto/a3m/ay1XHcpum1pgTOLgxAfGb/T4dCkwRUstSKLMmpL
-g9Y9TrN9BM4xn24tBFFyL5znGG0wQGzOVAM68RBzIQb6Fz758fjsr4yZnPbVsU1+gHEs/puNHrG0
-9e1EQXmUtfGn4InoopJuU8p5VGD9S3Ikd4UoBlc7xl5yjtNlQxUeYrRlnUSmdlucCEoTX1n4UmtA
-9CuVHSA7eUHO7I88CtWG9bGOU7tLgOZoSEvNqtaL/N7sQbBZK4jZ4Rr/zNTQg1SwYjjLB7u96lDP
-sipoCi8BfR35/ViNuYJWwDCOEua94WM3AgMBAAGjggGwMIIBrDAfBgNVHSMEGDAWgBSJSAjqIE53
-a4blgcjX4Y1khH/8cDAdBgNVHQ4EFgQUXGIam3Bs59Y60yTmWgfDu6pZQ6cwMAYDVR0RBCkwJ4ET
-ZHdtdzJAaW5mcmFkZWFkLm9yZ4EQZGF2aWRAd29vZGhvdS5zZTAUBgNVHSAEDTALMAkGB2eBDAEF
-AQEwDgYDVR0PAQH/BAQDAgXgMB0GA1UdJQQWMBQGCCsGAQUFBwMCBggrBgEFBQcDBDB7BgNVHR8E
-dDByMDegNaAzhjFodHRwOi8vY3JsMy5kaWdpY2VydC5jb20vVmVyb2tleVNlY3VyZUVtYWlsRzIu
-Y3JsMDegNaAzhjFodHRwOi8vY3JsNC5kaWdpY2VydC5jb20vVmVyb2tleVNlY3VyZUVtYWlsRzIu
-Y3JsMHYGCCsGAQUFBwEBBGowaDAkBggrBgEFBQcwAYYYaHR0cDovL29jc3AuZGlnaWNlcnQuY29t
-MEAGCCsGAQUFBzAChjRodHRwOi8vY2FjZXJ0cy5kaWdpY2VydC5jb20vVmVyb2tleVNlY3VyZUVt
-YWlsRzIuY3J0MA0GCSqGSIb3DQEBCwUAA4IBAQBBdzgU+I8tGdMO+Y4AETOQi6aiN9kB7lKWe5Ch
-4VR+L4uxYIqIHxR7G2+IEC9ugqEu43p4b80LpY7M4KmmfiaRDFGQ50s1OHAwdbR3X2OtkUQq0Qb9
-6ln+HD8N1JxO5nabuKbymki0BPoZcPdo+FeRecmkL/NOzzm41JBHrhwRwEWOOhAO5KxN4nkMBZ/w
-QzKEy4PylxurHmRG/K0k+xYFDO/UOx2/YsM8s138lQqEdKCvudtSvj5oA/Y8dNcZwQGHyVN5h5r2
-nh3mT3r2l7Q4dgxXlovERGpNqCZJ624jCiWQC4ELMD2+6WDxjj03PbOulQZ8oY4PQUyp6djF0keA
-MYIDuzCCA7cCAQEwVTBBMQswCQYDVQQGEwJBVTEQMA4GA1UEChMHVmVyb2tleTEgMB4GA1UEAxMX
-VmVyb2tleSBTZWN1cmUgRW1haWwgRzICEAfkkQ9qA1FdgOJE92VzW+AwDQYJYIZIAWUDBAIBBQCg
-ggE3MBgGCSqGSIb3DQEJAzELBgkqhkiG9w0BBwEwHAYJKoZIhvcNAQkFMQ8XDTI1MDkyNTA4NDQ1
-NFowLwYJKoZIhvcNAQkEMSIEIEKtBt2X7UCgQuU8khW2B0XXnqZusCQvQhqrCuvG5Wv6MGQGCSsG
-AQQBgjcQBDFXMFUwQTELMAkGA1UEBhMCQVUxEDAOBgNVBAoTB1Zlcm9rZXkxIDAeBgNVBAMTF1Zl
-cm9rZXkgU2VjdXJlIEVtYWlsIEcyAhAH5JEPagNRXYDiRPdlc1vgMGYGCyqGSIb3DQEJEAILMVeg
-VTBBMQswCQYDVQQGEwJBVTEQMA4GA1UEChMHVmVyb2tleTEgMB4GA1UEAxMXVmVyb2tleSBTZWN1
-cmUgRW1haWwgRzICEAfkkQ9qA1FdgOJE92VzW+AwDQYJKoZIhvcNAQEBBQAEggIAkSKgPrDt3Uho
-J3/C7bjVoW37s7hzTsnU3137pGib5qXp3tqadOlFQESr9IUnKu0pQKmN09gtiVOBkx2JPYz5d9PA
-RXokQ6GycM1ZlgqrOtO9usiJUP3K9RR8aryHBxEtKGiXrkIzwHf3D6H/RoXj5pGXClwntkBUM1l6
-3yKXj9pqApzEwURTmFn/sJsnPuwnR9BPi/T4qK22ML3OIrdfizlpzICOAS7HPLISNY+QEw2g+cQJ
-ojp07dRwx/Uf+hTxLXVMJZxV2TIufiRHeQKRPj3CWBUKT7rG8XGp/I1Ht7SeQwnm8ZM5A4dnhtEj
-rL771DudAckdJwGt0aS/iVRdfFQCEls8T/49rnMOuIzhuPOmFgHuC0qoDOaivjWkVJZ7GCP40y79
-Vson2bZ1OVU9NRbu8MimpDbVPvfTIkMybnZujLqSKHvWNXBBC1LneTdcb6QaIkSXR8JfpIp+gPw4
-k8kdGDnLqEdjprN/7v4CCtl5feRYAVN2cRzSQf+RjxicPY9kghgotq1kaTd7SblVBk7TGhu/I4qR
-MXeE2MUESeva/XH0CowUt1+CPQ4+lk3Aak+3fBWUfsBGMcc3UFnrLyvFMf4KBMoqo1NTQu/tv2La
-OYO+v0EYfNjX/etc/NS9BDY8ItZeszZral69MRXJYDYUqmg5/Gy9z4zl+A1dTgkAAAAAAAA=
-
-
---=-8mqoIiVtnlclBKnvEqXL--
 
