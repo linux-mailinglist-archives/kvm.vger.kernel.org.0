@@ -1,216 +1,139 @@
-Return-Path: <kvm+bounces-58715-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-58716-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id A6B63B9DBD9
-	for <lists+kvm@lfdr.de>; Thu, 25 Sep 2025 09:00:49 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 001ECB9DBF7
+	for <lists+kvm@lfdr.de>; Thu, 25 Sep 2025 09:03:37 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 27C5419C5EE6
-	for <lists+kvm@lfdr.de>; Thu, 25 Sep 2025 07:01:11 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 612CD4A7749
+	for <lists+kvm@lfdr.de>; Thu, 25 Sep 2025 07:03:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8B32A2E8E04;
-	Thu, 25 Sep 2025 07:00:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7DBC52E974D;
+	Thu, 25 Sep 2025 07:03:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=brainfault-org.20230601.gappssmtp.com header.i=@brainfault-org.20230601.gappssmtp.com header.b="hBWYHRwQ"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="qHutfg7p"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-il1-f171.google.com (mail-il1-f171.google.com [209.85.166.171])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E12B41CAA92
-	for <kvm@vger.kernel.org>; Thu, 25 Sep 2025 07:00:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.171
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7DAEC1CAA92;
+	Thu, 25 Sep 2025 07:03:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758783641; cv=none; b=TzjGSj+1KE9v3v5IDbrjtA6KDVUCbgyREobuQeYuD2DxEBCzcjy/c4W0pOwZAEk1ClDLpWcVzOY1gOxzTvxt6YQmaihK+B3AitSYuPbMlRg7M5xt4Bv5nsv6iv+4Cdru4iuvC1tZ2z2+7C2sBba2AoSV9uLMckTo5/bJnNwbXl0=
+	t=1758783801; cv=none; b=EhpeZ4N09Bs/KRSdMLJJRB5DSIOypRUcgIdRXhybTs8Id8LrUcnu2BzK3jbkixQpjK1wloVpE7z1eC91yWEQEXTIXYqIfa/nmg8DHm/BG8W7l9bjPSyo8SMLsGWQZR2INcYYY0uOMYK8XpFS1ITUYf13z4GAGclmBNUw1nNBwSc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758783641; c=relaxed/simple;
-	bh=oQuoD2aN3UlYm8Bjag3CGmhu/Y5HvkMpKqzWrQNnn8s=;
-	h=MIME-Version:From:Date:Message-ID:Subject:To:Cc:Content-Type; b=QjbKs1/Sv3VHwexNrF42y8O6DkpgORM/wjmYPpct8ehxdyMnfKEebVr7MgZ2M+xCJws161QaVBgGIbPNfk0XPLOaRygnC3wM2x61LcJpULWS7K9WZiz6VHg3BG96LRGm3yZTIST9zI+yqqPZCUF4USBnj3xrF98JR9Zck1Zm6xg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=brainfault.org; spf=none smtp.mailfrom=brainfault.org; dkim=pass (2048-bit key) header.d=brainfault-org.20230601.gappssmtp.com header.i=@brainfault-org.20230601.gappssmtp.com header.b=hBWYHRwQ; arc=none smtp.client-ip=209.85.166.171
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=brainfault.org
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=brainfault.org
-Received: by mail-il1-f171.google.com with SMTP id e9e14a558f8ab-425715aeccdso3109525ab.2
-        for <kvm@vger.kernel.org>; Thu, 25 Sep 2025 00:00:39 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=brainfault-org.20230601.gappssmtp.com; s=20230601; t=1758783639; x=1759388439; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=MmyT2DQ8FjwtnIvToh+8LVARVJ88hd64Mv9gPij29H0=;
-        b=hBWYHRwQwkG5EKuhiYFywjEs9mBsK2EDhuKYJ5LdCeZ1K93b/5HJ/VoIfhAWkYPbuM
-         MxGxsKMgMuH3HE0d4RkhGeI0noCjBMM3orHwzjpt/4Ajm6Ruh0yGxtvpIizaAqDQf7Yk
-         IFDdjI/lpktdZZ/s2tErqxDmtNDbrWnojayS3Rw4dRkxnQFvY4eajQGTsX9vv9kkmJcs
-         tptyckWKSp3uSTiJAFNrDQXH6M+ExUVjc9439Ao1Ml5kny6OsWumRC+2/eGrN+dcuyeo
-         IWaVxArKqwz4GB7tJW9y3Pz8SjnSWemART/6kstFYF62OLEE3xAJCHG0xH2gJerJq5IL
-         mT2g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1758783639; x=1759388439;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=MmyT2DQ8FjwtnIvToh+8LVARVJ88hd64Mv9gPij29H0=;
-        b=iIuPpBXUbnX+m1jpU7ehbDj5zJJWInfqyJJbyD4UjKZLXj8rBvzHiAfAJaIQ9scn+4
-         lexG5rIU62i29zpmZVp5W9lzweIczZ2shMCPGN57r+V2/Vb4C4f/FNLTY3ojsoiOHih/
-         m2TkuqEY934DuSzNcWpjAVsxqvfeV6fkpMWHt79uG3dQ4p26PwjbZfgJKwhGRYANPy97
-         i3sK74PTw2My258EFG5cjpc0fe6kkWH5Zlr+NukJeFptBTUace2A6BY/hUcss0Dwd+tU
-         AMsc5XzryrprFhzUFt1na51zaYegXaHPYUd1QpkfbiMX6LPPE99oVKy1kSxT3BZAT92Q
-         cWNg==
-X-Forwarded-Encrypted: i=1; AJvYcCVDMIsZvzeNPmLmI6ZR4fK3ZOx9MyKUd/g2oGB/6dk2xqqqyRAvVd7UNZ4YBEFkvknYTKQ=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzBMc98w1r+WHW/G5hPgRR2MA1w4pt01tEe9WirDed/XMa4CC4+
-	in9Jix4yxHSy+tH5JKs1pKWE3OKYcIGjx0ojtQUKoX72kLQPjlMjCK7i4Z0YgYRS62ThoJ/y13D
-	tc0VlstIPOb+zwfBKUMZLNcSI/Jzl61pyYHh0PRTF7A==
-X-Gm-Gg: ASbGncu248suBOxkS+vIcxhW/sDC8xi08zN3gSVojoXZuJuWnpDrrA2epZj8bO5iB1/
-	+UeGP1OvkQWSfdp8ArK8wYIaSTdhgOIgifL4ZHaIVQmyHVnkRVA18IRC/AZP5wbQpucCGbknSkd
-	UJl8wJXfKMfhRP1Qssgzm6Qu2K/GfybzAoJ10iAjwTK3kfmj7/p3xM2Apid7esbDdJyKkftQt4n
-	uocwg4sDwWCOfRVWeq8qrvhjUhMFs+NCq6kYQ==
-X-Google-Smtp-Source: AGHT+IHZRb9CK/OmyBqOaD/n1EoZIqcM4pae02poytMs04HVBkLjaVLzPJP9OpaAHZ4GqnnqxcX2Onw45K5JIuhAveI=
-X-Received: by 2002:a05:6e02:3cc1:b0:424:8d44:a267 with SMTP id
- e9e14a558f8ab-4259566089fmr35271475ab.29.1758783638175; Thu, 25 Sep 2025
- 00:00:38 -0700 (PDT)
+	s=arc-20240116; t=1758783801; c=relaxed/simple;
+	bh=IfFjt1sIn89xjUeeoV2zJsvE3bTjSj86lJ2QWvNYz8w=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=uT4W4PHEa0T9K2MMhqmpmAcD0+HhmD6HfR60fW77tc5ycyxSNKO4N4exspj2qU2YgjWIOwTnteK3TzHsWOg1fceWB5WZG+LTeGr8ERHp2lTCGi8YNaE0Y8OzBkvzyroKbFODJeFg/zxWWeunTBwYKdC6xT3gJyKcERtFjogIYPI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=qHutfg7p; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 476E0C4CEF4;
+	Thu, 25 Sep 2025 07:03:19 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1758783799;
+	bh=IfFjt1sIn89xjUeeoV2zJsvE3bTjSj86lJ2QWvNYz8w=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=qHutfg7p0MJiJzKdbXS/d6R3kdEqDhdXcGmgxvkwI4AM6XuKyeIpgR1GSCsEqIGVB
+	 9ZrAilO0Zj59EMAXR1lQlcpWEMA28nquUz1IKkduHGuS4dyD2OJmp5f3UxncKmQ8+I
+	 Dp30uxy2wGUYE3Hja5f4XS00BFzuj+WaXq60qYIzodUdV2tvE04uI5a85RPL6mAqR7
+	 MWKPSQplfkMcH9/nRS03UG60TJBwCq9ZQRhoS60sk8FdhiE0kifJqWTjrMUqN9REZV
+	 kUzpbXtt2XKNZVaDT/F1inIn9vj+we8Gfm9meFs0BUoq+pahNKDPioVkPIFajbcBnM
+	 waHnKaEouWGfQ==
+Date: Thu, 25 Sep 2025 10:03:14 +0300
+From: Leon Romanovsky <leon@kernel.org>
+To: Alex Williamson <alex.williamson@redhat.com>
+Cc: Jason Gunthorpe <jgg@nvidia.com>,
+	Andrew Morton <akpm@linux-foundation.org>,
+	Bjorn Helgaas <bhelgaas@google.com>,
+	Christian =?iso-8859-1?Q?K=F6nig?= <christian.koenig@amd.com>,
+	dri-devel@lists.freedesktop.org, iommu@lists.linux.dev,
+	Jens Axboe <axboe@kernel.dk>, Joerg Roedel <joro@8bytes.org>,
+	kvm@vger.kernel.org, linaro-mm-sig@lists.linaro.org,
+	linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-media@vger.kernel.org, linux-mm@kvack.org,
+	linux-pci@vger.kernel.org, Logan Gunthorpe <logang@deltatee.com>,
+	Marek Szyprowski <m.szyprowski@samsung.com>,
+	Robin Murphy <robin.murphy@arm.com>,
+	Sumit Semwal <sumit.semwal@linaro.org>,
+	Vivek Kasireddy <vivek.kasireddy@intel.com>,
+	Will Deacon <will@kernel.org>
+Subject: Re: [PATCH v2 03/10] PCI/P2PDMA: Refactor to separate core P2P
+ functionality from memory allocation
+Message-ID: <20250925070314.GA12165@unreal>
+References: <cover.1757589589.git.leon@kernel.org>
+ <1e2cb89ea76a92949d06a804e3ab97478e7cacbb.1757589589.git.leon@kernel.org>
+ <20250922150032.3e3da410.alex.williamson@redhat.com>
+ <20250923150414.GA2608121@nvidia.com>
+ <20250923113041.38bee711.alex.williamson@redhat.com>
+ <20250923174333.GE2608121@nvidia.com>
+ <20250923120932.47df57b2.alex.williamson@redhat.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: Anup Patel <anup@brainfault.org>
-Date: Thu, 25 Sep 2025 12:30:26 +0530
-X-Gm-Features: AS18NWBoHJSdz0RKFWvagHmEkQT_MCXcW0bn11BwoOh7tEVjSPPT1943J8gh5oY
-Message-ID: <CAAhSdy3pXsGfFi-A1jFsO3UJsjomJ1y3Z8F73xe0xuftzLHBLA@mail.gmail.com>
-Subject: [GIT PULL] KVM/riscv changes for 6.18
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: Palmer Dabbelt <palmer@dabbelt.com>, Paul Walmsley <pjw@kernel.org>, 
-	Andrew Jones <ajones@ventanamicro.com>, Atish Patra <atishp@rivosinc.com>, 
-	Atish Patra <atish.patra@linux.dev>, 
-	"open list:KERNEL VIRTUAL MACHINE FOR RISC-V (KVM/riscv)" <kvm-riscv@lists.infradead.org>, KVM General <kvm@vger.kernel.org>, 
-	linux-riscv <linux-riscv@lists.infradead.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250923120932.47df57b2.alex.williamson@redhat.com>
 
-Hi Paolo,
+On Tue, Sep 23, 2025 at 12:09:32PM -0600, Alex Williamson wrote:
+> On Tue, 23 Sep 2025 14:43:33 -0300
+> Jason Gunthorpe <jgg@nvidia.com> wrote:
+> 
+> > On Tue, Sep 23, 2025 at 11:30:41AM -0600, Alex Williamson wrote:
+> > > On Tue, 23 Sep 2025 12:04:14 -0300
+> > > Jason Gunthorpe <jgg@nvidia.com> wrote:
+> > >   
+> > > > On Mon, Sep 22, 2025 at 03:00:32PM -0600, Alex Williamson wrote:  
+> > > > > But then later in patch 8/ and again in 10/ why exactly do we cache
+> > > > > the provider on the vfio_pci_core_device rather than ask for it on
+> > > > > demand from the p2pdma?    
+> > > > 
+> > > > It makes the most sense if the P2P is activated once during probe(),
+> > > > it is just a cheap memory allocation, so no reason not to.
+> > > > 
+> > > > If you try to do it on-demand then it will require more locking.  
+> > > 
+> > > I'm only wondering about splitting to an "initialize/setup" function
+> > > where providers for each BAR are setup, and a "get provider" interface,
+> > > which doesn't really seem to be a hot path anyway.  Batching could
+> > > still be done to setup all BAR providers at once.  
+> > 
+> > I agree it is a weird interface, but it is close to the existing weird
+> > interface :\
+> 
+> Seems like it would help if we just positioned it as a "get provider
+> for BAR" function that happens to initialize all the providers on the
+> first call, rather than an "enable" function with some strange BAR
+> argument and provider return.  pcim_p2pdma_provider(pdev, bar)?
+> 
+> It would at least make sense to me then to store the provider on the
+> vfio_pci_dma_buf object at the time of the get feature call rather than
+> vfio_pci_core_init_dev() though.  That would eliminate patch 08/ and
+> the inline #ifdefs.
 
-We have the following KVM RISC-V changes for 6.18:
-1) Added SBI FWFT extension for Guest/VM along with
-    corresponding ONE_REG interface
-2) Added Zicbop and bfloat16 extensions for Guest/VM
-3) Enabled more common KVM selftests for RISC-V
-4) Added SBI v3.0 PMU enhancements in KVM and
-    perf driver
+I'll change it now. If "enable" function goes to be "get" function, we
+won't need to store anything in vfio_pci_dma_buf too. At the end, we
+have exactly two lines "provider = priv->vdev->provider[priv->bar];",
+which can easily be changed to be "provider = pcim_p2pdma_provider(priv->vdev->pdev, priv->bar)"
 
-The perf driver changes in #4 above are going through
-KVM RISC-V tree based discussion with Will and Paul [1].
+> 
+> > > However, the setup isn't really once per probe(), even in the case of a
+> > > new driver probing we re-use the previously setup providers.    
+> > 
+> > It uses devm to call pci_p2pdma_release() which NULL's pdev->p2pdma.
+> 
+> Ah, right.  So the /* PCI device was "rebound" to the driver */ comment
+> is further misleading, a new probe would do a new setup.  Thanks,
 
-Please pull.
+I will fix the comment.
 
-[1] - https://lore.kernel.org/all/CAAhSdy3wJd5uicJntf+WgTaLciiQsqT1QfUmrZ1J=
-k9qEONRgPw@mail.gmail.com/
+Thanks
 
-Regards,
-Anup
-
-The following changes since commit 76eeb9b8de9880ca38696b2fb56ac45ac0a25c6c=
-:
-
-  Linux 6.17-rc5 (2025-09-07 14:22:57 -0700)
-
-are available in the Git repository at:
-
-  https://github.com/kvm-riscv/linux.git tags/kvm-riscv-6.18-1
-
-for you to fetch changes up to dbdadd943a278fb8a24ae4199a668131108034b4:
-
-  RISC-V: KVM: Upgrade the supported SBI version to 3.0 (2025-09-16
-11:49:31 +0530)
-
-----------------------------------------------------------------
-KVM/riscv changes for 6.18
-
-- Added SBI FWFT extension for Guest/VM with misaligned
-  delegation and pointer masking PMLEN features
-- Added ONE_REG interface for SBI FWFT extension
-- Added Zicbop and bfloat16 extensions for Guest/VM
-- Enabled more common KVM selftests for RISC-V such as
-  access_tracking_perf_test, dirty_log_perf_test,
-  memslot_modification_stress_test, memslot_perf_test,
-  mmu_stress_test, and rseq_test
-- Added SBI v3.0 PMU enhancements in KVM and perf driver
-
-----------------------------------------------------------------
-Anup Patel (6):
-      RISC-V: KVM: Set initial value of hedeleg in kvm_arch_vcpu_create()
-      RISC-V: KVM: Introduce feature specific reset for SBI FWFT
-      RISC-V: KVM: Introduce optional ONE_REG callbacks for SBI extensions
-      RISC-V: KVM: Move copy_sbi_ext_reg_indices() to SBI implementation
-      RISC-V: KVM: Implement ONE_REG interface for SBI FWFT state
-      KVM: riscv: selftests: Add SBI FWFT to get-reg-list test
-
-Atish Patra (8):
-      drivers/perf: riscv: Add SBI v3.0 flag
-      drivers/perf: riscv: Add raw event v2 support
-      RISC-V: KVM: Add support for Raw event v2
-      drivers/perf: riscv: Implement PMU event info function
-      drivers/perf: riscv: Export PMU event info function
-      RISC-V: KVM: No need of explicit writable slot check
-      RISC-V: KVM: Implement get event info function
-      RISC-V: KVM: Upgrade the supported SBI version to 3.0
-
-Cl=C3=A9ment L=C3=A9ger (2):
-      RISC-V: KVM: add support for FWFT SBI extension
-      RISC-V: KVM: add support for SBI_FWFT_MISALIGNED_DELEG
-
-Dong Yang (1):
-      KVM: riscv: selftests: Add missing headers for new testcases
-
-Fangyu Yu (1):
-      RISC-V: KVM: Write hgatp register with valid mode bits
-
-Guo Ren (Alibaba DAMO Academy) (2):
-      RISC-V: KVM: Remove unnecessary HGATP csr_read
-      RISC-V: KVM: Prevent HGATP_MODE_BARE passed
-
-Quan Zhou (8):
-      RISC-V: KVM: Change zicbom/zicboz block size to depend on the host is=
-a
-      RISC-V: KVM: Provide UAPI for Zicbop block size
-      RISC-V: KVM: Allow Zicbop extension for Guest/VM
-      RISC-V: KVM: Allow bfloat16 extension for Guest/VM
-      KVM: riscv: selftests: Add Zicbop extension to get-reg-list test
-      KVM: riscv: selftests: Add bfloat16 extension to get-reg-list test
-      KVM: riscv: selftests: Use the existing RISCV_FENCE macro in
-`rseq-riscv.h`
-      KVM: riscv: selftests: Add common supported test cases
-
-Samuel Holland (1):
-      RISC-V: KVM: Add support for SBI_FWFT_POINTER_MASKING_PMLEN
-
- arch/riscv/include/asm/kvm_host.h                  |   4 +
- arch/riscv/include/asm/kvm_vcpu_pmu.h              |   3 +
- arch/riscv/include/asm/kvm_vcpu_sbi.h              |  25 +-
- arch/riscv/include/asm/kvm_vcpu_sbi_fwft.h         |  34 ++
- arch/riscv/include/asm/sbi.h                       |  13 +
- arch/riscv/include/uapi/asm/kvm.h                  |  21 +
- arch/riscv/kvm/Makefile                            |   1 +
- arch/riscv/kvm/gstage.c                            |  27 +-
- arch/riscv/kvm/main.c                              |  33 +-
- arch/riscv/kvm/vcpu.c                              |   3 +-
- arch/riscv/kvm/vcpu_onereg.c                       |  95 ++--
- arch/riscv/kvm/vcpu_pmu.c                          |  74 ++-
- arch/riscv/kvm/vcpu_sbi.c                          | 176 ++++++-
- arch/riscv/kvm/vcpu_sbi_fwft.c                     | 544 +++++++++++++++++=
-++++
- arch/riscv/kvm/vcpu_sbi_pmu.c                      |   3 +
- arch/riscv/kvm/vcpu_sbi_sta.c                      |  72 +--
- arch/riscv/kvm/vmid.c                              |   8 +-
- drivers/perf/riscv_pmu_sbi.c                       | 191 ++++++--
- include/linux/perf/riscv_pmu.h                     |   1 +
- tools/testing/selftests/kvm/Makefile.kvm           |   6 +
- .../selftests/kvm/access_tracking_perf_test.c      |   1 +
- .../selftests/kvm/include/riscv/processor.h        |   1 +
- .../kvm/memslot_modification_stress_test.c         |   1 +
- tools/testing/selftests/kvm/memslot_perf_test.c    |   1 +
- tools/testing/selftests/kvm/riscv/get-reg-list.c   |  60 +++
- tools/testing/selftests/rseq/rseq-riscv.h          |   3 +-
- 26 files changed, 1188 insertions(+), 213 deletions(-)
- create mode 100644 arch/riscv/include/asm/kvm_vcpu_sbi_fwft.h
- create mode 100644 arch/riscv/kvm/vcpu_sbi_fwft.c
+> 
+> Alex
+> 
 
