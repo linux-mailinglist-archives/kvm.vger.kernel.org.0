@@ -1,209 +1,106 @@
-Return-Path: <kvm+bounces-58810-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-58811-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 28427BA0E5D
-	for <lists+kvm@lfdr.de>; Thu, 25 Sep 2025 19:36:05 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0BD61BA0F5C
+	for <lists+kvm@lfdr.de>; Thu, 25 Sep 2025 19:55:17 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id AEB164C1D83
-	for <lists+kvm@lfdr.de>; Thu, 25 Sep 2025 17:35:32 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 04BA11C24F0F
+	for <lists+kvm@lfdr.de>; Thu, 25 Sep 2025 17:55:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 07DB2322A1A;
-	Thu, 25 Sep 2025 17:29:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A45E43115A3;
+	Thu, 25 Sep 2025 17:55:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="N2y8yFwm"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="kEMfcTgF"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pg1-f201.google.com (mail-pg1-f201.google.com [209.85.215.201])
+Received: from mail-ed1-f48.google.com (mail-ed1-f48.google.com [209.85.208.48])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 539AC3218B5
-	for <kvm@vger.kernel.org>; Thu, 25 Sep 2025 17:29:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0BC413064B2
+	for <kvm@vger.kernel.org>; Thu, 25 Sep 2025 17:55:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.48
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758821375; cv=none; b=ApCSUWR0cKt6TBE6kzwqgOxFX/lW5fuzI9nessznNz2wdnY76/o6JCP+3RIkArM3bTMmLf2e2Llpq0GvKLFtLeaLHtHOtV0Skd8u52vaIykSzYBkk4tOAIQDE5hp6qM3t0HUHDPhb6hb3aXHt8RvYlNzfcQIIR0BumzDnxHQbnQ=
+	t=1758822903; cv=none; b=ete45xoMP+ks4heNhmfsEt79s3cy+mHh4f5nhBdOpQpOOBHP9QMRLJqCmNCfqXfFoRvyBPPe6Wmz1vlOhBLpuCbveBANeHwTFGE5JyRpQ1gNKtS/8k6Q/cxgFX8pS2swfZDgZThw4USChuT5GifOIJE21a+UbH8e1qqNIWpoflo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758821375; c=relaxed/simple;
-	bh=agNHzizJ+pu2GHvDilj4v+Sz4qwxNdK8ZAynRol9myI=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=SaZrtwwObVndig5HMpt8zRr5uLCsKDvuQoGdts4M8pxKBfVHgix7fNJomnfSe75ILbh2iA3SbQJazg1PY/gTghlfAVkQmVKvzhL3dFEt2OvR5CRm3Ks9zEY1dTiak2lIPDOxozaCvrTW/gOB8CltBpEjISquH04R63cgE20O2u4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--sagis.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=N2y8yFwm; arc=none smtp.client-ip=209.85.215.201
+	s=arc-20240116; t=1758822903; c=relaxed/simple;
+	bh=nbPCHfJ+LLlBruT2Jb9S8w0HTGCja4pN4K+XH7Xc4jg=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=Vdp71nU/vK6K2AwE5uRe0Ksa+moLJh1DGUZNaeRhqyZvcrOYnrSZGFF0xosGQ0N7MNxLWkvMGjfyq5/JAn33dKpaoLhq/nXfbcV9CBm4M+1ldhDRtJAkCygR59YOPNKyV3TCJ6VIfTOuo+wnkxVTVNo4k2omcO/Sj77Te6W1PZg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=kEMfcTgF; arc=none smtp.client-ip=209.85.208.48
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--sagis.bounces.google.com
-Received: by mail-pg1-f201.google.com with SMTP id 41be03b00d2f7-b4f93fe3831so1597536a12.0
-        for <kvm@vger.kernel.org>; Thu, 25 Sep 2025 10:29:33 -0700 (PDT)
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-ed1-f48.google.com with SMTP id 4fb4d7f45d1cf-62f9089b957so1223a12.1
+        for <kvm@vger.kernel.org>; Thu, 25 Sep 2025 10:55:01 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1758821373; x=1759426173; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=1xPKp0CWKeH6BVksYl8nT4cVmvOfs6P2rPR25K+k3iU=;
-        b=N2y8yFwmZz5GX2ct89JU0BRXZNUgmOl21lR2lhRLY1yA3pCygw/gnkzBPodr5MapEQ
-         OvwnUe4VhvnBqs5skVhuv7qojuq21Vbyqp3HqtqdXXtrTwb7hB1o94dPuur3PHGmYFYN
-         hkfB7rdqlgVEDaduG0poh6VZEndPy0j3AEJK5/IF0RGIJ+5UXnPMyg2oxsGSB7qVtisH
-         ubNrhQLpfDPCrtdPY38XHSUmhT/Sz5aQiK6+p8eUaDXTk71d2OSftWykpEpuMngawrbX
-         fX/JsLeyx2rXsr0o0rlWNCtift1R464RwYxgOq3gOSnsUAV6wc2wI06hictsL88BSEv+
-         UY1w==
+        d=google.com; s=20230601; t=1758822900; x=1759427700; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=nbPCHfJ+LLlBruT2Jb9S8w0HTGCja4pN4K+XH7Xc4jg=;
+        b=kEMfcTgFw0ltHu13Pg/EWgspDruLGxYnWDotSauAa0ymcDoC7rYhZo2VSJeNOQ5kIQ
+         LlC2q+nwS+9KGnZpJVaNQDUa5832bEfCI/mi9112eUGc0wW5DbYId0q9ihqqk5qXK5ns
+         2xOSrdVZL/A0nO/8W0RjjpEBhp4Bvpfqu1HzqWbgQbZl8rO5CsjN/FU+N1ARWupbKEyN
+         oARaFG6DQtcEgjtGAaFLpGeybf042tOS7gKYOK5i2PGr6gVS8OeRJ6o2VILm4rqDa1VX
+         oBuTe4LRdbFCPfJ/AFIw29DiwggAIXndAYHwcN6Xy/IDUFgm7iIPkY2Mi9i+GIwzo1jg
+         fGVw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1758821373; x=1759426173;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=1xPKp0CWKeH6BVksYl8nT4cVmvOfs6P2rPR25K+k3iU=;
-        b=TZz1N21ceuYQa9ou5mFUcDufTKMoOCaK6mOgp3TZ5RH/yXLenX+m9mIMbcPHPqzabS
-         2nEnHaDtGQPku9iO0tDWnQraT6uiLY1QThY5sCiZyNIn/WIqF45Pzn1Uj8vbD0zowyKH
-         dcVFf3L8q5vGxY4KqptylyeEQsd7gXBgM/g3bDyyRUbJ6p+Kqnq2NAnNCnh540XsvXqW
-         xKdptNqOt9KJQjvM1uuw0C+DvTrqR8y7j9sbXJrLwJQjuFwNH+Akc+nZZBpkmujAAjWN
-         l1iIzcFQnThvOuyJ6MrZeDO0Tv9LABoCEfPXpx9MC3gHWj4BnbMa9L/VS8k9quxuGo/v
-         UTlA==
-X-Forwarded-Encrypted: i=1; AJvYcCVJm+weAUZ+bIi8GGWRch3GAIyjHKs4vEwjx2rlGqMrsUALmiApQ7p0gXsqeonwgbsmhKM=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwVDeMju7Wo1po2d03qAexYfpLVv9VVPMLSnd9gi40Ohw24pnQc
-	cnkQzmFfTNRMgjw7YHGxeUfojVvdoMDrUAIj9C9IZdpFtEInsaisUMDHGWG/1gG60UjnPdzy52I
-	0EQ==
-X-Google-Smtp-Source: AGHT+IFabB5ZJxkse1FxMHYo+VsnYSqWzdJfcXGK5NpuSl7voX2cKYO5R6GfWwQO7rPrUoSbZvlO3/cyHw==
-X-Received: from pjbcz15.prod.google.com ([2002:a17:90a:d44f:b0:32b:8eda:24e8])
- (user=sagis job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:1b07:b0:335:2824:aab4
- with SMTP id 98e67ed59e1d1-3352824ac26mr337614a91.24.1758821372692; Thu, 25
- Sep 2025 10:29:32 -0700 (PDT)
-Date: Thu, 25 Sep 2025 10:28:49 -0700
-In-Reply-To: <20250925172851.606193-1-sagis@google.com>
+        d=1e100.net; s=20230601; t=1758822900; x=1759427700;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=nbPCHfJ+LLlBruT2Jb9S8w0HTGCja4pN4K+XH7Xc4jg=;
+        b=ZkW0goGhgpYxhoEcDZxyVRe0eQuUiuB2C1ylNx/i+n1cDzY1XEMAAIfSzvIRkIVfIp
+         4tAN+hwS8BsDGsvDtsz8d0Sc+2dGAzJiXnTDyFmutJVPGUNLIyb+NfidMKxz+/zNH1v8
+         Q7BKO0W+OLx9tKb2g0/sROR6nxNaOcrvQwMQBhRLjh47h1s5rdR7dkeiWAzUAQGQh8vX
+         XuRIZhW+8CDajaU7fFQhaYjYrX04+CqnWGnBF7zEQ36ZzAZidQ94q+EnOXD1Fxice16n
+         jjVNAPljfMAt1NvPyyDczMrMd9ej6LzRUkAJeuIKK+3JpIrE6Bq+6jIzHQ5D30IG5Z5L
+         qiDA==
+X-Forwarded-Encrypted: i=1; AJvYcCXGFRizN34LCrhaMy/Bt6IID9AK7PBUT5S36OfIM7j4256djd2dwZndqE0H0rk0Fz0hvFE=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyuThTWafScJvzdpKksQYjKetycXk9TsJo1ze5cSVsfnXzE07NM
+	MJVAso0cZly6uRSGKtJi/XTYmiYEuwinTbjTNKe228F8drmE7/ll5f85GRxtmVtxNfWN4qaGzvj
+	683FjDxB4iGmsCj4vC0K75f203AMLgSe+XnQkBQgC
+X-Gm-Gg: ASbGncu3VHN6BcxAtjn9XHOFiYIQZycSKumBqV9wGNvAUcmHJ/v+rXTn182l+VQLhWt
+	cS0EDps4vVo9T+vyTdSM5MQ2fhsMBnO3JRvehTDNsxAeH3GsTas7RoFvbo7c8LxllUkGFXds7i2
+	D27wpuYX92KuIyIsGPGcapwwvwCL0LH/wiNdSULnRn5ouTBvNBsORvxKyc6oUf6AjqstxsmyUjq
+	0WOF/dRdYyFvA==
+X-Google-Smtp-Source: AGHT+IGtWrFCQ7mHkGVN8nL9J3bywwrPeWB4MitTqY1IKv2q0yoGPb264XUgeOr7c8WslC5vIz11r/IeITZc/CAugP4=
+X-Received: by 2002:a05:6402:703:b0:62f:cb1a:5c43 with SMTP id
+ 4fb4d7f45d1cf-634b63b6099mr7603a12.1.1758822900121; Thu, 25 Sep 2025 10:55:00
+ -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20250925172851.606193-1-sagis@google.com>
-X-Mailer: git-send-email 2.51.0.536.g15c5d4f767-goog
-Message-ID: <20250925172851.606193-22-sagis@google.com>
-Subject: [PATCH v11 21/21] KVM: selftests: Add TDX lifecycle test
-From: Sagi Shahar <sagis@google.com>
-To: linux-kselftest@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>, 
-	Shuah Khan <shuah@kernel.org>, Sean Christopherson <seanjc@google.com>, 
-	Ackerley Tng <ackerleytng@google.com>, Ryan Afranji <afranji@google.com>, 
-	Andrew Jones <ajones@ventanamicro.com>, Isaku Yamahata <isaku.yamahata@intel.com>, 
-	Erdem Aktas <erdemaktas@google.com>, Rick Edgecombe <rick.p.edgecombe@intel.com>, 
-	Sagi Shahar <sagis@google.com>, Roger Wang <runanwang@google.com>, 
-	Binbin Wu <binbin.wu@linux.intel.com>, Oliver Upton <oliver.upton@linux.dev>, 
-	"Pratik R. Sampat" <pratikrajesh.sampat@amd.com>, Reinette Chatre <reinette.chatre@intel.com>, 
-	Ira Weiny <ira.weiny@intel.com>, Chao Gao <chao.gao@intel.com>, 
-	Chenyi Qiang <chenyi.qiang@intel.com>
-Cc: linux-kernel@vger.kernel.org, kvm@vger.kernel.org
+MIME-Version: 1.0
+References: <20250924-vmscape-bhb-v1-0-da51f0e1934d@linux.intel.com> <20250924-vmscape-bhb-v1-1-da51f0e1934d@linux.intel.com>
+In-Reply-To: <20250924-vmscape-bhb-v1-1-da51f0e1934d@linux.intel.com>
+From: Jim Mattson <jmattson@google.com>
+Date: Thu, 25 Sep 2025 10:54:48 -0700
+X-Gm-Features: AS18NWC5T26-RT6cIjgQmdeDLluP8Y_82To_ggt5vVuXe4Ii6oC9sC1vUudwIWo
+Message-ID: <CALMp9eRcDZoRza7pkCx_fmYZ9UZDGRAXQ_0QP=v+pMMBKx4gfg@mail.gmail.com>
+Subject: Re: [PATCH 1/2] x86/bhi: Add BHB clearing for CPUs with larger branch history
+To: Pawan Gupta <pawan.kumar.gupta@linux.intel.com>
+Cc: x86@kernel.org, "H. Peter Anvin" <hpa@zytor.com>, Josh Poimboeuf <jpoimboe@kernel.org>, 
+	David Kaplan <david.kaplan@amd.com>, Sean Christopherson <seanjc@google.com>, 
+	Paolo Bonzini <pbonzini@redhat.com>, linux-kernel@vger.kernel.org, kvm@vger.kernel.org, 
+	Asit Mallick <asit.k.mallick@intel.com>, Tao Zhang <tao1.zhang@intel.com>
 Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Adding a test to verify TDX lifecycle by creating a simple TD.
+On Wed, Sep 24, 2025 at 8:09=E2=80=AFPM Pawan Gupta
+<pawan.kumar.gupta@linux.intel.com> wrote:
+>
+> Add a version of clear_bhb_loop() that works on CPUs with larger branch
+> history table such as Alder Lake and newer. This could serve as a cheaper
+> alternative to IBPB mitigation for VMSCAPE.
 
-Signed-off-by: Sagi Shahar <sagis@google.com>
----
- tools/testing/selftests/kvm/Makefile.kvm      |  1 +
- .../selftests/kvm/include/x86/tdx/tdx_util.h  | 10 ++++++
- .../selftests/kvm/lib/x86/tdx/tdx_util.c      | 18 +++++++++++
- tools/testing/selftests/kvm/x86/tdx_vm_test.c | 31 +++++++++++++++++++
- 4 files changed, 60 insertions(+)
- create mode 100644 tools/testing/selftests/kvm/x86/tdx_vm_test.c
+Yay!
 
-diff --git a/tools/testing/selftests/kvm/Makefile.kvm b/tools/testing/selftests/kvm/Makefile.kvm
-index 1a73e08c8437..1a76e9fa45d6 100644
---- a/tools/testing/selftests/kvm/Makefile.kvm
-+++ b/tools/testing/selftests/kvm/Makefile.kvm
-@@ -155,6 +155,7 @@ TEST_GEN_PROGS_x86 += rseq_test
- TEST_GEN_PROGS_x86 += steal_time
- TEST_GEN_PROGS_x86 += system_counter_offset_test
- TEST_GEN_PROGS_x86 += pre_fault_memory_test
-+TEST_GEN_PROGS_x86 += x86/tdx_vm_test
- 
- # Compiled outputs used by test targets
- TEST_GEN_PROGS_EXTENDED_x86 += x86/nx_huge_pages_test
-diff --git a/tools/testing/selftests/kvm/include/x86/tdx/tdx_util.h b/tools/testing/selftests/kvm/include/x86/tdx/tdx_util.h
-index 2467b6c35557..775ca249f74d 100644
---- a/tools/testing/selftests/kvm/include/x86/tdx/tdx_util.h
-+++ b/tools/testing/selftests/kvm/include/x86/tdx/tdx_util.h
-@@ -11,6 +11,14 @@ static inline bool is_tdx_vm(struct kvm_vm *vm)
- 	return vm->type == KVM_X86_TDX_VM;
- }
- 
-+/*
-+ * Verify that TDX is supported by KVM.
-+ */
-+static inline bool is_tdx_enabled(void)
-+{
-+	return !!(kvm_check_cap(KVM_CAP_VM_TYPES) & BIT(KVM_X86_TDX_VM));
-+}
-+
- /*
-  * TDX ioctls
-  */
-@@ -72,5 +80,7 @@ void vm_tdx_load_vcpu_boot_parameters(struct kvm_vm *vm, struct kvm_vcpu *vcpu);
- void vm_tdx_set_vcpu_entry_point(struct kvm_vcpu *vcpu, void *guest_code);
- 
- void vm_tdx_finalize(struct kvm_vm *vm);
-+struct kvm_vm *vm_tdx_create_with_one_vcpu(void *guest_code,
-+					   struct kvm_vcpu **vcpu);
- 
- #endif // SELFTESTS_TDX_TDX_UTIL_H
-diff --git a/tools/testing/selftests/kvm/lib/x86/tdx/tdx_util.c b/tools/testing/selftests/kvm/lib/x86/tdx/tdx_util.c
-index 53cfadeff8de..714413e062fd 100644
---- a/tools/testing/selftests/kvm/lib/x86/tdx/tdx_util.c
-+++ b/tools/testing/selftests/kvm/lib/x86/tdx/tdx_util.c
-@@ -328,3 +328,21 @@ void vm_tdx_finalize(struct kvm_vm *vm)
- 	load_td_private_memory(vm);
- 	vm_tdx_vm_ioctl(vm, KVM_TDX_FINALIZE_VM, 0, NULL);
- }
-+
-+struct kvm_vm *vm_tdx_create_with_one_vcpu(void *guest_code,
-+					   struct kvm_vcpu **vcpu)
-+{
-+	struct vm_shape shape = {
-+		.mode = VM_MODE_DEFAULT,
-+		.type = KVM_X86_TDX_VM,
-+	};
-+	struct kvm_vm *vm;
-+	struct kvm_vcpu *vcpus[1];
-+
-+	vm = __vm_create_with_vcpus(shape, 1, 0, guest_code, vcpus);
-+	*vcpu = vcpus[0];
-+
-+	vm_tdx_finalize(vm);
-+
-+	return vm;
-+}
-diff --git a/tools/testing/selftests/kvm/x86/tdx_vm_test.c b/tools/testing/selftests/kvm/x86/tdx_vm_test.c
-new file mode 100644
-index 000000000000..a9ee489eea1a
---- /dev/null
-+++ b/tools/testing/selftests/kvm/x86/tdx_vm_test.c
-@@ -0,0 +1,31 @@
-+// SPDX-License-Identifier: GPL-2.0-only
-+
-+#include "kvm_util.h"
-+#include "tdx/tdx_util.h"
-+#include "ucall_common.h"
-+#include "kselftest_harness.h"
-+
-+static void guest_code_lifecycle(void)
-+{
-+	GUEST_DONE();
-+}
-+
-+TEST(verify_td_lifecycle)
-+{
-+	struct kvm_vcpu *vcpu;
-+	struct kvm_vm *vm;
-+	struct ucall uc;
-+
-+	vm = vm_tdx_create_with_one_vcpu(guest_code_lifecycle, &vcpu);
-+
-+	vcpu_run(vcpu);
-+	TEST_ASSERT_EQ(get_ucall(vcpu, &uc), UCALL_DONE);
-+
-+	kvm_vm_free(vm);
-+}
-+
-+int main(int argc, char **argv)
-+{
-+	TEST_REQUIRE(is_tdx_enabled());
-+	return test_harness_run(argc, argv);
-+}
--- 
-2.51.0.536.g15c5d4f767-goog
-
+Can we also use this longer loop as a BHI mitigation on (virtual)
+processors with larger branch history tables that don't support
+BHI_DIS_S? Today, we just use the short BHB clearing loop and call it
+good.
 
