@@ -1,214 +1,321 @@
-Return-Path: <kvm+bounces-58777-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-58778-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6E5ADBA000F
-	for <lists+kvm@lfdr.de>; Thu, 25 Sep 2025 16:30:08 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id DBBB8BA0035
+	for <lists+kvm@lfdr.de>; Thu, 25 Sep 2025 16:31:28 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B2804163ED8
-	for <lists+kvm@lfdr.de>; Thu, 25 Sep 2025 14:27:02 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 86CAC168FF4
+	for <lists+kvm@lfdr.de>; Thu, 25 Sep 2025 14:28:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 385272D0C9B;
-	Thu, 25 Sep 2025 14:26:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A8FB92D027F;
+	Thu, 25 Sep 2025 14:28:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="cov1LflE"
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="UMdN1DI6"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CEABF2C15AC
-	for <kvm@vger.kernel.org>; Thu, 25 Sep 2025 14:26:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 145CF2C0F8C;
+	Thu, 25 Sep 2025 14:28:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758810404; cv=none; b=JgtOZF7H4b1Gf5+cZCZ8cz/WYt+kFXxkT+I14vchL2oI94H6B0rgfNQD6+eXMEGx09+fFusQ+qz7J9hOvCEdefPZI2zb+kU0Boyv881HZjWjCFQIim9sfxJjPKrPQHarqJN4rxrIFSxVeOU03FN8wyUV3BqOGNluC87HxsNnpBA=
+	t=1758810499; cv=none; b=fmoLTIgnhFrhpiqk6JfVUej8dwX5i4WCBht3vE5rCVJkkwGe7KEilIpz9lztXB5cAz3YCwupgCrCGZpNtrhes0jz7Da9jN/I2aSAePiWo3ymL9IbV67tjZSqdcXcnrjVluWdCZ8iREfn1Q3yhozYLwcFy6xryxhEYGEMd4SjXOs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758810404; c=relaxed/simple;
-	bh=D8wsuOOGG1VyLhZ0JxFPIQTVvR8s+TjTt638B6XCb2w=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=OYt1BrE2OG1OcKzdKTp5U4mRK/uxekCODQV64aBYjGKnJ8+r8qlxxge9YcOPv1XP1PBN0weuffPefh5Kh5E+MGmSejSDvI2fKwlAkddYRnVddFq+71pFV9/cAZ2xzrlsW37owIDAjENEcPvvvXHGsOfUTy+yxySsNG2ikEZ4c+c=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=cov1LflE; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1758810401;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-	bh=7NbQWxxCkkna6kPG5JPAnaAdZblXa8Jj1l6IA0HQVeA=;
-	b=cov1LflEGC16Rei+iT6tZ+LPurdrLCoLUhEocK7XYV0hydH/Uk8yrCwLwDUdVzK/uu/xUO
-	o/Tcs5cC3XG9mF8l8GIwd9iNq+Zrh/8XCQR0/6Vz/FdNmJ+gVb4KwKjfrij6AbkD+wccTx
-	zf4dgaO68Egnqu//3uhoYHiQ1QkBnDA=
-Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
- [209.85.128.70]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-86-eWky66iJPlaQKbBrH2KsAQ-1; Thu, 25 Sep 2025 10:26:40 -0400
-X-MC-Unique: eWky66iJPlaQKbBrH2KsAQ-1
-X-Mimecast-MFC-AGG-ID: eWky66iJPlaQKbBrH2KsAQ_1758810399
-Received: by mail-wm1-f70.google.com with SMTP id 5b1f17b1804b1-46e35baddc1so5938005e9.2
-        for <kvm@vger.kernel.org>; Thu, 25 Sep 2025 07:26:39 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1758810399; x=1759415199;
-        h=content-transfer-encoding:in-reply-to:autocrypt:content-language
-         :from:references:cc:to:subject:user-agent:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=7NbQWxxCkkna6kPG5JPAnaAdZblXa8Jj1l6IA0HQVeA=;
-        b=VQxct1saWNCMhs3M2VYAc4KgIa60OlXd/IemLfvmdMBVYf09mYl5qkZh1od5Sr19/Q
-         WuFlKh7+NvLjhNnCbd/jrUpyKhqXt1hnHIv/EbzUk7/oeQk2HpryoBXb0YHR6HFMS+pY
-         HqeLEFQHcaYPVd+5XMRXJlmtMoutkBar90mGZf+9gfaXaQkfsleCK481EBfmCW1BO5TD
-         s22YpjlKK+ZHkeqxOLCXwYwEhy2es8Fbmidnm3DQpfc/2JAtuTC44ixwzLDm34ax1rtM
-         tuTJyrlM1mBtbmafRvkxaBrJ+ti9i1tm1fI2zVe2Oum4TQr7zofaIOOIUN9wAxdd6ft4
-         Ww8g==
-X-Forwarded-Encrypted: i=1; AJvYcCVRuYUfvJKtT5Y5CYm2DoGss6yQsKrqLEDDKVCEOSZE5Onc6VLrTgdBBDhqJtfCMz5WUrE=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yy48KnZDcIjfRnWgRE+xR82cJl+Gc/uq0M19CzYFdB4qcZ2sU+l
-	/NRB0EHI5P74wB6aF60dT3cRXs8fkRCBjvWqFcWgh1ZjvbV+CdYNzVoqQZsDJ/kTtr+Z0/8PHTy
-	t//NIMXth08DxNcmQNGneoxwbpc4GSQwUFUEOWSuMOXiAoHrGHurnjg==
-X-Gm-Gg: ASbGnculJWh+l/JIB4tDkzXOj4GRE3P+rs3bwyFo+MlarE0FmYCfZMr8/aLBOL6QFwG
-	RSHlzAUEn1br8GLDHFOQboTco2uVzTvesD8mcTH4ojpuZCs5VqMWlLvJ7AuZuMAXa9R1jv7esAT
-	usvX9RfPeEZuQ5xdUo39iaHrSzue60KLUx6CwS+DQ1Fw+CgDgk0U4opUbetYRX7vPf7lVMyFAZy
-	oifNZaWgBL5gEqOP/6K9Uye/WV13sVJTWXFmPAmiNJbgrk/E3KeFFmtWmPklx0+3NimpkoIJ8xm
-	513uQh2KQVMfZcxNiWWJzpLeyhqfpwYMqCuVGbNrbuQ0APeJKMzwazGn+Tih+6QVgWTPgPJWYvf
-	e/Kcu9AESVrzEZW980WcXjuOtoohBDuI2nrsykJb607NC+61b5wvZaFtnckwqaPuxdjs1
-X-Received: by 2002:a05:600c:4e8b:b0:46e:37fc:def0 with SMTP id 5b1f17b1804b1-46e37fce148mr14763455e9.9.1758810398154;
-        Thu, 25 Sep 2025 07:26:38 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IHjZJ0WBMi2SLpg5brCAPP2ix/UVmUI6Mp8N0XKACsUKpJXXguXTVe5P/uAzXY2rpR891e88g==
-X-Received: by 2002:a05:600c:4e8b:b0:46e:37fc:def0 with SMTP id 5b1f17b1804b1-46e37fce148mr14762275e9.9.1758810397527;
-        Thu, 25 Sep 2025 07:26:37 -0700 (PDT)
-Received: from ?IPV6:2003:d8:2f3f:f800:c101:5c9f:3bc9:3d08? (p200300d82f3ff800c1015c9f3bc93d08.dip0.t-ipconnect.de. [2003:d8:2f3f:f800:c101:5c9f:3bc9:3d08])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-46e33bf6ecbsm39061825e9.22.2025.09.25.07.26.33
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 25 Sep 2025 07:26:36 -0700 (PDT)
-Message-ID: <3a82a197-495f-40c3-ae1b-500453e3d1ec@redhat.com>
-Date: Thu, 25 Sep 2025 16:26:32 +0200
+	s=arc-20240116; t=1758810499; c=relaxed/simple;
+	bh=vW7j2KWCOfJfuZMh3iWYpO1pCvtswVmOTtWQRB2BEdQ=;
+	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=poXzHd0wlsczIWQhy7UrXgF6eHJwd+Wi5EleHacMPBx8yMqYf9wbqrsjPpGErUmLFkPmq2STbc68syi3xsUt0Mz5BCbn08gOVyFgllOqAbB5aAAADrx5sKFHjW1g38Ssq1RYeA2ULvYMahNGj0jbVWMN20EZXJvQgq0YE3aVYZ0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=UMdN1DI6; arc=none smtp.client-ip=148.163.156.1
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
+Received: from pps.filterd (m0353729.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 58P7cfm3027646;
+	Thu, 25 Sep 2025 14:28:10 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
+	:content-transfer-encoding:content-type:date:from:in-reply-to
+	:message-id:mime-version:references:subject:to; s=pp1; bh=3HyxuZ
+	+gavaQ6q/gkoxk1mSPJPimkLJjL2E2gKKwKkM=; b=UMdN1DI6DdXqCKT94/MFSJ
+	EE8ypqYGbr4neS+suRFI3w9QTyrZoufCp2Z5cjUUXtD/7isFvO4MqZ+C+S2WiKcP
+	CpgXIq526/GwrnoD9sGkY+05wzT3eCvvU6rVeF72/fESOmGC2EkNL93lB9fHS1ms
+	5Gjh1tMO4yhdRTxY/idZb7LK2D/rKE7Rc1WxotI9Xfa0kATXa1/d9Z6MJqWgDHQv
+	Dl+ty2xdB09MNJvwMrwmIr2utacRrfNMoD3UBJLran03fXjYdo7sX3IuNFqd/Mxx
+	cRRIyxPP9q1PP2luT3xYw80JCSdPAsQamfhXivJUUE7lKg+oIHAFx0biXARRUPNQ
+	==
+Received: from ppma22.wdc07v.mail.ibm.com (5c.69.3da9.ip4.static.sl-reverse.com [169.61.105.92])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 499ky6ec81-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Thu, 25 Sep 2025 14:28:09 +0000 (GMT)
+Received: from pps.filterd (ppma22.wdc07v.mail.ibm.com [127.0.0.1])
+	by ppma22.wdc07v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 58PD9AjY008311;
+	Thu, 25 Sep 2025 14:28:08 GMT
+Received: from smtprelay04.wdc07v.mail.ibm.com ([172.16.1.71])
+	by ppma22.wdc07v.mail.ibm.com (PPS) with ESMTPS id 49a6yy6gbq-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Thu, 25 Sep 2025 14:28:08 +0000
+Received: from smtpav04.dal12v.mail.ibm.com (smtpav04.dal12v.mail.ibm.com [10.241.53.103])
+	by smtprelay04.wdc07v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 58PES67T41550500
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Thu, 25 Sep 2025 14:28:07 GMT
+Received: from smtpav04.dal12v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id D95485805E;
+	Thu, 25 Sep 2025 14:28:06 +0000 (GMT)
+Received: from smtpav04.dal12v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 497E658056;
+	Thu, 25 Sep 2025 14:28:05 +0000 (GMT)
+Received: from [9.111.71.247] (unknown [9.111.71.247])
+	by smtpav04.dal12v.mail.ibm.com (Postfix) with ESMTP;
+	Thu, 25 Sep 2025 14:28:05 +0000 (GMT)
+Message-ID: <d22cb26b864362454ace07ed5fcb9758c40ee32e.camel@linux.ibm.com>
+Subject: Re: [PATCH v4 07/10] s390/pci: Store PCI error information for
+ passthrough devices
+From: Niklas Schnelle <schnelle@linux.ibm.com>
+To: Farhan Ali <alifm@linux.ibm.com>, linux-s390@vger.kernel.org,
+        kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-pci@vger.kernel.org
+Cc: alex.williamson@redhat.com, helgaas@kernel.org, clg@redhat.com,
+        mjrosato@linux.ibm.com
+Date: Thu, 25 Sep 2025 16:28:04 +0200
+In-Reply-To: <20250924171628.826-8-alifm@linux.ibm.com>
+References: <20250924171628.826-1-alifm@linux.ibm.com>
+	 <20250924171628.826-8-alifm@linux.ibm.com>
+Autocrypt: addr=schnelle@linux.ibm.com; prefer-encrypt=mutual;
+ keydata=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
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.56.2 (3.56.2-2.fc42) 
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH kvm-next V11 4/7] KVM: guest_memfd: Use guest mem inodes
- instead of anonymous inodes
-To: Sean Christopherson <seanjc@google.com>
-Cc: Shivank Garg <shivankg@amd.com>, Ackerley Tng <ackerleytng@google.com>,
- willy@infradead.org, akpm@linux-foundation.org, pbonzini@redhat.com,
- shuah@kernel.org, vbabka@suse.cz, brauner@kernel.org,
- viro@zeniv.linux.org.uk, dsterba@suse.com, xiang@kernel.org,
- chao@kernel.org, jaegeuk@kernel.org, clm@fb.com, josef@toxicpanda.com,
- kent.overstreet@linux.dev, zbestahu@gmail.com, jefflexu@linux.alibaba.com,
- dhavale@google.com, lihongbo22@huawei.com, lorenzo.stoakes@oracle.com,
- Liam.Howlett@oracle.com, rppt@kernel.org, surenb@google.com,
- mhocko@suse.com, ziy@nvidia.com, matthew.brost@intel.com,
- joshua.hahnjy@gmail.com, rakie.kim@sk.com, byungchul@sk.com,
- gourry@gourry.net, ying.huang@linux.alibaba.com, apopple@nvidia.com,
- tabba@google.com, paul@paul-moore.com, jmorris@namei.org, serge@hallyn.com,
- pvorel@suse.cz, bfoster@redhat.com, vannapurve@google.com,
- chao.gao@intel.com, bharata@amd.com, nikunj@amd.com, michael.day@amd.com,
- shdhiman@amd.com, yan.y.zhao@intel.com, Neeraj.Upadhyay@amd.com,
- thomas.lendacky@amd.com, michael.roth@amd.com, aik@amd.com, jgg@nvidia.com,
- kalyazin@amazon.com, peterx@redhat.com, jack@suse.cz, hch@infradead.org,
- cgzones@googlemail.com, ira.weiny@intel.com, rientjes@google.com,
- roypat@amazon.co.uk, chao.p.peng@intel.com, amit@infradead.org,
- ddutile@redhat.com, dan.j.williams@intel.com, ashish.kalra@amd.com,
- gshan@redhat.com, jgowans@amazon.com, pankaj.gupta@amd.com,
- papaluri@amd.com, yuzhao@google.com, suzuki.poulose@arm.com,
- quic_eberman@quicinc.com, linux-bcachefs@vger.kernel.org,
- linux-btrfs@vger.kernel.org, linux-erofs@lists.ozlabs.org,
- linux-f2fs-devel@lists.sourceforge.net, linux-fsdevel@vger.kernel.org,
- linux-mm@kvack.org, linux-kernel@vger.kernel.org,
- linux-security-module@vger.kernel.org, kvm@vger.kernel.org,
- linux-kselftest@vger.kernel.org, linux-coco@lists.linux.dev
-References: <20250827175247.83322-2-shivankg@amd.com>
- <20250827175247.83322-7-shivankg@amd.com> <diqztt1sbd2v.fsf@google.com>
- <aNSt9QT8dmpDK1eE@google.com> <dc6eb85f-87b6-43a1-b1f7-4727c0b834cc@amd.com>
- <b67dd7cd-2c1c-4566-badf-32082d8cd952@redhat.com>
- <aNVFrZDAkHmgNNci@google.com>
-From: David Hildenbrand <david@redhat.com>
-Content-Language: en-US
-Autocrypt: addr=david@redhat.com; keydata=
- xsFNBFXLn5EBEAC+zYvAFJxCBY9Tr1xZgcESmxVNI/0ffzE/ZQOiHJl6mGkmA1R7/uUpiCjJ
- dBrn+lhhOYjjNefFQou6478faXE6o2AhmebqT4KiQoUQFV4R7y1KMEKoSyy8hQaK1umALTdL
- QZLQMzNE74ap+GDK0wnacPQFpcG1AE9RMq3aeErY5tujekBS32jfC/7AnH7I0v1v1TbbK3Gp
- XNeiN4QroO+5qaSr0ID2sz5jtBLRb15RMre27E1ImpaIv2Jw8NJgW0k/D1RyKCwaTsgRdwuK
- Kx/Y91XuSBdz0uOyU/S8kM1+ag0wvsGlpBVxRR/xw/E8M7TEwuCZQArqqTCmkG6HGcXFT0V9
- PXFNNgV5jXMQRwU0O/ztJIQqsE5LsUomE//bLwzj9IVsaQpKDqW6TAPjcdBDPLHvriq7kGjt
- WhVhdl0qEYB8lkBEU7V2Yb+SYhmhpDrti9Fq1EsmhiHSkxJcGREoMK/63r9WLZYI3+4W2rAc
- UucZa4OT27U5ZISjNg3Ev0rxU5UH2/pT4wJCfxwocmqaRr6UYmrtZmND89X0KigoFD/XSeVv
- jwBRNjPAubK9/k5NoRrYqztM9W6sJqrH8+UWZ1Idd/DdmogJh0gNC0+N42Za9yBRURfIdKSb
- B3JfpUqcWwE7vUaYrHG1nw54pLUoPG6sAA7Mehl3nd4pZUALHwARAQABzSREYXZpZCBIaWxk
- ZW5icmFuZCA8ZGF2aWRAcmVkaGF0LmNvbT7CwZoEEwEIAEQCGwMCF4ACGQEFCwkIBwICIgIG
- FQoJCAsCBBYCAwECHgcWIQQb2cqtc1xMOkYN/MpN3hD3AP+DWgUCaJzangUJJlgIpAAKCRBN
- 3hD3AP+DWhAxD/9wcL0A+2rtaAmutaKTfxhTP0b4AAp1r/eLxjrbfbCCmh4pqzBhmSX/4z11
- opn2KqcOsueRF1t2ENLOWzQu3Roiny2HOU7DajqB4dm1BVMaXQya5ae2ghzlJN9SIoopTWlR
- 0Af3hPj5E2PYvQhlcqeoehKlBo9rROJv/rjmr2x0yOM8qeTroH/ZzNlCtJ56AsE6Tvl+r7cW
- 3x7/Jq5WvWeudKrhFh7/yQ7eRvHCjd9bBrZTlgAfiHmX9AnCCPRPpNGNedV9Yty2Jnxhfmbv
- Pw37LA/jef8zlCDyUh2KCU1xVEOWqg15o1RtTyGV1nXV2O/mfuQJud5vIgzBvHhypc3p6VZJ
- lEf8YmT+Ol5P7SfCs5/uGdWUYQEMqOlg6w9R4Pe8d+mk8KGvfE9/zTwGg0nRgKqlQXrWRERv
- cuEwQbridlPAoQHrFWtwpgYMXx2TaZ3sihcIPo9uU5eBs0rf4mOERY75SK+Ekayv2ucTfjxr
- Kf014py2aoRJHuvy85ee/zIyLmve5hngZTTe3Wg3TInT9UTFzTPhItam6dZ1xqdTGHZYGU0O
- otRHcwLGt470grdiob6PfVTXoHlBvkWRadMhSuG4RORCDpq89vu5QralFNIf3EysNohoFy2A
- LYg2/D53xbU/aa4DDzBb5b1Rkg/udO1gZocVQWrDh6I2K3+cCs7BTQRVy5+RARAA59fefSDR
- 9nMGCb9LbMX+TFAoIQo/wgP5XPyzLYakO+94GrgfZjfhdaxPXMsl2+o8jhp/hlIzG56taNdt
- VZtPp3ih1AgbR8rHgXw1xwOpuAd5lE1qNd54ndHuADO9a9A0vPimIes78Hi1/yy+ZEEvRkHk
- /kDa6F3AtTc1m4rbbOk2fiKzzsE9YXweFjQvl9p+AMw6qd/iC4lUk9g0+FQXNdRs+o4o6Qvy
- iOQJfGQ4UcBuOy1IrkJrd8qq5jet1fcM2j4QvsW8CLDWZS1L7kZ5gT5EycMKxUWb8LuRjxzZ
- 3QY1aQH2kkzn6acigU3HLtgFyV1gBNV44ehjgvJpRY2cC8VhanTx0dZ9mj1YKIky5N+C0f21
- zvntBqcxV0+3p8MrxRRcgEtDZNav+xAoT3G0W4SahAaUTWXpsZoOecwtxi74CyneQNPTDjNg
- azHmvpdBVEfj7k3p4dmJp5i0U66Onmf6mMFpArvBRSMOKU9DlAzMi4IvhiNWjKVaIE2Se9BY
- FdKVAJaZq85P2y20ZBd08ILnKcj7XKZkLU5FkoA0udEBvQ0f9QLNyyy3DZMCQWcwRuj1m73D
- sq8DEFBdZ5eEkj1dCyx+t/ga6x2rHyc8Sl86oK1tvAkwBNsfKou3v+jP/l14a7DGBvrmlYjO
- 59o3t6inu6H7pt7OL6u6BQj7DoMAEQEAAcLBfAQYAQgAJgIbDBYhBBvZyq1zXEw6Rg38yk3e
- EPcA/4NaBQJonNqrBQkmWAihAAoJEE3eEPcA/4NaKtMQALAJ8PzprBEXbXcEXwDKQu+P/vts
- IfUb1UNMfMV76BicGa5NCZnJNQASDP/+bFg6O3gx5NbhHHPeaWz/VxlOmYHokHodOvtL0WCC
- 8A5PEP8tOk6029Z+J+xUcMrJClNVFpzVvOpb1lCbhjwAV465Hy+NUSbbUiRxdzNQtLtgZzOV
- Zw7jxUCs4UUZLQTCuBpFgb15bBxYZ/BL9MbzxPxvfUQIPbnzQMcqtpUs21CMK2PdfCh5c4gS
- sDci6D5/ZIBw94UQWmGpM/O1ilGXde2ZzzGYl64glmccD8e87OnEgKnH3FbnJnT4iJchtSvx
- yJNi1+t0+qDti4m88+/9IuPqCKb6Stl+s2dnLtJNrjXBGJtsQG/sRpqsJz5x1/2nPJSRMsx9
- 5YfqbdrJSOFXDzZ8/r82HgQEtUvlSXNaXCa95ez0UkOG7+bDm2b3s0XahBQeLVCH0mw3RAQg
- r7xDAYKIrAwfHHmMTnBQDPJwVqxJjVNr7yBic4yfzVWGCGNE4DnOW0vcIeoyhy9vnIa3w1uZ
- 3iyY2Nsd7JxfKu1PRhCGwXzRw5TlfEsoRI7V9A8isUCoqE2Dzh3FvYHVeX4Us+bRL/oqareJ
- CIFqgYMyvHj7Q06kTKmauOe4Nf0l0qEkIuIzfoLJ3qr5UyXc2hLtWyT9Ir+lYlX9efqh7mOY
- qIws/H2t
-In-Reply-To: <aNVFrZDAkHmgNNci@google.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-ORIG-GUID: gEqyHAxMd8WOw0AvtrnpLCnMhoue5R1M
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUwOTIwMDAyMCBTYWx0ZWRfX3b9scm/F1/Kq
+ GcbabaQ6tIbylgkDQiWSP3zGw2is0JwvJMDBBjvuHTPKzZqy7RfL7Z2ETjRc30wWxbmaY4WxXWQ
+ k83hReqbKY6hxpnI0TK+6GwBENtGteaEjDVxdvLiOBRMkdvGc3MOtS6TVcBTEAxarHOA82Zx1+W
+ mreOQhfO/K4d0DjEBYGDv9uXxqXqGQvywxNa6q7rKfW3NrB9MQKfR/kDIpYhVw+afELQcNnete3
+ 3CEx8bOfx2jODDpG6gDW3NCZejN3VNNkcLtPaU0PnwSk05k2QfHnVwuRepY4XSHDtnXe80SoNRC
+ 8ovrep0Uut0gXO5REGRxnchhiRtDqyGiNfgm4mXdqqx8ZouI7cxpwAM1GMVsJPlJyCOFQtt21Qj
+ aSteWWbE
+X-Authority-Analysis: v=2.4 cv=XYGJzJ55 c=1 sm=1 tr=0 ts=68d55179 cx=c_pps
+ a=5BHTudwdYE3Te8bg5FgnPg==:117 a=5BHTudwdYE3Te8bg5FgnPg==:17
+ a=IkcTkHD0fZMA:10 a=yJojWOMRYYMA:10 a=VnNF1IyMAAAA:8 a=NDtGctlWJZRkknF2ZLwA:9
+ a=QEXdDO2ut3YA:10
+X-Proofpoint-GUID: gEqyHAxMd8WOw0AvtrnpLCnMhoue5R1M
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1117,Hydra:6.1.9,FMLib:17.12.80.40
+ definitions=2025-09-25_01,2025-09-25_01,2025-03-28_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ spamscore=0 phishscore=0 clxscore=1015 adultscore=0 malwarescore=0
+ suspectscore=0 impostorscore=0 priorityscore=1501 bulkscore=0
+ classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
+ reason=mlx scancount=1 engine=8.19.0-2507300000 definitions=main-2509200020
 
-On 25.09.25 15:41, Sean Christopherson wrote:
-> On Thu, Sep 25, 2025, David Hildenbrand wrote:
->> On 25.09.25 13:44, Garg, Shivank wrote:
->>> On 9/25/2025 8:20 AM, Sean Christopherson wrote:
->>> I did functional testing and it works fine.
->>
->> I can queue this instead. I guess I can reuse the patch description and add
->> Sean as author + add his SOB (if he agrees).
-> 
-> Eh, Ackerley and Fuad did all the work.  If I had provided feedback earlier,
-> this would have been handled in a new version.  If they are ok with the changes,
-> I would prefer they remain co-authors.
+On Wed, 2025-09-24 at 10:16 -0700, Farhan Ali wrote:
+> For a passthrough device we need co-operation from user space to recover
+> the device. This would require to bubble up any error information to user
+> space.  Let's store this error information for passthrough devices, so it
+> can be retrieved later.
+>=20
+> Signed-off-by: Farhan Ali <alifm@linux.ibm.com>
+> ---
+>  arch/s390/include/asm/pci.h      | 28 ++++++++++
+>  arch/s390/pci/pci.c              |  1 +
+>  arch/s390/pci/pci_event.c        | 95 +++++++++++++++++++-------------
+>  drivers/vfio/pci/vfio_pci_zdev.c |  2 +
+>  4 files changed, 88 insertions(+), 38 deletions(-)
+>=20
+> diff --git a/arch/s390/include/asm/pci.h b/arch/s390/include/asm/pci.h
+> index f47f62fc3bfd..40bfe5721109 100644
+> --- a/arch/s390/include/asm/pci.h
+> +++ b/arch/s390/include/asm/pci.h
+> @@ -116,6 +116,31 @@ struct zpci_bus {
+>  	enum pci_bus_speed	max_bus_speed;
+>  };
+> =20
+> +/* Content Code Description for PCI Function Error */
+> +struct zpci_ccdf_err {
+> +	u32 reserved1;
+> +	u32 fh;                         /* function handle */
+> +	u32 fid;                        /* function id */
+> +	u32 ett         :  4;           /* expected table type */
+> +	u32 mvn         : 12;           /* MSI vector number */
+> +	u32 dmaas       :  8;           /* DMA address space */
+> +	u32 reserved2   :  6;
+> +	u32 q           :  1;           /* event qualifier */
+> +	u32 rw          :  1;           /* read/write */
+> +	u64 faddr;                      /* failing address */
+> +	u32 reserved3;
+> +	u16 reserved4;
+> +	u16 pec;                        /* PCI event code */
+> +} __packed;
+> +
+> +#define ZPCI_ERR_PENDING_MAX 4
+> +struct zpci_ccdf_pending {
+> +	u8 count;
+> +	u8 head;
+> +	u8 tail;
+> +	struct zpci_ccdf_err err[ZPCI_ERR_PENDING_MAX];
+> +};
 
-Yeah, that's what I would have done.
+Thanks this looks more reasonably sized.=20
 
-> 
-> Regarding timing, how much do people care about getting this into 6.18 in
-> particular?
+> +
+>  /* Private data per function */
+>  struct zpci_dev {
+>  	struct zpci_bus *zbus;
+> @@ -191,6 +216,8 @@ struct zpci_dev {
+>  	struct iommu_domain *s390_domain; /* attached IOMMU domain */
+>  	struct kvm_zdev *kzdev;
+>  	struct mutex kzdev_lock;
+> +	struct zpci_ccdf_pending pending_errs;
+> +	struct mutex pending_errs_lock;
+>  	spinlock_t dom_lock;		/* protect s390_domain change */
+>  };
+> =20
+--- snip ---
+> +static void zpci_store_pci_error(struct pci_dev *pdev,
+> +				 struct zpci_ccdf_err *ccdf)
+> +{
+> +	struct zpci_dev *zdev =3D to_zpci(pdev);
+> +	int i;
+> +
+> +	mutex_lock(&zdev->pending_errs_lock);
+> +	if (zdev->pending_errs.count >=3D ZPCI_ERR_PENDING_MAX) {
+> +		pr_err("%s: Maximum number (%d) of pending error events queued",
+> +				pci_name(pdev), ZPCI_ERR_PENDING_MAX);
 
-I think it will be beneficial if we start getting stuff upstream. But 
-waiting a bit longer probably doesn't hurt.
+So for a vfio-pci user which doesn't pick up the error information but
+does reset on error and thus recovers we would leave just the 4 first
+errors that occurred in the pending_errs and get this message once. I
+think that is okay and maybe even preferrable since most errors are,
+well, errors. And often the first time something went wrong is the
+interesting one. So I think this makes sense.
 
-> AFAICT, this hasn't gotten any coverage in -next, which makes me a
-> little nervous.
+> +		mutex_unlock(&zdev->pending_errs_lock);
+> +		return;
+> +	}
+> +
+> +	i =3D zdev->pending_errs.tail % ZPCI_ERR_PENDING_MAX;
+> +	memcpy(&zdev->pending_errs.err[i], ccdf, sizeof(struct zpci_ccdf_err));
+> +	zdev->pending_errs.tail++;
+> +	zdev->pending_errs.count++;
+> +	mutex_unlock(&zdev->pending_errs_lock);
+> +}
+> +
+> +void zpci_cleanup_pending_errors(struct zpci_dev *zdev)
+> +{
+> +	struct pci_dev *pdev =3D NULL;
+> +
+> +	mutex_lock(&zdev->pending_errs_lock);
+> +	pdev =3D pci_get_slot(zdev->zbus->bus, zdev->devfn);
 
-Right.
+I think you missed my comment on the previous version. This is missing
+the matching pci_dev_put() for the pci_get_slot().
 
-If we agree, then Shivank can just respin a new version after the merge 
-window.
+> +	if (zdev->pending_errs.count)
+> +		pr_info("%s: Unhandled PCI error events count=3D%d",
+> +				pci_name(pdev), zdev->pending_errs.count);
+> +	memset(&zdev->pending_errs, 0, sizeof(struct zpci_ccdf_pending));
+> +	mutex_unlock(&zdev->pending_errs_lock);
+> +}
+> +EXPORT_SYMBOL_GPL(zpci_cleanup_pending_errors);
+> +
+>=20
+--- snip ---
+> =20
+> @@ -322,12 +340,13 @@ static void __zpci_event_error(struct zpci_ccdf_err=
+ *ccdf)
+>  		break;
+>  	case 0x0040: /* Service Action or Error Recovery Failed */
+>  	case 0x003b:
+> -		zpci_event_io_failure(pdev, pci_channel_io_perm_failure);
+> +		zpci_event_io_failure(pdev, pci_channel_io_perm_failure, ccdf);
+>  		break;
+>  	default: /* PCI function left in the error state attempt to recover */
+> -		ers_res =3D zpci_event_attempt_error_recovery(pdev);
+> +		ers_res =3D zpci_event_attempt_error_recovery(pdev, ccdf);
+>  		if (ers_res !=3D PCI_ERS_RESULT_RECOVERED)
+> -			zpci_event_io_failure(pdev, pci_channel_io_perm_failure);
+> +			zpci_event_io_failure(pdev, pci_channel_io_perm_failure,
+> +					ccdf);
 
--- 
-Cheers
+Nit: I'd just keep the above on one line. It's still below the 100
+columns limit and just cleaner on one line.
 
-David / dhildenb
-
+>  		break;
+>  	}
+>  	pci_dev_put(pdev);
+> diff --git a/drivers/vfio/pci/vfio_pci_zdev.c b/drivers/vfio/pci/vfio_pci=
+_zdev.c
+> index a7bc23ce8483..2be37eab9279 100644
+> --- a/drivers/vfio/pci/vfio_pci_zdev.c
+> +++ b/drivers/vfio/pci/vfio_pci_zdev.c
+> @@ -168,6 +168,8 @@ void vfio_pci_zdev_close_device(struct vfio_pci_core_=
+device *vdev)
+> =20
+>  	zdev->mediated_recovery =3D false;
+> =20
+> +	zpci_cleanup_pending_errors(zdev);
+> +
+>  	if (!vdev->vdev.kvm)
+>  		return;
+> =20
 
