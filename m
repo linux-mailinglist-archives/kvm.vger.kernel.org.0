@@ -1,315 +1,212 @@
-Return-Path: <kvm+bounces-58712-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-58713-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2F588B9D497
-	for <lists+kvm@lfdr.de>; Thu, 25 Sep 2025 05:10:50 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 65F23B9D708
+	for <lists+kvm@lfdr.de>; Thu, 25 Sep 2025 07:16:55 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 9A1141BC27B1
-	for <lists+kvm@lfdr.de>; Thu, 25 Sep 2025 03:10:51 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id EE40E1763C3
+	for <lists+kvm@lfdr.de>; Thu, 25 Sep 2025 05:16:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2E3682E5B0E;
-	Thu, 25 Sep 2025 03:10:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A3EF82E7F00;
+	Thu, 25 Sep 2025 05:16:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="IfJgIm88"
+	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="h6elsHh4"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.9])
+Received: from SN4PR2101CU001.outbound.protection.outlook.com (mail-southcentralusazon11012056.outbound.protection.outlook.com [40.93.195.56])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 37CA41DE4E0;
-	Thu, 25 Sep 2025 03:09:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.9
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758769799; cv=none; b=NbGBz5V5viCBHi7MHQqqwzxXVigtNe00z6oy9bPd4BPm7NRuQ/1HmJ71YARrkx794ATTnCS/eFN8825jk2ARbDypWxYRmRUhfxZcO0SnYAB3j0qFD5rdnjbLRgkiOIesLNhvXku9oFWU1nUpN1fzryFMcPyEbzje8XEhlpPhvlc=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758769799; c=relaxed/simple;
-	bh=EoLnv2veQbDu1IytgGqUEE67+JwY3QnjCQUAEBqcLbs=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=qpd+sxVsOHhBQoW5ZSZhKAmUFM/HjtObxG/koDLl7e1kGM9y8YPu7YbdikIBu8WuVcV/AIMAi8ysrZO4EG8rykInoRgGgKJXmROlfBg/RkFbUUKLcDVThmfcsowoa0K/9ovKlwWhNg3lGlrv1aISpLPWbz3GAeZjAnRS0oEEVTI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=pass smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=IfJgIm88; arc=none smtp.client-ip=198.175.65.9
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1758769797; x=1790305797;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=EoLnv2veQbDu1IytgGqUEE67+JwY3QnjCQUAEBqcLbs=;
-  b=IfJgIm88plNbfyeg8Q9qc1TvuVR5OAjXMgvTS24Y3yEynus8q3VwPHHe
-   7v09dft0cyIcRqpItI2q34mHP5Wk1bSumkX4TScHKJuiXkyWgZG4bChd5
-   7qZ8Y1zEDcz4eZ6t3yxsMcQv+DPY/x2ji9vegQWj6i0GXSNb0sxRQSUTV
-   am6C4r+r74qy4ATAGZgsSqZIZDoyTRG2Ho1Op8hx4z1W3oqgVpEMg3eTw
-   zbk1dxg3hu+53A44AZH5TKqiy7WnjCLdsj+t8F6WtRRgx461/roNBQspd
-   4tGn6OyMWC/8NzcJisW+n/0F6XPC1O2ZIb3Y1E4TJgnKHg0wZGOvn1PIw
-   Q==;
-X-CSE-ConnectionGUID: 4Olj6TeiRwu5rSfRWmu11A==
-X-CSE-MsgGUID: XopqgdP4T/6kx8qfc2pz0g==
-X-IronPort-AV: E=McAfee;i="6800,10657,11563"; a="83683979"
-X-IronPort-AV: E=Sophos;i="6.18,291,1751266800"; 
-   d="scan'208";a="83683979"
-Received: from orviesa001.jf.intel.com ([10.64.159.141])
-  by orvoesa101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 24 Sep 2025 20:09:56 -0700
-X-CSE-ConnectionGUID: Zo6WYOTEQ66OV42RKuwnnQ==
-X-CSE-MsgGUID: dneCnMYKQ66fLOvgOkPdYg==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.18,291,1751266800"; 
-   d="scan'208";a="214340558"
-Received: from aschofie-mobl2.amr.corp.intel.com (HELO desk) ([10.124.220.91])
-  by smtpauth.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 24 Sep 2025 20:09:55 -0700
-Date: Wed, 24 Sep 2025 20:09:54 -0700
-From: Pawan Gupta <pawan.kumar.gupta@linux.intel.com>
-To: x86@kernel.org, "H. Peter Anvin" <hpa@zytor.com>,
-	Josh Poimboeuf <jpoimboe@kernel.org>,
-	David Kaplan <david.kaplan@amd.com>,
-	Sean Christopherson <seanjc@google.com>,
-	Paolo Bonzini <pbonzini@redhat.com>
-Cc: linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-	Asit Mallick <asit.k.mallick@intel.com>,
-	Tao Zhang <tao1.zhang@intel.com>
-Subject: [PATCH 2/2] x86/vmscape: Replace IBPB with branch history clear on
- exit to userspace
-Message-ID: <20250924-vmscape-bhb-v1-2-da51f0e1934d@linux.intel.com>
-X-Mailer: b4 0.14.2
-References: <20250924-vmscape-bhb-v1-0-da51f0e1934d@linux.intel.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 06FAA155326;
+	Thu, 25 Sep 2025 05:16:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.93.195.56
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1758777405; cv=fail; b=C7zTfUMds9dYxRhhrOq6pPR7u7dfz8ZvrMcdWLH8sld7oNj0UDpCBGgAO+KDHfUASxvWoU4O/PQcIkZGjcybUbHJ8eXL/JgpjGuqUSGaDW2BPq9qvK9ZOJfV213lMHPnBYhFNLafnM9ccEvU05NpPviSNa60L9ZELqmhwBHbLGA=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1758777405; c=relaxed/simple;
+	bh=TMWBNwKTa6D6fvxMcpFGe52lNrpWkqPgLH8xPsogZhE=;
+	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
+	 Content-Type:MIME-Version; b=jQSHtSrHeSiSY7cqFvhKrsH8Xbr2VViIroSTMt2BDuhQjbBWsbdheWJnJlc6+TgGzHP7asdFfU9G2KfooMnQgulzoWQjlD2umTmV+uCuA8yuf9NrHxwimETpYcZLvZFCpru8E78GAgEHoGCBuOdKzm6kSHrRj3OopxJAFOILK+c=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=h6elsHh4; arc=fail smtp.client-ip=40.93.195.56
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=rFu9usxGFAVk1brNjfUbRpGfZJxkRkcDMdQnji239nMuG1RPiPNUhJgXO+JJvQDPBiE7Hv1/U+J0q64fn1TVntcH/PexWdblPzi2chISQSN4xAG41uJSjNU1NffJTcOPyGOss002Q2svmvAZPYsiF/nfsskNVpIlGsR/3g3VG8ea4meRmGKcmkUZ8VYG0jCVCVMWmGBkDj8NWiRBrqRQw15m3WkW8l0uky1yfWj021AZM7xnByROZsTGoj6Hsd9YcSOIypSDYq2N8+u/nOttp2TijURdeiHQVZZH1vhYzXIeZrzfGlOdDrDwesokxBRqE82ZpTboq7842hq0WP/Nqw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=Ce+iuWUpbfJyY/X26sIfgF/TOnd0RZ/PLRt4Q9nejTw=;
+ b=y0YXf9enpRdbDWL4RXX0FJoQxys6SYttWDtTPLon1+0ua3MHVS79dYSEN1v8gUAasxpKd7LqhfpLmw46WB5/eNNRPXx/6DE5KDl+FwIqwDosqP69VoVK18NLpZbPpcECyxEc+384z4WM+95/TqRZM0EdlLss3g/aMfBRu5z6EYGxmvNL6ixIZJrVw2N7iYb3L7Dj9CfFp1k4jY4J9MDpn4KLmXil10Wo5i/yyq8O57DYzcZKG7qk+BMdoVFewdZaCBBki/5gLgz8PFzGIFNomb0S81aEft5QIpA2RBkN5wzaGLd30rcPGboWc28NWonoPWTTKcav6dQRLA1yht7qSA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
+ header.d=amd.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=Ce+iuWUpbfJyY/X26sIfgF/TOnd0RZ/PLRt4Q9nejTw=;
+ b=h6elsHh4O/d3r1yXaP44Cj82V9WXVux5E+61Nn9Z7UR1UtU6Y37eKq5ja2F2+dLa43ATKX0Y0T06aZmjwWD3LYwUi3R/u7uA4vyogUkILP7Lh7/YSOoOUTDrOGniUtfhEehq7pdqZqJL5+hXK0zZ18Im1f+8JktqkltwepfYBaw=
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=amd.com;
+Received: from DS0PR12MB6608.namprd12.prod.outlook.com (2603:10b6:8:d0::10) by
+ MN6PR12MB8544.namprd12.prod.outlook.com (2603:10b6:208:47f::17) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9137.19; Thu, 25 Sep
+ 2025 05:16:41 +0000
+Received: from DS0PR12MB6608.namprd12.prod.outlook.com
+ ([fe80::b71d:8902:9ab3:f627]) by DS0PR12MB6608.namprd12.prod.outlook.com
+ ([fe80::b71d:8902:9ab3:f627%5]) with mapi id 15.20.9137.022; Thu, 25 Sep 2025
+ 05:16:41 +0000
+Message-ID: <7fb62597-1197-486c-bceb-0563b7a1f5a0@amd.com>
+Date: Thu, 25 Sep 2025 10:46:29 +0530
+User-Agent: Mozilla Thunderbird
+Subject: Re: [RFC PATCH v2 05/17] KVM: SVM: Do not intercept
+ SECURE_AVIC_CONTROL MSR for SAVIC guests
+To: Tom Lendacky <thomas.lendacky@amd.com>, kvm@vger.kernel.org,
+ seanjc@google.com, pbonzini@redhat.com
+Cc: linux-kernel@vger.kernel.org, nikunj@amd.com, Santosh.Shukla@amd.com,
+ Vasant.Hegde@amd.com, Suravee.Suthikulpanit@amd.com, bp@alien8.de,
+ David.Kaplan@amd.com, huibo.wang@amd.com, naveen.rao@amd.com,
+ tiala@microsoft.com
+References: <20250923050317.205482-1-Neeraj.Upadhyay@amd.com>
+ <20250923050317.205482-6-Neeraj.Upadhyay@amd.com>
+ <82e85267-460e-39d5-98aa-427dd31cfadc@amd.com>
+Content-Language: en-US
+From: "Upadhyay, Neeraj" <neeraj.upadhyay@amd.com>
+In-Reply-To: <82e85267-460e-39d5-98aa-427dd31cfadc@amd.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: PN3PR01CA0171.INDPRD01.PROD.OUTLOOK.COM
+ (2603:1096:c01:de::14) To DS0PR12MB6608.namprd12.prod.outlook.com
+ (2603:10b6:8:d0::10)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250924-vmscape-bhb-v1-0-da51f0e1934d@linux.intel.com>
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: DS0PR12MB6608:EE_|MN6PR12MB8544:EE_
+X-MS-Office365-Filtering-Correlation-Id: d10325c9-f381-43ed-cb3a-08ddfbf2b570
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;ARA:13230040|1800799024|376014|366016;
+X-Microsoft-Antispam-Message-Info:
+	=?utf-8?B?OTNOeitZUDFOZG9hTFlBY1dRSmk2WS8rOTdyRHNnazlLVzlpcm41dVV6QWFj?=
+ =?utf-8?B?MjVjeVVReHhpTmNQWDhzSWkvcytRMjdqcENDTlIrRUZMRGt6SUJYVXVZRXEy?=
+ =?utf-8?B?Uk80ZktRZ1ozUy9xVEM2NVpZeWFBd3BlaTFjOGNNRjZnbmFWZ1JqNmk5NEdS?=
+ =?utf-8?B?enpnMThqd0IrYXNzUlp6SnpRTE1NMFoyQWd5QjFXdktaY0VJaGFGYlUwbGww?=
+ =?utf-8?B?QVZCdldlYWMySEFEbmdYbHRGWmh5V0VxTUdNa0FXQU5xRXg5b0lEVVB4QTRp?=
+ =?utf-8?B?dDliYlI5NEpuK0xPNlo5Ty80b0FyaDBzSUM4MXdmZnBka0RpVHUyeno4bEo1?=
+ =?utf-8?B?QlVTN1gzbnlsOWlYTnd5QmZHR1RackhMUTdZRGt2N2VxQ1c5YW0vOWZEVDRK?=
+ =?utf-8?B?aGhyN293OExBZEppT01NQ3J6VUJXQkNzdWRoZnpBdTZqOENoWVNPT2I0NXFL?=
+ =?utf-8?B?OXVCbDdtNFM3R0RFcWYwWEdWWU9HbDNlMHNWTndXS3Y5TEhGb2ZudVZJYmNS?=
+ =?utf-8?B?Sll4S3lXaG9BSXVXTWRNM1BtelRHYS9uSGxJbDQ1VXVVYTd4TjNUUVJwZTBx?=
+ =?utf-8?B?Vi9NcWE4NmlVeUhXZytRTWRlTzdYWFlDZSsxdGhRWlZwNVpQOVE3NDByT01L?=
+ =?utf-8?B?ZVBBdVBZMW9RYURvK2RRVnU2UDJkZ1dLM1haR2cwcTNZcUpaM1NEa2NJSzhr?=
+ =?utf-8?B?TGtJdVZETzBNaENsRi9RaUFKUGpKZUI1SHBCd1dyYTdPTVN3M3BhQ1VnZHFs?=
+ =?utf-8?B?Z2NyRjdwL1hQeHNBZ0p5aExhTWpYNVNPQy9KM2lsdjBOblFjSlZtVWI1YVAr?=
+ =?utf-8?B?TW5TaTNFMWlQWE9PcUo4YjdRS0JEcXB5NEpqY3BUUVpJejhVVXVsZkZoQTh4?=
+ =?utf-8?B?WUttbTZkVWFMcGE4REppa3hGRmVtdWZuUjA5ZHdsUFh2cDhkVUpUMlY5QVl4?=
+ =?utf-8?B?SWtPWWgvLzNFMGpaNFY0SHNhS2t0MjFDV2s4VVFVc1JMRjFBVEJ0K2VaTjhy?=
+ =?utf-8?B?WHBLY0NmT2lYVVcwK1JLdU9rSklSdzlsSUNJOVRWdGpaUlU5aU9uTllxRnFD?=
+ =?utf-8?B?R2RJNURhWjBGM1BOOWp2VjBSQTR1SUJyN3ZCODk5OXJLUFdrRDdNVTEvd0p3?=
+ =?utf-8?B?RUZ1LzgvVTZHUW9sMkxVa3VJVVpyWWQ0UVRxMGRCK2xrUmJXK3VxbXI2V0l4?=
+ =?utf-8?B?R2c4VkdPRTdSUFpVdmZXaEtMTEhzbGdxM2hHeS8wNGVMaTgvYm9yQ3dsMDd0?=
+ =?utf-8?B?VHV5cXU0VHUvRHB5U05lRXhrS2xoWUtBMUFYMzlBRC85VExLcDd5b0R2QUpa?=
+ =?utf-8?B?L0pDVDlPdmh4MVl5SWFGU0p0RU55STRwbXlieC9XNzZSbXp3QTA4dnF3TmZj?=
+ =?utf-8?B?MDVEM0FQZTlxOVp0SVgxcjEvK3pJcTBYY2dNdzhseGJjVG55OEZEL3JKd0Vh?=
+ =?utf-8?B?ajU5Ni85dUtHdFdVempDeXU2bU44MjNBdG0zM1Z2VTA3R0dTQWJSYVNGQXpa?=
+ =?utf-8?B?WVFVNGhOaTc2NE9ISWpKZFRUU09qM3lLYitpbXZhWkppZjYyUG4ycldEdDMw?=
+ =?utf-8?B?WTBjYm5MUzUvWG1pVW53azZqSE0xM2paaFJ5R3lxZEtFVFY1aDVhU0JESEhh?=
+ =?utf-8?B?OG9TUG4rNld0bjUwSVF6M2g3aGFNbFBLbUI4U0lsQWllN3pFT3BYN3NIZXU2?=
+ =?utf-8?B?RkoraHRIdjNLM3Byb005OXlVZS83OUdZTW1xdWtWZ25QTnVYa3F2Z3FmeGRw?=
+ =?utf-8?B?SUVoVVgya1QwNzdNMDJOTzBJckIwZDRkNjR5THd6MFRXSkVKWno0Z1VUVGtB?=
+ =?utf-8?B?MEp2ZGJJcmtLRkNQNnJ1M3VXSEZSUUdlcEhDRVJXaVFlenNkTU9pNUpwb3p5?=
+ =?utf-8?B?VTJtSXVUY0RxeDYxOXQxNGw3bWNkWnl5dWlvTHkvaUVETHc9PQ==?=
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DS0PR12MB6608.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(376014)(366016);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?utf-8?B?M1g1dG1tcTBnSFBEaG4zRzdjNzdQODlVTWZxYzVqcG9pL1ZPdDJpdUNwV2p6?=
+ =?utf-8?B?MHlBRU1RWjVZQ1A0SWNGRmRJQlZZUHVleFZMeVJiUDRBeWt1ckNTMmxVWGc5?=
+ =?utf-8?B?R2UyMERWbThVUGFOWWdMRjhvYUxBWGVoRlhBNlptdlJiT215M0ZuU25xM3lE?=
+ =?utf-8?B?U3F3MFREM3FieDkxY0VzTUZVT0NFOGI4UWFESytSbTRHM3dXd096QVhQTGtG?=
+ =?utf-8?B?cVVBaC9iYWh4eHNTdXRKZGVJTzRPT2lHZmVGUDVnaS9JWXpvL2kzTlZQK3Q5?=
+ =?utf-8?B?am5CYkIvc1NsVzZ6NGZHUXRuUDdxYnlrZFdTTngrRE9qSzBDSDEvOW8vYUo2?=
+ =?utf-8?B?eWJPVFBUNUNTbWRoaDljeTgzWHA1a3FNb3dheVFNUlZZVnRZOS8rT1lYMDhL?=
+ =?utf-8?B?ZnNFUmRCVktYQi9QM3krVklHRGFoUkNmOFZnZVRBVlgyM2wyUHA4NXJTQi8z?=
+ =?utf-8?B?UHpReFVzdGNKWUZJT0JDcTlJV1pLMGFhSklYeThUallmS3VlNGdQQ1Jick1y?=
+ =?utf-8?B?TGV2cHBMYzNvVjhEbWlvSWx3bkZjRndpZ0R1NU9xdnRvWStnRExDek9zMEVq?=
+ =?utf-8?B?eWxLMDBjSjI0ejJyNHdCOVVtS3dxdVdCeW5FRlJFd1plNCtjbTRSbDRiNUZa?=
+ =?utf-8?B?d0ZWWWdhK1FXd2JNVmJIdW5GM3dmMVl6QnBSYmRUblBFQVRyVU00aTd6NzhL?=
+ =?utf-8?B?WE5ucnpvaGRFOUFMaE1HRjNuUU94dHI0c25qeXRPMENWU2JlTU5rTVFUd0cy?=
+ =?utf-8?B?ZWU4Sys5YmlTaE1WTDJSM3crNnJ3MEJjR2pYSFdXb1BxSmhpV1ltRHMzVmcv?=
+ =?utf-8?B?TGdHaG91K0tWTzU3NDBCZGYySkoxNzR2Rm9XNDRuQndjZzhPR09JTU1mZXpv?=
+ =?utf-8?B?L0xidGxzbGN2WUZoSzZobDMvTWR3ZXMwNDBkVG1TRVZoYTd5MWVOT2wwRzBj?=
+ =?utf-8?B?akIvTGhPdTlSY0FWVytLT3NhQUFpR2FUSi9HM1BIQlBQMlJ0c3ZHTHF5THM5?=
+ =?utf-8?B?RW9GVlVkS2dEOE9mUmtkSTBnVXFHY2psaGZ6UHlVOFhxOVlramV4N2RyQ1N5?=
+ =?utf-8?B?QW82U29pdlhhL0xObTA4V1grdEp2K3JGU3cyV3A0Nk14ZHVaNzd3ZE9BSUxK?=
+ =?utf-8?B?eWlibUhFeDVJQTZ5MkoyR1RnWnlZb3lUdGNjUGZTc2dUSUEzNTg2NXpRTENE?=
+ =?utf-8?B?dXhYV09NUjlPU2k5d0Mvc2JkbUM2VHVZNTFQeGdPTTI0VWRNV0F2VXlpUm1J?=
+ =?utf-8?B?UFJiUTVRSGlPTE92NmUvSU9qb0N0ZFNPY1VHS2hmY2FNdUE3b1dxdUFVOUtn?=
+ =?utf-8?B?NjBxRVRuL29weWdFd1lORWVoeDlzaGZseXY3T1pHT1dBQU5WSDNOQTFydzgw?=
+ =?utf-8?B?Ti9JQUpic1JUaVpWR1hRbzd3RVF5VUVjbko3NFk4amNmWFlteTYwVDhaU1pm?=
+ =?utf-8?B?UmJiOGFCSnVLTVNUdzBKN2JzdjBWT25Yd3JoNWxWSS93WVZ4MS9UOExOU0Fq?=
+ =?utf-8?B?RlVSelNhL0RpRk1YTVZobTA2RUIzdnU1ZGhNSmNRNHUzb1dnY05oUDJiZXFO?=
+ =?utf-8?B?TmNraGdQT0tkaWw5VDdSUjV1c3cyYnFrZkZJdUNnaWZkQm1SWWNQT0dKdXU0?=
+ =?utf-8?B?OUFYbnRmcGpJR0xERzk0d21xMk9mbE80Skl6VzF3REFlQUZ3QzVVWmRxdUYw?=
+ =?utf-8?B?TFZGNWd6cEZlRzFSY25aNkdsY2tMSkRwTHFTQmdEZkFYbFdQZzdZeXdtWjdz?=
+ =?utf-8?B?WWhlc3NKRzZVdlZkd3BEcTdWTndYMU1RRTNiN2RibFJQT0NvZzE0MVFMNlpB?=
+ =?utf-8?B?YnRma0NEY1Vwb3habzFQaFluMy9jMnUwRmZ0VWRENGpDNW1RSHRWeXhYeE5w?=
+ =?utf-8?B?RmtzcCtYbitVUmlZcHdhYm5iZ3ZqWTZXelNzdWEzTEpMZ0RYeTJlVXRucVVT?=
+ =?utf-8?B?WmZiRWp0WndwZEd4WGd6NGdxNjNvUWdUOFNnYnorSHBNRld2cTlyZXpiY1JM?=
+ =?utf-8?B?Y0VHU1NDZHpiNitwOHp3NUdrdXo3aTNLWnQ5UzIzNVpqWWJnRmZ0bnFhUFJo?=
+ =?utf-8?B?dVhnUkpka2F0R1ZOSUlWWWZENlduaU92M05kcW9hNm44ZDlITHAvTUQyOVJx?=
+ =?utf-8?Q?jfpA95bX8aQtKrfJFRObvjV4m?=
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: d10325c9-f381-43ed-cb3a-08ddfbf2b570
+X-MS-Exchange-CrossTenant-AuthSource: DS0PR12MB6608.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 25 Sep 2025 05:16:41.1063
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: CnPXH/6g4S274fQ4NvuE6LvCwssB3qr32h3QNkDIuIam01+0VRIG4+uSLvX1w4Tf7qyButv7c6i0WQw1C/OV5Q==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: MN6PR12MB8544
 
-IBPB mitigation for VMSCAPE is an overkill for CPUs that are only affected
-by the BHI variant of VMSCAPE. On such CPUs, eIBRS already provides
-indirect branch isolation between guest and host userspace. But, a guest
-could still poison the branch history.
 
-To mitigate that, use the recently added clear_bhb_long_loop() to isolate
-the branch history between guest and userspace. Add cmdline option
-'vmscape=auto' that automatically selects the appropriate mitigation based
-on the CPU.
 
-Signed-off-by: Pawan Gupta <pawan.kumar.gupta@linux.intel.com>
----
- Documentation/admin-guide/hw-vuln/vmscape.rst   |  8 +++++
- Documentation/admin-guide/kernel-parameters.txt |  4 ++-
- arch/x86/include/asm/cpufeatures.h              |  1 +
- arch/x86/include/asm/entry-common.h             | 12 ++++---
- arch/x86/include/asm/nospec-branch.h            |  2 +-
- arch/x86/kernel/cpu/bugs.c                      | 44 ++++++++++++++++++-------
- arch/x86/kvm/x86.c                              |  5 +--
- 7 files changed, 55 insertions(+), 21 deletions(-)
+On 9/23/2025 7:25 PM, Tom Lendacky wrote:
+> On 9/23/25 00:03, Neeraj Upadhyay wrote:
+>> Disable interception for SECURE_AVIC_CONTROL MSR for Secure AVIC
+>> enabled guests. The SECURE_AVIC_CONTROL MSR holds the GPA of the
+>> guest APIC backing page and bitfields to control enablement of Secure
+>> AVIC and whether the guest allows NMIs to be injected by the hypervisor.
+>> This MSR is populated by the guest and can be read by the guest to get
+>> the GPA of the APIC backing page. The MSR can only be accessed in Secure
+>> AVIC mode; accessing it when not in Secure AVIC mode results in #GP. So,
+>> KVM should not intercept it.
+> 
+> The reason KVM should not intercept the MSR access is that the guest
+> would not be able to actually set the MSR if it is intercepted.
+> 
 
-diff --git a/Documentation/admin-guide/hw-vuln/vmscape.rst b/Documentation/admin-guide/hw-vuln/vmscape.rst
-index d9b9a2b6c114c05a7325e5f3c9d42129339b870b..13ca98f952f97daeb28194c3873e945b85eda6a1 100644
---- a/Documentation/admin-guide/hw-vuln/vmscape.rst
-+++ b/Documentation/admin-guide/hw-vuln/vmscape.rst
-@@ -86,6 +86,10 @@ The possible values in this file are:
-    run a potentially malicious guest and issues an IBPB before the first
-    exit to userspace after VM-exit.
- 
-+ * 'Mitigation: Clear BHB before exit to userspace':
-+
-+   As above conditional BHB clearing mitigation is enabled.
-+
-  * 'Mitigation: IBPB on VMEXIT':
- 
-    IBPB is issued on every VM-exit. This occurs when other mitigations like
-@@ -108,3 +112,7 @@ The mitigation can be controlled via the ``vmscape=`` command line parameter:
- 
-    Force vulnerability detection and mitigation even on processors that are
-    not known to be affected.
-+
-+ * ``vmscape=auto``:
-+
-+   Choose the mitigation based on the VMSCAPE variant the CPU is affected by.
-diff --git a/Documentation/admin-guide/kernel-parameters.txt b/Documentation/admin-guide/kernel-parameters.txt
-index 5a7a83c411e9c526f8df6d28beb4c784aec3cac9..4596bfcb401f1a89d2dc5ed8c44c83628c9c5dfe 100644
---- a/Documentation/admin-guide/kernel-parameters.txt
-+++ b/Documentation/admin-guide/kernel-parameters.txt
-@@ -8048,9 +8048,11 @@
- 
- 			off		- disable the mitigation
- 			ibpb		- use Indirect Branch Prediction Barrier
--					  (IBPB) mitigation (default)
-+					  (IBPB) mitigation
- 			force		- force vulnerability detection even on
- 					  unaffected processors
-+			auto		- (default) automatically select IBPB
-+			                  or BHB clear mitigation based on CPU
- 
- 	vsyscall=	[X86-64,EARLY]
- 			Controls the behavior of vsyscalls (i.e. calls to
-diff --git a/arch/x86/include/asm/cpufeatures.h b/arch/x86/include/asm/cpufeatures.h
-index 751ca35386b0ef02ad8413321028c15086b3a552..b7382735165210b006449f9f36f59d97d839cfe2 100644
---- a/arch/x86/include/asm/cpufeatures.h
-+++ b/arch/x86/include/asm/cpufeatures.h
-@@ -496,6 +496,7 @@
- #define X86_FEATURE_TSA_L1_NO		(21*32+12) /* AMD CPU not vulnerable to TSA-L1 */
- #define X86_FEATURE_CLEAR_CPU_BUF_VM	(21*32+13) /* Clear CPU buffers using VERW before VMRUN */
- #define X86_FEATURE_IBPB_EXIT_TO_USER	(21*32+14) /* Use IBPB on exit-to-userspace, see VMSCAPE bug */
-+#define X86_FEATURE_CLEAR_BHB_EXIT_TO_USER (21*32+15) /* Clear branch history on exit-to-userspace, see VMSCAPE bug */
- 
- /*
-  * BUG word(s)
-diff --git a/arch/x86/include/asm/entry-common.h b/arch/x86/include/asm/entry-common.h
-index ce3eb6d5fdf9f2dba59b7bad24afbfafc8c36918..b7b9af1b641385b8283edf2449578ff65e5bd6df 100644
---- a/arch/x86/include/asm/entry-common.h
-+++ b/arch/x86/include/asm/entry-common.h
-@@ -94,11 +94,13 @@ static inline void arch_exit_to_user_mode_prepare(struct pt_regs *regs,
- 	 */
- 	choose_random_kstack_offset(rdtsc());
- 
--	/* Avoid unnecessary reads of 'x86_ibpb_exit_to_user' */
--	if (cpu_feature_enabled(X86_FEATURE_IBPB_EXIT_TO_USER) &&
--	    this_cpu_read(x86_ibpb_exit_to_user)) {
--		indirect_branch_prediction_barrier();
--		this_cpu_write(x86_ibpb_exit_to_user, false);
-+	if (unlikely(this_cpu_read(x86_pred_flush_pending))) {
-+		if (cpu_feature_enabled(X86_FEATURE_IBPB_EXIT_TO_USER))
-+			indirect_branch_prediction_barrier();
-+		else if (cpu_feature_enabled(X86_FEATURE_CLEAR_BHB_EXIT_TO_USER))
-+			clear_bhb_long_loop();
-+
-+		this_cpu_write(x86_pred_flush_pending, false);
- 	}
- }
- #define arch_exit_to_user_mode_prepare arch_exit_to_user_mode_prepare
-diff --git a/arch/x86/include/asm/nospec-branch.h b/arch/x86/include/asm/nospec-branch.h
-index ad7e9d1b3a70cce1f24697e35cecd7761bb1984a..32d52f32a5e7761fa1988a054a5d40debf67f53f 100644
---- a/arch/x86/include/asm/nospec-branch.h
-+++ b/arch/x86/include/asm/nospec-branch.h
-@@ -533,7 +533,7 @@ void alternative_msr_write(unsigned int msr, u64 val, unsigned int feature)
- 		: "memory");
- }
- 
--DECLARE_PER_CPU(bool, x86_ibpb_exit_to_user);
-+DECLARE_PER_CPU(bool, x86_pred_flush_pending);
- 
- static inline void indirect_branch_prediction_barrier(void)
- {
-diff --git a/arch/x86/kernel/cpu/bugs.c b/arch/x86/kernel/cpu/bugs.c
-index 36dcfc5105be9acb6d67a0481949ff03874d5f5d..2f1a86d758777f03bb69b0dc60591108c5660f77 100644
---- a/arch/x86/kernel/cpu/bugs.c
-+++ b/arch/x86/kernel/cpu/bugs.c
-@@ -109,12 +109,11 @@ DEFINE_PER_CPU(u64, x86_spec_ctrl_current);
- EXPORT_PER_CPU_SYMBOL_GPL(x86_spec_ctrl_current);
- 
- /*
-- * Set when the CPU has run a potentially malicious guest. An IBPB will
-- * be needed to before running userspace. That IBPB will flush the branch
-- * predictor content.
-+ * Set when the CPU has run a potentially malicious guest. Indicates that a
-+ * branch predictor flush is needed before running userspace.
-  */
--DEFINE_PER_CPU(bool, x86_ibpb_exit_to_user);
--EXPORT_PER_CPU_SYMBOL_GPL(x86_ibpb_exit_to_user);
-+DEFINE_PER_CPU(bool, x86_pred_flush_pending);
-+EXPORT_PER_CPU_SYMBOL_GPL(x86_pred_flush_pending);
- 
- u64 x86_pred_cmd __ro_after_init = PRED_CMD_IBPB;
- 
-@@ -3270,13 +3269,15 @@ enum vmscape_mitigations {
- 	VMSCAPE_MITIGATION_AUTO,
- 	VMSCAPE_MITIGATION_IBPB_EXIT_TO_USER,
- 	VMSCAPE_MITIGATION_IBPB_ON_VMEXIT,
-+	VMSCAPE_MITIGATION_BHB_CLEAR_EXIT_TO_USER,
- };
- 
- static const char * const vmscape_strings[] = {
--	[VMSCAPE_MITIGATION_NONE]		= "Vulnerable",
-+	[VMSCAPE_MITIGATION_NONE]			= "Vulnerable",
- 	/* [VMSCAPE_MITIGATION_AUTO] */
--	[VMSCAPE_MITIGATION_IBPB_EXIT_TO_USER]	= "Mitigation: IBPB before exit to userspace",
--	[VMSCAPE_MITIGATION_IBPB_ON_VMEXIT]	= "Mitigation: IBPB on VMEXIT",
-+	[VMSCAPE_MITIGATION_IBPB_EXIT_TO_USER]		= "Mitigation: IBPB before exit to userspace",
-+	[VMSCAPE_MITIGATION_IBPB_ON_VMEXIT]		= "Mitigation: IBPB on VMEXIT",
-+	[VMSCAPE_MITIGATION_BHB_CLEAR_EXIT_TO_USER]	= "Mitigation: Clear BHB before exit to userspace",
- };
- 
- static enum vmscape_mitigations vmscape_mitigation __ro_after_init =
-@@ -3294,6 +3295,8 @@ static int __init vmscape_parse_cmdline(char *str)
- 	} else if (!strcmp(str, "force")) {
- 		setup_force_cpu_bug(X86_BUG_VMSCAPE);
- 		vmscape_mitigation = VMSCAPE_MITIGATION_AUTO;
-+	} else if (!strcmp(str, "auto")) {
-+		vmscape_mitigation = VMSCAPE_MITIGATION_AUTO;
- 	} else {
- 		pr_err("Ignoring unknown vmscape=%s option.\n", str);
- 	}
-@@ -3304,14 +3307,28 @@ early_param("vmscape", vmscape_parse_cmdline);
- 
- static void __init vmscape_select_mitigation(void)
- {
--	if (cpu_mitigations_off() ||
--	    !boot_cpu_has_bug(X86_BUG_VMSCAPE) ||
--	    !boot_cpu_has(X86_FEATURE_IBPB)) {
-+	if (cpu_mitigations_off() || !boot_cpu_has_bug(X86_BUG_VMSCAPE)) {
- 		vmscape_mitigation = VMSCAPE_MITIGATION_NONE;
- 		return;
- 	}
- 
--	if (vmscape_mitigation == VMSCAPE_MITIGATION_AUTO)
-+	if (vmscape_mitigation == VMSCAPE_MITIGATION_IBPB_EXIT_TO_USER &&
-+	    !boot_cpu_has(X86_FEATURE_IBPB)) {
-+		pr_err("IBPB not supported, switching to AUTO select\n");
-+		vmscape_mitigation = VMSCAPE_MITIGATION_AUTO;
-+	}
-+
-+	if (vmscape_mitigation != VMSCAPE_MITIGATION_AUTO)
-+		return;
-+
-+	/*
-+	 * CPUs with BHI_CTRL(ADL and newer) can avoid the IBPB and use BHB
-+	 * clear sequence. These CPUs are only vulnerable to the BHI variant
-+	 * of the VMSCAPE attack.
-+	 */
-+	if (boot_cpu_has(X86_FEATURE_BHI_CTRL))
-+		vmscape_mitigation = VMSCAPE_MITIGATION_BHB_CLEAR_EXIT_TO_USER;
-+	else
- 		vmscape_mitigation = VMSCAPE_MITIGATION_IBPB_EXIT_TO_USER;
- }
- 
-@@ -3331,6 +3348,8 @@ static void __init vmscape_apply_mitigation(void)
- {
- 	if (vmscape_mitigation == VMSCAPE_MITIGATION_IBPB_EXIT_TO_USER)
- 		setup_force_cpu_cap(X86_FEATURE_IBPB_EXIT_TO_USER);
-+	else if (vmscape_mitigation == VMSCAPE_MITIGATION_BHB_CLEAR_EXIT_TO_USER)
-+		setup_force_cpu_cap(X86_FEATURE_CLEAR_BHB_EXIT_TO_USER);
- }
- 
- #undef pr_fmt
-@@ -3422,6 +3441,7 @@ void cpu_bugs_smt_update(void)
- 		break;
- 	case VMSCAPE_MITIGATION_IBPB_ON_VMEXIT:
- 	case VMSCAPE_MITIGATION_IBPB_EXIT_TO_USER:
-+	case VMSCAPE_MITIGATION_BHB_CLEAR_EXIT_TO_USER:
- 		/*
- 		 * Hypervisors can be attacked across-threads, warn for SMT when
- 		 * STIBP is not already enabled system-wide.
-diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-index 706b6fd56d3c5d29e7f9f6816beeebacb5ef68e6..190f193ef90e6615c5b12530f3f0c6632fda9137 100644
---- a/arch/x86/kvm/x86.c
-+++ b/arch/x86/kvm/x86.c
-@@ -11016,8 +11016,9 @@ static int vcpu_enter_guest(struct kvm_vcpu *vcpu)
- 	 * set for the CPU that actually ran the guest, and not the CPU that it
- 	 * may migrate to.
- 	 */
--	if (cpu_feature_enabled(X86_FEATURE_IBPB_EXIT_TO_USER))
--		this_cpu_write(x86_ibpb_exit_to_user, true);
-+	if (cpu_feature_enabled(X86_FEATURE_IBPB_EXIT_TO_USER) ||
-+	    cpu_feature_enabled(X86_FEATURE_CLEAR_BHB_EXIT_TO_USER))
-+		this_cpu_write(x86_pred_flush_pending, true);
- 
- 	/*
- 	 * Consume any pending interrupts, including the possible source of
+Yes, something like below looks ok?
 
--- 
-2.34.1
+Disable interception for SECURE_AVIC_CONTROL MSR for Secure AVIC
+enabled guests. The SECURE_AVIC_CONTROL MSR holds the GPA of the
+guest APIC backing page and bitfields to control enablement of Secure
+AVIC and whether the guest allows NMIs to be injected by the hypervisor.
+This MSR is populated by the guest and can be read by the guest to get
+the GPA of the APIC backing page. This MSR is only accessible by the
+guest when the Secure AVIC feature is active; any other access attempt
+will result in a #GP fault. So, KVM should not intercept access to this
+MSR, as doing so prevents the guest from successfully reading/writing 
+its configuration and enabling the feature.
 
+
+
+- Neeraj
 
 
