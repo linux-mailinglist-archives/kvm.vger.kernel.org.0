@@ -1,155 +1,184 @@
-Return-Path: <kvm+bounces-58748-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-58749-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 54093B9F702
-	for <lists+kvm@lfdr.de>; Thu, 25 Sep 2025 15:10:33 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2F00AB9F7ED
+	for <lists+kvm@lfdr.de>; Thu, 25 Sep 2025 15:18:50 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C1E733B2887
-	for <lists+kvm@lfdr.de>; Thu, 25 Sep 2025 13:10:31 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id EA75D17D456
+	for <lists+kvm@lfdr.de>; Thu, 25 Sep 2025 13:18:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 114F321ADA4;
-	Thu, 25 Sep 2025 13:10:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CA6F023A58E;
+	Thu, 25 Sep 2025 13:18:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="DECKPo1S"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="tyMtduVm"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8A79D212548
-	for <kvm@vger.kernel.org>; Thu, 25 Sep 2025 13:10:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C43BE2264CA;
+	Thu, 25 Sep 2025 13:18:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758805822; cv=none; b=kMOQR/dxN9GtluLTCQRbw0nsV876sjN8T0ZE3EO5UNKXx8gRHeQtzJDnhkF4o5TkmYebYBruNna3z8RydYHYWzfBKnN7jkEbe38noNSSGmJOXR/IvS3nN1yjaS+irhxDQRUWcvZc85skypcYWq2+ObnB+fbi0/+7y7A3Of5Bs60=
+	t=1758806308; cv=none; b=l6t4te/0PkY8/AFOcHNqKJ6+fftsClg3BENXuXYFtuus0iZXQlkLilg2q4fPfS2wTewWEqDqKBVl/7Y0BTo8ZdfvQuIluRT7HVVgkPB4LdapE/QZ4VTbTlwJT/FynyptoMs7DML89N+wZeIU8gB+kb2RvhBTwLurboMZhturZmc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758805822; c=relaxed/simple;
-	bh=0B43x3hO60s/q7zuJq3RHOjXfJvIsP5KZNO4MN7Tppc=;
-	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
-	 Content-Disposition; b=qJp1NkghCkqDVk8CP5CNDdnFqDtHM9vxJovRI/iDiUprfWeG1d1A0r0HqncODIc4Za3X35nj4KFyUIy9VXJcAyfY44DiYoKW5gMNkZ05jtKLvjwUDquFWfGjJh+O9igBR8fVBhOvxCe64TKwZetLyDEGUNvEPrDzFd/qdd4eXnE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=DECKPo1S; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1758805819;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type;
-	bh=KW0ZC7vXwF1U7peaSsttqsWo+PHv2YRJfJzgYOs3pfE=;
-	b=DECKPo1SUylXy39P44wVpzMhUT+EypRxLpfO4IcaL/fBeyI+Wu13YdAbJ98dYjb/+o31O6
-	/0ZNnafaqFkkWgqVn51c5pBwphpaEDiRvAeY5ZedEHxY3FXWxJ5p53xWiP/6rWYuqBRSxS
-	oTiaJa7kcFOxICzJvnV7OjhxoNzjBCs=
-Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
- [209.85.221.72]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-606-9SV3UfcTNdK_ISU1eV15ag-1; Thu, 25 Sep 2025 09:10:17 -0400
-X-MC-Unique: 9SV3UfcTNdK_ISU1eV15ag-1
-X-Mimecast-MFC-AGG-ID: 9SV3UfcTNdK_ISU1eV15ag_1758805817
-Received: by mail-wr1-f72.google.com with SMTP id ffacd0b85a97d-3ecdc9dbc5fso706293f8f.1
-        for <kvm@vger.kernel.org>; Thu, 25 Sep 2025 06:10:17 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1758805816; x=1759410616;
-        h=content-disposition:mime-version:message-id:subject:cc:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=KW0ZC7vXwF1U7peaSsttqsWo+PHv2YRJfJzgYOs3pfE=;
-        b=K6b4diDhFGK7GMqi3yv7ewrqfjH24FWN9uGebApx2+O6YimlavRHRRRry8qEELNKGi
-         6SRMSsKV7uN2BJkebpAfBuA3WdqpXcKSbF6LzNN+ksO4mBtLdY+jUfj7C/DCF1htc9TS
-         C2k++nrNJEwYFx20IzYnblN+lCz1iUyoeP2QOi3/z0F08Xxk+cxr5iV6oBZ/WfNxkMnV
-         j0f47BzfxrkLYQ3OXEnVfT9R/AZzjFBdxJmglElmXURMzvCRJ1RGaEuJ4fJhaet23vJf
-         JSn0XTEqUXk6yOoi8a8kFkQMhhzIgwPyOjkdK6pt5zf9k4rUBf4V3DqG/K6yT2ug94F8
-         we0A==
-X-Gm-Message-State: AOJu0Yxy3sYmk05vqVHLTTXDm4ZaXc4W8rUAWyRX/kPnZ9Ocfo0gKIM9
-	GfjqUv+eM8btchh/Loz1uMel5wc++sijEmHpBlbE2/gqQZjobTxzq0LWlFyxzJIdYSuVoy0aNCl
-	Rhi7oDDWsvLvqJML/By8HMbq8sI1/KE2WY+1DjdJWDtXPWY4d8tGvFg==
-X-Gm-Gg: ASbGncsv3hz/WHDUcuz6JXuMbe5xAskSWQCN3hZCZlG8cXo+o8sFVV6FKIi8qtKxI06
-	e0CbW2ykWaRQnxkAku6mXPXR8PET3jQVEG/Z6Sgcck2qd/mk/fmPMo2udW1bTBR39h3wyh0cFPA
-	ATCUTw2F/6kKOMyWEaqIaZkybrM2WiJHmlpPdU+I6Gb7LBFDXgZFNKahzKAg9OpkRyXJKaX/tuC
-	koRAx5B9GRDH0joND8muFXl1VJ48eNax7KQppV3GANGPZRxVbaCgjry4b/FcTKNpxOH5+jQPltg
-	d1rDSzK+rxppEagsSZ6N7FbQuw7Hr7yMuw==
-X-Received: by 2002:a5d:588c:0:b0:3fb:37fd:c983 with SMTP id ffacd0b85a97d-40e48a57465mr3216282f8f.49.1758805816381;
-        Thu, 25 Sep 2025 06:10:16 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IFzU/fT07/taXxNhpSlgViOVy92VqAS1NyA0bx0hGfqPg/L3VBSKrQfSmeVvB7FScm07URuig==
-X-Received: by 2002:a5d:588c:0:b0:3fb:37fd:c983 with SMTP id ffacd0b85a97d-40e48a57465mr3216242f8f.49.1758805815830;
-        Thu, 25 Sep 2025 06:10:15 -0700 (PDT)
-Received: from redhat.com ([2a0d:6fc0:1538:2200:56d4:5975:4ce3:246f])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-40fb72facf9sm3112468f8f.13.2025.09.25.06.10.14
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 25 Sep 2025 06:10:15 -0700 (PDT)
-Date: Thu, 25 Sep 2025 09:10:12 -0400
-From: "Michael S. Tsirkin" <mst@redhat.com>
-To: Linus Torvalds <torvalds@linux-foundation.org>
-Cc: kvm@vger.kernel.org, virtualization@lists.linux-foundation.org,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-	alok.a.tiwari@oracle.com, ashwini@wisig.com, bigeasy@linutronix.de,
-	hi@alyssa.is, jasowang@redhat.com, jon@nutanix.com, mst@redhat.com,
-	peter.hilber@oss.qualcomm.com, seanjc@google.com,
-	stable@vger.kernel.org
-Subject: [GIT PULL] virtio,vhost: last minute fixes
-Message-ID: <20250925091012-mutt-send-email-mst@kernel.org>
+	s=arc-20240116; t=1758806308; c=relaxed/simple;
+	bh=jQzVVFrSJ7ucYZq15uO8/5+M3IU4mjEtHjNrG1vAE+o=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=gEaLlc4RHebSEa+eGCnKgGuRH5AspAzbu1n+qNzFzFDIXWreriKLlaSDCrvltiQF6hqf5/mgdnJPIUGHO8i9U7aN9DRWuIP/PBauCWGvMA0kcskNCW1b2b6uM+6WEkpLtxG5e2viCxMk/U5/oC8oq2VPX/uhVGy3C1uAwjuhHRE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=tyMtduVm; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id E522DC4CEF0;
+	Thu, 25 Sep 2025 13:18:27 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1758806308;
+	bh=jQzVVFrSJ7ucYZq15uO8/5+M3IU4mjEtHjNrG1vAE+o=;
+	h=From:To:Cc:Subject:Date:From;
+	b=tyMtduVmcBWMzBWiJspZLwmeJ2ceNqfCyWctxCHtsWpa33DUFzUSwR+lAYuXSkSbq
+	 7hyAzyHDnJmIUikYk3CItyM7Uh35bR2JxITeQkJhmDYCJYXHsKr+LGIuRm4+yXoCaD
+	 JZiNMdX+Zw0TOCsazhHYjXM8C1WC31w10xakUJdR/Vn7x+k3dTdJUf9G5Maob/fD4A
+	 26gabXuJymbyanTC7dVHAFcKpHr6e/oODVxTFeiHGn/xxwdP5aGAzn0HBac9BEnYEm
+	 arr3AcxqjEzjhe0bR+w8YwaGFfWHj/09uhM6APuXkZfWoicvjxRbdiHLgAavHVhOcQ
+	 +hGPrG6oy4xJQ==
+From: Leon Romanovsky <leon@kernel.org>
+To: Alex Williamson <alex.williamson@redhat.com>
+Cc: Jason Gunthorpe <jgg@nvidia.com>,
+	Andrew Morton <akpm@linux-foundation.org>,
+	Bjorn Helgaas <bhelgaas@google.com>,
+	=?UTF-8?q?Christian=20K=C3=B6nig?= <christian.koenig@amd.com>,
+	dri-devel@lists.freedesktop.org,
+	iommu@lists.linux.dev,
+	Jens Axboe <axboe@kernel.dk>,
+	Joerg Roedel <joro@8bytes.org>,
+	kvm@vger.kernel.org,
+	linaro-mm-sig@lists.linaro.org,
+	linux-block@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	linux-media@vger.kernel.org,
+	linux-mm@kvack.org,
+	linux-pci@vger.kernel.org,
+	Logan Gunthorpe <logang@deltatee.com>,
+	Marek Szyprowski <m.szyprowski@samsung.com>,
+	Robin Murphy <robin.murphy@arm.com>,
+	Sumit Semwal <sumit.semwal@linaro.org>,
+	Vivek Kasireddy <vivek.kasireddy@intel.com>,
+	Will Deacon <will@kernel.org>
+Subject: [PATCH v3 00/10] vfio/pci: Allow MMIO regions to be exported through dma-buf
+Date: Thu, 25 Sep 2025 16:14:28 +0300
+Message-ID: <cover.1758804980.git.leon@kernel.org>
+X-Mailer: git-send-email 2.51.0
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-X-Mutt-Fcc: =sent
+Content-Transfer-Encoding: 8bit
 
-I have a couple more fixes I'm testing but the issues have
-been with us for a long time, and they come from
-code review not from the field IIUC so no rush I think.
+Changelog:
+v3:
+ * Changed pcim_p2pdma_enable() to be pcim_p2pdma_provider().
+ * Cache provider in vfio_pci_dma_buf struct instead of BAR index.
+ * Removed misleading comment from pcim_p2pdma_provider().
+ * Moved MMIO check to be in pcim_p2pdma_provider().
+v2: https://lore.kernel.org/all/cover.1757589589.git.leon@kernel.org/
+ * Added extra patch which adds new CONFIG, so next patches can reuse it.
+ * Squashed "PCI/P2PDMA: Remove redundant bus_offset from map state"
+   into the other patch.
+ * Fixed revoke calls to be aligned with true->false semantics.
+ * Extended p2pdma_providers to be per-BAR and not global to whole device.
+ * Fixed possible race between dmabuf states and revoke.
+ * Moved revoke to PCI BAR zap block.
+v1: https://lore.kernel.org/all/cover.1754311439.git.leon@kernel.org
+ * Changed commit messages.
+ * Reused DMA_ATTR_MMIO attribute.
+ * Returned support for multiple DMA ranges per-dMABUF.
+v0: https://lore.kernel.org/all/cover.1753274085.git.leonro@nvidia.com
 
-The following changes since commit 76eeb9b8de9880ca38696b2fb56ac45ac0a25c6c:
+---------------------------------------------------------------------------
+Based on "[PATCH v6 00/16] dma-mapping: migrate to physical address-based API"
+https://lore.kernel.org/all/cover.1757423202.git.leonro@nvidia.com/ series.
+---------------------------------------------------------------------------
 
-  Linux 6.17-rc5 (2025-09-07 14:22:57 -0700)
+This series extends the VFIO PCI subsystem to support exporting MMIO
+regions from PCI device BARs as dma-buf objects, enabling safe sharing of
+non-struct page memory with controlled lifetime management. This allows RDMA
+and other subsystems to import dma-buf FDs and build them into memory regions
+for PCI P2P operations.
 
-are available in the Git repository at:
+The series supports a use case for SPDK where a NVMe device will be
+owned by SPDK through VFIO but interacting with a RDMA device. The RDMA
+device may directly access the NVMe CMB or directly manipulate the NVMe
+device's doorbell using PCI P2P.
 
-  https://git.kernel.org/pub/scm/linux/kernel/git/mst/vhost.git tags/for_linus
+However, as a general mechanism, it can support many other scenarios with
+VFIO. This dmabuf approach can be usable by iommufd as well for generic
+and safe P2P mappings.
 
-for you to fetch changes up to cde7e7c3f8745a61458cea61aa28f37c3f5ae2b4:
+In addition to the SPDK use-case mentioned above, the capability added
+in this patch series can also be useful when a buffer (located in device
+memory such as VRAM) needs to be shared between any two dGPU devices or
+instances (assuming one of them is bound to VFIO PCI) as long as they
+are P2P DMA compatible.
 
-  MAINTAINERS, mailmap: Update address for Peter Hilber (2025-09-21 17:44:20 -0400)
+The implementation provides a revocable attachment mechanism using dma-buf
+move operations. MMIO regions are normally pinned as BARs don't change
+physical addresses, but access is revoked when the VFIO device is closed
+or a PCI reset is issued. This ensures kernel self-defense against
+potentially hostile userspace.
 
-----------------------------------------------------------------
-virtio,vhost: last minute fixes
+The series includes significant refactoring of the PCI P2PDMA subsystem
+to separate core P2P functionality from memory allocation features,
+making it more modular and suitable for VFIO use cases that don't need
+struct page support.
 
-More small fixes. Most notably this fixes crashes and hangs in
-vhost-net.
+-----------------------------------------------------------------------
+The series is based originally on
+https://lore.kernel.org/all/20250307052248.405803-1-vivek.kasireddy@intel.com/
+but heavily rewritten to be based on DMA physical API.
+-----------------------------------------------------------------------
+The WIP branch can be found here:
+https://git.kernel.org/pub/scm/linux/kernel/git/leon/linux-rdma.git/log/?h=dmabuf-vfio-v3
 
-Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
+Thanks
 
-----------------------------------------------------------------
-Alok Tiwari (1):
-      vhost-scsi: fix argument order in tport allocation error message
+Leon Romanovsky (8):
+  PCI/P2PDMA: Separate the mmap() support from the core logic
+  PCI/P2PDMA: Simplify bus address mapping API
+  PCI/P2PDMA: Refactor to separate core P2P functionality from memory
+    allocation
+  PCI/P2PDMA: Export pci_p2pdma_map_type() function
+  types: move phys_vec definition to common header
+  vfio/pci: Add dma-buf export config for MMIO regions
+  vfio/pci: Enable peer-to-peer DMA transactions by default
+  vfio/pci: Add dma-buf export support for MMIO regions
 
-Alyssa Ross (1):
-      virtio_config: clarify output parameters
+Vivek Kasireddy (2):
+  vfio: Export vfio device get and put registration helpers
+  vfio/pci: Share the core device pointer while invoking feature
+    functions
 
-Ashwini Sahu (1):
-      uapi: vduse: fix typo in comment
+ block/blk-mq-dma.c                 |   7 +-
+ drivers/iommu/dma-iommu.c          |   4 +-
+ drivers/pci/p2pdma.c               | 176 +++++++++----
+ drivers/vfio/pci/Kconfig           |  20 ++
+ drivers/vfio/pci/Makefile          |   2 +
+ drivers/vfio/pci/vfio_pci_config.c |  22 +-
+ drivers/vfio/pci/vfio_pci_core.c   |  58 +++--
+ drivers/vfio/pci/vfio_pci_dmabuf.c | 394 +++++++++++++++++++++++++++++
+ drivers/vfio/pci/vfio_pci_priv.h   |  23 ++
+ drivers/vfio/vfio_main.c           |   2 +
+ include/linux/pci-p2pdma.h         | 115 +++++----
+ include/linux/types.h              |   5 +
+ include/linux/vfio.h               |   2 +
+ include/linux/vfio_pci_core.h      |   4 +
+ include/uapi/linux/vfio.h          |  25 ++
+ kernel/dma/direct.c                |   4 +-
+ mm/hmm.c                           |   2 +-
+ 17 files changed, 741 insertions(+), 124 deletions(-)
+ create mode 100644 drivers/vfio/pci/vfio_pci_dmabuf.c
 
-Jason Wang (2):
-      vhost-net: unbreak busy polling
-      vhost-net: flush batched before enabling notifications
-
-Michael S. Tsirkin (1):
-      Revert "vhost/net: Defer TX queue re-enable until after sendmsg"
-
-Peter Hilber (1):
-      MAINTAINERS, mailmap: Update address for Peter Hilber
-
-Sebastian Andrzej Siewior (1):
-      vhost: Take a reference on the task in struct vhost_task.
-
- .mailmap                      |  1 +
- MAINTAINERS                   |  2 +-
- drivers/vhost/net.c           | 40 +++++++++++++++++-----------------------
- drivers/vhost/scsi.c          |  2 +-
- include/linux/virtio_config.h | 11 ++++++-----
- include/uapi/linux/vduse.h    |  2 +-
- kernel/vhost_task.c           |  3 ++-
- 7 files changed, 29 insertions(+), 32 deletions(-)
+-- 
+2.51.0
 
 
