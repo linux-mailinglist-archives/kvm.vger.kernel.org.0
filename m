@@ -1,60 +1,61 @@
-Return-Path: <kvm+bounces-58721-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-58722-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9A405B9E941
-	for <lists+kvm@lfdr.de>; Thu, 25 Sep 2025 12:11:29 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 659E3B9E944
+	for <lists+kvm@lfdr.de>; Thu, 25 Sep 2025 12:11:33 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 489FA38240C
-	for <lists+kvm@lfdr.de>; Thu, 25 Sep 2025 10:11:29 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 6A9767A2C43
+	for <lists+kvm@lfdr.de>; Thu, 25 Sep 2025 10:09:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3059F2EA475;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5A0E02EA49C;
 	Thu, 25 Sep 2025 10:11:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="CCN6N5RT"
+	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="2rlXxGux"
 X-Original-To: kvm@vger.kernel.org
-Received: from CH5PR02CU005.outbound.protection.outlook.com (mail-northcentralusazon11012028.outbound.protection.outlook.com [40.107.200.28])
+Received: from BYAPR05CU005.outbound.protection.outlook.com (mail-westusazon11010006.outbound.protection.outlook.com [52.101.85.6])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A80112EA165
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9B1E72DE1F0
 	for <kvm@vger.kernel.org>; Thu, 25 Sep 2025 10:11:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.200.28
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.85.6
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758795079; cv=fail; b=Ga5Q48hDgi9ivYPIXjnVCwHnzpaJY9mE28xz2FeuYK9xHLe+YugEa5w/UCxQbqef5MdeYQX/jHYWYYEXOI9c2cj95cUD14jIEp2R7eF6ZEXNLs67Ou5U5pclKRGv5dNbp+Wr5w1FinD4fLi5QTb9Zx93bn3AQD9hvU4cEfzwxcA=
+	t=1758795079; cv=fail; b=i203F2HzRdpiEoc7aYfPZgsZXc3sRm7F35KihJ5cWMX9peRZ2J3CdoDRbtCkDA//NCMoB5ju/KqobQ84vKKVLlcWQDCnM5xAtOEwPJ/KAZbjl433gPT5qU2gZFLUuRAkaO0BmFUFb8udCUWXj2waHCBcv/lTm3Kdm9NuB4KuQV4=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1758795079; c=relaxed/simple;
-	bh=wYQgVd7BPBeKD2iwm1m5YXscF2P9BDzNin7urjxNM+o=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=YUYu/XmjOsflP7YnnKQMvharxBr82Y3sGEG4gu3ieVXYVi2hV3ex4R4DI0zGtBkno8iuIxQ97BSiMAYoSFvJZaVOR5tpo4ZUD430G9TzsQnZQ+t2mH6XeFu48uH83TVRfmkKoO7jnkKvPluuYQYOzsexcLCWb7xcvT6wWyGkVac=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=CCN6N5RT; arc=fail smtp.client-ip=40.107.200.28
+	bh=eS2r45M+EiAAuKGfg7WYyMHu30r9CCcBGdB6FkerfLk=;
+	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=hSj0nS5d78G3/w/kVB3IkGifrUlMhpYLP3UGp434DNYys4SWpS1sbYBU1/HstdUcLuO3eStylg9z9qwHdotcjlY5I965bjWFLvuDWVcRV5WkzkK27oUtrA6TpXy0yJdbjhh+T3TIcVNT9We8p2pnCplI/Ztu0FsCiCg/izspoLM=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=2rlXxGux; arc=fail smtp.client-ip=52.101.85.6
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
 Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=dxPgxqvXKHptt5wDJMsSumuvVyugsg7lzpdtQS12CmLrXkHelBhY7KxoUq+U8gdwknlQSfr/d+QzStL0n4TFzF0GxBwlQByJc6DuS8ObBWW/D4VieK7km7vbbHclJdDuyE+zh1q0TYGCoFE3oKRm2XPM+4dbiwzd1sZcbUaKIi0Pq0SdGXYjDjwO7faCavj4JOQkGtgnkbH7ruTbyTuztOBLLf7CvdNHNTc5HRJu+o1qWZjjK4pTaotVu8mKHK6X801z1NBMLvq6mbKPlwQTYIeCRodDfH4LEU4Cg9gPcJwwvnx8XeWsJYjNy7au/CmNYKzpqTqfexMA/TvV4/6zsA==
+ b=Il/4LZiBjZ/ss5Y0LL10U700BsP1DbgO4ZHh70N+52fZYD+f63/CXmHZbuS+OwcSdULZnacU6EwoD+7iNc/1L00SBECm17WD5UVUaRTFkW+3ye2cUp2vmXlpaWCtbwVWBVfVMuhQZ0TzYPsHgoE3JQyUqkC/DgElOmaJ3bJ8BAzSv2zKdCNTfrYxzHF/qiFbTOR5wtbiManQrMkIA6jQ6Ye3xNfJIZllMQIYqFWMPKocvyBSrczTVMiuimcUnSQ6W6w2gb3AtnAtripPsK18owPm0RwwWU3O/eWtuSHyVOudG7HQvNqUnG5y5LQliWfkTyt4TVqcabA+aBRgt8c3dw==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector10001;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=gm3BPqd5sYjublMLbPqD4BbuwIo0Z2ngFyzGSXPos5I=;
- b=GXHNohguV1ypBYW9as7ZDkMJNGB53Q7yfRQLOARolEq8u3JdLNoEojeNzWS13VNXfPYOXPYtaK+VWVzL7wFlD/bqF5DlYEwR4G6Cu2aJk8HG4BVzC2ikEnLvjEU67FgiR1EJjMkRqvzUa0ZfqmWtNehLzA9IVv9UGADKanJf7F4O1eUmZUh+fepigvIrR+bzlyhuGqx74F44Mh/Zmx7TfKIFEXlPwoiiTFz4JTIg8dLsdsg0vf69/6xH0kVSKCEs6C99rXnB2hAAq0XgXSSptQSYCsHPuHvSXLDDo3nSVYUxKYMmgXtvcWkGu2v4V/MPjPvB0vhpzO67Wr/U+R2c2g==
+ bh=Jxbwa0hAmcFaPbS95UAvb2TsjN/oPxjNoskHcgkdWXM=;
+ b=L01vPFBm515+zQJKBhVohdx6q7jzCcXloAhNZEND1ASdWZjOsdG/lfR78FuopoZxPQbInxtgaaa/72z/VhD3AT1tPG9lz8+zn1GtnlTQsDBB0UKwc2pzyhXhz3A6kLc+MkmPs6Ud4jQCTfXoSc6UTltO6uG2QfmfvRHevnQq0OH/5CGubU0UGkjvSaNh3x4YzTG40grOvCzNZsMxGmBCOd8eJad/ZjdDM24Ve006ktdnVVuldU2HfDNyBT4o4UguHuCZ8TRDehR5DzoCxa9kZp/iCDXE6FVtz5qG+jINHW0vNakZwAe1jnDPEseI1bjjhXPBPxZ74Ba+qCV/NSKtEQ==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
  165.204.84.17) smtp.rcpttodomain=google.com smtp.mailfrom=amd.com; dmarc=pass
  (p=quarantine sp=quarantine pct=100) action=none header.from=amd.com;
  dkim=none (message not signed); arc=none (0)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=gm3BPqd5sYjublMLbPqD4BbuwIo0Z2ngFyzGSXPos5I=;
- b=CCN6N5RTQmJYv3f1bMGZEZ9Swu+QFdSu/3JmrAS9Uo43XPWvOobxMpIONgFIK7/Fbt4lZBPhZ/FraiJLgkZ9oDdqFP3NUYUgoKjp28XGdYlGbubY8Wr8ciAjTJeaR3UDncLvdtB0uHaplubWnoJPUiTHj9K5G58IbxSQoDq84CU=
-Received: from CH5PR05CA0024.namprd05.prod.outlook.com (2603:10b6:610:1f0::29)
- by DS0PR12MB7629.namprd12.prod.outlook.com (2603:10b6:8:13e::13) with
+ bh=Jxbwa0hAmcFaPbS95UAvb2TsjN/oPxjNoskHcgkdWXM=;
+ b=2rlXxGux92D4UXSv+cVbxP3MouE5paJscq/ypDxv7wxC8TK4FBrg5D2AN9SzK1MqBtWbt7v+12o0360YImpi+KJv1wKelurNbE/jXfno+G3kvJLtUw7aqPcHsme86s4uVGKPFlESX+BlIxa0gF9DUG2IU75nd3UUCeEtt4OmkAQ=
+Received: from CH0PR03CA0350.namprd03.prod.outlook.com (2603:10b6:610:11a::24)
+ by MN2PR12MB4421.namprd12.prod.outlook.com (2603:10b6:208:26c::10) with
  Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9160.10; Thu, 25 Sep
- 2025 10:11:10 +0000
-Received: from CH1PEPF0000A34B.namprd04.prod.outlook.com
- (2603:10b6:610:1f0:cafe::a7) by CH5PR05CA0024.outlook.office365.com
- (2603:10b6:610:1f0::29) with Microsoft SMTP Server (version=TLS1_3,
- cipher=TLS_AES_256_GCM_SHA384) id 15.20.9182.4 via Frontend Transport; Thu,
- 25 Sep 2025 10:11:10 +0000
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9137.20; Thu, 25 Sep
+ 2025 10:11:13 +0000
+Received: from CH1PEPF0000A346.namprd04.prod.outlook.com
+ (2603:10b6:610:11a:cafe::30) by CH0PR03CA0350.outlook.office365.com
+ (2603:10b6:610:11a::24) with Microsoft SMTP Server (version=TLS1_3,
+ cipher=TLS_AES_256_GCM_SHA384) id 15.20.9137.21 via Frontend Transport; Thu,
+ 25 Sep 2025 10:11:13 +0000
 X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
  smtp.mailfrom=amd.com; dkim=none (message not signed)
  header.d=none;dmarc=pass action=none header.from=amd.com;
@@ -62,22 +63,24 @@ Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
  165.204.84.17 as permitted sender) receiver=protection.outlook.com;
  client-ip=165.204.84.17; helo=satlexmb07.amd.com; pr=C
 Received: from satlexmb07.amd.com (165.204.84.17) by
- CH1PEPF0000A34B.mail.protection.outlook.com (10.167.244.10) with Microsoft
+ CH1PEPF0000A346.mail.protection.outlook.com (10.167.244.11) with Microsoft
  SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.9160.9 via Frontend Transport; Thu, 25 Sep 2025 10:11:10 +0000
+ 15.20.9160.9 via Frontend Transport; Thu, 25 Sep 2025 10:11:13 +0000
 Received: from gomati.amd.com (10.180.168.240) by satlexmb07.amd.com
  (10.181.42.216) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.17; Thu, 25 Sep
- 2025 03:11:07 -0700
+ 2025 03:11:10 -0700
 From: Nikunj A Dadhania <nikunj@amd.com>
 To: <seanjc@google.com>, <pbonzini@redhat.com>
 CC: <kvm@vger.kernel.org>, <thomas.lendacky@amd.com>,
 	<santosh.shukla@amd.com>, <bp@alien8.de>, <joao.m.martins@oracle.com>,
 	<nikunj@amd.com>, <kai.huang@intel.com>
-Subject: [PATCH v3 0/5] KVM: SVM: Add Page Modification Logging (PML) support
-Date: Thu, 25 Sep 2025 10:10:47 +0000
-Message-ID: <20250925101052.1868431-1-nikunj@amd.com>
+Subject: [PATCH v3 1/5] KVM: x86: Carve out PML flush routine
+Date: Thu, 25 Sep 2025 10:10:48 +0000
+Message-ID: <20250925101052.1868431-2-nikunj@amd.com>
 X-Mailer: git-send-email 2.48.1
+In-Reply-To: <20250925101052.1868431-1-nikunj@amd.com>
+References: <20250925101052.1868431-1-nikunj@amd.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -90,108 +93,199 @@ X-ClientProxiedBy: satlexmb07.amd.com (10.181.42.216) To satlexmb07.amd.com
  (10.181.42.216)
 X-EOPAttributedMessage: 0
 X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: CH1PEPF0000A34B:EE_|DS0PR12MB7629:EE_
-X-MS-Office365-Filtering-Correlation-Id: 122547d7-2866-434d-b595-08ddfc1bd9ae
+X-MS-TrafficTypeDiagnostic: CH1PEPF0000A346:EE_|MN2PR12MB4421:EE_
+X-MS-Office365-Filtering-Correlation-Id: 6969d9b8-35a0-496e-aa6c-08ddfc1bdba5
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|1800799024|376014|36860700013|82310400026|13003099007;
+	BCL:0;ARA:13230040|82310400026|1800799024|36860700013|376014;
 X-Microsoft-Antispam-Message-Info:
-	=?us-ascii?Q?eTs5LrrmdeQl7gMw+ekOdWgbFVb+3hYZwqKhv7Ae9V7+7kH8xnE1WCoZFDlO?=
- =?us-ascii?Q?x27YeajI15aR9cYqhvGI5kta3xGyTK6Yf3thWcvH2m+5S8qpmkT5grS+t2F9?=
- =?us-ascii?Q?kD4l4RYNbTW/uns72YllNEmpqhpHnEfL8zk6BFaJ4VNwEDhJNxzsW67vSBk0?=
- =?us-ascii?Q?S3BMw6GSZP1V9V+CVM131Jh7ZI/nGS7wxYBk83bJtqfu6uJOR2VDRadR8usk?=
- =?us-ascii?Q?vB8E83iANLxj6eaKkWuoWnA/NoJONoeEyWjbvcljnfciEGTjtn1vZCxkEubn?=
- =?us-ascii?Q?uXLjovEO0XDBsi3P/53R72dE+RPwkplMBVtNRJWB477I6QS1YP2T+Mjy0SAL?=
- =?us-ascii?Q?ZaUE1xzSQ+ZDBm5v5GBNjijPMUpE2xEWa5Upv2qUfnNKqT+2CWR3j04hoMU3?=
- =?us-ascii?Q?gT+BB4CnAqWejQc1P236fn8s6So4GcFdDNSKb5CJpzLI6LsAlnUe48RL8cKe?=
- =?us-ascii?Q?rJPWFyXSa4yzyY00D02AL/v5x1RPk3DgZZRWavOCg22CFX6wN8yaUirCaBEQ?=
- =?us-ascii?Q?GYpTlbEyVw/gbpfwfhLgOgnZ4w7kKLGou80URMlgavMgd+2CFmq6mJmeMrqb?=
- =?us-ascii?Q?8f0g8kGS83kHxuEUFZ6uUNkvlUqfgwGMncdk2H1xNrF+ElfBAehCE6/v+Lth?=
- =?us-ascii?Q?7zYTRrshVIlJA+aXs+ktj3hjsf2oHvjDtRbbHAAfrdTKpEepThH1chV71ls+?=
- =?us-ascii?Q?Zg6PYnqEqzZrDDkZpWBNX2YkGMdAlcJ0b5VG6IurB0y20NuQd0ejvlovb6zt?=
- =?us-ascii?Q?xtLDUJF7t/ztzuMsy0ecR7qTREil1PINjxqX9STMa3ZvV4KE179LNYzbiOum?=
- =?us-ascii?Q?aoJ0U9v95sNabvrpZpzPhHiJrmP03z0copT5wV/WMheY/EWrjvqaGE8KojOC?=
- =?us-ascii?Q?CVi3UOk583SeplxhgvVbdLAO3OcslNKQ8SRnHn+VocCHlbZFHsydzUqb0VPH?=
- =?us-ascii?Q?vUXwxqWbEptc5TNEecK4Pb6+kOGvZ3nbsI0z0A6O0sGroJtcGUtnomvvWADA?=
- =?us-ascii?Q?pBLOL0kuatMFiupINDkxS//Tztuf/ZGc4QsP7a6ok8fJ3/SdujAuqXlrYBdY?=
- =?us-ascii?Q?/lbm1Lfi6xhhXynol6PnFqlFhgM1UGvjKzf21Q5S+dZeMEOpDUxrJA2QVtk5?=
- =?us-ascii?Q?P7Q4AUOFADL3SNSvMhRrwDrDV98b+ly0U/VSL9eSDN66Di5IBIpIjD/u6iVg?=
- =?us-ascii?Q?yv27EJdXwjk1gyBLIaPelsW6lqk5xSLeUmH3UpwDsnR1gZV4mLOC4yWRZ948?=
- =?us-ascii?Q?VhoE/22BEqtbUTq32tcQTX9NG7qIsX1pWOsy6xZGIalyxMpgzsTQdHRSlHo3?=
- =?us-ascii?Q?CbUHoF3zb5C9ojhCDgY+fWSz54Zr1ATfO3oWkYYfai8EvR4yD8WYLWQ77ows?=
- =?us-ascii?Q?05bgUnADz2vVt/T4YjUvKAw5iAy7U8kUx53kz29yv7IpDlHmSqc/kR6U33GL?=
- =?us-ascii?Q?gbhlVIwBw9qxJDWLi/nVgx1cgnWfhcN8ZkyEboUXzegJkDzhSUCI7OCsX0cg?=
- =?us-ascii?Q?k3JKktRlklyZnAo=3D?=
+	=?us-ascii?Q?OczcPG665KAUBFZ5iHFwMRf6xyLXrMw3Ib1HKh6bsg94Q6i8mKKq0YTaLhVc?=
+ =?us-ascii?Q?OdJ1z7R8hBKqQwTOxea6VN0Qo5M+rAoXiT24FQ/zm/wXKW/mzoDA3kDBuSCF?=
+ =?us-ascii?Q?Ahps0XibV4DKQqkKc3heqOFngNic2GRqxdGMdu/5wYHAt3v8ZTum+KHLi+/0?=
+ =?us-ascii?Q?Ucz7E72VFikQKxYLPWlT8O/TUpveQqH0IIkYWM5g1SCr7g+0KvvDwwmbxLEq?=
+ =?us-ascii?Q?TKlZSOOlXfX2d9GrulbSrnJY3sWOGsm9wGBbbO+yfao4Cl9hgj2ZNud6ZvK2?=
+ =?us-ascii?Q?Q0C4qpQIh843ht/XsWBJjjRoOeMigr0BgtcRHGNQn9Vd8768EGWVAEMiNhmZ?=
+ =?us-ascii?Q?YEmzcWjcip6yuvSGkaLjgGZrEI/2h7123/wpPAQyU9b+rsQXWjPSO0778DD3?=
+ =?us-ascii?Q?39zeBbJLsq5OxIAX91IoANvoQo0oER3JoioUFXtB53TiheRBkg39Wb5I76fN?=
+ =?us-ascii?Q?vmEoaSSf8xJU7kmW+dXuz1qhTzwLDhjIp1FwFEpv7Dn94PBNgUuJlO2px5ND?=
+ =?us-ascii?Q?zee+q6vKlc1LxrkO4ZsMuGcplgi6WAx8LwdB93P70fJmfc1Z6CTyXMN8Uvh9?=
+ =?us-ascii?Q?H68UQNIWhIWRY36At2JYoiamkSGdJcNy+l6LIKsx4h34Ofl6KWCqrka7vrKN?=
+ =?us-ascii?Q?SvRQFJhE5cCJbXp1UGx5eBZAKinc9OA8QhfercMfb8CVMr8dIXT/nk2Axc7d?=
+ =?us-ascii?Q?Z6JFFjNpQ3HiW/L2JPUnWWkWIOUNrUi9fB9Ln+zK8S/bqBWmOsBLKe2Nhh8o?=
+ =?us-ascii?Q?l8sbT5YVArPkfjXTnRVwjNSVCVKfdqf/ZItsKdDf0fInAdHUEIb9rRi3KPsX?=
+ =?us-ascii?Q?9mwr/ecTZEJwXHKzZa/EjUjGZtNrKIgh4FulXvcZEoXtbrGGkEftkOvebGAr?=
+ =?us-ascii?Q?0JUurZtv9RL1iCT4u9uCtgpOxFtcM03uxNWBzqXn7jeixUBI9GyjvjGoFwcI?=
+ =?us-ascii?Q?XOvsPnP9zFok56mBrggvOKnddpMYwL8VVwoonk+EWzSrDh8FxFuHorNA5Xr6?=
+ =?us-ascii?Q?hyTFnDVT8EaKcq5cBIy6wBMba6pOOrN4ERaGB1WivE3efm26phUxpSwtpB7m?=
+ =?us-ascii?Q?th3kHv2kGAvgFh1rhGgv37Z+Qd/ZSFDMld7DSO+gngI+1DFTK7nvs1Itz9OW?=
+ =?us-ascii?Q?ZpAdF6H3RQW5FAjWE4WL/43aibsoKF5SueZEE63Imj8RzFs0mOWqbFUO2xYe?=
+ =?us-ascii?Q?30KMbfv1TTpwAcgfgmxk/VnxmUu/49G05zSrzGJ93IO+VeCsy53XFF2JlH9h?=
+ =?us-ascii?Q?EerXj5uXh9aVisU22jAPdD8syjw6HJ88mxX1S2KT+bJTKH6DWKjFrNhXBLSq?=
+ =?us-ascii?Q?Ir8DENENUBqACJUgAdw7xNnLuObJED12iJWU9pewMDq9i3LIlf9WcJ9/EgMA?=
+ =?us-ascii?Q?LdHZl4Ea7IyWrB8+ytWS5ghDDqe7iRpzlQfyHFwb1wkM1GlEyTwriMJS/F1Q?=
+ =?us-ascii?Q?C6iexJq9IQ00btTZzDAvYbVSAENNTpYqQlxslR3KwiebUmMLj5/Ql7h1Rw/2?=
+ =?us-ascii?Q?wEhe0CpMVMEbbD5SKEArglPPBXq9fU9yFgW9?=
 X-Forefront-Antispam-Report:
-	CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:satlexmb07.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230040)(1800799024)(376014)(36860700013)(82310400026)(13003099007);DIR:OUT;SFP:1101;
+	CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:satlexmb07.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230040)(82310400026)(1800799024)(36860700013)(376014);DIR:OUT;SFP:1101;
 X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 25 Sep 2025 10:11:10.2370
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 25 Sep 2025 10:11:13.5340
  (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 122547d7-2866-434d-b595-08ddfc1bd9ae
+X-MS-Exchange-CrossTenant-Network-Message-Id: 6969d9b8-35a0-496e-aa6c-08ddfc1bdba5
 X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
 X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[satlexmb07.amd.com]
 X-MS-Exchange-CrossTenant-AuthSource:
-	CH1PEPF0000A34B.namprd04.prod.outlook.com
+	CH1PEPF0000A346.namprd04.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Anonymous
 X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DS0PR12MB7629
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: MN2PR12MB4421
 
-This series implements Page Modification Logging (PML) for guests, bringing
-hardware-assisted dirty logging support. PML is designed to track guest
-modified memory pages. PML enables the hypervisor to identify which pages in a
-guest's memory have been modified since the last checkpoint or during live
-migration.
+Move the PML (Page Modification Logging) buffer flushing logic from
+VMX-specific code to common x86 KVM code to enable reuse by SVM and avoid
+code duplication.
 
-The PML feature uses two new VMCB fields (PML_ADDR and PML_INDEX) and
-generates a VMEXIT when the 4KB log buffer becomes full.
+The AMD SVM PML implementations share the same behavior as VMX PML:
+ 1) The PML buffer is a 4K page with 512 entries
+ 2) Hardware records dirty GPAs in reverse order (from index 511 to 0)
+ 3) Hardware clears bits 11:0 when recording GPAs
 
-The feature is enabled by default when hardware support is detected and
-can be disabled via the 'pml' module parameter.
+The PML constants (PML_LOG_NR_ENTRIES and PML_HEAD_INDEX) are moved from
+vmx.h to x86.h to make them available to both VMX and SVM.
 
-Changelog:
-v3:
-* Update comments with nested details (Kai Huang)
-* Added nested.update_vmcb01_cpu_dirty_logging to update L1 PML (Kai Huang)
-* Added patch to use BIT_ULL() instead of BIT() for 64-bit nested_ctl
+No functional change intended for VMX, except tone down the WARN_ON() to
+WARN_ON_ONCE() for the page alignment check. If hardware exhibits this
+behavior once, it's likely to occur repeatedly, so use WARN_ON_ONCE() to
+avoid log flooding while still capturing the unexpected condition.
 
-v2: https://lore.kernel.org/kvm/20250915085938.639049-1-nikunj@amd.com/
-* Rebased on latest kvm/next
-* Added patch to move pml_pg field from struct vcpu_vmx to struct kvm_vcpu_arch
-  to share the PML page. (Kai Huang)
-* Dropped the SNP safe allocation optimization patch, will submit it separately.
-* Update commit message adding explicit mention that AMD PML follows VMX behavior
-  (Kai Huang)
-* Updated SNP erratum comment to include PML buffer alongside VMCB, VMSA, and
-  AVIC pages. (Kai Huang)
+The refactoring prepares for SVM to leverage the same PML flushing
+implementation.
 
-RFC: https://lore.kernel.org/kvm/20250825152009.3512-1-nikunj@amd.com/
+Signed-off-by: Nikunj A Dadhania <nikunj@amd.com>
+---
+ arch/x86/kvm/vmx/vmx.c | 26 ++------------------------
+ arch/x86/kvm/vmx/vmx.h |  5 -----
+ arch/x86/kvm/x86.c     | 31 +++++++++++++++++++++++++++++++
+ arch/x86/kvm/x86.h     |  7 +++++++
+ 4 files changed, 40 insertions(+), 29 deletions(-)
 
-
-Nikunj A Dadhania (5):
-  KVM: x86: Carve out PML flush routine
-  KVM: x86: Move PML page to common vcpu arch structure
-  x86/cpufeatures: Add Page modification logging
-  KVM: SVM: Use BIT_ULL for 64-bit nested_ctl bit definitions
-  KVM: SVM: Add Page modification logging support
-
- arch/x86/include/asm/cpufeatures.h |   1 +
- arch/x86/include/asm/kvm_host.h    |   2 +
- arch/x86/include/asm/svm.h         |  12 ++--
- arch/x86/include/uapi/asm/svm.h    |   2 +
- arch/x86/kernel/cpu/scattered.c    |   1 +
- arch/x86/kvm/svm/nested.c          |  13 +++-
- arch/x86/kvm/svm/sev.c             |   2 +-
- arch/x86/kvm/svm/svm.c             | 100 ++++++++++++++++++++++++++++-
- arch/x86/kvm/svm/svm.h             |   5 ++
- arch/x86/kvm/vmx/vmx.c             |  48 ++++----------
- arch/x86/kvm/vmx/vmx.h             |   7 --
- arch/x86/kvm/x86.c                 |  31 +++++++++
- arch/x86/kvm/x86.h                 |   7 ++
- 13 files changed, 179 insertions(+), 52 deletions(-)
-
-
-base-commit: a6ad54137af92535cfe32e19e5f3bc1bb7dbd383
+diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
+index aa157fe5b7b3..a0955155d7ca 100644
+--- a/arch/x86/kvm/vmx/vmx.c
++++ b/arch/x86/kvm/vmx/vmx.c
+@@ -6107,37 +6107,15 @@ static void vmx_destroy_pml_buffer(struct vcpu_vmx *vmx)
+ static void vmx_flush_pml_buffer(struct kvm_vcpu *vcpu)
+ {
+ 	struct vcpu_vmx *vmx = to_vmx(vcpu);
+-	u16 pml_idx, pml_tail_index;
+-	u64 *pml_buf;
+-	int i;
++	u16 pml_idx;
+ 
+ 	pml_idx = vmcs_read16(GUEST_PML_INDEX);
+ 
+ 	/* Do nothing if PML buffer is empty */
+ 	if (pml_idx == PML_HEAD_INDEX)
+ 		return;
+-	/*
+-	 * PML index always points to the next available PML buffer entity
+-	 * unless PML log has just overflowed.
+-	 */
+-	pml_tail_index = (pml_idx >= PML_LOG_NR_ENTRIES) ? 0 : pml_idx + 1;
+ 
+-	/*
+-	 * PML log is written backwards: the CPU first writes the entry 511
+-	 * then the entry 510, and so on.
+-	 *
+-	 * Read the entries in the same order they were written, to ensure that
+-	 * the dirty ring is filled in the same order the CPU wrote them.
+-	 */
+-	pml_buf = page_address(vmx->pml_pg);
+-
+-	for (i = PML_HEAD_INDEX; i >= pml_tail_index; i--) {
+-		u64 gpa;
+-
+-		gpa = pml_buf[i];
+-		WARN_ON(gpa & (PAGE_SIZE - 1));
+-		kvm_vcpu_mark_page_dirty(vcpu, gpa >> PAGE_SHIFT);
+-	}
++	kvm_flush_pml_buffer(vcpu, vmx->pml_pg, pml_idx);
+ 
+ 	/* reset PML index */
+ 	vmcs_write16(GUEST_PML_INDEX, PML_HEAD_INDEX);
+diff --git a/arch/x86/kvm/vmx/vmx.h b/arch/x86/kvm/vmx/vmx.h
+index d3389baf3ab3..4494c253727f 100644
+--- a/arch/x86/kvm/vmx/vmx.h
++++ b/arch/x86/kvm/vmx/vmx.h
+@@ -269,11 +269,6 @@ struct vcpu_vmx {
+ 	unsigned int ple_window;
+ 	bool ple_window_dirty;
+ 
+-	/* Support for PML */
+-#define PML_LOG_NR_ENTRIES	512
+-	/* PML is written backwards: this is the first entry written by the CPU */
+-#define PML_HEAD_INDEX		(PML_LOG_NR_ENTRIES-1)
+-
+ 	struct page *pml_pg;
+ 
+ 	/* apic deadline value in host tsc */
+diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+index 33fba801b205..123ebe7be184 100644
+--- a/arch/x86/kvm/x86.c
++++ b/arch/x86/kvm/x86.c
+@@ -6417,6 +6417,37 @@ void kvm_arch_sync_dirty_log(struct kvm *kvm, struct kvm_memory_slot *memslot)
+ 		kvm_vcpu_kick(vcpu);
+ }
+ 
++void kvm_flush_pml_buffer(struct kvm_vcpu *vcpu, struct page *pml_page, u16 pml_idx)
++{
++	u16 pml_tail_index;
++	u64 *pml_buf;
++	int i;
++
++	/*
++	 * PML index always points to the next available PML buffer entity
++	 * unless PML log has just overflowed.
++	 */
++	pml_tail_index = (pml_idx >= PML_LOG_NR_ENTRIES) ? 0 : pml_idx + 1;
++
++	/*
++	 * PML log is written backwards: the CPU first writes the entry 511
++	 * then the entry 510, and so on.
++	 *
++	 * Read the entries in the same order they were written, to ensure that
++	 * the dirty ring is filled in the same order the CPU wrote them.
++	 */
++	pml_buf = page_address(pml_page);
++
++	for (i = PML_HEAD_INDEX; i >= pml_tail_index; i--) {
++		u64 gpa;
++
++		gpa = pml_buf[i];
++		WARN_ON_ONCE(gpa & (PAGE_SIZE - 1));
++		kvm_vcpu_mark_page_dirty(vcpu, gpa >> PAGE_SHIFT);
++	}
++}
++EXPORT_SYMBOL_GPL(kvm_flush_pml_buffer);
++
+ int kvm_vm_ioctl_enable_cap(struct kvm *kvm,
+ 			    struct kvm_enable_cap *cap)
+ {
+diff --git a/arch/x86/kvm/x86.h b/arch/x86/kvm/x86.h
+index bcfd9b719ada..23c188c0a24b 100644
+--- a/arch/x86/kvm/x86.h
++++ b/arch/x86/kvm/x86.h
+@@ -699,4 +699,11 @@ int ____kvm_emulate_hypercall(struct kvm_vcpu *vcpu, int cpl,
+ 
+ int kvm_emulate_hypercall(struct kvm_vcpu *vcpu);
+ 
++/* Support for PML */
++#define PML_LOG_NR_ENTRIES	512
++/* PML is written backwards: this is the first entry written by the CPU */
++#define PML_HEAD_INDEX		(PML_LOG_NR_ENTRIES-1)
++
++void kvm_flush_pml_buffer(struct kvm_vcpu *vcpu, struct page *pml_pg, u16 pml_idx);
++
+ #endif
 -- 
 2.48.1
 
