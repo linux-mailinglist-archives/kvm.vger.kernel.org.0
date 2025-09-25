@@ -1,318 +1,468 @@
-Return-Path: <kvm+bounces-58740-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-58741-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6C1D1B9ED28
-	for <lists+kvm@lfdr.de>; Thu, 25 Sep 2025 12:54:32 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8235FB9ED88
+	for <lists+kvm@lfdr.de>; Thu, 25 Sep 2025 13:01:11 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2675D3A70D4
-	for <lists+kvm@lfdr.de>; Thu, 25 Sep 2025 10:54:31 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 88C5F188EBEE
+	for <lists+kvm@lfdr.de>; Thu, 25 Sep 2025 11:01:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C5FF52F5A18;
-	Thu, 25 Sep 2025 10:54:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D1C371D63D3;
+	Thu, 25 Sep 2025 11:00:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="iQj3bhp7"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="YSBVZ+3y"
 X-Original-To: kvm@vger.kernel.org
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 36E7F2F3C19;
-	Thu, 25 Sep 2025 10:54:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 067C62E9743
+	for <kvm@vger.kernel.org>; Thu, 25 Sep 2025 11:00:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758797659; cv=none; b=NDpSlt/rtqmJqydipSJnF8+X/+c24rZaJVKN6Fm6KQ3pAf+g+rOC2753da9uEc1TxSf5vNQGtFJLqJ8FZQZESoRtkv69V0DboENO+c5GJ5cvx+sMI4IRrU22l/gEGc8WVxuzAtX94Ed5D4TL1fv9S/M/FDqL/Tga2OkJsFM8mtE=
+	t=1758798056; cv=none; b=GkcfROKeV/iDv83WWjHrwbNDyau1hh3ovZKvgx3zTAtzQgPvBdl2qrswaIDFPkwVmFNOz8e9ZjrBgT2+v6Wu4sDkoX8L2C36j+cVzlk0spNN5IiZey9kRRbN2gpYytPhu6ZmLbAGDqXOK0bSSnkNdMcZOLqK91atG76tzh5mi0A=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758797659; c=relaxed/simple;
-	bh=gW6yDLpg5QpPBsovHx4B+NFb3GnUvfRZXCdEZ5L04VU=;
-	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=tLBcV77R+Of6ypMwEqV9m14Sfi5DyFrR6oq1sB8EpkikYlKZ3MAsb6XVcZJCQbPeSGSK4UD5qvmMRO5fHmqYwf18UVO7KF0L/OxUerYYNDy8+vVzP4MPionrXG7P4ggR0Tp0A5U77D6b+YqmMJql+1VzMt2IsOTAbZVHTgbHkNg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=iQj3bhp7; arc=none smtp.client-ip=148.163.156.1
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
-Received: from pps.filterd (m0360083.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 58P1wIWJ015399;
-	Thu, 25 Sep 2025 10:54:13 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
-	:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=pp1; bh=ja5yQQ
-	PjRjo0/Spx00gHL7pBWaoCv9NSzwf105E6Huc=; b=iQj3bhp75uOv7dlu81Wqx7
-	WWG1NLGwbP7XXxTwV8FETGSQuRMRnS/YTafzgfYlGFUUUupnzFesEa7uGaCCT1EN
-	DVo7/KwkObEdZ3U41wJUYGEXLxWsW1j9P9C+1DpNE8/ZAAoULFfhNIYpaXBzYJo3
-	dBMOiE5mppSK66arPrpn6U6tL1tx14531SVsZ87aNiDgK2IN89Ed8BuZPOQ0tDsr
-	Jmrv4BmZVwqmkI1PdsnZPgiazD8+diPzQ4T0gLZr+3C4/iRGbI+utzEHXWngf8JH
-	agjUSJADPEzRk8t8Z4rCRdiKKoqT1nGMWCWIrPrxTGRwDdVdIaqB09y3ReF6/UbQ
-	==
-Received: from ppma12.dal12v.mail.ibm.com (dc.9e.1632.ip4.static.sl-reverse.com [50.22.158.220])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 499ksc58tq-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 25 Sep 2025 10:54:12 +0000 (GMT)
-Received: from pps.filterd (ppma12.dal12v.mail.ibm.com [127.0.0.1])
-	by ppma12.dal12v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 58P9gWIb031139;
-	Thu, 25 Sep 2025 10:54:11 GMT
-Received: from smtprelay07.wdc07v.mail.ibm.com ([172.16.1.74])
-	by ppma12.dal12v.mail.ibm.com (PPS) with ESMTPS id 49b9vdeer2-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 25 Sep 2025 10:54:11 +0000
-Received: from smtpav01.wdc07v.mail.ibm.com (smtpav01.wdc07v.mail.ibm.com [10.39.53.228])
-	by smtprelay07.wdc07v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 58PAsAG818219714
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Thu, 25 Sep 2025 10:54:10 GMT
-Received: from smtpav01.wdc07v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 469D758059;
-	Thu, 25 Sep 2025 10:54:10 +0000 (GMT)
-Received: from smtpav01.wdc07v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 6B1FE58055;
-	Thu, 25 Sep 2025 10:54:08 +0000 (GMT)
-Received: from [9.111.71.247] (unknown [9.111.71.247])
-	by smtpav01.wdc07v.mail.ibm.com (Postfix) with ESMTP;
-	Thu, 25 Sep 2025 10:54:08 +0000 (GMT)
-Message-ID: <2d049d60868c0f61e53e70a73881f8674368537a.camel@linux.ibm.com>
-Subject: Re: [PATCH v4 04/10] s390/pci: Add architecture specific
- resource/bus address translation
-From: Niklas Schnelle <schnelle@linux.ibm.com>
-To: Farhan Ali <alifm@linux.ibm.com>, linux-s390@vger.kernel.org,
-        kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-pci@vger.kernel.org
-Cc: alex.williamson@redhat.com, helgaas@kernel.org, clg@redhat.com,
-        mjrosato@linux.ibm.com
-Date: Thu, 25 Sep 2025 12:54:07 +0200
-In-Reply-To: <20250924171628.826-5-alifm@linux.ibm.com>
-References: <20250924171628.826-1-alifm@linux.ibm.com>
-	 <20250924171628.826-5-alifm@linux.ibm.com>
-Autocrypt: addr=schnelle@linux.ibm.com; prefer-encrypt=mutual;
- keydata=mQINBGHm3M8BEAC+MIQkfoPIAKdjjk84OSQ8erd2OICj98+GdhMQpIjHXn/RJdCZLa58k
- /ay5x0xIHkWzx1JJOm4Lki7WEzRbYDexQEJP0xUia0U+4Yg7PJL4Dg/W4Ho28dRBROoJjgJSLSHwc
- 3/1pjpNlSaX/qg3ZM8+/EiSGc7uEPklLYu3gRGxcWV/944HdUyLcnjrZwCn2+gg9ncVJjsimS0ro/
- 2wU2RPE4ju6NMBn5Go26sAj1owdYQQv9t0d71CmZS9Bh+2+cLjC7HvyTHKFxVGOznUL+j1a45VrVS
- XQ+nhTVjvgvXR84z10bOvLiwxJZ/00pwNi7uCdSYnZFLQ4S/JGMs4lhOiCGJhJ/9FR7JVw/1t1G9a
- UlqVp23AXwzbcoV2fxyE/CsVpHcyOWGDahGLcH7QeitN6cjltf9ymw2spBzpRnfFn80nVxgSYVG1d
- w75ksBAuQ/3e+oTQk4GAa2ShoNVsvR9GYn7rnsDN5pVILDhdPO3J2PGIXa5ipQnvwb3EHvPXyzakY
- tK50fBUPKk3XnkRwRYEbbPEB7YT+ccF/HioCryqDPWUivXF8qf6Jw5T1mhwukUV1i+QyJzJxGPh19
- /N2/GK7/yS5wrt0Lwxzevc5g+jX8RyjzywOZGHTVu9KIQiG8Pqx33UxZvykjaqTMjo7kaAdGEkrHZ
- dVHqoPZwhCsgQARAQABtChOaWtsYXMgU2NobmVsbGUgPHNjaG5lbGxlQGxpbnV4LmlibS5jb20+iQ
- JXBBMBCABBAhsBBQsJCAcCBhUKCQgLAgQWAgMBAh4BAheAAhkBFiEEnbAAstJ1IDCl9y3cr+Q/Fej
- CYJAFAmesutgFCQenEYkACgkQr+Q/FejCYJDIzA//W5h3t+anRaztihE8ID1c6ifS7lNUtXr0wEKx
- Qm6EpDQKqFNP+n3R4A5w4gFqKv2JpYQ6UJAAlaXIRTeT/9XdqxQlHlA20QWI7yrJmoYaF74ZI9s/C
- 8aAxEzQZ64NjHrmrZ/N9q8JCTlyhk5ZEV1Py12I2UH7moLFgBFZsPlPWAjK2NO/ns5UJREAJ04pR9
- XQFSBm55gsqkPp028cdoFUD+IajGtW7jMIsx/AZfYMZAd30LfmSIpaPAi9EzgxWz5habO1ZM2++9e
- W6tSJ7KHO0ZkWkwLKicrqpPvA928eNPxYtjkLB2XipdVltw5ydH9SLq0Oftsc4+wDR8TqhmaUi8qD
- Fa2I/0NGwIF8hjwSZXtgJQqOTdQA5/6voIPheQIi0NBfUr0MwboUIVZp7Nm3w0QF9SSyTISrYJH6X
- qLp17NwnGQ9KJSlDYCMCBJ+JGVmlcMqzosnLli6JszAcRmZ1+sd/f/k47Fxy1i6o14z9Aexhq/UgI
- 5InZ4NUYhf5pWflV41KNupkS281NhBEpChoukw25iZk0AsrukpJ74x69MJQQO+/7PpMXFkt0Pexds
- XQrtsXYxLDQk8mgjlgsvWl0xlk7k7rddN1+O/alcv0yBOdvlruirtnxDhbjBqYNl8PCbfVwJZnyQ4
- SAX2S9XiGeNtWfZ5s2qGReyAcd2nBna0KU5pa2xhcyBTY2huZWxsZSA8bmlrbGFzLnNjaG5lbGxlQ
- GlibS5jb20+iQJUBBMBCAA+AhsBBQsJCAcCBhUKCQgLAgQWAgMBAh4BAheAFiEEnbAAstJ1IDCl9y
- 3cr+Q/FejCYJAFAmesuuEFCQenEYkACgkQr+Q/FejCYJCosA/9GCtbN8lLQkW71n/CHR58BAA5ct1
- KRYiZNPnNNAiAzjvSb0ezuRVt9H0bk/tnj6pPj0zdyU2bUj9Ok3lgocWhsF2WieWbG4dox5/L1K28
- qRf3p+vdPfu7fKkA1yLE5GXffYG3OJnqR7OZmxTnoutj81u/tXO95JBuCSJn5oc5xMQvUUFzLQSbh
- prIWxcnzQa8AHJ+7nAbSiIft/+64EyEhFqncksmzI5jiJ5edABiriV7bcNkK2d8KviUPWKQzVlQ3p
- LjRJcJJHUAFzsZlrsgsXyZLztAM7HpIA44yo+AVVmcOlmgPMUy+A9n+0GTAf9W3y36JYjTS+ZcfHU
- KP+y1TRGRzPrFgDKWXtsl1N7sR4tRXrEuNhbsCJJMvcFgHsfni/f4pilabXO1c5Pf8fiXndCz04V8
- ngKuz0aG4EdLQGwZ2MFnZdyf3QbG3vjvx7XDlrdzH0wUgExhd2fHQ2EegnNS4gNHjq82uLPU0hfcr
- obuI1D74nV0BPDtr7PKd2ryb3JgjUHKRKwok6IvlF2ZHMMXDxYoEvWlDpM1Y7g81NcKoY0BQ3ClXi
- a7vCaqAAuyD0zeFVGcWkfvxYKGqpj8qaI/mA8G5iRMTWUUUROy7rKJp/y2ioINrCul4NUJUujfx4k
- 7wFU11/YNAzRhQG4MwoO5e+VY66XnAd+XPyBIlvy0K05pa2xhcyBTY2huZWxsZSA8bmlrbGFzLnNj
- aG5lbGxlQGdtYWlsLmNvbT6JAlQEEwEIAD4CGwEFCwkIBwIGFQoJCAsCBBYCAwECHgECF4AWIQSds
- ACy0nUgMKX3Ldyv5D8V6MJgkAUCZ6y64QUJB6cRiQAKCRCv5D8V6MJgkEr/D/9iaYSYYwlmTJELv+
- +EjsIxXtneKYpjXEgNnPwpKEXNIpuU/9dcVDcJ10MfvWBPi3sFbIzO9ETIRyZSgrjQxCGSIhlbom4
- D8jVzTA698tl9id0FJKAi6T0AnBF7CxyqofPUzAEMSj9ynEJI/Qu8pHWkVp97FdJcbsho6HNMthBl
- +Qgj9l7/Gm1UW3ZPvGYgU75uB/mkaYtEv0vYrSZ+7fC2Sr/O5SM2SrNk+uInnkMBahVzCHcoAI+6O
- Enbag+hHIeFbqVuUJquziiB/J4Z2yT/3Ps/xrWAvDvDgdAEr7Kn697LLMRWBhGbdsxdHZ4ReAhc8M
- 8DOcSWX7UwjzUYq7pFFil1KPhIkHctpHj2Wvdnt+u1F9fN4e3C6lckUGfTVd7faZ2uDoCCkJAgpWR
- 10V1Q1Cgl09VVaoi6LcGFPnLZfmPrGYiDhM4gyDDQJvTmkB+eMEH8u8V1X30nCFP2dVvOpevmV5Uk
- onTsTwIuiAkoTNW4+lRCFfJskuTOQqz1F8xVae8KaLrUt2524anQ9x0fauJkl3XdsVcNt2wYTAQ/V
- nKUNgSuQozzfXLf+cOEbV+FBso/1qtXNdmAuHe76ptwjEfBhfg8L+9gMUthoCR94V0y2+GEzR5nlD
- 5kfu8ivV/gZvij+Xq3KijIxnOF6pd0QzliKadaFNgGw4FoUeZo0rQhTmlrbGFzIFNjaG5lbGxlIDx
- uaWtzQGtlcm5lbC5vcmc+iQJUBBMBCAA+AhsBBQsJCAcCBhUKCQgLAgQWAgMBAh4BAheAFiEEnbAA
- stJ1IDCl9y3cr+Q/FejCYJAFAmesuuEFCQenEYkACgkQr+Q/FejCYJC6yxAAiQQ5NAbWYKpkxxjP/
- AajXheMUW8EtK7EMJEKxyemj40laEs0wz9owu8ZDfQl4SPqjjtcRzUW6vE6JvfEiyCLd8gUFXIDMS
- l2hzuNot3sEMlER9kyVIvemtV9r8Sw1NHvvCjxOMReBmrtg9ooeboFL6rUqbXHW+yb4GK+1z7dy+Q
- 9DMlkOmwHFDzqvsP7eGJN0xD8MGJmf0L5LkR9LBc+jR78L+2ZpKA6P4jL53rL8zO2mtNQkoUO+4J6
- 0YTknHtZrqX3SitKEmXE2Is0Efz8JaDRW41M43cE9b+VJnNXYCKFzjiqt/rnqrhLIYuoWCNzSJ49W
- vt4hxfqh/v2OUcQCIzuzcvHvASmt049ZyGmLvEz/+7vF/Y2080nOuzE2lcxXF1Qr0gAuI+wGoN4gG
- lSQz9pBrxISX9jQyt3ztXHmH7EHr1B5oPus3l/zkc2Ajf5bQ0SE7XMlo7Pl0Xa1mi6BX6I98CuvPK
- SA1sQPmo+1dQYCWmdQ+OIovHP9Nx8NP1RB2eELP5MoEW9eBXoiVQTsS6g6OD3rH7xIRxRmuu42Z5e
- 0EtzF51BjzRPWrKSq/mXIbl5nVW/wD+nJ7U7elW9BoJQVky03G0DhEF6fMJs08DGG3XoKw/CpGtMe
- 2V1z/FRotP5Fkf5VD3IQGtkxSnO/awtxjlhytigylgrZ4wDpSE=
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.56.2 (3.56.2-2.fc42) 
+	s=arc-20240116; t=1758798056; c=relaxed/simple;
+	bh=WNLFrvOskwWENrF4CXX4Z4D7EhOVVB95cs7xFI3xkw0=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=g0RiMp8qrtlpRRpxuHBBHO7O2kVPsBOZvFjOnAsW/93+oQqI22y561TkFpyxdeD2ApFizocCHSDI3g3Nc/x/Fef3gTlPPm7nVQ4oVD9ToETnk30iwhFeQf5Y6Dlz64gSddT7gxwjiAF2oErRZtLKkyMeMRRmBs60RmmOqqYR9E0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=YSBVZ+3y; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1758798053;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+	bh=LsFjckaZRSZSgvIBBGozNR9QSfDm9ZdOZyuvNGkLoik=;
+	b=YSBVZ+3ynHMzQ6isRHnb4Cw32CrMrNNX9jfwnVxUuYVjnX35B23Syw1LwBikenmr1GXUWi
+	xRzBtVMh9joA7LMSInPL7YMAk6xAY/mY+AitvBgt0no0KsonJMLBhwn/Rli/JcDabcUrcY
+	n/qdjlWV+ERchNoZA0mikQ5ZDu1i36Y=
+Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
+ [209.85.128.72]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-121-x6-u_5nrNc6o8xKVv4aQ1w-1; Thu, 25 Sep 2025 07:00:51 -0400
+X-MC-Unique: x6-u_5nrNc6o8xKVv4aQ1w-1
+X-Mimecast-MFC-AGG-ID: x6-u_5nrNc6o8xKVv4aQ1w_1758798050
+Received: by mail-wm1-f72.google.com with SMTP id 5b1f17b1804b1-46da436df64so9527645e9.0
+        for <kvm@vger.kernel.org>; Thu, 25 Sep 2025 04:00:51 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1758798050; x=1759402850;
+        h=content-transfer-encoding:in-reply-to:autocrypt:content-language
+         :from:references:cc:to:subject:user-agent:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=LsFjckaZRSZSgvIBBGozNR9QSfDm9ZdOZyuvNGkLoik=;
+        b=Hd1rCSdsFkpbp9g59M2qDX88Gjpuu66kr0t+E0bSAUmr5hq90ydy3DGbyRxzG4ZuAC
+         T+3WscXxRohxQ5wWR3HBdS4rRyjo09kNEhSzEYmNTRVPkXm6D1Hg1WY4CsOFQTnTVk9e
+         E88l/LhkE/wamX3w3dJI2948JhkiANnXH6T6FfH6xHew7wB7ZkxgC6TeCCfIXKjPeQtF
+         F3XDu2ugwo5RC6Cbk2pXpTzTt8chyk9PEnz6cE8iwmlNqi2/4J8dbNw4Q0v7lMV85NVe
+         g/CNKZYbDwygSm/76hhgEBeClKlWZ7Cis2cC5crpZdl3UhC0kA6eJd8jjbEE+vEgUs5Z
+         jGug==
+X-Forwarded-Encrypted: i=1; AJvYcCU5j6gBf8e0Ghh3hRevgX9EBJldmxVVFp58WplfGqLnz5//rv2YS8u+PUvx87KeUJMJzEA=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yz9/ZMfcnl25BBoQFMiTYiHj1C45foV5a+vmroJeVpHo6h7hXbg
+	m/cj3518WGwb/BRMQUv/xTXKPRO+cC6MBk2GvN/VMtGo0V30nzGhLNfxEWS0xscSK2UP8feegia
+	LlzQaRUoOMJhwDJ04sldZKcYF0wSkm7bDrKQsZhtLVJVjZDxR+moQzg==
+X-Gm-Gg: ASbGncvili+xwN7V+q9HyooYYaDlPXBROVWWcfwgqAXSHU3+Rli+1Bwt0x3lXGn2dE8
+	wsU+goF6/wxtfsIhWpIyY0oaIOr1kZf2iwzdSwvWkQtaM8N7578rVYBaxYdjOGlnaQoaLreCNsn
+	1QkmX6OrWZmIYNIqVn7qZeoojXHB21PvJgrtbtq6cN49e/1y4o2C61s2jT88PjNdu0YDyb+N/SF
+	CcHnWNyLla1NKX4nzBrgWPi1mMtXQua/vtaHGaP5v8+ZlZb4RWNx3RCztMTDSvM2OpBK4s8KQ1B
+	ReHnCWo0F69cXrkwraKUyHt3aM/AMncr7StDle2dRcfs5p9IQcVppnMZh2UUYsRJkQTuErnh5Um
+	8tgq4t9iPBlKRL6+oJhccc6WKt2qdxJ93uNgyqYRIWEts4xh7ftHbZU3vxJWuqOfKjJMo
+X-Received: by 2002:a05:600c:1554:b0:45d:d6fc:24f7 with SMTP id 5b1f17b1804b1-46e32a158camr31228575e9.32.1758798050155;
+        Thu, 25 Sep 2025 04:00:50 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IHBJES16mG0dvjX/+8YEMFt/mXYaxImgtqz08XZYHmHVSOGfz52OI8Lf1kSYhL10lrl8HbeQA==
+X-Received: by 2002:a05:600c:1554:b0:45d:d6fc:24f7 with SMTP id 5b1f17b1804b1-46e32a158camr31227445e9.32.1758798049427;
+        Thu, 25 Sep 2025 04:00:49 -0700 (PDT)
+Received: from ?IPV6:2003:d8:2f3f:f800:c101:5c9f:3bc9:3d08? (p200300d82f3ff800c1015c9f3bc93d08.dip0.t-ipconnect.de. [2003:d8:2f3f:f800:c101:5c9f:3bc9:3d08])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-40fc6de90desm2659224f8f.47.2025.09.25.04.00.45
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 25 Sep 2025 04:00:48 -0700 (PDT)
+Message-ID: <a02996f3-fdf4-4b5f-85b6-d79b948b3237@redhat.com>
+Date: Thu, 25 Sep 2025 13:00:45 +0200
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: Rfo0fykP9xRX2Pu2mp6z6SyfxKLFvXsM
-X-Proofpoint-GUID: Rfo0fykP9xRX2Pu2mp6z6SyfxKLFvXsM
-X-Authority-Analysis: v=2.4 cv=SdH3duRu c=1 sm=1 tr=0 ts=68d51f54 cx=c_pps
- a=bLidbwmWQ0KltjZqbj+ezA==:117 a=bLidbwmWQ0KltjZqbj+ezA==:17
- a=IkcTkHD0fZMA:10 a=yJojWOMRYYMA:10 a=VnNF1IyMAAAA:8 a=LO_JpcyrgH6vAt2cTOsA:9
- a=QEXdDO2ut3YA:10
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUwOTIwMDAyMCBTYWx0ZWRfX3gqL01phd10O
- PwbAiQZRuz/Nzj0/Lqdw5/4qJq0dnuLE5mNoPmdRapH1N03f+R2GXEvvUgoi+8Pc8VesKHrJ4/U
- 6R22w7g/cW5R+KwEZEZMGLq0GD3t3K9VUbu2BZ7MACux7Nbrde3y5Bd/WdpUWTyzSUx3OkHqAwS
- Pr2ZuDH30Z4cE0HJ0SkKR1Cg5i47QDof/F2XLHsGudyBInF/zlw9ZJdYRI4PdRr8GKZz+hXRvap
- P2Bpo01IjywtGP4K4/xp5NHt7QP/JS5kVDItAMlXjy8vg3HuR1O/J9EKSGZssidoHa+z7Hi3+O4
- v2seJ297wL+DiO64SU+ZQuVxdZqIUC1PExeKtjls6B1paKWF4G6gHJDyCX6HcWkfPEShgSbQtp2
- QiEU6tIC
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1117,Hydra:6.1.9,FMLib:17.12.80.40
- definitions=2025-09-24_07,2025-09-24_01,2025-03-28_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- malwarescore=0 suspectscore=0 phishscore=0 spamscore=0 bulkscore=0
- priorityscore=1501 clxscore=1011 adultscore=0 impostorscore=0
- classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
- reason=mlx scancount=1 engine=8.19.0-2507300000 definitions=main-2509200020
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v7 05/12] KVM: guest_memfd: Add flag to remove from direct
+ map
+To: "Roy, Patrick" <roypat@amazon.co.uk>
+Cc: "pbonzini@redhat.com" <pbonzini@redhat.com>,
+ "corbet@lwn.net" <corbet@lwn.net>, "maz@kernel.org" <maz@kernel.org>,
+ "oliver.upton@linux.dev" <oliver.upton@linux.dev>,
+ "joey.gouly@arm.com" <joey.gouly@arm.com>,
+ "suzuki.poulose@arm.com" <suzuki.poulose@arm.com>,
+ "yuzenghui@huawei.com" <yuzenghui@huawei.com>,
+ "catalin.marinas@arm.com" <catalin.marinas@arm.com>,
+ "will@kernel.org" <will@kernel.org>, "tglx@linutronix.de"
+ <tglx@linutronix.de>, "mingo@redhat.com" <mingo@redhat.com>,
+ "bp@alien8.de" <bp@alien8.de>,
+ "dave.hansen@linux.intel.com" <dave.hansen@linux.intel.com>,
+ "x86@kernel.org" <x86@kernel.org>, "hpa@zytor.com" <hpa@zytor.com>,
+ "luto@kernel.org" <luto@kernel.org>,
+ "peterz@infradead.org" <peterz@infradead.org>,
+ "willy@infradead.org" <willy@infradead.org>,
+ "akpm@linux-foundation.org" <akpm@linux-foundation.org>,
+ "lorenzo.stoakes@oracle.com" <lorenzo.stoakes@oracle.com>,
+ "Liam.Howlett@oracle.com" <Liam.Howlett@oracle.com>,
+ "vbabka@suse.cz" <vbabka@suse.cz>, "rppt@kernel.org" <rppt@kernel.org>,
+ "surenb@google.com" <surenb@google.com>, "mhocko@suse.com"
+ <mhocko@suse.com>, "song@kernel.org" <song@kernel.org>,
+ "jolsa@kernel.org" <jolsa@kernel.org>, "ast@kernel.org" <ast@kernel.org>,
+ "daniel@iogearbox.net" <daniel@iogearbox.net>,
+ "andrii@kernel.org" <andrii@kernel.org>,
+ "martin.lau@linux.dev" <martin.lau@linux.dev>,
+ "eddyz87@gmail.com" <eddyz87@gmail.com>,
+ "yonghong.song@linux.dev" <yonghong.song@linux.dev>,
+ "john.fastabend@gmail.com" <john.fastabend@gmail.com>,
+ "kpsingh@kernel.org" <kpsingh@kernel.org>, "sdf@fomichev.me"
+ <sdf@fomichev.me>, "haoluo@google.com" <haoluo@google.com>,
+ "jgg@ziepe.ca" <jgg@ziepe.ca>, "jhubbard@nvidia.com" <jhubbard@nvidia.com>,
+ "peterx@redhat.com" <peterx@redhat.com>, "jannh@google.com"
+ <jannh@google.com>, "pfalcato@suse.de" <pfalcato@suse.de>,
+ "shuah@kernel.org" <shuah@kernel.org>, "seanjc@google.com"
+ <seanjc@google.com>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+ "linux-doc@vger.kernel.org" <linux-doc@vger.kernel.org>,
+ "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+ "linux-arm-kernel@lists.infradead.org"
+ <linux-arm-kernel@lists.infradead.org>,
+ "kvmarm@lists.linux.dev" <kvmarm@lists.linux.dev>,
+ "linux-fsdevel@vger.kernel.org" <linux-fsdevel@vger.kernel.org>,
+ "linux-mm@kvack.org" <linux-mm@kvack.org>,
+ "bpf@vger.kernel.org" <bpf@vger.kernel.org>,
+ "linux-kselftest@vger.kernel.org" <linux-kselftest@vger.kernel.org>,
+ "Cali, Marco" <xmarcalx@amazon.co.uk>,
+ "Kalyazin, Nikita" <kalyazin@amazon.co.uk>,
+ "Thomson, Jack" <jackabt@amazon.co.uk>,
+ "derekmn@amazon.co.uk" <derekmn@amazon.co.uk>,
+ "tabba@google.com" <tabba@google.com>,
+ "ackerleytng@google.com" <ackerleytng@google.com>
+References: <20250924151101.2225820-4-patrick.roy@campus.lmu.de>
+ <20250924152214.7292-1-roypat@amazon.co.uk>
+ <20250924152214.7292-2-roypat@amazon.co.uk>
+From: David Hildenbrand <david@redhat.com>
+Content-Language: en-US
+Autocrypt: addr=david@redhat.com; keydata=
+ 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
+ qIws/H2t
+In-Reply-To: <20250924152214.7292-2-roypat@amazon.co.uk>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-On Wed, 2025-09-24 at 10:16 -0700, Farhan Ali wrote:
-> On s390 today we overwrite the PCI BAR resource address to either an
-> artificial cookie address or MIO address.=C2=A0
->=20
-
-I'm not sure "overwrite" fits here. Maybe just "are" and also use the
-plural "addresses" and drop the "we" so:
-"On s390 today PCI BAR resource addresses are either artificial cookie
-addresses or MIO addresses". Then also adjust for the plural below with
-"these addresses are".
-
-Backghround: The resource addresses are CPU addresses used for MMIO. On
-s390 we either have to adapt the old PCI instructions, which are
-distinctly not memory mapped for a memory mapping based API via the
-address cookie / zpci_iomap mechanismm, or if we have memory-I/O (MIO)
-support, use the MIO addresses + memory mapped PCI instructions. Even
-the MIO addresses may not match the bus addresses.
-
-> However this address is different
-> from the bus address of the BARs programmed by firmware. The artificial
-> cookie address was created to index into an array of function handles
-> (zpci_iomap_start). The MIO (mapped I/O) addresses are provided by firmwa=
-re
-> but maybe different from the bus address. This creates an issue when tryi=
-ng
-
-Nit: "may be different from the corresponding bus addresses."
-
-> to convert the BAR resource address to bus address using the generic
-> pcibios_resource_to_bus().
->=20
-> Implement an architecture specific pcibios_resource_to_bus() function to
-> correctly translate PCI BAR resource addresses to bus addresses for s390.
-> Similarly add architecture specific pcibios_bus_to_resource function to d=
-o
-> the reverse translation.
->=20
-> Signed-off-by: Farhan Ali <alifm@linux.ibm.com>
+On 24.09.25 17:22, Roy, Patrick wrote:
+> Add GUEST_MEMFD_FLAG_NO_DIRECT_MAP flag for KVM_CREATE_GUEST_MEMFD()
+> ioctl. When set, guest_memfd folios will be removed from the direct map
+> after preparation, with direct map entries only restored when the folios
+> are freed.
+> 
+> To ensure these folios do not end up in places where the kernel cannot
+> deal with them, set AS_NO_DIRECT_MAP on the guest_memfd's struct
+> address_space if GUEST_MEMFD_FLAG_NO_DIRECT_MAP is requested.
+> 
+> Add KVM_CAP_GUEST_MEMFD_NO_DIRECT_MAP to let userspace discover whether
+> guest_memfd supports GUEST_MEMFD_FLAG_NO_DIRECT_MAP. Support depends on
+> guest_memfd itself being supported, but also on whether linux supports
+> manipulatomg the direct map at page granularity at all (possible most of
+> the time, outliers being arm64 where its impossible if the direct map
+> has been setup using hugepages, as arm64 cannot break these apart due to
+> break-before-make semantics, and powerpc, which does not select
+> ARCH_HAS_SET_DIRECT_MAP, though also doesn't support guest_memfd
+> anyway).
+> 
+> Note that this flag causes removal of direct map entries for all
+> guest_memfd folios independent of whether they are "shared" or "private"
+> (although current guest_memfd only supports either all folios in the
+> "shared" state, or all folios in the "private" state if
+> GUEST_MEMFD_FLAG_MMAP is not set). The usecase for removing direct map
+> entries of also the shared parts of guest_memfd are a special type of
+> non-CoCo VM where, host userspace is trusted to have access to all of
+> guest memory, but where Spectre-style transient execution attacks
+> through the host kernel's direct map should still be mitigated.  In this
+> setup, KVM retains access to guest memory via userspace mappings of
+> guest_memfd, which are reflected back into KVM's memslots via
+> userspace_addr. This is needed for things like MMIO emulation on x86_64
+> to work.
+> 
+> Direct map entries are zapped right before guest or userspace mappings
+> of gmem folios are set up, e.g. in kvm_gmem_fault_user_mapping() or
+> kvm_gmem_get_pfn() [called from the KVM MMU code]. The only place where
+> a gmem folio can be allocated without being mapped anywhere is
+> kvm_gmem_populate(), where handling potential failures of direct map
+> removal is not possible (by the time direct map removal is attempted,
+> the folio is already marked as prepared, meaning attempting to re-try
+> kvm_gmem_populate() would just result in -EEXIST without fixing up the
+> direct map state). These folios are then removed form the direct map
+> upon kvm_gmem_get_pfn(), e.g. when they are mapped into the guest later.
+> 
+> Signed-off-by: Patrick Roy <roypat@amazon.co.uk>
 > ---
->  arch/s390/pci/pci.c       | 74 +++++++++++++++++++++++++++++++++++++++
->  drivers/pci/host-bridge.c |  4 +--
->  2 files changed, 76 insertions(+), 2 deletions(-)
->=20
-> diff --git a/arch/s390/pci/pci.c b/arch/s390/pci/pci.c
-> index cd6676c2d602..3992ba44e1cf 100644
-> --- a/arch/s390/pci/pci.c
-> +++ b/arch/s390/pci/pci.c
-> @@ -264,6 +264,80 @@ resource_size_t pcibios_align_resource(void *data, c=
-onst struct resource *res,
->  	return 0;
->  }
-> =20
-> +void pcibios_resource_to_bus(struct pci_bus *bus, struct pci_bus_region =
-*region,
-> +			     struct resource *res)
+>   Documentation/virt/kvm/api.rst    |  5 +++
+>   arch/arm64/include/asm/kvm_host.h | 12 ++++++
+>   include/linux/kvm_host.h          |  6 +++
+>   include/uapi/linux/kvm.h          |  2 +
+>   virt/kvm/guest_memfd.c            | 61 ++++++++++++++++++++++++++++++-
+>   virt/kvm/kvm_main.c               |  5 +++
+>   6 files changed, 90 insertions(+), 1 deletion(-)
+> 
+> diff --git a/Documentation/virt/kvm/api.rst b/Documentation/virt/kvm/api.rst
+> index c17a87a0a5ac..b52c14d58798 100644
+> --- a/Documentation/virt/kvm/api.rst
+> +++ b/Documentation/virt/kvm/api.rst
+> @@ -6418,6 +6418,11 @@ When the capability KVM_CAP_GUEST_MEMFD_MMAP is supported, the 'flags' field
+>   supports GUEST_MEMFD_FLAG_MMAP.  Setting this flag on guest_memfd creation
+>   enables mmap() and faulting of guest_memfd memory to host userspace.
+>   
+> +When the capability KVM_CAP_GMEM_NO_DIRECT_MAP is supported, the 'flags' field
+> +supports GUEST_MEMFG_FLAG_NO_DIRECT_MAP. Setting this flag makes the guest_memfd
+> +instance behave similarly to memfd_secret, and unmaps the memory backing it from
+> +the kernel's address space after allocation.
+> +
+
+Do we want to document what the implication of that is? Meaning, 
+limitations etc. I recall that we would need the user mapping for gmem 
+slots to be properly set up.
+
+Is that still the case in this patch set?
+
+>   When the KVM MMU performs a PFN lookup to service a guest fault and the backing
+>   guest_memfd has the GUEST_MEMFD_FLAG_MMAP set, then the fault will always be
+>   consumed from guest_memfd, regardless of whether it is a shared or a private
+> diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+> index 2f2394cce24e..0bfd8e5fd9de 100644
+> --- a/arch/arm64/include/asm/kvm_host.h
+> +++ b/arch/arm64/include/asm/kvm_host.h
+> @@ -19,6 +19,7 @@
+>   #include <linux/maple_tree.h>
+>   #include <linux/percpu.h>
+>   #include <linux/psci.h>
+> +#include <linux/set_memory.h>
+>   #include <asm/arch_gicv3.h>
+>   #include <asm/barrier.h>
+>   #include <asm/cpufeature.h>
+> @@ -1706,5 +1707,16 @@ void compute_fgu(struct kvm *kvm, enum fgt_group_id fgt);
+>   void get_reg_fixed_bits(struct kvm *kvm, enum vcpu_sysreg reg, u64 *res0, u64 *res1);
+>   void check_feature_map(void);
+>   
+> +#ifdef CONFIG_KVM_GUEST_MEMFD
+> +static inline bool kvm_arch_gmem_supports_no_direct_map(void)
 > +{
-> +	struct zpci_bus *zbus =3D bus->sysdata;
-> +	struct zpci_bar_struct *zbar;
-> +	struct zpci_dev *zdev;
-> +
-> +	region->start =3D res->start;
-> +	region->end =3D res->end;
+> +	/*
+> +	 * Without FWB, direct map access is needed in kvm_pgtable_stage2_map(),
+> +	 * as it calls dcache_clean_inval_poc().
+> +	 */
+> +	return can_set_direct_map() && cpus_have_final_cap(ARM64_HAS_STAGE2_FWB);
+> +}
+> +#define kvm_arch_gmem_supports_no_direct_map kvm_arch_gmem_supports_no_direct_map
+> +#endif /* CONFIG_KVM_GUEST_MEMFD */
+>   
 
-When we don't find a BAR matching the resource this would become the
-region used. I'm not sure what a better value would be if we don't find
-a match though and that should hopefully not happen in sensible uses.
-Also this would keep the existing behavior so seems fine.
+I strongly assume that the aarch64 support should be moved to a separate 
+patch -- if possible, see below.
 
+>   #endif /* __ARM64_KVM_HOST_H__ */
+> diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
+> index 1d0585616aa3..73a15cade54a 100644
+> --- a/include/linux/kvm_host.h
+> +++ b/include/linux/kvm_host.h
+> @@ -731,6 +731,12 @@ static inline bool kvm_arch_has_private_mem(struct kvm *kvm)
+>   bool kvm_arch_supports_gmem_mmap(struct kvm *kvm);
+>   #endif
+>   
+> +#ifdef CONFIG_KVM_GUEST_MEMFD
+> +#ifndef kvm_arch_gmem_supports_no_direct_map
+> +#define kvm_arch_gmem_supports_no_direct_map can_set_direct_map
+> +#endif
+
+Hm, wouldn't it be better to have an opt-in per arch, and really only 
+unlock the ones we know work (tested etc), explicitly in separate patches.
+
+
+[...]
+
+>   
+>   #include "kvm_mm.h"
+>   
+> @@ -42,6 +45,44 @@ static int __kvm_gmem_prepare_folio(struct kvm *kvm, struct kvm_memory_slot *slo
+>   	return 0;
+>   }
+>   
+> +#define KVM_GMEM_FOLIO_NO_DIRECT_MAP BIT(0)
 > +
-> +	for (int i =3D 0; i < ZPCI_FUNCTIONS_PER_BUS; i++) {
-> +		int j =3D 0;
-> +
-> +		zbar =3D NULL;
-> +		zdev =3D zbus->function[i];
-> +		if (!zdev)
-> +			continue;
-> +
-> +		for (j =3D 0; j < PCI_STD_NUM_BARS; j++) {
-> +			if (zdev->bars[j].res->start =3D=3D res->start &&
-> +			    zdev->bars[j].res->end =3D=3D res->end &&
-> +			    res->flags & IORESOURCE_MEM) {
-> +				zbar =3D &zdev->bars[j];
-> +				break;
-> +			}
-> +		}
-> +
-> +		if (zbar) {
-> +			/* only MMIO is supported */
-> +			region->start =3D zbar->val & PCI_BASE_ADDRESS_MEM_MASK;
-> +			if (zbar->val & PCI_BASE_ADDRESS_MEM_TYPE_64)
-> +				region->start |=3D (u64)zdev->bars[j + 1].val << 32;
-> +
-> +			region->end =3D region->start + (1UL << zbar->size) - 1;
-> +			return;
-> +		}
-> +	}
+> +static bool kvm_gmem_folio_no_direct_map(struct folio *folio)
+> +{
+> +	return ((u64) folio->private) & KVM_GMEM_FOLIO_NO_DIRECT_MAP;
 > +}
 > +
-> +void pcibios_bus_to_resource(struct pci_bus *bus, struct resource *res,
-> +			     struct pci_bus_region *region)
+> +static int kvm_gmem_folio_zap_direct_map(struct folio *folio)
 > +{
-> +	struct zpci_bus *zbus =3D bus->sysdata;
-> +	struct zpci_dev *zdev;
-> +	resource_size_t start, end;
+> +	if (kvm_gmem_folio_no_direct_map(folio))
+> +		return 0;
 > +
-> +	res->start =3D region->start;
-> +	res->end =3D region->end;
+> +	int r = set_direct_map_valid_noflush(folio_page(folio, 0), folio_nr_pages(folio),
+> +					 false);
+> +
+> +	if (!r) {
+> +		unsigned long addr = (unsigned long) folio_address(folio);
 
-Similar to above. One thought though, I think we could set res->flags
-!=3D IORESOURCE_UNSET | IORESOURCE_DISABLED. Of course that would have to
-be moved after the loop so it only takes effect when we don't find a
-match.
+empty line missing.
 
-> +
-> +	for (int i =3D 0; i < ZPCI_FUNCTIONS_PER_BUS; i++) {
-> +		zdev =3D zbus->function[i];
-> +		if (!zdev || !zdev->has_resources)
-> +			continue;
-> +
-> +		for (int j =3D 0; j < PCI_STD_NUM_BARS; j++) {
-> +			if (!zdev->bars[j].size)
-> +				continue;
-> +
-> +			/* only MMIO is supported */
-> +			start =3D zdev->bars[j].val & PCI_BASE_ADDRESS_MEM_MASK;
-> +			if (zdev->bars[j].val & PCI_BASE_ADDRESS_MEM_TYPE_64)
-> +				start |=3D (u64)zdev->bars[j + 1].val << 32;
-> +
-> +			end =3D start + (1UL << zdev->bars[j].size) - 1;
-> +
-> +			if (start =3D=3D region->start && end =3D=3D region->end) {
-> +				res->start =3D zdev->bars[j].res->start;
-> +				res->end =3D zdev->bars[j].res->end;
-> +				return;
-> +			}
-> +		}
+> +		folio->private = (void *) ((u64) folio->private & KVM_GMEM_FOLIO_NO_DIRECT_MAP);
+> +		flush_tlb_kernel_range(addr, addr + folio_size(folio));
 > +	}
+> +
+> +	return r;
 > +}
 > +
---- snip ---
+> +static void kvm_gmem_folio_restore_direct_map(struct folio *folio)
+> +{
+> +	/*
+> +	 * Direct map restoration cannot fail, as the only error condition
+> +	 * for direct map manipulation is failure to allocate page tables
+> +	 * when splitting huge pages, but this split would have already
+> +	 * happened in set_direct_map_invalid_noflush() in kvm_gmem_folio_zap_direct_map().
+> +	 * Thus set_direct_map_valid_noflush() here only updates prot bits.
+> +	 */
+> +	if (kvm_gmem_folio_no_direct_map(folio))
+> +		set_direct_map_valid_noflush(folio_page(folio, 0), folio_nr_pages(folio),
+> +					 true);
+> +}
+> +
+>   static inline void kvm_gmem_mark_prepared(struct folio *folio)
+>   {
+>   	folio_mark_uptodate(folio);
+> @@ -324,13 +365,14 @@ static vm_fault_t kvm_gmem_fault_user_mapping(struct vm_fault *vmf)
+>   	struct inode *inode = file_inode(vmf->vma->vm_file);
+>   	struct folio *folio;
+>   	vm_fault_t ret = VM_FAULT_LOCKED;
+> +	int err;
+>   
+>   	if (((loff_t)vmf->pgoff << PAGE_SHIFT) >= i_size_read(inode))
+>   		return VM_FAULT_SIGBUS;
+>   
+>   	folio = kvm_gmem_get_folio(inode, vmf->pgoff);
+>   	if (IS_ERR(folio)) {
+> -		int err = PTR_ERR(folio);
+> +		err = PTR_ERR(folio);
+>   
+>   		if (err == -EAGAIN)
+>   			return VM_FAULT_RETRY;
+> @@ -348,6 +390,13 @@ static vm_fault_t kvm_gmem_fault_user_mapping(struct vm_fault *vmf)
+>   		kvm_gmem_mark_prepared(folio);
+>   	}
+>   
+> +	err = kvm_gmem_folio_zap_direct_map(folio);
+> +
 
+I'd drop this empty line here.
 
-With or without my suggestion this clearly looks more correct than what
-we had so far, even though that hasn't caused issues as far as I'm
-aware until your BAR restoration change.
+> +	if (err) {
+> +		ret = vmf_error(err);
+> +		goto out_folio;
+> +	}
+> +
+>   	vmf->page = folio_file_page(folio, vmf->pgoff);
+>   
+>   out_folio:
+> @@ -435,6 +484,8 @@ static void kvm_gmem_free_folio(struct folio *folio)
+>   	kvm_pfn_t pfn = page_to_pfn(page);
+>   	int order = folio_order(folio);
+>   
+> +	kvm_gmem_folio_restore_direct_map(folio);
+> +
+>   	kvm_arch_gmem_invalidate(pfn, pfn + (1ul << order));
+>   }
+>   
+> @@ -499,6 +550,9 @@ static int __kvm_gmem_create(struct kvm *kvm, loff_t size, u64 flags)
+>   	/* Unmovable mappings are supposed to be marked unevictable as well. */
+>   	WARN_ON_ONCE(!mapping_unevictable(inode->i_mapping));
+>   
+> +	if (flags & GUEST_MEMFD_FLAG_NO_DIRECT_MAP)
+> +		mapping_set_no_direct_map(inode->i_mapping);
+> +
+>   	kvm_get_kvm(kvm);
+>   	gmem->kvm = kvm;
+>   	xa_init(&gmem->bindings);
+> @@ -523,6 +577,9 @@ int kvm_gmem_create(struct kvm *kvm, struct kvm_create_guest_memfd *args)
+>   	if (kvm_arch_supports_gmem_mmap(kvm))
+>   		valid_flags |= GUEST_MEMFD_FLAG_MMAP;
+>   
+> +	if (kvm_arch_gmem_supports_no_direct_map())
+> +		valid_flags |= GUEST_MEMFD_FLAG_NO_DIRECT_MAP;
+> +
+>   	if (flags & ~valid_flags)
+>   		return -EINVAL;
+>   
+> @@ -687,6 +744,8 @@ int kvm_gmem_get_pfn(struct kvm *kvm, struct kvm_memory_slot *slot,
+>   	if (!is_prepared)
+>   		r = kvm_gmem_prepare_folio(kvm, slot, gfn, folio);
+>   
+> +	kvm_gmem_folio_zap_direct_map(folio);
+> +
+>   	folio_unlock(folio);
+>   
+>   	if (!r)
+> diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
+> index 18f29ef93543..b5e702d95230 100644
+> --- a/virt/kvm/kvm_main.c
+> +++ b/virt/kvm/kvm_main.c
+> @@ -65,6 +65,7 @@
+>   #include <trace/events/kvm.h>
+>   
+>   #include <linux/kvm_dirty_ring.h>
+> +#include <linux/set_memory.h>
 
-Reviewed-by: Niklas Schnelle <schnelle@linux.ibm.com>
+Likely not required here.
+
+-- 
+Cheers
+
+David / dhildenb
+
 
