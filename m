@@ -1,91 +1,197 @@
-Return-Path: <kvm+bounces-58776-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-58765-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 98E06B9FFE7
-	for <lists+kvm@lfdr.de>; Thu, 25 Sep 2025 16:28:52 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id B6911B9FFA5
+	for <lists+kvm@lfdr.de>; Thu, 25 Sep 2025 16:26:18 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 984864C790A
-	for <lists+kvm@lfdr.de>; Thu, 25 Sep 2025 14:26:11 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4F9913B63D6
+	for <lists+kvm@lfdr.de>; Thu, 25 Sep 2025 14:22:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 734632C15AC;
-	Thu, 25 Sep 2025 14:25:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DEF5A234973;
+	Thu, 25 Sep 2025 14:22:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="T4q97snF"
 X-Original-To: kvm@vger.kernel.org
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9A1792D23A4
-	for <kvm@vger.kernel.org>; Thu, 25 Sep 2025 14:25:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
+Received: from mail-pg1-f202.google.com (mail-pg1-f202.google.com [209.85.215.202])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8778229B8DD
+	for <kvm@vger.kernel.org>; Thu, 25 Sep 2025 14:22:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758810324; cv=none; b=ocWazkZt0EcGHPL+JlcvuOVc7Ta1AsXO20s1LQzhAKTNskbKKvYc0fQEIYqd48ieXFAuPmqKquLPqHb3mV7M8LAAPdPFD812M0RfLB8J2nkti203ccHEoA6ypQb7tNDBE8ahSZqcPbfz5tvpqWTKSSr6/y9O21Vi7AAKrYbJQKk=
+	t=1758810155; cv=none; b=ZXUQRlqkmuUPCSlMR9logWbF3ypootzC9j2+4Iyvg9AA/vPwKWiCQozELNCEnCkCgP+cJTROywUFFTwXek8tUScU48odKOWp6qal+MBawVF6TxUgZ8oYXeCV6GADH0JIO8++Po7Ty0gd4RuW0OxMgOh4dZ4BslKEj2NhnGWJecQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758810324; c=relaxed/simple;
-	bh=A9jLbSqY15I9mE6Eiis2TaQufr1DSCVgPVJbTstp0dI=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=FsnQFLh4czU87ZMqzozjuhKzhOh6d3ebFF+WuL7Gd9gbNp3IJPXGLot/2Bxr4XHKwvUbGKLsdszWiFz4jQgGY25rRAnmW87LDgYyN8/20ZDtEmEZjhpMuJcizhp6nLsdEXxuarRkuqQY2A72r7NgZAiJKZRKia88o3gMFWp+s9E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 4AE091692;
-	Thu, 25 Sep 2025 07:25:15 -0700 (PDT)
-Received: from e124191.cambridge.arm.com (e124191.cambridge.arm.com [10.1.197.45])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 1DA603F694;
-	Thu, 25 Sep 2025 07:25:21 -0700 (PDT)
-From: Joey Gouly <joey.gouly@arm.com>
-To: kvm@vger.kernel.org
-Cc: alexandru.elisei@arm.com,
-	joey.gouly@arm.com,
-	andrew.jones@linux.dev,
-	kvmarm@lists.linux.dev,
-	Marc Zyngier <maz@kernel.org>,
-	Oliver Upton <oliver.upton@linux.dev>
-Subject: [kvm-unit-tests PATCH v3 10/10] arm64: add EL2 environment variable
-Date: Thu, 25 Sep 2025 15:19:58 +0100
-Message-Id: <20250925141958.468311-11-joey.gouly@arm.com>
-X-Mailer: git-send-email 2.25.1
-In-Reply-To: <20250925141958.468311-1-joey.gouly@arm.com>
-References: <20250925141958.468311-1-joey.gouly@arm.com>
+	s=arc-20240116; t=1758810155; c=relaxed/simple;
+	bh=D7B17HCKz9nacwG7ZH5m7J7E2r4Whs5KBEZsYzJQ9uY=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=A78RiWsbFSMNZDBN4ClhItgHGnK8+rGiRewGjhs+ozz1mYXDdR4W12wZnqcS9nyHmDmuRLaqDnoQR/HfZbrcoiQ2kucrSueScDlP1neBxmiDpEZIzjCXHFf8jJdEWEIFzzgzl641s9ygRVrtgK4mSouFArV9C27TXHTiGWGag9c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=T4q97snF; arc=none smtp.client-ip=209.85.215.202
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+Received: by mail-pg1-f202.google.com with SMTP id 41be03b00d2f7-b54a30515cfso1610149a12.1
+        for <kvm@vger.kernel.org>; Thu, 25 Sep 2025 07:22:33 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1758810152; x=1759414952; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=SblUb3K9vKSfuIkumtnWvH3DVTbw+wxBSl+ZySJr9Gg=;
+        b=T4q97snFYwFV/I/rP2KGop0IKIfGS+1zuH81GX5DFJO3Qtx1vN1lWqnhoMJNLPZ/SX
+         +mkLKxlLA9+gFbsZWyUN+v1/EZGqCcyejP5rC/sXixM/JkZaIILAbryD9GFy0CmLi6cE
+         3LtKRPU5oj77JeTKYK/H+qJDMKHb9ZWyyrmU/rMXsvT/iCHZjLGfzUepZhkPociBvV7P
+         blBdvByUFYRk7jHiqg/fICeKlTeA0btmqMoV5QJskIH3Ky8Ehc06UmfQGp7/qXlkeH8F
+         bNUwcj1rc1yVtgHiTlVtPODWt/VWLxapmW8/lgb9d9Z6Nd0RqNFEpgfRerdESIG7FMU/
+         wGFw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1758810152; x=1759414952;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=SblUb3K9vKSfuIkumtnWvH3DVTbw+wxBSl+ZySJr9Gg=;
+        b=djEIKmSsxkR/m/dYIZQEszPq36RbcsunfkJxXcENOIA+ozDyLqWMld6qruagj9Wp8O
+         pJKbhnQ+LT5xT3oZOySRW4DbdqpV+2KVS6+lie372VXRkHLzOlIhtznXexKgbi5PkWAB
+         oAESUOIHmpsTJ4zkGW6ki3guDnuKJC6T3VqhEhLzvRQKf6vCAyL/61PHtcwUQDoXvYL5
+         O//8fc7hFZ+3xrz/zmaB8n8VQriJ45OON4aX1bL6hqiiarPhJRNv+JKNblYPUshAYedF
+         iT4qE2SwLn+8AZbou/53uIJP6Jc+jnLVWBmymnI+fv2caGb2zf+G/OzZzfxMhAorkPE9
+         FhJQ==
+X-Forwarded-Encrypted: i=1; AJvYcCVdB9OEtp1S4tf/SQmlWEeVEGfsEAfoYl1S0R/6SNEQoA+RGKz0IfPHFpTAG/Q/VzxcoRE=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwsXN/ZZxUBrx7vESbH7L8PhDnQDBljlA3dppjWVmRSQdiOjn4m
+	Sdq1uBQYL3w+RBDq590xkEvTMbC/+UE78r5Drq7S5fRfmdqrL0FALygNdmUkr72qSsnlVOwffkE
+	vinLRUg==
+X-Google-Smtp-Source: AGHT+IH/f88NvvxTkAVG4DhhjQkTxFzTBsV5SbcgowW0+JrB9EElqsyS6+jWyWSmkD83IUsL47BQyHKSocQ=
+X-Received: from pjbmj16.prod.google.com ([2002:a17:90b:3690:b0:32e:c154:c2f6])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:5107:b0:32b:a311:d1ae
+ with SMTP id 98e67ed59e1d1-334567a1c56mr2743555a91.10.1758810152121; Thu, 25
+ Sep 2025 07:22:32 -0700 (PDT)
+Date: Thu, 25 Sep 2025 07:22:30 -0700
+In-Reply-To: <20250827175247.83322-9-shivankg@amd.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Mime-Version: 1.0
+References: <20250827175247.83322-2-shivankg@amd.com> <20250827175247.83322-9-shivankg@amd.com>
+Message-ID: <aNVQJqYLX17v-fsf@google.com>
+Subject: Re: [PATCH kvm-next V11 6/7] KVM: guest_memfd: Enforce NUMA mempolicy
+ using shared policy
+From: Sean Christopherson <seanjc@google.com>
+To: Shivank Garg <shivankg@amd.com>
+Cc: willy@infradead.org, akpm@linux-foundation.org, david@redhat.com, 
+	pbonzini@redhat.com, shuah@kernel.org, vbabka@suse.cz, brauner@kernel.org, 
+	viro@zeniv.linux.org.uk, dsterba@suse.com, xiang@kernel.org, chao@kernel.org, 
+	jaegeuk@kernel.org, clm@fb.com, josef@toxicpanda.com, 
+	kent.overstreet@linux.dev, zbestahu@gmail.com, jefflexu@linux.alibaba.com, 
+	dhavale@google.com, lihongbo22@huawei.com, lorenzo.stoakes@oracle.com, 
+	Liam.Howlett@oracle.com, rppt@kernel.org, surenb@google.com, mhocko@suse.com, 
+	ziy@nvidia.com, matthew.brost@intel.com, joshua.hahnjy@gmail.com, 
+	rakie.kim@sk.com, byungchul@sk.com, gourry@gourry.net, 
+	ying.huang@linux.alibaba.com, apopple@nvidia.com, tabba@google.com, 
+	ackerleytng@google.com, paul@paul-moore.com, jmorris@namei.org, 
+	serge@hallyn.com, pvorel@suse.cz, bfoster@redhat.com, vannapurve@google.com, 
+	chao.gao@intel.com, bharata@amd.com, nikunj@amd.com, michael.day@amd.com, 
+	shdhiman@amd.com, yan.y.zhao@intel.com, Neeraj.Upadhyay@amd.com, 
+	thomas.lendacky@amd.com, michael.roth@amd.com, aik@amd.com, jgg@nvidia.com, 
+	kalyazin@amazon.com, peterx@redhat.com, jack@suse.cz, hch@infradead.org, 
+	cgzones@googlemail.com, ira.weiny@intel.com, rientjes@google.com, 
+	roypat@amazon.co.uk, chao.p.peng@intel.com, amit@infradead.org, 
+	ddutile@redhat.com, dan.j.williams@intel.com, ashish.kalra@amd.com, 
+	gshan@redhat.com, jgowans@amazon.com, pankaj.gupta@amd.com, papaluri@amd.com, 
+	yuzhao@google.com, suzuki.poulose@arm.com, quic_eberman@quicinc.com, 
+	linux-bcachefs@vger.kernel.org, linux-btrfs@vger.kernel.org, 
+	linux-erofs@lists.ozlabs.org, linux-f2fs-devel@lists.sourceforge.net, 
+	linux-fsdevel@vger.kernel.org, linux-mm@kvack.org, 
+	linux-kernel@vger.kernel.org, linux-security-module@vger.kernel.org, 
+	kvm@vger.kernel.org, linux-kselftest@vger.kernel.org, 
+	linux-coco@lists.linux.dev
+Content-Type: text/plain; charset="us-ascii"
 
-This variable when set to 1 will cause QEMU/kvmtool to start at EL2.
----
- arm/run | 7 +++++++
- 1 file changed, 7 insertions(+)
+On Wed, Aug 27, 2025, Shivank Garg wrote:
+> @@ -26,6 +28,9 @@ static inline struct kvm_gmem_inode_info *KVM_GMEM_I(struct inode *inode)
+>  	return container_of(inode, struct kvm_gmem_inode_info, vfs_inode);
+>  }
+>  
+> +static struct mempolicy *kvm_gmem_get_pgoff_policy(struct kvm_gmem_inode_info *info,
+> +						   pgoff_t index);
+> +
+>  /**
+>   * folio_file_pfn - like folio_file_page, but return a pfn.
+>   * @folio: The folio which contains this index.
+> @@ -112,7 +117,25 @@ static int kvm_gmem_prepare_folio(struct kvm *kvm, struct kvm_memory_slot *slot,
+>  static struct folio *kvm_gmem_get_folio(struct inode *inode, pgoff_t index)
+>  {
+>  	/* TODO: Support huge pages. */
+> -	return filemap_grab_folio(inode->i_mapping, index);
+> +	struct mempolicy *policy;
+> +	struct folio *folio;
+> +
+> +	/*
+> +	 * Fast-path: See if folio is already present in mapping to avoid
+> +	 * policy_lookup.
+> +	 */
+> +	folio = __filemap_get_folio(inode->i_mapping, index,
+> +				    FGP_LOCK | FGP_ACCESSED, 0);
+> +	if (!IS_ERR(folio))
+> +		return folio;
+> +
+> +	policy = kvm_gmem_get_pgoff_policy(KVM_GMEM_I(inode), index);
+> +	folio = __filemap_get_folio_mpol(inode->i_mapping, index,
+> +					 FGP_LOCK | FGP_ACCESSED | FGP_CREAT,
+> +					 mapping_gfp_mask(inode->i_mapping), policy);
+> +	mpol_cond_put(policy);
+> +
+> +	return folio;
+>  }
+>  
+>  static void kvm_gmem_invalidate_begin(struct kvm_gmem *gmem, pgoff_t start,
+> @@ -372,8 +395,45 @@ static vm_fault_t kvm_gmem_fault_user_mapping(struct vm_fault *vmf)
+>  	return ret;
+>  }
+>  
+> +#ifdef CONFIG_NUMA
+> +static int kvm_gmem_set_policy(struct vm_area_struct *vma, struct mempolicy *mpol)
+> +{
+> +	struct inode *inode = file_inode(vma->vm_file);
+> +
+> +	return mpol_set_shared_policy(&KVM_GMEM_I(inode)->policy, vma, mpol);
+> +}
+> +
+> +static struct mempolicy *kvm_gmem_get_policy(struct vm_area_struct *vma,
+> +					     unsigned long addr, pgoff_t *pgoff)
+> +{
+> +	struct inode *inode = file_inode(vma->vm_file);
+> +
+> +	*pgoff = vma->vm_pgoff + ((addr - vma->vm_start) >> PAGE_SHIFT);
+> +	return mpol_shared_policy_lookup(&KVM_GMEM_I(inode)->policy, *pgoff);
+> +}
+> +
+> +static struct mempolicy *kvm_gmem_get_pgoff_policy(struct kvm_gmem_inode_info *info,
+> +						   pgoff_t index)
 
-diff --git a/arm/run b/arm/run
-index 858333fc..2a9c0de0 100755
---- a/arm/run
-+++ b/arm/run
-@@ -59,6 +59,10 @@ function arch_run_qemu()
- 		M+=",highmem=off"
- 	fi
- 
-+	if [ "$EL2" = "1" ]; then
-+		M+=",virtualization=on"
-+	fi
-+
- 	if ! $qemu $M -device '?' | grep -q virtconsole; then
- 		echo "$qemu doesn't support virtio-console for chr-testdev. Exiting."
- 		exit 2
-@@ -116,6 +120,9 @@ function arch_run_kvmtool()
- 	fi
- 
- 	command="$(timeout_cmd) $kvmtool run"
-+	if [ "$EL2" = "1" ]; then
-+		command+=" --nested"
-+	fi
- 	if [ "$HOST" = "aarch64" ] && [ "$ARCH" = "arm" ]; then
- 		run_test_status $command --kernel "$@" --aarch32
- 	else
--- 
-2.25.1
+I keep reading this is "page offset policy", as opposed to "policy given a page
+offset".  Another oddity that is confusing is that this helper explicitly does
+get_task_policy(current), while kvm_gmem_get_policy() lets the caller do that.
+The end result is the same, but I think it would be helpful for gmem to be
+internally consistent.
 
+If we have kvm_gmem_get_policy() use this helper, then we can kill two birds with
+one stone:
+
+static struct mempolicy *__kvm_gmem_get_policy(struct gmem_inode *gi,
+					       pgoff_t index)
+{
+	struct mempolicy *mpol;
+
+	mpol = mpol_shared_policy_lookup(&gi->policy, index);
+	return mpol ? mpol : get_task_policy(current);
+}
+
+static struct mempolicy *kvm_gmem_get_policy(struct vm_area_struct *vma,
+					     unsigned long addr, pgoff_t *pgoff)
+{
+	*pgoff = vma->vm_pgoff + ((addr - vma->vm_start) >> PAGE_SHIFT);
+
+	return __kvm_gmem_get_policy(GMEM_I(file_inode(vma->vm_file)), *pgoff);
+}
 
