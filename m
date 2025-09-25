@@ -1,46 +1,46 @@
-Return-Path: <kvm+bounces-58738-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-58730-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2F077B9EA84
-	for <lists+kvm@lfdr.de>; Thu, 25 Sep 2025 12:30:54 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2A6F4B9EA52
+	for <lists+kvm@lfdr.de>; Thu, 25 Sep 2025 12:29:40 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id CC83E4E34BF
-	for <lists+kvm@lfdr.de>; Thu, 25 Sep 2025 10:30:52 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D6DC32A1A17
+	for <lists+kvm@lfdr.de>; Thu, 25 Sep 2025 10:29:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1B7D52F0693;
-	Thu, 25 Sep 2025 10:29:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C97502EC085;
+	Thu, 25 Sep 2025 10:28:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="t/EkI5S0"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="e1J3WX54"
 X-Original-To: kvm@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2FBDA2EC0AF
-	for <kvm@vger.kernel.org>; Thu, 25 Sep 2025 10:29:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EA81B2EB87C
+	for <kvm@vger.kernel.org>; Thu, 25 Sep 2025 10:28:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758796154; cv=none; b=HS4XxW80rTCiARQcdspN0E7AfcI9RfYvjvGLf3OThAGwxmYAh83ueloE7zG2uJgdCHZPorkbhEh/hXWYG9AlZFlfblxyUj1b0hf/PaAFAjmULxZUICFxuuXPJZ8vcnGWaOOqt5b1Y1FOkwiomKqM2+ESs6GIXbcxpk3oJyj/YiQ=
+	t=1758796082; cv=none; b=Y/srqg4BrlrTVv2O7jBpJ3K5cyk8DrQVQULh+d/G7c/37P8i4aCiEpyA5HhU0liUNZYXUECia+JUUSZ+SzUajdfJhKHet/ZqsZEQc4iZMJljitgbh7yYhfVu/X74jR8HF2Smj9osYDe5pdau+IfBmDcytjZFW1ZVf/g6vSfRD7I=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758796154; c=relaxed/simple;
-	bh=DMy/sGWIKYOYAjfxscxSO7zrh4vdvWXqXux+y2OofO0=;
+	s=arc-20240116; t=1758796082; c=relaxed/simple;
+	bh=svkyMfF221tycwz6u0wk23zZbnYE0gSsTIe18ZQ5q+E=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=Lvt6OYsovZ4lKju1+bj0Ab1/+KU9Z1WukinQrSoXbpPFNvNpiLp/yEWs8mBpvC7jMx1jaU6byVEHcI6FSH2ZhKerpQ2dCqp52kK3Fxc+agFe4pq8Gvxues4+VOKMRqDbme9z8AFb9A2gwkdmE2hAbvjqEvnAFj/RvFGFkRJaZmA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=t/EkI5S0; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3920FC4CEF4;
-	Thu, 25 Sep 2025 10:29:12 +0000 (UTC)
+	 MIME-Version; b=u4BRbnxurujAnvhRlROIy9v08yTUHkbouxm901l8p4l69Eu2+66xV+tIe81ChWt5rmeMUodvPiAMJvwCP3Xgs5y4fLG4xz328667XOl1oICTFfE++vrfz2XA4gGYh6qA+qlqNwNHHFhI+U4NIqlwY/BRO1nFvvM9tJyKl0Dm6ZQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=e1J3WX54; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9E734C4CEF0;
+	Thu, 25 Sep 2025 10:28:00 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1758796153;
-	bh=DMy/sGWIKYOYAjfxscxSO7zrh4vdvWXqXux+y2OofO0=;
+	s=k20201202; t=1758796081;
+	bh=svkyMfF221tycwz6u0wk23zZbnYE0gSsTIe18ZQ5q+E=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=t/EkI5S0VXn22jZ0NfmyryodVuBzaev8zU0XMomxtV/FKlYA3SIrLqQfUKiCh1SDy
-	 BEh32ylP4yJC9JVOXLpL1uHrmJVLsn2LQ3VaKPUqMB2OKbkhyG0I1p7eyOJkTDDi2l
-	 VCI/uvNJ+NVVSLRXVmz/MwLPRxH9v//24gZ90b47KD+FPdkOGfdwK5aiEbxu4keZgx
-	 xuLOEN+ynbZUiiksD82Ah+HPk5R4IwzmLRv1oPB5MQzV1cDvVygHvUAcPzU6Byud4X
-	 4UaMsERSgKbV4CEamdxkjfoZczsiZWJIhs4MQWktPJKLs6SARDf8gWRHsXCSE98u1C
-	 lDun9ezTQ+pug==
+	b=e1J3WX54IiZkP+Cvgkur21qsisX7iqAzGnji2CGaxlYaXTTYfdwqcFAp0A4Wl4qZr
+	 JZRTsK57sTMWt3IGIxhsVow42zIo9g8AipcjLiQRCOr/8WoRRx/SRwTWKMAo0qwigH
+	 eS0xbK/tzyHC5BPA2KSMLm6BE81dbsZPm2LDLRheO/B5Qdo63x1WdYwg3z0344h5Ug
+	 y4IlhDG2lDOXE7Wn1ojKxsxJpiJeeUKzHII/0GcRREm/jOhI02OFNn3nQdRqcVdG1p
+	 S8/xXacECuaias/mvNUer/+xk0oTve6xn1lE/KtjS5EpuauMgnocMcjTtV5i6e+m00
+	 s2Kmd77zsrYsw==
 From: "Naveen N Rao (AMD)" <naveen@kernel.org>
 To: Paolo Bonzini <pbonzini@redhat.com>,
 	Eric Blake <eblake@redhat.com>,
@@ -55,9 +55,9 @@ Cc: qemu-devel <qemu-devel@nongnu.org>,
 	Zhao Liu <zhao1.liu@intel.com>,
 	Michael Roth <michael.roth@amd.com>,
 	Roy Hopkins <roy.hopkins@randomman.co.uk>
-Subject: [PATCH v2 1/9] target/i386: SEV: Generalize handling of SVM_SEV_FEAT_SNP_ACTIVE
-Date: Thu, 25 Sep 2025 15:47:30 +0530
-Message-ID: <6dd579655ec0be6183479f6bc75279117403c2b8.1758794556.git.naveen@kernel.org>
+Subject: [PATCH v2 2/9] target/i386: SEV: Ensure SEV features are only set through qemu cli or IGVM
+Date: Thu, 25 Sep 2025 15:47:31 +0530
+Message-ID: <9353c74e7d610780bc1638e60ae2bafb5e6012d0.1758794556.git.naveen@kernel.org>
 X-Mailer: git-send-email 2.51.0
 In-Reply-To: <cover.1758794556.git.naveen@kernel.org>
 References: <cover.1758794556.git.naveen@kernel.org>
@@ -69,88 +69,36 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Align with IGVM files providing SEV features with
-SVM_SEV_FEAT_SNP_ACTIVE set by setting the same when creating a
-sev-snp-guest object.
-
-Since KVM sets this feature itself, SVM_SEV_FEAT_SNP_ACTIVE is unset
-before KVM_SEV_INIT2 ioctl is invoked. Move that out of IGVM-specific
-section to common code.
-
-While at it, convert the existing SVM_SEV_FEAT_SNP_ACTIVE definition to
-use the BIT() macro for consistency with upcoming feature flags.
+In preparation for qemu being able to set SEV features through the cli,
+add a check to ensure that SEV features are not also set if using IGVM
+files.
 
 Reviewed-by: Tom Lendacky <thomas.lendacky@amd.com>
 Signed-off-by: Naveen N Rao (AMD) <naveen@kernel.org>
 ---
- target/i386/sev.h |  2 +-
- target/i386/sev.c | 24 +++++++++++++++++-------
- 2 files changed, 18 insertions(+), 8 deletions(-)
+ target/i386/sev.c | 9 +++++++++
+ 1 file changed, 9 insertions(+)
 
-diff --git a/target/i386/sev.h b/target/i386/sev.h
-index 9db1a802f6bb..102546b112d6 100644
---- a/target/i386/sev.h
-+++ b/target/i386/sev.h
-@@ -44,7 +44,7 @@ bool sev_snp_enabled(void);
- #define SEV_SNP_POLICY_SMT      0x10000
- #define SEV_SNP_POLICY_DBG      0x80000
- 
--#define SVM_SEV_FEAT_SNP_ACTIVE 1
-+#define SVM_SEV_FEAT_SNP_ACTIVE     BIT(0)
- 
- typedef struct SevKernelLoaderContext {
-     char *setup_data;
 diff --git a/target/i386/sev.c b/target/i386/sev.c
-index 1057b8ab2c60..2fb1268ed788 100644
+index 2fb1268ed788..ddd7c01f5a56 100644
 --- a/target/i386/sev.c
 +++ b/target/i386/sev.c
-@@ -319,6 +319,15 @@ sev_set_guest_state(SevCommonState *sev_common, SevState new_state)
-     sev_common->state = new_state;
- }
- 
-+static void sev_set_feature(SevCommonState *sev_common, uint64_t feature, bool set)
-+{
-+    if (set) {
-+        sev_common->sev_features |= feature;
-+    } else {
-+        sev_common->sev_features &= ~feature;
-+    }
-+}
-+
- static void
- sev_ram_block_added(RAMBlockNotifier *n, void *host, size_t size,
-                     size_t max_size)
-@@ -1897,15 +1906,15 @@ static int sev_common_kvm_init(ConfidentialGuestSupport *cgs, Error **errp)
+@@ -1901,6 +1901,15 @@ static int sev_common_kvm_init(ConfidentialGuestSupport *cgs, Error **errp)
+          * as SEV_STATE_UNINIT.
+          */
+         if (x86machine->igvm) {
++            /*
++             * Test only the user-set SEV features by masking out
++             * SVM_SEV_FEAT_SNP_ACTIVE which is set by default.
++             */
++            if (sev_common->sev_features & ~SVM_SEV_FEAT_SNP_ACTIVE) {
++                error_setg(errp, "%s: SEV features can't be specified when using IGVM files",
++                           __func__);
++                return -1;
++            }
+             if (IGVM_CFG_GET_CLASS(x86machine->igvm)
+                     ->process(x86machine->igvm, machine->cgs, true, errp) ==
                  -1) {
-                 return -1;
-             }
--            /*
--             * KVM maintains a bitmask of allowed sev_features. This does not
--             * include SVM_SEV_FEAT_SNP_ACTIVE which is set accordingly by KVM
--             * itself. Therefore we need to clear this flag.
--             */
--            args.vmsa_features = sev_common->sev_features &
--                                 ~SVM_SEV_FEAT_SNP_ACTIVE;
-         }
- 
-+        /*
-+         * KVM maintains a bitmask of allowed sev_features. This does not
-+         * include SVM_SEV_FEAT_SNP_ACTIVE which is set accordingly by KVM
-+         * itself. Therefore we need to clear this flag.
-+         */
-+        args.vmsa_features = sev_common->sev_features & ~SVM_SEV_FEAT_SNP_ACTIVE;
-+
-         ret = sev_ioctl(sev_common->sev_fd, KVM_SEV_INIT2, &args, &fw_error);
-         break;
-     }
-@@ -3127,6 +3136,7 @@ sev_snp_guest_instance_init(Object *obj)
- 
-     /* default init/start/finish params for kvm */
-     sev_snp_guest->kvm_start_conf.policy = DEFAULT_SEV_SNP_POLICY;
-+    sev_set_feature(SEV_COMMON(sev_snp_guest), SVM_SEV_FEAT_SNP_ACTIVE, true);
- }
- 
- /* guest info specific to sev-snp */
 -- 
 2.51.0
 
