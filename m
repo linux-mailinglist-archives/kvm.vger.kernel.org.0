@@ -1,238 +1,128 @@
-Return-Path: <kvm+bounces-58821-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-58822-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 23864BA155A
-	for <lists+kvm@lfdr.de>; Thu, 25 Sep 2025 22:14:10 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 16B80BA15AC
+	for <lists+kvm@lfdr.de>; Thu, 25 Sep 2025 22:30:21 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id CD67F740001
-	for <lists+kvm@lfdr.de>; Thu, 25 Sep 2025 20:14:08 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B30E83A32E9
+	for <lists+kvm@lfdr.de>; Thu, 25 Sep 2025 20:30:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C8D2931E8A7;
-	Thu, 25 Sep 2025 20:13:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7680D2E54A0;
+	Thu, 25 Sep 2025 20:30:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="EKrLCKJQ"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="caJlLDJk"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pj1-f73.google.com (mail-pj1-f73.google.com [209.85.216.73])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 758AB3128D7
-	for <kvm@vger.kernel.org>; Thu, 25 Sep 2025 20:13:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3892E19AD5C
+	for <kvm@vger.kernel.org>; Thu, 25 Sep 2025 20:30:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.73
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758831237; cv=none; b=rVxdXwmMcBSv/gt7XgMAuai8nR3/Grw8gcFC2UoXtqPpmwii3Tcl626JAQdaVy5k6041MpxrbpSkTUTg4zJnvKsriFoNs0ewjIUW1EHwZAvJQrF9hvZD208ttAKYyQl2QcdnrHfoddeC1krFhv3Iy9mU7HEs9wJtCjSIppi6yIg=
+	t=1758832211; cv=none; b=Y1r+55kud8hEk2PjY+t+PDqgM1D4YgPPzGVaL24C5C3AFrKQc7EENsiqzxzXhB6+gbBKvuoR1oeUCbvj5DQFHmy1bEVTmaVJBSZyUGzBuE5l+1RGgx8h3iKeg64JD7Cj6o5xzlY9QFAy+FhJVpLtdfbk3r67srmvSp2Nm6WZQ5o=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758831237; c=relaxed/simple;
-	bh=VRNU/SIeWDAUnJXorg9z/v07pFFZ+5txlBQH4Ycxe7w=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=mpfvhS1FxP7zDpZOBKZD+VAGQccr/Syldw82/Z013xSIi4r6tJUjy7rn2SZWbozoGBySB6bWtEFvMJIOYQmiMO3sZDRoxbJTGCwPsfhgobyO3SFTfRN1KNp83BBCsAZoLET9dvrVX0H2Uz/xN2Xp2WEN08X8wWOADulOb5sAFqg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=EKrLCKJQ; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1758831234;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-	bh=Jt934pWl+waL11DifZ1ogJABhsR0QZuMWPNAUgnNLvs=;
-	b=EKrLCKJQ12cjXaEl/zjPnLr56NfKlt/k/dIUyFWINoUIsJOr8wH8ozHk2SZHA35jsVHxQj
-	9y9a6e1ZVKVYtmZgCl+mKgX6K/j5gq4PEwh6zZ5gctQ0FKJQTYE3BwZV1itr39BQupI5NG
-	9ag7/LIRC9cWuQg2afPhCgfR0crTGYM=
-Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
- [209.85.221.72]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-641-oTLwDYBsPqamZ82ndjIz3g-1; Thu, 25 Sep 2025 16:13:53 -0400
-X-MC-Unique: oTLwDYBsPqamZ82ndjIz3g-1
-X-Mimecast-MFC-AGG-ID: oTLwDYBsPqamZ82ndjIz3g_1758831232
-Received: by mail-wr1-f72.google.com with SMTP id ffacd0b85a97d-40fd1b17d2bso491662f8f.1
-        for <kvm@vger.kernel.org>; Thu, 25 Sep 2025 13:13:52 -0700 (PDT)
+	s=arc-20240116; t=1758832211; c=relaxed/simple;
+	bh=L35q1vuBSDOl7MaYa1hpVyLoad727cO65oWhEkClfdI=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=hrWBZbXMmAxA8kjZ3hWdjU9bMlQgTc6e6Erp+wuKBReId61/Dy2/pMkGo8BVI2k3m5fd0XbnltZ0vGDV9Gy3b70+VxoYmCVPAUcY/kwJaZNA/4yMHhfH1fU+cd3xmD4CZXOJCw7tyHsvpvE64ZOD803q4kVXsmyF/M3VqWtg7Jc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--jmattson.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=caJlLDJk; arc=none smtp.client-ip=209.85.216.73
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--jmattson.bounces.google.com
+Received: by mail-pj1-f73.google.com with SMTP id 98e67ed59e1d1-32ec69d22b2so1334302a91.1
+        for <kvm@vger.kernel.org>; Thu, 25 Sep 2025 13:30:10 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1758832209; x=1759437009; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=fUhQfuZQ49Qk6kF+H3E3oMnEtXpR0FIyehqJ5ObyXOo=;
+        b=caJlLDJkqQY03IDpNtHokSJD4TSbs7zcBpZXiPbb+Fycv+T6Il7uL5CG5hckzbmtxD
+         PqZMG+Z/VBKu9fS0oRGjgU1p5G3963eF7dF/8S6WvujgY5OMxsJMyOHGQ/2UXFbZWUFh
+         J59BLUdw1F1o7w2lkvOCI9TpXkinNUI9tQyvtm/iKpLr1lYeTh7XANLXky/TUZJ35LB7
+         ee/iva4Mn+VAPkoe1gSWTlfGf5IfycNzOl1GAwvq/CTRXZjxh26IhHlQgAkxhe5AENyl
+         JY4dZ+6wt8I3pRRq+USJXeLSx3k89U69vFBeHyAX43J+LN02GCagxbkREH6/R0uAwNhc
+         2BQA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1758831232; x=1759436032;
-        h=content-transfer-encoding:in-reply-to:autocrypt:content-language
-         :from:references:cc:to:subject:user-agent:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=Jt934pWl+waL11DifZ1ogJABhsR0QZuMWPNAUgnNLvs=;
-        b=BEM0S4K7iNoLBmXP23c4X+RAaV9V97IMFTjdug8uZ+XYhhhG8ViQ/VeTpgp05QLs9w
-         +GptUVhU2ZSF38AumpJuTC18pCWiaXGuO2TPuBgXoKHHgWzUp3IyNTL9Plh725zsuRib
-         eB4DE4/mS/8nORB5kh7zYms9ZIA3g/JgUarfPj+bOktSlR4ZB27p6IMwoWqK8wljwvPx
-         ISTjqOriOEIPC0T3NyRJ3pzHbC9S3HlfIZRJ8GywLlrpWdlw2oYJrgyp4slL6/Ex0/Hj
-         jHZ54qKsLXCGvLPimBTmTDeiE70trTaGlVjpU4nR9FsGIoTWLM/YSo3daED/8aAK5skJ
-         9V2A==
-X-Forwarded-Encrypted: i=1; AJvYcCVHSdjcPJXsHB0Yti684SvHXVXKlmpubSSiIdjHBvAeMERI5NrcZ/hHp6nTmuMqb/H2m8w=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxnlA+6lv1GFlL9oAEh1EeIPOdS+3QR9F6fGBmXcyF1GGJNdpv5
-	lO+3ISfe6D4a+KS8oxPaopR12Bs/KIDVP/8mLD4zDhrbV8+YIXtWspDul7NVetfbe8BxLbNlHov
-	Ylmq0evnBl/jKfF5ZLJPInXwLaspt04eEKGATXwMeNb3hslXYOaYTUw==
-X-Gm-Gg: ASbGnctZORVpcwLtNJSFjJjwqMGbOtkFMbKPwHaWNIpBFMOVrRW8RWY2ieO/35vRT1t
-	Xx7wfDLJwy5yFHcch0eRMfIJzY1POq+DF8rk0hsqGnwu21wgot5M9kDkCnDqAtt3enVSlMdackX
-	NKhHP/Yj8tq2HLT2BIUVzN6TzVDov5kPKu6Ij9W29ijg2fkLXHrfyALGF6LSrh8HpODGVb1WSnU
-	jyK7SANIw08EUHnisA2CsXNClgWLUz1iSY9CmhUiB6vFM5Jtds0gnrkw8jKnaNEu+fJ3ItXNutM
-	HDA1oVPXNv3NfErKUkwfpq7DL8ERGVBOH6k46CNaYQHCTRnhwQ2EQIVZWAPsKEzhnrPJovQIZ/+
-	OkpMBYJe1WpumL4Zvvl1pRo+1zdXF8N8kNPZITDU0OHzCutgcUsVafjfvdhd9mKvg2X74
-X-Received: by 2002:a05:6000:2304:b0:3ea:bed8:7040 with SMTP id ffacd0b85a97d-40e46ad00b9mr4712203f8f.25.1758831231669;
-        Thu, 25 Sep 2025 13:13:51 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IGFVVNLdXy4p/tTQ+NT/ePAfr5Q0kgcDHv5gQvTT3sYR20nows4MCsqZEQWfZcFoJRiSMKYvg==
-X-Received: by 2002:a05:6000:2304:b0:3ea:bed8:7040 with SMTP id ffacd0b85a97d-40e46ad00b9mr4712175f8f.25.1758831231212;
-        Thu, 25 Sep 2025 13:13:51 -0700 (PDT)
-Received: from ?IPV6:2003:d8:2f3f:f800:c101:5c9f:3bc9:3d08? (p200300d82f3ff800c1015c9f3bc93d08.dip0.t-ipconnect.de. [2003:d8:2f3f:f800:c101:5c9f:3bc9:3d08])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-40fc82f2ff6sm4094888f8f.56.2025.09.25.13.13.48
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 25 Sep 2025 13:13:50 -0700 (PDT)
-Message-ID: <c79173d8-6f18-40fa-9621-e691990501e4@redhat.com>
-Date: Thu, 25 Sep 2025 22:13:47 +0200
+        d=1e100.net; s=20230601; t=1758832209; x=1759437009;
+        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=fUhQfuZQ49Qk6kF+H3E3oMnEtXpR0FIyehqJ5ObyXOo=;
+        b=R3vZhWd95puRvhoXs1VS6XYlRA45mv5KCTkFVdFq6QRp3ptui4CBWGSQ5uoCf4usgW
+         IYVAPkDb2XTZGM8Rc90UVxqYyZvhDaXsb+m+4SNOlQPDSQBLIBhqTVvgFaRSMErkGamL
+         4HbFUtzRiLawtYhONPv5Dvoa4P/9ji4bl2XU7GUsI6NPXypx27F24hW3YVvFmYuhjIhh
+         PI2M+LcyeOUG2Y34nxaK0iptcQpZUjRDNkeV7qd1iWJBHE8xR4wfHuMwB74mOb8SQbwE
+         RsatSFuw+z+citG4RF3Gc14bleSXrBqm4TjuISeSA8Ji4YU45xnVQxRGo7FMsXmvx/pe
+         uh4g==
+X-Forwarded-Encrypted: i=1; AJvYcCXaoP0b479R/m1w+AuJEje7HIjOtXGb998zJ7roN22/r5yhCCrw39QnVc/nHv+t3p1JvAk=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yzy1DROf15jVA6lE0A3uViJOQWnbLcAiv+3UyuKgn0uAh/2U9Nd
+	gThN3NwElRWywtD6yNCTpUpqxALOrCkem4zxfaKpartCwKWzzGXZr9Jq/2/4K0HKbQ9Zj/OnbsB
+	4ujtFQuEIOOWauA==
+X-Google-Smtp-Source: AGHT+IEpADWjBInJevT1rnwxJnYk5LLarY2R9oiv6N/HEC1VxtOmQ+GZ+gaxN23ts7uJlWq6TnuMyA6b9Xczsw==
+X-Received: from pjot21.prod.google.com ([2002:a17:90a:9515:b0:32e:6111:40ac])
+ (user=jmattson job=prod-delivery.src-stubby-dispatcher) by
+ 2002:a17:90a:e710:b0:32e:ae12:9d32 with SMTP id 98e67ed59e1d1-3342a22beffmr4772179a91.11.1758832209587;
+ Thu, 25 Sep 2025 13:30:09 -0700 (PDT)
+Date: Thu, 25 Sep 2025 13:29:18 -0700
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v7 06/12] KVM: guest_memfd: add module param for disabling
- TLB flushing
-To: Dave Hansen <dave.hansen@intel.com>, "Roy, Patrick" <roypat@amazon.co.uk>
-Cc: "pbonzini@redhat.com" <pbonzini@redhat.com>,
- "corbet@lwn.net" <corbet@lwn.net>, "maz@kernel.org" <maz@kernel.org>,
- "oliver.upton@linux.dev" <oliver.upton@linux.dev>,
- "joey.gouly@arm.com" <joey.gouly@arm.com>,
- "suzuki.poulose@arm.com" <suzuki.poulose@arm.com>,
- "yuzenghui@huawei.com" <yuzenghui@huawei.com>,
- "catalin.marinas@arm.com" <catalin.marinas@arm.com>,
- "will@kernel.org" <will@kernel.org>, "tglx@linutronix.de"
- <tglx@linutronix.de>, "mingo@redhat.com" <mingo@redhat.com>,
- "bp@alien8.de" <bp@alien8.de>,
- "dave.hansen@linux.intel.com" <dave.hansen@linux.intel.com>,
- "x86@kernel.org" <x86@kernel.org>, "hpa@zytor.com" <hpa@zytor.com>,
- "luto@kernel.org" <luto@kernel.org>,
- "peterz@infradead.org" <peterz@infradead.org>,
- "willy@infradead.org" <willy@infradead.org>,
- "akpm@linux-foundation.org" <akpm@linux-foundation.org>,
- "lorenzo.stoakes@oracle.com" <lorenzo.stoakes@oracle.com>,
- "Liam.Howlett@oracle.com" <Liam.Howlett@oracle.com>,
- "vbabka@suse.cz" <vbabka@suse.cz>, "rppt@kernel.org" <rppt@kernel.org>,
- "surenb@google.com" <surenb@google.com>, "mhocko@suse.com"
- <mhocko@suse.com>, "song@kernel.org" <song@kernel.org>,
- "jolsa@kernel.org" <jolsa@kernel.org>, "ast@kernel.org" <ast@kernel.org>,
- "daniel@iogearbox.net" <daniel@iogearbox.net>,
- "andrii@kernel.org" <andrii@kernel.org>,
- "martin.lau@linux.dev" <martin.lau@linux.dev>,
- "eddyz87@gmail.com" <eddyz87@gmail.com>,
- "yonghong.song@linux.dev" <yonghong.song@linux.dev>,
- "john.fastabend@gmail.com" <john.fastabend@gmail.com>,
- "kpsingh@kernel.org" <kpsingh@kernel.org>, "sdf@fomichev.me"
- <sdf@fomichev.me>, "haoluo@google.com" <haoluo@google.com>,
- "jgg@ziepe.ca" <jgg@ziepe.ca>, "jhubbard@nvidia.com" <jhubbard@nvidia.com>,
- "peterx@redhat.com" <peterx@redhat.com>, "jannh@google.com"
- <jannh@google.com>, "pfalcato@suse.de" <pfalcato@suse.de>,
- "shuah@kernel.org" <shuah@kernel.org>, "seanjc@google.com"
- <seanjc@google.com>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
- "linux-doc@vger.kernel.org" <linux-doc@vger.kernel.org>,
- "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
- "linux-arm-kernel@lists.infradead.org"
- <linux-arm-kernel@lists.infradead.org>,
- "kvmarm@lists.linux.dev" <kvmarm@lists.linux.dev>,
- "linux-fsdevel@vger.kernel.org" <linux-fsdevel@vger.kernel.org>,
- "linux-mm@kvack.org" <linux-mm@kvack.org>,
- "bpf@vger.kernel.org" <bpf@vger.kernel.org>,
- "linux-kselftest@vger.kernel.org" <linux-kselftest@vger.kernel.org>,
- "Cali, Marco" <xmarcalx@amazon.co.uk>,
- "Kalyazin, Nikita" <kalyazin@amazon.co.uk>,
- "Thomson, Jack" <jackabt@amazon.co.uk>,
- "derekmn@amazon.co.uk" <derekmn@amazon.co.uk>,
- "tabba@google.com" <tabba@google.com>,
- "ackerleytng@google.com" <ackerleytng@google.com>
-References: <20250924151101.2225820-4-patrick.roy@campus.lmu.de>
- <20250924152214.7292-1-roypat@amazon.co.uk>
- <20250924152214.7292-3-roypat@amazon.co.uk>
- <e25867b6-ffc0-4c7c-9635-9b3f47b186ca@intel.com>
- <c1875a54-0c87-450f-9370-29e7ec4fea3d@redhat.com>
- <82bff1c4-987f-46cb-833c-bd99eaa46e7a@intel.com>
-From: David Hildenbrand <david@redhat.com>
-Content-Language: en-US
-Autocrypt: addr=david@redhat.com; keydata=
- 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
- qIws/H2t
-In-Reply-To: <82bff1c4-987f-46cb-833c-bd99eaa46e7a@intel.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.51.0.570.gb178f27e6d-goog
+Message-ID: <20250925202937.2734175-1-jmattson@google.com>
+Subject: [PATCH] KVM: x86: Advertise EferLmsleUnsupported to userspace
+From: Jim Mattson <jmattson@google.com>
+To: Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>, 
+	Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org, 
+	"H. Peter Anvin" <hpa@zytor.com>, Sean Christopherson <seanjc@google.com>, Paolo Bonzini <pbonzini@redhat.com>, 
+	Pawan Gupta <pawan.kumar.gupta@linux.intel.com>, Tom Lendacky <thomas.lendacky@amd.com>, 
+	Manali Shukla <manali.shukla@amd.com>, Yosry Ahmed <yosry.ahmed@linux.dev>, 
+	Sohil Mehta <sohil.mehta@intel.com>, "Xin Li (Intel)" <xin@zytor.com>, linux-kernel@vger.kernel.org, 
+	kvm@vger.kernel.org
+Cc: Jim Mattson <jmattson@google.com>
+Content-Type: text/plain; charset="UTF-8"
 
-On 25.09.25 21:59, Dave Hansen wrote:
-> On 9/25/25 12:20, David Hildenbrand wrote:
->> On 25.09.25 20:27, Dave Hansen wrote:
->>> On 9/24/25 08:22, Roy, Patrick wrote:
->>>> Add an option to not perform TLB flushes after direct map manipulations.
->>>
->>> I'd really prefer this be left out for now. It's a massive can of worms.
->>> Let's agree on something that works and has well-defined behavior before
->>> we go breaking it on purpose.
->>
->> May I ask what the big concern here is?
-> 
-> It's not a _big_ concern. 
+CPUID.80000008H:EBX.EferLmsleUnsupported[bit 20] is a defeature
+bit. When this bit is clear, EFER.LMSLE is supported. When this bit is
+set, EFER.LMLSE is unsupported. KVM has never supported EFER.LMSLE, so
+it cannot support a 0-setting of this bit.
 
-Oh, I read "can of worms" and thought there is something seriously 
-problematic :)
+Set the bit in KVM_GET_SUPPORTED_CPUID to advertise the unavailability
+of EFER.LMSLE to userspace.
 
-> I just think we want to start on something
-> like this as simple, secure, and deterministic as possible.
+Signed-off-by: Jim Mattson <jmattson@google.com>
+---
+ arch/x86/include/asm/cpufeatures.h | 1 +
+ arch/x86/kvm/cpuid.c               | 1 +
+ 2 files changed, 2 insertions(+)
 
-Yes, I agree. And it should be the default. Less secure would have to be 
-opt-in and documented thoroughly.
-
-> 
-> Let's say that with all the unmaps that load_unaligned_zeropad() faults
-> start to bite us. It'll take longer to find them if the TLB isn't flushed.
-> 
-> Basically, it'll make the bad things happen sooner rather than later.
-
-Agreed.
-
+diff --git a/arch/x86/include/asm/cpufeatures.h b/arch/x86/include/asm/cpufeatures.h
+index 751ca35386b0..f9b593721917 100644
+--- a/arch/x86/include/asm/cpufeatures.h
++++ b/arch/x86/include/asm/cpufeatures.h
+@@ -338,6 +338,7 @@
+ #define X86_FEATURE_AMD_STIBP		(13*32+15) /* Single Thread Indirect Branch Predictors */
+ #define X86_FEATURE_AMD_STIBP_ALWAYS_ON	(13*32+17) /* Single Thread Indirect Branch Predictors always-on preferred */
+ #define X86_FEATURE_AMD_IBRS_SAME_MODE	(13*32+19) /* Indirect Branch Restricted Speculation same mode protection*/
++#define X86_FEATURE_EFER_LMSLE_MBZ	(13*32+20) /* EFER.LMSLE must be zero */
+ #define X86_FEATURE_AMD_PPIN		(13*32+23) /* "amd_ppin" Protected Processor Inventory Number */
+ #define X86_FEATURE_AMD_SSBD		(13*32+24) /* Speculative Store Bypass Disable */
+ #define X86_FEATURE_VIRT_SSBD		(13*32+25) /* "virt_ssbd" Virtualized Speculative Store Bypass Disable */
+diff --git a/arch/x86/kvm/cpuid.c b/arch/x86/kvm/cpuid.c
+index e2836a255b16..e0426e057774 100644
+--- a/arch/x86/kvm/cpuid.c
++++ b/arch/x86/kvm/cpuid.c
+@@ -1096,6 +1096,7 @@ void kvm_set_cpu_caps(void)
+ 		F(AMD_STIBP),
+ 		F(AMD_STIBP_ALWAYS_ON),
+ 		F(AMD_IBRS_SAME_MODE),
++		EMULATED_F(EFER_LMSLE_MBZ),
+ 		F(AMD_PSFD),
+ 		F(AMD_IBPB_RET),
+ 	);
 -- 
-Cheers
-
-David / dhildenb
+2.51.0.570.gb178f27e6d-goog
 
 
