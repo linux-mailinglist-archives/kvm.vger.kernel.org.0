@@ -1,139 +1,216 @@
-Return-Path: <kvm+bounces-58714-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-58715-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7A7B0B9D851
-	for <lists+kvm@lfdr.de>; Thu, 25 Sep 2025 08:04:45 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id A6B63B9DBD9
+	for <lists+kvm@lfdr.de>; Thu, 25 Sep 2025 09:00:49 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id A62151BC118D
-	for <lists+kvm@lfdr.de>; Thu, 25 Sep 2025 06:05:07 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 27C5419C5EE6
+	for <lists+kvm@lfdr.de>; Thu, 25 Sep 2025 07:01:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C1A412E7BB3;
-	Thu, 25 Sep 2025 06:04:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8B32A2E8E04;
+	Thu, 25 Sep 2025 07:00:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="hddF+tjk"
+	dkim=pass (2048-bit key) header.d=brainfault-org.20230601.gappssmtp.com header.i=@brainfault-org.20230601.gappssmtp.com header.b="hBWYHRwQ"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-il1-f171.google.com (mail-il1-f171.google.com [209.85.166.171])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 553DA2E6CCB
-	for <kvm@vger.kernel.org>; Thu, 25 Sep 2025 06:04:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E12B41CAA92
+	for <kvm@vger.kernel.org>; Thu, 25 Sep 2025 07:00:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.171
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758780264; cv=none; b=gIN+mDwdWvOCIER9yeGx4zvEm5XgHkjjERfqzoG4zJJp2RcNYtQuci3fVrzx+OG+UrUkVZNqekLeNhTI8UAYu0/1acJ7Reu86ASacKc4vbTvF9SMIFTAIIBA7hrLqFd8KJZLPzaNGWgXN2b5hohlzcxlt+vw4cms5KF2WT7X93Q=
+	t=1758783641; cv=none; b=TzjGSj+1KE9v3v5IDbrjtA6KDVUCbgyREobuQeYuD2DxEBCzcjy/c4W0pOwZAEk1ClDLpWcVzOY1gOxzTvxt6YQmaihK+B3AitSYuPbMlRg7M5xt4Bv5nsv6iv+4Cdru4iuvC1tZ2z2+7C2sBba2AoSV9uLMckTo5/bJnNwbXl0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758780264; c=relaxed/simple;
-	bh=o0VNqoePQ9Fxc7vePL+KVWDFK3PNoSh+8m9moiHOP0E=;
-	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
-	 Content-Disposition; b=hpsbBQlDRgfTCu5XdyXpyu7PgEkGgPxw67LdUzcHEBUAbsaBJ9gvenxmVEfrtZgCrIil9uP9ykGZQqr7rymGHppG46nyUSUKWwuvqhBxJQyWevotQsDXstrZ9KW3DqDZ3StoqIuOwIkQkY/25oMztY9vS/1qNqVuw8QmfI1GDYQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=hddF+tjk; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1758780259;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type;
-	bh=aFGTlM/AfVM6UoD7+6D0K+JKl8i8C5klHuPNmVycESE=;
-	b=hddF+tjkvXa9V9wLegZHVDQXStTTCN2W3YTQxQQjB4sdo8Pyjwn0bv3f6dk7CjKe6cjV5O
-	ge37qLRCYfRsedShoAxs6fr2/5jpMFmIaqaZBY2cCg4vRpWqbS6Q4nOs30FCkgmYYFr167
-	+8B+dL+NjeE846rK6zevoalV7QzBKY8=
-Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
- [209.85.221.71]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-34-QhTsRZaUOpubcD2X41qIWQ-1; Thu, 25 Sep 2025 02:04:12 -0400
-X-MC-Unique: QhTsRZaUOpubcD2X41qIWQ-1
-X-Mimecast-MFC-AGG-ID: QhTsRZaUOpubcD2X41qIWQ_1758780251
-Received: by mail-wr1-f71.google.com with SMTP id ffacd0b85a97d-3ecdf7b5c46so324311f8f.2
-        for <kvm@vger.kernel.org>; Wed, 24 Sep 2025 23:04:12 -0700 (PDT)
+	s=arc-20240116; t=1758783641; c=relaxed/simple;
+	bh=oQuoD2aN3UlYm8Bjag3CGmhu/Y5HvkMpKqzWrQNnn8s=;
+	h=MIME-Version:From:Date:Message-ID:Subject:To:Cc:Content-Type; b=QjbKs1/Sv3VHwexNrF42y8O6DkpgORM/wjmYPpct8ehxdyMnfKEebVr7MgZ2M+xCJws161QaVBgGIbPNfk0XPLOaRygnC3wM2x61LcJpULWS7K9WZiz6VHg3BG96LRGm3yZTIST9zI+yqqPZCUF4USBnj3xrF98JR9Zck1Zm6xg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=brainfault.org; spf=none smtp.mailfrom=brainfault.org; dkim=pass (2048-bit key) header.d=brainfault-org.20230601.gappssmtp.com header.i=@brainfault-org.20230601.gappssmtp.com header.b=hBWYHRwQ; arc=none smtp.client-ip=209.85.166.171
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=brainfault.org
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=brainfault.org
+Received: by mail-il1-f171.google.com with SMTP id e9e14a558f8ab-425715aeccdso3109525ab.2
+        for <kvm@vger.kernel.org>; Thu, 25 Sep 2025 00:00:39 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=brainfault-org.20230601.gappssmtp.com; s=20230601; t=1758783639; x=1759388439; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=MmyT2DQ8FjwtnIvToh+8LVARVJ88hd64Mv9gPij29H0=;
+        b=hBWYHRwQwkG5EKuhiYFywjEs9mBsK2EDhuKYJ5LdCeZ1K93b/5HJ/VoIfhAWkYPbuM
+         MxGxsKMgMuH3HE0d4RkhGeI0noCjBMM3orHwzjpt/4Ajm6Ruh0yGxtvpIizaAqDQf7Yk
+         IFDdjI/lpktdZZ/s2tErqxDmtNDbrWnojayS3Rw4dRkxnQFvY4eajQGTsX9vv9kkmJcs
+         tptyckWKSp3uSTiJAFNrDQXH6M+ExUVjc9439Ao1Ml5kny6OsWumRC+2/eGrN+dcuyeo
+         IWaVxArKqwz4GB7tJW9y3Pz8SjnSWemART/6kstFYF62OLEE3xAJCHG0xH2gJerJq5IL
+         mT2g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1758780251; x=1759385051;
-        h=content-disposition:mime-version:message-id:subject:cc:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=aFGTlM/AfVM6UoD7+6D0K+JKl8i8C5klHuPNmVycESE=;
-        b=cQljlm4oNLRzhyiQK5Zm/Z8hOb0o2czaJtSBG+DbQZBMO4iVDLqrpWFdr7FmYlzf/d
-         aVS5IpFj0jiWxtOoMfGPs/YZi39AuatZfKx7LVE9Jqo5XnGbCZ44VT1a45o9XCg7IAy7
-         AeS6li4U4IYCLRWT/eBixwDSb6d8XoyDeRtljjcZtp2bOr3TEgRfeoTefosHxnBlEcDu
-         czfMDF0uAWqXXG63vxkZfD2mi2B+UnQEI+SRUtkddESo4/CWa13zMPQd18VrylZYlvsR
-         EcIJCTo5Q94V2Z+0mbQxWtanoxv5nFbHZdgKM/DSeNMbs79xtwSIEl3rQmsQi5F9jjsf
-         QaLg==
-X-Forwarded-Encrypted: i=1; AJvYcCUv7bs5H/jxEg5sFEAe8h1VjVL6EP0K0bX7Rm3b+23NLr1Mhph8qZ//ZZn4ZJOVHA36Tbo=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyhMEH/dS+LrkuhkLp4ZC5xSltZFWH0Y9KBqoi0tqzAIO1ktLy4
-	Q5MYwrtNOZQD0NuEcA+AyVVGJ1kViCvEIkwcpyAu50GnYKSk1/7rBHxOjP3vaUjvw+L/X6K09P+
-	UIJrnUES0lMiGzTpxHLQdO2vdfzL6z3DUnuN34ahcKvo/RvyITVVL7w==
-X-Gm-Gg: ASbGncv/Aww5z3vijVcrw4qJQj7Z+INTEBFzzqDGK60Vr3jUTNgY9YUDmPwzzjUUCsA
-	I/bpwkPSG3Z+oIyOXJub9dltdKgrn7QOzfv9ou9pRie16NxzJ/U6KMKpl2C3brr/OPynWVzZ45U
-	a/7z4MkPADykb8rQPzTn3eW6tsWlxw5LTC6O5BpM8fvcVJUv8VJjMVd7HqSVXpa08ADG3DAPRiy
-	p7+ClgxkT7AdamNeaF98oWjR8kLuILZ1hiy1aEFQxbOl3Dvo/Pck6tA+94qGJvKaY58wTNaNPwR
-	uTN00LtIinMWsGYkxYGbRDZpUL5CY4W1TA==
-X-Received: by 2002:a05:6000:2912:b0:3eb:f3de:1a87 with SMTP id ffacd0b85a97d-40e49e725f0mr2176048f8f.56.1758780250920;
-        Wed, 24 Sep 2025 23:04:10 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IEzXROWH0HheOoR3C9U+J8DhuDXRcMrs5JaiB8XcConfDaf/URbl6oeL/NMdqI1Vf+S1XrqWA==
-X-Received: by 2002:a05:6000:2912:b0:3eb:f3de:1a87 with SMTP id ffacd0b85a97d-40e49e725f0mr2176012f8f.56.1758780250483;
-        Wed, 24 Sep 2025 23:04:10 -0700 (PDT)
-Received: from redhat.com ([2a0d:6fc0:1538:2200:56d4:5975:4ce3:246f])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-40fc5603365sm1463946f8f.37.2025.09.24.23.04.08
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 24 Sep 2025 23:04:09 -0700 (PDT)
-Date: Thu, 25 Sep 2025 02:04:08 -0400
-From: "Michael S. Tsirkin" <mst@redhat.com>
-To: linux-kernel@vger.kernel.org
-Cc: zhang jiao <zhangjiao2@cmss.chinamobile.com>,
-	Jason Wang <jasowang@redhat.com>,
-	Eugenio =?utf-8?B?UMOpcmV6?= <eperezma@redhat.com>,
-	kvm@vger.kernel.org, virtualization@lists.linux.dev,
-	netdev@vger.kernel.org
-Subject: [PATCH net] vhost: vringh: Fix copy_to_iter return value check
-Message-ID: <cd637504a6e3967954a9e80fc1b75e8c0978087b.1758723310.git.mst@redhat.com>
+        d=1e100.net; s=20230601; t=1758783639; x=1759388439;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=MmyT2DQ8FjwtnIvToh+8LVARVJ88hd64Mv9gPij29H0=;
+        b=iIuPpBXUbnX+m1jpU7ehbDj5zJJWInfqyJJbyD4UjKZLXj8rBvzHiAfAJaIQ9scn+4
+         lexG5rIU62i29zpmZVp5W9lzweIczZ2shMCPGN57r+V2/Vb4C4f/FNLTY3ojsoiOHih/
+         m2TkuqEY934DuSzNcWpjAVsxqvfeV6fkpMWHt79uG3dQ4p26PwjbZfgJKwhGRYANPy97
+         i3sK74PTw2My258EFG5cjpc0fe6kkWH5Zlr+NukJeFptBTUace2A6BY/hUcss0Dwd+tU
+         AMsc5XzryrprFhzUFt1na51zaYegXaHPYUd1QpkfbiMX6LPPE99oVKy1kSxT3BZAT92Q
+         cWNg==
+X-Forwarded-Encrypted: i=1; AJvYcCVDMIsZvzeNPmLmI6ZR4fK3ZOx9MyKUd/g2oGB/6dk2xqqqyRAvVd7UNZ4YBEFkvknYTKQ=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzBMc98w1r+WHW/G5hPgRR2MA1w4pt01tEe9WirDed/XMa4CC4+
+	in9Jix4yxHSy+tH5JKs1pKWE3OKYcIGjx0ojtQUKoX72kLQPjlMjCK7i4Z0YgYRS62ThoJ/y13D
+	tc0VlstIPOb+zwfBKUMZLNcSI/Jzl61pyYHh0PRTF7A==
+X-Gm-Gg: ASbGncu248suBOxkS+vIcxhW/sDC8xi08zN3gSVojoXZuJuWnpDrrA2epZj8bO5iB1/
+	+UeGP1OvkQWSfdp8ArK8wYIaSTdhgOIgifL4ZHaIVQmyHVnkRVA18IRC/AZP5wbQpucCGbknSkd
+	UJl8wJXfKMfhRP1Qssgzm6Qu2K/GfybzAoJ10iAjwTK3kfmj7/p3xM2Apid7esbDdJyKkftQt4n
+	uocwg4sDwWCOfRVWeq8qrvhjUhMFs+NCq6kYQ==
+X-Google-Smtp-Source: AGHT+IHZRb9CK/OmyBqOaD/n1EoZIqcM4pae02poytMs04HVBkLjaVLzPJP9OpaAHZ4GqnnqxcX2Onw45K5JIuhAveI=
+X-Received: by 2002:a05:6e02:3cc1:b0:424:8d44:a267 with SMTP id
+ e9e14a558f8ab-4259566089fmr35271475ab.29.1758783638175; Thu, 25 Sep 2025
+ 00:00:38 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-X-Mailer: git-send-email 2.27.0.106.g8ac3dc51b1
-X-Mutt-Fcc: =sent
+From: Anup Patel <anup@brainfault.org>
+Date: Thu, 25 Sep 2025 12:30:26 +0530
+X-Gm-Features: AS18NWBoHJSdz0RKFWvagHmEkQT_MCXcW0bn11BwoOh7tEVjSPPT1943J8gh5oY
+Message-ID: <CAAhSdy3pXsGfFi-A1jFsO3UJsjomJ1y3Z8F73xe0xuftzLHBLA@mail.gmail.com>
+Subject: [GIT PULL] KVM/riscv changes for 6.18
+To: Paolo Bonzini <pbonzini@redhat.com>
+Cc: Palmer Dabbelt <palmer@dabbelt.com>, Paul Walmsley <pjw@kernel.org>, 
+	Andrew Jones <ajones@ventanamicro.com>, Atish Patra <atishp@rivosinc.com>, 
+	Atish Patra <atish.patra@linux.dev>, 
+	"open list:KERNEL VIRTUAL MACHINE FOR RISC-V (KVM/riscv)" <kvm-riscv@lists.infradead.org>, KVM General <kvm@vger.kernel.org>, 
+	linux-riscv <linux-riscv@lists.infradead.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-The return value of copy_to_iter can't be negative, check whether the
-copied length is equal to the requested length instead of checking for
-negative values.
+Hi Paolo,
 
-Cc: zhang jiao <zhangjiao2@cmss.chinamobile.com>
-Link: https://lore.kernel.org/all/20250910091739.2999-1-zhangjiao2@cmss.chinamobile.com
-Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
----
- drivers/vhost/vringh.c | 7 ++++---
- 1 file changed, 4 insertions(+), 3 deletions(-)
+We have the following KVM RISC-V changes for 6.18:
+1) Added SBI FWFT extension for Guest/VM along with
+    corresponding ONE_REG interface
+2) Added Zicbop and bfloat16 extensions for Guest/VM
+3) Enabled more common KVM selftests for RISC-V
+4) Added SBI v3.0 PMU enhancements in KVM and
+    perf driver
 
-diff --git a/drivers/vhost/vringh.c b/drivers/vhost/vringh.c
-index 0c8a17cbb22e..925858cc6096 100644
---- a/drivers/vhost/vringh.c
-+++ b/drivers/vhost/vringh.c
-@@ -1162,6 +1162,7 @@ static inline int copy_to_iotlb(const struct vringh *vrh, void *dst,
- 		struct iov_iter iter;
- 		u64 translated;
- 		int ret;
-+		size_t size;
- 
- 		ret = iotlb_translate(vrh, (u64)(uintptr_t)dst,
- 				      len - total_translated, &translated,
-@@ -1179,9 +1180,9 @@ static inline int copy_to_iotlb(const struct vringh *vrh, void *dst,
- 				      translated);
- 		}
- 
--		ret = copy_to_iter(src, translated, &iter);
--		if (ret < 0)
--			return ret;
-+		size = copy_to_iter(src, translated, &iter);
-+		if (size != translated)
-+			return -EFAULT;
- 
- 		src += translated;
- 		dst += translated;
--- 
-MST
+The perf driver changes in #4 above are going through
+KVM RISC-V tree based discussion with Will and Paul [1].
 
+Please pull.
+
+[1] - https://lore.kernel.org/all/CAAhSdy3wJd5uicJntf+WgTaLciiQsqT1QfUmrZ1J=
+k9qEONRgPw@mail.gmail.com/
+
+Regards,
+Anup
+
+The following changes since commit 76eeb9b8de9880ca38696b2fb56ac45ac0a25c6c=
+:
+
+  Linux 6.17-rc5 (2025-09-07 14:22:57 -0700)
+
+are available in the Git repository at:
+
+  https://github.com/kvm-riscv/linux.git tags/kvm-riscv-6.18-1
+
+for you to fetch changes up to dbdadd943a278fb8a24ae4199a668131108034b4:
+
+  RISC-V: KVM: Upgrade the supported SBI version to 3.0 (2025-09-16
+11:49:31 +0530)
+
+----------------------------------------------------------------
+KVM/riscv changes for 6.18
+
+- Added SBI FWFT extension for Guest/VM with misaligned
+  delegation and pointer masking PMLEN features
+- Added ONE_REG interface for SBI FWFT extension
+- Added Zicbop and bfloat16 extensions for Guest/VM
+- Enabled more common KVM selftests for RISC-V such as
+  access_tracking_perf_test, dirty_log_perf_test,
+  memslot_modification_stress_test, memslot_perf_test,
+  mmu_stress_test, and rseq_test
+- Added SBI v3.0 PMU enhancements in KVM and perf driver
+
+----------------------------------------------------------------
+Anup Patel (6):
+      RISC-V: KVM: Set initial value of hedeleg in kvm_arch_vcpu_create()
+      RISC-V: KVM: Introduce feature specific reset for SBI FWFT
+      RISC-V: KVM: Introduce optional ONE_REG callbacks for SBI extensions
+      RISC-V: KVM: Move copy_sbi_ext_reg_indices() to SBI implementation
+      RISC-V: KVM: Implement ONE_REG interface for SBI FWFT state
+      KVM: riscv: selftests: Add SBI FWFT to get-reg-list test
+
+Atish Patra (8):
+      drivers/perf: riscv: Add SBI v3.0 flag
+      drivers/perf: riscv: Add raw event v2 support
+      RISC-V: KVM: Add support for Raw event v2
+      drivers/perf: riscv: Implement PMU event info function
+      drivers/perf: riscv: Export PMU event info function
+      RISC-V: KVM: No need of explicit writable slot check
+      RISC-V: KVM: Implement get event info function
+      RISC-V: KVM: Upgrade the supported SBI version to 3.0
+
+Cl=C3=A9ment L=C3=A9ger (2):
+      RISC-V: KVM: add support for FWFT SBI extension
+      RISC-V: KVM: add support for SBI_FWFT_MISALIGNED_DELEG
+
+Dong Yang (1):
+      KVM: riscv: selftests: Add missing headers for new testcases
+
+Fangyu Yu (1):
+      RISC-V: KVM: Write hgatp register with valid mode bits
+
+Guo Ren (Alibaba DAMO Academy) (2):
+      RISC-V: KVM: Remove unnecessary HGATP csr_read
+      RISC-V: KVM: Prevent HGATP_MODE_BARE passed
+
+Quan Zhou (8):
+      RISC-V: KVM: Change zicbom/zicboz block size to depend on the host is=
+a
+      RISC-V: KVM: Provide UAPI for Zicbop block size
+      RISC-V: KVM: Allow Zicbop extension for Guest/VM
+      RISC-V: KVM: Allow bfloat16 extension for Guest/VM
+      KVM: riscv: selftests: Add Zicbop extension to get-reg-list test
+      KVM: riscv: selftests: Add bfloat16 extension to get-reg-list test
+      KVM: riscv: selftests: Use the existing RISCV_FENCE macro in
+`rseq-riscv.h`
+      KVM: riscv: selftests: Add common supported test cases
+
+Samuel Holland (1):
+      RISC-V: KVM: Add support for SBI_FWFT_POINTER_MASKING_PMLEN
+
+ arch/riscv/include/asm/kvm_host.h                  |   4 +
+ arch/riscv/include/asm/kvm_vcpu_pmu.h              |   3 +
+ arch/riscv/include/asm/kvm_vcpu_sbi.h              |  25 +-
+ arch/riscv/include/asm/kvm_vcpu_sbi_fwft.h         |  34 ++
+ arch/riscv/include/asm/sbi.h                       |  13 +
+ arch/riscv/include/uapi/asm/kvm.h                  |  21 +
+ arch/riscv/kvm/Makefile                            |   1 +
+ arch/riscv/kvm/gstage.c                            |  27 +-
+ arch/riscv/kvm/main.c                              |  33 +-
+ arch/riscv/kvm/vcpu.c                              |   3 +-
+ arch/riscv/kvm/vcpu_onereg.c                       |  95 ++--
+ arch/riscv/kvm/vcpu_pmu.c                          |  74 ++-
+ arch/riscv/kvm/vcpu_sbi.c                          | 176 ++++++-
+ arch/riscv/kvm/vcpu_sbi_fwft.c                     | 544 +++++++++++++++++=
+++++
+ arch/riscv/kvm/vcpu_sbi_pmu.c                      |   3 +
+ arch/riscv/kvm/vcpu_sbi_sta.c                      |  72 +--
+ arch/riscv/kvm/vmid.c                              |   8 +-
+ drivers/perf/riscv_pmu_sbi.c                       | 191 ++++++--
+ include/linux/perf/riscv_pmu.h                     |   1 +
+ tools/testing/selftests/kvm/Makefile.kvm           |   6 +
+ .../selftests/kvm/access_tracking_perf_test.c      |   1 +
+ .../selftests/kvm/include/riscv/processor.h        |   1 +
+ .../kvm/memslot_modification_stress_test.c         |   1 +
+ tools/testing/selftests/kvm/memslot_perf_test.c    |   1 +
+ tools/testing/selftests/kvm/riscv/get-reg-list.c   |  60 +++
+ tools/testing/selftests/rseq/rseq-riscv.h          |   3 +-
+ 26 files changed, 1188 insertions(+), 213 deletions(-)
+ create mode 100644 arch/riscv/include/asm/kvm_vcpu_sbi_fwft.h
+ create mode 100644 arch/riscv/kvm/vcpu_sbi_fwft.c
 
