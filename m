@@ -1,46 +1,46 @@
-Return-Path: <kvm+bounces-58730-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-58731-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2A6F4B9EA52
-	for <lists+kvm@lfdr.de>; Thu, 25 Sep 2025 12:29:40 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7F65FB9EA79
+	for <lists+kvm@lfdr.de>; Thu, 25 Sep 2025 12:30:16 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D6DC32A1A17
-	for <lists+kvm@lfdr.de>; Thu, 25 Sep 2025 10:29:39 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 920537B5802
+	for <lists+kvm@lfdr.de>; Thu, 25 Sep 2025 10:28:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C97502EC085;
-	Thu, 25 Sep 2025 10:28:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3A5322EC557;
+	Thu, 25 Sep 2025 10:28:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="e1J3WX54"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Gllvohn9"
 X-Original-To: kvm@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EA81B2EB87C
-	for <kvm@vger.kernel.org>; Thu, 25 Sep 2025 10:28:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 59C032EC0B5
+	for <kvm@vger.kernel.org>; Thu, 25 Sep 2025 10:28:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758796082; cv=none; b=Y/srqg4BrlrTVv2O7jBpJ3K5cyk8DrQVQULh+d/G7c/37P8i4aCiEpyA5HhU0liUNZYXUECia+JUUSZ+SzUajdfJhKHet/ZqsZEQc4iZMJljitgbh7yYhfVu/X74jR8HF2Smj9osYDe5pdau+IfBmDcytjZFW1ZVf/g6vSfRD7I=
+	t=1758796089; cv=none; b=Jpk8BGiuxmO9oJ9A4lPWJrpOsgUBMUD5Hbd9eeDmJZ/x5pA5+BUtrQg+nnK0e+LGElx6nIWywe8269/ZvAzEqMUsC1zE/thcW03l2fK9D3S24SGn8xtThraZOO9aEB71RivR82WsmepmM+Rmq13L3xf51X5lf1BVEhpL3MrNkzs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758796082; c=relaxed/simple;
-	bh=svkyMfF221tycwz6u0wk23zZbnYE0gSsTIe18ZQ5q+E=;
+	s=arc-20240116; t=1758796089; c=relaxed/simple;
+	bh=UPmN8zWX6qK/BDJEkiaVEyjwQcgJbk4nHuayO4CCPGQ=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=u4BRbnxurujAnvhRlROIy9v08yTUHkbouxm901l8p4l69Eu2+66xV+tIe81ChWt5rmeMUodvPiAMJvwCP3Xgs5y4fLG4xz328667XOl1oICTFfE++vrfz2XA4gGYh6qA+qlqNwNHHFhI+U4NIqlwY/BRO1nFvvM9tJyKl0Dm6ZQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=e1J3WX54; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9E734C4CEF0;
-	Thu, 25 Sep 2025 10:28:00 +0000 (UTC)
+	 MIME-Version; b=OfzpmJQg96yPm11BbQX6JCrNiilBhwh3ODdus4kpZynLnuXb6y3wN6le/PZxAw5aAFirRrGLtekoZd7XGDwU7QsPiq6wujZgC14ekAUKNGqaua5DyW50NzgR2DwtecxRp7nd9svncf2BIzfXPfkJ4FXSBlRokYenpnXdo6UsMwg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Gllvohn9; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id C04F3C4CEF0;
+	Thu, 25 Sep 2025 10:28:07 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1758796081;
-	bh=svkyMfF221tycwz6u0wk23zZbnYE0gSsTIe18ZQ5q+E=;
+	s=k20201202; t=1758796088;
+	bh=UPmN8zWX6qK/BDJEkiaVEyjwQcgJbk4nHuayO4CCPGQ=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=e1J3WX54IiZkP+Cvgkur21qsisX7iqAzGnji2CGaxlYaXTTYfdwqcFAp0A4Wl4qZr
-	 JZRTsK57sTMWt3IGIxhsVow42zIo9g8AipcjLiQRCOr/8WoRRx/SRwTWKMAo0qwigH
-	 eS0xbK/tzyHC5BPA2KSMLm6BE81dbsZPm2LDLRheO/B5Qdo63x1WdYwg3z0344h5Ug
-	 y4IlhDG2lDOXE7Wn1ojKxsxJpiJeeUKzHII/0GcRREm/jOhI02OFNn3nQdRqcVdG1p
-	 S8/xXacECuaias/mvNUer/+xk0oTve6xn1lE/KtjS5EpuauMgnocMcjTtV5i6e+m00
-	 s2Kmd77zsrYsw==
+	b=Gllvohn9hMnUbf65eidp3x6eELGh8Ch7RfJYKSBm8H0jzJHdX8jItx7JyiCpJhhNO
+	 E/IKSsOwpKK4MiHcs/QzEt/mFz29H22JftZAIOmhdRN7d3pmdIs73mX7g1JA2arPGQ
+	 xDePhb/ngpahLXdu++eSLQyEGY/WCma3cxR1omoAQTOdlAj1Ro6kPiel3uDtoZY6kQ
+	 TIboZS5bWUdXCmJEjh+NKZn9eln7p8byzLS/J3ucM8wUHPVmsSlNJEuB6SKIFaiWRv
+	 vcxMsSAZQqMjwSiWmwJ1Bs8eAuu+98bnMCdq8iyMCwktR9zhWg+18cXzZAQHdCH4Sn
+	 A4eSfzsLYEDGQ==
 From: "Naveen N Rao (AMD)" <naveen@kernel.org>
 To: Paolo Bonzini <pbonzini@redhat.com>,
 	Eric Blake <eblake@redhat.com>,
@@ -55,9 +55,9 @@ Cc: qemu-devel <qemu-devel@nongnu.org>,
 	Zhao Liu <zhao1.liu@intel.com>,
 	Michael Roth <michael.roth@amd.com>,
 	Roy Hopkins <roy.hopkins@randomman.co.uk>
-Subject: [PATCH v2 2/9] target/i386: SEV: Ensure SEV features are only set through qemu cli or IGVM
-Date: Thu, 25 Sep 2025 15:47:31 +0530
-Message-ID: <9353c74e7d610780bc1638e60ae2bafb5e6012d0.1758794556.git.naveen@kernel.org>
+Subject: [PATCH v2 3/9] target/i386: SEV: Consolidate SEV feature validation to common init path
+Date: Thu, 25 Sep 2025 15:47:32 +0530
+Message-ID: <f293557861e96e7c54f2e4fc1bba62e065fcd093.1758794556.git.naveen@kernel.org>
 X-Mailer: git-send-email 2.51.0
 In-Reply-To: <cover.1758794556.git.naveen@kernel.org>
 References: <cover.1758794556.git.naveen@kernel.org>
@@ -69,36 +69,54 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-In preparation for qemu being able to set SEV features through the cli,
-add a check to ensure that SEV features are not also set if using IGVM
-files.
+Currently, check_sev_features() is called in multiple places when
+processing IGVM files: both when processing the initial VMSA SEV
+features from IGVM, as well as when validating the full contents of the
+VMSA. Move this to a single point in sev_common_kvm_init() to simplify
+the flow, as well as to re-use this function when VMSA SEV features are
+being set without using IGVM files.
 
 Reviewed-by: Tom Lendacky <thomas.lendacky@amd.com>
 Signed-off-by: Naveen N Rao (AMD) <naveen@kernel.org>
 ---
- target/i386/sev.c | 9 +++++++++
- 1 file changed, 9 insertions(+)
+ target/i386/sev.c | 10 ++++------
+ 1 file changed, 4 insertions(+), 6 deletions(-)
 
 diff --git a/target/i386/sev.c b/target/i386/sev.c
-index 2fb1268ed788..ddd7c01f5a56 100644
+index ddd7c01f5a56..3b11e61f78d8 100644
 --- a/target/i386/sev.c
 +++ b/target/i386/sev.c
-@@ -1901,6 +1901,15 @@ static int sev_common_kvm_init(ConfidentialGuestSupport *cgs, Error **errp)
-          * as SEV_STATE_UNINIT.
-          */
-         if (x86machine->igvm) {
-+            /*
-+             * Test only the user-set SEV features by masking out
-+             * SVM_SEV_FEAT_SNP_ACTIVE which is set by default.
-+             */
-+            if (sev_common->sev_features & ~SVM_SEV_FEAT_SNP_ACTIVE) {
-+                error_setg(errp, "%s: SEV features can't be specified when using IGVM files",
-+                           __func__);
-+                return -1;
-+            }
-             if (IGVM_CFG_GET_CLASS(x86machine->igvm)
-                     ->process(x86machine->igvm, machine->cgs, true, errp) ==
-                 -1) {
+@@ -595,9 +595,6 @@ static int check_vmsa_supported(SevCommonState *sev_common, hwaddr gpa,
+     vmsa_check.x87_fcw = 0;
+     vmsa_check.mxcsr = 0;
+ 
+-    if (check_sev_features(sev_common, vmsa_check.sev_features, errp) < 0) {
+-        return -1;
+-    }
+     vmsa_check.sev_features = 0;
+ 
+     if (!buffer_is_zero(&vmsa_check, sizeof(vmsa_check))) {
+@@ -1917,6 +1914,10 @@ static int sev_common_kvm_init(ConfidentialGuestSupport *cgs, Error **errp)
+             }
+         }
+ 
++        if (check_sev_features(sev_common, sev_common->sev_features, errp) < 0) {
++            return -1;
++        }
++
+         /*
+          * KVM maintains a bitmask of allowed sev_features. This does not
+          * include SVM_SEV_FEAT_SNP_ACTIVE which is set accordingly by KVM
+@@ -2536,9 +2537,6 @@ static int cgs_set_guest_state(hwaddr gpa, uint8_t *ptr, uint64_t len,
+                            __func__);
+                 return -1;
+             }
+-            if (check_sev_features(sev_common, sa->sev_features, errp) < 0) {
+-                return -1;
+-            }
+             sev_common->sev_features = sa->sev_features;
+         }
+         return 0;
 -- 
 2.51.0
 
