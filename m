@@ -1,248 +1,251 @@
-Return-Path: <kvm+bounces-58824-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-58825-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id A5A2FBA1A1D
-	for <lists+kvm@lfdr.de>; Thu, 25 Sep 2025 23:43:41 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0496CBA1B9F
+	for <lists+kvm@lfdr.de>; Fri, 26 Sep 2025 00:03:13 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id B2ABE1C82734
-	for <lists+kvm@lfdr.de>; Thu, 25 Sep 2025 21:44:03 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B4AFD3BD19D
+	for <lists+kvm@lfdr.de>; Thu, 25 Sep 2025 22:03:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5C047323F69;
-	Thu, 25 Sep 2025 21:35:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EDF423218B5;
+	Thu, 25 Sep 2025 22:03:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="onw8lRvi"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="GvyB9qo4"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pj1-f74.google.com (mail-pj1-f74.google.com [209.85.216.74])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.13])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3F89A322759
-	for <kvm@vger.kernel.org>; Thu, 25 Sep 2025 21:35:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.74
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 12C58319870;
+	Thu, 25 Sep 2025 22:02:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.13
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758836124; cv=none; b=N+ftND6ozhEr0NcHRVeRSEobindxXUtHT+/SPkuIyCQ7d8SbprmFivnk7nje7FyfjE8S3pKxMBoi8k/1LexIOF/dnudmVRa3jU2rqmIMaFav4GFFgDivrjf+fV1QptvZcxfC537Mjlzs7W8s8rihUqv+6xMbGToWr3Hgno2Ra1c=
+	t=1758837780; cv=none; b=q3TtapKZBNnRod7zueOf2ttDQH1RaP0L/P+G4HyfPrmusiTMUMbmCGyfGDgpOFkcwM583PynYctFZKue77cU4iMKN/7+4JKuxmA5YiYpnY4LdqWk59yQh90sf+OWnX3HBYekpycYPThYOzByTwxnVous9mMVvoNX7yekYhN8tc8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758836124; c=relaxed/simple;
-	bh=Lh1tfSZ0NF/AFO/V/8hHUF+qpGzjYGIIGuaXa4zfnL4=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=pXR/ZSRNufZzGCWMDDWW0IZDQTGkFkxYNquZV3XA7x32Q/d/8iEfpQO1CizEZArpVLpsk5CUKU6mlxGtGEj2C/QfkAUcj66eaiOfML9iaoXaozrZNxsNm/X6I2Sh9x8e6yybNPhIXuWq7cLAzlQeGikHKjyEItFhzhES1UrdFmc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=onw8lRvi; arc=none smtp.client-ip=209.85.216.74
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pj1-f74.google.com with SMTP id 98e67ed59e1d1-329dca88b5aso2626650a91.1
-        for <kvm@vger.kernel.org>; Thu, 25 Sep 2025 14:35:22 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1758836121; x=1759440921; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=dyD0NvHQvKcjtkMWqtARFSwsGpym7n4r8JiRe/0tuUQ=;
-        b=onw8lRvivIaqXqhZ94k9VIfBy202X1wcl6kC5wMxM4fMRMqJCFtExOOO4OSzFrs0RS
-         qHFjEeoEtQfyZAZJP6YQmMYMFNJIzjcra6ZBnCxaERFeYR408n/9Ve3aVpTYm5nPBAgJ
-         qMsrAXWPQ+p75NcDftx9/Rr0IZF8PIOZA9ltXOiwvQ3g1F5fyBcv9jTQYfnHqjrZpAF3
-         2/qagGANvpvdP7va2hYkf8cOa2EP1yIlnKne6xfHvbNp5CAlkPKUDXZTgovUwRHGL259
-         zQiCfU9XIGcVYd7ArvCRqcPxJUFH5956E3BUVCgylnJjJk5rRwHzTewMQqRNjVs5Xxff
-         mXNA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1758836121; x=1759440921;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=dyD0NvHQvKcjtkMWqtARFSwsGpym7n4r8JiRe/0tuUQ=;
-        b=TGXtY3sozvWnuf5PSP4I+E5ARremoU0wy5ecyVjtwgmgGn2s624wb8KNeSk6fOibEV
-         Tevj8BgEhAXMY2CRLcMO7we6pe4dGlE3VxVHvbdXCeYxz2zLEAxW6u7xzM1SAjxwWkzv
-         lAvqMs8iwYURz9Bqe0immd/YYfOe/j6KnVDrGK9NSd9/q2zpOVmXmORZNP9PoUHlJwHz
-         uM3JYGrfmkhO/SjoDRcSi6/0ljK0FBSBjKrY8ngVswJiwZpKn+CkT/Spj7n3yDqA4Dea
-         KVjvZrT2br3jQ3O/QYrjKLJOhhi1xmScs4FangLwlz4BO2UAMEqFQm5v+w+fSTeIeq0e
-         A8HA==
-X-Forwarded-Encrypted: i=1; AJvYcCWMgmSJqHYfYYfGBFmHjDBi81bt5OavJiwXx+vAoM154CU2ETKgtkLBjASTmGDuVetnP6M=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yw2XE3mN5yGimJ99kgrnPPX3QzwkjGubrrCUTMdSlap6yTc2y0M
-	cxFG6vp/45xNvBli/aOqa8oiRO/GmlJepEsT6NCnQdsQm3wCXakK3Zh4NCKlh3/OZgUwn9pRyWj
-	Ug4VejQ==
-X-Google-Smtp-Source: AGHT+IEF46Ap3+CoFy4DNwHeeqPSdM0QIu1/iWB0NVseFrH0JqhT9O+vdtR7XjCf1sCWIaN5eWCQMso96V4=
-X-Received: from pjj5.prod.google.com ([2002:a17:90b:5545:b0:330:6cf5:5f38])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:1c07:b0:32e:ca60:6bd7
- with SMTP id 98e67ed59e1d1-334568960d8mr4094341a91.11.1758836121051; Thu, 25
- Sep 2025 14:35:21 -0700 (PDT)
-Date: Thu, 25 Sep 2025 14:35:19 -0700
-In-Reply-To: <20250827175247.83322-10-shivankg@amd.com>
+	s=arc-20240116; t=1758837780; c=relaxed/simple;
+	bh=kENjEMfJS4P0fKtr8yOl/LwdTi6bHeEMuxVxAnOTaCw=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=CeVw+cdyfGtDMPMLsm9whmptwZZ+hGddjwl7BHCNeNIBAhcQyFAnI8FOEJe+pGiC8kBeGBijoGFlfh8R0h1MhM28Yb4t/bFh0rvpYuUgOmkD3MSmh9xqv9wMgxGtuBwYSFbyW64NDBU1BivbIbu07jAtwbpYrTg/HROWjDdvPAA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=pass smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=GvyB9qo4; arc=none smtp.client-ip=192.198.163.13
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1758837778; x=1790373778;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=kENjEMfJS4P0fKtr8yOl/LwdTi6bHeEMuxVxAnOTaCw=;
+  b=GvyB9qo4n69tWoAI9HuaT9/Wmqrl96NRD+i+0Niue3sVnYEUvXswITRN
+   G789qUfqJ7jYcL67E74WVe8WMyV1wYUWdj6UBBHoch2pyTmmlgTJscETj
+   yKLeYKeTwhynE1SpsZVfFOB1bFS8hrV16ffjBSikMECbI+zntGSe8WOHv
+   ToRHjdCyrdnU1SMTDN+eyRVCvX2PfNPNhE6cGCUZY7OTltHMdrQKCFFac
+   b99PQBBW1boDoOxH611TF+MG+wOMLFhTouIfeaKTy0U8NejaDP3Y/1HEe
+   pi+0ArwmbsZEHSQpY/wGkVlHBxl0zd/xJRzzfvOPkwWu23bt3TARpwCyb
+   w==;
+X-CSE-ConnectionGUID: +6tPH+1hQMCN//l5T2lZEQ==
+X-CSE-MsgGUID: hxsM4aAQTHCBK7AcgtfWDQ==
+X-IronPort-AV: E=McAfee;i="6800,10657,11564"; a="63802779"
+X-IronPort-AV: E=Sophos;i="6.18,293,1751266800"; 
+   d="scan'208";a="63802779"
+Received: from fmviesa005.fm.intel.com ([10.60.135.145])
+  by fmvoesa107.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 25 Sep 2025 15:02:57 -0700
+X-CSE-ConnectionGUID: c3FBl/1YRFqy+hQ10f+jDw==
+X-CSE-MsgGUID: guW1hGW4ScicZ8voTpL6YQ==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.18,293,1751266800"; 
+   d="scan'208";a="181836387"
+Received: from mgerlach-mobl1.amr.corp.intel.com (HELO desk) ([10.124.220.190])
+  by fmviesa005-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 25 Sep 2025 15:02:57 -0700
+Date: Thu, 25 Sep 2025 15:02:51 -0700
+From: Pawan Gupta <pawan.kumar.gupta@linux.intel.com>
+To: "Kaplan, David" <David.Kaplan@amd.com>
+Cc: "x86@kernel.org" <x86@kernel.org>, "H. Peter Anvin" <hpa@zytor.com>,
+	Josh Poimboeuf <jpoimboe@kernel.org>,
+	Sean Christopherson <seanjc@google.com>,
+	Paolo Bonzini <pbonzini@redhat.com>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+	"kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+	Asit Mallick <asit.k.mallick@intel.com>,
+	Tao Zhang <tao1.zhang@intel.com>
+Subject: Re: [PATCH 2/2] x86/vmscape: Replace IBPB with branch history clear
+ on exit to userspace
+Message-ID: <20250925220251.qfn3w6rukhqr4lcs@desk>
+References: <20250924-vmscape-bhb-v1-0-da51f0e1934d@linux.intel.com>
+ <20250924-vmscape-bhb-v1-2-da51f0e1934d@linux.intel.com>
+ <LV3PR12MB9265478E85AA940EF6EA4D7D941FA@LV3PR12MB9265.namprd12.prod.outlook.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20250827175247.83322-2-shivankg@amd.com> <20250827175247.83322-10-shivankg@amd.com>
-Message-ID: <aNW1l-Wdk6wrigM8@google.com>
-Subject: Re: [PATCH kvm-next V11 7/7] KVM: guest_memfd: selftests: Add tests
- for mmap and NUMA policy support
-From: Sean Christopherson <seanjc@google.com>
-To: Shivank Garg <shivankg@amd.com>
-Cc: willy@infradead.org, akpm@linux-foundation.org, david@redhat.com, 
-	pbonzini@redhat.com, shuah@kernel.org, vbabka@suse.cz, brauner@kernel.org, 
-	viro@zeniv.linux.org.uk, dsterba@suse.com, xiang@kernel.org, chao@kernel.org, 
-	jaegeuk@kernel.org, clm@fb.com, josef@toxicpanda.com, 
-	kent.overstreet@linux.dev, zbestahu@gmail.com, jefflexu@linux.alibaba.com, 
-	dhavale@google.com, lihongbo22@huawei.com, lorenzo.stoakes@oracle.com, 
-	Liam.Howlett@oracle.com, rppt@kernel.org, surenb@google.com, mhocko@suse.com, 
-	ziy@nvidia.com, matthew.brost@intel.com, joshua.hahnjy@gmail.com, 
-	rakie.kim@sk.com, byungchul@sk.com, gourry@gourry.net, 
-	ying.huang@linux.alibaba.com, apopple@nvidia.com, tabba@google.com, 
-	ackerleytng@google.com, paul@paul-moore.com, jmorris@namei.org, 
-	serge@hallyn.com, pvorel@suse.cz, bfoster@redhat.com, vannapurve@google.com, 
-	chao.gao@intel.com, bharata@amd.com, nikunj@amd.com, michael.day@amd.com, 
-	shdhiman@amd.com, yan.y.zhao@intel.com, Neeraj.Upadhyay@amd.com, 
-	thomas.lendacky@amd.com, michael.roth@amd.com, aik@amd.com, jgg@nvidia.com, 
-	kalyazin@amazon.com, peterx@redhat.com, jack@suse.cz, hch@infradead.org, 
-	cgzones@googlemail.com, ira.weiny@intel.com, rientjes@google.com, 
-	roypat@amazon.co.uk, chao.p.peng@intel.com, amit@infradead.org, 
-	ddutile@redhat.com, dan.j.williams@intel.com, ashish.kalra@amd.com, 
-	gshan@redhat.com, jgowans@amazon.com, pankaj.gupta@amd.com, papaluri@amd.com, 
-	yuzhao@google.com, suzuki.poulose@arm.com, quic_eberman@quicinc.com, 
-	linux-bcachefs@vger.kernel.org, linux-btrfs@vger.kernel.org, 
-	linux-erofs@lists.ozlabs.org, linux-f2fs-devel@lists.sourceforge.net, 
-	linux-fsdevel@vger.kernel.org, linux-mm@kvack.org, 
-	linux-kernel@vger.kernel.org, linux-security-module@vger.kernel.org, 
-	kvm@vger.kernel.org, linux-kselftest@vger.kernel.org, 
-	linux-coco@lists.linux.dev
-Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <LV3PR12MB9265478E85AA940EF6EA4D7D941FA@LV3PR12MB9265.namprd12.prod.outlook.com>
 
-On Wed, Aug 27, 2025, Shivank Garg wrote:
-> Add tests for NUMA memory policy binding and NUMA aware allocation in
-> guest_memfd. This extends the existing selftests by adding proper
-> validation for:
-> - KVM GMEM set_policy and get_policy() vm_ops functionality using
->   mbind() and get_mempolicy()
-> - NUMA policy application before and after memory allocation
+On Thu, Sep 25, 2025 at 06:14:54PM +0000, Kaplan, David wrote:
+> [AMD Official Use Only - AMD Internal Distribution Only]
 > 
-> These tests help ensure NUMA support for guest_memfd works correctly.
+> > -----Original Message-----
+> > From: Pawan Gupta <pawan.kumar.gupta@linux.intel.com>
+> > Sent: Wednesday, September 24, 2025 10:10 PM
+> > To: x86@kernel.org; H. Peter Anvin <hpa@zytor.com>; Josh Poimboeuf
+> > <jpoimboe@kernel.org>; Kaplan, David <David.Kaplan@amd.com>; Sean
+> > Christopherson <seanjc@google.com>; Paolo Bonzini <pbonzini@redhat.com>
+> > Cc: linux-kernel@vger.kernel.org; kvm@vger.kernel.org; Asit Mallick
+> > <asit.k.mallick@intel.com>; Tao Zhang <tao1.zhang@intel.com>
+> > Subject: [PATCH 2/2] x86/vmscape: Replace IBPB with branch history clear on exit
+> > to userspace
+> >
+> > Caution: This message originated from an External Source. Use proper caution
+> > when opening attachments, clicking links, or responding.
+> >
+> >
+> > IBPB mitigation for VMSCAPE is an overkill for CPUs that are only affected
+> > by the BHI variant of VMSCAPE. On such CPUs, eIBRS already provides
+> > indirect branch isolation between guest and host userspace. But, a guest
+> > could still poison the branch history.
+> >
+> > To mitigate that, use the recently added clear_bhb_long_loop() to isolate
+> > the branch history between guest and userspace. Add cmdline option
+> > 'vmscape=auto' that automatically selects the appropriate mitigation based
+> > on the CPU.
+> >
+> > Signed-off-by: Pawan Gupta <pawan.kumar.gupta@linux.intel.com>
+> > ---
+> >  Documentation/admin-guide/hw-vuln/vmscape.rst   |  8 +++++
+> >  Documentation/admin-guide/kernel-parameters.txt |  4 ++-
+> >  arch/x86/include/asm/cpufeatures.h              |  1 +
+> >  arch/x86/include/asm/entry-common.h             | 12 ++++---
+> >  arch/x86/include/asm/nospec-branch.h            |  2 +-
+> >  arch/x86/kernel/cpu/bugs.c                      | 44 ++++++++++++++++++-------
+> >  arch/x86/kvm/x86.c                              |  5 +--
+> >  7 files changed, 55 insertions(+), 21 deletions(-)
+> >
+> > diff --git a/Documentation/admin-guide/hw-vuln/vmscape.rst
+> > b/Documentation/admin-guide/hw-vuln/vmscape.rst
+> > index
+> > d9b9a2b6c114c05a7325e5f3c9d42129339b870b..13ca98f952f97daeb28194c3873e
+> > 945b85eda6a1 100644
+> > --- a/Documentation/admin-guide/hw-vuln/vmscape.rst
+> > +++ b/Documentation/admin-guide/hw-vuln/vmscape.rst
+> > @@ -86,6 +86,10 @@ The possible values in this file are:
+> >     run a potentially malicious guest and issues an IBPB before the first
+> >     exit to userspace after VM-exit.
+> >
+> > + * 'Mitigation: Clear BHB before exit to userspace':
+> > +
+> > +   As above conditional BHB clearing mitigation is enabled.
+> > +
+> >   * 'Mitigation: IBPB on VMEXIT':
+> >
+> >     IBPB is issued on every VM-exit. This occurs when other mitigations like
+> > @@ -108,3 +112,7 @@ The mitigation can be controlled via the ``vmscape=``
+> > command line parameter:
+> >
+> >     Force vulnerability detection and mitigation even on processors that are
+> >     not known to be affected.
+> > +
+> > + * ``vmscape=auto``:
+> > +
+> > +   Choose the mitigation based on the VMSCAPE variant the CPU is affected by.
+> > diff --git a/Documentation/admin-guide/kernel-parameters.txt
+> > b/Documentation/admin-guide/kernel-parameters.txt
+> > index
+> > 5a7a83c411e9c526f8df6d28beb4c784aec3cac9..4596bfcb401f1a89d2dc5ed8c44c8
+> > 3628c9c5dfe 100644
+> > --- a/Documentation/admin-guide/kernel-parameters.txt
+> > +++ b/Documentation/admin-guide/kernel-parameters.txt
+> > @@ -8048,9 +8048,11 @@
+> >
+> >                         off             - disable the mitigation
+> >                         ibpb            - use Indirect Branch Prediction Barrier
+> > -                                         (IBPB) mitigation (default)
+> > +                                         (IBPB) mitigation
+> >                         force           - force vulnerability detection even on
+> >                                           unaffected processors
+> > +                       auto            - (default) automatically select IBPB
+> > +                                         or BHB clear mitigation based on CPU
 > 
-> Signed-off-by: Shivank Garg <shivankg@amd.com>
-> ---
->  tools/testing/selftests/kvm/Makefile.kvm      |   1 +
->  .../testing/selftests/kvm/guest_memfd_test.c  | 121 ++++++++++++++++++
->  2 files changed, 122 insertions(+)
+> Many of the other bugs (like srso, l1tf, bhi, etc.) do not have explicit
+> 'auto' options as 'auto' is implied by the lack of an explicit option.
+> Is there really value in creating an explicit 'auto' option here?
+
+Hmm, so to get the BHB clear mitigation do we advise the users to remove
+the vmscape= parameter? That feels a bit weird to me. Also, with
+CONFIG_MITIGATION_VMSCAPE=n a user can get IBPB mitigation with
+vmscape=ibpb, but there is not way to get the BHB clear mitigation.
+
+> >  u64 x86_pred_cmd __ro_after_init = PRED_CMD_IBPB;
+> >
+> > @@ -3270,13 +3269,15 @@ enum vmscape_mitigations {
+> >         VMSCAPE_MITIGATION_AUTO,
+> >         VMSCAPE_MITIGATION_IBPB_EXIT_TO_USER,
+> >         VMSCAPE_MITIGATION_IBPB_ON_VMEXIT,
+> > +       VMSCAPE_MITIGATION_BHB_CLEAR_EXIT_TO_USER,
+> >  };
+> >
+> >  static const char * const vmscape_strings[] = {
+> > -       [VMSCAPE_MITIGATION_NONE]               = "Vulnerable",
+> > +       [VMSCAPE_MITIGATION_NONE]                       = "Vulnerable",
+> >         /* [VMSCAPE_MITIGATION_AUTO] */
+> > -       [VMSCAPE_MITIGATION_IBPB_EXIT_TO_USER]  = "Mitigation: IBPB
+> > before exit to userspace",
+> > -       [VMSCAPE_MITIGATION_IBPB_ON_VMEXIT]     = "Mitigation: IBPB on
+> > VMEXIT",
+> > +       [VMSCAPE_MITIGATION_IBPB_EXIT_TO_USER]          = "Mitigation: IBPB
+> > before exit to userspace",
+> > +       [VMSCAPE_MITIGATION_IBPB_ON_VMEXIT]             = "Mitigation: IBPB on
+> > VMEXIT",
+> > +       [VMSCAPE_MITIGATION_BHB_CLEAR_EXIT_TO_USER]     = "Mitigation:
+> > Clear BHB before exit to userspace",
+> >  };
+> >
+> >  static enum vmscape_mitigations vmscape_mitigation __ro_after_init =
+> > @@ -3294,6 +3295,8 @@ static int __init vmscape_parse_cmdline(char *str)
+> >         } else if (!strcmp(str, "force")) {
+> >                 setup_force_cpu_bug(X86_BUG_VMSCAPE);
+> >                 vmscape_mitigation = VMSCAPE_MITIGATION_AUTO;
+> > +       } else if (!strcmp(str, "auto")) {
+> > +               vmscape_mitigation = VMSCAPE_MITIGATION_AUTO;
+> >         } else {
+> >                 pr_err("Ignoring unknown vmscape=%s option.\n", str);
+> >         }
+> > @@ -3304,14 +3307,28 @@ early_param("vmscape", vmscape_parse_cmdline);
+> >
+> >  static void __init vmscape_select_mitigation(void)
+> >  {
+> > -       if (cpu_mitigations_off() ||
+> > -           !boot_cpu_has_bug(X86_BUG_VMSCAPE) ||
+> > -           !boot_cpu_has(X86_FEATURE_IBPB)) {
+> > +       if (cpu_mitigations_off() || !boot_cpu_has_bug(X86_BUG_VMSCAPE)) {
+> >                 vmscape_mitigation = VMSCAPE_MITIGATION_NONE;
+> >                 return;
+> >         }
 > 
-> diff --git a/tools/testing/selftests/kvm/Makefile.kvm b/tools/testing/selftests/kvm/Makefile.kvm
-> index 90f03f00cb04..c46cef2a7cd7 100644
-> --- a/tools/testing/selftests/kvm/Makefile.kvm
-> +++ b/tools/testing/selftests/kvm/Makefile.kvm
-> @@ -275,6 +275,7 @@ pgste-option = $(call try-run, echo 'int main(void) { return 0; }' | \
->  	$(CC) -Werror -Wl$(comma)--s390-pgste -x c - -o "$$TMP",-Wl$(comma)--s390-pgste)
->  
->  LDLIBS += -ldl
-> +LDLIBS += -lnuma
+> It looks like this patch is based on a tree without vmscape attack vector
+> support, I think you may want to rebase on top of that since it reworked
+> some of this function.
 
-Hrm, this is going to be very annoying.  I don't have libnuma-dev installed on
-any of my <too many> systems, and I doubt I'm alone.  Installing the package is
-trivial, but I'm a little wary of foisting that requirement on all KVM developers
-and build bots.
+Yes, it is based on upstream. I will rebase it once we are close to a final
+version. I tend to base my patches on upstream to avoid any issues when tip
+branches get rebased.
 
-I'd be especially curious what ARM and RISC-V think, as NUMA is likely a bit less
-prevelant there.
+> > -       if (vmscape_mitigation == VMSCAPE_MITIGATION_AUTO)
+> > +       if (vmscape_mitigation == VMSCAPE_MITIGATION_IBPB_EXIT_TO_USER
+> > &&
+> > +           !boot_cpu_has(X86_FEATURE_IBPB)) {
+> > +               pr_err("IBPB not supported, switching to AUTO select\n");
+> > +               vmscape_mitigation = VMSCAPE_MITIGATION_AUTO;
+> > +       }
+> 
+> I think there's a bug here in case you (theoretically) had a vulnerable
+> CPU that did not have IBPB and did not have BHI_CTRL. In that case, we
+> should select VMSCAPE_MITIGATION_NONE as we have no mitigation available.
+> But the code below will still re-select IBPB I believe even though there
+> is no IBPB.
 
->  LDFLAGS += -pthread $(no-pie-option) $(pgste-option)
->  
->  LIBKVM_C := $(filter %.c,$(LIBKVM))
-> diff --git a/tools/testing/selftests/kvm/guest_memfd_test.c b/tools/testing/selftests/kvm/guest_memfd_test.c
-> index b3ca6737f304..9640d04ec293 100644
-> --- a/tools/testing/selftests/kvm/guest_memfd_test.c
-> +++ b/tools/testing/selftests/kvm/guest_memfd_test.c
-> @@ -7,6 +7,8 @@
->  #include <stdlib.h>
->  #include <string.h>
->  #include <unistd.h>
-> +#include <numa.h>
-> +#include <numaif.h>
->  #include <errno.h>
->  #include <stdio.h>
->  #include <fcntl.h>
-> @@ -19,6 +21,7 @@
->  #include <sys/mman.h>
->  #include <sys/types.h>
->  #include <sys/stat.h>
-> +#include <sys/syscall.h>
->  
->  #include "kvm_util.h"
->  #include "test_util.h"
-> @@ -72,6 +75,122 @@ static void test_mmap_supported(int fd, size_t page_size, size_t total_size)
->  	TEST_ASSERT(!ret, "munmap() should succeed.");
->  }
->  
-> +#define TEST_REQUIRE_NUMA_MULTIPLE_NODES()	\
-> +	TEST_REQUIRE(numa_available() != -1 && numa_max_node() >= 1)
-
-Using TEST_REQUIRE() here will result in skipping the _entire_ test.  Ideally
-this test would use fixtures so that each testcase can run in a child process
-and thus can use TEST_REQUIRE(), but that's a conversion for another day.
-
-Easiest thing would probably be to turn this into a common helper and then bail
-early.
-
-diff --git a/tools/testing/selftests/kvm/guest_memfd_test.c b/tools/testing/selftests/kvm/guest_memfd_test.c
-index 9640d04ec293..6acb186e5300 100644
---- a/tools/testing/selftests/kvm/guest_memfd_test.c
-+++ b/tools/testing/selftests/kvm/guest_memfd_test.c
-@@ -7,7 +7,6 @@
- #include <stdlib.h>
- #include <string.h>
- #include <unistd.h>
--#include <numa.h>
- #include <numaif.h>
- #include <errno.h>
- #include <stdio.h>
-@@ -75,9 +74,6 @@ static void test_mmap_supported(int fd, size_t page_size, size_t total_size)
-        TEST_ASSERT(!ret, "munmap() should succeed.");
- }
- 
--#define TEST_REQUIRE_NUMA_MULTIPLE_NODES()     \
--       TEST_REQUIRE(numa_available() != -1 && numa_max_node() >= 1)
--
- static void test_mbind(int fd, size_t page_size, size_t total_size)
- {
-        unsigned long nodemask = 1; /* nid: 0 */
-@@ -87,7 +83,8 @@ static void test_mbind(int fd, size_t page_size, size_t total_size)
-        char *mem;
-        int ret;
- 
--       TEST_REQUIRE_NUMA_MULTIPLE_NODES();
-+       if (!is_multi_numa_node_system())
-+               return;
- 
-        mem = mmap(NULL, total_size, PROT_READ | PROT_WRITE, MAP_SHARED, fd, 0);
-        TEST_ASSERT(mem != MAP_FAILED, "mmap for mbind test should succeed");
-@@ -136,7 +133,8 @@ static void test_numa_allocation(int fd, size_t page_size, size_t total_size)
-        char *mem;
-        int ret, i;
- 
--       TEST_REQUIRE_NUMA_MULTIPLE_NODES();
-+       if (!is_multi_numa_node_system())
-+               return;
- 
-        /* Clean slate: deallocate all file space, if any */
-        ret = fallocate(fd, FALLOC_FL_PUNCH_HOLE | FALLOC_FL_KEEP_SIZE, 0, total_size);
-diff --git a/tools/testing/selftests/kvm/include/kvm_util.h b/tools/testing/selftests/kvm/include/kvm_util.h
-index 23a506d7eca3..d7051607e6bf 100644
---- a/tools/testing/selftests/kvm/include/kvm_util.h
-+++ b/tools/testing/selftests/kvm/include/kvm_util.h
-@@ -21,6 +21,7 @@
- #include <sys/eventfd.h>
- #include <sys/ioctl.h>
- 
-+#include <numa.h>
- #include <pthread.h>
- 
- #include "kvm_util_arch.h"
-@@ -633,6 +634,11 @@ static inline bool is_smt_on(void)
-        return false;
- }
- 
-+static inline bool is_multi_numa_node_system(void)
-+{
-+       return numa_available() != -1 && numa_max_node() >= 1;
-+}
-+
- void vm_create_irqchip(struct kvm_vm *vm);
- 
- static inline int __vm_create_guest_memfd(struct kvm_vm *vm, uint64_t size,
+Yes, you are right. Let me see how to fix that.
 
