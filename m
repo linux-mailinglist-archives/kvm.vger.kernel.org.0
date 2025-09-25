@@ -1,323 +1,326 @@
-Return-Path: <kvm+bounces-58746-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-58747-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9D86BB9F092
-	for <lists+kvm@lfdr.de>; Thu, 25 Sep 2025 13:56:11 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 27536B9F38F
+	for <lists+kvm@lfdr.de>; Thu, 25 Sep 2025 14:25:38 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 0937E1899DD3
-	for <lists+kvm@lfdr.de>; Thu, 25 Sep 2025 11:56:23 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D9F343B856B
+	for <lists+kvm@lfdr.de>; Thu, 25 Sep 2025 12:21:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A129A2FE59B;
-	Thu, 25 Sep 2025 11:55:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A77AC3009E7;
+	Thu, 25 Sep 2025 12:20:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="NJkX5mhk"
+	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="PNkk8UbS"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from MW6PR02CU001.outbound.protection.outlook.com (mail-westus2azon11012042.outbound.protection.outlook.com [52.101.48.42])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4CE2C2FBE1A
-	for <kvm@vger.kernel.org>; Thu, 25 Sep 2025 11:55:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758801336; cv=none; b=HLhaVEbNlBJjDj0WNPaJDucjNvBMXRojBCTnygTG7D7K2LAh9rH2HTnRpQw0As2YBt5MmTLM0+ceO5ono3D/+iNfxy8OjBmcXpGE6MyP0bYf3Yk/2++HviIrDAlFqBvcwtDSliiyzQhCyJ+9wU3CVrlQZAgG9dbf/KhOczun28w=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758801336; c=relaxed/simple;
-	bh=+fP0M0ulLkKRfiYmi7kvzBtJSxdpLTHFIV0AyZ8rGr4=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=WzxqK4VTfhbEtCMEVQTVMfRzVcJ9EsfDXLQ3h7o+p33iIe/74WwWXZ1wn1jJZNsIo3ZQFOmXyo/LWB60zQjxew1MNJUBEaMf3LCK67DNPe8MXD24cSbgG8VTJ1w6LOkEF1HAZIWUKFaYVPyHSF2Qjjyt83MiW6lmY8owk9MwrM4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=NJkX5mhk; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1758801333;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-	bh=SCbRU8MveS1pgXPDEzPy2kt340UB03o/vXxtaoaDWAc=;
-	b=NJkX5mhkzxPQya2MmhiH+5FEF5FrSa/jZgUe0ZAhDzuxe1kxrRIy7OCxkqaQPJvWGNIy2o
-	Ln6ICBCKbDUORdGzzvRKmYcNsmJMRT0hegRBfMGEQkzmnflfaFeXerfNE0c2O+Lq5XktxX
-	KX5yI6nOhq4tmUqpUfNjulCHks6m+4I=
-Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
- [209.85.128.72]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-161-n61X1DmxO4m3-y2rTz71ew-1; Thu, 25 Sep 2025 07:55:32 -0400
-X-MC-Unique: n61X1DmxO4m3-y2rTz71ew-1
-X-Mimecast-MFC-AGG-ID: n61X1DmxO4m3-y2rTz71ew_1758801331
-Received: by mail-wm1-f72.google.com with SMTP id 5b1f17b1804b1-45de18e7eccso4732405e9.0
-        for <kvm@vger.kernel.org>; Thu, 25 Sep 2025 04:55:32 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1758801331; x=1759406131;
-        h=content-transfer-encoding:in-reply-to:autocrypt:content-language
-         :from:references:cc:to:subject:user-agent:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=SCbRU8MveS1pgXPDEzPy2kt340UB03o/vXxtaoaDWAc=;
-        b=n7IeXsfvIVbZyOsxstVAX9nlDjsLmDi3W6Vg1baI/N6YxL2gOBGoOTOfEfBKxE+I/w
-         isdjQvpHyWqJ/p80chpnKEIC/HXVvPb6eKZryGoaW2RID8UZAnciMdemKtiOjPqhsPYq
-         su29INL7HG3csfiELs+VX3dZUd1yzQear7GVxyxSbYQamOFnWPUpO8FOkrRd+dzyjwka
-         I5krmhrzOG+hAVPSTgmkui1gcjHCWwqDE5n2ur089cov+K0I/W6eyEj68ed2/OttbcdE
-         BgHdoM1EI3cZbJ3Y7b4ToWV633KNBWmrZc+zrPaWh/K/pA6dcK+Xu1cELCM7ZhGdhMC3
-         McGg==
-X-Forwarded-Encrypted: i=1; AJvYcCVjhvxNSXPJUgRnmQsdxbXPWl6A/RBtx1waUtp/9HES2RGnbU4xS8X/YdMrhNMok0oQME8=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwUuN+jl1TcHWfIIn11rpykkCbkDf9TJag+cm+0/jLiqY7xr7P4
-	j0jj2E68NEQtaKSU13Ti5esi2GyHK5TnK0pvy0f8xuDsPCRH/wv7fkFrhH+CcwVJLjpd6+PWO+Z
-	rTC5bvK2I8hdalZVLaWHLynTnYA6vUwXcOXxyFmvVHRi7AugdQVw9dg==
-X-Gm-Gg: ASbGncvFUURjUZea+JAQB7uKvcEwVtTSc9GHDVj0Wz1OqRJZY5n5XY3tenlBwgkxTuJ
-	bRl+T5qSX+U41j/FUvvxaWjSmr9IujW8CdKBOyhVxWvKrqVmtn8QQ9M3l0OupguICepEAebLejS
-	m1X6kYZ5B7ZGNXKFazkgkjBiN1PWrDSH9HGVg/z4O1TKl+g3OSFILd8/GTzqRI7IqoTZb++3rjw
-	ODbRIWqtKtWIIXzl9IORYxM2vAvKjh6V5nYpi1/Nw9gJdvgTP+46EgOI0irjQFiEyjIiY7O8lz5
-	lafIwjgbD8M79QAsmcUfbp0EnQaf08cnoceUsFJQAs9Yhf2CAHWVdtKCLabrLytH+SYK2W7tNmf
-	fCU4U5xrEk0Wl45VJUeow3NeEwXgkG6eRv34k7ZmlbKbCJ5aDfq6RXZ9VVZdd65SVmwmg
-X-Received: by 2002:a05:600c:c83:b0:46e:1c2d:bc84 with SMTP id 5b1f17b1804b1-46e329eb10emr33699455e9.17.1758801330699;
-        Thu, 25 Sep 2025 04:55:30 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IHt88AWAVfrsW7XtYeqx9eAlzDx2ZLFWRXrQuLhkskEblyKaQxcWglP3fS9EKwD9xW0YpDiXg==
-X-Received: by 2002:a05:600c:c83:b0:46e:1c2d:bc84 with SMTP id 5b1f17b1804b1-46e329eb10emr33698205e9.17.1758801329980;
-        Thu, 25 Sep 2025 04:55:29 -0700 (PDT)
-Received: from ?IPV6:2003:d8:2f3f:f800:c101:5c9f:3bc9:3d08? (p200300d82f3ff800c1015c9f3bc93d08.dip0.t-ipconnect.de. [2003:d8:2f3f:f800:c101:5c9f:3bc9:3d08])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-46e33b562d8sm31593705e9.0.2025.09.25.04.55.26
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 25 Sep 2025 04:55:29 -0700 (PDT)
-Message-ID: <b67dd7cd-2c1c-4566-badf-32082d8cd952@redhat.com>
-Date: Thu, 25 Sep 2025 13:55:26 +0200
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2E1D23002D7;
+	Thu, 25 Sep 2025 12:20:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.48.42
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1758802833; cv=fail; b=In02o4PDJsw+gifl8M+OXYtfp+QEyMzOyvr1qJCeHQQr1yUjruw8TMKIjLA0aI3uTCi+VfXZJgZdu4/z7XrrU0/wQL22A5SLztgd159gDLQ+OKdbGbWa6PHANMcwlayBZFMVf5enK9N6KIgJSGAtPFW9gB0nUMns+1pK4JJbgig=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1758802833; c=relaxed/simple;
+	bh=myAsuZ6PPUR4q+jrEZebILx+K85j8jK9r0oPBz8jufU=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:Content-Type:
+	 Content-Disposition:In-Reply-To:MIME-Version; b=JJ73fONs9oBvhgog/CVZJ8inVn7j2QciX6leBWZ3FbmOHyR29zIKVBl4qqadtmb059pHncuLu+jVuEEUX2UiPg+1dF7Qh9eMRRGvDGEgiolrda5xUNKpLLtOM08pQKmkEvlw/O42OyCMXwGuZM/CUiLlH9egjAzVuTnsfqvzUTY=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=PNkk8UbS; arc=fail smtp.client-ip=52.101.48.42
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=tQigW33qsxmGJfiiB0xDW1odQsri4t3mVH6rwxz3SvhTihEGr1mpyjKXDuC3ahlUbzTcWNzs51TXs4XopRDgtRTmMYdbD04B0Hb9XivsMta8I5rekLwcTYx44QWvVhJj9gpnQPEvO1cHu5FumvOuv1XjXivcacAP4gMb8AzVYhGZhsmIc0eyX3egzgSS4i4L5EYI4+vt2k+p1+ws9zPbspFMTdlvxAXEY9Q7S75Mthz1C8w2eCDj5XhHSF3vBUsyLKkFVV3glukm1Bsuwxkx0rtf2OvZpihGAlBglowf1c464CaxUI8+gY2iULJKlzFts3erOOBhS+2OA7jX/c1krA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=r/vcPIAqpBShxYHTPTjS5TuzHjo8TtH7KC6C0uUpgP0=;
+ b=D3muMmxv4MtJVymXModb+7It1q+1rJ8vwh14l49SoDIiVgmUb/r+JtRFP+8EpoR3GPSNKKTCgLhYQY4Z7f/jFK8QSDdXplVL/p0knUFj7uy+MEchh29LyhSUk5JCkltKg/jSEHBkaA/Wkhy6J1KIPA+SSm+s70EjVefMg0hekeh0mUU7bbNEmsp/gpzi5gdPG5fKkc6uM72BmYLRzBOPZu29TNjp3xqVQCMF28D0SFXxRudCQCdg7UQDk9BBG+bJFUazAFlGKfuFk0XMCbEdhnyT9Ydz8BlQOGK3oSG81v0rpUxMAxzm13i8mLUoVcM2v4P76dxmUpI/lyevl6lNXQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
+ dkim=pass header.d=nvidia.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=r/vcPIAqpBShxYHTPTjS5TuzHjo8TtH7KC6C0uUpgP0=;
+ b=PNkk8UbSPVvstK9xSmP25SXbgxm585JAPTBdjgUGrKNhOz7k3D0v7gGjPisYSxtUYdI+4FKyXKdH8Jix+dGMkY1Sw3Vfzpx9iXDPbKUuxPwcRu4bwXzwC0ZXP8zshBaxo3QpQJ/Ai+SwIEK+INwTwt9lWMkpjlR5PM2uE1s2ITnI/R9y2hhzTbl7Rr6Px+Is1rIXShwX0l+s+/FNl12wRwMfN1qERSqMV7o8VXtUjyHpaRJqJndpZkx5DMMGOV8Ga5tpWJr2W0C3EKvdFa8ATlauvk12A9vr2+IbxLSzuCXitlL7OPMa9UZbKGHXTjL3H7OhUdmn2CFDmjN9YnwFnw==
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nvidia.com;
+Received: from PH7PR12MB5757.namprd12.prod.outlook.com (2603:10b6:510:1d0::13)
+ by DS0PR12MB8504.namprd12.prod.outlook.com (2603:10b6:8:155::11) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9160.9; Thu, 25 Sep
+ 2025 12:20:28 +0000
+Received: from PH7PR12MB5757.namprd12.prod.outlook.com
+ ([fe80::f012:300c:6bf4:7632]) by PH7PR12MB5757.namprd12.prod.outlook.com
+ ([fe80::f012:300c:6bf4:7632%2]) with mapi id 15.20.9137.021; Thu, 25 Sep 2025
+ 12:20:28 +0000
+Date: Thu, 25 Sep 2025 09:20:26 -0300
+From: Jason Gunthorpe <jgg@nvidia.com>
+To: Alex Williamson <alex.williamson@redhat.com>
+Cc: Donald Dutile <ddutile@redhat.com>, Bjorn Helgaas <bhelgaas@google.com>,
+	iommu@lists.linux.dev, Joerg Roedel <joro@8bytes.org>,
+	linux-pci@vger.kernel.org, Robin Murphy <robin.murphy@arm.com>,
+	Will Deacon <will@kernel.org>, Lu Baolu <baolu.lu@linux.intel.com>,
+	galshalom@nvidia.com, Joerg Roedel <jroedel@suse.de>,
+	Kevin Tian <kevin.tian@intel.com>, kvm@vger.kernel.org,
+	maorg@nvidia.com, patches@lists.linux.dev, tdave@nvidia.com,
+	Tony Zhu <tony.zhu@intel.com>
+Subject: Re: [PATCH 03/11] iommu: Compute iommu_groups properly for PCIe
+ switches
+Message-ID: <20250925122026.GV2617119@nvidia.com>
+References: <20250702010407.GB1051729@nvidia.com>
+ <c05104a1-7c8e-4ce9-bfa3-bcbc8c9e0ef5@redhat.com>
+ <20250717202744.GA2250220@nvidia.com>
+ <2cb00715-bfa8-427a-a785-fa36667f91f9@redhat.com>
+ <20250718133259.GD2250220@nvidia.com>
+ <20250922163200.14025a41.alex.williamson@redhat.com>
+ <20250922231541.GF1391379@nvidia.com>
+ <20250922191029.7a000d64.alex.williamson@redhat.com>
+ <20250923130341.GJ1391379@nvidia.com>
+ <20250923152952.1f6c4b2f.alex.williamson@redhat.com>
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250923152952.1f6c4b2f.alex.williamson@redhat.com>
+X-ClientProxiedBy: DS0PR17CA0011.namprd17.prod.outlook.com
+ (2603:10b6:8:191::13) To PH7PR12MB5757.namprd12.prod.outlook.com
+ (2603:10b6:510:1d0::13)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH kvm-next V11 4/7] KVM: guest_memfd: Use guest mem inodes
- instead of anonymous inodes
-To: "Garg, Shivank" <shivankg@amd.com>,
- Sean Christopherson <seanjc@google.com>,
- Ackerley Tng <ackerleytng@google.com>
-Cc: willy@infradead.org, akpm@linux-foundation.org, pbonzini@redhat.com,
- shuah@kernel.org, vbabka@suse.cz, brauner@kernel.org,
- viro@zeniv.linux.org.uk, dsterba@suse.com, xiang@kernel.org,
- chao@kernel.org, jaegeuk@kernel.org, clm@fb.com, josef@toxicpanda.com,
- kent.overstreet@linux.dev, zbestahu@gmail.com, jefflexu@linux.alibaba.com,
- dhavale@google.com, lihongbo22@huawei.com, lorenzo.stoakes@oracle.com,
- Liam.Howlett@oracle.com, rppt@kernel.org, surenb@google.com,
- mhocko@suse.com, ziy@nvidia.com, matthew.brost@intel.com,
- joshua.hahnjy@gmail.com, rakie.kim@sk.com, byungchul@sk.com,
- gourry@gourry.net, ying.huang@linux.alibaba.com, apopple@nvidia.com,
- tabba@google.com, paul@paul-moore.com, jmorris@namei.org, serge@hallyn.com,
- pvorel@suse.cz, bfoster@redhat.com, vannapurve@google.com,
- chao.gao@intel.com, bharata@amd.com, nikunj@amd.com, michael.day@amd.com,
- shdhiman@amd.com, yan.y.zhao@intel.com, Neeraj.Upadhyay@amd.com,
- thomas.lendacky@amd.com, michael.roth@amd.com, aik@amd.com, jgg@nvidia.com,
- kalyazin@amazon.com, peterx@redhat.com, jack@suse.cz, hch@infradead.org,
- cgzones@googlemail.com, ira.weiny@intel.com, rientjes@google.com,
- roypat@amazon.co.uk, chao.p.peng@intel.com, amit@infradead.org,
- ddutile@redhat.com, dan.j.williams@intel.com, ashish.kalra@amd.com,
- gshan@redhat.com, jgowans@amazon.com, pankaj.gupta@amd.com,
- papaluri@amd.com, yuzhao@google.com, suzuki.poulose@arm.com,
- quic_eberman@quicinc.com, linux-bcachefs@vger.kernel.org,
- linux-btrfs@vger.kernel.org, linux-erofs@lists.ozlabs.org,
- linux-f2fs-devel@lists.sourceforge.net, linux-fsdevel@vger.kernel.org,
- linux-mm@kvack.org, linux-kernel@vger.kernel.org,
- linux-security-module@vger.kernel.org, kvm@vger.kernel.org,
- linux-kselftest@vger.kernel.org, linux-coco@lists.linux.dev
-References: <20250827175247.83322-2-shivankg@amd.com>
- <20250827175247.83322-7-shivankg@amd.com> <diqztt1sbd2v.fsf@google.com>
- <aNSt9QT8dmpDK1eE@google.com> <dc6eb85f-87b6-43a1-b1f7-4727c0b834cc@amd.com>
-From: David Hildenbrand <david@redhat.com>
-Content-Language: en-US
-Autocrypt: addr=david@redhat.com; keydata=
- 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
- qIws/H2t
-In-Reply-To: <dc6eb85f-87b6-43a1-b1f7-4727c0b834cc@amd.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: PH7PR12MB5757:EE_|DS0PR12MB8504:EE_
+X-MS-Office365-Filtering-Correlation-Id: 56692540-a63f-4917-014a-08ddfc2de990
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;ARA:13230040|366016|1800799024|376014|7416014;
+X-Microsoft-Antispam-Message-Info:
+	=?us-ascii?Q?/j0Wdmrrioq+0ypgGcAuRPp2uutk1HIGNdcrIhKugTIzI9VRlYynMCBKWhoH?=
+ =?us-ascii?Q?ZN9KjFM4yzUJrJWBQrrskRONELkO2Gx9nMCSvjd5SMF5wWgByqY0ggA3m7Gh?=
+ =?us-ascii?Q?CLiapkY4PTKNxZ3fLQyjoYdSX5tU/LDgbO8iwM4szSvhBHUvNfKnNSROXzlu?=
+ =?us-ascii?Q?UelwmUTrqfyVKRFTEn/KFPbPeKJAf8dDbvWnWmZaSj0SnzHtRFZ6SHB1g+9S?=
+ =?us-ascii?Q?NAbH7CpU8lQ8Atm9O0VjFrqyQqZzHiNBjBXCBIhWQJRttus6CNAPqbwr/r59?=
+ =?us-ascii?Q?apwId48W3LpmW/ADqPO403oZdiPfCDLIeCCkibpkkCTSFMmYMlsWNWls4N6H?=
+ =?us-ascii?Q?o4wdXSxCEL9DSp6Gvh3OxNxb9kSWkOdiT8FmjY5bLXc7Jfp+kiYXYmgJ0j8h?=
+ =?us-ascii?Q?ouy6wRmhs8UXHOX2HReauyEV+P3LXLFUBsd3w4k4DL1q7wLkc953UTwyNgrg?=
+ =?us-ascii?Q?7IivJQWUvC98yiGZcpD25kZB6rfBPu79YkZ1rfuPNGhrj0QMlxCSK25VJvwU?=
+ =?us-ascii?Q?A0VNCijhqdldS9haoj7Od+3woXVBvwkY1Q5TcmOmi3qQNi24pcUMSYcgP5Zh?=
+ =?us-ascii?Q?wxjf5Uxvgw0gUQWoRnZBc/qv3BJ9x096MFbQFIt7JJHM/4kL1bdRC+sV0+Sx?=
+ =?us-ascii?Q?v+jOuz6NHn9TLmE++Q1ifHqx0tb+o+8yYX80c/ByBvnVlt9Op5T5NEiSyw3T?=
+ =?us-ascii?Q?r6w9tbIYzvahZG+EGu/rVUzvHmcpI6erZDwW+dSmNahS3eBEZnRNR0rt4+Fm?=
+ =?us-ascii?Q?VtA8T0QNaGG85JVqYP+Ch1jDVUULIRSzBxgq7a5HciF9AfdqHH20CGfhpWGo?=
+ =?us-ascii?Q?i/pBUQaSr/DT3UUxoKfX5oLnFrJlKbF7PitEFWbCEbo7aeM6MnqE5Owc9zv5?=
+ =?us-ascii?Q?9Y5vIDKzjQjEIjkza6tc9EfLhFzOVZnpjAylulg0XdENpWGMc8QCMSx71t5A?=
+ =?us-ascii?Q?gKjhBpAQGWp+GzTIq8szY6XW2Ed9GGqt8tme7J/Jjanlrik9S0of1GT09hYt?=
+ =?us-ascii?Q?sAgMOV0/+eEIAYiu4DSRyLoPfbMVAvKXAdGP6JcdN+6Wc89/F7p3fbl2Cd/y?=
+ =?us-ascii?Q?lCWa4lE7jgXIBT5MeGrv49HXj8dx12t/zdBlSX7RKieMhPI4P32EkZWa9mV5?=
+ =?us-ascii?Q?Ny9vjGU7IKbYlMAr8+5KNxb8KymLbgZ6RH5MIUWT6J4l+JeCEW7aHIF+LMH0?=
+ =?us-ascii?Q?ED2LUQxrzvpyy8q16s7Y3GidJDM5IseTaO+d0+pTiXfhkYqUrAfHQF/X4kWj?=
+ =?us-ascii?Q?4U46sjreuuFWavI25+dJM++Yd7EUx5stTMXPgBCxBmktL2A078Z06SZUeZrb?=
+ =?us-ascii?Q?83HSO51JkPeiNCVUZpfUUcN8/IS/2Q6nfsbIw2VI3mQPgz5cPzcpZDy7pOvv?=
+ =?us-ascii?Q?2sNUFq11i88VnJ+gFdx/y4F+89nNQkjW8c6h5knMA0cvUe43w1fM4FeCEZ6z?=
+ =?us-ascii?Q?N3jVLPwzBYBmIcLp7wtP3pNNf8IcJJbmPZ6J3gg/vkHG7ocWnlag6w=3D=3D?=
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PH7PR12MB5757.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(1800799024)(376014)(7416014);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?us-ascii?Q?vFDxc7bdem87XIF5WJLmYXH01W0WlK1qqA6+H+XedMPyr3ED/Cv1EbNKRxjq?=
+ =?us-ascii?Q?60hW2cNt4SZFzgNVElStkkWWd9DbxfMNvCb5Nk0TzC1oMNgi5VvvfDQx4HZN?=
+ =?us-ascii?Q?SjLcHkGgp6XcPHSujVCHH7Np2cI/ltZ8hJVyhV7vwM+nr4oUD571tiUR0O2T?=
+ =?us-ascii?Q?ksYyIV4CDR17xj2N0eZHKLJyWr2oQQx9S9a5LcbEFlh9PJbtnN58Q/inWcu4?=
+ =?us-ascii?Q?rMtf/AxLRN1EWb9ik8oFko5ZBZWXOsXfctWFBm/8gjCER/OirFu7X22UAo4i?=
+ =?us-ascii?Q?vz6tyvJ1KTOcAssMiWHqEuw7CgeX3I6EzYjR+Uv7mb2+8H6HSoXv3Xbk/RLB?=
+ =?us-ascii?Q?XUEdplaLU4Jzd5tW5Hu4jtUeWs9d2buJGtIufVva/GG9Ex5JaXuSOaVfRT0a?=
+ =?us-ascii?Q?DUL1VXv05VCuJO0fSF8+ti+O/w6WUXcsvWplCnSzz20YLDDRjxJGZpZGURIs?=
+ =?us-ascii?Q?51f6HHU+hA3RBypZejO7t6C2sGmQmuDRSajSWiGvC1NQtxa/A9hkr4v3kCws?=
+ =?us-ascii?Q?FHK0u//AhYdaZQD2LO7XkgqWiFVlKuzG6X6NGB6T1byUw1y3JunGyPUzuRaC?=
+ =?us-ascii?Q?Bm2RBRbcZFNSCACkCSYAPOzqbRcOyBc5SWhRN35o+kD/XS55q+QN2ofxLumU?=
+ =?us-ascii?Q?fxwCDf+Pw6IJVulmghZtz/+DBA5wlyN7wOys5yunzH4gOdWJ9Sph+Flc1ro1?=
+ =?us-ascii?Q?rsr5BdhG1WrVTm0SsP+QH8GT6UYf4qXYTG7VzCYT+iKmbguFi0e+dA+qh6Km?=
+ =?us-ascii?Q?gw4ymMg7Q40ALyZmWmCl50d7DfCFkXJdxzLe2zk087rOGw/gNGjWy9DAYOZI?=
+ =?us-ascii?Q?2NVzy/EWUMQJy3jElzTJ7kvJI8ia28PlwxKAcjZYJ//D8dK/ggKyhS0QWHYB?=
+ =?us-ascii?Q?zOP8UzCEc8h3zdmchwfyEsttWkKtKDKEbgEYfrh1KOl3XgF87MR6e8oDKCcz?=
+ =?us-ascii?Q?aXdCBuWFEO027b3F46JWEuEidoB1Z9mkQDNd5HPjlSCibuv4CT0JieNwCbo+?=
+ =?us-ascii?Q?psoOVo81Pd2zprbV+48gB0kgqYnop+BLmkBn8qfuvGBgn7jIYLR9eFu5o5fF?=
+ =?us-ascii?Q?3PlRAvmwjSLCNmlGb12/5fI7ClKL6JrQFZJ7jTH4hFQTLFYjdxeNS8JmnNvm?=
+ =?us-ascii?Q?P46Ajv+CqAKEaAPv1HX2STHn2g5oON5ZiOdMQewwkzF7M63xkq2a0LTYJf2d?=
+ =?us-ascii?Q?KkVc1S9DFNzCpzXbwAopSGuCfwV05uk/5rOaywCyZYbGv1fd+xu6VWWsO7UA?=
+ =?us-ascii?Q?b3DpFoaMF71CMlOH/TQpfG5uwI9QzJEPjRfowf61IxImgtVDBDkuIdAOda5S?=
+ =?us-ascii?Q?SdaAJHMh5MoY5G4dW79NtThDfDOnFwrGiWF0wbsTqP7RqqBtGmbeQHGFZIid?=
+ =?us-ascii?Q?2r3tNIRJBrJ+TQEDMPVoAG2xeuZx2dvTFczngSMQrFmAIjc4K7wEtkmvTuJb?=
+ =?us-ascii?Q?rYz4QCm+ugYpiUQcRY6XT9uDidmn2/X9JnrYZAClRbZVzV5z2vu3DoON9kLL?=
+ =?us-ascii?Q?tgmZpUYv+/LN7dWaTYNvbesk58vCH2cMbk+lYiG3DvP6vo4RNmp0N4eghP6h?=
+ =?us-ascii?Q?IS0rhrJbG1CQud9jZBLdYcma5hGUCkb4UeIckDL0?=
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 56692540-a63f-4917-014a-08ddfc2de990
+X-MS-Exchange-CrossTenant-AuthSource: PH7PR12MB5757.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 25 Sep 2025 12:20:28.0424
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: Fy6BQYWl3aIsXANIx2CQ3DFov+tb2h61d1+uCy1bOWnmhvbiR0x0VNSsVQDax1w1
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DS0PR12MB8504
 
-On 25.09.25 13:44, Garg, Shivank wrote:
+On Tue, Sep 23, 2025 at 03:29:52PM -0600, Alex Williamson wrote:
+> > > Where?  Is this in reference to our handling of multi-function
+> > > endpoints vs whether downstream switch ports are represented as
+> > > multi-function vs multi-slot?  
+> > 
+> > If you have a MFD Linux with no ACS it will group the whole MFD if any
+> > of it lacks ACS caps because it assumes there is an internal loopback
+> > between functions.
 > 
+> Yes
 > 
-> On 9/25/2025 8:20 AM, Sean Christopherson wrote:
->> My apologies for the super late feedback.  None of this is critical (mechanical
->> things that can be cleaned up after the fact), so if there's any urgency to
->> getting this series into 6.18, just ignore it.
->>
->> On Wed, Aug 27, 2025, Ackerley Tng wrote:
->>> Shivank Garg <shivankg@amd.com> writes:
->>> @@ -463,11 +502,70 @@ bool __weak kvm_arch_supports_gmem_mmap(struct kvm *kvm)
->>>   	return true;
->>>   }
->>>
->>> +static struct inode *kvm_gmem_inode_create(const char *name, loff_t size,
->>> +					   u64 flags)
->>> +{
->>> +	struct inode *inode;
->>> +
->>> +	inode = anon_inode_make_secure_inode(kvm_gmem_mnt->mnt_sb, name, NULL);
->>> +	if (IS_ERR(inode))
->>> +		return inode;
->>> +
->>> +	inode->i_private = (void *)(unsigned long)flags;
->>> +	inode->i_op = &kvm_gmem_iops;
->>> +	inode->i_mapping->a_ops = &kvm_gmem_aops;
->>> +	inode->i_mode |= S_IFREG;
->>> +	inode->i_size = size;
->>> +	mapping_set_gfp_mask(inode->i_mapping, GFP_HIGHUSER);
->>> +	mapping_set_inaccessible(inode->i_mapping);
->>> +	/* Unmovable mappings are supposed to be marked unevictable as well. */
->>> +	WARN_ON_ONCE(!mapping_unevictable(inode->i_mapping));
->>> +
->>> +	return inode;
->>> +}
->>> +
->>> +static struct file *kvm_gmem_inode_create_getfile(void *priv, loff_t size,
->>> +						  u64 flags)
->>> +{
->>> +	static const char *name = "[kvm-gmem]";
->>> +	struct inode *inode;
->>> +	struct file *file;
->>> +	int err;
->>> +
->>> +	err = -ENOENT;
->>> +	/* __fput() will take care of fops_put(). */
->>> +	if (!fops_get(&kvm_gmem_fops))
->>> +		goto err;
->>> +
->>> +	inode = kvm_gmem_inode_create(name, size, flags);
->>> +	if (IS_ERR(inode)) {
->>> +		err = PTR_ERR(inode);
->>> +		goto err_fops_put;
->>> +	}
->>> +
->>> +	file = alloc_file_pseudo(inode, kvm_gmem_mnt, name, O_RDWR,
->>> +				 &kvm_gmem_fops);
->>> +	if (IS_ERR(file)) {
->>> +		err = PTR_ERR(file);
->>> +		goto err_put_inode;
->>> +	}
->>> +
->>> +	file->f_flags |= O_LARGEFILE;
->>> +	file->private_data = priv;
->>> +
->>> +	return file;
->>> +
->>> +err_put_inode:
->>> +	iput(inode);
->>> +err_fops_put:
->>> +	fops_put(&kvm_gmem_fops);
->>> +err:
->>> +	return ERR_PTR(err);
->>> +}
->>
->> I don't see any reason to add two helpers.  It requires quite a bit more lines
->> of code due to adding more error paths and local variables, and IMO doesn't make
->> the code any easier to read.
->>
->> Passing in "gmem" as @priv is especially ridiculous, as it adds code and
->> obfuscates what file->private_data is set to.
->>
->> I get the sense that the code was written to be a "replacement" for common APIs,
->> but that is nonsensical (no pun intended).
->>
->>>   static int __kvm_gmem_create(struct kvm *kvm, loff_t size, u64 flags)
->>>   {
->>> -	const char *anon_name = "[kvm-gmem]";
->>>   	struct kvm_gmem *gmem;
->>> -	struct inode *inode;
->>>   	struct file *file;
->>>   	int fd, err;
->>>
->>> @@ -481,32 +579,16 @@ static int __kvm_gmem_create(struct kvm *kvm, loff_t size, u64 flags)
->>>   		goto err_fd;
->>>   	}
->>>
->>> -	file = anon_inode_create_getfile(anon_name, &kvm_gmem_fops, gmem,
->>> -					 O_RDWR, NULL);
->>> +	file = kvm_gmem_inode_create_getfile(gmem, size, flags);
->>>   	if (IS_ERR(file)) {
->>>   		err = PTR_ERR(file);
->>>   		goto err_gmem;
->>>   	}
->>>
->>> -	file->f_flags |= O_LARGEFILE;
->>> -
->>> -	inode = file->f_inode;
->>> -	WARN_ON(file->f_mapping != inode->i_mapping);
->>> -
->>> -	inode->i_private = (void *)(unsigned long)flags;
->>> -	inode->i_op = &kvm_gmem_iops;
->>> -	inode->i_mapping->a_ops = &kvm_gmem_aops;
->>> -	inode->i_mode |= S_IFREG;
->>> -	inode->i_size = size;
->>> -	mapping_set_gfp_mask(inode->i_mapping, GFP_HIGHUSER);
->>> -	mapping_set_inaccessible(inode->i_mapping);
->>> -	/* Unmovable mappings are supposed to be marked unevictable as well. */
->>> -	WARN_ON_ONCE(!mapping_unevictable(inode->i_mapping));
->>> -
->>>   	kvm_get_kvm(kvm);
->>>   	gmem->kvm = kvm;
->>>   	xa_init(&gmem->bindings);
->>> -	list_add(&gmem->entry, &inode->i_mapping->i_private_list);
->>> +	list_add(&gmem->entry, &file_inode(file)->i_mapping->i_private_list);
->>
->> I don't understand this change?  Isn't file_inode(file) == inode?
->>
->> Compile tested only, and again not critical, but it's -40 LoC...
->>
->>
+> > If the MFD has a single function with ACS then only that function is
+> > removed from the group. The only way we can understand this as correct
+> > by our grouping definition is to require the MFD have no internal
+> > loopback. ACS is an egress control, not an ingress control.
 > 
-> Thanks.
-> I did functional testing and it works fine.
+> Yes, current grouping is focused on creating sets of devices that
+> cannot perform DMA outside of their group without passing through a
+> translation agent.  It doesn't account for ingress from other devices.
 
-I can queue this instead. I guess I can reuse the patch description and 
-add Sean as author + add his SOB (if he agrees).
+That isn't the definition of groups at all. If any two devices can DMA
+to each other they must be in the same group.
 
-Let me take a look at the patch later in more detail.
+There is no ingress or egress rational with groups. The fact the
+implementation is creating these inconsistencies with ingress vs
+egress is a BUG and not in anyway part of the security definition.
 
--- 
-Cheers
+> One of the few examples of this that seems to exist is something like
+> you're describing where we have a MFD and one of the functions is
+> quirked or reports an empty ACS capability to create another group.
 
-David / dhildenb
+Yes, one of my test systems has an intel NIC like this. 
 
+> The ACS/quirk device is believed not to have the capability to DMA into
+> the non-ACS/quirk devices, but the opposite is not guaranteed.  
+
+I don't think so. The quirk should have been applied to the whole
+MFD. Because the code has this behavior people got away with quirking
+the NIC only. IMHO the way to understand that quirk is applying to the
+whole MFD.
+
+> In practice the ACS/quirk device is typically the only device that's
+> worthwhile to assign, so the host is still isolated from the
+> userspace driver.  Arguably the userspace device may not be isolated
+> from the host devices, but without things like TDISP, there's
+> already a degree of trust in other host drivers and devices.
+
+No way! That isn't how any of this should work with hand waving around
+"worthwhile to assign" guessing.
+
+> I'm afraid that including the ingress potential in the group
+> configuration is going to blow up existing groups, for not much
+> practical gain.  
+
+You are aruging both ways. The current design does not follow the
+spec, and does not implement the security defintion for groups.
+
+Dismissing that as "no practical gain" for correcting the security is
+perhaps true, but then don't argue against this series that it
+slightly weakens the security if it has "no practical gain". :(
+
+> I wonder if there's an approach where a group split in
+> this way might taint the non-ACS/quirk group to prevent vfio use cases
+> and whether that would sufficiently close this gap with minimal
+> breakage.
+
+You want to build asymmetric groups now?? It is already too
+complicated - this really brings no value IMHO.
+
+> > If a MFD function is a bridge/port then the group doesn't propogate
+> > the group downstream of the bridge - again this requires assuming
+> > there is no internal loopback between functions.
+> 
+> I think that if we have a multi-function root port without ACS/quirks
+> that all the functions and downstream devices are grouped together.
+
+Yes, if the MFD bridge has ACS then yes it wrongly blocks the
+propogation. Again the only way to understand this behavior as making
+sense is if it is assuming there is no internal MFD loopback.
+
+> > It is taking the undefined behavior in the spec and selectively making
+> > both interpretations at once.
+> 
+> The intention is that undefined behavior should be considered
+> non-isolated.
+
+Sure, but it doesn't do that
+
+> We try to define that boundary of a group based on provable egress
+> DMA.
+
+It's a bug. That logic doesn't match the security defintion of groups.
+
+> > How about we answer the question "does this MFD have internal
+> > loopback" as:
+> >  - NO if any function has an appropriate ACS cap or quirk.
+> 
+> In this case rather than split the one ACS/quirk function into a group
+> we split each function into a group.  Now we potentially have singleton
+> groups for non-ACS/quirk functions that we really have no basis to
+> believe are isolated from other similar devices.  
+
+No, that's too strong. Given that ACS is an egress control it is
+totally pointless for a vendor to make an ACS that egress controls one
+function but the MFD has internal loopback allowing other functions to
+ingress.
+
+We are making the assumption, that Linux is already making, where if
+some vendor has added/quirked ACS then it actually provides egress and
+ingress isolation to that function. Meaning there is no MFD internal
+loopback.
+
+I'm propsing the consistently broaden this assumption to the whole MFD.
+
+> >  - NO if any function is bridge/port
+> 
+> This would hand-wave away grouping multi-function downstream ports
+> without ACS/quirks with no justification afaict.
+
+We can drop this if the bridge functions have ACS already today to get
+their groups split.
+
+> >  - YES otherwise - all functions are end functions and no ACS declared
+> > 
+> > As above this is quite a bit closer to what Linux is doing now. It is
+> > a practical estimation of the undefined spec behavior based on the
+> > historical security posture of Linux.
+> 
+> It's really not what we're doing now.  We currently consider undefined
+> behavior to be non-isolated, or we try to.  
+
+Maybe it wanted to, but it isn't implemented right.
+
+> The above makes broad and unwarranted (IMO) isolation claims.
+
+I agree, it is trying to match the bugs in the current code with a
+grounding in something explainable and understandable that matches our
+security definition for groups.
+
+> This puts data at risk more so than assuming undefined behavior is
+> non-isolated.
+
+I already sent a series that actually assumed undefined behavior was
+non-isolated.
+
+It breaks alot of systems because doing that *correctly* is extremely
+pessimistic toward real world HW.
+
+> Should we re-evaluate how we handle downstream switch ports exposed as
+> separate slots, certainly.  
+
+So lets start with that, we can stop this series after it fixes the
+switch ports.
+
+Jason
 
