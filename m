@@ -1,126 +1,146 @@
-Return-Path: <kvm+bounces-58826-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-58827-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7AA0EBA1CA8
-	for <lists+kvm@lfdr.de>; Fri, 26 Sep 2025 00:27:01 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3F927BA1CC3
+	for <lists+kvm@lfdr.de>; Fri, 26 Sep 2025 00:31:52 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3C0AB740C1F
-	for <lists+kvm@lfdr.de>; Thu, 25 Sep 2025 22:27:00 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 655371C2750D
+	for <lists+kvm@lfdr.de>; Thu, 25 Sep 2025 22:32:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D97BF31E89F;
-	Thu, 25 Sep 2025 22:26:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CEB7B321F2F;
+	Thu, 25 Sep 2025 22:31:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="PruQJXrX"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="C+yZubRg"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.9])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 50C11235358;
-	Thu, 25 Sep 2025 22:26:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.9
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 57B0F272E67
+	for <kvm@vger.kernel.org>; Thu, 25 Sep 2025 22:31:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758839211; cv=none; b=Ms9aewqOtpOu6wrE+hPFZRgRnuu0FEmOMxtNZPeipgQfGUrsG2S+lxsqzcDw5ePbIzo3mObV+RhQXdIppfqKQVGP2QuFGpCG3k8aaQd1lI6Qoz1T8flSY94RVj/SaM97+JMM0BlXY1RkQoPuPIaPRf3bTgkY+WKgSciDy/XAEhM=
+	t=1758839500; cv=none; b=jVfV+nrGXJ5RGH7cob+4zOMnzsyJUliaRJRy8nEQa+am4etaM2sOGf94QO9uA0N95LRZmm4BcbYvnA3SmKrBVh7sCbeY05OoMBUv6mSYju80tq/hAQY3XZfuXAoGZAbOqaZxhojQ0loRpLeBMbGE+Op1Xgf1xTus/omX3zddqXc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758839211; c=relaxed/simple;
-	bh=y8aCu9NESh0NVPciwZYe19Rxo6RA8Y4jx0b6M5NqwqM=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=R2hbmEYI4DAReFzrzaMKLeJ/0RilCC5qn025VaQ3gTZ9o9fQ7nkkd8CesekkNW67WRHQpqsrtwqds4yuh8NtCC1DC/a1g/8R/+9aBV9w76hRaXzyjgOrRkXz0sKHMu6OVizm1XaOHZbFhVyiBrFD5CYnhI8Uh+M/VzXvd9GlAvI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=pass smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=PruQJXrX; arc=none smtp.client-ip=198.175.65.9
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1758839209; x=1790375209;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=y8aCu9NESh0NVPciwZYe19Rxo6RA8Y4jx0b6M5NqwqM=;
-  b=PruQJXrXeAbnKOXtH/FsofMbXJilr/I9pB2dcsnSr/4CequipFNFyJBF
-   xGAkhW+0P5LSr25R03iq2K8sxFYTzHFruE9aGwkvyOt+lSAlcwKPPD46K
-   LMg/0pOVlQTsAgS/1NiD5q6VJpWTlbsU05zd9Z0mKVDbnsIUv3xSgbzGH
-   fOWPFCeEicPXY779//KgomiUP54iBT8xP75HyAYQHwixhhGGoRwz/kWD8
-   UBYPlUrYU+5kO5sJ+138461ERS0gMJTNWqHnIvlhK4lhs0YO9cW+AeBYv
-   crynj6KR/LGzAuGh1/smLQjqRmCNqSVaPpBh97pBabD93BIi68V2iFKUO
-   g==;
-X-CSE-ConnectionGUID: O3I3BHLKTlO2jtSZrIA/9Q==
-X-CSE-MsgGUID: fND8rEndQaePhH1uDyxa1Q==
-X-IronPort-AV: E=McAfee;i="6800,10657,11564"; a="83779841"
-X-IronPort-AV: E=Sophos;i="6.18,293,1751266800"; 
-   d="scan'208";a="83779841"
-Received: from orviesa003.jf.intel.com ([10.64.159.143])
-  by orvoesa101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 25 Sep 2025 15:26:49 -0700
-X-CSE-ConnectionGUID: ssyuVzJlRVu8xc7eoRt0VA==
-X-CSE-MsgGUID: sk1hz81AS0KnvxoU+GvQNg==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.18,293,1751266800"; 
-   d="scan'208";a="181447068"
-Received: from mgerlach-mobl1.amr.corp.intel.com (HELO desk) ([10.124.220.190])
-  by ORVIESA003-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 25 Sep 2025 15:26:48 -0700
-Date: Thu, 25 Sep 2025 15:26:41 -0700
-From: Pawan Gupta <pawan.kumar.gupta@linux.intel.com>
-To: "Kaplan, David" <David.Kaplan@amd.com>
-Cc: "x86@kernel.org" <x86@kernel.org>, "H. Peter Anvin" <hpa@zytor.com>,
-	Josh Poimboeuf <jpoimboe@kernel.org>,
-	Sean Christopherson <seanjc@google.com>,
-	Paolo Bonzini <pbonzini@redhat.com>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-	"kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-	Asit Mallick <asit.k.mallick@intel.com>,
-	Tao Zhang <tao1.zhang@intel.com>
-Subject: Re: [PATCH 2/2] x86/vmscape: Replace IBPB with branch history clear
- on exit to userspace
-Message-ID: <20250925222641.6lgdjua6oavdmih5@desk>
-References: <20250924-vmscape-bhb-v1-0-da51f0e1934d@linux.intel.com>
- <20250924-vmscape-bhb-v1-2-da51f0e1934d@linux.intel.com>
- <LV3PR12MB9265478E85AA940EF6EA4D7D941FA@LV3PR12MB9265.namprd12.prod.outlook.com>
- <20250925220251.qfn3w6rukhqr4lcs@desk>
+	s=arc-20240116; t=1758839500; c=relaxed/simple;
+	bh=0Alswmfe1zq7N80PnOB6XtFxyNuFoZwrMxHbgdTZfVk=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=rE2MQIIoy8/+VYjRVhK1BMrJTBX+/PyQXL2WQZfpx9XMJ4h4rBGoIxqRsKRi2pRhCe5QaPqo5Q/mjFyW2ydn3xzv/ksS8D/XpQ4mZXlW2Z4mN7478gEBY7EuGw2uDVyDlB8447BYDCh1ZBVdU9cOamXA/Cbp7FHyFj+cSoRiqPU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=C+yZubRg; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1758839497;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=pPGBYTkBK6lmMsctQg86rFzc+ubUYRnHqSeaFKAdA0w=;
+	b=C+yZubRgK7Xuwq8ZYbAwrcRYC9QJmxmKZYhbFEgZZzGy0wcSpRtZdmQIn5cJi+4/kE7I0b
+	H7LRxQ7lvfwPszHznmJsqnXlq31xtlX1UeKVoTth1DoVwhxeCom1E1069qr7z2twjZ/ElL
+	OZg7vgVrWNEhfNV/vmzboGSLcCUVDtI=
+Received: from mail-il1-f200.google.com (mail-il1-f200.google.com
+ [209.85.166.200]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-342-SZ5Dm_wfM7GO-we7Tjtzaw-1; Thu, 25 Sep 2025 18:31:36 -0400
+X-MC-Unique: SZ5Dm_wfM7GO-we7Tjtzaw-1
+X-Mimecast-MFC-AGG-ID: SZ5Dm_wfM7GO-we7Tjtzaw_1758839495
+Received: by mail-il1-f200.google.com with SMTP id e9e14a558f8ab-4248b4d6609so3761235ab.3
+        for <kvm@vger.kernel.org>; Thu, 25 Sep 2025 15:31:36 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1758839495; x=1759444295;
+        h=content-transfer-encoding:mime-version:organization:references
+         :in-reply-to:message-id:subject:cc:to:from:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=pPGBYTkBK6lmMsctQg86rFzc+ubUYRnHqSeaFKAdA0w=;
+        b=fScZtA6zjWTmnwE07Gzw2PLhLy+mhwoaSNPcxVxvKTLI4It5AIU0pvaCZ0BHFE7+6Z
+         Joyv6rfMAldAb0zM55JrXx23lXWtAxUPm0hiIawEJ0bAe2vdJR1sDY0zwG0ooxDjYqpN
+         aeWaLdtnLUmLZwmaHiR6xq0vejAHESVRAtNWNk8fniSGv68fCYtgN3U2R/33iI5HGNbn
+         HjIp5q6WpaYV2CAgh6UVZeNm5r8lYRdMglN559wySPpwPTu1rRs0ggtaNqHgTaE1x7zg
+         TOQF9POQVW71K+sT3gPIsSvfhOtcmrFUCsaEGH+3XnkMbprJxUhRmDuzX4bQLeDNwcN1
+         zNxg==
+X-Forwarded-Encrypted: i=1; AJvYcCXi6hQ7FTt6qDIYxHl6sQKLydWlhiH9LrK/hwTTsRg+G//W1XiY/rNTMoB625URMvPtTis=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzfdwMoHxYD8aflw2wWMBawbJabuvRSUqPklyeHlVkmAhI+DPZw
+	3XyvWj92sw7O6Rgcbo2h0a4T8o7V9QhCST5sh3GtNp5c3UUdzqBYbXhc18YBSCTWV7k9m3NVDNJ
+	AUIoB4nq2wLwqqeJFvoEnAgQ9P5Pcqej/7ier3XK9Ub8yyr0PslZ6SQ==
+X-Gm-Gg: ASbGnct7jscTe95UTOx9CLn4Z5lNG751mvonMidfA2Idu+ONNm6SWttbX5XolMzpdUZ
+	q9SavY3jojn2dk9iRZAjvmnRx43ayhsxKcIsqDXfD7yeyorT8SsVm3T0A2QmxipHD9PItRtJRPv
+	p8SqCRBTuCdxeiv0x+zCZfaojmjOzBuMZwJh8UyjDTnCcPODK1qeYkKJ0Suzv7uaY+Xy8XjUufK
+	y0vraul8QIeAsTW5pwRfrVjvBcMXYOcGTzeW5tB3ygt/5Rd8g1zH9tHiIbXePYdfHvKcpgTBZMU
+	RHUbPPqBYMTolmBINxM3Hw7oro/X9lbTIKNI1Itkom4=
+X-Received: by 2002:a92:d987:0:b0:424:80e6:9e8b with SMTP id e9e14a558f8ab-42595661562mr24720345ab.7.1758839495387;
+        Thu, 25 Sep 2025 15:31:35 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IGBjWzVlsd5kVvaGcIPZVt9Dy5vtGZ7X7lNybnyhnS6f36pgd3Q/xbJFuK0zszjvTKZaW8Iag==
+X-Received: by 2002:a92:d987:0:b0:424:80e6:9e8b with SMTP id e9e14a558f8ab-42595661562mr24719995ab.7.1758839494991;
+        Thu, 25 Sep 2025 15:31:34 -0700 (PDT)
+Received: from redhat.com ([38.15.36.11])
+        by smtp.gmail.com with ESMTPSA id 8926c6da1cb9f-56a69a1c574sm1211405173.40.2025.09.25.15.31.33
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 25 Sep 2025 15:31:34 -0700 (PDT)
+Date: Thu, 25 Sep 2025 16:31:31 -0600
+From: Alex Williamson <alex.williamson@redhat.com>
+To: Jason Gunthorpe <jgg@nvidia.com>
+Cc: Leon Romanovsky <leon@kernel.org>, Andrew Morton
+ <akpm@linux-foundation.org>, Bjorn Helgaas <bhelgaas@google.com>, Christian
+ =?UTF-8?B?S8O2bmln?= <christian.koenig@amd.com>,
+ dri-devel@lists.freedesktop.org, iommu@lists.linux.dev, Jens Axboe
+ <axboe@kernel.dk>, Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
+ linaro-mm-sig@lists.linaro.org, linux-block@vger.kernel.org,
+ linux-kernel@vger.kernel.org, linux-media@vger.kernel.org,
+ linux-mm@kvack.org, linux-pci@vger.kernel.org, Logan Gunthorpe
+ <logang@deltatee.com>, Marek Szyprowski <m.szyprowski@samsung.com>, Robin
+ Murphy <robin.murphy@arm.com>, Sumit Semwal <sumit.semwal@linaro.org>,
+ Vivek Kasireddy <vivek.kasireddy@intel.com>, Will Deacon <will@kernel.org>
+Subject: Re: [PATCH v2 03/10] PCI/P2PDMA: Refactor to separate core P2P
+ functionality from memory allocation
+Message-ID: <20250925163131.22a2c09b.alex.williamson@redhat.com>
+In-Reply-To: <20250925115308.GT2617119@nvidia.com>
+References: <cover.1757589589.git.leon@kernel.org>
+	<1e2cb89ea76a92949d06a804e3ab97478e7cacbb.1757589589.git.leon@kernel.org>
+	<20250922150032.3e3da410.alex.williamson@redhat.com>
+	<20250923150414.GA2608121@nvidia.com>
+	<20250923113041.38bee711.alex.williamson@redhat.com>
+	<20250923174333.GE2608121@nvidia.com>
+	<20250923120932.47df57b2.alex.williamson@redhat.com>
+	<20250925070314.GA12165@unreal>
+	<20250925115308.GT2617119@nvidia.com>
+Organization: Red Hat
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250925220251.qfn3w6rukhqr4lcs@desk>
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-On Thu, Sep 25, 2025 at 03:02:57PM -0700, Pawan Gupta wrote:
-> On Thu, Sep 25, 2025 at 06:14:54PM +0000, Kaplan, David wrote:
-> > > -       if (vmscape_mitigation == VMSCAPE_MITIGATION_AUTO)
-> > > +       if (vmscape_mitigation == VMSCAPE_MITIGATION_IBPB_EXIT_TO_USER
-> > > &&
-> > > +           !boot_cpu_has(X86_FEATURE_IBPB)) {
-> > > +               pr_err("IBPB not supported, switching to AUTO select\n");
-> > > +               vmscape_mitigation = VMSCAPE_MITIGATION_AUTO;
-> > > +       }
-> > 
-> > I think there's a bug here in case you (theoretically) had a vulnerable
-> > CPU that did not have IBPB and did not have BHI_CTRL. In that case, we
-> > should select VMSCAPE_MITIGATION_NONE as we have no mitigation available.
-> > But the code below will still re-select IBPB I believe even though there
-> > is no IBPB.
+On Thu, 25 Sep 2025 08:53:08 -0300
+Jason Gunthorpe <jgg@nvidia.com> wrote:
+
+> On Thu, Sep 25, 2025 at 10:03:14AM +0300, Leon Romanovsky wrote:
 > 
-> Yes, you are right. Let me see how to fix that.
+> > > It would at least make sense to me then to store the provider on the
+> > > vfio_pci_dma_buf object at the time of the get feature call rather than
+> > > vfio_pci_core_init_dev() though.  That would eliminate patch 08/ and
+> > > the inline #ifdefs.  
+> > 
+> > I'll change it now. If "enable" function goes to be "get" function, we
+> > won't need to store anything in vfio_pci_dma_buf too. At the end, we
+> > have exactly two lines "provider = priv->vdev->provider[priv->bar];",
+> > which can easily be changed to be "provider = pcim_p2pdma_provider(priv->vdev->pdev, priv->bar)"  
+> 
+> Not without some kind of locking change. I'd keep the
+> priv->vdev->provider[priv->bar] because setup during probe doesn't
+> need special locking.
 
-Below should fix it.
+Why do we need to store the provider on the vfio_pci_core_device at
+probe though, we can get it later via pcim_p2pdma_provider().  Ideally
+we'd take the opportunity to pull out the setup part of the _provider
+function to give us an initialization interface to use at probe time
+without an unnecessary BAR# arg.  Thanks,
 
----
-diff --git a/arch/x86/kernel/cpu/bugs.c b/arch/x86/kernel/cpu/bugs.c
-index 2f1a86d75877..60a2e54155e2 100644
---- a/arch/x86/kernel/cpu/bugs.c
-+++ b/arch/x86/kernel/cpu/bugs.c
-@@ -3328,8 +3328,10 @@ static void __init vmscape_select_mitigation(void)
- 	 */
- 	if (boot_cpu_has(X86_FEATURE_BHI_CTRL))
- 		vmscape_mitigation = VMSCAPE_MITIGATION_BHB_CLEAR_EXIT_TO_USER;
--	else
-+	else if (boot_cpu_has(X86_FEATURE_IBPB))
- 		vmscape_mitigation = VMSCAPE_MITIGATION_IBPB_EXIT_TO_USER;
-+	else
-+		vmscape_mitigation = VMSCAPE_MITIGATION_NONE;
- }
- 
- static void __init vmscape_update_mitigation(void)
+Alex
+
 
