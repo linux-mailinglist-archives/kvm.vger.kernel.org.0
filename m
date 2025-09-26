@@ -1,165 +1,87 @@
-Return-Path: <kvm+bounces-58858-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-58859-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id F10ABBA337A
-	for <lists+kvm@lfdr.de>; Fri, 26 Sep 2025 11:47:04 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id ED36FBA33DB
+	for <lists+kvm@lfdr.de>; Fri, 26 Sep 2025 11:52:17 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B1B913BF1E1
-	for <lists+kvm@lfdr.de>; Fri, 26 Sep 2025 09:47:03 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 237D4387278
+	for <lists+kvm@lfdr.de>; Fri, 26 Sep 2025 09:52:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DDCA329C323;
-	Fri, 26 Sep 2025 09:46:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4E3622BD5AD;
+	Fri, 26 Sep 2025 09:52:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="YNZESI5h"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="JGnMyA+m"
 X-Original-To: kvm@vger.kernel.org
-Received: from out-183.mta0.migadu.com (out-183.mta0.migadu.com [91.218.175.183])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0DCEE2BD5A8
-	for <kvm@vger.kernel.org>; Fri, 26 Sep 2025 09:46:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.183
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 63E8A265623;
+	Fri, 26 Sep 2025 09:52:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758879996; cv=none; b=ZTRXtZzPxwxYfi9DqhoCuaRF36DrcZ3EJI2P1Mdjrs41rHEAzPoyL3Mf13OG/nzG4kVABD11vZRWQKtuP+OjwCnDLxt0COLxOOthc1Z7uNF2EbCynLDwL7b2Ulqbt+omOaaDTKKcpASfy+3k7fH++3hr2DBszdXxJhDilt/MjQU=
+	t=1758880323; cv=none; b=fKHtZg9LSYzZNmSvphSz3Xdk1z85pylr7dwU5JiqcRCiBj+wlTDw3sgv6mHL1Qo4fXWHmoLBQG6+dT/wqyfpoSmcBrrSrNwie97Ra0nGKvv8GHgg3YyabccSr+2MEq/0wgZiXMyjKfDPCCb6JLokBfEN/IRtIIfTGvoohhF9TOQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758879996; c=relaxed/simple;
-	bh=hUMRS7DJvk7Xj1VzsmX84BYsYqaTZzC1ukrIfumPYIU=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=SM0iQFGzU3FXsSyfy8o+tMmSOUBZS9vYiYvt5BxguUPPjm32iSX5NARhxTZ6SfoUywiPZFV+iFoJJ6VV3VXLFwmpxLMMqLXF8vpbMnCbBdSd5NXLhNfpPldNqznzPtOLcJUTLRvHR5K0lOosFTHXjJMMIu6ocxacn0XxAvxT900=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=YNZESI5h; arc=none smtp.client-ip=91.218.175.183
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Message-ID: <c88514c3-e15f-4853-8acf-15e7b4b979f4@linux.dev>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1758879980;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=wL/DKY7lmmAFsSL3d0RvnMPd7olra+yxGHLjKGhoofY=;
-	b=YNZESI5h/jXNDiLLb7j86+j+TkXx1nKw543VaKtpr8w5CCCBn8PBOYUz9LE0gA3VqxAeTq
-	vk8gHrlHjKvE2h5y4LlVK9XHV23gdoSJUvecSr6p74DcXM6u9ckDN633ckuAjfmHnKaOOB
-	P/laAqnp0QFmiI8hpwCxa0nGYMdpMzQ=
-Date: Fri, 26 Sep 2025 10:46:15 +0100
+	s=arc-20240116; t=1758880323; c=relaxed/simple;
+	bh=K2PsWb515+NIbc7/1vFNik1ObXIyBBGTGxrD0zJQBz8=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Wba2Ar0u3V6OxPQe+lTpX5u+aIqlrufSDMiq4XY/yfz1Py22pHWxlnE5N93fXpBVBDrLZOjv6Ioy5eWICehtOItSmRg6H5rLMUEyTTFT0DWjk1wfrwp90FXeKAAgnSUG1M4T8iBGNx7QlbWVIJ7j0BpBUznEog5IHKnFQXl8gm8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=JGnMyA+m; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4FD66C4CEF4;
+	Fri, 26 Sep 2025 09:51:59 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1758880321;
+	bh=K2PsWb515+NIbc7/1vFNik1ObXIyBBGTGxrD0zJQBz8=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=JGnMyA+mZ2gBq2hXlzZkqhpIoBi7mNVsU/jCWYLYdgxKe3OQ17Wc7TOeQcv8/vhhF
+	 aLmgSx1LsF/jH3Ab8rQGsWc9Pk5sPHJN6s2Ae3QYdqT4Eihr1xPTBtQJvcqzyvJejd
+	 5x9/75FW0cs6uGJKZUoNh48QsRiWqey/D5Popk7viAUGvLMGsDVqCPszSxecNKLd5U
+	 AC4mF7dpHC6bJRY+TrdFw8lj9nXNcdvLYUnxdc3eSsUyp10IIpdhCRt3jCP5ceiXQb
+	 fsDgsAJ3D85R0cQ651jqaPi+6M0ddotzTVUP5LFiCeWcOK77aaMVeoKD36pdP1roXy
+	 EWGA00EXWvSPg==
+Date: Fri, 26 Sep 2025 10:51:57 +0100
+From: Simon Horman <horms@kernel.org>
+To: "Michael S. Tsirkin" <mst@redhat.com>
+Cc: linux-kernel@vger.kernel.org,
+	zhang jiao <zhangjiao2@cmss.chinamobile.com>,
+	Jason Wang <jasowang@redhat.com>,
+	Eugenio =?utf-8?B?UMOpcmV6?= <eperezma@redhat.com>,
+	kvm@vger.kernel.org, virtualization@lists.linux.dev,
+	netdev@vger.kernel.org
+Subject: Re: [PATCH net] vhost: vringh: Fix copy_to_iter return value check
+Message-ID: <aNZiPbINQWoJA_-w@horms.kernel.org>
+References: <cd637504a6e3967954a9e80fc1b75e8c0978087b.1758723310.git.mst@redhat.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Subject: Re: [PATCH v7 06/12] KVM: guest_memfd: add module param for disabling
- TLB flushing
-To: David Hildenbrand <david@redhat.com>, Dave Hansen
- <dave.hansen@intel.com>, "Roy, Patrick" <roypat@amazon.co.uk>
-Cc: "pbonzini@redhat.com" <pbonzini@redhat.com>,
- "corbet@lwn.net" <corbet@lwn.net>, "maz@kernel.org" <maz@kernel.org>,
- "oliver.upton@linux.dev" <oliver.upton@linux.dev>,
- "joey.gouly@arm.com" <joey.gouly@arm.com>,
- "suzuki.poulose@arm.com" <suzuki.poulose@arm.com>,
- "yuzenghui@huawei.com" <yuzenghui@huawei.com>,
- "catalin.marinas@arm.com" <catalin.marinas@arm.com>,
- "will@kernel.org" <will@kernel.org>, "tglx@linutronix.de"
- <tglx@linutronix.de>, "mingo@redhat.com" <mingo@redhat.com>,
- "bp@alien8.de" <bp@alien8.de>,
- "dave.hansen@linux.intel.com" <dave.hansen@linux.intel.com>,
- "x86@kernel.org" <x86@kernel.org>, "hpa@zytor.com" <hpa@zytor.com>,
- "luto@kernel.org" <luto@kernel.org>,
- "peterz@infradead.org" <peterz@infradead.org>,
- "willy@infradead.org" <willy@infradead.org>,
- "akpm@linux-foundation.org" <akpm@linux-foundation.org>,
- "lorenzo.stoakes@oracle.com" <lorenzo.stoakes@oracle.com>,
- "Liam.Howlett@oracle.com" <Liam.Howlett@oracle.com>,
- "vbabka@suse.cz" <vbabka@suse.cz>, "rppt@kernel.org" <rppt@kernel.org>,
- "surenb@google.com" <surenb@google.com>, "mhocko@suse.com"
- <mhocko@suse.com>, "song@kernel.org" <song@kernel.org>,
- "jolsa@kernel.org" <jolsa@kernel.org>, "ast@kernel.org" <ast@kernel.org>,
- "daniel@iogearbox.net" <daniel@iogearbox.net>,
- "andrii@kernel.org" <andrii@kernel.org>,
- "martin.lau@linux.dev" <martin.lau@linux.dev>,
- "eddyz87@gmail.com" <eddyz87@gmail.com>,
- "yonghong.song@linux.dev" <yonghong.song@linux.dev>,
- "john.fastabend@gmail.com" <john.fastabend@gmail.com>,
- "kpsingh@kernel.org" <kpsingh@kernel.org>, "sdf@fomichev.me"
- <sdf@fomichev.me>, "haoluo@google.com" <haoluo@google.com>,
- "jgg@ziepe.ca" <jgg@ziepe.ca>, "jhubbard@nvidia.com" <jhubbard@nvidia.com>,
- "peterx@redhat.com" <peterx@redhat.com>, "jannh@google.com"
- <jannh@google.com>, "pfalcato@suse.de" <pfalcato@suse.de>,
- "shuah@kernel.org" <shuah@kernel.org>, "seanjc@google.com"
- <seanjc@google.com>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
- "linux-doc@vger.kernel.org" <linux-doc@vger.kernel.org>,
- "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
- "linux-arm-kernel@lists.infradead.org"
- <linux-arm-kernel@lists.infradead.org>,
- "kvmarm@lists.linux.dev" <kvmarm@lists.linux.dev>,
- "linux-fsdevel@vger.kernel.org" <linux-fsdevel@vger.kernel.org>,
- "linux-mm@kvack.org" <linux-mm@kvack.org>,
- "bpf@vger.kernel.org" <bpf@vger.kernel.org>,
- "linux-kselftest@vger.kernel.org" <linux-kselftest@vger.kernel.org>,
- "Cali, Marco" <xmarcalx@amazon.co.uk>,
- "Kalyazin, Nikita" <kalyazin@amazon.co.uk>,
- "Thomson, Jack" <jackabt@amazon.co.uk>,
- "derekmn@amazon.co.uk" <derekmn@amazon.co.uk>,
- "tabba@google.com" <tabba@google.com>,
- "ackerleytng@google.com" <ackerleytng@google.com>
-References: <20250924151101.2225820-4-patrick.roy@campus.lmu.de>
- <20250924152214.7292-1-roypat@amazon.co.uk>
- <20250924152214.7292-3-roypat@amazon.co.uk>
- <e25867b6-ffc0-4c7c-9635-9b3f47b186ca@intel.com>
- <c1875a54-0c87-450f-9370-29e7ec4fea3d@redhat.com>
- <82bff1c4-987f-46cb-833c-bd99eaa46e7a@intel.com>
- <c79173d8-6f18-40fa-9621-e691990501e4@redhat.com>
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Patrick Roy <patrick.roy@linux.dev>
-Content-Language: en-US
-In-Reply-To: <c79173d8-6f18-40fa-9621-e691990501e4@redhat.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-Migadu-Flow: FLOW_OUT
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <cd637504a6e3967954a9e80fc1b75e8c0978087b.1758723310.git.mst@redhat.com>
 
-
-
-On Thu, 2025-09-25 at 21:13 +0100, David Hildenbrand wrote:
-> On 25.09.25 21:59, Dave Hansen wrote:
->> On 9/25/25 12:20, David Hildenbrand wrote:
->>> On 25.09.25 20:27, Dave Hansen wrote:
->>>> On 9/24/25 08:22, Roy, Patrick wrote:
->>>>> Add an option to not perform TLB flushes after direct map manipulations.
->>>>
->>>> I'd really prefer this be left out for now. It's a massive can of worms.
->>>> Let's agree on something that works and has well-defined behavior before
->>>> we go breaking it on purpose.
->>>
->>> May I ask what the big concern here is?
->>
->> It's not a _big_ concern. 
+On Thu, Sep 25, 2025 at 02:04:08AM -0400, Michael S. Tsirkin wrote:
+> The return value of copy_to_iter can't be negative, check whether the
+> copied length is equal to the requested length instead of checking for
+> negative values.
 > 
-> Oh, I read "can of worms" and thought there is something seriously problematic :)
-> 
->> I just think we want to start on something
->> like this as simple, secure, and deterministic as possible.
-> 
-> Yes, I agree. And it should be the default. Less secure would have to be opt-in and documented thoroughly.
+> Cc: zhang jiao <zhangjiao2@cmss.chinamobile.com>
+> Link: https://lore.kernel.org/all/20250910091739.2999-1-zhangjiao2@cmss.chinamobile.com
+> Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
 
-Yes, I am definitely happy to have the 100% secure behavior be the
-default, and the skipping of TLB flushes be an opt-in, with thorough
-documentation!
+Hi Michael,
 
-But I would like to include the "skip tlb flushes" option as part of
-this patch series straight away, because as I was alluding to in the
-commit message, with TLB flushes this is not usable for Firecracker for
-performance reasons :(
+As a patch for net, I think it would be nice to include a fixes tag.
+Perhaps:
 
->>
->> Let's say that with all the unmaps that load_unaligned_zeropad() faults
->> start to bite us. It'll take longer to find them if the TLB isn't flushed.
->>
->> Basically, it'll make the bad things happen sooner rather than later.
-> 
-> Agreed.
-> 
+Fixes: 309bba39c945 ("vringh: iterate on iotlb_translate to handle large translations")
 
-Best,
-Patrick
+And nicer still to include some description of the failure scenario.
+
+In any case, the code change looks good to me.
+
+Reviewed-by: Simon Horman <horms@kernel.org>
 
