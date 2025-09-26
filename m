@@ -1,279 +1,203 @@
-Return-Path: <kvm+bounces-58873-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-58874-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 34079BA4489
-	for <lists+kvm@lfdr.de>; Fri, 26 Sep 2025 16:49:41 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 47A61BA44CE
+	for <lists+kvm@lfdr.de>; Fri, 26 Sep 2025 16:54:21 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D4CDB384643
-	for <lists+kvm@lfdr.de>; Fri, 26 Sep 2025 14:49:40 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 5E04F1C03103
+	for <lists+kvm@lfdr.de>; Fri, 26 Sep 2025 14:54:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 33ECC1E25EF;
-	Fri, 26 Sep 2025 14:49:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6CBB81DE3DC;
+	Fri, 26 Sep 2025 14:54:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="p0uimPCK"
+	dkim=pass (2048-bit key) header.d=bytedance.com header.i=@bytedance.com header.b="S6WpvQSx"
 X-Original-To: kvm@vger.kernel.org
-Received: from out-188.mta0.migadu.com (out-188.mta0.migadu.com [91.218.175.188])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pg1-f179.google.com (mail-pg1-f179.google.com [209.85.215.179])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CFC3E1990C7
-	for <kvm@vger.kernel.org>; Fri, 26 Sep 2025 14:49:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.188
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2B19A38DE1
+	for <kvm@vger.kernel.org>; Fri, 26 Sep 2025 14:54:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.179
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758898164; cv=none; b=me6Fj7T6Iymu+WFIiZsM2+UPsB2JdnsX+jrAkgoAWTnVrqa8aNtEwtJeM4/iAAt+1Mks8o//nbMaAkXmXuXkBlV2Rb+pJRDm8BZa20nUal/EyN8WbVgtRzgUYW3jyahsztwiKggnYPPecujd2iUtN3sq7c6jkbbYwDEQJD6mikk=
+	t=1758898453; cv=none; b=Vp+cUj7ntfbxxzTCPlq9Tj3neRwTi6o5nbYu/5KnulRuUOGbpqLGZHTXKsPNKwy/8YGL1j52Gl3k8mXNG4B9BU6pqY5YH4xZBibELU7odSNirx8vDmy0TwEM8FfbLAU0Ax/np+E0v/gzQxaZ3fQo/+cVGtngwYuqx9ixwFcHkZM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758898164; c=relaxed/simple;
-	bh=X4MWoMvZpNFx+OVJEAY7k+/NlF9jfSSaTBDZkjwLetc=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=USQdYstMIauwdOBxf59/zh38VMHFIyhujScHvq8ROAJWW/pg+iLdmvX+c073vvhfvRyUEO/vZje3eGFOd+JjFCQ1G4vofzGcVBPo9tF31X7yfaBXsQQLNAwWqZ8yKBv8TGPjxzBSIoedGUrw3iJxQZrdbBqDlaAAJF+TzFB00Ik=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=p0uimPCK; arc=none smtp.client-ip=91.218.175.188
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Message-ID: <32608c1b-6da5-4a06-9790-58dfd4ba2011@linux.dev>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1758898159;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=gXM7GNVXlwNM6qgC8RcEz4DIWXulx4en7MnJK64sYug=;
-	b=p0uimPCKzx+0lRZWcpXNlJCkvBNo1Ljba0JQRRiJr1JwGeyRPb/ZvYNiwaZnqmaqBF7Hfc
-	3c7Khai3reWQ5g+jEsG9PV/jiNF/B/MaQknVMCzw1Eig28PrpuaUFhS2uvhY6e0GXpTSzo
-	qpRv/xQvchLVI0CesjUiAFowJOpaF6Q=
-Date: Fri, 26 Sep 2025 15:49:13 +0100
+	s=arc-20240116; t=1758898453; c=relaxed/simple;
+	bh=8Xxc/7rtUPc9xnIONdcHNfifm0SJQdHjqk5dmuIuFG4=;
+	h=Message-ID:Date:MIME-Version:From:Subject:To:Cc:References:
+	 In-Reply-To:Content-Type; b=VR/dJMOJ3EMQkRa1LbFayOV2yHOCcKh8V7v6ujUYLmRR0SUlapMpXUAyCLLKGOQrxG/AuUrUvf1kLFkadEkeqsqZbO3HhjJLxu59cFOzuTUvVPSn4OzsG+yMxJurQHfA6QjNXP55vHD5YR50osvzv/gVwBIEuZ3Z/ztr+r2b4do=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=bytedance.com; spf=pass smtp.mailfrom=bytedance.com; dkim=pass (2048-bit key) header.d=bytedance.com header.i=@bytedance.com header.b=S6WpvQSx; arc=none smtp.client-ip=209.85.215.179
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=bytedance.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bytedance.com
+Received: by mail-pg1-f179.google.com with SMTP id 41be03b00d2f7-b4ee87cc81eso2002544a12.1
+        for <kvm@vger.kernel.org>; Fri, 26 Sep 2025 07:54:10 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=bytedance.com; s=google; t=1758898450; x=1759503250; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:content-language:references
+         :cc:to:subject:from:user-agent:mime-version:date:message-id:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=fQ3d5ngg1DfO7r8b2XH43YDUg6JuZOy/Y/EgRNcVGic=;
+        b=S6WpvQSx0pqMGWPV668JhEMW1L5E2FxFL8/5ipU2tZkI7U5fePXC5e5HaF70ZPzdx3
+         dCtanS4VyHJGq0i8cTMW2X1nZAsuQtN/4ppV6Y9jl2YpShLNTQKtSn/ji1w2utj8v6TP
+         Io4hpZdSfn8u6uVl0Z6bYz9DeeDscHz8E3YoHELyNzUbR5uDMz63yC7GAbmgx0ezSzla
+         xJNEF3MvUAI9y5l/dT2iGoZw7Vz0cPi44D38xk3+jJPNwKJPnk84la3HIijE1NQrj4LC
+         f4og9qeaNH5aapeFtN6EprcifbSefMF8uM9axsW8iGK45pD/GCMHPt7HYmfZJB0FnU1p
+         CMxg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1758898450; x=1759503250;
+        h=content-transfer-encoding:in-reply-to:content-language:references
+         :cc:to:subject:from:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=fQ3d5ngg1DfO7r8b2XH43YDUg6JuZOy/Y/EgRNcVGic=;
+        b=j+dV7Avbd58TGkR/YKziQnlEUKyfNNBs8jP4b8zPrto0QNRjRwJE4fdjGByqQx/bf6
+         wVFR+Xu/R5GpzI8QWxR10cDeR84Kg11fkMqXGo4E+a9f8g443mKb9zbGbiWJ4NVESx6G
+         xkVG/zRNXwy/G7jxvLfFAyPRH8+VYjQB86hvqlfp+NFcYX6jzn6NEKahzakPVtkjGuWj
+         Zh0J4q06tHP7gRuWw+ak2eARTmfeVZ/h6hZIYhApy9j9XflOqbn/FV6Lxp/Pu1UWYlk6
+         xOYoFtZu78g91BejYroYRhX6fS2OLeXHowQwyio2AEMbJ7nMdXfQo44BWjnv1HYgM28F
+         eOcA==
+X-Forwarded-Encrypted: i=1; AJvYcCVWQAKr1ExSwWNQERk08Kwh5OOINJg6zGdtwTmnHnwMTTQh4+Top6GNIlC52FWGzM/mkrI=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yy9TZIxMZnm0lvTcb7mK/q4eVGsdvxQcwjcLS6Z1Lv5CqMHy7rI
+	lx4QvFtmp4kgA6JPHcdH9SOae7i+/9hk80OfObBVwLYwXYAJhz8pehqAYLj3yhFKark=
+X-Gm-Gg: ASbGncvQadBBKVBhyAAEe6eWMT8QIzjvo7R2H1hKNg8ijl2b39+RSwvrRk0r6o2CnkM
+	nwd0oaS+yuD2o6hBFG5n33He6qkrwuy3tnW7KNAzcZa6ay6b3aUEB3sSC2nwZW3AeFOrUoL0frV
+	Mn56XyHeqxQTVWethqToaho9wjOVMaXFijo+WSb+sOlIX9/CLwLe638C/PcAIpIOQ7oOhZwfX0A
+	c9VZpbyYuMiMIoCEfWychTRYRv4TFYFSBlz8gQYl2L9QQK1YRSvjVoqbEIn2Nk5FSO5BoPNfwMQ
+	KjmsT47ZHUlzwwxp583/4yxKakusMhQ9DzZVZ1dp8UAdfoGDPYrYVvi4U0o2bIrwyZ+xPNDovpz
+	McOqu/01yU6TQSEyjXqpXOYgn63vlY691m4FdqxW+n4JGmztdZyjccIcRXw==
+X-Google-Smtp-Source: AGHT+IEM5gfpTFeny4JGgiwPmQJtjR802N61GuO0pjn187ffL/azsDT3fsFt/ZGKNuDaQhw0bWZGdw==
+X-Received: by 2002:a17:903:1a2b:b0:24c:ea17:e322 with SMTP id d9443c01a7336-27ed49df28dmr87377845ad.3.1758898450221;
+        Fri, 26 Sep 2025 07:54:10 -0700 (PDT)
+Received: from [10.254.228.139] ([139.177.225.234])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-27ed69bc295sm56361985ad.123.2025.09.26.07.54.07
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 26 Sep 2025 07:54:09 -0700 (PDT)
+Message-ID: <5db494c6-c8dd-4073-bea0-5a62fce170e9@bytedance.com>
+Date: Fri, 26 Sep 2025 22:54:05 +0800
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Subject: Re: [PATCH v7 05/12] KVM: guest_memfd: Add flag to remove from direct
- map
-To: "Roy, Patrick" <roypat@amazon.co.uk>
-Cc: "pbonzini@redhat.com" <pbonzini@redhat.com>,
- "corbet@lwn.net" <corbet@lwn.net>, "maz@kernel.org" <maz@kernel.org>,
- "oliver.upton@linux.dev" <oliver.upton@linux.dev>,
- "joey.gouly@arm.com" <joey.gouly@arm.com>,
- "suzuki.poulose@arm.com" <suzuki.poulose@arm.com>,
- "yuzenghui@huawei.com" <yuzenghui@huawei.com>,
- "catalin.marinas@arm.com" <catalin.marinas@arm.com>,
- "will@kernel.org" <will@kernel.org>, "tglx@linutronix.de"
- <tglx@linutronix.de>, "mingo@redhat.com" <mingo@redhat.com>,
- "bp@alien8.de" <bp@alien8.de>,
- "dave.hansen@linux.intel.com" <dave.hansen@linux.intel.com>,
- "x86@kernel.org" <x86@kernel.org>, "hpa@zytor.com" <hpa@zytor.com>,
- "luto@kernel.org" <luto@kernel.org>,
- "peterz@infradead.org" <peterz@infradead.org>,
- "willy@infradead.org" <willy@infradead.org>,
- "akpm@linux-foundation.org" <akpm@linux-foundation.org>,
- "david@redhat.com" <david@redhat.com>,
- "lorenzo.stoakes@oracle.com" <lorenzo.stoakes@oracle.com>,
- "Liam.Howlett@oracle.com" <Liam.Howlett@oracle.com>,
- "vbabka@suse.cz" <vbabka@suse.cz>, "rppt@kernel.org" <rppt@kernel.org>,
- "surenb@google.com" <surenb@google.com>, "mhocko@suse.com"
- <mhocko@suse.com>, "song@kernel.org" <song@kernel.org>,
- "jolsa@kernel.org" <jolsa@kernel.org>, "ast@kernel.org" <ast@kernel.org>,
- "daniel@iogearbox.net" <daniel@iogearbox.net>,
- "andrii@kernel.org" <andrii@kernel.org>,
- "martin.lau@linux.dev" <martin.lau@linux.dev>,
- "eddyz87@gmail.com" <eddyz87@gmail.com>,
- "yonghong.song@linux.dev" <yonghong.song@linux.dev>,
- "john.fastabend@gmail.com" <john.fastabend@gmail.com>,
- "kpsingh@kernel.org" <kpsingh@kernel.org>, "sdf@fomichev.me"
- <sdf@fomichev.me>, "haoluo@google.com" <haoluo@google.com>,
- "jgg@ziepe.ca" <jgg@ziepe.ca>, "jhubbard@nvidia.com" <jhubbard@nvidia.com>,
- "peterx@redhat.com" <peterx@redhat.com>, "jannh@google.com"
- <jannh@google.com>, "pfalcato@suse.de" <pfalcato@suse.de>,
- "shuah@kernel.org" <shuah@kernel.org>, "seanjc@google.com"
- <seanjc@google.com>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
- "linux-doc@vger.kernel.org" <linux-doc@vger.kernel.org>,
- "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
- "linux-arm-kernel@lists.infradead.org"
- <linux-arm-kernel@lists.infradead.org>,
- "kvmarm@lists.linux.dev" <kvmarm@lists.linux.dev>,
- "linux-fsdevel@vger.kernel.org" <linux-fsdevel@vger.kernel.org>,
- "linux-mm@kvack.org" <linux-mm@kvack.org>,
- "bpf@vger.kernel.org" <bpf@vger.kernel.org>,
- "linux-kselftest@vger.kernel.org" <linux-kselftest@vger.kernel.org>,
- "Cali, Marco" <xmarcalx@amazon.co.uk>,
- "Kalyazin, Nikita" <kalyazin@amazon.co.uk>,
- "Thomson, Jack" <jackabt@amazon.co.uk>,
- "derekmn@amazon.co.uk" <derekmn@amazon.co.uk>,
- "tabba@google.com" <tabba@google.com>,
- "ackerleytng@google.com" <ackerleytng@google.com>
-References: <20250924151101.2225820-4-patrick.roy@campus.lmu.de>
- <20250924152214.7292-1-roypat@amazon.co.uk>
- <20250924152214.7292-2-roypat@amazon.co.uk>
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Patrick Roy <patrick.roy@linux.dev>
+User-Agent: Mozilla Thunderbird
+From: Fei Li <lifei.shirley@bytedance.com>
+Subject: Re: [PATCH] KVM: x86: Restrict writeback of SMI VCPU state
+To: pbonzini@redhat.com, mtosatti@redhat.com, seanjc@google.com,
+ kvm@vger.kernel.org, Jan Kiszka <jan.kiszka@siemens.com>
+Cc: qemu-devel@nongnu.org
+References: <20250909063327.14263-1-lifei.shirley@bytedance.com>
 Content-Language: en-US
-In-Reply-To: <20250924152214.7292-2-roypat@amazon.co.uk>
-Content-Type: text/plain; charset=UTF-8
+In-Reply-To: <20250909063327.14263-1-lifei.shirley@bytedance.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
-X-Migadu-Flow: FLOW_OUT
 
 
+Dear maintainers,
 
-On Wed, 2025-09-24 at 16:22 +0100, "Roy, Patrick" wrote:
+Could you please help to review the patch [PATCH] KVM: x86: Restrict 
+writeback of SMI VCPU state? This fixes a race condition causing VM hang 
+when frequently running `info registers -a` via HMP during VM startup. 
+The issue occurs because unrestricted SMI state writeback conflicts with 
+vCPU initialization sequences.
 
-[...]
+It would be very appreciated for us to know if this patch properly
+resolve the race condition, and if validated, we would like to apply it 
+to our production environment. Let me know if further details are needed. :)
 
-> diff --git a/virt/kvm/guest_memfd.c b/virt/kvm/guest_memfd.c
-> index 55b8d739779f..b7129c4868c5 100644
-> --- a/virt/kvm/guest_memfd.c
-> +++ b/virt/kvm/guest_memfd.c
-> @@ -4,6 +4,9 @@
->  #include <linux/kvm_host.h>
->  #include <linux/pagemap.h>
->  #include <linux/anon_inodes.h>
-> +#include <linux/set_memory.h>
-> +
-> +#include <asm/tlbflush.h>
->  
->  #include "kvm_mm.h"
->  
-> @@ -42,6 +45,44 @@ static int __kvm_gmem_prepare_folio(struct kvm *kvm, struct kvm_memory_slot *slo
->  	return 0;
->  }
->  
-> +#define KVM_GMEM_FOLIO_NO_DIRECT_MAP BIT(0)
-> +
-> +static bool kvm_gmem_folio_no_direct_map(struct folio *folio)
-> +{
-> +	return ((u64) folio->private) & KVM_GMEM_FOLIO_NO_DIRECT_MAP;
-> +}
-> +
-> +static int kvm_gmem_folio_zap_direct_map(struct folio *folio)
-> +{
-> +	if (kvm_gmem_folio_no_direct_map(folio))
-> +		return 0;
-> +
-> +	int r = set_direct_map_valid_noflush(folio_page(folio, 0), folio_nr_pages(folio),
-> +					 false);
-> +
-> +	if (!r) {
-> +		unsigned long addr = (unsigned long) folio_address(folio);
-> +		folio->private = (void *) ((u64) folio->private & KVM_GMEM_FOLIO_NO_DIRECT_MAP);
-> +		flush_tlb_kernel_range(addr, addr + folio_size(folio));
-> +	}
-> +
-> +	return r;
-> +}
+Best regards, and thanks again!
+Fei
 
-No idea how I managed to mess this function up so completely, but it
-should be more like
+On 9/9/25 2:33 PM, Fei Li wrote:
+> Recently, we meet a SMI race bug triggered by one monitor tool in our
+> production environment. This monitor executes 'info registers -a' hmp
+> at a fixed frequency, even during VM startup process, which makes
+> some AP stay in KVM_MP_STATE_UNINITIALIZED forever, thus VM hangs.
+> 
+> The complete calling processes for the SMI race are as follows:
+> 
+> //thread1                      //thread2               //thread3
+> `info registers -a` hmp [1]    AP(vcpu1) thread [2]    BSP(vcpu0) send INIT/SIPI [3]
+> 
+>                                 [2]
+>                                 KVM: KVM_RUN and then
+>                                      schedule() in kvm_vcpu_block() loop
+> 
+> [1]
+> for each cpu: cpu_synchronize_state
+> if !qemu_thread_is_self()
+> 1. insert to cpu->work_list, and handle asynchronously
+> 2. then kick the AP(vcpu1) by sending SIG_IPI/SIGUSR1 signal
+> 
+>                                 [2]
+>                                 KVM: checks signal_pending, breaks loop and returns -EINTR
+>                                 Qemu: break kvm_cpu_exec loop, run
+>                                       1. qemu_wait_io_event()
+>                                       => process_queued_cpu_work => cpu->work_list.func()
+>                                          e.i. do_kvm_cpu_synchronize_state() callback
+>                                          => kvm_arch_get_registers
+>                                             => kvm_get_mp_state /* KVM: get_mpstate also calls
+>                                                kvm_apic_accept_events() to handle INIT and SIPI */
+>                                       => cpu->vcpu_dirty = true;
+>                                       // end of qemu_wait_io_event
+> 
+>                                                         [3]
+>                                                         SeaBIOS: BSP enters non-root mode and runs reset_vector() in SeaBIOS.
+>                                                                  send INIT and then SIPI by writing APIC_ICR during smp_scan
+>                                                         KVM: BSP(vcpu0) exits, then => handle_apic_write
+>                                                              => kvm_lapic_reg_write => kvm_apic_send_ipi to all APs
+>                                                              => for each AP: __apic_accept_irq, e.g. for AP(vcpu1)
+>                                                              ==> case APIC_DM_INIT: apic->pending_events = (1UL << KVM_APIC_INIT)
+>                                                                  (not kick the AP yet)
+>                                                              ==> case APIC_DM_STARTUP: set_bit(KVM_APIC_SIPI, &apic->pending_events)
+>                                                                  (not kick the AP yet)
+> 
+>                                 [2]
+>                                 Qemu continue:
+>                                      2. kvm_cpu_exec()
+>                                      => if (cpu->vcpu_dirty):
+>                                         => kvm_arch_put_registers
+>                                            => kvm_put_vcpu_events
+>                                 KVM: kvm_vcpu_ioctl_x86_set_vcpu_events
+>                                      => clear_bit(KVM_APIC_INIT, &vcpu->arch.apic->pending_events);
+>                                         e.i. pending_events changes from 11b to 10b
+>                                        // end of kvm_vcpu_ioctl_x86_set_vcpu_events
+>                                 Qemu: => after put_registers, cpu->vcpu_dirty = false;
+>                                       => kvm_vcpu_ioctl(cpu, KVM_RUN, 0)
+>                                 KVM: KVM_RUN
+>                                      => schedule() in kvm_vcpu_block() until Qemu's next SIG_IPI/SIGUSR1 signal
+>                                      /* But AP(vcpu1)'s mp_state will never change from KVM_MP_STATE_UNINITIALIZED
+>                                        to KVM_MP_STATE_INIT_RECEIVED, even then to KVM_MP_STATE_RUNNABLE without
+>                                        handling INIT inside kvm_apic_accept_events(), considering BSP will never
+>                                        send INIT/SIPI again during smp_scan. Then AP(vcpu1) will never enter
+>                                        non-root mode */
+> 
+>                                                         [3]
+>                                                         SeaBIOS: waits CountCPUs == expected_cpus_count and loops forever
+>                                                                  e.i. the AP(vcpu1) stays: EIP=0000fff0 && CS =f000 ffff0000
+>                                                                  and BSP(vcpu0) appears 100% utilized as it is in a while loop.
+> 
+> To fix this, avoid clobbering SMI when not putting "reset" state, just
+> like NMI abd SIPI does.
+> 
+> Signed-off-by: Fei Li <lifei.shirley@bytedance.com>
+> ---
+>   target/i386/kvm/kvm.c | 2 +-
+>   1 file changed, 1 insertion(+), 1 deletion(-)
+> 
+> diff --git a/target/i386/kvm/kvm.c b/target/i386/kvm/kvm.c
+> index 369626f8c8..598661799a 100644
+> --- a/target/i386/kvm/kvm.c
+> +++ b/target/i386/kvm/kvm.c
+> @@ -5056,7 +5056,7 @@ static int kvm_put_vcpu_events(X86CPU *cpu, int level)
+>   
+>       events.sipi_vector = env->sipi_vector;
+>   
+> -    if (has_msr_smbase) {
+> +    if (has_msr_smbase && level >= KVM_PUT_RESET_STATE) {
+>           events.flags |= KVM_VCPUEVENT_VALID_SMM;
+>           events.smi.smm = !!(env->hflags & HF_SMM_MASK);
+>           events.smi.smm_inside_nmi = !!(env->hflags2 & HF2_SMM_INSIDE_NMI_MASK);
 
-static int kvm_gmem_folio_zap_direct_map(struct folio *folio)
-{
-	int r = 0;
-	unsigned long addr = (unsigned long) folio_address(folio);
-	u64 gmem_flags = (u64) folio_inode(folio)->i_private;
-
-	if (kvm_gmem_folio_no_direct_map(folio) || !(gmem_flags & GUEST_MEMFD_FLAG_NO_DIRECT_MAP))
-		goto out;
-
-	r = set_direct_map_valid_noflush(folio_page(folio, 0), folio_nr_pages(folio), false);
-
-	if (r)
-		goto out;
-
-	folio->private = (void *) KVM_GMEM_FOLIO_NO_DIRECT_MAP;
-	flush_tlb_kernel_range(addr, addr + folio_size(folio));
-
-out:
-	return r;
-}
-
-the version I sent (a) does not respect the flags passed to guest_memfd
-on creation, and (b) does not correctly set the bit in folio->private.
-
-> +static void kvm_gmem_folio_restore_direct_map(struct folio *folio)
-> +{
-> +	/*
-> +	 * Direct map restoration cannot fail, as the only error condition
-> +	 * for direct map manipulation is failure to allocate page tables
-> +	 * when splitting huge pages, but this split would have already
-> +	 * happened in set_direct_map_invalid_noflush() in kvm_gmem_folio_zap_direct_map().
-> +	 * Thus set_direct_map_valid_noflush() here only updates prot bits.
-> +	 */
-> +	if (kvm_gmem_folio_no_direct_map(folio))
-> +		set_direct_map_valid_noflush(folio_page(folio, 0), folio_nr_pages(folio),
-> +					 true);
-> +}
-> +
->  static inline void kvm_gmem_mark_prepared(struct folio *folio)
->  {
->  	folio_mark_uptodate(folio);
-> @@ -324,13 +365,14 @@ static vm_fault_t kvm_gmem_fault_user_mapping(struct vm_fault *vmf)
->  	struct inode *inode = file_inode(vmf->vma->vm_file);
->  	struct folio *folio;
->  	vm_fault_t ret = VM_FAULT_LOCKED;
-> +	int err;
->  
->  	if (((loff_t)vmf->pgoff << PAGE_SHIFT) >= i_size_read(inode))
->  		return VM_FAULT_SIGBUS;
->  
->  	folio = kvm_gmem_get_folio(inode, vmf->pgoff);
->  	if (IS_ERR(folio)) {
-> -		int err = PTR_ERR(folio);
-> +		err = PTR_ERR(folio);
->  
->  		if (err == -EAGAIN)
->  			return VM_FAULT_RETRY;
-> @@ -348,6 +390,13 @@ static vm_fault_t kvm_gmem_fault_user_mapping(struct vm_fault *vmf)
->  		kvm_gmem_mark_prepared(folio);
->  	}
->  
-> +	err = kvm_gmem_folio_zap_direct_map(folio);
-> +
-> +	if (err) {
-> +		ret = vmf_error(err);
-> +		goto out_folio;
-> +	}
-> +
->  	vmf->page = folio_file_page(folio, vmf->pgoff);
->  
->  out_folio:
-> @@ -435,6 +484,8 @@ static void kvm_gmem_free_folio(struct folio *folio)
->  	kvm_pfn_t pfn = page_to_pfn(page);
->  	int order = folio_order(folio);
->  
-> +	kvm_gmem_folio_restore_direct_map(folio);
-> +
->  	kvm_arch_gmem_invalidate(pfn, pfn + (1ul << order));
->  }
->  
-> @@ -499,6 +550,9 @@ static int __kvm_gmem_create(struct kvm *kvm, loff_t size, u64 flags)
->  	/* Unmovable mappings are supposed to be marked unevictable as well. */
->  	WARN_ON_ONCE(!mapping_unevictable(inode->i_mapping));
->  
-> +	if (flags & GUEST_MEMFD_FLAG_NO_DIRECT_MAP)
-> +		mapping_set_no_direct_map(inode->i_mapping);
-> +
->  	kvm_get_kvm(kvm);
->  	gmem->kvm = kvm;
->  	xa_init(&gmem->bindings);
-> @@ -523,6 +577,9 @@ int kvm_gmem_create(struct kvm *kvm, struct kvm_create_guest_memfd *args)
->  	if (kvm_arch_supports_gmem_mmap(kvm))
->  		valid_flags |= GUEST_MEMFD_FLAG_MMAP;
->  
-> +	if (kvm_arch_gmem_supports_no_direct_map())
-> +		valid_flags |= GUEST_MEMFD_FLAG_NO_DIRECT_MAP;
-> +
->  	if (flags & ~valid_flags)
->  		return -EINVAL;
->  
-> @@ -687,6 +744,8 @@ int kvm_gmem_get_pfn(struct kvm *kvm, struct kvm_memory_slot *slot,
->  	if (!is_prepared)
->  		r = kvm_gmem_prepare_folio(kvm, slot, gfn, folio);
->  
-> +	kvm_gmem_folio_zap_direct_map(folio);
-> +
->  	folio_unlock(folio);
->  
->  	if (!r)
-
-[...]
 
