@@ -1,65 +1,65 @@
-Return-Path: <kvm+bounces-58845-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-58846-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4F233BA268F
-	for <lists+kvm@lfdr.de>; Fri, 26 Sep 2025 06:52:29 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3B1EEBA273B
+	for <lists+kvm@lfdr.de>; Fri, 26 Sep 2025 07:37:12 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 39D1C4E210C
-	for <lists+kvm@lfdr.de>; Fri, 26 Sep 2025 04:52:28 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D8C022A3AFD
+	for <lists+kvm@lfdr.de>; Fri, 26 Sep 2025 05:37:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 57154274B48;
-	Fri, 26 Sep 2025 04:52:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 74B7B27817F;
+	Fri, 26 Sep 2025 05:37:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="MAhzkNoW"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="YjMUtGfO"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.8])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0A89817597;
-	Fri, 26 Sep 2025 04:52:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.8
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BFADE1FCFEF;
+	Fri, 26 Sep 2025 05:36:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758862339; cv=none; b=RqaqSEchqJbotkVPdL+EnsjdygrJX8LL4Vb6OPKf9FwUlE4bBrV1jvxt2nggYUShnBH/c1emjUk+x6iKPc5CQpyN/P+jlRp3xO82l4N0hBC2kY97tJaci2CSWIPlBP8lmi3ZCSXTZQHOYdcfAD73VolktbnUWhRrC6Lpw9MAI4g=
+	t=1758865019; cv=none; b=rh0LksvtMVwYYQGxw4PrGh26jRA55NuB6rrFIGe+AhA9gquImt7+7lcXZxpM9VBE55Gx3BzNSKYCBVkTn95XxW953Eo46i+d970G6rTCQOS8Nx79gqeV0JD7s5N90ol3qR4kPsomn+7ZqBc7Cfr7HdAqiU7XD6uB4U6tSIMEfOY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758862339; c=relaxed/simple;
-	bh=pi/qxE7z3rXc4YQAphl1XI6jyYFay+KjD9vofv+0N4A=;
+	s=arc-20240116; t=1758865019; c=relaxed/simple;
+	bh=9nb9C7yie/OSQdbh2G7LM3IWi8GLACvnVZn1kIDNYYA=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=h7+KNhyHfAtZFElIvAcfdYyDgdzWZApO/69hQ2Eo2AGS55umsMSmrfTT1VZLgXa9XVntGNNKqSGQMWJCQ7bM4onPTPEPSzJBUUUTLi/bKY8YBKWsouwxUOkeASC/rcoeM9X05/Mc0ALa8GXhWYepsUJGo/9cb841pemc5p9KQas=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=MAhzkNoW; arc=none smtp.client-ip=192.198.163.8
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+	 In-Reply-To:Content-Type; b=j65mOqOrJFDzYWw7RE8KTQhXMxTppTzrFNQLQPguWFekOTl8HXYp2ZhgxCHHxFqazqJO9BCMJsgjZIK7q+D6JnHYkrlSCGdNppOoBDzwSP8Xh2kiA3lXzftctaJHl+6XB6KO0f9fibMrSwFsbJNLy1VNVHxBKgoTLN/Koj+NuCs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=pass smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=YjMUtGfO; arc=none smtp.client-ip=192.198.163.18
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1758862338; x=1790398338;
+  t=1758865018; x=1790401018;
   h=message-id:date:mime-version:subject:to:cc:references:
    from:in-reply-to:content-transfer-encoding;
-  bh=pi/qxE7z3rXc4YQAphl1XI6jyYFay+KjD9vofv+0N4A=;
-  b=MAhzkNoWo6QvIE3dS9LqHiPRo0U5KC230tnf23NRYGuBBjcVHnMan/LH
-   TZBfkj4Fm8seqWkkQNLIQT9siKx2DzIIVTIRb9vM/z9PCyaZbOZKWWS60
-   X067QkJ+y9F3/r0FiPBuSO+kw1zoOUMOT0Y7KdflkA0xK7VV2zTH8QARS
-   D+hNNfO1sDEV2ChAA7ZDP8YlqN+awv4sjil/8rxTBGuJzjyyiDg12zw8E
-   JkeN6yRjnrdRLYGN/MbZN1vQy/1cnp0U70WTZKtXbJrza80PQkFlExLXS
-   +DuffldxROHl5T5NW1t9vDHBR/wiCFrAaXbnVTnpwaegICViryQx/6dF7
-   w==;
-X-CSE-ConnectionGUID: OE07OH/gTFCUltZgFYDtFw==
-X-CSE-MsgGUID: oeUELk1XS3y5Q7auQLo3Ag==
-X-IronPort-AV: E=McAfee;i="6800,10657,11564"; a="78832491"
+  bh=9nb9C7yie/OSQdbh2G7LM3IWi8GLACvnVZn1kIDNYYA=;
+  b=YjMUtGfOlnyl4yQXWbpZ3puNgRiB9IKt/u/63XqZ6ydqUZyHTQwAzN/i
+   Ckqhu+FjALnoLzodwWsVKK4wiEfvyNgwbanpk/JKOZ1JRwiMxmhz9bHQg
+   0N3iGKwCk68J6A8RzhinnVfAyqjrk3QkC+WJmsXx1rPdrmz94GhLFez92
+   /uFGVTL5kM2e3EMpgOZ3sM2axPS5l36zcF3Njp7ByxAMWO2FSyAJK8RGk
+   C5v6/aTq/wWkwKTXXKO1NlvC8ssACbH69W0V9ijZlWp1d4Zk/lq+LEGTh
+   iuGnpib3YjBUdmXeSXBKrOx6IHgzwya8T8pMisEDP/xOQpU35bwnjeHh0
+   g==;
+X-CSE-ConnectionGUID: 93zm3ElRSn2m1t/ZqxNsxA==
+X-CSE-MsgGUID: dlHsCd8yT1yXjXo+ESND+A==
+X-IronPort-AV: E=McAfee;i="6800,10657,11564"; a="60403363"
 X-IronPort-AV: E=Sophos;i="6.18,294,1751266800"; 
-   d="scan'208";a="78832491"
-Received: from orviesa008.jf.intel.com ([10.64.159.148])
-  by fmvoesa102.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 25 Sep 2025 21:52:17 -0700
-X-CSE-ConnectionGUID: 4V2GSJqpTPedKDw4GCOpTg==
-X-CSE-MsgGUID: XMMJGNDCS9qfljpRetNJ7A==
+   d="scan'208";a="60403363"
+Received: from fmviesa006.fm.intel.com ([10.60.135.146])
+  by fmvoesa112.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 25 Sep 2025 22:36:57 -0700
+X-CSE-ConnectionGUID: 0kxMoV0bQ1aifC21CNIs/Q==
+X-CSE-MsgGUID: 8XrxLRCnSFupWmBt/YS6Qg==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.18,294,1751266800"; 
-   d="scan'208";a="177563189"
-Received: from xiaoyaol-hp-g830.ccr.corp.intel.com (HELO [10.124.238.14]) ([10.124.238.14])
-  by orviesa008-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 25 Sep 2025 21:52:11 -0700
-Message-ID: <34a98a69-8ce2-447a-91b1-7c0232acdc46@intel.com>
-Date: Fri, 26 Sep 2025 12:52:08 +0800
+   d="scan'208";a="177456482"
+Received: from unknown (HELO [10.238.0.107]) ([10.238.0.107])
+  by fmviesa006-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 25 Sep 2025 22:36:53 -0700
+Message-ID: <c26dd87a-a92a-4a1d-a57a-4c7c8b2aa1fa@linux.intel.com>
+Date: Fri, 26 Sep 2025 13:36:51 +0800
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -69,38 +69,50 @@ MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
 Subject: Re: [PATCH v3 01/16] x86/tdx: Move all TDX error defines into
  <asm/shared/tdx_errno.h>
-To: Rick Edgecombe <rick.p.edgecombe@intel.com>, kas@kernel.org,
- bp@alien8.de, chao.gao@intel.com, dave.hansen@linux.intel.com,
- isaku.yamahata@intel.com, kai.huang@intel.com, kvm@vger.kernel.org,
- linux-coco@lists.linux.dev, linux-kernel@vger.kernel.org, mingo@redhat.com,
- pbonzini@redhat.com, seanjc@google.com, tglx@linutronix.de, x86@kernel.org,
- yan.y.zhao@intel.com, vannapurve@google.com
-Cc: "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>
+To: "Edgecombe, Rick P" <rick.p.edgecombe@intel.com>
+Cc: "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+ "linux-coco@lists.linux.dev" <linux-coco@lists.linux.dev>,
+ "Huang, Kai" <kai.huang@intel.com>, "Zhao, Yan Y" <yan.y.zhao@intel.com>,
+ "dave.hansen@linux.intel.com" <dave.hansen@linux.intel.com>,
+ "kas@kernel.org" <kas@kernel.org>, "seanjc@google.com" <seanjc@google.com>,
+ "mingo@redhat.com" <mingo@redhat.com>,
+ "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+ "tglx@linutronix.de" <tglx@linutronix.de>,
+ "Yamahata, Isaku" <isaku.yamahata@intel.com>,
+ "pbonzini@redhat.com" <pbonzini@redhat.com>,
+ "kirill.shutemov@linux.intel.com" <kirill.shutemov@linux.intel.com>,
+ "Annapurve, Vishal" <vannapurve@google.com>, "Gao, Chao"
+ <chao.gao@intel.com>, "bp@alien8.de" <bp@alien8.de>,
+ "x86@kernel.org" <x86@kernel.org>
 References: <20250918232224.2202592-1-rick.p.edgecombe@intel.com>
  <20250918232224.2202592-2-rick.p.edgecombe@intel.com>
+ <76019bfc-cd06-4a03-9e1e-721cf63637c4@linux.intel.com>
+ <ce717a9a5a7539b38b19115e0d3fa11306ddf9c3.camel@intel.com>
 Content-Language: en-US
-From: Xiaoyao Li <xiaoyao.li@intel.com>
-In-Reply-To: <20250918232224.2202592-2-rick.p.edgecombe@intel.com>
+From: Binbin Wu <binbin.wu@linux.intel.com>
+In-Reply-To: <ce717a9a5a7539b38b19115e0d3fa11306ddf9c3.camel@intel.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 
-On 9/19/2025 7:22 AM, Rick Edgecombe wrote:
-> From: "Kirill A. Shutemov"<kirill.shutemov@linux.intel.com>
-> 
-> Today there are two separate locations where TDX error codes are defined:
->           arch/x86/include/asm/tdx.h
->           arch/x86/kvm/vmx/tdx.h
 
-it's "arch/x86/kvm/vmx/tdx_errno.h" actually.
 
-> They have some overlap that is already defined similarly. Reduce the
-> duplication and prepare to introduce some helpers for these error codes in
-> the central place by unifying them. Join them at:
->          asm/shared/tdx_errno.h
-> ...and update the headers that contained the duplicated definitions to
-> include the new unified header.
-> 
-> Opportunistically massage some comments. Also, adjust
-> _BITUL()->_BITULL() to address 32 bit build errors after the move.
-
+On 9/26/2025 7:09 AM, Edgecombe, Rick P wrote:
+> On Tue, 2025-09-23 at 13:49 +0800, Binbin Wu wrote:
+>>> +/*
+>>> + * SW-defined error codes.
+>>> + *
+>>> + * Bits 47:40 == 0xFF indicate Reserved status code class that never used
+>>> by
+>>> + * TDX module.
+>>> + */
+>>> +#define TDX_ERROR			_BITULL(63)
+>>> +#define TDX_NON_RECOVERABLE		_BITULL(62)
+>> TDX_ERROR and TDX_NON_RECOVERABLE are defined in TDX spec as the classes of
+>> TDX
+>> Interface Functions Completion Status.
+>>
+>> For clarity, is it better to move the two before the "SW-defined error codes"
+>> comment?
+> This hunk is a direct copy, any reason to change it in this patch?
+yeah, it can be done separately.
 
