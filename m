@@ -1,107 +1,111 @@
-Return-Path: <kvm+bounces-58852-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-58853-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 74F64BA2D30
-	for <lists+kvm@lfdr.de>; Fri, 26 Sep 2025 09:38:51 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4F2A4BA2E00
+	for <lists+kvm@lfdr.de>; Fri, 26 Sep 2025 10:02:21 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 9AFCF1BC84F2
-	for <lists+kvm@lfdr.de>; Fri, 26 Sep 2025 07:39:13 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id F2D46621357
+	for <lists+kvm@lfdr.de>; Fri, 26 Sep 2025 08:02:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 910EA288505;
-	Fri, 26 Sep 2025 07:38:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EE82528C006;
+	Fri, 26 Sep 2025 08:02:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="eyYKDUg1"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="ZzUvmaaM"
 X-Original-To: kvm@vger.kernel.org
-Received: from PH0PR06CU001.outbound.protection.outlook.com (mail-westus3azon11011046.outbound.protection.outlook.com [40.107.208.46])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.21])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E4B821A295;
-	Fri, 26 Sep 2025 07:38:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.208.46
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 724161D6AA;
+	Fri, 26 Sep 2025 08:02:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=198.175.65.21
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758872313; cv=fail; b=T9RWtC3+m+Z45S39pENUFsUr4KBPKgM4kTxzpSy77YP7WZlT/1gCdysfDDsn1l2Vt6Fg4Z3V7bsrw7MjDc/YQb303hojyLS8h+sMEXs/qR8y3I3/xOnazMp1NrFEn76qtTrILuMWL1Kh6SUcRq+ckid4cjUDVgTN2i+bGX9Ijrw=
+	t=1758873730; cv=fail; b=bCns9zTHsIseckl3Rl5QDsDY+D8PSZobFVvsEMbBU43gZp9my6HbR8ag5nffnsIq3zuFYjaI6RY8P64/6rTtx3qUKd7kBpjGITxIzjiJhM2LI01TW3ZVWXnzaeBkdnsOGxXOWOiIf8n+3dCVfiKSRo8eSuCdhBX02DyguSq5mPE=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758872313; c=relaxed/simple;
-	bh=esWJPoLNWh2+PrgR7RMMstPoWQo+puJ/AWLewC67N4Q=;
-	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
-	 Content-Type:MIME-Version; b=L5c2f/NjA/QPAWSVZ99thA9SYBZl1l6yXhpLkZQIjILYfgrBLFUSBvrQJITK3Lh54MopEYyA+fY5c9tWgXG6KLeey/b5yfKDke3Rh/7U7OIuJCuROPDukwezPfN/ta2oZJdlv70502NiMwf1NJDaD9wQ+rmmTnA50eokPm6Bn3g=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=eyYKDUg1; arc=fail smtp.client-ip=40.107.208.46
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
+	s=arc-20240116; t=1758873730; c=relaxed/simple;
+	bh=O3OtBijwvz2ejMDFbT/pomPID5t9jS4IW6+2z3eoEmc=;
+	h=Date:From:To:Subject:Message-ID:References:Content-Type:
+	 Content-Disposition:In-Reply-To:MIME-Version; b=H10kGJzud8pmz/aMcuA8dYllBIon+3s028N++WzH7tokFW0Z0db5MCTmtK/c/imgd2AbHN7XXOEtyRrNwthpp+EftqQUJ7zn5K51ku1LUxl+VlMAi+nZgF5i5udS53d4gvr+0BtW3Pm3AKgqj7uz/cKfrgIlWFEB8NoEGdrGreA=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=ZzUvmaaM; arc=fail smtp.client-ip=198.175.65.21
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1758873729; x=1790409729;
+  h=date:from:to:subject:message-id:reply-to:references:
+   in-reply-to:mime-version;
+  bh=O3OtBijwvz2ejMDFbT/pomPID5t9jS4IW6+2z3eoEmc=;
+  b=ZzUvmaaMqWbkF3wUsLn2H4z+edov2RT1YGxRjvvC+RHPrTSnGdatEj6T
+   4/UIZYMFWz+RqiIVJJba49F+iKGcaKYDcfXe2Vco1B0fONNnV2zuMNPke
+   7andOLBq/pFy10Q2o4vOHE3P8mNz1d3ED0TZZKPae/xlcUPaX3KebTUkM
+   QC3KDFnU3cO1HBKsqBownbO8UFR5cwvE6cNTCayTWCvoLOa1ly9rGJAE8
+   Ot0sMefYT/6TdN5hGPDD81EwraHzQLr+mzUXbkSbMIIRj0fjhEhI2eMfc
+   JkODwfRL2H32keuIJzXtKcPCPe7OrUe6BgaKOdtkWytaPy1g718kX9tl6
+   Q==;
+X-CSE-ConnectionGUID: mMvZE6t+RoqCsNNGhrUlbA==
+X-CSE-MsgGUID: Lf+c3kSbQ32ePX2jaR6nDg==
+X-IronPort-AV: E=McAfee;i="6800,10657,11531"; a="61117303"
+X-IronPort-AV: E=Sophos;i="6.17,312,1747724400"; 
+   d="scan'208";a="61117303"
+Received: from orviesa009.jf.intel.com ([10.64.159.149])
+  by orvoesa113.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 26 Sep 2025 01:02:08 -0700
+X-CSE-ConnectionGUID: JhjwUPgrTpi7bRRAsO7WRg==
+X-CSE-MsgGUID: hjwFvVsRRWuBLMiKrn9fHw==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.18,294,1751266800"; 
+   d="scan'208";a="177117990"
+Received: from orsmsx901.amr.corp.intel.com ([10.22.229.23])
+  by orviesa009.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 26 Sep 2025 01:02:08 -0700
+Received: from ORSMSX901.amr.corp.intel.com (10.22.229.23) by
+ ORSMSX901.amr.corp.intel.com (10.22.229.23) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.2562.27; Fri, 26 Sep 2025 01:02:07 -0700
+Received: from ORSEDG901.ED.cps.intel.com (10.7.248.11) by
+ ORSMSX901.amr.corp.intel.com (10.22.229.23) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.2562.27 via Frontend Transport; Fri, 26 Sep 2025 01:02:07 -0700
+Received: from SN4PR2101CU001.outbound.protection.outlook.com (40.93.195.47)
+ by edgegateway.intel.com (134.134.137.111) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.2562.27; Fri, 26 Sep 2025 01:02:05 -0700
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=yVOYIbQqfMUx3/6ZPoak37c28QM2MyI1jpWOpcR2IBoWfwtlGfFb1mDe1vxsLCe+V7bjrmRYOO4QCEwij9eOxIYEoUTbyJ9ZJVteDcNJs2zNAGe/Sojf1i1c1A6wMhA7a2vnkJsN5jXHTQlK8UbX4wTM7s1osh9rQMTSvG34lR8UIzz4uSS5QF6wup2WRJikysBz/6tielaPcrTzKv/krRYweZB2oSBpZFVeM16rIK/ZfNVOW1leNQ6Y6MMuXjcN3dTkcQHqKnp0g2pCOCJC0i3EEgoFaQNh2LAormoThLzvFlirj5wvGqpgotpfum6wjIDPNyi0DbVKAzU2ArfgIw==
+ b=iFtYrt5Q11Sn40bam0YqanuiLC717uTHvtuZ1B0NQ5zITD9jYlu9gYmKIqS0+pYIjILU0b04JVMH/uDzKIX99gSlcVtRasmOzLwhQtafmOUumpJPgwsTfjGgXwjQ6kpEEZmm+TwatGWQGYddtnMd6Q1W2gfyxA01ANOsfGqdCQmVqN6WfwRrZm5bRqHxaLDv8/6Vs9bYKzHGBdUsvKBKCYv3m0Slpbh4hV4EFApUP2yzZ4bdNcUhbQWIPfzMX/PFFWwxQ1CKCyasje6b/PpHTomiJRr7VTlmCNKBECGw2jrB+wwik34AHlyRxVi/Cf8/1OODfkV0j/sR5G/qfzVCBw==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector10001;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=9nO6v1jBPXrL9qfNdMcZLxyETTA/u3Yf9lFrozO5XKw=;
- b=exjy5DTx3WMe3VNAthT65JIOchcWqanLq+xBW0Weluu1yb9rLZ/Mgrn/6xlufw8nu+L6uQa9BwRmig7IeFSEeAFL4y2rNcGFVbdEOiAxvBVae7uACUf29N1ZHRKBe8IttLmDsqPgJSZ61I3pK8PUHRMGFQcJ2j63n72UkNt4g+OoWcFamj+EWVGCeXtYN6w+k0ZjpFqTgeApGYEPKSGZ1aWmSQ+cIApE+MipJGK62M4W+qJ98V5rWJRgNS4jDyT81LOCqsmLLhlTJ13Q0qa+g0Itw+FqSZR9sHkQnNa5yHmW6lsashnhObTpaRb8YzD3GR3wTFp2SonTSw7YhoKjdw==
+ bh=uIXnnKGJITPFbdERZflqH9zBjVtVWhacunqj8LX435E=;
+ b=Jp7ivqWcCTjUHand+u30t+Ix7AeBRlldoVdSxgNfR6yrpSkBa04gxkUcPhIk/2RWVfRJWmkzYKzWOWbD4AQVMBuV+PcBLUPDDR/Il3aa0KAAtGatDe5mAd43BnEV0BAHHzF783LTS8OWvLCRAXcu/cMVTGM60cqdkdnbfxYL3ADwdpcV8ous9VQhXvOJZhv0PWOekGPyuZntXwofwfHEuIVzt32lEw5epThFH8OWLQ5t3kEaOPIZUJnv1d2sH/xfwI79H8zi9GS0AvjyBEqxLfkxDMKo3jJzYU2C0venjpleSF7CxguRXBt1W5tTV+pNkehXxaTRBEBABqfIbdU2Eg==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
- header.d=amd.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=9nO6v1jBPXrL9qfNdMcZLxyETTA/u3Yf9lFrozO5XKw=;
- b=eyYKDUg1Vcce3H74yR4y6l94iMdafVA6VM32B3gkZ5y5DSr9JsjwIKDTzsGHxhF1JbujsHRoG9+r13VtSS3StpKl48SVW/mHcGvQ+7j9HD84m1JHAeCeoPbywBz5RFmI5onCWwDFEsCtUcUV986GLJA8gXw6S9XVefRDRQy+2/4=
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
 Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=amd.com;
-Received: from IA0PR12MB8301.namprd12.prod.outlook.com (2603:10b6:208:40b::13)
- by PH7PR12MB9068.namprd12.prod.outlook.com (2603:10b6:510:1f4::7) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9137.18; Fri, 26 Sep
- 2025 07:38:27 +0000
-Received: from IA0PR12MB8301.namprd12.prod.outlook.com
- ([fe80::e929:57f5:f4db:5823]) by IA0PR12MB8301.namprd12.prod.outlook.com
- ([fe80::e929:57f5:f4db:5823%4]) with mapi id 15.20.9160.008; Fri, 26 Sep 2025
- 07:38:27 +0000
-Message-ID: <0e986bdb-7d1b-4c14-932e-771a87532947@amd.com>
-Date: Fri, 26 Sep 2025 13:07:57 +0530
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH kvm-next V11 7/7] KVM: guest_memfd: selftests: Add tests
- for mmap and NUMA policy support
-To: David Hildenbrand <david@redhat.com>,
- Sean Christopherson <seanjc@google.com>
-Cc: willy@infradead.org, akpm@linux-foundation.org, pbonzini@redhat.com,
- shuah@kernel.org, vbabka@suse.cz, brauner@kernel.org,
- viro@zeniv.linux.org.uk, dsterba@suse.com, xiang@kernel.org,
- chao@kernel.org, jaegeuk@kernel.org, clm@fb.com, josef@toxicpanda.com,
- kent.overstreet@linux.dev, zbestahu@gmail.com, jefflexu@linux.alibaba.com,
- dhavale@google.com, lihongbo22@huawei.com, lorenzo.stoakes@oracle.com,
- Liam.Howlett@oracle.com, rppt@kernel.org, surenb@google.com,
- mhocko@suse.com, ziy@nvidia.com, matthew.brost@intel.com,
- joshua.hahnjy@gmail.com, rakie.kim@sk.com, byungchul@sk.com,
- gourry@gourry.net, ying.huang@linux.alibaba.com, apopple@nvidia.com,
- tabba@google.com, ackerleytng@google.com, paul@paul-moore.com,
- jmorris@namei.org, serge@hallyn.com, pvorel@suse.cz, bfoster@redhat.com,
- vannapurve@google.com, chao.gao@intel.com, bharata@amd.com, nikunj@amd.com,
- michael.day@amd.com, shdhiman@amd.com, yan.y.zhao@intel.com,
- Neeraj.Upadhyay@amd.com, thomas.lendacky@amd.com, michael.roth@amd.com,
- aik@amd.com, jgg@nvidia.com, kalyazin@amazon.com, peterx@redhat.com,
- jack@suse.cz, hch@infradead.org, cgzones@googlemail.com,
- ira.weiny@intel.com, rientjes@google.com, roypat@amazon.co.uk,
- chao.p.peng@intel.com, amit@infradead.org, ddutile@redhat.com,
- dan.j.williams@intel.com, ashish.kalra@amd.com, gshan@redhat.com,
- jgowans@amazon.com, pankaj.gupta@amd.com, papaluri@amd.com,
- yuzhao@google.com, suzuki.poulose@arm.com, quic_eberman@quicinc.com,
- linux-bcachefs@vger.kernel.org, linux-btrfs@vger.kernel.org,
- linux-erofs@lists.ozlabs.org, linux-f2fs-devel@lists.sourceforge.net,
- linux-fsdevel@vger.kernel.org, linux-mm@kvack.org,
- linux-kernel@vger.kernel.org, linux-security-module@vger.kernel.org,
- kvm@vger.kernel.org, linux-kselftest@vger.kernel.org,
- linux-coco@lists.linux.dev
-References: <20250827175247.83322-2-shivankg@amd.com>
- <20250827175247.83322-10-shivankg@amd.com> <aNW1l-Wdk6wrigM8@google.com>
- <95ace421-36d2-48af-b527-7e799722eb17@redhat.com>
-Content-Language: en-US
-From: "Garg, Shivank" <shivankg@amd.com>
-In-Reply-To: <95ace421-36d2-48af-b527-7e799722eb17@redhat.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-X-ClientProxiedBy: PN2PR01CA0187.INDPRD01.PROD.OUTLOOK.COM
- (2603:1096:c01:e8::14) To IA0PR12MB8301.namprd12.prod.outlook.com
- (2603:10b6:208:40b::13)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+Received: from DS7PR11MB5966.namprd11.prod.outlook.com (2603:10b6:8:71::6) by
+ DS0PR11MB8740.namprd11.prod.outlook.com (2603:10b6:8:1b4::5) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.9160.10; Fri, 26 Sep 2025 08:00:57 +0000
+Received: from DS7PR11MB5966.namprd11.prod.outlook.com
+ ([fe80::e971:d8f4:66c4:12ca]) by DS7PR11MB5966.namprd11.prod.outlook.com
+ ([fe80::e971:d8f4:66c4:12ca%6]) with mapi id 15.20.9160.008; Fri, 26 Sep 2025
+ 08:00:57 +0000
+Date: Fri, 26 Sep 2025 15:59:53 +0800
+From: Yan Zhao <yan.y.zhao@intel.com>
+To: Sean Christopherson <seanjc@google.com>, Paolo Bonzini
+	<pbonzini@redhat.com>, <kvm@vger.kernel.org>, <linux-kernel@vger.kernel.org>
+Subject: Re: [PATCH v3] KVM: selftests: Test prefault memory during
+ concurrent memslot removal
+Message-ID: <aNZH+ftDGaHA7qCT@yzhao56-desk.sh.intel.com>
+Reply-To: Yan Zhao <yan.y.zhao@intel.com>
+References: <20250924174255.2141847-1-seanjc@google.com>
+ <aNYDtn1FJ65aDC0T@yzhao56-desk.sh.intel.com>
+Content-Type: text/plain; charset="us-ascii"
+Content-Disposition: inline
+In-Reply-To: <aNYDtn1FJ65aDC0T@yzhao56-desk.sh.intel.com>
+X-ClientProxiedBy: SI2PR01CA0035.apcprd01.prod.exchangelabs.com
+ (2603:1096:4:192::13) To DS7PR11MB5966.namprd11.prod.outlook.com
+ (2603:10b6:8:71::6)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -109,273 +113,143 @@ List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: IA0PR12MB8301:EE_|PH7PR12MB9068:EE_
-X-MS-Office365-Filtering-Correlation-Id: 94d3eeee-162b-4ee2-bff9-08ddfccfae33
+X-MS-TrafficTypeDiagnostic: DS7PR11MB5966:EE_|DS0PR11MB8740:EE_
+X-MS-Office365-Filtering-Correlation-Id: 1530caab-49f5-4c3c-956d-08ddfcd2d351
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230040|376014|7416014|1800799024|366016;
-X-Microsoft-Antispam-Message-Info:
-	=?utf-8?B?K094SHRzZVpMVGNpYVFmdU5BcTQwcXJTTC9DQUVabXc4cUtScCtHYkxPcGFo?=
- =?utf-8?B?RElyaS83REZIdlIrV2RzOG1zSmNwWkNhUytwOFVqNGNDOW9ETGdxTjQ5d2JJ?=
- =?utf-8?B?Vk5TQ0JxWW0wSkRaK2x6b2wzNHdlcmNBdExpbEljOWl0RzBKNzI4YlFXVHgz?=
- =?utf-8?B?UXBTMU5GY2VoOGUrZUliSVFlcWVUdG93K0YyT0FQRXA1RVQ3Y0QzUDNBZWp4?=
- =?utf-8?B?SXZzcUFva3RwZThZNUQ0ckxRNXNad21MNWJ4L29SeWlzTnB6U1hobUlUZTV1?=
- =?utf-8?B?VnFYMExTVXFZcGhCOEdhOU5wd0Rtcm9RTmNLb2JKaFljODRUQ1FhS1VneHhh?=
- =?utf-8?B?aU5pMk9ybURMTmpudkdjSFBaUXpMbndTUTc4L2RVdWV5SzRSUFc4aFlLL1kz?=
- =?utf-8?B?Ujhib3U2V25wcElYWklsanlreEh4ZEQvUFdvWFBydHVWa0p0emZJUzBxZkhU?=
- =?utf-8?B?TmxhYUJSWHJDeCtsZzRJWGlVbXJXVVdVU1dvUi9sR1A3bUdUSnFFM1FKL0tr?=
- =?utf-8?B?SFVpMUk0RkkyU0FmR1BLQm4rWVNDUEJ4cmVqcGwzUDg2TlZKNnVSbjRvL1Av?=
- =?utf-8?B?dENjUWR3U0FvMmQzSGw4YitaTTIvU2lYLzFQUkxubm9CSW5FdDhyTWh6VjlP?=
- =?utf-8?B?YkFvVjJRSFdMTjFZOHpnbS9hSTVEQUN6L3lLQ3Npd1Zmb0pqRHNTdDVsN2NR?=
- =?utf-8?B?K01jOFBhQ1hCS1pYbUNScDgvbnMwR2pmWlZsakRsVTJRVCtYWmhUQ1lRVXFo?=
- =?utf-8?B?cTFwbFdlMWV3VWcxU05PUzMvSXJsZTQ0YjlPYTRSMGs2ZHk4blprY1NoMHRL?=
- =?utf-8?B?dmNQWjlUVzEwUE5rOTgvWExwSXB4STBlUXlXWWwxczFjajRVeW40c3hkcmZK?=
- =?utf-8?B?YWZuaXFZNElJUk41MEpwczJGdit1akJFamV3TW9YN0w2RUVTMFVZc3ZtbFZV?=
- =?utf-8?B?SEx0ZDExL2NhWFFCdFc2cFJscHFNLzloRzMwRkRCeXJvQ09PVDU2U1RJd0Zy?=
- =?utf-8?B?THpFSHVwV1Z5Y05zSStmUWRuNERiMWkrYW00S0lWcDJHNkk2QU5xMGRuR1Vw?=
- =?utf-8?B?TmYybThvMUtUalpINjZlSzN6ekt5Qk1FbWtsQzdOL1lSVElaVUNRb2xmWUlt?=
- =?utf-8?B?VkdhMWtEejNlQVlJNzFGNzdubUlKZU1MU3phalA0Vy9PVHpDN21Ba1BOcjJu?=
- =?utf-8?B?UFZXSlFTVzFTUGpPS3ZGT3VHcExuakxaK0tzYXNOYy9jYjhXVmJndGlVc2li?=
- =?utf-8?B?SENHVVlhd2U4aitra3pMMno5b1llYTdJWE9vTHFHcTNQRnBSZzhjSnZlcFdl?=
- =?utf-8?B?TitkMnpUUVJ5bGZNMDBDQzhpQksxUTI5eGpLUEgzU0s2cXV5Y2tqUEpGN01t?=
- =?utf-8?B?YUNaSFhzNU9WZUhTRk91aThObmYyVnljeEtTQzFqNWtUMS9oa3N4ZDh1a0ow?=
- =?utf-8?B?R3NaK1h1WnBHR2w1MHRGTTBzR3UzY1YxajdRL2tWdDdZdWJQcmlwUEdxSDRR?=
- =?utf-8?B?VTVrdGpOYUVDZDRmeWNnMm1CaDVJSkJkWUhtK0wyMDZiR1BERnR0WTZtV3RS?=
- =?utf-8?B?SE5YSjludWVEdDlOTWplcTNPbWNxNVpONFRkMkR2SmhCOEtNYVVWZFJOTXAr?=
- =?utf-8?B?OHovMlpnWXQxUm5KNFVJM1dTbEVCTzJhdFlBU2lXM0pqdHVwa052ODFtc3Vh?=
- =?utf-8?B?OWJENi9WUEloT2psZUVYZGxxcEJzbmVZUWVXSU5PSVZoYTgvaExoVTlHNnk5?=
- =?utf-8?B?UGhLTWhqTXlNRFlERHQ3blJobGdGMUVCT0h1Rm1CWUJmMmxOaUR1TXN0NnAr?=
- =?utf-8?B?SGkxaHZqSjhuY3VHSFNQb1d5RC9OeVVGOXFPNHdFbWwvdEpOY0dUYXpWSEJt?=
- =?utf-8?B?TWxkdk4xTXo3T3AvanJPZHNmenU0YVZHQ1Axa1I3QWo1aXFaOU1XR0hIeW1V?=
- =?utf-8?Q?uyn4ioYfTnZ9jmnje/2WgMXE68bRDrcZ?=
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:IA0PR12MB8301.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(376014)(7416014)(1800799024)(366016);DIR:OUT;SFP:1101;
+X-Microsoft-Antispam: BCL:0;ARA:13230040|366016|1800799024|376014;
+X-Microsoft-Antispam-Message-Info: =?us-ascii?Q?3ilrYHR5b9fTpr0fUsLJlXFPfvKbRPsg8U+ANsihAMskkKD89C+4V1eY0P8x?=
+ =?us-ascii?Q?ylN1OQacTXtqn8p4ij7j2/4oBXjYGH+4V6a2l3+21qzYH4Pyz3hGKvfvjHAD?=
+ =?us-ascii?Q?NksVMvwXlrvtdrt3K6yC53RKHNdc1wXpLIFbTQozc6x+9v16y/lJ7rcQ6ltm?=
+ =?us-ascii?Q?tQxuyEbEcuzPGW0RhIFLl99bV3Bmee+GeZ5goNUoW5pbBpq9Sqgf+u2V9t/C?=
+ =?us-ascii?Q?JgSwq+IGcaaN1uRttS3CIVFx2y/kdseBuLb8de6mP08I8EVk3q05g5gDFmHU?=
+ =?us-ascii?Q?C5iotUagrghZfYGn89L2JLMRIL/nOnAD/ZbZRnYgdgdeoEvkWg321Obgc2ZQ?=
+ =?us-ascii?Q?BM0dSSp3EGtQCJWvwG2NWPbqvxsXdCRwU5nLYPqJoREgyXBd3rGdxsg+iy0H?=
+ =?us-ascii?Q?H1/wkr4ZSPw5xfksw3RRc3e6BYNt4/Y7hlkQScJ1KLMUS9upth2D1k9aK/n0?=
+ =?us-ascii?Q?QweAtLg3dOTO6RH2lzNtR0MKVsBXoF8HcI2nk/2hkmdeXyYmREYUsbkeaA5D?=
+ =?us-ascii?Q?AcMsiv95hDB+1xfnQFAumf8KnFpzmqnihivtCmUZQMzQWvIOFdYvLjIS5qTe?=
+ =?us-ascii?Q?Mg4/3Zry+UWw+V/SksmbNYv1u2wRtuppukHpDfdrQLbFvAzevBl+mAmcAw46?=
+ =?us-ascii?Q?fgpm23T3PCCaNahtzE8eDp39O7EECqx9zt0LmXlO5wEn59truYDXJK7X67rt?=
+ =?us-ascii?Q?/Ntj4dYh8aBeEwwuJhQJZhQ2OVGIRaTlN7/7DMWnkC/gC5QvsSNIA087EHFM?=
+ =?us-ascii?Q?btPpjhAuEMMbopK9E9qnGcwu+r6iQ3KU7UFf7KuQcpFjUVPjp/I6S+VKCzb3?=
+ =?us-ascii?Q?ygpQSdAQR9xo4EZvn95DQkUDQsEmE261FcI+bEEydLWRwgxs9akSv1qZs6xv?=
+ =?us-ascii?Q?2p2J8CCUsSFJJDwkv2MWwDPCEzgV7UxNuZu1ppuQdGksAkGqNXvkqp3wkagy?=
+ =?us-ascii?Q?AQcijxkHm3vnBr2fOEa8o7HuiqKKRglY+lkto15MR6c26d7rflkdy47yzPSF?=
+ =?us-ascii?Q?Too9W/XAFgNPHle8OVyRrEpqJZ1xUrX7tqwshPghuherHdpvBw6P4Nz0tVLN?=
+ =?us-ascii?Q?R5i2QwhmBot+4G3liLocM5XSOrwPWk1Lds9LtCrtGLpKOYEQr0uKJbHd40qd?=
+ =?us-ascii?Q?G/cFSSMH/QXeKrvnt7b+UY3Ad8ofMhOnGER8TVrGlI52ElffmyXI0n7X8icQ?=
+ =?us-ascii?Q?GfTAYQq+P9oM9RhhJ/MWHAmm1LGiyNP+APeu4JJzd+007ech561FagieYqtp?=
+ =?us-ascii?Q?Agse0xdSrbBn7qSjmUasazkUlKgeMZ/i9FpQSVpbBmyoPwEEMooZskMqPmkB?=
+ =?us-ascii?Q?rGRZQesIgS9QgLb0rOqu41V89B6wgK780Lxyh3SSroACJ547y2y5nkRgO325?=
+ =?us-ascii?Q?nzjICEo=3D?=
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DS7PR11MB5966.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(1800799024)(376014);DIR:OUT;SFP:1101;
 X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?utf-8?B?bmxmdzE5UXdWT0lyblR5OHpHUmlBUEYzSDBvRHR2dEllZ1hGTmgyeTQ3RUdq?=
- =?utf-8?B?L05mcXFULzdmRlpldU1NNWR0eVQ4MVlkTXhVZVJQVmJxU2lQUXM4allhRVNK?=
- =?utf-8?B?UDFHWlRNOFlaaFRtblcxWW1nYWtMNG8wZDlpT2FhYjZHbkJiQUZ0Uk1mRjFw?=
- =?utf-8?B?dFpLelJMbHFza2J1M0NNd0k5L1Vxak5iV2hpMlVHeXQwUE1senpja3VEekhH?=
- =?utf-8?B?ZnB1d0labXowQ3AvSWhBMUxvOGdUeFZxTEdXSlZHSk81M1ZCa01GRU9XSTlM?=
- =?utf-8?B?Y0Y3YmdMdzJXZlgzM1VQcGVPYUY3cVpSemRBeTNFOXFMZDZmbmkwQ2FOSzdt?=
- =?utf-8?B?Uk5rZ0ZxcTM2ZlI4Yk5SUXZiMWUrVFNLa1d1eENWTGkwY01rZU5XR3lYUld5?=
- =?utf-8?B?T28xM2FxK1c3a1ZxNkxTNUN4Tm1TNCtIdmRVQXpQOVhkWFg5NlVZaUNZelBQ?=
- =?utf-8?B?TFJPVDYyRUJSR0ZzWnphRG9GMzJhNUk4TktvWUZBZlpDMzNCZ09xYTdmZFBY?=
- =?utf-8?B?c0loN1BZTDJPV2lxVkd5TWszZEw1bW9PZ2lrTXh4QmNNNGdoY0lsd1VUMU9T?=
- =?utf-8?B?Zk8zbEZIZ2pKcTdHTGl3OW9SUTlKenNYM2Q5ekNua0szOVFUaHdvYzlpOGMz?=
- =?utf-8?B?Tk1EMFBjMUhoaTU2SHpwWjBaNklZSVJ0ZkJma3BVN2ErbG1uWlkvb1NUUHFy?=
- =?utf-8?B?UlZUajRVNWhYRm10ekZLRS9mK2ZCb0tSaXNTVllLemxJWXdzRmZQSmlkZDFU?=
- =?utf-8?B?QjFhWWZlV0ZKNU5aNDRXMjFtRDRpM0dxZXBYclRQeVBJbTZPTWV3Vm9tNDRU?=
- =?utf-8?B?cEd0NjEydjdRb2RWY0Y1RnpsbmdPR3hVR3VmTlptdU1SUjdobGJVQm9xQmtQ?=
- =?utf-8?B?Mll1UVBxc0d3ODVCMWJVWnJ6Nm12M1dpMXd1WVo2RUpzUGFOZWJTeHN6Wk9h?=
- =?utf-8?B?Y2hEb0xQWWpjRzFZMnVHcHEzK0hmU3VaSnZlOWF5M1BOWHcyZzdySEJRcW5P?=
- =?utf-8?B?YmVWVG42c09PTXphbk82bXRFU1FXWGVlQXI5MWFCcUgzUEhocEVlTXBYeDIy?=
- =?utf-8?B?dmh0MG1KZTc1UTVYa3JjaTYycnpUemluQ0ErSEI0V1lUZ09ZUkVWMlhlVE1B?=
- =?utf-8?B?Tm4rWUtpNjlXMWI5VUt0b0F4YXpiSmFKVGZram1Ta2ZPWVYydzFaRkhKZ3J6?=
- =?utf-8?B?SHZMK0czcVMrNDJ3YTVycFE2cnl0enIyOG1ZUk1DeDBsZnZIMVNlQ29CMS9w?=
- =?utf-8?B?WGE0OTF4RG03eHk5MWtIU1J1MzNSZkZjVGZZaWVRZDJsWDNGZWNCWnozWkli?=
- =?utf-8?B?ckw3aTZQNXB4UkJNTGtHMDIyUFFsMGdMSGdPbU9ENUdoU1JSdHZOQksvZHpz?=
- =?utf-8?B?NkUyeDNJZzJaWnF5TlEvZ1JzTC9pZVk1aDV1M216bURKNmZWTVlZUWtrSk9r?=
- =?utf-8?B?VEltVU5ERFlOMThQWElzYkdvL3JvM1EvTE8rQlVYblphUWxqSUtFS1RVVURU?=
- =?utf-8?B?Ui9TV1hzc3Nva05RcDFrVnh5UjczUHhNekNXSXVsWkUyV3J5dXNJSXQyZjda?=
- =?utf-8?B?QWJYV3FZSm1WeXRyYXlOSmEySHU0N0xaRzc0RU1mWDdJa2srTEwvUy9QSFVn?=
- =?utf-8?B?akhWTDQwS0N6ZWJxYUU4bC8rdGtvNWdNN1BrS2xtQ0w5aHBMT0xzTlpEb1oz?=
- =?utf-8?B?eDllQVM0UjExeGZZRWVGL2lQanVJeC9LSkh0UnUxdFArSDQxdkwxUnhDbTB2?=
- =?utf-8?B?QlhuRzNNUE41eE1DQThoUFVrNUZkSU56WUpVQk1vT29NVkVpM1hKcU5EMnNw?=
- =?utf-8?B?VVR6aDJNY0VtVThIcENFZDl4WGo4VUZ2N3BycHBtSzJTTzdRQUtrRzlqWEdn?=
- =?utf-8?B?U1RqS1haSnBzbG9jcWJhVnZMNmpoZlpIaXA2d0N2NG5oTzhpV0g2UDMvNEtK?=
- =?utf-8?B?T3RwWDl0MTBwZk5veVFrbTBmL0gvRDJiVUUvK05PYXRiVG02elhraEJzKyt2?=
- =?utf-8?B?TUhaSEhNZ1NqZDBqazRwY0hnbks3cTA3dVVzcFNFaHRxV0pKSmpGOUxQckFL?=
- =?utf-8?B?WmM3eTNrb3JOWHdhNzZ1ZEtzYU1yRGdFYW5pZnppODJIOTBSU0x3VjhFbWZ2?=
- =?utf-8?Q?9OsjLMHb9IDzFFJhMHIaCRTOm?=
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 94d3eeee-162b-4ee2-bff9-08ddfccfae33
-X-MS-Exchange-CrossTenant-AuthSource: IA0PR12MB8301.namprd12.prod.outlook.com
+X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?5ELj1wWgdhXKPJB2GBwwdjsY7Di6FFQbjftv3eeZYXz0kaLF0WQUzppdaZap?=
+ =?us-ascii?Q?w1hWmOKb8emetfDkxE7Ty2WM6MNJgm4lECwRkGVqeUg0K8QMIj7BoaJrTlNH?=
+ =?us-ascii?Q?qJ6/WUkHEzUhf29KQCg7gyFi065MMC7hP03lMiVoCEiW2UuvY6jTR8pWu0p/?=
+ =?us-ascii?Q?ttBngz6DRqHlUN2jyM5Ud+omRvSvN3k4D6xEOAv9m9yzP0xJt4CmMtfhHO9w?=
+ =?us-ascii?Q?cvWZNEyppBv8CdKMJtdzVzBsT7Gkkm0V2qU4goKpCwp+wYR2K0ojSQNF4xpl?=
+ =?us-ascii?Q?xUrnlPK28Fmw+Z5buTOZkzaVN7LAiUot5bJAu6c1cj6hLH4surC3gd/m79vs?=
+ =?us-ascii?Q?tNCy/hMKgej+mcXTZP6jLo5yuFv0kZLpr1rTbKYvg+udNDtU5q/X4Andm7wS?=
+ =?us-ascii?Q?lE3oQZrodvlnPLXNWZ7Id48kJ3I8ObBU7h6CyRYVSP7NQDB6ux5yotDzc4a0?=
+ =?us-ascii?Q?crU2ZPk1n/rxga7n6ecMKC5pxe3+csXZu2Eh6HpwqQH9oZVTFavNvaicWOSl?=
+ =?us-ascii?Q?YxBcu0P0e3AXhwVrQQwaDx6GHzDp2TKAGgtNVMU+LUMvEle9oeWCjIA+14Ca?=
+ =?us-ascii?Q?oUOJNTV8TP9epqguLrTdVPobbi4g8ZBTadSm4DHGPdX7yyyUJn5zQA33plkV?=
+ =?us-ascii?Q?5vCyOs/sEou3PfRzx8O5ZqfiaL4sydOlPUs9lOjjKW6y3bbRbkmXXcjMHoKI?=
+ =?us-ascii?Q?URWHtOMRaXwmuOx5Lfc5H0kk5JmKOUiBwADZcsk16rbx1Be9nmRFT+K0Vh5O?=
+ =?us-ascii?Q?wCHsvb59xfGfHEkz3lKcg6xZoe/485uriUTJi7fjFaAnpTNQQAWF0D8ckYwV?=
+ =?us-ascii?Q?EbTReZqXq0fWE6u8VDp2GgKNO/UuudmNPoDfBrCLyixMGoYzjraDDaIEs9Bj?=
+ =?us-ascii?Q?Xt3BhnXfOR49gtxKyzTP6KUcZCogQYy2iWc+skw2WE+ohESFORezgfkDiCvO?=
+ =?us-ascii?Q?R8xtfKWiNAt6gdmkIfB13aTiM1hBYPVwen5fgO+DHhHde7QE8CMnxB5PCw5Z?=
+ =?us-ascii?Q?/IToJXIc4DSrw/hOd9PrkZv5aL7qJkamGW99HT2J7LKutJp+xATCgMkAxkzm?=
+ =?us-ascii?Q?NxW+OG4nBCnznFOzUTA53qpwOSOfCNkCC8FExxQ0FR/DfSTnUXXkmkOkkYb3?=
+ =?us-ascii?Q?C6tHO42jtwVmoYu9N8fs5b4WJd8ideEX8T+YA9yuO3N3SyMcXJzrQOe+vHNP?=
+ =?us-ascii?Q?gArXhc4+AaubFgtONCysGf0UeeF3imusWkaqS8j7fuCDFTpK50f9GXGC5mud?=
+ =?us-ascii?Q?e7iGaUMVB14dsCV6FqnHbW+AJBVC5CBc8a7ZqAXOmAZc/GzMMAX4f/GeybXb?=
+ =?us-ascii?Q?nj6ASLfNzzgZCQDvWXwLmLP73VQzJlpTNZqXDvjj1dVuoTqBkRLzZyuQy+nv?=
+ =?us-ascii?Q?xbTbDgDfXyiSGJCn8GMji0sNhLjzF+sCpX+TVcfhjs1LmuwqgOV8LNiVsRj5?=
+ =?us-ascii?Q?kCRWkPYohUftz7Pi4/e7Y0Cr3NHzNz+xbce9ORxgH0pNhx+bSCcGBzcsqCSv?=
+ =?us-ascii?Q?th3SjPpV7gZCGGYOlCVSWfWQ09UMIcOiO2I1rHQ6+Bs+Yere6kaZ4hwQdhtn?=
+ =?us-ascii?Q?DdKOQDOmvwyT17dVYzPD0G/h7iywGjGI2+CQ8VmI?=
+X-MS-Exchange-CrossTenant-Network-Message-Id: 1530caab-49f5-4c3c-956d-08ddfcd2d351
+X-MS-Exchange-CrossTenant-AuthSource: DS7PR11MB5966.namprd11.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 26 Sep 2025 07:38:27.2978
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 26 Sep 2025 08:00:57.6686
  (UTC)
 X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
 X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: qERhmwqEDTTUsf8EY331X197pDmRa9i4UjRzF5ANHDGMG30Nz9UbWrBu+vEtGiFy3YjCGFJaVXGiSwvWxOrrow==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH7PR12MB9068
+X-MS-Exchange-CrossTenant-UserPrincipalName: EmG37SWHDx/+1xhL+RoQqZn61pKKt69V2UDAxw1CjF9TPuNnaXC4JjbmQnxvzyYn9qUiOqUu4ua8UA2HFCD8lw==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DS0PR11MB8740
+X-OriginatorOrg: intel.com
 
-
-
-On 9/26/2025 1:01 PM, David Hildenbrand wrote:
-> On 25.09.25 23:35, Sean Christopherson wrote:
->> On Wed, Aug 27, 2025, Shivank Garg wrote:
->>> Add tests for NUMA memory policy binding and NUMA aware allocation in
->>> guest_memfd. This extends the existing selftests by adding proper
->>> validation for:
->>> - KVM GMEM set_policy and get_policy() vm_ops functionality using
->>>    mbind() and get_mempolicy()
->>> - NUMA policy application before and after memory allocation
->>>
->>> These tests help ensure NUMA support for guest_memfd works correctly.
->>>
->>> Signed-off-by: Shivank Garg <shivankg@amd.com>
->>> ---
->>>   tools/testing/selftests/kvm/Makefile.kvm      |   1 +
->>>   .../testing/selftests/kvm/guest_memfd_test.c  | 121 ++++++++++++++++++
->>>   2 files changed, 122 insertions(+)
->>>
->>> diff --git a/tools/testing/selftests/kvm/Makefile.kvm b/tools/testing/selftests/kvm/Makefile.kvm
->>> index 90f03f00cb04..c46cef2a7cd7 100644
->>> --- a/tools/testing/selftests/kvm/Makefile.kvm
->>> +++ b/tools/testing/selftests/kvm/Makefile.kvm
->>> @@ -275,6 +275,7 @@ pgste-option = $(call try-run, echo 'int main(void) { return 0; }' | \
->>>       $(CC) -Werror -Wl$(comma)--s390-pgste -x c - -o "$$TMP",-Wl$(comma)--s390-pgste)
->>>     LDLIBS += -ldl
->>> +LDLIBS += -lnuma
->>
->> Hrm, this is going to be very annoying.  I don't have libnuma-dev installed on
->> any of my <too many> systems, and I doubt I'm alone.  Installing the package is
->> trivial, but I'm a little wary of foisting that requirement on all KVM developers
->> and build bots.
->>
->> I'd be especially curious what ARM and RISC-V think, as NUMA is likely a bit less
->> prevelant there.
+On Fri, Sep 26, 2025 at 11:08:38AM +0800, Yan Zhao wrote:
+> Thank you, Sean!
+> It looks good to me.
+> Testing passed on my side.
 > 
-> We unconditionally use it in the mm tests for ksm and migration tests, so it's not particularly odd to require it here as well.
-> 
-> What we do with liburing in mm selftests is to detect presence at compile time and essentially make the tests behave differently based on availability (see check_config.sh).
-> 
+> On Wed, Sep 24, 2025 at 10:42:55AM -0700, Sean Christopherson wrote:
+> > From: Yan Zhao <yan.y.zhao@intel.com>
+> > 
+> > Expand the prefault memory selftest to add a regression test for a KVM bug
+> > where TDX's retry logic (to avoid tripping the zero-step mitigation) would
+> > result in deadlock due to the memslot deletion waiting on prefaulting to
+> > release SRCU, and prefaulting waiting on the memslot to fully disappear
+Nit: it's not for the bug of "TDX's retry logic" (we have a separate TDX
+selftest from Reinette for that one).
 
-I have an alternative that drops libnuma entirely.
-If this approach looks reasonable, could we potentially factor these out into a
-common test utility for other selftests that currently depend on libnuma?
+This selftest is for the KVM bug for generic VMs and TDs, where the SRCU lock is
+held in kvm_vcpu_pre_fault_memory(). Previously, prefetching an invalid memslot
+caused kvm_tdp_map_page() to retry on RET_PF_RETRY endlessly, preventing the
+SRCU lock from being released.
 
-What are your thoughts on this?
+> > (KVM uses a two-step process to delete memslots, and KVM x86 retries page
+> > faults if a to-be-deleted, a.k.a. INVALID, memslot is encountered).
+> > 
+> > To exercise concurrent memslot remove, spawn a second thread to initiate
+> > memslot removal at roughly the same time as prefaulting.  Test memslot
+> > removal for all testcases, i.e. don't limit concurrent removal to only the
+> > success case.  There are essentially three prefault scenarios (so far)
+> > that are of interest:
+> > 
+> >  1. Success
+> >  2. ENOENT due to no memslot
+> >  3. EAGAIN due to INVALID memslot
+> > 
+> > For all intents and purposes, #1 and #2 are mutually exclusive, or rather,
+> > easier to test via separate testcases since writing to non-existent memory
+> > is trivial.  But for #3, making it mutually exclusive with #1 _or_ #2 is
+> > actually more complex than testing memslot removal for all scenarios.  The
+> > only requirement to let memslot removal coexist with other scenarios is a
+> > way to guarantee a stable result, e.g. that the "no memslot" test observes
+> > ENOENT, not EAGAIN, for the final checks.
+> > 
+> > So, rather than make memslot removal mutually exclusive with the ENOENT
+> > scenario, simply restore the memslot and retry prefaulting.  For the "no
+> > memslot" case, KVM_PRE_FAULT_MEMORY should be idempotent, i.e. should
+> > always fail with ENOENT regardless of how many times userspace attempts
+> > prefaulting.
+> > 
+> > Pass in both the base GPA and the offset (instead of the "full" GPA) so
+> > that the worker can recreate the memslot.
+> > 
+> > Signed-off-by: Yan Zhao <yan.y.zhao@intel.com>
+> > Co-developed-by: Sean Christopherson <seanjc@google.com>
+> > Signed-off-by: Sean Christopherson <seanjc@google.com>
+> > ---
+> > 
+> > v3 of Yan's series to fix a deadlock when prefaulting memory for a TDX
+> > guest.  The KVM fixes have already been applied, all that remains is this
+So it's for generic and TDX guests.
 
-diff --git a/tools/testing/selftests/kvm/Makefile.kvm b/tools/testing/selftests/kvm/Makefile.kvm
-index c46cef2a7cd7..90f03f00cb04 100644
---- a/tools/testing/selftests/kvm/Makefile.kvm
-+++ b/tools/testing/selftests/kvm/Makefile.kvm
-@@ -275,7 +275,6 @@ pgste-option = $(call try-run, echo 'int main(void) { return 0; }' | \
- 	$(CC) -Werror -Wl$(comma)--s390-pgste -x c - -o "$$TMP",-Wl$(comma)--s390-pgste)
- 
- LDLIBS += -ldl
--LDLIBS += -lnuma
- LDFLAGS += -pthread $(no-pie-option) $(pgste-option)
- 
- LIBKVM_C := $(filter %.c,$(LIBKVM))
-diff --git a/tools/testing/selftests/kvm/guest_memfd_test.c b/tools/testing/selftests/kvm/guest_memfd_test.c
-index 9640d04ec293..12ce91950c44 100644
---- a/tools/testing/selftests/kvm/guest_memfd_test.c
-+++ b/tools/testing/selftests/kvm/guest_memfd_test.c
-@@ -7,8 +7,6 @@
- #include <stdlib.h>
- #include <string.h>
- #include <unistd.h>
--#include <numa.h>
--#include <numaif.h>
- #include <errno.h>
- #include <stdio.h>
- #include <fcntl.h>
-@@ -75,9 +73,6 @@ static void test_mmap_supported(int fd, size_t page_size, size_t total_size)
- 	TEST_ASSERT(!ret, "munmap() should succeed.");
- }
- 
--#define TEST_REQUIRE_NUMA_MULTIPLE_NODES()	\
--	TEST_REQUIRE(numa_available() != -1 && numa_max_node() >= 1)
--
- static void test_mbind(int fd, size_t page_size, size_t total_size)
- {
- 	unsigned long nodemask = 1; /* nid: 0 */
-@@ -87,7 +82,8 @@ static void test_mbind(int fd, size_t page_size, size_t total_size)
- 	char *mem;
- 	int ret;
- 
--	TEST_REQUIRE_NUMA_MULTIPLE_NODES();
-+	if (!is_multi_numa_node_system())
-+		return;
- 
- 	mem = mmap(NULL, total_size, PROT_READ | PROT_WRITE, MAP_SHARED, fd, 0);
- 	TEST_ASSERT(mem != MAP_FAILED, "mmap for mbind test should succeed");
-@@ -136,7 +132,8 @@ static void test_numa_allocation(int fd, size_t page_size, size_t total_size)
- 	char *mem;
- 	int ret, i;
- 
--	TEST_REQUIRE_NUMA_MULTIPLE_NODES();
-+	if (!is_multi_numa_node_system())
-+		return;
- 
- 	/* Clean slate: deallocate all file space, if any */
- 	ret = fallocate(fd, FALLOC_FL_PUNCH_HOLE | FALLOC_FL_KEEP_SIZE, 0, total_size);
-diff --git a/tools/testing/selftests/kvm/include/kvm_util.h b/tools/testing/selftests/kvm/include/kvm_util.h
-index 23a506d7eca3..ba4c316f4fef 100644
---- a/tools/testing/selftests/kvm/include/kvm_util.h
-+++ b/tools/testing/selftests/kvm/include/kvm_util.h
-@@ -12,6 +12,7 @@
- #include "linux/list.h"
- #include <linux/kernel.h>
- #include <linux/kvm.h>
-+#include <linux/mempolicy.h>
- #include "linux/rbtree.h"
- #include <linux/types.h>
- 
-@@ -20,6 +21,7 @@
- 
- #include <sys/eventfd.h>
- #include <sys/ioctl.h>
-+#include <sys/syscall.h>
- 
- #include <pthread.h>
- 
-@@ -633,6 +635,50 @@ static inline bool is_smt_on(void)
- 	return false;
- }
- 
-+#include <dirent.h>
-+static int numa_max_node(void)
-+{
-+	DIR *d;
-+	struct dirent *de;
-+	int max_node = 0;
-+
-+	d = opendir("/sys/devices/system/node");
-+	if (!d) {
-+		/* No NUMA support or no nodes found, assume single node */
-+		return 0;
-+	}
-+
-+	while ((de = readdir(d)) != NULL) {
-+		int node_id;
-+		char *endptr;
-+
-+		if (strncmp(de->d_name, "node", 4) != 0)
-+			continue;
-+
-+		node_id = strtol(de->d_name + 4, &endptr, 10);
-+		if (*endptr != '\0')
-+			continue;
-+
-+		if (node_id > max_node)
-+			max_node = node_id;
-+	}
-+	closedir(d);
-+
-+	return max_node;
-+}
-+
-+static int numa_available(void)
-+{
-+	if (syscall(__NR_get_mempolicy, NULL, NULL, 0, 0, 0) < 0 && (errno == ENOSYS || errno == EPERM))
-+		return -1;
-+	return 0;
-+}
-+
-+static inline bool is_multi_numa_node_system(void)
-+{
-+	return numa_available() != -1 && numa_max_node() >= 1;
-+}
-+
- void vm_create_irqchip(struct kvm_vm *vm);
- 
- static inline int __vm_create_guest_memfd(struct kvm_vm *vm, uint64_t size,
-
-
-
+> > selftest.
+> > 
+> > v3: Test memslot removal for both positive and negative testcases, and simply
+> >     ensure a stable result by restoring the memslot and retrying if necessary.
+> > 
+> > v2: https://lore.kernel.org/all/20250822070305.26427-1-yan.y.zhao@intel.com
+> > 
+> >  .../selftests/kvm/pre_fault_memory_test.c     | 131 +++++++++++++++---
+> >  1 file changed, 114 insertions(+), 17 deletions(-)
 
 
