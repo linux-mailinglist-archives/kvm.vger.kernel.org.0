@@ -1,187 +1,147 @@
-Return-Path: <kvm+bounces-58883-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-58884-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2E5ABBA4953
-	for <lists+kvm@lfdr.de>; Fri, 26 Sep 2025 18:16:36 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1E4CFBA4A23
+	for <lists+kvm@lfdr.de>; Fri, 26 Sep 2025 18:31:30 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9016117025E
-	for <lists+kvm@lfdr.de>; Fri, 26 Sep 2025 16:16:23 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D26004A1F14
+	for <lists+kvm@lfdr.de>; Fri, 26 Sep 2025 16:31:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 342532594B7;
-	Fri, 26 Sep 2025 16:15:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F127C299A84;
+	Fri, 26 Sep 2025 16:31:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Hj/NhLVB"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="tr8rd6E9"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pj1-f73.google.com (mail-pj1-f73.google.com [209.85.216.73])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8A9D124BBF0
-	for <kvm@vger.kernel.org>; Fri, 26 Sep 2025 16:15:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9605423506F
+	for <kvm@vger.kernel.org>; Fri, 26 Sep 2025 16:31:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.73
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758903354; cv=none; b=dd9YIu5WihUUN0MJo/uBRBfBbqd3TQStQpWdUDIUqJviVjIKovC0KSrHqrQ0UBvECpHC6eq+IeEZxKOIuQwl1cnH0da0bzxGOx2E+Go/FFP+s0U1XjSkQU80WZWKkprPTXqvdIqiSewCIYzIPRiJcNfcT4N0XsCZmASA/EkCkVI=
+	t=1758904282; cv=none; b=BBMJdpxYd+eEabFpOkAeIkTKamZxEEH5wPNjS4+ySj17L9jUu9YHjG81SYYtKNnEdS0OqK6bjVHv296qe7RyLzpKRlqc+Ho3JGSzUFEpUIfRaluYEEZsU1IPaVVdlzTtyXRIlAGVLG7zhvtvP0N4F0kQbIryYknz1s5h8LFGwNg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758903354; c=relaxed/simple;
-	bh=de5+oDDVsgvGv8gkgdX1kmDXXsYWScA7Vf9sIiPm1sA=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=LAVzH68Fp4ZghhTeR2yWIE3FeN2NefhmvM+x8HHKF7uHCx7KU/vmxY8hYn14QDrHnho/UjU8LAmt5L030hsSlicXe29uShUTZTWf8p36qrHKw+3vaITZHdIv7YqVWuUcrwpAiJVdqFiNyHVIyqGAT8tv6y76Fi7tG+1DWpN51xw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Hj/NhLVB; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1758903351;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=d1MsLjQnmPTfFCIHbux9eMDbdADdPspQOJNP4rI8N8o=;
-	b=Hj/NhLVB1E5ZWq1MSO5Kd2FCgb8bHixvp7xSM1oJ2uUobqMm4BoR619/bK5f65yr54GTCD
-	SPACY/+dsS9XypFrGdVrKfLfxlT5RW+2DBQ7qzb/wXa/RNUqvEJEmnFRdEZC1SYEsVrZrV
-	M+ewdbIZgCv76H0vxhN/It5AMzprfkQ=
-Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
- [209.85.128.70]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-296-64nEr6EuMyKav1phQhejiQ-1; Fri, 26 Sep 2025 12:15:48 -0400
-X-MC-Unique: 64nEr6EuMyKav1phQhejiQ-1
-X-Mimecast-MFC-AGG-ID: 64nEr6EuMyKav1phQhejiQ_1758903348
-Received: by mail-wm1-f70.google.com with SMTP id 5b1f17b1804b1-46e31191379so15549245e9.3
-        for <kvm@vger.kernel.org>; Fri, 26 Sep 2025 09:15:48 -0700 (PDT)
+	s=arc-20240116; t=1758904282; c=relaxed/simple;
+	bh=7X7DAE+zbBabsCNjfRvfqvg2INWE+j2cApli2zX/d2E=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=Hv1d/f54iHcUa3cEUpzlrH+CiPXItScuLZrWSL3BF/LX8eG8hhMs0/7wLOAg/OplGNSyI8PnGx+g2G3EOgdl8CR2+O5MzI24JlUq+z/QOv3kkk9Y/XzX7ozkij3MrgFeTmvcxW4VDRqzCmGN8gzbowGEL+H4gI29sJs14vuAiHs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=tr8rd6E9; arc=none smtp.client-ip=209.85.216.73
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+Received: by mail-pj1-f73.google.com with SMTP id 98e67ed59e1d1-32eb2b284e4so3279024a91.1
+        for <kvm@vger.kernel.org>; Fri, 26 Sep 2025 09:31:20 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1758904280; x=1759509080; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:from:subject:message-id
+         :mime-version:date:reply-to:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=AwZ8vbOlyUhKwRHywOdNUWwguAQ2SVVHlBzl21pTQ9U=;
+        b=tr8rd6E9n9WVQz5bvqnbQU2ji4jhMg1Ht5nPI0+/RuXSFCJ/Z0qUar7IpGnWLKHiKJ
+         Tc/BXpZX8SYht6OyrgG60mIMW4E5Yrn0ukzyrYCIKoFoErs/JugLNn0Yo6fQ9XS1tXF7
+         yPhOMRwjgCe66lmBM5s37+AlfmqIzKJgZoMHKJwOmyNqggfoL9eugvuMdrnm05mxx7yw
+         3rjN7qLCa+tE8UrHWemJjBtZSpguQ52BnpfA14B3l2ns0o8iCRGPJZTokGdJ7/gn04Q0
+         7s6WjPfbc3xzigE7HoHjxSxnsbYVfWYxECMqDHJjhFGXSYA5AQ+oUPWLUdGzPC8s4QES
+         41zw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1758903347; x=1759508147;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=d1MsLjQnmPTfFCIHbux9eMDbdADdPspQOJNP4rI8N8o=;
-        b=WqeGAorlQv9mkgks+rZAgOR9cTA5+jc07mWQJjXSGer3KZNUdpum2AjrPEeA4lelvk
-         HwnVH3EGQBH/bXPAWIJbIAhnRdlYQ7VTrMx5ppuQ7+BuvfOv1k958u9lbdZEUyegk//c
-         zneFJ0OKVaTFFzTpBUkeFy/PnymeK1EM3qmq7KB0THsFuqCggCVSqfXVEK22iPMA91Af
-         OHMv/7BpmTSZlIbQbyvtMJevi0TcZhYpYv4zYOOhj+MC+uWGX1Xvv/9R+SWkhgcZbF8n
-         uJWpKpXjBpJgmav3vhfTO86BZY9iOEULXLe2kCkGL/KocMdZRT3quvCfQQWeqMzjHaIv
-         Z7Gw==
-X-Forwarded-Encrypted: i=1; AJvYcCXVN2EjOilDt+F9RPjKddVu8VqX3/ZeBBoUiRrsl1ErA/ZArkVZ3UbG+MGTrnqJy7uBeoM=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwAIkd5SAB/qAvZcEaZ+XpZjQBhQ3SOuajur3rfvzIyoDBQA+mk
-	+aJwnD9jK6OtV41/k4dM1W4gTFLpExxHN7Yp5XAD9+2Rb2nFK+4svm/YFu+lFBvbGniUr1D6pWJ
-	DEEmejhRsK8160xC5yEklb0XtB9v9QYCzV/0xfcSMInyDqfHCwaqHeA==
-X-Gm-Gg: ASbGncvEXkeX3YE3mV3fKCjcJSbGyImrDtZ716cXE/k6bgl30EfLNL5MOTbUF9L0Op+
-	QY51U5WAkya90/qpoe+fBlknaajaPt2PZ1h0KgacMVhuWDRkBog6TRF7pDFrO05N1ClxDC9SWcI
-	pQ4JJwn073EjvkiZpZOjXvVtakaotxo/1Qq9J5kg/a8UV/MKXEli02twV1/jKcH3vxrbP4UEUOB
-	V/ABCN2axSoBSq8O4ZQoy/GZzo7C5Qew6WW9FJ6hXoKQOEKgP4JumSJOvgP+Z/Qvy7RnZKyIKts
-	SEOGFH8SCi5DgVtJPQJJj9pPxjNthT9JC/LmVQKD
-X-Received: by 2002:a05:600c:444d:b0:468:86e0:de40 with SMTP id 5b1f17b1804b1-46e3299a5c0mr65455095e9.4.1758903347570;
-        Fri, 26 Sep 2025 09:15:47 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IFTjqxVm23Seu1emihYmKwo45GTVLo85bMBuuc3NdcYCq5ID+za/F9XBnzGN2W1Z6Hc9IxXiQ==
-X-Received: by 2002:a05:600c:444d:b0:468:86e0:de40 with SMTP id 5b1f17b1804b1-46e3299a5c0mr65454655e9.4.1758903347022;
-        Fri, 26 Sep 2025 09:15:47 -0700 (PDT)
-Received: from sgarzare-redhat ([5.77.94.69])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-46e33bf70dcsm78264455e9.23.2025.09.26.09.15.44
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 26 Sep 2025 09:15:46 -0700 (PDT)
-Date: Fri, 26 Sep 2025 18:15:37 +0200
-From: Stefano Garzarella <sgarzare@redhat.com>
-To: Bobby Eshleman <bobbyeshleman@gmail.com>,
-	g@sgarzare-redhat.smtp.subspace.kernel.org
-Cc: Shuah Khan <shuah@kernel.org>, "David S. Miller" <davem@davemloft.net>, 
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
-	Stefan Hajnoczi <stefanha@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, 
-	Jason Wang <jasowang@redhat.com>, Xuan Zhuo <xuanzhuo@linux.alibaba.com>, 
-	Eugenio =?utf-8?B?UMOpcmV6?= <eperezma@redhat.com>, "K. Y. Srinivasan" <kys@microsoft.com>, 
-	Haiyang Zhang <haiyangz@microsoft.com>, Wei Liu <wei.liu@kernel.org>, Dexuan Cui <decui@microsoft.com>, 
-	Bryan Tan <bryan-bt.tan@broadcom.com>, Vishnu Dasa <vishnu.dasa@broadcom.com>, 
-	Broadcom internal kernel review list <bcm-kernel-feedback-list@broadcom.com>, virtualization@lists.linux.dev, netdev@vger.kernel.org, 
-	linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org, kvm@vger.kernel.org, 
-	linux-hyperv@vger.kernel.org, berrange@redhat.com, Bobby Eshleman <bobbyeshleman@meta.com>
-Subject: Re: [PATCH net-next v6 2/9] vsock: add net to vsock skb cb
-Message-ID: <bnsgxged7onwkc4jxxttt6b5yb5ct5xekhybdhcduy75rwwprh@u5o6o3gtgvlj>
-References: <20250916-vsock-vmtest-v6-0-064d2eb0c89d@meta.com>
- <20250916-vsock-vmtest-v6-2-064d2eb0c89d@meta.com>
+        d=1e100.net; s=20230601; t=1758904280; x=1759509080;
+        h=content-transfer-encoding:cc:to:from:subject:message-id
+         :mime-version:date:reply-to:x-gm-message-state:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=AwZ8vbOlyUhKwRHywOdNUWwguAQ2SVVHlBzl21pTQ9U=;
+        b=DLhJqznlqktnLOerwtIlrDj5xlhPNvl8OvBepIipzv3Sd1+zne0uhAK/bb1+LvWfjp
+         on8LQyJCxtLpod1BswolotDqRkjFN6iTjT+tK1AYK8gyf3M52jqwIhSkdCga11L8GUks
+         tgavbOsDxu73BGNElg7wJS2jInHWk6fFZQ9i/hZl/06s52vizN6DpvmbSgEoBXtwdM7E
+         cMsQ84iAbNd4aAK52e7j6U5rZzfTPMWUoEsFtG8aQjjEPk7IKVqWc34YyoPhNGYwO3/r
+         zx2F2+lKLnkcMd2xHAYO6iuchS2j2cwa7QpjbdqXXQmWu9MRJufWTBiWg3pk9hASBYY3
+         1rsw==
+X-Gm-Message-State: AOJu0YymNra26wSPQT3HMtDL2ZEAU2yETTJkYCYiZiE7DkYgJFvP0jra
+	ZGUEfyGLCLZ3H/3neym0tb8xke7Hra2rmcQJnOREONM/z0j0MrgdXLMGfr3ltT8WKHmUD/o6eqU
+	CZ/TV4Q==
+X-Google-Smtp-Source: AGHT+IFySj9OYn2E4SgNIDe+xEiiRQ+ki7OWkDXB6YQkV7vuARDWepbSyLDRR6oOY3K5Xs8YlexYlJX3xDk=
+X-Received: from pjvf7.prod.google.com ([2002:a17:90a:da87:b0:330:49f5:c0a7])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:4acc:b0:32e:38b0:15f4
+ with SMTP id 98e67ed59e1d1-3342a22bf2emr7709699a91.7.1758904279954; Fri, 26
+ Sep 2025 09:31:19 -0700 (PDT)
+Reply-To: Sean Christopherson <seanjc@google.com>
+Date: Fri, 26 Sep 2025 09:31:01 -0700
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii; format=flowed
-Content-Disposition: inline
-In-Reply-To: <20250916-vsock-vmtest-v6-2-064d2eb0c89d@meta.com>
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.51.0.536.g15c5d4f767-goog
+Message-ID: <20250926163114.2626257-1-seanjc@google.com>
+Subject: [PATCH 0/6] KVM: Avoid a lurking guest_memfd ABI mess
+From: Sean Christopherson <seanjc@google.com>
+To: Paolo Bonzini <pbonzini@redhat.com>, Christian Borntraeger <borntraeger@linux.ibm.com>, 
+	Janosch Frank <frankja@linux.ibm.com>, Claudio Imbrenda <imbrenda@linux.ibm.com>
+Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	David Hildenbrand <david@redhat.com>, Fuad Tabba <tabba@google.com>, 
+	Sean Christopherson <seanjc@google.com>, Ackerley Tng <ackerleytng@google.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Tue, Sep 16, 2025 at 04:43:46PM -0700, Bobby Eshleman wrote:
->From: Bobby Eshleman <bobbyeshleman@meta.com>
->
->Add a net pointer and orig_net_mode to the vsock skb and helpers for
+Add a guest_memfd flag, DEFAULT_SHARED, to let userspace explicitly state
+whether the underlying memory should default to private vs. shared.  As-is,
+the default state is implicitly derived from the MMAP flag: guest_memfd
+without MMAP is private, and with MMAP is shared.  That implicit behavior
+is going to create a mess of an ABI once in-place conversion support comes
+along.
 
-Why? (Please try to always add the reason we are doing something in each 
-commit to simplify the life of reviewers but also for the future).
+If the default state is implicit, then x86 CoCo VMs will end up with defaul=
+t
+state that varies based on whether or not a guest_memfd instance is
+configured for mmap() support.  To avoid breaking guest<=3D>host ABI for Co=
+Co
+VMs when utilizing in-place conversion, i.e. MMAP, userspace would need to
+immediately convert all memory from shared=3D>private.
 
-It takes a lot of time to understand why we need to store these info for 
-each skb.
+Ackerley's RFC for in-place conversion fudged around this by adding a flag
+to let userspace set the default to _private_, but that will result in a
+messy and hard to document ABI.  For x86 CoCo VMs, memory would be private
+by default, unless MMAP but not INIT_PRIVATE is specified.  For everything
+else, memory would be shared by default, sort of?  Because without MMAP,
+the memory would be inaccessible, leading to Schr=C3=B6dinger's cat situati=
+on.
 
->getting/setting them.  This is in preparation for adding vsock NS
->support.
->
->Signed-off-by: Bobby Eshleman <bobbyeshleman@meta.com>
->
->---
->Changes in v5:
->- some diff context change due to rebase to current net-next
->---
-> include/linux/virtio_vsock.h | 23 +++++++++++++++++++++++
-> 1 file changed, 23 insertions(+)
->
->diff --git a/include/linux/virtio_vsock.h b/include/linux/virtio_vsock.h
->index 0c67543a45c8..ea955892488a 100644
->--- a/include/linux/virtio_vsock.h
->+++ b/include/linux/virtio_vsock.h
->@@ -13,6 +13,8 @@ struct virtio_vsock_skb_cb {
-> 	bool reply;
-> 	bool tap_delivered;
-> 	u32 offset;
->+	struct net *net;
->+	enum vsock_net_mode orig_net_mode;
-> };
+Since odds are very good we'll end up with a flag of some kind, add one now
+(for 6.18) so that the default state is explicit and simple: without
+DEFAULT_SHARED =3D=3D private, with DEFAULT_SHARED =3D=3D shared.
 
-This structure starting to get big and isn't optimized in terms of 
-layout. Since it's basically in every packet, should we start thinking 
-about optimizing this structure?
+As a bonus, this allows for adding test coverage that KVM rejects faults to
+private memory.
 
-Thanks,
-Stefano
+Ackerley Tng (1):
+  KVM: selftests: Add test coverage for guest_memfd without
+    GUEST_MEMFD_FLAG_MMAP
 
->
-> #define VIRTIO_VSOCK_SKB_CB(skb) ((struct virtio_vsock_skb_cb *)((skb)->cb))
->@@ -130,6 +132,27 @@ static inline size_t virtio_vsock_skb_len(struct sk_buff *skb)
-> 	return (size_t)(skb_end_pointer(skb) - skb->head);
-> }
->
->+static inline struct net *virtio_vsock_skb_net(struct sk_buff *skb)
->+{
->+	return VIRTIO_VSOCK_SKB_CB(skb)->net;
->+}
->+
->+static inline void virtio_vsock_skb_set_net(struct sk_buff *skb, struct net *net)
->+{
->+	VIRTIO_VSOCK_SKB_CB(skb)->net = net;
->+}
->+
->+static inline enum vsock_net_mode virtio_vsock_skb_orig_net_mode(struct sk_buff *skb)
->+{
->+	return VIRTIO_VSOCK_SKB_CB(skb)->orig_net_mode;
->+}
->+
->+static inline void virtio_vsock_skb_set_orig_net_mode(struct sk_buff *skb,
->+						      enum vsock_net_mode orig_net_mode)
->+{
->+	VIRTIO_VSOCK_SKB_CB(skb)->orig_net_mode = orig_net_mode;
->+}
->+
-> /* Dimension the RX SKB so that the entire thing fits exactly into
->  * a single 4KiB page. This avoids wasting memory due to alloc_skb()
->  * rounding up to the next page order and also means that we
->
->-- 
->2.47.3
->
+Sean Christopherson (5):
+  KVM: guest_memfd: Add DEFAULT_SHARED flag, reject user page faults if
+    not set
+  KVM: selftests: Stash the host page size in a global in the
+    guest_memfd test
+  KVM: selftests: Create a new guest_memfd for each testcase
+  KVM: selftests: Add wrappers for mmap() and munmap() to assert success
+  KVM: selftests: Verify that faulting in private guest_memfd memory
+    fails
+
+ Documentation/virt/kvm/api.rst                |  10 +-
+ include/uapi/linux/kvm.h                      |   3 +-
+ .../testing/selftests/kvm/guest_memfd_test.c  | 162 +++++++++++-------
+ .../testing/selftests/kvm/include/kvm_util.h  |  25 +++
+ tools/testing/selftests/kvm/lib/kvm_util.c    |  44 ++---
+ tools/testing/selftests/kvm/mmu_stress_test.c |   5 +-
+ .../selftests/kvm/s390/ucontrol_test.c        |  16 +-
+ .../selftests/kvm/set_memory_region_test.c    |  17 +-
+ virt/kvm/guest_memfd.c                        |   6 +-
+ 9 files changed, 169 insertions(+), 119 deletions(-)
+
+
+base-commit: a6ad54137af92535cfe32e19e5f3bc1bb7dbd383
+--=20
+2.51.0.536.g15c5d4f767-goog
 
 
