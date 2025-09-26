@@ -1,38 +1,38 @@
-Return-Path: <kvm+bounces-58865-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-58866-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id BF13CBA36F2
-	for <lists+kvm@lfdr.de>; Fri, 26 Sep 2025 13:04:32 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 48C89BA36F8
+	for <lists+kvm@lfdr.de>; Fri, 26 Sep 2025 13:04:51 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7AEE1627B6D
-	for <lists+kvm@lfdr.de>; Fri, 26 Sep 2025 11:04:31 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id EE6DE56132D
+	for <lists+kvm@lfdr.de>; Fri, 26 Sep 2025 11:04:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 43DA62F83AC;
-	Fri, 26 Sep 2025 11:03:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D746D2F90EA;
+	Fri, 26 Sep 2025 11:03:30 +0000 (UTC)
 X-Original-To: kvm@vger.kernel.org
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 350A12F548F;
-	Fri, 26 Sep 2025 11:03:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E3A532F8BF1;
+	Fri, 26 Sep 2025 11:03:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758884606; cv=none; b=W93MCS+E5lpYeJQ9W2cID20E3UasWeXTia3LO7TJzZO9ykPXPuO/PK6DLj7oTK/pmBqmKtFA7irVVwzxP6njCZ8AJcaKOGuaz9qf5mTCOUnPeG6lsGVn88kH6qRtfz6vykBq0NOzmX65bEU9AMwEa9U9AYWJTi+T9r7qqANSRRc=
+	t=1758884610; cv=none; b=ZGDFq/QRcAwuMAJXsNxx9wzeHmTfRybLTatFwfxfrK7eFBrK/pkS54T2X+3BX/xJ9AATULuU7qIi6L3/3HvueMCbfmWPrNtZX00MtZx4Sv8PyV4QYyaUu0N6AYj+kRem/Tu3fJpujSWQBn+Y6RiwXLlyUJF7IfDUOKXQte1gyTw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758884606; c=relaxed/simple;
-	bh=fjXJt2CfVxkbAP1rjjFOz5JK+z2VdhcQ7Q/T1ABGp24=;
+	s=arc-20240116; t=1758884610; c=relaxed/simple;
+	bh=NiM5bywEe+hqZEp48MCP0PMFIY9nEmXjNWVKXBI6nW4=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=WYt8HCp6XK3RTOQPXgAEFBMO3nR5YDL+AJYR46Miken8zgvbSwUoPdXihsyE0/NZT5KeGdtBPgVJ1FZDWzElWGMTVdWuqyeNDm/dNcEohZVNv/OgyezJ3vSMkFegbiTRbvBKYxzMNk6/bIAmDR6oU7h9MZyhwU2oQanAb5QAwNU=
+	 MIME-Version; b=B2t83yIikSXvEBS3ERyayL1+35zs0Xe+WwcUuucdnxnPLZm1S1nkLTJoQjryFM7T1vCkCFn/gJJ5bcQOGtVgMERtrLnZkyYJ2EM0EDK0Jnc83JsgSXMU2E9VO2Hk5WPRJG0JQwfB0OiPinrdcbZ9v3jbCKHrjHJ6Q0IIGh30Uw8=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 788B61691;
-	Fri, 26 Sep 2025 04:03:16 -0700 (PDT)
-Received: from e122027.cambridge.arm.com (e122027.cambridge.arm.com [10.1.38.22])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id C8DDD3F66E;
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 35699168F;
 	Fri, 26 Sep 2025 04:03:20 -0700 (PDT)
+Received: from e122027.cambridge.arm.com (e122027.cambridge.arm.com [10.1.38.22])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id D63AF3F66E;
+	Fri, 26 Sep 2025 04:03:24 -0700 (PDT)
 From: Steven Price <steven.price@arm.com>
 To: kvm@vger.kernel.org,
 	kvmarm@lists.linux.dev
@@ -55,9 +55,9 @@ Cc: Catalin Marinas <catalin.marinas@arm.com>,
 	Emi Kisanuki <fj0570is@fujitsu.com>,
 	Vishal Annapurve <vannapurve@google.com>,
 	Steven Price <steven.price@arm.com>
-Subject: [RFC PATCH 4/5] arm64: rme: Allocate AUX RTT PGDs and VMIDs
-Date: Fri, 26 Sep 2025 12:02:53 +0100
-Message-ID: <20250926110254.55449-5-steven.price@arm.com>
+Subject: [RFC PATCH 5/5] arm64: RME: Support num_aux_places & rtt_tree_pp realm parameters
+Date: Fri, 26 Sep 2025 12:02:54 +0100
+Message-ID: <20250926110254.55449-6-steven.price@arm.com>
 X-Mailer: git-send-email 2.43.0
 In-Reply-To: <20250926110254.55449-1-steven.price@arm.com>
 References: <20250926110254.55449-1-steven.price@arm.com>
@@ -69,229 +69,163 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-If using multiple planes then the auxiliary trees also need PGDs
-allocating for them. Each plane also needs its own VMID.
+CCA planes provides new parameters to the VMM:
+ - num_aux_planes defines the number of extra planes
+ - rtt_tree_pp controls whether each plane has it's own page table tree,
+   of if they share one tree.
 
 Signed-off-by: Steven Price <steven.price@arm.com>
 ---
- arch/arm64/include/asm/kvm_rme.h |   4 +-
- arch/arm64/kvm/rme.c             | 133 +++++++++++++++++++++++++++----
- 2 files changed, 122 insertions(+), 15 deletions(-)
+ arch/arm64/include/uapi/asm/kvm.h | 12 +++++
+ arch/arm64/kvm/rme.c              | 77 +++++++++++++++++++++++++++++--
+ 2 files changed, 86 insertions(+), 3 deletions(-)
 
-diff --git a/arch/arm64/include/asm/kvm_rme.h b/arch/arm64/include/asm/kvm_rme.h
-index 934b30a8e607..a9dc24a53c65 100644
---- a/arch/arm64/include/asm/kvm_rme.h
-+++ b/arch/arm64/include/asm/kvm_rme.h
-@@ -53,6 +53,7 @@ enum realm_state {
-  * @params: Parameters for the RMI_REALM_CREATE command
-  * @num_aux: The number of auxiliary pages required by the RMM
-  * @vmid: VMID to be used by the RMM for the realm
-+ * @aux_pgd: The PGDs for the auxiliary planes
-  * @ia_bits: Number of valid Input Address bits in the IPA
-  * @num_aux_planes: Number of auxiliary planes
-  * @rtt_tree_pp: True if each plane has its own RTT tree
-@@ -64,7 +65,8 @@ struct realm {
- 	struct realm_params *params;
+diff --git a/arch/arm64/include/uapi/asm/kvm.h b/arch/arm64/include/uapi/asm/kvm.h
+index 9b5d67ecbc5e..1d83da0f3aaa 100644
+--- a/arch/arm64/include/uapi/asm/kvm.h
++++ b/arch/arm64/include/uapi/asm/kvm.h
+@@ -440,6 +440,8 @@ enum {
+ /* List of configuration items accepted for KVM_CAP_ARM_RME_CONFIG_REALM */
+ #define ARM_RME_CONFIG_RPV			0
+ #define ARM_RME_CONFIG_HASH_ALGO		1
++#define ARM_RME_CONFIG_NUM_AUX_PLANES		2
++#define ARM_RME_CONFIG_RTT_TREE_PP		3
  
- 	unsigned long num_aux;
--	unsigned int vmid;
-+	unsigned int vmid[4];
-+	void *aux_pgd[3];
- 	unsigned int ia_bits;
- 	unsigned int num_aux_planes;
- 	bool rtt_tree_pp;
+ #define ARM_RME_CONFIG_HASH_ALGO_SHA256		0
+ #define ARM_RME_CONFIG_HASH_ALGO_SHA512		1
+@@ -459,6 +461,16 @@ struct arm_rme_config {
+ 			__u32	hash_algo;
+ 		};
+ 
++		/* cfg == ARM_RME_CONFIG_NUM_AUX_PLANES */
++		struct {
++			__u32	num_aux_planes;
++		};
++
++		/* cfg == ARM_RME_CONFIG_RTT_TREE_PP */
++		struct {
++			__u32	rtt_tree_pp;
++		};
++
+ 		/* Fix the size of the union */
+ 		__u8	reserved[256];
+ 	};
 diff --git a/arch/arm64/kvm/rme.c b/arch/arm64/kvm/rme.c
-index fa39a8393d53..6cb938957510 100644
+index 6cb938957510..fca305da1843 100644
 --- a/arch/arm64/kvm/rme.c
 +++ b/arch/arm64/kvm/rme.c
-@@ -782,10 +782,17 @@ static int realm_create_rd(struct kvm *kvm)
- 	params->rtt_level_start = get_start_level(realm);
- 	params->rtt_num_start = rtt_num_start;
- 	params->rtt_base = kvm->arch.mmu.pgd_phys;
--	params->vmid = realm->vmid;
-+	params->vmid = realm->vmid[0];
-+	for (int plane = 0; plane < realm->num_aux_planes; plane++)
-+		params->aux_vmid[plane] = realm->vmid[plane + 1];
- 	params->num_bps = SYS_FIELD_GET(ID_AA64DFR0_EL1, BRPs, dfr0);
- 	params->num_wps = SYS_FIELD_GET(ID_AA64DFR0_EL1, WRPs, dfr0);
+@@ -43,6 +43,28 @@ bool kvm_rme_supports_sve(void)
+ 	return rme_has_feature(RMI_FEATURE_REGISTER_0_SVE_EN);
+ }
  
-+	if (realm->rtt_tree_pp) {
-+		for (int plane = 0; plane < realm->num_aux_planes; plane++)
-+			params->aux_rtt_base[plane] = virt_to_phys(realm->aux_pgd[plane]);
-+	}
++static bool kvm_rme_supports_rtt_tree_single(void)
++{
++	int i = u64_get_bits(rmm_feat_reg0, RMI_FEATURE_REGISTER_0_RTT_PLANE);
 +
- 	if (kvm->arch.arm_pmu) {
- 		params->pmu_num_ctrs = kvm->arch.nr_pmu_counters;
- 		params->flags |= RMI_REALM_PARAM_FLAG_PMU;
-@@ -1483,25 +1490,117 @@ static int rme_vmid_init(void)
++	switch (i) {
++	case RMI_RTT_PLANE_AUX:
++		return false;
++	case RMI_RTT_PLANE_AUX_SINGLE:
++	case RMI_RTT_PLANE_SINGLE:
++		return true;
++	default:
++		WARN(1, "Unknown encoding for RMI_FEATURE_REGISTER_0_RTT_PLANE: %#x", i);
++	}
++	return false;
++}
++
++static unsigned int rme_get_max_num_aux_planes(void)
++{
++	return u64_get_bits(rmm_feat_reg0,
++			    RMI_FEATURE_REGISTER_0_MAX_NUM_AUX_PLANES);
++}
++
+ static int rmi_check_version(void)
+ {
+ 	struct arm_smccc_res res;
+@@ -1077,6 +1099,14 @@ int realm_map_protected(struct realm *realm,
+ 	return -ENXIO;
+ }
+ 
++static unsigned long pi_index_to_s2tte(unsigned long idx)
++{
++	return FIELD_PREP(BIT(PTE_PI_IDX_0), (idx >> 0) & 1) |
++	       FIELD_PREP(BIT(PTE_PI_IDX_1), (idx >> 1) & 1) |
++	       FIELD_PREP(BIT(PTE_PI_IDX_2), (idx >> 2) & 1) |
++	       FIELD_PREP(BIT(PTE_PI_IDX_3), (idx >> 3) & 1);
++}
++
+ int realm_map_non_secure(struct realm *realm,
+ 			 unsigned long ipa,
+ 			 kvm_pfn_t pfn,
+@@ -1101,9 +1131,17 @@ int realm_map_non_secure(struct realm *realm,
+ 		 * so for now we permit both read and write.
+ 		 */
+ 		unsigned long desc = phys |
+-				     PTE_S2_MEMATTR(MT_S2_FWB_NORMAL) |
+-				     KVM_PTE_LEAF_ATTR_LO_S2_S2AP_R |
+-				     KVM_PTE_LEAF_ATTR_LO_S2_S2AP_W;
++				     PTE_S2_MEMATTR(MT_S2_FWB_NORMAL);
++		/*
++		 * FIXME: Read+Write permissions for now, and no support yet
++		 * for setting RMI_REALM_PARAM_FLAG1_RTT_S2AP_ENCODING
++		 */
++		if (1)
++			desc |= KVM_PTE_LEAF_ATTR_LO_S2_S2AP_R |
++				KVM_PTE_LEAF_ATTR_LO_S2_S2AP_W;
++		else
++			desc |= pi_index_to_s2tte(RMI_BASE_PERM_RW_INDEX);
++
+ 		ret = rmi_rtt_map_unprotected(rd, ipa, map_level, desc);
+ 
+ 		if (RMI_RETURN_STATUS(ret) == RMI_ERROR_RTT) {
+@@ -1653,6 +1691,33 @@ static int config_realm_hash_algo(struct realm *realm,
  	return 0;
  }
  
--static int rme_vmid_reserve(void)
-+static int rme_vmids_reserve(unsigned int *vmids, int count)
- {
--	int ret;
-+	int ret = 0;
-+	int vmid;
-+	int i;
- 	unsigned int vmid_count = 1 << kvm_get_vmid_bits();
- 
- 	spin_lock(&rme_vmid_lock);
--	ret = bitmap_find_free_region(rme_vmid_bitmap, vmid_count, 0);
-+	for (i = 0; i < count; i++) {
-+		vmid = bitmap_find_free_region(rme_vmid_bitmap, vmid_count, 0);
-+		if (vmid < 0) {
-+			while (i > 0) {
-+				i--;
-+				bitmap_release_region(rme_vmid_bitmap,
-+						      vmids[i], 0);
-+			}
-+			ret = -EBUSY;
-+			break;
-+		}
-+		vmids[i] = vmid;
-+	}
- 	spin_unlock(&rme_vmid_lock);
- 
- 	return ret;
- }
- 
--static void rme_vmid_release(unsigned int vmid)
-+static void rme_vmids_release(unsigned int *vmids, int count)
- {
-+	int i;
-+
- 	spin_lock(&rme_vmid_lock);
--	bitmap_release_region(rme_vmid_bitmap, vmid, 0);
-+	for (i = 0; i < count; i++)
-+		bitmap_release_region(rme_vmid_bitmap, vmids[i], 0);
- 	spin_unlock(&rme_vmid_lock);
- }
- 
-+static void rme_free_aux_pgds(struct kvm *kvm)
++static int config_num_aux_planes(struct realm *realm,
++				 struct arm_rme_config *cfg)
 +{
-+	size_t pgd_size = kvm_pgtable_stage2_pgd_size(kvm->arch.mmu.vtcr);
-+	struct realm *realm = &kvm->arch.realm;
-+	int plane, i;
++	if (cfg->num_aux_planes > rme_get_max_num_aux_planes())
++		return -EINVAL;
 +
-+	for (plane = 0; plane < realm->num_aux_planes; plane++) {
-+		phys_addr_t pgd_phys;
-+		int ret = 0;
++	realm->num_aux_planes = cfg->num_aux_planes;
++	realm->params->num_aux_planes = cfg->num_aux_planes;
 +
-+		if (!realm->aux_pgd[plane])
-+			continue;
-+
-+		pgd_phys = virt_to_phys(realm->aux_pgd[plane]);
-+
-+		for (i = 0; i < pgd_size; i += RMM_PAGE_SIZE) {
-+			phys_addr_t table_phys = pgd_phys + i;
-+
-+			if (WARN_ON(rmi_granule_undelegate(table_phys))) {
-+				ret = -ENXIO;
-+				break;
-+			}
-+		}
-+		if (ret == 0)
-+			free_pages_exact(realm->aux_pgd[plane], pgd_size);
-+	}
-+}
-+
-+static int rme_alloc_aux_pgds(struct kvm *kvm)
-+{
-+	size_t pgd_size = kvm_pgtable_stage2_pgd_size(kvm->arch.mmu.vtcr);
-+	struct realm *realm = &kvm->arch.realm;
-+	phys_addr_t pgd_phys;
-+	void *aux_pages;
-+	int plane, i;
-+	int ret;
-+
-+	for (plane = 0; plane < realm->num_aux_planes; plane++) {
-+		aux_pages = alloc_pages_exact(pgd_size,
-+					      GFP_KERNEL_ACCOUNT | __GFP_ZERO);
-+		if (!aux_pages) {
-+			ret = -ENOMEM;
-+			goto err_alloc;
-+		}
-+		realm->aux_pgd[plane] = aux_pages;
-+
-+		pgd_phys = virt_to_phys(realm->aux_pgd[plane]);
-+
-+		for (i = 0; i < pgd_size; i += RMM_PAGE_SIZE) {
-+			if (rmi_granule_delegate(pgd_phys + i)) {
-+				ret = -ENXIO;
-+				goto err_delegate;
-+			}
-+		}
-+	}
 +	return 0;
-+
-+err_delegate:
-+	while (i > 0) {
-+		i -= RMM_PAGE_SIZE;
-+
-+		if (WARN_ON(rmi_granule_undelegate(pgd_phys + i))) {
-+			/* Leak the pages */
-+			goto err_undelegate_failed;
-+		}
-+	}
-+
-+	free_pages_exact(realm->aux_pgd[plane], pgd_size);
-+err_undelegate_failed:
-+	realm->aux_pgd[plane] = NULL;
-+err_alloc:
-+	rme_free_aux_pgds(kvm);
-+	return ret;
 +}
 +
- static int kvm_create_realm(struct kvm *kvm)
++static int config_rtt_tree_pp(struct realm *realm,
++			      struct arm_rme_config *cfg)
++{
++	if (!kvm_rme_supports_rtt_tree_single() && !cfg->rtt_tree_pp)
++		return -EINVAL;
++
++	realm->rtt_tree_pp = !!cfg->rtt_tree_pp;
++	if (realm->rtt_tree_pp)
++		realm->params->flags1 |= RMI_REALM_PARAM_FLAG1_RTT_TREE_PP;
++	else
++		realm->params->flags1 &= ~RMI_REALM_PARAM_FLAG1_RTT_TREE_PP;
++
++	return 0;
++}
++
+ static int kvm_rme_config_realm(struct kvm *kvm, struct kvm_enable_cap *cap)
  {
- 	struct realm *realm = &kvm->arch.realm;
-@@ -1510,16 +1609,17 @@ static int kvm_create_realm(struct kvm *kvm)
- 	if (kvm_realm_is_created(kvm))
- 		return -EEXIST;
- 
--	ret = rme_vmid_reserve();
--	if (ret < 0)
-+	ret = rme_vmids_reserve(realm->vmid, realm->num_aux_planes + 1);
-+	if (ret)
- 		return ret;
--	realm->vmid = ret;
-+
-+	ret = rme_alloc_aux_pgds(kvm);
-+	if (ret)
-+		goto error_release_vmids;
- 
- 	ret = realm_create_rd(kvm);
--	if (ret) {
--		rme_vmid_release(realm->vmid);
--		return ret;
--	}
-+	if (ret)
-+		goto error_release_vmids;
- 
- 	WRITE_ONCE(realm->state, REALM_STATE_NEW);
- 
-@@ -1528,6 +1628,10 @@ static int kvm_create_realm(struct kvm *kvm)
- 	realm->params = NULL;
- 
- 	return 0;
-+
-+error_release_vmids:
-+	rme_vmids_release(realm->vmid, realm->num_aux_planes + 1);
-+	return ret;
- }
- 
- static int config_realm_hash_algo(struct realm *realm,
-@@ -1649,7 +1753,8 @@ void kvm_destroy_realm(struct kvm *kvm)
- 		realm->rd = NULL;
+ 	struct arm_rme_config cfg;
+@@ -1672,6 +1737,12 @@ static int kvm_rme_config_realm(struct kvm *kvm, struct kvm_enable_cap *cap)
+ 	case ARM_RME_CONFIG_HASH_ALGO:
+ 		r = config_realm_hash_algo(realm, &cfg);
+ 		break;
++	case ARM_RME_CONFIG_NUM_AUX_PLANES:
++		r = config_num_aux_planes(realm, &cfg);
++		break;
++	case ARM_RME_CONFIG_RTT_TREE_PP:
++		r = config_rtt_tree_pp(realm, &cfg);
++		break;
+ 	default:
+ 		r = -EINVAL;
  	}
- 
--	rme_vmid_release(realm->vmid);
-+	rme_free_aux_pgds(kvm);
-+	rme_vmids_release(realm->vmid, realm->num_aux_planes + 1);
- 
- 	for (i = 0; i < pgd_size; i += RMM_PAGE_SIZE) {
- 		phys_addr_t pgd_phys = kvm->arch.mmu.pgd_phys + i;
 -- 
 2.43.0
 
