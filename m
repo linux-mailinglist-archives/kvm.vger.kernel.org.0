@@ -1,71 +1,71 @@
-Return-Path: <kvm+bounces-58919-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-58920-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id DD8FFBA59A8
-	for <lists+kvm@lfdr.de>; Sat, 27 Sep 2025 08:10:46 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9AD8FBA59B1
+	for <lists+kvm@lfdr.de>; Sat, 27 Sep 2025 08:11:02 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8E5A92A7CC5
-	for <lists+kvm@lfdr.de>; Sat, 27 Sep 2025 06:10:46 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 45A884A42C7
+	for <lists+kvm@lfdr.de>; Sat, 27 Sep 2025 06:10:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 73F822773FD;
-	Sat, 27 Sep 2025 06:09:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E48A527A925;
+	Sat, 27 Sep 2025 06:09:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="S9fnKluj"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="mtj3ggGh"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pj1-f73.google.com (mail-pj1-f73.google.com [209.85.216.73])
+Received: from mail-pg1-f202.google.com (mail-pg1-f202.google.com [209.85.215.202])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0898627281C
-	for <kvm@vger.kernel.org>; Sat, 27 Sep 2025 06:09:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.73
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9A0282701B1
+	for <kvm@vger.kernel.org>; Sat, 27 Sep 2025 06:09:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758953365; cv=none; b=sDFn7l229umgeXc7XQvS59rPp+8GYq/2fsSYrvKl28nEzWKXz5T4a0GdC9qaHB5uXi1QkV4J74Op/6obcnGU7mMol6hk3CYEUU5nHDhYluaARWu3VcjZJug9jNavec/C6n4/iWgd4vSXJHzH6Xom7UEMgwfkJwp0hOlR/boIpjE=
+	t=1758953367; cv=none; b=EB8emCsAojdD7/q57gXt1EcEdVTUVfI1Ihg1nck9jW5a8nukb/FwFDUCZgzVHFj7z0AgZ9GhLNchkZ0w31JuvYtlN+BzVQq7z266wlEWuS0Pm7RUwauO7nm8TPwu1f8aqaVhtNuGoXU3Y+wilgVD1srY6NjNIS+FjcL0VoGZdt4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758953365; c=relaxed/simple;
-	bh=Aw3LpoKze6Od7iNis+pOk5VCoxGuRw9YdIepK1YikRQ=;
+	s=arc-20240116; t=1758953367; c=relaxed/simple;
+	bh=Oj8qJ7rV9ehZRogVERfstPITaEHniz2Ln0i/vX4dVho=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=kekH4tudAnOX7QRz1VEFuileTh8cO4rr00bb60PpS4zG7AHe15ltqzT2VbVuQ0ESq7Npt5uwqd0jUCKcaSe9otNDNI42dKR6a6E2iNtbDFVJn/wCE49U4k2UmrRrEeErEU03t6xw7bmI12/LjCfEqHcx2i7mxNwSOCUCi7ZnH+U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=S9fnKluj; arc=none smtp.client-ip=209.85.216.73
+	 To:Cc:Content-Type; b=tXUouf1Ili6MjeLTNMPkD/FUCbSBDHGZxNmG+IbAGj8XAENzd95PYR6pJutExXX46zt3xCRNKF4hCsGJ42vbNQvmXy/a6eK5Qh7nzY3kw2x+ZmgCdPdaNM8piJUplqQsLmKo+5Hh1gtFZlp7nzrnXdfQ6OGbQ5/HAZD9fLdDs/4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=mtj3ggGh; arc=none smtp.client-ip=209.85.215.202
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pj1-f73.google.com with SMTP id 98e67ed59e1d1-32eaeba9abaso4265594a91.3
-        for <kvm@vger.kernel.org>; Fri, 26 Sep 2025 23:09:23 -0700 (PDT)
+Received: by mail-pg1-f202.google.com with SMTP id 41be03b00d2f7-b5529da7771so2206355a12.0
+        for <kvm@vger.kernel.org>; Fri, 26 Sep 2025 23:09:25 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1758953363; x=1759558163; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1758953365; x=1759558165; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:reply-to:from:to:cc:subject:date:message-id:reply-to;
-        bh=FomVTg8fXS3IIL+VtBjYE48chX58x7ITpnVKFfqAzqY=;
-        b=S9fnKlujFHiQ8MWiI2JJAyj8k8yGnzK/HnR0vDpiN061iaVX8kzBQkJV7XF3mQ7o1i
-         aAflboy93cLI9DLrd6iF5sRShygTMALsuVxHySO0Il5DqgPRSR9vNCLBX730Ue9gnIMK
-         zHiZeZ9GHlobT1rV4mvwVKjHKe/zykeDzrXMAiBnrGmiuYjku0uQSxc3aH6f2+AitFuj
-         joAOp+PCtE4d+qVCw/+C1HncUhhhVhYEKp5ARncxoVk7bWlLFPcGqr72xW1LTd+wYWo5
-         E1GqsSl1AJM9Ph1WVgXeXBCnxms+vd1/RJlouaM5Al4wfZ8qcJzEc9tbuTJuwTuZQjM5
-         XK2g==
+        bh=PGKeC8CnX61x5pXWQDTzl5eYQK0aDAaf5xtcWK0Yejs=;
+        b=mtj3ggGhBy3LCO6zjwfxHeqHGlbr1Kpli+nATyp7Ya2ioa3St3gX/DHMps7YtauR6/
+         lY0aFUt2jg68dPntIGARiNKQYDprgv40hJ3yStGDSYgQpCZO7sA98YQP2CPCXiun4ND5
+         Yn7BHpyimS0JPnXby8kbfAdCL3mLLYFDH6fPWC+9dExRfGb5BtgnwhLSqq3yPWvbQGuN
+         WNDrrFT+V3gnD9hplyFmL4n0mJpfziup8NsdAf+KGFPNX7N321RQp/XB85cgKlrrTyMg
+         HuC1jSlAefeIfPshGdqRC6Xd6C+vRtVGCjRkTgrw+dCVRAWOgqVryXIa9iEXqILoCS8c
+         +Q8g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1758953363; x=1759558163;
+        d=1e100.net; s=20230601; t=1758953365; x=1759558165;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:reply-to:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=FomVTg8fXS3IIL+VtBjYE48chX58x7ITpnVKFfqAzqY=;
-        b=SIC+gCl2+usBfLHDeWTI5gXRuqofdIqSEI03+IW+JQE5Dtc3tK7qjLJrbA5Yseg7CY
-         3d1W1SoNPZtc1JgyVrnigvvGJoThy2OruLeeGMpGSCt04UO6TGLh0Ukplx39A+bpukKc
-         JxyTntP63rLx6ekb4wJpOXBVsJ2NiLzibV+Te4bxIy8Bt+G8DPDd2Z3ycfk+M4H5sHZc
-         Xlo7umnaHSHyKVeoqPOqXzAIxGBHYKUsu3yDJPVzKAyuHjXo9TgxRv1jcy5A2RB0fOvH
-         umMvK++cJbUh3u7oOyzVnf6TdMNhM40by9/A8qIfxsfKRb1c5Gq0JIFZLWh4GPAoEIMX
-         8/kQ==
-X-Gm-Message-State: AOJu0YwCv0eWCpsuRMf+eim4+gJNmeNHR9tbTaHimaOnUFlbvhIzaNYo
-	BchfW2QberEgpHZCXMNL7v1VZqmKxOEnAimQlJCVBiZWp3EGQ3EIHuRghJzTSAdq1oM8/muMMA6
-	32mEmlA==
-X-Google-Smtp-Source: AGHT+IHGMjhNm8XpXCT9kovxBim2WMFctvMUN3tR5/GKMzL0Upe/cYZE49AAW4RcIPh/KTxREz18WObBlIM=
-X-Received: from pjvp6.prod.google.com ([2002:a17:90a:df86:b0:335:2761:ae0])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:380f:b0:32e:32e4:9789
- with SMTP id 98e67ed59e1d1-3342a257486mr11317437a91.3.1758953363496; Fri, 26
- Sep 2025 23:09:23 -0700 (PDT)
+        bh=PGKeC8CnX61x5pXWQDTzl5eYQK0aDAaf5xtcWK0Yejs=;
+        b=ZWMpCP6BTjmtsBkCvJByKXy4PwjlgSVltnDdci+4iINriGP6eAh9H/PmqKaYIoP2Ys
+         TEYxW08LmgLVtiPbbAped4GXB83WLmpLqZpGVQTP9AOcuyY2D2CPb5U9ZopPKM1XsYqP
+         ienY2VeEASSj71kPRCAj/1eWhmmpu0VVXsjbqoSNxGHX0r0Xw343F0E8IjJjk/fiBOFP
+         pDxFTJlEOG/q+aSrqkssPDOCyWxyC2GeBKTWMUMd2SAQ+iSVfJzG4T8Bft6IUMgwDT7U
+         PM2dsbjtY/+KiG58iFUkbevWts+WVRijzbVVZ8PLn7mgnTN5nQHEQ8MmMzYAM7G/BvF4
+         NLcg==
+X-Gm-Message-State: AOJu0YzTeW7sAsSfGHM0iB4bfzwUIJO+qOcTlTkwVh1uMwLJY10nbXtY
+	c2c0WidXEoz3M1KOW615rHqX3PzdZNraUxDzWZOX470zfViF0bfnX80YSM8wdIb1ZbSxYYPKSiN
+	ADGsB8Q==
+X-Google-Smtp-Source: AGHT+IFWQPF7mWizOzq2Vx3bLQVksJPtETuTn097fKU4c6kwXyGdc3Ivu6BvG8tVIpcBVR0dbBw4lv7WxqM=
+X-Received: from pgdi13.prod.google.com ([2002:a05:6a02:51ed:b0:b54:f631:e3a3])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a05:6a21:110:b0:2fd:a3b:933d
+ with SMTP id adf61e73a8af0-2fd0a3b9389mr2889844637.58.1758953365098; Fri, 26
+ Sep 2025 23:09:25 -0700 (PDT)
 Reply-To: Sean Christopherson <seanjc@google.com>
-Date: Fri, 26 Sep 2025 23:09:06 -0700
+Date: Fri, 26 Sep 2025 23:09:07 -0700
 In-Reply-To: <20250927060910.2933942-1-seanjc@google.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
@@ -75,116 +75,61 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
 References: <20250927060910.2933942-1-seanjc@google.com>
 X-Mailer: git-send-email 2.51.0.536.g15c5d4f767-goog
-Message-ID: <20250927060910.2933942-7-seanjc@google.com>
-Subject: [GIT PULL] KVM: x86: SVM changes for 6.18
+Message-ID: <20250927060910.2933942-8-seanjc@google.com>
+Subject: [GIT PULL] KVM: x86: SNP CipherTextHiding for 6.18
 From: Sean Christopherson <seanjc@google.com>
 To: Paolo Bonzini <pbonzini@redhat.com>
 Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
 	Sean Christopherson <seanjc@google.com>
 Content-Type: text/plain; charset="UTF-8"
 
-The headliner here is to enable AVIC by deafult for Zen4+ if x2AVIC is
-supported.  The other highlight is support for Secure TSC (support for
-CiphertextHiding is coming in a separate pull request).
+The tag has all the details of the feature.  Note that this is based directly
+on the v6.18-ccp tag from the cryptodev tree.  I included all of the ccp
+commits in the shortlog just in case the KVM pull request lands before the
+crypto pull request.
 
-The "lowlight" is a bug fix for an issue where KVM could clobber TSC_AUX if an
-SEV-ES+ vCPU runs on the same pCPU as a non-SEV-ES CPU.
+The following changes since commit 8f5ae30d69d7543eee0d70083daf4de8fe15d585:
 
-Regarding enabling AVIC by default, despite there still being at least one
-known wart (the IRQ window inhibit mess), I think AVIC is stable enough to
-enable by default.  More importantly, I think that getting it enabled in 6.18
-in particular, i.e. in the next LTS, will be a net positive in the sense that
-we'll hopefully get more "free" testing, and thus help fix any lurking bugs
-for the folks that are explicitly enabling AVIC.
-
-The following changes since commit c17b750b3ad9f45f2b6f7e6f7f4679844244f0b9:
-
-  Linux 6.17-rc2 (2025-08-17 15:22:10 -0700)
+  Linux 6.17-rc1 (2025-08-10 19:41:16 +0300)
 
 are available in the Git repository at:
 
-  https://github.com/kvm-x86/linux.git tags/kvm-x86-svm-6.18
+  https://github.com/kvm-x86/linux.git tags/kvm-x86-ciphertext-6.18
 
-for you to fetch changes up to ca2967de5a5b098b43c5ad665672945ce7e7d4f7:
+for you to fetch changes up to 6c7c620585c6537dd5dcc75f972b875caf00f773:
 
-  KVM: SVM: Enable AVIC by default for Zen4+ if x2AVIC is support (2025-09-23 08:56:49 -0700)
-
-----------------------------------------------------------------
-KVM SVM changes for 6.18
-
- - Require a minimum GHCB version of 2 when starting SEV-SNP guests via
-   KVM_SEV_INIT2 so that invalid GHCB versions result in immediate errors
-   instead of latent guest failures.
-
- - Add support for Secure TSC for SEV-SNP guests, which prevents the untrusted
-   host from tampering with the guest's TSC frequency, while still allowing the
-   the VMM to configure the guest's TSC frequency prior to launch.
-
- - Mitigate the potential for TOCTOU bugs when accessing GHCB fields by
-   wrapping all accesses via READ_ONCE().
-
- - Validate the XCR0 provided by the guest (via the GHCB) to avoid tracking a
-   bogous XCR0 value in KVM's software model.
-
- - Save an SEV guest's policy if and only if LAUNCH_START fully succeeds to
-   avoid leaving behind stale state (thankfully not consumed in KVM).
-
- - Explicitly reject non-positive effective lengths during SNP's LAUNCH_UPDATE
-   instead of subtly relying on guest_memfd to do the "heavy" lifting.
-
- - Reload the pre-VMRUN TSC_AUX on #VMEXIT for SEV-ES guests, not the host's
-   desired TSC_AUX, to fix a bug where KVM could clobber a different vCPU's
-   TSC_AUX due to hardware not matching the value cached in the user-return MSR
-   infrastructure.
-
- - Enable AVIC by default for Zen4+ if x2AVIC (and other prereqs) is supported,
-   and clean up the AVIC initialization code along the way.
+  KVM: SEV: Add SEV-SNP CipherTextHiding support (2025-09-15 10:14:11 -0700)
 
 ----------------------------------------------------------------
-Hou Wenlong (2):
-      KVM: x86: Add helper to retrieve current value of user return MSR
-      KVM: SVM: Re-load current, not host, TSC_AUX on #VMEXIT from SEV-ES guest
+KVM SEV-SNP CipherText Hiding support for 6.18
 
-Naveen N Rao (1):
-      KVM: SVM: Enable AVIC by default for Zen4+ if x2AVIC is support
+Add support for SEV-SNP's CipherText Hiding, an opt-in feature that prevents
+unauthorized CPU accesses from reading the ciphertext of SNP guest private
+memory, e.g. to attempt an offline attack.  Instead of ciphertext, the CPU
+will always read back all FFs when CipherText Hiding is enabled.
 
-Nikunj A Dadhania (4):
-      KVM: SEV: Drop GHCB_VERSION_DEFAULT and open code it
-      KVM: SEV: Enforce minimum GHCB version requirement for SEV-SNP guests
-      x86/cpufeatures: Add SNP Secure TSC
-      KVM: SVM: Enable Secure TSC for SNP guests
+Add new module parameter to the KVM module to enable CipherText Hiding and
+control the number of ASIDs that can be used for VMs with CipherText Hiding,
+which is in effect the number of SNP VMs.  When CipherText Hiding is enabled,
+the hared SEV-ES/SEV-SNP ASID space is split into separate ranges for SEV-ES
+and SEV-SNP guests, i.e. ASIDs that can be used for CipherText Hiding cannot
+be used to run SEV-ES guests.
 
-Sean Christopherson (15):
-      KVM: SVM: Move SEV-ES VMSA allocation to a dedicated sev_vcpu_create() helper
-      KVM: SEV: Move init of SNP guest state into sev_init_vmcb()
-      KVM: SEV: Set RESET GHCB MSR value during sev_es_init_vmcb()
-      KVM: SEV: Fold sev_es_vcpu_reset() into sev_vcpu_create()
-      KVM: SEV: Save the SEV policy if and only if LAUNCH_START succeeds
-      KVM: SEV: Rename kvm_ghcb_get_sw_exit_code() to kvm_get_cached_sw_exit_code()
-      KVM: SEV: Read save fields from GHCB exactly once
-      KVM: SEV: Validate XCR0 provided by guest in GHCB
-      KVM: SEV: Reject non-positive effective lengths during LAUNCH_UPDATE
-      KVM: SVM: Make svm_x86_ops globally visible, clean up on-HyperV usage
-      KVM: SVM: Move x2AVIC MSR interception helper to avic.c
-      KVM: SVM: Update "APICv in x2APIC without x2AVIC" in avic.c, not svm.c
-      KVM: SVM: Always print "AVIC enabled" separately, even when force enabled
-      KVM: SVM: Don't advise the user to do force_avic=y (when x2AVIC is detected)
-      KVM: SVM: Move global "avic" variable to avic.c
+----------------------------------------------------------------
+Ashish Kalra (7):
+      crypto: ccp - New bit-field definitions for SNP_PLATFORM_STATUS command
+      crypto: ccp - Cache SEV platform status and platform state
+      crypto: ccp - Add support for SNP_FEATURE_INFO command
+      crypto: ccp - Introduce new API interface to indicate SEV-SNP Ciphertext hiding feature
+      crypto: ccp - Add support to enable CipherTextHiding on SNP_INIT_EX
+      KVM: SEV: Introduce new min,max sev_es and sev_snp asid variables
+      KVM: SEV: Add SEV-SNP CipherTextHiding support
 
-Thorsten Blum (1):
-      KVM: nSVM: Replace kzalloc() + copy_from_user() with memdup_user()
-
- arch/x86/include/asm/cpufeatures.h |   1 +
- arch/x86/include/asm/kvm_host.h    |   2 +
- arch/x86/include/asm/svm.h         |   1 +
- arch/x86/kvm/svm/avic.c            | 151 ++++++++++++++++++++++++++++------
- arch/x86/kvm/svm/nested.c          |  18 ++---
- arch/x86/kvm/svm/sev.c             | 160 +++++++++++++++++++++++++------------
- arch/x86/kvm/svm/svm.c             | 126 +++++------------------------
- arch/x86/kvm/svm/svm.h             |  40 ++++++----
- arch/x86/kvm/svm/svm_onhyperv.c    |  28 ++++++-
- arch/x86/kvm/svm/svm_onhyperv.h    |  31 +------
- arch/x86/kvm/x86.c                 |   9 ++-
- virt/kvm/guest_memfd.c             |   3 +-
- 12 files changed, 323 insertions(+), 247 deletions(-)
+ Documentation/admin-guide/kernel-parameters.txt |  21 ++++
+ arch/x86/kvm/svm/sev.c                          |  68 +++++++++++--
+ drivers/crypto/ccp/sev-dev.c                    | 127 +++++++++++++++++++++---
+ drivers/crypto/ccp/sev-dev.h                    |   6 +-
+ include/linux/psp-sev.h                         |  44 +++++++-
+ include/uapi/linux/psp-sev.h                    |  10 +-
+ 6 files changed, 249 insertions(+), 27 deletions(-)
 
