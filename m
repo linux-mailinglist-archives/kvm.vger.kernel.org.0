@@ -1,197 +1,203 @@
-Return-Path: <kvm+bounces-58923-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-58924-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id A2566BA59C0
-	for <lists+kvm@lfdr.de>; Sat, 27 Sep 2025 08:11:36 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9F22DBA5A61
+	for <lists+kvm@lfdr.de>; Sat, 27 Sep 2025 09:39:00 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3B529160944
-	for <lists+kvm@lfdr.de>; Sat, 27 Sep 2025 06:11:36 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id AC1151C20BCF
+	for <lists+kvm@lfdr.de>; Sat, 27 Sep 2025 07:39:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 241A8284663;
-	Sat, 27 Sep 2025 06:09:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F41F72D0620;
+	Sat, 27 Sep 2025 07:38:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="3wkoNR9i"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="MDhzVIrG"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pj1-f73.google.com (mail-pj1-f73.google.com [209.85.216.73])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from out-189.mta0.migadu.com (out-189.mta0.migadu.com [91.218.175.189])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A2267280330
-	for <kvm@vger.kernel.org>; Sat, 27 Sep 2025 06:09:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.73
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DDE9F2C3244
+	for <kvm@vger.kernel.org>; Sat, 27 Sep 2025 07:38:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.189
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758953373; cv=none; b=l5TyE42n2pVrHl1CCfwsBqmzlhhdGTex17aix/cN4z7qGwffkJZtclENsIp0xZACouZLK36d9myer7nuGElD5+/DhRQDAjDiCdvM6rnl6PJUctp8mR7JtO70F7Ye3HcyURBLvaNlN3/waW7S9gYd0U8/Oyul4mGCiRQrGFvjmDw=
+	t=1758958720; cv=none; b=cxLeyECm09aVs8g/6yVrwjk/sYF0XiJB3keOWIEfCE7myJEW1ULzbGUbbkcimWarj7AptkZP1ebM9dBmDY032j57o2VZUr1c94f1DFQKhdJZvP2U/Yi01usWqthmD37NHk9e10jM9ioh6G6oNvSTphlIwDEblAXQsMC2aykQ+Go=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758953373; c=relaxed/simple;
-	bh=0Vb/mK7tmCJhFTWefrGXGNYHFyjEGtXS8pNsHcfbRVg=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=nd4Bf3ijSsRnxOOV6Y+q/6WFnjDvQotX7sJCupeuB6TADrK54dveAcW9P0QfQV+v21pi/NearWgDhGZrjGXPe4DBsU1vizj2Hh6j7Xe3ZSQIjStsfQb4Hb9zj/6nu/tZhcOu0j77MwfeHESvgFWTa9YSHruXb/doLi0xE4YgXFs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=3wkoNR9i; arc=none smtp.client-ip=209.85.216.73
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pj1-f73.google.com with SMTP id 98e67ed59e1d1-33428befd39so5182297a91.0
-        for <kvm@vger.kernel.org>; Fri, 26 Sep 2025 23:09:31 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1758953371; x=1759558171; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:reply-to:from:to:cc:subject:date:message-id:reply-to;
-        bh=4nfCukCOjTKBbX17kjTUtgyEmCtT5j5WUGq581i06Rk=;
-        b=3wkoNR9iT6c7XIbGPIKlCjxp0oilt14IduEohWLT7Hcs5tkSJCPGNUVtDs82jJVMLm
-         bV8HIJluk7n1sVNwsc7wtScBQqq5oGNdR+SFYWdYkEKv3nU41ElBB/CkAnd6ehHyx7bq
-         vOw4l/EUtMSZFj374hO7aeNWWzws+wPZRBkTp3dS+beE+wW5F5WAjWOPtc2WBh7T1ZTo
-         yfDXJoR1j8H8m+oMAbsVAyEoGrqJOs+QbuVxP7msh5lF3eS8nmKm3VdSlBZRJtL570TN
-         zQdZZtzV100B3UzYrmKshxw3HZqN9SC28waauAITeWveMbxI9/gO6rA5mo/Rz6sYHMBk
-         xKLg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1758953371; x=1759558171;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:reply-to:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=4nfCukCOjTKBbX17kjTUtgyEmCtT5j5WUGq581i06Rk=;
-        b=QcK5xCXbk52tDeoI3gjvxWqFZIYNxMFCVqPnnZjGMPOw+KIw3bRSAuKdivLjzImoua
-         CThvyUd9LIa9QFZWPXRAtgNjC+E5eysbXQZbbYP+gI2UfSHD3kU+7X4Ogydv2zTIkNvq
-         KpF69n1+lyxzPu/trucoY/Pl+36aOajf/MuJSpRPg9W4LiSVNyTPwdC4ZA/dtKIZktp/
-         WkNBpVs6jvFxWzQ2NKi6FT/1C39B6HPMMa6KJg3jpDQIgmW2fnJYcF7CRXVxFNTIDkY0
-         yPMG03lP7zpA6eUY/Z+c7qi3VdKFe/5MZzX5ZGsT7W0ZPBg3XU7AwgoBAcfrCQ2dCwio
-         NudQ==
-X-Gm-Message-State: AOJu0Yykuken6ZHllNcFimJ2bnsmGvN+/BnrbTbSLQXwvBn68rA21Xfz
-	oU94L0uh0AvTAE3s8YCpxg5XPuTBWRT/RgTND6+SRNvpgRERbpmA0jjv2eh/k34CqHEzlll6Bw5
-	80dKNtA==
-X-Google-Smtp-Source: AGHT+IHInN0XXrsVYcs2pmvpa43+3t7ExR39ZdBaGHVwMt0+ljeiTqzCG967MCRxjJMzZNeqZRdOZKQW9yc=
-X-Received: from pjnu2.prod.google.com ([2002:a17:90a:8902:b0:327:e172:e96])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:3885:b0:32e:3e2c:8ad8
- with SMTP id 98e67ed59e1d1-3342a2d9bdemr11248258a91.20.1758953370964; Fri, 26
- Sep 2025 23:09:30 -0700 (PDT)
-Reply-To: Sean Christopherson <seanjc@google.com>
-Date: Fri, 26 Sep 2025 23:09:10 -0700
-In-Reply-To: <20250927060910.2933942-1-seanjc@google.com>
+	s=arc-20240116; t=1758958720; c=relaxed/simple;
+	bh=tr3cVw/fHsBObw+4/03vyNgdWXv1m3E2RPdz5cDO+i4=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=fsGxPZ9PqFCnRLIAA5xm7fgCePyjr0t0v0ejZ73xE8nJnpdBAIlylmyVPr/PIuZiQ9d3/U/J81KPK71g9OcGLPhQnieLLCSrbMjKCu7kQ+9FdZOfiDHu+7r/AHqCFcRO7rt773ftg528daEOFPJKwCG15evRokkvKbl0vNrTdX0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=MDhzVIrG; arc=none smtp.client-ip=91.218.175.189
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+Message-ID: <be89abc6-97ca-47d8-b8e7-95f58ab9cc67@linux.dev>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1758958715;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=Wr7c37MXYsi1SZjRIiCMW6TvRd9zbqLAteCUC2bU040=;
+	b=MDhzVIrG9XqOhn+X4EyvqT5WFEC48i0ScQW1M2TEQNfH+Abi956kVrFuXVs5+tNbHUeEBS
+	HSH1dZ6zZI6FfoXFd0qRETX0UB3fscW0ypzjqRJvDzeO0w95mYEUlUuw8Y//m8zDINyAux
+	7aMnDrKrTlaK0SG5hxR2LTl6ILFDhs4=
+Date: Sat, 27 Sep 2025 08:38:29 +0100
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20250927060910.2933942-1-seanjc@google.com>
-X-Mailer: git-send-email 2.51.0.536.g15c5d4f767-goog
-Message-ID: <20250927060910.2933942-11-seanjc@google.com>
-Subject: [GIT PULL] KVM: Symbol export restrictions for 6.18
-From: Sean Christopherson <seanjc@google.com>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	Sean Christopherson <seanjc@google.com>
-Content-Type: text/plain; charset="UTF-8"
+MIME-Version: 1.0
+Subject: Re: [PATCH v7 06/12] KVM: guest_memfd: add module param for disabling
+ TLB flushing
+To: David Hildenbrand <david@redhat.com>, Will Deacon <will@kernel.org>
+Cc: Dave Hansen <dave.hansen@intel.com>, "Roy, Patrick"
+ <roypat@amazon.co.uk>, "pbonzini@redhat.com" <pbonzini@redhat.com>,
+ "corbet@lwn.net" <corbet@lwn.net>, "maz@kernel.org" <maz@kernel.org>,
+ "oliver.upton@linux.dev" <oliver.upton@linux.dev>,
+ "joey.gouly@arm.com" <joey.gouly@arm.com>,
+ "suzuki.poulose@arm.com" <suzuki.poulose@arm.com>,
+ "yuzenghui@huawei.com" <yuzenghui@huawei.com>,
+ "catalin.marinas@arm.com" <catalin.marinas@arm.com>,
+ "tglx@linutronix.de" <tglx@linutronix.de>,
+ "mingo@redhat.com" <mingo@redhat.com>, "bp@alien8.de" <bp@alien8.de>,
+ "dave.hansen@linux.intel.com" <dave.hansen@linux.intel.com>,
+ "x86@kernel.org" <x86@kernel.org>, "hpa@zytor.com" <hpa@zytor.com>,
+ "luto@kernel.org" <luto@kernel.org>,
+ "peterz@infradead.org" <peterz@infradead.org>,
+ "willy@infradead.org" <willy@infradead.org>,
+ "akpm@linux-foundation.org" <akpm@linux-foundation.org>,
+ "lorenzo.stoakes@oracle.com" <lorenzo.stoakes@oracle.com>,
+ "Liam.Howlett@oracle.com" <Liam.Howlett@oracle.com>,
+ "vbabka@suse.cz" <vbabka@suse.cz>, "rppt@kernel.org" <rppt@kernel.org>,
+ "surenb@google.com" <surenb@google.com>, "mhocko@suse.com"
+ <mhocko@suse.com>, "song@kernel.org" <song@kernel.org>,
+ "jolsa@kernel.org" <jolsa@kernel.org>, "ast@kernel.org" <ast@kernel.org>,
+ "daniel@iogearbox.net" <daniel@iogearbox.net>,
+ "andrii@kernel.org" <andrii@kernel.org>,
+ "martin.lau@linux.dev" <martin.lau@linux.dev>,
+ "eddyz87@gmail.com" <eddyz87@gmail.com>,
+ "yonghong.song@linux.dev" <yonghong.song@linux.dev>,
+ "john.fastabend@gmail.com" <john.fastabend@gmail.com>,
+ "kpsingh@kernel.org" <kpsingh@kernel.org>, "sdf@fomichev.me"
+ <sdf@fomichev.me>, "haoluo@google.com" <haoluo@google.com>,
+ "jgg@ziepe.ca" <jgg@ziepe.ca>, "jhubbard@nvidia.com" <jhubbard@nvidia.com>,
+ "peterx@redhat.com" <peterx@redhat.com>, "jannh@google.com"
+ <jannh@google.com>, "pfalcato@suse.de" <pfalcato@suse.de>,
+ "shuah@kernel.org" <shuah@kernel.org>, "seanjc@google.com"
+ <seanjc@google.com>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+ "linux-doc@vger.kernel.org" <linux-doc@vger.kernel.org>,
+ "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+ "linux-arm-kernel@lists.infradead.org"
+ <linux-arm-kernel@lists.infradead.org>,
+ "kvmarm@lists.linux.dev" <kvmarm@lists.linux.dev>,
+ "linux-fsdevel@vger.kernel.org" <linux-fsdevel@vger.kernel.org>,
+ "linux-mm@kvack.org" <linux-mm@kvack.org>,
+ "bpf@vger.kernel.org" <bpf@vger.kernel.org>,
+ "linux-kselftest@vger.kernel.org" <linux-kselftest@vger.kernel.org>,
+ "Cali, Marco" <xmarcalx@amazon.co.uk>,
+ "Kalyazin, Nikita" <kalyazin@amazon.co.uk>,
+ "Thomson, Jack" <jackabt@amazon.co.uk>,
+ "derekmn@amazon.co.uk" <derekmn@amazon.co.uk>,
+ "tabba@google.com" <tabba@google.com>,
+ "ackerleytng@google.com" <ackerleytng@google.com>
+References: <20250924151101.2225820-4-patrick.roy@campus.lmu.de>
+ <20250924152214.7292-1-roypat@amazon.co.uk>
+ <20250924152214.7292-3-roypat@amazon.co.uk>
+ <e25867b6-ffc0-4c7c-9635-9b3f47b186ca@intel.com>
+ <c1875a54-0c87-450f-9370-29e7ec4fea3d@redhat.com>
+ <82bff1c4-987f-46cb-833c-bd99eaa46e7a@intel.com>
+ <c79173d8-6f18-40fa-9621-e691990501e4@redhat.com>
+ <c88514c3-e15f-4853-8acf-15e7b4b979f4@linux.dev>
+ <aNZwmPFAxm_HRYpC@willie-the-truck>
+ <5d11b5f7-3208-4ea8-bbff-f535cf62d576@redhat.com>
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Patrick Roy <patrick.roy@linux.dev>
+Content-Language: en-US
+In-Reply-To: <5d11b5f7-3208-4ea8-bbff-f535cf62d576@redhat.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-Migadu-Flow: FLOW_OUT
 
-Note!  If possible, and you're feeling generous, please merge this dead last
-and manually convert any new KVM exports to EXPORT_SYMBOL_FOR_KVM_INTERNAL so
-that there are no unwanted exports.
 
-Three new exports are coming in via other kvm-x86 pull requests; I've been
-"fixing" them as part of the merge into kvm-x86/next (see diff below), so those
-at least have gotten coverage in -next.
 
-Note #2, this is based on the "misc" branch/pull, but includes a backmerge of
-v6.17-rc3.  I posted the patches against kvm-x86/next to avoid an annoying
-conflict (which I can't even remember at this point), and then didn't realize
-I needed v6.17-rc3 to pick up the EXPORT_SYMBOL_GPL_FOR_MODULES =>
-EXPORT_SYMBOL_FOR_MODULES rename that snuck in until the 0-day bot yelled
-because the branch didn't compile (I only tested when merged on top of
-kvm/next, doh).
+On Fri, 2025-09-26 at 21:09 +0100, David Hildenbrand wrote:
+> On 26.09.25 12:53, Will Deacon wrote:
+>> On Fri, Sep 26, 2025 at 10:46:15AM +0100, Patrick Roy wrote:
+>>>
+>>>
+>>> On Thu, 2025-09-25 at 21:13 +0100, David Hildenbrand wrote:
+>>>> On 25.09.25 21:59, Dave Hansen wrote:
+>>>>> On 9/25/25 12:20, David Hildenbrand wrote:
+>>>>>> On 25.09.25 20:27, Dave Hansen wrote:
+>>>>>>> On 9/24/25 08:22, Roy, Patrick wrote:
+>>>>>>>> Add an option to not perform TLB flushes after direct map manipulations.
+>>>>>>>
+>>>>>>> I'd really prefer this be left out for now. It's a massive can of worms.
+>>>>>>> Let's agree on something that works and has well-defined behavior before
+>>>>>>> we go breaking it on purpose.
+>>>>>>
+>>>>>> May I ask what the big concern here is?
+>>>>>
+>>>>> It's not a _big_ concern.
+>>>>
+>>>> Oh, I read "can of worms" and thought there is something seriously problematic :)
+>>>>
+>>>>> I just think we want to start on something
+>>>>> like this as simple, secure, and deterministic as possible.
+>>>>
+>>>> Yes, I agree. And it should be the default. Less secure would have to be opt-in and documented thoroughly.
+>>>
+>>> Yes, I am definitely happy to have the 100% secure behavior be the
+>>> default, and the skipping of TLB flushes be an opt-in, with thorough
+>>> documentation!
+>>>
+>>> But I would like to include the "skip tlb flushes" option as part of
+>>> this patch series straight away, because as I was alluding to in the
+>>> commit message, with TLB flushes this is not usable for Firecracker for
+>>> performance reasons :(
+>>
+>> I really don't want that option for arm64. If we're going to bother
+>> unmapping from the linear map, we should invalidate the TLB.
+> 
+> Reading "TLB flushes result in a up to 40x elongation of page faults in
+> guest_memfd (scaling with the number of CPU cores), or a 5x elongation
+> of memory population,", I can understand why one would want that optimization :)
+> 
+> @Patrick, couldn't we use fallocate() to preallocate memory and batch the TLB flush within such an operation?
+> 
+> That is, we wouldn't flush after each individual direct-map modification but after multiple ones part of a single operation like fallocate of a larger range.
+> 
+> Likely wouldn't make all use cases happy.
+>
 
-diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-index e96080cba540..3d4ec1806d3e 100644
---- a/arch/x86/kvm/x86.c
-+++ b/arch/x86/kvm/x86.c
-@@ -695,7 +695,7 @@ u64 kvm_get_user_return_msr(unsigned int slot)
- {
-        return this_cpu_ptr(user_return_msrs)->values[slot].curr;
- }
--EXPORT_SYMBOL_GPL(kvm_get_user_return_msr);
-+EXPORT_SYMBOL_FOR_KVM_INTERNAL(kvm_get_user_return_msr);
- 
- static void drop_user_return_notifiers(void)
- {
-@@ -1304,7 +1304,7 @@ int __kvm_set_xcr(struct kvm_vcpu *vcpu, u32 index, u64 xcr)
-                vcpu->arch.cpuid_dynamic_bits_dirty = true;
-        return 0;
- }
--EXPORT_SYMBOL_GPL(__kvm_set_xcr);
-+EXPORT_SYMBOL_FOR_KVM_INTERNAL(__kvm_set_xcr);
- 
- int kvm_emulate_xsetbv(struct kvm_vcpu *vcpu)
- {
-diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
-index b99eb34174af..83a1b4dbbbd8 100644
---- a/virt/kvm/kvm_main.c
-+++ b/virt/kvm/kvm_main.c
-@@ -2661,7 +2661,7 @@ struct kvm_memory_slot *kvm_vcpu_gfn_to_memslot(struct kvm_vcpu *vcpu, gfn_t gfn
- 
-        return NULL;
- }
--EXPORT_SYMBOL_GPL(kvm_vcpu_gfn_to_memslot);
-+EXPORT_SYMBOL_FOR_KVM_INTERNAL(kvm_vcpu_gfn_to_memslot);
- 
- bool kvm_is_visible_gfn(struct kvm *kvm, gfn_t gfn)
- {
+For Firecracker, we rely a lot on not preallocating _all_ VM memory, and
+trying to ensure only the actual "working set" of a VM is faulted in (we
+pack a lot more VMs onto a physical host than there is actual physical
+memory available). For VMs that are restored from a snapshot, we know
+pretty well what memory needs to be faulted in (that's where @Nikita's
+write syscall comes in), so there we could try such an optimization. But
+for everything else we very much rely on the on-demand nature of guest
+memory allocation (and hence direct map removal). And even right now,
+the long pole performance-wise are these on-demand faults, so really, we
+don't want them to become even slower :(
 
-The following changes since commit 1b237f190eb3d36f52dffe07a40b5eb210280e00:
+Also, can we really batch multiple TLB flushes as you suggest? Even if
+pages are at consecutive indices in guest_memfd, they're not guaranteed
+to be continguous physically, e.g. we couldn't just coalesce multiple
+TLB flushes into a single TLB flush of a larger range.
 
-  Linux 6.17-rc3 (2025-08-24 12:04:12 -0400)
+There's probably other things we can try. Backing guest_memfd with
+hugepages would reduce the number TLB flushes by 512x (although not all
+users of Firecracker at Amazon [can] use hugepages).
 
-are available in the Git repository at:
+And I do still wonder if it's possible to have "async TLB flushes" where
+we simply don't wait for the IPI (x86 terminology, not sure what the
+mechanism on arm64 is). Looking at
+smp_call_function_many_cond()/invlpgb_kernel_range_flush() on x86, it
+seems so? Although seems like on ARM it's actually just handled by a
+single instruction (TLBI) and not some interprocess communication
+thingy. Maybe there's a variant that's faster / better for this usecase?
 
-  https://github.com/kvm-x86/linux.git tags/kvm-x86-exports-6.18
-
-for you to fetch changes up to aca2a0fa7796cf026a39a49ef9325755a9ead932:
-
-  KVM: x86: Export KVM-internal symbols for sub-modules only (2025-09-24 07:01:30 -0700)
-
-----------------------------------------------------------------
-KVM symbol export restrictions for 6.18
-
-Use the newfangled EXPORT_SYMBOL_FOR_MODULES() along with some macro
-shenanigans to export KVM-internal symbols if and only if KVM has one or
-more sub-modules, and only for those sub-modules, e.g. x86's kvm-amd.ko
-and/or kvm-intel.ko, and PPC's many varieties of sub-modules.
-
-Define the macros in the kvm_types.h so that the core logic is visible outside
-of KVM, so that the logic can be reused in the future to further restrict
-kernel exports that exist purely for KVM (x86 in particular has a _lot_ of
-exports that are used only by KVM).
-
-----------------------------------------------------------------
-Sean Christopherson (6):
-      Merge 'v6.17-rc3' into 'exports' to EXPORT_SYMBOL_FOR_MODULES rename
-      KVM: s390/vfio-ap: Use kvm_is_gpa_in_memslot() instead of open coded equivalent
-      KVM: Export KVM-internal symbols for sub-modules only
-      KVM: x86: Move kvm_intr_is_single_vcpu() to lapic.c
-      KVM: x86: Drop pointless exports of kvm_arch_xxx() hooks
-      KVM: x86: Export KVM-internal symbols for sub-modules only
-
- arch/powerpc/include/asm/Kbuild      |   1 -
- arch/powerpc/include/asm/kvm_types.h |  15 +++++++++
- arch/s390/include/asm/kvm_host.h     |   2 ++
- arch/s390/kvm/priv.c                 |   8 +++++
- arch/x86/include/asm/kvm_host.h      |   3 --
- arch/x86/include/asm/kvm_types.h     |  10 ++++++
- arch/x86/kvm/cpuid.c                 |  10 +++---
- arch/x86/kvm/hyperv.c                |   4 +--
- arch/x86/kvm/irq.c                   |  34 ++------------------
- arch/x86/kvm/kvm_onhyperv.c          |   6 ++--
- arch/x86/kvm/lapic.c                 |  71 +++++++++++++++++++++++++++++-------------
- arch/x86/kvm/lapic.h                 |   4 +--
- arch/x86/kvm/mmu/mmu.c               |  36 ++++++++++-----------
- arch/x86/kvm/mmu/spte.c              |  10 +++---
- arch/x86/kvm/mmu/tdp_mmu.c           |   2 +-
- arch/x86/kvm/pmu.c                   |  10 +++---
- arch/x86/kvm/smm.c                   |   2 +-
- arch/x86/kvm/x86.c                   | 219 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++-----------------------------------------------------------------
- drivers/s390/crypto/vfio_ap_ops.c    |   2 +-
- include/linux/kvm_types.h            |  25 ++++++++++-----
- virt/kvm/eventfd.c                   |   2 +-
- virt/kvm/guest_memfd.c               |   4 +--
- virt/kvm/kvm_main.c                  | 126 +++++++++++++++++++++++++++++++++++++-------------------------------------
- 23 files changed, 323 insertions(+), 283 deletions(-)
- create mode 100644 arch/powerpc/include/asm/kvm_types.h
 
