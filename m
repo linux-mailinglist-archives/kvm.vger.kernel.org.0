@@ -1,203 +1,124 @@
-Return-Path: <kvm+bounces-58924-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-58925-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9F22DBA5A61
-	for <lists+kvm@lfdr.de>; Sat, 27 Sep 2025 09:39:00 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 611EBBA5EED
+	for <lists+kvm@lfdr.de>; Sat, 27 Sep 2025 14:25:53 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id AC1151C20BCF
-	for <lists+kvm@lfdr.de>; Sat, 27 Sep 2025 07:39:22 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 98FF31B20895
+	for <lists+kvm@lfdr.de>; Sat, 27 Sep 2025 12:26:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F41F72D0620;
-	Sat, 27 Sep 2025 07:38:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EEE2C2E0B79;
+	Sat, 27 Sep 2025 12:25:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="MDhzVIrG"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="to8Drjo/"
 X-Original-To: kvm@vger.kernel.org
-Received: from out-189.mta0.migadu.com (out-189.mta0.migadu.com [91.218.175.189])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f44.google.com (mail-wm1-f44.google.com [209.85.128.44])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DDE9F2C3244
-	for <kvm@vger.kernel.org>; Sat, 27 Sep 2025 07:38:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.189
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5AED9253F14
+	for <kvm@vger.kernel.org>; Sat, 27 Sep 2025 12:25:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.44
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758958720; cv=none; b=cxLeyECm09aVs8g/6yVrwjk/sYF0XiJB3keOWIEfCE7myJEW1ULzbGUbbkcimWarj7AptkZP1ebM9dBmDY032j57o2VZUr1c94f1DFQKhdJZvP2U/Yi01usWqthmD37NHk9e10jM9ioh6G6oNvSTphlIwDEblAXQsMC2aykQ+Go=
+	t=1758975941; cv=none; b=iLa5sUVVQnX60xn+bT6TsHjONuG/Fi9SWEb7LmroRj5nILMpuuKURGt2869DtrVvjOFnLSdm23INEWE4Wa0kjjhZqmn1JievNQGhnlFC85aF1PNj3ne1fVStsIDdvtlNS9ibxMulZLsDNdy82ns/S8y+82DHYAsTC3VKxHzAcAA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758958720; c=relaxed/simple;
-	bh=tr3cVw/fHsBObw+4/03vyNgdWXv1m3E2RPdz5cDO+i4=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=fsGxPZ9PqFCnRLIAA5xm7fgCePyjr0t0v0ejZ73xE8nJnpdBAIlylmyVPr/PIuZiQ9d3/U/J81KPK71g9OcGLPhQnieLLCSrbMjKCu7kQ+9FdZOfiDHu+7r/AHqCFcRO7rt773ftg528daEOFPJKwCG15evRokkvKbl0vNrTdX0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=MDhzVIrG; arc=none smtp.client-ip=91.218.175.189
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Message-ID: <be89abc6-97ca-47d8-b8e7-95f58ab9cc67@linux.dev>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1758958715;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=Wr7c37MXYsi1SZjRIiCMW6TvRd9zbqLAteCUC2bU040=;
-	b=MDhzVIrG9XqOhn+X4EyvqT5WFEC48i0ScQW1M2TEQNfH+Abi956kVrFuXVs5+tNbHUeEBS
-	HSH1dZ6zZI6FfoXFd0qRETX0UB3fscW0ypzjqRJvDzeO0w95mYEUlUuw8Y//m8zDINyAux
-	7aMnDrKrTlaK0SG5hxR2LTl6ILFDhs4=
-Date: Sat, 27 Sep 2025 08:38:29 +0100
+	s=arc-20240116; t=1758975941; c=relaxed/simple;
+	bh=Cz0upPHZk9fGBVcjG//ILHjl/qglp8+Tm6tLew6P7q4=;
+	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
+	 Content-Disposition; b=E/52Q82GN5sNmhSOXl/gMBWFwijbkD9ewZzBFwllZMaaPJMzN8xPo6jt83vwTvJM5cbjvdX6F3NFAvXgC7Drn2kjKBan398amrBJrsuXSilgfUUewq71+ojnTN3KjE8lyckBvljCUDoQYEml4IpXBIE0Yu/qHCrIyV9kMNXha3M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=to8Drjo/; arc=none smtp.client-ip=209.85.128.44
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
+Received: by mail-wm1-f44.google.com with SMTP id 5b1f17b1804b1-46b303f7469so20576815e9.1
+        for <kvm@vger.kernel.org>; Sat, 27 Sep 2025 05:25:39 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google; t=1758975938; x=1759580738; darn=vger.kernel.org;
+        h=content-disposition:mime-version:message-id:subject:cc:to:from:date
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=LVhumFC8qskWIHg2JamV1kuMQedk4HSzKMYaXz2FDxs=;
+        b=to8Drjo/JhFxv+tld4alYbgBdCEEm7/fkjY7h9bW15GsawpgkvDMn5lj+kutvhqqxO
+         dCer/i9CHp6V9Kmb59WuPjeMAn9ufcZeJ0cd57Bl1e7JsefhPyMx7266kprebbY+Bg0o
+         f0258PZ6Qi3mVOviarG4UrEY0RvX+8i0Oi/4KlEhNiTbx/0UL3Nx7OBAdUl2eWOTu2p8
+         JdLG8L7GylbtAMxrzPTtLioHxDDnJcEdmYGoqwzoUspFvyEiZKQ1tyjDg9bTJDX6Empf
+         yLm+d/RC/L7JgNON7B93IRCL+k6EmlUZgmNwgPy+gvOD0XJ0A6uKbju5HdqtdlbugRVR
+         55lg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1758975938; x=1759580738;
+        h=content-disposition:mime-version:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=LVhumFC8qskWIHg2JamV1kuMQedk4HSzKMYaXz2FDxs=;
+        b=SSuxnA09LWfvRXOFrJkPD01FfU4O4G4QuxUf6g7qqnGJ34JU23kIAAelFt1D2b8VPs
+         1dwzMyxgyo7+aturxnXYDK9Y59opO5PTRoCecbuMNoK6zbMOC9Aiw0WRPahgX3GBiCq8
+         mnsl8hvSFs1zzs5KRmlV9K2QeHaAaKs7Z/9VFERDfP4rRq0k1z8YYfXhy6dyIbmj/mc7
+         AQsHU7MJ61fgWObXdhtGx9Sd+kZibDi9DLMr7KBJOX/DnBaoOj+8TzgUa9+5kN54dx7c
+         7oWZhDAZcyHBrwWDjJ7bATz9LnsN52vy310i3JfUsI77c8j/xcoxOmaQWo/+U4SKvWtn
+         aW9Q==
+X-Forwarded-Encrypted: i=1; AJvYcCX3IRPBzwYR0IfBE+oPxLnLQhZCOIafHHVL8WbDtjrIZsCbid8ztXfBh+sDxZcgdN4KTNY=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyqYeYsttlI3OuU1MLlGOdJYZ7ykupaE1n39m45YpiM95f4s48Y
+	XYuPx+jq3wnMjq8tEu0MicA2wo9Shj8IGg9jqcb6LRsCORKNkUSLrZkhxw7issizuywaJY3kDS2
+	UEP7P
+X-Gm-Gg: ASbGncupbSwa0yL8LKM3063XbX00WD39n2Jx2zjAPkUYGRLAHdRuCfYHvekwyT0eciw
+	T3WTPyi8LK5KjmIEdBDaGcmcjIZaYYT/SPU/vyai3Jn+SL85y5JklFao3twC1o6Douh62y/QPou
+	AGwA1itgzJxVIgL9xQldy0FdtzWluUREpEfDY2PWgy7WMWaiapMjO0zNoeCsTE/fQPIxRVbsROo
+	whU/Pb8jFw1NGdWVcwSDmF/FSJO0IsclzB4UuOWk8x30a6eIF2u/Uwdtn+McbEDFVQ+PbuFlWYI
+	SVl7obMA49VgJGK3AZgk7X/ln+GJWWQUzPEmt7pFu0UQzcxZhP9xliU9mbRqBJpMVueWepuWwS5
+	epHKWcAwEEfc9mLDi3lm+AxQ7hFJAYicfksgIHCA=
+X-Google-Smtp-Source: AGHT+IH/fs4tI3yUr2ZaBw2ReWMi5Di+AwUxDHPsiDLmiEELtqX2JAh0B0XFiB/cSRsTRtqy4tVX2A==
+X-Received: by 2002:a05:600c:4694:b0:45d:e5ff:e38c with SMTP id 5b1f17b1804b1-46e32a1393cmr95976155e9.32.1758975937784;
+        Sat, 27 Sep 2025 05:25:37 -0700 (PDT)
+Received: from localhost ([196.207.164.177])
+        by smtp.gmail.com with UTF8SMTPSA id ffacd0b85a97d-40fb72fb017sm10713558f8f.3.2025.09.27.05.25.36
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sat, 27 Sep 2025 05:25:37 -0700 (PDT)
+Date: Sat, 27 Sep 2025 15:25:34 +0300
+From: Dan Carpenter <dan.carpenter@linaro.org>
+To: Eugenio =?iso-8859-1?Q?P=E9rez?= <eperezma@redhat.com>
+Cc: "Michael S. Tsirkin" <mst@redhat.com>, Jason Wang <jasowang@redhat.com>,
+	kvm@vger.kernel.org, virtualization@lists.linux.dev,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+	kernel-janitors@vger.kernel.org
+Subject: [PATCH] vhost-vdpa: Set s.num in GET_VRING_GROUP
+Message-ID: <aNfXvrK5EWIL3avR@stanley.mountain>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Subject: Re: [PATCH v7 06/12] KVM: guest_memfd: add module param for disabling
- TLB flushing
-To: David Hildenbrand <david@redhat.com>, Will Deacon <will@kernel.org>
-Cc: Dave Hansen <dave.hansen@intel.com>, "Roy, Patrick"
- <roypat@amazon.co.uk>, "pbonzini@redhat.com" <pbonzini@redhat.com>,
- "corbet@lwn.net" <corbet@lwn.net>, "maz@kernel.org" <maz@kernel.org>,
- "oliver.upton@linux.dev" <oliver.upton@linux.dev>,
- "joey.gouly@arm.com" <joey.gouly@arm.com>,
- "suzuki.poulose@arm.com" <suzuki.poulose@arm.com>,
- "yuzenghui@huawei.com" <yuzenghui@huawei.com>,
- "catalin.marinas@arm.com" <catalin.marinas@arm.com>,
- "tglx@linutronix.de" <tglx@linutronix.de>,
- "mingo@redhat.com" <mingo@redhat.com>, "bp@alien8.de" <bp@alien8.de>,
- "dave.hansen@linux.intel.com" <dave.hansen@linux.intel.com>,
- "x86@kernel.org" <x86@kernel.org>, "hpa@zytor.com" <hpa@zytor.com>,
- "luto@kernel.org" <luto@kernel.org>,
- "peterz@infradead.org" <peterz@infradead.org>,
- "willy@infradead.org" <willy@infradead.org>,
- "akpm@linux-foundation.org" <akpm@linux-foundation.org>,
- "lorenzo.stoakes@oracle.com" <lorenzo.stoakes@oracle.com>,
- "Liam.Howlett@oracle.com" <Liam.Howlett@oracle.com>,
- "vbabka@suse.cz" <vbabka@suse.cz>, "rppt@kernel.org" <rppt@kernel.org>,
- "surenb@google.com" <surenb@google.com>, "mhocko@suse.com"
- <mhocko@suse.com>, "song@kernel.org" <song@kernel.org>,
- "jolsa@kernel.org" <jolsa@kernel.org>, "ast@kernel.org" <ast@kernel.org>,
- "daniel@iogearbox.net" <daniel@iogearbox.net>,
- "andrii@kernel.org" <andrii@kernel.org>,
- "martin.lau@linux.dev" <martin.lau@linux.dev>,
- "eddyz87@gmail.com" <eddyz87@gmail.com>,
- "yonghong.song@linux.dev" <yonghong.song@linux.dev>,
- "john.fastabend@gmail.com" <john.fastabend@gmail.com>,
- "kpsingh@kernel.org" <kpsingh@kernel.org>, "sdf@fomichev.me"
- <sdf@fomichev.me>, "haoluo@google.com" <haoluo@google.com>,
- "jgg@ziepe.ca" <jgg@ziepe.ca>, "jhubbard@nvidia.com" <jhubbard@nvidia.com>,
- "peterx@redhat.com" <peterx@redhat.com>, "jannh@google.com"
- <jannh@google.com>, "pfalcato@suse.de" <pfalcato@suse.de>,
- "shuah@kernel.org" <shuah@kernel.org>, "seanjc@google.com"
- <seanjc@google.com>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
- "linux-doc@vger.kernel.org" <linux-doc@vger.kernel.org>,
- "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
- "linux-arm-kernel@lists.infradead.org"
- <linux-arm-kernel@lists.infradead.org>,
- "kvmarm@lists.linux.dev" <kvmarm@lists.linux.dev>,
- "linux-fsdevel@vger.kernel.org" <linux-fsdevel@vger.kernel.org>,
- "linux-mm@kvack.org" <linux-mm@kvack.org>,
- "bpf@vger.kernel.org" <bpf@vger.kernel.org>,
- "linux-kselftest@vger.kernel.org" <linux-kselftest@vger.kernel.org>,
- "Cali, Marco" <xmarcalx@amazon.co.uk>,
- "Kalyazin, Nikita" <kalyazin@amazon.co.uk>,
- "Thomson, Jack" <jackabt@amazon.co.uk>,
- "derekmn@amazon.co.uk" <derekmn@amazon.co.uk>,
- "tabba@google.com" <tabba@google.com>,
- "ackerleytng@google.com" <ackerleytng@google.com>
-References: <20250924151101.2225820-4-patrick.roy@campus.lmu.de>
- <20250924152214.7292-1-roypat@amazon.co.uk>
- <20250924152214.7292-3-roypat@amazon.co.uk>
- <e25867b6-ffc0-4c7c-9635-9b3f47b186ca@intel.com>
- <c1875a54-0c87-450f-9370-29e7ec4fea3d@redhat.com>
- <82bff1c4-987f-46cb-833c-bd99eaa46e7a@intel.com>
- <c79173d8-6f18-40fa-9621-e691990501e4@redhat.com>
- <c88514c3-e15f-4853-8acf-15e7b4b979f4@linux.dev>
- <aNZwmPFAxm_HRYpC@willie-the-truck>
- <5d11b5f7-3208-4ea8-bbff-f535cf62d576@redhat.com>
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Patrick Roy <patrick.roy@linux.dev>
-Content-Language: en-US
-In-Reply-To: <5d11b5f7-3208-4ea8-bbff-f535cf62d576@redhat.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-Migadu-Flow: FLOW_OUT
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+X-Mailer: git-send-email haha only kidding
 
+The group is supposed to be copied to the user, but it wasn't assigned
+until after the copy_to_user().  Move the "s.num = group;" earlier.
 
+Fixes: ffc3634b6696 ("vduse: add vq group support")
+Signed-off-by: Dan Carpenter <dan.carpenter@linaro.org>
+---
+This goes through the kvm tree I think.
 
-On Fri, 2025-09-26 at 21:09 +0100, David Hildenbrand wrote:
-> On 26.09.25 12:53, Will Deacon wrote:
->> On Fri, Sep 26, 2025 at 10:46:15AM +0100, Patrick Roy wrote:
->>>
->>>
->>> On Thu, 2025-09-25 at 21:13 +0100, David Hildenbrand wrote:
->>>> On 25.09.25 21:59, Dave Hansen wrote:
->>>>> On 9/25/25 12:20, David Hildenbrand wrote:
->>>>>> On 25.09.25 20:27, Dave Hansen wrote:
->>>>>>> On 9/24/25 08:22, Roy, Patrick wrote:
->>>>>>>> Add an option to not perform TLB flushes after direct map manipulations.
->>>>>>>
->>>>>>> I'd really prefer this be left out for now. It's a massive can of worms.
->>>>>>> Let's agree on something that works and has well-defined behavior before
->>>>>>> we go breaking it on purpose.
->>>>>>
->>>>>> May I ask what the big concern here is?
->>>>>
->>>>> It's not a _big_ concern.
->>>>
->>>> Oh, I read "can of worms" and thought there is something seriously problematic :)
->>>>
->>>>> I just think we want to start on something
->>>>> like this as simple, secure, and deterministic as possible.
->>>>
->>>> Yes, I agree. And it should be the default. Less secure would have to be opt-in and documented thoroughly.
->>>
->>> Yes, I am definitely happy to have the 100% secure behavior be the
->>> default, and the skipping of TLB flushes be an opt-in, with thorough
->>> documentation!
->>>
->>> But I would like to include the "skip tlb flushes" option as part of
->>> this patch series straight away, because as I was alluding to in the
->>> commit message, with TLB flushes this is not usable for Firecracker for
->>> performance reasons :(
->>
->> I really don't want that option for arm64. If we're going to bother
->> unmapping from the linear map, we should invalidate the TLB.
-> 
-> Reading "TLB flushes result in a up to 40x elongation of page faults in
-> guest_memfd (scaling with the number of CPU cores), or a 5x elongation
-> of memory population,", I can understand why one would want that optimization :)
-> 
-> @Patrick, couldn't we use fallocate() to preallocate memory and batch the TLB flush within such an operation?
-> 
-> That is, we wouldn't flush after each individual direct-map modification but after multiple ones part of a single operation like fallocate of a larger range.
-> 
-> Likely wouldn't make all use cases happy.
->
+ drivers/vhost/vdpa.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-For Firecracker, we rely a lot on not preallocating _all_ VM memory, and
-trying to ensure only the actual "working set" of a VM is faulted in (we
-pack a lot more VMs onto a physical host than there is actual physical
-memory available). For VMs that are restored from a snapshot, we know
-pretty well what memory needs to be faulted in (that's where @Nikita's
-write syscall comes in), so there we could try such an optimization. But
-for everything else we very much rely on the on-demand nature of guest
-memory allocation (and hence direct map removal). And even right now,
-the long pole performance-wise are these on-demand faults, so really, we
-don't want them to become even slower :(
-
-Also, can we really batch multiple TLB flushes as you suggest? Even if
-pages are at consecutive indices in guest_memfd, they're not guaranteed
-to be continguous physically, e.g. we couldn't just coalesce multiple
-TLB flushes into a single TLB flush of a larger range.
-
-There's probably other things we can try. Backing guest_memfd with
-hugepages would reduce the number TLB flushes by 512x (although not all
-users of Firecracker at Amazon [can] use hugepages).
-
-And I do still wonder if it's possible to have "async TLB flushes" where
-we simply don't wait for the IPI (x86 terminology, not sure what the
-mechanism on arm64 is). Looking at
-smp_call_function_many_cond()/invlpgb_kernel_range_flush() on x86, it
-seems so? Although seems like on ARM it's actually just handled by a
-single instruction (TLBI) and not some interprocess communication
-thingy. Maybe there's a variant that's faster / better for this usecase?
+diff --git a/drivers/vhost/vdpa.c b/drivers/vhost/vdpa.c
+index 6305382eacbb..25ab4d06e559 100644
+--- a/drivers/vhost/vdpa.c
++++ b/drivers/vhost/vdpa.c
+@@ -667,9 +667,9 @@ static long vhost_vdpa_vring_ioctl(struct vhost_vdpa *v, unsigned int cmd,
+ 		group = ops->get_vq_group(vdpa, idx);
+ 		if (group >= vdpa->ngroups || group > U32_MAX || group < 0)
+ 			return -EIO;
+-		else if (copy_to_user(argp, &s, sizeof(s)))
+-			return -EFAULT;
+ 		s.num = group;
++		if (copy_to_user(argp, &s, sizeof(s)))
++			return -EFAULT;
+ 		return 0;
+ 	}
+ 	case VHOST_VDPA_GET_VRING_DESC_GROUP:
+-- 
+2.51.0
 
 
