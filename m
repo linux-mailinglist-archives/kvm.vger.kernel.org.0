@@ -1,49 +1,49 @@
-Return-Path: <kvm+bounces-58940-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-58945-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1819FBA7250
-	for <lists+kvm@lfdr.de>; Sun, 28 Sep 2025 16:52:59 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 602ECBA72A1
+	for <lists+kvm@lfdr.de>; Sun, 28 Sep 2025 16:54:53 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4D2DD3BC9C8
-	for <lists+kvm@lfdr.de>; Sun, 28 Sep 2025 14:52:48 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C95D217B6E7
+	for <lists+kvm@lfdr.de>; Sun, 28 Sep 2025 14:54:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A71E92253B0;
-	Sun, 28 Sep 2025 14:51:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 24AF02E0411;
+	Sun, 28 Sep 2025 14:51:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="YqIHoQ4N"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Q1BG/dW3"
 X-Original-To: kvm@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AFA8B224AFA;
-	Sun, 28 Sep 2025 14:51:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1C4D822FE0E;
+	Sun, 28 Sep 2025 14:51:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1759071080; cv=none; b=b2YkomPWPOPfp+JwFWjDYS1zBfizoO3PtNwBVX105RkkiFfg9qNJSAw0h5E8erbl4Q99GsXUStKDH2dSafCsTqJR7XiRD3IJCag2vDsCMbKU+P+naZgnv6jWUZ9rGHxhXInUoEtu5PPqZhN94w9Dt7irwlHkJjvoTX6FfB9sxDM=
+	t=1759071099; cv=none; b=EWI+gicqhTWv6lZSapPXzLUGtmjdI6t2amIYzUK+QgXUS6RX4+qmjPmJLSEnsMuTcncRbOqs2EUn+OZb0j0TiH9xQHVQvLBIibsPWj6qcHxA4Q8v3pk6dHIKhdLj03jCjjRqrjZ+jEVisRsQjzrryrubh/vMOqI8Xda0CempWUc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1759071080; c=relaxed/simple;
-	bh=UDEaYl0OhzDARj37bjQqJ+X83+RxQVeSHSKiek/uf5Y=;
+	s=arc-20240116; t=1759071099; c=relaxed/simple;
+	bh=isdw6kZ8FFhWQVC3bDpjETrpal4zAOBPlSaTyAj5wzs=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=LW8oJt+qbUBSo5Y6Auq/wC961/EWXhpwi5EB1C6PpyRWJJDrBHTYjt6OWjFeB1ZsYYgZVJd0Upl9i0a+DJYjlYqmPPGdFW8le1SGQEjsI+Cc0lFKLmO66WNz9PT2892P8jmfAmsu3xVEkDVWqTJUUzyfXNbfXCHuG+PB00v/7o0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=YqIHoQ4N; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8D736C4CEF0;
-	Sun, 28 Sep 2025 14:51:18 +0000 (UTC)
+	 MIME-Version; b=g4pnwu9R4UsXCmBHidCPUb1zv0Bx/r2ULTt9E3hE4ehej6RLqMix8maQxMOp4cNqT/fMHNpnleYDWfXc3ro8JBChmrKu6VSIkDcqoXcL34GoVb3SzLNJun1I0THSKXhW6F1z3wKBwTRSHPv3xZ6VaNdxaQnp3MIO4op9mLMlaYQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Q1BG/dW3; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 118CEC4CEF0;
+	Sun, 28 Sep 2025 14:51:36 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1759071079;
-	bh=UDEaYl0OhzDARj37bjQqJ+X83+RxQVeSHSKiek/uf5Y=;
+	s=k20201202; t=1759071097;
+	bh=isdw6kZ8FFhWQVC3bDpjETrpal4zAOBPlSaTyAj5wzs=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=YqIHoQ4NCwYA2j/0dqZsjnS4YacHkAFLqvC2BzXTxNk1PU+2Pnb+U56ixrR26XkD7
-	 e21A0rF+V0VcbfCfRX9x7hRZuU6eVZKx0+aUmIdfb40mIdT7C5HXSN7kHXMzwVpj3S
-	 GpmCFFJuosFftkxWvKxw+NX8sTPYemceGo1wlNKb2VljArjONFW4yFPdcgRi+IxjPv
-	 aXn0G4jaupYmeSAZQQDVTpmh9rqhvKX3t0Jpu9HjAsqwB4p97xuS+sOsYh/LSTCtx9
-	 7ODkalKY3wtAonETDOQ5dDcO90TlZa7mKLv/z3ZUNU9GXFEgwwwdThIqMmBt8VeiSv
-	 fIDfZDfu4c50A==
+	b=Q1BG/dW3MMEpKiBoxWpHfJqeMARlzNFZH44gJGE3WyaIqYUkpbkLrHOlNjgBk8l3B
+	 K79RMwWDzKY9rwjxPRcXy+IWOatSDlm0WNCw9SnR+YljlPfMOgczoa5nlI7oUgi7Sj
+	 UQAoXR3lLhNAd0YivYU3cm4zqXVUpMn2Y5wPoKBwqj8Pvyo9MmIssqLjzYZbl2Wzp4
+	 DMImFauKBxnBz2yeyVgCUoUHvRQWeQqZ5Mfg1IpzBlT0lABuFhG+ttMofLklUfjaoB
+	 mOqn1C7RPLvoON1fae2FqTHSG3ZYzdIqtmvqYciR2Ym3gUFFXWQQfLhFTObif1nKU/
+	 kgGPoeD+32EDg==
 From: Leon Romanovsky <leon@kernel.org>
 To: Alex Williamson <alex.williamson@redhat.com>
-Cc: Leon Romanovsky <leonro@nvidia.com>,
+Cc: Vivek Kasireddy <vivek.kasireddy@intel.com>,
 	Jason Gunthorpe <jgg@nvidia.com>,
 	Andrew Morton <akpm@linux-foundation.org>,
 	Bjorn Helgaas <bhelgaas@google.com>,
@@ -63,11 +63,10 @@ Cc: Leon Romanovsky <leonro@nvidia.com>,
 	Marek Szyprowski <m.szyprowski@samsung.com>,
 	Robin Murphy <robin.murphy@arm.com>,
 	Sumit Semwal <sumit.semwal@linaro.org>,
-	Vivek Kasireddy <vivek.kasireddy@intel.com>,
 	Will Deacon <will@kernel.org>
-Subject: [PATCH v4 05/10] types: move phys_vec definition to common header
-Date: Sun, 28 Sep 2025 17:50:15 +0300
-Message-ID: <755063745aa413d7382dabba9bae91392cc9f1ef.1759070796.git.leon@kernel.org>
+Subject: [PATCH v4 06/10] vfio: Export vfio device get and put registration helpers
+Date: Sun, 28 Sep 2025 17:50:16 +0300
+Message-ID: <40c2a8507c5314f5008e07f4632a7dce3faf69e4.1759070796.git.leon@kernel.org>
 X-Mailer: git-send-email 2.51.0
 In-Reply-To: <cover.1759070796.git.leon@kernel.org>
 References: <cover.1759070796.git.leon@kernel.org>
@@ -79,58 +78,50 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-From: Leon Romanovsky <leonro@nvidia.com>
+From: Vivek Kasireddy <vivek.kasireddy@intel.com>
 
-Move the struct phys_vec definition from block/blk-mq-dma.c to
-include/linux/types.h to make it available for use across the kernel.
+These helpers are useful for managing additional references taken
+on the device from other associated VFIO modules.
 
-The phys_vec structure represents a physical address range with a
-length, which is used by the new physical address-based DMA mapping
-API. This structure is already used by the block layer and will be
-needed by upcoming VFIO patches for dma-buf operations.
-
-Moving this definition to types.h provides a centralized location
-for this common data structure and eliminates code duplication
-across subsystems that need to work with physical address ranges.
-
+Original-patch-by: Jason Gunthorpe <jgg@nvidia.com>
+Signed-off-by: Vivek Kasireddy <vivek.kasireddy@intel.com>
 Signed-off-by: Leon Romanovsky <leonro@nvidia.com>
 ---
- block/blk-mq-dma.c    | 5 -----
- include/linux/types.h | 5 +++++
- 2 files changed, 5 insertions(+), 5 deletions(-)
+ drivers/vfio/vfio_main.c | 2 ++
+ include/linux/vfio.h     | 2 ++
+ 2 files changed, 4 insertions(+)
 
-diff --git a/block/blk-mq-dma.c b/block/blk-mq-dma.c
-index 430e51ec494a..8d2646ab2795 100644
---- a/block/blk-mq-dma.c
-+++ b/block/blk-mq-dma.c
-@@ -5,11 +5,6 @@
- #include <linux/blk-mq-dma.h>
- #include "blk.h"
+diff --git a/drivers/vfio/vfio_main.c b/drivers/vfio/vfio_main.c
+index 5046cae05222..2f0dcec67ffe 100644
+--- a/drivers/vfio/vfio_main.c
++++ b/drivers/vfio/vfio_main.c
+@@ -171,11 +171,13 @@ void vfio_device_put_registration(struct vfio_device *device)
+ 	if (refcount_dec_and_test(&device->refcount))
+ 		complete(&device->comp);
+ }
++EXPORT_SYMBOL_GPL(vfio_device_put_registration);
  
--struct phys_vec {
--	phys_addr_t	paddr;
--	u32		len;
--};
--
- static bool blk_map_iter_next(struct request *req, struct req_iterator *iter,
- 			      struct phys_vec *vec)
+ bool vfio_device_try_get_registration(struct vfio_device *device)
  {
-diff --git a/include/linux/types.h b/include/linux/types.h
-index 6dfdb8e8e4c3..2bc56681b2e6 100644
---- a/include/linux/types.h
-+++ b/include/linux/types.h
-@@ -170,6 +170,11 @@ typedef u64 phys_addr_t;
- typedef u32 phys_addr_t;
- #endif
- 
-+struct phys_vec {
-+	phys_addr_t	paddr;
-+	u32		len;
-+};
-+
- typedef phys_addr_t resource_size_t;
+ 	return refcount_inc_not_zero(&device->refcount);
+ }
++EXPORT_SYMBOL_GPL(vfio_device_try_get_registration);
  
  /*
+  * VFIO driver API
+diff --git a/include/linux/vfio.h b/include/linux/vfio.h
+index eb563f538dee..217ba4ef1752 100644
+--- a/include/linux/vfio.h
++++ b/include/linux/vfio.h
+@@ -297,6 +297,8 @@ static inline void vfio_put_device(struct vfio_device *device)
+ int vfio_register_group_dev(struct vfio_device *device);
+ int vfio_register_emulated_iommu_dev(struct vfio_device *device);
+ void vfio_unregister_group_dev(struct vfio_device *device);
++bool vfio_device_try_get_registration(struct vfio_device *device);
++void vfio_device_put_registration(struct vfio_device *device);
+ 
+ int vfio_assign_device_set(struct vfio_device *device, void *set_id);
+ unsigned int vfio_device_set_open_count(struct vfio_device_set *dev_set);
 -- 
 2.51.0
 
