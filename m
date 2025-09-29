@@ -1,280 +1,320 @@
-Return-Path: <kvm+bounces-58977-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-58978-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 725D1BA8D90
-	for <lists+kvm@lfdr.de>; Mon, 29 Sep 2025 12:16:17 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id E7914BA8E00
+	for <lists+kvm@lfdr.de>; Mon, 29 Sep 2025 12:21:34 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 023121C09DB
-	for <lists+kvm@lfdr.de>; Mon, 29 Sep 2025 10:16:12 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E93C93C3A9D
+	for <lists+kvm@lfdr.de>; Mon, 29 Sep 2025 10:21:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 35C942FB615;
-	Mon, 29 Sep 2025 10:16:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B65942FBDF6;
+	Mon, 29 Sep 2025 10:21:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="BqBblMkL"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="I/2ztV8i"
 X-Original-To: kvm@vger.kernel.org
-Received: from out-174.mta1.migadu.com (out-174.mta1.migadu.com [95.215.58.174])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 41AF02FB614
-	for <kvm@vger.kernel.org>; Mon, 29 Sep 2025 10:15:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.174
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DD3A22FB97D
+	for <kvm@vger.kernel.org>; Mon, 29 Sep 2025 10:21:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1759140961; cv=none; b=RZ9G/QiXJhA3F9oEoMoX/DrfbZ2DRl5sKnIImCaHPx44IwETEKZLPjg5u7DH3fpHtARgQMEygTM+MI2529fEbGChxPBfdx30lrPaptVJDIWC0V1+SzbY20aLQhGEPSLLhxRzPmDh+15yi6qEEo1rFfC/soicRHEmXFatLq5zsok=
+	t=1759141278; cv=none; b=RC9mdTUXoQJiWF2FgYkX+8wIMHd0DQ2NBhuZR17bT8RoIrdLRlySZ1lJmo6AlUWldaKcEnKkYSMGhbl8IT7+YkL4sh6oAtocPobpPvBXxghMJS0vwOWM0UMcdb+WSnzdZZq+u8b6Hy91c4ZkXK/duIRbjP/1JGB/3P+SLSEvRrY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1759140961; c=relaxed/simple;
-	bh=YYKtnBG7DvxX4aTBPyhm4b+c2rtgas+o8iFNzcgvYtY=;
+	s=arc-20240116; t=1759141278; c=relaxed/simple;
+	bh=WcvQCY0+UwCaIb6eCl0gssuyRiHF3sXxtaZi0SsyUzg=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=lCRwtrnXrXtGbNZeGlKGcOIZ41Ih2+NUnO/NO8ZZRnEUES5tEKiE//1NCpVvMHWR4iY/78ZLIfoQF1N6FYJVkK89qmWe/TNqNWOthARX7aPhPcVVOLk9BPWhluU2YmgkMuXKhnGqjMfobUWgHTLdfNurDkmGkq715uTxRTb68ac=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=BqBblMkL; arc=none smtp.client-ip=95.215.58.174
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Message-ID: <a4976f04-959d-48ae-9815-d192365bdcc6@linux.dev>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1759140957;
+	 In-Reply-To:Content-Type; b=Uh1z+mVojatcEBHmjnLIVDjUKwnBZWJeS/xR7lW3wujfHLN0jximWd8GJjsz3lH66bShWbScUNlXVI2DpLVEolcsq4fFhuw1MHVU+gs/0jjlQR4eSZUtxY7hMPsWpJsT27YRbOcg+Tai3VTN4h7swt2xus+9z69R3JmrcmdJ4Ew=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=I/2ztV8i; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1759141276;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=HwnJt8i9Iujn1Yt70yEqGIwxGoXk6PzwRTGqmZBuEhQ=;
-	b=BqBblMkL0mPwfSTpqlxysaRrshHH3+KjeoE+mf9gTvi5Z//0AKEkyjXDfviGDUBs6+4LQV
-	cRDTsaGXn2WgMZnbwk35t0ZbYVbV9jhTM4PSGyj54M9v4xhGWTafEIJ7R93jjg+JW9YKNR
-	GJKPxxdsfVEWsZm/8T4PRgJ7OaV4km0=
-Date: Mon, 29 Sep 2025 11:15:54 +0100
+	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+	bh=Z3YKN3zIRZfonnEHUxLu7FAkkWR5YdTCLJYZ6VEYM8Y=;
+	b=I/2ztV8iLJgHykIkti2567/E+eovdeTL+W4TL7WAgUCJfirK80rfu/CuTT5D46iVNMZmwF
+	MmSqUBpwb+9qpa1jCMdaxstQXFCas9ucWviQYe6QjfowCYv8FLMIEp5A+pfFVaE0IZw9qy
+	JKxg2k511TiN57lChuu5Sb+ZYIm8oYI=
+Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
+ [209.85.221.72]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-224-j2FdJSSHPRitEHMsoHsa1A-1; Mon, 29 Sep 2025 06:21:14 -0400
+X-MC-Unique: j2FdJSSHPRitEHMsoHsa1A-1
+X-Mimecast-MFC-AGG-ID: j2FdJSSHPRitEHMsoHsa1A_1759141273
+Received: by mail-wr1-f72.google.com with SMTP id ffacd0b85a97d-3f3c118cbb3so2848881f8f.3
+        for <kvm@vger.kernel.org>; Mon, 29 Sep 2025 03:21:14 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1759141273; x=1759746073;
+        h=content-transfer-encoding:in-reply-to:autocrypt:content-language
+         :from:references:cc:to:subject:user-agent:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=Z3YKN3zIRZfonnEHUxLu7FAkkWR5YdTCLJYZ6VEYM8Y=;
+        b=NBS7pp8byVgZ4T9OFHmLLcTbtKoioIGj3BEZa6oz4n0eN5eGJuRTysgPgPttbct3w9
+         RnrW5KwOZ1wVQ2WcyW8kIWTVIsbqY9rZieH7CBhp/v0sBodl+Gqs9U8AQMHmP2smlrVW
+         ef3GnlQYKr2sC0cseOC+CzAOKUZcTHmWubKY8cEBv6HtrYtXhbA/Uukj/dqD+YEbnvmu
+         LIy/GMHAN9ttl2ugr6wPanxWCHdjNNNc22dZP7p9DJzkZ4/IdA0ONwqZteFGQmKGNZ5h
+         SBReD3JzWzuOlSdHlYrFtLODvy4Hf5nzQtGCihzb/HBxWmnvZcmBrWgMM0Q6blW2Xzw7
+         YMPw==
+X-Forwarded-Encrypted: i=1; AJvYcCWP3KtSOat2XvPYHHxVGmmGyYKXDKSa5JhPz0aF68JHFVHtPahvK33ZM8lz4cWd/TkaAf4=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxHNxzejoWTiz62wgdAzgVENNiUsx4lp+AeApF492EtROkNsRX6
+	WPgFdEbMGSpYoxmdXVTPLgVNXBNc218SBTrM7t+WF6SJf4Vi93LLgcZ79bMm6kLQj4QV+baw6p8
+	pbst+5tRMDRpX8mOwRVwozcDP+DnfnFwuYxvrSXN43K9suvnSKA3MiQ==
+X-Gm-Gg: ASbGncs70krG/LYtb2HEflfWeyiVV9DO72zez00B4s15v+xNvwTtsCJ6D/YXA7RFLSi
+	UFz2N8usjAIP/u5emJ/Sen/+3WnxvOatRhkIe8J6M16KbJEEVeM/AXFalJC3+fbvGNyivLaEMcT
+	+kd/jzd36IZvsRqaYZx9PEuDdPVB/knPCRLqQ9veSUOHaYyjLNUdoe1XX6ATz04JBNZltTcMM9k
+	ZyfdWv/HTpjxN48lZviPFzNUehpY/SMc+SvCVrrbBUzmLukx262jjI+TxOPWA6xT7HxsLuLDdjv
+	hNdhTDEvQkMRaSgoOkvf3GIsThyNHRpDzusfm6SjKsWLDj/YSKOERSrA5i4aNbZOzVtcUDK3
+X-Received: by 2002:a05:6000:2410:b0:3ec:d80d:e59b with SMTP id ffacd0b85a97d-40e4354d936mr17146005f8f.10.1759141273238;
+        Mon, 29 Sep 2025 03:21:13 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IHseD/VRuRD8/5XkmKc+WsswLQN2PeBfIKRcSn+dzEpfuntBaoyeW14SJHlBROwxevLjLT9Aw==
+X-Received: by 2002:a05:6000:2410:b0:3ec:d80d:e59b with SMTP id ffacd0b85a97d-40e4354d936mr17145899f8f.10.1759141272561;
+        Mon, 29 Sep 2025 03:21:12 -0700 (PDT)
+Received: from [192.168.3.141] (p4ff1fa94.dip0.t-ipconnect.de. [79.241.250.148])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-40fc5603161sm17745080f8f.35.2025.09.29.03.21.10
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 29 Sep 2025 03:21:11 -0700 (PDT)
+Message-ID: <f13e06f3-3c7b-4993-b33a-a6921c14231b@redhat.com>
+Date: Mon, 29 Sep 2025 12:20:57 +0200
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Subject: Re: [PATCH 1/6] KVM: guest_memfd: Add DEFAULT_SHARED flag, reject
- user page faults if not set
-To: Ackerley Tng <ackerleytng@google.com>, Fuad Tabba <tabba@google.com>,
- Sean Christopherson <seanjc@google.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>,
- Christian Borntraeger <borntraeger@linux.ibm.com>,
- Janosch Frank <frankja@linux.ibm.com>,
- Claudio Imbrenda <imbrenda@linux.ibm.com>, kvm@vger.kernel.org,
- linux-kernel@vger.kernel.org, David Hildenbrand <david@redhat.com>,
- "Kalyazin, Nikita" <kalyazin@amazon.co.uk>, shivankg@amd.com
-References: <20250926163114.2626257-1-seanjc@google.com>
- <20250926163114.2626257-2-seanjc@google.com>
- <CA+EHjTzdX8+MbsYOHAJn6Gkayfei-jE6Q_5HfZhnfwnMijmucw@mail.gmail.com>
- <diqz7bxh386h.fsf@google.com>
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Patrick Roy <patrick.roy@linux.dev>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v7 06/12] KVM: guest_memfd: add module param for disabling
+ TLB flushing
+To: Patrick Roy <patrick.roy@linux.dev>, Will Deacon <will@kernel.org>
+Cc: Dave Hansen <dave.hansen@intel.com>, "Roy, Patrick"
+ <roypat@amazon.co.uk>, "pbonzini@redhat.com" <pbonzini@redhat.com>,
+ "corbet@lwn.net" <corbet@lwn.net>, "maz@kernel.org" <maz@kernel.org>,
+ "oliver.upton@linux.dev" <oliver.upton@linux.dev>,
+ "joey.gouly@arm.com" <joey.gouly@arm.com>,
+ "suzuki.poulose@arm.com" <suzuki.poulose@arm.com>,
+ "yuzenghui@huawei.com" <yuzenghui@huawei.com>,
+ "catalin.marinas@arm.com" <catalin.marinas@arm.com>,
+ "tglx@linutronix.de" <tglx@linutronix.de>,
+ "mingo@redhat.com" <mingo@redhat.com>, "bp@alien8.de" <bp@alien8.de>,
+ "dave.hansen@linux.intel.com" <dave.hansen@linux.intel.com>,
+ "x86@kernel.org" <x86@kernel.org>, "hpa@zytor.com" <hpa@zytor.com>,
+ "luto@kernel.org" <luto@kernel.org>,
+ "peterz@infradead.org" <peterz@infradead.org>,
+ "willy@infradead.org" <willy@infradead.org>,
+ "akpm@linux-foundation.org" <akpm@linux-foundation.org>,
+ "lorenzo.stoakes@oracle.com" <lorenzo.stoakes@oracle.com>,
+ "Liam.Howlett@oracle.com" <Liam.Howlett@oracle.com>,
+ "vbabka@suse.cz" <vbabka@suse.cz>, "rppt@kernel.org" <rppt@kernel.org>,
+ "surenb@google.com" <surenb@google.com>, "mhocko@suse.com"
+ <mhocko@suse.com>, "song@kernel.org" <song@kernel.org>,
+ "jolsa@kernel.org" <jolsa@kernel.org>, "ast@kernel.org" <ast@kernel.org>,
+ "daniel@iogearbox.net" <daniel@iogearbox.net>,
+ "andrii@kernel.org" <andrii@kernel.org>,
+ "martin.lau@linux.dev" <martin.lau@linux.dev>,
+ "eddyz87@gmail.com" <eddyz87@gmail.com>,
+ "yonghong.song@linux.dev" <yonghong.song@linux.dev>,
+ "john.fastabend@gmail.com" <john.fastabend@gmail.com>,
+ "kpsingh@kernel.org" <kpsingh@kernel.org>, "sdf@fomichev.me"
+ <sdf@fomichev.me>, "haoluo@google.com" <haoluo@google.com>,
+ "jgg@ziepe.ca" <jgg@ziepe.ca>, "jhubbard@nvidia.com" <jhubbard@nvidia.com>,
+ "peterx@redhat.com" <peterx@redhat.com>, "jannh@google.com"
+ <jannh@google.com>, "pfalcato@suse.de" <pfalcato@suse.de>,
+ "shuah@kernel.org" <shuah@kernel.org>, "seanjc@google.com"
+ <seanjc@google.com>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+ "linux-doc@vger.kernel.org" <linux-doc@vger.kernel.org>,
+ "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+ "linux-arm-kernel@lists.infradead.org"
+ <linux-arm-kernel@lists.infradead.org>,
+ "kvmarm@lists.linux.dev" <kvmarm@lists.linux.dev>,
+ "linux-fsdevel@vger.kernel.org" <linux-fsdevel@vger.kernel.org>,
+ "linux-mm@kvack.org" <linux-mm@kvack.org>,
+ "bpf@vger.kernel.org" <bpf@vger.kernel.org>,
+ "linux-kselftest@vger.kernel.org" <linux-kselftest@vger.kernel.org>,
+ "Cali, Marco" <xmarcalx@amazon.co.uk>,
+ "Kalyazin, Nikita" <kalyazin@amazon.co.uk>,
+ "Thomson, Jack" <jackabt@amazon.co.uk>,
+ "derekmn@amazon.co.uk" <derekmn@amazon.co.uk>,
+ "tabba@google.com" <tabba@google.com>,
+ "ackerleytng@google.com" <ackerleytng@google.com>
+References: <20250924151101.2225820-4-patrick.roy@campus.lmu.de>
+ <20250924152214.7292-1-roypat@amazon.co.uk>
+ <20250924152214.7292-3-roypat@amazon.co.uk>
+ <e25867b6-ffc0-4c7c-9635-9b3f47b186ca@intel.com>
+ <c1875a54-0c87-450f-9370-29e7ec4fea3d@redhat.com>
+ <82bff1c4-987f-46cb-833c-bd99eaa46e7a@intel.com>
+ <c79173d8-6f18-40fa-9621-e691990501e4@redhat.com>
+ <c88514c3-e15f-4853-8acf-15e7b4b979f4@linux.dev>
+ <aNZwmPFAxm_HRYpC@willie-the-truck>
+ <5d11b5f7-3208-4ea8-bbff-f535cf62d576@redhat.com>
+ <be89abc6-97ca-47d8-b8e7-95f58ab9cc67@linux.dev>
+From: David Hildenbrand <david@redhat.com>
 Content-Language: en-US
-In-Reply-To: <diqz7bxh386h.fsf@google.com>
-Content-Type: text/plain; charset=UTF-8
+Autocrypt: addr=david@redhat.com; keydata=
+ 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
+ qIws/H2t
+In-Reply-To: <be89abc6-97ca-47d8-b8e7-95f58ab9cc67@linux.dev>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
-X-Migadu-Flow: FLOW_OUT
 
-Hi Ackerley!
+On 27.09.25 09:38, Patrick Roy wrote:
+> 
+> 
+> On Fri, 2025-09-26 at 21:09 +0100, David Hildenbrand wrote:
+>> On 26.09.25 12:53, Will Deacon wrote:
+>>> On Fri, Sep 26, 2025 at 10:46:15AM +0100, Patrick Roy wrote:
+>>>>
+>>>>
+>>>> On Thu, 2025-09-25 at 21:13 +0100, David Hildenbrand wrote:
+>>>>> On 25.09.25 21:59, Dave Hansen wrote:
+>>>>>> On 9/25/25 12:20, David Hildenbrand wrote:
+>>>>>>> On 25.09.25 20:27, Dave Hansen wrote:
+>>>>>>>> On 9/24/25 08:22, Roy, Patrick wrote:
+>>>>>>>>> Add an option to not perform TLB flushes after direct map manipulations.
+>>>>>>>>
+>>>>>>>> I'd really prefer this be left out for now. It's a massive can of worms.
+>>>>>>>> Let's agree on something that works and has well-defined behavior before
+>>>>>>>> we go breaking it on purpose.
+>>>>>>>
+>>>>>>> May I ask what the big concern here is?
+>>>>>>
+>>>>>> It's not a _big_ concern.
+>>>>>
+>>>>> Oh, I read "can of worms" and thought there is something seriously problematic :)
+>>>>>
+>>>>>> I just think we want to start on something
+>>>>>> like this as simple, secure, and deterministic as possible.
+>>>>>
+>>>>> Yes, I agree. And it should be the default. Less secure would have to be opt-in and documented thoroughly.
+>>>>
+>>>> Yes, I am definitely happy to have the 100% secure behavior be the
+>>>> default, and the skipping of TLB flushes be an opt-in, with thorough
+>>>> documentation!
+>>>>
+>>>> But I would like to include the "skip tlb flushes" option as part of
+>>>> this patch series straight away, because as I was alluding to in the
+>>>> commit message, with TLB flushes this is not usable for Firecracker for
+>>>> performance reasons :(
+>>>
+>>> I really don't want that option for arm64. If we're going to bother
+>>> unmapping from the linear map, we should invalidate the TLB.
+>>
+>> Reading "TLB flushes result in a up to 40x elongation of page faults in
+>> guest_memfd (scaling with the number of CPU cores), or a 5x elongation
+>> of memory population,", I can understand why one would want that optimization :)
+>>
+>> @Patrick, couldn't we use fallocate() to preallocate memory and batch the TLB flush within such an operation?
+>>
+>> That is, we wouldn't flush after each individual direct-map modification but after multiple ones part of a single operation like fallocate of a larger range.
+>>
+>> Likely wouldn't make all use cases happy.
+>>
+> 
+> For Firecracker, we rely a lot on not preallocating _all_ VM memory, and
+> trying to ensure only the actual "working set" of a VM is faulted in (we
+> pack a lot more VMs onto a physical host than there is actual physical
+> memory available). For VMs that are restored from a snapshot, we know
+> pretty well what memory needs to be faulted in (that's where @Nikita's
+> write syscall comes in), so there we could try such an optimization. But
+> for everything else we very much rely on the on-demand nature of guest
+> memory allocation (and hence direct map removal). And even right now,
+> the long pole performance-wise are these on-demand faults, so really, we
+> don't want them to become even slower :(
 
-On Mon, 2025-09-29 at 10:43 +0100, Ackerley Tng wrote:
-> Fuad Tabba <tabba@google.com> writes:
-> 
->> Hi Sean,
->>
->> On Fri, 26 Sept 2025 at 17:31, Sean Christopherson <seanjc@google.com> wrote:
->>>
->>> Add a guest_memfd flag to allow userspace to state that the underlying
->>> memory should be configured to be shared by default, and reject user page
->>> faults if the guest_memfd instance's memory isn't shared by default.
->>> Because KVM doesn't yet support in-place private<=>shared conversions, all
->>> guest_memfd memory effectively follows the default state.
->>>
->>> Alternatively, KVM could deduce the default state based on MMAP, which for
->>> all intents and purposes is what KVM currently does.  However, implicitly
->>> deriving the default state based on MMAP will result in a messy ABI when
->>> support for in-place conversions is added.
->>>
->>> For x86 CoCo VMs, which don't yet support MMAP, memory is currently private
->>> by default (otherwise the memory would be unusable).  If MMAP implies
->>> memory is shared by default, then the default state for CoCo VMs will vary
->>> based on MMAP, and from userspace's perspective, will change when in-place
->>> conversion support is added.  I.e. to maintain guest<=>host ABI, userspace
->>> would need to immediately convert all memory from shared=>private, which
->>> is both ugly and inefficient.  The inefficiency could be avoided by adding
->>> a flag to state that memory is _private_ by default, irrespective of MMAP,
->>> but that would lead to an equally messy and hard to document ABI.
->>>
->>> Bite the bullet and immediately add a flag to control the default state so
->>> that the effective behavior is explicit and straightforward.
->>>
-> 
-> I like having this flag, but didn't propose this because I thought folks
-> depending on the default being shared (Patrick/Nikita) might have their
-> usage broken.
+Makes sense. I guess even without support for large folios one could 
+implement a kind of "fault" around: for example, on access to one addr, 
+allocate+prepare all pages in the same 2 M chunk, flushing the tlb only 
+once after adjusting all the direct map entries.
 
-We'll just need to pass the new flag in Firecracker, that's not a problem
-at all :) We aren't running this anywhere in production yet, so nothing
-would break on our end.
+> 
+> Also, can we really batch multiple TLB flushes as you suggest? Even if
+> pages are at consecutive indices in guest_memfd, they're not guaranteed
+> to be continguous physically, e.g. we couldn't just coalesce multiple
+> TLB flushes into a single TLB flush of a larger range.
 
->>> Fixes: 3d3a04fad25a ("KVM: Allow and advertise support for host mmap() on guest_memfd files")
->>> Cc: David Hildenbrand <david@redhat.com>
->>> Cc: Fuad Tabba <tabba@google.com>
->>> Signed-off-by: Sean Christopherson <seanjc@google.com>
->>> ---
->>>  Documentation/virt/kvm/api.rst                 | 10 ++++++++--
->>>  include/uapi/linux/kvm.h                       |  3 ++-
->>>  tools/testing/selftests/kvm/guest_memfd_test.c |  5 +++--
->>>  virt/kvm/guest_memfd.c                         |  6 +++++-
->>>  4 files changed, 18 insertions(+), 6 deletions(-)
->>>
->>> diff --git a/Documentation/virt/kvm/api.rst b/Documentation/virt/kvm/api.rst
->>> index c17a87a0a5ac..4dfe156bbe3c 100644
->>> --- a/Documentation/virt/kvm/api.rst
->>> +++ b/Documentation/virt/kvm/api.rst
->>> @@ -6415,8 +6415,14 @@ guest_memfd range is not allowed (any number of memory regions can be bound to
->>>  a single guest_memfd file, but the bound ranges must not overlap).
->>>
->>>  When the capability KVM_CAP_GUEST_MEMFD_MMAP is supported, the 'flags' field
->>> -supports GUEST_MEMFD_FLAG_MMAP.  Setting this flag on guest_memfd creation
->>> -enables mmap() and faulting of guest_memfd memory to host userspace.
->>> +supports GUEST_MEMFD_FLAG_MMAP and  GUEST_MEMFD_FLAG_DEFAULT_SHARED.  Setting
->>
->> There's an extra space between `and` and `GUEST_MEMFD_FLAG_DEFAULT_SHARED`.
->>
-> 
-> +1 on this. Also, would you consider putting the concept of "at creation
-> time" or "at initialization time" into the name of the flag?
-> 
-> "Default" could be interpreted as "whenever a folio is allocated for
-> this guest_memfd", the memory the folio represents is by default
-> shared.
-> 
-> What we want to represent is that when the guest_memfd is created,
-> memory at all indices are initialized as shared.
-> 
-> Looking a bit further, when conversion is supported, if this flag is not
-> specified, then all the indices are initialized as private, right?
-> 
->>> +the MMAP flag on guest_memfd creation enables mmap() and faulting of guest_memfd
->>> +memory to host userspace (so long as the memory is currently shared).  Setting
->>> +DEFAULT_SHARED makes all guest_memfd memory shared by default (versus private
->>> +by default).  Note!  Because KVM doesn't yet support in-place private<=>shared
->>> +conversions, DEFAULT_SHARED must be specified in order to fault memory into
->>> +userspace page tables.  This limitation will go away when in-place conversions
->>> +are supported.
->>
->> I think that a more accurate (and future proof) description of the
->> mmap flag could be something along the lines of:
->>
-> 
-> +1 on these suggestions, I agree that making the concepts of SHARED vs
-> MMAP orthogonal from the start is more future proof.
-> 
->> + Setting GUEST_MEMFD_FLAG_MMAP enables using mmap() on the file descriptor.
->>
->> + Setting GUEST_MEMFD_FLAG_DEFAULT_SHARED makes all memory in the file shared
->> + by default
-> 
-> See above, I'd prefer clarifying this as "at initialization time" or
-> something similar.
-> 
->> , as opposed to private. Shared memory can be faulted into host
->> + userspace page tables. Private memory cannot.
->>
->>>  When the KVM MMU performs a PFN lookup to service a guest fault and the backing
->>>  guest_memfd has the GUEST_MEMFD_FLAG_MMAP set, then the fault will always be
->>> diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
->>> index 6efa98a57ec1..38a2c083b6aa 100644
->>> --- a/include/uapi/linux/kvm.h
->>> +++ b/include/uapi/linux/kvm.h
->>> @@ -1599,7 +1599,8 @@ struct kvm_memory_attributes {
->>>  #define KVM_MEMORY_ATTRIBUTE_PRIVATE           (1ULL << 3)
->>>
->>>  #define KVM_CREATE_GUEST_MEMFD _IOWR(KVMIO,  0xd4, struct kvm_create_guest_memfd)
->>> -#define GUEST_MEMFD_FLAG_MMAP  (1ULL << 0)
->>> +#define GUEST_MEMFD_FLAG_MMAP          (1ULL << 0)
->>> +#define GUEST_MEMFD_FLAG_DEFAULT_SHARED        (1ULL << 1)
->>>
->>>  struct kvm_create_guest_memfd {
->>>         __u64 size;
->>> diff --git a/tools/testing/selftests/kvm/guest_memfd_test.c b/tools/testing/selftests/kvm/guest_memfd_test.c
->>> index b3ca6737f304..81b11a958c7a 100644
->>> --- a/tools/testing/selftests/kvm/guest_memfd_test.c
->>> +++ b/tools/testing/selftests/kvm/guest_memfd_test.c
->>> @@ -274,7 +274,7 @@ static void test_guest_memfd(unsigned long vm_type)
->>>         vm = vm_create_barebones_type(vm_type);
->>>
->>>         if (vm_check_cap(vm, KVM_CAP_GUEST_MEMFD_MMAP))
->>> -               flags |= GUEST_MEMFD_FLAG_MMAP;
->>> +               flags |= GUEST_MEMFD_FLAG_MMAP | GUEST_MEMFD_FLAG_DEFAULT_SHARED;
->>>
->>>         test_create_guest_memfd_multiple(vm);
->>>         test_create_guest_memfd_invalid_sizes(vm, flags, page_size);
->>> @@ -337,7 +337,8 @@ static void test_guest_memfd_guest(void)
->>>                     "Default VM type should always support guest_memfd mmap()");
->>>
->>>         size = vm->page_size;
->>> -       fd = vm_create_guest_memfd(vm, size, GUEST_MEMFD_FLAG_MMAP);
->>> +       fd = vm_create_guest_memfd(vm, size, GUEST_MEMFD_FLAG_MMAP |
->>> +                                            GUEST_MEMFD_FLAG_DEFAULT_SHARED);
->>>         vm_set_user_memory_region2(vm, slot, KVM_MEM_GUEST_MEMFD, gpa, size, NULL, fd, 0);
->>>
->>>         mem = mmap(NULL, size, PROT_READ | PROT_WRITE, MAP_SHARED, fd, 0);
->>> diff --git a/virt/kvm/guest_memfd.c b/virt/kvm/guest_memfd.c
->>> index 08a6bc7d25b6..19f05a45be04 100644
->>> --- a/virt/kvm/guest_memfd.c
->>> +++ b/virt/kvm/guest_memfd.c
->>> @@ -328,6 +328,9 @@ static vm_fault_t kvm_gmem_fault_user_mapping(struct vm_fault *vmf)
->>>         if (((loff_t)vmf->pgoff << PAGE_SHIFT) >= i_size_read(inode))
->>>                 return VM_FAULT_SIGBUS;
->>>
->>> +       if (!((u64)inode->i_private & GUEST_MEMFD_FLAG_DEFAULT_SHARED))
->>> +               return VM_FAULT_SIGBUS;
->>> +
->>>         folio = kvm_gmem_get_folio(inode, vmf->pgoff);
->>>         if (IS_ERR(folio)) {
->>>                 int err = PTR_ERR(folio);
->>> @@ -525,7 +528,8 @@ int kvm_gmem_create(struct kvm *kvm, struct kvm_create_guest_memfd *args)
->>>         u64 valid_flags = 0;
->>>
->>>         if (kvm_arch_supports_gmem_mmap(kvm))
->>> -               valid_flags |= GUEST_MEMFD_FLAG_MMAP;
->>> +               valid_flags |= GUEST_MEMFD_FLAG_MMAP |
->>> +                              GUEST_MEMFD_FLAG_DEFAULT_SHARED;
->>
->> At least for now, GUEST_MEMFD_FLAG_DEFAULT_SHARED and
->> GUEST_MEMFD_FLAG_MMAP don't make sense without each other. Is it worth
->> checking for that, at least until we have in-place conversion? Having
->> only GUEST_MEMFD_FLAG_DEFAULT_SHARED set, but GUEST_MEMFD_FLAG_MMAP,
->> isn't a useful combination.
->>
-> 
-> I think it's okay to have the two flags be orthogonal from the start.
+Well, you there is the option on just flushing the complete tlb of 
+course :) When trying to flush a range you would indeed run into the 
+problem of flushing an ever growing range.
 
-I think I dimly remember someone at one of the guest_memfd syncs
-bringing up a usecase for having a VMA even if all memory is private,
-not for faulting anything in, but to do madvise or something? Maybe it
-was the NUMA stuff? (+Shivank)
-
-So for that, having the flags be orthogonal would be useful even without
-conversion support.
-
-> Reviewed-by: Ackerley Tng <ackerleytng@google.com>
 > 
->> That said, these are all nits, I'll leave it to you. With that:
->>
->> Reviewed-by: Fuad Tabba <tabba@google.com>
->> Tested-by: Fuad Tabba <tabba@google.com>
->>
->> Cheers,
->> /fuad
->>
->>
->>
->>>
->>>         if (flags & ~valid_flags)
->>>                 return -EINVAL;
->>> --
->>> 2.51.0.536.g15c5d4f767-goog
->>>
+> There's probably other things we can try. Backing guest_memfd with
+> hugepages would reduce the number TLB flushes by 512x (although not all
+> users of Firecracker at Amazon [can] use hugepages).
 
-Best,
-Patrick
+Right.
+
+> 
+> And I do still wonder if it's possible to have "async TLB flushes" where
+> we simply don't wait for the IPI (x86 terminology, not sure what the
+> mechanism on arm64 is). Looking at
+> smp_call_function_many_cond()/invlpgb_kernel_range_flush() on x86, it
+> seems so? Although seems like on ARM it's actually just handled by a
+> single instruction (TLBI) and not some interprocess communication
+> thingy. Maybe there's a variant that's faster / better for this usecase?
+
+Right, some architectures (and IIRC also x86 with some extension) are 
+able to flush remote TLBs without IPIs.
+
+Doing a quick search, there seems to be some research on async TLB 
+flushing, e.g., [1].
+
+In the context here, I wonder whether an async TLB flush would be 
+significantly better than not doing an explicit TLB flush: in both 
+cases, it's not really deterministic when the relevant TLB entries will 
+vanish: with the async variant it might happen faster on average I guess.
+
+
+[1] https://cs.yale.edu/homes/abhishek/kumar-taco20.pdf
+
+-- 
+Cheers
+
+David / dhildenb
+
 
