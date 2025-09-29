@@ -1,154 +1,226 @@
-Return-Path: <kvm+bounces-59014-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-59015-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 53197BAA019
-	for <lists+kvm@lfdr.de>; Mon, 29 Sep 2025 18:23:01 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id EB6C2BAA105
+	for <lists+kvm@lfdr.de>; Mon, 29 Sep 2025 18:54:48 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C83513AFBE8
-	for <lists+kvm@lfdr.de>; Mon, 29 Sep 2025 16:22:59 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 4627D7A420B
+	for <lists+kvm@lfdr.de>; Mon, 29 Sep 2025 16:53:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2E08330C345;
-	Mon, 29 Sep 2025 16:22:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 084943064A4;
+	Mon, 29 Sep 2025 16:54:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="AqJIZNl/"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="H/vLG15J"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.20])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pj1-f73.google.com (mail-pj1-f73.google.com [209.85.216.73])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CD91B1426C;
-	Mon, 29 Sep 2025 16:22:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.20
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 84FE53093A6
+	for <kvm@vger.kernel.org>; Mon, 29 Sep 2025 16:54:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.73
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1759162971; cv=none; b=P/Ugr2cWWsnFcmcpEXo3ANz2B2Hp9cXIPBQ4nk3288omLrTaGF1YvA8CqfJUrS+HOsIZInbQaaIp36g6OesqmUg5C/nEukRXHi5RvkR5I5bsGjdNGNVGyUwpm8KoNjtWWflDJVx7rYqRL9cBvY84hdUytatNbKCenexzFmDdYNg=
+	t=1759164879; cv=none; b=LYGKh3vi0PxkeLW8ytJmqpJ95BtS2G+XbEjmazvxtUoss/jEwyIbhnRrxfru8IMNbuJpUtYzG0CeaUMA22nv+NhxySvNBdoKOuspCFXS/0dzzMB0J3k1dQ9y/q80TmvNQD2xCC5jE9wIou2T6Nm3uKH7kPqK+3UzjjYsutc8ib4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1759162971; c=relaxed/simple;
-	bh=Ja04zuPU1uyHFDKWsa6zMBjZtraKPVCXSk0ngeYiWhU=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=F0YgNOhAzIxz97ondaHW1S1K0RyDn1SvQMGN4685ZzURiI+rdPeDL4SCYpMn0AbFZ90pzvtw8leWS46FNO9rc9bgrB2AiJnrEz+iQDtxpCZmrRL3KLuc7t8s1OT/dQ5RCI3gTZwcZ1UUMO6VBQ7fsVaZ4ZV5vFfMw+E/v5lIO7M=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=AqJIZNl/; arc=none smtp.client-ip=198.175.65.20
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1759162970; x=1790698970;
-  h=message-id:date:mime-version:subject:to:cc:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=Ja04zuPU1uyHFDKWsa6zMBjZtraKPVCXSk0ngeYiWhU=;
-  b=AqJIZNl/ZroJG4Garp/Q4teyF4tXukZ2hJbGSuKuPLZpgQT4Z5uPIheM
-   Ijyqr23ly4Pzu4WcVJqa6vuEQNgOrL3kSE33kBGtOPbM92G18LCvMtpL4
-   xVJAX/AiQDm9Z01STQlHzay/wgQWzygtv85K/O5I7ucJdpcSC0STEL87W
-   EC+gymU4oyT21j0ksc0LjYDI4fTMhVKlRx0SikWxUXuWtx/6fz8cSM8gQ
-   lEAgFSgpOwj937eJQXurnJZGFM0ct0JE0H8QPWPPYXy8K1LpnPD8b3TJ8
-   ptGyqoB1osM8Pi1B3NA3l9/wQQ3KVrUlZrk0eqkPfycvx8qDEaS3/DEMH
-   w==;
-X-CSE-ConnectionGUID: QIAXGC6HQ2OWUgLV9U131A==
-X-CSE-MsgGUID: 4hoxHhDWQc2uRfu1TlKL5g==
-X-IronPort-AV: E=McAfee;i="6800,10657,11568"; a="61120555"
-X-IronPort-AV: E=Sophos;i="6.18,301,1751266800"; 
-   d="scan'208";a="61120555"
-Received: from orviesa003.jf.intel.com ([10.64.159.143])
-  by orvoesa112.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 29 Sep 2025 09:22:50 -0700
-X-CSE-ConnectionGUID: TYendME6SgSovBECqpdklg==
-X-CSE-MsgGUID: fgKQzyFLTrGlvshpoqM9gA==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.18,301,1751266800"; 
-   d="scan'208";a="182290704"
-Received: from rchatre-mobl4.amr.corp.intel.com (HELO [10.125.109.105]) ([10.125.109.105])
-  by ORVIESA003-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 29 Sep 2025 09:22:49 -0700
-Message-ID: <0fc9a9ed-b0ba-45fc-8bd2-1bf24c14ab7f@intel.com>
-Date: Mon, 29 Sep 2025 09:22:48 -0700
+	s=arc-20240116; t=1759164879; c=relaxed/simple;
+	bh=C36iw42WNzHBob34Sc7O1uFATf6AUuCubPOgYq1tNx8=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=DFQQlg23iFoNUZj6LKJCbDz3SpBUZ5VMAkfvtJ5THSf/cPXYD6NKkPwHyFFaXZYkwMjDEM9mvSotFsE35qfUANfiqo6D9oHQn6F0abulKZTyeuIi7py3qm6cMsB1cjPFSAy5B7WXwcrHL+/whArH3UMBPNQy1cqOXcN4DI/k0tU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=H/vLG15J; arc=none smtp.client-ip=209.85.216.73
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+Received: by mail-pj1-f73.google.com with SMTP id 98e67ed59e1d1-32ec2211659so4703965a91.0
+        for <kvm@vger.kernel.org>; Mon, 29 Sep 2025 09:54:37 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1759164877; x=1759769677; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=EpOhXKI0b7JOoE1riy2qpQ88ygLrxOz+JUVQPC6uV2A=;
+        b=H/vLG15JAn2ScrJgYSaIzd/evMushkFmre2HR0APpiLJUe0zPKRDpf9HS0ZUAyyN+K
+         8d/bEiKA70NZUO6ttpq3dM8nvEZ2m8zNBJZZ6oGBeP5bV75CSoPoij3ae0/D1iR34iHJ
+         DrgVJdT6Q1D57RW7MO4S9oTH1nfmoa/6nHDYwag29/F0ONfFJ7x7Yop+qwKf16/TRday
+         bxdh3bHMbpMB0A6MK3V0KfJZSRdxcF8HqAXemKFSArwKtcg9nlvBLOiD7ErLGtG9socX
+         uWdbUN7hbNrO/0AzyakQjHJPYhWJLmxxShxjg5qQMAPpFcp7cJenZVFHcSUUvOC9hQz9
+         qy3g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1759164877; x=1759769677;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=EpOhXKI0b7JOoE1riy2qpQ88ygLrxOz+JUVQPC6uV2A=;
+        b=WF0tizEEPsJVwVS+G4NYRaVkcOK6WrTgU7xGilqenRtYs2QzZOfWdADE8TbxhShb+R
+         GRFxTeMSWHp3w13b0yGNRwhJ/e2EpJIlzoASIvTahp03TS9HDSl8N1iwGd1HZguGFNrz
+         e0jZXOIU3TzJGkuICrn0JkOzEmETajuy44vserrocO5/t7ABAb3kQWLk/dzC/GO2KdfQ
+         XaPoN8qStKNTjyeggEjlL+2BJ0h7ZQEXHb1gEkQNJ3vj8pZbVydE2OLM7qNcI88bLbWN
+         QFi9FSvPQhKLHcE3MrIhaNa6p7sS8BXSGGpFeWnVClz39OUPuVPkVMpFy+BIwuDrVd02
+         RPtg==
+X-Forwarded-Encrypted: i=1; AJvYcCWSRknYyPNSr02rfyIxx2RfJAorI/5ncTDVNOXwo/BQ3ZKKyx1NI0KUWgoeJ9NkPg6Ch/4=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yz7TVdSaImMkLnm28axoAiHCZEg/H21ckl2ZsCB6W7gXRr1NnoC
+	HVVrplwhmJLd2HI3Hg2Dh3JNjA6eC2aD8Ia3OPh9fe+Tp3A/e+OB7L1ez3C4jqnhn+HvfsFwgoo
+	MpAxrXw==
+X-Google-Smtp-Source: AGHT+IFKXQAGYWhcY9Nrbucmct+SZFNk35FaiXyhafONfT+/fbYaXvR+65vzkfSOY9ZmV2dPHjVs3zVyZ0U=
+X-Received: from pjeq9.prod.google.com ([2002:a17:90a:649:b0:329:ec3d:72ad])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:1644:b0:330:6d5e:f17e
+ with SMTP id 98e67ed59e1d1-3342a2b94c2mr19140153a91.24.1759164876887; Mon, 29
+ Sep 2025 09:54:36 -0700 (PDT)
+Date: Mon, 29 Sep 2025 09:54:35 -0700
+In-Reply-To: <diqz7bxh386h.fsf@google.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v3 00/16] TDX: Enable Dynamic PAMT
-To: Kiryl Shutsemau <kas@kernel.org>, Yan Zhao <yan.y.zhao@intel.com>
-Cc: "Edgecombe, Rick P" <rick.p.edgecombe@intel.com>,
- "Gao, Chao" <chao.gao@intel.com>, "seanjc@google.com" <seanjc@google.com>,
- "bp@alien8.de" <bp@alien8.de>, "Annapurve, Vishal" <vannapurve@google.com>,
- "Huang, Kai" <kai.huang@intel.com>, "mingo@redhat.com" <mingo@redhat.com>,
- "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
- "dave.hansen@linux.intel.com" <dave.hansen@linux.intel.com>,
- "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
- "linux-coco@lists.linux.dev" <linux-coco@lists.linux.dev>,
- "Yamahata, Isaku" <isaku.yamahata@intel.com>,
- "pbonzini@redhat.com" <pbonzini@redhat.com>,
- "tglx@linutronix.de" <tglx@linutronix.de>, "x86@kernel.org" <x86@kernel.org>
-References: <20250918232224.2202592-1-rick.p.edgecombe@intel.com>
- <aNX6V6OSIwly1hu4@yzhao56-desk.sh.intel.com>
- <8f772a23-ea7f-40eb-8852-49f5e3e16c15@intel.com>
- <2b951e427c3f3f06fc310d151b7c9e960c32ec3f.camel@intel.com>
- <7927271c-61e6-4f90-9127-c855a92fe766@intel.com>
- <2fc6595ba9b2b3dc59a251fbac33daa73a107a92.camel@intel.com>
- <aNiQlgY5fkz4mY0l@yzhao56-desk.sh.intel.com>
- <x5wtf2whjjofaxufloomkebek4wnaiyjnteguanpw3ijdaer6q@daize5ngmfcl>
-From: Dave Hansen <dave.hansen@intel.com>
-Content-Language: en-US
-Autocrypt: addr=dave.hansen@intel.com; keydata=
- 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
-In-Reply-To: <x5wtf2whjjofaxufloomkebek4wnaiyjnteguanpw3ijdaer6q@daize5ngmfcl>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Mime-Version: 1.0
+References: <20250926163114.2626257-1-seanjc@google.com> <20250926163114.2626257-2-seanjc@google.com>
+ <CA+EHjTzdX8+MbsYOHAJn6Gkayfei-jE6Q_5HfZhnfwnMijmucw@mail.gmail.com> <diqz7bxh386h.fsf@google.com>
+Message-ID: <aNq5y1BSWsjculYM@google.com>
+Subject: Re: [PATCH 1/6] KVM: guest_memfd: Add DEFAULT_SHARED flag, reject
+ user page faults if not set
+From: Sean Christopherson <seanjc@google.com>
+To: Ackerley Tng <ackerleytng@google.com>
+Cc: Fuad Tabba <tabba@google.com>, Paolo Bonzini <pbonzini@redhat.com>, 
+	Christian Borntraeger <borntraeger@linux.ibm.com>, Janosch Frank <frankja@linux.ibm.com>, 
+	Claudio Imbrenda <imbrenda@linux.ibm.com>, kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	David Hildenbrand <david@redhat.com>, roypat@amazon.co.uk, 
+	Nikita Kalyazin <kalyazin@amazon.co.uk>
+Content-Type: text/plain; charset="us-ascii"
 
-On 9/29/25 04:17, Kiryl Shutsemau wrote:
->> Do you have any suggestions for a better approach?
->>
->> e.g., could the PAMT pages be allocated from a dedicated pool that ensures they
->> reside in different 2MB ranges from guest private pages and TD control pages?
-> It can work: allocate 2M a time for PAMT and piecemeal it to TDX module
-> as needed. But it means if 2M allocation is failed, TDX is not functional.
+On Mon, Sep 29, 2025, Ackerley Tng wrote:
+> Fuad Tabba <tabba@google.com> writes:
 > 
-> Maybe just use a dedicated kmem_cache for PAMT allocations. Although, I
-> am not sure if there's a way to specify to kmem_cache what pages to ask
-> from page allocator.
+> > Hi Sean,
+> >
+> > On Fri, 26 Sept 2025 at 17:31, Sean Christopherson <seanjc@google.com> wrote:
+> >>
+> >> Add a guest_memfd flag to allow userspace to state that the underlying
+> >> memory should be configured to be shared by default, and reject user page
+> >> faults if the guest_memfd instance's memory isn't shared by default.
+> >> Because KVM doesn't yet support in-place private<=>shared conversions, all
+> >> guest_memfd memory effectively follows the default state.
+> >>
+> >> Alternatively, KVM could deduce the default state based on MMAP, which for
+> >> all intents and purposes is what KVM currently does.  However, implicitly
+> >> deriving the default state based on MMAP will result in a messy ABI when
+> >> support for in-place conversions is added.
+> >>
+> >> For x86 CoCo VMs, which don't yet support MMAP, memory is currently private
+> >> by default (otherwise the memory would be unusable).  If MMAP implies
+> >> memory is shared by default, then the default state for CoCo VMs will vary
+> >> based on MMAP, and from userspace's perspective, will change when in-place
+> >> conversion support is added.  I.e. to maintain guest<=>host ABI, userspace
+> >> would need to immediately convert all memory from shared=>private, which
+> >> is both ugly and inefficient.  The inefficiency could be avoided by adding
+> >> a flag to state that memory is _private_ by default, irrespective of MMAP,
+> >> but that would lead to an equally messy and hard to document ABI.
+> >>
+> >> Bite the bullet and immediately add a flag to control the default state so
+> >> that the effective behavior is explicit and straightforward.
+> >>
+> 
+> I like having this flag, but didn't propose this because I thought folks
+> depending on the default being shared (Patrick/Nikita) might have their
+> usage broken.
 
-That seems a bit obtuse rather than just respecting normal lock ordering
-rules. No?
+mmap() support hasn't landed upstream, so as far as the upstream kernel is
+concerned, there is no userspace to break.  Which is exactly why I want to land
+this (or something like it) in 6.18, before GUEST_MEMFD_FLAG_MMAP is officially
+released.
+
+> >> Fixes: 3d3a04fad25a ("KVM: Allow and advertise support for host mmap() on guest_memfd files")
+> >> Cc: David Hildenbrand <david@redhat.com>
+> >> Cc: Fuad Tabba <tabba@google.com>
+> >> Signed-off-by: Sean Christopherson <seanjc@google.com>
+> >> ---
+> >>  Documentation/virt/kvm/api.rst                 | 10 ++++++++--
+> >>  include/uapi/linux/kvm.h                       |  3 ++-
+> >>  tools/testing/selftests/kvm/guest_memfd_test.c |  5 +++--
+> >>  virt/kvm/guest_memfd.c                         |  6 +++++-
+> >>  4 files changed, 18 insertions(+), 6 deletions(-)
+> >>
+> >> diff --git a/Documentation/virt/kvm/api.rst b/Documentation/virt/kvm/api.rst
+> >> index c17a87a0a5ac..4dfe156bbe3c 100644
+> >> --- a/Documentation/virt/kvm/api.rst
+> >> +++ b/Documentation/virt/kvm/api.rst
+> >> @@ -6415,8 +6415,14 @@ guest_memfd range is not allowed (any number of memory regions can be bound to
+> >>  a single guest_memfd file, but the bound ranges must not overlap).
+> >>
+> >>  When the capability KVM_CAP_GUEST_MEMFD_MMAP is supported, the 'flags' field
+> >> -supports GUEST_MEMFD_FLAG_MMAP.  Setting this flag on guest_memfd creation
+> >> -enables mmap() and faulting of guest_memfd memory to host userspace.
+> >> +supports GUEST_MEMFD_FLAG_MMAP and  GUEST_MEMFD_FLAG_DEFAULT_SHARED.  Setting
+> >
+> > There's an extra space between `and` and `GUEST_MEMFD_FLAG_DEFAULT_SHARED`.
+> >
+> 
+> +1 on this. Also, would you consider putting the concept of "at creation
+> time" or "at initialization time" into the name of the flag?
+
+Yah, GUEST_MEMFD_FLAG_INIT_SHARED?
+
+> "Default" could be interpreted as "whenever a folio is allocated for
+> this guest_memfd", the memory the folio represents is by default
+> shared.
+> 
+> What we want to represent is that when the guest_memfd is created,
+> memory at all indices are initialized as shared.
+> 
+> Looking a bit further, when conversion is supported, if this flag is not
+> specified, then all the indices are initialized as private, right?
+
+Correct, which is the current (pre-6.18) behavior.
+
+> >> +the MMAP flag on guest_memfd creation enables mmap() and faulting of guest_memfd
+> >> +memory to host userspace (so long as the memory is currently shared).  Setting
+> >> +DEFAULT_SHARED makes all guest_memfd memory shared by default (versus private
+> >> +by default).  Note!  Because KVM doesn't yet support in-place private<=>shared
+> >> +conversions, DEFAULT_SHARED must be specified in order to fault memory into
+> >> +userspace page tables.  This limitation will go away when in-place conversions
+> >> +are supported.
+> >
+> > I think that a more accurate (and future proof) description of the
+> > mmap flag could be something along the lines of:
+> >
+> 
+> +1 on these suggestions, I agree that making the concepts of SHARED vs
+> MMAP orthogonal from the start is more future proof.
+> 
+> > + Setting GUEST_MEMFD_FLAG_MMAP enables using mmap() on the file descriptor.
+> >
+> > + Setting GUEST_MEMFD_FLAG_DEFAULT_SHARED makes all memory in the file shared
+> > + by default
+> 
+> See above, I'd prefer clarifying this as "at initialization time" or
+> something similar.
+
+Roger that.
+
+> > At least for now, GUEST_MEMFD_FLAG_DEFAULT_SHARED and GUEST_MEMFD_FLAG_MMAP
+> > don't make sense without each other. Is it worth checking for that, at
+> > least until we have in-place conversion? Having only
+> > GUEST_MEMFD_FLAG_DEFAULT_SHARED set, but GUEST_MEMFD_FLAG_MMAP, isn't a
+> > useful combination.
+
+Heh, that's exactly how I coded things up to start:
+
+        /*
+         * TODO: Drop the restriction that memory must be shared by default
+         *       once in-place conversions are supported.
+         */
+        if (flags & GUEST_MEMFD_FLAG_MMAP &&
+            !(flags & GUEST_MEMFD_FLAG_DEFAULT_SHARED))
+                return -EINVAL;
+
+but if we go that route, then dropping the restriction would result in an ABI
+change for non-CoCo VMs.  The odds of such an ABI changes breaking userspace are
+basically zero, but I couldn't think of any reason to risk it; userspace would
+need to specify MMAP+SHARED either way.
+
+And on the flip side, not enforcing the flags at the time of creation allows us
+to test that user page faults to private memory are rejected.  It's not a ton of
+meaningful coverage, but it's not nothing either.  And from a code perspective,
+the diffs when in-place conversions are added are quite nice, as the concepts
+don't change (user faults to private memory are disallowed), only the mechanics
+change, i.e. the diffs highlight what all needs to happen to support conversions
+without the extra noise of a change in overall semantics.
 
