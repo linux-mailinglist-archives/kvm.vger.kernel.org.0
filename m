@@ -1,51 +1,51 @@
-Return-Path: <kvm+bounces-59010-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-59011-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8AA8EBA9F32
-	for <lists+kvm@lfdr.de>; Mon, 29 Sep 2025 18:07:06 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id B098BBA9F2B
+	for <lists+kvm@lfdr.de>; Mon, 29 Sep 2025 18:06:42 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 342A31C6BAC
-	for <lists+kvm@lfdr.de>; Mon, 29 Sep 2025 16:06:24 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 3871F1922CB9
+	for <lists+kvm@lfdr.de>; Mon, 29 Sep 2025 16:06:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2759230EF81;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A63CC30DD33;
 	Mon, 29 Sep 2025 16:05:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Ja6RLET7"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="SMPN5496"
 X-Original-To: kvm@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0BE3D30DECF;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9209630C608;
 	Mon, 29 Sep 2025 16:05:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1759161908; cv=none; b=cZ+EalAXtPyH8BQB/g+DgebmaY0yGqcH7NeJvdpl0o61j2ossnCAqAv9jISOnYNn178i7SQ8xDMhOCL00Bgr4yICIfWLnO0ckQ0ItI5q668h/GjVSHSf6dNe6wqmEnF7B48Pk9eBhuYPNyCU4Rbl96F54WuUur6S1+Q9Rb/tQ2I=
+	t=1759161908; cv=none; b=nVKD9VVuaYonOBvPvpKPeZbVZc5xecLfOISUpWLaflmnESDMR7d6T3mbZ7MKLgp41pGnHp2l+72CAG0QJ/Jm2O0WvzM9/nphjY6J2z9pDBtfZxm/pn89M/6ji/mJabxpjvh9Ex/6bd+Py26O51h1Z2pNHFjKcxY4TuAy+UaA82Q=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1759161908; c=relaxed/simple;
-	bh=myl3kJcHcZU+j81WLuyOyt+RJbJ0t5SjDn5XC0asxto=;
+	bh=kcyjoSnEwVRb40n5xPJ2q3xE6tZqe4Q5DJgl5/ozZd0=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=DWmN1lF6nTbvTikXD5Jhp9WJznvWHzOp630kiWBu2wJoD1Gpsoh12J2a6FLDBDksamsrykj9P9DM/FUm73lH15GeN7uSOxsJac9j6O8Vb1PbcVCU4NfP17SCI+jWd5nWGyXIQRG5s4YnxSzajubKk3krldZHC8kyxoZNk7AO+UQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Ja6RLET7; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id DE8A3C116B1;
-	Mon, 29 Sep 2025 16:05:07 +0000 (UTC)
+	 MIME-Version; b=kAx3hJgA9mLjkUHiwj2WFAvCuiqgNl92igFL1CjVhHd5ze1c8l6dahCc+kS8SPVNoHbtm5s6kdJZmL0T2LwGlQBVUXxI7Xc+jhaw9RVS6Puy3nl7AvxoDLSgxzWB0BZDms3fhGwwHY2NXCqDrUoWxU8HvSzK3ra/XS9LbnwdGUg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=SMPN5496; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3266BC4CEF7;
+	Mon, 29 Sep 2025 16:05:08 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1759161907;
-	bh=myl3kJcHcZU+j81WLuyOyt+RJbJ0t5SjDn5XC0asxto=;
+	s=k20201202; t=1759161908;
+	bh=kcyjoSnEwVRb40n5xPJ2q3xE6tZqe4Q5DJgl5/ozZd0=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=Ja6RLET7ZPulgjDtRzKVsBAeH0Oanr9WlhZtHrBHWSDHJgjU6AWzQKzHZT7GKHFed
-	 kt/S2teyqQWKkG7jA5SS2vKT9o8A++5jIE1Hj7zLrTRcekQ2ImZa/KqFlF1sP60q86
-	 omXjUJeNcOZqYnSZYYUW+OlnYF/3fwVvu2W+r+CEv1XNJ7uV7wC/kZvSrR9IT6J7xf
-	 6g+G1IHqbzP9WHruY9sekPpo7Lc5cCc4p83811mmau3tfgsr1lTRC30/+KCmgNZ+WK
-	 rBQX0m4xLp/8pJ7htVzKftekJj8MOAPdEFcwG6X2LNlj8rEONwb73IcCOX9+x71jlQ
-	 3sPDg+BVaGNqw==
+	b=SMPN5496p3YhiMHtijNPxGOLjOq/BeECzsOMX83uOZSFONif4iAu7xSOjIreNpFsb
+	 Ib+BVm/F/K0IOzOFP/nmylecJGK+VOurBan3s6M5NXbOeej6wOuGHkADLCAnko9FFV
+	 +Gm/DM7hatdJFNhkkufk4gMxIWl7T/urCKTUbVOuu7yjWRlBXCz0amsseeOzTzgszQ
+	 rLa6KcLVMqHVDh3YvJltTy8mKIUEfZ75kOq1IR61tSWe1C/NmfKWvVbYAZ3STVwP8P
+	 1MSHsqYTT9lRwH+f95H5Hc6Ck2SLoPcU04JyZ+XOvEtnRqvvb2Oy9Rb0OyNHAvQCHp
+	 9ZGkKaWeeBw5g==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.98.2)
 	(envelope-from <maz@kernel.org>)
-	id 1v3GN7-0000000AHqo-3bVX;
+	id 1v3GN8-0000000AHqo-0ziP;
 	Mon, 29 Sep 2025 16:05:06 +0000
 From: Marc Zyngier <maz@kernel.org>
 To: kvmarm@lists.linux.dev,
@@ -55,9 +55,9 @@ Cc: Joey Gouly <joey.gouly@arm.com>,
 	Suzuki K Poulose <suzuki.poulose@arm.com>,
 	Oliver Upton <oliver.upton@linux.dev>,
 	Zenghui Yu <yuzenghui@huawei.com>
-Subject: [PATCH 11/13] KVM: arm64: selftests: Make dependencies on VHE-specific registers explicit
-Date: Mon, 29 Sep 2025 17:04:55 +0100
-Message-ID: <20250929160458.3351788-12-maz@kernel.org>
+Subject: [PATCH 12/13] KVM: arm64: selftests: Add an E2H=0-specific configuration to get_reg_list
+Date: Mon, 29 Sep 2025 17:04:56 +0100
+Message-ID: <20250929160458.3351788-13-maz@kernel.org>
 X-Mailer: git-send-email 2.47.3
 In-Reply-To: <20250929160458.3351788-1-maz@kernel.org>
 References: <20250929160458.3351788-1-maz@kernel.org>
@@ -73,30 +73,123 @@ X-SA-Exim-Rcpt-To: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-The hyp virtual timer registers only exist when VHE is present,
-Similarly, VNCR_EL2 only exists when NV2 is present.
-
-Make these dependencies explicit.
+Add yet another configuration, this time dealing E2H=0.
 
 Signed-off-by: Marc Zyngier <maz@kernel.org>
 ---
- tools/testing/selftests/kvm/arm64/get-reg-list.c | 3 +++
- 1 file changed, 3 insertions(+)
+ .../selftests/kvm/arm64/get-reg-list.c        | 79 +++++++++++++++++++
+ 1 file changed, 79 insertions(+)
 
 diff --git a/tools/testing/selftests/kvm/arm64/get-reg-list.c b/tools/testing/selftests/kvm/arm64/get-reg-list.c
-index 011fad95dd021..0a4cfb368512a 100644
+index 0a4cfb368512a..7a238755f0728 100644
 --- a/tools/testing/selftests/kvm/arm64/get-reg-list.c
 +++ b/tools/testing/selftests/kvm/arm64/get-reg-list.c
-@@ -65,6 +65,9 @@ static struct feature_id_reg feat_id_regs[] = {
- 	REG_FEAT(SCTLR2_EL1,	ID_AA64MMFR3_EL1, SCTLRX, IMP),
- 	REG_FEAT(VDISR_EL2,	ID_AA64PFR0_EL1, RAS, IMP),
- 	REG_FEAT(VSESR_EL2,	ID_AA64PFR0_EL1, RAS, IMP),
-+	REG_FEAT(VNCR_EL2,	ID_AA64MMFR4_EL1, NV_frac, NV2_ONLY),
-+	REG_FEAT(CNTHV_CTL_EL2, ID_AA64MMFR1_EL1, VH, IMP),
-+	REG_FEAT(CNTHV_CVAL_EL2,ID_AA64MMFR1_EL1, VH, IMP),
+@@ -758,6 +758,10 @@ static __u64 el2_regs[] = {
+ 	SYS_REG(VSESR_EL2),
  };
  
- bool filter_reg(__u64 reg)
++static __u64 el2_e2h0_regs[] = {
++	/* Empty */
++};
++
+ #define BASE_SUBLIST \
+ 	{ "base", .regs = base_regs, .regs_n = ARRAY_SIZE(base_regs), }
+ #define VREGS_SUBLIST \
+@@ -792,6 +796,15 @@ static __u64 el2_regs[] = {
+ 		.regs		= el2_regs,			\
+ 		.regs_n		= ARRAY_SIZE(el2_regs),		\
+ 	}
++#define EL2_E2H0_SUBLIST					\
++	EL2_SUBLIST,						\
++	{							\
++		.name 		= "EL2 E2H0",			\
++		.capability	= KVM_CAP_ARM_EL2_E2H0,		\
++		.feature	= KVM_ARM_VCPU_HAS_EL2_E2H0,	\
++		.regs		= el2_e2h0_regs,		\
++		.regs_n		= ARRAY_SIZE(el2_e2h0_regs),	\
++	}
+ 
+ static struct vcpu_reg_list vregs_config = {
+ 	.sublists = {
+@@ -900,6 +913,65 @@ static struct vcpu_reg_list el2_pauth_pmu_config = {
+ 	},
+ };
+ 
++static struct vcpu_reg_list el2_e2h0_vregs_config = {
++	.sublists = {
++	BASE_SUBLIST,
++	EL2_E2H0_SUBLIST,
++	VREGS_SUBLIST,
++	{0},
++	},
++};
++
++static struct vcpu_reg_list el2_e2h0_vregs_pmu_config = {
++	.sublists = {
++	BASE_SUBLIST,
++	EL2_E2H0_SUBLIST,
++	VREGS_SUBLIST,
++	PMU_SUBLIST,
++	{0},
++	},
++};
++
++static struct vcpu_reg_list el2_e2h0_sve_config = {
++	.sublists = {
++	BASE_SUBLIST,
++	EL2_E2H0_SUBLIST,
++	SVE_SUBLIST,
++	{0},
++	},
++};
++
++static struct vcpu_reg_list el2_e2h0_sve_pmu_config = {
++	.sublists = {
++	BASE_SUBLIST,
++	EL2_E2H0_SUBLIST,
++	SVE_SUBLIST,
++	PMU_SUBLIST,
++	{0},
++	},
++};
++
++static struct vcpu_reg_list el2_e2h0_pauth_config = {
++	.sublists = {
++	BASE_SUBLIST,
++	EL2_E2H0_SUBLIST,
++	VREGS_SUBLIST,
++	PAUTH_SUBLIST,
++	{0},
++	},
++};
++
++static struct vcpu_reg_list el2_e2h0_pauth_pmu_config = {
++	.sublists = {
++	BASE_SUBLIST,
++	EL2_E2H0_SUBLIST,
++	VREGS_SUBLIST,
++	PAUTH_SUBLIST,
++	PMU_SUBLIST,
++	{0},
++	},
++};
++
+ struct vcpu_reg_list *vcpu_configs[] = {
+ 	&vregs_config,
+ 	&vregs_pmu_config,
+@@ -914,5 +986,12 @@ struct vcpu_reg_list *vcpu_configs[] = {
+ 	&el2_sve_pmu_config,
+ 	&el2_pauth_config,
+ 	&el2_pauth_pmu_config,
++
++	&el2_e2h0_vregs_config,
++	&el2_e2h0_vregs_pmu_config,
++	&el2_e2h0_sve_config,
++	&el2_e2h0_sve_pmu_config,
++	&el2_e2h0_pauth_config,
++	&el2_e2h0_pauth_pmu_config,
+ };
+ int vcpu_configs_n = ARRAY_SIZE(vcpu_configs);
 -- 
 2.47.3
 
