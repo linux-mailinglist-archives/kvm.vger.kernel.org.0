@@ -1,212 +1,236 @@
-Return-Path: <kvm+bounces-59021-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-59022-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3D354BAA2DF
-	for <lists+kvm@lfdr.de>; Mon, 29 Sep 2025 19:32:42 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 86B0EBAA33B
+	for <lists+kvm@lfdr.de>; Mon, 29 Sep 2025 19:41:57 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 575127A12A7
-	for <lists+kvm@lfdr.de>; Mon, 29 Sep 2025 17:30:59 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 36FDE164202
+	for <lists+kvm@lfdr.de>; Mon, 29 Sep 2025 17:41:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4A01C21CC61;
-	Mon, 29 Sep 2025 17:32:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 76EDC22127A;
+	Mon, 29 Sep 2025 17:41:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="1fCmIzGv"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="M7mdTWvx"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pf1-f202.google.com (mail-pf1-f202.google.com [209.85.210.202])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.21])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E6F0E1F0E2E
-	for <kvm@vger.kernel.org>; Mon, 29 Sep 2025 17:32:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.202
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1759167150; cv=none; b=KIxbXL/ETRWTdEJ/EgD8l3U67aFKolpc26R04JEByJsBQBDNbgfSZfGBqyWI6YwiI6KbeSEuph1Iz7WEH+9O7ELL0MducOxhRQwvSVCtDmNj7t0EDzsSGy+rdWqaAdOlk0xC6Ahaoq3Dp7tlzW6gwfMFRUGwgR+6pbTuiON/Tas=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1759167150; c=relaxed/simple;
-	bh=AhUg1wNJnUNUOaFXK2JklY0vm1VBVormHGNet3yMe6M=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=aQk8n2H/geZEcg+SaDNl6CmltL0Iwh6hq4cglvkUZgy+4XD3BCDFdmBE56AeMCt5QolAnxgXEWxnd766RlmxKDnzXEyluw0nQBk4Ut4ZonkFfBO0fdeGWX84QeBXRSz9QmhaV1h1R6YqIfTYsHcAQOSzukSHFolkJ6CMWXshqLg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=1fCmIzGv; arc=none smtp.client-ip=209.85.210.202
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pf1-f202.google.com with SMTP id d2e1a72fcca58-7810912fc31so4171893b3a.3
-        for <kvm@vger.kernel.org>; Mon, 29 Sep 2025 10:32:28 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1759167148; x=1759771948; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=i5JsbcE+pbrv9WUMt/sTi7gQveEd5VSWsVent3A0wsM=;
-        b=1fCmIzGv67V2LnPzHyAnaHJBJJSOS7UqlvvOb9/fh9JpVGSWhdtPXoJF2H43srkxd0
-         Yn51hzFUWn5zAhTxh/Aw7GtfLxYZLP94iAH+j1WfMIS3WCxj2hYTj+rAsata3TM/CNz6
-         kkZoELUTnrfHhYZx15ltkQ2S292HFZiiXEpVxntz0GeB7xpEp2AelW/vc1u+0zgNsV7x
-         /5s2cNd4QtRW103qdQ4KgxE01nosebgDJftotnf70BusU9up5P2Z23ZyFaXOpsmwaYkL
-         afu1ebxfGqnKinQh5PuSVLRYIptMn0amq8vHSsio0U0hsxrHvFDGcbWyqyT5m4l1ykjN
-         2ZiQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1759167148; x=1759771948;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=i5JsbcE+pbrv9WUMt/sTi7gQveEd5VSWsVent3A0wsM=;
-        b=pNibkzywD+vgm+W1a41guITOJ7wGjLvggs+m8LaKDbvn+ndyhEV+8/+BDB1CGZDv2Q
-         Jo69H91HJTyUYUu9EM9M2CZnZg+vUoPGYqANNPkSoJG65ovifkw/9yCkx0T2DtgrT6+W
-         cR4fcLNv2OQvDARlxFMu1g9eLJ7vbMqSPlbUbm9XtwcbdPzNhaZRkYfdMpAA0I1Ilwsz
-         v+MsihmKRajL3DuOIKO4HU26kFCRaRvmg0sHsDa8cPVpm6acB87h3Dk245z+KlemjoOn
-         JLk/NFvniYwrHmrEPbHA86x+Ubwf4EaG9b8vmrbi7n9UnyNmxNGKqTQ5uAL7R/mLCTCM
-         pSog==
-X-Forwarded-Encrypted: i=1; AJvYcCWtq49ajOYMG852Hrxl9jmirL7PQL4hWZi394Ib0Jtc7LMPiroM4kU5iCCAC4nhS61/Fcw=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yzywh0RnjtmOMSJfPygI8mths8XW+4IuJbpiNNcfgjcB8WtjxpV
-	Vc/CPP8bhx4PO4Iz5jPALat+1bMtGuO/keSHCkML/0/XXrnTS/TvWvkm5l6f4kaTnHg4Z4Yln81
-	ItyI4bA==
-X-Google-Smtp-Source: AGHT+IFthVZp9FDHNDiWf7DEdVqLu65/sfmSoZEiv22BhqGqSE2Yu8ZjoyNg35szSSCNiS2WYA6x5zgdoLA=
-X-Received: from pgbfm22.prod.google.com ([2002:a05:6a02:4996:b0:b55:70c6:bece])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a05:6a21:3392:b0:249:467e:ba4c
- with SMTP id adf61e73a8af0-2e7d7368009mr21819265637.42.1759167148111; Mon, 29
- Sep 2025 10:32:28 -0700 (PDT)
-Date: Mon, 29 Sep 2025 10:32:26 -0700
-In-Reply-To: <diqztt0l1pol.fsf@google.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 27C1B21257F;
+	Mon, 29 Sep 2025 17:41:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=198.175.65.21
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1759167708; cv=fail; b=GPbFCJqRUhyulKKJ029VhvHW3mzDW0RdIlOzV9X6rMh7qlG11CPPaqRirpDWaVCB1mchZPHG7d9RRynyWX8U93B7h/lX8r4T6Il1vKI4tbcLeyHOAdD+5YpQh50fauFQJ/JJ+ZjcZiQleZSQbM71N3ocgnPh4lktuGYneI3yQ3w=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1759167708; c=relaxed/simple;
+	bh=xC+lwAr2Te4ey5v5crY1KdcqI+dd35CY8MojRWzaUJU=;
+	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=sQ5hLKDZYASmkYOkG0t1D2FGx5sgGvHTh0eZAUC10BF/eoSWA7sId1sQiPOVc91PrY3jB+iib7kBsA9PDWO01WPBnzJZ5vVN7IcGaVWewyFPRsBwm54uO9kC7MFZ/V3QkgibKT8OnAY2pGgD3fTdE+F6aQ9O35nNJDLL2wCn46Q=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=M7mdTWvx; arc=fail smtp.client-ip=198.175.65.21
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1759167707; x=1790703707;
+  h=from:to:cc:subject:date:message-id:references:
+   in-reply-to:content-id:content-transfer-encoding:
+   mime-version;
+  bh=xC+lwAr2Te4ey5v5crY1KdcqI+dd35CY8MojRWzaUJU=;
+  b=M7mdTWvxZUABfyCI48r00zXTHIT7Zdo8o4nAtrlN5Lo/dbO1rwq3QUJd
+   VElIZrt0TfZK32u1N0E54nD8MB3pfSntJ86m061dOTJNxGbJRKcGvAN7m
+   4Y7LYNUanekK5C1CKXnV/pku8tsl3J6/EibNhXVolKVVG+fukIE1UQ/K/
+   uaswu5mQYi+bksoGKgb9H182jJbygO1Ldk6EkR2lkgarPFzbVIkIBsXBZ
+   x1v/QeC4OwymTP6xRnFTrHB2b8Mk+bPxEHAfqvuEBM3HgZaJpBN8OjO4B
+   VoJijxRUxCAmR2EkwAWgSIQP8COVn1l4b/YG7pUIgZtgbmZr7u24jDIFi
+   g==;
+X-CSE-ConnectionGUID: 1BroEaiXQn+nH6+Xsg5xFA==
+X-CSE-MsgGUID: 4/uaZFRmTIW3cOrXPSdN6Q==
+X-IronPort-AV: E=McAfee;i="6800,10657,11531"; a="61328271"
+X-IronPort-AV: E=Sophos;i="6.17,312,1747724400"; 
+   d="scan'208";a="61328271"
+Received: from orviesa006.jf.intel.com ([10.64.159.146])
+  by orvoesa113.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 29 Sep 2025 10:41:45 -0700
+X-CSE-ConnectionGUID: Rh1WAw8UQiSSpuhFgaiGtg==
+X-CSE-MsgGUID: 4VbhYC/GRcG86e+KiAH6PA==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.18,302,1751266800"; 
+   d="scan'208";a="177417343"
+Received: from fmsmsx903.amr.corp.intel.com ([10.18.126.92])
+  by orviesa006.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 29 Sep 2025 10:41:45 -0700
+Received: from FMSMSX902.amr.corp.intel.com (10.18.126.91) by
+ fmsmsx903.amr.corp.intel.com (10.18.126.92) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.2562.27; Mon, 29 Sep 2025 10:41:43 -0700
+Received: from fmsedg903.ED.cps.intel.com (10.1.192.145) by
+ FMSMSX902.amr.corp.intel.com (10.18.126.91) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.2562.27 via Frontend Transport; Mon, 29 Sep 2025 10:41:43 -0700
+Received: from SA9PR02CU001.outbound.protection.outlook.com (40.93.196.60) by
+ edgegateway.intel.com (192.55.55.83) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.2562.27; Mon, 29 Sep 2025 10:41:41 -0700
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=ltQC6pKnObPDWhLZHPgy1oGFXo966VuyVmDLATU0FkPdFJnHbdT6CLV2xLMkAttNytY3rla0z0LYl851+6fIgqrzTq5SSGjp9JtZsHAPgbxZqwjDq2ryMEWi+RlRb/AmTmMmv8C38sJdwph6hPK4OT26H1aDLZvUq5MCy8iZIZbeodt/FOZea/bjZkIUbK2qzbq+pgjJHIaCL+LC1T+aQg8JhXjvgbWSv7lFHWLY663EsdXUeyL6KjSE+v32QdxFz1UHdM27yM0ZLRNPNsWkESth1uf6iX+WOef7mM7mLryBNvQnlesWUmO8eN5vpxzLtSKRTQgd2+dY9JmRJAS7dQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=xC+lwAr2Te4ey5v5crY1KdcqI+dd35CY8MojRWzaUJU=;
+ b=VYu4rCHoLJvS6drq1L9n1wwvmz15N9EDZ2ugFPLcvmf3A50Qjnk6dGYpqxcQfyOBJEESGB97sRHU6aaL3stqL01K+K60QI02bxzGsVvjnnlixlymsEmz+nx685bQtPr+0CSKe+1zUM29gA4RzGiPOPQ9R4atvFsATXl4LG2XYet9tKcmgD+SaIFom6yE2lUPn+2sJVbEL/77TV9Z4WqSBOB2q3W0d2gcBYgaKiqExfjqdN+3tte+RkVByy748YQgI3XohMGOoTeDVyJnFSCSOkxdwEeWyJGz/ChqK9t8iQBNi907rua11woe+ft4KYH90+0MUJ9U4AMtQR3Rq6KfKQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Received: from MN0PR11MB5963.namprd11.prod.outlook.com (2603:10b6:208:372::10)
+ by SJ5PPF6E320AF71.namprd11.prod.outlook.com (2603:10b6:a0f:fc02::833) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9137.19; Mon, 29 Sep
+ 2025 17:41:39 +0000
+Received: from MN0PR11MB5963.namprd11.prod.outlook.com
+ ([fe80::edb2:a242:e0b8:5ac9]) by MN0PR11MB5963.namprd11.prod.outlook.com
+ ([fe80::edb2:a242:e0b8:5ac9%5]) with mapi id 15.20.9160.015; Mon, 29 Sep 2025
+ 17:41:38 +0000
+From: "Edgecombe, Rick P" <rick.p.edgecombe@intel.com>
+To: "binbin.wu@linux.intel.com" <binbin.wu@linux.intel.com>
+CC: "kvm@vger.kernel.org" <kvm@vger.kernel.org>, "linux-coco@lists.linux.dev"
+	<linux-coco@lists.linux.dev>, "Huang, Kai" <kai.huang@intel.com>, "Zhao, Yan
+ Y" <yan.y.zhao@intel.com>, "dave.hansen@linux.intel.com"
+	<dave.hansen@linux.intel.com>, "kas@kernel.org" <kas@kernel.org>,
+	"seanjc@google.com" <seanjc@google.com>, "mingo@redhat.com"
+	<mingo@redhat.com>, "linux-kernel@vger.kernel.org"
+	<linux-kernel@vger.kernel.org>, "tglx@linutronix.de" <tglx@linutronix.de>,
+	"Yamahata, Isaku" <isaku.yamahata@intel.com>, "pbonzini@redhat.com"
+	<pbonzini@redhat.com>, "kirill.shutemov@linux.intel.com"
+	<kirill.shutemov@linux.intel.com>, "Annapurve, Vishal"
+	<vannapurve@google.com>, "Gao, Chao" <chao.gao@intel.com>, "bp@alien8.de"
+	<bp@alien8.de>, "x86@kernel.org" <x86@kernel.org>
+Subject: Re: [PATCH v3 05/16] x86/virt/tdx: Allocate reference counters for
+ PAMT memory
+Thread-Topic: [PATCH v3 05/16] x86/virt/tdx: Allocate reference counters for
+ PAMT memory
+Thread-Index: AQHcKPMyqcZdyD86IkOkQscaglq3prSgakGAgAoUdIA=
+Date: Mon, 29 Sep 2025 17:41:38 +0000
+Message-ID: <c8b69a9c5709d8bc482ce724f23da01e8d151727.camel@intel.com>
+References: <20250918232224.2202592-1-rick.p.edgecombe@intel.com>
+	 <20250918232224.2202592-6-rick.p.edgecombe@intel.com>
+	 <47f8b553-1cb0-4fb0-993b-affd4468475e@linux.intel.com>
+In-Reply-To: <47f8b553-1cb0-4fb0-993b-affd4468475e@linux.intel.com>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+user-agent: Evolution 3.44.4-0ubuntu2 
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: MN0PR11MB5963:EE_|SJ5PPF6E320AF71:EE_
+x-ms-office365-filtering-correlation-id: 867901b1-b659-47be-88d5-08ddff7f718a
+x-ld-processed: 46c98d88-e344-4ed4-8496-4ed7712e255d,ExtAddr
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam: BCL:0;ARA:13230040|1800799024|366016|7416014|376014|38070700021;
+x-microsoft-antispam-message-info: =?utf-8?B?T00xc1FudHJjWDJhRnpGK2liem9sWjZMTFR6bi9odWg4dDhCWWMzZ2IvSFJj?=
+ =?utf-8?B?NWY2Qm95ZFJta0M0VXd0OEZORXhPbTQwZGt5QmU5UEh0dHlTRDJTdUFkdThL?=
+ =?utf-8?B?SHJTYmZLU1N4akpyOGNYQ2tKWDcvNVVYVzRPMjNnak1lbkNPSHp6RERTblJF?=
+ =?utf-8?B?UFdlSXhBOVU0bHo4Z3NtNVZ0RGE3QWNZa1dnM2hMMVNpZHNMZ1c0SWo2cFdn?=
+ =?utf-8?B?ZnN1ZVhqditEbVEveUdIK2pXbUVxTElqVmI1T0NVbHRHNk45bXVibDJrUjQv?=
+ =?utf-8?B?NnJCRElhend4Qi9wSUxCTEJuSC9zdFhicVh5b2VTa0VHUmp4eTUzdTd1MWhO?=
+ =?utf-8?B?ck9mSGZ5UXlrWC9VbzFZMjJnY284VFp4cjlkZlZsUWlhWndSVHpmYldQVlJC?=
+ =?utf-8?B?REV6TGYzOElQTS8wMW41OWxVYjFBbGNBMmRJTzN5WnRqVDZ2ai9aRTBFQStJ?=
+ =?utf-8?B?SUdGZTdBRnc4RjB1QWdudWt3Wk0wcktXRnpDS2RtL09BaDJsM3R2YWUveHN1?=
+ =?utf-8?B?TDVvekNMdDZJbzR1WmlZSG9FaVdEVkp2R2hLc1ptWGoxSDhSSTJXNll1VzR2?=
+ =?utf-8?B?Q1J0cUZTdXVtbjJYQXV6OWswVTZBVEtHOElzYjJ3MDN4c2tzMFpjWDRJa1FX?=
+ =?utf-8?B?ZkNLZ1VoVVNGakkwb3RrdWg0WUU5MHFNalJEdWZjbEQ1QitWNGljSEY0aDA2?=
+ =?utf-8?B?K3c1akJ5eVRmc3JtY1ZrTmdYU0NIWkhrUlh4Mld1UmxGK1dnUmtacWtlSURE?=
+ =?utf-8?B?M3ptQUJsS3lNOHFFbFFzdDcwWWY5d3pUajZ3K0EybFY3UkdTMEhxVndWS3Aw?=
+ =?utf-8?B?UUVUa2tid2VHUmhjOGNYWE8rY1ZFQ1hPM2V1bGh2RkJIQ0FteTVXZEtIbnAr?=
+ =?utf-8?B?M1gxaC9ZRXd5dzJzNG1pVHp3Vlp4SkJIbHAxQ0NZaEZ2NHVmZnI2eG9YWWc5?=
+ =?utf-8?B?UWt2MzR5VUdtZnNyVnpoem5aUTBBYkk0eXBKQ0E5YkluUDBjd0ZvZ2czQTdt?=
+ =?utf-8?B?RDkxNjRXa1N2OXo0WUN1aDZFM1NsRVV3d2srejVyWm5nUGo4SHhod1FOMVNx?=
+ =?utf-8?B?V0g2aE9OcE9YZ0JNUHNzYzF3M0ZwTHBjTXFVWDQ1K3R4Tndvc0ZSVWlVeWFU?=
+ =?utf-8?B?MEdKVUpsVDg2RU9ETExFdDNUSFNGUkp2MWlXT094MjlKbHozSGNtMXVjRzEv?=
+ =?utf-8?B?cVU3bGpiNHFLcFIraWh4K3JKYmNWbUJEOUt2Tmp6Y05pRUIraUxKYWVLa3Ex?=
+ =?utf-8?B?ODFETXZ3U2JpeVZheVdLOXltUm9ra1FZbU83b1VudkJQZVpwd3A4bTJDL0Qy?=
+ =?utf-8?B?eWxCcStqTGhRS0dYVHhyVkJPdnRPNkhhYzFrcXVEVWF6WVpXakR6WXp2S2Ry?=
+ =?utf-8?B?dzFjTjZ1K0NDT0tIK01Dek9nTllTdTZsRzQvaVdra21nc3J0YWlCRE9yN1Zj?=
+ =?utf-8?B?aUZ5bElPNzBRZkx2QjVYTjVFcE9vQWJlYUFuNk5tZld4U0xWZzdZaGtsblVF?=
+ =?utf-8?B?Vm9tRE5iWmxzYkNDclJna05PVzFKcm4vdzBPVXJpd3RZUGxGL2F4UmtIMjJk?=
+ =?utf-8?B?MUhzdkxBWnFIMTJNbjFRejhKbm54MUtZZ3hyYzBtczBXTTRmZXVxOVVFcnJJ?=
+ =?utf-8?B?aE9FMlBkYzVVYjNnQkZGdytzdWRMTTNlY0RQL0Z0THVzOUd6aXEweSswVE5H?=
+ =?utf-8?B?SVhiYVV2T2Y1MTBzZFVOWjhXVW8vNngzMFF0T3FycU1hT25SMXJNNjFDU1pY?=
+ =?utf-8?B?aG0vNWpJQzZSZkZCVTh4N2VMQjV5RnRUVDdJVm9PQ1NDSHVEOVlxMTF2bUMz?=
+ =?utf-8?B?MHZwY01PRDMyd1dWNWFsQko5VUF5azdCblRuMmVjQVgzazhjVXREYnV1NXRI?=
+ =?utf-8?B?Y1pjR0RVd2VQQ0VyQUtYbVhvaUFHVzhvRjJUR0tQT25pcmdsZmJSS3YwK0tu?=
+ =?utf-8?B?ZHh2cVhISitzdnRUT2VqcVBOd1ljeG5rVEx6ZEpjOVBUVmwycm5UMDhGT1V2?=
+ =?utf-8?B?bmxDcWQycE9MU3JaS0FONDVqVUJobE1JUWI4OEtkSENQUkNZYzE3ZlhWZkx3?=
+ =?utf-8?Q?Tqit2t?=
+x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:MN0PR11MB5963.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(366016)(7416014)(376014)(38070700021);DIR:OUT;SFP:1101;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0: =?utf-8?B?WTlZY0JYTjc4MVowc00wTlVwT2h3L1VGQmtqQmd6Nzl5MnMwTjE3WVVveFJT?=
+ =?utf-8?B?bmdud3VjbzhweGR3dWtsSHBhSGZnNkNzTElpZ0pab0FyRE90aVBVQWlpTDF0?=
+ =?utf-8?B?QTZEb1VZVlUwcWdJZExUSnRZTXBuSlIvdmFsNU1TclJMZWc2MXEwMmpxZjJW?=
+ =?utf-8?B?Ykp0Z3VwMFQ0VlBQWEZubnJmVHdlWmJ0emw3amlITUxNRTg1ZDR1RUlLL1Zs?=
+ =?utf-8?B?ZU1ZT3lCcTJSMHlyNEdvRmhwdi9OL2JEaDdTeHFvbkU1U3M5KzRtYjMxaktC?=
+ =?utf-8?B?WFVDbXZJc0RtL2hGSW1WL1NRM1hpNkN3TWVvTkZlMm9RSFVLWDhEQmt3OHhP?=
+ =?utf-8?B?cjBnRVBnU1hOYncrcVZzYWJrWkdXaDRiT3BlMmdaNTFIODc3cm1EaHFTcExM?=
+ =?utf-8?B?bFR3SFBXNERlTmpJK0RqNlNPdVZtN1kyRVVmaHhMTWM1Rkp0VHlBUUdsTllt?=
+ =?utf-8?B?WGRldGM2cnhRWnA2cGVwbjAzUG1kalZtYU44MFNRa2JGdjNsbklxK2pSMU9X?=
+ =?utf-8?B?K2hSQ0svVVJpY0VVV0ZaLzdEUzZCeEJuZE9wY000dEo3eVBTVkZ4MWNZaWha?=
+ =?utf-8?B?NHhYcm54TUNySHliZm9jRzFUTHVOOGVLbEo2eEhSZzJlVWt1eStFSERncVly?=
+ =?utf-8?B?eEtmb1UxWDk1TklZRnVqSFlyMDRpbFVMNEEwUFE0OSsyMTRxd01yL0NTMHJD?=
+ =?utf-8?B?VlgvSitPcGFYWWNMckFPZ3IvQ0g1SnRobzd0WVJqMzlqVFZLSnVXbk5qcnk5?=
+ =?utf-8?B?Ri9nRm1aRitHY09GUnNwU25scXVrbzJnS1BKV0hxSmw0ZlBMV1hqSmdTUWx6?=
+ =?utf-8?B?MjdOV0IzMlRMcncyRWs5WHRpYnVlQWU5OFd5Z254bm91NFJNTlR5Mi9WOFdV?=
+ =?utf-8?B?bE0rN0VJZnFQV0F0aXRRZ1VMT01KNWRTVkU3ai9sSEZzbHFvNUtTT01iMUdz?=
+ =?utf-8?B?L2ZKaklXcjFiTVg3dUVJa1ZHTmtaTzBGRVFvUmF6VXRlUU5keFc0SE5EZUxE?=
+ =?utf-8?B?b0xGeHBQbG12RitrZzhsU3NuWTBqcnRYN1VMTzhrU1RnZUhiQTA0QUVtb2RP?=
+ =?utf-8?B?WFJnUVdBd3QvTU85Ym56TWk0cTlGaGppaUtSWkptQi9vNzVIaWltRUs2eHgy?=
+ =?utf-8?B?dTJkTTR1ZGlKb0tSYnFaRlFDQ3Y4bm5DWEgvUExGYkJZWXdqeW9rakc1WmZi?=
+ =?utf-8?B?SXRHd2wwWmNWRkR4VlYyQ21hVFVBTE81T2tINUIzTS9tc1J1TkNVeFpaeG8w?=
+ =?utf-8?B?dDdidmY5TUFXRnlpWktMd2JuZ1BIb1pBbE5GNFdFZDF2SWlMZDR0UXdkNkpQ?=
+ =?utf-8?B?UFV5ZzNUeVVuM2NuTmFoWkkvNFIzd2NHcC9zNDdGMDV5Zk9oWnZwYVh5R082?=
+ =?utf-8?B?b0tzNWFSN0dqYVlGV3NqZ2dtd3pOWU5vZ2szVDdsWVc1eWpYaEw0WkdtcElG?=
+ =?utf-8?B?cXA3NEJLVEx3Z1IwWW80L1ZObEZiSDdJVkRUWWZkbnZJSEpnQS80TERzWHNl?=
+ =?utf-8?B?NkR3a3RqbStDeGdGK2hmcDZ5UU9pYVJDZUN0Zkd2VjltS1JXeGp1eHhSV0Jm?=
+ =?utf-8?B?UTkySVBpSXdrdHRWVmMvZzM4QjZ5bVhrUGdiTDJNQUtJNHVxbXRPYzNLWHlS?=
+ =?utf-8?B?Q2E3V09EZ1JaM0VnWXJYZjhiekZrZkVkdzFKMEYrbGZ4OHNhbUY4WEhTRkk3?=
+ =?utf-8?B?VTBISUVNbkUwUThlTTdwdWdyUGFta3VqRXpjTzNGOU1WZzlJSG5zZ1FIcnF5?=
+ =?utf-8?B?T2gwZFJaNEZhaTZDN1B3Z2t6ZHBDdDRKaDRSNDI0WUNVRnZYRmNGSGZ5Zkdw?=
+ =?utf-8?B?SkNQT2hoYVVNZm9qQnVnSXIrUjZnZmxZTFZ6R0RpSDJiaFFEK1pSNkppR1Jk?=
+ =?utf-8?B?bU1qdCtDR0N0aVJRdzUzb3RtWEFKZ003TmRWc243S0lheGlrSUlzODJwVjk3?=
+ =?utf-8?B?U0tYaEUzcUtjS1ZvSk1MR1JYN2oyMFZ5UFp2d1B6T3E3VlQrRHd6K09iRStW?=
+ =?utf-8?B?c1puUG1nSXVRdEYwRFhsdVdUZjZNaFZQdldjcXhyU0xnUlZYa2F6SGgxZTRn?=
+ =?utf-8?B?TmdaSVNtR3NBZXpYMVpiZkZIWVBPTlo4b3p4U0lnUktqRmFMRUhmQnpyck15?=
+ =?utf-8?B?ZlM1aVZQZVVGNEZpMnZqT3hmb2sxVjBRaHJ2UDBObGFGVVVBOHc2bzhKNEhv?=
+ =?utf-8?B?Qnc9PQ==?=
+Content-Type: text/plain; charset="utf-8"
+Content-ID: <A3F676786D46EB4386A38DAA3A260CE9@namprd11.prod.outlook.com>
+Content-Transfer-Encoding: base64
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20250926163114.2626257-1-seanjc@google.com> <20250926163114.2626257-6-seanjc@google.com>
- <diqztt0l1pol.fsf@google.com>
-Message-ID: <aNrCqhA_hhUjflPA@google.com>
-Subject: Re: [PATCH 5/6] KVM: selftests: Add wrappers for mmap() and munmap()
- to assert success
-From: Sean Christopherson <seanjc@google.com>
-To: Ackerley Tng <ackerleytng@google.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, Christian Borntraeger <borntraeger@linux.ibm.com>, 
-	Janosch Frank <frankja@linux.ibm.com>, Claudio Imbrenda <imbrenda@linux.ibm.com>, kvm@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, David Hildenbrand <david@redhat.com>, 
-	Fuad Tabba <tabba@google.com>
-Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: MN0PR11MB5963.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 867901b1-b659-47be-88d5-08ddff7f718a
+X-MS-Exchange-CrossTenant-originalarrivaltime: 29 Sep 2025 17:41:38.7018
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: XklkpeR7Hru+IiiWysAF3lCG7WWZvxq9lG/FNUfY1P1G7d/aIqwZk+kq5nZg9ZtL3rbkko6rdhhkSka4uJFVHduc1ZBOdMdd053Qu6xjic8=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SJ5PPF6E320AF71
+X-OriginatorOrg: intel.com
 
-On Mon, Sep 29, 2025, Ackerley Tng wrote:
-> Sean Christopherson <seanjc@google.com> writes:
-> 
-> > Add and use wrappers for mmap() and munmap() that assert success to reduce
-> > a significant amount of boilerplate code, to ensure all tests assert on
-> > failure, and to provide consistent error messages on failure.
-> >
-> > No functional change intended.
-> >
-> > Signed-off-by: Sean Christopherson <seanjc@google.com>
-> > ---
-> >  .../testing/selftests/kvm/guest_memfd_test.c  | 21 +++------
-> >  .../testing/selftests/kvm/include/kvm_util.h  | 25 +++++++++++
-> >  tools/testing/selftests/kvm/lib/kvm_util.c    | 44 +++++++------------
-> >  tools/testing/selftests/kvm/mmu_stress_test.c |  5 +--
-> >  .../selftests/kvm/s390/ucontrol_test.c        | 16 +++----
-> >  .../selftests/kvm/set_memory_region_test.c    | 17 ++++---
-> >  6 files changed, 64 insertions(+), 64 deletions(-)
-> >
-> > 
-> > [...snip...]
-> > 
-> > diff --git a/tools/testing/selftests/kvm/include/kvm_util.h b/tools/testing/selftests/kvm/include/kvm_util.h
-> > index 23a506d7eca3..1c68ff0fb3fb 100644
-> > --- a/tools/testing/selftests/kvm/include/kvm_util.h
-> > +++ b/tools/testing/selftests/kvm/include/kvm_util.h
-> > @@ -278,6 +278,31 @@ static inline bool kvm_has_cap(long cap)
-> >  #define __KVM_SYSCALL_ERROR(_name, _ret) \
-> >  	"%s failed, rc: %i errno: %i (%s)", (_name), (_ret), errno, strerror(errno)
-> >  
-> > +static inline void *__kvm_mmap(size_t size, int prot, int flags, int fd,
-> > +			       off_t offset)
-> 
-> Do you have a policy/rationale for putting this in kvm_util.h as opposed
-> to test_util.h? I like the idea of this wrapper but I thought this is
-> less of a kvm thing and more of a test utility, and hence it belongs in
-> test_util.c and test_util.h.
-
-To be perfectly honest, I forgot test_util.h existed :-)
-
-> Also, the name kind of associates mmap with KVM too closely IMO, but
-> test_mmap() is not a great name either.
-
-Which file will hopefully be irrevelant, because ideally it'll be temporary (see
-below). But if someone has a strong opinion and/or better idea on the name prefix,
-I definitely want to settle on a name for syscall wrappers, because I want to go
-much further than just adding an mmap() wrapper.  I chose kvm_ because there's
-basically zero chance that will ever conflict with generic selftests functionality,
-and the wrappers utilize TEST_ASSERT(), which are unique to KVM selftests.
-
-As for why the current location will hopefully be temporary, and why I want to
-settle on a name, I have patches to add several more wrappers, along with
-infrastructure to make it super easy to add new wrappers.  When trying to sort
-out the libnuma stuff for Shivank's series[*], I discovered that KVM selftests
-already has a (very partial, very crappy) libnuma equivalent in
-tools/testing/selftests/kvm/include/numaif.h.
-
-Adding wrappers for NUMA syscalls became an exercise in frustration (so much
-uninteresting boilerplate, and I kept making silly mistakes), and so that combined
-with the desire for mmap() and munmap() wrappers motivated me to add a macro
-framework similar to the kernel's DEFINE_SYSCALL magic.
-
-So, I've got patches (that I'll post with the next version of the gmem NUMA
-series) that add tools/testing/selftests/kvm/include/kvm_syscalls.h, and
-__kvm_mmap() will be moved there (ideally it wouldn't move, but I want to land
-this small series in 6.18, and so wanted to keep the changes for 6.18 small-ish).
-
-For lack of a better namespace, and because we already have __KVM_SYSCALL_ERROR(),
-I picked KVM_SYSCALL_DEFINE() for the "standard" builder, e.g. libnuma equivalents,
-and then __KVM_SYSCALL_DEFINE() for a KVM selftests specific version to handle
-asserting success.
-
-/* Define a kvm_<syscall>() API to assert success. */
-#define __KVM_SYSCALL_DEFINE(name, nr_args, args...)			\
-static inline void kvm_##name(DECLARE_ARGS(nr_args, args))		\
-{									\
-	int r;								\
-									\
-	r = name(UNPACK_ARGS(nr_args, args));				\
-	TEST_ASSERT(!r, __KVM_SYSCALL_ERROR(#name, r));			\
-}
-
-/*
- * Macro to define syscall APIs, either because KVM selftests doesn't link to
- * the standard library, e.g. libnuma, or because there is no library that yet
- * provides the syscall.  These
- */
-#define KVM_SYSCALL_DEFINE(name, nr_args, args...)			\
-static inline long name(DECLARE_ARGS(nr_args, args))			\
-{									\
-	return syscall(__NR_##name, UNPACK_ARGS(nr_args, args));	\
-}									\
-__KVM_SYSCALL_DEFINE(name, nr_args, args)
-
-
-The usage looks like this (which is odd at first glance, but makes it trivially
-easy to copy+paste from the kernel SYSCALL_DEFINE invocations:
-
-KVM_SYSCALL_DEFINE(get_mempolicy, 5, int *, policy, const unsigned long *, nmask,
-		   unsigned long, maxnode, void *, addr, int, flags);
-
-KVM_SYSCALL_DEFINE(set_mempolicy, 3, int, mode, const unsigned long *, nmask,
-		   unsigned long, maxnode);
-
-KVM_SYSCALL_DEFINE(set_mempolicy_home_node, 4, unsigned long, start,
-		   unsigned long, len, unsigned long, home_node,
-		   unsigned long, flags);
-
-KVM_SYSCALL_DEFINE(migrate_pages, 4, int, pid, unsigned long, maxnode,
-		   const unsigned long *, frommask, const unsigned long *, tomask);
-
-KVM_SYSCALL_DEFINE(move_pages, 6, int, pid, unsigned long, count, void *, pages,
-		   const int *, nodes, int *, status, int, flags);
-
-KVM_SYSCALL_DEFINE(mbind, 6, void *, addr, unsigned long, size, int, mode,
-		   const unsigned long *, nodemask, unsigned long, maxnode,
-		   unsigned int, flags);
-
-__KVM_SYSCALL_DEFINE(munmap, 2, void *, mem, size_t, size);
-__KVM_SYSCALL_DEFINE(close, 1, int, fd);
-__KVM_SYSCALL_DEFINE(fallocate, 4, int, fd, int, mode, loff_t, offset, loff_t, len);
-__KVM_SYSCALL_DEFINE(ftruncate, 2, unsigned int, fd, off_t, length);
-
-[*] https://lore.kernel.org/all/0e986bdb-7d1b-4c14-932e-771a87532947@amd.com
+T24gVHVlLCAyMDI1LTA5LTIzIGF0IDE1OjQ1ICswODAwLCBCaW5iaW4gV3Ugd3JvdGU6DQo+ID4g
+Ky8qDQo+ID4gKyAqIEFsbG9jYXRlIFBBTVQgcmVmZXJlbmNlIGNvdW50ZXJzIGZvciBhbGwgcGh5
+c2ljYWwgbWVtb3J5Lg0KPiA+ICsgKg0KPiA+ICsgKiBJdCBjb25zdW1lcyAyTWlCIGZvciBldmVy
+eSAxVGlCIG9mIHBoeXNpY2FsIG1lbW9yeS4NCj4gPiArICovDQo+ID4gK3N0YXRpYyBpbnQgaW5p
+dF9wYW10X21ldGFkYXRhKHZvaWQpDQo+ID4gK3sNCj4gPiArCXNpemVfdCBzaXplID0gbWF4X3Bm
+biAvIFBUUlNfUEVSX1BURSAqIHNpemVvZigqcGFtdF9yZWZjb3VudHMpOw0KPiANCj4gSXMgdGhl
+cmUgZ3VhcmFudGVlIHRoYXQgbWF4X3BmbiBpcyBQVFJTX1BFUl9QVEUgYWxpZ25lZD8NCj4gSWYg
+bm90LCBpdCBzaG91bGQgYmUgcm91bmRlZCB1cC4NCg0KVm1hbGxvYygpIHNob3VsZCBoYW5kbGUg
+aXQ/DQo=
 
