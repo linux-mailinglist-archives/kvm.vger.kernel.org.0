@@ -1,87 +1,87 @@
-Return-Path: <kvm+bounces-58967-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-58968-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1B56ABA8936
-	for <lists+kvm@lfdr.de>; Mon, 29 Sep 2025 11:18:29 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5C36BBA8945
+	for <lists+kvm@lfdr.de>; Mon, 29 Sep 2025 11:22:16 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id A48817B3F21
-	for <lists+kvm@lfdr.de>; Mon, 29 Sep 2025 09:16:46 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 479BD1885F65
+	for <lists+kvm@lfdr.de>; Mon, 29 Sep 2025 09:22:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C1BAF286D46;
-	Mon, 29 Sep 2025 09:18:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B51D7286D40;
+	Mon, 29 Sep 2025 09:22:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="hho3VQpM"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="BkxXBzCq"
 X-Original-To: kvm@vger.kernel.org
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 56C4D286438
-	for <kvm@vger.kernel.org>; Mon, 29 Sep 2025 09:18:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 43EF6274659
+	for <kvm@vger.kernel.org>; Mon, 29 Sep 2025 09:21:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1759137494; cv=none; b=meKBsrYOpsIU/3C8XLpkW38Z/VTRViKtS1X+wqKj/Z0Ub3m2UWd+Xg5iEBPvCAowh764wgNxIJSrjpuvrdnrKmqusCsK97C0Bc6wkZKGvQA7qnRxudR0iX8jgc4RYjFwWrX4HHrFo1B7+cXwkOYsPU/gGLznxTUzQd+fWV5+HtQ=
+	t=1759137720; cv=none; b=D/K9wN5wJuSphejYdfBldV6RdR9qMeNMNJ9WZqKTC6dSEM3sCfQLATl9lnUrW8jYAdPcR9+XsCGeYpHF15k6WzJicdTjI4vcFRnD4/WTpl6zEKLAH05h0jAfgWidRwweYJBNL+kksmV0RbQxLsJEGC70Gg6lk9ppb4quInTtBHM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1759137494; c=relaxed/simple;
-	bh=Ks2BBBzQqjGWEUp3vTQtsltYJN13fV/jNGcOycVGv2I=;
+	s=arc-20240116; t=1759137720; c=relaxed/simple;
+	bh=1mFtIsxgWL/cDrVYTrGXPefT0SWQMlxAe2lw1SiGW1U=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=I1kca3aB7OCm3uj4hzRW3sWtcNJJDaA+GeNQHLtgZTWyFHP4OlZUKFFtlcHUPkHc+kR2J+EX4pHdup9qdbnfP2tSLsKjnArpHKPOtn+X0xydES6TFAdoinzG5PnS/38U2szNE0s/BEGGRvk8DlSVYTQ5Nk+tcIyHsvDYGsGvWcc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=hho3VQpM; arc=none smtp.client-ip=170.10.133.124
+	 In-Reply-To:Content-Type; b=MExhTyaKu5jQItmffiIIvYn5FJ7RW/DYcQwx0CvqsUNYH2KlPPMo7nr2a0TeRwFYixzz7p9oKSepPKRIegGMSQ6Lu4ktQ76ezybDAt5npyZ+75ySa+rMRuUX4TnPzOvAzKy3fgWGqg6Z/7/hDEutZJsljv2meZaW28ds/fEJ5w8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=BkxXBzCq; arc=none smtp.client-ip=170.10.133.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1759137492;
+	s=mimecast20190719; t=1759137718;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-	bh=vk82StvtzuvoQmzBkr51Z9nRoIXejYH8Zn9Ho/zzzFs=;
-	b=hho3VQpMJwNT6FD0sBhWXNnhnO8mpwtcsnxWT5p89MNJW/xA2MJzKFV0G/XcFprUcxbTNy
-	tOg5Uqg8DHKxgg8Bpqa34QsLF2LHTzb8nEHCKZRftwE3W6Qtm40jcDlgKvJmvcMNcjnjR/
-	NCVnJxvdRtxnA4tddrOj+y8ouTDfFJk=
-Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
- [209.85.221.69]) by relay.mimecast.com with ESMTP with STARTTLS
+	bh=dgQTpwdj6I19pwH7DxZR1LuGI+OTUqSIq5i+R/eVUzY=;
+	b=BkxXBzCqC/TNpuR+e44NgISmzLfIo6Vs43lIRarq0mLSff55KatThu60SrESAtZgF9Eik0
+	ptHxO3vEshmrzgtgcaiFAnPiuFlkBqTvAT2d9XpANhWeiwlevJAev+VXiscajNtPjhl6mu
+	xjod/LbGHX9VHbKD0bRzGG6tYWpa7qE=
+Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
+ [209.85.128.70]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-330-8X7SFCTNMYilfp855qLWtg-1; Mon, 29 Sep 2025 05:18:05 -0400
-X-MC-Unique: 8X7SFCTNMYilfp855qLWtg-1
-X-Mimecast-MFC-AGG-ID: 8X7SFCTNMYilfp855qLWtg_1759137485
-Received: by mail-wr1-f69.google.com with SMTP id ffacd0b85a97d-3ee12ab7f33so2329429f8f.2
-        for <kvm@vger.kernel.org>; Mon, 29 Sep 2025 02:18:05 -0700 (PDT)
+ us-mta-458-wWUdxZg_Ndmtw53HOAES_w-1; Mon, 29 Sep 2025 05:21:56 -0400
+X-MC-Unique: wWUdxZg_Ndmtw53HOAES_w-1
+X-Mimecast-MFC-AGG-ID: wWUdxZg_Ndmtw53HOAES_w_1759137715
+Received: by mail-wm1-f70.google.com with SMTP id 5b1f17b1804b1-46b303f6c9cso31821655e9.2
+        for <kvm@vger.kernel.org>; Mon, 29 Sep 2025 02:21:56 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1759137484; x=1759742284;
+        d=1e100.net; s=20230601; t=1759137715; x=1759742515;
         h=content-transfer-encoding:in-reply-to:autocrypt:content-language
          :from:references:cc:to:subject:user-agent:mime-version:date
          :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=vk82StvtzuvoQmzBkr51Z9nRoIXejYH8Zn9Ho/zzzFs=;
-        b=EEU2IKQBJOAPfM/wciwzt1//iwkHdMX8fwVQ0oJgzjYbVl6htIg8+nsY/3Oma1Lzo2
-         dZ6pTDPtHfvRgI/prO/wwYlr6eEhSzm6BUF8vHTMdxu7zGRqJfXM/8JcVVARTuK2mhJf
-         JnkFtb1X4jMOAvfDe7X+K4L7d02Vda7+7SKc+6W9OSTb2iyHfxnX4DSPyr4JJvL1J1LP
-         yBzpSRRMbz5J9+M1lTvsCiu8PaqTkbuARJw5Ch40GlJHV+Kbw2VHWj8yIn+yWwPNqNVm
-         PsjwKW8A4d333nDzafv9hziXX2813+Ate0fl/zOLGvjCrNTFaD4ndFWcrsOhPeXKKQdI
-         irtQ==
-X-Gm-Message-State: AOJu0YyZPylHHG0K/4BI6lMtCt1ma9ENVdgXFq5NrBfF/S1QoDgPZh6W
-	4924FbxNjokxsDKB4aKReWIxz8N7LRumx89piCl9ZnHIWZIXLfIIl4j+xSS3ZrBSmPzmkEOFsDx
-	kbnxfZWZQLIdO9fM1YuY3fw5tnvDJ71hjvZvtZsm6ojT+WHDaaIKBig==
-X-Gm-Gg: ASbGncsgaHFWvRGFbjJSBmTBZYcbcxuWBszrdNdOBOi+jzM1N3m1PMkwa6VKeVvTS14
-	jLOVy1oIPNyOKTCi4t/X9RfHyuT19GmRu/xZCFd0O5U4dFguMCMG417dIobkxGhfBLFlLxhPvax
-	eqhi8XAri3Oall4PVWkRm8LIy4E2HY22NCsoTtkG7+fBXU2iQOALMdz8vp/ooxxVz+g4vaYCi2m
-	s2Q7ycOBFKwDM72PkvBAeoIg/wCz6ynMXlqBZX1w3rTjy9WqySlpLPQ/G1wqM0ifXzDVwtd2DrS
-	3QR0sXM+MeLgcGzYBCtLM5IT8NCO7iscNUWJnE7zOXDOn6XEmLEtH4ndCAECgHUH7td/FyZLYHP
-	4svJRtAVdGc9FElBhblWw/7d0DYqzjU8L8JX2des+3IppxDkoQxn4cQG2GrtZTMphYQ==
-X-Received: by 2002:a5d:5d03:0:b0:3f5:453:77ea with SMTP id ffacd0b85a97d-40e4dabf28emr14251794f8f.58.1759137484484;
-        Mon, 29 Sep 2025 02:18:04 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IEXlkIee2EP6cCZceUObBZoMhwWwE2P79HU2Td+9p0UV2c9KpI5Byo6/WYxtplqGTOY5+qGuQ==
-X-Received: by 2002:a5d:5d03:0:b0:3f5:453:77ea with SMTP id ffacd0b85a97d-40e4dabf28emr14251773f8f.58.1759137484049;
-        Mon, 29 Sep 2025 02:18:04 -0700 (PDT)
+        bh=dgQTpwdj6I19pwH7DxZR1LuGI+OTUqSIq5i+R/eVUzY=;
+        b=TuxhunMyUzqy/WUU+rfrkIAIWHIhvL/r17LQ6hKPKnauUeGcF8SFavV6zxNLIYIjpK
+         W26NeRSQA9WXD0GM5zAARYXHMR29frbHGlwLzZGN/qCvh5pbF3uJ9nzVE5iKuSdFP/IU
+         GHZewHcaih3SGybRewDbT8QT1bqD5fj/cmuOfoChy0TlBM8BTpnRL+BA1yYQotXocpCF
+         HgJRLpYjw0euVFEmt2oNnNYd5ZoaTA3ldmQ/XK+CR02R3JW17HOYZZOa0RvoXYhJE/aW
+         SSVg9FxRFNAzmG+kMSKkTMe0L4hpOcSsBYMPeB91pMOaC9sJBY7q4LOMKws9cZ7cjGVE
+         jtIw==
+X-Gm-Message-State: AOJu0YxhUUAi15Npqm6U+0LRuYV2ZH3eJpqpQBo1cUCqVvrdAQmCB1xr
+	aK5zicoa5K7OMHZCuEr2HiZifWvhRlzmw7zAOEqjEFPNo4xM7JjEoalsn1SXYWeQuowwKTBcDU7
+	z6xqT3Js/KgXCYhzWKJbAaUxfJNQwzLopFpoP8KzqfaM1iLHiHgiKNQ==
+X-Gm-Gg: ASbGnctIVgqAYU8upERA4sMiF+GV89oMkd71rpeR3gQbDG5Hb9DNklnny8w9P010uc7
+	6fFvrYIrpKOi+f9B/x4LsYlsyaBs1UVPFZ5uFi9+l1/yEw963csjzy/eseM78jB57u2eU5SCIZO
+	5DH+KTVuNREDgB1+QlJ4iGJON4PbSxu2vMzWuWemCCqzrrHYNdQYcR8t0elCLxeKDVmRF7LQdiA
+	nb5BitTgEYHp6UplWkEmlwNQ7mV7gGcWjfv6YK1QIgdtxSTD3oSHnn53e3axfexaeiPBYbyo1Ao
+	IUsPTYbagSx8OyfzpUOwxidhvL5puxPyljo9IV1hjs5iy19+kHI7zLEtsdChC98QG2pStEY5tTP
+	IIbvB7QqjHCwC4WMFyi22qpyd/fVda7RtII88fUUW3dmiyCD4ojrtAyZXT94Z6bLRYQ==
+X-Received: by 2002:a05:600c:1986:b0:45d:d8d6:7fcc with SMTP id 5b1f17b1804b1-46e32a057c2mr132123905e9.27.1759137715191;
+        Mon, 29 Sep 2025 02:21:55 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IGesYviK8pYyvk4J7HUCmypxt1moyxCjWTm9Bxvu0M1IPcLV+oSkce5n8tX4RYhtCkwU5SCNw==
+X-Received: by 2002:a05:600c:1986:b0:45d:d8d6:7fcc with SMTP id 5b1f17b1804b1-46e32a057c2mr132123575e9.27.1759137714726;
+        Mon, 29 Sep 2025 02:21:54 -0700 (PDT)
 Received: from ?IPV6:2003:d8:2f05:e100:526f:9b8:bd2a:2997? (p200300d82f05e100526f09b8bd2a2997.dip0.t-ipconnect.de. [2003:d8:2f05:e100:526f:9b8:bd2a:2997])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-40fb871d051sm17855205f8f.14.2025.09.29.02.18.03
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-46e56f65290sm4788855e9.13.2025.09.29.02.21.53
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 29 Sep 2025 02:18:03 -0700 (PDT)
-Message-ID: <59730bad-4731-4c25-838d-9dafee1c6c44@redhat.com>
-Date: Mon, 29 Sep 2025 11:18:02 +0200
+        Mon, 29 Sep 2025 02:21:54 -0700 (PDT)
+Message-ID: <00838b58-06ba-4468-a226-8e20bf1fd773@redhat.com>
+Date: Mon, 29 Sep 2025 11:21:52 +0200
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -89,8 +89,8 @@ List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 3/6] KVM: selftests: Create a new guest_memfd for each
- testcase
+Subject: Re: [PATCH 4/6] KVM: selftests: Add test coverage for guest_memfd
+ without GUEST_MEMFD_FLAG_MMAP
 To: Sean Christopherson <seanjc@google.com>,
  Paolo Bonzini <pbonzini@redhat.com>,
  Christian Borntraeger <borntraeger@linux.ibm.com>,
@@ -99,7 +99,7 @@ To: Sean Christopherson <seanjc@google.com>,
 Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
  Fuad Tabba <tabba@google.com>, Ackerley Tng <ackerleytng@google.com>
 References: <20250926163114.2626257-1-seanjc@google.com>
- <20250926163114.2626257-4-seanjc@google.com>
+ <20250926163114.2626257-5-seanjc@google.com>
 From: David Hildenbrand <david@redhat.com>
 Content-Language: en-US
 Autocrypt: addr=david@redhat.com; keydata=
@@ -146,24 +146,93 @@ Autocrypt: addr=david@redhat.com; keydata=
  3iyY2Nsd7JxfKu1PRhCGwXzRw5TlfEsoRI7V9A8isUCoqE2Dzh3FvYHVeX4Us+bRL/oqareJ
  CIFqgYMyvHj7Q06kTKmauOe4Nf0l0qEkIuIzfoLJ3qr5UyXc2hLtWyT9Ir+lYlX9efqh7mOY
  qIws/H2t
-In-Reply-To: <20250926163114.2626257-4-seanjc@google.com>
+In-Reply-To: <20250926163114.2626257-5-seanjc@google.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 
 On 26.09.25 18:31, Sean Christopherson wrote:
-> Refactor the guest_memfd selftest to improve test isolation by creating a
-> a new guest_memfd for each testcase.  Currently, the test reuses a single
-> guest_memfd instance for all testcases, and thus creates dependencies
-> between tests, e.g. not truncating folios from the guest_memfd instance
-> at the end of a test could lead to unexpected results (see the PUNCH_HOLE
-> purging that needs to done by in-flight the NUMA testcases[1]).
+> From: Ackerley Tng <ackerleytng@google.com>
 > 
-> Invoke each test via a macro wrapper to create and close a guest_memfd
-> to cut down on the boilerplate copy+paste needed to create a test.
+> If a VM type supports KVM_CAP_GUEST_MEMFD_MMAP, the guest_memfd test will
+> run all test cases with GUEST_MEMFD_FLAG_MMAP set.  This leaves the code
+> path for creating a non-mmap()-able guest_memfd on a VM that supports
+> mappable guest memfds untested.
 > 
-> Link: https://lore.kernel.org/all/20250827175247.83322-10-shivankg@amd.com
-> Reported-by: Ackerley Tng <ackerleytng@google.com>
+> Refactor the test to run the main test suite with a given set of flags.
+> Then, for VM types that support the mappable capability, invoke the test
+> suite twice: once with no flags, and once with GUEST_MEMFD_FLAG_MMAP
+> set.
+> 
+> This ensures both creation paths are properly exercised on capable VMs.
+> 
+> test_guest_memfd_flags() tests valid flags, hence it can be run just once
+> per VM type, and valid flag identification can be moved into the test
+> function.
+> 
+> Signed-off-by: Ackerley Tng <ackerleytng@google.com>
+> [sean: use double-underscores for the inner helper]
 > Signed-off-by: Sean Christopherson <seanjc@google.com>
+> ---
+>   .../testing/selftests/kvm/guest_memfd_test.c  | 30 ++++++++++++-------
+>   1 file changed, 19 insertions(+), 11 deletions(-)
+> 
+> diff --git a/tools/testing/selftests/kvm/guest_memfd_test.c b/tools/testing/selftests/kvm/guest_memfd_test.c
+> index 60c6dec63490..5a50a28ce1fa 100644
+> --- a/tools/testing/selftests/kvm/guest_memfd_test.c
+> +++ b/tools/testing/selftests/kvm/guest_memfd_test.c
+> @@ -239,11 +239,16 @@ static void test_create_guest_memfd_multiple(struct kvm_vm *vm)
+>   	close(fd1);
+>   }
+>   
+> -static void test_guest_memfd_flags(struct kvm_vm *vm, uint64_t valid_flags)
+> +static void test_guest_memfd_flags(struct kvm_vm *vm)
+>   {
+> +	uint64_t valid_flags = 0;
+>   	uint64_t flag;
+>   	int fd;
+>   
+> +	if (vm_check_cap(vm, KVM_CAP_GUEST_MEMFD_MMAP))
+> +		valid_flags |= GUEST_MEMFD_FLAG_MMAP |
+> +			       GUEST_MEMFD_FLAG_DEFAULT_SHARED;
+> +
+>   	for (flag = BIT(0); flag; flag <<= 1) {
+>   		fd = __vm_create_guest_memfd(vm, page_size, flag);
+>   		if (flag & valid_flags) {
+> @@ -267,16 +272,8 @@ do {									\
+>   	close(fd);							\
+>   } while (0)
+>   
+> -static void test_guest_memfd(unsigned long vm_type)
+> +static void __test_guest_memfd(struct kvm_vm *vm, uint64_t flags)
+>   {
+> -	uint64_t flags = 0;
+> -	struct kvm_vm *vm;
+> -
+> -	vm = vm_create_barebones_type(vm_type);
+> -
+> -	if (vm_check_cap(vm, KVM_CAP_GUEST_MEMFD_MMAP))
+> -		flags |= GUEST_MEMFD_FLAG_MMAP | GUEST_MEMFD_FLAG_DEFAULT_SHARED;
+> -
+>   	test_create_guest_memfd_multiple(vm);
+>   	test_create_guest_memfd_invalid_sizes(vm, flags);
+>   
+> @@ -292,8 +289,19 @@ static void test_guest_memfd(unsigned long vm_type)
+>   	gmem_test(file_size, vm, flags);
+>   	gmem_test(fallocate, vm, flags);
+>   	gmem_test(invalid_punch_hole, vm, flags);
+> +}
+>   
+> -	test_guest_memfd_flags(vm, flags);
+> +static void test_guest_memfd(unsigned long vm_type)
+> +{
+> +	struct kvm_vm *vm = vm_create_barebones_type(vm_type);
+> +
+> +	test_guest_memfd_flags(vm);
+> +
+> +	__test_guest_memfd(vm, 0);
+
+Having a simple test_guest_memfd_noflags() wrapper might make this 
+easier to read.
 
 Reviewed-by: David Hildenbrand <david@redhat.com>
 
