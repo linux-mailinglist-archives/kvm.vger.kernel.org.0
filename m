@@ -1,211 +1,168 @@
-Return-Path: <kvm+bounces-59044-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-59045-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id CD52ABAA9D4
-	for <lists+kvm@lfdr.de>; Mon, 29 Sep 2025 22:59:01 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9B0C4BAAA20
+	for <lists+kvm@lfdr.de>; Mon, 29 Sep 2025 23:17:58 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7019F16FCCC
-	for <lists+kvm@lfdr.de>; Mon, 29 Sep 2025 20:59:01 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4CBAC421C09
+	for <lists+kvm@lfdr.de>; Mon, 29 Sep 2025 21:17:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5E810258ECC;
-	Mon, 29 Sep 2025 20:58:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1154F33F9;
+	Mon, 29 Sep 2025 21:17:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="OH1hPajq"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="PRqBoWWm"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A7CF71EB9E3
-	for <kvm@vger.kernel.org>; Mon, 29 Sep 2025 20:58:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 99DD3221FC7
+	for <kvm@vger.kernel.org>; Mon, 29 Sep 2025 21:17:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1759179532; cv=none; b=PhZkUGMle0besqbwaXK/qztug1JfJZCw8OAFnHsbDWIpdqGF+scEA21ZbJIFr2tW9zURUo8Vpg4ioavSX7+CzhixjYUsCC/tB2vt42w/wbIIImU8wyQYMSqhmKBFvmENpXDYzymVQIeveW96GBkLvuhi4cBRNXQUlCxnLjiQMYA=
+	t=1759180669; cv=none; b=jD2rO0zUPc4GvWpeBQW0pRp/IR0DyT9EKTtYhg3nf0do3Y7iCd/tMK+Zgyx/7oa6r87cSiL5XNetYRbLxZ6f1TcECkmcaPGxXNt+UL2+mZOYwX97gOnMApbyzqVuDymf82OTmNxPDiPeSZgewlud8ddW5BRuVScYFuFtI4Io1hA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1759179532; c=relaxed/simple;
-	bh=J76N2wEur0Y+i5AoxNHpEXUoeTsTOvVmp7a7y+pNgkQ=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=awxBTsUcDDBKnqDlsW8hu4+dzOHPaLXyenxWBkmWBYpRJyCLu8n/l5IQs++nEDgssiEZmCdcQTrnrTBWG8NOLo9ysTeYac//dMbuiZ95SGmfhmDmYMrKbE1U4f7sWTH3ueYJw/nF0qwD7FJEusqqw5mItMfIvNBLORE8b4v9KwM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=OH1hPajq; arc=none smtp.client-ip=170.10.133.124
+	s=arc-20240116; t=1759180669; c=relaxed/simple;
+	bh=fo8uROp6Yd4p51oNun07BdvS3ckFl/pgBYhRp5v8n58=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=cUqyDXDIDsPQSVeBDd3cwPpqQCCVDHRSJilElBw2cE7UxWUY/WkJTfs5G9x36ZCh5hb1EHjp3bnPtgskj5pDBN+DWxSZFCTfR3EeZF7MsTYGJzEYv2NDD7PH5WpJS7cEqWeSYC6IgcqH/hs8Z7iH/fyoSMOvetdLyMBK/K9pgyg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=PRqBoWWm; arc=none smtp.client-ip=170.10.129.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1759179529;
+	s=mimecast20190719; t=1759180666;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=qGlYEFRv8xDNhpiiWlWf8YqSTaYSiFOP+ymflG4dl6g=;
-	b=OH1hPajqlf7JW6d25VMxLH1ryiNLn7yZk112Ym1dBTmlQ/smJfhveVbwrQHQC2HRROF5jh
-	5SXQW+D9ir6WVkx2SH+3/Csv92yw89GsxEAmre9jfeN/rbGJZhmCeYsJjc0Fz4/gzKw10N
-	RhC+PcyHlI1usHdmYvvVMlxyQWZog5c=
-Received: from mail-qv1-f71.google.com (mail-qv1-f71.google.com
- [209.85.219.71]) by relay.mimecast.com with ESMTP with STARTTLS
+	bh=pvJsfDbbmraa6iCCkjoqVoBB3Mb9XdjPoCcVP3qHFzU=;
+	b=PRqBoWWmZf9bx5sAghO/yeCFDa5/DCJV29BNJOZgQLBDdtur8MTCn2aL82tGx5VSg4BjpN
+	69uZtADX1TPTW6es+SlAUKdZaSk3Mr+Y0u+HfSpnHONjIflQ46OV0LnGkEzg5hRih9K1EJ
+	kugIpO5FE+bgDTpyByJUKJCCmdjd4u8=
+Received: from mail-il1-f197.google.com (mail-il1-f197.google.com
+ [209.85.166.197]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-360-DBV9PB2iMjGBdpNhI_us9A-1; Mon, 29 Sep 2025 16:58:47 -0400
-X-MC-Unique: DBV9PB2iMjGBdpNhI_us9A-1
-X-Mimecast-MFC-AGG-ID: DBV9PB2iMjGBdpNhI_us9A_1759179527
-Received: by mail-qv1-f71.google.com with SMTP id 6a1803df08f44-78f2b1bacfcso88882756d6.3
-        for <kvm@vger.kernel.org>; Mon, 29 Sep 2025 13:58:47 -0700 (PDT)
+ us-mta-187-jIsVazWjOxypFl91IUQJqQ-1; Mon, 29 Sep 2025 17:17:45 -0400
+X-MC-Unique: jIsVazWjOxypFl91IUQJqQ-1
+X-Mimecast-MFC-AGG-ID: jIsVazWjOxypFl91IUQJqQ_1759180664
+Received: by mail-il1-f197.google.com with SMTP id e9e14a558f8ab-427350656e3so6835485ab.1
+        for <kvm@vger.kernel.org>; Mon, 29 Sep 2025 14:17:45 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1759179526; x=1759784326;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=qGlYEFRv8xDNhpiiWlWf8YqSTaYSiFOP+ymflG4dl6g=;
-        b=H3pi+o+xCH5j2Jw0Zr3Bac+I728B5cE1Psrihv8sQQtqvZSGFrtGp/fStFZW+2NROC
-         ShZpLnLM/XEAaCR3d5XaGFy3QUBW0sbbu3kQz8BBF7AZtqB1ax4QS4o4NOT0B6TpIRgS
-         WSnEs2wqwTs5yr8HvrOBoTXYaWXR/29zWJmL2XaTNfTHxw8vBklwK0HZXC8NGMtKAVBf
-         N8qvvOOtsFrYr2ce0wzzGa/TneZEIpIIg65KdF+QM8Bg03jumj0uSn5s96VBb6E7H6z1
-         E8D3o7WQAFbNPU6UucCMP0gn75ZvxcpzGV2FO0Tw/vHljssAPPeFsBnzmnjGK0baVO/e
-         AhTQ==
-X-Forwarded-Encrypted: i=1; AJvYcCU7tp9I1BGYRAJsb+wRi+TDhHDvq+PRXXrfbOEpDby0q8mlecsd7T4gPEVRdRiOyqlh7uI=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxNQk2B5jDcmEAU7xDiO3JyOIRAgDY+jB/4gxaidhdPaIRQsGb/
-	7ZGoiUyYwbHbQqiK+qUeZ2doU5Hry1mApbSoIvACkOpGQvskshmKF9uefffykoq/OtF47098po+
-	I7zcCryxcEqoybC6Bko8LFVdAXPxoZXyEzv0fF+SKAQagR+O6pH1fHg==
-X-Gm-Gg: ASbGncsoMtkf+gYkAOMbA1Nde2r6olGrgCVupdlCSlex3H1W4+TdBxrc3jkajQ48a29
-	1K4K9GV7jNFvILX+qHkssnyWUc8I182CzW0tU5piVpxXBuW0i/9rh/gwIbmYVqnKXKxoaKUC6yL
-	mqVjrcQZrCXanhcyk6PNCkwLZbwpBhYTQjg0bQHq67i06vqx94biIvw/ZDS1qPyhmc1G7KQEYHK
-	cHM8XgaN98LZSB6YxPO1jGcVr7qTv2OPgh5l9b6vR0398AMiVJ1jBFVeTabSwqdEEC46EKoRKI/
-	80GtJT6s2yavl3jDjepx/FBc5HPIAcJ6
-X-Received: by 2002:a05:620a:a00d:b0:85c:3bcf:e843 with SMTP id af79cd13be357-85c3bcfeaa1mr2112609285a.43.1759179526135;
-        Mon, 29 Sep 2025 13:58:46 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IEDVAfO10gZpyYJ8dwCVcOEIU84P0ACyRABeDGvxvxzPh4CJm5bPu8NN+2BKbE3WeVcAszc+g==
-X-Received: by 2002:a05:620a:a00d:b0:85c:3bcf:e843 with SMTP id af79cd13be357-85c3bcfeaa1mr2112601685a.43.1759179525509;
-        Mon, 29 Sep 2025 13:58:45 -0700 (PDT)
-Received: from x1.local ([142.188.210.50])
-        by smtp.gmail.com with ESMTPSA id af79cd13be357-85c2a1913d5sm893653985a.31.2025.09.29.13.58.41
+        d=1e100.net; s=20230601; t=1759180664; x=1759785464;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=pvJsfDbbmraa6iCCkjoqVoBB3Mb9XdjPoCcVP3qHFzU=;
+        b=lhDt4DqRQgNOV5aeJQFmtrW9EG2kU/gCiKq0yVi3cOht/Yrh0yY0csapqObcykK/gL
+         pR8FbbeLN8C8VLDYf/oy8SSIhUWcPIlQFWaxQMozcQ2C19nQt9xzZMPdhn1Y/+kTmk2u
+         UhV7blbX30L7pXfJu22E8T0nBnuBXxphzg6Nf8gI7SlA+g8OqBcHub01uQuddWJlPrR8
+         n1Bg1oqVpZdB3KcyJq3jtgjgZiVQqRtqHHaAVVIh6ps0s6FsLy8NwmGETf0XdnLauHzq
+         8JKGIqE64HTuZMVBhw+DF4l8S1GFktDGoAjm91d6KUtgI9XrCoUhqCRXYri1WbZ1c0y/
+         jXwA==
+X-Forwarded-Encrypted: i=1; AJvYcCXO6+hVkuQiECRTgmcF7yyBSjeZkwDcmvcCEzOH+kKxkfG1yUE36vI1mi3MpVfPFMb5QAw=@vger.kernel.org
+X-Gm-Message-State: AOJu0Ywd+F8imIu1zosVfYdJwhO7L1ctM5eorh21R6mqJk1/cCs9uoFC
+	1nGW3H+6QYwTFaNi2LnO4/WFlkb8NMNBiZe4djq+Biu8cRl9AQWTVWwmcgbZ0n9n0DX7tFcdu9J
+	M6SKxyajrFXtjkb608JA96w4eauBNxuyz2rxeCmqvc4K7mk1gFKgiYw==
+X-Gm-Gg: ASbGncs99pzXPaLtMHLPZ7csDHlsS3FWD0ee0cLBzqfmIsV3mn6EE2W7ZYXmRHz5Ok1
+	Wfz4C9CbIo5qe0dtPUTWSWR4bf0HfHzq+DUzI16ZBEKCiCsGb52FXheD7qAKmePNTNkztWdupD4
+	jKlV4ecjTFNJQFQ8YFZWeZYsTJb7rwfVTKryCtfFnXG95NMt5ZDFsrMzceptXc4a+iZTmfGG8dB
+	wItMpgKR74prt8teXongtmN3DOWR9Duo7FWHz9a99mwW6TI0q2BcOIdB5hGQUFtrYgi7QiLmGBi
+	A2dub208X196m2qEvlDX/goLjS6835lMb/ad3q2SgZk=
+X-Received: by 2002:a05:6e02:1525:b0:408:1624:b2ee with SMTP id e9e14a558f8ab-425955e4f60mr87965015ab.1.1759180664163;
+        Mon, 29 Sep 2025 14:17:44 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IG3VrvxaH7k00bkTZJWrxcv/Xeuv7Ik/zOnPnH3ASkfKmA5ptZ34qoyLfGaDXRfunQjFfs8kg==
+X-Received: by 2002:a05:6e02:1525:b0:408:1624:b2ee with SMTP id e9e14a558f8ab-425955e4f60mr87964675ab.1.1759180663680;
+        Mon, 29 Sep 2025 14:17:43 -0700 (PDT)
+Received: from redhat.com ([38.15.36.11])
+        by smtp.gmail.com with ESMTPSA id 8926c6da1cb9f-57269f5d0c5sm1963571173.13.2025.09.29.14.17.42
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 29 Sep 2025 13:58:45 -0700 (PDT)
-Date: Mon, 29 Sep 2025 16:58:41 -0400
-From: Peter Xu <peterx@redhat.com>
-To: Akihiko Odaki <odaki@rsg.ci.i.u-tokyo.ac.jp>,
-	=?utf-8?Q?C=C3=A9dric?= Le Goater <clg@redhat.com>
-Cc: =?utf-8?Q?C=C3=A9dric?= Le Goater <clg@redhat.com>,
-	qemu-devel@nongnu.org,
-	Richard Henderson <richard.henderson@linaro.org>,
-	Peter Maydell <peter.maydell@linaro.org>,
-	=?utf-8?Q?C=C3=A9dric?= Le Goater <clg@kaod.org>,
-	Steven Lee <steven_lee@aspeedtech.com>,
-	Troy Lee <leetroy@gmail.com>, Jamin Lin <jamin_lin@aspeedtech.com>,
-	Andrew Jeffery <andrew@codeconstruct.com.au>,
-	Joel Stanley <joel@jms.id.au>, Eric Auger <eric.auger@redhat.com>,
-	Helge Deller <deller@gmx.de>,
-	Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@linaro.org>,
-	=?utf-8?B?SGVydsOp?= Poussineau <hpoussin@reactos.org>,
-	Aleksandar Rikalo <arikalo@gmail.com>,
-	"Edgar E. Iglesias" <edgar.iglesias@gmail.com>,
-	Alistair Francis <alistair@alistair23.me>,
-	Ninad Palsule <ninad@linux.ibm.com>,
-	Paolo Bonzini <pbonzini@redhat.com>,
-	Eduardo Habkost <eduardo@habkost.net>,
-	"Michael S. Tsirkin" <mst@redhat.com>,
-	Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
-	Jason Wang <jasowang@redhat.com>, Yi Liu <yi.l.liu@intel.com>,
-	=?utf-8?Q?Cl=C3=A9ment?= Mathieu--Drif <clement.mathieu--drif@eviden.com>,
-	Nicholas Piggin <npiggin@gmail.com>,
-	Aditya Gupta <adityag@linux.ibm.com>,
-	Gautam Menghani <gautam@linux.ibm.com>,
-	Song Gao <gaosong@loongson.cn>, Bibo Mao <maobibo@loongson.cn>,
-	Jiaxun Yang <jiaxun.yang@flygoat.com>,
-	Jonathan Cameron <jonathan.cameron@huawei.com>,
-	Fan Ni <fan.ni@samsung.com>, David Hildenbrand <david@redhat.com>,
-	Igor Mammedov <imammedo@redhat.com>,
-	Xiao Guangrong <xiaoguangrong.eric@gmail.com>,
-	Beniamino Galvani <b.galvani@gmail.com>,
-	Strahinja Jankovic <strahinja.p.jankovic@gmail.com>,
-	Subbaraya Sundeep <sundeep.lkml@gmail.com>,
-	Jan Kiszka <jan.kiszka@web.de>, Laurent Vivier <laurent@vivier.eu>,
-	Andrey Smirnov <andrew.smirnov@gmail.com>,
-	Aurelien Jarno <aurelien@aurel32.net>,
-	BALATON Zoltan <balaton@eik.bme.hu>,
-	Bernhard Beschow <shentey@gmail.com>,
-	Harsh Prateek Bora <harshpb@linux.ibm.com>,
-	Elena Ufimtseva <elena.ufimtseva@oracle.com>,
-	Jagannathan Raman <jag.raman@oracle.com>,
-	Palmer Dabbelt <palmer@dabbelt.com>,
-	Weiwei Li <liwei1518@gmail.com>,
-	Daniel Henrique Barboza <dbarboza@ventanamicro.com>,
-	Liu Zhiwei <zhiwei_liu@linux.alibaba.com>,
-	Matthew Rosato <mjrosato@linux.ibm.com>,
-	Eric Farman <farman@linux.ibm.com>, Thomas Huth <thuth@redhat.com>,
-	Halil Pasic <pasic@linux.ibm.com>,
-	Christian Borntraeger <borntraeger@linux.ibm.com>,
-	Ilya Leoshkevich <iii@linux.ibm.com>, Fam Zheng <fam@euphon.net>,
-	Bin Meng <bmeng.cn@gmail.com>,
-	Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>,
-	Artyom Tarasenko <atar4qemu@gmail.com>,
-	Marcelo Tosatti <mtosatti@redhat.com>,
-	Max Filippov <jcmvbkbc@gmail.com>, qemu-arm@nongnu.org,
-	qemu-ppc@nongnu.org, qemu-riscv@nongnu.org, qemu-s390x@nongnu.org,
-	qemu-block@nongnu.org, kvm@vger.kernel.org,
-	Alex Williamson <alex.williamson@redhat.com>,
-	Stefano Garzarella <sgarzare@redhat.com>,
-	Alistair Francis <alistair.francis@wdc.com>
-Subject: Re: [PATCH 00/35] memory: QOM-ify AddressSpace
-Message-ID: <aNrzASvJCP_axv22@x1.local>
-References: <20250917-qom-v1-0-7262db7b0a84@rsg.ci.i.u-tokyo.ac.jp>
- <a06a989d-b685-4e62-be06-d96fb91ed6ea@redhat.com>
- <61e4c2bb-d8fa-446a-b4ec-027d4eae35b5@rsg.ci.i.u-tokyo.ac.jp>
+        Mon, 29 Sep 2025 14:17:42 -0700 (PDT)
+Date: Mon, 29 Sep 2025 15:17:40 -0600
+From: Alex Williamson <alex.williamson@redhat.com>
+To: Leon Romanovsky <leon@kernel.org>
+Cc: Leon Romanovsky <leonro@nvidia.com>, Jason Gunthorpe <jgg@nvidia.com>,
+ Andrew Morton <akpm@linux-foundation.org>, Bjorn Helgaas
+ <bhelgaas@google.com>, Christian =?UTF-8?B?S8O2bmln?=
+ <christian.koenig@amd.com>, dri-devel@lists.freedesktop.org,
+ iommu@lists.linux.dev, Jens Axboe <axboe@kernel.dk>, Joerg Roedel
+ <joro@8bytes.org>, kvm@vger.kernel.org, linaro-mm-sig@lists.linaro.org,
+ linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+ linux-media@vger.kernel.org, linux-mm@kvack.org, linux-pci@vger.kernel.org,
+ Logan Gunthorpe <logang@deltatee.com>, Marek Szyprowski
+ <m.szyprowski@samsung.com>, Robin Murphy <robin.murphy@arm.com>, Sumit
+ Semwal <sumit.semwal@linaro.org>, Vivek Kasireddy
+ <vivek.kasireddy@intel.com>, Will Deacon <will@kernel.org>
+Subject: Re: [PATCH v4 07/10] vfio/pci: Add dma-buf export config for MMIO
+ regions
+Message-ID: <20250929151740.21f001e3.alex.williamson@redhat.com>
+In-Reply-To: <b1b44823f93fd9e7fa73dc165141d716cb74fa90.1759070796.git.leon@kernel.org>
+References: <cover.1759070796.git.leon@kernel.org>
+	<b1b44823f93fd9e7fa73dc165141d716cb74fa90.1759070796.git.leon@kernel.org>
+X-Mailer: Claws Mail 4.3.1 (GTK 3.24.43; x86_64-redhat-linux-gnu)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <61e4c2bb-d8fa-446a-b4ec-027d4eae35b5@rsg.ci.i.u-tokyo.ac.jp>
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-On Thu, Sep 18, 2025 at 09:47:07PM +0900, Akihiko Odaki wrote:
-> On 2025/09/18 21:39, Cédric Le Goater wrote:
-> > Hello Akihiko,
-> > 
-> > On 9/17/25 14:56, Akihiko Odaki wrote:
-> > > Based-on: <20250917-subregion-v1-0-bef37d9b4f73@rsg.ci.i.u-tokyo.ac.jp>
-> > > ("[PATCH 00/14] Fix memory region use-after-finalization")
-> > > 
-> > > Make AddressSpaces QOM objects to ensure that they are destroyed when
-> > > their owners are finalized and also to get a unique path for debugging
-> > > output.
-> > > 
-> > > Suggested by BALATON Zoltan:
-> > > https://lore.kernel.org/qemu-devel/cd21698f-db77-eb75-6966-
-> > > d559fdcab835@eik.bme.hu/
-> > > 
-> > > Signed-off-by: Akihiko Odaki <odaki@rsg.ci.i.u-tokyo.ac.jp>
-> > 
-> > I wonder if this is going to fix an issue I was seeing a while ago
-> > in the FSI models. I couldn't find a clean way to avoid corrupting
-> > memory because of how the address_space was created and later on
-> > destroyed. See below,
+On Sun, 28 Sep 2025 17:50:17 +0300
+Leon Romanovsky <leon@kernel.org> wrote:
+
+> From: Leon Romanovsky <leonro@nvidia.com>
 > 
-> Partially, but this is insufficient.
+> Add new kernel config which indicates support for dma-buf export
+> of MMIO regions, which implementation is provided in next patches.
 > 
-> The first problem is that AddressSpace suffers from circular references the
-> following series solves:
-> https://lore.kernel.org/qemu-devel/20250906-mr-v2-0-2820f5a3d282@rsg.ci.i.u-tokyo.ac.jp/
-> "[PATCH v2 0/3] memory: Stop piggybacking on memory region owners"
+> Signed-off-by: Leon Romanovsky <leonro@nvidia.com>
+> ---
+>  drivers/vfio/pci/Kconfig | 20 ++++++++++++++++++++
+>  1 file changed, 20 insertions(+)
 > 
-> Another problem is that RCU is not properly waited. This is left to future
-> work.
+> diff --git a/drivers/vfio/pci/Kconfig b/drivers/vfio/pci/Kconfig
+> index 2b0172f54665..55ae888bf26a 100644
+> --- a/drivers/vfio/pci/Kconfig
+> +++ b/drivers/vfio/pci/Kconfig
+> @@ -55,6 +55,26 @@ config VFIO_PCI_ZDEV_KVM
+>  
+>  	  To enable s390x KVM vfio-pci extensions, say Y.
+>  
+> +config VFIO_PCI_DMABUF
+> +	bool "VFIO PCI extensions for DMA-BUF"
+> +	depends on VFIO_PCI_CORE
+> +	depends on PCI_P2PDMA && DMA_SHARED_BUFFER
+> +	default y
+> +	help
+> +	  Enable support for VFIO PCI extensions that allow exporting
+> +	  device MMIO regions as DMA-BUFs for peer devices to access via
+> +	  peer-to-peer (P2P) DMA.
+> +
+> +	  This feature enables a VFIO-managed PCI device to export a portion
+> +	  of its MMIO BAR as a DMA-BUF file descriptor, which can be passed
+> +	  to other userspace drivers or kernel subsystems capable of
+> +	  initiating DMA to that region.
+> +
+> +	  Say Y here if you want to enable VFIO DMABUF-based MMIO export
+> +	  support for peer-to-peer DMA use cases.
+> +
+> +	  If unsure, say N.
+> +
+>  source "drivers/vfio/pci/mlx5/Kconfig"
+>  
+>  source "drivers/vfio/pci/hisilicon/Kconfig"
 
-Just to mention, Peter Maydell just posted a series for fixing AS
-destructions here:
+This is only necessary if we think there's a need to build a kernel with
+P2PDMA and VFIO_PCI, but not VFIO_PCI_DMABUF.  Does that need really
+exist?
 
-https://lore.kernel.org/qemu-devel/20250929144228.1994037-1-peter.maydell@linaro.org/
+I also find it unusual to create the Kconfig before adding the
+supporting code.  Maybe this could be popped to the end or rolled into
+the last patch if we decided to keep it.  Thanks,
 
-IIUC it should also work for FSI, if FSI can convert to use dynamically
-allocated AddressSpaces (with/without QOMify; as Akihiko pointed out
-correctly, these should be orthogonal), then provide a proper unrealize()
-of the bus device to invoke address_space_destroy_free().
-
-Thanks,
-
--- 
-Peter Xu
+Alex
 
 
