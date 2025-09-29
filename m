@@ -1,51 +1,51 @@
-Return-Path: <kvm+bounces-59003-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-59005-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id DFC8CBA9F0D
-	for <lists+kvm@lfdr.de>; Mon, 29 Sep 2025 18:05:52 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 615A8BA9F2E
+	for <lists+kvm@lfdr.de>; Mon, 29 Sep 2025 18:06:51 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 6819E7A24DA
-	for <lists+kvm@lfdr.de>; Mon, 29 Sep 2025 16:04:10 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6F28A1C6A89
+	for <lists+kvm@lfdr.de>; Mon, 29 Sep 2025 16:06:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 83DE930DD26;
-	Mon, 29 Sep 2025 16:05:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7563E30E0EB;
+	Mon, 29 Sep 2025 16:05:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="mguS8PJ5"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="QYk1Jx3C"
 X-Original-To: kvm@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9960D30CB55;
-	Mon, 29 Sep 2025 16:05:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 043F630CDA0;
+	Mon, 29 Sep 2025 16:05:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1759161906; cv=none; b=U36fZH+KmoBPdbgX2DeuVO7n/WEUUXc1JdiuHKL0z9pTikz+rPP6yQBN3kLO57FVRgiNZeX62X/TtnH9jt8c+WROzpILxq6yXeSX2TkwD4/qo1EnExZUIS+fJPrC1MowRE2t1vLgMs+ONEDhdKxprKNYa3BlPeno1iD3sam5tUc=
+	t=1759161907; cv=none; b=oil332WpUSbcdkbZpDgiyx9+28B6qntwws1flgGtuo3zM4/+GcAXXBm0Wi+GIwb8fv0wiDPdE2ULHnmhmqXVPCvrn2h980SfIRY6gfU2cY6XL7f4F8i/UUwP/3IsJS2vKvtzGX8XocnZrCxx94zB2tYqKnNtqjTPAtWomcYjWeM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1759161906; c=relaxed/simple;
-	bh=5tQEXQDyC9vxxdE7mqQF1/f3C1/wRXDxUYy358duArk=;
+	s=arc-20240116; t=1759161907; c=relaxed/simple;
+	bh=FYkTMaNMt2gav9jtrgpiFbBiAEdFV/eKHpXBBf6r0zI=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=oGL2P85PbC+LaYfn4aa7QCMppohJrq7OFwtSVMBiQ9DmPmYJzaY4KFTR57NEE0V++rwGWajlUVrj7x4rS0XJ0w3Qz9/xX7njo9MHumvtItxFCiF3qe7qOVCvT4hYeUyor2xI4MV9jyIVkYs5CiLXUdZgm4c1HlgxxI1fH66zkBY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=mguS8PJ5; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 75BADC116B1;
+	 MIME-Version; b=laT0/YlbKHlxGF7ioDQ9HpDsPzGLWUKOy19wn3eifiKtfCTSxqlHZjhaUSrJt/2L07NOUVJdEjKPCzRq/6a7gdTlS7xz1FCXWKYuIcGnjnZJ+ECzPYpcWyUla9tcwwVSDgxG1+TDLoj3CAbPBJTaxXajF7Lyf3n7OuCAwRkGzbo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=QYk1Jx3C; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id DCA67C4CEF4;
 	Mon, 29 Sep 2025 16:05:06 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=k20201202; t=1759161906;
-	bh=5tQEXQDyC9vxxdE7mqQF1/f3C1/wRXDxUYy358duArk=;
+	bh=FYkTMaNMt2gav9jtrgpiFbBiAEdFV/eKHpXBBf6r0zI=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=mguS8PJ5es/pXZHYSoUzE5f0pJHxXShYNFeHBATXJCfJPpnIjqDmin7B9UFwA6NS8
-	 D2Mce+VHPJlEfE7aGWv7wzg8kL3xtBu0XlUfStAQDF9zCglTqyxOAyBRuQiMwwfuwh
-	 fhQzeSFOU6UfqBKmZTd/lScxHViysNxPdFUH26C3m+B+exPp2PeqxDsWoKyhJGjpUS
-	 bqehRPK182VHHyk5A1OcrIUKsKshfjXqy2UdW9eETGhplzKIi91DZplPslPpEan2Lp
-	 lipbvtqUZt6FlYeczaSzyHcXbfEpaK1a0si9a/Uie9Y0Zrcr8sw13M08xKORfv4tVB
-	 3lMOf8klTDaQA==
+	b=QYk1Jx3C9g/vRs0glnODl3QGMP5q04jeBbuom1x5rZAzaSmTNgIRrKxL+hogX/iTV
+	 PbnPqQp37JzMUk4Qhw5fyrjdvQO9MHz/bOHLxxH/HXxO0LUAXuNapWtPuII7liqktX
+	 1TcmW4+czUMy9gf+peGJL8bL8X5oG5Di4WXmQ5y1PtrzyTHo3/UOUdQjP+dqoQOQwY
+	 vGtF370TQ1kH48zonUFxHHZ2wNzrUqbRIqJh4seY6lP9iQlbvEK3N6xzKPYGMZ8xF9
+	 wmDLMCtXlEoJOrucz6rIGtAH2w+3xE5kRWduBq9zgLecprKOtuB7s1Uwv8WWcgGmfE
+	 MrMFgcBHan8pg==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.98.2)
 	(envelope-from <maz@kernel.org>)
-	id 1v3GN6-0000000AHqo-2L5H;
+	id 1v3GN6-0000000AHqo-3IjN;
 	Mon, 29 Sep 2025 16:05:04 +0000
 From: Marc Zyngier <maz@kernel.org>
 To: kvmarm@lists.linux.dev,
@@ -55,9 +55,9 @@ Cc: Joey Gouly <joey.gouly@arm.com>,
 	Suzuki K Poulose <suzuki.poulose@arm.com>,
 	Oliver Upton <oliver.upton@linux.dev>,
 	Zenghui Yu <yuzenghui@huawei.com>
-Subject: [PATCH 05/13] KVM: arm64: Add timer UAPI workaround to sysreg infrastructure
-Date: Mon, 29 Sep 2025 17:04:49 +0100
-Message-ID: <20250929160458.3351788-6-maz@kernel.org>
+Subject: [PATCH 06/13] KVM: arm64: Move CNT*_CTL_EL0 userspace accessors to generic infrastructure
+Date: Mon, 29 Sep 2025 17:04:50 +0100
+Message-ID: <20250929160458.3351788-7-maz@kernel.org>
 X-Mailer: git-send-email 2.47.3
 In-Reply-To: <20250929160458.3351788-1-maz@kernel.org>
 References: <20250929160458.3351788-1-maz@kernel.org>
@@ -73,112 +73,130 @@ X-SA-Exim-Rcpt-To: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-Amongst the numerous bugs that plague the KVM/arm64 UAPI, one of
-the most annoying thing is that the userspace view of the virtual
-timer has its CVAL and CNT encodings swapped.
-
-In order to reduce the amount of code that has to know about this,
-start by adding handling for this bug in the sys_reg code.
-
-Nothing is making use of it yet, as the code responsible for userspace
-interaction is catching the accesses early.
+Remove the handling of CNT*_CTL_EL0 from guest.c, and move it to
+sys_regs.c, using a new TIMER_REG() definition to encapsulate it.
 
 Signed-off-by: Marc Zyngier <maz@kernel.org>
 ---
- arch/arm64/kvm/sys_regs.c | 33 ++++++++++++++++++++++++++++++---
- arch/arm64/kvm/sys_regs.h |  6 ++++++
- 2 files changed, 36 insertions(+), 3 deletions(-)
+ arch/arm64/kvm/guest.c    |  4 ----
+ arch/arm64/kvm/sys_regs.c | 36 +++++++++++++++++++++++++++++++-----
+ 2 files changed, 31 insertions(+), 9 deletions(-)
 
-diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-index 9f2f4e0b042e8..8e6f50f54b4bf 100644
---- a/arch/arm64/kvm/sys_regs.c
-+++ b/arch/arm64/kvm/sys_regs.c
-@@ -5231,15 +5231,28 @@ static int demux_c15_set(struct kvm_vcpu *vcpu, u64 id, void __user *uaddr)
- 	}
+diff --git a/arch/arm64/kvm/guest.c b/arch/arm64/kvm/guest.c
+index 16ba5e9ac86c3..dea648706fd52 100644
+--- a/arch/arm64/kvm/guest.c
++++ b/arch/arm64/kvm/guest.c
+@@ -592,10 +592,8 @@ static unsigned long num_core_regs(const struct kvm_vcpu *vcpu)
  }
  
-+static u64 kvm_one_reg_to_id(const struct kvm_one_reg *reg)
+ static const u64 timer_reg_list[] = {
+-	KVM_REG_ARM_TIMER_CTL,
+ 	KVM_REG_ARM_TIMER_CNT,
+ 	KVM_REG_ARM_TIMER_CVAL,
+-	KVM_REG_ARM_PTIMER_CTL,
+ 	KVM_REG_ARM_PTIMER_CNT,
+ 	KVM_REG_ARM_PTIMER_CVAL,
+ };
+@@ -605,10 +603,8 @@ static const u64 timer_reg_list[] = {
+ static bool is_timer_reg(u64 index)
+ {
+ 	switch (index) {
+-	case KVM_REG_ARM_TIMER_CTL:
+ 	case KVM_REG_ARM_TIMER_CNT:
+ 	case KVM_REG_ARM_TIMER_CVAL:
+-	case KVM_REG_ARM_PTIMER_CTL:
+ 	case KVM_REG_ARM_PTIMER_CNT:
+ 	case KVM_REG_ARM_PTIMER_CVAL:
+ 		return true;
+diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
+index 8e6f50f54b4bf..d97aacf4c1dc9 100644
+--- a/arch/arm64/kvm/sys_regs.c
++++ b/arch/arm64/kvm/sys_regs.c
+@@ -1594,6 +1594,23 @@ static bool access_arch_timer(struct kvm_vcpu *vcpu,
+ 	return true;
+ }
+ 
++static int arch_timer_set_user(struct kvm_vcpu *vcpu,
++			       const struct sys_reg_desc *rd,
++			       u64 val)
 +{
-+	switch(reg->id) {
-+	case KVM_REG_ARM_TIMER_CVAL:
-+		return TO_ARM64_SYS_REG(CNTV_CVAL_EL0);
-+	case KVM_REG_ARM_TIMER_CNT:
-+		return TO_ARM64_SYS_REG(CNTVCT_EL0);
-+	default:
-+		return reg->id;
++	switch (reg_to_encoding(rd)) {
++	case SYS_CNTV_CTL_EL0:
++	case SYS_CNTP_CTL_EL0:
++	case SYS_CNTHV_CTL_EL2:
++	case SYS_CNTHP_CTL_EL2:
++		val &= ~ARCH_TIMER_CTRL_IT_STAT;
++		break;
 +	}
++
++	__vcpu_assign_sys_reg(vcpu, rd->reg, val);
++	return 0;
 +}
 +
- int kvm_sys_reg_get_user(struct kvm_vcpu *vcpu, const struct kvm_one_reg *reg,
- 			 const struct sys_reg_desc table[], unsigned int num)
+ static s64 kvm_arm64_ftr_safe_value(u32 id, const struct arm64_ftr_bits *ftrp,
+ 				    s64 new, s64 cur)
  {
- 	u64 __user *uaddr = (u64 __user *)(unsigned long)reg->addr;
- 	const struct sys_reg_desc *r;
-+	u64 id = kvm_one_reg_to_id(reg);
- 	u64 val;
- 	int ret;
+@@ -2496,15 +2513,20 @@ static bool bad_redir_trap(struct kvm_vcpu *vcpu,
+ 			"trap of EL2 register redirected to EL1");
+ }
  
--	r = id_to_sys_reg_desc(vcpu, reg->id, table, num);
-+	r = id_to_sys_reg_desc(vcpu, id, table, num);
- 	if (!r || sysreg_hidden(vcpu, r))
- 		return -ENOENT;
+-#define EL2_REG_FILTERED(name, acc, rst, v, filter) {	\
++#define SYS_REG_USER_FILTER(name, acc, rst, v, gu, su, filter) { \
+ 	SYS_DESC(SYS_##name),			\
+ 	.access = acc,				\
+ 	.reset = rst,				\
+ 	.reg = name,				\
++	.get_user = gu,				\
++	.set_user = su,				\
+ 	.visibility = filter,			\
+ 	.val = v,				\
+ }
  
-@@ -5272,13 +5285,14 @@ int kvm_sys_reg_set_user(struct kvm_vcpu *vcpu, const struct kvm_one_reg *reg,
- {
- 	u64 __user *uaddr = (u64 __user *)(unsigned long)reg->addr;
- 	const struct sys_reg_desc *r;
-+	u64 id = kvm_one_reg_to_id(reg);
- 	u64 val;
- 	int ret;
- 
- 	if (get_user(val, uaddr))
- 		return -EFAULT;
- 
--	r = id_to_sys_reg_desc(vcpu, reg->id, table, num);
-+	r = id_to_sys_reg_desc(vcpu, id, table, num);
- 	if (!r || sysreg_hidden(vcpu, r))
- 		return -ENOENT;
- 
-@@ -5338,10 +5352,23 @@ static u64 sys_reg_to_index(const struct sys_reg_desc *reg)
- 
- static bool copy_reg_to_user(const struct sys_reg_desc *reg, u64 __user **uind)
- {
-+	u64 idx;
++#define EL2_REG_FILTERED(name, acc, rst, v, filter)	\
++	SYS_REG_USER_FILTER(name, acc, rst, v, NULL, NULL, filter)
 +
- 	if (!*uind)
- 		return true;
+ #define EL2_REG(name, acc, rst, v)			\
+ 	EL2_REG_FILTERED(name, acc, rst, v, el2_visibility)
  
--	if (put_user(sys_reg_to_index(reg), *uind))
-+	switch (reg_to_encoding(reg)) {
-+	case SYS_CNTV_CVAL_EL0:
-+		idx = KVM_REG_ARM_TIMER_CVAL;
-+		break;
-+	case SYS_CNTVCT_EL0:
-+		idx = KVM_REG_ARM_TIMER_CNT;
-+		break;
-+	default:
-+		idx = sys_reg_to_index(reg);
-+	}
+@@ -2515,6 +2537,10 @@ static bool bad_redir_trap(struct kvm_vcpu *vcpu,
+ 	EL2_REG_VNCR_FILT(name, hidden_visibility)
+ #define EL2_REG_REDIR(name, rst, v)	EL2_REG(name, bad_redir_trap, rst, v)
+ 
++#define TIMER_REG(name, vis)					   \
++	SYS_REG_USER_FILTER(name, access_arch_timer, reset_val, 0, \
++			    NULL, arch_timer_set_user, vis)
 +
-+	if (put_user(idx, *uind))
- 		return false;
+ /*
+  * Since reset() callback and field val are not used for idregs, they will be
+  * used for specific purposes for idregs.
+@@ -3485,11 +3511,11 @@ static const struct sys_reg_desc sys_reg_descs[] = {
+ 	{ SYS_DESC(SYS_CNTPCTSS_EL0), access_arch_timer },
+ 	{ SYS_DESC(SYS_CNTVCTSS_EL0), access_arch_timer },
+ 	{ SYS_DESC(SYS_CNTP_TVAL_EL0), access_arch_timer },
+-	{ SYS_DESC(SYS_CNTP_CTL_EL0), access_arch_timer },
++	TIMER_REG(CNTP_CTL_EL0, NULL),
+ 	{ SYS_DESC(SYS_CNTP_CVAL_EL0), access_arch_timer },
  
- 	(*uind)++;
-diff --git a/arch/arm64/kvm/sys_regs.h b/arch/arm64/kvm/sys_regs.h
-index 317abc490368d..b3f904472fac5 100644
---- a/arch/arm64/kvm/sys_regs.h
-+++ b/arch/arm64/kvm/sys_regs.h
-@@ -257,4 +257,10 @@ int kvm_finalize_sys_regs(struct kvm_vcpu *vcpu);
- 	(val);								       \
- })
+ 	{ SYS_DESC(SYS_CNTV_TVAL_EL0), access_arch_timer },
+-	{ SYS_DESC(SYS_CNTV_CTL_EL0), access_arch_timer },
++	TIMER_REG(CNTV_CTL_EL0, NULL),
+ 	{ SYS_DESC(SYS_CNTV_CVAL_EL0), access_arch_timer },
  
-+#define TO_ARM64_SYS_REG(r)	ARM64_SYS_REG(sys_reg_Op0(SYS_ ## r),	\
-+					      sys_reg_Op1(SYS_ ## r),	\
-+					      sys_reg_CRn(SYS_ ## r),	\
-+					      sys_reg_CRm(SYS_ ## r),	\
-+					      sys_reg_Op2(SYS_ ## r))
-+
- #endif /* __ARM64_KVM_SYS_REGS_LOCAL_H__ */
+ 	/* PMEVCNTRn_EL0 */
+@@ -3688,11 +3714,11 @@ static const struct sys_reg_desc sys_reg_descs[] = {
+ 	EL2_REG_VNCR(CNTVOFF_EL2, reset_val, 0),
+ 	EL2_REG(CNTHCTL_EL2, access_rw, reset_val, 0),
+ 	{ SYS_DESC(SYS_CNTHP_TVAL_EL2), access_arch_timer },
+-	EL2_REG(CNTHP_CTL_EL2, access_arch_timer, reset_val, 0),
++	TIMER_REG(CNTHP_CTL_EL2, el2_visibility),
+ 	EL2_REG(CNTHP_CVAL_EL2, access_arch_timer, reset_val, 0),
+ 
+ 	{ SYS_DESC(SYS_CNTHV_TVAL_EL2), access_arch_timer, .visibility = cnthv_visibility },
+-	EL2_REG_FILTERED(CNTHV_CTL_EL2, access_arch_timer, reset_val, 0, cnthv_visibility),
++	TIMER_REG(CNTHV_CTL_EL2, cnthv_visibility),
+ 	EL2_REG_FILTERED(CNTHV_CVAL_EL2, access_arch_timer, reset_val, 0, cnthv_visibility),
+ 
+ 	{ SYS_DESC(SYS_CNTKCTL_EL12), access_cntkctl_el12 },
 -- 
 2.47.3
 
