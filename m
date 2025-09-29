@@ -1,87 +1,87 @@
-Return-Path: <kvm+bounces-58978-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-58979-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id E7914BA8E00
-	for <lists+kvm@lfdr.de>; Mon, 29 Sep 2025 12:21:34 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5B614BA8E12
+	for <lists+kvm@lfdr.de>; Mon, 29 Sep 2025 12:22:27 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E93C93C3A9D
-	for <lists+kvm@lfdr.de>; Mon, 29 Sep 2025 10:21:32 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id B3F7B189D9B7
+	for <lists+kvm@lfdr.de>; Mon, 29 Sep 2025 10:22:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B65942FBDF6;
-	Mon, 29 Sep 2025 10:21:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 90CB52FB995;
+	Mon, 29 Sep 2025 10:22:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="I/2ztV8i"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="YtMQXGic"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DD3A22FB97D
-	for <kvm@vger.kernel.org>; Mon, 29 Sep 2025 10:21:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5BA522EC56F
+	for <kvm@vger.kernel.org>; Mon, 29 Sep 2025 10:22:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1759141278; cv=none; b=RC9mdTUXoQJiWF2FgYkX+8wIMHd0DQ2NBhuZR17bT8RoIrdLRlySZ1lJmo6AlUWldaKcEnKkYSMGhbl8IT7+YkL4sh6oAtocPobpPvBXxghMJS0vwOWM0UMcdb+WSnzdZZq+u8b6Hy91c4ZkXK/duIRbjP/1JGB/3P+SLSEvRrY=
+	t=1759141338; cv=none; b=gew5/Uhdq7FOvB4OR4+x11I//I9DfiKQCgRgm+OE5skcHsGacItxzYQpKz0x2saJWwUzvRlyfTvsxPVi1l0kLfQ3nK6g9eg7iOgc6RU2RSLEm/bYIpxtSwwebzqN+PwtOLV2ra0OStNd63M19tg32XZOoxsSlFLD7xhaXoFa6vo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1759141278; c=relaxed/simple;
-	bh=WcvQCY0+UwCaIb6eCl0gssuyRiHF3sXxtaZi0SsyUzg=;
+	s=arc-20240116; t=1759141338; c=relaxed/simple;
+	bh=YJjG7q3oPFCJAUZOA6f3h4dExpYvsQPN2rafoNzBl5c=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=Uh1z+mVojatcEBHmjnLIVDjUKwnBZWJeS/xR7lW3wujfHLN0jximWd8GJjsz3lH66bShWbScUNlXVI2DpLVEolcsq4fFhuw1MHVU+gs/0jjlQR4eSZUtxY7hMPsWpJsT27YRbOcg+Tai3VTN4h7swt2xus+9z69R3JmrcmdJ4Ew=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=I/2ztV8i; arc=none smtp.client-ip=170.10.133.124
+	 In-Reply-To:Content-Type; b=PTduvd9bPxTnO46rQeRq9MPlLohEouQapRslHzqc58jI2cumXVzr4AZGZJ4WxaPp7TbUGCIvh8124i7SvrlvwjAse7fO/56fjaMXJbZK0OsEHaXtig0f8tKv8Y86XuAB4CCdyM6NRcu/rdUzkNqnzpMnHfqDq/wMykJfCMkyXtk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=YtMQXGic; arc=none smtp.client-ip=170.10.129.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1759141276;
+	s=mimecast20190719; t=1759141336;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-	bh=Z3YKN3zIRZfonnEHUxLu7FAkkWR5YdTCLJYZ6VEYM8Y=;
-	b=I/2ztV8iLJgHykIkti2567/E+eovdeTL+W4TL7WAgUCJfirK80rfu/CuTT5D46iVNMZmwF
-	MmSqUBpwb+9qpa1jCMdaxstQXFCas9ucWviQYe6QjfowCYv8FLMIEp5A+pfFVaE0IZw9qy
-	JKxg2k511TiN57lChuu5Sb+ZYIm8oYI=
-Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
- [209.85.221.72]) by relay.mimecast.com with ESMTP with STARTTLS
+	bh=gTfF/9tS74v6KOk7XL7uKXLPFCkMs1I/RkhQW/KFaXg=;
+	b=YtMQXGic0zcUWMy5w9ZygH5nzY6ZG086HjQAYfVmgpA12ON/Xy+ilCouQJSLVwwePXchSn
+	iZsGmkmo/jxjJoC64g7hJjNReKkcuPnw9774t61JPqIyh2w4h53jB0kZE+F9K5JC5u9lCM
+	8BDgormXZocdyBSq65uvs9VRVwhPAD4=
+Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
+ [209.85.128.72]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-224-j2FdJSSHPRitEHMsoHsa1A-1; Mon, 29 Sep 2025 06:21:14 -0400
-X-MC-Unique: j2FdJSSHPRitEHMsoHsa1A-1
-X-Mimecast-MFC-AGG-ID: j2FdJSSHPRitEHMsoHsa1A_1759141273
-Received: by mail-wr1-f72.google.com with SMTP id ffacd0b85a97d-3f3c118cbb3so2848881f8f.3
-        for <kvm@vger.kernel.org>; Mon, 29 Sep 2025 03:21:14 -0700 (PDT)
+ us-mta-571-dwBNT0sAPM6W2MJm7pNw6Q-1; Mon, 29 Sep 2025 06:22:15 -0400
+X-MC-Unique: dwBNT0sAPM6W2MJm7pNw6Q-1
+X-Mimecast-MFC-AGG-ID: dwBNT0sAPM6W2MJm7pNw6Q_1759141334
+Received: by mail-wm1-f72.google.com with SMTP id 5b1f17b1804b1-46e44b9779eso12429505e9.1
+        for <kvm@vger.kernel.org>; Mon, 29 Sep 2025 03:22:15 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1759141273; x=1759746073;
+        d=1e100.net; s=20230601; t=1759141334; x=1759746134;
         h=content-transfer-encoding:in-reply-to:autocrypt:content-language
          :from:references:cc:to:subject:user-agent:mime-version:date
          :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=Z3YKN3zIRZfonnEHUxLu7FAkkWR5YdTCLJYZ6VEYM8Y=;
-        b=NBS7pp8byVgZ4T9OFHmLLcTbtKoioIGj3BEZa6oz4n0eN5eGJuRTysgPgPttbct3w9
-         RnrW5KwOZ1wVQ2WcyW8kIWTVIsbqY9rZieH7CBhp/v0sBodl+Gqs9U8AQMHmP2smlrVW
-         ef3GnlQYKr2sC0cseOC+CzAOKUZcTHmWubKY8cEBv6HtrYtXhbA/Uukj/dqD+YEbnvmu
-         LIy/GMHAN9ttl2ugr6wPanxWCHdjNNNc22dZP7p9DJzkZ4/IdA0ONwqZteFGQmKGNZ5h
-         SBReD3JzWzuOlSdHlYrFtLODvy4Hf5nzQtGCihzb/HBxWmnvZcmBrWgMM0Q6blW2Xzw7
-         YMPw==
-X-Forwarded-Encrypted: i=1; AJvYcCWP3KtSOat2XvPYHHxVGmmGyYKXDKSa5JhPz0aF68JHFVHtPahvK33ZM8lz4cWd/TkaAf4=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxHNxzejoWTiz62wgdAzgVENNiUsx4lp+AeApF492EtROkNsRX6
-	WPgFdEbMGSpYoxmdXVTPLgVNXBNc218SBTrM7t+WF6SJf4Vi93LLgcZ79bMm6kLQj4QV+baw6p8
-	pbst+5tRMDRpX8mOwRVwozcDP+DnfnFwuYxvrSXN43K9suvnSKA3MiQ==
-X-Gm-Gg: ASbGncs70krG/LYtb2HEflfWeyiVV9DO72zez00B4s15v+xNvwTtsCJ6D/YXA7RFLSi
-	UFz2N8usjAIP/u5emJ/Sen/+3WnxvOatRhkIe8J6M16KbJEEVeM/AXFalJC3+fbvGNyivLaEMcT
-	+kd/jzd36IZvsRqaYZx9PEuDdPVB/knPCRLqQ9veSUOHaYyjLNUdoe1XX6ATz04JBNZltTcMM9k
-	ZyfdWv/HTpjxN48lZviPFzNUehpY/SMc+SvCVrrbBUzmLukx262jjI+TxOPWA6xT7HxsLuLDdjv
-	hNdhTDEvQkMRaSgoOkvf3GIsThyNHRpDzusfm6SjKsWLDj/YSKOERSrA5i4aNbZOzVtcUDK3
-X-Received: by 2002:a05:6000:2410:b0:3ec:d80d:e59b with SMTP id ffacd0b85a97d-40e4354d936mr17146005f8f.10.1759141273238;
-        Mon, 29 Sep 2025 03:21:13 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IHseD/VRuRD8/5XkmKc+WsswLQN2PeBfIKRcSn+dzEpfuntBaoyeW14SJHlBROwxevLjLT9Aw==
-X-Received: by 2002:a05:6000:2410:b0:3ec:d80d:e59b with SMTP id ffacd0b85a97d-40e4354d936mr17145899f8f.10.1759141272561;
-        Mon, 29 Sep 2025 03:21:12 -0700 (PDT)
+        bh=gTfF/9tS74v6KOk7XL7uKXLPFCkMs1I/RkhQW/KFaXg=;
+        b=HOzq9CMy02rDp+Td0LZL37VVGjj5WfzXzqJjXCnPBGrL910LqOgUjlwrGRp1SzYS9K
+         YFNemyU2OKi+C4Nkc4ylWy4vobbXGYB+YfjE8vBgxz+vLOh46WGkz6fJTFvtRzcAg8EK
+         IIqP94b3MqF2FMvJ+k9T/ix7qUIQrI/0tjLShNSfblUt24vM/kn/YSKbRmVTUINzGrlu
+         6tpLA5iqIUGALTAVKWxIsPRObRV5ZtzmRFsxPOPipStTEb/l2KChMqvmMMyJ/EJXDmBN
+         y0PYugAssO46Q+E+R3J5Px7IVAtwY7tADS/6neCXR6bpMmQksK0C7Sy3oXEM277VRCIZ
+         MYEQ==
+X-Forwarded-Encrypted: i=1; AJvYcCXJQ9KO+XspGUE99MA+F4teGSTkZ+H88S1YnAs1N32xoCU9j1DysoAc/xFmGHoo8xkcRlU=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyNnQUin5/73kKo/up3Nnwc6/VsEs5kiMwcpwC9Esl/+fM8ZSA7
+	7qrmlCQBBSrY9xbhmT/MqFgk4eGK/Nw2sKbsK8F9XbU+3oaKjKrRG3VI9/GkPSGgYBNtOvpUDTE
+	KcfxT7QM0Xh5pD8/kgTtYO/rJoG86BZkTPBsnLOMFHQCIsBr5/fhyoQ==
+X-Gm-Gg: ASbGncscDFdu8kn+wDMU9prCuyWJtipgYTM3SbSZJERxY80XlCPKt+2ly9VIGM9gZyz
+	iUcKjhs3u6itMrV9cMuYWaNp+5GXLt9ZoGnfMbjcXXzaw3FdLoM2eD3+YwfkCLIZ/5IiztsWE/J
+	gij0hX8o4jfaggge6efEqQvbX3vGok4rOUWR4621jl2BEVuVfFkUQByx3n6zUqGdoziYS1U0gV0
+	62nL7tRWo7dmb6nkyvH6HMz0+SyEFPzEgxEn9ynlLP6I3RPqmGqj8aRFo42YFqMTGC8tF/JerVu
+	2jPUnPfoUIh4JEXCrqJ8yNaZO69u88BYsmd4c7e/klaSsG12pIHXsLRqIqim8XsMhC28E7rZ
+X-Received: by 2002:a05:600c:1e85:b0:45d:d5df:ab2d with SMTP id 5b1f17b1804b1-46e32a03456mr153455715e9.26.1759141334053;
+        Mon, 29 Sep 2025 03:22:14 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IFcPTC0WN8sznaK2VhvNvPmXdMZ5tY9SOo2+KWlJ8c8Cfvq/5YcnNrrC/JndZbTtN7rU24FIw==
+X-Received: by 2002:a05:600c:1e85:b0:45d:d5df:ab2d with SMTP id 5b1f17b1804b1-46e32a03456mr153455355e9.26.1759141333625;
+        Mon, 29 Sep 2025 03:22:13 -0700 (PDT)
 Received: from [192.168.3.141] (p4ff1fa94.dip0.t-ipconnect.de. [79.241.250.148])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-40fc5603161sm17745080f8f.35.2025.09.29.03.21.10
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-40fb985e080sm17624009f8f.24.2025.09.29.03.22.12
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 29 Sep 2025 03:21:11 -0700 (PDT)
-Message-ID: <f13e06f3-3c7b-4993-b33a-a6921c14231b@redhat.com>
-Date: Mon, 29 Sep 2025 12:20:57 +0200
+        Mon, 29 Sep 2025 03:22:13 -0700 (PDT)
+Message-ID: <d2fa49af-112b-4de9-8c03-5f38618b1e57@redhat.com>
+Date: Mon, 29 Sep 2025 12:22:12 +0200
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -89,70 +89,22 @@ List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v7 06/12] KVM: guest_memfd: add module param for disabling
- TLB flushing
-To: Patrick Roy <patrick.roy@linux.dev>, Will Deacon <will@kernel.org>
-Cc: Dave Hansen <dave.hansen@intel.com>, "Roy, Patrick"
- <roypat@amazon.co.uk>, "pbonzini@redhat.com" <pbonzini@redhat.com>,
- "corbet@lwn.net" <corbet@lwn.net>, "maz@kernel.org" <maz@kernel.org>,
- "oliver.upton@linux.dev" <oliver.upton@linux.dev>,
- "joey.gouly@arm.com" <joey.gouly@arm.com>,
- "suzuki.poulose@arm.com" <suzuki.poulose@arm.com>,
- "yuzenghui@huawei.com" <yuzenghui@huawei.com>,
- "catalin.marinas@arm.com" <catalin.marinas@arm.com>,
- "tglx@linutronix.de" <tglx@linutronix.de>,
- "mingo@redhat.com" <mingo@redhat.com>, "bp@alien8.de" <bp@alien8.de>,
- "dave.hansen@linux.intel.com" <dave.hansen@linux.intel.com>,
- "x86@kernel.org" <x86@kernel.org>, "hpa@zytor.com" <hpa@zytor.com>,
- "luto@kernel.org" <luto@kernel.org>,
- "peterz@infradead.org" <peterz@infradead.org>,
- "willy@infradead.org" <willy@infradead.org>,
- "akpm@linux-foundation.org" <akpm@linux-foundation.org>,
- "lorenzo.stoakes@oracle.com" <lorenzo.stoakes@oracle.com>,
- "Liam.Howlett@oracle.com" <Liam.Howlett@oracle.com>,
- "vbabka@suse.cz" <vbabka@suse.cz>, "rppt@kernel.org" <rppt@kernel.org>,
- "surenb@google.com" <surenb@google.com>, "mhocko@suse.com"
- <mhocko@suse.com>, "song@kernel.org" <song@kernel.org>,
- "jolsa@kernel.org" <jolsa@kernel.org>, "ast@kernel.org" <ast@kernel.org>,
- "daniel@iogearbox.net" <daniel@iogearbox.net>,
- "andrii@kernel.org" <andrii@kernel.org>,
- "martin.lau@linux.dev" <martin.lau@linux.dev>,
- "eddyz87@gmail.com" <eddyz87@gmail.com>,
- "yonghong.song@linux.dev" <yonghong.song@linux.dev>,
- "john.fastabend@gmail.com" <john.fastabend@gmail.com>,
- "kpsingh@kernel.org" <kpsingh@kernel.org>, "sdf@fomichev.me"
- <sdf@fomichev.me>, "haoluo@google.com" <haoluo@google.com>,
- "jgg@ziepe.ca" <jgg@ziepe.ca>, "jhubbard@nvidia.com" <jhubbard@nvidia.com>,
- "peterx@redhat.com" <peterx@redhat.com>, "jannh@google.com"
- <jannh@google.com>, "pfalcato@suse.de" <pfalcato@suse.de>,
- "shuah@kernel.org" <shuah@kernel.org>, "seanjc@google.com"
- <seanjc@google.com>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
- "linux-doc@vger.kernel.org" <linux-doc@vger.kernel.org>,
- "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
- "linux-arm-kernel@lists.infradead.org"
- <linux-arm-kernel@lists.infradead.org>,
- "kvmarm@lists.linux.dev" <kvmarm@lists.linux.dev>,
- "linux-fsdevel@vger.kernel.org" <linux-fsdevel@vger.kernel.org>,
- "linux-mm@kvack.org" <linux-mm@kvack.org>,
- "bpf@vger.kernel.org" <bpf@vger.kernel.org>,
- "linux-kselftest@vger.kernel.org" <linux-kselftest@vger.kernel.org>,
- "Cali, Marco" <xmarcalx@amazon.co.uk>,
- "Kalyazin, Nikita" <kalyazin@amazon.co.uk>,
- "Thomson, Jack" <jackabt@amazon.co.uk>,
- "derekmn@amazon.co.uk" <derekmn@amazon.co.uk>,
- "tabba@google.com" <tabba@google.com>,
- "ackerleytng@google.com" <ackerleytng@google.com>
-References: <20250924151101.2225820-4-patrick.roy@campus.lmu.de>
- <20250924152214.7292-1-roypat@amazon.co.uk>
- <20250924152214.7292-3-roypat@amazon.co.uk>
- <e25867b6-ffc0-4c7c-9635-9b3f47b186ca@intel.com>
- <c1875a54-0c87-450f-9370-29e7ec4fea3d@redhat.com>
- <82bff1c4-987f-46cb-833c-bd99eaa46e7a@intel.com>
- <c79173d8-6f18-40fa-9621-e691990501e4@redhat.com>
- <c88514c3-e15f-4853-8acf-15e7b4b979f4@linux.dev>
- <aNZwmPFAxm_HRYpC@willie-the-truck>
- <5d11b5f7-3208-4ea8-bbff-f535cf62d576@redhat.com>
- <be89abc6-97ca-47d8-b8e7-95f58ab9cc67@linux.dev>
+Subject: Re: [PATCH 1/6] KVM: guest_memfd: Add DEFAULT_SHARED flag, reject
+ user page faults if not set
+To: Patrick Roy <patrick.roy@linux.dev>, Ackerley Tng
+ <ackerleytng@google.com>, Fuad Tabba <tabba@google.com>,
+ Sean Christopherson <seanjc@google.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>,
+ Christian Borntraeger <borntraeger@linux.ibm.com>,
+ Janosch Frank <frankja@linux.ibm.com>,
+ Claudio Imbrenda <imbrenda@linux.ibm.com>, kvm@vger.kernel.org,
+ linux-kernel@vger.kernel.org, "Kalyazin, Nikita" <kalyazin@amazon.co.uk>,
+ shivankg@amd.com
+References: <20250926163114.2626257-1-seanjc@google.com>
+ <20250926163114.2626257-2-seanjc@google.com>
+ <CA+EHjTzdX8+MbsYOHAJn6Gkayfei-jE6Q_5HfZhnfwnMijmucw@mail.gmail.com>
+ <diqz7bxh386h.fsf@google.com>
+ <a4976f04-959d-48ae-9815-d192365bdcc6@linux.dev>
 From: David Hildenbrand <david@redhat.com>
 Content-Language: en-US
 Autocrypt: addr=david@redhat.com; keydata=
@@ -199,118 +151,28 @@ Autocrypt: addr=david@redhat.com; keydata=
  3iyY2Nsd7JxfKu1PRhCGwXzRw5TlfEsoRI7V9A8isUCoqE2Dzh3FvYHVeX4Us+bRL/oqareJ
  CIFqgYMyvHj7Q06kTKmauOe4Nf0l0qEkIuIzfoLJ3qr5UyXc2hLtWyT9Ir+lYlX9efqh7mOY
  qIws/H2t
-In-Reply-To: <be89abc6-97ca-47d8-b8e7-95f58ab9cc67@linux.dev>
+In-Reply-To: <a4976f04-959d-48ae-9815-d192365bdcc6@linux.dev>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 
-On 27.09.25 09:38, Patrick Roy wrote:
-> 
-> 
-> On Fri, 2025-09-26 at 21:09 +0100, David Hildenbrand wrote:
->> On 26.09.25 12:53, Will Deacon wrote:
->>> On Fri, Sep 26, 2025 at 10:46:15AM +0100, Patrick Roy wrote:
->>>>
->>>>
->>>> On Thu, 2025-09-25 at 21:13 +0100, David Hildenbrand wrote:
->>>>> On 25.09.25 21:59, Dave Hansen wrote:
->>>>>> On 9/25/25 12:20, David Hildenbrand wrote:
->>>>>>> On 25.09.25 20:27, Dave Hansen wrote:
->>>>>>>> On 9/24/25 08:22, Roy, Patrick wrote:
->>>>>>>>> Add an option to not perform TLB flushes after direct map manipulations.
->>>>>>>>
->>>>>>>> I'd really prefer this be left out for now. It's a massive can of worms.
->>>>>>>> Let's agree on something that works and has well-defined behavior before
->>>>>>>> we go breaking it on purpose.
->>>>>>>
->>>>>>> May I ask what the big concern here is?
->>>>>>
->>>>>> It's not a _big_ concern.
->>>>>
->>>>> Oh, I read "can of worms" and thought there is something seriously problematic :)
->>>>>
->>>>>> I just think we want to start on something
->>>>>> like this as simple, secure, and deterministic as possible.
->>>>>
->>>>> Yes, I agree. And it should be the default. Less secure would have to be opt-in and documented thoroughly.
->>>>
->>>> Yes, I am definitely happy to have the 100% secure behavior be the
->>>> default, and the skipping of TLB flushes be an opt-in, with thorough
->>>> documentation!
->>>>
->>>> But I would like to include the "skip tlb flushes" option as part of
->>>> this patch series straight away, because as I was alluding to in the
->>>> commit message, with TLB flushes this is not usable for Firecracker for
->>>> performance reasons :(
+                          GUEST_MEMFD_FLAG_DEFAULT_SHARED;
 >>>
->>> I really don't want that option for arm64. If we're going to bother
->>> unmapping from the linear map, we should invalidate the TLB.
+>>> At least for now, GUEST_MEMFD_FLAG_DEFAULT_SHARED and
+>>> GUEST_MEMFD_FLAG_MMAP don't make sense without each other. Is it worth
+>>> checking for that, at least until we have in-place conversion? Having
+>>> only GUEST_MEMFD_FLAG_DEFAULT_SHARED set, but GUEST_MEMFD_FLAG_MMAP,
+>>> isn't a useful combination.
+>>>
 >>
->> Reading "TLB flushes result in a up to 40x elongation of page faults in
->> guest_memfd (scaling with the number of CPU cores), or a 5x elongation
->> of memory population,", I can understand why one would want that optimization :)
->>
->> @Patrick, couldn't we use fallocate() to preallocate memory and batch the TLB flush within such an operation?
->>
->> That is, we wouldn't flush after each individual direct-map modification but after multiple ones part of a single operation like fallocate of a larger range.
->>
->> Likely wouldn't make all use cases happy.
->>
+>> I think it's okay to have the two flags be orthogonal from the start.
 > 
-> For Firecracker, we rely a lot on not preallocating _all_ VM memory, and
-> trying to ensure only the actual "working set" of a VM is faulted in (we
-> pack a lot more VMs onto a physical host than there is actual physical
-> memory available). For VMs that are restored from a snapshot, we know
-> pretty well what memory needs to be faulted in (that's where @Nikita's
-> write syscall comes in), so there we could try such an optimization. But
-> for everything else we very much rely on the on-demand nature of guest
-> memory allocation (and hence direct map removal). And even right now,
-> the long pole performance-wise are these on-demand faults, so really, we
-> don't want them to become even slower :(
+> I think I dimly remember someone at one of the guest_memfd syncs
+> bringing up a usecase for having a VMA even if all memory is private,
+> not for faulting anything in, but to do madvise or something? Maybe it
+> was the NUMA stuff? (+Shivank)
 
-Makes sense. I guess even without support for large folios one could 
-implement a kind of "fault" around: for example, on access to one addr, 
-allocate+prepare all pages in the same 2 M chunk, flushing the tlb only 
-once after adjusting all the direct map entries.
-
-> 
-> Also, can we really batch multiple TLB flushes as you suggest? Even if
-> pages are at consecutive indices in guest_memfd, they're not guaranteed
-> to be continguous physically, e.g. we couldn't just coalesce multiple
-> TLB flushes into a single TLB flush of a larger range.
-
-Well, you there is the option on just flushing the complete tlb of 
-course :) When trying to flush a range you would indeed run into the 
-problem of flushing an ever growing range.
-
-> 
-> There's probably other things we can try. Backing guest_memfd with
-> hugepages would reduce the number TLB flushes by 512x (although not all
-> users of Firecracker at Amazon [can] use hugepages).
-
-Right.
-
-> 
-> And I do still wonder if it's possible to have "async TLB flushes" where
-> we simply don't wait for the IPI (x86 terminology, not sure what the
-> mechanism on arm64 is). Looking at
-> smp_call_function_many_cond()/invlpgb_kernel_range_flush() on x86, it
-> seems so? Although seems like on ARM it's actually just handled by a
-> single instruction (TLBI) and not some interprocess communication
-> thingy. Maybe there's a variant that's faster / better for this usecase?
-
-Right, some architectures (and IIRC also x86 with some extension) are 
-able to flush remote TLBs without IPIs.
-
-Doing a quick search, there seems to be some research on async TLB 
-flushing, e.g., [1].
-
-In the context here, I wonder whether an async TLB flush would be 
-significantly better than not doing an explicit TLB flush: in both 
-cases, it's not really deterministic when the relevant TLB entries will 
-vanish: with the async variant it might happen faster on average I guess.
-
-
-[1] https://cs.yale.edu/homes/abhishek/kumar-taco20.pdf
+Yes, that should be it. But we're never faulting in these pages, we only 
+need the VMA (for the time being, until there is the in-place conversion).
 
 -- 
 Cheers
