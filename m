@@ -1,87 +1,87 @@
-Return-Path: <kvm+bounces-58973-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-58974-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0EBCCBA89DB
-	for <lists+kvm@lfdr.de>; Mon, 29 Sep 2025 11:29:29 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8E6CDBA89FF
+	for <lists+kvm@lfdr.de>; Mon, 29 Sep 2025 11:31:31 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 5154F18826D7
-	for <lists+kvm@lfdr.de>; Mon, 29 Sep 2025 09:29:51 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D05143AAA73
+	for <lists+kvm@lfdr.de>; Mon, 29 Sep 2025 09:29:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 385EF2C08DC;
-	Mon, 29 Sep 2025 09:28:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 04F6A289E30;
+	Mon, 29 Sep 2025 09:29:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="HbvRBREz"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ALNZfKad"
 X-Original-To: kvm@vger.kernel.org
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DEE1C2BF3CC
-	for <kvm@vger.kernel.org>; Mon, 29 Sep 2025 09:28:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A8D0A2741AC
+	for <kvm@vger.kernel.org>; Mon, 29 Sep 2025 09:28:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1759138090; cv=none; b=u+BXO307jVOPnSHKBwPX2CmY2+UsuTEhF3Pqpb+NaJFovdPkezkSEZzTD5xtk/81twGfqY32nWCMwWv8y3+taWoSdc5DkYjrovJERYN8DkgaAyyEFZRQP40JeTagH1poWBN4S4q3SeKDmt+sypBK05qFQa89Yc4qbOekdDWs7/A=
+	t=1759138141; cv=none; b=Cj0bfNwmutFcQ0f9QXANGxgx0NeNcRG+UmjQDJ8sEMKPZDOshobkPn1ZkH1vZ5/9Rj2/8C5kb5c05/S+i9nkHCPRZjDxieIh/btLsbYtRBrvjuC3xc3np1uOpvl6wvonumbECCYzFiSRnI7yjxElr99lRE4cNmbEZ7cUVgZK1hI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1759138090; c=relaxed/simple;
-	bh=CzoqSQAtrHopHmh7+p28qve9d/KAPvjug+Gt5Zonb4Q=;
+	s=arc-20240116; t=1759138141; c=relaxed/simple;
+	bh=9Iv/YKi4vWmW1Ixln+NK3vRNp+MgtI2uqSJRCvisxvU=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=U0I065c1LNSblSr3X3o/xnTI/0Fl1yKkQxl72n1XKlxLW7NosphA8Kd0gvc6UnIvwpdatwW4MWy9awgqHJ+oEDPn5Nv+fL1Z8AHZkiqaSkmQoTie6Z4DVloNeTuGiNVBvrobdZwQ55L5TPjipoZ9UyLc80r8xwgkkmQ1dsPN5k0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=HbvRBREz; arc=none smtp.client-ip=170.10.133.124
+	 In-Reply-To:Content-Type; b=oR6cSbmPYfmNuJ04k9KGAgaFbQai4rSa/PKjbuf+FJi7vGJ6bcOE9Iqyp/OwYYecnyCNAkYTLxEeURn96RcXn/JW6USUL8Jz6vzU0yuWjYL8p8dIEVrvPx7bb1K9t7biVu0JuLCWAsCEIx4PR6OV1WmpMgpVWHmovXqTi/cUZnk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=ALNZfKad; arc=none smtp.client-ip=170.10.133.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1759138086;
+	s=mimecast20190719; t=1759138138;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-	bh=yulkKep+6RVjT2oprrxgTzmD6j55rnQgjMoMG/WnDdQ=;
-	b=HbvRBREzDpz3dqZIPbqzTTqPNKH58nDHJp4Zrza2ARNCuXnKRQfp8Edw08Jvtym+k0lvuu
-	ogmkEGuduhX4wooxJfe/sK8wI8+UYdObqAVMOPz5CXY+kJ+yPFJXq2zJZhHEw1YZD6yqTz
-	vKPi81YdTsQmncsfAxU5GCITUI09VpE=
-Received: from mail-ej1-f72.google.com (mail-ej1-f72.google.com
- [209.85.218.72]) by relay.mimecast.com with ESMTP with STARTTLS
+	bh=uFkqt0GKSONCdD0Ht/pmTUQIhyf3zin58Hn7YjIOo84=;
+	b=ALNZfKadijhd7Nl5aP5YITR+XPE+mMwh2RJ1iUyweWg9dymL6UJ+m1V9r1LlZhromCwDe3
+	FhA7R5W5IO/jj1qu829WnCV0mK0LUTpEX93aHGWipCBwdJ98oxmuuH3iDrKxI7hhFoK/e4
+	30C9fqWbxaEEntNV7tzsmctfiLXl9WU=
+Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
+ [209.85.221.71]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-166-xwpn0Rl0Om-o6oi9-aBVZQ-1; Mon, 29 Sep 2025 05:28:05 -0400
-X-MC-Unique: xwpn0Rl0Om-o6oi9-aBVZQ-1
-X-Mimecast-MFC-AGG-ID: xwpn0Rl0Om-o6oi9-aBVZQ_1759138084
-Received: by mail-ej1-f72.google.com with SMTP id a640c23a62f3a-afe81959e5cso458984066b.1
-        for <kvm@vger.kernel.org>; Mon, 29 Sep 2025 02:28:04 -0700 (PDT)
+ us-mta-428-WZstaT0hNUGU5IXaZjrJpQ-1; Mon, 29 Sep 2025 05:28:56 -0400
+X-MC-Unique: WZstaT0hNUGU5IXaZjrJpQ-1
+X-Mimecast-MFC-AGG-ID: WZstaT0hNUGU5IXaZjrJpQ_1759138135
+Received: by mail-wr1-f71.google.com with SMTP id ffacd0b85a97d-3ecdd80ea44so3081978f8f.1
+        for <kvm@vger.kernel.org>; Mon, 29 Sep 2025 02:28:56 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1759138084; x=1759742884;
+        d=1e100.net; s=20230601; t=1759138135; x=1759742935;
         h=content-transfer-encoding:in-reply-to:autocrypt:content-language
          :from:references:cc:to:subject:user-agent:mime-version:date
          :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=yulkKep+6RVjT2oprrxgTzmD6j55rnQgjMoMG/WnDdQ=;
-        b=JaMfW8G2c2L78TfCmmMd3hTuGkdEAgKbWttNqMYojR5MvkggBaQJsGzXaiLhNGve1p
-         wtl8qMwS45VYrqgNPoMReuRq2NbdzE4EU6Z/poBkGhjEElvQfU107gH9yVESYsWb3+5W
-         gAz3YcBASRdHzj1bHMzHUfK5y1petWdR4JSA1lvXUWt26BIBlvhKOE1U4NUIMtf83zVz
-         /ZNFt7POYkOaxXDMjxEsfQJT1w3Kaw/31IElkvylqhFPfGgfBhYtV5Kkks4YK8TtDK1n
-         VYGwC8NWko5q/ETRWBJS9LUJW1il32701y6oeThhMUcUL+pPLmjzGs2xSLo3B/bXoKJx
-         Mv3w==
-X-Gm-Message-State: AOJu0YwMHAUtPd5R4hla6e1BMXVYJafOvQcIV4ixx14rI4tkTVdlHRBt
-	EheEWoOEVXs7LJpefA+nK3bn6TAFPPdcrQoxWVwvpH5jN0Pu3X45CBQCk8sisoMdIQYZQ0Ncnwu
-	ROVN+g1jT9Qv3gnEZRIZYPHOVc51E9WvYltU1VJiubEPkGFfjnvxkvw==
-X-Gm-Gg: ASbGncsygLq3YPbgG9/8WIOfMFYgSV7x6R3QnbxtzftUsbjYuReQazU7zeSEoJCmODP
-	+Az0vRKqLUxXnJD/CgYa/Vj0IkEnRWeF80EPqgzYNt7k04i+tZBIUgQA2wtsVub2Qx86G9rj0YQ
-	+igVsAannmHCfoUF835vBM8IMczKg3ENSG+YsSojM0AchvJEupDlrGl2Y47AQkf4/IAY2BwBDjN
-	V2nyA/FQPvKUSnQRpnFhZEzmGGfx3DpEq+/ngh+ZiJu3UdqDKpZVLPthghjwJ9jy5yyNrf4DiZ6
-	DZUeQZ+TevcNBnu8+b3PMPjXBkqJKs1z3oc/IrMhST5uDCl7McGRFvdTG/PS90RT9tlNlLiqdx6
-	iHulyROzzbpwYZDXcy0UykdAwog6nJ8oxrvHTk4LLmdMhQPA8QpKFfp14M0E21tfruw==
-X-Received: by 2002:a17:907:970c:b0:b2d:e514:5348 with SMTP id a640c23a62f3a-b34bde10157mr1814947666b.33.1759138083815;
-        Mon, 29 Sep 2025 02:28:03 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IEq0hztu3WTB87+2wyGseIxcgiuDab6+e5OPDrFvRNz3LhA7PBFZicfGkKq384OO32+ikAD2Q==
-X-Received: by 2002:a17:907:970c:b0:b2d:e514:5348 with SMTP id a640c23a62f3a-b34bde10157mr1814946066b.33.1759138083358;
-        Mon, 29 Sep 2025 02:28:03 -0700 (PDT)
+        bh=uFkqt0GKSONCdD0Ht/pmTUQIhyf3zin58Hn7YjIOo84=;
+        b=YZL9Ca4f4+S7YauNPoSUclFysNOgROe1ySDs/hG03MVhWOCsYeRYN5noFJkXriKLs4
+         MJwbYUH1lngjZmN1P3GSSvrdcZy90nfirf2b2HOZHims8zWzfprFH3PamKhB6somyylk
+         mUmgoF0XvXs3SEDyKnzcZtfWdkxsaKlhllTrG3wT6aVGbublm6ZchDr2YMADBPIyinMW
+         t9vk91Pl1/nOD4RVSp7i98IA9QogSI+2+acgf44tPCcDitkVk1nV88rSlPFqUSppMKQS
+         xFP9vWNWCc7aU2nlxF6CHDkY2s/seZUBF8F949LH6G8EQEviCm8V3GzK72IAvmEYnYU5
+         oAOA==
+X-Gm-Message-State: AOJu0Yx5yBLCS43IP6xnXF6WOw46TnayOwYTYvmJ4rRLkq+x+g55L9Xl
+	2kQx9oMJ7J/qfqlKkwhHoZVua7KncXhfjjvg3Zv4rF1vNjfzyOpwesWlU6aaIm3D/f7JDtebEl7
+	Cjz61ZCIH0cuwlFlvIRQ1BOmRWRIe4uo9Pqx40XNNYMiyOKwut7/qJQ==
+X-Gm-Gg: ASbGncuhP0xn9O6mWFtyMK7IYGkvtELMCnnEF6mOoPRLbvgCv/gkc0H/kFXP/cPZq05
+	qulHtI6Sjk5r+SUy5tGxs2qwjnKoYZCqYM64VgyjHx793MXn2GRMvJJvDKOCqoHfeb/PSKuRCrE
+	qCJUJnfEJim/48oQFywwFCEd3f7uMmW/00jEnL8y6i2CvDpa51sU9+zQbNduy6YVNBMsca+6uLO
+	7brkA398u4LwyKxO/ybPv3RuaToZEBsuEf9e+zyynfeQPPnT+gMK/u2fumdcKIZDhKD9aACwJo6
+	/Hzuq1FUn9JztXvDj4baxKdRQwrxc80EEaxqz3PudArzZBOJ0uWvoOyl5HG861KxeiZlD1IR4ZX
+	Y8NW+SbN5xYhPTOhXs6Q2yI17qTEAo0XwCX2hN+7aruOkIGNW+f8Ti5pWcZLUQ0T55g==
+X-Received: by 2002:a05:6000:310e:b0:3ee:11d1:2a1e with SMTP id ffacd0b85a97d-418006e9436mr7736209f8f.10.1759138135491;
+        Mon, 29 Sep 2025 02:28:55 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IEhj92keFT9kI7se9rXn87mbCWcrzPoba9ngrzHqfBYVZUSwQh/f7s1gufI5z/APklWGCpBjg==
+X-Received: by 2002:a05:6000:310e:b0:3ee:11d1:2a1e with SMTP id ffacd0b85a97d-418006e9436mr7736181f8f.10.1759138135076;
+        Mon, 29 Sep 2025 02:28:55 -0700 (PDT)
 Received: from ?IPV6:2003:d8:2f05:e100:526f:9b8:bd2a:2997? (p200300d82f05e100526f09b8bd2a2997.dip0.t-ipconnect.de. [2003:d8:2f05:e100:526f:9b8:bd2a:2997])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-b3539347676sm908088566b.0.2025.09.29.02.28.01
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-46e56f536a3sm6047565e9.8.2025.09.29.02.28.53
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 29 Sep 2025 02:28:02 -0700 (PDT)
-Message-ID: <07cb40d8-83ef-4f2f-b07c-550656d454ab@redhat.com>
-Date: Mon, 29 Sep 2025 11:28:01 +0200
+        Mon, 29 Sep 2025 02:28:54 -0700 (PDT)
+Message-ID: <69695cae-3b1b-4d5f-8616-6de1c804b6f1@redhat.com>
+Date: Mon, 29 Sep 2025 11:28:53 +0200
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -89,8 +89,8 @@ List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 5/6] KVM: selftests: Add wrappers for mmap() and munmap()
- to assert success
+Subject: Re: [PATCH 6/6] KVM: selftests: Verify that faulting in private
+ guest_memfd memory fails
 To: Sean Christopherson <seanjc@google.com>,
  Paolo Bonzini <pbonzini@redhat.com>,
  Christian Borntraeger <borntraeger@linux.ibm.com>,
@@ -99,7 +99,7 @@ To: Sean Christopherson <seanjc@google.com>,
 Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
  Fuad Tabba <tabba@google.com>, Ackerley Tng <ackerleytng@google.com>
 References: <20250926163114.2626257-1-seanjc@google.com>
- <20250926163114.2626257-6-seanjc@google.com>
+ <20250926163114.2626257-7-seanjc@google.com>
 From: David Hildenbrand <david@redhat.com>
 Content-Language: en-US
 Autocrypt: addr=david@redhat.com; keydata=
@@ -146,17 +146,16 @@ Autocrypt: addr=david@redhat.com; keydata=
  3iyY2Nsd7JxfKu1PRhCGwXzRw5TlfEsoRI7V9A8isUCoqE2Dzh3FvYHVeX4Us+bRL/oqareJ
  CIFqgYMyvHj7Q06kTKmauOe4Nf0l0qEkIuIzfoLJ3qr5UyXc2hLtWyT9Ir+lYlX9efqh7mOY
  qIws/H2t
-In-Reply-To: <20250926163114.2626257-6-seanjc@google.com>
+In-Reply-To: <20250926163114.2626257-7-seanjc@google.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 
 On 26.09.25 18:31, Sean Christopherson wrote:
-> Add and use wrappers for mmap() and munmap() that assert success to reduce
-> a significant amount of boilerplate code, to ensure all tests assert on
-> failure, and to provide consistent error messages on failure.
+> Add a guest_memfd testcase to verify that faulting in private memory gets
+> a SIGBUS.  For now, test only the case where memory is private by default
+> since KVM doesn't yet support in-place conversion.
 > 
-> No functional change intended.
-> 
+> Cc: Ackerley Tng <ackerleytng@google.com>
 > Signed-off-by: Sean Christopherson <seanjc@google.com>
 > ---
 
