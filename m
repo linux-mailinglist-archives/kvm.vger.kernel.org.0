@@ -1,127 +1,134 @@
-Return-Path: <kvm+bounces-58998-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-59000-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7608BBA9EB3
-	for <lists+kvm@lfdr.de>; Mon, 29 Sep 2025 18:01:41 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 33A8DBA9F28
+	for <lists+kvm@lfdr.de>; Mon, 29 Sep 2025 18:06:42 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 91BC83C161E
-	for <lists+kvm@lfdr.de>; Mon, 29 Sep 2025 16:01:09 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 070C63A8382
+	for <lists+kvm@lfdr.de>; Mon, 29 Sep 2025 16:05:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 36E4D30C344;
-	Mon, 29 Sep 2025 16:01:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F285030C0EB;
+	Mon, 29 Sep 2025 16:05:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="JfN+ag3p"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="SKZPE8da"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B6C58309EE8
-	for <kvm@vger.kernel.org>; Mon, 29 Sep 2025 16:01:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1C02E30CB40;
+	Mon, 29 Sep 2025 16:05:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1759161662; cv=none; b=HZx+uA7JLMFvxsXQZDobNv/6EzikylbEJRqC+KQPqx6BtQsXv87hZRW1Gw4z7JtxQrHwL0Tl0Ia0CiYspx7ZSD1yl8AraW7BXEy9x4ldTDRvZJ0/8up248ONXTyjaOwqqPoZYz3wMpW+9TN2tCln7sfN6zGb1TFi0QdhdicGXEM=
+	t=1759161906; cv=none; b=BLrNYiaEMkaOwGf2wcniBUNyoVnRuczm3f3afY3RwVlo6G28xrx4orpKNs86hX2V6a5WJLNX9BlvGZ4Oxjr7iHs0uwa9+ETGI/NMQOSxqlNHgmVY4u9CffNaGz7GNTkM5wrxvoE7yyOnkeL76f06DxRTvk+GkNmUmtU2MLHUU2E=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1759161662; c=relaxed/simple;
-	bh=rvJzaJvHn4ysl0SarKojQPWkHG0cHul95/d7suros2Y=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=iOqIj8QzqGXiktiWLiPKAfDrN4RtkQuaxnfzi9r84Z5cw5NG7KLgKs2/HufFkZrcKCAo/44A1dtbnq5HJ2u4yTILzHqCx14sNW7PlO6zeQaGP6873omb6co7oxvR/aDViK4U9FqqWoaGGtgG2KGvZxNzTCV01jTrDqTBJyrfREw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=JfN+ag3p; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1759161659;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=rvJzaJvHn4ysl0SarKojQPWkHG0cHul95/d7suros2Y=;
-	b=JfN+ag3pNuXQwhIKsJ2eOHLF1Qtb5wwK6bFHSSwv1V+2Y5NTbhSaEniITycAuopVKeEYzT
-	frLrEZ4WpgAanJxm/l20pvhLJ9bHJjQG9x50RdTqZRryK6KoIv3n9Kyiq0Lj2qoHaTTk6w
-	aFAb5z55wWnzWY5az4ECLhrHaWgxnuY=
-Received: from mail-ej1-f70.google.com (mail-ej1-f70.google.com
- [209.85.218.70]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-329-df2kDgSxPCeyJ5k1xUFcdw-1; Mon, 29 Sep 2025 12:00:57 -0400
-X-MC-Unique: df2kDgSxPCeyJ5k1xUFcdw-1
-X-Mimecast-MFC-AGG-ID: df2kDgSxPCeyJ5k1xUFcdw_1759161656
-Received: by mail-ej1-f70.google.com with SMTP id a640c23a62f3a-b2e6b2bb443so510031066b.2
-        for <kvm@vger.kernel.org>; Mon, 29 Sep 2025 09:00:56 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1759161656; x=1759766456;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=rvJzaJvHn4ysl0SarKojQPWkHG0cHul95/d7suros2Y=;
-        b=a/DPMqIp6uOTEmvzaBmIDy6Uy5e4Wm239Bn1eiyR4R0g2riHCZd+d0IlYhBFGffsS8
-         3GzGQLN+wy3vQmJ+FwOwFl8m8S8wyJKSVVEXXgsRy2G4HPCJImf8LHVS8SswAbhvNosA
-         TbkaEW6m7N9mCYIPUvomV3niL+DsKycB1dcU1g1wIPuSzOn5nCnpJmKusDtPKS2WCu8w
-         yD0+zd+oZKB0cfXLbTN93Hc7XGUeYn+KI815yMj3hD1LARslF0rLvwjwEIQL+FVq5iXf
-         KTVjrrY2WYOOC6q9FX2WbrdIDxrd7xy8vK1R7r85s+2JHqJbdQxWM0GUlE8AZoGK4GWL
-         NzfQ==
-X-Forwarded-Encrypted: i=1; AJvYcCUjxpsaWYmukn3GbsavjJNL0vlrl9rGUiRgCM1dYC72ix4QhPvncGBOO+1J4Nf9Dcrj0GU=@vger.kernel.org
-X-Gm-Message-State: AOJu0Ywl2CAEEP7W5dGIo3vnRHRIT9Bz0O8OHA4XrpXvkd9r9c/kSU9n
-	MCcKQOA6epI69EZlUpnBE49oDDImAdrcJI0YtxsTWb/26nTEaw5RY4yQcj7WRRD6GJbo/2kCJY3
-	ngVB3trEmXiStku40WqxSKAxqX7nPtjpa7l28WEUwWZAKmHke25eLrmvEHyg09OS0mZAPmCHQYs
-	PQWkYnsj00Nhy1yNNc7zKFXZJ0b5Qv
-X-Gm-Gg: ASbGncsnjY133Zaldhjad3yW1XSh7vxiju/NSVPlXcMZdErUe3gINprlXNJFyA4DwrY
-	QoSh74s0axu4EsWE2A/GIeQj/oGQc1QjRWEjpqbGf912PEG7DAK0GJoaiILtWl37g+EBbzgSoah
-	Ntspzoh8lAaJHw1fgsxMuPHw==
-X-Received: by 2002:a17:907:3e9f:b0:b3b:d772:719b with SMTP id a640c23a62f3a-b3bd781ba71mr843425466b.41.1759161655728;
-        Mon, 29 Sep 2025 09:00:55 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IG6hzu6lwEjjnhGnHFD8M9ofM8ojrlvCKKGBmnqXaS/KCPAQ0khSQKd+hnPIMyAHKH3zg+/WlTMjm+XtQu+5y0=
-X-Received: by 2002:a17:907:3e9f:b0:b3b:d772:719b with SMTP id
- a640c23a62f3a-b3bd781ba71mr843420566b.41.1759161655326; Mon, 29 Sep 2025
- 09:00:55 -0700 (PDT)
+	s=arc-20240116; t=1759161906; c=relaxed/simple;
+	bh=ekwDuQm/LViV5dWIz28P721OuKbhpFowpx6Jkl0Irms=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=fcT8K7wKUJjLLRDpJauDKuPA3YL1Mu2SLzFiaYoleMZ4O8uqJnIGxPefJVeCv0ox8QMjpK4S6lRQnlSlheml1CwWYB4lc1iaM/WNMQbAVRazvIL7wdAHh5xt5CPbMZq+JENRppGEHZiFpRoZQGET5tQpYnz+O+HTrfWq1SgXFzE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=SKZPE8da; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B76BDC113D0;
+	Mon, 29 Sep 2025 16:05:05 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1759161905;
+	bh=ekwDuQm/LViV5dWIz28P721OuKbhpFowpx6Jkl0Irms=;
+	h=From:To:Cc:Subject:Date:From;
+	b=SKZPE8daQEViOlp2HYgoJhPIXdAGzG2SqZl/c0EV8UnHPLICvQzvHyxLogMv1M1h5
+	 jY5z9NIIEWX0B5YXuFeGU+5xIpXUbNjmmidC6zJpm5ocEd9Yh3C+JH8EE4lEHDKqnJ
+	 HP6wftqushbfhF4DhDsY2DgkRnZSnsPwXVc6mik1rAxNUJSMhQEHzu5EB26E0kNYCt
+	 /DkVxxyvxErXR9KSNb1gLI2U/xD0ASscl8qHxVi+8V0HmN8XUJ4s7B3hILNveRnNgq
+	 HT6slkrogWplR4QWwt9ksj0dEjcZkIHdnEr8gzvK8tFqMdDxNMdXNFoTXekdGbo/vo
+	 dAmGqQooW+87g==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.98.2)
+	(envelope-from <maz@kernel.org>)
+	id 1v3GN5-0000000AHqo-0cJ2;
+	Mon, 29 Sep 2025 16:05:03 +0000
+From: Marc Zyngier <maz@kernel.org>
+To: kvmarm@lists.linux.dev,
+	linux-arm-kernel@lists.infradead.org,
+	kvm@vger.kernel.org
+Cc: Joey Gouly <joey.gouly@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Oliver Upton <oliver.upton@linux.dev>,
+	Zenghui Yu <yuzenghui@huawei.com>
+Subject: [PATCH 00/13] KVM: arm64: De-specialise the timer UAPI
+Date: Mon, 29 Sep 2025 17:04:44 +0100
+Message-ID: <20250929160458.3351788-1-maz@kernel.org>
+X-Mailer: git-send-email 2.47.3
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <cd637504a6e3967954a9e80fc1b75e8c0978087b.1758664002.git.mst@redhat.com>
- <CACGkMEtU9YSuJhuHCk=RZ2wyPbb+zYp05jdGp1rtpJx8iRDpXg@mail.gmail.com>
-In-Reply-To: <CACGkMEtU9YSuJhuHCk=RZ2wyPbb+zYp05jdGp1rtpJx8iRDpXg@mail.gmail.com>
-From: Lei Yang <leiyang@redhat.com>
-Date: Tue, 30 Sep 2025 00:00:18 +0800
-X-Gm-Features: AS18NWC2orrPAiafpnWLj0PiUo6H6ktFe9pH1En2rWhE1VkgRlQKrFKPhSd3Jgc
-Message-ID: <CAPpAL=z9GZKTDETJVEpq1aop8q1Rgn7VaXbV_S4_y-nsVfzpxQ@mail.gmail.com>
-Subject: Re: [PATCH] vhost: vringh: Fix copy_to_iter return value check
-To: Jason Wang <jasowang@redhat.com>
-Cc: "Michael S. Tsirkin" <mst@redhat.com>, linux-kernel@vger.kernel.org, 
-	zhang jiao <zhangjiao2@cmss.chinamobile.com>, =?UTF-8?Q?Eugenio_P=C3=A9rez?= <eperezma@redhat.com>, 
-	kvm@vger.kernel.org, virtualization@lists.linux.dev, netdev@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, joey.gouly@arm.com, suzuki.poulose@arm.com, oliver.upton@linux.dev, yuzenghui@huawei.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-Tested this patch with virtio-net regression tests, everything works fine.
+Since the beginning of the KVM/arm64 port, the timer registers were
+handled out of the normal sysreg flow when it came to userspace
+access, leading to extra complexity and a bit of code duplication.
 
-Tested-by: Lei Yang <leiyang@redhat.com>
+When NV was introduced, the decision was made early to handle the new
+timer registers as part of the generic infrastructure. However, the
+EL0 timers were left behind until someone could be bothered to
+entangle that mess.
 
-On Wed, Sep 24, 2025 at 8:54=E2=80=AFAM Jason Wang <jasowang@redhat.com> wr=
-ote:
->
-> On Wed, Sep 24, 2025 at 5:48=E2=80=AFAM Michael S. Tsirkin <mst@redhat.co=
-m> wrote:
-> >
-> > The return value of copy_to_iter can't be negative, check whether the
-> > copied length is equal to the requested length instead of checking for
-> > negative values.
-> >
-> > Cc: zhang jiao <zhangjiao2@cmss.chinamobile.com>
-> > Link: https://lore.kernel.org/all/20250910091739.2999-1-zhangjiao2@cmss=
-.chinamobile.com
-> > Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
-> > ---
-> >
-> >
->
-> Acked-by: Jason Wang <jasowang@redhat.com>
->
-> Thanks
->
->
+Said mess is more complicated than it looks, due to a nasty bug
+documented in 290a6bb06de9e ("arm64: KVM: Add UAPI notes for swapped
+registers"), where it was realised that CNTV_CVAL_EL0 and CNTVCT_EL0
+have had their encoding swapped at the user interface level. Handling
+of this issue is spread all over the place instead of being contained
+in a single location, and it needs to be contained.
+
+Finally, it was noticed that we expose the CNTHV_*_EL2 registers to
+userspace for nVHE guest, while the architecture is clear that they do
+not exist in that configuration.
+
+This series aims at fixing all of the above, moving the handling of
+the timer sysregs to sys_regs.c, fix a corner case with WFxT, handle
+the nVHE issue described above, and finally improve the testing by
+introducing an E2H==0 configuration.
+
+If excluding the selftests, this is a net deletion of code. What's not
+to like?
+
+Marc Zyngier (13):
+  KVM: arm64: Hide CNTHV_*_EL2 from userspace for nVHE guests
+  KVM: arm64: Introduce timer_context_to_vcpu() helper
+  KVM: arm64: Replace timer context vcpu pointer with timer_id
+  KVM: arm64: Make timer_set_offset() generally accessible
+  KVM: arm64: Add timer UAPI workaround to sysreg infrastructure
+  KVM: arm64: Move CNT*_CTL_EL0 userspace accessors to generic
+    infrastructure
+  KVM: arm64: Move CNT*_CVAL_EL0 userspace accessors to generic
+    infrastructure
+  KVM: arm64: Move CNT*CT_EL0 userspace accessors to generic
+    infrastructure
+  KVM: arm64: Fix WFxT handling of nested virt
+  KVM: arm64: Kill leftovers of ad-hoc timer userspace access
+  KVM: arm64: selftests: Make dependencies on VHE-specific registers
+    explicit
+  KVM: arm64: selftests: Add an E2H=0-specific configuration to
+    get_reg_list
+  KVM: arm64: selftest: Fix misleading comment about virtual timer
+    encoding
+
+ arch/arm64/kvm/arch_timer.c                   | 105 ++-------------
+ arch/arm64/kvm/guest.c                        |  70 ----------
+ arch/arm64/kvm/handle_exit.c                  |   7 +-
+ arch/arm64/kvm/sys_regs.c                     | 123 +++++++++++++++---
+ arch/arm64/kvm/sys_regs.h                     |   6 +
+ include/kvm/arm_arch_timer.h                  |  24 ++--
+ .../selftests/kvm/arm64/get-reg-list.c        |  99 +++++++++++++-
+ 7 files changed, 240 insertions(+), 194 deletions(-)
+
+-- 
+2.47.3
 
 
