@@ -1,88 +1,88 @@
-Return-Path: <kvm+bounces-59080-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-59081-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0E165BAB701
-	for <lists+kvm@lfdr.de>; Tue, 30 Sep 2025 07:00:30 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id A2535BAB707
+	for <lists+kvm@lfdr.de>; Tue, 30 Sep 2025 07:03:04 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7F52A3AA6AA
-	for <lists+kvm@lfdr.de>; Tue, 30 Sep 2025 05:00:28 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 58C053A98CB
+	for <lists+kvm@lfdr.de>; Tue, 30 Sep 2025 05:03:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EFBAE25A2DA;
-	Tue, 30 Sep 2025 05:00:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 07775246774;
+	Tue, 30 Sep 2025 05:02:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Gl3v0jwv"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="AQXMQfpq"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 014412EB10
-	for <kvm@vger.kernel.org>; Tue, 30 Sep 2025 05:00:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A83E22EB10
+	for <kvm@vger.kernel.org>; Tue, 30 Sep 2025 05:02:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1759208423; cv=none; b=Upaa2OezmEs2h2onwCzwY+y8PQzHXJiuSbkAZaEiPjjLfrGFHSoo1QiJbaCs+PT/94njn1waCcUSR6b12HjYx53Zk2jiHw4he8hKu+RRIwvXkOhZDTp3CwinAPtKomVDWz6x6FbIKGSK/baQxB2svDsEi6dAYkqR/nQ/xoUono0=
+	t=1759208576; cv=none; b=EFPVHZ5fdmebRrHYbk0Lw2iyq6lAkDsajel74axHSUBeRLsRKxI4Ry5/mhVVFJyxnFBvAPVZTBqFJgwHtmGY9183skU/dCXE7XUYSPPO1owgdj6xwMxMa1sBqv0yHXnGPlEoadeQMei454h5i6LYFi1v2/lfdkHDQE29H6NV4tE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1759208423; c=relaxed/simple;
-	bh=Jk9eBsMbtO9NAB5HQyiGEFFChF25It4CKqf9TpVaETk=;
+	s=arc-20240116; t=1759208576; c=relaxed/simple;
+	bh=8PZrXcvd9ulQodjiqKHotmC5rzaSWKRPRJlXe6xTA+8=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=EyuEyFiwoognE1y8PshF3CB8uYrvwMYBQ/JatH3WB4/wOhwAL4O7G9QzSHOlF4ajdNuA6dBiWtOKrfP5hve+fnfthomUqX+plvtzWHB16SBfVgA7UKeWlMHB1WlayqmtDFDQhCye2KU+aep9AQbw/Sl8ihWvCJpNZKOEGApP38I=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Gl3v0jwv; arc=none smtp.client-ip=170.10.133.124
+	 In-Reply-To:Content-Type; b=OFkwgTzNPQEr0z1PdY+xL9UjVH/MupuiFBZzJ2PyQ3ccG93DrGAmxY/aIvUGQiNNZPZclfRUR420BJU/fuiSVLtJ8kofzhQvCuoT2LP7PT75CADlTM9oJwUX0gnfGGK9zDWRkbHQP62jhboeaKXRV2TLIXjBWLfCh05CfAhHXkM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=AQXMQfpq; arc=none smtp.client-ip=170.10.129.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1759208419;
+	s=mimecast20190719; t=1759208573;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-	bh=3xiFBQZdSxrBR3BZG3caEthJ8AMJq39BtL8Q95119s8=;
-	b=Gl3v0jwv3fXdeuXdojsEWtiJXVswq4HBvnDOo1iXbO0kdCq8FM6fJX4av5sVIsDKEx2LTn
-	RXSSPJ2c0Q/2bHTrPBUyxR8v/q5L5gdbyP6RkER6RzkVSh1FX7v/u6wJMXDOlX2EBTIsfr
-	yW6RihWCn3JVecPhZ4I7Prg87gjP970=
-Received: from mail-ed1-f70.google.com (mail-ed1-f70.google.com
- [209.85.208.70]) by relay.mimecast.com with ESMTP with STARTTLS
+	bh=bL+RjxGqhOdRGXNtIbLqiRsKj/Y3K4D3P43i5DVXnfw=;
+	b=AQXMQfpq1Zl5N4RYltApZW3u303kJCD1/VkTpgsnrj6lWjsmZ5+i+nn3RYxLepKO8DPvzJ
+	4p1d77uUfoO7yhrwIMHXujgHD6INXjrkWZXKD31hL77eaB1VpNZDBEy0O8jE/q5MM6x97b
+	dsfHC41DeBRhRQ1/M21XkazW9jULsbQ=
+Received: from mail-ej1-f72.google.com (mail-ej1-f72.google.com
+ [209.85.218.72]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-650-W7nADQy8Ok6Pzk3a1xxVgQ-1; Tue, 30 Sep 2025 01:00:17 -0400
-X-MC-Unique: W7nADQy8Ok6Pzk3a1xxVgQ-1
-X-Mimecast-MFC-AGG-ID: W7nADQy8Ok6Pzk3a1xxVgQ_1759208417
-Received: by mail-ed1-f70.google.com with SMTP id 4fb4d7f45d1cf-634bff4ccc6so4433309a12.1
-        for <kvm@vger.kernel.org>; Mon, 29 Sep 2025 22:00:17 -0700 (PDT)
+ us-mta-625-oWfBo0dxMpiY5-sNUvcuwA-1; Tue, 30 Sep 2025 01:02:52 -0400
+X-MC-Unique: oWfBo0dxMpiY5-sNUvcuwA-1
+X-Mimecast-MFC-AGG-ID: oWfBo0dxMpiY5-sNUvcuwA_1759208571
+Received: by mail-ej1-f72.google.com with SMTP id a640c23a62f3a-b335ec149a8so467302266b.1
+        for <kvm@vger.kernel.org>; Mon, 29 Sep 2025 22:02:52 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1759208416; x=1759813216;
+        d=1e100.net; s=20230601; t=1759208571; x=1759813371;
         h=content-transfer-encoding:in-reply-to:autocrypt:content-language
          :from:references:cc:to:subject:user-agent:mime-version:date
          :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=3xiFBQZdSxrBR3BZG3caEthJ8AMJq39BtL8Q95119s8=;
-        b=iCOK1ngjz5nNAh9KTwcGsCYVClltYBXAQpe7/gxXtHa8n5EpQB5R9kyZ0/O3G59+Qe
-         mbSxitnZz+w8FUODF4mHid/4YmizFM+eDiz4veTi55VsNJcApVforVRX4sTkZyvSyPYi
-         cWyjGrwwV7ntc/T4CZ/p0JTcnD61s/txSdTRd5LmJ5qPa5B694ibWwedT07WTCxuofTv
-         ebq8VmFA1SKRSmvfVLFmmA501wUyPa8oGfCXDQJ1aLhJmYD5JBmQnyoC3i0cftaQrKGM
-         L2mBwCl03/Ve3LHeh3EPXjRgQuwBI/HCPJu5F1CVT4x3jDSpUeZqU5S3Gy5txVT3S3Cy
-         Zr8A==
-X-Forwarded-Encrypted: i=1; AJvYcCXa7sm3BMlivN5SBNq3/z44ppKbq4dXaTJ4vakRaEc3uvpVil06N+jWDGeJXNBKr9Nd0IA=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yw9DJI1Pq9KPx1vr/l284/7eXXN4xVTgisKYxlWMNNukEO7jKyV
-	vc7aXWpWx3KtRo4PTG63SH/LiuSfmDHbeBIzGkPSIB2T6x3faV2kHXZtbNPDsU+wUw3PNIyOvVV
-	ieESfbiSGJ2kA76KzboYf/COOmtqYYDmXb4EHsygBougIDCgPm3HQIQ==
-X-Gm-Gg: ASbGncvF0XHIQFxgy9Er4i3GFPuICGu89adNSSJfnNoIVRRcZNRkwOtGeWOYCJ3L8HO
-	w66JglXwmR1c9Y93zGOX74nIJ8GiLtpb17f7l5WxQ0CYNnIi6BA/9MHi3UMI5lb2o/96zawmY7X
-	Kc1MJIHqVe0ZcwGvr24d1gG7VvKIA4FPOUYBkkmamGhDzxLI15LDb1q8IeMoQJIjs+THnvU3kAb
-	XSG/iLCh8HkG2R5ReV8q2ejpRnWAlztiHOHDCG5b1MwgpZ0UMCmq3H+MseBkKucBJMoZWJPvGiG
-	Dc5RodEHNSN6ih0VkAdPIB+1s/nrvP+MvsKD/NQrsDqHrNRECkfuFKCs5NNyc3yz/IEJbzIshVm
-	EaXDfvxu+zA==
-X-Received: by 2002:a17:907:3da6:b0:b3e:f987:d6a8 with SMTP id a640c23a62f3a-b3ef987d997mr637745866b.44.1759208416644;
-        Mon, 29 Sep 2025 22:00:16 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IHa8KgJhbAbV0RRCkwD4pI/pD3HkfND1iGeihF86L8+aCZePSj+3WOJ+3YXP8Jeay5jFXCoTA==
-X-Received: by 2002:a17:907:3da6:b0:b3e:f987:d6a8 with SMTP id a640c23a62f3a-b3ef987d997mr637742166b.44.1759208416253;
-        Mon, 29 Sep 2025 22:00:16 -0700 (PDT)
+        bh=bL+RjxGqhOdRGXNtIbLqiRsKj/Y3K4D3P43i5DVXnfw=;
+        b=chPOx3Zp/2XtymaPHFmIBF2Um+8A6kFfrrJkX+F2LKgvj0RuClNy2Q/+ot12PM4uuw
+         Ks9uzihowhSHUbqcQCnJzU1apL7NhE4u+BAwKuT0CacR3XgY9JLeaLRGtjbZ8rlTNVyA
+         1efFjhOXhc1wz47oZMc1aHKrvba/GU6KSfcJaToE3W9bNlFmvE4ZnRiult9TQxtMVyGZ
+         euTYtWH+N9aHtcDrspfyjDPu/Ywdu5YthAYmVRF3cm7ty+JydTFbXhsPPw2hkqisXMAR
+         BuqMWO/LwAaI9MPjxZuiaX/38E3fKRaJD+rwm27F9QX9nGh6JqKkjfADz0UYAAMNaw0g
+         is7Q==
+X-Forwarded-Encrypted: i=1; AJvYcCVjARWNdltNXEBG8/nQWxVRWbcvqW1OPoPkWsdBX3oLu7KCnL5f5da7MRoqcTjn00qMhg0=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yx7vHt/geNv+2Nhz6X4FMqbQz2SGPUkUD8h6rIn05dW/kY4hHV1
+	CibA3NZtg5/w/X+FN5QWRD6TV4GA78HtrgMVLE0Yce/2uE1Yy92FS3+4oopqZ8i1csMAlVyGiFM
+	IizJhI2NRGfTatfOPG2vQLwfkissljVbzqhPQYppns2lMYZTk26ApIA==
+X-Gm-Gg: ASbGncvtB6QgTYeNQsRBdIWxykKfB1tuBfWjiuDyykS++bO1QggG1J4kODYUsaFu3d5
+	B6BooOhBSyQGwiixuOoeENji+qfG28emGNTW2eY4fMsdsPH0vP9cyh9wpir4anGQTxWgrt5+dF/
+	FYbhh3zp6m93B8c/5Jw6QcUiiuHRQ/qdg3hPiNTAAMKPCaCoPmRm1EOALVOLfows+R+9l/da3qk
+	IxO1QfqkeZ25M4j48Zmc3rcWXPjifg7d5v8JCRSPn9KrxyzLLeMC60uiNwpqvQDJ5PSCw7G2PWI
+	Ef9r1aU1bSQop+j9vh4BmNFVnUuTD4hCL5O3pGazl7Ye026xWIOYS5UkkChaPogH6tsNpb9adag
+	wnP/5yJ3t6w==
+X-Received: by 2002:a17:906:f5a0:b0:b41:a571:21b0 with SMTP id a640c23a62f3a-b41a5712270mr236498266b.39.1759208570375;
+        Mon, 29 Sep 2025 22:02:50 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IFxIe1/gUAycFtpVQcR4b+NsqR4Pre+MyQnotThndZ321+xPzQyp6FkW4vxaOLRMNcnkRphAA==
+X-Received: by 2002:a17:906:f5a0:b0:b41:a571:21b0 with SMTP id a640c23a62f3a-b41a5712270mr236492866b.39.1759208569870;
+        Mon, 29 Sep 2025 22:02:49 -0700 (PDT)
 Received: from [192.168.0.7] (ltea-047-064-114-056.pools.arcor-ip.net. [47.64.114.56])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-b3d277598bdsm449199366b.3.2025.09.29.22.00.14
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-b353efb88ebsm1061296766b.32.2025.09.29.22.02.48
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 29 Sep 2025 22:00:15 -0700 (PDT)
-Message-ID: <6c7d7a37-c7e1-44af-839f-7d6d01fc843f@redhat.com>
-Date: Tue, 30 Sep 2025 07:00:13 +0200
+        Mon, 29 Sep 2025 22:02:49 -0700 (PDT)
+Message-ID: <193cd8a8-2c4c-4c2c-af22-622b74c332ee@redhat.com>
+Date: Tue, 30 Sep 2025 07:02:47 +0200
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -90,7 +90,8 @@ List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2 03/17] system/memory: Factor address_space_is_io() out
+Subject: Re: [PATCH v2 14/17] system/physmem: Un-inline
+ cpu_physical_memory_read/write()
 To: =?UTF-8?Q?Philippe_Mathieu-Daud=C3=A9?= <philmd@linaro.org>,
  qemu-devel@nongnu.org, Peter Maydell <peter.maydell@linaro.org>
 Cc: Jason Herne <jjherne@linux.ibm.com>,
@@ -109,7 +110,7 @@ Cc: Jason Herne <jjherne@linux.ibm.com>,
  Richard Henderson <richard.henderson@linaro.org>,
  David Hildenbrand <david@redhat.com>
 References: <20250930041326.6448-1-philmd@linaro.org>
- <20250930041326.6448-4-philmd@linaro.org>
+ <20250930041326.6448-15-philmd@linaro.org>
 From: Thomas Huth <thuth@redhat.com>
 Content-Language: en-US
 Autocrypt: addr=thuth@redhat.com; keydata=
@@ -154,16 +155,66 @@ Autocrypt: addr=thuth@redhat.com; keydata=
  oiT+z+/E59qj/EKfyce3sbC9XLjXv3mHMrq1tKX4G7IJGnS989E/fg6crv6NHae9Ckm7+lSs
  IQu4bBP2GxiRQ+NV3iV/KU3ebMRzqIC//DCOxzQNFNJAKldPe/bKZMCxEqtVoRkuJtNdp/5a
  yXFZ6TfE1hGKrDBYAm4vrnZ4CXFSBDllL59cFFOJCkn4Xboj/aVxxJxF30bn
-In-Reply-To: <20250930041326.6448-4-philmd@linaro.org>
+In-Reply-To: <20250930041326.6448-15-philmd@linaro.org>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
 
 On 30/09/2025 06.13, Philippe Mathieu-Daudé wrote:
-> Factor address_space_is_io() out of cpu_physical_memory_is_io().
-> 
+> Un-inline cpu_physical_memory_read() and cpu_physical_memory_write().
+
+What's the reasoning for this patch?
+
+  Thomas
+
 > Signed-off-by: Philippe Mathieu-Daudé <philmd@linaro.org>
 > ---
-
-Reviewed-by: Thomas Huth <thuth@redhat.com>
+>   include/exec/cpu-common.h | 12 ++----------
+>   system/physmem.c          | 10 ++++++++++
+>   2 files changed, 12 insertions(+), 10 deletions(-)
+> 
+> diff --git a/include/exec/cpu-common.h b/include/exec/cpu-common.h
+> index 6c7d84aacb4..6e8cb530f6e 100644
+> --- a/include/exec/cpu-common.h
+> +++ b/include/exec/cpu-common.h
+> @@ -133,16 +133,8 @@ void cpu_address_space_destroy(CPUState *cpu, int asidx);
+>   
+>   void cpu_physical_memory_rw(hwaddr addr, void *buf,
+>                               hwaddr len, bool is_write);
+> -static inline void cpu_physical_memory_read(hwaddr addr,
+> -                                            void *buf, hwaddr len)
+> -{
+> -    cpu_physical_memory_rw(addr, buf, len, false);
+> -}
+> -static inline void cpu_physical_memory_write(hwaddr addr,
+> -                                             const void *buf, hwaddr len)
+> -{
+> -    cpu_physical_memory_rw(addr, (void *)buf, len, true);
+> -}
+> +void cpu_physical_memory_read(hwaddr addr, void *buf, hwaddr len);
+> +void cpu_physical_memory_write(hwaddr addr, const void *buf, hwaddr len);
+>   void *cpu_physical_memory_map(hwaddr addr,
+>                                 hwaddr *plen,
+>                                 bool is_write);
+> diff --git a/system/physmem.c b/system/physmem.c
+> index 70b02675b93..6d6bc449376 100644
+> --- a/system/physmem.c
+> +++ b/system/physmem.c
+> @@ -3188,6 +3188,16 @@ void cpu_physical_memory_rw(hwaddr addr, void *buf,
+>                        buf, len, is_write);
+>   }
+>   
+> +void cpu_physical_memory_read(hwaddr addr, void *buf, hwaddr len)
+> +{
+> +    cpu_physical_memory_rw(addr, buf, len, false);
+> +}
+> +
+> +void cpu_physical_memory_write(hwaddr addr, const void *buf, hwaddr len)
+> +{
+> +    cpu_physical_memory_rw(addr, (void *)buf, len, true);
+> +}
+> +
+>   /* used for ROM loading : can write in RAM and ROM */
+>   MemTxResult address_space_write_rom(AddressSpace *as, hwaddr addr,
+>                                       MemTxAttrs attrs,
 
 
