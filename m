@@ -1,272 +1,246 @@
-Return-Path: <kvm+bounces-59089-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-59090-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 02A6DBABBC9
-	for <lists+kvm@lfdr.de>; Tue, 30 Sep 2025 09:05:18 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3FE9DBABC1D
+	for <lists+kvm@lfdr.de>; Tue, 30 Sep 2025 09:09:42 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 554E71923A96
-	for <lists+kvm@lfdr.de>; Tue, 30 Sep 2025 07:05:40 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 8456B7A7FE9
+	for <lists+kvm@lfdr.de>; Tue, 30 Sep 2025 07:07:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4FC632C028E;
-	Tue, 30 Sep 2025 07:04:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 93E812BD5A7;
+	Tue, 30 Sep 2025 07:09:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=suse.com header.i=@suse.com header.b="cLHyrL95";
-	dkim=pass (1024-bit key) header.d=suse.com header.i=@suse.com header.b="cLHyrL95"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="0lO8Xds8"
 X-Original-To: kvm@vger.kernel.org
-Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.223.131])
+Received: from mail-pf1-f202.google.com (mail-pf1-f202.google.com [209.85.210.202])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 01EE12BE7AF
-	for <kvm@vger.kernel.org>; Tue, 30 Sep 2025 07:04:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.131
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1F6A81F462C
+	for <kvm@vger.kernel.org>; Tue, 30 Sep 2025 07:09:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1759215870; cv=none; b=owVOqW/8xfv1Z+utEU6y9JbekPoBl7loTcahTf8gWiS0xUT6A1rDmZHNiRanLWOUAHMH3vHAAaWzPN5ShgGEwy9MbkFq26hGHrcta/sl510ApbYm9YVKxk+k+wpkMm3O1fhZhbumpVGMBiWDSwjrsF45PeOmketcujLozxgeY1Q=
+	t=1759216170; cv=none; b=TquJaedb4GVkAzKRynhNxCZ/Ih+RoCdc8XKkk03gZqAFAh3dGp7652ItmRtkiMOPsx9Re7Y7lqk5Z5pxRgOcrUm5/i6WoAIn7BDxenkKjWgroxTfMyz1tsQgYGzs/EAqSq6lFfz7QfwAutqInn+N6TMWY6/lTKMP9O9WsliKYDs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1759215870; c=relaxed/simple;
-	bh=aQ0m/xSL1AS9g/hMCQjEXIoQBIrx8Hdv8I0I4thHv8k=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=D41Fvi3pXYuZ6Qwlnebu9D6ZwPctZuvNiCgCzcL+LHBunh0Sf65HitIFZDoVXGGDPShgFdvpHjNNmepy7mME3lz8vVOd4JH6m2/qxl+DJLhotm3L49HYulY+yN7bVDodX5PqpzudPytAtP+Axg8oXv7IvE8oPvzEEE9f/aow8yc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com; spf=pass smtp.mailfrom=suse.com; dkim=pass (1024-bit key) header.d=suse.com header.i=@suse.com header.b=cLHyrL95; dkim=pass (1024-bit key) header.d=suse.com header.i=@suse.com header.b=cLHyrL95; arc=none smtp.client-ip=195.135.223.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.com
-Received: from imap1.dmz-prg2.suse.org (imap1.dmz-prg2.suse.org [IPv6:2a07:de40:b281:104:10:150:64:97])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by smtp-out2.suse.de (Postfix) with ESMTPS id 1F3561F7F0;
-	Tue, 30 Sep 2025 07:04:24 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.com; s=susede1;
-	t=1759215864; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=Gb/490BwBT2pJb8VyiYCDqR7oVEXLp6PItp8lOXpG+8=;
-	b=cLHyrL958OTnlFYNDsyhvs5Jx8YJsVXY3jgWesU9DwMy3sVcFdlCJ6ofnheGWYTCoTixda
-	XBUj2VZxq9APW9dl7AuCDkHiLj3C8xTaZ/QlrTEdbQkGzHMAjdnP1F3UOSoDrfCLpbglhW
-	660NgLMHkoojRmT5xYEh5UQk2nCGC1w=
-Authentication-Results: smtp-out2.suse.de;
-	dkim=pass header.d=suse.com header.s=susede1 header.b=cLHyrL95
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.com; s=susede1;
-	t=1759215864; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=Gb/490BwBT2pJb8VyiYCDqR7oVEXLp6PItp8lOXpG+8=;
-	b=cLHyrL958OTnlFYNDsyhvs5Jx8YJsVXY3jgWesU9DwMy3sVcFdlCJ6ofnheGWYTCoTixda
-	XBUj2VZxq9APW9dl7AuCDkHiLj3C8xTaZ/QlrTEdbQkGzHMAjdnP1F3UOSoDrfCLpbglhW
-	660NgLMHkoojRmT5xYEh5UQk2nCGC1w=
-Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id 724E513A3F;
-	Tue, 30 Sep 2025 07:04:23 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
-	by imap1.dmz-prg2.suse.org with ESMTPSA
-	id PKpCGveA22iWRwAAD6G6ig
-	(envelope-from <jgross@suse.com>); Tue, 30 Sep 2025 07:04:23 +0000
-From: Juergen Gross <jgross@suse.com>
-To: linux-kernel@vger.kernel.org,
-	x86@kernel.org,
-	linux-hyperv@vger.kernel.org,
-	kvm@vger.kernel.org
-Cc: xin@zytor.com,
-	Juergen Gross <jgross@suse.com>,
-	"K. Y. Srinivasan" <kys@microsoft.com>,
-	Haiyang Zhang <haiyangz@microsoft.com>,
-	Wei Liu <wei.liu@kernel.org>,
-	Dexuan Cui <decui@microsoft.com>,
-	Thomas Gleixner <tglx@linutronix.de>,
-	Ingo Molnar <mingo@redhat.com>,
-	Borislav Petkov <bp@alien8.de>,
-	Dave Hansen <dave.hansen@linux.intel.com>,
-	"H. Peter Anvin" <hpa@zytor.com>,
-	Paolo Bonzini <pbonzini@redhat.com>,
-	Vitaly Kuznetsov <vkuznets@redhat.com>,
-	Sean Christopherson <seanjc@google.com>,
-	Boris Ostrovsky <boris.ostrovsky@oracle.com>,
-	xen-devel@lists.xenproject.org
-Subject: [PATCH v2 04/12] x86/msr: Minimize usage of native_*() msr access functions
-Date: Tue, 30 Sep 2025 09:03:48 +0200
-Message-ID: <20250930070356.30695-5-jgross@suse.com>
-X-Mailer: git-send-email 2.51.0
-In-Reply-To: <20250930070356.30695-1-jgross@suse.com>
-References: <20250930070356.30695-1-jgross@suse.com>
+	s=arc-20240116; t=1759216170; c=relaxed/simple;
+	bh=nEib4Ghi85l3FWyJxphX9jSiYJFIQEl6res5LifHFg4=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=KO/7JSVeCQ4BJdTof8Ko6dP9sPvfFUloxeiTSrE7iJG+AaXDNRwGnusX7cmfTD1+853JZjZje0sCLXkc7P8iZ/rK9wbs15hcWxHknpcORXIfT4TdMgaHTbKvqpeimVW2vr9eJLexrsgFYmpnJ+Z2nV/cRNBMlsbf0rYikHp0thk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--ackerleytng.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=0lO8Xds8; arc=none smtp.client-ip=209.85.210.202
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--ackerleytng.bounces.google.com
+Received: by mail-pf1-f202.google.com with SMTP id d2e1a72fcca58-782063922ceso2632937b3a.0
+        for <kvm@vger.kernel.org>; Tue, 30 Sep 2025 00:09:28 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1759216168; x=1759820968; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=UP672iBXqfF/M4eb7b0fPJvD5RDYtZGt7W3+nRDDW7U=;
+        b=0lO8Xds8ydbtanpWt92wS2riIySTmNyo5zdDZVcxYVjpQ6dDK29Q762W2rqKxm74sT
+         3bbkiJ9iy5hxsUwjw2Ei5MJDo3JYPHhwkE/Qq/87g7hCAHmAOT/QaMDZdrqadObmDxks
+         lkuu2x9Z3YuDYPJtDi5sMPdhcm+C6MN1mnrQF/jQ0T1UZjH0t0V+uMLJNq98f11TIDQX
+         RSl4QjHXt/KN9XJPjzyx3JYer9UpE026K1i+SWd+uyniVUWDRwW6g2sE3aqN94jkMLOb
+         /xI2ZCIIYa8urue2W4iZ4c8ARLognClJ1SQBJRJv4/2W76HeVuulMSjmEZ/DSd/aGsRp
+         bzNA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1759216168; x=1759820968;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=UP672iBXqfF/M4eb7b0fPJvD5RDYtZGt7W3+nRDDW7U=;
+        b=qVRTVnaFSCH74gIr6w5TNSkMDOTl5NFxvMzBGl7C+4RXRc5FLcqwIzFo6ujegiiIBk
+         zNgSTNTgEnIU27dfmvvZiCktuelCeqqlpufLTNBl6u0Vl1P+51bGgbGn+xRz5OxTKtfT
+         J24tMJO5Yt3594raVR0Kdl6DlZlv6yRIp7VhXFG93lJZLQi+S4ifoncTp/1wDmYbQSkt
+         TxyN1YOfRjAeACxfjvwmWhPQl1hbFwvQh3MES2KsxU4WFhwNM4wfakA7NOgpcGLXXGsL
+         2Aq6FoDj01Ufuu7DAVHIQWI4hxR9C5+SmQogFtgl8mtPm6sDl/zzwMeYAyZEYRQnsTUV
+         WoOQ==
+X-Forwarded-Encrypted: i=1; AJvYcCV5c2Eshy1BAKNIx92LSJrQlFWfac+KaglPfmfSmI+h3LjFHMmmfe/j+qloQ224HnnvLkM=@vger.kernel.org
+X-Gm-Message-State: AOJu0YysPOj9gIo8+PypERz+XYZEzdKKWZVO2P2HazIoAq+Ic7a6gupH
+	gchG0kDbsNW+8bgYBWbaTlOWLDB/lUc5x9r23RCdcHSZ/dwE1Ixx69JCtdR35lhyecsX9UXzU0A
+	Nv2H5AyCeiIBTBHUJjSHJhvI6NQ==
+X-Google-Smtp-Source: AGHT+IGBuYj/q0jGYUG7M3fPbV2JRBsFGwjHP1fPe6GdcNCfcMiclGAvh4hoSmA12qBaQKnFC6Jqg4jVIDpe2cQnaA==
+X-Received: from pffj26.prod.google.com ([2002:a62:b61a:0:b0:77f:5d99:87b6])
+ (user=ackerleytng job=prod-delivery.src-stubby-dispatcher) by
+ 2002:a05:6a00:a1d:b0:781:275a:29d9 with SMTP id d2e1a72fcca58-781275a2b55mr13651457b3a.18.1759216168240;
+ Tue, 30 Sep 2025 00:09:28 -0700 (PDT)
+Date: Tue, 30 Sep 2025 07:09:27 +0000
+In-Reply-To: <aNrCqhA_hhUjflPA@google.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Spamd-Result: default: False [-3.01 / 50.00];
-	BAYES_HAM(-3.00)[100.00%];
-	MID_CONTAINS_FROM(1.00)[];
-	NEURAL_HAM_LONG(-1.00)[-1.000];
-	R_MISSING_CHARSET(0.50)[];
-	R_DKIM_ALLOW(-0.20)[suse.com:s=susede1];
-	NEURAL_HAM_SHORT(-0.20)[-1.000];
-	MIME_GOOD(-0.10)[text/plain];
-	MX_GOOD(-0.01)[];
-	FUZZY_RATELIMITED(0.00)[rspamd.com];
-	DKIM_SIGNED(0.00)[suse.com:s=susede1];
-	RBL_SPAMHAUS_BLOCKED_OPENRESOLVER(0.00)[2a07:de40:b281:104:10:150:64:97:from];
-	SPAMHAUS_XBL(0.00)[2a07:de40:b281:104:10:150:64:97:from];
-	MIME_TRACE(0.00)[0:+];
-	ARC_NA(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[20];
-	RCVD_COUNT_TWO(0.00)[2];
-	TO_MATCH_ENVRCPT_ALL(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	RECEIVED_SPAMHAUS_BLOCKED_OPENRESOLVER(0.00)[2a07:de40:b281:106:10:150:64:167:received];
-	FROM_EQ_ENVFROM(0.00)[];
-	R_RATELIMIT(0.00)[to_ip_from(RLkdkdrsxe9hqhhs5ask8616i6)];
-	RCVD_TLS_ALL(0.00)[];
-	DKIM_TRACE(0.00)[suse.com:+];
-	TO_DN_SOME(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[suse.com:mid,suse.com:dkim,suse.com:email,imap1.dmz-prg2.suse.org:helo,imap1.dmz-prg2.suse.org:rdns]
-X-Spam-Flag: NO
-X-Spam-Level: 
-X-Rspamd-Queue-Id: 1F3561F7F0
-X-Rspamd-Server: rspamd2.dmz-prg2.suse.org
-X-Rspamd-Action: no action
-X-Spam-Score: -3.01
+Mime-Version: 1.0
+References: <20250926163114.2626257-1-seanjc@google.com> <20250926163114.2626257-6-seanjc@google.com>
+ <diqztt0l1pol.fsf@google.com> <aNrCqhA_hhUjflPA@google.com>
+Message-ID: <diqzfrc41kns.fsf@google.com>
+Subject: Re: [PATCH 5/6] KVM: selftests: Add wrappers for mmap() and munmap()
+ to assert success
+From: Ackerley Tng <ackerleytng@google.com>
+To: Sean Christopherson <seanjc@google.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, Christian Borntraeger <borntraeger@linux.ibm.com>, 
+	Janosch Frank <frankja@linux.ibm.com>, Claudio Imbrenda <imbrenda@linux.ibm.com>, kvm@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, David Hildenbrand <david@redhat.com>, 
+	Fuad Tabba <tabba@google.com>
+Content-Type: text/plain; charset="UTF-8"
 
-In order to prepare for some MSR access function reorg work, switch
-most users of native_{read|write}_msr[_safe]() to the more generic
-rdmsr*()/wrmsr*() variants.
+Sean Christopherson <seanjc@google.com> writes:
 
-For now this will have some intermediate performance impact with
-paravirtualization configured when running on bare metal, but this
-is a prereq change for the planned direct inlining of the rdmsr/wrmsr
-instructions with this configuration.
+> On Mon, Sep 29, 2025, Ackerley Tng wrote:
+>> Sean Christopherson <seanjc@google.com> writes:
+>> 
+>> > Add and use wrappers for mmap() and munmap() that assert success to reduce
+>> > a significant amount of boilerplate code, to ensure all tests assert on
+>> > failure, and to provide consistent error messages on failure.
+>> >
+>> > No functional change intended.
+>> >
+>> > Signed-off-by: Sean Christopherson <seanjc@google.com>
+>> > ---
+>> >  .../testing/selftests/kvm/guest_memfd_test.c  | 21 +++------
+>> >  .../testing/selftests/kvm/include/kvm_util.h  | 25 +++++++++++
+>> >  tools/testing/selftests/kvm/lib/kvm_util.c    | 44 +++++++------------
+>> >  tools/testing/selftests/kvm/mmu_stress_test.c |  5 +--
+>> >  .../selftests/kvm/s390/ucontrol_test.c        | 16 +++----
+>> >  .../selftests/kvm/set_memory_region_test.c    | 17 ++++---
+>> >  6 files changed, 64 insertions(+), 64 deletions(-)
+>> >
+>> > 
+>> > [...snip...]
+>> > 
+>> > diff --git a/tools/testing/selftests/kvm/include/kvm_util.h b/tools/testing/selftests/kvm/include/kvm_util.h
+>> > index 23a506d7eca3..1c68ff0fb3fb 100644
+>> > --- a/tools/testing/selftests/kvm/include/kvm_util.h
+>> > +++ b/tools/testing/selftests/kvm/include/kvm_util.h
+>> > @@ -278,6 +278,31 @@ static inline bool kvm_has_cap(long cap)
+>> >  #define __KVM_SYSCALL_ERROR(_name, _ret) \
+>> >  	"%s failed, rc: %i errno: %i (%s)", (_name), (_ret), errno, strerror(errno)
+>> >  
+>> > +static inline void *__kvm_mmap(size_t size, int prot, int flags, int fd,
+>> > +			       off_t offset)
+>> 
+>> Do you have a policy/rationale for putting this in kvm_util.h as opposed
+>> to test_util.h? I like the idea of this wrapper but I thought this is
+>> less of a kvm thing and more of a test utility, and hence it belongs in
+>> test_util.c and test_util.h.
+>
+> To be perfectly honest, I forgot test_util.h existed :-)
+>
 
-The main reason for this switch is the planned move of the MSR trace
-function invocation from the native_*() functions to the generic
-rdmsr*()/wrmsr*() variants. Without this switch the users of the
-native_*() functions would lose the related tracing entries.
+Merging/dropping one of kvm_util.h vs test_util.h is a good idea. The
+distinction is not clear and it's already kind of messy between the two.
 
-Note that the Xen related MSR access functions will not be switched,
-as these will be handled after the move of the trace hooks.
+>> Also, the name kind of associates mmap with KVM too closely IMO, but
+>> test_mmap() is not a great name either.
+>
+> Which file will hopefully be irrevelant, because ideally it'll be temporary (see
+> below). But if someone has a strong opinion and/or better idea on the name prefix,
+> I definitely want to settle on a name for syscall wrappers, because I want to go
+> much further than just adding an mmap() wrapper.  I chose kvm_ because there's
+> basically zero chance that will ever conflict with generic selftests functionality,
+> and the wrappers utilize TEST_ASSERT(), which are unique to KVM selftests.
+>
+> As for why the current location will hopefully be temporary, and why I want to
+> settle on a name, I have patches to add several more wrappers, along with
+> infrastructure to make it super easy to add new wrappers.  When trying to sort
+> out the libnuma stuff for Shivank's series[*], I discovered that KVM selftests
+> already has a (very partial, very crappy) libnuma equivalent in
+> tools/testing/selftests/kvm/include/numaif.h.
+>
+> Adding wrappers for NUMA syscalls became an exercise in frustration (so much
+> uninteresting boilerplate, and I kept making silly mistakes), and so that combined
+> with the desire for mmap() and munmap() wrappers motivated me to add a macro
+> framework similar to the kernel's DEFINE_SYSCALL magic.
+>
+> So, I've got patches (that I'll post with the next version of the gmem NUMA
+> series) that add tools/testing/selftests/kvm/include/kvm_syscalls.h, and
+> __kvm_mmap() will be moved there (ideally it wouldn't move, but I want to land
+> this small series in 6.18, and so wanted to keep the changes for 6.18 small-ish).
+>
+> For lack of a better namespace, and because we already have __KVM_SYSCALL_ERROR(),
+> I picked KVM_SYSCALL_DEFINE() for the "standard" builder, e.g. libnuma equivalents,
+> and then __KVM_SYSCALL_DEFINE() for a KVM selftests specific version to handle
+> asserting success.
+>
 
-Signed-off-by: Juergen Gross <jgross@suse.com>
-Acked-by: Sean Christopherson <seanjc@google.com>
-Acked-by: Wei Liu <wei.liu@kernel.org>
----
- arch/x86/hyperv/ivm.c      |  2 +-
- arch/x86/kernel/kvmclock.c |  2 +-
- arch/x86/kvm/svm/svm.c     | 16 ++++++++--------
- arch/x86/xen/pmu.c         |  4 ++--
- 4 files changed, 12 insertions(+), 12 deletions(-)
+It's a common pattern in KVM selftests to have a syscall/ioctl wrapper
+foo() that asserts defaults and a __foo() that doesn't assert anything
+and allows tests to assert something else, but I have a contrary
+opinion.
 
-diff --git a/arch/x86/hyperv/ivm.c b/arch/x86/hyperv/ivm.c
-index ade6c665c97e..202ed01dc151 100644
---- a/arch/x86/hyperv/ivm.c
-+++ b/arch/x86/hyperv/ivm.c
-@@ -327,7 +327,7 @@ int hv_snp_boot_ap(u32 apic_id, unsigned long start_ip, unsigned int cpu)
- 	asm volatile("movl %%ds, %%eax;" : "=a" (vmsa->ds.selector));
- 	hv_populate_vmcb_seg(vmsa->ds, vmsa->gdtr.base);
- 
--	vmsa->efer = native_read_msr(MSR_EFER);
-+	rdmsrq(MSR_EFER, vmsa->efer);
- 
- 	vmsa->cr4 = native_read_cr4();
- 	vmsa->cr3 = __native_read_cr3();
-diff --git a/arch/x86/kernel/kvmclock.c b/arch/x86/kernel/kvmclock.c
-index ca0a49eeac4a..b6cd45cce5fe 100644
---- a/arch/x86/kernel/kvmclock.c
-+++ b/arch/x86/kernel/kvmclock.c
-@@ -196,7 +196,7 @@ static void kvm_setup_secondary_clock(void)
- void kvmclock_disable(void)
- {
- 	if (msr_kvm_system_time)
--		native_write_msr(msr_kvm_system_time, 0);
-+		wrmsrq(msr_kvm_system_time, 0);
- }
- 
- static void __init kvmclock_init_mem(void)
-diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
-index 1bfebe40854f..105d5c2aae46 100644
---- a/arch/x86/kvm/svm/svm.c
-+++ b/arch/x86/kvm/svm/svm.c
-@@ -393,12 +393,12 @@ static void svm_init_erratum_383(void)
- 		return;
- 
- 	/* Use _safe variants to not break nested virtualization */
--	if (native_read_msr_safe(MSR_AMD64_DC_CFG, &val))
-+	if (rdmsrq_safe(MSR_AMD64_DC_CFG, &val))
- 		return;
- 
- 	val |= (1ULL << 47);
- 
--	native_write_msr_safe(MSR_AMD64_DC_CFG, val);
-+	wrmsrq_safe(MSR_AMD64_DC_CFG, val);
- 
- 	erratum_383_found = true;
- }
-@@ -558,9 +558,9 @@ static int svm_enable_virtualization_cpu(void)
- 		u64 len, status = 0;
- 		int err;
- 
--		err = native_read_msr_safe(MSR_AMD64_OSVW_ID_LENGTH, &len);
-+		err = rdmsrq_safe(MSR_AMD64_OSVW_ID_LENGTH, &len);
- 		if (!err)
--			err = native_read_msr_safe(MSR_AMD64_OSVW_STATUS, &status);
-+			err = rdmsrq_safe(MSR_AMD64_OSVW_STATUS, &status);
- 
- 		if (err)
- 			osvw_status = osvw_len = 0;
-@@ -2032,7 +2032,7 @@ static bool is_erratum_383(void)
- 	if (!erratum_383_found)
- 		return false;
- 
--	if (native_read_msr_safe(MSR_IA32_MC0_STATUS, &value))
-+	if (rdmsrq_safe(MSR_IA32_MC0_STATUS, &value))
- 		return false;
- 
- 	/* Bit 62 may or may not be set for this mce */
-@@ -2043,11 +2043,11 @@ static bool is_erratum_383(void)
- 
- 	/* Clear MCi_STATUS registers */
- 	for (i = 0; i < 6; ++i)
--		native_write_msr_safe(MSR_IA32_MCx_STATUS(i), 0);
-+		wrmsrq_safe(MSR_IA32_MCx_STATUS(i), 0);
- 
--	if (!native_read_msr_safe(MSR_IA32_MCG_STATUS, &value)) {
-+	if (!rdmsrq_safe(MSR_IA32_MCG_STATUS, &value)) {
- 		value &= ~(1ULL << 2);
--		native_write_msr_safe(MSR_IA32_MCG_STATUS, value);
-+		wrmsrq_safe(MSR_IA32_MCG_STATUS, value);
- 	}
- 
- 	/* Flush tlb to evict multi-match entries */
-diff --git a/arch/x86/xen/pmu.c b/arch/x86/xen/pmu.c
-index 8f89ce0b67e3..d49a3bdc448b 100644
---- a/arch/x86/xen/pmu.c
-+++ b/arch/x86/xen/pmu.c
-@@ -323,7 +323,7 @@ static u64 xen_amd_read_pmc(int counter)
- 		u64 val;
- 
- 		msr = amd_counters_base + (counter * amd_msr_step);
--		native_read_msr_safe(msr, &val);
-+		rdmsrq_safe(msr, &val);
- 		return val;
- 	}
- 
-@@ -349,7 +349,7 @@ static u64 xen_intel_read_pmc(int counter)
- 		else
- 			msr = MSR_IA32_PERFCTR0 + counter;
- 
--		native_read_msr_safe(msr, &val);
-+		rdmsrq_safe(msr, &val);
- 		return val;
- 	}
- 
--- 
-2.51.0
+I think it's better that tests be explicit about what they're testing
+for, so perhaps it's better to use macros like TEST_ASSERT_EQ() to
+explicitly call a function and check the results.
 
+Or perhaps it should be more explicit, like in the name, that an
+assertion is made within this function?
+
+In many cases a foo() exists without the corresponding __foo(), which
+seems to be discouraging testing for error cases.
+
+Also, I guess especially for vcpu_run(), tests would like to loop/take
+different actions based on different errnos and then it gets a bit
+unwieldy to have to avoid functions that have assertions within them.
+
+I can see people forgetting to add TEST_ASSERT_EQ()s to check results of
+setup/teardown functions but I think those errors would surface some
+other way anyway.
+
+Not a strongly-held opinion, and no major concerns on the naming
+either. It's a selftest after all and IIUC we're okay to have selftest
+interfaces change anyway?
+
+> /* Define a kvm_<syscall>() API to assert success. */
+> #define __KVM_SYSCALL_DEFINE(name, nr_args, args...)			\
+> static inline void kvm_##name(DECLARE_ARGS(nr_args, args))		\
+> {									\
+> 	int r;								\
+> 									\
+> 	r = name(UNPACK_ARGS(nr_args, args));				\
+> 	TEST_ASSERT(!r, __KVM_SYSCALL_ERROR(#name, r));			\
+> }
+>
+> /*
+>  * Macro to define syscall APIs, either because KVM selftests doesn't link to
+>  * the standard library, e.g. libnuma, or because there is no library that yet
+>  * provides the syscall.  These
+>  */
+> #define KVM_SYSCALL_DEFINE(name, nr_args, args...)			\
+> static inline long name(DECLARE_ARGS(nr_args, args))			\
+> {									\
+> 	return syscall(__NR_##name, UNPACK_ARGS(nr_args, args));	\
+> }									\
+> __KVM_SYSCALL_DEFINE(name, nr_args, args)
+>
+>
+> The usage looks like this (which is odd at first glance, but makes it trivially
+> easy to copy+paste from the kernel SYSCALL_DEFINE invocations:
+>
+> KVM_SYSCALL_DEFINE(get_mempolicy, 5, int *, policy, const unsigned long *, nmask,
+> 		   unsigned long, maxnode, void *, addr, int, flags);
+>
+> KVM_SYSCALL_DEFINE(set_mempolicy, 3, int, mode, const unsigned long *, nmask,
+> 		   unsigned long, maxnode);
+>
+> KVM_SYSCALL_DEFINE(set_mempolicy_home_node, 4, unsigned long, start,
+> 		   unsigned long, len, unsigned long, home_node,
+> 		   unsigned long, flags);
+>
+> KVM_SYSCALL_DEFINE(migrate_pages, 4, int, pid, unsigned long, maxnode,
+> 		   const unsigned long *, frommask, const unsigned long *, tomask);
+>
+> KVM_SYSCALL_DEFINE(move_pages, 6, int, pid, unsigned long, count, void *, pages,
+> 		   const int *, nodes, int *, status, int, flags);
+>
+> KVM_SYSCALL_DEFINE(mbind, 6, void *, addr, unsigned long, size, int, mode,
+> 		   const unsigned long *, nodemask, unsigned long, maxnode,
+> 		   unsigned int, flags);
+>
+> __KVM_SYSCALL_DEFINE(munmap, 2, void *, mem, size_t, size);
+> __KVM_SYSCALL_DEFINE(close, 1, int, fd);
+> __KVM_SYSCALL_DEFINE(fallocate, 4, int, fd, int, mode, loff_t, offset, loff_t, len);
+> __KVM_SYSCALL_DEFINE(ftruncate, 2, unsigned int, fd, off_t, length);
+>
+> [*] https://lore.kernel.org/all/0e986bdb-7d1b-4c14-932e-771a87532947@amd.com
 
