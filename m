@@ -1,88 +1,88 @@
-Return-Path: <kvm+bounces-59076-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-59077-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id A314BBAB641
-	for <lists+kvm@lfdr.de>; Tue, 30 Sep 2025 06:42:29 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 73C6ABAB658
+	for <lists+kvm@lfdr.de>; Tue, 30 Sep 2025 06:44:16 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 52B281C338C
-	for <lists+kvm@lfdr.de>; Tue, 30 Sep 2025 04:42:29 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id A87147A2A3F
+	for <lists+kvm@lfdr.de>; Tue, 30 Sep 2025 04:42:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0AE1E24EF76;
-	Tue, 30 Sep 2025 04:42:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B63F5265CC8;
+	Tue, 30 Sep 2025 04:43:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="NZcrNuND"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Dchm/pMJ"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A936672617
-	for <kvm@vger.kernel.org>; Tue, 30 Sep 2025 04:42:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6FB0925BF13
+	for <kvm@vger.kernel.org>; Tue, 30 Sep 2025 04:43:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1759207342; cv=none; b=P8/qatH9qNKKdu5vfp1tItugWHS4tIwgSN5SW5Krb6IGKwQNv7xKe/uPK1jPNeLtF0ZSx8DdYZWeg+rLBefQziuTPXkUMsp3JpilvDULzSG2BNl/HKU6yMYdGGzujBKPIlmeiundlHIQzywojUWzpy1YBhEfBWjbcrY94/UK2i8=
+	t=1759207434; cv=none; b=tjZZ5nzQajNi5F8TR+SFdTCLbtGdKTyFaFwlO0Lx25TjadUak9fOZFLSHbEp3i/etWmmcsBiBoi4LD5GiMSrhLU0IvZ49G+zK4UA0o5M1WlwPGgcKK6jPEHd1WYWChvB0P6039Nm8wPumYcgX7IV+h59ho0uIq1u2fvGGwAjruY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1759207342; c=relaxed/simple;
-	bh=bUEbHmAgV500zj4N1yrxbpg5atbryz28JlWOsu02ki4=;
+	s=arc-20240116; t=1759207434; c=relaxed/simple;
+	bh=WX0GIhE765HSCR7s/Bw4UDWgJsl3iLi8D+9z3tgwV58=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=nKYllVRdDewHJLbWq2nZpDkLSYdvJpYDSjNhU2oDkYPhCIbkoAN5Itf5aGKhdhHX5x1frcjyzIBAZESmvt467M8HxoCKnHvECc76S+YooP0KIfafP9gWUPP7YZ1LLasdCd4XEvUCFqnSGid/DHWPo2GXhYCCs2sPujEjjcHqxuo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=NZcrNuND; arc=none smtp.client-ip=170.10.133.124
+	 In-Reply-To:Content-Type; b=pNFo00oLqE3Jn5LrnTn60Tyyplmg624Dm811/qY2HkitXuH+WWFlwcovsPrH5zoVMkRvXQs798StMn+g22qYPtGBSvOrDXSyUCON9RfYkecLhGPyfp+hJVdEoy0ZOThS0E8ae1ogqc23os16zLPWMmGVhWY5F0thT916zz90oxM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Dchm/pMJ; arc=none smtp.client-ip=170.10.129.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1759207339;
+	s=mimecast20190719; t=1759207432;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-	bh=tvxLjB/EsvBZ5htouvq/q3x83R6wXLK+5or1QrTnakw=;
-	b=NZcrNuNDEV+RiCbVuGjddgcNeoRWmtrnQalgxte8aZZDS5gPkEefYEchJWGNDnIij1pL0m
-	831tnulTVCoXPK/o73TeIApKtRUTTXsWKV93dekAyhC12aXGQPKZjEWPNkmAmKTzmtXiMJ
-	QWOSnBXXFX9Ghpk1MueW081ZQygjecM=
-Received: from mail-ej1-f69.google.com (mail-ej1-f69.google.com
- [209.85.218.69]) by relay.mimecast.com with ESMTP with STARTTLS
+	bh=IFA/ZKajMt+npZXBOLV5WlPV0wIgh0I4dBfqL+bGAaY=;
+	b=Dchm/pMJaqnJfudJ5z9a3yfQ+0k4Q8kB77SxO3kgzzeaGZh+2Klc0vGxkLTiALom/q1t+a
+	ZI45uOzOEPjbGN3FVUiXFURt8XAKgj8ikDA/tnDhNB5AkheSg8LnqeY8b8g4cjn/t/0MXV
+	gKIO9v0+y2dnvPcgNr21pdTiWZdHSs4=
+Received: from mail-ej1-f70.google.com (mail-ej1-f70.google.com
+ [209.85.218.70]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-184-A4efLaebOOCjU3i9JwAeYw-1; Tue, 30 Sep 2025 00:42:17 -0400
-X-MC-Unique: A4efLaebOOCjU3i9JwAeYw-1
-X-Mimecast-MFC-AGG-ID: A4efLaebOOCjU3i9JwAeYw_1759207337
-Received: by mail-ej1-f69.google.com with SMTP id a640c23a62f3a-b335fbe7c0dso652070766b.1
-        for <kvm@vger.kernel.org>; Mon, 29 Sep 2025 21:42:17 -0700 (PDT)
+ us-mta-515-MkoTyzBlPXCkyWZZKC7jIw-1; Tue, 30 Sep 2025 00:43:50 -0400
+X-MC-Unique: MkoTyzBlPXCkyWZZKC7jIw-1
+X-Mimecast-MFC-AGG-ID: MkoTyzBlPXCkyWZZKC7jIw_1759207429
+Received: by mail-ej1-f70.google.com with SMTP id a640c23a62f3a-b448c864d45so17166466b.2
+        for <kvm@vger.kernel.org>; Mon, 29 Sep 2025 21:43:50 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1759207336; x=1759812136;
+        d=1e100.net; s=20230601; t=1759207429; x=1759812229;
         h=content-transfer-encoding:in-reply-to:autocrypt:content-language
          :from:references:cc:to:subject:user-agent:mime-version:date
          :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=tvxLjB/EsvBZ5htouvq/q3x83R6wXLK+5or1QrTnakw=;
-        b=AMBzrGYCra3cCxYJAjfFQf7opBiU49bu0JKzufqyHGdGeuDv/GdkPwexabg3T1sEBH
-         /cUY+IsO1i2sWRT5t2mSAd7HOWoERdrvyXsW7o5LAOSsZ4dNiSkAUOa0fcVNbyl/Q8pv
-         ISjBS0kFO3hBJgAVHB+IMkWzqY4MdxHG8Rdfe8el2pivH8z5r3rudH864L7ERV3NP2Bf
-         aShOCyiYGmo3pgWMGCxeDFaewuGS2L3BSroxg0GGOhbokx5ZVnNKxnSo1j6VLgP07XBN
-         wdnp2UPxsytbzxXx86io/z+/89ThD3+nlDbq6Jp13ouDWwDznfrvY6MRTNNfZAdeeJ3Y
-         JPOg==
-X-Forwarded-Encrypted: i=1; AJvYcCUm7+dtK+IrX+4riZzMrP1O91VY7BVgkEUwp8sUy89X6M97gR3JKvK+5oh7xjgPMSBRM8Q=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxBOPr8aWWgSL1EFfC27V1tJeP1iRULRAXNLkPYX7hrdb636O5r
-	J3+Ngj9/zepXoWIXi1iVA4B81xmxrvbSATcGrhRlV/WFHb2apXRsNkZpdgPX2CLXFpKCwiG8lwM
-	uELzDaYOH9Ugi7X6anZiUoSRAp3z5SGSm4ELF6EcK261E3kBurslX8A==
-X-Gm-Gg: ASbGncuLz0Vcsrchr4TIWplAvQj6t2Ait8KWdwAjDcAdd4AUWk0yeNAiJTbrJZig+LY
-	SeP803p79yaLxPo8XIx/TEjiflmXTbuUEGw+Ylrn0+EkbHpLwKcyrHLzA/c94/W+/7FHZloHJB5
-	w5vileV8XJWuBWbWn2iI2ZVGyM2m5FmXfqj9VZkuyPQ6O6dy3CUlZkjGXViTUGCARHJbj6P2cPm
-	8JNhNciIEbBqMJUYdnokqwo0OqSK9ifApkeubJ6yihh4aYXnP9llWNoFvrLPAki3UrRhZeBl+53
-	bNDEFQ1BKLMGNHGwidRscgwWhBsB5E2SQakZURBa7SM0Dtiv9Jmfz51hx3BXTjrgXBCetIfurF0
-	K3BCcmmPeKA==
-X-Received: by 2002:a17:906:55d3:b0:b3a:875c:294f with SMTP id a640c23a62f3a-b3a875c2f2bmr943873866b.10.1759207336652;
-        Mon, 29 Sep 2025 21:42:16 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IE05FwuhQMGeXmbqCfNb5OYa/tRq8eoNKOW/kmksbVHWw0wqxA34cy3qT6OjHD0nk6wgB/ziw==
-X-Received: by 2002:a17:906:55d3:b0:b3a:875c:294f with SMTP id a640c23a62f3a-b3a875c2f2bmr943870066b.10.1759207336259;
-        Mon, 29 Sep 2025 21:42:16 -0700 (PDT)
+        bh=IFA/ZKajMt+npZXBOLV5WlPV0wIgh0I4dBfqL+bGAaY=;
+        b=XnwTG6Kfankr6sVamGI8ydz2nFljuajWUDYZoFuwHmWVHtch2aoBF6mV1Rfrlu0ZwR
+         lVNsqJzVUsiq6AgxgJP4oGHcwGYXroFI982xejkckL+QPoH6gK7da/T7ApXOp8Ugz5ss
+         72POtumddTt+7cWgSLUbiRC+LQKQ7iumflb7dt3Uoen6cjOlid0FW5E/Cyw+XOBjejBk
+         /AqRl7c1I2SfiOfVTMVbp63xZrFQjZRmdl5pg/cE3QCcIb76f4M5/wJUJlotPg7MKeEI
+         Lpf0g36xK4oaTyNgESVQDc0LZQhZnBuMrjMit039+l15kaJjhGeC44yqlsjxxWiYy62A
+         FFtQ==
+X-Forwarded-Encrypted: i=1; AJvYcCX4SaWQ5dit3SwCdhpyewvTbnFc9gnFfgN9yXkqfiW9VSVg5vdci34JT+QafU8/THCJOuk=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwPMC2yqATNQ6RuJS0uyhNGmWT+EbahzUwDP5g0ZJT3dtggqdhh
+	YWxdyGJpkwDrGt/hYehjuEff6niV/DDyTBUEmVwnR5/6tgAYTc04+BwBuq/EQ8f4AW22hjU0m0I
+	SIE1ApCxffo1JkBAsmr3kvs4xIrROxTbbpQ+dxFDsxneIWuv8pDdr3g==
+X-Gm-Gg: ASbGnctfw3n13ge0WAcBjzRUChFodOS9jAd8vMLp4xBMWGDtT4fZDsRX+A2Pur2l/9K
+	IkknEGyDmZRekltyJMGBHx30iXXxa/VH3jw57LWd66gi2f/WGilrkmzEALutjEsdNa4c71AQfQV
+	TZRn1tEGFkIVKWy6ssgu/uImDqAB6U0YJIEpKp2ExSim133MYFFVc5wGNDubD982Vz3gn/n4hmt
+	qnBe4WuTAIHfsZHNlLrJfLFRhemH73cyRRrlVRDicUUyn9NM6FqosuEpIphRGIKttN6fDFYxS7m
+	Pr4yu4OHOUwDU5UvAntBmAoGJcG9t745/qHFpujYTI8KetPu6kD9MjPrpfI5hX2Vqy0xwKW1KZ6
+	vqZ9AgY6KSA==
+X-Received: by 2002:a17:906:b0b:b0:b3b:8158:48d4 with SMTP id a640c23a62f3a-b3b8176d599mr705917366b.13.1759207429310;
+        Mon, 29 Sep 2025 21:43:49 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IEEEN+aLuKNT3JrbnL9wHpSrGyIpOBnWD9C8+mIEIuRXFAWmiOmVNhLUOh/8RrbMdmxUy1frA==
+X-Received: by 2002:a17:906:b0b:b0:b3b:8158:48d4 with SMTP id a640c23a62f3a-b3b8176d599mr705914066b.13.1759207428915;
+        Mon, 29 Sep 2025 21:43:48 -0700 (PDT)
 Received: from [192.168.0.7] (ltea-047-064-114-056.pools.arcor-ip.net. [47.64.114.56])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-b3e89655b09sm359039666b.77.2025.09.29.21.42.14
+        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-634a36521c2sm9027477a12.20.2025.09.29.21.43.46
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 29 Sep 2025 21:42:15 -0700 (PDT)
-Message-ID: <69b0255a-b6b5-46da-9940-ce1f2a18c2e6@redhat.com>
-Date: Tue, 30 Sep 2025 06:42:13 +0200
+        Mon, 29 Sep 2025 21:43:48 -0700 (PDT)
+Message-ID: <7e8d3fcf-3ec3-4209-8f7f-93c210690f73@redhat.com>
+Date: Tue, 30 Sep 2025 06:43:45 +0200
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -90,8 +90,8 @@ List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2 09/17] target/s390x/mmu: Replace [cpu_physical_memory
- -> address_space]_rw()
+Subject: Re: [PATCH v2 05/17] hw/s390x/sclp: Use address_space_memory_is_io()
+ in sclp_service_call()
 To: =?UTF-8?Q?Philippe_Mathieu-Daud=C3=A9?= <philmd@linaro.org>,
  qemu-devel@nongnu.org, Peter Maydell <peter.maydell@linaro.org>
 Cc: Jason Herne <jjherne@linux.ibm.com>,
@@ -110,7 +110,7 @@ Cc: Jason Herne <jjherne@linux.ibm.com>,
  Richard Henderson <richard.henderson@linaro.org>,
  David Hildenbrand <david@redhat.com>
 References: <20250930041326.6448-1-philmd@linaro.org>
- <20250930041326.6448-10-philmd@linaro.org>
+ <20250930041326.6448-6-philmd@linaro.org>
 From: Thomas Huth <thuth@redhat.com>
 Content-Language: en-US
 Autocrypt: addr=thuth@redhat.com; keydata=
@@ -155,7 +155,7 @@ Autocrypt: addr=thuth@redhat.com; keydata=
  oiT+z+/E59qj/EKfyce3sbC9XLjXv3mHMrq1tKX4G7IJGnS989E/fg6crv6NHae9Ckm7+lSs
  IQu4bBP2GxiRQ+NV3iV/KU3ebMRzqIC//DCOxzQNFNJAKldPe/bKZMCxEqtVoRkuJtNdp/5a
  yXFZ6TfE1hGKrDBYAm4vrnZ4CXFSBDllL59cFFOJCkn4Xboj/aVxxJxF30bn
-In-Reply-To: <20250930041326.6448-10-philmd@linaro.org>
+In-Reply-To: <20250930041326.6448-6-philmd@linaro.org>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
 
@@ -166,8 +166,8 @@ On 30/09/2025 06.13, Philippe Mathieu-Daudé wrote:
 > As s390x boards don't call cpu_address_space_init(),
 > cpu_get_address_space(CPU(cpu), 0) returns &address_space_memory.
 > 
-> We can then replace cpu_physical_memory_rw() by the semantically
-> equivalent address_space_rw() call.
+> We can then replace cpu_physical_memory_is_io() by the semantically
+> equivalent address_space_memory_is_io() call.
 > 
 > Signed-off-by: Philippe Mathieu-Daudé <philmd@linaro.org>
 > ---
