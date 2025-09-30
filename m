@@ -1,182 +1,129 @@
-Return-Path: <kvm+bounces-59074-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-59075-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id CE1FEBAB4E1
-	for <lists+kvm@lfdr.de>; Tue, 30 Sep 2025 06:15:22 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0EFADBAB4E4
+	for <lists+kvm@lfdr.de>; Tue, 30 Sep 2025 06:15:45 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 24E803A1E81
-	for <lists+kvm@lfdr.de>; Tue, 30 Sep 2025 04:15:17 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C26C516324B
+	for <lists+kvm@lfdr.de>; Tue, 30 Sep 2025 04:15:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9E10D220698;
-	Tue, 30 Sep 2025 04:15:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8294E24677D;
+	Tue, 30 Sep 2025 04:15:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="AC1MF6Pl"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="IjU+pWJH"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-wm1-f50.google.com (mail-wm1-f50.google.com [209.85.128.50])
+Received: from mail-wr1-f54.google.com (mail-wr1-f54.google.com [209.85.221.54])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DAD7324BD04
-	for <kvm@vger.kernel.org>; Tue, 30 Sep 2025 04:15:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.50
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A5C961DE89A
+	for <kvm@vger.kernel.org>; Tue, 30 Sep 2025 04:15:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.54
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1759205713; cv=none; b=dwWgVur2/oAJJzHeEW99DsEi89myZMUjohFpGaClU+HcyPF+J4wSMKhVtLk3Cus99V4eQbbQ7sDIatjAIuOxq3odZXZbDI+PCeBNA2lX5VfviPUEWzE/AN3EX0rE1FSvvC8jD5cBGgrEAc2a44ZgkiFD5RTwTPOxyZ8kYxKy6Uc=
+	t=1759205738; cv=none; b=C5rl5rSGjWlbNFCdvtBgdax3+00CeecTn1ggK+TPq6acqd4q+VLfmf/U4Q6jmixSVX+xEFxNsAnIOdE1C4yY57ye0iGNLQXvh7adoou6q4Bu2VHskKgCVk5Uvr3KLGvOoAOpufmfL10jX9e3EGCqfiKftDkSO2MWKUVA+5PYhxs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1759205713; c=relaxed/simple;
-	bh=gpbrxqeVsUck1o447XlF65le5rCLL7mzuLZFTIOOjOY=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=sbn/a+yy2tHS4rjUlHPyykI1zHyK2xT1dEPjGkPOYIlf6nfcfm1YayFwa06ODvvs+Nkxy3YSRtVc5e3zS9Wip/GNgorACZAVmSQKIc5pNIs7YKMcmdIhi/A6Ty3TbeE72jAPxG4/s5psx56dPJ1oXOzJg4fsf7kF3YZjCZwJ42w=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=AC1MF6Pl; arc=none smtp.client-ip=209.85.128.50
+	s=arc-20240116; t=1759205738; c=relaxed/simple;
+	bh=LuY/fuI25ix/jLxeQc6Vujowfpy2w6BNYH45SLPtOac=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=HuTMQl+nwMW9oi7o+PmZYZSJCpoYjZUbfCUA6dn6TWBj/7p2p+aLIi+H2nOX/ev8ZnriyerZ37692y7584OhtQiFZ4aiKMCpAsDIZEriEWpjFXiLOiUiew5nm9Kk1y5a8U3iYmr26qnvnwUdWcfjBGx/Vl6GdgLrpSItyc3KLXc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=IjU+pWJH; arc=none smtp.client-ip=209.85.221.54
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
-Received: by mail-wm1-f50.google.com with SMTP id 5b1f17b1804b1-46e34bd8eb2so7519635e9.3
-        for <kvm@vger.kernel.org>; Mon, 29 Sep 2025 21:15:11 -0700 (PDT)
+Received: by mail-wr1-f54.google.com with SMTP id ffacd0b85a97d-42421b1514fso232587f8f.2
+        for <kvm@vger.kernel.org>; Mon, 29 Sep 2025 21:15:35 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1759205710; x=1759810510; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=+R20KfaeepivX48ztS5Qk+Utu4Wf2nP4nwxC8R0e4a4=;
-        b=AC1MF6PlbLSYRuaiUXedquFl7VYDyzBpyh53QY62KwOlaqsuYj2MmCkPaBqu4WrAt6
-         VxXgsXtn0jBJSOsyozS9Y9jYeVxjkHuX24iBo+b2GZ2rKJ2rkVNg9aaAn8u2/LWq2xnA
-         vUCBsMpsUVfRyuBBQDzWbl/McESiRnBcPvFv53wOfcC1FtqOYJ92OmxztuZjalNnQtoI
-         FzrNDW13DELC8sEW+eRa+Ao3Noi/cKvGIznlaXflZAJ2ItlrCXQmZl5Z4JDNl4/92cWr
-         QKx3dehjMo5qaQpPRXRkqWckmJUmgFTj0NMIryvIacpXisLNghYJOEDCrejcT24PGIpx
-         envw==
+        d=linaro.org; s=google; t=1759205734; x=1759810534; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=+gM01wdk2UseDL4pB4Fgwz3uSs5dQf4zrjZtOq7eYBI=;
+        b=IjU+pWJHS7CcLdr7VLu6f1K6lGg+B+AmBpMfmPvqbj0l2P9qiWKLtZJnR2/kZ2mNYT
+         rCiJpwtUvhHTCNEX66911Nqpce5R0vYanvx9o+Qcj4mdQJtKxAZ8PlR3HTGISP8xd72U
+         AMdbDTxHHjd2oMx4KAnprwYJKmdAXO2fOXuCm79LFfpHpg/BCC7tfMYCp5X+7oqSITLI
+         1txqwzsIXFhJWsUr6JhGPHL4NKMptellB+Rw+98pz6prsSVrXXn0J0cisBvlVoQK7XCD
+         KkkYddsbacnfytRz/uPRNyI3dSmQejUtnUh9/26jt/PIbZWiGEBsYGcee8/vwAV5uMcm
+         vEBw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1759205710; x=1759810510;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=+R20KfaeepivX48ztS5Qk+Utu4Wf2nP4nwxC8R0e4a4=;
-        b=UPqaCvJZMh8d/0S7/yIaZ3MmwxHYqpIVuZYxP+wQMXFJsvtdSAnVI4fGZyAmTTh1ku
-         G3S/bhYj8O2nt0QQrigeBrq5e51EoflukxaNuWfaSBNtJtuDndD2DFiUxvC0El9GrvGW
-         WbGg1cyy1F7lS8U1f9oJtd/X4ivZZUEzBfBl1qcEuSVSfhI8ysRMXppxeuvDas5S072U
-         vS+9PcS3JiS0P+H2s6dq1R4lEaS65f9mVYTXRVo9hQJeaKob7wCNhkC+magGUORxOZRQ
-         CheccicZjQpBkUF6IreNKQZGEA9piI2W635VrG9Vz08zN9vgETTnxhaMMnRH8qBWrBSm
-         iRxg==
-X-Forwarded-Encrypted: i=1; AJvYcCWQTR7P6PrZHyMsx2lXva3PiURzXMA+876/cvB7DpSl9iKXkj1KuixnNlltI5jMWZjnsz4=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzFfixwM/QiyDAReEWeJjnFCU8z0XHib8gJtZaDL5KADftCibh6
-	5t6RuNFzj9yHR3HNtUsuP0h9GiP9r/zaw0ljbJ9yj+SYpwlMgYVmnT7C+J9TiIJdBDc=
-X-Gm-Gg: ASbGncu+6x41yoWpqWSmurmLBr9EBfhcMaF8WPhq3JGoUeb8Jiq+toaq1IyG7C+KyHO
-	qGQLCmdVbjbmmNxBCtMxyVrrfR9yypFgus0aOTgIewbHs+eRVp0YY3C8Fk+ISLIe4ozMo99dAew
-	urdbzktfW+uXY+UOQvL4LIcix9wFlBVhBf6gpzxhsZLRjFO3dm5Zu5PGqYBKvK+YkCxLeJiksn9
-	iAMpkI6diNEN2A+WcighkzgoqfCm7GYEJ6XQzys/vQyNdn2a8BCL9WaVSG5YeQiBr6aQDw0e62g
-	VEmqu4p3AJ6Bm4nik4I+pyP2PJ21kcJ+wgDeqSCeuFSX5My//llNTrv3q17IGVunVBIHZneIU2i
-	DK4WJ2OkGYr3imvR/Xv0fwnLTcjSfcJu2UH9neYv//tdKhfqHx8+D7rKkV8Zl6BulutNU0uQmIm
-	fBs+StSuIlXorVZivqSgoS/ZZSz0fV4y0=
-X-Google-Smtp-Source: AGHT+IEUJE1IYP/kfT6NPYb+xEkszrcjL4tSyyPjenIF9G8p6iMdA3UofkAUQEEOCpstatyYsaodDw==
-X-Received: by 2002:a05:600c:5290:b0:46e:394b:4991 with SMTP id 5b1f17b1804b1-46e394b4b1emr152224145e9.11.1759205710145;
-        Mon, 29 Sep 2025 21:15:10 -0700 (PDT)
-Received: from localhost.localdomain (88-187-86-199.subs.proxad.net. [88.187.86.199])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-46e56f3dcacsm39499115e9.2.2025.09.29.21.15.08
-        (version=TLS1_3 cipher=TLS_CHACHA20_POLY1305_SHA256 bits=256/256);
-        Mon, 29 Sep 2025 21:15:09 -0700 (PDT)
-From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@linaro.org>
-To: qemu-devel@nongnu.org,
-	Peter Maydell <peter.maydell@linaro.org>
-Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@linaro.org>,
-	Jason Herne <jjherne@linux.ibm.com>,
-	Stefano Stabellini <sstabellini@kernel.org>,
-	Stefano Garzarella <sgarzare@redhat.com>,
-	xen-devel@lists.xenproject.org,
-	Paolo Bonzini <pbonzini@redhat.com>,
-	Ilya Leoshkevich <iii@linux.ibm.com>,
-	Anthony PERARD <anthony@xenproject.org>,
-	Paul Durrant <paul@xen.org>,
-	Eric Farman <farman@linux.ibm.com>,
-	Marcelo Tosatti <mtosatti@redhat.com>,
-	Halil Pasic <pasic@linux.ibm.com>,
-	Matthew Rosato <mjrosato@linux.ibm.com>,
-	Reinoud Zandijk <reinoud@netbsd.org>,
-	Zhao Liu <zhao1.liu@intel.com>,
-	David Woodhouse <dwmw2@infradead.org>,
-	Christian Borntraeger <borntraeger@linux.ibm.com>,
-	Sunil Muthuswamy <sunilmut@microsoft.com>,
-	kvm@vger.kernel.org,
-	"Michael S. Tsirkin" <mst@redhat.com>,
-	Peter Xu <peterx@redhat.com>,
-	Thomas Huth <thuth@redhat.com>,
-	qemu-s390x@nongnu.org,
-	"Edgar E. Iglesias" <edgar.iglesias@gmail.com>,
-	Richard Henderson <richard.henderson@linaro.org>,
-	David Hildenbrand <david@redhat.com>
-Subject: [PATCH v2 17/17] hw/virtio/virtio: Replace legacy cpu_physical_memory_map() call
-Date: Tue, 30 Sep 2025 06:13:25 +0200
-Message-ID: <20250930041326.6448-18-philmd@linaro.org>
-X-Mailer: git-send-email 2.51.0
-In-Reply-To: <20250930041326.6448-1-philmd@linaro.org>
-References: <20250930041326.6448-1-philmd@linaro.org>
+        d=1e100.net; s=20230601; t=1759205734; x=1759810534;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=+gM01wdk2UseDL4pB4Fgwz3uSs5dQf4zrjZtOq7eYBI=;
+        b=A6htheMS+Aq9KXBKhRDezxXqWpyDbgyqxmnAzksqp7AQ1SuZq498kK9S9arnAAAywy
+         zmV2zf0/U7uh9KcOq+t+0ufJcicS6PuI8Do9iMr14Um/CpKnExG7wVjVILZn1F2UP+u5
+         omqfJKRvkrkwkf/4TgycbpEl4DyHsHAsCTIKfapjT2Hh3Oqk9THKFC8/+5Q+OqfzY9r8
+         I6ii9W9DGIoJBpervY2Itysl2UgflvO+3+WOhSGgnz4uWw8hlY7F9oqmcEN+zjWCNHpx
+         zRQmf/GpsmnLGKYf6oQ7f02t+H7Mcfetphc5qAym+P5SeSfYx0CQ5+9i/K2dCeMG9NBm
+         WHGw==
+X-Forwarded-Encrypted: i=1; AJvYcCWj1gaUZMjw+EsY46rIs3o4z6LfEaA+tfoYOZMuz3qH1jVsfA6gpnZDg12QeZNwlnqcpUI=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwZdyPtk1IKqGUdSRDfmtt1hFTjIpZJG/+9eRpVCIUzxX2o9WSj
+	dDhe6AMTI9tywbpAH3JW6FtSvNbqkSTX1+2vOP5t3Ec85AxyndwzWKUURGzREpejNG0=
+X-Gm-Gg: ASbGncslpsArnqa5BQLA+Vfjm3Q82mmjQaKX1mHWtDscNYIZYnD0JHVd3nbGMmO65Sj
+	1d2mQJu5K7BkB0TzijjSEKuSq6DuGZj3ud41AQHI0fv5qVXB2IqKQW4PpC+B5Y6Jt4i9lkP2JiE
+	2Vm4o2Hs7Lww0tdbtRlz4JmUDSTT+faZByFdHnWGS9VHKF3oazxs+XzI6HRaz91mu/8riDkJzzv
+	mwlAH+fuHFCbTpIMYot8iyeK/FuAWwXjP1OOoWrmlPBkdGKKIyjee46c9SiNmGgSPPGfJiIocjA
+	xx0d/XWayhmg128FfuIKYmA+pii5S2mR2YMxztaIYZqG7o1y5A5d7T5nuQI9c7JFuAraPIMNfRX
+	sIRTNTdI0LxoDtwaR6AZqTfFukYVDxBnLTTnrixRmfd/Jb+ybRV5vl+WgVXnF/3kb4KlfFvsseB
+	Au5Pt8o1IIRtbk4gzjAIgq8VfN
+X-Google-Smtp-Source: AGHT+IG3+NO8caXmgDpmIXUT4U2a38OsXEUMyu+A/7GxYYPazyV8IqumGfAwZ8JxEPW+ODAlASvvgw==
+X-Received: by 2002:a5d:5888:0:b0:3ec:dd16:fc16 with SMTP id ffacd0b85a97d-40e4bd186aamr16627860f8f.43.1759205734391;
+        Mon, 29 Sep 2025 21:15:34 -0700 (PDT)
+Received: from [192.168.69.221] (88-187-86-199.subs.proxad.net. [88.187.86.199])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-40fb89fb2fcsm22030581f8f.22.2025.09.29.21.15.32
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 29 Sep 2025 21:15:33 -0700 (PDT)
+Message-ID: <95145136-7d86-4fb0-a93e-f23af9622ea6@linaro.org>
+Date: Tue, 30 Sep 2025 06:15:31 +0200
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v2 07/17] system/physmem: Pass address space argument to
+ cpu_flush_icache_range()
+Content-Language: en-US
+To: qemu-devel@nongnu.org, Peter Maydell <peter.maydell@linaro.org>
+Cc: Jason Herne <jjherne@linux.ibm.com>,
+ Stefano Stabellini <sstabellini@kernel.org>,
+ Stefano Garzarella <sgarzare@redhat.com>, xen-devel@lists.xenproject.org,
+ Paolo Bonzini <pbonzini@redhat.com>, Ilya Leoshkevich <iii@linux.ibm.com>,
+ Anthony PERARD <anthony@xenproject.org>, Paul Durrant <paul@xen.org>,
+ Eric Farman <farman@linux.ibm.com>, Marcelo Tosatti <mtosatti@redhat.com>,
+ Halil Pasic <pasic@linux.ibm.com>, Matthew Rosato <mjrosato@linux.ibm.com>,
+ Reinoud Zandijk <reinoud@netbsd.org>, Zhao Liu <zhao1.liu@intel.com>,
+ David Woodhouse <dwmw2@infradead.org>,
+ Christian Borntraeger <borntraeger@linux.ibm.com>,
+ Sunil Muthuswamy <sunilmut@microsoft.com>, kvm@vger.kernel.org,
+ "Michael S. Tsirkin" <mst@redhat.com>, Peter Xu <peterx@redhat.com>,
+ Thomas Huth <thuth@redhat.com>, qemu-s390x@nongnu.org,
+ "Edgar E. Iglesias" <edgar.iglesias@gmail.com>,
+ Richard Henderson <richard.henderson@linaro.org>,
+ David Hildenbrand <david@redhat.com>
+References: <20250930041326.6448-1-philmd@linaro.org>
+ <20250930041326.6448-8-philmd@linaro.org>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=C3=A9?= <philmd@linaro.org>
+In-Reply-To: <20250930041326.6448-8-philmd@linaro.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
 
-Propagate VirtIODevice::dma_as to virtqueue_undo_map_desc()
-in order to replace the legacy cpu_physical_memory_unmap()
-call by address_space_unmap().
+On 30/9/25 06:13, Philippe Mathieu-Daudé wrote:
+> Rename cpu_flush_icache_range() as address_space_flush_icache_range(),
+> passing an address space by argument. The single caller, rom_reset(),
+> already operates on an address space. Use it.
+> 
+> Signed-off-by: Philippe Mathieu-Daudé <philmd@linaro.org>
 
-Signed-off-by: Philippe Mathieu-Daudé <philmd@linaro.org>
----
- hw/virtio/virtio.c | 10 ++++++----
- 1 file changed, 6 insertions(+), 4 deletions(-)
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 
-diff --git a/hw/virtio/virtio.c b/hw/virtio/virtio.c
-index 9a81ad912e0..1ed3aa6abab 100644
---- a/hw/virtio/virtio.c
-+++ b/hw/virtio/virtio.c
-@@ -31,6 +31,7 @@
- #include "hw/qdev-properties.h"
- #include "hw/virtio/virtio-access.h"
- #include "system/dma.h"
-+#include "system/memory.h"
- #include "system/runstate.h"
- #include "virtio-qmp.h"
- 
-@@ -1622,7 +1623,8 @@ out:
-  * virtqueue_unmap_sg() can't be used).  Assumes buffers weren't written to
-  * yet.
-  */
--static void virtqueue_undo_map_desc(unsigned int out_num, unsigned int in_num,
-+static void virtqueue_undo_map_desc(AddressSpace *as,
-+                                    unsigned int out_num, unsigned int in_num,
-                                     struct iovec *iov)
- {
-     unsigned int i;
-@@ -1630,7 +1632,7 @@ static void virtqueue_undo_map_desc(unsigned int out_num, unsigned int in_num,
-     for (i = 0; i < out_num + in_num; i++) {
-         int is_write = i >= out_num;
- 
--        cpu_physical_memory_unmap(iov->iov_base, iov->iov_len, is_write, 0);
-+        address_space_unmap(as, iov->iov_base, iov->iov_len, is_write, 0);
-         iov++;
-     }
- }
-@@ -1832,7 +1834,7 @@ done:
-     return elem;
- 
- err_undo_map:
--    virtqueue_undo_map_desc(out_num, in_num, iov);
-+    virtqueue_undo_map_desc(vdev->dma_as, out_num, in_num, iov);
-     goto done;
- }
- 
-@@ -1982,7 +1984,7 @@ done:
-     return elem;
- 
- err_undo_map:
--    virtqueue_undo_map_desc(out_num, in_num, iov);
-+    virtqueue_undo_map_desc(vdev->dma_as, out_num, in_num, iov);
-     goto done;
- }
- 
--- 
-2.51.0
+> ---
+>   include/exec/cpu-common.h | 2 --
+>   include/system/memory.h   | 2 ++
+>   hw/core/loader.c          | 2 +-
+>   system/physmem.c          | 5 ++---
+>   4 files changed, 5 insertions(+), 6 deletions(-)
 
 
