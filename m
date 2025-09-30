@@ -1,38 +1,38 @@
-Return-Path: <kvm+bounces-59145-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-59146-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id E0E84BAC808
-	for <lists+kvm@lfdr.de>; Tue, 30 Sep 2025 12:34:14 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 05276BAC814
+	for <lists+kvm@lfdr.de>; Tue, 30 Sep 2025 12:34:37 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 244D81940159
-	for <lists+kvm@lfdr.de>; Tue, 30 Sep 2025 10:34:36 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id CFAA4485628
+	for <lists+kvm@lfdr.de>; Tue, 30 Sep 2025 10:34:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CD68B2FE06B;
-	Tue, 30 Sep 2025 10:32:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 023042FF164;
+	Tue, 30 Sep 2025 10:32:16 +0000 (UTC)
 X-Original-To: kvm@vger.kernel.org
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D57632FD7D5;
-	Tue, 30 Sep 2025 10:32:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0C4692FDC44;
+	Tue, 30 Sep 2025 10:32:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1759228334; cv=none; b=Deka8zqH0mSsAaOi4fz0HgYrNnFbfOLmmehfE3g7zARjeqDli6LTfUxMiCYjmmPGtBy4sK+BUDyTCadfLsykS6xde/TDjAi6M+xoYHKLmXzAEpspDHkMS9WT+cH3k3tKAeAhlxsAqSJ7H7JqQrKkgIuSf0kMthXmw6IWlyNefZQ=
+	t=1759228335; cv=none; b=SJ4qzgcX1DjgFT3ChteFgQBng/b7Dr2Fz9ZJ71Po4ep0JMNJQ1lJ/MMNtvH14mRC7bUlLxF5ahxD7kITJFKHvLwYMv3rad2BqumhH/TO9e6hn6iAgIswoj8aSURQglTajjKyq3zYvzfuRI5v2jfhlUHGuncBROttxYxsHpr/d/U=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1759228334; c=relaxed/simple;
-	bh=LymncfSA2wqDatx+hg4EJp5rCAjsNxkPAVPRuGIOGZs=;
+	s=arc-20240116; t=1759228335; c=relaxed/simple;
+	bh=zGdVqIbpQPBSUw3Jutj7bJBQ1ltnUDkmYx/Oioo8W/Q=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=FZh7qr3ZoTh3RyoAG3RIVRAu3XBiHkg2vbvvjS9XeELYufOh81vY+K2/xJ7nu9OYg1dhoOxbWo6baP5Rj8sFH8OrGuRRloJq1D0KRSpt/W/K/AINJcmMKXz8Eri0JfCQXQHtZ+D9+FvPpf73n0BZS3h0Ccye6jz41MzLAk+tL64=
+	 MIME-Version; b=ShY1iZQBCaDDHNGToz0gVsCMW1IYmcNKN14yWZHXyYTQy/LRr8qti0zsXxdZzsV7AJKWz4k17Gu7bCf2zcO86G+0U3G0FVdo5+dkhNtzmzRbx8nn6YgQaw+jEbamEGT2ySdpaYbeHHBrgaDEcEdu6NsYCQJLjIJ6vfvc3t3VsPQ=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 2DA822682;
-	Tue, 30 Sep 2025 03:32:04 -0700 (PDT)
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id C0AFD2696;
+	Tue, 30 Sep 2025 03:32:05 -0700 (PDT)
 Received: from ewhatever.cambridge.arm.com (ewhatever.cambridge.arm.com [10.1.197.1])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPA id D46703F66E;
-	Tue, 30 Sep 2025 03:32:10 -0700 (PDT)
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPA id 76A9F3F66E;
+	Tue, 30 Sep 2025 03:32:12 -0700 (PDT)
 From: Suzuki K Poulose <suzuki.poulose@arm.com>
 To: kvmarm@lists.linux.dev
 Cc: kvm@vger.kernel.org,
@@ -45,9 +45,9 @@ Cc: kvm@vger.kernel.org,
 	steven.price@arm.com,
 	tabba@google.com,
 	Suzuki K Poulose <suzuki.poulose@arm.com>
-Subject: [PATCH kvmtool v4 07/15] arm64: Expose ARM64_CORE_REG() for general use
-Date: Tue, 30 Sep 2025 11:31:22 +0100
-Message-ID: <20250930103130.197534-9-suzuki.poulose@arm.com>
+Subject: [PATCH kvmtool v4 08/15] arm64: Add support for finding vCPU for given MPIDR
+Date: Tue, 30 Sep 2025 11:31:23 +0100
+Message-ID: <20250930103130.197534-10-suzuki.poulose@arm.com>
 X-Mailer: git-send-email 2.43.0
 In-Reply-To: <20250930103130.197534-1-suzuki.poulose@arm.com>
 References: <20250930103130.197534-1-suzuki.poulose@arm.com>
@@ -61,68 +61,63 @@ Content-Transfer-Encoding: 8bit
 
 From: Oliver Upton <oliver.upton@linux.dev>
 
-Expose the macro such that it may be used to get SMCCC arguments in a
-future change.
+Some PSCI calls take an MPIDR affinity as an argument. Add a helper to
+get the vCPU that matches an MPIDR so we can find the intended
+recipient.
 
 Signed-off-by: Oliver Upton <oliver.upton@linux.dev>
 Signed-off-by: Suzuki K Poulose <suzuki.poulose@arm.com>
 ---
- arm64/include/kvm/kvm-cpu-arch.h | 16 ++++++++++++++++
- arm64/kvm-cpu.c                  | 16 ----------------
- 2 files changed, 16 insertions(+), 16 deletions(-)
+ arm64/include/kvm/kvm-arch.h |  2 ++
+ arm64/kvm.c                  | 17 +++++++++++++++++
+ 2 files changed, 19 insertions(+)
 
-diff --git a/arm64/include/kvm/kvm-cpu-arch.h b/arm64/include/kvm/kvm-cpu-arch.h
-index 2f189abc..dbd90647 100644
---- a/arm64/include/kvm/kvm-cpu-arch.h
-+++ b/arm64/include/kvm/kvm-cpu-arch.h
-@@ -67,4 +67,20 @@ unsigned long kvm_cpu__get_vcpu_mpidr(struct kvm_cpu *vcpu);
- int kvm_cpu__setup_pvtime(struct kvm_cpu *vcpu);
- int kvm_cpu__teardown_pvtime(struct kvm *kvm);
+diff --git a/arm64/include/kvm/kvm-arch.h b/arm64/include/kvm/kvm-arch.h
+index 8f508ef8..a50e6a4f 100644
+--- a/arm64/include/kvm/kvm-arch.h
++++ b/arm64/include/kvm/kvm-arch.h
+@@ -114,4 +114,6 @@ struct kvm_arch {
+ 	cpu_set_t *vcpu_affinity_cpuset;
+ };
  
-+static inline __u64 __core_reg_id(__u64 offset)
-+{
-+	__u64 id = KVM_REG_ARM64 | KVM_REG_ARM_CORE | offset;
++struct kvm_cpu *kvm__arch_mpidr_to_vcpu(struct kvm *kvm, u64 target_mpidr);
 +
-+	if (offset < KVM_REG_ARM_CORE_REG(fp_regs))
-+		id |= KVM_REG_SIZE_U64;
-+	else if (offset < KVM_REG_ARM_CORE_REG(fp_regs.fpsr))
-+		id |= KVM_REG_SIZE_U128;
-+	else
-+		id |= KVM_REG_SIZE_U32;
-+
-+	return id;
-+}
-+
-+#define ARM64_CORE_REG(x) __core_reg_id(KVM_REG_ARM_CORE_REG(x))
-+
- #endif /* ARM_COMMON__KVM_CPU_ARCH_H */
-diff --git a/arm64/kvm-cpu.c b/arm64/kvm-cpu.c
-index c7286484..f8e08b5d 100644
---- a/arm64/kvm-cpu.c
-+++ b/arm64/kvm-cpu.c
-@@ -238,22 +238,6 @@ void kvm_cpu__show_page_tables(struct kvm_cpu *vcpu)
- {
+ #endif /* ARM_COMMON__KVM_ARCH_H */
+diff --git a/arm64/kvm.c b/arm64/kvm.c
+index 23b4dab1..41c47b13 100644
+--- a/arm64/kvm.c
++++ b/arm64/kvm.c
+@@ -5,6 +5,7 @@
+ #include "kvm/virtio-console.h"
+ #include "kvm/fdt.h"
+ #include "kvm/gic.h"
++#include "kvm/kvm-cpu.h"
+ 
+ #include <linux/byteorder.h>
+ #include <linux/cpumask.h>
+@@ -128,6 +129,22 @@ void kvm__arch_init(struct kvm *kvm)
+ 	kvm__arch_enable_mte(kvm);
  }
  
--static __u64 __core_reg_id(__u64 offset)
--{
--	__u64 id = KVM_REG_ARM64 | KVM_REG_ARM_CORE | offset;
--
--	if (offset < KVM_REG_ARM_CORE_REG(fp_regs))
--		id |= KVM_REG_SIZE_U64;
--	else if (offset < KVM_REG_ARM_CORE_REG(fp_regs.fpsr))
--		id |= KVM_REG_SIZE_U128;
--	else
--		id |= KVM_REG_SIZE_U32;
--
--	return id;
--}
--
--#define ARM64_CORE_REG(x) __core_reg_id(KVM_REG_ARM_CORE_REG(x))
--
- unsigned long kvm_cpu__get_vcpu_mpidr(struct kvm_cpu *vcpu)
++
++struct kvm_cpu *kvm__arch_mpidr_to_vcpu(struct kvm *kvm, u64 target_mpidr)
++{
++	int i;
++
++	for (i = 0; i < kvm->nrcpus; i++) {
++		struct kvm_cpu *tmp = kvm->cpus[i];
++		u64 mpidr = kvm_cpu__get_vcpu_mpidr(tmp) & ARM_MPIDR_HWID_BITMASK;
++
++		if (mpidr == target_mpidr)
++			return tmp;
++	}
++
++	return NULL;
++}
++
+ static u64 kvm__arch_get_payload_region_size(struct kvm *kvm)
  {
- 	struct kvm_one_reg reg;
+ 	if (kvm->cfg.arch.aarch32_guest)
 -- 
 2.43.0
 
