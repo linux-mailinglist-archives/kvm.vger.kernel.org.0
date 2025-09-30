@@ -1,246 +1,242 @@
-Return-Path: <kvm+bounces-59090-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-59091-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3FE9DBABC1D
-	for <lists+kvm@lfdr.de>; Tue, 30 Sep 2025 09:09:42 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 08F4ABABC93
+	for <lists+kvm@lfdr.de>; Tue, 30 Sep 2025 09:21:29 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 8456B7A7FE9
-	for <lists+kvm@lfdr.de>; Tue, 30 Sep 2025 07:07:58 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A96E81C2A48
+	for <lists+kvm@lfdr.de>; Tue, 30 Sep 2025 07:21:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 93E812BD5A7;
-	Tue, 30 Sep 2025 07:09:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="0lO8Xds8"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E621724C068;
+	Tue, 30 Sep 2025 07:21:20 +0000 (UTC)
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pf1-f202.google.com (mail-pf1-f202.google.com [209.85.210.202])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mxct.zte.com.cn (mxct.zte.com.cn [183.62.165.209])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1F6A81F462C
-	for <kvm@vger.kernel.org>; Tue, 30 Sep 2025 07:09:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B99981EBA14;
+	Tue, 30 Sep 2025 07:21:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=183.62.165.209
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1759216170; cv=none; b=TquJaedb4GVkAzKRynhNxCZ/Ih+RoCdc8XKkk03gZqAFAh3dGp7652ItmRtkiMOPsx9Re7Y7lqk5Z5pxRgOcrUm5/i6WoAIn7BDxenkKjWgroxTfMyz1tsQgYGzs/EAqSq6lFfz7QfwAutqInn+N6TMWY6/lTKMP9O9WsliKYDs=
+	t=1759216880; cv=none; b=G3Gu7COqJ1sqhNAHxk40ZuwJsEjxsW2D2vHARsCnZckR67lbhd2KToRcy+dlJ8stAn9+qWBom/nYlcsWVVWOJlITf98663KW9JGJ7orVS4af6wcQ6DimknlnbH/h4VjJ+jSVLcmqb2QEZJW97LDdMZP/eC3xeTvFTz9nIF9KRKU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1759216170; c=relaxed/simple;
-	bh=nEib4Ghi85l3FWyJxphX9jSiYJFIQEl6res5LifHFg4=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=KO/7JSVeCQ4BJdTof8Ko6dP9sPvfFUloxeiTSrE7iJG+AaXDNRwGnusX7cmfTD1+853JZjZje0sCLXkc7P8iZ/rK9wbs15hcWxHknpcORXIfT4TdMgaHTbKvqpeimVW2vr9eJLexrsgFYmpnJ+Z2nV/cRNBMlsbf0rYikHp0thk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--ackerleytng.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=0lO8Xds8; arc=none smtp.client-ip=209.85.210.202
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--ackerleytng.bounces.google.com
-Received: by mail-pf1-f202.google.com with SMTP id d2e1a72fcca58-782063922ceso2632937b3a.0
-        for <kvm@vger.kernel.org>; Tue, 30 Sep 2025 00:09:28 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1759216168; x=1759820968; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=UP672iBXqfF/M4eb7b0fPJvD5RDYtZGt7W3+nRDDW7U=;
-        b=0lO8Xds8ydbtanpWt92wS2riIySTmNyo5zdDZVcxYVjpQ6dDK29Q762W2rqKxm74sT
-         3bbkiJ9iy5hxsUwjw2Ei5MJDo3JYPHhwkE/Qq/87g7hCAHmAOT/QaMDZdrqadObmDxks
-         lkuu2x9Z3YuDYPJtDi5sMPdhcm+C6MN1mnrQF/jQ0T1UZjH0t0V+uMLJNq98f11TIDQX
-         RSl4QjHXt/KN9XJPjzyx3JYer9UpE026K1i+SWd+uyniVUWDRwW6g2sE3aqN94jkMLOb
-         /xI2ZCIIYa8urue2W4iZ4c8ARLognClJ1SQBJRJv4/2W76HeVuulMSjmEZ/DSd/aGsRp
-         bzNA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1759216168; x=1759820968;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=UP672iBXqfF/M4eb7b0fPJvD5RDYtZGt7W3+nRDDW7U=;
-        b=qVRTVnaFSCH74gIr6w5TNSkMDOTl5NFxvMzBGl7C+4RXRc5FLcqwIzFo6ujegiiIBk
-         zNgSTNTgEnIU27dfmvvZiCktuelCeqqlpufLTNBl6u0Vl1P+51bGgbGn+xRz5OxTKtfT
-         J24tMJO5Yt3594raVR0Kdl6DlZlv6yRIp7VhXFG93lJZLQi+S4ifoncTp/1wDmYbQSkt
-         TxyN1YOfRjAeACxfjvwmWhPQl1hbFwvQh3MES2KsxU4WFhwNM4wfakA7NOgpcGLXXGsL
-         2Aq6FoDj01Ufuu7DAVHIQWI4hxR9C5+SmQogFtgl8mtPm6sDl/zzwMeYAyZEYRQnsTUV
-         WoOQ==
-X-Forwarded-Encrypted: i=1; AJvYcCV5c2Eshy1BAKNIx92LSJrQlFWfac+KaglPfmfSmI+h3LjFHMmmfe/j+qloQ224HnnvLkM=@vger.kernel.org
-X-Gm-Message-State: AOJu0YysPOj9gIo8+PypERz+XYZEzdKKWZVO2P2HazIoAq+Ic7a6gupH
-	gchG0kDbsNW+8bgYBWbaTlOWLDB/lUc5x9r23RCdcHSZ/dwE1Ixx69JCtdR35lhyecsX9UXzU0A
-	Nv2H5AyCeiIBTBHUJjSHJhvI6NQ==
-X-Google-Smtp-Source: AGHT+IGBuYj/q0jGYUG7M3fPbV2JRBsFGwjHP1fPe6GdcNCfcMiclGAvh4hoSmA12qBaQKnFC6Jqg4jVIDpe2cQnaA==
-X-Received: from pffj26.prod.google.com ([2002:a62:b61a:0:b0:77f:5d99:87b6])
- (user=ackerleytng job=prod-delivery.src-stubby-dispatcher) by
- 2002:a05:6a00:a1d:b0:781:275a:29d9 with SMTP id d2e1a72fcca58-781275a2b55mr13651457b3a.18.1759216168240;
- Tue, 30 Sep 2025 00:09:28 -0700 (PDT)
-Date: Tue, 30 Sep 2025 07:09:27 +0000
-In-Reply-To: <aNrCqhA_hhUjflPA@google.com>
+	s=arc-20240116; t=1759216880; c=relaxed/simple;
+	bh=gd5AM5kFPFHwXr9afj5JmD2qql1PiKMI8relNGBh+F8=;
+	h=Date:Message-ID:Mime-Version:From:To:Cc:Subject:Content-Type; b=A9R7EiK42H6r4nmqWEjiqWGZmS/mmziVm9RuUGok4XO0LSiCF32i2FdxPI/kpluPcETf0MNTDQNrhiSmUUhNGDhH4yAflSsHOOTGdpgSqi07LpqcyqpaOiN9NE/tzWDqD7r9yBjIrN47id41bPylOkZBcP3M+hy5Ic+RItGSWMo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=zte.com.cn; spf=pass smtp.mailfrom=zte.com.cn; arc=none smtp.client-ip=183.62.165.209
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=zte.com.cn
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=zte.com.cn
+Received: from mse-fl2.zte.com.cn (unknown [10.5.228.133])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange x25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mxct.zte.com.cn (FangMail) with ESMTPS id 4cbTxW60Stz4xNt3;
+	Tue, 30 Sep 2025 15:21:03 +0800 (CST)
+Received: from xaxapp05.zte.com.cn ([10.99.98.109])
+	by mse-fl2.zte.com.cn with SMTP id 58U7Kqll028593;
+	Tue, 30 Sep 2025 15:20:52 +0800 (+08)
+	(envelope-from liu.xuemei1@zte.com.cn)
+Received: from mapi (xaxapp02[null])
+	by mapi (Zmail) with MAPI id mid32;
+	Tue, 30 Sep 2025 15:20:54 +0800 (CST)
+Date: Tue, 30 Sep 2025 15:20:54 +0800 (CST)
+X-Zmail-TransId: 2afa68db84d67a6-a6dcc
+X-Mailer: Zmail v1.0
+Message-ID: <202509301520545960_jMIljfZY7bMHBkBbaHR@zte.com.cn>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
-References: <20250926163114.2626257-1-seanjc@google.com> <20250926163114.2626257-6-seanjc@google.com>
- <diqztt0l1pol.fsf@google.com> <aNrCqhA_hhUjflPA@google.com>
-Message-ID: <diqzfrc41kns.fsf@google.com>
-Subject: Re: [PATCH 5/6] KVM: selftests: Add wrappers for mmap() and munmap()
- to assert success
-From: Ackerley Tng <ackerleytng@google.com>
-To: Sean Christopherson <seanjc@google.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, Christian Borntraeger <borntraeger@linux.ibm.com>, 
-	Janosch Frank <frankja@linux.ibm.com>, Claudio Imbrenda <imbrenda@linux.ibm.com>, kvm@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, David Hildenbrand <david@redhat.com>, 
-	Fuad Tabba <tabba@google.com>
-Content-Type: text/plain; charset="UTF-8"
+From: <liu.xuemei1@zte.com.cn>
+To: <anup@brainfault.org>
+Cc: <atish.patra@linux.dev>, <paul.walmsley@sifive.com>, <palmer@dabbelt.com>,
+        <aou@eecs.berkeley.edu>, <alex@ghiti.fr>, <kvm@vger.kernel.org>,
+        <kvm-riscv@lists.infradead.org>, <linux-riscv@lists.infradead.org>,
+        <linux-kernel@vger.kernel.org>
+Subject: =?UTF-8?B?W1BBVENIIHYyXSBSSVNDLVY6IEtWTTogVHJhbnNwYXJlbnQgaHVnZSBwYWdlIHN1cHBvcnQ=?=
+Content-Type: text/plain;
+	charset="UTF-8"
+X-MAIL:mse-fl2.zte.com.cn 58U7Kqll028593
+X-TLS: YES
+X-SPF-DOMAIN: zte.com.cn
+X-ENVELOPE-SENDER: liu.xuemei1@zte.com.cn
+X-SPF: None
+X-SOURCE-IP: 10.5.228.133 unknown Tue, 30 Sep 2025 15:21:03 +0800
+X-Fangmail-Anti-Spam-Filtered: true
+X-Fangmail-MID-QID: 68DB84DF.002/4cbTxW60Stz4xNt3
 
-Sean Christopherson <seanjc@google.com> writes:
+From: Jessica Liu <liu.xuemei1@zte.com.cn>
 
-> On Mon, Sep 29, 2025, Ackerley Tng wrote:
->> Sean Christopherson <seanjc@google.com> writes:
->> 
->> > Add and use wrappers for mmap() and munmap() that assert success to reduce
->> > a significant amount of boilerplate code, to ensure all tests assert on
->> > failure, and to provide consistent error messages on failure.
->> >
->> > No functional change intended.
->> >
->> > Signed-off-by: Sean Christopherson <seanjc@google.com>
->> > ---
->> >  .../testing/selftests/kvm/guest_memfd_test.c  | 21 +++------
->> >  .../testing/selftests/kvm/include/kvm_util.h  | 25 +++++++++++
->> >  tools/testing/selftests/kvm/lib/kvm_util.c    | 44 +++++++------------
->> >  tools/testing/selftests/kvm/mmu_stress_test.c |  5 +--
->> >  .../selftests/kvm/s390/ucontrol_test.c        | 16 +++----
->> >  .../selftests/kvm/set_memory_region_test.c    | 17 ++++---
->> >  6 files changed, 64 insertions(+), 64 deletions(-)
->> >
->> > 
->> > [...snip...]
->> > 
->> > diff --git a/tools/testing/selftests/kvm/include/kvm_util.h b/tools/testing/selftests/kvm/include/kvm_util.h
->> > index 23a506d7eca3..1c68ff0fb3fb 100644
->> > --- a/tools/testing/selftests/kvm/include/kvm_util.h
->> > +++ b/tools/testing/selftests/kvm/include/kvm_util.h
->> > @@ -278,6 +278,31 @@ static inline bool kvm_has_cap(long cap)
->> >  #define __KVM_SYSCALL_ERROR(_name, _ret) \
->> >  	"%s failed, rc: %i errno: %i (%s)", (_name), (_ret), errno, strerror(errno)
->> >  
->> > +static inline void *__kvm_mmap(size_t size, int prot, int flags, int fd,
->> > +			       off_t offset)
->> 
->> Do you have a policy/rationale for putting this in kvm_util.h as opposed
->> to test_util.h? I like the idea of this wrapper but I thought this is
->> less of a kvm thing and more of a test utility, and hence it belongs in
->> test_util.c and test_util.h.
->
-> To be perfectly honest, I forgot test_util.h existed :-)
->
+Use block mapping if backed by a THP, as implemented in architectures
+like ARM and x86_64.
 
-Merging/dropping one of kvm_util.h vs test_util.h is a good idea. The
-distinction is not clear and it's already kind of messy between the two.
+Signed-off-by: Jessica Liu <liu.xuemei1@zte.com.cn>
+---
+Changes in v2:
+- Fixed the typo of writing PAGE_SHIFT as PAGE_SIZE.
 
->> Also, the name kind of associates mmap with KVM too closely IMO, but
->> test_mmap() is not a great name either.
->
-> Which file will hopefully be irrevelant, because ideally it'll be temporary (see
-> below). But if someone has a strong opinion and/or better idea on the name prefix,
-> I definitely want to settle on a name for syscall wrappers, because I want to go
-> much further than just adding an mmap() wrapper.  I chose kvm_ because there's
-> basically zero chance that will ever conflict with generic selftests functionality,
-> and the wrappers utilize TEST_ASSERT(), which are unique to KVM selftests.
->
-> As for why the current location will hopefully be temporary, and why I want to
-> settle on a name, I have patches to add several more wrappers, along with
-> infrastructure to make it super easy to add new wrappers.  When trying to sort
-> out the libnuma stuff for Shivank's series[*], I discovered that KVM selftests
-> already has a (very partial, very crappy) libnuma equivalent in
-> tools/testing/selftests/kvm/include/numaif.h.
->
-> Adding wrappers for NUMA syscalls became an exercise in frustration (so much
-> uninteresting boilerplate, and I kept making silly mistakes), and so that combined
-> with the desire for mmap() and munmap() wrappers motivated me to add a macro
-> framework similar to the kernel's DEFINE_SYSCALL magic.
->
-> So, I've got patches (that I'll post with the next version of the gmem NUMA
-> series) that add tools/testing/selftests/kvm/include/kvm_syscalls.h, and
-> __kvm_mmap() will be moved there (ideally it wouldn't move, but I want to land
-> this small series in 6.18, and so wanted to keep the changes for 6.18 small-ish).
->
-> For lack of a better namespace, and because we already have __KVM_SYSCALL_ERROR(),
-> I picked KVM_SYSCALL_DEFINE() for the "standard" builder, e.g. libnuma equivalents,
-> and then __KVM_SYSCALL_DEFINE() for a KVM selftests specific version to handle
-> asserting success.
->
+ arch/riscv/include/asm/kvm_gstage.h |   3 +
+ arch/riscv/kvm/gstage.c             | 100 ++++++++++++++++++++++++++++
+ arch/riscv/kvm/mmu.c                |  12 +++-
+ 3 files changed, 114 insertions(+), 1 deletion(-)
 
-It's a common pattern in KVM selftests to have a syscall/ioctl wrapper
-foo() that asserts defaults and a __foo() that doesn't assert anything
-and allows tests to assert something else, but I have a contrary
-opinion.
+diff --git a/arch/riscv/include/asm/kvm_gstage.h b/arch/riscv/include/asm/kvm_gstage.h
+index 595e2183173e..cc67fb2d2d42 100644
+--- a/arch/riscv/include/asm/kvm_gstage.h
++++ b/arch/riscv/include/asm/kvm_gstage.h
+@@ -69,4 +69,7 @@ void kvm_riscv_gstage_wp_range(struct kvm_gstage *gstage, gpa_t start, gpa_t end
 
-I think it's better that tests be explicit about what they're testing
-for, so perhaps it's better to use macros like TEST_ASSERT_EQ() to
-explicitly call a function and check the results.
+ void kvm_riscv_gstage_mode_detect(void);
 
-Or perhaps it should be more explicit, like in the name, that an
-assertion is made within this function?
++long kvm_riscv_gstage_thp_adjust(struct kvm *kvm, struct kvm_memory_slot *memslot,
++				 unsigned long hva, kvm_pfn_t *pfnp, gpa_t *gpa);
++
+ #endif
+diff --git a/arch/riscv/kvm/gstage.c b/arch/riscv/kvm/gstage.c
+index 24c270d6d0e2..129dee62c570 100644
+--- a/arch/riscv/kvm/gstage.c
++++ b/arch/riscv/kvm/gstage.c
+@@ -77,6 +77,106 @@ static int gstage_level_to_page_size(u32 level, unsigned long *out_pgsize)
+ 	return 0;
+ }
 
-In many cases a foo() exists without the corresponding __foo(), which
-seems to be discouraging testing for error cases.
++static int gstage_get_user_mapping_size(struct kvm *kvm, u64 addr)
++{
++	pte_t *ptepp;
++	u32 ptep_level;
++	unsigned long out_pgsize;
++	struct kvm_gstage gstage = {
++		.pgd = kvm->mm->pgd
++	};
++
++	if (!kvm_riscv_gstage_get_leaf(&gstage, addr, &ptepp, &ptep_level))
++		return -EFAULT;
++
++	if (gstage_level_to_page_size(ptep_level, &out_pgsize))
++		return -EFAULT;
++
++	return out_pgsize;
++}
++
++static bool gstage_supports_huge_mapping(struct kvm_memory_slot *memslot, unsigned long hva)
++{
++	gpa_t gpa_start;
++	hva_t uaddr_start, uaddr_end;
++	size_t size;
++
++	size = memslot->npages * PAGE_SIZE;
++	uaddr_start = memslot->userspace_addr;
++	uaddr_end = uaddr_start + size;
++
++	gpa_start = memslot->base_gfn << PAGE_SHIFT;
++
++	/*
++	 * Pages belonging to memslots that don't have the same alignment
++	 * within a PMD for userspace and GPA cannot be mapped with g-stage
++	 * PMD entries, because we'll end up mapping the wrong pages.
++	 *
++	 * Consider a layout like the following:
++	 *
++	 *    memslot->userspace_addr:
++	 *    +-----+--------------------+--------------------+---+
++	 *    |abcde|fgh  vs-stage block  |    vs-stage block tv|xyz|
++	 *    +-----+--------------------+--------------------+---+
++	 *
++	 *    memslot->base_gfn << PAGE_SHIFT:
++	 *      +---+--------------------+--------------------+-----+
++	 *      |abc|def  g-stage block  |    g-stage block   |tvxyz|
++	 *      +---+--------------------+--------------------+-----+
++	 *
++	 * If we create those g-stage blocks, we'll end up with this incorrect
++	 * mapping:
++	 *   d -> f
++	 *   e -> g
++	 *   f -> h
++	 */
++	if ((gpa_start & (PMD_SIZE - 1)) != (uaddr_start & (PMD_SIZE - 1)))
++		return false;
++
++	/*
++	 * Next, let's make sure we're not trying to map anything not covered
++	 * by the memslot. This means we have to prohibit block size mappings
++	 * for the beginning and end of a non-block aligned and non-block sized
++	 * memory slot (illustrated by the head and tail parts of the
++	 * userspace view above containing pages 'abcde' and 'xyz',
++	 * respectively).
++	 *
++	 * Note that it doesn't matter if we do the check using the
++	 * userspace_addr or the base_gfn, as both are equally aligned (per
++	 * the check above) and equally sized.
++	 */
++	return (hva >= ALIGN(uaddr_start, PMD_SIZE)) && (hva < ALIGN_DOWN(uaddr_end, PMD_SIZE));
++}
++
++long kvm_riscv_gstage_thp_adjust(struct kvm *kvm, struct kvm_memory_slot *memslot,
++				 unsigned long hva, kvm_pfn_t *hfnp, gpa_t *gpa)
++{
++	kvm_pfn_t hfn = *hfnp;
++
++	/*
++	 * Make sure the adjustment is done only for THP pages. Also make
++	 * sure that the HVA and GPA are sufficiently aligned and that the
++	 * block map is contained within the memslot.
++	 */
++	if (gstage_supports_huge_mapping(memslot, hva)) {
++		int sz = gstage_get_user_mapping_size(kvm, hva);
++
++		if (sz < 0)
++			return sz;
++
++		if (sz < PMD_SIZE)
++			return PAGE_SIZE;
++
++		*gpa &= PMD_MASK;
++		hfn &= ~(PTRS_PER_PMD - 1);
++		*hfnp = hfn;
++
++		return PMD_SIZE;
++	}
++
++	return PAGE_SIZE;
++}
++
+ bool kvm_riscv_gstage_get_leaf(struct kvm_gstage *gstage, gpa_t addr,
+ 			       pte_t **ptepp, u32 *ptep_level)
+ {
+diff --git a/arch/riscv/kvm/mmu.c b/arch/riscv/kvm/mmu.c
+index 525fb5a330c0..f70cf721ebb8 100644
+--- a/arch/riscv/kvm/mmu.c
++++ b/arch/riscv/kvm/mmu.c
+@@ -337,7 +337,8 @@ int kvm_riscv_mmu_map(struct kvm_vcpu *vcpu, struct kvm_memory_slot *memslot,
+ 	struct kvm_mmu_memory_cache *pcache = &vcpu->arch.mmu_page_cache;
+ 	bool logging = (memslot->dirty_bitmap &&
+ 			!(memslot->flags & KVM_MEM_READONLY)) ? true : false;
+-	unsigned long vma_pagesize, mmu_seq;
++	unsigned long mmu_seq;
++	long vma_pagesize;
+ 	struct kvm_gstage gstage;
+ 	struct page *page;
 
-Also, I guess especially for vcpu_run(), tests would like to loop/take
-different actions based on different errnos and then it gets a bit
-unwieldy to have to avoid functions that have assertions within them.
+@@ -416,6 +417,15 @@ int kvm_riscv_mmu_map(struct kvm_vcpu *vcpu, struct kvm_memory_slot *memslot,
+ 	if (mmu_invalidate_retry(kvm, mmu_seq))
+ 		goto out_unlock;
 
-I can see people forgetting to add TEST_ASSERT_EQ()s to check results of
-setup/teardown functions but I think those errors would surface some
-other way anyway.
-
-Not a strongly-held opinion, and no major concerns on the naming
-either. It's a selftest after all and IIUC we're okay to have selftest
-interfaces change anyway?
-
-> /* Define a kvm_<syscall>() API to assert success. */
-> #define __KVM_SYSCALL_DEFINE(name, nr_args, args...)			\
-> static inline void kvm_##name(DECLARE_ARGS(nr_args, args))		\
-> {									\
-> 	int r;								\
-> 									\
-> 	r = name(UNPACK_ARGS(nr_args, args));				\
-> 	TEST_ASSERT(!r, __KVM_SYSCALL_ERROR(#name, r));			\
-> }
->
-> /*
->  * Macro to define syscall APIs, either because KVM selftests doesn't link to
->  * the standard library, e.g. libnuma, or because there is no library that yet
->  * provides the syscall.  These
->  */
-> #define KVM_SYSCALL_DEFINE(name, nr_args, args...)			\
-> static inline long name(DECLARE_ARGS(nr_args, args))			\
-> {									\
-> 	return syscall(__NR_##name, UNPACK_ARGS(nr_args, args));	\
-> }									\
-> __KVM_SYSCALL_DEFINE(name, nr_args, args)
->
->
-> The usage looks like this (which is odd at first glance, but makes it trivially
-> easy to copy+paste from the kernel SYSCALL_DEFINE invocations:
->
-> KVM_SYSCALL_DEFINE(get_mempolicy, 5, int *, policy, const unsigned long *, nmask,
-> 		   unsigned long, maxnode, void *, addr, int, flags);
->
-> KVM_SYSCALL_DEFINE(set_mempolicy, 3, int, mode, const unsigned long *, nmask,
-> 		   unsigned long, maxnode);
->
-> KVM_SYSCALL_DEFINE(set_mempolicy_home_node, 4, unsigned long, start,
-> 		   unsigned long, len, unsigned long, home_node,
-> 		   unsigned long, flags);
->
-> KVM_SYSCALL_DEFINE(migrate_pages, 4, int, pid, unsigned long, maxnode,
-> 		   const unsigned long *, frommask, const unsigned long *, tomask);
->
-> KVM_SYSCALL_DEFINE(move_pages, 6, int, pid, unsigned long, count, void *, pages,
-> 		   const int *, nodes, int *, status, int, flags);
->
-> KVM_SYSCALL_DEFINE(mbind, 6, void *, addr, unsigned long, size, int, mode,
-> 		   const unsigned long *, nodemask, unsigned long, maxnode,
-> 		   unsigned int, flags);
->
-> __KVM_SYSCALL_DEFINE(munmap, 2, void *, mem, size_t, size);
-> __KVM_SYSCALL_DEFINE(close, 1, int, fd);
-> __KVM_SYSCALL_DEFINE(fallocate, 4, int, fd, int, mode, loff_t, offset, loff_t, len);
-> __KVM_SYSCALL_DEFINE(ftruncate, 2, unsigned int, fd, off_t, length);
->
-> [*] https://lore.kernel.org/all/0e986bdb-7d1b-4c14-932e-771a87532947@amd.com
++	/* check if we are backed by a THP and thus use block mapping if possible */
++	if (vma_pagesize == PAGE_SIZE) {
++		vma_pagesize = kvm_riscv_gstage_thp_adjust(kvm, memslot, hva, &hfn, &gpa);
++		if (vma_pagesize < 0) {
++			ret = vma_pagesize;
++			goto out_unlock;
++		}
++	}
++
+ 	if (writable) {
+ 		mark_page_dirty_in_slot(kvm, memslot, gfn);
+ 		ret = kvm_riscv_gstage_map_page(&gstage, pcache, gpa, hfn << PAGE_SHIFT,
+-- 
+2.27.0
 
