@@ -1,38 +1,38 @@
-Return-Path: <kvm+bounces-59141-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-59142-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9C5B4BAC7E7
-	for <lists+kvm@lfdr.de>; Tue, 30 Sep 2025 12:33:03 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id EF302BAC7ED
+	for <lists+kvm@lfdr.de>; Tue, 30 Sep 2025 12:33:17 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 09F6D188D569
-	for <lists+kvm@lfdr.de>; Tue, 30 Sep 2025 10:33:26 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 2659E188FB3B
+	for <lists+kvm@lfdr.de>; Tue, 30 Sep 2025 10:33:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5C4252FBDFD;
-	Tue, 30 Sep 2025 10:32:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DE83E2FC016;
+	Tue, 30 Sep 2025 10:32:09 +0000 (UTC)
 X-Original-To: kvm@vger.kernel.org
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E7E852FB972;
-	Tue, 30 Sep 2025 10:32:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 894462FBDE3;
+	Tue, 30 Sep 2025 10:32:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1759228327; cv=none; b=Kozq2Cr9afYhRdAgTiXhvLAY9hY0N9G6C2RdukNUY2Mvo3yQ6bb24LB6BaX1eHiv9pvld9+Z1dRJe0LMT7IE1beKzwQyL1sQPMVwHXEujhDZtcXoyIruaE7aR+0jRa6eJcPCts8avO4XQnuL/YfkTbjEDqbDHhnePgQplrmIQAI=
+	t=1759228329; cv=none; b=CS40c0OPyJWtBq6CfjWETooiEIkNVfzoHCU9kCcfYHYPB7++S/Zu9KPqzedQ+AYXN8/sWwXLNS1B2cf2f31wmVA4UCV54QbOR5hK1vbazrxaq3oBiwLmAZ4WuXutyhj7WvhYKKNwZqBzCCUTiM3Ir6jV7EAvFUmlavmQtas2Krc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1759228327; c=relaxed/simple;
+	s=arc-20240116; t=1759228329; c=relaxed/simple;
 	bh=o4B+S59z6sqFBoafis1yhVBnv55ilM2ESRaRPeUIBT4=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=AxjjJfETPim/UD4iE2qCs8klUvjzP7qGIrNEXoB3U2O3RXFfZqDTeJoAj9pElMeIL6uGGvBvCLQEWLHIQSW6o8Zc4ihOy/zQwxEKVAI1MLDgmg4Vi06JYAY7lDABroXSdJ30ZweaI1Z7ZzPFSX0niywaJSul8WEXcGON61NxvBg=
+	 MIME-Version; b=TKa6qB5so7x4FyPKrqt+0PNyuAHNY+mavnqoHvE+0X/lbMy6iKi+8gpe1FK2ILDg3CiTZs1dgs59ZZXnhdfp0+NBzmONhzgp7EKfYNPG4cgWMp7joJCVAsDuPN69pMYqxtNSnkiWkirC8b514Kqs6I/+beRtwSJiTIkVDfn/X+o=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id A723B25E0;
-	Tue, 30 Sep 2025 03:31:57 -0700 (PDT)
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 47818267F;
+	Tue, 30 Sep 2025 03:31:59 -0700 (PDT)
 Received: from ewhatever.cambridge.arm.com (ewhatever.cambridge.arm.com [10.1.197.1])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPA id 59E7A3F66E;
-	Tue, 30 Sep 2025 03:32:04 -0700 (PDT)
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPA id F0ACB3F66E;
+	Tue, 30 Sep 2025 03:32:05 -0700 (PDT)
 From: Suzuki K Poulose <suzuki.poulose@arm.com>
 To: kvmarm@lists.linux.dev
 Cc: kvm@vger.kernel.org,
@@ -45,9 +45,9 @@ Cc: kvm@vger.kernel.org,
 	steven.price@arm.com,
 	tabba@google.com,
 	Suzuki K Poulose <suzuki.poulose@arm.com>
-Subject: [PATCH kvmtool v4 04/15] Import arm-smccc.h from Linux 6.16-rc1
-Date: Tue, 30 Sep 2025 11:31:18 +0100
-Message-ID: <20250930103130.197534-5-suzuki.poulose@arm.com>
+Subject: [PATCH kvmtool v4 04/15] Import arm-smccc.h from Linux 6.17-rc7
+Date: Tue, 30 Sep 2025 11:31:19 +0100
+Message-ID: <20250930103130.197534-6-suzuki.poulose@arm.com>
 X-Mailer: git-send-email 2.43.0
 In-Reply-To: <20250930103130.197534-1-suzuki.poulose@arm.com>
 References: <20250930103130.197534-1-suzuki.poulose@arm.com>
