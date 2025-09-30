@@ -1,320 +1,200 @@
-Return-Path: <kvm+bounces-59163-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-59164-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id F1CE2BAD2A8
-	for <lists+kvm@lfdr.de>; Tue, 30 Sep 2025 16:24:19 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 41C61BAD341
+	for <lists+kvm@lfdr.de>; Tue, 30 Sep 2025 16:34:59 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A6B534A24EE
-	for <lists+kvm@lfdr.de>; Tue, 30 Sep 2025 14:24:18 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id EBD53480E7E
+	for <lists+kvm@lfdr.de>; Tue, 30 Sep 2025 14:34:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 611822FC881;
-	Tue, 30 Sep 2025 14:24:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C28BC304BBF;
+	Tue, 30 Sep 2025 14:34:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="2ZuA/d9x"
+	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="lpGrvc3+"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pj1-f74.google.com (mail-pj1-f74.google.com [209.85.216.74])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from CY7PR03CU001.outbound.protection.outlook.com (mail-westcentralusazon11010013.outbound.protection.outlook.com [40.93.198.13])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D95A120B7E1
-	for <kvm@vger.kernel.org>; Tue, 30 Sep 2025 14:24:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.74
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1759242251; cv=none; b=ogQKp3evMZoHrbQiv1jfmX+PmlusGKMzFz5gwdEGZGgzRexlf2Km2YTCPUZ+TwY4G9/QJYMusrhRnQUYF02NQ35PIZPXFOF7atjTz+6T0IsfVY3zr+jjhR+Ln6PMIPky7ps+yDkGwWc308C4mxq8e9tDzERND3/2Ab50DlBS6sk=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1759242251; c=relaxed/simple;
-	bh=QX4I/lCarlYgvfsjBbMkBMBMASp/lik6TTXQ2+1tQ5Y=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=ELQK2U6zjauwxD1puARMqccuusjw9/HiAZLyDiJbJYyOw1na9CLrz7djV6X8X1EpLuIEI9+TAL5eP4cSRmzkZVH6ry2L+pdvIhSFUsbQqU7K9iK+BX4Xk3YlCKIX3JC9Bqxjm4Bo2myLloyeA/vlsiJDD7aoAQA0DegMxfkZrdk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=2ZuA/d9x; arc=none smtp.client-ip=209.85.216.74
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pj1-f74.google.com with SMTP id 98e67ed59e1d1-3306543e5abso6781866a91.1
-        for <kvm@vger.kernel.org>; Tue, 30 Sep 2025 07:24:09 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1759242249; x=1759847049; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=oQlJNmaSy7Vsey9bZkxA7JGXtQsD4l92RLpVpPchWDw=;
-        b=2ZuA/d9x4STm9M28mbYFfxncb31DO8LaUjtbpc8kFduhRUUhKMuoPgHzhkIc18RvMo
-         3tu2gJE+VPHxbBH5mK6CIECGIpAVw0gtx/VAX8wtt/oe3qUH8OoOXpQL1PZnQU65XWxp
-         9q2xkAWZMlUxbVXfo10rcPP/WcOfnuQ3RJxFMT/O8zwZQoCjIcboG4cB3JT2pVTAL6KC
-         aCGt/3jflz4vAxsfl0igIcT+NJ0Msvjc1YVkgplV7ZG/yw+GJsJxEfQD1w6/A9BeVwYj
-         8YOBp8mXrn0cg9Dq+e1KKl6FmYR9BD1GQqODdApBozmg9gA6gPgGTPDdKfl1n7Llf4yY
-         wgEw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1759242249; x=1759847049;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=oQlJNmaSy7Vsey9bZkxA7JGXtQsD4l92RLpVpPchWDw=;
-        b=FTInfPiw7nqtl9hRod1n2ijSM3jaA6tuOr0cmleq/A+RwQZEqM7K9/FhwRMpIJ2Mq/
-         V2OcFDPp8YoPDDQzd0lAqpLvk4LxL6ED1xCZ7qvUHvslbIKzW16LHo2ozWs+R67m2e7Z
-         IeARzmS9Xkko9z0P3y8QOkKkuBZ4qddzTCyAJoPYJgYbjkh6GOwb3hExfuxCSMwSlzhq
-         lQIj4KpHayxitDyzBUe6+rFNCwpI/xoMyVwU/KlsAa26FtYqtcha/O1J+tp/kJxLhnif
-         eaqkm/G1IR+QNKf8R+pCI9YuFP8yb1QNIGJVqGvJ+zMP8EaYNvfqIMxDytvaQg2jNERB
-         iuJA==
-X-Forwarded-Encrypted: i=1; AJvYcCVK598lbKt5aghSAiAsAdjFuaiBRtFzJQ2iL1492xwPNUkiPFvnobHs0/+HeHkdBegylVE=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyXsTyU9ZheqKzM1GgyTrO3xSlMAeY1f9x3aNXErXnvgfPMrnwM
-	NUAKKceltBG6k+kC9y/X2o7mOAHKt2B5TG5C8wUR7NbGw6eicf8mncgOMMOVLU3WVU7WimaohrB
-	559Nniw==
-X-Google-Smtp-Source: AGHT+IFz/mOSeweoDFQEe1prKxm0oY3++suIaj9pQRWJfRm1ouaf2TCChsh41iBwxlNuzYnHzPTecD9i+ec=
-X-Received: from pjbbk12.prod.google.com ([2002:a17:90b:80c:b0:32d:7097:81f1])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:4ac4:b0:32e:8c6d:5928
- with SMTP id 98e67ed59e1d1-3383abde248mr5248895a91.13.1759242249096; Tue, 30
- Sep 2025 07:24:09 -0700 (PDT)
-Date: Tue, 30 Sep 2025 07:24:07 -0700
-In-Reply-To: <diqzfrc41kns.fsf@google.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1CEFB201017;
+	Tue, 30 Sep 2025 14:34:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.93.198.13
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1759242860; cv=fail; b=HmVHdATko4cCZYj1IZLEy2TYCfKpB2eaLAzq3i0sg+4BdbWiu01cjjQVjWiL1mzJnv5ZgfQhSIDTPpx7b9jHdVkakfLNhLep2UTJWdmR9eV33Doi5XWctPYlZplWs0zehFI8CfBdFDE3tXg6cTJMfSkqBPVKzeTogAxs+/c5Ctg=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1759242860; c=relaxed/simple;
+	bh=BWb85YI1VAI1u57e9BaSuKn7OX//onhqU/j1fE+iGeM=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:Content-Type:
+	 Content-Disposition:In-Reply-To:MIME-Version; b=sFo1L4wWhTLOkVP2/H14iCA/DPpX6WcEXeGsy2AkvUuV5a82sbkn030Qc00ovkJDfQ/2pcAv+PuYaHywawRMPj0dN2EqxOuYQyROGV8XkkuW1C+E09YSN9yMNwevuhI7Ernaql0MkLhsu7u9pvJfo/9I636jmw7xlDwz6dDwllU=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=lpGrvc3+; arc=fail smtp.client-ip=40.93.198.13
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=HUS0E9qByJJgu09puVh6qbCm++TXjkVVyNyVVzNz43JI5FpNEc6MWX/qnTirGVZSP9zg/ejciJ3KBPSqzpNMJx5dHSUcJg0w0+brolMBUCVZGBFLMykMWhLDTLqrnrm6kYjkH3CSGkXPh1cyd3kc9n60m8o443Fzlt1Jut+iR7fTzRMn9ia5MWjHP3Vis9RZzDgmZLu/gMOdHxdwIfz0dJ5OU4LCsIaG07t7KCM7MoqqqWBv0HcCBiU6baJsC1JZ4qY2tZqhTTPaIgWp1gZ6I7Px8bRDgodlK6bO+yH3cSzAXvXnWDatMBlZ0ci1kEPgqyhJQ1EhAOWlyed59/1t4w==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=BWb85YI1VAI1u57e9BaSuKn7OX//onhqU/j1fE+iGeM=;
+ b=A+EAhyD+O/+HkBRFsYTO68DLec9DLNSZObaUI6eFhvCT4VamfxMqFUVweF37yOjSYagbn1NJwSaK3TPTiVbD9z9EUvS6qXjXlM2aHrugOOpbouEgq2wFnDbu0tqp8CEEJM5pYiDMdZ28keiCtsqOAVBm0CwzehRwVmHqavuY4yckubRN89WPbu62OVnd/RzBaXEbYk4pdKSCtnykAfWfbRX83tF1it7W6wzRYRzEQZcdi1NJr25GdnCt3RwtS/1/NqYld6OvojabJMHYSJWrsa9aLov1CBzsENtK8BGeZ4V9laJib+VnCLyPxV6e1KfGJwTsnbCFAmDyY90zOFSt8Q==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
+ dkim=pass header.d=nvidia.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=BWb85YI1VAI1u57e9BaSuKn7OX//onhqU/j1fE+iGeM=;
+ b=lpGrvc3+bXWKdknypUgMPCr4E8wu8pALBeiQyMaUdKTIaNXe9GhLaEkPbUZ5anVNdQbo6UvY+ewOfTdRZmNWX3lwvnmhEQB56oc6MDUQWhI4HBw1eMhMJBR/nC6fOV3WdaKToUYAMz39jwopjmWTFdvC8BCf+L2LnmwR8Zn5WD0BaQq0E0F+A17xgKnOO/A7CJERQ4jXHNvkDRwdMW17KTZBRXIALzsmmT3oryrG9yG4ZKQEkcnY75J7oa2Uvth9Fj9Jvl+47mVNcoPGpbdkpO9OR5Ou53FI/bxBvdUl9HnLl82bFDkmXQhJm5X6jIS9C1o0rK6w8Wej7PeDpJiPKw==
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nvidia.com;
+Received: from PH7PR12MB5757.namprd12.prod.outlook.com (2603:10b6:510:1d0::13)
+ by PH7PR12MB8425.namprd12.prod.outlook.com (2603:10b6:510:240::13) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9160.17; Tue, 30 Sep
+ 2025 14:34:11 +0000
+Received: from PH7PR12MB5757.namprd12.prod.outlook.com
+ ([fe80::f012:300c:6bf4:7632]) by PH7PR12MB5757.namprd12.prod.outlook.com
+ ([fe80::f012:300c:6bf4:7632%2]) with mapi id 15.20.9160.014; Tue, 30 Sep 2025
+ 14:34:11 +0000
+Date: Tue, 30 Sep 2025 11:34:08 -0300
+From: Jason Gunthorpe <jgg@nvidia.com>
+To: Shameer Kolothum <skolothumtho@nvidia.com>
+Cc: Leon Romanovsky <leon@kernel.org>,
+	Alex Williamson <alex.williamson@redhat.com>,
+	Andrew Morton <akpm@linux-foundation.org>,
+	Bjorn Helgaas <bhelgaas@google.com>,
+	Christian =?utf-8?B?S8O2bmln?= <christian.koenig@amd.com>,
+	"dri-devel@lists.freedesktop.org" <dri-devel@lists.freedesktop.org>,
+	"iommu@lists.linux.dev" <iommu@lists.linux.dev>,
+	Jens Axboe <axboe@kernel.dk>, Joerg Roedel <joro@8bytes.org>,
+	"kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+	"linaro-mm-sig@lists.linaro.org" <linaro-mm-sig@lists.linaro.org>,
+	"linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+	"linux-media@vger.kernel.org" <linux-media@vger.kernel.org>,
+	"linux-mm@kvack.org" <linux-mm@kvack.org>,
+	"linux-pci@vger.kernel.org" <linux-pci@vger.kernel.org>,
+	Logan Gunthorpe <logang@deltatee.com>,
+	Marek Szyprowski <m.szyprowski@samsung.com>,
+	Robin Murphy <robin.murphy@arm.com>,
+	Sumit Semwal <sumit.semwal@linaro.org>,
+	Vivek Kasireddy <vivek.kasireddy@intel.com>,
+	Will Deacon <will@kernel.org>
+Subject: Re: [PATCH v4 10/10] vfio/pci: Add dma-buf export support for MMIO
+ regions
+Message-ID: <20250930143408.GI2942991@nvidia.com>
+References: <cover.1759070796.git.leon@kernel.org>
+ <53f3ea1947919a5e657b4f83e74ca53aa45814d4.1759070796.git.leon@kernel.org>
+ <20250929151749.2007b192.alex.williamson@redhat.com>
+ <20250930090048.GG324804@unreal>
+ <CH3PR12MB754801DC65227CC39A3CB1F3AB1AA@CH3PR12MB7548.namprd12.prod.outlook.com>
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CH3PR12MB754801DC65227CC39A3CB1F3AB1AA@CH3PR12MB7548.namprd12.prod.outlook.com>
+X-ClientProxiedBy: BN0PR07CA0018.namprd07.prod.outlook.com
+ (2603:10b6:408:141::25) To PH7PR12MB5757.namprd12.prod.outlook.com
+ (2603:10b6:510:1d0::13)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20250926163114.2626257-1-seanjc@google.com> <20250926163114.2626257-6-seanjc@google.com>
- <diqztt0l1pol.fsf@google.com> <aNrCqhA_hhUjflPA@google.com> <diqzfrc41kns.fsf@google.com>
-Message-ID: <aNvoB6DWSbda2lXQ@google.com>
-Subject: Re: [PATCH 5/6] KVM: selftests: Add wrappers for mmap() and munmap()
- to assert success
-From: Sean Christopherson <seanjc@google.com>
-To: Ackerley Tng <ackerleytng@google.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, Christian Borntraeger <borntraeger@linux.ibm.com>, 
-	Janosch Frank <frankja@linux.ibm.com>, Claudio Imbrenda <imbrenda@linux.ibm.com>, kvm@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, David Hildenbrand <david@redhat.com>, 
-	Fuad Tabba <tabba@google.com>
-Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: PH7PR12MB5757:EE_|PH7PR12MB8425:EE_
+X-MS-Office365-Filtering-Correlation-Id: 3abc86bf-36ec-4831-a421-08de002e6ba8
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;ARA:13230040|366016|1800799024|7416014|376014;
+X-Microsoft-Antispam-Message-Info:
+	=?us-ascii?Q?zk5++mRU27edAOeAL7UL+yNfoW6jFDjhMWcRzDoBxseHJGKdBHcdeq8r+sM2?=
+ =?us-ascii?Q?EPp4MO5DSMLEi3+cythe/dhtKyob2vluNTgxX6+TBDEXepGiYJ3ggjEvNQBZ?=
+ =?us-ascii?Q?58M9uegDlFxbR6zs0IfAMgVqT4d7bPbknEop7Yw1LQNvit663CgYSquKF76u?=
+ =?us-ascii?Q?K++zGodYxKgb//TkNzayMAYru3iCxwlaGNJNCeWtQziiNJtCFvh0QaAFck/G?=
+ =?us-ascii?Q?+ksakBqG3GsQjIPAuasCRU5+RWaLRPML4hvG8LsNeJdf7GLqc6n7J8SEqZF9?=
+ =?us-ascii?Q?rwBA8ANzJBgUg/wdAXo88ZXVDb5R7i50DqDlHjFVU+QZP5gzvtL2InCihBFp?=
+ =?us-ascii?Q?ks3muR1h0yfLaScny7yLSkveMj+CyD0zYeMjssGuBFkeA6NKcexWICJdoG+z?=
+ =?us-ascii?Q?hc4/J/fcCY5qqhEVVGJT5Uxr2GuA0rWjUFPlDv5DJGHypklgL23m0uWyZcA9?=
+ =?us-ascii?Q?rp+5kxSByjRS16imbuJ75PzRxo+SADjXClLW0vcWFSUfQ70LmvUcqzjVZnd2?=
+ =?us-ascii?Q?1jTsU1AqLf1anNKsvt2YdEkALahgDBzh/RrJmYeiIrxrXazuYid8+u9w4+R/?=
+ =?us-ascii?Q?zVnIJqZJFtq75C6HIKltfAG43/Whuf2nN0DF6EKUlMVdfwxrVAMEjdsiKjLP?=
+ =?us-ascii?Q?MAK8zgf57HfuDL29QDZRrOtctOsu4lHQkLmyU6MrYgmLk1pAoutFe03xZJzK?=
+ =?us-ascii?Q?cgSbJQeA49KoEA5EwNBKNMeh4d4dZsIbR+FUxgh5CodsvywpwINYyl0ycXbD?=
+ =?us-ascii?Q?Mas2V+iXEXUyjb5aVQrSlhOiEctd9TZ+1D040xswi2q39r9eSYRxoL3mgPH6?=
+ =?us-ascii?Q?EqBh6rE8ycBuu6VoEj8Yd2opuXYec0NehZPzXqp3c193nIbBr+rCq/26wbmc?=
+ =?us-ascii?Q?yb8vRBQsSViAoXP6UWm8mpgwaFKHgZN0w4mGtImBO6AzkSUALvE/WRnR4dP+?=
+ =?us-ascii?Q?EF6/FN/G2S9/db492yeEPDrZgoqoO/kzGAvYVqnL3UV+73vyfpgpDYCOqlYm?=
+ =?us-ascii?Q?mq4nxqIWfdJw9z6oWCXJ4EEliiZWDNsdU+qrc57hdoxUrC1CjWhTo4PIOf/+?=
+ =?us-ascii?Q?4LGJuTGSh+4Pq/Pmk3ggP5bv5kKBDUB/4EPZos3tDWeJpiPOv1Mn8az7i8+S?=
+ =?us-ascii?Q?lpdfOi9yC6YDhf1c6+MFWzHbP5n2UxXt9bOs+WOTJGSNO1hIeFhQ7rRdVLFv?=
+ =?us-ascii?Q?A6KNM7J6gBxMYJx7kFDpXZHVouCBBtl1bHoJyp+odsO1QVxVJO+PErJjdrFE?=
+ =?us-ascii?Q?Oz9H8MAXiKY9Ql05L9ex3xpUamfTpczDFhq+cZBJeQuSj34dDoZmKar3oveg?=
+ =?us-ascii?Q?VoY4z404gdnJkhK45CaZrMm0?=
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PH7PR12MB5757.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(1800799024)(7416014)(376014);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?us-ascii?Q?JJRHN8vE2WuQYNc6WJirOIQRQ5M3gyPrSil1VVJLK44jOYf6fAoMhcO8VFWo?=
+ =?us-ascii?Q?vS4ncEdMq9rfS6jTy31HtJ/kr03ZoLQSNqVwPgXV4YWJf0T3NQr91koFCwnT?=
+ =?us-ascii?Q?l6nzhYCOcCfA7kbG/8YCul9qr+KoVAdveG+bBkiz11jZ93QRC1djb4LqsMfw?=
+ =?us-ascii?Q?4U2MP6ArnqiyxMrlmnclMRUYLHkKlTzgkQm60QjzoYCg2L6cs+o6fMIL/0Yf?=
+ =?us-ascii?Q?ALc3d+DQjz1kU37xFSOE3NxHsUKBYs5lAiO642J+uMBAAcyKWbXxyfi6RXre?=
+ =?us-ascii?Q?BHG/r2L2vkVIPVPAX++TkPSbsMEYnZgOkNXnVspFRG06kJ2cweNeivUPF/F6?=
+ =?us-ascii?Q?CXS7HeWbJ5yMJPX4vtMIW5I4PxnXZSS4HYVmThulnVKBKpEqTkL/N4t6XehR?=
+ =?us-ascii?Q?vNUpjl3tzHXdGOL8ysprtGje8vyzd04DFXdnxvwWLBvOnuH3x/SADKtdaqRY?=
+ =?us-ascii?Q?c5Somy2qNQcCuZ3Z1Pw3ZFSlbrONpSKrpNSC+smVDpC+zL22PjFH77jhIGwY?=
+ =?us-ascii?Q?pPYjW/1dh2lqKnBDtDrz+w/0pBiLQjyuZYNQkZEBLiq/6+Mk3U/dTb2+Kf2A?=
+ =?us-ascii?Q?gdozRUEqhWSdGDPEYJbt7iry5J3PEZDNSEofC37WH9XZqsAHzmiRW9HsrMm0?=
+ =?us-ascii?Q?FeR7D2oSk8KAH4bGQT/yXDhEEW2LESlT9UpODKOu63CBBGDQ9Za01wc9bJ9H?=
+ =?us-ascii?Q?dKZCQ8rFW4Cieg0i1XoFrLX8cMMjo3UW8c9C1379ESHiSQ54Qups/tcMAgsm?=
+ =?us-ascii?Q?fpGSUaZ6w1bH8XVLruLy7phGPWyYgWFrMf59YDx9o3gOaITkFX0e8loVjN8Y?=
+ =?us-ascii?Q?ZJj92hnm5pmigdkSosrgRyTS7gHx1X79dy/weLUbIbx6BRunEsppbGFBNB1d?=
+ =?us-ascii?Q?Xa7Z8vWq+K51od7rZLD5udhJkaxQNtJgqYbXLsGA8Fn9vB9W+FiQ8FpqilMu?=
+ =?us-ascii?Q?yBd2OYH/mTF/e8TGdhvQbiD+B6kyx/N6PU2OY1XaWcavBuYIO4BZkiKICTX4?=
+ =?us-ascii?Q?dH6YG3TofNXqbyaMpkXuHcJSO8W8YJQak7OBsD5HW1/1PGRU++ucAP3N2t3W?=
+ =?us-ascii?Q?7fhVXAsUEnfxkzuYJfTlwOHgCvrSy81ws2YQ/6UfG9Y4VF45/T/k4OzSeLbf?=
+ =?us-ascii?Q?ti9dG+EqNgSZD4NlT489Ri6/j+KQiT1qxzzLh8ozE9V4h3BGyro0sc83OyYK?=
+ =?us-ascii?Q?7jxCXV5yN6ENmWsLclJpLVWSBoBudPyZNGNvEwxDWcQwa/oCmT7uAwfouV+y?=
+ =?us-ascii?Q?0u6C5TIaP1X48Y7k+MwEhdhttZ0ZaTD/ItwNUrllUZrghymTIE2qnhhw2ffo?=
+ =?us-ascii?Q?qdGGeEvnaFdQ/FqA6w7c2EoEvSjTwK+OTNbINzdNYhOg05o1ms/cGs0ET0G9?=
+ =?us-ascii?Q?AQ8cIMpNKMJDnyW6QdMViOmJRv/FK93rkvwj9Yg3CXaZMfy7ANRgJj4o8bIL?=
+ =?us-ascii?Q?k4+Y5MxkMXg6YUKa/kzNjNtr5/HFVgdn3wkQMQ0MgHcNya81navQJ7glK1rn?=
+ =?us-ascii?Q?/kbg9sqlo3Vsz7ZSeYy5m1GAfgkQi4yEahTKIWCKmpsHPE65MnB9LsVJHBEv?=
+ =?us-ascii?Q?cPpeQRT8+s44eW2MddIJH1igmTSp7SvFwOWj9vwB?=
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 3abc86bf-36ec-4831-a421-08de002e6ba8
+X-MS-Exchange-CrossTenant-AuthSource: PH7PR12MB5757.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 30 Sep 2025 14:34:11.0186
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: fD2nX+HNIxtPpBPldMJ+Uhjb+M9Ymg6B4Brli66rjds5EqfKQELgyMBIfmUlBatL
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH7PR12MB8425
 
-On Tue, Sep 30, 2025, Ackerley Tng wrote:
-> Sean Christopherson <seanjc@google.com> writes:
-> > To be perfectly honest, I forgot test_util.h existed :-)
-> 
-> Merging/dropping one of kvm_util.h vs test_util.h is a good idea. The
-> distinction is not clear and it's already kind of messy between the two.
+On Tue, Sep 30, 2025 at 12:50:47PM +0000, Shameer Kolothum wrote:
 
-That's a topic for another day.
+> This is where hisi_acc reports a different BAR size as it tries to hide
+> the migration control region from Guest access.
 
-> It's a common pattern in KVM selftests to have a syscall/ioctl wrapper
-> foo() that asserts defaults and a __foo() that doesn't assert anything
-> and allows tests to assert something else, but I have a contrary
-> opinion.
-> 
-> I think it's better that tests be explicit about what they're testing
-> for, so perhaps it's better to use macros like TEST_ASSERT_EQ() to
-> explicitly call a function and check the results.
+I think for now we should disable DMABUF for any PCI driver that
+implements a VFIO_DEVICE_GET_REGION_INFO
 
-No, foo() and __foo() is a well-established pattern in the kernel, and in KVM
-selftests it is a very well-established pattern for syscalls and ioctls.  And
-I feel very, very strong about handling errors in the core infrastructure.
+For a while I've wanted to further reduce the use of the ioctl
+multiplexer, so maybe this series:
 
-Relying on developers to remember to add an assert is 100% guaranteed to result
-in missed asserts.  That makes everyone's life painful, because inevitably an
-ioctl will fail on someone else's system, and then they're stuck debugging a
-super random failure with no insight into what the developer _meant_ to do.
+https://github.com/jgunthorpe/linux/commits/vfio_get_region_info_op/
 
-And requiring developers to write (i.e. copy+paste) boring, uninteresting code
-to handle failures adds a lot of friction to development, is a terrible use of
-developers' time, and results in _awful_ error messages.  Bad or missing error
-messages in tests have easily wasted tens of hours of just _my_ time; I suspect
-the total cost throughout the KVM community can be measured in tens of days.
- 
-E.g. pop quiz, what state did I clobber that generated this error message with
-a TEST_ASSERT_EQ(ret, 0)?  Answer at the bottom.
+And then the dmabuf code can check if the ops are set to the generic
+or not and disable itself automatically.
 
-  ==== Test Assertion Failure ====
-  lib/x86/processor.c:1128: ret == 0
-  pid=2456 tid=2456 errno=22 - Invalid argument
-     1	0x0000000000415465: vcpu_load_state at processor.c:1128
-     2	0x0000000000402805: save_restore_vm at hyperv_evmcs.c:221
-     3	0x000000000040204d: main at hyperv_evmcs.c:286
-     4	0x000000000041df43: __libc_start_call_main at libc-start.o:?
-     5	0x00000000004200ec: __libc_start_main_impl at ??:?
-     6	0x0000000000402220: _start at ??:?
-  0xffffffffffffffff != 0 (ret != 0)
+Otherwise perhaps route the dmabuf through an op and deliberately omit
+it (with a comment!) from hisi, virtio, nvgrace.
 
-You might say "oh, I can go look at the source".  But what if you don't have the
-source because you got a test failure from CI?  Or because the assert came from
-a bug report due to a failure in someone else's CI pipeline?
+We need to route it through an op anyhow as those three drivers will
+probably eventually want to implement their own version.
 
-That is not a contrived example.  Before the ioctl assertion framework was added,
-KVM selftests was littered with such garbage.  Note, I'm not blaming developers
-in any way.  After having to add tens of asserts on KVM ioctls just to write a
-simple test, it's entirely natural to become fatigued and start throwing in
-TEST_ASSERT_EQ(ret, 0) or TEST_ASSERT(!ret, "ioctl failed").
-
-There's also the mechanics of requiring the caller to assert.  KVM ioctls that
-return a single value, e.g. register accessors, then need to use an out-param to
-communicate the value or error code, e.g. this
-
-	val = vcpu_get_reg(vcpu, reg_id);
-	TEST_ASSERT_EQ(val, 0);
-
-would become this:
-
-	ret = vcpu_get_reg(vcpu, reg_id, &val);
-	TEST_ASSERT_EQ(ret, 0);
-	TEST_ASSERT_EQ(val, 0);
-
-But of course, the developer would bundle that into:
-
-	TEST_ASSERT(!ret && !val, "get_reg failed");
-
-And then the user is really sad when the "!val" condition fails, because they
-can't even tell.  Again, this't a contrived example, it literally happend to me
-when dealing with the guest_memfd NUMA testcase, and was what prompted me to
-write this syscall framework.  This also shows the typical error message that a
-developer will write. 
-
-This TEST_ASSERT() failed on me due to a misguided cleanup I made:
-
-	ret = syscall(__NR_get_mempolicy, &get_policy, &get_nodemask,
-		      maxnode, mem, MPOL_F_ADDR);
-	TEST_ASSERT(!ret && get_policy == MPOL_DEFAULT && get_nodemask == 0,
-		"Policy should be MPOL_DEFAULT and nodes zero");
-
-generating this error message:
-
-  ==== Test Assertion Failure ====
-  guest_memfd_test.c:120: !ret && get_policy == MPOL_DEFAULT && get_nodemask == 0
-  pid=52062 tid=52062 errno=22 - Invalid argument
-     1	0x0000000000404113: test_mbind at guest_memfd_test.c:120 (discriminator 6)
-     2	 (inlined by) __test_guest_memfd at guest_memfd_test.c:409 (discriminator 6)
-     3	0x0000000000402320: test_guest_memfd at guest_memfd_test.c:432
-     4	 (inlined by) main at guest_memfd_test.c:529
-     5	0x000000000041eda3: __libc_start_call_main at libc-start.o:?
-     6	0x0000000000420f4c: __libc_start_main_impl at ??:?
-     7	0x00000000004025c0: _start at ??:?
-  Policy should be MPOL_DEFAULT and nodes zero
-
-At first glance, it would appear that get_mempolicy() failed with -EINVAL.  Nope.
-ret==0, but errno was left set from an earlier syscall.  It took me a few minutes
-of digging and a run with strace to figure out that get_mempolicy() succeeded.
-
-Constrast that with:
-
-        kvm_get_mempolicy(&policy, &nodemask, maxnode, mem, MPOL_F_ADDR);
-        TEST_ASSERT(policy == MPOL_DEFAULT && !nodemask,
-                    "Wanted MPOL_DEFAULT (%u) and nodemask 0x0, got %u and 0x%lx",
-                    MPOL_DEFAULT, policy, nodemask);
-
-  ==== Test Assertion Failure ====
-  guest_memfd_test.c:120: policy == MPOL_DEFAULT && !nodemask
-  pid=52700 tid=52700 errno=22 - Invalid argument
-     1	0x0000000000404915: test_mbind at guest_memfd_test.c:120 (discriminator 6)
-     2	 (inlined by) __test_guest_memfd at guest_memfd_test.c:407 (discriminator 6)
-     3	0x0000000000402320: test_guest_memfd at guest_memfd_test.c:430
-     4	 (inlined by) main at guest_memfd_test.c:527
-     5	0x000000000041eda3: __libc_start_call_main at libc-start.o:?
-     6	0x0000000000420f4c: __libc_start_main_impl at ??:?
-     7	0x00000000004025c0: _start at ??:?
-  Wanted MPOL_DEFAULT (0) and nodemask 0x0, got 1 and 0x1
-
-Yeah, there's still some noise with errno=22, but it's fairly clear that the
-returned values mismatches, and super obvious that the syscall succeeded when
-looking at the code.  This is not a cherry-picked example.  There are hundreds,
-if not thousands, of such asserts in KVM selftests and KVM-Unit-Tests in
-particular.  And that's when developers _aren't_ forced to manually add boilerplate
-asserts in ioctls succeeding.
-
-For people that are completely new to KVM selftests, I can appreciate that it
-might take a while to acclimate to the foo() and __foo() pattern, but I have a
-hard time believing that it adds significant cognitive load after you've spent
-a decent amount of time in KVM selftests.  And I 100% want to cater to the people
-that are dealing with KVM selftests day in, day out.
-
-> Or perhaps it should be more explicit, like in the name, that an
-> assertion is made within this function?
-
-No, that's entirely inflexible, will lead to confusion, and adds a copious amount
-of noise.  E.g. this
-
-	/* emulate hypervisor clearing CR4.OSXSAVE */
-	vcpu_sregs_get(vcpu, &sregs);
-	sregs.cr4 &= ~X86_CR4_OSXSAVE;
-	vcpu_sregs_set(vcpu, &sregs);
-
-versus
-
-	/* emulate hypervisor clearing CR4.OSXSAVE */
-	vcpu_sregs_get_assert(vcpu, &sregs);
-	sregs.cr4 &= ~X86_CR4_OSXSAVE;
-	vcpu_sregs_set_assert(vcpu, &sregs);
-
-The "assert" is pure noise and makes it harder to see the "get" versus "set".
-
-If we instead annotate the the "no_assert" case, then we'll end up with ambigous
-cases where a developer won't be able to determine if an unannotated API asserts
-or not, and conflict cases where a "no_assert" API _does_ assert, just not on the
-primary ioctl it's invoking.
-
-IMO, foo() and __foo() is quite explicit once you become accustomed to the
-environment.
-
-> In many cases a foo() exists without the corresponding __foo(), which
-> seems to be discouraging testing for error cases.
-
-That's almost always because no one has needed __foo().
-
-> Also, I guess especially for vcpu_run(), tests would like to loop/take
-> different actions based on different errnos and then it gets a bit
-> unwieldy to have to avoid functions that have assertions within them.
-
-vcpu_run() is a special case.  KVM_RUN is so much more than a normal ioctl, and
-so having vcpu_run() follow the "standard" pattern isn't entirely feasible.
-
-Speaking of vcpu_run(), and directly related to idea of having developers manually
-do TEST_ASSERT_EQ(), one of the top items on my selftests todo list is to have
-vcpu_run() handle GUEST_ASSERT and GUEST_PRINTF whenever possible.  Having to add
-UCALL_PRINTF handling just to get a debug message out of a test's guest code is
-beyond frustrating.  Ditto for the 60+ tests that had to manually add UCALL_ABORT
-handling, which leads to tests having code like this, which then gets copy+pasted
-all over the place and becomes a nightmare to maintain.
-
-static void __vcpu_run_expect(struct kvm_vcpu *vcpu, unsigned int cmd)
-{
-	struct ucall uc;
-
-	vcpu_run(vcpu);
-	switch (get_ucall(vcpu, &uc)) {
-	case UCALL_ABORT:
-		REPORT_GUEST_ASSERT(uc);
-		break;
-	default:
-		if (uc.cmd == cmd)
-			return;
-
-		TEST_FAIL("Unexpected ucall: %lu", uc.cmd);
-	}
-}
-
-> I can see people forgetting to add TEST_ASSERT_EQ()s to check results of
-> setup/teardown functions but I think those errors would surface some
-> other way anyway.
-
-Heh, I don't mean to be condescending, but I highly doubt you'll have this
-opinion after you've had to debug a completely unfamiliar test that's failing
-in weird ways, for the tenth time.
-
-> Not a strongly-held opinion,
-
-As you may have noticed, I have extremely strong opinions in this area :-)
-
-> and no major concerns on the naming either. It's a selftest after all and
-> IIUC we're okay to have selftest interfaces change anyway?
-
-Yes, changes are fine.  It's the churn I want to avoid.
-
-Oh, and here's the "answer" to the TEST_ASSERT_EQ() failure:
-
-  ==== Test Assertion Failure ====
-  include/kvm_util.h:794: !ret
-  pid=43866 tid=43866 errno=22 - Invalid argument
-     1	0x0000000000415486: vcpu_sregs_set at kvm_util.h:794 (discriminator 4)
-     2	 (inlined by) vcpu_load_state at processor.c:1125 (discriminator 4)
-     3	0x0000000000402805: save_restore_vm at hyperv_evmcs.c:221
-     4	0x000000000040204d: main at hyperv_evmcs.c:286
-     5	0x000000000041dfc3: __libc_start_call_main at libc-start.o:?
-     6	0x000000000042016c: __libc_start_main_impl at ??:?
-     7	0x0000000000402220: _start at ??:?
-  KVM_SET_SREGS failed, rc: -1 errno: 22 (Invalid argument)
+Jason
 
