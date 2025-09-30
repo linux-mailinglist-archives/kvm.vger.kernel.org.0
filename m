@@ -1,125 +1,181 @@
-Return-Path: <kvm+bounces-59181-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-59182-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 86D9EBAE0ED
-	for <lists+kvm@lfdr.de>; Tue, 30 Sep 2025 18:34:36 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id E16C2BAE0F3
+	for <lists+kvm@lfdr.de>; Tue, 30 Sep 2025 18:36:57 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 225B63AF0BA
-	for <lists+kvm@lfdr.de>; Tue, 30 Sep 2025 16:34:35 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3C66E4A8010
+	for <lists+kvm@lfdr.de>; Tue, 30 Sep 2025 16:36:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AEEDF246BB0;
-	Tue, 30 Sep 2025 16:34:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 40A3A242D60;
+	Tue, 30 Sep 2025 16:36:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="mLrl8Gbx"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="Pp2l3RCb"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pg1-f201.google.com (mail-pg1-f201.google.com [209.85.215.201])
+Received: from mail-pf1-f202.google.com (mail-pf1-f202.google.com [209.85.210.202])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7D4EC3C465
-	for <kvm@vger.kernel.org>; Tue, 30 Sep 2025 16:34:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C944323ABAF
+	for <kvm@vger.kernel.org>; Tue, 30 Sep 2025 16:36:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1759250065; cv=none; b=B1bEg9btlTX6Qv2LbgcaAH5PkQ0H+OoRT5zSjbEgYEPhdjMnsRy4AD47F7GWGn/DxbWf6BfhKujdIuZrXMwzgtJw+QbAECf89qgA9MdGBd3xNBTodMs4GUrNuh4HtPV/msnj5t7iuAnfDS1j6QWb/rWEKcam0mqoQzc2G7X48Po=
+	t=1759250212; cv=none; b=YwZyb3iJUXRWP67egkcxwZ1NTVrbYHH+XrJ9sFLAN3tIuK2U7JFB8h1rfa+zOj2jgjexlL74W5WRGsNonMjWfdxwRb0ZDVokQTIl5ceig1D2PDd1k4xcvIf4ygUdShnYD8Ga2SOvvR0ggGS7O78Lo6smOk86r8l9N902TZe1f8U=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1759250065; c=relaxed/simple;
-	bh=TzPIt5QqZ/ncsUjXjePi75S8DUEZ/jVmGu8XXDEiJAM=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=VGSbKkQZ8MJFM8KZAjLWOtX4L8EtYcjp+2U7yQ7I+bWfmnK6cBAM10uvRI1gwdSqhluTEH6lJ9S1DQa+hUwI8GJLSm7Kdv45nm4hmeiQGigWC2t0seBajLAMlxf4+ORSPOZYXG4VHg+e4hkAi1pva0exh0W2E3ijB4SIxmocPCE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=mLrl8Gbx; arc=none smtp.client-ip=209.85.215.201
+	s=arc-20240116; t=1759250212; c=relaxed/simple;
+	bh=6kgZ+o75xEJ9EbdBpm/V0tjYB3JQHgta7TJivYfMla0=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=a3Vi+IqhMwprvCwqjsvhkXvThOEmPFDjMx9DhK4WYXW7jK+lh+HiP1VMbl6MX4Zm8khqQhcWX4AgmWYzVh1EtPOLimC9dKmp46dEmfVRPSONQ197JmAZsIOBnFCaWlD/JDlSN+5EhYFDPJfa99u4WKBIxYDIIs7COUb5lhSdf7U=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--vipinsh.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=Pp2l3RCb; arc=none smtp.client-ip=209.85.210.202
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pg1-f201.google.com with SMTP id 41be03b00d2f7-b59682541d5so6131887a12.0
-        for <kvm@vger.kernel.org>; Tue, 30 Sep 2025 09:34:24 -0700 (PDT)
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--vipinsh.bounces.google.com
+Received: by mail-pf1-f202.google.com with SMTP id d2e1a72fcca58-77f68c697d3so4373794b3a.1
+        for <kvm@vger.kernel.org>; Tue, 30 Sep 2025 09:36:49 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1759250064; x=1759854864; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=ts11PRKQJbECWFlSkrZaC2Cq1Up8eQN07d9pIiZQ+5k=;
-        b=mLrl8Gbx8P/xaEvvVhl9dZlhF0gROHdf67ZZwcZEczk1C61fTGzTaUf/0wZhsfPX4t
-         TJINk2ZRMiQlwCJB4eoxbFCngN/WnW9KpGTwOiP4KbDFeZRg5hq9Yfs5dfyAk03av6l1
-         u+R+cHNU+XF9g4VXntrYdu8E8/APH7DGb/tBO1uNXuCGiPoQvr27faNZKIkF1nCnItpg
-         t3WAwREU3P9IqJ+VC0W4SexOc/YT8CziDSU6+ByBFufw/0NnLSq52m8yz9GmUPTB76Of
-         hw3dsqu/bXSQVlj7FHcCuIStm8cVa7LfVBLQjV7ZEjDW+8H303TxTQpPizU1UODDRDIf
-         T/0Q==
+        d=google.com; s=20230601; t=1759250209; x=1759855009; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=q5LgePzkRxjmi424htLltNXg1q5zxRKaifVE5Syh82s=;
+        b=Pp2l3RCbo7sMeuEw8/RcMgSvwTd3/41KS7O+IO4rlNeTLiiu+S9+pwQ7NqRlV5hIdf
+         0QRNCvXFgAWFqgWgsy1sS4Jy9y7SutIbSbjgT51boxG/sQG/hEY7uM7djWTJycPVtMLy
+         qoZma2Dq6XLdkSZSRrrhavFuBZP/+U9ph2Uq8FbNH9bfLCsMZBVqRWfqBNRLoqVLIBtg
+         AYxa1C64fUyp8gKNpCDyQMgDV98BktaEoEMtyj4Uk2ldaiz8ebj0XMvHl3k2OPBx4s08
+         AYdyq2RKdzAKD2LcQD40nlPMa1ICHcRhS/s2CXa9HQOjmcwDyBbeVWPvFc9b9IC1Tr2p
+         5i/g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1759250064; x=1759854864;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=ts11PRKQJbECWFlSkrZaC2Cq1Up8eQN07d9pIiZQ+5k=;
-        b=OVyB8ERLlQFazgMDd0cCyOe4pAVSXSKUc+EB2uRTZY9bzixO4fmvkzQKsQ6fBy+m7d
-         PMjAS90o4VyfxsxNGBMRD2rX+itNHkvG3DM9BP8Qsozzn4B/atM+h/sTTB/Cf5cLS4eR
-         1H8L3Bq1VFoGrvt5SSOS3osRI5n2SbyPPko/0Gqj6nXGhExMphAmTP74wzhkRzdcAFwE
-         /7hMxBcu7GCrLdEfuy3tF9wegkr/vGoiSrl9RCUCDINybRLgeRPSho6llH9aPLldpmdN
-         pMdZ+WGF0SgNon48nTY+Mn9IU/AFpklXFkWp841wiizv7pZVFJs5OtNEBa9Yi7m+56W5
-         Ghpw==
-X-Forwarded-Encrypted: i=1; AJvYcCV6lnBKEKeISg06edc8BMoTTXoXcgslbk/9XWCxq9CTaPvYJ+jaSrMSMmDVCYACVkPwex8=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxTzrdHUQCZOftE+3JIfyBD+MMUiyuaOmCsFOt/OyTuxicf0UlP
-	L+eVXWjnXvo6JlzlP3tPkGIY4nGFRPBJYci4dffILJ2/OmaAhFlcJ1yb16D48adjPx5jF8zGtwe
-	BemMr8A==
-X-Google-Smtp-Source: AGHT+IFX4CBMrBfFxnkGRFgOYRHXTZmNWaYLzdc89aJiDnP/g8eaLWlThAkjYKzlvZmnAhY1DXZxav01xFw=
-X-Received: from pjzg20.prod.google.com ([2002:a17:90a:e594:b0:339:9a75:1b1e])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:38cb:b0:338:3dca:e0a3
- with SMTP id 98e67ed59e1d1-339a6ec7e16mr119884a91.16.1759250061911; Tue, 30
- Sep 2025 09:34:21 -0700 (PDT)
-Date: Tue, 30 Sep 2025 09:34:20 -0700
-In-Reply-To: <aNwFTLM3yt6AGAzd@google.com>
+        d=1e100.net; s=20230601; t=1759250209; x=1759855009;
+        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=q5LgePzkRxjmi424htLltNXg1q5zxRKaifVE5Syh82s=;
+        b=D0b0eAdMd9eI2COBiX7dHVI4r/1YO9KU7A92MHZpketnm4FZg7ic49P7KClpj0Ujfk
+         flheYJmlgllduO9i/ThUs7AQ3RjOetaRqZWyihQSfhb/sldWrw8wvNhL2gvpGEnUkGn3
+         7FptowqkFdPA2fnHCYNAdTsD05WsRfQWqJaaUYcJpV5HCJGzQdqz29VvAQVJwv/fy0O0
+         4Ki0mTnNXVzYFhGTZfQIjwVl2BfY8TCkSMVOclpsQdwEKQ3tgD1HNRQ8AtGqrQ65K4QA
+         AWt9126lBsuWlKZavazjEjRqXpq0RXK+pqZH2n3OW//wfr2Di4hUNhfFw8oqI++WlDWP
+         7dDw==
+X-Gm-Message-State: AOJu0Yxr0dnY+7kvT9ScGpe1zuc7Mi65e6tWRzSNtip2/2oAGGUpcfoS
+	lGgogDubli1bWY8X/mJJHu0p1yDq7gGZGRlQjjY3eIxrPL+cC4VzNE5m9aP2hV15RyXMKfzG8qT
+	G2En8n1IxtoOjoFCbI5CrRNyuWvaDvUuEvGwLeGIOMh7xMlmX/h5IN2qhzqdympsZT1ww+e9RI3
+	GDGyQoeqHO0hmRoRRRGYD3qyj3EWzkj1DCqUqSyQ==
+X-Google-Smtp-Source: AGHT+IFfwV3VactE4ba6FoRVHzTuew8H79oNEwJxTcAq0uf0cCqCG98iICrJcj6DOYhQRbECloIyWc7dk2Ej
+X-Received: from pfoh10.prod.google.com ([2002:aa7:86ca:0:b0:77c:4a2a:9783])
+ (user=vipinsh job=prod-delivery.src-stubby-dispatcher) by 2002:a05:6a20:7fa3:b0:2e8:6bf6:7d6c
+ with SMTP id adf61e73a8af0-321d8452cb1mr555553637.2.1759250208788; Tue, 30
+ Sep 2025 09:36:48 -0700 (PDT)
+Date: Tue, 30 Sep 2025 09:36:26 -0700
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
-References: <20250919214259.1584273-1-seanjc@google.com> <aNvLkRZCZ1ckPhFa@yzhao56-desk.sh.intel.com>
- <aNvT8s01Q5Cr3wAq@yzhao56-desk.sh.intel.com> <aNwFTLM3yt6AGAzd@google.com>
-Message-ID: <aNwGjIoNRGZL3_Qr@google.com>
-Subject: Re: [PATCH] KVM: x86: Drop "cache" from user return MSR setter that
- skips WRMSR
-From: Sean Christopherson <seanjc@google.com>
-To: Yan Zhao <yan.y.zhao@intel.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	Xiaoyao Li <xiaoyao.li@intel.com>, Rick Edgecombe <rick.p.edgecombe@intel.com>
-Content-Type: text/plain; charset="us-ascii"
+X-Mailer: git-send-email 2.51.0.618.g983fd99d29-goog
+Message-ID: <20250930163635.4035866-1-vipinsh@google.com>
+Subject: [PATCH v3 0/9] KVM Selftest Runner
+From: Vipin Sharma <vipinsh@google.com>
+To: kvm@vger.kernel.org, kvmarm@lists.linux.dev, kvm-riscv@lists.infradead.org
+Cc: seanjc@google.com, pbonzini@redhat.com, borntraeger@linux.ibm.com, 
+	frankja@linux.ibm.com, imbrenda@linux.ibm.com, anup@brainfault.org, 
+	atish.patra@linux.dev, zhaotianrui@loongson.cn, maobibo@loongson.cn, 
+	chenhuacai@kernel.org, maz@kernel.org, oliver.upton@linux.dev, 
+	ajones@ventanamicro.com, Vipin Sharma <vipinsh@google.com>
+Content-Type: text/plain; charset="UTF-8"
 
-On Tue, Sep 30, 2025, Sean Christopherson wrote:
-> On Tue, Sep 30, 2025, Yan Zhao wrote:
-> > On Tue, Sep 30, 2025 at 08:22:41PM +0800, Yan Zhao wrote:
-> > > On Fri, Sep 19, 2025 at 02:42:59PM -0700, Sean Christopherson wrote:
-> > > > Rename kvm_user_return_msr_update_cache() to __kvm_set_user_return_msr()
-> > > > and use the helper kvm_set_user_return_msr() to make it obvious that the
-> > > > double-underscores version is doing a subset of the work of the "full"
-> > > > setter.
-> > > > 
-> > > > While the function does indeed update a cache, the nomenclature becomes
-> > > > slightly misleading when adding a getter[1], as the current value isn't
-> > > > _just_ the cached value, it's also the value that's currently loaded in
-> > > > hardware.
-> > > Nit:
-> > > 
-> > > For TDX, "it's also the value that's currently loaded in hardware" is not true.
-> > since tdx module invokes wrmsr()s before each exit to VMM, while KVM only
-> > invokes __kvm_set_user_return_msr() in tdx_vcpu_put().
-> 
-> No?  kvm_user_return_msr_update_cache() is passed the value that's currently
-> loaded in hardware, by way of the TDX-Module zeroing some MSRs on TD-Exit.
-> 
-> Ah, I suspect you're calling out that the cache can be stale.  Maybe this?
-> 
->   While the function does indeed update a cache, the nomenclature becomes
->   slightly misleading when adding a getter[1], as the current value isn't
->   _just_ the cached value, it's also the value that's currently loaded in
->   hardware (ignoring that the cache holds stale data until the vCPU is put,
->   i.e. until KVM prepares to switch back to the host).
-> 
-> Actually, that's a bug waiting to happen when the getter comes along.  Rather
-> than document the potential pitfall, what about adding a prep patch to mimize
-> the window?  Then _this_ patch shouldn't need the caveat about the cache being
-> stale.
+Hello,
 
-Ha!  It's technically a bug fix.  Because a forced shutdown will invoke
-kvm_shutdown() without waiting for tasks to exit, and so the on_each_cpu() calls
-to kvm_disable_virtualization_cpu() can call kvm_on_user_return() and thus
-consume a stale values->curr.
+This is v3 of KVM selftest runner. After making changes on feedback
+given in v2, this series has reduced from 15 patches to 9 patches. I
+have tried to address all of the comments from v2. There are none left
+open and are incorporated to best of my understanding. 
+
+To recap (copied from v2), KVM Selftest Runner allows running KVM
+selftests with added features not present in default selftest runner
+provided by selftests framework.
+
+This Runner has two broad goals:
+1. Make it easier for contributors and maintainers to run various
+   configuration of tests with features like preserving output,
+   controlling output verbosity, parallelism, different combinations of
+   command line arguments.
+2. Provide common place to write interesting and useful combinations of
+   tests command line arguments to improve KVM test coverage. Default
+   selftests runner provide little to no control over this.
+
+Future patches will add features like:
+- Print process id of the test in execution.
+- CTRL+C currently spits out lots of warning (depending on --job value).
+  This will be fixed in the next version.
+- Add more tests configurations.
+- Provide a way to set the environment in which runner will start tests. For
+  example, setting huge pages, stress testing based on resources
+  available on host.
+
+This series is also available on github at:
+
+https://github.com/shvipin/linux kvm/sefltests/runner-v3
+
+v3:
+- Created "tests_install" rule in Makefile.kvm to auto generate default
+  testcases, which will be ignored in .gitignore.
+- Changed command line option names to pass testcase files, directories,
+  executable paths, print based on test status, and what to print.
+  Removed certain other options based on feedback in v2.
+- Merged command.py into selftest.py
+- Fixed issue where timed out test's stdout and stderr were not printed.
+- Reduced python version from 3.7 to 3.6.
+- Fixed issue where test status numerical value was printed instead of
+  text like PASSED, FAILED, SKIPPED, etc.
+- Added README.rst.
+
+v2: https://lore.kernel.org/kvm/20250606235619.1841595-1-vipinsh@google.com/
+- Automatic default test generation.
+- Command line flag to provide executables location
+- Dump output to filesystem with timestamp
+- Accept absolute path of *.test files/directory location
+- Sticky status at bottom for the current state of runner.
+- Knobs to control output verbosity
+- Colored output for terminals.
+
+v1: https://lore.kernel.org/kvm/20250222005943.3348627-1-vipinsh@google.com/
+- Parallel test execution.
+- Dumping separate output for each test.
+- Timeout for test execution
+- Specify single test or a test directory.
+
+RFC: https://lore.kernel.org/kvm/20240821223012.3757828-1-vipinsh@google.com/
+
+Vipin Sharma (9):
+  KVM: selftest: Create KVM selftest runner
+  KVM: selftests: Provide executables path option to the KVM selftest
+    runner
+  KVM: selftests: Add timeout option in selftests runner
+  KVM: selftests: Add option to save selftest runner output to a
+    directory
+  KVM: selftests: Run tests concurrently in KVM selftests runner
+  KVM: selftests: Add various print flags to KVM selftest runner
+  KVM: selftests: Print sticky KVM selftests runner status at bottom
+  KVM: selftests: Add rule to generate default tests for KVM selftests
+    runner
+  KVM: selftests: Provide README.rst for KVM selftests runner
+
+ tools/testing/selftests/kvm/.gitignore        |   6 +-
+ tools/testing/selftests/kvm/Makefile.kvm      |  20 ++
+ tools/testing/selftests/kvm/runner/README.rst |  54 +++++
+ .../testing/selftests/kvm/runner/__main__.py  | 184 ++++++++++++++++++
+ .../testing/selftests/kvm/runner/selftest.py  | 105 ++++++++++
+ .../selftests/kvm/runner/test_runner.py       |  79 ++++++++
+ .../2slot_5vcpu_10iter.test                   |   1 +
+ .../no_dirty_log_protect.test                 |   1 +
+ 8 files changed, 449 insertions(+), 1 deletion(-)
+ create mode 100644 tools/testing/selftests/kvm/runner/README.rst
+ create mode 100644 tools/testing/selftests/kvm/runner/__main__.py
+ create mode 100644 tools/testing/selftests/kvm/runner/selftest.py
+ create mode 100644 tools/testing/selftests/kvm/runner/test_runner.py
+ create mode 100644 tools/testing/selftests/kvm/tests/dirty_log_perf_test/2slot_5vcpu_10iter.test
+ create mode 100644 tools/testing/selftests/kvm/tests/dirty_log_perf_test/no_dirty_log_protect.test
+
+-- 
+2.51.0.618.g983fd99d29-goog
+
 
