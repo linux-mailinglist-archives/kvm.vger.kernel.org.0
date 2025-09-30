@@ -1,202 +1,312 @@
-Return-Path: <kvm+bounces-59127-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-59128-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1FB13BAC136
-	for <lists+kvm@lfdr.de>; Tue, 30 Sep 2025 10:36:26 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1B3BDBAC154
+	for <lists+kvm@lfdr.de>; Tue, 30 Sep 2025 10:38:41 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 71CC51886CFF
-	for <lists+kvm@lfdr.de>; Tue, 30 Sep 2025 08:36:48 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id BED26320B7E
+	for <lists+kvm@lfdr.de>; Tue, 30 Sep 2025 08:38:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6064D26C384;
-	Tue, 30 Sep 2025 08:36:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8DCCC2F5301;
+	Tue, 30 Sep 2025 08:38:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="upx0hhSy"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Oqhtu44L"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pf1-f202.google.com (mail-pf1-f202.google.com [209.85.210.202])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F31502475CD
-	for <kvm@vger.kernel.org>; Tue, 30 Sep 2025 08:36:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2810B24501B
+	for <kvm@vger.kernel.org>; Tue, 30 Sep 2025 08:38:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1759221375; cv=none; b=Ex2OWTao1po9I2rrmyapeuw8UD3ZQ/oHqmRmjMuT59j8zE8CN7NDAL6c6aoGG5ws7QVogHm/c8NpX7W9qW8NGw06Ql7r7X2n2UG+ytXUKFQiJHd2xOn3mkZ5ULa17uimwcj0EJw1LTgmsKZovfLDY0rWlyznh5s5jIuLhGZ0+UE=
+	t=1759221489; cv=none; b=rDilhCzHQylFwxLfHU3rXFOGSeK+c8diygLrkK8SPsHbdeXeBjhz/ejy3YR3e/V1u9AnLUyhRyeCMuoQ16u27wIXDfpa70/e3bUfauFbyMZfrA3tVxA3tlmL3BfWV9Fp00DBPddsRjOCGr9EuhOCmow8ZNLW+SaODSVoeXUIn5I=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1759221375; c=relaxed/simple;
-	bh=3ApQz3zWEqQtKCd46uqg3P7F105aAnSBnojZ09IUAOA=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=jR6CCQXa5kybh+1hO7BR8NZMDeKvRzi4NtLNMwh2hQI0ROFg0H2PbXJ4a3YkHECbhSkDoqfOoN4LzRfHvROOEF5JdwHRGpaUi7rU14rnmwiBAiEdDa6pkgiYqQSl599Ce4xly0FjcTiniVXdpPXANTkFORdxIp6xBvydyUCqh+s=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--ackerleytng.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=upx0hhSy; arc=none smtp.client-ip=209.85.210.202
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--ackerleytng.bounces.google.com
-Received: by mail-pf1-f202.google.com with SMTP id d2e1a72fcca58-783c3400b5dso1678061b3a.1
-        for <kvm@vger.kernel.org>; Tue, 30 Sep 2025 01:36:13 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1759221373; x=1759826173; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=BGEcQ039PHX8Z6bbWR5CExl7OEuHya7NAHoYULkizA0=;
-        b=upx0hhSytbsM4hmsVLNMYbCUtVVxPaMUsFc2vtHkQb/xQvfCfsGfud9XbGJ0Acq2VQ
-         jOtekl+ikDeeAqJI+XcEVg4fI4DLSZ/od2uatDfR1ejQMcHTslRYJD9d2+UOTVIvDvu5
-         gdQzNfiZgsxPdOTbsatTwB71fXongh0LA53HNBNclzqbhVnYzy7Fuy0E5wGKIzT8pvao
-         K9lITB/d06WzhXWq3Xu24c5aS5gEehKOByiYcDy3QJHiKEEywxuJ7MV+NsLsAuRQcXgA
-         UdwFNXGmaZ8QaQalu0qBLpt85+ZTqOmDcxsM9VYCOLtAD5bsVXc5nTjP0BO5RMGIZZ82
-         Qjow==
+	s=arc-20240116; t=1759221489; c=relaxed/simple;
+	bh=xnpiQCURkOhfQrdwgPHiUaP8a9tkI+p9FQwCHjcwcds=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=gsC4Md0SuRnBaEMUEQQkoLW8cT1KGMxI2EO4BOwHMSlbCubafKuPD9s88LOmCYsCaWi1VR3iECJi1zRnHdSZu57ms48BziuYS1A/GXWbHatSWqEzEfQLwG5yBnLB86eG10QlOoNwhbozEORgigxZRIB9lgvVZJezylTqSULn4GY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Oqhtu44L; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1759221487;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=VccAC6xB6U34Xf9cLOXrFM7PAx88aOBuUi8cY9wyl/8=;
+	b=Oqhtu44LdefZTEtnRlAU86tDGUtvaHPBxDbKCCUJF55zlZVZqkhCZsfwIqGG6y0RqiCrp2
+	SMFrIL4DwVtEnrHBR7mKM+EMuutBBTKUFQhqBPT9LmrnTTdYNrOjh/LMjKPY8WrSQQguLB
+	cmgd0PvWja0nLTwT3Of2+tYPJJ0GGPc=
+Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
+ [209.85.128.70]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-210-Rqwms0FCMoyxpWNEF5lBpw-1; Tue, 30 Sep 2025 04:38:01 -0400
+X-MC-Unique: Rqwms0FCMoyxpWNEF5lBpw-1
+X-Mimecast-MFC-AGG-ID: Rqwms0FCMoyxpWNEF5lBpw_1759221480
+Received: by mail-wm1-f70.google.com with SMTP id 5b1f17b1804b1-46e4cc8ed76so15056005e9.1
+        for <kvm@vger.kernel.org>; Tue, 30 Sep 2025 01:38:00 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1759221373; x=1759826173;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=BGEcQ039PHX8Z6bbWR5CExl7OEuHya7NAHoYULkizA0=;
-        b=QsktL5MUEPFAp0YSQ7qokW7+8zuQmZP+8Mb8yoedgav0fRsP7vQcIdeQ2leHXBwU7/
-         EI8+uCPbYfIEgGQKJkcbH3IcNoInpKGvKRhwxSfrF2k0aGW23S9izjcJ/ytQo5gowlaO
-         2oRlQb+B+awawZALnBc4KwFH+3gDqu78RWZcizJXxnfTWgEWUxCMP8D2mX34A6B1dmGv
-         Am2bqZ8ZM1GGVtrJ1cI75db+XREzeJ3j9K42iUfUx3LGU68rayFIZvdrXSZd5nlUlqKT
-         sSNR4zK9wnC2MrvZnoDrSh8SydYCGK7Qu5LESujiFiL0BbBZes0YB4pWfSnRnyrE0KyR
-         1pvw==
-X-Forwarded-Encrypted: i=1; AJvYcCUrhSR9wjUZnpXHGcHTzGlduasDPv43iHDMX0uSRZF24UHiPNX1ADQ4PiBlW9y+BvT85cY=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxHysRvSFlpHn22I2n1vcAgG3Cva3l0xrieehx0PA6AOHuJs+FD
-	vFgzi7RLLuPZ5NbFTDJedCcZOArJy224IM9GP8XIqxj1O1zHV7cCx3RbwhRbCj9MfkGhLilvat2
-	OVLVu4aAr59CBi97H+Uqw4/wvLg==
-X-Google-Smtp-Source: AGHT+IEiNQr5CnkmLDEZS68hRK4QsiHIiyJxnvGvd2vfUrjjCIDnWPhr2xJhSzzVgM6uSvZRJyLQq6SFb4/fJ5Rq1Q==
-X-Received: from pfbhc7.prod.google.com ([2002:a05:6a00:6507:b0:76b:3822:35ea])
- (user=ackerleytng job=prod-delivery.src-stubby-dispatcher) by
- 2002:a05:6a00:1896:b0:77f:4b9b:8c34 with SMTP id d2e1a72fcca58-780fceeb3b7mr21693306b3a.31.1759221372983;
- Tue, 30 Sep 2025 01:36:12 -0700 (PDT)
-Date: Tue, 30 Sep 2025 08:36:11 +0000
-In-Reply-To: <aNshILzpjAS-bUL5@google.com>
+        d=1e100.net; s=20230601; t=1759221480; x=1759826280;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=VccAC6xB6U34Xf9cLOXrFM7PAx88aOBuUi8cY9wyl/8=;
+        b=TcytoMQ6TxnDloVwJ+ptgOwNTFYPJCgVftvlxYGchrAekxLlXt5OunoGdY4dVt1Mn3
+         UqMMj5JO4t3/ns3OH8nWTpQzsfVlkSzsAw02jx3c0R9AJG8/OnIXDqDAd4Vv+2tyCvaL
+         noFB/YD3slD5kGJAjs+qUmGCF4i+QOa19rQZEaeo+hMZlNkqOmGudmKS6hdVL9TN6wxa
+         sfNgr2iNxoT7FpTxhjqzCE9+Mz86db1tlCz4emzNGnnU4kMEly976/lkS1cqBJR12Go4
+         xMFS0Lm4ThHboKuzuPWWrgj5ZTjJKhwbGIroal5ad5r156WJXeKAULXmbWBtHfnVxwvn
+         HsEQ==
+X-Forwarded-Encrypted: i=1; AJvYcCViA2diQcMn4bLnshEq4PioBnrVDsvS63P0Uz/r4jApG+9z33UPD+/wOhR49CDTRqqsy10=@vger.kernel.org
+X-Gm-Message-State: AOJu0YymTXHNpFg43hNz/vP0dlN4KDxN2UF0+1jrUuoik6Ih6OzNmnAr
+	Sg5O7/bDy9h9bKVVlUIwS4tz6gXR4+neYfP65gxKV0lyrsB3XgLMrq9k+njLB0tbt+RtCp/5MSW
+	xSjLhdoqUDCcNThxZJIpMLgp47hZq2FPr6FmIzezOgFcFyp7GHk6quA==
+X-Gm-Gg: ASbGncsULcKgkX1XuMBCy+eJHSNWbLjZrSKTi/ZB4rBAtlvEqfhXXrx0PsuDteQb7n3
+	vSnZQnpZUWgSq0pbXJUihl7zouygQy3dGVQ5BleNclSqwx4T8XdCM9SUYMGeEmToyfwoEZzUBRy
+	55geAL7q5WVDCFULA56XqWdz0YjQvBV/S6rbzyaBYw3gwkelkfeTRoBLXoioT21s3rrkKd1oQ8b
+	Gq1oCWF279aYMjtAxKnUbv9T3W950olA3TzB/Wibn3xzFCaiSndMgOEZHuhOlpgzC/RssiyvtKQ
+	nSDW09dxn5eeXzUeyoWd3HQJKo0jZT8fElZGjY3XnxnBEopvTmdsAGSHr+HjjTZQMct5rW1jKqt
+	kakX+LGnISL12OhcO+TchSQ==
+X-Received: by 2002:a05:600c:1f86:b0:46e:3d41:5fed with SMTP id 5b1f17b1804b1-46e5da8bd67mr7433005e9.11.1759221479615;
+        Tue, 30 Sep 2025 01:37:59 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IGO1GaSyS8oGmkfg/b3GKSfbgVAIueIpwgEMFL2DPKaUi87iq81o8rzQl9AgYDOFKU8/6wPPw==
+X-Received: by 2002:a05:600c:1f86:b0:46e:3d41:5fed with SMTP id 5b1f17b1804b1-46e5da8bd67mr7432535e9.11.1759221479106;
+        Tue, 30 Sep 2025 01:37:59 -0700 (PDT)
+Received: from sgarzare-redhat (host-79-46-200-153.retail.telecomitalia.it. [79.46.200.153])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-46e5b577c87sm10285805e9.0.2025.09.30.01.37.57
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 30 Sep 2025 01:37:58 -0700 (PDT)
+Date: Tue, 30 Sep 2025 10:37:52 +0200
+From: Stefano Garzarella <sgarzare@redhat.com>
+To: Bobby Eshleman <bobbyeshleman@gmail.com>
+Cc: Shuah Khan <shuah@kernel.org>, "David S. Miller" <davem@davemloft.net>, 
+	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
+	Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
+	Stefan Hajnoczi <stefanha@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, 
+	Jason Wang <jasowang@redhat.com>, Xuan Zhuo <xuanzhuo@linux.alibaba.com>, 
+	Eugenio =?utf-8?B?UMOpcmV6?= <eperezma@redhat.com>, "K. Y. Srinivasan" <kys@microsoft.com>, 
+	Haiyang Zhang <haiyangz@microsoft.com>, Wei Liu <wei.liu@kernel.org>, Dexuan Cui <decui@microsoft.com>, 
+	Bryan Tan <bryan-bt.tan@broadcom.com>, Vishnu Dasa <vishnu.dasa@broadcom.com>, 
+	Broadcom internal kernel review list <bcm-kernel-feedback-list@broadcom.com>, virtualization@lists.linux.dev, netdev@vger.kernel.org, 
+	linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org, kvm@vger.kernel.org, 
+	linux-hyperv@vger.kernel.org, berrange@redhat.com, Bobby Eshleman <bobbyeshleman@meta.com>
+Subject: Re: [PATCH net-next v6 8/9] selftests/vsock: invoke vsock_test
+ through helpers
+Message-ID: <2a2qhhyui2by6cw3nqepwgfxxrknyjx5rgaybt4dvqowflom2r@i55r2csxbmb4>
+References: <20250916-vsock-vmtest-v6-0-064d2eb0c89d@meta.com>
+ <20250916-vsock-vmtest-v6-8-064d2eb0c89d@meta.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20250926163114.2626257-1-seanjc@google.com> <20250926163114.2626257-2-seanjc@google.com>
- <CA+EHjTzdX8+MbsYOHAJn6Gkayfei-jE6Q_5HfZhnfwnMijmucw@mail.gmail.com>
- <diqz7bxh386h.fsf@google.com> <a4976f04-959d-48ae-9815-d192365bdcc6@linux.dev>
- <d2fa49af-112b-4de9-8c03-5f38618b1e57@redhat.com> <diqz4isl351g.fsf@google.com>
- <aNq6Hz8U0BtjlgQn@google.com> <aNshILzpjAS-bUL5@google.com>
-Message-ID: <diqz4isk1gn8.fsf@google.com>
-Subject: Re: [PATCH 1/6] KVM: guest_memfd: Add DEFAULT_SHARED flag, reject
- user page faults if not set
-From: Ackerley Tng <ackerleytng@google.com>
-To: Sean Christopherson <seanjc@google.com>
-Cc: David Hildenbrand <david@redhat.com>, Patrick Roy <patrick.roy@linux.dev>, 
-	Fuad Tabba <tabba@google.com>, Paolo Bonzini <pbonzini@redhat.com>, 
-	Christian Borntraeger <borntraeger@linux.ibm.com>, Janosch Frank <frankja@linux.ibm.com>, 
-	Claudio Imbrenda <imbrenda@linux.ibm.com>, kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	Nikita Kalyazin <kalyazin@amazon.co.uk>, shivankg@amd.com
-Content-Type: text/plain; charset="UTF-8"
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20250916-vsock-vmtest-v6-8-064d2eb0c89d@meta.com>
 
-Sean Christopherson <seanjc@google.com> writes:
-
-> On Mon, Sep 29, 2025, Sean Christopherson wrote:
->> On Mon, Sep 29, 2025, Ackerley Tng wrote:
->> > David Hildenbrand <david@redhat.com> writes:
->> > 
->> > >                           GUEST_MEMFD_FLAG_DEFAULT_SHARED;
->> > >>>>
->> > >>>> At least for now, GUEST_MEMFD_FLAG_DEFAULT_SHARED and
->> > >>>> GUEST_MEMFD_FLAG_MMAP don't make sense without each other. Is it worth
->> > >>>> checking for that, at least until we have in-place conversion? Having
->> > >>>> only GUEST_MEMFD_FLAG_DEFAULT_SHARED set, but GUEST_MEMFD_FLAG_MMAP,
->> > >>>> isn't a useful combination.
->> > >>>>
->> > >>>
->> > >>> I think it's okay to have the two flags be orthogonal from the start.
->> > >> 
->> > >> I think I dimly remember someone at one of the guest_memfd syncs
->> > >> bringing up a usecase for having a VMA even if all memory is private,
->> > >> not for faulting anything in, but to do madvise or something? Maybe it
->> > >> was the NUMA stuff? (+Shivank)
->> > >
->> > > Yes, that should be it. But we're never faulting in these pages, we only 
->> > > need the VMA (for the time being, until there is the in-place conversion).
->> > >
->> > 
->> > Yup, Sean's patch disables faulting if GUEST_MEMFD_FLAG_DEFAULT_SHARED
->> > is not set, but mmap() is always enabled so madvise() still works.
->> 
->> Hah!  I totally intended that :-D
->> 
->> > Requiring GUEST_MEMFD_FLAG_DEFAULT_SHARED to be set together with
->> > GUEST_MEMFD_FLAG_MMAP would still allow madvise() to work since
->> > GUEST_MEMFD_FLAG_DEFAULT_SHARED only gates faulting.
->> > 
->> > To clarify, I'm still for making GUEST_MEMFD_FLAG_DEFAULT_SHARED
->> > orthogonal to GUEST_MEMFD_FLAG_MMAP with no additional checks on top of
->> > whatever's in this patch. :)
+On Tue, Sep 16, 2025 at 04:43:52PM -0700, Bobby Eshleman wrote:
+>From: Bobby Eshleman <bobbyeshleman@meta.com>
 >
-> Oh!  This got me looking at kvm_arch_supports_gmem_mmap() and thus
-> KVM_CAP_GUEST_MEMFD_MMAP.  Two things:
+>Add helper calls vm_vsock_test() and host_vsock_test() to invoke the
+>vsock_test binary. This encapsulates several items of repeat logic, such
+>as waiting for the server to reach listening state and
+>enabling/disabling the bash option pipefail to avoid pipe-style logging
+>from hiding failures.
 >
->  1. We should change KVM_CAP_GUEST_MEMFD_MMAP into KVM_CAP_GUEST_MEMFD_FLAGS so
->     that we don't need to add a capability every time a new flag comes along,
->     and so that userspace can gather all flags in a single ioctl.  If gmem ever
->     supports more than 32 flags, we'll need KVM_CAP_GUEST_MEMFD_FLAGS2, but
->     that's a non-issue relatively speaking.
+>Signed-off-by: Bobby Eshleman <bobbyeshleman@meta.com>
+>---
+> tools/testing/selftests/vsock/vmtest.sh | 120 ++++++++++++++++++++++++++++----
+> 1 file changed, 108 insertions(+), 12 deletions(-)
+>
+>diff --git a/tools/testing/selftests/vsock/vmtest.sh b/tools/testing/selftests/vsock/vmtest.sh
+>index 183647a86c8a..5e36d1068f6f 100755
+>--- a/tools/testing/selftests/vsock/vmtest.sh
+>+++ b/tools/testing/selftests/vsock/vmtest.sh
+>@@ -248,6 +248,7 @@ wait_for_listener()
+> 	local port=$1
+> 	local interval=$2
+> 	local max_intervals=$3
+>+	local old_pipefail
+> 	local protocol=tcp
+> 	local pattern
+> 	local i
+>@@ -256,6 +257,13 @@ wait_for_listener()
+>
+> 	# for tcp protocol additionally check the socket state
+> 	[ "${protocol}" = "tcp" ] && pattern="${pattern}0A"
+>+
+>+	# 'grep -q' exits on match, sending SIGPIPE to 'awk', which exits with
+>+	# an error, causing the if-condition to fail when pipefail is set.
+>+	# Instead, temporarily disable pipefail and restore it later.
+>+	old_pipefail=$(set -o | awk '/^pipefail[[:space:]]+(on|off)$/{print $2}')
+>+	set +o pipefail
+>+
+> 	for i in $(seq "${max_intervals}"); do
+> 		if awk '{print $2" "$4}' /proc/net/"${protocol}"* | \
+> 		   grep -q "${pattern}"; then
+>@@ -263,6 +271,10 @@ wait_for_listener()
+> 		fi
+> 		sleep "${interval}"
+> 	done
+>+
+>+	if [[ "${old_pipefail}" == on ]]; then
+>+		set -o pipefail
+>+	fi
+> }
+>
+> vm_wait_for_listener() {
+>@@ -314,28 +326,112 @@ log_guest() {
+> 	LOG_PREFIX=guest log $@
+> }
+>
+>+vm_vsock_test() {
+>+	local ns=$1
+>+	local mode=$2
+>+	local rc
+>+
+>+	set -o pipefail
+>+	if [[ "${mode}" == client ]]; then
+>+		local host=$3
+
+I don't really like having the number and type of parameters of a 
+function depend on others, maintaining it could become a mess.
+
+Can we avoid “mode” altogether and use “host” to discriminate between 
+server and client?
+
+e.g. if “host” == server then we launch the server, otherwise we 
+interpret it as IP, or something else.
+
+>+		local cid=$4
+>+		local port=$5
+>+
+>+		# log output and use pipefail to respect vsock_test errors
+>+		vm_ssh "${ns}" -- "${VSOCK_TEST}" \
+>+			--mode=client \
+>+			--control-host="${host}" \
+>+			--peer-cid="${cid}" \
+>+			--control-port="${port}" \
+>+			2>&1 | log_guest
+>+		rc=$?
+>+	else
+>+		local cid=$3
+>+		local port=$4
+>+
+>+		# log output and use pipefail to respect vsock_test errors
+>+		vm_ssh "${ns}" -- "${VSOCK_TEST}" \
+>+			--mode=server \
+>+			--peer-cid="${cid}" \
+>+			--control-port="${port}" \
+>+			2>&1 | log_guest &
+>+		rc=$?
+>+
+>+		if [[ $rc -ne 0 ]]; then
+>+			set +o pipefail
+>+			return $rc
+>+		fi
+>+
+>+		vm_wait_for_listener "${ns}" "${port}"
+>+		rc=$?
+>+	fi
+>+	set +o pipefail
+>+
+>+	return $rc
+> }
+>
+>+host_vsock_test() {
+>+	local ns=$1
+>+	local mode=$2
+>+	local cmd
+>+
+>+	if [[ "${ns}" == none ]]; then
+>+		cmd="${VSOCK_TEST}"
+>+	else
+>+		cmd="ip netns exec ${ns} ${VSOCK_TEST}"
+>+	fi
+>+
+>+	# log output and use pipefail to respect vsock_test errors
+>+	set -o pipefail
+>+	if [[ "${mode}" == client ]]; then
+>+		local host=$3
+
+Ditto.
+
+The rest LGTM.
+
+Thanks,
+Stefano
+
+>+		local cid=$4
+>+		local port=$5
+>+
+>+		${cmd} \
+>+			--mode="${mode}" \
+>+			--peer-cid="${cid}" \
+>+			--control-host="${host}" \
+>+			--control-port="${port}" 2>&1 | log_host
+>+		rc=$?
+>+	else
+>+		local cid=$3
+>+		local port=$4
+>+
+>+		${cmd} \
+>+			--mode="${mode}" \
+>+			--peer-cid="${cid}" \
+>+			--control-port="${port}" 2>&1 | log_host &
+>+		rc=$?
+>+
+>+		if [[ $rc -ne 0 ]]; then
+>+			return $rc
+>+		fi
+>+
+>+		host_wait_for_listener "${ns}" "${port}" "${WAIT_PERIOD}" "${WAIT_PERIOD_MAX}"
+>+		rc=$?
+>+	fi
+>+	set +o pipefail
+>
+>+	return $rc
+> }
+>
+> test_vm_server_host_client() {
+>+	vm_vsock_test "none" "server" 2 "${TEST_GUEST_PORT}"
+>+	host_vsock_test "none" "client" "127.0.0.1" "${VSOCK_CID}" "${TEST_HOST_PORT}"
+>+}
+>
+>-	vm_ssh -- "${VSOCK_TEST}" \
+>-		--mode=server \
+>-		--control-port="${TEST_GUEST_PORT}" \
+>-		--peer-cid=2 \
+>-		2>&1 | log_guest &
+>+test_vm_client_host_server() {
+>+	host_vsock_test "none" "server" "${VSOCK_CID}" "${TEST_HOST_PORT_LISTENER}"
+>+	vm_vsock_test "none" "client" "10.0.2.2" 2 "${TEST_HOST_PORT_LISTENER}"
+>+}
+>
+>-	vm_wait_for_listener "${TEST_GUEST_PORT}"
+>+test_vm_loopback() {
+>+	vm_vsock_test "none" "server" 1 "${TEST_HOST_PORT_LISTENER}"
+>+	vm_vsock_test "none" "client" "127.0.0.1" 1 "${TEST_HOST_PORT_LISTENER}"
+>+}
+>
+>-	${VSOCK_TEST} \
+>-		--mode=client \
+>-		--control-host=127.0.0.1 \
+>-		--peer-cid="${VSOCK_CID}" \
+>-		--control-port="${TEST_HOST_PORT}" 2>&1 | log_host
+>
+>-	return $?
+> }
+>
+> test_vm_client_host_server() {
+>
+>-- 
+>2.47.3
 >
 
-This is a good idea. In my internal WIP series I have 3 flags and 4
-CAPs, lol. Some of those CAPs are not for new flags, though.
-
-Would like to check your rationale for future reference: how about
-generalizing beyong flags and having KVM_CAP_GUEST_MEMFD_CAPS which
-returns 32 bits, one bit for every guest_memfd-related (not necessarily
-flags-related) cap?
-
->  2. We should allow mmap() for x86 CoCo VMs right away.  As evidenced by this
->     series, mmap() on private memory is totally fine.  It's not useful until the
->     NUMA and/or in-place conversion support comes along, but's not dangerous in
->     any way.  The actual restriction is on initializing memory to be shared,
-
-The actual restriction is that private memory must not be mapped to host
-userspace, so it's not really about initializing, though before
-conversion, initialization state is the only state.
-
-With GUEST_MEMFD_FLAG_INIT_SHARED, the entire guest_memfd is shared and
-mappable; without GUEST_MEMFD_FLAG_INIT_SHARED the entire guest_memfd is
-private and not mappable (gated in kvm_gmem_fault_user_mapping()).
-
-So yes, I agree that CoCo VMs should be allowed mmap() but not
-GUEST_MEMFD_FLAG_INIT_SHARED, since GUEST_MEMFD_FLAG_INIT_SHARED makes
-the entire guest_memfd take the shared state for the lifetime of
-guest_memfd.
-
-This is turning out to be a much nicer cleanup :)
-
->     because allowing memory to be shared from gmem's perspective while it's
->     private from the VM's perspective would be all kinds of broken.
->
->
-> E.g. with a s/kvm_arch_supports_gmem_mmap/kvm_arch_supports_gmem_init_shared:
->
-> 	case KVM_CAP_GUEST_MEMFD_FLAGS:
-> 		if (!kvm || kvm_arch_supports_init_shared(kvm))
-> 			return GUEST_MEMFD_FLAG_MMAP |
-> 			       GUEST_MEMFD_FLAG_INIT_SHARED;
->
-> 		return GUEST_MEMFD_FLAG_MMAP;
->
-
-You might end up with this while actually coding v2 up, but how about
-
-	case KVM_CAP_GUEST_MEMFD_FLAGS: {
-        	int flag_caps = GUEST_MEMFD_FLAG_MMAP;
-                
-		if (!kvm || kvm_arch_supports_init_shared(kvm))
-			flag_caps |= GUEST_MEMFD_FLAG_INIT_SHARED;
-
-		return flag_caps;
-	}
-
-Then all the new non-optional CAPs can be or-ed onto flag_caps from the
-start.
-        
-> #2 is also a good reason to add INIT_SHARED straightaway.  Without INIT_SHARED,
-> we'd have to INIT_PRIVATE to make the NUMA support useful for x86 CoCo VMs, i.e.
-> it's not just in-place conversion that's affected, IIUC.
->
-> I'll add this in v2.
 
