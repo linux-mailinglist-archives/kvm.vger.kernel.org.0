@@ -1,246 +1,154 @@
-Return-Path: <kvm+bounces-59204-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-59205-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 64DB2BAE302
-	for <lists+kvm@lfdr.de>; Tue, 30 Sep 2025 19:31:06 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 44459BAE327
+	for <lists+kvm@lfdr.de>; Tue, 30 Sep 2025 19:33:49 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 43B501885CE4
-	for <lists+kvm@lfdr.de>; Tue, 30 Sep 2025 17:31:25 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id F3BB232235D
+	for <lists+kvm@lfdr.de>; Tue, 30 Sep 2025 17:33:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 340B230DEA2;
-	Tue, 30 Sep 2025 17:29:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 63FF126A1AB;
+	Tue, 30 Sep 2025 17:33:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="QiXW/bYW"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="dFiyTxjo"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pj1-f73.google.com (mail-pj1-f73.google.com [209.85.216.73])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BA2AD30DD3D
-	for <kvm@vger.kernel.org>; Tue, 30 Sep 2025 17:29:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.73
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 153181E0DFE
+	for <kvm@vger.kernel.org>; Tue, 30 Sep 2025 17:33:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1759253351; cv=none; b=AMgHTpSHYWZ3uBocO4q+i7yGyStrwRhaPUJV7UxEN+QWkMG6L+YluAMjKBWMpU1whSPdjtteLSR75GpSsAf+7FPkpF/9BhYOYHn1u7dxkLC6cl5Div+krFKSGbgniR0ekUZoGhIlJft5jUcIMA9YEXyBhtsivl5Rqu0UGcx6XWk=
+	t=1759253620; cv=none; b=iM0rMBXGCnj7SIkyOvgqE0sT7ntbOhoCM80C4JOyLo32jtUmnEdbYKTrLkgHjDm+JLCDaRzZPXmoqAH0c11gXErkfQ3lS/uyUfBefXnOd291RVR3DrLCan7vdkbCNvCxjO1qouHETI0XM7hfkV6VmA8PUpbgEsAFmO8YeEtttpU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1759253351; c=relaxed/simple;
-	bh=n+pm1Tzp0fX9Woesz3maNmLxRH7hRrSoa2S948LYM2Q=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=QkKkKJdVHmG/RblCS55DSMrpYfyX083quNi3gAIRyZOvGdXg4+uUzYJ7sg5AlJmE6Yz+Wa/M1Cs+JEYDVbaL4gqnQF45gyXFlBgv+YB8dIckzaueb7Yo99jdNU5Rveod2EB9okRQ7OOY2dPdaXSlldPAX0wcJo68dUmqMBbFIOs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--jthoughton.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=QiXW/bYW; arc=none smtp.client-ip=209.85.216.73
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--jthoughton.bounces.google.com
-Received: by mail-pj1-f73.google.com with SMTP id 98e67ed59e1d1-32eddb7e714so5414586a91.1
-        for <kvm@vger.kernel.org>; Tue, 30 Sep 2025 10:29:09 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1759253349; x=1759858149; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=Vw+is60elbQtO0wwD/2XU6waUg/I4wOE9b9vLsqfwE0=;
-        b=QiXW/bYWFOdQsZEc05xD78QRosuGh4FXHDA3EVY++t2hGwnL/bzX835vlHHgVgyphh
-         /2Amx4DsRpKTDx8uu0CMl30+2Vbm54jBmTae1hFkVNctCCKYCH6ysaveaPlrP165/liL
-         QzYSn1R34eoAwvch75FlMxIydvPcD4r6CiQXtXqfohSYWlOce+OrL/JoR5OGYcSG2B8W
-         LSTrRxlqcl9CkCP0UDrTTT5ss5ceZBO30SbMzjX5B/ILvmghms7LJy5ftJc4vsXKRpn+
-         TV/LAWrTZX0NIJnjcU+xxyJhl22QqH3mbHlo3B7kYq0PIoqFU4WJq4xs4Z58Oyw2HUlO
-         y5wA==
+	s=arc-20240116; t=1759253620; c=relaxed/simple;
+	bh=/uzHTZRlmfTXfkbDbdCgwivf0VeFrYx3UT6Fycy7EKg=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=eFQw03p/5SYOHoBI2iLH5DYwlTsskwY1qABu92njsGoHo4ClKiDo699+dXRUqPgnh9zEMOC0iRqnEzt/fpkVj1M74iDE7sEhZ21hf1JhgmfgwZ3uTDtmfm2S+2NcBpWSY29iaUspixR1YrLPuy1gErbcxAsqqvU5f6sgreQFN/k=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=dFiyTxjo; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1759253618;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=DVdC9fzy8g2U07P39DvGMyerTR2hUiEGZN4FGElHXu8=;
+	b=dFiyTxjoqWwObaRezi4Fbsc9Fv+wP37RR0ufgLqpJtc1c/WqhKbf53cplHAzS32jd1eX+9
+	JZNEEK5XOsXemNAWU+oYx4mAIHBFTVpEyRr8e8Ja858pecQW5/aJJ4JeOswm41zpN0UBmf
+	uhxSu+3vm3QZQB9r3SRKwn3XldeyrYo=
+Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
+ [209.85.221.70]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-547-b7HOV6XkOEqw7lbtznAs7A-1; Tue, 30 Sep 2025 13:33:36 -0400
+X-MC-Unique: b7HOV6XkOEqw7lbtznAs7A-1
+X-Mimecast-MFC-AGG-ID: b7HOV6XkOEqw7lbtznAs7A_1759253615
+Received: by mail-wr1-f70.google.com with SMTP id ffacd0b85a97d-3ecdf7b5c46so3636964f8f.2
+        for <kvm@vger.kernel.org>; Tue, 30 Sep 2025 10:33:36 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1759253349; x=1759858149;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=Vw+is60elbQtO0wwD/2XU6waUg/I4wOE9b9vLsqfwE0=;
-        b=wROr3TMd54cMh83vq6L3TZHlWQDVipgvqShW2Jl0ao6ddIkhrLVDX1qQdF/I9VDdOI
-         a/fgNrB2TkcWvqXlwVgRIJKD6WL2r48k6DdQzgQ66cETpWv1+A4VlFkXfSj0gQzVkJYK
-         Z2CNo2xqgfuwuR40VodHGEaqpRiAV7tccVJ7p+cKaWn0cc/dJnzX1bPDKNLqne2cxN3Y
-         NVf2GyqjMr4useyamhxf3DTaKm/w3yfMCNh/TmqJUaFG0uhvqd49jyNc9qZriRp4A1uf
-         WSXmkkQGYqw+ahLsS3Gf3tci0GhYd4eFMkmz8wfhSZacMyG2qcQjb3aj5GxlAu5kW8Dz
-         1cpg==
-X-Forwarded-Encrypted: i=1; AJvYcCUks5IWrp3FZTvwlke3rI6DFq059YfXvZE2UV+/V3YmmokdeGcLjljOlJ2Jy5LfCcwovYc=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwgsvYFWtV6X5X+wCg+MoS3a36O1k0R2e/nvujYwC9x+5lDlAcP
-	E+ZfZ/pbgnuAN6CTKbvlcEhMX3hXsUuKL1230rpKD1uM9Uyyiid/TTZduxih7EyDurLiqJk8Sfo
-	xm40+kdTysHs/xhZre/Q00g==
-X-Google-Smtp-Source: AGHT+IGdL9Ry3P3DwBkpnSXkYT5+WSHErQCisnYVa6t/02kcKG+f669JdC7/aSKfvH0zLfBC6GwoZJEhovnoFKVs
-X-Received: from pjbcm23.prod.google.com ([2002:a17:90a:fa17:b0:32e:ddac:6ea5])
- (user=jthoughton job=prod-delivery.src-stubby-dispatcher) by
- 2002:a17:90b:33c2:b0:334:cb89:bde6 with SMTP id 98e67ed59e1d1-339a6e83b68mr247132a91.4.1759253348928;
- Tue, 30 Sep 2025 10:29:08 -0700 (PDT)
-Date: Tue, 30 Sep 2025 17:28:50 +0000
-In-Reply-To: <20250930172850.598938-1-jthoughton@google.com>
+        d=1e100.net; s=20230601; t=1759253615; x=1759858415;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=DVdC9fzy8g2U07P39DvGMyerTR2hUiEGZN4FGElHXu8=;
+        b=PchAmDhON/NySx50pkqzv+uzSK/N3wIQr4T5KvMXMH0Wx4+eerxRic0V8XlAGkLMMz
+         vrs7vXtdw6NoT/9NIFvjQjjwlU7wElxxWvda25Y+swf6Wwm7zh76WQ0zmFaWaSJS5wqY
+         kpWYS9z8qQLK93exXRD5rhSZdabRkNlNSiobzu7cuaT+B0AtSxouO5s5nrlXoZOqXtDD
+         +fytiTXdCJhKRfEzaW5ur6NG1YnGD1BzkkElaDbzxdb2C6qyKw3YXfSY4Kny3dndvV4I
+         +fVplBdAQZJz47vwcfhjJjXhyjzUEyGzsJ6b4OVG/xznPHQNoDAIIzk9f0DFoP6IFBMy
+         uP6g==
+X-Gm-Message-State: AOJu0Yxoh1CZwFJFOiFuVscFK8p0Kj13QM9Qyj8FAs6Ld+0sIDiNYkAQ
+	DmreLhcu56wwavLpQa8MRbkP1LV0oYduKR8yH2iAzf6ewkuAapPysxNeZJJpvYmE/YKpaUICulG
+	fyCfclWoC2hP8fbAsGlNaxrcV05eLMhKXTHdRTF3MNHeqtDkst3Jr6YAE0n+zBvP10Zn2IUtdqj
+	Irs91/eO1vD4/SREBLbPOgMh92QN9V
+X-Gm-Gg: ASbGncv4iNJHukK0ku9DUemK+D7Q/3ACuLdHdx2XNWUOaD0+ENbdDSubjSEa+oCsDvl
+	LE1dvDArV3HV8vx5/ZdMcfkflig/tD6v0HtUixAUsT2vw4YEXlsMDrWGcTc5Wo42GbN0XJTdkPV
+	WMJug6VXHmbqQa3PMc913cM6c4mqkRrAs+yiCtRC4fiS6tECycCwf6Di+hN4cMUJjwLp4NpGfRi
+	pBWDmIamcvOyFJEzzbS+1uM7MzJxe8v
+X-Received: by 2002:a05:6000:420a:b0:3ee:15d5:614f with SMTP id ffacd0b85a97d-4255781b050mr453893f8f.46.1759253615171;
+        Tue, 30 Sep 2025 10:33:35 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IGPEGl7i1wI3zGz8Gl0JlNQlV381u6TWCOx0x5yH96A4cHnQkC4YdjEEJwapOyYbkd/ZvX3EIxM60w4sr5oFVo=
+X-Received: by 2002:a05:6000:420a:b0:3ee:15d5:614f with SMTP id
+ ffacd0b85a97d-4255781b050mr453874f8f.46.1759253614771; Tue, 30 Sep 2025
+ 10:33:34 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20250930172850.598938-1-jthoughton@google.com>
-X-Mailer: git-send-email 2.51.0.618.g983fd99d29-goog
-Message-ID: <20250930172850.598938-2-jthoughton@google.com>
-Subject: [PATCH 2/2] KVM: selftests: Add parallel KVM_GET_DIRTY_LOG to dirty_log_perf_test
-From: James Houghton <jthoughton@google.com>
-To: Paolo Bonzini <pbonzini@redhat.com>, Sean Christopherson <seanjc@google.com>
-Cc: James Houghton <jthoughton@google.com>, kvm@vger.kernel.org, 
-	linux-kernel@vger.kernel.org
+MIME-Version: 1.0
+References: <20250927060910.2933942-1-seanjc@google.com> <20250927060910.2933942-6-seanjc@google.com>
+In-Reply-To: <20250927060910.2933942-6-seanjc@google.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Date: Tue, 30 Sep 2025 19:33:22 +0200
+X-Gm-Features: AS18NWBYZvWeclECRyRctpt0s36DZsWKpQ0aMUf6N3yHtD8DPtsunh5xRdz3dz4
+Message-ID: <CABgObfbOSffjFPgpOe1TQ8XJNYD907Ufa-YQN7C--9dREkFw2w@mail.gmail.com>
+Subject: Re: [GIT PULL] KVM: x86: VMX changes for 6.18
+To: Sean Christopherson <seanjc@google.com>
+Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-The parallelism is by memslot. This is useful because KVM no longer
-serializes KVM_GET_DIRTY_LOG if KVM_CAP_MANUAL_DIRTY_LOG_PROTECT2 is
-enabled.
+On Sat, Sep 27, 2025 at 8:09=E2=80=AFAM Sean Christopherson <seanjc@google.=
+com> wrote:
+>
+> Fix a TDX bug detected by Smatch where KVM would return '0' on failure, d=
+o a
+> bit of early prep for FRED virtualization, and tidy up.
+>
+> The following changes since commit c17b750b3ad9f45f2b6f7e6f7f4679844244f0=
+b9:
+>
+>   Linux 6.17-rc2 (2025-08-17 15:22:10 -0700)
+>
+> are available in the Git repository at:
+>
+>   https://github.com/kvm-x86/linux.git tags/kvm-x86-vmx-6.18
+>
+> for you to fetch changes up to 510c47f165f0c1f0b57329a30a9a797795519831:
+>
+>   KVM: TDX: Fix uninitialized error code for __tdx_bringup() (2025-09-19 =
+15:25:34 -0700)
 
-Signed-off-by: James Houghton <jthoughton@google.com>
----
- .../selftests/kvm/dirty_log_perf_test.c       | 20 ++++++++--
- .../testing/selftests/kvm/include/memstress.h |  2 +
- tools/testing/selftests/kvm/lib/kvm_util.c    |  2 +
- tools/testing/selftests/kvm/lib/memstress.c   | 40 +++++++++++++++++++
- 4 files changed, 61 insertions(+), 3 deletions(-)
+Pulled, thanks.
 
-diff --git a/tools/testing/selftests/kvm/dirty_log_perf_test.c b/tools/testing/selftests/kvm/dirty_log_perf_test.c
-index e79817bd0e29..8a5f289c4966 100644
---- a/tools/testing/selftests/kvm/dirty_log_perf_test.c
-+++ b/tools/testing/selftests/kvm/dirty_log_perf_test.c
-@@ -131,8 +131,18 @@ struct test_params {
- 	int slots;
- 	uint32_t write_percent;
- 	bool random_access;
-+	bool parallel_get_dirty_log;
- };
- 
-+static void get_dirty_log(struct kvm_vm *vm, unsigned long *bitmaps[],
-+			  struct test_params *p)
-+{
-+	if (p->parallel_get_dirty_log)
-+		memstress_get_dirty_log_parallel(vm, bitmaps, p->slots);
-+	else
-+		memstress_get_dirty_log(vm, bitmaps, p->slots);
-+}
-+
- static void run_test(enum vm_guest_mode mode, void *arg)
- {
- 	struct test_params *p = arg;
-@@ -230,7 +240,7 @@ static void run_test(enum vm_guest_mode mode, void *arg)
- 			iteration, ts_diff.tv_sec, ts_diff.tv_nsec);
- 
- 		clock_gettime(CLOCK_MONOTONIC, &start);
--		memstress_get_dirty_log(vm, bitmaps, p->slots);
-+		get_dirty_log(vm, bitmaps, p);
- 		ts_diff = timespec_elapsed(start);
- 		get_dirty_log_total = timespec_add(get_dirty_log_total,
- 						   ts_diff);
-@@ -292,7 +302,7 @@ static void run_test(enum vm_guest_mode mode, void *arg)
- static void help(char *name)
- {
- 	puts("");
--	printf("usage: %s [-h] [-a] [-i iterations] [-p offset] [-g] "
-+	printf("usage: %s [-h] [-a] [-i iterations] [-p offset] [-g] [-l] "
- 	       "[-m mode] [-n] [-b vcpu bytes] [-v vcpus] [-o] [-r random seed ] [-s mem type]"
- 	       "[-x memslots] [-w percentage] [-c physical cpus to run test on]\n", name);
- 	puts("");
-@@ -305,6 +315,7 @@ static void help(char *name)
- 	       "     and writes will be tracked as soon as dirty logging is\n"
- 	       "     enabled on the memslot (i.e. KVM_DIRTY_LOG_INITIALLY_SET\n"
- 	       "     is not enabled).\n");
-+	printf(" -l: Do KVM_GET_DIRTY_LOG calls for each memslot in parallel.\n");
- 	printf(" -p: specify guest physical test memory offset\n"
- 	       "     Warning: a low offset can conflict with the loaded test code.\n");
- 	guest_modes_help();
-@@ -355,7 +366,7 @@ int main(int argc, char *argv[])
- 
- 	guest_modes_append_default();
- 
--	while ((opt = getopt(argc, argv, "ab:c:eghi:m:nop:r:s:v:x:w:")) != -1) {
-+	while ((opt = getopt(argc, argv, "ab:c:eghi:lm:nop:r:s:v:x:w:")) != -1) {
- 		switch (opt) {
- 		case 'a':
- 			p.random_access = true;
-@@ -379,6 +390,9 @@ int main(int argc, char *argv[])
- 		case 'i':
- 			p.iterations = atoi_positive("Number of iterations", optarg);
- 			break;
-+		case 'l':
-+			p.parallel_get_dirty_log = true;
-+			break;
- 		case 'm':
- 			guest_modes_cmdline(optarg);
- 			break;
-diff --git a/tools/testing/selftests/kvm/include/memstress.h b/tools/testing/selftests/kvm/include/memstress.h
-index 9071eb6dea60..3e6ad2cdec80 100644
---- a/tools/testing/selftests/kvm/include/memstress.h
-+++ b/tools/testing/selftests/kvm/include/memstress.h
-@@ -74,6 +74,8 @@ void memstress_setup_nested(struct kvm_vm *vm, int nr_vcpus, struct kvm_vcpu *vc
- void memstress_enable_dirty_logging(struct kvm_vm *vm, int slots);
- void memstress_disable_dirty_logging(struct kvm_vm *vm, int slots);
- void memstress_get_dirty_log(struct kvm_vm *vm, unsigned long *bitmaps[], int slots);
-+void memstress_get_dirty_log_parallel(struct kvm_vm *vm, unsigned long *bitmaps[],
-+				      int slots);
- void memstress_clear_dirty_log(struct kvm_vm *vm, unsigned long *bitmaps[],
- 			       int slots, uint64_t pages_per_slot);
- unsigned long **memstress_alloc_bitmaps(int slots, uint64_t pages_per_slot);
-diff --git a/tools/testing/selftests/kvm/lib/memstress.c b/tools/testing/selftests/kvm/lib/memstress.c
-index 557c0a0a5658..abbd96a1c3ba 100644
---- a/tools/testing/selftests/kvm/lib/memstress.c
-+++ b/tools/testing/selftests/kvm/lib/memstress.c
-@@ -40,6 +40,12 @@ static bool all_vcpu_threads_running;
- 
- static struct kvm_vcpu *vcpus[KVM_MAX_VCPUS];
- 
-+struct get_dirty_log_args {
-+	struct kvm_vm *vm;
-+	unsigned long *bitmap;
-+	int slot;
-+};
-+
- /*
-  * Continuously write to the first 8 bytes of each page in the
-  * specified region.
-@@ -341,6 +347,15 @@ void memstress_disable_dirty_logging(struct kvm_vm *vm, int slots)
- 	toggle_dirty_logging(vm, slots, false);
- }
- 
-+static void *get_dirty_log_worker(void *arg)
-+{
-+	struct get_dirty_log_args *args = arg;
-+
-+	kvm_vm_get_dirty_log(args->vm, args->slot, args->bitmap);
-+
-+	return NULL;
-+}
-+
- void memstress_get_dirty_log(struct kvm_vm *vm, unsigned long *bitmaps[], int slots)
- {
- 	int i;
-@@ -352,6 +367,31 @@ void memstress_get_dirty_log(struct kvm_vm *vm, unsigned long *bitmaps[], int sl
- 	}
- }
- 
-+void memstress_get_dirty_log_parallel(struct kvm_vm *vm, unsigned long *bitmaps[],
-+				      int slots)
-+{
-+	struct {
-+		pthread_t thd;
-+		struct get_dirty_log_args args;
-+	} *threads;
-+	int i;
-+
-+	threads = malloc(slots * sizeof(*threads));
-+
-+	for (i = 0; i < slots; i++) {
-+		threads[i].args.vm = vm;
-+		threads[i].args.slot = MEMSTRESS_MEM_SLOT_INDEX + i;
-+		threads[i].args.bitmap = bitmaps[i];
-+		pthread_create(&threads[i].thd, NULL, get_dirty_log_worker,
-+			       &threads[i].args);
-+	}
-+
-+	for (i = 0; i < slots; i++)
-+		pthread_join(threads[i].thd, NULL);
-+
-+	free(threads);
-+}
-+
- void memstress_clear_dirty_log(struct kvm_vm *vm, unsigned long *bitmaps[],
- 			       int slots, uint64_t pages_per_slot)
- {
--- 
-2.51.0.618.g983fd99d29-goog
+Paolo
+
+> ----------------------------------------------------------------
+> KVM VMX changes for 6.18
+>
+>  - Add read/write helpers for MSRs that need to be accessed with preempti=
+on
+>    disable to prepare for virtualizing FRED RSP0.
+>
+>  - Fix a bug where KVM would return 0/success from __tdx_bringup() on err=
+or,
+>    i.e. where KVM would load with enable_tdx=3Dtrue despite TDX not being=
+ usable.
+>
+>  - Minor cleanups.
+>
+> ----------------------------------------------------------------
+> Qianfeng Rong (1):
+>       KVM: TDX: Remove redundant __GFP_ZERO
+>
+> Sean Christopherson (1):
+>       KVM: VMX: Add host MSR read/write helpers to consolidate preemption=
+ handling
+>
+> Tony Lindgren (1):
+>       KVM: TDX: Fix uninitialized error code for __tdx_bringup()
+>
+> Xin Li (1):
+>       KVM: VMX: Fix an indentation
+>
+>  arch/x86/kvm/vmx/tdx.c | 12 ++++--------
+>  arch/x86/kvm/vmx/vmx.c | 37 ++++++++++++++++++++++++++-----------
+>  2 files changed, 30 insertions(+), 19 deletions(-)
+>
 
 
