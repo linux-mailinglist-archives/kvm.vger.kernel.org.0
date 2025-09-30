@@ -1,183 +1,157 @@
-Return-Path: <kvm+bounces-59096-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-59097-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id E1347BABDD1
-	for <lists+kvm@lfdr.de>; Tue, 30 Sep 2025 09:41:16 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id E0B55BABE04
+	for <lists+kvm@lfdr.de>; Tue, 30 Sep 2025 09:44:37 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2EB503C1965
-	for <lists+kvm@lfdr.de>; Tue, 30 Sep 2025 07:41:13 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id DF84D1926120
+	for <lists+kvm@lfdr.de>; Tue, 30 Sep 2025 07:44:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 017F829E116;
-	Tue, 30 Sep 2025 07:41:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 86FFA219303;
+	Tue, 30 Sep 2025 07:44:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="K0lG1OtO"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="I+qJ5cUP"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B4CB7219303
-	for <kvm@vger.kernel.org>; Tue, 30 Sep 2025 07:41:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9154D29E116;
+	Tue, 30 Sep 2025 07:44:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1759218068; cv=none; b=rdPBNthjLcD4OTROgQAudOtrsITfqwBjX78R5xCdE44kxwW/h0PuhOHn4db3CLIc56EehlgSh0pgwWo3wXu/t6/4zmzjyhyR6r6OFYX81Qf6s+q23CFejNWzaKvsKg+iTtDlU96uXlNptWLgm0ixTCXfaRIfee2Wq3h3Dnevp6E=
+	t=1759218267; cv=none; b=M6LO83tcoyyPuPU6svoVpF7q3jsjwA4iIsdaMroVPFJp4mM1/gby1yPQjQiA12JjGqSR6xr/2Qkwx/GXWOF3btdcb88rakUPEmL31PcDbuPtRGw3wOOp6AgSHScjKP5elFmk3VjD5VgAUE28G8oaINWC8JXhZ5B3tVnsvYju7Lo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1759218068; c=relaxed/simple;
-	bh=vMyvu0CCSR9R7KlxEtsVi1J1PQBIeYSia0Bn0hLlAoM=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=FQKNNzOV2/afXjiYXEifZC8iTesSjStYN80drmr4JvBODx427VbxvIWMPdvCaQ3LbyTu+yKWm4mywVO21ippO6cI8mR0vcBCSvLGLr1ItqIDdrNHQWnp4CIdTRnqb2Vei62VK4+DuyH7c2AVcZ+/U/VHl87I3aMCwLj179xGfok=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=K0lG1OtO; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1759218064;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-	bh=j5g55fSIVioaOkOGMYUBzd3ThDPmNzBRB7wmsPOA2xg=;
-	b=K0lG1OtOtmcXANzb0lPM1nndAV9ujh7uceqdF/f67McdzE7N5XIPrxjzyIWK38il3vepYN
-	8gliWw8/w1cIvq3FPxRyCA0nfaF1glV4HEYpMevZdo638lMwyXjfTc/ADcqT+aZCVBKGV3
-	LqZM6EXcVOQPLvMPjX7vQbyAlX2EdWs=
-Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
- [209.85.221.71]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-433-DtrOZfmaNQ-3l6K3NyaRZA-1; Tue, 30 Sep 2025 03:41:00 -0400
-X-MC-Unique: DtrOZfmaNQ-3l6K3NyaRZA-1
-X-Mimecast-MFC-AGG-ID: DtrOZfmaNQ-3l6K3NyaRZA_1759218059
-Received: by mail-wr1-f71.google.com with SMTP id ffacd0b85a97d-3ece14b9231so3831024f8f.0
-        for <kvm@vger.kernel.org>; Tue, 30 Sep 2025 00:41:00 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1759218059; x=1759822859;
-        h=content-transfer-encoding:in-reply-to:autocrypt:content-language
-         :from:references:cc:to:subject:user-agent:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=j5g55fSIVioaOkOGMYUBzd3ThDPmNzBRB7wmsPOA2xg=;
-        b=Rge8LgZBUZXpQX4/1z1VVEzAHqUJ/jI0bBPZ7Th8Qi0X2RWbMNobVg6b+0BgTgFMr8
-         Zu2bDVx68ZRDg3mo/9R4C8ax2z7kJ1HNziHNjrxUzIUdoxCGNvnRoMbGY7WDoM23sNhG
-         guDE74//U4qUHGENzbhDiVmYZvLxIbb1X4gVDCo4SdCpyWufmo9Mvu+w+ipkarkcGFml
-         HMah7+8fGUFM+krFBhEb6aMhOByZu40NqIKxWBzHicUBr3/hKuLEqN/p/Qxud6/p9ZCR
-         0gm5leZpHk/3gxd4RJBur3oTo8x2akrNbkRReJc75sMr0B4GGgo39LB2SibK0S+3DnCS
-         DrqA==
-X-Forwarded-Encrypted: i=1; AJvYcCW69fg83hsiAIkB1WEFUlVZSo+TaIwEF4FuvcflyVvEEs9Tu66QxBpvN564cX55nNCX060=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yy9nYlnaW/FYeeIP5GRI3kZOTp9Dj54Fd8v5x9Cixf2DmHgSmo5
-	FTrdm9kL0bgxvDFZqlkSizfZFkCHm9xWmJ0UoMqUodOGA+NmfOBtTT0PaAPD0KbnSlmT80kHtl5
-	IhLV4XxN2LKIT1Dt6OZNLF8wNoWGaCPxUFPkrofaJKi3ztRqBXTF6Ug==
-X-Gm-Gg: ASbGncsqiNv9EhUf3GS7jbemiJPpp9K6xlBc203JpUtzDVYxqIKzPuMdJrIqeJ47MqU
-	l5oKrvEa5Qw+iV1sGvwgdb+9Z8Yi/vNIkfwqk8cuw9Y/IMmvB1bhTfofczVoXh+zaSGFnmKdA+8
-	QjHovfu3dz+tNG5Emhq9bJqxIa13fbxj+GxFJgAPWBGlpbeaxqiXtxSIVMYehvhCds431ljkkzQ
-	TFnEaHyuXa9dwKVvSIZ4Z3SAgX+1vPWOTdmgvNYh+db8V6nalHREHHd5T0Un7CkzmgnTXnauAqj
-	eFqg93/8ySxdDXH2A7Fdf7zzw/1umW0iCo9CxnmmJXZiCXupY7xXmDXc2q5xUdH2EoczCVvKOrZ
-	X8I5+RLMwfg==
-X-Received: by 2002:a05:6000:2512:b0:3e7:610b:85f6 with SMTP id ffacd0b85a97d-40e4ece56f9mr18746565f8f.39.1759218059526;
-        Tue, 30 Sep 2025 00:40:59 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IFtAakQVSr7pX6RBy8gWI/wBsZCTYsWc4ZTAkgkXM7gzrLE/6RH/bVKOjbcCuughEeAm/sEXA==
-X-Received: by 2002:a05:6000:2512:b0:3e7:610b:85f6 with SMTP id ffacd0b85a97d-40e4ece56f9mr18746511f8f.39.1759218059101;
-        Tue, 30 Sep 2025 00:40:59 -0700 (PDT)
-Received: from [192.168.0.7] (ltea-047-064-114-056.pools.arcor-ip.net. [47.64.114.56])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-40fb74e46bcsm21596535f8f.8.2025.09.30.00.40.57
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 30 Sep 2025 00:40:58 -0700 (PDT)
-Message-ID: <b041eb8a-7b2e-41ec-bdfa-1867814dde36@redhat.com>
-Date: Tue, 30 Sep 2025 09:40:56 +0200
+	s=arc-20240116; t=1759218267; c=relaxed/simple;
+	bh=8/Vy0IpBdnBl3FqITdTg6fXAw6N3XdQbwsG+l9Eo8mQ=;
+	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=kAnUTwWjJndzhTQC1mHg0MD9Kmq+aJE57FITqVFj8v8kQFKVy3vuj/xmq9ZkYhztRh6yTmPnFJa76J2TNRU1QInjhMv02wzI1vyes8Hwgj83ieRaUOwWJ7lNSQ4Ixyepw3Ve0idL0Bvt2peXEVsjkb27SEN+r6OKCyQaIIgl92g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=I+qJ5cUP; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1F3D3C4CEF0;
+	Tue, 30 Sep 2025 07:44:27 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1759218267;
+	bh=8/Vy0IpBdnBl3FqITdTg6fXAw6N3XdQbwsG+l9Eo8mQ=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=I+qJ5cUPYt9zuzbo3fVNhdOCGiIJeWqXPLm8P121Hi3fEM4gLQ9Uc4HUM9JggJZrJ
+	 AOYTlWZz/qprgsasmnH+PE4GGRDc7oioJ1laPXjGKuNUA21CyawfZ7azyZzdZ/CPNj
+	 H3dXhezGRebrLbcYm1HwChXGdMChBxPnwrlKMHQgRhwXZeupXYPMW4VXmolt5EjEqN
+	 C5BTIwItLLankmAr4YDD4GqCza9i2kdgbCStkM7/qCprmprAN9UdO9hv2MWieNYp1J
+	 bSP5fXqYEpTtKaBMMfUAH34bz40isnMzCtPOmQ7gZny/vM0eDvHjLdU8tuX1QkQ9Tb
+	 DlvuhrHU+XQ3w==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.98.2)
+	(envelope-from <maz@kernel.org>)
+	id 1v3V28-0000000ASrQ-2v5h;
+	Tue, 30 Sep 2025 07:44:24 +0000
+Date: Tue, 30 Sep 2025 08:44:24 +0100
+Message-ID: <86zfacz8o7.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Oliver Upton <oliver.upton@linux.dev>
+Cc: kvmarm@lists.linux.dev,
+	linux-arm-kernel@lists.infradead.org,
+	kvm@vger.kernel.org,
+	Joey Gouly <joey.gouly@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Zenghui Yu <yuzenghui@huawei.com>
+Subject: Re: [PATCH 01/13] KVM: arm64: Hide CNTHV_*_EL2 from userspace for nVHE guests
+In-Reply-To: <aNslu47Dl13iNcaL@linux.dev>
+References: <20250929160458.3351788-1-maz@kernel.org>
+	<20250929160458.3351788-2-maz@kernel.org>
+	<aNslu47Dl13iNcaL@linux.dev>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2 14/17] system/physmem: Un-inline
- cpu_physical_memory_read/write()
-To: =?UTF-8?Q?Philippe_Mathieu-Daud=C3=A9?= <philmd@linaro.org>,
- qemu-devel@nongnu.org, Peter Maydell <peter.maydell@linaro.org>
-Cc: Jason Herne <jjherne@linux.ibm.com>,
- Stefano Stabellini <sstabellini@kernel.org>,
- Stefano Garzarella <sgarzare@redhat.com>, xen-devel@lists.xenproject.org,
- Paolo Bonzini <pbonzini@redhat.com>, Ilya Leoshkevich <iii@linux.ibm.com>,
- Anthony PERARD <anthony@xenproject.org>, Paul Durrant <paul@xen.org>,
- Eric Farman <farman@linux.ibm.com>, Marcelo Tosatti <mtosatti@redhat.com>,
- Halil Pasic <pasic@linux.ibm.com>, Matthew Rosato <mjrosato@linux.ibm.com>,
- Reinoud Zandijk <reinoud@netbsd.org>, Zhao Liu <zhao1.liu@intel.com>,
- David Woodhouse <dwmw2@infradead.org>,
- Christian Borntraeger <borntraeger@linux.ibm.com>,
- Sunil Muthuswamy <sunilmut@microsoft.com>, kvm@vger.kernel.org,
- "Michael S. Tsirkin" <mst@redhat.com>, Peter Xu <peterx@redhat.com>,
- qemu-s390x@nongnu.org, "Edgar E. Iglesias" <edgar.iglesias@gmail.com>,
- Richard Henderson <richard.henderson@linaro.org>,
- David Hildenbrand <david@redhat.com>
-References: <20250930041326.6448-1-philmd@linaro.org>
- <20250930041326.6448-15-philmd@linaro.org>
- <193cd8a8-2c4c-4c2c-af22-622b74c332ee@redhat.com>
- <61c31076-5330-426a-9c28-b2400bec44f6@linaro.org>
-From: Thomas Huth <thuth@redhat.com>
-Content-Language: en-US
-Autocrypt: addr=thuth@redhat.com; keydata=
- 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
-In-Reply-To: <61c31076-5330-426a-9c28-b2400bec44f6@linaro.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: oliver.upton@linux.dev, kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, joey.gouly@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On 30/09/2025 09.23, Philippe Mathieu-Daudé wrote:
-> On 30/9/25 07:02, Thomas Huth wrote:
->> On 30/09/2025 06.13, Philippe Mathieu-Daudé wrote:
->>> Un-inline cpu_physical_memory_read() and cpu_physical_memory_write().
->>
->> What's the reasoning for this patch?
+On Tue, 30 Sep 2025 01:35:07 +0100,
+Oliver Upton <oliver.upton@linux.dev> wrote:
 > 
-> Remove cpu_physical_memory_rw() in the next patch without having
-> to inline the address_space_read/address_space_write() calls in
-> "exec/cpu-common.h".
+> Hey,
 > 
-> Maybe better squashing both together?
+> On Mon, Sep 29, 2025 at 05:04:45PM +0100, Marc Zyngier wrote:
+> > Although we correctly UNDEF any CNTHV_*_EL2 access from the guest
+> > when E2H==0, we still expose these registers to userspace, which
+> > is a bad idea.
+> > 
+> > Drop the ad-hoc UNDEF injection and switch to a .visibility()
+> > callback which will also hide the register from userspace.
+> > 
+> > Fixes: 0e45981028550 ("KVM: arm64: timer: Don't adjust the EL2 virtual timer offset")
+> > Signed-off-by: Marc Zyngier <maz@kernel.org>
+> > ---
+> >  arch/arm64/kvm/sys_regs.c | 26 +++++++++++++-------------
+> >  1 file changed, 13 insertions(+), 13 deletions(-)
+> > 
+> > diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
+> > index ee8a7033c85bf..9f2f4e0b042e8 100644
+> > --- a/arch/arm64/kvm/sys_regs.c
+> > +++ b/arch/arm64/kvm/sys_regs.c
+> > @@ -1594,16 +1594,6 @@ static bool access_arch_timer(struct kvm_vcpu *vcpu,
+> >  	return true;
+> >  }
+> >  
+> > -static bool access_hv_timer(struct kvm_vcpu *vcpu,
+> > -			    struct sys_reg_params *p,
+> > -			    const struct sys_reg_desc *r)
+> > -{
+> > -	if (!vcpu_el2_e2h_is_set(vcpu))
+> > -		return undef_access(vcpu, p, r);
+> > -
+> > -	return access_arch_timer(vcpu, p, r);
+> > -}
+> > -
+> >  static s64 kvm_arm64_ftr_safe_value(u32 id, const struct arm64_ftr_bits *ftrp,
+> >  				    s64 new, s64 cur)
+> >  {
+> > @@ -2831,6 +2821,16 @@ static unsigned int s1pie_el2_visibility(const struct kvm_vcpu *vcpu,
+> >  	return __el2_visibility(vcpu, rd, s1pie_visibility);
+> >  }
+> >  
+> > +static unsigned int cnthv_visibility(const struct kvm_vcpu *vcpu,
+> > +				     const struct sys_reg_desc *rd)
+> > +{
+> > +	if (vcpu_has_nv(vcpu) &&
+> > +	    !vcpu_has_feature(vcpu, KVM_ARM_VCPU_HAS_EL2_E2H0))
+> > +		return 0;
+> > +
+> > +	return REG_HIDDEN;
+> > +}
+> 
+> Hmm. We've already exposed these to userspace at this point, we just
+> conveniently last the get-reg-list test to assert the accessibility of
+> these (broken) exposures.
+> 
+> Given the amount of UAPI mishaps we've had with registers in the past I
+> don't have much appetite for taking away something we already
+> advertised.
+> 
+> What about making these RAZ/WI from userspace?
 
-Either squash them, or provide a proper patch description here, but just 
-repeating the patch title as description without giving a reasoning is just 
-confusing for the reviewers.
+Honestly, I don't think we should bother.
 
-  Thomas
+The only VMM supporting NV is QEMU, and it explicitly isn't able to
+select E2H0. I'm happy to Cc stable on this, but worrying about nVHE
+save/restore at this stage seems like an overreaction -- I'm pretty
+sure NV save/restore is generally broken in many more ways.
 
+Thanks,
+
+	M.
+
+-- 
+Without deviation from the norm, progress is not possible.
 
