@@ -1,290 +1,245 @@
-Return-Path: <kvm+bounces-59165-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-59166-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 60665BAD681
-	for <lists+kvm@lfdr.de>; Tue, 30 Sep 2025 16:59:55 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2CDF8BAD8ED
+	for <lists+kvm@lfdr.de>; Tue, 30 Sep 2025 17:09:47 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 21E6B4A2EB4
-	for <lists+kvm@lfdr.de>; Tue, 30 Sep 2025 14:58:25 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6420217635E
+	for <lists+kvm@lfdr.de>; Tue, 30 Sep 2025 15:09:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B2EDB30595D;
-	Tue, 30 Sep 2025 14:58:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DD227306B33;
+	Tue, 30 Sep 2025 15:09:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="QJCf05Z6"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="dY1kqWHa"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pj1-f74.google.com (mail-pj1-f74.google.com [209.85.216.74])
+Received: from mail-pj1-f73.google.com (mail-pj1-f73.google.com [209.85.216.73])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 438391EF38E
-	for <kvm@vger.kernel.org>; Tue, 30 Sep 2025 14:58:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.74
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 76EA0304964
+	for <kvm@vger.kernel.org>; Tue, 30 Sep 2025 15:09:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.73
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1759244298; cv=none; b=rBlGq48EDUQCDk+JqazOOS8metYvsjoW93AFcoMBcjIawjouP9DJHqWy9Dwn0kvJ3u7/HEuql7MWa5TBjeMg2hD1ZEfmYzJWuQ/Q9sd5DNsKkinn/kvyulTiC8sEXfHk1RlVJGtRx7UeMTYFamIp9O7noLA3DiEih9om3M9Kn/4=
+	t=1759244947; cv=none; b=Qrat15R5W8cEsha7FWCW+QkzIK52tUvNQmIYdswCsFqqWCLl4QxuBMlW/dDv/lsNfTJi/n61Niv9EkpCJ25YVzjp89dvCCnOYlL9q/nJzDeuvOC1HGsYWXwC2vwcJqPEB4GlHco9U5+xT6IKvNIijiaQ8bQcN3fIT/OdOijYKUA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1759244298; c=relaxed/simple;
-	bh=BAZpClejLbE/TaGhph3A+ZJPzB3IeFvn8SYUvadWRF8=;
+	s=arc-20240116; t=1759244947; c=relaxed/simple;
+	bh=bzRw5S3aSwLlBhgF+V0xet2L6cvR7OM+F2/OGtaeYUg=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=HZelVzA1BwFqKTZ6jyo2t5efrzwGLrYp+EeXH7X0degFyM/W9ZvA5t85OAPlXvToQhV2K+u1ZooRy5mZJd3I7c8wYJiaJAR2D7HafCwTROghKybdH/6zxj7f2obd0MaldPCeirf601pqjk+Wua2lbISWMm12ipENrc4FhOubKVE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=QJCf05Z6; arc=none smtp.client-ip=209.85.216.74
+	 To:Cc:Content-Type; b=cK7c+/s60VWSrXfAYMu6YCar96uNrXEgHnA1jovSLzq4FhqOrQ3XsfVkIT4oYQQe3kq+0YX4YwpndY6lRGqYzT1c1CgSldrRVcRuEcuGaHpyEwmsi9XMKT16eCNXY/wzcLpxKC60QWg/aJ/pUelhdRCM5c5U1AmID2kdhDGvtT8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=dY1kqWHa; arc=none smtp.client-ip=209.85.216.73
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pj1-f74.google.com with SMTP id 98e67ed59e1d1-3324538ceb0so9543186a91.1
-        for <kvm@vger.kernel.org>; Tue, 30 Sep 2025 07:58:17 -0700 (PDT)
+Received: by mail-pj1-f73.google.com with SMTP id 98e67ed59e1d1-334b0876195so6271560a91.1
+        for <kvm@vger.kernel.org>; Tue, 30 Sep 2025 08:09:05 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1759244296; x=1759849096; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=RZdEeuIZmBzDLZbYs/yNXlSKEGLonVMQ6j0Z4GNNa5k=;
-        b=QJCf05Z6PViXx6nerJSw9REqTGuRtQ8+OHJTAXCsV9PrRXPHIgL3XBUKYQJq2N+Hz+
-         9N+w/aeXtbjIQ5kfcczYqgUc6YJbuE15TSfX6lnv56O8XQJPNw48QWITW2PXLAsbsn8e
-         YTPzrDT3tRRsZ1itqQdRilBPp2AyOONcyilaarUkUPqGgZxtBL4SeKtYb46qkU3/xtkq
-         sgPq5YB/1qHWm1oRscoijeW/Ge7y7sy6yaLPimrS0XLtLvXopdkh5P69HupioEDgS9oj
-         a74ymHqvzHORJwNfqX1pXR3+gNfVk3KfdoQESZmpfH1gsHSKqSLgghOwM+qz6Eqrvzdp
-         lTHA==
+        d=google.com; s=20230601; t=1759244945; x=1759849745; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:from:subject:message-id:references
+         :mime-version:in-reply-to:date:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=7ODp4hXf78r1NKAjPiKA6rGoEALXfFCwoofnk7fPCbI=;
+        b=dY1kqWHauoQXsllH6YXAST4NRmZR/wg521dKizitTSF8/WtgVNvRPzwj4Is/H7qdTi
+         ab3MaIqYoxNMN7oSuN7HHWY0bVemkofguSoBoeffz0tfCwqTUcselWtCb+1mmPRrvaKp
+         hSknuNXxAUFS9a8UMXMzZdm8BjUmlyhxRZ8ppZKCXyF8xt2L8eOadcDuiTJjlHTNn81M
+         8BL4Wbjjsjz4ITkjIwkeUPWdb0O7TuDar6q7c6S/IIoTYMKuW2WOLRbTWLo59waYkAfU
+         cyZ2ImoTKi2vx2NnJB8Mgdd9MG3cWf24Zo0mmaTF1uqZUEbOthPSPGq8P9RFrQbE4zEY
+         hE9Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1759244296; x=1759849096;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=RZdEeuIZmBzDLZbYs/yNXlSKEGLonVMQ6j0Z4GNNa5k=;
-        b=RgWRrMB5Mxnrw8mF00g7vxoZkXbsyHImga4C+B+tHTRPRIKkBmX3sskTeNtrNB50m4
-         o9HneM3cnKTDO2pf5W/rd6y9CtpJNjmmMSI+Wd3QD4AxfYRftKvKpYt9Xdi2cc8Av9fo
-         nNzlaJEX5ASElZKx9YCj1nnO3SB7D0rNN+4c2IEDwPxJCgZVwAhVR1FDGO3/ArJmqhvw
-         IMPjyJ+/9WInttozILQvV8D/XrEvannOPdpviiilNxwiwIy5ZkWCh78Ww8AJW8POYer9
-         vCyktxP5x/yChS8LodcfxnaOhBVinJlYt5iKBvJs4MOVP9P0IV7EysK1wFZ6L/uRE9WO
-         4PuQ==
-X-Forwarded-Encrypted: i=1; AJvYcCWSA40WVR7w6zXvtbvTTyobcoFoLhz5rmUpWZIze2DNGe36Lcnig5Yrm7CUJDUeHrRZIHI=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyVnU9XI8hdUDWU9hOOVuWmiIU0RH56HM2IIEm+mQOjX27BAcEg
-	vFKApSu0CkjNiKYmfVcwKJetOXGwXgxmYwXVFTufunBbZztSSbIJh2Mbr5YuLpFbQSkZLWgaqfK
-	yOw1OKw==
-X-Google-Smtp-Source: AGHT+IETSMM9ujw5b0glTdu6eKbkhEayF+u6JJrEpWt0cq5tgvyVGupQAvG78QacKBP/NJlodlJGlJsgdyU=
-X-Received: from pjsa23.prod.google.com ([2002:a17:90a:be17:b0:330:523b:2b23])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:1b4f:b0:335:5e84:6d37
- with SMTP id 98e67ed59e1d1-3355e846e68mr16804530a91.6.1759244296622; Tue, 30
- Sep 2025 07:58:16 -0700 (PDT)
-Date: Tue, 30 Sep 2025 07:58:15 -0700
-In-Reply-To: <diqza52c1im6.fsf@google.com>
+        d=1e100.net; s=20230601; t=1759244945; x=1759849745;
+        h=content-transfer-encoding:cc:to:from:subject:message-id:references
+         :mime-version:in-reply-to:date:x-gm-message-state:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=7ODp4hXf78r1NKAjPiKA6rGoEALXfFCwoofnk7fPCbI=;
+        b=iZrNmUKROVi10iiTsi0LMO3SLUxN4pGZy1kz5mh05S8laI+6eFIaH3XuQMp9uQqy2L
+         bPjwy4x11rJ86zqXHFFOyOBLp2ZRrd54bRiRHnu4Slz0BNCbsVC/WckAbVQxyIyddbOK
+         UMJ8K8nxWRpGEha17iOAkr+GrXjtyZi/r+BT/vGe2s3ljaOh5rV/D/5EE24gxx2ugO80
+         l6GYgw94GX30JmS9/oFFrSlE7SQfy3fapuzD76azKo8+4UlUfrpgBfeirhJWAFTOuLMg
+         DZF1wgl4hVlltniccU5sLTcipIk08CemvbAAxy5QRhZVWOgttmWiXUEBcmU+JBGkkQ5Q
+         CYMQ==
+X-Forwarded-Encrypted: i=1; AJvYcCW0OtX20za28DF3bZV86iFC0AdvXfdg930ZLiaJuo0zhCT1e/xxgVhgJ2PM8ADz5HoQxxc=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwdfRE2WrQNzy2UX7iAQ9krhcgl3DKgJ6sTzz4k0sJVSK+YlG1V
+	6LDgfkuzVe4oq7AkIEwsIKUmQ32azdRXl5iM3qyT15fOF3ToH0jCKEU3ZDDBn4Ab6agsK664e+1
+	v7XKdLw==
+X-Google-Smtp-Source: AGHT+IHxOlAKDce6G3e7ntXQKt1wX4suXvuZZH7i/V1r3vdMpd8L8snRXlRR+/0n5jye/ZH4eRkU+hrWbKw=
+X-Received: from pjrv6.prod.google.com ([2002:a17:90a:bb86:b0:329:f232:dac7])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:3e85:b0:31f:5ebe:fa1c
+ with SMTP id 98e67ed59e1d1-3342a7ba512mr24538137a91.0.1759244943821; Tue, 30
+ Sep 2025 08:09:03 -0700 (PDT)
+Date: Tue, 30 Sep 2025 08:09:02 -0700
+In-Reply-To: <25af94f5-79e3-4005-964e-e77b1320a16e@linux.intel.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
-References: <20250926163114.2626257-1-seanjc@google.com> <20250926163114.2626257-7-seanjc@google.com>
- <diqzldlx1fyk.fsf@google.com> <aNrLpkrbnwVSaQGX@google.com> <diqza52c1im6.fsf@google.com>
-Message-ID: <aNvwB2fr2p45hhC0@google.com>
-Subject: Re: [PATCH 6/6] KVM: selftests: Verify that faulting in private
- guest_memfd memory fails
+References: <70b64347-2aca-4511-af78-a767d5fa8226@intel.com> <25af94f5-79e3-4005-964e-e77b1320a16e@linux.intel.com>
+Message-ID: <aNvyjkuDLOfxAANd@google.com>
+Subject: Re: REGRESSION on linux-next (next-20250919)
 From: Sean Christopherson <seanjc@google.com>
-To: Ackerley Tng <ackerleytng@google.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, Christian Borntraeger <borntraeger@linux.ibm.com>, 
-	Janosch Frank <frankja@linux.ibm.com>, Claudio Imbrenda <imbrenda@linux.ibm.com>, kvm@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, David Hildenbrand <david@redhat.com>, 
-	Fuad Tabba <tabba@google.com>
-Content-Type: text/plain; charset="us-ascii"
+To: Dapeng Mi <dapeng1.mi@linux.intel.com>
+Cc: Chaitanya Kumar Borah <chaitanya.kumar.borah@intel.com>, 
+	"intel-gfx@lists.freedesktop.org" <intel-gfx@lists.freedesktop.org>, 
+	"intel-xe@lists.freedesktop.org" <intel-xe@lists.freedesktop.org>, 
+	Suresh Kumar Kurmi <suresh.kumar.kurmi@intel.com>, Jani Saarinen <jani.saarinen@intel.com>, 
+	lucas.demarchi@intel.com, linux-perf-users@vger.kernel.org, 
+	kvm@vger.kernel.org
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Tue, Sep 30, 2025, Ackerley Tng wrote:
-> Sean Christopherson <seanjc@google.com> writes:
-> > How's this look?
+On Tue, Sep 30, 2025, Dapeng Mi wrote:
+>=20
+> On 9/30/2025 1:30 PM, Borah, Chaitanya Kumar wrote:
+> > Hello Sean,
 > >
-> > static void test_fault_sigbus(int fd, size_t accessible_size, size_t mmap_size)
-> > {
-> > 	struct sigaction sa_old, sa_new = {
-> > 		.sa_handler = fault_sigbus_handler,
-> > 	};
-> > 	const uint8_t val = 0xaa;
-> > 	uint8_t *mem;
-> > 	size_t i;
+> > Hope you are doing well. I am Chaitanya from the linux=C2=A0graphics te=
+am in=20
+> > Intel.
 > >
-> > 	mem = kvm_mmap(mmap_size, PROT_READ | PROT_WRITE, MAP_SHARED, fd);
+> > This mail is regarding a regression we are seeing in our CI runs[1] on
+> > linux-next repository.
 > >
-> > 	sigaction(SIGBUS, &sa_new, &sa_old);
-> > 	if (sigsetjmp(jmpbuf, 1) == 0) {
-> > 		memset(mem, val, mmap_size);
-> > 		TEST_FAIL("memset() should have triggered SIGBUS");
-> > 	}
-> > 	if (sigsetjmp(jmpbuf, 1) == 0) {
-> > 		(void)READ_ONCE(mem[accessible_size]);
-> > 		TEST_FAIL("load at first unaccessible byte should have triggered SIGBUS");
-> > 	}
-> > 	sigaction(SIGBUS, &sa_old, NULL);
+> > Since the version next-20250919=C2=A0[2], we are seeing the following r=
+egression
 > >
-> > 	for (i = 0; i < accessible_size; i++)
-> > 		TEST_ASSERT_EQ(READ_ONCE(mem[i]), val);
+> > ```````````````````````````````````````````````````````````````````````=
+``````````
+> > <4>[   10.973827] ------------[ cut here ]------------
+> > <4>[   10.973841] WARNING: arch/x86/events/core.c:3089 at=20
+> > perf_get_x86_pmu_capability+0xd/0xc0, CPU#15: (udev-worker)/386
+> > ...
+> > <4>[   10.974028] Call Trace:
+> > <4>[   10.974030]  <TASK>
+> > <4>[   10.974033]  ? kvm_init_pmu_capability+0x2b/0x190 [kvm]
+> > <4>[   10.974154]  kvm_x86_vendor_init+0x1b0/0x1a40 [kvm]
+> > <4>[   10.974248]  vmx_init+0xdb/0x260 [kvm_intel]
+> > <4>[   10.974278]  ? __pfx_vt_init+0x10/0x10 [kvm_intel]
+> > <4>[   10.974296]  vt_init+0x12/0x9d0 [kvm_intel]
+> > <4>[   10.974309]  ? __pfx_vt_init+0x10/0x10 [kvm_intel]
+> > <4>[   10.974322]  do_one_initcall+0x60/0x3f0
+> > <4>[   10.974335]  do_init_module+0x97/0x2b0
+> > <4>[   10.974345]  load_module+0x2d08/0x2e30
+> > <4>[   10.974349]  ? __kernel_read+0x158/0x2f0
+> > <4>[   10.974370]  ? kernel_read_file+0x2b1/0x320
+> > <4>[   10.974381]  init_module_from_file+0x96/0xe0
+> > <4>[   10.974384]  ? init_module_from_file+0x96/0xe0
+> > <4>[   10.974399]  idempotent_init_module+0x117/0x330
+> > <4>[   10.974415]  __x64_sys_finit_module+0x73/0xe0
+> > ...
+> > ```````````````````````````````````````````````````````````````````````=
+``````````
+> > Details log can be found in [3].
 > >
-> > 	kvm_munmap(mem, mmap_size);
-> > }
+> > After bisecting the tree, the following patch [4] seems to be the first=
+=20
+> > "bad" commit
 > >
-> > static void test_fault_overflow(int fd, size_t total_size)
-> > {
-> > 	test_fault_sigbus(fd, total_size, total_size * 4);
-> > }
+> > ```````````````````````````````````````````````````````````````````````=
+``````````````````````````````````
+> >  From 51f34b1e650fc5843530266cea4341750bd1ae37 Mon Sep 17 00:00:00 2001
 > >
-> 
-> Is it intentional that the same SIGBUS on offset mem + total_size is
-> triggered twice? The memset would have worked fine until offset mem +
-> total_size, which is the same SIGBUS case as mem[accessible_size]. Or
-> was it meant to test that both read and write trigger SIGBUS?
-
-The latter (test both read and write).  I plan on adding this in a separate
-commit, i.e. it should be obvious in the actual patches.
-
-> > static void test_fault_private(int fd, size_t total_size)
-> > {
-> > 	test_fault_sigbus(fd, 0, total_size);
-> > }
+> > From: Sean Christopherson <seanjc@google.com>
 > >
-> 
-> I would prefer more unrolling to avoid mental hoops within test code,
-> perhaps like (not compile tested):
-> 
-> static void assert_host_fault_sigbus(uint8_t *mem) 
-> {
->  	struct sigaction sa_old, sa_new = {
->  		.sa_handler = fault_sigbus_handler,
->  	};
-> 
->  	sigaction(SIGBUS, &sa_new, &sa_old);
->  	if (sigsetjmp(jmpbuf, 1) == 0) {
->  		(void)READ_ONCE(*mem);
->  		TEST_FAIL("Reading %p should have triggered SIGBUS", mem);
->  	}
->         sigaction(SIGBUS, &sa_old, NULL);
-> }
-> 
-> static void test_fault_overflow(int fd, size_t total_size)
-> {
-> 	uint8_t *mem = kvm_mmap(total_size * 2, PROT_READ | PROT_WRITE, MAP_SHARED, fd);
->         int i;
-> 
->  	for (i = 0; i < total_size; i++)
->  		TEST_ASSERT_EQ(READ_ONCE(mem[i]), val);
-> 
->         assert_host_fault_sigbus(mem + total_size);
-> 
->         kvm_munmap(mem, mmap_size);
-> }
-> 
-> static void test_fault_private(int fd, size_t total_size)
-> {
-> 	uint8_t *mem = kvm_mmap(total_size, PROT_READ | PROT_WRITE, MAP_SHARED, fd);
->         int i;
-> 
->         assert_host_fault_sigbus(mem);
-> 
->         kvm_munmap(mem, mmap_size);
-> }
-
-Why?  That loses coverage for read to private memory getting SIBUGS.  I genuinely
-don't understand the desire to copy+paste uninteresting code.
-
-> assert_host_fault_sigbus() can then be flexibly reused for conversion
-
-assert_host_fault_sigbus() is a misleading name in the sense that it suggests
-that the _only_ thing the helper does is assert that a SIGBUS occurred.  It's
-not at all obvious that there's a write to "mem" in there.
-
-> tests (coming up) at various offsets from the mmap()-ed addresses.
-> 
-> At some point, sigaction, sigsetjmp, etc could perhaps even be further
-> wrapped. For testing memory_failure() for guest_memfd we will want to
-> check for SIGBUS on memory failure injection instead of on host fault.
-> 
-> Would be nice if it looked like this (maybe not in this patch series):
-> 
-> + TEST_ASSERT_WILL_SIGBUS(READ_ONCE(mem[i]))
-> + TEST_ASSERT_WILL_SIGBUS(WRITE_ONCE(mem[i]))
-> + TEST_ASSERT_WILL_SIGBUS(madvise(MADV_HWPOISON))
-
-Ooh, me likey.  Definitely can do it now.  Using a macro means we can print out
-the actual action that didn't generate a SIGUBS, e.g. hacking the test to read
-byte 0 generates:
-
-	'(void)READ_ONCE(mem[0])' should have triggered SIGBUS
-
-Hmm, how about TEST_EXPECT_SIGBUS?  TEST_ASSERT_xxx() typically asserts on a
-value, i.e. on the result of a previous action.  And s/WILL/EXPECT to make it
-clear that the action is expected to SIGBUS _now_.
-
-And if we use a descriptive global variable, we can extract the macro to e.g.
-test_util.h or kvm_util.h (not sure we want to do that right away; probably best
-left to the future).
-
-static sigjmp_buf expect_sigbus_jmpbuf;
-void fault_sigbus_handler(int signum)
-{
-	siglongjmp(expect_sigbus_jmpbuf, 1);
-}
-
-#define TEST_EXPECT_SIGBUS(action)						\
-do {										\
-	struct sigaction sa_old, sa_new = {					\
-		.sa_handler = fault_sigbus_handler,				\
-	};									\
-										\
-	sigaction(SIGBUS, &sa_new, &sa_old);					\
-	if (sigsetjmp(expect_sigbus_jmpbuf, 1) == 0) {				\
-		action;								\
-		TEST_FAIL("'%s' should have triggered SIGBUS", #action);	\
-	}									\
-	sigaction(SIGBUS, &sa_old, NULL);					\
-} while (0)
-
-static void test_fault_sigbus(int fd, size_t accessible_size, size_t map_size)
-{
-	const char val = 0xaa;
-	char *mem;
-	size_t i;
-
-	mem = kvm_mmap(map_size, PROT_READ | PROT_WRITE, MAP_SHARED, fd);
-
-	TEST_EXPECT_SIGBUS(memset(mem, val, map_size));
-	TEST_EXPECT_SIGBUS((void)READ_ONCE(mem[accessible_size]));
-
-	for (i = 0; i < accessible_size; i++)
-		TEST_ASSERT_EQ(READ_ONCE(mem[i]), val);
-
-	kvm_munmap(mem, map_size);
-}
-
-> >> If split up as described above, this could be
-> >> 
-> >> 	if (flags & GUEST_MEMFD_FLAG_MMAP &&
-> >> 	    flags & GUEST_MEMFD_FLAG_DEFAULT_SHARED) {
-> >> 		gmem_test(mmap_supported_fault_supported, vm, flags);
-> >> 		gmem_test(fault_overflow, vm, flags);
-> >> 	} else if (flags & GUEST_MEMFD_FLAG_MMAP) {
-> >> 		gmem_test(mmap_supported_fault_sigbus, vm, flags);
+> > Date: Wed, 6 Aug 2025 12:56:39 -0700
 > >
-> > I find these unintuitive, e.g. is this one "mmap() supported, test fault sigbus",
-> > or is it "mmap(), test supported fault sigbus".  I also don't like that some of
-> > the test names describe the _result_ (SIBGUS), where as others describe _what_
-> > is being tested.
+> > Subject: KVM: x86/pmu: Snapshot host (i.e. perf's) reported PMU capabil=
+ities
 > >
-> 
-> I think of the result (SIGBUS) as part of what's being tested. So
-> test_supported_fault_sigbus() is testing that mmap is supported, and
-> faulting will result in a SIGBUS.
-
-For an utility helper, e.g. test_fault_sigbus(), or test_write_sigbus(), that's
-a-ok.  But it doesn't work for the top-level test functions because trying to
-follow that pattern effectively prevents bundling multiple individual testcases,
-e.g. test_fallocate() becomes what?  And test_invalid_punch_hole_einval() is
-quite obnoxious.
-
-> > In general, I don't like test names that describe the result, because IMO what
-> > is being tested is far more interesting.  E.g. from a test coverage persective,
-> > I don't care if attempting to fault in (CoCO) private memory gets SIGBUS versus
-> > SIGSEGV, but I most definitely care that we have test coverage for the "what".
+> > Take a snapshot of the unadulterated PMU capabilities provided by perf =
+so
+> > that KVM can compare guest vPMU capabilities against hardware capabilit=
+ies
+> > when determining whether or not to intercept PMU MSRs (and RDPMC).
+> > ```````````````````````````````````````````````````````````````````````=
+``````````````````````````````````
 > >
-> 
-> The SIGBUS is part of the contract with userspace and that's also part
-> of what's being tested IMO.
+> > We also verified that if we revert the patch the issue is not seen.
+> >
+> > Could you please check why the patch causes this regression and provide=
+=20
+> > a fix if necessary?
+>=20
+> Hi Chaitanya,
+>=20
+> I suppose you found this warning on a hybrid client platform, right? It
+> looks the warning is triggered by the below=C2=A0WARN_ON_ONCE()=C2=A0in
+> perf_get_x86_pmu_capability() function.
+>=20
+> =C2=A0 if (WARN_ON_ONCE(cpu_feature_enabled(X86_FEATURE_HYBRID_CPU)) ||
+> =C2=A0 =C2=A0 =C2=A0 =C2=A0 !x86_pmu_initialized()) {
+> =C2=A0 =C2=A0 =C2=A0 =C2=A0 memset(cap, 0, sizeof(*cap));
+> =C2=A0 =C2=A0 =C2=A0 =C2=A0 return;
+> =C2=A0 =C2=A0 }
+>=20
+> The below change should fix it (just building, not test it). I would run =
+a
+> full scope vPMU test after I come back from China national day's holiday.
 
-I don't disagree, but IMO bleeding those details into the top-level functions
-isn't necessary.  Random developer that comes along isn't going to care whether
-KVM is supposed to SIGBUS or SIGSEGV unless there is a failure.  And as above,
-doing so either singles out sigbus or necessitates truly funky names.
+I have access to a hybrid system, I'll also double check there (though I'm =
+99.9%
+certain you've got it right).
+
+> Thanks.
+>=20
+> diff --git a/arch/x86/kvm/pmu.c b/arch/x86/kvm/pmu.c
+> index cebce7094de8..6d87c25226d8 100644
+> --- a/arch/x86/kvm/pmu.c
+> +++ b/arch/x86/kvm/pmu.c
+> @@ -108,8 +108,6 @@ void kvm_init_pmu_capability(struct kvm_pmu_ops *pmu_=
+ops)
+> =C2=A0 =C2=A0 =C2=A0 =C2=A0 bool is_intel =3D boot_cpu_data.x86_vendor =
+=3D=3D X86_VENDOR_INTEL;
+> =C2=A0 =C2=A0 =C2=A0 =C2=A0 int min_nr_gp_ctrs =3D pmu_ops->MIN_NR_GP_COU=
+NTERS;
+>=20
+> -=C2=A0 =C2=A0 =C2=A0 =C2=A0perf_get_x86_pmu_capability(&kvm_host_pmu);
+> -
+> =C2=A0 =C2=A0 =C2=A0 =C2=A0 /*
+> =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0* Hybrid PMUs don't play nice with virt=
+ualization without careful
+> =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0* configuration by userspace, and KVM's=
+ APIs for reporting supported
+> @@ -120,6 +118,8 @@ void kvm_init_pmu_capability(struct kvm_pmu_ops *pmu_=
+ops)
+> =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 enable_pmu =3D fa=
+lse;
+>=20
+> =C2=A0 =C2=A0 =C2=A0 =C2=A0 if (enable_pmu) {
+> +=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0perf_get_x86_pmu_=
+capability(&kvm_host_pmu);
+> +
+> =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 /*
+> =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0* WARN if p=
+erf did NOT disable hardware PMU if the number of
+> =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0* architect=
+urally required GP counters aren't present, i.e. if
+
+If we go this route, then the !enable_pmu path should explicitly zero kvm_h=
+ost_pmu
+so that the behavior is consistent userspace loads kvm.ko with enable_pmu=
+=3D0,
+versus enable_pmu being cleared because of lack of support.
+
+	if (!enable_pmu) {
+		memset(&kvm_host_pmu, 0, sizeof(kvm_host_pmu));
+		memset(&kvm_pmu_cap, 0, sizeof(kvm_pmu_cap));
+		return;
+	}
+
+The alternative would be keep kvm_host_pmu valid at all times for !HYBRID, =
+which
+is what I intended with the bad patch, but that too would lead to inconsist=
+ent
+behavior.  So I think it makes sense to go with Dapeng's approach; we can a=
+lways
+revisit this if some future thing in KVM _needs_ kvm_host_pmu even with ena=
+ble_pmu=3D0.=20
+
+	if (cpu_feature_enabled(X86_FEATURE_HYBRID_CPU)) {
+		enable_pmu =3D false;
+		memset(&kvm_host_pmu, 0, sizeof(kvm_host_pmu));
+	} else {
+		perf_get_x86_pmu_capability(&kvm_host_pmu);
+	}
 
