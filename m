@@ -1,79 +1,79 @@
-Return-Path: <kvm+bounces-59071-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-59072-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5C845BAB4D8
-	for <lists+kvm@lfdr.de>; Tue, 30 Sep 2025 06:15:01 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 5A088BAB4DB
+	for <lists+kvm@lfdr.de>; Tue, 30 Sep 2025 06:15:07 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 118073C2A1B
-	for <lists+kvm@lfdr.de>; Tue, 30 Sep 2025 04:15:00 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0F61A3C2B36
+	for <lists+kvm@lfdr.de>; Tue, 30 Sep 2025 04:15:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EFC6C158DAC;
-	Tue, 30 Sep 2025 04:14:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4CBB423496F;
+	Tue, 30 Sep 2025 04:15:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="bf24sZ+x"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="lI8ybbzF"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-wr1-f45.google.com (mail-wr1-f45.google.com [209.85.221.45])
+Received: from mail-wr1-f53.google.com (mail-wr1-f53.google.com [209.85.221.53])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 626A22EB10
-	for <kvm@vger.kernel.org>; Tue, 30 Sep 2025 04:14:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.45
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 713362EB10
+	for <kvm@vger.kernel.org>; Tue, 30 Sep 2025 04:15:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.53
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1759205696; cv=none; b=FB8CP9MykM3OPKA38mX53o4gedAVofUORBIZ4prca+v9p2eP59/csWdQ/hJPAhF29hsKjKFpPaA/0WPz5YawhP4Pr58ejNnrEGBX9tzYuyMpFnPOQkCj8oWW9HtNv/EHI4TPsP+zx+06L5oTHHN8sWb2/fiVv7zNQ7JAUFQ39so=
+	t=1759205702; cv=none; b=iV02KsNiLbrsvxGq7NzKGV9EIgt8//6ckkUVdv6klc1V7rwq4dMiU/uni5iIENqdVMAF2omifCxyFfuAM/NP0AQ5sLf3/TlJdfLEdGngtDBEQug33elFOaRwUONU/+R+6ZqEZw9cmvlh3tgYaopIsGi9Fgf6+VwyspUr469xzRU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1759205696; c=relaxed/simple;
-	bh=9n4Eqyt5JnPjPyu8+HVhzBeQ0IZmT+fevn1ZcKpEW5s=;
+	s=arc-20240116; t=1759205702; c=relaxed/simple;
+	bh=D6uWF5gHfimLEtm6wuWGN2ijXj5YLI6I+PXAY0ScjKM=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=UC9uGJxsGMMl7LTFFbLJItW6aransImBWyEQf0yTYX2cAZXO4CdYbGJKxw+mmWpa13StoKMW/euDDW/3b91LlaNrV20gORAncmiss09jd7nPdDrPbp6WealRL+bJzI9Pxn3xcUT2qbAILMum4MX4KVNZEayzzNC6QFT72q/IMHw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=bf24sZ+x; arc=none smtp.client-ip=209.85.221.45
+	 MIME-Version:Content-Type; b=ldJYzu0cdIBNJSBv+5siHl3oqiPksvqJxqXkkDpccow367HfM/r3DD1lUkVnIyboebLyxkoCzBRANH+CDofaYKHDNb+u8ki9iuuMm07wx+IxoaVYcDVj9OD6aXPbgMXfhPTkpaO2yOMZGF1P9wlNb6UpMiugpIi+JbK00rKISfY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=lI8ybbzF; arc=none smtp.client-ip=209.85.221.53
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
-Received: by mail-wr1-f45.google.com with SMTP id ffacd0b85a97d-3fa528f127fso4221559f8f.1
-        for <kvm@vger.kernel.org>; Mon, 29 Sep 2025 21:14:54 -0700 (PDT)
+Received: by mail-wr1-f53.google.com with SMTP id ffacd0b85a97d-42421b1514fso232414f8f.2
+        for <kvm@vger.kernel.org>; Mon, 29 Sep 2025 21:15:00 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1759205693; x=1759810493; darn=vger.kernel.org;
+        d=linaro.org; s=google; t=1759205699; x=1759810499; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=tDZrJ5n4JJlGtTIDZGasXxs/GbyDfsVnrlhryX3chWg=;
-        b=bf24sZ+xo3jbVNokdv/WO6wzEwjZT58D2DQVj8LB1BJsykZhmnBJzVKvNDhN7xEcid
-         OIsbs5LX/iwRIGKk24g+0jVnZAy5HXxT1evN+c03GFjFNMFJZYrfH4EG5GJqpl7GOayF
-         EB7TDIUwdKdUo9TxJO03oHR+WlSHyV5Ivnlc2WE0EUs8xOdV9IfPnYLIH+2lqQCTWItX
-         Bzc8/WP3YFnefEdADp2AiTzm269KDMxgB48ey418uq4ydXUqk982S8sjgj3J7MZeu6AQ
-         3lTwd/BYb6in412cEZYYva6SYE0CoIJIfl0P4KXj1k20yiZPbTEFtHRHIclJbWx6W80k
-         DTSg==
+        bh=FwO23E8zQD3tYxR1qcdfXict3HnZqpkDFtM6ocAlj5I=;
+        b=lI8ybbzFPOJrIPzR8P8iSatNAGXOPHn3VDQHNCG6yMReCxwRwNM5VWKth89hiYgTji
+         /QK8Mw37b6LyW3umgy7Tj/7j7tFLOeOYPHAakrn8ko8ytIfU6w6Ffx7LwJTgpo/NLM1v
+         iF0H0PkNqgtzxBs/UI8K1se73XYq6KeikcpPrT2i92pakIFY2Sd9QnKTfUe1Z3v1t7sM
+         y/9o6tc+eDQXjehkMZlbbERzh1Fn5A5WUSkEHcYs9iPSRn4yHc4JZqTKi+z4Iv5Xpdpy
+         /ecvEgDT9G/y1F1iIWLHHK2Sz2bSr9u5IIwROpB6T06XU8Xm9B+aVL5kQIG+a2Jt5sPN
+         2Ukw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1759205693; x=1759810493;
+        d=1e100.net; s=20230601; t=1759205699; x=1759810499;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=tDZrJ5n4JJlGtTIDZGasXxs/GbyDfsVnrlhryX3chWg=;
-        b=hUsBvLP3/a9qTxMet3Mj1/p8gp516tG//b683X2bXQ0QGbsLSW9LnAAEO9s6exVd+i
-         K4V7MARtHUtWApSh6BVAo61IAdOyz0GzCYWynAmCsxNxetsU6rOtLsmhVrjOkFTscnGw
-         BNGKL6ZH6IhVjRRZHoMyVHMEgLnHiyizW1cIdbybYyh5xFhFhW3V5bLxqlkJWywpjcMI
-         LwzdgBhAeaic6sMQv2cQQh2nEPAadryw9aJultMrFeT4PANEGNCoHv8hGnLXprXDxRqR
-         5JRaenEKlV5u/5cglHnYuJ3E9yta9ad7bizM4SbocU/SkMUbzgWMQhhL+mk1SRejJCDe
-         Gl9w==
-X-Forwarded-Encrypted: i=1; AJvYcCVrggZ66k7kcdXfdq45VHc1Y5hkOUIlSf4oP7SS3IvSo+pLxpeK9UytFDfb+02od68vQq0=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwxF2X2JNCkAb92N51G415vKZR8ebA2msWEclnQ+ZUKSjw1qRjE
-	0fytgECDHY3aA7g4LvFGHk2repO2vjAZyuj5+1nHTmJ0d3UYz4buBUP1LzQDHs2iNK8=
-X-Gm-Gg: ASbGncvejuD1lbb/tYYtKixhwPhpDnqcfP29v3EBu8ugHHzSz0R5K6SW/9bDzZV/7Mp
-	BgAigGyXID37PtvStGzr75nf1tySWK0XT7AMsAWemT0HZc19Yvubl80BmDkwXk4cZihLcXP+TL3
-	cxbfnsceYVz77oOL/IyZ9rt0Zwjp/aM/nASXvlEnFP7jYeoN/c+oWzFBXh+3IRqhjBXmwlzIsBC
-	wCDfDPAFHF6L6XjxajiQHCftYguNWUWOowPzGIFpO7BRThY5vbXsq0B149zQT9a9eGN/NyfLNm0
-	izRWVolTrK1yNUXpyyr76Aoh0K7D54w7ogTVuEO0doH/3ndkAnzQtAYH1Eu0mRTvbsUHwFJj8pI
-	C+eLrU/l4DR4b1+HJotpYXsRwMP3mggULB3nXCHAhZAmUAAfI+iq26R4ky7CBuLXnPeP8c4+R/1
-	Fh7jAkWwjCpleFs6+AIsxE
-X-Google-Smtp-Source: AGHT+IGTcuGp6K4U+VzNJFqsWFt5qmyyMICY36EpMMpwA/c/CYvK54pPvXL/H3Oj0HTHDk8uqyOMBA==
-X-Received: by 2002:a05:6000:2901:b0:3e7:617f:8458 with SMTP id ffacd0b85a97d-424116eaebcmr2419836f8f.24.1759205692755;
-        Mon, 29 Sep 2025 21:14:52 -0700 (PDT)
+        bh=FwO23E8zQD3tYxR1qcdfXict3HnZqpkDFtM6ocAlj5I=;
+        b=rL9khIFTjBnpIYpwDLLW3c0sPeuBcYCEVn5mCewYZATmmZWba90AscPQhaAXWQxrV8
+         iGldss7d4yfm5tOOkIT/4n6ZzEEGRz5mmft9+VnYBnEqSx8qYK+cZZ0pqfP2OlkR3vSM
+         5xm+TraP43WNl5YbefBmNaW4jBRYL3DPzCrZTMIJvDULnRiMTwNSI3ZgtYziQ6YjxUBL
+         oUphqNVz/zHO6kD4JH1GEz0N72jM7MqWaihr+VnYQSMvyUfeNYmhuEaRdwONLZVzS5+S
+         v6Fa2CXBmB0Z3pEDOoddkRsoi5jnu5CB3TIVys2fTIf6GCxyekPd7o1BRoNd75vSgkbn
+         E4Iw==
+X-Forwarded-Encrypted: i=1; AJvYcCV9JiGItBRPFvpo/WPbRyi2thfvy2SXy64+0ZBGqas+VMsLfU2jdl8E3m5sIBL78MZkLhY=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwpcdqfWl2hAGtDb0XN/joqY772wa7/3r6RTqPLG4GE0sETlclC
+	RofZRT0gjIp3rhbr5PwrE77C19AIaQNFs9ZMboOQvxISFkZAY/Pb7r+wdWKMCbL46WQ=
+X-Gm-Gg: ASbGncuoa2zLsbxqV8B4WX5BCUIos8lunL0DTyfVFmcgvlJ2XDa/A531iYyvobuG6zd
+	DwFD7s6U0EhdW00HGSgH0CboTKq7mxH2KsI7CjHRBROxInNzH0cWlti9OqltoGDTvcsP0R/CNY0
+	lwlEgBWUIf/+N3UEy8oAg2wPQwC80ad9/OmzwRLYhYPhUirtSpDaBRCBkgr0sGlSQtSEGqmtc1q
+	UqZZEvNeUILbExbopMybYCWwnPkV5C1QNLkJZbmPiUH6mi7AUzRCT5xg10xqAmSiSjcB7MKPnW2
+	P3TskVVqfnW5zUHvPmh8kVCTYmY1PLCPS8tLrBiuSeyYYA2ooJcd0RNywhq7/MvST+wcJ0kGO8s
+	q3EjA8PU9sDBXjvYr6+XzdfL10tBitJWQjyaLB/mBhLku/E9f6KhqQxKk128+cVTGyzpak+DKaI
+	Y3MQqzOVJd7qZ/A25w2JVcF5zttB3cSClsBKRA7Ln1Qg==
+X-Google-Smtp-Source: AGHT+IHQUeMIWrPOvhxUlcXifIoWvE3/8AU9Ob5ucePyts2g6/ZGYEFjge5tsRgBwyw13Vrh3DLZdg==
+X-Received: by 2002:a05:6000:430d:b0:3ed:a43d:e8c4 with SMTP id ffacd0b85a97d-40e458a9856mr16110543f8f.6.1759205698778;
+        Mon, 29 Sep 2025 21:14:58 -0700 (PDT)
 Received: from localhost.localdomain (88-187-86-199.subs.proxad.net. [88.187.86.199])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-41855fc661esm13064710f8f.45.2025.09.29.21.14.50
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-40fb72fbb27sm20526091f8f.4.2025.09.29.21.14.56
         (version=TLS1_3 cipher=TLS_CHACHA20_POLY1305_SHA256 bits=256/256);
-        Mon, 29 Sep 2025 21:14:51 -0700 (PDT)
+        Mon, 29 Sep 2025 21:14:58 -0700 (PDT)
 From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@linaro.org>
 To: qemu-devel@nongnu.org,
 	Peter Maydell <peter.maydell@linaro.org>
@@ -103,9 +103,9 @@ Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@linaro.org>,
 	"Edgar E. Iglesias" <edgar.iglesias@gmail.com>,
 	Richard Henderson <richard.henderson@linaro.org>,
 	David Hildenbrand <david@redhat.com>
-Subject: [PATCH v2 14/17] system/physmem: Un-inline cpu_physical_memory_read/write()
-Date: Tue, 30 Sep 2025 06:13:22 +0200
-Message-ID: <20250930041326.6448-15-philmd@linaro.org>
+Subject: [PATCH v2 15/17] system/physmem: Inline cpu_physical_memory_rw() and remove it
+Date: Tue, 30 Sep 2025 06:13:23 +0200
+Message-ID: <20250930041326.6448-16-philmd@linaro.org>
 X-Mailer: git-send-email 2.51.0
 In-Reply-To: <20250930041326.6448-1-philmd@linaro.org>
 References: <20250930041326.6448-1-philmd@linaro.org>
@@ -118,58 +118,124 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 
-Un-inline cpu_physical_memory_read() and cpu_physical_memory_write().
+After inlining the legacy cpu_physical_memory_rw() in the 2 functions
+using it (cpu_physical_memory_read and cpu_physical_memory_write), we
+removed all its use: remove it.
 
 Signed-off-by: Philippe Mathieu-Daudé <philmd@linaro.org>
 ---
- include/exec/cpu-common.h | 12 ++----------
- system/physmem.c          | 10 ++++++++++
- 2 files changed, 12 insertions(+), 10 deletions(-)
+ docs/devel/loads-stores.rst            |  4 +---
+ scripts/coccinelle/exec_rw_const.cocci | 22 ----------------------
+ include/exec/cpu-common.h              |  2 --
+ system/physmem.c                       | 13 ++++---------
+ 4 files changed, 5 insertions(+), 36 deletions(-)
 
+diff --git a/docs/devel/loads-stores.rst b/docs/devel/loads-stores.rst
+index f9b565da57a..c906c6509ee 100644
+--- a/docs/devel/loads-stores.rst
++++ b/docs/devel/loads-stores.rst
+@@ -460,10 +460,8 @@ For new code they are better avoided:
+ 
+ ``cpu_physical_memory_write``
+ 
+-``cpu_physical_memory_rw``
+-
+ Regexes for git grep:
+- - ``\<cpu_physical_memory_\(read\|write\|rw\)\>``
++ - ``\<cpu_physical_memory_\(read\|write\)\>``
+ 
+ ``cpu_memory_rw_debug``
+ ~~~~~~~~~~~~~~~~~~~~~~~
+diff --git a/scripts/coccinelle/exec_rw_const.cocci b/scripts/coccinelle/exec_rw_const.cocci
+index 1a202969519..4c02c94e04e 100644
+--- a/scripts/coccinelle/exec_rw_const.cocci
++++ b/scripts/coccinelle/exec_rw_const.cocci
+@@ -21,13 +21,6 @@ expression E1, E2, E3, E4, E5;
+ + address_space_rw(E1, E2, E3, E4, E5, true)
+ |
+ 
+-- cpu_physical_memory_rw(E1, E2, E3, 0)
+-+ cpu_physical_memory_rw(E1, E2, E3, false)
+-|
+-- cpu_physical_memory_rw(E1, E2, E3, 1)
+-+ cpu_physical_memory_rw(E1, E2, E3, true)
+-|
+-
+ - cpu_physical_memory_map(E1, E2, 0)
+ + cpu_physical_memory_map(E1, E2, false)
+ |
+@@ -62,18 +55,6 @@ symbol true, false;
+ + address_space_write(E1, E2, E3, E4, E5)
+ )
+ 
+-// Avoid uses of cpu_physical_memory_rw() with a constant is_write argument.
+-@@
+-expression E1, E2, E3;
+-@@
+-(
+-- cpu_physical_memory_rw(E1, E2, E3, false)
+-+ cpu_physical_memory_read(E1, E2, E3)
+-|
+-- cpu_physical_memory_rw(E1, E2, E3, true)
+-+ cpu_physical_memory_write(E1, E2, E3)
+-)
+-
+ // Remove useless cast
+ @@
+ expression E1, E2, E3, E4, E5, E6;
+@@ -93,9 +74,6 @@ type T;
+ + address_space_write_rom(E1, E2, E3, E4, E5)
+ |
+ 
+-- cpu_physical_memory_rw(E1, (T *)(E2), E3, E4)
+-+ cpu_physical_memory_rw(E1, E2, E3, E4)
+-|
+ - cpu_physical_memory_read(E1, (T *)(E2), E3)
+ + cpu_physical_memory_read(E1, E2, E3)
+ |
 diff --git a/include/exec/cpu-common.h b/include/exec/cpu-common.h
-index 6c7d84aacb4..6e8cb530f6e 100644
+index 6e8cb530f6e..910e1c2afb9 100644
 --- a/include/exec/cpu-common.h
 +++ b/include/exec/cpu-common.h
-@@ -133,16 +133,8 @@ void cpu_address_space_destroy(CPUState *cpu, int asidx);
+@@ -131,8 +131,6 @@ void cpu_address_space_init(CPUState *cpu, int asidx,
+  */
+ void cpu_address_space_destroy(CPUState *cpu, int asidx);
  
- void cpu_physical_memory_rw(hwaddr addr, void *buf,
-                             hwaddr len, bool is_write);
--static inline void cpu_physical_memory_read(hwaddr addr,
--                                            void *buf, hwaddr len)
--{
--    cpu_physical_memory_rw(addr, buf, len, false);
--}
--static inline void cpu_physical_memory_write(hwaddr addr,
--                                             const void *buf, hwaddr len)
--{
--    cpu_physical_memory_rw(addr, (void *)buf, len, true);
--}
-+void cpu_physical_memory_read(hwaddr addr, void *buf, hwaddr len);
-+void cpu_physical_memory_write(hwaddr addr, const void *buf, hwaddr len);
+-void cpu_physical_memory_rw(hwaddr addr, void *buf,
+-                            hwaddr len, bool is_write);
+ void cpu_physical_memory_read(hwaddr addr, void *buf, hwaddr len);
+ void cpu_physical_memory_write(hwaddr addr, const void *buf, hwaddr len);
  void *cpu_physical_memory_map(hwaddr addr,
-                               hwaddr *plen,
-                               bool is_write);
 diff --git a/system/physmem.c b/system/physmem.c
-index 70b02675b93..6d6bc449376 100644
+index 6d6bc449376..a654b2af2a3 100644
 --- a/system/physmem.c
 +++ b/system/physmem.c
-@@ -3188,6 +3188,16 @@ void cpu_physical_memory_rw(hwaddr addr, void *buf,
-                      buf, len, is_write);
+@@ -3181,21 +3181,16 @@ MemTxResult address_space_set(AddressSpace *as, hwaddr addr,
+     return error;
  }
  
-+void cpu_physical_memory_read(hwaddr addr, void *buf, hwaddr len)
-+{
-+    cpu_physical_memory_rw(addr, buf, len, false);
-+}
-+
-+void cpu_physical_memory_write(hwaddr addr, const void *buf, hwaddr len)
-+{
-+    cpu_physical_memory_rw(addr, (void *)buf, len, true);
-+}
-+
+-void cpu_physical_memory_rw(hwaddr addr, void *buf,
+-                            hwaddr len, bool is_write)
+-{
+-    address_space_rw(&address_space_memory, addr, MEMTXATTRS_UNSPECIFIED,
+-                     buf, len, is_write);
+-}
+-
+ void cpu_physical_memory_read(hwaddr addr, void *buf, hwaddr len)
+ {
+-    cpu_physical_memory_rw(addr, buf, len, false);
++    address_space_read(&address_space_memory, addr,
++                       MEMTXATTRS_UNSPECIFIED, buf, len);
+ }
+ 
+ void cpu_physical_memory_write(hwaddr addr, const void *buf, hwaddr len)
+ {
+-    cpu_physical_memory_rw(addr, (void *)buf, len, true);
++    address_space_write(&address_space_memory, addr,
++                        MEMTXATTRS_UNSPECIFIED, buf, len);
+ }
+ 
  /* used for ROM loading : can write in RAM and ROM */
- MemTxResult address_space_write_rom(AddressSpace *as, hwaddr addr,
-                                     MemTxAttrs attrs,
 -- 
 2.51.0
 
