@@ -1,79 +1,79 @@
-Return-Path: <kvm+bounces-59064-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-59065-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9445DBAB4C3
-	for <lists+kvm@lfdr.de>; Tue, 30 Sep 2025 06:14:22 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id BCE6CBAB4C4
+	for <lists+kvm@lfdr.de>; Tue, 30 Sep 2025 06:14:25 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id CA11A17199F
-	for <lists+kvm@lfdr.de>; Tue, 30 Sep 2025 04:14:16 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 000FB7A45C4
+	for <lists+kvm@lfdr.de>; Tue, 30 Sep 2025 04:12:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EC424248F7F;
-	Tue, 30 Sep 2025 04:14:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 32F4F248F7F;
+	Tue, 30 Sep 2025 04:14:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="gRFMWGRV"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="FqJ6mTKw"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-wr1-f45.google.com (mail-wr1-f45.google.com [209.85.221.45])
+Received: from mail-wr1-f54.google.com (mail-wr1-f54.google.com [209.85.221.54])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 64C31247284
-	for <kvm@vger.kernel.org>; Tue, 30 Sep 2025 04:14:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.45
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 93431248878
+	for <kvm@vger.kernel.org>; Tue, 30 Sep 2025 04:14:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.54
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1759205652; cv=none; b=J/P0yF1frmAwuzP5nEMY8UKKU38rlepBpeWW2ri/yHAmMVfHvG0Cn+KxYWcJ5b19cIIGSZn9GrWpNmtRSlP5djoTjCKotUGJPQTpw7GDdRlPgXFJE1JwFVEey4O/CAzMVSSXsvfJ1oHbmn71VT5tHT2672CWXpiGREfl9OJOl/w=
+	t=1759205658; cv=none; b=nA+zv/hfT2o45uzVvvZbftMe1+4WSGoLbmeKgk0q7PQikJooTWzCC/1ZJBdA3BpcRBX0VyLcFDOhSOW7DIFc+AAdUeT/LoZSUG4HMoMyZGFZChFRZLV70alk8VOW01ZMiVXla56P11BHGVlimRXomHLgtdxnXN2f6cs31AFCSc8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1759205652; c=relaxed/simple;
-	bh=giGQfDxTtujI1DL14yVQRSjbiqWAqC2i4+BZ2jOPuHc=;
+	s=arc-20240116; t=1759205658; c=relaxed/simple;
+	bh=7ZRazBY47bhUT6pdzVjIjO1wWnlchkM0+VhS0ryjJ4s=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=s7CotKytCJJWKCH3JIoX/zwggaP6/peyYUOqXDw3IujWUwMXLHSVhtps6PcwLppjjZVyOqgTBYdCtJtTdWZb8ADAyk1k1dyRoRpo1Kp8ZHSWBtrV2l5V++3xb9mN4EzjmnlNn7Dh3c2I20TdUETZm/9F7UWb9tkUKV8AJkxQUZw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=gRFMWGRV; arc=none smtp.client-ip=209.85.221.45
+	 MIME-Version:Content-Type; b=iaf4k1Xr0nbqq4MrMGb7+5mcNSQWNefWMSNSU7R8pbMXI6hmNpgGs5AjR4kDc0yvuQW/2BsBZyENYbnMpAMWVKOhpL61qxFzZ3TFdpjMtuIwCCLFqHCCGjFHDK/IcUKBCmVZj0CZsrF+EFoDAP1dphuqHYedIy9J67zjS2Y0Bfc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=FqJ6mTKw; arc=none smtp.client-ip=209.85.221.54
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
-Received: by mail-wr1-f45.google.com with SMTP id ffacd0b85a97d-3ee130237a8so3873149f8f.0
-        for <kvm@vger.kernel.org>; Mon, 29 Sep 2025 21:14:10 -0700 (PDT)
+Received: by mail-wr1-f54.google.com with SMTP id ffacd0b85a97d-3f0308469a4so3076662f8f.0
+        for <kvm@vger.kernel.org>; Mon, 29 Sep 2025 21:14:16 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1759205649; x=1759810449; darn=vger.kernel.org;
+        d=linaro.org; s=google; t=1759205655; x=1759810455; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=uk5+wyHN7CkT7HC+T4CiL8GLFFBvq7A2wJEeem4enV4=;
-        b=gRFMWGRV679EnrEa97VOzdEROEYS/7ag1/y62hi2yQZKwt03udWmgCOL0EZyPkf1JX
-         mNEAbp5te7+xGjG3szAqfNYflaOGvyCBXeK9GqDPbTRQr1dwiQrFH4HAx9CYWRlFp3db
-         f5DiR87GUPhuPtK+Zw2DftgMf5HIgt2O07v+W1W+B2shNGMO8V/neKFzoRa9xaUZrtg7
-         CJhuUjPBMk03hPT/GvKThoXRCCjwXgJULD1N11QQpvnNXraAwfmFoiW1N+vRgFur10jE
-         hl0oroy7/vZZ/8PC2NTLiltySbAUpzvGMXYs+WbmkfrnLGS/bFZMbmbkDQ8gzmQyxjg9
-         BKLw==
+        bh=cfNLwv+i5cO84zMF6diWkvUfOapkzoMYrwwz0ZMfYgk=;
+        b=FqJ6mTKwq+SirrRaNtnkPNjI7KIQmbbGKhdI+Ow7Ws/SA2PSpRpE+HINt4aG5y/S3G
+         IXK1i5fofq7nng3GkZTYEfzXn+uKWZdV9Rnu51oBR5OHvcPoUICnana9/5T/REZlptFe
+         xZsIW8aTS9+noiHrdWyVC4hT1xm/pW8NcCNzy02ssgQPFAKdo47kcvHP19kPumvvL6jq
+         obQDFGa9thH2dCTWUAygq3XCS0UfFYrSyckYonleSQeyupn1hwSbQ7iWEMoTOJ1vKZ1j
+         5jInZ1HeTRFt8kni1gSxSW6cO/nWxIsiSnSuqQVjKtTX+cCllZSF2/G0E3kESKTqX/iF
+         37YQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1759205649; x=1759810449;
+        d=1e100.net; s=20230601; t=1759205655; x=1759810455;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=uk5+wyHN7CkT7HC+T4CiL8GLFFBvq7A2wJEeem4enV4=;
-        b=LnNeOxzQxGO14cBm4x6vvEDVzj5JuphGe1pGCq9QyommXsxFobojxr5hN2YeAwgdT0
-         jO7o5csV59h+rZGBADuScVyHHu/iq+l1JqjSJb++LIxLdf2h13kyk4mm2pUtbcLY3M5D
-         Z32CYEhHDfdMYCdUowIZ2eUs111Y0DGpXIJcyvx2bptuV5vgLvQWbS03eMyLkoUlILqm
-         NIJMny27I7G5n1IjhAcJhRf7BeMrY624EBb2re4gsz4xs+HR2WNQwDeAoMf6AHbwpDVB
-         ygy8a0Sjys6QjDWR+FFF4y5SPIirHDjRkQVMdX9jMR1hnFfx1bzPrs8OtL8Ck1wErIoC
-         O3sg==
-X-Forwarded-Encrypted: i=1; AJvYcCVhf6C7fEWAftF3tmkzonWKsAGhzNebL5LgBHJqmfGcQ+fcneoTMANUWvT1ZQbZ7oWfEik=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyjTIuEVuTxPSX2yFZA0nXR9qILS+YtsmusHlA/UiP/xAk72mf6
-	tV6aNrstcgrHXQzEka5XAujGvSWRd/oT+O+k/P8YfLFLh4s5w8Vw5KF92ykxpCsJ+Ag=
-X-Gm-Gg: ASbGnctWqH2fJvE/oIbstO3xdyZx76McA1P7E5dgVkG+0zGnzwSb3KPfzLclzuNj1DZ
-	1lUpoQXd1oLe93tcQZau2aDexrJRnR6AZTtRE64Tvo3EkPmr4tgHIyv7C2vskHYd+Wn4CL919Yc
-	/cpVwVerIGmXMv3irk67FN/GSFT/PjpfX4xa0zfUMX56VIQGC9QCdHuD4auA78NUqJnSW08vXaN
-	aXkuU1PDBqMxIzjevJSxuMRkl+sjUv5TR9g4GWBgxNhDkppLMhsUgiIhLvdqrzcE3FAD7+4TE8I
-	DvRctKWEsnFMVJqL01uS1IRbQN3y68VvPhVrF4Y8BCxkOY2nUFktjfaZXjTUSBBcb38+HQNZ7sS
-	EIiGAUBoSs7jPJkiBD8np1PngzYvkozR9JrhaP32spJdeKFTVC/Pls7iYthgs/DLCj5fqUgBqEo
-	2UaTsFFSdSOSRq6OW0NeDxG6/416o54EQ=
-X-Google-Smtp-Source: AGHT+IHVwaY6Q4s0F84QmaOmJAx4BK9ueW3Bbg0HpiOJvzkr7RtDJkQ0plXWj1SaEJLGINz1Ov7KPQ==
-X-Received: by 2002:a05:6000:3101:b0:3eb:5e99:cbbc with SMTP id ffacd0b85a97d-40e458a9394mr12531634f8f.9.1759205648705;
-        Mon, 29 Sep 2025 21:14:08 -0700 (PDT)
+        bh=cfNLwv+i5cO84zMF6diWkvUfOapkzoMYrwwz0ZMfYgk=;
+        b=Bo1kta3Ahq7QjRtAgxtxSbNujk2Of2G/W1IpNlm6KQ5D52xFWy9D3yIBiUDkGJgwL0
+         ppDDAxCQBy17+5FbRsP9blUSe8QGeQHTPNfOkvN3jCjXmhLZW0i+XuAMEKteIkCa77uj
+         Jtj2Kewy7UlwByoP5NhMFyGCKK7qdf500GCAexJpl57vYx8kmXTBAFoB3T9KI3/kzTrZ
+         meCIuPVQDbAUa/kLm25KP67I8FzlB9QzKbBMD7AqArsCGfWZSJcogx4wdggGvo6/a1Xy
+         OgEyzrkQ5nmMvkGpmvyswOWoapcsfq8a2orgxNWOkBYUXDldB4BS+z9vZYycohR7MTvi
+         cJUA==
+X-Forwarded-Encrypted: i=1; AJvYcCWvsbGGj23Uftbopj+49lSHYol0HCuVr68rTXeyUmkrzI2Y9wBeVoEWKYtQCrAWeuwtx7Y=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyanX0UO8PiKvlZcDmwKz+vD6VzEmn84XsjLL/3Y8e2NKXZ5Adb
+	5DOA82PBQUJnK2EHYDehEbOFh1o5TMQssLMU/3E+le10a4RV37SiOC9PYEC+mLaR9Og=
+X-Gm-Gg: ASbGnct6ZNqn1liojuvaUPbLHi30Zr1ivpcull2lh9iJs6sIMHW4GIP2rzxB1vWvrRm
+	gzgQVSrImMunA1Vo/ruPK1wYw3SktHI+Vi3JKnK5UidOwRWMgpEpEsCoLZVfSIY9+FljgWoNJQj
+	lDBl6vH/glv2QIeU2OdOpCi8sq6t1JXhmOYFXRK/B3UVQ5HlKlIy0w1l3YUMDN7TRVMaL2E1KSp
+	yOl+WgFCKHdwIKHEW1ZYoit9no4Dg5mYeWC9fVadCfvGRARBLbaSDXp+dcC+5x0BsFvS/8c/1YO
+	gEM23316g0NhllJ6/Yp63JhiPM/Ar7aefx+V2Y0q+D6iemub8BuUUIcC9nIAM8lMQtyG1KtiEFw
+	GwhUQzXtIGIjWl7fRhkphE1tOUrKajvegn+X8afQ3JUfCahramnIcuaZX0Hs13FpxzeGQ5h4k4r
+	O3f8lID5bt+9um//oUuwX6
+X-Google-Smtp-Source: AGHT+IHP/zG4X6xn4hUDdclB/D1afSsyjXOgC/ThtRrRCj048iTFTeDxSXkrbhWZePrU5zQ+WKtYTA==
+X-Received: by 2002:a05:6000:1848:b0:3eb:8395:e2e0 with SMTP id ffacd0b85a97d-40e4b38923emr16718454f8f.51.1759205654828;
+        Mon, 29 Sep 2025 21:14:14 -0700 (PDT)
 Received: from localhost.localdomain (88-187-86-199.subs.proxad.net. [88.187.86.199])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-46e5b69bc0bsm5141855e9.3.2025.09.29.21.14.07
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-41f00aebdb7sm8027318f8f.57.2025.09.29.21.14.12
         (version=TLS1_3 cipher=TLS_CHACHA20_POLY1305_SHA256 bits=256/256);
-        Mon, 29 Sep 2025 21:14:08 -0700 (PDT)
+        Mon, 29 Sep 2025 21:14:14 -0700 (PDT)
 From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@linaro.org>
 To: qemu-devel@nongnu.org,
 	Peter Maydell <peter.maydell@linaro.org>
@@ -103,9 +103,9 @@ Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@linaro.org>,
 	"Edgar E. Iglesias" <edgar.iglesias@gmail.com>,
 	Richard Henderson <richard.henderson@linaro.org>,
 	David Hildenbrand <david@redhat.com>
-Subject: [PATCH v2 07/17] system/physmem: Pass address space argument to cpu_flush_icache_range()
-Date: Tue, 30 Sep 2025 06:13:15 +0200
-Message-ID: <20250930041326.6448-8-philmd@linaro.org>
+Subject: [PATCH v2 08/17] hw/s390x/sclp: Replace [cpu_physical_memory -> address_space]_r/w()
+Date: Tue, 30 Sep 2025 06:13:16 +0200
+Message-ID: <20250930041326.6448-9-philmd@linaro.org>
 X-Mailer: git-send-email 2.51.0
 In-Reply-To: <20250930041326.6448-1-philmd@linaro.org>
 References: <20250930041326.6448-1-philmd@linaro.org>
@@ -118,80 +118,50 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 
-Rename cpu_flush_icache_range() as address_space_flush_icache_range(),
-passing an address space by argument. The single caller, rom_reset(),
-already operates on an address space. Use it.
+cpu_physical_memory_read() and cpu_physical_memory_write() are
+legacy (see commit b7ecba0f6f6), replace by address_space_read()
+and address_space_write().
 
 Signed-off-by: Philippe Mathieu-Daudé <philmd@linaro.org>
 ---
- include/exec/cpu-common.h | 2 --
- include/system/memory.h   | 2 ++
- hw/core/loader.c          | 2 +-
- system/physmem.c          | 5 ++---
- 4 files changed, 5 insertions(+), 6 deletions(-)
+ hw/s390x/sclp.c | 10 ++++++----
+ 1 file changed, 6 insertions(+), 4 deletions(-)
 
-diff --git a/include/exec/cpu-common.h b/include/exec/cpu-common.h
-index a73463a7038..6c7d84aacb4 100644
---- a/include/exec/cpu-common.h
-+++ b/include/exec/cpu-common.h
-@@ -156,8 +156,6 @@ void cpu_physical_memory_unmap(void *buffer, hwaddr len,
-  */
- void qemu_flush_coalesced_mmio_buffer(void);
- 
--void cpu_flush_icache_range(hwaddr start, hwaddr len);
--
- typedef int (RAMBlockIterFunc)(RAMBlock *rb, void *opaque);
- 
- int qemu_ram_foreach_block(RAMBlockIterFunc func, void *opaque);
-diff --git a/include/system/memory.h b/include/system/memory.h
-index 546c643961d..dfea90c4d6b 100644
---- a/include/system/memory.h
-+++ b/include/system/memory.h
-@@ -2977,6 +2977,8 @@ void address_space_cache_invalidate(MemoryRegionCache *cache,
-  */
- void address_space_cache_destroy(MemoryRegionCache *cache);
- 
-+void address_space_flush_icache_range(AddressSpace *as, hwaddr addr, hwaddr len);
-+
- /* address_space_get_iotlb_entry: translate an address into an IOTLB
-  * entry. Should be called from an RCU critical section.
-  */
-diff --git a/hw/core/loader.c b/hw/core/loader.c
-index 524af6f14a0..477661a0255 100644
---- a/hw/core/loader.c
-+++ b/hw/core/loader.c
-@@ -1242,7 +1242,7 @@ static void rom_reset(void *unused)
-          * that the instruction cache for that new region is clear, so that the
-          * CPU definitely fetches its instructions from the just written data.
-          */
--        cpu_flush_icache_range(rom->addr, rom->datasize);
-+        address_space_flush_icache_range(rom->as, rom->addr, rom->datasize);
- 
-         trace_loader_write_rom(rom->name, rom->addr, rom->datasize, rom->isrom);
+diff --git a/hw/s390x/sclp.c b/hw/s390x/sclp.c
+index f507b36cd91..152c773d1b4 100644
+--- a/hw/s390x/sclp.c
++++ b/hw/s390x/sclp.c
+@@ -319,7 +319,8 @@ int sclp_service_call(S390CPU *cpu, uint64_t sccb, uint32_t code)
      }
-diff --git a/system/physmem.c b/system/physmem.c
-index 573e5bb1adc..70b02675b93 100644
---- a/system/physmem.c
-+++ b/system/physmem.c
-@@ -3214,7 +3214,7 @@ MemTxResult address_space_write_rom(AddressSpace *as, hwaddr addr,
-     return MEMTX_OK;
- }
  
--void cpu_flush_icache_range(hwaddr addr, hwaddr len)
-+void address_space_flush_icache_range(AddressSpace *as, hwaddr addr, hwaddr len)
- {
-     /*
-      * This function should do the same thing as an icache flush that was
-@@ -3229,8 +3229,7 @@ void cpu_flush_icache_range(hwaddr addr, hwaddr len)
-     RCU_READ_LOCK_GUARD();
-     while (len > 0) {
-         hwaddr addr1, l = len;
--        MemoryRegion *mr = address_space_translate(&address_space_memory,
--                                                   addr, &addr1, &l, true,
-+        MemoryRegion *mr = address_space_translate(as, addr, &addr1, &l, true,
-                                                    MEMTXATTRS_UNSPECIFIED);
+     /* the header contains the actual length of the sccb */
+-    cpu_physical_memory_read(sccb, &header, sizeof(SCCBHeader));
++    address_space_read(as, sccb, MEMTXATTRS_UNSPECIFIED,
++                       &header, sizeof(SCCBHeader));
  
-         if (!memory_region_supports_direct_access(mr)) {
+     /* Valid sccb sizes */
+     if (be16_to_cpu(header.length) < sizeof(SCCBHeader)) {
+@@ -332,7 +333,8 @@ int sclp_service_call(S390CPU *cpu, uint64_t sccb, uint32_t code)
+      * the host has checked the values
+      */
+     work_sccb = g_malloc0(be16_to_cpu(header.length));
+-    cpu_physical_memory_read(sccb, work_sccb, be16_to_cpu(header.length));
++    address_space_read(as, sccb, MEMTXATTRS_UNSPECIFIED,
++                       work_sccb, be16_to_cpu(header.length));
+ 
+     if (!sclp_command_code_valid(code)) {
+         work_sccb->h.response_code = cpu_to_be16(SCLP_RC_INVALID_SCLP_COMMAND);
+@@ -346,8 +348,8 @@ int sclp_service_call(S390CPU *cpu, uint64_t sccb, uint32_t code)
+ 
+     sclp_c->execute(sclp, work_sccb, code);
+ out_write:
+-    cpu_physical_memory_write(sccb, work_sccb,
+-                              be16_to_cpu(work_sccb->h.length));
++    address_space_write(as, sccb, MEMTXATTRS_UNSPECIFIED,
++                        work_sccb, be16_to_cpu(header.length));
+ 
+     sclp_c->service_interrupt(sclp, sccb);
+ 
 -- 
 2.51.0
 
