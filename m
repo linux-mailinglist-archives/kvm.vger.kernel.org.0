@@ -1,86 +1,65 @@
-Return-Path: <kvm+bounces-59169-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-59170-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id D0A60BADC54
-	for <lists+kvm@lfdr.de>; Tue, 30 Sep 2025 17:23:22 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6FB56BADCF6
+	for <lists+kvm@lfdr.de>; Tue, 30 Sep 2025 17:25:55 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4B4963269DF
-	for <lists+kvm@lfdr.de>; Tue, 30 Sep 2025 15:23:22 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 7126719457BE
+	for <lists+kvm@lfdr.de>; Tue, 30 Sep 2025 15:26:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1FC4F30597A;
-	Tue, 30 Sep 2025 15:23:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 993A230597A;
+	Tue, 30 Sep 2025 15:25:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="NJlUN5Xw"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="Sch1TQlO"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.15])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 285F820E334
-	for <kvm@vger.kernel.org>; Tue, 30 Sep 2025 15:23:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A055F2FD1DD;
+	Tue, 30 Sep 2025 15:25:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.15
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1759245795; cv=none; b=U6qryDu77wvkJxm7o040rcXCPf40IzZ06lWr+DmNWdUZRQ5iS3/QnFW55bqyrI//XIfxevjujcyNI3u3zxs2M3WQvCJL5VnX0Nr3HY0w2VnXNzX6L8JzreqFzmHGdLPZ6iLy8N0BKXaaaRKftAQFVStt4gJC1YwOmp2EjP64bgM=
+	t=1759245945; cv=none; b=m3F36iAA/6z/vawYTyk1VToUmyu+KL/dFZ+ELCqkKMYLT7rIx1Zxk8H/aNBT7sweLd95+W3D4Ngl1rZdzwhCOJngZ9X2Dr70KwL5u7/bCwspfqQEa+5RpKW7KjXfpXHCVBtqmO3aSU+qK3tPpqWYRUgAZ8IiIticqBTZ7pr5OAA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1759245795; c=relaxed/simple;
-	bh=kwWN1ojFN23w2IyndKFywgE+0NXKrHOWeVJ1sBs3XHw=;
+	s=arc-20240116; t=1759245945; c=relaxed/simple;
+	bh=HBwQytcSwykONCNxeqm1o0gfZIKOYI96xjSq1aGiaLA=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=QwauMudofmTct0xZ8wMAxb9kzPSSAqeMUKyEnscRvyZV83urjY46vutjqLArb2ezpSkOO4bUOjIGOhKNX/0RWqB9bg+LCqixAudtb+4WVXlGyzlQrY4SSUY9ZHiUCNvMPmfgrIQnlJfcwkpw7zjxFBTpDSD+HrI+DN5RXsdzxDU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=NJlUN5Xw; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1759245792;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=SsuyPtDK6XJK760Eoqkd4wK0OmUB8NIH50EbT0njy7Q=;
-	b=NJlUN5Xwnv+Rq93i7FzWlvQM4VVtDB3r2n1fs1Vg3byKXLxoQG22xSqHt/z8xG0BGkYTne
-	QgZ97DwqADEfrHskO6Q0vl1nYmTbDGDPrBCp54TMA8UDDvAbbe6OOhseByUUFMTWM5TWIj
-	jupNqboHlcPsROaqlg1Fng5sArYtXUo=
-Received: from mail-qk1-f200.google.com (mail-qk1-f200.google.com
- [209.85.222.200]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-173-4mdlOF00Naey-QUubJbLDg-1; Tue, 30 Sep 2025 11:23:10 -0400
-X-MC-Unique: 4mdlOF00Naey-QUubJbLDg-1
-X-Mimecast-MFC-AGG-ID: 4mdlOF00Naey-QUubJbLDg_1759245790
-Received: by mail-qk1-f200.google.com with SMTP id af79cd13be357-829080582b4so1432341985a.0
-        for <kvm@vger.kernel.org>; Tue, 30 Sep 2025 08:23:10 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1759245790; x=1759850590;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=SsuyPtDK6XJK760Eoqkd4wK0OmUB8NIH50EbT0njy7Q=;
-        b=MBIIGiSO3t5ETtIiNx05mBUPQfccAeg+Yv3M4t3i8GzwzbL/xRZn5s9V/waWuCwNXx
-         MgMrNZcfDXKPbHId2vVbtzkIKe6f6ssF+2m3Tkr9lhTXX/68abiEy6wXiOcnEoLqS9uk
-         aozmX632BU9E2Py8dEIYsZAFCd/kxrKAddU7gUBPIDz/gMfrjUTfqQixnj5/J3zy5aez
-         ddH86YRs1a1TnnLsz+zeaw7WjFz5pqYylQ2YDpYnyEjoat99gt+pP7LxXaJub7pLnpdq
-         vA7pVu0zMG0xCTq01N5KMpFywHvIShpI7GQ3KmVjPjvRhn4eGuaxYCLNH7Rtc44k5Va4
-         EI5g==
-X-Forwarded-Encrypted: i=1; AJvYcCXNM/9yz1UcmsG8GrCoPhtndRofAOgkPHiQXyfKrXGyBsh6rxvmWe30W/KPwljRRF+w+j8=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzCR3ToRs7jz8HCL6V4Qv9klIJD10i4xkK5e/3D1yfcb8Mn0mRC
-	AfLeKqC3eHAGi3WACwFTdqNEVSko67l4LFJhP8ax42mJQlEgiQcF/6py7JzWDkep63T3uRNpSre
-	0dFHZaRtibx5XOPLziG1r49HT9zw96AKT9hQOVJG2ekgAOSHxKV23tg==
-X-Gm-Gg: ASbGncvoaH+pT41uvuxkSFvcrl7XYZpqv2L13AQBlsV4zghT3wEjdSylmz0TxC90hn7
-	KCoBVIvZ+2O6wwk5LCQMiPmJUfimtozN3ZlrO/5fxAjDbHyG2DNqtJrgKWpSCYCPQce8VIqKAU2
-	XplMwo6sWQ2QO5J8X9WoimVfU4NjO4vn50CPCCSSebpyw23Er5C4Z5n4y5KFFFASfK9wYsRl26k
-	Yj8XUIPnfPfjuIzaJMLhW59QporMpx1Ds2oOVuOywBuhASl1ELOM00Pdhnyjhory/cLKW9l/RZq
-	niwIlVplkr9BqD4iQcwNCOsp80XgudtmQlBUqFkKjbAFYw==
-X-Received: by 2002:a05:620a:290d:b0:870:66d5:5284 with SMTP id af79cd13be357-87375854bdamr22871485a.51.1759245789811;
-        Tue, 30 Sep 2025 08:23:09 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IHoV0XR/bU5/GBGvKDQ/F8SMF4jsGamSO5DIEeVU6HtXJ5tudJzUxrgoBnOdQayLxjabnl6Gg==
-X-Received: by 2002:a05:620a:290d:b0:870:66d5:5284 with SMTP id af79cd13be357-87375854bdamr22863685a.51.1759245789173;
-        Tue, 30 Sep 2025 08:23:09 -0700 (PDT)
-Received: from [192.168.40.164] ([70.105.235.240])
-        by smtp.gmail.com with ESMTPSA id af79cd13be357-85c28a8a7b5sm1070665585a.26.2025.09.30.08.23.07
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 30 Sep 2025 08:23:08 -0700 (PDT)
-Message-ID: <8e679dad-b16d-45e3-b844-fa30b5a574ee@redhat.com>
-Date: Tue, 30 Sep 2025 11:23:06 -0400
+	 In-Reply-To:Content-Type; b=QoF+3ORe+g37UP4gztToVFieZ/1Nbs0JzoXQzqmrI+zl6YzkvwVwGJmugLA93gby9Ghz/X/raVrAPylIDf0AAd7aeoEk7PUN3ww7MvfC9f0sI6OFQwSz1gVN7IdRAWsTcwsHuKfqYFWst7blZc5lDnXtH2IMJISALXOykBseR/A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=Sch1TQlO; arc=none smtp.client-ip=192.198.163.15
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1759245942; x=1790781942;
+  h=message-id:date:mime-version:subject:to:cc:references:
+   from:in-reply-to:content-transfer-encoding;
+  bh=HBwQytcSwykONCNxeqm1o0gfZIKOYI96xjSq1aGiaLA=;
+  b=Sch1TQlOJGES0fQrAIEKwNy7ncyV6ZP2D+jwvUJ2NYzCaVvsFSFNja9N
+   rcnU0Ax8dkvsnZelIgSKJSV1tIsE5icUE2vjsNAX4Tl2QwIAisx9xpudA
+   TevEVEp5SDqp0pWa/YiQXUps44udB7+u+cRb/yjMM6rreQ/hQRRdY3HZz
+   mPIcTst4uEbcQs6Bdn5VeeWK5oEfujiAD0rGVVlGttAsI4LEzAksKP74f
+   mvIaTdfP19goGr/YAKPw+uCoACWq/wWUDsHNgbLv9qAmc5Nl870AkXhKp
+   5znVLAoKqZhypwMjXGRITWA2dFqWeli+3zyL+XoztSQi4cgBHLWOILF92
+   Q==;
+X-CSE-ConnectionGUID: fNilZaJYSeyQRb6AABDCIw==
+X-CSE-MsgGUID: gfZBVS8QSAWGCD7KvpK87Q==
+X-IronPort-AV: E=McAfee;i="6800,10657,11569"; a="61615114"
+X-IronPort-AV: E=Sophos;i="6.18,304,1751266800"; 
+   d="scan'208";a="61615114"
+Received: from orviesa010.jf.intel.com ([10.64.159.150])
+  by fmvoesa109.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 30 Sep 2025 08:25:42 -0700
+X-CSE-ConnectionGUID: xPIrSchvQRGKByruv3nG5w==
+X-CSE-MsgGUID: l3OvyQB4RciR0OIF1sVnkQ==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.18,304,1751266800"; 
+   d="scan'208";a="177823755"
+Received: from tslove-mobl4.amr.corp.intel.com (HELO [10.125.109.151]) ([10.125.109.151])
+  by orviesa010-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 30 Sep 2025 08:25:41 -0700
+Message-ID: <355ad607-52ed-42cc-9a48-63aaa49f4c68@intel.com>
+Date: Tue, 30 Sep 2025 08:25:40 -0700
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -88,282 +67,365 @@ List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v3 00/11] Fix incorrect iommu_groups with PCIe ACS
+Subject: Re: [PATCH v3 07/16] x86/virt/tdx: Add tdx_alloc/free_page() helpers
+To: Rick Edgecombe <rick.p.edgecombe@intel.com>, kas@kernel.org,
+ bp@alien8.de, chao.gao@intel.com, dave.hansen@linux.intel.com,
+ isaku.yamahata@intel.com, kai.huang@intel.com, kvm@vger.kernel.org,
+ linux-coco@lists.linux.dev, linux-kernel@vger.kernel.org, mingo@redhat.com,
+ pbonzini@redhat.com, seanjc@google.com, tglx@linutronix.de, x86@kernel.org,
+ yan.y.zhao@intel.com, vannapurve@google.com
+Cc: "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>
+References: <20250918232224.2202592-1-rick.p.edgecombe@intel.com>
+ <20250918232224.2202592-8-rick.p.edgecombe@intel.com>
+From: Dave Hansen <dave.hansen@intel.com>
 Content-Language: en-US
-To: Alex Williamson <alex.williamson@redhat.com>
-Cc: Jason Gunthorpe <jgg@nvidia.com>, Bjorn Helgaas <bhelgaas@google.com>,
- iommu@lists.linux.dev, Joerg Roedel <joro@8bytes.org>,
- linux-pci@vger.kernel.org, Robin Murphy <robin.murphy@arm.com>,
- Will Deacon <will@kernel.org>, Lu Baolu <baolu.lu@linux.intel.com>,
- galshalom@nvidia.com, Joerg Roedel <jroedel@suse.de>,
- Kevin Tian <kevin.tian@intel.com>, kvm@vger.kernel.org, maorg@nvidia.com,
- patches@lists.linux.dev, tdave@nvidia.com, Tony Zhu <tony.zhu@intel.com>
-References: <0-v3-8827cc7fc4e0+23f-pcie_switch_groups_jgg@nvidia.com>
- <20250922163947.5a8304d4.alex.williamson@redhat.com>
- <e9d4f76a-5355-4068-a322-a6d5c081e406@redhat.com>
- <20250922200654.1d4ff8b8.alex.williamson@redhat.com>
- <0eb2e721-8b9c-40d0-afe7-c81c6b765f49@redhat.com>
- <20250923162337.5ab1fe89.alex.williamson@redhat.com>
-From: Donald Dutile <ddutile@redhat.com>
-In-Reply-To: <20250923162337.5ab1fe89.alex.williamson@redhat.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+Autocrypt: addr=dave.hansen@intel.com; keydata=
+ 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
+In-Reply-To: <20250918232224.2202592-8-rick.p.edgecombe@intel.com>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 
+On 9/18/25 16:22, Rick Edgecombe wrote:
+...
+> +/*
+> + * The TDX spec treats the registers like an array, as they are ordered
+> + * in the struct. The array size is limited by the number or registers,
+> + * so define the max size it could be for worst case allocations and sanity
+> + * checking.
+> + */
+> +#define MAX_DPAMT_ARG_SIZE (sizeof(struct tdx_module_args) - \
+> +			    offsetof(struct tdx_module_args, rdx))
+> +
+> +/*
+> + * Treat struct the registers like an array that starts at RDX, per
+> + * TDX spec. Do some sanitychecks, and return an indexable type.
+> + */
+> +static u64 *dpamt_args_array_ptr(struct tdx_module_args *args)
+> +{
+> +	WARN_ON_ONCE(tdx_dpamt_entry_pages() > MAX_DPAMT_ARG_SIZE);
+> +
+> +	/*
+> +	 * FORTIFY_SOUCE could inline this and complain when callers copy
+> +	 * across fields, which is exactly what this is supposed to be
+> +	 * used for. Obfuscate it.
+> +	 */
+> +	return (u64 *)((u8 *)args + offsetof(struct tdx_module_args, rdx));
+> +}
 
-note: I removed Joerg's suse email address & Tony's intel address as I keep getting numerous undeliverable emails when those are included in cc:
+There are a lot of ways to to all of this jazz to alias an array over
+the top of a bunch of named structure fields. My worry about this
+approach is that it intentionally tries to hide the underlying type from
+the compiler.
 
-On 9/23/25 6:23 PM, Alex Williamson wrote:
-> On Mon, 22 Sep 2025 22:42:37 -0400
-> Donald Dutile <ddutile@redhat.com> wrote:
-> 
->> On 9/22/25 10:06 PM, Alex Williamson wrote:
->>> On Mon, 22 Sep 2025 21:44:27 -0400
->>> Donald Dutile <ddutile@redhat.com> wrote:
->>>    
->>>> On 9/22/25 6:39 PM, Alex Williamson wrote:
->>>>> On Fri,  5 Sep 2025 15:06:15 -0300
->>>>> Jason Gunthorpe <jgg@nvidia.com> wrote:
->>>>>       
->>>>>> The series patches have extensive descriptions as to the problem and
->>>>>> solution, but in short the ACS flags are not analyzed according to the
->>>>>> spec to form the iommu_groups that VFIO is expecting for security.
->>>>>>
->>>>>> ACS is an egress control only. For a path the ACS flags on each hop only
->>>>>> effect what other devices the TLP is allowed to reach. It does not prevent
->>>>>> other devices from reaching into this path.
->>>>>>
->>>>>> For VFIO if device A is permitted to access device B's MMIO then A and B
->>>>>> must be grouped together. This says that even if a path has isolating ACS
->>>>>> flags on each hop, off-path devices with non-isolating ACS can still reach
->>>>>> into that path and must be grouped gother.
->>>>>>
->>>>>> For switches, a PCIe topology like:
->>>>>>
->>>>>>                                   -- DSP 02:00.0 -> End Point A
->>>>>>     Root 00:00.0 -> USP 01:00.0 --|
->>>>>>                                   -- DSP 02:03.0 -> End Point B
->>>>>>
->>>>>> Will generate unique single device groups for every device even if ACS is
->>>>>> not enabled on the two DSP ports. It should at least group A/B together
->>>>>> because no ACS means A can reach the MMIO of B. This is a serious failure
->>>>>> for the VFIO security model.
->>>>>>
->>>>>> For multi-function-devices, a PCIe topology like:
->>>>>>
->>>>>>                      -- MFD 00:1f.0 ACS not supported
->>>>>>      Root 00:00.00 --|- MFD 00:1f.2 ACS not supported
->>>>>>                      |- MFD 00:1f.6 ACS = REQ_ACS_FLAGS
->>>>>>
->>>>>> Will group [1f.0, 1f.2] and 1f.6 gets a single device group. However from
->>>>>> a spec perspective each device should get its own group, because ACS not
->>>>>> supported can assume no loopback is possible by spec.
->>>>>
->>>>> I just dug through the thread with Don that I think tries to justify
->>>>> this, but I have a lot of concerns about this.  I think the "must be
->>>>> implemented by Functions that support peer-to-peer traffic with other
->>>>> Functions" language is specifying that IF the device implements an ACS
->>>>> capability AND does not implement the specific ACS P2P flag being
->>>>> described, then and only then can we assume that form of P2P is not
->>>>> supported.  OTOH, we cannot assume anything regarding internal P2P of an
->>>>> MFD that does not implement an ACS capability at all.
->>>>>       
->>>> The first, non-IF'd, non-AND'd req in PCIe spec 7.0, section 6.12.1.2 is:
->>>> "ACS P2P Request Redirect: must be implemented by Functions that
->>>> support peer-to-peer traffic with other Functions. This includes
->>>> SR-IOV Virtual Functions (VFs)." There is not further statement about
->>>> control of peer-to-peer traffic, just the ability to do so, or not.
->>>>
->>>> Note: ACS P2P Request Redirect.
->>>>
->>>> Later in that section it says:
->>>> ACS P2P Completion Redirect: must be implemented by Functions that
->>>> implement ACS P2P Request Redirect.
->>>>
->>>> That can be read as an 'IF Request-Redirect is implemented, than ACS
->>>> Completion Request must be implemented. IOW, the Completion Direct
->>>> control is required if Request Redirect is implemented, and not
->>>> necessary if Request Redirect is omitted.
->>>>
->>>> If ACS P2P Require Redirect isn't implemented, than per the first
->>>> requirement for MFDs, the PCIe device does not support peer-to-peer
->>>> traffic amongst its function or virtual functions.
->>>>
->>>> It goes on...
->>>> ACS Direct Translated P2P: must be implemented if the Function
->>>> supports Address Translation Services (ATS) and also peer-to-peer
->>>> traffic with other Functions.
->>>>
->>>> If an MFD does not do peer-to-peer, and P2P Request Redirect would be
->>>> implemented if it did, than this ACS control does not have to be
->>>> implemented either.
->>>>
->>>> Egress control structures are either optional or dependent on Request
->>>> Redirect &/or Direct Translated P2P control, which have been
->>>> addressed above as not needed if on peer-to-peer btwn functions in an
->>>> MFD (and their VFs).
->>>>
->>>>
->>>> Now, if previous PCIe spec versions (which I didn't read & re-read &
->>>> re-read like the 6.12 section of PCIe spec 7.0) had more IF and ANDs,
->>>> than that could be cause for less than clear specmanship enabling
->>>> vendors of MFDs to yield a non-PCIe-7.0 conformant MFD wrt ACS
->>>> structures. I searched section 6.12.1.2 for if/IF and AND/and, and
->>>> did not yield any conditions not stated above.
->>>
->>> Back up to 6.12.1:
->>>
->>>     ACS functionality is reported and managed via ACS Extended Capability
->>>     structures. PCI Express components are permitted to implement ACS
->>>     Extended Capability structures in some, none, or all of their
->>>     applicable Functions. The extent of what is implemented is
->>>     communicated through capability bits in each ACS Extended Capability
->>>     structure. A given Function with an ACS Extended Capability structure
->>>     may be required or forbidden to implement certain capabilities,
->>>     depending upon the specific type of the Function and whether it is
->>>     part of a Multi-Function Device.
->>>    
->> Right, depending on type of function or part of MFD.
->> Maybe I mis-understood your point, or vice-versa:
->> section 6.12.1.2 is for MFDs, and I was only discussing MFD ACS structs.
->> I did not mean to imply the sections I was quoting was for anything but an MFD.
-> 
-> I'm really going after the first half of that last sentence rather than
-> any specific device type:
-> 
->    A given Function with an ACS Extended Capability structure may be
->    required or forbidden to implement certain capabilities...
-> 
-> "...[WITH] an ACS Extended Capbility structure..."
-> 
-> "implement certain capabilities" is referring to the capabilities
-> exposed within the capability register of the overall ACS extended
-> capability structure.
-> 
-> Therefore when section 6.12.1.2 goes on to say:
-> 
->    ACS P2P Request Redirect: must be implemented by Functions that
->    support peer-to-peer traffic with other Functions.
-> 
-> This is saying this type of function _with_ an ACS extended capability
-> (carrying forward from 6.12.1) must implement the p2p RR bit of the ACS
-> capability register (a specific bit within the register, not the ACS
-> extended capability) if it is capable of p2p traffic with other
-> functions.  We can only infer the function is not capable of p2p traffic
-> with other functions if it both implements an ACS extended capability
-> and the p2p RR bit of the capability register is zero.
-> 
->>> What you're quoting are the requirements for the individual p2p
->>> capabilities IF the ACS extended capability is implemented.
->>>    
->> No, I'm not.  I'm quoting 6.12.1.2, which is MFD-specific.
->>
->>> Section 6.12.1.1 describing ACS for downstream ports begins:
->>>
->>>     This section applies to Root Ports and Switch Downstream Ports
->>>    that implement an ACS Extended Capability structure.
->>>
->>> Section 6.12.1.2 for SR-IOV, SIOV and MFDs begins:
->>>
->>>     This section applies to Multi-Function Device ACS Functions,
->>>    with the exception of Downstream Port Functions, which are
->>>    covered in the preceding section.
->>>    
->> Right.  I wasn't discussing Downstream port functions.
->>
->>> While not as explicit, what is a Multi-Function Device ACS Function
->>>    if not a function of a MFD that implements ACS?
->>>    
->> I think you are inferring too much into that less-than-optimally
->>    worded section.
->>
->>>>> I believe we even reached agreement with some NIC vendors in the
->>>>> early days of IOMMU groups that they needed to implement an
->>>>>    "empty" ACS capability on their multifunction NICs such that
->>>>>    they could describe in this way that internal P2P is not
->>>>>    supported by the device.  Thanks,
->>>> In the early days -- gen1->gen3 (2009->2015) I could see that
->>>> happening. I think time (a decade) has closed those defaults to
->>>> less-common quirks. If 'empty ACS' is how they liked to do it back
->>>> than, sure. [A definition of empty ACS may be needed to fully
->>>> appreciate that statement, though.] If this patch series needs to
->>>> support an 'empty ACS' for this older case, let's add it now, or
->>>> follow-up with another fix.
->>>
->>> An "empty" ACS capability is an ACS extended capability where the
->>>    ACS capability register reads as zero, precisely to match the
->>>    spec in indicating that the device does not support p2p.  Again,
->>>    I don't see how time passing plays a role here.  A MFD must
->>>    implement ACS to infer anything about internal p2p behavior.
->>>      
->> Again, I don't read the 'must' in the spec.
->> Although I'll agree that your definition of an empty ACS makes it
->>    unambiguous.
->>
->>>> In summary, I still haven't found the IF and AND you refer to in
->>>> section 6.12.1.2 for MFDs, so if you want to quote those sections I
->>>> mis-read, or mis-interpreted their (subtle?) existence, than I'm
->>>>    not immovable on the spec interpretation.
->>>
->>> As above, I think it's covered by 6.12.1 and the introductory
->>>    sentence of 6.12.1.2 defining the requirements for ACS functions.
->>>     Thanks,
->> 6.12.1 is not specific enough about what MFDs must or must not
->>    support; it's a broad description of ACS in different PCIe
->>    functions. As for 6.12.1.2, I stand by the statement that ACS P2P
->>    Request Redirect must be implemented if peer-to-peer is implemented
->>    in an MFD. It's not inferred, it's not unambiguous.
->> You are intepreting the first sentence in 6.12.1.2 as indirectly
->>    saying that the reqs only apply to an MFD with ACS.  The title of
->>    the section is: "ACS Functions in SR-IOV, SIOV, and Multi-Function
->>    Devices"  not ACS requirements for ACS-controlled SR-IOV, SIOV, and
->>    Multi-Function Devices", in which case, I could agree with the
->>    interpretation you gave of that first sentence.
->>
->> I think it's time to reach out to the PCI-SIG, and the authors of
->>    this section to dissect these interpretations and get some clarity.
-> 
-> You're welcome to.  I think it's sufficiently clear.
-> 
-> The specification is stating that if a function exposes an ACS extended
-> capability and the function supports p2p with other functions, it must
-> implement that specific bit in the ACS capability register of the ACS
-> extended capability.
-> 
-> Therefore if the function implements an ACS extended capability and
-> does not implement this bit in the ACS capability register, we can
-> infer that the device does is not capable of p2p with other functions.
-> It would violate the spec otherwise.
-> 
-> However, if the function does not implement an ACS extended capability,
-> we can infer nothing.
-> 
-> It's logically impossible for the specification to add an optional
-> extended capability where the lack of a function implementing the
-> extended capability implies some specific behavior.  It's not backwards
-> compatible, which is a fundamental requirement of the PCI spec.  Thanks,
-> 
-> Alex
-> 
-This is boiling down to an interpretation of the spec.
+It could be done with a bunch of union/struct voodoo like 'struct page':
 
-If the latest PCI-v7 spec is not backward compatible, that a function within an MFD
-not having an ACS struct must not be isolated from other functions within the MFD without an ACS struct,
-then the current Linux implementation/interpretation, and the need for the acs quirks
-when hw vendors improperly omit the ACS structure, is the safest/secure route to go.
+struct tdx_module_args {
+	u64 rcx;
+	union {
+		struct {
+			u64 rdx;
+			u64 r8;
+			u64 r9;
+			...
+		};
+		u64 array[FOO];
+	};
+}
 
-Historical/legacy implementations of MFDs without ACS structs have bolstered that
-position/interpretation/agreed-to-required-acs-quicks implementation.
-The small number of acs quirks also seems to support that past interpretation.
+Or a separate structure:
 
-I believe a definitive answer from the PCI-SIG would be best, especially wrt
-backward compatibility.  Such a review & feedback is likely to take quite some
-time.  Thus, taking the current-conservative approach for omitted ACS structs for
-MFD functions would allow this series to progress with the numerous other bug-fixes
-that are needed, with a minor change to the MFD iommu-group check/creation function
-to use acs-quirks to create better isolation groups if a hw vendor interprets and
-implements no ACS as having no p2p connectivity.
+struct tdx_module_array_args {
+	u64 rcx;
+	u64 array[FOO];
+};
 
-- Don
+So that you could do something simpler:
 
+u64 *dpamt_args_array_ptr(struct tdx_module_args *args)
+{
+	return ((struct tdx_module_array_args *)args)->array;
+}
+
+Along with one of these somewhere:
+
+BUILD_BUG_ON(sizeof(struct tdx_module_array_args) !=
+	     sizeof(struct tdx_module_array));
+
+I personally find the offsetof() tricks to be harder to follow than
+either of those.
+
+> +static int alloc_pamt_array(u64 *pa_array)
+> +{
+> +	struct page *page;
+> +
+> +	for (int i = 0; i < tdx_dpamt_entry_pages(); i++) {
+> +		page = alloc_page(GFP_KERNEL);
+> +		if (!page)
+> +			return -ENOMEM;
+> +		pa_array[i] = page_to_phys(page);
+> +	}
+> +
+> +	return 0;
+> +}
+> +
+> +static void free_pamt_array(u64 *pa_array)
+> +{
+> +	for (int i = 0; i < tdx_dpamt_entry_pages(); i++) {
+> +		if (!pa_array[i])
+> +			break;
+> +
+> +		reset_tdx_pages(pa_array[i], PAGE_SIZE);
+
+One nit: this reset is unnecessary in the error cases here where the
+array never gets handed to the TDX module. Right?
+
+> +		/*
+> +		 * It might have come from 'prealloc', but this is an error
+> +		 * path. Don't be fancy, just free them. TDH.PHYMEM.PAMT.ADD
+> +		 * only modifies RAX, so the encoded array is still in place.
+> +		 */
+> +		__free_page(phys_to_page(pa_array[i]));
+> +	}
+> +}
+> +
+> +/*
+> + * Add PAMT memory for the given HPA. Return's negative error code
+> + * for kernel side error conditions (-ENOMEM) and 1 for TDX Module
+> + * error. In the case of TDX module error, the return code is stored
+> + * in tdx_err.
+> + */
+> +static u64 tdh_phymem_pamt_add(unsigned long hpa, u64 *pamt_pa_array)
+> +{
+> +	struct tdx_module_args args = {
+> +		.rcx = hpa,
+> +	};
+> +	u64 *args_array = dpamt_args_array_ptr(&args);
+> +
+> +	WARN_ON_ONCE(!IS_ALIGNED(hpa & PAGE_MASK, PMD_SIZE));
+> +
+> +	/* Copy PAMT page PA's into the struct per the TDX ABI */
+> +	memcpy(args_array, pamt_pa_array,
+> +	       tdx_dpamt_entry_pages() * sizeof(*args_array));
+
+This uses 'sizeof(*args_array)'.
+
+> +	return seamcall(TDH_PHYMEM_PAMT_ADD, &args);
+> +}
+> +
+> +/* Remove PAMT memory for the given HPA */
+> +static u64 tdh_phymem_pamt_remove(unsigned long hpa, u64 *pamt_pa_array)
+> +{
+> +	struct tdx_module_args args = {
+> +		.rcx = hpa,
+> +	};
+> +	u64 *args_array = dpamt_args_array_ptr(&args);
+> +	u64 ret;
+> +
+> +	WARN_ON_ONCE(!IS_ALIGNED(hpa & PAGE_MASK, PMD_SIZE));
+> +
+> +	ret = seamcall_ret(TDH_PHYMEM_PAMT_REMOVE, &args);
+> +	if (ret)
+> +		return ret;
+> +
+> +	/* Copy PAMT page PA's out of the struct per the TDX ABI */
+> +	memcpy(pamt_pa_array, args_array,
+> +	       tdx_dpamt_entry_pages() * sizeof(u64));
+
+While this one is sizeof(u64).
+
+Could we make it consistent, please?
+
+
+> +/* Serializes adding/removing PAMT memory */
+> +static DEFINE_SPINLOCK(pamt_lock);
+> +
+> +/* Bump PAMT refcount for the given page and allocate PAMT memory if needed */
+> +int tdx_pamt_get(struct page *page)
+> +{
+> +	unsigned long hpa = ALIGN_DOWN(page_to_phys(page), PMD_SIZE);
+> +	u64 pamt_pa_array[MAX_DPAMT_ARG_SIZE];
+> +	atomic_t *pamt_refcount;
+> +	u64 tdx_status;
+> +	int ret;
+> +
+> +	if (!tdx_supports_dynamic_pamt(&tdx_sysinfo))
+> +		return 0;
+> +
+> +	ret = alloc_pamt_array(pamt_pa_array);
+> +	if (ret)
+> +		return ret;
+> +
+> +	pamt_refcount = tdx_find_pamt_refcount(hpa);
+> +
+> +	scoped_guard(spinlock, &pamt_lock) {
+> +		if (atomic_read(pamt_refcount))
+> +			goto out_free;
+> +
+> +		tdx_status = tdh_phymem_pamt_add(hpa | TDX_PS_2M, pamt_pa_array);
+> +
+> +		if (IS_TDX_SUCCESS(tdx_status)) {
+> +			atomic_inc(pamt_refcount);
+> +		} else {
+> +			pr_err("TDH_PHYMEM_PAMT_ADD failed: %#llx\n", tdx_status);
+> +			goto out_free;
+> +		}
+
+I'm feeling like the states here are under-commented.
+
+	1. PAMT already allocated
+	2. 'pamt_pa_array' consumed, bump the refcount
+	3. TDH_PHYMEM_PAMT_ADD failed
+
+#1 and #3 need to free the allocation.
+
+Could we add comments to that effect, please?
+
+> +	}
+
+This might get easier to read if the pr_err() gets dumped in
+tdh_phymem_pamt_add() instead.
+
+> +	return ret;
+> +out_free:
+> +	free_pamt_array(pamt_pa_array);
+> +	return ret;
+> +}
+> +EXPORT_SYMBOL_GPL(tdx_pamt_get);
+> +
+> +/*
+> + * Drop PAMT refcount for the given page and free PAMT memory if it is no
+> + * longer needed.
+> + */
+> +void tdx_pamt_put(struct page *page)
+> +{
+> +	unsigned long hpa = ALIGN_DOWN(page_to_phys(page), PMD_SIZE);
+> +	u64 pamt_pa_array[MAX_DPAMT_ARG_SIZE];
+> +	atomic_t *pamt_refcount;
+> +	u64 tdx_status;
+> +
+> +	if (!tdx_supports_dynamic_pamt(&tdx_sysinfo))
+> +		return;
+> +
+> +	hpa = ALIGN_DOWN(hpa, PMD_SIZE);
+> +
+> +	pamt_refcount = tdx_find_pamt_refcount(hpa);
+> +
+> +	scoped_guard(spinlock, &pamt_lock) {
+> +		if (!atomic_read(pamt_refcount))
+> +			return;
+> +
+> +		tdx_status = tdh_phymem_pamt_remove(hpa | TDX_PS_2M, pamt_pa_array);
+> +
+> +		if (IS_TDX_SUCCESS(tdx_status)) {
+> +			atomic_dec(pamt_refcount);
+> +		} else {
+> +			pr_err("TDH_PHYMEM_PAMT_REMOVE failed: %#llx\n", tdx_status);
+> +			return;
+> +		}
+> +	}
+> +
+> +	free_pamt_array(pamt_pa_array);
+> +}
+> +EXPORT_SYMBOL_GPL(tdx_pamt_put);
+
+It feels like there's some magic in terms of how the entire contents of
+pamt_pa_array[] get zeroed so that this ends up being safe.
+
+Could that get commented, please?
+
+> +/* Allocate a page and make sure it is backed by PAMT memory */
+
+This comment is giving the "what" but is weak on the "why". Could we add
+this?
+
+	This ensures that the page can be used as TDX private
+	memory and obtain TDX protections.
+
+> +struct page *tdx_alloc_page(void)
+> +{
+> +	struct page *page;
+> +
+> +	page = alloc_page(GFP_KERNEL);
+> +	if (!page)
+> +		return NULL;
+> +
+> +	if (tdx_pamt_get(page)) {
+> +		__free_page(page);
+> +		return NULL;
+> +	}
+> +
+> +	return page;
+> +}
+> +EXPORT_SYMBOL_GPL(tdx_alloc_page);
+> +
+> +/* Free a page and release its PAMT memory */
+
+Also:
+
+	After this, the page is can no longer be protected by TDX.
+
+> +void tdx_free_page(struct page *page)
+> +{
+> +	if (!page)
+> +		return;
+> +
+> +	tdx_pamt_put(page);
+> +	__free_page(page);
+> +}
+> +EXPORT_SYMBOL_GPL(tdx_free_page);
+> diff --git a/arch/x86/virt/vmx/tdx/tdx.h b/arch/x86/virt/vmx/tdx/tdx.h
+> index 82bb82be8567..46c4214b79fb 100644
+> --- a/arch/x86/virt/vmx/tdx/tdx.h
+> +++ b/arch/x86/virt/vmx/tdx/tdx.h
+> @@ -46,6 +46,8 @@
+>  #define TDH_PHYMEM_PAGE_WBINVD		41
+>  #define TDH_VP_WR			43
+>  #define TDH_SYS_CONFIG			45
+> +#define TDH_PHYMEM_PAMT_ADD		58
+> +#define TDH_PHYMEM_PAMT_REMOVE		59
+>  
+>  /*
+>   * SEAMCALL leaf:
 
 
