@@ -1,54 +1,54 @@
-Return-Path: <kvm+bounces-59097-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-59098-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id E0B55BABE04
-	for <lists+kvm@lfdr.de>; Tue, 30 Sep 2025 09:44:37 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 989B3BABE46
+	for <lists+kvm@lfdr.de>; Tue, 30 Sep 2025 09:48:18 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id DF84D1926120
-	for <lists+kvm@lfdr.de>; Tue, 30 Sep 2025 07:44:59 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4B91916DC80
+	for <lists+kvm@lfdr.de>; Tue, 30 Sep 2025 07:48:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 86FFA219303;
-	Tue, 30 Sep 2025 07:44:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A08CC24168D;
+	Tue, 30 Sep 2025 07:48:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="I+qJ5cUP"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="VEb6B3/V"
 X-Original-To: kvm@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9154D29E116;
-	Tue, 30 Sep 2025 07:44:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BF33F33F6;
+	Tue, 30 Sep 2025 07:48:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1759218267; cv=none; b=M6LO83tcoyyPuPU6svoVpF7q3jsjwA4iIsdaMroVPFJp4mM1/gby1yPQjQiA12JjGqSR6xr/2Qkwx/GXWOF3btdcb88rakUPEmL31PcDbuPtRGw3wOOp6AgSHScjKP5elFmk3VjD5VgAUE28G8oaINWC8JXhZ5B3tVnsvYju7Lo=
+	t=1759218491; cv=none; b=cH/oUSLsl/UPohoo5wGkOWUK9bUmLtB45T5OHchx8VoYAZ9cLcm+IueWfuNY0/e1qEaj7iI8BUv/zrkQWc1G+zZFLWFB0vx0Mp1ITBKwVBGjnCyCkayyOQ/Fak5VsDojApc6YWl2m9fnKVONT31y3by3fYeJ6eG3vOvvx24z6yw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1759218267; c=relaxed/simple;
-	bh=8/Vy0IpBdnBl3FqITdTg6fXAw6N3XdQbwsG+l9Eo8mQ=;
+	s=arc-20240116; t=1759218491; c=relaxed/simple;
+	bh=4T+XQXD3LHjmczUTO39ClqL11skFL4B6shLS9cZAwxg=;
 	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=kAnUTwWjJndzhTQC1mHg0MD9Kmq+aJE57FITqVFj8v8kQFKVy3vuj/xmq9ZkYhztRh6yTmPnFJa76J2TNRU1QInjhMv02wzI1vyes8Hwgj83ieRaUOwWJ7lNSQ4Ixyepw3Ve0idL0Bvt2peXEVsjkb27SEN+r6OKCyQaIIgl92g=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=I+qJ5cUP; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1F3D3C4CEF0;
-	Tue, 30 Sep 2025 07:44:27 +0000 (UTC)
+	 MIME-Version:Content-Type; b=PoVilRfzzpXn57QZmnnjH1N9gqnXVHxZK6U8VF9y+fo7jRFLV1HyYuw47u5Sa8LT4ICvvnlJGpRXiFtXtY/78tmIpwNPswgH+TqD+nuUUlA7ZN6+NyeO/SUyyEFAh5P6eX+PrHOe/IZR9nFpYGOd3EMuf2tW6XFJQYRMl4Ynmcc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=VEb6B3/V; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 59F20C4CEF0;
+	Tue, 30 Sep 2025 07:48:11 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1759218267;
-	bh=8/Vy0IpBdnBl3FqITdTg6fXAw6N3XdQbwsG+l9Eo8mQ=;
+	s=k20201202; t=1759218491;
+	bh=4T+XQXD3LHjmczUTO39ClqL11skFL4B6shLS9cZAwxg=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=I+qJ5cUPYt9zuzbo3fVNhdOCGiIJeWqXPLm8P121Hi3fEM4gLQ9Uc4HUM9JggJZrJ
-	 AOYTlWZz/qprgsasmnH+PE4GGRDc7oioJ1laPXjGKuNUA21CyawfZ7azyZzdZ/CPNj
-	 H3dXhezGRebrLbcYm1HwChXGdMChBxPnwrlKMHQgRhwXZeupXYPMW4VXmolt5EjEqN
-	 C5BTIwItLLankmAr4YDD4GqCza9i2kdgbCStkM7/qCprmprAN9UdO9hv2MWieNYp1J
-	 bSP5fXqYEpTtKaBMMfUAH34bz40isnMzCtPOmQ7gZny/vM0eDvHjLdU8tuX1QkQ9Tb
-	 DlvuhrHU+XQ3w==
+	b=VEb6B3/VJCPnNK82slvGZUWFmpJmpyI1qBH3M/UFtekDuEB5dYj3Bh2HmPpUDQWG2
+	 FUuOEQuna1z47W2eRq9cT8S7UgGr6SRNHaDXYLg/DKpH2UH2mcZFO7Jx5Z6zoTOx4B
+	 YvGLdTnc2DzGGnI9FVZwFYJ/2I4PcIZCiW1KgRyDSb7yRYQsC/qOAcOQo5hgIY0PfE
+	 +9uc9WIHYYprNuQIprPEv1V5Dj3FEN2xoBH93sWfRRIeVQ/ot9a0PUDW+cBSsizW/5
+	 3G67FiEx+g9yi2ZPclLFzE7Obfo/dgzm/iFUCduaIr8jI6HAukBoGnqxx3B/i3w84g
+	 hJeL8R5oNmVbw==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.98.2)
 	(envelope-from <maz@kernel.org>)
-	id 1v3V28-0000000ASrQ-2v5h;
-	Tue, 30 Sep 2025 07:44:24 +0000
-Date: Tue, 30 Sep 2025 08:44:24 +0100
-Message-ID: <86zfacz8o7.wl-maz@kernel.org>
+	id 1v3V5l-0000000ASwF-0Ixc;
+	Tue, 30 Sep 2025 07:48:09 +0000
+Date: Tue, 30 Sep 2025 08:48:08 +0100
+Message-ID: <86y0pwz8hz.wl-maz@kernel.org>
 From: Marc Zyngier <maz@kernel.org>
 To: Oliver Upton <oliver.upton@linux.dev>
 Cc: kvmarm@lists.linux.dev,
@@ -57,11 +57,11 @@ Cc: kvmarm@lists.linux.dev,
 	Joey Gouly <joey.gouly@arm.com>,
 	Suzuki K Poulose <suzuki.poulose@arm.com>,
 	Zenghui Yu <yuzenghui@huawei.com>
-Subject: Re: [PATCH 01/13] KVM: arm64: Hide CNTHV_*_EL2 from userspace for nVHE guests
-In-Reply-To: <aNslu47Dl13iNcaL@linux.dev>
+Subject: Re: [PATCH 05/13] KVM: arm64: Add timer UAPI workaround to sysreg infrastructure
+In-Reply-To: <aNsnHUTaHgrql07j@linux.dev>
 References: <20250929160458.3351788-1-maz@kernel.org>
-	<20250929160458.3351788-2-maz@kernel.org>
-	<aNslu47Dl13iNcaL@linux.dev>
+	<20250929160458.3351788-6-maz@kernel.org>
+	<aNsnHUTaHgrql07j@linux.dev>
 User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
  FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
  (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
@@ -77,76 +77,53 @@ X-SA-Exim-Rcpt-To: oliver.upton@linux.dev, kvmarm@lists.linux.dev, linux-arm-ker
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Tue, 30 Sep 2025 01:35:07 +0100,
+On Tue, 30 Sep 2025 01:41:01 +0100,
 Oliver Upton <oliver.upton@linux.dev> wrote:
 > 
-> Hey,
-> 
-> On Mon, Sep 29, 2025 at 05:04:45PM +0100, Marc Zyngier wrote:
-> > Although we correctly UNDEF any CNTHV_*_EL2 access from the guest
-> > when E2H==0, we still expose these registers to userspace, which
-> > is a bad idea.
+> On Mon, Sep 29, 2025 at 05:04:49PM +0100, Marc Zyngier wrote:
+> > Amongst the numerous bugs that plague the KVM/arm64 UAPI, one of
+> > the most annoying thing is that the userspace view of the virtual
+> > timer has its CVAL and CNT encodings swapped.
 > > 
-> > Drop the ad-hoc UNDEF injection and switch to a .visibility()
-> > callback which will also hide the register from userspace.
+> > In order to reduce the amount of code that has to know about this,
+> > start by adding handling for this bug in the sys_reg code.
 > > 
-> > Fixes: 0e45981028550 ("KVM: arm64: timer: Don't adjust the EL2 virtual timer offset")
+> > Nothing is making use of it yet, as the code responsible for userspace
+> > interaction is catching the accesses early.
+> > 
 > > Signed-off-by: Marc Zyngier <maz@kernel.org>
 > > ---
-> >  arch/arm64/kvm/sys_regs.c | 26 +++++++++++++-------------
-> >  1 file changed, 13 insertions(+), 13 deletions(-)
+> >  arch/arm64/kvm/sys_regs.c | 33 ++++++++++++++++++++++++++++++---
+> >  arch/arm64/kvm/sys_regs.h |  6 ++++++
+> >  2 files changed, 36 insertions(+), 3 deletions(-)
 > > 
 > > diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-> > index ee8a7033c85bf..9f2f4e0b042e8 100644
+> > index 9f2f4e0b042e8..8e6f50f54b4bf 100644
 > > --- a/arch/arm64/kvm/sys_regs.c
 > > +++ b/arch/arm64/kvm/sys_regs.c
-> > @@ -1594,16 +1594,6 @@ static bool access_arch_timer(struct kvm_vcpu *vcpu,
-> >  	return true;
+> > @@ -5231,15 +5231,28 @@ static int demux_c15_set(struct kvm_vcpu *vcpu, u64 id, void __user *uaddr)
+> >  	}
 > >  }
 > >  
-> > -static bool access_hv_timer(struct kvm_vcpu *vcpu,
-> > -			    struct sys_reg_params *p,
-> > -			    const struct sys_reg_desc *r)
-> > -{
-> > -	if (!vcpu_el2_e2h_is_set(vcpu))
-> > -		return undef_access(vcpu, p, r);
-> > -
-> > -	return access_arch_timer(vcpu, p, r);
-> > -}
-> > -
-> >  static s64 kvm_arm64_ftr_safe_value(u32 id, const struct arm64_ftr_bits *ftrp,
-> >  				    s64 new, s64 cur)
-> >  {
-> > @@ -2831,6 +2821,16 @@ static unsigned int s1pie_el2_visibility(const struct kvm_vcpu *vcpu,
-> >  	return __el2_visibility(vcpu, rd, s1pie_visibility);
-> >  }
-> >  
-> > +static unsigned int cnthv_visibility(const struct kvm_vcpu *vcpu,
-> > +				     const struct sys_reg_desc *rd)
+> > +static u64 kvm_one_reg_to_id(const struct kvm_one_reg *reg)
 > > +{
-> > +	if (vcpu_has_nv(vcpu) &&
-> > +	    !vcpu_has_feature(vcpu, KVM_ARM_VCPU_HAS_EL2_E2H0))
-> > +		return 0;
-> > +
-> > +	return REG_HIDDEN;
+> > +	switch(reg->id) {
+> > +	case KVM_REG_ARM_TIMER_CVAL:
+> > +		return TO_ARM64_SYS_REG(CNTV_CVAL_EL0);
+> > +	case KVM_REG_ARM_TIMER_CNT:
+> > +		return TO_ARM64_SYS_REG(CNTVCT_EL0);
+> > +	default:
+> > +		return reg->id;
+> > +	}
 > > +}
+> > +
 > 
-> Hmm. We've already exposed these to userspace at this point, we just
-> conveniently last the get-reg-list test to assert the accessibility of
-> these (broken) exposures.
-> 
-> Given the amount of UAPI mishaps we've had with registers in the past I
-> don't have much appetite for taking away something we already
-> advertised.
-> 
-> What about making these RAZ/WI from userspace?
+> Seems like a good spot to name n' blame the commit that introduced this
+> bug as a comment.
 
-Honestly, I don't think we should bother.
-
-The only VMM supporting NV is QEMU, and it explicitly isn't able to
-select E2H0. I'm happy to Cc stable on this, but worrying about nVHE
-save/restore at this stage seems like an overreaction -- I'm pretty
-sure NV save/restore is generally broken in many more ways.
+Sure. That'd be 39735a3a39043 ("ARM/KVM: save and restore generic
+timer registers"), but that's also the first time save/restore was
+implemented at all, and there wasn't a sane version before that.
 
 Thanks,
 
