@@ -1,242 +1,184 @@
-Return-Path: <kvm+bounces-59091-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-59092-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 08F4ABABC93
-	for <lists+kvm@lfdr.de>; Tue, 30 Sep 2025 09:21:29 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7176BBABCD5
+	for <lists+kvm@lfdr.de>; Tue, 30 Sep 2025 09:23:56 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A96E81C2A48
-	for <lists+kvm@lfdr.de>; Tue, 30 Sep 2025 07:21:28 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 1D11D7A1846
+	for <lists+kvm@lfdr.de>; Tue, 30 Sep 2025 07:22:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E621724C068;
-	Tue, 30 Sep 2025 07:21:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7B7C6242D8B;
+	Tue, 30 Sep 2025 07:23:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="vTs8gwfv"
 X-Original-To: kvm@vger.kernel.org
-Received: from mxct.zte.com.cn (mxct.zte.com.cn [183.62.165.209])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f41.google.com (mail-wm1-f41.google.com [209.85.128.41])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B99981EBA14;
-	Tue, 30 Sep 2025 07:21:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=183.62.165.209
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 69A5723182D
+	for <kvm@vger.kernel.org>; Tue, 30 Sep 2025 07:23:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.41
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1759216880; cv=none; b=G3Gu7COqJ1sqhNAHxk40ZuwJsEjxsW2D2vHARsCnZckR67lbhd2KToRcy+dlJ8stAn9+qWBom/nYlcsWVVWOJlITf98663KW9JGJ7orVS4af6wcQ6DimknlnbH/h4VjJ+jSVLcmqb2QEZJW97LDdMZP/eC3xeTvFTz9nIF9KRKU=
+	t=1759217025; cv=none; b=gXt0m+EVBP6EmyEtqTDBXpYsidJ8PZtun/epgsrPRnEHD+T0Mb212hGDzb+H7C2gwE9VXse/oeGnj1ePU7jTNPbSgrFzl+nMWeEGmk1ABVOL0d1O3QolQyDEWSHsJXxl4P+j5cR8412DzpupRqPuqK0rAViPLfklgu+puNRzT7E=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1759216880; c=relaxed/simple;
-	bh=gd5AM5kFPFHwXr9afj5JmD2qql1PiKMI8relNGBh+F8=;
-	h=Date:Message-ID:Mime-Version:From:To:Cc:Subject:Content-Type; b=A9R7EiK42H6r4nmqWEjiqWGZmS/mmziVm9RuUGok4XO0LSiCF32i2FdxPI/kpluPcETf0MNTDQNrhiSmUUhNGDhH4yAflSsHOOTGdpgSqi07LpqcyqpaOiN9NE/tzWDqD7r9yBjIrN47id41bPylOkZBcP3M+hy5Ic+RItGSWMo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=zte.com.cn; spf=pass smtp.mailfrom=zte.com.cn; arc=none smtp.client-ip=183.62.165.209
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=zte.com.cn
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=zte.com.cn
-Received: from mse-fl2.zte.com.cn (unknown [10.5.228.133])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange x25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mxct.zte.com.cn (FangMail) with ESMTPS id 4cbTxW60Stz4xNt3;
-	Tue, 30 Sep 2025 15:21:03 +0800 (CST)
-Received: from xaxapp05.zte.com.cn ([10.99.98.109])
-	by mse-fl2.zte.com.cn with SMTP id 58U7Kqll028593;
-	Tue, 30 Sep 2025 15:20:52 +0800 (+08)
-	(envelope-from liu.xuemei1@zte.com.cn)
-Received: from mapi (xaxapp02[null])
-	by mapi (Zmail) with MAPI id mid32;
-	Tue, 30 Sep 2025 15:20:54 +0800 (CST)
-Date: Tue, 30 Sep 2025 15:20:54 +0800 (CST)
-X-Zmail-TransId: 2afa68db84d67a6-a6dcc
-X-Mailer: Zmail v1.0
-Message-ID: <202509301520545960_jMIljfZY7bMHBkBbaHR@zte.com.cn>
+	s=arc-20240116; t=1759217025; c=relaxed/simple;
+	bh=WfocPMJ6djbM57riOWqw2dhHOkBuexya4hwwR7Zxq9w=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=BhjgRG5f6YCrCZALJqNz69eytM9lVRJaLgcX+8X+vrdGvKnWnqd5VAvuSWExjgKr/bZETJuJkokrLxTRkYPIS9TvOi4/gzn/q7SxKuRUO4ONwc8uDRmcqTMynxbsx5TRN5Gbwd0RBY7lQyhkz98HvpJ9ThxSpvEhMek+4siSgk0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=vTs8gwfv; arc=none smtp.client-ip=209.85.128.41
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
+Received: by mail-wm1-f41.google.com with SMTP id 5b1f17b1804b1-46e414f90ceso6518845e9.0
+        for <kvm@vger.kernel.org>; Tue, 30 Sep 2025 00:23:43 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google; t=1759217022; x=1759821822; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=itVX7tgCqZhn3DDR7jTxWGvfg+OOdlBPano0M6bAsBg=;
+        b=vTs8gwfvoTl77R8QAVW6E9pSCyEKb/XgXSaW5FYbCErjTiDLQgd3vUCsfZ4vD3HSPu
+         EFHZA95ij6IuOTzCvMNVP6ZBbzX0BtKrj4qtmHz7xnR/4mK/cFodKrOYhNembg2UGjMS
+         ViHOMxzK/Q5dC9sq/akRUM+1k5z35UIpdIpke2gn+syE8KtCaMrfjfIweI7YwzWCX1ot
+         +jjE98pF6C7Ly3w6RJJdYdYqLU2/XB7vgc7R12pbJo/TgRQ12SH0GsM4jxV7gdwhK1ln
+         APcyENzb7lCrcDke315PNlAdI61tEdL2XSw2JW0WcxN2bh9FYozCBEncrQ0rY2lzBdf3
+         QCsg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1759217022; x=1759821822;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=itVX7tgCqZhn3DDR7jTxWGvfg+OOdlBPano0M6bAsBg=;
+        b=LVhMn9MlrS9MhyoQW/vmX2lB63kAkKQgAg/8H0UBC1CppAywtdPQIbhR9hkRpbV4X9
+         BJ4JHsEHB/2aIdFR5PkOwMN+IP9NW8YnEttJy7y8VhYV6CdaJ3aQxh4TGW30FcUQOAH/
+         RDcRRHk+5GcHUpfE+/WgzN19qEyfmpDwJ57Q68LNe3sAwEaYOnCcTbKZTiShQMV6bFPn
+         SKsVH0uLDyzc5aEQcYUDoo5R3sA5KeAxbD94P1L0P1mL18Btk5CszqyL6Azr1eUAtW5L
+         4JHc7A6Kkr0vJo/h3U5BnU24xeDC2WX8mbIJYnemZNTcTkTddVbk0P3vmKe36jDCSxg8
+         uwmA==
+X-Forwarded-Encrypted: i=1; AJvYcCWhoaIIQue0v8+b1j9nq20/lVzcBoQ4i+BaNaukWeYcm1rjAnBRJKbh3FiI6M7EFC7RLMs=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwSV1H+IMOjzrDN7YhNx7cZXDvxHbjjhR4CnalrNy5fqnQ0XWK1
+	rayUJP+tkVii8lDPCu3ejTkrFPMgH1Xf0oNPY91OaWwvJInNbSIouXjKtSrKmnYSHYzTUVD+V4y
+	YncJJ7LrEAg==
+X-Gm-Gg: ASbGncuYSfzkp2qVwQglx5PmFqzajTeDU8NMB1OTlRHV1kixkgKp9J/qNwLiG81dDON
+	mecOKX69BYU3TpsDwoBC3IdcxVU3cea770GsfDaI+hHRNKCXE0svUtpwVhacTyKww8QxtwSTXep
+	SxAQf3oydL4nXzYGNTeXuCvsXnJ/xnVSRueaDpkID8132A4kyNbsQNvaXx8Y3xTqiblQ4G6rnRU
+	qnqEoJjZ2PSthsJr7uEQEg2qhXabbOqwjFxDBe+W3rKyfcI5fvFHQqrHqFYPUj1ujKjiAlWYvmi
+	iaHMDo4DOIEKFHJYjQGkA1tpv9uiYEKRt8iIw6XS40hQNPOL9Sf2IKgWPfadCo2dPbVUpeUQQbl
+	+fzFQqZ0nEVinj1jmBju7yBH72B+TlW4tb360isPYoA/pa7QCdHbcDy2HxZZC11CMaLYyHvFT9x
+	CCi+xIg6Dljjfmiw==
+X-Google-Smtp-Source: AGHT+IHvY4Ey9R8Ex4kFK/h9CrX/gZMo0TkG92UrmsqICbzAXLN4hHP/QkaUH3LOu+37Fvfb480y1w==
+X-Received: by 2002:a05:600c:4e4a:b0:46e:4b79:551 with SMTP id 5b1f17b1804b1-46e4b7906ecmr109670425e9.31.1759217021708;
+        Tue, 30 Sep 2025 00:23:41 -0700 (PDT)
+Received: from [192.168.69.221] (88-187-86-199.subs.proxad.net. [88.187.86.199])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-46e56f3dbcfsm44146575e9.3.2025.09.30.00.23.40
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 30 Sep 2025 00:23:41 -0700 (PDT)
+Message-ID: <61c31076-5330-426a-9c28-b2400bec44f6@linaro.org>
+Date: Tue, 30 Sep 2025 09:23:39 +0200
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-From: <liu.xuemei1@zte.com.cn>
-To: <anup@brainfault.org>
-Cc: <atish.patra@linux.dev>, <paul.walmsley@sifive.com>, <palmer@dabbelt.com>,
-        <aou@eecs.berkeley.edu>, <alex@ghiti.fr>, <kvm@vger.kernel.org>,
-        <kvm-riscv@lists.infradead.org>, <linux-riscv@lists.infradead.org>,
-        <linux-kernel@vger.kernel.org>
-Subject: =?UTF-8?B?W1BBVENIIHYyXSBSSVNDLVY6IEtWTTogVHJhbnNwYXJlbnQgaHVnZSBwYWdlIHN1cHBvcnQ=?=
-Content-Type: text/plain;
-	charset="UTF-8"
-X-MAIL:mse-fl2.zte.com.cn 58U7Kqll028593
-X-TLS: YES
-X-SPF-DOMAIN: zte.com.cn
-X-ENVELOPE-SENDER: liu.xuemei1@zte.com.cn
-X-SPF: None
-X-SOURCE-IP: 10.5.228.133 unknown Tue, 30 Sep 2025 15:21:03 +0800
-X-Fangmail-Anti-Spam-Filtered: true
-X-Fangmail-MID-QID: 68DB84DF.002/4cbTxW60Stz4xNt3
+MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v2 14/17] system/physmem: Un-inline
+ cpu_physical_memory_read/write()
+To: Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org,
+ Peter Maydell <peter.maydell@linaro.org>
+Cc: Jason Herne <jjherne@linux.ibm.com>,
+ Stefano Stabellini <sstabellini@kernel.org>,
+ Stefano Garzarella <sgarzare@redhat.com>, xen-devel@lists.xenproject.org,
+ Paolo Bonzini <pbonzini@redhat.com>, Ilya Leoshkevich <iii@linux.ibm.com>,
+ Anthony PERARD <anthony@xenproject.org>, Paul Durrant <paul@xen.org>,
+ Eric Farman <farman@linux.ibm.com>, Marcelo Tosatti <mtosatti@redhat.com>,
+ Halil Pasic <pasic@linux.ibm.com>, Matthew Rosato <mjrosato@linux.ibm.com>,
+ Reinoud Zandijk <reinoud@netbsd.org>, Zhao Liu <zhao1.liu@intel.com>,
+ David Woodhouse <dwmw2@infradead.org>,
+ Christian Borntraeger <borntraeger@linux.ibm.com>,
+ Sunil Muthuswamy <sunilmut@microsoft.com>, kvm@vger.kernel.org,
+ "Michael S. Tsirkin" <mst@redhat.com>, Peter Xu <peterx@redhat.com>,
+ qemu-s390x@nongnu.org, "Edgar E. Iglesias" <edgar.iglesias@gmail.com>,
+ Richard Henderson <richard.henderson@linaro.org>,
+ David Hildenbrand <david@redhat.com>
+References: <20250930041326.6448-1-philmd@linaro.org>
+ <20250930041326.6448-15-philmd@linaro.org>
+ <193cd8a8-2c4c-4c2c-af22-622b74c332ee@redhat.com>
+Content-Language: en-US
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=C3=A9?= <philmd@linaro.org>
+In-Reply-To: <193cd8a8-2c4c-4c2c-af22-622b74c332ee@redhat.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 
-From: Jessica Liu <liu.xuemei1@zte.com.cn>
+On 30/9/25 07:02, Thomas Huth wrote:
+> On 30/09/2025 06.13, Philippe Mathieu-Daudé wrote:
+>> Un-inline cpu_physical_memory_read() and cpu_physical_memory_write().
+> 
+> What's the reasoning for this patch?
 
-Use block mapping if backed by a THP, as implemented in architectures
-like ARM and x86_64.
+Remove cpu_physical_memory_rw() in the next patch without having
+to inline the address_space_read/address_space_write() calls in
+"exec/cpu-common.h".
 
-Signed-off-by: Jessica Liu <liu.xuemei1@zte.com.cn>
----
-Changes in v2:
-- Fixed the typo of writing PAGE_SHIFT as PAGE_SIZE.
+Maybe better squashing both together?
 
- arch/riscv/include/asm/kvm_gstage.h |   3 +
- arch/riscv/kvm/gstage.c             | 100 ++++++++++++++++++++++++++++
- arch/riscv/kvm/mmu.c                |  12 +++-
- 3 files changed, 114 insertions(+), 1 deletion(-)
+> 
+>   Thomas
+> 
+>> Signed-off-by: Philippe Mathieu-Daudé <philmd@linaro.org>
+>> ---
+>>   include/exec/cpu-common.h | 12 ++----------
+>>   system/physmem.c          | 10 ++++++++++
+>>   2 files changed, 12 insertions(+), 10 deletions(-)
+>>
+>> diff --git a/include/exec/cpu-common.h b/include/exec/cpu-common.h
+>> index 6c7d84aacb4..6e8cb530f6e 100644
+>> --- a/include/exec/cpu-common.h
+>> +++ b/include/exec/cpu-common.h
+>> @@ -133,16 +133,8 @@ void cpu_address_space_destroy(CPUState *cpu, int 
+>> asidx);
+>>   void cpu_physical_memory_rw(hwaddr addr, void *buf,
+>>                               hwaddr len, bool is_write);
+>> -static inline void cpu_physical_memory_read(hwaddr addr,
+>> -                                            void *buf, hwaddr len)
+>> -{
+>> -    cpu_physical_memory_rw(addr, buf, len, false);
+>> -}
+>> -static inline void cpu_physical_memory_write(hwaddr addr,
+>> -                                             const void *buf, hwaddr 
+>> len)
+>> -{
+>> -    cpu_physical_memory_rw(addr, (void *)buf, len, true);
+>> -}
+>> +void cpu_physical_memory_read(hwaddr addr, void *buf, hwaddr len);
+>> +void cpu_physical_memory_write(hwaddr addr, const void *buf, hwaddr 
+>> len);
+>>   void *cpu_physical_memory_map(hwaddr addr,
+>>                                 hwaddr *plen,
+>>                                 bool is_write);
+>> diff --git a/system/physmem.c b/system/physmem.c
+>> index 70b02675b93..6d6bc449376 100644
+>> --- a/system/physmem.c
+>> +++ b/system/physmem.c
+>> @@ -3188,6 +3188,16 @@ void cpu_physical_memory_rw(hwaddr addr, void 
+>> *buf,
+>>                        buf, len, is_write);
+>>   }
+>> +void cpu_physical_memory_read(hwaddr addr, void *buf, hwaddr len)
+>> +{
+>> +    cpu_physical_memory_rw(addr, buf, len, false);
+>> +}
+>> +
+>> +void cpu_physical_memory_write(hwaddr addr, const void *buf, hwaddr len)
+>> +{
+>> +    cpu_physical_memory_rw(addr, (void *)buf, len, true);
+>> +}
+>> +
+>>   /* used for ROM loading : can write in RAM and ROM */
+>>   MemTxResult address_space_write_rom(AddressSpace *as, hwaddr addr,
+>>                                       MemTxAttrs attrs,
+> 
 
-diff --git a/arch/riscv/include/asm/kvm_gstage.h b/arch/riscv/include/asm/kvm_gstage.h
-index 595e2183173e..cc67fb2d2d42 100644
---- a/arch/riscv/include/asm/kvm_gstage.h
-+++ b/arch/riscv/include/asm/kvm_gstage.h
-@@ -69,4 +69,7 @@ void kvm_riscv_gstage_wp_range(struct kvm_gstage *gstage, gpa_t start, gpa_t end
-
- void kvm_riscv_gstage_mode_detect(void);
-
-+long kvm_riscv_gstage_thp_adjust(struct kvm *kvm, struct kvm_memory_slot *memslot,
-+				 unsigned long hva, kvm_pfn_t *pfnp, gpa_t *gpa);
-+
- #endif
-diff --git a/arch/riscv/kvm/gstage.c b/arch/riscv/kvm/gstage.c
-index 24c270d6d0e2..129dee62c570 100644
---- a/arch/riscv/kvm/gstage.c
-+++ b/arch/riscv/kvm/gstage.c
-@@ -77,6 +77,106 @@ static int gstage_level_to_page_size(u32 level, unsigned long *out_pgsize)
- 	return 0;
- }
-
-+static int gstage_get_user_mapping_size(struct kvm *kvm, u64 addr)
-+{
-+	pte_t *ptepp;
-+	u32 ptep_level;
-+	unsigned long out_pgsize;
-+	struct kvm_gstage gstage = {
-+		.pgd = kvm->mm->pgd
-+	};
-+
-+	if (!kvm_riscv_gstage_get_leaf(&gstage, addr, &ptepp, &ptep_level))
-+		return -EFAULT;
-+
-+	if (gstage_level_to_page_size(ptep_level, &out_pgsize))
-+		return -EFAULT;
-+
-+	return out_pgsize;
-+}
-+
-+static bool gstage_supports_huge_mapping(struct kvm_memory_slot *memslot, unsigned long hva)
-+{
-+	gpa_t gpa_start;
-+	hva_t uaddr_start, uaddr_end;
-+	size_t size;
-+
-+	size = memslot->npages * PAGE_SIZE;
-+	uaddr_start = memslot->userspace_addr;
-+	uaddr_end = uaddr_start + size;
-+
-+	gpa_start = memslot->base_gfn << PAGE_SHIFT;
-+
-+	/*
-+	 * Pages belonging to memslots that don't have the same alignment
-+	 * within a PMD for userspace and GPA cannot be mapped with g-stage
-+	 * PMD entries, because we'll end up mapping the wrong pages.
-+	 *
-+	 * Consider a layout like the following:
-+	 *
-+	 *    memslot->userspace_addr:
-+	 *    +-----+--------------------+--------------------+---+
-+	 *    |abcde|fgh  vs-stage block  |    vs-stage block tv|xyz|
-+	 *    +-----+--------------------+--------------------+---+
-+	 *
-+	 *    memslot->base_gfn << PAGE_SHIFT:
-+	 *      +---+--------------------+--------------------+-----+
-+	 *      |abc|def  g-stage block  |    g-stage block   |tvxyz|
-+	 *      +---+--------------------+--------------------+-----+
-+	 *
-+	 * If we create those g-stage blocks, we'll end up with this incorrect
-+	 * mapping:
-+	 *   d -> f
-+	 *   e -> g
-+	 *   f -> h
-+	 */
-+	if ((gpa_start & (PMD_SIZE - 1)) != (uaddr_start & (PMD_SIZE - 1)))
-+		return false;
-+
-+	/*
-+	 * Next, let's make sure we're not trying to map anything not covered
-+	 * by the memslot. This means we have to prohibit block size mappings
-+	 * for the beginning and end of a non-block aligned and non-block sized
-+	 * memory slot (illustrated by the head and tail parts of the
-+	 * userspace view above containing pages 'abcde' and 'xyz',
-+	 * respectively).
-+	 *
-+	 * Note that it doesn't matter if we do the check using the
-+	 * userspace_addr or the base_gfn, as both are equally aligned (per
-+	 * the check above) and equally sized.
-+	 */
-+	return (hva >= ALIGN(uaddr_start, PMD_SIZE)) && (hva < ALIGN_DOWN(uaddr_end, PMD_SIZE));
-+}
-+
-+long kvm_riscv_gstage_thp_adjust(struct kvm *kvm, struct kvm_memory_slot *memslot,
-+				 unsigned long hva, kvm_pfn_t *hfnp, gpa_t *gpa)
-+{
-+	kvm_pfn_t hfn = *hfnp;
-+
-+	/*
-+	 * Make sure the adjustment is done only for THP pages. Also make
-+	 * sure that the HVA and GPA are sufficiently aligned and that the
-+	 * block map is contained within the memslot.
-+	 */
-+	if (gstage_supports_huge_mapping(memslot, hva)) {
-+		int sz = gstage_get_user_mapping_size(kvm, hva);
-+
-+		if (sz < 0)
-+			return sz;
-+
-+		if (sz < PMD_SIZE)
-+			return PAGE_SIZE;
-+
-+		*gpa &= PMD_MASK;
-+		hfn &= ~(PTRS_PER_PMD - 1);
-+		*hfnp = hfn;
-+
-+		return PMD_SIZE;
-+	}
-+
-+	return PAGE_SIZE;
-+}
-+
- bool kvm_riscv_gstage_get_leaf(struct kvm_gstage *gstage, gpa_t addr,
- 			       pte_t **ptepp, u32 *ptep_level)
- {
-diff --git a/arch/riscv/kvm/mmu.c b/arch/riscv/kvm/mmu.c
-index 525fb5a330c0..f70cf721ebb8 100644
---- a/arch/riscv/kvm/mmu.c
-+++ b/arch/riscv/kvm/mmu.c
-@@ -337,7 +337,8 @@ int kvm_riscv_mmu_map(struct kvm_vcpu *vcpu, struct kvm_memory_slot *memslot,
- 	struct kvm_mmu_memory_cache *pcache = &vcpu->arch.mmu_page_cache;
- 	bool logging = (memslot->dirty_bitmap &&
- 			!(memslot->flags & KVM_MEM_READONLY)) ? true : false;
--	unsigned long vma_pagesize, mmu_seq;
-+	unsigned long mmu_seq;
-+	long vma_pagesize;
- 	struct kvm_gstage gstage;
- 	struct page *page;
-
-@@ -416,6 +417,15 @@ int kvm_riscv_mmu_map(struct kvm_vcpu *vcpu, struct kvm_memory_slot *memslot,
- 	if (mmu_invalidate_retry(kvm, mmu_seq))
- 		goto out_unlock;
-
-+	/* check if we are backed by a THP and thus use block mapping if possible */
-+	if (vma_pagesize == PAGE_SIZE) {
-+		vma_pagesize = kvm_riscv_gstage_thp_adjust(kvm, memslot, hva, &hfn, &gpa);
-+		if (vma_pagesize < 0) {
-+			ret = vma_pagesize;
-+			goto out_unlock;
-+		}
-+	}
-+
- 	if (writable) {
- 		mark_page_dirty_in_slot(kvm, memslot, gfn);
- 		ret = kvm_riscv_gstage_map_page(&gstage, pcache, gpa, hfn << PAGE_SHIFT,
--- 
-2.27.0
 
