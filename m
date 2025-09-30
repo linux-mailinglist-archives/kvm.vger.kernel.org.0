@@ -1,173 +1,127 @@
-Return-Path: <kvm+bounces-59191-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-59192-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 47E04BAE10E
-	for <lists+kvm@lfdr.de>; Tue, 30 Sep 2025 18:37:44 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 05099BAE126
+	for <lists+kvm@lfdr.de>; Tue, 30 Sep 2025 18:39:27 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id BEACC1944A16
-	for <lists+kvm@lfdr.de>; Tue, 30 Sep 2025 16:38:06 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 2E81A1944B21
+	for <lists+kvm@lfdr.de>; Tue, 30 Sep 2025 16:39:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 66061264F96;
-	Tue, 30 Sep 2025 16:37:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2418024290D;
+	Tue, 30 Sep 2025 16:39:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="0m2M6q1j"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="S0K3mXIT"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pj1-f74.google.com (mail-pj1-f74.google.com [209.85.216.74])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from out-183.mta1.migadu.com (out-183.mta1.migadu.com [95.215.58.183])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 22F12259CA4
-	for <kvm@vger.kernel.org>; Tue, 30 Sep 2025 16:37:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.74
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3DDA1224245
+	for <kvm@vger.kernel.org>; Tue, 30 Sep 2025 16:39:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.183
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1759250227; cv=none; b=K2pSuvD8Hb6nXR3Dxg4dYBpcfMCJz8zH7BatEqATanaWZSc1ymJ7G6X9HIefpEi4qfDf+f1SRnD50jZgrLyhnCTtofBg1pvvcxs49SZUa6HiBab0OazyEW2wSBAtNnG8hO11y2777BCWGlXGGDdcmEmUlq+2OmuniiIRYhQJFZw=
+	t=1759250357; cv=none; b=BNF0TKF1ud0j+l2wPhjk1FNouxa7LjE8WUioaTklEbhNKn2s2lQYtBoXTcukja5rYLEuLHVO8UFARw3X6DyiVZfsCYFksiEElIMmpuoBXtoxc8xp0ZLL2M7m2gXXau3JXr/lyIyO3QhL3tXz7iDoXdkauqRUqtWGg3E3PCq8UbE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1759250227; c=relaxed/simple;
-	bh=GJ6Trfw8ZxlzDRTI1uQfQ+m2EdLCPjK6h626Z8z84xY=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=RgJVgMM8AdT6/J45RXQnz4G6yT3n+skcDSwYrlWo2GGdCxg5XmMnWrmA5oq9Px7uKljvZwTpS6KR2D4TCYvnNQlVaLEvC7X+uUNnbEnQ1Wxdp545PT6s6/c/XBiHWb18zhoxJspkVx+gZLijENjBajTOyD5ALkGdS/tzXVSs+hQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--vipinsh.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=0m2M6q1j; arc=none smtp.client-ip=209.85.216.74
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--vipinsh.bounces.google.com
-Received: by mail-pj1-f74.google.com with SMTP id 98e67ed59e1d1-3307af9b55eso5292194a91.2
-        for <kvm@vger.kernel.org>; Tue, 30 Sep 2025 09:37:04 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1759250224; x=1759855024; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=VhViqDkwcWVSLWWD+zOBqBHO20tquMwNgbfY3Bzt4yk=;
-        b=0m2M6q1jbZfJ2GWzXibrSoxsd3in9uS58AbZ+hzsdq3S+fE4ap71dX93B9B7eYoSc2
-         M4q3g3pAL9lMvmFrOoP7daWSsO7hL+N9D1yRlVivJU5K+gFz2q0HshZBcnWetGihKIzJ
-         smv/zHH67YocaXfX16tQ1To4AWijwvQGvq1VDw5LRdnCX7YlqGI5pNmPjg9gImZBjnL8
-         YYSpDnN+3cWubuLCiWxFReozV7WSa7zZTzf4zuizuaWF8pwbMw2IBzXN2iCYL1tLTJ2W
-         HyUpiFoTYXc9bHSPuVJaoCLnm6A3LIKW7+XF6l9c7dUlADtB+Rs3OhnTCup03RfYrO9g
-         S88g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1759250224; x=1759855024;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=VhViqDkwcWVSLWWD+zOBqBHO20tquMwNgbfY3Bzt4yk=;
-        b=W67aRMe3i6P/aAAmLOoAZ0iHSaZ428/e4xrvUwzZ1DvVylsIO291RN39NVzEJm/FDr
-         xWrL9+bLvyeWPhcZzDrw7RwFIk/pQlRlXBuLoyHP8/DxXbk7u1NsZAoSu0xGU3GNF7uB
-         CKk0MaSJvoygoKt76/QqWH9VhHPiNV1lKqgS6h6KFPP63gJ97Yx/ViR6HuenrA5ETL+y
-         6hyTbBmNbcgqTtE+Ng1SkPiaMmX5sdouyhz0jodYwxFmc/ByT4o1KLr3HgXq+K/IaEkV
-         VzifGN/Xwfcnkbu2OBaWgdjWEVEMxsWZq+Gf2uKApocUWVMKEwxW9bkJOIZw5g2qWw2K
-         6svA==
-X-Gm-Message-State: AOJu0YwJJaO1VssmhJPlfYPtgV4DXSBEhTeiYlvdEoVHZyIAQBuP5o2g
-	pMAxaeU+BM6HBWAbBwxyh7P1/WbsSm4bICh8dnnZefwHHjL9dYVcEDLNA9fwfyIBjUzY5s5o4F4
-	giXq8SsO8hhV3JFYfReRBCrXh6FK68pDagxEqUUWiFe4djsO6LD9sCWMbzLw1B33L5JlMg9IFUr
-	gcsfXiibde7HsOOCAbkSdAnES99QwnNBUht5aPZQ==
-X-Google-Smtp-Source: AGHT+IFNJr9lipNoSDt3DruF7rcxWQ60eYd2ESWJFpivjjPDmvUD5g41M9KiJ+nbTnZt0uYf5BR5V0buLOkY
-X-Received: from pjkh7.prod.google.com ([2002:a17:90a:7107:b0:332:4129:51b2])
- (user=vipinsh job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:1b50:b0:330:48d1:f90a
- with SMTP id 98e67ed59e1d1-339a6f680d9mr89247a91.27.1759250224019; Tue, 30
- Sep 2025 09:37:04 -0700 (PDT)
-Date: Tue, 30 Sep 2025 09:36:35 -0700
-In-Reply-To: <20250930163635.4035866-1-vipinsh@google.com>
+	s=arc-20240116; t=1759250357; c=relaxed/simple;
+	bh=K/OW5QVJiYUdeHnfxTsx43OwQg//BxaPlBCvPJ8I494=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=XGgN81lcZ1ulbmythbGGGfAdf4eG45TVCaCY+IR5+xdsulc7blHEScVvGHrfyg8O8+R/9j1LgqcYVMXcox/ToFn1N/0zi2ZWCHgZEKVDSeX1XR5in+vFMIdsYVnQuKznI1l6l5iAbVAZqO8pZcmKFiU9HVV4gViqMpT8dcvq3XI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=S0K3mXIT; arc=none smtp.client-ip=95.215.58.183
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+Date: Tue, 30 Sep 2025 16:38:55 +0000
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1759250342;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=B3CKhHSKM3GAHgQOBi5L/lbF/hi6x7IpHKwCLnAX/hw=;
+	b=S0K3mXITYdBzco4OPx4s4kDHufQW7Dk1ZDHiLzDl8uf2PmJOi5N6RYV70/g2vltuhqShCW
+	Uq5wmuYVFEmvtPQe2aLA/gbBMHqPHwFp82r4XI3ZHS+mdWOIOv+pw9Dv+fJWTAe1FYlpey
+	aZms9l3QNdGWgxU67Tz/+F0U19FlsAQ=
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Yosry Ahmed <yosry.ahmed@linux.dev>
+To: Jim Mattson <jmattson@google.com>
+Cc: Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>, 
+	Borislav Petkov <bp@alien8.de>, Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org, 
+	"H. Peter Anvin" <hpa@zytor.com>, Sean Christopherson <seanjc@google.com>, 
+	Paolo Bonzini <pbonzini@redhat.com>, Pawan Gupta <pawan.kumar.gupta@linux.intel.com>, 
+	Tom Lendacky <thomas.lendacky@amd.com>, Manali Shukla <manali.shukla@amd.com>, 
+	Sohil Mehta <sohil.mehta@intel.com>, "Xin Li (Intel)" <xin@zytor.com>, linux-kernel@vger.kernel.org, 
+	kvm@vger.kernel.org
+Subject: Re: [PATCH] KVM: x86: Advertise EferLmsleUnsupported to userspace
+Message-ID: <qglalt6crrqevdpvsp25tlo3onmcuhyneft2cptwxzebj7ych5@dmk2xhsjvlgl>
+References: <20250925202937.2734175-1-jmattson@google.com>
+ <byqww7zx55qgtbauqmrqzyz4vwcwojhxguqskv4oezmish6vub@iwe62secbobm>
+ <CALMp9eRvf54jCrmWXH_WDZwB7KJcM3DLtPubvDibAUKj7-=yyg@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20250930163635.4035866-1-vipinsh@google.com>
-X-Mailer: git-send-email 2.51.0.618.g983fd99d29-goog
-Message-ID: <20250930163635.4035866-10-vipinsh@google.com>
-Subject: [PATCH v3 9/9] KVM: selftests: Provide README.rst for KVM selftests runner
-From: Vipin Sharma <vipinsh@google.com>
-To: kvm@vger.kernel.org, kvmarm@lists.linux.dev, kvm-riscv@lists.infradead.org
-Cc: seanjc@google.com, pbonzini@redhat.com, borntraeger@linux.ibm.com, 
-	frankja@linux.ibm.com, imbrenda@linux.ibm.com, anup@brainfault.org, 
-	atish.patra@linux.dev, zhaotianrui@loongson.cn, maobibo@loongson.cn, 
-	chenhuacai@kernel.org, maz@kernel.org, oliver.upton@linux.dev, 
-	ajones@ventanamicro.com, Vipin Sharma <vipinsh@google.com>
-Content-Type: text/plain; charset="UTF-8"
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <CALMp9eRvf54jCrmWXH_WDZwB7KJcM3DLtPubvDibAUKj7-=yyg@mail.gmail.com>
+X-Migadu-Flow: FLOW_OUT
 
-Add README.rst for KVM selftest runner and explain how to use the
-runner.
+On Tue, Sep 30, 2025 at 09:02:46AM -0700, Jim Mattson wrote:
+> On Tue, Sep 30, 2025 at 8:31 AM Yosry Ahmed <yosry.ahmed@linux.dev> wrote:
+> >
+> > On Thu, Sep 25, 2025 at 01:29:18PM -0700, Jim Mattson wrote:
+> > > CPUID.80000008H:EBX.EferLmsleUnsupported[bit 20] is a defeature
+> > > bit. When this bit is clear, EFER.LMSLE is supported. When this bit is
+> > > set, EFER.LMLSE is unsupported. KVM has never supported EFER.LMSLE, so
+> > > it cannot support a 0-setting of this bit.
+> > >
+> > > Set the bit in KVM_GET_SUPPORTED_CPUID to advertise the unavailability
+> > > of EFER.LMSLE to userspace.
+> >
+> > It seems like KVM allows setting EFER.LMSLE when nested SVM is enabled:
+> > https://elixir.bootlin.com/linux/v6.17/source/arch/x86/kvm/svm/svm.c#L5354
+> >
+> > It goes back to commit eec4b140c924 ("KVM: SVM: Allow EFER.LMSLE to be
+> > set with nested svm"), the commit log says it was needed for the SLES11
+> > version of Xen 4.0 to boot with nested SVM. Maybe that's no longer the
+> > case.
+> >
+> > Should KVM advertise EferLmsleUnsupported if it allows setting
+> > EFER.LMSLE in some cases?
+> 
+> I don't think KVM should allow setting the bit if it's not going to
+> actually implement long mode segment limits. That seems like a
+> security issue. The L1 hypervisor thinks that the L2 guest will not be
+> able to access memory above the segment limit, but if there are no
+> segment limit checks, then L2 will be able to access that memory.
 
-Signed-off-by: Vipin Sharma <vipinsh@google.com>
----
- tools/testing/selftests/kvm/.gitignore        |  1 +
- tools/testing/selftests/kvm/runner/README.rst | 54 +++++++++++++++++++
- 2 files changed, 55 insertions(+)
- create mode 100644 tools/testing/selftests/kvm/runner/README.rst
+Yeah this sounds bad.
 
-diff --git a/tools/testing/selftests/kvm/.gitignore b/tools/testing/selftests/kvm/.gitignore
-index 548d435bde2f..83aa2fe01bac 100644
---- a/tools/testing/selftests/kvm/.gitignore
-+++ b/tools/testing/selftests/kvm/.gitignore
-@@ -4,6 +4,7 @@
- !*.c
- !*.h
- !*.py
-+!*.rst
- !*.S
- !*.sh
- !*.test
-diff --git a/tools/testing/selftests/kvm/runner/README.rst b/tools/testing/selftests/kvm/runner/README.rst
-new file mode 100644
-index 000000000000..83b071c0a0e6
---- /dev/null
-+++ b/tools/testing/selftests/kvm/runner/README.rst
-@@ -0,0 +1,54 @@
-+KVM Selftest Runner
-+===================
-+
-+KVM selftest runner is highly configurable test executor that allows to run
-+tests with different configurations (not just the default), parallely, save
-+output to disk hierarchically, control what gets printed on console, provide
-+execution status.
-+
-+To generate default tests use::
-+
-+  # make tests_install
-+
-+This will create ``testcases_default_gen`` directory which will have testcases
-+in `default.test` files. Each KVM selftest will have a directory in  which
-+`default.test` file will be created with executable path relative to KVM
-+selftest root directory i.e. `/tools/testing/selftests/kvm`. For example, the
-+`dirty_log_perf_test` will have::
-+
-+  # cat testcase_default_gen/dirty_log_perf_test/default.test
-+  dirty_log_perf_test
-+
-+Runner will execute `dirty_log_perf_test`. Testcases files can also provide
-+extra arguments to the test::
-+
-+  # cat tests/dirty_log_perf_test/2slot_5vcpu_10iter.test
-+  dirty_log_perf_test -x 2 -v 5 -i 10
-+
-+In this case runner will execute the `dirty_log_perf_test` with the options.
-+
-+Example
-+=======
-+
-+To see all of the options::
-+
-+  # python3 runner -h
-+
-+To run all of the default tests::
-+
-+  # python3 runner -d testcases_default_gen
-+
-+To run tests parallely::
-+
-+  # python3 runner -d testcases_default_gen -j 40
-+
-+To print only passed test status and failed test stderr::
-+
-+  # python3 runner -d testcases_default_gen --print-passed status \
-+  --print-failed stderr
-+
-+To run tests binary which are in some other directory (out of tree builds)::
-+
-+  # python3 runner -d testcases_default_gen -p /path/to/binaries
-+
-+
--- 
-2.51.0.618.g983fd99d29-goog
+On HW that supports EFER.LMSLE we're mostly virtualizing it, but not
+entirely.
 
+On HW that doesn't support it, we're not advertising
+EferLmsleUnsupported and we allow the guest to set EFER.LMSLE, so the
+VMRUN will fail with the invalid EFER (or immediate #VMexit?), and the
+VM will crash.
+
+> 
+> It should be possible for KVM to implement long mode segment limits on
+> hardware that supports the feature, but offering the feature on
+> hardware that doesn't support it is infeasible.
+
+I am not sure what we can and cannot do in terms of backward
+compatibility. Ideally we'd stop allowing EFER.LMSLE completely, but
+maybe we cannot break old users like that on HW that supports
+EFER.LMSLE.
+
+> 
+> Do we really want to implement long mode segment limits in KVM, given
+> that modern CPUs don't support the feature?
+
+Probably not, and it causes crashes today anyway so I don't think anyone
+depends on it.
 
