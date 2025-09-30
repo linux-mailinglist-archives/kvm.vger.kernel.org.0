@@ -1,245 +1,299 @@
-Return-Path: <kvm+bounces-59219-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-59220-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 66693BAE505
-	for <lists+kvm@lfdr.de>; Tue, 30 Sep 2025 20:29:52 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id A76B2BAE54A
+	for <lists+kvm@lfdr.de>; Tue, 30 Sep 2025 20:42:50 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 79CA27A5F1C
-	for <lists+kvm@lfdr.de>; Tue, 30 Sep 2025 18:28:09 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 175FC1944E0C
+	for <lists+kvm@lfdr.de>; Tue, 30 Sep 2025 18:43:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8FC6326B742;
-	Tue, 30 Sep 2025 18:29:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7B6FB267F58;
+	Tue, 30 Sep 2025 18:42:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="YTPW4pR3"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="euVuJ7Iw"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.11])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2D79920FA81;
-	Tue, 30 Sep 2025 18:29:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=192.198.163.11
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1759256981; cv=fail; b=DrsQkDqOBWSqMjIlpmc3FqLipQtNTw2wcxxHVoBkfiqY4NejFG81Ll3TvrV5MeFiUp9/srXwQf69AbmRnlpzN1+hr7W+rUWa4nhNpzci9XzaxEb0zuFg4p/ZTz4nk+AbcO24jAQ5MftXjyaDbl6LNPaWcvBacA+5alvMB3gitbM=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1759256981; c=relaxed/simple;
-	bh=wZdEY8dJKg+SV7Im7YDZD3PIAqdZVYPXJ25XEotfh9c=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=cpvBMPCLeKHHYU8/RjIHF51xkb0irlstpWFxf6pMhRK3uTauJbi9s84WUMHo6lY6ZECndmQXBI929GtiYkYJpYGA6ixl2IGafihMDGoEIruU+8O9j+JBi9HYy4KYaQfVPNd6Juxl4Zru8flqMwWXJWpvHAu8fcKJHfjKtKGisGE=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=YTPW4pR3; arc=fail smtp.client-ip=192.198.163.11
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1759256980; x=1790792980;
-  h=from:to:cc:subject:date:message-id:references:
-   in-reply-to:content-id:content-transfer-encoding:
-   mime-version;
-  bh=wZdEY8dJKg+SV7Im7YDZD3PIAqdZVYPXJ25XEotfh9c=;
-  b=YTPW4pR3WDGh7DcrvLoy3Pef/7j0ll75A0FUNpoBuno7t4Lk3jcFNFgC
-   kxRDCe3fxhQztYqxcZQk1fXNajcT+Z8pEsMnzCcaGa8HyeZMhfMR2KRhb
-   ddf4LgUOJrbce/33mJpBzl8tHDS0D/IDMCbbl6y+saXc07OiCJVKlqYu3
-   Kys+GujeWft/x4b2dcW8DCxh5yitP/A4MFyTClHTZacvfv1irYDTszQl/
-   jPzLaAskRSz/QDdRtYXiNrEJ96wUu7ztfusmBd5IH6bcB+9J/Dw2T6Baw
-   IkXZcTT9bO5nF3XgXa6dkOWjp7AOcPoLiyB+vUVVUMNuE0udS7NiGc1iL
-   Q==;
-X-CSE-ConnectionGUID: muyv8q8kSfurnZNrU85Kjw==
-X-CSE-MsgGUID: 3f1JIEMKQ6OxXXo2ajFALw==
-X-IronPort-AV: E=McAfee;i="6800,10657,11569"; a="72140839"
-X-IronPort-AV: E=Sophos;i="6.18,304,1751266800"; 
-   d="scan'208";a="72140839"
-Received: from orviesa001.jf.intel.com ([10.64.159.141])
-  by fmvoesa105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 30 Sep 2025 11:29:39 -0700
-X-CSE-ConnectionGUID: YFy9Iy/8RpWrkp+NixP6tg==
-X-CSE-MsgGUID: RJIRmzyXSmidwyipkbJATQ==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.18,304,1751266800"; 
-   d="scan'208";a="215725249"
-Received: from fmsmsx902.amr.corp.intel.com ([10.18.126.91])
-  by orviesa001.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 30 Sep 2025 11:29:38 -0700
-Received: from FMSMSX903.amr.corp.intel.com (10.18.126.92) by
- fmsmsx902.amr.corp.intel.com (10.18.126.91) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.27; Tue, 30 Sep 2025 11:29:37 -0700
-Received: from fmsedg902.ED.cps.intel.com (10.1.192.144) by
- FMSMSX903.amr.corp.intel.com (10.18.126.92) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.27 via Frontend Transport; Tue, 30 Sep 2025 11:29:37 -0700
-Received: from PH8PR06CU001.outbound.protection.outlook.com (40.107.209.18) by
- edgegateway.intel.com (192.55.55.82) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.27; Tue, 30 Sep 2025 11:29:37 -0700
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=QnJqKnsZQFvvlKTYzFUpf824iNKqnYXOppIjRcVEVGppfpLMGegJBpbR2uOhy5mWsPLW8TMcvUXlga85Q7hfraV1+tqIU5xLxqNAY7xU92yQfMeFpUeBVQDmgGaVCyAcUu3E4Pu2yvugEZOhEOjuVLPD0J7CFgocedcCXaOOL46QqCwuRkzrwDr5tSVwDtXVuNZAvB0ls6W5l6Og7fiQ92OwabXoYNd9Ub0HC5+/FV5SUYzXHWJC/kZoewtJmQTbnD8EbBcWhw1sp8xa1FeNoiXjZ4FTrT1xNVIFBshJpjSWAHu1TKmyyXV7RJYV7/cZR2skOUA/ozhDULn8PvuFUw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=wZdEY8dJKg+SV7Im7YDZD3PIAqdZVYPXJ25XEotfh9c=;
- b=PSh3kVjSjiGju2e5wb2HL8XCqxPI0yONN5SaIBRuULzzxsq/effYPCRu8ZUshr6/XJjnUZpBxrAN2mK6SZBES5+6/KHSMICXhFPlp06CsNaCR3xjyl0lF++g44423vfjfgBmMqk/p9dFCOdrv+NwjPN7Sy31jWgZPPIapL3KKItrqZLcaFZX0ifcka3ESTRzlBNFtgTCwjaTKbAMu00t4CUI8Xapjxzs0ULJAWSBICNslFpcbUgrp/JIJQOKC7Ot+epvYGWt3y6XUVBjxzOjgTXzEla8IhPw8ON13L7ji9IKbwQqC0dXp+WY0vQFI8eqo9D1d/3RESdivyWSiXLLqQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Received: from MN0PR11MB5963.namprd11.prod.outlook.com (2603:10b6:208:372::10)
- by CY5PR11MB6366.namprd11.prod.outlook.com (2603:10b6:930:3a::8) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9160.17; Tue, 30 Sep
- 2025 18:29:34 +0000
-Received: from MN0PR11MB5963.namprd11.prod.outlook.com
- ([fe80::edb2:a242:e0b8:5ac9]) by MN0PR11MB5963.namprd11.prod.outlook.com
- ([fe80::edb2:a242:e0b8:5ac9%5]) with mapi id 15.20.9160.015; Tue, 30 Sep 2025
- 18:29:34 +0000
-From: "Edgecombe, Rick P" <rick.p.edgecombe@intel.com>
-To: "Hansen, Dave" <dave.hansen@intel.com>, "kas@kernel.org" <kas@kernel.org>,
-	"Zhao, Yan Y" <yan.y.zhao@intel.com>
-CC: "Gao, Chao" <chao.gao@intel.com>, "seanjc@google.com" <seanjc@google.com>,
-	"Huang, Kai" <kai.huang@intel.com>, "dave.hansen@linux.intel.com"
-	<dave.hansen@linux.intel.com>, "Annapurve, Vishal" <vannapurve@google.com>,
-	"bp@alien8.de" <bp@alien8.de>, "mingo@redhat.com" <mingo@redhat.com>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-	"tglx@linutronix.de" <tglx@linutronix.de>, "kvm@vger.kernel.org"
-	<kvm@vger.kernel.org>, "linux-coco@lists.linux.dev"
-	<linux-coco@lists.linux.dev>, "Yamahata, Isaku" <isaku.yamahata@intel.com>,
-	"pbonzini@redhat.com" <pbonzini@redhat.com>, "x86@kernel.org"
-	<x86@kernel.org>
-Subject: Re: [PATCH v3 00/16] TDX: Enable Dynamic PAMT
-Thread-Topic: [PATCH v3 00/16] TDX: Enable Dynamic PAMT
-Thread-Index: AQHcKPMxbI3n4d0yEEyHrd2rA1fcBLSkyKKAgADDrQCAAB+VAIAAAsIAgAAvCACAAgBqAIACNVcAgABVQQCAAAn0AIABq8qA
-Date: Tue, 30 Sep 2025 18:29:33 +0000
-Message-ID: <c5115ecbf5b6e3b135f91a5ccc2bf1aa8cdcf0b1.camel@intel.com>
-References: <20250918232224.2202592-1-rick.p.edgecombe@intel.com>
-	 <aNX6V6OSIwly1hu4@yzhao56-desk.sh.intel.com>
-	 <8f772a23-ea7f-40eb-8852-49f5e3e16c15@intel.com>
-	 <2b951e427c3f3f06fc310d151b7c9e960c32ec3f.camel@intel.com>
-	 <7927271c-61e6-4f90-9127-c855a92fe766@intel.com>
-	 <2fc6595ba9b2b3dc59a251fbac33daa73a107a92.camel@intel.com>
-	 <aNiQlgY5fkz4mY0l@yzhao56-desk.sh.intel.com>
-	 <x5wtf2whjjofaxufloomkebek4wnaiyjnteguanpw3ijdaer6q@daize5ngmfcl>
-	 <0fc9a9ed-b0ba-45fc-8bd2-1bf24c14ab7f@intel.com>
-	 <9f12fd82fec7fb4fa99ef51a4a80b9fe08c0001a.camel@intel.com>
-In-Reply-To: <9f12fd82fec7fb4fa99ef51a4a80b9fe08c0001a.camel@intel.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-user-agent: Evolution 3.44.4-0ubuntu2 
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: MN0PR11MB5963:EE_|CY5PR11MB6366:EE_
-x-ms-office365-filtering-correlation-id: a004cb10-8625-4c63-a25c-08de004f4dcb
-x-ld-processed: 46c98d88-e344-4ed4-8496-4ed7712e255d,ExtAddr
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;ARA:13230040|366016|1800799024|376014|7416014|38070700021;
-x-microsoft-antispam-message-info: =?utf-8?B?RkpvRFBTT25yTWlNaG1oOVhodGxoQnFZWHNYUXFnNHpPN0FOM3pMTlpMcVBy?=
- =?utf-8?B?bVJMcTAxem42SElaaDJPaWVLOUd0QWxZUUEvb0JVRVUwbVVOUUwvY2h2L3oy?=
- =?utf-8?B?K1F0ZTM1MDlEL08rTExuNDRmSFNIL01mb3NnbUxZelU1MzZYZmhNVFAxTkNM?=
- =?utf-8?B?d3pEU0ZveWFQRXlpM3BZRmVwZDJJV1ZZVi9ab1krSEdSTzYvM0hIcCtocWNL?=
- =?utf-8?B?ZmpRYmVGc1ViQjA4RFphMXJPRHpnTmdHVGwwdG1hOU5Ra1hxTUg2S0h0blV2?=
- =?utf-8?B?SXJBMVBRU29Fb29yQnhqNndzTGZ2YnNkTjdwc0tLMHpweVlWeklvbURTMzV1?=
- =?utf-8?B?T3RxR2JRc0VaaStPTlRmNmNoeFJscnlOem91VGUyWTRmZUhFc1FYelV1RzF1?=
- =?utf-8?B?VXVwWTF2VjNJVGVlU0ErNXJtdVpYTWtBay9OSysrZVZKajZYMXgwRE1FNENE?=
- =?utf-8?B?ZUhUendhZ1d2K2Ryb01Mc2tZazBMR29WY2pqWnJqa0x1SGY1RDJWVit1YmRF?=
- =?utf-8?B?bW4xdVdSTFU5VlhGNlVmUEhJLzhpMXI0eTJ2Wlh0QUtWeldPUHhjTjVwSlBD?=
- =?utf-8?B?K2hwSGhaMTZISlBMOE5ybTVGOFkydlJQaklnSWhzTUZFeEllTzdVS2hOY3J6?=
- =?utf-8?B?UkRvWTRZUnFMTU9CbXZYaTRZNXN2KzU2cTN1cG85dXVtSEQvRU5PenJhRnl6?=
- =?utf-8?B?YWtMdXA2cFE1Z3F6WG5uS0xGZTdKZ0s5aEFPc3hPOS9VNkx1U04vdGNrVXpQ?=
- =?utf-8?B?ajIyYmxwZW1RNWlWcFB5MG9UdHgwT1lUZTBMcWp4akR3M3Z6R0VEQWRZeE5R?=
- =?utf-8?B?V1EzUDFIT2paeGhMUlRrOFQxQmR2Y0F3RDJsVXlQc21wY3l4bmNGT3l3WmRl?=
- =?utf-8?B?eXIrNUp3a2NhbWYvTG9BMjl3aFNabFhSbnhLemNmTjJ4bHRDS2ZvT25YTGht?=
- =?utf-8?B?c2cvQ3h2N000aFowbms1djZqWXVKUVMwUWZiSWFmU0RtODlCdjFyRGFobVFj?=
- =?utf-8?B?S2ZZUlpyRkNLRm15WVdCVm5jRWptNXhOQmRwNW1ZbkZiRnlKTG10enNvaDZD?=
- =?utf-8?B?Wm55czEzZ2pmVUpBdU41Nll1V2dHRUEzRGwwMWxxOGNPNlEvZks1RkRiczNY?=
- =?utf-8?B?YzFPKzFDbEdxL05CMVJhNVpkNTFsZHRQWk1JeXRaZ212VjRKUnVmaXZsbEY3?=
- =?utf-8?B?ZEpaaHdtZ0pzck9JMVBUU05mcFVSQktBY0FHWVZSaEdvZEEvT3I1NzQxMjVu?=
- =?utf-8?B?SGRwK2M5Z1NiWHVoLzNJd3NHMUV1enAycFlIcVZSUk1SSVlUWlEwd2NFOGNl?=
- =?utf-8?B?Qlk2eml6NlRrb2ZoNzMyd0VTOGVtM2FMMGZaRkIwUWx0NU1YbnNYOHFsVXly?=
- =?utf-8?B?THd2MDh4d29XUmgwbmkvbDlDYmRzaURXUkI1MkZyRCtDVjd2TkxXREcxd09z?=
- =?utf-8?B?SE01SUhnOGVYRlpTWGR6RFYxV3JlTDlIRVpqZ25yemlmeXlhZ2ZScUpxMzlR?=
- =?utf-8?B?RjhjNjUvOXhoUVAvRXpPaXNyempRNldhby95eXJRWFY4eFdhWXU4aDlRbWF4?=
- =?utf-8?B?Q2tQWjBQL2hZU0lVYUZIRjRxS0lrTEwwbHIrWHhCUEkwZFBNQStyMGZMMkR1?=
- =?utf-8?B?NjNXSFhGeDhGM2xTb0F4b2Z1UjRiNmJ2ZG9mVW9OVXdkOW1HbWRINlNFbUxE?=
- =?utf-8?B?Vm9iQ3FMcm42RU1tYm1jT2gzbW5mNTNRQ0ptNjVaSUNIWWpEVm5tVTNIRkxZ?=
- =?utf-8?B?aW5POUFDUnZPZGJVUmFpenJpR2RKdnYxUm1xamJiNWN1OFdKYXUrTitwTHU5?=
- =?utf-8?B?ZVVJY3o0Y3IwbkFGWmtUNHFsYTlWVS8rS0toOUx1QVR2UTZIVms1QmxWbWYv?=
- =?utf-8?B?aEdEZDVSUDJoTWk5Y0xGeU1MSENEMzFqVFdrL0hVU21lbXRBTUxsZzhkRWxw?=
- =?utf-8?B?Wi9FWU0zRnVLektWSTh3L2NhQ0ZCNUFWS3lqTE5BYlJsZGxsdGFWSHliTHlD?=
- =?utf-8?B?YjFFcTI1UXhxNEN1ZE01YnpjV1FqTGZJMVBWSFVSM1RlSWR5RXhXTVFRRTlB?=
- =?utf-8?Q?a82uof?=
-x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:MN0PR11MB5963.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(1800799024)(376014)(7416014)(38070700021);DIR:OUT;SFP:1101;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0: =?utf-8?B?Sk1sbkFoUHZDaUF0N3JvUUJhUHo2cWtqMFhjQ0dZNURiUkpWZC9NQ2RTU29P?=
- =?utf-8?B?MmlCdzFkUXFHclZQTGVHRnZOS21leC9BNGpDV3JnMytEQVJ3b2ZNNzMrOTJ4?=
- =?utf-8?B?d2JBR29NcDJQNWNsUHdSeXlDanlyMWd2TXl3UU5QYjhTT1cxM1RuNnJsUnZS?=
- =?utf-8?B?aFVoL01nTmdGWEZDTUMrU0dJTUZHNU5MYThFNkVJY3R6ZStra2g5UGwydWZy?=
- =?utf-8?B?RjJOdDMwZFhOcEg4L0pCdWNNN1RYbXhsN3ZKcnZZN1VpdXI4MW1HN2Fsd0Vw?=
- =?utf-8?B?MVBrMkc0dmRGa1RQY2VqYW9vOUhYamlkRytQTXZzeThGaytHN1RXeUlBREhz?=
- =?utf-8?B?SmxYMS9UaWhEOVBVK1FRQlJqSFVOTlA0SjN2UzV1VDBYZmJwbmwydjBDTjUz?=
- =?utf-8?B?bFhhRFh5akdRdzFRdTU1WTFlREE3cEl2d1duYnIxQ2JIQ0hLM1RyZU5MMWts?=
- =?utf-8?B?bWxlZEc4UDVSeSs2eS95aUJicHhCMjlkem1ZeTdXTkVxdHM5RXpnUlBjbFY1?=
- =?utf-8?B?TEVSbFgrcHF6RXhaMWhONjc2OU5LRXhsd0NVcWFIV0ZrSGh6UlBmb0pKZnBy?=
- =?utf-8?B?aGxITzFmU29hNVRHS2g3NnhoLzN0QUhSc2UzUDNkLzBOTk5JUEpvYkRWcGUv?=
- =?utf-8?B?QU5VV2RNN00zWlg0S05hS3NlY0VhQ0kwSkdUMUxHYTRuYzVtNW1DeWN1RzFh?=
- =?utf-8?B?NmxycDdTWjd3dlovSDduL2Y0MUlMaWsvRndTZzVKOWpaUlZjTEFhcGMxZU5I?=
- =?utf-8?B?MnVFVTRLdDhiMDNIc1ZwMm1vdVJOUWNkbzVEY1hVTEtlUW9nSGxPLzFhYVht?=
- =?utf-8?B?b2g3aWJHSHNKa1d3M1h5NjRaS1NSVkRaT0ltZDRCSnpOMnZya2tvNGJGb1Jk?=
- =?utf-8?B?Nm1pZFlRTXNzN3ZwTFpxK3E0YVhTbmR2MWtaMVNacDJQSEI3SjFsOHVDYVdQ?=
- =?utf-8?B?QW04TUNvNmZBcVI2WEhDRHU0amZLNVdMd3hyNjZsaVpsVWtZOTZ0dnZOSklW?=
- =?utf-8?B?ejBJNVI3cFlqYlZvTVpOVGxQL2tVWTUrNUlpamRrUXU3cXZUSTVmTDEydklS?=
- =?utf-8?B?eTZXRkFLUlpUYk1rbTJkWEsvYnZ1Q3Z1a2hvNDNJQ21lMHhsR2ZQRE02SC9L?=
- =?utf-8?B?dXphbFNTZEJZWXlZQTE1bXQ2bnpJTjlVV0o5YWkvY3BOM2RWNzZhSVVWdURI?=
- =?utf-8?B?STNLVUxDeTNxc055cDFZUU0rdWVzY2syL0NCWllnSUtRR3pZQWc1ZTNkVVEy?=
- =?utf-8?B?a0JiRkxmcWNqM3paazZ3ZVZHamkyRTI3MkZ6VmM5UDg0UkxzL0Z4RERvbFZk?=
- =?utf-8?B?QmxSMnE3NEwzdkF0SEp2YmtqSWNFUkFtTURQSy96T3E1bzFCcC9razljQkZy?=
- =?utf-8?B?cHNxYkdjMWJmanpGeDBhNys4bHJDMWYrNE5KeG9aUmdEWmdhOHozbVhrS0Zi?=
- =?utf-8?B?NTd5Wkp6MFp6M2o5UnlQaUszaWlqeGVjVyt3NDUvKzdyUUc5S0ZTZWk2NUVV?=
- =?utf-8?B?b3BILy9WcnhQS3NWN0tMMlY0YnI4em44eEoxZkNQeWRRTTVzUDY0ajh4bkpY?=
- =?utf-8?B?RjhNM3Z4L2xob2Q3WS8yTWdxanI3S0k0N3ZYV3V6K2l1aDVkS2dnZnBJcTly?=
- =?utf-8?B?eUJ3cTdyMzFkZG1wVW9LVTZzK1dKNVJRZW1jOVR5Y2VzcWwyblh2a1lmaU93?=
- =?utf-8?B?dVVxMUE5bngyNlVENndzVjRqVmYrL1lUUzVhNWRBd2V0MXRsNTQxZ3BUK3Vy?=
- =?utf-8?B?SjBsU3R1L1lQUHVWZTk4ejdmVVVsclNRaFhKTXBXaDNEYU9VWTVsb1lEU2Z1?=
- =?utf-8?B?SXQvU1lMclAxWG15eGVMVThtTVpYZlVScXhzajl1dEpHLzdFY2hMUjZyZzVP?=
- =?utf-8?B?SGFYYU9GMkROVGhWUWI4UEpnM0Z4M0RIZ2g5NmpVaVJjYmNVZWo2aGorOE1T?=
- =?utf-8?B?NE1TUmwxY0JoQ2ZUVnc2TlZGUkhBemR6cmY3VGxSTDlBRGRKeW1NZ2dZMnk1?=
- =?utf-8?B?MVlRWStSVmt6UEhYaG1DSVlVRGV6V2NNWjZpbDZtdTRiVGV6R2lOSjg5bnY1?=
- =?utf-8?B?bXN0aTNDTHRzc3JPWWgzbG9rSUY0NjV5alJ5RTlXUENkT0dGcGVSOHRDMnZM?=
- =?utf-8?B?TWEzM3N6b1dyeUpHSGVKditRWXI2QnFEa3Z1OXdEeWMxUHVRNTl6RG5WM0R1?=
- =?utf-8?B?R0E9PQ==?=
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <565F1F541AD3FC4E924E7A90DEEFDF43@namprd11.prod.outlook.com>
-Content-Transfer-Encoding: base64
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E13A624EAB1
+	for <kvm@vger.kernel.org>; Tue, 30 Sep 2025 18:42:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1759257761; cv=none; b=DYtU0k28y3NtQGpxRqQyf5x7XlYpodvmhKBuFtP5oZ40/D3ocWyvSzDHro5Khql81INFae1LUf+j3Wx1RbY/jwmlxh2oOqIiE6xCiAOGpfbgGC7NqUkUJ21AI1gLpGHLYszCat8Lxk87xGHvxPEcfnFbFpKufdzvTzGvBPWvqKY=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1759257761; c=relaxed/simple;
+	bh=aVWVURhii6qBrIwK+bR3pj92fwrHdTqPFet1/u8qBEc=;
+	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type; b=Hs4I24fTrCGfJ+0t5Dn70tseVU6szhACDGvHfp6HnC61LIBXKPcwXEHg7xDr0qRu0RPxxmqvBqdUSYiOwQWs4lxeon3MD2iw35ASlV3EnLx+9xqAempMN7nBX/w5eOjxTbLtWEH41Wn6+/oU3e8Eh9ttasGp9NWOIkI4GlTTI5c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=euVuJ7Iw; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1759257748;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=x6hlcVbvRzzKhW3YzhPC1SyaWRJSa9WcOx8faDw3Dvk=;
+	b=euVuJ7Iw5C+k7dEphvKcUqTS66NPvQmGkweZesb8SfRhdsBHmBPIXwrLeqpb/7BYTLS9tY
+	sb9OoMceXZbbxJFjnnx9xn6nIsuNxyPSBqi7BAhQ7iIPh7PQ1ajCLsla/YtB8azqM8Xek5
+	BgIBuIfenhtBfzQSA9XJYAqyVwYVOio=
+Received: from mail-il1-f199.google.com (mail-il1-f199.google.com
+ [209.85.166.199]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-41-4jgCrF-ZNIK8Rvqzz0dPbA-1; Tue, 30 Sep 2025 14:42:26 -0400
+X-MC-Unique: 4jgCrF-ZNIK8Rvqzz0dPbA-1
+X-Mimecast-MFC-AGG-ID: 4jgCrF-ZNIK8Rvqzz0dPbA_1759257746
+Received: by mail-il1-f199.google.com with SMTP id e9e14a558f8ab-427350656e3so8840515ab.1
+        for <kvm@vger.kernel.org>; Tue, 30 Sep 2025 11:42:26 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1759257745; x=1759862545;
+        h=content-transfer-encoding:mime-version:message-id:subject:cc:to
+         :from:date:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=x6hlcVbvRzzKhW3YzhPC1SyaWRJSa9WcOx8faDw3Dvk=;
+        b=vK5JhVW69rFBoCoghzHIVjYAvN+sYTeH99XTj35M6Z0TlrhW8YVYrOI0aFAvJbhBAd
+         10SHuNdt4Y1H82L6U/76RckmQO2CmlbvVFTEXkGOU6OzWhJ88NR/S8vcbknSF7vxvi3F
+         3B/uahBMs/K+F3kvi8cyOyRSemvi1NJrMJ0G+UT4VGM0EgdvjHLn6qnRjBM7Rb8GrSiA
+         FW+e9siD1KWcClZWhDOT7ogUcO3OBRZt3zkwnmdP4Gx5jFJkIkIwY8+xfL15+maCk8NA
+         DOYc+puDzDnUEDzM7IHzFJ8ZDBRhgTwLWJdyLHDiI5ZYAqZdOPtJWmBNFqEM0ok/jA9r
+         id/w==
+X-Forwarded-Encrypted: i=1; AJvYcCXssR5nQyqCpbuyAtLYMTJXPiHqiNy5+UV8QHWi0GSgLO6U/rddn1no6Qd66dbjLEyGQkU=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwMzDytFrUArpbw2syT+oeJLwiD6W0WV9c19TGX+1cwt28vyMMr
+	xXU//C59X4UvEqZLY3m4oOtu3u9r65I3ah0nnlY0hW7ekazB7/+VujJhc/Dmfzo1vHGfGwN77/Q
+	wR7/27xASwEcD67Vc8NrrnnStaWGw9wrUGR9EIa5h2zUTETt28w6ER3SqmI9Sgw==
+X-Gm-Gg: ASbGncvWxS3wbUvuJ0SrdFoxWjNNHETL2bM0UX9M3Y6jm65IfhtdR+2wXFP5/e4azrR
+	BxFrVR+uLZlyNuvayOONglVvuHDEJT4Vgiovu8zMri/ZhiqechEXwaSeK/i09hnmNErz4Q/eM4c
+	O856tvPA5FePSaRn7G9kkyRmxguN+hOqObEUA5jDEZJrx+nH5jWe5d6vwyQwlX0lX46dTV8ao8Z
+	YCH/i0hfdLZJ5dWvqBpnRqpI/NbyF9ayiOIOjeoTxsDFxa643/6bShOA6x+dpetAkM5Sa6OF3Wz
+	J6F9RFJ9+j9obgfE8hLIhfjHxyRFQaWsoPkTz374+mvBAfRv
+X-Received: by 2002:a05:6e02:1a86:b0:423:fcd6:549e with SMTP id e9e14a558f8ab-42d81632973mr5896365ab.7.1759257745069;
+        Tue, 30 Sep 2025 11:42:25 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IFy1hxkRNTtZx8e+QGHUmQrk20UQiCzg7Pz4dXbjRyqOCvglQxBciKjkUUeA8UDvyuA8k/elg==
+X-Received: by 2002:a05:6e02:1a86:b0:423:fcd6:549e with SMTP id e9e14a558f8ab-42d81632973mr5896245ab.7.1759257744575;
+        Tue, 30 Sep 2025 11:42:24 -0700 (PDT)
+Received: from redhat.com ([38.15.36.11])
+        by smtp.gmail.com with ESMTPSA id 8926c6da1cb9f-56a6ae6ec63sm6130670173.73.2025.09.30.11.42.23
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 30 Sep 2025 11:42:23 -0700 (PDT)
+Date: Tue, 30 Sep 2025 12:42:21 -0600
+From: Alex Williamson <alex.williamson@redhat.com>
+To: Linus Torvalds <torvalds@linux-foundation.org>
+Cc: <linux-kernel@vger.kernel.org>, "kvm@vger.kernel.org"
+ <kvm@vger.kernel.org>
+Subject: [GIT PULL] VFIO updates for v6.18-rc1
+Message-ID: <20250930124221.39523455.alex.williamson@redhat.com>
+X-Mailer: Claws Mail 4.3.1 (GTK 3.24.43; x86_64-redhat-linux-gnu)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: MN0PR11MB5963.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: a004cb10-8625-4c63-a25c-08de004f4dcb
-X-MS-Exchange-CrossTenant-originalarrivaltime: 30 Sep 2025 18:29:34.0188
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: RYBE/4OJYnQl77VkGIAMGXnT3x0Od1HRVW9Hh+pRW1yKaNH3RkXzAQEUqLrW/cdL2yMrmGuBPnovdumxvSmmAfFehaTb6kWE0IvGOeY7fWU=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: CY5PR11MB6366
-X-OriginatorOrg: intel.com
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-T24gTW9uLCAyMDI1LTA5LTI5IGF0IDA5OjU4IC0wNzAwLCBSaWNrIEVkZ2Vjb21iZSB3cm90ZToN
-Cj4gSXQgbWlnaHQgc2VydmUgYSBwdXJwb3NlIG9mIHByb3ZpbmcgdGhhdCBzY2FsYWJpbGl0eSBp
-cyBwb3NzaWJsZS4gSSB3YXMgdGhpbmtpbmcNCj4gaWYgd2UgaGFkIGxpbmUgb2Ygc2lnaHQgdG8g
-aW1wcm92aW5nIGl0IHdlIGNvdWxkIGdvIHdpdGggdGhlICJzaW1wbGUiIHNvbHV0aW9uDQo+IGFu
-ZCB3YWl0IHVudGlsIHRoZXJlIGlzIGEgcHJvYmxlbS4gSXMgaXQgcmVhc29uYWJsZT8NCg0KV2Ug
-ZGlzY3Vzc2VkIHRoaXMgb2ZmbGluZSBhbmQgdGhlIGNvbmNsdXNpb24gd2FzIHRvIGp1c3Qga2Vl
-cCBhIGdsb2JhbA0KcmVhZGVyL3dyaXRlciBsb2NrIGFzIHRoZSBiYWNrcG9ja2V0IHNvbHV0aW9u
-LiBTbyBEUEFNVCBzZWFtY2FsbHMgdGFrZSB0aGUNCmdsb2JhbCByZWFkZXIsIGFuZCBpZiB0aGV5
-IGdldCBhIEJVU1kgY29kZSwgdGhleSB0YWtlIHRoZSBnbG9iYWwgbG9jayBhcyB3cml0ZQ0KYW5k
-IHJldHJ5LiBTaW1pbGFyIHRvIHdoYXQgS1ZNIGRvZXMgb24gYSBwZXItVk0gc2NvcGUsIGJ1dCBn
-bG9iYWxseSBhbmQgcmVkdWNlZA0KYnkgdGhlIHJlZmNvdW50Lg0KDQpCdXQgdW50aWwgdGhlcmUg
-aXMgYSBtZWFzdXJlZCBpc3N1ZSwganVzdCBrZWVwIHRoZSBzaW1wbGVyIGdsb2JhbCBleGNsdXNp
-dmUgbG9jaw0Kd2l0aCB0aGUgcmVmY291bnQgdG8gc3RhcnQuIFNvIHVubGVzcyBhbnlvbmUgbmV3
-IGNoaW1lcyBpbiwgd2UgY2FuIGNhbGwgdGhpcw0KY2xvc2VkLg0K
+Hi Linus,
+
+The following changes since commit 1b237f190eb3d36f52dffe07a40b5eb210280e00:
+
+  Linux 6.17-rc3 (2025-08-24 12:04:12 -0400)
+
+are available in the Git repository at:
+
+  https://github.com/awilliam/linux-vfio.git tags/vfio-v6.18-rc1
+
+for you to fetch changes up to 407aa63018d15c35a34938633868e61174d2ef6e:
+
+  vfio/nvgrace-gpu: Add GB300 SKU to the devid table (2025-09-26 08:38:05 -0600)
+
+----------------------------------------------------------------
+VFIO updates for v6.18-rc1
+
+ - Use fdinfo to expose the sysfs path of a device represented by a
+   vfio device file. (Alex Mastro)
+
+ - Mark vfio-fsl-mc, vfio-amba, and the reset functions for
+   vfio-platform for removal as these are either orphaned or believed
+   to be unused. (Alex Williamson)
+
+ - Add reviewers for vfio-platform to save it from also being marked
+   for removal. (Mostafa Saleh, Pranjal Shrivastava)
+
+ - VFIO selftests, including basic sanity testing and minimal userspace
+   drivers for testing against real hardware.  This is also expected to
+   provide integration with KVM selftests for KVM-VFIO interfaces.
+   (David Matlack, Josh Hilke)
+
+ - Fix drivers/cdx and vfio/cdx to build without CONFIG_GENERIC_MSI_IRQ.
+   (Nipun Gupta)
+
+ - Fix reference leak in hisi_acc. (Miaoqian Lin)
+
+ - Use consistent return for unsupported device feature. (Alex Mastro)
+
+ - Unwind using the correct memory free callback in vfio/pds.
+   (Zilin Guan)
+
+ - Use IRQ_DISABLE_LAZY flag to improve handling of pre-PCI2.3 INTx
+   and resolve stalled interrupt on ppc64. (Timothy Pearson)
+
+ - Enable GB300 in nvgrace-gpu vfio-pci variant driver. (Tushar Dave)
+
+ - Misc:
+   - Drop unnecessary ternary conversion in vfio/pci. (Xichao Zhao)
+   - Grammatical fix in nvgrace-gpu. (Morduan Zang)
+   - Update Shameer's email address. (Shameer Kolothum)
+   - Fix document build warning. (Alex Williamson)
+
+----------------------------------------------------------------
+Alex Mastro (2):
+      vfio/pci: print vfio-device syspath to fdinfo
+      vfio: return -ENOTTY for unsupported device feature
+
+Alex Williamson (4):
+      vfio/fsl-mc: Mark for removal
+      docs: proc.rst: Fix VFIO Device title formatting
+      vfio/amba: Mark for removal
+      vfio/platform: Mark reset drivers for removal
+
+David Matlack (26):
+      selftests: Create tools/testing/selftests/vfio
+      vfio: selftests: Add a helper library for VFIO selftests
+      vfio: selftests: Introduce vfio_pci_device_test
+      vfio: selftests: Keep track of DMA regions mapped into the device
+      vfio: selftests: Enable asserting MSI eventfds not firing
+      vfio: selftests: Add a helper for matching vendor+device IDs
+      vfio: selftests: Add driver framework
+      vfio: sefltests: Add vfio_pci_driver_test
+      tools headers: Add stub definition for __iomem
+      tools headers: Import asm-generic MMIO helpers
+      tools headers: Import x86 MMIO helper overrides
+      tools headers: Add symlink to linux/pci_ids.h
+      dmaengine: ioat: Move system_has_dca_enabled() to dma.h
+      vfio: selftests: Add driver for Intel CBDMA
+      tools headers: Import iosubmit_cmds512()
+      dmaengine: idxd: Allow registers.h to be included from tools/
+      vfio: selftests: Add driver for Intel DSA
+      vfio: selftests: Move helper to get cdev path to libvfio
+      vfio: selftests: Encapsulate IOMMU mode
+      vfio: selftests: Replicate tests across all iommu_modes
+      vfio: selftests: Add vfio_type1v2_mode
+      vfio: selftests: Add iommufd_compat_type1{,v2} modes
+      vfio: selftests: Add iommufd mode
+      vfio: selftests: Make iommufd the default iommu_mode
+      vfio: selftests: Add a script to help with running VFIO selftests
+      vfio: selftests: Fix .gitignore for already tracked files
+
+Josh Hilke (5):
+      vfio: selftests: Test basic VFIO and IOMMUFD integration
+      vfio: selftests: Move vfio dma mapping test to their own file
+      vfio: selftests: Add test to reset vfio device.
+      vfio: selftests: Add DMA mapping tests for 2M and 1G HugeTLB
+      vfio: selftests: Validate 2M/1G HugeTLB are mapped as 2M/1G in IOMMU
+
+Miaoqian Lin (1):
+      hisi_acc_vfio_pci: Fix reference leak in hisi_acc_vfio_debug_init
+
+Morduan Zang (1):
+      vfio/nvgrace-gpu: fix grammatical error
+
+Mostafa Saleh (1):
+      MAINTAINERS: Add myself as VFIO-platform reviewer
+
+Nipun Gupta (2):
+      cdx: don't select CONFIG_GENERIC_MSI_IRQ
+      vfio/cdx: update driver to build without CONFIG_GENERIC_MSI_IRQ
+
+Pranjal Shrivastava (1):
+      MAINTAINERS: Add myself as VFIO-platform reviewer
+
+Shameer Kolothum (1):
+      MAINTAINERS: Update Shameer Kolothum's email address
+
+Timothy Pearson (1):
+      vfio/pci: Fix INTx handling on legacy non-PCI 2.3 devices
+
+Tushar Dave (1):
+      vfio/nvgrace-gpu: Add GB300 SKU to the devid table
+
+Xichao Zhao (1):
+      vfio/pci: drop redundant conversion to bool
+
+Zilin Guan (1):
+      vfio/pds: replace bitmap_free with vfree
+
+ .mailmap                                           |   1 +
+ Documentation/filesystems/proc.rst                 |  14 +
+ MAINTAINERS                                        |  14 +-
+ drivers/cdx/Kconfig                                |   1 -
+ drivers/cdx/cdx.c                                  |   4 +-
+ drivers/cdx/controller/Kconfig                     |   1 -
+ drivers/cdx/controller/cdx_controller.c            |   3 +-
+ drivers/dma/idxd/registers.h                       |   4 +
+ drivers/dma/ioat/dma.h                             |   2 +
+ drivers/dma/ioat/hw.h                              |   3 -
+ drivers/vfio/cdx/Makefile                          |   6 +-
+ drivers/vfio/cdx/private.h                         |  14 +
+ drivers/vfio/fsl-mc/Kconfig                        |   5 +-
+ drivers/vfio/fsl-mc/vfio_fsl_mc.c                  |   2 +
+ drivers/vfio/pci/hisilicon/hisi_acc_vfio_pci.c     |   6 +-
+ drivers/vfio/pci/nvgrace-gpu/main.c                |   4 +-
+ drivers/vfio/pci/pds/dirty.c                       |   2 +-
+ drivers/vfio/pci/vfio_pci_intrs.c                  |   9 +-
+ drivers/vfio/platform/Kconfig                      |   5 +-
+ drivers/vfio/platform/reset/Kconfig                |   6 +-
+ .../vfio/platform/reset/vfio_platform_amdxgbe.c    |   2 +
+ .../vfio/platform/reset/vfio_platform_bcmflexrm.c  |   2 +
+ .../platform/reset/vfio_platform_calxedaxgmac.c    |   2 +
+ drivers/vfio/platform/vfio_amba.c                  |   2 +
+ drivers/vfio/vfio_main.c                           |  22 +-
+ tools/arch/x86/include/asm/io.h                    | 101 ++++
+ tools/arch/x86/include/asm/special_insns.h         |  27 +
+ tools/include/asm-generic/io.h                     | 482 +++++++++++++++++
+ tools/include/asm/io.h                             |  11 +
+ tools/include/linux/compiler.h                     |   4 +
+ tools/include/linux/io.h                           |   4 +-
+ tools/include/linux/pci_ids.h                      |   1 +
+ tools/testing/selftests/Makefile                   |   1 +
+ tools/testing/selftests/vfio/.gitignore            |  10 +
+ tools/testing/selftests/vfio/Makefile              |  21 +
+ tools/testing/selftests/vfio/lib/drivers/dsa/dsa.c | 416 +++++++++++++++
+ .../selftests/vfio/lib/drivers/dsa/registers.h     |   1 +
+ tools/testing/selftests/vfio/lib/drivers/ioat/hw.h |   1 +
+ .../testing/selftests/vfio/lib/drivers/ioat/ioat.c | 235 ++++++++
+ .../selftests/vfio/lib/drivers/ioat/registers.h    |   1 +
+ .../testing/selftests/vfio/lib/include/vfio_util.h | 295 ++++++++++
+ tools/testing/selftests/vfio/lib/libvfio.mk        |  24 +
+ tools/testing/selftests/vfio/lib/vfio_pci_device.c | 594 +++++++++++++++++++++
+ tools/testing/selftests/vfio/lib/vfio_pci_driver.c | 126 +++++
+ tools/testing/selftests/vfio/run.sh                | 109 ++++
+ .../testing/selftests/vfio/vfio_dma_mapping_test.c | 199 +++++++
+ .../selftests/vfio/vfio_iommufd_setup_test.c       | 127 +++++
+ .../testing/selftests/vfio/vfio_pci_device_test.c  | 176 ++++++
+ .../testing/selftests/vfio/vfio_pci_driver_test.c  | 244 +++++++++
+ 49 files changed, 3323 insertions(+), 23 deletions(-)
+ create mode 100644 tools/arch/x86/include/asm/io.h
+ create mode 100644 tools/arch/x86/include/asm/special_insns.h
+ create mode 100644 tools/include/asm-generic/io.h
+ create mode 100644 tools/include/asm/io.h
+ create mode 120000 tools/include/linux/pci_ids.h
+ create mode 100644 tools/testing/selftests/vfio/.gitignore
+ create mode 100644 tools/testing/selftests/vfio/Makefile
+ create mode 100644 tools/testing/selftests/vfio/lib/drivers/dsa/dsa.c
+ create mode 120000 tools/testing/selftests/vfio/lib/drivers/dsa/registers.h
+ create mode 120000 tools/testing/selftests/vfio/lib/drivers/ioat/hw.h
+ create mode 100644 tools/testing/selftests/vfio/lib/drivers/ioat/ioat.c
+ create mode 120000 tools/testing/selftests/vfio/lib/drivers/ioat/registers.h
+ create mode 100644 tools/testing/selftests/vfio/lib/include/vfio_util.h
+ create mode 100644 tools/testing/selftests/vfio/lib/libvfio.mk
+ create mode 100644 tools/testing/selftests/vfio/lib/vfio_pci_device.c
+ create mode 100644 tools/testing/selftests/vfio/lib/vfio_pci_driver.c
+ create mode 100755 tools/testing/selftests/vfio/run.sh
+ create mode 100644 tools/testing/selftests/vfio/vfio_dma_mapping_test.c
+ create mode 100644 tools/testing/selftests/vfio/vfio_iommufd_setup_test.c
+ create mode 100644 tools/testing/selftests/vfio/vfio_pci_device_test.c
+ create mode 100644 tools/testing/selftests/vfio/vfio_pci_driver_test.c
+
 
