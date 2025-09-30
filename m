@@ -1,243 +1,125 @@
-Return-Path: <kvm+bounces-59180-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-59181-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id DD65BBAE0E7
-	for <lists+kvm@lfdr.de>; Tue, 30 Sep 2025 18:34:17 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 86D9EBAE0ED
+	for <lists+kvm@lfdr.de>; Tue, 30 Sep 2025 18:34:36 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 43BDD19442B8
-	for <lists+kvm@lfdr.de>; Tue, 30 Sep 2025 16:34:39 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 225B63AF0BA
+	for <lists+kvm@lfdr.de>; Tue, 30 Sep 2025 16:34:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C1D422512D7;
-	Tue, 30 Sep 2025 16:34:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AEEDF246BB0;
+	Tue, 30 Sep 2025 16:34:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="fE4kFnb/"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="mLrl8Gbx"
 X-Original-To: kvm@vger.kernel.org
-Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pg1-f201.google.com (mail-pg1-f201.google.com [209.85.215.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 16D8434BA28;
-	Tue, 30 Sep 2025 16:33:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7D4EC3C465
+	for <kvm@vger.kernel.org>; Tue, 30 Sep 2025 16:34:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1759250040; cv=none; b=u7sMYYZXgt/D+AJ/OaS9fpRrINMLmqp5SCHj7wrKj2+jejJONiLBrzf4Xbj1ztbdGtzVdMqHgtzLSu5bnzPgCRxkQqZpc7Mm3oyqrLW94bsd6TB3Rhocp4vLhk3G2gtMxBrB/53yMuqwvlrGhRIadl3FKdG8ZifjXXrYX5gx09Q=
+	t=1759250065; cv=none; b=B1bEg9btlTX6Qv2LbgcaAH5PkQ0H+OoRT5zSjbEgYEPhdjMnsRy4AD47F7GWGn/DxbWf6BfhKujdIuZrXMwzgtJw+QbAECf89qgA9MdGBd3xNBTodMs4GUrNuh4HtPV/msnj5t7iuAnfDS1j6QWb/rWEKcam0mqoQzc2G7X48Po=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1759250040; c=relaxed/simple;
-	bh=AEPMdml46ULUtTOKqF5X8r3wP3pKhY5Ejtc1s+85IJQ=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=iTQHu4gdi77KeskWuQr/ZXsmmg8Gz/s9hSDxhfXKJ2tMtRxh9W/pqCFG4+5O/Tn7CmqLSQ/z4L29lPVZlY/dGowtk917OvaniIdYODha9kKl8J+VOZs9PAGpQjev7uD9/zV+JV9OOqkp87/dJ0HEH4yWVcdL0N5qkxDVnQ7br/A=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=fE4kFnb/; arc=none smtp.client-ip=148.163.158.5
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
-Received: from pps.filterd (m0353725.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 58U9Sn3F026191;
-	Tue, 30 Sep 2025 16:33:55 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
-	:content-transfer-encoding:date:from:in-reply-to:message-id
-	:mime-version:references:subject:to; s=pp1; bh=jR3v6SSaULZd3rObz
-	M7pdTAJnQxNk3urHNrPSmK9tys=; b=fE4kFnb/83jg8QteEcWEJZh8iueGKxdCk
-	5/zusVGaRp+yB20X9Yf0FtHHyN9vGLNYPZjyCfBGat8Kaq+Op6CR7ilCCrIiIyiR
-	e+YYK4RttEpwaKto40w1MOQDole/6IrUYJTK94qgRwC7NIlqTPv7OaNt5KM9Abeq
-	9MaIAydDnNrjhQyB9jkcXYAv/S9fzFPt3UBqEhbsSo5bGV1sSE5rlwM8Ge7lHUXc
-	wTBOXp1zNYG9+Xj0uIFk35bvkVmyUlGSTQ4RwouroHRPMNo8BLDuBy/MMSeI2Whu
-	RbM8VFd1wsSrVUyDAhZ12FarkHlruCUX09SmEIzd3Kjdnyvu0wo0w==
-Received: from ppma21.wdc07v.mail.ibm.com (5b.69.3da9.ip4.static.sl-reverse.com [169.61.105.91])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 49e6bhhw7k-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Tue, 30 Sep 2025 16:33:55 +0000 (GMT)
-Received: from pps.filterd (ppma21.wdc07v.mail.ibm.com [127.0.0.1])
-	by ppma21.wdc07v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 58UGXhPq026752;
-	Tue, 30 Sep 2025 16:33:55 GMT
-Received: from smtprelay02.fra02v.mail.ibm.com ([9.218.2.226])
-	by ppma21.wdc07v.mail.ibm.com (PPS) with ESMTPS id 49eu8mvctg-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Tue, 30 Sep 2025 16:33:54 +0000
-Received: from smtpav05.fra02v.mail.ibm.com (smtpav05.fra02v.mail.ibm.com [10.20.54.104])
-	by smtprelay02.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 58UGXo4A49414462
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Tue, 30 Sep 2025 16:33:51 GMT
-Received: from smtpav05.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id DECDC2004B;
-	Tue, 30 Sep 2025 16:33:50 +0000 (GMT)
-Received: from smtpav05.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id C100B20043;
-	Tue, 30 Sep 2025 16:33:50 +0000 (GMT)
-Received: from p-imbrenda.boeblingen.de.ibm.com (unknown [9.152.224.66])
-	by smtpav05.fra02v.mail.ibm.com (Postfix) with ESMTP;
-	Tue, 30 Sep 2025 16:33:50 +0000 (GMT)
-From: Claudio Imbrenda <imbrenda@linux.ibm.com>
-To: pbonzini@redhat.com
-Cc: kvm@vger.kernel.org, linux-s390@vger.kernel.org, frankja@linux.ibm.com,
-        borntraeger@de.ibm.com, david@redhat.com
-Subject: [GIT PULL v1 2/2] KVM: s390: Fix to clear PTE when discarding a swapped page
-Date: Tue, 30 Sep 2025 18:33:50 +0200
-Message-ID: <20250930163350.83377-3-imbrenda@linux.ibm.com>
-X-Mailer: git-send-email 2.51.0
-In-Reply-To: <20250930163350.83377-1-imbrenda@linux.ibm.com>
-References: <20250930163350.83377-1-imbrenda@linux.ibm.com>
+	s=arc-20240116; t=1759250065; c=relaxed/simple;
+	bh=TzPIt5QqZ/ncsUjXjePi75S8DUEZ/jVmGu8XXDEiJAM=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=VGSbKkQZ8MJFM8KZAjLWOtX4L8EtYcjp+2U7yQ7I+bWfmnK6cBAM10uvRI1gwdSqhluTEH6lJ9S1DQa+hUwI8GJLSm7Kdv45nm4hmeiQGigWC2t0seBajLAMlxf4+ORSPOZYXG4VHg+e4hkAi1pva0exh0W2E3ijB4SIxmocPCE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=mLrl8Gbx; arc=none smtp.client-ip=209.85.215.201
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+Received: by mail-pg1-f201.google.com with SMTP id 41be03b00d2f7-b59682541d5so6131887a12.0
+        for <kvm@vger.kernel.org>; Tue, 30 Sep 2025 09:34:24 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1759250064; x=1759854864; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=ts11PRKQJbECWFlSkrZaC2Cq1Up8eQN07d9pIiZQ+5k=;
+        b=mLrl8Gbx8P/xaEvvVhl9dZlhF0gROHdf67ZZwcZEczk1C61fTGzTaUf/0wZhsfPX4t
+         TJINk2ZRMiQlwCJB4eoxbFCngN/WnW9KpGTwOiP4KbDFeZRg5hq9Yfs5dfyAk03av6l1
+         u+R+cHNU+XF9g4VXntrYdu8E8/APH7DGb/tBO1uNXuCGiPoQvr27faNZKIkF1nCnItpg
+         t3WAwREU3P9IqJ+VC0W4SexOc/YT8CziDSU6+ByBFufw/0NnLSq52m8yz9GmUPTB76Of
+         hw3dsqu/bXSQVlj7FHcCuIStm8cVa7LfVBLQjV7ZEjDW+8H303TxTQpPizU1UODDRDIf
+         T/0Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1759250064; x=1759854864;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=ts11PRKQJbECWFlSkrZaC2Cq1Up8eQN07d9pIiZQ+5k=;
+        b=OVyB8ERLlQFazgMDd0cCyOe4pAVSXSKUc+EB2uRTZY9bzixO4fmvkzQKsQ6fBy+m7d
+         PMjAS90o4VyfxsxNGBMRD2rX+itNHkvG3DM9BP8Qsozzn4B/atM+h/sTTB/Cf5cLS4eR
+         1H8L3Bq1VFoGrvt5SSOS3osRI5n2SbyPPko/0Gqj6nXGhExMphAmTP74wzhkRzdcAFwE
+         /7hMxBcu7GCrLdEfuy3tF9wegkr/vGoiSrl9RCUCDINybRLgeRPSho6llH9aPLldpmdN
+         pMdZ+WGF0SgNon48nTY+Mn9IU/AFpklXFkWp841wiizv7pZVFJs5OtNEBa9Yi7m+56W5
+         Ghpw==
+X-Forwarded-Encrypted: i=1; AJvYcCV6lnBKEKeISg06edc8BMoTTXoXcgslbk/9XWCxq9CTaPvYJ+jaSrMSMmDVCYACVkPwex8=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxTzrdHUQCZOftE+3JIfyBD+MMUiyuaOmCsFOt/OyTuxicf0UlP
+	L+eVXWjnXvo6JlzlP3tPkGIY4nGFRPBJYci4dffILJ2/OmaAhFlcJ1yb16D48adjPx5jF8zGtwe
+	BemMr8A==
+X-Google-Smtp-Source: AGHT+IFX4CBMrBfFxnkGRFgOYRHXTZmNWaYLzdc89aJiDnP/g8eaLWlThAkjYKzlvZmnAhY1DXZxav01xFw=
+X-Received: from pjzg20.prod.google.com ([2002:a17:90a:e594:b0:339:9a75:1b1e])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:38cb:b0:338:3dca:e0a3
+ with SMTP id 98e67ed59e1d1-339a6ec7e16mr119884a91.16.1759250061911; Tue, 30
+ Sep 2025 09:34:21 -0700 (PDT)
+Date: Tue, 30 Sep 2025 09:34:20 -0700
+In-Reply-To: <aNwFTLM3yt6AGAzd@google.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-X-Authority-Analysis: v=2.4 cv=Se/6t/Ru c=1 sm=1 tr=0 ts=68dc0673 cx=c_pps
- a=GFwsV6G8L6GxiO2Y/PsHdQ==:117 a=GFwsV6G8L6GxiO2Y/PsHdQ==:17
- a=yJojWOMRYYMA:10 a=VnNF1IyMAAAA:8 a=VwQbUJbxAAAA:8 a=o9l_a8J5pJTIQegNmNkA:9
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUwOTI3MDAxMCBTYWx0ZWRfXziRO5KWpw7Yu
- 2dhD3Vzk0drr4UdN81PwJDVWwOGGmcoStzEATpao/Pspg5GBC5aC19OGDl0lCOa1sEDzg0VeCJO
- Ml3WYYK5SoyTZAUy3MtMXYRj2HU9HXB6/FoCWqFBgfp3VGjdU0Rhgzwij3n15dxyX14ck7DSREj
- 3+0+LokHi9FbXdbokIxAh3Wdj34N1N85dtyg6z3y/bo/Of6EdKqbNIVBqezMIowpDWPaV4oVLAs
- 5mPrP+qyx5R0T5XOYns94/XNC9/MdsKR3pJ42fQmJC04OgNVTuMy35ttmQZlnzzxPjTxpdjsdtd
- OloH0J1xzqo7SGxGhXcLaInzkRVSGWhdWhzD31mPn5//A16fdekE4wI7OUdaRAjIfPV7Nqs0V+S
- WISJsrvK2xjWXmL1eZwH7ZJSLtu1iA==
-X-Proofpoint-GUID: 3GsrbdsNaAM0LZsFauFLuDZhXTV7WBtC
-X-Proofpoint-ORIG-GUID: 3GsrbdsNaAM0LZsFauFLuDZhXTV7WBtC
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1117,Hydra:6.1.9,FMLib:17.12.80.40
- definitions=2025-09-30_03,2025-09-29_04,2025-03-28_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- impostorscore=0 malwarescore=0 suspectscore=0 bulkscore=0 lowpriorityscore=0
- clxscore=1015 phishscore=0 priorityscore=1501 adultscore=0 spamscore=0
- classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
- reason=mlx scancount=1 engine=8.19.0-2509150000 definitions=main-2509270010
+Mime-Version: 1.0
+References: <20250919214259.1584273-1-seanjc@google.com> <aNvLkRZCZ1ckPhFa@yzhao56-desk.sh.intel.com>
+ <aNvT8s01Q5Cr3wAq@yzhao56-desk.sh.intel.com> <aNwFTLM3yt6AGAzd@google.com>
+Message-ID: <aNwGjIoNRGZL3_Qr@google.com>
+Subject: Re: [PATCH] KVM: x86: Drop "cache" from user return MSR setter that
+ skips WRMSR
+From: Sean Christopherson <seanjc@google.com>
+To: Yan Zhao <yan.y.zhao@intel.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	Xiaoyao Li <xiaoyao.li@intel.com>, Rick Edgecombe <rick.p.edgecombe@intel.com>
+Content-Type: text/plain; charset="us-ascii"
 
-From: Gautam Gala <ggala@linux.ibm.com>
+On Tue, Sep 30, 2025, Sean Christopherson wrote:
+> On Tue, Sep 30, 2025, Yan Zhao wrote:
+> > On Tue, Sep 30, 2025 at 08:22:41PM +0800, Yan Zhao wrote:
+> > > On Fri, Sep 19, 2025 at 02:42:59PM -0700, Sean Christopherson wrote:
+> > > > Rename kvm_user_return_msr_update_cache() to __kvm_set_user_return_msr()
+> > > > and use the helper kvm_set_user_return_msr() to make it obvious that the
+> > > > double-underscores version is doing a subset of the work of the "full"
+> > > > setter.
+> > > > 
+> > > > While the function does indeed update a cache, the nomenclature becomes
+> > > > slightly misleading when adding a getter[1], as the current value isn't
+> > > > _just_ the cached value, it's also the value that's currently loaded in
+> > > > hardware.
+> > > Nit:
+> > > 
+> > > For TDX, "it's also the value that's currently loaded in hardware" is not true.
+> > since tdx module invokes wrmsr()s before each exit to VMM, while KVM only
+> > invokes __kvm_set_user_return_msr() in tdx_vcpu_put().
+> 
+> No?  kvm_user_return_msr_update_cache() is passed the value that's currently
+> loaded in hardware, by way of the TDX-Module zeroing some MSRs on TD-Exit.
+> 
+> Ah, I suspect you're calling out that the cache can be stale.  Maybe this?
+> 
+>   While the function does indeed update a cache, the nomenclature becomes
+>   slightly misleading when adding a getter[1], as the current value isn't
+>   _just_ the cached value, it's also the value that's currently loaded in
+>   hardware (ignoring that the cache holds stale data until the vCPU is put,
+>   i.e. until KVM prepares to switch back to the host).
+> 
+> Actually, that's a bug waiting to happen when the getter comes along.  Rather
+> than document the potential pitfall, what about adding a prep patch to mimize
+> the window?  Then _this_ patch shouldn't need the caveat about the cache being
+> stale.
 
-KVM run fails when guests with 'cmm' cpu feature and host are
-under memory pressure and use swap heavily. This is because
-npages becomes ENOMEN (out of memory) in hva_to_pfn_slow()
-which inturn propagates as EFAULT to qemu. Clearing the page
-table entry when discarding an address that maps to a swap
-entry resolves the issue.
-
-Fixes: 200197908dc4 ("KVM: s390: Refactor and split some gmap helpers")
-Cc: stable@vger.kernel.org
-Suggested-by: Claudio Imbrenda <imbrenda@linux.ibm.com>
-Signed-off-by: Gautam Gala <ggala@linux.ibm.com>
-Reviewed-by: Claudio Imbrenda <imbrenda@linux.ibm.com>
-Signed-off-by: Claudio Imbrenda <imbrenda@linux.ibm.com>
----
- arch/s390/include/asm/pgtable.h | 22 ++++++++++++++++++++++
- arch/s390/mm/gmap_helpers.c     | 12 +++++++++++-
- arch/s390/mm/pgtable.c          | 23 +----------------------
- 3 files changed, 34 insertions(+), 23 deletions(-)
-
-diff --git a/arch/s390/include/asm/pgtable.h b/arch/s390/include/asm/pgtable.h
-index 6d8bc27a366e..324f96485604 100644
---- a/arch/s390/include/asm/pgtable.h
-+++ b/arch/s390/include/asm/pgtable.h
-@@ -2010,4 +2010,26 @@ static inline unsigned long gmap_pgste_get_pgt_addr(unsigned long *pgt)
- 	return res;
- }
- 
-+static inline pgste_t pgste_get_lock(pte_t *ptep)
-+{
-+	unsigned long value = 0;
-+#ifdef CONFIG_PGSTE
-+	unsigned long *ptr = (unsigned long *)(ptep + PTRS_PER_PTE);
-+
-+	do {
-+		value = __atomic64_or_barrier(PGSTE_PCL_BIT, ptr);
-+	} while (value & PGSTE_PCL_BIT);
-+	value |= PGSTE_PCL_BIT;
-+#endif
-+	return __pgste(value);
-+}
-+
-+static inline void pgste_set_unlock(pte_t *ptep, pgste_t pgste)
-+{
-+#ifdef CONFIG_PGSTE
-+	barrier();
-+	WRITE_ONCE(*(unsigned long *)(ptep + PTRS_PER_PTE), pgste_val(pgste) & ~PGSTE_PCL_BIT);
-+#endif
-+}
-+
- #endif /* _S390_PAGE_H */
-diff --git a/arch/s390/mm/gmap_helpers.c b/arch/s390/mm/gmap_helpers.c
-index a45d417ad951..c382005577bd 100644
---- a/arch/s390/mm/gmap_helpers.c
-+++ b/arch/s390/mm/gmap_helpers.c
-@@ -13,6 +13,7 @@
- #include <linux/pagewalk.h>
- #include <linux/ksm.h>
- #include <asm/gmap_helpers.h>
-+#include <asm/pgtable.h>
- 
- /**
-  * ptep_zap_swap_entry() - discard a swap entry.
-@@ -45,6 +46,7 @@ void gmap_helper_zap_one_page(struct mm_struct *mm, unsigned long vmaddr)
- {
- 	struct vm_area_struct *vma;
- 	spinlock_t *ptl;
-+	pgste_t pgste;
- 	pte_t *ptep;
- 
- 	mmap_assert_locked(mm);
-@@ -58,8 +60,16 @@ void gmap_helper_zap_one_page(struct mm_struct *mm, unsigned long vmaddr)
- 	ptep = get_locked_pte(mm, vmaddr, &ptl);
- 	if (unlikely(!ptep))
- 		return;
--	if (pte_swap(*ptep))
-+	if (pte_swap(*ptep)) {
-+		preempt_disable();
-+		pgste = pgste_get_lock(ptep);
-+
- 		ptep_zap_swap_entry(mm, pte_to_swp_entry(*ptep));
-+		pte_clear(mm, vmaddr, ptep);
-+
-+		pgste_set_unlock(ptep, pgste);
-+		preempt_enable();
-+	}
- 	pte_unmap_unlock(ptep, ptl);
- }
- EXPORT_SYMBOL_GPL(gmap_helper_zap_one_page);
-diff --git a/arch/s390/mm/pgtable.c b/arch/s390/mm/pgtable.c
-index 7df70cd8f739..6b92c348b56f 100644
---- a/arch/s390/mm/pgtable.c
-+++ b/arch/s390/mm/pgtable.c
-@@ -23,6 +23,7 @@
- #include <asm/tlbflush.h>
- #include <asm/mmu_context.h>
- #include <asm/page-states.h>
-+#include <asm/pgtable.h>
- #include <asm/machine.h>
- 
- pgprot_t pgprot_writecombine(pgprot_t prot)
-@@ -114,28 +115,6 @@ static inline pte_t ptep_flush_lazy(struct mm_struct *mm,
- 	return old;
- }
- 
--static inline pgste_t pgste_get_lock(pte_t *ptep)
--{
--	unsigned long value = 0;
--#ifdef CONFIG_PGSTE
--	unsigned long *ptr = (unsigned long *)(ptep + PTRS_PER_PTE);
--
--	do {
--		value = __atomic64_or_barrier(PGSTE_PCL_BIT, ptr);
--	} while (value & PGSTE_PCL_BIT);
--	value |= PGSTE_PCL_BIT;
--#endif
--	return __pgste(value);
--}
--
--static inline void pgste_set_unlock(pte_t *ptep, pgste_t pgste)
--{
--#ifdef CONFIG_PGSTE
--	barrier();
--	WRITE_ONCE(*(unsigned long *)(ptep + PTRS_PER_PTE), pgste_val(pgste) & ~PGSTE_PCL_BIT);
--#endif
--}
--
- static inline pgste_t pgste_get(pte_t *ptep)
- {
- 	unsigned long pgste = 0;
--- 
-2.51.0
-
+Ha!  It's technically a bug fix.  Because a forced shutdown will invoke
+kvm_shutdown() without waiting for tasks to exit, and so the on_each_cpu() calls
+to kvm_disable_virtualization_cpu() can call kvm_on_user_return() and thus
+consume a stale values->curr.
 
