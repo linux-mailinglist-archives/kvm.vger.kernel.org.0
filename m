@@ -1,213 +1,202 @@
-Return-Path: <kvm+bounces-59126-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-59127-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id F239EBAC0EE
-	for <lists+kvm@lfdr.de>; Tue, 30 Sep 2025 10:31:46 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1FB13BAC136
+	for <lists+kvm@lfdr.de>; Tue, 30 Sep 2025 10:36:26 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 86EEE3C30B1
-	for <lists+kvm@lfdr.de>; Tue, 30 Sep 2025 08:31:45 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 71CC51886CFF
+	for <lists+kvm@lfdr.de>; Tue, 30 Sep 2025 08:36:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D9F0B1A5B92;
-	Tue, 30 Sep 2025 08:31:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6064D26C384;
+	Tue, 30 Sep 2025 08:36:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="dToV/JMA"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="upx0hhSy"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-wr1-f65.google.com (mail-wr1-f65.google.com [209.85.221.65])
+Received: from mail-pf1-f202.google.com (mail-pf1-f202.google.com [209.85.210.202])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0E4A22BB17
-	for <kvm@vger.kernel.org>; Tue, 30 Sep 2025 08:31:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.65
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F31502475CD
+	for <kvm@vger.kernel.org>; Tue, 30 Sep 2025 08:36:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1759221100; cv=none; b=a5ia3r+18KCA+zucdqQlcEilPUsy6h7OXtKl4LVSB6AP7GDF/ZACWGUAMFKDxezomKVv+YQqL1eOlQ6vfFr2Nl6260EQjOzQ4eeH3sFGhQEEX5AehCreR0+5He1YlJpc+PxJdAds3k+JGskG0LugkoqlQ5uQASa/SihSQXLIgBo=
+	t=1759221375; cv=none; b=Ex2OWTao1po9I2rrmyapeuw8UD3ZQ/oHqmRmjMuT59j8zE8CN7NDAL6c6aoGG5ws7QVogHm/c8NpX7W9qW8NGw06Ql7r7X2n2UG+ytXUKFQiJHd2xOn3mkZ5ULa17uimwcj0EJw1LTgmsKZovfLDY0rWlyznh5s5jIuLhGZ0+UE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1759221100; c=relaxed/simple;
-	bh=hJwQ+1TnEjSuEyAWDWMOoEqLfa9xehXf84yRakrXUZ0=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=Nom+3wO3//+a8q/Rpo57rMNM1ay693SHIu341160D+izYAdtJKfQ2i6NWVLwixOaWvtjGrAwh12uiPkvhHzvTnKa/t12MGmOWsENRVmb1dG0hMAYH/V+y8RyaKpRINWCKRb3NwJDT5kr2ILymkwyDrTEsLdVGb7KgjAoGzJSVWg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=dToV/JMA; arc=none smtp.client-ip=209.85.221.65
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
-Received: by mail-wr1-f65.google.com with SMTP id ffacd0b85a97d-3f2cf786abeso4049809f8f.3
-        for <kvm@vger.kernel.org>; Tue, 30 Sep 2025 01:31:37 -0700 (PDT)
+	s=arc-20240116; t=1759221375; c=relaxed/simple;
+	bh=3ApQz3zWEqQtKCd46uqg3P7F105aAnSBnojZ09IUAOA=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=jR6CCQXa5kybh+1hO7BR8NZMDeKvRzi4NtLNMwh2hQI0ROFg0H2PbXJ4a3YkHECbhSkDoqfOoN4LzRfHvROOEF5JdwHRGpaUi7rU14rnmwiBAiEdDa6pkgiYqQSl599Ce4xly0FjcTiniVXdpPXANTkFORdxIp6xBvydyUCqh+s=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--ackerleytng.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=upx0hhSy; arc=none smtp.client-ip=209.85.210.202
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--ackerleytng.bounces.google.com
+Received: by mail-pf1-f202.google.com with SMTP id d2e1a72fcca58-783c3400b5dso1678061b3a.1
+        for <kvm@vger.kernel.org>; Tue, 30 Sep 2025 01:36:13 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1759221096; x=1759825896; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=EPblYzRdSvAbjbwbh03+CbSDEcFIuNHCFm6Gcm76lBw=;
-        b=dToV/JMApIA46Drx6jEBfNA5UZOvQ/bpPOoBnBRLS25Zako/utco5aioICKiRoqFz5
-         XRdXGnmSRTlLqy3OK8qm65pDxFZG4WUb0cQXrcXPEZnkMpW2aKaDDcOGttSCyHy3IbPb
-         CDTFLCXoZFqXP88TWyn+EgrfHvTmI/D0yvIuQgOPQBlgQ8hixg3OGj6MmtZBGl8ILNyN
-         AzD3jsCKWNwOyrW0/4k1ElxPnbLeF5Y3x8biVqSEMd3xvQlrw7R+aQ+GhvjAuf8rB3Gk
-         Iym5H8M6kYUCa3p9xA7PKCEDcbFwjZbW+E2IywnUJx2S0XTp3Wy83O1UiSEMRHPWnl+C
-         KsFA==
+        d=google.com; s=20230601; t=1759221373; x=1759826173; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=BGEcQ039PHX8Z6bbWR5CExl7OEuHya7NAHoYULkizA0=;
+        b=upx0hhSytbsM4hmsVLNMYbCUtVVxPaMUsFc2vtHkQb/xQvfCfsGfud9XbGJ0Acq2VQ
+         jOtekl+ikDeeAqJI+XcEVg4fI4DLSZ/od2uatDfR1ejQMcHTslRYJD9d2+UOTVIvDvu5
+         gdQzNfiZgsxPdOTbsatTwB71fXongh0LA53HNBNclzqbhVnYzy7Fuy0E5wGKIzT8pvao
+         K9lITB/d06WzhXWq3Xu24c5aS5gEehKOByiYcDy3QJHiKEEywxuJ7MV+NsLsAuRQcXgA
+         UdwFNXGmaZ8QaQalu0qBLpt85+ZTqOmDcxsM9VYCOLtAD5bsVXc5nTjP0BO5RMGIZZ82
+         Qjow==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1759221096; x=1759825896;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=EPblYzRdSvAbjbwbh03+CbSDEcFIuNHCFm6Gcm76lBw=;
-        b=WCXViv5Jv/wvpeyn8SvuQSMhcAgeX8Ysmt0bycbz1J1AAk/HYvpHDAL0S7kIAThsm+
-         DrbIIvA89cn1C42wPjhT5t3Y+/1ABppVkc92GzxfoYqo4GtaFcYDu+cVY2Fh/11oJtlp
-         I4hePcEC6+aJqDVxm/2uX9SDru++eSUhY1JaDh9TdPcBvEwbc4chY64epnFHH7wI5B5m
-         WVLgSkBp9GSzCPEw3FvuyLkrsO661/05/FFegvrOtDvOHZeFoIHbgvCXTcCSqq5lvy1E
-         gy/zaJqdCWYh3olaIG8NeIdSuFxoSgp+SNoPX1WK3MwBl+oGRK0S0X1SOs/ZvYhlkVDE
-         AqiQ==
-X-Forwarded-Encrypted: i=1; AJvYcCXtEQJQctVXRfvu+EtOQMhsHJ49gql5A1egyb1wUULNlym1luPDHboJWc0KBo262VRLvmc=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwYvHRnE22/F8JnP2fwHGWiDBkdPf1irpVfP6b2qphzAPCXE3DZ
-	wn8vGHYJ0Ig7DbzKrX6n3Y5ZzZDONAyqzZ9aHkpvH4Sftf6fWC865LbXgN4QebdZZPU=
-X-Gm-Gg: ASbGncuwoF2Sv04+MYaXBdvVitrX9FimskOvznJG/qqhN1TJHT4PqV4HlibdiCaTewA
-	q07AJuKKDRgFSLgrXt6zVQKnGdheafSQgWZwGSw2suqp5IFWKOVpnEMmxjLS0vmsn+ii2MQJyhF
-	9vtgeaOy2bRE4Zf97GKP0Dlkjlb8nU7RROB2FavcTejD2+YTE/qO15ncsB6GE1+Znt9hxJuyR1J
-	OWsIeVtxsXKeGoFrgjTvIXK9FESl8wX/u1VIhS9h+B+pLlgJ0eAGDdE1cMsam/WDV1FRCNWWeyB
-	8ltbZCS+Pt5b7hr8ghmgIUFR9NLuq/V4xFUiaE1bqnQchiXwfDoX5DZkCOSFB54g5f1rEuzKu+I
-	biq25V/Ifm01T8CZllKJi10qQOJZ5T0N4DRiB6APef3qoGclZrVn+Ii7+pyxgRLq0meQlCJarFJ
-	yrDVJwa9Sjb+CKBg==
-X-Google-Smtp-Source: AGHT+IF0LgtI7pDkBA/eYAeHLSMtAuwN7D6X/YI2HPPLpuFu6atvuEp5p5mznrjKdUvD2ZsGu34EiA==
-X-Received: by 2002:a05:6000:2385:b0:405:8ef9:ee6e with SMTP id ffacd0b85a97d-40e4a8f9b38mr19131448f8f.25.1759221095990;
-        Tue, 30 Sep 2025 01:31:35 -0700 (PDT)
-Received: from [192.168.69.221] (88-187-86-199.subs.proxad.net. [88.187.86.199])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-40fc749b8f9sm21268471f8f.50.2025.09.30.01.31.34
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 30 Sep 2025 01:31:35 -0700 (PDT)
-Message-ID: <ededf937-5424-4cf7-8ea1-e07709db27f1@linaro.org>
-Date: Tue, 30 Sep 2025 10:31:33 +0200
+        d=1e100.net; s=20230601; t=1759221373; x=1759826173;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=BGEcQ039PHX8Z6bbWR5CExl7OEuHya7NAHoYULkizA0=;
+        b=QsktL5MUEPFAp0YSQ7qokW7+8zuQmZP+8Mb8yoedgav0fRsP7vQcIdeQ2leHXBwU7/
+         EI8+uCPbYfIEgGQKJkcbH3IcNoInpKGvKRhwxSfrF2k0aGW23S9izjcJ/ytQo5gowlaO
+         2oRlQb+B+awawZALnBc4KwFH+3gDqu78RWZcizJXxnfTWgEWUxCMP8D2mX34A6B1dmGv
+         Am2bqZ8ZM1GGVtrJ1cI75db+XREzeJ3j9K42iUfUx3LGU68rayFIZvdrXSZd5nlUlqKT
+         sSNR4zK9wnC2MrvZnoDrSh8SydYCGK7Qu5LESujiFiL0BbBZes0YB4pWfSnRnyrE0KyR
+         1pvw==
+X-Forwarded-Encrypted: i=1; AJvYcCUrhSR9wjUZnpXHGcHTzGlduasDPv43iHDMX0uSRZF24UHiPNX1ADQ4PiBlW9y+BvT85cY=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxHysRvSFlpHn22I2n1vcAgG3Cva3l0xrieehx0PA6AOHuJs+FD
+	vFgzi7RLLuPZ5NbFTDJedCcZOArJy224IM9GP8XIqxj1O1zHV7cCx3RbwhRbCj9MfkGhLilvat2
+	OVLVu4aAr59CBi97H+Uqw4/wvLg==
+X-Google-Smtp-Source: AGHT+IEiNQr5CnkmLDEZS68hRK4QsiHIiyJxnvGvd2vfUrjjCIDnWPhr2xJhSzzVgM6uSvZRJyLQq6SFb4/fJ5Rq1Q==
+X-Received: from pfbhc7.prod.google.com ([2002:a05:6a00:6507:b0:76b:3822:35ea])
+ (user=ackerleytng job=prod-delivery.src-stubby-dispatcher) by
+ 2002:a05:6a00:1896:b0:77f:4b9b:8c34 with SMTP id d2e1a72fcca58-780fceeb3b7mr21693306b3a.31.1759221372983;
+ Tue, 30 Sep 2025 01:36:12 -0700 (PDT)
+Date: Tue, 30 Sep 2025 08:36:11 +0000
+In-Reply-To: <aNshILzpjAS-bUL5@google.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v3 02/18] system/memory: Better describe @plen argument of
- flatview_translate()
-Content-Language: en-US
-To: Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org,
- Peter Maydell <peter.maydell@linaro.org>, Peter Xu <peterx@redhat.com>
-Cc: Marcelo Tosatti <mtosatti@redhat.com>,
- Ilya Leoshkevich <iii@linux.ibm.com>, Reinoud Zandijk <reinoud@netbsd.org>,
- Zhao Liu <zhao1.liu@intel.com>, David Hildenbrand <david@redhat.com>,
- Halil Pasic <pasic@linux.ibm.com>, kvm@vger.kernel.org,
- "Edgar E. Iglesias" <edgar.iglesias@gmail.com>,
- xen-devel@lists.xenproject.org, Stefano Garzarella <sgarzare@redhat.com>,
- David Woodhouse <dwmw2@infradead.org>,
- Sunil Muthuswamy <sunilmut@microsoft.com>,
- Richard Henderson <richard.henderson@linaro.org>,
- Stefano Stabellini <sstabellini@kernel.org>,
- Matthew Rosato <mjrosato@linux.ibm.com>, qemu-s390x@nongnu.org,
- Paul Durrant <paul@xen.org>, "Michael S. Tsirkin" <mst@redhat.com>,
- Christian Borntraeger <borntraeger@linux.ibm.com>,
- Anthony PERARD <anthony@xenproject.org>, Jason Herne
- <jjherne@linux.ibm.com>, Paolo Bonzini <pbonzini@redhat.com>,
- Eric Farman <farman@linux.ibm.com>
-References: <20250930082126.28618-1-philmd@linaro.org>
- <20250930082126.28618-3-philmd@linaro.org>
- <525dd07f-ae64-4ba7-b3ec-b9fcd86aa8a5@redhat.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=C3=A9?= <philmd@linaro.org>
-In-Reply-To: <525dd07f-ae64-4ba7-b3ec-b9fcd86aa8a5@redhat.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+Mime-Version: 1.0
+References: <20250926163114.2626257-1-seanjc@google.com> <20250926163114.2626257-2-seanjc@google.com>
+ <CA+EHjTzdX8+MbsYOHAJn6Gkayfei-jE6Q_5HfZhnfwnMijmucw@mail.gmail.com>
+ <diqz7bxh386h.fsf@google.com> <a4976f04-959d-48ae-9815-d192365bdcc6@linux.dev>
+ <d2fa49af-112b-4de9-8c03-5f38618b1e57@redhat.com> <diqz4isl351g.fsf@google.com>
+ <aNq6Hz8U0BtjlgQn@google.com> <aNshILzpjAS-bUL5@google.com>
+Message-ID: <diqz4isk1gn8.fsf@google.com>
+Subject: Re: [PATCH 1/6] KVM: guest_memfd: Add DEFAULT_SHARED flag, reject
+ user page faults if not set
+From: Ackerley Tng <ackerleytng@google.com>
+To: Sean Christopherson <seanjc@google.com>
+Cc: David Hildenbrand <david@redhat.com>, Patrick Roy <patrick.roy@linux.dev>, 
+	Fuad Tabba <tabba@google.com>, Paolo Bonzini <pbonzini@redhat.com>, 
+	Christian Borntraeger <borntraeger@linux.ibm.com>, Janosch Frank <frankja@linux.ibm.com>, 
+	Claudio Imbrenda <imbrenda@linux.ibm.com>, kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	Nikita Kalyazin <kalyazin@amazon.co.uk>, shivankg@amd.com
+Content-Type: text/plain; charset="UTF-8"
 
-Hi Thomas,
+Sean Christopherson <seanjc@google.com> writes:
 
-On 30/9/25 10:24, Thomas Huth wrote:
-> On 30/09/2025 10.21, Philippe Mathieu-Daudé wrote:
->> flatview_translate()'s @plen argument is output-only and can be NULL.
->>
->> When Xen is enabled, only update @plen_out when non-NULL.
->>
->> Signed-off-by: Philippe Mathieu-Daudé <philmd@linaro.org>
->> ---
->>   include/system/memory.h | 5 +++--
->>   system/physmem.c        | 9 +++++----
->>   2 files changed, 8 insertions(+), 6 deletions(-)
->>
->> diff --git a/include/system/memory.h b/include/system/memory.h
->> index aa85fc27a10..3e5bf3ef05e 100644
->> --- a/include/system/memory.h
->> +++ b/include/system/memory.h
->> @@ -2992,13 +2992,14 @@ IOMMUTLBEntry 
->> address_space_get_iotlb_entry(AddressSpace *as, hwaddr addr,
->>    * @addr: address within that address space
->>    * @xlat: pointer to address within the returned memory region 
->> section's
->>    * #MemoryRegion.
->> - * @len: pointer to length
->> + * @plen_out: pointer to valid read/write length of the translated 
->> address.
->> + *            It can be @NULL when we don't care about it.
->>    * @is_write: indicates the transfer direction
->>    * @attrs: memory attributes
->>    */
->>   MemoryRegion *flatview_translate(FlatView *fv,
->>                                    hwaddr addr, hwaddr *xlat,
->> -                                 hwaddr *len, bool is_write,
->> +                                 hwaddr *plen_out, bool is_write,
->>                                    MemTxAttrs attrs);
->>   static inline MemoryRegion *address_space_translate(AddressSpace *as,
->> diff --git a/system/physmem.c b/system/physmem.c
->> index 8a8be3a80e2..86422f294e2 100644
->> --- a/system/physmem.c
->> +++ b/system/physmem.c
->> @@ -566,7 +566,7 @@ iotlb_fail:
->>   /* Called from RCU critical section */
->>   MemoryRegion *flatview_translate(FlatView *fv, hwaddr addr, hwaddr 
->> *xlat,
->> -                                 hwaddr *plen, bool is_write,
->> +                                 hwaddr *plen_out, bool is_write,
->>                                    MemTxAttrs attrs)
->>   {
->>       MemoryRegion *mr;
->> @@ -574,13 +574,14 @@ MemoryRegion *flatview_translate(FlatView *fv, 
->> hwaddr addr, hwaddr *xlat,
->>       AddressSpace *as = NULL;
->>       /* This can be MMIO, so setup MMIO bit. */
->> -    section = flatview_do_translate(fv, addr, xlat, plen, NULL,
->> +    section = flatview_do_translate(fv, addr, xlat, plen_out, NULL,
->>                                       is_write, true, &as, attrs);
->>       mr = section.mr;
->> -    if (xen_enabled() && memory_access_is_direct(mr, is_write, attrs)) {
->> +    if (xen_enabled() && plen_out && memory_access_is_direct(mr, 
->> is_write,
->> +                                                             attrs)) {
->>           hwaddr page = ((addr & TARGET_PAGE_MASK) + TARGET_PAGE_SIZE) 
->> - addr;
->> -        *plen = MIN(page, *plen);
->> +        *plen_out = MIN(page, *plen_out);
->>       }
-> 
-> My question from the previous version is still unanswered:
-> 
-> https://lore.kernel.org/qemu- 
-> devel/22ff756a-51a2-43f4-8fe1-05f17ff4a371@redhat.com/
+> On Mon, Sep 29, 2025, Sean Christopherson wrote:
+>> On Mon, Sep 29, 2025, Ackerley Tng wrote:
+>> > David Hildenbrand <david@redhat.com> writes:
+>> > 
+>> > >                           GUEST_MEMFD_FLAG_DEFAULT_SHARED;
+>> > >>>>
+>> > >>>> At least for now, GUEST_MEMFD_FLAG_DEFAULT_SHARED and
+>> > >>>> GUEST_MEMFD_FLAG_MMAP don't make sense without each other. Is it worth
+>> > >>>> checking for that, at least until we have in-place conversion? Having
+>> > >>>> only GUEST_MEMFD_FLAG_DEFAULT_SHARED set, but GUEST_MEMFD_FLAG_MMAP,
+>> > >>>> isn't a useful combination.
+>> > >>>>
+>> > >>>
+>> > >>> I think it's okay to have the two flags be orthogonal from the start.
+>> > >> 
+>> > >> I think I dimly remember someone at one of the guest_memfd syncs
+>> > >> bringing up a usecase for having a VMA even if all memory is private,
+>> > >> not for faulting anything in, but to do madvise or something? Maybe it
+>> > >> was the NUMA stuff? (+Shivank)
+>> > >
+>> > > Yes, that should be it. But we're never faulting in these pages, we only 
+>> > > need the VMA (for the time being, until there is the in-place conversion).
+>> > >
+>> > 
+>> > Yup, Sean's patch disables faulting if GUEST_MEMFD_FLAG_DEFAULT_SHARED
+>> > is not set, but mmap() is always enabled so madvise() still works.
+>> 
+>> Hah!  I totally intended that :-D
+>> 
+>> > Requiring GUEST_MEMFD_FLAG_DEFAULT_SHARED to be set together with
+>> > GUEST_MEMFD_FLAG_MMAP would still allow madvise() to work since
+>> > GUEST_MEMFD_FLAG_DEFAULT_SHARED only gates faulting.
+>> > 
+>> > To clarify, I'm still for making GUEST_MEMFD_FLAG_DEFAULT_SHARED
+>> > orthogonal to GUEST_MEMFD_FLAG_MMAP with no additional checks on top of
+>> > whatever's in this patch. :)
+>
+> Oh!  This got me looking at kvm_arch_supports_gmem_mmap() and thus
+> KVM_CAP_GUEST_MEMFD_MMAP.  Two things:
+>
+>  1. We should change KVM_CAP_GUEST_MEMFD_MMAP into KVM_CAP_GUEST_MEMFD_FLAGS so
+>     that we don't need to add a capability every time a new flag comes along,
+>     and so that userspace can gather all flags in a single ioctl.  If gmem ever
+>     supports more than 32 flags, we'll need KVM_CAP_GUEST_MEMFD_FLAGS2, but
+>     that's a non-issue relatively speaking.
+>
 
-This patches
-- checks for plen not being NULL
-- describes it as
-   "When Xen is enabled, only update @plen_out when non-NULL."
-- mention that in the updated flatview_translate() documentation
-   "It can be @NULL when we don't care about it." as documented for
-   the flatview_do_translate() callee in commit d5e5fafd11b ("exec:
-   add page_mask for flatview_do_translate")
+This is a good idea. In my internal WIP series I have 3 flags and 4
+CAPs, lol. Some of those CAPs are not for new flags, though.
 
-before:
+Would like to check your rationale for future reference: how about
+generalizing beyong flags and having KVM_CAP_GUEST_MEMFD_CAPS which
+returns 32 bits, one bit for every guest_memfd-related (not necessarily
+flags-related) cap?
 
-   it was not clear whether we can pass plen=NULL without having
-   to look at the code.
+>  2. We should allow mmap() for x86 CoCo VMs right away.  As evidenced by this
+>     series, mmap() on private memory is totally fine.  It's not useful until the
+>     NUMA and/or in-place conversion support comes along, but's not dangerous in
+>     any way.  The actual restriction is on initializing memory to be shared,
 
-after:
+The actual restriction is that private memory must not be mapped to host
+userspace, so it's not really about initializing, though before
+conversion, initialization state is the only state.
 
-   no change when plen is not NULL, we can pass plen=NULL safely
-   (it is documented).
+With GUEST_MEMFD_FLAG_INIT_SHARED, the entire guest_memfd is shared and
+mappable; without GUEST_MEMFD_FLAG_INIT_SHARED the entire guest_memfd is
+private and not mappable (gated in kvm_gmem_fault_user_mapping()).
 
-I shouldn't be understanding your original question, do you mind
-rewording it?
+So yes, I agree that CoCo VMs should be allowed mmap() but not
+GUEST_MEMFD_FLAG_INIT_SHARED, since GUEST_MEMFD_FLAG_INIT_SHARED makes
+the entire guest_memfd take the shared state for the lifetime of
+guest_memfd.
 
-Thanks,
+This is turning out to be a much nicer cleanup :)
 
-Phil.
+>     because allowing memory to be shared from gmem's perspective while it's
+>     private from the VM's perspective would be all kinds of broken.
+>
+>
+> E.g. with a s/kvm_arch_supports_gmem_mmap/kvm_arch_supports_gmem_init_shared:
+>
+> 	case KVM_CAP_GUEST_MEMFD_FLAGS:
+> 		if (!kvm || kvm_arch_supports_init_shared(kvm))
+> 			return GUEST_MEMFD_FLAG_MMAP |
+> 			       GUEST_MEMFD_FLAG_INIT_SHARED;
+>
+> 		return GUEST_MEMFD_FLAG_MMAP;
+>
+
+You might end up with this while actually coding v2 up, but how about
+
+	case KVM_CAP_GUEST_MEMFD_FLAGS: {
+        	int flag_caps = GUEST_MEMFD_FLAG_MMAP;
+                
+		if (!kvm || kvm_arch_supports_init_shared(kvm))
+			flag_caps |= GUEST_MEMFD_FLAG_INIT_SHARED;
+
+		return flag_caps;
+	}
+
+Then all the new non-optional CAPs can be or-ed onto flag_caps from the
+start.
+        
+> #2 is also a good reason to add INIT_SHARED straightaway.  Without INIT_SHARED,
+> we'd have to INIT_PRIVATE to make the NUMA support useful for x86 CoCo VMs, i.e.
+> it's not just in-place conversion that's affected, IIUC.
+>
+> I'll add this in v2.
 
