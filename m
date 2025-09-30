@@ -1,200 +1,290 @@
-Return-Path: <kvm+bounces-59164-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-59165-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 41C61BAD341
-	for <lists+kvm@lfdr.de>; Tue, 30 Sep 2025 16:34:59 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 60665BAD681
+	for <lists+kvm@lfdr.de>; Tue, 30 Sep 2025 16:59:55 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id EBD53480E7E
-	for <lists+kvm@lfdr.de>; Tue, 30 Sep 2025 14:34:57 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 21E6B4A2EB4
+	for <lists+kvm@lfdr.de>; Tue, 30 Sep 2025 14:58:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C28BC304BBF;
-	Tue, 30 Sep 2025 14:34:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B2EDB30595D;
+	Tue, 30 Sep 2025 14:58:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="lpGrvc3+"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="QJCf05Z6"
 X-Original-To: kvm@vger.kernel.org
-Received: from CY7PR03CU001.outbound.protection.outlook.com (mail-westcentralusazon11010013.outbound.protection.outlook.com [40.93.198.13])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pj1-f74.google.com (mail-pj1-f74.google.com [209.85.216.74])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1CEFB201017;
-	Tue, 30 Sep 2025 14:34:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.93.198.13
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1759242860; cv=fail; b=HmVHdATko4cCZYj1IZLEy2TYCfKpB2eaLAzq3i0sg+4BdbWiu01cjjQVjWiL1mzJnv5ZgfQhSIDTPpx7b9jHdVkakfLNhLep2UTJWdmR9eV33Doi5XWctPYlZplWs0zehFI8CfBdFDE3tXg6cTJMfSkqBPVKzeTogAxs+/c5Ctg=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1759242860; c=relaxed/simple;
-	bh=BWb85YI1VAI1u57e9BaSuKn7OX//onhqU/j1fE+iGeM=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:Content-Type:
-	 Content-Disposition:In-Reply-To:MIME-Version; b=sFo1L4wWhTLOkVP2/H14iCA/DPpX6WcEXeGsy2AkvUuV5a82sbkn030Qc00ovkJDfQ/2pcAv+PuYaHywawRMPj0dN2EqxOuYQyROGV8XkkuW1C+E09YSN9yMNwevuhI7Ernaql0MkLhsu7u9pvJfo/9I636jmw7xlDwz6dDwllU=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=lpGrvc3+; arc=fail smtp.client-ip=40.93.198.13
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=HUS0E9qByJJgu09puVh6qbCm++TXjkVVyNyVVzNz43JI5FpNEc6MWX/qnTirGVZSP9zg/ejciJ3KBPSqzpNMJx5dHSUcJg0w0+brolMBUCVZGBFLMykMWhLDTLqrnrm6kYjkH3CSGkXPh1cyd3kc9n60m8o443Fzlt1Jut+iR7fTzRMn9ia5MWjHP3Vis9RZzDgmZLu/gMOdHxdwIfz0dJ5OU4LCsIaG07t7KCM7MoqqqWBv0HcCBiU6baJsC1JZ4qY2tZqhTTPaIgWp1gZ6I7Px8bRDgodlK6bO+yH3cSzAXvXnWDatMBlZ0ci1kEPgqyhJQ1EhAOWlyed59/1t4w==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=BWb85YI1VAI1u57e9BaSuKn7OX//onhqU/j1fE+iGeM=;
- b=A+EAhyD+O/+HkBRFsYTO68DLec9DLNSZObaUI6eFhvCT4VamfxMqFUVweF37yOjSYagbn1NJwSaK3TPTiVbD9z9EUvS6qXjXlM2aHrugOOpbouEgq2wFnDbu0tqp8CEEJM5pYiDMdZ28keiCtsqOAVBm0CwzehRwVmHqavuY4yckubRN89WPbu62OVnd/RzBaXEbYk4pdKSCtnykAfWfbRX83tF1it7W6wzRYRzEQZcdi1NJr25GdnCt3RwtS/1/NqYld6OvojabJMHYSJWrsa9aLov1CBzsENtK8BGeZ4V9laJib+VnCLyPxV6e1KfGJwTsnbCFAmDyY90zOFSt8Q==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
- dkim=pass header.d=nvidia.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=BWb85YI1VAI1u57e9BaSuKn7OX//onhqU/j1fE+iGeM=;
- b=lpGrvc3+bXWKdknypUgMPCr4E8wu8pALBeiQyMaUdKTIaNXe9GhLaEkPbUZ5anVNdQbo6UvY+ewOfTdRZmNWX3lwvnmhEQB56oc6MDUQWhI4HBw1eMhMJBR/nC6fOV3WdaKToUYAMz39jwopjmWTFdvC8BCf+L2LnmwR8Zn5WD0BaQq0E0F+A17xgKnOO/A7CJERQ4jXHNvkDRwdMW17KTZBRXIALzsmmT3oryrG9yG4ZKQEkcnY75J7oa2Uvth9Fj9Jvl+47mVNcoPGpbdkpO9OR5Ou53FI/bxBvdUl9HnLl82bFDkmXQhJm5X6jIS9C1o0rK6w8Wej7PeDpJiPKw==
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nvidia.com;
-Received: from PH7PR12MB5757.namprd12.prod.outlook.com (2603:10b6:510:1d0::13)
- by PH7PR12MB8425.namprd12.prod.outlook.com (2603:10b6:510:240::13) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9160.17; Tue, 30 Sep
- 2025 14:34:11 +0000
-Received: from PH7PR12MB5757.namprd12.prod.outlook.com
- ([fe80::f012:300c:6bf4:7632]) by PH7PR12MB5757.namprd12.prod.outlook.com
- ([fe80::f012:300c:6bf4:7632%2]) with mapi id 15.20.9160.014; Tue, 30 Sep 2025
- 14:34:11 +0000
-Date: Tue, 30 Sep 2025 11:34:08 -0300
-From: Jason Gunthorpe <jgg@nvidia.com>
-To: Shameer Kolothum <skolothumtho@nvidia.com>
-Cc: Leon Romanovsky <leon@kernel.org>,
-	Alex Williamson <alex.williamson@redhat.com>,
-	Andrew Morton <akpm@linux-foundation.org>,
-	Bjorn Helgaas <bhelgaas@google.com>,
-	Christian =?utf-8?B?S8O2bmln?= <christian.koenig@amd.com>,
-	"dri-devel@lists.freedesktop.org" <dri-devel@lists.freedesktop.org>,
-	"iommu@lists.linux.dev" <iommu@lists.linux.dev>,
-	Jens Axboe <axboe@kernel.dk>, Joerg Roedel <joro@8bytes.org>,
-	"kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-	"linaro-mm-sig@lists.linaro.org" <linaro-mm-sig@lists.linaro.org>,
-	"linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-	"linux-media@vger.kernel.org" <linux-media@vger.kernel.org>,
-	"linux-mm@kvack.org" <linux-mm@kvack.org>,
-	"linux-pci@vger.kernel.org" <linux-pci@vger.kernel.org>,
-	Logan Gunthorpe <logang@deltatee.com>,
-	Marek Szyprowski <m.szyprowski@samsung.com>,
-	Robin Murphy <robin.murphy@arm.com>,
-	Sumit Semwal <sumit.semwal@linaro.org>,
-	Vivek Kasireddy <vivek.kasireddy@intel.com>,
-	Will Deacon <will@kernel.org>
-Subject: Re: [PATCH v4 10/10] vfio/pci: Add dma-buf export support for MMIO
- regions
-Message-ID: <20250930143408.GI2942991@nvidia.com>
-References: <cover.1759070796.git.leon@kernel.org>
- <53f3ea1947919a5e657b4f83e74ca53aa45814d4.1759070796.git.leon@kernel.org>
- <20250929151749.2007b192.alex.williamson@redhat.com>
- <20250930090048.GG324804@unreal>
- <CH3PR12MB754801DC65227CC39A3CB1F3AB1AA@CH3PR12MB7548.namprd12.prod.outlook.com>
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CH3PR12MB754801DC65227CC39A3CB1F3AB1AA@CH3PR12MB7548.namprd12.prod.outlook.com>
-X-ClientProxiedBy: BN0PR07CA0018.namprd07.prod.outlook.com
- (2603:10b6:408:141::25) To PH7PR12MB5757.namprd12.prod.outlook.com
- (2603:10b6:510:1d0::13)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 438391EF38E
+	for <kvm@vger.kernel.org>; Tue, 30 Sep 2025 14:58:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.74
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1759244298; cv=none; b=rBlGq48EDUQCDk+JqazOOS8metYvsjoW93AFcoMBcjIawjouP9DJHqWy9Dwn0kvJ3u7/HEuql7MWa5TBjeMg2hD1ZEfmYzJWuQ/Q9sd5DNsKkinn/kvyulTiC8sEXfHk1RlVJGtRx7UeMTYFamIp9O7noLA3DiEih9om3M9Kn/4=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1759244298; c=relaxed/simple;
+	bh=BAZpClejLbE/TaGhph3A+ZJPzB3IeFvn8SYUvadWRF8=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=HZelVzA1BwFqKTZ6jyo2t5efrzwGLrYp+EeXH7X0degFyM/W9ZvA5t85OAPlXvToQhV2K+u1ZooRy5mZJd3I7c8wYJiaJAR2D7HafCwTROghKybdH/6zxj7f2obd0MaldPCeirf601pqjk+Wua2lbISWMm12ipENrc4FhOubKVE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=QJCf05Z6; arc=none smtp.client-ip=209.85.216.74
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+Received: by mail-pj1-f74.google.com with SMTP id 98e67ed59e1d1-3324538ceb0so9543186a91.1
+        for <kvm@vger.kernel.org>; Tue, 30 Sep 2025 07:58:17 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1759244296; x=1759849096; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=RZdEeuIZmBzDLZbYs/yNXlSKEGLonVMQ6j0Z4GNNa5k=;
+        b=QJCf05Z6PViXx6nerJSw9REqTGuRtQ8+OHJTAXCsV9PrRXPHIgL3XBUKYQJq2N+Hz+
+         9N+w/aeXtbjIQ5kfcczYqgUc6YJbuE15TSfX6lnv56O8XQJPNw48QWITW2PXLAsbsn8e
+         YTPzrDT3tRRsZ1itqQdRilBPp2AyOONcyilaarUkUPqGgZxtBL4SeKtYb46qkU3/xtkq
+         sgPq5YB/1qHWm1oRscoijeW/Ge7y7sy6yaLPimrS0XLtLvXopdkh5P69HupioEDgS9oj
+         a74ymHqvzHORJwNfqX1pXR3+gNfVk3KfdoQESZmpfH1gsHSKqSLgghOwM+qz6Eqrvzdp
+         lTHA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1759244296; x=1759849096;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=RZdEeuIZmBzDLZbYs/yNXlSKEGLonVMQ6j0Z4GNNa5k=;
+        b=RgWRrMB5Mxnrw8mF00g7vxoZkXbsyHImga4C+B+tHTRPRIKkBmX3sskTeNtrNB50m4
+         o9HneM3cnKTDO2pf5W/rd6y9CtpJNjmmMSI+Wd3QD4AxfYRftKvKpYt9Xdi2cc8Av9fo
+         nNzlaJEX5ASElZKx9YCj1nnO3SB7D0rNN+4c2IEDwPxJCgZVwAhVR1FDGO3/ArJmqhvw
+         IMPjyJ+/9WInttozILQvV8D/XrEvannOPdpviiilNxwiwIy5ZkWCh78Ww8AJW8POYer9
+         vCyktxP5x/yChS8LodcfxnaOhBVinJlYt5iKBvJs4MOVP9P0IV7EysK1wFZ6L/uRE9WO
+         4PuQ==
+X-Forwarded-Encrypted: i=1; AJvYcCWSA40WVR7w6zXvtbvTTyobcoFoLhz5rmUpWZIze2DNGe36Lcnig5Yrm7CUJDUeHrRZIHI=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyVnU9XI8hdUDWU9hOOVuWmiIU0RH56HM2IIEm+mQOjX27BAcEg
+	vFKApSu0CkjNiKYmfVcwKJetOXGwXgxmYwXVFTufunBbZztSSbIJh2Mbr5YuLpFbQSkZLWgaqfK
+	yOw1OKw==
+X-Google-Smtp-Source: AGHT+IETSMM9ujw5b0glTdu6eKbkhEayF+u6JJrEpWt0cq5tgvyVGupQAvG78QacKBP/NJlodlJGlJsgdyU=
+X-Received: from pjsa23.prod.google.com ([2002:a17:90a:be17:b0:330:523b:2b23])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:1b4f:b0:335:5e84:6d37
+ with SMTP id 98e67ed59e1d1-3355e846e68mr16804530a91.6.1759244296622; Tue, 30
+ Sep 2025 07:58:16 -0700 (PDT)
+Date: Tue, 30 Sep 2025 07:58:15 -0700
+In-Reply-To: <diqza52c1im6.fsf@google.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: PH7PR12MB5757:EE_|PH7PR12MB8425:EE_
-X-MS-Office365-Filtering-Correlation-Id: 3abc86bf-36ec-4831-a421-08de002e6ba8
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230040|366016|1800799024|7416014|376014;
-X-Microsoft-Antispam-Message-Info:
-	=?us-ascii?Q?zk5++mRU27edAOeAL7UL+yNfoW6jFDjhMWcRzDoBxseHJGKdBHcdeq8r+sM2?=
- =?us-ascii?Q?EPp4MO5DSMLEi3+cythe/dhtKyob2vluNTgxX6+TBDEXepGiYJ3ggjEvNQBZ?=
- =?us-ascii?Q?58M9uegDlFxbR6zs0IfAMgVqT4d7bPbknEop7Yw1LQNvit663CgYSquKF76u?=
- =?us-ascii?Q?K++zGodYxKgb//TkNzayMAYru3iCxwlaGNJNCeWtQziiNJtCFvh0QaAFck/G?=
- =?us-ascii?Q?+ksakBqG3GsQjIPAuasCRU5+RWaLRPML4hvG8LsNeJdf7GLqc6n7J8SEqZF9?=
- =?us-ascii?Q?rwBA8ANzJBgUg/wdAXo88ZXVDb5R7i50DqDlHjFVU+QZP5gzvtL2InCihBFp?=
- =?us-ascii?Q?ks3muR1h0yfLaScny7yLSkveMj+CyD0zYeMjssGuBFkeA6NKcexWICJdoG+z?=
- =?us-ascii?Q?hc4/J/fcCY5qqhEVVGJT5Uxr2GuA0rWjUFPlDv5DJGHypklgL23m0uWyZcA9?=
- =?us-ascii?Q?rp+5kxSByjRS16imbuJ75PzRxo+SADjXClLW0vcWFSUfQ70LmvUcqzjVZnd2?=
- =?us-ascii?Q?1jTsU1AqLf1anNKsvt2YdEkALahgDBzh/RrJmYeiIrxrXazuYid8+u9w4+R/?=
- =?us-ascii?Q?zVnIJqZJFtq75C6HIKltfAG43/Whuf2nN0DF6EKUlMVdfwxrVAMEjdsiKjLP?=
- =?us-ascii?Q?MAK8zgf57HfuDL29QDZRrOtctOsu4lHQkLmyU6MrYgmLk1pAoutFe03xZJzK?=
- =?us-ascii?Q?cgSbJQeA49KoEA5EwNBKNMeh4d4dZsIbR+FUxgh5CodsvywpwINYyl0ycXbD?=
- =?us-ascii?Q?Mas2V+iXEXUyjb5aVQrSlhOiEctd9TZ+1D040xswi2q39r9eSYRxoL3mgPH6?=
- =?us-ascii?Q?EqBh6rE8ycBuu6VoEj8Yd2opuXYec0NehZPzXqp3c193nIbBr+rCq/26wbmc?=
- =?us-ascii?Q?yb8vRBQsSViAoXP6UWm8mpgwaFKHgZN0w4mGtImBO6AzkSUALvE/WRnR4dP+?=
- =?us-ascii?Q?EF6/FN/G2S9/db492yeEPDrZgoqoO/kzGAvYVqnL3UV+73vyfpgpDYCOqlYm?=
- =?us-ascii?Q?mq4nxqIWfdJw9z6oWCXJ4EEliiZWDNsdU+qrc57hdoxUrC1CjWhTo4PIOf/+?=
- =?us-ascii?Q?4LGJuTGSh+4Pq/Pmk3ggP5bv5kKBDUB/4EPZos3tDWeJpiPOv1Mn8az7i8+S?=
- =?us-ascii?Q?lpdfOi9yC6YDhf1c6+MFWzHbP5n2UxXt9bOs+WOTJGSNO1hIeFhQ7rRdVLFv?=
- =?us-ascii?Q?A6KNM7J6gBxMYJx7kFDpXZHVouCBBtl1bHoJyp+odsO1QVxVJO+PErJjdrFE?=
- =?us-ascii?Q?Oz9H8MAXiKY9Ql05L9ex3xpUamfTpczDFhq+cZBJeQuSj34dDoZmKar3oveg?=
- =?us-ascii?Q?VoY4z404gdnJkhK45CaZrMm0?=
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PH7PR12MB5757.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(1800799024)(7416014)(376014);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?us-ascii?Q?JJRHN8vE2WuQYNc6WJirOIQRQ5M3gyPrSil1VVJLK44jOYf6fAoMhcO8VFWo?=
- =?us-ascii?Q?vS4ncEdMq9rfS6jTy31HtJ/kr03ZoLQSNqVwPgXV4YWJf0T3NQr91koFCwnT?=
- =?us-ascii?Q?l6nzhYCOcCfA7kbG/8YCul9qr+KoVAdveG+bBkiz11jZ93QRC1djb4LqsMfw?=
- =?us-ascii?Q?4U2MP6ArnqiyxMrlmnclMRUYLHkKlTzgkQm60QjzoYCg2L6cs+o6fMIL/0Yf?=
- =?us-ascii?Q?ALc3d+DQjz1kU37xFSOE3NxHsUKBYs5lAiO642J+uMBAAcyKWbXxyfi6RXre?=
- =?us-ascii?Q?BHG/r2L2vkVIPVPAX++TkPSbsMEYnZgOkNXnVspFRG06kJ2cweNeivUPF/F6?=
- =?us-ascii?Q?CXS7HeWbJ5yMJPX4vtMIW5I4PxnXZSS4HYVmThulnVKBKpEqTkL/N4t6XehR?=
- =?us-ascii?Q?vNUpjl3tzHXdGOL8ysprtGje8vyzd04DFXdnxvwWLBvOnuH3x/SADKtdaqRY?=
- =?us-ascii?Q?c5Somy2qNQcCuZ3Z1Pw3ZFSlbrONpSKrpNSC+smVDpC+zL22PjFH77jhIGwY?=
- =?us-ascii?Q?pPYjW/1dh2lqKnBDtDrz+w/0pBiLQjyuZYNQkZEBLiq/6+Mk3U/dTb2+Kf2A?=
- =?us-ascii?Q?gdozRUEqhWSdGDPEYJbt7iry5J3PEZDNSEofC37WH9XZqsAHzmiRW9HsrMm0?=
- =?us-ascii?Q?FeR7D2oSk8KAH4bGQT/yXDhEEW2LESlT9UpODKOu63CBBGDQ9Za01wc9bJ9H?=
- =?us-ascii?Q?dKZCQ8rFW4Cieg0i1XoFrLX8cMMjo3UW8c9C1379ESHiSQ54Qups/tcMAgsm?=
- =?us-ascii?Q?fpGSUaZ6w1bH8XVLruLy7phGPWyYgWFrMf59YDx9o3gOaITkFX0e8loVjN8Y?=
- =?us-ascii?Q?ZJj92hnm5pmigdkSosrgRyTS7gHx1X79dy/weLUbIbx6BRunEsppbGFBNB1d?=
- =?us-ascii?Q?Xa7Z8vWq+K51od7rZLD5udhJkaxQNtJgqYbXLsGA8Fn9vB9W+FiQ8FpqilMu?=
- =?us-ascii?Q?yBd2OYH/mTF/e8TGdhvQbiD+B6kyx/N6PU2OY1XaWcavBuYIO4BZkiKICTX4?=
- =?us-ascii?Q?dH6YG3TofNXqbyaMpkXuHcJSO8W8YJQak7OBsD5HW1/1PGRU++ucAP3N2t3W?=
- =?us-ascii?Q?7fhVXAsUEnfxkzuYJfTlwOHgCvrSy81ws2YQ/6UfG9Y4VF45/T/k4OzSeLbf?=
- =?us-ascii?Q?ti9dG+EqNgSZD4NlT489Ri6/j+KQiT1qxzzLh8ozE9V4h3BGyro0sc83OyYK?=
- =?us-ascii?Q?7jxCXV5yN6ENmWsLclJpLVWSBoBudPyZNGNvEwxDWcQwa/oCmT7uAwfouV+y?=
- =?us-ascii?Q?0u6C5TIaP1X48Y7k+MwEhdhttZ0ZaTD/ItwNUrllUZrghymTIE2qnhhw2ffo?=
- =?us-ascii?Q?qdGGeEvnaFdQ/FqA6w7c2EoEvSjTwK+OTNbINzdNYhOg05o1ms/cGs0ET0G9?=
- =?us-ascii?Q?AQ8cIMpNKMJDnyW6QdMViOmJRv/FK93rkvwj9Yg3CXaZMfy7ANRgJj4o8bIL?=
- =?us-ascii?Q?k4+Y5MxkMXg6YUKa/kzNjNtr5/HFVgdn3wkQMQ0MgHcNya81navQJ7glK1rn?=
- =?us-ascii?Q?/kbg9sqlo3Vsz7ZSeYy5m1GAfgkQi4yEahTKIWCKmpsHPE65MnB9LsVJHBEv?=
- =?us-ascii?Q?cPpeQRT8+s44eW2MddIJH1igmTSp7SvFwOWj9vwB?=
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 3abc86bf-36ec-4831-a421-08de002e6ba8
-X-MS-Exchange-CrossTenant-AuthSource: PH7PR12MB5757.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 30 Sep 2025 14:34:11.0186
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: fD2nX+HNIxtPpBPldMJ+Uhjb+M9Ymg6B4Brli66rjds5EqfKQELgyMBIfmUlBatL
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH7PR12MB8425
+Mime-Version: 1.0
+References: <20250926163114.2626257-1-seanjc@google.com> <20250926163114.2626257-7-seanjc@google.com>
+ <diqzldlx1fyk.fsf@google.com> <aNrLpkrbnwVSaQGX@google.com> <diqza52c1im6.fsf@google.com>
+Message-ID: <aNvwB2fr2p45hhC0@google.com>
+Subject: Re: [PATCH 6/6] KVM: selftests: Verify that faulting in private
+ guest_memfd memory fails
+From: Sean Christopherson <seanjc@google.com>
+To: Ackerley Tng <ackerleytng@google.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, Christian Borntraeger <borntraeger@linux.ibm.com>, 
+	Janosch Frank <frankja@linux.ibm.com>, Claudio Imbrenda <imbrenda@linux.ibm.com>, kvm@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, David Hildenbrand <david@redhat.com>, 
+	Fuad Tabba <tabba@google.com>
+Content-Type: text/plain; charset="us-ascii"
 
-On Tue, Sep 30, 2025 at 12:50:47PM +0000, Shameer Kolothum wrote:
+On Tue, Sep 30, 2025, Ackerley Tng wrote:
+> Sean Christopherson <seanjc@google.com> writes:
+> > How's this look?
+> >
+> > static void test_fault_sigbus(int fd, size_t accessible_size, size_t mmap_size)
+> > {
+> > 	struct sigaction sa_old, sa_new = {
+> > 		.sa_handler = fault_sigbus_handler,
+> > 	};
+> > 	const uint8_t val = 0xaa;
+> > 	uint8_t *mem;
+> > 	size_t i;
+> >
+> > 	mem = kvm_mmap(mmap_size, PROT_READ | PROT_WRITE, MAP_SHARED, fd);
+> >
+> > 	sigaction(SIGBUS, &sa_new, &sa_old);
+> > 	if (sigsetjmp(jmpbuf, 1) == 0) {
+> > 		memset(mem, val, mmap_size);
+> > 		TEST_FAIL("memset() should have triggered SIGBUS");
+> > 	}
+> > 	if (sigsetjmp(jmpbuf, 1) == 0) {
+> > 		(void)READ_ONCE(mem[accessible_size]);
+> > 		TEST_FAIL("load at first unaccessible byte should have triggered SIGBUS");
+> > 	}
+> > 	sigaction(SIGBUS, &sa_old, NULL);
+> >
+> > 	for (i = 0; i < accessible_size; i++)
+> > 		TEST_ASSERT_EQ(READ_ONCE(mem[i]), val);
+> >
+> > 	kvm_munmap(mem, mmap_size);
+> > }
+> >
+> > static void test_fault_overflow(int fd, size_t total_size)
+> > {
+> > 	test_fault_sigbus(fd, total_size, total_size * 4);
+> > }
+> >
+> 
+> Is it intentional that the same SIGBUS on offset mem + total_size is
+> triggered twice? The memset would have worked fine until offset mem +
+> total_size, which is the same SIGBUS case as mem[accessible_size]. Or
+> was it meant to test that both read and write trigger SIGBUS?
 
-> This is where hisi_acc reports a different BAR size as it tries to hide
-> the migration control region from Guest access.
+The latter (test both read and write).  I plan on adding this in a separate
+commit, i.e. it should be obvious in the actual patches.
 
-I think for now we should disable DMABUF for any PCI driver that
-implements a VFIO_DEVICE_GET_REGION_INFO
+> > static void test_fault_private(int fd, size_t total_size)
+> > {
+> > 	test_fault_sigbus(fd, 0, total_size);
+> > }
+> >
+> 
+> I would prefer more unrolling to avoid mental hoops within test code,
+> perhaps like (not compile tested):
+> 
+> static void assert_host_fault_sigbus(uint8_t *mem) 
+> {
+>  	struct sigaction sa_old, sa_new = {
+>  		.sa_handler = fault_sigbus_handler,
+>  	};
+> 
+>  	sigaction(SIGBUS, &sa_new, &sa_old);
+>  	if (sigsetjmp(jmpbuf, 1) == 0) {
+>  		(void)READ_ONCE(*mem);
+>  		TEST_FAIL("Reading %p should have triggered SIGBUS", mem);
+>  	}
+>         sigaction(SIGBUS, &sa_old, NULL);
+> }
+> 
+> static void test_fault_overflow(int fd, size_t total_size)
+> {
+> 	uint8_t *mem = kvm_mmap(total_size * 2, PROT_READ | PROT_WRITE, MAP_SHARED, fd);
+>         int i;
+> 
+>  	for (i = 0; i < total_size; i++)
+>  		TEST_ASSERT_EQ(READ_ONCE(mem[i]), val);
+> 
+>         assert_host_fault_sigbus(mem + total_size);
+> 
+>         kvm_munmap(mem, mmap_size);
+> }
+> 
+> static void test_fault_private(int fd, size_t total_size)
+> {
+> 	uint8_t *mem = kvm_mmap(total_size, PROT_READ | PROT_WRITE, MAP_SHARED, fd);
+>         int i;
+> 
+>         assert_host_fault_sigbus(mem);
+> 
+>         kvm_munmap(mem, mmap_size);
+> }
 
-For a while I've wanted to further reduce the use of the ioctl
-multiplexer, so maybe this series:
+Why?  That loses coverage for read to private memory getting SIBUGS.  I genuinely
+don't understand the desire to copy+paste uninteresting code.
 
-https://github.com/jgunthorpe/linux/commits/vfio_get_region_info_op/
+> assert_host_fault_sigbus() can then be flexibly reused for conversion
 
-And then the dmabuf code can check if the ops are set to the generic
-or not and disable itself automatically.
+assert_host_fault_sigbus() is a misleading name in the sense that it suggests
+that the _only_ thing the helper does is assert that a SIGBUS occurred.  It's
+not at all obvious that there's a write to "mem" in there.
 
-Otherwise perhaps route the dmabuf through an op and deliberately omit
-it (with a comment!) from hisi, virtio, nvgrace.
+> tests (coming up) at various offsets from the mmap()-ed addresses.
+> 
+> At some point, sigaction, sigsetjmp, etc could perhaps even be further
+> wrapped. For testing memory_failure() for guest_memfd we will want to
+> check for SIGBUS on memory failure injection instead of on host fault.
+> 
+> Would be nice if it looked like this (maybe not in this patch series):
+> 
+> + TEST_ASSERT_WILL_SIGBUS(READ_ONCE(mem[i]))
+> + TEST_ASSERT_WILL_SIGBUS(WRITE_ONCE(mem[i]))
+> + TEST_ASSERT_WILL_SIGBUS(madvise(MADV_HWPOISON))
 
-We need to route it through an op anyhow as those three drivers will
-probably eventually want to implement their own version.
+Ooh, me likey.  Definitely can do it now.  Using a macro means we can print out
+the actual action that didn't generate a SIGUBS, e.g. hacking the test to read
+byte 0 generates:
 
-Jason
+	'(void)READ_ONCE(mem[0])' should have triggered SIGBUS
+
+Hmm, how about TEST_EXPECT_SIGBUS?  TEST_ASSERT_xxx() typically asserts on a
+value, i.e. on the result of a previous action.  And s/WILL/EXPECT to make it
+clear that the action is expected to SIGBUS _now_.
+
+And if we use a descriptive global variable, we can extract the macro to e.g.
+test_util.h or kvm_util.h (not sure we want to do that right away; probably best
+left to the future).
+
+static sigjmp_buf expect_sigbus_jmpbuf;
+void fault_sigbus_handler(int signum)
+{
+	siglongjmp(expect_sigbus_jmpbuf, 1);
+}
+
+#define TEST_EXPECT_SIGBUS(action)						\
+do {										\
+	struct sigaction sa_old, sa_new = {					\
+		.sa_handler = fault_sigbus_handler,				\
+	};									\
+										\
+	sigaction(SIGBUS, &sa_new, &sa_old);					\
+	if (sigsetjmp(expect_sigbus_jmpbuf, 1) == 0) {				\
+		action;								\
+		TEST_FAIL("'%s' should have triggered SIGBUS", #action);	\
+	}									\
+	sigaction(SIGBUS, &sa_old, NULL);					\
+} while (0)
+
+static void test_fault_sigbus(int fd, size_t accessible_size, size_t map_size)
+{
+	const char val = 0xaa;
+	char *mem;
+	size_t i;
+
+	mem = kvm_mmap(map_size, PROT_READ | PROT_WRITE, MAP_SHARED, fd);
+
+	TEST_EXPECT_SIGBUS(memset(mem, val, map_size));
+	TEST_EXPECT_SIGBUS((void)READ_ONCE(mem[accessible_size]));
+
+	for (i = 0; i < accessible_size; i++)
+		TEST_ASSERT_EQ(READ_ONCE(mem[i]), val);
+
+	kvm_munmap(mem, map_size);
+}
+
+> >> If split up as described above, this could be
+> >> 
+> >> 	if (flags & GUEST_MEMFD_FLAG_MMAP &&
+> >> 	    flags & GUEST_MEMFD_FLAG_DEFAULT_SHARED) {
+> >> 		gmem_test(mmap_supported_fault_supported, vm, flags);
+> >> 		gmem_test(fault_overflow, vm, flags);
+> >> 	} else if (flags & GUEST_MEMFD_FLAG_MMAP) {
+> >> 		gmem_test(mmap_supported_fault_sigbus, vm, flags);
+> >
+> > I find these unintuitive, e.g. is this one "mmap() supported, test fault sigbus",
+> > or is it "mmap(), test supported fault sigbus".  I also don't like that some of
+> > the test names describe the _result_ (SIBGUS), where as others describe _what_
+> > is being tested.
+> >
+> 
+> I think of the result (SIGBUS) as part of what's being tested. So
+> test_supported_fault_sigbus() is testing that mmap is supported, and
+> faulting will result in a SIGBUS.
+
+For an utility helper, e.g. test_fault_sigbus(), or test_write_sigbus(), that's
+a-ok.  But it doesn't work for the top-level test functions because trying to
+follow that pattern effectively prevents bundling multiple individual testcases,
+e.g. test_fallocate() becomes what?  And test_invalid_punch_hole_einval() is
+quite obnoxious.
+
+> > In general, I don't like test names that describe the result, because IMO what
+> > is being tested is far more interesting.  E.g. from a test coverage persective,
+> > I don't care if attempting to fault in (CoCO) private memory gets SIGBUS versus
+> > SIGSEGV, but I most definitely care that we have test coverage for the "what".
+> >
+> 
+> The SIGBUS is part of the contract with userspace and that's also part
+> of what's being tested IMO.
+
+I don't disagree, but IMO bleeding those details into the top-level functions
+isn't necessary.  Random developer that comes along isn't going to care whether
+KVM is supposed to SIGBUS or SIGSEGV unless there is a failure.  And as above,
+doing so either singles out sigbus or necessitates truly funky names.
 
