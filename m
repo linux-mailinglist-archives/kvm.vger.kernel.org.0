@@ -1,181 +1,326 @@
-Return-Path: <kvm+bounces-59124-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-59125-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 299F4BAC094
-	for <lists+kvm@lfdr.de>; Tue, 30 Sep 2025 10:27:01 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9AF29BAC0AF
+	for <lists+kvm@lfdr.de>; Tue, 30 Sep 2025 10:27:43 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id CA5BD16E04C
-	for <lists+kvm@lfdr.de>; Tue, 30 Sep 2025 08:27:00 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 02B081925648
+	for <lists+kvm@lfdr.de>; Tue, 30 Sep 2025 08:28:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D263C2F3C3A;
-	Tue, 30 Sep 2025 08:26:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C0D152F4A04;
+	Tue, 30 Sep 2025 08:27:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=hotmail.com header.i=@hotmail.com header.b="T9L2eqUM"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="gGPcod77"
 X-Original-To: kvm@vger.kernel.org
-Received: from TYPPR03CU001.outbound.protection.outlook.com (mail-japaneastazolkn19012057.outbound.protection.outlook.com [52.103.43.57])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 12C49221F17;
-	Tue, 30 Sep 2025 08:26:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.103.43.57
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1759220812; cv=fail; b=dX6nAzxCRchXzifPrjnJsbC91oZVzEMnzYk7Kt3ftusCMUYJ1ZGlTpSSDXSRa4rgwBqQxbRfCQgHTQlEmJKZmtoS60OGIYA62t5e5O5ELDD1L9CyKQ3ReF09n3agsNfgROJfJf9oHwwfOUuPyokP1EDuo0ZGn15bItPMWDPSXVs=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1759220812; c=relaxed/simple;
-	bh=EpvaaekXKTNMRX4vHgZJc+M10yC2UJKD3fEa4/QKyPg=;
-	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
-	 Content-Type:MIME-Version; b=qF6O5rpYyZiXckZsIHLR7RXSOWZkomtZjhQH9CK98xhR4z6HHORC6klaXKBGon/x9cVLq5lS0AVQ/xV8N4yHnRz2gZOmwOS/zEK3m+2fqn8EZC1EhpTa1NDFCQye12NWlZ2kuEta3nrNo29H6v+uGTRP2/+YGznxTkAg5/8PSSE=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=hotmail.com; spf=pass smtp.mailfrom=hotmail.com; dkim=pass (2048-bit key) header.d=hotmail.com header.i=@hotmail.com header.b=T9L2eqUM; arc=fail smtp.client-ip=52.103.43.57
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=hotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=hotmail.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=dmvyPznHJjY/Ihon/hfxuFPwEPF6Iz8/zL54xqTclcfHYzClfHjfAfxMnOKYasL8tMaHFBtUYLyXfjVNKTRpEJKbRhxWFRn8I/Ybh5Q7jruPUz3YhHbEFSpH4IO+jAg8l9op4lMERSnxQcEM4pVQ32AFtrPl0vIPy5384soX+X2hmsnLJc0mXTc/PSTmRVrRUB/DAnxethD0j6DTjH9chbI9cKKQTLtTRTbZl2ZeUsyf+uci/W38ivrPeu1bE6Cn8pVu8wSfo3axrMIVUeBh1p8+fbX2P8BYN23t9PK/96UkpKKzzZon222OztAVbPOYJQWVdMlSF3uX6ggC5qwXOQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=pqQx/siSvgza/jSVxExB3K2dd6OkYRzPjTwKLF3XQho=;
- b=eM+P0OGWKVCews1xLm6za76mpPicucpLHIeyD6sZFbWcjLspr8+BpRfGOMSNrGDEkqkduGvRYlOF9c+2s9xckkxjVGjhq0l/gHyTTKv+mvE+tThS49/d2d+W1Hqgsjhqq+dWZOn7+o8di1QBwjXQup/5XN9nZn07Zi+Lyb79JRa5jzOsyOVp8yLKmHsOiFARTC5fPqOCCHdtJ6qPG2j62z7T+RBGSFIIGN/6Usc+bm9qWsTD84Blo8Pt4AfW1VDIsMNrhWAIoengKCvegjeJx0HsmSQIq3ElkND91asafHAgM198XijF6qljMA7Hin0eR2faUby3RMTcB445Cp81VA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=none; dmarc=none;
- dkim=none; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=hotmail.com;
- s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=pqQx/siSvgza/jSVxExB3K2dd6OkYRzPjTwKLF3XQho=;
- b=T9L2eqUMe95hTd+0iQ40WU8n5EQL160jkcCfs0b39vQfU3k/V2PYLtWkJKjUHiiAFkgBeRE2QRcvNFkxe+60INnH5xrrtNs3ARZxpsX0YP+P23QaJIbQqHYh6/2OQTIqk+HFqW5iqkKykZwOeJc/qSaOPFf/2iY1iiC+MPlMiyiLSoR0BBhT+nDpgIPU9yHeRGFw2+fj6BDAbdUqVBL/JfOrQF9CjnH0hsnVvw9jMkaCGFBSU77kepIykof+C45PcoDxbI2bJ0UGxdNcj4xl/4tZnNIbANwP6gRwMoj34n9o9bTv/tL5KuQUloYOBqC/NPTnSK18w4aY4EENokdxdg==
-Received: from TY1PPFCDFFFA68A.apcprd02.prod.outlook.com (2603:1096:408::966)
- by JH0PR02MB7088.apcprd02.prod.outlook.com (2603:1096:990:53::10) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9160.11; Tue, 30 Sep
- 2025 08:26:43 +0000
-Received: from TY1PPFCDFFFA68A.apcprd02.prod.outlook.com
- ([fe80::209a:b4cd:540:c5da]) by TY1PPFCDFFFA68A.apcprd02.prod.outlook.com
- ([fe80::209a:b4cd:540:c5da%6]) with mapi id 15.20.9094.021; Tue, 30 Sep 2025
- 08:26:43 +0000
-Message-ID:
- <TY1PPFCDFFFA68A8A7B407686AFB2DE4AA4F31AA@TY1PPFCDFFFA68A.apcprd02.prod.outlook.com>
-Date: Tue, 30 Sep 2025 16:26:32 +0800
-User-Agent: Mozilla Thunderbird
-Subject: Re: [RFC PATCH v2 02/18] iommu/riscv: Move struct riscv_iommu_domain
- and info to iommu.h
-To: Andrew Jones <ajones@ventanamicro.com>, iommu@lists.linux.dev,
- kvm-riscv@lists.infradead.org, kvm@vger.kernel.org,
- linux-riscv@lists.infradead.org, linux-kernel@vger.kernel.org
-Cc: jgg@nvidia.com, zong.li@sifive.com, tjeznach@rivosinc.com,
- joro@8bytes.org, will@kernel.org, robin.murphy@arm.com, anup@brainfault.org,
- atish.patra@linux.dev, tglx@linutronix.de, alex.williamson@redhat.com,
- paul.walmsley@sifive.com, palmer@dabbelt.com, alex@ghiti.fr
-References: <20250920203851.2205115-20-ajones@ventanamicro.com>
- <20250920203851.2205115-22-ajones@ventanamicro.com>
-Content-Language: en-US
-From: "Nutty.Liu" <nutty.liu@hotmail.com>
-In-Reply-To: <20250920203851.2205115-22-ajones@ventanamicro.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: SI2PR04CA0002.apcprd04.prod.outlook.com
- (2603:1096:4:197::17) To TY1PPFCDFFFA68A.apcprd02.prod.outlook.com
- (2603:1096:408::966)
-X-Microsoft-Original-Message-ID:
- <67b82728-66ff-45b5-8ffa-35b66cf3f046@hotmail.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3F16A2F39DA
+	for <kvm@vger.kernel.org>; Tue, 30 Sep 2025 08:27:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1759220846; cv=none; b=R6kMVqZPwc3s5wNbpC3NVXydN5BIGjp8W5/Re0XD8gyRM7uLtOKbaz63re5kvO3joMhk1otEnECQOpm+X8xJvNM0wbQsBGqTxr1fvocCSAPgLCmtTepRVsdT8d3/jQ9kdJ22aLCxO4+GHbCmllwj1/2NHHVosO4jdPwXcx2qdxM=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1759220846; c=relaxed/simple;
+	bh=OByUwkUqD2B2/nwZYmEaHE1jBaKbSJmFUJdyN/riHtw=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=F7DBRAG02EyOm1MQCZDw3WVFqV/rZPQPK56LAhQy3UiVibXqHims//PFU9vi6uz89rdIuFWmiBX9BrFtTdEshRxL0Ls0SyeWg7ee+yosokqqqy5vxTRW53tnPyYrVRwMG8Z6SP7jmOzcx/6nnrTOJ10NfDDJwj4JN87nZ+hspdM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=gGPcod77; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1759220844;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=0k53564HVWSnWT4QeushBTs4QSP6pO7lgGYw2Y1kNtA=;
+	b=gGPcod774jtph18gWmo7svrXstSD1eDyT9gv3qxCZJq4iOCPjyG60c6SlVvOIsqMIo5zCx
+	5WJgsHohUu2F37tGforka3Mml+fl7KUkpX1E/0YoJKAokAXBNtKP8w1OOaPlmzw0eAPw/W
+	5796lBafNpu3Ggn+qJR9tRcMexT2r8M=
+Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
+ [209.85.221.70]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-498-rg3ZEF-BOD6830mnF4APNg-1; Tue, 30 Sep 2025 04:27:08 -0400
+X-MC-Unique: rg3ZEF-BOD6830mnF4APNg-1
+X-Mimecast-MFC-AGG-ID: rg3ZEF-BOD6830mnF4APNg_1759220827
+Received: by mail-wr1-f70.google.com with SMTP id ffacd0b85a97d-3ece14b9231so3865627f8f.0
+        for <kvm@vger.kernel.org>; Tue, 30 Sep 2025 01:27:07 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1759220827; x=1759825627;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=0k53564HVWSnWT4QeushBTs4QSP6pO7lgGYw2Y1kNtA=;
+        b=p5AOXJjytcTufUFwrrTBaV4uVZjyXdfnTllzZhQO+7ojke1x6jOc/mZhAdZWrkebev
+         45OU3fLIqebEviFklBhGQSWH+56lFILqsqGBWx7w1Xu+FsVzsLLvyQbof2rHp8yHE+5u
+         iVFFtUzXMXoIImmq4rsIMFrO+dWg1bd9WCJNlM00wfN0KxzNJLH4ZWs64ryow26tQito
+         Z83olzgKV6d4G8zJ5v19XrgUf8+7bmi4bvI1DtRdah1iacgq8BiwANkBuxOLdiPcitMl
+         QD+nAFD6WXXIRjUlCulDgNaXC655pXJBSZHqSGjRA9hO7rMcpb5r47kdXH6pgt4n8bEH
+         2sxg==
+X-Forwarded-Encrypted: i=1; AJvYcCWa8njpEMrUjuAeTG3lC1siZP71iEZppvhFEEL5YdFmkcOxLhmOkOa2CxlU7GOJJJDP7po=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yw75MVF0ywr0gBrZFRpaJaIk115NjRigp+1Ecxz7xIyWGXUZHz+
+	MJfIqQKHQmecwmSQFH4k8Z8zx/Izy1h/Hg5Wyc/SBhvO8GVkHhsLGrGG6B61PcozdFiy8LVUCUV
+	uuhjG+K8gSAB0Lyhy2IQmRjb/lu/yc8qBXv4kG2IEKkIYnHHgKYDK8g==
+X-Gm-Gg: ASbGncsB5aFglH0wsr15bTmYtnWRMrLJ2T0/R/wNUouqA4dvQTN04/fKUDoqd8Xj487
+	DlZj2draqJxqPUm+GBLRBA7JsPRlSA9H8qWdIqjfKwjxpmhFEe58MaVUtY2f2I1TamyCN1alla5
+	NXfcCN5zQ3G+FWsQKlid5Nj1bKfdN0/G2eaxCptP+RPuo7ngYVyGEiAlVtGlhk5emoPsXzZg2IS
+	avpcHb3jwaPyhu7oRoje2cjgy0bAZ1K+FmcPo/JjgdF49EGGbbv5Y+8WeriDA5Cq+OIumMTwcdo
+	PzSJITq83QIXSPEPzp/4AE5PNqINVEfj3N5AklwaTgg2Chpaiisd0UMeJIcDVVTXA1JRjuYHDyh
+	WzHVBT9QcK6vIt/TqgCCSUg==
+X-Received: by 2002:a05:6000:610:b0:3ee:109a:3a83 with SMTP id ffacd0b85a97d-40e4ece5726mr16763801f8f.29.1759220826784;
+        Tue, 30 Sep 2025 01:27:06 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IErkmBK2pEHIR11t9h0fOhWc98uNL2Ww5V4K1p5cxBvz0HlJrGFndWMq/zucbPlLC+5Qu2udA==
+X-Received: by 2002:a05:6000:610:b0:3ee:109a:3a83 with SMTP id ffacd0b85a97d-40e4ece5726mr16763764f8f.29.1759220826311;
+        Tue, 30 Sep 2025 01:27:06 -0700 (PDT)
+Received: from sgarzare-redhat (host-79-46-200-153.retail.telecomitalia.it. [79.46.200.153])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-40fc5603381sm23147503f8f.31.2025.09.30.01.27.03
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 30 Sep 2025 01:27:05 -0700 (PDT)
+Date: Tue, 30 Sep 2025 10:26:55 +0200
+From: Stefano Garzarella <sgarzare@redhat.com>
+To: Bobby Eshleman <bobbyeshleman@gmail.com>
+Cc: Shuah Khan <shuah@kernel.org>, "David S. Miller" <davem@davemloft.net>, 
+	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
+	Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
+	Stefan Hajnoczi <stefanha@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, 
+	Jason Wang <jasowang@redhat.com>, Xuan Zhuo <xuanzhuo@linux.alibaba.com>, 
+	Eugenio =?utf-8?B?UMOpcmV6?= <eperezma@redhat.com>, "K. Y. Srinivasan" <kys@microsoft.com>, 
+	Haiyang Zhang <haiyangz@microsoft.com>, Wei Liu <wei.liu@kernel.org>, Dexuan Cui <decui@microsoft.com>, 
+	Bryan Tan <bryan-bt.tan@broadcom.com>, Vishnu Dasa <vishnu.dasa@broadcom.com>, 
+	Broadcom internal kernel review list <bcm-kernel-feedback-list@broadcom.com>, virtualization@lists.linux.dev, netdev@vger.kernel.org, 
+	linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org, kvm@vger.kernel.org, 
+	linux-hyperv@vger.kernel.org, berrange@redhat.com, Bobby Eshleman <bobbyeshleman@meta.com>
+Subject: Re: [PATCH net-next v6 7/9] selftests/vsock: improve logging in
+ vmtest.sh
+Message-ID: <f7oeyneht4vxtfolrgv36b5tu4zreffcwztimc6s5jixszjt75@yjkhcuhuwbpi>
+References: <20250916-vsock-vmtest-v6-0-064d2eb0c89d@meta.com>
+ <20250916-vsock-vmtest-v6-7-064d2eb0c89d@meta.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-Exchange-MessageSentRepresentingType: 1
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: TY1PPFCDFFFA68A:EE_|JH0PR02MB7088:EE_
-X-MS-Office365-Filtering-Correlation-Id: 0b8f382e-cbcf-46ab-03e2-08ddfffb154b
-X-MS-Exchange-SLBlob-MailProps:
-	WaIXnCbdHrNsJbj7NxvUrpSYkT7K1zyU9/F5LFZ3l9LS+T44MweSaNc5vytV+1WvQJLbQdGbSOix4uH0LitTl2Ybvwm+XIBJZTzTeJe1bSGhVk8DA1Z8QKipIy5+l8NDTgGX2JilPF7WWupvDKh2wxXLr7rtYjhsqQpSukEgTCmc32wyTyxDo56Uzq/7msjOTJjWQ/kxNNQ2iaw0OoZWJiGBh8ZrDK3rNI7LQvS2y3HbmB3Kogy6nQmoOMxcyVfqyEXGOs27pUpof3hJCCcc/zzTwgUUhuWE0kLBhdz+cMGgToLF67siibEJU7WF9Si6cNOMvrBFmuNqf4lMbaqMy/N+u03KbwRKhX1aWMiZARrlfMrH/1c1+dX7joBsVCl7Bg6juEWZXSneB0dHVD+yvzNykaJUlxdusSUmU63fjtPzq8tui4tRUcTqSXK7DCqjGVpY9RVrBojn3ZL0sZXLbiNU2/BdIM/BTboaAVo9lws2eoVW5cK1Gp+mUDkCNUcGMlRlxUOknn5kY0Y9Qj/vMpMopsPsE9XhvMkEHe/tRpDcTV8fPLSqs0lx9LGlX5zXDb8wBTvdH7SWp1jyRF1YMKaqxOthL5kgWRM8DaDECWfzolUB5bFA5XwRFbbX8hNNfPDwfDBIVV3/i1Gv6clyck4n9L0sZF6iUvMQxa2qYCFtsnMuSZA7dWPB14kul+UHnYfWo1JSqCfCTxWCtfEi1TW5rbE+OXv/KTvZdavsQEWME/b9OdUKbg4uCECkGqsKW3x9YK9XkQU=
-X-Microsoft-Antispam:
-	BCL:0;ARA:14566002|37102599003|8060799015|19110799012|6090799003|15080799012|461199028|5072599009|23021999003|40105399003|440099028|3412199025;
-X-Microsoft-Antispam-Message-Info:
-	=?utf-8?B?OVEwOS83cWoyb0ErSFBiZzFWUUhnRGZQbnRTcTRvS3ZNMDBGRnNwSXZCeU9K?=
- =?utf-8?B?UWVHRnZtYVByb0JwbUhPQmRDcXowaWp0QkIzMHE0R0FTaXVJejR2aVprUU1u?=
- =?utf-8?B?TVFTTDJWdnR2T3VSOTA3SUhDVlMvb1UwUzhvV3EvdFVQUG9GeW96NGNVdTg0?=
- =?utf-8?B?T2RBeENWOHNqSEFIVG1vWm14VUZOQzdOMzF2YUJLYXUxVmNpaitPaTZXU2dD?=
- =?utf-8?B?d3hiTm5LbitWWEVybjRNVHhmVU1JcmpEdWh0NlYreTArdHJLSjRBVWhSc1dL?=
- =?utf-8?B?T1hMV2xRVG0xT3hwYWFWd3JiUmpudlpkQ3psUFJPMGUvbERueVozTWdMN3lG?=
- =?utf-8?B?SDBQVEpSUVZ2Wk0xdkZDc2xWcVZwWnRRdlo4VFpnZS9oWWExV2h2TFlydUE2?=
- =?utf-8?B?ZkxIa1Fxd0hZcDhNbGV0SzVlb1Yyd3p4RERNUzU3VXI3Zk9nTVRlZWt6RUJw?=
- =?utf-8?B?TWRZeit4N3VhWXRMQ1FhajNrYkNuZ3dqQ3BzNTZrVnlHTXVPcWpYUEI1VW9z?=
- =?utf-8?B?ZTdrZURvUU5PZ0tXVlV0bFRJK09wVXdxMmdESk96WExGY2NldTZvTmIrOFh1?=
- =?utf-8?B?bkNwaVFyOS9kaW9BL05XNUd6YTdabVZqSlFieFBjV2JWeGpPZWYrTzZyUlk5?=
- =?utf-8?B?U0ZMSnpycHE0Qkl0SXpXbUUrdWp5SHBmRUV2UEUxUG1PazZXdVlORnphQTh6?=
- =?utf-8?B?OVJUS25LTHJlMFlBWCtBR29lKzR1WjZQdTlxeHhjRDZXdDMxUjR2ZG0yYW5D?=
- =?utf-8?B?NDZjRjJMOVAxdUZRV0NZMXpwYW9jejRIT096My95OGVvdjJBc2hYTktoOU9Z?=
- =?utf-8?B?Uk9kRlNJdWdiRWxTUWgrZWFWbXNLR252dzNvb3RrZXBXdmVlenpPYnNFMm9m?=
- =?utf-8?B?SENxaXJIWnY1YVJxKzZhSmZaZ1VveVJTZDNyK1o5cG5DdDA0dDhseHJTT1hV?=
- =?utf-8?B?RlRGOW9jUGdSbkNpZlV0ZEYxNklXNEJyZUhwS2FLT1Jmb0hzam5reDlaZ3pv?=
- =?utf-8?B?OEhsczU0SitSYVBDa2RKZStod0hUMmhDZGtObjJ4SlZxZ2NCV3lKVXp5UTRF?=
- =?utf-8?B?WnFuY1JTRzNVSXBrS3RIZmQza01hRVJBMitrTXlnMG45VkRhMHZBckk5QlFW?=
- =?utf-8?B?Uy95R09Xcy9kMHhpVDVvdW9vS2ZJOWM4NnJENTNsWDUrK0s0UGhSZE9zYUls?=
- =?utf-8?B?Y1NhWFFXZUUxaXcwU0UwOEFaZ24wcmc5aEhsSHNmZTlIZEZVV0xXWVNiL3pS?=
- =?utf-8?B?emNRRzVjRUdaUzRpWTB2aDM0RTFjdzV0a09aRmZnSWpNeTVDSW9QSEs5WjdI?=
- =?utf-8?B?Tkg0RHd5eEswVmlXbFhPQk12T3NLeDFUR1lraUh1WlJPL20yZ0k1VzI0UFJt?=
- =?utf-8?B?Sy8veFI2UCtPTHRqN29xZ25zOGp2d29BQ3g4ZEg4d3NDTWQ5QVhENi9hRk9U?=
- =?utf-8?B?VzRsTXl4cG5LOUw5ZFNRL0JlTElzdm5idXFBZFlFUWUrRGlKclhkQjhyb3k5?=
- =?utf-8?B?cXo3SFBIQXgxMU9MQnZtVzlWelJjQXJmZ2crYWMvSHEyOC9hbzZhbHN6OE5G?=
- =?utf-8?B?TkpoUk83QlJ5a2JJdlZuNTM5cnlrZVJBSzB5R3RydUZGTkMvUzBVZUlOa3Vi?=
- =?utf-8?B?Uy9OWEltSXNCbDF5QkgyQ1FucEJZTVE9PQ==?=
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?utf-8?B?TnRtS3cxZUkrS3lIb0psMWFiMHBva1RVWGdEYzNYMkF1Mm1oRElscDhIeEJi?=
- =?utf-8?B?SHNNM3ZVbUxUOVpzd29nYkZhTWJ3aUo4K1oyNHBaRHpkNXoxaXp6T3d4Wm5J?=
- =?utf-8?B?REJBMXRrUi9mV0U3WG0vM0ZYbWZMZFNHSEt4ZU00dDNQbzAya0lyWjRTUVVh?=
- =?utf-8?B?WnQ3RThhWWJHQjVsUlZUWWs2b3ZrS1JzdXdmWWFINHFEcGw3bzdFRzlqYTRo?=
- =?utf-8?B?Vm9BT0tKcTRSRGZhWG4vR3M0bksrUzZyR2NtNmRXdy8rZ2VSelZpRkoyRGZs?=
- =?utf-8?B?aXlGSDhsbGE3WWtZNGdKUmQ2Uyt5RGtTV2lWd1RnNk5FbUZqV21FMXI2bVdS?=
- =?utf-8?B?Q1k4ano2bXB3aVdXSmxoSlBnYVpKRGZUMXFGeWlnSjJ1TkNmNkJ5alk0OTNl?=
- =?utf-8?B?L255cmlNemJmRVdNZEY4WEVJSU5LWGV2aWpUMUdRMVp3ZDY3ZDN2dzEySHNj?=
- =?utf-8?B?VllhYXA3TkRVT0paeC92MEJkbFp5TGtTQ2tHSTg0NVJHQnhUN1RMdFh5V1E0?=
- =?utf-8?B?azM5S0pKKzU5L3ZNYXllODhnZW9KSTgrMmVaTUUrcGJuOEJhQWJqVVFxbkNT?=
- =?utf-8?B?WURtcWsvbW94NlY0alBzbGhURGVsSjhDRzhWaWh4RldQeDZ3dm51TVdsZ1hq?=
- =?utf-8?B?UERKcFZQYnlrcU5XT0haWVl5VTJhT0E5SjFwREJRVCtjL1FVL1hyRm9qWFFt?=
- =?utf-8?B?TEhDV2xSekNMWnJQa3pmRzNPRDdSOElJeXQvK0FDR2lRRytnSUJXU0FnMlRS?=
- =?utf-8?B?alcwdjluRzVLYzJOdkRVdGNZWGUwUFhYbjdpMXlKTFd0TUNuc3NTMktYak1u?=
- =?utf-8?B?TW9sRjdlbFI3Y0t2VEZMbWZxaC82dlJOR2tvK2duVUQ3VENKeVIvcndmWmJX?=
- =?utf-8?B?QVZjK1ovVk9MSWttMisyNldzVE1PMGJVVkhQbk9LQkUycnRjeno5N1dxTlVY?=
- =?utf-8?B?aU5DYmpySktRTHBNN1RzbzBFenZJUVNhR011ZUZGN3N5NXduWmszQWJqMnFk?=
- =?utf-8?B?NmFLWi8wTXFRVGRNdHczclI5MVEwdTRVYlptOVBJQTlYaVYvcFk0V3VmQzEr?=
- =?utf-8?B?ZTVwak9VYjB4eE8zazcvMXoyeVZsNC83S3NHeWtWVWNyVFJGbTlrZkIxRGR6?=
- =?utf-8?B?bkRIWXQvS0RyRmdFaXFjUlMxbDM2UUpadmtFRFFTRXBOdnYyd3NKQlhsZC8x?=
- =?utf-8?B?Z1JSVGxIcEoxOHhOb3ZjemRBZ3F3R01hZGFZUDJMUmk4SnYzTTQxL2lPZjUw?=
- =?utf-8?B?ekdBdU5xeDZDVXVMazFpSVliSE5TaU1zUG1tT2s1b3RLWnExdXZqNDVUSzNp?=
- =?utf-8?B?cXFtTTFpR3pEMS9vNVgvUHZyZS8vZVd5a2hxbFI2NHcxcDZUcHFmYnhHbUlD?=
- =?utf-8?B?L2o2bnFjRWxkMlZTMDFwbTNLMmNXdDZDV0RiUHFyLzR0SDlRY3JNT09ZYllt?=
- =?utf-8?B?Y05NUDZadlZlYUJwam1KSlFzY1U1dlJrMktoVUpaZnYwY05FUytsbnlFZGdL?=
- =?utf-8?B?azJkUENlVjZEdXJ6SHBJOExDK3NLazM4cVI0NzYzLzNFTGlaRkR4KzZuZUtC?=
- =?utf-8?B?ZndoZ1d5cDZqL29WQ2JMK1RNanVSV2hQbG5JOUxQcGNhZWxsd1N3bU1DSnNi?=
- =?utf-8?Q?TbHeUBl9dg8MI+TmkEvyL39JzBDToBxuAYzf6aqdj11s=3D?=
-X-OriginatorOrg: sct-15-20-9115-0-msonline-outlook-a092a.templateTenant
-X-MS-Exchange-CrossTenant-Network-Message-Id: 0b8f382e-cbcf-46ab-03e2-08ddfffb154b
-X-MS-Exchange-CrossTenant-AuthSource: TY1PPFCDFFFA68A.apcprd02.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 30 Sep 2025 08:26:42.9821
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 84df9e7f-e9f6-40af-b435-aaaaaaaaaaaa
-X-MS-Exchange-CrossTenant-RMS-PersistedConsumerOrg:
-	00000000-0000-0000-0000-000000000000
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: JH0PR02MB7088
+Content-Type: text/plain; charset=us-ascii; format=flowed
+Content-Disposition: inline
+In-Reply-To: <20250916-vsock-vmtest-v6-7-064d2eb0c89d@meta.com>
 
-On 9/21/2025 4:38 AM, Andrew Jones wrote:
-> In order to add the interrupt remapping support in a separate file,
-> share struct riscv_iommu_domain and struct riscv_iommu_info through
-> the header.
+On Tue, Sep 16, 2025 at 04:43:51PM -0700, Bobby Eshleman wrote:
+>From: Bobby Eshleman <bobbyeshleman@meta.com>
 >
-> Signed-off-by: Andrew Jones <ajones@ventanamicro.com>
-> ---
->   drivers/iommu/riscv/iommu.c | 20 --------------------
->   drivers/iommu/riscv/iommu.h | 20 ++++++++++++++++++++
->   2 files changed, 20 insertions(+), 20 deletions(-)
-Reviewed-by: Nutty Liu <nutty.liu@hotmail.com>
+>Improve logging by adding configurable log levels. Additionally, improve
+>usability of logging functions. Remove the test name prefix from logging
+>functions so that logging calls can be made deeper into the call stack
+>without passing down the test name or setting some global. Teach log
+>function to accept a LOG_PREFIX variable to avoid unnecessary argument
+>shifting.
+>
+>Signed-off-by: Bobby Eshleman <bobbyeshleman@meta.com>
+>---
+> tools/testing/selftests/vsock/vmtest.sh | 75 ++++++++++++++++-----------------
+> 1 file changed, 37 insertions(+), 38 deletions(-)
+>
+>diff --git a/tools/testing/selftests/vsock/vmtest.sh b/tools/testing/selftests/vsock/vmtest.sh
+>index edacebfc1632..183647a86c8a 100755
+>--- a/tools/testing/selftests/vsock/vmtest.sh
+>+++ b/tools/testing/selftests/vsock/vmtest.sh
+>@@ -51,7 +51,12 @@ readonly TEST_DESCS=(
+> 	"Run vsock_test using the loopback transport in the VM."
+> )
+>
+>-VERBOSE=0
+>+readonly LOG_LEVEL_DEBUG=0
+>+readonly LOG_LEVEL_INFO=1
+>+readonly LOG_LEVEL_WARN=2
+>+readonly LOG_LEVEL_ERROR=3
+>+
+>+VERBOSE="${LOG_LEVEL_WARN}"
+
+If the default is 2, how the user can set 3 (error) ?
+
+BTW I find a bit strange the reverse order.
+Is this something specific to selftest?
+
+The rest LGTM.
 
 Thanks,
-Nutty
+Stefano
+
+>
+> usage() {
+> 	local name
+>@@ -196,7 +201,7 @@ vm_start() {
+>
+> 	qemu=$(command -v "${QEMU}")
+>
+>-	if [[ "${VERBOSE}" -eq 1 ]]; then
+>+	if [[ ${VERBOSE} -le ${LOG_LEVEL_DEBUG} ]]; then
+> 		verbose_opt="--verbose"
+> 		logfile=/dev/stdout
+> 	fi
+>@@ -271,60 +276,56 @@ EOF
+>
+> host_wait_for_listener() {
+> 	wait_for_listener "${TEST_HOST_PORT_LISTENER}" "${WAIT_PERIOD}" "${WAIT_PERIOD_MAX}"
+>-}
+>-
+>-__log_stdin() {
+>-	cat | awk '{ printf "%s:\t%s\n","'"${prefix}"'", $0 }'
+>-}
+>
+>-__log_args() {
+>-	echo "$*" | awk '{ printf "%s:\t%s\n","'"${prefix}"'", $0 }'
+> }
+>
+> log() {
+>-	local prefix="$1"
+>+	local redirect
+>+	local prefix
+>
+>-	shift
+>-	local redirect=
+>-	if [[ ${VERBOSE} -eq 0 ]]; then
+>+	if [[ ${VERBOSE} -gt ${LOG_LEVEL_INFO} ]]; then
+> 		redirect=/dev/null
+> 	else
+> 		redirect=/dev/stdout
+> 	fi
+>
+>+	prefix="${LOG_PREFIX:-}"
+>+
+> 	if [[ "$#" -eq 0 ]]; then
+>-		__log_stdin | tee -a "${LOG}" > ${redirect}
+>+		if [[ -n "${prefix}" ]]; then
+>+			cat | awk -v prefix="${prefix}" '{printf "%s: %s\n", prefix, $0}'
+>+		else
+>+			cat
+>+		fi
+> 	else
+>-		__log_args "$@" | tee -a "${LOG}" > ${redirect}
+>-	fi
+>+		if [[ -n "${prefix}" ]]; then
+>+			echo "${prefix}: " "$@"
+>+		else
+>+			echo "$@"
+>+		fi
+>+	fi | tee -a "${LOG}" > ${redirect}
+> }
+>
+>-log_setup() {
+>-	log "setup" "$@"
+>+log_host() {
+>+	LOG_PREFIX=host log $@
+> }
+>
+>-log_host() {
+>-	local testname=$1
+>+log_guest() {
+>+	LOG_PREFIX=guest log $@
+>+}
+>
+>-	shift
+>-	log "test:${testname}:host" "$@"
+> }
+>
+>-log_guest() {
+>-	local testname=$1
+>
+>-	shift
+>-	log "test:${testname}:guest" "$@"
+> }
+>
+> test_vm_server_host_client() {
+>-	local testname="${FUNCNAME[0]#test_}"
+>
+> 	vm_ssh -- "${VSOCK_TEST}" \
+> 		--mode=server \
+> 		--control-port="${TEST_GUEST_PORT}" \
+> 		--peer-cid=2 \
+>-		2>&1 | log_guest "${testname}" &
+>+		2>&1 | log_guest &
+>
+> 	vm_wait_for_listener "${TEST_GUEST_PORT}"
+>
+>@@ -332,18 +333,17 @@ test_vm_server_host_client() {
+> 		--mode=client \
+> 		--control-host=127.0.0.1 \
+> 		--peer-cid="${VSOCK_CID}" \
+>-		--control-port="${TEST_HOST_PORT}" 2>&1 | log_host "${testname}"
+>+		--control-port="${TEST_HOST_PORT}" 2>&1 | log_host
+>
+> 	return $?
+> }
+>
+> test_vm_client_host_server() {
+>-	local testname="${FUNCNAME[0]#test_}"
+>
+> 	${VSOCK_TEST} \
+> 		--mode "server" \
+> 		--control-port "${TEST_HOST_PORT_LISTENER}" \
+>-		--peer-cid "${VSOCK_CID}" 2>&1 | log_host "${testname}" &
+>+		--peer-cid "${VSOCK_CID}" 2>&1 | log_host &
+>
+> 	host_wait_for_listener
+>
+>@@ -351,19 +351,18 @@ test_vm_client_host_server() {
+> 		--mode=client \
+> 		--control-host=10.0.2.2 \
+> 		--peer-cid=2 \
+>-		--control-port="${TEST_HOST_PORT_LISTENER}" 2>&1 | log_guest "${testname}"
+>+		--control-port="${TEST_HOST_PORT_LISTENER}" 2>&1 | log_guest
+>
+> 	return $?
+> }
+>
+> test_vm_loopback() {
+>-	local testname="${FUNCNAME[0]#test_}"
+> 	local port=60000 # non-forwarded local port
+>
+> 	vm_ssh -- "${VSOCK_TEST}" \
+> 		--mode=server \
+> 		--control-port="${port}" \
+>-		--peer-cid=1 2>&1 | log_guest "${testname}" &
+>+		--peer-cid=1 2>&1 | log_guest &
+>
+> 	vm_wait_for_listener "${port}"
+>
+>@@ -371,7 +370,7 @@ test_vm_loopback() {
+> 		--mode=client \
+> 		--control-host="127.0.0.1" \
+> 		--control-port="${port}" \
+>-		--peer-cid=1 2>&1 | log_guest "${testname}"
+>+		--peer-cid=1 2>&1 | log_guest
+>
+> 	return $?
+> }
+>@@ -429,7 +428,7 @@ QEMU="qemu-system-$(uname -m)"
+> while getopts :hvsq:b o
+> do
+> 	case $o in
+>-	v) VERBOSE=1;;
+>+	v) VERBOSE=$(( VERBOSE - 1 ));;
+> 	b) BUILD=1;;
+> 	q) QEMU=$OPTARG;;
+> 	h|*) usage;;
+>@@ -452,10 +451,10 @@ handle_build
+>
+> echo "1..${#ARGS[@]}"
+>
+>-log_setup "Booting up VM"
+>+log_host "Booting up VM"
+> vm_start
+> vm_wait_for_ssh
+>-log_setup "VM booted up"
+>+log_host "VM booted up"
+>
+> cnt_pass=0
+> cnt_fail=0
+>
+>-- 
+>2.47.3
+>
+
 
