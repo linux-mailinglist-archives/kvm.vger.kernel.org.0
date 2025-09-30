@@ -1,79 +1,79 @@
-Return-Path: <kvm+bounces-59106-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-59107-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id D4467BABFCE
-	for <lists+kvm@lfdr.de>; Tue, 30 Sep 2025 10:21:55 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 765F1BABFD1
+	for <lists+kvm@lfdr.de>; Tue, 30 Sep 2025 10:22:00 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 337861922C4F
-	for <lists+kvm@lfdr.de>; Tue, 30 Sep 2025 08:22:18 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 31A083C5948
+	for <lists+kvm@lfdr.de>; Tue, 30 Sep 2025 08:21:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B851E2F3C13;
-	Tue, 30 Sep 2025 08:21:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 03D2D2F3C03;
+	Tue, 30 Sep 2025 08:21:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="WwL1grxA"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="icrSK1qD"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-wm1-f42.google.com (mail-wm1-f42.google.com [209.85.128.42])
+Received: from mail-wr1-f41.google.com (mail-wr1-f41.google.com [209.85.221.41])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1A2AC2D24B1
-	for <kvm@vger.kernel.org>; Tue, 30 Sep 2025 08:21:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.42
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 692B52BE037
+	for <kvm@vger.kernel.org>; Tue, 30 Sep 2025 08:21:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.41
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1759220508; cv=none; b=uIkMFJxIpc1qmxkkCwXuRnoQotdBLH9maXfpSjmRiV68AOEtlhWZgq1AZTm9j/l+ZMUgDvrWNd79KGrMZaJyYGcrtWUodI39Ry1WXWs7dyVu1iW74I+rrOnLeXhMgs9lyUDDOU+I9n1MbLR6H7oLlNuC84MSehBgRTu2ahdYDDI=
+	t=1759220514; cv=none; b=UiaaJ9PyHS0aYm/u7GkxC/XHz5U3jP80U/GB0kxzauW4rDImjJAK136IM22rd9UnRv6uMkZFTveE8zHZJK/kLYmxyN/ExP3NhNbJqGR/EWHYbWzRmBYyClcfxtPOfIgvMH9MkSPEv9+Rbf2sCSUMW40rOItgLQ8O5AdDgsHLeDA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1759220508; c=relaxed/simple;
-	bh=V7YTTK3DadZF/66Yk4V5kuHtpRQG5xx88T1upr8EniY=;
+	s=arc-20240116; t=1759220514; c=relaxed/simple;
+	bh=4ijS8QI8JPVn2RfjDSD5HXVxDXtq0+sHN630Ou+jRUM=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=TXBMoGYqfMeSFKG3fxyuOz5DWCfJgFvjvE8sX1qE77jjfgyTg9D/NEmdSi20KA5OWck9cVbQnuAqP2ga6LL2lMY+B0ihmZwIJztbGfwiKRyXS3igIi9QY8M+LYJ8RDnCmdikh2I2QGNkwPPj8L7Uv0ckkCT4tUy2rNEqPr3a8Jg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=WwL1grxA; arc=none smtp.client-ip=209.85.128.42
+	 MIME-Version:Content-Type; b=cJkPCaHnU8nGtMt1aT6Pmo194nttmlG+S+BszZn2zS/HgYQoeThJpWh5ah1K5IDNMQoRuNqd+KrAxIb6nZN0KLj+Rnk6yMCnj+bgvlZhaQYj4p9Q22f34LtwgI1o3wevsfvZUgh3sgB8wWiHMAU3BzM3Im/HaTNG2n8cGE6F1cs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=icrSK1qD; arc=none smtp.client-ip=209.85.221.41
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
-Received: by mail-wm1-f42.google.com with SMTP id 5b1f17b1804b1-46e2c3b6d4cso41510855e9.3
-        for <kvm@vger.kernel.org>; Tue, 30 Sep 2025 01:21:46 -0700 (PDT)
+Received: by mail-wr1-f41.google.com with SMTP id ffacd0b85a97d-3f99ac9acc4so679592f8f.3
+        for <kvm@vger.kernel.org>; Tue, 30 Sep 2025 01:21:52 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1759220505; x=1759825305; darn=vger.kernel.org;
+        d=linaro.org; s=google; t=1759220511; x=1759825311; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=uVuWODNllLBcWHkHdEzk+20qcWtQ6YA1oYWBzMhXpCQ=;
-        b=WwL1grxAdj3BB4e+FHGCJlA/3euOZEs7qdQxpsj0wAsKhPqDOF9JXMYJPReOiDMJHE
-         1lsFiRX8W7PJjxO6q++3SZDLTUhRvcpfz+VZWSZhfRzQfrsn/NLLcNutXICYSTUDC48j
-         U1LCDWAv2cEW5ycxpCW9li1L0QjWZ/8OPppkXeNGx0d3gwkTblk+oAEeFL43JMXhPW9V
-         onRDzJ/5PtWy0CnjuttkDW3sYIdA6lFHoEVHP2PstK5q6bnwrLsP+57J9BPO65e9LStW
-         u5zT3FOe1z7VGreTveoPLu6MSN/8NasPdmQhYgT59ZRANSlp5rJ+53/M40b0J7NobXG0
-         ZHyw==
+        bh=jPaFfZE+Vm6W3t7QC31lKwf41cuqTfJ0BWTKMrsHvkU=;
+        b=icrSK1qDgYuAZj5lHoecTfWBfKAtf0ubSwLilgp64JU43/848LAp+XyF7VkDl5bRt9
+         Wz1CkPwlagk2Vpz7OTjn5v8RSPojfaGUVvbnlKQwUBSZqEgzPZPyNP8rtoMjzHHdiViO
+         voiPUDdiyixaj5IqWBeF2QZe584RPFuFOJQArII/P5d4Xb2jPDcMWB9JS66WhPVBvv3D
+         RTnV+lkiLdkzb8QraQhIyVGAWPBwVPhyltwIsRZ/ksQ2/RT2sODPjylWuujabGWvlFjw
+         6Z1efYAl5wPKekvpW4XK2z6r23TWaHEfQqF5HL9yJPZq6PWH0O5WeZiH0mN3amsnZ0ww
+         6/kg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1759220505; x=1759825305;
+        d=1e100.net; s=20230601; t=1759220511; x=1759825311;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=uVuWODNllLBcWHkHdEzk+20qcWtQ6YA1oYWBzMhXpCQ=;
-        b=a1DF3zo4bHU0R1QOhDv7YnUEbH+Jx8Wc7O6RWNBWRy0WEIoNGnWC+ieHmuBC8gaa3a
-         9ae6h++0a10hAjp/LwCtHMrr1vG1+PErbC4g9iglT1avu4bLb5xCWOMAMg5Kgqbsw7dR
-         7pJB05jjpKDNzXaxkXoIMnxtjCmsT6v03jV8Gs6U7rS6Shm8sM2MapnrJIqYqiqyrIv8
-         H3ndJcAg15P2oGFlexUN0x+Z9u5G5WnUF5Yoz8fjRDWHEOP4qBx7zHe5xuKwrUZxwFWz
-         mTStI3J3xhWusGRp4M9aZdZiVPtBwODbGVsXA7XYqYpk3Vc/6MwNRMYEwJZWvDpZ8JTH
-         bN0g==
-X-Forwarded-Encrypted: i=1; AJvYcCXD3oXBvOsddS2KhzXBeQ4F1A9ZPu7FKqwfc8s5MXPtpm1R+XO0BKNsTkY2V2/cCqb2CI4=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxAk86rjHUAWlL3ABpHSZuS611izz+Eo1e5vwLokgMn9PW5GQl4
-	dfOx6IEoUruDtcTfEru0OKibTOxwzBS3h63UZ0bGxG5rGOVi3MreUvzpXkPNSNoUDnU=
-X-Gm-Gg: ASbGncs3j/GWcNgtzaHr2cOLQhqZZSkSog/98iksqDg/USFwHp5NnT3f9UzEr9drNgF
-	i8CViQaS7p7WtcxWRzM0IJeupGBpNO6Iq7zLkdRkbA5Cz3mQ1fDOXhtVpbzlkn5PpEEzUliGMXk
-	SlG9bIah+O3huDfMeviA/OBh+SjNFekwZfHXp8F8yn6SP5+7+cSXPMRXFrpRtMWUQ72W/7Q90oR
-	Q1rORzXp0uo1rfNu9niTV9yOrSjCX8UF1Ohs7hTdFy8R1COxxUZ4TNvIqQPyUfkFhVWssKTq1ji
-	QUk/RTMR+OfCThmDQxFTTJNahe0aN5dRZyq+sfNnT1NR/7dbJ4gA8wrs8WQdDt3ipKzrtrFOta4
-	sBXeWhL0brCrrkl3jUtJ8auGDB1ZErEwXfwtZzJYXciLvnbK73xKQRWeyMVz/JaiBhlzzUxu2XY
-	ciAdt6fAh3h5vJGKi80A1Rd8Mv8IZKTyw=
-X-Google-Smtp-Source: AGHT+IEnN1+Dj0G5eE22oo/LVcWK6MF1t2TvnNSxkl29p00iMJks8dqgYIqx9W0IIiNQ+maQ1TKmXg==
-X-Received: by 2002:a05:600c:1e85:b0:45d:d5df:ab2d with SMTP id 5b1f17b1804b1-46e32a03456mr188255845e9.26.1759220505370;
-        Tue, 30 Sep 2025 01:21:45 -0700 (PDT)
+        bh=jPaFfZE+Vm6W3t7QC31lKwf41cuqTfJ0BWTKMrsHvkU=;
+        b=be21j0doM3z44uP+J86yHvJnNwllgfbAIHA1T+34iUODZQ78cDtSghLuj0n7oibrrO
+         ZMu5jks/NG6d/kNM/QashN+TCsDAG0H8niCbAXZZWzIRRfzpQZ0PXsR02GssTsqxFel9
+         rQgnwsF4S5y+KpMz2WOyzjB5F18AhICslJ2/NnWxqiCfCOfjQdpDEsogtlVyjG442p/L
+         SmclJl6C1PbXJwLguorUmUdI+b5ER7avI0r8STuAXffBbwmEqRJEAhqSWHUNyk0DdXSW
+         BEw9oaGCEN5n/CIbF+P97/3rMbOqsCYgTBt5Yw+YMtjKgeOoPg74wMbbh07j8ZujTDE5
+         WI1g==
+X-Forwarded-Encrypted: i=1; AJvYcCUyc1lH5OuLqEguabIfv6KfpYG0jFEuYZMEtnAtcTJZMAtnnQObVilzGnI7wZd62sANsrs=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzDH8BffZ4fBY2KWeJE11OqQgdkbhZ69zwZQKs1Dqc+wpSUWWay
+	Ro6tBzTedL816Gt7KNQAYMZupbYXUGyiRtMtuOoOSHBm3ZOcq+nTEw/nUwO4LmY4GNw=
+X-Gm-Gg: ASbGnct2fa+tCLNdyvtfnEoMZJQYCrv3Cwu/8YmAsyA8ovwdx2jxlXrXjM6HOThz9EH
+	8t7uIJefe8rQMDT19LYO2CuZBrRvOl4ImA8k4IpHXjPUIitsr4joy8YY3YxrM2gorjVQsCfFKUc
+	mGmIhrHbK+gHU9AhuOSb8lYBmk+aG37DTBejE8uvQvbH1YhiO4B/C3IuIs5jRoWt39coyymK0rb
+	xditTx0R7ztPnrEgYvp1XIkP5LfxohlUHm5WPhWU/9wJc+hI1BxWnwD72g9xzdNhNi4BuhjIeRa
+	Tyk3+QeydoTtvSofGZ9/8ROM4HQZx2oukrpT9jcU2C6cPMNviuPLW77Ukj/Ul8C0KJdpw18d9uZ
+	ydiNRQKCDM7woI9leRhJwddYwZso6rMzmXTL5EwZ3naTwys/GHkOy0IZ5Bo5WCSNFe9Q+9lnUMN
+	3EUM8V+PDrtI+loGBFqHau
+X-Google-Smtp-Source: AGHT+IEB8eNGO8ibaj4OUUkCL1Gk/lot4nZRiwg5YPnw3XMPBC9mULq1peqy0gUd0OsdrauuTBslPQ==
+X-Received: by 2002:a05:6000:2511:b0:3d8:3eca:a978 with SMTP id ffacd0b85a97d-40e44682229mr16305754f8f.21.1759220510700;
+        Tue, 30 Sep 2025 01:21:50 -0700 (PDT)
 Received: from localhost.localdomain (88-187-86-199.subs.proxad.net. [88.187.86.199])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-46e5c3cad50sm8272675e9.3.2025.09.30.01.21.43
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-40fc5602f15sm21609359f8f.39.2025.09.30.01.21.49
         (version=TLS1_3 cipher=TLS_CHACHA20_POLY1305_SHA256 bits=256/256);
-        Tue, 30 Sep 2025 01:21:44 -0700 (PDT)
+        Tue, 30 Sep 2025 01:21:50 -0700 (PDT)
 From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@linaro.org>
 To: qemu-devel@nongnu.org,
 	Peter Maydell <peter.maydell@linaro.org>
@@ -103,9 +103,9 @@ Cc: Marcelo Tosatti <mtosatti@redhat.com>,
 	Paolo Bonzini <pbonzini@redhat.com>,
 	Thomas Huth <thuth@redhat.com>,
 	Eric Farman <farman@linux.ibm.com>
-Subject: [PATCH v3 03/18] system/memory: Factor address_space_is_io() out
-Date: Tue, 30 Sep 2025 10:21:10 +0200
-Message-ID: <20250930082126.28618-4-philmd@linaro.org>
+Subject: [PATCH v3 04/18] target/i386/arch_memory_mapping: Use address_space_memory_is_io()
+Date: Tue, 30 Sep 2025 10:21:11 +0200
+Message-ID: <20250930082126.28618-5-philmd@linaro.org>
 X-Mailer: git-send-email 2.51.0
 In-Reply-To: <20250930082126.28618-1-philmd@linaro.org>
 References: <20250930082126.28618-1-philmd@linaro.org>
@@ -118,74 +118,64 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 
-Factor address_space_is_io() out of cpu_physical_memory_is_io().
+Since all functions have an address space argument, it is
+trivial to replace cpu_physical_memory_is_io() by
+address_space_memory_is_io().
 
 Signed-off-by: Philippe Mathieu-Daudé <philmd@linaro.org>
-Reviewed-by: Thomas Huth <thuth@redhat.com>
 ---
- include/system/memory.h |  9 +++++++++
- system/physmem.c        | 21 ++++++++++++---------
- 2 files changed, 21 insertions(+), 9 deletions(-)
+ target/i386/arch_memory_mapping.c | 10 +++++-----
+ 1 file changed, 5 insertions(+), 5 deletions(-)
 
-diff --git a/include/system/memory.h b/include/system/memory.h
-index 3e5bf3ef05e..546c643961d 100644
---- a/include/system/memory.h
-+++ b/include/system/memory.h
-@@ -3030,6 +3030,15 @@ static inline MemoryRegion *address_space_translate(AddressSpace *as,
- bool address_space_access_valid(AddressSpace *as, hwaddr addr, hwaddr len,
-                                 bool is_write, MemTxAttrs attrs);
+diff --git a/target/i386/arch_memory_mapping.c b/target/i386/arch_memory_mapping.c
+index a2398c21732..560f4689abc 100644
+--- a/target/i386/arch_memory_mapping.c
++++ b/target/i386/arch_memory_mapping.c
+@@ -35,7 +35,7 @@ static void walk_pte(MemoryMappingList *list, AddressSpace *as,
+         }
  
-+/**
-+ * address_space_is_io: check whether an guest physical addresses
-+ *                      whithin an address space is I/O memory.
-+ *
-+ * @as: #AddressSpace to be accessed
-+ * @addr: address within that address space
-+ */
-+bool address_space_is_io(AddressSpace *as, hwaddr addr);
-+
- /* address_space_map: map a physical memory region into a host virtual address
-  *
-  * May map a subset of the requested range, given by and returned in @plen.
-diff --git a/system/physmem.c b/system/physmem.c
-index 86422f294e2..84d7754ccab 100644
---- a/system/physmem.c
-+++ b/system/physmem.c
-@@ -3359,6 +3359,17 @@ bool address_space_access_valid(AddressSpace *as, hwaddr addr,
-     return flatview_access_valid(fv, addr, len, is_write, attrs);
- }
+         start_paddr = (pte & ~0xfff) & ~(0x1ULL << 63);
+-        if (cpu_physical_memory_is_io(start_paddr)) {
++        if (address_space_is_io(as, start_paddr)) {
+             /* I/O region */
+             continue;
+         }
+@@ -65,7 +65,7 @@ static void walk_pte2(MemoryMappingList *list, AddressSpace *as,
+         }
  
-+bool address_space_is_io(AddressSpace *as, hwaddr addr)
-+{
-+    MemoryRegion *mr;
-+
-+    RCU_READ_LOCK_GUARD();
-+    mr = address_space_translate(as, addr, &addr, NULL, false,
-+                                 MEMTXATTRS_UNSPECIFIED);
-+
-+    return !(memory_region_is_ram(mr) || memory_region_is_romd(mr));
-+}
-+
- static hwaddr
- flatview_extend_translation(FlatView *fv, hwaddr addr,
-                             hwaddr target_len,
-@@ -3755,15 +3766,7 @@ int cpu_memory_rw_debug(CPUState *cpu, vaddr addr,
- 
- bool cpu_physical_memory_is_io(hwaddr phys_addr)
- {
--    MemoryRegion*mr;
--    hwaddr l = 1;
--
--    RCU_READ_LOCK_GUARD();
--    mr = address_space_translate(&address_space_memory,
--                                 phys_addr, &phys_addr, &l, false,
--                                 MEMTXATTRS_UNSPECIFIED);
--
--    return !(memory_region_is_ram(mr) || memory_region_is_romd(mr));
-+    return address_space_is_io(&address_space_memory, phys_addr);
- }
- 
- int qemu_ram_foreach_block(RAMBlockIterFunc func, void *opaque)
+         start_paddr = pte & ~0xfff;
+-        if (cpu_physical_memory_is_io(start_paddr)) {
++        if (address_space_is_io(as, start_paddr)) {
+             /* I/O region */
+             continue;
+         }
+@@ -100,7 +100,7 @@ static void walk_pde(MemoryMappingList *list, AddressSpace *as,
+         if (pde & PG_PSE_MASK) {
+             /* 2 MB page */
+             start_paddr = (pde & ~0x1fffff) & ~(0x1ULL << 63);
+-            if (cpu_physical_memory_is_io(start_paddr)) {
++            if (address_space_is_io(as, start_paddr)) {
+                 /* I/O region */
+                 continue;
+             }
+@@ -142,7 +142,7 @@ static void walk_pde2(MemoryMappingList *list, AddressSpace *as,
+              */
+             high_paddr = ((hwaddr)(pde & 0x1fe000) << 19);
+             start_paddr = (pde & ~0x3fffff) | high_paddr;
+-            if (cpu_physical_memory_is_io(start_paddr)) {
++            if (address_space_is_io(as, start_paddr)) {
+                 /* I/O region */
+                 continue;
+             }
+@@ -203,7 +203,7 @@ static void walk_pdpe(MemoryMappingList *list, AddressSpace *as,
+         if (pdpe & PG_PSE_MASK) {
+             /* 1 GB page */
+             start_paddr = (pdpe & ~0x3fffffff) & ~(0x1ULL << 63);
+-            if (cpu_physical_memory_is_io(start_paddr)) {
++            if (address_space_is_io(as, start_paddr)) {
+                 /* I/O region */
+                 continue;
+             }
 -- 
 2.51.0
 
