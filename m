@@ -1,79 +1,79 @@
-Return-Path: <kvm+bounces-59061-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-59062-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id BBFB4BAB4A2
-	for <lists+kvm@lfdr.de>; Tue, 30 Sep 2025 06:13:59 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 4DAF9BAB4A5
+	for <lists+kvm@lfdr.de>; Tue, 30 Sep 2025 06:14:05 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 191851924D19
-	for <lists+kvm@lfdr.de>; Tue, 30 Sep 2025 04:14:22 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 9513C1924C9F
+	for <lists+kvm@lfdr.de>; Tue, 30 Sep 2025 04:14:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 16EBA248F47;
-	Tue, 30 Sep 2025 04:13:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5544E24C068;
+	Tue, 30 Sep 2025 04:14:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="w1b/dXgS"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="HbTHbVb+"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-wm1-f51.google.com (mail-wm1-f51.google.com [209.85.128.51])
+Received: from mail-wr1-f47.google.com (mail-wr1-f47.google.com [209.85.221.47])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 65E41247284
-	for <kvm@vger.kernel.org>; Tue, 30 Sep 2025 04:13:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.51
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A59E0247284
+	for <kvm@vger.kernel.org>; Tue, 30 Sep 2025 04:13:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.47
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1759205635; cv=none; b=RNMtRh46XJOcNyp3+6MMOQMSSQ/7nq/YjqGIbVLQZYVUygn5Bbs51gmXmanW7H83UdS0QIgmP6+MNVEOnh1XFi/SJ7MK0Df3KUirxpVdSPqsD4INyLrD5BGjlc2AfNNcEQlW/gOU6aWipvQgvmo2l8yc09MujoZ+QiLTKdMCYx8=
+	t=1759205640; cv=none; b=OT8gLxZ/PHErF1mPBmxqmA4DU5zf6pcv1LIwIvUydjwOTwwoNASxrA2YsB/cm8ACgxCuKRveHjVTyxE8aBlteiBdsAUxDTyN7Jhie5LZdBWnL8zqP0tORXhRg/x+bFNGAmOAPU7vu+MmaqzaGYY1I3s9oEYVcZQjf5MCkjYbsww=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1759205635; c=relaxed/simple;
-	bh=4ijS8QI8JPVn2RfjDSD5HXVxDXtq0+sHN630Ou+jRUM=;
+	s=arc-20240116; t=1759205640; c=relaxed/simple;
+	bh=vQ1XP+EJjfISfUhqcAuz7EHNGolncv1rVCxDcJErohg=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=LAkXNVyO3zIKnLe3bn7Rv9eALLaXdyvZTOOhj319VwED8vlsJPKWYoAy30RmUazq/dqndl4N6kBCzPskSuFXHTBuh3RMcbm2bM6zqOl7YSVbnOFvAAhks9GIsish41jez0NJOScsdVrXzKyHjAV3yGAyJPp6tNu4hHc7j5xrUJs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=w1b/dXgS; arc=none smtp.client-ip=209.85.128.51
+	 MIME-Version:Content-Type; b=iLQedXoca88TRzS+qSTE7Hl0U51gcJb67vg1fw8xzZgosYrbpT9WJZtVjMti0ydpAtSYW68BLJ37PJE1XsS5chrY9un1xfQ1LUqagUM3hVRtYcFDrUNjoeLTnsVH/+fGBPo6n6kWwWf2Rg9pOGGxMwP3ejS2Bv3aLbt2XQnfG8c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=HbTHbVb+; arc=none smtp.client-ip=209.85.221.47
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
-Received: by mail-wm1-f51.google.com with SMTP id 5b1f17b1804b1-46e37d10f3eso40467285e9.0
-        for <kvm@vger.kernel.org>; Mon, 29 Sep 2025 21:13:53 -0700 (PDT)
+Received: by mail-wr1-f47.google.com with SMTP id ffacd0b85a97d-3fa528f127fso4221189f8f.1
+        for <kvm@vger.kernel.org>; Mon, 29 Sep 2025 21:13:58 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1759205631; x=1759810431; darn=vger.kernel.org;
+        d=linaro.org; s=google; t=1759205637; x=1759810437; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=jPaFfZE+Vm6W3t7QC31lKwf41cuqTfJ0BWTKMrsHvkU=;
-        b=w1b/dXgSB4VBne6rUfBNAGX2HPo1vuDOhYBv1GSNN2fdwHjtBqOMA7r5z3BGIICvOd
-         IhCmcNBcqdFIwWcTGRJ7pNjj/N74cbislL8dkIyYD+dXYJ1tCqqqWIUIBDJHNilK6Dw/
-         69/fufKDBGFlkWiqZEsgtPOrQ/G3bKPvxiI+8JHZnEGJokrZp3CVcSkBIVUiCGpH7Kjq
-         ZJavMv356C1GLDtRrOvb+HCJZbNjvCmrkN3+TwqaxAsUfOFgoCJFPRIHZDPpalKNkh+s
-         JKHrv7ZUgqpBt9FYxBKCMme8hH71zIRWvm4Q/7O8WG/Xe+QFL3x8u7r/v1rApIv+zYbr
-         IcNw==
+        bh=UsPYBf9Y41DYeMpdEdOkBi/mu9mpDrkpGT9A+u43FVY=;
+        b=HbTHbVb+00qctnvHWao+FDgG4vUaEp+HazG3V89KZYDOjrMGmsEHxvg0VuQzutYg+m
+         X+6HZR+k1PFdxXOxzBXBLhLZQaXQ76uFbl3TyLICpq/TydOG6+RXngf2il5MY/G0XZrp
+         sq1zOC6GeQ8wRg81tlkpkgJr/pq35XNl3CN+X6pgtDfvCe7YfdNEY8Hi43/Dkg+v45U4
+         WCSTHvDxSFQgwMUR53iEQATiqgPoEw7D9bIp9sKP9hFSZDs3zDWbF2v8yDhZLP5LHW4+
+         4N2B/qEd3rssn3MXwLNEQCkALfwLMoWAN0wC8bB4K7g0cHip6X8rHZbR5Bo5vhOr0vBU
+         QheQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1759205631; x=1759810431;
+        d=1e100.net; s=20230601; t=1759205637; x=1759810437;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=jPaFfZE+Vm6W3t7QC31lKwf41cuqTfJ0BWTKMrsHvkU=;
-        b=Cv9BPdXgkwmIC1ZjTaMCvui0IFNEaYi7aHREgjqRLzvkOzz/Tndg1xN1BugYtUouDW
-         m3QqbyikFSnxG9xtHVtrPkgBl6HEerDSzl1oXJeDQSOlEEJ1J5GfyK5R0hblgJDN1Lge
-         WeKSBesL9RMR6gBlGwOoJLn3SZdeuxPxZSrsAoU1f8hGVScIQK7XMcTnRwkiOafYZvfw
-         4+1rftVf1OzXLMRmS4wOR19CUuJOTtMDYwAtJ7g0yMRcFqMAJS6QzcO7gxJdkxwSrtY5
-         tKzFukwC7ghaO/788kv+5gucOwW0Ot+BsslzEGOBt/FvPUS1nyXRK0QKd/6VsfAMPDRQ
-         7SAQ==
-X-Forwarded-Encrypted: i=1; AJvYcCVd97si2lgzP4QEKYkJ2s0uQXgW/SCr6VQkUHTG2p542M+cJW/Fv7JyiEvXCO8x5C2eR7A=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyEqGEq2eR7XZJACrE0Y0W7w1cv0JCL3rLvrJsYmTinFkkgUejZ
-	dgYqbMMGbNo52BUmly5C18DQQJ0jezBjGfLyqW569vUaQt8fTeLqAYUJPF6Tc3VPlFc=
-X-Gm-Gg: ASbGncskvzyw4XrzAa2B6BAJASyy4co3wcGrLor7xzXWVSTclCI1V9A//cN103B5DSH
-	c7/50+xt4GYCL/LinE6rxhLe6MQMyD2fkM/WN4uyVPauY/BzHSozde+756nqK877OAW8MxPg63G
-	4emjCa033GvhByA5Ds3W/eIms/arrFlA55jnY0cvpGTO3/vCsk+28wNGNejICXmIa/KisdUgDko
-	8Py34aSa6PJgp1x7Pj5TPxf0kh3vTcT2P/TuIlAol8AWncg6Vw2FpdVjr04P+e+pMw1zkrGgfT4
-	cyl/2ZmPkWeUNFyACiQia2zzA1oGRLHyhuDYSI0lDxkr9xOw02UvzTTIaz9VNoI5CjRKVHDZN+8
-	MVsdKHIUCpR9UNOPSceqvGD1696zVs5HOkRQ4SBDMoWpxB4vhb9vHnm8EqBl82D2pKI5BE/3gza
-	mWtiODdK2eRq3Rn5C/0oXbHCI47TpB4UU=
-X-Google-Smtp-Source: AGHT+IGcac+YiZIcZSnCrqiaQ5DwkBXJUwHzOeJuSpEQu46EHairXFh+p7pa80eZkns9YIhZ38oTxg==
-X-Received: by 2002:a05:600c:444d:b0:45f:2cd5:5086 with SMTP id 5b1f17b1804b1-46e3299f4f3mr172171215e9.3.1759205631445;
-        Mon, 29 Sep 2025 21:13:51 -0700 (PDT)
+        bh=UsPYBf9Y41DYeMpdEdOkBi/mu9mpDrkpGT9A+u43FVY=;
+        b=sEzDZXi+Q5CeqOW6s9omAsa5gIoGjfmeEPkxp+8LZa5QIUOpm2miAN5QodKKguzpdv
+         ucuECZKv3fZs1nE0G5IrFhIXjjF46jSBOBoDhwXpRw53+dnHVJI775S9HjknTE0cNyqq
+         pKNhylJiXWm2GbttXtOeQeddxQh3rXhxgYJCd25Ggtn5j0staGtl3WD7JDawPiVeJqpy
+         5WMKMwPuRdjcws+p0gvdLgrbKMdIbpxMBLK6vw6uPkZcpTcKYUpn/fx8FXtz9Wruunnn
+         7Vxt2+XW86pfd/pMrFSbi9Bh48KyEYIZnCX9OUk4lPVlaHKHx4oDv/Uo9TqzvKIyIjId
+         ef8w==
+X-Forwarded-Encrypted: i=1; AJvYcCUxM++NZJ1i9xQn5lSbr1c6libk/i6dk3cCJNphgEAC7+G2qSHnXMvSGGpuKdYp+kXqQ3g=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwLXKBCOibH3uR0NvwzlJpDPttlYADKR7jwGGj3870wfursS5tU
+	kKMvFloinkIyjVmSVC91vzqp66ZR67zhvgPJY7UgbpI3/dqXYOXiDobgKwZU9t2M+GM=
+X-Gm-Gg: ASbGncuXyRJFBN55l37wUQGv/blKEj1VqwzszOTDz49UEw18WWGlfYTUy0tdwyq3+Ok
+	D1JqWMVmnEUjWvpR5kwuSShEQyuQA4KxBhLUomvntIhaDg5iPAFsN617fQgafcjA83kNLDXqQaA
+	OPj8zPJjNH38bq4Rtg1+oSjHY9EVIYiUfpB1T5Yd3YmwVdAyk65nnOSMn9mjPsI9usCreoxef8Q
+	ynfa0xIDvXbWEke8y9q0+M56DoQMOuRHtt+eZnhpLDSxfAuWuH6jqsgxm1sWdPer9PoX3ub0/hp
+	m0cZcc4CbHom4+82sRG3fJq8500iFies/DyMdICH75r6sOGHmyojOi55r4K0JwtETWuZuiuOb2w
+	hxK1aVY98JfMY7R3XI/aQsV9gCPxRLxzMLaISl6/snK9dJ66GjAoVAN5mPrnajTKOZdfMqDnhAg
+	j8v4wLNBRrNFbRO05GyKuS
+X-Google-Smtp-Source: AGHT+IH3He/bgDcAVA0O1uM4KAZUJWAOZ5pxrLV0agMvoc3nOriIeKi2nLWEPRWZf/BAWQ6cyeIFXA==
+X-Received: by 2002:a05:6000:40c7:b0:407:d776:4434 with SMTP id ffacd0b85a97d-4241227789emr2285457f8f.30.1759205636900;
+        Mon, 29 Sep 2025 21:13:56 -0700 (PDT)
 Received: from localhost.localdomain (88-187-86-199.subs.proxad.net. [88.187.86.199])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-46e56f536a3sm43891685e9.8.2025.09.29.21.13.50
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-46e2ab31e97sm251610955e9.14.2025.09.29.21.13.55
         (version=TLS1_3 cipher=TLS_CHACHA20_POLY1305_SHA256 bits=256/256);
-        Mon, 29 Sep 2025 21:13:51 -0700 (PDT)
+        Mon, 29 Sep 2025 21:13:56 -0700 (PDT)
 From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@linaro.org>
 To: qemu-devel@nongnu.org,
 	Peter Maydell <peter.maydell@linaro.org>
@@ -103,9 +103,9 @@ Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@linaro.org>,
 	"Edgar E. Iglesias" <edgar.iglesias@gmail.com>,
 	Richard Henderson <richard.henderson@linaro.org>,
 	David Hildenbrand <david@redhat.com>
-Subject: [PATCH v2 04/17] target/i386/arch_memory_mapping: Use address_space_memory_is_io()
-Date: Tue, 30 Sep 2025 06:13:12 +0200
-Message-ID: <20250930041326.6448-5-philmd@linaro.org>
+Subject: [PATCH v2 05/17] hw/s390x/sclp: Use address_space_memory_is_io() in sclp_service_call()
+Date: Tue, 30 Sep 2025 06:13:13 +0200
+Message-ID: <20250930041326.6448-6-philmd@linaro.org>
 X-Mailer: git-send-email 2.51.0
 In-Reply-To: <20250930041326.6448-1-philmd@linaro.org>
 References: <20250930041326.6448-1-philmd@linaro.org>
@@ -118,64 +118,49 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 
-Since all functions have an address space argument, it is
-trivial to replace cpu_physical_memory_is_io() by
-address_space_memory_is_io().
+When cpu_address_space_init() isn't called during vCPU creation,
+its single address space is the global &address_space_memory.
+
+As s390x boards don't call cpu_address_space_init(),
+cpu_get_address_space(CPU(cpu), 0) returns &address_space_memory.
+
+We can then replace cpu_physical_memory_is_io() by the semantically
+equivalent address_space_memory_is_io() call.
 
 Signed-off-by: Philippe Mathieu-Daudé <philmd@linaro.org>
 ---
- target/i386/arch_memory_mapping.c | 10 +++++-----
- 1 file changed, 5 insertions(+), 5 deletions(-)
+ hw/s390x/sclp.c | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
 
-diff --git a/target/i386/arch_memory_mapping.c b/target/i386/arch_memory_mapping.c
-index a2398c21732..560f4689abc 100644
---- a/target/i386/arch_memory_mapping.c
-+++ b/target/i386/arch_memory_mapping.c
-@@ -35,7 +35,7 @@ static void walk_pte(MemoryMappingList *list, AddressSpace *as,
-         }
+diff --git a/hw/s390x/sclp.c b/hw/s390x/sclp.c
+index 9718564fa42..f507b36cd91 100644
+--- a/hw/s390x/sclp.c
++++ b/hw/s390x/sclp.c
+@@ -16,6 +16,7 @@
+ #include "qemu/units.h"
+ #include "qapi/error.h"
+ #include "hw/boards.h"
++#include "system/memory.h"
+ #include "hw/s390x/sclp.h"
+ #include "hw/s390x/event-facility.h"
+ #include "hw/s390x/s390-pci-bus.h"
+@@ -301,6 +302,7 @@ int sclp_service_call(S390CPU *cpu, uint64_t sccb, uint32_t code)
+     CPUS390XState *env = &cpu->env;
+     SCLPDevice *sclp = get_sclp_device();
+     SCLPDeviceClass *sclp_c = SCLP_GET_CLASS(sclp);
++    AddressSpace *as = cpu_get_address_space(CPU(cpu), 0);
+     SCCBHeader header;
+     g_autofree SCCB *work_sccb = NULL;
  
-         start_paddr = (pte & ~0xfff) & ~(0x1ULL << 63);
--        if (cpu_physical_memory_is_io(start_paddr)) {
-+        if (address_space_is_io(as, start_paddr)) {
-             /* I/O region */
-             continue;
-         }
-@@ -65,7 +65,7 @@ static void walk_pte2(MemoryMappingList *list, AddressSpace *as,
-         }
- 
-         start_paddr = pte & ~0xfff;
--        if (cpu_physical_memory_is_io(start_paddr)) {
-+        if (address_space_is_io(as, start_paddr)) {
-             /* I/O region */
-             continue;
-         }
-@@ -100,7 +100,7 @@ static void walk_pde(MemoryMappingList *list, AddressSpace *as,
-         if (pde & PG_PSE_MASK) {
-             /* 2 MB page */
-             start_paddr = (pde & ~0x1fffff) & ~(0x1ULL << 63);
--            if (cpu_physical_memory_is_io(start_paddr)) {
-+            if (address_space_is_io(as, start_paddr)) {
-                 /* I/O region */
-                 continue;
-             }
-@@ -142,7 +142,7 @@ static void walk_pde2(MemoryMappingList *list, AddressSpace *as,
-              */
-             high_paddr = ((hwaddr)(pde & 0x1fe000) << 19);
-             start_paddr = (pde & ~0x3fffff) | high_paddr;
--            if (cpu_physical_memory_is_io(start_paddr)) {
-+            if (address_space_is_io(as, start_paddr)) {
-                 /* I/O region */
-                 continue;
-             }
-@@ -203,7 +203,7 @@ static void walk_pdpe(MemoryMappingList *list, AddressSpace *as,
-         if (pdpe & PG_PSE_MASK) {
-             /* 1 GB page */
-             start_paddr = (pdpe & ~0x3fffffff) & ~(0x1ULL << 63);
--            if (cpu_physical_memory_is_io(start_paddr)) {
-+            if (address_space_is_io(as, start_paddr)) {
-                 /* I/O region */
-                 continue;
-             }
+@@ -308,7 +310,7 @@ int sclp_service_call(S390CPU *cpu, uint64_t sccb, uint32_t code)
+     if (env->psw.mask & PSW_MASK_PSTATE) {
+         return -PGM_PRIVILEGED;
+     }
+-    if (cpu_physical_memory_is_io(sccb)) {
++    if (address_space_is_io(as, sccb)) {
+         return -PGM_ADDRESSING;
+     }
+     if ((sccb & ~0x1fffUL) == 0 || (sccb & ~0x1fffUL) == env->psa
 -- 
 2.51.0
 
