@@ -1,70 +1,70 @@
-Return-Path: <kvm+bounces-59239-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-59240-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 05453BAF38A
-	for <lists+kvm@lfdr.de>; Wed, 01 Oct 2025 08:22:02 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 76121BAF877
+	for <lists+kvm@lfdr.de>; Wed, 01 Oct 2025 10:00:45 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9FCB1170EC7
-	for <lists+kvm@lfdr.de>; Wed,  1 Oct 2025 06:22:01 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E908C3B1393
+	for <lists+kvm@lfdr.de>; Wed,  1 Oct 2025 08:00:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C7E7F2D739C;
-	Wed,  1 Oct 2025 06:21:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8D92C2701C0;
+	Wed,  1 Oct 2025 08:00:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="g83fPaov"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="i/g4j24e"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pl1-f201.google.com (mail-pl1-f201.google.com [209.85.214.201])
+Received: from mail-pj1-f74.google.com (mail-pj1-f74.google.com [209.85.216.74])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 451A926D4CA
-	for <kvm@vger.kernel.org>; Wed,  1 Oct 2025 06:21:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 302AC1C862D
+	for <kvm@vger.kernel.org>; Wed,  1 Oct 2025 08:00:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.74
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1759299712; cv=none; b=HQQmCCEBiONjGk22m5dPirTTMWSssPbdsvSEvxI5iP/GggwPVaUM5ZXaLEAdgIppOewE8W71NrKnFX7+R8tq83bLT96j/8TA/UiL9pC3+FwU62zEH2oTBj/jDavgmcnvEiazdxLPXTJSfjuvXrLs6QXEagrTvuCChYQ1gzbOuxg=
+	t=1759305625; cv=none; b=U7Xr4Fx0Jc4oGFuti0FzR9AUx3GeLiH1j1ivST8jsyJoRCbtnrGLILKtUF2/Ta5k1t3VrBGSO8bE2KNAk8+XQQV6hqOTYuDU1kiHzc3xIveWjNJEKwvdHee0U9rsmJHtu0ABThhh8BCKk6fA2y7jvSXoGjsON295WfkYzM0JAaM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1759299712; c=relaxed/simple;
-	bh=CnpYtzn8PUc0ZBYLdHGVpOdTJPVwWMwJAwS94JAPcks=;
+	s=arc-20240116; t=1759305625; c=relaxed/simple;
+	bh=Hy1eDptd3RnDCLhYADdcAkwktCJao8VLHf5Lwifc0jU=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=cxXfexyavRgmrEJuk4eRErACAlkmaYwP25Mpfoeeh4Dha3fr2VylTUJUoEH2mUT93UrbTlGqO9KYrRUNrosO1VumtKOieHWu2DIPTimpLedXc1ctsmcROzwNI+/ihn8PLZwVNhBPvoaCY1A2HC3wiip0gVv4qDYx06H/2L9Cj+w=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--ackerleytng.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=g83fPaov; arc=none smtp.client-ip=209.85.214.201
+	 To:Cc:Content-Type; b=lhosGFVzDr1nAf8Kci0T77NE/SX7QtftwG4ySWtMz9kAUi0P0VTCWB0ul/xu6/gyueKbs+X9WnxO+Gxzi4sssGHXECVIHtSGTG4bNIEo2L9VW75lu1ZG0wQ98PUfjSUdUXSxpX2AyMUzEpTmRuvycu/UoQhY06cbRLLMdULwPXk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--ackerleytng.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=i/g4j24e; arc=none smtp.client-ip=209.85.216.74
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--ackerleytng.bounces.google.com
-Received: by mail-pl1-f201.google.com with SMTP id d9443c01a7336-269880a7bd9so82957585ad.3
-        for <kvm@vger.kernel.org>; Tue, 30 Sep 2025 23:21:49 -0700 (PDT)
+Received: by mail-pj1-f74.google.com with SMTP id 98e67ed59e1d1-32ee157b9c9so6080692a91.2
+        for <kvm@vger.kernel.org>; Wed, 01 Oct 2025 01:00:23 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1759299708; x=1759904508; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1759305623; x=1759910423; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=gKyzk1pWtrNabjmeFySfVdKtKDt4rOVB/cSEsmccNXs=;
-        b=g83fPaov2u0cDHkCnR3/lI62BOO7z45fEvMJ42bbRY2JHWLE2gm6K/XMqfEz3COvTd
-         Af1pl36jnPeYTE3JQXHnRta4hZMGs8CnuUte8NrR4foGZts5w5u/uteEW5V7/weTcL2q
-         LP4X2pyeWlVIIgldfuvZOB7o4Df3B+j/I+hSIDrpS15VElNbbQqwlxc2n4prLJ+vc5O9
-         jfXwXPikix3fuejz14TbEpEx8z6Nczw2xFJl29pM3BtD61gBAqxRo4kUCCrvaOiAnvlh
-         PE1FXfWtk5boNvTBr4u6egTqUc42WsaPfTcWbca9VGjjHIJAckly5WpQOJ0jpNddGDje
-         ZRAQ==
+        bh=4Tl+hed0N6TppaJ6AKUhyqnsxkebUjy4YDJ4+LU5qyE=;
+        b=i/g4j24eo96B+LajOT7NZj/WhyINLwG22XB3FlxOlPP/IxKj6i1d3ED3ItJrhdCpUx
+         QqsPgP2q0r767kAbU5FCp6svyHPcj1h+GoCWkN4J9IclWUOeYEXELOgCiRhsdW/tdAyl
+         CeXNNOHicYyf2UfOFSNaMnW4JDA9iy1X2KpnRUacjZp1eAuRtcrQcAnDSUTpH9l2aEdu
+         r8bNPArtcK8bNm73+uXQrpW9m06j6rzuf0FFPPjotwZ7iKm8RBETz0pMd+JYf55sUriB
+         yHKhKb3pDwhlS7L2PrHajKYB92wkRyR+1D0+5G1jxDsiuc1FYXmxQd4fZBWYTX/sB7c2
+         sfCw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1759299708; x=1759904508;
+        d=1e100.net; s=20230601; t=1759305623; x=1759910423;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=gKyzk1pWtrNabjmeFySfVdKtKDt4rOVB/cSEsmccNXs=;
-        b=et+mSt0lFdp5tRzaSqggCq9YOwRqW9+XrVy7N2R0bFGzS/o+CiS1WSfU9JohiRq5MP
-         ci9u2SbEIDpaFpHzIC67SkLUXotbeFtx5TvMkCKhypqNoGUUjhX9XWaL9yzGw6urwnb0
-         yfWLcbP3ixwumuRN12bLs5EziQI0dF1V1ebqGYLs16dGYwW9Jw+Bzuf5+QgMCwxEtFHv
-         FwV6y5tYKld8VWWI1gMfcFP6b6EYoq1Fm3J9syuReYW2lsY907uBhV3JYt+ieyCWBOiI
-         b2vfqkWFxbadZvBGMPczZE96hJdps8XDT+6Lc8Ssrk7t0MDnCmrMu2ELbVRPzgHso/Uh
-         he5g==
-X-Forwarded-Encrypted: i=1; AJvYcCUeADkKqvB4SnnxdcHoyz6m6l//ZW1I5TBKyikXipGXiywS9H+qRD+dmyOaJPLm5bdvMr0=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yyb+Jq3DV/LzO/zp4xbZoSkQstODqMfFwzpBQvBihcJ5o5oQAer
-	bEl5FgVofZBorDSXcoVoxYA4Tp/SOfbRfLCmLZYqx2StCjMVfSeBPCI/9MG1XK0c7ZZ4daP7YdM
-	HybmqJFnpIBeEyr1dsE+c0O8Uwg==
-X-Google-Smtp-Source: AGHT+IHE0M7fuh9/BYVbAm929jP+iKH/pWdowlRc+CxCehWBNW7QMDY1Rz46MkircjbJVl76AmtAEEEYRxQN81OqOg==
-X-Received: from plbjw19.prod.google.com ([2002:a17:903:2793:b0:273:c5f4:a8ca])
+        bh=4Tl+hed0N6TppaJ6AKUhyqnsxkebUjy4YDJ4+LU5qyE=;
+        b=RZLbGXGL330k3QS63RgF4VZJfGFVhWZMdMH0NIgJlwbHrMl1GeIXP5Gc6WVtEINR7U
+         EdkNpNj9trHhg2kxdhqo09mD9vCmejD4LoNqQCDiMDOI0gp4uYBx7AONRUMQ604hAjQr
+         HyRTZSCq5Jrn1o/MUeXN0C1EYpQQQqDXKZxtfBEjf7htFhvrzvFT2SsT57XJePjPrMh6
+         dKTjhQxEU1w7BYEecUczFKX8FPY5CT5THbKl841WnK2CWgVI3nckTRxgp8um3MR5t4ry
+         wjq0MzDvJVRXypejhqCJLaKzrU8lKFScFAsU5Wuz19l+mjrXXRdOqRnLRIKzeHuqLiwf
+         lMKg==
+X-Forwarded-Encrypted: i=1; AJvYcCUh6UGqStQBX5C+TI2ACyNWx/xuEIUiRh9IrBEWJ24AaFxxzdctQzu5FYaWzhlbTG4LrHI=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxW/BE1JmVZcR2FPKo0qRXPqOXeo8JtGwyUZb2giSAP6sVF2Vg8
+	1OX6L9GxAhfVlEJk5Q453B/G4GNVkwPw6Rdb/8N0HK81vKnAg4PhYY/m82kQdyCWW/ZlkTnv8Rd
+	GXAAAURrOyajtYbH362ppIFvG3w==
+X-Google-Smtp-Source: AGHT+IFOxY0jnEcQfjZ7ErODgrPkCwI41v2vt546rzZ8qNIQTJpctxaVBVP6CbAGfqh6eDUwSlLw/ARkE9aRRb7Viw==
+X-Received: from pjvg23.prod.google.com ([2002:a17:90a:db17:b0:330:6c04:207])
  (user=ackerleytng job=prod-delivery.src-stubby-dispatcher) by
- 2002:a17:903:1251:b0:283:c950:a783 with SMTP id d9443c01a7336-28e7f437ef7mr31963025ad.56.1759299708586;
- Tue, 30 Sep 2025 23:21:48 -0700 (PDT)
-Date: Wed, 01 Oct 2025 06:21:47 +0000
+ 2002:a17:90b:4c48:b0:330:a301:35f4 with SMTP id 98e67ed59e1d1-339a6f30424mr2773499a91.20.1759305622740;
+ Wed, 01 Oct 2025 01:00:22 -0700 (PDT)
+Date: Wed, 01 Oct 2025 08:00:21 +0000
 In-Reply-To: <20250807094503.4691-1-yan.y.zhao@intel.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
@@ -73,7 +73,7 @@ List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
 References: <20250807093950.4395-1-yan.y.zhao@intel.com> <20250807094503.4691-1-yan.y.zhao@intel.com>
-Message-ID: <diqzh5wj2lc4.fsf@google.com>
+Message-ID: <diqzecrn2gru.fsf@google.com>
 Subject: Re: [RFC PATCH v2 17/23] KVM: guest_memfd: Split for punch hole and
  private-to-shared conversion
 From: Ackerley Tng <ackerleytng@google.com>
@@ -90,10 +90,32 @@ Content-Type: text/plain; charset="UTF-8"
 
 Yan Zhao <yan.y.zhao@intel.com> writes:
 
-Thanks Yan! Just got around to looking at this, sorry about the delay!
+I was looking deeper into this patch since on my WIP tree I already had
+the invalidate and zap steps separated out and had to do more to rebase
+this patch :)
 
 > In TDX, private page tables require precise zapping because faulting back
-> the zapped mappings necessitates the guest's re-acceptance. Therefore,
+> the zapped mappings necessitates the guest's re-acceptance.
+
+I feel that this statement could be better phrased because all zapped
+mappings require re-acceptance, not just anything related to precise
+zapping. Would this be better:
+
+    On private-to-shared conversions, page table entries must be zapped
+    from the Secure EPTs. Any pages mapped into Secure EPTs must be
+    accepted by the guest before they are used.
+
+    Hence, care must be taken to only precisely zap ranges requested for
+    private-to-shared conversion, since the guest is only prepared to
+    re-accept precisely the ranges it requested for conversion.
+
+    The guest may request to convert ranges not aligned with private
+    page table entry boundaries. To precisely zap these ranges, huge
+    leaves that span the boundaries of the requested ranges must be
+    split into smaller leaves, so that the split, smaller leaves now
+    align with the requested range for zapping.
+
+> Therefore,
 > before performing a zap for hole punching and private-to-shared
 > conversions, huge leafs that cross the boundary of the zapping GFN range in
 > the mirror page table must be split.
@@ -106,38 +128,28 @@ Thanks Yan! Just got around to looking at this, sorry about the delay!
 > table is being zapped, nor for kvm_gmem_error_folio() as an SPTE must not
 > map more than one physical folio.
 >
+
+I think splitting is not necessary as long as aligned page table entries
+are zapped. Splitting is also not necessary if the entire page table is
+zapped but that's a superset of zapping aligned page table
+entries. (Probably just a typo on your side.) Here's my attempt at
+rephrasing this:
+
+    Splitting is not necessary for the cases where only aligned page
+    table entries are zapped, such as during kvm_gmem_release() where
+    the entire guest_memfd worth of memory is zapped, nor for
+    truncation, where truncation of pages within a huge folio is not
+    allowed.
+
 > Therefore, in this patch,
 > - break kvm_gmem_invalidate_begin_and_zap() into
 >   kvm_gmem_invalidate_begin() and kvm_gmem_zap() and have
 >   kvm_gmem_release() and kvm_gmem_error_folio() to invoke them.
 >
-
-I think perhaps separating invalidate and zip could be a separate patch
-from adding the split step into the flow, that would make this patch
-smaller and easier to review.
-
-No action required from you for now, I have the the above part in a
-separate patch already (not yet posted).
-
 > - have kvm_gmem_punch_hole() to invoke kvm_gmem_invalidate_begin(),
 >   kvm_gmem_split_private(), and kvm_gmem_zap().
 >   Bail out if kvm_gmem_split_private() returns error.
 >
-
-IIUC the current upstream position is that hole punching will not
-be permitted for ranges smaller than the page size for the entire
-guest_memfd.
-
-Hence no splitting required during hole punch?
-
-+ 4K guest_memfd: no splitting required since the EPT entries will not
-  be larger than 4K anyway
-+ 2M and 1G (x86) guest_memfd: no splitting required since the entire
-  EPT entry will have to go away for valid ranges (valid ranges are
-  either 2M or 1G anyway)
-
-Does that sound right?
-
 > - drop the old kvm_gmem_unmap_private() and have private-to-shared
 >   conversion to invoke kvm_gmem_split_private() and kvm_gmem_zap() instead.
 >   Bail out if kvm_gmem_split_private() returns error.
@@ -145,81 +157,18 @@ Does that sound right?
 > Co-developed-by: Ackerley Tng <ackerleytng@google.com>
 > Signed-off-by: Ackerley Tng <ackerleytng@google.com>
 > Signed-off-by: Yan Zhao <yan.y.zhao@intel.com>
+> ---
+> RFC v2:
+> - Rebased to [1]. As changes in this patch are gmem specific, they may need
+>   to be updated if the implementation in [1] changes.
+> - Update kvm_split_boundary_leafs() to kvm_split_cross_boundary_leafs() and
+>   invoke it before kvm_gmem_punch_hole() and private-to-shared conversion.
+>
+> [1] https://lore.kernel.org/all/cover.1747264138.git.ackerleytng@google.com/
+>
+> RFC v1:
+> - new patch.
 > 
 > [...snip...]
 > 
-> @@ -514,6 +554,8 @@ static int kvm_gmem_convert_should_proceed(struct inode *inode,
->  					   struct conversion_work *work,
->  					   bool to_shared, pgoff_t *error_index)
->  {
-> +	int ret = 0;
-> +
->  	if (to_shared) {
->  		struct list_head *gmem_list;
->  		struct kvm_gmem *gmem;
-> @@ -522,19 +564,24 @@ static int kvm_gmem_convert_should_proceed(struct inode *inode,
->  		work_end = work->start + work->nr_pages;
->  
->  		gmem_list = &inode->i_mapping->i_private_list;
-> +		list_for_each_entry(gmem, gmem_list, entry) {
-> +			ret = kvm_gmem_split_private(gmem, work->start, work_end);
-> +			if (ret)
-> +				return ret;
-> +		}
-
-Will be refactoring the conversion steps a little for the next version
-of this series, hence I'd like to ask about the requirements before
-doing splitting.
-
-The requirement is to split before zapping, right? Other than that
-we technically don't need to split before checking for a safe refcount, right?
-
->  		list_for_each_entry(gmem, gmem_list, entry)
-> -			kvm_gmem_unmap_private(gmem, work->start, work_end);
-> +			kvm_gmem_zap(gmem, work->start, work_end, KVM_FILTER_PRIVATE);
->  	} else {
->  		unmap_mapping_pages(inode->i_mapping, work->start,
->  				    work->nr_pages, false);
->  
->  		if (!kvm_gmem_has_safe_refcount(inode->i_mapping, work->start,
->  						work->nr_pages, error_index)) {
-> -			return -EAGAIN;
-> +			ret = -EAGAIN;
->  		}
->  	}
->  
-> -	return 0;
-> +	return ret;
->  }
->  
-> 
-> [...snip...]
-> 
-> @@ -1906,8 +1926,14 @@ static int kvm_gmem_error_folio(struct address_space *mapping, struct folio *fol
->  	start = folio->index;
->  	end = start + folio_nr_pages(folio);
->  
-> -	list_for_each_entry(gmem, gmem_list, entry)
-> -		kvm_gmem_invalidate_begin_and_zap(gmem, start, end);
-> +	/* The size of the SEPT will not exceed the size of the folio */
-
-I think splitting might be required here, but that depends on whether we
-want to unmap just a part of the huge folio or whether we want to unmap
-the entire folio.
-
-Lots of open questions on memory failure handling, but for now I think
-this makes sense.
-
-> +	list_for_each_entry(gmem, gmem_list, entry) {
-> +		enum kvm_gfn_range_filter filter;
-> +
-> +		kvm_gmem_invalidate_begin(gmem, start, end);
-> +		filter = KVM_FILTER_PRIVATE | KVM_FILTER_SHARED;
-> +		kvm_gmem_zap(gmem, start, end, filter);
-> +	}
->  
->  	/*
->  	 * Do not truncate the range, what action is taken in response to the
-> -- 
-> 2.43.2
 
