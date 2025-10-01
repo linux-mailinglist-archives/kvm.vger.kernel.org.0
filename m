@@ -1,79 +1,79 @@
-Return-Path: <kvm+bounces-59247-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-59248-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 94C81BAF93D
-	for <lists+kvm@lfdr.de>; Wed, 01 Oct 2025 10:22:07 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id A352DBAF940
+	for <lists+kvm@lfdr.de>; Wed, 01 Oct 2025 10:22:14 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4E9BB1C3F95
-	for <lists+kvm@lfdr.de>; Wed,  1 Oct 2025 08:22:07 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 8D4C77ADC38
+	for <lists+kvm@lfdr.de>; Wed,  1 Oct 2025 08:20:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 24CF427A465;
-	Wed,  1 Oct 2025 08:22:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 75A7227FB28;
+	Wed,  1 Oct 2025 08:22:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="oo9M8VM4"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="wVpdhIqw"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-wr1-f48.google.com (mail-wr1-f48.google.com [209.85.221.48])
+Received: from mail-wm1-f51.google.com (mail-wm1-f51.google.com [209.85.128.51])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 933E919DF4F
-	for <kvm@vger.kernel.org>; Wed,  1 Oct 2025 08:21:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.48
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D09C319DF4F
+	for <kvm@vger.kernel.org>; Wed,  1 Oct 2025 08:22:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1759306920; cv=none; b=bLWTpapXu+rfTDMzXxY8RtNe/kGZdr87/5oQk1dcOgFhIsvNogcEeSm57wFMAwd5x5HlnALV2f7qo5jsECaukEgLRT7zyV7bX8MMmCq0y+b4yNxW+C9oj5QgHvOJ7tlbsle10xfjNfCjqJBNgURG4aZOaGX8d4PpKGulx9Uacdw=
+	t=1759306925; cv=none; b=RBaXcoBNsJl1GTrrxx2isZPGUU65tkZYqxvhTGvOTKzHlHZerP+NbUiL3VeO2RId7z2sJ6mv6GsHIU9AFVWWGIs/Jn5q5sKqwps3Qi3s6kAFDEBhY4MCGBUAiVDfactj8u7G7VI/ysw18QrVlxJo/8dQpw17O2CB0whOqJpK160=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1759306920; c=relaxed/simple;
-	bh=Bt7/Fo3I+rezFqRrOSYjqsGwZOA4N+0mqsehCAVsseM=;
+	s=arc-20240116; t=1759306925; c=relaxed/simple;
+	bh=am/53L3nYTbaM8zEf7rftKfSucLpbyHSzUwGcPYUySU=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=alTf8pq/i4k90MIFa0Nn7S7OGtjlcsZ2LXOmaax2X6clclYfnibZT9RViBLSORjXYC4KOfEqZWKsrlDxZOBzWaJ85uLUDVeipRknC5Dw0rJjvxmC65ibGbGNtsRXJ1VB8uroJVxsprfTMx8fMoVZ4v5pp1Pc8hdkKY7utyYJCiM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=oo9M8VM4; arc=none smtp.client-ip=209.85.221.48
+	 MIME-Version:Content-Type; b=t0ZDMWgSqrW/aMAU+OASIMGOXSkUFh+AnMsp1Lm8GLjtUvfm9py5xMoCXK5Xmla1Zyvo9UiSb541iOb6EBGpmKLhbBibTXmKEshrSh4LuIRIfw+g5BaEVkHEu3mnV037P/opAhSd5jUfF0TJQAR+G27LYY7RKiTzTj+g3hsW1N0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=wVpdhIqw; arc=none smtp.client-ip=209.85.128.51
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
-Received: by mail-wr1-f48.google.com with SMTP id ffacd0b85a97d-3b9edf4cf6cso6229489f8f.3
-        for <kvm@vger.kernel.org>; Wed, 01 Oct 2025 01:21:58 -0700 (PDT)
+Received: by mail-wm1-f51.google.com with SMTP id 5b1f17b1804b1-46e34bd8eb2so24751535e9.3
+        for <kvm@vger.kernel.org>; Wed, 01 Oct 2025 01:22:03 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1759306917; x=1759911717; darn=vger.kernel.org;
+        d=linaro.org; s=google; t=1759306922; x=1759911722; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=SiAF+xKMY/ZjdE56BR2SJrHQNq0qMD7rf4hlNCZkp34=;
-        b=oo9M8VM4KgTAaQKLG26T0mHICEWx5u8lQqtMEMqe2iS2emtWeDgFehajqq+AvBWTvl
-         x29Ko4cJ+D5TJDCRV03g9saps/X/pakLBAIzDY2voe0YB4ZhCLWaYR9Y8wWRUB6kjw5+
-         iWdceSzkuTgz5WoJ5yHrIKHy/zQzPmDxTN4pNR2yFyB8oPt/trpoygYlRvGKWvLqkdmN
-         EkhlMkG26yOtThJdOctR1Tb2agccAPbCsLtpguaP5F3+rsZg7jk/toT/vECxN6OcTuAm
-         fVzfiyjDHquHnK1WTZT9JEIU/6/NQpfC031CI8vMmI94OsKVP/JpcplbhQXMA3rUGyXp
-         yj+A==
+        bh=PmMYrzZ4D+COFB5SMLmnCIFwzyfRzy/9G7uraFCWXGE=;
+        b=wVpdhIqw/35W4Yjm2DbN65hxTk9otQi2MUxVMCZr9qKkq5CJKOakc5IJ1LNcgDXtq2
+         W76ms5T50m26M6RO8CKITuwNvDMIHo8mKMWAkNGooygUCa2lNHAiMqpnxM1a1W0l0B1U
+         XF0JQ+l4oo2jJqwJwXuGTKzNaMoeg+H7NkMn3VdC0xxPFa6uax5vRawTATr4sQS8S0e+
+         IEpyUAyVt263vVxpir2VCk0s32xPbNOwJZIGO3GairK2Idzltl7Mi8aX+mA9J022h8Xq
+         D3qbEgUimA3A5OqL71BJMT66QkFv00sMAHy2HOvDh3h1vL9i2BH+64IrKEA3mHWYBrpA
+         qecw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1759306917; x=1759911717;
+        d=1e100.net; s=20230601; t=1759306922; x=1759911722;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=SiAF+xKMY/ZjdE56BR2SJrHQNq0qMD7rf4hlNCZkp34=;
-        b=m4hRQ+oAcZb8MlKk0SlmShmAbMgvvAL2e8QKpRgNNZ3BS80wUVVMUsocXM9l9N0O1G
-         2kpLknlH6dzqSwlFhcpSj+gtoPk2L8Z3dS1oLImzO1wc59E+2pzwjfmLZha60o8Jq1hg
-         9nMfKe6AJfSdD7/6TltCBDoxhQLdFuZWxyKFlrIxxjy1AMdL7Je3yb80c5R9ixws+x/x
-         H0mUeqRwsfX+eMBG5C9JN+NwRx/x5OqcupmcZM5cjbNrh3XnA5+56H+ZzLMThFuS2JfN
-         cF592dnsFDj16RQbog8JijbhYS51r/391mawJ2AAmw4e/4Fvu1kik+4xcjitGf4wpz04
-         m9ww==
-X-Forwarded-Encrypted: i=1; AJvYcCWoKDORBrtstkRWkJvH/zI6nhFJOUYYAqrKeicj1fXLsDILxJvYeNWc+Fl6tCCRJqDwR+o=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yzb8KJv3ZNsJrSU4Klzj+MEMOV4hPhVJ0zkajOumERd/RIcqcsU
-	peZWqXBlGXDPVBRdfsKfHS4kgAoOVw8NEHdwVeY8hgW0FvDxMHFwbYTZNj2ynWvDM04=
-X-Gm-Gg: ASbGncvBW0baeLmVU/Jwo9JR9h7f9f3Dl9x+HFHy4JDcVofxtw+EWtrAuCYNTf557rF
-	DJX2oigPUTWZhKZ4JGM4r/KwB1t0488qG09rnouUCSWIQ9ZY4kihIGEtf0mzR8qwv0La0yIpRC4
-	ZaoU9Pu7YuspvDUkutN4ftrGDjTWA0ab0Tr9QVibp2VbhcLqdnw/3a2PygJjkuKGHDvcran4YM8
-	Fjop0Kvj+cz4gFjsfgoQW/0JpUC3BWSkdi8ECw+SJx57SCcXQrXAkKxSys499aNVop1blWZqyhH
-	ZMvT9fvw2Az5JVl/gBhIKx0Zp5u7NKNoI3vuQvFEgnR0LiYIbp08s/J5GD1MR34wRuX6kp2WW6x
-	vE7rauZH3T318vO450Lk/xCEQxX+SgW+0rWe5xAWa3JfN/VretZ5qPFVVbVM+uvGJjoLXzqZiZk
-	LbQF2j0jJHK4qnAo9I+e05
-X-Google-Smtp-Source: AGHT+IG2c0fzOsFiKbrvJ6/AoYIm/GgfiCoe/atI67XIMJvAlpgbgwgfqiNLjcER0nZiKAK5YPtzGQ==
-X-Received: by 2002:a05:6000:220b:b0:3ee:1357:e191 with SMTP id ffacd0b85a97d-4255780b78bmr1411077f8f.30.1759306916617;
-        Wed, 01 Oct 2025 01:21:56 -0700 (PDT)
+        bh=PmMYrzZ4D+COFB5SMLmnCIFwzyfRzy/9G7uraFCWXGE=;
+        b=fy1d0PdQV/Mhoc0PNrT5fAHMMnlIYnoz+lMka5VxoSBoR0lShUbHrjAcoXXzaankxf
+         0J7ssLxF+9ctMDtl6mAhZO/U8JpDuAFnv4aRJc1sUSyX+NypuN8rV4b8U3eIZrN4GXle
+         tLBH85ebcBXM94iYk9EmCm26s7oG9LoYtm7HZ0l8qeu6nuvmNGNVNvT7VLxn4wU4sY7s
+         0IsTCLgKy82ffcBNmSra8W646yIf5CBjBZYJJmoUqWFO7A7i8GDee7RSS3WPiUP/fKGU
+         0iGbVHnoYtulzr0pJXZaFVbg2sL9uTJQo3j3NBlsPrM0yqsMTmrVSuzz5Lsdigr/hBIY
+         o4uQ==
+X-Forwarded-Encrypted: i=1; AJvYcCX3Op3KAolxqYgMtnwrDQFz4DkvDEFACh+oHeGRwMk2ECxq7gUxvsuKA97ElszYwoextY8=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwFFGSDDNB6nIGZ1LZxrhSY3HEJx15silKDOjqnljmEr2KmHeXF
+	qzqlPrPPEaH2hQZ2M6pdbIDsDJ7x5bTAFVpUnqiJ9UxJFYibxxApYlED5tI0qnwjIy8=
+X-Gm-Gg: ASbGncud5Dud76ipL00tRAzcw4rRJoFa6f+noW8Nixbze8mheRvRsZZGe7kC9X3aclg
+	15rVr5kJ9bvhHf7i1MrMi9U8ck71lwwxIWQjpPbF/QsU0pyBEXMKlsHkD4F6+5oSdWSkSDmHbgM
+	IciSx/mPF9izq4Mjvk0aCM26QBhL70lIxDlZVV1BfWTPMGPuyvrqsvkqS836jzZmigr48n5yC0E
+	5ckYtoQ+AO54CR8jtABViFmXaLhHPCIRKl1Of6qWJeN9nLsqxnqu6REycNuGBLtfbK7aqvkyx4e
+	rCt870rWGgy8lmHFhVITgiJ0mY+ekJPUbBbCzDB8vvszl+DE20EHs+YpKZr7AaMfe1TzvEW663c
+	7n5Tx+tyImAypdzc5ozLktrImhFRg46Nz+i7YB+O+gR1yna/oFQu6dAaXP1P/4wCcdDJFS1ALql
+	+ifBta1SxRaKc5GJI/6zNB
+X-Google-Smtp-Source: AGHT+IHO1xSfq3+2eBPBriOScyM58WZ+3hjUuJsBi94Lwh6mBwAPJdjI/1LMjxcK+JWGn/tb5utZZw==
+X-Received: by 2002:a05:600c:468e:b0:46e:36ba:9253 with SMTP id 5b1f17b1804b1-46e6127b93cmr20886795e9.15.1759306922129;
+        Wed, 01 Oct 2025 01:22:02 -0700 (PDT)
 Received: from localhost.localdomain (88-187-86-199.subs.proxad.net. [88.187.86.199])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-40fc7e2c6b3sm27728732f8f.54.2025.10.01.01.21.55
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-46e619c3b75sm27136995e9.7.2025.10.01.01.22.00
         (version=TLS1_3 cipher=TLS_CHACHA20_POLY1305_SHA256 bits=256/256);
-        Wed, 01 Oct 2025 01:21:56 -0700 (PDT)
+        Wed, 01 Oct 2025 01:22:01 -0700 (PDT)
 From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@linaro.org>
 To: qemu-devel@nongnu.org
 Cc: "Michael S. Tsirkin" <mst@redhat.com>,
@@ -101,9 +101,9 @@ Cc: "Michael S. Tsirkin" <mst@redhat.com>,
 	Paolo Bonzini <pbonzini@redhat.com>,
 	qemu-s390x@nongnu.org,
 	Peter Xu <peterx@redhat.com>
-Subject: [PATCH 05/25] target/arm/tcg/mte: Include missing 'exec/target_page.h' header
-Date: Wed,  1 Oct 2025 10:21:05 +0200
-Message-ID: <20251001082127.65741-6-philmd@linaro.org>
+Subject: [PATCH 06/25] hw: Remove unnecessary 'system/ram_addr.h' header
+Date: Wed,  1 Oct 2025 10:21:06 +0200
+Message-ID: <20251001082127.65741-7-philmd@linaro.org>
 X-Mailer: git-send-email 2.51.0
 In-Reply-To: <20251001082127.65741-1-philmd@linaro.org>
 References: <20251001082127.65741-1-philmd@linaro.org>
@@ -116,34 +116,117 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 
-The "exec/target_page.h" header is indirectly pulled from
-"system/ram_addr.h". Include it explicitly, in order to
-avoid unrelated issues when refactoring "system/ram_addr.h":
-
-  target/arm/tcg/mte_helper.c:815:23: error: use of undeclared identifier 'TARGET_PAGE_MASK'
-    815 |     prev_page = ptr & TARGET_PAGE_MASK;
-        |                       ^
-  target/arm/tcg/mte_helper.c:816:29: error: use of undeclared identifier 'TARGET_PAGE_SIZE'
-    816 |     next_page = prev_page + TARGET_PAGE_SIZE;
-        |                             ^
+None of these files require definition exposed by "system/ram_addr.h",
+remove its inclusion.
 
 Signed-off-by: Philippe Mathieu-Daudé <philmd@linaro.org>
 ---
- target/arm/tcg/mte_helper.c | 1 +
- 1 file changed, 1 insertion(+)
+ hw/ppc/spapr.c                    | 1 -
+ hw/ppc/spapr_caps.c               | 1 -
+ hw/ppc/spapr_pci.c                | 1 -
+ hw/remote/memory.c                | 1 -
+ hw/remote/proxy-memory-listener.c | 1 -
+ hw/s390x/s390-virtio-ccw.c        | 1 -
+ hw/vfio/spapr.c                   | 1 -
+ hw/virtio/virtio-mem.c            | 1 -
+ 8 files changed, 8 deletions(-)
 
-diff --git a/target/arm/tcg/mte_helper.c b/target/arm/tcg/mte_helper.c
-index 302e899287c..7d80244788e 100644
---- a/target/arm/tcg/mte_helper.c
-+++ b/target/arm/tcg/mte_helper.c
-@@ -21,6 +21,7 @@
- #include "qemu/log.h"
- #include "cpu.h"
- #include "internals.h"
-+#include "exec/target_page.h"
- #include "exec/page-protection.h"
- #ifdef CONFIG_USER_ONLY
- #include "user/cpu_loop.h"
+diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
+index eb22333404d..15d09ef9618 100644
+--- a/hw/ppc/spapr.c
++++ b/hw/ppc/spapr.c
+@@ -77,7 +77,6 @@
+ #include "hw/virtio/virtio-scsi.h"
+ #include "hw/virtio/vhost-scsi-common.h"
+ 
+-#include "system/ram_addr.h"
+ #include "system/confidential-guest-support.h"
+ #include "hw/usb.h"
+ #include "qemu/config-file.h"
+diff --git a/hw/ppc/spapr_caps.c b/hw/ppc/spapr_caps.c
+index f2f5722d8ad..0f94c192fd4 100644
+--- a/hw/ppc/spapr_caps.c
++++ b/hw/ppc/spapr_caps.c
+@@ -27,7 +27,6 @@
+ #include "qapi/error.h"
+ #include "qapi/visitor.h"
+ #include "system/hw_accel.h"
+-#include "system/ram_addr.h"
+ #include "target/ppc/cpu.h"
+ #include "target/ppc/mmu-hash64.h"
+ #include "cpu-models.h"
+diff --git a/hw/ppc/spapr_pci.c b/hw/ppc/spapr_pci.c
+index 1ac1185825e..f9095552e86 100644
+--- a/hw/ppc/spapr_pci.c
++++ b/hw/ppc/spapr_pci.c
+@@ -34,7 +34,6 @@
+ #include "hw/pci/pci_host.h"
+ #include "hw/ppc/spapr.h"
+ #include "hw/pci-host/spapr.h"
+-#include "system/ram_addr.h"
+ #include <libfdt.h>
+ #include "trace.h"
+ #include "qemu/error-report.h"
+diff --git a/hw/remote/memory.c b/hw/remote/memory.c
+index 00193a552fa..8195aa5fb83 100644
+--- a/hw/remote/memory.c
++++ b/hw/remote/memory.c
+@@ -11,7 +11,6 @@
+ #include "qemu/osdep.h"
+ 
+ #include "hw/remote/memory.h"
+-#include "system/ram_addr.h"
+ #include "qapi/error.h"
+ 
+ static void remote_sysmem_reset(void)
+diff --git a/hw/remote/proxy-memory-listener.c b/hw/remote/proxy-memory-listener.c
+index 30ac74961dd..e1a52d24f0b 100644
+--- a/hw/remote/proxy-memory-listener.c
++++ b/hw/remote/proxy-memory-listener.c
+@@ -12,7 +12,6 @@
+ #include "qemu/range.h"
+ #include "system/memory.h"
+ #include "exec/cpu-common.h"
+-#include "system/ram_addr.h"
+ #include "qapi/error.h"
+ #include "qemu/error-report.h"
+ #include "hw/remote/mpqemu-link.h"
+diff --git a/hw/s390x/s390-virtio-ccw.c b/hw/s390x/s390-virtio-ccw.c
+index d0c6e80cb05..ad2c48188a8 100644
+--- a/hw/s390x/s390-virtio-ccw.c
++++ b/hw/s390x/s390-virtio-ccw.c
+@@ -13,7 +13,6 @@
+ 
+ #include "qemu/osdep.h"
+ #include "qapi/error.h"
+-#include "system/ram_addr.h"
+ #include "system/confidential-guest-support.h"
+ #include "hw/boards.h"
+ #include "hw/s390x/sclp.h"
+diff --git a/hw/vfio/spapr.c b/hw/vfio/spapr.c
+index 8d9d68da4ec..0f23681a3f9 100644
+--- a/hw/vfio/spapr.c
++++ b/hw/vfio/spapr.c
+@@ -17,7 +17,6 @@
+ 
+ #include "hw/vfio/vfio-container-legacy.h"
+ #include "hw/hw.h"
+-#include "system/ram_addr.h"
+ #include "qemu/error-report.h"
+ #include "qapi/error.h"
+ #include "trace.h"
+diff --git a/hw/virtio/virtio-mem.c b/hw/virtio/virtio-mem.c
+index 1de2d3de521..15ba6799f22 100644
+--- a/hw/virtio/virtio-mem.c
++++ b/hw/virtio/virtio-mem.c
+@@ -25,7 +25,6 @@
+ #include "hw/virtio/virtio-mem.h"
+ #include "qapi/error.h"
+ #include "qapi/visitor.h"
+-#include "system/ram_addr.h"
+ #include "migration/misc.h"
+ #include "hw/boards.h"
+ #include "hw/qdev-properties.h"
 -- 
 2.51.0
 
