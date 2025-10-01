@@ -1,384 +1,136 @@
-Return-Path: <kvm+bounces-59282-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-59283-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 79CA0BB0156
-	for <lists+kvm@lfdr.de>; Wed, 01 Oct 2025 13:06:12 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6200FBB0207
+	for <lists+kvm@lfdr.de>; Wed, 01 Oct 2025 13:22:26 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 32CC34A417B
-	for <lists+kvm@lfdr.de>; Wed,  1 Oct 2025 11:06:11 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1B6602A0D70
+	for <lists+kvm@lfdr.de>; Wed,  1 Oct 2025 11:22:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5F6892C2377;
-	Wed,  1 Oct 2025 11:06:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 414F82D0618;
+	Wed,  1 Oct 2025 11:22:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="fO5S/ltQ"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="iXdYR8BM"
 X-Original-To: kvm@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6C6CF19DF4F;
-	Wed,  1 Oct 2025 11:06:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2E67327F18C
+	for <kvm@vger.kernel.org>; Wed,  1 Oct 2025 11:22:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1759316761; cv=none; b=RMb9tDc7h26h/KUyLJJXjJouZOy2kelHE4QGQI1skDdtJKUD9cAiGAYtPUYHRjNkscMONwJjO1qbf0MjjDOq9oWDuA/Bhl4JBAN7J90Nf/LtkvJu2Jzq5BArEuIPICVS+B9KhyQihA/039TKfzyES3LcdEKMXcqV4F6OYnXxfyE=
+	t=1759317729; cv=none; b=UHakK60tr6vscl7hWUyYZnYQee6fUddQ+UN44d/r9kjJo2fK8620phrPYyj0qKVNQhPvOdKTX5BG+/aj+xaHnZ2shlyekq4Hq7IB+RqiLmgzOA7LWOXU2n3Skzq92JQuUbturFJr118iDzMIS8pFXrNGmoGoiUT6RF+EiSS/N8o=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1759316761; c=relaxed/simple;
-	bh=BBQTY11uPcvv9rvZ3xpgazdEbhNoa7n1ec1bbV18sIk=;
-	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=nXcs2HKpCa//S5WLhyOd150VcAE0N2b8rmjSZWv/Ut5zXB1r3M7ptPhnI4oB6sh7t5BuaC/bjrbPbCQSFI5aItsQkrcwwsffNvqlsnw/V948xEBh6wYqxm9T9GRIPTz3p6HBinA7ew61gI5p7KRk5K0YnURbV/0+1eTZE2CYjTU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=fO5S/ltQ; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id D19A4C4CEF4;
-	Wed,  1 Oct 2025 11:06:00 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1759316761;
-	bh=BBQTY11uPcvv9rvZ3xpgazdEbhNoa7n1ec1bbV18sIk=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=fO5S/ltQCfJbMtQ6/ZUyMaSOM6TbHn3SBVMfywlHB9NeL1YHyjF5tLPSpc5XQ3rop
-	 SKku27McJ+bfiTFkcX9LDFyjSeFp6xvQ69OOZaVZmudG5qLL3w0NBWuGB3ckCwm8zl
-	 VRZs3g69e2F6E724KnFiZux7FRE93kcbpsBjRqGjuvuOCNwZ6ZulDA6OJ9Ib1/f6KB
-	 Dz9VsaAE6iNvA0FPInNtD0d/d/SPJcVZLr26kUaUkPr/1V4VMJhKcK+sxlvznxME9Z
-	 ZxhGYbH04e5IMm5WCZ9mNN1K23lVLVU/1kIzyXdBUTCnOIYMZ+JKEJtEz7cCoKEqeh
-	 2mouohLM6mL0Q==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.98.2)
-	(envelope-from <maz@kernel.org>)
-	id 1v3uek-0000000AmO3-29VK;
-	Wed, 01 Oct 2025 11:05:58 +0000
-Date: Wed, 01 Oct 2025 12:05:58 +0100
-Message-ID: <86ms6azxt5.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: Steven Price <steven.price@arm.com>
-Cc: kvm@vger.kernel.org,
-	kvmarm@lists.linux.dev,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Will Deacon <will@kernel.org>,
-	James Morse <james.morse@arm.com>,
-	Oliver Upton <oliver.upton@linux.dev>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	linux-arm-kernel@lists.infradead.org,
-	linux-kernel@vger.kernel.org,
-	Joey Gouly <joey.gouly@arm.com>,
-	Alexandru Elisei <alexandru.elisei@arm.com>,
-	Christoffer Dall <christoffer.dall@arm.com>,
-	Fuad Tabba <tabba@google.com>,
-	linux-coco@lists.linux.dev,
-	Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>,
-	Gavin Shan <gshan@redhat.com>,
-	Shanker Donthineni <sdonthineni@nvidia.com>,
-	Alper Gun <alpergun@google.com>,
-	"Aneesh Kumar K . V" <aneesh.kumar@kernel.org>,
-	Emi Kisanuki <fj0570is@fujitsu.com>,
-	Vishal Annapurve <vannapurve@google.com>
-Subject: Re: [PATCH v10 05/43] arm64: RME: Check for RME support at KVM init
-In-Reply-To: <20250820145606.180644-6-steven.price@arm.com>
-References: <20250820145606.180644-1-steven.price@arm.com>
-	<20250820145606.180644-6-steven.price@arm.com>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+	s=arc-20240116; t=1759317729; c=relaxed/simple;
+	bh=MHUSi4P/U4csGmhflVuOc3gtRv4O4p5QklistO68IOQ=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=MvksM7OsLb87vmAPzXVVNUI/NLKNt0LK+rdYs8EFvGXWyixC5X6gv6cDBMF8KVzVC1VmnSlk7v3/q41reR0CQKArRKWbc0yq9AkEBtePdacBE4si7SQ4Xz9EwmrexZU5owWVq8yy771OA4Tz2ewqC+g83VU6K3GdFX5AUYJZ93M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=iXdYR8BM; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1759317726;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=ql3BeV8zLppnm7zJzsQP4NuOCJwg+ayk79UQ80gXYqg=;
+	b=iXdYR8BMmDBxquLWQGAE/DAvT49wRvs8MiQqLoQ0z1aWy3r4p3iPN5no0t4a28QdFSCTZI
+	SyCv+OXZLw5hG0bAWEihz1eFx9D1Ms4ft/4Y56EXGUT1H18zGscclT5u5kZluC0CpfYpGw
+	ni5teKlvJSlIRHZIK3EXXEyGBeMjNiM=
+Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
+ [209.85.221.70]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-26-gYJ-AqGNPsOm7UyS3JtvzQ-1; Wed, 01 Oct 2025 07:22:05 -0400
+X-MC-Unique: gYJ-AqGNPsOm7UyS3JtvzQ-1
+X-Mimecast-MFC-AGG-ID: gYJ-AqGNPsOm7UyS3JtvzQ_1759317724
+Received: by mail-wr1-f70.google.com with SMTP id ffacd0b85a97d-42421b15185so1247794f8f.1
+        for <kvm@vger.kernel.org>; Wed, 01 Oct 2025 04:22:04 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1759317724; x=1759922524;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=ql3BeV8zLppnm7zJzsQP4NuOCJwg+ayk79UQ80gXYqg=;
+        b=hPBWtUPayS5tzWYFY9Wsr42+sPQat6xQyFzixPWEqHqSvlOROc+rF19y5GtJA+Fd3P
+         qkaN3DL6L3t7vDK/XgkUv8B0VQItOki745KfldxglHc40SVE00aE1tog0IYpwOpjsLBh
+         3f/42H12uvk8Xuw4Z/S9kMHRwnCwji5Hzahr2/qBQykS/9Rzz1yob5+AtTLfPy8c4cmJ
+         4worWa0VvsRpVwDIaD9WMYAGiGiGZZLxkTd3DoJ8ETO9ah08JyQPUWSbZcRyV3aJxfYq
+         r7V8fYBcTdGYFrDj2q77cqIb954ys2ZLTxqcvOhFXpMLLzMEhLdnSZaqQxiPA4xWZx+w
+         v4Ew==
+X-Forwarded-Encrypted: i=1; AJvYcCVP2sXmByxwlLR6r8KVj1NlLeaaDm4b+/O2VyiH3sBfsESmYgJ0meWQ9VsCIIf/N9vHaX4=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yz8V9dbvvpuQ0nvIvTeQCRahghnWu6s2rZexyncYd7N9jku5L/V
+	s7QONjbmew73LhIHxPoe9J/kX5Uk1kMYPh+LS/+CMaw3LVoBuYQ75fQX7to1uFa9pE5nwsJEBzH
+	vqZa5CG4bmuI1LxHhdzJPTR4taiTKG1C0tBAya1GH1VqoMgowIiXWXA==
+X-Gm-Gg: ASbGncuBDyzqQV/J8KdaIWClxOh/ylNreumIPXPH2oLhml/JbOBhPpNF9obidQ2erli
+	+++dUhC3COqNWSiTYqrdbn3XGVzoyE1weJGKQXyl+dHkaTkT4jHQ3YYkxKTCCeRGIkH0yBjzmLQ
+	/ptgQTeAueogd8yCvGe9e1G/M8h/wokWr7fYfYSngRF3oga/o3BT+or1U1nmTDxB6OT8nWQadV0
+	o7PfRslMDKpF+tsG4DZoq3BLkvOnkH94TUyNsaHKAOTAMniw881cl+YZ90joU63EIuAfn6VR60f
+	vn6WQrouRL72VZeST293KrJ9hMrPQzayDeOQSRE=
+X-Received: by 2002:a05:6000:1a8e:b0:3ec:a019:3936 with SMTP id ffacd0b85a97d-42557816dadmr2479667f8f.55.1759317723707;
+        Wed, 01 Oct 2025 04:22:03 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IE2YMfWSirAsieLM5wvLlIAO/DtCA3N6PuMAY/Nmj+lVBGtH+Oqh6a2oWTtM5/KVZ/v7RwKwA==
+X-Received: by 2002:a05:6000:1a8e:b0:3ec:a019:3936 with SMTP id ffacd0b85a97d-42557816dadmr2479627f8f.55.1759317723082;
+        Wed, 01 Oct 2025 04:22:03 -0700 (PDT)
+Received: from redhat.com ([2a0d:6fc0:1518:6900:b69a:73e1:9698:9cd3])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-40fb89fb264sm27105223f8f.20.2025.10.01.04.22.01
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 01 Oct 2025 04:22:02 -0700 (PDT)
+Date: Wed, 1 Oct 2025 07:22:00 -0400
+From: "Michael S. Tsirkin" <mst@redhat.com>
+To: patchwork-bot+netdevbpf@kernel.org
+Cc: Jakub Kicinski <kuba@kernel.org>, linux-kernel@vger.kernel.org,
+	zhangjiao2@cmss.chinamobile.com, jasowang@redhat.com,
+	eperezma@redhat.com, kvm@vger.kernel.org,
+	virtualization@lists.linux.dev, netdev@vger.kernel.org
+Subject: Re: [PATCH net] vhost: vringh: Fix copy_to_iter return value check
+Message-ID: <20251001071456-mutt-send-email-mst@kernel.org>
+References: <cd637504a6e3967954a9e80fc1b75e8c0978087b.1758723310.git.mst@redhat.com>
+ <175893420700.108864.10199269230355246073.git-patchwork-notify@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: steven.price@arm.com, kvm@vger.kernel.org, kvmarm@lists.linux.dev, catalin.marinas@arm.com, will@kernel.org, james.morse@arm.com, oliver.upton@linux.dev, suzuki.poulose@arm.com, yuzenghui@huawei.com, linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, joey.gouly@arm.com, alexandru.elisei@arm.com, christoffer.dall@arm.com, tabba@google.com, linux-coco@lists.linux.dev, gankulkarni@os.amperecomputing.com, gshan@redhat.com, sdonthineni@nvidia.com, alpergun@google.com, aneesh.kumar@kernel.org, fj0570is@fujitsu.com, vannapurve@google.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <175893420700.108864.10199269230355246073.git-patchwork-notify@kernel.org>
 
-On Wed, 20 Aug 2025 15:55:25 +0100,
-Steven Price <steven.price@arm.com> wrote:
+On Sat, Sep 27, 2025 at 12:50:07AM +0000, patchwork-bot+netdevbpf@kernel.org wrote:
+> Hello:
 > 
-> Query the RMI version number and check if it is a compatible version. A
-> static key is also provided to signal that a supported RMM is available.
+> This patch was applied to netdev/net.git (main)
+> by Jakub Kicinski <kuba@kernel.org>:
 > 
-> Functions are provided to query if a VM or VCPU is a realm (or rec)
-> which currently will always return false.
+> On Thu, 25 Sep 2025 02:04:08 -0400 you wrote:
+> > The return value of copy_to_iter can't be negative, check whether the
+> > copied length is equal to the requested length instead of checking for
+> > negative values.
+> > 
+> > Cc: zhang jiao <zhangjiao2@cmss.chinamobile.com>
+> > Link: https://lore.kernel.org/all/20250910091739.2999-1-zhangjiao2@cmss.chinamobile.com
+> > Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
+> > 
+> > [...]
 > 
-> Later patches make use of struct realm and the states as the ioctls
-> interfaces are added to support realm and REC creation and destruction.
+> Here is the summary with links:
+>   - [net] vhost: vringh: Fix copy_to_iter return value check
+>     https://git.kernel.org/netdev/net/c/439263376c2c
 > 
-> Reviewed-by: Gavin Shan <gshan@redhat.com>
-> Reviewed-by: Suzuki K Poulose <suzuki.poulose@arm.com>
-> Signed-off-by: Steven Price <steven.price@arm.com>
-> ---
-> Changes since v8:
->  * No need to guard kvm_init_rme() behind 'in_hyp_mode'.
-> Changes since v6:
->  * Improved message for an unsupported RMI ABI version.
-> Changes since v5:
->  * Reword "unsupported" message from "host supports" to "we want" to
->    clarify that 'we' are the 'host'.
-> Changes since v2:
->  * Drop return value from kvm_init_rme(), it was always 0.
->  * Rely on the RMM return value to identify whether the RSI ABI is
->    compatible.
-> ---
->  arch/arm64/include/asm/kvm_emulate.h | 18 +++++++++
->  arch/arm64/include/asm/kvm_host.h    |  4 ++
->  arch/arm64/include/asm/kvm_rme.h     | 56 ++++++++++++++++++++++++++++
->  arch/arm64/include/asm/virt.h        |  1 +
->  arch/arm64/kvm/Makefile              |  2 +-
->  arch/arm64/kvm/arm.c                 |  5 +++
->  arch/arm64/kvm/rme.c                 | 56 ++++++++++++++++++++++++++++
->  7 files changed, 141 insertions(+), 1 deletion(-)
->  create mode 100644 arch/arm64/include/asm/kvm_rme.h
->  create mode 100644 arch/arm64/kvm/rme.c
+> You are awesome, thank you!
+> -- 
+> Deet-doot-dot, I am a bot.
+> https://korg.docs.kernel.org/patchwork/pwbot.html
 > 
-> diff --git a/arch/arm64/include/asm/kvm_emulate.h b/arch/arm64/include/asm/kvm_emulate.h
-> index fa8a08a1ccd5..ab4093e41c4b 100644
-> --- a/arch/arm64/include/asm/kvm_emulate.h
-> +++ b/arch/arm64/include/asm/kvm_emulate.h
-> @@ -674,4 +674,22 @@ static inline void vcpu_set_hcrx(struct kvm_vcpu *vcpu)
->  			vcpu->arch.hcrx_el2 |= HCRX_EL2_SCTLR2En;
->  	}
->  }
-> +
-> +static inline bool kvm_is_realm(struct kvm *kvm)
-> +{
-> +	if (static_branch_unlikely(&kvm_rme_is_available) && kvm)
 
-Under what circumstances would you call this with a NULL pointer?
 
-> +		return kvm->arch.is_realm;
-> +	return false;
-> +}
-> +
-> +static inline enum realm_state kvm_realm_state(struct kvm *kvm)
-> +{
-> +	return READ_ONCE(kvm->arch.realm.state);
-> +}
-> +
-> +static inline bool vcpu_is_rec(struct kvm_vcpu *vcpu)
-> +{
-> +	return false;
-> +}
-> +
->  #endif /* __ARM64_KVM_EMULATE_H__ */
-> diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-> index 2f2394cce24e..d1511ce26191 100644
-> --- a/arch/arm64/include/asm/kvm_host.h
-> +++ b/arch/arm64/include/asm/kvm_host.h
-> @@ -27,6 +27,7 @@
->  #include <asm/fpsimd.h>
->  #include <asm/kvm.h>
->  #include <asm/kvm_asm.h>
-> +#include <asm/kvm_rme.h>
->  #include <asm/vncr_mapping.h>
->  
->  #define __KVM_HAVE_ARCH_INTC_INITIALIZED
-> @@ -404,6 +405,9 @@ struct kvm_arch {
->  	 * the associated pKVM instance in the hypervisor.
->  	 */
->  	struct kvm_protected_vm pkvm;
-> +
-> +	bool is_realm;
-> +	struct realm realm;
-
-Given that pkvm and CCA are pretty much exclusive, I don't think we
-need to store both states separately. Make those a union.
-
->  };
->  
->  struct kvm_vcpu_fault_info {
-> diff --git a/arch/arm64/include/asm/kvm_rme.h b/arch/arm64/include/asm/kvm_rme.h
-> new file mode 100644
-> index 000000000000..9c8a0b23e0e4
-> --- /dev/null
-> +++ b/arch/arm64/include/asm/kvm_rme.h
-> @@ -0,0 +1,56 @@
-> +/* SPDX-License-Identifier: GPL-2.0 */
-> +/*
-> + * Copyright (C) 2023 ARM Ltd.
-> + */
-> +
-> +#ifndef __ASM_KVM_RME_H
-> +#define __ASM_KVM_RME_H
-
-None of that is about RME. This is about CCA, which is purely a SW
-construct, and not a CPU architecture feature.
-
-So 's/rme/cca/' everywhere that describe something that is not a
-direct effect of FEAT_RME being implemented on the CPU, but instead
-something that is CCA-specific.
-
-> +
-> +/**
-> + * enum realm_state - State of a Realm
-> + */
-> +enum realm_state {
-> +	/**
-> +	 * @REALM_STATE_NONE:
-> +	 *      Realm has not yet been created. rmi_realm_create() may be
-> +	 *      called to create the realm.
-> +	 */
-> +	REALM_STATE_NONE,
-> +	/**
-> +	 * @REALM_STATE_NEW:
-> +	 *      Realm is under construction, not eligible for execution. Pages
-> +	 *      may be populated with rmi_data_create().
-> +	 */
-> +	REALM_STATE_NEW,
-> +	/**
-> +	 * @REALM_STATE_ACTIVE:
-> +	 *      Realm has been created and is eligible for execution with
-> +	 *      rmi_rec_enter(). Pages may no longer be populated with
-> +	 *      rmi_data_create().
-> +	 */
-> +	REALM_STATE_ACTIVE,
-> +	/**
-> +	 * @REALM_STATE_DYING:
-> +	 *      Realm is in the process of being destroyed or has already been
-> +	 *      destroyed.
-> +	 */
-> +	REALM_STATE_DYING,
-> +	/**
-> +	 * @REALM_STATE_DEAD:
-> +	 *      Realm has been destroyed.
-> +	 */
-> +	REALM_STATE_DEAD
-> +};
-> +
-> +/**
-> + * struct realm - Additional per VM data for a Realm
-> + *
-> + * @state: The lifetime state machine for the realm
-> + */
-> +struct realm {
-> +	enum realm_state state;
-> +};
-> +
-> +void kvm_init_rme(void);
-> +
-> +#endif /* __ASM_KVM_RME_H */
-> diff --git a/arch/arm64/include/asm/virt.h b/arch/arm64/include/asm/virt.h
-> index aa280f356b96..db73c9bfd8c9 100644
-> --- a/arch/arm64/include/asm/virt.h
-> +++ b/arch/arm64/include/asm/virt.h
-> @@ -82,6 +82,7 @@ void __hyp_reset_vectors(void);
->  bool is_kvm_arm_initialised(void);
->  
->  DECLARE_STATIC_KEY_FALSE(kvm_protected_mode_initialized);
-> +DECLARE_STATIC_KEY_FALSE(kvm_rme_is_available);
-
-Same thing about RME.
-
->  
->  static inline bool is_pkvm_initialized(void)
->  {
-> diff --git a/arch/arm64/kvm/Makefile b/arch/arm64/kvm/Makefile
-> index 3ebc0570345c..70fa017831b3 100644
-> --- a/arch/arm64/kvm/Makefile
-> +++ b/arch/arm64/kvm/Makefile
-> @@ -16,7 +16,7 @@ CFLAGS_handle_exit.o += -Wno-override-init
->  kvm-y += arm.o mmu.o mmio.o psci.o hypercalls.o pvtime.o \
->  	 inject_fault.o va_layout.o handle_exit.o config.o \
->  	 guest.o debug.o reset.o sys_regs.o stacktrace.o \
-> -	 vgic-sys-reg-v3.o fpsimd.o pkvm.o \
-> +	 vgic-sys-reg-v3.o fpsimd.o pkvm.o rme.o \
->  	 arch_timer.o trng.o vmid.o emulate-nested.o nested.o at.o \
->  	 vgic/vgic.o vgic/vgic-init.o \
->  	 vgic/vgic-irqfd.o vgic/vgic-v2.o \
-> diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
-> index 888f7c7abf54..76177c56f1ef 100644
-> --- a/arch/arm64/kvm/arm.c
-> +++ b/arch/arm64/kvm/arm.c
-> @@ -40,6 +40,7 @@
->  #include <asm/kvm_nested.h>
->  #include <asm/kvm_pkvm.h>
->  #include <asm/kvm_ptrauth.h>
-> +#include <asm/kvm_rme.h>
->  #include <asm/sections.h>
->  
->  #include <kvm/arm_hypercalls.h>
-> @@ -59,6 +60,8 @@ enum kvm_wfx_trap_policy {
->  static enum kvm_wfx_trap_policy kvm_wfi_trap_policy __read_mostly = KVM_WFX_NOTRAP_SINGLE_TASK;
->  static enum kvm_wfx_trap_policy kvm_wfe_trap_policy __read_mostly = KVM_WFX_NOTRAP_SINGLE_TASK;
->  
-> +DEFINE_STATIC_KEY_FALSE(kvm_rme_is_available);
-> +
->  DECLARE_KVM_HYP_PER_CPU(unsigned long, kvm_hyp_vector);
->  
->  DEFINE_PER_CPU(unsigned long, kvm_arm_hyp_stack_base);
-> @@ -2836,6 +2839,8 @@ static __init int kvm_arm_init(void)
->  
->  	in_hyp_mode = is_kernel_in_hyp_mode();
->  
-> +	kvm_init_rme();
-> +
->  	if (cpus_have_final_cap(ARM64_WORKAROUND_DEVICE_LOAD_ACQUIRE) ||
->  	    cpus_have_final_cap(ARM64_WORKAROUND_1508412))
->  		kvm_info("Guests without required CPU erratum workarounds can deadlock system!\n" \
-> diff --git a/arch/arm64/kvm/rme.c b/arch/arm64/kvm/rme.c
-> new file mode 100644
-> index 000000000000..67cf2d94cb2d
-> --- /dev/null
-> +++ b/arch/arm64/kvm/rme.c
-> @@ -0,0 +1,56 @@
-> +// SPDX-License-Identifier: GPL-2.0
-> +/*
-> + * Copyright (C) 2023 ARM Ltd.
-> + */
-> +
-> +#include <linux/kvm_host.h>
-> +
-> +#include <asm/rmi_cmds.h>
-> +#include <asm/virt.h>
-> +
-> +static int rmi_check_version(void)
-> +{
-> +	struct arm_smccc_res res;
-> +	unsigned short version_major, version_minor;
-> +	unsigned long host_version = RMI_ABI_VERSION(RMI_ABI_MAJOR_VERSION,
-> +						     RMI_ABI_MINOR_VERSION);
-> +
-> +	arm_smccc_1_1_invoke(SMC_RMI_VERSION, host_version, &res);
-
-Shouldn't you first check that RME is actually available, by looking
-at ID_AA64PFR0_EL1.RME?
-
-> +
-> +	if (res.a0 == SMCCC_RET_NOT_SUPPORTED)
-> +		return -ENXIO;
-> +
-> +	version_major = RMI_ABI_VERSION_GET_MAJOR(res.a1);
-> +	version_minor = RMI_ABI_VERSION_GET_MINOR(res.a1);
-> +
-> +	if (res.a0 != RMI_SUCCESS) {
-> +		unsigned short high_version_major, high_version_minor;
-> +
-> +		high_version_major = RMI_ABI_VERSION_GET_MAJOR(res.a2);
-> +		high_version_minor = RMI_ABI_VERSION_GET_MINOR(res.a2);
-> +
-> +		kvm_err("Unsupported RMI ABI (v%d.%d - v%d.%d) we want v%d.%d\n",
-> +			version_major, version_minor,
-> +			high_version_major, high_version_minor,
-> +			RMI_ABI_MAJOR_VERSION,
-> +			RMI_ABI_MINOR_VERSION);
-> +		return -ENXIO;
-> +	}
-> +
-> +	kvm_info("RMI ABI version %d.%d\n", version_major, version_minor);
-> +
-> +	return 0;
-> +}
-> +
-> +void kvm_init_rme(void)
-> +{
-> +	if (PAGE_SIZE != SZ_4K)
-> +		/* Only 4k page size on the host is supported */
-> +		return;
-
-Move the comment above the check (same thing below).
-
-	M.
+It's probably stable material. Does netdev still have a separate
+stable process? I'm not sure I remember.
 
 -- 
-Without deviation from the norm, progress is not possible.
+MST
+
 
