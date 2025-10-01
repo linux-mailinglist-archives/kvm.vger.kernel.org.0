@@ -1,63 +1,63 @@
-Return-Path: <kvm+bounces-59288-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-59289-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id B7B99BB05A5
-	for <lists+kvm@lfdr.de>; Wed, 01 Oct 2025 14:29:01 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6BDCBBB06F5
+	for <lists+kvm@lfdr.de>; Wed, 01 Oct 2025 15:11:58 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6516A4A29BA
-	for <lists+kvm@lfdr.de>; Wed,  1 Oct 2025 12:29:00 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id CBC0C1891EA3
+	for <lists+kvm@lfdr.de>; Wed,  1 Oct 2025 13:12:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BBEAE2EB851;
-	Wed,  1 Oct 2025 12:28:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3B2CB2EC56E;
+	Wed,  1 Oct 2025 13:11:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="pMl7mM9Y"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="t6dO4Qcq"
 X-Original-To: kvm@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CB74D2EAD09;
-	Wed,  1 Oct 2025 12:28:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 50EBA2E264C;
+	Wed,  1 Oct 2025 13:11:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1759321730; cv=none; b=LvVSrWSUgwBY7lI9YZ7Q9UR2tvZA8nvp30WSYi9pddQaXVG38VMwbmD37LnMr83s8kTmhgpzTQkydTi3gPsh7HYbwLiDeIYcoq2TaNk+TM+SdrcAHjLB2Th5UwZwG8daYi7NN5hN/KfykI5JARZMrQM+6M1DCvzX+bc0jvxWe1Y=
+	t=1759324308; cv=none; b=KPwS+5Zy2G0C/6reLvlnh2eKcjfSXRJ6pyIcTktsafhBSR3o0NeNYLUMJ5wAIBKjg/ANownNpghsvNPG1csDBxwoH70fTkMO5xLmPoEse4zpnLCewqdQ7EdFh9QnjJLy7/xZwgfCJbBtplCf2nfvJ+9xeanzCBAoaEYEoBzbNIk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1759321730; c=relaxed/simple;
-	bh=qKn+fAbzogVE3WSFyoWrdGdlZst0c1BmRiTf+la+zNM=;
+	s=arc-20240116; t=1759324308; c=relaxed/simple;
+	bh=clujk22pKlR3lY5QkTpBaiYqGOkG+FR+VUr/OI56JdE=;
 	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=VvvRcTCZlmUq5mAbnRlsn6AZ/Ad6BTA6t0VWEeV0g9QO6+4pDgitXTqlT/VbFRJdWtwQLD/CrmqvoHKjV0TarvS3UDKCi+5t6TICrk/wb9XQT/TMB9HWJDOf7XiezoAdATIVAPFVKozj+i/BGix+jFIQY+7KDqGQiICnkY0nSiM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=pMl7mM9Y; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 40E7EC4CEF4;
-	Wed,  1 Oct 2025 12:28:50 +0000 (UTC)
+	 MIME-Version:Content-Type; b=SyqPvWSU3cAxyj5usH1md3h8e9IOLLkOq2JVLFABuM5+78aAzR52UWmXGhlqOymqGxCr34dVZRYZPxTRKdVVV1iu4mZ5fjUVx5w69draz0phMjfkmZVM4vvu9tfkFwYMn/4S4qT2PXg1jC3HL9/VS9B32H4JJ6onmC7qc68Xruw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=t6dO4Qcq; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 16CE1C4CEF4;
+	Wed,  1 Oct 2025 13:11:48 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1759321730;
-	bh=qKn+fAbzogVE3WSFyoWrdGdlZst0c1BmRiTf+la+zNM=;
+	s=k20201202; t=1759324308;
+	bh=clujk22pKlR3lY5QkTpBaiYqGOkG+FR+VUr/OI56JdE=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=pMl7mM9YEEF37W3mMep75kyO5Fx0kg3eKW0ABdWDvwNIyo3A4iGQkE4NXC+zDwiJc
-	 ABv+66cmawpkgiJgkxmQkLAN0w005pIZJCOi+bw/sn219/gub9GMx4HEMBg2WPpzB0
-	 A+YnPuEujyYd4RYiSp5rKByJyVP4XPTS8aoswYWtLv8PtTehmYCQvsSb4UUplN1LuD
-	 Wb3l7C2kPNVmolXVVbpPd1s0TGThxY7SpzCL0jNpga/PP17sPvz71mi5n7zf6Xkpls
-	 d3xA1CPBjq9RYmGj9XbIcLNpFGfTFWSqX7VtgISInLkjmvVjJbqVy3BsRLFupJlUhu
-	 4QsfSMWaJIl1A==
+	b=t6dO4Qcq2sgN7MqMsG/tl7axae64golJdNSQYH49U2njLFcdLDW2/UKLm/I8YP6hA
+	 qMZ+eTrysKQpzc74Rk430lXfMCafWTjnmOZNYPOS8/4ACokUJWcqA0VbYFkg4+h0ED
+	 ioi99/Kt4Tw3BQcYr/WfBKWUzoLBzI4k/DEm14+4TiXg8cnM4KtSAJpwXmGDrZi3t7
+	 oHNa/xR3uuDwWEpJVDwVbq/K1Z4kLFqQzIpLAR7hegl0xVhLftGeyd9DFWSKSNMojh
+	 hcJ2SmR5l3SK4zZ5EzSwdanA87PmX8ctlLjWZpzDcO6yumncHFZJrnq9FWTAPwFAbo
+	 ZqL8j43BqtQGQ==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.98.2)
 	(envelope-from <maz@kernel.org>)
-	id 1v3vwu-0000000AndA-0XY3;
-	Wed, 01 Oct 2025 12:28:48 +0000
-Date: Wed, 01 Oct 2025 13:28:47 +0100
-Message-ID: <86jz1eztz4.wl-maz@kernel.org>
+	id 1v3wcT-0000000Ao9g-1u79;
+	Wed, 01 Oct 2025 13:11:45 +0000
+Date: Wed, 01 Oct 2025 14:11:44 +0100
+Message-ID: <86ikgyzrzj.wl-maz@kernel.org>
 From: Marc Zyngier <maz@kernel.org>
 To: Steven Price <steven.price@arm.com>
 Cc: kvm@vger.kernel.org,
 	kvmarm@lists.linux.dev,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
 	Catalin Marinas <catalin.marinas@arm.com>,
 	Will Deacon <will@kernel.org>,
 	James Morse <james.morse@arm.com>,
 	Oliver Upton <oliver.upton@linux.dev>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
 	Zenghui Yu <yuzenghui@huawei.com>,
 	linux-arm-kernel@lists.infradead.org,
 	linux-kernel@vger.kernel.org,
@@ -73,10 +73,10 @@ Cc: kvm@vger.kernel.org,
 	"Aneesh Kumar K . V" <aneesh.kumar@kernel.org>,
 	Emi Kisanuki <fj0570is@fujitsu.com>,
 	Vishal Annapurve <vannapurve@google.com>
-Subject: Re: [PATCH v10 06/43] arm64: RME: Define the user ABI
-In-Reply-To: <20250820145606.180644-7-steven.price@arm.com>
+Subject: Re: [PATCH v10 08/43] kvm: arm64: Don't expose debug capabilities for realm guests
+In-Reply-To: <20250820145606.180644-9-steven.price@arm.com>
 References: <20250820145606.180644-1-steven.price@arm.com>
-	<20250820145606.180644-7-steven.price@arm.com>
+	<20250820145606.180644-9-steven.price@arm.com>
 User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
  FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
  (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
@@ -88,161 +88,20 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
 Content-Type: text/plain; charset=US-ASCII
 X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: steven.price@arm.com, kvm@vger.kernel.org, kvmarm@lists.linux.dev, catalin.marinas@arm.com, will@kernel.org, james.morse@arm.com, oliver.upton@linux.dev, suzuki.poulose@arm.com, yuzenghui@huawei.com, linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, joey.gouly@arm.com, alexandru.elisei@arm.com, christoffer.dall@arm.com, tabba@google.com, linux-coco@lists.linux.dev, gankulkarni@os.amperecomputing.com, gshan@redhat.com, sdonthineni@nvidia.com, alpergun@google.com, aneesh.kumar@kernel.org, fj0570is@fujitsu.com, vannapurve@google.com
+X-SA-Exim-Rcpt-To: steven.price@arm.com, kvm@vger.kernel.org, kvmarm@lists.linux.dev, suzuki.poulose@arm.com, catalin.marinas@arm.com, will@kernel.org, james.morse@arm.com, oliver.upton@linux.dev, yuzenghui@huawei.com, linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, joey.gouly@arm.com, alexandru.elisei@arm.com, christoffer.dall@arm.com, tabba@google.com, linux-coco@lists.linux.dev, gankulkarni@os.amperecomputing.com, gshan@redhat.com, sdonthineni@nvidia.com, alpergun@google.com, aneesh.kumar@kernel.org, fj0570is@fujitsu.com, vannapurve@google.com
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Wed, 20 Aug 2025 15:55:26 +0100,
+On Wed, 20 Aug 2025 15:55:28 +0100,
 Steven Price <steven.price@arm.com> wrote:
 > 
-> There is one (multiplexed) CAP which can be used to create, populate and
-> then activate the realm.
+> From: Suzuki K Poulose <suzuki.poulose@arm.com>
 > 
-> Co-developed-by: Suzuki K Poulose <suzuki.poulose@arm.com>
-> Signed-off-by: Suzuki K Poulose <suzuki.poulose@arm.com>
-> Signed-off-by: Steven Price <steven.price@arm.com>
-> Reviewed-by: Gavin Shan <gshan@redhat.com>
-> ---
-> Changes since v9:
->  * Improvements to documentation.
->  * Bump the magic number for KVM_CAP_ARM_RME to avoid conflicts.
-> Changes since v8:
->  * Minor improvements to documentation following review.
->  * Bump the magic numbers to avoid conflicts.
-> Changes since v7:
->  * Add documentation of new ioctls
->  * Bump the magic numbers to avoid conflicts
-> Changes since v6:
->  * Rename some of the symbols to make their usage clearer and avoid
->    repetition.
-> Changes from v5:
->  * Actually expose the new VCPU capability (KVM_ARM_VCPU_REC) by bumping
->    KVM_VCPU_MAX_FEATURES - note this also exposes KVM_ARM_VCPU_HAS_EL2!
-> ---
->  Documentation/virt/kvm/api.rst    | 71 +++++++++++++++++++++++++++++++
->  arch/arm64/include/uapi/asm/kvm.h | 49 +++++++++++++++++++++
->  include/uapi/linux/kvm.h          | 10 +++++
->  3 files changed, 130 insertions(+)
-> 
-> diff --git a/Documentation/virt/kvm/api.rst b/Documentation/virt/kvm/api.rst
-> index 6aa40ee05a4a..69c0a9eba6c5 100644
-> --- a/Documentation/virt/kvm/api.rst
-> +++ b/Documentation/virt/kvm/api.rst
-> @@ -3549,6 +3549,11 @@ Possible features:
->  	  Depends on KVM_CAP_ARM_EL2_E2H0.
->  	  KVM_ARM_VCPU_HAS_EL2 must also be set.
->  
-> +	- KVM_ARM_VCPU_REC: Allocate a REC (Realm Execution Context) for this
-> +	  VCPU. This must be specified on all VCPUs created in a Realm VM.
-> +	  Depends on KVM_CAP_ARM_RME.
-> +	  Requires KVM_ARM_VCPU_FINALIZE(KVM_ARM_VCPU_REC).
-> +
->  4.83 KVM_ARM_PREFERRED_TARGET
->  -----------------------------
->  
-> @@ -5122,6 +5127,7 @@ Recognised values for feature:
->  
->    =====      ===========================================
->    arm64      KVM_ARM_VCPU_SVE (requires KVM_CAP_ARM_SVE)
-> +  arm64      KVM_ARM_VCPU_REC (requires KVM_CAP_ARM_RME)
->    =====      ===========================================
->  
->  Finalizes the configuration of the specified vcpu feature.
-> @@ -6476,6 +6482,30 @@ the capability to be present.
->  
->  `flags` must currently be zero.
->  
-> +4.144 KVM_ARM_VCPU_RMM_PSCI_COMPLETE
-> +------------------------------------
-> +
-> +:Capability: KVM_CAP_ARM_RME
-> +:Architectures: arm64
-> +:Type: vcpu ioctl
-> +:Parameters: struct kvm_arm_rmm_psci_complete (in)
-> +:Returns: 0 if successful, < 0 on error
-> +
-> +::
-> +
-> +  struct kvm_arm_rmm_psci_complete {
-> +	__u64 target_mpidr;
-> +	__u32 psci_status;
-> +	__u32 padding[3];
-> +  };
-> +
-> +Where PSCI functions are handled by user space, the RMM needs to be informed of
-> +the target of the operation using `target_mpidr`, along with the status
-> +(`psci_status`). The RMM v1.0 specification defines two functions that require
-> +this call: PSCI_CPU_ON and PSCI_AFFINITY_INFO.
-> +
-> +If the kernel is handling PSCI then this is done automatically and the VMM
-> +doesn't need to call this ioctl.
+> RMM v1.0 provides no mechanism for the host to perform debug operations
+> on the guest. So don't expose KVM_CAP_SET_GUEST_DEBUG and report 0
+> breakpoints and 0 watch points.
 
-Why should userspace involved in this? Why can't this be a
-notification that the host delivers to the RMM when the vcpu is about
-to run?
-
->  
->  .. _kvm_run:
->  
-> @@ -8662,6 +8692,47 @@ This capability indicate to the userspace whether a PFNMAP memory region
->  can be safely mapped as cacheable. This relies on the presence of
->  force write back (FWB) feature support on the hardware.
->  
-> +7.44 KVM_CAP_ARM_RME
-> +--------------------
-> +
-> +:Architectures: arm64
-> +:Target: VM
-> +:Parameters: args[0] provides an action, args[1] points to a structure in
-> +             memory for the action.
-> +:Returns: 0 on success, negative value on error
-> +
-> +Used to configure and set up the memory for a Realm. The available actions are:
-> +
-> +================================= =============================================
-> + KVM_CAP_ARM_RME_CONFIG_REALM     Takes struct arm_rme_config as args[1] and
-> +                                  configures realm parameters prior to it being
-> +                                  created.
-> +
-> +                                  Options are ARM_RME_CONFIG_RPV to set the
-> +                                  "Realm Personalization Value" and
-> +                                  ARM_RME_CONFIG_HASH_ALGO to set the hash
-> +                                  algorithm.
-> +
-> + KVM_CAP_ARM_RME_CREATE_REALM     Request the RMM to create the realm. The
-> +                                  realm's configuration parameters must be set
-> +                                  first.
-> +
-> + KVM_CAP_ARM_RME_INIT_RIPAS_REALM Takes struct arm_rme_init_ripas as args[1]
-> +                                  and sets the RIPAS (Realm IPA State) to
-> +                                  RIPAS_RAM of a specified area of the realm's
-> +                                  IPA.
-> +
-> + KVM_CAP_ARM_RME_POPULATE_REALM   Takes struct arm_rme_populate_realm as
-> +                                  args[1] and populates a region of protected
-> +                                  address space by copying the data from the
-> +                                  shared alias.
-> +
-> + KVM_CAP_ARM_RME_ACTIVATE_REALM   Request the RMM to activate the realm. No
-> +                                  changes can be made to the Realm's populated
-> +                                  memory, IPA state, configuration parameters
-> +                                  or vCPU additions after this step.
-> +================================= =============================================
-> +
-
-These are not capabilities, they are actions that the VMM may perform
-on a VM. You don't configure a VM using capabilities. You use it to
-buy into some behaviours, but that's all.
-
-And then there is the semantic of this stuff. Why do I need something
-like KVM_CAP_ARM_RME_CREATE_REALM when I can just pass this as part of
-the VM type? Why do I need a new way to describe memory region when we
-already have memslots for that exact purpose?
-
-Overall, you are leaking the RMM interface into userspace, and that's
-an absolute show-stopper. We have an API, it is not pretty, but it
-exists. We don't need another one that will be just as broken. If the
-RMM needs some impedance matching, that's the kernel's job.
+What is the guest seeing for the same things?
 
 	M.
 
