@@ -1,426 +1,197 @@
-Return-Path: <kvm+bounces-59314-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-59315-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 823F5BB0F43
-	for <lists+kvm@lfdr.de>; Wed, 01 Oct 2025 17:08:55 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 0C062BB104A
+	for <lists+kvm@lfdr.de>; Wed, 01 Oct 2025 17:18:57 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9895E3ACCA9
-	for <lists+kvm@lfdr.de>; Wed,  1 Oct 2025 15:04:18 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A04793B2FA5
+	for <lists+kvm@lfdr.de>; Wed,  1 Oct 2025 15:16:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A6E4D30EF7E;
-	Wed,  1 Oct 2025 14:59:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 679112E11AA;
+	Wed,  1 Oct 2025 15:15:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="FZ1Y/c5W"
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="ETneQCBg"
 X-Original-To: kvm@vger.kernel.org
-Received: from out-174.mta1.migadu.com (out-174.mta1.migadu.com [95.215.58.174])
+Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8EDE230E0C7
-	for <kvm@vger.kernel.org>; Wed,  1 Oct 2025 14:59:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.174
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B8A8F27A90A;
+	Wed,  1 Oct 2025 15:15:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1759330745; cv=none; b=fKRMUNNfGCzGd4CtGh4btaGkKaqgaMWN3oOtN97i0xyMYBKH0mk4+uB867VN0a13OuBHSTkA4K6cfqHeN+13CayGM6yac2jjQ1hLstB86VX+zjeQjXFeh9c6Doq09yuuha5IIfCG/HAUgBoLGrPaRZzjSoQzK8/BOUfvJTU36pI=
+	t=1759331754; cv=none; b=resGnhfoXbEX1OIYwBoZa2Vbcyf7ZFJJuvbZ0c/Q40u5SsfrRY0WNVy0lVYzRiQyNKl/aNhtOfOh9jZLOeVveT+Cbe9pau/Gi8SyRl1vedYUdkdS+1DSrab0u9mPW1Okh+bXjufVv2lTNDGGFB3ScOnKZnZhylJpSs7cIjtsgw4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1759330745; c=relaxed/simple;
-	bh=3XZH7BRfy9GZsl2l9dW0v0fS+AFAUfjkshK6UQgXYew=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=WPW/KupyUXqX6VehX5fymU24AdCWHtAb3//gWJXn5IU6tQjqYqJxxTqRPyh0/nGC+BVVXWAgfzPA8Z0C0nnv02cKlpYofPZqGwJBdi1VGf2cWaKAhAdDyaJQci/LmbBHR/dwTg8ICWs2c8U46fpufiIuVU1CWT8W83Xc3DPm5Xw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=FZ1Y/c5W; arc=none smtp.client-ip=95.215.58.174
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1759330740;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=njLgviB8zkOyaMBe4TukJ4UcfLgF0Cr0ukv2OYqfgrI=;
-	b=FZ1Y/c5WydlXzXQ6g6dQwVlvLoBYC2BsJimarpYifney7ha8MVlq//kjk06omLorh+N8M7
-	MPgvAE86qGjwt0h982X1UV5eAQSlwZE70GTZXqvyy4FNon70Qg6sm7kY3CBJcL9+APUWag
-	aofYjPDQ6e0IsCBl3BLG8ng6elG9y6Q=
-From: Yosry Ahmed <yosry.ahmed@linux.dev>
-To: Sean Christopherson <seanjc@google.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>,
-	kvm@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Yosry Ahmed <yosryahmed@google.com>,
-	Yosry Ahmed <yosry.ahmed@linux.dev>
-Subject: [PATCH 12/12] KVM: selftests: Extend vmx_dirty_log_test to cover SVM
-Date: Wed,  1 Oct 2025 14:58:16 +0000
-Message-ID: <20251001145816.1414855-13-yosry.ahmed@linux.dev>
-In-Reply-To: <20251001145816.1414855-1-yosry.ahmed@linux.dev>
-References: <20251001145816.1414855-1-yosry.ahmed@linux.dev>
+	s=arc-20240116; t=1759331754; c=relaxed/simple;
+	bh=xo+LjN+6M5xrDWe0LumImYYdQdiYA36qXm/82TdgDb4=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=DCn9alGvdhVTG08Oa4fYl94CeICLqzVpYAyvRhVZ0XFGjrvMGn3z8B8BOBoWKTxS69Sy9LjlsNS3GX+q6Q43FeC7BKXC5zqA8DDBVY0A0aGAGFt9xkC43l03+wJ/Jcu5Z3+WLgfESKPUPqoecNgqm58MX/6U2jNYjKUyaGLNJXA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=ETneQCBg; arc=none smtp.client-ip=148.163.158.5
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
+Received: from pps.filterd (m0356516.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 591C3qOD026121;
+	Wed, 1 Oct 2025 15:15:48 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
+	:content-transfer-encoding:content-type:date:from:in-reply-to
+	:message-id:mime-version:references:sender:subject:to; s=pp1;
+	 bh=MlDiE1bhc4JPlZ7JkI12SJv+T2Q6ot/KiLSntWAWJ5Y=; b=ETneQCBgyPEn
+	1JbN3k+Ey1s4Z1ZFKd0Mjnj2iV4NMsjIJzCPv3R97mMARmB+mNXFgnzlAjcufsDF
+	/7J6XC4OWqIDNJnr/a+nypm9UWm7HxVDi6pjJgWmOAHKaVTkFcSAgeODj6Niswsr
+	W5jGInZYRjtqV+Nqsp6/6JxRfvnilA5KU6GyyoV/8hvcLkGVHpbvFZD4OgQcaBAk
+	pzPDhuYdvWGn8DaIRI8pWiZOeqlJVLYsga4Y3VtGliXyeBS/N8N+8ozlbFkpVx3q
+	ZtaMgAjBb6OxDMR00GDWHVJWd+0JkD5oI1qogf74NxBzNANQkQ7611BC2RWf0j0y
+	FCdV0syR6g==
+Received: from ppma23.wdc07v.mail.ibm.com (5d.69.3da9.ip4.static.sl-reverse.com [169.61.105.93])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 49e5bqyrwb-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Wed, 01 Oct 2025 15:15:48 +0000 (GMT)
+Received: from pps.filterd (ppma23.wdc07v.mail.ibm.com [127.0.0.1])
+	by ppma23.wdc07v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 591D6aRP007328;
+	Wed, 1 Oct 2025 15:15:47 GMT
+Received: from smtprelay04.fra02v.mail.ibm.com ([9.218.2.228])
+	by ppma23.wdc07v.mail.ibm.com (PPS) with ESMTPS id 49eurk1bvf-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Wed, 01 Oct 2025 15:15:47 +0000
+Received: from smtpav04.fra02v.mail.ibm.com (smtpav04.fra02v.mail.ibm.com [10.20.54.103])
+	by smtprelay04.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 591FFhe718088278
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Wed, 1 Oct 2025 15:15:43 GMT
+Received: from smtpav04.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 6B7262004D;
+	Wed,  1 Oct 2025 15:15:43 +0000 (GMT)
+Received: from smtpav04.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 5908720043;
+	Wed,  1 Oct 2025 15:15:43 +0000 (GMT)
+Received: from p1gen4-pw042f0m (unknown [9.152.212.180])
+	by smtpav04.fra02v.mail.ibm.com (Postfix) with ESMTPS;
+	Wed,  1 Oct 2025 15:15:43 +0000 (GMT)
+Received: from bblock by p1gen4-pw042f0m with local (Exim 4.98.2)
+	(envelope-from <bblock@linux.ibm.com>)
+	id 1v3yYR-00000001mJM-0NOD;
+	Wed, 01 Oct 2025 17:15:43 +0200
+Date: Wed, 1 Oct 2025 17:15:43 +0200
+From: Benjamin Block <bblock@linux.ibm.com>
+To: Farhan Ali <alifm@linux.ibm.com>
+Cc: linux-s390@vger.kernel.org, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org, linux-pci@vger.kernel.org,
+        alex.williamson@redhat.com, helgaas@kernel.org, clg@redhat.com,
+        schnelle@linux.ibm.com, mjrosato@linux.ibm.com
+Subject: Re: [PATCH v4 01/10] PCI: Avoid saving error values for config space
+Message-ID: <20251001151543.GB408411@p1gen4-pw042f0m>
+References: <20250924171628.826-1-alifm@linux.ibm.com>
+ <20250924171628.826-2-alifm@linux.ibm.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-X-Migadu-Flow: FLOW_OUT
+In-Reply-To: <20250924171628.826-2-alifm@linux.ibm.com>
+Sender: Benjamin Block <bblock@linux.ibm.com>
+X-TM-AS-GCONF: 00
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUwOTI2MDIxNCBTYWx0ZWRfX70nNezYDrZzd
+ kslqs4ddK8xtFuNuxen0NdVxnYvrFmYQWNB+Vto7UiLIRNnJjVehvBbEVubYB50MwVREfH0xdXb
+ qPi0QyBMB8ma1ckPQCHSDV59Xve/w4tlrI7w0dMx+IsGl4N47pO77eVzQSu8zNfHWfRjt9mI5LQ
+ gwmrtGJZCjm1LAgAdOlCKznjBabA1jZgPmaAV8/vgIQ8To1SWDwQZUjQuSU6R/GYyVwGWQ4gNGd
+ nwB+sF9Mq33QJ4ys2JTU0J6pm5lZOUK1e6PuWVnFYfFCzSBbY+oFRd597AeW9jvW48Ooh5edRYT
+ mzSaddYGtlclGOofg1uG9bV5JKWeUX0pfFr5P4n+gxDfRlqpWP/j3AaZG3HEUtWotbKfn+m0X7w
+ B88stuy1T3cYWckp9wvl6QpIeIye7Q==
+X-Proofpoint-GUID: 2W8DL0p3Yhafhks06gyp_QkSmr5xPuYZ
+X-Authority-Analysis: v=2.4 cv=LLZrgZW9 c=1 sm=1 tr=0 ts=68dd45a4 cx=c_pps
+ a=3Bg1Hr4SwmMryq2xdFQyZA==:117 a=3Bg1Hr4SwmMryq2xdFQyZA==:17
+ a=8nJEP1OIZ-IA:10 a=x6icFKpwvdMA:10 a=VnNF1IyMAAAA:8 a=fNfyPmc1JltVXBjRTFUA:9
+ a=3ZKOabzyN94A:10 a=wPNLvfGTeEIA:10 a=cPQSjfK2_nFv0Q5t_7PE:22
+X-Proofpoint-ORIG-GUID: 2W8DL0p3Yhafhks06gyp_QkSmr5xPuYZ
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1117,Hydra:6.1.9,FMLib:17.12.80.40
+ definitions=2025-10-01_04,2025-09-29_04,2025-03-28_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ spamscore=0 impostorscore=0 bulkscore=0 malwarescore=0 suspectscore=0
+ clxscore=1015 priorityscore=1501 phishscore=0 lowpriorityscore=0 adultscore=0
+ classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
+ reason=mlx scancount=1 engine=8.19.0-2509150000 definitions=main-2509260214
 
-From: Yosry Ahmed <yosryahmed@google.com>
+On Wed, Sep 24, 2025 at 10:16:19AM -0700, Farhan Ali wrote:
+> @@ -1792,6 +1798,14 @@ static void pci_restore_pcix_state(struct pci_dev *dev)
+>  int pci_save_state(struct pci_dev *dev)
+>  {
+>  	int i;
+> +	u32 val;
+> +
+> +	pci_read_config_dword(dev, PCI_COMMAND, &val);
+> +	if (PCI_POSSIBLE_ERROR(val)) {
+> +		pci_warn(dev, "Device config space inaccessible, will only be partially restored\n");
+> +		return -EIO;
 
-Add the necessary infrastructure to support setting up nested NPTs and
-creating nested NPT mappings. There is some redundancy between
-nested_npt_create_pte() and nested_ept_create_pte(), especially that we
-access the same fields in both. An alternative is to have a single
-function in nested_map.c, and use macros to cast an obaque PTE pointer
-to the correct type (EPT entry vs NPT entry).
+Should it set `dev->state_saved` to `false`, to be on the save side?
+Not sure whether we run a risk of restoring an old, outdated state otherwise.
 
-Add a check in kvm_cpu_has_ept() to return false on AMD CPUs without
-attempting to read VMX-specific MSRs, since now it can be called on AMD
-CPUs. Generalize the code in vmx_dirty_log_test.c by adding SVM-specific
-L1 code, doing some renaming (e.g. EPT -> TDP), and having setup code
-for both SVM and VMX in test_dirty_log().
+> +	}
+> +
+>  	/* XXX: 100% dword access ok here? */
+>  	for (i = 0; i < 16; i++) {
+>  		pci_read_config_dword(dev, i * 4, &dev->saved_config_space[i]);
+> @@ -1854,6 +1868,14 @@ static void pci_restore_config_space_range(struct pci_dev *pdev,
+>  
+>  static void pci_restore_config_space(struct pci_dev *pdev)
+>  {
+> +	if (!pdev->state_saved) {
+> +		pci_warn(pdev, "No saved config space, restoring BARs\n");
+> +		pci_restore_bars(pdev);
+> +		pci_write_config_word(pdev, PCI_COMMAND,
+> +				PCI_COMMAND_MEMORY | PCI_COMMAND_IO);
 
-Having multiple points to check for SVM vs VMX is not ideal, but the
-alternatives either include a lot of redundancy or a lot of abstracting
-functions that will make the test logic harder to follow.
+Is this really something that ought to be universally enabled? I thought this
+depends on whether attached resources are IO and/or MEM?
 
-Signed-off-by: Yosry Ahmed <yosry.ahmed@linux.dev>
----
- tools/testing/selftests/kvm/Makefile.kvm      |  2 +-
- .../selftests/kvm/include/x86/svm_util.h      | 13 +++
- tools/testing/selftests/kvm/lib/x86/svm.c     | 70 ++++++++++++++
- tools/testing/selftests/kvm/lib/x86/vmx.c     |  3 +
- ...rty_log_test.c => nested_dirty_log_test.c} | 94 ++++++++++++++-----
- 5 files changed, 155 insertions(+), 27 deletions(-)
- rename tools/testing/selftests/kvm/x86/{vmx_dirty_log_test.c => nested_dirty_log_test.c} (62%)
+	int pci_enable_resources(struct pci_dev *dev, int mask)
+	{
+		...
+		pci_dev_for_each_resource(dev, r, i) {
+			...
+			if (r->flags & IORESOURCE_IO)
+				cmd |= PCI_COMMAND_IO;
+			if (r->flags & IORESOURCE_MEM)
+				cmd |= PCI_COMMAND_MEMORY;
+		}
+		...
+	}
 
-diff --git a/tools/testing/selftests/kvm/Makefile.kvm b/tools/testing/selftests/kvm/Makefile.kvm
-index 9547d7263e236..acedbf726f493 100644
---- a/tools/testing/selftests/kvm/Makefile.kvm
-+++ b/tools/testing/selftests/kvm/Makefile.kvm
-@@ -113,7 +113,7 @@ TEST_GEN_PROGS_x86 += x86/userspace_io_test
- TEST_GEN_PROGS_x86 += x86/userspace_msr_exit_test
- TEST_GEN_PROGS_x86 += x86/vmx_apic_access_test
- TEST_GEN_PROGS_x86 += x86/close_while_nested_test
--TEST_GEN_PROGS_x86 += x86/vmx_dirty_log_test
-+TEST_GEN_PROGS_x86 += x86/nested_dirty_log_test
- TEST_GEN_PROGS_x86 += x86/vmx_exception_with_invalid_guest_state
- TEST_GEN_PROGS_x86 += x86/vmx_msrs_test
- TEST_GEN_PROGS_x86 += x86/vmx_invalid_nested_guest_state
-diff --git a/tools/testing/selftests/kvm/include/x86/svm_util.h b/tools/testing/selftests/kvm/include/x86/svm_util.h
-index b74c6dcddcbd6..84b79113b5433 100644
---- a/tools/testing/selftests/kvm/include/x86/svm_util.h
-+++ b/tools/testing/selftests/kvm/include/x86/svm_util.h
-@@ -27,6 +27,11 @@ struct svm_test_data {
- 	void *msr; /* gva */
- 	void *msr_hva;
- 	uint64_t msr_gpa;
-+
-+	/* NPT */
-+	void *ncr3; /* gva */
-+	void *ncr3_hva;
-+	uint64_t ncr3_gpa;
- };
- 
- static inline void vmmcall(void)
-@@ -57,6 +62,14 @@ struct svm_test_data *vcpu_alloc_svm(struct kvm_vm *vm, vm_vaddr_t *p_svm_gva);
- void generic_svm_setup(struct svm_test_data *svm, void *guest_rip, void *guest_rsp);
- void run_guest(struct vmcb *vmcb, uint64_t vmcb_gpa);
- 
-+bool nested_npt_create_pte(struct kvm_vm *vm,
-+			   uint64_t *pte,
-+			   uint64_t paddr,
-+			   uint64_t *address,
-+			   bool *leaf);
-+bool kvm_cpu_has_npt(void);
-+void prepare_npt(struct svm_test_data *svm, struct kvm_vm *vm);
-+
- int open_sev_dev_path_or_exit(void);
- 
- #endif /* SELFTEST_KVM_SVM_UTILS_H */
-diff --git a/tools/testing/selftests/kvm/lib/x86/svm.c b/tools/testing/selftests/kvm/lib/x86/svm.c
-index d239c20973918..9524abf7e779a 100644
---- a/tools/testing/selftests/kvm/lib/x86/svm.c
-+++ b/tools/testing/selftests/kvm/lib/x86/svm.c
-@@ -16,6 +16,23 @@
- struct gpr64_regs guest_regs;
- u64 rflags;
- 
-+struct nptPageTableEntry {
-+       uint64_t present:1;
-+       uint64_t writable:1;
-+       uint64_t user:1;
-+       uint64_t pwt:1;
-+       uint64_t pcd:1;
-+       uint64_t accessed:1;
-+       uint64_t dirty:1;
-+       uint64_t page_size:1;
-+       uint64_t global:1;
-+       uint64_t avail1:3;
-+       uint64_t address:40;
-+       uint64_t avail2:11;
-+       uint64_t nx:1;
-+};
-+static_assert(sizeof(struct nptPageTableEntry) == sizeof(uint64_t));
-+
- /* Allocate memory regions for nested SVM tests.
-  *
-  * Input Args:
-@@ -59,6 +76,54 @@ static void vmcb_set_seg(struct vmcb_seg *seg, u16 selector,
- 	seg->base = base;
- }
- 
-+bool nested_npt_create_pte(struct kvm_vm *vm,
-+			   uint64_t *pte,
-+			   uint64_t paddr,
-+			   uint64_t *address,
-+			   bool *leaf)
-+{
-+	struct nptPageTableEntry *npte = (struct nptPageTableEntry *)pte;
-+
-+	if (npte->present) {
-+		*leaf = npte->page_size;
-+		*address = npte->address;
-+		return false;
-+	}
-+
-+	npte->present = true;
-+	npte->writable = true;
-+	npte->page_size = *leaf;
-+
-+	if (*leaf)
-+		npte->address = paddr >> vm->page_shift;
-+	else
-+		npte->address = vm_alloc_page_table(vm) >> vm->page_shift;
-+
-+	*address = npte->address;
-+
-+	/*
-+	 * For now mark these as accessed and dirty because the only
-+	 * testcase we have needs that.  Can be reconsidered later.
-+	 */
-+	npte->accessed = *leaf;
-+	npte->dirty = *leaf;
-+	return true;
-+}
-+
-+bool kvm_cpu_has_npt(void)
-+{
-+       return kvm_cpu_has(X86_FEATURE_NPT);
-+}
-+
-+void prepare_npt(struct svm_test_data *svm, struct kvm_vm *vm)
-+{
-+	TEST_ASSERT(kvm_cpu_has_npt(), "KVM doesn't support nested NPT");
-+
-+	svm->ncr3 = (void *)vm_vaddr_alloc_page(vm);
-+	svm->ncr3_hva = addr_gva2hva(vm, (uintptr_t)svm->ncr3);
-+	svm->ncr3_gpa = addr_gva2gpa(vm, (uintptr_t)svm->ncr3);
-+}
-+
- void generic_svm_setup(struct svm_test_data *svm, void *guest_rip, void *guest_rsp)
- {
- 	struct vmcb *vmcb = svm->vmcb;
-@@ -102,6 +167,11 @@ void generic_svm_setup(struct svm_test_data *svm, void *guest_rip, void *guest_r
- 	vmcb->save.rip = (u64)guest_rip;
- 	vmcb->save.rsp = (u64)guest_rsp;
- 	guest_regs.rdi = (u64)svm;
-+
-+	if (svm->ncr3_gpa) {
-+		ctrl->nested_ctl |= SVM_NESTED_CTL_NP_ENABLE;
-+		ctrl->nested_cr3 = svm->ncr3_gpa;
-+	}
- }
- 
- /*
-diff --git a/tools/testing/selftests/kvm/lib/x86/vmx.c b/tools/testing/selftests/kvm/lib/x86/vmx.c
-index 24345213fcd04..0ced959184cd9 100644
---- a/tools/testing/selftests/kvm/lib/x86/vmx.c
-+++ b/tools/testing/selftests/kvm/lib/x86/vmx.c
-@@ -405,6 +405,9 @@ bool kvm_cpu_has_ept(void)
- {
- 	uint64_t ctrl;
- 
-+	if (!kvm_cpu_has(X86_FEATURE_VMX))
-+		return false;
-+
- 	ctrl = kvm_get_feature_msr(MSR_IA32_VMX_TRUE_PROCBASED_CTLS) >> 32;
- 	if (!(ctrl & CPU_BASED_ACTIVATE_SECONDARY_CONTROLS))
- 		return false;
-diff --git a/tools/testing/selftests/kvm/x86/vmx_dirty_log_test.c b/tools/testing/selftests/kvm/x86/nested_dirty_log_test.c
-similarity index 62%
-rename from tools/testing/selftests/kvm/x86/vmx_dirty_log_test.c
-rename to tools/testing/selftests/kvm/x86/nested_dirty_log_test.c
-index db88a1e5e9d0c..56f741ddce944 100644
---- a/tools/testing/selftests/kvm/x86/vmx_dirty_log_test.c
-+++ b/tools/testing/selftests/kvm/x86/nested_dirty_log_test.c
-@@ -13,6 +13,7 @@
- #include "kvm_util.h"
- #include "nested_map.h"
- #include "processor.h"
-+#include "svm_util.h"
- #include "vmx.h"
- 
- /* The memory slot index to track dirty pages */
-@@ -26,6 +27,8 @@
- #define NESTED_TEST_MEM1		0xc0001000
- #define NESTED_TEST_MEM2		0xc0002000
- 
-+#define L2_GUEST_STACK_SIZE 64
-+
- static void l2_guest_code(u64 *a, u64 *b)
- {
- 	READ_ONCE(*a);
-@@ -43,20 +46,19 @@ static void l2_guest_code(u64 *a, u64 *b)
- 	vmcall();
- }
- 
--static void l2_guest_code_ept_enabled(void)
-+static void l2_guest_code_tdp_enabled(void)
- {
- 	l2_guest_code((u64 *)NESTED_TEST_MEM1, (u64 *)NESTED_TEST_MEM2);
- }
- 
--static void l2_guest_code_ept_disabled(void)
-+static void l2_guest_code_tdp_disabled(void)
- {
--	/* Access the same L1 GPAs as l2_guest_code_ept_enabled() */
-+	/* Access the same L1 GPAs as l2_guest_code_tdp_enabled() */
- 	l2_guest_code((u64 *)GUEST_TEST_MEM, (u64 *)GUEST_TEST_MEM);
- }
- 
--void l1_guest_code(struct vmx_pages *vmx)
-+void l1_vmx_code(struct vmx_pages *vmx)
- {
--#define L2_GUEST_STACK_SIZE 64
- 	unsigned long l2_guest_stack[L2_GUEST_STACK_SIZE];
- 	void *l2_rip;
- 
-@@ -65,9 +67,9 @@ void l1_guest_code(struct vmx_pages *vmx)
- 	GUEST_ASSERT(load_vmcs(vmx));
- 
- 	if (vmx->eptp_gpa)
--		l2_rip = l2_guest_code_ept_enabled;
-+		l2_rip = l2_guest_code_tdp_enabled;
- 	else
--		l2_rip = l2_guest_code_ept_disabled;
-+		l2_rip = l2_guest_code_tdp_disabled;
- 
- 	prepare_vmcs(vmx, l2_rip, &l2_guest_stack[L2_GUEST_STACK_SIZE]);
- 
-@@ -78,10 +80,38 @@ void l1_guest_code(struct vmx_pages *vmx)
- 	GUEST_DONE();
- }
- 
--static void test_vmx_dirty_log(bool enable_ept)
-+static void l1_svm_code(struct svm_test_data *svm)
-+{
-+       unsigned long l2_guest_stack[L2_GUEST_STACK_SIZE];
-+       void *l2_rip;
-+
-+       if (svm->ncr3_gpa)
-+               l2_rip = l2_guest_code_tdp_enabled;
-+       else
-+               l2_rip = l2_guest_code_tdp_disabled;
-+
-+       generic_svm_setup(svm, l2_rip, &l2_guest_stack[L2_GUEST_STACK_SIZE]);
-+
-+       GUEST_SYNC(false);
-+       run_guest(svm->vmcb, svm->vmcb_gpa);
-+       GUEST_SYNC(false);
-+       GUEST_ASSERT(svm->vmcb->control.exit_code == SVM_EXIT_VMMCALL);
-+       GUEST_DONE();
-+}
-+
-+static void l1_guest_code(void *data)
-+{
-+	if (this_cpu_has(X86_FEATURE_VMX))
-+		l1_vmx_code(data);
-+	else
-+		l1_svm_code(data);
-+}
-+
-+static void test_dirty_log(bool enable_tdp)
- {
--	vm_vaddr_t vmx_pages_gva = 0;
--	struct vmx_pages *vmx;
-+	struct svm_test_data *svm = NULL;
-+	struct vmx_pages *vmx = NULL;
-+	vm_vaddr_t nested_gva = 0;
- 	unsigned long *bmap;
- 	uint64_t *host_test_mem;
- 
-@@ -90,12 +120,16 @@ static void test_vmx_dirty_log(bool enable_ept)
- 	struct ucall uc;
- 	bool done = false;
- 
--	pr_info("Nested EPT: %s\n", enable_ept ? "enabled" : "disabled");
-+	pr_info("Nested TDP: %s\n", enable_tdp ? "enabled" : "disabled");
- 
- 	/* Create VM */
- 	vm = vm_create_with_one_vcpu(&vcpu, l1_guest_code);
--	vmx = vcpu_alloc_vmx(vm, &vmx_pages_gva);
--	vcpu_args_set(vcpu, 1, vmx_pages_gva);
-+	if (kvm_cpu_has(X86_FEATURE_VMX))
-+		vmx = vcpu_alloc_vmx(vm, &nested_gva);
-+	else
-+		svm = vcpu_alloc_svm(vm, &nested_gva);
-+
-+	vcpu_args_set(vcpu, 1, nested_gva);
- 
- 	/* Add an extra memory slot for testing dirty logging */
- 	vm_userspace_mem_region_add(vm, VM_MEM_SRC_ANONYMOUS,
-@@ -114,17 +148,25 @@ static void test_vmx_dirty_log(bool enable_ept)
- 	 * ... pages in the L2 GPA range [0xc0001000, 0xc0003000) will map to
- 	 * 0xc0000000.
- 	 *
--	 * Note that prepare_eptp should be called only L1's GPA map is done,
--	 * meaning after the last call to virt_map.
-+	 * Note that prepare_eptp()/prepare_npt() should be called only when
-+	 * L1's GPA map is done, meaning after the last call to virt_map.
- 	 *
--	 * When EPT is disabled, the L2 guest code will still access the same L1
--	 * GPAs as the EPT enabled case.
-+	 * When TDP is disabled, the L2 guest code will still access the same L1
-+	 * GPAs as the TDP enabled case.
- 	 */
--	if (enable_ept) {
--		prepare_eptp(vmx, vm, 0);
--		nested_map_memslot(vmx->eptp_hva, vm, 0);
--		nested_map(vmx->eptp_hva, vm, NESTED_TEST_MEM1, GUEST_TEST_MEM, 4096);
--		nested_map(vmx->eptp_hva, vm, NESTED_TEST_MEM2, GUEST_TEST_MEM, 4096);
-+	if (enable_tdp) {
-+		void *root_hva;
-+
-+		if (kvm_cpu_has(X86_FEATURE_VMX)) {
-+			prepare_eptp(vmx, vm, 0);
-+			root_hva = vmx->eptp_hva;
-+		} else {
-+			prepare_npt(svm, vm);
-+			root_hva = svm->ncr3_hva;
-+		}
-+		nested_map_memslot(root_hva, vm, 0);
-+		nested_map(root_hva, vm, NESTED_TEST_MEM1, GUEST_TEST_MEM, 4096);
-+		nested_map(root_hva, vm, NESTED_TEST_MEM2, GUEST_TEST_MEM, 4096);
- 	}
- 
- 	bmap = bitmap_zalloc(TEST_MEM_PAGES);
-@@ -169,12 +211,12 @@ static void test_vmx_dirty_log(bool enable_ept)
- 
- int main(int argc, char *argv[])
- {
--	TEST_REQUIRE(kvm_cpu_has(X86_FEATURE_VMX));
-+	TEST_REQUIRE(kvm_cpu_has(X86_FEATURE_VMX) || kvm_cpu_has(X86_FEATURE_SVM));
- 
--	test_vmx_dirty_log(/*enable_ept=*/false);
-+	test_dirty_log(/*enable_tdp=*/false);
- 
--	if (kvm_cpu_has_ept())
--		test_vmx_dirty_log(/*enable_ept=*/true);
-+	if (kvm_cpu_has_ept() || kvm_cpu_has_npt())
-+		test_dirty_log(/*enable_tdp=*/true);
- 
- 	return 0;
- }
+Also IIRC, especially on s390, we never have IO resources?
+
+	int zpci_setup_bus_resources(struct zpci_dev *zdev)
+	{
+		...
+		for (i = 0; i < PCI_STD_NUM_BARS; i++) {
+			...
+			/* only MMIO is supported */
+			flags = IORESOURCE_MEM;
+			if (zdev->bars[i].val & 8)
+				flags |= IORESOURCE_PREFETCH;
+			if (zdev->bars[i].val & 4)
+				flags |= IORESOURCE_MEM_64;
+			...
+		}
+		...
+	}
+
+So I guess this would have to have some form of the same logic as in
+`pci_enable_resources()`, after restoring the BARs.
+
+Or am I missing something?
+
+> +		return;
+> +	}
+
 -- 
-2.51.0.618.g983fd99d29-goog
-
+Best Regards, Benjamin Block        /        Linux on IBM Z Kernel Development
+IBM Deutschland Research & Development GmbH    /   https://www.ibm.com/privacy
+Vors. Aufs.-R.: Wolfgang Wendt         /        Geschäftsführung: David Faller
+Sitz der Ges.: Böblingen     /    Registergericht: AmtsG Stuttgart, HRB 243294
 
