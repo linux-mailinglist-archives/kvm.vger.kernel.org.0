@@ -1,79 +1,79 @@
-Return-Path: <kvm+bounces-59253-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-59254-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 159A4BAF94F
-	for <lists+kvm@lfdr.de>; Wed, 01 Oct 2025 10:22:37 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 25F22BAF952
+	for <lists+kvm@lfdr.de>; Wed, 01 Oct 2025 10:22:42 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B8D843C6CFD
-	for <lists+kvm@lfdr.de>; Wed,  1 Oct 2025 08:22:35 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id CBAAE1C4342
+	for <lists+kvm@lfdr.de>; Wed,  1 Oct 2025 08:22:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 006BA27FB0E;
-	Wed,  1 Oct 2025 08:22:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5FF0819DF4F;
+	Wed,  1 Oct 2025 08:22:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="BnLG7/JN"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="XatFwkPT"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-wr1-f52.google.com (mail-wr1-f52.google.com [209.85.221.52])
+Received: from mail-wm1-f49.google.com (mail-wm1-f49.google.com [209.85.128.49])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 80B0227B35B
-	for <kvm@vger.kernel.org>; Wed,  1 Oct 2025 08:22:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.52
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BB07127A456
+	for <kvm@vger.kernel.org>; Wed,  1 Oct 2025 08:22:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.49
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1759306952; cv=none; b=D5elJwW3muNjzyN5eapu+XYfVuVBK5SrtQPvMiySK4EJP3CvmsugQQeVIvnibAu0TJ9IWcyZSzFks9XgPHlIQbwmIieTPjnQJm7bHLDsr97v4vKgH5UnCMaRxNmbiFSdo8RAwTTzSx+d4cxY69VEZ6tXhS5qZC08g8Q9tmfdOu4=
+	t=1759306957; cv=none; b=PNwq5L0wLQ9qqPYCH1hah9ybbPvOjk4Y1lRCMuwe5lZB+wdHHJYKsN13+5vO7qNQIr9i3bRhjt96xRpKE+rVHCw/Hwie9QpP95uxyNTKmh876wnyzrb+q1JG/QH019Nu7IPJeATie4yCGTdrjiLOgZplz5ROWLePwNwo9e9FWbA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1759306952; c=relaxed/simple;
-	bh=6wKvjfCFrjJ8u4CPobX0hP4EaNVQN62JkQpAPxP/Gos=;
+	s=arc-20240116; t=1759306957; c=relaxed/simple;
+	bh=+SXA9XCBHEip0Zva4OuKdPlWL5Aq7TM+LAb1/+BTrGM=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=kZ48uXoJupgvJY4OAcIS90K7gXKI+TaeBE7ox69x5uRax3Rxji1nB2wI2rHd3qrYMd6HSeZAy8v3uGobqJ1UKUkjJplSMk1xXvRcBouB+9G89FQe+vcbT+xu03TIIEXHUX7fvweZbc5h4DkRWtyZFBe4GYb2U8yI0x+pl6aIbN8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=BnLG7/JN; arc=none smtp.client-ip=209.85.221.52
+	 MIME-Version:Content-Type; b=U499kGIKdyZ96sKpoH97/6NT3vD8rzM2oZiPjwH0gizT0JM2kJBooKHm1Yqdkv74k8uTnoNQMcKwLyif3lX+C4X8CyDaVPMefx8SXEBHDhyMVQ6kr9bNlwzFxiiHLqIlPOW1jincGuMaiVxr3fgqoDfSmlVh3RzioizOFI/H1qs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=XatFwkPT; arc=none smtp.client-ip=209.85.128.49
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
-Received: by mail-wr1-f52.google.com with SMTP id ffacd0b85a97d-3ee1221ceaaso5515898f8f.3
-        for <kvm@vger.kernel.org>; Wed, 01 Oct 2025 01:22:30 -0700 (PDT)
+Received: by mail-wm1-f49.google.com with SMTP id 5b1f17b1804b1-46e6674caa5so980725e9.0
+        for <kvm@vger.kernel.org>; Wed, 01 Oct 2025 01:22:35 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1759306949; x=1759911749; darn=vger.kernel.org;
+        d=linaro.org; s=google; t=1759306954; x=1759911754; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=V9IGpJufeP6E66MY+FRkIfF2QgQ90YgPFg2n1Q4hyMg=;
-        b=BnLG7/JNR69EGq+ro+x0CQqj7aosGnEM+TRFE4pqY9YoN2d+1oRrqlH8ajlcNKDXHc
-         lbKZIqTLE4JolNtvuJ7DtTI9rrg0FLCirfMBZLzYbswzvAz6zFWP1gB3xDFKd4PTxX3l
-         S7eNWaB3xNvl9450XbI5uMzWbsHei8EWrDl1KABlBr7qai1/Cv7FQT+rX7t571mJrddX
-         JTAjR8aSY8FwAzXvOliywuuOouuVrZ1NYU0/PZZm9gW/FcYNmlTz2K7Z4kSDmSy8OLjt
-         HSkdN2XQtda9dN0cAQx4RlihyaExXut0KYwDGGpJk6d716mszFZrQXM8igjfbhxEP7cx
-         786Q==
+        bh=uDgeo2zJE06h8QgA17T0RsOYYTnGmADPzWOfZYKLdkw=;
+        b=XatFwkPT9QKumcfu40RdqYulGp0hA6+fAoi5gPgaeGukmBIBFGCtJ+VcdlYUfU+gin
+         tVs4J3tEwdN8M1zxtZyu7WKa7WlpnV91PHpocm2YjwbI+MtL90xwhnOrb5QkNnql6Rib
+         pmpM3ckkMk/tg+sbdheBLI7XWgY3bZfgW3IzD/ZjWN0BOLnL34iPZJriGEH+88aui4ne
+         3qnNdV2kKFwqGPTgGVWkq6aayOJkZYebciRllmeHh82uUYgHPJES+tysFYka9a118rkm
+         wk8H7XBF1vPDESf2lbS5rt2KdWeXuDjXsrVhGuWEoc53avPv3sWnjAvxH3ku7VcbUmJV
+         TiLA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1759306949; x=1759911749;
+        d=1e100.net; s=20230601; t=1759306954; x=1759911754;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=V9IGpJufeP6E66MY+FRkIfF2QgQ90YgPFg2n1Q4hyMg=;
-        b=rAsVmv2LL6nAMLRBLNAg2Sh5d+xMqetngztUOPHaxGLdxbAPA0hBK8WDK62L1FQGWV
-         Okb5WTF3q2hESKvFoxDcVzdEy4BITVrXnEqofL1JJi24Ik21GvXO661v1r87X9iJZUJa
-         rN0bzUsJhKQB3WULzi/ZLssTyxzPAhbhOf+21ZlQZYYCR5Y5CZxvK2YeLoa0CV754zxu
-         x+HG0YuSEbljU7UxBHfU4ujiuJuqSEaZQX025JH4m3as8PdGJF4D1RiBEW09lVcyD5y0
-         G3XwgnMikweIoA8DfEUOyA/eqyyAG5Kc4n2LWR3Lj4OfNiBImgKxMfimjJKGdidT4cXH
-         v6FQ==
-X-Forwarded-Encrypted: i=1; AJvYcCXlFJYjG/SvQKSBDkYz7kFbL7CSDkDEPGvRuCGY/G54s/a35e46A4ueKepBNvBAxV3ibQE=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yw4+C5LmQ0RepDJjbw3/4f85R+1lHQBBZ8Q9P+tzeE9Z+sdRFbf
-	PVXXkY4cQBrT8g3u/XihghdZ5JjHQZqjepz1E5GVLKq4ZJ4tGy6IWb32ZE6uItqa5uM=
-X-Gm-Gg: ASbGncsJwK42aqbqWQOSh7gpZSzGZipTFEIyVGlUP+aBRoQLBRl3z1HumE81TeCru85
-	Rj3ETL/qzSpbmD/9/EPYXCR4mrrF7K996Rv9N4sLQEGyAZd5p7T6MOOjU7msnlrUrRxlE6hXyTg
-	CQP8/7iqGoYZknQshwojVtpNVGUPK2IVC3KA4GP/Xj4f4eOJ/+S6cED5jKrEg3zHzYiyPmjsmJK
-	Aekv55aMvWn2AhM4vXYw543xQ0LhZAXrpzvU/bw7NJaKzuCu16ntJMYw7J9lzKnn0VmVhq2j5ix
-	fSWpRh0uL6gQqj+pSa0E1UQEbd9fZe/NuzzryDOx3/aPmmdUBkLS2PSQgmF4cW7mV4LBhOdW0B1
-	VXo9ygG8TxVD2Lm0VUXb5W+cPflttZ5A2zI73lBskOljeTDr0EybP4wskkmFGeZ29kn2oD/s3ha
-	VDVys1m0qmP+ZlggvQRSfg
-X-Google-Smtp-Source: AGHT+IE7KkPLvaR1QK3ujSOd6vDORA988gltgTw9ux7aYxUsmtBHV92rbuikFKmOoYRH4wm0uOW4Ew==
-X-Received: by 2002:a05:6000:400b:b0:3e7:535e:986c with SMTP id ffacd0b85a97d-425577ee89cmr1798733f8f.2.1759306948890;
-        Wed, 01 Oct 2025 01:22:28 -0700 (PDT)
+        bh=uDgeo2zJE06h8QgA17T0RsOYYTnGmADPzWOfZYKLdkw=;
+        b=QEZrCB3Ps3n0eFAp3nXNkAu6rzTcX1N/QF4n6XtQFZ6xmwE0B4f76OKa0wXy+l0Mmc
+         udvMBb/b4JoEy4BPjzmj7HYOHSqdRtBvTDNZ8xA4ypzHPbcL68+aqGxhuboa5n9vWleZ
+         VdDMelJqYWIoHksCjPN0XRVffzEJG1VhAUhODNkUnOjYPu790qeqOS6DcJ18g02bWdUx
+         73IyC11p4JokvQHcrrLkSw0qFHJKFJ8N01Kg80kawwelXMKfcnjTasJKZclJ+3KB0V+0
+         fNLA4Sw5Ph/2OYKeTte0wpgDqb6+kBdSxvtODI/8j70knVqrNPowu1IDTHG/4KETOWzN
+         Xfew==
+X-Forwarded-Encrypted: i=1; AJvYcCWxViskuKdcNg1eTOdU9N5St5PJYq5czw9auss+uDhoppdvmb+9o0gEBRE7Keu+BrWmkk8=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwEvIG7qg3QBXeEKALpyp9X2Woutvq2WQ2vDnPMBCl/C0iDhHk7
+	/38ZJ7+izahfvS29Altf14T3QtPrImmhfAnSqwhD4dKyCVng0hJSEO69VuHtqzSSKgU=
+X-Gm-Gg: ASbGncs2PuYXeDH0E62v1CbR+bVKiCDEOTreg8BLF0gV9y8jnftKpfFjEzCC3kwAdOL
+	Elo5PYq4nmEdfs1x/Ch5mqrJXfKglHQzQqzLjcWLBpA4bZhDNtAGkKLG0HjsbmqURpvcyQawca+
+	TM3Okp2eJD06cOCdvW6HyVjuCqigzHj97zg5za+V2Nf7MoRYxF5YBc6N7/JXonQfkuVzbnJ4rvM
+	9l3eoQHP8evLVvOp0MaMizPPaXDc4inCe1QotS8zGIGwdlX+JME2wM96uh3HHbHlo7dJSjIDc+U
+	bOVLdC2hLy85wU++I1VoPWinWkyWVK75XNrtJl1rHs9OY7/8BPpe8OLE4NPiKlEAX9Zof30Lfnd
+	Tj/FylAQ8DTDohUP6WizvO2z4K/kCTRcn8GZyB8GXU+kivlR8eX2zkvznpn+axsizP4RzTi1eUF
+	uiyI59eQxnvwgLDoaGlckS
+X-Google-Smtp-Source: AGHT+IHvBo+V8oomdTfosMLuI0EpMsA23PUCxfHTKlB72ocxI/viBCxHR6lbgB29b5WbCh/EkkRIww==
+X-Received: by 2002:a05:600c:a30b:b0:46c:adf8:cd82 with SMTP id 5b1f17b1804b1-46e58aac99cmr48828895e9.3.1759306954128;
+        Wed, 01 Oct 2025 01:22:34 -0700 (PDT)
 Received: from localhost.localdomain (88-187-86-199.subs.proxad.net. [88.187.86.199])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-46e619b7e37sm27742425e9.1.2025.10.01.01.22.27
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-46e6111c1f4sm17544135e9.0.2025.10.01.01.22.32
         (version=TLS1_3 cipher=TLS_CHACHA20_POLY1305_SHA256 bits=256/256);
-        Wed, 01 Oct 2025 01:22:28 -0700 (PDT)
+        Wed, 01 Oct 2025 01:22:33 -0700 (PDT)
 From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@linaro.org>
 To: qemu-devel@nongnu.org
 Cc: "Michael S. Tsirkin" <mst@redhat.com>,
@@ -101,9 +101,9 @@ Cc: "Michael S. Tsirkin" <mst@redhat.com>,
 	Paolo Bonzini <pbonzini@redhat.com>,
 	qemu-s390x@nongnu.org,
 	Peter Xu <peterx@redhat.com>
-Subject: [PATCH 11/25] system/physmem: Un-inline cpu_physical_memory_is_clean()
-Date: Wed,  1 Oct 2025 10:21:11 +0200
-Message-ID: <20251001082127.65741-12-philmd@linaro.org>
+Subject: [PATCH 12/25] system/physmem: Rename @start argument of physical_memory_all_dirty()
+Date: Wed,  1 Oct 2025 10:21:12 +0200
+Message-ID: <20251001082127.65741-13-philmd@linaro.org>
 X-Mailer: git-send-email 2.51.0
 In-Reply-To: <20251001082127.65741-1-philmd@linaro.org>
 References: <20251001082127.65741-1-philmd@linaro.org>
@@ -116,55 +116,42 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 
-Avoid maintaining large functions in header, rely on the
-linker to optimize at linking time.
+Generally we want to clarify terminology and avoid confusions,
+prefering @start with (exclusive) @end, and base @addr with
+@length (for inclusive range).
+
+Here as cpu_physical_memory_all_dirty() operates on a range,
+rename @start as @addr.
 
 Signed-off-by: Philippe Mathieu-Daudé <philmd@linaro.org>
 ---
- include/system/ram_addr.h | 9 +--------
- system/physmem.c          | 9 +++++++++
- 2 files changed, 10 insertions(+), 8 deletions(-)
+ include/system/ram_addr.h | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
 
 diff --git a/include/system/ram_addr.h b/include/system/ram_addr.h
-index f8a307d1a3d..cdf25c315be 100644
+index cdf25c315be..7a9e8f86be0 100644
 --- a/include/system/ram_addr.h
 +++ b/include/system/ram_addr.h
-@@ -183,14 +183,7 @@ static inline bool cpu_physical_memory_all_dirty(ram_addr_t start,
+@@ -142,7 +142,7 @@ static inline void qemu_ram_block_writeback(RAMBlock *block)
+ #define DIRTY_CLIENTS_ALL     ((1 << DIRTY_MEMORY_NUM) - 1)
+ #define DIRTY_CLIENTS_NOCODE  (DIRTY_CLIENTS_ALL & ~(1 << DIRTY_MEMORY_CODE))
  
- bool cpu_physical_memory_get_dirty_flag(ram_addr_t addr, unsigned client);
+-static inline bool cpu_physical_memory_all_dirty(ram_addr_t start,
++static inline bool cpu_physical_memory_all_dirty(ram_addr_t addr,
+                                                  ram_addr_t length,
+                                                  unsigned client)
+ {
+@@ -153,8 +153,8 @@ static inline bool cpu_physical_memory_all_dirty(ram_addr_t start,
  
--static inline bool cpu_physical_memory_is_clean(ram_addr_t addr)
--{
--    bool vga = cpu_physical_memory_get_dirty_flag(addr, DIRTY_MEMORY_VGA);
--    bool code = cpu_physical_memory_get_dirty_flag(addr, DIRTY_MEMORY_CODE);
--    bool migration =
--        cpu_physical_memory_get_dirty_flag(addr, DIRTY_MEMORY_MIGRATION);
--    return !(vga && code && migration);
--}
-+bool cpu_physical_memory_is_clean(ram_addr_t addr);
+     assert(client < DIRTY_MEMORY_NUM);
  
- static inline uint8_t cpu_physical_memory_range_includes_clean(ram_addr_t start,
-                                                                ram_addr_t length,
-diff --git a/system/physmem.c b/system/physmem.c
-index 7973448b3f8..b27519c3075 100644
---- a/system/physmem.c
-+++ b/system/physmem.c
-@@ -946,6 +946,15 @@ bool cpu_physical_memory_get_dirty_flag(ram_addr_t addr, unsigned client)
-     return physical_memory_get_dirty(addr, 1, client);
- }
+-    end = TARGET_PAGE_ALIGN(start + length) >> TARGET_PAGE_BITS;
+-    page = start >> TARGET_PAGE_BITS;
++    end = TARGET_PAGE_ALIGN(addr + length) >> TARGET_PAGE_BITS;
++    page = addr >> TARGET_PAGE_BITS;
  
-+bool cpu_physical_memory_is_clean(ram_addr_t addr)
-+{
-+    bool vga = cpu_physical_memory_get_dirty_flag(addr, DIRTY_MEMORY_VGA);
-+    bool code = cpu_physical_memory_get_dirty_flag(addr, DIRTY_MEMORY_CODE);
-+    bool migration =
-+        cpu_physical_memory_get_dirty_flag(addr, DIRTY_MEMORY_MIGRATION);
-+    return !(vga && code && migration);
-+}
-+
- /* Note: start and end must be within the same ram block.  */
- bool cpu_physical_memory_test_and_clear_dirty(ram_addr_t start,
-                                               ram_addr_t length,
+     RCU_READ_LOCK_GUARD();
+ 
 -- 
 2.51.0
 
