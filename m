@@ -1,71 +1,237 @@
-Return-Path: <kvm+bounces-59294-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-59295-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 32786BB0982
-	for <lists+kvm@lfdr.de>; Wed, 01 Oct 2025 16:01:02 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id D38E8BB0A48
+	for <lists+kvm@lfdr.de>; Wed, 01 Oct 2025 16:06:57 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C3AE73B7F0F
-	for <lists+kvm@lfdr.de>; Wed,  1 Oct 2025 14:01:00 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8060F2A5110
+	for <lists+kvm@lfdr.de>; Wed,  1 Oct 2025 14:06:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B433F30215A;
-	Wed,  1 Oct 2025 14:00:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="enmNegtf"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AEB39303A10;
+	Wed,  1 Oct 2025 14:05:12 +0000 (UTC)
 X-Original-To: kvm@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BC26230171A;
-	Wed,  1 Oct 2025 14:00:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1574F303A09;
+	Wed,  1 Oct 2025 14:05:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1759327249; cv=none; b=F9wQIH1kE+Yk6MnbQU3/ge5ZQD1WxlDNRby+goa5xx6JDniLqB+NmFlm0IKTRts9oljzZSOqiZALB6iabuIGjUii0i/7hHCtFLwxxj26V01u7RdJlb+BiU/Xl6UQuyUuEgnKqv3iRm+LUHOdLhM3e/fMSw1PtOD2ncgLUaRy8yo=
+	t=1759327512; cv=none; b=sN0aQFPks6+I+jTiGvBhSTPpp5NEVSJYHUltrvqL9hHxrm2XTn7tmCrNKSKpQdB9rmRQGmun5GIeS42f8kr0SuTLSetyygocUsdcuOh5t73/7DaK/+Z0x1/OvJwI/G+MyQ2vImj/z4c6d/Uoj3ivDb90pPIb95ElWNHyoalz8Bo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1759327249; c=relaxed/simple;
-	bh=pOd1BvnuzhfzaFifmVUeHSLOXMN8uAeuiuOhBxWEacA=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=fUokCtwR7qTEF4aql8EVxuUXdfnJXgi5xVHKF5BHt7eeK3eabGNywvorpTJYCoIRVCjp0dpvrm5xo565uJs3JNozQXqYkoZMY0Et6Xriy5mv4VCSzTRYFRoZ6rxga3mxgqpueEc7VrbIdyoEiDnWcbQxLwmary0+4LmtO2rN3t8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=enmNegtf; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 03E72C4CEF5;
-	Wed,  1 Oct 2025 14:00:48 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1759327249;
-	bh=pOd1BvnuzhfzaFifmVUeHSLOXMN8uAeuiuOhBxWEacA=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=enmNegtfjCmxv7B0haPoSP+16jl1bWZm1STOzUMfW1Ww1EBmr+33tqzjZvfswIjvB
-	 RX8rXA/izNUsxyDxPaTFa8+zWUXDEOMS75bXznnSdzRtfikgd6LPV7a7tZSVuWf8N0
-	 ZRkXgcMPZMxnZVA1FHzLCDHmnxzKR/77iw6m80R6aiEduzS1rHFSWEhAYvS+BDAIy6
-	 DLuKj06+iPOIIVfwsdR6btAWve4ltyHunBUJirBi0srkvML73h+SJo5R3d2gBVqp8q
-	 Agf5busOQ8M8EINAbS11fDZ2UsfBoaIN+lbao+Mf1mJx1ZS/pae1IKdqGoDHmkK4uJ
-	 ym840VENb1coA==
-Date: Wed, 1 Oct 2025 07:00:48 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: "Michael S. Tsirkin" <mst@redhat.com>
-Cc: patchwork-bot+netdevbpf@kernel.org, linux-kernel@vger.kernel.org,
- zhangjiao2@cmss.chinamobile.com, jasowang@redhat.com, eperezma@redhat.com,
- kvm@vger.kernel.org, virtualization@lists.linux.dev, netdev@vger.kernel.org
-Subject: Re: [PATCH net] vhost: vringh: Fix copy_to_iter return value check
-Message-ID: <20251001070048.29d71d65@kernel.org>
-In-Reply-To: <20251001071456-mutt-send-email-mst@kernel.org>
-References: <cd637504a6e3967954a9e80fc1b75e8c0978087b.1758723310.git.mst@redhat.com>
-	<175893420700.108864.10199269230355246073.git-patchwork-notify@kernel.org>
-	<20251001071456-mutt-send-email-mst@kernel.org>
+	s=arc-20240116; t=1759327512; c=relaxed/simple;
+	bh=oWFIvq6oE4Bis32InxYXskecssaW5/5hnuHe3y+UwFk=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=L7yuCaNNQ0CcX9MM5e28lO7YOzsWV10r6D3Nn0WFivb3cgMygE5d0nOk2XZuzCUScSCeE78+avD64xIeaPlpiyQN2wgaDYKLTuR/2Y3ROY7DXL3wPWJMNMqyxpgBcjOuTT61a96zr/jpTOtG9KPXNuSkYIy0mX1JLW0K+45WRbk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 23D3816F2;
+	Wed,  1 Oct 2025 07:05:01 -0700 (PDT)
+Received: from [10.57.0.204] (unknown [10.57.0.204])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 771943F66E;
+	Wed,  1 Oct 2025 07:05:04 -0700 (PDT)
+Message-ID: <990a62ee-c7a7-4cdf-9e0a-efc7908a1f2e@arm.com>
+Date: Wed, 1 Oct 2025 15:05:02 +0100
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v10 03/43] arm64: RME: Add SMC definitions for calling the
+ RMM
+To: Marc Zyngier <maz@kernel.org>
+Cc: kvm@vger.kernel.org, kvmarm@lists.linux.dev,
+ Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>,
+ James Morse <james.morse@arm.com>, Oliver Upton <oliver.upton@linux.dev>,
+ Suzuki K Poulose <suzuki.poulose@arm.com>, Zenghui Yu
+ <yuzenghui@huawei.com>, linux-arm-kernel@lists.infradead.org,
+ linux-kernel@vger.kernel.org, Joey Gouly <joey.gouly@arm.com>,
+ Alexandru Elisei <alexandru.elisei@arm.com>,
+ Christoffer Dall <christoffer.dall@arm.com>, Fuad Tabba <tabba@google.com>,
+ linux-coco@lists.linux.dev,
+ Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>,
+ Gavin Shan <gshan@redhat.com>, Shanker Donthineni <sdonthineni@nvidia.com>,
+ Alper Gun <alpergun@google.com>, "Aneesh Kumar K . V"
+ <aneesh.kumar@kernel.org>, Emi Kisanuki <fj0570is@fujitsu.com>,
+ Vishal Annapurve <vannapurve@google.com>
+References: <20250820145606.180644-1-steven.price@arm.com>
+ <20250820145606.180644-4-steven.price@arm.com> <86o6qrym2b.wl-maz@kernel.org>
+ <747ab990-d02d-4e7c-9007-a7ac73bb1062@arm.com> <86ldluzvdb.wl-maz@kernel.org>
+From: Steven Price <steven.price@arm.com>
+Content-Language: en-GB
+In-Reply-To: <86ldluzvdb.wl-maz@kernel.org>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 
-On Wed, 1 Oct 2025 07:22:00 -0400 Michael S. Tsirkin wrote:
-> It's probably stable material. Does netdev still have a separate
-> stable process? I'm not sure I remember.
+On 01/10/2025 12:58, Marc Zyngier wrote:
+> On Wed, 01 Oct 2025 12:00:14 +0100,
+> Steven Price <steven.price@arm.com> wrote:
+>>
+>> Hi Marc,
+>>
+>> On 01/10/2025 11:05, Marc Zyngier wrote:
+>>> On Wed, 20 Aug 2025 15:55:23 +0100,
+>>> Steven Price <steven.price@arm.com> wrote:
+>>>>
+>>>> The RMM (Realm Management Monitor) provides functionality that can be
+>>>> accessed by SMC calls from the host.
+>>>>
+>>>> The SMC definitions are based on DEN0137[1] version 1.0-rel0
+>>>>
+>>>> [1] https://developer.arm.com/documentation/den0137/1-0rel0/
+>>>>
+>>>> Reviewed-by: Gavin Shan <gshan@redhat.com>
+>>>> Reviewed-by: Suzuki K Poulose <suzuki.poulose@arm.com>
+>>>> Signed-off-by: Steven Price <steven.price@arm.com>
+>>>> ---
+>>>> Changes since v9:
+>>>>  * Corrected size of 'ripas_value' in struct rec_exit. The spec states
+>>>>    this is an 8-bit type with padding afterwards (rather than a u64).
+>>>> Changes since v8:
+>>>>  * Added RMI_PERMITTED_GICV3_HCR_BITS to define which bits the RMM
+>>>>    permits to be modified.
+>>>> Changes since v6:
+>>>>  * Renamed REC_ENTER_xxx defines to include 'FLAG' to make it obvious
+>>>>    these are flag values.
+>>>> Changes since v5:
+>>>>  * Sorted the SMC #defines by value.
+>>>>  * Renamed SMI_RxI_CALL to SMI_RMI_CALL since the macro is only used for
+>>>>    RMI calls.
+>>>>  * Renamed REC_GIC_NUM_LRS to REC_MAX_GIC_NUM_LRS since the actual
+>>>>    number of available list registers could be lower.
+>>>>  * Provided a define for the reserved fields of FeatureRegister0.
+>>>>  * Fix inconsistent names for padding fields.
+>>>> Changes since v4:
+>>>>  * Update to point to final released RMM spec.
+>>>>  * Minor rearrangements.
+>>>> Changes since v3:
+>>>>  * Update to match RMM spec v1.0-rel0-rc1.
+>>>> Changes since v2:
+>>>>  * Fix specification link.
+>>>>  * Rename rec_entry->rec_enter to match spec.
+>>>>  * Fix size of pmu_ovf_status to match spec.
+>>>> ---
+>>>>  arch/arm64/include/asm/rmi_smc.h | 269 +++++++++++++++++++++++++++++++
+>>>>  1 file changed, 269 insertions(+)
+>>>>  create mode 100644 arch/arm64/include/asm/rmi_smc.h
+>>>>
+>>>> diff --git a/arch/arm64/include/asm/rmi_smc.h b/arch/arm64/include/asm/rmi_smc.h
+>>>> new file mode 100644
+>>>> index 000000000000..1000368f1bca
+>>>> --- /dev/null
+>>>> +++ b/arch/arm64/include/asm/rmi_smc.h
+>>>
+>>> [...]
+>>>
+>>>> +#define RMI_PERMITTED_GICV3_HCR_BITS	(ICH_HCR_EL2_UIE |		\
+>>>> +					 ICH_HCR_EL2_LRENPIE |		\
+>>>> +					 ICH_HCR_EL2_NPIE |		\
+>>>> +					 ICH_HCR_EL2_VGrp0EIE |		\
+>>>> +					 ICH_HCR_EL2_VGrp0DIE |		\
+>>>> +					 ICH_HCR_EL2_VGrp1EIE |		\
+>>>> +					 ICH_HCR_EL2_VGrp1DIE |		\
+>>>> +					 ICH_HCR_EL2_TDIR)
+>>>
+>>> Why should KVM care about what bits the RMM wants to use? Also, why
+>>> should KVM be forbidden to use the TALL0, TALL1 and TC bits? If
+>>> interrupt delivery is the host's business, then the RMM has no
+>>> business interfering with the GIC programming.
+>>
+>> The RMM receives the guest's GIC state in a field within the REC entry
+>> structure (enter.gicv3_hcr). The RMM spec states that the above is the
+>> list of fields that will be considered and that everything else must be
+>> 0[1]. So this is used to filter the configuration to make sure it's
+>> valid for the RMM.
+>>
+>> In terms of TALL0/TALL1/TC bits: these control trapping to EL2, and when
+>> in a realm guest the RMM is EL2 - so it's up to the RMM to configure
+>> these bits appropriately as it is the RMM which will have to deal with
+>> the trap.
+> 
+> And I claim this is *wrong*. Again, if the host is in charge of
+> interrupt injection, then the RMM has absolutely no business is
+> deciding what can or cannot be trapped. There is zero information
+> exposed by these traps that the host is not already aware of.
+> 
+>> [1] RWVGFJ in the 1.0 spec from
+>> https://developer.arm.com/documentation/den0137/latest
+> 
+> Well, until someone explains what this is protecting against, I
+> consider this as broken.
 
-Not any more. FWIW Paolo posted our -next PR earlier today, so the fix
-should reach Linus within the next couple of days.
+I'm not sure I understand how you want this to work. Ultimately the
+realm guest entry is a bounce from NS-EL2 to EL3 to R-EL2 to R-EL1/0. So
+the RMM has to have some control over the trapping behaviour for its own
+protection. The current spec means that the RMM does not have to
+implement the trap handlers for TALL0/TALL1/TC and can simply force
+these bits to 0. Allowing the host to enable traps that the RMM isn't
+expecting will obviously end in problems.
+
+If your argument is that because the NS host is emulating the GIC it
+needs to be able to do these traps, then that's something that can be
+fed back to the spec and hopefully improved. In that case the trap
+information would be provided in the rec_entry structure and on trap the
+RMM would return prepare information in the rec_exit structure. This
+could in theory be handled similar to an emulatable data abort with a
+new exit reason.
+
+The other approach would be to push more GIC handling into the RMM such
+that these trap bits are not needed (i.e. there's no requirement to exit
+to the NS host to handle the trap, and the RMM can program them
+independently). I'm afraid I don't understand the GIC well enough to
+know how these traps are used and how feasible it is for the RMM to just
+"do the right thing" here.
+
+>>>> +	union { /* 0x300 */
+>>>> +		struct {
+>>>> +			u64 gicv3_hcr;
+>>>> +			u64 gicv3_lrs[REC_MAX_GIC_NUM_LRS];
+>>>> +			u64 gicv3_misr;
+>>>
+>>> Why do we care about ICH_MISR_EL2? Surely we get everything in the
+>>> registers themselves, right? I think this goes back to my question
+>>> above: why is the RMM getting in the way of ICH_*_EL2 accesses?
+>>
+>> As mentioned above, the state of the guest's GIC isn't passed through
+>> the CPU's registers, but instead using the rec_enter/rec_exit
+>> structures. So unlike a normal guest entry we don't set all the CPU's
+>> register state before entering, but instead hand over a shared data
+>> structure and the RMM is responsible for actually programming the
+>> registers on the CPU. Since many of the registers are (deliberately)
+>> unavailable to the host (e.g. all the GPRs) it makes some sense the RMM
+>> also handles the GIC registers save/restore.
+> 
+> And I claim this is nonsense. There is nothing in these registers that
+> the host doesn't need to know about, which is why they are basically
+> copied over.
+
+Well it's fairly obvious that the host (generally) doesn't need to know
+the general purpose registers. And it's fairly clear that confidential
+compute would be pretty pointless if the hypervisor leaked those
+registers. So I hope we agree that some architectural registers are
+going to have to be handled differently from a normal guest.
+
+The GIC is unusual because it's (partly) emulated by the host. The
+configuration is also complex because during guest entry rather than
+just dropping down to EL1/0 we're actually performing an SMC to EL3 and
+world-switching. So I'm not sure to what extent programming the
+architectural registers in the normal world would work.
+
+> It all feels just wrong.
+
+I think fundamentally the confusing thing is there are two hypervisors
+pretending to be one. Both KVM and the RMM are providing part of the
+role of the hypervisor. It would "feel" neater for the RMM to take on
+more responsibility of the hypervisor role but that leads to more
+complexity in the RMM (whose simplicity is part of the value of CCA) and
+potentially less flexibility because you haven't got the functionality
+of KVM.
+
+Thanks,
+Steve
 
