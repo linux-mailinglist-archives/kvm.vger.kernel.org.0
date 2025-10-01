@@ -1,47 +1,47 @@
-Return-Path: <kvm+bounces-59313-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-59314-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4A6D0BB0F01
-	for <lists+kvm@lfdr.de>; Wed, 01 Oct 2025 17:06:52 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 823F5BB0F43
+	for <lists+kvm@lfdr.de>; Wed, 01 Oct 2025 17:08:55 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7860C165AE5
-	for <lists+kvm@lfdr.de>; Wed,  1 Oct 2025 15:04:06 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9895E3ACCA9
+	for <lists+kvm@lfdr.de>; Wed,  1 Oct 2025 15:04:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 41A8A30E82B;
-	Wed,  1 Oct 2025 14:59:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A6E4D30EF7E;
+	Wed,  1 Oct 2025 14:59:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="M74zuC+x"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="FZ1Y/c5W"
 X-Original-To: kvm@vger.kernel.org
-Received: from out-176.mta1.migadu.com (out-176.mta1.migadu.com [95.215.58.176])
+Received: from out-174.mta1.migadu.com (out-174.mta1.migadu.com [95.215.58.174])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E5B6E30DD01
-	for <kvm@vger.kernel.org>; Wed,  1 Oct 2025 14:59:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.176
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8EDE230E0C7
+	for <kvm@vger.kernel.org>; Wed,  1 Oct 2025 14:59:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.174
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1759330743; cv=none; b=UOn9rvbDGTi3LX+OG8Vg/sFB0bLO1uULxzh2Y9qunHthQEVz6aJLNTypAcmr2XgKIHzSyolU37f2oSTbrUhRmJG9ps5cHUgtnhVnnqo+UZMi209KxA68EQ4z1hYWQkifMiVbN1+Zr6S5V0Dwa8WtR+VxUTPgRzjHcPup1gGPPwM=
+	t=1759330745; cv=none; b=fKRMUNNfGCzGd4CtGh4btaGkKaqgaMWN3oOtN97i0xyMYBKH0mk4+uB867VN0a13OuBHSTkA4K6cfqHeN+13CayGM6yac2jjQ1hLstB86VX+zjeQjXFeh9c6Doq09yuuha5IIfCG/HAUgBoLGrPaRZzjSoQzK8/BOUfvJTU36pI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1759330743; c=relaxed/simple;
-	bh=cTQXGUYVVEI0C0zMAxK/fgTuCww5s7JNxb7uIbmmSuo=;
+	s=arc-20240116; t=1759330745; c=relaxed/simple;
+	bh=3XZH7BRfy9GZsl2l9dW0v0fS+AFAUfjkshK6UQgXYew=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=B1p5ieyXwD5cadb3DDgnM3WREeqmOCgsiyKvOh7bggPNWyVGJ+fjRix5Z0OTRxIy8x1LtGXpAFfn5rZV04kuinLSGG57r8tCsOGuk8+g31hXhDE2K+d2jcAhjHtZCrbE1ZLjeo9Y6mNSUzW66Ep1A1w27I9GcdmlFnp1FaRw4YA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=M74zuC+x; arc=none smtp.client-ip=95.215.58.176
+	 MIME-Version; b=WPW/KupyUXqX6VehX5fymU24AdCWHtAb3//gWJXn5IU6tQjqYqJxxTqRPyh0/nGC+BVVXWAgfzPA8Z0C0nnv02cKlpYofPZqGwJBdi1VGf2cWaKAhAdDyaJQci/LmbBHR/dwTg8ICWs2c8U46fpufiIuVU1CWT8W83Xc3DPm5Xw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=FZ1Y/c5W; arc=none smtp.client-ip=95.215.58.174
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1759330739;
+	t=1759330740;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=ibrGkq3SxosgUA5keIrPxQk0XJRBo1woRRNtpr/YYnE=;
-	b=M74zuC+x1/Ccv0M9v1P9jcUvWiAbo/kSQvydEatpnYA3fUEHx7/LLd+oKL4dklO1ZflvJf
-	zJDN2283ArjLom2L5qbKpgMKbGqcSvkOAVjvlxNIyPH+f/35F1iYo+1GLqUnvjmvdE3P5x
-	XePzus2KAkxth1TP84N7MygvPFhUwcg=
+	bh=njLgviB8zkOyaMBe4TukJ4UcfLgF0Cr0ukv2OYqfgrI=;
+	b=FZ1Y/c5WydlXzXQ6g6dQwVlvLoBYC2BsJimarpYifney7ha8MVlq//kjk06omLorh+N8M7
+	MPgvAE86qGjwt0h982X1UV5eAQSlwZE70GTZXqvyy4FNon70Qg6sm7kY3CBJcL9+APUWag
+	aofYjPDQ6e0IsCBl3BLG8ng6elG9y6Q=
 From: Yosry Ahmed <yosry.ahmed@linux.dev>
 To: Sean Christopherson <seanjc@google.com>
 Cc: Paolo Bonzini <pbonzini@redhat.com>,
@@ -49,9 +49,9 @@ Cc: Paolo Bonzini <pbonzini@redhat.com>,
 	linux-kernel@vger.kernel.org,
 	Yosry Ahmed <yosryahmed@google.com>,
 	Yosry Ahmed <yosry.ahmed@linux.dev>
-Subject: [PATCH 11/12] KVM: selftests: Refactor generic nested mapping outside VMX code
-Date: Wed,  1 Oct 2025 14:58:15 +0000
-Message-ID: <20251001145816.1414855-12-yosry.ahmed@linux.dev>
+Subject: [PATCH 12/12] KVM: selftests: Extend vmx_dirty_log_test to cover SVM
+Date: Wed,  1 Oct 2025 14:58:16 +0000
+Message-ID: <20251001145816.1414855-13-yosry.ahmed@linux.dev>
 In-Reply-To: <20251001145816.1414855-1-yosry.ahmed@linux.dev>
 References: <20251001145816.1414855-1-yosry.ahmed@linux.dev>
 Precedence: bulk
@@ -65,443 +65,361 @@ X-Migadu-Flow: FLOW_OUT
 
 From: Yosry Ahmed <yosryahmed@google.com>
 
-Now that the nested mapping functions in vmx.c are all generic except
-for nested_ept_create_pte(), move them all out into a new nested_map.c
-lib file and expose nested_ept_create_pte() in vmx.h. This allows
-reusing the code for NPT in following changes.
+Add the necessary infrastructure to support setting up nested NPTs and
+creating nested NPT mappings. There is some redundancy between
+nested_npt_create_pte() and nested_ept_create_pte(), especially that we
+access the same fields in both. An alternative is to have a single
+function in nested_map.c, and use macros to cast an obaque PTE pointer
+to the correct type (EPT entry vs NPT entry).
 
-While we're at it, merge nested_pg_map() and __nested_pg_map(), as the
-former is unused, and make sure all functions not exposed in the header
-are static.
+Add a check in kvm_cpu_has_ept() to return false on AMD CPUs without
+attempting to read VMX-specific MSRs, since now it can be called on AMD
+CPUs. Generalize the code in vmx_dirty_log_test.c by adding SVM-specific
+L1 code, doing some renaming (e.g. EPT -> TDP), and having setup code
+for both SVM and VMX in test_dirty_log().
+
+Having multiple points to check for SVM vs VMX is not ideal, but the
+alternatives either include a lot of redundancy or a lot of abstracting
+functions that will make the test logic harder to follow.
 
 Signed-off-by: Yosry Ahmed <yosry.ahmed@linux.dev>
 ---
- tools/testing/selftests/kvm/Makefile.kvm      |   1 +
- .../selftests/kvm/include/x86/nested_map.h    |  20 +++
- tools/testing/selftests/kvm/include/x86/vmx.h |  13 +-
- .../testing/selftests/kvm/lib/x86/memstress.c |   1 +
- .../selftests/kvm/lib/x86/nested_map.c        | 150 +++++++++++++++++
- tools/testing/selftests/kvm/lib/x86/vmx.c     | 155 +-----------------
- .../selftests/kvm/x86/vmx_dirty_log_test.c    |   1 +
- 7 files changed, 183 insertions(+), 158 deletions(-)
- create mode 100644 tools/testing/selftests/kvm/include/x86/nested_map.h
- create mode 100644 tools/testing/selftests/kvm/lib/x86/nested_map.c
+ tools/testing/selftests/kvm/Makefile.kvm      |  2 +-
+ .../selftests/kvm/include/x86/svm_util.h      | 13 +++
+ tools/testing/selftests/kvm/lib/x86/svm.c     | 70 ++++++++++++++
+ tools/testing/selftests/kvm/lib/x86/vmx.c     |  3 +
+ ...rty_log_test.c => nested_dirty_log_test.c} | 94 ++++++++++++++-----
+ 5 files changed, 155 insertions(+), 27 deletions(-)
+ rename tools/testing/selftests/kvm/x86/{vmx_dirty_log_test.c => nested_dirty_log_test.c} (62%)
 
 diff --git a/tools/testing/selftests/kvm/Makefile.kvm b/tools/testing/selftests/kvm/Makefile.kvm
-index 9b3c99acd51a3..9547d7263e236 100644
+index 9547d7263e236..acedbf726f493 100644
 --- a/tools/testing/selftests/kvm/Makefile.kvm
 +++ b/tools/testing/selftests/kvm/Makefile.kvm
-@@ -23,6 +23,7 @@ LIBKVM_x86 += lib/x86/apic.c
- LIBKVM_x86 += lib/x86/handlers.S
- LIBKVM_x86 += lib/x86/hyperv.c
- LIBKVM_x86 += lib/x86/memstress.c
-+LIBKVM_x86 += lib/x86/nested_map.c
- LIBKVM_x86 += lib/x86/pmu.c
- LIBKVM_x86 += lib/x86/processor.c
- LIBKVM_x86 += lib/x86/sev.c
-diff --git a/tools/testing/selftests/kvm/include/x86/nested_map.h b/tools/testing/selftests/kvm/include/x86/nested_map.h
-new file mode 100644
-index 0000000000000..362162dd6db43
---- /dev/null
-+++ b/tools/testing/selftests/kvm/include/x86/nested_map.h
-@@ -0,0 +1,20 @@
-+/* SPDX-License-Identifier: GPL-2.0-only */
-+/*
-+ * tools/testing/selftests/kvm/include/x86_64/nested_map.h
-+ *
-+ * Copyright (C) 2025, Google LLC.
-+ */
+@@ -113,7 +113,7 @@ TEST_GEN_PROGS_x86 += x86/userspace_io_test
+ TEST_GEN_PROGS_x86 += x86/userspace_msr_exit_test
+ TEST_GEN_PROGS_x86 += x86/vmx_apic_access_test
+ TEST_GEN_PROGS_x86 += x86/close_while_nested_test
+-TEST_GEN_PROGS_x86 += x86/vmx_dirty_log_test
++TEST_GEN_PROGS_x86 += x86/nested_dirty_log_test
+ TEST_GEN_PROGS_x86 += x86/vmx_exception_with_invalid_guest_state
+ TEST_GEN_PROGS_x86 += x86/vmx_msrs_test
+ TEST_GEN_PROGS_x86 += x86/vmx_invalid_nested_guest_state
+diff --git a/tools/testing/selftests/kvm/include/x86/svm_util.h b/tools/testing/selftests/kvm/include/x86/svm_util.h
+index b74c6dcddcbd6..84b79113b5433 100644
+--- a/tools/testing/selftests/kvm/include/x86/svm_util.h
++++ b/tools/testing/selftests/kvm/include/x86/svm_util.h
+@@ -27,6 +27,11 @@ struct svm_test_data {
+ 	void *msr; /* gva */
+ 	void *msr_hva;
+ 	uint64_t msr_gpa;
 +
-+#ifndef SELFTEST_KVM_NESTED_MAP_H
-+#define SELFTEST_KVM_NESTED_MAP_H
-+
-+#include "kvm_util.h"
-+
-+void nested_map(void *root_hva, struct kvm_vm *vm,
-+		uint64_t nested_paddr, uint64_t paddr, uint64_t size);
-+void nested_map_memslot(void *root_hva, struct kvm_vm *vm,
-+			uint32_t memslot);
-+void nested_identity_map_1g(void *root_hva, struct kvm_vm *vm,
-+			    uint64_t addr, uint64_t size);
-+
-+#endif /* SELFTEST_KVM_NESTED_MAP_H */
-diff --git a/tools/testing/selftests/kvm/include/x86/vmx.h b/tools/testing/selftests/kvm/include/x86/vmx.h
-index 06ae68cf9635c..49d763144dbfe 100644
---- a/tools/testing/selftests/kvm/include/x86/vmx.h
-+++ b/tools/testing/selftests/kvm/include/x86/vmx.h
-@@ -559,14 +559,11 @@ bool load_vmcs(struct vmx_pages *vmx);
++	/* NPT */
++	void *ncr3; /* gva */
++	void *ncr3_hva;
++	uint64_t ncr3_gpa;
+ };
  
- bool ept_1g_pages_supported(void);
+ static inline void vmmcall(void)
+@@ -57,6 +62,14 @@ struct svm_test_data *vcpu_alloc_svm(struct kvm_vm *vm, vm_vaddr_t *p_svm_gva);
+ void generic_svm_setup(struct svm_test_data *svm, void *guest_rip, void *guest_rsp);
+ void run_guest(struct vmcb *vmcb, uint64_t vmcb_gpa);
  
--void nested_pg_map(void *root_hva, struct kvm_vm *vm,
--		   uint64_t nested_paddr, uint64_t paddr);
--void nested_map(void *root_hva, struct kvm_vm *vm,
--		 uint64_t nested_paddr, uint64_t paddr, uint64_t size);
--void nested_map_memslot(void *root_hva, struct kvm_vm *vm,
--			uint32_t memslot);
--void nested_identity_map_1g(void *root_hva, struct kvm_vm *vm,
--			    uint64_t addr, uint64_t size);
-+bool nested_ept_create_pte(struct kvm_vm *vm,
++bool nested_npt_create_pte(struct kvm_vm *vm,
 +			   uint64_t *pte,
 +			   uint64_t paddr,
 +			   uint64_t *address,
 +			   bool *leaf);
- bool kvm_cpu_has_ept(void);
- void prepare_eptp(struct vmx_pages *vmx, struct kvm_vm *vm,
- 		  uint32_t eptp_memslot);
-diff --git a/tools/testing/selftests/kvm/lib/x86/memstress.c b/tools/testing/selftests/kvm/lib/x86/memstress.c
-index 7981e295cac70..d3e2fbd550acd 100644
---- a/tools/testing/selftests/kvm/lib/x86/memstress.c
-+++ b/tools/testing/selftests/kvm/lib/x86/memstress.c
-@@ -12,6 +12,7 @@
- #include "test_util.h"
- #include "kvm_util.h"
- #include "memstress.h"
-+#include "nested_map.h"
- #include "processor.h"
- #include "vmx.h"
++bool kvm_cpu_has_npt(void);
++void prepare_npt(struct svm_test_data *svm, struct kvm_vm *vm);
++
+ int open_sev_dev_path_or_exit(void);
  
-diff --git a/tools/testing/selftests/kvm/lib/x86/nested_map.c b/tools/testing/selftests/kvm/lib/x86/nested_map.c
-new file mode 100644
-index 0000000000000..454ab3e2f5b7e
---- /dev/null
-+++ b/tools/testing/selftests/kvm/lib/x86/nested_map.c
-@@ -0,0 +1,150 @@
-+// SPDX-License-Identifier: GPL-2.0-only
-+/*
-+ * tools/testing/selftests/kvm/lib/x86_64/nested_map.c
-+ *
-+ * Copyright (C) 2025, Google LLC.
-+ */
+ #endif /* SELFTEST_KVM_SVM_UTILS_H */
+diff --git a/tools/testing/selftests/kvm/lib/x86/svm.c b/tools/testing/selftests/kvm/lib/x86/svm.c
+index d239c20973918..9524abf7e779a 100644
+--- a/tools/testing/selftests/kvm/lib/x86/svm.c
++++ b/tools/testing/selftests/kvm/lib/x86/svm.c
+@@ -16,6 +16,23 @@
+ struct gpr64_regs guest_regs;
+ u64 rflags;
+ 
++struct nptPageTableEntry {
++       uint64_t present:1;
++       uint64_t writable:1;
++       uint64_t user:1;
++       uint64_t pwt:1;
++       uint64_t pcd:1;
++       uint64_t accessed:1;
++       uint64_t dirty:1;
++       uint64_t page_size:1;
++       uint64_t global:1;
++       uint64_t avail1:3;
++       uint64_t address:40;
++       uint64_t avail2:11;
++       uint64_t nx:1;
++};
++static_assert(sizeof(struct nptPageTableEntry) == sizeof(uint64_t));
 +
-+#include "test_util.h"
-+#include "kvm_util.h"
-+#include "processor.h"
-+#include "nested_map.h"
-+#include "vmx.h"
-+
-+static uint64_t nested_create_pte(struct kvm_vm *vm,
-+				  uint64_t *pte,
-+				  uint64_t nested_paddr,
-+				  uint64_t paddr,
-+				  int level,
-+				  bool want_leaf)
-+{
-+	bool leaf = want_leaf;
-+	uint64_t address;
-+
-+	if (!nested_ept_create_pte(vm, pte, paddr, &address, &leaf)) {
-+		TEST_ASSERT(!want_leaf,
-+			    "Cannot create leaf entry at level: %u, nested_paddr: 0x%lx",
-+			    level, nested_paddr);
-+		TEST_ASSERT(!leaf,
-+			    "Leaf entry already exists at level: %u, nested_paddr: 0x%lx",
-+			    level, nested_paddr);
-+	}
-+	return address;
-+}
-+
-+static void nested_pg_map(void *root_hva, struct kvm_vm *vm, uint64_t
-+			  nested_paddr, uint64_t paddr, int target_level)
-+{
-+	const uint64_t page_size = PG_LEVEL_SIZE(target_level);
-+	uint64_t *pt = root_hva, *pte;
-+	uint16_t index, address;
-+	bool leaf;
-+
-+	TEST_ASSERT(vm->mode == VM_MODE_PXXV48_4K, "Attempt to use "
-+		    "unknown or unsupported guest mode, mode: 0x%x", vm->mode);
-+
-+	TEST_ASSERT((nested_paddr >> 48) == 0,
-+		    "Nested physical address 0x%lx requires 5-level paging",
-+		    nested_paddr);
-+	TEST_ASSERT((nested_paddr % page_size) == 0,
-+		    "Nested physical address not on page boundary,\n"
-+		    "  nested_paddr: 0x%lx page_size: 0x%lx",
-+		    nested_paddr, page_size);
-+	TEST_ASSERT((nested_paddr >> vm->page_shift) <= vm->max_gfn,
-+		    "Physical address beyond beyond maximum supported,\n"
-+		    "  nested_paddr: 0x%lx vm->max_gfn: 0x%lx vm->page_size: 0x%x",
-+		    paddr, vm->max_gfn, vm->page_size);
-+	TEST_ASSERT((paddr % page_size) == 0,
-+		    "Physical address not on page boundary,\n"
-+		    "  paddr: 0x%lx page_size: 0x%lx",
-+		    paddr, page_size);
-+	TEST_ASSERT((paddr >> vm->page_shift) <= vm->max_gfn,
-+		    "Physical address beyond beyond maximum supported,\n"
-+		    "  paddr: 0x%lx vm->max_gfn: 0x%lx vm->page_size: 0x%x",
-+		    paddr, vm->max_gfn, vm->page_size);
-+
-+	for (int level = PG_LEVEL_512G; level >= PG_LEVEL_4K; level--) {
-+		index = (nested_paddr >> PG_LEVEL_SHIFT(level)) & 0x1ffu;
-+		pte = &pt[index];
-+		leaf = (level == target_level);
-+
-+		address = nested_create_pte(vm, pte, nested_paddr, paddr, level, leaf);
-+
-+		if (leaf)
-+			break;
-+
-+		pt = addr_gpa2hva(vm, address * vm->page_size);
-+	}
-+
-+}
-+
-+/*
-+ * Map a range of EPT guest physical addresses to the VM's physical address
-+ *
-+ * Input Args:
-+ *   vm - Virtual Machine
-+ *   nested_paddr - Nested guest physical address to map
-+ *   paddr - VM Physical Address
-+ *   size - The size of the range to map
-+ *   level - The level at which to map the range
-+ *
-+ * Output Args: None
-+ *
-+ * Return: None
-+ *
-+ * Within the VM given by vm, creates a nested guest translation for the
-+ * page range starting at nested_paddr to the page range starting at paddr.
-+ */
-+static void __nested_map(void *root_hva, struct kvm_vm *vm, uint64_t
-+			 nested_paddr, uint64_t paddr, uint64_t size, int level)
-+{
-+	size_t page_size = PG_LEVEL_SIZE(level);
-+	size_t npages = size / page_size;
-+
-+	TEST_ASSERT(nested_paddr + size > nested_paddr, "Vaddr overflow");
-+	TEST_ASSERT(paddr + size > paddr, "Paddr overflow");
-+
-+	while (npages--) {
-+		nested_pg_map(root_hva, vm, nested_paddr, paddr, level);
-+		nested_paddr += page_size;
-+		paddr += page_size;
-+	}
-+}
-+
-+void nested_map(void *root_hva, struct kvm_vm *vm,
-+		uint64_t nested_paddr, uint64_t paddr, uint64_t size)
-+{
-+	__nested_map(root_hva, vm, nested_paddr, paddr, size, PG_LEVEL_4K);
-+}
-+
-+/*
-+ * Prepare an identity nested page table that maps all the
-+ * physical pages in VM.
-+ */
-+void nested_map_memslot(void *root_hva, struct kvm_vm *vm,
-+			uint32_t memslot)
-+{
-+	sparsebit_idx_t i, last;
-+	struct userspace_mem_region *region =
-+		memslot2region(vm, memslot);
-+
-+	i = (region->region.guest_phys_addr >> vm->page_shift) - 1;
-+	last = i + (region->region.memory_size >> vm->page_shift);
-+	for (;;) {
-+		i = sparsebit_next_clear(region->unused_phy_pages, i);
-+		if (i > last)
-+			break;
-+
-+		nested_map(root_hva, vm,
-+			   (uint64_t)i << vm->page_shift,
-+			   (uint64_t)i << vm->page_shift,
-+			   1 << vm->page_shift);
-+	}
-+}
-+
-+/* Identity map a region with 1GiB Pages. */
-+void nested_identity_map_1g(void *root_hva, struct kvm_vm *vm,
-+			    uint64_t addr, uint64_t size)
-+{
-+	__nested_map(root_hva, vm, addr, addr, size, PG_LEVEL_1G);
-+}
-diff --git a/tools/testing/selftests/kvm/lib/x86/vmx.c b/tools/testing/selftests/kvm/lib/x86/vmx.c
-index eeacf42bf30b1..24345213fcd04 100644
---- a/tools/testing/selftests/kvm/lib/x86/vmx.c
-+++ b/tools/testing/selftests/kvm/lib/x86/vmx.c
-@@ -365,11 +365,11 @@ void prepare_vmcs(struct vmx_pages *vmx, void *guest_rip, void *guest_rsp)
- 	init_vmcs_guest_state(guest_rip, guest_rsp);
+ /* Allocate memory regions for nested SVM tests.
+  *
+  * Input Args:
+@@ -59,6 +76,54 @@ static void vmcb_set_seg(struct vmcb_seg *seg, u16 selector,
+ 	seg->base = base;
  }
  
--static bool nested_ept_create_pte(struct kvm_vm *vm,
--				  uint64_t *pte,
--				  uint64_t paddr,
--				  uint64_t *address,
--				  bool *leaf)
-+bool nested_ept_create_pte(struct kvm_vm *vm,
++bool nested_npt_create_pte(struct kvm_vm *vm,
 +			   uint64_t *pte,
 +			   uint64_t paddr,
 +			   uint64_t *address,
 +			   bool *leaf)
++{
++	struct nptPageTableEntry *npte = (struct nptPageTableEntry *)pte;
++
++	if (npte->present) {
++		*leaf = npte->page_size;
++		*address = npte->address;
++		return false;
++	}
++
++	npte->present = true;
++	npte->writable = true;
++	npte->page_size = *leaf;
++
++	if (*leaf)
++		npte->address = paddr >> vm->page_shift;
++	else
++		npte->address = vm_alloc_page_table(vm) >> vm->page_shift;
++
++	*address = npte->address;
++
++	/*
++	 * For now mark these as accessed and dirty because the only
++	 * testcase we have needs that.  Can be reconsidered later.
++	 */
++	npte->accessed = *leaf;
++	npte->dirty = *leaf;
++	return true;
++}
++
++bool kvm_cpu_has_npt(void)
++{
++       return kvm_cpu_has(X86_FEATURE_NPT);
++}
++
++void prepare_npt(struct svm_test_data *svm, struct kvm_vm *vm)
++{
++	TEST_ASSERT(kvm_cpu_has_npt(), "KVM doesn't support nested NPT");
++
++	svm->ncr3 = (void *)vm_vaddr_alloc_page(vm);
++	svm->ncr3_hva = addr_gva2hva(vm, (uintptr_t)svm->ncr3);
++	svm->ncr3_gpa = addr_gva2gpa(vm, (uintptr_t)svm->ncr3);
++}
++
+ void generic_svm_setup(struct svm_test_data *svm, void *guest_rip, void *guest_rsp)
  {
- 	struct eptPageTableEntry *epte = (struct eptPageTableEntry *)pte;
- 
-@@ -401,151 +401,6 @@ static bool nested_ept_create_pte(struct kvm_vm *vm,
- 	return true;
+ 	struct vmcb *vmcb = svm->vmcb;
+@@ -102,6 +167,11 @@ void generic_svm_setup(struct svm_test_data *svm, void *guest_rip, void *guest_r
+ 	vmcb->save.rip = (u64)guest_rip;
+ 	vmcb->save.rsp = (u64)guest_rsp;
+ 	guest_regs.rdi = (u64)svm;
++
++	if (svm->ncr3_gpa) {
++		ctrl->nested_ctl |= SVM_NESTED_CTL_NP_ENABLE;
++		ctrl->nested_cr3 = svm->ncr3_gpa;
++	}
  }
  
--static uint64_t nested_create_pte(struct kvm_vm *vm,
--				  uint64_t *pte,
--				  uint64_t nested_paddr,
--				  uint64_t paddr,
--				  int level,
--				  bool want_leaf)
--{
--	bool leaf = want_leaf;
--	uint64_t address;
--
--	if (!nested_ept_create_pte(vm, pte, paddr, &address, &leaf)) {
--		TEST_ASSERT(!want_leaf,
--			    "Cannot create leaf entry at level: %u, nested_paddr: 0x%lx",
--			    level, nested_paddr);
--		TEST_ASSERT(!leaf,
--			    "Leaf entry already exists at level: %u, nested_paddr: 0x%lx",
--			    level, nested_paddr);
--	}
--	return address;
--}
--
--
--void __nested_pg_map(void *root_hva, struct kvm_vm *vm,
--		     uint64_t nested_paddr, uint64_t paddr, int target_level)
--{
--	const uint64_t page_size = PG_LEVEL_SIZE(target_level);
--	uint64_t *pt = root_hva, *pte;
--	uint16_t index, address;
--	bool leaf;
--
--	TEST_ASSERT(vm->mode == VM_MODE_PXXV48_4K, "Attempt to use "
--		    "unknown or unsupported guest mode, mode: 0x%x", vm->mode);
--
--	TEST_ASSERT((nested_paddr >> 48) == 0,
--		    "Nested physical address 0x%lx requires 5-level paging",
--		    nested_paddr);
--	TEST_ASSERT((nested_paddr % page_size) == 0,
--		    "Nested physical address not on page boundary,\n"
--		    "  nested_paddr: 0x%lx page_size: 0x%lx",
--		    nested_paddr, page_size);
--	TEST_ASSERT((nested_paddr >> vm->page_shift) <= vm->max_gfn,
--		    "Physical address beyond beyond maximum supported,\n"
--		    "  nested_paddr: 0x%lx vm->max_gfn: 0x%lx vm->page_size: 0x%x",
--		    paddr, vm->max_gfn, vm->page_size);
--	TEST_ASSERT((paddr % page_size) == 0,
--		    "Physical address not on page boundary,\n"
--		    "  paddr: 0x%lx page_size: 0x%lx",
--		    paddr, page_size);
--	TEST_ASSERT((paddr >> vm->page_shift) <= vm->max_gfn,
--		    "Physical address beyond beyond maximum supported,\n"
--		    "  paddr: 0x%lx vm->max_gfn: 0x%lx vm->page_size: 0x%x",
--		    paddr, vm->max_gfn, vm->page_size);
--
--	for (int level = PG_LEVEL_512G; level >= PG_LEVEL_4K; level--) {
--		index = (nested_paddr >> PG_LEVEL_SHIFT(level)) & 0x1ffu;
--		pte = &pt[index];
--		leaf = (level == target_level);
--
--		address = nested_create_pte(vm, pte, nested_paddr, paddr, level, leaf);
--
--		if (leaf)
--			break;
--
--		pt = addr_gpa2hva(vm, address * vm->page_size);
--	}
--
--}
--
--void nested_pg_map(void *root_hva, struct kvm_vm *vm,
--		   uint64_t nested_paddr, uint64_t paddr)
--{
--	__nested_pg_map(root_hva, vm, nested_paddr, paddr, PG_LEVEL_4K);
--}
--
--/*
-- * Map a range of EPT guest physical addresses to the VM's physical address
-- *
-- * Input Args:
-- *   vm - Virtual Machine
-- *   nested_paddr - Nested guest physical address to map
-- *   paddr - VM Physical Address
-- *   size - The size of the range to map
-- *   level - The level at which to map the range
-- *
-- * Output Args: None
-- *
-- * Return: None
-- *
-- * Within the VM given by vm, creates a nested guest translation for the
-- * page range starting at nested_paddr to the page range starting at paddr.
-- */
--void __nested_map(void *root_hva, struct kvm_vm *vm,
--		  uint64_t nested_paddr, uint64_t paddr, uint64_t size,
--		  int level)
--{
--	size_t page_size = PG_LEVEL_SIZE(level);
--	size_t npages = size / page_size;
--
--	TEST_ASSERT(nested_paddr + size > nested_paddr, "Vaddr overflow");
--	TEST_ASSERT(paddr + size > paddr, "Paddr overflow");
--
--	while (npages--) {
--		__nested_pg_map(root_hva, vm, nested_paddr, paddr, level);
--		nested_paddr += page_size;
--		paddr += page_size;
--	}
--}
--
--void nested_map(void *root_hva, struct kvm_vm *vm,
--		uint64_t nested_paddr, uint64_t paddr, uint64_t size)
--{
--	__nested_map(root_hva, vm, nested_paddr, paddr, size, PG_LEVEL_4K);
--}
--
--/* Prepare an identity extended page table that maps all the
-- * physical pages in VM.
-- */
--void nested_map_memslot(void *root_hva, struct kvm_vm *vm,
--			uint32_t memslot)
--{
--	sparsebit_idx_t i, last;
--	struct userspace_mem_region *region =
--		memslot2region(vm, memslot);
--
--	i = (region->region.guest_phys_addr >> vm->page_shift) - 1;
--	last = i + (region->region.memory_size >> vm->page_shift);
--	for (;;) {
--		i = sparsebit_next_clear(region->unused_phy_pages, i);
--		if (i > last)
--			break;
--
--		nested_map(root_hva, vm,
--			   (uint64_t)i << vm->page_shift,
--			   (uint64_t)i << vm->page_shift,
--			   1 << vm->page_shift);
--	}
--}
--
--/* Identity map a region with 1GiB Pages. */
--void nested_identity_map_1g(void *root_hva, struct kvm_vm *vm,
--			    uint64_t addr, uint64_t size)
--{
--	__nested_map(root_hva, vm, addr, addr, size, PG_LEVEL_1G);
--}
--
- bool kvm_cpu_has_ept(void)
+ /*
+diff --git a/tools/testing/selftests/kvm/lib/x86/vmx.c b/tools/testing/selftests/kvm/lib/x86/vmx.c
+index 24345213fcd04..0ced959184cd9 100644
+--- a/tools/testing/selftests/kvm/lib/x86/vmx.c
++++ b/tools/testing/selftests/kvm/lib/x86/vmx.c
+@@ -405,6 +405,9 @@ bool kvm_cpu_has_ept(void)
  {
  	uint64_t ctrl;
-diff --git a/tools/testing/selftests/kvm/x86/vmx_dirty_log_test.c b/tools/testing/selftests/kvm/x86/vmx_dirty_log_test.c
-index 21a57805e9780..db88a1e5e9d0c 100644
---- a/tools/testing/selftests/kvm/x86/vmx_dirty_log_test.c
-+++ b/tools/testing/selftests/kvm/x86/vmx_dirty_log_test.c
-@@ -11,6 +11,7 @@
  
- #include "test_util.h"
++	if (!kvm_cpu_has(X86_FEATURE_VMX))
++		return false;
++
+ 	ctrl = kvm_get_feature_msr(MSR_IA32_VMX_TRUE_PROCBASED_CTLS) >> 32;
+ 	if (!(ctrl & CPU_BASED_ACTIVATE_SECONDARY_CONTROLS))
+ 		return false;
+diff --git a/tools/testing/selftests/kvm/x86/vmx_dirty_log_test.c b/tools/testing/selftests/kvm/x86/nested_dirty_log_test.c
+similarity index 62%
+rename from tools/testing/selftests/kvm/x86/vmx_dirty_log_test.c
+rename to tools/testing/selftests/kvm/x86/nested_dirty_log_test.c
+index db88a1e5e9d0c..56f741ddce944 100644
+--- a/tools/testing/selftests/kvm/x86/vmx_dirty_log_test.c
++++ b/tools/testing/selftests/kvm/x86/nested_dirty_log_test.c
+@@ -13,6 +13,7 @@
  #include "kvm_util.h"
-+#include "nested_map.h"
+ #include "nested_map.h"
  #include "processor.h"
++#include "svm_util.h"
  #include "vmx.h"
  
+ /* The memory slot index to track dirty pages */
+@@ -26,6 +27,8 @@
+ #define NESTED_TEST_MEM1		0xc0001000
+ #define NESTED_TEST_MEM2		0xc0002000
+ 
++#define L2_GUEST_STACK_SIZE 64
++
+ static void l2_guest_code(u64 *a, u64 *b)
+ {
+ 	READ_ONCE(*a);
+@@ -43,20 +46,19 @@ static void l2_guest_code(u64 *a, u64 *b)
+ 	vmcall();
+ }
+ 
+-static void l2_guest_code_ept_enabled(void)
++static void l2_guest_code_tdp_enabled(void)
+ {
+ 	l2_guest_code((u64 *)NESTED_TEST_MEM1, (u64 *)NESTED_TEST_MEM2);
+ }
+ 
+-static void l2_guest_code_ept_disabled(void)
++static void l2_guest_code_tdp_disabled(void)
+ {
+-	/* Access the same L1 GPAs as l2_guest_code_ept_enabled() */
++	/* Access the same L1 GPAs as l2_guest_code_tdp_enabled() */
+ 	l2_guest_code((u64 *)GUEST_TEST_MEM, (u64 *)GUEST_TEST_MEM);
+ }
+ 
+-void l1_guest_code(struct vmx_pages *vmx)
++void l1_vmx_code(struct vmx_pages *vmx)
+ {
+-#define L2_GUEST_STACK_SIZE 64
+ 	unsigned long l2_guest_stack[L2_GUEST_STACK_SIZE];
+ 	void *l2_rip;
+ 
+@@ -65,9 +67,9 @@ void l1_guest_code(struct vmx_pages *vmx)
+ 	GUEST_ASSERT(load_vmcs(vmx));
+ 
+ 	if (vmx->eptp_gpa)
+-		l2_rip = l2_guest_code_ept_enabled;
++		l2_rip = l2_guest_code_tdp_enabled;
+ 	else
+-		l2_rip = l2_guest_code_ept_disabled;
++		l2_rip = l2_guest_code_tdp_disabled;
+ 
+ 	prepare_vmcs(vmx, l2_rip, &l2_guest_stack[L2_GUEST_STACK_SIZE]);
+ 
+@@ -78,10 +80,38 @@ void l1_guest_code(struct vmx_pages *vmx)
+ 	GUEST_DONE();
+ }
+ 
+-static void test_vmx_dirty_log(bool enable_ept)
++static void l1_svm_code(struct svm_test_data *svm)
++{
++       unsigned long l2_guest_stack[L2_GUEST_STACK_SIZE];
++       void *l2_rip;
++
++       if (svm->ncr3_gpa)
++               l2_rip = l2_guest_code_tdp_enabled;
++       else
++               l2_rip = l2_guest_code_tdp_disabled;
++
++       generic_svm_setup(svm, l2_rip, &l2_guest_stack[L2_GUEST_STACK_SIZE]);
++
++       GUEST_SYNC(false);
++       run_guest(svm->vmcb, svm->vmcb_gpa);
++       GUEST_SYNC(false);
++       GUEST_ASSERT(svm->vmcb->control.exit_code == SVM_EXIT_VMMCALL);
++       GUEST_DONE();
++}
++
++static void l1_guest_code(void *data)
++{
++	if (this_cpu_has(X86_FEATURE_VMX))
++		l1_vmx_code(data);
++	else
++		l1_svm_code(data);
++}
++
++static void test_dirty_log(bool enable_tdp)
+ {
+-	vm_vaddr_t vmx_pages_gva = 0;
+-	struct vmx_pages *vmx;
++	struct svm_test_data *svm = NULL;
++	struct vmx_pages *vmx = NULL;
++	vm_vaddr_t nested_gva = 0;
+ 	unsigned long *bmap;
+ 	uint64_t *host_test_mem;
+ 
+@@ -90,12 +120,16 @@ static void test_vmx_dirty_log(bool enable_ept)
+ 	struct ucall uc;
+ 	bool done = false;
+ 
+-	pr_info("Nested EPT: %s\n", enable_ept ? "enabled" : "disabled");
++	pr_info("Nested TDP: %s\n", enable_tdp ? "enabled" : "disabled");
+ 
+ 	/* Create VM */
+ 	vm = vm_create_with_one_vcpu(&vcpu, l1_guest_code);
+-	vmx = vcpu_alloc_vmx(vm, &vmx_pages_gva);
+-	vcpu_args_set(vcpu, 1, vmx_pages_gva);
++	if (kvm_cpu_has(X86_FEATURE_VMX))
++		vmx = vcpu_alloc_vmx(vm, &nested_gva);
++	else
++		svm = vcpu_alloc_svm(vm, &nested_gva);
++
++	vcpu_args_set(vcpu, 1, nested_gva);
+ 
+ 	/* Add an extra memory slot for testing dirty logging */
+ 	vm_userspace_mem_region_add(vm, VM_MEM_SRC_ANONYMOUS,
+@@ -114,17 +148,25 @@ static void test_vmx_dirty_log(bool enable_ept)
+ 	 * ... pages in the L2 GPA range [0xc0001000, 0xc0003000) will map to
+ 	 * 0xc0000000.
+ 	 *
+-	 * Note that prepare_eptp should be called only L1's GPA map is done,
+-	 * meaning after the last call to virt_map.
++	 * Note that prepare_eptp()/prepare_npt() should be called only when
++	 * L1's GPA map is done, meaning after the last call to virt_map.
+ 	 *
+-	 * When EPT is disabled, the L2 guest code will still access the same L1
+-	 * GPAs as the EPT enabled case.
++	 * When TDP is disabled, the L2 guest code will still access the same L1
++	 * GPAs as the TDP enabled case.
+ 	 */
+-	if (enable_ept) {
+-		prepare_eptp(vmx, vm, 0);
+-		nested_map_memslot(vmx->eptp_hva, vm, 0);
+-		nested_map(vmx->eptp_hva, vm, NESTED_TEST_MEM1, GUEST_TEST_MEM, 4096);
+-		nested_map(vmx->eptp_hva, vm, NESTED_TEST_MEM2, GUEST_TEST_MEM, 4096);
++	if (enable_tdp) {
++		void *root_hva;
++
++		if (kvm_cpu_has(X86_FEATURE_VMX)) {
++			prepare_eptp(vmx, vm, 0);
++			root_hva = vmx->eptp_hva;
++		} else {
++			prepare_npt(svm, vm);
++			root_hva = svm->ncr3_hva;
++		}
++		nested_map_memslot(root_hva, vm, 0);
++		nested_map(root_hva, vm, NESTED_TEST_MEM1, GUEST_TEST_MEM, 4096);
++		nested_map(root_hva, vm, NESTED_TEST_MEM2, GUEST_TEST_MEM, 4096);
+ 	}
+ 
+ 	bmap = bitmap_zalloc(TEST_MEM_PAGES);
+@@ -169,12 +211,12 @@ static void test_vmx_dirty_log(bool enable_ept)
+ 
+ int main(int argc, char *argv[])
+ {
+-	TEST_REQUIRE(kvm_cpu_has(X86_FEATURE_VMX));
++	TEST_REQUIRE(kvm_cpu_has(X86_FEATURE_VMX) || kvm_cpu_has(X86_FEATURE_SVM));
+ 
+-	test_vmx_dirty_log(/*enable_ept=*/false);
++	test_dirty_log(/*enable_tdp=*/false);
+ 
+-	if (kvm_cpu_has_ept())
+-		test_vmx_dirty_log(/*enable_ept=*/true);
++	if (kvm_cpu_has_ept() || kvm_cpu_has_npt())
++		test_dirty_log(/*enable_tdp=*/true);
+ 
+ 	return 0;
+ }
 -- 
 2.51.0.618.g983fd99d29-goog
 
