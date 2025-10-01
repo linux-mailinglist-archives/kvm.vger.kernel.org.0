@@ -1,80 +1,81 @@
-Return-Path: <kvm+bounces-59370-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-59371-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5D1D3BB1BC9
-	for <lists+kvm@lfdr.de>; Wed, 01 Oct 2025 23:03:33 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 051E3BB1C38
+	for <lists+kvm@lfdr.de>; Wed, 01 Oct 2025 23:06:52 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1C4F23B9377
-	for <lists+kvm@lfdr.de>; Wed,  1 Oct 2025 21:03:32 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 5B24719206C9
+	for <lists+kvm@lfdr.de>; Wed,  1 Oct 2025 21:07:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CAC1F30DD2E;
-	Wed,  1 Oct 2025 21:03:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 70BA7312822;
+	Wed,  1 Oct 2025 21:04:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="A/2X4Xtw"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="yKwuyWt/"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pl1-f181.google.com (mail-pl1-f181.google.com [209.85.214.181])
+Received: from mail-pf1-f171.google.com (mail-pf1-f171.google.com [209.85.210.171])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 759D530DEA9
-	for <kvm@vger.kernel.org>; Wed,  1 Oct 2025 21:03:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.181
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9894B311C27
+	for <kvm@vger.kernel.org>; Wed,  1 Oct 2025 21:04:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.171
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1759352606; cv=none; b=nmbTFdbdZVrZMoUqAK7aGHnclTU4Rpyht45HFkauJ3tQXmNMRG/pEmGZocECxGOTP1jswtoqe8O7zA83fFJc+Pfwad3yaaRh5mqcCIAxEegxS2gVPwEwXgpDtxOr0fgU0BtAwl20rbcaaJ8UAAVrSiaX8FA2x+2V3htCnJlSrgQ=
+	t=1759352650; cv=none; b=EwwskMQJj7EbSiYbJbqpcmdK6kbTbpcz5rFR0qpuMagrBqh4RGeA9r6txAlagIVYfEPMd7irn3suXCV0fix+sqK4QIblZ+GX+5qFg/kxYQfBl4X84ASojaDf1kdTPTESzemJ9aKv+bZied3NKh+zRcZ33VtlMXTOUsqZT4TdvHQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1759352606; c=relaxed/simple;
-	bh=VE4AMct4NkxLw8d/dkKEm1Doer3T9sCrgHhTxsp1aaY=;
+	s=arc-20240116; t=1759352650; c=relaxed/simple;
+	bh=0NNPh6nN+DvOBnHOxRGWsfvGhR3YhcnkCwFxoDQBtOY=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=XH1dOeOFkxB44F8/mG2KhzyR53rF87Bm50+6l+DurK789Onq0qRF0ZUEcwPwj1q9Cx9Dv41sAIVxr56nyqSmT1j3+DcDMhlgJMATjPDYQr8WiNDSNgXwBZPWXu5HcYtTIX0AGFmER2gI5U3W+N+2ctNq0nufJeOrNLnaQHfWV24=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=A/2X4Xtw; arc=none smtp.client-ip=209.85.214.181
+	 In-Reply-To:Content-Type; b=kM5T1kwRZT89sD01wTzUymNXOfSl5sGOcgWMHkmwKP2Ng23Bc6y7cUuJ1Ob2TGR3/gveNk7+8ec0PV0K7VbLmdZyq5Ou2vSzwQn37hzVbgPla6Jkb8WPHmj295bSE2u+vDgNPYZT7OYjFoatKNCsOJUDZx1mphkjxw8a42DoXAY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=yKwuyWt/; arc=none smtp.client-ip=209.85.210.171
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
-Received: by mail-pl1-f181.google.com with SMTP id d9443c01a7336-27ee41e074dso2904415ad.1
-        for <kvm@vger.kernel.org>; Wed, 01 Oct 2025 14:03:24 -0700 (PDT)
+Received: by mail-pf1-f171.google.com with SMTP id d2e1a72fcca58-77f5d497692so574694b3a.1
+        for <kvm@vger.kernel.org>; Wed, 01 Oct 2025 14:04:07 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1759352604; x=1759957404; darn=vger.kernel.org;
+        d=linaro.org; s=google; t=1759352647; x=1759957447; darn=vger.kernel.org;
         h=content-transfer-encoding:in-reply-to:content-language:from
          :references:cc:to:subject:user-agent:mime-version:date:message-id
          :from:to:cc:subject:date:message-id:reply-to;
-        bh=ZbWysB4BLwKnNSFlp6k22DnxpWHP5NTJ3CmDeF4a/mw=;
-        b=A/2X4Xtwi6JtB+9dNR5a6YFNZDYUP2nGjky6avE+f90hz81kuLHWqyQkQOSr8zm13Z
-         VRTRiPXGN9EaiI55+PrSUefOn7Foc0AoUIrJ7inEEw2LbpxBpcDU1Zq/iD76giN9S4JJ
-         a7xtSsPIxgF17MGSznE4YJ2o28Y+6NfWYuHXxVjboYdr+CXjsAxM/WOjM3NW1LwB0PuQ
-         chspsBQHvxjkNtgT13nSEEL3wBo5fSSAdfYeMKl/E/x634yDu+wzzSdjMHXAl0T4LWdM
-         ML7/nLtITfY/a7h6dwwo3o9/7nE0xYi5+Wn42sqKOEdqamFbFurcETpwRoeWi922IhOY
-         T4bQ==
+        bh=W9XFCxpFTs5n3pKyc3+ovsnuFiQyiP+5TOIkYE21+Yk=;
+        b=yKwuyWt/V0oZdqCfnX2szpikkCOeoWT6O2PgaiXr5jHPCPovfqYEwfPtIhqB3PQvaG
+         YxxYvoKZURs5mHUgQDiiSH2kyKUhgqzfTrTPDP78NJrTWg2K4emfql9FBU/GLE5IWoiL
+         5y+kkk4tEWg3upRH+iAS6aCDn5a7OTbnqu2Q3MH+x6tp2vzM0LW6K12085WZ/ffGVFjc
+         BeFjFuXlBf1riBv1hHno0brAOQgIkfVqm+tZgxoIj7mWSmZBVkvjiqES5/N6pQvNCqUX
+         Atgpt9S26silAySCsS6DHNeAAXnb6lvifxhK47kqv2MZm8LRwG5iVX65X0ACXQlR3ug4
+         +emw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1759352604; x=1759957404;
+        d=1e100.net; s=20230601; t=1759352647; x=1759957447;
         h=content-transfer-encoding:in-reply-to:content-language:from
          :references:cc:to:subject:user-agent:mime-version:date:message-id
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=ZbWysB4BLwKnNSFlp6k22DnxpWHP5NTJ3CmDeF4a/mw=;
-        b=Pd4TdI1XOCL43IiJf0gxHBJdPQ+9hi2qJzV4FyeO/E7SC7OGn/q+hOG6PTcx/D/xuG
-         uVKZhHS/0pdTzvXoAbapY5s4l/WHJ1Dg5yGexyK0dg2TW3yzAflFYVLRfMGIvDfgo6ou
-         I6p2BWMUA9qmDy1pi9yrKUn8mSKS4NAXEPd5q1I825pS2uFGNiKlC2vJDg8KQsijKkA0
-         LTzgOti0puq+m49SzzKFXnwG341RFk9MTA4+VqFWT2ARtnFwwOBPWcIIM/r0xFKo5z6h
-         Aub0qcOrd1XJ9lOrQkv8nO62RjNsfiaDh/Att3AoSScnPhU3dDat0gmJfx87OiXLrVax
-         8uJw==
-X-Forwarded-Encrypted: i=1; AJvYcCV3duMwd03tYkUyaGlSmogj2XFX7DGfrReboQnCFrQeWEBEF72JwK5JGQh+xpZ9hXOms0w=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwzHIow4Lda7ZkP724HWUnsDgtEewTgSO5d3yege3UQ97Bx16lH
-	0X2QJYycHzHytm3nNeFVqhsGzrAh56/As2HgIGahsU8AlcrZ/sBpI2ApgaKDb/QRUXU=
-X-Gm-Gg: ASbGncv43FQj5VE1892HBlD5kxKlL8UqPT8zHWmTFA9OYODUQ1iZ8kIl7e4o3eelZWT
-	h7g+JGmHetcAbIuIW+adAJJfZPKYoYg0ISdJPLR4NG0vp8JAQnZB73FesGfkDfzJuQ/D72VAn4L
-	OVdO15+PVRTyXXdg9+7UUzl6qll06tOcXtDlmGQ76aleMexcoVcE6H1SUWV2Vk5T3LvrLq2TfPa
-	YVTcfbVTBWF8gIsm/sgtj7wbE20NvSE+zKcG0blBnNDq+BAi/WRkmeDArx0it4z/vAHQn4JHa8J
-	YPPeW42ko4EBpeO/e85TPSpVCu47oxis+Ovj+mRiGj32votm8TpYzKp6x8ZU9b5LIydBE4Q3byD
-	snDkkQLDy08Ny/N62gbv9fGFCNjOSBoANh3jREc3+9PoLC+nyhVJwV21auPR9
-X-Google-Smtp-Source: AGHT+IEze18lci6QhXSI0pyjivHhs8/ki5NdOSJauXh39b6o1CSyAoKunE55CzTsis1nowYaOBnG0w==
-X-Received: by 2002:a17:902:ce0b:b0:28e:80bc:46b4 with SMTP id d9443c01a7336-28e80bc4968mr52046075ad.55.1759352603665;
-        Wed, 01 Oct 2025 14:03:23 -0700 (PDT)
+        bh=W9XFCxpFTs5n3pKyc3+ovsnuFiQyiP+5TOIkYE21+Yk=;
+        b=ioCLP31Jt2XibmOuZFyQC9nSmX9jY7LXxxafWv+G5ScSN9ATCvHiFPxtlVgKFQslvf
+         00nVbal5FiQX5Zw3r+lstuN2U91LC85OLamS/jDWp6ocfTGnSw7CzhT/McoDpn3mbtsr
+         G1Dj2Fu59q0PHCtrLw42byZ2cr9Je8q6E7SNmWmdaeNetzsEN2oyP7rYff5fVAoZKvxh
+         a8/r2PqRNhictPqeOzEZDbelnZWpm8eM9aEMTKcSJN4ZvRunCTco9zyBIEYWU2xqrz87
+         7xu99LoXprxSiZue2A+P4mHLGN+5sBXDoipeNiR4e2y5P21mELonr7wqLOEaYg3Fsw3X
+         4xnw==
+X-Forwarded-Encrypted: i=1; AJvYcCWfO8AJCSFxMWD2X5V1NrhuL1cdgXwYo6ONt4Ev+dGjZ6xvmIslvCFtwGbU88HjRKXwD50=@vger.kernel.org
+X-Gm-Message-State: AOJu0Ywm3oMRrbR1Sk3HnrTXfAeO/Wtq8lrfYKDxmqi5sZMPay44ZvGI
+	28VX/1XRxwjFSgw0TJ8GQIlVfccbYdkaQUe7XtAlUaSszCCOsEcysZA1EKjAric+oK8u7MRuvdM
+	9e+twuVY=
+X-Gm-Gg: ASbGncvhzL5SZ9nhZ0DTwShWDY+wkEhrmC6Ch/eaIxz/M93NC6eVN0haFfvp/8j0YQM
+	97GpFLj/vEKF7Rr4NObSkAWI8JBIjZI3RKMQ9Yft8g4FxEoqoGhThaWg5y+4N6A2/ZaUyAWcms3
+	qewT9nEAfgGPIvDrgp+Ry+BeTqxqyNMJiwHICk1Sl5uDryRIpiCcxPf5cYXKB+sW1VTcrg8WRVm
+	c2Y6iH5QMMEEbYewNf+zoJP2wArjlb2pg2F0e2nGnaYdzJaCT0nd1adkRmls5IjskXbbhSVf8ad
+	BcgMOsVyh2O8nBhkYFnJNYNqCiVnZxTthDp2HsM9dPzSzt2XrO3/GFGXJz5UrCKuCmU3BU2xpoY
+	d52Hg1pPJKjgRD0Edxe41ws6HvvVPt0Ri8p7/eKtHMus1Haf0nA0MLVS5th6is+1isAE5uVQ=
+X-Google-Smtp-Source: AGHT+IFZi9hBFX4bMDuQM4hhXPrcVQWZ09HiVl5GCehsB3MjmubtNU4WWWEcHQzhy9ryEbc5P1Q8dA==
+X-Received: by 2002:aa7:8893:0:b0:77f:3db0:630f with SMTP id d2e1a72fcca58-78af425d26dmr5363134b3a.28.1759352646769;
+        Wed, 01 Oct 2025 14:04:06 -0700 (PDT)
 Received: from [192.168.0.4] ([71.212.157.132])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-28e8d111a37sm5280805ad.8.2025.10.01.14.03.23
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-78b01f9cd56sm594019b3a.2.2025.10.01.14.04.05
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 01 Oct 2025 14:03:23 -0700 (PDT)
-Message-ID: <51dc4cd9-a12c-4302-ac47-93aaf09a6406@linaro.org>
-Date: Wed, 1 Oct 2025 14:03:21 -0700
+        Wed, 01 Oct 2025 14:04:06 -0700 (PDT)
+Message-ID: <c37880dc-1d27-4213-aa31-19068b437a98@linaro.org>
+Date: Wed, 1 Oct 2025 14:04:04 -0700
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -82,37 +83,35 @@ List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2 2/6] system/ramblock: Move ram_block_is_pmem()
- declaration
+Subject: Re: [PATCH v2 3/6] system/ramblock: Move ram_block_discard_*_range()
+ declarations
 To: =?UTF-8?Q?Philippe_Mathieu-Daud=C3=A9?= <philmd@linaro.org>,
  qemu-devel@nongnu.org
 Cc: Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org,
  Peter Xu <peterx@redhat.com>,
  "Maciej S. Szmigiero" <maciej.szmigiero@oracle.com>,
  "Michael S. Tsirkin" <mst@redhat.com>, Fabiano Rosas <farosas@suse.de>,
- David Hildenbrand <david@redhat.com>, =?UTF-8?Q?Alex_Benn=C3=A9e?=
- <alex.bennee@linaro.org>
+ David Hildenbrand <david@redhat.com>
 References: <20251001164456.3230-1-philmd@linaro.org>
- <20251001164456.3230-3-philmd@linaro.org>
+ <20251001164456.3230-4-philmd@linaro.org>
 From: Richard Henderson <richard.henderson@linaro.org>
 Content-Language: en-US
-In-Reply-To: <20251001164456.3230-3-philmd@linaro.org>
+In-Reply-To: <20251001164456.3230-4-philmd@linaro.org>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
 
 On 10/1/25 09:44, Philippe Mathieu-Daudé wrote:
-> Move ramblock_is_pmem() along with the RAM Block API
-> exposed by the "system/ramblock.h" header. Rename as
-> ram_block_is_pmem() to keep API prefix consistency.
+> Keep RAM blocks API in the same header: "system/ramblock.h".
 > 
 > Signed-off-by: Philippe Mathieu-Daudé<philmd@linaro.org>
-> Reviewed-by: Alex Bennée<alex.bennee@linaro.org>
 > ---
->   include/system/ram_addr.h | 2 --
->   include/system/ramblock.h | 5 +++++
->   migration/ram.c           | 3 ++-
->   system/physmem.c          | 5 +++--
->   4 files changed, 10 insertions(+), 5 deletions(-)
+>   include/exec/cpu-common.h                 | 3 ---
+>   include/system/ramblock.h                 | 4 ++++
+>   accel/kvm/kvm-all.c                       | 1 +
+>   hw/hyperv/hv-balloon-our_range_memslots.c | 1 +
+>   hw/virtio/virtio-balloon.c                | 1 +
+>   hw/virtio/virtio-mem.c                    | 1 +
+>   6 files changed, 8 insertions(+), 3 deletions(-)
 
 Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 
