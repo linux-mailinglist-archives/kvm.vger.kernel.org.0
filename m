@@ -1,97 +1,110 @@
-Return-Path: <kvm+bounces-59318-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-59319-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 984DBBB10A1
-	for <lists+kvm@lfdr.de>; Wed, 01 Oct 2025 17:20:51 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id BDCA4BB10FD
+	for <lists+kvm@lfdr.de>; Wed, 01 Oct 2025 17:26:28 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3EC593AB40E
-	for <lists+kvm@lfdr.de>; Wed,  1 Oct 2025 15:19:42 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 0092F1894C85
+	for <lists+kvm@lfdr.de>; Wed,  1 Oct 2025 15:26:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5EC0246BF;
-	Wed,  1 Oct 2025 15:19:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EC8852773C2;
+	Wed,  1 Oct 2025 15:26:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="Aaiu0gfT"
 X-Original-To: kvm@vger.kernel.org
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3096C2517B9;
-	Wed,  1 Oct 2025 15:19:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
+Received: from out-172.mta1.migadu.com (out-172.mta1.migadu.com [95.215.58.172])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1F77D274B2B
+	for <kvm@vger.kernel.org>; Wed,  1 Oct 2025 15:26:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1759331966; cv=none; b=eTGGrfvuPEhhoA6CqEZV32pP2q1UkdlDkAOZFM8JGWLoOk5/hx/9wAfASvpGpmQa9c0GJmI+B6j0wGTaquKqn4DjNErDQvprRDmOG5caYgzyHsi0qtwX0ZSPci7Q1WKnp+1NK1v/zJH5CnP35K2V35Z0mCncNe70NlXf1FW2h2w=
+	t=1759332374; cv=none; b=thcQQCUPVznBeMQ+NoCGEmupZoYzqoGQy7Oup8BIPbd3XcRvYZT51J9vdWsAXDO2EHWq6XpW/fHR7wM3E3l+tudzlDfDdXzHglFdAhethVne9OMZYl1eG9lYL3Akke5a3uR7Fo3DV1wbjFGnTy9zhTlg0cFBQxmkTnFcUNF/5b0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1759331966; c=relaxed/simple;
-	bh=AuwwvpeSpDso60zCvsa1OUltjVmGQt8y3NeOBslXwNk=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=btEcg6jRvrPO/Z0Mg4bHrmiF8dqxbKVHEBTOdldmuWmkbAMBLVJ4d82ywhNVHUst4GewEmYl4DaqZBiMp2AslhlFQF5udPg0DGYV1SWs2H1Y/hGwJFYnJS/TkcwNPryOJ7zStG9xY0i/lLa2CswXlmq75QKNdJxdS3JIeBgMx7s=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 7DB241424;
-	Wed,  1 Oct 2025 08:19:16 -0700 (PDT)
-Received: from [10.57.0.204] (unknown [10.57.0.204])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id C5E213F59E;
-	Wed,  1 Oct 2025 08:19:18 -0700 (PDT)
-Message-ID: <765f8a3e-2bdd-4352-ba89-99ce3dbc6e4c@arm.com>
-Date: Wed, 1 Oct 2025 16:19:16 +0100
+	s=arc-20240116; t=1759332374; c=relaxed/simple;
+	bh=3NPgTdCTSiOwSfyaOccKmeH1hQcF01gH+1NVUof/2hE=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=kuku77MzBvYfGkucjusZoRoKquqaqKGl1/xJrw561YSp4SX9PBGxm1WDELSYodxhckmdiCeOP0e45sEtCeveMgae60OTgay+0GfZ9xQOF4+EQbnxmQCcRQfJHrVle2wrJdasrmFx6cHkBvVgJc6mSY6pqnm/VvSZywUqUoaVGKY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=Aaiu0gfT; arc=none smtp.client-ip=95.215.58.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+Date: Wed, 1 Oct 2025 15:25:08 +0000
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1759332359;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=QBXvtvXzaamYu4esLWBy5y0OZPQ0U3Papg1nhMt8jew=;
+	b=Aaiu0gfT9xu+QL3y6vH9H5yr+eql58RaGE7wlVgqBoy5qArLkrvEixCANlC6LpO0jKgSUA
+	PcluVR9ZSYF1CemNNm3+6+RwmbmB1Lb4Vvp7dcYsLOEZ6kqqAplzpGQ7BRa14QftyF6Qon
+	95sn2lAdSMHDaJPAqzOjInFQgPQM55g=
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Yosry Ahmed <yosry.ahmed@linux.dev>
+To: Jim Mattson <jmattson@google.com>
+Cc: Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>, 
+	Borislav Petkov <bp@alien8.de>, Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org, 
+	"H. Peter Anvin" <hpa@zytor.com>, Sean Christopherson <seanjc@google.com>, 
+	Paolo Bonzini <pbonzini@redhat.com>, Pawan Gupta <pawan.kumar.gupta@linux.intel.com>, 
+	Tom Lendacky <thomas.lendacky@amd.com>, Perry Yuan <perry.yuan@amd.com>, 
+	Sohil Mehta <sohil.mehta@intel.com>, "Xin Li (Intel)" <xin@zytor.com>, 
+	Joerg Roedel <joerg.roedel@amd.com>, Avi Kivity <avi@redhat.com>, linux-kernel@vger.kernel.org, 
+	kvm@vger.kernel.org
+Subject: Re: [PATCH v2 2/2] KVM: SVM: Disallow EFER.LMSLE when not supported
+ by hardware
+Message-ID: <auftrtth2z3df4qc5vfm2cxv5b2tnhcu4eron7fbebalh6laxd@wgw2tamdw5ho>
+References: <20251001001529.1119031-1-jmattson@google.com>
+ <20251001001529.1119031-3-jmattson@google.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v10 08/43] kvm: arm64: Don't expose debug capabilities for
- realm guests
-To: Marc Zyngier <maz@kernel.org>
-Cc: kvm@vger.kernel.org, kvmarm@lists.linux.dev,
- Suzuki K Poulose <suzuki.poulose@arm.com>,
- Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>,
- James Morse <james.morse@arm.com>, Oliver Upton <oliver.upton@linux.dev>,
- Zenghui Yu <yuzenghui@huawei.com>, linux-arm-kernel@lists.infradead.org,
- linux-kernel@vger.kernel.org, Joey Gouly <joey.gouly@arm.com>,
- Alexandru Elisei <alexandru.elisei@arm.com>,
- Christoffer Dall <christoffer.dall@arm.com>, Fuad Tabba <tabba@google.com>,
- linux-coco@lists.linux.dev,
- Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>,
- Gavin Shan <gshan@redhat.com>, Shanker Donthineni <sdonthineni@nvidia.com>,
- Alper Gun <alpergun@google.com>, "Aneesh Kumar K . V"
- <aneesh.kumar@kernel.org>, Emi Kisanuki <fj0570is@fujitsu.com>,
- Vishal Annapurve <vannapurve@google.com>
-References: <20250820145606.180644-1-steven.price@arm.com>
- <20250820145606.180644-9-steven.price@arm.com> <86ikgyzrzj.wl-maz@kernel.org>
-From: Steven Price <steven.price@arm.com>
-Content-Language: en-GB
-In-Reply-To: <86ikgyzrzj.wl-maz@kernel.org>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20251001001529.1119031-3-jmattson@google.com>
+X-Migadu-Flow: FLOW_OUT
 
-On 01/10/2025 14:11, Marc Zyngier wrote:
-> On Wed, 20 Aug 2025 15:55:28 +0100,
-> Steven Price <steven.price@arm.com> wrote:
->>
->> From: Suzuki K Poulose <suzuki.poulose@arm.com>
->>
->> RMM v1.0 provides no mechanism for the host to perform debug operations
->> on the guest. So don't expose KVM_CAP_SET_GUEST_DEBUG and report 0
->> breakpoints and 0 watch points.
+On Tue, Sep 30, 2025 at 05:14:08PM -0700, Jim Mattson wrote:
+> Modern AMD CPUs do not support segment limit checks in 64-bit mode
+> (i.e. EFER.LMSLE must be zero). Do not allow a guest to set EFER.LMSLE
+> on a CPU that requires the bit to be zero.
+
+If anyone is as curious as I was, the bit seemingly started being set on
+Milan. Rome (and supposedly older CPUs) support EFER.LMSLE.
+
 > 
-> What is the guest seeing for the same things?
-
-The number of breakpoints/watchpoints is configured using the usual
-architectural register ID_AA64DFR0_EL1. So the VMM can configure the
-guest as it pleases to be able to debug itself.
-
-Obviously CCA is about the host not seeing into the guest so debugging
-the guest is generally not permitted.
-
-RMM v1.1 should provide some mechanisms for the host to debug a realm -
-but this would also change the attestation measurement so needs buy in
-from the guest's attestation flow. I don't think the RMM API for that is
-finalised yet, and I certainly don't have any Linux patches.
-
-Thanks,
-Steve
-
+> For backwards compatibility, allow EFER.LMSLE to be set on CPUs that
+> support segment limit checks in 64-bit mode, even though KVM's
+> implementation of the feature is incomplete (e.g. KVM's emulator does
+> not enforce segment limits in 64-bit mode).
+> 
+> Fixes: eec4b140c924 ("KVM: SVM: Allow EFER.LMSLE to be set with nested svm")
+> 
+> Signed-off-by: Jim Mattson <jmattson@google.com>
+> ---
+>  arch/x86/kvm/svm/svm.c | 4 +++-
+>  1 file changed, 3 insertions(+), 1 deletion(-)
+> 
+> diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
+> index 1bfebe40854f..78d0fc85d0bd 100644
+> --- a/arch/x86/kvm/svm/svm.c
+> +++ b/arch/x86/kvm/svm/svm.c
+> @@ -5351,7 +5351,9 @@ static __init int svm_hardware_setup(void)
+>  
+>  	if (nested) {
+>  		pr_info("Nested Virtualization enabled\n");
+> -		kvm_enable_efer_bits(EFER_SVME | EFER_LMSLE);
+> +		kvm_enable_efer_bits(EFER_SVME);
+> +		if (!boot_cpu_has(X86_FEATURE_EFER_LMSLE_MBZ))
+> +			kvm_enable_efer_bits(EFER_LMSLE);
+>  
+>  		r = nested_svm_init_msrpm_merge_offsets();
+>  		if (r)
+> -- 
+> 2.51.0.618.g983fd99d29-goog
+> 
 
