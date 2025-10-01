@@ -1,113 +1,223 @@
-Return-Path: <kvm+bounces-59286-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-59287-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 06157BB03E1
-	for <lists+kvm@lfdr.de>; Wed, 01 Oct 2025 13:51:10 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 21B52BB0423
+	for <lists+kvm@lfdr.de>; Wed, 01 Oct 2025 13:58:53 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 203007A67C0
-	for <lists+kvm@lfdr.de>; Wed,  1 Oct 2025 11:49:27 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 9864C1941103
+	for <lists+kvm@lfdr.de>; Wed,  1 Oct 2025 11:59:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A61C02E283E;
-	Wed,  1 Oct 2025 11:50:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1CB4C2E88A2;
+	Wed,  1 Oct 2025 11:58:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="LBKrq1Gc"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="qZCPm84S"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.12])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 097862522BE;
-	Wed,  1 Oct 2025 11:50:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.12
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 288182E611B;
+	Wed,  1 Oct 2025 11:58:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1759319457; cv=none; b=QQTM6r6a7yyYJ3OLG12Z2t2KykT3DfZbChyeJlqT1RKLxTjny1qm6eF5OaViUkgRDM7mc/xGZUjozSOP3qe4raiOewZLtrGiuCkeJv81nT5N9kZTARLbLn2/TaxwN9hUBZywQsVEzagug74VZrsrbbWknzKNqR9xLPrA5StnJP4=
+	t=1759319924; cv=none; b=fVeQWB7Z1SY4R08gWo6TSpDeYja11FEEWEZXreVWIQYN4NgYYw/GPA6DbH+xWom+SC9mo1mUzsoRjS2HhDfAgTPiVyVvsEWgnthW4f6DM0dYlIeXAzJ10Tr9RW0/MeAkwO5cWx/1Gf+uzjM2PA8YVu+1/23ZkPUap/Bak44GbYQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1759319457; c=relaxed/simple;
-	bh=UUMgyh1khVMAvCaYjTZGs4C0yTwafGUhOSzbw+S1OlM=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=p92rQQI47wMK6bSRncYDnixVtoIjlSmAzFU7C1yB/Co7pg7PmsoZBrs0jmUaYW11Mj1xdjX5BW52g6J7i//H4h+CVDItkNbTm0X8JBN+sWkP3jYaJkT47PdYv1CtT4awujUsv2PnhmvgI4LoQob3suZyHRdIjxWeHCoU3GLuCBk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=LBKrq1Gc; arc=none smtp.client-ip=192.198.163.12
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1759319456; x=1790855456;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=UUMgyh1khVMAvCaYjTZGs4C0yTwafGUhOSzbw+S1OlM=;
-  b=LBKrq1GcrfHQRdxDPp2doNE2IqsPjuYdxAZg2R+Edm12DKLh/+7HmaKp
-   /1w7QEDVtIz2u09vmmPhb8UP75B6aZ8q40gx5zXYHefQSBLsLcJRNosIt
-   EYPzCngZ3Kq6kdZq4VTCX59SVFb/01tnYhDCVfDrCEJh5W8+rLSrm9krK
-   2t1hUfC8GfxjLCC8QKTxjQAfrlQlRVqS7O43dwTz2jlKX5t9LgSsF7mNz
-   tpGoFZwvO1LpcCo51BO81dDzGWBYOAwqiZsXwpRhsGzFqvtkHl2quzdfB
-   XGYKwC6k0nM3hTFWvkv57aLDwVv3ATl6908WM/G5XZdkUiyVO+GbSySdR
-   g==;
-X-CSE-ConnectionGUID: g4PjAqOmSAGdGJhfEtTgWA==
-X-CSE-MsgGUID: Y/KMYMQqT06Tb9SukATZnw==
-X-IronPort-AV: E=McAfee;i="6800,10657,11569"; a="65443970"
-X-IronPort-AV: E=Sophos;i="6.18,306,1751266800"; 
-   d="scan'208";a="65443970"
-Received: from orviesa001.jf.intel.com ([10.64.159.141])
-  by fmvoesa106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 01 Oct 2025 04:50:55 -0700
-X-CSE-ConnectionGUID: usEHt5hORTqkcXV+hJVCiA==
-X-CSE-MsgGUID: oJ6f0FRMQWy3rQi94VIwEA==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.18,306,1751266800"; 
-   d="scan'208";a="215893106"
-Received: from lkp-server01.sh.intel.com (HELO 2f2a1232a4e4) ([10.239.97.150])
-  by orviesa001.jf.intel.com with ESMTP; 01 Oct 2025 04:50:53 -0700
-Received: from kbuild by 2f2a1232a4e4 with local (Exim 4.96)
-	(envelope-from <lkp@intel.com>)
-	id 1v3vMB-0002xH-01;
-	Wed, 01 Oct 2025 11:50:51 +0000
-Date: Wed, 1 Oct 2025 19:50:32 +0800
-From: kernel test robot <lkp@intel.com>
-To: James Houghton <jthoughton@google.com>,
-	Paolo Bonzini <pbonzini@redhat.com>,
-	Sean Christopherson <seanjc@google.com>
-Cc: llvm@lists.linux.dev, oe-kbuild-all@lists.linux.dev,
-	James Houghton <jthoughton@google.com>, kvm@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH 1/2] KVM: For manual-protect GET_DIRTY_LOG, do not hold
- slots lock
-Message-ID: <202510011941.dJGxEiZE-lkp@intel.com>
-References: <20250930172850.598938-1-jthoughton@google.com>
+	s=arc-20240116; t=1759319924; c=relaxed/simple;
+	bh=q2oyD5KugDIaW6JSBh1QBJ0TUR6MW5UO2WCtAgLmeh8=;
+	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=LMIJhE1DmN+XEtQdpKi1cC2VRCm7mOHjK5y329aLWhwBOk5dbAE2KoNVX7clCujy0nitrTO6lGzNW6pgy7UBRhE53hw8DVcgHD3OadtdqbdVdspI6cdgNqwJNr+56SClLrgueTcpX3iDa0RseSLaRers9ZhQbK13/q4KbXfl1FE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=qZCPm84S; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id ABEC3C4CEF4;
+	Wed,  1 Oct 2025 11:58:43 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1759319923;
+	bh=q2oyD5KugDIaW6JSBh1QBJ0TUR6MW5UO2WCtAgLmeh8=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=qZCPm84S00rcJ/5DZZiAQBlbVyFTQO+QHK5ZY/4bD3YhlyN4HVP7XkS2p9o0/WGh3
+	 Fu0nDDQctiP6lxSelsLnadRvYKULsWI1WRhAhmH6CXE1dLQ89MYv9TvbMUz125aMY0
+	 b7MnaqQtvm381/diXi6A8LLLTaUlgQvmOS3WMVGXEudJ5Tjr//6BHC0XKb6J7bBdHg
+	 V1waUBZjdW9YJvCaUhesrG2cMrLgerZcmHlbd6wtZ1SApJXoP+jvecGK65TRwkZ/iq
+	 L2rqLAFdjZC53pMBqGe9hGrOgSBfKJol4kn4Fhtc/G9JstpqBcvX0WfuNp+3Jwww3a
+	 pUBGKgU9Bopng==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.98.2)
+	(envelope-from <maz@kernel.org>)
+	id 1v3vTl-0000000AnCw-1j7p;
+	Wed, 01 Oct 2025 11:58:41 +0000
+Date: Wed, 01 Oct 2025 12:58:40 +0100
+Message-ID: <86ldluzvdb.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Steven Price <steven.price@arm.com>
+Cc: kvm@vger.kernel.org,
+	kvmarm@lists.linux.dev,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Will Deacon <will@kernel.org>,
+	James Morse <james.morse@arm.com>,
+	Oliver Upton <oliver.upton@linux.dev>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Zenghui Yu
+ <yuzenghui@huawei.com>,
+	linux-arm-kernel@lists.infradead.org,
+	linux-kernel@vger.kernel.org,
+	Joey Gouly <joey.gouly@arm.com>,
+	Alexandru Elisei <alexandru.elisei@arm.com>,
+	Christoffer Dall <christoffer.dall@arm.com>,
+	Fuad Tabba <tabba@google.com>,
+	linux-coco@lists.linux.dev,
+	Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>,
+	Gavin Shan <gshan@redhat.com>,
+	Shanker Donthineni <sdonthineni@nvidia.com>,
+	Alper Gun <alpergun@google.com>,
+	"Aneesh Kumar K . V"
+ <aneesh.kumar@kernel.org>,
+	Emi Kisanuki <fj0570is@fujitsu.com>,
+	Vishal Annapurve <vannapurve@google.com>
+Subject: Re: [PATCH v10 03/43] arm64: RME: Add SMC definitions for calling the RMM
+In-Reply-To: <747ab990-d02d-4e7c-9007-a7ac73bb1062@arm.com>
+References: <20250820145606.180644-1-steven.price@arm.com>
+	<20250820145606.180644-4-steven.price@arm.com>
+	<86o6qrym2b.wl-maz@kernel.org>
+	<747ab990-d02d-4e7c-9007-a7ac73bb1062@arm.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250930172850.598938-1-jthoughton@google.com>
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: steven.price@arm.com, kvm@vger.kernel.org, kvmarm@lists.linux.dev, catalin.marinas@arm.com, will@kernel.org, james.morse@arm.com, oliver.upton@linux.dev, suzuki.poulose@arm.com, yuzenghui@huawei.com, linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, joey.gouly@arm.com, alexandru.elisei@arm.com, christoffer.dall@arm.com, tabba@google.com, linux-coco@lists.linux.dev, gankulkarni@os.amperecomputing.com, gshan@redhat.com, sdonthineni@nvidia.com, alpergun@google.com, aneesh.kumar@kernel.org, fj0570is@fujitsu.com, vannapurve@google.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-Hi James,
+On Wed, 01 Oct 2025 12:00:14 +0100,
+Steven Price <steven.price@arm.com> wrote:
+> 
+> Hi Marc,
+> 
+> On 01/10/2025 11:05, Marc Zyngier wrote:
+> > On Wed, 20 Aug 2025 15:55:23 +0100,
+> > Steven Price <steven.price@arm.com> wrote:
+> >>
+> >> The RMM (Realm Management Monitor) provides functionality that can be
+> >> accessed by SMC calls from the host.
+> >>
+> >> The SMC definitions are based on DEN0137[1] version 1.0-rel0
+> >>
+> >> [1] https://developer.arm.com/documentation/den0137/1-0rel0/
+> >>
+> >> Reviewed-by: Gavin Shan <gshan@redhat.com>
+> >> Reviewed-by: Suzuki K Poulose <suzuki.poulose@arm.com>
+> >> Signed-off-by: Steven Price <steven.price@arm.com>
+> >> ---
+> >> Changes since v9:
+> >>  * Corrected size of 'ripas_value' in struct rec_exit. The spec states
+> >>    this is an 8-bit type with padding afterwards (rather than a u64).
+> >> Changes since v8:
+> >>  * Added RMI_PERMITTED_GICV3_HCR_BITS to define which bits the RMM
+> >>    permits to be modified.
+> >> Changes since v6:
+> >>  * Renamed REC_ENTER_xxx defines to include 'FLAG' to make it obvious
+> >>    these are flag values.
+> >> Changes since v5:
+> >>  * Sorted the SMC #defines by value.
+> >>  * Renamed SMI_RxI_CALL to SMI_RMI_CALL since the macro is only used for
+> >>    RMI calls.
+> >>  * Renamed REC_GIC_NUM_LRS to REC_MAX_GIC_NUM_LRS since the actual
+> >>    number of available list registers could be lower.
+> >>  * Provided a define for the reserved fields of FeatureRegister0.
+> >>  * Fix inconsistent names for padding fields.
+> >> Changes since v4:
+> >>  * Update to point to final released RMM spec.
+> >>  * Minor rearrangements.
+> >> Changes since v3:
+> >>  * Update to match RMM spec v1.0-rel0-rc1.
+> >> Changes since v2:
+> >>  * Fix specification link.
+> >>  * Rename rec_entry->rec_enter to match spec.
+> >>  * Fix size of pmu_ovf_status to match spec.
+> >> ---
+> >>  arch/arm64/include/asm/rmi_smc.h | 269 +++++++++++++++++++++++++++++++
+> >>  1 file changed, 269 insertions(+)
+> >>  create mode 100644 arch/arm64/include/asm/rmi_smc.h
+> >>
+> >> diff --git a/arch/arm64/include/asm/rmi_smc.h b/arch/arm64/include/asm/rmi_smc.h
+> >> new file mode 100644
+> >> index 000000000000..1000368f1bca
+> >> --- /dev/null
+> >> +++ b/arch/arm64/include/asm/rmi_smc.h
+> > 
+> > [...]
+> > 
+> >> +#define RMI_PERMITTED_GICV3_HCR_BITS	(ICH_HCR_EL2_UIE |		\
+> >> +					 ICH_HCR_EL2_LRENPIE |		\
+> >> +					 ICH_HCR_EL2_NPIE |		\
+> >> +					 ICH_HCR_EL2_VGrp0EIE |		\
+> >> +					 ICH_HCR_EL2_VGrp0DIE |		\
+> >> +					 ICH_HCR_EL2_VGrp1EIE |		\
+> >> +					 ICH_HCR_EL2_VGrp1DIE |		\
+> >> +					 ICH_HCR_EL2_TDIR)
+> > 
+> > Why should KVM care about what bits the RMM wants to use? Also, why
+> > should KVM be forbidden to use the TALL0, TALL1 and TC bits? If
+> > interrupt delivery is the host's business, then the RMM has no
+> > business interfering with the GIC programming.
+> 
+> The RMM receives the guest's GIC state in a field within the REC entry
+> structure (enter.gicv3_hcr). The RMM spec states that the above is the
+> list of fields that will be considered and that everything else must be
+> 0[1]. So this is used to filter the configuration to make sure it's
+> valid for the RMM.
+> 
+> In terms of TALL0/TALL1/TC bits: these control trapping to EL2, and when
+> in a realm guest the RMM is EL2 - so it's up to the RMM to configure
+> these bits appropriately as it is the RMM which will have to deal with
+> the trap.
 
-kernel test robot noticed the following build warnings:
+And I claim this is *wrong*. Again, if the host is in charge of
+interrupt injection, then the RMM has absolutely no business is
+deciding what can or cannot be trapped. There is zero information
+exposed by these traps that the host is not already aware of.
 
-[auto build test WARNING on a6ad54137af92535cfe32e19e5f3bc1bb7dbd383]
+> [1] RWVGFJ in the 1.0 spec from
+> https://developer.arm.com/documentation/den0137/latest
 
-url:    https://github.com/intel-lab-lkp/linux/commits/James-Houghton/KVM-selftests-Add-parallel-KVM_GET_DIRTY_LOG-to-dirty_log_perf_test/20251001-013306
-base:   a6ad54137af92535cfe32e19e5f3bc1bb7dbd383
-patch link:    https://lore.kernel.org/r/20250930172850.598938-1-jthoughton%40google.com
-patch subject: [PATCH 1/2] KVM: For manual-protect GET_DIRTY_LOG, do not hold slots lock
-config: x86_64-buildonly-randconfig-005-20251001 (https://download.01.org/0day-ci/archive/20251001/202510011941.dJGxEiZE-lkp@intel.com/config)
-compiler: clang version 20.1.8 (https://github.com/llvm/llvm-project 87f0227cb60147a26a1eeb4fb06e3b505e9c7261)
-reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20251001/202510011941.dJGxEiZE-lkp@intel.com/reproduce)
+Well, until someone explains what this is protecting against, I
+consider this as broken.
 
-If you fix the issue in a separate patch/commit (i.e. not just a new version of
-the same patch/commit), kindly add following tags
-| Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202510011941.dJGxEiZE-lkp@intel.com/
+> >> +	union { /* 0x300 */
+> >> +		struct {
+> >> +			u64 gicv3_hcr;
+> >> +			u64 gicv3_lrs[REC_MAX_GIC_NUM_LRS];
+> >> +			u64 gicv3_misr;
+> > 
+> > Why do we care about ICH_MISR_EL2? Surely we get everything in the
+> > registers themselves, right? I think this goes back to my question
+> > above: why is the RMM getting in the way of ICH_*_EL2 accesses?
+> 
+> As mentioned above, the state of the guest's GIC isn't passed through
+> the CPU's registers, but instead using the rec_enter/rec_exit
+> structures. So unlike a normal guest entry we don't set all the CPU's
+> register state before entering, but instead hand over a shared data
+> structure and the RMM is responsible for actually programming the
+> registers on the CPU. Since many of the registers are (deliberately)
+> unavailable to the host (e.g. all the GPRs) it makes some sense the RMM
+> also handles the GIC registers save/restore.
 
-All warnings (new ones prefixed by >>):
+And I claim this is nonsense. There is nothing in these registers that
+the host doesn't need to know about, which is why they are basically
+copied over.
 
->> Warning: arch/x86/kvm/../../../virt/kvm/kvm_main.c:2220 function parameter 'protect' not described in 'kvm_get_dirty_log_protect'
+It all feels just wrong.
+
+	M.
 
 -- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
+Without deviation from the norm, progress is not possible.
 
