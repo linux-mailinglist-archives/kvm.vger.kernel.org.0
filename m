@@ -1,188 +1,172 @@
-Return-Path: <kvm+bounces-59270-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-59271-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id AF889BAFB4A
-	for <lists+kvm@lfdr.de>; Wed, 01 Oct 2025 10:41:49 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 0F1B2BAFB5C
+	for <lists+kvm@lfdr.de>; Wed, 01 Oct 2025 10:44:33 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 2EF031923B0B
-	for <lists+kvm@lfdr.de>; Wed,  1 Oct 2025 08:42:12 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id A082B19246C8
+	for <lists+kvm@lfdr.de>; Wed,  1 Oct 2025 08:44:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 513C4284665;
-	Wed,  1 Oct 2025 08:41:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D3FBB27D771;
+	Wed,  1 Oct 2025 08:44:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="FB79tHok"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Plqo/NgC"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CDA271E3DCF
-	for <kvm@vger.kernel.org>; Wed,  1 Oct 2025 08:41:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EC1A9270553;
+	Wed,  1 Oct 2025 08:44:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1759308102; cv=none; b=dmP7cWqe9paRgQWqr7ZPfl5wlyvuqV2epXcSmTyo6zmx/b56lx3geyx0mvSsDtuVDxWSG/ggzoHz1+ydhT1quI+6iLzGOCw+b1nM8oLnbTpMnaZtEPsXaTX5I6LR0gkr6r4U2V0spXPLl70AH1tL9hxTxFwdMixde7zPEm44oSM=
+	t=1759308266; cv=none; b=g2IBWtWeiewscKiYYxpXa1xIt8R+gbZ8cPapvQUJCTES4oNbelqwkdjfA8u7t/1wEdmQYMW6wrX9E37iTx9wBnAsRZ0XzFkBsDZ/8e4uHPBJak5yOHOge+DGS+2vunUipQObWLegs4zUfsPwphfRRxbNKcUplv3akPhxX2yzij4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1759308102; c=relaxed/simple;
-	bh=pt+nZvnNhIgZZp/HZKdLK+QnZ6VP3XibZuLZOYSJVcY=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=Cq53Uc5HLklnfI8Qid9PJC2CYluukGzs39DudCKdnp0rzSBHf8jsaab3Brx1YjlLZOv9GC6Upm6a6CxwfL+LboIaOQ3yX02zzIFQQ0+oxC4+3XoMxQILxj6rc5FfR9J3zOJGL/Ok+Gn3h+5TGIH33SFYXynDThXjJ/I8tcvOt0E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=FB79tHok; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1759308099;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-	bh=OoxPbfNPOVDhTmTUjEeR9wPvseI20Xeikoc5bFV+ZYg=;
-	b=FB79tHokiUFQfUaj6WQBtTC1xgpiagv32dBIZh1eIH+QCM9Obx4IG3CTKITLNB4NxaP3hg
-	/wJOSMjqmF/jR8I7JiG9y/Zy132bn86wQRZumX/gQEcWnLOciq+fbyB2VASPGlhyktTEUo
-	Q5OmiQFOeqyyU6naMnsRB5hIHITqg4o=
-Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
- [209.85.128.69]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-86-4dmfS0WqN0qrXku5VdsgUA-1; Wed, 01 Oct 2025 04:41:38 -0400
-X-MC-Unique: 4dmfS0WqN0qrXku5VdsgUA-1
-X-Mimecast-MFC-AGG-ID: 4dmfS0WqN0qrXku5VdsgUA_1759308097
-Received: by mail-wm1-f69.google.com with SMTP id 5b1f17b1804b1-46e303235e8so50893905e9.1
-        for <kvm@vger.kernel.org>; Wed, 01 Oct 2025 01:41:38 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1759308097; x=1759912897;
-        h=content-transfer-encoding:in-reply-to:autocrypt:content-language
-         :from:references:cc:to:subject:user-agent:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=OoxPbfNPOVDhTmTUjEeR9wPvseI20Xeikoc5bFV+ZYg=;
-        b=sA2Fr1PlBXNdpOeyrXXWwcECYaogc9UUbKAkxbkkZ+SDfrxoCKnsgoJEaEu9+N8WLT
-         0w+9RnU7XE3SuukocQy9kVgSV5HdlCUgTxcJ4c10qDZP4XWqotkTc0UWxkMM7xVxnGXw
-         w+ns8UQ+mbEkQbzyTrmNJzP11Aj4r2RyxlJNS5l8WHYpM6Hyw+h06ZymC9Nfopy8HWOQ
-         Z51spgzkuyZq9jo5zksS8P+njOoz669I4eMBmMETZV974onr7qGUeppu+Um77ZtOAdBZ
-         KY92TWEga151mm90CqUrGx034767gkWIQq2jkh/lIZwkGTpFWbsQ1aEo4gA9a9MJFzVE
-         XWRQ==
-X-Forwarded-Encrypted: i=1; AJvYcCWn9OtL2FLd4dGcmprvbOxzdtGHywdgiB4JwDuNfup9oDxEnXbOTbQItRNsyqiYhTc2Dzw=@vger.kernel.org
-X-Gm-Message-State: AOJu0YysNge4PoLp5LP5YfytOdhY8330JHyCvyVEWE7hLe427Rn+RrnB
-	AUeFUx8AhI7n1F4xojYBfpJWVE+F2KR3dE4eej5fSsLnCCWs5vKLY7Jbzq/NRr4CQz3RXrPlRao
-	+ORaPe8CjS5VBsRnvg9tFZFJkFl26uhP5qNaCU/uMci+6pxDDySH6kA==
-X-Gm-Gg: ASbGnctIdIu870Gnwi0/ClpuqCgI6J4tcBbdjYVbBwc7zMwmSH8Ren71Td43uHGfcvH
-	Ywmzic6B0VvIsPXTRCF9bnakBW1wjuq+KQmyyiuQyPaLukRtiuxRQH3r9OqMcRnIbTLTVCU7Aqb
-	D2xqEje/e8/ln1j24TPu0bzTo1ekZphjtqn0kOxrMXafgBBeI/wDJ61+nY3h7awW5bjW7WnFLha
-	dcnfvVneY0IXd8hlG0U0GTqFOY50oxNEeIIEl2WWxhxEXr1yRiJVY+/ThrShD+/glN6kfBWb2qe
-	ZEuR98v8HnJ/N3acXZUrPIuAfLTw+Akj0sVMlMRD+79zeQQ6G0VzmrLugzGjpsAQU4IaZqA=
-X-Received: by 2002:a05:600c:4e52:b0:45b:7b00:c129 with SMTP id 5b1f17b1804b1-46e612e6f9fmr20481935e9.35.1759308097326;
-        Wed, 01 Oct 2025 01:41:37 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IH8QJAuvtlCsccWP6Z3nHhGp8ri9bfmSgiuHkBCRTAQ5VY/+kdMyl+7997vo9nNzkJh4eB3wg==
-X-Received: by 2002:a05:600c:4e52:b0:45b:7b00:c129 with SMTP id 5b1f17b1804b1-46e612e6f9fmr20481615e9.35.1759308096925;
-        Wed, 01 Oct 2025 01:41:36 -0700 (PDT)
-Received: from [10.33.192.176] (nat-pool-str-t.redhat.com. [149.14.88.106])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-40fc5602eccsm27512661f8f.40.2025.10.01.01.41.35
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 01 Oct 2025 01:41:36 -0700 (PDT)
-Message-ID: <07c0b947-8a17-4efb-a0e8-0f17ab70021a@redhat.com>
-Date: Wed, 1 Oct 2025 10:41:35 +0200
+	s=arc-20240116; t=1759308266; c=relaxed/simple;
+	bh=OITbHtBiKQulBfkyYae+4T6+4pYA0XrXm6IhiHjoxnw=;
+	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=Pu96krDoJR/Vrpaf6WpBcF3eeXfmuJ1olEu8VL3N9hO7jX0dSaoYgNbXZbqjgfHd/hQegg7WG9ZOcZxCW6VSbgdkvo6GcIfc1slgoFxwC0Arns9ssuwtOzpg0kn+HYOeC/ZLR9yGtSPrVfBpinkSk8rLY8ksi6ycTMgm4aZQHXg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Plqo/NgC; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 71C1AC4CEF4;
+	Wed,  1 Oct 2025 08:44:25 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1759308265;
+	bh=OITbHtBiKQulBfkyYae+4T6+4pYA0XrXm6IhiHjoxnw=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=Plqo/NgC3CS3b/cef7CYFgq3oEFShqUTYQrA7AQxkoGnGvb2uG1WVNI7AgBiSt58V
+	 LjpMQ6S+4rxbvcEMeHFmv8Teg1jsTGO82+31mRAhfpoBxhFc5BOqSuIUobj+goVLr9
+	 YAkJalMWxd7ck/Ncyh0thM049zf/w5iOSRdY8rIbNpUqjTmK5K3IMeAkr3tceEOd7U
+	 KcenwMIdFMgXAPrf9UbWTwg11GjzpYwGFwF2OH+09WyUrCZX7KqmQnN+6VOHW1JktR
+	 BcSuEYIx9znSuONefevTRqPPjAYhf2H/ExldrlIuC+sqq/J+QjT64z37AkiP8RU8Xn
+	 IMbpdXklAQp9Q==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.98.2)
+	(envelope-from <maz@kernel.org>)
+	id 1v3sRj-0000000AkPc-0VsO;
+	Wed, 01 Oct 2025 08:44:23 +0000
+Date: Wed, 01 Oct 2025 09:44:22 +0100
+Message-ID: <86qzvnypsp.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Vipin Sharma <vipinsh@google.com>
+Cc: kvm@vger.kernel.org,
+	kvmarm@lists.linux.dev,
+	kvm-riscv@lists.infradead.org,
+	seanjc@google.com,
+	pbonzini@redhat.com,
+	borntraeger@linux.ibm.com,
+	frankja@linux.ibm.com,
+	imbrenda@linux.ibm.com,
+	anup@brainfault.org,
+	atish.patra@linux.dev,
+	zhaotianrui@loongson.cn,
+	maobibo@loongson.cn,
+	chenhuacai@kernel.org,
+	oliver.upton@linux.dev,
+	ajones@ventanamicro.com
+Subject: Re: [PATCH v3 9/9] KVM: selftests: Provide README.rst for KVM selftests runner
+In-Reply-To: <20250930163635.4035866-10-vipinsh@google.com>
+References: <20250930163635.4035866-1-vipinsh@google.com>
+	<20250930163635.4035866-10-vipinsh@google.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 01/25] system/ram_addr: Remove unnecessary
- 'exec/cpu-common.h' header
-To: =?UTF-8?Q?Philippe_Mathieu-Daud=C3=A9?= <philmd@linaro.org>,
- qemu-devel@nongnu.org
-Cc: "Michael S. Tsirkin" <mst@redhat.com>, Nicholas Piggin
- <npiggin@gmail.com>, Elena Ufimtseva <elena.ufimtseva@oracle.com>,
- qemu-arm@nongnu.org, Jagannathan Raman <jag.raman@oracle.com>,
- David Hildenbrand <david@redhat.com>, Halil Pasic <pasic@linux.ibm.com>,
- Eric Farman <farman@linux.ibm.com>, Matthew Rosato <mjrosato@linux.ibm.com>,
- Jason Herne <jjherne@linux.ibm.com>, =?UTF-8?Q?C=C3=A9dric_Le_Goater?=
- <clg@redhat.com>, kvm@vger.kernel.org,
- Christian Borntraeger <borntraeger@linux.ibm.com>,
- Ilya Leoshkevich <iii@linux.ibm.com>,
- Peter Maydell <peter.maydell@linaro.org>, qemu-ppc@nongnu.org,
- Harsh Prateek Bora <harshpb@linux.ibm.com>, Fabiano Rosas <farosas@suse.de>,
- Richard Henderson <richard.henderson@linaro.org>,
- Alex Williamson <alex.williamson@redhat.com>,
- Paolo Bonzini <pbonzini@redhat.com>, qemu-s390x@nongnu.org,
- Peter Xu <peterx@redhat.com>
-References: <20251001082127.65741-1-philmd@linaro.org>
- <20251001082127.65741-2-philmd@linaro.org>
-From: Thomas Huth <thuth@redhat.com>
-Content-Language: en-US
-Autocrypt: addr=thuth@redhat.com; keydata=
- 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
-In-Reply-To: <20251001082127.65741-2-philmd@linaro.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: vipinsh@google.com, kvm@vger.kernel.org, kvmarm@lists.linux.dev, kvm-riscv@lists.infradead.org, seanjc@google.com, pbonzini@redhat.com, borntraeger@linux.ibm.com, frankja@linux.ibm.com, imbrenda@linux.ibm.com, anup@brainfault.org, atish.patra@linux.dev, zhaotianrui@loongson.cn, maobibo@loongson.cn, chenhuacai@kernel.org, oliver.upton@linux.dev, ajones@ventanamicro.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On 01/10/2025 10.21, Philippe Mathieu-Daudé wrote:
-> Nothing in "system/ram_addr.h" requires definitions fromi
-
-s/fromi/from/
-
-> "exec/cpu-common.h", remove it.
+On Tue, 30 Sep 2025 17:36:35 +0100,
+Vipin Sharma <vipinsh@google.com> wrote:
 > 
-> Signed-off-by: Philippe Mathieu-Daudé <philmd@linaro.org>
+> Add README.rst for KVM selftest runner and explain how to use the
+> runner.
+> 
+> Signed-off-by: Vipin Sharma <vipinsh@google.com>
 > ---
->   include/system/ram_addr.h | 1 -
->   1 file changed, 1 deletion(-)
+>  tools/testing/selftests/kvm/.gitignore        |  1 +
+>  tools/testing/selftests/kvm/runner/README.rst | 54 +++++++++++++++++++
+>  2 files changed, 55 insertions(+)
+>  create mode 100644 tools/testing/selftests/kvm/runner/README.rst
 > 
-> diff --git a/include/system/ram_addr.h b/include/system/ram_addr.h
-> index 6b528338efc..f74a0ecee56 100644
-> --- a/include/system/ram_addr.h
-> +++ b/include/system/ram_addr.h
-> @@ -29,7 +29,6 @@
->   #include "qemu/rcu.h"
->   
->   #include "exec/hwaddr.h"
-> -#include "exec/cpu-common.h"
->   
->   extern uint64_t total_dirty_pages;
+> diff --git a/tools/testing/selftests/kvm/.gitignore b/tools/testing/selftests/kvm/.gitignore
+> index 548d435bde2f..83aa2fe01bac 100644
+> --- a/tools/testing/selftests/kvm/.gitignore
+> +++ b/tools/testing/selftests/kvm/.gitignore
+> @@ -4,6 +4,7 @@
+>  !*.c
+>  !*.h
+>  !*.py
+> +!*.rst
+>  !*.S
+>  !*.sh
+>  !*.test
+> diff --git a/tools/testing/selftests/kvm/runner/README.rst b/tools/testing/selftests/kvm/runner/README.rst
+> new file mode 100644
+> index 000000000000..83b071c0a0e6
+> --- /dev/null
+> +++ b/tools/testing/selftests/kvm/runner/README.rst
+> @@ -0,0 +1,54 @@
+> +KVM Selftest Runner
+> +===================
+> +
+> +KVM selftest runner is highly configurable test executor that allows to run
+> +tests with different configurations (not just the default), parallely, save
 
-With the typo fixed:
-Reviewed-by: Thomas Huth <thuth@redhat.com>
+s/parallely/in parallel/
 
+> +output to disk hierarchically, control what gets printed on console, provide
+> +execution status.
+> +
+> +To generate default tests use::
+> +
+> +  # make tests_install
+> +
+> +This will create ``testcases_default_gen`` directory which will have testcases
+
+I don't think using the future tense is correct here. I'd rather see
+something written in the present tense, possibly imperative. For
+example:
+
+"Create 'blah' directory containing 'foo' files, one per test-case.
+
+> +in `default.test` files. Each KVM selftest will have a directory in  which
+> +`default.test` file will be created with executable path relative to KVM
+> +selftest root directory i.e. `/tools/testing/selftests/kvm`.
+
+Shouldn't this honor the existing build output directives? If it
+actually does, then you want to call this out.
+
+> For example, the
+> +`dirty_log_perf_test` will have::
+> +
+> +  # cat testcase_default_gen/dirty_log_perf_test/default.test
+> +  dirty_log_perf_test
+> +
+> +Runner will execute `dirty_log_perf_test`. Testcases files can also provide
+> +extra arguments to the test::
+> +
+> +  # cat tests/dirty_log_perf_test/2slot_5vcpu_10iter.test
+> +  dirty_log_perf_test -x 2 -v 5 -i 10
+> +
+> +In this case runner will execute the `dirty_log_perf_test` with the options.
+> +
+
+The beginning of the text talks about "non-default' configurations,
+but you only seem to talk about the default stuff. How does one deals
+with a non-default config?
+
+	M.
+
+-- 
+Without deviation from the norm, progress is not possible.
 
