@@ -1,77 +1,79 @@
-Return-Path: <kvm+bounces-59328-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-59329-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9EBC5BB1465
-	for <lists+kvm@lfdr.de>; Wed, 01 Oct 2025 18:45:09 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id D4CF2BB1468
+	for <lists+kvm@lfdr.de>; Wed, 01 Oct 2025 18:45:14 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 59F5B2A0363
-	for <lists+kvm@lfdr.de>; Wed,  1 Oct 2025 16:45:09 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9673D2A091D
+	for <lists+kvm@lfdr.de>; Wed,  1 Oct 2025 16:45:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 06372287273;
-	Wed,  1 Oct 2025 16:45:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BDB2927F000;
+	Wed,  1 Oct 2025 16:45:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="KaD2TjU0"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="WfqJISAI"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-wr1-f41.google.com (mail-wr1-f41.google.com [209.85.221.41])
+Received: from mail-wm1-f48.google.com (mail-wm1-f48.google.com [209.85.128.48])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5C43325484B
-	for <kvm@vger.kernel.org>; Wed,  1 Oct 2025 16:45:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.41
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 144EA296BA7
+	for <kvm@vger.kernel.org>; Wed,  1 Oct 2025 16:45:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.48
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1759337102; cv=none; b=K2OtDA4j9JVgesO9l0wbLnZLK6wHuzkzfloFfuWlnQSrpUiutGW4us5KcoGH1d754c7ioDiTCNY4c60f9eyI1vrewBdzrEVPSTPoQO6OrB2hm6t8lJj8Sm0yj8xqpsL8OjCyU6QpuZPmdlfefBfP43CKy7k6qEI8OwMlGrHKIWk=
+	t=1759337106; cv=none; b=RALLbCVrPm5kPXvYru601C84jzvdZJYZo3+QJXY5WiTi+vds65YJYmR3enRFpGURITbOSnH60II38w7+X7P5sRKciXe09Nk1myLpjSeQVEyl4EePQk4RnWxNI8EoqrEh+cdsBCTtAYOJAIUB8caxN4P/n5QGUPSIYtbUdSamDN8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1759337102; c=relaxed/simple;
-	bh=n2atzHTMT+2cbmOqJuot+6k6uHUNUxmR9x/Xp3x1GLM=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=Jdg3r/175iksWc76Dv8TuuKSZ3cefZxoC+zo9c5LxS/lzHRKf7F9aMQRsjV5kXSYc9LAT62C6o+ub7Agy3pbHW3ySMlyXkkgnmffdNuKYCAgF+3h+qH4zESkB3RzjJdFkEvP1LKt6jE3fP2K93SjLMsfr8zxsnkpX/2q+t+A5xc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=KaD2TjU0; arc=none smtp.client-ip=209.85.221.41
+	s=arc-20240116; t=1759337106; c=relaxed/simple;
+	bh=slBLAVh+oEIXiWoa3fOcyT0zcBK2GZDozC/t5svsLgw=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=RTQol+JnVAT88mBCfe9rb/5p2C5vvSfYzdTkAvv0870BMoTLwpVt0zRF0Gyr16NJF0h2fZiJbuIpx3MTlrV5veRecYH7vaspQLllUIQ9t6iQPwYnO2Ix9MF6xci9t1EClwqLVNyIp3AyvYp36gXwWbXJiM+6ZPJg5+Mp9lKqUUM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=WfqJISAI; arc=none smtp.client-ip=209.85.128.48
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
-Received: by mail-wr1-f41.google.com with SMTP id ffacd0b85a97d-42557c5cedcso14746f8f.0
-        for <kvm@vger.kernel.org>; Wed, 01 Oct 2025 09:45:00 -0700 (PDT)
+Received: by mail-wm1-f48.google.com with SMTP id 5b1f17b1804b1-46e2c3b6d4cso51005e9.3
+        for <kvm@vger.kernel.org>; Wed, 01 Oct 2025 09:45:04 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1759337098; x=1759941898; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=tPaV+VFWxQXUIKu08GdGOFPhuZfOnUHddrLWV+7K1Lw=;
-        b=KaD2TjU0mVtOHL0ojzz4a7dmvGunLrrhm+MXO1S8oOkm1dSuuOFHNYJFIJtVRHo8Ik
-         cz9e12Y9pwWEE1S7Aru40zzNHvtIk6UAM9I5boo+nslVOeoM7bHXE21peA8/FZSu4eAg
-         R0iv/u4S1hjoXnKJCXHBoc0Fe1XhSgDwZkxZwQ9FQQyCHbPt4zOmJ6Db0OZpP2uBiTPW
-         7I5mqjv9rR06JSJMBg9aIyQEKuEfn9PqUzWRPItxiAALTt7R13197mBIol323Wy3sZ3t
-         8vU8q+N8591Xz2qBbY6R8ZVvd98K/vvHjZB+Hto1PfP8x31c0UQ2iPxfPJhSrz1v3ikh
-         OICQ==
+        d=linaro.org; s=google; t=1759337103; x=1759941903; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=caJIjlQVI1zG/C/he2yH9f+M89HcV8DgqjfXZVRQPEU=;
+        b=WfqJISAIBLVIYLF2N6jmAROWu2/bQ7E7g8TN9BC4T5r8YiV8IeQrw1P+xHbUSkIr8P
+         SuWAuJt7AKaL1IGKcp9/TmmIckmGIc23TK2jRu2KalFsIlyAPbqTfM3RoMvGRnuPiA3z
+         ZiHntVbYRNI/VGoYKWpq9c7R4ljhFoa697RMwNuQqSX3vEA133QGsutZ/C84+W04CjtK
+         aibCypDF/6vVEZ3OmzPXeCwXBOCSn/Ag/JIdP5uU16cLELY+tOZMoo+eFafKEW1fhPrM
+         oMu3FhhCUuDB5hJWcACDtUnCLo5gsgPrpnuSZyDfgb+iiAa9KbVJqnkg3MAQTELOX3bn
+         D5yA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1759337098; x=1759941898;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=tPaV+VFWxQXUIKu08GdGOFPhuZfOnUHddrLWV+7K1Lw=;
-        b=KAgm+go/nW7DS7qHJxzihR+hq0cYwbjR8fflPuG92aq1Co+8LXYbGBy+b2otLp50wH
-         8Pot54W355STdmQAjkYDiOqB1o9P3uBZ4ZmyoZDkVQrwQHQlbLMEUtHe5KJMa8W7oK8i
-         yPmtEvk+RYdIenLNXpbxzfX0v6DXqoDUO/EA+Su/V/8QUWueirV9eik4UGgY4n0Dp82r
-         6/JPryHH48fG6btnISUc6p1ANqNrYbHO7hHYcIer9cEX4qL0ofq2WtfyvfVNu4kCJy9A
-         S3HVmXo8aA9XQml92Np1eoNOfTIsFK7vcoMNsxTCdjWNXgCFl2Pob8yQzE9L8KFbw8ON
-         Vz/A==
-X-Forwarded-Encrypted: i=1; AJvYcCVXC2puHP6OurxLUH4zmdb+02sLMynV+lqkbOzXmYHydbJBKuylIlr5dCVJ0GH95ZhSdeA=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyqpJyjaUB4vki81rEdc2gyhfEiA4h3iSA9HMBTyqfoHUCnpbFV
-	bobbTNmKyUNoXbBaiIjlj92fyexTJAEqYaV1dXdJb4owoZRBmg3RcDGSbGr66dBPsto=
-X-Gm-Gg: ASbGncspdpAovOGP/VLYwL1uIridHpcP8RzuYSyUjW8Gjt8Ra0qNGuXfx2D4wobRcO1
-	zrgnnESXpfgt/NUV2Lor9yVhMbOh8c2P3WbD1EPelry6x5t50lmZKDLbXSlHQrIwNFt73CQqP+z
-	GEsGkkAAlkUqv26afDWyZj/cP8bzNGalw7dQ1ntEul+hNzJLtoiH0IZB1B5FVgf7ipveMTEaBu1
-	8aQ0jOrI67nT00gMCE5v3/6uIXh5sFT8KWlJZIP/15zTyEWuRRUBhS6Xbm0u9qc3B8ODp3IMYsX
-	7Hy/CLhKsYTeygC8612ZwyIYE8E5XDK8As78wnakbiSxGIGDslIXOCpux2ejpIsBWT+dzWB2ZAW
-	Ffur3nFXQ7xejBIvZLSMIulIpJDcoiw2XEQPVU2uYsk9Fuss2a867Us/QdDodIl5TwR5Md+8BGJ
-	w3je/XjVW7zmj8WunPdTQQ
-X-Google-Smtp-Source: AGHT+IEkbIsBMTIstQ0lP9y8hSs1E0dcxoBKUVnIcQD9/CDQ0YIod8B2npgW5sGEVlTBXLntX/axNQ==
-X-Received: by 2002:a05:6000:24c8:b0:3f9:1571:fdea with SMTP id ffacd0b85a97d-4255781b8d0mr3521580f8f.44.1759337098555;
-        Wed, 01 Oct 2025 09:44:58 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1759337103; x=1759941903;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=caJIjlQVI1zG/C/he2yH9f+M89HcV8DgqjfXZVRQPEU=;
+        b=J+nTGWR+RcqCMnHVOAAmtToYSFQYZgq9mAZSPpEd6oy0zqJt9dPadkntVHG2BPsM4p
+         Fv0VpQd84nDa13jFnCRozoa4Nhnv8cBgubnpMUs8k8zDE9fqJHf+M7g9Vd8P0zVcalRq
+         b5M9RIDg56gpYvp2zTcQ+3j3r5RsTQUcqn23/wCY5laQIO61tUBBN9Je001Lx5ebIZLQ
+         7Sj2MTpUWlTE0EJ/k2YGebvidRv+PhLjZztVvZbLINxgm0yPHhYGbhAGb7aW8JmwJKJQ
+         402q/gULOe5H/m09FKfonxBuLxrFfFZvTZm20+uKBydDgConX4MwyKXurH4vWAKXJsXd
+         YjTA==
+X-Forwarded-Encrypted: i=1; AJvYcCX7A//woFUVGtlT+4qRzzveO0p0XfhbCkTTBiSQdJrsTrMrbJDjevVMyY1InMFxlUI0u4w=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yyl0hPb3EzDbKjTf7PqEt0D1iAxJu0gD6EoYqLDFXwlHip43eI2
+	W4LKujE9uNjDjMy4KLbXG7GRjHzx00/eOqDDXwwZGsxtG3QWiBqmCunpCkUR2mWKxv0=
+X-Gm-Gg: ASbGnctkiVZtMUwclApCs/rf3AvCNqET1HBGL55/XeTmsrcoZ1nlo8L4i05wPpTTTjN
+	f5SGnmmmlkEYHu/yfubMJ7O++WldZ5O/tknTc4eafi26iwqZlCdgpKDIVyCX6FBml7fdTMxOnvS
+	3xMKQ5t0kiPntZ1RU5uvfS3l50rfzTLRHjDNT3+tNwXcWkEN8xvEyULdntJTAVm39QibmsugRQ/
+	cU4WhhEA/UkuGhsuZ7qKI+d+nCGFHQO1MCkgL5K24WT51U8USB0iKLyKRW1yUYQI6FH37/3x5Mo
+	DBzPw+UG3HyMB38c5h8vSq64QA7AK5i1pCwLGXDkdURMWxOUjfStpK0U8WhpA+zf5Nxkry72XXr
+	HMF2/qVJfyptApBT2ovqDPRKeU5Kuu9rYtZV8gWYijhbyl+bJjVS+JfWcWkyzIRhWHFq6r7VTIw
+	c/lYqIjJIuo+iJpdOKeNJY
+X-Google-Smtp-Source: AGHT+IHSXLf/MaBMGoP1ipyo6HIx1farhws9Inco9aGTj7aaRrCeY0cgBMm3s7sKT+uA83mkq0UQnw==
+X-Received: by 2002:a05:600c:1f8c:b0:45d:e5ff:e38c with SMTP id 5b1f17b1804b1-46e612daeccmr28760345e9.32.1759337103419;
+        Wed, 01 Oct 2025 09:45:03 -0700 (PDT)
 Received: from localhost.localdomain (88-187-86-199.subs.proxad.net. [88.187.86.199])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-40fc6cf3835sm27970896f8f.46.2025.10.01.09.44.57
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-46e5b5f3015sm41174145e9.1.2025.10.01.09.45.02
         (version=TLS1_3 cipher=TLS_CHACHA20_POLY1305_SHA256 bits=256/256);
-        Wed, 01 Oct 2025 09:44:58 -0700 (PDT)
+        Wed, 01 Oct 2025 09:45:02 -0700 (PDT)
 From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@linaro.org>
 To: qemu-devel@nongnu.org
 Cc: Paolo Bonzini <pbonzini@redhat.com>,
@@ -83,45 +85,67 @@ Cc: Paolo Bonzini <pbonzini@redhat.com>,
 	Fabiano Rosas <farosas@suse.de>,
 	David Hildenbrand <david@redhat.com>,
 	=?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@linaro.org>
-Subject: [PATCH v2 0/6] system/ramblock: Sanitize header
-Date: Wed,  1 Oct 2025 18:44:50 +0200
-Message-ID: <20251001164456.3230-1-philmd@linaro.org>
+Subject: [PATCH v2 1/6] system/ramblock: Remove obsolete comment
+Date: Wed,  1 Oct 2025 18:44:51 +0200
+Message-ID: <20251001164456.3230-2-philmd@linaro.org>
 X-Mailer: git-send-email 2.51.0
+In-Reply-To: <20251001164456.3230-1-philmd@linaro.org>
+References: <20251001164456.3230-1-philmd@linaro.org>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 
-Usual API cleanups, here focusing on RAMBlock API:
-move few prototypes out of "exec/cpu-common.h" and
-"system/ram_addr.h" to "system/ramblock.h".
+This comment was added almost 5 years ago in commit 41aa4e9fd84
+("ram_addr: Split RAMBlock definition"). Clearly it got ignored:
 
-v2:
-- Do not use ram_addr_t for offsets (rth)
+  $ git grep -l system/ramblock.h
+  hw/display/virtio-gpu-udmabuf.c
+  hw/hyperv/hv-balloon.c
+  hw/virtio/vhost-user.c
+  migration/dirtyrate.c
+  migration/file.c
+  migration/multifd-nocomp.c
+  migration/multifd-qatzip.c
+  migration/multifd-qpl.c
+  migration/multifd-uadk.c
+  migration/multifd-zero-page.c
+  migration/multifd-zlib.c
+  migration/multifd-zstd.c
+  migration/multifd.c
+  migration/postcopy-ram.c
+  system/ram-block-attributes.c
+  target/i386/kvm/tdx.c
+  tests/qtest/fuzz/generic_fuzz.c
 
-Philippe Mathieu-Daudé (6):
-  system/ramblock: Remove obsolete comment
-  system/ramblock: Move ram_block_is_pmem() declaration
-  system/ramblock: Move ram_block_discard_*_range() declarations
-  system/ramblock: Use ram_addr_t in ram_block_discard_guest_memfd_range
-  system/ramblock: Use ram_addr_t in ram_block_discard_range()
-  system/ramblock: Move RAMBlock helpers out of "system/ram_addr.h"
+At this point it seems saner to just remove it.
 
- include/exec/cpu-common.h                 |  3 ---
- include/system/ram_addr.h                 | 13 ---------
- include/system/ramblock.h                 | 27 +++++++++++++++----
- accel/kvm/kvm-all.c                       |  1 +
- hw/hyperv/hv-balloon-our_range_memslots.c |  1 +
- hw/virtio/virtio-balloon.c                |  1 +
- hw/virtio/virtio-mem.c                    |  1 +
- migration/ram.c                           |  3 ++-
- system/physmem.c                          | 33 ++++++++++++-----------
- 9 files changed, 45 insertions(+), 38 deletions(-)
+Signed-off-by: Philippe Mathieu-Daudé <philmd@linaro.org>
+Reviewed-by: David Hildenbrand <david@redhat.com>
+---
+ include/system/ramblock.h | 5 -----
+ 1 file changed, 5 deletions(-)
 
+diff --git a/include/system/ramblock.h b/include/system/ramblock.h
+index 87e847e184a..8999206592d 100644
+--- a/include/system/ramblock.h
++++ b/include/system/ramblock.h
+@@ -11,11 +11,6 @@
+  *
+  */
+ 
+-/*
+- * This header is for use by exec.c and memory.c ONLY.  Do not include it.
+- * The functions declared here will be removed soon.
+- */
+-
+ #ifndef SYSTEM_RAMBLOCK_H
+ #define SYSTEM_RAMBLOCK_H
+ 
 -- 
 2.51.0
 
