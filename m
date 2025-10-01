@@ -1,237 +1,187 @@
-Return-Path: <kvm+bounces-59241-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-59242-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0C1C0BAF8F7
-	for <lists+kvm@lfdr.de>; Wed, 01 Oct 2025 10:13:02 +0200 (CEST)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
+	by mail.lfdr.de (Postfix) with ESMTPS id E94CABAF92E
+	for <lists+kvm@lfdr.de>; Wed, 01 Oct 2025 10:21:40 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 67D3F1940C42
-	for <lists+kvm@lfdr.de>; Wed,  1 Oct 2025 08:13:24 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 9B8B44E1A9B
+	for <lists+kvm@lfdr.de>; Wed,  1 Oct 2025 08:21:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 012BF27B4F7;
-	Wed,  1 Oct 2025 08:12:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7888627D771;
+	Wed,  1 Oct 2025 08:21:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ionos.com header.i=@ionos.com header.b="IVczpYBv"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="dHbEIOyt"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-ed1-f45.google.com (mail-ed1-f45.google.com [209.85.208.45])
+Received: from mail-wr1-f66.google.com (mail-wr1-f66.google.com [209.85.221.66])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E7CEA279782
-	for <kvm@vger.kernel.org>; Wed,  1 Oct 2025 08:12:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.45
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 96E9E19DF4F
+	for <kvm@vger.kernel.org>; Wed,  1 Oct 2025 08:21:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.66
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1759306371; cv=none; b=dQEoT8brcbJz9KXNwUaWWhujIe8Nmk/pyzyWSGcFYYm8vJwMzFr5N2eCj9tvCPEMkqBZfM2UvAjLxYmg6HwrtY87XsqDxXnjUou+tiXX9zA+d+8YAZ/3WkiM3fRxNwkTYXXTkfRcb9C21fdN2syZF7+MOx5ujhWIRzJ7hQH+Lpw=
+	t=1759306893; cv=none; b=PBeACmaEm/hxktkuy/lbrNliuAeoUntdhBsNl6YytJBzw1CM1XIPT62BDLDtlEwhQiWbhltenPVesxam4aYRB8kFxne0HskJRNXmwE4zJ9CGWcBF4+wm0VgcRN4OXjbU/xh8zsl8As6h/A/uBtZamLoxiO+CuRTIuR3Y1mPC2Ws=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1759306371; c=relaxed/simple;
-	bh=/ykmk2fkekJndu1S7aDPXYfJRdmiCohbXJjZADcy7R4=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=k+vV3LJIQfbyOIrmaxBOc/THV05vDEV8ETpSZ3dHdS0gff7FRWZ5AIVakR0Pzs4kr8OpCzv7Fq0RBZim9Ao2VwrCbqLb1rEB9gWRq8KWZ8OrCNPAL4OczN+SeePJ/jx1CK81mEVh+LpXQBWoP+MerTB0n0RZSW/WOARlfL0Bsmk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=ionos.com; spf=pass smtp.mailfrom=ionos.com; dkim=pass (2048-bit key) header.d=ionos.com header.i=@ionos.com header.b=IVczpYBv; arc=none smtp.client-ip=209.85.208.45
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=ionos.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ionos.com
-Received: by mail-ed1-f45.google.com with SMTP id 4fb4d7f45d1cf-634beb1a884so1079897a12.3
-        for <kvm@vger.kernel.org>; Wed, 01 Oct 2025 01:12:47 -0700 (PDT)
+	s=arc-20240116; t=1759306893; c=relaxed/simple;
+	bh=GQc+UN5FthX5dgvHGCUoBL/3QCykQk14VbR13XAGTus=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=Nq9ta80LBrafgZ5hn0I26ZwhSGat1Npk2T2Am/yErsB26NNloUC2Zdp3FXdcLayMlbrTpN9dIUASdl3vnxixF3EJ/mKTgZQpuut2QEnbyhsQtHE7fbXvUupCNgALTTJ5CzhADWyKHA3FBhcVWQxT9dNVE8Fu+gy63MOhLYv+7MQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=dHbEIOyt; arc=none smtp.client-ip=209.85.221.66
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
+Received: by mail-wr1-f66.google.com with SMTP id ffacd0b85a97d-3f0ae439b56so3951734f8f.3
+        for <kvm@vger.kernel.org>; Wed, 01 Oct 2025 01:21:31 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=ionos.com; s=google; t=1759306366; x=1759911166; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=/wta+A7F956rwxD04gcs4FdCT+k6OzI/an4+vTIk+CQ=;
-        b=IVczpYBv2qLCeWjInXrrmtVuhT8dPmMMc43wBtgblij+igRlqvbOk8RWyVYd6YXgAI
-         l1Cn5c/nQNJspUmcT1yqY8/XFGPQPMeE4mFBTHelL1Hf9rdt0EctoG7v2djXU34NhIBM
-         XsRGpGswui+f2xMtXvqNTi0b6ikh9VYaNl0hFPnyHE/VVRgFgE+tU0HhBM6mXrrAcwZA
-         80365TNXfzZCHJF3hpDU4vMg7+Zb06avzz62QpmFTbUSrXp5c/ehSLwKbiSUSJpGQz1k
-         d/3JpvGco+2DsAjnJ/SRpdYeHnIal82pq12B/mHTFbPxrjMcHNoFjPZkTpnLNDrZ/6uX
-         IFUw==
+        d=linaro.org; s=google; t=1759306890; x=1759911690; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=UYQLfS3wHinTh/qC50pdHFAAD2+v7Vtk7mze5MUxp5E=;
+        b=dHbEIOytZdO8Kta5T2p19b+r59dOY81ZMckdgtjkc+Q0TdxDJ8RAfD9DeLL3rHLiZx
+         HgWWDvY+Pf/pBPQsDidqUXcK1vjMIxneFisO738F9cG2vstOeeTWLIkSqMWJcGUfl7vd
+         s3qnDZvlREnUGL2B67kJUHxC33oMNTC4pNCWgswBK4UTAhpOQz1OQJnfmVPgYRIvcduL
+         fr4I4fURkyesnxzE99CqU2Y/oqf5NVJ9YjntzmHTU5UGwAz/QUQehaQFhA1eYn6kDw9p
+         PTQPiICvAm2Cw09pMsXLAeSKSbkSIo2ZMUbymMnPjY6zyU9iK0QbF3TgVVoqRr7K7yTk
+         u23w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1759306366; x=1759911166;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=/wta+A7F956rwxD04gcs4FdCT+k6OzI/an4+vTIk+CQ=;
-        b=fPHLJJ7wF/Lzg3yapyck7dQXUq2e3HluvhK6r7RjbyRty5e+g3PH59wRmO8Ic4iJAe
-         yIh3baPDb5HdT27xvYsjnDdqiyeyN1HHajbCSrTDOQW8g7HxmFbdg7CZ+xIvGeuVQmDZ
-         pNJFIdc09M/1JczIiPfew1RiM/1By7vf5dBxNSViVmWGekV3uO8OmjC/TxJu37558cpJ
-         zWB8geFWsG2OIF68A+Z55YgcO1HdRnojVbUUZ/eQruPbGXz1zIvlUdB0euEij1oPoPIC
-         VCPW3VCyzKw4kuD1i3/yBmLXugVyX/UtIuxptO4Av8dZMBhPPYxfd981DdJOYGQp3Yfh
-         64IQ==
-X-Forwarded-Encrypted: i=1; AJvYcCXK6Bz0bfk9XSU919lfPzDGG2BbFR0pQw9cDE73wPHy//9IJjG9B1gDkbo2xluGxLC3bo0=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzrZcYFtJGky0pOy8PciD8xDwA6wJi0SffpWMHMd2MqCM/93JSv
-	zee5zvx+DrcGi5SN5Mz+fe0SY7FYJelMQucmSVOt74uVJ6VDEPWVcEuKgKgw5C1vSHULf9sih7e
-	EDcGT4gHi732OtO1FO/KC2YZ1hsJVYfiaJ4MPObYW4A==
-X-Gm-Gg: ASbGncsJzDjMkZ36LrvAcdbzgeSGcxkhVnu4O0fhQu3AXPs/cputuUXYuJO04xiBEoD
-	OWS+0N1NLV9+2Q62kdQWH5pmXrFV3heFtcjds80J1V1MSmMZ0R4q8bwPDgrbv6edP8qJh7IR52J
-	sbfqf3Jj5Ya8af+4dUEMW0547t+/ej6ut7/jR2xLvqwcFjHWQVhJoz4EaGawS2U0dnR+Y6AIYcM
-	XcUU7EddDUyJdrG0cpTgIjACBol/9s=
-X-Google-Smtp-Source: AGHT+IHxoxX3gNePX92jgrf3o5NGrsKnxP1/TaoEMmDFGG51CJYv4H8WcqjR9qqpRa0ecLRvIjN9Sz2BUF6bF5jNxvU=
-X-Received: by 2002:a05:6402:354f:b0:62f:935e:5f56 with SMTP id
- 4fb4d7f45d1cf-63678e7ba35mr1645295a12.7.1759306366111; Wed, 01 Oct 2025
- 01:12:46 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1759306890; x=1759911690;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=UYQLfS3wHinTh/qC50pdHFAAD2+v7Vtk7mze5MUxp5E=;
+        b=g3EKqyoGZYMXv6andX5epox8acW3f5WRrWNPgiWZwZPUH3k2ccDeRHIX/yi2iFXL2M
+         ei9VKQoVy9EVgfIel4nLxa75qyAgaWqu/5870NS6lMJj1yczQgORKqtARqUlDxGn7xy8
+         tnGH7fjYS5VXhEa5P2CWAjNJ78x0itP6LM+sJWQr/Hxyo/gRSKRjY3VWq860Uqp5id0s
+         cTm2FN+4wOIN0Vq7iWxDJuZvVTBLQClG0+l2cI51sEnCySD+XFJDvm/f+P8OymEqyAY8
+         xm3feM0jmLhYKriUuadKN6C19U69N8xEo1JhYHY2S2MEpQ8Lo8fTarLlNtSJdTGkPGbE
+         wVDQ==
+X-Forwarded-Encrypted: i=1; AJvYcCUW0IpmYMAMzXBTd1wlbOblIuJQbpFNeaHWeQreo0VlwS0wvyp18fPyxqWhZkdgyFFkSoc=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxKYRCJWpzQu7h4pEwPHeWmmTIaJt3xjeAerVscKRLmoZ5tBQJa
+	/lGaqw+u4leZnCXKsIEohlGhqIpg1oBbdKntEfkfslMPWwlc5cprInI0z925fZkWMso=
+X-Gm-Gg: ASbGnctI83xNB9W6HMThZvIwiR5GgCjJBGC+eVzYudTBuAswKTzuzr8PB1wXsP0hGsV
+	+JKi/ZT7Qb//vxY6gsa+j5+eYZzZEAFwT7ZL1XKSLduFM/yMm4Mz3IdzLOMcxkxZSZW2Xt003Lg
+	lL73ItFAEtBlmAPK1YTQrckZZNIAKPAhSMTq5QMiqIxAvPHZaGvsFhOiyi+1L/SN8fYBCN0l+CM
+	K8YlYr/SUC5B0twXHs01dBSaQgfMjVYRNskdEboOkH94UVpyCH7I3wtuvqybiOV/ENR1yvXEQq2
+	a0yH8e5cW5nkijKdrvBSaCM/jRXqLVU8TVyHbJ2m16+UwyaYK59/J6cB62Kx6mDUMT2JC4MHd6F
+	VT7idoFTlq1CgFswJ45IOconMJYC2u/RyWCS/fLlZ00VMo0PgR0DPrL6YsYfxw39g/muD/6Szc5
+	BU6skEj91eZ9eZok6aBxPV
+X-Google-Smtp-Source: AGHT+IHKt/ivTsoC6PZcZTjZzL5LDs95xiGR88ZSKusdRALPX64xSrvTFt9lt4nGAnJGd8G2pFxftQ==
+X-Received: by 2002:a05:6000:310d:b0:3ee:af89:a68 with SMTP id ffacd0b85a97d-425577f321dmr1791557f8f.22.1759306889640;
+        Wed, 01 Oct 2025 01:21:29 -0700 (PDT)
+Received: from localhost.localdomain (88-187-86-199.subs.proxad.net. [88.187.86.199])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-40fc8aa0078sm25842872f8f.59.2025.10.01.01.21.28
+        (version=TLS1_3 cipher=TLS_CHACHA20_POLY1305_SHA256 bits=256/256);
+        Wed, 01 Oct 2025 01:21:29 -0700 (PDT)
+From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@linaro.org>
+To: qemu-devel@nongnu.org
+Cc: "Michael S. Tsirkin" <mst@redhat.com>,
+	Nicholas Piggin <npiggin@gmail.com>,
+	Elena Ufimtseva <elena.ufimtseva@oracle.com>,
+	qemu-arm@nongnu.org,
+	Jagannathan Raman <jag.raman@oracle.com>,
+	David Hildenbrand <david@redhat.com>,
+	=?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@linaro.org>,
+	Halil Pasic <pasic@linux.ibm.com>,
+	Eric Farman <farman@linux.ibm.com>,
+	Thomas Huth <thuth@redhat.com>,
+	Matthew Rosato <mjrosato@linux.ibm.com>,
+	Jason Herne <jjherne@linux.ibm.com>,
+	=?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@redhat.com>,
+	kvm@vger.kernel.org,
+	Christian Borntraeger <borntraeger@linux.ibm.com>,
+	Ilya Leoshkevich <iii@linux.ibm.com>,
+	Peter Maydell <peter.maydell@linaro.org>,
+	qemu-ppc@nongnu.org,
+	Harsh Prateek Bora <harshpb@linux.ibm.com>,
+	Fabiano Rosas <farosas@suse.de>,
+	Richard Henderson <richard.henderson@linaro.org>,
+	Alex Williamson <alex.williamson@redhat.com>,
+	Paolo Bonzini <pbonzini@redhat.com>,
+	qemu-s390x@nongnu.org,
+	Peter Xu <peterx@redhat.com>
+Subject: [PATCH 00/25] system/physmem: Extract API out of 'system/ram_addr.h' header
+Date: Wed,  1 Oct 2025 10:21:00 +0200
+Message-ID: <20251001082127.65741-1-philmd@linaro.org>
+X-Mailer: git-send-email 2.51.0
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250924-vmscape-bhb-v1-0-da51f0e1934d@linux.intel.com> <20250930012102.iayl5otar3lim23i@desk>
-In-Reply-To: <20250930012102.iayl5otar3lim23i@desk>
-From: Jinpu Wang <jinpu.wang@ionos.com>
-Date: Wed, 1 Oct 2025 10:12:33 +0200
-X-Gm-Features: AS18NWDjsMAcIoTBRAqX3j_rJS61kSImXarv5R47JeNrqoZozENyZbt4z5E7ip0
-Message-ID: <CAMGffEmJM+NZVM4HaXA6jmdjB1C6nPNxmLizD9P-3CojfVLsXw@mail.gmail.com>
-Subject: Re: [PATCH 0/2] VMSCAPE optimization for BHI variant
-To: Pawan Gupta <pawan.kumar.gupta@linux.intel.com>
-Cc: x86@kernel.org, "H. Peter Anvin" <hpa@zytor.com>, Josh Poimboeuf <jpoimboe@kernel.org>, 
-	David Kaplan <david.kaplan@amd.com>, Sean Christopherson <seanjc@google.com>, 
-	Paolo Bonzini <pbonzini@redhat.com>, asit.k.mallick@intel.com, kvm@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, tao1.zhang@intel.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 8bit
 
-On Tue, Sep 30, 2025 at 3:22=E2=80=AFAM Pawan Gupta
-<pawan.kumar.gupta@linux.intel.com> wrote:
->
-> On Mon, Sep 29, 2025 at 07:12:03AM +0200, Jack Wang wrote:
-> > From: Pawan Gupta <pawan.kumar.gupta@linux.intel.com>
-> >
-> > Hi Pawan,
-> >
-> > Thx for the patches, I tested them on our Intel SierraForest machine wi=
-th
-> > fio 4k randread/randwrite from guest, qemu virtio-blk, noticed nice
-> > performance improvement comparing to the default IBPB before exit to
-> > userspace mitigation. eg with default IBPB mitigation fio gets 204k IOP=
-S,
-> > with this new Clear BHB before exit to userspace gets 323k IOPS.
->
-> Thanks for sharing the results.
->
-> I realized the LFENCE in the clear_bhb_long_loop() is not required. The
-> ring3 transition after the loop should be serializing anyways. Below patc=
-h
-> gets rid of that LFENCE. It should give some performance boost as well.
->
-> --- 8< ---
-> From: Pawan Gupta <pawan.kumar.gupta@linux.intel.com>
-> Subject: [PATCH] x86/vmscape: Remove LFENCE from BHB clearing long loop
->
-> Long loop is used to clear the branch history when switching from a guest
-> to host userspace. The LFENCE barrier is not required as ring transition
-> itself acts as a barrier.
->
-> Move the prologue, LFENCE and epilogue out of __CLEAR_BHB_LOOP macro to
-> allow skipping the LFENCE in the long loop variant. Rename the long loop
-> function to clear_bhb_long_loop_no_barrier() to reflect the change.
->
-> Signed-off-by: Pawan Gupta <pawan.kumar.gupta@linux.intel.com>
-Yes, I can confirm with this change on top, I get almost same
-performance as vmscape=3Doff for fio test.
+Following a previous comment from Richard in [*],
+reduce "system/ram_addr.h" size by un-inlining a
+lot of huge functions that aren't really justified,
+and extract the API to the hew "system/physmem.h"
+header, after renaming the functions (removing the
+confusing 'cpu_' prefix).
 
-Thx for pushing the performance further.
-> ---
->  arch/x86/entry/entry_64.S            | 32 +++++++++++++++++-----------
->  arch/x86/include/asm/entry-common.h  |  2 +-
->  arch/x86/include/asm/nospec-branch.h |  4 ++--
->  3 files changed, 23 insertions(+), 15 deletions(-)
->
-> diff --git a/arch/x86/entry/entry_64.S b/arch/x86/entry/entry_64.S
-> index f5f62af080d8..bb456a3c652e 100644
-> --- a/arch/x86/entry/entry_64.S
-> +++ b/arch/x86/entry/entry_64.S
-> @@ -1525,10 +1525,6 @@ SYM_CODE_END(rewind_stack_and_make_dead)
->   * Target Selection, rather than taking the slowpath via its_return_thun=
-k.
->   */
->  .macro __CLEAR_BHB_LOOP outer_loop_count:req, inner_loop_count:req
-> -       ANNOTATE_NOENDBR
-> -       push    %rbp
-> -       mov     %rsp, %rbp
-> -
->         movl    $\outer_loop_count, %ecx
->         ANNOTATE_INTRA_FUNCTION_CALL
->         call    1f
-> @@ -1560,10 +1556,7 @@ SYM_CODE_END(rewind_stack_and_make_dead)
->         jnz     1b
->  .Lret2_\@:
->         RET
-> -5:     lfence
-> -
-> -       pop     %rbp
-> -       RET
-> +5:
->  .endm
->
->  /*
-> @@ -1573,7 +1566,15 @@ SYM_CODE_END(rewind_stack_and_make_dead)
->   * setting BHI_DIS_S for the guests.
->   */
->  SYM_FUNC_START(clear_bhb_loop)
-> +       ANNOTATE_NOENDBR
-> +       push    %rbp
-> +       mov     %rsp, %rbp
-> +
->         __CLEAR_BHB_LOOP 5, 5
-> +
-> +       lfence
-> +       pop     %rbp
-> +       RET
->  SYM_FUNC_END(clear_bhb_loop)
->  EXPORT_SYMBOL_GPL(clear_bhb_loop)
->  STACK_FRAME_NON_STANDARD(clear_bhb_loop)
-> @@ -1584,8 +1585,15 @@ STACK_FRAME_NON_STANDARD(clear_bhb_loop)
->   * protects the kernel, but to mitigate the guest influence on the host
->   * userspace either IBPB or this sequence should be used. See VMSCAPE bu=
-g.
->   */
-> -SYM_FUNC_START(clear_bhb_long_loop)
-> +SYM_FUNC_START(clear_bhb_long_loop_no_barrier)
-> +       ANNOTATE_NOENDBR
-> +       push    %rbp
-> +       mov     %rsp, %rbp
-> +
->         __CLEAR_BHB_LOOP 12, 7
-> -SYM_FUNC_END(clear_bhb_long_loop)
-> -EXPORT_SYMBOL_GPL(clear_bhb_long_loop)
-> -STACK_FRAME_NON_STANDARD(clear_bhb_long_loop)
-> +
-> +       pop     %rbp
-> +       RET
-> +SYM_FUNC_END(clear_bhb_long_loop_no_barrier)
-> +EXPORT_SYMBOL_GPL(clear_bhb_long_loop_no_barrier)
-> +STACK_FRAME_NON_STANDARD(clear_bhb_long_loop_no_barrier)
-> diff --git a/arch/x86/include/asm/entry-common.h b/arch/x86/include/asm/e=
-ntry-common.h
-> index b7b9af1b6413..c70454bdd0e3 100644
-> --- a/arch/x86/include/asm/entry-common.h
-> +++ b/arch/x86/include/asm/entry-common.h
-> @@ -98,7 +98,7 @@ static inline void arch_exit_to_user_mode_prepare(struc=
-t pt_regs *regs,
->                 if (cpu_feature_enabled(X86_FEATURE_IBPB_EXIT_TO_USER))
->                         indirect_branch_prediction_barrier();
->                 else if (cpu_feature_enabled(X86_FEATURE_CLEAR_BHB_EXIT_T=
-O_USER))
-> -                       clear_bhb_long_loop();
-> +                       clear_bhb_long_loop_no_barrier();
->
->                 this_cpu_write(x86_pred_flush_pending, false);
->         }
-> diff --git a/arch/x86/include/asm/nospec-branch.h b/arch/x86/include/asm/=
-nospec-branch.h
-> index 32d52f32a5e7..151f5de1a430 100644
-> --- a/arch/x86/include/asm/nospec-branch.h
-> +++ b/arch/x86/include/asm/nospec-branch.h
-> @@ -388,9 +388,9 @@ extern void write_ibpb(void);
->
->  #ifdef CONFIG_X86_64
->  extern void clear_bhb_loop(void);
-> -extern void clear_bhb_long_loop(void);
-> +extern void clear_bhb_long_loop_no_barrier(void);
->  #else
-> -static inline void clear_bhb_long_loop(void) {}
-> +static inline void clear_bhb_long_loop_no_barrier(void) {}
->  #endif
->
->  extern void (*x86_return_thunk)(void);
+(I plan to eventually merge this myself due to the
+likelyness of conflicts).
+
+[*] https://lore.kernel.org/qemu-devel/9151205a-13d3-401e-b403-f9195cdb1a45@linaro.org/
+
+Philippe Mathieu-Daudé (25):
+  system/ram_addr: Remove unnecessary 'exec/cpu-common.h' header
+  accel/kvm: Include missing 'exec/target_page.h' header
+  hw/s390x/s390-stattrib: Include missing 'exec/target_page.h' header
+  hw/vfio/listener: Include missing 'exec/target_page.h' header
+  target/arm/tcg/mte: Include missing 'exec/target_page.h' header
+  hw: Remove unnecessary 'system/ram_addr.h' header
+  accel/tcg: Document rcu_read_lock is held when calling
+    tlb_reset_dirty()
+  accel/tcg: Rename @start argument of tlb_reset_dirty*()
+  system/physmem: Rename @start argument of physical_memory_get_dirty()
+  system/physmem: Un-inline cpu_physical_memory_get_dirty_flag()
+  system/physmem: Un-inline cpu_physical_memory_is_clean()
+  system/physmem: Rename @start argument of physical_memory_all_dirty()
+  system/physmem: Rename @start argument of physical_memory_range*()
+  system/physmem: Un-inline cpu_physical_memory_range_includes_clean()
+  system/physmem: Un-inline cpu_physical_memory_set_dirty_flag()
+  system/physmem: Rename @start argument of physical_memory_*range()
+  system/physmem: Un-inline cpu_physical_memory_set_dirty_range()
+  system/physmem: Un-inline cpu_physical_memory_set_dirty_lebitmap()
+  system/physmem: Rename @start argument of physmem_dirty_bits_cleared()
+  system/physmem: Un-inline cpu_physical_memory_dirty_bits_cleared()
+  system/physmem: Rename @start argument of
+    physmem_test_and_clear_dirty()
+  system/physmem: Reduce cpu_physical_memory_clear_dirty_range() scope
+  system/physmem: Reduce cpu_physical_memory_sync_dirty_bitmap() scope
+  system/physmem: Drop 'cpu_' prefix in Physical Memory API
+  system/physmem: Extract API out of 'system/ram_addr.h' header
+
+ MAINTAINERS                       |   1 +
+ include/exec/cputlb.h             |   5 +-
+ include/system/physmem.h          |  56 ++++
+ include/system/ram_addr.h         | 413 ------------------------------
+ accel/kvm/kvm-all.c               |   5 +-
+ accel/tcg/cputlb.c                |  19 +-
+ hw/ppc/spapr.c                    |   1 -
+ hw/ppc/spapr_caps.c               |   1 -
+ hw/ppc/spapr_pci.c                |   1 -
+ hw/remote/memory.c                |   1 -
+ hw/remote/proxy-memory-listener.c |   1 -
+ hw/s390x/s390-stattrib-kvm.c      |   2 +-
+ hw/s390x/s390-stattrib.c          |   2 +-
+ hw/s390x/s390-virtio-ccw.c        |   1 -
+ hw/vfio/container-legacy.c        |  10 +-
+ hw/vfio/container.c               |   5 +-
+ hw/vfio/listener.c                |   2 +-
+ hw/vfio/spapr.c                   |   1 -
+ hw/virtio/virtio-mem.c            |   1 -
+ migration/ram.c                   |  79 +++++-
+ system/memory.c                   |   9 +-
+ system/physmem.c                  | 342 +++++++++++++++++++++++--
+ target/arm/tcg/mte_helper.c       |   5 +-
+ system/memory_ldst.c.inc          |   2 +-
+ tests/tsan/ignore.tsan            |   4 +-
+ 25 files changed, 495 insertions(+), 474 deletions(-)
+ create mode 100644 include/system/physmem.h
+
+-- 
+2.51.0
+
 
