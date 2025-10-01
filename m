@@ -1,383 +1,226 @@
-Return-Path: <kvm+bounces-59276-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-59277-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id AD205BAFF21
-	for <lists+kvm@lfdr.de>; Wed, 01 Oct 2025 12:00:43 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id A7895BAFF39
+	for <lists+kvm@lfdr.de>; Wed, 01 Oct 2025 12:05:16 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 51C9917DD49
-	for <lists+kvm@lfdr.de>; Wed,  1 Oct 2025 10:00:43 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 578761C6DA1
+	for <lists+kvm@lfdr.de>; Wed,  1 Oct 2025 10:05:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DDCDD29BDA2;
-	Wed,  1 Oct 2025 10:00:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B690F29C343;
+	Wed,  1 Oct 2025 10:05:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="zhjssJQy"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="D9qFXftc"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pj1-f74.google.com (mail-pj1-f74.google.com [209.85.216.74])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4ADC5270EDE
-	for <kvm@vger.kernel.org>; Wed,  1 Oct 2025 10:00:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.74
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C93BB46B5;
+	Wed,  1 Oct 2025 10:05:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1759312835; cv=none; b=KiMiyTXkEaPGlqVKOTOoQcHsDZ+mwsMB0z7r+CZqMy2KhHYq2kKHNy4PfWDyoazZeIGk2wpeFFl9esf6HSRFByH7WjQ0LMnC/AsQRUhC2KFxo5h+zP9b7IHC0q2ZYfKTYOyu44ROcqYNu0n/jEXRxIwP8KXpsSbwqS0Mk8hx+lE=
+	t=1759313105; cv=none; b=rfZ1Z2UlVM7ITQXUCdLZL+9Dkohg1jK8IcrKYagD1oOmNzevBTCNAvcll6lo4gMvnVQTC9oyFBatnMI02vHphMU3MqIsMfA5BDzIbJ7scwu5Ninu9An+o/k63tGqxZ73/NFCfANBGj3mLST7q6b1iHc5LCrY3vChP/AyFd5VQo8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1759312835; c=relaxed/simple;
-	bh=H3TDODa/l/wiO8Ra9Ela4YtRq8a5diFpTSoqQipaUhQ=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=BxnYZm6wz8pTYE3bGCaHlh8Roj1n81CdIJjwPEQgaOiFcteeRjKGlqrvrJVgF/csSVqKVM0bv7cAGHL0Z6zD68c6yQlgtgeIJNXYkc34wwE4BtwVXwcEzFUM01IuXTqYspSGu+D+knGou0TCyHnLtXqB9HDgUoYupPQTbCs0Sb8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--ackerleytng.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=zhjssJQy; arc=none smtp.client-ip=209.85.216.74
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--ackerleytng.bounces.google.com
-Received: by mail-pj1-f74.google.com with SMTP id 98e67ed59e1d1-3307af9b55eso6059044a91.2
-        for <kvm@vger.kernel.org>; Wed, 01 Oct 2025 03:00:33 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1759312832; x=1759917632; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=nE/kAPloyk+vIitKqvItd7cTOgaxobjI+8lPWSREex4=;
-        b=zhjssJQyMlJ3IXLfp8dy3F5yD6LfrDMaPAFM8vudMoBb31P7yYybm7f3pRJEEN7gED
-         XYB0aLySqAWEzEecfpPJwupgDQdceaHB42oE0uHcnBHfrfxc9bsNDo6NeLujh78DMTuR
-         iu06fNS193bRkdy436nhbN5dasAOjYYo0tdUrBlbHj7L3KiyUTMMVu5NoOTkRzT5qXAk
-         BxKkoK8XkGKh4W4SdFcjZsh3sVkPE9BQ05y3DW4msawCCNGHXjlNaRXzqXY7f65RUttX
-         wKfo5bQaWnyzhGhvD8GivgndxQtqXeCqJZK7OglHZUIqxYoiAgORQbOlXyNF84ZkGCMH
-         pM2w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1759312832; x=1759917632;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=nE/kAPloyk+vIitKqvItd7cTOgaxobjI+8lPWSREex4=;
-        b=GGKa0YhWdqC5tcrxiZDLJPBAxm4Iim7MVXfQBqrm+EiUqvW7f5fHR14QBXC02zartc
-         ruVUrbOyIIatHvHgCrUWQB4E35GDUQ5KRuo5dSndOdiDSSKNZ9LswUGpfjf5/MKRMVT9
-         WmadMcbkoG3NyeJ+EZizNKVDNlUwLq4ry89Bi9jbBOyvON7+KXw4ErS4jGv4oJjqSwbs
-         E7ldsDeJYY8CDTEfZCPRWn+EGvNyX/wmlhcaY29CspRS6yvjjb5JpX9Df7fLpY++HmKB
-         6+I3ArWQ6FDGGNWEnA6NPOEcGTq56pBU255HvgvMbJsjzZmtuQ/ge3cvKFebAfRSpHCg
-         LMBg==
-X-Gm-Message-State: AOJu0Yz5ZvPxQ25QsPnPpBdCuXUrSoWjw6n3Ui61GIrX2ekLy70ZZwgz
-	BN+VwOaKebVpjEW0eLFE5fAtiEcqp4eIHWG2OsEAj6zPNEhsK94223ZqgRe/n1xsZGBOSz7pAMI
-	c1NjSu9vy3JHebyv/4IvtX8hu/g==
-X-Google-Smtp-Source: AGHT+IEqSr8kTQUFBD7R6EE0q+2GCBiFIJAcxUWGdcy5F1b5JeOAUPNVzgyE8ySwzEClSamwyt7lcH+mVn3rvlmfIQ==
-X-Received: from pjbmt19.prod.google.com ([2002:a17:90b:2313:b0:32b:35fb:187f])
- (user=ackerleytng job=prod-delivery.src-stubby-dispatcher) by
- 2002:a17:90b:1c04:b0:32b:d8af:b636 with SMTP id 98e67ed59e1d1-339a6f3cd4bmr2802820a91.19.1759312832562;
- Wed, 01 Oct 2025 03:00:32 -0700 (PDT)
-Date: Wed, 01 Oct 2025 10:00:31 +0000
-In-Reply-To: <aNxqYMqtBKll-TgV@google.com>
+	s=arc-20240116; t=1759313105; c=relaxed/simple;
+	bh=GkDZ6NXoxTMf23WDTs15nu962/34sSuHxOTDvtqezTE=;
+	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=VI+qzy7/uhAv7WLb+NK91cHFHz8vi4HRqBdI+V7mdcJONl88nW8syUNMevRLgZKoKBiySiL4OJ48k+Pk0WA0+Zp5/7HVI1XWK5lu+7jl1XlTWpY7L18S0udwFwmuo9jfXWnCw9JKIi8rs9e01NVeB2Mv5So89DIKqCGjlKrQUoo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=D9qFXftc; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 42433C116C6;
+	Wed,  1 Oct 2025 10:05:03 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1759313104;
+	bh=GkDZ6NXoxTMf23WDTs15nu962/34sSuHxOTDvtqezTE=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=D9qFXftckYU8UZNcyAyVFAjSHt6W8vXaQM46Df3/j2uJZmSW8m84coZ/j1zjfUidE
+	 n7SNHslwRuxinAykPqkM/8Jn4JIMk7PHcDyVBvkgCsq7P8l9Ep+pwXAB5WHplsnAyH
+	 EDuZT6LJzdg0YRo874RJOeIR2w59HlGEMGs5GPPJkQhwLAJB+iXJTpsPIY5//ku6iP
+	 F6/jlw2yhtO3fXYMdGHMZ4oe03jkFLy80nAk3CiOtY03JyBtgZ/4CvavoQsrxe8HPC
+	 LqwAx0MtS8JVQBQxo84mLov2DbVYEUPIKPpRd2HG4wzsWNa6KRKFz2DH5T3nDCisXL
+	 ZFSFmu0ICqfNQ==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.98.2)
+	(envelope-from <maz@kernel.org>)
+	id 1v3thl-0000000AlcY-0RZd;
+	Wed, 01 Oct 2025 10:05:01 +0000
+Date: Wed, 01 Oct 2025 11:05:00 +0100
+Message-ID: <86o6qrym2b.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Steven Price <steven.price@arm.com>
+Cc: kvm@vger.kernel.org,
+	kvmarm@lists.linux.dev,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Will Deacon <will@kernel.org>,
+	James Morse <james.morse@arm.com>,
+	Oliver Upton <oliver.upton@linux.dev>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	linux-arm-kernel@lists.infradead.org,
+	linux-kernel@vger.kernel.org,
+	Joey Gouly <joey.gouly@arm.com>,
+	Alexandru Elisei <alexandru.elisei@arm.com>,
+	Christoffer Dall <christoffer.dall@arm.com>,
+	Fuad Tabba <tabba@google.com>,
+	linux-coco@lists.linux.dev,
+	Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>,
+	Gavin Shan <gshan@redhat.com>,
+	Shanker Donthineni <sdonthineni@nvidia.com>,
+	Alper Gun <alpergun@google.com>,
+	"Aneesh Kumar K . V" <aneesh.kumar@kernel.org>,
+	Emi Kisanuki <fj0570is@fujitsu.com>,
+	Vishal Annapurve <vannapurve@google.com>
+Subject: Re: [PATCH v10 03/43] arm64: RME: Add SMC definitions for calling the RMM
+In-Reply-To: <20250820145606.180644-4-steven.price@arm.com>
+References: <20250820145606.180644-1-steven.price@arm.com>
+	<20250820145606.180644-4-steven.price@arm.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <cover.1747264138.git.ackerleytng@google.com> <b784326e9ccae6a08388f1bf39db70a2204bdc51.1747264138.git.ackerleytng@google.com>
- <aNxqYMqtBKll-TgV@google.com>
-Message-ID: <diqzbjmrt000.fsf@google.com>
-Subject: Re: [RFC PATCH v2 02/51] KVM: guest_memfd: Introduce and use
- shareability to guard faulting
-From: Ackerley Tng <ackerleytng@google.com>
-To: Sean Christopherson <seanjc@google.com>
-Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	Yan Zhao <yan.y.zhao@intel.com>, Fuad Tabba <tabba@google.com>, 
-	Binbin Wu <binbin.wu@linux.intel.com>, Michael Roth <michael.roth@amd.com>, 
-	Ira Weiny <ira.weiny@intel.com>, Rick P Edgecombe <rick.p.edgecombe@intel.com>, 
-	Vishal Annapurve <vannapurve@google.com>, David Hildenbrand <david@redhat.com>, 
-	Paolo Bonzini <pbonzini@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: steven.price@arm.com, kvm@vger.kernel.org, kvmarm@lists.linux.dev, catalin.marinas@arm.com, will@kernel.org, james.morse@arm.com, oliver.upton@linux.dev, suzuki.poulose@arm.com, yuzenghui@huawei.com, linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, joey.gouly@arm.com, alexandru.elisei@arm.com, christoffer.dall@arm.com, tabba@google.com, linux-coco@lists.linux.dev, gankulkarni@os.amperecomputing.com, gshan@redhat.com, sdonthineni@nvidia.com, alpergun@google.com, aneesh.kumar@kernel.org, fj0570is@fujitsu.com, vannapurve@google.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-Sean Christopherson <seanjc@google.com> writes:
+On Wed, 20 Aug 2025 15:55:23 +0100,
+Steven Price <steven.price@arm.com> wrote:
+> 
+> The RMM (Realm Management Monitor) provides functionality that can be
+> accessed by SMC calls from the host.
+> 
+> The SMC definitions are based on DEN0137[1] version 1.0-rel0
+> 
+> [1] https://developer.arm.com/documentation/den0137/1-0rel0/
+> 
+> Reviewed-by: Gavin Shan <gshan@redhat.com>
+> Reviewed-by: Suzuki K Poulose <suzuki.poulose@arm.com>
+> Signed-off-by: Steven Price <steven.price@arm.com>
+> ---
+> Changes since v9:
+>  * Corrected size of 'ripas_value' in struct rec_exit. The spec states
+>    this is an 8-bit type with padding afterwards (rather than a u64).
+> Changes since v8:
+>  * Added RMI_PERMITTED_GICV3_HCR_BITS to define which bits the RMM
+>    permits to be modified.
+> Changes since v6:
+>  * Renamed REC_ENTER_xxx defines to include 'FLAG' to make it obvious
+>    these are flag values.
+> Changes since v5:
+>  * Sorted the SMC #defines by value.
+>  * Renamed SMI_RxI_CALL to SMI_RMI_CALL since the macro is only used for
+>    RMI calls.
+>  * Renamed REC_GIC_NUM_LRS to REC_MAX_GIC_NUM_LRS since the actual
+>    number of available list registers could be lower.
+>  * Provided a define for the reserved fields of FeatureRegister0.
+>  * Fix inconsistent names for padding fields.
+> Changes since v4:
+>  * Update to point to final released RMM spec.
+>  * Minor rearrangements.
+> Changes since v3:
+>  * Update to match RMM spec v1.0-rel0-rc1.
+> Changes since v2:
+>  * Fix specification link.
+>  * Rename rec_entry->rec_enter to match spec.
+>  * Fix size of pmu_ovf_status to match spec.
+> ---
+>  arch/arm64/include/asm/rmi_smc.h | 269 +++++++++++++++++++++++++++++++
+>  1 file changed, 269 insertions(+)
+>  create mode 100644 arch/arm64/include/asm/rmi_smc.h
+> 
+> diff --git a/arch/arm64/include/asm/rmi_smc.h b/arch/arm64/include/asm/rmi_smc.h
+> new file mode 100644
+> index 000000000000..1000368f1bca
+> --- /dev/null
+> +++ b/arch/arm64/include/asm/rmi_smc.h
 
-> Trimmed the Cc substantially as I doubt non-gmem/KVM folks will be excited about
-> thread necromancy.
->
-> On Wed, May 14, 2025, Ackerley Tng wrote:
->> diff --git a/Documentation/virt/kvm/api.rst b/Documentation/virt/kvm/api.rst
->> index 86f74ce7f12a..f609337ae1c2 100644
->> --- a/Documentation/virt/kvm/api.rst
->> +++ b/Documentation/virt/kvm/api.rst
->> @@ -6408,6 +6408,11 @@ belonging to the slot via its userspace_addr.
->>  The use of GUEST_MEMFD_FLAG_SUPPORT_SHARED will not be allowed for CoCo VMs.
->>  This is validated when the guest_memfd instance is bound to the VM.
->>  
->> +If the capability KVM_CAP_GMEM_CONVERSIONS is supported, then the 'flags' field
->> +supports GUEST_MEMFD_FLAG_INIT_PRIVATE.  Setting GUEST_MEMFD_FLAG_INIT_PRIVATE
->> +will initialize the memory for the guest_memfd as guest-only and not faultable
->> +by the host.
->
-> Whatever documentation we add should land at the same time as the collateral.
-> KVM_CAP_GMEM_CONVERSIONS literally doesn't exist at this time.
->
+[...]
 
-Thanks, will keep this in mind for next time.
+> +#define RMI_PERMITTED_GICV3_HCR_BITS	(ICH_HCR_EL2_UIE |		\
+> +					 ICH_HCR_EL2_LRENPIE |		\
+> +					 ICH_HCR_EL2_NPIE |		\
+> +					 ICH_HCR_EL2_VGrp0EIE |		\
+> +					 ICH_HCR_EL2_VGrp0DIE |		\
+> +					 ICH_HCR_EL2_VGrp1EIE |		\
+> +					 ICH_HCR_EL2_VGrp1DIE |		\
+> +					 ICH_HCR_EL2_TDIR)
 
->> @@ -17,6 +18,24 @@ struct kvm_gmem {
->>  	struct list_head entry;
->>  };
->>  
->> +struct kvm_gmem_inode_private {
->> +#ifdef CONFIG_KVM_GMEM_SHARED_MEM
->> +	struct maple_tree shareability;
->> +#endif
->> +};
->> +
->> +enum shareability {
->> +	SHAREABILITY_GUEST = 1,	/* Only the guest can map (fault) folios in this range. */
->> +	SHAREABILITY_ALL = 2,	/* Both guest and host can fault folios in this range. */
->> +};
->
-> Rather than define new values and new KVM uAPI, I think we should instead simply
-> support KVM_SET_MEMORY_ATTRIBUTES.  We'll probably need a new CAP, as I'm not sure
-> supporting KVM_CHECK_EXTENSION+KVM_CAP_MEMORY_ATTRIBUTES on a gmem fd would be a
-> good idea (e.g. trying to do KVM_CAP_GUEST_MEMFD_FLAGS on a gmem fd doesn't work
-> because the whole point is to get flags _before_ creating the gmem instance).  But
-> adding e.g. KVM_CAP_GUEST_MEMFD_MEMORY_ATTRIBUTES is easy enough.
->
+Why should KVM care about what bits the RMM wants to use? Also, why
+should KVM be forbidden to use the TALL0, TALL1 and TC bits? If
+interrupt delivery is the host's business, then the RMM has no
+business interfering with the GIC programming.
 
-I've read this a few times and I'm a bit confused, so just making sure:
-you are suggesting that we reuse the KVM_SET_MEMORY_ATTRIBUTES ioctl as
-a guest_memfd (not a VM) ioctl and still store private/shared state
-within guest_memfd, right?
+> +
+> +struct rec_enter {
+> +	union { /* 0x000 */
+> +		u64 flags;
+> +		u8 padding0[0x200];
+> +	};
+> +	union { /* 0x200 */
+> +		u64 gprs[REC_RUN_GPRS];
+> +		u8 padding1[0x100];
+> +	};
+> +	union { /* 0x300 */
+> +		struct {
+> +			u64 gicv3_hcr;
+> +			u64 gicv3_lrs[REC_MAX_GIC_NUM_LRS];
+> +		};
+> +		u8 padding2[0x100];
+> +	};
+> +	u8 padding3[0x400];
+> +};
+> +
+> +#define RMI_EXIT_SYNC			0x00
+> +#define RMI_EXIT_IRQ			0x01
+> +#define RMI_EXIT_FIQ			0x02
+> +#define RMI_EXIT_PSCI			0x03
+> +#define RMI_EXIT_RIPAS_CHANGE		0x04
+> +#define RMI_EXIT_HOST_CALL		0x05
+> +#define RMI_EXIT_SERROR			0x06
+> +
+> +struct rec_exit {
+> +	union { /* 0x000 */
+> +		u8 exit_reason;
+> +		u8 padding0[0x100];
+> +	};
+> +	union { /* 0x100 */
+> +		struct {
+> +			u64 esr;
+> +			u64 far;
+> +			u64 hpfar;
+> +		};
+> +		u8 padding1[0x100];
+> +	};
+> +	union { /* 0x200 */
+> +		u64 gprs[REC_RUN_GPRS];
+> +		u8 padding2[0x100];
+> +	};
+> +	union { /* 0x300 */
+> +		struct {
+> +			u64 gicv3_hcr;
+> +			u64 gicv3_lrs[REC_MAX_GIC_NUM_LRS];
+> +			u64 gicv3_misr;
 
-I think fundamentally the introduction of the guest_memfd ioctls was
-motivated by how private/shared state is a property of memory and not a
-property of the VM. (IIRC you were the one to most succinctly phrase it
-this way on one of the guest_memfd biweeklies.) So I hope you don't mean
-to revert to doing conversions through a VM ioctl.
+Why do we care about ICH_MISR_EL2? Surely we get everything in the
+registers themselves, right? I think this goes back to my question
+above: why is the RMM getting in the way of ICH_*_EL2 accesses?
 
-> But for specifying PRIVATE vs. SHARED, I don't see any reason to define new uAPI.
-> I also don't want an entirely new set of terms in KVM to describe the same things.
-> PRIVATE and SHARED are far from perfect, but they're better than https://xkcd.com/927.
-> And if we ever want to let userspace restrict RWX protections in gmem, we'll have
-> a ready-made way to do so.  
->
+> +			u64 gicv3_vmcr;
+> +		};
 
-Would like to understand more about RWX protections: is the use case to
-let userspace specify that certain ranges of guest memory are to be
-mapped into stage 2 page tables without executable permissions?
+Thanks,
 
-Is there a further use case to let the guest specify that userspace must
-not mmap() some ranges as executable?
+	M.
 
-For guest_memfd the userspace mapping permissions are already defined
-by userspace and so unless guest_memfd must enforce something on behalf
-of the guest, there shouldn't be anything more that guest_memfd should
-track with respect to RWX permissions.
-
-> Internally, that let's us do some fun things in KVM.  E.g. if we make the "disable
-> legacy per-VM memory attributes" a read-only module param, then we can wire up a
-> static_call() for kvm_get_memory_attributes() and then kvm_mem_is_private() will
-> Just Work.
->
->   static inline unsigned long kvm_get_memory_attributes(struct kvm *kvm, gfn_t gfn)
->   {
-> 	return static_call(__kvm_get_memory_attributes)(kvm, gfn);
->   }
->
->   static inline bool kvm_mem_is_private(struct kvm *kvm, gfn_t gfn)
->   {
-> 	return kvm_get_memory_attributes(kvm, gfn) & KVM_MEMORY_ATTRIBUTE_PRIVATE;
->   }
->
-> That might trigger some additional surgery if/when we want to support RWX
-> protections on a per-VM basis _and_ a per-gmem basic, but I suspect such churn
-> would pale in comparison to the overall support needed for RWX protections.
->
-
-RWX protections are more of a VM-level property, if I understood the use
-case correctly that some gfn ranges are to be marked non-executable by
-userspace. Setting RWX within guest_memfd would be kind of awkward since
-userspace must first translate GFN to offset, then set it using the
-offset within guest_memfd. Hence I think it's okay to have RWX stuff go
-through the regular KVM_SET_MEMORY_ATTRIBUTES *VM* ioctl and have it
-tracked in mem_attr_array.
-
-I'd prefer not to have the module param choose between the use of
-mem_attr_array and guest_memfd conversion in case we need both
-mem_attr_array to support other stuff in future while supporting
-conversions.
-
-> The kvm_memory_attributes structure is compatible, all that's needed AFAICT is a
-> union to clarify it's a pgoff instead of an address when used for guest_memfd.
->
-> diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
-> index 52f6000ab020..e0d8255ac8d2 100644
-> --- a/include/uapi/linux/kvm.h
-> +++ b/include/uapi/linux/kvm.h
-> @@ -1590,7 +1590,10 @@ struct kvm_stats_desc {
->  #define KVM_SET_MEMORY_ATTRIBUTES              _IOW(KVMIO,  0xd2, struct kvm_memory_attributes)
->  
->  struct kvm_memory_attributes {
-> -       __u64 address;
-> +       union {
-> +               __u64 address;
-> +               __u64 offset;
-> +       };
->         __u64 size;
->         __u64 attributes;
->         __u64 flags;
->
-
-struct kvm_memory_attributes doesn't have room for reporting the offset
-at which conversion failed (error_offset in the new struct). How do we
-handle this? Do we reuse the flags field, or do we not report
-error_offset?
-
->> +static struct folio *kvm_gmem_get_folio(struct inode *inode, pgoff_t index);
->> +
->> +static struct kvm_gmem_inode_private *kvm_gmem_private(struct inode *inode)
->> +{
->> +	return inode->i_mapping->i_private_data;
->
-> This is a hilarious bad helper.  Everyone and their mother is going to think
-> about "private vs. shared" when they see kvm_gmem_private(), at least on the x86
-> side.
->
-
-Totally missed this interpretation of private, lol. Too many
-interpretations of private: MAP_PRIVATE, CoCo's private vs shared, and
-i_private_data.
-
-> What's even more absurd is that the only "final" usage of the helper is to
-> free/destroy the inode:
->
->   $ git grep kvm_gmem_private
->   virt/kvm/guest_memfd.c:static struct kvm_gmem_inode_private *kvm_gmem_private(struct inode *inode)
->   virt/kvm/guest_memfd.c: return kvm_gmem_private(inode)->allocator_ops;
->   virt/kvm/guest_memfd.c: return kvm_gmem_private(inode)->allocator_private;
->   virt/kvm/guest_memfd.c: mt = &kvm_gmem_private(inode)->shareability;
->   virt/kvm/guest_memfd.c: mt = &kvm_gmem_private(inode)->shareability;
->   virt/kvm/guest_memfd.c: mt = &kvm_gmem_private(inode)->shareability;
->   virt/kvm/guest_memfd.c: mt = &kvm_gmem_private(inode)->shareability;
->   virt/kvm/guest_memfd.c: struct kvm_gmem_inode_private *private = kvm_gmem_private(inode);
->   virt/kvm/guest_memfd.c: struct kvm_gmem_inode_private *private = kvm_gmem_private(inode);
->
-> And in that case, using a wrapper is counter-productive, just reference
-> inode->i_mapping->i_private_data directly so that readeres don't have to jump
-> through a useless layer.
->
-> Luckily, "struct kvm_gmem_inode_private" no longer needs to exist, now that
-> Shivank's NUMA policy series wraps the vfs_inode with a gmem_inode, and can be
-> retrieved via GMEM_I().  FWIW, before looking that series, I was going to suggest
-> something like to_gmem(), but I definitely think we should follow filesystems
-> convention, not KVM vCPU/VM convention.
->
-
-I'll align with the wrapper struct to align with filesystems conventions then.
-
->>   * folio_file_pfn - like folio_file_page, but return a pfn.
->>   * @folio: The folio which contains this index.
->> @@ -29,6 +48,58 @@ static inline kvm_pfn_t folio_file_pfn(struct folio *folio, pgoff_t index)
->>  	return folio_pfn(folio) + (index & (folio_nr_pages(folio) - 1));
->>  }
->>  
->> +#ifdef CONFIG_KVM_GMEM_SHARED_MEM
->> +
->> +static int kvm_gmem_shareability_setup(struct kvm_gmem_inode_private *private,
->> +				      loff_t size, u64 flags)
->> +{
->> +	enum shareability m;
->> +	pgoff_t last;
->> +
->> +	last = (size >> PAGE_SHIFT) - 1;
->> +	m = flags & GUEST_MEMFD_FLAG_INIT_PRIVATE ? SHAREABILITY_GUEST :
->> +						    SHAREABILITY_ALL;
->> +	return mtree_store_range(&private->shareability, 0, last, xa_mk_value(m),
->> +				 GFP_KERNEL);
->> +}
->> +
->> +static enum shareability kvm_gmem_shareability_get(struct inode *inode,
->> +						 pgoff_t index)
->> +{
->> +	struct maple_tree *mt;
->> +	void *entry;
->> +
->> +	mt = &kvm_gmem_private(inode)->shareability;
->> +	entry = mtree_load(mt, index);
->> +	WARN(!entry,
->
-> WARN_ON_ONCE(), otherwise we risk escalating a per-VM problem into a system-wide
-> DoS.
->
-
-Will take note for next time.
-
->> +	     "Shareability should always be defined for all indices in inode.");
->> +
->> +	return xa_to_value(entry);
->> +}
->> +
->> +static struct folio *kvm_gmem_get_shared_folio(struct inode *inode, pgoff_t index)
->> +{
->> +	if (kvm_gmem_shareability_get(inode, index) != SHAREABILITY_ALL)
->> +		return ERR_PTR(-EACCES);
->> +
->> +	return kvm_gmem_get_folio(inode, index);
->
-> Please don't add 1-3 line helpers with one caller and very little hope of gaining
-> additional users, especially in guest_memfd where "shared" and "private" have
-> multiple meanings, and so things like "get_shared_folio" are inherently ambiguous.
->
-> I'm pretty sure a lot of this stems from CONFIG_KVM_GMEM_SHARED_MEM, which AFAICT
-> simply won't exist.  But just in case this is a Google3 pattern... 
->
-
-Will take note for next time.
-
->> +}
->> +
->> +#else
->> +
->> +static int kvm_gmem_shareability_setup(struct maple_tree *mt, loff_t size, u64 flags)
->> +{
->> +	return 0;
->> +}
->> +
->> +static inline struct folio *kvm_gmem_get_shared_folio(struct inode *inode, pgoff_t index)
->> +{
->> +	WARN_ONCE("Unexpected call to get shared folio.")
->> +	return NULL;
->> +}
->> +
->> +#endif /* CONFIG_KVM_GMEM_SHARED_MEM */
->> +
->>  static int __kvm_gmem_prepare_folio(struct kvm *kvm, struct kvm_memory_slot *slot,
->>  				    pgoff_t index, struct folio *folio)
->>  {
->> @@ -333,7 +404,7 @@ static vm_fault_t kvm_gmem_fault_shared(struct vm_fault *vmf)
->>  
->>  	filemap_invalidate_lock_shared(inode->i_mapping);
->>  
->> -	folio = kvm_gmem_get_folio(inode, vmf->pgoff);
->> +	folio = kvm_gmem_get_shared_folio(inode, vmf->pgoff);
->
-> I am fairly certain there's a TOCTOU bug here.  AFAICT, nothing prevents the
-> underlying memory from being converted from shared=>private after checking that
-> the page is SHARED.
->
-
-Conversions take the filemap_invalidate_lock() too, along with
-allocations, truncations.
-
-Because the filemap_invalidate_lock() might be reused for other
-fs-specific operations, I didn't do the mt_set_external_lock() thing to
-lock at a low level to avoid nested locking or special maple tree code
-to avoid taking the lock on other paths.
-
-> The locking rules for the maple_tree are also undocumented and haphazard.  I think
-> we can kill several birds with one stone by protecting the attributes with
-> invalidate_lock.  A bonus with using invalidate_lock is that it's a sleepable
-> lock, not a spinlock.  I don't think there's anything that would immediately
-> benefit?  But if we wanted to populate the tree on-demand (versus pre-filling
-> all possible pages), then it'd be easier to handle things like allocations in a
-> race free manner.
->
-> 	/*
-> 	 * Protect the attributes with the invalidation lock, which will always
-> 	 * be held on conversions
-> 	 */
-> 	mt_init_flags(&gi->attributes, MT_FLAGS_LOCK_EXTERN);
-> 	mt_set_external_lock(&gi->attributes,
-> 			     &inode->i_mapping->invalidate_lock);
-
+-- 
+Without deviation from the norm, progress is not possible.
 
