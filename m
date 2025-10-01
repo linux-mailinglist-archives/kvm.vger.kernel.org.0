@@ -1,124 +1,140 @@
-Return-Path: <kvm+bounces-59234-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-59235-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id D5D22BAEDD3
-	for <lists+kvm@lfdr.de>; Wed, 01 Oct 2025 02:16:21 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id DE716BAEDEC
+	for <lists+kvm@lfdr.de>; Wed, 01 Oct 2025 02:25:00 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A13F33B9A94
-	for <lists+kvm@lfdr.de>; Wed,  1 Oct 2025 00:16:09 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9A8D73AD5F6
+	for <lists+kvm@lfdr.de>; Wed,  1 Oct 2025 00:24:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 458D94594A;
-	Wed,  1 Oct 2025 00:15:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DA31419CCFC;
+	Wed,  1 Oct 2025 00:24:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="PTYcjf2y"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="XYMrT5H3"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pl1-f201.google.com (mail-pl1-f201.google.com [209.85.214.201])
+Received: from mail-pj1-f74.google.com (mail-pj1-f74.google.com [209.85.216.74])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1182917AE1D
-	for <kvm@vger.kernel.org>; Wed,  1 Oct 2025 00:15:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 941DF182B7
+	for <kvm@vger.kernel.org>; Wed,  1 Oct 2025 00:24:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.74
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1759277742; cv=none; b=kM5cL0cp69Xjo+8r8H/fXlDqB+kbCCCOs0dDVmoUzX0WfN3h02YW+fT0UvalscDnXP9gqCam1gxdMlNIfqDCeKBWLPwxiKz0FaSsaQ7TtOFseBB7j3SY/cujsO8HNCJ2DJMqt7Yn0X8pEsJW0PqhGnxfmWMBGnAexNarOIVGJmY=
+	t=1759278291; cv=none; b=mmAbLZwEOop08mUmg+EPscidXsT54GiIZ1TdaTkzyOMOs17Vcgzly9hlElrvfAeYYukrtEkIl39+jML45RZL/q+e5jTFcFQ7GoBnFOzK673ZKPD4AnBcILEi6nV1/2DXoCeiNbbSfnro8z7PMGw3jXhd3ff7WXSi86HalkN1EL8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1759277742; c=relaxed/simple;
-	bh=Kducq2ZeSjXYvGI/ghOcZsk4NUusB8RxSwzsVgzEpgw=;
+	s=arc-20240116; t=1759278291; c=relaxed/simple;
+	bh=wdbGl3YtlYSj7rUi4uJ4rCJpgVcR+R3PUL10KRjlh0o=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Content-Type; b=V10YsgoY6j7bzYlwfDiMRqu6EX4xIWOd+72ga1AS29QK01Syg41guIlYHNV1TB7cPj6i2SjG5QxecIM4SLxia510/iuOdT491uqCHYwsVohla28j/SXQzcPT+TIFrAaOHup3nnQpOthIF0ea0WjGipj+x3w8HtN6Vv1cslM69Vc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--jmattson.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=PTYcjf2y; arc=none smtp.client-ip=209.85.214.201
+	 To:Cc:Content-Type; b=O/A5bO9JahW+TosgElCtnSa4yIlR+TTxQPWEUhIRBl5NJaqX4WqR/3jk8zF9JxFBAMcy/eM09+iuAKsueZUuPgdkyI3N3PZt7tydIY0LrTw/RXQtxgVPgIkgY7uewWylliFt2b6vT7AfSDX+bOsZQDcJ517ODWkI3AQ2DM8TKIw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=XYMrT5H3; arc=none smtp.client-ip=209.85.216.74
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--jmattson.bounces.google.com
-Received: by mail-pl1-f201.google.com with SMTP id d9443c01a7336-27ee214108cso127694025ad.0
-        for <kvm@vger.kernel.org>; Tue, 30 Sep 2025 17:15:40 -0700 (PDT)
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+Received: by mail-pj1-f74.google.com with SMTP id 98e67ed59e1d1-33428befbbaso7863127a91.0
+        for <kvm@vger.kernel.org>; Tue, 30 Sep 2025 17:24:49 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1759277740; x=1759882540; darn=vger.kernel.org;
-        h=to:from:subject:message-id:references:mime-version:in-reply-to:date
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=LcYitO65fM6U+2guQlIxnINa19j5zqeVtzHxSXLQKIA=;
-        b=PTYcjf2yc8QM1y2Lp+iN4nMpe+n9kNDkkffxMdzj0fPBDS6XjVpE2a9Ss3io9NFAYz
-         RBLGGuRj83SfFkkprgVZyY9QiTwVxQZgxMLz/AFTB3hzHjewJSEw9xsj/2djSBm7hFCo
-         jciT3hYZquFauZBWnjen4a8D7hYgZoSjK7+Cj++4qOvC1maNaYO1qw1t6fuQeF5mpUeI
-         +eBmKt/pSNFm43CTAvT4FYTwaJGj9JINzZ+bHHH93bEveT07ASJOcEHT0XDiR3NyEa7c
-         gqYa2cV44pAVO6HPCf4MhcVncTZRQn9+VdeLlufUeHWDlV8eXLHAKMQdtYOpajAKwtNQ
-         zBWg==
+        d=google.com; s=20230601; t=1759278289; x=1759883089; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=IpX7eK2KA+kl+z8v9XAKv4xAjG0zaOC9KjRE1zxocmk=;
+        b=XYMrT5H3RBSkPZKEcYTetKn0sYs82V345JTYjstXRcnVG3uwNRTlD2cr73C6zdb/No
+         T4B3DekaYrGZdqx8Un6oy6EhyamhcoDBCbPwK0np3g8k8c3n+roZweYujBXzZCHKW4Us
+         hXNZ854nWJU17J2rM1ycJGwlCVIyvB3rH228L66zwyawfavSTH+J233WGfvwUmqMzTeo
+         klLXyOd52r8ZjJDgcNKXmqHhSaCXrtx6qirqHongA66+ufIS1mj4A42sx0t/y6xB1oyW
+         qdWM7t7ZQDpTIBjuhaMsYUlg8a9L+IowimN+lACbGN+CPTFRna+0cKBtOUC77fAluHmt
+         /1Uw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1759277740; x=1759882540;
-        h=to:from:subject:message-id:references:mime-version:in-reply-to:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=LcYitO65fM6U+2guQlIxnINa19j5zqeVtzHxSXLQKIA=;
-        b=JlqCP/IMN/TkFqZQ/v2fcWLtwp6fbHakz4FolXiQprLCC+Uq9Y0Z6SgR36AievWBkk
-         8AulImDUX7kUjgKZe8DTacHIAm6r9b7A0jHYam5V7fvWC99yk2kYlnffhIYSM47j5W/U
-         HnqeYNTAg84ALP77InwoMQQIkcmPMgzd0HsYDBOt+1CdoGQCjoeAF2ZqXn9JkEqFVXRa
-         +A6up7U9MzptaJOt9IPlzq2ueAFjHZT2fqMHFF76CcQ6rH2mVxmA8P1n/MEJaHtsMbvg
-         SlnrjTa3rhs18Sil1OIV2J7FoyP7AvCoFHSUDjwXs+juLOFqVbY2k1b0AOmurJiwCDKd
-         LoPw==
-X-Forwarded-Encrypted: i=1; AJvYcCXC/eRDw5p1YDXegpkDdNBmj+mw1s6FZyEBTDyjjdxgPOE0GZbE8aGsUON2YEMkRKqhRVo=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyPxyrmW91ztFTk5mSBIBZjVbp5iNhvCSxDU7H+SVZZUu+yvvIu
-	BiZK8bcMn9RsuSQhS0Ck2flPhj0KNZgujE3BQyKJLdlrTYiaR8+gDD4Rhgdc6+5oEAvUocrH24s
-	cOBJ8fhxrlcfjcg==
-X-Google-Smtp-Source: AGHT+IEIIEjWwhQ/2dq2CphjZTc2Klk/2tjbWkphIg3Eyh1AwnfRMWPBkeJy4YRaqzCXcKDyOONweBtc+rC66Q==
-X-Received: from plsm6.prod.google.com ([2002:a17:902:bb86:b0:267:dbc3:f98d])
- (user=jmattson job=prod-delivery.src-stubby-dispatcher) by
- 2002:a17:902:ef02:b0:269:a4ed:13c9 with SMTP id d9443c01a7336-28e7f2eee4amr16409815ad.30.1759277740288;
- Tue, 30 Sep 2025 17:15:40 -0700 (PDT)
-Date: Tue, 30 Sep 2025 17:14:08 -0700
-In-Reply-To: <20251001001529.1119031-1-jmattson@google.com>
+        d=1e100.net; s=20230601; t=1759278289; x=1759883089;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=IpX7eK2KA+kl+z8v9XAKv4xAjG0zaOC9KjRE1zxocmk=;
+        b=I6vNM9NJuHMKo3rBqcG+AX1S+ttuHJbmml2EICjFOV39mq/wsRuC2EzsFQ0x0M7ii6
+         vbfcBPuDSzykYoNFdY1nouGbv/fDT2salaTLV1ja+/tOQ1lSOI8fsTwL6QfxbMZ6yH7T
+         t0T28dzWMuN8RfbBaxrBRpd5vwh2jRqT8pjQJ6L5BDoidhG634jyYLNSV6u8DUK4IO0y
+         TTa+8tn2y7bQgqObzVtVy5FxXiI6kAURF0MJN8CsEMS68+C0419sCoWb7E0TVUEhaoRa
+         AOHjubDpKUcrRd0tfjWGfWBl/Uq0bw7sHsGuTq1P+TPlFCoErV2LSh39sXlH9ja69ghL
+         umXA==
+X-Gm-Message-State: AOJu0Yw/0yMboKAZWo1Gg9pOccO96rS/hPHuFvRhwpY8gege5BMAiD4v
+	zFs3dUMjq5j0kNEhyFZXiaEPLEO8iJQrQwaW0sPTor+3Sku9cZuT9qPfc9vj/pXPIjAlKuNhLwl
+	whWD3Og==
+X-Google-Smtp-Source: AGHT+IEbTJH04br7v19Ddhz6CwxncgpPh5C9LtMO0MpANPdZxHKsfM3i1TAb2fiklX0x6gfHWXFhHnT87mw=
+X-Received: from pjzm1.prod.google.com ([2002:a17:90b:681:b0:327:50fa:eff9])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:1c8b:b0:32b:baaa:21b0
+ with SMTP id 98e67ed59e1d1-339a6e6d5c9mr1452538a91.6.1759278288907; Tue, 30
+ Sep 2025 17:24:48 -0700 (PDT)
+Date: Tue, 30 Sep 2025 17:24:47 -0700
+In-Reply-To: <aDbdjmRceMLs1RPN@yzhao56-desk.sh.intel.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
-References: <20251001001529.1119031-1-jmattson@google.com>
-X-Mailer: git-send-email 2.51.0.618.g983fd99d29-goog
-Message-ID: <20251001001529.1119031-3-jmattson@google.com>
-Subject: [PATCH v2 2/2] KVM: SVM: Disallow EFER.LMSLE when not supported by hardware
-From: Jim Mattson <jmattson@google.com>
-To: Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>, 
-	Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org, 
-	"H. Peter Anvin" <hpa@zytor.com>, Sean Christopherson <seanjc@google.com>, Paolo Bonzini <pbonzini@redhat.com>, 
-	Pawan Gupta <pawan.kumar.gupta@linux.intel.com>, Tom Lendacky <thomas.lendacky@amd.com>, 
-	Jim Mattson <jmattson@google.com>, Perry Yuan <perry.yuan@amd.com>, 
-	Sohil Mehta <sohil.mehta@intel.com>, "Xin Li (Intel)" <xin@zytor.com>, 
-	Joerg Roedel <joerg.roedel@amd.com>, Avi Kivity <avi@redhat.com>, linux-kernel@vger.kernel.org, 
-	kvm@vger.kernel.org, Yosry Ahmed <yosry.ahmed@linux.dev>
-Content-Type: text/plain; charset="UTF-8"
+References: <cover.1747264138.git.ackerleytng@google.com> <237590b163506821120734a0c8aad95d9c7ef299.1747264138.git.ackerleytng@google.com>
+ <aDU3pN/0FVbowmNH@yzhao56-desk.sh.intel.com> <e38f0573-520a-4fe8-91fc-797086ab5866@linux.intel.com>
+ <aDbdjmRceMLs1RPN@yzhao56-desk.sh.intel.com>
+Message-ID: <aNx0z2XZaJZxQ44W@google.com>
+Subject: Re: [RFC PATCH v2 06/51] KVM: Query guest_memfd for private/shared status
+From: Sean Christopherson <seanjc@google.com>
+To: Yan Zhao <yan.y.zhao@intel.com>
+Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	Yan Zhao <yan.y.zhao@intel.com>, Fuad Tabba <tabba@google.com>, 
+	Binbin Wu <binbin.wu@linux.intel.com>, Michael Roth <michael.roth@amd.com>, 
+	Ira Weiny <ira.weiny@intel.com>, Rick P Edgecombe <rick.p.edgecombe@intel.com>, 
+	Vishal Annapurve <vannapurve@google.com>, David Hildenbrand <david@redhat.com>, 
+	Paolo Bonzini <pbonzini@redhat.com>
+Content-Type: text/plain; charset="us-ascii"
 
-Modern AMD CPUs do not support segment limit checks in 64-bit mode
-(i.e. EFER.LMSLE must be zero). Do not allow a guest to set EFER.LMSLE
-on a CPU that requires the bit to be zero.
+On Wed, May 28, 2025, Yan Zhao wrote:
+> On Wed, May 28, 2025 at 04:08:34PM +0800, Binbin Wu wrote:
+> > On 5/27/2025 11:55 AM, Yan Zhao wrote:
+> > > On Wed, May 14, 2025 at 04:41:45PM -0700, Ackerley Tng wrote:
+> > > > @@ -2544,13 +2554,8 @@ static inline bool kvm_mem_is_private(struct kvm *kvm, gfn_t gfn)
+> > > >   		return false;
+> > > >   	slot = gfn_to_memslot(kvm, gfn);
+> > > > -	if (kvm_slot_has_gmem(slot) && kvm_gmem_memslot_supports_shared(slot)) {
+> > > > -		/*
+> > > > -		 * For now, memslots only support in-place shared memory if the
+> > > > -		 * host is allowed to mmap memory (i.e., non-Coco VMs).
+> > > > -		 */
+> > > > -		return false;
+> > > > -	}
+> > > > +	if (kvm_slot_has_gmem(slot) && kvm_gmem_memslot_supports_shared(slot))
+> > > > +		return kvm_gmem_is_private(slot, gfn);
+> > > When userspace gets an exit reason KVM_EXIT_MEMORY_FAULT, looks it needs to
+> > > update both KVM memory attribute and gmem shareability, via two separate ioctls?
+> > IIUC, when userspace sets flag GUEST_MEMFD_FLAG_SUPPORT_SHARED to create the
+> > guest_memfd, the check for memory attribute will go through the guest_memfd way,
+> > the information in kvm->mem_attr_array will not be used.
+> > 
+> > So if userspace sets GUEST_MEMFD_FLAG_SUPPORT_SHARED, it uses
+> > KVM_GMEM_CONVERT_SHARED/PRIVATE to update gmem shareability.
+> > If userspace doesn't set GUEST_MEMFD_FLAG_SUPPORT_SHARED, it still uses
+> > KVM_SET_MEMORY_ATTRIBUTES to update KVM memory attribute tracking.
+> Ok, so the user needs to search the memory region and guest_memfd to choose the
+> right ioctl.
 
-For backwards compatibility, allow EFER.LMSLE to be set on CPUs that
-support segment limit checks in 64-bit mode, even though KVM's
-implementation of the feature is incomplete (e.g. KVM's emulator does
-not enforce segment limits in 64-bit mode).
+I don't see any reason to support "split" models like this.  Tracking PRIVATE in
+two separate locations would be all kinds of crazy.  E.g. if a slot is temporarily
+deleted, memory could unexpected toggle between private and shared.  As evidenced
+by Yan's questions, the cognitive load on developers would also be very high.
 
-Fixes: eec4b140c924 ("KVM: SVM: Allow EFER.LMSLE to be set with nested svm")
+Just make userspace choose between per-VM and per-gmem, and obviously allow
+in-place conversions if and only if attributes are per-gmem.
 
-Signed-off-by: Jim Mattson <jmattson@google.com>
----
- arch/x86/kvm/svm/svm.c | 4 +++-
- 1 file changed, 3 insertions(+), 1 deletion(-)
+I (or someone else?) suggested adding a capability to disable per-VM tracking, but
+I don't see any reason to allow userspace to opt-out on a per-VM basis either.
+The big selling point of in-place conversions is that it avoids having to double
+provision some amount of guest memory.  Those types of changes go far beyond the
+VMM.  So I have a very hard time imagining a use case where VMM A will want to
+use per-VM attributes while VMM B will want per-gmem attributes.
 
-diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
-index 1bfebe40854f..78d0fc85d0bd 100644
---- a/arch/x86/kvm/svm/svm.c
-+++ b/arch/x86/kvm/svm/svm.c
-@@ -5351,7 +5351,9 @@ static __init int svm_hardware_setup(void)
- 
- 	if (nested) {
- 		pr_info("Nested Virtualization enabled\n");
--		kvm_enable_efer_bits(EFER_SVME | EFER_LMSLE);
-+		kvm_enable_efer_bits(EFER_SVME);
-+		if (!boot_cpu_has(X86_FEATURE_EFER_LMSLE_MBZ))
-+			kvm_enable_efer_bits(EFER_LMSLE);
- 
- 		r = nested_svm_init_msrpm_merge_offsets();
- 		if (r)
--- 
-2.51.0.618.g983fd99d29-goog
+Using a read-only module param will also simplify the internal code, as KVM will
+be able to route memory attributes queries without need a pointer to the "struct
+kvm".
 
+In the future, we might have to swizzle things, e.g. if we want with per-VM RWX
+attributes, but that's largely a future problem, and a module param also gives us
+more flexibility anyways since they tend not to be considered rigid ABI in KVM.
 
