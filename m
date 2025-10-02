@@ -1,162 +1,183 @@
-Return-Path: <kvm+bounces-59419-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-59420-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id BCCF4BB3596
-	for <lists+kvm@lfdr.de>; Thu, 02 Oct 2025 10:52:59 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id C398ABB3502
+	for <lists+kvm@lfdr.de>; Thu, 02 Oct 2025 10:48:59 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A956916BDEC
-	for <lists+kvm@lfdr.de>; Thu,  2 Oct 2025 08:48:30 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id DC7EA7A3261
+	for <lists+kvm@lfdr.de>; Thu,  2 Oct 2025 08:47:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 990362DC780;
-	Thu,  2 Oct 2025 08:43:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="k4ihuOBt"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 73AE42FE561;
+	Thu,  2 Oct 2025 08:46:38 +0000 (UTC)
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-wm1-f44.google.com (mail-wm1-f44.google.com [209.85.128.44])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B697D2D7DFB
-	for <kvm@vger.kernel.org>; Thu,  2 Oct 2025 08:43:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.44
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2298C2FE049;
+	Thu,  2 Oct 2025 08:46:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1759394610; cv=none; b=exjfkxENv1OB+u4diDZQF3N9wtkbEg9O1tDypnHI1Etj++4n75ovpTjBvxEmE56UlVc7toY1lm9wSGGIThFI8kwRtOpIbvBC4bV/TwMq+PDgBY/oDH69fBxY5+hOllZpH2GiWm0NUTjHlfy1/f2p1fpAP/U1/SG1uj+tvl1ajFQ=
+	t=1759394797; cv=none; b=PtRQkuS5yDaVfVRq9lq8f5QPUdq9lvTj9XaM3/yVU3mwNFv5eQqGVL3Nw3s3yaa41qjgar3B6wjtn3Plk4VDn89s9s0qk0zUxXSGftyXD0jWrt9dmVoVik8EoMyJdWod2RHe28OfSAk2tbrWEbNkzyGPdDq9pyjiJ6saTHXBNdY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1759394610; c=relaxed/simple;
-	bh=Z/NE2taBiV5wsH3JcjmWW0tO1e/5lrJjuTutFIc6dmg=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=NuDvI33I5B0+tYuYn9Sw8+SDi7GXhanOJRRw4g0ftys9Fr55FxmXjwKSd+C86IH2f5uZramDMhE7yrb++a4sKudWsvd71lu86NSYIlJ/jHVW8uiLYKykbe4fIHkIz/pQqRzNksPdPl4ZIHNm2rfcfdtp2qy2xR3AYINIalNAJlQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=k4ihuOBt; arc=none smtp.client-ip=209.85.128.44
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
-Received: by mail-wm1-f44.google.com with SMTP id 5b1f17b1804b1-46e6a689bd0so4140715e9.1
-        for <kvm@vger.kernel.org>; Thu, 02 Oct 2025 01:43:28 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1759394607; x=1759999407; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=sizE8fixTdjMLNdHvH96mSdoNGp/FmemDWUp22VSw54=;
-        b=k4ihuOBtoexWlBSWbeWSFrAuV4voAYDQdwMUkYiaOzMEg3Jt3fsarFLu79P8yFcxh4
-         fdKx+qWzfJxVWvxulK4VIgwqCJIjhryoTSHrzlORCbl9rVpC9+DdBXjT20bR/grMdmnx
-         kRYbNoLdh9u7KcOmVjBWgrYDzaq9pQoUzRfPP2fDdGukF366zqBFVWieowJ7/DD+yxNJ
-         us9RLSJqFG9o8XkNO88H6+QETwBCuUC5o8BbJx/THZ1nUCI3BR47DSjtb6zLkJXTDBMX
-         JEmKVc3k8F6TgxwgoCgeVUi4vaVm28BOwBBqrKNqihBFBh/PuYQIGlRPVwML0DB1dUVh
-         SEDQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1759394607; x=1759999407;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=sizE8fixTdjMLNdHvH96mSdoNGp/FmemDWUp22VSw54=;
-        b=NLJoQ65mQPk3Y+14iFM2d4AeyaKLtwHUkYZ1Ea3yL4hVN7J/EtRPBN5IFcSDCbetmu
-         fs61muhCtn1rx2hJDyEhVv3GxCpHepxGNs0j3K1kFKZh5ccaMeLrM8Ox/M/DTrYP88CQ
-         jqIfgkuDhuf8lkEnI+zbVBhyRg/R1+kUI7oTekKJ4xuWM3jzJcNGofLwQ4jxjCqSXr4v
-         RPmJoqJB8SU0nPLn2s2BEQkWhQ9k93K2SrN+6w8xt1A196ujE7iTFWv9aT2rTXOlC7S2
-         9WE33vhrm1AAkFIR2sGk99a/J26aOQ70A/AN383y6rhlHQukM0494pFGW1xnyhWMXgvf
-         cPlg==
-X-Forwarded-Encrypted: i=1; AJvYcCUsW9bZq0WAemMEUfebNyzOEOJujsBjak6DUVMnv0oIIva7YJzXDGOnWYbndQCL+Dl1ElY=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyGFgfTheRu2wQkTbgI94acz7p3mRxnu5XP4O07Rs2MdJWHeyVk
-	8xBfmNUG6PtbbZEXNM9clywYD5xfgVDfj5M4vn4g6Neg8A15/3enlPCTvXlJt18g/8g=
-X-Gm-Gg: ASbGncsfkVWP1QfW/1875UFNLIcUJfA1YCOgrr3P/SVdsJjQ3UiF+j7rJ5u5duM1XMn
-	2P5TuQuM0RLoDYOXi7NtCO3rG4ubSb6widkz5XpxzERMnqqA/F8KosH8qltmtj8Zi0wJpFIWqYl
-	hE3dxTrqVUNhrRnOvqUMrghxqRCpagr2/HKQIVGO5B8Bn+csWm8V6lm5TqsjfUP7/UDX+4vBVEW
-	6ak0r+QCz+TaDF5mGKNFUPXLlGWAJqsxrpc7dWx/NsSbVYD6F2lwHzu2ZHv4AfpwJBT2FXBFRq7
-	O6rMjZUCeecFNF8g/inwYrEXDZxdL5QxkPi/pAyCyFU3Z4c7AUDd2JBQOghFXBQVx2CogufSoX2
-	aG8G80dZADjEg5HhqJt9ZXm1sSzHwvZVBlCfPUqhuivnUuvvcHuxfT4hTa6M7iYBDys5X4+WSbU
-	PUbqUBOyHZog0+n+BIhINxVDD+exh/Yw==
-X-Google-Smtp-Source: AGHT+IF9YgQxjGmfBS/VLSZ9Yn1NV8aiLQRYv9H/Rha4by/slLu+GOg0yeUsYkmlZm+Qs2ADprJnow==
-X-Received: by 2002:a05:600c:5289:b0:46e:6d5f:f59 with SMTP id 5b1f17b1804b1-46e6d5f1183mr8939815e9.4.1759394606884;
-        Thu, 02 Oct 2025 01:43:26 -0700 (PDT)
-Received: from localhost.localdomain (88-187-86-199.subs.proxad.net. [88.187.86.199])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-46e693bd655sm26669815e9.14.2025.10.02.01.43.26
-        (version=TLS1_3 cipher=TLS_CHACHA20_POLY1305_SHA256 bits=256/256);
-        Thu, 02 Oct 2025 01:43:26 -0700 (PDT)
-From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@linaro.org>
-To: qemu-devel@nongnu.org
-Cc: qemu-s390x@nongnu.org,
-	kvm@vger.kernel.org,
-	xen-devel@lists.xenproject.org,
-	=?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@linaro.org>,
-	Richard Henderson <richard.henderson@linaro.org>,
-	"Michael S. Tsirkin" <mst@redhat.com>
-Subject: [PATCH v4 17/17] hw/virtio/virtio: Replace legacy cpu_physical_memory_map() call
-Date: Thu,  2 Oct 2025 10:42:02 +0200
-Message-ID: <20251002084203.63899-18-philmd@linaro.org>
-X-Mailer: git-send-email 2.51.0
-In-Reply-To: <20251002084203.63899-1-philmd@linaro.org>
-References: <20251002084203.63899-1-philmd@linaro.org>
+	s=arc-20240116; t=1759394797; c=relaxed/simple;
+	bh=6F+DR4WRZKG0j8hQTKo5t/bxdCuQDOz0ydW2ZYJ1qT0=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=ix10b7R1nUSv8CJb3rWyYdc9UqNxNmkpPvsODmpbYpA3uqgqOQxQcPMtbHlcWodxdaB54B1aD5X1YrThJLtFvprTjArrGAp+Dbz2HOMgbLkvPV16FrsAaAKcPR7+547NFZI35uilvghTnRb2aWWVwXXgYOjVhKPNh0a6v9StV0c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 2721C1692;
+	Thu,  2 Oct 2025 01:46:27 -0700 (PDT)
+Received: from [10.1.27.48] (unknown [10.1.27.48])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 584853F66E;
+	Thu,  2 Oct 2025 01:46:31 -0700 (PDT)
+Message-ID: <6d3953f3-14ce-4a58-a018-3636e77dbdf8@arm.com>
+Date: Thu, 2 Oct 2025 09:46:29 +0100
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v10 06/43] arm64: RME: Define the user ABI
+Content-Language: en-GB
+To: Steven Price <steven.price@arm.com>, Marc Zyngier <maz@kernel.org>
+Cc: kvm@vger.kernel.org, kvmarm@lists.linux.dev,
+ Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>,
+ James Morse <james.morse@arm.com>, Oliver Upton <oliver.upton@linux.dev>,
+ Zenghui Yu <yuzenghui@huawei.com>, linux-arm-kernel@lists.infradead.org,
+ linux-kernel@vger.kernel.org, Joey Gouly <joey.gouly@arm.com>,
+ Alexandru Elisei <alexandru.elisei@arm.com>,
+ Christoffer Dall <christoffer.dall@arm.com>, Fuad Tabba <tabba@google.com>,
+ linux-coco@lists.linux.dev,
+ Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>,
+ Gavin Shan <gshan@redhat.com>, Shanker Donthineni <sdonthineni@nvidia.com>,
+ Alper Gun <alpergun@google.com>, "Aneesh Kumar K . V"
+ <aneesh.kumar@kernel.org>, Emi Kisanuki <fj0570is@fujitsu.com>,
+ Vishal Annapurve <vannapurve@google.com>
+References: <20250820145606.180644-1-steven.price@arm.com>
+ <20250820145606.180644-7-steven.price@arm.com> <86jz1eztz4.wl-maz@kernel.org>
+ <47a7bc06-9d44-42f8-88df-f6db3bc997bc@arm.com>
+From: Suzuki K Poulose <suzuki.poulose@arm.com>
+In-Reply-To: <47a7bc06-9d44-42f8-88df-f6db3bc997bc@arm.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-Propagate VirtIODevice::dma_as to virtqueue_undo_map_desc()
-in order to replace the legacy cpu_physical_memory_unmap()
-call by address_space_unmap().
+On 01/10/2025 15:44, Steven Price wrote:
+> On 01/10/2025 13:28, Marc Zyngier wrote:
+>> On Wed, 20 Aug 2025 15:55:26 +0100,
+>> Steven Price <steven.price@arm.com> wrote:
+>>>
+>>> There is one (multiplexed) CAP which can be used to create, populate and
+>>> then activate the realm.
+>>>
+>>> Co-developed-by: Suzuki K Poulose <suzuki.poulose@arm.com>
+>>> Signed-off-by: Suzuki K Poulose <suzuki.poulose@arm.com>
+>>> Signed-off-by: Steven Price <steven.price@arm.com>
+>>> Reviewed-by: Gavin Shan <gshan@redhat.com>
+>>> ---
+>>> Changes since v9:
+>>>   * Improvements to documentation.
+>>>   * Bump the magic number for KVM_CAP_ARM_RME to avoid conflicts.
+>>> Changes since v8:
+>>>   * Minor improvements to documentation following review.
+>>>   * Bump the magic numbers to avoid conflicts.
+>>> Changes since v7:
+>>>   * Add documentation of new ioctls
+>>>   * Bump the magic numbers to avoid conflicts
+>>> Changes since v6:
+>>>   * Rename some of the symbols to make their usage clearer and avoid
+>>>     repetition.
+>>> Changes from v5:
+>>>   * Actually expose the new VCPU capability (KVM_ARM_VCPU_REC) by bumping
+>>>     KVM_VCPU_MAX_FEATURES - note this also exposes KVM_ARM_VCPU_HAS_EL2!
+>>> ---
+>>>   Documentation/virt/kvm/api.rst    | 71 +++++++++++++++++++++++++++++++
+>>>   arch/arm64/include/uapi/asm/kvm.h | 49 +++++++++++++++++++++
+>>>   include/uapi/linux/kvm.h          | 10 +++++
+>>>   3 files changed, 130 insertions(+)
+>>>
+>>> diff --git a/Documentation/virt/kvm/api.rst b/Documentation/virt/kvm/api.rst
+>>> index 6aa40ee05a4a..69c0a9eba6c5 100644
+>>> --- a/Documentation/virt/kvm/api.rst
+>>> +++ b/Documentation/virt/kvm/api.rst
+>>> @@ -3549,6 +3549,11 @@ Possible features:
+>>>   	  Depends on KVM_CAP_ARM_EL2_E2H0.
+>>>   	  KVM_ARM_VCPU_HAS_EL2 must also be set.
+>>>   
+>>> +	- KVM_ARM_VCPU_REC: Allocate a REC (Realm Execution Context) for this
+>>> +	  VCPU. This must be specified on all VCPUs created in a Realm VM.
+>>> +	  Depends on KVM_CAP_ARM_RME.
+>>> +	  Requires KVM_ARM_VCPU_FINALIZE(KVM_ARM_VCPU_REC).
+>>> +
+>>>   4.83 KVM_ARM_PREFERRED_TARGET
+>>>   -----------------------------
+>>>   
+>>> @@ -5122,6 +5127,7 @@ Recognised values for feature:
+>>>   
+>>>     =====      ===========================================
+>>>     arm64      KVM_ARM_VCPU_SVE (requires KVM_CAP_ARM_SVE)
+>>> +  arm64      KVM_ARM_VCPU_REC (requires KVM_CAP_ARM_RME)
+>>>     =====      ===========================================
+>>>   
+>>>   Finalizes the configuration of the specified vcpu feature.
+>>> @@ -6476,6 +6482,30 @@ the capability to be present.
+>>>   
+>>>   `flags` must currently be zero.
+>>>   
+>>> +4.144 KVM_ARM_VCPU_RMM_PSCI_COMPLETE
+>>> +------------------------------------
+>>> +
+>>> +:Capability: KVM_CAP_ARM_RME
+>>> +:Architectures: arm64
+>>> +:Type: vcpu ioctl
+>>> +:Parameters: struct kvm_arm_rmm_psci_complete (in)
+>>> +:Returns: 0 if successful, < 0 on error
+>>> +
+>>> +::
+>>> +
+>>> +  struct kvm_arm_rmm_psci_complete {
+>>> +	__u64 target_mpidr;
+>>> +	__u32 psci_status;
+>>> +	__u32 padding[3];
+>>> +  };
+>>> +
+>>> +Where PSCI functions are handled by user space, the RMM needs to be informed of
+>>> +the target of the operation using `target_mpidr`, along with the status
+>>> +(`psci_status`). The RMM v1.0 specification defines two functions that require
+>>> +this call: PSCI_CPU_ON and PSCI_AFFINITY_INFO.
+>>> +
+>>> +If the kernel is handling PSCI then this is done automatically and the VMM
+>>> +doesn't need to call this ioctl.
+>>
+>> Why should userspace involved in this? Why can't this be a
+>> notification that the host delivers to the RMM when the vcpu is about
+>> to run?
+> 
+> This is only when PSCI is being handled by user space. If the kernel
+> (i.e KVM) is handling PSCI then indeed there's no user space involvement.
+> 
+> I'm not sure how we could avoid this when PSCI is being implemented in
+> user space. Or am I missing something?
 
-Signed-off-by: Philippe Mathieu-Daudé <philmd@linaro.org>
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
----
- hw/virtio/virtio.c | 10 ++++++----
- 1 file changed, 6 insertions(+), 4 deletions(-)
+I think there is a bit of disconnect here.
 
-diff --git a/hw/virtio/virtio.c b/hw/virtio/virtio.c
-index 9a81ad912e0..1ed3aa6abab 100644
---- a/hw/virtio/virtio.c
-+++ b/hw/virtio/virtio.c
-@@ -31,6 +31,7 @@
- #include "hw/qdev-properties.h"
- #include "hw/virtio/virtio-access.h"
- #include "system/dma.h"
-+#include "system/memory.h"
- #include "system/runstate.h"
- #include "virtio-qmp.h"
- 
-@@ -1622,7 +1623,8 @@ out:
-  * virtqueue_unmap_sg() can't be used).  Assumes buffers weren't written to
-  * yet.
-  */
--static void virtqueue_undo_map_desc(unsigned int out_num, unsigned int in_num,
-+static void virtqueue_undo_map_desc(AddressSpace *as,
-+                                    unsigned int out_num, unsigned int in_num,
-                                     struct iovec *iov)
- {
-     unsigned int i;
-@@ -1630,7 +1632,7 @@ static void virtqueue_undo_map_desc(unsigned int out_num, unsigned int in_num,
-     for (i = 0; i < out_num + in_num; i++) {
-         int is_write = i >= out_num;
- 
--        cpu_physical_memory_unmap(iov->iov_base, iov->iov_len, is_write, 0);
-+        address_space_unmap(as, iov->iov_base, iov->iov_len, is_write, 0);
-         iov++;
-     }
- }
-@@ -1832,7 +1834,7 @@ done:
-     return elem;
- 
- err_undo_map:
--    virtqueue_undo_map_desc(out_num, in_num, iov);
-+    virtqueue_undo_map_desc(vdev->dma_as, out_num, in_num, iov);
-     goto done;
- }
- 
-@@ -1982,7 +1984,7 @@ done:
-     return elem;
- 
- err_undo_map:
--    virtqueue_undo_map_desc(out_num, in_num, iov);
-+    virtqueue_undo_map_desc(vdev->dma_as, out_num, in_num, iov);
-     goto done;
- }
- 
--- 
-2.51.0
+The RMM doesn't track the RECs for a given vCPU. So, when it requires
+the REC object for a given vCPU, the Host provides this via an 
+RMI_PSCI_COMPLETE call. This is used for PSCI_CPU_ON and 
+PSCI_AFFINITY_INFO today, where the RMM can do the book keeping
+for the REC and emulate the PSCI. Now, the host does have a control
+on whether to ACCEPT or REJECT a request (for CPU_ON).
+The RMM requires the PSCI_COMPLETE call, before it can return the
+PSCI_CPU_ON back to the caller and also before the target vCPU can
+run. Thus, this cannot be delayed until the "new VCPU" is run.
 
+Like Steven mentioned, this is only useful in the UABI if the VMM is
+handling the PSCI. And this must be issued, before the target vCPU
+can be scheduled.
+
+Suzuki
 
