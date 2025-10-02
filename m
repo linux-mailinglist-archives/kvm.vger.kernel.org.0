@@ -1,267 +1,117 @@
-Return-Path: <kvm+bounces-59428-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-59429-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5971ABB4316
-	for <lists+kvm@lfdr.de>; Thu, 02 Oct 2025 16:41:38 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 52622BB4343
+	for <lists+kvm@lfdr.de>; Thu, 02 Oct 2025 16:43:53 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id C35F919E0FC9
-	for <lists+kvm@lfdr.de>; Thu,  2 Oct 2025 14:42:00 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 26F857A1C09
+	for <lists+kvm@lfdr.de>; Thu,  2 Oct 2025 14:42:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1D3E8312803;
-	Thu,  2 Oct 2025 14:41:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C308E312822;
+	Thu,  2 Oct 2025 14:43:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="NVugEe9f"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="jWjQ9Aj6"
 X-Original-To: kvm@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2FC3B2C027F;
-	Thu,  2 Oct 2025 14:41:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0DA6E3128A3
+	for <kvm@vger.kernel.org>; Thu,  2 Oct 2025 14:43:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1759416090; cv=none; b=NMD6cysleQDQO/v/H4dMy1FuzlYcELjCAB/J3o/AkatoRMggvOmZRXSpDi9CSUWhqj7epeyp6gA7X+s7+7vlBI4nAypaTRCSseloVh6DKNHp1uze4ozWTRwoxMywdt89uDcgbiPrS6/3UhgwMvmIFzI/WPmCdT7g5TAGaNMyYbA=
+	t=1759416219; cv=none; b=Iq1gsP52weW1FLBucZDGqCB7GoJog7RiC82l8HsVXm9wiJwmeJYMgSb0itW/1ydavEzjo/6gkWtWDEu+P43kCmh1MtjE9klkSb7RGAvQlbFyYwpZBIQBheuVrlcE8oEfM37FEGryslvRTMsjLPxSQa3PY1MPBc12rr6yBiUHTXQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1759416090; c=relaxed/simple;
-	bh=HcWa8+/7HpfIO4HCatnbcdT8Qggyf0k+gQ/HNIeL38o=;
-	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=S//G4SQjmTMMzbHGGz3Rc5P6SQRLH3LCxF3cAB6+r6tLwPerYBVEgGGu9lZfqzfmOfxkCQdUemShOETOM+9ZBHbWWc6OKO3Rs55encWp/b2bPQggb0L2EbVqrf6+3Vf1d8tsCbKy3GXtZY3q0jpgbDGYFLbozLytoKdiLFc3gCQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=NVugEe9f; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id DF784C4CEF4;
-	Thu,  2 Oct 2025 14:41:29 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1759416090;
-	bh=HcWa8+/7HpfIO4HCatnbcdT8Qggyf0k+gQ/HNIeL38o=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=NVugEe9ft5Jkhp5UvmLvmY87/yzeX0fnBUxalpGV6FkHWWeUMCfELz+u2e5HgaDeS
-	 hJAsl25RRJxePXYtCzVuZvAjLjaNEidW1JfBlSyLMQXVfcKR6euXzePe94qsNjDr97
-	 mjH++vBvOR2p1LAP+SWbIk1KcyPe7wmgbJbpgqG4BpiZ2KcwlN7whWk0C7eunBTN62
-	 vzZZR5YScFwOvy4dqe8ABIErGg3V1fnpUX7NUY8rH6VcgJGkdKxuad4I2JakrYIaFd
-	 4O+eT+0mOolKRflSJ6Z2V3PKycTlJnulYUiNqg5WP5EYGa2QEmCeRQmyF/68pThyyk
-	 MMSkPRfpzC1vw==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.98.2)
-	(envelope-from <maz@kernel.org>)
-	id 1v4KUp-0000000B6Jf-0vxs;
-	Thu, 02 Oct 2025 14:41:27 +0000
-Date: Thu, 02 Oct 2025 15:41:26 +0100
-Message-ID: <86a529z7qh.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: Vipin Sharma <vipinsh@google.com>
-Cc: kvm@vger.kernel.org,
-	kvmarm@lists.linux.dev,
-	kvm-riscv@lists.infradead.org,
-	seanjc@google.com,
-	pbonzini@redhat.com,
-	borntraeger@linux.ibm.com,
-	frankja@linux.ibm.com,
-	imbrenda@linux.ibm.com,
-	anup@brainfault.org,
-	atish.patra@linux.dev,
-	zhaotianrui@loongson.cn,
-	maobibo@loongson.cn,
-	chenhuacai@kernel.org,
-	oliver.upton@linux.dev,
-	ajones@ventanamicro.com
-Subject: Re: [PATCH v3 9/9] KVM: selftests: Provide README.rst for KVM selftests runner
-In-Reply-To: <20251001173225.GA420255.vipinsh@google.com>
-References: <20250930163635.4035866-1-vipinsh@google.com>
-	<20250930163635.4035866-10-vipinsh@google.com>
-	<86qzvnypsp.wl-maz@kernel.org>
-	<20251001173225.GA420255.vipinsh@google.com>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+	s=arc-20240116; t=1759416219; c=relaxed/simple;
+	bh=GlgNCqSjZpjIz8IRKR6GJ4b9WqqQmb59lUmwQAT+azY=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=El2SpilykK6CozOQykTqi0zOhYnDeJHe3j6NOoxONRRfi9ANIUctf1Xe75X/11qE2jF5Q+SwJXXPWdw1bdq6jEs1/1tfYzu6G/r+KhtIdJIV/sXR3qBil6UfYO9EJ9nFVJoBV9TwYmyHoY2nh2aAqPc5wNtALGc6ISCEf0R+cc8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=jWjQ9Aj6; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1759416217;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=9rrcUC+gzDyEMjCtBSzxmOK2Xsj8RXVs22FZMi4vvac=;
+	b=jWjQ9Aj64ojOrIBFOPvuPkwsxq20uJ/dviAfkL6baPPKcYRyoj+EuDXJiIb7L7CSPBYvNe
+	m2U4TXsLs41jAb7q4seRNTmLnIVTWGDhE/P9Qq1mJ2idh23dU0fYJNvoa7GJ9T8eMyxAuc
+	gDJBgmbGO+ndg7ogBqRxA56tcuBL4I4=
+Received: from mail-qv1-f71.google.com (mail-qv1-f71.google.com
+ [209.85.219.71]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-567-DZLMpxHbNw-Qz_0JMb0Krg-1; Thu, 02 Oct 2025 10:43:34 -0400
+X-MC-Unique: DZLMpxHbNw-Qz_0JMb0Krg-1
+X-Mimecast-MFC-AGG-ID: DZLMpxHbNw-Qz_0JMb0Krg_1759416214
+Received: by mail-qv1-f71.google.com with SMTP id 6a1803df08f44-78e30eaca8eso37623526d6.2
+        for <kvm@vger.kernel.org>; Thu, 02 Oct 2025 07:43:34 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1759416214; x=1760021014;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=9rrcUC+gzDyEMjCtBSzxmOK2Xsj8RXVs22FZMi4vvac=;
+        b=AlQ2GTfKsJ9N5EGxEZDGCRUeTArobs23nsy5A/N2/3aMkYK4BO/359Lw/F4ILLqIyC
+         CAJrEIjP/MCG6p+iYP+CcDSSsypEpL2fDADepfakFuZsjZDEP89dwIkaynEKWA7Xzz0E
+         HQkboiK1nyFZA/MALLm94EPJSorGCoi1OOKT7m/0oZsoegoq0+ZLauekalMqwpn2/8Wz
+         oh3WEEy+OGsNAFj53LqmlsmyWwQuPnil9+SB2CD8QnflQeN3k9i8+2EFGGia8N6BzOPH
+         IoFaC2Zd9VIcB2qTxyoIk22nDNUBZFjTAYjYsgHaTw/j0Os0wo/+1pSxQ+DC4uujbD9d
+         9Bsw==
+X-Forwarded-Encrypted: i=1; AJvYcCWau+MphklbKsGVLGDS9Vo9BDakIcvTKP+rgGvDo7GpfER43R26+OkCrPx1zz3801Mbqs8=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yy5FJ6W8ihNVd37jRPKfA1nonS7Eq7uL2wj/OlwNRt/WhkjO+jx
+	5cHMhF1rjIzDiRl/otK/QWp8CiB0X9pDO5S9XmPa7eKPgKh8hMR3oq5+Vssg17aDKEHq40AAhQr
+	+Q+S7kQuWVIAmKUZiVA3QgceQy9lcQkJo8fNof8W5cfe6Z6h27Nr7bA==
+X-Gm-Gg: ASbGnctyi3gOfjtpa1TjZGz1SV+QwgxFXq4ChyLU/x+vxiJWVG0YJO6tRjUTW6Z/MU+
+	FcxTqKZqtEB1B4Up1beY29NCC/kew2mYcPOGyAOvDCvNPV4Yvba+3GzLfi5JL6ES+WilwoJvwCg
+	Nb5JyY/P0M35Q3B3iQbF+qWG4/ywAm6goySR3VkcPLg/BJ7/F6GRmiEHArcxJr/MRQgcTmxPfcP
+	iqH5nzai/jbUtHKHENK8Pr/djZeAqg2/XSpVNt06zH+xSLKVRLzlh+MaA+8qck1+QtBUnQzlV5z
+	r2sQgEyc6UOVjwMAN/edfs9wbmn8LDSbvwNgbA==
+X-Received: by 2002:a05:620a:1910:b0:853:20b1:cf12 with SMTP id af79cd13be357-873768a536emr1089056385a.65.1759416214199;
+        Thu, 02 Oct 2025 07:43:34 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IFYhhy9AiOFVdgEwVsdNu041FmEbs4JKWJfK2nsAoYrsrPMBghvMcNluzdipR5aoQkuErP90Q==
+X-Received: by 2002:a05:620a:1910:b0:853:20b1:cf12 with SMTP id af79cd13be357-873768a536emr1089052185a.65.1759416213751;
+        Thu, 02 Oct 2025 07:43:33 -0700 (PDT)
+Received: from x1.local ([142.188.210.50])
+        by smtp.gmail.com with ESMTPSA id d75a77b69052e-4e55a84a055sm22561111cf.15.2025.10.02.07.43.32
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 02 Oct 2025 07:43:33 -0700 (PDT)
+Date: Thu, 2 Oct 2025 10:43:29 -0400
+From: Peter Xu <peterx@redhat.com>
+To: Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@linaro.org>
+Cc: qemu-devel@nongnu.org, David Hildenbrand <david@redhat.com>,
+	"Maciej S. Szmigiero" <maciej.szmigiero@oracle.com>,
+	Paolo Bonzini <pbonzini@redhat.com>,
+	Richard Henderson <richard.henderson@linaro.org>,
+	kvm@vger.kernel.org, "Michael S. Tsirkin" <mst@redhat.com>,
+	Fabiano Rosas <farosas@suse.de>
+Subject: Re: [PATCH v3 0/5] system/ramblock: Sanitize header
+Message-ID: <aN6Pkeu_tb5giiPc@x1.local>
+References: <20251002032812.26069-1-philmd@linaro.org>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: vipinsh@google.com, kvm@vger.kernel.org, kvmarm@lists.linux.dev, kvm-riscv@lists.infradead.org, seanjc@google.com, pbonzini@redhat.com, borntraeger@linux.ibm.com, frankja@linux.ibm.com, imbrenda@linux.ibm.com, anup@brainfault.org, atish.patra@linux.dev, zhaotianrui@loongson.cn, maobibo@loongson.cn, chenhuacai@kernel.org, oliver.upton@linux.dev, ajones@ventanamicro.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20251002032812.26069-1-philmd@linaro.org>
 
-On Wed, 01 Oct 2025 18:32:25 +0100,
-Vipin Sharma <vipinsh@google.com> wrote:
->=20
-> On 2025-10-01 09:44:22, Marc Zyngier wrote:
-> > On Tue, 30 Sep 2025 17:36:35 +0100,
-> > Vipin Sharma <vipinsh@google.com> wrote:
-> > >=20
-> > > +KVM selftest runner is highly configurable test executor that allows=
- to run
-> > > +tests with different configurations (not just the default), parallel=
-y, save
-> >=20
-> > s/parallely/in parallel/
-> >=20
->=20
-> Thanks, I will fix it.
->=20
-> > > +output to disk hierarchically, control what gets printed on console,=
- provide
-> > > +execution status.
-> > > +
-> > > +To generate default tests use::
-> > > +
-> > > +  # make tests_install
-> > > +
-> > > +This will create ``testcases_default_gen`` directory which will have=
- testcases
-> >=20
-> > I don't think using the future tense is correct here. I'd rather see
-> > something written in the present tense, possibly imperative. For
-> > example:
-> >=20
-> > "Create 'blah' directory containing 'foo' files, one per test-case.
-> >=20
->=20
-> Thanks, I will fix it.
->=20
-> > > +in `default.test` files. Each KVM selftest will have a directory in =
- which
-> > > +`default.test` file will be created with executable path relative to=
- KVM
-> > > +selftest root directory i.e. `/tools/testing/selftests/kvm`.
-> >=20
-> > Shouldn't this honor the existing build output directives? If it
-> > actually does, then you want to call this out.
-> >=20
->=20
-> To generate default test files in a specific directory one can use
-> "OUTPUT" in the make command
+On Thu, Oct 02, 2025 at 05:28:07AM +0200, Philippe Mathieu-Daudé wrote:
+> (series fully reviewed, I plan to merge via my tree)
+> 
+> Usual API cleanups, here focusing on RAMBlock API:
+> move few prototypes out of "exec/cpu-common.h" and
+> "system/ram_addr.h" to "system/ramblock.h".
 
-The standard way to do this is documented in the top level Makefile:
+Acked-by: Peter Xu <peterx@redhat.com>
 
-<quote>
-# This does not need to match to the root of the kernel source tree.
-#
-# For example, you can do this:
-#
-#  cd /dir/to/store/output/files; make -f /dir/to/kernel/source/Makefile
-#
-# If you want to save output files in a different location, there are
-# two syntaxes to specify it.
-#
-# 1) O=3D
-# Use "make O=3Ddir/to/store/output/files/"
-#
-# 2) Set KBUILD_OUTPUT
-# Set the environment variable KBUILD_OUTPUT to point to the output directo=
-ry.
-# export KBUILD_OUTPUT=3Ddir/to/store/output/files/; make
-#
-# The O=3D assignment takes precedence over the KBUILD_OUTPUT environment
-# variable.
-</quote>
+-- 
+Peter Xu
 
-Your new infrastructure should support the existing mechanism (and
-avoid introducing a new one).
-
->=20
->   make OUTPUT=3D"~/test/directory/path" tests_install
->=20
-> This allows to generate testcases_default_gen in the given output
-> directory. default.test files will still have test binary path relative
-> kvm selftest root directory.=20
->=20
-> $OUTPUT
-> =E2=94=94=E2=94=80=E2=94=80 testcases_default_gen
->     =E2=94=9C=E2=94=80=E2=94=80 access_tracking_perf_test
->     =E2=94=82   =E2=94=94=E2=94=80=E2=94=80 default.test
->     =E2=94=9C=E2=94=80=E2=94=80 arch_timer
->     =E2=94=82   =E2=94=94=E2=94=80=E2=94=80 default.test
->     =E2=94=9C=E2=94=80=E2=94=80 arm64
->     =E2=94=82   =E2=94=9C=E2=94=80=E2=94=80 aarch32_id_regs
->     =E2=94=82   =E2=94=82   =E2=94=94=E2=94=80=E2=94=80 default.test
->     =E2=94=82   =E2=94=9C=E2=94=80=E2=94=80 arch_timer_edge_cases
->     =E2=94=82   =E2=94=82   =E2=94=94=E2=94=80=E2=94=80 default.test
->     =E2=94=82   =E2=94=9C=E2=94=80=E2=94=80 debug-exceptions
->     =E2=94=82   =E2=94=82   =E2=94=94=E2=94=80=E2=94=80 default.test
->     =E2=94=82   =E2=94=9C=E2=94=80=E2=94=80 external_aborts
->     =E2=94=82   =E2=94=82   =E2=94=94=E2=94=80=E2=94=80 default.test
->     =E2=94=82   =E2=94=82   =E2=94=94=E2=94=80=E2=94=80 default.test
->     =E2=94=82   =E2=94=94=E2=94=80=E2=94=80 ...
->     =E2=94=9C=E2=94=80=E2=94=80 coalesced_io_test
->     =E2=94=82   =E2=94=94=E2=94=80=E2=94=80 default.test
->     =E2=94=9C=E2=94=80=E2=94=80 demand_paging_test
->     =E2=94=82   =E2=94=94=E2=94=80=E2=94=80 default.test
->     =E2=94=9C=E2=94=80=E2=94=80 ...
->=20
-> So, arm64/aarch32_id_regs/default.test will have 'arm64/aarch32_id_regs'
->=20
-> User can then supply -p/--path with the path of build output directory
-> to runner.=20
->=20
->   python3 runner -p ~/path/to/selftest/binaries -d $OUTPUT/testcases_defa=
-ult_gen
->=20
-> If -p not given then current directory is considered for test
-> executables.
->
-> > > For example, the
-> > > +`dirty_log_perf_test` will have::
-> > > +
-> > > +  # cat testcase_default_gen/dirty_log_perf_test/default.test
-> > > +  dirty_log_perf_test
-> > > +
-> > > +Runner will execute `dirty_log_perf_test`. Testcases files can also =
-provide
-> > > +extra arguments to the test::
-> > > +
-> > > +  # cat tests/dirty_log_perf_test/2slot_5vcpu_10iter.test
-> > > +  dirty_log_perf_test -x 2 -v 5 -i 10
-> > > +
-> > > +In this case runner will execute the `dirty_log_perf_test` with the =
-options.
-> > > +
-> >=20
-> > The beginning of the text talks about "non-default' configurations,
-> > but you only seem to talk about the default stuff. How does one deals
-> > with a non-default config?
-> >=20
->=20
-> In the patch 1, I created two sample tests files,
-> 2slot_5vcpu_10iter.test and no_dirty_log_protect.test, in the directory
-> tools/testing/selftests/kvm/tests/dirty_log_perf_test.
->=20
-> Contents of those files provide non-default arguments to test, for exampl=
-e,
-> 2slot_5vcpu10iter.test has the command:
->=20
->   dirty_log_perf_test -x 2 -v 5  -i 10
->=20
-> One can run these non-default tests as (assuming current directory is
-> kvm selftests):
->=20
->   python3 runner -d ./tests
->=20
-> Over the time we will add more of these non-default interesting
-> testcases. One can then run:
->=20
->   python3 runner -d ./tests ./testcases_default_gen
-
-That's not what I am complaining about. What you call "configuration"
-seems to just be "random set of parameters for a random test".
-
-In practice, your runner does not seem configurable at all. You just
-treat all possible configurations of a single test as different tests.
-
-My (admittedly very personal) view of what a configuration should be
-is "run this single test with these parameters varying in these
-ranges, for this long".
-
-Thanks,
-
-	M.
-
---=20
-Without deviation from the norm, progress is not possible.
 
