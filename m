@@ -1,189 +1,120 @@
-Return-Path: <kvm+bounces-59437-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-59438-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 70B23BB496A
-	for <lists+kvm@lfdr.de>; Thu, 02 Oct 2025 18:46:45 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 41283BB49C7
+	for <lists+kvm@lfdr.de>; Thu, 02 Oct 2025 19:00:27 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id A0EF619E256D
-	for <lists+kvm@lfdr.de>; Thu,  2 Oct 2025 16:47:04 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B6AD6321EDD
+	for <lists+kvm@lfdr.de>; Thu,  2 Oct 2025 17:00:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D2066258EFF;
-	Thu,  2 Oct 2025 16:46:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E737226E153;
+	Thu,  2 Oct 2025 17:00:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="iJJlSgvJ"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="tfYrp3gD"
 X-Original-To: kvm@vger.kernel.org
-Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 68C1F23183F
-	for <kvm@vger.kernel.org>; Thu,  2 Oct 2025 16:46:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C0B451419A9;
+	Thu,  2 Oct 2025 17:00:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1759423591; cv=none; b=sZMsDqRl+5RmkvJTMSKSG+Gy9I+7wQmUC46C2/dA+Nwyy8JpjNvm5nF6SSI8hD2TY7Kn84PmmjB3mK9G8Xvku4637n1mM9eFEw2HRFcfLs72qOKzyQeL+x7Dsnw3dH1SEPcgC05LE5k5+ouSwXu0BmY7QXdzOnvpSa90hPs4oi8=
+	t=1759424414; cv=none; b=tpy+LGvQHJ2ay5mNEJCUEiGQtUq+qBYK8zacJrq7hed8v1G0AFFqG/BdYDe39FT9TAD0Ov6PHa8Y7OYdlpVXcUoEdNXGjlSKP8LS/lQNzlCjPPZfJIpwT/p0NU7CxQm9yfYvpDBcZBfnLYk5kiusI/A40OaeSyqb57g01FcHgqA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1759423591; c=relaxed/simple;
-	bh=vA7jealyvtopMOC5RwiAr5GmUWf8uULud80PXLmDeds=;
-	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=IBYH0mHfXxlyQ/D4X/VEgtmeEZj4DXHamgolq2GmTXXWC60I4rJBVfIzy1sbhfxN4sCWVAimMeVla8KfESNNnnENtsxrtcd70X5J5gGMduZPC1xcMKxNK8+zfRD53VFsU4LIRZxXO4dAAezTnXyQd1f+1eYPWM4/i3lLfFAIpiA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=iJJlSgvJ; arc=none smtp.client-ip=148.163.158.5
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
-Received: from pps.filterd (m0353725.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 592DcqPu018505;
-	Thu, 2 Oct 2025 16:45:53 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
-	:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=pp1; bh=pbhKEa
-	E1DBlDRKYZ27gq35MgCt3ia1W2prQ54VRuuz4=; b=iJJlSgvJZE0txa0d60CSr3
-	hwQjVm+nIEE5/WOGu3+aBuUeQgF/fRi7rwfZjQOiQ9o0ZkNwA/s7/3eiuOzFk/i4
-	WKucmJ7Z+ztl91g8HbqZLfVAeHYIx6/TB4Fup9sPxNNQz5ASCxMLpXwenTHWPJM5
-	NXfvd4V9gfYDtUFzUed3VTbEqqreY/kgKcZUuDnwt8y6q7Jr+svThk08syqQxfr3
-	ANH22HZUi1yU/rrJt8u2SS4TSPTOPXM1uBNnWyBEaU46H6aAn0uIrpCEGfXYveiZ
-	da0xSIdIZUq+idchaa8Wo3F22m1bIcNM0XS/OjJaH9cjpFxoRBAGDdVL4wRSGgIQ
-	==
-Received: from pps.reinject (localhost [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 49e6bhwq5s-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 02 Oct 2025 16:45:53 +0000 (GMT)
-Received: from m0353725.ppops.net (m0353725.ppops.net [127.0.0.1])
-	by pps.reinject (8.18.1.12/8.18.0.8) with ESMTP id 592GSKMD008352;
-	Thu, 2 Oct 2025 16:45:53 GMT
-Received: from ppma22.wdc07v.mail.ibm.com (5c.69.3da9.ip4.static.sl-reverse.com [169.61.105.92])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 49e6bhwq5p-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 02 Oct 2025 16:45:53 +0000 (GMT)
-Received: from pps.filterd (ppma22.wdc07v.mail.ibm.com [127.0.0.1])
-	by ppma22.wdc07v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 592GIiGc003325;
-	Thu, 2 Oct 2025 16:45:52 GMT
-Received: from smtprelay05.wdc07v.mail.ibm.com ([172.16.1.72])
-	by ppma22.wdc07v.mail.ibm.com (PPS) with ESMTPS id 49etmy721d-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 02 Oct 2025 16:45:52 +0000
-Received: from smtpav06.wdc07v.mail.ibm.com (smtpav06.wdc07v.mail.ibm.com [10.39.53.233])
-	by smtprelay05.wdc07v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 592GjoDD30605892
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Thu, 2 Oct 2025 16:45:51 GMT
-Received: from smtpav06.wdc07v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id D91095803F;
-	Thu,  2 Oct 2025 16:45:50 +0000 (GMT)
-Received: from smtpav06.wdc07v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 50E0958056;
-	Thu,  2 Oct 2025 16:45:48 +0000 (GMT)
-Received: from li-479af74c-31f9-11b2-a85c-e4ddee11713b.ibm.com (unknown [9.61.134.141])
-	by smtpav06.wdc07v.mail.ibm.com (Postfix) with ESMTP;
-	Thu,  2 Oct 2025 16:45:48 +0000 (GMT)
-Message-ID: <387abc0573ed488798ec805451a5e7e6c79b9a0b.camel@linux.ibm.com>
-Subject: Re: [PATCH v2 06/18] hw: Remove unnecessary 'system/ram_addr.h'
- header
-From: Eric Farman <farman@linux.ibm.com>
-To: Philippe =?ISO-8859-1?Q?Mathieu-Daud=E9?= <philmd@linaro.org>,
-        qemu-devel@nongnu.org
-Cc: Peter Maydell <peter.maydell@linaro.org>,
-        Jagannathan Raman	
- <jag.raman@oracle.com>, qemu-ppc@nongnu.org,
-        Ilya Leoshkevich
- <iii@linux.ibm.com>, Thomas Huth <thuth@redhat.com>,
-        Jason Herne
- <jjherne@linux.ibm.com>, Peter Xu <peterx@redhat.com>,
-        =?ISO-8859-1?Q?C=E9dric?= Le Goater	 <clg@redhat.com>,
-        kvm@vger.kernel.org,
-        Christian Borntraeger	 <borntraeger@linux.ibm.com>,
-        Halil Pasic
- <pasic@linux.ibm.com>,
-        Matthew Rosato	 <mjrosato@linux.ibm.com>,
-        Paolo
- Bonzini <pbonzini@redhat.com>,
-        "Michael S. Tsirkin" <mst@redhat.com>,
-        Elena
- Ufimtseva <elena.ufimtseva@oracle.com>,
-        Richard Henderson	
- <richard.henderson@linaro.org>,
-        Harsh Prateek Bora <harshpb@linux.ibm.com>,
-        Fabiano Rosas <farosas@suse.de>, qemu-arm@nongnu.org,
-        qemu-s390x@nongnu.org, David Hildenbrand <david@redhat.com>,
-        Alex
- Williamson <alex.williamson@redhat.com>,
-        Nicholas Piggin <npiggin@gmail.com>
-Date: Thu, 02 Oct 2025 12:45:47 -0400
-In-Reply-To: <20251001175448.18933-7-philmd@linaro.org>
-References: <20251001175448.18933-1-philmd@linaro.org>
-	 <20251001175448.18933-7-philmd@linaro.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.56.2 (3.56.2-2.fc42) 
+	s=arc-20240116; t=1759424414; c=relaxed/simple;
+	bh=JeDo0/gU/aESo9xjFaYoM9qP44UP1j9qzQZuprvxYBc=;
+	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
+	 Content-Disposition:In-Reply-To; b=au0+3Ugwvb1at0VENwkxMjh3nmtGDv0wrD1n1J6Ha6JHo17xgSqsz9xfTBhD9P9b7EaH73LPkuQJTMKxglOzX8hb0+Wzzau2kUGJpcfSPip1LIK5rwDLYV2hYOIxb/ZwGuiqXxnv1iZRqHSYrjwHdrLt9QuZuTdgszFHgVuUDgA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=tfYrp3gD; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 75414C4CEF4;
+	Thu,  2 Oct 2025 17:00:14 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1759424414;
+	bh=JeDo0/gU/aESo9xjFaYoM9qP44UP1j9qzQZuprvxYBc=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:From;
+	b=tfYrp3gDrkm1utxo4ziuF3mm7o/zWzsSnOByeTqhVl2Z8gFpwqyj5Bhaf5nfQ5Tao
+	 wxU0PkCLscfjB40FmXWgjsJipOSll3imjERGnUBvScnrDniapFuomAMA/Ru3PtSX1z
+	 SZZLFC7ycSg7qMv6hmde4oNMp8AePiVz68I2Ca3nwF08dMUYpsTovXEhqmvh8ZrSEA
+	 ds7nwIQEVMnbbyGowfMPme3HhOQxuCs7wv4etQCAHAqEga8uJUX08Ad3AfLi0qIOoH
+	 rqjpd9hETAVn8khrUBKUz1sXmuhylGLB3x+S474ZpfzV2Hwbg1JksEp39XllqIxDyA
+	 FD8Bw5/b7U/Bw==
+Date: Thu, 2 Oct 2025 12:00:13 -0500
+From: Bjorn Helgaas <helgaas@kernel.org>
+To: Niklas Schnelle <schnelle@linux.ibm.com>
+Cc: Ilpo =?utf-8?B?SsOkcnZpbmVu?= <ilpo.jarvinen@linux.intel.com>,
+	alex.williamson@redhat.com, clg@redhat.com, mjrosato@linux.ibm.com,
+	Farhan Ali <alifm@linux.ibm.com>, linux-s390@vger.kernel.org,
+	kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-pci <linux-pci@vger.kernel.org>
+Subject: Re: [PATCH v4 04/10] s390/pci: Add architecture specific
+ resource/bus address translation
+Message-ID: <20251002170013.GA278722@bhelgaas>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-TM-AS-GCONF: 00
-X-Authority-Analysis: v=2.4 cv=Se/6t/Ru c=1 sm=1 tr=0 ts=68deac41 cx=c_pps
- a=5BHTudwdYE3Te8bg5FgnPg==:117 a=5BHTudwdYE3Te8bg5FgnPg==:17
- a=IkcTkHD0fZMA:10 a=x6icFKpwvdMA:10 a=KKAkSRfTAAAA:8 a=VnNF1IyMAAAA:8
- a=aGwGTAKf3ZeqeKgWoQ8A:9 a=NqO74GWdXPXpGKcKHaDJD/ajO6k=:19 a=QEXdDO2ut3YA:10
- a=cvBusfyB2V15izCimMoJ:22 a=cPQSjfK2_nFv0Q5t_7PE:22
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUwOTI3MDAxMCBTYWx0ZWRfX5K2/3oNHL62q
- mPnN8/B+etDF9KFrdn/UxXWqa+l73ypEUWjN4e3pwvRWAfgWeBH0u51VuWlp8uLlvA17M+YHyio
- iAENZpRMES16emUC23NDKzckmhhB/rLaTLynMQ/UaOPpOXCnCh+m1frDOedv7qHt/EQMq0/i7La
- HJkcAKi+laDJ4+JQlZD0cE+ukw078y7+UJV6xgVmdT5JrcnuaSA4tbiSCktG7c1DaoA+SeLeiQ/
- uiRYtdRBmbiMRdqRyV2ShF67XGzmUPx8FclcxIK3ANbAIsC0Qhl7SWlfEBBwBmmnwXmo0XUfOeu
- TxkS0gyoY3LOG2bpxJUFeMLBAG2OD3H7s8x7O/NowuJia7oaQ+DLSM/B6PhjEKFKAD7g/tjVt2V
- Hr/oDpywz0z6gJEAZxKbafXcoM14og==
-X-Proofpoint-GUID: Ip_bUE8ZxJcETWq2tmqVsME2d70jhphX
-X-Proofpoint-ORIG-GUID: dQR6yCoHl9AulGC0oIbXH9W_n3wmFPRR
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1117,Hydra:6.1.9,FMLib:17.12.80.40
- definitions=2025-10-02_06,2025-10-02_03,2025-03-28_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- impostorscore=0 malwarescore=0 suspectscore=0 bulkscore=0 lowpriorityscore=0
- clxscore=1015 phishscore=0 priorityscore=1501 adultscore=0 spamscore=0
- classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
- reason=mlx scancount=1 engine=8.19.0-2509150000 definitions=main-2509270010
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <a5ab698977f724e9121f81b9cfec9503d9decc72.camel@linux.ibm.com>
 
-On Wed, 2025-10-01 at 19:54 +0200, Philippe Mathieu-Daud=C3=A9 wrote:
-> None of these files require definition exposed by "system/ram_addr.h",
-> remove its inclusion.
->=20
-> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@linaro.org>
-> Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
-> ---
->  hw/ppc/spapr.c                    | 1 -
->  hw/ppc/spapr_caps.c               | 1 -
->  hw/ppc/spapr_pci.c                | 1 -
->  hw/remote/memory.c                | 1 -
->  hw/remote/proxy-memory-listener.c | 1 -
->  hw/s390x/s390-virtio-ccw.c        | 1 -
->  hw/vfio/spapr.c                   | 1 -
->  hw/virtio/virtio-mem.c            | 1 -
->  8 files changed, 8 deletions(-)
->=20
+On Thu, Oct 02, 2025 at 02:58:45PM +0200, Niklas Schnelle wrote:
+> On Wed, 2025-09-24 at 10:16 -0700, Farhan Ali wrote:
+> > On s390 today we overwrite the PCI BAR resource address to either an
+> > artificial cookie address or MIO address. However this address is different
+> > from the bus address of the BARs programmed by firmware. The artificial
+> > cookie address was created to index into an array of function handles
+> > (zpci_iomap_start). The MIO (mapped I/O) addresses are provided by firmware
+> > but maybe different from the bus address. This creates an issue when trying
+> > to convert the BAR resource address to bus address using the generic
+> > pcibios_resource_to_bus().
+> > 
+> > Implement an architecture specific pcibios_resource_to_bus() function to
+> > correctly translate PCI BAR resource addresses to bus addresses for s390.
+> > Similarly add architecture specific pcibios_bus_to_resource function to do
+> > the reverse translation.
+> > 
+> > Signed-off-by: Farhan Ali <alifm@linux.ibm.com>
+> > ---
+> >  arch/s390/pci/pci.c       | 74 +++++++++++++++++++++++++++++++++++++++
+> >  drivers/pci/host-bridge.c |  4 +--
+> >  2 files changed, 76 insertions(+), 2 deletions(-)
+> > 
+> 
+> @Bjorn, interesting new development. This actually fixes a current
+> linux-next breakage for us. In linux-next commit 06b77d5647a4 ("PCI:
+> Mark resources IORESOURCE_UNSET when outside bridge windows") from Ilpo
+> (added) breaks PCI on s390 because the check he added in
+> __pci_read_base() doesn't find the resource because the BAR address
+> does not match our MIO / address cookie addresses. With this patch
+> added however the pcibios_bus_to_resource() in __pci_read_base()
+> converts  the region correctly and then Ilpo's check works. I was
+> looking at this code quite intensely today wondering about Benjamin's
+> comment if we do need to check for containment rather than exact match.
+> I concluded that I think it is fine as is and was about to give my R-b
+> before Gerd had tracked down the linux-next issue and I found that this
+> fixes it.
+> 
+> So now I wonder if we might want to pick this one already to fix the
+> linux-next regression? Either way I'd like to add my:
+> 
+> Reviewed-by: Niklas Schnelle <schnelle@linux.ibm.com>
 
-...snip...
+Hmmm, thanks for the report.  I'm about ready to send the pull
+request, and I hate to include something that is known to break s390
+and would require a fix before v6.18.  At the same time, I hate to add
+non-trivial code, including more weak functions, this late in the
+window.
 
-> diff --git a/hw/s390x/s390-virtio-ccw.c b/hw/s390x/s390-virtio-ccw.c
-> index d0c6e80cb05..ad2c48188a8 100644
-> --- a/hw/s390x/s390-virtio-ccw.c
-> +++ b/hw/s390x/s390-virtio-ccw.c
-> @@ -13,7 +13,6 @@
-> =20
->  #include "qemu/osdep.h"
->  #include "qapi/error.h"
-> -#include "system/ram_addr.h"
->  #include "system/confidential-guest-support.h"
->  #include "hw/boards.h"
->  #include "hw/s390x/sclp.h"
+06b77d5647a4 ("PCI: Mark resources IORESOURCE_UNSET when outside
+bridge windows") fixes some bogus messages, but I'm not sure that it's
+actually a functional change.  So maybe the simplest at this point
+would be to defer that commit until we can do it and the s390 change
+together.
 
-This was added in 9138977b18 ("s390x/kvm: Configure page size after memory =
-has actually been
-initialized") for the purposes of calling qemu_getrampagesize(), but that g=
-ot renamed and later
-moved by c6cd30fead ("system: Declare qemu_[min/max]rampagesize() in 'syste=
-m/hostmem.h'"). So I
-agree this is no longer needed.
-
-Reviewed-by: Eric Farman <farman@linux.ibm.com>  # s390
+Bjorn
 
