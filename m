@@ -1,299 +1,131 @@
-Return-Path: <kvm+bounces-59379-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-59380-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 335DEBB2298
-	for <lists+kvm@lfdr.de>; Thu, 02 Oct 2025 02:42:51 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 32A9CBB26E4
+	for <lists+kvm@lfdr.de>; Thu, 02 Oct 2025 05:28:25 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D4B8E3C809B
-	for <lists+kvm@lfdr.de>; Thu,  2 Oct 2025 00:42:49 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id EADEC32112E
+	for <lists+kvm@lfdr.de>; Thu,  2 Oct 2025 03:28:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0EED672628;
-	Thu,  2 Oct 2025 00:42:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 37B1F25C80E;
+	Thu,  2 Oct 2025 03:28:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="Ld5pgPXA"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="zH36A2C2"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pj1-f73.google.com (mail-pj1-f73.google.com [209.85.216.73])
+Received: from mail-wm1-f43.google.com (mail-wm1-f43.google.com [209.85.128.43])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 85C2128FD
-	for <kvm@vger.kernel.org>; Thu,  2 Oct 2025 00:42:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.73
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4EF821E9B0B
+	for <kvm@vger.kernel.org>; Thu,  2 Oct 2025 03:28:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.43
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1759365762; cv=none; b=jj1TR4mySyOFK2R1qCgiUsdX+b5DJ55fWxOtUzr2Ha7CKlHpMMWPt3JhWi/XINJvgMXnQYHk0rmHQ6AVObQlibjoV7ldZinzSlpKzgI2b6ZsoH+E9nZqbEIzeLM+EEMkfVH1XrcfUeU5RphdE1sS/pOQTSIVFzkyj/0RyyPwUqM=
+	t=1759375698; cv=none; b=fhdPibyJJ4oivLl7z+BN6ZaVBOH4AgLe5WT5NLO29m4H5TsTmhA+2PRxaH4BJ3RB1giLp/ZFxtAUE7gN/jvmdK9TXCzowkxQkKQvf2i9vpwGibCnBwt7/ARUcdV2LsdVVz57Ekz6tO4PBVAOrunjbr6ICQkkVZY+Z++d3BQMeGY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1759365762; c=relaxed/simple;
-	bh=X15PQgHkJVKwkb88PX3aDM2MIy3nCGxR8WbDTZfxuT0=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=j2+Kcly7JNGi+rqW0HPmyN6N4TXkM85/VbN2vNCEO4n6pRNJA1U5sYCqX+KVX7/0rEaSN0tijO5EzpvcGkFNbKNHlp/V+8RCAh+XkLJTn+UrMdbQARLR5wH7yvuAfrz37BFczHMvS/7tc5+ZTnAwNaKnvv+DospXTf1kbaELWlM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=Ld5pgPXA; arc=none smtp.client-ip=209.85.216.73
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pj1-f73.google.com with SMTP id 98e67ed59e1d1-32ee4998c50so416354a91.3
-        for <kvm@vger.kernel.org>; Wed, 01 Oct 2025 17:42:40 -0700 (PDT)
+	s=arc-20240116; t=1759375698; c=relaxed/simple;
+	bh=hQufVHl47M1IwcCzm691eDQqDWsbNzmVx47oLcWiD+I=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=nzlUDgP/5NdVYSVbZPdqXc2g2xCkfpNXeMbpYuZ5F/WnsczBNVASBSMjm62FACVWrQgg8ukm3wdDy2AIui1m9PY54Xd5K7OQX5SRh7kHZ429ZLnKq0XUqcHwFfBPhed6heL6Veicn1Jtz4pGZHnVNd/0Iz04KPAvbGCqC2PxTZk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=zH36A2C2; arc=none smtp.client-ip=209.85.128.43
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
+Received: by mail-wm1-f43.google.com with SMTP id 5b1f17b1804b1-46e4ad36541so5746205e9.0
+        for <kvm@vger.kernel.org>; Wed, 01 Oct 2025 20:28:15 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1759365760; x=1759970560; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=vINZJTC9nZWgB4cyQg89PRYIAJ8j/OCjZLjXorvYxPs=;
-        b=Ld5pgPXASWb0egYq1uML5N3rBalK4THySe8fkb8cgjDusdn3V00h+wkzi8ylau343X
-         WkWSOwLqvM6CIu0xyyWYl6MQM2zanUxltIytHxNWImdB179Kk2lcQOGYvRDtUCIjth5a
-         JlznDkG+muykNkjYvaeSfkCVD69RAA2xQqPtIlQaLf7Xe/Ke1ukV2ddtYXqa9fLo1W79
-         RnWeP9N+bG13VftHfScDdKieBEVKe5MpaMiFfRyT1vV83aoFKJs5n4VVNnk9DssgiZg7
-         eRkk81oC0QNh95wAJoADAntiqz/S5VEsS5jgLKsxSNjGssQu7fbDQwS8We2kvwc8L5gH
-         RYqg==
+        d=linaro.org; s=google; t=1759375694; x=1759980494; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=UfjQR4Y9f8csqu3NmyR/zKukxoGk0bM2pEElqqrIVXw=;
+        b=zH36A2C21nV+e7SOWwl4pIDd2FEWCCOHdEyjRS890Ev8B4/TPQHWAki1H4xBIJHl+v
+         6CLWvy4c2jIzmEadS0/IfpdM0i8iVNytqWAZkl5Qfa3Tyjvx+rZoss56LykqV0f3Gdni
+         roOy42QcPZUW5YDly7KjGMm0l6XYT2jCudvb7JLPy5HYxZMLGtMP52J1u89It7tqpY/4
+         ySgn6FLj7vlE+ynsStXYSNgwtSBE3JlpG0YUVBCSKeYXtLneOXXG59IJZTPgJhYuoCt3
+         3u/6bmsx70Oa1esYQqle08CMkQLUCI+e/qQDpnNVmmcZTEfQgWggwiaWWQQbT7+96gOv
+         kSlA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1759365760; x=1759970560;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=vINZJTC9nZWgB4cyQg89PRYIAJ8j/OCjZLjXorvYxPs=;
-        b=UQ1P0exyZS2UtFzShL5vqmcLGcr4koDMeylKYv/fJGweFLNwSL0oI293TmXnXvsExJ
-         nfO6eY0dxRgH1pDm36u9i0sJKZQMz603/qPELNcxCxo8CRL2tKjGcc4ycMy8HCK5+IEU
-         SY0+TTpLRPKyxOOI6b5HgHLHNzz7eJ/EdL5VHcGuRBEigz8GEiOoF5+ZzwvG4VfXvtJF
-         /VpM/J96LMCu6pBwOeeq3Yn00iVpIE+1jLg8PYFCI+2NsZe/d3hAo0rZ+vO5adKuP1AB
-         p4yCUpgcRfF8KN5AFZteIdbnU84UvlkOeHKvmI0Mqfid/fF0YowuXPHzBgX6CewZiDes
-         h3yg==
-X-Gm-Message-State: AOJu0YzX17Y9uhXE12twOInW2bYxLqWK4zHMGuTl8L/wCPD9tnwd9Z/3
-	3Od6mNK2AIXRmXsnW3eSdv8YLs4MTYq/qhEIukFbtbnPW/7PNY7ocdkIovwRzburhPYSSAxmkc5
-	GI8cgBQ==
-X-Google-Smtp-Source: AGHT+IHoSZkKiGXCyrNz5rnlYg519w6ZS4TwYwBc53oulAbHVsuUB3NVS1fQkS/tQ5r3xuGxS+0gJGHXmyI=
-X-Received: from pjyp4.prod.google.com ([2002:a17:90a:e704:b0:32b:65c6:661a])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90a:e7d0:b0:330:6d2f:1b5d
- with SMTP id 98e67ed59e1d1-339a6f5b61amr6344256a91.26.1759365759828; Wed, 01
- Oct 2025 17:42:39 -0700 (PDT)
-Date: Wed, 1 Oct 2025 17:42:38 -0700
-In-Reply-To: <diqz1pnmtg4h.fsf@google.com>
+        d=1e100.net; s=20230601; t=1759375694; x=1759980494;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=UfjQR4Y9f8csqu3NmyR/zKukxoGk0bM2pEElqqrIVXw=;
+        b=Sup8EZ+3B2LM8zFMW5aJ9jnSay02cfB24+HmHIsW+2y9/TRFngkm+aI44gLPrHsRXT
+         MNT21aRoKDGXt64sve9JTO2x8J3vDQ9sDN8qCm9oyA5t463ikUlf01HQW6sOTLDwn82q
+         YVXvTn7dDRqTCuFn+Q3TEV/REJL9KSGJy1rViwubI2x6XGtdVd2VBZmGVt/ZYcMy2iUE
+         zPTqjL+XEiFHPVXTtDFQaTwLBSZx9Ax/DHz2NUb/fJ3rn98Q1lBQUk0NYLBsD9VLjjEd
+         M1M0lz6nHPfsZpeRK2OO3E0o0Zvb6TbPFlpsukE6Fi7snzNMnanWbZcfy9e1kXbanLY9
+         cuHA==
+X-Forwarded-Encrypted: i=1; AJvYcCVexfXOq10jVbMS0l+Uo0nAVLN9M3dIp0nzfnC0oR4jOa6UJFiCH63fNn5POnUw71bZF+U=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwAs3IJ+wlQ5tD2se8zvdRa/aeuLCKio2p7Av3oyU+xI6/Pb1cb
+	J618JrjP1AyY8NslMFYqwrrU3PdMJWdw2AMaBUySQylNiEmCKUoJGrzGgxC13bBXVFM=
+X-Gm-Gg: ASbGncsxK9hZ5MhT8Gy0B1iahrTVHoHXKrkDJ7uzSMT7GizUB7jY3QDElrWT+Vxasve
+	7dMgf7ksgrrt/68ldCo7EdBpI7PEQmj3iZ1fruxpagAcVLjLQ9VSVVUqdjt1Ql8XxFa8UU91SmN
+	FlBRxjjooBJuNw8aKCE9ZsXsr19CcRdtZCMO9xV2xjVLBzttsWt+xPmspRLWPnpqo2fMMrMsElj
+	w+dT+q2Bkj/H23GDuTzGo3JjQUV1lhZH9iaaTUsiZvfkqQxWUVoCS3N6ElHUYyoSmMeODGe2DGk
+	A6+mF8UGjVY2GzlAqZe9QMfbZNhdYiwO6qiIyzZTziYa3haarDCWsKrmhZi7rv4Gyo57mteVsdr
+	mLQpsPatWyDiH/lQ9hlVe+9wUp21cuCqlH8JSYR1Tsa5EtllZi8BOQBFnvh5xO4izL5zcDWGlMj
+	NPPor3L35qMZCivRikP4PN3d/neMxn6w==
+X-Google-Smtp-Source: AGHT+IFaMeJH4C+jU1Rs3DrDDuKPH9/s2q9KQI8i51a4A4KvYP56ZA1zsf3emLdnKFGZoWVu/kjBxQ==
+X-Received: by 2002:a05:600c:64c5:b0:46e:1d8d:cfb6 with SMTP id 5b1f17b1804b1-46e612bc80dmr40792425e9.19.1759375694501;
+        Wed, 01 Oct 2025 20:28:14 -0700 (PDT)
+Received: from localhost.localdomain (88-187-86-199.subs.proxad.net. [88.187.86.199])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-46e693c9ca3sm14710065e9.22.2025.10.01.20.28.13
+        (version=TLS1_3 cipher=TLS_CHACHA20_POLY1305_SHA256 bits=256/256);
+        Wed, 01 Oct 2025 20:28:13 -0700 (PDT)
+From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@linaro.org>
+To: qemu-devel@nongnu.org
+Cc: David Hildenbrand <david@redhat.com>,
+	"Maciej S. Szmigiero" <maciej.szmigiero@oracle.com>,
+	Paolo Bonzini <pbonzini@redhat.com>,
+	Richard Henderson <richard.henderson@linaro.org>,
+	Peter Xu <peterx@redhat.com>,
+	kvm@vger.kernel.org,
+	=?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@linaro.org>,
+	"Michael S. Tsirkin" <mst@redhat.com>,
+	Fabiano Rosas <farosas@suse.de>
+Subject: [PATCH v3 0/5] system/ramblock: Sanitize header
+Date: Thu,  2 Oct 2025 05:28:07 +0200
+Message-ID: <20251002032812.26069-1-philmd@linaro.org>
+X-Mailer: git-send-email 2.51.0
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <cover.1747264138.git.ackerleytng@google.com> <b784326e9ccae6a08388f1bf39db70a2204bdc51.1747264138.git.ackerleytng@google.com>
- <aNxqYMqtBKll-TgV@google.com> <diqzbjmrt000.fsf@google.com>
- <aN1bXOg3x0ZdTI1D@google.com> <diqz1pnmtg4h.fsf@google.com>
-Message-ID: <aN3KfrWERpXsj3ld@google.com>
-Subject: Re: [RFC PATCH v2 02/51] KVM: guest_memfd: Introduce and use
- shareability to guard faulting
-From: Sean Christopherson <seanjc@google.com>
-To: Ackerley Tng <ackerleytng@google.com>
-Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	Yan Zhao <yan.y.zhao@intel.com>, Fuad Tabba <tabba@google.com>, 
-	Binbin Wu <binbin.wu@linux.intel.com>, Michael Roth <michael.roth@amd.com>, 
-	Ira Weiny <ira.weiny@intel.com>, Rick P Edgecombe <rick.p.edgecombe@intel.com>, 
-	Vishal Annapurve <vannapurve@google.com>, David Hildenbrand <david@redhat.com>, 
-	Paolo Bonzini <pbonzini@redhat.com>
-Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 8bit
 
-On Wed, Oct 01, 2025, Ackerley Tng wrote:
-> Sean Christopherson <seanjc@google.com> writes:
-> >> I'd prefer not to have the module param choose between the use of
-> >> mem_attr_array and guest_memfd conversion in case we need both
-> >> mem_attr_array to support other stuff in future while supporting
-> >> conversions.
-> >
-> > Luckily, we don't actually need to make a decision on this, because PRIVATE is
-> > the only attribute that exists.  Which is partly why I want to go with a module
-> > param.  We can make the behavior very definitive without significant risk of
-> > causing ABI hell.
-> >
-> 
-> Then maybe I'm misunderstanding the static_call() thing you were
-> describing. Is it like, at KVM module initialization time,
-> 
->     if module_param == disable_tracking:
->         .__kvm_get_memory_attributes = read_attributes_from_guest_memfd
->     else
->         .__kvm_get_memory_attributes = read_attributes_from_mem_attr_array
-> 
-> With that, I can't have both CoCo private/shared state tracked in
-> guest_memfd and RWX (as an example, could be any future attribute)
-> tracked in mem_attr_array on the same VM.
+(series fully reviewed, I plan to merge via my tree)
 
-More or less.
+Usual API cleanups, here focusing on RAMBlock API:
+move few prototypes out of "exec/cpu-common.h" and
+"system/ram_addr.h" to "system/ramblock.h".
 
-> > It's entirely possible I'm completely wrong and we'll end up with per-VM RWX
-> > protections and no other per-gmem memory attributes, but as above, unwinding or
-> > adjusting the module param will be a drop in the bucket compared to the effort
-> > needed to add whatever support comes along.
-> >
-> 
-> Is a module param a weaker userspace contract such that the definition
-> for module params can be more flexibly adjusted?
+v2:
+- Do not use ram_addr_t for offsets (rth)
+v3:
+- Updated subject & squashed (rth)
 
-Yes, much weaker.
+Philippe Mathieu-Daudé (5):
+  system/ramblock: Remove obsolete comment
+  system/ramblock: Move ram_block_is_pmem() declaration
+  system/ramblock: Move ram_block_discard_*_range() declarations
+  system/ramblock: Rename @start -> @offset in ram_block_discard_range()
+  system/ramblock: Move RAMBlock helpers out of "system/ram_addr.h"
 
-> >> > The kvm_memory_attributes structure is compatible, all that's needed AFAICT is a
-> >> > union to clarify it's a pgoff instead of an address when used for guest_memfd.
-> >> >
-> >> > diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
-> >> > index 52f6000ab020..e0d8255ac8d2 100644
-> >> > --- a/include/uapi/linux/kvm.h
-> >> > +++ b/include/uapi/linux/kvm.h
-> >> > @@ -1590,7 +1590,10 @@ struct kvm_stats_desc {
-> >> >  #define KVM_SET_MEMORY_ATTRIBUTES              _IOW(KVMIO,  0xd2, struct kvm_memory_attributes)
-> >> >  
-> >> >  struct kvm_memory_attributes {
-> >> > -       __u64 address;
-> >> > +       union {
-> >> > +               __u64 address;
-> >> > +               __u64 offset;
-> >> > +       };
-> >> >         __u64 size;
-> >> >         __u64 attributes;
-> >> >         __u64 flags;
-> >> >
-> >> 
-> >> struct kvm_memory_attributes doesn't have room for reporting the offset
-> >> at which conversion failed (error_offset in the new struct). How do we
-> >> handle this? Do we reuse the flags field, or do we not report
-> >> error_offset?
-> >
-> > Write back at address/offset
-> 
-> I think it might be surprising to the userspace program, when it wants
-> to check the offset that it had requested and found that it changed due
-> to an error, or upon decoding the error, be unable to find the original
-> offset it had requested.
+ include/exec/cpu-common.h                 |  3 ---
+ include/system/ram_addr.h                 | 13 ---------
+ include/system/ramblock.h                 | 27 +++++++++++++++----
+ accel/kvm/kvm-all.c                       |  1 +
+ hw/hyperv/hv-balloon-our_range_memslots.c |  1 +
+ hw/virtio/virtio-balloon.c                |  1 +
+ hw/virtio/virtio-mem.c                    |  1 +
+ migration/ram.c                           |  3 ++-
+ system/physmem.c                          | 33 ++++++++++++-----------
+ 9 files changed, 45 insertions(+), 38 deletions(-)
 
-It's a somewhat common pattern in the kernel.  Updating the offset+size is most
-often used with -EAGAIN to say "got this far, try the syscall again from this
-point".
+-- 
+2.51.0
 
-> Like,
-> 
->     printf("Error during conversion from offset=%lx with size=%lx, at
->            error_offset=%lx", attr.offset, attr.size, attr.error_offset)
-> 
-> would be nicer than 
-> 
->     original_offset = attr.offset
->     printf("Error during conversion from offset=%lx with size=%lx, at
->            error_offset=%lx", original_offset, attr.size, attr.error_offset)
->            
-> > (and update size too, which I probably forgot to do).
-> 
-> Why does size need to be updated? I think u64 for size is great, and
-> size is better than nr_pages since nr_pages differs on different
-> platforms based on PAGE_SIZE and also nr_pages introduces the question
-> of "was it hugetlb, or a native page size?".
-
-I meant update the number of bytes remaining when updating the offset so that
-userspace can redo the ioctl without having to update parameters.
-
-> > Ugh, but it's defined _IOW.  I forget if that matters in practice (IIRC, it's not
-> > enforced anywhere, i.e. purely informational for userspace).
-> >
-> 
-> I didn't notice this IOW vs IORW part, but if it starts getting
-> enforced/specified [1] or auto-documented we'd be in trouble.
-
-IOW vs IORW is alread specified in the ioctl.  More below.
-
-> At this point, maybe it's better to just have a different ioctl number
-> and struct definition. I feel that it would be easier for a user to
-> associate/separate
-
-Amusingly, we'd only need a different name along with the IORW thing.  A full
-ioctl number is comproised of the "directory" (KVM), the number, the size of the
-payload, and how the payload is accessed.
-
-#define _IOC(dir,type,nr,size) \
-	(((dir)  << _IOC_DIRSHIFT) | \
-	 ((type) << _IOC_TYPESHIFT) | \
-	 ((nr)   << _IOC_NRSHIFT) | \
-	 ((size) << _IOC_SIZESHIFT))
-
-So this:
-
-  #define KVM_SET_MEMORY_ATTRIBUTES	_IOW(KVMIO,  0xd2, struct kvm_memory_attributes)
-  #define KVM_SET_MEMORY_ATTRIBUTES2	_IOWR(KVMIO, 0xd2, struct kvm_memory_attributes2)
-
-actually generates two different values, and so is two different ioctls from a
-code perspective.
-
-The "size" of the payload is nice to have as it allows userspace to assert that
-it's passing the right structure, e.g. this static assert from KVM selftests:
-
-#define kvm_do_ioctl(fd, cmd, arg)						\
-({										\
-	kvm_static_assert(!_IOC_SIZE(cmd) || sizeof(*arg) == _IOC_SIZE(cmd));	\
-	ioctl(fd, cmd, arg);							\
-})
-
-> + KVM_SET_MEMORY_ATTRIBUTES
->     + Is VM ioctl
->     + Is a write-only ioctl
->     + Is for setting memory attributes at a VM level
->     + Use struct kvm_memory_attributes for this
-> + KVM_GUEST_MEMFD_SET_MEMORY_ATTRIBUTES (name TBD)
->     + Is guest_memfd ioctl
->     + Is a read/write ioctl
->     + Is for setting memory attributes only for this guest_memfd
->     + Use struct guest_memfd_memory_attributes for this
->     + Also decode errors from this struct
-
-      + Has extra padding for future expansion (because why not)
-
-If we really truly need a new ioctl, I'd probably prefer KVM_SET_MEMORY_ATTRIBUTES2.
-Yeah, it's silly, but I don't think baking GUEST_MEMFD into the names buys us
-anything.  Then we can use KVM_SET_MEMORY_ATTRIBUTES2 on a VM if the need ever
-arises.
-
-Alternative #1 is to try and unwind on failure, but that gets complex, and it
-simply can't be done for some CoCo VMs.  E.g. a private=>shared conversion for
-TDX is descrutive.
-
-Alternative #2 is to make the updates atomic and all-or-nothing, which is what
-we did for per-VM attributes.  That's doable, but it'd either be much more
-complex than telling userspace to retry, or we'd have to lose the maple tree
-optimizations (which is effectively what we did for per-VM attributes).
-
-> [1] https://lore.kernel.org/all/20250825181434.3340805-1-sashal@kernel.org/
-> 
-> >> >>  static int __kvm_gmem_prepare_folio(struct kvm *kvm, struct kvm_memory_slot *slot,
-> >> >>  				    pgoff_t index, struct folio *folio)
-> >> >>  {
-> >> >> @@ -333,7 +404,7 @@ static vm_fault_t kvm_gmem_fault_shared(struct vm_fault *vmf)
-> >> >>  
-> >> >>  	filemap_invalidate_lock_shared(inode->i_mapping);
-> >> >>  
-> >> >> -	folio = kvm_gmem_get_folio(inode, vmf->pgoff);
-> >> >> +	folio = kvm_gmem_get_shared_folio(inode, vmf->pgoff);
-> >> >
-> >> > I am fairly certain there's a TOCTOU bug here.  AFAICT, nothing prevents the
-> >> > underlying memory from being converted from shared=>private after checking that
-> >> > the page is SHARED.
-> >> >
-> >> 
-> >> Conversions take the filemap_invalidate_lock() too, along with
-> >> allocations, truncations.
-> >> 
-> >> Because the filemap_invalidate_lock() might be reused for other
-> >> fs-specific operations, I didn't do the mt_set_external_lock() thing to
-> >> lock at a low level to avoid nested locking or special maple tree code
-> >> to avoid taking the lock on other paths.
-> >
-> > mt_set_external_lock() is a nop.  It exists purely for lockdep assertions.  Per
-> > the comment for MT_FLAGS_LOCK_EXTERN, "mt_lock is not used", LOCK_EXTERN simply
-> > tells maple tree to not use/take mt_lock.   I.e. it doesn't say "take this lock
-> > instead", it says "I'll handle locking".
-> 
-> Thanks for pointing this out!
-> 
-> Conversions (and others) taking the filemap_invalidate_lock() probably
-> fixes the TOCTOU bug, right?
-
-Yes, grabbing a reference to the folio under lock and thus elevating its refcount
-should prevent conversions to private from that point forward, until the PTE is
-zapped and the folio is released:
-
-	filemap_invalidate_lock_shared(inode->i_mapping);
-	if (kvm_gmem_is_shared_mem(inode, vmf->pgoff))
-		folio = kvm_gmem_get_folio(inode, vmf->pgoff);
-	else
-		folio = ERR_PTR(-EACCES);
-	filemap_invalidate_unlock_shared(inode->i_mapping);
 
