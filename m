@@ -1,382 +1,223 @@
-Return-Path: <kvm+bounces-59440-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-59441-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id AF3A1BB4B36
-	for <lists+kvm@lfdr.de>; Thu, 02 Oct 2025 19:31:57 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id B5D49BB4B6F
+	for <lists+kvm@lfdr.de>; Thu, 02 Oct 2025 19:39:08 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id EE21E19C7D41
-	for <lists+kvm@lfdr.de>; Thu,  2 Oct 2025 17:32:19 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id E9A467ADA24
+	for <lists+kvm@lfdr.de>; Thu,  2 Oct 2025 17:37:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 085E52737E1;
-	Thu,  2 Oct 2025 17:31:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 54F342727EA;
+	Thu,  2 Oct 2025 17:38:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="C/NrFgdO"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="IqnwB4Sr"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.19])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f67.google.com (mail-wm1-f67.google.com [209.85.128.67])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 735482AEE4;
-	Thu,  2 Oct 2025 17:31:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=198.175.65.19
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1759426300; cv=fail; b=DLXZ6uX2ge/P2jo7DImPTKMUQEjL9EA6reUbvMjO+IXraiiYFB7mO8hRc3s1/1tUC7z2gVldflOj5mF0nBxS+7u/h0skVKxokVGc/xW0cPsAcKQ/p3wGs2nobJwhhctRQnvu/hOxX2zp4w3PRNz79Tm6A7vSdz+qmvZG6dG4XTw=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1759426300; c=relaxed/simple;
-	bh=6BerUDB21qW5XZXg3BwAzyafhCYkcfujVTqUllrhuOs=;
-	h=Date:From:To:CC:Subject:Message-ID:References:Content-Type:
-	 Content-Disposition:In-Reply-To:MIME-Version; b=auj7JNLip4PPZX0GJjeL6lqCn3eDF6IGDTBaQz2m0l5bMuKhCfYvPatzAlqEAF4Tgp/Ut/k3TQkt1TQjdtV3CXK3XlU7tTBUWK76Dg9FdUGeGg+XHPHIQ30SfR9X0ebwqLTl2E5BBSewLGlJT04Ne1/PsUkyru4kxz84eaMR2Ms=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=C/NrFgdO; arc=fail smtp.client-ip=198.175.65.19
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1759426298; x=1790962298;
-  h=date:from:to:cc:subject:message-id:references:
-   in-reply-to:mime-version;
-  bh=6BerUDB21qW5XZXg3BwAzyafhCYkcfujVTqUllrhuOs=;
-  b=C/NrFgdOTGZ5+bgsEWMc7XD27LKzr2G9aCDrbqyGnR+a4VTcRKefqIWJ
-   f/VlTd8rImzQR5Qz2JCXqVxcCd7fzJRSKWR+9nNPjsAJ/rqtzXGxk6Ap0
-   ToymFISqVwE1SeAO8Ngg1NzxtflLsj9JMmHAbfq0OzSydihvf0KynKot/
-   nftVUQz6VtzsA1X3y6qvIQAw+kPUWI4ow0MQMUnOVjURbeBRJiSrZ7IEx
-   KqYKef299rKwCZebR1DyqNXtgj2rFu03WphXdJsK4FC0nfSFyOL4JRMn2
-   heAVlX2qH7fxRSnx3oAEkyigRk+MrxXbzZHrcCDzMc/pfd73PSS2Cf4LB
-   w==;
-X-CSE-ConnectionGUID: +UI4RV3SRPSUjWwE2u/lPw==
-X-CSE-MsgGUID: 4MpeWgIuRcmT09ZXcN4mvg==
-X-IronPort-AV: E=McAfee;i="6800,10657,11570"; a="61602764"
-X-IronPort-AV: E=Sophos;i="6.18,310,1751266800"; 
-   d="scan'208";a="61602764"
-Received: from fmviesa005.fm.intel.com ([10.60.135.145])
-  by orvoesa111.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 02 Oct 2025 10:31:37 -0700
-X-CSE-ConnectionGUID: aRFkWUGVRy2T+NmnmL/OTQ==
-X-CSE-MsgGUID: jJ9msRMFS4mOv1R998/XEw==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.18,310,1751266800"; 
-   d="scan'208";a="183496244"
-Received: from orsmsx902.amr.corp.intel.com ([10.22.229.24])
-  by fmviesa005.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 02 Oct 2025 10:31:36 -0700
-Received: from ORSMSX902.amr.corp.intel.com (10.22.229.24) by
- ORSMSX902.amr.corp.intel.com (10.22.229.24) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.27; Thu, 2 Oct 2025 10:31:35 -0700
-Received: from ORSEDG901.ED.cps.intel.com (10.7.248.11) by
- ORSMSX902.amr.corp.intel.com (10.22.229.24) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.27 via Frontend Transport; Thu, 2 Oct 2025 10:31:35 -0700
-Received: from PH7PR06CU001.outbound.protection.outlook.com (52.101.201.63) by
- edgegateway.intel.com (134.134.137.111) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.27; Thu, 2 Oct 2025 10:31:35 -0700
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=a8sAjdMoRiwHNBhCcQqnZIX2SzY6kF96jySRA7PBI5b4coePTDDZwgSuGqWKDilSgj4ZXGhCso2dabMk6gvkRh/9NcWRXpovXq/eynQcUYEBXHHQTiB+jbUuHYbl2judO2M9YOrcmWx118cSI8RK9KtRImGUEqxitG7L+cxInCrrDZxIx9PJaTBcNwJIl1rhyLaA0KGHOLNSANNmCkCCyNKD8C56D1Y6EZWari3q4Gju+y8xBEJARXuFg7eQI6TATsWivc6sbGMot3XASsBiw5RZqADkzuf8+f2+ES9NCDDyHhAj0tRqygFdzuCAgDn6MGifcPB5i3U1HrTGgf1aHg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=NPnrNftqEzCDt5H+O/8Vb9AASTBfX3D/mmkRUgxs7mA=;
- b=XfeGpzoDqxlZTXHjAoj9Zcfd5XzC8uFmQZiDKoQoVhVS9gAYGi67gWCUpDPcOgSh4iR6KR6MmayMF2e+UtUcb8HDzbrFdIL1q0zdYM1WWZkelChX1s3piCg+NrCv5o5qmnUaoxK/ly1udBqhVFAS0tbvBIqr17TYKEXWhn/LjX5W8cjHj48ew4AcydI89FZm4Q4uZrfNNTirThnF4pF72EoyV2FZNeN/3p4znpaPEw2KcGwDr7EJvbf042dA/jb/VWp5GSWJsMxRxl/b+QHUyPXO3LAPxvj2D3kwEDt2j3GjBpSa4PMazIQlICDu0FC66DYZN1RNZKY7JxNuHlGfqA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-Received: from IA4PR11MB9131.namprd11.prod.outlook.com (2603:10b6:208:55c::11)
- by SJ5PPF5B09F0799.namprd11.prod.outlook.com (2603:10b6:a0f:fc02::82c) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9160.14; Thu, 2 Oct
- 2025 17:31:32 +0000
-Received: from IA4PR11MB9131.namprd11.prod.outlook.com
- ([fe80::7187:92a3:991:56e2]) by IA4PR11MB9131.namprd11.prod.outlook.com
- ([fe80::7187:92a3:991:56e2%5]) with mapi id 15.20.9115.020; Thu, 2 Oct 2025
- 17:31:32 +0000
-Date: Thu, 2 Oct 2025 12:33:32 -0500
-From: Ira Weiny <ira.weiny@intel.com>
-To: Ackerley Tng <ackerleytng@google.com>, Ira Weiny <ira.weiny@intel.com>,
-	Sean Christopherson <seanjc@google.com>
-CC: <kvm@vger.kernel.org>, <linux-kernel@vger.kernel.org>, Yan Zhao
-	<yan.y.zhao@intel.com>, Fuad Tabba <tabba@google.com>, Binbin Wu
-	<binbin.wu@linux.intel.com>, Michael Roth <michael.roth@amd.com>, Ira Weiny
-	<ira.weiny@intel.com>, Rick P Edgecombe <rick.p.edgecombe@intel.com>, "Vishal
- Annapurve" <vannapurve@google.com>, David Hildenbrand <david@redhat.com>,
-	Paolo Bonzini <pbonzini@redhat.com>
-Subject: Re: [RFC PATCH v2 02/51] KVM: guest_memfd: Introduce and use
- shareability to guard faulting
-Message-ID: <68deb76c2dc2a_2957e22943f@iweiny-mobl.notmuch>
-References: <cover.1747264138.git.ackerleytng@google.com>
- <b784326e9ccae6a08388f1bf39db70a2204bdc51.1747264138.git.ackerleytng@google.com>
- <aNxqYMqtBKll-TgV@google.com>
- <diqzbjmrt000.fsf@google.com>
- <68ddb87b16415_28f5c229470@iweiny-mobl.notmuch>
- <diqzv7kxsobo.fsf@google.com>
-Content-Type: text/plain; charset="us-ascii"
-Content-Disposition: inline
-In-Reply-To: <diqzv7kxsobo.fsf@google.com>
-X-ClientProxiedBy: MW2PR16CA0039.namprd16.prod.outlook.com
- (2603:10b6:907:1::16) To IA4PR11MB9131.namprd11.prod.outlook.com
- (2603:10b6:208:55c::11)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3208B236A70
+	for <kvm@vger.kernel.org>; Thu,  2 Oct 2025 17:38:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.67
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1759426734; cv=none; b=BPyPxCGwWhlow00Q0LutDNQIIwRQgmE79pUrvw8Ws7LFfqfJ0qImswpT5ICLxROS0UWZ7CtfqpIjzu9i/93ghdqo4W1GjMAyKpgBobAF4fmv5t4r+g1rL0RLVxrouatIHmnf5SxjJncaWFW9EoNCmPvkCLAGvjjVv3s7y7CUQbg=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1759426734; c=relaxed/simple;
+	bh=wrs/gJ/jh5JajI8A3qsgEnd/1PhG9BkN98YYml/K4oc=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=t9r4luy6bsaF/rULVfDbUxNi538KlvmYugqOMYWKSo9ELQxxX5pvKELvTZyspHKCqFyrreUkq77h4tW3LvPuB5z7cuUD2hnPDA8LdDFnb+F2qjO81zvuVqFVQkkbBcPqBary357WthlsgqrJ9zppH8nSPLXgAyQ3hFRD1MVswnQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=IqnwB4Sr; arc=none smtp.client-ip=209.85.128.67
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
+Received: by mail-wm1-f67.google.com with SMTP id 5b1f17b1804b1-46e4f2696bdso16284305e9.0
+        for <kvm@vger.kernel.org>; Thu, 02 Oct 2025 10:38:51 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google; t=1759426730; x=1760031530; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=+V2wPuGfCio4QUFBc5XwSn82EF99kzO0rV5pMclAj8k=;
+        b=IqnwB4SrATeq5dE8g1zEZMJxKQf4M1WmDpTCGaJ1tzSWCHiOHGnlBJelDXI/dXjBsi
+         gKY7e2u2TQ5m905ceRzkoACNTvwYMylYNBOr6Sj23zbicR9aPFnwLmB0HMHLLYmrkY7e
+         8rKU8ScfEn3r7i7/lFYJnR2rhz/aTVyGCQp1y/gorQT9zTrYPVq8CtJ5juSXqx71d/hl
+         It5bi4Xg/tH43adVPEkgigtuNFl2bunYfpwKVzj8qX4eA63GDeXhKcWHhbh99JDG2Bn2
+         6jewsNwZuBye7m0ENY91S2PqsOBRpOJLTJGVKpC6JEs+bPF02nSX+P7TV6D1r+HRNREZ
+         YVDg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1759426730; x=1760031530;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=+V2wPuGfCio4QUFBc5XwSn82EF99kzO0rV5pMclAj8k=;
+        b=GKEnHtz5p0iot8ZyAp1ajCPq0+vF/tcbQt3yPXc0gsVERlhqDgQ9QX/0gWa69kLQrD
+         teCaHRb3IGClI+Slp8DbmEpV4lkty2epvDoIGHvJNjWK3Qwybem8Mqg+9zL8P26UTqM5
+         p4XnuuT6TAD9eXyPRyOsLf6oCQBem3u2A0NPU7JU+jsMfySZO5laKBV+6EV8jvYCjOIN
+         XmLIP0FjUrvoaEkXjv4J9KivUXp06IBpOgbZMobdYiyyYDlj+2zPeYowa5W43a/5p2FT
+         HQVijT6pigGqbxkZrpdJA/FfoK9xGSwLxOV/tioF3SY0EuJUnTCFCXb8TwspdKREwIlB
+         uyww==
+X-Forwarded-Encrypted: i=1; AJvYcCX8igP9DP00aK5YtuMJaKu1R3aMGSsg/wFpHNcmrPuWZ7k+qr/Z1dVSLxVxCbiqS4a6EZE=@vger.kernel.org
+X-Gm-Message-State: AOJu0YydR6UEFIp0YUmf9mVqxA0qYo01fpQyZuiG0wAQoEunFtoJks9b
+	TAxhpWAkLeu//aVClcELIrpU61mTUjNTolvdjgU/lfnCj25Lr3WUGZ8p02/eSRAjre0=
+X-Gm-Gg: ASbGncsjUWxLWIOwzmNOkH+AQRGOkAevRqG0N9EFV4C1iPMW9yqK/9eUiiA+V/sCcLN
+	PEM7fjcIPs5k09orNAktOREqVGpPDfgsAXaD2VcLwa8SEay1ecK/njZY1u7UpOHcA9Xhf3EQjJj
+	H8ynohOwWIBtSZsJItF0OW2dWBnnBOYhQDFc789WJbXWJN0usr5/zlB4+djtoPq5/MnJ1OqjK2l
+	DcFmbpKoiKbXtgq9AeKugp2ToaB0N1+/tdaeRns6RmjHlVMyuRrq79Jx8r4SqqqJqGn9An2k5nk
+	Xf4nwi6glJ8teqSiALoiZRHRmg8mHiIxmkSvNjPGnExcY8plNi2NMqvUpbq4AiRvzJ4+k7+3n4n
+	dA4rzlpjqvENInw8GsQaWuRRN2pEp3rL6NoD83eW2vZC5S3SkkM3l5QoRvxesg/JtDmd+BAIEvv
+	/tCNNdSVc7gdeaHnx1Eg==
+X-Google-Smtp-Source: AGHT+IEzLXvjBFsflezIs0tpM1/mJV+Aj4RSV5J6Itd4MVihCEh67jQ9oba/kdfrPT1zTJ0LBEFfLg==
+X-Received: by 2002:a05:6000:2203:b0:40f:288e:9990 with SMTP id ffacd0b85a97d-425671abae4mr77123f8f.48.1759426730275;
+        Thu, 02 Oct 2025 10:38:50 -0700 (PDT)
+Received: from [192.168.69.221] (88-187-86-199.subs.proxad.net. [88.187.86.199])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-4255d8e97fbsm4401347f8f.34.2025.10.02.10.38.48
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 02 Oct 2025 10:38:49 -0700 (PDT)
+Message-ID: <cb828163-d23f-4a1c-b312-4ff24c4e02f1@linaro.org>
+Date: Thu, 2 Oct 2025 19:38:48 +0200
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: IA4PR11MB9131:EE_|SJ5PPF5B09F0799:EE_
-X-MS-Office365-Filtering-Correlation-Id: 0269ac04-5e8e-406b-62c5-08de01d9875a
-X-LD-Processed: 46c98d88-e344-4ed4-8496-4ed7712e255d,ExtAddr
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230040|366016|1800799024|376014|7416014;
-X-Microsoft-Antispam-Message-Info: =?us-ascii?Q?rzNLJh2RAfV/lzyiBDwvUPXrGwcn2o+kvqrqIyxYi+K9PhTlb8NWyNCK9ZK1?=
- =?us-ascii?Q?5hi3DkyUi89HNZ/TVSc8zlOFp0U7ddMYpA8eDD3exTZOzqoaEsxMdLNIpTb9?=
- =?us-ascii?Q?jS00iOjVh2dwz+2rP3s/m6nDsT025krxHLqd4MJ5NbU3spKOYgadGbADIkPO?=
- =?us-ascii?Q?MfyKaSCCkBqN5GWLOe7FQ932mCUCa5HBXilyzF1af5Di9/zBDnY6JchZ8Tou?=
- =?us-ascii?Q?CbLfBQ4koHUgvDG+nAfM5pc0y72mleRuMFbu5mmLTemjFT6Ksd0+L+M857XY?=
- =?us-ascii?Q?V9IR2BcOHyNqBvwpNYnWoQLyms5927oDyYiTJ3/YxT1yAv6E7MSHH3orF9Zx?=
- =?us-ascii?Q?LoCkfajqYmTpA6luWbrvn11EUGQ08GDNpCd4RksD7Mq7I2GPpLCyaNK1Hdjw?=
- =?us-ascii?Q?+4rxVyt6JwJXJ1GrHHB/60/XyrVH223HxH0PzO+pM8l+MUWf4s1S27P4KlHZ?=
- =?us-ascii?Q?jdIO+lY3ExMSsprEzCA4onwnoiReCXdtGnKpVym8bBvO8P4Y8U7tD5ZwUwru?=
- =?us-ascii?Q?OgkYsOXVMFckiMLypxGaTZ1wk45WmMdFX3MJVHH3YbeAc3/us6hh9adCXVET?=
- =?us-ascii?Q?2rApYLYzRxFoG0avM53NkwbZ/1T9NOCxuUkW4VTDMoDXRyxg6IqOq+C0oxfd?=
- =?us-ascii?Q?UAaZM8ymx39FAHxKKO5L4dc0u2pufa0ff3PlJhJGkLUsffLc/iWxNq5ewfRL?=
- =?us-ascii?Q?Dg95poBUbTkyCP1RhSZ+GbS/if+UhToG8J5c4ENkgkpgBJXHpVD5665vkTCC?=
- =?us-ascii?Q?tTIXwpw0FkraL+IkMuox9KSKPQAWv0xOo0/eKpubfftIzE/d7SOjIRGnuU2D?=
- =?us-ascii?Q?DURPSQpq+umAidCFfIkJGwf7J3FieXRR3xBKcyJBMBEshAgDHb+iqh3IEh6J?=
- =?us-ascii?Q?WUOLw0XZ82ziyBAYFVPn6Y/Gmqz38gl94pq3HC9tadunryhr8HqZRNNZtpe0?=
- =?us-ascii?Q?e+UhlkwrMSi7b1Mmi/Kpy9Fi9FSBkC2vijA8Gx3VKFmWnESbcNALyhAHWJlm?=
- =?us-ascii?Q?aqcgkXTOpVWiVAmula1W+1VCEaFaE66NoJbzgyQTH9roF6dNkbEUxHugTPS3?=
- =?us-ascii?Q?xRNi8RSev2P6RUSKbD1Z0Hp8lflcw5LXr5XRHHmnpI1VoaIxAPOqPmFdH0C1?=
- =?us-ascii?Q?PJiV0iPFgDgThFZ4fvwZv4A6c3KNk54ipC6XDhT6MGNsZy0VcE7NJKDYSC+c?=
- =?us-ascii?Q?z48UWTxO1N1a9xdFctfL8xN0GBxCI5ebBANhribHuz0jW756IAiojV1kAIM7?=
- =?us-ascii?Q?W2DZPWvwsh0YTXXHD1bt0rEiLa+GrtoCV7zcTLa1KHGmshZfxxvpKrJBw2dC?=
- =?us-ascii?Q?Vu1Zmqk6K+p0OixqEgtD+Z/o5RGcyFy5kN3QL9rk0oWTU8hWBxNMjjFAGqHQ?=
- =?us-ascii?Q?fDOlj3syajwQxrexc3CAAWCAX5U0GHu45PxPjQsIa7NiWqoKfgTtibDTVCtK?=
- =?us-ascii?Q?H98UhTzB/g4MrwHWPgzzx+ffmIBqMQwt?=
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:IA4PR11MB9131.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(1800799024)(376014)(7416014);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?GJAv5p9rWNTe2Zez4K21C+O2AmQm1ghZIkzoE/PhTHsgtuDZnu1w7rAEBci2?=
- =?us-ascii?Q?OftL2hMQOZyAKY2A5vYcSdIE9iVFj0hpRO5HPw2sL9M4datmJxFGn4ZQR/Vd?=
- =?us-ascii?Q?C83PyvBLyNRaeNvbvAu8oEuBrc8lvzxxDOw7m8isPKGRk9AE0gxOYeKPZVbn?=
- =?us-ascii?Q?3HHQ4AxsdOVgS5V8jG0S5DMWdJuQos2y8qcFINgyu6uFz9mZ7RtSUtmtuyNS?=
- =?us-ascii?Q?VmnEAaptRvURqjHYZ/yBCdsHHiE1/t4kmzgtkm5D7rqh7neRwFEejlD5V1B/?=
- =?us-ascii?Q?ZvwlG97iK1Ah4RIAhiSWPu4Px5rhnXZi1MoiyjVkdElv0UGNnwOOIfoTqami?=
- =?us-ascii?Q?zh+LILAh9CJpHDr4Kg+8/c2T99YU0SHGGA44IOLTK/LRxgZDrhINN/r2bKb5?=
- =?us-ascii?Q?O1zQUvApzwAZ+HicpJ6Wg3sxyrIlNVfXNj/G+oU2TmeaURWa5G15mywcvZP0?=
- =?us-ascii?Q?hmnRu7lTAas1oPjM0Xsggyu9vSBseq4Ud4nfUJsDBjBazS6957tROSZMUBwK?=
- =?us-ascii?Q?Zqt5+WI28kuvloeaRmbSpfDIOroH1M/7rkK9TM9ncEvwbjwnACAAn+XBHOHO?=
- =?us-ascii?Q?ATX2fEIq/oG3KOrqDNCSN5Nl9fXnRoM3M3xPFa4dMQ01tNpiJtJvRGTRqRAm?=
- =?us-ascii?Q?AC85nx9nOhY90iX7+3BHHPWPPPInGzF5/pVvgpat1ukVX/hiP5BcJX1AGIPz?=
- =?us-ascii?Q?B6wYAAy9uJw5OjJWWngMrsKxh42q3f4HEZ2aKtsmtk5wRI13lkLl1fze4emu?=
- =?us-ascii?Q?sVYK3wNu+ncGkjOKK02Nr5Sk22B8dgGjVGdnqGDRNETVy2L5ZxdG6POxwCJ6?=
- =?us-ascii?Q?NMb1tQ4C6rp/x6+MFRPnH+02M1QAu8im2EIP2L/jCh82Lq3+B7nZAEAsyRJ8?=
- =?us-ascii?Q?sF45Ph0C9eOco3cBRX2SpZQEccWPKZ9RSIF/coS9lienzbsxMFmH/wU6l8TZ?=
- =?us-ascii?Q?vvYkYww//07I7RjWJ5pnpGSgEIZPTdBR5/PW9iM35rN8ASmc5ksfdALat31A?=
- =?us-ascii?Q?eqUTgUGo2z96sKWbvaYJ0Bcw9pQfIp8zZCYeNd8ITnhu/5MscKeEyvCUdOy4?=
- =?us-ascii?Q?CP0/h8dNwFvhIJviThZaaYH+2mQftEWsFhIxAcbAcsRoKKpc2OZ4iF6yhwx1?=
- =?us-ascii?Q?AGRzu58mQmOWZBiJPRVWI/l5m7ZmijiJ7rJZDOYvHbxthaQhdWZNBk93wyUn?=
- =?us-ascii?Q?tfZf4wDzmRdwVByLgNuxEpyHCr7BgAdD4lRM8pi+1rqg5whj9jmd+cQ6qaIc?=
- =?us-ascii?Q?1S7cRSBAsL4EIIrF+u8sz7SDSTpAN3n0CjUNmHKh+GqS5x6tFIKcCPDkD6dp?=
- =?us-ascii?Q?LpHmdLjp9t71nr9RmYIrMFjkIWGZ3NaGYOkhCQ/mnaUXLHAcRLIUpQlOzyhC?=
- =?us-ascii?Q?+VFM7Aana8U0UT0tvpDGyJPrJR2cMUhv2sd2yWrspnpnfdmeWLkciR6wL4UT?=
- =?us-ascii?Q?LOPcDHxVykMyc2gcPL8Ljq+/K4Kmr1DCJ04J2/8+IqyGPLQj5eY42JSlKM5f?=
- =?us-ascii?Q?pz7eeEzc6qGyu0pyLW6LSAacv78hGo5Dy3nqMkf34/wKo5SSHOd5h4IglOJP?=
- =?us-ascii?Q?U6fbfuYhwipZHB5J0gyp5dgAI6kkcIlck9YhhgLN?=
-X-MS-Exchange-CrossTenant-Network-Message-Id: 0269ac04-5e8e-406b-62c5-08de01d9875a
-X-MS-Exchange-CrossTenant-AuthSource: IA4PR11MB9131.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 02 Oct 2025 17:31:32.6175
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: WDtcSfbkZ6M5ahDYgE15zGZhLT8sfkkmjkO81WvR7o4/l0g36oJERTMZkxToJOZGB7YJLYpd7CP7w6gzH8/dtQ==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SJ5PPF5B09F0799
-X-OriginatorOrg: intel.com
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v2 06/18] hw: Remove unnecessary 'system/ram_addr.h'
+ header
+Content-Language: en-US
+To: Harsh Prateek Bora <harshpb@linux.ibm.com>, qemu-devel@nongnu.org
+Cc: Peter Maydell <peter.maydell@linaro.org>,
+ Jagannathan Raman <jag.raman@oracle.com>, qemu-ppc@nongnu.org,
+ Ilya Leoshkevich <iii@linux.ibm.com>, Thomas Huth <thuth@redhat.com>,
+ Jason Herne <jjherne@linux.ibm.com>, Peter Xu <peterx@redhat.com>,
+ =?UTF-8?Q?C=C3=A9dric_Le_Goater?= <clg@redhat.com>, kvm@vger.kernel.org,
+ Christian Borntraeger <borntraeger@linux.ibm.com>,
+ Halil Pasic <pasic@linux.ibm.com>, Matthew Rosato <mjrosato@linux.ibm.com>,
+ Paolo Bonzini <pbonzini@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>,
+ Elena Ufimtseva <elena.ufimtseva@oracle.com>,
+ Richard Henderson <richard.henderson@linaro.org>,
+ Fabiano Rosas <farosas@suse.de>, Eric Farman <farman@linux.ibm.com>,
+ qemu-arm@nongnu.org, qemu-s390x@nongnu.org,
+ David Hildenbrand <david@redhat.com>,
+ Alex Williamson <alex.williamson@redhat.com>,
+ Nicholas Piggin <npiggin@gmail.com>
+References: <20251001175448.18933-1-philmd@linaro.org>
+ <20251001175448.18933-7-philmd@linaro.org>
+ <a8be844e-5f9d-478a-a96e-b76bfed9c764@linux.ibm.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=C3=A9?= <philmd@linaro.org>
+In-Reply-To: <a8be844e-5f9d-478a-a96e-b76bfed9c764@linux.ibm.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 
-Ackerley Tng wrote:
-> Ira Weiny <ira.weiny@intel.com> writes:
+On 2/10/25 17:59, Harsh Prateek Bora wrote:
 > 
-> > Ackerley Tng wrote:
-> >> Sean Christopherson <seanjc@google.com> writes:
-> >> 
-> >
-> > [snip]
-> >
+> 
+> On 10/1/25 23:24, Philippe Mathieu-Daudé wrote:
+>> None of these files require definition exposed by "system/ram_addr.h",
+>> remove its inclusion.
+>>
+>> Signed-off-by: Philippe Mathieu-Daudé <philmd@linaro.org>
+>> Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+>> ---
+>>   hw/ppc/spapr.c                    | 1 -
+>>   hw/ppc/spapr_caps.c               | 1 -
+>>   hw/ppc/spapr_pci.c                | 1 -
+>>   hw/remote/memory.c                | 1 -
+>>   hw/remote/proxy-memory-listener.c | 1 -
+>>   hw/s390x/s390-virtio-ccw.c        | 1 -
+>>   hw/vfio/spapr.c                   | 1 -
+>>   hw/virtio/virtio-mem.c            | 1 -
+>>   8 files changed, 8 deletions(-)
+>>
+>> diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
+>> index 82fb23beaa8..97ab6bebd25 100644
+>> --- a/hw/ppc/spapr.c
+>> +++ b/hw/ppc/spapr.c
+>> @@ -77,7 +77,6 @@
+>>   #include "hw/virtio/virtio-scsi.h"
+>>   #include "hw/virtio/vhost-scsi-common.h"
+>> -#include "system/ram_addr.h"
+>>   #include "system/confidential-guest-support.h"
+>>   #include "hw/usb.h"
+>>   #include "qemu/config-file.h"
+>> diff --git a/hw/ppc/spapr_caps.c b/hw/ppc/spapr_caps.c
+>> index f2f5722d8ad..0f94c192fd4 100644
+>> --- a/hw/ppc/spapr_caps.c
+>> +++ b/hw/ppc/spapr_caps.c
+>> @@ -27,7 +27,6 @@
+>>   #include "qapi/error.h"
+>>   #include "qapi/visitor.h"
+>>   #include "system/hw_accel.h"
+>> -#include "system/ram_addr.h"
+>>   #include "target/ppc/cpu.h"
+>>   #include "target/ppc/mmu-hash64.h"
+>>   #include "cpu-models.h"
+>> diff --git a/hw/ppc/spapr_pci.c b/hw/ppc/spapr_pci.c
+>> index 1ac1185825e..f9095552e86 100644
+>> --- a/hw/ppc/spapr_pci.c
+>> +++ b/hw/ppc/spapr_pci.c
+>> @@ -34,7 +34,6 @@
+>>   #include "hw/pci/pci_host.h"
+>>   #include "hw/ppc/spapr.h"
+>>   #include "hw/pci-host/spapr.h"
+>> -#include "system/ram_addr.h"
+>>   #include <libfdt.h>
+>>   #include "trace.h"
+>>   #include "qemu/error-report.h"
+> 
+> I am seeing error while applying patch series:
+> 
+> harshpb:patches$ git log --oneline -n1
+> 29b77c1a2d (HEAD -> review-20251002, upstream/master, master) Merge tag 
+> 'rust-ci-pull-request' of https://gitlab.com/marcandre.lureau/qemu into 
+> staging
+> harshpb:patches$ git am ./ 
+> v2_20251001_philmd_system_physmem_extract_api_out_of_system_ram_addr_h_header.mbx
+> 
+> 
+> Applying: system/ram_addr: Remove unnecessary 'exec/cpu-common.h' header
+> Applying: accel/kvm: Include missing 'exec/target_page.h' header
+> Applying: hw/s390x/s390-stattrib: Include missing 'exec/target_page.h' 
+> header
+> Applying: hw/vfio/listener: Include missing 'exec/target_page.h' header
+> Applying: target/arm/tcg/mte: Include missing 'exec/target_page.h' header
+> Applying: hw: Remove unnecessary 'system/ram_addr.h' header
+> Applying: system/physmem: Un-inline cpu_physical_memory_get_dirty_flag()
+> Applying: system/physmem: Un-inline cpu_physical_memory_is_clean()
+> Applying: system/physmem: Un-inline 
+> cpu_physical_memory_range_includes_clean()
+> Applying: system/physmem: Un-inline cpu_physical_memory_set_dirty_flag()
+> Applying: system/physmem: Un-inline cpu_physical_memory_set_dirty_range()
+> Applying: system/physmem: Remove _WIN32 #ifdef'ry
+> Applying: system/physmem: Un-inline 
+> cpu_physical_memory_set_dirty_lebitmap()
+> Applying: system/physmem: Un-inline 
+> cpu_physical_memory_dirty_bits_cleared()
+> Applying: system/physmem: Reduce cpu_physical_memory_clear_dirty_range() 
+> scope
+> Applying: system/physmem: Reduce cpu_physical_memory_sync_dirty_bitmap() 
+> scope
+> Applying: system/physmem: Drop 'cpu_' prefix in Physical Memory API
+> error: patch failed: hw/vfio/container.c:255
+> error: hw/vfio/container.c: patch does not apply
+> Patch failed at 0017 system/physmem: Drop 'cpu_' prefix in Physical 
+> Memory API
+> hint: Use 'git am --show-current-patch=diff' to see the failed patch
+> When you have resolved this problem, run "git am --continue".
+> If you prefer to skip this patch, run "git am --skip" instead.
+> To restore the original branch and stop patching, run "git am --abort".
+> harshpb:patches$
+> 
+> However, changes for ppc/spapr looks fine to me.
 
-[snip]
-
-> >> 
-> >> I'd prefer not to have the module param choose between the use of
-> >> mem_attr_array and guest_memfd conversion in case we need both
-> >> mem_attr_array to support other stuff in future while supporting
-> >> conversions.
-> >
-> > I'm getting pretty confused on how userspace is going to know which ioctl
-> > to use VM vs gmem.
-> >
-> 
-> It is confusing, yes!
-> 
-> > I was starting to question if going through the VM ioctl should actually
-> > change the guest_memfd flags (shareability).
-> >
-> 
-> At one of the guest_memfd biweeklies, we came to the conclusion that we
-> should have a per-VM KVM_CAP_DISABLE_LEGACY_PRIVATE_TRACKING, which will
-> disable the use of just KVM_MEMORY_ATTRIBUTE_PRIVATE for the
-> KVM_SET_MEMORY_ATTRIBUTES ioctl, and
-> KVM_CAP_DISABLE_LEGACY_PRIVATE_TRACKING is the only way to enable
-> conversions for a guest_memfd with mmap() support.
-> 
-> IOW, KVM_CAP_DISABLE_LEGACY_PRIVATE_TRACKING makes userspace choose
-> either
-> 
-> + Using guest_memfd for private memory and some other memory
->   (e.g. anonymous memory) for shared memory (aka legacy dual backing)
->     + And using KVM_SET_MEMORY_ATTRIBUTES VM ioctl for conversions
->     + And using mem_attr_array to track shared/private status
-> 
-> + Using guest_memfd for both private and shared memory (aka single backing)
->     + And using the guest_memfd ioctl for conversions
->     + And using guest_memfd shareability to track shared/private status
->     
-> Since userspace has to choose one of the above, there's no point in the
-> VM ioctl affecting shareability.
-> 
-> Sean's suggestion of a module param moves this choice from VM-level to
-> KVM/host-level.
-
-Ok I remember this discussion but I was not clear on the mechanics.  This
-helps clarify things thanks!
-
-> 
-> > In a prototype I'm playing with shareability has become a bit field which
-> > I think aligns with the idea of expanding the memory attributes.
-> 
-> I guess this is tangentially related and could do with some profiling,
-> but we should be careful about adding too many states in the maple tree.
-> 
-> Conversion iterates over offset ranges in the maple tree, and iteration
-> is faster if there are fewer nodes in the maple tree.
-> 
-> If we just have two states (shared/private) in the maple tree, each node
-> is either all private or all shared.
-> 
-> If we have more states, private ranges might get fragmented based on the
-> orthogonal bits, e.g. RWX, which could then impact conversion
-> performance.
-
-I'm thinking along these same lines yea.
+Sorry, I forgot the 'Based-on' tag on v1 and added it separately:
+https://lore.kernel.org/qemu-devel/ef4baceb-671f-4afe-8a41-cafb89ea1707@linaro.org/
+then forgot to add it again on v2 :/
 
 > 
-> > But I've
-> > had some issues with the TDX tests in trying to decipher when to call
-> > vm_set_memory_attributes() vs guest_memfd_convert_private().
-> >
-> 
-> Hope the above explanation helps!
-> 
-> + Legacy dual backing: vm_set_memory_attributes()
-> + Single backing: guest_memfd_convert_private()
-> 
-> I don't think this will change much even with the module param, since
-> userspace will still need to know whether to pass in a vm fd or a
-> guest_memfd fd.
-> 
-> Or maybe vm_set_memory_attributes() can take a vm fd, then query module
-> params and then figure out if it should pass vm or guest_mefd fds?
+> Thanks
+> Harsh
 
-For the tests that might help for sure.
 
-Generally I'm hesitant to introduce module parameters as they are pretty
-big hammers to change behavior.  But if it makes things easier and is
-acceptable then I'm not going to complain...
-
-> 
-> >> 
-> >> [...snip...]
-> >> 
-> >> >>  static int __kvm_gmem_prepare_folio(struct kvm *kvm, struct kvm_memory_slot *slot,
-> >> >>  				    pgoff_t index, struct folio *folio)
-> >> >>  {
-> >> >> @@ -333,7 +404,7 @@ static vm_fault_t kvm_gmem_fault_shared(struct vm_fault *vmf)
-> >> >>  
-> >> >>  	filemap_invalidate_lock_shared(inode->i_mapping);
-> >> >>  
-> >> >> -	folio = kvm_gmem_get_folio(inode, vmf->pgoff);
-> >> >> +	folio = kvm_gmem_get_shared_folio(inode, vmf->pgoff);
-> >> >
-> >> > I am fairly certain there's a TOCTOU bug here.  AFAICT, nothing prevents the
-> >> > underlying memory from being converted from shared=>private after checking that
-> >> > the page is SHARED.
-> >> >
-> >> 
-> >> Conversions take the filemap_invalidate_lock() too, along with
-> >> allocations, truncations.
-> >> 
-> >> Because the filemap_invalidate_lock() might be reused for other
-> >> fs-specific operations, I didn't do the mt_set_external_lock() thing to
-> >> lock at a low level to avoid nested locking or special maple tree code
-> >> to avoid taking the lock on other paths.
-> >
-> > I don't think using the filemap_invalidate_lock() is going to work well
-> > here.  I've had some hangs on it in my testing and experiments.  I think
-> > it is better to specifically lock the state tracking itself.  I believe
-> > Michael mentioned this as well in a previous thread.
-> 
-> Definitely took the big hammer lock for a start and might be optimizable.
-> 
-> Considerations so far: when a conversion is happening, these have to be
-> locked out:
-> 
-> + Conversions from competing threads
-
-Agreed.  And this needs filemap_invalidate_lock() as well as the maple
-tree lock.
-
-Call this item 1.
-
-> + Allocations in kvm_gmem_fault_user_mapping(), because whether an
->   offset can be faulted depends on the outcome of conversion
-
-Agreed.  And this needs filemap_invalidate_lock() as well as the maple
-tree lock.
-
-Call this item 2.
-
-> + Allocations (fallocate() or kvm_gmem_get_pfn()) and truncations,
->   because conversions (for now) involves removing a folio from the
->   filemap, restructuring, then restoring to the filemap, and
->     + Allocations should reuse a folio that was already in the filemap
->     + Truncations remove a folio, and should not skip removal of a folio
->       because it was taken out just for conversion
-
-I don't think this is required...
-
-> + memory failure handling, where we don't remove folios from the
->   filemap, but we might restructure, to split huge folios to just unmap
->   pages with failed memory
-
-... nor this.  These don't change the sharability maple tree.
-
-These operations don't change or need to know the shareability AFAICT.
-
-Merging a folio would have to check the maple tree to ensure we don't
-merge incompatible folios...  But that is a read check and should be easy
-to add.
-
-> I think essentially because conversion involves restructuring, and
-> restructuring involves filemap operations and other filemap operations
-> have to wait, conversion also takes the filemap_invalidate_lock() that
-> filemap operations use.
-
-I could be convinced otherwise but I'm thinking the overhead of another
-lock for the sake of simplicity is a good trade off.  I don't think any of
-the conversions are a fast path operation are they?
-
-Ira
-
-[snip]
 
