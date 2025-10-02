@@ -1,373 +1,326 @@
-Return-Path: <kvm+bounces-59393-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-59394-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9269ABB2BB6
-	for <lists+kvm@lfdr.de>; Thu, 02 Oct 2025 09:47:08 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id F34E4BB2BD7
+	for <lists+kvm@lfdr.de>; Thu, 02 Oct 2025 09:49:15 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4886C4232CE
-	for <lists+kvm@lfdr.de>; Thu,  2 Oct 2025 07:47:07 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 83A1719C3B48
+	for <lists+kvm@lfdr.de>; Thu,  2 Oct 2025 07:49:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6B5572D0C73;
-	Thu,  2 Oct 2025 07:47:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 351B72D1F4E;
+	Thu,  2 Oct 2025 07:49:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=suse.com header.i=@suse.com header.b="ksmrQUKY";
-	dkim=pass (1024-bit key) header.d=suse.com header.i=@suse.com header.b="ksmrQUKY"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="x3xZkaje"
 X-Original-To: kvm@vger.kernel.org
-Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.223.131])
+Received: from mail-pj1-f74.google.com (mail-pj1-f74.google.com [209.85.216.74])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 62C9D238166
-	for <kvm@vger.kernel.org>; Thu,  2 Oct 2025 07:46:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.131
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B90331DD9AD
+	for <kvm@vger.kernel.org>; Thu,  2 Oct 2025 07:49:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.74
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1759391220; cv=none; b=jk12da7HIfNbXfc+oxkRWPgniv7eqeHy+QaRhnK9KprwHkVrkGrOWBsEgjnTgpQbG7S3q+9DC+cnjnttBbnYccNIVR8YPcrJFHyEA2qnBP1aAxwvDgwsJ+jnRr7HcpOIEiTC0ddPPl3yuncaKNrFq7a3JJkvFqUfqn4g+ksjyX4=
+	t=1759391346; cv=none; b=qBOwXR7XJ+dkBAM+WCoLL5zFvIajjIGOckMTfzCX5cR9IqR18IO2WlOj8Mno4Y5ouWaTzcXiqYmEZ4IR+089NDF8Ro3yOzTfvon8oUKWxgBYzY07psedPwInczS2q32kcEwY7VCQw+HdCAckqhS/ZcQKfhvc4nh4RoPKuxCrUOo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1759391220; c=relaxed/simple;
-	bh=HbUDv50SZcajdTpZlbZra6ry+wsVkSq/kY4OBLKyqKI=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=itjKHJeOu60rq4q+zepfTykMPaAycYzcjbWVkSzm04KgU84QjUO50121V5jTL5H7qSy2UgjgDNnsUyA9ud9AqYaxNeyzdbtLV2sLe1VuUfOl5BGaFhuwNoZp010WUUHIaHQmtyFm9fH/q60y6aL7zj3DiuszFiWPifVaKTqUZpk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com; spf=pass smtp.mailfrom=suse.com; dkim=pass (1024-bit key) header.d=suse.com header.i=@suse.com header.b=ksmrQUKY; dkim=pass (1024-bit key) header.d=suse.com header.i=@suse.com header.b=ksmrQUKY; arc=none smtp.client-ip=195.135.223.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.com
-Received: from imap1.dmz-prg2.suse.org (unknown [10.150.64.97])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by smtp-out2.suse.de (Postfix) with ESMTPS id 5E0681F8D4;
-	Thu,  2 Oct 2025 07:46:56 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.com; s=susede1;
-	t=1759391216; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-	bh=HbUDv50SZcajdTpZlbZra6ry+wsVkSq/kY4OBLKyqKI=;
-	b=ksmrQUKY+gWdiS0+kn1fKoGHBNMTBvASbqmplyXXb92RJ/yu9tBetMsfC9VV0YopE5Itf/
-	ZE4N+uGzIAeCCEyO229VbN0R1oxa0YiPGEv6FaN/kvjWjxUnNwK694C/p7CgxInlguCmFr
-	NTUPsnpa6G5JGhxSWSazGNKVq77TRsA=
-Authentication-Results: smtp-out2.suse.de;
-	none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.com; s=susede1;
-	t=1759391216; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-	bh=HbUDv50SZcajdTpZlbZra6ry+wsVkSq/kY4OBLKyqKI=;
-	b=ksmrQUKY+gWdiS0+kn1fKoGHBNMTBvASbqmplyXXb92RJ/yu9tBetMsfC9VV0YopE5Itf/
-	ZE4N+uGzIAeCCEyO229VbN0R1oxa0YiPGEv6FaN/kvjWjxUnNwK694C/p7CgxInlguCmFr
-	NTUPsnpa6G5JGhxSWSazGNKVq77TRsA=
-Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id 724FC1395B;
-	Thu,  2 Oct 2025 07:46:55 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
-	by imap1.dmz-prg2.suse.org with ESMTPSA
-	id sIoUGu8t3mjARwAAD6G6ig
-	(envelope-from <jgross@suse.com>); Thu, 02 Oct 2025 07:46:55 +0000
-Message-ID: <27d19ea5-d078-405b-a963-91d19b4229c8@suse.com>
-Date: Thu, 2 Oct 2025 09:46:54 +0200
+	s=arc-20240116; t=1759391346; c=relaxed/simple;
+	bh=Y3/dmaL8PlTUGmtZQc6HGcv0c1HgbBDs64Fw+IreoUw=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=O8q3CJnSKY6NpiTxjNBjAPqIp1UTDT1NT5LYqehCM3G8N5SrRZutmac+5VYTiXZhB84dbBFTZx+Fmk5QbRpEk5UrQ6haI1n/rOiZH6fxs8ujq9Ep8eN4zNXTQKDU+vKbQdHuUNSagYYJx5nS61W/Ryj5tQhX1gJxZbqxPI+NyR4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--ackerleytng.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=x3xZkaje; arc=none smtp.client-ip=209.85.216.74
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--ackerleytng.bounces.google.com
+Received: by mail-pj1-f74.google.com with SMTP id 98e67ed59e1d1-32ecab3865dso1069578a91.1
+        for <kvm@vger.kernel.org>; Thu, 02 Oct 2025 00:49:04 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1759391344; x=1759996144; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=go+hWBT9ITOWDP8uH4s0K8lsbawxN4U22H6W6XNbqbU=;
+        b=x3xZkajejI5LCEoBanAAx4FuQdvI2xs7F2T+HnyUCtqxbJZuQU14i6VI2MEmJYGdqR
+         IE2VlC35GRRWhcQBJn38vE8fil1ck44QqocWp/5AOg6OvuT2q2RDqOe7Qlj0Kr6GZ+PS
+         fusd25XgF9X3wz7GJNLOmYH2nQTxH31Qbogst//uvgHrzeeHuQpV2e8bOUYtjQMZD4lH
+         Pu5nme0Xi7d9VUc1mxoF9QGva0QFo1xY6HeiYBQ3+R53GzIkbrDSizIdxGATyPvF/D53
+         PCRI9P/2VbL2CeKP04NV76hhEg0xQUopzFvEtmNjfDNmziVlm37143BaZU+k7B8O9qal
+         5mSQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1759391344; x=1759996144;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=go+hWBT9ITOWDP8uH4s0K8lsbawxN4U22H6W6XNbqbU=;
+        b=kdzrM33DnuLuiatdcF0AQS8y3Gv+RyNrneo263jqysIVZhBYTNOBAuaPvbNHPfQtAk
+         D64Tzo/6dHgksbUNbYo/VQ/mGMaZcgbwtH9lGZKFw8zGKmiu9+ZI2IcrWhCp6Qm0cf+K
+         MvlE9aLy76Tc06h1SJCOXF+aIlil8rIuzpTw9ZukndCEZ/KZhSYU88KCF7D96jHfvHFm
+         vU/KJygZJmjxfrbY1WoW+kG6XO/vDcr4OcFhcxBBab0t3E31sqF9JPLsWuTdtwqlLDdq
+         gqNyyBib2F2QBuGl1a6vtCe/NQndCtpEkaDRChGMXSwjqei38pUmTgQhpFQn65NfMXNN
+         OhBQ==
+X-Gm-Message-State: AOJu0Yx0MP1UoNO4eQzyquAFAzY19u2BzUogw5GPVlvL4QZLkMsrq5H2
+	nUh02GeVY0cCv6UhR6nu+uaWcS8BUtXDrmEJH+0F6dz8Rezw/108rCMgRHflwXZN9e48AQT+BFp
+	53n4tHdG9Zhg87/PRNaLVwhwR4A==
+X-Google-Smtp-Source: AGHT+IFbOguSE7ziCxSGMFAgR4r0H/koNUOPNzdkm5U8rQvN7qKaB1KuYgNKpVTHPLhsI92ZrDZL9/VIY8yAAC8xLg==
+X-Received: from pjuu7.prod.google.com ([2002:a17:90b:5867:b0:32e:c154:c2f6])
+ (user=ackerleytng job=prod-delivery.src-stubby-dispatcher) by
+ 2002:a17:90b:4d06:b0:32d:17ce:49d5 with SMTP id 98e67ed59e1d1-339a6f06af6mr7405966a91.23.1759391343848;
+ Thu, 02 Oct 2025 00:49:03 -0700 (PDT)
+Date: Thu, 02 Oct 2025 07:49:02 +0000
+In-Reply-To: <aN3KfrWERpXsj3ld@google.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 4/7] x86/kexec: Disable kexec/kdump on platforms with TDX
- partial write erratum
-To: "Reshetova, Elena" <elena.reshetova@intel.com>,
- "Annapurve, Vishal" <vannapurve@google.com>,
- "Hansen, Dave" <dave.hansen@intel.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>,
- "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
- "kvm@vger.kernel.org" <kvm@vger.kernel.org>, "bp@alien8.de" <bp@alien8.de>,
- "tglx@linutronix.de" <tglx@linutronix.de>,
- "peterz@infradead.org" <peterz@infradead.org>,
- "mingo@redhat.com" <mingo@redhat.com>, "hpa@zytor.com" <hpa@zytor.com>,
- "thomas.lendacky@amd.com" <thomas.lendacky@amd.com>,
- "x86@kernel.org" <x86@kernel.org>, "kas@kernel.org" <kas@kernel.org>,
- "Edgecombe, Rick P" <rick.p.edgecombe@intel.com>,
- "dwmw@amazon.co.uk" <dwmw@amazon.co.uk>, "Huang, Kai" <kai.huang@intel.com>,
- "seanjc@google.com" <seanjc@google.com>,
- "Chatre, Reinette" <reinette.chatre@intel.com>,
- "Yamahata, Isaku" <isaku.yamahata@intel.com>,
- "Williams, Dan J" <dan.j.williams@intel.com>,
- "ashish.kalra@amd.com" <ashish.kalra@amd.com>,
- "nik.borisov@suse.com" <nik.borisov@suse.com>, "Gao, Chao"
- <chao.gao@intel.com>, "sagis@google.com" <sagis@google.com>,
- "Chen, Farrah" <farrah.chen@intel.com>, Binbin Wu <binbin.wu@linux.intel.com>
-References: <20250901160930.1785244-1-pbonzini@redhat.com>
- <20250901160930.1785244-5-pbonzini@redhat.com>
- <CAGtprH__G96uUmiDkK0iYM2miXb31vYje9aN+J=stJQqLUUXEg@mail.gmail.com>
- <74a390a1-42a7-4e6b-a76a-f88f49323c93@intel.com>
- <CAGtprH-mb0Cw+OzBj-gSWenA9kSJyu-xgXhsTjjzyY6Qi4E=aw@mail.gmail.com>
- <a2042a7b-2e12-4893-ac8d-50c0f77f26e9@intel.com>
- <CAGtprH_nTBdX-VtMQJM4-y8KcB_F4CnafqpDX7ktASwhO0sxAg@mail.gmail.com>
- <DM8PR11MB575071F87791817215355DD8E7E7A@DM8PR11MB5750.namprd11.prod.outlook.com>
-Content-Language: en-US
-From: Juergen Gross <jgross@suse.com>
-Autocrypt: addr=jgross@suse.com; keydata=
- xsBNBFOMcBYBCACgGjqjoGvbEouQZw/ToiBg9W98AlM2QHV+iNHsEs7kxWhKMjrioyspZKOB
- ycWxw3ie3j9uvg9EOB3aN4xiTv4qbnGiTr3oJhkB1gsb6ToJQZ8uxGq2kaV2KL9650I1SJve
- dYm8Of8Zd621lSmoKOwlNClALZNew72NjJLEzTalU1OdT7/i1TXkH09XSSI8mEQ/ouNcMvIJ
- NwQpd369y9bfIhWUiVXEK7MlRgUG6MvIj6Y3Am/BBLUVbDa4+gmzDC9ezlZkTZG2t14zWPvx
- XP3FAp2pkW0xqG7/377qptDmrk42GlSKN4z76ELnLxussxc7I2hx18NUcbP8+uty4bMxABEB
- AAHNH0p1ZXJnZW4gR3Jvc3MgPGpncm9zc0BzdXNlLmNvbT7CwHkEEwECACMFAlOMcK8CGwMH
- CwkIBwMCAQYVCAIJCgsEFgIDAQIeAQIXgAAKCRCw3p3WKL8TL8eZB/9G0juS/kDY9LhEXseh
- mE9U+iA1VsLhgDqVbsOtZ/S14LRFHczNd/Lqkn7souCSoyWsBs3/wO+OjPvxf7m+Ef+sMtr0
- G5lCWEWa9wa0IXx5HRPW/ScL+e4AVUbL7rurYMfwCzco+7TfjhMEOkC+va5gzi1KrErgNRHH
- kg3PhlnRY0Udyqx++UYkAsN4TQuEhNN32MvN0Np3WlBJOgKcuXpIElmMM5f1BBzJSKBkW0Jc
- Wy3h2Wy912vHKpPV/Xv7ZwVJ27v7KcuZcErtptDevAljxJtE7aJG6WiBzm+v9EswyWxwMCIO
- RoVBYuiocc51872tRGywc03xaQydB+9R7BHPzsBNBFOMcBYBCADLMfoA44MwGOB9YT1V4KCy
- vAfd7E0BTfaAurbG+Olacciz3yd09QOmejFZC6AnoykydyvTFLAWYcSCdISMr88COmmCbJzn
- sHAogjexXiif6ANUUlHpjxlHCCcELmZUzomNDnEOTxZFeWMTFF9Rf2k2F0Tl4E5kmsNGgtSa
- aMO0rNZoOEiD/7UfPP3dfh8JCQ1VtUUsQtT1sxos8Eb/HmriJhnaTZ7Hp3jtgTVkV0ybpgFg
- w6WMaRkrBh17mV0z2ajjmabB7SJxcouSkR0hcpNl4oM74d2/VqoW4BxxxOD1FcNCObCELfIS
- auZx+XT6s+CE7Qi/c44ibBMR7hyjdzWbABEBAAHCwF8EGAECAAkFAlOMcBYCGwwACgkQsN6d
- 1ii/Ey9D+Af/WFr3q+bg/8v5tCknCtn92d5lyYTBNt7xgWzDZX8G6/pngzKyWfedArllp0Pn
- fgIXtMNV+3t8Li1Tg843EXkP7+2+CQ98MB8XvvPLYAfW8nNDV85TyVgWlldNcgdv7nn1Sq8g
- HwB2BHdIAkYce3hEoDQXt/mKlgEGsLpzJcnLKimtPXQQy9TxUaLBe9PInPd+Ohix0XOlY+Uk
- QFEx50Ki3rSDl2Zt2tnkNYKUCvTJq7jvOlaPd6d/W0tZqpyy7KVay+K4aMobDsodB3dvEAs6
- ScCnh03dDAFgIq5nsB11j3KPKdVoPlfucX2c7kGNH+LUMbzqV6beIENfNexkOfxHfw==
-In-Reply-To: <DM8PR11MB575071F87791817215355DD8E7E7A@DM8PR11MB5750.namprd11.prod.outlook.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature";
- boundary="------------8Kvnz2vWSuar3VVm72WJ3lkr"
-X-Spamd-Result: default: False [-6.20 / 50.00];
-	BAYES_HAM(-3.00)[100.00%];
-	SIGNED_PGP(-2.00)[];
-	NEURAL_HAM_LONG(-1.00)[-1.000];
-	MIME_GOOD(-0.20)[multipart/signed,multipart/mixed,text/plain];
-	NEURAL_HAM_SHORT(-0.20)[-0.993];
-	MIME_UNKNOWN(0.10)[application/pgp-keys];
-	MIME_BASE64_TEXT(0.10)[];
-	MIME_TRACE(0.00)[0:+,1:+,2:+,3:+,4:~,5:~];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	ARC_NA(0.00)[];
-	TO_DN_SOME(0.00)[];
-	FUZZY_RATELIMITED(0.00)[rspamd.com];
-	RCPT_COUNT_TWELVE(0.00)[27];
-	TO_DN_EQ_ADDR_SOME(0.00)[];
-	RCVD_TLS_ALL(0.00)[];
-	R_RATELIMIT(0.00)[to_ip_from(RLfdszjqhz8kzzb9uwpzdm8png)];
-	FROM_EQ_ENVFROM(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	MID_RHS_MATCH_FROM(0.00)[];
-	RCVD_COUNT_TWO(0.00)[2];
-	TO_MATCH_ENVRCPT_ALL(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[imap1.dmz-prg2.suse.org:helo];
-	DKIM_SIGNED(0.00)[suse.com:s=susede1];
-	HAS_ATTACHMENT(0.00)[]
-X-Spam-Flag: NO
-X-Spam-Level: 
-X-Spam-Score: -6.20
+Mime-Version: 1.0
+References: <cover.1747264138.git.ackerleytng@google.com> <b784326e9ccae6a08388f1bf39db70a2204bdc51.1747264138.git.ackerleytng@google.com>
+ <aNxqYMqtBKll-TgV@google.com> <diqzbjmrt000.fsf@google.com>
+ <aN1bXOg3x0ZdTI1D@google.com> <diqz1pnmtg4h.fsf@google.com> <aN3KfrWERpXsj3ld@google.com>
+Message-ID: <diqzy0ptspzl.fsf@google.com>
+Subject: Re: [RFC PATCH v2 02/51] KVM: guest_memfd: Introduce and use
+ shareability to guard faulting
+From: Ackerley Tng <ackerleytng@google.com>
+To: Sean Christopherson <seanjc@google.com>
+Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	Yan Zhao <yan.y.zhao@intel.com>, Fuad Tabba <tabba@google.com>, 
+	Binbin Wu <binbin.wu@linux.intel.com>, Michael Roth <michael.roth@amd.com>, 
+	Ira Weiny <ira.weiny@intel.com>, Rick P Edgecombe <rick.p.edgecombe@intel.com>, 
+	Vishal Annapurve <vannapurve@google.com>, David Hildenbrand <david@redhat.com>, 
+	Paolo Bonzini <pbonzini@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---------------8Kvnz2vWSuar3VVm72WJ3lkr
-Content-Type: multipart/mixed; boundary="------------bRM7eILUcb7tiYuilz9WTFd7";
- protected-headers="v1"
-From: Juergen Gross <jgross@suse.com>
-To: "Reshetova, Elena" <elena.reshetova@intel.com>,
- "Annapurve, Vishal" <vannapurve@google.com>,
- "Hansen, Dave" <dave.hansen@intel.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>,
- "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
- "kvm@vger.kernel.org" <kvm@vger.kernel.org>, "bp@alien8.de" <bp@alien8.de>,
- "tglx@linutronix.de" <tglx@linutronix.de>,
- "peterz@infradead.org" <peterz@infradead.org>,
- "mingo@redhat.com" <mingo@redhat.com>, "hpa@zytor.com" <hpa@zytor.com>,
- "thomas.lendacky@amd.com" <thomas.lendacky@amd.com>,
- "x86@kernel.org" <x86@kernel.org>, "kas@kernel.org" <kas@kernel.org>,
- "Edgecombe, Rick P" <rick.p.edgecombe@intel.com>,
- "dwmw@amazon.co.uk" <dwmw@amazon.co.uk>, "Huang, Kai" <kai.huang@intel.com>,
- "seanjc@google.com" <seanjc@google.com>,
- "Chatre, Reinette" <reinette.chatre@intel.com>,
- "Yamahata, Isaku" <isaku.yamahata@intel.com>,
- "Williams, Dan J" <dan.j.williams@intel.com>,
- "ashish.kalra@amd.com" <ashish.kalra@amd.com>,
- "nik.borisov@suse.com" <nik.borisov@suse.com>, "Gao, Chao"
- <chao.gao@intel.com>, "sagis@google.com" <sagis@google.com>,
- "Chen, Farrah" <farrah.chen@intel.com>, Binbin Wu <binbin.wu@linux.intel.com>
-Message-ID: <27d19ea5-d078-405b-a963-91d19b4229c8@suse.com>
-Subject: Re: [PATCH 4/7] x86/kexec: Disable kexec/kdump on platforms with TDX
- partial write erratum
-References: <20250901160930.1785244-1-pbonzini@redhat.com>
- <20250901160930.1785244-5-pbonzini@redhat.com>
- <CAGtprH__G96uUmiDkK0iYM2miXb31vYje9aN+J=stJQqLUUXEg@mail.gmail.com>
- <74a390a1-42a7-4e6b-a76a-f88f49323c93@intel.com>
- <CAGtprH-mb0Cw+OzBj-gSWenA9kSJyu-xgXhsTjjzyY6Qi4E=aw@mail.gmail.com>
- <a2042a7b-2e12-4893-ac8d-50c0f77f26e9@intel.com>
- <CAGtprH_nTBdX-VtMQJM4-y8KcB_F4CnafqpDX7ktASwhO0sxAg@mail.gmail.com>
- <DM8PR11MB575071F87791817215355DD8E7E7A@DM8PR11MB5750.namprd11.prod.outlook.com>
-In-Reply-To: <DM8PR11MB575071F87791817215355DD8E7E7A@DM8PR11MB5750.namprd11.prod.outlook.com>
+Sean Christopherson <seanjc@google.com> writes:
 
---------------bRM7eILUcb7tiYuilz9WTFd7
-Content-Type: multipart/mixed; boundary="------------UyQCERjKhD3gmelcdITVzU3t"
+> On Wed, Oct 01, 2025, Ackerley Tng wrote:
+>> Sean Christopherson <seanjc@google.com> writes:
+>> >> I'd prefer not to have the module param choose between the use of
+>> >> mem_attr_array and guest_memfd conversion in case we need both
+>> >> mem_attr_array to support other stuff in future while supporting
+>> >> conversions.
+>> >
+>> > Luckily, we don't actually need to make a decision on this, because PRIVATE is
+>> > the only attribute that exists.  Which is partly why I want to go with a module
+>> > param.  We can make the behavior very definitive without significant risk of
+>> > causing ABI hell.
+>> >
+>> 
+>> Then maybe I'm misunderstanding the static_call() thing you were
+>> describing. Is it like, at KVM module initialization time,
+>> 
+>>     if module_param == disable_tracking:
+>>         .__kvm_get_memory_attributes = read_attributes_from_guest_memfd
+>>     else
+>>         .__kvm_get_memory_attributes = read_attributes_from_mem_attr_array
+>> 
+>> With that, I can't have both CoCo private/shared state tracked in
+>> guest_memfd and RWX (as an example, could be any future attribute)
+>> tracked in mem_attr_array on the same VM.
+>
+> More or less.
+>
 
---------------UyQCERjKhD3gmelcdITVzU3t
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: base64
+Hm okay. So introducing the module param will only allow the use of one
+of the following?
 
-T24gMDIuMTAuMjUgMDg6NTksIFJlc2hldG92YSwgRWxlbmEgd3JvdGU6DQo+PiBPbiBXZWQs
-IE9jdCAxLCAyMDI1IGF0IDc6MzLigK9BTSBEYXZlIEhhbnNlbiA8ZGF2ZS5oYW5zZW5AaW50
-ZWwuY29tPg0KPj4gd3JvdGU6DQo+Pj4NCj4+PiBPbiA5LzMwLzI1IDE5OjA1LCBWaXNoYWwg
-QW5uYXB1cnZlIHdyb3RlOg0KPj4+IC4uLg0KPj4+Pj4gQW55IHdvcmthcm91bmRzIGFyZSBn
-b2luZyB0byBiZSBzbG93IGFuZCBwcm9iYWJseSBpbXBlcmZlY3QuIFRoYXQncyBub3QNCj4+
-Pj4NCj4+Pj4gRG8gd2UgcmVhbGx5IG5lZWQgdG8gZGVwbG95IHdvcmthcm91bmRzIHRoYXQg
-YXJlIGNvbXBsZXggYW5kIHNsb3cgdG8NCj4+Pj4gZ2V0IGtkdW1wIHdvcmtpbmcgZm9yIHRo
-ZSBtYWpvcml0eSBvZiB0aGUgc2NlbmFyaW9zPyBJcyB0aGVyZSBhbnkNCj4+Pj4gYW5hbHlz
-aXMgZG9uZSBmb3IgdGhlIHJpc2sgd2l0aCBpbXBlcmZlY3QgYW5kIHNpbXBsZXIgd29ya2Fy
-b3VuZHMgdnMNCj4+Pj4gYmVuZWZpdHMgb2Yga2R1bXAgZnVuY3Rpb25hbGl0eT8NCj4+Pj4N
-Cj4+Pj4+IGEgZ3JlYXQgbWF0Y2ggZm9yIGtkdW1wLiBJJ20gcGVyZmVjdGx5IGhhcHB5IHdh
-aXRpbmcgZm9yIGZpeGVkIGhhcmR3YXJlDQo+Pj4+PiBmcm9tIHdoYXQgSSd2ZSBzZWVuLg0K
-Pj4+Pg0KPj4+PiBJSVVDIFNQUi9FTVIgLSB0d28gQ1BVIGdlbmVyYXRpb25zIG91dCB0aGVy
-ZSBhcmUgaW1wYWN0ZWQgYnkgdGhpcw0KPj4+PiBlcnJhdHVtIGFuZCBqdXN0IGRpc2FibGlu
-ZyBrZHVtcCBmdW5jdGlvbmFsaXR5IElNTyBpcyBub3QgdGhlIGJlc3QNCj4+Pj4gc29sdXRp
-b24gaGVyZS4NCj4+Pg0KPj4+IFRoYXQncyBhbiBlbWluZW50bHkgcmVhc29uYWJsZSBwb3Np
-dGlvbi4gQnV0IHdlJ3JlIHNwZWFraW5nIGluIGJyb2FkDQo+Pj4gZ2VuZXJhbGl0aWVzIGFu
-ZCBJJ20gdW5zdXJlIHdoYXQgeW91IGRvbid0IGxpa2UgYWJvdXQgdGhlIHN0YXR1cyBxdW8g
-b3INCj4+PiBob3cgeW91J2QgbGlrZSB0byBzZWUgdGhpbmdzIGNoYW5nZS4NCj4+DQo+PiBM
-b29rcyBsaWtlIHRoZSBkZWNpc2lvbiB0byBkaXNhYmxlIGtkdW1wIHdhcyB0YWtlbiBiZXR3
-ZWVuIFsxXSAtPiBbMl0uDQo+PiAiVGhlIGtlcm5lbCBjdXJyZW50bHkgZG9lc24ndCB0cmFj
-ayB3aGljaCBwYWdlIGlzIFREWCBwcml2YXRlIG1lbW9yeS4NCj4+IEl0J3Mgbm90IHRyaXZp
-YWwgdG8gcmVzZXQgVERYIHByaXZhdGUgbWVtb3J5LiAgRm9yIHNpbXBsaWNpdHksIHRoaXMN
-Cj4+IHNlcmllcyBzaW1wbHkgZGlzYWJsZXMga2V4ZWMva2R1bXAgZm9yIHN1Y2ggcGxhdGZv
-cm1zLiAgVGhpcyB3aWxsIGJlDQo+PiBlbmhhbmNlZCBpbiB0aGUgZnV0dXJlLiINCj4+DQo+
-PiBBIHBhdGNoIFszXSBmcm9tIHRoZSBzZXJpZXNbMV0sIGRlc2NyaWJlcyB0aGUgaXNzdWUg
-YXM6DQo+PiAiVGhpcyBwcm9ibGVtIGlzIHRyaWdnZXJlZCBieSAicGFydGlhbCIgd3JpdGVz
-IHdoZXJlIGEgd3JpdGUgdHJhbnNhY3Rpb24NCj4+IG9mIGxlc3MgdGhhbiBjYWNoZWxpbmUg
-bGFuZHMgYXQgdGhlIG1lbW9yeSBjb250cm9sbGVyLiAgVGhlIENQVSBkb2VzDQo+PiB0aGVz
-ZSB2aWEgbm9uLXRlbXBvcmFsIHdyaXRlIGluc3RydWN0aW9ucyAobGlrZSBNT1ZOVEkpLCBv
-ciB0aHJvdWdoDQo+PiBVQy9XQyBtZW1vcnkgbWFwcGluZ3MuICBUaGUgaXNzdWUgY2FuIGFs
-c28gYmUgdHJpZ2dlcmVkIGF3YXkgZnJvbSB0aGUNCj4+IENQVSBieSBkZXZpY2VzIGRvaW5n
-IHBhcnRpYWwgd3JpdGVzIHZpYSBETUEuIg0KPj4NCj4+IEFuZCBhbHNvIG1lbnRpb25zOg0K
-Pj4gIkFsc28gbm90ZSBvbmx5IHRoZSBub3JtYWwga2V4ZWMgbmVlZHMgdG8gd29ycnkgYWJv
-dXQgdGhpcyBwcm9ibGVtLCBidXQNCj4+IG5vdCB0aGUgY3Jhc2gga2V4ZWM6IDEpIFRoZSBr
-ZHVtcCBrZXJuZWwgb25seSB1c2VzIHRoZSBzcGVjaWFsIG1lbW9yeQ0KPj4gcmVzZXJ2ZWQg
-YnkgdGhlIGZpcnN0IGtlcm5lbCwgYW5kIHRoZSByZXNlcnZlZCBtZW1vcnkgY2FuIG5ldmVy
-IGJlIHVzZWQNCj4+IGJ5IFREWCBpbiB0aGUgZmlyc3Qga2VybmVsOyAyKSBUaGUgL3Byb2Mv
-dm1jb3JlLCB3aGljaCByZWZsZWN0cyB0aGUNCj4+IGZpcnN0IChjcmFzaGVkKSBrZXJuZWwn
-cyBtZW1vcnksIGlzIG9ubHkgZm9yIHJlYWQuICBUaGUgcmVhZCB3aWxsIG5ldmVyDQo+PiAi
-cG9pc29uIiBURFggbWVtb3J5IHRodXMgY2F1c2UgdW5leHBlY3RlZCBtYWNoaW5lIGNoZWNr
-IChvbmx5IHBhcnRpYWwNCj4+IHdyaXRlIGRvZXMpLiINCj4gDQo+IFdoaWxlIHRoZSBzdGF0
-ZW1lbnQgdGhhdCB0aGUgcmVhZCB3aWxsIG5ldmVyIHBvaXNvbiB0aGUgbWVtb3J5IGlzIGNv
-cnJlY3QsDQo+IHRoZSBzaXR1YXRpb24gd2UgY2FuIHRoZW9yZXRpY2FsbHkgd29ycnkgYWJv
-dXQgaXMgdGhlIGZvbGxvd2luZyBpbiBteSB1bmRlcnN0YW5kaW5nOg0KPiANCj4gMS4gRHVy
-aW5nIGl0cyBleGVjdXRpb24gb24gcGxhdGZvcm0gd2l0aCBwYXJ0aWFsIHdyaXRlIHByb2Js
-ZW0sIGhvc3QgT1Mgb3Igb3RoZXINCj4gYWN0b3IgZXhlY3V0aW5nIG91dHNpZGUgb2YgU0VB
-TSBtb2RlIHRyaWdnZXJzIHBhcnRpYWwgd3JpdGUgaW50byBhIGNhY2hlIGxpbmUgdGhhdA0K
-PiBvcmlnaW5hbGx5IGJlbG9uZ2VkIHRvIFREWCBwcml2YXRlIG1lbW9yeS4NCj4gVGhpcyBp
-cyBzbXRoIHRoYXQgaG9zdCBPUyBvciBvdGhlciBlbnRpdGllcyBzaG91bGQgbm90IGRvLCBi
-dXQgaXQgY291bGQgaGFwcGVuIGR1ZQ0KPiB0byBob3N0IE9TIGJ1Z3MsIGV0Yy4NCj4gMi4g
-VGhlIGFib3ZlIGNhdXNlcyB0aGUgc3BlY2lmaWVkIGNhY2hlIGxpbmUgdG8gYmUgcG9pc29u
-ZWQgYnkgbWVtIGNvbnRyb2xsZXIuDQo+IEhvd2V2ZXIsIGhlcmUgd2UgYXNzdW1lIHRoYXQg
-bm8gb25lIGFjY2Vzc2VzIHRoaXMgY2FjaGUgbGluZSBmcm9tIFREWCBtb2R1bGUsDQo+IFRE
-IGd1ZXN0cyBvciBIb3N0IE9TIGZvciB0aGUgdGltZSBiZWluZyBhbmQgdGhlIHByb2JsZW0g
-cmVtYWlucyBoaWRkZW4uDQo+IDMuIEhvc3QgT1MgY3Jhc2hlcyBkdWUgdG8gc29tZSBvdGhl
-ciBpc3N1ZSwga2R1bXAgY3Jhc2gga2VybmVsIGlzIHRyaWdnZXJlZCwNCj4gYW5kIGtkdW1w
-IHN0YXJ0cyB0byByZWFkIGFsbCB0aGUgbWVtb3J5IGZyb20gdGhlIHByZXZpb3VzIGhvc3Qg
-a2VybmVsIHRvIGR1bXANCj4gdGhlIGRpYWdub3N0aWNzIGluZm8uDQo+IDQuIEF0IHNvbWUg
-cG9pbnQgb2YgdGltZSwga2R1bXAgY3Jhc2gga2VybmVsIHJlYWNoZXMgdGhlIG1lbW9yeSB3
-aXRoIHRoZSBwb2lzb25lZA0KPiBjYWNoZSBsaW5lLCBjb25zdW1lcyBwb2lzb24sIGFuZCB0
-aGUgI01DIGlzIGlzc3VlZCBmb3IgdGhlIGtlcm5lbCBzcGFjZS4NCj4gDQo+IElzbid0IHRo
-aXMgdGhlIHJlYXNvbiBmb3IgYWxzbyBkaXNhYmxpbmcga2R1bXA/IE9yIGRvIEkgbWlzcyBz
-bXRoPw0KDQpTbyBsZXRzIGNvbXBhcmUgdGhlIDIgY2FzZXMgd2l0aCBrZHVtcCBlbmFibGVk
-IGFuZCBkaXNhYmxlZCBpbiB5b3VyIHNjZW5hcmlvDQooY3Jhc2ggb2YgdGhlIGhvc3QgT1Mp
-Og0KDQprZHVtcCBlbmFibGVkOiBObyBkdW1wIGNhbiBiZSBwcm9kdWNlZCBkdWUgdG8gdGhl
-ICNNQyBhbmQgc3lzdGVtIGlzIHJlYm9vdGVkLg0KDQprZHVtcCBkaXNhYmxlZDogTm8gZHVt
-cCBpcyBwcm9kdWNlZCBhbmQgc3lzdGVtIGlzIHJlYm9vdGVkIGFmdGVyIGNyYXNoLg0KDQpX
-aGF0IGlzIHRoZSBtYWluIGNvbmNlcm4gd2l0aCBrZHVtcCBlbmFibGVkPyBJIGRvbid0IHNl
-ZSBhbnkgZGlzYWR2YW50YWdlIHdpdGgNCmVuYWJsaW5nIGl0LCBqdXN0IHRoZSBhZHZhbnRh
-Z2UgdGhhdCBpbiBtYW55IGNhc2VzIGEgZHVtcCB3aWxsIGJlIHdyaXR0ZW4uDQoNCg0KSnVl
-cmdlbg0K
---------------UyQCERjKhD3gmelcdITVzU3t
-Content-Type: application/pgp-keys; name="OpenPGP_0xB0DE9DD628BF132F.asc"
-Content-Disposition: attachment; filename="OpenPGP_0xB0DE9DD628BF132F.asc"
-Content-Description: OpenPGP public key
-Content-Transfer-Encoding: quoted-printable
++ KVM_SET_MEMORY_ATTRIBUTES (vm ioctl)
++ KVM_SET_MEMORY_ATTRIBUTES2 (guest_memfd ioctl)
 
------BEGIN PGP PUBLIC KEY BLOCK-----
+Then I guess using a module param which is a weaker userspace contract
+allows us to later enable both vm and guest_memfd ioctl if the need
+arises?
 
-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
-kt+z4drzFUyEjLM1vVvIMjkUoJs=3D
-=3DeeAB
------END PGP PUBLIC KEY BLOCK-----
+>> > It's entirely possible I'm completely wrong and we'll end up with per-VM RWX
+>> > protections and no other per-gmem memory attributes, but as above, unwinding or
+>> > adjusting the module param will be a drop in the bucket compared to the effort
+>> > needed to add whatever support comes along.
+>> >
+>> 
+>> Is a module param a weaker userspace contract such that the definition
+>> for module params can be more flexibly adjusted?
+>
+> Yes, much weaker.
+>
 
---------------UyQCERjKhD3gmelcdITVzU3t--
+I have a new tool in my toolbox now :)
 
---------------bRM7eILUcb7tiYuilz9WTFd7--
+>> >> > The kvm_memory_attributes structure is compatible, all that's needed AFAICT is a
+>> >> > union to clarify it's a pgoff instead of an address when used for guest_memfd.
+>> >> >
+>> >> > diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
+>> >> > index 52f6000ab020..e0d8255ac8d2 100644
+>> >> > --- a/include/uapi/linux/kvm.h
+>> >> > +++ b/include/uapi/linux/kvm.h
+>> >> > @@ -1590,7 +1590,10 @@ struct kvm_stats_desc {
+>> >> >  #define KVM_SET_MEMORY_ATTRIBUTES              _IOW(KVMIO,  0xd2, struct kvm_memory_attributes)
+>> >> >  
+>> >> >  struct kvm_memory_attributes {
+>> >> > -       __u64 address;
+>> >> > +       union {
+>> >> > +               __u64 address;
+>> >> > +               __u64 offset;
+>> >> > +       };
+>> >> >         __u64 size;
+>> >> >         __u64 attributes;
+>> >> >         __u64 flags;
+>> >> >
+>> >> 
+>> >> struct kvm_memory_attributes doesn't have room for reporting the offset
+>> >> at which conversion failed (error_offset in the new struct). How do we
+>> >> handle this? Do we reuse the flags field, or do we not report
+>> >> error_offset?
+>> >
+>> > Write back at address/offset
+>> 
+>> I think it might be surprising to the userspace program, when it wants
+>> to check the offset that it had requested and found that it changed due
+>> to an error, or upon decoding the error, be unable to find the original
+>> offset it had requested.
+>
+> It's a somewhat common pattern in the kernel.  Updating the offset+size is most
+> often used with -EAGAIN to say "got this far, try the syscall again from this
+> point".
+>
 
---------------8Kvnz2vWSuar3VVm72WJ3lkr
-Content-Type: application/pgp-signature; name="OpenPGP_signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="OpenPGP_signature.asc"
+TIL, thanks!
 
------BEGIN PGP SIGNATURE-----
+>> Like,
+>> 
+>>     printf("Error during conversion from offset=%lx with size=%lx, at
+>>            error_offset=%lx", attr.offset, attr.size, attr.error_offset)
+>> 
+>> would be nicer than 
+>> 
+>>     original_offset = attr.offset
+>>     printf("Error during conversion from offset=%lx with size=%lx, at
+>>            error_offset=%lx", original_offset, attr.size, attr.error_offset)
+>>            
+>> > (and update size too, which I probably forgot to do).
+>> 
+>> Why does size need to be updated? I think u64 for size is great, and
+>> size is better than nr_pages since nr_pages differs on different
+>> platforms based on PAGE_SIZE and also nr_pages introduces the question
+>> of "was it hugetlb, or a native page size?".
+>
+> I meant update the number of bytes remaining when updating the offset so that
+> userspace can redo the ioctl without having to update parameters.
+>
+>> > Ugh, but it's defined _IOW.  I forget if that matters in practice (IIRC, it's not
+>> > enforced anywhere, i.e. purely informational for userspace).
+>> >
+>> 
+>> I didn't notice this IOW vs IORW part, but if it starts getting
+>> enforced/specified [1] or auto-documented we'd be in trouble.
+>
+> IOW vs IORW is alread specified in the ioctl.  More below.
+>
+>> At this point, maybe it's better to just have a different ioctl number
+>> and struct definition. I feel that it would be easier for a user to
+>> associate/separate
+>
+> Amusingly, we'd only need a different name along with the IORW thing.  A full
+> ioctl number is comproised of the "directory" (KVM), the number, the size of the
+> payload, and how the payload is accessed.
+>
+> #define _IOC(dir,type,nr,size) \
+> 	(((dir)  << _IOC_DIRSHIFT) | \
+> 	 ((type) << _IOC_TYPESHIFT) | \
+> 	 ((nr)   << _IOC_NRSHIFT) | \
+> 	 ((size) << _IOC_SIZESHIFT))
+>
+> So this:
+>
+>   #define KVM_SET_MEMORY_ATTRIBUTES	_IOW(KVMIO,  0xd2, struct kvm_memory_attributes)
+>   #define KVM_SET_MEMORY_ATTRIBUTES2	_IOWR(KVMIO, 0xd2, struct kvm_memory_attributes2)
+>
+> actually generates two different values, and so is two different ioctls from a
+> code perspective.
+>
+> The "size" of the payload is nice to have as it allows userspace to assert that
+> it's passing the right structure, e.g. this static assert from KVM selftests:
+>
+> #define kvm_do_ioctl(fd, cmd, arg)						\
+> ({										\
+> 	kvm_static_assert(!_IOC_SIZE(cmd) || sizeof(*arg) == _IOC_SIZE(cmd));	\
+> 	ioctl(fd, cmd, arg);							\
+> })
+>
+>> + KVM_SET_MEMORY_ATTRIBUTES
+>>     + Is VM ioctl
+>>     + Is a write-only ioctl
+>>     + Is for setting memory attributes at a VM level
+>>     + Use struct kvm_memory_attributes for this
+>> + KVM_GUEST_MEMFD_SET_MEMORY_ATTRIBUTES (name TBD)
+>>     + Is guest_memfd ioctl
+>>     + Is a read/write ioctl
+>>     + Is for setting memory attributes only for this guest_memfd
+>>     + Use struct guest_memfd_memory_attributes for this
+>>     + Also decode errors from this struct
+>
+>       + Has extra padding for future expansion (because why not)
+>
+> If we really truly need a new ioctl, I'd probably prefer KVM_SET_MEMORY_ATTRIBUTES2.
+> Yeah, it's silly, but I don't think baking GUEST_MEMFD into the names buys us
+> anything.  Then we can use KVM_SET_MEMORY_ATTRIBUTES2 on a VM if the need ever
+> arises.
+>
 
-wsB5BAABCAAjFiEEhRJncuj2BJSl0Jf3sN6d1ii/Ey8FAmjeLe4FAwAAAAAACgkQsN6d1ii/Ey+O
-tQf+JlGyu78uiqtQprjWGnZUSLnoc5bpJ4jugzyEuSsAREHHra+ykY6tiFyB8CIGczTZgOpYLb/0
-+mFc/IF5I/cwaeWOXwfRLOkCrYsYqoXhGCBBb2miFcfmU0PmwXVvXcyb8b/83VmGEd9MfDKxPPaM
-bFA7SaJiPvjSq44dw28wqsazlMos9r5AErczL3LtslzAZHpy48y4dwJfI4yzrnWlWlGzut3Zn//U
-IAlgua54SuKNqTUX82wDqAke79bTQJ+GxsHahUDYGk0KcX1IgfSPd4ZyITLJbEuTIsclOAyyQYmM
-wNcsRufcII/fKnzAQy1/34qip1m2u062CzfsDx102g==
-=zZKx
------END PGP SIGNATURE-----
+I'm for having a new ioctl number and new struct, which are you leaning
+towards?
 
---------------8Kvnz2vWSuar3VVm72WJ3lkr--
+As for the naming, I think it's confusing to have something similar, and
+Ira mentioned it being confusing in the other email too. At the same
+time, I accept that it's useful if the same struct were to be used for a
+new iteration of the KVM_SET_MEMORY_ATTRIBUTES VM ioctl in future. No
+strong preference either way on naming.
+
+
+Trying to understand the difference between unwind on failure vs
+all-or-nothing:
+
+> Alternative #1 is to try and unwind on failure, but that gets complex, and it
+> simply can't be done for some CoCo VMs.  E.g. a private=>shared conversion for
+> TDX is descrutive.
+>
+
+Unwind on failure is:
+
+1. Store current state
+2. Convert
+3. Restore current state on conversion failure
+
+> Alternative #2 is to make the updates atomic and all-or-nothing, which is what
+> we did for per-VM attributes.  That's doable, but it'd either be much more
+> complex than telling userspace to retry, or we'd have to lose the maple tree
+> optimizations (which is effectively what we did for per-VM attributes).
+>
+
+All-or-nothing:
+
+1. Do everything to make sure conversion doesn't fail, bail early if it
+   fails
+2. Convert (always successful)
+
+Is that it?
+
+
+Zapping private pages from the stage 2 page tables for TDX can't be
+recovered without help from the guest (I think that's what you're
+talking about too), although technically I think this zapping step could
+be delayed right till the end.
+
+Maple tree allocations for conversion could fail, and allocations are a
+bit more complicated since we try to compact ranges with the same
+shared/private status into one same maple tree node. Still technically
+possible, maybe by updating a copy of the maple tree first, then
+swapping the current maple tree out atomically.
+
+With HugeTLB, undoing HVO needs pages to be allocated, will need more
+digging into the details to determine if preallocation could work.
+
+I'd still prefer having the option to return an error so that we don't
+paint ourselves into a corner.
+
+>> [1] https://lore.kernel.org/all/20250825181434.3340805-1-sashal@kernel.org/
+>> 
+>> 
+>> [...snip...]
+>> 
 
