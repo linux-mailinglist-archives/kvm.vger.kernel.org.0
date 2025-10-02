@@ -1,125 +1,145 @@
-Return-Path: <kvm+bounces-59443-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-59444-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id A066FBB4E5E
-	for <lists+kvm@lfdr.de>; Thu, 02 Oct 2025 20:39:17 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2A84DBB4EB5
+	for <lists+kvm@lfdr.de>; Thu, 02 Oct 2025 20:43:31 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 325F219E2DAF
-	for <lists+kvm@lfdr.de>; Thu,  2 Oct 2025 18:39:40 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D335B422D75
+	for <lists+kvm@lfdr.de>; Thu,  2 Oct 2025 18:43:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 799C0279DB5;
-	Thu,  2 Oct 2025 18:39:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C0B2327B325;
+	Thu,  2 Oct 2025 18:43:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="BiEIH/OB"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="qqO99X8y"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pj1-f73.google.com (mail-pj1-f73.google.com [209.85.216.73])
+Received: from mail-pj1-f74.google.com (mail-pj1-f74.google.com [209.85.216.74])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 22AB317A2E1
-	for <kvm@vger.kernel.org>; Thu,  2 Oct 2025 18:39:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.73
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 816A517A2E1
+	for <kvm@vger.kernel.org>; Thu,  2 Oct 2025 18:43:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.74
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1759430348; cv=none; b=Zi2C0MMQqXAfXyTKXY9X2hkcRZm4zVSNpHtRUNiXmN8DIb3Ce+VfrWrQq68lnKqH71mLxdiXZKQMjZoPmaXw0F/IUYl9ien2X0q1EqMQIYSRa3zPfsRlQIPNosmMbFZPvZJBFDXdTwQ45OowH/0/CdtfNfbNgMqXloA4ZyDiyc8=
+	t=1759430601; cv=none; b=WUL595y72UuOjQw8ArgP67cYrd4rhX3umZLoiJ1fSEfYXaSqYU0r01eoQORoBKE4VPr56MJkmnkMCtghhfgfb5yUm/OQfbmxgnNpO62864HfZqwONaDJF6nJSTA1PC7MlXi/rzYULl8zkWSgbfU9n8RorYV2KStAliFfj0NVA6U=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1759430348; c=relaxed/simple;
-	bh=G09Kpo4xTPUVEiyG22AAm1ZAbiJJ+0YFliGitufaR1g=;
+	s=arc-20240116; t=1759430601; c=relaxed/simple;
+	bh=7XyovT+QBcLHy4MPeRdMb9YVKvCLLkVo5ozVSgotKL4=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=lVMl5947NVXOdk8Jc7s/oJADoHWxmhhoVwvDLHBLZn0cn3w0byDFa7pAkI6/jMqFNF9pljelq/Qj3B7kfWwXPfzVByuAUO37BS9+tXgmi0tIDUTwf1xFh7BOTEVYy2/bjPcMzX60ar4c+470Jh5Jo81KmhaxRUteTZJqpDLMgsI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=BiEIH/OB; arc=none smtp.client-ip=209.85.216.73
+	 To:Cc:Content-Type; b=Mgexjwx+nEl2WJ8G9b1T9L2YA0c+VpWZTtLSBL8R2V97sZYcjhFVfd1li34Kz/Wpm2huiv6tE3SsNY35tgDtTcU8JfL093BnBhreth22Pj/Azm+yTt2D1vdkgil+0f2W3LndVZE/kb3lLz+pVxxkZPiPgOi1JWWvATg+E3KYoWc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=qqO99X8y; arc=none smtp.client-ip=209.85.216.74
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pj1-f73.google.com with SMTP id 98e67ed59e1d1-32ee4998c50so1329785a91.3
-        for <kvm@vger.kernel.org>; Thu, 02 Oct 2025 11:39:06 -0700 (PDT)
+Received: by mail-pj1-f74.google.com with SMTP id 98e67ed59e1d1-32ecab3865dso1868454a91.1
+        for <kvm@vger.kernel.org>; Thu, 02 Oct 2025 11:43:19 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1759430346; x=1760035146; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1759430599; x=1760035399; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=duEE5S2daxBtDzrQtu0r5VIf4FyGlLEemzqCmyOwWzI=;
-        b=BiEIH/OBSrVZYDvsKyOSgTxnTSgN8HZTuT5R6BMusTMVgJkQICuztelM0x1mgaTt4A
-         /tfRkr8W/HA9Imf0ThUw7fELjzpyxyLdYaRAy6n1IUCBgmEhkw/Ge1q/FvmN/HOLLzhL
-         T+liuJl8ZlnCCaI7rFQ6OwtsacD+Uz9VR1rIjTHoeMAI9n4v+79ZA4cUz0Z0KiBgkrlK
-         K801K2RjdXYAl4mifr0OnaJ/h+IkzHfWTy7rQ3uUZYLWj82XHUywOh7KRfEB3TTL+oeT
-         nitF7UIWLXo+0v73y9UV9ecol+MAqUqNJaW9uuBuS1j0bwiqM7ilQv36k9JlIKqf8DgK
-         1gGQ==
+        bh=BF36+HuAPUu3G3takel+0xxVXkuZOozonOLvpYNbbPY=;
+        b=qqO99X8y6qg49Wscwnp9bCnBcPS9Be231Uxq6bMjkgNvQax9ftGS9ia1cQQCGbJKeg
+         tFqyVDiRO9FoJjQZ5AJ1yjGhnv2dIxazp+Haa0hUVq2908nOTCGf+ZtBJlt9QFH2VEcr
+         ur5dx0wEL/Usa1H4oNWx8JvNFSld+o56OwEpZiqCJxJGPqYoctIgN0cSgrXVhG+oPpBd
+         qwRJss/REAsITUNIfnHt+r1qlp3lohMxhS4NvIqnZvwi1s95O/5D6ga2zDmuLyjwrZST
+         SBq/tQu3CmjcIswZpP0Qkzjgnr6oEfs4/f0C+bKFDnix5chgE25x7vg+DAaj4a9GFa2j
+         OLSw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1759430346; x=1760035146;
+        d=1e100.net; s=20230601; t=1759430599; x=1760035399;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=duEE5S2daxBtDzrQtu0r5VIf4FyGlLEemzqCmyOwWzI=;
-        b=FqTMqO4GuvOXE/fgie+eGDxpXo9aBkQUf0vym6os7FclD0vy+chKOFPUXmUDII88aZ
-         lP2Lh4WCpDcao64Bip/7BrQu3PgnqDN/07Z/7aQ/1Om1mVScd34Ucip+kfmAmL5inN3Y
-         muUG97LEtEmb8k6xRmaa2IOIPtJzWRzGmYOMxuKDR0h/wPRdJYtJIr+addKh0Pbkeuce
-         tkhJuo+f68QLcoVVJInTP0MJ58Kd6txLa3mKNAIDsjMr3HcJ2t11scPdR30NKKi02lIp
-         LX0UArdNZFPXDLxRiWvJwLjblpt1GUIQN/ZXi6eBQ3xDdgQQvfJn+GlKXuNtPRWZ8kGA
-         eIOw==
-X-Forwarded-Encrypted: i=1; AJvYcCWhpGT1eJYVq9QXfyBGr7UPGsNL1FJmPi20JkUrcveoEo+AwwtehhFva0H3A79Nqd6JsTY=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzkB49YcxzKQpkb5RwCWRpTdzr8RfBM4u+ofnFK8gtgWOigF5ym
-	WboZYhjuZ0Q3M8O1gDsWNDPg/vpwGmN4YYjuBoLScAXVYQMg5qArVec2mILt7LJU8IhBiIPVfIE
-	55oJjoA==
-X-Google-Smtp-Source: AGHT+IEFL9bqgbP8tD63/vZT6rn/5qVLAEV3U7x2zSmWmIO2mCnwPRYoP1fhIFqrQuodI6f+gnNPUZpWXpc=
-X-Received: from pjbgb10.prod.google.com ([2002:a17:90b:60a:b0:325:220a:dd41])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:1642:b0:32d:601d:f718
- with SMTP id 98e67ed59e1d1-339c27d3eacmr345300a91.31.1759430346442; Thu, 02
- Oct 2025 11:39:06 -0700 (PDT)
-Date: Thu, 2 Oct 2025 11:39:05 -0700
-In-Reply-To: <aN6hwNUa3Kh08yog@sirena.org.uk>
+        bh=BF36+HuAPUu3G3takel+0xxVXkuZOozonOLvpYNbbPY=;
+        b=wIoeWo6hLgAZR0zsG5TyWrMmHmdUr6h/OSi/hRjsQ/CS5LphwCLP+7W5WbcT+1Ck7B
+         r9N7Dh5wZ3GBIj3DazCeyeJH/Xr1zRMPJQjnOEQKk3GyB9sMNki/Zz33Mp441QxovUy1
+         pEv+TIs40y5N5rts42PZSJHGdH+4TcbGfuoMIq++EOWJF7s5jB/PBbkaaoF/UTdMGg5b
+         b/hKq0zAWieA/l9oejpWdTy513BjN+nmx03Saw4ndoPq70CzEP44ys9NiWH21WfbuQgP
+         Cay0Exg0vxtnMk3OhPs1kuv0MTXin/cbN+vT6HzDUt8XxQzuM0I4vdq2+mgswRIHS4mh
+         kDDA==
+X-Gm-Message-State: AOJu0YwE+Bp8LyBJ6SQWLE0I+0pgkRuloJgWAAOHnhZrutCL05ZXUV8n
+	N/j8YkE0PA9aQSh49rQPdoD5L0hxmKl55D4uVwEBti/xHoIwR5lwyFX/kSiE7v9JspR8AU+4WR2
+	sLdTQPA==
+X-Google-Smtp-Source: AGHT+IHzKP+mkTV9r2F6im0ZZKYHqqWZ0dx4/6eJaCqR+H+7NxXGm68uyuJOAHQ9Qymj9O+tm0fETNVF/Vk=
+X-Received: from pjre16.prod.google.com ([2002:a17:90a:b390:b0:330:a006:a384])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:4a8c:b0:32b:cb05:849a
+ with SMTP id 98e67ed59e1d1-339c27bc475mr438569a91.29.1759430598389; Thu, 02
+ Oct 2025 11:43:18 -0700 (PDT)
+Date: Thu, 2 Oct 2025 11:43:16 -0700
+In-Reply-To: <09e75529c3f844b1bb4dd5a096ed4160905fca7f.1747264138.git.ackerleytng@google.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
-References: <aN6hwNUa3Kh08yog@sirena.org.uk>
-Message-ID: <aN7GyQU6q8fKsJ7J@google.com>
-Subject: Re: linux-next: manual merge of the kvm tree with the origin tree
+References: <cover.1747264138.git.ackerleytng@google.com> <09e75529c3f844b1bb4dd5a096ed4160905fca7f.1747264138.git.ackerleytng@google.com>
+Message-ID: <aN7HxBgFwm2B7Cv3@google.com>
+Subject: Re: [RFC PATCH v2 11/51] KVM: selftests: Allow cleanup of ucall_pool
+ from host
 From: Sean Christopherson <seanjc@google.com>
-To: Mark Brown <broonie@kernel.org>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, KVM <kvm@vger.kernel.org>, 
-	Babu Moger <babu.moger@amd.com>, Borislav Petkov <bp@alien8.de>, 
-	Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, 
-	Linux Next Mailing List <linux-next@vger.kernel.org>, Xin Li <xin@zytor.com>
+To: Ackerley Tng <ackerleytng@google.com>
+Cc: kvm@vger.kernel.org, linux-mm@kvack.org, linux-kernel@vger.kernel.org, 
+	x86@kernel.org, linux-fsdevel@vger.kernel.org, aik@amd.com, 
+	ajones@ventanamicro.com, akpm@linux-foundation.org, amoorthy@google.com, 
+	anthony.yznaga@oracle.com, anup@brainfault.org, aou@eecs.berkeley.edu, 
+	bfoster@redhat.com, binbin.wu@linux.intel.com, brauner@kernel.org, 
+	catalin.marinas@arm.com, chao.p.peng@intel.com, chenhuacai@kernel.org, 
+	dave.hansen@intel.com, david@redhat.com, dmatlack@google.com, 
+	dwmw@amazon.co.uk, erdemaktas@google.com, fan.du@intel.com, fvdl@google.com, 
+	graf@amazon.com, haibo1.xu@intel.com, hch@infradead.org, hughd@google.com, 
+	ira.weiny@intel.com, isaku.yamahata@intel.com, jack@suse.cz, 
+	james.morse@arm.com, jarkko@kernel.org, jgg@ziepe.ca, jgowans@amazon.com, 
+	jhubbard@nvidia.com, jroedel@suse.de, jthoughton@google.com, 
+	jun.miao@intel.com, kai.huang@intel.com, keirf@google.com, 
+	kent.overstreet@linux.dev, kirill.shutemov@intel.com, liam.merwick@oracle.com, 
+	maciej.wieczor-retman@intel.com, mail@maciej.szmigiero.name, maz@kernel.org, 
+	mic@digikod.net, michael.roth@amd.com, mpe@ellerman.id.au, 
+	muchun.song@linux.dev, nikunj@amd.com, nsaenz@amazon.es, 
+	oliver.upton@linux.dev, palmer@dabbelt.com, pankaj.gupta@amd.com, 
+	paul.walmsley@sifive.com, pbonzini@redhat.com, pdurrant@amazon.co.uk, 
+	peterx@redhat.com, pgonda@google.com, pvorel@suse.cz, qperret@google.com, 
+	quic_cvanscha@quicinc.com, quic_eberman@quicinc.com, 
+	quic_mnalajal@quicinc.com, quic_pderrin@quicinc.com, quic_pheragu@quicinc.com, 
+	quic_svaddagi@quicinc.com, quic_tsoni@quicinc.com, richard.weiyang@gmail.com, 
+	rick.p.edgecombe@intel.com, rientjes@google.com, roypat@amazon.co.uk, 
+	rppt@kernel.org, shuah@kernel.org, steven.price@arm.com, 
+	steven.sistare@oracle.com, suzuki.poulose@arm.com, tabba@google.com, 
+	thomas.lendacky@amd.com, usama.arif@bytedance.com, vannapurve@google.com, 
+	vbabka@suse.cz, viro@zeniv.linux.org.uk, vkuznets@redhat.com, 
+	wei.w.wang@intel.com, will@kernel.org, willy@infradead.org, 
+	xiaoyao.li@intel.com, yan.y.zhao@intel.com, yilun.xu@intel.com, 
+	yuzenghui@huawei.com, zhiquan1.li@intel.com
 Content-Type: text/plain; charset="us-ascii"
 
-On Thu, Oct 02, 2025, Mark Brown wrote:
-> Hi all,
+On Wed, May 14, 2025, Ackerley Tng wrote:
+> Many selftests use GUEST_DONE() to signal the end of guest code, which
+> is handled in userspace. In most tests, the test exits and there is no
+> need to clean up the ucall_pool->in_use bitmap.
 > 
-> Today's linux-next merge of the kvm tree got a conflict in:
+> If there are many guest code functions using GUEST_DONE(), or of guest
+> code functions are run many times, the ucall_pool->in_use bitmap will
+> fill up, causing later runs of the same guest code function to fail.
 > 
->   arch/x86/include/asm/cpufeatures.h
-> 
-> between commit:
-> 
->   e19c06219985f ("x86/cpufeatures: Add support for Assignable Bandwidth Monitoring Counters (ABMC)")
-> 
-> from the origin tree and commit:
-> 
->   3c7cb84145336 ("x86/cpufeatures: Add a CPU feature bit for MSR immediate form instructions")
-> 
-> from the kvm tree.
-> 
-> I fixed it up (see below) and can carry the fix as necessary. This
-> is now fixed as far as linux-next is concerned, but any non trivial
-> conflicts should be mentioned to your upstream maintainer when your tree
-> is submitted for merging.  You may also want to consider cooperating
-> with the maintainer of the conflicting tree to minimise any particularly
-> complex conflicts.
-> 
-> diff --cc arch/x86/include/asm/cpufeatures.h
-> index b2a562217d3ff,f1a9f40622cdc..0000000000000
-> --- a/arch/x86/include/asm/cpufeatures.h
-> +++ b/arch/x86/include/asm/cpufeatures.h
-> @@@ -496,7 -497,7 +497,8 @@@
->   #define X86_FEATURE_TSA_L1_NO		(21*32+12) /* AMD CPU not vulnerable to TSA-L1 */
->   #define X86_FEATURE_CLEAR_CPU_BUF_VM	(21*32+13) /* Clear CPU buffers using VERW before VMRUN */
->   #define X86_FEATURE_IBPB_EXIT_TO_USER	(21*32+14) /* Use IBPB on exit-to-userspace, see VMSCAPE bug */
->  -#define X86_FEATURE_MSR_IMM		(21*32+15) /* MSR immediate form instructions */
->  +#define X86_FEATURE_ABMC		(21*32+15) /* Assignable Bandwidth Monitoring Counters */
-> ++#define X86_FEATURE_MSR_IMM		(21*32+16) /* MSR immediate form instructions */
+> This patch allows ucall_free() to be called from userspace on uc.hva,
+> which will unset and free the correct struct ucall in the pool,
+> allowing ucalls to continue being used.
 
-Just in case anyone else is starled by the change in bit number, these are
-synthetic (or scattered) flags, i.e. the the bit number is arbitrary and not
-tied to hardware.
+NAK.
+
+The ucall thing isn't an issue with GUEST_DONE(), it's a general issue with not
+completing a ucall.  The simple answer here is to not abuse GUEST_xxx().
+
+I tried doing the same thing (jumping back to a guest's entry point) in what is
+now the mmu_stress_test, and it didn't end well.  Restoring just registers mostly
+works on x86, but it's not foolproof even there.  And on other architectures, the
+approach is even less viable (IIRC).  E.g. if the guest code touches *anything*
+that's not saved/restore, the test is hosed.
+
+In short, while clever, the approach just doesn't work. Which is why I don't want
+ucall_free() to exist: it's only useful for a pattern that is deeply flawed.
+
+The easiest alternative is to use GUEST_SYNC(), have the guest code loop, and
+use global variables to pass data.  It's ugly, but it works and is much less likely
+to have arch specific quirks.   The worst of the ugliness can be mitigated by
+using a struct to pass info, e.g. so that you only have to do one "sync global"
+call.
 
