@@ -1,192 +1,163 @@
-Return-Path: <kvm+bounces-59454-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-59455-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
-	by mail.lfdr.de (Postfix) with ESMTPS id 571ABBB5FCA
-	for <lists+kvm@lfdr.de>; Fri, 03 Oct 2025 08:39:47 +0200 (CEST)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
+	by mail.lfdr.de (Postfix) with ESMTPS id B497EBB6EEC
+	for <lists+kvm@lfdr.de>; Fri, 03 Oct 2025 15:15:22 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 45E414E18C2
-	for <lists+kvm@lfdr.de>; Fri,  3 Oct 2025 06:39:46 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 0E16A4EC86D
+	for <lists+kvm@lfdr.de>; Fri,  3 Oct 2025 13:14:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DB66B212F89;
-	Fri,  3 Oct 2025 06:39:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 96A0C2F3630;
+	Fri,  3 Oct 2025 13:09:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="zSQupMJu"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="NwzR6ij7"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pl1-f175.google.com (mail-pl1-f175.google.com [209.85.214.175])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8B07F19258E
-	for <kvm@vger.kernel.org>; Fri,  3 Oct 2025 06:39:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.175
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 07D502F0687
+	for <kvm@vger.kernel.org>; Fri,  3 Oct 2025 13:09:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1759473579; cv=none; b=Ric2cMX12UVlL+XhWiKnRDYTTvLhPl3FwNtrQVoco5C8rSZff3dXxlgC8xuQh5twHsCVdYSx6AuY/PhjYP0uZjkCOXESZZ0ywAMRQAd2XQOg/Bsapu1MoOZhDkSEMANAOEwXW+A9+Bj1/Se/I/YGoRq0dHCg2QjAQLUXALOupNw=
+	t=1759496976; cv=none; b=u1dm2uJEHB3sNoH4/5KkWJ5AVdB4RSJjVhzkHSiIIyXRXatAH8f8jry3yYgVaKqhYfr8oEQ7kJHo/Myi5+97W2ie8MMTEe5uVtVUMmwF3zWIiA4HtL/vwaHlFYeNyD/m63otINMpU6sQH7gNCiAvb4W5lNEXLTrV1LGjO3wJWsc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1759473579; c=relaxed/simple;
-	bh=LX/Y9FMJvTjkJ9jsE2wR6/osViFePVkZkwtJLD4RsZ4=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=M0liQArpGcjymqa+9P8aWKq+B4h9GHHKYQqEC0EA3OmVL644fDFNGqCKc4hs7pctzi9b4xrAfOdY9KEJFPi082vPa6TsGIzdMmnAevwKadXqiZ2AzgYBRnuDJG7IQv0qaPJjCgJjy5cfzkP47JD+yqD6aXTfAYntwAxrQFnH3Bo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=zSQupMJu; arc=none smtp.client-ip=209.85.214.175
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-pl1-f175.google.com with SMTP id d9443c01a7336-27d67abd215so147325ad.0
-        for <kvm@vger.kernel.org>; Thu, 02 Oct 2025 23:39:37 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1759473577; x=1760078377; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=7NUJR+0x4Extu7PhnW8nn0TsoPMkUfDkUjklFIsZ2dE=;
-        b=zSQupMJudXgotq2lJXfnBjSUaTNfZqnjmWxQmYX7giUj5INoEKKxyb5NuAPEKVtMDW
-         GIR9pXrlfS6JbNLSASUsYPuOl9XvLx6V7QKHO51cLHYcs52Q7IE/Q696it0GY1E4wsVO
-         a61eswufM0B+1bH1B6k7Xn5dSmcSM6WacDQT8SA4H31P/XJQy7eeHNCHZry52Mx/NGF4
-         JXr96wgRtX84EMtLERT3WJYRNWLElJadX5Y03C0XBP73goxufgIIX1S65ssGB/Dhhn1o
-         f+OhpJzaFyQzV8QD+cyAzD/lgff3bfpmKi2G8r9RSgICezgaUjNZFa+pyCAuZ6Ig+gIf
-         oLXg==
+	s=arc-20240116; t=1759496976; c=relaxed/simple;
+	bh=0Xw4OrpjWdDORDcldR9v9bzLrfr0F1CBruVxe1CW9mY=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=aFWUhJUaawM7YzqPlK3ljzTZkFYRRLW0sZBmSxlqlB8JjWeiJabNpod7q64Q+NMnWAo4N0EL5v6xkq4Im8kgUGv0Eh1Pa7JBzbqTK9huNMmtLN6+EVy81VpjY14yVaZ33qUSrhZ/h2AvpzfCDEc6wk5YYakXKD//lzCljie0I9U=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=NwzR6ij7; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1759496973;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=Eg6B+28DeYgN6XdKeJOVznWh4ZfZPQPBD7mqFN84nc8=;
+	b=NwzR6ij7Nw4SI9cN6alPYmXFyhnnriAazQ1v8M1cPCiJTv6JtH9CXO212epqkWDjflvaoQ
+	APDMa2hRhaBE+WVUuSmtMGzd+Qtb6bw34zRF2TWMuBxQgzXV83Uxp1UScarwZi4oRJXrNz
+	Teol03UjoQ6TFmIU4ftRGHo0F3FOiVs=
+Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
+ [209.85.221.69]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-394-b6LUFOGLMp6tk2Rp2Ji0qA-1; Fri, 03 Oct 2025 09:09:30 -0400
+X-MC-Unique: b6LUFOGLMp6tk2Rp2Ji0qA-1
+X-Mimecast-MFC-AGG-ID: b6LUFOGLMp6tk2Rp2Ji0qA_1759496969
+Received: by mail-wr1-f69.google.com with SMTP id ffacd0b85a97d-3ecdf7b5c46so1064303f8f.2
+        for <kvm@vger.kernel.org>; Fri, 03 Oct 2025 06:09:30 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1759473577; x=1760078377;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=7NUJR+0x4Extu7PhnW8nn0TsoPMkUfDkUjklFIsZ2dE=;
-        b=Bedj/T/5NdqX6FyZW6UKnlaKj6vwE2W8RGXTyh2W7Jck4bYGct5RwmJFL5cShjQaR1
-         PHdyn8rtNIAfrWiMrxRY0/paHoGWGRUSFtXJEBYTJ7EmvIVF4t/pMjeS2LN4icb3sIQM
-         n+4WXLnBVMG+bw+OJqRRjO7UkZgGZE6lXwW+jKINzI5x/CSBXcAPILF1ydtwYp29alDk
-         pdYiSMl/2bE860ARpQxBPbZtdG96kY/LGoeJIdpdr7LYvoEbuJKMKxxWqOrj2Y1TLa5i
-         P8HZUpII4ZeBZf3YGy3634pRMhcAhI/P1KfNow8DPyWZabRP9FF97NLRpLY4IL6ygKuq
-         7R9g==
-X-Gm-Message-State: AOJu0Yxu00m8k4V32kMFv9cc1+CSnfYDdH9vzNdygE/9FMTVvSPqByZV
-	Geycv5DNCJQZ98+/2CMjkkL++tM1WO68ahV2HlpwwopiPu/PVLvtY09C1n5vkGAWNQ==
-X-Gm-Gg: ASbGnctgJ2o1agWJmHnJYitQdd+Mob+fywEluzvjjebnCdm0P84qu1XJHV3w4M1vyVA
-	KE2oI/WJ6ssMcJQlVm6yO3g1ZiarHB3NebVIqDCEHNoNJ/yLekO3pRAlXQSdysnH/QeqpaNI1yo
-	LXO615u7bJR0PFcGcPcbne9O7ukCjxft6NdUg7w3or6eXPHo8Jffye9qnabIIPMX8HEC8KW8ccU
-	ksdK7FhJaEC7LBrh5wAN0zNte7MxCeSXVuAMD2nkjzfcuucFkLeOBu6lEt6wmRN3gWO/lNB7e1V
-	nIyaATG8kJoLHCqFkXE7hKKLf0NPLxoMio8GxN5FM/zbl3mQsOoWwF3xqGtQNgVAzBJ9l5UiDw0
-	blj6hYawEtQPTBseHOTKRk366d1I+iFhH6t0L5/eyEFC9FiuN7pztJVd/GZ2PZpRhKV9vFSMGTl
-	1mPJl3icSFDsC73A==
-X-Google-Smtp-Source: AGHT+IF225ruxuMkKqMzIY2DU6axi9BegMmyzKVEb8CRf18y/aWsRDvWSU7iRPoYcjDxe3FPYwAwQQ==
-X-Received: by 2002:a17:903:3c2e:b0:268:cc5:5e44 with SMTP id d9443c01a7336-28e9a558cd2mr2630335ad.6.1759473576553;
-        Thu, 02 Oct 2025 23:39:36 -0700 (PDT)
-Received: from google.com (176.13.105.34.bc.googleusercontent.com. [34.105.13.176])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-28e8d1ba024sm39044885ad.68.2025.10.02.23.39.35
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 02 Oct 2025 23:39:35 -0700 (PDT)
-Date: Thu, 2 Oct 2025 23:39:31 -0700
-From: Vipin Sharma <vipinsh@google.com>
-To: Marc Zyngier <maz@kernel.org>
-Cc: kvm@vger.kernel.org, kvmarm@lists.linux.dev,
-	kvm-riscv@lists.infradead.org, seanjc@google.com,
-	pbonzini@redhat.com, borntraeger@linux.ibm.com,
-	frankja@linux.ibm.com, imbrenda@linux.ibm.com, anup@brainfault.org,
-	atish.patra@linux.dev, zhaotianrui@loongson.cn, maobibo@loongson.cn,
-	chenhuacai@kernel.org, oliver.upton@linux.dev,
-	ajones@ventanamicro.com
-Subject: Re: [PATCH v3 9/9] KVM: selftests: Provide README.rst for KVM
- selftests runner
-Message-ID: <20251003063931.GA1130776.vipinsh@google.com>
-References: <20250930163635.4035866-1-vipinsh@google.com>
- <20250930163635.4035866-10-vipinsh@google.com>
- <86qzvnypsp.wl-maz@kernel.org>
- <20251001173225.GA420255.vipinsh@google.com>
- <86a529z7qh.wl-maz@kernel.org>
+        d=1e100.net; s=20230601; t=1759496969; x=1760101769;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=Eg6B+28DeYgN6XdKeJOVznWh4ZfZPQPBD7mqFN84nc8=;
+        b=GoJ+G8wwTYWFZn1NR0KpkR36T6lZh4wS+pl/MkUAvXR3nOurIxrP2ku/ljVmqkqv+p
+         UKxStQF5AfK/oLO+7vsBp4AkAuc9b+/krDtDbDcdYUAkX4xWUdpyBjtdkZfLOsO0Rnzp
+         CmX+VpPPYa/hq4gNM6ShgoPMFWr8Nu98CwYReT7gPuQ+0OQnOuw7+rTKPl2bC96eZfMT
+         wrjaJWywuOAMXKCmtk4B79YTzGcTjwlB/Bl0+peRnrYiS0NaBiKSMHIOxj/XMxPDg2/3
+         U6DMTRo69nCE58B2t/Ze+O7srO2Wd5G1uH/0inkLaKmt63Yn1zG71fNweeC/s4Pz2rNk
+         9xWw==
+X-Forwarded-Encrypted: i=1; AJvYcCVfa8f9Ne6LvOSjUzSNn8jncGHsDn6m3WqXz7vp0RbMfm3Ic+HuuIxJC93qivcIaPN23ls=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyHOP0C8aPXnNzvw1A2ZBRse43CvP+CEDoSl/htGCyTHRxD3hfX
+	AC+afly+Yyyqr2h28ACxkhB9AzJg5CPT+V21Y9qZx7fcWrBLqop4R9mAI7+AIohm4xobQqV8pV6
+	vuQ480aIelCFThJqAXM0OXWja7ZfFBzdtymRU4URx35yFlOw99RXYLGPAaWyQOWIuj+opJQsDj/
+	oTNczgjsX0cv/IZ5MLE6TabZ21abzE
+X-Gm-Gg: ASbGncskI2jOQn6u3XXb63QaIPohWOSZcJOtjonwinRn8lu6YJQF0PaHFWyxlW0g6XC
+	hrPMdpvHmLH/Ku451hYxB5LimxfTCvywxIITyxWR/2hGI4QZeSlFeVv4pBrKF+TsxN3fQL4Fq1D
+	rJYIIV8l8G+hO6skt6iXNWsmwarYtW01FrQqSeaoTLxheFS0GWYcoTDb1x8ZyyzNy2kA2eG9Uwk
+	E8Lbrf53Z62bdTjDYY8oGY+TduHZQ==
+X-Received: by 2002:a05:6000:2583:b0:407:23f7:51 with SMTP id ffacd0b85a97d-42567139c92mr1640649f8f.1.1759496969105;
+        Fri, 03 Oct 2025 06:09:29 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IFzAenVtcphcMGAWHYvO2v3kNfpOU2vJxj0QqILnulExcDPJNr8MPCwAVl6rlHmLadXK2j/bt5MbGd1fhqTEe8=
+X-Received: by 2002:a05:6000:2583:b0:407:23f7:51 with SMTP id
+ ffacd0b85a97d-42567139c92mr1640625f8f.1.1759496968712; Fri, 03 Oct 2025
+ 06:09:28 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <86a529z7qh.wl-maz@kernel.org>
+References: <20250901160930.1785244-1-pbonzini@redhat.com>
+In-Reply-To: <20250901160930.1785244-1-pbonzini@redhat.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Date: Fri, 3 Oct 2025 15:09:17 +0200
+X-Gm-Features: AS18NWAANVc028IrEWCYH8_s3j0p7D-JkOKS1W3aZhhlnuZ_7HZRUQfOviWSiqM
+Message-ID: <CABgObfb0Qc3hdXTmZvOykxuR+7RZ4vRUBpm8M84UmHgjwx7BCA@mail.gmail.com>
+Subject: Re: [PATCH v8 0/7] TDX host: kexec/kdump support
+To: linux-kernel@vger.kernel.org, kvm@vger.kernel.org, dave.hansen@intel.com
+Cc: bp@alien8.de, tglx@linutronix.de, peterz@infradead.org, mingo@redhat.com, 
+	hpa@zytor.com, thomas.lendacky@amd.com, x86@kernel.org, kas@kernel.org, 
+	rick.p.edgecombe@intel.com, dwmw@amazon.co.uk, kai.huang@intel.com, 
+	seanjc@google.com, reinette.chatre@intel.com, isaku.yamahata@intel.com, 
+	dan.j.williams@intel.com, ashish.kalra@amd.com, nik.borisov@suse.com, 
+	chao.gao@intel.com, sagis@google.com, farrah.chen@intel.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On 2025-10-02 15:41:26, Marc Zyngier wrote:
-> On Wed, 01 Oct 2025 18:32:25 +0100,
-> Vipin Sharma <vipinsh@google.com> wrote:
-> > 
-> > On 2025-10-01 09:44:22, Marc Zyngier wrote:
-> > 
-> > > > +in `default.test` files. Each KVM selftest will have a directory in  which
-> > > > +`default.test` file will be created with executable path relative to KVM
-> > > > +selftest root directory i.e. `/tools/testing/selftests/kvm`.
-> > > 
-> > > Shouldn't this honor the existing build output directives? If it
-> > > actually does, then you want to call this out.
-> > > 
-> > 
-> > To generate default test files in a specific directory one can use
-> > "OUTPUT" in the make command
-> 
-> The standard way to do this is documented in the top level Makefile:
-> 
-> <quote>
-> # This does not need to match to the root of the kernel source tree.
-> #
-> # For example, you can do this:
-> #
-> #  cd /dir/to/store/output/files; make -f /dir/to/kernel/source/Makefile
-> #
-> # If you want to save output files in a different location, there are
-> # two syntaxes to specify it.
-> #
-> # 1) O=
-> # Use "make O=dir/to/store/output/files/"
-> #
-> # 2) Set KBUILD_OUTPUT
-> # Set the environment variable KBUILD_OUTPUT to point to the output directory.
-> # export KBUILD_OUTPUT=dir/to/store/output/files/; make
-> #
-> # The O= assignment takes precedence over the KBUILD_OUTPUT environment
-> # variable.
-> </quote>
-> 
-> Your new infrastructure should support the existing mechanism (and
-> avoid introducing a new one).
-> 
+Hi Dave and others,
 
-Options "O" and "KBUILD_OUTPUT" are not supported by KVM makefile. I
-tried running below commands in KVM selftest directory
+any reason why this series was not pulled into 6.18? I was a bit
+surprised not to see it...
 
-  make O=~/some/dir
-  make KBUILD_OUTPUT=~/some/dir
+Thanks,
 
-Both of the command generate output in the KVM selftest directory. So,
-my new Makefile rule "tests_install" is behaving as per the current KVM
-behavior.
+Paolo
 
-However, building through kselftest Makefile do support "O" and
-"KBUILD_OUTPUT". For example, if we are in kernel root directory,
+On Mon, Sep 1, 2025 at 6:09=E2=80=AFPM Paolo Bonzini <pbonzini@redhat.com> =
+wrote:
+>
+> Currently kexec() support and TDX host are muturally exclusive in the
+> Kconfig.  This series adds the TDX host kexec support so that they can
+> be both enabled in Kconfig.
+>
+> With this series, the user can kexec (including crash kdump) to the new
+> kernel at any time regardless of whether TDX has been enabled in the
+> first kernel.  One limitation is if the first kernel has ever enabled
+> TDX, for now the second kernel cannot use TDX.  This is the future work
+> in my TODO list.
+>
+> This series should go in through the tip tree.
+>
+> Thanks,
+>
+> Paolo
+>
+> v7->v8: stub out the new code when kexec is not enabled in the kernel.
+>         Of course even the smallest code change is subject to bikesheddin=
+g,
+>         and I chose my preferred color for the bikeshed.  But it's pastel
+>         green and I'm sure you'll agree that it's beautiful.
+>
+>
+> Kai Huang (7):
+>   x86/kexec: Consolidate relocate_kernel() function parameters
+>   x86/sme: Use percpu boolean to control WBINVD during kexec
+>   x86/virt/tdx: Mark memory cache state incoherent when making SEAMCALL
+>   x86/kexec: Disable kexec/kdump on platforms with TDX partial write
+>     erratum
+>   x86/virt/tdx: Remove the !KEXEC_CORE dependency
+>   x86/virt/tdx: Update the kexec section in the TDX documentation
+>   KVM: TDX: Explicitly do WBINVD when no more TDX SEAMCALLs
+>
+>  Documentation/arch/x86/tdx.rst       | 14 ++++-----
+>  arch/x86/Kconfig                     |  1 -
+>  arch/x86/include/asm/kexec.h         | 12 ++++++--
+>  arch/x86/include/asm/processor.h     |  2 ++
+>  arch/x86/include/asm/tdx.h           | 31 +++++++++++++++++++-
+>  arch/x86/kernel/cpu/amd.c            | 17 +++++++++++
+>  arch/x86/kernel/machine_kexec_64.c   | 44 ++++++++++++++++++++++------
+>  arch/x86/kernel/process.c            | 24 +++++++--------
+>  arch/x86/kernel/relocate_kernel_64.S | 36 +++++++++++++++--------
+>  arch/x86/kvm/vmx/tdx.c               | 10 +++++++
+>  arch/x86/virt/vmx/tdx/tdx.c          | 23 +++++++++++++--
+>  11 files changed, 167 insertions(+), 47 deletions(-)
+>
+> --
+> 2.51.0
 
-  make O=~/some/dir -C tools/testing/selftests TARGETS=kvm
-
-now output binaries will be generated in ~/some/dir. To make testcases
-also be generated in the output directory below change is needed. 
-
-diff --git a/tools/testing/selftests/kvm/Makefile.kvm b/tools/testing/selftests/kvm/Makefile.kvm
-index 6bb63f88c0e6..a2b5c064d3a3 100644
---- a/tools/testing/selftests/kvm/Makefile.kvm
-+++ b/tools/testing/selftests/kvm/Makefile.kvm
-@@ -1,7 +1,7 @@
- # SPDX-License-Identifier: GPL-2.0-only
- include ../../../build/Build.include
- 
--all:
-+all: tests_install
- 
- LIBKVM += lib/assert.c
- LIBKVM += lib/elf.c
-@@ -358,4 +358,7 @@ tests_install:
-        $(foreach tc, $(list_progs), \
-                $(shell echo $(tc) > $(patsubst %,$(OUTPUT)/$(DEFAULT_TESTCASES)/%/default.test,$(tc))))
- 
-+       @if [ ! -d $(OUTPUT)/runner ]; then             \
-+               cp -r $(selfdir)/kvm/runner $(OUTPUT);  \
-+       fi
-        @:
-
-Since testcases by themselves will not be useful, I have updated the
-rule in the above diff to copy runner code as well to the output directory.
-
-I think this brings my changes to honor existing build output
-directives. Let me know if this needs some fixes.
 
