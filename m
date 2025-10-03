@@ -1,81 +1,80 @@
-Return-Path: <kvm+bounces-59465-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-59466-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
-	by mail.lfdr.de (Postfix) with ESMTPS id CFDCBBB7739
-	for <lists+kvm@lfdr.de>; Fri, 03 Oct 2025 18:06:35 +0200 (CEST)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
+	by mail.lfdr.de (Postfix) with ESMTPS id EE12CBB77E5
+	for <lists+kvm@lfdr.de>; Fri, 03 Oct 2025 18:11:27 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 7B2ED4ED517
-	for <lists+kvm@lfdr.de>; Fri,  3 Oct 2025 16:06:18 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id B356E4ED9ED
+	for <lists+kvm@lfdr.de>; Fri,  3 Oct 2025 16:11:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id ABB9A2BE7AC;
-	Fri,  3 Oct 2025 16:06:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B02572BE05B;
+	Fri,  3 Oct 2025 16:11:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="PxPRkymo"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="TJFydeTr"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pf1-f202.google.com (mail-pf1-f202.google.com [209.85.210.202])
+Received: from mail-pl1-f202.google.com (mail-pl1-f202.google.com [209.85.214.202])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4C7322BD00C
-	for <kvm@vger.kernel.org>; Fri,  3 Oct 2025 16:05:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8F18526E6FA
+	for <kvm@vger.kernel.org>; Fri,  3 Oct 2025 16:11:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1759507560; cv=none; b=KLEWd0w9AusNPGbHgy4qIZTL+J7MRKvko31D7HYOaxvCCRgQY88wb3ZZtGg/7+5h490jrsw7QD1c5dijFs3aAirDjyfhSizmBV3TUwDZjP7mlGS0xxkh6ymtAUb+2v+qI9QM+J2pJVkW+3jrYzsmcaHoCFfu86Bk/ow28XY7IcY=
+	t=1759507864; cv=none; b=YNnH7xuNkO4omlvzT1hj8hz8RGWwn49XJpNrQvJ5uQ2bRclfftP087I48c5CimD/DiaMIjeWen8alFoM2GJx7M6VNFkQHNrsWzANqhdb7bZkukBUqJnFoxCX8DFWjWJGdHiUDxSfZ4V7cO7zoTdiu/H6gOypa3p0pYO5PsJ2xxA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1759507560; c=relaxed/simple;
-	bh=DTBd9BA1usFwsidcGi2Him6mYDP+NXsirmy/wzo3TNc=;
+	s=arc-20240116; t=1759507864; c=relaxed/simple;
+	bh=PZQha7RBk24SP6qwyggJkFay7mNZRHmPQnH5kdOnMRw=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=XIN6hcOeqUwEUMI8+OpEtTDLcKpuBcQ5wAsF4Gob+D63CzruTPlAeFDjrNqoufg5lt7jEdcvYJVfVWOOelpPtBjJht96oGiIMhX5P/rmoISZrFzMRpQSwurkUUIiWZLlknPq290GTmlAWyEFwPpD+TYfUkH0RfCXJ2HqMtjzWqw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=PxPRkymo; arc=none smtp.client-ip=209.85.210.202
+	 To:Cc:Content-Type; b=WhGANp9ncI8owIrgbrPhxbh0IYezntWQD0zzFI7i//9KE7Rl7ICmSlwblPcmPWzO7Gu7l7cJtwhsreJ32vSy6lfAeLP5lTrscel7YM6YIWAbZqeoyqJde7NSgLisEZWtgnxrXAOp3ZauNdxySakFP8wdJRuFdEiHV6eisGaz1kU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=TJFydeTr; arc=none smtp.client-ip=209.85.214.202
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pf1-f202.google.com with SMTP id d2e1a72fcca58-77f5e6a324fso3921429b3a.0
-        for <kvm@vger.kernel.org>; Fri, 03 Oct 2025 09:05:59 -0700 (PDT)
+Received: by mail-pl1-f202.google.com with SMTP id d9443c01a7336-2699ed6d43dso25079105ad.1
+        for <kvm@vger.kernel.org>; Fri, 03 Oct 2025 09:11:03 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1759507559; x=1760112359; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1759507863; x=1760112663; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=Rr9Zgpsr/95Zre8MDjbJaLg4HUOz/eRCvS4su6KFtWM=;
-        b=PxPRkymolx7gOqlpYtTASk6OrDG6NSjHhBprkdzdQOeWDj4emw400t/npBbLGlrUGr
-         WhEw6ySe7rOh2SGvUtDScizbL4RJPtQ4Qamjc0ARY4fvbfhpGN112k2qg3OtyHAAuInG
-         AY6WrQFu/2LQgHdRz3KDlpiSEXbaA/LK969+ke13KinIAjeR1I/gwrjatfPKOPQJ8yy+
-         0OnFo2+MsCynUmO/f8K6qzRGNvbFZKDhLchqJwdgN9kUbePWdjrRn9mR+nJjePTA8DKc
-         Z9U2NxTLi0AAYG2iu1JSTyJo2a48XAV8EZDwneGt8pGwRn3OLwdLz4CxFZOUflCR7BCR
-         CVuQ==
+        bh=lNh2mX9a3msgEQw2OsPB0rXj0BKWzfoqoJiUnuGpBLY=;
+        b=TJFydeTr+mFmSPqZErGU6IftQjd3w61WHvoph4LINqFGKN+RgOsmJcLkdLBwm6DXrQ
+         CicN7vqVJePkbThYz5ndDKqrhcWBQhgGJo4bDQ/ru2UDzrzF5Qca9QsTKvNHNN1fxuft
+         Aiw3zoIVX5AYszvM2skCACMa4uQYaBmW5G7bHNNBNzgYYJCSjpG5dABY8azpqLc63P8I
+         MRKWxxCUP9txgK5oLmtHuk1gkE9CKBsMgI4COK2m90h1HlKwJD2fYVR9EpIobydPy9Gf
+         5celyMoVpgTzKr8hgn6wss1J2cs2+OeJzg0TNqXzPCqWVKN0XPFDm4bPGHpHJk/DEMzz
+         0DHg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1759507559; x=1760112359;
+        d=1e100.net; s=20230601; t=1759507863; x=1760112663;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=Rr9Zgpsr/95Zre8MDjbJaLg4HUOz/eRCvS4su6KFtWM=;
-        b=cCmybmlsLiCFxNQY4Ju6VXMKX551eVLISq8Pd/2FxST3pYvi3XCNUwRof1rcf8Tqno
-         1K0PKGklnvYA0JCOpimzDBPqXuWFYfBwlkbubNTAAO3Pt174W8xmMDTnoHXIVhlbmB2+
-         y5rNI381UGlaLYqh/n328j56BB/Nn4z++N1kijTkzlrd26AukAc1IFfZKtSu7pMpYWzV
-         Pk3DSfk4R9MZeQwYM+PD+vtDXZAE03n/Km+Y1yb+JyHT/Ob34YMtJfZ7gxJM7Vd/qyNg
-         suJOcmUfArEPHwLfwFP/1THVmiFCVjr8UCaSPYd8te/teXtoRDLg0TbvbQgxlMhJE/bb
-         a7Og==
-X-Gm-Message-State: AOJu0YyGhXTb1Z6HzvbPKup/f1RcXGvIz6Oozju7hN8h7I8hu9IBSHmg
-	WwjVPELG6TW/PBgiiUbGFTg/FruEkjpJiPsbQpbtr8uIyjtop+SCvCZf9Dx6KCV3LqY/GFZj80V
-	G3mXbeg==
-X-Google-Smtp-Source: AGHT+IGkAn/LwerysZuGwJxYNVKUT2Gz4Ib8pIhMx4SKsJOPx+xTCSenhBS2G7GLP8kza9/oaz73nVHnf4c=
-X-Received: from pgct2.prod.google.com ([2002:a05:6a02:5282:b0:b55:135:7cb9])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a05:6a20:3ca8:b0:245:fb85:ef69
- with SMTP id adf61e73a8af0-32b620cbda2mr5197670637.40.1759507558303; Fri, 03
- Oct 2025 09:05:58 -0700 (PDT)
-Date: Fri, 3 Oct 2025 09:05:56 -0700
-In-Reply-To: <aN_fJEZXo6wkcHOh@google.com>
+        bh=lNh2mX9a3msgEQw2OsPB0rXj0BKWzfoqoJiUnuGpBLY=;
+        b=PRWkhlXc3ygJcyRMUkM68p8d4FW6HjDsFe2cv02X8V/Ru0wfuPMRHljjS/2O9tqgdS
+         7PN2HLnIfkxEKT+2lsugffsD/HvuAhUdKnoTRm4VhJ/L+7f6e24/uyqoR+gnul+hxVlN
+         HvZ1kI5ZBkiSxQH0BfBwfOJ6g2HRBZEHjJOphJjSX1jFolZhdD0/krO2AdAvAapHi0Vz
+         VC+v16pf7lmPP92Uj8ySSxlA+U5ohMm9biE8BKZQjEBkj1eWkYet+ykyFi8MEQY0Nu2Z
+         W03nq16+I15jqqUiry9vSThVAjvFwl0OFKITHQKUC/B87zz4j92vh4P8/dovgJHovTJy
+         NdNg==
+X-Gm-Message-State: AOJu0Yz6VRoqysJUWhTObof6qJgjStY6yjwV4z/X9LbPZwf36TfIpOlN
+	FIAJI6qq05v5w4DLbs1txbJUkdZq/n7oeElbG/DzrCZ6BZseLlIU7+kPijJdycGxEwRcDutxZLe
+	QRIoy6g==
+X-Google-Smtp-Source: AGHT+IGqNOuAruJgEcEZ8T6X7B8VeXMzqceZ1ggBpiDOEhdpqVLI6EnOOFhpmeY8C5TVlMwWJfNoQPt99zY=
+X-Received: from plbjw19.prod.google.com ([2002:a17:903:2793:b0:273:c5f4:a8ca])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:902:e786:b0:268:15f:8358
+ with SMTP id d9443c01a7336-28e9a656d8fmr47206475ad.42.1759507862519; Fri, 03
+ Oct 2025 09:11:02 -0700 (PDT)
+Date: Fri, 3 Oct 2025 09:11:01 -0700
+In-Reply-To: <2ae41e0d80339da2b57011622ac2288fed65cd01.1747264138.git.ackerleytng@google.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
-References: <cover.1747264138.git.ackerleytng@google.com> <b3c2da681c5bf139e2eaf0ea82c7422f972f6288.1747264138.git.ackerleytng@google.com>
- <aN_fJEZXo6wkcHOh@google.com>
-Message-ID: <aN_0ZMduyGlX0QwU@google.com>
-Subject: Re: [RFC PATCH v2 29/51] mm: guestmem_hugetlb: Wrap HugeTLB as an
- allocator for guest_memfd
+References: <cover.1747264138.git.ackerleytng@google.com> <2ae41e0d80339da2b57011622ac2288fed65cd01.1747264138.git.ackerleytng@google.com>
+Message-ID: <aN_1lSZJKBKvU9gV@google.com>
+Subject: Re: [RFC PATCH v2 35/51] mm: guestmem_hugetlb: Add support for
+ splitting and merging pages
 From: Sean Christopherson <seanjc@google.com>
 To: Ackerley Tng <ackerleytng@google.com>
 Cc: kvm@vger.kernel.org, linux-mm@kvack.org, linux-kernel@vger.kernel.org, 
@@ -111,70 +110,20 @@ Cc: kvm@vger.kernel.org, linux-mm@kvack.org, linux-kernel@vger.kernel.org,
 	yuzenghui@huawei.com, zhiquan1.li@intel.com
 Content-Type: text/plain; charset="us-ascii"
 
-On Fri, Oct 03, 2025, Sean Christopherson wrote:
-> On Wed, May 14, 2025, Ackerley Tng wrote:
-> > guestmem_hugetlb is an allocator for guest_memfd. It wraps HugeTLB to
-> > provide huge folios for guest_memfd.
-> > 
-> > This patch also introduces guestmem_allocator_operations as a set of
-> > operations that allocators for guest_memfd can provide. In a later
-> > patch, guest_memfd will use these operations to manage pages from an
-> > allocator.
-> > 
-> > The allocator operations are memory-management specific and are placed
-> > in mm/ so key mm-specific functions do not have to be exposed
-> > unnecessarily.
-> 
-> This code doesn't have to be put in mm/, all of the #includes are to <linux/xxx.h>.
-> Unless I'm missing something, what you actually want to avoid is _exporting_ mm/
-> APIs, and for that all that is needed is ensure the code is built-in to the kernel
-> binary, not to kvm.ko.
-> 
-> diff --git a/virt/kvm/Makefile.kvm b/virt/kvm/Makefile.kvm
-> index d047d4cf58c9..c18c77e8a638 100644
-> --- a/virt/kvm/Makefile.kvm
-> +++ b/virt/kvm/Makefile.kvm
-> @@ -13,3 +13,5 @@ kvm-$(CONFIG_HAVE_KVM_IRQ_ROUTING) += $(KVM)/irqchip.o
->  kvm-$(CONFIG_HAVE_KVM_DIRTY_RING) += $(KVM)/dirty_ring.o
->  kvm-$(CONFIG_HAVE_KVM_PFNCACHE) += $(KVM)/pfncache.o
->  kvm-$(CONFIG_KVM_GUEST_MEMFD) += $(KVM)/guest_memfd.o
-> +
-> +obj-$(subst m,y,$(CONFIG_KVM_GUEST_MEMFD)) += $(KVM)/guest_memfd_hugepages.o
-> \ No newline at end of file
-> 
-> People may want the code to live in mm/ for maintenance and ownership reasons
-> (or not, I haven't followed the discussions on hugepage support), but that's a
-> very different justification than what's described in the changelog.
-> 
-> And if the _only_ user is guest_memfd, putting this in mm/ feels quite weird.
-> And if we anticipate other users, the name guestmem_hugetlb is weird, because
-> AFAICT there's nothing in here that is in any way guest specific, it's just a
-> few APIs for allocating and accounting hugepages.
-> 
-> Personally, I don't see much point in trying to make this a "generic" library,
-> in quotes because the whole guestmem_xxx namespace makes it anything but generic.
-> I don't see anything in mm/guestmem_hugetlb.c that makes me go "ooh, that's nasty,
-> I'm glad this is handled by a library".  But if we want to go straight to a
-> library, it should be something that is really truly generic, i.e. not "guest"
-> specific in any way.
+On Wed, May 14, 2025, Ackerley Tng wrote:
+>  const struct guestmem_allocator_operations guestmem_hugetlb_ops = {
+>  	.inode_setup = guestmem_hugetlb_setup,
+>  	.inode_teardown = guestmem_hugetlb_teardown,
+>  	.alloc_folio = guestmem_hugetlb_alloc_folio,
+> +	.split_folio = guestmem_hugetlb_split_folio,
+> +	.merge_folio = guestmem_hugetlb_merge_folio,
+> +	.free_folio = guestmem_hugetlb_free_folio,
+>  	.nr_pages_in_folio = guestmem_hugetlb_nr_pages_in_folio,
+>  };
+>  EXPORT_SYMBOL_GPL(guestmem_hugetlb_ops);
 
-Ah, the complexity and the mm-internal dependencies come along in the splitting
-and merging patch.  Putting that code in mm/ makes perfect sense, but I'm still
-not convinced that putting _all_ of this code in mm/ is the correct split.
-
-As proposed, this is a weird combination of being an extension of guest_memfd, a
-somewhat generic library, _and_ a subsystem (e.g. the global workqueue and stash).
-
-_If_ we need a library, then IMO it should be a truly generic library.  Any pieces
-that are guest_memfd specific belong in KVM.  And any subsystem-like things should
-should probably be implemented as an extension to HugeTLB itself, which is already
-it's own subsytem.  Emphasis on "if", because it's not clear to me that that a
-library is warranted.
-
-AFAICT, the novelty here is the splitting and re-merging of hugetlb folios, and
-that seems like it should be explicitly an extension of the hugetlb subsystem.
-E.g. that behavior needs to take hugetlb_lock, interact with global vmemmap state
-like hugetlb_optimize_vmemmap_key, etc.  If that's implemented as something like
-hugetlb_splittable.c or whatever, and wired up to be explicitly configured via
-hugetlb_init(), then there may not be much left for a library.
+Don't bury exports in an "ops" like this.  Be very explicit in what is exported.
+_If_ KVM needs a layer of indirection to support multiple, custom guest_memfd
+allocators, then KVM can wire up ops as above.  Indirectly exporting core mm/
+functionality via an ops structure like this is unnecessarily sneaky.
 
