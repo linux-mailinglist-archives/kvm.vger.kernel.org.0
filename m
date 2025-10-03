@@ -1,173 +1,209 @@
-Return-Path: <kvm+bounces-59469-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-59470-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
-	by mail.lfdr.de (Postfix) with ESMTPS id 898A2BB7B72
-	for <lists+kvm@lfdr.de>; Fri, 03 Oct 2025 19:24:31 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 5C66BBB81B5
+	for <lists+kvm@lfdr.de>; Fri, 03 Oct 2025 22:30:26 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 6C52A4E8080
-	for <lists+kvm@lfdr.de>; Fri,  3 Oct 2025 17:24:30 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 9522B4EF02E
+	for <lists+kvm@lfdr.de>; Fri,  3 Oct 2025 20:30:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BFBFC2DAFAE;
-	Fri,  3 Oct 2025 17:24:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E532023D281;
+	Fri,  3 Oct 2025 20:30:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=amazon.com header.i=@amazon.com header.b="PYzluhqd"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="PtvW/RSp"
 X-Original-To: kvm@vger.kernel.org
-Received: from fra-out-013.esa.eu-central-1.outbound.mail-perimeter.amazon.com (fra-out-013.esa.eu-central-1.outbound.mail-perimeter.amazon.com [63.178.132.221])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f180.google.com (mail-pl1-f180.google.com [209.85.214.180])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 897D323AB8B;
-	Fri,  3 Oct 2025 17:24:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=63.178.132.221
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 90AC8225788
+	for <kvm@vger.kernel.org>; Fri,  3 Oct 2025 20:30:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.180
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1759512257; cv=none; b=HzrQ33R6jSr73rss7QJqqKnvn011X9VpLQm/MyxJKuP4S6singbOibSfDgVj7qxxn1aEVbB7vQ25mAkx1XYXKO2KHHyLRlf9HGw0tECR2NWawwSRT2WyEFtxIfu/lfCMxv2V6qU9mVT2WZG1Xfaka8HSi/73c7Qj6tNOXJjaCjk=
+	t=1759523418; cv=none; b=bht8Bd1GK326a5CCYElqbwMhmCnp+cK1igQnRr4fcAK9i0MDYzL/dvS1MZQ1hwHsnkV28f8shtE4fERf6VDlJBQoqQ1s02T1KjeFw2wQtsi/19/mVgYup0BMsIu4G2PJBhVaRbhLO65wJFbdzh3t0U9G+YM946ix2jp42qi/MaM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1759512257; c=relaxed/simple;
-	bh=mFfzPBlsrBjZYoYWR5CsI5nmru5owMjyTu2F9V71tbY=;
-	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
-	 In-Reply-To:Content-Type; b=RLgvw3Fl5LNVXnK9/PZ/uTYyPls+YRjK9HqBsWGQRzmgvks4JuRyq0C2122Ct9M6xZHki2TODAbb3SFS51W9lFA/jKdx/eewvoMtCAAOIjpH4k3XvcW1C2srTV5yhUj4Omu9tl1V2nAeO+T+fZxE9N+et9q23qzosi6zOeYt64w=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.uk; dkim=pass (2048-bit key) header.d=amazon.com header.i=@amazon.com header.b=PYzluhqd; arc=none smtp.client-ip=63.178.132.221
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.uk
+	s=arc-20240116; t=1759523418; c=relaxed/simple;
+	bh=8c912eY1UEEgVwBhK9alWqGDDsyKRZobEz+Fu9lJIhg=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=LJL6pCH1Awrvo+6nyeKhDdr6Y0s5qeFP++W/1HEneGPgPJIxXETSDxSuLThRxRWn9DG5+gOQDOuJqoryFtjqm1sFuceulpVoMi4Y9G1BiLC5D4Y1wTkZ8VoxityDxpoqRLLmK5WlznpAZZkapxJjCtiWaoWoA+gIf2sl48pkgBk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=PtvW/RSp; arc=none smtp.client-ip=209.85.214.180
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-pl1-f180.google.com with SMTP id d9443c01a7336-27eeafd4882so51895ad.0
+        for <kvm@vger.kernel.org>; Fri, 03 Oct 2025 13:30:16 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazoncorp2;
-  t=1759512256; x=1791048256;
-  h=message-id:date:mime-version:reply-to:subject:to:cc:
-   references:from:in-reply-to:content-transfer-encoding;
-  bh=eKU8SJ09O6RAdk9rzTuf+EPgBar7M5OPCHBeslmadhA=;
-  b=PYzluhqdFytr1f+tIZuEP0ntdTnpWqNu0WSc/koi1UXBGs5BjfXL0nAh
-   +U3k4A0OniF19BA7AUoqLRtAIUFdHBMLQ1NQEzjX50OjBeNa8pY3iURWW
-   end8AbZsvxBHjUyhmuwK2PBeIFaciTo1Lul/fIdrxt7j41PSLCrbXsHiB
-   nIZpUsxFBLjjfLcUtk3aHgGAOLU6CfUpFlREe+2nN8MCibzc0mgaqCqg3
-   b/mpAgwQAcc3iDecGybznr6u8ffqfZZp2BdmqywoL5cZIRJKCNRpKxib7
-   CMZMi91qiIRjyQFVwft0oXCKXh/a1nkAsALSKKfbGDPHHX8lPYi8p4iHa
-   g==;
-X-CSE-ConnectionGUID: /bGeMqI5QHGO7ZeMBtXCHg==
-X-CSE-MsgGUID: d1ZXsYzERHSwet8rfgRFpg==
-X-IronPort-AV: E=Sophos;i="6.18,313,1751241600"; 
-   d="scan'208";a="2975643"
-Received: from ip-10-6-3-216.eu-central-1.compute.internal (HELO smtpout.naws.eu-central-1.prod.farcaster.email.amazon.dev) ([10.6.3.216])
-  by internal-fra-out-013.esa.eu-central-1.outbound.mail-perimeter.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 03 Oct 2025 17:24:05 +0000
-Received: from EX19MTAEUC001.ant.amazon.com [54.240.197.225:5746]
- by smtpin.naws.eu-central-1.prod.farcaster.email.amazon.dev [10.0.33.147:2525] with esmtp (Farcaster)
- id f44c7b7f-75fc-43b3-8033-16cf4d5d0ded; Fri, 3 Oct 2025 17:24:04 +0000 (UTC)
-X-Farcaster-Flow-ID: f44c7b7f-75fc-43b3-8033-16cf4d5d0ded
-Received: from EX19D022EUC002.ant.amazon.com (10.252.51.137) by
- EX19MTAEUC001.ant.amazon.com (10.252.51.193) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.2562.20;
- Fri, 3 Oct 2025 17:24:04 +0000
-Received: from [192.168.4.149] (10.106.83.12) by EX19D022EUC002.ant.amazon.com
- (10.252.51.137) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.2562.20; Fri, 3 Oct 2025
- 17:24:02 +0000
-Message-ID: <fc0bb268-07b7-41ef-9a82-791d381f56ac@amazon.com>
-Date: Fri, 3 Oct 2025 18:23:57 +0100
+        d=google.com; s=20230601; t=1759523416; x=1760128216; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=r/0L3YZsGlZPOGFIT/xNUCPnxRniP3fT1sUMkDCiDzQ=;
+        b=PtvW/RSp7Ja8otztNd4E91+3BmxwGZFf+KCSje90C0EunVUJrX5DNG1SQSOTbKU1S8
+         e79CZHTVE0FZEPeIQyFN7RzRG2pjw59AwnWycjYZuDILFaBx2QqRDuRATPOw/7+IChss
+         G96B+bAg0UErBg2KSdm+WH5DL27er3Sdo5FnlJRvV8g/bn1IfWBLAYKFv8IS4gEqEaWI
+         5F2aJxigzClJXKRPh0RscOpIpn7zOh/cWk5Sj2iOr2lo9DRHExFhG7f/VNeiyRuaimt/
+         oKnfjpdPzZOhZqaE7pq8cV9XZHeQKSllKOCsbCFEYQbrxgbx2CucVXzSGLFUzNshvhI1
+         Rd6g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1759523416; x=1760128216;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=r/0L3YZsGlZPOGFIT/xNUCPnxRniP3fT1sUMkDCiDzQ=;
+        b=J3SUyPxjH6qPPj1vHK15o3yGZNY1Th68pe4mpasQyxF6ZFskcSnwNx+hp9fH8+gefN
+         HoW8vOnfRkXJOjNDcxAxPMFajoUrIV7Eus5UmDu9bldAEry0C0Z9+WxLZP+jCWk0iRdK
+         kZJ2R/4qgmNTeie2e1suW3nDYFQmxvt5+zPkYhczDCRQPF+bMplM1qYyCy2N15hX2aT1
+         dKbDxgwxdYvHRHvyqEj+WSVnTE6o4q2FNf5keW3WVSOBIJBruqFpDAnpfjdMT+b2nkKO
+         wqU4G1R60UESaFxsoI9jhvkZ5/WeTf9D/dp6JTz9a6GGvuQROvarMjcEoyP5OLLhKodc
+         BiQw==
+X-Forwarded-Encrypted: i=1; AJvYcCUXikxUsX1KOAJnd91NY7hT3j7zGclxwhLdU2pG43FG0YXp8MPWvNt3spx2MO5Tg9Dqqi0=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxIzCWKpVchUYRI1/aw0Sb5g3CZqepTo4K9tW3DNOZZTFpnBM/A
+	hH57Pb3ruGSlwz1OB18Geq+YGjnk/xkRkJOWEBPOrVJpN2ATJWVB0yPxxeEWM5RT3YtTetGR+B+
+	D/9HkR0OnwvTaWhuU6/wnG/3VOklUXsQrDimFZg3F
+X-Gm-Gg: ASbGncuuQVC/F0I+sELNax0cFn4C+Cw5ztzNMYEG/+yHGNJzlmM3lrn/86gUkZE6QQP
+	TqAIY/lIoktkFXz8cebY5hqEz1zS3OO/wEQVmmxacCXy4la+HDw5oT8+B4VtxzLgeBB9WL8BuxE
+	meaIcKAn4Ei5jlOlsP3Z+aqTcyAizdvn2HBY00kRyNo2qVjyWUZ4hysXqVh+972xuBSv+tVky14
+	qAHkPpJTvmlrIowBo2niocICOGaL6pEom++xjuL5EKP9fZTMM2t58Z8lBBbbv3XDxQO
+X-Google-Smtp-Source: AGHT+IHyUpiBlEGtx1ZWxN1upFN31zq9jqARbqfv4Hz2Xb4ggiQ+FOCdH3M199iB+zFMTMni4io379S7xpZOgTQnrMU=
+X-Received: by 2002:a17:903:2383:b0:240:6076:20cd with SMTP id
+ d9443c01a7336-28ea80c8c6bmr924255ad.15.1759523415313; Fri, 03 Oct 2025
+ 13:30:15 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Reply-To: <kalyazin@amazon.com>
-Subject: Re: [PATCH 15/34] KVM: Add KVM_CREATE_GUEST_MEMFD ioctl() for
- guest-specific backing memory
-To: Paolo Bonzini <pbonzini@redhat.com>, Marc Zyngier <maz@kernel.org>,
-	"Oliver Upton" <oliver.upton@linux.dev>, Huacai Chen <chenhuacai@kernel.org>,
-	"Michael Ellerman" <mpe@ellerman.id.au>, Anup Patel <anup@brainfault.org>,
-	"Paul Walmsley" <paul.walmsley@sifive.com>, Palmer Dabbelt
-	<palmer@dabbelt.com>, Albert Ou <aou@eecs.berkeley.edu>, Sean Christopherson
-	<seanjc@google.com>, Alexander Viro <viro@zeniv.linux.org.uk>, Christian
- Brauner <brauner@kernel.org>, "Matthew Wilcox (Oracle)"
-	<willy@infradead.org>, "Andrew Morton" <akpm@linux-foundation.org>
-CC: <kvm@vger.kernel.org>, <linux-arm-kernel@lists.infradead.org>,
-	<kvmarm@lists.linux.dev>, <linux-mips@vger.kernel.org>,
-	<linuxppc-dev@lists.ozlabs.org>, <kvm-riscv@lists.infradead.org>,
-	<linux-riscv@lists.infradead.org>, <linux-fsdevel@vger.kernel.org>,
-	<linux-mm@kvack.org>, <linux-kernel@vger.kernel.org>, Xiaoyao Li
-	<xiaoyao.li@intel.com>, Xu Yilun <yilun.xu@intel.com>, Chao Peng
-	<chao.p.peng@linux.intel.com>, Fuad Tabba <tabba@google.com>, Jarkko Sakkinen
-	<jarkko@kernel.org>, Anish Moorthy <amoorthy@google.com>, David Matlack
-	<dmatlack@google.com>, Yu Zhang <yu.c.zhang@linux.intel.com>, Isaku Yamahata
-	<isaku.yamahata@intel.com>, =?UTF-8?B?TWlja2HDq2wgU2FsYcO8?= =?UTF-8?Q?n?=
-	<mic@digikod.net>, Vlastimil Babka <vbabka@suse.cz>, Vishal Annapurve
-	<vannapurve@google.com>, Ackerley Tng <ackerleytng@google.com>, "Maciej
- Szmigiero" <mail@maciej.szmigiero.name>, David Hildenbrand
-	<david@redhat.com>, Quentin Perret <qperret@google.com>, Michael Roth
-	<michael.roth@amd.com>, Wang <wei.w.wang@intel.com>, Liam Merwick
-	<liam.merwick@oracle.com>, "Isaku Yamahata" <isaku.yamahata@gmail.com>,
-	"Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>
-References: <20231105163040.14904-1-pbonzini@redhat.com>
- <20231105163040.14904-16-pbonzini@redhat.com>
-Content-Language: en-US
-From: Nikita Kalyazin <kalyazin@amazon.com>
-Autocrypt: addr=kalyazin@amazon.com; keydata=
- xjMEY+ZIvRYJKwYBBAHaRw8BAQdA9FwYskD/5BFmiiTgktstviS9svHeszG2JfIkUqjxf+/N
- JU5pa2l0YSBLYWx5YXppbiA8a2FseWF6aW5AYW1hem9uLmNvbT7CjwQTFggANxYhBGhhGDEy
- BjLQwD9FsK+SyiCpmmTzBQJnrNfABQkFps9DAhsDBAsJCAcFFQgJCgsFFgIDAQAACgkQr5LK
- IKmaZPOpfgD/exazh4C2Z8fNEz54YLJ6tuFEgQrVQPX6nQ/PfQi2+dwBAMGTpZcj9Z9NvSe1
- CmmKYnYjhzGxzjBs8itSUvWIcMsFzjgEY+ZIvRIKKwYBBAGXVQEFAQEHQCqd7/nb2tb36vZt
- ubg1iBLCSDctMlKHsQTp7wCnEc4RAwEIB8J+BBgWCAAmFiEEaGEYMTIGMtDAP0Wwr5LKIKma
- ZPMFAmes18AFCQWmz0MCGwwACgkQr5LKIKmaZPNTlQEA+q+rGFn7273rOAg+rxPty0M8lJbT
- i2kGo8RmPPLu650A/1kWgz1AnenQUYzTAFnZrKSsXAw5WoHaDLBz9kiO5pAK
-In-Reply-To: <20231105163040.14904-16-pbonzini@redhat.com>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: EX19D013EUA004.ant.amazon.com (10.252.50.48) To
- EX19D022EUC002.ant.amazon.com (10.252.51.137)
+References: <aNshILzpjAS-bUL5@google.com> <CAGtprH_JgWfr2wPGpJg_mY5Sxf6E0dp5r-_4aVLi96To2pugXA@mail.gmail.com>
+ <aN1TgRpde5hq_FPn@google.com> <CAGtprH-0B+cDARbK-xPGfx4sva+F1akbkX1gXts2VHaqyDWdzA@mail.gmail.com>
+ <aN1h4XTfRsJ8dhVJ@google.com> <CAGtprH-5NWVVyEM63ou4XjG4JmF2VYNakoFkwFwNR1AnJmiDpA@mail.gmail.com>
+ <aN3BhKZkCC4-iphM@google.com> <CAGtprH_evo=nyk1B6ZRdKJXX2s7g1W8dhwJhEPJkG=o2ORU48g@mail.gmail.com>
+ <aN8U2c8KMXTy6h9Q@google.com> <CAGtprH9N=974HZiqfdaO9DK9nycDD9NeiPeHC49P-DkgTaWtTw@mail.gmail.com>
+ <aN_2JaorgERIkpW4@google.com>
+In-Reply-To: <aN_2JaorgERIkpW4@google.com>
+From: Vishal Annapurve <vannapurve@google.com>
+Date: Fri, 3 Oct 2025 13:30:02 -0700
+X-Gm-Features: AS18NWCcLkRWY4ao1VCj7qy0k_ytrZZdsE8Fa7TimWaUhu8L01CyT8ya4dms5AE
+Message-ID: <CAGtprH-CUMpGqN_68Q_+voJzMpsWnfKKBPmgBGgMgoeTt0E-aw@mail.gmail.com>
+Subject: Re: [PATCH 1/6] KVM: guest_memfd: Add DEFAULT_SHARED flag, reject
+ user page faults if not set
+To: Sean Christopherson <seanjc@google.com>
+Cc: Ackerley Tng <ackerleytng@google.com>, David Hildenbrand <david@redhat.com>, 
+	Patrick Roy <patrick.roy@linux.dev>, Fuad Tabba <tabba@google.com>, 
+	Paolo Bonzini <pbonzini@redhat.com>, Christian Borntraeger <borntraeger@linux.ibm.com>, 
+	Janosch Frank <frankja@linux.ibm.com>, Claudio Imbrenda <imbrenda@linux.ibm.com>, 
+	kvm list <kvm@vger.kernel.org>, LKML <linux-kernel@vger.kernel.org>, 
+	Nikita Kalyazin <kalyazin@amazon.co.uk>, Shivank Garg <shivankg@amd.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
+On Fri, Oct 3, 2025 at 9:13=E2=80=AFAM Sean Christopherson <seanjc@google.c=
+om> wrote:
+>
+> On Thu, Oct 02, 2025, Vishal Annapurve wrote:
+> > On Thu, Oct 2, 2025, 5:12=E2=80=AFPM Sean Christopherson <seanjc@google=
+.com> wrote:
+> > >
+> > > > >
+> > > > > If the _only_ user-visible asset that is added is a KVM_CREATE_GU=
+EST_MEMFD flag,
+> > > > > a CAP is gross overkill.  Even if there are other assets that acc=
+ompany the new
+> > > > > flag, there's no reason we couldn't say "this feature exist if XY=
+Z flag is
+> > > > > supported".
+> > > > >
+> > > > > E.g. it's functionally no different than KVM_CAP_VM_TYPES reporti=
+ng support for
+> > > > > KVM_X86_TDX_VM also effectively reporting support for a _huge_ nu=
+mber of things
+> > > > > far beyond being able to create a VM of type KVM_X86_TDX_VM.
+> > > > >
+> > > >
+> > > > What's your opinion about having KVM_CAP_GUEST_MEMFD_MMAP part of
+> > > > KVM_CAP_GUEST_MEMFD_CAPS i.e. having a KVM cap covering all feature=
+s
+> > > > of guest_memfd?
+> > >
+> > > I'd much prefer to have both.  Describing flags for an ioctl via a bi=
+tmask that
+> > > doesn't *exactly* match the flags is asking for problems.  At best, i=
+t will be
+> > > confusing.  E.g. we'll probably end up with code like this:
+> > >
+> > >         gmem_caps =3D kvm_check_cap(KVM_CAP_GUEST_MEMFD_CAPS);
+> > >
+> > >         if (gmem_caps & KVM_CAP_GUEST_MEMFD_MMAP)
+> > >                 gmem_flags |=3D GUEST_MEMFD_FLAG_MMAP;
+> > >         if (gmem_caps & KVM_CAP_GUEST_MEMFD_INIT_SHARED)
+> > >                 gmem_flags |=3D KVM_CAP_GUEST_MEMFD_INIT_SHARED;
+> > >
+> >
+> > No, I actually meant the userspace can just rely on the cap to assume
+> > right flags to be available (not necessarily the same flags as cap
+> > bits).
+> >
+> > i.e. Userspace will do something like:
+> > gmem_caps =3D kvm_check_cap(KVM_CAP_GUEST_MEMFD_CAPS);
+> >
+> > if (gmem_caps & KVM_CAP_GUEST_MEMFD_MMAP)
+> >         gmem_flags |=3D GUEST_MEMFD_FLAG_MMAP;
+> > if (gmem_caps & KVM_CAP_GUEST_MEMFD_HUGETLB)
+> >         gmem_flags |=3D GUEST_MEMFD_FLAG_HUGETLB | GUEST_MEMFD_FLAG_HUG=
+ETLB_2MB;
+>
+> Yes, that's exactly what I said.  But I goofed when copy+pasted and faile=
+d to
+> do s/KVM_CAP_GUEST_MEMFD_INIT_SHARED/GUEST_MEMFD_FLAG_INIT_SHARED, which =
+is the
+> type of bug that ideally just can't happen.
+>
+> Side topic, I'm not at all convinced that this is what we want for KVM's =
+uAPI:
+>
+>         if (gmem_caps & KVM_CAP_GUEST_MEMFD_HUGETLB)
+>                 gmem_flags |=3D GUEST_MEMFD_FLAG_HUGETLB | GUEST_MEMFD_FL=
+AG_HUGETLB_2MB;
+>
+> See https://lore.kernel.org/all/aN_fJEZXo6wkcHOh@google.com.
 
+Ack, that makes sense to me.
 
-On 05/11/2023 16:30, Paolo Bonzini wrote:
-> From: Sean Christopherson <seanjc@google.com>
-> 
-> Introduce an ioctl(), KVM_CREATE_GUEST_MEMFD, to allow creating file-based
-> memory that is tied to a specific KVM virtual machine and whose primary
-> purpose is to serve guest memory.
+>
+> > Userspace has to anyways assume flag values, userspace just needs to
+> > know if a particular feature is available.
+>
+> I don't understand what you mean by "assume flag values".
 
-...
-> diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
-> index f1a575d39b3b..8f46d757a2c5 100644
-> --- a/virt/kvm/kvm_main.c
-> +++ b/virt/kvm/kvm_main.c
+Ok, I think you covered the explanation of why you would prefer to
+have KVM_CAP_GUEST_MEMFD_FLAGS around and I misinterpreted some of it.
 
-...
+One more example with KVM_CAP_GUEST_MEMFD_FLAGS around:
 
-> -static int check_memory_region_flags(const struct kvm_userspace_memory_region2 *mem)
-> +static int check_memory_region_flags(struct kvm *kvm,
-> +				     const struct kvm_userspace_memory_region2 *mem)
->   {
->   	u32 valid_flags = KVM_MEM_LOG_DIRTY_PAGES;
->   
-> +	if (kvm_arch_has_private_mem(kvm))
-> +		valid_flags |= KVM_MEM_GUEST_MEMFD;
-> +
-> +	/* Dirty logging private memory is not currently supported. */
-> +	if (mem->flags & KVM_MEM_GUEST_MEMFD)
-> +		valid_flags &= ~KVM_MEM_LOG_DIRTY_PAGES;
+gmem_caps =3D kvm_check_cap(KVM_CAP_GUEST_MEMFD_CAPS);
+valid_flags =3D kvm_check_cap(KVM_CAP_GUEST_MEMFD_FLAGS);
 
-I was wondering whether this restriction is still required at this stage 
-or can be lifted in cases where the guest memory is accessible by the 
-host.  Specifically, it would be useful to support differential memory 
-snapshots based on dirty page tracking in Firecracker [1] or in live 
-migration.  As an experiment, I removed the check and was able to 
-produce a diff snapshot and restore a Firecracker VM from it.
+if (gmem_caps & KVM_CAP_GUEST_MEMFD_CONVERSION) {
+               // Use single memory backing paths for 4K backing
+              if (valid_flags & GUEST_MEMFD_FLAG_MMAP)
+                          gmem_flags |=3D GUEST_MEMFD_FLAG_MMAP;
+              else
+                        // error out;
+}
+if (gmem_caps & KVM_CAP_GUEST_MEMFD_HUGETLB_CONVERSION) {
+               // Use single memory backing paths for hugetlb memory backin=
+g
+               if (valid_flags & GUEST_MEMFD_FLAG_HUGETLB) {
+                          gmem_flags |=3D GUEST_MEMFD_FLAG_HUGETLB;
+                          kvm_create_guest_memfd.huge_page_size_log2 =3D ..=
+.;
+               } else
+                        // error out;
+}
 
-[1] 
-https://github.com/firecracker-microvm/firecracker/blob/main/docs/snapshotting/snapshot-support.md#creating-diff-snapshots
-
-> +
->   #ifdef __KVM_HAVE_READONLY_MEM
->   	valid_flags |= KVM_MEM_READONLY;
->   #endif
-> @@ -2018,7 +2029,7 @@ int __kvm_set_memory_region(struct kvm *kvm,
->   	int as_id, id;
->   	int r;
->   
-> -	r = check_memory_region_flags(mem);
-> +	r = check_memory_region_flags(kvm, mem);
->   	if (r)
->   		return r;
+Userspace will have to rely on a combination of flags and caps to
+decide it's control flow instead of just caps. Thinking more about
+this, I don't have a strong preference between two scenarios i.e. with
+or without KVM_CAP_GUEST_MEMFD_FLAGS.
 
