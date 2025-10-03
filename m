@@ -1,347 +1,189 @@
-Return-Path: <kvm+bounces-59458-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-59457-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 84D80BB7151
-	for <lists+kvm@lfdr.de>; Fri, 03 Oct 2025 15:55:15 +0200 (CEST)
+Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [213.196.21.55])
+	by mail.lfdr.de (Postfix) with ESMTPS id D93E4BB714D
+	for <lists+kvm@lfdr.de>; Fri, 03 Oct 2025 15:54:55 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 373313B6F2C
-	for <lists+kvm@lfdr.de>; Fri,  3 Oct 2025 13:55:14 +0000 (UTC)
+	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 217723462E5
+	for <lists+kvm@lfdr.de>; Fri,  3 Oct 2025 13:54:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 478EC1DF759;
-	Fri,  3 Oct 2025 13:55:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EE8FC1DE3C7;
+	Fri,  3 Oct 2025 13:54:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="faF+gDt8"
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="lIc4V6hL"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.12])
+Received: from casper.infradead.org (casper.infradead.org [90.155.50.34])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 722DC34BA50;
-	Fri,  3 Oct 2025 13:55:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=198.175.65.12
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1759499706; cv=fail; b=f2Egl09O97Jc0LHJjVep1tHI3b7v21LtK/vJ72QB8GHSOCJNTJfBjokxMHjb/j0E2v+VbUDCychuFPPyiWIl8McyFcYtHm8QKiZG/xq3tQJNhWLdirZtAJwwqK2nEcrSndtDrTgDPSQVUG3RrxTOJNa4JZWBqpwCu8H1IIBnfLw=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1759499706; c=relaxed/simple;
-	bh=/eLdmc71xGmlOC1aSG71JxETMVHNBKizGzTfmkINvzw=;
-	h=Date:From:To:CC:Subject:Message-ID:References:Content-Type:
-	 Content-Disposition:In-Reply-To:MIME-Version; b=Hb3AkHmsBz9+q9TkTmaaorHUtxbW6/jrNPS/TLoW0ltr/IvuLJe5JNDnL2j5sujWE2krjZDE18iu7sZ6UePChIJAGMiVaJR1CWKFBVUgGUjUYrHaCWGPlejHGmzQuMXppGNLKdboPSuTPs2iJhlRd7fY3J0jvgOrrbXXlYCGllk=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=faF+gDt8; arc=fail smtp.client-ip=198.175.65.12
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1759499704; x=1791035704;
-  h=date:from:to:cc:subject:message-id:reply-to:references:
-   in-reply-to:mime-version;
-  bh=/eLdmc71xGmlOC1aSG71JxETMVHNBKizGzTfmkINvzw=;
-  b=faF+gDt80+qfr5tb9WyA5h9lP1Caoh7Ge0KxiqcEYmJ8gUKROhjwczAO
-   rCZ/IljyNS4cjCF73pGkZSLSQ+ZZOhFvsO+3Pcq6GKc6R5OMmynoeOgfl
-   KvARpJoegWX2L6m1NcxQ2Znt/jkNuP0iE+Pt1/CcXnEjkqozbRpuoRK63
-   5S1o+wxN3sIbpSLqJ8gQ8XTyfOLRLHoCWdUCfCTohLf8n2m3R/XALfFO2
-   bJ14gMHBEjeRyoCngFxuPc193osPwskSL/fti90Sv3AMKTzNl6HKtO4DJ
-   XqNzt1hLQX6gPFLwVPhc5PPVeYXmPdNrd7XXKVugjVGXheaYjky+AuRx3
-   A==;
-X-CSE-ConnectionGUID: ltqEkQdrTjeaCU8d3U7MEA==
-X-CSE-MsgGUID: PdHvatbJQJ+0aHHYgkTJRA==
-X-IronPort-AV: E=McAfee;i="6800,10657,11571"; a="73209537"
-X-IronPort-AV: E=Sophos;i="6.18,312,1751266800"; 
-   d="scan'208";a="73209537"
-Received: from orviesa010.jf.intel.com ([10.64.159.150])
-  by orvoesa104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 03 Oct 2025 06:55:03 -0700
-X-CSE-ConnectionGUID: u0nn0QJ7TTKNgeNFiUsSJw==
-X-CSE-MsgGUID: upntdiQnQKuC8FHHed+7Eg==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.18,312,1751266800"; 
-   d="scan'208";a="178587894"
-Received: from orsmsx903.amr.corp.intel.com ([10.22.229.25])
-  by orviesa010.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 03 Oct 2025 06:55:04 -0700
-Received: from ORSMSX901.amr.corp.intel.com (10.22.229.23) by
- ORSMSX903.amr.corp.intel.com (10.22.229.25) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.27; Fri, 3 Oct 2025 06:55:02 -0700
-Received: from ORSEDG901.ED.cps.intel.com (10.7.248.11) by
- ORSMSX901.amr.corp.intel.com (10.22.229.23) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.27 via Frontend Transport; Fri, 3 Oct 2025 06:55:02 -0700
-Received: from CH5PR02CU005.outbound.protection.outlook.com (40.107.200.0) by
- edgegateway.intel.com (134.134.137.111) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.27; Fri, 3 Oct 2025 06:55:02 -0700
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=eSzUzVMdTyriYdqS4dO1RdeBkE3veUdvb5+wNJ7vBwCzEiZZciyA+Nt1Vjz6DRIx84qtFKMmmiTYt4eKdOJcgQtBP+/+o/neqXNO9MrfOVuHq1+qhuJetUccvMhc5eUaIQL6phqRshIuyolVj6A+mbtMw6ULi41janSsX5/uD4WOiRiq6jJrjAJEWHsmuAyZxETvO0yLbAlwpQAKezh2qLJxp9AJpyrXONgqkmgo2oquE+PjLLFefKPTBMhiyLzTj046C1rAqFeZcOArjvY3l8MXbdCzMFk1myYMKzDBd+3SmSKzYso0jTLqY6TdW08EBTgj1T+7bfoi8oLM9qBtqg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=aVo2nMUarPGv+/dfmruHm8RAtDj9n6ViiPQLJWIOoKc=;
- b=fZWv8qPo1Qd8vVX3sFq8inrpTYz1NSOCjd9bnF0EYReLFo35Xve811xocz1IGHCNQulN+u02Q/+GE2bMgDLECXVuToWh57ms1YYEw5Lb4hjKWehOPtpW/lhp02z5rb3k1Tn9KLab7BJThO+c9glnfqPf90idi1QMMDjxt/tkeSaBqhB1aw2y90tv6AjpMNjsKay3+Bpod5OQL+zjaG8mm0SzgH4BWpw0ht49XMNcrWDWPFaH+iTS7faQ1g4+yhu9dN3EQEO/YAwpUUWgwoZw+y/XnI9e8eiSsUkErnntGwD6W98kFFrsZOhTSDYtdVUgK4Aj/Cl+hzNxITOHtFv0mA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-Received: from DS7PR11MB5966.namprd11.prod.outlook.com (2603:10b6:8:71::6) by
- CY5PR11MB6536.namprd11.prod.outlook.com (2603:10b6:930:40::5) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.9182.16; Fri, 3 Oct 2025 13:54:56 +0000
-Received: from DS7PR11MB5966.namprd11.prod.outlook.com
- ([fe80::e971:d8f4:66c4:12ca]) by DS7PR11MB5966.namprd11.prod.outlook.com
- ([fe80::e971:d8f4:66c4:12ca%6]) with mapi id 15.20.9160.017; Fri, 3 Oct 2025
- 13:54:55 +0000
-Date: Fri, 3 Oct 2025 21:53:45 +0800
-From: Yan Zhao <yan.y.zhao@intel.com>
-To: Sean Christopherson <seanjc@google.com>
-CC: Paolo Bonzini <pbonzini@redhat.com>, <kvm@vger.kernel.org>,
-	<linux-kernel@vger.kernel.org>, Xiaoyao Li <xiaoyao.li@intel.com>, "Rick
- Edgecombe" <rick.p.edgecombe@intel.com>
-Subject: Re: [PATCH] KVM: x86: Drop "cache" from user return MSR setter that
- skips WRMSR
-Message-ID: <aN/VaVklfXO5rId4@yzhao56-desk.sh.intel.com>
-Reply-To: Yan Zhao <yan.y.zhao@intel.com>
-References: <20250919214259.1584273-1-seanjc@google.com>
- <aNvLkRZCZ1ckPhFa@yzhao56-desk.sh.intel.com>
- <aNvT8s01Q5Cr3wAq@yzhao56-desk.sh.intel.com>
- <aNwFTLM3yt6AGAzd@google.com>
-Content-Type: text/plain; charset="us-ascii"
-Content-Disposition: inline
-In-Reply-To: <aNwFTLM3yt6AGAzd@google.com>
-X-ClientProxiedBy: SG2PR01CA0116.apcprd01.prod.exchangelabs.com
- (2603:1096:4:40::20) To DS7PR11MB5966.namprd11.prod.outlook.com
- (2603:10b6:8:71::6)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D96A223AD;
+	Fri,  3 Oct 2025 13:54:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=90.155.50.34
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1759499686; cv=none; b=FQopa0pHwja23HdwTI3X73TOPOGCb64XyCW8u1GPMKg4w7xHjLQL5i183yqYjSJNw3lmNjL4OscUnj79VRfL3pztAqygR1MP1a56FfrPTu1rtvCd7npP39YsTYaANtOOJlbhW6oXe+crGnAEmeN+fp6AiuHVqxd/imhjCXRXfV0=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1759499686; c=relaxed/simple;
+	bh=GQY+R4366m3H8q2YNBYsgMj4faLW+j5tJyr6kIuR+3I=;
+	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=MgTlhPby2pqmJoRcHnkdtjY2eHhSODMiDqVuUqhPLRe2nQZcf3RNqiWOvIhm33CfuRXP/hQN6saGNlk2rXFGfdm2W2qZ6eFIJPJVU2OxLLW/Uxzb7vEZy6WvWCAHCT1V7BxT3ImVpWkWUoKe0H9jtZR+yKs/yIR8ypuv11V2qRI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=casper.srs.infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=lIc4V6hL; arc=none smtp.client-ip=90.155.50.34
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=casper.srs.infradead.org
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=infradead.org; s=casper.20170209; h=MIME-Version:Content-Type:References:
+	In-Reply-To:Date:Cc:To:From:Subject:Message-ID:Sender:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description;
+	bh=GQY+R4366m3H8q2YNBYsgMj4faLW+j5tJyr6kIuR+3I=; b=lIc4V6hLa+S7lG0AEkSfGpNtRn
+	+KbsYhZlclDDFH6Bt2eu8d293f2ke1QuH3mb0ANuIn4t8YFGA2mlqSfiF6U5MSup7ME2NQVe8s1ec
+	X5bZxIkMhKtbZRDfBRQpvBz44CSJQAg8H3k8JunJaxKQp/nzfEIv5m8/+RaAXbZmapzggr25TJ5Wc
+	G+dVagZkMMzcK2D5MCqZ4d8FFDC6Lgx39r3u0gAipIOmUbq3odoEx54u8vt1M2SbyLkraz+iYhEBU
+	b+2b1XE+Nmf62qzH/pvHBguEVjAE13UTV15lszifED0hx52KCDUYHTXNJD2eIUpOtrhRW3Ismzg2M
+	SQ3ePkLg==;
+Received: from [2001:8b0:10b:5:fcf2:4aab:f877:798d] (helo=u09cd745991455d.ant.amazon.com)
+	by casper.infradead.org with esmtpsa (Exim 4.98.2 #2 (Red Hat Linux))
+	id 1v4gF2-0000000EfSL-3nNL;
+	Fri, 03 Oct 2025 13:54:38 +0000
+Message-ID: <999d6cadeb3c272e04b83ee0672d169372ab5efd.camel@infradead.org>
+Subject: Re:  [PATCH v8 0/7] TDX host: kexec/kdump support
+From: David Woodhouse <dwmw2@infradead.org>
+To: Paolo Bonzini <pbonzini@redhat.com>, linux-kernel@vger.kernel.org, 
+	kvm@vger.kernel.org, dave.hansen@intel.com
+Cc: bp@alien8.de, tglx@linutronix.de, peterz@infradead.org,
+ mingo@redhat.com,  hpa@zytor.com, thomas.lendacky@amd.com, x86@kernel.org,
+ kas@kernel.org,  rick.p.edgecombe@intel.com, kai.huang@intel.com,
+ seanjc@google.com,  reinette.chatre@intel.com, isaku.yamahata@intel.com,
+ dan.j.williams@intel.com,  ashish.kalra@amd.com, nik.borisov@suse.com,
+ chao.gao@intel.com, sagis@google.com,  farrah.chen@intel.com
+Date: Fri, 03 Oct 2025 14:54:34 +0100
+In-Reply-To: <CABgObfb0Qc3hdXTmZvOykxuR+7RZ4vRUBpm8M84UmHgjwx7BCA@mail.gmail.com>
+References: <20250901160930.1785244-1-pbonzini@redhat.com>
+	 <CABgObfb0Qc3hdXTmZvOykxuR+7RZ4vRUBpm8M84UmHgjwx7BCA@mail.gmail.com>
+Content-Type: multipart/signed; micalg="sha-256"; protocol="application/pkcs7-signature";
+	boundary="=-vwepbdyxFhym1efp99qD"
+User-Agent: Evolution 3.52.3-0ubuntu1 
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: DS7PR11MB5966:EE_|CY5PR11MB6536:EE_
-X-MS-Office365-Filtering-Correlation-Id: b4c9d0bf-6db4-4356-fc54-08de02846eff
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230040|1800799024|366016|376014;
-X-Microsoft-Antispam-Message-Info: =?us-ascii?Q?S9Ti2nHP7m1ZOJLvgxWMWR96GhEFtKbLmYa/HKb0hW7u5FF+FVvYN0ZVMBap?=
- =?us-ascii?Q?18YCuB/5ar6jVmk3UzAYLbxxLR+Isp5/nQ5BZsOM5cKVzRtVEen/cl0wy2H0?=
- =?us-ascii?Q?Y1Ai4q9047UWFdj7S3F9KUKM+RRoeY4Fk6CIgoj3p45iyiKMSxyHronM93lY?=
- =?us-ascii?Q?SCETLbudEsaJUV9YqQHL9rV8VioXNGs5YhthVAdDmM+wdRNTVTF9zmGEbbF8?=
- =?us-ascii?Q?is6eCTloF9LrWprS15W9eUGb2KNrmXo+eXTghkcqMyVK7Cx9Dp9lsW5EFxqI?=
- =?us-ascii?Q?M+CplcwVlRSmKk98PhNzi/JukVThPVNNwoO+GVDIFaRp+0+bQsYLOHRWKLyu?=
- =?us-ascii?Q?h3//Yy0/VqJeqinqnP+VZJujPO3pROhSfZj7/r8ghKlZvARuGa79JzDvk1fa?=
- =?us-ascii?Q?b2bjHSElgQVdTPhhch9Oj+OGHC5ww5KxFRj6WzHZa7C6zrGD2LOb7gytnYoF?=
- =?us-ascii?Q?UKS/p3AulutSdlErcG7zZ2FBHB2YR/6tVIbNPUybsEc5Wc7JGlDFi8Y4sa3w?=
- =?us-ascii?Q?ffncY1zWMJEWfV/zMfDboIQIFTbB/iOFIUrMguVTYOVHjIxpmf7kOKZ8cnQG?=
- =?us-ascii?Q?Uq3I4IhtRcJLxzeWQzsi3fxAv4l27PcT71ofqRde9fkbW4vhaPLE+z3G2IAm?=
- =?us-ascii?Q?CChufOzRj4RRXplLx6/ZnxHIsNCyscnnDSDT51f18gFM0DioFpryOutMYKPC?=
- =?us-ascii?Q?LQhsOMNDi4jpZ0L+CdgivU+Z37mw+bMYKbgXJvAO1+GdxHvcWiiKWuXUNIpr?=
- =?us-ascii?Q?cY6IrQ2Nie3r+eHMi8oD0TAlbz4LnhIk2UH/5B5hrk2498exVW/hZAXBCtRW?=
- =?us-ascii?Q?lxgT5J5Vk4HwblMqiD1wa5lCMfvuiFqQ4pe8i7kWVwshLGfGwqYc6hnA5sft?=
- =?us-ascii?Q?9/ebk6bhHOr5uSQuDD3J6QgW2nSllmylMHOXYMJs/4MgMEAY3fZ3x7oCdzk9?=
- =?us-ascii?Q?AbmaSLA6YxmbRINVIJymOzp9FlHdfqbqEI0njOEgiJTxzSOS6bAo2p7mQy/I?=
- =?us-ascii?Q?kcKRuD4e+rKeTVcPOhO0NGCAvUjzNsr/aIS/Kp4FEUeGBgRTYja5EofR+Pz2?=
- =?us-ascii?Q?iHEIXb5ELON/qtNaRrk8s2SpqwjhCivSTjB3JjAl2hw7c4nbyt7O1F4t3+Ul?=
- =?us-ascii?Q?u55vAgv6YbwbtIiGL1pJZdml+v3gcIPbm6Tm8yfjj3rViye56saZs3P5K1+3?=
- =?us-ascii?Q?08JkGAbik4PKH5qJvLsXh5+P2OJu7aiBYwGtaI6KyPGi/a8rD9platn7rZ18?=
- =?us-ascii?Q?exIhQRQbvjWM03AFtu7VwQy9UW6bvQT5x06j3vphjJKr39AKx7kMECeGrH/f?=
- =?us-ascii?Q?GwUAe5nmnPajedMI7kEvVyyf/yxOpETkx47AqpNV7hvEnRi7IwfErp9S7u6H?=
- =?us-ascii?Q?4zdiUp5Aj+8wWAd4NcJZqNktwxiynA1B3PyfXka1g40LYNw8EERHpClDsrMN?=
- =?us-ascii?Q?aM0PYZ6jn9UQmcme8fdl4QIUW7zjaEiL?=
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DS7PR11MB5966.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(366016)(376014);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?AnnqodJhGMGEJ3Xg48Pzy+0PflfCZdpfN73QjVXybjV/VmbhGkoWsNlWwufC?=
- =?us-ascii?Q?568XceTe09b3ZoREB2AyeDnATnzdQNGxpOTuRxXrTnJvRpY+0RiAPkTxdj8M?=
- =?us-ascii?Q?1ZObvQv5aPgt5D+ljCj7BjrFJBNRYPwiGZFGsh5/WAeAfy27Bx/HY6x0yuza?=
- =?us-ascii?Q?Qbc1bfe1mXey3AcsmKNRpJHaxG1dDI+WFplOZUfrmx2GSHv4c/rCxLD1mHvB?=
- =?us-ascii?Q?WEgkgkSWVNMcze0qxHAyI5nku/JBe6I1n3nm6JNkblK9D05hbGj9SULCMMLJ?=
- =?us-ascii?Q?3ru38UFcoLkszfM9+fJOZl+4V2FqEm8tMxlRnvOZAQvSTv7Ksamualxhd+0P?=
- =?us-ascii?Q?C5Gkq2YnhxvUEvsYDrFx0LmYH6qP6gH02tjwll3Kt7yOFvw6HGAqcw3fHxPc?=
- =?us-ascii?Q?EK8UFY9Et13JqWYEt1njoq+CnZ4np+d/aIHkyfTdRjiiLQEWNP+VdO6UBkUX?=
- =?us-ascii?Q?gh5kRp+GlO344hzyN/Ovp2KYFh6D0cE58ohzOQfd9bA3U9JGpxBjZRIIjuJe?=
- =?us-ascii?Q?Mpz8ex30hxu6QYXP2vZDcsJsvVDyv2uO5/tQ6WxeHqeT+G90Gh7HP6a6jZk7?=
- =?us-ascii?Q?S3StXLObWQgBEQ3oVejIcOR40TyGlC1esg6gqA0exPaMdnR1j+F37LfYqQGr?=
- =?us-ascii?Q?tT+Ici0k2VjNs2XVyPfxpKv9tm3zv4HycHhZZ3nNrQ2dl3ZiNMq1004eEE8+?=
- =?us-ascii?Q?9RfYqhsh4gxB805aq6KigBnF+tCWj++IEi8RNait3lQEvZ0KQgJmOfNkPviq?=
- =?us-ascii?Q?Dr8Yhn9r/OuncTJdlwCQRDf8sLdKdYgh+ZYeEW6fGr808aR8M62RnsWlEKKs?=
- =?us-ascii?Q?Tl3bmXYE/H7tpw8QrqKaW1TSdEz488urfUAjF+epmH+MAoe5X9MlfQx0QP5D?=
- =?us-ascii?Q?FtpIejzDS62p67waD5R+rBa491t/kDbKBl2paiqzY2yw12+7W7nlBhnJXYfX?=
- =?us-ascii?Q?9vQA0vDMiMrS7INhNgDKJmdifboKg6NGI9mSkd3D6nLo6WxFsEQORCXS6C+0?=
- =?us-ascii?Q?twHzhNNuVWKV5iHxOApHgmYOb4/Nhwnyl70WsQrzYV1ugmAaTagZIUYJwTFr?=
- =?us-ascii?Q?NA7i+0qPiMsDXo7oTDzXaigMPSPR8A876VE7weRidiBV6/Pl0Lym7CSlZ98m?=
- =?us-ascii?Q?cCtOC57kLr/wShO9kxCNNlYU6KCV/dgQ4Z9EDjVnKnoBDL4GUvqfDQXRw/J6?=
- =?us-ascii?Q?ruBCWI2ZiGHj30cDl6mul+CerPeg6w90OUj4mOZu59COl6fm48OAQep1qcnz?=
- =?us-ascii?Q?7TRyTDF8vg+GJ8o8VMMdCM6MmGw1BYQzaRr/6i5BkgnFHQRpaF117rAIABrl?=
- =?us-ascii?Q?hSXAMt2dXaI+DgGYK6f4QslGaVp19KZjsLCRT0WaCYGP9eiT3wEltXlh46am?=
- =?us-ascii?Q?zJDmGexGjsmgKjs+5ovw8PrYFCjWHFx+R4Zdtlkc3IM8/HVdTx/wi4AJafDg?=
- =?us-ascii?Q?u1YRgEsMiPoyB7u4h7oKdV7/uc6S3hQOT/AWWuNFMf+5j1EwVYlxVo5sI4xj?=
- =?us-ascii?Q?VsuoXwehii2hY0dMXIVsroNxFWE4FH7QZ1oc4Lh7ce0GXXZNiKYTzwe+aRqF?=
- =?us-ascii?Q?af27fAwfUraM5D8AgQ3isFe4xCIlluGHnCG7P4rh?=
-X-MS-Exchange-CrossTenant-Network-Message-Id: b4c9d0bf-6db4-4356-fc54-08de02846eff
-X-MS-Exchange-CrossTenant-AuthSource: DS7PR11MB5966.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 03 Oct 2025 13:54:55.9149
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: nNNWYcyFBhhDASY1V0ZUVBX5wjZOJm1lVAIti5J5fUPSSW0SP+7Iog+alZXNQzFbl8XEySsELkUfNoyQO24aaQ==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: CY5PR11MB6536
-X-OriginatorOrg: intel.com
-
-Sorry for the slow response due to the PRC holiday.
-
-On Tue, Sep 30, 2025 at 09:29:00AM -0700, Sean Christopherson wrote:
-> On Tue, Sep 30, 2025, Yan Zhao wrote:
-> > On Tue, Sep 30, 2025 at 08:22:41PM +0800, Yan Zhao wrote:
-> > > On Fri, Sep 19, 2025 at 02:42:59PM -0700, Sean Christopherson wrote:
-> > > > Rename kvm_user_return_msr_update_cache() to __kvm_set_user_return_msr()
-> > > > and use the helper kvm_set_user_return_msr() to make it obvious that the
-> > > > double-underscores version is doing a subset of the work of the "full"
-> > > > setter.
-> > > > 
-> > > > While the function does indeed update a cache, the nomenclature becomes
-> > > > slightly misleading when adding a getter[1], as the current value isn't
-> > > > _just_ the cached value, it's also the value that's currently loaded in
-> > > > hardware.
-> > > Nit:
-> > > 
-> > > For TDX, "it's also the value that's currently loaded in hardware" is not true.
-> > since tdx module invokes wrmsr()s before each exit to VMM, while KVM only
-> > invokes __kvm_set_user_return_msr() in tdx_vcpu_put().
-> 
-> No?  kvm_user_return_msr_update_cache() is passed the value that's currently
-> loaded in hardware, by way of the TDX-Module zeroing some MSRs on TD-Exit.
-> 
-> Ah, I suspect you're calling out that the cache can be stale.  Maybe this?
-Right. But not just that the cache can be stale. My previous reply was quite
-misleading.
-
-As with below tables, where
-CURR: msrs->values[slot].curr.
-REAL: value that's currently loaded in hardware
-
-For TDs,
-                            CURR          REAL
-   -----------------------------------------------------------------------
-1. enable virtualization    host value    host value
-
-2. TDH.VP.ENTER             host value    guest value (updated by tdx module)
-3. TDH.VP.ENTER return      host value    defval (updated by tdx module)
-4. tdx_vcpu_put             defval        defval
-5. exit to user mode        host value    host value
+X-SRS-Rewrite: SMTP reverse-path rewritten from <dwmw2@infradead.org> by casper.infradead.org. See http://www.infradead.org/rpr.html
 
 
-For normal VMs,
-                            CURR                 REAL
-   -----------------------------------------------------------------------
-1. enable virtualization    host value           host value
+--=-vwepbdyxFhym1efp99qD
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-2. before vcpu_run          shadow guest value   shadow guest value
-3. after vcpu_run           shadow guest value   shadow guest value
-4. exit to user mode        host value           host value
+On Fri, 2025-10-03 at 15:09 +0200, Paolo Bonzini wrote:
+> Hi Dave and others,
+>=20
+> any reason why this series was not pulled into 6.18? I was a bit
+> surprised not to see it...
+
+At the very least I'd like to see the first patch with the
+relocate_kernel() rework go in. I have some stuff lined up which would
+conflict with that and needs to go after it, to speed up kexec by
+keeping CPUs online, etc.
 
 
-Unlike normal VMs, where msrs->values[slot].curr always matches the the value
-that's currently loaded in hardware. For TDs, msrs->values[slot].curr does not
-contain the value that's currently loaded in hardware in stages 2-3.
+
+--=-vwepbdyxFhym1efp99qD
+Content-Type: application/pkcs7-signature; name="smime.p7s"
+Content-Disposition: attachment; filename="smime.p7s"
+Content-Transfer-Encoding: base64
+
+MIAGCSqGSIb3DQEHAqCAMIACAQExDzANBglghkgBZQMEAgEFADCABgkqhkiG9w0BBwEAAKCCD9Aw
+ggSOMIIDdqADAgECAhAOmiw0ECVD4cWj5DqVrT9PMA0GCSqGSIb3DQEBCwUAMGUxCzAJBgNVBAYT
+AlVTMRUwEwYDVQQKEwxEaWdpQ2VydCBJbmMxGTAXBgNVBAsTEHd3dy5kaWdpY2VydC5jb20xJDAi
+BgNVBAMTG0RpZ2lDZXJ0IEFzc3VyZWQgSUQgUm9vdCBDQTAeFw0yNDAxMzAwMDAwMDBaFw0zMTEx
+MDkyMzU5NTlaMEExCzAJBgNVBAYTAkFVMRAwDgYDVQQKEwdWZXJva2V5MSAwHgYDVQQDExdWZXJv
+a2V5IFNlY3VyZSBFbWFpbCBHMjCCASIwDQYJKoZIhvcNAQEBBQADggEPADCCAQoCggEBAMjvgLKj
+jfhCFqxYyRiW8g3cNFAvltDbK5AzcOaR7yVzVGadr4YcCVxjKrEJOgi7WEOH8rUgCNB5cTD8N/Et
+GfZI+LGqSv0YtNa54T9D1AWJy08ZKkWvfGGIXN9UFAPMJ6OLLH/UUEgFa+7KlrEvMUupDFGnnR06
+aDJAwtycb8yXtILj+TvfhLFhafxroXrflspavejQkEiHjNjtHnwbZ+o43g0/yxjwnarGI3kgcak7
+nnI9/8Lqpq79tLHYwLajotwLiGTB71AGN5xK+tzB+D4eN9lXayrjcszgbOv2ZCgzExQUAIt98mre
+8EggKs9mwtEuKAhYBIP/0K6WsoMnQCcCAwEAAaOCAVwwggFYMBIGA1UdEwEB/wQIMAYBAf8CAQAw
+HQYDVR0OBBYEFIlICOogTndrhuWByNfhjWSEf/xwMB8GA1UdIwQYMBaAFEXroq/0ksuCMS1Ri6en
+IZ3zbcgPMA4GA1UdDwEB/wQEAwIBhjAdBgNVHSUEFjAUBggrBgEFBQcDBAYIKwYBBQUHAwIweQYI
+KwYBBQUHAQEEbTBrMCQGCCsGAQUFBzABhhhodHRwOi8vb2NzcC5kaWdpY2VydC5jb20wQwYIKwYB
+BQUHMAKGN2h0dHA6Ly9jYWNlcnRzLmRpZ2ljZXJ0LmNvbS9EaWdpQ2VydEFzc3VyZWRJRFJvb3RD
+QS5jcnQwRQYDVR0fBD4wPDA6oDigNoY0aHR0cDovL2NybDMuZGlnaWNlcnQuY29tL0RpZ2lDZXJ0
+QXNzdXJlZElEUm9vdENBLmNybDARBgNVHSAECjAIMAYGBFUdIAAwDQYJKoZIhvcNAQELBQADggEB
+ACiagCqvNVxOfSd0uYfJMiZsOEBXAKIR/kpqRp2YCfrP4Tz7fJogYN4fxNAw7iy/bPZcvpVCfe/H
+/CCcp3alXL0I8M/rnEnRlv8ItY4MEF+2T/MkdXI3u1vHy3ua8SxBM8eT9LBQokHZxGUX51cE0kwa
+uEOZ+PonVIOnMjuLp29kcNOVnzf8DGKiek+cT51FvGRjV6LbaxXOm2P47/aiaXrDD5O0RF5SiPo6
+xD1/ClkCETyyEAE5LRJlXtx288R598koyFcwCSXijeVcRvBB1cNOLEbg7RMSw1AGq14fNe2cH1HG
+W7xyduY/ydQt6gv5r21mDOQ5SaZSWC/ZRfLDuEYwggWbMIIEg6ADAgECAhAH5JEPagNRXYDiRPdl
+c1vgMA0GCSqGSIb3DQEBCwUAMEExCzAJBgNVBAYTAkFVMRAwDgYDVQQKEwdWZXJva2V5MSAwHgYD
+VQQDExdWZXJva2V5IFNlY3VyZSBFbWFpbCBHMjAeFw0yNDEyMzAwMDAwMDBaFw0yODAxMDQyMzU5
+NTlaMB4xHDAaBgNVBAMME2R3bXcyQGluZnJhZGVhZC5vcmcwggIiMA0GCSqGSIb3DQEBAQUAA4IC
+DwAwggIKAoICAQDali7HveR1thexYXx/W7oMk/3Wpyppl62zJ8+RmTQH4yZeYAS/SRV6zmfXlXaZ
+sNOE6emg8WXLRS6BA70liot+u0O0oPnIvnx+CsMH0PD4tCKSCsdp+XphIJ2zkC9S7/yHDYnqegqt
+w4smkqUqf0WX/ggH1Dckh0vHlpoS1OoxqUg+ocU6WCsnuz5q5rzFsHxhD1qGpgFdZEk2/c//ZvUN
+i12vPWipk8TcJwHw9zoZ/ZrVNybpMCC0THsJ/UEVyuyszPtNYeYZAhOJ41vav1RhZJzYan4a1gU0
+kKBPQklcpQEhq48woEu15isvwWh9/+5jjh0L+YNaN0I//nHSp6U9COUG9Z0cvnO8FM6PTqsnSbcc
+0j+GchwOHRC7aP2t5v2stVx3KbptaYEzi4MQHxm/0+HQpMEVLLUiizJqS4PWPU6zfQTOMZ9uLQRR
+ci+c5xhtMEBszlQDOvEQcyEG+hc++fH47K+MmZz21bFNfoBxLP6bjR6xtPXtREF5lLXxp+CJ6KKS
+blPKeVRg/UtyJHeFKAZXO8Zeco7TZUMVHmK0ZZ1EpnZbnAhKE19Z+FJrQPQrlR0gO3lBzuyPPArV
+hvWxjlO7S4DmaEhLzarWi/ze7EGwWSuI2eEa/8zU0INUsGI4ywe7vepQz7IqaAovAX0d+f1YjbmC
+VsAwjhLmveFjNwIDAQABo4IBsDCCAawwHwYDVR0jBBgwFoAUiUgI6iBOd2uG5YHI1+GNZIR//HAw
+HQYDVR0OBBYEFFxiGptwbOfWOtMk5loHw7uqWUOnMDAGA1UdEQQpMCeBE2R3bXcyQGluZnJhZGVh
+ZC5vcmeBEGRhdmlkQHdvb2Rob3Uuc2UwFAYDVR0gBA0wCzAJBgdngQwBBQEBMA4GA1UdDwEB/wQE
+AwIF4DAdBgNVHSUEFjAUBggrBgEFBQcDAgYIKwYBBQUHAwQwewYDVR0fBHQwcjA3oDWgM4YxaHR0
+cDovL2NybDMuZGlnaWNlcnQuY29tL1Zlcm9rZXlTZWN1cmVFbWFpbEcyLmNybDA3oDWgM4YxaHR0
+cDovL2NybDQuZGlnaWNlcnQuY29tL1Zlcm9rZXlTZWN1cmVFbWFpbEcyLmNybDB2BggrBgEFBQcB
+AQRqMGgwJAYIKwYBBQUHMAGGGGh0dHA6Ly9vY3NwLmRpZ2ljZXJ0LmNvbTBABggrBgEFBQcwAoY0
+aHR0cDovL2NhY2VydHMuZGlnaWNlcnQuY29tL1Zlcm9rZXlTZWN1cmVFbWFpbEcyLmNydDANBgkq
+hkiG9w0BAQsFAAOCAQEAQXc4FPiPLRnTDvmOABEzkIumojfZAe5SlnuQoeFUfi+LsWCKiB8Uextv
+iBAvboKhLuN6eG/NC6WOzOCppn4mkQxRkOdLNThwMHW0d19jrZFEKtEG/epZ/hw/DdScTuZ2m7im
+8ppItAT6GXD3aPhXkXnJpC/zTs85uNSQR64cEcBFjjoQDuSsTeJ5DAWf8EMyhMuD8pcbqx5kRvyt
+JPsWBQzv1Dsdv2LDPLNd/JUKhHSgr7nbUr4+aAP2PHTXGcEBh8lTeYea9p4d5k969pe0OHYMV5aL
+xERqTagmSetuIwolkAuBCzA9vulg8Y49Nz2zrpUGfKGOD0FMqenYxdJHgDCCBZswggSDoAMCAQIC
+EAfkkQ9qA1FdgOJE92VzW+AwDQYJKoZIhvcNAQELBQAwQTELMAkGA1UEBhMCQVUxEDAOBgNVBAoT
+B1Zlcm9rZXkxIDAeBgNVBAMTF1Zlcm9rZXkgU2VjdXJlIEVtYWlsIEcyMB4XDTI0MTIzMDAwMDAw
+MFoXDTI4MDEwNDIzNTk1OVowHjEcMBoGA1UEAwwTZHdtdzJAaW5mcmFkZWFkLm9yZzCCAiIwDQYJ
+KoZIhvcNAQEBBQADggIPADCCAgoCggIBANqWLse95HW2F7FhfH9bugyT/danKmmXrbMnz5GZNAfj
+Jl5gBL9JFXrOZ9eVdpmw04Tp6aDxZctFLoEDvSWKi367Q7Sg+ci+fH4KwwfQ8Pi0IpIKx2n5emEg
+nbOQL1Lv/IcNiep6Cq3DiyaSpSp/RZf+CAfUNySHS8eWmhLU6jGpSD6hxTpYKye7PmrmvMWwfGEP
+WoamAV1kSTb9z/9m9Q2LXa89aKmTxNwnAfD3Ohn9mtU3JukwILRMewn9QRXK7KzM+01h5hkCE4nj
+W9q/VGFknNhqfhrWBTSQoE9CSVylASGrjzCgS7XmKy/BaH3/7mOOHQv5g1o3Qj/+cdKnpT0I5Qb1
+nRy+c7wUzo9OqydJtxzSP4ZyHA4dELto/a3m/ay1XHcpum1pgTOLgxAfGb/T4dCkwRUstSKLMmpL
+g9Y9TrN9BM4xn24tBFFyL5znGG0wQGzOVAM68RBzIQb6Fz758fjsr4yZnPbVsU1+gHEs/puNHrG0
+9e1EQXmUtfGn4InoopJuU8p5VGD9S3Ikd4UoBlc7xl5yjtNlQxUeYrRlnUSmdlucCEoTX1n4UmtA
+9CuVHSA7eUHO7I88CtWG9bGOU7tLgOZoSEvNqtaL/N7sQbBZK4jZ4Rr/zNTQg1SwYjjLB7u96lDP
+sipoCi8BfR35/ViNuYJWwDCOEua94WM3AgMBAAGjggGwMIIBrDAfBgNVHSMEGDAWgBSJSAjqIE53
+a4blgcjX4Y1khH/8cDAdBgNVHQ4EFgQUXGIam3Bs59Y60yTmWgfDu6pZQ6cwMAYDVR0RBCkwJ4ET
+ZHdtdzJAaW5mcmFkZWFkLm9yZ4EQZGF2aWRAd29vZGhvdS5zZTAUBgNVHSAEDTALMAkGB2eBDAEF
+AQEwDgYDVR0PAQH/BAQDAgXgMB0GA1UdJQQWMBQGCCsGAQUFBwMCBggrBgEFBQcDBDB7BgNVHR8E
+dDByMDegNaAzhjFodHRwOi8vY3JsMy5kaWdpY2VydC5jb20vVmVyb2tleVNlY3VyZUVtYWlsRzIu
+Y3JsMDegNaAzhjFodHRwOi8vY3JsNC5kaWdpY2VydC5jb20vVmVyb2tleVNlY3VyZUVtYWlsRzIu
+Y3JsMHYGCCsGAQUFBwEBBGowaDAkBggrBgEFBQcwAYYYaHR0cDovL29jc3AuZGlnaWNlcnQuY29t
+MEAGCCsGAQUFBzAChjRodHRwOi8vY2FjZXJ0cy5kaWdpY2VydC5jb20vVmVyb2tleVNlY3VyZUVt
+YWlsRzIuY3J0MA0GCSqGSIb3DQEBCwUAA4IBAQBBdzgU+I8tGdMO+Y4AETOQi6aiN9kB7lKWe5Ch
+4VR+L4uxYIqIHxR7G2+IEC9ugqEu43p4b80LpY7M4KmmfiaRDFGQ50s1OHAwdbR3X2OtkUQq0Qb9
+6ln+HD8N1JxO5nabuKbymki0BPoZcPdo+FeRecmkL/NOzzm41JBHrhwRwEWOOhAO5KxN4nkMBZ/w
+QzKEy4PylxurHmRG/K0k+xYFDO/UOx2/YsM8s138lQqEdKCvudtSvj5oA/Y8dNcZwQGHyVN5h5r2
+nh3mT3r2l7Q4dgxXlovERGpNqCZJ624jCiWQC4ELMD2+6WDxjj03PbOulQZ8oY4PQUyp6djF0keA
+MYIDuzCCA7cCAQEwVTBBMQswCQYDVQQGEwJBVTEQMA4GA1UEChMHVmVyb2tleTEgMB4GA1UEAxMX
+VmVyb2tleSBTZWN1cmUgRW1haWwgRzICEAfkkQ9qA1FdgOJE92VzW+AwDQYJYIZIAWUDBAIBBQCg
+ggE3MBgGCSqGSIb3DQEJAzELBgkqhkiG9w0BBwEwHAYJKoZIhvcNAQkFMQ8XDTI1MTAwMzEzNTQz
+NFowLwYJKoZIhvcNAQkEMSIEILdcEYhNLbO34aX2R88GPT3PLQKSUpEZj/lOzdQE8zj3MGQGCSsG
+AQQBgjcQBDFXMFUwQTELMAkGA1UEBhMCQVUxEDAOBgNVBAoTB1Zlcm9rZXkxIDAeBgNVBAMTF1Zl
+cm9rZXkgU2VjdXJlIEVtYWlsIEcyAhAH5JEPagNRXYDiRPdlc1vgMGYGCyqGSIb3DQEJEAILMVeg
+VTBBMQswCQYDVQQGEwJBVTEQMA4GA1UEChMHVmVyb2tleTEgMB4GA1UEAxMXVmVyb2tleSBTZWN1
+cmUgRW1haWwgRzICEAfkkQ9qA1FdgOJE92VzW+AwDQYJKoZIhvcNAQEBBQAEggIAZngKQA61kgfp
+XkcvZhN4Rn1VvbLeUQ4QqzeoAgN6DWN/9DjhYVkdAT+6jQYrlFUjH1G8SHV8C9nJGIrbXXSGggIU
+isVgvH4aTLchZ2AEKbDNqYJXuOiikxU98M/bEagxBS1W2QVaMMZ00b0GXJONvLo7tHbg6UuWkGBd
+6S5qL/ycRQgHZfTaykN04FEnEgajOpx3wBeEl+u3Cw3jxCC9h7HQsx+805n7HmP1xFnt6fKpcexm
+PdJhCc+tylcIBeiXNWHPE+ZfHRrODq48jT6QFG8WxTNbA6YQ/i5XTmUEhJUG27BdvMJ1A1gNOVQv
+KynDBjOtOvibBSoQRMgVkvMuzmBGTK9bHYLDx2WHswJHIg4WB3g2vy9MUgphwD7qfEpVY/eAL9x1
+t1X5OVtt+TINf7spc33oF1kMy06nWybsmWaE3k6elpd1Fs3HB3j6GLyoLYtVAH0bXHAsCAYVRVnP
+VKlgv0KSmAO1Ez4dcFnSVu6CcNtVmRuJ9lYKADyVhxAI9ZOhXO6VAmdrWkBjq0H8bobbZay7xP7i
+kw28Is8PeWIB4upQHuxJM47XUkOPizMbNPsFaAgi23jzxa88P+OuLPBe/MEPvrFTkcJJPDOs4b4E
+VO9AlUX2IWt/iXFHNLzZEBepbdSioLiNjROwhsGRApY8VvV69MGG3fhIXlvQDyoAAAAAAAA=
 
 
->   While the function does indeed update a cache, the nomenclature becomes
->   slightly misleading when adding a getter[1], as the current value isn't
->   _just_ the cached value, it's also the value that's currently loaded in
->   hardware (ignoring that the cache holds stale data until the vCPU is put,
-So, "stale data" is not accurate.
-It just can't hold the current hardware loaded value when guest is running in
-TD.
-
->   i.e. until KVM prepares to switch back to the host).
-> 
-> Actually, that's a bug waiting to happen when the getter comes along.  Rather
-> than document the potential pitfall, what about adding a prep patch to mimize
-> the window?  Then _this_ patch shouldn't need the caveat about the cache being
-> stale.
-With below patch,
-
-For TDs,
-                            CURR          REAL
-   -----------------------------------------------------------------------
-1. enable virtualization    host value    host value
-
-2. before TDH.VP.ENTER      defval        host value or defval
-3. TDH.VP.ENTER             defval        guest value (updated by tdx module)
-4. TDH.VP.ENTER return      defval        defval (updated by tdx module)
-5. exit to user mode        host value    host value
-
-msrs->values[slot].curr is still not the current value loaded in hardware.
-
-> diff --git a/arch/x86/kvm/vmx/tdx.c b/arch/x86/kvm/vmx/tdx.c
-> index ff41d3d00380..326fa81cb35f 100644
-> --- a/arch/x86/kvm/vmx/tdx.c
-> +++ b/arch/x86/kvm/vmx/tdx.c
-> @@ -789,6 +789,14 @@ void tdx_prepare_switch_to_guest(struct kvm_vcpu *vcpu)
->                 vt->msr_host_kernel_gs_base = read_msr(MSR_KERNEL_GS_BASE);
->  
->         vt->guest_state_loaded = true;
-> +
-> +       /*
-> +        * Several of KVM's user-return MSRs are clobbered by the TDX-Module if
-Hmm, my previous mail didn't mention that besides saving guest value + clobber
-hardware value before exit to VMM, the TDX module also loads saved guest value
-to hardware on TDH.VP.ENTER.
-
-> +        * VP.ENTER succeeds, i.e. on TD-Exit.  Mark those MSRs as needing an
-> +        * update to synchronize the "current" value in KVM's cache with the
-> +        * value in hardware (loaded by the TDX-Module).
-> +        */
-> +       to_tdx(vcpu)->need_user_return_msr_update = true;
->  }
->  
->  struct tdx_uret_msr {
-> @@ -816,7 +824,6 @@ static void tdx_user_return_msr_update_cache(void)
->  static void tdx_prepare_switch_to_host(struct kvm_vcpu *vcpu)
->  {
->         struct vcpu_vt *vt = to_vt(vcpu);
-> -       struct vcpu_tdx *tdx = to_tdx(vcpu);
->  
->         if (!vt->guest_state_loaded)
->                 return;
-> @@ -824,11 +831,6 @@ static void tdx_prepare_switch_to_host(struct kvm_vcpu *vcpu)
->         ++vcpu->stat.host_state_reload;
->         wrmsrl(MSR_KERNEL_GS_BASE, vt->msr_host_kernel_gs_base);
->  
-> -       if (tdx->guest_entered) {
-> -               tdx_user_return_msr_update_cache();
-> -               tdx->guest_entered = false;
-> -       }
-> -
->         vt->guest_state_loaded = false;
->  }
->  
-> @@ -1067,7 +1069,11 @@ fastpath_t tdx_vcpu_run(struct kvm_vcpu *vcpu, u64 run_flags)
->                 update_debugctlmsr(vcpu->arch.host_debugctl);
->  
->         tdx_load_host_xsave_state(vcpu);
-> -       tdx->guest_entered = true;
-> +
-> +       if (tdx->need_user_return_msr_update) {
-> +               tdx_user_return_msr_update_cache();
-> +               tdx->need_user_return_msr_update = false;
-> +       }
->  
->         vcpu->arch.regs_avail &= TDX_REGS_AVAIL_SET;
->  
-> diff --git a/arch/x86/kvm/vmx/tdx.h b/arch/x86/kvm/vmx/tdx.h
-> index ca39a9391db1..fcac1627f71f 100644
-> --- a/arch/x86/kvm/vmx/tdx.h
-> +++ b/arch/x86/kvm/vmx/tdx.h
-> @@ -67,7 +67,7 @@ struct vcpu_tdx {
->         u64 vp_enter_ret;
->  
->         enum vcpu_tdx_state state;
-> -       bool guest_entered;
-> +       bool need_user_return_msr_update;
->  
->         u64 map_gpa_next;
->         u64 map_gpa_end;
-> 
+--=-vwepbdyxFhym1efp99qD--
 
