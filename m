@@ -1,129 +1,166 @@
-Return-Path: <kvm+bounces-59466-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-59467-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id EE12CBB77E5
-	for <lists+kvm@lfdr.de>; Fri, 03 Oct 2025 18:11:27 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id D3CE4BB7805
+	for <lists+kvm@lfdr.de>; Fri, 03 Oct 2025 18:13:48 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id B356E4ED9ED
-	for <lists+kvm@lfdr.de>; Fri,  3 Oct 2025 16:11:14 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id AF5DF4E7C17
+	for <lists+kvm@lfdr.de>; Fri,  3 Oct 2025 16:13:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B02572BE05B;
-	Fri,  3 Oct 2025 16:11:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0B91F2BDC33;
+	Fri,  3 Oct 2025 16:13:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="TJFydeTr"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="eSVl+qmC"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pl1-f202.google.com (mail-pl1-f202.google.com [209.85.214.202])
+Received: from mail-pf1-f202.google.com (mail-pf1-f202.google.com [209.85.210.202])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8F18526E6FA
-	for <kvm@vger.kernel.org>; Fri,  3 Oct 2025 16:11:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D40FA14A8B
+	for <kvm@vger.kernel.org>; Fri,  3 Oct 2025 16:13:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1759507864; cv=none; b=YNnH7xuNkO4omlvzT1hj8hz8RGWwn49XJpNrQvJ5uQ2bRclfftP087I48c5CimD/DiaMIjeWen8alFoM2GJx7M6VNFkQHNrsWzANqhdb7bZkukBUqJnFoxCX8DFWjWJGdHiUDxSfZ4V7cO7zoTdiu/H6gOypa3p0pYO5PsJ2xxA=
+	t=1759508009; cv=none; b=CnOfhfBM6rDEeivqQW24saivKrC+EfnqEJ6KD8iHNS2oibgyhJYOujaEY58FmsITu2vgKbX709PPlx0DPdyvtxsihV9hFRfEDtWbGDMA32tghEeRbEv+awQuPWWzsbXl2l1UJMJbngCYZti2EEQE69Za9qUHJfYqqeQ7Q+1jJzE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1759507864; c=relaxed/simple;
-	bh=PZQha7RBk24SP6qwyggJkFay7mNZRHmPQnH5kdOnMRw=;
+	s=arc-20240116; t=1759508009; c=relaxed/simple;
+	bh=YST8ZF3CcYfjTEJjqYRKNJnCudGeZXmyFr2oVhiwg2c=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=WhGANp9ncI8owIrgbrPhxbh0IYezntWQD0zzFI7i//9KE7Rl7ICmSlwblPcmPWzO7Gu7l7cJtwhsreJ32vSy6lfAeLP5lTrscel7YM6YIWAbZqeoyqJde7NSgLisEZWtgnxrXAOp3ZauNdxySakFP8wdJRuFdEiHV6eisGaz1kU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=TJFydeTr; arc=none smtp.client-ip=209.85.214.202
+	 To:Cc:Content-Type; b=RDZg1oiASlApon5WwM/M+c9xu+skDlPVa4vAhKVk0bEEWb+kfBsV5cW/wl7zrHAkDl71NNzTokTxSBJI++DjwKnQ2cZwx+yu9z3OTrmcn5u/0IZvjoonsZN26MReZ8Ff+RN0ra5LRkal0vQbPnCdasZzt+XW/QGY2a2I6us0Ytg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=eSVl+qmC; arc=none smtp.client-ip=209.85.210.202
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pl1-f202.google.com with SMTP id d9443c01a7336-2699ed6d43dso25079105ad.1
-        for <kvm@vger.kernel.org>; Fri, 03 Oct 2025 09:11:03 -0700 (PDT)
+Received: by mail-pf1-f202.google.com with SMTP id d2e1a72fcca58-78105c10afdso2364075b3a.1
+        for <kvm@vger.kernel.org>; Fri, 03 Oct 2025 09:13:27 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1759507863; x=1760112663; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=lNh2mX9a3msgEQw2OsPB0rXj0BKWzfoqoJiUnuGpBLY=;
-        b=TJFydeTr+mFmSPqZErGU6IftQjd3w61WHvoph4LINqFGKN+RgOsmJcLkdLBwm6DXrQ
-         CicN7vqVJePkbThYz5ndDKqrhcWBQhgGJo4bDQ/ru2UDzrzF5Qca9QsTKvNHNN1fxuft
-         Aiw3zoIVX5AYszvM2skCACMa4uQYaBmW5G7bHNNBNzgYYJCSjpG5dABY8azpqLc63P8I
-         MRKWxxCUP9txgK5oLmtHuk1gkE9CKBsMgI4COK2m90h1HlKwJD2fYVR9EpIobydPy9Gf
-         5celyMoVpgTzKr8hgn6wss1J2cs2+OeJzg0TNqXzPCqWVKN0XPFDm4bPGHpHJk/DEMzz
-         0DHg==
+        d=google.com; s=20230601; t=1759508007; x=1760112807; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:from:subject:message-id:references
+         :mime-version:in-reply-to:date:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=tmfo6BfSj1vijjHYWbexLj1tiKT+0K4lqvnwt2mSWyo=;
+        b=eSVl+qmCuoJOZllp0tfhLGnX8cM47fY35j8urvgCGfPROS3mpPVzCO8FzAvv4Tkpvl
+         umi9kjk8RJT6qyZZyiWSQqzntUwBaNukU74V+Ft6qdlN6M69Fb5UzJQslowojasgExgl
+         yJCu9x3v6h6BYOTV1KQo5YpHmlOQCpmU3BNqwp2qptuLnyS+1I6DDOsDPctTBI9ajNZ9
+         ajdeiXauDREizMn2e0m6XGKu1mz2tq5Ym7MHykcXpwfuvqX0b/c5wBIs8FKUkHF74sgD
+         sGxr7nnky5t9lb078mFj+ME3u6kvX3LoIZBPtZantwMJDfM4JXUD81XncIl5hNgph1b1
+         UgQA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1759507863; x=1760112663;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=lNh2mX9a3msgEQw2OsPB0rXj0BKWzfoqoJiUnuGpBLY=;
-        b=PRWkhlXc3ygJcyRMUkM68p8d4FW6HjDsFe2cv02X8V/Ru0wfuPMRHljjS/2O9tqgdS
-         7PN2HLnIfkxEKT+2lsugffsD/HvuAhUdKnoTRm4VhJ/L+7f6e24/uyqoR+gnul+hxVlN
-         HvZ1kI5ZBkiSxQH0BfBwfOJ6g2HRBZEHjJOphJjSX1jFolZhdD0/krO2AdAvAapHi0Vz
-         VC+v16pf7lmPP92Uj8ySSxlA+U5ohMm9biE8BKZQjEBkj1eWkYet+ykyFi8MEQY0Nu2Z
-         W03nq16+I15jqqUiry9vSThVAjvFwl0OFKITHQKUC/B87zz4j92vh4P8/dovgJHovTJy
-         NdNg==
-X-Gm-Message-State: AOJu0Yz6VRoqysJUWhTObof6qJgjStY6yjwV4z/X9LbPZwf36TfIpOlN
-	FIAJI6qq05v5w4DLbs1txbJUkdZq/n7oeElbG/DzrCZ6BZseLlIU7+kPijJdycGxEwRcDutxZLe
-	QRIoy6g==
-X-Google-Smtp-Source: AGHT+IGqNOuAruJgEcEZ8T6X7B8VeXMzqceZ1ggBpiDOEhdpqVLI6EnOOFhpmeY8C5TVlMwWJfNoQPt99zY=
-X-Received: from plbjw19.prod.google.com ([2002:a17:903:2793:b0:273:c5f4:a8ca])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:902:e786:b0:268:15f:8358
- with SMTP id d9443c01a7336-28e9a656d8fmr47206475ad.42.1759507862519; Fri, 03
- Oct 2025 09:11:02 -0700 (PDT)
-Date: Fri, 3 Oct 2025 09:11:01 -0700
-In-Reply-To: <2ae41e0d80339da2b57011622ac2288fed65cd01.1747264138.git.ackerleytng@google.com>
+        d=1e100.net; s=20230601; t=1759508007; x=1760112807;
+        h=content-transfer-encoding:cc:to:from:subject:message-id:references
+         :mime-version:in-reply-to:date:x-gm-message-state:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=tmfo6BfSj1vijjHYWbexLj1tiKT+0K4lqvnwt2mSWyo=;
+        b=deMm9Wl3XF66ghi6sCGafiP33ujeRIdei7QRiEWdcJD/TcPBG6T+1I69Jh6McCR9DH
+         /Xn4cu4YVCLDrLmstXmzNf9s/pIzEZDZ22IBdPVMgA2wJtaPOTnum1cBGh6qhSaW0wrl
+         RrauRe22OpC+MuQtU//MkD2Km6lnAORcWvIq5KRfTTn1j2FLHq/s14TkuKX8Iy4P1mRq
+         O2wfkRfk+7kaVax7g/UOt6DlRBEvSqZdwkhCmTlPshgPNPqRUCHRbe69UmImL3rSfPKH
+         CHlnNSpj9YIg29bqzgw5dTE/7QLnXqbr/ZknccwetJxyzv+LBI6YDC3GDrIjjHygDy6K
+         THrQ==
+X-Forwarded-Encrypted: i=1; AJvYcCUu/G+oljyFuuIjH2/ukYFSHD1Ufmi3jA0vBo+bcd0u7lt4+84yg5FUrhF4uF3DAw1Pof0=@vger.kernel.org
+X-Gm-Message-State: AOJu0YymaYipnd0DfVve+/u6cjVFVp1j1oiENQU+emSzC4XD5ekBvsar
+	wPqymmrr05VN+eKvkG9KPfF+qXVMAAzHkVcjlOYcBztpkynDliLPFLe+ZpS4Sf6fNVr8Fm4tybd
+	2JTBrdQ==
+X-Google-Smtp-Source: AGHT+IGckT+FYIKyF0u496NCKfZhFFbReLIlmMVt60Vecws/DHOYXpXuGQnDznnvpoOwwtW65OfuIzp1Y8U=
+X-Received: from pgbcv13.prod.google.com ([2002:a05:6a02:420d:b0:b62:de94:990d])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a05:6a20:6a10:b0:2cd:a43f:78fb
+ with SMTP id adf61e73a8af0-32b620db8b0mr4716222637.48.1759508007117; Fri, 03
+ Oct 2025 09:13:27 -0700 (PDT)
+Date: Fri, 3 Oct 2025 09:13:25 -0700
+In-Reply-To: <CAGtprH9N=974HZiqfdaO9DK9nycDD9NeiPeHC49P-DkgTaWtTw@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
-References: <cover.1747264138.git.ackerleytng@google.com> <2ae41e0d80339da2b57011622ac2288fed65cd01.1747264138.git.ackerleytng@google.com>
-Message-ID: <aN_1lSZJKBKvU9gV@google.com>
-Subject: Re: [RFC PATCH v2 35/51] mm: guestmem_hugetlb: Add support for
- splitting and merging pages
+References: <aNshILzpjAS-bUL5@google.com> <CAGtprH_JgWfr2wPGpJg_mY5Sxf6E0dp5r-_4aVLi96To2pugXA@mail.gmail.com>
+ <aN1TgRpde5hq_FPn@google.com> <CAGtprH-0B+cDARbK-xPGfx4sva+F1akbkX1gXts2VHaqyDWdzA@mail.gmail.com>
+ <aN1h4XTfRsJ8dhVJ@google.com> <CAGtprH-5NWVVyEM63ou4XjG4JmF2VYNakoFkwFwNR1AnJmiDpA@mail.gmail.com>
+ <aN3BhKZkCC4-iphM@google.com> <CAGtprH_evo=nyk1B6ZRdKJXX2s7g1W8dhwJhEPJkG=o2ORU48g@mail.gmail.com>
+ <aN8U2c8KMXTy6h9Q@google.com> <CAGtprH9N=974HZiqfdaO9DK9nycDD9NeiPeHC49P-DkgTaWtTw@mail.gmail.com>
+Message-ID: <aN_2JaorgERIkpW4@google.com>
+Subject: Re: [PATCH 1/6] KVM: guest_memfd: Add DEFAULT_SHARED flag, reject
+ user page faults if not set
 From: Sean Christopherson <seanjc@google.com>
-To: Ackerley Tng <ackerleytng@google.com>
-Cc: kvm@vger.kernel.org, linux-mm@kvack.org, linux-kernel@vger.kernel.org, 
-	x86@kernel.org, linux-fsdevel@vger.kernel.org, aik@amd.com, 
-	ajones@ventanamicro.com, akpm@linux-foundation.org, amoorthy@google.com, 
-	anthony.yznaga@oracle.com, anup@brainfault.org, aou@eecs.berkeley.edu, 
-	bfoster@redhat.com, binbin.wu@linux.intel.com, brauner@kernel.org, 
-	catalin.marinas@arm.com, chao.p.peng@intel.com, chenhuacai@kernel.org, 
-	dave.hansen@intel.com, david@redhat.com, dmatlack@google.com, 
-	dwmw@amazon.co.uk, erdemaktas@google.com, fan.du@intel.com, fvdl@google.com, 
-	graf@amazon.com, haibo1.xu@intel.com, hch@infradead.org, hughd@google.com, 
-	ira.weiny@intel.com, isaku.yamahata@intel.com, jack@suse.cz, 
-	james.morse@arm.com, jarkko@kernel.org, jgg@ziepe.ca, jgowans@amazon.com, 
-	jhubbard@nvidia.com, jroedel@suse.de, jthoughton@google.com, 
-	jun.miao@intel.com, kai.huang@intel.com, keirf@google.com, 
-	kent.overstreet@linux.dev, kirill.shutemov@intel.com, liam.merwick@oracle.com, 
-	maciej.wieczor-retman@intel.com, mail@maciej.szmigiero.name, maz@kernel.org, 
-	mic@digikod.net, michael.roth@amd.com, mpe@ellerman.id.au, 
-	muchun.song@linux.dev, nikunj@amd.com, nsaenz@amazon.es, 
-	oliver.upton@linux.dev, palmer@dabbelt.com, pankaj.gupta@amd.com, 
-	paul.walmsley@sifive.com, pbonzini@redhat.com, pdurrant@amazon.co.uk, 
-	peterx@redhat.com, pgonda@google.com, pvorel@suse.cz, qperret@google.com, 
-	quic_cvanscha@quicinc.com, quic_eberman@quicinc.com, 
-	quic_mnalajal@quicinc.com, quic_pderrin@quicinc.com, quic_pheragu@quicinc.com, 
-	quic_svaddagi@quicinc.com, quic_tsoni@quicinc.com, richard.weiyang@gmail.com, 
-	rick.p.edgecombe@intel.com, rientjes@google.com, roypat@amazon.co.uk, 
-	rppt@kernel.org, shuah@kernel.org, steven.price@arm.com, 
-	steven.sistare@oracle.com, suzuki.poulose@arm.com, tabba@google.com, 
-	thomas.lendacky@amd.com, usama.arif@bytedance.com, vannapurve@google.com, 
-	vbabka@suse.cz, viro@zeniv.linux.org.uk, vkuznets@redhat.com, 
-	wei.w.wang@intel.com, will@kernel.org, willy@infradead.org, 
-	xiaoyao.li@intel.com, yan.y.zhao@intel.com, yilun.xu@intel.com, 
-	yuzenghui@huawei.com, zhiquan1.li@intel.com
-Content-Type: text/plain; charset="us-ascii"
+To: Vishal Annapurve <vannapurve@google.com>
+Cc: Ackerley Tng <ackerleytng@google.com>, David Hildenbrand <david@redhat.com>, 
+	Patrick Roy <patrick.roy@linux.dev>, Fuad Tabba <tabba@google.com>, 
+	Paolo Bonzini <pbonzini@redhat.com>, Christian Borntraeger <borntraeger@linux.ibm.com>, 
+	Janosch Frank <frankja@linux.ibm.com>, Claudio Imbrenda <imbrenda@linux.ibm.com>, 
+	kvm list <kvm@vger.kernel.org>, LKML <linux-kernel@vger.kernel.org>, 
+	Nikita Kalyazin <kalyazin@amazon.co.uk>, Shivank Garg <shivankg@amd.com>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Wed, May 14, 2025, Ackerley Tng wrote:
->  const struct guestmem_allocator_operations guestmem_hugetlb_ops = {
->  	.inode_setup = guestmem_hugetlb_setup,
->  	.inode_teardown = guestmem_hugetlb_teardown,
->  	.alloc_folio = guestmem_hugetlb_alloc_folio,
-> +	.split_folio = guestmem_hugetlb_split_folio,
-> +	.merge_folio = guestmem_hugetlb_merge_folio,
-> +	.free_folio = guestmem_hugetlb_free_folio,
->  	.nr_pages_in_folio = guestmem_hugetlb_nr_pages_in_folio,
->  };
->  EXPORT_SYMBOL_GPL(guestmem_hugetlb_ops);
+On Thu, Oct 02, 2025, Vishal Annapurve wrote:
+> On Thu, Oct 2, 2025, 5:12=E2=80=AFPM Sean Christopherson <seanjc@google.c=
+om> wrote:
+> >
+> > > >
+> > > > If the _only_ user-visible asset that is added is a KVM_CREATE_GUES=
+T_MEMFD flag,
+> > > > a CAP is gross overkill.  Even if there are other assets that accom=
+pany the new
+> > > > flag, there's no reason we couldn't say "this feature exist if XYZ =
+flag is
+> > > > supported".
+> > > >
+> > > > E.g. it's functionally no different than KVM_CAP_VM_TYPES reporting=
+ support for
+> > > > KVM_X86_TDX_VM also effectively reporting support for a _huge_ numb=
+er of things
+> > > > far beyond being able to create a VM of type KVM_X86_TDX_VM.
+> > > >
+> > >
+> > > What's your opinion about having KVM_CAP_GUEST_MEMFD_MMAP part of
+> > > KVM_CAP_GUEST_MEMFD_CAPS i.e. having a KVM cap covering all features
+> > > of guest_memfd?
+> >
+> > I'd much prefer to have both.  Describing flags for an ioctl via a bitm=
+ask that
+> > doesn't *exactly* match the flags is asking for problems.  At best, it =
+will be
+> > confusing.  E.g. we'll probably end up with code like this:
+> >
+> >         gmem_caps =3D kvm_check_cap(KVM_CAP_GUEST_MEMFD_CAPS);
+> >
+> >         if (gmem_caps & KVM_CAP_GUEST_MEMFD_MMAP)
+> >                 gmem_flags |=3D GUEST_MEMFD_FLAG_MMAP;
+> >         if (gmem_caps & KVM_CAP_GUEST_MEMFD_INIT_SHARED)
+> >                 gmem_flags |=3D KVM_CAP_GUEST_MEMFD_INIT_SHARED;
+> >
+>=20
+> No, I actually meant the userspace can just rely on the cap to assume
+> right flags to be available (not necessarily the same flags as cap
+> bits).
+>=20
+> i.e. Userspace will do something like:
+> gmem_caps =3D kvm_check_cap(KVM_CAP_GUEST_MEMFD_CAPS);
+>=20
+> if (gmem_caps & KVM_CAP_GUEST_MEMFD_MMAP)
+>         gmem_flags |=3D GUEST_MEMFD_FLAG_MMAP;
+> if (gmem_caps & KVM_CAP_GUEST_MEMFD_HUGETLB)
+>         gmem_flags |=3D GUEST_MEMFD_FLAG_HUGETLB | GUEST_MEMFD_FLAG_HUGET=
+LB_2MB;
 
-Don't bury exports in an "ops" like this.  Be very explicit in what is exported.
-_If_ KVM needs a layer of indirection to support multiple, custom guest_memfd
-allocators, then KVM can wire up ops as above.  Indirectly exporting core mm/
-functionality via an ops structure like this is unnecessarily sneaky.
+Yes, that's exactly what I said.  But I goofed when copy+pasted and failed =
+to
+do s/KVM_CAP_GUEST_MEMFD_INIT_SHARED/GUEST_MEMFD_FLAG_INIT_SHARED, which is=
+ the
+type of bug that ideally just can't happen.
+
+Side topic, I'm not at all convinced that this is what we want for KVM's uA=
+PI:
+
+	if (gmem_caps & KVM_CAP_GUEST_MEMFD_HUGETLB)                              =
+   =20
+		gmem_flags |=3D GUEST_MEMFD_FLAG_HUGETLB | GUEST_MEMFD_FLAG_HUGETLB_2MB;
+
+See https://lore.kernel.org/all/aN_fJEZXo6wkcHOh@google.com.
+
+> Userspace has to anyways assume flag values, userspace just needs to
+> know if a particular feature is available.
+
+I don't understand what you mean by "assume flag values".
 
