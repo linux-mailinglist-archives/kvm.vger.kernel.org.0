@@ -1,282 +1,228 @@
-Return-Path: <kvm+bounces-59463-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-59464-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id EDF61BB745B
-	for <lists+kvm@lfdr.de>; Fri, 03 Oct 2025 17:02:46 +0200 (CEST)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
+	by mail.lfdr.de (Postfix) with ESMTPS id 54D45BB7519
+	for <lists+kvm@lfdr.de>; Fri, 03 Oct 2025 17:30:04 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A960548567A
-	for <lists+kvm@lfdr.de>; Fri,  3 Oct 2025 15:02:45 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id F3F8E4E6B69
+	for <lists+kvm@lfdr.de>; Fri,  3 Oct 2025 15:30:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A62D623B618;
-	Fri,  3 Oct 2025 15:02:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 64E1F23B618;
+	Fri,  3 Oct 2025 15:29:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="fb+pcPxO"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="l6RQmq4r"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pg1-f202.google.com (mail-pg1-f202.google.com [209.85.215.202])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.10])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5672778F4A
-	for <kvm@vger.kernel.org>; Fri,  3 Oct 2025 15:02:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.202
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1759503759; cv=none; b=jWq+q/N9Wfpbg0BP3j3/NYUKrhvG6BD4qcl399KkhubXdBrVKoAQ53RT3L1zL58vcYX1lUb5zFbo5Xug2NDJxGMXK7pz2jqHNR8v2M5FBSXI7uXAGDbBb7rNcfuxaj0VFIb0CZ5A6/Soa/kGycyaPcHk1VS2WUAHn5+/iNHT+B4=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1759503759; c=relaxed/simple;
-	bh=BON7ZLgEkt1iDODoys9xHbWPGh2KxPus2qs97vxbhnI=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=fc4zz3mxpPHFVU+swV0C9QKgZw/3aBOQzDlwckO3JGXfmItVuIU7y85MTpP1Tbx+11E7WHItZumzsIsNT0r5H+kHy8e2UbsuZki9cQqEkDf7+mJ8iUxJVqX0kItE86bFhJqsXZGMxDtcGik3xa+QFkLgW7LPg89oC2rpYYhZvRc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=fb+pcPxO; arc=none smtp.client-ip=209.85.215.202
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pg1-f202.google.com with SMTP id 41be03b00d2f7-b55283ff3fcso1801306a12.3
-        for <kvm@vger.kernel.org>; Fri, 03 Oct 2025 08:02:38 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1759503757; x=1760108557; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=K0wDuhcL+HFHK9SNYF6Zl0qzqMkBdhZwVr5fMqCakwM=;
-        b=fb+pcPxOsoJhZJ58kQCEExbIlXg7dJwa1i9CP75K6eirAAMg7jePhCrd/FgpKsJh++
-         +aGFdydeZVAbst2yezOn4KdE0SqvqJQKMoLAne9f9bu/MHagCYs1vomoai9kfbIB4X8B
-         i97Z8caRoiNwtGwzmZBeWFWeAYz6EEvin1jPueE3FGaZHMDm/7ofyKIOov+aQzQs+nJ8
-         F5pm/KHQrL44j8Z95Y5dGyp8BabodDkRmr5fVyebetis2sa3pRM78nCYZdDQMXD1Epbi
-         a6G+El/C5LEQcEVQhjKvmOTMeZNuElpTh0xBtqFYDpUHngUEpw3B+OVEdfLTNsPjSl+7
-         /lRA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1759503757; x=1760108557;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=K0wDuhcL+HFHK9SNYF6Zl0qzqMkBdhZwVr5fMqCakwM=;
-        b=a4Z+mwt4m6ou4c1JRnPmvNJA0G2Yuw5HKwWeHuITsIhVqmJdmAuJvPg9kwvSzMz+OZ
-         KAIUnR5dVWRU00ClIOaWtSvWvCidoWW2rAhG0DDS5q2PTtFNzEnyDDdcpr0g5gcqfDiU
-         kK3DH6itmnXvQXvgqpAB+3flsf5Xz/WkNJBd/lBHQZC4FSJ6/6B+E6fq2VPvNxAv87S7
-         AcSBvMsSstigMPLVqg8PMcgXOU5Utpa8bQzr0YJtXQ13Ya/4hv1zOmvzhTKqvbfvZPtY
-         dXKokdxKJnGuC52byn2qsjrcwiuDqTDwom74gShDmab5kf0+f/KMQhz2iyhJS3Aja5XP
-         L7ag==
-X-Gm-Message-State: AOJu0YwPnt6bLhjbeKDH8hal1AhcfsmiNXntXD0SJGPYFvJlneZrLDpW
-	4QKQ+Qg8APHrGKKKo/KODUjkSRpH/MpRkIi8ojr0/DdDre5JhBgqu4YBW0tHWbglstAD35O5lsl
-	Q1go7GA==
-X-Google-Smtp-Source: AGHT+IFVDlLHkijqYvW2+0fFGYYR1+C6mGqgdJR3Wrx5+wOsGLv9/K2lzb4ZvmMqRl2iwWCMgZwpd8Pj/gg=
-X-Received: from pjus13.prod.google.com ([2002:a17:90a:d48d:b0:330:5945:699e])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:1d09:b0:327:9e88:7714
- with SMTP id 98e67ed59e1d1-339c27b5508mr5030575a91.37.1759503756354; Fri, 03
- Oct 2025 08:02:36 -0700 (PDT)
-Date: Fri, 3 Oct 2025 08:02:34 -0700
-In-Reply-To: <e9aaf20d31281d00861b1805404dbed40024f824.1747264138.git.ackerleytng@google.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EEBB4285058;
+	Fri,  3 Oct 2025 15:29:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=198.175.65.10
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1759505398; cv=fail; b=WwFpyQfRjQ9Cyu19zSvcOTZwTLlq3nePiiZuS6hxqilGJyZCNkASH97mgATlfXYqZ2LqGF4ajt1WOepnI+zmm0oH1miSI6RFZmoEILI/wQyabYjHYz6QTd+YyTNoUi3ZWKz0nBHRd2Ncl2uO6LRT8RhxuUAAo7abYVLdemZx0hw=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1759505398; c=relaxed/simple;
+	bh=eS2TE6SEj41KYL5yAQp8h+qw4n3HWqdmTb7fvIhOvs4=;
+	h=Date:From:To:CC:Subject:Message-ID:References:Content-Type:
+	 Content-Disposition:In-Reply-To:MIME-Version; b=iL7DL/NUab2Ct17MnNANFhMyxOvCc3hiH5w9YAAT3Ty6gWd5mcF5uHT6HKCTlPgBrbNwr7ufGMFYmyHWTTyfqLMaSgQkJJlxDvuGWigAfxugpUM7UYe5zKpyWfxQU3ZHkcY7o+DfgMoxtu+c7FF6T1nYe9KC050RXgYJCmSE8+E=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=l6RQmq4r; arc=fail smtp.client-ip=198.175.65.10
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1759505396; x=1791041396;
+  h=date:from:to:cc:subject:message-id:references:
+   in-reply-to:mime-version;
+  bh=eS2TE6SEj41KYL5yAQp8h+qw4n3HWqdmTb7fvIhOvs4=;
+  b=l6RQmq4rZdkG32AoX/rUgO6LAucaJA/WKOWB2HvS7bzHduQIhlvsVghY
+   REEYf5JvmKhyr1/p/7HzOzbp1Wa9E0vsrZJBMTv0jit2NzhUaqf2iP9vq
+   W+Fvk41/1vtxYgMArERv6bo9hsqEJUord0P16F1A0s/KXfIEQGgGof2cT
+   cyrx+bzJzw+DMK5sYokXIjMsW9cph5gcgb4NpyJqHatDxPZsSq5i/u+xW
+   KRlwOVvSFwXjqiNJbfPAm/a3EKMqmzw8bW3wLqwP4WvVwk8GfUhU1dQps
+   rbHWMJzlRCYEEnJKUNYdcfagalQD2LrPhXLSYhKCRFIOHFh/nm7xbqkyg
+   g==;
+X-CSE-ConnectionGUID: n8qYYz5dRcuES1kRAShIEA==
+X-CSE-MsgGUID: lcCSs2AYTMKhAiMGCg+nvQ==
+X-IronPort-AV: E=McAfee;i="6800,10657,11571"; a="79218325"
+X-IronPort-AV: E=Sophos;i="6.18,312,1751266800"; 
+   d="scan'208";a="79218325"
+Received: from orviesa004.jf.intel.com ([10.64.159.144])
+  by orvoesa102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 03 Oct 2025 08:29:56 -0700
+X-CSE-ConnectionGUID: l4Ssn35rQFSimRzi99ZVLw==
+X-CSE-MsgGUID: XPiYw6+JRb+dTR/Vdezkpw==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.18,312,1751266800"; 
+   d="scan'208";a="183598773"
+Received: from orsmsx903.amr.corp.intel.com ([10.22.229.25])
+  by orviesa004.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 03 Oct 2025 08:29:56 -0700
+Received: from ORSMSX901.amr.corp.intel.com (10.22.229.23) by
+ ORSMSX903.amr.corp.intel.com (10.22.229.25) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.2562.27; Fri, 3 Oct 2025 08:29:55 -0700
+Received: from ORSEDG902.ED.cps.intel.com (10.7.248.12) by
+ ORSMSX901.amr.corp.intel.com (10.22.229.23) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.2562.27 via Frontend Transport; Fri, 3 Oct 2025 08:29:55 -0700
+Received: from PH0PR06CU001.outbound.protection.outlook.com (40.107.208.71) by
+ edgegateway.intel.com (134.134.137.112) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.2562.27; Fri, 3 Oct 2025 08:29:55 -0700
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=aYatm6UozxBXIX1t+AB4Py1CXJkf+HMmtY0HZ6IYAu0W+P2mMLRkKMMl5QG8ZW50zkpSQt4fCAhV5THqcFZgIZjmcje+fay9q1AmEJDwK49O8WApgPgzycqkHpDR+OE5g3RNR7b0iDTG1oTiip3P/ZJp7qNUD+E6UkvnykFlmvz6RrWVujpmd9OvITP+2gtOFMmjbrYf8lsVhy3248k96KZ7LT6+IEFJbwB6DD7M381CegqPNTIhpi3cc2Cv9l3NK398ZgFiGCaLAJbCyqy+7F2Hdh7kMCmHkBq2HajtBRlTrdFBJ+gGUJ5iBPBIxKXn+cNV7kL6snOzZHTmsR1NBQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=dFkYE1YCdvCOO3EVO7ZpzJC+sgK1ynhN5q6Px7iWMgI=;
+ b=UlsOJ0MLptPWxlZkRG838H/OD6vdXeWVoenIHPXAw2dSa/sxUKovzdPDD/Ry20FgNDFsnfReaZqzrziu25KuxvufE0S/bv+cdKJLeV7D8zTemjQNtfkOH5uHR+z2PVKKCy9xTgUA/Qz/cVMWdNXPLilw31VyIerlExcz3fBAqpRCE1SROodHzN/N3xUG2VJW+Rw7rHo28E+VkUYiEuIbKWiN4Grwl1wgMbB+okqWKjKSYboD4dtPOBTyNAi0ZUvz8+Gz8AKaRGEmU4sO/x8KDUlxFPS+NbPt1lGdJr5+Z//WLvRQZNka2vOFXSae74DFhvgncUXW3UvfzWABrb0gzw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+Received: from IA4PR11MB9131.namprd11.prod.outlook.com (2603:10b6:208:55c::11)
+ by LV4PR11MB9514.namprd11.prod.outlook.com (2603:10b6:408:2e0::10) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9160.18; Fri, 3 Oct
+ 2025 15:29:52 +0000
+Received: from IA4PR11MB9131.namprd11.prod.outlook.com
+ ([fe80::7187:92a3:991:56e2]) by IA4PR11MB9131.namprd11.prod.outlook.com
+ ([fe80::7187:92a3:991:56e2%5]) with mapi id 15.20.9115.020; Fri, 3 Oct 2025
+ 15:29:52 +0000
+Date: Fri, 3 Oct 2025 10:31:57 -0500
+From: Ira Weiny <ira.weiny@intel.com>
+To: Sean Christopherson <seanjc@google.com>, Ira Weiny <ira.weiny@intel.com>
+CC: Vishal Annapurve <vannapurve@google.com>, Yan Zhao <yan.y.zhao@intel.com>,
+	Michael Roth <michael.roth@amd.com>, <pbonzini@redhat.com>,
+	<kvm@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+	<rick.p.edgecombe@intel.com>, <kai.huang@intel.com>,
+	<adrian.hunter@intel.com>, <reinette.chatre@intel.com>,
+	<xiaoyao.li@intel.com>, <tony.lindgren@intel.com>,
+	<binbin.wu@linux.intel.com>, <dmatlack@google.com>,
+	<isaku.yamahata@intel.com>, <david@redhat.com>, <ackerleytng@google.com>,
+	<tabba@google.com>, <chao.p.peng@intel.com>
+Subject: Re: [RFC PATCH] KVM: TDX: Decouple TDX init mem region from
+ kvm_gmem_populate()
+Message-ID: <68dfec6db50a5_2a45d629486@iweiny-mobl.notmuch>
+References: <aIdHdCzhrXtwVqAO@yzhao56-desk.sh.intel.com>
+ <CAGtprH-xGHGfieOCV2xJen+GG66rVrpFw_s9jdWABuLQ2hos5A@mail.gmail.com>
+ <aIgl7pl5ZiEJKpwk@yzhao56-desk.sh.intel.com>
+ <6888f7e4129b9_ec573294fa@iweiny-mobl.notmuch>
+ <aJFOt64k2EFjaufd@google.com>
+ <CAGtprH9ELoYmwA+brSx-kWH5qSK==u8huW=4otEZ5evu_GTvtQ@mail.gmail.com>
+ <aJJimk8FnfnYaZ2j@google.com>
+ <CAGtprH9JifhhmTdseXLi9ax_imnY5b=K_+_bhkTXKSaW8VMFRQ@mail.gmail.com>
+ <68dee81d79199_296d74294b9@iweiny-mobl.notmuch>
+ <aN8Vn9iD7OMzspp5@google.com>
+Content-Type: text/plain; charset="us-ascii"
+Content-Disposition: inline
+In-Reply-To: <aN8Vn9iD7OMzspp5@google.com>
+X-ClientProxiedBy: MW4PR03CA0242.namprd03.prod.outlook.com
+ (2603:10b6:303:b4::7) To IA4PR11MB9131.namprd11.prod.outlook.com
+ (2603:10b6:208:55c::11)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <cover.1747264138.git.ackerleytng@google.com> <e9aaf20d31281d00861b1805404dbed40024f824.1747264138.git.ackerleytng@google.com>
-Message-ID: <aN_liua2oaAyyuL_@google.com>
-Subject: Re: [RFC PATCH v2 33/51] KVM: guest_memfd: Allocate and truncate from
- custom allocator
-From: Sean Christopherson <seanjc@google.com>
-To: Ackerley Tng <ackerleytng@google.com>
-Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	Yan Zhao <yan.y.zhao@intel.com>, Fuad Tabba <tabba@google.com>, 
-	Binbin Wu <binbin.wu@linux.intel.com>, Michael Roth <michael.roth@amd.com>, 
-	Ira Weiny <ira.weiny@intel.com>, Rick P Edgecombe <rick.p.edgecombe@intel.com>, 
-	Vishal Annapurve <vannapurve@google.com>, David Hildenbrand <david@redhat.com>, 
-	Paolo Bonzini <pbonzini@redhat.com>
-Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: IA4PR11MB9131:EE_|LV4PR11MB9514:EE_
+X-MS-Office365-Filtering-Correlation-Id: 882879e6-51f9-4a15-e142-08de0291b29c
+X-LD-Processed: 46c98d88-e344-4ed4-8496-4ed7712e255d,ExtAddr
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;ARA:13230040|7416014|376014|1800799024|366016|7053199007;
+X-Microsoft-Antispam-Message-Info: =?us-ascii?Q?hhSLzc4pS00WYM6c8b66oQBpNIqveZ3tAA63Yjh6qnqMpRRbvl8I8nu84UEa?=
+ =?us-ascii?Q?ArWFDH/onOZ0W4ONGp+3rc0lawY0BAI1xn9IS6j8DyaeDTtdwqZZS522j74A?=
+ =?us-ascii?Q?rfRflSN/vq3yGGXPdl4VWVCv+QTRcqxdKcSWvLhmgXxUAV09+xB3s3Q9kQyZ?=
+ =?us-ascii?Q?mnDaHhmgAEWDyzHpAXPO/PiFoOH0FL16AKI5DAmgkcFMMEef/ZbfbR+U7AHy?=
+ =?us-ascii?Q?ohf5hniTVa7WIpWIgeBFPrD0v9HDxXWtozdOgN4DKvwGVfYlllBU9wA9RKqs?=
+ =?us-ascii?Q?SJD7q7OeLy5Fx2Z63xs9x2KpHIPsStcV4mY2XRnbc2rW5itPinhCMHoOHcYe?=
+ =?us-ascii?Q?pW+DnLTS8Cahhi8RB2IvvcGwK9skwIUUIg1bG6GX+oa4HuJAB/KNLgc3aLor?=
+ =?us-ascii?Q?XXDWZAgpg04aAM4RUG/jU0nhix/86Lfo0QmfDUsYdk0nj2lLf/ccQt7Qh0Wf?=
+ =?us-ascii?Q?/MkUWd0UQ06+EX4J2CQtp4lj4uRJlNW4rHIhvaIDMakfrl/tCgxeJHtzfn99?=
+ =?us-ascii?Q?eFb1lxCyn9lUhM6mrIAPgWw5a9TcvWd1KtPSiqWbB5Yk/pXVIAIF4XWgW5ve?=
+ =?us-ascii?Q?E7KaufQa+CZfJ5qlisTT/B87JtOs5rqWq4T32/3rQABkZTntxSoHDZiH3Vqo?=
+ =?us-ascii?Q?dFBjrq2GbQqBFWHL15vQvn7sYp4/vRl+HEPgqFMOuNJS2K/p913n0Y7akqi1?=
+ =?us-ascii?Q?7VEXlJrsLbOUcd4uuJa9d7IRFWEnPgjR1LD4bTdqHn+yBUYOpuql3kmywCm1?=
+ =?us-ascii?Q?e55d2OiQDV5913uFUwpPE7fXCaNUyNCmNjGZe1yYNriU4n5zhPUS+FRqbMXP?=
+ =?us-ascii?Q?SH3tw3/jBvbBoqrKf6Cj3512EMVJVRsF+2pVgLVdZzDWN3dW6ygtHZdV7xmo?=
+ =?us-ascii?Q?UqWXuARiKFck/xPFB8B2oLv5uBNzNw0qPJcThHtIXyxx6uqPaxdkZKJzBODE?=
+ =?us-ascii?Q?eMimIosK2G/3yOtTFt5FEhUlSwbaHQyzELjIuNEzzOrR+UW1zq5xyYN33/vx?=
+ =?us-ascii?Q?tYpIpqcBiBzslc+2LNE3OK0nLtFjy76DlB7IFbtNoEhWaQYuH1ueV6FoYzal?=
+ =?us-ascii?Q?taV+LHaYFCVjwYr7sHDTjGgEDK0N4nIAUDnzrSswYLp9DsNxLkFSfsFS3PbQ?=
+ =?us-ascii?Q?VUQg+OM8H7lHIwVCumccvYGpo2oB7Vvjni0/Az8ckD21ryAWudfr1s89BwF2?=
+ =?us-ascii?Q?pg9vwqBptnTNkAKySZmXGRd+4KATez3aQVILeFnGUvfZCEPa+3VurhHFX9vK?=
+ =?us-ascii?Q?NNwNbdRK1jcjBWyvNZ9Hu9ofjl2vlnS6n2nrDLNPfke/0+r1eox1vn+wkHry?=
+ =?us-ascii?Q?/VnafHk3usCwhRPHdpGjiubDkFjlnmZ524Xbz1C0A9eY9FcOV9wuTBUeDNDu?=
+ =?us-ascii?Q?4D6E/w83JzfVWTxfe6f2slZRoTIFde69g3i2UUHHN7err001z4lx8KKU1XTv?=
+ =?us-ascii?Q?UhiPlZ46dAKPINRVvgivMAx9z0e69XSV4UGLWw0QxykaMnY3LUJTBw=3D=3D?=
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:IA4PR11MB9131.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(7416014)(376014)(1800799024)(366016)(7053199007);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?qW4gDHGsRDs+iViTk+BR9xCQ4OvsNUkY1VtXo/5y7ku3ZgX8miBRffDdzGrX?=
+ =?us-ascii?Q?r+EHbmin+wPgKZRO9d7H3uhL6WwCuy2yHjAcjhCJhyIN4J/OkCVwcmnD5H9N?=
+ =?us-ascii?Q?YsILAQ7sQfbOsULMeoRuqUekKBVBFyMC7eKD1Y+nCWMgU+jddxivYpZEElzn?=
+ =?us-ascii?Q?R4L6ksGHocE/CKZhgIWyny469dMbJEA7kCjzJzgImJZ5N+FZGty5UIgUVpni?=
+ =?us-ascii?Q?F5nLijVp2pZ34G/pBoAfdDsJZ9yJ0Ycj3LcAaDOTPCSwec+LfmIoMMm5p25q?=
+ =?us-ascii?Q?GW6odE2zOYm6Njy/O9Az3sauHjYiQOZiCdLg6tY2hWRtpLVJ5wFXseYwbM+a?=
+ =?us-ascii?Q?a9d0EitXZOgHozlXhAB9mQja+xXb+dsfEa0gUo7FlQh5YQwQ3V9pAZV/gkcu?=
+ =?us-ascii?Q?39rG4A8Bdz/T7D2maqMYgXLeO69wAe6Mf5ZkddhKPb6FIHCq0NRLrlEuUtRe?=
+ =?us-ascii?Q?tjFZFnjtsFrZyJAfRdh/C1/0G0y/TnZfbEWuy4+tiSzxcKEqV+J1/CddifNz?=
+ =?us-ascii?Q?jqaF2PQhnxsO+sK7RLYp7edDm1heOzbVrqll621DFS9IGRdA67HF3IUVAAtU?=
+ =?us-ascii?Q?JXKCN6DpJ9BiYx0rgIZs0GwG2ib6D2Y2HjT15q7ZKCyqco9lSBR08117a80h?=
+ =?us-ascii?Q?BtkmcBAUzkfY1+X9vOHPZecSlzEWZ2WjgTer/OqpT6OB5hlkcP1TTBf8lFLV?=
+ =?us-ascii?Q?fkTI5YyhUeLJdbTSE49XXpWAFD4jIe4jEYBWLCTyhWe/XZliNIDLxU/0E6j0?=
+ =?us-ascii?Q?XtZ0NNnY94AIAKHDxp/dICsfFIxJ7q2vMI8stzW0CtVpkC1os7pvAabIBiOb?=
+ =?us-ascii?Q?tE+2cHHogGfFWOvfvYtIj8tJ8lSemXWCkVAs0PLCRTAdYUSddazdSNh6D8mC?=
+ =?us-ascii?Q?XfNnAVHXY8Bvrfc4402nwe7sVVIGMEViVkb7FRps6Ro3rb6YoVSroMO7GXQx?=
+ =?us-ascii?Q?PoujX5xIWRKzzH8D/1cyUk5YVqQYxs76yyGbahuULyawmiTGamAr8FXdIy3o?=
+ =?us-ascii?Q?F7ZoX5SI6/GBMkkjN1fGPKYzaA0X35YKaEa+w5fOMFMb+/pjIjGHi6SIo6kJ?=
+ =?us-ascii?Q?xJ5WU6BbuC4mMhZAfA8kuaGzu4ZWVhyayVkyIA4YWRm1UMiCwHD4BUd0G2Xm?=
+ =?us-ascii?Q?sPUUN7u5SzrTxCxSu3vj7fyy+LbS7hcnPWXKXoD0Qt+/5eCOeibUxpGsJEE1?=
+ =?us-ascii?Q?pzE57f65d/HfEahuw063LPCHfNydjB5OeLN5Qgtoh5z8dpeboQeNDYA2JXDC?=
+ =?us-ascii?Q?5q07a/WOPMxU4rkmgEcjKhX1VSK8B1fPn+QVulG6FM5HvZ1HV8F7HRjDlX1w?=
+ =?us-ascii?Q?06Lrfc0e2l8sHaHo8K63Ye3RODohUC3J9wGBODATBfKM4tIRUQZPQh0IOl81?=
+ =?us-ascii?Q?hJ4nE46MQUfv+hxkPKt2ebO5efDL9Skk2juDqvX4GkTjdwD/wRhjGcGUPwQJ?=
+ =?us-ascii?Q?5d50F9kAhrYwTmLGuF3Lu59Fg5rGFOSTLU4qxJLvZHv4m/gpnZj326q9gCRL?=
+ =?us-ascii?Q?FH3lgoS6LLIUop0wYDZeqm6k0ym4kXSV4rJAR7HvXqHcm65sJKltYsOvS0th?=
+ =?us-ascii?Q?+kkw3vxvOjiBrGu+qvDkS2nDgpWslTiXvs+9LYLl?=
+X-MS-Exchange-CrossTenant-Network-Message-Id: 882879e6-51f9-4a15-e142-08de0291b29c
+X-MS-Exchange-CrossTenant-AuthSource: IA4PR11MB9131.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 03 Oct 2025 15:29:52.5473
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: o899k5QtiFWhwUeA9OxOqCjqCTQEqWsKzVbzVLwsOwXleqoCcpinzBZRnaMymiAajhiB309ZZTjleX2UKkvEnw==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: LV4PR11MB9514
+X-OriginatorOrg: intel.com
 
-Trimmed Cc to KVM/guest_memfd again.
+Sean Christopherson wrote:
 
-On Wed, May 14, 2025, Ackerley Tng wrote:
-> If a custom allocator is requested at guest_memfd creation time, pages
-> from the custom allocator will be used to back guest_memfd.
+[snip]
+
+> > 
+> > Sean,
+> > 
+> > Where did this thread land?  Was there a follow on series which came out
+> > of this?  I thought you sent a patch with the suggestions in this thread
+> > but I can't find it.
 > 
-> Change-Id: I59df960b3273790f42fe5bea54a234f40962eb75
-> Signed-off-by: Ackerley Tng <ackerleytng@google.com>
-> ---
->  mm/memory.c            |   1 +
->  virt/kvm/guest_memfd.c | 142 +++++++++++++++++++++++++++++++++++++----
->  2 files changed, 132 insertions(+), 11 deletions(-)
+> Are you referring to "KVM: x86/mmu: TDX post-populate cleanups"[*]?
+
+Yep.
+
+> If so, my
+> goal is to send v3 next week.
+
+Thanks,
+Ira
+
+> If you're talking about something else, then no idea :-)
 > 
-> diff --git a/mm/memory.c b/mm/memory.c
-> index ba3ea0a82f7f..3af45e96913c 100644
-> --- a/mm/memory.c
-> +++ b/mm/memory.c
-> @@ -7249,6 +7249,7 @@ void folio_zero_user(struct folio *folio, unsigned long addr_hint)
->  	else
->  		process_huge_page(addr_hint, nr_pages, clear_subpage, folio);
->  }
-> +EXPORT_SYMBOL_GPL(folio_zero_user);
-
-This needs to be in a separate patch.
-
->  static int copy_user_gigantic_page(struct folio *dst, struct folio *src,
->  				   unsigned long addr_hint,
-> diff --git a/virt/kvm/guest_memfd.c b/virt/kvm/guest_memfd.c
-> index c65d93c5a443..24d270b9b725 100644
-> --- a/virt/kvm/guest_memfd.c
-> +++ b/virt/kvm/guest_memfd.c
-> @@ -478,15 +478,13 @@ static inline void kvm_gmem_mark_prepared(struct folio *folio)
->   * leaking host data and the up-to-date flag is set.
->   */
->  static int kvm_gmem_prepare_folio(struct kvm *kvm, struct kvm_memory_slot *slot,
-> -				  gfn_t gfn, struct folio *folio)
-> +				  gfn_t gfn, struct folio *folio,
-> +				  unsigned long addr_hint)
->  {
-> -	unsigned long nr_pages, i;
->  	pgoff_t index;
->  	int r;
->  
-> -	nr_pages = folio_nr_pages(folio);
-> -	for (i = 0; i < nr_pages; i++)
-> -		clear_highpage(folio_page(folio, i));
-> +	folio_zero_user(folio, addr_hint);
-
-As does this.
-
->  	/*
->  	 * Preparing huge folios should always be safe, since it should
-> @@ -554,7 +552,9 @@ static int kvm_gmem_filemap_add_folio(struct address_space *mapping,
->   */
->  static struct folio *kvm_gmem_get_folio(struct inode *inode, pgoff_t index)
->  {
-> +	size_t allocated_size;
->  	struct folio *folio;
-> +	pgoff_t index_floor;
->  	int ret;
->  
->  repeat:
-> @@ -581,8 +581,10 @@ static struct folio *kvm_gmem_get_folio(struct inode *inode, pgoff_t index)
->  			return ERR_PTR(ret);
->  		}
->  	}
-> +	allocated_size = folio_size(folio);
->  
-> -	ret = kvm_gmem_filemap_add_folio(inode->i_mapping, folio, index);
-> +	index_floor = round_down(index, folio_nr_pages(folio));
-> +	ret = kvm_gmem_filemap_add_folio(inode->i_mapping, folio, index_floor);
->  	if (ret) {
->  		folio_put(folio);
->  
-> @@ -598,7 +600,17 @@ static struct folio *kvm_gmem_get_folio(struct inode *inode, pgoff_t index)
->  		return ERR_PTR(ret);
->  	}
->  
-> -	__folio_set_locked(folio);
-> +	spin_lock(&inode->i_lock);
-> +	inode->i_blocks += allocated_size / 512;
-
-???  If anything needs a comment, it's this.
-
-> +	spin_unlock(&inode->i_lock);
-> +
-> +	/*
-> +	 * folio is the one that is allocated, this gets the folio at the
-> +	 * requested index.
-> +	 */
-> +	folio = page_folio(folio_file_page(folio, index));
-> +	folio_lock(folio);
-> +
->  	return folio;
->  }
-
-...
-
-> +static void kvm_gmem_truncate_inode_range(struct inode *inode, loff_t lstart,
-> +					  loff_t lend)
-> +{
-> +	pgoff_t full_hpage_start;
-> +	size_t nr_per_huge_page;
-> +	pgoff_t full_hpage_end;
-> +	size_t nr_pages;
-> +	pgoff_t start;
-> +	pgoff_t end;
-> +	void *priv;
-> +
-> +	priv = kvm_gmem_allocator_private(inode);
-> +	nr_per_huge_page = kvm_gmem_allocator_ops(inode)->nr_pages_in_folio(priv);
-> +
-> +	start = lstart >> PAGE_SHIFT;
-> +	end = min(lend, i_size_read(inode)) >> PAGE_SHIFT;
-> +
-> +	full_hpage_start = round_up(start, nr_per_huge_page);
-> +	full_hpage_end = round_down(end, nr_per_huge_page);
-
-This is where the layer of indirection completely breaks down.  This is blatantly
-specific to hugepages, but presented as if it's some generic logic.
-
-> +
-> +	if (start < full_hpage_start) {
-> +		pgoff_t zero_end = min(full_hpage_start, end);
-> +
-> +		kvm_gmem_zero_range(inode->i_mapping, start, zero_end);
-> +	}
-> +
-> +	if (full_hpage_end > full_hpage_start) {
-> +		nr_pages = full_hpage_end - full_hpage_start;
-> +		kvm_gmem_truncate_inode_aligned_pages(inode, full_hpage_start,
-> +						      nr_pages);
-> +	}
-> +
-> +	if (end > full_hpage_end && end > full_hpage_start) {
-> +		pgoff_t zero_start = max(full_hpage_end, start);
-> +
-> +		kvm_gmem_zero_range(inode->i_mapping, zero_start, end);
-> +	}
-> +}
-> +
->  static long kvm_gmem_punch_hole(struct inode *inode, loff_t offset, loff_t len)
->  {
->  	struct list_head *gmem_list = &inode->i_mapping->i_private_list;
-> @@ -752,7 +850,12 @@ static long kvm_gmem_punch_hole(struct inode *inode, loff_t offset, loff_t len)
->  	list_for_each_entry(gmem, gmem_list, entry)
->  		kvm_gmem_invalidate_begin(gmem, start, end);
->  
-> -	truncate_inode_pages_range(inode->i_mapping, offset, offset + len - 1);
-> +	if (kvm_gmem_has_custom_allocator(inode)) {
-> +		kvm_gmem_truncate_inode_range(inode, offset, offset + len);
-> +	} else {
-> +		/* Page size is PAGE_SIZE, so use optimized truncation function. */
-
-For cases like this, put the comment outside of the if-statement.  Because what
-you're documenting isn't just the call to truncate_inode_pages_range(), it's the
-pivot on a "custom" allocator.
-
-E.g. this should look more like:
-
-	/* Comment about why KVM needs custom code for hugetlb. */
-	if (kvm_gmem_is_hugetlb(inode))
-		kvm_gmem_truncate_inode_range(...);
-	else
-		truncate_inode_pages_range(...);
-
-> +		truncate_inode_pages_range(inode->i_mapping, offset, offset + len - 1);
-> +	}
->  
->  	list_for_each_entry(gmem, gmem_list, entry)
->  		kvm_gmem_invalidate_end(gmem, start, end);
-> @@ -776,6 +879,16 @@ static long kvm_gmem_allocate(struct inode *inode, loff_t offset, loff_t len)
->  
->  	start = offset >> PAGE_SHIFT;
->  	end = (offset + len) >> PAGE_SHIFT;
-> +	if (kvm_gmem_has_custom_allocator(inode)) {
-> +		size_t nr_pages;
-> +		void *p;
-> +
-> +		p = kvm_gmem_allocator_private(inode);
-> +		nr_pages = kvm_gmem_allocator_ops(inode)->nr_pages_in_folio(p);
-> +
-> +		start = round_down(start, nr_pages);
-> +		end = round_down(end, nr_pages);
-> +	}
-
-This adds sooo much noise to a stupidly simple thing.  The per-gmem page size is
-constant, just add gmem_inode.page_size and gmem_inode.page_shift then this becomes:
-
-	start = offset >> gi->page_shift;
-	start = (offset + len) >> gi->page_shift;
-
-We can do that even if we end up with a layer of indirection (which the more I
-look at this, the more I'm convinced that's completely unnecessary).
+> [*] https://lore.kernel.org/all/20250829000618.351013-1-seanjc@google.com
 
