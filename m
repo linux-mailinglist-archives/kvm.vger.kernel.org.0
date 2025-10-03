@@ -1,271 +1,206 @@
-Return-Path: <kvm+bounces-59461-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-59462-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 36CE9BB731A
-	for <lists+kvm@lfdr.de>; Fri, 03 Oct 2025 16:35:46 +0200 (CEST)
+Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [213.196.21.55])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8FF42BB73E3
+	for <lists+kvm@lfdr.de>; Fri, 03 Oct 2025 16:52:28 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 55A2F19E8100
-	for <lists+kvm@lfdr.de>; Fri,  3 Oct 2025 14:36:08 +0000 (UTC)
+	by ams.mirrors.kernel.org (Postfix) with ESMTPS id E31C634671D
+	for <lists+kvm@lfdr.de>; Fri,  3 Oct 2025 14:52:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EAEC8242D66;
-	Fri,  3 Oct 2025 14:35:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 650CB28313D;
+	Fri,  3 Oct 2025 14:52:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="xhCX0EiJ"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="RX0F19tG"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pg1-f201.google.com (mail-pg1-f201.google.com [209.85.215.201])
+Received: from mail-pj1-f73.google.com (mail-pj1-f73.google.com [209.85.216.73])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 73EFB1E2834
-	for <kvm@vger.kernel.org>; Fri,  3 Oct 2025 14:35:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 11EFF2459CF
+	for <kvm@vger.kernel.org>; Fri,  3 Oct 2025 14:52:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.73
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1759502121; cv=none; b=I28auM5Yc41H1HCFFyEMHgsRz4aRMr9mf6oKHfnirMvyg9nV8hXqS8nGOYEfZQSOHDikZkJWFhq4e3vYrPLWC+dKrAf5XB8jf3MbHV1tIWxW67VRlsZHTsaA2W5UIWcWrFF2npnmAfHs0P2wmUwisRhT1g3qx/myFIq0fhHr15o=
+	t=1759503135; cv=none; b=AHytEmj2NcnmZoWaAmnGe9jpfDDka0Vf9juJWH9+jD0WwCt46cq7LVZuULkbjfW19wqak7Flk18CrH83KTBA43zSkY0K8zWRYHyOGPZBowEWcDu5SnVlGxUOLX0i24o74pcXnazkU25IEiwfhf8VR8wfqY1wdxaHdr5SvdxRNjc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1759502121; c=relaxed/simple;
-	bh=Q4wvhKK1SLC7lyGyvNT/vgYSM+5FbboY05jYhys6UEU=;
+	s=arc-20240116; t=1759503135; c=relaxed/simple;
+	bh=4b0coGweLPmrVerXT4VS/6VDTPWKnMwazrzwdaJrH1E=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=c/NSw87Jv8Gwv4jPabhZ139Ar5OiG4R/C80rfeFuH+VFismqGDXiwstsHi3CkCSYjUx8QTeLbN0WXjHfB5orn3qwjbgeQosXmC6QPVRjWqHU5azyBrVpA4Jq2LWQGyS01iohOc0sAB2j4W1PVUAYZsXc0oMXGWHdaa9SM1JMstQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=xhCX0EiJ; arc=none smtp.client-ip=209.85.215.201
+	 To:Cc:Content-Type; b=b1GSU5KoSdSKLiRfdxyCMEV8PjaGUs2higwtRwLsAeysRoZVeTipbduY24bkcPQWYzwYEHnIzGvEk23jR1z6lSDUsB57ONhU4lWXkGasFEZgBnipLHYRN5vzefnCLekpzB95yqwZi2KIEoWZLnnlLKz+E4m0iDvVPwHIKTCjzp4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=RX0F19tG; arc=none smtp.client-ip=209.85.216.73
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pg1-f201.google.com with SMTP id 41be03b00d2f7-b55153c5ef2so1671313a12.0
-        for <kvm@vger.kernel.org>; Fri, 03 Oct 2025 07:35:19 -0700 (PDT)
+Received: by mail-pj1-f73.google.com with SMTP id 98e67ed59e1d1-32eaa47c7c8so2240509a91.3
+        for <kvm@vger.kernel.org>; Fri, 03 Oct 2025 07:52:12 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1759502119; x=1760106919; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1759503132; x=1760107932; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=Iz/kuorGnhS1JOjPWbMWU1uMXuAxZjX5KeqruEHo5gU=;
-        b=xhCX0EiJWFYwAOJ9Hx1CL2LrSi4BlAnCg5AMuvjvqS6xZuUsBwXwmKLxgXRgOTiF6r
-         W4OXOTn5Y9+HaEghznHKnFZPcaK+Bu65bV+IG6LiryzVzvgotPDM1KYNfRxM5qpYB1lz
-         k0FulPSDye9EQQuMwcXTSgHTEolLffJFBsaJn/WZ4JJX7B1tcYlZ8kC18TlP5LpEbWfr
-         MxkGAjcwDUXa8SgvxJJ3TUqrZEJyE5OvhMfp1frqyTH5FmvL0OGJyHeACEnEtPQ7FURI
-         wj9cbjhtyz8qQPSJk0bYQS9IA12E7q3wcsA1aDG1iKu4lCKkG3W7qRpVal/A1iZS2cB3
-         veJA==
+        bh=xpN9x5MKoIyJVB04EWmewZK/AQGVBuwB42Zza3jf0V8=;
+        b=RX0F19tGIb2MEJDX7z0i77WkNRXwWMntO6bdbiNAowm6K9NlHf1budsrdlWuCI793Q
+         bpWQ3JgdupE0kANZPJDHFgTpw1u0/fJkZ8qDUBXmAtkf5rFxUppc6EdVyItVt51mwKgU
+         6namnLK4u7AWAqnRD6nPrxHGDR/Gn/vtMWm/es49OaEK98/fSB6NN3bxUZVO5fCS1jzx
+         seAf9ORILLovIAi3Qnc+omy0oCji3xEQs2n6+7sa+HK5v69PtUIEzh+f+0Zbn3xaGajT
+         YWbW1AQmI416p6siYI4mC28oUPJYPlaGD9cp+1xMBvZ9fm8ERdnpSTYIqcIhhapPRNb7
+         epiw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1759502119; x=1760106919;
+        d=1e100.net; s=20230601; t=1759503132; x=1760107932;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=Iz/kuorGnhS1JOjPWbMWU1uMXuAxZjX5KeqruEHo5gU=;
-        b=l8IloJtBWYueiUerq9S29rBBO294jeMHhNO5PsxfXGgUKBCMJg5glccBVMlGGs1dmp
-         H21CF60tGo56sx7TVt/JQOj8fHPc6HZFXsAyNcaxEEbYlK6tDSEzcaaLKsME9rhTjYMc
-         r3xEN696JXBPskxMflGzqtkrHyBycWMi8ZkHobXVrl2l7WxipTBpRh4D/+85aG38EzPo
-         K9CiTVyX7BsAEbYHm6ySub+L+Xkre1vx1VX0tFkmiDlNmzWymM608rZlxEbObUOj3int
-         E7eeLmiXOVl1M873dqRM4iE7UfJPHSVctU/r7225ToGlhHv+G0nieebAtQA3sjvWFn0s
-         C0Kg==
-X-Gm-Message-State: AOJu0Yyt+6Mh8XC7YiEBXzrEt6Km8qcs61Ku06HRjNghkNldnB3+26cb
-	sl5qSY+oDcxJ4EAjsj58V4f4tZU0j+D+LcAwrQbYwb3piEznVgMo7tpuBy8sM0EcQtOY2OEBucu
-	noihZXA==
-X-Google-Smtp-Source: AGHT+IFUN7Oe4z6ZymRlBXqr3L4kG4PYp2PMFWWKwKk/eG/6YDVO+WPrjEYPY3MOxRYFU3HuhZBFs27G7uM=
-X-Received: from pjpy4.prod.google.com ([2002:a17:90a:a404:b0:32b:95bb:dbc])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:4a11:b0:32e:e18a:3691
- with SMTP id 98e67ed59e1d1-339c27b3cf0mr3856927a91.35.1759502118454; Fri, 03
- Oct 2025 07:35:18 -0700 (PDT)
-Date: Fri, 3 Oct 2025 07:35:16 -0700
-In-Reply-To: <b3c2da681c5bf139e2eaf0ea82c7422f972f6288.1747264138.git.ackerleytng@google.com>
+        bh=xpN9x5MKoIyJVB04EWmewZK/AQGVBuwB42Zza3jf0V8=;
+        b=i0/bTJmGqp8BOyPe/eapzRDd8T2ofCFNbSXUuy93lU7/TEusb3v/r1+p97I/8/Y+bO
+         GyB/UihceaXrJLktMnlbKObdEz9/5AthWNGcW1qBwIUJaRVKITh8ZPYmfYgap4vdd5Z/
+         If6MN05OD1uZwT8FjOASa6oRoZ54BBMnTS2FLO6KY3RitWinbmbY5H+I8sMMBFbsfwpV
+         f8zH5fPglHl0pMqaTIRav5JUgT+10F2AxR4Y1hOP2IDyQ9h1lVHE6ygwp/z832QpC9I8
+         sjAF13vHWb38P0JKBTPWIzIjrcRVAz66N/+Ixka0gAlC1NNxRtJp6f7/FE6umV7cE5Js
+         6ong==
+X-Gm-Message-State: AOJu0Yymw3PdL+RG1eEIpuWSVyF7aHcz7OBVEA41NzEWOevnNIUzuvow
+	Kvvc5wKEGXNlNsUYQRMPD8wcCum/VnNjmZrc7JLHsw9PEdVboUcQExaGt6gPzJJdkUbdF8XFY4S
+	si1rY0w==
+X-Google-Smtp-Source: AGHT+IFOx/1HIGJBL3nY8+UsIOfKhr1DvTj0RUho954nMJOAkqUQ2/whOS9dK57jpBCvFyocW4al5BM6oPo=
+X-Received: from pjyo11.prod.google.com ([2002:a17:90a:eb8b:b0:327:50fa:eff9])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:4d12:b0:338:3789:2e89
+ with SMTP id 98e67ed59e1d1-339c2720709mr4203886a91.10.1759503132338; Fri, 03
+ Oct 2025 07:52:12 -0700 (PDT)
+Date: Fri, 3 Oct 2025 07:52:10 -0700
+In-Reply-To: <4d16522293c9a3eacdbe30148b6d6c8ad2eb5908.1747264138.git.ackerleytng@google.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
-References: <cover.1747264138.git.ackerleytng@google.com> <b3c2da681c5bf139e2eaf0ea82c7422f972f6288.1747264138.git.ackerleytng@google.com>
-Message-ID: <aN_fJEZXo6wkcHOh@google.com>
-Subject: Re: [RFC PATCH v2 29/51] mm: guestmem_hugetlb: Wrap HugeTLB as an
- allocator for guest_memfd
+References: <cover.1747264138.git.ackerleytng@google.com> <4d16522293c9a3eacdbe30148b6d6c8ad2eb5908.1747264138.git.ackerleytng@google.com>
+Message-ID: <aN_jGnu2KQnxDniD@google.com>
+Subject: Re: [RFC PATCH v2 32/51] KVM: guest_memfd: Support guestmem_hugetlb
+ as custom allocator
 From: Sean Christopherson <seanjc@google.com>
 To: Ackerley Tng <ackerleytng@google.com>
-Cc: kvm@vger.kernel.org, linux-mm@kvack.org, linux-kernel@vger.kernel.org, 
-	x86@kernel.org, linux-fsdevel@vger.kernel.org, aik@amd.com, 
-	ajones@ventanamicro.com, akpm@linux-foundation.org, amoorthy@google.com, 
-	anthony.yznaga@oracle.com, anup@brainfault.org, aou@eecs.berkeley.edu, 
-	bfoster@redhat.com, binbin.wu@linux.intel.com, brauner@kernel.org, 
-	catalin.marinas@arm.com, chao.p.peng@intel.com, chenhuacai@kernel.org, 
-	dave.hansen@intel.com, david@redhat.com, dmatlack@google.com, 
-	dwmw@amazon.co.uk, erdemaktas@google.com, fan.du@intel.com, fvdl@google.com, 
-	graf@amazon.com, haibo1.xu@intel.com, hch@infradead.org, hughd@google.com, 
-	ira.weiny@intel.com, isaku.yamahata@intel.com, jack@suse.cz, 
-	james.morse@arm.com, jarkko@kernel.org, jgg@ziepe.ca, jgowans@amazon.com, 
-	jhubbard@nvidia.com, jroedel@suse.de, jthoughton@google.com, 
-	jun.miao@intel.com, kai.huang@intel.com, keirf@google.com, 
-	kent.overstreet@linux.dev, kirill.shutemov@intel.com, liam.merwick@oracle.com, 
-	maciej.wieczor-retman@intel.com, mail@maciej.szmigiero.name, maz@kernel.org, 
-	mic@digikod.net, michael.roth@amd.com, mpe@ellerman.id.au, 
-	muchun.song@linux.dev, nikunj@amd.com, nsaenz@amazon.es, 
-	oliver.upton@linux.dev, palmer@dabbelt.com, pankaj.gupta@amd.com, 
-	paul.walmsley@sifive.com, pbonzini@redhat.com, pdurrant@amazon.co.uk, 
-	peterx@redhat.com, pgonda@google.com, pvorel@suse.cz, qperret@google.com, 
-	quic_cvanscha@quicinc.com, quic_eberman@quicinc.com, 
-	quic_mnalajal@quicinc.com, quic_pderrin@quicinc.com, quic_pheragu@quicinc.com, 
-	quic_svaddagi@quicinc.com, quic_tsoni@quicinc.com, richard.weiyang@gmail.com, 
-	rick.p.edgecombe@intel.com, rientjes@google.com, roypat@amazon.co.uk, 
-	rppt@kernel.org, shuah@kernel.org, steven.price@arm.com, 
-	steven.sistare@oracle.com, suzuki.poulose@arm.com, tabba@google.com, 
-	thomas.lendacky@amd.com, usama.arif@bytedance.com, vannapurve@google.com, 
-	vbabka@suse.cz, viro@zeniv.linux.org.uk, vkuznets@redhat.com, 
-	wei.w.wang@intel.com, will@kernel.org, willy@infradead.org, 
-	xiaoyao.li@intel.com, yan.y.zhao@intel.com, yilun.xu@intel.com, 
-	yuzenghui@huawei.com, zhiquan1.li@intel.com
+Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	Yan Zhao <yan.y.zhao@intel.com>, Fuad Tabba <tabba@google.com>, 
+	Binbin Wu <binbin.wu@linux.intel.com>, Michael Roth <michael.roth@amd.com>, 
+	Ira Weiny <ira.weiny@intel.com>, Rick P Edgecombe <rick.p.edgecombe@intel.com>, 
+	Vishal Annapurve <vannapurve@google.com>, David Hildenbrand <david@redhat.com>, 
+	Paolo Bonzini <pbonzini@redhat.com>
 Content-Type: text/plain; charset="us-ascii"
 
+Trimmed the Cc to KVM/guest_memfd folks.
+
 On Wed, May 14, 2025, Ackerley Tng wrote:
-> guestmem_hugetlb is an allocator for guest_memfd. It wraps HugeTLB to
-> provide huge folios for guest_memfd.
-> 
-> This patch also introduces guestmem_allocator_operations as a set of
-> operations that allocators for guest_memfd can provide. In a later
-> patch, guest_memfd will use these operations to manage pages from an
-> allocator.
-> 
-> The allocator operations are memory-management specific and are placed
-> in mm/ so key mm-specific functions do not have to be exposed
-> unnecessarily.
+> @@ -22,6 +25,10 @@ struct kvm_gmem_inode_private {
+>  #ifdef CONFIG_KVM_GMEM_SHARED_MEM
+>  	struct maple_tree shareability;
+>  #endif
+> +#ifdef CONFIG_KVM_GMEM_HUGETLB
+> +	const struct guestmem_allocator_operations *allocator_ops;
+> +	void *allocator_private;
+> +#endif
 
-This code doesn't have to be put in mm/, all of the #includes are to <linux/xxx.h>.
-Unless I'm missing something, what you actually want to avoid is _exporting_ mm/
-APIs, and for that all that is needed is ensure the code is built-in to the kernel
-binary, not to kvm.ko.
+This is beyond silly.  There is _one_ "custom" allocator, and no evidence that
+the "generic" logic written for custom allocators would actually be correct for
+anything other than a hugetlb allocator.
 
-diff --git a/virt/kvm/Makefile.kvm b/virt/kvm/Makefile.kvm
-index d047d4cf58c9..c18c77e8a638 100644
---- a/virt/kvm/Makefile.kvm
-+++ b/virt/kvm/Makefile.kvm
-@@ -13,3 +13,5 @@ kvm-$(CONFIG_HAVE_KVM_IRQ_ROUTING) += $(KVM)/irqchip.o
- kvm-$(CONFIG_HAVE_KVM_DIRTY_RING) += $(KVM)/dirty_ring.o
- kvm-$(CONFIG_HAVE_KVM_PFNCACHE) += $(KVM)/pfncache.o
- kvm-$(CONFIG_KVM_GUEST_MEMFD) += $(KVM)/guest_memfd.o
-+
-+obj-$(subst m,y,$(CONFIG_KVM_GUEST_MEMFD)) += $(KVM)/guest_memfd_hugepages.o
-\ No newline at end of file
+And to my point about guestmem_hugetlb.c not actually needing access to "private"
+mm/ state,  I would much rather add e.g. virt/kvm/guest_memfd_hugetlb.{c.h}, and
+in the header define:
 
-People may want the code to live in mm/ for maintenance and ownership reasons
-(or not, I haven't followed the discussions on hugepage support), but that's a
-very different justification than what's described in the changelog.
+  struct gmem_hugetlb_inode {
+	struct hstate *h;
+	struct hugepage_subpool *spool;
+	struct hugetlb_cgroup *h_cg_rsvd;
+  };
 
-And if the _only_ user is guest_memfd, putting this in mm/ feels quite weird.
-And if we anticipate other users, the name guestmem_hugetlb is weird, because
-AFAICT there's nothing in here that is in any way guest specific, it's just a
-few APIs for allocating and accounting hugepages.
+and then in guest_memfd.c have
 
-Personally, I don't see much point in trying to make this a "generic" library,
-in quotes because the whole guestmem_xxx namespace makes it anything but generic.
-I don't see anything in mm/guestmem_hugetlb.c that makes me go "ooh, that's nasty,
-I'm glad this is handled by a library".  But if we want to go straight to a
-library, it should be something that is really truly generic, i.e. not "guest"
-specific in any way.
+  struct gmem_inode {
+	struct shared_policy policy;
+	struct inode vfs_inode;
 
-> Signed-off-by: Ackerley Tng <ackerleytng@google.com>
-> 
-> Change-Id: I3cafe111ea7b3c84755d7112ff8f8c541c11136d
-> ---
->  include/linux/guestmem.h      |  20 +++++
->  include/uapi/linux/guestmem.h |  29 +++++++
->  mm/Kconfig                    |   5 +-
->  mm/guestmem_hugetlb.c         | 159 ++++++++++++++++++++++++++++++++++
->  4 files changed, 212 insertions(+), 1 deletion(-)
->  create mode 100644 include/linux/guestmem.h
->  create mode 100644 include/uapi/linux/guestmem.h
+	u64 flags;
+	struct maple_tree attributes;
+
+#ifdef CONFIG_KVM_GUEST_MEMFD_HUGETLB
+	struct gmem_hugetlb_inode hugetlb;
+#endif
+  };
+
+or maybe even better, avoid even that "jump" and define "struct gmem_inode" in a
+new virt/kvm/guest_memfd.h:
+
+  struct gmem_inode {
+	struct shared_policy policy;
+	struct inode vfs_inode;
+
+	u64 flags;
+	struct maple_tree attributes;
+
+#ifdef CONFIG_KVM_GUEST_MEMFD_HUGETLB
+	struct hstate *h;
+	struct hugepage_subpool *spool;
+	struct hugetlb_cgroup *h_cg_rsvd;
+#endif
+  };
 
 
-..
+The setup code can them be:
 
-> diff --git a/include/uapi/linux/guestmem.h b/include/uapi/linux/guestmem.h
-> new file mode 100644
-> index 000000000000..2e518682edd5
-> --- /dev/null
-> +++ b/include/uapi/linux/guestmem.h
+#ifdef CONFIG_KVM_GUEST_MEMFD_HUGETLB
+	if (flags & GUEST_MEMFD_FLAG_HUGETLB) {
+		err = kvm_gmem_init_hugetlb(inode, size, huge_page_size_log2)
+		if (err)
+			goto out;
+	}
+#endif
 
-With my KVM hat on, NAK to defining uAPI in a library like this.  This subtly
-defines uAPI for KVM, and effectively any other userspace-facing entity that
-utilizes the library/allocator.  KVM's uAPI needs to be defined by KVM, period.
 
-There's absolutely zero reason to have guestmem_hugetlb_setup() take in flags.
-Explicitly pass the page size, or if preferred, the page_size_log, and let the
-caller figure out how to communicate the size to the kernel.
+Actually, if we're at all clever, the #ifdefs can go away completely so long as
+kvm_gmem_init_hugetlb() is uncondtionally _declared_, because we rely on dead
+code elimination to drop the call before linking.
 
-IMO, the whole MAP_HUGE_xxx approach is a (clever) hack to squeeze the desired
-size into mmap() flags.  I don't see any reason to carry that forward to guest_memfd.
-For once, we had the foresight to reserve some space in KVM's uAPI structure, so
-there's no need to squeeze things into flags.
-
-E.g. we could do something like this:
-
-diff --git include/uapi/linux/kvm.h include/uapi/linux/kvm.h
-index 42053036d38d..b79914472d27 100644
---- include/uapi/linux/kvm.h
-+++ include/uapi/linux/kvm.h
-@@ -1605,11 +1605,16 @@ struct kvm_memory_attributes {
- #define KVM_CREATE_GUEST_MEMFD _IOWR(KVMIO,  0xd4, struct kvm_create_guest_memfd)
- #define GUEST_MEMFD_FLAG_MMAP          (1ULL << 0)
- #define GUEST_MEMFD_FLAG_INIT_SHARED   (1ULL << 1)
-+#define GUEST_MEMFD_FLAG_HUGE_PAGES    (1ULL << 2)
- 
- struct kvm_create_guest_memfd {
-        __u64 size;
-        __u64 flags;
--       __u64 reserved[6];
-+       __u8 huge_page_size_log2;
-+       __u8 reserve8;
-+       __u16 reserve16;
-+       __u32 reserve32;
-+       __u64 reserved[5];
- };
- 
- #define KVM_PRE_FAULT_MEMORY   _IOWR(KVMIO, 0xd5, struct kvm_pre_fault_memory)
-
-And not have to burn 6 bits of flags to encode the size in a weird location.
-
-But that's a detail for KVM to sort out, which is exactly my point; how this is
-presented to userspace for guest_memfd is question for KVM.
-
-> @@ -0,0 +1,29 @@
-> +/* SPDX-License-Identifier: GPL-2.0 WITH Linux-syscall-note */
-> +#ifndef _UAPI_LINUX_GUESTMEM_H
-> +#define _UAPI_LINUX_GUESTMEM_H
-> +
-> +/*
-> + * Huge page size must be explicitly defined when using the guestmem_hugetlb
-> + * allocator for guest_memfd.  It is the responsibility of the application to
-> + * know which sizes are supported on the running system.  See mmap(2) man page
-> + * for details.
+>  };
+> +/**
+> + * kvm_gmem_truncate_indices() - Truncates all folios beginning @index for
+> + * @nr_pages.
+> + *
+> + * @mapping: filemap to truncate pages from.
+> + * @index: the index in the filemap to begin truncation.
+> + * @nr_pages: number of PAGE_SIZE pages to truncate.
+> + *
+> + * Return: the number of PAGE_SIZE pages that were actually truncated.
 > + */
-> +
-> +#define GUESTMEM_HUGETLB_FLAG_SHIFT	58
-> +#define GUESTMEM_HUGETLB_FLAG_MASK	0x3fUL
-> +
-> +#define GUESTMEM_HUGETLB_FLAG_16KB	(14UL << GUESTMEM_HUGETLB_FLAG_SHIFT)
-> +#define GUESTMEM_HUGETLB_FLAG_64KB	(16UL << GUESTMEM_HUGETLB_FLAG_SHIFT)
-> +#define GUESTMEM_HUGETLB_FLAG_512KB	(19UL << GUESTMEM_HUGETLB_FLAG_SHIFT)
-> +#define GUESTMEM_HUGETLB_FLAG_1MB	(20UL << GUESTMEM_HUGETLB_FLAG_SHIFT)
-> +#define GUESTMEM_HUGETLB_FLAG_2MB	(21UL << GUESTMEM_HUGETLB_FLAG_SHIFT)
-> +#define GUESTMEM_HUGETLB_FLAG_8MB	(23UL << GUESTMEM_HUGETLB_FLAG_SHIFT)
-> +#define GUESTMEM_HUGETLB_FLAG_16MB	(24UL << GUESTMEM_HUGETLB_FLAG_SHIFT)
-> +#define GUESTMEM_HUGETLB_FLAG_32MB	(25UL << GUESTMEM_HUGETLB_FLAG_SHIFT)
-> +#define GUESTMEM_HUGETLB_FLAG_256MB	(28UL << GUESTMEM_HUGETLB_FLAG_SHIFT)
-> +#define GUESTMEM_HUGETLB_FLAG_512MB	(29UL << GUESTMEM_HUGETLB_FLAG_SHIFT)
-> +#define GUESTMEM_HUGETLB_FLAG_1GB	(30UL << GUESTMEM_HUGETLB_FLAG_SHIFT)
-> +#define GUESTMEM_HUGETLB_FLAG_2GB	(31UL << GUESTMEM_HUGETLB_FLAG_SHIFT)
-> +#define GUESTMEM_HUGETLB_FLAG_16GB	(34UL << GUESTMEM_HUGETLB_FLAG_SHIFT)
-> +
-> +#endif /* _UAPI_LINUX_GUESTMEM_H */
 
-...
+Do not add kerneldoc comments for internal helpers.  They inevitably become stale
+and are a source of friction for developers.  The _only_ non-obvious thing here
+is the return value.  
 
-> +const struct guestmem_allocator_operations guestmem_hugetlb_ops = {
-> +	.inode_setup = guestmem_hugetlb_setup,
-> +	.inode_teardown = guestmem_hugetlb_teardown,
-> +	.alloc_folio = guestmem_hugetlb_alloc_folio,
-> +	.nr_pages_in_folio = guestmem_hugetlb_nr_pages_in_folio,
-> +};
-> +EXPORT_SYMBOL_GPL(guestmem_hugetlb_ops);
-
-Why are these bundled into a structure?  AFAICT, that adds layers of indirection
-for absolutely no reason.  And especially on the KVM guest_memfd side, implementing
-a pile of infrastructure to support "custom" allocators is very premature.  Without
-a second "custom" allocator, it's impossible to determine if the indirection
-provided is actually a good design.  I.e. all of the kvm_gmem_has_custom_allocator()
-logic in guest_memfd.c is just HugeTLB logic buried behind a layer of unnecessary
-indirection.
+> +static long kvm_gmem_truncate_indices(struct address_space *mapping,
+> +				      pgoff_t index, size_t nr_pages)
+> +{
+> +	struct folio_batch fbatch;
+> +	long truncated;
+> +	pgoff_t last;
+> +
+> +	last = index + nr_pages - 1;
+> +
+> +	truncated = 0;
+> +	folio_batch_init(&fbatch);
+> +	while (filemap_get_folios(mapping, &index, last, &fbatch)) {
+> +		unsigned int i;
+> +
+> +		for (i = 0; i < folio_batch_count(&fbatch); ++i) {
+> +			struct folio *f = fbatch.folios[i];
+> +
+> +			truncated += folio_nr_pages(f);
+> +			folio_lock(f);
+> +			truncate_inode_folio(f->mapping, f);
+> +			folio_unlock(f);
+> +		}
+> +
+> +		folio_batch_release(&fbatch);
+> +		cond_resched();
+> +	}
+> +
+> +	return truncated;
+> +}
 
