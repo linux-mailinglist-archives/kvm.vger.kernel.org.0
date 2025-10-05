@@ -1,65 +1,64 @@
-Return-Path: <kvm+bounces-59502-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-59503-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [213.196.21.55])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4AF8EBB94DF
-	for <lists+kvm@lfdr.de>; Sun, 05 Oct 2025 10:44:43 +0200 (CEST)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
+	by mail.lfdr.de (Postfix) with ESMTPS id E4F88BB94E5
+	for <lists+kvm@lfdr.de>; Sun, 05 Oct 2025 10:45:16 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ams.mirrors.kernel.org (Postfix) with ESMTPS id C370D345AA6
-	for <lists+kvm@lfdr.de>; Sun,  5 Oct 2025 08:44:42 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id DBCD24E2D16
+	for <lists+kvm@lfdr.de>; Sun,  5 Oct 2025 08:45:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A3F2F208994;
-	Sun,  5 Oct 2025 08:44:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7ABF420B81B;
+	Sun,  5 Oct 2025 08:45:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=hotmail.com header.i=@hotmail.com header.b="bnhTNpyq"
+	dkim=pass (2048-bit key) header.d=hotmail.com header.i=@hotmail.com header.b="ZYk7bSsO"
 X-Original-To: kvm@vger.kernel.org
-Received: from SEYPR02CU001.outbound.protection.outlook.com (mail-koreacentralazolkn19013072.outbound.protection.outlook.com [52.103.74.72])
+Received: from TYPPR03CU001.outbound.protection.outlook.com (mail-japaneastazolkn19012054.outbound.protection.outlook.com [52.103.43.54])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 15A141865FA;
-	Sun,  5 Oct 2025 08:44:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.103.74.72
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E24C02080C8;
+	Sun,  5 Oct 2025 08:45:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.103.43.54
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1759653873; cv=fail; b=LqI3AKqwrArIAFnshAJZfNDj6FQo9cI92JMt3TBRw8XepSqwEvftWFMYUvnJUI8ME3A7P7gsxtVaUoaeOBtMZQMgp9JhNjMt5sWqwO3Z+ZO76eGshiMxC8VN6+KXanh7NZEXb39mn3ApuEjMdGAk/WvJVpLtIrVO9tHGQmV0yfY=
+	t=1759653908; cv=fail; b=UNt1eQWlv839Pr5m9ij66TuS1G4mWr8dGetKtfIl1l1dUaX7cLy4s+CtVofs9m3R2/6w4uFoVrCWN5Im5Gg9/cHWGDUXYvfC58q2pYwR4K8/8+67v4maI7OIubTUTLiCoHsvXurGoSV07TWYwwheLIErSA+qIB/UyJJf/GmFnsM=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1759653873; c=relaxed/simple;
-	bh=gZ2BDZFL5EqQse1AX0qPtsLZEL9lmdRMrPq73wcagi8=;
+	s=arc-20240116; t=1759653908; c=relaxed/simple;
+	bh=vFGCYPIPw/tc8ZlAZrzHvwO+ziMWSG25fmRuMUwirZE=;
 	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
-	 Content-Type:MIME-Version; b=eU78x2DCSus68UZed7fbT6TLmGLQGKP6qsVZvAXxlAWpNiS7aiIBUkTlcW7koOv+tgdartcpUZiI0plg/wbutEbd3o5D7OJSa03J/f9aVDgFGQ1b2SnGbOf+pFriNwKXvyGw7ZyjZxPAK6aFAz2Bbqe3QaT2JA391zkJFLQc2wU=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=hotmail.com; spf=pass smtp.mailfrom=hotmail.com; dkim=pass (2048-bit key) header.d=hotmail.com header.i=@hotmail.com header.b=bnhTNpyq; arc=fail smtp.client-ip=52.103.74.72
+	 Content-Type:MIME-Version; b=sL/VL/YcWRbOGnQhH6WvqJCs4ipNSvIrxT2ny1vqmXNLVDxrkZkqnuyfWuYSZfaSMsaFxKZ5HI8ZQUZAPa13qycfoDmiMospQm2wefyDPbGMXOE3ulcfcI6yoiqIODwxPXGEH2PShD1EVEsPlzr7AyUUI8B05yaOyAYN8t7zm5c=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=hotmail.com; spf=pass smtp.mailfrom=hotmail.com; dkim=pass (2048-bit key) header.d=hotmail.com header.i=@hotmail.com header.b=ZYk7bSsO; arc=fail smtp.client-ip=52.103.43.54
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=hotmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=hotmail.com
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=Gh1rcGOL6oCNOr+SO2+ABobqgUxxFbtNeNLUFbey85v6x77PNbBqgfDj+pJc1lNiBGLi5U+8GVlGi3DK+6PU+Tgh1DIeoVQLVVgghPgHfyQLoj1gD+zm+ULmtkg0wg0S6gWuQceJf+ZoQhqyqCwoEPWjVJqOKHjOUKWBK/fVlau2Z5eTTRfnG2DqWAAg2zAOGJrKPaaX4GXGXYciAHzg5hkYmw+qfDCUbT/WebXBVdBdWjKxjh/C7MAQYpxDufOrSgAYcL6g8guZjL9b3PbiqaCsAnibyNqXBpN4RVqObGhJCAWVwtkYfAVX3J6JtB3ylaBXOZL3A1lkaP2mzV/eyg==
+ b=XRZ6r5VD5l/HB3H3rhWLp2/WhoOW5732/6MbHf+t09w3XgkSJPKZ6Q/bIrtJzZleZ49eQoIR64qz2TIlMTzZWziZGPMKMVCYekOYNApbIUPhIhDvHwb8sAV8SiqRTjuoy7slKM62Affi9lavNlHFOhyzqEB/LkftDfDLeNtT89jQtph/LIyYYBsb6B4oBAavEAL4J8ibSYKK75NrKPT3cXwWbpVzZ7v2ILWyiRp+MAL/GgGYjLLcDF0OSnrWmW9EXeQpnJY/ofYBfaBGVZTuXFU2tUNBF7/NBHlIi6X2VtDPyv546BTfPKPGcH8F8bEX/HMFyi8XmGEY2mtLzGOvzA==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector10001;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=6GBn8fNk/CwlZ69yhThcdETS6jlHK7nmkwRuvgCtqVU=;
- b=fDxU+mZUSQKv+YbizZIMXRmjEVybFqwLJjDx8ssK9cALX9yBDulxjJsoj5VN5wgPifj6ZW3CRsEgo4fdRjGtRXbVC5ws6YacQt11PaySekfBJQajsIg2Whn73voP5AhjzdBoHc2G8YclVIslYE4iayZxEo4cV+UEpa2PJVBcdEp6lmDkTkF0ClxfoQazOwKwNT6EY6mnCjIBsHLzGAlcvVAfdzkXWbzDqz/mKYXhbYp649pVw6f8F151VhrrstzM5Rin9r+L08UvfbGFM1RHu5EmeRjSea2zbHT/QOOjtqcF00hT2wI4SbyMkj2yQZCFYeR0uUsH8HO7K5Qy0eRNRA==
+ bh=OXJFgTe4oER/45wmSoYyxn7VsRpCH/CmzMc8e7FQufk=;
+ b=g30Q+yA/Gtv40soM7btdmnj/pUmAU7voOhlXD4GxaddifKgygJZfYSbbsV5TjpvJmclmv/eWoptS40P4a8pgsyWi9pzOJQb3BJ+ivn1Qj8TyCE3Cnp67iCNkQH8o3L4NX3x3pfCJMNwk76vw+3nAf3i+0huvZFK7VNcsvXjpmBVeOcEtOiv1refrgBw2B8wo2LofzbhpOHFuj08CtUpLfa8NxsKVExVVsiHY6JPfA9XWQEascNWSo7tt7L6K5d2PmzBRIc2cZDNAuNFvmwSH1gOJKQ+cK4JbhYbU3C3Twf4COAz9BxXNRr/UA6cR3BaTCmY1+k0OiNvJLYmdHkIB0g==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=none; dmarc=none;
  dkim=none; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=hotmail.com;
  s=selector1;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=6GBn8fNk/CwlZ69yhThcdETS6jlHK7nmkwRuvgCtqVU=;
- b=bnhTNpyqfPvYG9zkcLWjnj2SmUJvRWKZaXRsQXo49w8WDh37f/SrrmyPbws6rqKHYdatozEYOWZFumuFAK75Cci9/bIZ3i3vOWLggXEH50v+fL7jw4zyasozMyKaNMzoQMnu4xULiXHJTsVY5QF+4dFj0UO94YPSlYB9Y4HkiWy/OHX+29J8ilqz7foua0jpvcgUEoFqgrSjKUlgmLiPJX/MOjjDl7dY67++G2K3TnlZTsRhMtRau8+1jgve3OJ7DN9JyQFDAeWhr4YxGRnP0aYtuQYVHYXxM1KqdKgblBdlBEdG46IbyCKoKCJst8U2EicFOR1qJs+KVpilMGi99g==
+ bh=OXJFgTe4oER/45wmSoYyxn7VsRpCH/CmzMc8e7FQufk=;
+ b=ZYk7bSsOjXiBU0a8k5r8M0nYvmQDFvH4eE27ANm3umQNqpX44mzDCYeMKcqPioXvUpDUCKWXQ6FNfeyYP6u+DOLVPfTQqDcfE4xp5wTHKoTwqeOTRBWqJE41C3K9TY3UtbjPDOyBB77/irG7nVYgLzbUTgEoBL/Xl6pfca082FrCcn6grpxik/0BtX/RAQPjKExY3HwigJf9oKVCWE733krvDnKthvD8c5WSepUNQUqO1DvMVgRibLkdZefs0icSIg/VNRwD2Cqe1H2J9FRkFDettsN8FmNrMHzywg9y9615tIc/KrRA9olO0u+7NYCl7fUvV0RZpSZkXXI306cbbA==
 Received: from KUZPR04MB9265.apcprd04.prod.outlook.com (2603:1096:d10:5a::6)
  by TYZPR04MB5805.apcprd04.prod.outlook.com (2603:1096:400:1fe::7) with
  Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9182.18; Sun, 5 Oct
- 2025 08:44:26 +0000
+ 2025 08:44:59 +0000
 Received: from KUZPR04MB9265.apcprd04.prod.outlook.com
  ([fe80::3c38:c065:daf4:cbfa]) by KUZPR04MB9265.apcprd04.prod.outlook.com
  ([fe80::3c38:c065:daf4:cbfa%5]) with mapi id 15.20.9182.017; Sun, 5 Oct 2025
- 08:44:24 +0000
+ 08:44:59 +0000
 Message-ID:
- <KUZPR04MB9265EEB3E98A19CE443F8DC8F3E2A@KUZPR04MB9265.apcprd04.prod.outlook.com>
-Date: Sun, 5 Oct 2025 16:44:17 +0800
+ <KUZPR04MB9265F2B6E662CCF1C6745155F3E2A@KUZPR04MB9265.apcprd04.prod.outlook.com>
+Date: Sun, 5 Oct 2025 16:44:52 +0800
 User-Agent: Mozilla Thunderbird
-Subject: Re: [RFC PATCH v2 14/18] RISC-V: KVM: Enable KVM_VFIO interfaces on
- RISC-V arch
+Subject: Re: [RFC PATCH v2 16/18] vfio: enable IOMMU_TYPE1 for RISC-V
 To: Andrew Jones <ajones@ventanamicro.com>, iommu@lists.linux.dev,
  kvm-riscv@lists.infradead.org, kvm@vger.kernel.org,
  linux-riscv@lists.infradead.org, linux-kernel@vger.kernel.org
@@ -68,17 +67,17 @@ Cc: jgg@nvidia.com, zong.li@sifive.com, tjeznach@rivosinc.com,
  atish.patra@linux.dev, tglx@linutronix.de, alex.williamson@redhat.com,
  paul.walmsley@sifive.com, palmer@dabbelt.com, alex@ghiti.fr
 References: <20250920203851.2205115-20-ajones@ventanamicro.com>
- <20250920203851.2205115-34-ajones@ventanamicro.com>
+ <20250920203851.2205115-36-ajones@ventanamicro.com>
 Content-Language: en-US
 From: "Nutty.Liu" <nutty.liu@hotmail.com>
-In-Reply-To: <20250920203851.2205115-34-ajones@ventanamicro.com>
+In-Reply-To: <20250920203851.2205115-36-ajones@ventanamicro.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: TYCPR01CA0115.jpnprd01.prod.outlook.com
- (2603:1096:405:4::31) To KUZPR04MB9265.apcprd04.prod.outlook.com
+X-ClientProxiedBy: TYCP286CA0217.JPNP286.PROD.OUTLOOK.COM
+ (2603:1096:400:3c5::18) To KUZPR04MB9265.apcprd04.prod.outlook.com
  (2603:1096:d10:5a::6)
 X-Microsoft-Original-Message-ID:
- <98017c59-7425-4b93-bd14-d5f9653e6e55@hotmail.com>
+ <5319ea7d-41e4-489b-b2af-4b4a5a21e83e@hotmail.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -88,73 +87,73 @@ MIME-Version: 1.0
 X-MS-Exchange-MessageSentRepresentingType: 1
 X-MS-PublicTrafficType: Email
 X-MS-TrafficTypeDiagnostic: KUZPR04MB9265:EE_|TYZPR04MB5805:EE_
-X-MS-Office365-Filtering-Correlation-Id: 77f3a465-6c8d-476b-3e7d-08de03eb62b8
+X-MS-Office365-Filtering-Correlation-Id: 175a39fa-2d14-4b92-9235-08de03eb778d
 X-Microsoft-Antispam:
 	BCL:0;ARA:14566002|6090799003|461199028|8060799015|19110799012|5072599009|37102599003|23021999003|15080799012|3412199025|440099028|40105399003;
 X-Microsoft-Antispam-Message-Info:
-	=?utf-8?B?TFB3Wk1vRVNCYndqVkJ6aXpockxhT2NLWng5OVF5R1NNbXlManpRNXlwUE9B?=
- =?utf-8?B?Q1NHUGNUL09FdW8ybTVha3AyLzZ2NHBTcVpTN244QTBqQU1tT3owQ0Q0K1hN?=
- =?utf-8?B?Zm1ndXIxajdaNnMrNnc1emd2ZWxNeDNVYVJRUmhIdHVPZnZsOEVBekFjR3kx?=
- =?utf-8?B?aUlTZURJQUNrcXRTbWptcldJTEtDb2RuS01TUll4cjhYb21UOXNmbjU2WFdi?=
- =?utf-8?B?OXp2RWVUT3QvaFVzUXY2RkxvbGxkNmVERG5xTXh5c2lLZjhOb0MxanBHWmY2?=
- =?utf-8?B?a1BlWHJMdWwxWWRtUUdjYk16WnNSdWt3QWZJeUFMRHljNFhiSzVwVi9nL01O?=
- =?utf-8?B?c0xhcUE1aUNYcThKMzF5WVhyTFpwNVFNd0RHcjRvdS9NNUk0dTdDWlJmVEdh?=
- =?utf-8?B?Q283Mk54eEN6UXJmbDBhUUk3TmtpcjMyaHc1dENJY1hQTGpwYk4vMVl0S0JT?=
- =?utf-8?B?V1AzWkVDRXkzZExkaTFpcDFacG16RldrOFJvUnFjS0cyWTNNcWpYdmY5ckdF?=
- =?utf-8?B?TlRBaGg2QUxkMDNVOVkvc2Q4WFE3MllmdmFYOTFQSmZrZ2JRbktFRVZNL0Nt?=
- =?utf-8?B?bjdDZ05FTUVRMmlISUlub0thS21sUHBGb3NMbCtxVytnc2xnOUhSdlkxTHZL?=
- =?utf-8?B?cmcyR1pZQWNxMWR1OEcyaEdNeTd4b0wvK1h1Q3VtUndrMGd0c1ZBcjI3WXdC?=
- =?utf-8?B?UGh6ZGVmTHcyRmVHSmpkL2NnUDlkSXR5YUEzRnlTRDlEcnhDdHNDcXdnNW5l?=
- =?utf-8?B?S3VlV0NqMnRNcHhFa29ISm0wS01MWjVDQXQrMkRicVdrMzlibFZzU0RYWWJI?=
- =?utf-8?B?cW01dUNwelFJRTZLbkZSeUZ0Tkk2TG9kTGdFS0VtdkpDWVNDaVhkclBGOTJS?=
- =?utf-8?B?dEhYamZjUlFzTU84cGFuRFFSbnJnNWFyZzZTUXptalhrMWZDd2J1SmRzTDd0?=
- =?utf-8?B?enJlakFTcUxDWnVrRVpSWkw4TS9uM3MwRDZKbnJNM1ZjOTdGTDRiK3BoN0pH?=
- =?utf-8?B?Wms3dmNmY1ZiZmhsN2J6WkFlZTRpNmVIKzFPSkF3U0N6TWVLcGh4UDlSRktS?=
- =?utf-8?B?V0F6dks5N05haTRYUEZkK09iRDhWZnN6dGlDNUZrbittS3VIRUprMU5qYWZE?=
- =?utf-8?B?NWw4T2JZL1BiMVJPd05yWE92dnhkamllUnRYc0U2alRQUVJESWk0eWhPanMw?=
- =?utf-8?B?MnJyMXRWY2ZhQzZOS3d3MHR4TC9wcWdZb2FlUjRrNGpMZjJ1V2VDV05Qc1F2?=
- =?utf-8?B?VGk2aGgxbHArTDZqTnBBSnBRdk5BTWRYbWhUcmlWcGpQcjhZSER0RW8veCs3?=
- =?utf-8?B?bi8yb1hqVUdKbUd1NzZSZ29haWFOcFBicjJiNkxzdEJLMmpxdmJqcUVYa1lt?=
- =?utf-8?B?Um1IeUxWZnZrWGZYVUNCVml0WjRVaTdtSDBuUngzQ1Nadkk5ZVFwc2xrRjBy?=
- =?utf-8?B?U04yUStZOVlmWkMzNWpFbjhEMXEvRnJVNlNBQUZ6R1hsNlJhOFBmNk5VTkMx?=
- =?utf-8?B?bUxxTWgrS1U1MXJlcStMbWNLUlNqeFYwUzUxdmxReWpuZjliRW01WVJia0Iv?=
- =?utf-8?B?bWFHSE1BT2NjMzFUdWxEUzNSSUo5aGU3bDQzd2JUekhEZEd1Y2VGb1ROcVND?=
- =?utf-8?B?QjAwWFEzNU5yWStyeXJvUkl4NnBpM1E9PQ==?=
+	=?utf-8?B?bVdvRzBwWVFCdXRoVmlGWXhWQkVNdE1mWkJnNlJibFdxWmlGcVcyMGJoRFh4?=
+ =?utf-8?B?OU9TZ0JEKzV3Zjd3VG5oRzNpcFZwSjdvTGF2eEhKYzczU2M3WjdOMnpRbG9k?=
+ =?utf-8?B?YkVSSnF6dFNLRjJNL29sSnJPdGpZU2o0MHljT2R1Zk90VkxRSGw3eGRLdHE0?=
+ =?utf-8?B?NUUxakNXdy9LdnNaMmJKSjRicEl6b0EzWndFcDUwampNaWxzVUwrbGE2WXRV?=
+ =?utf-8?B?RTlVL3BxZE5iV1lqU3FJTnpqeTNDR09FVFM2NmhEZ1Q4K2s1N2hCT0hBVmxl?=
+ =?utf-8?B?L3pmc2VJTFRVWHFleTFmV0E1U3MyUFFmeVp5aUtxdms1akZqbnRVdkNKU2lK?=
+ =?utf-8?B?M3JLQ3R4RnBubGVvRk5LZ25paFNWeFJVclRTNlB5VGxxN1IyRlJaNlhlNjVY?=
+ =?utf-8?B?NUZqb3ZscGhMOHI4NmNoOC9LYVg1VlZ0N3JDd0k3dlFSd3BEWlpuZWIxZFdP?=
+ =?utf-8?B?VUVHUitMcnhDcmErQzV4R0ZlbWJPemViV1F2cVZTdHBwZDhsZlNXWTNnMGdW?=
+ =?utf-8?B?ZVIzY2NCZnRjSlFKa3ZHNVNnd0dobDdvK1hxNkVFdGJucjlXU1JHOEM2azBu?=
+ =?utf-8?B?bExQK1BoSEZMaE94bG15N2ZqcFJHQ2J2ZVdNT3pBMVlWRmQxQWRGOUhVKzF5?=
+ =?utf-8?B?SDhxWDJhaXFWbW8zdmZiZFZJdGh1bkFrQ1diNzBJRkVIdE5DcHlRTzNkcmZw?=
+ =?utf-8?B?YUZMQlQzQ0lKZlVQWHdQdEV0aCt4Y1o4clBOLzIweE1seFErZURERG9LRUZv?=
+ =?utf-8?B?cllBcTZDcHFXMnFUSld2QUJkTzg4L2RSSisvbE5rZGVVTEtXR1BhdXJZMklw?=
+ =?utf-8?B?L3g3Q0lWbXVjem1kbklOb3U1Q1FCSmxacnU5c1dTMVpXbUdZUE83TzhJVWkw?=
+ =?utf-8?B?NHFSaXJwUE9tT0RuSkVPcjh1SElHQngrVFkyNUZFQ1RobFA4UHc5TENFODgr?=
+ =?utf-8?B?ZGQ3T0ZrN1RvRnZ0cnBBZ0oyTjE2UlpLNU1EREdPSjhMdWxBaVFPQ1hIVHRp?=
+ =?utf-8?B?aW5aRFVSOVNJN2xUbnFMK2V4T093YmhuQVV2WlF6cUY0NCtWU0pyb0xhYlhU?=
+ =?utf-8?B?ZldpaTlYMytDcXY1WkRjdjZab2o0aElkUTRzNkE1MUszUE9sbWNZU0xvU3h1?=
+ =?utf-8?B?YmkyNzlqNTNhUHpQUUxNVUJMUlRrdFRwMktEMG42WXkydkU1K2daalhNYkJ0?=
+ =?utf-8?B?NjNUdkI4bnF3ZGVYbndZcXBkM3hIK29vYTN2VHlXcUxPRzE0S0l3NDNuWDFE?=
+ =?utf-8?B?WmdaVUhSOThWcHFSTm90QXV6elFMOTM0cVNhSmlabC9YMVRWR2dSZFZUcCt5?=
+ =?utf-8?B?ek9wdlYySk8vU2k2MXhkL0ZQK05pUURWQW9LZmVmb2dRYzJ3UkR2N0JkUTd1?=
+ =?utf-8?B?OTZ3TENBYmE5Y1lNUldmWVNtNFVtRm96VHU0TnlMeEhBMnRpN3hIU0pxNTYv?=
+ =?utf-8?B?OWxmd1JUaFJ5OWZuZ0I4QjF3UXQwY1FVM2lyS1F2WDJQNk41U2M0M1RTbHgv?=
+ =?utf-8?B?OThtem9LZUs5L2hQbWpKSjBCNHFUNGtsUFdTMlpQWVJpWlRmZTllWjRtWDJq?=
+ =?utf-8?B?UVkyeGRPOExkZTFBSUV2djd3b05udWloUUVhYm1yNkkyL01MVjFkS2d3YXcz?=
+ =?utf-8?B?L1RNQ0owMzJxMno1RTZreUhaclpsRVE9PQ==?=
 X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
 X-MS-Exchange-AntiSpam-MessageData-0:
-	=?utf-8?B?b2d2Q3pkcExsR3kwV2lQUWZVdFl1akIrZkRTQjhMblNEL1dHNE94Z3JRa25n?=
- =?utf-8?B?WGtOZHdpVDNiTnRqQkpueHY3YnhZeTRSeXptTmdqZDVkaHY1RXJPMTRwSGUr?=
- =?utf-8?B?cGhucXNlU1dEQmw0Zis2WjFtZFB0ZC9JMEdNaXArNExqbTlIeENNUCt3Qm9P?=
- =?utf-8?B?S3BOM29XMGpSS0FiK1B2QlZ6d0ovZS9YTkFNSjNEZkxrSFlCNjhyN2p1b3Zk?=
- =?utf-8?B?QWsvTXJTR2F2QTRvbko0VTlpT2M5K3paQUpFM0N4NHljbWdLL0cyRTJtUksw?=
- =?utf-8?B?eEpJUGhFMHRPS3M1MEdpZzFTaGZEaldFNGNzQTFPUUQ2aGJiaDhUUnV0bzV4?=
- =?utf-8?B?VHRaeUJSZFlLaXBNdjkxR0xDcUF3eklsSnFtNFZST1psM1lzWXVuM3NqZmFQ?=
- =?utf-8?B?MkxXVXVmckNyUXBEZGZKQWh3d3VBRU9WeW02U1dFMnZZR0tXQ1Z3RlJMZGZK?=
- =?utf-8?B?bWV6Mkl0RklacDE5L0ZvSkhIa1BVcEpqWWoxakc2RnNHVWNyRGlRZE1iTk1M?=
- =?utf-8?B?WWNBVnRyb0NITmpadWUzb2t1eHljMDEwZkpSbVpWOVcrWUZNS0xWREl3QkRW?=
- =?utf-8?B?ZVJEYS82ZlVrTEJTNCtGdHdHVWozbTZtVWszNXVSWVQ0TXRBNURFNjJkbmZC?=
- =?utf-8?B?Mm14Q0lGK3dZalg2dE5RKzhjTmhOdElMejZvM2FEWFI0RmRDdjEyTDJJVEQv?=
- =?utf-8?B?QmZ6Q3VLemszVjlzazBRR1pvandNbXp6OWtXVm1GWkJmcFNIKzdYQ09iZzcw?=
- =?utf-8?B?bE0zTElKMVUrLzhXNzNaUWlqNkRHUVl0T3VpRVFDQXFTeituY0tPeGhDRFFE?=
- =?utf-8?B?QndYWmhET3V3eGdpSkRYRTFmaGVLa0k1NDlFdkJIQVNjNUE3aG1IUU4waWsw?=
- =?utf-8?B?RjRBbDdSZmxKNm4zQ0tnMDRVbDJsWFhsWW00MGllTFhNV0RBbU8rNEx2a1lP?=
- =?utf-8?B?WWZqRGJ2a2N0SWhQSWxLZTNoQ0QzZ0MzdzJQVm82VXd0eGxKbEhMa3c0WGh3?=
- =?utf-8?B?UmVlMzhiNlZjU3ZHcS9udUdmdzFIdFR4eU54QTF2M0FCYzNmNUpRcmNsTG1y?=
- =?utf-8?B?NDFlOXBLeGhkSzJxd2lKbUJ3dUpvUElRdXVvdzlCWDdFZkRXVlpDeWxCWjZx?=
- =?utf-8?B?WXpwVGJkUFAyMWM2S1QrRWpkRW1SK2VySFhhT2FwaUZMUXhYRmt6UVk5MXdS?=
- =?utf-8?B?c1ZINlpmMzlmMTJQbW1yWDl4WGRMZXZEWkE4WXBHSVd0UUFBVlJGNjBBbmdx?=
- =?utf-8?B?YnVKRWgya3EreWhvZWFLcFRuQm93YlY5SDM1VFY0MVV3WFNSelJOeGNJTm5o?=
- =?utf-8?B?ak9DRWN6eHNjc3l6RGR5YmJPd1ljYUZFUHlUbTR2TjlERUxFbnhDL0NOcTJV?=
- =?utf-8?B?MEdZeEhOT1VYZHVwMUZRYkQrb3YxZHF2cVlMZUU3TS8vVkhqbElER2VrZ0Y0?=
- =?utf-8?B?WjRxVjVrNkw3SGRwazd0Z3V2TW9TVDNtallLYUpLby9YVW8xN2VjZWNPMlBR?=
- =?utf-8?B?c1M0b1dLZ3FuY3NGTDVOM3JKbnd6ZHFMLzZNV2wyZy9IUkVnOFF0ekNsVWNV?=
- =?utf-8?B?UnNib3MrdDJZTVNvN2gwWkY2YXlTY0lXOTlNaTIvdE0xQ2g2YWl0dG01VWpw?=
- =?utf-8?Q?D9T/55MvRt3H+x6qb18sfGJ/zcCtTnYaBRKWPX03Yghs=3D?=
+	=?utf-8?B?eGthMHRDOWVjWG5VL0dsUys3a3Nod1R4RDEyY1kwblM0b3F5YWtWRDJ2ekZQ?=
+ =?utf-8?B?Z3p6WDdGMjdPVGMrc1VyelA2NXRaYjA0MzdzTHpublNibFBIM0x5N2Q1Sjc3?=
+ =?utf-8?B?K0V1R2pIU1dRdG5QZXFDOHBJMys4Nkl5d1UvUlNXbXNVMGJIQi95cHdXYkoy?=
+ =?utf-8?B?ZGJLelZHYmpXTklEdEdVVXlrMUlaQkNXbEw0b1NUUHZoMjdtaU9FRUZJcG9Z?=
+ =?utf-8?B?SUllUXBtVHlOVzBOd0NTWldxQ1NFMU5SMmJ1MGwvYVhYOXA5NTlHUEZ1bDFt?=
+ =?utf-8?B?ZHI2ZVV3bTlhZ1lCbGR4ZTRHY1ZiNW5Nakh4dzhqcHJUTzdVbVVyamk1ekx5?=
+ =?utf-8?B?S1BKZmZwUFRSWFdtRm1FaXNwc2lyMzV4dnBzMzI3SS9wMEY1UHg4T1R3bFpS?=
+ =?utf-8?B?ZlMzdHhvRFhHM2ZTK2pRdjh6Tmt6MHpaVHVDQkljUXpmUjFhdjBrV3Y1SThE?=
+ =?utf-8?B?SytGOThZRlVrK2MvZ0Y0cnB5bTloN3VzZ0M3WHZFSDdtaDlibEpkWkJFam9h?=
+ =?utf-8?B?cnFxd3dlRE94Z29Ha0QyU3h0L25YalVLZHBkMVhXYkUzemNoYjZZbWxIQjQv?=
+ =?utf-8?B?eEhLUmRNaFpMcjlsN0FVT1NQaEFLNjhzb2lzc2RCeWFBbmdDa21ZMG1iejhX?=
+ =?utf-8?B?WEUwMnpJemhtaWJ3NzdxL2EyYTVCNk1IekFpTGtlcjhtUjBneXVMM25qTmla?=
+ =?utf-8?B?ZEU2ZXF6d3lBWWFaYmFTMDM5WW8yNGdKWkRlR3poVm9vd0d2c09HaUY3a2xr?=
+ =?utf-8?B?bnNlN0FMVldraSsyekRXK1J4NGhDNFVZR0kreHlhajIvMWRxdnNKdk9YVFpN?=
+ =?utf-8?B?ZitaSkgzL2pTZXlXY2lJZlk0M1ZGVmRrdHFzanJ4SVZ2RmF0VUZHdWI2S0c4?=
+ =?utf-8?B?V0Ivc3ZIMFlMcVZzdnZOWTZxNVVra3V3end2ZTZRdVVtLzBoY1BVTWI1WFlP?=
+ =?utf-8?B?NEt0NzAvb1lZeXFwK3ZKZUJVRERuT1dZMGhYdURNUThka1lyZU04RzZnazl1?=
+ =?utf-8?B?WGhzanIxSE1NNEhxTy8zeDUwS2dpelE4T1c5QnNZTkxERm5LMUdmNXd4aDdQ?=
+ =?utf-8?B?QWovYlJTTmd2S3lsYmdkUzNSYlhUTUVacnNBclhXYk54blRyN01TZ0J5MEw5?=
+ =?utf-8?B?QW9wOTUyUlExNXFNZHJUZmNwYUcyMDdwY0VMeG1uMWZxZ0VycDhqSzAyN240?=
+ =?utf-8?B?Qld4QU5QVkhYd01PN29tdmpCSTFZcFBmd2FkTHJVK3VWdjlQYXpNanNtTUEz?=
+ =?utf-8?B?LzFaaHZQWDdLQ2hUdWpBT2FYRkpFb29jc2ZJamtDZGJzSnlnTGJxbVFtbk45?=
+ =?utf-8?B?K2lRbk1Ra3IycVdSOHZIamdGckhmMUY1clBSM0pSYlFxVHNQYytZWnpYQ2Rj?=
+ =?utf-8?B?VldGQUI2NkljTWptVW56UWRQcU5YRXJOYlFNUW4ybzhrelc2Wmd2aHl2TGVY?=
+ =?utf-8?B?VXpGaWZ5M0FyRTQ5TXR5R3lxUEdQd2c5TkJrQ3k1Z2EzN096SXl1MUtzS05y?=
+ =?utf-8?B?bm9WS3lhYnIwcmJBa25oaUJxbC82M3B1Y09WNmdCVDdZcTl5MHdrdjBleWNU?=
+ =?utf-8?B?S1pzVGxmOXc0YnRjNk5KRVhDdi9QV2Q0NmczcklKOXk5dFRVTDRCTGVvUkc1?=
+ =?utf-8?Q?rZZDfrdlgW0hLWRZCpV+Bogsjee6yPXNRX1elWZh8J6E=3D?=
 X-OriginatorOrg: sct-15-20-9052-0-msonline-outlook-38779.templateTenant
-X-MS-Exchange-CrossTenant-Network-Message-Id: 77f3a465-6c8d-476b-3e7d-08de03eb62b8
+X-MS-Exchange-CrossTenant-Network-Message-Id: 175a39fa-2d14-4b92-9235-08de03eb778d
 X-MS-Exchange-CrossTenant-AuthSource: KUZPR04MB9265.apcprd04.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 05 Oct 2025 08:44:24.3878
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 05 Oct 2025 08:44:59.3383
  (UTC)
 X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
 X-MS-Exchange-CrossTenant-Id: 84df9e7f-e9f6-40af-b435-aaaaaaaaaaaa
@@ -165,32 +164,28 @@ X-MS-Exchange-Transport-CrossTenantHeadersStamped: TYZPR04MB5805
 On 9/21/2025 4:39 AM, Andrew Jones wrote:
 > From: Tomasz Jeznach <tjeznach@rivosinc.com>
 >
-> Enable KVM/VFIO support on RISC-V architecture.
+> Enable VFIO support on RISC-V architecture.
 >
 > Signed-off-by: Tomasz Jeznach <tjeznach@rivosinc.com>
 > Signed-off-by: Andrew Jones <ajones@ventanamicro.com>
 > ---
->   arch/riscv/kvm/Kconfig | 2 ++
->   1 file changed, 2 insertions(+)
+>   drivers/vfio/Kconfig | 2 +-
+>   1 file changed, 1 insertion(+), 1 deletion(-)
 Reviewed-by: Nutty Liu <nutty.liu@hotmail.com>
 
 Thanks,
 Nutty
-> diff --git a/arch/riscv/kvm/Kconfig b/arch/riscv/kvm/Kconfig
-> index 5a62091b0809..968a33ab23b8 100644
-> --- a/arch/riscv/kvm/Kconfig
-> +++ b/arch/riscv/kvm/Kconfig
-> @@ -30,10 +30,12 @@ config KVM
->   	select KVM_GENERIC_DIRTYLOG_READ_PROTECT
->   	select KVM_GENERIC_HARDWARE_ENABLING
->   	select KVM_MMIO
-> +	select KVM_VFIO
->   	select KVM_XFER_TO_GUEST_WORK
->   	select KVM_GENERIC_MMU_NOTIFIER
->   	select SCHED_INFO
->   	select GUEST_PERF_EVENTS if PERF_EVENTS
-> +	select SRCU
->   	help
->   	  Support hosting virtualized guest machines.
+> diff --git a/drivers/vfio/Kconfig b/drivers/vfio/Kconfig
+> index ceae52fd7586..ad62205b4e45 100644
+> --- a/drivers/vfio/Kconfig
+> +++ b/drivers/vfio/Kconfig
+> @@ -39,7 +39,7 @@ config VFIO_GROUP
 >   
+>   config VFIO_CONTAINER
+>   	bool "Support for the VFIO container /dev/vfio/vfio"
+> -	select VFIO_IOMMU_TYPE1 if MMU && (X86 || S390 || ARM || ARM64)
+> +	select VFIO_IOMMU_TYPE1 if MMU && (X86 || S390 || ARM || ARM64 || RISCV)
+>   	depends on VFIO_GROUP
+>   	default y
+>   	help
 
