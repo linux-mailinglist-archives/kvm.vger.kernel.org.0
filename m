@@ -1,123 +1,106 @@
-Return-Path: <kvm+bounces-59542-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-59543-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [IPv6:2a01:60a::1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id 546E6BBF154
-	for <lists+kvm@lfdr.de>; Mon, 06 Oct 2025 21:17:12 +0200 (CEST)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
+	by mail.lfdr.de (Postfix) with ESMTPS id C9E15BBF169
+	for <lists+kvm@lfdr.de>; Mon, 06 Oct 2025 21:25:06 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 0000134B27B
-	for <lists+kvm@lfdr.de>; Mon,  6 Oct 2025 19:17:11 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 833EB4F0F92
+	for <lists+kvm@lfdr.de>; Mon,  6 Oct 2025 19:25:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 542042DE71B;
-	Mon,  6 Oct 2025 19:17:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D3DE12DE70E;
+	Mon,  6 Oct 2025 19:24:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="TE2t7rHO"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="mYB/1Hwk"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pl1-f202.google.com (mail-pl1-f202.google.com [209.85.214.202])
+Received: from mail-pf1-f202.google.com (mail-pf1-f202.google.com [209.85.210.202])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 12472248F58
-	for <kvm@vger.kernel.org>; Mon,  6 Oct 2025 19:17:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AAC2B156236
+	for <kvm@vger.kernel.org>; Mon,  6 Oct 2025 19:24:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1759778222; cv=none; b=Hx2aQYC93hGu+fk44rw2e5i6ocA6awEkWfxMm3T2p2GhKJ7W6KUG57t97TVtqmQDld+EeLwx4UKHBO5s+7IuiJXlRMnZ4DJqiBrZaoV8FqFhZPNaRs50KjucpWFeOzp0gfcdgZUoP/hjJdJeQnDCHiAl1pJEAvlua7tVh54jhwQ=
+	t=1759778696; cv=none; b=N8voNYM4+QebDz6H60A+SGiGKpD9Ik1ZRuCoKCLXKJZ8+X/XVYL8wRhL9tnov6A4gXgoDief6Um8I1t7LOvVTW9vzx6FKg6OJqmeTyhRcAfZXTQvqXwpgleXVncbhL8BzLzBOPMY8fmTBMYz34ixEsxrxkfRAfKeKDzqc0W7oE4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1759778222; c=relaxed/simple;
-	bh=cM60IkBOfzroK8/Hzvuzyt9qlRtbHMsJ/OSo9179Sq0=;
+	s=arc-20240116; t=1759778696; c=relaxed/simple;
+	bh=gzzvKnF6qJ7lJudLs/+S8tBn4LMDyPLqXA/nMHePsSc=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=N5rm0GaEYd4Cdt7ed/cCpWGd08UN1/Glfn2z0rSHcfdZrwyu7qzW0nZTfqeyzQqJkzYOAx+rUayHoh0Oa9DYS7TlyHaZR0cEwHDNU4kd5LGgPtXJGkxcVLz5/z7Ydl13UTNNCscnyyvHjRgW6gKEoJAOn9w2iPxqF0g/NKgoBq4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--ackerleytng.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=TE2t7rHO; arc=none smtp.client-ip=209.85.214.202
+	 To:Cc:Content-Type; b=lSwpbyPnrOTfEcF6QV1qc34/GfC+E6mGhW9MBNiwZTmfqEmhWf2bMSGIESwXNCtm54vbsR2IJUgvewCHayYhikiDlt/32DsCaf/oLt2nhRxYIJ/ar4O/pjt6qKUSON8m8RB9xc0T7VkXI1giyMsIKM7BQBW1kTqYv6WhCzQSeAw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=mYB/1Hwk; arc=none smtp.client-ip=209.85.210.202
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--ackerleytng.bounces.google.com
-Received: by mail-pl1-f202.google.com with SMTP id d9443c01a7336-2699ebc0319so50741205ad.3
-        for <kvm@vger.kernel.org>; Mon, 06 Oct 2025 12:17:00 -0700 (PDT)
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+Received: by mail-pf1-f202.google.com with SMTP id d2e1a72fcca58-780fdbbdd20so4216894b3a.1
+        for <kvm@vger.kernel.org>; Mon, 06 Oct 2025 12:24:54 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1759778220; x=1760383020; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1759778694; x=1760383494; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=UmP4P4nLLPuVhrMlePaQHRElG0BD9VdigM6MdStk+fU=;
-        b=TE2t7rHOVPb0OBN8svNnP6LY+cJXj2jyZBEYy1ljGiQLaiHX/Pt3U2gRJgynz2IFzQ
-         3h17ZJp2tLA16kvmUjVSf4pzX+WhuUAe2cgmUQXHiky6URyU+1NgDcPILwALgOjpAB+N
-         pB/F9jQBbBkLBPIcVdPuk456KmszUQHeQnybTlMn9Tl9HF2fv+gRFg4ZfR/0PSsIfxGp
-         j6v91Fxm3MwFV56dVWkOQ0FP7J7ea2PX8RmkyDQeSABj0IjQSLc/ZCOQxQNhOtMTrI2m
-         pPPVrU1lptz63wBFZIBEaAdbsUKbK0td5gscTTxR0HObsDnXgzY3uUK7x+7s/xTtdBSH
-         r0pg==
+        bh=MwCv/q5RLrOVP5H2/mUJFVpJKUB0tJIPOkj23AFdbos=;
+        b=mYB/1Hwk5/djOTQkZojycRPAJ17J8MkN12THO24D6IxGz4uHfoLTEQZ6OE3cvFtbfP
+         b4p2Ak4Dyc40UZKmkrqy7vXWJB6ce5yn+nW0ASQI4fRFEd4pZEdFnFuOkWawfqCzWdNj
+         ciVjSDyM0vZ0IfpZezELznHeQkRtEWiKbBF4t9supT4HdBEOEeNyhAjryPJZEst6epx3
+         6NV95NWGlQv2Nk9FrTr9wog3LXU215QcdMy0rS7YGnJdO4eBM5iUqfN2JegLVbRPIXHH
+         NyAwGajYxqvkVCIsU4YCzepF3+y7AUNzIMg+Smz/daP2EXH0QaXL+oVnUTM4v1UWYvMo
+         sENA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1759778220; x=1760383020;
+        d=1e100.net; s=20230601; t=1759778694; x=1760383494;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=UmP4P4nLLPuVhrMlePaQHRElG0BD9VdigM6MdStk+fU=;
-        b=KGH8IK5iJ9ITRgU59dvUx9D3hxtXy6nSUPM/N5J1YKKv5lteJ5a1zh2h/unus+Kpo/
-         +etVtJ0PGDN4CBhx7KP4AtUvx6keh160OJrDNHMi+J7fzszdy3QkK5dZqWGkFQwir7/C
-         EwxT7R40E2wOW/CVarrECLGkUCQXXySM5kVU8UZY4KTZr33orfZh5eUUxry9TJb+/Eb9
-         qXECFYK+o2nkW+EAWdjclgFTdzXXRCqtSd7ThqTaXqmaz0khPmsqg3bO6/yuzqvA37lz
-         fnviWVtCN9SQ+qJmhtZUPBr8KpXYWI68o66Xp640xw1Rpd8Q4UK/mI2bePytXYSsDbFD
-         +HrQ==
-X-Gm-Message-State: AOJu0Yxw8fb4O85ezjLeC96OQwt0pruOXkrHIF9xwuDRJb5EjG4bVd5a
-	Kn7xgjssBoL9Bf/FbuYCwQ+RcuYLu0CnzvuYh7Jli9p5N+C6RzbPKBH251OPNTeSuPZRG4kGHAJ
-	t0vt2KI2dWsJmHbOwB2SF0y1csg==
-X-Google-Smtp-Source: AGHT+IFyvieDVAJzpWWfH+/pCoaAH28kEGEsXDjiF6l+kpgp/Oi5CGPOiOvnSAUYzLGP6ggwRAbOwNW8BRrqhE15cA==
-X-Received: from plau17.prod.google.com ([2002:a17:903:3051:b0:27e:ed03:b5a5])
- (user=ackerleytng job=prod-delivery.src-stubby-dispatcher) by
- 2002:a17:903:11c6:b0:262:79a:93fb with SMTP id d9443c01a7336-28e9a61a8a9mr128039295ad.32.1759778220362;
- Mon, 06 Oct 2025 12:17:00 -0700 (PDT)
-Date: Mon, 06 Oct 2025 12:16:58 -0700
-In-Reply-To: <20251003232606.4070510-2-seanjc@google.com>
+        bh=MwCv/q5RLrOVP5H2/mUJFVpJKUB0tJIPOkj23AFdbos=;
+        b=GwwcAQ/AEESGwJ8k49N9Pv7Vxcm8dXe6YihFZG+ZEZJUc15HI2E91JFLxIpBlafZQ9
+         N/jV4zIyc1+nQRBF7DXIqwI/NS3rbpKF2z/7RHNmpGhNhVoqMTN/7vbzwgGR2EY9OQSb
+         24SoIb5bjxSYrNfVAq/pu7J9Bk1wcuKsTCRvOcsM3u7InO9kn00G+ySwVfHpCPSMv9FC
+         aPsP9FQVV+/q+wmyVQFhdclMgzfT9XkEuPpOHOz5L8RhIzQfLkwltvLggYrTCb9HPe0Y
+         M7gCkKF7WvHSkgTIh61kkLRz62erLSS58lMyYC0aEy9/5pD4wGlaLc+z3WTnqVGra/++
+         DHAw==
+X-Forwarded-Encrypted: i=1; AJvYcCVwCuVtH6PUJ+mpymvKOE7d/uvjsPuwzeVsprzKFCRb/RzBTAYHAytXpv9HCs16uFCrFYQ=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzkIbzWrp9kvLMeSTSKDyONLDXqnLBEZ+pxfAASVAjBoSfO1CSD
+	H5VaeAdl5XMONxWDClYYp0dcE5AmcS/acPBzoIrU+U5QbtA7Tiul8Zj9n4ovH1lKwyjT8PbTWys
+	XuYdOgg==
+X-Google-Smtp-Source: AGHT+IHiIsra+i6pzpFSJKTUcR3R1ZEtEd8CiGXaiveuskEqCtWdUdLIj7ydtiLIe9mDGjYusezaU4r2um0=
+X-Received: from pgbdo10.prod.google.com ([2002:a05:6a02:e8a:b0:b5f:5359:4b92])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a05:6a20:e290:b0:2c2:626b:b052
+ with SMTP id adf61e73a8af0-32b6209da14mr18587401637.38.1759778693902; Mon, 06
+ Oct 2025 12:24:53 -0700 (PDT)
+Date: Mon, 6 Oct 2025 12:24:52 -0700
+In-Reply-To: <diqz5xcrgaa5.fsf@google.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
-References: <20251003232606.4070510-1-seanjc@google.com> <20251003232606.4070510-2-seanjc@google.com>
-Message-ID: <diqzplazet79.fsf@google.com>
-Subject: Re: [PATCH v2 01/13] KVM: Rework KVM_CAP_GUEST_MEMFD_MMAP into KVM_CAP_GUEST_MEMFD_FLAGS
-From: Ackerley Tng <ackerleytng@google.com>
-To: Sean Christopherson <seanjc@google.com>, Paolo Bonzini <pbonzini@redhat.com>, 
-	Christian Borntraeger <borntraeger@linux.ibm.com>, Janosch Frank <frankja@linux.ibm.com>, 
-	Claudio Imbrenda <imbrenda@linux.ibm.com>
-Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	David Hildenbrand <david@redhat.com>, Fuad Tabba <tabba@google.com>
-Content-Type: text/plain; charset="UTF-8"
+References: <20251003232606.4070510-1-seanjc@google.com> <20251003232606.4070510-14-seanjc@google.com>
+ <diqz5xcrgaa5.fsf@google.com>
+Message-ID: <aOQXhJyTXHt8Kw7F@google.com>
+Subject: Re: [PATCH v2 13/13] KVM: selftests: Verify that reads to
+ inaccessible guest_memfd VMAs SIGBUS
+From: Sean Christopherson <seanjc@google.com>
+To: Ackerley Tng <ackerleytng@google.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, Christian Borntraeger <borntraeger@linux.ibm.com>, 
+	Janosch Frank <frankja@linux.ibm.com>, Claudio Imbrenda <imbrenda@linux.ibm.com>, kvm@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, David Hildenbrand <david@redhat.com>, 
+	Fuad Tabba <tabba@google.com>
+Content-Type: text/plain; charset="us-ascii"
 
-Sean Christopherson <seanjc@google.com> writes:
-
-> Rework the not-yet-released KVM_CAP_GUEST_MEMFD_MMAP into a more generic
-> KVM_CAP_GUEST_MEMFD_FLAGS capability so that adding new flags doesn't
-> require a new capability, and so that developers aren't tempted to bundle
-> multiple flags into a single capability.
->
-> Note, kvm_vm_ioctl_check_extension_generic() can only return a 32-bit
-> value, but that limitation can be easily circumvented by adding e.g.
-> KVM_CAP_GUEST_MEMFD_FLAGS2 in the unlikely event guest_memfd supports more
-> than 32 flags.
->
-
-I know you suggested that guest_memfd's HugeTLB sizes shouldn't be
-squashed into the flags. Just using that as an example, would those
-kinds of flags (since they're using the upper bits, above the lower 32
-bits) be awkward to represent in this new model?
-
-In this model, conditionally valid flags are always set, but userspace
-won't be able to do a flags check against the returned 32-bit value. Or
-do you think when this issue comes up, we'd put the flags in the upper
-bits in KVM_CAP_GUEST_MEMFD_FLAGS2 and userspace would then check
-against the OR-ed set of flags instead?
-
-Reviewed-by: Ackerley Tng <ackerleytng@google.com>
-Tested-by: Ackerley Tng <ackerleytng@google.com>
-
-> Signed-off-by: Sean Christopherson <seanjc@google.com>
-> ---
->  Documentation/virt/kvm/api.rst                 | 10 +++++++---
->  include/uapi/linux/kvm.h                       |  2 +-
->  tools/testing/selftests/kvm/guest_memfd_test.c | 13 ++++++-------
->  virt/kvm/kvm_main.c                            |  7 +++++--
->  4 files changed, 19 insertions(+), 13 deletions(-)
->
+On Mon, Oct 06, 2025, Ackerley Tng wrote:
+> Sean Christopherson <seanjc@google.com> writes:
 > 
-> [...snip...]
+> > Expand the guest_memfd negative testcases for overflow and MAP_PRIVATE to
+> > verify that reads to inaccessible memory also get a SIGBUS.
+> >
+> > Opportunistically fix the write path to use the "val" instead of hardcoding
+> > the literal value a second time, and to use TEST_FAIL(...) instead of
+> > TEST_ASSERT(false, ...).
+> >
 > 
+> The change the use "val" isn't in this patch, and I think the
+> TEST_FAIL() change was intended for another earlier patch.
+
+Yep.  I originally had the TEST_ASSERT => TEST_FAIL change in this patch, and
+forgot all about the changelog when I added the SIGBUS "catch".
+
+Thanks!
 
