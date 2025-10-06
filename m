@@ -1,176 +1,135 @@
-Return-Path: <kvm+bounces-59547-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-59548-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [213.196.21.55])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4C85CBBF1FC
-	for <lists+kvm@lfdr.de>; Mon, 06 Oct 2025 21:47:04 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 91E89BBF2D3
+	for <lists+kvm@lfdr.de>; Mon, 06 Oct 2025 22:20:15 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ams.mirrors.kernel.org (Postfix) with ESMTPS id C3CC034B72E
-	for <lists+kvm@lfdr.de>; Mon,  6 Oct 2025 19:47:03 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 17FFB189BD58
+	for <lists+kvm@lfdr.de>; Mon,  6 Oct 2025 20:20:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1E8D52D8DA6;
-	Mon,  6 Oct 2025 19:46:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7F5522DC341;
+	Mon,  6 Oct 2025 20:19:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="BDs2mMop"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="yW4oXocW"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f201.google.com (mail-pl1-f201.google.com [209.85.214.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A67BC1F03FB
-	for <kvm@vger.kernel.org>; Mon,  6 Oct 2025 19:46:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1D8DF242D6B
+	for <kvm@vger.kernel.org>; Mon,  6 Oct 2025 20:19:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1759780011; cv=none; b=tvlu7Q7LXWXsxtWkzNiUjD1+dL++oizE45a3Pj2wGXfCDv1FUqoq92ma8dGeXKSiWjVdxnxn4FhRldIl9GFahlZANxMf1/gIQMW0PE0oaGp4iVA+lGEeLIIpkL636Qv46+HhD5UC5zjEmdJQIbReVcqCQAkPctYnJ1qslBO+f+4=
+	t=1759781996; cv=none; b=YWyYZplul5PXk9+4WDD8fyqNuGi/UxY3zrMM9fWaX6Bc31cMCLfDRAmoGxkQpotUOgjsyRcRK41R7QUKl+Iz3pq3vi6ZTo7/CluJyDonCgg2w3wEJgl4Qfjgeu19KUVjuimDVdypS6jexwiRL/6uxyy7cxnCP+p8gZi+umJDZI0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1759780011; c=relaxed/simple;
-	bh=RpzZsSQdr0hQNB60BVgDeuxT0TDaqlGHirWXIco0GKU=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=AajhnBEn/nYfawqKV2tzZeDvUU8IPTOEe/2kVCjzDZXGF7KINzty4PYxNp8WTMChoRb/oIC3LFPFxvL/04wTBta4aIRbE9Nw09D49fZqP4XCzHYur2ths1Uk6mnfVu5qGEpWSO2CW4j3bzEyAQLeHJeCOThf0CsMQTulwEEAYRY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=BDs2mMop; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1759780008;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=dEP4bvQgSEfzGRmi8Yd/uqvmJgEkoYKfsq3TYxXDi7E=;
-	b=BDs2mMopFO4Kh+DHbnKsgDpNfbaytAISXHogmPfPA02eInO/XpruidUz5PgXiNEH41EH62
-	/S+VwKXdEzFuy8TcVUe7tM2BLWMTOR2rvVEk7l/6TSwlq6Ue4PuoqPNcf1kOSOLOSfuOH7
-	M2hgZI07hET7Frc2tQlB9zZhcz+XvOQ=
-Received: from mail-il1-f197.google.com (mail-il1-f197.google.com
- [209.85.166.197]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-286-QEnzgo5BMfGU1bBzAR_69w-1; Mon, 06 Oct 2025 15:46:47 -0400
-X-MC-Unique: QEnzgo5BMfGU1bBzAR_69w-1
-X-Mimecast-MFC-AGG-ID: QEnzgo5BMfGU1bBzAR_69w_1759780006
-Received: by mail-il1-f197.google.com with SMTP id e9e14a558f8ab-4257fce57faso3489015ab.1
-        for <kvm@vger.kernel.org>; Mon, 06 Oct 2025 12:46:47 -0700 (PDT)
+	s=arc-20240116; t=1759781996; c=relaxed/simple;
+	bh=/SYC2F5CivU54FwucLiYMKq6VGD4NHmrnyTKCQAvMpk=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=nq/JcH8EtfiY/enlMY+4q6v8SlNspntoy3thu7DJJPGM3dZe3Wn/4H7eVg6904EfCDFMV54tQCsRHkpwcMPnEo3K8tS0YY4nJnEyhkLstI1u/OjFfvxWOM8w2JKXwRQ8b1qukGFX1L19yer6z7mG62TiVCviC8Jm3nJQk8NHp0k=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=yW4oXocW; arc=none smtp.client-ip=209.85.214.201
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+Received: by mail-pl1-f201.google.com with SMTP id d9443c01a7336-269af520712so57222085ad.2
+        for <kvm@vger.kernel.org>; Mon, 06 Oct 2025 13:19:54 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1759781994; x=1760386794; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=9pN3I+qDlRm86RsLpONZsIyYY5NvfWVzalcxaJr2Pds=;
+        b=yW4oXocWW14Dg2vFl/jgQyfg4+dizJ1sxK1o7D3TCJCt+P1m0sbaavf5A1Ve3e3mQ1
+         cxJlYIBl61ursrpp8Wr4PhVn4KNy7qXLYnhwE6Z1PQuyXezDKaOwSHSPK2tOSLUigvty
+         zsuhNDKlm8anfz7ldVPOSU5RmVqa8CSlxlz7Cc3NFiqNPXtpHl4+jzOs7+Gqb8ir3S1/
+         I2wROZWTMon/AaEBwiKMRJuZmWZcjn/C5hsRDhXDVRww60ajFCBWITCeWMlGhwaX8njn
+         394LPrzrmIoRP2nkg/9kP2NFjOl/OdKVGMLXSfo7jHrIj62SFtXdB0cOQ+15dgKOBwd9
+         J00Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1759780005; x=1760384805;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=dEP4bvQgSEfzGRmi8Yd/uqvmJgEkoYKfsq3TYxXDi7E=;
-        b=G7N9sfQ6aMuwlAeRIC6yTAH/RhwMVGhDG5p8bo6DBd4c9ELO4sdqEF6FVT74OBLUYC
-         wLe+vt6e+7qJNI0wEivGmAEjanfxS/iptacZlDU6MKyqjnH12mE7GhFbPksGEfFgjWev
-         iHDpfRaaGw5HJa8Njy2Wbskkd5DU1WMXBTVYAA60i0IP6CFePsewaLw9R5CVbZQKMndI
-         zusG0Pk8aCHagDyqyYIpJFnGKdJpocoR9FJDt1PZsxyf5/KeDLVhA4lAnT8FRi70Ywjs
-         xsoxRvDTOc4IDljsWQXHVhwiAwp01Muc9hEoDOEjBoqyCDIoELM4ubbOmeX8pGP/Sq8f
-         mzzw==
-X-Gm-Message-State: AOJu0YxxfYbtTaCCeVs4r+aBJVQi28XInV7L1CtQW/3kx569x0uDrOLh
-	TiPuQdO8HMUiOaA5NwEF4P8C6FoL1jip08AGzM2A0uIqLSd5i9PvVoF3o55m/XUmeQYz5vteigD
-	FwZtYcG8VkYPORN/Tu8cr6S5Mq+RQBB7sBPeY4MDAvUYzUyEvcb2spav4/H20Sw==
-X-Gm-Gg: ASbGncv+lsg3admQROyjO6oJNJtLaaH2NpgEX7zxH+J2nWhnFIiBenXxmW8ueGOQax8
-	hXnGfP1LdckQ+WRUX6inQe9iYeaS0bQdPdB992+DGGwi4/1oEFnt4Y+UpemAsnPmVentN9pmejA
-	xkhZVIKMUSB2Gqhywy3g6uKaOV19doSKuWSeHmg1G67q2VDaruOfhk2v4MmC9xhkrBbvclXlQ6Y
-	JUYJv6t7/nH08wlci0zdwgIFt5Jn710Uh4EKdTP7525ZrP8MumQVV52owH0dNgYJE+g0nHZ8/WX
-	ioBJJBR0k5WSOGxbeH9d7krxhVuBx7nsD+aTkq3f1gAFnmWa
-X-Received: by 2002:a05:6e02:1a81:b0:42d:89d2:bb with SMTP id e9e14a558f8ab-42e7ad894ebmr73562595ab.6.1759780005299;
-        Mon, 06 Oct 2025 12:46:45 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IEifc22XtdKCJ76WuLXjkG/CH7GbrgaM1lNvaHoU49PuB2rEVRz9xNuIY1xjj+apJYv7FEpWA==
-X-Received: by 2002:a05:6e02:1a81:b0:42d:89d2:bb with SMTP id e9e14a558f8ab-42e7ad894ebmr73562395ab.6.1759780004792;
-        Mon, 06 Oct 2025 12:46:44 -0700 (PDT)
-Received: from redhat.com ([38.15.36.11])
-        by smtp.gmail.com with ESMTPSA id 8926c6da1cb9f-57b5e9ec393sm5228654173.14.2025.10.06.12.46.43
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 06 Oct 2025 12:46:44 -0700 (PDT)
-Date: Mon, 6 Oct 2025 13:46:42 -0600
-From: Alex Williamson <alex.williamson@redhat.com>
-To: =?UTF-8?B?Q8OpZHJpYw==?= Le Goater <clg@redhat.com>
-Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] vfio: Dump migration features under debugfs
-Message-ID: <20251006134642.4aee649a.alex.williamson@redhat.com>
-In-Reply-To: <20250918121928.1921871-1-clg@redhat.com>
-References: <20250918121928.1921871-1-clg@redhat.com>
-X-Mailer: Claws Mail 4.3.1 (GTK 3.24.43; x86_64-redhat-linux-gnu)
+        d=1e100.net; s=20230601; t=1759781994; x=1760386794;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=9pN3I+qDlRm86RsLpONZsIyYY5NvfWVzalcxaJr2Pds=;
+        b=gwZ+6VZXm1EO3YucrOzhs6H79a94+Aq40ahKXUhENBlGBlIE5XScJmojdWzJGj6o0x
+         et43OVOyCKdekoJKDHogatAWhDse6YBle2iJufZu38VaT3oXXG5DHeNn8pX7xueltdfg
+         +JaFIEDZ/kjp3UTlsFKy1REFcuNoDoaC5dK4zTrzVInjRdlTlrYNEItZ89vEowdUryEW
+         LuiacRmMGxKI0zBpYJuUa2XNa0jEGgKjl9usc5IxHRqvhFPfgDYoL5OTvQ7hNslX4YaD
+         DS5KX+mew0Nr6uB2AebjCram9Xv1eRPqZwBs8fozGE4uEIzzPxchJ4pYl2jjfrKVWqtp
+         cl9Q==
+X-Forwarded-Encrypted: i=1; AJvYcCWyV36dufWuKhXu9Tn4p8JrZ8gF+wVMhkPnw3VVz8kgOCT6gNVKF9ukK+ZXmrsYcnrZlVo=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyTVAa9jlrzrkrhg6SnpEiA6M0RVlyEmFQLi091lWHdbypyc1Ic
+	GicOAOGAl+EMPOwW4c+/IW9V274V/h14rlnHAnGBLhraxGlu06RejW7Jgm0wJc7NPIQqD+trDJH
+	8xr9lng==
+X-Google-Smtp-Source: AGHT+IG+dPypssAxxB1AhIyikjpakIZz2qhMM7F+pWzPuRCSHZx5xpLGrwjB3vBabj2YhH49dtdnSu/VJJM=
+X-Received: from pjxx8.prod.google.com ([2002:a17:90b:58c8:b0:31f:2a78:943])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:902:fc86:b0:267:f7bc:673c
+ with SMTP id d9443c01a7336-28e9a656997mr180158905ad.44.1759781994498; Mon, 06
+ Oct 2025 13:19:54 -0700 (PDT)
+Date: Mon, 6 Oct 2025 13:19:52 -0700
+In-Reply-To: <diqzplazet79.fsf@google.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
+Mime-Version: 1.0
+References: <20251003232606.4070510-1-seanjc@google.com> <20251003232606.4070510-2-seanjc@google.com>
+ <diqzplazet79.fsf@google.com>
+Message-ID: <aOQkaJ05FjsZz7yn@google.com>
+Subject: Re: [PATCH v2 01/13] KVM: Rework KVM_CAP_GUEST_MEMFD_MMAP into KVM_CAP_GUEST_MEMFD_FLAGS
+From: Sean Christopherson <seanjc@google.com>
+To: Ackerley Tng <ackerleytng@google.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, Christian Borntraeger <borntraeger@linux.ibm.com>, 
+	Janosch Frank <frankja@linux.ibm.com>, Claudio Imbrenda <imbrenda@linux.ibm.com>, kvm@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, David Hildenbrand <david@redhat.com>, 
+	Fuad Tabba <tabba@google.com>
+Content-Type: text/plain; charset="us-ascii"
 
-On Thu, 18 Sep 2025 14:19:28 +0200
-C=C3=A9dric Le Goater <clg@redhat.com> wrote:
+On Mon, Oct 06, 2025, Ackerley Tng wrote:
+> Sean Christopherson <seanjc@google.com> writes:
+> 
+> > Rework the not-yet-released KVM_CAP_GUEST_MEMFD_MMAP into a more generic
+> > KVM_CAP_GUEST_MEMFD_FLAGS capability so that adding new flags doesn't
+> > require a new capability, and so that developers aren't tempted to bundle
+> > multiple flags into a single capability.
+> >
+> > Note, kvm_vm_ioctl_check_extension_generic() can only return a 32-bit
+> > value, but that limitation can be easily circumvented by adding e.g.
+> > KVM_CAP_GUEST_MEMFD_FLAGS2 in the unlikely event guest_memfd supports more
+> > than 32 flags.
+> 
+> I know you suggested that guest_memfd's HugeTLB sizes shouldn't be
+> squashed into the flags. Just using that as an example, would those
+> kinds of flags (since they're using the upper bits, above the lower 32
+> bits) be awkward to represent in this new model?
 
-> A debugfs directory was recently added for VFIO devices. Add a new
-> "features" file under the migration sub-directory to expose which
-> features the device supports.
->=20
-> Signed-off-by: C=C3=A9dric Le Goater <clg@redhat.com>
-> ---
->  drivers/vfio/debugfs.c                 | 19 +++++++++++++++++++
->  Documentation/ABI/testing/debugfs-vfio |  6 ++++++
->  2 files changed, 25 insertions(+)
+Are you asking specifically about flags that use bits 63:32?  If so, no, I don't
+see those as being awkward to deal with.  Hopefully we kill of 32-bit KVM and it's
+a complete non-issue, but even if we have to add KVM_CAP_GUEST_MEMFD_FLAGS2, I
+don't see it being all that awkward for userspace to do:
 
-I think this was overlooked, but should have been considered for the
-v6.18 merge window.  Given the plan to get the DMA mapping
-optimizations in this merge window, I think we should pull this in too.
-Applied to the vfio next branch.  Thanks,
+  uint64_t supported_gmem_flags = kvm_check_extension(KVM_CAP_GUEST_MEMFD_FLAGS) |
+                                  (kvm_check_extension(KVM_CAP_GUEST_MEMFD_FLAGS2) << 32);
 
-Alex
-=20
-> diff --git a/drivers/vfio/debugfs.c b/drivers/vfio/debugfs.c
-> index 298bd866f15766b50e342511d8a83f0621cb4f55..8b0ca7a09064072b3d489dab8=
-072dbb1a2871d10 100644
-> --- a/drivers/vfio/debugfs.c
-> +++ b/drivers/vfio/debugfs.c
-> @@ -58,6 +58,23 @@ static int vfio_device_state_read(struct seq_file *seq=
-, void *data)
->  	return 0;
->  }
-> =20
-> +static int vfio_device_features_read(struct seq_file *seq, void *data)
-> +{
-> +	struct device *vf_dev =3D seq->private;
-> +	struct vfio_device *vdev =3D container_of(vf_dev, struct vfio_device, d=
-evice);
-> +
-> +	if (vdev->migration_flags & VFIO_MIGRATION_STOP_COPY)
-> +		seq_puts(seq, "stop-copy\n");
-> +	if (vdev->migration_flags & VFIO_MIGRATION_P2P)
-> +		seq_puts(seq, "p2p\n");
-> +	if (vdev->migration_flags & VFIO_MIGRATION_PRE_COPY)
-> +		seq_puts(seq, "pre-copy\n");
-> +	if (vdev->log_ops)
-> +		seq_puts(seq, "dirty-tracking\n");
-> +
-> +	return 0;
-> +}
-> +
->  void vfio_device_debugfs_init(struct vfio_device *vdev)
->  {
->  	struct device *dev =3D &vdev->device;
-> @@ -72,6 +89,8 @@ void vfio_device_debugfs_init(struct vfio_device *vdev)
->  							vdev->debug_root);
->  		debugfs_create_devm_seqfile(dev, "state", vfio_dev_migration,
->  					    vfio_device_state_read);
-> +		debugfs_create_devm_seqfile(dev, "features", vfio_dev_migration,
-> +					    vfio_device_features_read);
->  	}
->  }
-> =20
-> diff --git a/Documentation/ABI/testing/debugfs-vfio b/Documentation/ABI/t=
-esting/debugfs-vfio
-> index 90f7c262f591306bdb99295ab4e857ca0e0b537a..70ec2d454686290e13380340d=
-fd6a5a67a642533 100644
-> --- a/Documentation/ABI/testing/debugfs-vfio
-> +++ b/Documentation/ABI/testing/debugfs-vfio
-> @@ -23,3 +23,9 @@ Contact:	Longfang Liu <liulongfang@huawei.com>
->  Description:	Read the live migration status of the vfio device.
->  		The contents of the state file reflects the migration state
->  		relative to those defined in the vfio_device_mig_state enum
-> +
-> +What:		/sys/kernel/debug/vfio/<device>/migration/features
-> +Date:		Oct 2025
-> +KernelVersion:	6.18
-> +Contact:	C=C3=A9dric Le Goater <clg@redhat.com>
-> +Description:	Read the migration features of the vfio device.
+We could even mimic what Intel did with 64-bit VMCS fields to handle 32-bit mode,
+and explicitly name the second one KVM_CAP_GUEST_MEMFD_FLAGS_HI:
 
+  uint64_t supported_gmem_flags = kvm_check_extension(KVM_CAP_GUEST_MEMFD_FLAGS) |
+                                  (kvm_check_extension(KVM_CAP_GUEST_MEMFD_FLAGS_HI) << 32);
+
+so that if KVM_CAP_GUEST_MEMFD_FLAGS_HI precedes 64-bit-only KVM, it could become
+fully redundant, i.e. where someday this would hold true:
+
+  kvm_check_extension(KVM_CAP_GUEST_MEMFD_FLAGS) == 
+  kvm_check_extension(KVM_CAP_GUEST_MEMFD_FLAGS) | kvm_check_extension(KVM_CAP_GUEST_MEMFD_FLAGS_HI) << 32
+
+> In this model, conditionally valid flags are always set, 
+
+I followed everything except this snippet.
+
+> but userspace won't be able to do a flags check against the returned 32-bit
+> value. Or do you think when this issue comes up, we'd put the flags in the
+> upper bits in KVM_CAP_GUEST_MEMFD_FLAGS2 and userspace would then check
+> against the OR-ed set of flags instead?
+
+As above, enumerate support for flags 63:32 in a separate capability.
 
