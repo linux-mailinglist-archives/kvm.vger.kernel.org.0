@@ -1,63 +1,63 @@
-Return-Path: <kvm+bounces-59520-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-59521-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id 587A0BBDE0D
-	for <lists+kvm@lfdr.de>; Mon, 06 Oct 2025 13:36:38 +0200 (CEST)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9056EBBDE10
+	for <lists+kvm@lfdr.de>; Mon, 06 Oct 2025 13:36:46 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id EC1F84EA27F
-	for <lists+kvm@lfdr.de>; Mon,  6 Oct 2025 11:36:35 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 4D1D24EA297
+	for <lists+kvm@lfdr.de>; Mon,  6 Oct 2025 11:36:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3DE7F26A1D9;
-	Mon,  6 Oct 2025 11:36:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8DB7A26A1D9;
+	Mon,  6 Oct 2025 11:36:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="XG+a4Mvm"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="jR9mlPVe"
 X-Original-To: kvm@vger.kernel.org
 Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 83D3D2561AE
-	for <kvm@vger.kernel.org>; Mon,  6 Oct 2025 11:36:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E70282561AE
+	for <kvm@vger.kernel.org>; Mon,  6 Oct 2025 11:36:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.19
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1759750592; cv=none; b=abcIQB6M3tFLIJ7xzlZf4Y+c21CgBgJUeImZKM751sRYHOdmIN3pGCcHzQnxxx7TGw366Zz43PGIDybUWIRwZhgw/MDP2fPO0O46HGk7RYwELKvqpnBi9twS7/MDTWVmmZyJMrhf7CUJ0C9kzxLDQJsmxFsUTVfFrc426ZLv+tQ=
+	t=1759750600; cv=none; b=ce05n8ErYf8B4qW50mD0IBJUy4Ug+SEyqtG1mtMQMPfldKkmFH2SJhXgbSZf7MHLdGyzQvTFbhqRm3SQs+SbzIPgUq5ji46UUiyEPhfZeVYd3FeaAMDbJE22XBfKONju7x8un4UQiao5rP8hybkZJl9d6VM8DliAzG6Z7FVESEk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1759750592; c=relaxed/simple;
-	bh=M6G5A31ZEq/JRJ2gj8m8NBBaQ5MZnXbzZYAYpBE7Os4=;
+	s=arc-20240116; t=1759750600; c=relaxed/simple;
+	bh=u7AbABXVJpoVa8AfrYjIbF/VUInx35JIGpjJhhZDflg=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=qM9rGAlfZlV1cPbqv8Lo4hzk/0Z0Pn5WKmwAMRUYlH4aIBzKgwhbta7FPZQdY29eceuaiP5/mVo2Wo6zmfGata0qENxG8NSGxD13GaZa4dQI+PH1q8hZO/E3juBfH9FSMDkm6tkBd25ay0S1zCf4ZdWwsnCF63GgLonT65L9yZ4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=pass smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=XG+a4Mvm; arc=none smtp.client-ip=192.198.163.19
+	 MIME-Version; b=pbTaRRh+9IehX10c5DZnAjoUz63MJVW9YrawJOPoAXDCzudfLJiQPCOEGpb9iOjR8NLiVW6sksOpVodhysK5uMKXRZkkYG4Ug9RKBofofESwWryh/qr5bDKxC7Vb29dTqi02cqAoq3zxGoJmJAP79dbz9pZo0cO9uFmROcboQfQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=pass smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=jR9mlPVe; arc=none smtp.client-ip=192.198.163.19
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1759750591; x=1791286591;
+  t=1759750599; x=1791286599;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=M6G5A31ZEq/JRJ2gj8m8NBBaQ5MZnXbzZYAYpBE7Os4=;
-  b=XG+a4Mvm280OyGJw5at4DAK03weeN2mIV7n4M4VTqeacjVykzsTtVQGw
-   g5cDTlJZDwV4VjLT8CHjLZVx4C+RRshDskm0JOLFxRERW/fH0lwgX7L8c
-   /i1XvbmVE0/xktZ0hwAUDDEh36GvyHVkvOAw3v5Ym0ArzKYcAX89TVFAi
-   ujDtR2tVEZ8i5aBZxosHLZriZMkLYlMfAs9/TjD0iPCCuLOiBfBDL6HYT
-   eew1kSJ720o0wSKWbPPli+fnRbkn1id/I8Lf7UZMNewfkUvJ6knleO9Zu
-   gQJwebEdZqn79bNr1F01abNvCbOfqPAY4Oj9w8oO9bF45Vl7IryayrT/h
+  bh=u7AbABXVJpoVa8AfrYjIbF/VUInx35JIGpjJhhZDflg=;
+  b=jR9mlPVe6cUw2oSSp6o5cavt4XrYPrVb9LhnXCmjg/2N9ipJmEPrMRFL
+   aNz/9sULjdrrHXCYZrMFV7VHZFrracSlCiJWPwIOsDFEYW21dXSj827/0
+   eL6leQcKGXhpfWXd1dOz2WnArwwik0qZ9MyMrmAek8iq/YicjscBlesUY
+   QUcKnpcMp8Xf5JD42pWJgZHn2eiMl/815Jnxu5OFy6iTwU4l3G7Ebpb4R
+   2kmIC1YEzH+YsZ8emTYIRWcuSs6/uw5uZi/vrYLqL1a9QXWlBYtTzVocO
+   Cb8Q4eO3IA8c+GC9YeyJaeJm+n1uVN6dRQKANEMorro6EJ84gvZsFoOyQ
    g==;
-X-CSE-ConnectionGUID: /fO+VYJBSd66G1IEjIFxrA==
-X-CSE-MsgGUID: pcZB85T2S2ikTt7Jhj/Btg==
-X-IronPort-AV: E=McAfee;i="6800,10657,11573"; a="60958776"
+X-CSE-ConnectionGUID: Ch853PG4RcmK2+P7BiVicA==
+X-CSE-MsgGUID: iHGp11qXToe/g/efanm3kQ==
+X-IronPort-AV: E=McAfee;i="6800,10657,11573"; a="60958812"
 X-IronPort-AV: E=Sophos;i="6.18,319,1751266800"; 
-   d="scan'208";a="60958776"
+   d="scan'208";a="60958812"
 Received: from fmviesa001.fm.intel.com ([10.60.135.141])
-  by fmvoesa113.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 06 Oct 2025 04:36:30 -0700
-X-CSE-ConnectionGUID: qzKW3yIKSCS6rjJQNR88cw==
-X-CSE-MsgGUID: MizBEneTQRSQCJ+LDXpaVw==
+  by fmvoesa113.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 06 Oct 2025 04:36:38 -0700
+X-CSE-ConnectionGUID: sRuh1Oe9QNirJm5LaaIkog==
+X-CSE-MsgGUID: NjOCJ/qYTzyVmAxjI/VFZg==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.18,319,1751266800"; 
-   d="scan'208";a="210815083"
+   d="scan'208";a="210815134"
 Received: from ettammin-mobl2.ger.corp.intel.com (HELO tlindgre-MOBL1..) ([10.245.246.151])
-  by smtpauth.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 06 Oct 2025 04:36:21 -0700
+  by smtpauth.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 06 Oct 2025 04:36:30 -0700
 From: Tony Lindgren <tony.lindgren@linux.intel.com>
 To: Paolo Bonzini <pbonzini@redhat.com>,
 	Sean Christopherson <seanjc@google.com>
@@ -84,9 +84,9 @@ Cc: Peter Xu <peterx@redhat.com>,
 	Rick Edgecombe <rick.p.edgecombe@intel.com>,
 	Xiaoyao Li <xiaoyao.li@intel.com>,
 	kvm@vger.kernel.org
-Subject: [RFC PATCH 1/3] Documentation: kvm: Add KVM_MIGRATE_CMD
-Date: Mon,  6 Oct 2025 14:35:22 +0300
-Message-ID: <20251006113524.1573116-2-tony.lindgren@linux.intel.com>
+Subject: [RFC PATCH 2/3] Documentation: kvm: Add KVM_IMPORT/EXPORT_MEMORY
+Date: Mon,  6 Oct 2025 14:35:23 +0300
+Message-ID: <20251006113524.1573116-3-tony.lindgren@linux.intel.com>
 X-Mailer: git-send-email 2.43.0
 In-Reply-To: <20251006113524.1573116-1-tony.lindgren@linux.intel.com>
 References: <20251006113524.1573116-1-tony.lindgren@linux.intel.com>
@@ -98,48 +98,51 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Document KVM_MIGRATE_CMD. To support live migration of confidential
-computing guests, the hardware may need to pass migration command related
-data between the source and destination. For confidential computing, the
-migration command related data is not accessible to KVM.
+Document KVM_IMPORT_MEMORY and KVM_EXPORT_MEMORY. To support live
+migration of confidential computing guests, the hardware needs to export
+the encrypted pages on the source and to import the encrypted pages on
+the destination.
 
 Signed-off-by: Tony Lindgren <tony.lindgren@linux.intel.com>
 ---
- Documentation/virt/kvm/api.rst | 47 ++++++++++++++++++++++++++++++++++
- 1 file changed, 47 insertions(+)
+ Documentation/virt/kvm/api.rst | 89 +++++++++++++++++++++++++++++++++-
+ 1 file changed, 88 insertions(+), 1 deletion(-)
 
 diff --git a/Documentation/virt/kvm/api.rst b/Documentation/virt/kvm/api.rst
-index 6ae24c5ca559..31db949d3e44 100644
+index 31db949d3e44..dec73fd2c5bf 100644
 --- a/Documentation/virt/kvm/api.rst
 +++ b/Documentation/virt/kvm/api.rst
-@@ -6504,6 +6504,53 @@ the capability to be present.
+@@ -6503,7 +6503,6 @@ the capability to be present.
+ 
  `flags` must currently be zero.
  
+-
+ 4.144 KVM_MIGRATE_CMD
+ ---------------------
  
-+4.144 KVM_MIGRATE_CMD
-+---------------------
+@@ -6551,6 +6550,94 @@ The parameter related data structures are::
+   @reserved - Reserved for future use
+   @buf      - Userspace buffer for hardware specific data
+ 
++.. _KVM_IMPORT_MEMORY:
++
++4.145 KVM_IMPORT_MEMORY
++-----------------------
 +
 +:Capability: KVM_CAP_MIGRATION
 +:Architectures: arm64, x86
 +:Type: vm ioctl
-+:Parameters: struct kvm_migrate_cmd (in/out)
++:Parameters: struct kvm_memory_transfer (in/out)
 +:Returns: 0 on success, < 0 on error
 +
-+Allows userspace to send migration commands to the hardware.
++Allows userspace to request the hardware to import an array of memory pages from
++a userspace buffer.
 +
-+For confidential computing, the migration commands may use encrypted data
-+that needs to be passed between the source and destination hardware. The
-+hardware may also require specific coordination steps during migration that
-+must be triggered at precise points in the migration process.
++The memory may not be directly accessible to KVM because of encryption. For
++confidential computing, the guest memory is encrypted and only accessible to the
++guest.
 +
 +The parameter related data structures are::
-+
-+  #define KVM_MIGRATE_PREPARE		0
-+  #define KVM_MIGRATE_SETUP		1
-+  #define KVM_MIGRATE_TOKEN		2
-+  #define KVM_MIGRATE_SOURCE_BLACKOUT	3
-+  #define KVM_MIGRATE_ABORT		4
-+  #define KVM_MIGRATE_FINISH		5
 +
 +  struct kvm_transfer_buffer {
 +	__u64 address;
@@ -151,17 +154,63 @@ index 6ae24c5ca559..31db949d3e44 100644
 +  @size     - Size of the userspace buffer
 +  @reserved - Reserved for future use
 +
-+  struct kvm_migrate_cmd {
-+	__u16 command;
++  struct kvm_memory_transfer {
++	__u64 gfns;
++	__u32 nr_gfns;
++	__u16 id;
 +	__u16 flags;
-+	__u32 reserved;
++	__u64 reserved;
 +	struct kvm_transfer_buffer buf;
 +  };
 +
-+  @command  - One of the defined KVM_MIGRATE commands
++  @gfns     - Userspace array of GFNs to import
++  @nr_gfns  - Number of GFNs
++  @id       - Optional hardware specific transfer ID
 +  @flags    - Hardware specific flags
 +  @reserved - Reserved for future use
-+  @buf      - Userspace buffer for hardware specific data
++  @buf      - Userspace buffer to import memory from
++
++The hardware specific ID is used at least for TDX for the migration thread
++index.
++
++4.146 KVM_EXPORT_MEMORY
++-----------------------
++
++:Capability: KVM_CAP_MIGRATION
++:Architectures: arm64, x86
++:Type: vm ioctl
++:Parameters: struct kvm_memory_transfer (in/out)
++:Returns: 0 on success, < 0 on error
++
++Allows userspace to request the hardware to export an array of memory pages
++to a userspace buffer.
++
++The memory may not be directly accessible to KVM because of encryption. For
++confidential computing, the guest memory is encrypted and only accessible to the
++guest.
++
++The parameters are::
++
++  struct kvm_memory_transfer {
++	__u64 gfns;
++	__u32 nr_gfns;
++	__u16 id;
++	__u16 flags;
++	__u64 reserved;
++	struct kvm_transfer_buffer buf;
++  };
++
++  @gfns     - Userspace array of GFNs to export
++  @nr_gfns  - Number of GFNs
++  @id       - Optional hardware specific transfer ID
++  @flags    - Hardware specific flags
++  @reserved - Reserved for future use
++  @buf      - Userspace buffer to export memory to
++
++The hardware specific ID is used at least for TDX for the migration thread
++index.
++
++See also :ref:`KVM_IMPORT_MEMORY <KVM_IMPORT_MEMORY>`.
 +
  .. _kvm_run:
  
