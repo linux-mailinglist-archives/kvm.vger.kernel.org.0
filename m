@@ -1,88 +1,88 @@
-Return-Path: <kvm+bounces-59526-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-59527-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id B37C6BBE1FC
-	for <lists+kvm@lfdr.de>; Mon, 06 Oct 2025 15:03:05 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id AEAB9BBE205
+	for <lists+kvm@lfdr.de>; Mon, 06 Oct 2025 15:03:12 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A64CE3BF641
-	for <lists+kvm@lfdr.de>; Mon,  6 Oct 2025 13:02:42 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A93213BF422
+	for <lists+kvm@lfdr.de>; Mon,  6 Oct 2025 13:02:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B695A2848B3;
-	Mon,  6 Oct 2025 13:01:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0CE4A286D4B;
+	Mon,  6 Oct 2025 13:02:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="M5eSCUIq"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="PEmm/hp7"
 X-Original-To: kvm@vger.kernel.org
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 37674284662
-	for <kvm@vger.kernel.org>; Mon,  6 Oct 2025 13:01:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3DB032868B0
+	for <kvm@vger.kernel.org>; Mon,  6 Oct 2025 13:02:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1759755677; cv=none; b=NfZtQJ3AhewxYrLo/lZVt189+087UA1/EcJJc63skN/0Kdr2OLlrpUl4hiEFwDEbGwJzTefZR3cOLGkvP6UAUYAIaqtlmhOOrU2XQCFiQAR5oLy+iizjcvody4muZ8AaICaNsfwVTr3A6LA3RVapCo+b8z7LCMa8ibjFN2XWlkk=
+	t=1759755741; cv=none; b=So+CEiZJUcN+JZLEyjEui21inLxbt+Q/Z/qA7sgfKHktdsDDeEz4JlL76udTm5OIF78QT3R2SjtFZKt9wyhw34ZWUteMrjNxxzDIZqOp71vpC1boTq+i3pw3gbE9CXfTctYU8VWqzLZpLPMooZVV+wlJa3CGQ7YUptn65PwLxj8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1759755677; c=relaxed/simple;
-	bh=DMf3Bv60FETylcvilDLAgaW4Fm39getzasuR0OY6UVM=;
+	s=arc-20240116; t=1759755741; c=relaxed/simple;
+	bh=UPkwNlSY/9N8EmAYSw1o8kXKQrb+iH1+cyfJ/ckoVEI=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=U2gJhW8tXJ95p0Dumw9lsepNTynn1OpArFvugLjn+N7N6QoFqBtb+wPJe8F/qtpXFGafCYEKW14KGlw9uKPBbQipJeS4l5U9TfB2Uz8Z3q7q1WQ9bCyYtjUrnFQjd5NcTNOAhpNJfyyCOv4hJ4FYu+S4PFL2E90zq33VJSwYwak=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=M5eSCUIq; arc=none smtp.client-ip=170.10.133.124
+	 In-Reply-To:Content-Type; b=M2x8e13chij85BIWQbnSs7RPl3NRserDIHE5GnkTRf/VPaMRSHcJnqPuZ4DccB0rHtSyYH1WCyz7lSheHvKReFP/btpcMIT1zl3hYd7cKzN+LgJygLrU+9jIRZN+dE/VXx6ZAYpr2IuwbEvGKarbbzXp4vsGgchEDz4LnbNP1xY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=PEmm/hp7; arc=none smtp.client-ip=170.10.133.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1759755675;
+	s=mimecast20190719; t=1759755738;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-	bh=tbg/jdlMLCmitobHajNdFI55jOdnqoy47OONdMKjRyA=;
-	b=M5eSCUIqCpFdXMpNn3n8PCzI6PZtEERpU++SCHGJY4tAimEzzjpm2S7kWOt4bZ81LTicVB
-	OHTI0HaMhBD/3FcQD2q+fUOYewS8ljKd7ApI4TqdIaXSJri0TxHkPpR9SnCqrxs9Um0Z7V
-	0JQARrK59re/xDjaSqTOQykmT6dsWP8=
-Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
- [209.85.128.72]) by relay.mimecast.com with ESMTP with STARTTLS
+	bh=8XP+/L6ShZ+ErNDo2j7T4i24j2ImOHXB2awMNPB8ugI=;
+	b=PEmm/hp7oj393jTUDtyVJjcy0EDHy/xZjl8ZK/0U1Z6ykghw7JdmOmtOYsBPH3kGrXcm7C
+	cK8VsmBrIdWlz1awBX8ZcGtklwnR6r4JNA8ozeDZOPHdvzMOZBcb3h1Pn/o2AXtlc6btxE
+	wHf3l3SupgYM/L8obKZzbo4/5Sln7RQ=
+Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
+ [209.85.128.71]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-590-VQ1pQ-CfO-ioYqpfkYTWcw-1; Mon, 06 Oct 2025 09:01:13 -0400
-X-MC-Unique: VQ1pQ-CfO-ioYqpfkYTWcw-1
-X-Mimecast-MFC-AGG-ID: VQ1pQ-CfO-ioYqpfkYTWcw_1759755672
-Received: by mail-wm1-f72.google.com with SMTP id 5b1f17b1804b1-46e509374dcso22752615e9.1
-        for <kvm@vger.kernel.org>; Mon, 06 Oct 2025 06:01:13 -0700 (PDT)
+ us-mta-480-lxdhwQmXPrOdXBuODmV9iQ-1; Mon, 06 Oct 2025 09:02:16 -0400
+X-MC-Unique: lxdhwQmXPrOdXBuODmV9iQ-1
+X-Mimecast-MFC-AGG-ID: lxdhwQmXPrOdXBuODmV9iQ_1759755735
+Received: by mail-wm1-f71.google.com with SMTP id 5b1f17b1804b1-46e4c8fa2b1so21085495e9.0
+        for <kvm@vger.kernel.org>; Mon, 06 Oct 2025 06:02:16 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1759755672; x=1760360472;
+        d=1e100.net; s=20230601; t=1759755735; x=1760360535;
         h=content-transfer-encoding:in-reply-to:autocrypt:content-language
          :from:references:cc:to:subject:user-agent:mime-version:date
          :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=tbg/jdlMLCmitobHajNdFI55jOdnqoy47OONdMKjRyA=;
-        b=VYh3htij/hoCN890rMus3NhgdrE/eqKSAk3Nyx6iby8XJ7jR19hfUavq9yKKrXpCdU
-         dcz3PjpHUV6OO0rfG1/rat2FqOVKvgCt4B4GHYDZ8PygCI1sonmL7Hevacigw7xpbSsS
-         bduAfeNEkn5S2cpbMX01foh3cnxQdCIilHADcLZ9LR6Aknex7uPww1Z+DCLGe1QBvE/l
-         CBNc5RmYbXtBJUW5618FNqmuyDUbKEHSQSBDHueGTAii1qGmzMXr5+6cMbQcP7boHcjx
-         /S4aksd0dhEHp8ZtMxcqARHZ2qpS+FFoXj1PaqU0oaFeQzaSV4iybNavxbikUoO0tLkV
-         gaDA==
-X-Forwarded-Encrypted: i=1; AJvYcCUAB8zucXsmHyzzbDdPwYJ7z+7aNji0hmYt96003QYggpJh+ks6Sh05rIuCAXj6fh9tieE=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwrSWsx8/Z+fQi/aJ8Yjau9J5QT4g7iL6GS6BOQkrQObIYw04Z2
-	0Xv+qIaU3a84rJ+ThBcIYbJJ6+NpTjgp5mfqWo1Zv2tvx+nisyD6HtTHETXeKFVugtMB51eUY1W
-	NJzv1VhF/iK086aBXNpLbk3OT8GVxO+KKyGrvyFD/xG+djAT16X4WlQ==
-X-Gm-Gg: ASbGncuXLbonIrDhmBXuKHPpi3cCw48wIMWm5PmKh990wJ5O/Vwt0a/CJmLUREJeYLm
-	QLadkKPWo2+l1CJUHbqtQ7HOkiP+BPT+vEM+D/++Ym6EqEHSeNMJRQyXXJhfYtRlNvqr8CEYV0y
-	tjGUH2LOEf4XPqWWBI6P27p2wBLr8Vc0WioGPUYegPmUh4WvkNUIeqy0jvu/IczXwtsZMIrpoXP
-	I4/78/Q+dNzT5T554RrwBP44K0GWOk6Lz9EBDaJLfwNz213DovGjlRyEd2v4TI/ENTLTLjbo7p9
-	WTLtHssbacj0UX/S4Quw4dB4ycFENNIxMgtuIIy0oRBXpRTeCIJjdRsnoQ3qq29Ick3+RmGUizy
-	yyKci2tPohA==
-X-Received: by 2002:a05:600c:4fc6:b0:46c:adf8:c845 with SMTP id 5b1f17b1804b1-46e71124395mr99858255e9.16.1759755672192;
-        Mon, 06 Oct 2025 06:01:12 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IH/RFmdQCBtd4GU/CABKhL7qsIvB+A+AXJ+ouRDj1zbgXPndLNpU2GqgLCh7IjJLD/drew79w==
-X-Received: by 2002:a05:600c:4fc6:b0:46c:adf8:c845 with SMTP id 5b1f17b1804b1-46e71124395mr99857655e9.16.1759755671596;
-        Mon, 06 Oct 2025 06:01:11 -0700 (PDT)
+        bh=8XP+/L6ShZ+ErNDo2j7T4i24j2ImOHXB2awMNPB8ugI=;
+        b=DXVyk9W/49LZ6V7zvklPPzoYDRLW96UBXRY9/6TKABeojjYfXFgBbqjvVkhT/VrKhz
+         wZP9FetWJcBL90Z45Ua7Scjq5U9g6BSYLq/trLrTbHpu2EonqvOW1lTewknUUc2Xmg3S
+         /HdOIdAVb1HWrf/0Efeqr6+RJaNQGZR7D3Ah1Ed4fX2acWtFXaeCJxLNGp9bsViaOAFS
+         sPz25RVjdo4Pub/4m0Z6Y1M9x54sAhuj8SVCnOBNFAQ6s+QB7fhEgBnCkUA7VJ4hwyGQ
+         t3/c9dMT08GieucrjUdkLjS6VTtxq941rLjMNMeIoPyJ2nlCqoXu03SNFYmY+RT0C+rJ
+         JDrQ==
+X-Forwarded-Encrypted: i=1; AJvYcCWCB5tskNTfGFmUdXS+7hSlTPL8xUlW5d7Niyzb9yTsQRsOUgfUKGvrxomqGsyaym3W+cA=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yxih7a7+0Wx/RB5BlZyXeHvFZfsL2QH7X2dgLTHH8ixGGQ08ZfR
+	s8ZWFPRZZr5bfOTXkaBUkteBbz+jJQJxVWkh4h/7HLQ4uMW6aBxnDXBU+453NESOD4WhYHSWQTe
+	UqDmVFa6F47Sl9213M0oz3eFZxkjb61kSrJ8sDO3En5h5Cox7+A5PKQ==
+X-Gm-Gg: ASbGncu7WsPUyDd3Whm71O3OtbefVMHNlyfMEW6eEcl0nvJq3l9cLmPR/P/ee/OBfrD
+	yjkQD+2/NRCmRAupeIu85imzt3lnRUtE+v4osPkSFarLsnIuf5OrMlo0ATSAN0DRCE2YY8NFlV2
+	YxumGSgHUkeiPr6AMTMr5NaPPpdFOnUBkV3LD40o24FUKo//AFsSMiouRcGrf1wPlU63t7aPmQX
+	Sy6Yi/rL5ocXPU0QEsP4jyfSiu+ikZ1jEvhKvF/AT3o4aOKZsr68DmqMZbTZGTajkBoyJFTp0Pq
+	mArLiBBYV7oeV8tHBfPOnsY5Y9sq23F85RUysWDawXE9FMGjMrUXDg5Zi/T4vswovhiD0h31/Yd
+	kMZo2MwGNeQ==
+X-Received: by 2002:a05:600c:474d:b0:46e:3901:4a25 with SMTP id 5b1f17b1804b1-46e7116411emr74067905e9.20.1759755735224;
+        Mon, 06 Oct 2025 06:02:15 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IH5c3nOdBnQ9j37P39o/Q5Li46dr79sX1W7PgBCfxkuek9zYsqmOCp+rbWk9IR7bBwE9cCAYw==
+X-Received: by 2002:a05:600c:474d:b0:46e:3901:4a25 with SMTP id 5b1f17b1804b1-46e7116411emr74067525e9.20.1759755734647;
+        Mon, 06 Oct 2025 06:02:14 -0700 (PDT)
 Received: from [192.168.0.7] (ltea-047-064-114-056.pools.arcor-ip.net. [47.64.114.56])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-46e72374b8dsm174600995e9.19.2025.10.06.06.01.09
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-46e78c5d290sm117768045e9.0.2025.10.06.06.02.13
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 06 Oct 2025 06:01:11 -0700 (PDT)
-Message-ID: <932a0061-a673-4ca9-a935-99edca9af9da@redhat.com>
-Date: Mon, 6 Oct 2025 15:01:08 +0200
+        Mon, 06 Oct 2025 06:02:14 -0700 (PDT)
+Message-ID: <3209475c-ea4e-4b73-942c-6354aaa36f52@redhat.com>
+Date: Mon, 6 Oct 2025 15:02:12 +0200
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -90,8 +90,7 @@ List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 03/25] hw/s390x/s390-stattrib: Include missing
- 'exec/target_page.h' header
+Subject: Re: [PATCH 06/25] hw: Remove unnecessary 'system/ram_addr.h' header
 To: =?UTF-8?Q?Philippe_Mathieu-Daud=C3=A9?= <philmd@linaro.org>,
  qemu-devel@nongnu.org
 Cc: "Michael S. Tsirkin" <mst@redhat.com>, Nicholas Piggin
@@ -110,7 +109,7 @@ Cc: "Michael S. Tsirkin" <mst@redhat.com>, Nicholas Piggin
  Paolo Bonzini <pbonzini@redhat.com>, qemu-s390x@nongnu.org,
  Peter Xu <peterx@redhat.com>
 References: <20251001082127.65741-1-philmd@linaro.org>
- <20251001082127.65741-4-philmd@linaro.org>
+ <20251001082127.65741-7-philmd@linaro.org>
 From: Thomas Huth <thuth@redhat.com>
 Content-Language: en-US
 Autocrypt: addr=thuth@redhat.com; keydata=
@@ -155,25 +154,25 @@ Autocrypt: addr=thuth@redhat.com; keydata=
  oiT+z+/E59qj/EKfyce3sbC9XLjXv3mHMrq1tKX4G7IJGnS989E/fg6crv6NHae9Ckm7+lSs
  IQu4bBP2GxiRQ+NV3iV/KU3ebMRzqIC//DCOxzQNFNJAKldPe/bKZMCxEqtVoRkuJtNdp/5a
  yXFZ6TfE1hGKrDBYAm4vrnZ4CXFSBDllL59cFFOJCkn4Xboj/aVxxJxF30bn
-In-Reply-To: <20251001082127.65741-4-philmd@linaro.org>
+In-Reply-To: <20251001082127.65741-7-philmd@linaro.org>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
 
 On 01/10/2025 10.21, Philippe Mathieu-Daudé wrote:
-> The "exec/target_page.h" header is indirectly pulled from
-> "system/ram_addr.h". Include it explicitly, in order to
-> avoid unrelated issues when refactoring "system/ram_addr.h":
-> 
->    hw/s390x/s390-stattrib-kvm.c: In function ‘kvm_s390_stattrib_set_stattr’:
->    hw/s390x/s390-stattrib-kvm.c:89:57: error: ‘TARGET_PAGE_SIZE’ undeclared (first use in this function); did you mean ‘TARGET_PAGE_BITS’?
->       89 |     unsigned long max = s390_get_memory_limit(s390ms) / TARGET_PAGE_SIZE;
->          |                                                         ^~~~~~~~~~~~~~~~
->          |                                                         TARGET_PAGE_BITS
-> 
-> Since "system/ram_addr.h" is actually not needed, remove it.
+> None of these files require definition exposed by "system/ram_addr.h",
+> remove its inclusion.
 > 
 > Signed-off-by: Philippe Mathieu-Daudé <philmd@linaro.org>
 > ---
+>   hw/ppc/spapr.c                    | 1 -
+>   hw/ppc/spapr_caps.c               | 1 -
+>   hw/ppc/spapr_pci.c                | 1 -
+>   hw/remote/memory.c                | 1 -
+>   hw/remote/proxy-memory-listener.c | 1 -
+>   hw/s390x/s390-virtio-ccw.c        | 1 -
+>   hw/vfio/spapr.c                   | 1 -
+>   hw/virtio/virtio-mem.c            | 1 -
+>   8 files changed, 8 deletions(-)
 
 Reviewed-by: Thomas Huth <thuth@redhat.com>
 
