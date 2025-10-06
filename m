@@ -1,106 +1,111 @@
-Return-Path: <kvm+bounces-59543-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-59544-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
-	by mail.lfdr.de (Postfix) with ESMTPS id C9E15BBF169
-	for <lists+kvm@lfdr.de>; Mon, 06 Oct 2025 21:25:06 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2FE95BBF17E
+	for <lists+kvm@lfdr.de>; Mon, 06 Oct 2025 21:26:57 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 833EB4F0F92
-	for <lists+kvm@lfdr.de>; Mon,  6 Oct 2025 19:25:04 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 2147A1898D5A
+	for <lists+kvm@lfdr.de>; Mon,  6 Oct 2025 19:27:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D3DE12DE70E;
-	Mon,  6 Oct 2025 19:24:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="mYB/1Hwk"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A08052DE715;
+	Mon,  6 Oct 2025 19:26:46 +0000 (UTC)
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pf1-f202.google.com (mail-pf1-f202.google.com [209.85.210.202])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from bmailout3.hostsharing.net (bmailout3.hostsharing.net [176.9.242.62])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AAC2B156236
-	for <kvm@vger.kernel.org>; Mon,  6 Oct 2025 19:24:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CACD92D7803;
+	Mon,  6 Oct 2025 19:26:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=176.9.242.62
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1759778696; cv=none; b=N8voNYM4+QebDz6H60A+SGiGKpD9Ik1ZRuCoKCLXKJZ8+X/XVYL8wRhL9tnov6A4gXgoDief6Um8I1t7LOvVTW9vzx6FKg6OJqmeTyhRcAfZXTQvqXwpgleXVncbhL8BzLzBOPMY8fmTBMYz34ixEsxrxkfRAfKeKDzqc0W7oE4=
+	t=1759778806; cv=none; b=tN+oKdV3btwxfmIIyLEAsRKOAcyYd3OPEk2FfbkaMXq60GZLQxLSIFQEQlzSUCAl0lZhxylvlvpTDDi2mFrVBrEViiTxI81EWJM374H911K5IM3asxCQxDVYMM4bawXxYMhp/zieg9w3F0r/4woOcsVUyM1muQM1c+toRJF7NNo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1759778696; c=relaxed/simple;
-	bh=gzzvKnF6qJ7lJudLs/+S8tBn4LMDyPLqXA/nMHePsSc=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=lSwpbyPnrOTfEcF6QV1qc34/GfC+E6mGhW9MBNiwZTmfqEmhWf2bMSGIESwXNCtm54vbsR2IJUgvewCHayYhikiDlt/32DsCaf/oLt2nhRxYIJ/ar4O/pjt6qKUSON8m8RB9xc0T7VkXI1giyMsIKM7BQBW1kTqYv6WhCzQSeAw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=mYB/1Hwk; arc=none smtp.client-ip=209.85.210.202
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pf1-f202.google.com with SMTP id d2e1a72fcca58-780fdbbdd20so4216894b3a.1
-        for <kvm@vger.kernel.org>; Mon, 06 Oct 2025 12:24:54 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1759778694; x=1760383494; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=MwCv/q5RLrOVP5H2/mUJFVpJKUB0tJIPOkj23AFdbos=;
-        b=mYB/1Hwk5/djOTQkZojycRPAJ17J8MkN12THO24D6IxGz4uHfoLTEQZ6OE3cvFtbfP
-         b4p2Ak4Dyc40UZKmkrqy7vXWJB6ce5yn+nW0ASQI4fRFEd4pZEdFnFuOkWawfqCzWdNj
-         ciVjSDyM0vZ0IfpZezELznHeQkRtEWiKbBF4t9supT4HdBEOEeNyhAjryPJZEst6epx3
-         6NV95NWGlQv2Nk9FrTr9wog3LXU215QcdMy0rS7YGnJdO4eBM5iUqfN2JegLVbRPIXHH
-         NyAwGajYxqvkVCIsU4YCzepF3+y7AUNzIMg+Smz/daP2EXH0QaXL+oVnUTM4v1UWYvMo
-         sENA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1759778694; x=1760383494;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=MwCv/q5RLrOVP5H2/mUJFVpJKUB0tJIPOkj23AFdbos=;
-        b=GwwcAQ/AEESGwJ8k49N9Pv7Vxcm8dXe6YihFZG+ZEZJUc15HI2E91JFLxIpBlafZQ9
-         N/jV4zIyc1+nQRBF7DXIqwI/NS3rbpKF2z/7RHNmpGhNhVoqMTN/7vbzwgGR2EY9OQSb
-         24SoIb5bjxSYrNfVAq/pu7J9Bk1wcuKsTCRvOcsM3u7InO9kn00G+ySwVfHpCPSMv9FC
-         aPsP9FQVV+/q+wmyVQFhdclMgzfT9XkEuPpOHOz5L8RhIzQfLkwltvLggYrTCb9HPe0Y
-         M7gCkKF7WvHSkgTIh61kkLRz62erLSS58lMyYC0aEy9/5pD4wGlaLc+z3WTnqVGra/++
-         DHAw==
-X-Forwarded-Encrypted: i=1; AJvYcCVwCuVtH6PUJ+mpymvKOE7d/uvjsPuwzeVsprzKFCRb/RzBTAYHAytXpv9HCs16uFCrFYQ=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzkIbzWrp9kvLMeSTSKDyONLDXqnLBEZ+pxfAASVAjBoSfO1CSD
-	H5VaeAdl5XMONxWDClYYp0dcE5AmcS/acPBzoIrU+U5QbtA7Tiul8Zj9n4ovH1lKwyjT8PbTWys
-	XuYdOgg==
-X-Google-Smtp-Source: AGHT+IHiIsra+i6pzpFSJKTUcR3R1ZEtEd8CiGXaiveuskEqCtWdUdLIj7ydtiLIe9mDGjYusezaU4r2um0=
-X-Received: from pgbdo10.prod.google.com ([2002:a05:6a02:e8a:b0:b5f:5359:4b92])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a05:6a20:e290:b0:2c2:626b:b052
- with SMTP id adf61e73a8af0-32b6209da14mr18587401637.38.1759778693902; Mon, 06
- Oct 2025 12:24:53 -0700 (PDT)
-Date: Mon, 6 Oct 2025 12:24:52 -0700
-In-Reply-To: <diqz5xcrgaa5.fsf@google.com>
+	s=arc-20240116; t=1759778806; c=relaxed/simple;
+	bh=vUBnTJnshouH8Q+l4EvtuFnkCSf2h532KLfPXz8Faug=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=udjHLe57ml0sE8l1mMEoVLxuF6eSEh5luA79qg3Jv0l1TZdXs4f7Ox4+3MqYGtdY4ZPKW4sha/yus2N4Y/0H1Pq/CiEhIZ87o8QuqptFuK+Z4mYhpA7iX/+ttLWV5sPup2+2Ikj7FyAckpTpeLPQXWxbf1TWhpVjwgPW/L/1inI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=wunner.de; spf=none smtp.mailfrom=h08.hostsharing.net; arc=none smtp.client-ip=176.9.242.62
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=wunner.de
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=h08.hostsharing.net
+Received: from h08.hostsharing.net (h08.hostsharing.net [83.223.95.28])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256
+	 client-signature RSA-PSS (4096 bits) client-digest SHA256)
+	(Client CN "*.hostsharing.net", Issuer "RapidSSL TLS RSA CA G1" (verified OK))
+	by bmailout3.hostsharing.net (Postfix) with ESMTPS id B80C02C05680;
+	Mon,  6 Oct 2025 21:26:33 +0200 (CEST)
+Received: by h08.hostsharing.net (Postfix, from userid 100393)
+	id 90C01549512; Mon,  6 Oct 2025 21:26:33 +0200 (CEST)
+Date: Mon, 6 Oct 2025 21:26:33 +0200
+From: Lukas Wunner <lukas@wunner.de>
+To: Farhan Ali <alifm@linux.ibm.com>
+Cc: Benjamin Block <bblock@linux.ibm.com>, linux-s390@vger.kernel.org,
+	kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-pci@vger.kernel.org, alex.williamson@redhat.com,
+	helgaas@kernel.org, clg@redhat.com, schnelle@linux.ibm.com,
+	mjrosato@linux.ibm.com
+Subject: Re: [PATCH v4 01/10] PCI: Avoid saving error values for config space
+Message-ID: <aOQX6ZTMvekd6gWy@wunner.de>
+References: <20250924171628.826-1-alifm@linux.ibm.com>
+ <20250924171628.826-2-alifm@linux.ibm.com>
+ <20251001151543.GB408411@p1gen4-pw042f0m>
+ <ae5b191d-ffc6-4d40-a44b-d08e04cac6be@linux.ibm.com>
+ <aOE1JMryY_Oa663e@wunner.de>
+ <c0818c13-8075-4db0-b76f-3c9b10516e7a@linux.ibm.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20251003232606.4070510-1-seanjc@google.com> <20251003232606.4070510-14-seanjc@google.com>
- <diqz5xcrgaa5.fsf@google.com>
-Message-ID: <aOQXhJyTXHt8Kw7F@google.com>
-Subject: Re: [PATCH v2 13/13] KVM: selftests: Verify that reads to
- inaccessible guest_memfd VMAs SIGBUS
-From: Sean Christopherson <seanjc@google.com>
-To: Ackerley Tng <ackerleytng@google.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, Christian Borntraeger <borntraeger@linux.ibm.com>, 
-	Janosch Frank <frankja@linux.ibm.com>, Claudio Imbrenda <imbrenda@linux.ibm.com>, kvm@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, David Hildenbrand <david@redhat.com>, 
-	Fuad Tabba <tabba@google.com>
-Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <c0818c13-8075-4db0-b76f-3c9b10516e7a@linux.ibm.com>
 
-On Mon, Oct 06, 2025, Ackerley Tng wrote:
-> Sean Christopherson <seanjc@google.com> writes:
+On Mon, Oct 06, 2025 at 10:54:51AM -0700, Farhan Ali wrote:
+> On 10/4/2025 7:54 AM, Lukas Wunner wrote:
+> > I believe this also makes patch [01/10] in your series unnecessary.
 > 
-> > Expand the guest_memfd negative testcases for overflow and MAP_PRIVATE to
-> > verify that reads to inaccessible memory also get a SIGBUS.
-> >
-> > Opportunistically fix the write path to use the "val" instead of hardcoding
-> > the literal value a second time, and to use TEST_FAIL(...) instead of
-> > TEST_ASSERT(false, ...).
-> >
+> I tested your patches + patches 2-10 of this series. It unfortunately didn't
+> completely help with the s390x use case. We still need the check to in
+> pci_save_state() from this patch to make sure we are not saving error
+> values, which can be written back to the device in pci_restore_state().
+
+What's the caller of pci_save_state() that needs this?
+
+Can you move the check for PCI_POSSIBLE_ERROR() to the caller?
+I think plenty of other callers don't need this, so it adds
+extra overhead for them and down the road it'll be difficult
+to untangle which caller needs it and which doesn't.
+
+
+> As part of the error recovery userspace can use the VFIO_DEVICE_RESET to
+> reset the device (pci_try_reset_function()). The function call for this is:
 > 
-> The change the use "val" isn't in this patch, and I think the
-> TEST_FAIL() change was intended for another earlier patch.
+> pci_dev_save_and_disable <https://elixir.bootlin.com/linux/v6.17.1/C/ident/pci_dev_save_and_disable>();
+> 
+> __pci_reset_function_locked <https://elixir.bootlin.com/linux/v6.17.1/C/ident/__pci_reset_function_locked>();
+> 
+> pci_dev_restore
+> <https://elixir.bootlin.com/linux/v6.17.1/C/ident/pci_dev_restore>();
+> 
+> So we can end up overwriting the initial saved state (added by you in
+> pci_bus_add_device()). Do we need to update the pci_dev_save_and_disable()
+> not to save the state?
 
-Yep.  I originally had the TEST_ASSERT => TEST_FAIL change in this patch, and
-forgot all about the changelog when I added the SIGBUS "catch".
+The state saved on device addition is just the initial state and
+it is fine if later on it gets updated (which is a nicer term than
+"overwritten").  E.g. when portdrv.c instantiates port services
+and drivers are bound to them, various registers in Config Space
+are changed, hence pcie_portdrv_probe() calls pci_save_state()
+again.
 
-Thanks!
+However we can discuss whether pci_save_state() is still needed
+in pci_dev_save_and_disable().
+
+Thanks,
+
+Lukas
 
