@@ -1,120 +1,110 @@
-Return-Path: <kvm+bounces-59552-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-59553-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8EAC4BBFB9A
-	for <lists+kvm@lfdr.de>; Tue, 07 Oct 2025 00:50:59 +0200 (CEST)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
+	by mail.lfdr.de (Postfix) with ESMTPS id D1DDEBBFDB8
+	for <lists+kvm@lfdr.de>; Tue, 07 Oct 2025 02:39:41 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 670BC189E158
-	for <lists+kvm@lfdr.de>; Mon,  6 Oct 2025 22:51:22 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 89DB84E37E3
+	for <lists+kvm@lfdr.de>; Tue,  7 Oct 2025 00:39:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A00751DB958;
-	Mon,  6 Oct 2025 22:50:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6D0A81D61BB;
+	Tue,  7 Oct 2025 00:39:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ziepe.ca header.i=@ziepe.ca header.b="BDZ4EHSg"
+	dkim=pass (2048-bit key) header.d=fb.com header.i=@fb.com header.b="4mY+aOVE"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-qv1-f54.google.com (mail-qv1-f54.google.com [209.85.219.54])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx0b-00082601.pphosted.com (mx0b-00082601.pphosted.com [67.231.153.30])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 19FB24A00
-	for <kvm@vger.kernel.org>; Mon,  6 Oct 2025 22:50:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.54
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EF64034BA50
+	for <kvm@vger.kernel.org>; Tue,  7 Oct 2025 00:39:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=67.231.153.30
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1759791044; cv=none; b=K68s53uyeakBO+rwsoeUgN6ICh3l5xLGQmEVdNZRYaYX3u2Zu2porqJ45TAiAH3HYUSfTus4u4fGfRpMgDjtdW44aGNr122mkjfbfSDKX0B/Xkz29Wvv77JfpqCrdvHFar/LhEjj6acxZ5iB5HJ+l19AyrXBaeelZUIi8pXaEag=
+	t=1759797572; cv=none; b=EKc6cQZ1vPQDfH0wPvS9TtDwrnv10MWLKkvqqGfxYUVbDD8nvLJMGfZ5gnMZWeD+MAa5pQzkcGhgu3UXakPzEgaoTp2e87LFPKmXKPQGzgAh3sYUeOwGXAGIoGXcfsjSR8w7LcKQZiUV04Txhmcm3fL3GX8siiZEBKUCMAe01Nc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1759791044; c=relaxed/simple;
-	bh=j8RVgIHcecZ6vNuLBZhQD8XDmrwSGnwngJoxF/6sqdo=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=PJahZEeRbTwmCZi+OplCAJbhsUPrxhz0XxVbkbT23WiK6LwZ9HyvYjPC+tThd7L5zxW5tg3w06zTihtxChh7cLv3aedza94srCDg3yP8CZRVYKMEokFn4DgavNf8yjo8ygXp8bYKLDVDGUYtHHVLc6I0NEBtybKAtwiCqF/kF+Q=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ziepe.ca; spf=pass smtp.mailfrom=ziepe.ca; dkim=pass (2048-bit key) header.d=ziepe.ca header.i=@ziepe.ca header.b=BDZ4EHSg; arc=none smtp.client-ip=209.85.219.54
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ziepe.ca
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ziepe.ca
-Received: by mail-qv1-f54.google.com with SMTP id 6a1803df08f44-7960d69f14bso35138286d6.2
-        for <kvm@vger.kernel.org>; Mon, 06 Oct 2025 15:50:42 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=ziepe.ca; s=google; t=1759791042; x=1760395842; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=t1+dP9kjoBak9iuGOU/j3R1WyEWlKUJiQn+oDzUnB/s=;
-        b=BDZ4EHSg5GzH1tetl7kQ3cZaQ9mXyBtsvsfVggmMC/04tf4tc/XZJERblzAqc78Pne
-         DWmmdgmk1FnkYJfO1YUeva8PSaIANVvDo70lXc0kmw68k9Qrb48kBasy93mRY+8Mn+JC
-         Cyu7R94047P4d6/2v3WKNNRFFNjEEqvJcRk0KKFjtLMwcvhSvtjEwhuIgcV/6qHXtJb6
-         BLoAP0hFAoa1FFtk/BOUfPy6T3JXGA0kdbPBpiJ/OxYvUu38HXb+0tj0PWcvEdVtoMb+
-         RPV27txRDPJGu6qvaxjCnSLu5bjZaFQjtnGPlRMfYTj5k5hSE6ZxZsQCDxF8efP/7T3b
-         iM3g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1759791042; x=1760395842;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=t1+dP9kjoBak9iuGOU/j3R1WyEWlKUJiQn+oDzUnB/s=;
-        b=c4AEdho5TaIMPypdqvnt5gzQ2SoSVuFf/6y67/PgDKIscLgnGaCVHon8TP/QN+zQ48
-         yKPVyH6x2ESUvQtjJ9ExmXZIlKJpICfM/BOPQVTsD1GSikTJcrUBDhSFct3dqUYUX2SF
-         RDVJBRe8gGRl9k9DkL5umwGXHhu0LqmNiv12HIUUc6FbDcaffO7lqVbxw0bVJAXxv5ZL
-         piyy/CT3Xy0AWzKDKmvia32IGbNvsscpQZRT+TpwuSKQ5fRK226olPYdi14ZeQLXqqzU
-         LOdvTurboBog+9t9dhTlfLMOuIX+sDcKO0Axvua7bj2RWZaD3dANC9Yq5n1iRDdv78Hd
-         Rl2w==
-X-Forwarded-Encrypted: i=1; AJvYcCXVDwJELyrIkspmzh3K2YyXXe1apJQofOe92600eMyjG3JwUtYX12VASyHSjzPr72h7n3k=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyFp0LO+XoU6dAVcs5uEh5hgW8tkB5gzhW1Lsp9L/UGuLZ4hK5I
-	Jj63htzn+IquHoTrYgpvOVFmKF/gzFxQhPkMpwh1QY1NiWZ13xM9yqgE2u1tJwxApno=
-X-Gm-Gg: ASbGnctL5eQ02hWuih3ev4sYhM9U7cN7DfYUpyMYA0tGDF8FaZmY+s9Plaw6ASU5FYp
-	4P80s4LCJtvqisTnoXd5ZjVPNTI1onY6yL8HxHy2eQL5w4mAvItvJBFc1PfsBj/y0SYHq1UVaYw
-	toM9SXTLc1EEnUmfFH4DyW/kpSIK0+jNFVrFk7tyUayABi6Af2Zc0HOy5xRGENone8yWNzQrj3h
-	q38Sga58KUDmEX2QlwHDoQ0Zze+D63PffRTs2DIZuyHTFjgxrUpvTbjenwF61HeFirid7WGK912
-	NfwljTBctDMDKYhYLzNZSBcy9HxDN9GxTUW01qlCRnfQvYnNWe0Jii6DxHHnDT4d5KsSeJ6E684
-	/TwzKTG8fRtTn+ns2fIDS
-X-Google-Smtp-Source: AGHT+IHzlobXG0MjkPJh2nGePMJSByfyR0QwUZj8yqsAUFGxRY2aOWeCzXWMnbZWCqE5GDBOCCvduQ==
-X-Received: by 2002:ad4:4ee4:0:b0:863:5c7a:728a with SMTP id 6a1803df08f44-879dc869b21mr181258646d6.37.1759791041935;
-        Mon, 06 Oct 2025 15:50:41 -0700 (PDT)
-Received: from ziepe.ca ([130.41.10.202])
-        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-878be61f6bcsm130119516d6.65.2025.10.06.15.50.41
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 06 Oct 2025 15:50:41 -0700 (PDT)
-Received: from jgg by wakko with local (Exim 4.97)
-	(envelope-from <jgg@ziepe.ca>)
-	id 1v5u2R-0000000EUgB-3p8Y;
-	Mon, 06 Oct 2025 19:50:39 -0300
-Date: Mon, 6 Oct 2025 19:50:39 -0300
-From: Jason Gunthorpe <jgg@ziepe.ca>
-To: Alex Mastro <amastro@fb.com>
-Cc: Alex Williamson <alex.williamson@redhat.com>, kvm@vger.kernel.org,
-	linux-kernel@vger.kernel.org
+	s=arc-20240116; t=1759797572; c=relaxed/simple;
+	bh=kO3ODXqs9k7pwqkR/guQ/caM0qB7jAeOF091Dd7wRU0=;
+	h=Date:From:To:CC:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=nhseahavjV3Ao/grdD9YZQIo8is8pwkivzhMRRo/oWMI8GvIjM/XONzPIE1XN+RVVpIXtsXaBC5jXOBugdN8ZV0bxOIMhJNL3niMC7Q2BhrqH7nzJ+6OH3CEP81cmKYfnpzs2bROJbqm4S6RzKSnK7ps+5let53UhGMbPjuxXGc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fb.com; spf=pass smtp.mailfrom=meta.com; dkim=pass (2048-bit key) header.d=fb.com header.i=@fb.com header.b=4mY+aOVE; arc=none smtp.client-ip=67.231.153.30
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fb.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=meta.com
+Received: from pps.filterd (m0148460.ppops.net [127.0.0.1])
+	by mx0a-00082601.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 596NraQK3885881
+	for <kvm@vger.kernel.org>; Mon, 6 Oct 2025 17:39:29 -0700
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=fb.com; h=cc
+	:content-type:date:from:in-reply-to:message-id:mime-version
+	:references:subject:to; s=s2048-2025-q2; bh=kO3ODXqs9k7pwqkR/guQ
+	/caM0qB7jAeOF091Dd7wRU0=; b=4mY+aOVEe29vUt114OipFP8JGFE5URGXBbpB
+	cBAEjpOlVtLyJeu0Wn3NMoZUD5kykJulae3rDQQ69YT0HO480lMJt0k1AicQw9mq
+	qrg4NLGx3SewBINxQKLClclARbRTy+chEYrumWLDjUh3STpX/hmt8xrhNP4143bD
+	DEaqmNoGMkwvhpPMYiw8h5TrCwqxX7bOBE4KlzPx9maSZrWazrDjoA6rmFIAAWn7
+	iF9aNrZZE9CqS/rkcE7IXs1Wm1pMynGUsXhl9qp0Z/9V5efHZyl5FmrfGnP9Ehsr
+	kPuAxd+j87toHRzdio291pGeV0Zj9yMU/D5XZLqw7O/I68/7SQ==
+Received: from mail.thefacebook.com ([163.114.134.16])
+	by mx0a-00082601.pphosted.com (PPS) with ESMTPS id 49mjnf2vc7-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128 verify=NOT)
+	for <kvm@vger.kernel.org>; Mon, 06 Oct 2025 17:39:29 -0700 (PDT)
+Received: from twshared18070.28.prn2.facebook.com (2620:10d:c085:108::150d) by
+ mail.thefacebook.com (2620:10d:c08b:78::2ac9) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.2.2562.20; Tue, 7 Oct 2025 00:39:28 +0000
+Received: by devgpu015.cco6.facebook.com (Postfix, from userid 199522)
+	id 5602EC4B352; Mon,  6 Oct 2025 17:39:12 -0700 (PDT)
+Date: Mon, 6 Oct 2025 17:39:12 -0700
+From: Alex Mastro <amastro@fb.com>
+To: Jason Gunthorpe <jgg@ziepe.ca>
+CC: Alex Williamson <alex.williamson@redhat.com>, <kvm@vger.kernel.org>,
+        <linux-kernel@vger.kernel.org>
 Subject: Re: [PATCH] vfio: fix VFIO_IOMMU_UNMAP_DMA when end of range would
  overflow u64
-Message-ID: <20251006225039.GA3441843@ziepe.ca>
+Message-ID: <aORhMMOU5p3j69ld@devgpu015.cco6.facebook.com>
 References: <20251005-fix-unmap-v1-1-6687732ed44e@fb.com>
  <20251006121618.GA3365647@ziepe.ca>
  <aOPuU0O6PlOjd/Xs@devgpu015.cco6.facebook.com>
+ <20251006225039.GA3441843@ziepe.ca>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset="us-ascii"
 Content-Disposition: inline
-In-Reply-To: <aOPuU0O6PlOjd/Xs@devgpu015.cco6.facebook.com>
+In-Reply-To: <20251006225039.GA3441843@ziepe.ca>
+X-FB-Internal: Safe
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUxMDA3MDAwMyBTYWx0ZWRfX84To8NjTGgLB
+ tUoDioFgUH/y0PvAT/tuXDHGA6e9E7Z9PKsLQguPyOrmVzTjYjsAaAWogmfvrN/9lS2iyvgTJUy
+ OVifm8bpbLUkjHo8BoH3c7H5nfp5E1LLchEOoBkGLGpTK+Os0HtyTyvvqnPWwy6Y9JH69fOS6QN
+ 4dJip9RLqtYC6+1Gx3MEeIiljWMYYCs+5M8BjZjsP5xWje1xAh5IK/mSUKOH+hhJ7obusp0KPYp
+ +OguC8SPap7TditZVKaD0vy9h6KCcT7XE17w42ryU5m6iw2IN77w893yMBUIERe7W7lbd7pUvP3
+ Gnn1wSJBXCzml/JQCBYFGCWhgH83EHwYgARQyYrEXm/ELjleLu4S/Sy4H4v1rtE4G/wM4ndBBVY
+ LIKvrRXwGgvnjqH2KNuHt2LMhzAxyQ==
+X-Proofpoint-GUID: UKW1rlppIFxtnGT9IrEjX9f4980nPyzk
+X-Authority-Analysis: v=2.4 cv=Zo3g6t7G c=1 sm=1 tr=0 ts=68e46141 cx=c_pps
+ a=CB4LiSf2rd0gKozIdrpkBw==:117 a=CB4LiSf2rd0gKozIdrpkBw==:17
+ a=kj9zAlcOel0A:10 a=x6icFKpwvdMA:10 a=cnzby_Kikf3u7RrYEdwA:9
+ a=CjuIK1q_8ugA:10
+X-Proofpoint-ORIG-GUID: UKW1rlppIFxtnGT9IrEjX9f4980nPyzk
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1117,Hydra:6.1.9,FMLib:17.12.80.40
+ definitions=2025-10-06_07,2025-10-06_01,2025-03-28_01
 
-On Mon, Oct 06, 2025 at 09:29:07AM -0700, Alex Mastro wrote:
-> On Mon, Oct 06, 2025 at 09:16:18AM -0300, Jason Gunthorpe wrote:
-> > This doesn't seem complete though, if the range ends at the ULONG_MAX
-> > then these are not working either:
-> > 
-> > 		if (start < dma->iova + dma->size) {
-> > 
-> > ?
-> > 
-> > And I see a few more instances like that eg in
-> > vfio_iova_dirty_bitmap(), vfio_dma_do_unmap(), vfio_iommu_replay()
-> 
-> You are right. There are several places which would need to be fixed to handle
-> mappings which lie against the end of the addressable range. At least these
-> would need to be vetted:
+On Mon, Oct 06, 2025 at 07:50:39PM -0300, Jason Gunthorpe wrote:
+> Could we block right at the ioctl inputs that end at ULONG_MAX? Maybe
+> that is a good enough fix?
 
-Could we block right at the ioctl inputs that end at ULONG_MAX? Maybe
-that is a good enough fix?
+That would be a simpler, and perhaps less risky fix than surgically fixing every
+affected place.
 
-Jason
+If we were to do that, I think VFIO_IOMMU_TYPE1_INFO_CAP_IOVA_RANGE should
+report coherent limits -- i.e. it should "lie" and say the last page (or
+whatever) of u64 addressable space is inaccessible so that the UAPI is coherent
+with itself. It should be legal to map/unmap iova ranges up to the limits it
+claims to support.
+
+I have doubts that anyone actually relies on MAP_DMA-ing such
+end-of-u64-mappings in practice, so perhaps it's OK?
 
