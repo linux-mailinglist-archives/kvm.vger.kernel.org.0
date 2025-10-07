@@ -1,155 +1,204 @@
-Return-Path: <kvm+bounces-59585-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-59586-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id C76F9BC212E
-	for <lists+kvm@lfdr.de>; Tue, 07 Oct 2025 18:14:47 +0200 (CEST)
+Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [213.196.21.55])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4DA7DBC21DA
+	for <lists+kvm@lfdr.de>; Tue, 07 Oct 2025 18:28:35 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C24D23E2EC0
-	for <lists+kvm@lfdr.de>; Tue,  7 Oct 2025 16:14:19 +0000 (UTC)
+	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 2193F350395
+	for <lists+kvm@lfdr.de>; Tue,  7 Oct 2025 16:28:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 861132E7BA2;
-	Tue,  7 Oct 2025 16:14:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 81D242E8B6F;
+	Tue,  7 Oct 2025 16:28:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="SWejzV/g"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="V6gLOwgn"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pj1-f74.google.com (mail-pj1-f74.google.com [209.85.216.74])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3281B2E0B74
-	for <kvm@vger.kernel.org>; Tue,  7 Oct 2025 16:14:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.74
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 937CD11712;
+	Tue,  7 Oct 2025 16:28:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1759853650; cv=none; b=GoH27xWSXPMKKbZcllQM0muxXzcEUWvoh1FoD79Ps5BM72O+2vEsl/YrNvlb4F6I13S4LP8irXeEc0cprZ2pwwXGi5sSVVpe+DcBQafJKB934lLrFPp59VggEIulwCl9UFLLNlg2IwjsYf5eUkoUCsbhpxMiUnfnWr4141TDqxg=
+	t=1759854498; cv=none; b=GD9euknB66oGhmLML3ObvWsyU+qbu54ywZT3KY1YzyNUxIB+oxtXslWM+5Ee0Qe5nyzgP18KbJllJVHhWuMuhj6begse5jjcpBnekUTktwH/CY55+ZQC6tZa27zT8VKQ/+PY43VWhX6kAAF+SO1wEJ7vmTbTlQ4EcatXAdmUHyE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1759853650; c=relaxed/simple;
-	bh=mVzsovC58EEV1QLoRn5Q6vMEItcEyrBnmeexI0Cw4F0=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=Qdn1/nmSRa0Z1btEKxxvggYoQ34Nl7f7kB571TQEm6l+M4tcYwQvEH7ycFyfwWMe2k2jsbbbTjBoO2MTCimyas9cQyMIuEHNNHLzvSgAl1qLayIjqcbLSqjdqWL3HKPfBLaJi7z+97VgRDZwx4pEUtQTBuJipUg8TLTYt7f8Xtw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--ackerleytng.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=SWejzV/g; arc=none smtp.client-ip=209.85.216.74
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--ackerleytng.bounces.google.com
-Received: by mail-pj1-f74.google.com with SMTP id 98e67ed59e1d1-32ee4998c50so5707956a91.3
-        for <kvm@vger.kernel.org>; Tue, 07 Oct 2025 09:14:09 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1759853648; x=1760458448; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=/irXsuAsamtgCtTOtUDY4BLJIyfQgPNN1bFCPmxoW+M=;
-        b=SWejzV/g5ryUAiGVuVNh10ho17+MbJpKoqn6NvoGX21ghgDzwPnAAzp/z891zrP8Yo
-         O+27ld91bAmJR3GlhSlKuHpTTC5ZGohT5q+OlSlpm4Q/QhQ/ltCUAj4A548SeWCpRBcN
-         ne7lwm3secZnz04DBTDB8qolpEekwXi/2LkJpzXAbkMEyL4AbY69xPISG8Rnpd+ump6d
-         M9jxEdKaLyVtC680E0+2mviS7C595NCSjlcCr9m+f1I8vOCd+85ba9J3246YcWv6HAMf
-         x6cuqJ6W/BV546OFqyKgyp6+k6uAEgurw4gM0/LDY1zv9zQzKacDx1bOq1awvAf74uwF
-         a70g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1759853648; x=1760458448;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=/irXsuAsamtgCtTOtUDY4BLJIyfQgPNN1bFCPmxoW+M=;
-        b=oIPwqLi6k08shAXwtZ6hYwgfyEwACt39l6et9PsRGAYqB+BYrT6lntySXOU8FzrVO2
-         //Lk69xLG9ndQre4L0QJeuxHWi4G7FXFqsicQuWabEshZV6lX8wUbl3BmBHLZodzSO1/
-         MXSgG5XvDQZ4tGhQYqfC18nDBMxFwACckX2NI+tDGmh969z+yX0+2t8jZPBINvKMm6JQ
-         7fRmTKJR319SdnylcYSuJFhjvPATVIZ8KmLsXEvemWBuTPH6j3xOzkCWGaUqE+ui0ETO
-         5UWugcdZQOxdUBcI0ERVD0uxFEPdcVtrqMoygMGKPe0JwR4Ic6EIu/6E5Rze+MvX1tV0
-         +Uvw==
-X-Gm-Message-State: AOJu0YxI/tz7yPkWewaI31ry6Bbm6FkPmtZ9/ULQfgFrLfqSHtXkUmn4
-	Sdvp4NM8f7mw1muGtihvqnCugbfDTQVBuXaIS+dDaNw2MGnwinVPiVdTBi5ZWjRY+2RXDgY6Mlv
-	u/wWg2ap975+Yglp069BpyfSf8A==
-X-Google-Smtp-Source: AGHT+IGQJ9dt+G+ZFPwTDhM1HDP1QQ7G7O/XAdM0NKpHIchJqMPg0aPlJZz4Dn0RLMvkAE7a+NuOyaT3bV2/gD20kQ==
-X-Received: from pjkk8.prod.google.com ([2002:a17:90b:57e8:b0:334:1935:56cc])
- (user=ackerleytng job=prod-delivery.src-stubby-dispatcher) by
- 2002:a17:90b:1d0a:b0:32e:87f6:f5a6 with SMTP id 98e67ed59e1d1-33b50f2300dmr157081a91.0.1759853648456;
- Tue, 07 Oct 2025 09:14:08 -0700 (PDT)
-Date: Tue, 07 Oct 2025 09:14:07 -0700
-In-Reply-To: <20251003232606.4070510-3-seanjc@google.com>
+	s=arc-20240116; t=1759854498; c=relaxed/simple;
+	bh=xYeA5nn/abbj5ed3ef1cNUU82SoHc8qkl+HZ9ylyjw0=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=K9PgkzPY/ohSTyDwc1iScqabgDsP95NbA8LcR0dMoF3zuxqRgfaQtEnDim9DwiA9D303/rFUOB4HYV0k/tJMTD+GerzQO0ZYmZpZni4RaKYcAahQGfHV1ioK5Bc3p7VeFXQFtEnoi0ydRZ5Hvb4+oT2Ul6c10QaiDiYJB83SRnE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=V6gLOwgn; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 35AEBC4CEF7;
+	Tue,  7 Oct 2025 16:28:15 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1759854498;
+	bh=xYeA5nn/abbj5ed3ef1cNUU82SoHc8qkl+HZ9ylyjw0=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=V6gLOwgnvOxPmJz0LQMipMYO5vPDFV2CTcpBXKWlC2TaqSGT+mEm4K0D0NemSziR+
+	 a4L5Jd2D+bj64roEwzpceQowvn1wIf8vSepKeIwWp//LmKqlJarXByX8yBNEm0K9wT
+	 QB1ZUUIKRIHJE66kz3NZL3TUwuBF6yZcXvXc0fsz5fYo1vIIdIjgtL64vHPyF5V54T
+	 nk2QNw3WoblZcLttkdFD0oPGFd3IThCJcEgCoTjVRR3FAWogq8xYeFhE8tcpkXN4BS
+	 yapf08l++uGwkTeGLJagoTf86oBKBPUPxbfQKXJwnjS9kNhWRl1Lsnt2+URfaCWFtx
+	 Zth3UW0roW0uw==
+Date: Tue, 7 Oct 2025 17:28:12 +0100
+From: Mark Brown <broonie@kernel.org>
+To: Sascha Bischoff <Sascha.Bischoff@arm.com>
+Cc: "linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>,
+	"kvmarm@lists.linux.dev" <kvmarm@lists.linux.dev>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+	"kvm@vger.kernel.org" <kvm@vger.kernel.org>, nd <nd@arm.com>,
+	Mark Rutland <Mark.Rutland@arm.com>,
+	Catalin Marinas <Catalin.Marinas@arm.com>,
+	"maz@kernel.org" <maz@kernel.org>,
+	"oliver.upton@linux.dev" <oliver.upton@linux.dev>,
+	Joey Gouly <Joey.Gouly@arm.com>,
+	Suzuki Poulose <Suzuki.Poulose@arm.com>,
+	"yuzenghui@huawei.com" <yuzenghui@huawei.com>,
+	"will@kernel.org" <will@kernel.org>,
+	"lpieralisi@kernel.org" <lpieralisi@kernel.org>
+Subject: Re: [PATCH 1/3] arm64/sysreg: Support feature-specific fields with
+ 'Feat' descriptor
+Message-ID: <26d69b0d-3529-454f-9385-99a914bf1ebc@sirena.org.uk>
+References: <20251007153505.1606208-1-sascha.bischoff@arm.com>
+ <20251007153505.1606208-2-sascha.bischoff@arm.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20251003232606.4070510-1-seanjc@google.com> <20251003232606.4070510-3-seanjc@google.com>
-Message-ID: <diqzecreelkg.fsf@google.com>
-Subject: Re: [PATCH v2 02/13] KVM: guest_memfd: Add INIT_SHARED flag, reject
- user page faults if not set
-From: Ackerley Tng <ackerleytng@google.com>
-To: Sean Christopherson <seanjc@google.com>, Paolo Bonzini <pbonzini@redhat.com>, 
-	Christian Borntraeger <borntraeger@linux.ibm.com>, Janosch Frank <frankja@linux.ibm.com>, 
-	Claudio Imbrenda <imbrenda@linux.ibm.com>
-Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	David Hildenbrand <david@redhat.com>, Fuad Tabba <tabba@google.com>
-Content-Type: text/plain; charset="UTF-8"
+MIME-Version: 1.0
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="2tSGI2X8sep9nY9m"
+Content-Disposition: inline
+In-Reply-To: <20251007153505.1606208-2-sascha.bischoff@arm.com>
+X-Cookie: Teachers have class.
 
-Sean Christopherson <seanjc@google.com> writes:
 
-> Add a guest_memfd flag to allow userspace to state that the underlying
-> memory should be configured to be initialized as shared, and reject user
-> page faults if the guest_memfd instance's memory isn't shared.  Because
-> KVM doesn't yet support in-place private<=>shared conversions, all
-> guest_memfd memory effectively follows the initial state.
->
-> Alternatively, KVM could deduce the initial state based on MMAP, which for
-> all intents and purposes is what KVM currently does.  However, implicitly
-> deriving the default state based on MMAP will result in a messy ABI when
-> support for in-place conversions is added.
->
-> For x86 CoCo VMs, which don't yet support MMAP, memory is currently private
-> by default (otherwise the memory would be unusable).  If MMAP implies
-> memory is shared by default, then the default state for CoCo VMs will vary
-> based on MMAP, and from userspace's perspective, will change when in-place
-> conversion support is added.  I.e. to maintain guest<=>host ABI, userspace
-> would need to immediately convert all memory from shared=>private, which
-> is both ugly and inefficient.  The inefficiency could be avoided by adding
-> a flag to state that memory is _private_ by default, irrespective of MMAP,
-> but that would lead to an equally messy and hard to document ABI.
->
-> Bite the bullet and immediately add a flag to control the default state so
-> that the effective behavior is explicit and straightforward.
->
-> Fixes: 3d3a04fad25a ("KVM: Allow and advertise support for host mmap() on guest_memfd files")
-> Cc: David Hildenbrand <david@redhat.com>
-> Reviewed-by: Fuad Tabba <tabba@google.com>
-> Tested-by: Fuad Tabba <tabba@google.com>
-> Reviewed-by: Ackerley Tng <ackerleytng@google.com>
+--2tSGI2X8sep9nY9m
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-Tested-by: Ackerley Tng <ackerleytng@google.com>
+On Tue, Oct 07, 2025 at 03:35:14PM +0000, Sascha Bischoff wrote:
 
-> Signed-off-by: Sean Christopherson <seanjc@google.com>
-> ---
->  Documentation/virt/kvm/api.rst                 |  5 +++++
->  include/uapi/linux/kvm.h                       |  3 ++-
->  tools/testing/selftests/kvm/guest_memfd_test.c | 15 ++++++++++++---
->  virt/kvm/guest_memfd.c                         |  6 +++++-
->  virt/kvm/kvm_main.c                            |  3 ++-
->  5 files changed, 26 insertions(+), 6 deletions(-)
->
-> diff --git a/Documentation/virt/kvm/api.rst b/Documentation/virt/kvm/api.rst
-> index 7ba92f2ced38..754b662a453c 100644
-> --- a/Documentation/virt/kvm/api.rst
-> +++ b/Documentation/virt/kvm/api.rst
-> @@ -6438,6 +6438,11 @@ specified via KVM_CREATE_GUEST_MEMFD.  Currently defined flags:
->    ============================ ================================================
->    GUEST_MEMFD_FLAG_MMAP        Enable using mmap() on the guest_memfd file
->                                 descriptor.
-> +  GUEST_MEMFD_FLAG_INIT_SHARED Make all memory in the file shared during
-> +                               KVM_CREATE_GUEST_MEMFD (memory files created
-> +                               without INIT_SHARED will be marked private).
-> +                               Shared memory can be faulted into host userspace
-> +                               page tables. Private memory cannot.
->    ============================ ================================================
->
+> Some system register field encodings change based on the available and
+> in-use architecture features. In order to support these different
+> field encodings, introduce the Feat descriptor (Feat, ElseFeat,
+> EndFeat) for describing such sysregs.
 
-Also tested make htmldocs. Interestingly even though Sphinx docs [1]
-says simple tables must contain more than one row, the html output is
-as-expected before and after the GUEST_MEMFD_FLAG_INIT_SHARED row.
+We have other system registers which change layouts based on things
+other than features, ESR_ELx is probably the most entertaining of these
+but there's others like PAR_EL1.  Ideally we should probably do the
+logic for generating the conditionals in a manner that's not tied to
+features with a layer on top that generates standard naming for common
+patterns like FEAT, but OTOH part of why that's not been done because
+it's got a bunch of nasty issues so perhaps just doing the simpler case
+is fine.
 
-[1] https://www.sphinx-doc.org/en/master/usage/restructuredtext/basics.html
+> The Feat descriptor can be used in the following way (Feat acts as
+> both an if and an else-if):
 
->  When the KVM MMU performs a PFN lookup to service a guest fault and the backing
-> 
-> [...snip...]
-> 
+>         Sysreg  EXAMPLE 0    1    2    3    4
+>         Feat    FEAT_A
+>         Field   63:0    Foo
+>         Feat    FEAT_B
+
+This assumes that there will never be nesting of these conditions in the
+architecture.  I'm not sure I would want to assume that, even for plain
+features though I can't think of any examples where it's an issue.
+There are more serious issues with the implementation for practical
+patterns with nesting (see below) which mean we might not want to deal
+with that now but we should define the syntax for the file in a way that
+will cope so I'd prefer not to have the implicit elses.
+
+I'd also be inclined to say that something that's specificly for
+features shouldn't repeat the FEAT_ so:
+
+          Feat    A
+
+instead, but that's purely a taste question.
+
+> -	define("REG_" reg, "S" op0 "_" op1 "_C" crn "_C" crm "_" op2)
+> -	define("SYS_" reg, "sys_reg(" op0 ", " op1 ", " crn ", " crm ", " op2 "=
+)")
+> +	feat =3D null
+> +
+> +	define(feat, "REG_" reg, "S" op0 "_" op1 "_C" crn "_C" crm "_" op2)
+> +	define(feat, "SYS_" reg, "sys_reg(" op0 ", " op1 ", " crn ", " crm ", "=
+ op2 ")")
+> =20
+> -	define("SYS_" reg "_Op0", op0)
+> -	define("SYS_" reg "_Op1", op1)
+> -	define("SYS_" reg "_CRn", crn)
+> -	define("SYS_" reg "_CRm", crm)
+> -	define("SYS_" reg "_Op2", op2)
+> +	define(feat, "SYS_" reg "_Op0", op0)
+> +	define(feat, "SYS_" reg "_Op1", op1)
+> +	define(feat, "SYS_" reg "_CRn", crn)
+> +	define(feat, "SYS_" reg "_CRm", crm)
+> +	define(feat, "SYS_" reg "_Op2", op2)
+
+Possibly it's worth having a reg_define() or something given the number
+of things needing updating here?
+
+> @@ -201,6 +205,7 @@ $1 =3D=3D "EndSysreg" && block_current() =3D=3D "Sysr=
+eg" {
+>  	res0 =3D null
+>  	res1 =3D null
+>  	unkn =3D null
+> +	feat =3D null
+> =20
+>  	block_pop()
+>  	next
+
+Probably worth complaining if we end a sysreg with a feature/prefix
+defined.
+
+> +$1 =3D=3D "Feat" && (block_current() =3D=3D "Sysreg" || block_current() =
+=3D=3D "SysregFields" || block_current() =3D=3D "Feat") {
+
+=2E..
+
+> +	next_bit =3D 63
+> +
+> +	res0 =3D "UL(0)"
+> +	res1 =3D "UL(0)"
+> +	unkn =3D "UL(0)"
+
+This is only going to work if the whole register is in a FEAT_ block, so
+you coudn't have:
+
+        Sysreg  EXAMPLE 0    1    2    3    4
+	Res0	63
+        Feat    FEAT_A
+        Field   62:1    Foo
+        Feat    FEAT_B
+        Field   62:32    Foo
+        Field   31:1     Bar
+	EndFeat
+	Res0	0
+	EndSysreg
+
+but then supporting partial registers does have entertaining
+consequences for handling Res0 and Res1.  If we're OK with that
+restriction then the program should complain if someone tries to=20
+define a smaller FEAT block.
+
+--2tSGI2X8sep9nY9m
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAABCgAdFiEEreZoqmdXGLWf4p/qJNaLcl1Uh9AFAmjlP5sACgkQJNaLcl1U
+h9AY1Qf/csPwwhVqEVz16SFCiD4J+Z7duRX2w5NTCWs3V6z30u19pzao0zemleKD
+l0UdPz/T/LaiHj6hEdZqwuni6i84rlzgmbPfJ6XPXAfjmg7p4FeKBavOLU3Ablhz
+yiTGGyi4INGrTu4znpmuHVT1Vx2RIeaCWPpjkTcGdJ7aHWIErjKNPzpdJTl6cz7n
+f6ChusvOhN5nCKgD93MX5imL2oe+xULMuCBEhJ9EdjsWHCndFmIl/hoLv1gFJ0yJ
+ppwnKqdEiszW8Gx6VUhiCILY5lkuVl0yOwM7tsol+sGEv44msyJJouplCqw1JoYt
+7Rb48t0H3ra9N3XS6TOh7UQOYBKkDw==
+=QE7l
+-----END PGP SIGNATURE-----
+
+--2tSGI2X8sep9nY9m--
 
