@@ -1,69 +1,69 @@
-Return-Path: <kvm+bounces-59612-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-59613-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [IPv6:2a01:60a::1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id 672C1BC2E21
-	for <lists+kvm@lfdr.de>; Wed, 08 Oct 2025 00:36:39 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id C5FBEBC2E3C
+	for <lists+kvm@lfdr.de>; Wed, 08 Oct 2025 00:44:38 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ams.mirrors.kernel.org (Postfix) with ESMTPS id BE46434E744
-	for <lists+kvm@lfdr.de>; Tue,  7 Oct 2025 22:36:38 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 771303C4AB5
+	for <lists+kvm@lfdr.de>; Tue,  7 Oct 2025 22:44:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1ED08259C83;
-	Tue,  7 Oct 2025 22:36:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 957DA259CAB;
+	Tue,  7 Oct 2025 22:44:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="Cw/xybFL"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="4NQNsDEZ"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pj1-f73.google.com (mail-pj1-f73.google.com [209.85.216.73])
+Received: from mail-pl1-f201.google.com (mail-pl1-f201.google.com [209.85.214.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C10872459ED
-	for <kvm@vger.kernel.org>; Tue,  7 Oct 2025 22:36:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.73
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 68F2E23D281
+	for <kvm@vger.kernel.org>; Tue,  7 Oct 2025 22:44:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1759876590; cv=none; b=bqT78Xbt+WHhbrrDf64X4ZkPUK4YDhbmq72PSPhL6H1j1bfWoiliCcKarIrrDIKH1t3pOZGyuUAlyYn7lDXXTSztKrJdjFVieyqUC9NPTpf0+jBOzbTlUn99pKqi3qJWHYh/2XMOoIlsthdfLiJ6O4imOtvsNE5AG8HJZVOKaog=
+	t=1759877069; cv=none; b=kEXbJgJ6CJbwMarYuvfep+Qm5EBLmWl943p/OrodKYeBg3JxNfKLaUn1rYkLd9eB3L6dcaSBB1dmG/GcCTi4gB7BiDLZFRTPE80sgSp5tRAMhiz42bCtAgNKMy+M0gtqEEj+6xfalB6EYFaDwSYkdo0bZveano46BF6DX7nXz6M=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1759876590; c=relaxed/simple;
-	bh=8m9s5ewUnOI8HOC6LmCn+j18kEaFqyw5sp0EdYi5yfU=;
-	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=VhVL20EVXHkHrW91jDjZg6z2jJ6MoySrHJ4NTnx98oSDwk0q6OiYVIYv5WcF52onXxUw3VLJaBGTDKuLCAJHn3ImFy2KMSguWmHrUZ7+5HtAOpW7rBG9/tJc+TtZIGv4e/ycM/OylrSCY3Vyf1bpbyRYWz0q5e/4z+VQFIalD1o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=Cw/xybFL; arc=none smtp.client-ip=209.85.216.73
+	s=arc-20240116; t=1759877069; c=relaxed/simple;
+	bh=78cJopXpOQG9OAsUEwX6lCCobqh+oH6OfHl5pPo7Ztk=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=SDypkPdhVe/IZWvCMhhkDw3kzoyqPlswo/sxfmKDi5l3oBv5tSl4aOuHyhMzRvYvzrFeR+4QIKHKrwr+pBpzjSrGEPU1uB78pQgYcbmJ0u028bMcFWkMwsdyR1k45RKo7xcgXO/EL9NqweYxP3qQQfnEeBogweYV+ha8dSc1tP4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--jmattson.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=4NQNsDEZ; arc=none smtp.client-ip=209.85.214.201
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pj1-f73.google.com with SMTP id 98e67ed59e1d1-3307af9b55eso5716514a91.2
-        for <kvm@vger.kernel.org>; Tue, 07 Oct 2025 15:36:28 -0700 (PDT)
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--jmattson.bounces.google.com
+Received: by mail-pl1-f201.google.com with SMTP id d9443c01a7336-2711a55da20so42793865ad.1
+        for <kvm@vger.kernel.org>; Tue, 07 Oct 2025 15:44:28 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1759876588; x=1760481388; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:mime-version:date:reply-to:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=68qo6n2TcvOcWthot2i6pnlKFOZE+Ug0E5pPbn/P/4I=;
-        b=Cw/xybFLrITsOmLqrBcE9GRy3C9K0osP91GMpTD0ZOc201R0P3FIDXX/zHWSACe/3W
-         xXLURWyA+xpCgcYdCLX3WRe4TDiK9M/xlPa5lMn/KFa/JqmyKysD95u0xy6RqTr/hgBU
-         j+n63A+ee2Gr9j5wvdqpvstlcFBBPTTQIAC6X/bXG9hUOtfVR7xY+YttppzIqbSlbdEb
-         4339RWerx1RjB60arXUopSJ6IjL02ORaAC6sSYMmYcx97hJSumN2KPeXXvicXAG8WI3S
-         xgc541V53by26UPuzd7VlhiTOVF5yHzTHSd4s2YVzD1BrQqTWobCenwFM21TjJp1uS0/
-         P0sA==
+        d=google.com; s=20230601; t=1759877068; x=1760481868; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=/Rkpq/p6vlS1ftX3Hk8IgbTMJisDfUj8W7AvidCFsY0=;
+        b=4NQNsDEZNgslDedNuS9YaH/UJZei4lcYI38XojhVitXe653Xij8s8dph+tu+CCo0Gn
+         obBcLwKkuN3LFFl3QQnZ3vppbCngv8xZhNybtqilV/Zq499T0zFZEIqFxxrqRRN2IvXf
+         WODbis9u1BPnBpM3j2wD7PRoVBmnOnv7G7CHwssdWxJiEAaic3jXfc0VK0M1SvYC6vJt
+         hsRmDHK2MEGFwHlmO53sWyFiLkLY7oHF/GSCywHj128dVG3C4D7eWEGKNmLafmHvZyy0
+         xnDJddbc4dOAtqioYUSJSz9o9zebLS25UgKNAeVHFyw7/fbk4qO7dR5BgwEab3He6nNo
+         5oBQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1759876588; x=1760481388;
-        h=cc:to:from:subject:message-id:mime-version:date:reply-to
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=68qo6n2TcvOcWthot2i6pnlKFOZE+Ug0E5pPbn/P/4I=;
-        b=dsgRudNhfmMqBRuyF/dMFpJamkQsPkcdrDJYfWQ6bjSlgitQw8KlW5eceYZjKrG/Vp
-         MC8IMfBppxtHeV9Iiv8yxeHPIth8N0wnEJX1oVWaEeQ6sVW6LDT8HIUPWAmCDBHA4K4G
-         K5rjV7ZcSKVq43Q/wG3x/vAMZidgZXLN4VI36pyq90jejOIWfixql7XQ2Wg/Ol7QHB1g
-         cRuQH8WvP7dFOzy5ediO5BeF0X9QyAa1Yz7CCVmIVtMRYwv1xjwJi0/679Zr3xB0pGlg
-         IF+jBpAa9q51Q1JSatqe7THuwE2wDh0Z6RhqoxyGNTNepkLDTEjlRg/oUbT4gIBwevU7
-         I9dQ==
-X-Gm-Message-State: AOJu0YxO0uUqXTujmWXU5Y/RDECVn3zLQQ2/QY4sQrw/mCHwgkuwvCns
-	7iCbY3uiN0HgUHevDtwxaG5jzUjEafJMSB6kMOBx0QXJncqqgS70Bal0H/LfWGV7tFlZSvsTTmh
-	dsKMWpA==
-X-Google-Smtp-Source: AGHT+IHCZuGC68qasf7KAOUWdyDnwSOMgu3ErsL6HL80dAIVGS/k+xxOUSgxkSNZO0APtx0Mg4yaL0cDewI=
-X-Received: from pjbpc1.prod.google.com ([2002:a17:90b:3b81:b0:327:e021:e61d])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:4d06:b0:32c:2cd:4d67
- with SMTP id 98e67ed59e1d1-33b511188dcmr1161678a91.13.1759876587894; Tue, 07
- Oct 2025 15:36:27 -0700 (PDT)
-Reply-To: Sean Christopherson <seanjc@google.com>
-Date: Tue,  7 Oct 2025 15:36:25 -0700
+        d=1e100.net; s=20230601; t=1759877068; x=1760481868;
+        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=/Rkpq/p6vlS1ftX3Hk8IgbTMJisDfUj8W7AvidCFsY0=;
+        b=N/SDCFuKwouzNem9c2xYGGWSeKt3rMxQWc5+3/Krm4C3LqQQkB3pozw6fHpJrKh8OQ
+         SzfnII75/OJAPsZ34Tukea84VGXFe82jhOM8oZybRbE0TUkyfs64WhyscZKBQa6xR2zO
+         YRQ7ukJ4yfo9o97r8dejlQRkpq+Zml7IeKBhdQNNsFBGGa5EyRzJYNRWLuy/i5ifOj/Q
+         ND/OKF9IhmNMDHIW1r38D6eq3vw7sXUh7TgABa8LKHuCaa2cVHz66Si86U5WTUCyWrDF
+         CU0/f7e94Be4ldp3MTA385k5BCSleOA19vk6fSXPNggpGEpFLb3ml6w3jv6D/Rv8p0vh
+         wc7Q==
+X-Forwarded-Encrypted: i=1; AJvYcCVLybkR6GNVRBNWQQkdRZBfc94R93zuRQKP5xPtzX6tFGCPgu0Po0dH/PaCdg4nXe/HJOw=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzRYJmJYDipGqXs7ku0DyrL6zfQcpqeYAkto1D3lRga25WcFSpe
+	2b+7qa0jDcoi2LMHDC0u2baVVTDT2dKEEIazNvgVOAaIeFYDrbdabuWqB2W/XAleucs/n2pMeXK
+	24ECGmeVGb13KVg==
+X-Google-Smtp-Source: AGHT+IH/DPeqBgyKHXxOCo4/E3KmZEcspJS7td8Arw5LBmg4kppGX/eQxm4ue9E3qb2QwOhVlQeaDs/189kaJw==
+X-Received: from pjnh3.prod.google.com ([2002:a17:90a:8303:b0:32e:c154:c2f6])
+ (user=jmattson job=prod-delivery.src-stubby-dispatcher) by
+ 2002:a17:902:ef10:b0:27e:eabd:4b41 with SMTP id d9443c01a7336-29027216505mr14903695ad.7.1759877067692;
+ Tue, 07 Oct 2025 15:44:27 -0700 (PDT)
+Date: Tue,  7 Oct 2025 15:44:00 -0700
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -71,165 +71,40 @@ List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
 X-Mailer: git-send-email 2.51.0.710.ga91ca5db03-goog
-Message-ID: <20251007223625.369939-1-seanjc@google.com>
-Subject: [PATCH] KVM: selftests: Rename "guest_paddr" variables to "gpa"
-From: Sean Christopherson <seanjc@google.com>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	Sean Christopherson <seanjc@google.com>
+Message-ID: <20251007224405.1914008-1-jmattson@google.com>
+Subject: [PATCH] KVM: SVM: Don't set GIF when clearing EFER.SVME
+From: Jim Mattson <jmattson@google.com>
+To: Yosry Ahmed <yosry.ahmed@linux.dev>, Sean Christopherson <seanjc@google.com>, 
+	Paolo Bonzini <pbonzini@redhat.com>, Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>, 
+	Borislav Petkov <bp@alien8.de>, Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org, 
+	"H. Peter Anvin" <hpa@zytor.com>, kvm@vger.kernel.org, linux-kernel@vger.kernel.org
+Cc: Jim Mattson <jmattson@google.com>
 Content-Type: text/plain; charset="UTF-8"
 
-Rename "guest_paddr" variables in vm_userspace_mem_region_add() and
-vm_mem_add() to KVM's de facto standard "gpa", both for consistency and
-to shorten line lengths.
+Clearing EFER.SVME is not architected to set GIF. Don't set GIF when
+emulating a change to EFER that clears EFER.SVME.
 
-Opportunistically fix the indentation of the
-vm_userspace_mem_region_add() declaration.
+This is covered in the discussion at
+https://lore.kernel.org/all/5b8787b8-16e9-13dc-7fca-0dc441d673f9@citrix.com/.
 
-Signed-off-by: Sean Christopherson <seanjc@google.com>
+Fixes: c513f484c558 ("KVM: nSVM: leave guest mode when clearing EFER.SVME")
+Signed-off-by: Jim Mattson <jmattson@google.com>
 ---
- .../testing/selftests/kvm/include/kvm_util.h  | 10 ++--
- tools/testing/selftests/kvm/lib/kvm_util.c    | 46 +++++++++----------
- 2 files changed, 26 insertions(+), 30 deletions(-)
+ arch/x86/kvm/svm/svm.c | 1 -
+ 1 file changed, 1 deletion(-)
 
-diff --git a/tools/testing/selftests/kvm/include/kvm_util.h b/tools/testing/selftests/kvm/include/kvm_util.h
-index 26cc30290e76..3aa7a286d4a0 100644
---- a/tools/testing/selftests/kvm/include/kvm_util.h
-+++ b/tools/testing/selftests/kvm/include/kvm_util.h
-@@ -675,12 +675,12 @@ int __vm_set_user_memory_region2(struct kvm_vm *vm, uint32_t slot, uint32_t flag
- 				 uint32_t guest_memfd, uint64_t guest_memfd_offset);
- 
- void vm_userspace_mem_region_add(struct kvm_vm *vm,
--	enum vm_mem_backing_src_type src_type,
--	uint64_t guest_paddr, uint32_t slot, uint64_t npages,
--	uint32_t flags);
-+				 enum vm_mem_backing_src_type src_type,
-+				 uint64_t gpa, uint32_t slot, uint64_t npages,
-+				 uint32_t flags);
- void vm_mem_add(struct kvm_vm *vm, enum vm_mem_backing_src_type src_type,
--		uint64_t guest_paddr, uint32_t slot, uint64_t npages,
--		uint32_t flags, int guest_memfd_fd, uint64_t guest_memfd_offset);
-+		uint64_t gpa, uint32_t slot, uint64_t npages, uint32_t flags,
-+		int guest_memfd_fd, uint64_t guest_memfd_offset);
- 
- #ifndef vm_arch_has_protected_memory
- static inline bool vm_arch_has_protected_memory(struct kvm_vm *vm)
-diff --git a/tools/testing/selftests/kvm/lib/kvm_util.c b/tools/testing/selftests/kvm/lib/kvm_util.c
-index 6743fbd9bd67..ce3230068482 100644
---- a/tools/testing/selftests/kvm/lib/kvm_util.c
-+++ b/tools/testing/selftests/kvm/lib/kvm_util.c
-@@ -963,8 +963,8 @@ void vm_set_user_memory_region2(struct kvm_vm *vm, uint32_t slot, uint32_t flags
- 
- /* FIXME: This thing needs to be ripped apart and rewritten. */
- void vm_mem_add(struct kvm_vm *vm, enum vm_mem_backing_src_type src_type,
--		uint64_t guest_paddr, uint32_t slot, uint64_t npages,
--		uint32_t flags, int guest_memfd, uint64_t guest_memfd_offset)
-+		uint64_t gpa, uint32_t slot, uint64_t npages, uint32_t flags,
-+		int guest_memfd, uint64_t guest_memfd_offset)
- {
- 	int ret;
- 	struct userspace_mem_region *region;
-@@ -978,30 +978,29 @@ void vm_mem_add(struct kvm_vm *vm, enum vm_mem_backing_src_type src_type,
- 		"Number of guest pages is not compatible with the host. "
- 		"Try npages=%d", vm_adjust_num_guest_pages(vm->mode, npages));
- 
--	TEST_ASSERT((guest_paddr % vm->page_size) == 0, "Guest physical "
-+	TEST_ASSERT((gpa % vm->page_size) == 0, "Guest physical "
- 		"address not on a page boundary.\n"
--		"  guest_paddr: 0x%lx vm->page_size: 0x%x",
--		guest_paddr, vm->page_size);
--	TEST_ASSERT((((guest_paddr >> vm->page_shift) + npages) - 1)
-+		"  gpa: 0x%lx vm->page_size: 0x%x",
-+		gpa, vm->page_size);
-+	TEST_ASSERT((((gpa >> vm->page_shift) + npages) - 1)
- 		<= vm->max_gfn, "Physical range beyond maximum "
- 		"supported physical address,\n"
--		"  guest_paddr: 0x%lx npages: 0x%lx\n"
-+		"  gpa: 0x%lx npages: 0x%lx\n"
- 		"  vm->max_gfn: 0x%lx vm->page_size: 0x%x",
--		guest_paddr, npages, vm->max_gfn, vm->page_size);
-+		gpa, npages, vm->max_gfn, vm->page_size);
- 
- 	/*
- 	 * Confirm a mem region with an overlapping address doesn't
- 	 * already exist.
- 	 */
- 	region = (struct userspace_mem_region *) userspace_mem_region_find(
--		vm, guest_paddr, (guest_paddr + npages * vm->page_size) - 1);
-+		vm, gpa, (gpa + npages * vm->page_size) - 1);
- 	if (region != NULL)
- 		TEST_FAIL("overlapping userspace_mem_region already "
- 			"exists\n"
--			"  requested guest_paddr: 0x%lx npages: 0x%lx "
--			"page_size: 0x%x\n"
--			"  existing guest_paddr: 0x%lx size: 0x%lx",
--			guest_paddr, npages, vm->page_size,
-+			"  requested gpa: 0x%lx npages: 0x%lx page_size: 0x%x\n"
-+			"  existing gpa: 0x%lx size: 0x%lx",
-+			gpa, npages, vm->page_size,
- 			(uint64_t) region->region.guest_phys_addr,
- 			(uint64_t) region->region.memory_size);
- 
-@@ -1015,8 +1014,7 @@ void vm_mem_add(struct kvm_vm *vm, enum vm_mem_backing_src_type src_type,
- 			"already exists.\n"
- 			"  requested slot: %u paddr: 0x%lx npages: 0x%lx\n"
- 			"  existing slot: %u paddr: 0x%lx size: 0x%lx",
--			slot, guest_paddr, npages,
--			region->region.slot,
-+			slot, gpa, npages, region->region.slot,
- 			(uint64_t) region->region.guest_phys_addr,
- 			(uint64_t) region->region.memory_size);
- 	}
-@@ -1042,7 +1040,7 @@ void vm_mem_add(struct kvm_vm *vm, enum vm_mem_backing_src_type src_type,
- 	if (src_type == VM_MEM_SRC_ANONYMOUS_THP)
- 		alignment = max(backing_src_pagesz, alignment);
- 
--	TEST_ASSERT_EQ(guest_paddr, align_up(guest_paddr, backing_src_pagesz));
-+	TEST_ASSERT_EQ(gpa, align_up(gpa, backing_src_pagesz));
- 
- 	/* Add enough memory to align up if necessary */
- 	if (alignment > 1)
-@@ -1106,20 +1104,18 @@ void vm_mem_add(struct kvm_vm *vm, enum vm_mem_backing_src_type src_type,
- 	region->unused_phy_pages = sparsebit_alloc();
- 	if (vm_arch_has_protected_memory(vm))
- 		region->protected_phy_pages = sparsebit_alloc();
--	sparsebit_set_num(region->unused_phy_pages,
--		guest_paddr >> vm->page_shift, npages);
-+	sparsebit_set_num(region->unused_phy_pages, gpa >> vm->page_shift, npages);
- 	region->region.slot = slot;
- 	region->region.flags = flags;
--	region->region.guest_phys_addr = guest_paddr;
-+	region->region.guest_phys_addr = gpa;
- 	region->region.memory_size = npages * vm->page_size;
- 	region->region.userspace_addr = (uintptr_t) region->host_mem;
- 	ret = __vm_ioctl(vm, KVM_SET_USER_MEMORY_REGION2, &region->region);
- 	TEST_ASSERT(ret == 0, "KVM_SET_USER_MEMORY_REGION2 IOCTL failed,\n"
- 		"  rc: %i errno: %i\n"
- 		"  slot: %u flags: 0x%x\n"
--		"  guest_phys_addr: 0x%lx size: 0x%lx guest_memfd: %d",
--		ret, errno, slot, flags,
--		guest_paddr, (uint64_t) region->region.memory_size,
-+		"  guest_phys_addr: 0x%lx size: 0x%llx guest_memfd: %d",
-+		ret, errno, slot, flags, gpa, region->region.memory_size,
- 		region->region.guest_memfd);
- 
- 	/* Add to quick lookup data structures */
-@@ -1143,10 +1139,10 @@ void vm_mem_add(struct kvm_vm *vm, enum vm_mem_backing_src_type src_type,
- 
- void vm_userspace_mem_region_add(struct kvm_vm *vm,
- 				 enum vm_mem_backing_src_type src_type,
--				 uint64_t guest_paddr, uint32_t slot,
--				 uint64_t npages, uint32_t flags)
-+				 uint64_t gpa, uint32_t slot, uint64_t npages,
-+				 uint32_t flags)
- {
--	vm_mem_add(vm, src_type, guest_paddr, slot, npages, flags, -1, 0);
-+	vm_mem_add(vm, src_type, gpa, slot, npages, flags, -1, 0);
- }
- 
- /*
-
-base-commit: 6b36119b94d0b2bb8cea9d512017efafd461d6ac
+diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
+index 3a9fe0a8b78c..5387851a96da 100644
+--- a/arch/x86/kvm/svm/svm.c
++++ b/arch/x86/kvm/svm/svm.c
+@@ -223,7 +223,6 @@ int svm_set_efer(struct kvm_vcpu *vcpu, u64 efer)
+ 	if ((old_efer & EFER_SVME) != (efer & EFER_SVME)) {
+ 		if (!(efer & EFER_SVME)) {
+ 			svm_leave_nested(vcpu);
+-			svm_set_gif(svm, true);
+ 			/* #GP intercept is still needed for vmware backdoor */
+ 			if (!enable_vmware_backdoor)
+ 				clr_exception_intercept(svm, GP_VECTOR);
 -- 
 2.51.0.710.ga91ca5db03-goog
 
