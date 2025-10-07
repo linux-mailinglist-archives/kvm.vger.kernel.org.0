@@ -1,204 +1,260 @@
-Return-Path: <kvm+bounces-59586-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-59587-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [213.196.21.55])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4DA7DBC21DA
-	for <lists+kvm@lfdr.de>; Tue, 07 Oct 2025 18:28:35 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id CFE76BC21E0
+	for <lists+kvm@lfdr.de>; Tue, 07 Oct 2025 18:31:35 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 2193F350395
-	for <lists+kvm@lfdr.de>; Tue,  7 Oct 2025 16:28:34 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4BEFF3E2BC1
+	for <lists+kvm@lfdr.de>; Tue,  7 Oct 2025 16:31:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 81D242E8B6F;
-	Tue,  7 Oct 2025 16:28:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5011521A420;
+	Tue,  7 Oct 2025 16:31:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="V6gLOwgn"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="TxZCZtrZ"
 X-Original-To: kvm@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pj1-f74.google.com (mail-pj1-f74.google.com [209.85.216.74])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 937CD11712;
-	Tue,  7 Oct 2025 16:28:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E24A21B0F1C
+	for <kvm@vger.kernel.org>; Tue,  7 Oct 2025 16:31:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.74
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1759854498; cv=none; b=GD9euknB66oGhmLML3ObvWsyU+qbu54ywZT3KY1YzyNUxIB+oxtXslWM+5Ee0Qe5nyzgP18KbJllJVHhWuMuhj6begse5jjcpBnekUTktwH/CY55+ZQC6tZa27zT8VKQ/+PY43VWhX6kAAF+SO1wEJ7vmTbTlQ4EcatXAdmUHyE=
+	t=1759854688; cv=none; b=lXX7+Irzjb4ZwP/28ZN+BiCKCOR3zivJvTwrDFZG0JsCExgRrtn1wLk9F0NCS2TVb8Gy3f6AYxSU+RHbo7hGf57iCrDHL8gGIcUX2IFBNSi1riGMAQloUiOUXTVOAvufUK/Mb07PbDVcmALKHpomXi/ECzoRJnGyHcvHX408Oos=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1759854498; c=relaxed/simple;
-	bh=xYeA5nn/abbj5ed3ef1cNUU82SoHc8qkl+HZ9ylyjw0=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=K9PgkzPY/ohSTyDwc1iScqabgDsP95NbA8LcR0dMoF3zuxqRgfaQtEnDim9DwiA9D303/rFUOB4HYV0k/tJMTD+GerzQO0ZYmZpZni4RaKYcAahQGfHV1ioK5Bc3p7VeFXQFtEnoi0ydRZ5Hvb4+oT2Ul6c10QaiDiYJB83SRnE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=V6gLOwgn; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 35AEBC4CEF7;
-	Tue,  7 Oct 2025 16:28:15 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1759854498;
-	bh=xYeA5nn/abbj5ed3ef1cNUU82SoHc8qkl+HZ9ylyjw0=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=V6gLOwgnvOxPmJz0LQMipMYO5vPDFV2CTcpBXKWlC2TaqSGT+mEm4K0D0NemSziR+
-	 a4L5Jd2D+bj64roEwzpceQowvn1wIf8vSepKeIwWp//LmKqlJarXByX8yBNEm0K9wT
-	 QB1ZUUIKRIHJE66kz3NZL3TUwuBF6yZcXvXc0fsz5fYo1vIIdIjgtL64vHPyF5V54T
-	 nk2QNw3WoblZcLttkdFD0oPGFd3IThCJcEgCoTjVRR3FAWogq8xYeFhE8tcpkXN4BS
-	 yapf08l++uGwkTeGLJagoTf86oBKBPUPxbfQKXJwnjS9kNhWRl1Lsnt2+URfaCWFtx
-	 Zth3UW0roW0uw==
-Date: Tue, 7 Oct 2025 17:28:12 +0100
-From: Mark Brown <broonie@kernel.org>
-To: Sascha Bischoff <Sascha.Bischoff@arm.com>
-Cc: "linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>,
-	"kvmarm@lists.linux.dev" <kvmarm@lists.linux.dev>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-	"kvm@vger.kernel.org" <kvm@vger.kernel.org>, nd <nd@arm.com>,
-	Mark Rutland <Mark.Rutland@arm.com>,
-	Catalin Marinas <Catalin.Marinas@arm.com>,
-	"maz@kernel.org" <maz@kernel.org>,
-	"oliver.upton@linux.dev" <oliver.upton@linux.dev>,
-	Joey Gouly <Joey.Gouly@arm.com>,
-	Suzuki Poulose <Suzuki.Poulose@arm.com>,
-	"yuzenghui@huawei.com" <yuzenghui@huawei.com>,
-	"will@kernel.org" <will@kernel.org>,
-	"lpieralisi@kernel.org" <lpieralisi@kernel.org>
-Subject: Re: [PATCH 1/3] arm64/sysreg: Support feature-specific fields with
- 'Feat' descriptor
-Message-ID: <26d69b0d-3529-454f-9385-99a914bf1ebc@sirena.org.uk>
-References: <20251007153505.1606208-1-sascha.bischoff@arm.com>
- <20251007153505.1606208-2-sascha.bischoff@arm.com>
+	s=arc-20240116; t=1759854688; c=relaxed/simple;
+	bh=zRn9l5M3+J57K4Nf/MSyE1kact60dzbaTi+YViUvQEI=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=EiOBt4apFlDCV3sR3kspSaF6IahqCVb7MSlQL8fuYwkuwxhGH6GUn+zLAFPvaSebCWhq2K8BaARG1hbiCZc8YUb5WDK844bx+FSfqgrKmb+0ExijJiZ6Gd1/Obg6azZtf4arQ8nl7JMMhGg8jnrVWLBHXB0qA3dB8kzqiNfrqGk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--ackerleytng.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=TxZCZtrZ; arc=none smtp.client-ip=209.85.216.74
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--ackerleytng.bounces.google.com
+Received: by mail-pj1-f74.google.com with SMTP id 98e67ed59e1d1-33274f8ff7cso9502645a91.0
+        for <kvm@vger.kernel.org>; Tue, 07 Oct 2025 09:31:26 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1759854686; x=1760459486; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=DUfQZGdB8vnQ3BrO/9eKlA0A4GR0IweUUWX2EFRalJA=;
+        b=TxZCZtrZmPIMiH2jB1H2EB6QFXa1nnepz0E0xDH7weZTfOjxJqcmIRvdsgegYZsEZi
+         Q+IOutPCqcY0HOvYEZCCeJBqGNA6kpxWsZ95rR8ifrH2vzKAdTahg746pQB4PrDFY6tC
+         C0bfLvPoHKtf+de7jieD7GwalecwdeyX6Ni5JULfy0CgiMvpj5LDDGYfB5xQeIjGTgkP
+         7tZEb0f+qjF5+Lo4odTen5N9rxGw8hvtERqcfoZojDEHvdEou3zHolqsb4U2iyy0wYkU
+         Kszs+CB4liWrZZ/ONXeDaaYvowHlxc6+0XYLGtcJIHJX0g0Qf/ns314SU7GMff1WmsFr
+         D80A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1759854686; x=1760459486;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=DUfQZGdB8vnQ3BrO/9eKlA0A4GR0IweUUWX2EFRalJA=;
+        b=XbfA6uu1gM5bYmDqWHfx49k+yctdiQGA2BuZriTlNKmEH/yNNx0d8lnLHVkyYTPBfY
+         7c0hDZoYHNPYjnA2tAua10Feyl3c8+GzsjDoyfchqyLO8LlslvI0Y7zvbcINyWDTVtH2
+         Sc3em8KtoHIy0BjTwHDSAbLac0bGgJvHJWtvPHtHCfiZNYIOmpmxAoqcRxPX0z9GGF/Z
+         LuuZBjchwxxsORq5nhFI7N69H1vYsHt6DVBe0OCbIKkXb+5WzzMQicDj2YdjOSefdM0Q
+         dAhtUyqzf/8tY37lfVFMIBnmpSHf4djeCU3erloUKE+18K1zvm8i86iFijLeMzb8lVp6
+         8aRw==
+X-Gm-Message-State: AOJu0YyPaxmwl/MtDAc/5vyJtOaudYr5cE9XH0fnn3uPHcH1jlrFlnZe
+	rYvakqcNmZXwhZKXe/bORgfpgNT/g64ZKwHvyp72DPJF/RK9eLmi+Z2/EH5YmZOdKQVN1ZeP+/B
+	XfvqnNEzCFRv2iAQTzVHJ7xYFnw==
+X-Google-Smtp-Source: AGHT+IFhqcZFcRMhW8qlWIS/kR93SNJpodMaSdwu3z7otH1Ts8WLKOWU6DlQ64PJlD/ZZmNPqHVeCV0AVk821S0veA==
+X-Received: from pjbdj15.prod.google.com ([2002:a17:90a:d2cf:b0:330:793a:2e77])
+ (user=ackerleytng job=prod-delivery.src-stubby-dispatcher) by
+ 2002:a17:90b:4a52:b0:332:84c1:31de with SMTP id 98e67ed59e1d1-33b513ced6emr119418a91.25.1759854686135;
+ Tue, 07 Oct 2025 09:31:26 -0700 (PDT)
+Date: Tue, 07 Oct 2025 09:31:24 -0700
+In-Reply-To: <20251003232606.4070510-4-seanjc@google.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="2tSGI2X8sep9nY9m"
-Content-Disposition: inline
-In-Reply-To: <20251007153505.1606208-2-sascha.bischoff@arm.com>
-X-Cookie: Teachers have class.
+Mime-Version: 1.0
+References: <20251003232606.4070510-1-seanjc@google.com> <20251003232606.4070510-4-seanjc@google.com>
+Message-ID: <diqzbjmiekrn.fsf@google.com>
+Subject: Re: [PATCH v2 03/13] KVM: guest_memfd: Invalidate SHARED GPAs if gmem
+ supports INIT_SHARED
+From: Ackerley Tng <ackerleytng@google.com>
+To: Sean Christopherson <seanjc@google.com>, Paolo Bonzini <pbonzini@redhat.com>, 
+	Christian Borntraeger <borntraeger@linux.ibm.com>, Janosch Frank <frankja@linux.ibm.com>, 
+	Claudio Imbrenda <imbrenda@linux.ibm.com>
+Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	David Hildenbrand <david@redhat.com>, Fuad Tabba <tabba@google.com>
+Content-Type: text/plain; charset="UTF-8"
 
+Sean Christopherson <seanjc@google.com> writes:
 
---2tSGI2X8sep9nY9m
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+> When invalidating gmem ranges, e.g. in response to PUNCH_HOLE, process all
+> possible range types (PRIVATE vs. SHARED) for the gmem instance.  Since
+> since guest_memfd doesn't yet support in-place conversions, simply pivot
+> on INIT_SHARED as a gmem instance can currently only have private or shared
+> memory, not both.
+>
+> Failure to mark shared GPAs for invalidation is benign in the current code
+> base, as only x86's TDX consumes KVM_FILTER_{PRIVATE,SHARED}, and TDX
+> doesn't yet support INIT_SHARED with guest_memfd.
 
-On Tue, Oct 07, 2025 at 03:35:14PM +0000, Sascha Bischoff wrote:
+This is the correct fix, and I agree it is not a problem in current code
+since before this patch series and the introduction of INIT_SHARED,
+mmap() was only supported by non-CoCo, which doesn't interpret
+KVM_FILTER_{PRIVATE,SHARED} anyway.
 
-> Some system register field encodings change based on the available and
-> in-use architecture features. In order to support these different
-> field encodings, introduce the Feat descriptor (Feat, ElseFeat,
-> EndFeat) for describing such sysregs.
+Had something similar/related here [1]
 
-We have other system registers which change layouts based on things
-other than features, ESR_ELx is probably the most entertaining of these
-but there's others like PAR_EL1.  Ideally we should probably do the
-logic for generating the conditionals in a manner that's not tied to
-features with a layer on top that generates standard naming for common
-patterns like FEAT, but OTOH part of why that's not been done because
-it's got a bunch of nasty issues so perhaps just doing the simpler case
-is fine.
+[1] https://lore.kernel.org/all/d3832fd95a03aad562705872cbda5b3d248ca321.1747264138.git.ackerleytng@google.com/
 
-> The Feat descriptor can be used in the following way (Feat acts as
-> both an if and an else-if):
+Reviewed-by: Ackerley Tng <ackerleytng@google.com>
 
->         Sysreg  EXAMPLE 0    1    2    3    4
->         Feat    FEAT_A
->         Field   63:0    Foo
->         Feat    FEAT_B
-
-This assumes that there will never be nesting of these conditions in the
-architecture.  I'm not sure I would want to assume that, even for plain
-features though I can't think of any examples where it's an issue.
-There are more serious issues with the implementation for practical
-patterns with nesting (see below) which mean we might not want to deal
-with that now but we should define the syntax for the file in a way that
-will cope so I'd prefer not to have the implicit elses.
-
-I'd also be inclined to say that something that's specificly for
-features shouldn't repeat the FEAT_ so:
-
-          Feat    A
-
-instead, but that's purely a taste question.
-
-> -	define("REG_" reg, "S" op0 "_" op1 "_C" crn "_C" crm "_" op2)
-> -	define("SYS_" reg, "sys_reg(" op0 ", " op1 ", " crn ", " crm ", " op2 "=
-)")
-> +	feat =3D null
+> However, invalidating
+> only private GPAs is conceptually wrong and a lurking bug, e.g. could
+> result in missed invalidations if ARM starts filtering invalidations based
+> on attributes.
+>
+> Fixes: 3d3a04fad25a ("KVM: Allow and advertise support for host mmap() on guest_memfd files")
+> Signed-off-by: Sean Christopherson <seanjc@google.com>
+> ---
+>  virt/kvm/guest_memfd.c | 64 +++++++++++++++++++++++++++++-------------
+>  1 file changed, 44 insertions(+), 20 deletions(-)
+>
+> diff --git a/virt/kvm/guest_memfd.c b/virt/kvm/guest_memfd.c
+> index cf3afba23a6b..e10d2c71e78c 100644
+> --- a/virt/kvm/guest_memfd.c
+> +++ b/virt/kvm/guest_memfd.c
+> @@ -102,8 +102,17 @@ static struct folio *kvm_gmem_get_folio(struct inode *inode, pgoff_t index)
+>  	return filemap_grab_folio(inode->i_mapping, index);
+>  }
+>  
+> -static void kvm_gmem_invalidate_begin(struct kvm_gmem *gmem, pgoff_t start,
+> -				      pgoff_t end)
+> +static enum kvm_gfn_range_filter kvm_gmem_get_invalidate_filter(struct inode *inode)
+> +{
+> +	if ((u64)inode->i_private & GUEST_MEMFD_FLAG_INIT_SHARED)
+> +		return KVM_FILTER_SHARED;
 > +
-> +	define(feat, "REG_" reg, "S" op0 "_" op1 "_C" crn "_C" crm "_" op2)
-> +	define(feat, "SYS_" reg, "sys_reg(" op0 ", " op1 ", " crn ", " crm ", "=
- op2 ")")
-> =20
-> -	define("SYS_" reg "_Op0", op0)
-> -	define("SYS_" reg "_Op1", op1)
-> -	define("SYS_" reg "_CRn", crn)
-> -	define("SYS_" reg "_CRm", crm)
-> -	define("SYS_" reg "_Op2", op2)
-> +	define(feat, "SYS_" reg "_Op0", op0)
-> +	define(feat, "SYS_" reg "_Op1", op1)
-> +	define(feat, "SYS_" reg "_CRn", crn)
-> +	define(feat, "SYS_" reg "_CRm", crm)
-> +	define(feat, "SYS_" reg "_Op2", op2)
-
-Possibly it's worth having a reg_define() or something given the number
-of things needing updating here?
-
-> @@ -201,6 +205,7 @@ $1 =3D=3D "EndSysreg" && block_current() =3D=3D "Sysr=
-eg" {
->  	res0 =3D null
->  	res1 =3D null
->  	unkn =3D null
-> +	feat =3D null
-> =20
->  	block_pop()
->  	next
-
-Probably worth complaining if we end a sysreg with a feature/prefix
-defined.
-
-> +$1 =3D=3D "Feat" && (block_current() =3D=3D "Sysreg" || block_current() =
-=3D=3D "SysregFields" || block_current() =3D=3D "Feat") {
-
-=2E..
-
-> +	next_bit =3D 63
+> +	return KVM_FILTER_PRIVATE;
+> +}
 > +
-> +	res0 =3D "UL(0)"
-> +	res1 =3D "UL(0)"
-> +	unkn =3D "UL(0)"
-
-This is only going to work if the whole register is in a FEAT_ block, so
-you coudn't have:
-
-        Sysreg  EXAMPLE 0    1    2    3    4
-	Res0	63
-        Feat    FEAT_A
-        Field   62:1    Foo
-        Feat    FEAT_B
-        Field   62:32    Foo
-        Field   31:1     Bar
-	EndFeat
-	Res0	0
-	EndSysreg
-
-but then supporting partial registers does have entertaining
-consequences for handling Res0 and Res1.  If we're OK with that
-restriction then the program should complain if someone tries to=20
-define a smaller FEAT block.
-
---2tSGI2X8sep9nY9m
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAABCgAdFiEEreZoqmdXGLWf4p/qJNaLcl1Uh9AFAmjlP5sACgkQJNaLcl1U
-h9AY1Qf/csPwwhVqEVz16SFCiD4J+Z7duRX2w5NTCWs3V6z30u19pzao0zemleKD
-l0UdPz/T/LaiHj6hEdZqwuni6i84rlzgmbPfJ6XPXAfjmg7p4FeKBavOLU3Ablhz
-yiTGGyi4INGrTu4znpmuHVT1Vx2RIeaCWPpjkTcGdJ7aHWIErjKNPzpdJTl6cz7n
-f6ChusvOhN5nCKgD93MX5imL2oe+xULMuCBEhJ9EdjsWHCndFmIl/hoLv1gFJ0yJ
-ppwnKqdEiszW8Gx6VUhiCILY5lkuVl0yOwM7tsol+sGEv44msyJJouplCqw1JoYt
-7Rb48t0H3ra9N3XS6TOh7UQOYBKkDw==
-=QE7l
------END PGP SIGNATURE-----
-
---2tSGI2X8sep9nY9m--
+> +static void __kvm_gmem_invalidate_begin(struct kvm_gmem *gmem, pgoff_t start,
+> +					pgoff_t end,
+> +					enum kvm_gfn_range_filter attr_filter)
+>  {
+>  	bool flush = false, found_memslot = false;
+>  	struct kvm_memory_slot *slot;
+> @@ -118,8 +127,7 @@ static void kvm_gmem_invalidate_begin(struct kvm_gmem *gmem, pgoff_t start,
+>  			.end = slot->base_gfn + min(pgoff + slot->npages, end) - pgoff,
+>  			.slot = slot,
+>  			.may_block = true,
+> -			/* guest memfd is relevant to only private mappings. */
+> -			.attr_filter = KVM_FILTER_PRIVATE,
+> +			.attr_filter = attr_filter,
+>  		};
+>  
+>  		if (!found_memslot) {
+> @@ -139,8 +147,21 @@ static void kvm_gmem_invalidate_begin(struct kvm_gmem *gmem, pgoff_t start,
+>  		KVM_MMU_UNLOCK(kvm);
+>  }
+>  
+> -static void kvm_gmem_invalidate_end(struct kvm_gmem *gmem, pgoff_t start,
+> -				    pgoff_t end)
+> +static void kvm_gmem_invalidate_begin(struct inode *inode, pgoff_t start,
+> +				      pgoff_t end)
+> +{
+> +	struct list_head *gmem_list = &inode->i_mapping->i_private_list;
+> +	enum kvm_gfn_range_filter attr_filter;
+> +	struct kvm_gmem *gmem;
+> +
+> +	attr_filter = kvm_gmem_get_invalidate_filter(inode);
+> +
+> +	list_for_each_entry(gmem, gmem_list, entry)
+> +		__kvm_gmem_invalidate_begin(gmem, start, end, attr_filter);
+> +}
+> +
+> +static void __kvm_gmem_invalidate_end(struct kvm_gmem *gmem, pgoff_t start,
+> +				      pgoff_t end)
+>  {
+>  	struct kvm *kvm = gmem->kvm;
+>  
+> @@ -151,12 +172,20 @@ static void kvm_gmem_invalidate_end(struct kvm_gmem *gmem, pgoff_t start,
+>  	}
+>  }
+>  
+> +static void kvm_gmem_invalidate_end(struct inode *inode, pgoff_t start,
+> +				    pgoff_t end)
+> +{
+> +	struct list_head *gmem_list = &inode->i_mapping->i_private_list;
+> +	struct kvm_gmem *gmem;
+> +
+> +	list_for_each_entry(gmem, gmem_list, entry)
+> +		__kvm_gmem_invalidate_end(gmem, start, end);
+> +}
+> +
+>  static long kvm_gmem_punch_hole(struct inode *inode, loff_t offset, loff_t len)
+>  {
+> -	struct list_head *gmem_list = &inode->i_mapping->i_private_list;
+>  	pgoff_t start = offset >> PAGE_SHIFT;
+>  	pgoff_t end = (offset + len) >> PAGE_SHIFT;
+> -	struct kvm_gmem *gmem;
+>  
+>  	/*
+>  	 * Bindings must be stable across invalidation to ensure the start+end
+> @@ -164,13 +193,11 @@ static long kvm_gmem_punch_hole(struct inode *inode, loff_t offset, loff_t len)
+>  	 */
+>  	filemap_invalidate_lock(inode->i_mapping);
+>  
+> -	list_for_each_entry(gmem, gmem_list, entry)
+> -		kvm_gmem_invalidate_begin(gmem, start, end);
+> +	kvm_gmem_invalidate_begin(inode, start, end);
+>  
+>  	truncate_inode_pages_range(inode->i_mapping, offset, offset + len - 1);
+>  
+> -	list_for_each_entry(gmem, gmem_list, entry)
+> -		kvm_gmem_invalidate_end(gmem, start, end);
+> +	kvm_gmem_invalidate_end(inode, start, end);
+>  
+>  	filemap_invalidate_unlock(inode->i_mapping);
+>  
+> @@ -280,8 +307,9 @@ static int kvm_gmem_release(struct inode *inode, struct file *file)
+>  	 * Zap all SPTEs pointed at by this file.  Do not free the backing
+>  	 * memory, as its lifetime is associated with the inode, not the file.
+>  	 */
+> -	kvm_gmem_invalidate_begin(gmem, 0, -1ul);
+> -	kvm_gmem_invalidate_end(gmem, 0, -1ul);
+> +	__kvm_gmem_invalidate_begin(gmem, 0, -1ul,
+> +				    kvm_gmem_get_invalidate_filter(inode));
+> +	__kvm_gmem_invalidate_end(gmem, 0, -1ul);
+>  
+>  	list_del(&gmem->entry);
+>  
+> @@ -403,8 +431,6 @@ static int kvm_gmem_migrate_folio(struct address_space *mapping,
+>  
+>  static int kvm_gmem_error_folio(struct address_space *mapping, struct folio *folio)
+>  {
+> -	struct list_head *gmem_list = &mapping->i_private_list;
+> -	struct kvm_gmem *gmem;
+>  	pgoff_t start, end;
+>  
+>  	filemap_invalidate_lock_shared(mapping);
+> @@ -412,8 +438,7 @@ static int kvm_gmem_error_folio(struct address_space *mapping, struct folio *fol
+>  	start = folio->index;
+>  	end = start + folio_nr_pages(folio);
+>  
+> -	list_for_each_entry(gmem, gmem_list, entry)
+> -		kvm_gmem_invalidate_begin(gmem, start, end);
+> +	kvm_gmem_invalidate_begin(mapping->host, start, end);
+>  
+>  	/*
+>  	 * Do not truncate the range, what action is taken in response to the
+> @@ -424,8 +449,7 @@ static int kvm_gmem_error_folio(struct address_space *mapping, struct folio *fol
+>  	 * error to userspace.
+>  	 */
+>  
+> -	list_for_each_entry(gmem, gmem_list, entry)
+> -		kvm_gmem_invalidate_end(gmem, start, end);
+> +	kvm_gmem_invalidate_end(mapping->host, start, end);
+>  
+>  	filemap_invalidate_unlock_shared(mapping);
+>  
+> -- 
+> 2.51.0.618.g983fd99d29-goog
 
