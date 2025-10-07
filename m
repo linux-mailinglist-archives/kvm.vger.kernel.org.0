@@ -1,120 +1,123 @@
-Return-Path: <kvm+bounces-59592-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-59593-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 59EDABC2525
-	for <lists+kvm@lfdr.de>; Tue, 07 Oct 2025 20:07:01 +0200 (CEST)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
+	by mail.lfdr.de (Postfix) with ESMTPS id E4493BC27A5
+	for <lists+kvm@lfdr.de>; Tue, 07 Oct 2025 21:12:53 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 13A013C4741
-	for <lists+kvm@lfdr.de>; Tue,  7 Oct 2025 18:07:00 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id C80D44EC026
+	for <lists+kvm@lfdr.de>; Tue,  7 Oct 2025 19:12:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BA6C22571BD;
-	Tue,  7 Oct 2025 18:06:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 65A5C22AE7F;
+	Tue,  7 Oct 2025 19:12:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="4WjB5Zx3"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="Xd3cM1sU"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pf1-f201.google.com (mail-pf1-f201.google.com [209.85.210.201])
+Received: from mail-wm1-f74.google.com (mail-wm1-f74.google.com [209.85.128.74])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 504F221255B
-	for <kvm@vger.kernel.org>; Tue,  7 Oct 2025 18:06:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BD1EB220F29
+	for <kvm@vger.kernel.org>; Tue,  7 Oct 2025 19:12:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.74
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1759860407; cv=none; b=ib4Z7ZzcnPFfd/U0P6/b0cap3Ic5YRapqUawlZMtc6yoX+O2NDmrchSvQ6rFuE4kICQxb7nqXE2CDbbdZ6BVhAgUN2HttmsXBhBs6XFv3PLUuDzff7tNywjEDQaMySIoF/+lC1UTO9J4ZUe/nEC6NC5dp/Pvby2yiDaEmHkqEzM=
+	t=1759864360; cv=none; b=MjwJudEkTUEQCjN8OPXs+su6pW3k+os6nEkHl2vPYExbBQmA5VU5H6PzXtLd9W4Rya+ZpPuAsV+NSyKTv/8sHcSLup84una9gkbOy5nkJQisWcus8a8jbMuUeENkr3I1nY2Zrf+I2DypI1oaYylCaA3UrkVzAHydctTyqQiukrk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1759860407; c=relaxed/simple;
-	bh=q6J61bs7L3ujukcqpOfn3PO8VFKDKO+odJmf7OZwqE8=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=DGE4dtzonfPrzwpHL8IznacnMTISs0sef+d8Zltyz2RTQkDXluGflUaO+6bomsBitmfEe5SypSkGA0QdealV5oGkCnxk5uUaRV9w5GrRfVjg9zD0pd+sJXf93AuJ70ezf3cd722JAPfoDyV8yMdOoJL9GFozrzatSpM1dESLFwQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--wyihan.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=4WjB5Zx3; arc=none smtp.client-ip=209.85.210.201
+	s=arc-20240116; t=1759864360; c=relaxed/simple;
+	bh=1zq+wnX1vqfhxHgRG9451gSG2RiJStNjkn4b+44kVWs=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=IT/HIlglIxKWG9iRF87N2/z8InSy+l2ZCJjvXW25GXnOo7nOFtUtCC5NLURFb3NshREmBY6LumzzYnFdKz2cFgTfADxStRA9QzWrzaUUs3wE+x/uv+ItnIiU9PPHUB0bJ2H3WLDnkmJIX73+uxPqtimBrwbHRBjvnHqeRnbzHaI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--jackmanb.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=Xd3cM1sU; arc=none smtp.client-ip=209.85.128.74
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--wyihan.bounces.google.com
-Received: by mail-pf1-f201.google.com with SMTP id d2e1a72fcca58-7821487d16bso11706996b3a.1
-        for <kvm@vger.kernel.org>; Tue, 07 Oct 2025 11:06:45 -0700 (PDT)
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--jackmanb.bounces.google.com
+Received: by mail-wm1-f74.google.com with SMTP id 5b1f17b1804b1-46e3dcb36a1so39811455e9.2
+        for <kvm@vger.kernel.org>; Tue, 07 Oct 2025 12:12:37 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1759860404; x=1760465204; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=Jy9uoa9n7CiOeOtHRkWJVJ718GS54wk/TvFhgvjRAGk=;
-        b=4WjB5Zx3PWSn2EIrhSL5yvD4QblGhEl3eUBlngvYpz8eOaY/SU1SNEIN1hw5bUrlmQ
-         rNqjnHz5YhQm0mZpXIZmTp3Av3Zb5Rfygjt4aQqCsgLz/QYNLuCVkwRyxD6CDcIuL+Yc
-         2iEN0BauroDWgcUe0ScyEFVwaTyDgvoqa3XTsDsmG3/2WYkxAhpb3vpG77sru8uQBwb1
-         c+avHlkhaON8oQ3JhJROrKeUzeWnYsC/qCze5wSguIjQofTze2TYZXzvOVsBqve1VBx8
-         KE/+8UGQ9f1k3zEvYaoNbTQa1JWMbkoGtnU8BzxkmNv8THAMsQ1pFNoud1PX3wvDIgQS
-         q06w==
+        d=google.com; s=20230601; t=1759864356; x=1760469156; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=xvaIFYn8xxn1Zh95yE3a4kb+EhT+TJRLQn+JPUMtZMI=;
+        b=Xd3cM1sUDRdMe/hcpWwKJOjdwiam0WZf53hvhu1twpYFP2Es7JPhNB6CJ/gbrymL1O
+         X4I+WecHOmNz37dKHwYlyzi52nXJpUviymGuzkhUQ12WPrv6hczXnEbjFeHzaG7jTJbT
+         5tPLd41WJC4rYdxgMiPet/lhVXDClNj2fezr8GzuUx1HKyH7z1XjQ0LDOV59z6TpyFW2
+         xcQKbGFmAk2yoG4c20eEYORNXxWpZ1E1xGDxNyUbOyANGP/HA98JnN/39lMtR7ZvD7+C
+         RkxI8Jl2yAW4RBm3NCO5QiVxwPN/I334RD7nQFlCOEg7ASlbg75ffJRPfLnMPFuzt5G0
+         MXcw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1759860404; x=1760465204;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=Jy9uoa9n7CiOeOtHRkWJVJ718GS54wk/TvFhgvjRAGk=;
-        b=fNd7EZtZ4Bn0a/myVJu6BvQM/Ukjo5XNvWtqwVG2DxRVvhAg/ZUsDcDa12X0grbrsF
-         J5AeDTZhmnbKCwS4lIJBYJZrGEHQUyEfi0jPKhqM6jGKGzf/f1ZdfmbXmKwM/XaGs9oo
-         jK4IeOAvuBBPGkqUVtJpGpZ1BBKwiGL1CKr6ewtjds1i4TyBCvBvJdvtk5YzfEa60nM3
-         5MasT4i0AXKwO0uYsl3dPGmJj7BLz6uEBLrTNA0wh4kNVcza7fdyREeknmIqzjpUP7Id
-         NZ3R+qCDVW5v5rRRcpS1v/tOp7W4eKObECLwCozfXG1m9MY+c4ooYNM3pjE3xM2WIM0O
-         xg0g==
-X-Forwarded-Encrypted: i=1; AJvYcCVa2xub8YFWehMmPhoZ0gHOf7+LJ4KOWDq0/eBpDSsuAVIgr14KZTmrodwiVRETiPuWmJg=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyZM8w4bzHj8U+/cEgC50TYg3ecFE8KFyIXr3PMyqilG4Taces/
-	4GSSMyZjrFC8PRkRiCVczKtSZePT2hPL2y53T2ISj+EESaI6B8IT5yaJ5gz+YaBXg4EVd2d3Htl
-	6FN/6uQ==
-X-Google-Smtp-Source: AGHT+IFM0FyD52n4COlTUfeE1w0IfmK3uQQePrMvE9YP1sa7uKjBgBKdHuInhyl0TsFz1oW0BpvBogVlPbg=
-X-Received: from pfms2.prod.google.com ([2002:aa7:8282:0:b0:781:1d87:4584])
- (user=wyihan job=prod-delivery.src-stubby-dispatcher) by 2002:a05:6a00:891:b0:77e:cac4:446e
- with SMTP id d2e1a72fcca58-79387e0539cmr513966b3a.31.1759860404519; Tue, 07
- Oct 2025 11:06:44 -0700 (PDT)
-Date: Tue,  7 Oct 2025 18:06:06 +0000
-In-Reply-To: <20251003232606.4070510-14-seanjc@google.com>
+        d=1e100.net; s=20230601; t=1759864356; x=1760469156;
+        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=xvaIFYn8xxn1Zh95yE3a4kb+EhT+TJRLQn+JPUMtZMI=;
+        b=VZCOjATmMHj5W+i6NvdX2m50Tg0pfUGPqWw5DMbpkawulX0JWXIGon7D8uSeIlY1FZ
+         s6yPMs83Zb8ANUeVQpwD6sQ1SZslhSdx+bIpTetJwT+Ij9l/SIPaRSJDlXaxqQQsEfA1
+         goVbGNeTFCbfcGm+cMVevDsHFIlKnxSo/WRRoi7lIPXklgLJsqUeFfTV4UQokhD8BP1/
+         CHWyMpU3aBOlwvYID1EZCuNx7n989TSOYZd1uo/iXXxZ8AL4epNU/4HeZwdzHFcK+JLF
+         wwr1LAaEKsQlIy653+xNLhZwPV4H7KAQ90jmZosS9rMJahkj8FeILyfb0jxUjKKbRtSX
+         UOsQ==
+X-Gm-Message-State: AOJu0YycT2zGWTDAdEa3CHKaaDyKgIRHelDtNGQBD9YAQ8nFqGouin8B
+	arBRC1IRpzmgFJG32Tuq2aYMMI2gb9YAQfQzIXqmPb6xSsoxdh7q2Eyze+cpCA0Gsbgx5oCCCx6
+	lIS+ezTBC0mhspw==
+X-Google-Smtp-Source: AGHT+IF8cPzfTUCADjWMgjnDGXv9bUSJvQjzkSR8TvbNkHcOTb21Htn49hpM3qx+nFkCimdVq0HJmb49CeMBYA==
+X-Received: from wmcm4.prod.google.com ([2002:a7b:ce04:0:b0:45d:cfa4:ce19])
+ (user=jackmanb job=prod-delivery.src-stubby-dispatcher) by
+ 2002:a05:600c:3e8d:b0:46e:6d5f:f68 with SMTP id 5b1f17b1804b1-46fa9aa1d13mr5841565e9.12.1759864356219;
+ Tue, 07 Oct 2025 12:12:36 -0700 (PDT)
+Date: Tue, 07 Oct 2025 19:12:31 +0000
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
-References: <20251003232606.4070510-14-seanjc@google.com>
-X-Mailer: git-send-email 2.51.0.710.ga91ca5db03-goog
-Message-ID: <20251007180606.940219-1-wyihan@google.com>
-Subject: Re: [PATCH v2 13/13] KVM: selftests: Verify that reads to
- inaccessible guest_memfd VMAs SIGBUS
-From: Lisa Wang <wyihan@google.com>
-To: seanjc@google.com
-Cc: ackerleytng@google.com, borntraeger@linux.ibm.com, david@redhat.com, 
-	frankja@linux.ibm.com, imbrenda@linux.ibm.com, kvm@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, pbonzini@redhat.com, tabba@google.com, 
-	Lisa Wang <wyihan@google.com>
-Content-Type: text/plain; charset="UTF-8"
+X-B4-Tracking: v=1; b=H4sIAB5m5WgC/x3MwQqDMAwA0F+RnA00Ou3Yr8gO2mUapCpJJ4L47
+ 5Yd3+WdYKzCBq/iBOVdTNYlg8oCwtQvI6N8sqFyVUPOeRweOO8RY/yhJWWzxJaQNl0DckuND1T 7p+8hD5vyV47/3r2v6wbvcihFbQAAAA==
+X-Change-Id: 20251007-b4-kvm-mmu-stresstest-1proc-e6157c13787a
+X-Mailer: b4 0.14.2
+Message-ID: <20251007-b4-kvm-mmu-stresstest-1proc-v1-1-8c95aa0e30b6@google.com>
+Subject: [PATCH] KVM: selftests: Don't fall over when only one CPU
+From: Brendan Jackman <jackmanb@google.com>
+To: Paolo Bonzini <pbonzini@redhat.com>, Sean Christopherson <seanjc@google.com>, 
+	Shuah Khan <shuah@kernel.org>
+Cc: kvm@vger.kernel.org, linux-kselftest@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, Brendan Jackman <jackmanb@google.com>
+Content-Type: text/plain; charset="utf-8"
 
-Sean Christopherson <seanjc@google.com> writes:
+Running this test on a system with only one CPU is not a recipe for
+success. However, there's no clear-cut reason why it absolutely
+shouldn't work, so the test shouldn't completely reject such a platform.
 
-> Expand the guest_memfd negative testcases for overflow and MAP_PRIVATE to
-> verify that reads to inaccessible memory also get a SIGBUS.
->
-> Opportunistically fix the write path to use the "val" instead of hardcoding
-> the literal value a second time, and to use TEST_FAIL(...) instead of
-> TEST_ASSERT(false, ...).
->
+At present, the *3/4 calculation will return zero on these platforms and
+the test fails. So, instead just skip that calculation.
 
-Reviewed-by: Lisa Wang <wyihan@google.com>
-Tested-by: Lisa Wang <wyihan@google.com>
+Suggested-by: Sean Christopherson <seanjc@google.com>
+Signed-off-by: Brendan Jackman <jackmanb@google.com>
+---
+ tools/testing/selftests/kvm/mmu_stress_test.c | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
 
-> Signed-off-by: Sean Christopherson <seanjc@google.com>
-> ---
->  tools/testing/selftests/kvm/guest_memfd_test.c | 1 +
->  1 file changed, 1 insertion(+)
->
-> diff --git a/tools/testing/selftests/kvm/guest_memfd_test.c b/tools/testing/selftests/kvm/guest_memfd_test.c
-> index f5372fdf096d..e7d9aeb418d3 100644
-> --- a/tools/testing/selftests/kvm/guest_memfd_test.c
-> +++ b/tools/testing/selftests/kvm/guest_memfd_test.c
-> @@ -84,6 +84,7 @@ static void test_fault_sigbus(int fd, size_t accessible_size, size_t map_size)
->  	mem = kvm_mmap(map_size, PROT_READ | PROT_WRITE, MAP_SHARED, fd);
->  
->  	TEST_EXPECT_SIGBUS(memset(mem, val, map_size));
-> +	TEST_EXPECT_SIGBUS((void)READ_ONCE(mem[accessible_size]));
->  
->  	for (i = 0; i < accessible_size; i++)
->  		TEST_ASSERT_EQ(READ_ONCE(mem[i]), val);
-> -- 
-> 2.51.0.618.g983fd99d29-goog
+diff --git a/tools/testing/selftests/kvm/mmu_stress_test.c b/tools/testing/selftests/kvm/mmu_stress_test.c
+index 6a437d2be9fa444b34c2a73308a9d1c7ff3cc4f5..b5bd6fbad32a9ad5247a52ecf811b29293763e2e 100644
+--- a/tools/testing/selftests/kvm/mmu_stress_test.c
++++ b/tools/testing/selftests/kvm/mmu_stress_test.c
+@@ -263,8 +263,10 @@ static void calc_default_nr_vcpus(void)
+ 	TEST_ASSERT(!r, "sched_getaffinity failed, errno = %d (%s)",
+ 		    errno, strerror(errno));
+ 
+-	nr_vcpus = CPU_COUNT(&possible_mask) * 3/4;
++	nr_vcpus = CPU_COUNT(&possible_mask);
+ 	TEST_ASSERT(nr_vcpus > 0, "Uh, no CPUs?");
++	if (nr_vcpus >= 2)
++		nr_vcpus = nr_vcpus * 3/4;
+ }
+ 
+ int main(int argc, char *argv[])
+
+---
+base-commit: 6b36119b94d0b2bb8cea9d512017efafd461d6ac
+change-id: 20251007-b4-kvm-mmu-stresstest-1proc-e6157c13787a
+
+Best regards,
+-- 
+Brendan Jackman <jackmanb@google.com>
+
 
