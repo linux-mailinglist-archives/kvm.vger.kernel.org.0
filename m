@@ -1,61 +1,61 @@
-Return-Path: <kvm+bounces-59636-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-59637-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6CEF1BC48C6
-	for <lists+kvm@lfdr.de>; Wed, 08 Oct 2025 13:25:57 +0200 (CEST)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3FEF5BC48CC
+	for <lists+kvm@lfdr.de>; Wed, 08 Oct 2025 13:26:03 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 0F1FE4F1B6E
-	for <lists+kvm@lfdr.de>; Wed,  8 Oct 2025 11:25:45 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 006254F07BA
+	for <lists+kvm@lfdr.de>; Wed,  8 Oct 2025 11:25:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 283002F6191;
-	Wed,  8 Oct 2025 11:25:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2979B2F618B;
+	Wed,  8 Oct 2025 11:25:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="uvkPfaSQ"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Av2DtcjJ"
 X-Original-To: kvm@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 47B382EC55B
-	for <kvm@vger.kernel.org>; Wed,  8 Oct 2025 11:25:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4F03021767A
+	for <kvm@vger.kernel.org>; Wed,  8 Oct 2025 11:25:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1759922742; cv=none; b=KrO+Z+zGZwSTP/4v6LQ/xsKHGjmX4J4G+VES+R6mCTca8xgtjhRLmXgz729pR1vsW2DXwgvpPQnHevJL5LCIYRwZLA1FH3lTJG+E7/59gRk9yojkmGz7CPoZZBFXP3criEUzW+t0SA/J4/dte+Z6HsjXjODC+HcmHTQgGsV8rGc=
+	t=1759922751; cv=none; b=pTiU+8MkCK6Wg0AhrkBPuu/lt5LjdI1dJfgP/LhQvFLxMlox+dEP0fWLc1bD8JJWVUyPah77La3BH30SikJ4WBIhJfJTdgWZc5D/KdyZzc3owa0cIuhC+v3IVk0pB+fzwRHwGuYivAX12oApMQhaUlyqvMF9B+EldDZtR6qPcek=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1759922742; c=relaxed/simple;
-	bh=0QNN3tIVq8T2c5IFDVGhEWEWYxZIkYUzOSVKY3KuacU=;
+	s=arc-20240116; t=1759922751; c=relaxed/simple;
+	bh=aFEhoYDAhCVC6PyY8ZrlUZht3yUsY0wyaIhThtFLA4w=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=tfd7ALr1+M9/HerTf9YAolzwV0HdReLvVgxdGFx5iYFzlPshb8AkBFR7PZWyvuarNdzCTKDadXOHRIdKw9Z3Qq8fEVLgsiuMJCLD85nKogcQWidQ87mfMttxezlWRo0hjKposDOUFuAAvMCwf1HtiXjy2WMvpnP8PRrpDQtKtL4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=uvkPfaSQ; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A5090C4CEF4;
-	Wed,  8 Oct 2025 11:25:41 +0000 (UTC)
+	 Content-Type:Content-Disposition:In-Reply-To; b=FSynmQy/VsI72LlSgDa8ypxZMdGMgXV7+9nkP27XV6GLwAjujaNHzPvUdstq/37LOjNfXJkh0qD52nI+Ex53I054ZaEM6DpTandEgHzL+nRzQe02MM6Y+4p6H9mardHqqcYJpDIE9rDIVUeYlBFQtL1hbMTaEnUmwfuImf0WTfg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Av2DtcjJ; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 678EEC4CEF4;
+	Wed,  8 Oct 2025 11:25:50 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1759922742;
-	bh=0QNN3tIVq8T2c5IFDVGhEWEWYxZIkYUzOSVKY3KuacU=;
+	s=k20201202; t=1759922750;
+	bh=aFEhoYDAhCVC6PyY8ZrlUZht3yUsY0wyaIhThtFLA4w=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=uvkPfaSQdAW5wGizHdWYr/+VZvqocEClsOBT5FbOZf81Ki4TrHkbKDgpREvsl6oFb
-	 tMD7lJbehPj9apKweGRW8n4shCYzgy2dfTOdsNRLi2hiGbEM/N2IZEv/nNFpyMIHke
-	 d4T6EFBum+E/PEkAL6eKOVKl9/WnkN3RjrYEYBMb76D5RTTEHPRyU1xKFqQ7Fp47wh
-	 Y6lT4wFKBYUTVDZeLrRlxIXny0MzbFPP2muEnCrMn4lT/g8WcQgmXNxE01hTiEhAB5
-	 JsL+5oHhgxECNwanlclKpe7RyN5+oyj0ipwi+Ef/sx1nM3r4EuWGarKeuMp6P83Mzl
-	 fKd0Kar5Ps6/g==
-Date: Wed, 8 Oct 2025 13:50:00 +0530
+	b=Av2DtcjJQmsP+YtQHGNjSsL2X+ntVZ/zYB68yCy6zRaNnwSBw7/LsFpAh30eUwfYP
+	 DLjjKVoaAUs7SvEAYnvu9AnAI4BTWJmZ+pzaLw9VQVGIan0Pmd9LnT3Na4mpJ5H097
+	 14Aq2c2t1BQAIOZzP830CW84W1Qe1aw2BM6eM1Dd8iREnxI60HyrIj54WN2yrmazc8
+	 CcajtzX+jVUFqIuJE0bq+QHRZVMZejtVjDWHex8mdE0HSSVBXdm8/2EIcgZA3hV/eW
+	 2cM4BRdjLu6apGvFSQ5j/MMfdSvkMxfdNrJp1I7UXjuNX732+huzTboXLdSg961bYL
+	 RtnCQV1I6Nbrw==
+Date: Wed, 8 Oct 2025 15:22:52 +0530
 From: Naveen N Rao <naveen@kernel.org>
-To: Markus Armbruster <armbru@redhat.com>
+To: Tom Lendacky <thomas.lendacky@amd.com>
 Cc: Paolo Bonzini <pbonzini@redhat.com>, Eric Blake <eblake@redhat.com>, 
-	Marcelo Tosatti <mtosatti@redhat.com>, qemu-devel <qemu-devel@nongnu.org>, kvm@vger.kernel.org, 
-	Tom Lendacky <thomas.lendacky@amd.com>, Nikunj A Dadhania <nikunj@amd.com>, 
+	Markus Armbruster <armbru@redhat.com>, Marcelo Tosatti <mtosatti@redhat.com>, 
+	qemu-devel <qemu-devel@nongnu.org>, kvm@vger.kernel.org, Nikunj A Dadhania <nikunj@amd.com>, 
 	"Daniel P. Berrange" <berrange@redhat.com>, Eduardo Habkost <eduardo@habkost.net>, 
 	Zhao Liu <zhao1.liu@intel.com>, Michael Roth <michael.roth@amd.com>, 
 	Roy Hopkins <roy.hopkins@randomman.co.uk>
-Subject: Re: [PATCH v2 6/9] target/i386: SEV: Add support for enabling
- debug-swap SEV feature
-Message-ID: <w4fwyzmq2a7of5wemzkxwwt4igvacjxnzecypyz4nbhuxvzz5v@oa5lql4qvpw7>
+Subject: Re: [PATCH v2 8/9] target/i386: SEV: Add support for setting TSC
+ frequency for Secure TSC
+Message-ID: <uzfmnzzhz7a7lghdpazb2sphtctphmsj2nyfqnu6erjt44h577@bjj57um7n2ze>
 References: <cover.1758794556.git.naveen@kernel.org>
- <4f0f28154342d562e76107dfd60ed3a02665fbfe.1758794556.git.naveen@kernel.org>
- <871pnfjl0y.fsf@pond.sub.org>
+ <65400881e426aa0e412eb431099626dceb145ddd.1758794556.git.naveen@kernel.org>
+ <6a9ce7bb-5c69-ad8b-8bfd-638122619c71@amd.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -64,131 +64,50 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <871pnfjl0y.fsf@pond.sub.org>
+In-Reply-To: <6a9ce7bb-5c69-ad8b-8bfd-638122619c71@amd.com>
 
-On Tue, Oct 07, 2025 at 08:14:37AM +0200, Markus Armbruster wrote:
-> "Naveen N Rao (AMD)" <naveen@kernel.org> writes:
-> 
-> > Add support for enabling debug-swap VMSA SEV feature in SEV-ES and
-> > SEV-SNP guests through a new "debug-swap" boolean property on SEV guest
-> > objects. Though the boolean property is available for plain SEV guests,
-> > check_sev_features() will reject setting this for plain SEV guests.
-> 
-> Is this the sev_features && !sev_es_enabled() check there?
+On Tue, Oct 07, 2025 at 08:31:47AM -0500, Tom Lendacky wrote:
+> On 9/25/25 05:17, Naveen N Rao (AMD) wrote:
 
-Yes, that's the one.
+...
 
-> 
-> Does "reject setting this" mean setting it to true is rejected, or does
-> it mean setting it to any value is rejected?
-
-Right -- we don't allow this to be "enabled". Passing "debug-swap=off" 
-should mostly be a no-op.
-
-> 
-> > Though this SEV feature is called "Debug virtualization" in the APM, KVM
-> > calls this "debug swap" so use the same name for consistency.
-> >
-> > Sample command-line:
-> >   -machine q35,confidential-guest-support=sev0 \
-> >   -object sev-snp-guest,id=sev0,cbitpos=51,reduced-phys-bits=1,debug-swap=on
-> 
-> Always appreciated in commit messages.
-> 
-> I get "cannot set up private guest memory for sev-snp-guest: KVM
-> required".  If I add the obvious "-accel kvm", I get "-accel kvm:
-> vm-type SEV-SNP not supported by KVM".  I figure that's because my
-> hardware isn't capable.  The error message could be clearer.  Not this
-> patch's fault.
-
-SEV needs to be explicitly enabled in the BIOS:
-https://github.com/AMDESE/AMDSEV/tree/snp-latest?tab=readme-ov-file#prepare-host
-
-Be sure to enable SMEE first to be able to see the other options.
-
-> 
-> > Reviewed-by: Tom Lendacky <thomas.lendacky@amd.com>
-> > Signed-off-by: Naveen N Rao (AMD) <naveen@kernel.org>
-> > ---
-> >  target/i386/sev.h |  1 +
-> >  target/i386/sev.c | 20 ++++++++++++++++++++
-> >  qapi/qom.json     |  6 +++++-
-> >  3 files changed, 26 insertions(+), 1 deletion(-)
-> >
-> > diff --git a/target/i386/sev.h b/target/i386/sev.h
-> > index 102546b112d6..8e09b2ce1976 100644
-> > --- a/target/i386/sev.h
-> > +++ b/target/i386/sev.h
-> > @@ -45,6 +45,7 @@ bool sev_snp_enabled(void);
-> >  #define SEV_SNP_POLICY_DBG      0x80000
-> >  
-> >  #define SVM_SEV_FEAT_SNP_ACTIVE     BIT(0)
-> > +#define SVM_SEV_FEAT_DEBUG_SWAP     BIT(5)
-> >  
-> >  typedef struct SevKernelLoaderContext {
-> >      char *setup_data;
-> > diff --git a/target/i386/sev.c b/target/i386/sev.c
-> > index 88dd0750d481..e9d84ea25571 100644
-> > --- a/target/i386/sev.c
-> > +++ b/target/i386/sev.c
-> > @@ -319,6 +319,11 @@ sev_set_guest_state(SevCommonState *sev_common, SevState new_state)
-> >      sev_common->state = new_state;
-> >  }
-> >  
-> > +static bool is_sev_feature_set(SevCommonState *sev_common, uint64_t feature)
-> > +{
-> > +    return !!(sev_common->sev_features & feature);
-> > +}
 > > +
-> >  static void sev_set_feature(SevCommonState *sev_common, uint64_t feature, bool set)
-> >  {
-> >      if (set) {
-> > @@ -2744,6 +2749,16 @@ static int cgs_set_guest_policy(ConfidentialGuestPolicyType policy_type,
-> >      return 0;
-> >  }
-> >  
-> > +static bool sev_common_get_debug_swap(Object *obj, Error **errp)
+> > +static void
+> > +sev_snp_guest_set_tsc_frequency(Object *obj, Visitor *v, const char *name,
+> > +                                void *opaque, Error **errp)
 > > +{
-> > +    return is_sev_feature_set(SEV_COMMON(obj), SVM_SEV_FEAT_DEBUG_SWAP);
-> > +}
+> > +    uint32_t value;
 > > +
-> > +static void sev_common_set_debug_swap(Object *obj, bool value, Error **errp)
-> > +{
-> > +    sev_set_feature(SEV_COMMON(obj), SVM_SEV_FEAT_DEBUG_SWAP, value);
-> > +}
+> > +    if (!visit_type_uint32(v, name, &value, errp)) {
+> > +        return;
+> > +    }
 > > +
-> >  static void
-> >  sev_common_class_init(ObjectClass *oc, const void *data)
-> >  {
-> > @@ -2761,6 +2776,11 @@ sev_common_class_init(ObjectClass *oc, const void *data)
-> >                                     sev_common_set_kernel_hashes);
-> >      object_class_property_set_description(oc, "kernel-hashes",
-> >              "add kernel hashes to guest firmware for measured Linux boot");
-> > +    object_class_property_add_bool(oc, "debug-swap",
-> > +                                   sev_common_get_debug_swap,
-> > +                                   sev_common_set_debug_swap);
-> > +    object_class_property_set_description(oc, "debug-swap",
-> > +            "enable virtualization of debug registers");
-> >  }
-> >  
-> >  static void
-> > diff --git a/qapi/qom.json b/qapi/qom.json
-> > index 830cb2ffe781..df962d4a5215 100644
-> > --- a/qapi/qom.json
-> > +++ b/qapi/qom.json
-> > @@ -1010,13 +1010,17 @@
-> >  #     designated guest firmware page for measured boot with -kernel
-> >  #     (default: false) (since 6.2)
-> >  #
-> > +# @debug-swap: enable virtualization of debug registers
-> > +#     (default: false) (since 10.2)
-> > +#
+> > +    SEV_SNP_GUEST(obj)->tsc_khz = value / 1000;
 > 
-> According to the commit message, setting @default-swap works only for
-> SEV-ES and SEV-SNP guests, i.e. it fails for plain SEV guests.  Should
-> we document this here?
+> This will cause a value that isn't evenly divisible by 1000 to be
+> rounded down, e.g.: tsc-frequency=2500000999. Should this name instead
+> just be tsc-khz or secure-tsc-khz (to show it is truly associated with
+> Secure TSC)?
 
-Sure, we can add that.
+I modeled this after the existing tsc-frequency parameter on the cpu 
+object to keep it simple (parameter is the same, just where it is 
+specified differs). This also aligns with TDX which re-uses the 
+tsc-frequency parameter on the cpu object.
+
+> 
+> Also, I think there is already a "tsc-freq" parameter for the -cpu
+> parameter (?), should there be some kind of error message if both of
+> these are set? Or a warning saying it is being ignored? Or ...?
+
+This is validated when the TSC frequency is being set on the vcpu, so I didn't
+add an explicit check.
+
+As an example, with:
+  -cpu EPYC-v4,tsc-frequency=2500000000 \
+  -object sev-snp-guest,id=sev0,cbitpos=51,reduced-phys-bits=1,secure-tsc=on
+
+qemu-system-x86_64: warning: TSC frequency mismatch between VM (2500000 kHz) and host (2596099 kHz), and TSC scaling unavailable
+qemu-system-x86_64: kvm_init_vcpu: kvm_arch_init_vcpu failed (0): Invalid argument
 
 
 Thanks,
