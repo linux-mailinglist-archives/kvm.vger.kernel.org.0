@@ -1,140 +1,113 @@
-Return-Path: <kvm+bounces-59644-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-59645-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2F8F5BC53A8
-	for <lists+kvm@lfdr.de>; Wed, 08 Oct 2025 15:34:44 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id DC87FBC5DA9
+	for <lists+kvm@lfdr.de>; Wed, 08 Oct 2025 17:49:37 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 72D0B4F5406
-	for <lists+kvm@lfdr.de>; Wed,  8 Oct 2025 13:34:36 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 1E1754FB62F
+	for <lists+kvm@lfdr.de>; Wed,  8 Oct 2025 15:44:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7EF23285C81;
-	Wed,  8 Oct 2025 13:34:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 95AD82F90D4;
+	Wed,  8 Oct 2025 15:39:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=fb.com header.i=@fb.com header.b="d3rIbryL"
 X-Original-To: kvm@vger.kernel.org
-Received: from bmailout1.hostsharing.net (bmailout1.hostsharing.net [83.223.95.100])
+Received: from mx0a-00082601.pphosted.com (mx0a-00082601.pphosted.com [67.231.145.42])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E0E1424E01D;
-	Wed,  8 Oct 2025 13:34:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=83.223.95.100
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EF86E283FCD
+	for <kvm@vger.kernel.org>; Wed,  8 Oct 2025 15:39:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=67.231.145.42
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1759930469; cv=none; b=YZ2oamUITFXtcomblTxQwbk06Nv2DECJXC8EAxOjkDExRnMzTXgmIQK0GsU/HM8MjO3Vo4Ko00ypKKpSZgNXqEnlb4IDTPZSgwoEyj9fwL4iveTgH0TveQsbZOuOxKn7BXPLL2qB2faxpm9fDLCGulIst/ZZZuwppQ3gGJqDD00=
+	t=1759937979; cv=none; b=LDFKuRKMMsU5t4cIkQIDld4OJXtia5Fs8Kr6saI46bherBunw/mn5WP3HaaegsowEHIcOSSpL6uvDsRgbiR+HvgPXjfsTcWXsICwufzuyqb65HjtR/SL3dGtfD9owZmkLYaR68V1TeEK3r5Fp8Jf3VL8kyQRhbn1PCv5zpzc+S4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1759930469; c=relaxed/simple;
-	bh=L/JfgYUl9kx54NZaz4So/Tc7t9Ld6kXKMjxc+OdFfT4=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Ni7SAbaJWuGAuoQ95vzONXZNCDrr/CJv3rKukPbuKlAtns/PDSWeWinS3q3cENlBTBIRhEW5qBIGTkm1rxOr044NeYcIWrgY8eWWSfyPi3YNsJBnZspynp6DWHGITWrtUFdEzPU4Pr9WP+a3502j8vUSh8C4/7YAB2CAsH8AN34=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=wunner.de; spf=none smtp.mailfrom=h08.hostsharing.net; arc=none smtp.client-ip=83.223.95.100
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=wunner.de
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=h08.hostsharing.net
-Received: from h08.hostsharing.net (h08.hostsharing.net [83.223.95.28])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256
-	 client-signature RSA-PSS (4096 bits) client-digest SHA256)
-	(Client CN "*.hostsharing.net", Issuer "RapidSSL TLS RSA CA G1" (verified OK))
-	by bmailout1.hostsharing.net (Postfix) with ESMTPS id C542E2C4E592;
-	Wed,  8 Oct 2025 15:34:16 +0200 (CEST)
-Received: by h08.hostsharing.net (Postfix, from userid 100393)
-	id B363A5F7D2E; Wed,  8 Oct 2025 15:34:16 +0200 (CEST)
-Date: Wed, 8 Oct 2025 15:34:16 +0200
-From: Lukas Wunner <lukas@wunner.de>
-To: Farhan Ali <alifm@linux.ibm.com>
-Cc: Benjamin Block <bblock@linux.ibm.com>, linux-s390@vger.kernel.org,
-	kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-pci@vger.kernel.org, alex.williamson@redhat.com,
-	helgaas@kernel.org, clg@redhat.com, schnelle@linux.ibm.com,
-	mjrosato@linux.ibm.com
-Subject: Re: [PATCH v4 01/10] PCI: Avoid saving error values for config space
-Message-ID: <aOZoWDQV0TNh-NiM@wunner.de>
-References: <20250924171628.826-1-alifm@linux.ibm.com>
- <20250924171628.826-2-alifm@linux.ibm.com>
- <20251001151543.GB408411@p1gen4-pw042f0m>
- <ae5b191d-ffc6-4d40-a44b-d08e04cac6be@linux.ibm.com>
- <aOE1JMryY_Oa663e@wunner.de>
- <c0818c13-8075-4db0-b76f-3c9b10516e7a@linux.ibm.com>
- <aOQX6ZTMvekd6gWy@wunner.de>
- <8c14d648-453c-4426-af69-4e911a1128c1@linux.ibm.com>
+	s=arc-20240116; t=1759937979; c=relaxed/simple;
+	bh=prwSvqu9MGiHjwNKVOTAp54pKuVdWoI9wNc12CjnUiY=;
+	h=Date:From:To:CC:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=HOtaRqGkIEQf82cEc/zkXIH6EhvqzEH9/YFdm58R9ESd2XNh5pLv9hPRT0dSGUSxtuMUhHJcB0D2gnE65i2CwwCbBOwHeBsW7SeLt6RIeZ8lxKBGklq52sZpacgN87tRGuwWlwJvmNZ7Ha28Hrya3LoA/JDMmxbIy9gzgZK8XpY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fb.com; spf=pass smtp.mailfrom=meta.com; dkim=pass (2048-bit key) header.d=fb.com header.i=@fb.com header.b=d3rIbryL; arc=none smtp.client-ip=67.231.145.42
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fb.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=meta.com
+Received: from pps.filterd (m0044010.ppops.net [127.0.0.1])
+	by mx0a-00082601.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 598EZSd43817531
+	for <kvm@vger.kernel.org>; Wed, 8 Oct 2025 08:39:37 -0700
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=fb.com; h=cc
+	:content-type:date:from:in-reply-to:message-id:mime-version
+	:references:subject:to; s=s2048-2025-q2; bh=Y6rX75GCY18R2EPN4PkQ
+	EedkSYgIhsGgAaXv2mMV+ko=; b=d3rIbryLBO69TrQZISYTb/kuP/3DTMD/bANR
+	I20PkNCsVx3ziLSO9CePtsiqQXh9TT8Yjo8Ih3C689fnOLMyqFWcDe31j8bS7urM
+	s1uzgRC7NQK/eRjV3cqhcQeLC1IOrVfskP113f3fFTl4jW0Ej6rJsKA3j+FuO3Le
+	JwaknbgkMyqiqUFbCTmq7PoYAoKdF2rVC6ZzbzrsDHzAhuJ+/VP8aWt22n7MpiRd
+	OLW7S9J0ViRQav5fOhEJNZ6FFuWrQN/gTj+Q8ZrdGpsyZ8ZpFj8lhKAwWXfz513C
+	T7aQIHWs8mEs7qkBigxrMMMcT9a9D5k9px+iwl/MGhMoCbA7Bg==
+Received: from mail.thefacebook.com ([163.114.134.16])
+	by mx0a-00082601.pphosted.com (PPS) with ESMTPS id 49nsut8hwj-3
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128 verify=NOT)
+	for <kvm@vger.kernel.org>; Wed, 08 Oct 2025 08:39:37 -0700 (PDT)
+Received: from twshared63906.02.prn5.facebook.com (2620:10d:c085:108::4) by
+ mail.thefacebook.com (2620:10d:c08b:78::2ac9) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.2.2562.20; Wed, 8 Oct 2025 15:39:35 +0000
+Received: by devgpu015.cco6.facebook.com (Postfix, from userid 199522)
+	id 67471D6B67F; Wed,  8 Oct 2025 08:39:21 -0700 (PDT)
+Date: Wed, 8 Oct 2025 08:39:21 -0700
+From: Alex Mastro <amastro@fb.com>
+To: Jason Gunthorpe <jgg@ziepe.ca>
+CC: Alex Williamson <alex.williamson@redhat.com>,
+        Alejandro Jimenez
+	<alejandro.j.jimenez@oracle.com>,
+        <kvm@vger.kernel.org>, <linux-kernel@vger.kernel.org>
+Subject: Re: [PATCH v2 1/3] vfio/type1: sanitize for overflow using
+ check_*_overflow
+Message-ID: <aOaFqZ5cPgeRyoNS@devgpu015.cco6.facebook.com>
+References: <20251007-fix-unmap-v2-0-759bceb9792e@fb.com>
+ <20251007-fix-unmap-v2-1-759bceb9792e@fb.com>
+ <20251008121930.GA3734646@ziepe.ca>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset="us-ascii"
 Content-Disposition: inline
-In-Reply-To: <8c14d648-453c-4426-af69-4e911a1128c1@linux.ibm.com>
+In-Reply-To: <20251008121930.GA3734646@ziepe.ca>
+X-FB-Internal: Safe
+X-Proofpoint-GUID: UnwEriscznuLspT2mjcmwOhkW534b5s5
+X-Authority-Analysis: v=2.4 cv=UadciaSN c=1 sm=1 tr=0 ts=68e685b9 cx=c_pps
+ a=CB4LiSf2rd0gKozIdrpkBw==:117 a=CB4LiSf2rd0gKozIdrpkBw==:17
+ a=kj9zAlcOel0A:10 a=x6icFKpwvdMA:10 a=M8q2Z_HFV9kjbA1Vx5EA:9
+ a=CjuIK1q_8ugA:10
+X-Proofpoint-ORIG-GUID: UnwEriscznuLspT2mjcmwOhkW534b5s5
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUxMDA4MDExMCBTYWx0ZWRfX6QYrrNWE4sRi
+ gOr5TRruaj/fYhOWmfEwdj8okoRORPMYzjnt6y/gPOEUqvYrIHMO57T7O1JJ/PR5FAeXIextoHf
+ sWMqlBifcYGXzxY7lwDUX0xbcVNSg3tNRIab10EYgHMbnFDqsAi7jvf4T5P2sddFgbNI7L9j2I0
+ XnaQ63gNttC0UGSOqdeStsbem6BzBjAM2q3Mdo4Ie47Zp/xpF8dVNVdbtDdlKCKRkFQ72tX4QTL
+ mnh87BWRLdX2Ea5W8S4c4R9vipVu1aWKcv5HfPHPK/+gnEmRzdyl7J0vO0LpreCuxajslz0UXiU
+ zJRB+Xu7k1wCZtCVvt9HxQszV5DSmKJ6mNRF1CMDB5u1GANhZ+MhGbRfAwcaqDVAKxOb5lFGMmX
+ arZhIW0+WkCgTRleXaivT50c+uf/BQ==
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1117,Hydra:6.1.9,FMLib:17.12.80.40
+ definitions=2025-10-08_05,2025-10-06_01,2025-03-28_01
 
-On Mon, Oct 06, 2025 at 02:35:49PM -0700, Farhan Ali wrote:
-> On 10/6/2025 12:26 PM, Lukas Wunner wrote:
-> > On Mon, Oct 06, 2025 at 10:54:51AM -0700, Farhan Ali wrote:
-> > > On 10/4/2025 7:54 AM, Lukas Wunner wrote:
-> > > > I believe this also makes patch [01/10] in your series unnecessary.
-> > > I tested your patches + patches 2-10 of this series. It unfortunately didn't
-> > > completely help with the s390x use case. We still need the check to in
-> > > pci_save_state() from this patch to make sure we are not saving error
-> > > values, which can be written back to the device in pci_restore_state().
-> > What's the caller of pci_save_state() that needs this?
-> > 
-> > Can you move the check for PCI_POSSIBLE_ERROR() to the caller?
-> > I think plenty of other callers don't need this, so it adds
-> > extra overhead for them and down the road it'll be difficult
-> > to untangle which caller needs it and which doesn't.
+On Wed, Oct 08, 2025 at 09:19:30AM -0300, Jason Gunthorpe wrote:
+> On Tue, Oct 07, 2025 at 09:08:46PM -0700, Alex Mastro wrote:
+> > +	if (check_mul_overflow(npage, PAGE_SIZE, &iova_size))
+> > +		return -EINVAL;
 > 
-> The caller would be pci_dev_save_and_disable(). Are you suggesting moving
-> the PCI_POSSIBLE_ERROR() prior to calling pci_save_state()?
-
-I'm not sure yet.  Let's back up a little:  I'm missing an
-architectural description how you're intending to do error
-recovery in the VM.  If I understand correctly, you're
-informing the VM of the error via the ->error_detected() callback.
-
-You're saying you need to check for accessibility of the device
-prior to resetting it from the VM, does that mean you're attempting
-a reset from the ->error_detected() callback?
-
-According to Documentation/PCI/pci-error-recovery.rst, the device
-isn't supposed to be considered accessible in ->error_detected().
-The first callback which allows access is ->mmio_enabled().
-
-I also don't quite understand why the VM needs to perform a reset.
-Why can't you just let the VM tell the host that a reset is needed
-(PCI_ERS_RESULT_NEED_RESET) and then the host resets the device on
-behalf of the VM?
-
-Furthermore, I'm thinking that you should be using pci_channel_offline()
-to detect accessibility of the device, rather than reading from
-Config Space and checking for PCI_POSSIBLE_ERROR().
-
-> > The state saved on device addition is just the initial state and
-> > it is fine if later on it gets updated (which is a nicer term than
-> > "overwritten").  E.g. when portdrv.c instantiates port services
-> > and drivers are bound to them, various registers in Config Space
-> > are changed, hence pcie_portdrv_probe() calls pci_save_state()
-> > again.
-> > 
-> > However we can discuss whether pci_save_state() is still needed
-> > in pci_dev_save_and_disable().
+> -EOVERFLOW and everywhere else
 > 
-> The commit 8dd7f8036c12 ("PCI: add support for function level reset")
-> introduced the logic of saving/restoring the device state after an FLR. My
-> assumption is it was done to save the most recent state of the device (as
-> the state could be updated by drivers). So I think it would still make sense
-> to save the device state in pci_dev_save_and_disable() if the Config Space
-> is still accessible?
+> > +
+> > +	if (check_add_overflow(user_iova, iova_size - 1, &iova_end))
+> > +		return -EINVAL;
+> 
+> Let's be consistent with iommufd/etc, 'end' is start+size 'last' is start+size-1
+> 
+> Otherwise it is super confusing :(
 
-Yes, right now we can't assume that drivers call pci_save_state()
-in their probe hook if they modified Config Space.  They may rely
-on the state being saved prior to reset or a D3hot/D3cold transition.
-So we need to keep the pci_dev_save_and_disable() call for now.
 
-Generally the expectation is that Config Space is accessible when
-performing a reset with pci_try_reset_function().  Since that's
-apparently not guaranteed for your use case, I'm wondering if you
-might be using the function in a context it's not supposed to be used.
-
-Thanks,
-
-Lukas
+Both suggestions SGTM.
 
