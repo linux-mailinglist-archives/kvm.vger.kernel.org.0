@@ -1,267 +1,173 @@
-Return-Path: <kvm+bounces-59640-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-59641-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 05071BC4E87
-	for <lists+kvm@lfdr.de>; Wed, 08 Oct 2025 14:44:34 +0200 (CEST)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9B14BBC4F15
+	for <lists+kvm@lfdr.de>; Wed, 08 Oct 2025 14:47:59 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id DB7D61897243
-	for <lists+kvm@lfdr.de>; Wed,  8 Oct 2025 12:44:56 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id A0B064F3BF4
+	for <lists+kvm@lfdr.de>; Wed,  8 Oct 2025 12:47:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D55F2255F24;
-	Wed,  8 Oct 2025 12:44:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 11ECD264F99;
+	Wed,  8 Oct 2025 12:47:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ionos.com header.i=@ionos.com header.b="fgUskTBW"
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="ZyqjHbht"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-ej1-f48.google.com (mail-ej1-f48.google.com [209.85.218.48])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5CD1C251795
-	for <kvm@vger.kernel.org>; Wed,  8 Oct 2025 12:44:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.48
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8600A25DD0B;
+	Wed,  8 Oct 2025 12:47:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1759927462; cv=none; b=n4pm/HLQG5pOVrU5DrVNTNJFA3S03DOuGcNEW/z+XvAAk63JC6K+HTZBydd3HNpltOBjuyMX8Cur441Q5nkh9HrwB+j6yI2QbtKclQS6gC7rMdkRdUeqwSAss2gi+9kth0NN7/FqfcbzxVS5khE9pI0NItZkbw5OUIeBlOVwq6g=
+	t=1759927662; cv=none; b=BrN75YBUTtGh5Qg0FYW7Ydq7mjQ5MAk2xjf2stSonTaEEMIMKn/Du8w4UpRla/2JPvlwB8zIWiset21DjEOD0MHRVlyzeQb7/s+3mbg8w9Zpy+gHikRLqmUhnHu4RGnLSfDdS4Q2Q0HQN59x0npxCkfKGcaqnrUdMM81SjClFN8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1759927462; c=relaxed/simple;
-	bh=1achrQX9VgMwxqnrWluZElDIr8lUkiEBJLPNIW8+n/A=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 Mime-Version:Content-Type; b=PtR2s3u+6hJuE7xrvGl2oxMiRJEdBJieRO0seXzcnODUN4RzBVgh11SNlc/Tkd4jtBc5fDrPXkQMpsmDfU2bTLnHRqcAwZvpJJeCk1ggPYryDYRWLr/dU5Gr+yEQ3bxJYT5kpXmsinuYNdlCtgxYwELSopwXEY04+VTl+55PfI4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=ionos.com; spf=pass smtp.mailfrom=ionos.com; dkim=pass (2048-bit key) header.d=ionos.com header.i=@ionos.com header.b=fgUskTBW; arc=none smtp.client-ip=209.85.218.48
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=ionos.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ionos.com
-Received: by mail-ej1-f48.google.com with SMTP id a640c23a62f3a-b3df81b1486so149162366b.2
-        for <kvm@vger.kernel.org>; Wed, 08 Oct 2025 05:44:18 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=ionos.com; s=google; t=1759927457; x=1760532257; darn=vger.kernel.org;
-        h=content-transfer-encoding:list-id:mime-version:references
-         :in-reply-to:message-id:date:subject:cc:to:from:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=+WrorA5/NbVwiDAVLkXUunOrMflDUIhM9V0D4U9QYvY=;
-        b=fgUskTBWYlb8bLAFD+TsJRBQXEEKlxgAdAg5bv5Sosd6BBXfkWXnf+TI1B4J8gdXJh
-         KNq8hOMc8DT5zpAkzASOkbygBM44wqUwD4+kw/C+aMM9XK5VaXtJ+mOahQZrt3U2IspF
-         ATfYdcovU8YQOvIv4KjRXdHr2KUjByzNkuolIZ/J/v18VYFKkkFEDu5tSPqkujlHrPho
-         hMR3AYdsbuDwcc/MEMPg464QD2IA1KWX09RtImD0zLuy9mdcSjtyxDT5gsxgsgKJRl+L
-         llqah9EnLV5g0i7iQxHkza/zwCQntRC+eT8OqoDrBgQ0ZkGI2p1RUqDZZ9MlB1v4SDvt
-         16pA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1759927457; x=1760532257;
-        h=content-transfer-encoding:list-id:mime-version:references
-         :in-reply-to:message-id:date:subject:cc:to:from:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=+WrorA5/NbVwiDAVLkXUunOrMflDUIhM9V0D4U9QYvY=;
-        b=fbAuhI5JNXywYhkrbneGm044fBGtfmAZ4cUAfBvE1v+38a9htr4M2WbMugjk7UCddf
-         qqwojcwPEjW3044vqfuXZq84XlXQMZHBmsTzLmpVkVE80kE+uvu02/oey0zq2HZCNtu5
-         nNS3V/4dprJXVuWNNZQ1OoM0bgJy01tQiv9iacfuxA5pcvcyULaH/98e878be2eJ8YN3
-         g1mCJxcY6Jm3rKs0fhFWLj4aun8yWl57ZwwNp672GGPlyb8yw0N+XsYApiPmeXT7R/dm
-         FGUEHlWe4iHxeWV8oWOGwh37LQEAZwv0KctEzwvpPYYYgsthwp29R+8LZQPPTHOlts3t
-         zuYA==
-X-Forwarded-Encrypted: i=1; AJvYcCXCQEXC+pcTwfEZGJkvJQZxemErCdNbdu8fCbwRQAgsHu1Asrx7BvXvm9UkDXbVf/6ri6E=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yw9yg02IN+qDaWxVysed0ptlJK0yPGkGU9bdtoWvfg41k8R4MOf
-	jFLVP4DbrravJ8QWNt2qZhluX1BHB5bucmrP0BwJ/AKuLW42SmpJc9tgSY78RU0vR3E=
-X-Gm-Gg: ASbGncs0gKkXVNwvd+sIY7ca0lTgUnde2bLR6FuAarlRTmxdW6uVsrDRTGpcdV4S59a
-	MpWudbX1RaXrQTGvVgkQimCb7pnKpXPFW3FCY4NFiOQ1T+0XcD9jeLdpPRazBAzstaG/YdVTtVK
-	1itirY7GezaVwuQZh5zCAjZjlvZbtYHDfPcdhPrS2LftLSJYvXdZoRnYl2lPsK90QDGWBjUYGdv
-	KaOz4pLoCN7jGaxplyQgkcLiTJaFs2rMO3Hz3rWA/ip6j8NlF7dQl44Se9hbOPhPEfKJV07XRCg
-	LaBjBZ9SXnzIZSS3bzXT3pJnyvfLW8deaqDrCnods/8fgbuzyDACF+Rri6gOO8JrAMP/y8yHbEo
-	9kjDe4f8yN3yxXVAlT9Jch7ZEFcjL0pWWKAnI2snDgkLKbNzIsHD3sHbjoUEYTaQbucIP
-X-Google-Smtp-Source: AGHT+IFQ1CFSBAbV7cXue2hoWW0fXuG7B1J+apihWWp3w7F7VKA+D1P8IiZtqrZmu/+h8sQaMjJdqg==
-X-Received: by 2002:a17:906:c146:b0:b28:f64f:2fb2 with SMTP id a640c23a62f3a-b50ad34ee65mr174061566b.11.1759927456553;
-        Wed, 08 Oct 2025 05:44:16 -0700 (PDT)
-Received: from lb02065.txl.profitbricks.net ([212.227.34.98])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-b486970b315sm1653463366b.64.2025.10.08.05.44.15
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 08 Oct 2025 05:44:16 -0700 (PDT)
-From: Jack Wang <jinpu.wang@ionos.com>
-To: fanwenyi0529@gmail.com,
-	John Nielsen <lists@jnielsen.net>
-Cc: bsd@redhat.com,
-	gleb@kernel.org,
-	kvm@vger.kernel.org,
-	pbonzini@redhat.com,
-	xiaoyao.li@intel.com
-Subject: Re: Hang on reboot in FreeBSD guest on Linux KVM host
-Date: Wed,  8 Oct 2025 14:44:02 +0200
-Message-ID: <CACzj_yVTyescyWBRuA3MMCC0Ymg7TKF-+sCW1N+Xwfffvw_Wsg@mail.gmail.com>
-X-Mailer: git-send-email 2.43.0
-In-Reply-To: <FAFB2BA9-E924-4E70-A84A-E5F2D97BC2F0@jnielsen.net>
-References: <6DBD3DBB-24B1-4564-B524-E8E73508BBC5@jnielsen.net> <42870B81-CA29-4161-9BCE-F6D6020C3D2C@jnielsen.net> <539F1DC0.4020604@redhat.com> <4F14D859-D641-4AB5-B749-83D9D82F1DEA@jnielsen.net> <539FC243.2070906@redhat.com> <20140617060500.GA20764@minantech.com> <FFEF5F78-D9E6-4333-BC1A-78076C132CBF@jnielsen.net> <6850B127-F16B-465F-BDDB-BA3F99B9E446@jnielsen.net> <jpgioafjtxb.fsf@redhat.com> <74412BDB-EF6F-4C20-84C8-C6EF3A25885C@jnielsen.net> <558AD1B0.5060200@redhat.com> <FAFB2BA9-E924-4E70-A84A-E5F2D97BC2F0@jnielsen.net>
+	s=arc-20240116; t=1759927662; c=relaxed/simple;
+	bh=9oEYxSjZqlIAA+cCSre2rgovRfPuHA0sMuZ7ItzITQs=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=if9C4herhq964SXkORJ1ksoE1Ez1fGZ5lQhV1ONQBy+sXA/se7Fhfy8bvWha8P8URKctbgG8coXzFz9LVtUcIn6EVdmM8FdNj3Mv1+B2UdaYfX4oYqQEY7KE+e6qys0LBfjSknVL87P4pbiWtaausqQ4KIKKLdzJmc0mrEa8glA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=ZyqjHbht; arc=none smtp.client-ip=148.163.158.5
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
+Received: from pps.filterd (m0360072.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 5984uYHg002491;
+	Wed, 8 Oct 2025 12:47:38 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
+	:content-transfer-encoding:content-type:date:from:in-reply-to
+	:message-id:mime-version:references:subject:to; s=pp1; bh=N4zpMc
+	C/Cps5ja4lDluPN0SzVC7G7PBdIa4bZbOGYwY=; b=ZyqjHbhtm8V41NleyCtgm8
+	8d60v/xZCM98hv/wwfGMaIymkkpjcwQ2CHOp0Z5s3sf19PV2Vk2QzlvZdYv7P7Gq
+	Mtf4rx1kdtC7i/piBT7BhDFeGAEuqJ2P41g1/KX2fgDi0p3HChzoM8WWaqORaf8e
+	MBu5OQvjc1tLU4FnIqmQqypqbA+niLWNIrfe+d7fX89D9BJvqcq2YTVTGfYuZ48G
+	+VY5gU/HO1XJlhIXpRmHdgMa6LnXbj5c728QBAEIpZV/8l4gtOYjTW+u5jHOcdwK
+	H9R4NLQAwoX5IYXkN5dgO3P61wEuKnVUkbzSxbkX54ULq+lvukn3FCB4ZFJ78HMg
+	==
+Received: from ppma22.wdc07v.mail.ibm.com (5c.69.3da9.ip4.static.sl-reverse.com [169.61.105.92])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 49ju8avajm-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Wed, 08 Oct 2025 12:47:38 +0000 (GMT)
+Received: from pps.filterd (ppma22.wdc07v.mail.ibm.com [127.0.0.1])
+	by ppma22.wdc07v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 59894wqS000875;
+	Wed, 8 Oct 2025 12:47:37 GMT
+Received: from smtprelay06.fra02v.mail.ibm.com ([9.218.2.230])
+	by ppma22.wdc07v.mail.ibm.com (PPS) with ESMTPS id 49ke9y8m4b-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Wed, 08 Oct 2025 12:47:37 +0000
+Received: from smtpav05.fra02v.mail.ibm.com (smtpav05.fra02v.mail.ibm.com [10.20.54.104])
+	by smtprelay06.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 598ClXBa30802224
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Wed, 8 Oct 2025 12:47:33 GMT
+Received: from smtpav05.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 9F15420043;
+	Wed,  8 Oct 2025 12:47:33 +0000 (GMT)
+Received: from smtpav05.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 0758D20040;
+	Wed,  8 Oct 2025 12:47:33 +0000 (GMT)
+Received: from [9.87.146.232] (unknown [9.87.146.232])
+	by smtpav05.fra02v.mail.ibm.com (Postfix) with ESMTP;
+	Wed,  8 Oct 2025 12:47:32 +0000 (GMT)
+Message-ID: <818d278c-8918-4a73-b582-e4cbc1fe11a3@linux.ibm.com>
+Date: Wed, 8 Oct 2025 14:47:32 +0200
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Received: from mail-lb0-f182.google.com ([209.85.217.182]:35910 "EHLO mail-lb0-f182.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP id S1751098AbbFYCk2 convert rfc822-to-8bit (ORCPT <rfc822;kvm@vger.kernel.org>); Wed, 24 Jun 2015 22:40:28 -0400
-Received: by lbbpo10 with SMTP id po10so37140278lbb.3 for <kvm@vger.kernel.org>; Wed, 24 Jun 2015 19:40:26 -0700 (PDT)
-Content-Transfer-Encoding: 8bit
+MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH] s390/uv: Fix the comment of the uv_find_secret() function
+To: Thomas Huth <thuth@redhat.com>, freude@linux.ibm.com,
+        Christian Borntraeger <borntraeger@linux.ibm.com>,
+        Claudio Imbrenda <imbrenda@linux.ibm.com>,
+        Vasily Gorbik
+ <gor@linux.ibm.com>,
+        Alexander Gordeev <agordeev@linux.ibm.com>
+Cc: David Hildenbrand <david@redhat.com>, Heiko Carstens <hca@linux.ibm.com>,
+        Sven Schnelle <svens@linux.ibm.com>, kvm@vger.kernel.org,
+        linux-s390@vger.kernel.org, linux-kernel@vger.kernel.org
+References: <20251002155423.466142-1-thuth@redhat.com>
+Content-Language: en-US
+From: Janosch Frank <frankja@linux.ibm.com>
+Autocrypt: addr=frankja@linux.ibm.com; keydata=
+ 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
+In-Reply-To: <20251002155423.466142-1-thuth@redhat.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: h29j1gSJaw7CZHOozFa20DVKWXG_z47y
+X-Authority-Analysis: v=2.4 cv=BpiQAIX5 c=1 sm=1 tr=0 ts=68e65d6a cx=c_pps
+ a=5BHTudwdYE3Te8bg5FgnPg==:117 a=5BHTudwdYE3Te8bg5FgnPg==:17
+ a=IkcTkHD0fZMA:10 a=x6icFKpwvdMA:10 a=20KFwNOVAAAA:8 a=IkQwAILPEdY48X5WYg4A:9
+ a=QEXdDO2ut3YA:10 a=cPQSjfK2_nFv0Q5t_7PE:22
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUxMDA0MDAyMiBTYWx0ZWRfX0SIhKjGT4POm
+ z4MnuidsxYlU6cIXEVlXcFAXpOr+Gd7BA98vND8FLpjLkTKSMff41ZBbmJe9qv6n+HwDKKbFs79
+ pVmwM72y1p93vMQ7wPcVq4mx6DhbJLxRQT5+eCRX7UVhr/ru4n/O3WVGzOq29AMVDMOIth5vGhB
+ /0od6+LABmzlL0CI6+oOESN32zrFUfNyIyeSXxTplrF6pxFDQDzP+4EABxOJBfl9QLiFs7gcol2
+ 7F39rHRF92pJ7fck970pMUfCrQ8FbuSfys9LzzktCys4+RLiSY443iz+l8icNZuCM04ezNXOgwi
+ lcPuhrgbsyP1+xT05PduKyt61CCP4p3Wd5JBWsm4cFLENMw11VpzWI7WOC6VU86nwGlFHHE6Qi4
+ h8Zzrp4RKtQvFkPIPyoarkspbRlYFw==
+X-Proofpoint-ORIG-GUID: h29j1gSJaw7CZHOozFa20DVKWXG_z47y
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1117,Hydra:6.1.9,FMLib:17.12.80.40
+ definitions=2025-10-08_04,2025-10-06_01,2025-03-28_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ spamscore=0 lowpriorityscore=0 priorityscore=1501 malwarescore=0
+ suspectscore=0 bulkscore=0 impostorscore=0 adultscore=0 clxscore=1015
+ phishscore=0 classifier=typeunknown authscore=0 authtc= authcc=
+ route=outbound adjust=0 reason=mlx scancount=1 engine=8.19.0-2509150000
+ definitions=main-2510040022
 
-From: Wincy Van <fanwenyi0529@gmail.com>
+On 10/2/25 5:54 PM, Thomas Huth wrote:
+> From: Thomas Huth <thuth@redhat.com>
+> 
+> The uv_get_secret_metadata() function has been removed some
+> months ago, so we should not mention it in the comment anymore.
+> 
+> Fixes: a42831f0b74dc ("s390/uv: Remove uv_get_secret_metadata function")
+> Signed-off-by: Thomas Huth <thuth@redhat.com>
 
-On Thu, Jun 25, 2015 at 1:07 AM, John Nielsen <lists@jnielsen.net> wrot=
-e:
-> Interesting. Using the same PC-BSD image I am able to reproduce on a =
-server running slightly older software but I can not reproduce running =
-bleeding edge. I verified enable_apicv=3DY on both. In both cases I ran
-> qemu-kvm -drive if=3Dvirtio,file=3DPCBSD10.1.2-x64-trueos-server.raw =
--smp 2 -vnc 0.0.0.0:0
->
-> Specifically:
->
-> Breaks (VM hangs during boot after pressing ctrl-alt-del):
-> kernel 3.12.22
-> qemu-kvm-1.7.0-3.el6.x86_64
-> seabios-1.7.3.1-1.el6.noarch
-> Intel(R) Xeon(R) CPU E5-2667 v2 @ 3.30GHz
->
-> Works (VM reboots normally):
-> kernel 4.0.4
-> qemu-kvm-2.3.0-6.el7.centos.x86_64
-> seabios-bin-1.8.1-1.el7.centos.noarch
-> Intel(R) Xeon(R) CPU E5-2680 v2 @ 2.80GHz
->
->
-> Unfortunately I no longer have the test environment I used a few days=
- ago to reproduce this issue so I can=E2=80=99t verify the software ver=
-sions that were in use. It=E2=80=99s possible I was mistaken about the =
-kernel version (I thought it was 4.0.4). Perhaps it really is fixed in =
-the newer kernel? In any case, this is great news! I would be intereste=
-d in identifying the patch(es) that fixed the issue to make back-portin=
-g them easier, but I won=E2=80=99t have time to do a binary search anyt=
-ime soon.
->
-> Thanks for looking in to this again. If anyone else is interested in =
-identifying what specifically fixed the issue please let me know if I c=
-an do anything to help.
->
-
-John,
-
-This commit may work for you.
-
-commit 4114c27d450bef228be9c7b0c40a888e18a3a636
-Author: Wei Wang <wei.w.wang@intel.com>
-Date:   Wed Nov 5 10:53:43 2014 +0800
-
-    KVM: x86: reset RVI upon system reset
-
-
-Thanks
-Wincy
-
-Sorry for bump this old thread, we hit same issue on Intel Sierra Forest
-machines with LTS kernel 6.1/6.12, maybe KVM comunity could help fix it.
-
----
-
-### **[BUG] Hang on FreeBSD Guest Reboot under KVM on Intel SierraForest (Xeon 6710E)**
-
-**Summary:**
-Multi-cores FreeBSD guests hang during reboot under KVM on systems with Intel(R) Xeon(R) 6710E (SierraForest). The issue is fully reproducible with APICv enabled and disappears when disabling APICv (`enable_apicv=N`). The same configuration works correctly on Ice Lake (Xeon Gold 6338).
-
----
-
-#### **Environment**
-
-**Host:**
-
-* OS: Debian 12 (Bookworm)
-* Kernel versions tested: 6.1.118 and 6.12.47 (both affected)
-* QEMU versions tested: 8.2.10 and 9.2.4
-* Firmware: SeaBIOS 1.16.2-1 and OVMF 2024.11.1
-* CPU: Intel(R) Xeon(R) 6710E (SierraForest)
-* KVM module: `kvm_intel`
-* Command-line (simplified example):
-
-  ```
-  qemu-system-x86_64 -m 2048 -enable-kvm -cpu host -smp 4 -hda freebsd14.img
-  ```
-
-**Guest:**
-
-* OS: FreeBSD 14.3-RELEASE
-* SMP guests multi-cores
-
----
-
-#### **Steps to Reproduce**
-
-1. Start a FreeBSD 14.3 guest under KVM on a SierraForest host.
-2. Log in and run:
-
-   ```
-   # reboot
-   ```
-
-   or press `Ctrl+Alt+Del`.
-3. Observe that the VM hangs during reboot — it never returns to BIOS/UEFI.
-
----
-
-#### **Expected Result**
-
-FreeBSD should reboot cleanly and return to login prompt.
-
----
-
-#### **Actual Result**
-
-Guest hangs indefinitely during reboot.
-QEMU remains running but guest output is frozen.
-No host kernel warnings or errors in `dmesg`.
-
----
-
-#### **Workaround**
-
-Disable APICv on the host before starting QEMU:
-
-```
-modprobe kvm_intel enable_apicv=N
-```
-
-With `enable_apicv=N`, the FreeBSD guest reboots normally every time.
-
----
-
-#### **Additional Information**
-
-* The issue **does not reproduce** on an Ice Lake host (Intel Xeon Gold 6338) with identical kernel, QEMU, and guest image.
-* Collected `trace-cmd` data for `kvm*` events during both:
-
-  * **Good reboot** (with `enable_apicv=N`)
-  * **Bad reboot** (default APICv enabled)
-
-Traces are available for analysis upon request.
-
----
-
-#### **Preliminary Analysis**
-
-Disabling APICv avoids the hang, suggesting the problem is related to APIC virtualization on SierraForest.
-Possible causes:
-
-* Regression in APICv or posted-interrupt handling on new Xeon platforms.
-* Microcode or MSR-related difference in APICv behavior on SierraForest.
-* Incorrect EOI or interrupt delivery sequence during guest reboot.
-
----
-
-#### **Reproducibility**
-
-* 100% reproducible on SierraForest systems
-* Not reproducible on Ice Lake
-
----
-
-#### **Request for Guidance**
-
-* Is this a known KVM or Intel virtualization issue on SierraForest?
-* Would you like `trace-cmd` traces, MSR dumps, or `perf kvm` data for further diagnosis?
-* Is there a kernel parameter or patch to selectively disable APICv on affected models?
-
-
-
+FYI:
+The 390 team has picked this up and will move it through their repository.
 
