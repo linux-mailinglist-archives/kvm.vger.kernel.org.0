@@ -1,203 +1,255 @@
-Return-Path: <kvm+bounces-59630-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-59631-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 62926BC3C60
-	for <lists+kvm@lfdr.de>; Wed, 08 Oct 2025 10:14:29 +0200 (CEST)
+Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [213.196.21.55])
+	by mail.lfdr.de (Postfix) with ESMTPS id 69FABBC3E6D
+	for <lists+kvm@lfdr.de>; Wed, 08 Oct 2025 10:46:43 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1E2713B9E01
-	for <lists+kvm@lfdr.de>; Wed,  8 Oct 2025 08:14:28 +0000 (UTC)
+	by ams.mirrors.kernel.org (Postfix) with ESMTPS id A2061352197
+	for <lists+kvm@lfdr.de>; Wed,  8 Oct 2025 08:46:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 260E22F3617;
-	Wed,  8 Oct 2025 08:14:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="TLYzuiLZ";
-	dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="4Qldh2rM"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A3A022F3C37;
+	Wed,  8 Oct 2025 08:46:31 +0000 (UTC)
 X-Original-To: kvm@vger.kernel.org
-Received: from galois.linutronix.de (Galois.linutronix.de [193.142.43.55])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 45EF134BA3C;
-	Wed,  8 Oct 2025 08:14:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.142.43.55
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 36C692EC087;
+	Wed,  8 Oct 2025 08:46:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1759911259; cv=none; b=s2XB8J5vBwmv0z7n7TriLo5pHs2GErbpO9WROg59pB5Q7IqAB/5Gv7ZEYqZiZMm8mnjq4IWh7XOaJgtY7B/tIV0hT9el9Ey+2DB63uYFbm4DfftFtHxXCXsJ2cki5ZhvInj/N337gsBBjQc0jAwH+Gfi5aQ/gtadbpViVotCrxs=
+	t=1759913191; cv=none; b=U8DIJmmvGYF7u2tm6O85qe0/GVlyBEQo3mWyAQ/BVX1GMUS6sT9hJDqJGxEvDN0qOmHxxmiN2lzvUvdrGaFuHk+txSDqFfFrWJoSixL8QlL9Ctybh7Y2XSBfgmqZ37nG1TqNnGdGvQGZReeKdvRUp/lIj/yJVxQvUVAmurwRHmg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1759911259; c=relaxed/simple;
-	bh=etNC4AoN+WiTAxrG7ImcBG+LLIlJF8oJN4cSiaXug24=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=uUH+R0Y2R9D4lHCP0g9zGz9YPjJ7YQE63OXpzdkhQmj8j1ZpnJ8yxijfEdLCE3fy17+0OrD50Lz1Z15qMaAK+STt6bw+2evraMSISxGLTUbWUx8j1AT0IOMQ0UWAltIBfe3GNMTvaFfKLles6WvgAdkNdPx4jnppjKUxer4VpqM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de; spf=pass smtp.mailfrom=linutronix.de; dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=TLYzuiLZ; dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=4Qldh2rM; arc=none smtp.client-ip=193.142.43.55
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linutronix.de
-From: Nam Cao <namcao@linutronix.de>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
-	s=2020; t=1759911254;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=H5TDg8FSvQpDKH++xWAtG1t0GE6Gx0i9+KrmLqybckU=;
-	b=TLYzuiLZY2Sklg9yYjmr8SHWaWYn0YpZ3oWlUhhRWYX0FgK71fBDVLsVj+7pF1GnHowFUr
-	+0kHfwZuCRBP5WXFLjnhcx8XthcjitAg3kn0GkJiWmVfw4rNv1m5UlxhgAXGk0KsBO/+uK
-	AGJyiXtfB/bl6hLM+t/GE6wb5XFRqWSEinluaGYAN6j0qAzSjhtrMXFGGtB2c2QDxTsJOL
-	89P+5l85eLHD4i3Nhsl7erpaHiTlAm2/Wt68VQhrwt7O60gRro6SeEa7o7bis0HvTsrkjd
-	igxdjgWrL1hPnLwXlLt1U2OiX3TkzAlaV1jBNNlykpa312jmASbJgHFEclA9RA==
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
-	s=2020e; t=1759911254;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=H5TDg8FSvQpDKH++xWAtG1t0GE6Gx0i9+KrmLqybckU=;
-	b=4Qldh2rMCNzlzmnuLKwkQ4g4LcJEyGBAPvTu822MxwPO39Gsbk9N4VuL6B+PaZLocm8AHY
-	+cU+LnQYG/jgo3BA==
-To: Madhavan Srinivasan <maddy@linux.ibm.com>,
-	Nicholas Piggin <npiggin@gmail.com>,
-	Michael Ellerman <mpe@ellerman.id.au>,
-	Christophe Leroy <christophe.leroy@csgroup.eu>,
-	Frederic Barrat <fbarrat@linux.ibm.com>,
-	Andrew Donnellan <ajd@linux.ibm.com>
-Cc: Arnd Bergmann <arnd@arndb.de>,
-	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-	Nam Cao <namcao@linutronix.de>,
-	Thomas Gleixner <tglx@linutronix.de>,
-	linuxppc-dev@lists.ozlabs.org,
-	kvm@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	"Ritesh Harjani (IBM)" <ritesh.list@gmail.com>
-Subject: [PATCH] powerpc, ocxl: Fix extraction of struct xive_irq_data
-Date: Wed,  8 Oct 2025 08:13:59 +0000
-Message-ID: <20251008081359.1382699-1-namcao@linutronix.de>
+	s=arc-20240116; t=1759913191; c=relaxed/simple;
+	bh=+XznjIOve31pzE7pEfFd9HONdlJdvzdANALqU09QmDc=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=IeGvT3vEIaZd7ENXufw2tXP38FD1BwM7VUrz/1gdqlDGlgqgjw75GDsfLpE1BE/exiGKO1h558tEmSGSmMJ3Nv6r9Emf9dna91ryvWP5J3bwcksGuX5rHGJsOu8v70w524xjC9Tm+iPNnjYl9Jubi001sIr+qdp/jFqaaDBGbjI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 0D7FD113E;
+	Wed,  8 Oct 2025 01:46:13 -0700 (PDT)
+Received: from [10.1.197.1] (ewhatever.cambridge.arm.com [10.1.197.1])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 616CB3F738;
+	Wed,  8 Oct 2025 01:46:18 -0700 (PDT)
+Message-ID: <21424147-f060-4a96-a362-23dc4378a2d5@arm.com>
+Date: Wed, 8 Oct 2025 09:46:16 +0100
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v10 03/43] arm64: RME: Add SMC definitions for calling the
+ RMM
+To: Steven Price <steven.price@arm.com>, Marc Zyngier <maz@kernel.org>
+Cc: kvm@vger.kernel.org, kvmarm@lists.linux.dev,
+ Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>,
+ James Morse <james.morse@arm.com>, Oliver Upton <oliver.upton@linux.dev>,
+ Zenghui Yu <yuzenghui@huawei.com>, linux-arm-kernel@lists.infradead.org,
+ linux-kernel@vger.kernel.org, Joey Gouly <joey.gouly@arm.com>,
+ Alexandru Elisei <alexandru.elisei@arm.com>,
+ Christoffer Dall <christoffer.dall@arm.com>, Fuad Tabba <tabba@google.com>,
+ linux-coco@lists.linux.dev,
+ Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>,
+ Gavin Shan <gshan@redhat.com>, Shanker Donthineni <sdonthineni@nvidia.com>,
+ Alper Gun <alpergun@google.com>, "Aneesh Kumar K . V"
+ <aneesh.kumar@kernel.org>, Emi Kisanuki <fj0570is@fujitsu.com>,
+ Vishal Annapurve <vannapurve@google.com>
+References: <20250820145606.180644-1-steven.price@arm.com>
+ <20250820145606.180644-4-steven.price@arm.com> <86o6qrym2b.wl-maz@kernel.org>
+ <747ab990-d02d-4e7c-9007-a7ac73bb1062@arm.com> <86ldluzvdb.wl-maz@kernel.org>
+ <990a62ee-c7a7-4cdf-9e0a-efc7908a1f2e@arm.com>
+Content-Language: en-US
+From: Suzuki K Poulose <suzuki.poulose@arm.com>
+In-Reply-To: <990a62ee-c7a7-4cdf-9e0a-efc7908a1f2e@arm.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-Commit cc0cc23babc9 ("powerpc/xive: Untangle xive from child interrupt
-controller drivers") changed xive_irq_data to be stashed to chip_data
-instead of handler_data. However, multiple places are still attempting to
-read xive_irq_data from handler_data and get a NULL pointer deference bug.
+Hi,
 
-Update them to read xive_irq_data from chip_data.
+On 01/10/2025 15:05, Steven Price wrote:
+> On 01/10/2025 12:58, Marc Zyngier wrote:
+>> On Wed, 01 Oct 2025 12:00:14 +0100,
+>> Steven Price <steven.price@arm.com> wrote:
+>>>
+>>> Hi Marc,
+>>>
+>>> On 01/10/2025 11:05, Marc Zyngier wrote:
+>>>> On Wed, 20 Aug 2025 15:55:23 +0100,
+>>>> Steven Price <steven.price@arm.com> wrote:
+>>>>>
+>>>>> The RMM (Realm Management Monitor) provides functionality that can be
+>>>>> accessed by SMC calls from the host.
+>>>>>
+>>>>> The SMC definitions are based on DEN0137[1] version 1.0-rel0
+>>>>>
+>>>>> [1] https://developer.arm.com/documentation/den0137/1-0rel0/
+>>>>>
+>>>>> Reviewed-by: Gavin Shan <gshan@redhat.com>
+>>>>> Reviewed-by: Suzuki K Poulose <suzuki.poulose@arm.com>
+>>>>> Signed-off-by: Steven Price <steven.price@arm.com>
+>>>>> ---
+>>>>> Changes since v9:
+>>>>>   * Corrected size of 'ripas_value' in struct rec_exit. The spec states
+>>>>>     this is an 8-bit type with padding afterwards (rather than a u64).
+>>>>> Changes since v8:
+>>>>>   * Added RMI_PERMITTED_GICV3_HCR_BITS to define which bits the RMM
+>>>>>     permits to be modified.
+>>>>> Changes since v6:
+>>>>>   * Renamed REC_ENTER_xxx defines to include 'FLAG' to make it obvious
+>>>>>     these are flag values.
+>>>>> Changes since v5:
+>>>>>   * Sorted the SMC #defines by value.
+>>>>>   * Renamed SMI_RxI_CALL to SMI_RMI_CALL since the macro is only used for
+>>>>>     RMI calls.
+>>>>>   * Renamed REC_GIC_NUM_LRS to REC_MAX_GIC_NUM_LRS since the actual
+>>>>>     number of available list registers could be lower.
+>>>>>   * Provided a define for the reserved fields of FeatureRegister0.
+>>>>>   * Fix inconsistent names for padding fields.
+>>>>> Changes since v4:
+>>>>>   * Update to point to final released RMM spec.
+>>>>>   * Minor rearrangements.
+>>>>> Changes since v3:
+>>>>>   * Update to match RMM spec v1.0-rel0-rc1.
+>>>>> Changes since v2:
+>>>>>   * Fix specification link.
+>>>>>   * Rename rec_entry->rec_enter to match spec.
+>>>>>   * Fix size of pmu_ovf_status to match spec.
+>>>>> ---
+>>>>>   arch/arm64/include/asm/rmi_smc.h | 269 +++++++++++++++++++++++++++++++
+>>>>>   1 file changed, 269 insertions(+)
+>>>>>   create mode 100644 arch/arm64/include/asm/rmi_smc.h
+>>>>>
+>>>>> diff --git a/arch/arm64/include/asm/rmi_smc.h b/arch/arm64/include/asm/rmi_smc.h
+>>>>> new file mode 100644
+>>>>> index 000000000000..1000368f1bca
+>>>>> --- /dev/null
+>>>>> +++ b/arch/arm64/include/asm/rmi_smc.h
+>>>>
+>>>> [...]
+>>>>
+>>>>> +#define RMI_PERMITTED_GICV3_HCR_BITS	(ICH_HCR_EL2_UIE |		\
+>>>>> +					 ICH_HCR_EL2_LRENPIE |		\
+>>>>> +					 ICH_HCR_EL2_NPIE |		\
+>>>>> +					 ICH_HCR_EL2_VGrp0EIE |		\
+>>>>> +					 ICH_HCR_EL2_VGrp0DIE |		\
+>>>>> +					 ICH_HCR_EL2_VGrp1EIE |		\
+>>>>> +					 ICH_HCR_EL2_VGrp1DIE |		\
+>>>>> +					 ICH_HCR_EL2_TDIR)
+>>>>
+>>>> Why should KVM care about what bits the RMM wants to use? Also, why
+>>>> should KVM be forbidden to use the TALL0, TALL1 and TC bits? If
+>>>> interrupt delivery is the host's business, then the RMM has no
+>>>> business interfering with the GIC programming.
+>>>
+>>> The RMM receives the guest's GIC state in a field within the REC entry
+>>> structure (enter.gicv3_hcr). The RMM spec states that the above is the
+>>> list of fields that will be considered and that everything else must be
+>>> 0[1]. So this is used to filter the configuration to make sure it's
+>>> valid for the RMM.
+>>>
+>>> In terms of TALL0/TALL1/TC bits: these control trapping to EL2, and when
+>>> in a realm guest the RMM is EL2 - so it's up to the RMM to configure
+>>> these bits appropriately as it is the RMM which will have to deal with
+>>> the trap.
+>>
+>> And I claim this is *wrong*. Again, if the host is in charge of
+>> interrupt injection, then the RMM has absolutely no business is
+>> deciding what can or cannot be trapped. There is zero information
+>> exposed by these traps that the host is not already aware of.
+>>
+>>> [1] RWVGFJ in the 1.0 spec from
+>>> https://developer.arm.com/documentation/den0137/latest
+>>
+>> Well, until someone explains what this is protecting against, I
+>> consider this as broken.
+> 
+> I'm not sure I understand how you want this to work. Ultimately the
+> realm guest entry is a bounce from NS-EL2 to EL3 to R-EL2 to R-EL1/0. So
+> the RMM has to have some control over the trapping behaviour for its own
+> protection. The current spec means that the RMM does not have to
+> implement the trap handlers for TALL0/TALL1/TC and can simply force
+> these bits to 0. Allowing the host to enable traps that the RMM isn't
+> expecting will obviously end in problems.
 
-Non-XIVE files which touch xive_irq_data seem quite strange to me,
-especially the ocxl driver. I think there ought to be an alternative
-platform-independent solution, instead of touching XIVE's data directly.
-Therefore, I think this whole thing should be cleaned up. But perhaps I
-just misunderstand something. In any case, this cleanup would not be
-trivial; for now, just get things working again.
+The RMM design took a conservative approach of exposing bare minimum
+controls to the host to manage the VGIC, without increasing the
+complexity in the RMM. But if you think that the current set of
+controls are not sufficient for the Host to manage the Realm VGIC,
+like Steven mentions below, we could feed this back to the RMM spec
+and extend it in the future versions. I expect the new traps
+would be reported back as "sysreg" accesses (similar to the already
+exposed ICC_DIR, ICC_SGIxR).
 
-Fixes: cc0cc23babc9 ("powerpc/xive: Untangle xive from child interrupt cont=
-roller drivers")
-Reported-by: Ritesh Harjani (IBM) <ritesh.list@gmail.com>
-Closes: https://lore.kernel.org/linuxppc-dev/68e48df8.170a0220.4b4b0.217d@m=
-x.google.com/
-Signed-off-by: Nam Cao <namcao@linutronix.de>
----
-VAS and OCXL has not been tested. I noticed them while grepping.
----
- arch/powerpc/kvm/book3s_xive.c       | 12 ++++--------
- arch/powerpc/platforms/powernv/vas.c |  2 +-
- arch/powerpc/sysdev/xive/common.c    |  2 +-
- drivers/misc/ocxl/afu_irq.c          |  2 +-
- 4 files changed, 7 insertions(+), 11 deletions(-)
+Thanks
+Suzuki
 
-diff --git a/arch/powerpc/kvm/book3s_xive.c b/arch/powerpc/kvm/book3s_xive.c
-index 1302b5ac5672..89a1b8c21ab4 100644
---- a/arch/powerpc/kvm/book3s_xive.c
-+++ b/arch/powerpc/kvm/book3s_xive.c
-@@ -916,8 +916,7 @@ int kvmppc_xive_attach_escalation(struct kvm_vcpu *vcpu=
-, u8 prio,
- 	 * it fires once.
- 	 */
- 	if (single_escalation) {
--		struct irq_data *d =3D irq_get_irq_data(xc->esc_virq[prio]);
--		struct xive_irq_data *xd =3D irq_data_get_irq_handler_data(d);
-+		struct xive_irq_data *xd =3D irq_get_chip_data(xc->esc_virq[prio]);
-=20
- 		xive_vm_esb_load(xd, XIVE_ESB_SET_PQ_01);
- 		vcpu->arch.xive_esc_raddr =3D xd->eoi_page;
-@@ -1612,7 +1611,7 @@ int kvmppc_xive_set_mapped(struct kvm *kvm, unsigned =
-long guest_irq,
-=20
- 	/* Grab info about irq */
- 	state->pt_number =3D hw_irq;
--	state->pt_data =3D irq_data_get_irq_handler_data(host_data);
-+	state->pt_data =3D irq_data_get_irq_chip_data(host_data);
-=20
- 	/*
- 	 * Configure the IRQ to match the existing configuration of
-@@ -1787,8 +1786,7 @@ void kvmppc_xive_disable_vcpu_interrupts(struct kvm_v=
-cpu *vcpu)
-  */
- void xive_cleanup_single_escalation(struct kvm_vcpu *vcpu, int irq)
- {
--	struct irq_data *d =3D irq_get_irq_data(irq);
--	struct xive_irq_data *xd =3D irq_data_get_irq_handler_data(d);
-+	struct xive_irq_data *xd =3D irq_get_chip_data(irq);
-=20
- 	/*
- 	 * This slightly odd sequence gives the right result
-@@ -2827,9 +2825,7 @@ int kvmppc_xive_debug_show_queues(struct seq_file *m,=
- struct kvm_vcpu *vcpu)
- 				   i0, i1);
- 		}
- 		if (xc->esc_virq[i]) {
--			struct irq_data *d =3D irq_get_irq_data(xc->esc_virq[i]);
--			struct xive_irq_data *xd =3D
--				irq_data_get_irq_handler_data(d);
-+			struct xive_irq_data *xd =3D irq_get_chip_data(xc->esc_virq[i]);
- 			u64 pq =3D xive_vm_esb_load(xd, XIVE_ESB_GET);
-=20
- 			seq_printf(m, "    ESC %d %c%c EOI @%llx",
-diff --git a/arch/powerpc/platforms/powernv/vas.c b/arch/powerpc/platforms/=
-powernv/vas.c
-index b65256a63e87..9c9650319f3b 100644
---- a/arch/powerpc/platforms/powernv/vas.c
-+++ b/arch/powerpc/platforms/powernv/vas.c
-@@ -121,7 +121,7 @@ static int init_vas_instance(struct platform_device *pd=
-ev)
- 		return -EINVAL;
- 	}
-=20
--	xd =3D irq_get_handler_data(vinst->virq);
-+	xd =3D irq_get_chip_data(vinst->virq);
- 	if (!xd) {
- 		pr_err("Inst%d: Invalid virq %d\n",
- 				vinst->vas_id, vinst->virq);
-diff --git a/arch/powerpc/sysdev/xive/common.c b/arch/powerpc/sysdev/xive/c=
-ommon.c
-index 625361a15424..8d0123b0ae84 100644
---- a/arch/powerpc/sysdev/xive/common.c
-+++ b/arch/powerpc/sysdev/xive/common.c
-@@ -1580,7 +1580,7 @@ static void xive_flush_cpu_queue(unsigned int cpu, st=
-ruct xive_cpu *xc)
- 			cpu, irq);
- #endif
- 		raw_spin_lock(&desc->lock);
--		xd =3D irq_desc_get_handler_data(desc);
-+		xd =3D irq_desc_get_chip_data(desc);
-=20
- 		/*
- 		 * Clear saved_p to indicate that it's no longer pending
-diff --git a/drivers/misc/ocxl/afu_irq.c b/drivers/misc/ocxl/afu_irq.c
-index 36f7379b8e2d..f6b821fc274c 100644
---- a/drivers/misc/ocxl/afu_irq.c
-+++ b/drivers/misc/ocxl/afu_irq.c
-@@ -203,7 +203,7 @@ u64 ocxl_afu_irq_get_addr(struct ocxl_context *ctx, int=
- irq_id)
- 	mutex_lock(&ctx->irq_lock);
- 	irq =3D idr_find(&ctx->irq_idr, irq_id);
- 	if (irq) {
--		xd =3D irq_get_handler_data(irq->virq);
-+		xd =3D irq_get_chip_data(irq->virq);
- 		addr =3D xd ? xd->trig_page : 0;
- 	}
- 	mutex_unlock(&ctx->irq_lock);
---=20
-2.51.0
+
+> 
+> If your argument is that because the NS host is emulating the GIC it
+> needs to be able to do these traps, then that's something that can be
+> fed back to the spec and hopefully improved. In that case the trap
+> information would be provided in the rec_entry structure and on trap the
+> RMM would return prepare information in the rec_exit structure. This
+> could in theory be handled similar to an emulatable data abort with a
+> new exit reason.
+> 
+> The other approach would be to push more GIC handling into the RMM such
+> that these trap bits are not needed (i.e. there's no requirement to exit
+> to the NS host to handle the trap, and the RMM can program them
+> independently). I'm afraid I don't understand the GIC well enough to
+> know how these traps are used and how feasible it is for the RMM to just
+> "do the right thing" here.
+> 
+>>>>> +	union { /* 0x300 */
+>>>>> +		struct {
+>>>>> +			u64 gicv3_hcr;
+>>>>> +			u64 gicv3_lrs[REC_MAX_GIC_NUM_LRS];
+>>>>> +			u64 gicv3_misr;
+>>>>
+>>>> Why do we care about ICH_MISR_EL2? Surely we get everything in the
+>>>> registers themselves, right? I think this goes back to my question
+>>>> above: why is the RMM getting in the way of ICH_*_EL2 accesses?
+>>>
+>>> As mentioned above, the state of the guest's GIC isn't passed through
+>>> the CPU's registers, but instead using the rec_enter/rec_exit
+>>> structures. So unlike a normal guest entry we don't set all the CPU's
+>>> register state before entering, but instead hand over a shared data
+>>> structure and the RMM is responsible for actually programming the
+>>> registers on the CPU. Since many of the registers are (deliberately)
+>>> unavailable to the host (e.g. all the GPRs) it makes some sense the RMM
+>>> also handles the GIC registers save/restore.
+>>
+>> And I claim this is nonsense. There is nothing in these registers that
+>> the host doesn't need to know about, which is why they are basically
+>> copied over.
+> 
+> Well it's fairly obvious that the host (generally) doesn't need to know
+> the general purpose registers. And it's fairly clear that confidential
+> compute would be pretty pointless if the hypervisor leaked those
+> registers. So I hope we agree that some architectural registers are
+> going to have to be handled differently from a normal guest.
+> 
+> The GIC is unusual because it's (partly) emulated by the host. The
+> configuration is also complex because during guest entry rather than
+> just dropping down to EL1/0 we're actually performing an SMC to EL3 and
+> world-switching. So I'm not sure to what extent programming the
+> architectural registers in the normal world would work.
+> 
+>> It all feels just wrong.
+> 
+> I think fundamentally the confusing thing is there are two hypervisors
+> pretending to be one. Both KVM and the RMM are providing part of the
+> role of the hypervisor. It would "feel" neater for the RMM to take on
+> more responsibility of the hypervisor role but that leads to more
+> complexity in the RMM (whose simplicity is part of the value of CCA) and
+> potentially less flexibility because you haven't got the functionality
+> of KVM.
+> 
+> Thanks,
+> Steve
 
 
