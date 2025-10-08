@@ -1,75 +1,75 @@
-Return-Path: <kvm+bounces-59641-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-59642-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9B14BBC4F15
-	for <lists+kvm@lfdr.de>; Wed, 08 Oct 2025 14:47:59 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 20CF4BC4F2D
+	for <lists+kvm@lfdr.de>; Wed, 08 Oct 2025 14:48:17 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id A0B064F3BF4
-	for <lists+kvm@lfdr.de>; Wed,  8 Oct 2025 12:47:56 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id EB39019E26F0
+	for <lists+kvm@lfdr.de>; Wed,  8 Oct 2025 12:48:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 11ECD264F99;
-	Wed,  8 Oct 2025 12:47:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0630C2609D9;
+	Wed,  8 Oct 2025 12:48:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="ZyqjHbht"
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="qHKPTCP6"
 X-Original-To: kvm@vger.kernel.org
 Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8600A25DD0B;
-	Wed,  8 Oct 2025 12:47:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 764E42561D1;
+	Wed,  8 Oct 2025 12:47:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1759927662; cv=none; b=BrN75YBUTtGh5Qg0FYW7Ydq7mjQ5MAk2xjf2stSonTaEEMIMKn/Du8w4UpRla/2JPvlwB8zIWiset21DjEOD0MHRVlyzeQb7/s+3mbg8w9Zpy+gHikRLqmUhnHu4RGnLSfDdS4Q2Q0HQN59x0npxCkfKGcaqnrUdMM81SjClFN8=
+	t=1759927681; cv=none; b=mmv6Hahe9pU76FbBU/YuL5AIDQfTWmBszrC4Lx1UdgBojmlOxvizHNJWCWI1EsCJrKuqnZextzS8PjPWi8tM9lCqLlf8zXaV/mXTYw7l1OyEYh23T62eHRRqO20PWAjojwWHOA1Kt+K2ZqMPeLJpY4ZJ/2opbmb5pmThTtdZZmA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1759927662; c=relaxed/simple;
-	bh=9oEYxSjZqlIAA+cCSre2rgovRfPuHA0sMuZ7ItzITQs=;
+	s=arc-20240116; t=1759927681; c=relaxed/simple;
+	bh=6AmhIi3MmgCdH6CIWiMbAKEKpfuN9vg9Ic1yxljoxfA=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=if9C4herhq964SXkORJ1ksoE1Ez1fGZ5lQhV1ONQBy+sXA/se7Fhfy8bvWha8P8URKctbgG8coXzFz9LVtUcIn6EVdmM8FdNj3Mv1+B2UdaYfX4oYqQEY7KE+e6qys0LBfjSknVL87P4pbiWtaausqQ4KIKKLdzJmc0mrEa8glA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=ZyqjHbht; arc=none smtp.client-ip=148.163.158.5
+	 In-Reply-To:Content-Type; b=bqn6qi1mEeJHkmFGmJNUR4NQWf46rdGzl/aJUpQzZEroJoU2MNVnxF9Tajn6TPgGDk4lYT+Ots9cYo5jZJHJsegQvGPgqNtfe9/S/xVK6aaAw9xEWb8WDRD2dBgiq8TjAQ80BDknMBIqiNRiD1ExNdogoxmpwovJD2C/ocwsHYs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=qHKPTCP6; arc=none smtp.client-ip=148.163.158.5
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
-Received: from pps.filterd (m0360072.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 5984uYHg002491;
-	Wed, 8 Oct 2025 12:47:38 GMT
+Received: from pps.filterd (m0356516.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 59873WWP005660;
+	Wed, 8 Oct 2025 12:47:55 GMT
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
 	:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=pp1; bh=N4zpMc
-	C/Cps5ja4lDluPN0SzVC7G7PBdIa4bZbOGYwY=; b=ZyqjHbhtm8V41NleyCtgm8
-	8d60v/xZCM98hv/wwfGMaIymkkpjcwQ2CHOp0Z5s3sf19PV2Vk2QzlvZdYv7P7Gq
-	Mtf4rx1kdtC7i/piBT7BhDFeGAEuqJ2P41g1/KX2fgDi0p3HChzoM8WWaqORaf8e
-	MBu5OQvjc1tLU4FnIqmQqypqbA+niLWNIrfe+d7fX89D9BJvqcq2YTVTGfYuZ48G
-	+VY5gU/HO1XJlhIXpRmHdgMa6LnXbj5c728QBAEIpZV/8l4gtOYjTW+u5jHOcdwK
-	H9R4NLQAwoX5IYXkN5dgO3P61wEuKnVUkbzSxbkX54ULq+lvukn3FCB4ZFJ78HMg
+	:message-id:mime-version:references:subject:to; s=pp1; bh=DwX5WA
+	ICUnR+TeJnVwuTku4sIShybBBekPaqL7cCM7U=; b=qHKPTCP6q/gIKPYqO2s//a
+	pgbqAs8E9+w11pb1mykS5ukiZYBApdDZKAzT7NAZr8HhJoYSDf8ec79lHM8i4bP7
+	Tn8WUQ+381huuEcnYtgIUdZr6MrFRCvfyzjcUB/MtiaaNLhNeARVg1dQG+teUaEt
+	8Cowu44370GMdkgKMRhne6I8WlPj3u8+nIKN+LgyARW98xxRAyh9fgGzh39dqeTy
+	5w4XOFH0JS3ViD7uj3AocZ1oSzdq1ub3a+hqLgkpewPQDJsem2yYUOFS7LXUwMrP
+	2PSF1qlUM6FLjb5lyQNHkR6bgkF0ti09t7FWPkwSNJf8BlC4y5C+SV8PoZM4Y8Aw
 	==
-Received: from ppma22.wdc07v.mail.ibm.com (5c.69.3da9.ip4.static.sl-reverse.com [169.61.105.92])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 49ju8avajm-1
+Received: from ppma12.dal12v.mail.ibm.com (dc.9e.1632.ip4.static.sl-reverse.com [50.22.158.220])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 49js0smn4y-1
 	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Wed, 08 Oct 2025 12:47:38 +0000 (GMT)
-Received: from pps.filterd (ppma22.wdc07v.mail.ibm.com [127.0.0.1])
-	by ppma22.wdc07v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 59894wqS000875;
-	Wed, 8 Oct 2025 12:47:37 GMT
-Received: from smtprelay06.fra02v.mail.ibm.com ([9.218.2.230])
-	by ppma22.wdc07v.mail.ibm.com (PPS) with ESMTPS id 49ke9y8m4b-1
+	Wed, 08 Oct 2025 12:47:55 +0000 (GMT)
+Received: from pps.filterd (ppma12.dal12v.mail.ibm.com [127.0.0.1])
+	by ppma12.dal12v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 5988hFWJ019591;
+	Wed, 8 Oct 2025 12:47:54 GMT
+Received: from smtprelay01.fra02v.mail.ibm.com ([9.218.2.227])
+	by ppma12.dal12v.mail.ibm.com (PPS) with ESMTPS id 49kdwsgn6m-1
 	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Wed, 08 Oct 2025 12:47:37 +0000
+	Wed, 08 Oct 2025 12:47:54 +0000
 Received: from smtpav05.fra02v.mail.ibm.com (smtpav05.fra02v.mail.ibm.com [10.20.54.104])
-	by smtprelay06.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 598ClXBa30802224
+	by smtprelay01.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 598ClooY60817878
 	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Wed, 8 Oct 2025 12:47:33 GMT
+	Wed, 8 Oct 2025 12:47:50 GMT
 Received: from smtpav05.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 9F15420043;
-	Wed,  8 Oct 2025 12:47:33 +0000 (GMT)
+	by IMSVA (Postfix) with ESMTP id 8F75420040;
+	Wed,  8 Oct 2025 12:47:50 +0000 (GMT)
 Received: from smtpav05.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 0758D20040;
-	Wed,  8 Oct 2025 12:47:33 +0000 (GMT)
+	by IMSVA (Postfix) with ESMTP id 0B21F2004E;
+	Wed,  8 Oct 2025 12:47:50 +0000 (GMT)
 Received: from [9.87.146.232] (unknown [9.87.146.232])
 	by smtpav05.fra02v.mail.ibm.com (Postfix) with ESMTP;
-	Wed,  8 Oct 2025 12:47:32 +0000 (GMT)
-Message-ID: <818d278c-8918-4a73-b582-e4cbc1fe11a3@linux.ibm.com>
-Date: Wed, 8 Oct 2025 14:47:32 +0200
+	Wed,  8 Oct 2025 12:47:49 +0000 (GMT)
+Message-ID: <3589d9b8-ccb4-4a55-8986-d14456218210@linux.ibm.com>
+Date: Wed, 8 Oct 2025 14:47:49 +0200
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -77,17 +77,17 @@ List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] s390/uv: Fix the comment of the uv_find_secret() function
-To: Thomas Huth <thuth@redhat.com>, freude@linux.ibm.com,
-        Christian Borntraeger <borntraeger@linux.ibm.com>,
-        Claudio Imbrenda <imbrenda@linux.ibm.com>,
-        Vasily Gorbik
- <gor@linux.ibm.com>,
-        Alexander Gordeev <agordeev@linux.ibm.com>
-Cc: David Hildenbrand <david@redhat.com>, Heiko Carstens <hca@linux.ibm.com>,
+Subject: Re: [PATCH] s390/kvm: Replace sprintf with snprintf for buffer safety
+To: Josephine Pfeiffer <hi@josie.lol>,
+        Christian Borntraeger <borntraeger@linux.ibm.com>
+Cc: Claudio Imbrenda <imbrenda@linux.ibm.com>,
+        David Hildenbrand <david@redhat.com>,
+        Heiko Carstens <hca@linux.ibm.com>, Vasily Gorbik <gor@linux.ibm.com>,
+        Alexander Gordeev
+ <agordeev@linux.ibm.com>,
         Sven Schnelle <svens@linux.ibm.com>, kvm@vger.kernel.org,
         linux-s390@vger.kernel.org, linux-kernel@vger.kernel.org
-References: <20251002155423.466142-1-thuth@redhat.com>
+References: <20251001174046.192295-1-hi@josie.lol>
 Content-Language: en-US
 From: Janosch Frank <frankja@linux.ibm.com>
 Autocrypt: addr=frankja@linux.ibm.com; keydata=
@@ -132,42 +132,59 @@ Autocrypt: addr=frankja@linux.ibm.com; keydata=
  DchCqFm5adiSP5+OT4NjkKUeGpBe/aRyQSle/RropTgCi85pje/juYEn2P9UAgkfBJrOHvQ9
  Z+2Sva8FRd61NJLkCJ4LFumRn9wQlX2icFbi8UDV3do0hXJRRYTWCxrHscMhkrFWLhYiPF4i
  phX7UNdOWBQ90qpHyAxHmDazdo27gEjfvsgYMdveKknEOTEb5phwxWgg7BcIDoJf9UMC
-In-Reply-To: <20251002155423.466142-1-thuth@redhat.com>
+In-Reply-To: <20251001174046.192295-1-hi@josie.lol>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: h29j1gSJaw7CZHOozFa20DVKWXG_z47y
-X-Authority-Analysis: v=2.4 cv=BpiQAIX5 c=1 sm=1 tr=0 ts=68e65d6a cx=c_pps
- a=5BHTudwdYE3Te8bg5FgnPg==:117 a=5BHTudwdYE3Te8bg5FgnPg==:17
- a=IkcTkHD0fZMA:10 a=x6icFKpwvdMA:10 a=20KFwNOVAAAA:8 a=IkQwAILPEdY48X5WYg4A:9
+X-Authority-Analysis: v=2.4 cv=EqnfbCcA c=1 sm=1 tr=0 ts=68e65d7b cx=c_pps
+ a=bLidbwmWQ0KltjZqbj+ezA==:117 a=bLidbwmWQ0KltjZqbj+ezA==:17
+ a=IkcTkHD0fZMA:10 a=x6icFKpwvdMA:10 a=KxyNpdYphnprUX8qlBEA:9
  a=QEXdDO2ut3YA:10 a=cPQSjfK2_nFv0Q5t_7PE:22
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUxMDA0MDAyMiBTYWx0ZWRfX0SIhKjGT4POm
- z4MnuidsxYlU6cIXEVlXcFAXpOr+Gd7BA98vND8FLpjLkTKSMff41ZBbmJe9qv6n+HwDKKbFs79
- pVmwM72y1p93vMQ7wPcVq4mx6DhbJLxRQT5+eCRX7UVhr/ru4n/O3WVGzOq29AMVDMOIth5vGhB
- /0od6+LABmzlL0CI6+oOESN32zrFUfNyIyeSXxTplrF6pxFDQDzP+4EABxOJBfl9QLiFs7gcol2
- 7F39rHRF92pJ7fck970pMUfCrQ8FbuSfys9LzzktCys4+RLiSY443iz+l8icNZuCM04ezNXOgwi
- lcPuhrgbsyP1+xT05PduKyt61CCP4p3Wd5JBWsm4cFLENMw11VpzWI7WOC6VU86nwGlFHHE6Qi4
- h8Zzrp4RKtQvFkPIPyoarkspbRlYFw==
-X-Proofpoint-ORIG-GUID: h29j1gSJaw7CZHOozFa20DVKWXG_z47y
+X-Proofpoint-GUID: vzkEeV8gVGElsF-BLNgtV0oouIjZHEHB
+X-Proofpoint-ORIG-GUID: vzkEeV8gVGElsF-BLNgtV0oouIjZHEHB
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUxMDAzMDIwMSBTYWx0ZWRfX6YxaCX/SCoNa
+ u47c/Z3ElkI6b/A9SOtfR5Jqx0dx3fd62uQpTlx7Qso8RxilvAF7/1MQLDhP9ghLl5pyUJgNHWD
+ aP6chz2ceZs9F+Rrm4cgaSDdks6WiJBo6yCLunxcVp6J3LiPN2rikwqDdsJNajdw0E54o7LyU3p
+ zzR73e3S6bO0nVQVjarNL7RlL0v0X2gbIhEbEVDY9x/sMNIGd4aWsFaebTcgfX+Rbk7qdacHjaO
+ /dzGT1w4gCC6oAiQrXib7fGrpihVUeNijeqGED/ntOPQZqvQ5U+vx5h61xaHlrtTzN5vh7vsLVT
+ pG+aZJRmX2y0Kp7Pbf8RzU1HVHDK/c6A/U1VtYeR/00jmhISPJTUgjhpUYTjoD2a01VxxPgCdNe
+ xs02XOw5n0quK75heF80GqKM6C7Ipw==
 X-Proofpoint-Virus-Version: vendor=baseguard
  engine=ICAP:2.0.293,Aquarius:18.0.1117,Hydra:6.1.9,FMLib:17.12.80.40
  definitions=2025-10-08_04,2025-10-06_01,2025-03-28_01
 X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- spamscore=0 lowpriorityscore=0 priorityscore=1501 malwarescore=0
- suspectscore=0 bulkscore=0 impostorscore=0 adultscore=0 clxscore=1015
- phishscore=0 classifier=typeunknown authscore=0 authtc= authcc=
- route=outbound adjust=0 reason=mlx scancount=1 engine=8.19.0-2509150000
- definitions=main-2510040022
+ suspectscore=0 malwarescore=0 impostorscore=0 adultscore=0 phishscore=0
+ priorityscore=1501 bulkscore=0 clxscore=1011 spamscore=0 lowpriorityscore=0
+ classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
+ reason=mlx scancount=1 engine=8.19.0-2509150000 definitions=main-2510030201
 
-On 10/2/25 5:54 PM, Thomas Huth wrote:
-> From: Thomas Huth <thuth@redhat.com>
+On 10/1/25 7:40 PM, Josephine Pfeiffer wrote:
+> Replace sprintf() with snprintf() when formatting debug names to prevent
+> potential buffer overflow. The debug_name buffer is 16 bytes, and while
+> unlikely to overflow with current PIDs, using snprintf() provides proper
+> bounds checking.
 > 
-> The uv_get_secret_metadata() function has been removed some
-> months ago, so we should not mention it in the comment anymore.
-> 
-> Fixes: a42831f0b74dc ("s390/uv: Remove uv_get_secret_metadata function")
-> Signed-off-by: Thomas Huth <thuth@redhat.com>
 
-FYI:
-The 390 team has picked this up and will move it through their repository.
+Hey, we generally use "KVM: s390: Subject" so I'll fix this up.
+Thanks, picked.
+
+> Signed-off-by: Josephine Pfeiffer <hi@josie.lol>
+> ---
+>   arch/s390/kvm/kvm-s390.c | 2 +-
+>   1 file changed, 1 insertion(+), 1 deletion(-)
+> 
+> diff --git a/arch/s390/kvm/kvm-s390.c b/arch/s390/kvm/kvm-s390.c
+> index 6d51aa5f66be..005c117be086 100644
+> --- a/arch/s390/kvm/kvm-s390.c
+> +++ b/arch/s390/kvm/kvm-s390.c
+> @@ -3371,7 +3371,7 @@ int kvm_arch_init_vm(struct kvm *kvm, unsigned long type)
+>   			((char *) kvm->arch.sca + sca_offset);
+>   	mutex_unlock(&kvm_lock);
+>   
+> -	sprintf(debug_name, "kvm-%u", current->pid);
+> +	snprintf(debug_name, sizeof(debug_name), "kvm-%u", current->pid);
+>   
+>   	kvm->arch.dbf = debug_register(debug_name, 32, 1, 7 * sizeof(long));
+>   	if (!kvm->arch.dbf)
+
 
