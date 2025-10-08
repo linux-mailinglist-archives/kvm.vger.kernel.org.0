@@ -1,133 +1,156 @@
-Return-Path: <kvm+bounces-59647-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-59648-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id BBCD6BC5E90
-	for <lists+kvm@lfdr.de>; Wed, 08 Oct 2025 17:59:31 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id B38C1BC5F49
+	for <lists+kvm@lfdr.de>; Wed, 08 Oct 2025 18:09:21 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id ECB024F9F5A
-	for <lists+kvm@lfdr.de>; Wed,  8 Oct 2025 15:55:37 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 6457F19E0656
+	for <lists+kvm@lfdr.de>; Wed,  8 Oct 2025 16:09:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3F2F029E0FD;
-	Wed,  8 Oct 2025 15:55:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A31492F360C;
+	Wed,  8 Oct 2025 16:08:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="Rmzgu+5J"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="hWBMIDax"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pl1-f201.google.com (mail-pl1-f201.google.com [209.85.214.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0FAAF28507D
-	for <kvm@vger.kernel.org>; Wed,  8 Oct 2025 15:55:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E60D82E8DEB
+	for <kvm@vger.kernel.org>; Wed,  8 Oct 2025 16:08:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1759938927; cv=none; b=VpeUzeb2vzfg4AUKi0HaLnR/0mmBhAC7kADn+6jChj5t7BUf32rQCZ/cYlAHbNeP7Gu5fQcUlBnw/tnbbJYEccGASPlinAVxRckdHoDFi/ITS8aEqcAegLuKnvMCVlqlfbmWKGVGlgqv/d5Y3+T2a9Bo8NWvSAUSUNxdmw+QNMA=
+	t=1759939735; cv=none; b=Bhlzp52v3ZglpUO4ltDTxf6AK1+qin/2QlvRabPSOodVsbYvx3SMxejYkYB4A0Fnk6SdEzUTNWr7Si7TuY20B/fngkSx7C2g6bS2PNbZzqARr/x25ditGG3WgZ2d0ni8uIi7qqVf2X4uipHaFPZW1ATO+mep53JUyxAw4hRL/Pk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1759938927; c=relaxed/simple;
-	bh=85/mm3sXpOoNOn6cTJ/JXyXBRwl6do61EpL+5QUva/0=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=bYhXyHSCF9ge8em0T0tFVMDUunn+xLU1H7f/6gtGqt2SIRM9NFV+myhW6+xLQuqTGL/gllJNHOn/iBb6Ff+qIkjFtV7axFRBayCp30Sj+vV51eGaO+MXYvZhFM7bpVi+Dm97z3X4JH5nQRlFCjK7Eh0aqIz3+AlVBPAVXWBl3wM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=Rmzgu+5J; arc=none smtp.client-ip=209.85.214.201
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pl1-f201.google.com with SMTP id d9443c01a7336-27c62320f16so88215855ad.1
-        for <kvm@vger.kernel.org>; Wed, 08 Oct 2025 08:55:25 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1759938925; x=1760543725; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:from:subject:message-id:references
-         :mime-version:in-reply-to:date:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=yE/1NjviAjYgzvKEBWocmDsuG1eu4K2fZd8EwARCmAo=;
-        b=Rmzgu+5JNaP/UN9JgmylzNruOIukS2R/xVk7j7Iqnnhl7MKPZ1UjPISJYpLxpxV/6u
-         s+lQHSnOnijkTV0g2ym7gBYtC7eJsR7CAQGVFVR0aNCjeDWVu1a5MpmtRGFhw2re+oek
-         FDQ16zrGEgJr3qBS2LnUS7Gctro8DA/G8Qys02TF0kqGX3R94iL5ZkJJnpdOHD97Xa+l
-         xOVX9Gzja6xl2NIO+mWzGnpNeFTqEwdNiJ/FnK94+nxPN2bDNqZvp60mCCtF7gAx8xnE
-         GicmN0Fa8TLdlu+KlUx2LU5sZHiA5CmaQ++OO0UfqWJPo2TQrcPwwYFQ0CxlOh0gwS8k
-         WuYA==
+	s=arc-20240116; t=1759939735; c=relaxed/simple;
+	bh=vk3AuPzABSqiYhDKyK5DZW5TBoEaJm0wm/y7QixLxVw=;
+	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type; b=u8cl+GOkFCqWf/ZRAH6lAOtF+C4LjX0cGmj1vdlCqjco4rrHPtDatEBrEjoi5kNK8zXIgO+M+13TLdJoSUz3/nFCVSNXZTwo5RjgbelAeJcfBoye/VFW59ZJTwkOOyhTOyEJk+KMfbjbZiVAyeSNRvtM2lmHvVRDEXKOk9W0WtE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=hWBMIDax; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1759939732;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=d83HNR6tAkbhcYaA0tnAzOhkHW7QfhiumWGCMyzcg9A=;
+	b=hWBMIDaxhaAtdEdpLAnIC7J6jcIMfnYJivMpbZyKWk9TfL3TVWLKwWLwEEwUzYeUQCsq+F
+	SH5J/9/C5D/S+agmv7HQmfzadJewLG2hg6DcFPkFxRk51c0VWUEB1jPX2qVqsUSU37zNLt
+	FWYWYbLqmltpkqZJE1VX1oZqI3wnKOE=
+Received: from mail-io1-f70.google.com (mail-io1-f70.google.com
+ [209.85.166.70]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-649-SR7frf0gPXueZyRdwF2geA-1; Wed, 08 Oct 2025 12:08:51 -0400
+X-MC-Unique: SR7frf0gPXueZyRdwF2geA-1
+X-Mimecast-MFC-AGG-ID: SR7frf0gPXueZyRdwF2geA_1759939730
+Received: by mail-io1-f70.google.com with SMTP id ca18e2360f4ac-88dd4fb24d1so57089439f.2
+        for <kvm@vger.kernel.org>; Wed, 08 Oct 2025 09:08:50 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1759938925; x=1760543725;
-        h=content-transfer-encoding:cc:to:from:subject:message-id:references
-         :mime-version:in-reply-to:date:x-gm-message-state:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=yE/1NjviAjYgzvKEBWocmDsuG1eu4K2fZd8EwARCmAo=;
-        b=cjHGrGcm6DbB3eUt/pc+Er8qD7e2RJL22jauuR8o+Cd3nBLhhVJmS4qOd1cTh2iLA3
-         TS4hoH9JXe/njjoogIDkNncPNqVTYDhiv+zUMnJJ4fGsDTDvFihhSJ9iaXm41DQf0oUO
-         BRbggBWwoizwtK/KEh9xtAhpcA8WggK4IiNwIhcKDXKiawRB111WNiIMi8RzbpN/KP/L
-         PPcv4UBx3NmyCJ8vxlJU+tDPvsaD7owvQJMnRxOisNI9p/IxYa5OxvsVeN/Iiuh1Qiro
-         xW62pFeiYskLKqD9jatT3xUko2hoTwPP4sKbQfSzkfXK9a+FX5pyV+D+ICp3s/c1hbvo
-         NnOg==
-X-Forwarded-Encrypted: i=1; AJvYcCWJTz4Mg5HkBu359SEpgCUp9cxt7TUNxal63DU/0HN9HeDufF1NwNnBK1ah24V7nnPCwls=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yz/2eCXpN1x3E4LU54XugzD7ME6NPCHDAojnWBzwzJ01Ca6KNuL
-	n0Q1WEHiwIAAxh4lqxrm9j6kR8hA+VZdpiL/GR7Zxa1WgLl4+OtJUBr4RPkB2fPGjw8R+Cmm47c
-	V/R9stw==
-X-Google-Smtp-Source: AGHT+IHNZ9o1aucHiV07bHDBIvskxFmukfMK9SZ5tpZZEnJ+tyDCdecEFDLxuqTyrcbJu7v6jlO0OKadLqQ=
-X-Received: from plblv11.prod.google.com ([2002:a17:903:2a8b:b0:234:c104:43f1])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:903:ac7:b0:269:9a8f:a4ab
- with SMTP id d9443c01a7336-29027321d6fmr43055485ad.60.1759938925410; Wed, 08
- Oct 2025 08:55:25 -0700 (PDT)
-Date: Wed, 8 Oct 2025 08:55:24 -0700
-In-Reply-To: <CAMGffE=P5HJkJxh2mj3c_oh6busFKYb0TGuhAc36toc5_uD72w@mail.gmail.com>
+        d=1e100.net; s=20230601; t=1759939730; x=1760544530;
+        h=content-transfer-encoding:mime-version:message-id:subject:cc:to
+         :from:date:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=d83HNR6tAkbhcYaA0tnAzOhkHW7QfhiumWGCMyzcg9A=;
+        b=LsBbU0IODcts04TeoqwqfaR/nc7Gg7jkZBFKv8+7KHHuQYzWMdeS/E1+7iJ4LOyFd0
+         pGaCFOvzHd5IRVROWpKNRAWhTPznwPxyo9zgbkqZ9GGBdjH7QlT462qtaJ0O0SN/gTJD
+         YuIb0NYUQ0k5GS3AMfFnZcr8U9GE/kSsA+GxzB/2o3oSaBE/DyU/pwxSUQ8wj7QWYveA
+         12dDDdp1GpRi4rnu7GT2xzxzv3iMj8VJmW8sjtJGxAGqMutMY+EIlZ9yj0yulzXaksTm
+         Osnh+WOLZPQQ/ot0gt1qXodFc979ooA0xEKE0HF/1F/12o42VhIpmKmKwtFqgn0noyek
+         KeuQ==
+X-Forwarded-Encrypted: i=1; AJvYcCVQkQxaBX60lBnJZreEAeah85cUoKUXkP7PjOFPXQa2HLPFiNTnX4IOHcP0zuR54AOSsIc=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyPiYlxernuhd7lgur9OvX+rFN7GZqTXEMvh8ysy22WBv5rcCQh
+	aQO6D87iW3fa8cZN6ODKfcz3mBjWJ993hQMy11s4nUm0chkFML4WErjNruRHGhvrw+tJAlsUy2f
+	DruQSvNCmOY7rV5zfBzcUdtEa/NPHqIbYVPlh96OuIsGNXUIsSt8mcA==
+X-Gm-Gg: ASbGncuimVnCDcJ+qgKwROn5vbfzhaghmx22imDrFTsBJoK64T/tJIW0DcUa+5st3g7
+	3dDU736nWnevzi1jMH7G4wOSEJm0QIJJiaMAhByMu4O79V8lWgn+RGBZNnzrKpH4kWITKJU957D
+	CDptfT2YcNW08iepY/hBgwqqw07ye5my6lVYXRhAf0Dh6umVPNSNABBXAhTf+QW63x+VoFCzmeY
+	a0/va1zinBm+rjjalElmGzOgtrqkLLOPV1ZaUKuYl3y/q5oJliYCBETvFOz6f4LjVhn/Dr8DAFy
+	Za4wAuV2iSzRqK3ocUta0SeAB9PQ7LRq91LDwpDjiE4IpZPn
+X-Received: by 2002:a05:6602:4016:b0:921:5e64:677 with SMTP id ca18e2360f4ac-93bd197e8cfmr161410139f.4.1759939730082;
+        Wed, 08 Oct 2025 09:08:50 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IHg4nuM2w2if09kF/9hjDJAQxyAe4TBWUu9omT72OFBq2W4qsR27e2Ru0/zlWuNm4KiUOruMg==
+X-Received: by 2002:a05:6602:4016:b0:921:5e64:677 with SMTP id ca18e2360f4ac-93bd197e8cfmr161408239f.4.1759939729565;
+        Wed, 08 Oct 2025 09:08:49 -0700 (PDT)
+Received: from redhat.com ([38.15.36.11])
+        by smtp.gmail.com with ESMTPSA id 8926c6da1cb9f-57b5e9ec393sm7191810173.14.2025.10.08.09.08.48
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 08 Oct 2025 09:08:48 -0700 (PDT)
+Date: Wed, 8 Oct 2025 10:08:46 -0600
+From: Alex Williamson <alex.williamson@redhat.com>
+To: Linus Torvalds <torvalds@linux-foundation.org>
+Cc: <linux-kernel@vger.kernel.org>, "kvm@vger.kernel.org"
+ <kvm@vger.kernel.org>, Andrew Morton <akpm@linux-foundation.org>, David
+ Hildenbrand <david@redhat.com>, lizhe.67@bytedance.com, =?UTF-8?B?Q8Op?=
+ =?UTF-8?B?ZHJpYw==?= Le Goater <clg@redhat.com>
+Subject: [GIT PULL] VFIO updates for v6.18-rc1 part 2
+Message-ID: <20251008100846.47bcedd1.alex.williamson@redhat.com>
+X-Mailer: Claws Mail 4.3.1 (GTK 3.24.43; x86_64-redhat-linux-gnu)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <539FC243.2070906@redhat.com> <20140617060500.GA20764@minantech.com>
- <FFEF5F78-D9E6-4333-BC1A-78076C132CBF@jnielsen.net> <6850B127-F16B-465F-BDDB-BA3F99B9E446@jnielsen.net>
- <jpgioafjtxb.fsf@redhat.com> <74412BDB-EF6F-4C20-84C8-C6EF3A25885C@jnielsen.net>
- <558AD1B0.5060200@redhat.com> <FAFB2BA9-E924-4E70-A84A-E5F2D97BC2F0@jnielsen.net>
- <CACzj_yVTyescyWBRuA3MMCC0Ymg7TKF-+sCW1N+Xwfffvw_Wsg@mail.gmail.com> <CAMGffE=P5HJkJxh2mj3c_oh6busFKYb0TGuhAc36toc5_uD72w@mail.gmail.com>
-Message-ID: <aOaJbHPBXHwxlC1S@google.com>
-Subject: Re: Hang on reboot in multi-core FreeBSD guest on Linux KVM host with
- Intel Sierra Forest CPU
-From: Sean Christopherson <seanjc@google.com>
-To: Jinpu Wang <jinpu.wang@ionos.com>
-Cc: fanwenyi0529@gmail.com, kvm@vger.kernel.org, 
-	Paolo Bonzini <pbonzini@redhat.com>, Xiaoyao Li <xiaoyao.li@intel.com>, linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="utf-8"
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
 
-Trimmed Cc: to drop people from the original thread.  In the future, just s=
-tart
-a new bug report.  Piggybacking a 10 year old bug just because the symptoms=
- are
-similar does more harm than good.  Whatever the old thread was chasing was =
-already
-fixed, _10 years_ ago; they were just trying to identy exactly what commit =
-fixed
-the problem.  I.e. whatever they were chasing _can't_ be the same root caus=
-e,
-because even if it's literally the same code bug, it would require a code c=
-hange
-and thus a regression between v4.0 and v6.1.
+Hi Linus,
 
-On Wed, Oct 08, 2025, Jinpu Wang wrote:
-> On Wed, Oct 8, 2025 at 2:44=E2=80=AFPM Jack Wang <jinpu.wang@ionos.com> w=
-rote:
-> > Sorry for bump this old thread, we hit same issue on Intel Sierra Fores=
-t
-> > machines with LTS kernel 6.1/6.12, maybe KVM comunity could help fix it=
-.
+Sorry for the two part pull request, this is mostly the DMA map/unmap
+optimization series that we tried to get into v6.17, but made use of
+the nth_page API that generated some objections.  That has since been
+removed, but was stalled again by the page_to_section() to
+memdesc_section() change, where I opt'd for this two part approach
+rather than resolution buried in a merge commit since we saw it coming.
+Thanks,
 
-Are there any host kernels that _do_ work?  E.g. have you tried a bleeding =
-edge
-host kernel?
+Alex
 
-> > ### **[BUG] Hang on FreeBSD Guest Reboot under KVM on Intel SierraFores=
-t (Xeon 6710E)**
-> >
-> > **Summary:**
-> > Multi-cores FreeBSD guests hang during reboot under KVM on systems with
-> > Intel(R) Xeon(R) 6710E (SierraForest). The issue is fully reproducible =
-with
-> > APICv enabled and disappears when disabling APICv (`enable_apicv=3DN`).=
- The
-> > same configuration works correctly on Ice Lake (Xeon Gold 6338).
+The following changes since commit fd94619c43360eb44d28bd3ef326a4f85c600a07:
 
-Does Sierra Forest have IPI virtualization?  If so, you could try running w=
-ith
-APICv enabled, but enable_ipiv=3Dfalse to specifically disable IPI virtuali=
-zation.
+  Merge tag 'zonefs-6.18-rc1' of git://git.kernel.org/pub/scm/linux/kernel/=
+git/dlemoal/zonefs (2025-10-05 20:45:49 -0700)
+
+are available in the Git repository at:
+
+  https://github.com/awilliam/linux-vfio.git tags/vfio-v6.18-rc1-pt2
+
+for you to fetch changes up to 451bb96328981808463405d436bd58de16dd967d:
+
+  vfio: Dump migration features under debugfs (2025-10-06 11:22:48 -0600)
+
+----------------------------------------------------------------
+VFIO updates for v6.18-rc1 part 2
+
+ - Optimizations for DMA map and unmap opertions through the type1
+   vfio IOMMU backend.  This uses various means of batching and hints
+   from the mm structures to improve efficiency and therefore
+   performance, resulting in a significant speedup for huge page
+   use cases. (Li Zhe)
+
+ - Expose supported device migration features through debugfs.
+   (C=C3=A9dric Le Goater)
+
+----------------------------------------------------------------
+C=C3=A9dric Le Goater (1):
+      vfio: Dump migration features under debugfs
+
+Li Zhe (5):
+      mm: introduce num_pages_contiguous()
+      vfio/type1: optimize vfio_pin_pages_remote()
+      vfio/type1: batch vfio_find_vpfn() in function vfio_unpin_pages_remot=
+e()
+      vfio/type1: introduce a new member has_rsvd for struct vfio_dma
+      vfio/type1: optimize vfio_unpin_pages_remote()
+
+ Documentation/ABI/testing/debugfs-vfio |   6 ++
+ drivers/vfio/debugfs.c                 |  19 ++++++
+ drivers/vfio/vfio_iommu_type1.c        | 112 ++++++++++++++++++++++++++---=
+----
+ include/linux/mm.h                     |   7 ++-
+ include/linux/mm_inline.h              |  36 +++++++++++
+ 5 files changed, 158 insertions(+), 22 deletions(-)
+
 
