@@ -1,162 +1,133 @@
-Return-Path: <kvm+bounces-59646-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-59647-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id DC06EBC5DDC
-	for <lists+kvm@lfdr.de>; Wed, 08 Oct 2025 17:51:40 +0200 (CEST)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
+	by mail.lfdr.de (Postfix) with ESMTPS id BBCD6BC5E90
+	for <lists+kvm@lfdr.de>; Wed, 08 Oct 2025 17:59:31 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B1E82424032
-	for <lists+kvm@lfdr.de>; Wed,  8 Oct 2025 15:45:32 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id ECB024F9F5A
+	for <lists+kvm@lfdr.de>; Wed,  8 Oct 2025 15:55:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 26DD82FB0B4;
-	Wed,  8 Oct 2025 15:40:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3F2F029E0FD;
+	Wed,  8 Oct 2025 15:55:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="XmryXEaL"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="Rmzgu+5J"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.18])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f201.google.com (mail-pl1-f201.google.com [209.85.214.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 50DEF243956;
-	Wed,  8 Oct 2025 15:40:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0FAAF28507D
+	for <kvm@vger.kernel.org>; Wed,  8 Oct 2025 15:55:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1759938035; cv=none; b=f+ZEphFAagVIxeS0km9maycpetyb7eBpsUgdT6m0f4DNqlH8akfRGc5e9KiiG3FeBSXac07EdI5I57YY1T7Fqw7Y6spI3EZsjH+MJRBaUc28CAdLw+DsAP8njGCj2JHFvr7Mf8lLhxUMh2KqBYcdMq+pGOHGF3eZio1zacahJpE=
+	t=1759938927; cv=none; b=VpeUzeb2vzfg4AUKi0HaLnR/0mmBhAC7kADn+6jChj5t7BUf32rQCZ/cYlAHbNeP7Gu5fQcUlBnw/tnbbJYEccGASPlinAVxRckdHoDFi/ITS8aEqcAegLuKnvMCVlqlfbmWKGVGlgqv/d5Y3+T2a9Bo8NWvSAUSUNxdmw+QNMA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1759938035; c=relaxed/simple;
-	bh=UlvfyKMxLWiKKPCBd6sAWIadJGuh5KhE/Vp4up1n9MM=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=hloPmXRDdSe2C0tEvlzbOEBD+GYJncC6LshvSibPgZzmlAvoFr+ru3V/ylVbjIRG6krEpzqNS7Rm7j4Xa3YwDOF2PdyplsAlhE7dm6cWHzQbSte1DUOjpeuO6Ugvdy/YbAJvF6XtQ5lLDAzCps4t9fe2P8wLAeH9q6FhHRlq+JI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=XmryXEaL; arc=none smtp.client-ip=192.198.163.18
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1759938034; x=1791474034;
-  h=message-id:date:mime-version:subject:to:cc:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=UlvfyKMxLWiKKPCBd6sAWIadJGuh5KhE/Vp4up1n9MM=;
-  b=XmryXEaLoT7Tib7K5QzNdKS/Ukw7KJJhCWGDRYqruxrXUSd5k7QzDrs/
-   fvUYIZsPUUUbEdWBLxRrfrmkcuuHRAZ0u3nPfvDKE1td2H8s8ni5jyvGD
-   /YQyEZlqHl7cT8jCbCbazpsxQlGPVPmNE4ORETtN/pLz+TDzVK27m7n/7
-   l7kOcFOfdRP4CLqAozmZLIyIges7gWZatIeDAhFGku1/OnvlEdSl7krxI
-   7Gy/1zEmYas2hRHyrdYPbx+gqz1DRmmgfrkMLzrRrvgjSzEJbPdbX3gkL
-   zA27tlWNEHEAR9AsLliZ9TQmhOdNJvR5IgbmSivkvLxO19EHVm454KvLW
-   w==;
-X-CSE-ConnectionGUID: dyeLeD50QZ+sS93ZNHbwYg==
-X-CSE-MsgGUID: iALhAs1BSr2qH7G/2nq21A==
-X-IronPort-AV: E=McAfee;i="6800,10657,11576"; a="61340091"
-X-IronPort-AV: E=Sophos;i="6.19,213,1754982000"; 
-   d="scan'208";a="61340091"
-Received: from fmviesa004.fm.intel.com ([10.60.135.144])
-  by fmvoesa112.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 08 Oct 2025 08:40:32 -0700
-X-CSE-ConnectionGUID: BFEC38dWRj6w95GURz76ig==
-X-CSE-MsgGUID: kgCZmnoUQiamyk0XYdDkKA==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.19,213,1754982000"; 
-   d="scan'208";a="185759905"
-Received: from rchatre-mobl4.amr.corp.intel.com (HELO [10.125.110.204]) ([10.125.110.204])
-  by fmviesa004-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 08 Oct 2025 08:40:29 -0700
-Message-ID: <9d86698d-525e-4d8c-b3d9-b6a0e7634649@intel.com>
-Date: Wed, 8 Oct 2025 08:40:28 -0700
+	s=arc-20240116; t=1759938927; c=relaxed/simple;
+	bh=85/mm3sXpOoNOn6cTJ/JXyXBRwl6do61EpL+5QUva/0=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=bYhXyHSCF9ge8em0T0tFVMDUunn+xLU1H7f/6gtGqt2SIRM9NFV+myhW6+xLQuqTGL/gllJNHOn/iBb6Ff+qIkjFtV7axFRBayCp30Sj+vV51eGaO+MXYvZhFM7bpVi+Dm97z3X4JH5nQRlFCjK7Eh0aqIz3+AlVBPAVXWBl3wM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=Rmzgu+5J; arc=none smtp.client-ip=209.85.214.201
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+Received: by mail-pl1-f201.google.com with SMTP id d9443c01a7336-27c62320f16so88215855ad.1
+        for <kvm@vger.kernel.org>; Wed, 08 Oct 2025 08:55:25 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1759938925; x=1760543725; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:from:subject:message-id:references
+         :mime-version:in-reply-to:date:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=yE/1NjviAjYgzvKEBWocmDsuG1eu4K2fZd8EwARCmAo=;
+        b=Rmzgu+5JNaP/UN9JgmylzNruOIukS2R/xVk7j7Iqnnhl7MKPZ1UjPISJYpLxpxV/6u
+         s+lQHSnOnijkTV0g2ym7gBYtC7eJsR7CAQGVFVR0aNCjeDWVu1a5MpmtRGFhw2re+oek
+         FDQ16zrGEgJr3qBS2LnUS7Gctro8DA/G8Qys02TF0kqGX3R94iL5ZkJJnpdOHD97Xa+l
+         xOVX9Gzja6xl2NIO+mWzGnpNeFTqEwdNiJ/FnK94+nxPN2bDNqZvp60mCCtF7gAx8xnE
+         GicmN0Fa8TLdlu+KlUx2LU5sZHiA5CmaQ++OO0UfqWJPo2TQrcPwwYFQ0CxlOh0gwS8k
+         WuYA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1759938925; x=1760543725;
+        h=content-transfer-encoding:cc:to:from:subject:message-id:references
+         :mime-version:in-reply-to:date:x-gm-message-state:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=yE/1NjviAjYgzvKEBWocmDsuG1eu4K2fZd8EwARCmAo=;
+        b=cjHGrGcm6DbB3eUt/pc+Er8qD7e2RJL22jauuR8o+Cd3nBLhhVJmS4qOd1cTh2iLA3
+         TS4hoH9JXe/njjoogIDkNncPNqVTYDhiv+zUMnJJ4fGsDTDvFihhSJ9iaXm41DQf0oUO
+         BRbggBWwoizwtK/KEh9xtAhpcA8WggK4IiNwIhcKDXKiawRB111WNiIMi8RzbpN/KP/L
+         PPcv4UBx3NmyCJ8vxlJU+tDPvsaD7owvQJMnRxOisNI9p/IxYa5OxvsVeN/Iiuh1Qiro
+         xW62pFeiYskLKqD9jatT3xUko2hoTwPP4sKbQfSzkfXK9a+FX5pyV+D+ICp3s/c1hbvo
+         NnOg==
+X-Forwarded-Encrypted: i=1; AJvYcCWJTz4Mg5HkBu359SEpgCUp9cxt7TUNxal63DU/0HN9HeDufF1NwNnBK1ah24V7nnPCwls=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yz/2eCXpN1x3E4LU54XugzD7ME6NPCHDAojnWBzwzJ01Ca6KNuL
+	n0Q1WEHiwIAAxh4lqxrm9j6kR8hA+VZdpiL/GR7Zxa1WgLl4+OtJUBr4RPkB2fPGjw8R+Cmm47c
+	V/R9stw==
+X-Google-Smtp-Source: AGHT+IHNZ9o1aucHiV07bHDBIvskxFmukfMK9SZ5tpZZEnJ+tyDCdecEFDLxuqTyrcbJu7v6jlO0OKadLqQ=
+X-Received: from plblv11.prod.google.com ([2002:a17:903:2a8b:b0:234:c104:43f1])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:903:ac7:b0:269:9a8f:a4ab
+ with SMTP id d9443c01a7336-29027321d6fmr43055485ad.60.1759938925410; Wed, 08
+ Oct 2025 08:55:25 -0700 (PDT)
+Date: Wed, 8 Oct 2025 08:55:24 -0700
+In-Reply-To: <CAMGffE=P5HJkJxh2mj3c_oh6busFKYb0TGuhAc36toc5_uD72w@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 4/7] x86/kexec: Disable kexec/kdump on platforms with TDX
- partial write erratum
-To: =?UTF-8?B?SsO8cmdlbiBHcm/Dnw==?= <jgross@suse.com>,
- "Reshetova, Elena" <elena.reshetova@intel.com>,
- "Annapurve, Vishal" <vannapurve@google.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>,
- "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
- "kvm@vger.kernel.org" <kvm@vger.kernel.org>, "bp@alien8.de" <bp@alien8.de>,
- "tglx@linutronix.de" <tglx@linutronix.de>,
- "peterz@infradead.org" <peterz@infradead.org>,
- "mingo@redhat.com" <mingo@redhat.com>, "hpa@zytor.com" <hpa@zytor.com>,
- "thomas.lendacky@amd.com" <thomas.lendacky@amd.com>,
- "x86@kernel.org" <x86@kernel.org>, "kas@kernel.org" <kas@kernel.org>,
- "Edgecombe, Rick P" <rick.p.edgecombe@intel.com>,
- "dwmw@amazon.co.uk" <dwmw@amazon.co.uk>, "Huang, Kai" <kai.huang@intel.com>,
- "seanjc@google.com" <seanjc@google.com>,
- "Chatre, Reinette" <reinette.chatre@intel.com>,
- "Yamahata, Isaku" <isaku.yamahata@intel.com>,
- "Williams, Dan J" <dan.j.williams@intel.com>,
- "ashish.kalra@amd.com" <ashish.kalra@amd.com>,
- "nik.borisov@suse.com" <nik.borisov@suse.com>, "Gao, Chao"
- <chao.gao@intel.com>, "sagis@google.com" <sagis@google.com>,
- "Chen, Farrah" <farrah.chen@intel.com>, Binbin Wu <binbin.wu@linux.intel.com>
-References: <20250901160930.1785244-1-pbonzini@redhat.com>
- <20250901160930.1785244-5-pbonzini@redhat.com>
- <CAGtprH__G96uUmiDkK0iYM2miXb31vYje9aN+J=stJQqLUUXEg@mail.gmail.com>
- <74a390a1-42a7-4e6b-a76a-f88f49323c93@intel.com>
- <CAGtprH-mb0Cw+OzBj-gSWenA9kSJyu-xgXhsTjjzyY6Qi4E=aw@mail.gmail.com>
- <a2042a7b-2e12-4893-ac8d-50c0f77f26e9@intel.com>
- <CAGtprH_nTBdX-VtMQJM4-y8KcB_F4CnafqpDX7ktASwhO0sxAg@mail.gmail.com>
- <DM8PR11MB575071F87791817215355DD8E7E7A@DM8PR11MB5750.namprd11.prod.outlook.com>
- <27d19ea5-d078-405b-a963-91d19b4229c8@suse.com>
- <5b007887-d475-4970-b01d-008631621192@intel.com>
- <5d792dc5-ea8e-46d2-8031-44f8e92b0188@suse.com>
-From: Dave Hansen <dave.hansen@intel.com>
-Content-Language: en-US
-Autocrypt: addr=dave.hansen@intel.com; keydata=
- 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
-In-Reply-To: <5d792dc5-ea8e-46d2-8031-44f8e92b0188@suse.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+Mime-Version: 1.0
+References: <539FC243.2070906@redhat.com> <20140617060500.GA20764@minantech.com>
+ <FFEF5F78-D9E6-4333-BC1A-78076C132CBF@jnielsen.net> <6850B127-F16B-465F-BDDB-BA3F99B9E446@jnielsen.net>
+ <jpgioafjtxb.fsf@redhat.com> <74412BDB-EF6F-4C20-84C8-C6EF3A25885C@jnielsen.net>
+ <558AD1B0.5060200@redhat.com> <FAFB2BA9-E924-4E70-A84A-E5F2D97BC2F0@jnielsen.net>
+ <CACzj_yVTyescyWBRuA3MMCC0Ymg7TKF-+sCW1N+Xwfffvw_Wsg@mail.gmail.com> <CAMGffE=P5HJkJxh2mj3c_oh6busFKYb0TGuhAc36toc5_uD72w@mail.gmail.com>
+Message-ID: <aOaJbHPBXHwxlC1S@google.com>
+Subject: Re: Hang on reboot in multi-core FreeBSD guest on Linux KVM host with
+ Intel Sierra Forest CPU
+From: Sean Christopherson <seanjc@google.com>
+To: Jinpu Wang <jinpu.wang@ionos.com>
+Cc: fanwenyi0529@gmail.com, kvm@vger.kernel.org, 
+	Paolo Bonzini <pbonzini@redhat.com>, Xiaoyao Li <xiaoyao.li@intel.com>, linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
 
-On 10/7/25 06:31, Jürgen Groß wrote:>
-> If we can't come to an agreement that kdump should be allowed in
-> spite of a potential #MC, maybe we could disable kdump only if TDX
-> guests have been active on the machine before?
+Trimmed Cc: to drop people from the original thread.  In the future, just s=
+tart
+a new bug report.  Piggybacking a 10 year old bug just because the symptoms=
+ are
+similar does more harm than good.  Whatever the old thread was chasing was =
+already
+fixed, _10 years_ ago; they were just trying to identy exactly what commit =
+fixed
+the problem.  I.e. whatever they were chasing _can't_ be the same root caus=
+e,
+because even if it's literally the same code bug, it would require a code c=
+hange
+and thus a regression between v4.0 and v6.1.
 
-How would we determine that?
+On Wed, Oct 08, 2025, Jinpu Wang wrote:
+> On Wed, Oct 8, 2025 at 2:44=E2=80=AFPM Jack Wang <jinpu.wang@ionos.com> w=
+rote:
+> > Sorry for bump this old thread, we hit same issue on Intel Sierra Fores=
+t
+> > machines with LTS kernel 6.1/6.12, maybe KVM comunity could help fix it=
+.
 
-We can't just call the TDX module to see because it might have been
-running before but got shut down.
+Are there any host kernels that _do_ work?  E.g. have you tried a bleeding =
+edge
+host kernel?
+
+> > ### **[BUG] Hang on FreeBSD Guest Reboot under KVM on Intel SierraFores=
+t (Xeon 6710E)**
+> >
+> > **Summary:**
+> > Multi-cores FreeBSD guests hang during reboot under KVM on systems with
+> > Intel(R) Xeon(R) 6710E (SierraForest). The issue is fully reproducible =
+with
+> > APICv enabled and disappears when disabling APICv (`enable_apicv=3DN`).=
+ The
+> > same configuration works correctly on Ice Lake (Xeon Gold 6338).
+
+Does Sierra Forest have IPI virtualization?  If so, you could try running w=
+ith
+APICv enabled, but enable_ipiv=3Dfalse to specifically disable IPI virtuali=
+zation.
 
