@@ -1,132 +1,135 @@
-Return-Path: <kvm+bounces-59677-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-59678-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id BB058BC7185
-	for <lists+kvm@lfdr.de>; Thu, 09 Oct 2025 03:15:46 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id B913BBC71E9
+	for <lists+kvm@lfdr.de>; Thu, 09 Oct 2025 03:34:59 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id B0E8F19E35C2
-	for <lists+kvm@lfdr.de>; Thu,  9 Oct 2025 01:16:09 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id C97D519E3C00
+	for <lists+kvm@lfdr.de>; Thu,  9 Oct 2025 01:35:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8A8BD81724;
-	Thu,  9 Oct 2025 01:15:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 61C8F18DF89;
+	Thu,  9 Oct 2025 01:34:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ziepe.ca header.i=@ziepe.ca header.b="Buntc0/f"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="ZZQuxwcv"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-qk1-f175.google.com (mail-qk1-f175.google.com [209.85.222.175])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.11])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C78C010FD
-	for <kvm@vger.kernel.org>; Thu,  9 Oct 2025 01:15:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.175
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5F8B6F9C1;
+	Thu,  9 Oct 2025 01:34:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.11
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1759972539; cv=none; b=UzLWjQ3IIeYfuGI/MeHAajpy4/xrNIHwiEBoYThUI4axvFBzishPcNbGVfjFXz92UgeW0EObAzksfMpe2SUTW/BTODcZhoz55YDDXn+Ktsz7DN+AXRE5lRl/k/gJ6nzDzOQX6Z5d9oP5lQT1PGURUY3smSnLDaD97ZNnMJZdgPg=
+	t=1759973691; cv=none; b=kusDNVhFj3K8UxiCo4Zf2+qlWPn2Mnfq8F05uB3XkSrktkWt+uSVp51Yx4uCzlYU3nIMN2QXnaMJ2J9ZwS84YZAFWYh8VJDsUFNa8Qk2NRKrK7CLTrhGeaWKIl5TBjcRYpbZ76IEdP272YdCq9rsCNkeACIF/hnjJJ1S/saVnsc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1759972539; c=relaxed/simple;
-	bh=6NlSKkxZlVO5WTh8oEYqMjakzlLE08JnCxCMdojLM0U=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=KHM2PX3lXNz7rbpvPcowp5tDxxkozUStKNlVihUnY+QI3BFyZWIIcNM68rZ05hjs1l0W5IlKtMIe/IFM4wQmU+3KBPyJ0Ft2YqR4HBWhwcKBdPzhETIM3raWhI9lF/Ds0ffyZP8J6OGXzYSDeE8ddxf6xRgg92UiEiBrWTdMUno=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ziepe.ca; spf=pass smtp.mailfrom=ziepe.ca; dkim=pass (2048-bit key) header.d=ziepe.ca header.i=@ziepe.ca header.b=Buntc0/f; arc=none smtp.client-ip=209.85.222.175
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ziepe.ca
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ziepe.ca
-Received: by mail-qk1-f175.google.com with SMTP id af79cd13be357-856328df6e1so44364585a.0
-        for <kvm@vger.kernel.org>; Wed, 08 Oct 2025 18:15:37 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=ziepe.ca; s=google; t=1759972536; x=1760577336; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=X+50x3SuEDTQMHbMrZRx1tSrxHENkGNKFoxPTbcoO7Y=;
-        b=Buntc0/fb13M4oijdSbbiT1OCU5SW0r30JoG7YUD2byjeAFt0pfs/T0lkZ34A9C4Nr
-         wa9UKjjl4u861OkRG8MPp8PUYIYXAVvJlusAoaXSMRYIBL4ZZYhOEfdOD2o1meHSDLsF
-         60TlMD+6Ptq3CJ752KcY4MvowAyR2yoe3Sv1FOEwWgooukxiuEa6BxffOfgTPFVmTmjT
-         LcizFBWSNyb5Kve7vso07pOW9eTcBBy7RicgJzQc0uPAMjlb5VuatzQYHMmq0c9v2oq8
-         C0RR3gqT745Xxh3z6JOlcBBcvcbUqHYaBUjuhjAZK6WfNBAS5/MpUdz8/xNhNX0gNpOn
-         XWRA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1759972536; x=1760577336;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=X+50x3SuEDTQMHbMrZRx1tSrxHENkGNKFoxPTbcoO7Y=;
-        b=QECQAV2oCMwDThWLrDrq1EplQ/M1XNGlaCh/LjR+TjdHN/MmH0f9aCoqRDGZxatNGS
-         bJwl8Qe8EaBAyQrTfQKZ5g0SXpg+A4PBcOY6VwKDOiQ3h28b2yWNvFpnOvmf4UOAY7rB
-         +fT35Mhcf3K/uHMqd3i6EkqXT9ypAUoKttFIGb+Z9fSpyR02RnMJlxgvd1BPElfdCJab
-         G0+vHNzXQKvhW5b9enVh63ZKQa3AEfItvLiZMq4Vg0S/yTv38tdVJSeAI6onk4sWHCe0
-         wvSAtApFsCWp93Z3OHgA7P9XttRCfcp/85fq6NGfjTN6/LsYBfubhKpBa4HWQuS0DYua
-         QbZQ==
-X-Forwarded-Encrypted: i=1; AJvYcCVyDb+iFg3NQIXT26sRR/ZDefDha7fpsBo5TGS9rqwYlEN6BfNffkaB+/tWFHEdteUAam8=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yy76NeTOUtWrsle+vOUUiSDP4QsYtO0k7i5SGz8FjBB60htctlw
-	po+IkL42s7eFSeJxc08GNuimmMtQb/AGyVTpyIKxcc8kgBMlMI2zQdRUh4/22n91iMCC+dLPB+z
-	up3Z1C8s=
-X-Gm-Gg: ASbGnctZFGBjZBtVNbfMDIK7GzvxCDJ7ik9jHSRBuxMmJJ7FORAV9TrlRND/8Mp9nvU
-	frK/FIWfiDS14j/7rL6RWIJGVGni/aOQ/xfSeaUIlJIrXnYPrVwKNGqyWguJ+EC6XzjSpUdtCsp
-	q1VLTP87e13H8Yasd/l2QymZ662m56HVGAwyzcuAsvRYzI/oGUQGIZ+AMgVjQ1zM6lnZ0CMhnR4
-	AXwoEAVMLxFsqOWG5WmzhU32NnCUadNVPPO51S2XQ2fPexxvLCO1kKJBZBTap7XP2KdSmhoXES8
-	p5SK9mXhLaJm0840gdeQWYB/HTRGDV1PxYsWjv+fkFwT/dHRK/zjKqVDdS4p+s3k63SBfJB4++J
-	ejNeZfj9dFjTutT6iXDFSaQ==
-X-Google-Smtp-Source: AGHT+IFYnvoWW9Ct2gqjPcp1GG/GlxQ2K5VY9T33xZfe+kDiDclwBD57GYhyabKLuQmZsWKoqGGFng==
-X-Received: by 2002:a05:620a:6914:b0:860:e823:887d with SMTP id af79cd13be357-88352babc71mr840838685a.71.1759972536584;
-        Wed, 08 Oct 2025 18:15:36 -0700 (PDT)
-Received: from ziepe.ca ([140.209.225.78])
-        by smtp.gmail.com with ESMTPSA id af79cd13be357-884a1ca3defsm98772985a.38.2025.10.08.18.15.35
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 08 Oct 2025 18:15:35 -0700 (PDT)
-Received: from jgg by wakko with local (Exim 4.97)
-	(envelope-from <jgg@ziepe.ca>)
-	id 1v6fFn-0000000GEZH-0Pfw;
-	Wed, 08 Oct 2025 22:15:35 -0300
-Date: Wed, 8 Oct 2025 22:15:35 -0300
-From: Jason Gunthorpe <jgg@ziepe.ca>
-To: Alex Mastro <amastro@fb.com>
-Cc: Alex Williamson <alex.williamson@redhat.com>,
-	Alejandro Jimenez <alejandro.j.jimenez@oracle.com>,
-	kvm@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v2 1/3] vfio/type1: sanitize for overflow using
- check_*_overflow
-Message-ID: <20251009011535.GB3833649@ziepe.ca>
-References: <20251007-fix-unmap-v2-0-759bceb9792e@fb.com>
- <20251007-fix-unmap-v2-1-759bceb9792e@fb.com>
- <20251008121930.GA3734646@ziepe.ca>
- <aOaFqZ5cPgeRyoNS@devgpu015.cco6.facebook.com>
- <aObjW9VxYMkFQ1KB@devgpu015.cco6.facebook.com>
+	s=arc-20240116; t=1759973691; c=relaxed/simple;
+	bh=eq1ErBn0paUoH1VyOJWvLBa1xZf5uLKYIdGW7A7Qi+M=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=A+UtbfAKRVAL0g8DUj92qnWWfx1jMvZhieXfjIlJSO5V2KOn77PVBZy0ZBLZgg/bHwRLiu9boHPn82ntEDs/HSEw26uTeCzJEI1Q8JJVjtPm8y7JHMFEVPxHiE8Ggwo+vAARvhNohwGT9XMACdC7w0GIGn/ccufNKa3apz0lKlQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=pass smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=ZZQuxwcv; arc=none smtp.client-ip=192.198.163.11
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1759973689; x=1791509689;
+  h=message-id:date:mime-version:subject:to:cc:references:
+   from:in-reply-to:content-transfer-encoding;
+  bh=eq1ErBn0paUoH1VyOJWvLBa1xZf5uLKYIdGW7A7Qi+M=;
+  b=ZZQuxwcvIKRMGaF+DJAPt16LcHIv4WKeD/sdbhRBhaebZYgGJhCo1+WX
+   noC8IEeA3J/YYClYILxYz/bkv90j/j/vF6PGYGL5nTkKPjhmNtTYUTKFe
+   danqGcurhTWtzmMKrNqF5G9kALC9lcwASJPlpR3PyZ8eQPhUT6FQ9X40n
+   gP6/Zz4VO15t9/892VLjzTwEvkWQV4ftxSh6tPnxRiEibQ1ZnYl9z8bn6
+   4B5ym51I0Kzb7J6ST96vZpvIYzcZtwBq2Ya4ueMnQ9fTNgiUnsAVTzBd/
+   mx7EEjw5d/OwG3NTV3FiCywGkCHUBPsCUu+0uFM+tuHtGnf1KcXMPPJAv
+   A==;
+X-CSE-ConnectionGUID: E+nSCfquTM2wN2b6KAM5Nw==
+X-CSE-MsgGUID: enpUYWTPS5mhMwjjKvLUlA==
+X-IronPort-AV: E=McAfee;i="6800,10657,11576"; a="72789477"
+X-IronPort-AV: E=Sophos;i="6.19,214,1754982000"; 
+   d="scan'208";a="72789477"
+Received: from orviesa006.jf.intel.com ([10.64.159.146])
+  by fmvoesa105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 08 Oct 2025 18:34:47 -0700
+X-CSE-ConnectionGUID: vzF1OKCdSPqPBTsdim5l8w==
+X-CSE-MsgGUID: aU7v1SHWTUSeIllMAynIgw==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.19,214,1754982000"; 
+   d="scan'208";a="179698971"
+Received: from dapengmi-mobl1.ccr.corp.intel.com (HELO [10.124.232.209]) ([10.124.232.209])
+  by orviesa006-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 08 Oct 2025 18:34:44 -0700
+Message-ID: <e9e8f087-60f6-455a-b0e0-e5c29fc54129@linux.intel.com>
+Date: Thu, 9 Oct 2025 09:34:41 +0800
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <aObjW9VxYMkFQ1KB@devgpu015.cco6.facebook.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: REGRESSION on linux-next (next-20250919)
+To: "Borah, Chaitanya Kumar" <chaitanya.kumar.borah@intel.com>,
+ Sean Christopherson <seanjc@google.com>
+Cc: "intel-gfx@lists.freedesktop.org" <intel-gfx@lists.freedesktop.org>,
+ "intel-xe@lists.freedesktop.org" <intel-xe@lists.freedesktop.org>,
+ Suresh Kumar Kurmi <suresh.kumar.kurmi@intel.com>,
+ Jani Saarinen <jani.saarinen@intel.com>, lucas.demarchi@intel.com,
+ linux-perf-users@vger.kernel.org, kvm@vger.kernel.org
+References: <70b64347-2aca-4511-af78-a767d5fa8226@intel.com>
+ <25af94f5-79e3-4005-964e-e77b1320a16e@linux.intel.com>
+ <aNvyjkuDLOfxAANd@google.com>
+ <3bbc4e6d-9f52-483c-a25d-166dca62fb25@intel.com>
+ <00d0f3f3-d2b4-4885-9a49-5e6f8390142b@intel.com>
+Content-Language: en-US
+From: "Mi, Dapeng" <dapeng1.mi@linux.intel.com>
+In-Reply-To: <00d0f3f3-d2b4-4885-9a49-5e6f8390142b@intel.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 
-On Wed, Oct 08, 2025 at 03:19:07PM -0700, Alex Mastro wrote:
-> On Wed, Oct 08, 2025 at 08:39:21AM -0700, Alex Mastro wrote:
-> > On Wed, Oct 08, 2025 at 09:19:30AM -0300, Jason Gunthorpe wrote:
-> > > On Tue, Oct 07, 2025 at 09:08:46PM -0700, Alex Mastro wrote:
-> > > > +	if (check_add_overflow(user_iova, iova_size - 1, &iova_end))
-> > > > +		return -EINVAL;
-> > > 
-> > > Let's be consistent with iommufd/etc, 'end' is start+size 'last' is start+size-1
-> > > 
-> > > Otherwise it is super confusing :(
-> > 
-> > 
-> > Both suggestions SGTM.
-> 
-> I'm not sure about the latter anymore. There's somewhat pervasive precedent for
-> using 'end' as the inclusive limit in vfio_iommu_type1.c. I am all for making
-> things less confusing. I don't think I can introduce 'end' 'last' convention
-> without preparing the existing code first.
-> 
-> Thoughts? Spend another commit renaming this to 'last'? Tolerate inconsistency
-> between vfio and iommufd?
 
-IDK, if it is actually internally consistent and not using end
-interchangably then it is probably Ok to keep doing it. If it is
-already inconsistent then use last for new code and leave the old as
-is?
+On 10/7/2025 2:22 PM, Borah, Chaitanya Kumar wrote:
+> Hi,
+>
+> On 10/6/2025 1:33 PM, Borah, Chaitanya Kumar wrote:
+>> Thank you for your responses.
+>>
+>> Following change fixes the issue for us.
+>>
+>>
+>> diff --git a/arch/x86/kvm/pmu.c b/arch/x86/kvm/pmu.c
+>> index 40ac4cb44ed2..487ad19a236e 100644
+>> --- a/arch/x86/kvm/pmu.c
+>> +++ b/arch/x86/kvm/pmu.c
+>> @@ -108,16 +108,18 @@ void kvm_init_pmu_capability(const struct 
+>> kvm_pmu_ops *pmu_ops)
+>>          bool is_intel = boot_cpu_data.x86_vendor == X86_VENDOR_INTEL;
+>>          int min_nr_gp_ctrs = pmu_ops->MIN_NR_GP_COUNTERS;
+>>
+>> -       perf_get_x86_pmu_capability(&kvm_host_pmu);
+>> -
+>>          /*
+>>           * Hybrid PMUs don't play nice with virtualization without careful
+>>           * configuration by userspace, and KVM's APIs for reporting 
+>> supported
+>>           * vPMU features do not account for hybrid PMUs.  Disable vPMU 
+>> support
+>>           * for hybrid PMUs until KVM gains a way to let userspace opt-in.
+>>           */
+>> -       if (cpu_feature_enabled(X86_FEATURE_HYBRID_CPU))
+>> +       if (cpu_feature_enabled(X86_FEATURE_HYBRID_CPU)) {
+>>                  enable_pmu = false;
+>> +               memset(&kvm_host_pmu, 0, sizeof(kvm_host_pmu));
+>> +       } else {
+>> +               perf_get_x86_pmu_capability(&kvm_host_pmu);
+>> +       }
+> Can we expect a formal patch soon?
 
-Jason
+I'd like to post a patch to fix this tomorrow if Sean has no bandwidth on
+this. Thanks.
+
+
+>
+> Regards
+>
+> Chaitanya
 
