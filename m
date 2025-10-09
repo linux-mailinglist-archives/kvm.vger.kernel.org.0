@@ -1,65 +1,65 @@
-Return-Path: <kvm+bounces-59678-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-59679-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id B913BBC71E9
-	for <lists+kvm@lfdr.de>; Thu, 09 Oct 2025 03:34:59 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id AB2E0BC731B
+	for <lists+kvm@lfdr.de>; Thu, 09 Oct 2025 04:20:04 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id C97D519E3C00
-	for <lists+kvm@lfdr.de>; Thu,  9 Oct 2025 01:35:22 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 9C93219E48EE
+	for <lists+kvm@lfdr.de>; Thu,  9 Oct 2025 02:20:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 61C8F18DF89;
-	Thu,  9 Oct 2025 01:34:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A09C11B78F3;
+	Thu,  9 Oct 2025 02:19:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="ZZQuxwcv"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="jBBW05E1"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.11])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.21])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5F8B6F9C1;
-	Thu,  9 Oct 2025 01:34:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.11
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AD288182D0;
+	Thu,  9 Oct 2025 02:19:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.21
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1759973691; cv=none; b=kusDNVhFj3K8UxiCo4Zf2+qlWPn2Mnfq8F05uB3XkSrktkWt+uSVp51Yx4uCzlYU3nIMN2QXnaMJ2J9ZwS84YZAFWYh8VJDsUFNa8Qk2NRKrK7CLTrhGeaWKIl5TBjcRYpbZ76IEdP272YdCq9rsCNkeACIF/hnjJJ1S/saVnsc=
+	t=1759976393; cv=none; b=HUgdT5lfUD2CAimjE2b9teHj8l++mJqN+PTfqkUiQ+9Uchp6TL9PY1kntITlMih9kFCQdbHfxIEGIKI9SQ/AXJfhMGj4qGZJuhDU5wPgCKI/Cc2c9VST5mZAiGlHaFc8WQ/2aW3ksqGqQBZMR659DjoAsJwGWh0NcNFNwY9owOw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1759973691; c=relaxed/simple;
-	bh=eq1ErBn0paUoH1VyOJWvLBa1xZf5uLKYIdGW7A7Qi+M=;
+	s=arc-20240116; t=1759976393; c=relaxed/simple;
+	bh=MKwwAjIvNTVYzVSKLCj93oAfQ4vIbNdKNB8W0YNJ6Qg=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=A+UtbfAKRVAL0g8DUj92qnWWfx1jMvZhieXfjIlJSO5V2KOn77PVBZy0ZBLZgg/bHwRLiu9boHPn82ntEDs/HSEw26uTeCzJEI1Q8JJVjtPm8y7JHMFEVPxHiE8Ggwo+vAARvhNohwGT9XMACdC7w0GIGn/ccufNKa3apz0lKlQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=pass smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=ZZQuxwcv; arc=none smtp.client-ip=192.198.163.11
+	 In-Reply-To:Content-Type; b=FC/ETsMn5r5OPk8arapq3I8BSVwtdJrNrWepuMzs9PL/8v8oBL/HVYHyW3r/sjCQtS4vtgVEbA5pRbFdPV5acPMlzYvuQrmrTKhs5A3+xSGMC+cIypCt7zA/mjNSYoB+R55eP8B1bF+Syl2Sfbb0S9YuLlEzamAX5Ksw9uNOulA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=pass smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=jBBW05E1; arc=none smtp.client-ip=198.175.65.21
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1759973689; x=1791509689;
+  t=1759976391; x=1791512391;
   h=message-id:date:mime-version:subject:to:cc:references:
    from:in-reply-to:content-transfer-encoding;
-  bh=eq1ErBn0paUoH1VyOJWvLBa1xZf5uLKYIdGW7A7Qi+M=;
-  b=ZZQuxwcvIKRMGaF+DJAPt16LcHIv4WKeD/sdbhRBhaebZYgGJhCo1+WX
-   noC8IEeA3J/YYClYILxYz/bkv90j/j/vF6PGYGL5nTkKPjhmNtTYUTKFe
-   danqGcurhTWtzmMKrNqF5G9kALC9lcwASJPlpR3PyZ8eQPhUT6FQ9X40n
-   gP6/Zz4VO15t9/892VLjzTwEvkWQV4ftxSh6tPnxRiEibQ1ZnYl9z8bn6
-   4B5ym51I0Kzb7J6ST96vZpvIYzcZtwBq2Ya4ueMnQ9fTNgiUnsAVTzBd/
-   mx7EEjw5d/OwG3NTV3FiCywGkCHUBPsCUu+0uFM+tuHtGnf1KcXMPPJAv
+  bh=MKwwAjIvNTVYzVSKLCj93oAfQ4vIbNdKNB8W0YNJ6Qg=;
+  b=jBBW05E1MUnYFZWaxdB/CrGNH0YhcZIm6QcYaCyKHBRYGwEypd7EPUQb
+   /+MQkOd1iQfrAVSs8CBM1Uj39Oq7VX+kh0DsfP/AUZAifJOMfUxKl5h0x
+   HvHW6em/ugZFcBsDESnaqQQ+juCXybb18nGjBRX2bDD67mqFulYS5F5c0
+   6pV0+TZNkxkrfdy6OplVUGptqP6tkM45HSHR0MEraGGWkCTDgKLpD8pPL
+   hIl2bMhCWf73SW/PISpd2ShsPlrI5wIu/mu5Yn7sGFNqOPWpGiitroA53
+   CPgcjDWK39+lCJ3JLwhBD5nV+U9nTrfAGmB5ne2KGVlHw0sX5ndmRhNmK
    A==;
-X-CSE-ConnectionGUID: E+nSCfquTM2wN2b6KAM5Nw==
-X-CSE-MsgGUID: enpUYWTPS5mhMwjjKvLUlA==
-X-IronPort-AV: E=McAfee;i="6800,10657,11576"; a="72789477"
-X-IronPort-AV: E=Sophos;i="6.19,214,1754982000"; 
-   d="scan'208";a="72789477"
-Received: from orviesa006.jf.intel.com ([10.64.159.146])
-  by fmvoesa105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 08 Oct 2025 18:34:47 -0700
-X-CSE-ConnectionGUID: vzF1OKCdSPqPBTsdim5l8w==
-X-CSE-MsgGUID: aU7v1SHWTUSeIllMAynIgw==
+X-CSE-ConnectionGUID: mdL1U0ecRGGUSFbzfG6UGQ==
+X-CSE-MsgGUID: PA2QuWEaR/eC9WBYagUvpA==
+X-IronPort-AV: E=McAfee;i="6800,10657,11531"; a="62097737"
+X-IronPort-AV: E=Sophos;i="6.17,312,1747724400"; 
+   d="scan'208";a="62097737"
+Received: from fmviesa001.fm.intel.com ([10.60.135.141])
+  by orvoesa113.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 08 Oct 2025 19:19:51 -0700
+X-CSE-ConnectionGUID: SjjAIAIGQgGwYyFr6uTBmQ==
+X-CSE-MsgGUID: dnnE1byERkONzbCEalT4rw==
 X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.19,214,1754982000"; 
-   d="scan'208";a="179698971"
+X-IronPort-AV: E=Sophos;i="6.19,215,1754982000"; 
+   d="scan'208";a="211538774"
 Received: from dapengmi-mobl1.ccr.corp.intel.com (HELO [10.124.232.209]) ([10.124.232.209])
-  by orviesa006-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 08 Oct 2025 18:34:44 -0700
-Message-ID: <e9e8f087-60f6-455a-b0e0-e5c29fc54129@linux.intel.com>
-Date: Thu, 9 Oct 2025 09:34:41 +0800
+  by smtpauth.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 08 Oct 2025 19:19:44 -0700
+Message-ID: <0276af52-c697-46c3-9db8-9284adb6beee@linux.intel.com>
+Date: Thu, 9 Oct 2025 10:19:41 +0800
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -67,69 +67,165 @@ List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: REGRESSION on linux-next (next-20250919)
-To: "Borah, Chaitanya Kumar" <chaitanya.kumar.borah@intel.com>,
- Sean Christopherson <seanjc@google.com>
-Cc: "intel-gfx@lists.freedesktop.org" <intel-gfx@lists.freedesktop.org>,
- "intel-xe@lists.freedesktop.org" <intel-xe@lists.freedesktop.org>,
- Suresh Kumar Kurmi <suresh.kumar.kurmi@intel.com>,
- Jani Saarinen <jani.saarinen@intel.com>, lucas.demarchi@intel.com,
- linux-perf-users@vger.kernel.org, kvm@vger.kernel.org
-References: <70b64347-2aca-4511-af78-a767d5fa8226@intel.com>
- <25af94f5-79e3-4005-964e-e77b1320a16e@linux.intel.com>
- <aNvyjkuDLOfxAANd@google.com>
- <3bbc4e6d-9f52-483c-a25d-166dca62fb25@intel.com>
- <00d0f3f3-d2b4-4885-9a49-5e6f8390142b@intel.com>
+Subject: Re: [PATCH v5 32/44] KVM: x86/pmu: Disable interception of select PMU
+ MSRs for mediated vPMUs
+To: Sean Christopherson <seanjc@google.com>, Sandipan Das <sandidas@amd.com>
+Cc: Marc Zyngier <maz@kernel.org>, Oliver Upton <oliver.upton@linux.dev>,
+ Tianrui Zhao <zhaotianrui@loongson.cn>, Bibo Mao <maobibo@loongson.cn>,
+ Huacai Chen <chenhuacai@kernel.org>, Anup Patel <anup@brainfault.org>,
+ Paul Walmsley <paul.walmsley@sifive.com>, Palmer Dabbelt
+ <palmer@dabbelt.com>, Albert Ou <aou@eecs.berkeley.edu>,
+ Xin Li <xin@zytor.com>, "H. Peter Anvin" <hpa@zytor.com>,
+ Andy Lutomirski <luto@kernel.org>, Peter Zijlstra <peterz@infradead.org>,
+ Ingo Molnar <mingo@redhat.com>, Arnaldo Carvalho de Melo <acme@kernel.org>,
+ Namhyung Kim <namhyung@kernel.org>, Paolo Bonzini <pbonzini@redhat.com>,
+ linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
+ kvm@vger.kernel.org, loongarch@lists.linux.dev,
+ kvm-riscv@lists.infradead.org, linux-riscv@lists.infradead.org,
+ linux-kernel@vger.kernel.org, linux-perf-users@vger.kernel.org,
+ Kan Liang <kan.liang@linux.intel.com>, Yongwei Ma <yongwei.ma@intel.com>,
+ Mingwei Zhang <mizhang@google.com>,
+ Xiong Zhang <xiong.y.zhang@linux.intel.com>,
+ Sandipan Das <sandipan.das@amd.com>
+References: <20250806195706.1650976-1-seanjc@google.com>
+ <20250806195706.1650976-33-seanjc@google.com>
+ <f896966e-8925-4b4f-8f0d-f1ae8aa197f7@amd.com> <aN1vfykNs8Dmv_g0@google.com>
 Content-Language: en-US
 From: "Mi, Dapeng" <dapeng1.mi@linux.intel.com>
-In-Reply-To: <00d0f3f3-d2b4-4885-9a49-5e6f8390142b@intel.com>
+In-Reply-To: <aN1vfykNs8Dmv_g0@google.com>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 
 
-On 10/7/2025 2:22 PM, Borah, Chaitanya Kumar wrote:
-> Hi,
+On 10/2/2025 2:14 AM, Sean Christopherson wrote:
+> On Fri, Sep 26, 2025, Sandipan Das wrote:
+>> On 8/7/2025 1:26 AM, Sean Christopherson wrote:
+>>> From: Dapeng Mi <dapeng1.mi@linux.intel.com>
+>>>
+>>> For vCPUs with a mediated vPMU, disable interception of counter MSRs for
+>>> PMCs that are exposed to the guest, and for GLOBAL_CTRL and related MSRs
+>>> if they are fully supported according to the vCPU model, i.e. if the MSRs
+>>> and all bits supported by hardware exist from the guest's point of view.
+>>>
+>>> Do NOT passthrough event selector or fixed counter control MSRs, so that
+>>> KVM can enforce userspace-defined event filters, e.g. to prevent use of
+>>> AnyThread events (which is unfortunately a setting in the fixed counter
+>>> control MSR).
+>>>
+>>> Defer support for nested passthrough of mediated PMU MSRs to the future,
+>>> as the logic for nested MSR interception is unfortunately vendor specific.
+> ...
 >
-> On 10/6/2025 1:33 PM, Borah, Chaitanya Kumar wrote:
->> Thank you for your responses.
->>
->> Following change fixes the issue for us.
->>
->>
->> diff --git a/arch/x86/kvm/pmu.c b/arch/x86/kvm/pmu.c
->> index 40ac4cb44ed2..487ad19a236e 100644
->> --- a/arch/x86/kvm/pmu.c
->> +++ b/arch/x86/kvm/pmu.c
->> @@ -108,16 +108,18 @@ void kvm_init_pmu_capability(const struct 
->> kvm_pmu_ops *pmu_ops)
->>          bool is_intel = boot_cpu_data.x86_vendor == X86_VENDOR_INTEL;
->>          int min_nr_gp_ctrs = pmu_ops->MIN_NR_GP_COUNTERS;
->>
->> -       perf_get_x86_pmu_capability(&kvm_host_pmu);
->> -
->>          /*
->>           * Hybrid PMUs don't play nice with virtualization without careful
->>           * configuration by userspace, and KVM's APIs for reporting 
->> supported
->>           * vPMU features do not account for hybrid PMUs.  Disable vPMU 
->> support
->>           * for hybrid PMUs until KVM gains a way to let userspace opt-in.
->>           */
->> -       if (cpu_feature_enabled(X86_FEATURE_HYBRID_CPU))
->> +       if (cpu_feature_enabled(X86_FEATURE_HYBRID_CPU)) {
->>                  enable_pmu = false;
->> +               memset(&kvm_host_pmu, 0, sizeof(kvm_host_pmu));
->> +       } else {
->> +               perf_get_x86_pmu_capability(&kvm_host_pmu);
->> +       }
-> Can we expect a formal patch soon?
-
-I'd like to post a patch to fix this tomorrow if Sean has no bandwidth on
-this. Thanks.
-
-
+>>>  #define MSR_AMD64_LBR_SELECT			0xc000010e
+>>> diff --git a/arch/x86/kvm/pmu.c b/arch/x86/kvm/pmu.c
+>>> index 4246e1d2cfcc..817ef852bdf9 100644
+>>> --- a/arch/x86/kvm/pmu.c
+>>> +++ b/arch/x86/kvm/pmu.c
+>>> @@ -715,18 +715,14 @@ int kvm_pmu_rdpmc(struct kvm_vcpu *vcpu, unsigned idx, u64 *data)
+>>>  	return 0;
+>>>  }
+>>>  
+>>> -bool kvm_need_rdpmc_intercept(struct kvm_vcpu *vcpu)
+>>> +bool kvm_need_perf_global_ctrl_intercept(struct kvm_vcpu *vcpu)
+>>>  {
+>>>  	struct kvm_pmu *pmu = vcpu_to_pmu(vcpu);
+>>>  
+>>>  	if (!kvm_vcpu_has_mediated_pmu(vcpu))
+>>>  		return true;
+>>>  
+>>> -	/*
+>>> -	 * VMware allows access to these Pseduo-PMCs even when read via RDPMC
+>>> -	 * in Ring3 when CR4.PCE=0.
+>>> -	 */
+>>> -	if (enable_vmware_backdoor)
+>>> +	if (!kvm_pmu_has_perf_global_ctrl(pmu))
+>>>  		return true;
+>>>  
+>>>  	/*
+>>> @@ -735,7 +731,22 @@ bool kvm_need_rdpmc_intercept(struct kvm_vcpu *vcpu)
+>>>  	 * capabilities themselves may be a subset of hardware capabilities.
+>>>  	 */
+>>>  	return pmu->nr_arch_gp_counters != kvm_host_pmu.num_counters_gp ||
+>>> -	       pmu->nr_arch_fixed_counters != kvm_host_pmu.num_counters_fixed ||
+>>> +	       pmu->nr_arch_fixed_counters != kvm_host_pmu.num_counters_fixed;
+>>> +}
+>>> +EXPORT_SYMBOL_GPL(kvm_need_perf_global_ctrl_intercept);
+>>> +
+>>> +bool kvm_need_rdpmc_intercept(struct kvm_vcpu *vcpu)
+>>> +{
+>>> +	struct kvm_pmu *pmu = vcpu_to_pmu(vcpu);
+>>> +
+>>> +	/*
+>>> +	 * VMware allows access to these Pseduo-PMCs even when read via RDPMC
+>>> +	 * in Ring3 when CR4.PCE=0.
+>>> +	 */
+>>> +	if (enable_vmware_backdoor)
+>>> +		return true;
+>>> +
+>>> +	return kvm_need_perf_global_ctrl_intercept(vcpu) ||
+>>>  	       pmu->counter_bitmask[KVM_PMC_GP] != (BIT_ULL(kvm_host_pmu.bit_width_gp) - 1) ||
+>>>  	       pmu->counter_bitmask[KVM_PMC_FIXED] != (BIT_ULL(kvm_host_pmu.bit_width_fixed) - 1);
+>>>  }
+>> There is a case for AMD processors where the global MSRs are absent in the guest
+>> but the guest still uses the same number of counters as what is advertised by the
+>> host capabilities. So RDPMC interception is not necessary for all cases where
+>> global control is unavailable.o
+> Hmm, I think Intel would be the same?  Ah, no, because the host will have fixed
+> counters, but the guest will not.  However, that's not directly related to
+> kvm_pmu_has_perf_global_ctrl(), so I think this would be correct?
 >
-> Regards
+> diff --git a/arch/x86/kvm/pmu.c b/arch/x86/kvm/pmu.c
+> index 4414d070c4f9..4c5b2712ee4c 100644
+> --- a/arch/x86/kvm/pmu.c
+> +++ b/arch/x86/kvm/pmu.c
+> @@ -744,16 +744,13 @@ int kvm_pmu_rdpmc(struct kvm_vcpu *vcpu, unsigned idx, u64 *data)
+>         return 0;
+>  }
+>  
+> -bool kvm_need_perf_global_ctrl_intercept(struct kvm_vcpu *vcpu)
+> +static bool kvm_need_pmc_intercept(struct kvm_vcpu *vcpu)
+
+The function name kvm_need_pmc_intercept() seems a little bit misleading
+and make users think this function is used to check if a certain PMC is
+intercepted. Maybe we can rename the function to kvm_need_global_intercept().
+
+Others look good to me. Thanks.
+
+
+>  {
+>         struct kvm_pmu *pmu = vcpu_to_pmu(vcpu);
+>  
+>         if (!kvm_vcpu_has_mediated_pmu(vcpu))
+>                 return true;
+>  
+> -       if (!kvm_pmu_has_perf_global_ctrl(pmu))
+> -               return true;
+> -
+>         /*
+>          * Note!  Check *host* PMU capabilities, not KVM's PMU capabilities, as
+>          * KVM's capabilities are constrained based on KVM support, i.e. KVM's
+> @@ -762,6 +759,13 @@ bool kvm_need_perf_global_ctrl_intercept(struct kvm_vcpu *vcpu)
+>         return pmu->nr_arch_gp_counters != kvm_host_pmu.num_counters_gp ||
+>                pmu->nr_arch_fixed_counters != kvm_host_pmu.num_counters_fixed;
+>  }
+> +
+> +bool kvm_need_perf_global_ctrl_intercept(struct kvm_vcpu *vcpu)
+> +{
+> +
+> +       return kvm_need_pmc_intercept(vcpu) ||
+> +              !kvm_pmu_has_perf_global_ctrl(vcpu_to_pmu(vcpu));
+> +}
+>  EXPORT_SYMBOL_GPL(kvm_need_perf_global_ctrl_intercept);
+>  
+>  bool kvm_need_rdpmc_intercept(struct kvm_vcpu *vcpu)
+> @@ -775,7 +779,7 @@ bool kvm_need_rdpmc_intercept(struct kvm_vcpu *vcpu)
+>         if (enable_vmware_backdoor)
+>                 return true;
+>  
+> -       return kvm_need_perf_global_ctrl_intercept(vcpu) ||
+> +       return kvm_need_pmc_intercept(vcpu) ||
+>                pmu->counter_bitmask[KVM_PMC_GP] != (BIT_ULL(kvm_host_pmu.bit_width_gp) - 1) ||
+>                pmu->counter_bitmask[KVM_PMC_FIXED] != (BIT_ULL(kvm_host_pmu.bit_width_fixed) - 1);
+>  }
 >
-> Chaitanya
 
