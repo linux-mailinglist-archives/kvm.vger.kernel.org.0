@@ -1,237 +1,121 @@
-Return-Path: <kvm+bounces-59699-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-59698-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 70037BC8750
-	for <lists+kvm@lfdr.de>; Thu, 09 Oct 2025 12:21:25 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 27CDEBC8701
+	for <lists+kvm@lfdr.de>; Thu, 09 Oct 2025 12:16:42 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3E3563B7625
-	for <lists+kvm@lfdr.de>; Thu,  9 Oct 2025 10:21:01 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5585A3C0D9E
+	for <lists+kvm@lfdr.de>; Thu,  9 Oct 2025 10:16:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 96AE52DC794;
-	Thu,  9 Oct 2025 10:20:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 496002D8DD9;
+	Thu,  9 Oct 2025 10:16:31 +0000 (UTC)
 X-Original-To: kvm@vger.kernel.org
-Received: from pegase2.c-s.fr (pegase2.c-s.fr [93.17.235.10])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 33DC3275844;
-	Thu,  9 Oct 2025 10:20:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=93.17.235.10
+Received: from Atcsqr.andestech.com (60-248-80-70.hinet-ip.hinet.net [60.248.80.70])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C130C1CCEE0
+	for <kvm@vger.kernel.org>; Thu,  9 Oct 2025 10:15:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=60.248.80.70
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1760005237; cv=none; b=WIvcQ2t4cCQeAjdmm06rO8P8/i52z7+xLaegywcqXizPePR+pTGm41zfNVGBkOJULoFddUYzha9TveyLIsdlMS9LiYi+DgmhJwzrUp2kehcshQbURqm8C4InVNOvZrwVKlMFncX0EtdyJ8Wn6ykwMvGm5PjwAsHFdT4+lkpmn+4=
+	t=1760004990; cv=none; b=CBNA8RjVUGNcNYlPhCfrs8BqgrXDPr5kXZVK/d9cN51grhSTQ/4zqaKTRMyfl8csqCiwZbHKyrRJfagqamgqI0A9dsCmuLP/guDt9/c8kIFcqv863IrZ207+MoKFKXRBUEryOHE49dFcL/zAJMwGSnRkDVa8PhSw35sLFRCfjn8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1760005237; c=relaxed/simple;
-	bh=lUs8p2fW3v1l2sBrZO8lIJGpAyvrMi+W3vfGsTEx0nY=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=Gxvq81XBV4Yr5tyBP12Aekpq8rPAHuBo9JLuJk724Hf4lg6IAm1mUvBeA5qGaK9mnnrFs9nQY0XzbjdzjO6TDB2zYdBSTJsMEt0L3F+XDy5tzkwLNnHuI8zaq7Wly7ItkU7YdLwDu/0bjP0Nv2oi/C/KthYTDtuBvnX/m2fTBh0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=csgroup.eu; spf=pass smtp.mailfrom=csgroup.eu; arc=none smtp.client-ip=93.17.235.10
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=csgroup.eu
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=csgroup.eu
-Received: from localhost (mailhub4.si.c-s.fr [172.26.127.67])
-	by localhost (Postfix) with ESMTP id 4cj548110xz9sSL;
-	Thu,  9 Oct 2025 12:01:12 +0200 (CEST)
-X-Virus-Scanned: amavisd-new at c-s.fr
-Received: from pegase2.c-s.fr ([172.26.127.65])
-	by localhost (pegase2.c-s.fr [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id qOLNCcqM6pFr; Thu,  9 Oct 2025 12:01:12 +0200 (CEST)
-Received: from messagerie.si.c-s.fr (messagerie.si.c-s.fr [192.168.25.192])
-	by pegase2.c-s.fr (Postfix) with ESMTP id 4cj5476tjqz9sSC;
-	Thu,  9 Oct 2025 12:01:11 +0200 (CEST)
-Received: from localhost (localhost [127.0.0.1])
-	by messagerie.si.c-s.fr (Postfix) with ESMTP id D06108B76C;
-	Thu,  9 Oct 2025 12:01:11 +0200 (CEST)
-X-Virus-Scanned: amavisd-new at c-s.fr
-Received: from messagerie.si.c-s.fr ([127.0.0.1])
-	by localhost (messagerie.si.c-s.fr [127.0.0.1]) (amavisd-new, port 10023)
-	with ESMTP id MfDghYtIuYkA; Thu,  9 Oct 2025 12:01:11 +0200 (CEST)
-Received: from [192.168.235.99] (unknown [192.168.235.99])
-	by messagerie.si.c-s.fr (Postfix) with ESMTP id 776CE8B767;
-	Thu,  9 Oct 2025 12:01:09 +0200 (CEST)
-Message-ID: <0c730c52-97ee-43ea-9697-ac11d2880ab7@csgroup.eu>
-Date: Thu, 9 Oct 2025 12:01:08 +0200
+	s=arc-20240116; t=1760004990; c=relaxed/simple;
+	bh=ohtR0oYn448oPLiSFOjbSqDaVglh/DTDY7LpHa0tRdE=;
+	h=Date:From:To:CC:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=j66Fjoou7/Z8IyOiNSAAi03/+eadWV1hiv9zz7E0UOreHXFiJO6ers8rjabAaS5TgHJi5KuY8B0b9hXRQPir/yUH885XvsN7dNNR9vEvfR2G1/2Xz7vZd1pVisTv6sEHDNAGzNr7DH/lfoAF4m/FUw39X9lDYkBSjjXzCh0cvgI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=permerror header.from=andestech.com; spf=pass smtp.mailfrom=andestech.com; arc=none smtp.client-ip=60.248.80.70
+Authentication-Results: smtp.subspace.kernel.org; dmarc=permerror header.from=andestech.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=andestech.com
+Received: from mail.andestech.com (ATCPCS34.andestech.com [10.0.1.134])
+	by Atcsqr.andestech.com with ESMTPS id 599AFpSq031528
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128 verify=OK);
+	Thu, 9 Oct 2025 18:15:51 +0800 (+08)
+	(envelope-from ben717@andestech.com)
+Received: from atctrx.andestech.com (10.0.15.173) by ATCPCS34.andestech.com
+ (10.0.1.134) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.39; Thu, 9 Oct
+ 2025 18:15:51 +0800
+Date: Thu, 9 Oct 2025 18:15:51 +0800
+From: Ben Zong-You Xie <ben717@andestech.com>
+To: Radim =?utf-8?B?S3LEjW3DocWZ?= <rkrcmar@ventanamicro.com>
+CC: <anup@brainfault.org>, <atish.patra@linux.dev>, <pjw@kernel.org>,
+        <palmer@dabbelt.com>, <aou@eecs.berkeley.edu>, <alex@ghiti.fr>,
+        <liujingqi@lanxincomputing.com>, <kvm@vger.kernel.org>,
+        <kvm-riscv@lists.infradead.org>, <linux-riscv@lists.infradead.org>,
+        <linux-kernel@vger.kernel.org>, <tim609@andestech.com>,
+        Hui Min Mina Chou
+	<minachou@andestech.com>,
+        linux-riscv
+	<linux-riscv-bounces@lists.infradead.org>
+Subject: Re: [PATCH] RISC-V: KVM: flush VS-stage TLB after VCPU migration to
+ prevent stale entries
+Message-ID: <aOeLVwXW/sF4NBUJ@atctrx.andestech.com>
+References: <20251002033402.610651-1-ben717@andestech.com>
+ <DDDKX1VNCCVS.2KVYNU4WBEOVI@ventanamicro.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: (bisected) [PATCH v2 08/37] mm/hugetlb: check for unreasonable
- folio sizes when registering hstate
-To: David Hildenbrand <david@redhat.com>, linux-kernel@vger.kernel.org
-Cc: Zi Yan <ziy@nvidia.com>, Lorenzo Stoakes <lorenzo.stoakes@oracle.com>,
- "Liam R. Howlett" <Liam.Howlett@oracle.com>,
- Alexander Potapenko <glider@google.com>,
- Andrew Morton <akpm@linux-foundation.org>,
- Brendan Jackman <jackmanb@google.com>, Christoph Lameter <cl@gentwo.org>,
- Dennis Zhou <dennis@kernel.org>, Dmitry Vyukov <dvyukov@google.com>,
- dri-devel@lists.freedesktop.org, intel-gfx@lists.freedesktop.org,
- iommu@lists.linux.dev, io-uring@vger.kernel.org,
- Jason Gunthorpe <jgg@nvidia.com>, Jens Axboe <axboe@kernel.dk>,
- Johannes Weiner <hannes@cmpxchg.org>, John Hubbard <jhubbard@nvidia.com>,
- kasan-dev@googlegroups.com, kvm@vger.kernel.org,
- Linus Torvalds <torvalds@linux-foundation.org>, linux-arm-kernel@axis.com,
- linux-arm-kernel@lists.infradead.org, linux-crypto@vger.kernel.org,
- linux-ide@vger.kernel.org, linux-kselftest@vger.kernel.org,
- linux-mips@vger.kernel.org, linux-mmc@vger.kernel.org, linux-mm@kvack.org,
- linux-riscv@lists.infradead.org, linux-s390@vger.kernel.org,
- linux-scsi@vger.kernel.org, Marco Elver <elver@google.com>,
- Marek Szyprowski <m.szyprowski@samsung.com>, Michal Hocko <mhocko@suse.com>,
- Mike Rapoport <rppt@kernel.org>, Muchun Song <muchun.song@linux.dev>,
- netdev@vger.kernel.org, Oscar Salvador <osalvador@suse.de>,
- Peter Xu <peterx@redhat.com>, Robin Murphy <robin.murphy@arm.com>,
- Suren Baghdasaryan <surenb@google.com>, Tejun Heo <tj@kernel.org>,
- virtualization@lists.linux.dev, Vlastimil Babka <vbabka@suse.cz>,
- wireguard@lists.zx2c4.com, x86@kernel.org,
- "linuxppc-dev@lists.ozlabs.org" <linuxppc-dev@lists.ozlabs.org>
-References: <20250901150359.867252-1-david@redhat.com>
- <20250901150359.867252-9-david@redhat.com>
- <3e043453-3f27-48ad-b987-cc39f523060a@csgroup.eu>
- <d3fc12d4-0b59-4b1f-bb5c-13189a01e13d@redhat.com>
- <faf62f20-8844-42a0-a7a7-846d8ead0622@csgroup.eu>
- <9361c75a-ab37-4d7f-8680-9833430d93d4@redhat.com>
- <03671aa8-4276-4707-9c75-83c96968cbb2@csgroup.eu>
- <1db15a30-72d6-4045-8aa1-68bd8411b0ba@redhat.com>
-From: Christophe Leroy <christophe.leroy@csgroup.eu>
-Content-Language: fr-FR
-In-Reply-To: <1db15a30-72d6-4045-8aa1-68bd8411b0ba@redhat.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Type: text/plain; charset="utf-8"
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
+In-Reply-To: <DDDKX1VNCCVS.2KVYNU4WBEOVI@ventanamicro.com>
+User-Agent: Mutt/2.1.4 (2021-12-11)
+X-ClientProxiedBy: ATCPCS33.andestech.com (10.0.1.100) To
+ ATCPCS34.andestech.com (10.0.1.134)
+X-DKIM-Results: atcpcs34.andestech.com; dkim=none;
+X-DNSRBL: 
+X-SPAM-SOURCE-CHECK: pass
+X-MAIL:Atcsqr.andestech.com 599AFpSq031528
 
+Hi Radim,
 
+Thanks for the review and the detailed comments.
 
-Le 09/10/2025 à 11:20, David Hildenbrand a écrit :
-> On 09.10.25 11:16, Christophe Leroy wrote:
->>
->>
->> Le 09/10/2025 à 10:14, David Hildenbrand a écrit :
->>> On 09.10.25 10:04, Christophe Leroy wrote:
->>>>
->>>>
->>>> Le 09/10/2025 à 09:22, David Hildenbrand a écrit :
->>>>> On 09.10.25 09:14, Christophe Leroy wrote:
->>>>>> Hi David,
->>>>>>
->>>>>> Le 01/09/2025 à 17:03, David Hildenbrand a écrit :
->>>>>>> diff --git a/mm/hugetlb.c b/mm/hugetlb.c
->>>>>>> index 1e777cc51ad04..d3542e92a712e 100644
->>>>>>> --- a/mm/hugetlb.c
->>>>>>> +++ b/mm/hugetlb.c
->>>>>>> @@ -4657,6 +4657,7 @@ static int __init hugetlb_init(void)
->>>>>>>          BUILD_BUG_ON(sizeof_field(struct page, private) *
->>>>>>> BITS_PER_BYTE <
->>>>>>>                  __NR_HPAGEFLAGS);
->>>>>>> +    BUILD_BUG_ON_INVALID(HUGETLB_PAGE_ORDER > MAX_FOLIO_ORDER);
->>>>>>>          if (!hugepages_supported()) {
->>>>>>>              if (hugetlb_max_hstate || 
->>>>>>> default_hstate_max_huge_pages)
->>>>>>> @@ -4740,6 +4741,7 @@ void __init hugetlb_add_hstate(unsigned int
->>>>>>> order)
->>>>>>>          }
->>>>>>>          BUG_ON(hugetlb_max_hstate >= HUGE_MAX_HSTATE);
->>>>>>>          BUG_ON(order < order_base_2(__NR_USED_SUBPAGE));
->>>>>>> +    WARN_ON(order > MAX_FOLIO_ORDER);
->>>>>>>          h = &hstates[hugetlb_max_hstate++];
->>>>>>>          __mutex_init(&h->resize_lock, "resize mutex", &h- 
->>>>>>> >resize_key);
->>>>>>>          h->order = order;
->>>>>
->>>>> We end up registering hugetlb folios that are bigger than
->>>>> MAX_FOLIO_ORDER. So we have to figure out how a config can trigger 
->>>>> that
->>>>> (and if we have to support that).
->>>>>
->>>>
->>>> MAX_FOLIO_ORDER is defined as:
->>>>
->>>> #ifdef CONFIG_ARCH_HAS_GIGANTIC_PAGE
->>>> #define MAX_FOLIO_ORDER        PUD_ORDER
->>>> #else
->>>> #define MAX_FOLIO_ORDER        MAX_PAGE_ORDER
->>>> #endif
->>>>
->>>> MAX_PAGE_ORDER is the limit for dynamic creation of hugepages via
->>>> /sys/kernel/mm/hugepages/ but bigger pages can be created at boottime
->>>> with kernel boot parameters without CONFIG_ARCH_HAS_GIGANTIC_PAGE:
->>>>
->>>>      hugepagesz=64m hugepages=1 hugepagesz=256m hugepages=1
->>>>
->>>> Gives:
->>>>
->>>> HugeTLB: registered 1.00 GiB page size, pre-allocated 0 pages
->>>> HugeTLB: 0 KiB vmemmap can be freed for a 1.00 GiB page
->>>> HugeTLB: registered 64.0 MiB page size, pre-allocated 1 pages
->>>> HugeTLB: 0 KiB vmemmap can be freed for a 64.0 MiB page
->>>> HugeTLB: registered 256 MiB page size, pre-allocated 1 pages
->>>> HugeTLB: 0 KiB vmemmap can be freed for a 256 MiB page
->>>> HugeTLB: registered 4.00 MiB page size, pre-allocated 0 pages
->>>> HugeTLB: 0 KiB vmemmap can be freed for a 4.00 MiB page
->>>> HugeTLB: registered 16.0 MiB page size, pre-allocated 0 pages
->>>> HugeTLB: 0 KiB vmemmap can be freed for a 16.0 MiB page
->>>
->>> I think it's a violation of CONFIG_ARCH_HAS_GIGANTIC_PAGE. The existing
->>> folio_dump() code would not handle it correctly as well.
->>
->> I'm trying to dig into history and when looking at commit 4eb0716e868e
->> ("hugetlb: allow to free gigantic pages regardless of the
->> configuration") I understand that CONFIG_ARCH_HAS_GIGANTIC_PAGE is
->> needed to be able to allocate gigantic pages at runtime. It is not
->> needed to reserve gigantic pages at boottime.
->>
->> What am I missing ?
-> 
-> That CONFIG_ARCH_HAS_GIGANTIC_PAGE has nothing runtime-specific in its 
-> name.
-
-In its name for sure, but the commit I mention says:
-
-     On systems without CONTIG_ALLOC activated but that support gigantic 
-pages,
-     boottime reserved gigantic pages can not be freed at all.  This patch
-     simply enables the possibility to hand back those pages to memory
-     allocator.
-
-And one of the hunks is:
-
-diff --git a/arch/arm64/Kconfig b/arch/arm64/Kconfig
-index 7f7fbd8bd9d5b..7a1aa53d188d3 100644
---- a/arch/arm64/Kconfig
-+++ b/arch/arm64/Kconfig
-@@ -19,7 +19,7 @@ config ARM64
-         select ARCH_HAS_FAST_MULTIPLIER
-         select ARCH_HAS_FORTIFY_SOURCE
-         select ARCH_HAS_GCOV_PROFILE_ALL
--       select ARCH_HAS_GIGANTIC_PAGE if CONTIG_ALLOC
-+       select ARCH_HAS_GIGANTIC_PAGE
-         select ARCH_HAS_KCOV
-         select ARCH_HAS_KEEPINITRD
-         select ARCH_HAS_MEMBARRIER_SYNC_CORE
-
-So I understand from the commit message that it was possible at that 
-time to have gigantic pages without ARCH_HAS_GIGANTIC_PAGE as long as 
-you didn't have to be able to free them during runtime.
-
-> 
-> Can't we just select CONFIG_ARCH_HAS_GIGANTIC_PAGE for the relevant 
-> hugetlb config that allows for *gigantic pages*.
+> What RISC-V implementation are you using?  (And does the implementation
+> have the same memory access performance in V=0 and V=1 modes, even
+> though the latter has two levels of TLBs?)
 > 
 
-We probably can, but I'd really like to understand history and how we 
-ended up in the situation we are now.
-Because blind fixes often lead to more problems.
+The issue is found when validating our new AndesCore AX66.
+The address translation performance is the same for U and VU-mode when the uTLB is hit.
 
-If I follow things correctly I see a helper gigantic_page_supported() 
-added by commit 944d9fec8d7a ("hugetlb: add support for gigantic page 
-allocation at runtime").
+> > To fix this, kvm_riscv_gstage_vmid_sanitize() is extended to flush both
+> > G-stage and VS-stage TLBs whenever a VCPU migrates to a different Host CPU.
+> > This ensures that no stale VS-stage mappings remain after VCPU migration.
+> >
+> > Fixes: b79bf2025dbc ("RISC-V: KVM: Rename and move kvm_riscv_local_tlb_sanitize()")
+> 
+> b79bf2025dbc does not change behavior.
+> The bug must have been introduced earlier.
+> 
 
-And then commit 461a7184320a ("mm/hugetlb: introduce 
-ARCH_HAS_GIGANTIC_PAGE") is added to wrap gigantic_page_supported()
+Will fix the incorrect Fixes tag in the next version.
+Thanks for pointing that out, we'll change to the following:
 
-Then commit 4eb0716e868e ("hugetlb: allow to free gigantic pages 
-regardless of the configuration") changed gigantic_page_supported() to 
-gigantic_page_runtime_supported()
+    Fixes: 92e450507d56 ("RISC-V: KVM: Cleanup stale TLB entries when host CPU changes")
 
-So where are we now ?
+> > Signed-off-by: Hui Min Mina Chou <minachou@andestech.com>
+> > Signed-off-by: Ben Zong-You Xie <ben717@andestech.com>
+> > ---
+> > diff --git a/arch/riscv/kvm/vmid.c b/arch/riscv/kvm/vmid.c
+> > @@ -146,4 +146,10 @@ void kvm_riscv_gstage_vmid_sanitize(struct kvm_vcpu *vcpu)
+> 
+> The function is now doing more that sanitizing gstage.
+> Maybe we can again call it kvm_riscv_local_tlb_sanitize()?
+> 
 
-Christophe
+As for the naming, your suggestion makes sense.
+We’re also considering whether it should be moved back from vmid.c to tlb.c,
+and we’d like to hear other maintainers’ opinions before doing so.
+
+Thanks again for your feedback.
+
+Best regards,
+Ben
 
