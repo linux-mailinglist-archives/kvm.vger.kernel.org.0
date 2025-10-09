@@ -1,182 +1,275 @@
-Return-Path: <kvm+bounces-59718-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-59720-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 54D9FBC955B
-	for <lists+kvm@lfdr.de>; Thu, 09 Oct 2025 15:38:12 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4B404BCA41D
+	for <lists+kvm@lfdr.de>; Thu, 09 Oct 2025 18:55:56 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 387AD3B4DAD
-	for <lists+kvm@lfdr.de>; Thu,  9 Oct 2025 13:38:09 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 496CA19E70F3
+	for <lists+kvm@lfdr.de>; Thu,  9 Oct 2025 16:56:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A4A0B2E9EA6;
-	Thu,  9 Oct 2025 13:37:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D271923BCF7;
+	Thu,  9 Oct 2025 16:55:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="IIB7EKYe"
+	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="TcqY/hvD";
+	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="TcqY/hvD"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from DUZPR83CU001.outbound.protection.outlook.com (mail-northeuropeazon11012001.outbound.protection.outlook.com [52.101.66.1])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 518A12E973D
-	for <kvm@vger.kernel.org>; Thu,  9 Oct 2025 13:37:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1760017054; cv=none; b=l5m4db0kV9FkMrtx+EAm+8rPvFCld6TlRA4rsQcFw5bkT8E6jhRSjVk1HJYNbp2y5sNYHqE/hRRnapmL21yhNBFyjaVY6vLo8Hs8rGPx7z2sMphYswU3SBN3SkkJUHqGAr6Dyjwu+9YZNYuKyatIYheY2g9eArTszX6eR1//GGA=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1760017054; c=relaxed/simple;
-	bh=7NdTvvUFK/WVGSYlLXsbwdrwKPNZwb8MV31/iuYNMko=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=DWC505BfyUzliUFNPjnYirQ5ZdxaczxU99+XrDfz26EU+Khq7b4e+5PpbYkXt2cIEavIV4Oii3BaWQ2pQHVUoLDpiDLIkNyCqKfMOsi3yP1wBv+iV61Isdx571wj3yw8t/7pM+mW532Zy6ooL6qbMonWGHJRWAY2qR4gpQgPnhQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=IIB7EKYe; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1760017052;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=QSnlK9qf9+QtrbFfXzTXGo8du1cPFojIdvhyIWDFaG4=;
-	b=IIB7EKYe3fh+SCHFkVLMTEhNDTodZII9+nrQxfsdtZL5DOXDjKywtyU279AvklTNKRTR1T
-	arHh4/pNnZS+ilLcyA7WNiEG73IFUUEiU3+jHYosMEtIMxV9sjW2Xcr8h4yceC1OnPACkB
-	+YsT6ETMwGZlrL8u2fDSucO/09dx3H4=
-Received: from mail-qt1-f197.google.com (mail-qt1-f197.google.com
- [209.85.160.197]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-619-dwq2XUwRPR2sx1QVv8s8aQ-1; Thu, 09 Oct 2025 09:37:28 -0400
-X-MC-Unique: dwq2XUwRPR2sx1QVv8s8aQ-1
-X-Mimecast-MFC-AGG-ID: dwq2XUwRPR2sx1QVv8s8aQ_1760017047
-Received: by mail-qt1-f197.google.com with SMTP id d75a77b69052e-4ddc5a484c9so35494451cf.1
-        for <kvm@vger.kernel.org>; Thu, 09 Oct 2025 06:37:27 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1760017047; x=1760621847;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=QSnlK9qf9+QtrbFfXzTXGo8du1cPFojIdvhyIWDFaG4=;
-        b=T2gTbj23jB08ndstxF9Vrod/AWoQtxZwOJCB053LPICZhSZbkAR3sjf2Y9XxaSSUCD
-         +1ofS2kOgu1yEeRT7D2r4SFJFLs5CFtyN0Hu81djA4OkgbuMnFb+AS5slH4KJFj4FQux
-         0trO4Lanb5wQapoA6BQ9U9+eny9bABB99Y2DfjQQ8/an5QKkZp3AHhYVdKnmcAb6Ypzf
-         JOU3Olo2VHoxzqiSu9f8+Ly4u+9/9vu4fvh0pxECsaVssknIL8fYkZ2dP9UFktb+mfjJ
-         ZGhS1EOdwKKbgJX03cBL5N5DTy9HcF0/vUnmer8oX0CcMTs8jXaG2R5VqPEuMV+g+Q7E
-         9X2w==
-X-Forwarded-Encrypted: i=1; AJvYcCUwH4Fxl5STWmStRSIzDPpRY4MpgqRO1GcamX1r4UbNiDULKJ+3ypBHgfikZA6ghuISsvA=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxD0PfSlZ/mpouMBfCBgDwjYo2qQT3aXbl1gp4RZjR7kqEhRwRP
-	F96n7yu5himDF1QCdosxNgj0Ne7g8MuG+iZZYdA52sqsV3eYf4WMRBtmsZRdHkhafTtoXJ0hVBW
-	+Ll/bkEp17dQXdUp1LX1GPD6wVL7f/zCw9iHoyF4UDlWUgaRahImfZw==
-X-Gm-Gg: ASbGncvSgq4o/VkofZWs9H63sc2OvKTtJAuj/MrF7Pjo/yG9puHx/Mq7MQ0VDnKFFbc
-	Hoeif/aPBhONpFy+coQdb2ZBWilVJnqL1u/Qblzm/piHfpnM8cqUwrqlaAKFcRGwXJknft7byVq
-	Y3eC+UkLuwPwjf+X70Fjji4BfYBNBhry41XIGz6S0k+ZW59+lDymEtPnUQPSRcJS/95nzdEqcDL
-	OihJ6qhfio4t6BOiiFjwsfUladUytI+RD1jWzovaR3JhboYBeD2YLUOHSU7DouSLn5j3zuUFWal
-	LPn+VFXLMUeD/iiQ0Oazqz2DSqB55FuLfi4=
-X-Received: by 2002:a05:622a:552:b0:4d3:1b4f:dda1 with SMTP id d75a77b69052e-4e6ead5b74fmr99238161cf.61.1760017046384;
-        Thu, 09 Oct 2025 06:37:26 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IGkkkln0wvJVfA+/SQdl7KyNaqeghASgRMRgQSZA/6yVrMeWhD/2djQvFf88sK4uQV3LAnLRw==
-X-Received: by 2002:a05:622a:552:b0:4d3:1b4f:dda1 with SMTP id d75a77b69052e-4e6ead5b74fmr99237541cf.61.1760017045789;
-        Thu, 09 Oct 2025 06:37:25 -0700 (PDT)
-Received: from redhat.com ([138.199.52.81])
-        by smtp.gmail.com with ESMTPSA id af79cd13be357-884a2369b3fsm191330185a.51.2025.10.09.06.37.23
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 09 Oct 2025 06:37:25 -0700 (PDT)
-Date: Thu, 9 Oct 2025 09:37:20 -0400
-From: "Michael S. Tsirkin" <mst@redhat.com>
-To: Andrew Lunn <andrew@lunn.ch>
-Cc: linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
-	Paolo Abeni <pabeni@redhat.com>, Jason Wang <jasowang@redhat.com>,
-	Eugenio =?iso-8859-1?Q?P=E9rez?= <eperezma@redhat.com>,
-	Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
-	Jonathan Corbet <corbet@lwn.net>, kvm@vger.kernel.org,
-	virtualization@lists.linux.dev, linux-doc@vger.kernel.org
-Subject: Re: [PATCH 1/3] virtio: dwords->qwords
-Message-ID: <20251009093127-mutt-send-email-mst@kernel.org>
-References: <cover.1760008797.git.mst@redhat.com>
- <350d0abfaa2dcdb44678098f9119ba41166f375f.1760008798.git.mst@redhat.com>
- <26d7d26e-dd45-47bb-885b-45c6d44900bb@lunn.ch>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 08E8E2264DC;
+	Thu,  9 Oct 2025 16:55:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.66.1
+ARC-Seal:i=3; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1760028928; cv=fail; b=U/o4bpd7S2FXY7S2Y1AqMjDaz2qfaYk8WpoanE3gJKerNAKMM+NnSKqNUHG6ehnIXhGWfG2S9QPqD+0DSSa1oIF5bj792hG6tecqqFlHzyr6Po+5tx44GCP+o1Wj59YwCDAvgm9h3EFSUGVqEblASjASiH72yB7RSw8MI+3Z9OE=
+ARC-Message-Signature:i=3; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1760028928; c=relaxed/simple;
+	bh=kIg2fmlCnCoDet1SmM15f2fjTUpcYgQnookAa31I5gw=;
+	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=Qsk/McQLpN3NatNWyrc85B/pHJduvZ7e2rs0+zBnjbjUtRMIOLwPCV86pXCKiU43AQqNJYHrctr+iWfz8/EJiCuO/aRO80Y+JZhRYBW4gMKxq/i4TsZepCDx6Vnk1Nu2v/Rjd9NWzpdn3tiPVYxJ9tFCnjZwWQ6w1xBoUA30aTg=
+ARC-Authentication-Results:i=3; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=TcqY/hvD; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=TcqY/hvD; arc=fail smtp.client-ip=52.101.66.1
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+ARC-Seal: i=2; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=pass;
+ b=TQENvdL1jCefoRekPgiIjqZn7fVCUrncz0+YaG+LH5I1AraCdW+lu8SEWhtb45WMJ/cGRWyQ1PNog8ijiyEdfEnA7+da0Cis9AEVtpwPShbT/bUY54KC/r4lXzJZ+vpcZDGWhgii/Jo6GTlxCYijvS27m40Gz7JF8rQ9cGYFsboHebquCQqxwqoF5fNdQG1jlRYOOIQ0lOr8Qo98Ig0FXdz+kvwc6X5IwbGcKmThI0sGJUYpCpM6SvuMmzte43km3CTOuOEnGUAKQP6b1BtqJ6QHLJx5cPawbtVC/mjxusrnpOI4ac9Lfn6SIWdZZfwE2EEk/YL4aT0EO3ukeEdC4A==
+ARC-Message-Signature: i=2; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=Hb5Q2Ol0YLbT1pdH6xGpYSlcDHd3kJho7DfzzI4Uj9w=;
+ b=VcYvpbTw4ckzF9LGcwdRLgCoADm7zmCimJoFGgJ1Rf8q2pQNWKECBzbflCqWegSvpQgGDur/4LZMWgYAa8WGQPjpzUU0LitZDE1u9JxtdiXTlSlt+MrWxWrhtKexSSc3xiM9d6ovqUD4PfPYS0P2OEmL2l/7DgFqkldIrgphT3OlQieffAmtP46btimuHTB4TNEM92QP1U/uurDmgy3d/JRhKezPDqxTiz6f/LHLDZk8H4bnXntG4nG2lJZGB3DAp138Olkgixl13JO+qDgRwljopetmelAhQ13z34lmUGqoocGqALheV73sZToW/DstjgwnHHi70Z4rfhyR78UsgQ==
+ARC-Authentication-Results: i=2; mx.microsoft.com 1; spf=pass (sender ip is
+ 4.158.2.129) smtp.rcpttodomain=lists.infradead.org smtp.mailfrom=arm.com;
+ dmarc=pass (p=none sp=none pct=100) action=none header.from=arm.com;
+ dkim=pass (signature was verified) header.d=arm.com; arc=pass (0 oda=1 ltdi=1
+ spf=[1,1,smtp.mailfrom=arm.com] dkim=[1,1,header.d=arm.com]
+ dmarc=[1,1,header.from=arm.com])
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=arm.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=Hb5Q2Ol0YLbT1pdH6xGpYSlcDHd3kJho7DfzzI4Uj9w=;
+ b=TcqY/hvDz0R5/WMPuoz99MdW+BefqN9hfliGmevWWDbCdG0CAz/YsL5TqaLnSqGu1UjDZElP4+TtZWVR4IziV1cHTLkeQAFdhwc2Rpo1bO275pwTF2zMOhmvpGSphIPR6SifCuAysyfp1JKAV2MfLCIqbhX9FJzVPd2SXwSXIz0=
+Received: from AM9P193CA0008.EURP193.PROD.OUTLOOK.COM (2603:10a6:20b:21e::13)
+ by DB9PR08MB9803.eurprd08.prod.outlook.com (2603:10a6:10:460::12) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9203.9; Thu, 9 Oct
+ 2025 16:55:21 +0000
+Received: from AMS0EPF00000192.eurprd05.prod.outlook.com
+ (2603:10a6:20b:21e:cafe::b6) by AM9P193CA0008.outlook.office365.com
+ (2603:10a6:20b:21e::13) with Microsoft SMTP Server (version=TLS1_3,
+ cipher=TLS_AES_256_GCM_SHA384) id 15.20.9182.20 via Frontend Transport; Thu,
+ 9 Oct 2025 16:55:21 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 4.158.2.129)
+ smtp.mailfrom=arm.com; dkim=pass (signature was verified)
+ header.d=arm.com;dmarc=pass action=none header.from=arm.com;
+Received-SPF: Pass (protection.outlook.com: domain of arm.com designates
+ 4.158.2.129 as permitted sender) receiver=protection.outlook.com;
+ client-ip=4.158.2.129; helo=outbound-uk1.az.dlp.m.darktrace.com; pr=C
+Received: from outbound-uk1.az.dlp.m.darktrace.com (4.158.2.129) by
+ AMS0EPF00000192.mail.protection.outlook.com (10.167.16.218) with Microsoft
+ SMTP Server (version=TLS1_3, cipher=TLS_AES_256_GCM_SHA384) id 15.20.9203.9
+ via Frontend Transport; Thu, 9 Oct 2025 16:55:20 +0000
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=Q3grx1C1lTLoQs4dp1raEC7th9Erwfhaccf6lKme6wzIGa1h9dkQ4UcVgj9KFxkb8aS/38vpVWNLr+wW8U09LkhdrYeHw9yVRYVUQY23n99bobqz5TJMvjcggeshERxou3TPo1d9oMJUsxhVv46P5RfS9a1MCYC2FZUseTUQzBmnvFJ7HN1isAJgEoDpPvosir1uDoTqsLYdk++8ibJZthpdxM+9CZGHnmJXhJuL7VJTFPbIXGnfW3j5tp7kSO3ep7vgA1W0o/20GBVsk/C+pK2GfVfSAMr6F/7Hz10FC5vTNnJUgCodBdDrhxtvXpiPl1znTf1n+7EkY2K/v6egVQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=Hb5Q2Ol0YLbT1pdH6xGpYSlcDHd3kJho7DfzzI4Uj9w=;
+ b=RsD22/BRaNmiBMOhq8MxhcWWoUypqWzhAhmGqHL9fNZKRg41POdmxXAN2wTOU2sxpIdp7K3ZD8O3G/kizOOa5vQYTZ9eiJOgnII6QgC5EJYorj2ZpObnIEYZ7fdJgXw08HHM0lfRAE+7+52QimTxROCkZI2Hnz6GVWEN9jOIt3iQbTSgZsXU374gYM9scw2SFTfKNpI/+DtXYsY0TLrUU2cJlOa+UIOsJKifIwuJxR1peIgTpbAwyul8N6A8QQnj901w8YwiMjlkNctP/HLwMubV1SeG7RfK8ME/tACe/kChlRFv6My30UFIjyHYESDXlZTUW5kQ5YMInIZZe5FkAg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=arm.com; dmarc=pass action=none header.from=arm.com; dkim=pass
+ header.d=arm.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=arm.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=Hb5Q2Ol0YLbT1pdH6xGpYSlcDHd3kJho7DfzzI4Uj9w=;
+ b=TcqY/hvDz0R5/WMPuoz99MdW+BefqN9hfliGmevWWDbCdG0CAz/YsL5TqaLnSqGu1UjDZElP4+TtZWVR4IziV1cHTLkeQAFdhwc2Rpo1bO275pwTF2zMOhmvpGSphIPR6SifCuAysyfp1JKAV2MfLCIqbhX9FJzVPd2SXwSXIz0=
+Received: from PR3PR08MB5786.eurprd08.prod.outlook.com (2603:10a6:102:85::9)
+ by DB3PR08MB8795.eurprd08.prod.outlook.com (2603:10a6:10:432::18) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9203.9; Thu, 9 Oct
+ 2025 16:54:48 +0000
+Received: from PR3PR08MB5786.eurprd08.prod.outlook.com
+ ([fe80::320c:9322:f90f:8522]) by PR3PR08MB5786.eurprd08.prod.outlook.com
+ ([fe80::320c:9322:f90f:8522%4]) with mapi id 15.20.9203.009; Thu, 9 Oct 2025
+ 16:54:48 +0000
+From: Sascha Bischoff <Sascha.Bischoff@arm.com>
+To: "linux-arm-kernel@lists.infradead.org"
+	<linux-arm-kernel@lists.infradead.org>, "kvmarm@lists.linux.dev"
+	<kvmarm@lists.linux.dev>, "linux-kernel@vger.kernel.org"
+	<linux-kernel@vger.kernel.org>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>
+CC: nd <nd@arm.com>, Mark Rutland <Mark.Rutland@arm.com>, Mark Brown
+	<broonie@kernel.org>, Catalin Marinas <Catalin.Marinas@arm.com>,
+	"maz@kernel.org" <maz@kernel.org>, "oliver.upton@linux.dev"
+	<oliver.upton@linux.dev>, Joey Gouly <Joey.Gouly@arm.com>, Suzuki Poulose
+	<Suzuki.Poulose@arm.com>, "yuzenghui@huawei.com" <yuzenghui@huawei.com>,
+	"will@kernel.org" <will@kernel.org>, "lpieralisi@kernel.org"
+	<lpieralisi@kernel.org>
+Subject: [PATCH v2 1/4] arm64/sysreg: Fix checks for incomplete sysreg
+ definitions
+Thread-Topic: [PATCH v2 1/4] arm64/sysreg: Fix checks for incomplete sysreg
+ definitions
+Thread-Index: AQHcOT1r6a65ndYfEE+XapMGdpiAfA==
+Date: Thu, 9 Oct 2025 16:54:47 +0000
+Message-ID: <20251009165427.437379-2-sascha.bischoff@arm.com>
+References: <20251009165427.437379-1-sascha.bischoff@arm.com>
+In-Reply-To: <20251009165427.437379-1-sascha.bischoff@arm.com>
+Accept-Language: en-GB, en-US
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+x-mailer: git-send-email 2.34.1
+Authentication-Results-Original: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=arm.com;
+x-ms-traffictypediagnostic:
+	PR3PR08MB5786:EE_|DB3PR08MB8795:EE_|AMS0EPF00000192:EE_|DB9PR08MB9803:EE_
+X-MS-Office365-Filtering-Correlation-Id: d9b8a982-1948-4e72-d7de-08de0754a1c4
+x-checkrecipientrouted: true
+nodisclaimer: true
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam-Untrusted:
+ BCL:0;ARA:13230040|7416014|376014|1800799024|366016|38070700021;
+X-Microsoft-Antispam-Message-Info-Original:
+ =?iso-8859-1?Q?SclAl3qBCJIdwWu2u3EzVSZKNG3y9FOAU/7cIHfH4AWCGdJB5fGTuCDsb9?=
+ =?iso-8859-1?Q?oJbd8ydaHwjCoSY1yucKSN2MMxDXkMZI3vkV9FKxtFvXmhFG3NsUw/UZK+?=
+ =?iso-8859-1?Q?XCeWM+jDqY5m1pO/tE7VU6aO/N54qQcCJDiHJ1E7loAJHPVcvv2rJz6StT?=
+ =?iso-8859-1?Q?ZmketWl4fXA8YLn+amgUB8azL4GMUXBlH+n3BeZIp490w4xjpFA89eFq1X?=
+ =?iso-8859-1?Q?x56Ngu/dMqGir8WtN6o0wvn6SGIgbkJv0dFS4jeK/jeaH9+Fvb21K8XNnH?=
+ =?iso-8859-1?Q?pXt1CXMl6goDSRfoPUnxJbRiZTki1rgjDDA3cn3p12xinPaAQOIjhpAVen?=
+ =?iso-8859-1?Q?ZloSZa4VjaivM1eSnlP0OTuPGa2MLZwt5EHzdiT73rSmulpHFq+jcIA2oV?=
+ =?iso-8859-1?Q?f6D0hUgTAE1z6/MGj7C3d9eJ59SfKQvj96BoWVagk+2U6apGBgfWMwNNk/?=
+ =?iso-8859-1?Q?EgAKRuZFBmPhoA9EYW6bHcETWtCvU5uO/dCuaHIwQ9pqB94FgXxZNva3GQ?=
+ =?iso-8859-1?Q?FNDAbC0GZQUcIKZtbhzg8WViLw9cJ5aO9LlJECEmB6Lt0Gk8FCv3mi0BAR?=
+ =?iso-8859-1?Q?+7ejVDHgHLeGeHfUc2b5sDTfc8mVlaC5E/JpiFxWUgFOeLGZs9kt3wkfsR?=
+ =?iso-8859-1?Q?uUbL7LN2gwcaYpGSLsMO1SlAY2ZwbZIIz+66ZTVmh5O1bTXO+AEJXWrm7f?=
+ =?iso-8859-1?Q?Xc2gKopoJLj49YlD0IfXP78Ma1SOXzbOCr2lThjk3xbYf/CQYw1Nea4WQ/?=
+ =?iso-8859-1?Q?T/wkNfpsWN/AlL7iRght4EaLHNL/agLnfG6nQs/O9EcsLeiyudrzujJAG5?=
+ =?iso-8859-1?Q?+6j21+s2wBeVKnY/CU6mDUwEjaODj2ADWnRfNfFH6m8SZu5zOXs7JqNy2h?=
+ =?iso-8859-1?Q?PCyzQNHI60Wf5uRbeBvwjlcLWnrPfBfDJ7pxJbB82CEBDkubf3YiI1GQ6P?=
+ =?iso-8859-1?Q?ZtnyIN+jB8NNNpNdIObhT1C4pYQ8R/W/dMW68jUpKuI5NqslHqGj9+tJz+?=
+ =?iso-8859-1?Q?bt2hHmRaITSJOS2BxcZ7rjcu7Fu7ARyzrNNTQtGXXHqs6WmCCssd33F5yf?=
+ =?iso-8859-1?Q?peMUfGvs06hbs19HqCUYl5QJjIcEna31oBcuEmIB5Mc+tqRDa0am7PBRYs?=
+ =?iso-8859-1?Q?xt4qS6RcSvAbJj8UWunOMo8tB5j7N4KDCtA4OE247xernnJ+9REUZL2KoS?=
+ =?iso-8859-1?Q?t+7ZqLAyDfOQ6s6/eqOfUQsoU4edcTvMrlca2sr+mRWKRiAklhAy/QDMgx?=
+ =?iso-8859-1?Q?oH6PMrcL7uszdzbFsFI1DTaYC7ZoL5mQfvHvIPQ17x28Oh70vzljg+gE2i?=
+ =?iso-8859-1?Q?nUSycZ3ccIOL2yXG4EcnjVWnh8yMN5D8b/+jUD0QPB0saEK7UAAhaNtCDu?=
+ =?iso-8859-1?Q?DCQ/JR7q+KRkbD4S5nBLzxpzNPFiVPQOf4ocO44+oIj4OdwChDq8x+Rn/q?=
+ =?iso-8859-1?Q?QoMJPQY/YHweKM511rPrOiYTXd8TJvH1x3WOgxWZnstRmo5cO5AO+8Drpr?=
+ =?iso-8859-1?Q?AfLsHUYZZZH1coqfcJZ8wSnC/nxn3i7b5w9VSfZAsXsYxk5IzlHKibRidO?=
+ =?iso-8859-1?Q?tJLFRfkxLoXcLZkqEAnkwcY/xylo?=
+X-Forefront-Antispam-Report-Untrusted:
+ CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PR3PR08MB5786.eurprd08.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(7416014)(376014)(1800799024)(366016)(38070700021);DIR:OUT;SFP:1101;
+Content-Type: text/plain; charset="iso-8859-1"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <26d7d26e-dd45-47bb-885b-45c6d44900bb@lunn.ch>
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DB3PR08MB8795
+X-EOPAttributedMessage: 0
+X-MS-Exchange-Transport-CrossTenantHeadersStripped:
+ AMS0EPF00000192.eurprd05.prod.outlook.com
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-Correlation-Id-Prvs:
+	e69ff6c1-5314-4f90-45f9-08de07548e79
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|35042699022|14060799003|376014|7416014|36860700013|1800799024|82310400026;
+X-Microsoft-Antispam-Message-Info:
+	=?iso-8859-1?Q?1+lPETLTKBPSw+RX9kjDaAG22oVNTXPgHo8dDiCZ2l110kokTLxd1MwXii?=
+ =?iso-8859-1?Q?ZmX7ulHSio7Yo3O8HGOqi/8sZ+Vrk9+ZYxb/NxJ6qI9oAAVwmU2EmJHhta?=
+ =?iso-8859-1?Q?hG5AFAnVQnO7sQIePWM3tm6IgZCtFlEzVJYGjoQdn7w/Lb74ohfJEw4he2?=
+ =?iso-8859-1?Q?2er04cdMFB34GyEDjbJE9YWsXjynelZYe+dtKan1iFOLykl8AxEqN/spAp?=
+ =?iso-8859-1?Q?ulnd7bc8MOw+j/pJnIQuB0vnwElMT5hIDhs0GPcIcQG6ean8YfQ/7m4F1R?=
+ =?iso-8859-1?Q?UVs/LJQDsOHzplErtu4tGST1s0xO5zgFsM5TZSc7wgWtM4n0lMrEsIocGP?=
+ =?iso-8859-1?Q?4NC8eYrwK+jOC1OwTOogCXTfPoSt01Lg9gSj0FCVCYW8HOsjGk/L+OahoO?=
+ =?iso-8859-1?Q?FFFGmQkLb5OjAWHcXiKpbXqgkMrdrSDi2ffKzp1kgPCqY5K1h/73ZoLwVy?=
+ =?iso-8859-1?Q?l07HI2DqCc7UpOWdI2OChV1BJmws5VjyyPW9yKetXQMxEoMeb67feOecYw?=
+ =?iso-8859-1?Q?8eurY8m5jRQfqndoF7h5OZcae6gDX5e3CMjL2z+P2xP6vZwfRNP6d1iRsm?=
+ =?iso-8859-1?Q?ym+tHWNFkUHw0/73yF2aswRGn3+tqFVYUI11ml/KX55dlhqm6sGO3XaWy6?=
+ =?iso-8859-1?Q?4dvYlVs4uL1LZNvJ2EC76wkma/4D3teTN3VoX9mbqU194dhUzOafTdFoCf?=
+ =?iso-8859-1?Q?Cr7t8fGpGQvgkbz1gXJvCrpduC9UYPDaOc1o4O9hMCvkX8qSS4FyI32FDh?=
+ =?iso-8859-1?Q?xos0chvLd5s8vsLv2PA3YHdQeV0HdzQbO/gbXmVQQA2n4C2nIUAzYSuDbE?=
+ =?iso-8859-1?Q?jxHRhk+HzMR/FCz2mGqLR/1RKKeGQbKa7FcOEW4oeqJVvBsgYo3fr+0pPa?=
+ =?iso-8859-1?Q?164yK436xvTSizTUzFD6olD2mEgK+qXS8goJPjy5FwuBe/wTDOkZ13zk4a?=
+ =?iso-8859-1?Q?aGh6tePxy+l0287G5h3d8y3iLmZ+cr2YGJlEvh58p8zuziT1we1IancEQ9?=
+ =?iso-8859-1?Q?vOmDmVOF5xxlB3ZJDGOyPwwZld7rpGskXl0z7+xone9BykfjSTxJVaDcgz?=
+ =?iso-8859-1?Q?BzplEHkTAAc+Cyzj5bARNhH8QWx4TL4PGVsLApwTvoJtpUuMatvYN+rzTH?=
+ =?iso-8859-1?Q?kN7bkhmZ8vuGlZwkCTdjRKSfvCD2kZTyqHnJjVpHsIOeSyVO1AnaxQy9kt?=
+ =?iso-8859-1?Q?2wuQfbfHI7OH7w3DcKbXvfme/xMhOZdSP0wTxiF+ZTi6aUHx3Zc2Qn1Gjl?=
+ =?iso-8859-1?Q?+dkY6iBQF4067zR1DSE+kl2Ej/67hJD2Hi6RIRjp7wu4dL+P74yLsP1jKP?=
+ =?iso-8859-1?Q?XyIv/TP45pg2QZtfiNAxrOtwWGptLz7oMyrrKGBa2xQBkMwyUG/bbMhLaV?=
+ =?iso-8859-1?Q?pF4A4y+HbTh14pJm+civ06BPAH/LHM/tMuJhyuh5SNAPFwVMVRRBp+F6z8?=
+ =?iso-8859-1?Q?XxhvG9EzWY2/9rWbbnDXJLC64YoaUcq3dsqjzC5ZBl0UFZr20KE4K25kF4?=
+ =?iso-8859-1?Q?NUIOTqdVxPLw8DWV06kG5UopJ4LiEMjAFQJcXJu4ning9zmkcc3RaMU0qE?=
+ =?iso-8859-1?Q?Xm4ECN0euj2NdZPkagEfoIYIKJj/c128ECgFcwhHUclWzeJo+RKVeu17d1?=
+ =?iso-8859-1?Q?ap66s4454zU2c=3D?=
+X-Forefront-Antispam-Report:
+	CIP:4.158.2.129;CTRY:GB;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:outbound-uk1.az.dlp.m.darktrace.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230040)(35042699022)(14060799003)(376014)(7416014)(36860700013)(1800799024)(82310400026);DIR:OUT;SFP:1101;
+X-OriginatorOrg: arm.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 09 Oct 2025 16:55:20.4986
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: d9b8a982-1948-4e72-d7de-08de0754a1c4
+X-MS-Exchange-CrossTenant-Id: f34e5979-57d9-4aaa-ad4d-b122a662184d
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=f34e5979-57d9-4aaa-ad4d-b122a662184d;Ip=[4.158.2.129];Helo=[outbound-uk1.az.dlp.m.darktrace.com]
+X-MS-Exchange-CrossTenant-AuthSource:
+	AMS0EPF00000192.eurprd05.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DB9PR08MB9803
 
-On Thu, Oct 09, 2025 at 02:31:04PM +0200, Andrew Lunn wrote:
-> On Thu, Oct 09, 2025 at 07:24:08AM -0400, Michael S. Tsirkin wrote:
-> > A "word" is 16 bit. 64 bit integers like virtio uses are not dwords,
-> > they are actually qwords.
-> 
-> I'm having trouble with this....
-> 
-> This bit makes sense. 4x 16bits = 64 bits.
-> 
-> > -static const u64 vhost_net_features[VIRTIO_FEATURES_DWORDS] = {
-> > +static const u64 vhost_net_features[VIRTIO_FEATURES_QWORDS] = {
-> 
-> If this was u16, and VIRTIO_FEATURES_QWORDS was 4, which the Q would
-> imply, than i would agree with what you are saying. But this is a u64
-> type.  It is already a QWORD, and this is an array of two of them.
+The checks for incomplete sysreg definitions were checking if the
+next_bit was greater than 0, which is incorrect and missed occasions
+where bit 0 hasn't been defined for a sysreg. The reason is that
+next_bit is -1 when all bits have been processed (LSB - 1).
 
-I don't get what you are saying here.
-It's an array of qwords and VIRTIO_FEATURES_QWORDS tells you
-how many QWORDS are needed to fit all of them.
+Change the checks to use >=3D 0, instead. Also, set next_bit in Mapping
+to -1 instead of 0 to match these new checks.
 
-This is how C arrays are declared.
+There are no changes to the generated sysreg definitons as part of
+this change, and conveniently no definitions lack definitions for bit
+0.
 
+Signed-off-by: Sascha Bischoff <sascha.bischoff@arm.com>
+---
+ arch/arm64/tools/gen-sysreg.awk | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
 
-> I think the real issue here is not D vs Q, but WORD. We have a default
-> meaning of a u16 for a word, especially in C. But that is not the
-> actual definition of a word a computer scientist would use. Wikipedia
-> has:
-> 
->   In computing, a word is any processor design's natural unit of
->   data. A word is a fixed-sized datum handled as a unit by the
->   instruction set or the hardware of the processor.
-> 
-> A word can be any size. In this context, virtio is not referring to
-> the instruction set, but a protocol. Are all fields in this protocol
-> u64? Hence word is u64? And this is an array of two words? That would
-> make DWORD correct, it is two words.
-> 
-> If you want to change anything here, i would actually change WORD to
-> something else, maybe FIELD?
-> 
-> And i could be wrong here, i've not looked at the actual protocol, so
-> i've no idea if all fields in the protocol are u64. There are
-> protocols like this, IPv6 uses u32, not octets, and the length field
-> in the headers refer to the number of u32s in the header.
-> 
-> 	Andrew
-
-
-Virtio uses "dword" to mean "32 bits" in several places:
-
-
-
-device-types/i2c/description.tex:The \field{padding} is used to pad to full dword.
-
-pads to 32 bit
-
-
-transport-pci.tex:        u8 padding[2];  /* Pad to full dword. */
-
-same
-
-
-
-
-Under pci, the meaning is also generally as I use it here.
-E.g.:
-
-Documentation/PCI/pci.rst:You can use `pci_(read|write)_config_(byte|word|dword)` to access the config
-
-
-
-
-
-
--- 
-MST
-
+diff --git a/arch/arm64/tools/gen-sysreg.awk b/arch/arm64/tools/gen-sysreg.=
+awk
+index f2a1732cb1f63..c74d805a2aa38 100755
+--- a/arch/arm64/tools/gen-sysreg.awk
++++ b/arch/arm64/tools/gen-sysreg.awk
+@@ -129,7 +129,7 @@ $1 =3D=3D "SysregFields" && block_current() =3D=3D "Roo=
+t" {
+=20
+ $1 =3D=3D "EndSysregFields" && block_current() =3D=3D "SysregFields" {
+ 	expect_fields(1)
+-	if (next_bit > 0)
++	if (next_bit >=3D 0)
+ 		fatal("Unspecified bits in " reg)
+=20
+ 	define(reg "_RES0", "(" res0 ")")
+@@ -180,7 +180,7 @@ $1 =3D=3D "Sysreg" && block_current() =3D=3D "Root" {
+=20
+ $1 =3D=3D "EndSysreg" && block_current() =3D=3D "Sysreg" {
+ 	expect_fields(1)
+-	if (next_bit > 0)
++	if (next_bit >=3D 0)
+ 		fatal("Unspecified bits in " reg)
+=20
+ 	if (res0 !=3D null)
+@@ -217,7 +217,7 @@ $1 =3D=3D "EndSysreg" && block_current() =3D=3D "Sysreg=
+" {
+ 	print "/* For " reg " fields see " $2 " */"
+ 	print ""
+=20
+-        next_bit =3D 0
++        next_bit =3D -1
+ 	res0 =3D null
+ 	res1 =3D null
+ 	unkn =3D null
+--=20
+2.34.1
 
