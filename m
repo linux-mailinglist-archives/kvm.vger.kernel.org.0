@@ -1,104 +1,213 @@
-Return-Path: <kvm+bounces-59743-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-59744-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id AC320BCB26B
-	for <lists+kvm@lfdr.de>; Fri, 10 Oct 2025 00:55:54 +0200 (CEST)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6803CBCB2BB
+	for <lists+kvm@lfdr.de>; Fri, 10 Oct 2025 01:08:59 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id BF9AB188DB95
-	for <lists+kvm@lfdr.de>; Thu,  9 Oct 2025 22:56:17 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id D75EA4E65E1
+	for <lists+kvm@lfdr.de>; Thu,  9 Oct 2025 23:08:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CE66D287250;
-	Thu,  9 Oct 2025 22:55:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5EF3428726F;
+	Thu,  9 Oct 2025 23:08:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="H7istZyj"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="u1LrsfmA"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-ed1-f51.google.com (mail-ed1-f51.google.com [209.85.208.51])
+Received: from mail-pg1-f202.google.com (mail-pg1-f202.google.com [209.85.215.202])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3E46272625
-	for <kvm@vger.kernel.org>; Thu,  9 Oct 2025 22:55:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.51
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EC2B3155C88
+	for <kvm@vger.kernel.org>; Thu,  9 Oct 2025 23:08:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1760050548; cv=none; b=AVz7PAa7Lk5y6j3HtaNf4gdiPmM9Vt1vgXlYYV5ghOlt2YPRuTE6+sIflIxFH+FtlQwmLKw6K5YYsWjvaojv9mbxikCq4ZzckJP25qWe4kkA2YnZic/0PfOO45Lt88YCa4YavIbgidIIZUYlv28i6/t7ur8fdwaxJs+J+CaD2rw=
+	t=1760051328; cv=none; b=uxolrDZphi99N8lC5a4O+T1AMz5C35w9L/qa0dUezSm2/MdDM2RRv61yJOKYJteMd+55MuPLob9s9/PwQ4awm8B/NJd55g4YzCpMbu3omGYk0EAeOfirMFaxUlBY0m9Qrps9nsA+0++aCvwtriZpdYPH5UR/Rgam6kxavdNHLac=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1760050548; c=relaxed/simple;
-	bh=L/uOVVJxa0Vjg6Rg2XdGp0L24W+XSU7os1JdPoYNL4g=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=sb+lTNaQQ+uvzTUyQRSQOdGSsZXAEUaTdep3n2xLf87ZPHx4HsdhezK4TgjiC1KWdsOcS39lW3kN/BsKJhK4TJg7t0oXU0u4hEkIqqlrxnrrkn0WrYP7HtkxBq6gPRNvpLFkyK2X85xjr3E3zs7UI3l7TAdoQnhdqwwLawXfPiM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=H7istZyj; arc=none smtp.client-ip=209.85.208.51
+	s=arc-20240116; t=1760051328; c=relaxed/simple;
+	bh=mO3BfBl7Y/2I52TbjPHtPsUEdKOX2+l8+hnFuUeuyKo=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=GnbBzDXSYlw0KTjjgiYpIh1MFelKZA33byiZh5kpNBQu+arDYM8BFqq8hL6efox6fQbYM8XFMmxQTuUqwQR2rc96M/bM+aocTqh5NrcMHys0/DymOWA7XB7i8LauVDQRboYFJ6jw+glNWV2ZQ0hPdmmTOuOXVQC03ZbqyypasSA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--ackerleytng.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=u1LrsfmA; arc=none smtp.client-ip=209.85.215.202
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-ed1-f51.google.com with SMTP id 4fb4d7f45d1cf-634cc96ccaeso2056a12.1
-        for <kvm@vger.kernel.org>; Thu, 09 Oct 2025 15:55:45 -0700 (PDT)
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--ackerleytng.bounces.google.com
+Received: by mail-pg1-f202.google.com with SMTP id 41be03b00d2f7-b5a013bc46dso2340300a12.1
+        for <kvm@vger.kernel.org>; Thu, 09 Oct 2025 16:08:46 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1760050544; x=1760655344; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=L/uOVVJxa0Vjg6Rg2XdGp0L24W+XSU7os1JdPoYNL4g=;
-        b=H7istZyjCwC4HX/3Hb5ocNSI7PYwVdrXv6xAeOLkMTiy0TKKnoazdqbwXK+TwCEtdj
-         w55fmlu1j+lElm4orYUiHvECXPulmvkYoW25nAJKAdRoRdp2nqxMLyl3cXTZaVFIF/NN
-         9oWKchkSrea87fwv6JAOGT90/0fzmIrld0aIOt54TYo2HimvSqN/kkfxQvExqicsbdbt
-         9t+1PSOCjqtIp8UU7m1HWt3V0hkEx4gyR+CY11Z6tnnCPI/RfpnYhaeXyCeLia2fDNR2
-         s1GpLYvFFSkRV4PR+EFPpv0hmsFUCUuRHggVcEXTACgL6anSoceS5QjUDE9opwsCckYZ
-         MXkw==
+        d=google.com; s=20230601; t=1760051326; x=1760656126; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=rDpIaffmoR6Qy88AeMwNPxO5iOtC8dDi++B0iTvo01A=;
+        b=u1LrsfmA3WrZtKf5hktbo5bfAjsWJWtD2zwrucbY+opy798sJyLX0i8LHuWmhQNcsG
+         ytI2MS0Q6+9x/btCzlaYdDTNxnjKOp4Uz0eywr8T5RBwryyjAfjWTnwrpQY141FEEtgc
+         Rlji/CClZrjvB96qrFqjDKApp8YDDpge4JxeY401x+ci1yRlHMsMx+RAKRhM8fxFHbJS
+         kyAORDGwsaBbhOwESzlfDD+c+o545SiltxCGBpAL/2KBGY4gmz5FuAFDE5PQ70Zfa0n0
+         1eMX6fcWWim3YlZHpyXDHEzEf1JB+8lmMQ3eYYdCl31I4BHNGwAoZQSFqVuX4iPcS9ya
+         LvTg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1760050544; x=1760655344;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=L/uOVVJxa0Vjg6Rg2XdGp0L24W+XSU7os1JdPoYNL4g=;
-        b=FmoxswermPWvm0obH5e3ZQFgPa/uM7R3DMojqbmoCAFVvK+nciDHmDjXlFtwNRupf/
-         JX3l3KzD20lV/PBhNKz3ueKbethPXNxEuHr7cjYf1xn//BMbD+fRgCxM+bxWP8MChGQT
-         vOyMuC/CSzK69UeAfI6ww4rkIm9VH+Ji6u9a/c/IL2tuksAf8etPv5qwbEfqS+E+Qbm5
-         KDg+bz3K+p+sOpI/1xENyO61QhK+PDBzIquROGc3WQvaPMOGVbwz8HaxLyq5bX8zSlKm
-         rbLbgdAw0uwzo+SaMUuEQ1FuYqqdQe1VFZPm+j50ipdx0EYNVkk5wL0TVFrXaJbN/fGH
-         Ioyg==
-X-Forwarded-Encrypted: i=1; AJvYcCUwjKzphSLxw1aS7zOojFpJbruKxEi+2c3BLzgodaLYuB21xEYIINlb/WUleHGOtwWzI2Y=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzrMM5s8RNkXdHruw6RC1rXDR9oxRmg6dJAL3DbyEpaapN9Oh+C
-	1A0As+m//2tzsuQJpFIXOfgeJGJgBlUZ+4XlvUAEiAwzpHYeGRsaHVj63JON4qf7nJWCwTiyWFm
-	C7Gb7MuarCf86GWBVl6g8kIuEApOFiQqZfUgQ/7VI
-X-Gm-Gg: ASbGnctR9rVcThFtLml3W6gFYrK10NsntYHyiUlvp3Udb/6V5hlmcTVf5WjQ5J6KqxF
-	+/DO31Y74/CcMA+9yYNFGjRMMwrS7dPD4qvhVLsp5BOEIWw2vBmxZXsgwQCR8OwHns/w27AfQTu
-	Lg8lVYdOy8SR4h6ova5UC0VelRjrd4Y8BqAWlx6NvYvIJ+paR9oLsaMXNKnxHfocxzqnckNZhu7
-	6QeCi1CUQZ1/yvmF1JKaXGeKSFSliGlYtJmVe1lki5xcJ8X
-X-Google-Smtp-Source: AGHT+IFtEIp1lPIe1h+vRaxhMKax87qlktoQDl5DPpMmr89GoDxH8/qbNe1TY3lmDd/nEtpZKLV/ufs5dB6mUjMCM60=
-X-Received: by 2002:a05:6402:70d:b0:62f:c78f:d0d4 with SMTP id
- 4fb4d7f45d1cf-639d52ea25amr280278a12.6.1760050544364; Thu, 09 Oct 2025
- 15:55:44 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1760051326; x=1760656126;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=rDpIaffmoR6Qy88AeMwNPxO5iOtC8dDi++B0iTvo01A=;
+        b=SyUtm9QRr6rPuEZfQkkFCNrcTUd+JEM1jOPEIwpWQVEh4a8L+PvcQ3c+VoI347rgnr
+         YGgrnWqe0TNju12OrHcvdH0J/QzGueGS5jSaO2y9avzodu6UIo4ja0iUwSg/+Q0J/4GF
+         KiBDyMrx8iAfLYkm+z8VeKYfzuMljcLXIazMMQ+cyt/0Abhdzm4eIC31JisPGlfzB70Z
+         XCD4xlXfPT/TMb2EnaB2FJyKLLC6kbAF7h3+SCiViBTyf6KlDfanXeCL3Hum4DvWkTZe
+         2BTru9dX28BONz7Dzwngt6W9gTZJMGTghrK1kx0b8+piJ6T39oP5Ke+attFo2AW7PP57
+         ChYQ==
+X-Forwarded-Encrypted: i=1; AJvYcCXtc1dLbv4aNrC8KbMZEgrYp66KgQSfUuYgT2oQSXdpvPOHhSSDaT2y23+WIPvoresUtWk=@vger.kernel.org
+X-Gm-Message-State: AOJu0Ywe8I/f9L/HDccDfSJ1lf2UCriAySjFkd0lzACWktIlO2rAWOe5
+	vGp4xwTcgQva1vU5yN5xPQCWZ9tW41qFzxS1h60Hs9yiash3YXpV7UQBeQsCLAn+PtKHs/1kcvc
+	OQnteYp5F8AF7EoKBA4XR7fMOoA==
+X-Google-Smtp-Source: AGHT+IEKbmOpgQyGpF8iZG/gJeSzfxpKObXTtqbwqaHzaJgPnDoFIt/+KkqyzPgCgGNzWKTNkqyAjVnIwO8aJ2WY7Q==
+X-Received: from pjca12.prod.google.com ([2002:a17:90b:5b8c:b0:32b:35fb:187f])
+ (user=ackerleytng job=prod-delivery.src-stubby-dispatcher) by
+ 2002:a17:90b:4d8b:b0:329:e703:d00b with SMTP id 98e67ed59e1d1-33b51386449mr12422922a91.19.1760051326203;
+ Thu, 09 Oct 2025 16:08:46 -0700 (PDT)
+Date: Thu, 09 Oct 2025 16:08:44 -0700
+In-Reply-To: <20251007221420.344669-12-seanjc@google.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-References: <20251001145816.1414855-1-yosry.ahmed@linux.dev> <20251001145816.1414855-6-yosry.ahmed@linux.dev>
-In-Reply-To: <20251001145816.1414855-6-yosry.ahmed@linux.dev>
-From: Jim Mattson <jmattson@google.com>
-Date: Thu, 9 Oct 2025 15:55:32 -0700
-X-Gm-Features: AS18NWATDdsUyWZvLc2joY1-sJnSzc9Iy__XCFHTGQXE8gB6pObIfutGF2HxCok
-Message-ID: <CALMp9eT5DjpTy_UcU_99uHjSWymk09riWePTCzZG7RyHb5KFUw@mail.gmail.com>
-Subject: Re: [PATCH 05/12] KVM: selftests: Remove invalid CR3 test from vmx_tsc_adjust_test
-To: Yosry Ahmed <yosry.ahmed@linux.dev>
-Cc: Sean Christopherson <seanjc@google.com>, Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, Yosry Ahmed <yosryahmed@google.com>
+Mime-Version: 1.0
+References: <20251007221420.344669-1-seanjc@google.com> <20251007221420.344669-12-seanjc@google.com>
+Message-ID: <diqzcy6vhdvn.fsf@google.com>
+Subject: Re: [PATCH v12 11/12] KVM: selftests: Add guest_memfd tests for mmap
+ and NUMA policy support
+From: Ackerley Tng <ackerleytng@google.com>
+To: Sean Christopherson <seanjc@google.com>, Marc Zyngier <maz@kernel.org>, 
+	Oliver Upton <oliver.upton@linux.dev>, Paolo Bonzini <pbonzini@redhat.com>
+Cc: linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, 
+	kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	David Hildenbrand <david@redhat.com>, Fuad Tabba <tabba@google.com>, Shivank Garg <shivankg@amd.com>, 
+	Ashish Kalra <ashish.kalra@amd.com>, Vlastimil Babka <vbabka@suse.cz>
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
 
-On Wed, Oct 1, 2025 at 8:02=E2=80=AFAM Yosry Ahmed <yosry.ahmed@linux.dev> =
-wrote:
->
-> From: Yosry Ahmed <yosryahmed@google.com>
->
-> Checking that VMLAUNCH fails with an invalid CR3 is irrelevant to this
-> test. Remove it to simplify the test a little bit before generalizing it
-> to cover SVM.
->
-> Signed-off-by: Yosry Ahmed <yosry.ahmed@linux.dev>
+Sean Christopherson <seanjc@google.com> writes:
 
-Is there value in moving the invalid CR3 test elsewhere, rather than
-just eliminating it?
+> From: Shivank Garg <shivankg@amd.com>
+>
+> Add tests for NUMA memory policy binding and NUMA aware allocation in
+> guest_memfd. This extends the existing selftests by adding proper
+> validation for:
+>   - KVM GMEM set_policy and get_policy() vm_ops functionality using
+>     mbind() and get_mempolicy()
+>   - NUMA policy application before and after memory allocation
+>
+> Run the NUMA mbind() test with and without INIT_SHARED, as KVM should allow
+> doing mbind(), madvise(), etc. on guest-private memory, e.g. so that
+> userspace can set NUMA policy for CoCo VMs.
+>
+> Run the NUMA allocation test only for INIT_SHARED, i.e. if the host can't
+> fault-in memory (via direct access, madvise(), etc.) as move_pages()
+> returns -ENOENT if the page hasn't been faulted in (walks the host page
+> tables to find the associated folio)
+>
+> Signed-off-by: Shivank Garg <shivankg@amd.com>
+> Tested-by: Ashish Kalra <ashish.kalra@amd.com>
+> [sean: don't skip entire test when running on non-NUMA system, test mbind()
+>        with private memory, provide more info in assert messages]
+> Signed-off-by: Sean Christopherson <seanjc@google.com>
+> ---
+>  .../testing/selftests/kvm/guest_memfd_test.c  | 98 +++++++++++++++++++
+>  1 file changed, 98 insertions(+)
+>
+> 
+> [...snip...]
+> 
+> +static void test_numa_allocation(int fd, size_t total_size)
+> +{
+> +	unsigned long node0_mask = 1;  /* Node 0 */
+> +	unsigned long node1_mask = 2;  /* Node 1 */
+> +	unsigned long maxnode = 8;
+> +	void *pages[4];
+> +	int status[4];
+> +	char *mem;
+> +	int i;
+> +
+> +	if (!is_multi_numa_node_system())
+> +		return;
+> +
+> +	mem = kvm_mmap(total_size, PROT_READ | PROT_WRITE, MAP_SHARED, fd);
+> +
+> +	for (i = 0; i < 4; i++)
+> +		pages[i] = (char *)mem + page_size * i;
+> +
+> +	/* Set NUMA policy after allocation */
+> +	memset(mem, 0xaa, page_size);
+> +	kvm_mbind(pages[0], page_size, MPOL_BIND, &node0_mask, maxnode, 0);
+> +	kvm_fallocate(fd, FALLOC_FL_PUNCH_HOLE | FALLOC_FL_KEEP_SIZE, 0, page_size);
+> +
+> +	/* Set NUMA policy before allocation */
+> +	kvm_mbind(pages[0], page_size * 2, MPOL_BIND, &node1_mask, maxnode, 0);
+> +	kvm_mbind(pages[2], page_size * 2, MPOL_BIND, &node0_mask, maxnode, 0);
+> +	memset(mem, 0xaa, total_size);
+> +
+> +	/* Validate if pages are allocated on specified NUMA nodes */
+> +	kvm_move_pages(0, 4, pages, NULL, status, 0);
+> +	TEST_ASSERT(status[0] == 1, "Expected page 0 on node 1, got it on node %d", status[0]);
+> +	TEST_ASSERT(status[1] == 1, "Expected page 1 on node 1, got it on node %d", status[1]);
+> +	TEST_ASSERT(status[2] == 0, "Expected page 2 on node 0, got it on node %d", status[2]);
+> +	TEST_ASSERT(status[3] == 0, "Expected page 3 on node 0, got it on node %d", status[3]);
+> +
+> +	/* Punch hole for all pages */
+> +	kvm_fallocate(fd, FALLOC_FL_PUNCH_HOLE | FALLOC_FL_KEEP_SIZE, 0, total_size);
+> +
+> +	/* Change NUMA policy nodes and reallocate */
+> +	kvm_mbind(pages[0], page_size * 2, MPOL_BIND, &node0_mask, maxnode, 0);
+> +	kvm_mbind(pages[2], page_size * 2, MPOL_BIND, &node1_mask, maxnode, 0);
+> +	memset(mem, 0xaa, total_size);
+> +
+> +	kvm_move_pages(0, 4, pages, NULL, status, 0);
+> +	TEST_ASSERT(status[0] == 0, "Expected page 0 on node 0, got it on node %d", status[0]);
+> +	TEST_ASSERT(status[1] == 0, "Expected page 1 on node 0, got it on node %d", status[1]);
+> +	TEST_ASSERT(status[2] == 1, "Expected page 2 on node 1, got it on node %d", status[2]);
+> +	TEST_ASSERT(status[3] == 1, "Expected page 3 on node 1, got it on node %d", status[3]);
+> +
+
+Related to my comment on patch 5: might a test for guest_memfd with
+regard to the memory spread page cache feature provided by the cpuset
+subsystem be missing?
+
+Perhaps we need tests for
+
+1. Test that the allocation matches current's mempolicy, with no
+   mempolicy defined for specific indices.
+2. Test that during allocation, current's mempolicy can be overridden with
+   a mempolicy defined for specific indices.
+3. Test that during allocation, current's mempolicy and the effect of
+   cpuset config can be overridden with a mempolicy defined for specific
+   indices.
+4. Test that during allocation, without defining a mempolicy for given
+   index, current's mempolicy is overridden by the effect of cpuset
+   config
+
+I believe test 4, before patch 5, will show that guest_memfd respects
+cpuset config, but after patch 5, will show that guest_memfd no longer
+allows cpuset config to override current's mempolicy.
+
+> +	kvm_munmap(mem, total_size);
+> +}
+> +
+>  static void test_fault_sigbus(int fd, size_t accessible_size, size_t map_size)
+>  {
+>  	const char val = 0xaa;
+> @@ -273,11 +369,13 @@ static void __test_guest_memfd(struct kvm_vm *vm, uint64_t flags)
+>  		if (flags & GUEST_MEMFD_FLAG_INIT_SHARED) {
+>  			gmem_test(mmap_supported, vm, flags);
+>  			gmem_test(fault_overflow, vm, flags);
+> +			gmem_test(numa_allocation, vm, flags);
+>  		} else {
+>  			gmem_test(fault_private, vm, flags);
+>  		}
+>  
+>  		gmem_test(mmap_cow, vm, flags);
+> +		gmem_test(mbind, vm, flags);
+>  	} else {
+>  		gmem_test(mmap_not_supported, vm, flags);
+>  	}
+> -- 
+> 2.51.0.710.ga91ca5db03-goog
 
