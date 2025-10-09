@@ -1,168 +1,151 @@
-Return-Path: <kvm+bounces-59715-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-59716-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id A294ABC9230
-	for <lists+kvm@lfdr.de>; Thu, 09 Oct 2025 14:54:45 +0200 (CEST)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
+	by mail.lfdr.de (Postfix) with ESMTPS id 56643BC9263
+	for <lists+kvm@lfdr.de>; Thu, 09 Oct 2025 14:59:00 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id CD8133E4029
-	for <lists+kvm@lfdr.de>; Thu,  9 Oct 2025 12:54:31 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id A660D4FA7CA
+	for <lists+kvm@lfdr.de>; Thu,  9 Oct 2025 12:58:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 994EB2E5B05;
-	Thu,  9 Oct 2025 12:54:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 965D82E62BF;
+	Thu,  9 Oct 2025 12:58:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="EmD0KM70"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="ns3HjRNm"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f201.google.com (mail-pl1-f201.google.com [209.85.214.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EF6ED26FA5E
-	for <kvm@vger.kernel.org>; Thu,  9 Oct 2025 12:54:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 54D1B2E62B7
+	for <kvm@vger.kernel.org>; Thu,  9 Oct 2025 12:58:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1760014466; cv=none; b=DmucNDVhVTRxvm3RqhxPP/NSxKOUvjPCwzh0/0Zatf+I9xbvCw0U30gbaqeMfDI4x3V4KIv7XQPzEBgDAzIuBXQ03UA8u5sdeYX89DUVvgvk6/01RrJiw6PALPMhsKYt7kVv6NzfnW3sf0bEv5kUTcgaHP8uTICqjf2U8VWt3LI=
+	t=1760014719; cv=none; b=maX+F03fKFBlVTqnOaVyTXjVNyOVcKRn0XAfohNrQpgIeh14zyGvZQ1sh1vRVsCXAnXBECB5sciWedfmh503WMEkbRUJO//g8q4r9fCP7UKpgajwWu0tFGJ7XmF6yWnIH2Pn+K915NTjkU235E2m3YFY3MYuyUFLXqRpDdfzu6c=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1760014466; c=relaxed/simple;
-	bh=d+WHqjD1e2xfxGWREFy8UIQh97c1/2BfHbOxP9RKa5g=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=PJ+A+U9OcM+4TpqHFFgIygTceXCkl9Ke9xUy+zzlEWLY50mr5TqcHOKyH47Lw1H/jG3uTTn5ompiuobtchCm5bSB348PY0z+m2Tzjrz3pJOujzOJR0VDqT6vywZg4bY2SKp96jhAgAI4c09ZxKKx1R4rsvixSO41q6ssSPs1n0g=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=EmD0KM70; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1760014464;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=sLVQWh+Znqw6JAYRNwQHXL1TFNSvZ0jniZ0MloD7+Hg=;
-	b=EmD0KM70H+qEk6u1/odi44dhRuJ0K//SKUto1pWqhyzf2GbFFVJmOcA8n6hUqUnRG6J3QU
-	V66IpEO7gxhbE/i6C5sVV7N2ypZ3zouB0z9/KPZJgawI7PqZe+yQy/OwGtLxTN2i6OM0NW
-	IXwE7TQyw4TJTlhVRtezBhSW0uiMgHA=
-Received: from mail-qk1-f200.google.com (mail-qk1-f200.google.com
- [209.85.222.200]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-483-N5RDkZ6WN-SaMaN9NuNkYw-1; Thu, 09 Oct 2025 08:54:23 -0400
-X-MC-Unique: N5RDkZ6WN-SaMaN9NuNkYw-1
-X-Mimecast-MFC-AGG-ID: N5RDkZ6WN-SaMaN9NuNkYw_1760014462
-Received: by mail-qk1-f200.google.com with SMTP id af79cd13be357-870d82c566fso302805385a.1
-        for <kvm@vger.kernel.org>; Thu, 09 Oct 2025 05:54:22 -0700 (PDT)
+	s=arc-20240116; t=1760014719; c=relaxed/simple;
+	bh=fG8614poqmYHLHwPJZtoBYycrE1J9gSjrapsjsi+MJY=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=FZmKuc5d1FXx35YtHez8rxm3Dn8RJRbzprIn+oKEU95fOAmg8ZesnSCOPGqFaEDfQTu57l9CvMaBo+8+NR8YQmoxY6/t6D5tUZliJia6R0xL3dwFqP3QHtC/8ommAXM9kwZ6mX/2eIToGsFhptWxidCjjAXLTCgNHzAe5SHwhhw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=ns3HjRNm; arc=none smtp.client-ip=209.85.214.201
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+Received: by mail-pl1-f201.google.com with SMTP id d9443c01a7336-268149e1c28so17722895ad.1
+        for <kvm@vger.kernel.org>; Thu, 09 Oct 2025 05:58:38 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1760014718; x=1760619518; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:from:subject:message-id:references
+         :mime-version:in-reply-to:date:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=rW1G3rL+KumF5u3WwLC+tOU95q8htP+/xpt0iPYfuBA=;
+        b=ns3HjRNmQTCsc+ZTgkRcnpCRiahI8aj/Zk5jA03ejUJxtOro4zT5lTeoDDsofxw+FG
+         GoWix1BvQf0sY5K+K9cL2ouBLeA185hEed+TUxl9UqNc8cQXF1Vb8zOwRcNFxxjs9tFk
+         OAAD4F2mWnuZZLEDh8T4+WGRUaYRtTL5fGlRfBqGsomABkqlBHKnK9A+Y/67Uc55ZLL3
+         Gh/jfnxMRm9MqBchwvL/jr9HxdtovVVuifpCmZ3jR4xMshdhelpxBIPr2pQmQnwK0Bq/
+         O12hEojPeWHj995j/KPsDLRQQ9EDe8GKxgk1DB5jsE+eapOJzA0DxxREsNff5+pmAJky
+         8oGA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1760014462; x=1760619262;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=sLVQWh+Znqw6JAYRNwQHXL1TFNSvZ0jniZ0MloD7+Hg=;
-        b=FLwfxm9egw5V5m2KKdq4BCRlHrgXwwPQ7S0mVjOcNWu3VrzUoTJCRN97+mxB3kl7sq
-         1ad3DuzArLlfPnDUbvr6MWfIw3z5PX+F97Hgbg38HZh0Z6h4XThYkt35QrdhUssXqii+
-         elcCPk63UNYtplxbpN6ZLzJ8xfnw5ejvuMk5pxyR4RSNFyzDH2H0pbhSv5rZoZlRmXS/
-         H2V4MrbQZ+RHRQiO9q1f1DcZ/Lm+5k4OPTYuSamdCsVQjFq0y7vR7ug9bjJrTa93cnOT
-         SpsV7PAo1e5BEVXzrl+uWZiukA/JITZh+3i8OUm0w0IxNbdvPfeOEEf6Y+qgwqelr1OU
-         FbOQ==
-X-Forwarded-Encrypted: i=1; AJvYcCXuY4LExAF6ujrUfEOFEBWIUJ3m0r2wrrbLpuD6epvsAJrmOGK1ODSB5J9hLORc76qxwxg=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyahXVwIKFxiTNkU5WisZII3gCq5ynKBem2H/BPPp5e5H1fJW+E
-	rcAEQLpTNQ6JvhBtSKFmDefZgZo7sR+Ssx+cuu9F1pyJQbE83aYgOAW7YTbZRjrNr+wg3fzWZGb
-	hFLG05h1U0WRTNNOeIqoLDk6o/Hh+lmvJo62sAM8Kw1tGL4IiHbpFUQ==
-X-Gm-Gg: ASbGnctOqT3BSu5WDoduA/MBtNouKtMiYmoxcUQ7PMcKQgJUMez3pOwu3lUpA8F0gSr
-	b4nEFYX1M1RuxkGZVVRpeTlt7C5sR8RHia2kT3DR+vjTH4omM7FZK4WZrT2V8a5A27VD9JM5pCd
-	+gJqfK8jcIrKHutSuPOGb6URNOCBFX9F1AkV8mAcLPRmaRJJXpTMIi1tpnS0nPlwLql8pJXQ/kR
-	yrIojUERimBgCuQtANFc29HjknOqarcePjVRh84JqCSry3DwuJkYdy9coL2JK3LvxwHKKCLEXT3
-	3PmT3vp77ZKKV0SjkfHqidOW1OXRufDhXgs=
-X-Received: by 2002:a05:620a:269f:b0:82b:5e2e:bc46 with SMTP id af79cd13be357-8820d18e350mr1885885085a.35.1760014461565;
-        Thu, 09 Oct 2025 05:54:21 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IEqMpvtMJcanZP3rlvKbgdpkQAf5WVURwTPSiw1JSFVgNS1mLi/kxcHSU28QD1hy96VkYKztg==
-X-Received: by 2002:a05:620a:269f:b0:82b:5e2e:bc46 with SMTP id af79cd13be357-8820d18e350mr1885875985a.35.1760014460576;
-        Thu, 09 Oct 2025 05:54:20 -0700 (PDT)
-Received: from redhat.com ([138.199.52.81])
-        by smtp.gmail.com with ESMTPSA id af79cd13be357-8849f9ad8dasm190766385a.21.2025.10.09.05.54.17
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 09 Oct 2025 05:54:20 -0700 (PDT)
-Date: Thu, 9 Oct 2025 08:54:15 -0400
-From: "Michael S. Tsirkin" <mst@redhat.com>
-To: Andrew Lunn <andrew@lunn.ch>
-Cc: linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
-	Paolo Abeni <pabeni@redhat.com>, Jason Wang <jasowang@redhat.com>,
-	Eugenio =?iso-8859-1?Q?P=E9rez?= <eperezma@redhat.com>,
-	Xuan Zhuo <xuanzhuo@linux.alibaba.com>, kvm@vger.kernel.org,
-	virtualization@lists.linux.dev
-Subject: Re: [PATCH 3/3] vhost: use checked versions of VIRTIO_BIT
-Message-ID: <20251009085057-mutt-send-email-mst@kernel.org>
-References: <cover.1760008797.git.mst@redhat.com>
- <6629538adfd821c8626ab8b9def49c23781e6775.1760008798.git.mst@redhat.com>
- <d4fcd2d8-ac84-4d9f-a47a-fecc50e18e20@lunn.ch>
+        d=1e100.net; s=20230601; t=1760014718; x=1760619518;
+        h=content-transfer-encoding:cc:to:from:subject:message-id:references
+         :mime-version:in-reply-to:date:x-gm-message-state:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=rW1G3rL+KumF5u3WwLC+tOU95q8htP+/xpt0iPYfuBA=;
+        b=qpSEp0zDQ+qpQUniZpuNWZIUaoORRc9A36P0KUdoSZRYhiFuj14PB44lacwQ/hgGGY
+         x7hASxk1uqhXEZPm9RLdipH966a/u84W217C6nfqX6ZHX/aVkNtpLd0KbBATsTxtawuu
+         KGlElh8wPKDuudWmUPcWQMXZe0MspXHYG4OnMlCKqrRyknWB3RCUW8nKEJr+kyvBVu78
+         WnoiyMNMwuBIUy5xjZUUutrF5/ItMlch4dKbqfJkSq9pKJQMWK7So1Fd+D74Pnkr4uuE
+         uwNGkVyDo9rW2IQb3F4G2GZ2O/87Nuse0Yvgx+gNfNVJKnsa56mUN41nKjCRV9jd2b+s
+         iDxg==
+X-Forwarded-Encrypted: i=1; AJvYcCWef2FyqIAJTElAYQybxzBKJtF8fau0r5uwk6GvMpXAHGiPUwsG43lBZi2vIT11K1LVojc=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzoKSBbby6iStjL4qK5y5K1yHM5FoLm/j5QyMDltkPBVp5Xq1nw
+	EBptkcVS1K2drx7RyEf9lJEgP2zshBtBpLH2FcrPwcfi5kwEzeO6wwKeQayQTuOnGycXg3Pmw9m
+	hUN4G1g==
+X-Google-Smtp-Source: AGHT+IH7h/AMFky1MZe0POKihyk6CBGGTuNOR3bkBF5NzMdZe3AIhToBPbzyEpzWmh5xCsVBnvVH62o1WfY=
+X-Received: from plbkv14.prod.google.com ([2002:a17:903:28ce:b0:268:eb:3b3b])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:902:ef10:b0:271:5bde:697e
+ with SMTP id d9443c01a7336-29027213340mr92639575ad.3.1760014717676; Thu, 09
+ Oct 2025 05:58:37 -0700 (PDT)
+Date: Thu, 9 Oct 2025 05:58:35 -0700
+In-Reply-To: <e9e8f087-60f6-455a-b0e0-e5c29fc54129@linux.intel.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <d4fcd2d8-ac84-4d9f-a47a-fecc50e18e20@lunn.ch>
+Mime-Version: 1.0
+References: <70b64347-2aca-4511-af78-a767d5fa8226@intel.com>
+ <25af94f5-79e3-4005-964e-e77b1320a16e@linux.intel.com> <aNvyjkuDLOfxAANd@google.com>
+ <3bbc4e6d-9f52-483c-a25d-166dca62fb25@intel.com> <00d0f3f3-d2b4-4885-9a49-5e6f8390142b@intel.com>
+ <e9e8f087-60f6-455a-b0e0-e5c29fc54129@linux.intel.com>
+Message-ID: <aOexe4LNpmJnHTm9@google.com>
+Subject: Re: REGRESSION on linux-next (next-20250919)
+From: Sean Christopherson <seanjc@google.com>
+To: Dapeng Mi <dapeng1.mi@linux.intel.com>
+Cc: Chaitanya Kumar Borah <chaitanya.kumar.borah@intel.com>, 
+	"intel-gfx@lists.freedesktop.org" <intel-gfx@lists.freedesktop.org>, 
+	"intel-xe@lists.freedesktop.org" <intel-xe@lists.freedesktop.org>, 
+	Suresh Kumar Kurmi <suresh.kumar.kurmi@intel.com>, Jani Saarinen <jani.saarinen@intel.com>, 
+	lucas.demarchi@intel.com, linux-perf-users@vger.kernel.org, 
+	kvm@vger.kernel.org
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Thu, Oct 09, 2025 at 02:47:53PM +0200, Andrew Lunn wrote:
-> On Thu, Oct 09, 2025 at 07:24:16AM -0400, Michael S. Tsirkin wrote:
-> > This adds compile-time checked versions of VIRTIO_BIT that set bits in
-> > low and high qword, respectively.  Will prevent confusion when people
-> > set bits in the wrong qword.
-> > 
-> > Cc: "Paolo Abeni" <pabeni@redhat.com>
-> > Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
-> > ---
-> >  drivers/vhost/net.c             | 4 ++--
-> >  include/linux/virtio_features.h | 9 +++++++++
-> >  2 files changed, 11 insertions(+), 2 deletions(-)
-> > 
-> > diff --git a/drivers/vhost/net.c b/drivers/vhost/net.c
-> > index 43d51fb1f8ea..8b98e1a8baaa 100644
-> > --- a/drivers/vhost/net.c
-> > +++ b/drivers/vhost/net.c
-> > @@ -76,8 +76,8 @@ static const u64 vhost_net_features[VIRTIO_FEATURES_QWORDS] = {
-> >  	(1ULL << VIRTIO_F_ACCESS_PLATFORM) |
-> >  	(1ULL << VIRTIO_F_RING_RESET) |
-> >  	(1ULL << VIRTIO_F_IN_ORDER),
-> > -	VIRTIO_BIT(VIRTIO_NET_F_GUEST_UDP_TUNNEL_GSO) |
-> > -	VIRTIO_BIT(VIRTIO_NET_F_HOST_UDP_TUNNEL_GSO),
-> > +	VIRTIO_BIT_HI(VIRTIO_NET_F_GUEST_UDP_TUNNEL_GSO) |
-> > +	VIRTIO_BIT_HI(VIRTIO_NET_F_HOST_UDP_TUNNEL_GSO),
-> 
-> How any bits in vhost_net_features are currently in use?
+On Thu, Oct 09, 2025, Dapeng Mi wrote:
+>=20
+> On 10/7/2025 2:22 PM, Borah, Chaitanya Kumar wrote:
+> > Hi,
+> >
+> > On 10/6/2025 1:33 PM, Borah, Chaitanya Kumar wrote:
+> >> Thank you for your responses.
+> >>
+> >> Following change fixes the issue for us.
+> >>
+> >>
+> >> diff --git a/arch/x86/kvm/pmu.c b/arch/x86/kvm/pmu.c
+> >> index 40ac4cb44ed2..487ad19a236e 100644
+> >> --- a/arch/x86/kvm/pmu.c
+> >> +++ b/arch/x86/kvm/pmu.c
+> >> @@ -108,16 +108,18 @@ void kvm_init_pmu_capability(const struct=20
+> >> kvm_pmu_ops *pmu_ops)
+> >>  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 bool is_intel =3D boot_cpu=
+_data.x86_vendor =3D=3D X86_VENDOR_INTEL;
+> >>  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 int min_nr_gp_ctrs =3D pmu=
+_ops->MIN_NR_GP_COUNTERS;
+> >>
+> >> -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 perf_get_x86_pmu_capability(&kvm=
+_host_pmu);
+> >> -
+> >>  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 /*
+> >>  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 * Hybrid PMUs don't =
+play nice with virtualization without careful
+> >>  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 * configuration by u=
+serspace, and KVM's APIs for reporting=20
+> >> supported
+> >>  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 * vPMU features do n=
+ot account for hybrid PMUs.=C2=A0 Disable vPMU=20
+> >> support
+> >>  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 * for hybrid PMUs un=
+til KVM gains a way to let userspace opt-in.
+> >>  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 */
+> >> -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 if (cpu_feature_enabled(X86_FEAT=
+URE_HYBRID_CPU))
+> >> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 if (cpu_feature_enabled(X86_FEAT=
+URE_HYBRID_CPU)) {
+> >>  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0 enable_pmu =3D false;
+> >> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0 memset(&kvm_host_pmu, 0, sizeof(kvm_host_pmu));
+> >> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 } else {
+> >> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0 perf_get_x86_pmu_capability(&kvm_host_pmu);
+> >> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 }
+> > Can we expect a formal patch soon?
+>=20
+> I'd like to post a patch to fix this tomorrow if Sean has no bandwidth on
+> this. Thanks.
 
-68
-
-> How likely is
-> it to go from 2x 64bit words to 3x 64 bit words?
-
-Maybe.
-
-> Rather than _LO, _HI,
-> would _1ST, _2ND be better leaving it open for _3RD?
-
-I can just open-code
-
-	VIRTIO_BIT_QWORD(VIRTIO_NET_F_GUEST_UDP_TUNNEL_GSO, 1)
-
-
-> I would also be tempted to rename these macros to include _LO_ and
-> _HI_ in them. VIRTIO_BIT_HI(VIRTIO_LO_F_IN_ORDER) is more likely to be
-> spotted as wrong this way.
-
-Hmm but with my macros compiler will warn so why uglify then?
-
-
-> An alternative would be to convert to a linux bitmap, which is
-> arbitrary length so you just use bit number and leave the
-> implementation to map that to the correct offset in the underlying
-> data structure.
-> 
-> 	Andrew
-
-Right but it's a bit more work as we then have to change
-all drivers. Not ruling this out, but this patchset
-is not aiming that high.
-
--- 
-MST
-
+Sorry, my bad, I was waiting for you to post a patch, but that wasn't at al=
+l
+clear.  So yeah, go ahead and post one :-)
 
