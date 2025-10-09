@@ -1,279 +1,259 @@
-Return-Path: <kvm+bounces-59684-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-59685-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 494D5BC771D
-	for <lists+kvm@lfdr.de>; Thu, 09 Oct 2025 07:37:07 +0200 (CEST)
+Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [213.196.21.55])
+	by mail.lfdr.de (Postfix) with ESMTPS id 30578BC781D
+	for <lists+kvm@lfdr.de>; Thu, 09 Oct 2025 08:12:49 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 94E323B8F78
-	for <lists+kvm@lfdr.de>; Thu,  9 Oct 2025 05:37:03 +0000 (UTC)
+	by ams.mirrors.kernel.org (Postfix) with ESMTPS id D06FE34B6BD
+	for <lists+kvm@lfdr.de>; Thu,  9 Oct 2025 06:12:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CEB71261B76;
-	Thu,  9 Oct 2025 05:36:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DE066299922;
+	Thu,  9 Oct 2025 06:12:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="e2LwdlQP"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="CbmIGXve"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.13])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 496F754279;
-	Thu,  9 Oct 2025 05:36:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=192.198.163.13
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1759988219; cv=fail; b=PYVa29wLe37iJm/m9Sn6HmSQfAcZm2lnA4DJNkj+T8jLRLU/0OyzuHHEGDo+OVNyTzuYpba/7YnEgVvEfRoos2BujsZP/s7608NA4T34Xoit4kfFaJ/17NPsXcKKxEsr4q6mfs/ysS8+FCedR+2h6+rHz333HIJibjC54fZ5AT4=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1759988219; c=relaxed/simple;
-	bh=ZrD+vOuv8dbaqJHYt2AwJ9k1RxgvkuUs1fJX5OY0IuE=;
-	h=Date:From:To:CC:Subject:Message-ID:References:Content-Type:
-	 Content-Disposition:In-Reply-To:MIME-Version; b=PU2BXC/bqAzzGkNDpY8EXV/gcmkdQd1Q79nRXuYQFqM0f5S5SQNjs+ogkMZj22NDgT42jw6ZKJPWKq4ndfZuZ9MQ4lJM/i8qSd04RHWC/2S4tqZo2c5QBArOOuIrJh+uDFAWNufeXRenbfKH7nSuZX7e6xN/368yVgKFS7KN2c8=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=e2LwdlQP; arc=fail smtp.client-ip=192.198.163.13
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1759988217; x=1791524217;
-  h=date:from:to:cc:subject:message-id:references:
-   in-reply-to:mime-version;
-  bh=ZrD+vOuv8dbaqJHYt2AwJ9k1RxgvkuUs1fJX5OY0IuE=;
-  b=e2LwdlQPzjVf6nAYXPU8QASSURZx39SCLZN5peQUDw7jMMNLLQI2+YDW
-   u4aQ3pIPPl4sHDbD4gjR0UGxjMjZ+RNWRKGBI1HleBgmXnFoiLiGZSgoj
-   PkXU9uTuMObgZqCXKL22hn7lURk8lMYijTt6BRCa5l8a/1IIgQdrUFvOS
-   es0bCzNxuE8re0iRo5JpCn6Yfc+JkaosB1H8CWg1plvJDOiY1pOGAhxWJ
-   oWqy/P3yJK/c24byaOqH9fwmLfBrLDwXp0j7h1R0RCGJfBtOTAbhyJstd
-   FggXlu2u9HlnL+1yhi3yU6aWjh3MhsHCnxK645Sa8E3x2hvJpynRrujGv
-   A==;
-X-CSE-ConnectionGUID: uP5wCe4eRnq56AVsuz1CSg==
-X-CSE-MsgGUID: b0Db6ud/RkePzMmxDTHgoQ==
-X-IronPort-AV: E=McAfee;i="6800,10657,11576"; a="64811192"
-X-IronPort-AV: E=Sophos;i="6.19,215,1754982000"; 
-   d="scan'208";a="64811192"
-Received: from fmviesa009.fm.intel.com ([10.60.135.149])
-  by fmvoesa107.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 08 Oct 2025 22:36:57 -0700
-X-CSE-ConnectionGUID: 1THorIt4TNGfIeZr5/8aug==
-X-CSE-MsgGUID: l/m8R0OrSD+wUoXXsGFtXg==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.19,215,1754982000"; 
-   d="scan'208";a="181047892"
-Received: from orsmsx902.amr.corp.intel.com ([10.22.229.24])
-  by fmviesa009.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 08 Oct 2025 22:36:56 -0700
-Received: from ORSMSX903.amr.corp.intel.com (10.22.229.25) by
- ORSMSX902.amr.corp.intel.com (10.22.229.24) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.27; Wed, 8 Oct 2025 22:36:56 -0700
-Received: from ORSEDG903.ED.cps.intel.com (10.7.248.13) by
- ORSMSX903.amr.corp.intel.com (10.22.229.25) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.27 via Frontend Transport; Wed, 8 Oct 2025 22:36:56 -0700
-Received: from MW6PR02CU001.outbound.protection.outlook.com (52.101.48.1) by
- edgegateway.intel.com (134.134.137.113) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.27; Wed, 8 Oct 2025 22:36:55 -0700
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=oZvB42KFWoRMsVot/tkyym5kAgCKzo9fkSJzSuCVrrUYMKV6k9o4QKu3WgywSbPwGmjDNoPTtny26ej00L7ZAa+4+Fle/hM5QBH0GMOezszJwIljk99ucYiPcC0H9/+6Tk4umgzepXJlWZZ5rfMMnf/Q11UGAInnRiuebr7SIZj6H1AS/9bpotykWzPd5nyCxh/ytDuAjG2T7DYtiyPXGXxpfq68sjZFTEztfZTaKaoqR8XOcsK9tZGJ6Hy/Nc0QHR+a0f+xq0R+p6x+MsIuNWS+Wi8GZnVUkZdVeQ2Tb5ejffajy4jROtLUmt608HKFn6Sb553nDGrMfHT9WVzlVg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=0z6IwfqiHfl5Q5i2YfYAFZgpmYwWQEXfc8GBL/874Y0=;
- b=fCRbJJ8ulzf93Rd3V1lgKNTxolqzn1B0UB2pIaGi20S6SinS6wCgzhUWHxWHYpByFCbND3Pz+4OLMyd8ZPwkTXkZ7/hPKZb3+mz/jpAwBK/vYL/OTgnga2EaVQP9AQ/Kvy0UPAhgqzbo3U8zKex9FtgCDSrb4pMicJh12nfWkV7yrdh3xc3s3T9OZlAxnCCLqPo/3YkO3XoqPgqWqpssP8DOCkBqNk5tNwkxPuBY6XUZiwYHZc367cUu7o/VFiurPUmgr9Ja6CZBzPAIsWcFNI9yiCSLpcgV4IiHrmbGgIkZMkOr9TphLAUbsAEtZfkR48R9k2ta+mNEYX2fxriPWg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-Received: from CH3PR11MB8660.namprd11.prod.outlook.com (2603:10b6:610:1ce::13)
- by MW3PR11MB4652.namprd11.prod.outlook.com (2603:10b6:303:5a::21) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9182.20; Thu, 9 Oct
- 2025 05:36:53 +0000
-Received: from CH3PR11MB8660.namprd11.prod.outlook.com
- ([fe80::fdc2:40ba:101d:40bf]) by CH3PR11MB8660.namprd11.prod.outlook.com
- ([fe80::fdc2:40ba:101d:40bf%7]) with mapi id 15.20.9182.017; Thu, 9 Oct 2025
- 05:36:53 +0000
-Date: Thu, 9 Oct 2025 13:36:44 +0800
-From: Chao Gao <chao.gao@intel.com>
-To: Sean Christopherson <seanjc@google.com>
-CC: <kvm@vger.kernel.org>, <linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH] KVM: VMX: Flush shadow VMCS on emergency reboot
-Message-ID: <aOdJ7JZWsfanX0JV@intel.com>
-References: <20250324140849.2099723-1-chao.gao@intel.com>
- <Z_g-UQoZ8fQhVD_2@google.com>
- <aObtM-7S0UfIRreU@google.com>
-Content-Type: text/plain; charset="us-ascii"
-Content-Disposition: inline
-In-Reply-To: <aObtM-7S0UfIRreU@google.com>
-X-ClientProxiedBy: KU0P306CA0073.MYSP306.PROD.OUTLOOK.COM
- (2603:1096:d10:2b::18) To CH3PR11MB8660.namprd11.prod.outlook.com
- (2603:10b6:610:1ce::13)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 410962459D7
+	for <kvm@vger.kernel.org>; Thu,  9 Oct 2025 06:12:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1759990356; cv=none; b=A7GZPaY3SvI3xgI+/xT5qm3uuQ1dcKnsw7gqjBioUxtYtoZOMF3HNAjO3qdhe0AldUTK/EKb0dcpTMB0ISlCES93HyikeDXq2l7bqdPzq4Otp7X3OrVJwBMunVMAcx1ypj7nxI9NMhXJztcNheEBpx8Zgyz90PhmEEhTJdVU9W4=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1759990356; c=relaxed/simple;
+	bh=MI6RSF4NOK4MepNK6VnhBlb5+fKB4cfghytxEFoX7MI=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=f5yjtsBloHT5FWR21KTgIIEpauNjxA48iO+DWOu/KuXJQNJ2Hoyiu+RjBlek9KLcGQ3pGZMqBHCN7ZTwdED03D9jggrqMj/AZnlT5ZMq6Oacm+EPGiSsMmL9Gbylq2CqErXb3T/x8jddi51Hf4/SQstf3VHvwLCMT+1z0ARftgU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=CbmIGXve; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1759990353;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+	bh=NRkB3HnbXEauvObRKfhLALPNCnH0LKvnQC+gj83VPV0=;
+	b=CbmIGXveOYXOiWVVlrxSyxO9zuzsvFL/YGV+fcnhtGkIYDWz45EdfHyNE+2f59fs0MfFEs
+	uGufdqqmjO+iOUb0CXNuY1qhsJT2Fb8bByc9LNnAAZtsx2vskdZFgzjgM+HzA2B4KaDWas
+	FHlHbUa++EVi5SUILim9yiOeljsoU5c=
+Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
+ [209.85.128.70]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-262-vZXVXzwtNiadkkMpwES7zw-1; Thu, 09 Oct 2025 02:12:31 -0400
+X-MC-Unique: vZXVXzwtNiadkkMpwES7zw-1
+X-Mimecast-MFC-AGG-ID: vZXVXzwtNiadkkMpwES7zw_1759990350
+Received: by mail-wm1-f70.google.com with SMTP id 5b1f17b1804b1-46e36686ca1so5715905e9.2
+        for <kvm@vger.kernel.org>; Wed, 08 Oct 2025 23:12:31 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1759990350; x=1760595150;
+        h=content-transfer-encoding:in-reply-to:autocrypt:content-language
+         :from:references:cc:to:subject:user-agent:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=NRkB3HnbXEauvObRKfhLALPNCnH0LKvnQC+gj83VPV0=;
+        b=f3SBMSDnMxK9ehSMAbI2aYvXNhR7qDcEbZDmmvvTcviVcY6K0262olx8IPiT466f5c
+         L8uxpH/+566cTh5lPZ2xcdo8K84S9mppFF7iims7+e8SBVY0sjL8K9Y8tYkf+KeHkDvl
+         HYZIgJ+Oa19QKiIFDotBzOglCjv06s5Wd9z3LswOuvcbo35+BMtR+42yMLrvIMv2cc27
+         8kNX5QRuYSiZk9t85qcbi8kLD/x5VS936D4Vh8T+E82HMp/BUYmetdc2sbcVjqELbjWv
+         QoLjky4wRrlBAjIIcnRnuK1Ia+CJm0uVg/UGtsiiSgZu6y6ywO0JGUkuMmAcK912cpur
+         q8CQ==
+X-Forwarded-Encrypted: i=1; AJvYcCWRG1f285wx42eahZFqDliVcwmYXTWDBZ1quWm+enE3Hrj9m5cv7+aA8fLbqucqFDy8h3Y=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzwSjwdVGlj+d1NcERtNhwKhwghfYOvhZ9ZFyih36wV8FgX+5wq
+	ezPuoshl4UzuO+A9eEqVX4AoPB3Vi/A5FinEsEVgy0kiJkmKg+p1VSc5n/1jSkNIK8t2ThwlWjl
+	x6HawaI+npmS7hSzTC4hR45AgS4ERd+uL//V4/UjYXE9RRJzgwR4GiQ==
+X-Gm-Gg: ASbGncuxq690YqIIJATkPj7AmIvLsamh5Mu3RHaRjSP2bG1XgnSLee0d0uw2A/OMi5u
+	GJQzTuq2/Ngz+ko5HzagjUnKJEw21dXY7VlwM4jVX4RUpcbwKpQEtsmFPvyDAbFbfrePRM27I67
+	D31mvsT/f2yW96MdYkyqPkr90fM63GGcgQcx/i/oALW083KOovGFK90o92QvZ9rYjnGwxJR89yT
+	qip+E1uUzTeyTXhIx2EvXMVE44A5p1SXau7oNAIfDmwhpDBTHdnhqZ7CTzi1nhSF102rcNTkfEd
+	yv8cdsK11QOxfhs6XQ4F/o/dSgGoD7CMXNsOK7CUgNKH8UNwayS6xAVs3ewKiY8ZhbXlTcEVmqH
+	nECnDbP3h
+X-Received: by 2002:a05:600c:34cc:b0:46e:59dd:1b4d with SMTP id 5b1f17b1804b1-46fa9aa2076mr63277535e9.16.1759990350184;
+        Wed, 08 Oct 2025 23:12:30 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IGgr3EwtW4kZSC4wN79xTrMonutG/ORyGxtzc7Y7j2Fbu8/LN9oI7c3abBPFzy3SYjFVQbwOQ==
+X-Received: by 2002:a05:600c:34cc:b0:46e:59dd:1b4d with SMTP id 5b1f17b1804b1-46fa9aa2076mr63277065e9.16.1759990349745;
+        Wed, 08 Oct 2025 23:12:29 -0700 (PDT)
+Received: from [192.168.3.141] (tmo-083-189.customers.d1-online.com. [80.187.83.189])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-4255d869d50sm33971611f8f.0.2025.10.08.23.12.26
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 08 Oct 2025 23:12:29 -0700 (PDT)
+Message-ID: <5a5013ca-e976-4622-b881-290eb0d78b44@redhat.com>
+Date: Thu, 9 Oct 2025 08:12:25 +0200
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: CH3PR11MB8660:EE_|MW3PR11MB4652:EE_
-X-MS-Office365-Filtering-Correlation-Id: a5240ef8-c723-43e4-03aa-08de06f5da22
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230040|366016|376014|1800799024|7053199007;
-X-Microsoft-Antispam-Message-Info: =?us-ascii?Q?Ys6CXz8N+QGnzUVHpvIVX+rGHtF2GxENg57mzSgpd2RkCGRGYcuM/Hfn55pH?=
- =?us-ascii?Q?y2NN+gEwBCTkaR0OxvGb8h6/Xn2yPnyu/ziFeBmf0XrbQXuBJMqEcKUw2n17?=
- =?us-ascii?Q?WynzdUFP/5msHmGk2aVE/WComSqRb1ouN3wB73xsliS7hEemAr+0iHCIhw6O?=
- =?us-ascii?Q?VlpRBVecSXxR58XDC8DPH+6yQx54R9Ai08D5kSHff99VHqQrAMrrx/nLxZdc?=
- =?us-ascii?Q?reLA0EW3aTegWOhiz26IzXA1oP0tOvDsiBtRpfBfiUzOcb7cOHgssxhDyjRX?=
- =?us-ascii?Q?HM6FGOWhptx1Dyd7p8zr4fAFbfMtolBXqairgK3r9T7UDSUruNZ8KYAeNjiZ?=
- =?us-ascii?Q?7QBHzNRqe66Amk41VCEpShxBfzd3LRkLNnPfxiBBnAXq7fRuqQqMv88Cp47y?=
- =?us-ascii?Q?uOBr34x/YNW5b86Vn6KN+mlt1xhzVeFuDyJ7USLvveV5JcHa0O2BzDikNzu4?=
- =?us-ascii?Q?j08mLnsY7jBjNxjPMahS8uZWZ9yNLAGqp953Xba1cMbFk3h32r3x5e1XEDNx?=
- =?us-ascii?Q?wgaKf6z6V1Cl+j8wTgVgXAOuoWzsfzV/P8XUraP08YueYK1qD9o16xNCcj7m?=
- =?us-ascii?Q?Z8Wl4jPB5gVDZJIkPb5huzbFTbCeyaFaOTCZ/QwcEQweZQd9lNXmNY8LxKWX?=
- =?us-ascii?Q?BaZok80LZZvc61jbiM5DGy7ksaeFpYzgKaBu7GUV9LuqO5IWOjJ6nh4pyZ+x?=
- =?us-ascii?Q?dfB9XYKFMivnBacfsFylbxGIXSDnLCWbuT6IXzKkrCVeuAbl9kWQ90Igi+jq?=
- =?us-ascii?Q?8pteUlmnT9+YBf32TSRuKqLpRwbcbCh+hmZdKxvOMrJ1ZMyztX9THSUj0e5t?=
- =?us-ascii?Q?5GHicLTjv38LXuwV9QficFK1MS99Oz5WPQGGH26Jv6+SyJEg8aG6BIadICIQ?=
- =?us-ascii?Q?C6hpmvQ7E4FwWW1j7kF/nK1JnXnMcW37iKmF+xHwmXCyuDdARxbuo9HpMdU9?=
- =?us-ascii?Q?V+hiO1jIxzQeZBNAsRaZV1Zc+8aYeWidZyOizNldmNfmfDQXMkS5/PR1v988?=
- =?us-ascii?Q?jb2vbKDBXS6rLNV8UusHEl4wEkH9W0Sjj19W0xPy0qFhJAdlY0LMwgFoQVMg?=
- =?us-ascii?Q?zsCpjSLBqaz2jC/WoRPqf5IGzvR4oAAExEALaf+acARYaeo6yM1+LzvWLx2L?=
- =?us-ascii?Q?rcqwPqzn2oKNH2WG5VjKIsLExw/jKPtYyk9oL2jaMcF/MTeXgm+diHdyS1bw?=
- =?us-ascii?Q?xv7owFd6uA2RWOb01BtLPi5lCLHRvRDVO21btUAe92eqUoOYWu+eZYfQNFYK?=
- =?us-ascii?Q?0/D4RJl7lZkTgkT7T58Z3wpkhTzkcw8lSyN/ZUmtIb+zE5U7r8re/yKSskd0?=
- =?us-ascii?Q?OTp0Y6Yuu8Y7pI6kA37Pq0/0vD+8e+szNPdMNd+9zh9Gws6yycIH2b0lz2c0?=
- =?us-ascii?Q?7pwEuEjBBu4wyjEFFiZ/XwMCH33Aa8SHgk4gZ/y7tT0dHFxmBGZBSWsYRqqQ?=
- =?us-ascii?Q?2tOUOBxmlHzpaTizFXZpPbWzKKUvAbey?=
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CH3PR11MB8660.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(376014)(1800799024)(7053199007);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?iItIx1b6uCMy45rzxsjRuq5gDOIv8R5pn3dhl/L66Is+CszOp9mPXdI7n5VF?=
- =?us-ascii?Q?xlJhXtTpbqdcg91slLtbVog6t/FJMzPiZx2Arsb41BegLSSwCWRL4B85+S6v?=
- =?us-ascii?Q?DvM877h2z/+Pjk++vZqaf6V7NawlnEjCN11eEa531OBgCuHKcndCMi46tL/k?=
- =?us-ascii?Q?aYiw3rkgpeKraZnK63U0YmOU6Q1oxEzBkGFJEM7g9GMLCNGQAIvSx3ksSX7o?=
- =?us-ascii?Q?dTfiUrBNrpaJVtib6su0oQCBFIS1e1N+J3nDCSC/EsFJrZZBIBSN0mP49uet?=
- =?us-ascii?Q?X4APvFEdFww+wGIf0AAF22NztzMHI36WAlYGzVsm6eC/vY6t0wrD1GKs8N0T?=
- =?us-ascii?Q?tRjhCdW9cgMSMQ+wZqx8Hfl6oZXgei8OMjYEBSr69T06zrL+9n0y2WE7nG0p?=
- =?us-ascii?Q?wD71M8p1/xx5ah0g/TPcjmMrZlwySUpvk0g3cSpcHiCF910zlabCPYltpPmr?=
- =?us-ascii?Q?cVEti6K7Z+FH0Y6YBCmktfrST0//VRhSRdjv1cYCU8t4+Makanm7ChLlSnTE?=
- =?us-ascii?Q?Cs2Xna+Y60VbgkybRrHg50rRxJcRC/CuHz6v3XBvQcgSF4xgvsW273MKyuyK?=
- =?us-ascii?Q?8/WIMiJD2+qkDiLC+Bl9KddQd0F5tAILIAFRyPzKhsxLtZtXKEa/ZWtHyMS8?=
- =?us-ascii?Q?8kvSQ/bPjrWsuQNJPymazqSsD/Drh1j0yCAGG+7RbEiB++SQvpWMLR2LKZ5o?=
- =?us-ascii?Q?+feijrOEp82j6EG8IjUmaI8UEyJtnnmu/N81RfqfYYkLye4Yzn763v77BIG/?=
- =?us-ascii?Q?PaO8BvN1zA3TPtGkluNpopiH5IDiHS7IquIxJ4rXXaEjddwT6QJZ4wVgVGM8?=
- =?us-ascii?Q?npMEGRPcCDdL27lRU4Nhgal6M3j1HgMXUl1ggxo/z7gyXT2DGFmYDdV3cBN7?=
- =?us-ascii?Q?5VjYS/WBOL8QfW8FMHrxcwq5hS79IeQNg5C2alPFum93A7xaHOH4bNrt/mM9?=
- =?us-ascii?Q?fcd9P/IfDGkl2q3/elKDkPEaRTrI5oyLjE/XNt1Sz0Nllvw5rJWUg/0LOSdE?=
- =?us-ascii?Q?uRHzQe0jPgdYVv3i6u1h5iSCwj195QKcO95mDTb6sVDkMT5A82kBPqI/9CUg?=
- =?us-ascii?Q?e1AqAf36BO+aYFLnbpeV99cAUEQ1dmdfVT87AGrBVGwpan3qA4JEgXM7hEYC?=
- =?us-ascii?Q?AnO3PUysKlnFg3oefsSK57S3fVYGg6+Z859vqIHpFwx3aFiotE+yCAgCLLyN?=
- =?us-ascii?Q?aKWAJjY4mWdfxsqICFqPiM/O8waVGEIm/lgFSlWw86viHQqlCojImrhvb8Hj?=
- =?us-ascii?Q?y7TbC/lbuYECXC6Aegz42RIItFbyQTHQXNl0HjYYQ5Cy29l6ZBBWt+nmEskx?=
- =?us-ascii?Q?vHeKxuAeVwXZn9XnS16ivxIYg3GleJB0bvlDnvQGSxhP7DajPRuYOMtdr/xF?=
- =?us-ascii?Q?DCUx6GCE3+ocpTV7jYwrmjMyHlr7EmRgITIpcVtYnEk105CmBzFy9B8sUoQU?=
- =?us-ascii?Q?2grbDMcw4g8hECTs1YH7mPrx5+wBI3yPWde15/wrOWkpS22ksP4/h1HXCpID?=
- =?us-ascii?Q?qLWZ2xUK+RI3+OwTCAmkULf1hza05JC+xMM9FrXdE56MAnFRNvzR32Xlii4J?=
- =?us-ascii?Q?wwa2WlRseWzGpLrORcO7LAPgkz1eomS4twtrvocY?=
-X-MS-Exchange-CrossTenant-Network-Message-Id: a5240ef8-c723-43e4-03aa-08de06f5da22
-X-MS-Exchange-CrossTenant-AuthSource: CH3PR11MB8660.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 09 Oct 2025 05:36:53.2123
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: vK0Aj7GfREgXlm9sTGPEXQ/w0q6mZ/P9xIc1GaqI12+wVcQv4JWh6f1pMstmAXCOqCRcdKTWSW9a6LxnwQa+0w==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: MW3PR11MB4652
-X-OriginatorOrg: intel.com
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH RFC 06/35] mm/page_alloc: reject unreasonable
+ folio/compound page sizes in alloc_contig_range_noprof()
+To: Balbir Singh <balbirs@nvidia.com>, linux-kernel@vger.kernel.org
+Cc: Alexander Potapenko <glider@google.com>,
+ Andrew Morton <akpm@linux-foundation.org>,
+ Brendan Jackman <jackmanb@google.com>, Christoph Lameter <cl@gentwo.org>,
+ Dennis Zhou <dennis@kernel.org>, Dmitry Vyukov <dvyukov@google.com>,
+ dri-devel@lists.freedesktop.org, intel-gfx@lists.freedesktop.org,
+ iommu@lists.linux.dev, io-uring@vger.kernel.org,
+ Jason Gunthorpe <jgg@nvidia.com>, Jens Axboe <axboe@kernel.dk>,
+ Johannes Weiner <hannes@cmpxchg.org>, John Hubbard <jhubbard@nvidia.com>,
+ kasan-dev@googlegroups.com, kvm@vger.kernel.org,
+ "Liam R. Howlett" <Liam.Howlett@oracle.com>,
+ Linus Torvalds <torvalds@linux-foundation.org>, linux-arm-kernel@axis.com,
+ linux-arm-kernel@lists.infradead.org, linux-crypto@vger.kernel.org,
+ linux-ide@vger.kernel.org, linux-kselftest@vger.kernel.org,
+ linux-mips@vger.kernel.org, linux-mmc@vger.kernel.org, linux-mm@kvack.org,
+ linux-riscv@lists.infradead.org, linux-s390@vger.kernel.org,
+ linux-scsi@vger.kernel.org, Lorenzo Stoakes <lorenzo.stoakes@oracle.com>,
+ Marco Elver <elver@google.com>, Marek Szyprowski <m.szyprowski@samsung.com>,
+ Michal Hocko <mhocko@suse.com>, Mike Rapoport <rppt@kernel.org>,
+ Muchun Song <muchun.song@linux.dev>, netdev@vger.kernel.org,
+ Oscar Salvador <osalvador@suse.de>, Peter Xu <peterx@redhat.com>,
+ Robin Murphy <robin.murphy@arm.com>, Suren Baghdasaryan <surenb@google.com>,
+ Tejun Heo <tj@kernel.org>, virtualization@lists.linux.dev,
+ Vlastimil Babka <vbabka@suse.cz>, wireguard@lists.zx2c4.com, x86@kernel.org,
+ Zi Yan <ziy@nvidia.com>
+References: <20250821200701.1329277-1-david@redhat.com>
+ <20250821200701.1329277-7-david@redhat.com>
+ <fa2e262c-d732-48e3-9c59-6ed7c684572c@nvidia.com>
+From: David Hildenbrand <david@redhat.com>
+Content-Language: en-US
+Autocrypt: addr=david@redhat.com; keydata=
+ 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
+ qIws/H2t
+In-Reply-To: <fa2e262c-d732-48e3-9c59-6ed7c684572c@nvidia.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-On Wed, Oct 08, 2025 at 04:01:07PM -0700, Sean Christopherson wrote:
->Trimmed Cc: to lists, as this is basically off-topic, but I thought you might
->be amused :-)
->
->On Thu, Apr 10, 2025, Sean Christopherson wrote:
->> On Mon, Mar 24, 2025, Chao Gao wrote:
->> > Ensure the shadow VMCS cache is evicted during an emergency reboot to
->> > prevent potential memory corruption if the cache is evicted after reboot.
->> 
->> I don't suppose Intel would want to go on record and state what CPUs would actually
->> be affected by this bug.  My understanding is that Intel has never shipped a CPU
->> that caches shadow VMCS state.
+On 09.10.25 06:21, Balbir Singh wrote:
+> On 8/22/25 06:06, David Hildenbrand wrote:
+>> Let's reject them early, which in turn makes folio_alloc_gigantic() reject
+>> them properly.
+>>
+>> To avoid converting from order to nr_pages, let's just add MAX_FOLIO_ORDER
+>> and calculate MAX_FOLIO_NR_PAGES based on that.
+>>
+>> Signed-off-by: David Hildenbrand <david@redhat.com>
+>> ---
+>>   include/linux/mm.h | 6 ++++--
+>>   mm/page_alloc.c    | 5 ++++-
+>>   2 files changed, 8 insertions(+), 3 deletions(-)
+>>
+>> diff --git a/include/linux/mm.h b/include/linux/mm.h
+>> index 00c8a54127d37..77737cbf2216a 100644
+>> --- a/include/linux/mm.h
+>> +++ b/include/linux/mm.h
+>> @@ -2055,11 +2055,13 @@ static inline long folio_nr_pages(const struct folio *folio)
+>>   
+>>   /* Only hugetlbfs can allocate folios larger than MAX_ORDER */
+>>   #ifdef CONFIG_ARCH_HAS_GIGANTIC_PAGE
+>> -#define MAX_FOLIO_NR_PAGES	(1UL << PUD_ORDER)
+>> +#define MAX_FOLIO_ORDER		PUD_ORDER
+> 
+> Do we need to check for CONTIG_ALLOC as well with CONFIG_ARCH_HAS_GIGANTIC_PAGE?
+> 
 
-Yes. Shadow VMCSs are never cached. But this is an implementation detail.
-Per SDM, software is required to VMCLEAR a shadow VMCS that was made active
-to be forward compatible.
+I don't think so, can you elaborate?
 
->> 
->> On a very related topic, doesn't SPR+ now flush the VMCS caches on VMXOFF?  If
->> that's going to be the architectural behavior going forward, will that behavior
->> be enumerated to software?  Regardless of whether there's software enumeration,
->> I would like to have the emergency disable path depend on that behavior.  In part
->> to gain confidence that SEAM VMCSes won't screw over kdump, but also in light of
->> this bug.
+>>   #else
+>> -#define MAX_FOLIO_NR_PAGES	MAX_ORDER_NR_PAGES
+>> +#define MAX_FOLIO_ORDER		MAX_PAGE_ORDER
+>>   #endif
+>>   
+>> +#define MAX_FOLIO_NR_PAGES	(1UL << MAX_FOLIO_ORDER)
+>> +
+>>   /*
+>>    * compound_nr() returns the number of pages in this potentially compound
+>>    * page.  compound_nr() can be called on a tail page, and is defined to
+>> diff --git a/mm/page_alloc.c b/mm/page_alloc.c
+>> index ca9e6b9633f79..1e6ae4c395b30 100644
+>> --- a/mm/page_alloc.c
+>> +++ b/mm/page_alloc.c
+>> @@ -6833,6 +6833,7 @@ static int __alloc_contig_verify_gfp_mask(gfp_t gfp_mask, gfp_t *gfp_cc_mask)
+>>   int alloc_contig_range_noprof(unsigned long start, unsigned long end,
+>>   			      acr_flags_t alloc_flags, gfp_t gfp_mask)
+>>   {
+>> +	const unsigned int order = ilog2(end - start);
+> 
+> Do we need a VM_WARN_ON(end < start)?
 
-Yes. The current implementation is that CPUs with SEAM support flush _all_
-VMCS caches on VMXOFF. But the architectural behavior is trending toward
-CPUs that enumerate IA32_VMX_PROCBASED_CTRLS3[5] as 1 flushing _SEAM_ VMCS
-caches on VMXOFF.
+I don't think so.
 
->
->Apparently I completely purged it from my memory, but while poking through an
->internal branch related to moving VMXON out of KVM, I came across this:
->
->--
->Author:     Sean Christopherson <seanjc@google.com>
->AuthorDate: Wed Jan 17 16:19:28 2024 -0800
->Commit:     Sean Christopherson <seanjc@google.com>
->CommitDate: Fri Jan 26 13:16:31 2024 -0800
->
->    KVM: VMX: VMCLEAR loaded shadow VMCSes on kexec()
->    
->    Add a helper to VMCLEAR _all_ loaded VMCSes in a loaded_vmcs pair, and use
->    it when doing VMCLEAR before kexec() after a crash to fix a (likely benign)
->    bug where KVM neglects to VMCLEAR loaded shadow VMCSes.  The bug is likely
->    benign as existing Intel CPUs don't insert shadow VMCSes into the VMCS
->    cache, i.e. shadow VMCSes can't be evicted since they're never cached, and
->    thus won't clobber memory in the new kernel.
->
->--
->
->At least my reaction was more or less the same both times?
->
->> If all past CPUs never cache shadow VMCS state, and all future CPUs flush the
->> caches on VMXOFF, then this is a glorified NOP, and thus probably shouldn't be
->> tagged for stable.
->> 
->> > This issue was identified through code inspection, as __loaded_vmcs_clear()
->> > flushes both the normal VMCS and the shadow VMCS.
->> > 
->> > Avoid checking the "launched" state during an emergency reboot, unlike the
->> > behavior in __loaded_vmcs_clear(). This is important because reboot NMIs
->> > can interfere with operations like copy_shadow_to_vmcs12(), where shadow
->> > VMCSes are loaded directly using VMPTRLD. In such cases, if NMIs occur
->> > right after the VMCS load, the shadow VMCSes will be active but the
->> > "launched" state may not be set.
->> > 
->> > Signed-off-by: Chao Gao <chao.gao@intel.com>
->> > ---
->> >  arch/x86/kvm/vmx/vmx.c | 5 ++++-
->> >  1 file changed, 4 insertions(+), 1 deletion(-)
->> > 
->> > diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
->> > index b70ed72c1783..dccd1c9939b8 100644
->> > --- a/arch/x86/kvm/vmx/vmx.c
->> > +++ b/arch/x86/kvm/vmx/vmx.c
->> > @@ -769,8 +769,11 @@ void vmx_emergency_disable_virtualization_cpu(void)
->> >  		return;
->> >  
->> >  	list_for_each_entry(v, &per_cpu(loaded_vmcss_on_cpu, cpu),
->> > -			    loaded_vmcss_on_cpu_link)
->> > +			    loaded_vmcss_on_cpu_link) {
->> >  		vmcs_clear(v->vmcs);
->> > +		if (v->shadow_vmcs)
->> > +			vmcs_clear(v->shadow_vmcs);
->> > +	}
->> >  
->> >  	kvm_cpu_vmxoff();
->> >  }
->> > -- 
->> > 2.46.1
->> > 
+> 
+>>   	unsigned long outer_start, outer_end;
+>>   	int ret = 0;
+>>   
+>> @@ -6850,6 +6851,9 @@ int alloc_contig_range_noprof(unsigned long start, unsigned long end,
+>>   					    PB_ISOLATE_MODE_CMA_ALLOC :
+>>   					    PB_ISOLATE_MODE_OTHER;
+>>   
+>> +	if (WARN_ON_ONCE((gfp_mask & __GFP_COMP) && order > MAX_FOLIO_ORDER))
+>> +		return -EINVAL;
+>> +
+>>   	gfp_mask = current_gfp_context(gfp_mask);
+>>   	if (__alloc_contig_verify_gfp_mask(gfp_mask, (gfp_t *)&cc.gfp_mask))
+>>   		return -EINVAL;
+>> @@ -6947,7 +6951,6 @@ int alloc_contig_range_noprof(unsigned long start, unsigned long end,
+>>   			free_contig_range(end, outer_end - end);
+>>   	} else if (start == outer_start && end == outer_end && is_power_of_2(end - start)) {
+>>   		struct page *head = pfn_to_page(start);
+>> -		int order = ilog2(end - start);
+>>   
+>>   		check_new_pages(head, order);
+>>   		prep_new_page(head, order, gfp_mask, 0);
+> 
+> Acked-by: Balbir Singh <balbirs@nvidia.com>
+
+Thanks for the review, but note that this is already upstream.
+
+-- 
+Cheers
+
+David / dhildenb
+
 
