@@ -1,233 +1,168 @@
-Return-Path: <kvm+bounces-59714-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-59715-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7D5E8BC920C
-	for <lists+kvm@lfdr.de>; Thu, 09 Oct 2025 14:53:29 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id A294ABC9230
+	for <lists+kvm@lfdr.de>; Thu, 09 Oct 2025 14:54:45 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id DA0624FA6D7
-	for <lists+kvm@lfdr.de>; Thu,  9 Oct 2025 12:53:12 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id CD8133E4029
+	for <lists+kvm@lfdr.de>; Thu,  9 Oct 2025 12:54:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 077232E6CD3;
-	Thu,  9 Oct 2025 12:53:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 994EB2E5B05;
+	Thu,  9 Oct 2025 12:54:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Ln7bmxsH"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="EmD0KM70"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8D96A2E5B0D
-	for <kvm@vger.kernel.org>; Thu,  9 Oct 2025 12:53:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EF6ED26FA5E
+	for <kvm@vger.kernel.org>; Thu,  9 Oct 2025 12:54:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1760014383; cv=none; b=HAI3zISEPpHbgHX02u2Oit+OHytQBba9RjZMofdqJUDv+EBorN9vK6B76gg2DLhT8Z/Xq3K5F/19bWOBjQx5ASwPmRUoH2Vpi9cYAYONfCn2qU/JLIfpgXuRbWgaoLFZWKMQtUd+uzQQsssUw8Pc7x6ELXFMee1we2N31VRa9SQ=
+	t=1760014466; cv=none; b=DmucNDVhVTRxvm3RqhxPP/NSxKOUvjPCwzh0/0Zatf+I9xbvCw0U30gbaqeMfDI4x3V4KIv7XQPzEBgDAzIuBXQ03UA8u5sdeYX89DUVvgvk6/01RrJiw6PALPMhsKYt7kVv6NzfnW3sf0bEv5kUTcgaHP8uTICqjf2U8VWt3LI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1760014383; c=relaxed/simple;
-	bh=X8mJTyar/juDqkVpENiOV+AphX1e6sbRKy+cvFNi8Iw=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
-	 MIME-Version:Content-Type; b=mgF3a0PD6XR7KZADGC+Ucm36ETEUa+zHRk8U6mhEIWNr3Iics+4Hd6Q0272k+HC8Y+0XRhh25dJBe0KBNhGwXIeIIUJAzgafalCnFxLp13bqMTOlITIO48lKUm8ZfYZn5b7et4Tn+xaDIilhjRjmrEIbNCANv53mNPIbPciSNQo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Ln7bmxsH; arc=none smtp.client-ip=170.10.133.124
+	s=arc-20240116; t=1760014466; c=relaxed/simple;
+	bh=d+WHqjD1e2xfxGWREFy8UIQh97c1/2BfHbOxP9RKa5g=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=PJ+A+U9OcM+4TpqHFFgIygTceXCkl9Ke9xUy+zzlEWLY50mr5TqcHOKyH47Lw1H/jG3uTTn5ompiuobtchCm5bSB348PY0z+m2Tzjrz3pJOujzOJR0VDqT6vywZg4bY2SKp96jhAgAI4c09ZxKKx1R4rsvixSO41q6ssSPs1n0g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=EmD0KM70; arc=none smtp.client-ip=170.10.129.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1760014380;
+	s=mimecast20190719; t=1760014464;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=+waPU4EoP1XKdkvMFZASVqNI18Mpmp7i8qiR8k7lEjg=;
-	b=Ln7bmxsHrrmN9XxwIktjh2zDb3vI8jeh+OYY4HZ2u2VC1kolyPp+guUhKe3G7rOugnEMSL
-	r3y0+gBMrZDWbs2GN/QNOcGqzGrX8BIgtu7CeWVcnoAwYWnMsy1MSr2R6qw3naoca+Y3pU
-	ChSUoV9BeIiJJFpv5xwAXOCw+AYR7GI=
-Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
- [209.85.221.71]) by relay.mimecast.com with ESMTP with STARTTLS
+	bh=sLVQWh+Znqw6JAYRNwQHXL1TFNSvZ0jniZ0MloD7+Hg=;
+	b=EmD0KM70H+qEk6u1/odi44dhRuJ0K//SKUto1pWqhyzf2GbFFVJmOcA8n6hUqUnRG6J3QU
+	V66IpEO7gxhbE/i6C5sVV7N2ypZ3zouB0z9/KPZJgawI7PqZe+yQy/OwGtLxTN2i6OM0NW
+	IXwE7TQyw4TJTlhVRtezBhSW0uiMgHA=
+Received: from mail-qk1-f200.google.com (mail-qk1-f200.google.com
+ [209.85.222.200]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-654-odhYKX9YOMO7IgBzHHrEAA-1; Thu, 09 Oct 2025 08:52:59 -0400
-X-MC-Unique: odhYKX9YOMO7IgBzHHrEAA-1
-X-Mimecast-MFC-AGG-ID: odhYKX9YOMO7IgBzHHrEAA_1760014378
-Received: by mail-wr1-f71.google.com with SMTP id ffacd0b85a97d-3f384f10762so739469f8f.3
-        for <kvm@vger.kernel.org>; Thu, 09 Oct 2025 05:52:58 -0700 (PDT)
+ us-mta-483-N5RDkZ6WN-SaMaN9NuNkYw-1; Thu, 09 Oct 2025 08:54:23 -0400
+X-MC-Unique: N5RDkZ6WN-SaMaN9NuNkYw-1
+X-Mimecast-MFC-AGG-ID: N5RDkZ6WN-SaMaN9NuNkYw_1760014462
+Received: by mail-qk1-f200.google.com with SMTP id af79cd13be357-870d82c566fso302805385a.1
+        for <kvm@vger.kernel.org>; Thu, 09 Oct 2025 05:54:22 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1760014378; x=1760619178;
-        h=content-transfer-encoding:mime-version:message-id:date:references
-         :in-reply-to:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=+waPU4EoP1XKdkvMFZASVqNI18Mpmp7i8qiR8k7lEjg=;
-        b=GOohE6rLMRh1Mt4IU8XICXQojDEQjXNudA3FL8uZSR1eO6Mei7TEdEQrehUi/jI2v5
-         4CWMDe5yfNChANukwDIXQIFwRMVnUSIo65qK8d7fYAc78/2igPZ8tpFI6bjnxG86RNNa
-         J+rI41SA/6X+ztmwfmZNforlmpSE7mjnBSgl7JVbGMGZ+30IV9vtcE4Q5HuXt7wdGRQQ
-         YUJg3ASJOJtQJoLThRjRPTwyB4tGJUcqZD2+iVb6bkYpSbeVIN37SMOYC23kP0NK4c/h
-         Z+KuhiNnLgQTA4Pg7eF/gqmc/FIPHu0eh6C+J3RwjuTlWA1beDc4rmsmWJhFbraMabn2
-         voAg==
-X-Forwarded-Encrypted: i=1; AJvYcCW/zWuA2n+prXK8nghoX0XJ7H4XiDu+k99jDvMy7VCeVjSWNVkFrcQd8UIZ8bjDFNQSI60=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yye/IW+YoN4Va7gIf3aJEc3J31pFz1IJbP4uspOCkKVExJkbzDB
-	pHyN9MGFUt8gpfhbIRkeQakV3H3ZAZSiat+EbmXWPPP9rYt3NErWbLtFr2qGLfpYoTMQppgCMyO
-	S3UHL0zL9UFAo5AgB4I6/vEyCXjqy22U+Uiuzt+6pB3LvOXDO1a+6Rw==
-X-Gm-Gg: ASbGncv8vr9XnKg1n32Oyph0zumeO/yREBVegkcqoH+AJtjSdwEgwhDhB5fdH1ULsFN
-	/6W08fw40jKQkYDeE1WL1XSHR1hG2FM3TxQzsaij4GV36TXm4FXqlArkjpWY7LAKmMXVS7t9mlc
-	MP9fp7TGMaxJbTiHai9D9exwlirfW486N983QqphDB1bgnYsdCVAEsYcbxelpKuWRTpcvJy93Hk
-	rI4LARmOeXJHvj+OUTmkatJH4eD2Nn9g+tyZ8QNx/PSiUEoP5GFpNo5WPFSxTo4m2A6F1CXuccp
-	09sB7fQPtfUmpZIvpr/XGbpKaQeEn4LInz7ijk193A==
-X-Received: by 2002:a05:6000:2c06:b0:40f:5eb7:f23e with SMTP id ffacd0b85a97d-42666ab2b15mr4101216f8f.1.1760014377899;
-        Thu, 09 Oct 2025 05:52:57 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IG6sYUNnJKtLYymNGyZnaS/EKYVGpmsOe8naPHzyYPhk9811ZTFpkCfmibAqOb5QeKoOkS8AA==
-X-Received: by 2002:a05:6000:2c06:b0:40f:5eb7:f23e with SMTP id ffacd0b85a97d-42666ab2b15mr4101201f8f.1.1760014377497;
-        Thu, 09 Oct 2025 05:52:57 -0700 (PDT)
-Received: from fedora (g3.ign.cz. [91.219.240.17])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-4255d8e97f0sm34348382f8f.27.2025.10.09.05.52.56
+        d=1e100.net; s=20230601; t=1760014462; x=1760619262;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=sLVQWh+Znqw6JAYRNwQHXL1TFNSvZ0jniZ0MloD7+Hg=;
+        b=FLwfxm9egw5V5m2KKdq4BCRlHrgXwwPQ7S0mVjOcNWu3VrzUoTJCRN97+mxB3kl7sq
+         1ad3DuzArLlfPnDUbvr6MWfIw3z5PX+F97Hgbg38HZh0Z6h4XThYkt35QrdhUssXqii+
+         elcCPk63UNYtplxbpN6ZLzJ8xfnw5ejvuMk5pxyR4RSNFyzDH2H0pbhSv5rZoZlRmXS/
+         H2V4MrbQZ+RHRQiO9q1f1DcZ/Lm+5k4OPTYuSamdCsVQjFq0y7vR7ug9bjJrTa93cnOT
+         SpsV7PAo1e5BEVXzrl+uWZiukA/JITZh+3i8OUm0w0IxNbdvPfeOEEf6Y+qgwqelr1OU
+         FbOQ==
+X-Forwarded-Encrypted: i=1; AJvYcCXuY4LExAF6ujrUfEOFEBWIUJ3m0r2wrrbLpuD6epvsAJrmOGK1ODSB5J9hLORc76qxwxg=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyahXVwIKFxiTNkU5WisZII3gCq5ynKBem2H/BPPp5e5H1fJW+E
+	rcAEQLpTNQ6JvhBtSKFmDefZgZo7sR+Ssx+cuu9F1pyJQbE83aYgOAW7YTbZRjrNr+wg3fzWZGb
+	hFLG05h1U0WRTNNOeIqoLDk6o/Hh+lmvJo62sAM8Kw1tGL4IiHbpFUQ==
+X-Gm-Gg: ASbGnctOqT3BSu5WDoduA/MBtNouKtMiYmoxcUQ7PMcKQgJUMez3pOwu3lUpA8F0gSr
+	b4nEFYX1M1RuxkGZVVRpeTlt7C5sR8RHia2kT3DR+vjTH4omM7FZK4WZrT2V8a5A27VD9JM5pCd
+	+gJqfK8jcIrKHutSuPOGb6URNOCBFX9F1AkV8mAcLPRmaRJJXpTMIi1tpnS0nPlwLql8pJXQ/kR
+	yrIojUERimBgCuQtANFc29HjknOqarcePjVRh84JqCSry3DwuJkYdy9coL2JK3LvxwHKKCLEXT3
+	3PmT3vp77ZKKV0SjkfHqidOW1OXRufDhXgs=
+X-Received: by 2002:a05:620a:269f:b0:82b:5e2e:bc46 with SMTP id af79cd13be357-8820d18e350mr1885885085a.35.1760014461565;
+        Thu, 09 Oct 2025 05:54:21 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IEqMpvtMJcanZP3rlvKbgdpkQAf5WVURwTPSiw1JSFVgNS1mLi/kxcHSU28QD1hy96VkYKztg==
+X-Received: by 2002:a05:620a:269f:b0:82b:5e2e:bc46 with SMTP id af79cd13be357-8820d18e350mr1885875985a.35.1760014460576;
+        Thu, 09 Oct 2025 05:54:20 -0700 (PDT)
+Received: from redhat.com ([138.199.52.81])
+        by smtp.gmail.com with ESMTPSA id af79cd13be357-8849f9ad8dasm190766385a.21.2025.10.09.05.54.17
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 09 Oct 2025 05:52:57 -0700 (PDT)
-From: Vitaly Kuznetsov <vkuznets@redhat.com>
-To: Jinpu Wang <jinpu.wang@ionos.com>, Sean Christopherson <seanjc@google.com>
-Cc: fanwenyi0529@gmail.com, kvm@vger.kernel.org, Paolo Bonzini
- <pbonzini@redhat.com>, Xiaoyao Li <xiaoyao.li@intel.com>,
- linux-kernel@vger.kernel.org
-Subject: Re: Hang on reboot in multi-core FreeBSD guest on Linux KVM host
- with Intel Sierra Forest CPU
-In-Reply-To: <CAMGffEmin4HAwoQUjkkoq+_z0sherZcCnkXgMu4PahnM8UmO+A@mail.gmail.com>
-References: <539FC243.2070906@redhat.com>
- <20140617060500.GA20764@minantech.com>
- <FFEF5F78-D9E6-4333-BC1A-78076C132CBF@jnielsen.net>
- <6850B127-F16B-465F-BDDB-BA3F99B9E446@jnielsen.net>
- <jpgioafjtxb.fsf@redhat.com>
- <74412BDB-EF6F-4C20-84C8-C6EF3A25885C@jnielsen.net>
- <558AD1B0.5060200@redhat.com>
- <FAFB2BA9-E924-4E70-A84A-E5F2D97BC2F0@jnielsen.net>
- <CACzj_yVTyescyWBRuA3MMCC0Ymg7TKF-+sCW1N+Xwfffvw_Wsg@mail.gmail.com>
- <CAMGffE=P5HJkJxh2mj3c_oh6busFKYb0TGuhAc36toc5_uD72w@mail.gmail.com>
- <aOaJbHPBXHwxlC1S@google.com>
- <CAMGffEn1i-qTVRD+9PWDfNUMvbBCp9dV2f=Cgu=VLtoHs-6JTA@mail.gmail.com>
- <CAMGffEmt2ZEL3uxRd+mWkKB=K8Q3seo9Kp-T06rZahxsX4Wm4Q@mail.gmail.com>
- <CAMGffEmin4HAwoQUjkkoq+_z0sherZcCnkXgMu4PahnM8UmO+A@mail.gmail.com>
-Date: Thu, 09 Oct 2025 14:52:56 +0200
-Message-ID: <87bjmg8cev.fsf@redhat.com>
+        Thu, 09 Oct 2025 05:54:20 -0700 (PDT)
+Date: Thu, 9 Oct 2025 08:54:15 -0400
+From: "Michael S. Tsirkin" <mst@redhat.com>
+To: Andrew Lunn <andrew@lunn.ch>
+Cc: linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
+	Paolo Abeni <pabeni@redhat.com>, Jason Wang <jasowang@redhat.com>,
+	Eugenio =?iso-8859-1?Q?P=E9rez?= <eperezma@redhat.com>,
+	Xuan Zhuo <xuanzhuo@linux.alibaba.com>, kvm@vger.kernel.org,
+	virtualization@lists.linux.dev
+Subject: Re: [PATCH 3/3] vhost: use checked versions of VIRTIO_BIT
+Message-ID: <20251009085057-mutt-send-email-mst@kernel.org>
+References: <cover.1760008797.git.mst@redhat.com>
+ <6629538adfd821c8626ab8b9def49c23781e6775.1760008798.git.mst@redhat.com>
+ <d4fcd2d8-ac84-4d9f-a47a-fecc50e18e20@lunn.ch>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <d4fcd2d8-ac84-4d9f-a47a-fecc50e18e20@lunn.ch>
 
-Jinpu Wang <jinpu.wang@ionos.com> writes:
+On Thu, Oct 09, 2025 at 02:47:53PM +0200, Andrew Lunn wrote:
+> On Thu, Oct 09, 2025 at 07:24:16AM -0400, Michael S. Tsirkin wrote:
+> > This adds compile-time checked versions of VIRTIO_BIT that set bits in
+> > low and high qword, respectively.  Will prevent confusion when people
+> > set bits in the wrong qword.
+> > 
+> > Cc: "Paolo Abeni" <pabeni@redhat.com>
+> > Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
+> > ---
+> >  drivers/vhost/net.c             | 4 ++--
+> >  include/linux/virtio_features.h | 9 +++++++++
+> >  2 files changed, 11 insertions(+), 2 deletions(-)
+> > 
+> > diff --git a/drivers/vhost/net.c b/drivers/vhost/net.c
+> > index 43d51fb1f8ea..8b98e1a8baaa 100644
+> > --- a/drivers/vhost/net.c
+> > +++ b/drivers/vhost/net.c
+> > @@ -76,8 +76,8 @@ static const u64 vhost_net_features[VIRTIO_FEATURES_QWORDS] = {
+> >  	(1ULL << VIRTIO_F_ACCESS_PLATFORM) |
+> >  	(1ULL << VIRTIO_F_RING_RESET) |
+> >  	(1ULL << VIRTIO_F_IN_ORDER),
+> > -	VIRTIO_BIT(VIRTIO_NET_F_GUEST_UDP_TUNNEL_GSO) |
+> > -	VIRTIO_BIT(VIRTIO_NET_F_HOST_UDP_TUNNEL_GSO),
+> > +	VIRTIO_BIT_HI(VIRTIO_NET_F_GUEST_UDP_TUNNEL_GSO) |
+> > +	VIRTIO_BIT_HI(VIRTIO_NET_F_HOST_UDP_TUNNEL_GSO),
+> 
+> How any bits in vhost_net_features are currently in use?
 
-> On Thu, Oct 9, 2025 at 1:21=E2=80=AFPM Jinpu Wang <jinpu.wang@ionos.com> =
-wrote:
->>
->> On Thu, Oct 9, 2025 at 5:44=E2=80=AFAM Jinpu Wang <jinpu.wang@ionos.com>=
- wrote:
->> >
->> > Hi Sean,
->> >
->> > On Wed, Oct 8, 2025 at 5:55=E2=80=AFPM Sean Christopherson <seanjc@goo=
-gle.com> wrote:
->> > >
->> > > Trimmed Cc: to drop people from the original thread.  In the future,=
- just start
->> > > a new bug report.  Piggybacking a 10 year old bug just because the s=
-ymptoms are
->> > > similar does more harm than good.  Whatever the old thread was chasi=
-ng was already
->> > > fixed, _10 years_ ago; they were just trying to identy exactly what =
-commit fixed
->> > > the problem.  I.e. whatever they were chasing _can't_ be the same ro=
-ot cause,
->> > > because even if it's literally the same code bug, it would require a=
- code change
->> > > and thus a regression between v4.0 and v6.1.
->> > Thx for the reply,  it makes sense. I will remember this next time.
->> > >
->> > > On Wed, Oct 08, 2025, Jinpu Wang wrote:
->> > > > On Wed, Oct 8, 2025 at 2:44=E2=80=AFPM Jack Wang <jinpu.wang@ionos=
-.com> wrote:
->> > > > > Sorry for bump this old thread, we hit same issue on Intel Sierr=
-a Forest
->> > > > > machines with LTS kernel 6.1/6.12, maybe KVM comunity could help=
- fix it.
->> > >
->> > > Are there any host kernels that _do_ work?  E.g. have you tried a bl=
-eeding edge
->> > > host kernel?
->> > I will try linus/master today.
->> > >
->> > > > > ### **[BUG] Hang on FreeBSD Guest Reboot under KVM on Intel Sier=
-raForest (Xeon 6710E)**
->> > > > >
->> > > > > **Summary:**
->> > > > > Multi-cores FreeBSD guests hang during reboot under KVM on syste=
-ms with
->> > > > > Intel(R) Xeon(R) 6710E (SierraForest). The issue is fully reprod=
-ucible with
->> > > > > APICv enabled and disappears when disabling APICv (`enable_apicv=
-=3DN`). The
->> > > > > same configuration works correctly on Ice Lake (Xeon Gold 6338).
->> > >
->> > > Does Sierra Forest have IPI virtualization?  If so, you could try ru=
-nning with
->> > > APICv enabled, but enable_ipiv=3Dfalse to specifically disable IPI v=
-irtualization.
->> > Yes, it does:
->> > $  grep . /sys/module/kvm_intel/parameters/*
->> > /sys/module/kvm_intel/parameters/allow_smaller_maxphyaddr:N
->> > /sys/module/kvm_intel/parameters/dump_invalid_vmcs:N
->> > /sys/module/kvm_intel/parameters/emulate_invalid_guest_state:Y
->> > /sys/module/kvm_intel/parameters/enable_apicv:Y
->> > /sys/module/kvm_intel/parameters/enable_ipiv:Y
->> > /sys/module/kvm_intel/parameters/enable_shadow_vmcs:Y
->> > /sys/module/kvm_intel/parameters/ept:Y
->> > /sys/module/kvm_intel/parameters/eptad:Y
->> > /sys/module/kvm_intel/parameters/error_on_inconsistent_vmcs_config:Y
->> > /sys/module/kvm_intel/parameters/fasteoi:Y
->> > /sys/module/kvm_intel/parameters/flexpriority:Y
->> > /sys/module/kvm_intel/parameters/nested:Y
->> > /sys/module/kvm_intel/parameters/nested_early_check:N
->> > /sys/module/kvm_intel/parameters/ple_gap:128
->> > /sys/module/kvm_intel/parameters/ple_window:4096
->> > /sys/module/kvm_intel/parameters/ple_window_grow:2
->> > /sys/module/kvm_intel/parameters/ple_window_max:4294967295
->> > /sys/module/kvm_intel/parameters/ple_window_shrink:0
->> > /sys/module/kvm_intel/parameters/pml:Y
->> > /sys/module/kvm_intel/parameters/preemption_timer:Y
->> > /sys/module/kvm_intel/parameters/sgx:N
->> > /sys/module/kvm_intel/parameters/unrestricted_guest:Y
->> > /sys/module/kvm_intel/parameters/vmentry_l1d_flush:not required
->> > /sys/module/kvm_intel/parameters/vnmi:Y
->> > /sys/module/kvm_intel/parameters/vpid:Y
->> >
->> > I tried to disable ipiv, but it doesn't help. freebsd hang on reboot.
->> > sudo modprobe -r kvm_intel
->> > sudo modprobe  kvm_intel enable_ipiv=3DN
->> > /sys/module/kvm_intel/parameters/enable_ipiv:N
->> >
->> > Thx!
->> +cc Vitaly
->> Sorry, I missed one detail, we are use hyper-V enlightment features:
->> "+hv-relaxed,+hv-vapic,+hv-time,+hv-runtime,hv-spinlocks=3D0x1fff,+hv-vp=
-index,+hv-synic,+hv-stimer,+hv-tlbflush,hv-ipi."
->>
->> did a lot tests with different features, and looks the hang is related
->> to  +hv-synic,+hv-stimer.  hv-synic seems the key which causes boot
->> hang of Freebsd 14.
->>
->> But the problem seems fixed with FreeBSD 15?  I guess it's this fix:
-> https://reviews.freebsd.org/D43508
->
->>
->> Seems it's a bug from freebsd side, rather than on kvm side to me, but
->> I'm puzzled by disable apicv helps?
+68
 
-In theory, FreeBSD should work well even if KVM is misdetected as
-genuine Hyper-V. Apparently, our emulation is not 1:1 and there are
-subtle differences which cause the hang. I did not look at FreeBSD code
-at all but my wild guess is that SynIC/stimer are not disabled properly
-upon reboot and this causes the problem. If we somehow manage to find
-how genuine Hyper-V's behavior is different, it would make sense to
-update KVM/QEMU to match.
+> How likely is
+> it to go from 2x 64bit words to 3x 64 bit words?
 
---=20
-Vitaly
+Maybe.
+
+> Rather than _LO, _HI,
+> would _1ST, _2ND be better leaving it open for _3RD?
+
+I can just open-code
+
+	VIRTIO_BIT_QWORD(VIRTIO_NET_F_GUEST_UDP_TUNNEL_GSO, 1)
+
+
+> I would also be tempted to rename these macros to include _LO_ and
+> _HI_ in them. VIRTIO_BIT_HI(VIRTIO_LO_F_IN_ORDER) is more likely to be
+> spotted as wrong this way.
+
+Hmm but with my macros compiler will warn so why uglify then?
+
+
+> An alternative would be to convert to a linux bitmap, which is
+> arbitrary length so you just use bit number and leave the
+> implementation to map that to the correct offset in the underlying
+> data structure.
+> 
+> 	Andrew
+
+Right but it's a bit more work as we then have to change
+all drivers. Not ruling this out, but this patchset
+is not aiming that high.
+
+-- 
+MST
 
 
