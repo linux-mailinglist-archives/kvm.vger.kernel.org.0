@@ -1,259 +1,164 @@
-Return-Path: <kvm+bounces-59685-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-59686-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [213.196.21.55])
-	by mail.lfdr.de (Postfix) with ESMTPS id 30578BC781D
-	for <lists+kvm@lfdr.de>; Thu, 09 Oct 2025 08:12:49 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id BC638BC78D6
+	for <lists+kvm@lfdr.de>; Thu, 09 Oct 2025 08:32:00 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ams.mirrors.kernel.org (Postfix) with ESMTPS id D06FE34B6BD
-	for <lists+kvm@lfdr.de>; Thu,  9 Oct 2025 06:12:48 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id D07241899374
+	for <lists+kvm@lfdr.de>; Thu,  9 Oct 2025 06:32:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DE066299922;
-	Thu,  9 Oct 2025 06:12:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CEAA429B204;
+	Thu,  9 Oct 2025 06:31:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="CbmIGXve"
+	dkim=pass (2048-bit key) header.d=ventanamicro.com header.i=@ventanamicro.com header.b="fDh31YBh"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f41.google.com (mail-wm1-f41.google.com [209.85.128.41])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 410962459D7
-	for <kvm@vger.kernel.org>; Thu,  9 Oct 2025 06:12:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A60792B9B9
+	for <kvm@vger.kernel.org>; Thu,  9 Oct 2025 06:31:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.41
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1759990356; cv=none; b=A7GZPaY3SvI3xgI+/xT5qm3uuQ1dcKnsw7gqjBioUxtYtoZOMF3HNAjO3qdhe0AldUTK/EKb0dcpTMB0ISlCES93HyikeDXq2l7bqdPzq4Otp7X3OrVJwBMunVMAcx1ypj7nxI9NMhXJztcNheEBpx8Zgyz90PhmEEhTJdVU9W4=
+	t=1759991513; cv=none; b=MHaHKet2wlenL4UUxlZ5c/u7RJy21sYRgNZ6lt1re/1liXkPpgCaShmrRXp+ystSy7vSaTocY3+X4cOoU3+5c43zTu+Pp31YvEOITcfdLGidesZQY1JIdGuwOtjXeLFroD8bOWOlkt6RQhVvtnvgHBv6dTOrj43mIOEjFTwYlHQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1759990356; c=relaxed/simple;
-	bh=MI6RSF4NOK4MepNK6VnhBlb5+fKB4cfghytxEFoX7MI=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=f5yjtsBloHT5FWR21KTgIIEpauNjxA48iO+DWOu/KuXJQNJ2Hoyiu+RjBlek9KLcGQ3pGZMqBHCN7ZTwdED03D9jggrqMj/AZnlT5ZMq6Oacm+EPGiSsMmL9Gbylq2CqErXb3T/x8jddi51Hf4/SQstf3VHvwLCMT+1z0ARftgU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=CbmIGXve; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1759990353;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-	bh=NRkB3HnbXEauvObRKfhLALPNCnH0LKvnQC+gj83VPV0=;
-	b=CbmIGXveOYXOiWVVlrxSyxO9zuzsvFL/YGV+fcnhtGkIYDWz45EdfHyNE+2f59fs0MfFEs
-	uGufdqqmjO+iOUb0CXNuY1qhsJT2Fb8bByc9LNnAAZtsx2vskdZFgzjgM+HzA2B4KaDWas
-	FHlHbUa++EVi5SUILim9yiOeljsoU5c=
-Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
- [209.85.128.70]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-262-vZXVXzwtNiadkkMpwES7zw-1; Thu, 09 Oct 2025 02:12:31 -0400
-X-MC-Unique: vZXVXzwtNiadkkMpwES7zw-1
-X-Mimecast-MFC-AGG-ID: vZXVXzwtNiadkkMpwES7zw_1759990350
-Received: by mail-wm1-f70.google.com with SMTP id 5b1f17b1804b1-46e36686ca1so5715905e9.2
-        for <kvm@vger.kernel.org>; Wed, 08 Oct 2025 23:12:31 -0700 (PDT)
+	s=arc-20240116; t=1759991513; c=relaxed/simple;
+	bh=YWnhHQcSyGlFWhF9IR/pq1cQnmO90pMmUASkR0pB2Sg=;
+	h=Mime-Version:Content-Type:Date:Message-Id:Subject:Cc:To:From:
+	 References:In-Reply-To; b=dgVUMjtQJ6ZDJG49fEwBHbE31dykkAOBQdXkdaTGoUfGhl9PjgYWE4ZEMQpAnwySNxhRnslUcNVCGNN1ZaatKG/UgDtxVjOhTRHwollTmxfS91QXxFYw2iYyThc7Lbh5RjS1aJ60V4QGW+USpO/FlHeR08284APcr2zIpqERvm8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ventanamicro.com; spf=pass smtp.mailfrom=ventanamicro.com; dkim=pass (2048-bit key) header.d=ventanamicro.com header.i=@ventanamicro.com header.b=fDh31YBh; arc=none smtp.client-ip=209.85.128.41
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ventanamicro.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ventanamicro.com
+Received: by mail-wm1-f41.google.com with SMTP id 5b1f17b1804b1-46e2cfbf764so769135e9.1
+        for <kvm@vger.kernel.org>; Wed, 08 Oct 2025 23:31:44 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=ventanamicro.com; s=google; t=1759991503; x=1760596303; darn=vger.kernel.org;
+        h=in-reply-to:references:from:to:cc:subject:message-id:date
+         :content-transfer-encoding:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=ZphDIVd5tmeP6KAhy58kJYA1PrGr3bDOHMWlYgqBwIY=;
+        b=fDh31YBh0j84ookgphRxISNEP0JZRmdqjNrT6DMwcDfLhSBv7jVRoRQi1A743a3DEW
+         G7Ll0wq1lAsNxD1maeeg071KVHL64a9iLRo3TEP+x/Ush4P/G1b8MxY9ReiTg7Bgbssh
+         S4g0ReyA6aOU36IlFLsbkYbR8itGsw/FEx/yX0++3B0gq6fsPW7vexYlFvBKVPC41Bsr
+         QSxrK+mkqVFnGWQQW2DOS1MHSPuyLPpLWcLc/ATeftSUAtb+cKK8pQwYSZAP+hs8Cc/S
+         F/Un7LMPtOuH/LzqEzaK7wYLhwBZ7r1LL0djihd8HCY7RQR/a8DeapiDJmvO73cWA3dZ
+         YLUA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1759990350; x=1760595150;
-        h=content-transfer-encoding:in-reply-to:autocrypt:content-language
-         :from:references:cc:to:subject:user-agent:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=NRkB3HnbXEauvObRKfhLALPNCnH0LKvnQC+gj83VPV0=;
-        b=f3SBMSDnMxK9ehSMAbI2aYvXNhR7qDcEbZDmmvvTcviVcY6K0262olx8IPiT466f5c
-         L8uxpH/+566cTh5lPZ2xcdo8K84S9mppFF7iims7+e8SBVY0sjL8K9Y8tYkf+KeHkDvl
-         HYZIgJ+Oa19QKiIFDotBzOglCjv06s5Wd9z3LswOuvcbo35+BMtR+42yMLrvIMv2cc27
-         8kNX5QRuYSiZk9t85qcbi8kLD/x5VS936D4Vh8T+E82HMp/BUYmetdc2sbcVjqELbjWv
-         QoLjky4wRrlBAjIIcnRnuK1Ia+CJm0uVg/UGtsiiSgZu6y6ywO0JGUkuMmAcK912cpur
-         q8CQ==
-X-Forwarded-Encrypted: i=1; AJvYcCWRG1f285wx42eahZFqDliVcwmYXTWDBZ1quWm+enE3Hrj9m5cv7+aA8fLbqucqFDy8h3Y=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzwSjwdVGlj+d1NcERtNhwKhwghfYOvhZ9ZFyih36wV8FgX+5wq
-	ezPuoshl4UzuO+A9eEqVX4AoPB3Vi/A5FinEsEVgy0kiJkmKg+p1VSc5n/1jSkNIK8t2ThwlWjl
-	x6HawaI+npmS7hSzTC4hR45AgS4ERd+uL//V4/UjYXE9RRJzgwR4GiQ==
-X-Gm-Gg: ASbGncuxq690YqIIJATkPj7AmIvLsamh5Mu3RHaRjSP2bG1XgnSLee0d0uw2A/OMi5u
-	GJQzTuq2/Ngz+ko5HzagjUnKJEw21dXY7VlwM4jVX4RUpcbwKpQEtsmFPvyDAbFbfrePRM27I67
-	D31mvsT/f2yW96MdYkyqPkr90fM63GGcgQcx/i/oALW083KOovGFK90o92QvZ9rYjnGwxJR89yT
-	qip+E1uUzTeyTXhIx2EvXMVE44A5p1SXau7oNAIfDmwhpDBTHdnhqZ7CTzi1nhSF102rcNTkfEd
-	yv8cdsK11QOxfhs6XQ4F/o/dSgGoD7CMXNsOK7CUgNKH8UNwayS6xAVs3ewKiY8ZhbXlTcEVmqH
-	nECnDbP3h
-X-Received: by 2002:a05:600c:34cc:b0:46e:59dd:1b4d with SMTP id 5b1f17b1804b1-46fa9aa2076mr63277535e9.16.1759990350184;
-        Wed, 08 Oct 2025 23:12:30 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IGgr3EwtW4kZSC4wN79xTrMonutG/ORyGxtzc7Y7j2Fbu8/LN9oI7c3abBPFzy3SYjFVQbwOQ==
-X-Received: by 2002:a05:600c:34cc:b0:46e:59dd:1b4d with SMTP id 5b1f17b1804b1-46fa9aa2076mr63277065e9.16.1759990349745;
-        Wed, 08 Oct 2025 23:12:29 -0700 (PDT)
-Received: from [192.168.3.141] (tmo-083-189.customers.d1-online.com. [80.187.83.189])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-4255d869d50sm33971611f8f.0.2025.10.08.23.12.26
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 08 Oct 2025 23:12:29 -0700 (PDT)
-Message-ID: <5a5013ca-e976-4622-b881-290eb0d78b44@redhat.com>
-Date: Thu, 9 Oct 2025 08:12:25 +0200
+        d=1e100.net; s=20230601; t=1759991503; x=1760596303;
+        h=in-reply-to:references:from:to:cc:subject:message-id:date
+         :content-transfer-encoding:mime-version:x-gm-message-state:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=ZphDIVd5tmeP6KAhy58kJYA1PrGr3bDOHMWlYgqBwIY=;
+        b=tKdkRIjAthwWh19k4M1K7kX99nJi8/3gdWm75g/oVl0tMEHeeYPm4vndqnbMyMl5gr
+         cRdDG/pVg2vaeVXbCHPl03VQ3C6ivIBaBKli2F3i+LQUr4IkRVKEDb4WY7Snq6QKxWbe
+         1uG0DcxAPzrd+Tr4aJnCt7gkOI3lFQpvPYnxQkWRvkPx52r1Gzl7j7XXOHcWxt049Ysj
+         wGYjHrcINMzkj92gAVDkFU1/wOhGf+r50XQ9eHWJm7Igxo210OFgE2h2vbQkdpZy9c3p
+         kV7fa0hnNtUcIiLq5tGJWuBwy3qdP2gAEMMai1sWKY+rdWnn87Dv8IjwjZh3TknraRCl
+         uztg==
+X-Forwarded-Encrypted: i=1; AJvYcCVtLibreaDcvgYiC4gg1jcu3fFxYt5wIiZ3Le75zGMf4ZzM/d3R45qTTamkU9KIixz1zMw=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yz3pZ54Vj+oudAxBlFKK1HSQhq+J5wWHhH2B8Yv0ilGsyN/RUXQ
+	GwcWlbf3FgYpd4vmLhDmrF9zj0vVGxz78maBt8oiktwuJp/COwXnP6/WLPKD/a790DU=
+X-Gm-Gg: ASbGncu/oDfqCyoZoqUvIAhLFwwfxQLhFrOKdC9j92s1mOTV/GDlTTrOOPGOlzLsIpz
+	iZre+Cpwyg8F+ldgG8wpUbURjOtOgY5muuW0kKFmkGKeUz2lh8d7jIxp3uUPwR41yb1Zagi/BZS
+	Id8keUnpbr/DZCbOfNu6YAE+ot3OUUfIxoegwEJVMFampLyzOewJqP2URsikMU6scsNHcW/88Hy
+	F28m4YOH8Qqk0zJsjt6hvInyFBwJv3GEw5LytIYEI3FjAeQJwEqHA/n4Np/kFvkHu4I8eJDa1Rl
+	1JvtdcSFMWq2omnmsdqT74XCC/GYYCm62tffP/Btv/IDTW3dT6AnyAElIxhX+6TNZdRwR654asR
+	mJpYvDquwf8aggfffslx3kbmGnwB29n8dTFnUdJ84JAioT/IWKze3qg7ceJI=
+X-Google-Smtp-Source: AGHT+IEIf07lX5X1t9lPoRt1uKJDa5WT2TozooFfyQvTgQYIm3IKeoNZOzn9APYtFiu6W4PehuHHyQ==
+X-Received: by 2002:a05:600c:548b:b0:46e:3d3d:ea92 with SMTP id 5b1f17b1804b1-46fa9b06cabmr25204355e9.5.1759991502804;
+        Wed, 08 Oct 2025 23:31:42 -0700 (PDT)
+Received: from localhost ([193.86.240.59])
+        by smtp.gmail.com with UTF8SMTPSA id ffacd0b85a97d-4255d8abf38sm32664903f8f.20.2025.10.08.23.31.41
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 08 Oct 2025 23:31:42 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH RFC 06/35] mm/page_alloc: reject unreasonable
- folio/compound page sizes in alloc_contig_range_noprof()
-To: Balbir Singh <balbirs@nvidia.com>, linux-kernel@vger.kernel.org
-Cc: Alexander Potapenko <glider@google.com>,
- Andrew Morton <akpm@linux-foundation.org>,
- Brendan Jackman <jackmanb@google.com>, Christoph Lameter <cl@gentwo.org>,
- Dennis Zhou <dennis@kernel.org>, Dmitry Vyukov <dvyukov@google.com>,
- dri-devel@lists.freedesktop.org, intel-gfx@lists.freedesktop.org,
- iommu@lists.linux.dev, io-uring@vger.kernel.org,
- Jason Gunthorpe <jgg@nvidia.com>, Jens Axboe <axboe@kernel.dk>,
- Johannes Weiner <hannes@cmpxchg.org>, John Hubbard <jhubbard@nvidia.com>,
- kasan-dev@googlegroups.com, kvm@vger.kernel.org,
- "Liam R. Howlett" <Liam.Howlett@oracle.com>,
- Linus Torvalds <torvalds@linux-foundation.org>, linux-arm-kernel@axis.com,
- linux-arm-kernel@lists.infradead.org, linux-crypto@vger.kernel.org,
- linux-ide@vger.kernel.org, linux-kselftest@vger.kernel.org,
- linux-mips@vger.kernel.org, linux-mmc@vger.kernel.org, linux-mm@kvack.org,
- linux-riscv@lists.infradead.org, linux-s390@vger.kernel.org,
- linux-scsi@vger.kernel.org, Lorenzo Stoakes <lorenzo.stoakes@oracle.com>,
- Marco Elver <elver@google.com>, Marek Szyprowski <m.szyprowski@samsung.com>,
- Michal Hocko <mhocko@suse.com>, Mike Rapoport <rppt@kernel.org>,
- Muchun Song <muchun.song@linux.dev>, netdev@vger.kernel.org,
- Oscar Salvador <osalvador@suse.de>, Peter Xu <peterx@redhat.com>,
- Robin Murphy <robin.murphy@arm.com>, Suren Baghdasaryan <surenb@google.com>,
- Tejun Heo <tj@kernel.org>, virtualization@lists.linux.dev,
- Vlastimil Babka <vbabka@suse.cz>, wireguard@lists.zx2c4.com, x86@kernel.org,
- Zi Yan <ziy@nvidia.com>
-References: <20250821200701.1329277-1-david@redhat.com>
- <20250821200701.1329277-7-david@redhat.com>
- <fa2e262c-d732-48e3-9c59-6ed7c684572c@nvidia.com>
-From: David Hildenbrand <david@redhat.com>
-Content-Language: en-US
-Autocrypt: addr=david@redhat.com; keydata=
- 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
- qIws/H2t
-In-Reply-To: <fa2e262c-d732-48e3-9c59-6ed7c684572c@nvidia.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Mime-Version: 1.0
+Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=UTF-8
+Date: Thu, 09 Oct 2025 08:31:41 +0200
+Message-Id: <DDDKX1VNCCVS.2KVYNU4WBEOVI@ventanamicro.com>
+Subject: Re: [PATCH] RISC-V: KVM: flush VS-stage TLB after VCPU migration to
+ prevent stale entries
+Cc: <anup@brainfault.org>, <atish.patra@linux.dev>, <pjw@kernel.org>,
+ <palmer@dabbelt.com>, <aou@eecs.berkeley.edu>, <alex@ghiti.fr>,
+ <liujingqi@lanxincomputing.com>, <kvm@vger.kernel.org>,
+ <kvm-riscv@lists.infradead.org>, <linux-riscv@lists.infradead.org>,
+ <linux-kernel@vger.kernel.org>, <tim609@andestech.com>, "Hui Min Mina Chou"
+ <minachou@andestech.com>, "linux-riscv"
+ <linux-riscv-bounces@lists.infradead.org>
+To: "Ben Zong-You Xie" <ben717@andestech.com>
+From: =?utf-8?q?Radim_Kr=C4=8Dm=C3=A1=C5=99?= <rkrcmar@ventanamicro.com>
+References: <20251002033402.610651-1-ben717@andestech.com>
+In-Reply-To: <20251002033402.610651-1-ben717@andestech.com>
 
-On 09.10.25 06:21, Balbir Singh wrote:
-> On 8/22/25 06:06, David Hildenbrand wrote:
->> Let's reject them early, which in turn makes folio_alloc_gigantic() reject
->> them properly.
->>
->> To avoid converting from order to nr_pages, let's just add MAX_FOLIO_ORDER
->> and calculate MAX_FOLIO_NR_PAGES based on that.
->>
->> Signed-off-by: David Hildenbrand <david@redhat.com>
->> ---
->>   include/linux/mm.h | 6 ++++--
->>   mm/page_alloc.c    | 5 ++++-
->>   2 files changed, 8 insertions(+), 3 deletions(-)
->>
->> diff --git a/include/linux/mm.h b/include/linux/mm.h
->> index 00c8a54127d37..77737cbf2216a 100644
->> --- a/include/linux/mm.h
->> +++ b/include/linux/mm.h
->> @@ -2055,11 +2055,13 @@ static inline long folio_nr_pages(const struct folio *folio)
->>   
->>   /* Only hugetlbfs can allocate folios larger than MAX_ORDER */
->>   #ifdef CONFIG_ARCH_HAS_GIGANTIC_PAGE
->> -#define MAX_FOLIO_NR_PAGES	(1UL << PUD_ORDER)
->> +#define MAX_FOLIO_ORDER		PUD_ORDER
-> 
-> Do we need to check for CONTIG_ALLOC as well with CONFIG_ARCH_HAS_GIGANTIC_PAGE?
-> 
+2025-10-02T11:34:02+08:00, Ben Zong-You Xie <ben717@andestech.com>:
+> From: Hui Min Mina Chou <minachou@andestech.com>
+>
+> If multiple VCPUs of the same Guest/VM run on the same Host CPU,
+> hfence.vvma only flushes that Host CPU=E2=80=99s VS-stage TLB. Other Host=
+ CPUs
+> may retain stale VS-stage entries. When a VCPU later migrates to a
+> different Host CPU, it can hit these stale GVA to GPA mappings, causing
+> unexpected faults in the Guest.
 
-I don't think so, can you elaborate?
+The issue can also be hit with a single VCPU migrated over two harts:
 
->>   #else
->> -#define MAX_FOLIO_NR_PAGES	MAX_ORDER_NR_PAGES
->> +#define MAX_FOLIO_ORDER		MAX_PAGE_ORDER
->>   #endif
->>   
->> +#define MAX_FOLIO_NR_PAGES	(1UL << MAX_FOLIO_ORDER)
->> +
->>   /*
->>    * compound_nr() returns the number of pages in this potentially compound
->>    * page.  compound_nr() can be called on a tail page, and is defined to
->> diff --git a/mm/page_alloc.c b/mm/page_alloc.c
->> index ca9e6b9633f79..1e6ae4c395b30 100644
->> --- a/mm/page_alloc.c
->> +++ b/mm/page_alloc.c
->> @@ -6833,6 +6833,7 @@ static int __alloc_contig_verify_gfp_mask(gfp_t gfp_mask, gfp_t *gfp_cc_mask)
->>   int alloc_contig_range_noprof(unsigned long start, unsigned long end,
->>   			      acr_flags_t alloc_flags, gfp_t gfp_mask)
->>   {
->> +	const unsigned int order = ilog2(end - start);
-> 
-> Do we need a VM_WARN_ON(end < start)?
+  1) [hart A] accessing X as Y, caching X->Y in first stage TLB
+  2) [hart B] remapping X to Z, sfence.vma
+  3) [hart A] accessing X as Y, instead of correct Z
 
-I don't think so.
+Migration from 2 to 1 does hfence.gvma, but that doesn't flush first
+stage TLB, so the translation produces an error due to stale entries.
 
-> 
->>   	unsigned long outer_start, outer_end;
->>   	int ret = 0;
->>   
->> @@ -6850,6 +6851,9 @@ int alloc_contig_range_noprof(unsigned long start, unsigned long end,
->>   					    PB_ISOLATE_MODE_CMA_ALLOC :
->>   					    PB_ISOLATE_MODE_OTHER;
->>   
->> +	if (WARN_ON_ONCE((gfp_mask & __GFP_COMP) && order > MAX_FOLIO_ORDER))
->> +		return -EINVAL;
->> +
->>   	gfp_mask = current_gfp_context(gfp_mask);
->>   	if (__alloc_contig_verify_gfp_mask(gfp_mask, (gfp_t *)&cc.gfp_mask))
->>   		return -EINVAL;
->> @@ -6947,7 +6951,6 @@ int alloc_contig_range_noprof(unsigned long start, unsigned long end,
->>   			free_contig_range(end, outer_end - end);
->>   	} else if (start == outer_start && end == outer_end && is_power_of_2(end - start)) {
->>   		struct page *head = pfn_to_page(start);
->> -		int order = ilog2(end - start);
->>   
->>   		check_new_pages(head, order);
->>   		prep_new_page(head, order, gfp_mask, 0);
-> 
-> Acked-by: Balbir Singh <balbirs@nvidia.com>
+What RISC-V implementation are you using?  (And does the implementation
+have the same memory access performance in V=3D0 and V=3D1 modes, even
+though the latter has two levels of TLBs?)
 
-Thanks for the review, but note that this is already upstream.
+> To fix this, kvm_riscv_gstage_vmid_sanitize() is extended to flush both
+> G-stage and VS-stage TLBs whenever a VCPU migrates to a different Host CP=
+U.
+> This ensures that no stale VS-stage mappings remain after VCPU migration.
+>
+> Fixes: b79bf2025dbc ("RISC-V: KVM: Rename and move kvm_riscv_local_tlb_sa=
+nitize()")
 
--- 
-Cheers
+b79bf2025dbc does not change behavior.
+The bug must have been introduced earlier.
 
-David / dhildenb
+> Signed-off-by: Hui Min Mina Chou <minachou@andestech.com>
+> Signed-off-by: Ben Zong-You Xie <ben717@andestech.com>
+> ---
+> diff --git a/arch/riscv/kvm/vmid.c b/arch/riscv/kvm/vmid.c
+> @@ -146,4 +146,10 @@ void kvm_riscv_gstage_vmid_sanitize(struct kvm_vcpu =
+*vcpu)
 
+The function is now doing more that sanitizing gstage.
+Maybe we can again call it kvm_riscv_local_tlb_sanitize()?
+
+> =20
+>  	vmid =3D READ_ONCE(vcpu->kvm->arch.vmid.vmid);
+>  	kvm_riscv_local_hfence_gvma_vmid_all(vmid);
+> +
+> +	/*
+> +	 * Flush VS-stage TLBs entry after VCPU migration to avoid using
+> +	 * stale entries.
+> +	 */
+> +	kvm_riscv_local_hfence_vvma_all(vmid);
+>  }
+
+I had some nits, but the approach is sound,
+
+Reviewed-by: Radim Kr=C4=8Dm=C3=A1=C5=99 <rkrcmar@ventanamicro.com>
+
+Thanks.
+
+---
+There is a room for a RISC-V extension that tells whether the two TLB
+flushes are needed, or hfence.gvma is enough. :)
 
