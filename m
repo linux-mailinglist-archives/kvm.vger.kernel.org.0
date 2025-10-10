@@ -1,243 +1,110 @@
-Return-Path: <kvm+bounces-59778-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-59779-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
-	by mail.lfdr.de (Postfix) with ESMTPS id E4664BCE141
-	for <lists+kvm@lfdr.de>; Fri, 10 Oct 2025 19:27:47 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8767BBCE2BB
+	for <lists+kvm@lfdr.de>; Fri, 10 Oct 2025 19:56:20 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 79A374F2EF2
-	for <lists+kvm@lfdr.de>; Fri, 10 Oct 2025 17:27:46 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 568CD4256E4
+	for <lists+kvm@lfdr.de>; Fri, 10 Oct 2025 17:56:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4C52F22157E;
-	Fri, 10 Oct 2025 17:27:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 924BB29BD82;
+	Fri, 10 Oct 2025 17:56:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="afzOI2F1"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="x/xeE8yg"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pg1-f201.google.com (mail-pg1-f201.google.com [209.85.215.201])
+Received: from mail-pl1-f201.google.com (mail-pl1-f201.google.com [209.85.214.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E585C21ABAC
-	for <kvm@vger.kernel.org>; Fri, 10 Oct 2025 17:27:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 42D39224249
+	for <kvm@vger.kernel.org>; Fri, 10 Oct 2025 17:56:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1760117256; cv=none; b=rHVBfOPFzfhAMTs8Vuf1O808yQ6nHvSFlyoD5rzb9aG9UdwQ+8wEKr4D+d942Vhb3ShBK4kalA8BoTfkyPyjBD8OXODz6dmz4LE+antckhZA4BhziSsakrEkb5hLasngLBrLffjOQDVdlm0QKNll387ngvm5RZzduJzt6xojDkU=
+	t=1760118967; cv=none; b=OKIlV2Cs2L6c5eWZV2wkHGV2qXtId8NwOZc7fJU18NeioSh55jcyqiv2H6W+maKAlevcHgXNm4+XWIfHOxPF/EmyH52/09Fiv/xjl81wzlFe1LGlq+KjibomK5W9GvQf5aQWuQ2SwIF7tuK7rC/kVxPxiRXLDJnwN9e4cv100Vc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1760117256; c=relaxed/simple;
-	bh=ml7tkRYI4xUtnVPnGG3PEMXwN8cqSfZjMGoJtLfhFCk=;
+	s=arc-20240116; t=1760118967; c=relaxed/simple;
+	bh=4WCXyfTTCLJOyLXrUdyX+y0+hs9jTJ7a5FhgD26A9JM=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=FVQoio3v10k9UjH6I1viNKC4nr/sDkKLj4qWp/hqdWKZ+9nDGBti3FBGgnQ5qZtfmT2HNbMJLtD1RSKX6AJ/pMkdcVoMknEprN2+N07eSKmqEsz7bb4PBDL+/oisATNGrLt4fjwFFkUl7Te6qNBHq60p6LxlmkfStXJf7lw6U4Q=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=afzOI2F1; arc=none smtp.client-ip=209.85.215.201
+	 To:Cc:Content-Type; b=DsyEENKMisozJBjJn6c5XgDIdTRmScEoRw8f07hsBi+05xU6HKNpg9PvifnQFQYR7d2jCUqFMKLqxDrQxAJ3fQKxJ/RKmw/ur9cptJG2EcMoxeHnAip61En15zDz7K645KT5iiaam/39Q47yK46fLoqZrV9hhBy/ZLgb3pTdmps=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--ackerleytng.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=x/xeE8yg; arc=none smtp.client-ip=209.85.214.201
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pg1-f201.google.com with SMTP id 41be03b00d2f7-b62f9247dd1so4719676a12.0
-        for <kvm@vger.kernel.org>; Fri, 10 Oct 2025 10:27:34 -0700 (PDT)
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--ackerleytng.bounces.google.com
+Received: by mail-pl1-f201.google.com with SMTP id d9443c01a7336-28c58e009d1so78767495ad.3
+        for <kvm@vger.kernel.org>; Fri, 10 Oct 2025 10:56:06 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1760117254; x=1760722054; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1760118965; x=1760723765; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=pH+3AD8kiJqRKCGYKWcLo8VESpsbXYEFy+dJrOPNWBo=;
-        b=afzOI2F1k7v90/qFAEODJJM8nGz2T5WQ4bchp1NxZP6hKYZxcB59/4MCHhFe7yFCT8
-         nCLDcAnPkS6Xw+CFEw9qHrS4XZfmZuuECK0pbwyP0YZU/4sTkes2oGVe4mUxBLS5Ahtq
-         p0FgupSNiQMHcR8f6C2MBB+F5dKOgpLn0ZXwDNRrjXdAIw4DrBvz/e2i6DoPS7xs7M/l
-         vsDMBbQI2pYGnU3P+lY8lF+p3zM+UKSKplNoVHkzORJLrCGOO/jtSVA5N0BVoyJLv7Gj
-         QxXZ2iDjJfzmdErBUOES00pMPAcksVAubrfM2k0SyRkugF+dKW9yPNaM7zdXC7h2ejz5
-         KfhQ==
+        bh=r+fNeysjSBqXJo83LMvpOWAm6fUtr/rW8XiVtt3RPUw=;
+        b=x/xeE8yg5d1JoPSxDsj/raHLY1e6kOa/qsvwlfM5/NiBmexMmUqSwZ1QQnV8CTeBey
+         fa85u+8FXQiOCbJ0I04Vm1P6oLKVrQo+cYplDc5ElXXsqY9yGQn3Ri49t2Lg16D+m9xb
+         II6lOrAp9UxS978ZhsB9NDSCYcBYas1vkpAfmGYpznUhqQu+8s5n/ERaITkmYbAZHnmf
+         PytoeuF/L7G8MYu7GB5NfO4k7IDLG//K+zkZ6+vpls2hAec2e2NGIGtT9toQ/hZfL/Jl
+         mpZGNxVx0Pqo4XFtxG4lNu52xTtYXuiMK9aSOn0H4MCPn0uAMXC5tIdX7BA3sZOOn3SX
+         vQvg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1760117254; x=1760722054;
+        d=1e100.net; s=20230601; t=1760118965; x=1760723765;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=pH+3AD8kiJqRKCGYKWcLo8VESpsbXYEFy+dJrOPNWBo=;
-        b=qYcbAZmDAMha6FV/vmTmLjQtFkxFVy5gllTWmg8fo4PE4XGluawgD0ORJAt+kxrLCq
-         nYt7al76qfUdxrHCbs7+VuUSThiw3EhAUVwumV8xibSUB8vRx3Kf+OkLM4yW4rQUWs48
-         ZC+vCzpmu4FEPr3OOfJiQJjkq61XoydcpzcMyETyyi7VY1LfB/DL82yJkP28eOqeaFwJ
-         gCoecRBqpqwnB8MM/mSdDQzTgaU5bymT38aVn1il9X1O+O03MPjckqU6B1A4/U0phuxK
-         0Mj8XXc9Gp1Y4SRWXT9qBcFVajrgoovALiJIu5dNiJp8sSTC1e9CYzEBSOxagfpBQ4NQ
-         feeA==
-X-Forwarded-Encrypted: i=1; AJvYcCV34EzDq8w8hAsvSUowPbhvZxER3/Oh6nBsTI93Sn/MwKnRhrhq8WlKT799o8lTOVrCyv8=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yy0y9XaDjoqopxrPhuGnpdgVsTi9wCX3eMWC4VBRId7k/Ydt88n
-	/EPpLJ16r+tiUZB1Bwnt36CjspJTdP/ttj/+hFIbMBPBXwnS6m6HfCF6UG90NtffzRAD+T6Mcin
-	Cksz+dg==
-X-Google-Smtp-Source: AGHT+IGLlaru28z5BZejE+3H8K3desl6vTwTOLea5xBA+YbUfKPv8Q3V+etJLSLVdLEu9RSlY4xKC/8mIr8=
-X-Received: from pjbpb16.prod.google.com ([2002:a17:90b:3c10:b0:330:49f5:c0b1])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:38c3:b0:32b:d8af:b636
- with SMTP id 98e67ed59e1d1-33b51377d87mr16939056a91.19.1760117253944; Fri, 10
- Oct 2025 10:27:33 -0700 (PDT)
-Date: Fri, 10 Oct 2025 10:27:32 -0700
-In-Reply-To: <20250902080307.153171-2-shivankg@amd.com>
+        bh=r+fNeysjSBqXJo83LMvpOWAm6fUtr/rW8XiVtt3RPUw=;
+        b=V9AFJNuKk3QhBHSdOSA20tl3MbY1lOiY3cp04zHXVXqCyyucIJcop45IoIckOh+c2g
+         b3qX8hmBGhBPOm5S2G4y0fdi+3bc8xMH8eX1H/Nd4EuTP3XLKyrBa1Km2XA3LxRmBNJu
+         vWQ/6SeRsrsv0Y6oN1lBpnsZeHMA+RLFGE2Xb/f/qI3nufBG7Q9XXszedclP6HvCsszG
+         TxQwiGqc508/I8zHB+/DxMGGGLSRCEDjvH6oTEXvcHgG0PN97BIzDZgeMAsQ4KixCeb8
+         Ddl0FDJpRR+LaYsv/ZlBvmpiqqxU4yBYLj8JYaXaAgc78h72psLtkPcjrHOKMrUn7JET
+         6kqA==
+X-Forwarded-Encrypted: i=1; AJvYcCUVBPQdHLVHgKgK7wtkBZ+G2LR2kw1/wM0E965h+QtsA4bID2i5hfkfbuiJHAPbjFKyCQA=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwUCb1mKmotcb9pBqGRCtkSbYyi+O0mexyULXceJ53Yd45sAX4d
+	zrBuO/xVthpALxWK4jRecwApsR0pL3MArffI1/WjEvXSkX2S0l4rtqcibGkKr7Fc5kdWcA6nyGb
+	U7RanGDYXfHOjJqcKe9BDP1VtsQ==
+X-Google-Smtp-Source: AGHT+IGjclZ91N97ptCXAmoIKfA3u2zw8eqXw1SihXP/pw9xAZDrc7Put3tnbaSd6Ang0fIk2Ogt4e6D4jCqFIGlKA==
+X-Received: from pjbsk7.prod.google.com ([2002:a17:90b:2dc7:b0:339:dc19:ae60])
+ (user=ackerleytng job=prod-delivery.src-stubby-dispatcher) by
+ 2002:a17:903:2a8d:b0:24e:e5c9:ecfd with SMTP id d9443c01a7336-290273ffc74mr153940805ad.42.1760118965545;
+ Fri, 10 Oct 2025 10:56:05 -0700 (PDT)
+Date: Fri, 10 Oct 2025 10:56:04 -0700
+In-Reply-To: <46f31ad5-be3b-4945-87d1-c280f76fba76@amd.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
-References: <20250902080307.153171-2-shivankg@amd.com>
-Message-ID: <aOlCBEw1DpdLlWA1@google.com>
-Subject: Re: [PATCH V2 kvm-next] KVM: guest_memfd: use kvm_gmem_get_index() in
- more places and smaller cleanups
-From: Sean Christopherson <seanjc@google.com>
-To: Shivank Garg <shivankg@amd.com>
-Cc: pbonzini@redhat.com, david@redhat.com, kvm@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, linux-coco@lists.linux.dev
-Content-Type: text/plain; charset="us-ascii"
+References: <20251007221420.344669-1-seanjc@google.com> <diqz5xcniyhb.fsf@google.com>
+ <46f31ad5-be3b-4945-87d1-c280f76fba76@amd.com>
+Message-ID: <diqz347qhc97.fsf@google.com>
+Subject: Re: [PATCH v12 00/12] KVM: guest_memfd: Add NUMA mempolicy support
+From: Ackerley Tng <ackerleytng@google.com>
+To: "Garg, Shivank" <shivankg@amd.com>, Sean Christopherson <seanjc@google.com>, Marc Zyngier <maz@kernel.org>, 
+	Oliver Upton <oliver.upton@linux.dev>, Paolo Bonzini <pbonzini@redhat.com>
+Cc: linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, 
+	kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	David Hildenbrand <david@redhat.com>, Fuad Tabba <tabba@google.com>, Ashish Kalra <ashish.kalra@amd.com>, 
+	Vlastimil Babka <vbabka@suse.cz>, akpm@linux-foundation.org
+Content-Type: text/plain; charset="UTF-8"
 
-TL;DR: Please split this into three patches, call out the use of
-kvm_gmem_get_index() in kvm_gmem_prepare_folio, and unless someone feels strongly
-about the ULONG_MAX change, just drop it.
+"Garg, Shivank" <shivankg@amd.com> writes:
 
-On Tue, Sep 02, 2025, Shivank Garg wrote:
-> Move kvm_gmem_get_index() to the top of the file and make it available for
-> use in more places.
+> On 10/10/2025 2:28 AM, Ackerley Tng wrote:
+>> For future reference, these are the three specific patches:
+>> 
+>> [1] https://lore.kernel.org/all/20250827175247.83322-4-shivankg@amd.com/
+>> [2] https://lore.kernel.org/all/20250827175247.83322-5-shivankg@amd.com/
+>> [3] https://lore.kernel.org/all/20250827175247.83322-6-shivankg@amd.com/
+>> 
+>> Might have missed this, did we discuss how these 3 would get merged? I
+>> noticed this patch was withdrawn, not sure what that means: [4]
+>> 
+>
+> Andrew confirmed he's fine with these MM changes going through the KVM tree.
+>
+>> [4] https://lore.kernel.org/all/20250625000155.62D08C4CEE3@smtp.kernel.org/
+>
 
-Not just "in more places", specifically for kvm_gmem_prepare_folio().  And this
-also has kvm_gmem_prepare_folio() _use_ the helper.  That detail matters, because
-without having actual user, such code movement would be completely arbitrary and
-likely pointless churn.  E.g. AFAICT, it's not needed for the NUMA support or
-even for the WIP-but-functional in-place conversion patches I have.
+Thanks Shivank and Andrew!
 
-> Remove redundant initialization of the gmem variable because it's already
-> initialized.
-> 
-> Replace magic number -1UL with ULONG_MAX.
-
-This is quite clearly three distinct patches.  Yes, they're trivial, but that's
-exactly why they should be split up: it takes so, so little brain power to review
-super trivial patches.  Bundling such patches together almost always increases
-the total review cost relative to if they are split up.  I.e. if split, the cost
-is A + B + C, but bundled together, the cost is A + B + C + X, where 'X' is the
-extra effort it takes to figure out what changes go with what part of the changelog.
-And sometimes (and for me, it's the case here), X > A + B + C, which makes for
-grumpy reviewers.
-
-Case in point, it took me way too long to spot the new use of kvm_gmem_get_index()
-in kvm_gmem_prepare_folio(), due to the noise from the other changes getting in
-the way.
-
-More importantly, bundling things together like this makes it an all-or-nothing
-proposition.  That matters, because I don't want to take the ULONG_MAX change.
-The -1 pattern is meaningful (at least, IMO), as KVM is very specifically
-invalidating 0 => 0xffffffff_ffffffff.  I don't love hiding those details behind
-ULONG_MAX.  I realize it's a somewhat silly position, because xarray uses ULONG_MAX
-for it's terminal value, but it gets weird in the guest_memfd code because @end is
-used for both the xarray and for gfn range sent over to KVM.
-
-Amusingly, the -1UL is also technically wrong, because @end is exclusive.  AFAIK
-it's not actually possible to populate offset -1, so it's a benign off-by-one,
-but I think super duper technically, we would want something absurd like this:
-
-diff --git a/virt/kvm/guest_memfd.c b/virt/kvm/guest_memfd.c
-index cfbb2f1aa1ab..f4d15cda2029 100644
---- a/virt/kvm/guest_memfd.c
-+++ b/virt/kvm/guest_memfd.c
-@@ -231,12 +231,13 @@ static void __kvm_gmem_invalidate_begin(struct gmem_file *f, pgoff_t start,
-                                        pgoff_t end,
-                                        enum kvm_gfn_range_filter attr_filter)
- {
-+       pgoff_t last  = end == -1UL ? ULONG_MAX : end;
-        bool flush = false, found_memslot = false;
-        struct kvm_memory_slot *slot;
-        struct kvm *kvm = f->kvm;
-        unsigned long index;
- 
--       xa_for_each_range(&f->bindings, index, slot, start, end - 1) {
-+       xa_for_each_range(&f->bindings, index, slot, start, last) {
-                pgoff_t pgoff = slot->gmem.pgoff;
- 
-                struct kvm_gfn_range gfn_range = {
-
-> No functional change intended.
-> 
-> Signed-off-by: Shivank Garg <shivankg@amd.com>
-> ---
-> Applies cleanly on kvm-next (a6ad54137) and guestmemfd-preview (3d23d4a27).
-> 
-> Changelog:
-> V2: Incorporate David's suggestions.
-> V1: https://lore.kernel.org/all/20250901051532.207874-3-shivankg@amd.com
-> 
-> 
->  virt/kvm/guest_memfd.c | 17 +++++++++--------
->  1 file changed, 9 insertions(+), 8 deletions(-)
-> 
-> diff --git a/virt/kvm/guest_memfd.c b/virt/kvm/guest_memfd.c
-> index b2d6ad80f54c..1299e5e50844 100644
-> --- a/virt/kvm/guest_memfd.c
-> +++ b/virt/kvm/guest_memfd.c
-> @@ -44,6 +44,11 @@ static inline kvm_pfn_t folio_file_pfn(struct folio *folio, pgoff_t index)
->  	return folio_pfn(folio) + (index & (folio_nr_pages(folio) - 1));
->  }
->  
-> +static pgoff_t kvm_gmem_get_index(struct kvm_memory_slot *slot, gfn_t gfn)
-> +{
-> +	return gfn - slot->base_gfn + slot->gmem.pgoff;
-> +}
-> +
->  static int __kvm_gmem_prepare_folio(struct kvm *kvm, struct kvm_memory_slot *slot,
->  				    pgoff_t index, struct folio *folio)
->  {
-> @@ -51,6 +56,7 @@ static int __kvm_gmem_prepare_folio(struct kvm *kvm, struct kvm_memory_slot *slo
->  	kvm_pfn_t pfn = folio_file_pfn(folio, index);
->  	gfn_t gfn = slot->base_gfn + index - slot->gmem.pgoff;
->  	int rc = kvm_arch_gmem_prepare(kvm, gfn, pfn, folio_order(folio));
-> +
-
-Spurious whitespace change.  Yes, a newline should technically be there, but if
-we make a change, I would prefer:
-
-	int rc;
-
-	rc = kvm_arch_gmem_prepare(kvm, gfn, pfn, folio_order(folio));
-	if (rc) {
-		...
-	}
-
-So that the check of the return value is tightly couple to the function call that
-set the return value.
-
->  	if (rc) {
->  		pr_warn_ratelimited("gmem: Failed to prepare folio for index %lx GFN %llx PFN %llx error %d.\n",
->  				    index, gfn, pfn, rc);
-> @@ -107,7 +113,7 @@ static int kvm_gmem_prepare_folio(struct kvm *kvm, struct kvm_memory_slot *slot,
->  	 * checked when creating memslots.
->  	 */
->  	WARN_ON(!IS_ALIGNED(slot->gmem.pgoff, 1 << folio_order(folio)));
-> -	index = gfn - slot->base_gfn + slot->gmem.pgoff;
-> +	index = kvm_gmem_get_index(slot, gfn);
->  	index = ALIGN_DOWN(index, 1 << folio_order(folio));
->  	r = __kvm_gmem_prepare_folio(kvm, slot, index, folio);
->  	if (!r)
-> @@ -327,8 +333,8 @@ static int kvm_gmem_release(struct inode *inode, struct file *file)
->  	 * Zap all SPTEs pointed at by this file.  Do not free the backing
->  	 * memory, as its lifetime is associated with the inode, not the file.
->  	 */
-> -	kvm_gmem_invalidate_begin(gmem, 0, -1ul);
-> -	kvm_gmem_invalidate_end(gmem, 0, -1ul);
-> +	kvm_gmem_invalidate_begin(gmem, 0, ULONG_MAX);
-> +	kvm_gmem_invalidate_end(gmem, 0, ULONG_MAX);
->  
->  	list_del(&gmem->entry);
->  
-> @@ -354,10 +360,6 @@ static inline struct file *kvm_gmem_get_file(struct kvm_memory_slot *slot)
->  	return get_file_active(&slot->gmem.file);
->  }
->  
-> -static pgoff_t kvm_gmem_get_index(struct kvm_memory_slot *slot, gfn_t gfn)
-> -{
-> -	return gfn - slot->base_gfn + slot->gmem.pgoff;
-> -}
->  
->  static bool kvm_gmem_supports_mmap(struct inode *inode)
->  {
-> @@ -940,7 +942,6 @@ static struct folio *__kvm_gmem_get_pfn(struct file *file,
->  		return ERR_PTR(-EFAULT);
->  	}
->  
-> -	gmem = file->private_data;
->  	if (xa_load(&gmem->bindings, index) != slot) {
->  		WARN_ON_ONCE(xa_load(&gmem->bindings, index));
->  		return ERR_PTR(-EIO);
-> -- 
-> 2.43.0
-> 
+> Regarding [4]:
+> https://lore.kernel.org/linux-mm/aFlHIjLBwn3LQFMC@casper.infradead.org/
 
