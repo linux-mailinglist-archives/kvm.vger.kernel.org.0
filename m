@@ -1,87 +1,88 @@
-Return-Path: <kvm+bounces-59775-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-59776-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0581EBCDB9D
-	for <lists+kvm@lfdr.de>; Fri, 10 Oct 2025 17:11:19 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 00B5FBCDBE5
+	for <lists+kvm@lfdr.de>; Fri, 10 Oct 2025 17:13:27 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3C3A74080E2
-	for <lists+kvm@lfdr.de>; Fri, 10 Oct 2025 15:06:18 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2D55742483D
+	for <lists+kvm@lfdr.de>; Fri, 10 Oct 2025 15:08:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5DA5C2F7ADC;
-	Fri, 10 Oct 2025 15:05:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C42C82F83A1;
+	Fri, 10 Oct 2025 15:07:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ikxmbUG3"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="YvNqNllZ"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F3EE92F60CD
-	for <kvm@vger.kernel.org>; Fri, 10 Oct 2025 15:05:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 676BC2F7457
+	for <kvm@vger.kernel.org>; Fri, 10 Oct 2025 15:07:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1760108708; cv=none; b=YvjCyOR6qPSzjRiVw6yfEdBJG61pP+XxxFdR7rtN3xkF8MBHEzLXreRn/VoQBa+7qu1qO1nXnnCsfg09KS+YghaKg14UmJ9xqidD2g8eLmxXeulBdqtCV5QDGT25RpaXnKN/6AwxXTFMJTo29rbMeDw9Zi9gznLJuvCBy+FTuVY=
+	t=1760108876; cv=none; b=B6Vpzc2WYSRFKNFT6cFP3HzlOjXJ3t4LjPQWoeMvVURarCu7wScVBsEnP6rh5Al8AadiWA+DGAmesT+hyQheIR4ED+cXXOO7NDYj5u8Gxl5+fIUt+gAp3xb9aWzOPjeMcEXENaX/bIxTh1KC2rtWrMWKetL6zt/u7pvdBSumcWY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1760108708; c=relaxed/simple;
-	bh=cGGzf9hN3EGKjgIyz3nrHIYTNGgrUsMbns4BgkbDuv8=;
+	s=arc-20240116; t=1760108876; c=relaxed/simple;
+	bh=gQrwr4gwxMvke4mFhglRe1Cg7eWP4zQ10dzsO7O6LTw=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=cAuf20r761/RlUJFBRTxg6WPYePUuD55jKqch/QHIi1prxvaoaxlq4wnw2QDpMPAP5yaY6DsKRjXE456TPTu/0GO2Gyj+dIpfOP3SwbCVZ06YNCLcLCYIjDpEEpKWdmruq45ZPEViOG2rGGnHSsm5ucmQda3eV/BK5pXVhRAnBs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=ikxmbUG3; arc=none smtp.client-ip=170.10.133.124
+	 In-Reply-To:Content-Type; b=RU0IIn0UnPgbPwXF/pfUGUq/n/1Kydgy7j2kdTEovdO8yqoLeJwWa2lAwLw7Kl2N5LhZemOr1tDPVHUTiVwdHr97Qd4eq/eY/Ro02Eq1UpHFMK6IG5CxDDFCx2tdm66Ngi84NjVzQhUR2XjG+P1feyroqPqlRLJ9Y/uFVnlUstA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=YvNqNllZ; arc=none smtp.client-ip=170.10.129.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1760108705;
+	s=mimecast20190719; t=1760108873;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-	bh=14x8DQmV6z2ehBA4LIP2D9xCeyvVVgYWSqxD44RO2o8=;
-	b=ikxmbUG3eoY+DVRm6V9vsRp8f67M2Q9ZQnqw44OgOaB/kHhQcrAizxvoJ+GYhFP3GQxeQ7
-	+OYaqxyyPgtr3g2Y2KorNNMDBRi1HWzVyBHYvWmiu0Pm3E4y01w9WNHv8squttDabsViSJ
-	hLWdRgAKVIqVzHhKMUc5yPNWKNKJeB4=
-Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
- [209.85.221.69]) by relay.mimecast.com with ESMTP with STARTTLS
+	bh=LZmqunuZRQwJHo8CjkO0APHqvfQELPC5kOsrm4zYYHY=;
+	b=YvNqNllZIT8EnAcItKCWQ5SfdnyynJF9DcTg0N7bjs528I13rs7XAWEUvNj4KMLNJPODXg
+	y/J89RgxdOZ9lk9t1ji7jUBbdrFj2lfH4XGqHf41e6nvUT5cIzTEuvG4Cofh6T1xuLVVdk
+	qb4x//LL1VHGtC+yfOEz5w8kuIg6GzM=
+Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
+ [209.85.128.69]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-132-fl1Jls0ZMomJrPAt0oA4eg-1; Fri, 10 Oct 2025 11:05:04 -0400
-X-MC-Unique: fl1Jls0ZMomJrPAt0oA4eg-1
-X-Mimecast-MFC-AGG-ID: fl1Jls0ZMomJrPAt0oA4eg_1760108702
-Received: by mail-wr1-f69.google.com with SMTP id ffacd0b85a97d-42558f501adso1552442f8f.1
-        for <kvm@vger.kernel.org>; Fri, 10 Oct 2025 08:05:03 -0700 (PDT)
+ us-mta-35-DrjiwHe-NLeywOEVvbrKKw-1; Fri, 10 Oct 2025 11:07:52 -0400
+X-MC-Unique: DrjiwHe-NLeywOEVvbrKKw-1
+X-Mimecast-MFC-AGG-ID: DrjiwHe-NLeywOEVvbrKKw_1760108871
+Received: by mail-wm1-f69.google.com with SMTP id 5b1f17b1804b1-46b303f6c9cso17558015e9.2
+        for <kvm@vger.kernel.org>; Fri, 10 Oct 2025 08:07:51 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1760108702; x=1760713502;
+        d=1e100.net; s=20230601; t=1760108871; x=1760713671;
         h=content-transfer-encoding:in-reply-to:autocrypt:content-language
          :from:references:cc:to:subject:user-agent:mime-version:date
          :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=14x8DQmV6z2ehBA4LIP2D9xCeyvVVgYWSqxD44RO2o8=;
-        b=W8gjoYS8naKgWkpECuCtqRNEYDvyIE6EuQlUg2Y8Py3usygmLCp4ulXAmtkejuR0gb
-         lj09TcIQy2c2ZEWunUHAh1zji1tMZbX39pXr8F4GleCdfdfhBKZH+3OSE3xw7x3+pSEV
-         BWn0pzfMH/cOIwPlnYkcE1GB1o+D9E4gPKItX14JhxMJQ/X1x1WcjuncG/QqezbgXAXF
-         pik94EjCAqVaa/+LChmo6j1fUN8qtlkMm4KyHfITfPbiUpRvI1NxbgT5yhHflWi3s9Dz
-         2shpUXFuipTSEyjssjbCFrQIv6KixY8/p3TWID3PqaodCJ6wFnr/S+HAwOs3JJqBUbtw
-         NJTg==
-X-Gm-Message-State: AOJu0YwO/itMyZGEyKaiihbIf2ZSv7FApn+ny1uee+cIPfQqWgBzgDZ4
-	b5tyWmYOC4m8jvCTbbNKXpw7rsl5Y4HEWu3SuMsTQmxggGlalB66c4NLYfju5UUYf6PxQDTT9oT
-	k+0Pf9Jqd9kNVbRgXwKjNxOMQCFW7fG9lXTpApjAjiwauPB4hINzcfg==
-X-Gm-Gg: ASbGncuteTVHI6cbJESJr7Hnh3Umeg3L5SPfuGNLke+HbYAkiDFZ5ISujXrW29ACUKa
-	C4WXAWzcl3ns5jlLSNm7VYjz/5s+0dz3U8NIs59J21CrSdoQhdFBLAQqjP4o6SmoI+AjmzbWeHW
-	McN4HbVxxvbPbYzaQhPQAfMhyLUD8OTqYhfb6Ske+oP0xB4iHTnfKpDl/ah9rZriyiE5iloEi3d
-	pdXSS/o30UmuAHBxjS+E0dqW6PbNhuY0Iu2MifTmC7Y2Z7g0P+NX+d+fGi2Yy74GzmKXHqxyJs4
-	mMsSFN+VL1ltjAQNvdByFeKtDvQ/tYiKFXeapaojZ0sWxqYiVmQl0U2IVse2QCRBdP0PX6CFFn+
-	GZvg=
-X-Received: by 2002:a05:6000:420d:b0:3f8:e016:41c0 with SMTP id ffacd0b85a97d-42666abb540mr7265837f8f.10.1760108702268;
-        Fri, 10 Oct 2025 08:05:02 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IFdAL2XeniwemES/tB1DQlU4huABJjIG2OWey2XifuXvcbLTvo6OdHTiDcsvIO+vABjUKKRDA==
-X-Received: by 2002:a05:6000:420d:b0:3f8:e016:41c0 with SMTP id ffacd0b85a97d-42666abb540mr7265802f8f.10.1760108701605;
-        Fri, 10 Oct 2025 08:05:01 -0700 (PDT)
+        bh=LZmqunuZRQwJHo8CjkO0APHqvfQELPC5kOsrm4zYYHY=;
+        b=mk8hr5wi9L+SR1urwnOBrER8cwAHklZ8Efns3WHQIBZTM6BPWBv2zWGs7OeCsJYOAP
+         ZtyPRtbCYS2Ajkdk70HIpa+8XObpfEOjUY6eyt9PEablZAiHRrA3gSbHFWBJQADfu0a3
+         9U3nMeYzAywuLIDwF3Owng/CdzVSabI96ejFQi1WfZsS3S+5wJSy+79FEH54HZ0y9gUI
+         1FFS08G5yeyDIm5IqhXuofMbgOa1B4moMJlHJiXZ60RCWSxdBfhjkyRkO0VOkh0nRj74
+         0wZzqS+BmpbTaT2uYmBQ6Ir8bAr7cxzWvCyiSdGVJrAxkccbJjYbO5LJ3+fcSoG3Q3hP
+         qMmg==
+X-Forwarded-Encrypted: i=1; AJvYcCWsUUxsMF0MuKTzgZgzjqTZHLwvlClvQAAf6FXeJjUVCrcPQ6kCjyGtDrB1FGzQJqL+wKs=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwxPWizIiKjcuUI8Wgh7T0yAU1/62IZ71KeVj5zktWgqGWRKRb3
+	fmJH2jvm/W+PHFQbQ5JTCnnhxSFtLkTEh+HQhCcHo5drjbAKFqYf10fV51kM7iX6+n+GbTxpboL
+	h6xx4vrHI18pgThatVUr1XUuj5WPqdtVrSrQYysKt3uAW2v1mLk4rTA==
+X-Gm-Gg: ASbGncvRHyUwNBhVwoigL2OZ4FPuxIJQHT5B5a1imZgoYZ74lZ3p3aHpAPDYcY+tUVl
+	D9ORsCQI8qHu6OhlXkXvF0mVq32RU1rZjUeoNXwUbNqMYZG4EW1mdwnS7Bklc52I5QMvKUA5nrT
+	V5cfn+8vB0XqsHj8lxrjep/Kg7mMSm0nAybicbPgvtqyWA+XIVelmp30+bwDX+9VuL75oY5fD7h
+	av1llECVcS/phR4FbufkpxlHFkofYS1JfsR4qVeSUZThBuEG0RH8JJxMxBxTOG6iNiQDwBPHv5W
+	wsgocQ6DiEAHUu+YbmPh2oBUekrnfjI3MaFPg/CfeUKgNMyZhOYJc91WO7DAnLtgiwmvISA8FBV
+	UVUo=
+X-Received: by 2002:a05:600c:4750:b0:45f:28d2:bd38 with SMTP id 5b1f17b1804b1-46fa9af3095mr88636155e9.18.1760108870686;
+        Fri, 10 Oct 2025 08:07:50 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IH5JHSDo+98ZcIlXqkfGtP4ZZEWBP769aS/wsbUmwWkDRX+gxG1VW9W555xuFif1HCTIaL95g==
+X-Received: by 2002:a05:600c:4750:b0:45f:28d2:bd38 with SMTP id 5b1f17b1804b1-46fa9af3095mr88635835e9.18.1760108870194;
+        Fri, 10 Oct 2025 08:07:50 -0700 (PDT)
 Received: from [192.168.3.141] (tmo-083-189.customers.d1-online.com. [80.187.83.189])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-426ce582b44sm4575185f8f.16.2025.10.10.08.04.58
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-46fb489ad27sm51946505e9.15.2025.10.10.08.07.46
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 10 Oct 2025 08:05:01 -0700 (PDT)
-Message-ID: <76daa3ed-4f75-494e-ba3e-0bfcd7a367e4@redhat.com>
-Date: Fri, 10 Oct 2025 17:04:58 +0200
+        Fri, 10 Oct 2025 08:07:49 -0700 (PDT)
+Message-ID: <c8f74a07-9003-433a-9b1f-888df335e31b@redhat.com>
+Date: Fri, 10 Oct 2025 17:07:45 +0200
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -89,17 +90,18 @@ List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2 07/13] KVM: selftests: Create a new guest_memfd for
- each testcase
-To: Sean Christopherson <seanjc@google.com>,
- Paolo Bonzini <pbonzini@redhat.com>,
- Christian Borntraeger <borntraeger@linux.ibm.com>,
- Janosch Frank <frankja@linux.ibm.com>,
- Claudio Imbrenda <imbrenda@linux.ibm.com>
-Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
- Fuad Tabba <tabba@google.com>, Ackerley Tng <ackerleytng@google.com>
-References: <20251003232606.4070510-1-seanjc@google.com>
- <20251003232606.4070510-8-seanjc@google.com>
+Subject: Re: [PATCH v12 01/12] KVM: guest_memfd: Rename "struct kvm_gmem" to
+ "struct gmem_file"
+To: "Garg, Shivank" <shivankg@amd.com>,
+ Sean Christopherson <seanjc@google.com>, Marc Zyngier <maz@kernel.org>,
+ Oliver Upton <oliver.upton@linux.dev>, Paolo Bonzini <pbonzini@redhat.com>
+Cc: linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
+ kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+ Fuad Tabba <tabba@google.com>, Ackerley Tng <ackerleytng@google.com>,
+ Ashish Kalra <ashish.kalra@amd.com>, Vlastimil Babka <vbabka@suse.cz>
+References: <20251007221420.344669-1-seanjc@google.com>
+ <20251007221420.344669-2-seanjc@google.com>
+ <dd948073-0839-4f75-8cec-1f3041231ed7@amd.com>
 From: David Hildenbrand <david@redhat.com>
 Content-Language: en-US
 Autocrypt: addr=david@redhat.com; keydata=
@@ -146,30 +148,36 @@ Autocrypt: addr=david@redhat.com; keydata=
  3iyY2Nsd7JxfKu1PRhCGwXzRw5TlfEsoRI7V9A8isUCoqE2Dzh3FvYHVeX4Us+bRL/oqareJ
  CIFqgYMyvHj7Q06kTKmauOe4Nf0l0qEkIuIzfoLJ3qr5UyXc2hLtWyT9Ir+lYlX9efqh7mOY
  qIws/H2t
-In-Reply-To: <20251003232606.4070510-8-seanjc@google.com>
+In-Reply-To: <dd948073-0839-4f75-8cec-1f3041231ed7@amd.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 
-On 04.10.25 01:26, Sean Christopherson wrote:
-> Refactor the guest_memfd selftest to improve test isolation by creating a
-> a new guest_memfd for each testcase.  Currently, the test reuses a single
-> guest_memfd instance for all testcases, and thus creates dependencies
-> between tests, e.g. not truncating folios from the guest_memfd instance
-> at the end of a test could lead to unexpected results (see the PUNCH_HOLE
-> purging that needs to done by in-flight the NUMA testcases[1]).
+>> -	struct file *gmem_file = READ_ONCE(slot->gmem.file);
+>> -	struct kvm_gmem *gmem = file->private_data;
+>> +	struct file *slot_file = READ_ONCE(slot->gmem.file);
+>> +	struct gmem_file *f = file->private_data;
+> 			^^^
+>>   	struct folio *folio;
+>>   
+>> -	if (file != gmem_file) {
+>> -		WARN_ON_ONCE(gmem_file);
+>> +	if (file != slot_file) {
+>> +		WARN_ON_ONCE(slot_file);
+>>   		return ERR_PTR(-EFAULT);
+>>   	}
+>>   
+>> -	gmem = file->private_data;
+>> -	if (xa_load(&gmem->bindings, index) != slot) {
+>> -		WARN_ON_ONCE(xa_load(&gmem->bindings, index));
+>> +	f = file->private_data;
 > 
-> Invoke each test via a macro wrapper to create and close a guest_memfd
-> to cut down on the boilerplate copy+paste needed to create a test.
+> This redundant initialization can be dropped.
 > 
-> Link: https://lore.kernel.org/all/20250827175247.83322-10-shivankg@amd.com
-> Reported-by: Ackerley Tng <ackerleytng@google.com>
+> I sent a cleanup patch including this change a few weeks ago:
+> 
+> https://lore.kernel.org/kvm/20250902080307.153171-2-shivankg@amd.com
 
-Do we have a Closes: link where this was reported?
-
-> Reviewed-by: Fuad Tabba <tabba@google.com>
-> Tested-by: Fuad Tabba <tabba@google.com>
-> Reviewed-by: David Hildenbrand <david@redhat.com>
-> Signed-off-by: Sean Christopherson <seanjc@google.com>
+Yeah, Sean/Oaolo, can you take a look and pick that up as well?
 
 -- 
 Cheers
