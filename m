@@ -1,87 +1,87 @@
-Return-Path: <kvm+bounces-59774-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-59775-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
-	by mail.lfdr.de (Postfix) with ESMTPS id 03B36BCD6C5
-	for <lists+kvm@lfdr.de>; Fri, 10 Oct 2025 16:12:51 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0581EBCDB9D
+	for <lists+kvm@lfdr.de>; Fri, 10 Oct 2025 17:11:19 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 3DA4E4FE9BC
-	for <lists+kvm@lfdr.de>; Fri, 10 Oct 2025 14:12:12 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3C3A74080E2
+	for <lists+kvm@lfdr.de>; Fri, 10 Oct 2025 15:06:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B7F202F547F;
-	Fri, 10 Oct 2025 14:11:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5DA5C2F7ADC;
+	Fri, 10 Oct 2025 15:05:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="elojs4/C"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ikxmbUG3"
 X-Original-To: kvm@vger.kernel.org
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 636902F4A00
-	for <kvm@vger.kernel.org>; Fri, 10 Oct 2025 14:11:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F3EE92F60CD
+	for <kvm@vger.kernel.org>; Fri, 10 Oct 2025 15:05:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1760105491; cv=none; b=Vu1MQX1+ptLUxuIvGtezWA6TsktoHddiN4TXb/DIoRGyhB8cPbboytEezFfUoPhOPm887DuKdGnKOi5S6prjgjFCBri+XxGgxaJqx9utM23gtkmi6Q8WcMhBj6vErJovBy3TnfwGOuA631YmM2sbxXUiS5FhYgQTmHnXGEolE5g=
+	t=1760108708; cv=none; b=YvjCyOR6qPSzjRiVw6yfEdBJG61pP+XxxFdR7rtN3xkF8MBHEzLXreRn/VoQBa+7qu1qO1nXnnCsfg09KS+YghaKg14UmJ9xqidD2g8eLmxXeulBdqtCV5QDGT25RpaXnKN/6AwxXTFMJTo29rbMeDw9Zi9gznLJuvCBy+FTuVY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1760105491; c=relaxed/simple;
-	bh=JYnBnCWHkef8RyBvi69YmEV68PI6DXCISPx+R2HIFJs=;
+	s=arc-20240116; t=1760108708; c=relaxed/simple;
+	bh=cGGzf9hN3EGKjgIyz3nrHIYTNGgrUsMbns4BgkbDuv8=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=tLfQPqgll7WmjmnEP9yMIAUxocQApzYLmsMEpCEqz+lfvyNHw+i8bzfeRZblB23i1OZqgADQixYHBTw9vwnmNI+3r1VMzx98YaYsDxSi0OB6R2QoBh80H0lOnzmSCErlPDT0EzrR7iRwXsMLS/YjvAnQPodzQe57rb4g604q/Ak=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=elojs4/C; arc=none smtp.client-ip=170.10.133.124
+	 In-Reply-To:Content-Type; b=cAuf20r761/RlUJFBRTxg6WPYePUuD55jKqch/QHIi1prxvaoaxlq4wnw2QDpMPAP5yaY6DsKRjXE456TPTu/0GO2Gyj+dIpfOP3SwbCVZ06YNCLcLCYIjDpEEpKWdmruq45ZPEViOG2rGGnHSsm5ucmQda3eV/BK5pXVhRAnBs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=ikxmbUG3; arc=none smtp.client-ip=170.10.133.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1760105489;
+	s=mimecast20190719; t=1760108705;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-	bh=wbJHZ97LShKz75F6YVPrIwKeljLc2UX59sgdVUiGzTY=;
-	b=elojs4/CDK4x8fJUMS/IBAbBkTyVu/JjV0ZAgJtWe04Ve/Nvejm3ZN9pyEhD6MKdpR9VOU
-	q4Hbw5DVnx+5XgGYzWQBiOQoy7KvqAdUjVZSyAVzQW5z027bUu46m4lo7HA7lEa45rZxZm
-	JhJ2/5Toxrm5VuJ/wd5HcuZ3xrrRzfE=
-Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
- [209.85.128.72]) by relay.mimecast.com with ESMTP with STARTTLS
+	bh=14x8DQmV6z2ehBA4LIP2D9xCeyvVVgYWSqxD44RO2o8=;
+	b=ikxmbUG3eoY+DVRm6V9vsRp8f67M2Q9ZQnqw44OgOaB/kHhQcrAizxvoJ+GYhFP3GQxeQ7
+	+OYaqxyyPgtr3g2Y2KorNNMDBRi1HWzVyBHYvWmiu0Pm3E4y01w9WNHv8squttDabsViSJ
+	hLWdRgAKVIqVzHhKMUc5yPNWKNKJeB4=
+Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
+ [209.85.221.69]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-456-7XxYTl91NW6iY6KDm2pU8w-1; Fri, 10 Oct 2025 10:11:28 -0400
-X-MC-Unique: 7XxYTl91NW6iY6KDm2pU8w-1
-X-Mimecast-MFC-AGG-ID: 7XxYTl91NW6iY6KDm2pU8w_1760105487
-Received: by mail-wm1-f72.google.com with SMTP id 5b1f17b1804b1-46e25f5ed85so17351965e9.3
-        for <kvm@vger.kernel.org>; Fri, 10 Oct 2025 07:11:27 -0700 (PDT)
+ us-mta-132-fl1Jls0ZMomJrPAt0oA4eg-1; Fri, 10 Oct 2025 11:05:04 -0400
+X-MC-Unique: fl1Jls0ZMomJrPAt0oA4eg-1
+X-Mimecast-MFC-AGG-ID: fl1Jls0ZMomJrPAt0oA4eg_1760108702
+Received: by mail-wr1-f69.google.com with SMTP id ffacd0b85a97d-42558f501adso1552442f8f.1
+        for <kvm@vger.kernel.org>; Fri, 10 Oct 2025 08:05:03 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1760105486; x=1760710286;
+        d=1e100.net; s=20230601; t=1760108702; x=1760713502;
         h=content-transfer-encoding:in-reply-to:autocrypt:content-language
          :from:references:cc:to:subject:user-agent:mime-version:date
          :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=wbJHZ97LShKz75F6YVPrIwKeljLc2UX59sgdVUiGzTY=;
-        b=l7s5MInETXiafHzPyyjbREGx3kjJ4KbrVbpZJKojI1x9q3p71D2QzoSfAi1hiN2Zst
-         yUchHL+4HSmLQdDc/i+43EHYZcrn4mdilpS9zAYox2l/VGfKOV+4LYQ6D48VAADKF3XF
-         0r1/ZoUJBrZKbbVAr38iLFhoxfxDKjhiCv5/GSaEmYMhw0Phcbj0NqI57QpmPiq3l3eJ
-         E6sqSmyp1zsXikyOhNUamobPfGWL8ZaSjMjBQoPNPRQeNLoTRwqMef9W4Wp1SwKaFgEr
-         LWm+Xg3uhVYn9QeXr3+Fw9kdD42y2FZrs9RhJcLvg3/5oVXKa0gVx1eB3vz/y9JQ5BsM
-         eC+g==
-X-Gm-Message-State: AOJu0Yy3VTM98H4yJTWXewbRJ4EWMDmcgdZibylIUr5olrN5RykZ62ly
-	0woi7tRhxEbjXKNjjvFu2febCTkD7X/Z/tIBzkPErr43P7mW97CGmAYhl/wy+9x7dFetFrpecYo
-	hykOfnu/ogYSSATRqj5CvjmTLIQ5jRoMx3IJDNBuKTAeRfIZ6pHPcZg==
-X-Gm-Gg: ASbGncsudLWH/Ge0M1o12M0HoMxw1oSbMNBuw6dlpvNrp0HrskdM0U9CuCOjJq8jEXP
-	0bd765yfNi4XERZ08RzYYnn11yF5jXJUmTPoxdcxj535BYkTOVjrxSQ+PGApdaI1A4gdyA6NfAB
-	NEXXQl6G3eBYOT1nmOlCyk5t9ue1rxleoNywRSNaP4B1aMZY3YzFznexhDHLCyB3wI3EoUpgPZ3
-	i/iyRVtV7jRi+bFfj35JX9ie61dyi36q+vHL7Bj8iiFSXBCOp/6A+TuJssQ5jN9v8GjQ4kz/rMX
-	SrrI2XqISClKKzNbmzQWekD1C51efGc6S+wI94tYwoFgkFQEqNcdMdFFHH2XshFmmuTli3aOddt
-	hYmQ=
-X-Received: by 2002:a05:600d:8221:b0:46f:aa02:98b1 with SMTP id 5b1f17b1804b1-46faa02ec6emr62953635e9.21.1760105486677;
-        Fri, 10 Oct 2025 07:11:26 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IFRROnZFvl2ovceyizR0lS0KdtdpVJX5+dWxkwGf23/+teGdNZWxplYlhTI+5TIKPkXoBbOQQ==
-X-Received: by 2002:a05:600d:8221:b0:46f:aa02:98b1 with SMTP id 5b1f17b1804b1-46faa02ec6emr62953415e9.21.1760105486235;
-        Fri, 10 Oct 2025 07:11:26 -0700 (PDT)
+        bh=14x8DQmV6z2ehBA4LIP2D9xCeyvVVgYWSqxD44RO2o8=;
+        b=W8gjoYS8naKgWkpECuCtqRNEYDvyIE6EuQlUg2Y8Py3usygmLCp4ulXAmtkejuR0gb
+         lj09TcIQy2c2ZEWunUHAh1zji1tMZbX39pXr8F4GleCdfdfhBKZH+3OSE3xw7x3+pSEV
+         BWn0pzfMH/cOIwPlnYkcE1GB1o+D9E4gPKItX14JhxMJQ/X1x1WcjuncG/QqezbgXAXF
+         pik94EjCAqVaa/+LChmo6j1fUN8qtlkMm4KyHfITfPbiUpRvI1NxbgT5yhHflWi3s9Dz
+         2shpUXFuipTSEyjssjbCFrQIv6KixY8/p3TWID3PqaodCJ6wFnr/S+HAwOs3JJqBUbtw
+         NJTg==
+X-Gm-Message-State: AOJu0YwO/itMyZGEyKaiihbIf2ZSv7FApn+ny1uee+cIPfQqWgBzgDZ4
+	b5tyWmYOC4m8jvCTbbNKXpw7rsl5Y4HEWu3SuMsTQmxggGlalB66c4NLYfju5UUYf6PxQDTT9oT
+	k+0Pf9Jqd9kNVbRgXwKjNxOMQCFW7fG9lXTpApjAjiwauPB4hINzcfg==
+X-Gm-Gg: ASbGncuteTVHI6cbJESJr7Hnh3Umeg3L5SPfuGNLke+HbYAkiDFZ5ISujXrW29ACUKa
+	C4WXAWzcl3ns5jlLSNm7VYjz/5s+0dz3U8NIs59J21CrSdoQhdFBLAQqjP4o6SmoI+AjmzbWeHW
+	McN4HbVxxvbPbYzaQhPQAfMhyLUD8OTqYhfb6Ske+oP0xB4iHTnfKpDl/ah9rZriyiE5iloEi3d
+	pdXSS/o30UmuAHBxjS+E0dqW6PbNhuY0Iu2MifTmC7Y2Z7g0P+NX+d+fGi2Yy74GzmKXHqxyJs4
+	mMsSFN+VL1ltjAQNvdByFeKtDvQ/tYiKFXeapaojZ0sWxqYiVmQl0U2IVse2QCRBdP0PX6CFFn+
+	GZvg=
+X-Received: by 2002:a05:6000:420d:b0:3f8:e016:41c0 with SMTP id ffacd0b85a97d-42666abb540mr7265837f8f.10.1760108702268;
+        Fri, 10 Oct 2025 08:05:02 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IFdAL2XeniwemES/tB1DQlU4huABJjIG2OWey2XifuXvcbLTvo6OdHTiDcsvIO+vABjUKKRDA==
+X-Received: by 2002:a05:6000:420d:b0:3f8:e016:41c0 with SMTP id ffacd0b85a97d-42666abb540mr7265802f8f.10.1760108701605;
+        Fri, 10 Oct 2025 08:05:01 -0700 (PDT)
 Received: from [192.168.3.141] (tmo-083-189.customers.d1-online.com. [80.187.83.189])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-46fb479c171sm49893295e9.0.2025.10.10.07.11.24
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-426ce582b44sm4575185f8f.16.2025.10.10.08.04.58
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 10 Oct 2025 07:11:25 -0700 (PDT)
-Message-ID: <afb2d4f6-cc5a-4aa3-9194-8822060a0552@redhat.com>
-Date: Fri, 10 Oct 2025 16:11:23 +0200
+        Fri, 10 Oct 2025 08:05:01 -0700 (PDT)
+Message-ID: <76daa3ed-4f75-494e-ba3e-0bfcd7a367e4@redhat.com>
+Date: Fri, 10 Oct 2025 17:04:58 +0200
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -89,8 +89,8 @@ List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2 05/13] KVM: guest_memfd: Allow mmap() on guest_memfd
- for x86 VMs with private memory
+Subject: Re: [PATCH v2 07/13] KVM: selftests: Create a new guest_memfd for
+ each testcase
 To: Sean Christopherson <seanjc@google.com>,
  Paolo Bonzini <pbonzini@redhat.com>,
  Christian Borntraeger <borntraeger@linux.ibm.com>,
@@ -99,7 +99,7 @@ To: Sean Christopherson <seanjc@google.com>,
 Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
  Fuad Tabba <tabba@google.com>, Ackerley Tng <ackerleytng@google.com>
 References: <20251003232606.4070510-1-seanjc@google.com>
- <20251003232606.4070510-6-seanjc@google.com>
+ <20251003232606.4070510-8-seanjc@google.com>
 From: David Hildenbrand <david@redhat.com>
 Content-Language: en-US
 Autocrypt: addr=david@redhat.com; keydata=
@@ -146,27 +146,30 @@ Autocrypt: addr=david@redhat.com; keydata=
  3iyY2Nsd7JxfKu1PRhCGwXzRw5TlfEsoRI7V9A8isUCoqE2Dzh3FvYHVeX4Us+bRL/oqareJ
  CIFqgYMyvHj7Q06kTKmauOe4Nf0l0qEkIuIzfoLJ3qr5UyXc2hLtWyT9Ir+lYlX9efqh7mOY
  qIws/H2t
-In-Reply-To: <20251003232606.4070510-6-seanjc@google.com>
+In-Reply-To: <20251003232606.4070510-8-seanjc@google.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 
-On 04.10.25 01:25, Sean Christopherson wrote:
-> Allow mmap() on guest_memfd instances for x86 VMs with private memory as
-> the need to track private vs. shared state in the guest_memfd instance is
-> only pertinent to INIT_SHARED.  Doing mmap() on private memory isn't
-> terrible useful (yet!), but it's now possible, and will be desirable when
-> guest_memfd gains support for other VMA-based syscalls, e.g. mbind() to
-> set NUMA policy.
+On 04.10.25 01:26, Sean Christopherson wrote:
+> Refactor the guest_memfd selftest to improve test isolation by creating a
+> a new guest_memfd for each testcase.  Currently, the test reuses a single
+> guest_memfd instance for all testcases, and thus creates dependencies
+> between tests, e.g. not truncating folios from the guest_memfd instance
+> at the end of a test could lead to unexpected results (see the PUNCH_HOLE
+> purging that needs to done by in-flight the NUMA testcases[1]).
 > 
-> Lift the restriction now, before MMAP support is officially released, so
-> that KVM doesn't need to add another capability to enumerate support for
-> mmap() on private memory.
+> Invoke each test via a macro wrapper to create and close a guest_memfd
+> to cut down on the boilerplate copy+paste needed to create a test.
 > 
-> Fixes: 3d3a04fad25a ("KVM: Allow and advertise support for host mmap() on guest_memfd files")
-> Signed-off-by: Sean Christopherson <seanjc@google.com>
-> ---
+> Link: https://lore.kernel.org/all/20250827175247.83322-10-shivankg@amd.com
+> Reported-by: Ackerley Tng <ackerleytng@google.com>
 
-Reviewed-by: David Hildenbrand <david@redhat.com>
+Do we have a Closes: link where this was reported?
+
+> Reviewed-by: Fuad Tabba <tabba@google.com>
+> Tested-by: Fuad Tabba <tabba@google.com>
+> Reviewed-by: David Hildenbrand <david@redhat.com>
+> Signed-off-by: Sean Christopherson <seanjc@google.com>
 
 -- 
 Cheers
