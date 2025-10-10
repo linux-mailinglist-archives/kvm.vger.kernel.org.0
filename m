@@ -1,218 +1,98 @@
-Return-Path: <kvm+bounces-59760-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-59761-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
-	by mail.lfdr.de (Postfix) with ESMTPS id 41951BCBE20
-	for <lists+kvm@lfdr.de>; Fri, 10 Oct 2025 09:13:02 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id BABB5BCBED6
+	for <lists+kvm@lfdr.de>; Fri, 10 Oct 2025 09:32:42 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 3A9734EC9BB
-	for <lists+kvm@lfdr.de>; Fri, 10 Oct 2025 07:13:01 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 733D51A60C1A
+	for <lists+kvm@lfdr.de>; Fri, 10 Oct 2025 07:33:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5A7CB272810;
-	Fri, 10 Oct 2025 07:12:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 34051274B32;
+	Fri, 10 Oct 2025 07:32:33 +0000 (UTC)
 X-Original-To: kvm@vger.kernel.org
-Received: from mail.loongson.cn (mail.loongson.cn [114.242.206.163])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DD65A1991D2;
-	Fri, 10 Oct 2025 07:12:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=114.242.206.163
+Received: from mail-il1-f200.google.com (mail-il1-f200.google.com [209.85.166.200])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 449C1126C03
+	for <kvm@vger.kernel.org>; Fri, 10 Oct 2025 07:32:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.200
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1760080371; cv=none; b=O2EimdiJJ3AlV0mPaPjGTITXl/iY/3wJJuoETteBdsO7FBv0oKtkF9rN8uqb/JTdHlSIRjSoTKYQZujBk4NzP436BXjKohko4escgcxqoJM0nrLXY76fPKD3J4DwFa1iUN5YL5lbpEoLsRvWB0ObfyGMr4F/Ig9LNpw3bdmBapE=
+	t=1760081552; cv=none; b=jFvlTywcOUc8GBwNzxwLNKxUGMSwEB9NSsBnnThqs882TTsTdMlTFFBya6RBBCt3L1NeqkmS2p7uwU312bAUPArlvHxCIMVft8YfIKvbFRUEBvLS59sIIRyUS2D9gudqExV9D/pnP/xxivAcWkfrk+MhsGiQcCD3VnB4BwCCOSg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1760080371; c=relaxed/simple;
-	bh=oHUPYoK0XprxGtek8pJ17S5bSCYNpVt98rv9tMQIWtQ=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=jYkaLzSbKnp74GNReyCnQqKKYS1P+bCoWH+r/PCPIvWeJY2e5Jp8OwpmQxO4Z7Y/4qWp4yIQ/BrH62XAIb5MgzFyorRJDW1mkMZ+mMzQLRE1YBL91z3VU1gGYU29hT37Ogy5osNjZxmc+v5YMkel0gFZMLR4ZMezB0+VrmFyBrU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=loongson.cn; spf=pass smtp.mailfrom=loongson.cn; arc=none smtp.client-ip=114.242.206.163
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=loongson.cn
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=loongson.cn
-Received: from loongson.cn (unknown [10.2.5.185])
-	by gateway (Coremail) with SMTP id _____8BxH9PtsehoEpUUAA--.44270S3;
-	Fri, 10 Oct 2025 15:12:45 +0800 (CST)
-Received: from localhost.localdomain (unknown [10.2.5.185])
-	by front1 (Coremail) with SMTP id qMiowJBxjcHrsehojynYAA--.29868S2;
-	Fri, 10 Oct 2025 15:12:43 +0800 (CST)
-From: Song Gao <gaosong@loongson.cn>
-To: maobibo@loongson.cn,
-	chenhuacai@kernel.org
-Cc: kvm@vger.kernel.org,
-	loongarch@lists.linux.dev,
-	kernel@xen0n.name,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH v2] LoongArch: KVM: Add AVEC support
-Date: Fri, 10 Oct 2025 14:48:58 +0800
-Message-Id: <20251010064858.2392927-1-gaosong@loongson.cn>
-X-Mailer: git-send-email 2.39.1
+	s=arc-20240116; t=1760081552; c=relaxed/simple;
+	bh=ttINZP9/5MVUK0XvaowCW7l/505B7b4VQq9AdR7brbw=;
+	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=RJ7+PNZfPV9X4b682wv7o50IEp00SS4OWFTRKh9X/ijEbeVfzHe/UXBH9PQcaH5mdGcESSSii2bg0rPabjVPNHtVlGjSzz485CjImt6VtO+1n71xhQLZVPykyI9CG4sb0AS7BkHLmKuE6QfnOwqSkEzsmxhyJwuZ+QyjkvHW66w=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.200
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
+Received: by mail-il1-f200.google.com with SMTP id e9e14a558f8ab-4257e203f14so106427555ab.2
+        for <kvm@vger.kernel.org>; Fri, 10 Oct 2025 00:32:31 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1760081550; x=1760686350;
+        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=fQPoOHJXVilhqdCudz8OjlgRyvFMfrtV4ytvm2IsQfg=;
+        b=dI5AWYV1qKAAMXXsM4zA+SwPaSzb4BCOS3IWLpcdvvU0EZe0heBQHDHp4dCumAWhkG
+         jMBDOMpLP1azCiZIIv8TRDGCR9Vh6qknLyOdUq3fP3W6HIrcyzxFYC+jd4fye2xAk8o1
+         EQ+zhSnkikmPHBCzOOeSrARu8fM+rvSHfZVZr5zJV3+LKkGkIQx4F/+NPzKJA5mmmzmh
+         NYXlUzsYMIdE8aBC3AfM0XgkGTwiZY+xBi8L566lGCXYoQZpwNMxJzN4Pb3E5tVFStZe
+         SMctocWHU3of7D5k+LTSQIvMTYaMEohrRtEYxQNMH/a8w4Rm0SIZhDDA9ADuDRgpDKCm
+         0w4g==
+X-Gm-Message-State: AOJu0Yw/EndQn8GSChukMNSBfgcIkxwxSDGrl207HtSbyrkhMDFazoWF
+	gdeGpHXdgB5fWIRzc6NDEAUnTxTR/yVvuZEM/7qE7y63ZJgUPxRT5s9CQ/E6/dxsTpMAly99s6O
+	//wx6UQLwJSBf9jrZQrau+TF3uFMV/9lIJSneSj1ofabgR2pqLsGuIZY/TUA=
+X-Google-Smtp-Source: AGHT+IHRnXbjnWVa57fAT/g/AunyboyoAzVLWuG5/Zj91A2ki2q1fTgqkAUvQTGs9z1Wl05C6nvOLw5ZFDRsUEJpiNCrvDKng1J5
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:qMiowJBxjcHrsehojynYAA--.29868S2
-X-CM-SenderInfo: 5jdr20tqj6z05rqj20fqof0/
-X-Coremail-Antispam: 1Uk129KBjDUn29KB7ZKAUJUUUUU529EdanIXcx71UUUUU7KY7
-	ZEXasCq-sGcSsGvfJ3UbIjqfuFe4nvWSU5nxnvy29KBjDU0xBIdaVrnUUvcSsGvfC2Kfnx
-	nUUI43ZEXa7xR_UUUUUUUUU==
+X-Received: by 2002:a05:6e02:1a44:b0:42f:8b94:c128 with SMTP id
+ e9e14a558f8ab-42f8b94e60dmr85150445ab.28.1760081550412; Fri, 10 Oct 2025
+ 00:32:30 -0700 (PDT)
+Date: Fri, 10 Oct 2025 00:32:30 -0700
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <68e8b68e.050a0220.3897dc.0117.GAE@google.com>
+Subject: [syzbot] Monthly kvm report (Oct 2025)
+From: syzbot <syzbot+list6bac0337c0f09a6aace1@syzkaller.appspotmail.com>
+To: kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	syzkaller-bugs@googlegroups.com
+Content-Type: text/plain; charset="UTF-8"
 
-Add cpu_has_msgint() to check whether the host cpu supported avec,
-and restore/save CSR_MSGIS0-CSR_MSGIS3.
+Hello kvm maintainers/developers,
 
-Signed-off-by: Song Gao <gaosong@loongson.cn>
+This is a 31-day syzbot report for the kvm subsystem.
+All related reports/information can be found at:
+https://syzkaller.appspot.com/upstream/s/kvm
+
+During the period, 0 new issues were detected and 0 were fixed.
+In total, 3 issues are still open and 64 have already been fixed.
+
+Some of the still happening issues:
+
+Ref Crashes Repro Title
+<1> 649     Yes   WARNING: locking bug in kvm_xen_set_evtchn_fast
+                  https://syzkaller.appspot.com/bug?extid=919877893c9d28162dc2
+<2> 15      Yes   WARNING in __kvm_gpc_refresh (3)
+                  https://syzkaller.appspot.com/bug?extid=cde12433b6c56f55d9ed
+<3> 4       Yes   WARNING in kvm_read_guest_offset_cached
+                  https://syzkaller.appspot.com/bug?extid=bc0e18379a290e5edfe4
+
 ---
-Based-on: https://patchew.org/linux/20250930093741.2734974-1-maobibo@loongson.cn/
-v2: fix build error.
+This report is generated by a bot. It may contain errors.
+See https://goo.gl/tpsmEJ for more information about syzbot.
+syzbot engineers can be reached at syzkaller@googlegroups.com.
 
- arch/loongarch/include/asm/kvm_host.h |  4 ++++
- arch/loongarch/include/asm/kvm_vcpu.h |  1 +
- arch/loongarch/include/uapi/asm/kvm.h |  1 +
- arch/loongarch/kvm/interrupt.c        |  3 +++
- arch/loongarch/kvm/vcpu.c             | 19 +++++++++++++++++--
- arch/loongarch/kvm/vm.c               |  4 ++++
- 6 files changed, 30 insertions(+), 2 deletions(-)
+To disable reminders for individual bugs, reply with the following command:
+#syz set <Ref> no-reminders
 
-diff --git a/arch/loongarch/include/asm/kvm_host.h b/arch/loongarch/include/asm/kvm_host.h
-index 392480c9b958..446f1104d59d 100644
---- a/arch/loongarch/include/asm/kvm_host.h
-+++ b/arch/loongarch/include/asm/kvm_host.h
-@@ -285,6 +285,10 @@ static inline bool kvm_guest_has_lbt(struct kvm_vcpu_arch *arch)
- 	return arch->cpucfg[2] & (CPUCFG2_X86BT | CPUCFG2_ARMBT | CPUCFG2_MIPSBT);
- }
- 
-+static inline bool cpu_has_msgint(void)
-+{
-+	return read_cpucfg(LOONGARCH_CPUCFG1) & CPUCFG1_MSGINT;
-+}
- static inline bool kvm_guest_has_pmu(struct kvm_vcpu_arch *arch)
- {
- 	return arch->cpucfg[6] & CPUCFG6_PMP;
-diff --git a/arch/loongarch/include/asm/kvm_vcpu.h b/arch/loongarch/include/asm/kvm_vcpu.h
-index f1efd7cfbc20..3784ab4ccdb5 100644
---- a/arch/loongarch/include/asm/kvm_vcpu.h
-+++ b/arch/loongarch/include/asm/kvm_vcpu.h
-@@ -15,6 +15,7 @@
- #define CPU_PMU				(_ULCAST_(1) << 10)
- #define CPU_TIMER			(_ULCAST_(1) << 11)
- #define CPU_IPI				(_ULCAST_(1) << 12)
-+#define CPU_AVEC                        (_ULCAST_(1) << 14)
- 
- /* Controlled by 0x52 guest exception VIP aligned to estat bit 5~12 */
- #define CPU_IP0				(_ULCAST_(1))
-diff --git a/arch/loongarch/include/uapi/asm/kvm.h b/arch/loongarch/include/uapi/asm/kvm.h
-index 57ba1a563bb1..de6c3f18e40a 100644
---- a/arch/loongarch/include/uapi/asm/kvm.h
-+++ b/arch/loongarch/include/uapi/asm/kvm.h
-@@ -104,6 +104,7 @@ struct kvm_fpu {
- #define  KVM_LOONGARCH_VM_FEAT_PV_IPI		6
- #define  KVM_LOONGARCH_VM_FEAT_PV_STEALTIME	7
- #define  KVM_LOONGARCH_VM_FEAT_PTW		8
-+#define  KVM_LOONGARCH_VM_FEAT_MSGINT		9
- 
- /* Device Control API on vcpu fd */
- #define KVM_LOONGARCH_VCPU_CPUCFG	0
-diff --git a/arch/loongarch/kvm/interrupt.c b/arch/loongarch/kvm/interrupt.c
-index 8462083f0301..adc278fb3cb9 100644
---- a/arch/loongarch/kvm/interrupt.c
-+++ b/arch/loongarch/kvm/interrupt.c
-@@ -21,6 +21,7 @@ static unsigned int priority_to_irq[EXCCODE_INT_NUM] = {
- 	[INT_HWI5]	= CPU_IP5,
- 	[INT_HWI6]	= CPU_IP6,
- 	[INT_HWI7]	= CPU_IP7,
-+	[INT_AVEC]	= CPU_AVEC,
- };
- 
- static int kvm_irq_deliver(struct kvm_vcpu *vcpu, unsigned int priority)
-@@ -36,6 +37,7 @@ static int kvm_irq_deliver(struct kvm_vcpu *vcpu, unsigned int priority)
- 	case INT_IPI:
- 	case INT_SWI0:
- 	case INT_SWI1:
-+	case INT_AVEC:
- 		set_gcsr_estat(irq);
- 		break;
- 
-@@ -63,6 +65,7 @@ static int kvm_irq_clear(struct kvm_vcpu *vcpu, unsigned int priority)
- 	case INT_IPI:
- 	case INT_SWI0:
- 	case INT_SWI1:
-+	case INT_AVEC:
- 		clear_gcsr_estat(irq);
- 		break;
- 
-diff --git a/arch/loongarch/kvm/vcpu.c b/arch/loongarch/kvm/vcpu.c
-index 30e3b089a596..226c735155be 100644
---- a/arch/loongarch/kvm/vcpu.c
-+++ b/arch/loongarch/kvm/vcpu.c
-@@ -657,8 +657,7 @@ static int _kvm_get_cpucfg_mask(int id, u64 *v)
- 		*v = GENMASK(31, 0);
- 		return 0;
- 	case LOONGARCH_CPUCFG1:
--		/* CPUCFG1_MSGINT is not supported by KVM */
--		*v = GENMASK(25, 0);
-+		*v = GENMASK(26, 0);
- 		return 0;
- 	case LOONGARCH_CPUCFG2:
- 		/* CPUCFG2 features unconditionally supported by KVM */
-@@ -726,6 +725,10 @@ static int kvm_check_cpucfg(int id, u64 val)
- 		return -EINVAL;
- 
- 	switch (id) {
-+	case LOONGARCH_CPUCFG1:
-+		if ((val & CPUCFG1_MSGINT) && (!cpu_has_msgint()))
-+			return -EINVAL;
-+		return 0;
- 	case LOONGARCH_CPUCFG2:
- 		if (!(val & CPUCFG2_LLFTP))
- 			/* Guests must have a constant timer */
-@@ -1658,6 +1661,12 @@ static int _kvm_vcpu_load(struct kvm_vcpu *vcpu, int cpu)
- 	kvm_restore_hw_gcsr(csr, LOONGARCH_CSR_DMWIN2);
- 	kvm_restore_hw_gcsr(csr, LOONGARCH_CSR_DMWIN3);
- 	kvm_restore_hw_gcsr(csr, LOONGARCH_CSR_LLBCTL);
-+	if (cpu_has_msgint()) {
-+		kvm_restore_hw_gcsr(csr, LOONGARCH_CSR_ISR0);
-+		kvm_restore_hw_gcsr(csr, LOONGARCH_CSR_ISR1);
-+		kvm_restore_hw_gcsr(csr, LOONGARCH_CSR_ISR2);
-+		kvm_restore_hw_gcsr(csr, LOONGARCH_CSR_ISR3);
-+	}
- 
- 	/* Restore Root.GINTC from unused Guest.GINTC register */
- 	write_csr_gintc(csr->csrs[LOONGARCH_CSR_GINTC]);
-@@ -1747,6 +1756,12 @@ static int _kvm_vcpu_put(struct kvm_vcpu *vcpu, int cpu)
- 	kvm_save_hw_gcsr(csr, LOONGARCH_CSR_DMWIN1);
- 	kvm_save_hw_gcsr(csr, LOONGARCH_CSR_DMWIN2);
- 	kvm_save_hw_gcsr(csr, LOONGARCH_CSR_DMWIN3);
-+	if (cpu_has_msgint()) {
-+		kvm_save_hw_gcsr(csr, LOONGARCH_CSR_ISR0);
-+		kvm_save_hw_gcsr(csr, LOONGARCH_CSR_ISR1);
-+		kvm_save_hw_gcsr(csr, LOONGARCH_CSR_ISR2);
-+		kvm_save_hw_gcsr(csr, LOONGARCH_CSR_ISR3);
-+	}
- 
- 	vcpu->arch.aux_inuse |= KVM_LARCH_SWCSR_LATEST;
- 
-diff --git a/arch/loongarch/kvm/vm.c b/arch/loongarch/kvm/vm.c
-index d8c813e2d72e..438885b6f2b1 100644
---- a/arch/loongarch/kvm/vm.c
-+++ b/arch/loongarch/kvm/vm.c
-@@ -37,6 +37,9 @@ static void kvm_vm_init_features(struct kvm *kvm)
- 		kvm->arch.support_features |= BIT(KVM_LOONGARCH_VM_FEAT_PV_STEALTIME);
- 	}
- 
-+	if (cpu_has_msgint())
-+		kvm->arch.support_features |= BIT(KVM_LOONGARCH_VM_FEAT_MSGINT);
-+
- 	val = read_csr_gcfg();
- 	if (val & CSR_GCFG_GPMP)
- 		kvm->arch.support_features |= BIT(KVM_LOONGARCH_VM_FEAT_PMU);
-@@ -153,6 +156,7 @@ static int kvm_vm_feature_has_attr(struct kvm *kvm, struct kvm_device_attr *attr
- 	case KVM_LOONGARCH_VM_FEAT_PMU:
- 	case KVM_LOONGARCH_VM_FEAT_PV_IPI:
- 	case KVM_LOONGARCH_VM_FEAT_PV_STEALTIME:
-+        case KVM_LOONGARCH_VM_FEAT_MSGINT:
- 		if (kvm_vm_support(&kvm->arch, attr->attr))
- 			return 0;
- 		return -ENXIO;
--- 
-2.39.3
+To change bug's subsystems, reply with:
+#syz set <Ref> subsystems: new-subsystem
 
+You may send multiple commands in a single email message.
 
