@@ -1,70 +1,70 @@
-Return-Path: <kvm+bounces-59752-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-59753-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id AFCEABCB43C
-	for <lists+kvm@lfdr.de>; Fri, 10 Oct 2025 02:21:16 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 97B8ABCB442
+	for <lists+kvm@lfdr.de>; Fri, 10 Oct 2025 02:21:32 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 63D383C60C6
-	for <lists+kvm@lfdr.de>; Fri, 10 Oct 2025 00:21:15 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 995E3189723B
+	for <lists+kvm@lfdr.de>; Fri, 10 Oct 2025 00:21:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 313A91B142D;
-	Fri, 10 Oct 2025 00:21:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 499B219309E;
+	Fri, 10 Oct 2025 00:21:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="MqFizPv3"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="bhICESxo"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pj1-f73.google.com (mail-pj1-f73.google.com [209.85.216.73])
+Received: from mail-pl1-f202.google.com (mail-pl1-f202.google.com [209.85.214.202])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BE71635950
-	for <kvm@vger.kernel.org>; Fri, 10 Oct 2025 00:21:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.73
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D2C8D35950
+	for <kvm@vger.kernel.org>; Fri, 10 Oct 2025 00:21:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1760055668; cv=none; b=mn94LFaUvOiEtdGVbP59wIyNKMrQaYMqBc6A+lHW9zsap90qZuwNrsw293pqiIohMbHdKR12P4plNs9aPScgOBGlkTnWsbGbPAe2W1LOvZXmW0TVuK5+tgCxCAUH3viCBgtx1PV7GQalXuVsWhRnW5y6CgOpR61tVs0ijt4F9Vo=
+	t=1760055688; cv=none; b=PcRIXvJGSBxZhHz7a3su60m4yhojgQzFruoyZD6qdYG9lOS6JiAIog2XuJWY1nhlnWXGhnFFC40DisKN4/qC5dxoLZLw7RcwdSvzKwTZ0tVWwoAlD1Tizx8CEdO90fZmE82Q7YVyoSrNPBmfnWEXrDc0QNeqiusq9BIoAHfSxn0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1760055668; c=relaxed/simple;
-	bh=KMt095iiyuBP1knvWX8UoQHqOWM6llfPWYLTHZZQfig=;
+	s=arc-20240116; t=1760055688; c=relaxed/simple;
+	bh=lwSnZjzI7WMbrxBCXF6bZqUJlkk0sDJDteEZzsG7vQg=;
 	h=Date:In-Reply-To:Mime-Version:Message-ID:Subject:From:To:Cc:
-	 Content-Type; b=XIB6EOx5ZyFVA7eSoX9Dko2grXiIJ+19rW5o+9yIAQ49wRUc7HKuQdpfy3x5iYPVLdbBEc3ufOhCPRC1ZeZ8F1Xcnjq0oUlEG+ElPgLu3owLrDd10lOKuAdKnPjfoggSRZvtK63f09x5nPkap9i25K/gQI68XNhaRuR8NVefldE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--ackerleytng.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=MqFizPv3; arc=none smtp.client-ip=209.85.216.73
+	 Content-Type; b=kY6vyZ54Yr2IbFC7p5WXtx+A2uEbWXKdMoS9HdNwv3ZGqj4ze36yh8UsCwBC0hbk1cME+FZf7Yo1cSdFGR3cbDy54GYGhz+nfkxLzzfSgk3XTN1NGFMxGA3bmo8a2KIY58OYYetv88ekk8zUNPfrpXK61RCtzlQcRl0lMNAGaXY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--ackerleytng.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=bhICESxo; arc=none smtp.client-ip=209.85.214.202
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--ackerleytng.bounces.google.com
-Received: by mail-pj1-f73.google.com with SMTP id 98e67ed59e1d1-335276a711cso3873067a91.2
-        for <kvm@vger.kernel.org>; Thu, 09 Oct 2025 17:21:06 -0700 (PDT)
+Received: by mail-pl1-f202.google.com with SMTP id d9443c01a7336-2699ed6d43dso26074605ad.1
+        for <kvm@vger.kernel.org>; Thu, 09 Oct 2025 17:21:26 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1760055666; x=1760660466; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1760055686; x=1760660486; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:mime-version:in-reply-to:date:from:to
          :cc:subject:date:message-id:reply-to;
-        bh=8J/T8vKLOgBLYKJ9qjPmAcztyaV4J8sITP6618B36dM=;
-        b=MqFizPv31fuBqet0o9RFcElHN+hxbzluCZ1KgXH71eFsReZCbGfFY8gCDaWT3I/7A4
-         ziRbmIEhccD/xMEpBrTXy8EwEKH4tK2FZx5vY76TIuiqvZrOcXIQVTwWE23QJwjryrxu
-         sF1sl/QGUBBkFm3MnC8Kdm1UMAFU8e+38PBCiaMvj3Cu8RD6E8ib6XlPNc/mq4Yex2Wl
-         P/WYcbrTbsI2M+nfGYu38Cv5nDb05L0EUqLXkY16mOu0gWQy/yvPXThmVZ93A1ne/iRw
-         grTBfwaCmNu91rtak0epvEqjhT9v/LH5XVwXhcVZ4kLq/yCsNBGUXX89LFZp2GQwD1xw
-         LDaQ==
+        bh=rGp2wfDAFolkfVq9Qs1rE1NgIbJJDObk0zASInZr3ZY=;
+        b=bhICESxoVQQt0bfMaRyeBWmcmn6Gwd1tw/tbcqf5nUMXMnSUVaXQZJNE56PTn85alB
+         VowYsrJFPpKXsrYlnFpRYL5dhwbyHO8PL7ZeY8yCCPqFut7TPyN6W8PpfjO93r3rxVBu
+         Yb9MZ5DqZQaTbzuS7/fsOUGFUjDR9UuIMBz9Az6ONr349o2bjUjMd/c0wPVb2QLstwTV
+         xAAzRNPDp8V7wqnv0LDrA3VIuWepRDvsEYGopdrzE2I7YnYCjKsPl8ABBfXIrI2hG0FP
+         Hh+Qf9L19XM1ay7i83y+x1nqBhuHSMKtEZBobWd2zQlqvAZHhecUhcxjT7VrJpRPbKfc
+         qvrg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1760055666; x=1760660466;
+        d=1e100.net; s=20230601; t=1760055686; x=1760660486;
         h=cc:to:from:subject:message-id:mime-version:in-reply-to:date
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=8J/T8vKLOgBLYKJ9qjPmAcztyaV4J8sITP6618B36dM=;
-        b=Jb9vDF4GSt4dx0isVp+rNf1aEYYbQUaYKDdCTgeUZ3lwZOxv6FbSixksTaiLtySXCI
-         Oj1psFb7fB4jIBJJE1bsMk4Zlcat6MXYhii+UUHoqWHYiFJh6nqIPn3Qzvmon6WOqWl/
-         tlq+kifzdF6Kj8Ka11IEp/EsWiPLswuK5egQ07bPwC0+jOOAAWAUTsrx0mSi5V+lF0lr
-         NGPfidbqCExgYrd0nL6SGwDigLGcwF1Esv5Vuu5CHRVsaLGrg/Jkt/ZvCaW6dp0ttH3V
-         vxWpfvVaePaD6SPYBS0A9KzYKqk/yu/sfJTdK72y23VngVpxQbZKVdu8FJkj80nSB29K
-         fvuA==
-X-Forwarded-Encrypted: i=1; AJvYcCWMNBEm2cTnjTGbiwasf7rt2Qg2/W8WtDetr7i5q60GCnuiUoCdgDqtQeLAkW2+0cFN0Qw=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzJSsSZI5/Rm1oIB+xED5eABQq2/82O+90tE3wt4n4kQTTJzqx0
-	55ySzVOE1sesooX2mQ5h6Cimd+++pEE912LVCN5b+XW8+WY8V4FeiAgQnYLU4HvzXiN+sEy9n0O
-	G+InUUaEseYNMBBauRlyjxBr74w==
-X-Google-Smtp-Source: AGHT+IFCF4kBFT0RabFawshnZQQD13nsDTauZ920Dv/bvVdtd5JRE7f5nr5M5m5TgY/YQczN9wLa+pjeYwjxb5YA8A==
-X-Received: from pjbta16.prod.google.com ([2002:a17:90b:4ed0:b0:339:dc34:fa49])
+        bh=rGp2wfDAFolkfVq9Qs1rE1NgIbJJDObk0zASInZr3ZY=;
+        b=nsSDFy8j+1p3r8fRP04jp6vyq9D9iqHGqyETUGwi1447QmjPqQyHDy5lNpAtYeWh6/
+         IBSj/ciQ8e7QsyvXCHXoXFH8xFcB7vU7NsIR7znOgsP5eHKIPtxHCsaN3UESaz9jJLaB
+         k7skKl6FSP1N/CRnXCBJhZKmcAUt4zqmMdTZs5f0kVQdjfLnPD3m7TAnvwgDlFqkBebL
+         0zK82vpu4jGQlisRTH/ZTWzx+++yNKzObu39zd76Zd8h2fPbboQIHly62UTZq6e07sYW
+         Y61SGUrfn0aSXZQKhi23wH20q2JSYz2Wcxs5plrqp+Z77CmOk94MrADKG+OE50X4w9MA
+         l0kw==
+X-Forwarded-Encrypted: i=1; AJvYcCWxXabLc117cMO4qRGRLq4j9iq//jTpeP9UViV2rTUyW4sCS+v2o59lV+14J+Ev07aumfQ=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyD/jGBI1Q+HbF8QCQGl+O+pfpDE+yyyajGxBcJjGAYpMf4fXDI
+	6b1jbFDLggAtvZRr0NXToxqItb+7MxHezw/7ZNzS+yRkTGUJ1P4Mir203O7lzSPImjUOET4BH6C
+	A/WB87zLJU8PZKFV/7/bmFjq3Cw==
+X-Google-Smtp-Source: AGHT+IG451d95NRbSW/wlsg20bhmpTgeVeiEB2OFWXt7jX0fy0jXtG2MkrCaEHgibL5DvluwKHNfYT//yI41A2iPOw==
+X-Received: from pjbbo24.prod.google.com ([2002:a17:90b:918:b0:334:1935:56cc])
  (user=ackerleytng job=prod-delivery.src-stubby-dispatcher) by
- 2002:a17:90b:17c2:b0:327:734a:ae7a with SMTP id 98e67ed59e1d1-33b5114ac35mr14074248a91.11.1760055666058;
- Thu, 09 Oct 2025 17:21:06 -0700 (PDT)
-Date: Thu, 09 Oct 2025 17:21:04 -0700
+ 2002:a17:903:2c5:b0:27f:1c1a:ee57 with SMTP id d9443c01a7336-290273736d4mr132813845ad.16.1760055686189;
+ Thu, 09 Oct 2025 17:21:26 -0700 (PDT)
+Date: Thu, 09 Oct 2025 17:21:24 -0700
 In-Reply-To: <20251007222356.348349-1-seanjc@google.com> (message from Sean
  Christopherson on Tue,  7 Oct 2025 15:23:56 -0700)
 Precedence: bulk
@@ -73,7 +73,7 @@ List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
-Message-ID: <diqz7bx3haj3.fsf@google.com>
+Message-ID: <diqz5xcnhaij.fsf@google.com>
 Subject: Re: [PATCH] KVM: guest_memfd: Define a CLASS to get+put guest_memfd
  file from a memslot
 From: Ackerley Tng <ackerleytng@google.com>
@@ -118,7 +118,7 @@ This is kind of dangerous, glad you highlighted this!
 >
 > Signed-off-by: Sean Christopherson <seanjc@google.com>
 
-
+Reviewed-by: Ackerley Tng <ackerleytng@google.com>
 
 > ---
 >  virt/kvm/guest_memfd.c | 22 ++++++++--------------
