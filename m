@@ -1,166 +1,253 @@
-Return-Path: <kvm+bounces-59801-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-59802-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id BDDBBBCF4D1
-	for <lists+kvm@lfdr.de>; Sat, 11 Oct 2025 13:58:19 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 45900BCF767
+	for <lists+kvm@lfdr.de>; Sat, 11 Oct 2025 16:33:06 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 3ABBB4E96EF
-	for <lists+kvm@lfdr.de>; Sat, 11 Oct 2025 11:58:05 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 7BCE3189B8AF
+	for <lists+kvm@lfdr.de>; Sat, 11 Oct 2025 14:33:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4A38426D4F1;
-	Sat, 11 Oct 2025 11:57:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0090A290F;
+	Sat, 11 Oct 2025 14:32:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="T7OK2Gog"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="UjrCKKxZ"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.21])
+Received: from out-172.mta0.migadu.com (out-172.mta0.migadu.com [91.218.175.172])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 63FB026B74A;
-	Sat, 11 Oct 2025 11:57:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.21
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BA39627BF6C
+	for <kvm@vger.kernel.org>; Sat, 11 Oct 2025 14:32:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1760183878; cv=none; b=YK9e+wn2LJxBexWP3NcP4WYlS+MiUMSGuNtxO53eBmuXEZevVpPWbsDS8/XxjA98UMpoRZSg12LqvrjPgY7YXoUw+8zjy51w3PROl8S5Tr5ZmxxVGvz0JPGvNBTColrKEx3+Rj9EMBJQXXzPIwuuqCTJHyQQy9aqF1EHyE21s4Y=
+	t=1760193176; cv=none; b=Hiei9JWB7cWV9ExCxJA/dKUZxRhX+KWOkyO6gvsBxm9I5LGVK2mrqcxpWclL2SIl9+7O+OOV3avJymGSOqK8BsgRjE6Evp83Hvmaz4ObXaY0evbXzJ8XVemgtETdPa84paMrdidIT6pZQNZA+b1zwGI6qHpevhXe4wldvAXVqRc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1760183878; c=relaxed/simple;
-	bh=apJt3RY2rGIw2sSuDVIW9g28uVuWxjX8XuKvILDChHM=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=lFKjBuaEkf2f6XK+EP55O1lyqBkZQ+/YwzIfDcIvpei91HAOAYJxJdY5ojzTj/oTf1+tccH4N5OgWM3S9sD0HUEkdg3kx78i21SO2Ttq05oHwDezg/4T4fawQDPwLDv71ZB3JBvcHa5RqJFoh8RJ0btNE9sVcrvA9zlaeUGOr4s=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=T7OK2Gog; arc=none smtp.client-ip=198.175.65.21
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1760183871; x=1791719871;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=apJt3RY2rGIw2sSuDVIW9g28uVuWxjX8XuKvILDChHM=;
-  b=T7OK2GogHBR0kk+JDLxOjxrLvMylpnjREdbfgRjhy5iTmjujXm7veKNS
-   PTVGd9co5hYgkJyncWiDrv1QkfXBfM9oDL+T9WEVLl8Faat38dYW11b6B
-   y1oB9p/qMIhTvnXlBFhnvU/siCk5T25cER+yZs3pTK+mFt+m/Yc3aMO4z
-   4Nvv3JGF5uyXZ4HM/x9tpEO6mOk+kPFAvrXvIoRyVWCQMTWugsvq/ZDqi
-   nXQIz6D1fzI1ORmui2UnptKRbGFkSiHtvo3lk2/sqHztfXh5gRFKAL7RY
-   nUXwgKxTxDhKQUyIxEpOtE3js2ZElq9UdVif69RxTSw7sU2iEOeII/ckG
-   g==;
-X-CSE-ConnectionGUID: kdoArvJnRUSl4PpYSpkQxQ==
-X-CSE-MsgGUID: q7Uj38mCTwOdOlaW+adRKQ==
-X-IronPort-AV: E=McAfee;i="6800,10657,11531"; a="62305702"
-X-IronPort-AV: E=Sophos;i="6.17,312,1747724400"; 
-   d="scan'208";a="62305702"
-Received: from orviesa005.jf.intel.com ([10.64.159.145])
-  by orvoesa113.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 11 Oct 2025 04:57:51 -0700
-X-CSE-ConnectionGUID: I+r30GgoQwCI86EDS47p9g==
-X-CSE-MsgGUID: k9tYwXXhQgy2YtKkrvIYwA==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.19,221,1754982000"; 
-   d="scan'208";a="186294987"
-Received: from lkp-server01.sh.intel.com (HELO 6a630e8620ab) ([10.239.97.150])
-  by orviesa005.jf.intel.com with ESMTP; 11 Oct 2025 04:57:49 -0700
-Received: from kbuild by 6a630e8620ab with local (Exim 4.96)
-	(envelope-from <lkp@intel.com>)
-	id 1v7YEM-0003kB-23;
-	Sat, 11 Oct 2025 11:57:46 +0000
-Date: Sat, 11 Oct 2025 19:57:07 +0800
-From: kernel test robot <lkp@intel.com>
-To: Alex Mastro <amastro@fb.com>,
-	Alex Williamson <alex.williamson@redhat.com>
-Cc: oe-kbuild-all@lists.linux.dev, Jason Gunthorpe <jgg@ziepe.ca>,
-	Alejandro Jimenez <alejandro.j.jimenez@oracle.com>,
-	kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
-	Alex Mastro <amastro@fb.com>
-Subject: Re: [PATCH v3 3/3] vfio/type1: handle DMA map/unmap up to the
- addressable limit
-Message-ID: <202510111953.naYvy8XB-lkp@intel.com>
-References: <20251010-fix-unmap-v3-3-306c724d6998@fb.com>
+	s=arc-20240116; t=1760193176; c=relaxed/simple;
+	bh=Rg//Celz7bZVYwFutchuLMutpRd3KAuXCKgvp9l+Sp4=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=uu7KhF7fwvhAZJltRif9BGFK95Mz2SLkT8ozXXphoFME8ZMfzDNZ7A1VTVR5mJCsLDvU+Je/CgURhssyb+CQJXXtWmyXIiYfqdyC191hCrOSU0uKDWXgaOLd9PQ5K9iKpAkfwWpQbZVawd0+xnhLtDASt+MA5a+uPElJQ5QqclU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=UjrCKKxZ; arc=none smtp.client-ip=91.218.175.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+Message-ID: <d25340e3-2017-4614-a472-c5c7244c7ce4@linux.dev>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1760193160;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=W6DAktFf8ux13w20eariAQM5EE06H68osCBE8i4364c=;
+	b=UjrCKKxZ7HfUt7+I13g5vfVRPU1qXFULaDafrS7I83LwXVt6aH0moEoYrW9v3fMHyte3Lc
+	JIVb1vAXalk/iAX9JV1paqTF7GbCKdZcWmZHtsHe0AsdOKnwoKmIv3g4EwebnsComkRoff
+	oN69fjYfPJQ1nqoEOUx/q55njQikJ+A=
+Date: Sat, 11 Oct 2025 16:32:34 +0200
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20251010-fix-unmap-v3-3-306c724d6998@fb.com>
+Subject: Re: [PATCH v7 06/12] KVM: guest_memfd: add module param for disabling
+ TLB flushing
+To: David Hildenbrand <david@redhat.com>, Will Deacon <will@kernel.org>
+Cc: Dave Hansen <dave.hansen@intel.com>, "Roy, Patrick"
+ <roypat@amazon.co.uk>, "pbonzini@redhat.com" <pbonzini@redhat.com>,
+ "corbet@lwn.net" <corbet@lwn.net>, "maz@kernel.org" <maz@kernel.org>,
+ "oliver.upton@linux.dev" <oliver.upton@linux.dev>,
+ "joey.gouly@arm.com" <joey.gouly@arm.com>,
+ "suzuki.poulose@arm.com" <suzuki.poulose@arm.com>,
+ "yuzenghui@huawei.com" <yuzenghui@huawei.com>,
+ "catalin.marinas@arm.com" <catalin.marinas@arm.com>,
+ "tglx@linutronix.de" <tglx@linutronix.de>,
+ "mingo@redhat.com" <mingo@redhat.com>, "bp@alien8.de" <bp@alien8.de>,
+ "dave.hansen@linux.intel.com" <dave.hansen@linux.intel.com>,
+ "x86@kernel.org" <x86@kernel.org>, "hpa@zytor.com" <hpa@zytor.com>,
+ "luto@kernel.org" <luto@kernel.org>,
+ "peterz@infradead.org" <peterz@infradead.org>,
+ "willy@infradead.org" <willy@infradead.org>,
+ "akpm@linux-foundation.org" <akpm@linux-foundation.org>,
+ "lorenzo.stoakes@oracle.com" <lorenzo.stoakes@oracle.com>,
+ "Liam.Howlett@oracle.com" <Liam.Howlett@oracle.com>,
+ "vbabka@suse.cz" <vbabka@suse.cz>, "rppt@kernel.org" <rppt@kernel.org>,
+ "surenb@google.com" <surenb@google.com>, "mhocko@suse.com"
+ <mhocko@suse.com>, "song@kernel.org" <song@kernel.org>,
+ "jolsa@kernel.org" <jolsa@kernel.org>, "ast@kernel.org" <ast@kernel.org>,
+ "daniel@iogearbox.net" <daniel@iogearbox.net>,
+ "andrii@kernel.org" <andrii@kernel.org>,
+ "martin.lau@linux.dev" <martin.lau@linux.dev>,
+ "eddyz87@gmail.com" <eddyz87@gmail.com>,
+ "yonghong.song@linux.dev" <yonghong.song@linux.dev>,
+ "john.fastabend@gmail.com" <john.fastabend@gmail.com>,
+ "kpsingh@kernel.org" <kpsingh@kernel.org>, "sdf@fomichev.me"
+ <sdf@fomichev.me>, "haoluo@google.com" <haoluo@google.com>,
+ "jgg@ziepe.ca" <jgg@ziepe.ca>, "jhubbard@nvidia.com" <jhubbard@nvidia.com>,
+ "peterx@redhat.com" <peterx@redhat.com>, "jannh@google.com"
+ <jannh@google.com>, "pfalcato@suse.de" <pfalcato@suse.de>,
+ "shuah@kernel.org" <shuah@kernel.org>, "seanjc@google.com"
+ <seanjc@google.com>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+ "linux-doc@vger.kernel.org" <linux-doc@vger.kernel.org>,
+ "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+ "linux-arm-kernel@lists.infradead.org"
+ <linux-arm-kernel@lists.infradead.org>,
+ "kvmarm@lists.linux.dev" <kvmarm@lists.linux.dev>,
+ "linux-fsdevel@vger.kernel.org" <linux-fsdevel@vger.kernel.org>,
+ "linux-mm@kvack.org" <linux-mm@kvack.org>,
+ "bpf@vger.kernel.org" <bpf@vger.kernel.org>,
+ "linux-kselftest@vger.kernel.org" <linux-kselftest@vger.kernel.org>,
+ "Cali, Marco" <xmarcalx@amazon.co.uk>,
+ "Kalyazin, Nikita" <kalyazin@amazon.co.uk>,
+ "Thomson, Jack" <jackabt@amazon.co.uk>,
+ "derekmn@amazon.co.uk" <derekmn@amazon.co.uk>,
+ "tabba@google.com" <tabba@google.com>,
+ "ackerleytng@google.com" <ackerleytng@google.com>
+References: <20250924151101.2225820-4-patrick.roy@campus.lmu.de>
+ <20250924152214.7292-1-roypat@amazon.co.uk>
+ <20250924152214.7292-3-roypat@amazon.co.uk>
+ <e25867b6-ffc0-4c7c-9635-9b3f47b186ca@intel.com>
+ <c1875a54-0c87-450f-9370-29e7ec4fea3d@redhat.com>
+ <82bff1c4-987f-46cb-833c-bd99eaa46e7a@intel.com>
+ <c79173d8-6f18-40fa-9621-e691990501e4@redhat.com>
+ <c88514c3-e15f-4853-8acf-15e7b4b979f4@linux.dev>
+ <aNZwmPFAxm_HRYpC@willie-the-truck>
+ <5d11b5f7-3208-4ea8-bbff-f535cf62d576@redhat.com>
+ <be89abc6-97ca-47d8-b8e7-95f58ab9cc67@linux.dev>
+ <f13e06f3-3c7b-4993-b33a-a6921c14231b@redhat.com>
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Patrick Roy <patrick.roy@linux.dev>
+Content-Language: en-US
+In-Reply-To: <f13e06f3-3c7b-4993-b33a-a6921c14231b@redhat.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-Migadu-Flow: FLOW_OUT
 
-Hi Alex,
+Hey all,
 
-kernel test robot noticed the following build warnings:
+sorry it took me a while to get back to this, turns out moving
+internationally is move time consuming than I expected.
 
-[auto build test WARNING on 407aa63018d15c35a34938633868e61174d2ef6e]
+On Mon, 2025-09-29 at 12:20 +0200, David Hildenbrand wrote:
+> On 27.09.25 09:38, Patrick Roy wrote:
+>> On Fri, 2025-09-26 at 21:09 +0100, David Hildenbrand wrote:
+>>> On 26.09.25 12:53, Will Deacon wrote:
+>>>> On Fri, Sep 26, 2025 at 10:46:15AM +0100, Patrick Roy wrote:
+>>>>> On Thu, 2025-09-25 at 21:13 +0100, David Hildenbrand wrote:
+>>>>>> On 25.09.25 21:59, Dave Hansen wrote:
+>>>>>>> On 9/25/25 12:20, David Hildenbrand wrote:
+>>>>>>>> On 25.09.25 20:27, Dave Hansen wrote:
+>>>>>>>>> On 9/24/25 08:22, Roy, Patrick wrote:
+>>>>>>>>>> Add an option to not perform TLB flushes after direct map manipulations.
+>>>>>>>>>
+>>>>>>>>> I'd really prefer this be left out for now. It's a massive can of worms.
+>>>>>>>>> Let's agree on something that works and has well-defined behavior before
+>>>>>>>>> we go breaking it on purpose.
+>>>>>>>>
+>>>>>>>> May I ask what the big concern here is?
+>>>>>>>
+>>>>>>> It's not a _big_ concern.
+>>>>>>
+>>>>>> Oh, I read "can of worms" and thought there is something seriously problematic :)
+>>>>>>
+>>>>>>> I just think we want to start on something
+>>>>>>> like this as simple, secure, and deterministic as possible.
+>>>>>>
+>>>>>> Yes, I agree. And it should be the default. Less secure would have to be opt-in and documented thoroughly.
+>>>>>
+>>>>> Yes, I am definitely happy to have the 100% secure behavior be the
+>>>>> default, and the skipping of TLB flushes be an opt-in, with thorough
+>>>>> documentation!
+>>>>>
+>>>>> But I would like to include the "skip tlb flushes" option as part of
+>>>>> this patch series straight away, because as I was alluding to in the
+>>>>> commit message, with TLB flushes this is not usable for Firecracker for
+>>>>> performance reasons :(
+>>>>
+>>>> I really don't want that option for arm64. If we're going to bother
+>>>> unmapping from the linear map, we should invalidate the TLB.
+>>>
+>>> Reading "TLB flushes result in a up to 40x elongation of page faults in
+>>> guest_memfd (scaling with the number of CPU cores), or a 5x elongation
+>>> of memory population,", I can understand why one would want that optimization :)
+>>>
+>>> @Patrick, couldn't we use fallocate() to preallocate memory and batch the TLB flush within such an operation?
+>>>
+>>> That is, we wouldn't flush after each individual direct-map modification but after multiple ones part of a single operation like fallocate of a larger range.
+>>>
+>>> Likely wouldn't make all use cases happy.
+>>>
+>>
+>> For Firecracker, we rely a lot on not preallocating _all_ VM memory, and
+>> trying to ensure only the actual "working set" of a VM is faulted in (we
+>> pack a lot more VMs onto a physical host than there is actual physical
+>> memory available). For VMs that are restored from a snapshot, we know
+>> pretty well what memory needs to be faulted in (that's where @Nikita's
+>> write syscall comes in), so there we could try such an optimization. But
+>> for everything else we very much rely on the on-demand nature of guest
+>> memory allocation (and hence direct map removal). And even right now,
+>> the long pole performance-wise are these on-demand faults, so really, we
+>> don't want them to become even slower :(
+> 
+> Makes sense. I guess even without support for large folios one could implement a kind of "fault" around: for example, on access to one addr, allocate+prepare all pages in the same 2 M chunk, flushing the tlb only once after adjusting all the direct map entries.
+> 
+>>
+>> Also, can we really batch multiple TLB flushes as you suggest? Even if
+>> pages are at consecutive indices in guest_memfd, they're not guaranteed
+>> to be continguous physically, e.g. we couldn't just coalesce multiple
+>> TLB flushes into a single TLB flush of a larger range.
+> 
+> Well, you there is the option on just flushing the complete tlb of course :) When trying to flush a range you would indeed run into the problem of flushing an ever growing range.
 
-url:    https://github.com/intel-lab-lkp/linux/commits/Alex-Mastro/vfio-type1-sanitize-for-overflow-using-check_-_overflow/20251010-154148
-base:   407aa63018d15c35a34938633868e61174d2ef6e
-patch link:    https://lore.kernel.org/r/20251010-fix-unmap-v3-3-306c724d6998%40fb.com
-patch subject: [PATCH v3 3/3] vfio/type1: handle DMA map/unmap up to the addressable limit
-config: i386-buildonly-randconfig-001-20251011 (https://download.01.org/0day-ci/archive/20251011/202510111953.naYvy8XB-lkp@intel.com/config)
-compiler: gcc-13 (Debian 13.3.0-16) 13.3.0
-reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20251011/202510111953.naYvy8XB-lkp@intel.com/reproduce)
+In the last guest_memfd upstream call (over a week ago now), we've
+discussed the option of batching and deferring TLB flushes, while
+providing a sort of "deadline" at which a TLB flush will
+deterministically be done.  E.g. guest_memfd would keep a counter of how
+many pages got direct map zapped, and do a flush of a range that
+contains all zapped pages every 512 allocated pages (and to ensure the
+flushes even happen in a timely manner if no allocations happen for a
+long time, also every, say, 5 seconds or something like that). Would
+that work for everyone? I briefly tested the performance of
+batch-flushes with secretmem in QEMU, and its within of 30% of the "no
+TLB flushes at all" solution in a simple benchmark that just memsets
+2GiB of memory.
 
-If you fix the issue in a separate patch/commit (i.e. not just a new version of
-the same patch/commit), kindly add following tags
-| Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202510111953.naYvy8XB-lkp@intel.com/
+I think something like this, together with the batch-flushing at the end
+of fallocate() / write() as David suggested above should work for
+Firecracker.
 
-All warnings (new ones prefixed by >>):
+>> There's probably other things we can try. Backing guest_memfd with
+>> hugepages would reduce the number TLB flushes by 512x (although not all
+>> users of Firecracker at Amazon [can] use hugepages).
+> 
+> Right.
+> 
+>>
+>> And I do still wonder if it's possible to have "async TLB flushes" where
+>> we simply don't wait for the IPI (x86 terminology, not sure what the
+>> mechanism on arm64 is). Looking at
+>> smp_call_function_many_cond()/invlpgb_kernel_range_flush() on x86, it
+>> seems so? Although seems like on ARM it's actually just handled by a
+>> single instruction (TLBI) and not some interprocess communication
+>> thingy. Maybe there's a variant that's faster / better for this usecase?
+> 
+> Right, some architectures (and IIRC also x86 with some extension) are able to flush remote TLBs without IPIs.
+> 
+> Doing a quick search, there seems to be some research on async TLB flushing, e.g., [1].
+> 
+> In the context here, I wonder whether an async TLB flush would be
+> significantly better than not doing an explicit TLB flush: in both
+> cases, it's not really deterministic when the relevant TLB entries
+> will vanish: with the async variant it might happen faster on average
+> I guess.
 
-   In file included from include/linux/overflow.h:6,
-                    from include/linux/bits.h:32,
-                    from include/linux/bitops.h:6,
-                    from include/linux/log2.h:12,
-                    from arch/x86/include/asm/div64.h:8,
-                    from include/linux/math.h:6,
-                    from include/linux/math64.h:6,
-                    from include/linux/time.h:6,
-                    from include/linux/compat.h:10,
-                    from drivers/vfio/vfio_iommu_type1.c:24:
-   drivers/vfio/vfio_iommu_type1.c: In function 'vfio_dma_do_unmap':
->> include/linux/limits.h:25:25: warning: conversion from 'long long unsigned int' to 'dma_addr_t' {aka 'unsigned int'} changes value from '18446744073709551615' to '4294967295' [-Woverflow]
-      25 | #define U64_MAX         ((u64)~0ULL)
-         |                         ^
-   drivers/vfio/vfio_iommu_type1.c:1361:28: note: in expansion of macro 'U64_MAX'
-    1361 |                 iova_end = U64_MAX;
-         |                            ^~~~~~~
---
-   In file included from include/linux/overflow.h:6,
-                    from include/linux/bits.h:32,
-                    from include/linux/bitops.h:6,
-                    from include/linux/log2.h:12,
-                    from arch/x86/include/asm/div64.h:8,
-                    from include/linux/math.h:6,
-                    from include/linux/math64.h:6,
-                    from include/linux/time.h:6,
-                    from include/linux/compat.h:10,
-                    from vfio_iommu_type1.c:24:
-   vfio_iommu_type1.c: In function 'vfio_dma_do_unmap':
->> include/linux/limits.h:25:25: warning: conversion from 'long long unsigned int' to 'dma_addr_t' {aka 'unsigned int'} changes value from '18446744073709551615' to '4294967295' [-Woverflow]
-      25 | #define U64_MAX         ((u64)~0ULL)
-         |                         ^
-   vfio_iommu_type1.c:1361:28: note: in expansion of macro 'U64_MAX'
-    1361 |                 iova_end = U64_MAX;
-         |                            ^~~~~~~
+I actually did end up playing around with this a while ago, and it made
+things slightly better performance wise, but it was still too bad to be
+useful :(
 
+> 
+> [1] https://cs.yale.edu/homes/abhishek/kumar-taco20.pdf
+>
 
-vim +25 include/linux/limits.h
-
-3c9d017cc283df Andy Shevchenko 2023-08-04  14  
-54d50897d544c8 Masahiro Yamada 2019-03-07  15  #define U8_MAX		((u8)~0U)
-54d50897d544c8 Masahiro Yamada 2019-03-07  16  #define S8_MAX		((s8)(U8_MAX >> 1))
-54d50897d544c8 Masahiro Yamada 2019-03-07  17  #define S8_MIN		((s8)(-S8_MAX - 1))
-54d50897d544c8 Masahiro Yamada 2019-03-07  18  #define U16_MAX		((u16)~0U)
-54d50897d544c8 Masahiro Yamada 2019-03-07  19  #define S16_MAX		((s16)(U16_MAX >> 1))
-54d50897d544c8 Masahiro Yamada 2019-03-07  20  #define S16_MIN		((s16)(-S16_MAX - 1))
-54d50897d544c8 Masahiro Yamada 2019-03-07  21  #define U32_MAX		((u32)~0U)
-3f50f132d8400e John Fastabend  2020-03-30  22  #define U32_MIN		((u32)0)
-54d50897d544c8 Masahiro Yamada 2019-03-07  23  #define S32_MAX		((s32)(U32_MAX >> 1))
-54d50897d544c8 Masahiro Yamada 2019-03-07  24  #define S32_MIN		((s32)(-S32_MAX - 1))
-54d50897d544c8 Masahiro Yamada 2019-03-07 @25  #define U64_MAX		((u64)~0ULL)
-54d50897d544c8 Masahiro Yamada 2019-03-07  26  #define S64_MAX		((s64)(U64_MAX >> 1))
-54d50897d544c8 Masahiro Yamada 2019-03-07  27  #define S64_MIN		((s64)(-S64_MAX - 1))
-54d50897d544c8 Masahiro Yamada 2019-03-07  28  
-
--- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
+Best, 
+Patrick
 
