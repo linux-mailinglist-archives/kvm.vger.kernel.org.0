@@ -1,93 +1,120 @@
-Return-Path: <kvm+bounces-59838-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-59839-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [213.196.21.55])
-	by mail.lfdr.de (Postfix) with ESMTPS id 21B7EBCFED1
-	for <lists+kvm@lfdr.de>; Sun, 12 Oct 2025 04:53:18 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id E8B6DBCFFD7
+	for <lists+kvm@lfdr.de>; Sun, 12 Oct 2025 08:35:02 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 80A6634859B
-	for <lists+kvm@lfdr.de>; Sun, 12 Oct 2025 02:53:17 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id ADF691895132
+	for <lists+kvm@lfdr.de>; Sun, 12 Oct 2025 06:35:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 321401E0DFE;
-	Sun, 12 Oct 2025 02:53:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B3E0E219A8A;
+	Sun, 12 Oct 2025 06:34:50 +0000 (UTC)
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-il1-f200.google.com (mail-il1-f200.google.com [209.85.166.200])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from bmailout1.hostsharing.net (bmailout1.hostsharing.net [83.223.95.100])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 307971CDFCA
-	for <kvm@vger.kernel.org>; Sun, 12 Oct 2025 02:53:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.200
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 04D811E5B71;
+	Sun, 12 Oct 2025 06:34:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=83.223.95.100
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1760237584; cv=none; b=i9mPtpdRDV8kG+JSExiIZLvDNCHevgH7Q76z1RaFnrwKFqv55DFvQRyeNAKPqjXJrgWTA/hRpCjeSkZy4LxqVDXuyfKH9F4W0UTGgA46xxonxxjRCKEDAdOqunW9coje6LhHoD1q6+8gIPW+IKUzvou9pbyuJf6Ps11ZWkadn9M=
+	t=1760250890; cv=none; b=AIpoMWSywDqjtrsrw4YG22miaHR2OkJztiGte+wVp0ED5Bk376jbiUlKjt/gJRIcQiS2yHX3IkBw6+X6SlPOjM3a0KdMAY2aaIXnRqRlgpd6C7jc7hEG+vv2OH2IvzFDQfIm0GrXJl1Dg1dV0ghd1JAvGecp+2MkMneW5t70CJk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1760237584; c=relaxed/simple;
-	bh=7BJjU8mvRZTO3CSraVklA+BVU855Jmx35bucmD12j8s=;
-	h=MIME-Version:Date:In-Reply-To:Message-ID:Subject:From:To:
-	 Content-Type; b=lP0AD/T9WC7hboImOTU2tYEFCcB5zU3fUioQ/vjw7qG3dxlprRXOoIOJdGeNEsstKNk4yElINTrPhXdnZ/Q3CEZ3iJ0n73XCRbUOWqb28xQJECQ+BPVny78j8NE0xF4DEn1NlvbGyGS7A0Oo63/fuKD84Vwnm2CZ0UQUXq0pnbU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.200
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-il1-f200.google.com with SMTP id e9e14a558f8ab-42f610046d9so244570105ab.3
-        for <kvm@vger.kernel.org>; Sat, 11 Oct 2025 19:53:02 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1760237582; x=1760842382;
-        h=to:from:subject:message-id:in-reply-to:date:mime-version
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=POMw7ZBLU0e1mkn6ITfoldLxK4uCmWFVIYgnY1nu5E8=;
-        b=DE8lNXgnKcpuWjZRmsqaSN3K5cNNZtwOTbBNCOHZ4XClFK7cHNOMt0xMmbm5PjdR7l
-         1C0mYGt4FitCQ81I8ANF4A9Y+Ji7HKSv1RzHzGse52JSoskt18TKFCqLFrMxr1iW76e9
-         GqwEkdzCavfkX1WrLs4n6ty4UTpjG1Kmr7AK17QtuF9whXVSrHJino7Lb2/l/fv+Mgha
-         hTfON9uq0vLANDvR+FDxg1dGI/FxKO61OboXX3rhOXtR2ZIWas19HYOLCuO6bWdQNH8n
-         uC0gQk5ZnJ5MnXSJrSLZ1MOfC8BPcIOCrB229pE+qCMGAL8sfQ8T2meWgkg4SqQ4ZBda
-         7u7g==
-X-Forwarded-Encrypted: i=1; AJvYcCV/MZR2x6HLopZ0UJFnxKAvgULYkz66P0gwWtLJS0Qj7aLJi44S7MYoj4VzjEtjBLc0UQk=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxT6DBcu3Ej81iaxly0OBm+dWD/k2rhdDu+RAKEZfU7WDjzu+uw
-	8TJWiOen8ygMC5WEDTxVAmXdA/MOqFCKAwqIUxeW2/dRJQhXU54RTe+xR4V7MTS/KhkcQbG5tBe
-	Y8E7rlYt6ldbi0B+/Dk21tKH2HIJMrePTZdn+V9RY4yGX3t5jUxo51UyCiKU=
-X-Google-Smtp-Source: AGHT+IGqV0tPIVVdEjjAOeDHjFSsyZFT0ykscgyvsHYo2mV1t+Vehl/zrV8TZ9Q5Jm5BJ8acjYmW9IU1jCBhRzvqgTCKTWGetdYt
+	s=arc-20240116; t=1760250890; c=relaxed/simple;
+	bh=LiSurZAtGfp1vzW2kzC2/cKeiPOwaeE3HkoNSkO3WKo=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=t/AgLzExSoCGpoBi8bYJxwfIzSZLC4dVOiwzpf4GkEHsDcRuWdp3YI323hcZko4pKMinHAEyHhpbyqpltYKAwThCbZ60eBnEMbFi+wOR06NfyUZbA6a9gJyAy6i8/jjIIZNyNTQZLfLFVUCXtia8pBQWdIO+uHH8gIksOl6d030=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=wunner.de; spf=none smtp.mailfrom=h08.hostsharing.net; arc=none smtp.client-ip=83.223.95.100
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=wunner.de
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=h08.hostsharing.net
+Received: from h08.hostsharing.net (h08.hostsharing.net [83.223.95.28])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256
+	 client-signature RSA-PSS (4096 bits) client-digest SHA256)
+	(Client CN "*.hostsharing.net", Issuer "RapidSSL TLS RSA CA G1" (verified OK))
+	by bmailout1.hostsharing.net (Postfix) with ESMTPS id 2478B2C06845;
+	Sun, 12 Oct 2025 08:34:37 +0200 (CEST)
+Received: by h08.hostsharing.net (Postfix, from userid 100393)
+	id 0A6EE4A12; Sun, 12 Oct 2025 08:34:37 +0200 (CEST)
+Date: Sun, 12 Oct 2025 08:34:37 +0200
+From: Lukas Wunner <lukas@wunner.de>
+To: Niklas Schnelle <schnelle@linux.ibm.com>
+Cc: Farhan Ali <alifm@linux.ibm.com>, Benjamin Block <bblock@linux.ibm.com>,
+	linux-s390@vger.kernel.org, kvm@vger.kernel.org,
+	linux-kernel@vger.kernel.org, linux-pci@vger.kernel.org,
+	alex.williamson@redhat.com, helgaas@kernel.org, clg@redhat.com,
+	mjrosato@linux.ibm.com
+Subject: Re: [PATCH v4 01/10] PCI: Avoid saving error values for config space
+Message-ID: <aOtL_Y6HH5-qh2jD@wunner.de>
+References: <20251001151543.GB408411@p1gen4-pw042f0m>
+ <ae5b191d-ffc6-4d40-a44b-d08e04cac6be@linux.ibm.com>
+ <aOE1JMryY_Oa663e@wunner.de>
+ <c0818c13-8075-4db0-b76f-3c9b10516e7a@linux.ibm.com>
+ <aOQX6ZTMvekd6gWy@wunner.de>
+ <8c14d648-453c-4426-af69-4e911a1128c1@linux.ibm.com>
+ <aOZoWDQV0TNh-NiM@wunner.de>
+ <21ef5524-738a-43d5-bc9a-87f907a8aa70@linux.ibm.com>
+ <aOaqEhLOzWzswx8O@wunner.de>
+ <d69f239040b830718b124c5bcef01b5075768226.camel@linux.ibm.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a05:6e02:1488:b0:42e:2c30:285b with SMTP id
- e9e14a558f8ab-42f873d1c4bmr168499695ab.20.1760237582254; Sat, 11 Oct 2025
- 19:53:02 -0700 (PDT)
-Date: Sat, 11 Oct 2025 19:53:02 -0700
-In-Reply-To: <684196cd.050a0220.2461cf.001e.GAE@google.com>
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <68eb180e.a70a0220.b3ac9.0010.GAE@google.com>
-Subject: Re: [syzbot] [kvm-x86?] WARNING in kvm_apic_accept_events
-From: syzbot <syzbot+b1784a9a955885da51cd@syzkaller.appspotmail.com>
-To: bp@alien8.de, dave.hansen@linux.intel.com, hpa@zytor.com, 
-	kvm@vger.kernel.org, linux-kernel@vger.kernel.org, mingo@redhat.com, 
-	pbonzini@redhat.com, seanjc@google.com, syzkaller-bugs@googlegroups.com, 
-	tglx@linutronix.de, x86@kernel.org
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <d69f239040b830718b124c5bcef01b5075768226.camel@linux.ibm.com>
 
-syzbot suspects this issue was fixed by commit:
+On Thu, Oct 09, 2025 at 11:12:03AM +0200, Niklas Schnelle wrote:
+> On Wed, 2025-10-08 at 20:14 +0200, Lukas Wunner wrote:
+> > And yet you're touching the device by trying to reset it.
+> > 
+> > The code you're introducing in patch [01/10] only becomes necessary
+> > because you're not following the above-quoted protocol.  If you
+> > follow the protocol, patch [01/10] becomes unnecessary.
+> 
+> I agree with your point above error_detected() should not touch the
+> device. My understanding of Farhan's series though is that it follows
+> that rule. As I understand it error_detected() is only used to inject
+> the s390 specific PCI error event into the VM using the information
+> stored in patch 7. As before vfio-pci returns
+> PCI_ERS_RESULT_CAN_RECOVER from error_detected() but then with patch 7
+> the pass-through case is detected and this gets turned into
+> PCI_ERS_RESULT_RECOVERED and the rest of the s390 recovery code gets
+> skipped. And yeah, writing it down I'm not super happy with this part,
+> maybe it would be better to have an explicit
+> PCI_ERS_RESULT_LEAVE_AS_IS.
 
-commit 0fe3e8d804fdcc09ef44fbffcad8c39261a03470
-Author: Sean Christopherson <seanjc@google.com>
-Date:   Thu Jun 5 19:50:17 2025 +0000
+Thanks, that's the high-level overview I was looking for.
 
-    KVM: x86: Move INIT_RECEIVED vs. INIT/SIPI blocked check to KVM_RUN
+It would be good to include something like this at least
+in the cover letter or additionally in the commit messages
+so that it's easier for reviewers to connect the dots.
 
-bisection log:  https://syzkaller.appspot.com/x/bisect.txt?x=1585c9e2580000
-start commit:   64980441d269 Merge tag 'bpf-fixes' of git://git.kernel.org..
-git tree:       upstream
-kernel config:  https://syzkaller.appspot.com/x/.config?x=26abb92f9ef9d1d0
-dashboard link: https://syzkaller.appspot.com/bug?extid=b1784a9a955885da51cd
-syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=12200c0c580000
-C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=16fd31d4580000
+I was expecting paravirtualized error handling, i.e. the
+VM is aware it's virtualized and vfio essentially proxies
+the pci_ers_result return value of the driver (e.g. nvme)
+back to the host, thereby allowing the host to drive error
+recovery normally.  I'm not sure if there are technical
+reasons preventing such an approach.
 
-If the result looks correct, please mark the issue as fixed by replying with:
+If you do want to stick with your alternative approach,
+maybe doing the error handling in the ->mmio_enabled() phase
+instead of ->error_detected() would make more sense.
+In that phase you're allowed to access the device,
+you can also attempt a local reset and return
+PCI_ERS_RESULT_RECOVERED on success.
 
-#syz fix: KVM: x86: Move INIT_RECEIVED vs. INIT/SIPI blocked check to KVM_RUN
+You'd have to return PCI_ERS_RESULT_CAN_RECOVER though
+from the ->error_detected() callback in order to progress
+to the ->mmio_enabled() step.
 
-For information about bisection process see: https://goo.gl/tpsmEJ#bisection
+Does that make sense?
+
+Thanks,
+
+Lukas
 
