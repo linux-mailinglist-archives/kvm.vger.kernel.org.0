@@ -1,180 +1,178 @@
-Return-Path: <kvm+bounces-59842-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-59843-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id C512ABD0030
-	for <lists+kvm@lfdr.de>; Sun, 12 Oct 2025 09:16:50 +0200 (CEST)
+Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [213.196.21.55])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6B243BD0046
+	for <lists+kvm@lfdr.de>; Sun, 12 Oct 2025 09:26:47 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id DB3CD189494A
-	for <lists+kvm@lfdr.de>; Sun, 12 Oct 2025 07:17:13 +0000 (UTC)
+	by ams.mirrors.kernel.org (Postfix) with ESMTPS id E411434878C
+	for <lists+kvm@lfdr.de>; Sun, 12 Oct 2025 07:26:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C0153212572;
-	Sun, 12 Oct 2025 07:16:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 85C03221FB2;
+	Sun, 12 Oct 2025 07:26:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="mWaJR1Gm"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="BdmKOPcL"
 X-Original-To: kvm@vger.kernel.org
-Received: from MW6PR02CU001.outbound.protection.outlook.com (mail-westus2azon11012055.outbound.protection.outlook.com [52.101.48.55])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 73AEA221F00;
-	Sun, 12 Oct 2025 07:16:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.48.55
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1760253393; cv=fail; b=WFBaOM5M0zDu5Xz+55MfHEoN8Xbsci5JB6i+ZDZm7QngOpc/K4kwj1ily4tPaBBDbql6lbGGvYapkCtuE2deKalzXhwhqgUVwsbDBk6TApqMRNoiQPWpXeFvzMoovLR6MLbJjHWyB5J1PO0MKZB/eiligSLiFfaaYlngcZIIjQM=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1760253393; c=relaxed/simple;
-	bh=WCuGq9eFpjNcOdEn6S9sKF1OKFW5aP0ZojeN2zUGjZM=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=UgMxVstxZnGwzrLSL3hBDJSJkAm0IKNGoPUvHlGXfmfPVHzUD1m7rLjUVXIwy0VbKaGAHhQ6+pMcwmWhwkMD0lQfiw4+fJJ59Kp1f/I+Lr/x4/Ekg5FFbYs+ficy9n0nSqHcNjToXPL9AIU5d8+WAGJq646Ais4NJW4ZQ2WHYlY=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=mWaJR1Gm; arc=fail smtp.client-ip=52.101.48.55
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=YFWyHhm4A87mEbwbJoPIpQqpc0wFoE9dWg3C63R4eE7OTB58MSvwYcpXeH831I/JdH7kRLook/dGJzWUZjOFgmeoW6R9FoCisPzglt0qM3hQ0tv42DuZKv/mbF24AFMqSyMI+HQuOdacEkOLMja1CdM1uI8IKSKucScKMZITRApHwa/PiBSrgz+U69l49I+ma9CQrwp6IVJZBbFc/XQIDSkkTx4mse1ch4osh5InnEP/LMSB2Ib7OEYufllWuki7aM10sFV+EStzXxQdXmVUzmsAl3jAnyisjtL0wIBBq5wvrSw3aCB1Sa5SEMp/vyjUOTXsdr7v36xlsilE1Dek3g==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=oRFQz9hut+AkMJmBn+s9xdbz26IfbQCH4yE0DcrJur4=;
- b=pQGz8kZlVUAIynmHy0y2YtwdLWXoBQW8ad6YKMkhVPKTIjgJgvWwxmQ2mQPmwe0eZ6JR0TcY0RIPn0RjmJZlBTzAMgUQVEv3OD9oGIFmxXPfw0uYFKMJq7B7Yqb+22aVqU3ZnVz5uQQvEtGKW068gwH/xRzLkWZ0epdD/N8Frhki7RP8lg9a/MpmYv/nN+dHvhp5sSiRdKyxRm05ZmZInAO83MFmlnxIPTLqos8/pwhLkimh+zo5Ts6lauV1zp/0dSli5J0UJTbL7JRLLLEOFbyFT2kyO/DTkw6lfkeOVtavK/6WZMEo1MHxfbaNJADqNvH0hHabYX7hW3dKAPnEjg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 165.204.84.17) smtp.rcpttodomain=redhat.com smtp.mailfrom=amd.com; dmarc=pass
- (p=quarantine sp=quarantine pct=100) action=none header.from=amd.com;
- dkim=none (message not signed); arc=none (0)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=oRFQz9hut+AkMJmBn+s9xdbz26IfbQCH4yE0DcrJur4=;
- b=mWaJR1GmjBoKSdGVzBJAOxkMme5Me4K1AXqrOJFuqLOPbF5iQGT6GkNrXjqX3qZV7j71o5JAr4niL1xzOb+XA/jql9bQVwEpWHXH3Wv9PupAVUP+HVqqH+s0Kt8A/F5GqRBEvJNH8wHGRdsgvzavsmptJ9VqNswhxRLFceTmMuU=
-Received: from MN2PR13CA0036.namprd13.prod.outlook.com (2603:10b6:208:160::49)
- by CH1PR12MB9597.namprd12.prod.outlook.com (2603:10b6:610:2ae::12) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9203.11; Sun, 12 Oct
- 2025 07:16:28 +0000
-Received: from BN1PEPF00004683.namprd03.prod.outlook.com
- (2603:10b6:208:160:cafe::3b) by MN2PR13CA0036.outlook.office365.com
- (2603:10b6:208:160::49) with Microsoft SMTP Server (version=TLS1_3,
- cipher=TLS_AES_256_GCM_SHA384) id 15.20.9228.8 via Frontend Transport; Sun,
- 12 Oct 2025 07:16:27 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
- smtp.mailfrom=amd.com; dkim=none (message not signed)
- header.d=none;dmarc=pass action=none header.from=amd.com;
-Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
- 165.204.84.17 as permitted sender) receiver=protection.outlook.com;
- client-ip=165.204.84.17; helo=satlexmb07.amd.com; pr=C
-Received: from satlexmb07.amd.com (165.204.84.17) by
- BN1PEPF00004683.mail.protection.outlook.com (10.167.243.89) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.9228.7 via Frontend Transport; Sun, 12 Oct 2025 07:16:27 +0000
-Received: from kaveri.amd.com (10.180.168.240) by satlexmb07.amd.com
- (10.181.42.216) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.17; Sun, 12 Oct
- 2025 00:16:24 -0700
-From: Shivank Garg <shivankg@amd.com>
-To: <pbonzini@redhat.com>, <seanjc@google.com>
-CC: <david@redhat.com>, <kvm@vger.kernel.org>, <linux-coco@lists.linux.dev>,
-	<linux-kernel@vger.kernel.org>, <shivankg@amd.com>
-Subject: [PATCH V3 kvm-x86/gmem 2/2] KVM: guest_memfd: remove redundant gmem variable initialization
-Date: Sun, 12 Oct 2025 07:16:07 +0000
-Message-ID: <20251012071607.17646-2-shivankg@amd.com>
-X-Mailer: git-send-email 2.43.0
-In-Reply-To: <20251012071607.17646-1-shivankg@amd.com>
-References: <20251012071607.17646-1-shivankg@amd.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F0BE120B7E1
+	for <kvm@vger.kernel.org>; Sun, 12 Oct 2025 07:26:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1760253990; cv=none; b=YyuEHE73xLQAkGi7cmHuviXPdjmdZ6xdbRdBE9sxfXBVdmUYPqFX0rRmRNp1FGiKcD/LVl0f0nZFUmM4im5cbdyWGXwV1XKPjMUGYqVeuJHBLSrjSrTmkFCavVd1cHKEILmMXLF9eM8/ayNeX0X+jvU3tPTq7ayg3dxmksuuwac=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1760253990; c=relaxed/simple;
+	bh=UEv2x/Lmp84MhY9spkwvdA5qI6xvme3Kk+89d41lEWc=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=KFq6y6sWksPwKlbdizI3ZEYdiU3WpE/OPAwco4goubCPomd1OTQyJ9ij7n7d67MNlXzbbmln/FfK00U1eYrO6V76KF5sQrNI80b18SAgNQp+nOOAvM5C5FukUxh0JiTipfV5sRwf9L/OmeehIzqpr6EuyPFc/uhuOztWXe4Fc1M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=BdmKOPcL; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1760253988;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=mg3HCPvWm6jwVlci7BHs0yCEk+Zd1iOvD/o3EJNM9JE=;
+	b=BdmKOPcLGmHQBCuih3yJFx7ptznKkA1R7ar72zjy/HdeU79B4j3gBOG4qmW1b2cZ9yQjGO
+	1k44Qsh750Ox2XutuhHIGl8sj//CN9znl0zcIjsEGRVHc2S6ZfzeWRUwpNjQZEzhx9FheX
+	j9TmfmDgkoECLvNBBxPAcLsqrwnoJpA=
+Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
+ [209.85.128.71]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-6-DHNnLtvFPgWcFGJg0E0WBA-1; Sun, 12 Oct 2025 03:26:26 -0400
+X-MC-Unique: DHNnLtvFPgWcFGJg0E0WBA-1
+X-Mimecast-MFC-AGG-ID: DHNnLtvFPgWcFGJg0E0WBA_1760253985
+Received: by mail-wm1-f71.google.com with SMTP id 5b1f17b1804b1-46e47d14dceso17584265e9.2
+        for <kvm@vger.kernel.org>; Sun, 12 Oct 2025 00:26:26 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1760253985; x=1760858785;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=mg3HCPvWm6jwVlci7BHs0yCEk+Zd1iOvD/o3EJNM9JE=;
+        b=rMvrgXiPwXcje44F1UoGBOpKQVI0RbcEVLJb6PKy1WrgxsCXmaFC0FAcKInU1IABAL
+         Huik5tZuncDpqndVsv5MhDp8hgelhd8C7bO+1D5B0p0zFDODOGj7J0+zZSuXiAOLebuc
+         e8yG3pH/CuNCaxYWVVYUw6vP3+Y4Tz2ZjxSAHVlE+0kKKBleZ0vQq5U0bhJZMCVIIcne
+         CvEybovkLq/Q+l2Is+ByBPKpAtnsRd21vLP7+HLsEwROw5BnyDPyhjA/fz15GpsdM3Ir
+         BDBq5JZcFqbte3BYWeRRyoLbKeLpOR1BYqoQjwS64alwDaB4AJNpxGmZ315MD1VBLXnl
+         8t9w==
+X-Forwarded-Encrypted: i=1; AJvYcCUuTrlS6QQ4lcaXEcbuxZ2QqOz3inu7caJoE7fxw5ZrdgChF5tftHxjwA7LdOJgZYjIUek=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yxzm+RO1v5Aponwly9+eWPYbofUphjZv1fv6xqwBpyPjCZrjqyB
+	DpOhPuSlKQZ9I+fdgfUnyGxcAsAp1CRMBtaS9vn4ce/8g2KvfjerrAA7xtQtDxWZzBbk6sSYwKC
+	4QK/5yuN7ppgonqtiD6+zqKKi6B7gqLEm+Uvq0ovL8r6H/3dXAPP+5g==
+X-Gm-Gg: ASbGncuGicHBkLMTmMQFHWAJmcgxY8P1Vi3DwsjtqEM6VIutCeJDQcX+VnB4mOZ3jXC
+	YZGp2OnMiIZY9sN5up7Ue2rQ/hisismILcUS21UcI0rgrvdBmNtm5H98O/Ca08Nu9Jxxlujrgl8
+	xTkL2UJSvgRjm00HzeTnJYDfZ6MxKo9/SLhgEfiLjQP7o0xCezkdaSSOqFnzhDysN5yWPFUOOvE
+	CeYaueaNJDv8FUSjqKE1de9BJq1OvY5GJAHaHaWCNOvcPlWSmoa5JgftQchWTWggwIfZQeX1a4s
+	ezcrQ0BTbvsNjNKRYanyEDp6XBeSMFRB2w==
+X-Received: by 2002:a05:600c:1c96:b0:46f:c0c9:6961 with SMTP id 5b1f17b1804b1-46fc0e7f6e7mr21553995e9.14.1760253985224;
+        Sun, 12 Oct 2025 00:26:25 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IE3gaXMtNNYza81JdpwSjq/QqGvQLh5iun4C2wC9jv6BcMxYyPNrpdbHApBSwlfgxaXbiFriA==
+X-Received: by 2002:a05:600c:1c96:b0:46f:c0c9:6961 with SMTP id 5b1f17b1804b1-46fc0e7f6e7mr21553775e9.14.1760253984757;
+        Sun, 12 Oct 2025 00:26:24 -0700 (PDT)
+Received: from redhat.com ([2a0d:6fc0:152d:b200:2a90:8f13:7c1e:f479])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-46fb483bcf9sm127107785e9.6.2025.10.12.00.26.23
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sun, 12 Oct 2025 00:26:24 -0700 (PDT)
+Date: Sun, 12 Oct 2025 03:26:21 -0400
+From: "Michael S. Tsirkin" <mst@redhat.com>
+To: Andrew Lunn <andrew@lunn.ch>
+Cc: linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
+	Paolo Abeni <pabeni@redhat.com>, Jason Wang <jasowang@redhat.com>,
+	Eugenio =?iso-8859-1?Q?P=E9rez?= <eperezma@redhat.com>,
+	Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
+	Jonathan Corbet <corbet@lwn.net>, kvm@vger.kernel.org,
+	virtualization@lists.linux.dev, linux-doc@vger.kernel.org
+Subject: Re: [PATCH 1/3] virtio: dwords->qwords
+Message-ID: <20251012031758-mutt-send-email-mst@kernel.org>
+References: <cover.1760008797.git.mst@redhat.com>
+ <350d0abfaa2dcdb44678098f9119ba41166f375f.1760008798.git.mst@redhat.com>
+ <26d7d26e-dd45-47bb-885b-45c6d44900bb@lunn.ch>
+ <20251009093127-mutt-send-email-mst@kernel.org>
+ <6ca20538-d2ab-4b73-8b1a-028f83828f3e@lunn.ch>
+ <20251011134052-mutt-send-email-mst@kernel.org>
+ <c4aa4304-b675-4a60-bb7e-adcf26a8694d@lunn.ch>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: satlexmb08.amd.com (10.181.42.217) To satlexmb07.amd.com
- (10.181.42.216)
-X-EOPAttributedMessage: 0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: BN1PEPF00004683:EE_|CH1PR12MB9597:EE_
-X-MS-Office365-Filtering-Correlation-Id: 39f10301-0eba-4873-e3c7-08de095f42ad
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|82310400026|376014|36860700013|1800799024|13003099007;
-X-Microsoft-Antispam-Message-Info:
-	=?us-ascii?Q?Ko5eEqNNnfLi5BViBLiq4YGzHt4Y6tw1BNW2mMDCk6a48M2pZWdh9beJURRX?=
- =?us-ascii?Q?0jLpTizZS/iKO0xpb4xHUNrkuhoBGs/3NkXSGHyqcfBuGA5eXncl2vnyzXmd?=
- =?us-ascii?Q?BuKH1sbmKHAWWK0NkJraCqMmHRgFAgYWDeKWX9+Tsz3NyixsnSvnM/66NC9k?=
- =?us-ascii?Q?UKCfZ7kaCCci+9QFY+rwJHSOypRNuqFRLWSHHMOXHFpFtE1ETpBMM4KFD1hx?=
- =?us-ascii?Q?Np4A7ouqMLHbE1GUWB12Y1hnlTESZKYhg54ZdwrnKrOYZgNWYn2PUQCHnSVQ?=
- =?us-ascii?Q?AO37cAzYOuq4mTQoNbNtYvMyXKSe65RTbYq+PnmWzw3Xv5lg9t+xgQ5L2Xq+?=
- =?us-ascii?Q?5csmWaXMDQfkviSIrTZhtK5P8z6Rs+SGnDazR3VEFs7Jsji2uSz93A1ziZxD?=
- =?us-ascii?Q?lJKRh3h03H44TaCTuScDQOnLOBDsCCb1xKowcZ+AfIWczfp/PdMM9Da0IZEO?=
- =?us-ascii?Q?/UnIPXhozW9OH9k5/fuhfkqEh7ux8kk+6Hq0XtcWCry0D9IeEBC9NG3Z7xe+?=
- =?us-ascii?Q?iGUGADF6hUdxJw8VN8mfkzc4+1njnwuzt6nslPFiyAVJl43YlC/M+S+/AUAN?=
- =?us-ascii?Q?Fl3MW3MuZhOWov7AlOEOWxbtllnHzJzL1Husotu1YzQr5/5OwxhFt+PsnUCG?=
- =?us-ascii?Q?rjlKn1bi3XQwX6bF/ncXJW8K9AqSWzYXSxgw69H4YJSOHocC1VAyMp1djOf8?=
- =?us-ascii?Q?wL5pChR314yS0ZpCxN7faRw6g81BPt7xjA4sAsRdOSL+z/A8M5h0m3GTHK1o?=
- =?us-ascii?Q?XLM5TNsEAB6UUGxm7bloV6fh8ne3e53y0tMbzh1etoNZ18OIPE5OlRzYwtjb?=
- =?us-ascii?Q?Nk04cMpMOB5Is7SOu7IiDWRoWKuEwFbn7r7L5wkirR2MmRuR58HBqRTpP/7j?=
- =?us-ascii?Q?NZqan7akNsucu/I0Aji23AoXL4YOB8LwYYtSu1XhoLhQXjANv9awuW2YR7eY?=
- =?us-ascii?Q?owVbOk9ih8QcY77HQrR9pK52S8veH0RBjCUgISZz4JdZijiSGUuh8SccGcHg?=
- =?us-ascii?Q?62pAO3XQ+8okuBoYeyoaLoqfL7rNWWbq0ollCnddlyDNCIAdSYB4df/i9jur?=
- =?us-ascii?Q?KNmNHQ3URCCdAA5Uj/TpWnjIGGU7dygUGoTFXyeJI2OJNKQGimFm37cg8fBM?=
- =?us-ascii?Q?ODIX7B+ngRXkKtCr2AU2oO/iBRJsPut9mRLuX9HSlu5BEVs0+fLF5+mdgIK0?=
- =?us-ascii?Q?KsdUTP+aX54f5EHPYcNjrm59NTejaYn1nLDSzDKbtrg1lp8KV810WZrgyZFP?=
- =?us-ascii?Q?IanQqch0n9R2fwGKXlBvUW4GtzFuZClczVzfN9DKqEAbSeXvekfx/HqzAtIv?=
- =?us-ascii?Q?lzzeIg3fbJ3HuEVb1QefkRyXp7FRJnPsav3D7XaZnWrXzDUYGl0HLs2wK1aG?=
- =?us-ascii?Q?5BexcZ5P4EK8Fih5RzK1GQaHSvwLSQHl5qAFOFDAxAsH06NM/69yKafsJova?=
- =?us-ascii?Q?zc1yj8qkc+UlONmKnYXfQV3juj2s3KOGCytje8C4ujVG4gu4IJoMYQaQTqiN?=
- =?us-ascii?Q?Os2XpUW91LawRxyxDLQ8jyFY4EqZIT5W2k4KquDoqs7KxpXGYCjGfXvXsBKa?=
- =?us-ascii?Q?PsEOryT2YTohvQH4lyVaCb68yImilxb+Cej7j4jj?=
-X-Forefront-Antispam-Report:
-	CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:satlexmb07.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230040)(82310400026)(376014)(36860700013)(1800799024)(13003099007);DIR:OUT;SFP:1101;
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 12 Oct 2025 07:16:27.7996
- (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 39f10301-0eba-4873-e3c7-08de095f42ad
-X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[satlexmb07.amd.com]
-X-MS-Exchange-CrossTenant-AuthSource:
-	BN1PEPF00004683.namprd03.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: CH1PR12MB9597
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <c4aa4304-b675-4a60-bb7e-adcf26a8694d@lunn.ch>
 
-Remove redundant initialization of gmem in __kvm_gmem_get_pfn() as it is
-already initialized at the top of the function.
+On Sat, Oct 11, 2025 at 08:52:18PM +0200, Andrew Lunn wrote:
+> > That's not spec, that's linux driver. The spec is the source of truth.
+> 
+> Right, lets follow this.
+> 
+> I'm looking at
+> 
+> https://docs.oasis-open.org/virtio/virtio/v1.3/csd01/virtio-v1.3-csd01.html
+> 
+> Is that correct?
+> 
+> That document does not have a definition of word. However, what is
+> interesting is section "4.2.2 MMIO Device Register Layout"
+> 
+> DeviceFeaturesSel 0x014
+> 
+> Device (host) features word selection.
+> Writing to this register selects a set of 32 device feature bits accessible by reading from DeviceFeatures.
+> 
+> and
+> 
+> DriverFeaturesSel 0x024
+> 
+> Activated (guest) features word selection
+> Writing to this register selects a set of 32 activated feature bits accessible by writing to DriverFeatures.
+> 
+> I would interpret this as meaning a feature word is a u32. Hence a
+> DWORD is a u64, as the current code uses.
+> 
+> 	Andrew
 
-No functional change intended.
 
-Reviewed-by: David Hildenbrand <david@redhat.com>
-Signed-off-by: Shivank Garg <shivankg@amd.com>
----
+Hmm indeed.
+At the same time, pci transport has:
 
-Changelog:
-V3:
-- Split into distinct patches per Sean's feedback, drop whitespace and
-  ULONG_MAX change.
-V2:
-- https://lore.kernel.org/all/20250902080307.153171-2-shivankg@amd.com
-- Incorporate David's suggestions.
-V1:
-- https://lore.kernel.org/all/20250901051532.207874-3-shivankg@amd.com
+         u8 padding[2];  /* Pad to full dword. */
 
- virt/kvm/guest_memfd.c | 1 -
- 1 file changed, 1 deletion(-)
+and i2c has:
 
-diff --git a/virt/kvm/guest_memfd.c b/virt/kvm/guest_memfd.c
-index 22dacf49a04d..caa87efc8f7a 100644
---- a/virt/kvm/guest_memfd.c
-+++ b/virt/kvm/guest_memfd.c
-@@ -668,7 +668,6 @@ static struct folio *__kvm_gmem_get_pfn(struct file *file,
- 		return ERR_PTR(-EFAULT);
- 	}
- 
--	gmem = file->private_data;
- 	if (xa_load(&gmem->bindings, index) != slot) {
- 		WARN_ON_ONCE(xa_load(&gmem->bindings, index));
- 		return ERR_PTR(-EIO);
+The \field{padding} is used to pad to full dword.
+
+both of which use dword to mean 32 bit.
+
+This comes from PCI which also does not define word but uses it
+to mean 16 bit.
+
+
+
+
+I don't have the problem changing everything to some other
+wording completely but "chunk" is uninformative, and
+more importantly does not give a clean way to refer to
+2 chunks and 4 chunks.
+Similarly, if we use "word" to mean 32 bit there is n clean
+way to refer to 16 bits which we use a lot.
+
+
+using word as 16 bit has the advantage that you
+can say byte/word/dword/qword and these do not
+cause too much confusion.
+
+
+So I am still inclined to align everything on pci terminology
+but interested to hear what alternative you suggest.
+
+
 -- 
-2.43.0
+MST
 
 
