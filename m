@@ -1,138 +1,96 @@
-Return-Path: <kvm+bounces-59910-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-59919-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id C9E3ABD4AE3
-	for <lists+kvm@lfdr.de>; Mon, 13 Oct 2025 18:01:29 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id A4021BD49CD
+	for <lists+kvm@lfdr.de>; Mon, 13 Oct 2025 17:56:52 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 092B2540759
-	for <lists+kvm@lfdr.de>; Mon, 13 Oct 2025 15:39:23 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id E7B54189FF88
+	for <lists+kvm@lfdr.de>; Mon, 13 Oct 2025 15:56:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 74529311976;
-	Mon, 13 Oct 2025 15:26:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 03E4F3101CD;
+	Mon, 13 Oct 2025 15:36:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="H76ihorC"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="VixOhuDl"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f74.google.com (mail-wm1-f74.google.com [209.85.128.74])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8A3B830DEB6
-	for <kvm@vger.kernel.org>; Mon, 13 Oct 2025 15:26:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 75FF83101C7
+	for <kvm@vger.kernel.org>; Mon, 13 Oct 2025 15:36:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.74
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1760369193; cv=none; b=nQqbTg5pXpE7nLLhUgQU/LhCpMSl+iqvfeqy6ufr0iR5grVCWObE9iU6K2iaRs5SNRTnRvsFc2ly7ATJLMxDU5hTIdWi2lg/fj/ncpaRjHx+T4q8mXT88HH2EGSS/tlDKAxRz2tU8+snH3HEhYME9hFI7Zy3b9OY0jw92cizwvg=
+	t=1760369780; cv=none; b=mP24yBF+oKkk6V1wAsfACFGjxt+EvsUP1h7zwZDZPVOrO/34FfyOiFNj1VG3BMhsweHwDY+0p9YiZZwy29opDOaH+mnALp3jkgTLLhBjbdDvQ/p3+M60MBi32LFWeag8nr38YMvjNYFLcmtzqCVDbx9sAtEQtPBCwx6nz/0RLL4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1760369193; c=relaxed/simple;
-	bh=gR+HxQZ5Ps5HzOMs2Fd2vwAZAI0viEAdbAcy/yn+CaE=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=VtCPOpZk4nI/eok9BY25Hl6QlDBU00PdEfhlaZQF70dWdIWnq/AcuJnEHeUwgJ1v3uYB/VHP7I6LrsVKHNVbAfX7ofPE1TxYTsrxlDWVL/FEUPwHXMp4rM5inuN6f8Z9618gfz77tO6vq3i3JpHnyoxRSQvBIwtekKy/Ld+7Nfc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=H76ihorC; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1760369190;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=7+wzjnqJB4THueAfimc/qkfTpa1defvaMULnsvxNcPo=;
-	b=H76ihorC1DTSA7IACcmsGys8jU8MZBWWGjY0hQyAQ/mfIFIFsAVUNM4i8n1+P/hYPXlWiq
-	kvUn/7aefWH7RI693tAX8ZW6LIZo318IXtJ8Y1kLsCA2LJv/N0qjD8fLhfKK8DoZI9rVyL
-	y1YpMT1spzUra4/igDAT2WZ3I96OkWo=
-Received: from mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-220-rsEQL3-hP9-AmLqB_In2pA-1; Mon,
- 13 Oct 2025 11:26:26 -0400
-X-MC-Unique: rsEQL3-hP9-AmLqB_In2pA-1
-X-Mimecast-MFC-AGG-ID: rsEQL3-hP9-AmLqB_In2pA_1760369183
-Received: from mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.17])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 9D8C71800357;
-	Mon, 13 Oct 2025 15:26:23 +0000 (UTC)
-Received: from omen.home.shazbot.org (unknown [10.22.89.76])
-	by mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id D2A701954107;
-	Mon, 13 Oct 2025 15:26:19 +0000 (UTC)
-From: Alex Williamson <alex.williamson@redhat.com>
-To: alex@shazbot.org,
-	alex.williamson@redhat.com
-Cc: kvm@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	liulongfang@huawei.com,
-	kwankhede@nvidia.com,
-	yishaih@nvidia.com,
-	ankita@nvidia.com,
-	jgg@nvidia.com,
-	skolothumtho@nvidia.com,
-	kevin.tian@intel.com,
-	brett.creeley@amd.com,
-	eric.auger@redhat.com,
-	giovanni.cabiddu@intel.com,
-	dmatlack@google.com,
-	pbonzini@redhat.com,
-	torvalds@linux-foundation.org
-Subject: [PATCH] MAINTAINERS: Update Alex Williamson's email address
-Date: Mon, 13 Oct 2025 09:26:11 -0600
-Message-ID: <20251013152613.3088777-1-alex.williamson@redhat.com>
+	s=arc-20240116; t=1760369780; c=relaxed/simple;
+	bh=KnbiNEI6jdfFoyCXFlvrrBN2LNaWnjAsJojkaDAb3zY=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=G93oHhcsxgcNM4U2NeAnwfgVYHa+xsqn+SEl3iPfQU78BXvS0RLgWCZvvRbUKI8uOyJ9xQ2iHDmG/Xe/s2hllAsTiOTftbLLVypoXpfWckXLogG47yyhkNFyEMSECWSWn61CmnejOI/cNCpYB3r+l4/KmEvHP4FiG7al7fpoCeM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--jackmanb.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=VixOhuDl; arc=none smtp.client-ip=209.85.128.74
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--jackmanb.bounces.google.com
+Received: by mail-wm1-f74.google.com with SMTP id 5b1f17b1804b1-46e473e577eso30156875e9.0
+        for <kvm@vger.kernel.org>; Mon, 13 Oct 2025 08:36:18 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1760369777; x=1760974577; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=FlFedRueswZiwwJSvXOIyDnT3oPzpw1Sfa+/cqnl83o=;
+        b=VixOhuDlRMASSH2Ew9mehjOzjWokkcGCCRdHf8AMO5OClJ0Fr0LOTdvRH0mi5A5XiH
+         kO4fsUFGI4vYu5qL7MloeBxssldw0PWI7+Zdu2aThISPeR89vLFbGncEXToXv9yEIht/
+         4qUoDYr2tizImnE9U5fOHCKUFwq/tB6vesJe8GcD9dorknx3kOaJqXvUuINv/xkiWkkA
+         m5n4yMELxn/8vlGCti/YwJdzZQccm6U64lVXjalFRZugh+iTkNibpfuwjmpyg4O8ztkr
+         UHRdtGiHjtK6ovbfur5eTWOaEGucxrG/oG9q4+pdXWVn9t3pDL2kdj/dVSoNGpQiDLeB
+         hhvA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1760369777; x=1760974577;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=FlFedRueswZiwwJSvXOIyDnT3oPzpw1Sfa+/cqnl83o=;
+        b=wJVOLSAerQiwmrfu9It0LzHmM4H3038Mi+RFxkyQBpaOXaXtMajU+2xHJ+zTkP9Hkn
+         LHTSlqwn/Y3o2RV7j1XZuzjVRSmXUaKX+6gxXtnO0MeP4s2mfIdGNSQG8Y2UFJRMyfvE
+         qWdz+fbzfo08mDUaNLPpFE40mjuUymcVBLhbLvcBzEr3CE6gVhgEIKgQT5/H2nXFA2Ot
+         cc5r3WmDNlOS6XDioqu0/YHucKbcP/yATm6yVkyfilZJQ2HSiY5jI1BLbDFh01edvyUk
+         6iOsIp6OzecNXvG8s+kiiibLPhUxwr+jtuohmrm7IVFHq0eqm7lqzWcTQ1HgmpijAZi/
+         SLDw==
+X-Forwarded-Encrypted: i=1; AJvYcCUOsCk8awQ7qYjoqpHxiPoHxvZnrcutX23cBuwske/sr+9oZgIuG/G4vJh4RwGhXg6tgxM=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yy6s0j1WPzFJrkxkRxPX5RZx+jxKI7E1hYNxy0MgDa8tH/4aygO
+	fchnl03PCQi+emHokGTTNiXwEqHaAqxU1oBkowqZ4lZ/dvbqYkChP1XuTUcv8SG9KT58GyQdSYW
+	i2M5eQ1PtG3YHuA==
+X-Google-Smtp-Source: AGHT+IHe33aTc6DLr2QuBitaWmdhOm2nkmbEu0YxgnPqOB4zoPd1RlYBlwwAqBGdVpW1YUG3fMQrmSmUYvbqkQ==
+X-Received: from wmby12.prod.google.com ([2002:a05:600c:c04c:b0:46e:3771:b9c9])
+ (user=jackmanb job=prod-delivery.src-stubby-dispatcher) by
+ 2002:a05:600c:a341:b0:46e:74bb:6bc with SMTP id 5b1f17b1804b1-46fa9a8932cmr136710475e9.5.1760369776743;
+ Mon, 13 Oct 2025 08:36:16 -0700 (PDT)
+Date: Mon, 13 Oct 2025 15:36:16 +0000
+In-Reply-To: <20251013-l1tf-test-v1-2-583fb664836d@google.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.0 on 10.30.177.17
+Mime-Version: 1.0
+References: <20251013-l1tf-test-v1-0-583fb664836d@google.com> <20251013-l1tf-test-v1-2-583fb664836d@google.com>
+X-Mailer: aerc 0.21.0
+Message-ID: <DDHB06W60S97.3GDEC7DRZFQEJ@google.com>
+Subject: Re: [PATCH 2/2] KVM: x86: selftests: add an L1TF exploit test
+From: Brendan Jackman <jackmanb@google.com>
+To: Brendan Jackman <jackmanb@google.com>, Shuah Khan <shuah@kernel.org>, 
+	Paolo Bonzini <pbonzini@redhat.com>, Sean Christopherson <seanjc@google.com>
+Cc: Alexandra Sandulescu <aesa@google.com>, Thomas Gleixner <tglx@linutronix.de>, 
+	Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>, 
+	Dave Hansen <dave.hansen@linux.intel.com>, <x86@kernel.org>, 
+	<linux-kselftest@vger.kernel.org>, <linux-kernel@vger.kernel.org>, 
+	<kvm@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 
-Switch to a personal email account as I'll be leaving Red Hat soon.
+On Mon Oct 13, 2025 at 3:13 PM UTC, Brendan Jackman wrote:
+> The test requirements are: the machine is vulnerable to L1TF and the
+> helper kernel module is loaded prior to the test execution.
+> The test should pass when the kernel enables asi (asi=on). 
 
-Signed-off-by: Alex Williamson <alex@shazbot.org>
-Signed-off-by: Alex Williamson <alex.williamson@redhat.com>
----
-
-I'll intend to send this via a signed tag pull request during
-v6.18-rc.  Thanks
-
- .mailmap    | 1 +
- MAINTAINERS | 4 ++--
- 2 files changed, 3 insertions(+), 2 deletions(-)
-
-diff --git a/.mailmap b/.mailmap
-index d2edd256b19d..ace467e3d0e2 100644
---- a/.mailmap
-+++ b/.mailmap
-@@ -27,6 +27,7 @@ Alan Cox <alan@lxorguk.ukuu.org.uk>
- Alan Cox <root@hraefn.swansea.linux.org.uk>
- Aleksandar Markovic <aleksandar.markovic@mips.com> <aleksandar.markovic@imgtec.com>
- Aleksey Gorelov <aleksey_gorelov@phoenix.com>
-+Alex Williamson <alex@shazbot.org> <alex.williamson@redhat.com>
- Alexander Lobakin <alobakin@pm.me> <alobakin@dlink.ru>
- Alexander Lobakin <alobakin@pm.me> <alobakin@marvell.com>
- Alexander Lobakin <alobakin@pm.me> <bloodyreaper@yandex.ru>
-diff --git a/MAINTAINERS b/MAINTAINERS
-index 46126ce2f968..2d2e9da401d5 100644
---- a/MAINTAINERS
-+++ b/MAINTAINERS
-@@ -26874,7 +26874,7 @@ S:	Maintained
- F:	drivers/vfio/cdx/*
- 
- VFIO DRIVER
--M:	Alex Williamson <alex.williamson@redhat.com>
-+M:	Alex Williamson <alex@shazbot.org>
- L:	kvm@vger.kernel.org
- S:	Maintained
- T:	git https://github.com/awilliam/linux-vfio.git
-@@ -27037,7 +27037,7 @@ T:	git git://linuxtv.org/media.git
- F:	drivers/media/test-drivers/vimc/*
- 
- VIRT LIB
--M:	Alex Williamson <alex.williamson@redhat.com>
-+M:	Alex Williamson <alex@shazbot.org>
- M:	Paolo Bonzini <pbonzini@redhat.com>
- L:	kvm@vger.kernel.org
- S:	Supported
--- 
-2.51.0
-
+Agh, sorry, I missed a bit when scrubbing the commit message, there
+should not be mentions of ASI in here.
 
