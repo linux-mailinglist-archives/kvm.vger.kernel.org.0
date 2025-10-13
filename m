@@ -1,389 +1,262 @@
-Return-Path: <kvm+bounces-59863-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-59865-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [IPv6:2a01:60a::1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id 46CA4BD1777
-	for <lists+kvm@lfdr.de>; Mon, 13 Oct 2025 07:33:07 +0200 (CEST)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
+	by mail.lfdr.de (Postfix) with ESMTPS id 32EE8BD1792
+	for <lists+kvm@lfdr.de>; Mon, 13 Oct 2025 07:37:11 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ams.mirrors.kernel.org (Postfix) with ESMTPS id BFD1B3450BC
-	for <lists+kvm@lfdr.de>; Mon, 13 Oct 2025 05:33:06 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 5E1C34E7F07
+	for <lists+kvm@lfdr.de>; Mon, 13 Oct 2025 05:37:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2C3142DC346;
-	Mon, 13 Oct 2025 05:32:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 029222DC76A;
+	Mon, 13 Oct 2025 05:37:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=fb.com header.i=@fb.com header.b="GgqCHrje"
+	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="to/ikK68"
 X-Original-To: kvm@vger.kernel.org
-Received: from mx0a-00082601.pphosted.com (mx0a-00082601.pphosted.com [67.231.145.42])
+Received: from DM5PR21CU001.outbound.protection.outlook.com (mail-centralusazon11011004.outbound.protection.outlook.com [52.101.62.4])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7D68A2DA750
-	for <kvm@vger.kernel.org>; Mon, 13 Oct 2025 05:32:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=67.231.145.42
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1760333567; cv=none; b=euikDJ0T+pThw/B+nph750eNM8j0xcIO/Gv7tpmqVCs5dtYR6J7EmEqkYJEnDQFD591Hxp9Aw/kwqNaWMRVwYeFxbO7uep05lUb5Ix8gEJEkCO2v1EwBEMfzYUCDfzGZraLRSUE29rtaOAdjcUpYxk3J10c50kEGJisuxkpgW9Q=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1760333567; c=relaxed/simple;
-	bh=4hYhb+EPmlaOc3bN+TTQRMFugJwG6oxY36pVB85jVgQ=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-ID:References:
-	 In-Reply-To:To:CC; b=bR8xVOfDy19MDv4+tceBGim7x24Li0w5OcSzdkrGTf8b9mHPyUd130CutaEPOX0T6icH+ijM7rz1mOsTZABbhb6A1a8lkEEK3e+n0/j3bnMhyyzPpUUK779ss6tEATBSsZJeNt1oGgeLnzM/F6P5BA6gV/54raWHnh29kl/OWv0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fb.com; spf=pass smtp.mailfrom=meta.com; dkim=pass (2048-bit key) header.d=fb.com header.i=@fb.com header.b=GgqCHrje; arc=none smtp.client-ip=67.231.145.42
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fb.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=meta.com
-Received: from pps.filterd (m0148461.ppops.net [127.0.0.1])
-	by mx0a-00082601.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 59CMgNrH1450873
-	for <kvm@vger.kernel.org>; Sun, 12 Oct 2025 22:32:44 -0700
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=fb.com; h=cc
-	:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=s2048-2025-q2;
-	 bh=5W/oWlGSgrgcpquGT5WzQZk6fkYCHamp032I6BK5EHA=; b=GgqCHrjeo6Dd
-	Cxuia4OULEpPoPjM39fFVIHZaA/PW8whz1mKEqQhh7awmMa0tGvsIhuKPruYJYia
-	i1EwkH3FFSUijxwIYgL6/txAJxcdeetzbO0BoI6cJQblQvGlRgOMHUD8YCXkKLS3
-	/4oYCtIpoI4cYLuVwt/pl8D4mf53WHTbBdxasTVIx//R9XL9af1+mcmO3rWddRVb
-	RkWePLcePeDHGduBLPDqtqN0nRD66MsOGq0E9HFxOOm6oB+yd3NOrp5vmzbS08uq
-	IX2TH4aFXP93mDDJPTm+6Lz1J0LiaXwNzfjRGMonOvG84A922+mJLdhQ8hVIcgMG
-	faFolgT3Mg==
-Received: from mail.thefacebook.com ([163.114.134.16])
-	by mx0a-00082601.pphosted.com (PPS) with ESMTPS id 49rnbm172b-5
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128 verify=NOT)
-	for <kvm@vger.kernel.org>; Sun, 12 Oct 2025 22:32:44 -0700 (PDT)
-Received: from twshared28243.32.prn2.facebook.com (2620:10d:c085:208::7cb7) by
- mail.thefacebook.com (2620:10d:c08b:78::2ac9) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.2.2562.20; Mon, 13 Oct 2025 05:32:44 +0000
-Received: by devgpu015.cco6.facebook.com (Postfix, from userid 199522)
-	id 9E654102FE49; Sun, 12 Oct 2025 22:32:30 -0700 (PDT)
-From: Alex Mastro <amastro@fb.com>
-Date: Sun, 12 Oct 2025 22:32:26 -0700
-Subject: [PATCH v4 3/3] vfio/type1: handle DMA map/unmap up to the
- addressable limit
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5BEF42D46C8;
+	Mon, 13 Oct 2025 05:37:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.62.4
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1760333824; cv=fail; b=M45khXPgwPqDH8/1a6qeRJyq2B8gbBMb6mFDZNwYWv9UckGqMrYkXBE/w2cUeMz4GVAq5p79J0B3vKZGy9ds+u8MEXlzW2FFPIwC4iLPq1cDU7ml5UKVANj0LYjmRbuACyAre3B/bMCFUxEfoOw1PpI75prc5DkuQQRi5nmnvYE=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1760333824; c=relaxed/simple;
+	bh=rBk3S3c50Ey/xa3dv/jN/yI6HIAiBoFrI5fTst1309M=;
+	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
+	 In-Reply-To:Content-Type; b=e8rwh48YvC+hPmOONA4zACsXVZ7facbXaOUQxC0uQgVpp7liVXVOVWavBlvhMgeFAZiTonKnv/xDK9rKicYj59LtaMFlx8gYWYZdSk2Olud1AeeiCrc0Prz2ZEd2rKwsZL0c6mJCC/SiyoxWtKfrgzKcjNKaIrcg1JjGsUnUIrs=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=to/ikK68; arc=fail smtp.client-ip=52.101.62.4
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=CXp74rNsS61WrAVhb7Bmw9vNKqcTuLtJKsHiaB+xqJcBLYV98dm6ZXzqt5bJMU7bnjja9eJk5DBx1IE6DHzs/8EqOeskuIWKBBBE5I7PnfrcFkVhnafbjnp5hqVzKQW+6hP5RwWqlcBUYVkSbo80QKPfhssydRrvgGe0RSDMoHBu+ErLjmm559jQcHDYvF0viXVyEXil83uNLQ6goF3KVUeU6PSh4pQ4waUqriS49VRq009SeoJRRbaYBr73Q8IVrv1Zvd2nvqt8MAhuQ0xAG7Od0OQ3+bebu9Va8AhOFOyzLoUzx2qfJ0nhj+uAXqsb9GDUwa+Wtj9/YKXBY4IfZw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=gCOHY5HoceEsEQ+Ui+8xfMqaJtME11MyU2pzhMT1Zf8=;
+ b=MEf2F3loXot+YnQzlLqRMUEevBZ87Y72hJ8oVLucpgAfedsGs5+K0BHy+s+MnaQ+p2sDTlxX2KcRV+rPzP2/LjNhEjwbzoSNnSFRBIuWwbheQnH+Akhm5iefF9qBHLSxMv4XFkfTYQh8Lq3g7ePfCQNEAPCg7SxXDmR+VHfYwqvxEOiqLg9s8r5y/VQ30qVSwNBnvofHbC3i62SeI4lgTSJ7kRUhvFaP3h/wXLk1z3C9hdYGTqSXE8mvOgrYiKrPryvYNCk68m52IPapV4MjLh6a2VmDUUyDgeZ8RqxAwYBnncoG3VFhXFcQcNTa7GIPMCN7npq3fmlcdkJ8b6g8jQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 165.204.84.17) smtp.rcpttodomain=kernel.org smtp.mailfrom=amd.com; dmarc=pass
+ (p=quarantine sp=quarantine pct=100) action=none header.from=amd.com;
+ dkim=none (message not signed); arc=none (0)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=gCOHY5HoceEsEQ+Ui+8xfMqaJtME11MyU2pzhMT1Zf8=;
+ b=to/ikK68d6r4gjtalLxQJ+nmhyUzPs/My0xKQYmEHBi6c6BTU3Fb4y7KQrQLWvPU53fHCh6zKtnaDj6XaT5JZ+wQLDZVm8NrI1OpqskoyH+0JBb74K2XEdc5DqLJVmFS/eiITs0ndx/yJ/UWKx8VuZhFRxm8JIwE6ra8qYpTB+g=
+Received: from SJ0P220CA0009.NAMP220.PROD.OUTLOOK.COM (2603:10b6:a03:41b::25)
+ by MN2PR12MB4111.namprd12.prod.outlook.com (2603:10b6:208:1de::22) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9203.12; Mon, 13 Oct
+ 2025 05:36:58 +0000
+Received: from SJ1PEPF00001CDD.namprd05.prod.outlook.com
+ (2603:10b6:a03:41b:cafe::d2) by SJ0P220CA0009.outlook.office365.com
+ (2603:10b6:a03:41b::25) with Microsoft SMTP Server (version=TLS1_3,
+ cipher=TLS_AES_256_GCM_SHA384) id 15.20.9203.13 via Frontend Transport; Mon,
+ 13 Oct 2025 05:36:50 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
+ smtp.mailfrom=amd.com; dkim=none (message not signed)
+ header.d=none;dmarc=pass action=none header.from=amd.com;
+Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
+ 165.204.84.17 as permitted sender) receiver=protection.outlook.com;
+ client-ip=165.204.84.17; helo=satlexmb08.amd.com; pr=C
+Received: from satlexmb08.amd.com (165.204.84.17) by
+ SJ1PEPF00001CDD.mail.protection.outlook.com (10.167.242.5) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.9228.7 via Frontend Transport; Mon, 13 Oct 2025 05:36:57 +0000
+Received: from Satlexmb09.amd.com (10.181.42.218) by satlexmb08.amd.com
+ (10.181.42.217) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.17; Sun, 12 Oct
+ 2025 22:36:56 -0700
+Received: from satlexmb08.amd.com (10.181.42.217) by satlexmb09.amd.com
+ (10.181.42.218) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.17; Sun, 12 Oct
+ 2025 22:36:56 -0700
+Received: from [10.252.198.192] (10.180.168.240) by satlexmb08.amd.com
+ (10.181.42.217) with Microsoft SMTP Server id 15.2.2562.17 via Frontend
+ Transport; Sun, 12 Oct 2025 22:36:52 -0700
+Message-ID: <bbb7f19b-f54f-4d15-82c9-4468aaa8daca@amd.com>
+Date: Mon, 13 Oct 2025 11:06:51 +0530
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-ID: <20251012-fix-unmap-v4-3-9eefc90ed14c@fb.com>
-References: <20251012-fix-unmap-v4-0-9eefc90ed14c@fb.com>
-In-Reply-To: <20251012-fix-unmap-v4-0-9eefc90ed14c@fb.com>
-To: Alex Williamson <alex.williamson@redhat.com>
-CC: Jason Gunthorpe <jgg@ziepe.ca>,
-        Alejandro Jimenez
-	<alejandro.j.jimenez@oracle.com>,
-        <kvm@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-        Alex Mastro <amastro@fb.com>
-X-Mailer: b4 0.13.0
-X-FB-Internal: Safe
-X-Proofpoint-GUID: 2mUXEKl0dVUIfSfC1uwp41yHa8XndtXt
-X-Authority-Analysis: v=2.4 cv=NfjrFmD4 c=1 sm=1 tr=0 ts=68ec8efc cx=c_pps
- a=CB4LiSf2rd0gKozIdrpkBw==:117 a=CB4LiSf2rd0gKozIdrpkBw==:17
- a=IkcTkHD0fZMA:10 a=x6icFKpwvdMA:10 a=FOH2dFAWAAAA:8 a=P34euavMcYKjluB8mAYA:9
- a=QEXdDO2ut3YA:10
-X-Proofpoint-ORIG-GUID: 2mUXEKl0dVUIfSfC1uwp41yHa8XndtXt
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUxMDEzMDAyNiBTYWx0ZWRfX0Hiu6U68LwRm
- N4XkWa0WzxlsViXpzjKFU8RPrJqJr5ziEqeW1901eltWsM4K1o0SWOsdEzB5mc8W0lYIMhZOI4x
- rat+wIlSHTrjo0S1x/kjMuzwNZCXytvGR6ElHfEd/z5rozHtI2RmxJo18F0I9k3lzi0+qy6ij7p
- jaO+DlXTGKYYBrFMwsHl2aUWWbFK0+Zct/0YRdA+iBdHc7kKzUpVNqfoiqzU9xWfFKSdczeiRak
- twKtknAh/NL6S9lI2pInLaxAdGtNBjGkMsRF2wXphH+leja1j7pVh2Jv2r0ye69Yu1D+Fm3rk2A
- g0GT6aLxUVqpNtsboccVGYKjk8ii6XCpYCP0npkGaZSnQFJZm5X7QwVJHJ4Jr5Vqm6YCpr/Rrn0
- tzXxYL6DHd9Fv6YdTcbeQrqNov3T2A==
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1117,Hydra:6.1.9,FMLib:17.12.80.40
- definitions=2025-10-13_02,2025-10-06_01,2025-03-28_01
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v2 04/12] x86/cpufeatures: Add CPUID feature bit for
+ Extended LVT
+To: Naveen N Rao <naveen@kernel.org>
+CC: <kvm@vger.kernel.org>, <linux-perf-users@vger.kernel.org>,
+	<linux-doc@vger.kernel.org>, <seanjc@google.com>, <pbonzini@redhat.com>,
+	<nikunj@amd.com>, <bp@alien8.de>, <peterz@infradead.org>, <mingo@redhat.com>,
+	<mizhang@google.com>, <thomas.lendacky@amd.com>, <ravi.bangoria@amd.com>,
+	<Sandipan.Das@amd.com>
+References: <20250901051656.209083-1-manali.shukla@amd.com>
+ <20250901052212.209171-1-manali.shukla@amd.com>
+ <kgavy7x2hweqc5fbg65fwxv7twmaiyt3l5brluqhxt57rjfvmq@aixr2qd436a2>
+ <1acb5a6d-377b-4f0a-8a70-0dddaefa149c@amd.com>
+ <gugvbbcl3q6qu3dabwyl75nsf7tvy4tbsa34s4on2q5jclz3fd@4my3uhrovbtv>
+Content-Language: en-US
+From: Manali Shukla <manali.shukla@amd.com>
+In-Reply-To: <gugvbbcl3q6qu3dabwyl75nsf7tvy4tbsa34s4on2q5jclz3fd@4my3uhrovbtv>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: SJ1PEPF00001CDD:EE_|MN2PR12MB4111:EE_
+X-MS-Office365-Filtering-Correlation-Id: 47089c3c-ff10-45cd-e9fa-08de0a1a8679
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|36860700013|376014|7416014|1800799024|82310400026|13003099007;
+X-Microsoft-Antispam-Message-Info:
+	=?utf-8?B?TnJyZHV3Q0dwdUNweUpuMUR4amJ3a3dMdVl1eVRqcE9kTGJaOCtpUE1pSnVR?=
+ =?utf-8?B?U0xLbE1UYjZYeW9kZFREaFZ2V3duMVByUXZjMjlvNW5obGdKWEVDemthNXRN?=
+ =?utf-8?B?R1R1aFJ6aWFaNUtmOXJBaXB5U3k4WWQ5Yjk0YkdXSnJMbVM3aWNUK1grelBl?=
+ =?utf-8?B?M2x0VVo1Si83ZDlmOXgyU2xWRFZkcWw0TG0xWnNRNVpzM0ZXOVkwbkdMU3hE?=
+ =?utf-8?B?VHdxTnBBQzl0R1l3UGhrZXY0ZlZQRXVGMm8ycGRwVVdhT2MyK2FrdDljR1RL?=
+ =?utf-8?B?c1FyRnF3K3l4NnFvaG16T3AwZENBMHZRellCZ011V1Fsb3o0aktNRm5sTlJL?=
+ =?utf-8?B?L1R6dldoaWZGa3BrLzVOR0hUMVV6aGlrb3VYVFVDUVFpSHV2cXFCZ0xWQ0tQ?=
+ =?utf-8?B?US85TmpmNHVob1pzMzBEdHAwZkIyYXVpYzBNc1pESEp1YnhZR05aMUU2dFl4?=
+ =?utf-8?B?c2NzYWhvb1I0MFpQUkJ1T3I4L0NVdEU3MjZLODIyM0lxRDhPUG9BYkN5VmJG?=
+ =?utf-8?B?dHNYYWdTQm1SNXh4MXJmNGNOTll2NFdJODV0ZS85ODVpTGNuVHl3OVR1WDdH?=
+ =?utf-8?B?amZLTTlvWU1NdG4vNXRUSTRuUXo0dW9BTE1mTTIxZnpvR3g3WEV3eXhqd3Iv?=
+ =?utf-8?B?Vy9Dd3lBdUs2WWthUEgxUXV0M1ZpbVhqYVJTT3dXSEkrNHFPK09ybGROdGhw?=
+ =?utf-8?B?ZmJQeFpoQmc5MDVockVaR00wcm4xOWhURnJ4UlV3WjFCWEU3U1EvaFZMbWJ2?=
+ =?utf-8?B?TCtXak9NTUNmVkdSbE1FTnZjV3NnN2UzbWJHVk1ydTJTUFF3MWhVSUxrMlVj?=
+ =?utf-8?B?R0dra1MxeWxvVFVoYUxHVHU1SVUzc3RVbWJCVThFb0JFeEJ3REh6OS9VakZz?=
+ =?utf-8?B?MnFacTY1ZExTNnVvYUJtbUFxTUh4b0xqME9FZjJUcjZZVzZiSFFJYXJSV29a?=
+ =?utf-8?B?SFFuYmNlZEZLTkl2cE9sOW5mcUU1R1hMVDdidWF1YUc5eUJjcmxZOXg5M0sx?=
+ =?utf-8?B?cnErWDBBQ2dQempFRmZYNC9VV0ZkTXNGM2tmZFRTR0lHcXNHOWh4ajB2dHZ3?=
+ =?utf-8?B?SzNPbmM1OFVhTm1YYzNBZkJkSGpYTC9GeWJ1T2c0QzBSZ2E5dVJHS2NYRkVL?=
+ =?utf-8?B?NDJsbUlIWWhjWmU1NUROZjA2eGFJRVo1dVBDeXZOQ3haL2lXcWtxSXFYeUF3?=
+ =?utf-8?B?dUs0MGd5MFNFaVE4SVViVkFEN3dIbkJhK09vdklIYWxxRVJSdlR1M3B6R2ti?=
+ =?utf-8?B?cm1IbFRJMk5HalBNVGgwRVpwYmVUMXVzaHpaa3JIMmx3TENNME5jbDRkS2Ju?=
+ =?utf-8?B?NG9LbEFoQ0FETWRyUVJaVTI1dkpUUGlIdlRSbDlwWEs4VHdQUWFxaG9iQXJF?=
+ =?utf-8?B?dXRKcWl3MzRnS2Fsd0VMMGpWanBWcHBEdDZOR3RkZTdVZVVBb01vQ1ptY3pz?=
+ =?utf-8?B?d0dUZk82VlNyZ3d0ZlJocUd4eEU1YTFleFFUWXlRczJMT092a2NNNXNtQzlW?=
+ =?utf-8?B?OHVOeU1QeWNBYnhCNm9SNi9Kd0p1ak04UHZhQXhHbmgzeWozQVUxQzVsZ1Nx?=
+ =?utf-8?B?VHBGYmx5anBVNkRlZVVUR0tPcDdJcytueVF5TWkveHU2QkRnMGdaMGxhb1NS?=
+ =?utf-8?B?ZTZjNm1zSW5CUG1Tam9ZcVJKaHRCdGc2aC80S3FZS0pXVFIrb01rc2dweFlT?=
+ =?utf-8?B?MkFMZHZscThUM3lXZ2JQcmRGRjNuTFhEK0FLc2thOHd1WmNzNHRKWUJhN2RV?=
+ =?utf-8?B?VWtycEhSVHhyaFIveE9ra0g0ZXkrM3lWTDQ2ckxaVHlQeXE5MGxsZWdyMmZ4?=
+ =?utf-8?B?b25yMVNadlNUZnhmS0VRdDhmbDIvKzVtbmJKaHRBaEJXY3Z1MStPbi9kT2g0?=
+ =?utf-8?B?ckg5aTBWNG1xSlE5ei9EdG9kdDg3Tlk2VGVraGFZYXVvV3NMN2RyaitCOERi?=
+ =?utf-8?B?RGd3QUhOejJndXg3MUR1NlI2S21ZUkxOSnZTNlNyVlovcGpVcU1zTzlteXhJ?=
+ =?utf-8?B?OWRhaiswaHlEOHJWUmhoNCsyK2V4WGFLWWVINTE3NjBXUC91QmN0dFBTVHpu?=
+ =?utf-8?B?WFVFUzg5LzRoMGJsR1hsNnJWMDJkQm1kRDhNTnRGSGc3M2VlRHBRbFE5UVR2?=
+ =?utf-8?Q?VcZ0=3D?=
+X-Forefront-Antispam-Report:
+	CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:satlexmb08.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230040)(36860700013)(376014)(7416014)(1800799024)(82310400026)(13003099007);DIR:OUT;SFP:1101;
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 13 Oct 2025 05:36:57.3401
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: 47089c3c-ff10-45cd-e9fa-08de0a1a8679
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[satlexmb08.amd.com]
+X-MS-Exchange-CrossTenant-AuthSource:
+	SJ1PEPF00001CDD.namprd05.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: MN2PR12MB4111
 
-Handle DMA map/unmap operations up to the addressable limit by comparing
-against inclusive end-of-range limits, and changing iteration to
-perform relative traversals across range sizes, rather than absolute
-traversals across addresses.
+On 10/8/2025 12:28 PM, Naveen N Rao wrote:
+> On Wed, Sep 17, 2025 at 09:04:57PM +0530, Manali Shukla wrote:
+>> Hi Naveen,
+>>
+>> Thank you for reviewing my patches.
+>>
+>> On 9/8/2025 7:09 PM, Naveen N Rao wrote:
+>>> On Mon, Sep 01, 2025 at 10:52:12AM +0530, Manali Shukla wrote:
+>>>> From: Santosh Shukla <santosh.shukla@amd.com>
+>>>>
+>>>> Local interrupts can be extended to include more LVT registers in
+>>>> order to allow additional interrupt sources, like Instruction Based
+>>>> Sampling (IBS).
+>>>>
+>>>> The Extended APIC feature register indicates the number of extended
+>>>> Local Vector Table(LVT) registers in the local APIC.  Currently, there
+>>>> are 4 extended LVT registers available which are located at APIC
+>>>> offsets (400h-530h).
+>>>>
+>>>> The EXTLVT feature bit changes the behavior associated with reading
+>>>> and writing an extended LVT register when AVIC is enabled. When the
+>>>> EXTLVT and AVIC are enabled, a write to an extended LVT register
+>>>> changes from a fault style #VMEXIT to a trap style #VMEXIT and a read
+>>>> of an extended LVT register no longer triggers a #VMEXIT [2].
+>>>>
+>>>> Presence of the EXTLVT feature is indicated via CPUID function
+>>>> 0x8000000A_EDX[27].
+>>>>
+>>>> More details about the EXTLVT feature can be found at [1].
+>>>>
+>>>> [1]: AMD Programmer's Manual Volume 2,
+>>>> Section 16.4.5 Extended Interrupts.
+>>>> https://bugzilla.kernel.org/attachment.cgi?id=306250
+>>>>
+>>>> [2]: AMD Programmer's Manual Volume 2,
+>>>> Table 15-22. Guest vAPIC Register Access Behavior.
+>>>> https://bugzilla.kernel.org/attachment.cgi?id=306250
+>>>>
+>>>> Signed-off-by: Santosh Shukla <santosh.shukla@amd.com>
+>>>> Signed-off-by: Manali Shukla <manali.shukla@amd.com>
+>>>> ---
+>>>>  arch/x86/include/asm/cpufeatures.h | 1 +
+>>>>  1 file changed, 1 insertion(+)
+>>>>
+>>>> diff --git a/arch/x86/include/asm/cpufeatures.h b/arch/x86/include/asm/cpufeatures.h
+>>>> index 286d509f9363..0dd44cbf7196 100644
+>>>> --- a/arch/x86/include/asm/cpufeatures.h
+>>>> +++ b/arch/x86/include/asm/cpufeatures.h
+>>>> @@ -378,6 +378,7 @@
+>>>>  #define X86_FEATURE_X2AVIC		(15*32+18) /* "x2avic" Virtual x2apic */
+>>>>  #define X86_FEATURE_V_SPEC_CTRL		(15*32+20) /* "v_spec_ctrl" Virtual SPEC_CTRL */
+>>>>  #define X86_FEATURE_VNMI		(15*32+25) /* "vnmi" Virtual NMI */
+>>>> +#define X86_FEATURE_EXTLVT		(15*32+27) /* Extended Local vector Table */
+>>>
+>>> Per APM Vol 3, Appendix E.4.9 "Function 8000_000Ah", bit 27 is:
+>>> ExtLvtAvicAccessChgExtended: Interrupt Local Vector Table Register AVIC 
+>>> Access changes. See “Virtual APIC Register Accesses.”
+>>>
+>>> And, APM Vol 2, 15.29.3.1 "Virtual APIC Register Accesses" says:
+>>> Extended Interrupt [3:0] Local Vector Table Registers:
+>>> 	CPUID Fn8000_000A_EDX[27]=1:
+>>> 		Read: Allowed
+>>> 		Write: #VMEXIT (trap)
+>>> 	CPUID Fn8000_000A_EDX[27]=0:
+>>> 		Read: #VMEXIT (fault)
+>>> 		Write: #VMEXIT(fault)
+>>>
+>>> So, as far as I can tell, this feature is only used to determine how 
+>>> AVIC hardware handles accesses to the extended LVT entries. Does this 
+>>> matter for vIBS? In the absence of this feature, we should take a fault 
+>>> and KVM should be able to handle that.
+>>>
+>>
+>> Yes, but KVM still needs to emulate extended LVT registers to handle the
+>> fault when the guest IBS driver attempts to read/write extended LVT
+>> registers.
+>>
+>> "KVM: x86: Add emulation support for Extented LVT registers"
+>> patch covers two aspects:
+>>
+>> Extended LVT register emulation (EXTAPIC feature bit in
+>> CPUID 0x80000001:ECX[3])
+>>
+>> ExtLvtAvicAccessChgExtended which changes the behavior of read/write
+>> access when AVIC is enabled.
+> 
+> Sure, it will be good if you can separate out the changes required for 
+> the latter, and perhaps move those at the beginning of this series.
+> 
+> - Naveen
+> 
 
-vfio_link_dma inserts a zero-sized vfio_dma into the rb-tree, and is
-only used for that purpose, so discard the size from consideration for
-the insertion point.
+Sure. Will split the patches in V3.
 
-Signed-off-by: Alex Mastro <amastro@fb.com>
----
- drivers/vfio/vfio_iommu_type1.c | 77 ++++++++++++++++++++++-------------------
- 1 file changed, 42 insertions(+), 35 deletions(-)
-
-diff --git a/drivers/vfio/vfio_iommu_type1.c b/drivers/vfio/vfio_iommu_type1.c
-index 48b84a7af2e1..a65625dcf708 100644
---- a/drivers/vfio/vfio_iommu_type1.c
-+++ b/drivers/vfio/vfio_iommu_type1.c
-@@ -166,12 +166,14 @@ static struct vfio_dma *vfio_find_dma(struct vfio_iommu *iommu,
- {
- 	struct rb_node *node = iommu->dma_list.rb_node;
- 
-+	WARN_ON(!size);
-+
- 	while (node) {
- 		struct vfio_dma *dma = rb_entry(node, struct vfio_dma, node);
- 
--		if (start + size <= dma->iova)
-+		if (start + size - 1 < dma->iova)
- 			node = node->rb_left;
--		else if (start >= dma->iova + dma->size)
-+		else if (start > dma->iova + dma->size - 1)
- 			node = node->rb_right;
- 		else
- 			return dma;
-@@ -181,16 +183,19 @@ static struct vfio_dma *vfio_find_dma(struct vfio_iommu *iommu,
- }
- 
- static struct rb_node *vfio_find_dma_first_node(struct vfio_iommu *iommu,
--						dma_addr_t start, size_t size)
-+						dma_addr_t start,
-+						dma_addr_t end)
- {
- 	struct rb_node *res = NULL;
- 	struct rb_node *node = iommu->dma_list.rb_node;
- 	struct vfio_dma *dma_res = NULL;
- 
-+	WARN_ON(end < start);
-+
- 	while (node) {
- 		struct vfio_dma *dma = rb_entry(node, struct vfio_dma, node);
- 
--		if (start < dma->iova + dma->size) {
-+		if (start <= dma->iova + dma->size - 1) {
- 			res = node;
- 			dma_res = dma;
- 			if (start >= dma->iova)
-@@ -200,7 +205,7 @@ static struct rb_node *vfio_find_dma_first_node(struct vfio_iommu *iommu,
- 			node = node->rb_right;
- 		}
- 	}
--	if (res && size && dma_res->iova >= start + size)
-+	if (res && dma_res->iova > end)
- 		res = NULL;
- 	return res;
- }
-@@ -210,11 +215,13 @@ static void vfio_link_dma(struct vfio_iommu *iommu, struct vfio_dma *new)
- 	struct rb_node **link = &iommu->dma_list.rb_node, *parent = NULL;
- 	struct vfio_dma *dma;
- 
-+	WARN_ON(new->size != 0);
-+
- 	while (*link) {
- 		parent = *link;
- 		dma = rb_entry(parent, struct vfio_dma, node);
- 
--		if (new->iova + new->size <= dma->iova)
-+		if (new->iova <= dma->iova)
- 			link = &(*link)->rb_left;
- 		else
- 			link = &(*link)->rb_right;
-@@ -1071,12 +1078,12 @@ static size_t unmap_unpin_slow(struct vfio_domain *domain,
- static long vfio_unmap_unpin(struct vfio_iommu *iommu, struct vfio_dma *dma,
- 			     bool do_accounting)
- {
--	dma_addr_t iova = dma->iova, end = dma->iova + dma->size;
- 	struct vfio_domain *domain, *d;
- 	LIST_HEAD(unmapped_region_list);
- 	struct iommu_iotlb_gather iotlb_gather;
- 	int unmapped_region_cnt = 0;
- 	long unlocked = 0;
-+	size_t pos = 0;
- 
- 	if (!dma->size)
- 		return 0;
-@@ -1100,13 +1107,14 @@ static long vfio_unmap_unpin(struct vfio_iommu *iommu, struct vfio_dma *dma,
- 	}
- 
- 	iommu_iotlb_gather_init(&iotlb_gather);
--	while (iova < end) {
-+	while (pos < dma->size) {
- 		size_t unmapped, len;
- 		phys_addr_t phys, next;
-+		dma_addr_t iova = dma->iova + pos;
- 
- 		phys = iommu_iova_to_phys(domain->domain, iova);
- 		if (WARN_ON(!phys)) {
--			iova += PAGE_SIZE;
-+			pos += PAGE_SIZE;
- 			continue;
- 		}
- 
-@@ -1115,7 +1123,7 @@ static long vfio_unmap_unpin(struct vfio_iommu *iommu, struct vfio_dma *dma,
- 		 * may require hardware cache flushing, try to find the
- 		 * largest contiguous physical memory chunk to unmap.
- 		 */
--		for (len = PAGE_SIZE; iova + len < end; len += PAGE_SIZE) {
-+		for (len = PAGE_SIZE; pos + len < dma->size; len += PAGE_SIZE) {
- 			next = iommu_iova_to_phys(domain->domain, iova + len);
- 			if (next != phys + len)
- 				break;
-@@ -1136,7 +1144,7 @@ static long vfio_unmap_unpin(struct vfio_iommu *iommu, struct vfio_dma *dma,
- 				break;
- 		}
- 
--		iova += unmapped;
-+		pos += unmapped;
- 	}
- 
- 	dma->iommu_mapped = false;
-@@ -1228,7 +1236,7 @@ static int update_user_bitmap(u64 __user *bitmap, struct vfio_iommu *iommu,
- }
- 
- static int vfio_iova_dirty_bitmap(u64 __user *bitmap, struct vfio_iommu *iommu,
--				  dma_addr_t iova, size_t size, size_t pgsize)
-+				  dma_addr_t iova, dma_addr_t iova_end, size_t pgsize)
- {
- 	struct vfio_dma *dma;
- 	struct rb_node *n;
-@@ -1245,8 +1253,8 @@ static int vfio_iova_dirty_bitmap(u64 __user *bitmap, struct vfio_iommu *iommu,
- 	if (dma && dma->iova != iova)
- 		return -EINVAL;
- 
--	dma = vfio_find_dma(iommu, iova + size - 1, 0);
--	if (dma && dma->iova + dma->size != iova + size)
-+	dma = vfio_find_dma(iommu, iova_end, 1);
-+	if (dma && dma->iova + dma->size - 1 != iova_end)
- 		return -EINVAL;
- 
- 	for (n = rb_first(&iommu->dma_list); n; n = rb_next(n)) {
-@@ -1255,7 +1263,7 @@ static int vfio_iova_dirty_bitmap(u64 __user *bitmap, struct vfio_iommu *iommu,
- 		if (dma->iova < iova)
- 			continue;
- 
--		if (dma->iova > iova + size - 1)
-+		if (dma->iova > iova_end)
- 			break;
- 
- 		ret = update_user_bitmap(bitmap, iommu, dma, iova, pgsize);
-@@ -1348,7 +1356,7 @@ static int vfio_dma_do_unmap(struct vfio_iommu *iommu,
- 	if (unmap_all) {
- 		if (iova || size)
- 			goto unlock;
--		size = SIZE_MAX;
-+		iova_end = ~(dma_addr_t)0;
- 	} else {
- 		if (!size || size & (pgsize - 1))
- 			goto unlock;
-@@ -1403,17 +1411,17 @@ static int vfio_dma_do_unmap(struct vfio_iommu *iommu,
- 		if (dma && dma->iova != iova)
- 			goto unlock;
- 
--		dma = vfio_find_dma(iommu, iova_end, 0);
--		if (dma && dma->iova + dma->size != iova + size)
-+		dma = vfio_find_dma(iommu, iova_end, 1);
-+		if (dma && dma->iova + dma->size - 1 != iova_end)
- 			goto unlock;
- 	}
- 
- 	ret = 0;
--	n = first_n = vfio_find_dma_first_node(iommu, iova, size);
-+	n = first_n = vfio_find_dma_first_node(iommu, iova, iova_end);
- 
- 	while (n) {
- 		dma = rb_entry(n, struct vfio_dma, node);
--		if (dma->iova >= iova + size)
-+		if (dma->iova > iova_end)
- 			break;
- 
- 		if (!iommu->v2 && iova > dma->iova)
-@@ -1743,12 +1751,12 @@ static int vfio_iommu_replay(struct vfio_iommu *iommu,
- 
- 	for (; n; n = rb_next(n)) {
- 		struct vfio_dma *dma;
--		dma_addr_t iova;
-+		size_t pos = 0;
- 
- 		dma = rb_entry(n, struct vfio_dma, node);
--		iova = dma->iova;
- 
--		while (iova < dma->iova + dma->size) {
-+		while (pos < dma->size) {
-+			dma_addr_t iova = dma->iova + pos;
- 			phys_addr_t phys;
- 			size_t size;
- 
-@@ -1764,14 +1772,14 @@ static int vfio_iommu_replay(struct vfio_iommu *iommu,
- 				phys = iommu_iova_to_phys(d->domain, iova);
- 
- 				if (WARN_ON(!phys)) {
--					iova += PAGE_SIZE;
-+					pos += PAGE_SIZE;
- 					continue;
- 				}
- 
- 				size = PAGE_SIZE;
- 				p = phys + size;
- 				i = iova + size;
--				while (i < dma->iova + dma->size &&
-+				while (pos + size < dma->size &&
- 				       p == iommu_iova_to_phys(d->domain, i)) {
- 					size += PAGE_SIZE;
- 					p += PAGE_SIZE;
-@@ -1779,9 +1787,8 @@ static int vfio_iommu_replay(struct vfio_iommu *iommu,
- 				}
- 			} else {
- 				unsigned long pfn;
--				unsigned long vaddr = dma->vaddr +
--						     (iova - dma->iova);
--				size_t n = dma->iova + dma->size - iova;
-+				unsigned long vaddr = dma->vaddr + pos;
-+				size_t n = dma->size - pos;
- 				long npage;
- 
- 				npage = vfio_pin_pages_remote(dma, vaddr,
-@@ -1812,7 +1819,7 @@ static int vfio_iommu_replay(struct vfio_iommu *iommu,
- 				goto unwind;
- 			}
- 
--			iova += size;
-+			pos += size;
- 		}
- 	}
- 
-@@ -1829,29 +1836,29 @@ static int vfio_iommu_replay(struct vfio_iommu *iommu,
- unwind:
- 	for (; n; n = rb_prev(n)) {
- 		struct vfio_dma *dma = rb_entry(n, struct vfio_dma, node);
--		dma_addr_t iova;
-+		size_t pos = 0;
- 
- 		if (dma->iommu_mapped) {
- 			iommu_unmap(domain->domain, dma->iova, dma->size);
- 			continue;
- 		}
- 
--		iova = dma->iova;
--		while (iova < dma->iova + dma->size) {
-+		while (pos < dma->size) {
-+			dma_addr_t iova = dma->iova + pos;
- 			phys_addr_t phys, p;
- 			size_t size;
- 			dma_addr_t i;
- 
- 			phys = iommu_iova_to_phys(domain->domain, iova);
- 			if (!phys) {
--				iova += PAGE_SIZE;
-+				pos += PAGE_SIZE;
- 				continue;
- 			}
- 
- 			size = PAGE_SIZE;
- 			p = phys + size;
- 			i = iova + size;
--			while (i < dma->iova + dma->size &&
-+			while (pos + size < dma->size &&
- 			       p == iommu_iova_to_phys(domain->domain, i)) {
- 				size += PAGE_SIZE;
- 				p += PAGE_SIZE;
-@@ -2989,7 +2996,7 @@ static int vfio_iommu_type1_dirty_pages(struct vfio_iommu *iommu,
- 
- 		if (iommu->dirty_page_tracking)
- 			ret = vfio_iova_dirty_bitmap(range.bitmap.data,
--						     iommu, iova, size,
-+						     iommu, iova, iova_end,
- 						     range.bitmap.pgsize);
- 		else
- 			ret = -EINVAL;
-
--- 
-2.47.3
+-Manali
 
 
