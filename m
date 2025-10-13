@@ -1,143 +1,150 @@
-Return-Path: <kvm+bounces-59956-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-59957-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 67727BD6C7D
-	for <lists+kvm@lfdr.de>; Tue, 14 Oct 2025 01:50:12 +0200 (CEST)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
+	by mail.lfdr.de (Postfix) with ESMTPS id C3DB9BD6CB0
+	for <lists+kvm@lfdr.de>; Tue, 14 Oct 2025 01:55:09 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id BF38D3BB2D9
-	for <lists+kvm@lfdr.de>; Mon, 13 Oct 2025 23:50:09 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id B3B764F6808
+	for <lists+kvm@lfdr.de>; Mon, 13 Oct 2025 23:54:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A7FB82EA46C;
-	Mon, 13 Oct 2025 23:50:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A5F952F39BF;
+	Mon, 13 Oct 2025 23:54:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="ZGQt1CdM"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="lZOCtGcb"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pf1-f201.google.com (mail-pf1-f201.google.com [209.85.210.201])
+Received: from mail-pl1-f202.google.com (mail-pl1-f202.google.com [209.85.214.202])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 55BC029B22F
-	for <kvm@vger.kernel.org>; Mon, 13 Oct 2025 23:50:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7D9B1271459
+	for <kvm@vger.kernel.org>; Mon, 13 Oct 2025 23:54:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1760399402; cv=none; b=AJHiSzjRRS7zrw1l7xF6Om46WYx2AEOCCqZOaENpY3huziL/RMW2L3Q7OePpXC6t4L4aIn8I6EBCb1CQVSuO5qsbFSZklhDRBYrnfCGKUCrnKGxDX2nsjzPm25fcKnH429mOFhJXqKCgJjkVEW0pvHZ5CeS+AIOw7g5jyB4OmQI=
+	t=1760399685; cv=none; b=I8diGVf+0LYgZa2I33fXzMkAi98N1o4sPKre3Khra4beyRup+kIStoQCklNR2MS2Qav/BtPXWqOwm/XlbN5UUXVIOzAha0b7i08mis8xSWM1rTQhMy4PqI6gr5082MRkUi2bfs7xNxJC791wyta7f8iTBKxzX4FpTr78zchT9Co=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1760399402; c=relaxed/simple;
-	bh=p1/z9JXn/6u67zL4YtuE3iecUE2DhRP6BHFknbwMdZs=;
+	s=arc-20240116; t=1760399685; c=relaxed/simple;
+	bh=wt8ABhQBNkuDTssrmADKWdmhe2+xsFwQvydnfFEZuw4=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=rw3tSxL/9KQglJ69M5+uNw6P7I3tvmi7T0dExixwMGvU4fNItpM9B/N7lgcwzJYVmxZZgnm3FEazyuxUjaTNx+zhX77qRcOTJd+7THFn9/xXHugjz1eOAkFr5ZPw7LCeeq/fhlvSTogpjIpKdmmw93G9LYbnTTBGisI5KadJRm4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=ZGQt1CdM; arc=none smtp.client-ip=209.85.210.201
+	 To:Cc:Content-Type; b=eMk63LQmlHpwyhXLd3pgrUQadHyOQFhAhYkCrEVbMHctX2JkkfTPdGicvBKn6ZHAUInmeB1x+Kusl1kKW8DIltNu9uf/ULnsPKsIf7bD0n+S46EChuHXs8P/ZmQdF4rtEY0M4dtrkDfB6fFh7EL43IJH2t94WK/JHvL7X3hWci4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=lZOCtGcb; arc=none smtp.client-ip=209.85.214.202
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pf1-f201.google.com with SMTP id d2e1a72fcca58-78427dae77eso7432518b3a.3
-        for <kvm@vger.kernel.org>; Mon, 13 Oct 2025 16:50:01 -0700 (PDT)
+Received: by mail-pl1-f202.google.com with SMTP id d9443c01a7336-27eca7298d9so222922645ad.0
+        for <kvm@vger.kernel.org>; Mon, 13 Oct 2025 16:54:44 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1760399401; x=1761004201; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1760399684; x=1761004484; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=xOsqthpgUN+7hMYU4tdGq9Dk1J6tZ/phPwfI6EdZH7w=;
-        b=ZGQt1CdMy96UwU17HoLyfkacLk4tu8gtHU7+TprMpNa6AbLyaJCouT4S+d47ePyBYB
-         rovl2wuKOOiZp5/ncwkDsWSmQA1hGce3u+0XcP98qskZtFWthTl7GO9QuupLcsNjC8Gu
-         7pdJglaKJLNg5ieSDVVf0drfukcPL++H/lpKKFv+BsuZvMammX6t0MgPrvdRCM2yj+jv
-         Fai0Hm0i9HvSaI5xNo24lqCmO/fRKVsSdSUrXOyAVp5UIRKUaRoz1GeGCNc0HlCg4EZr
-         9nFnaXAC+ue8UCsx4ydmOACd5DT13rbdp8KIGSSWi5/aXKO6sFnUA4RvHKMZjASRGBXZ
-         72rg==
+        bh=5eSzM1BbjacPfILv0jrYJHzJQhHV06H7cFKDBkrRkvg=;
+        b=lZOCtGcb+hFCxLPKlNasSR1pn8YsATj2jdsl0LhBLh3LnYOCP41DQM/t1xjRbeKyO2
+         GlhY3SCDfKje92lP6UIE1rZRdgru4y52z16sh0gsHa5PR72irecohXObMtBPnFk3xA3W
+         gGj9amIh/53e2IkSdkTWcjkHm7AtsC7HXhuT2cQXJm7f1uyDUkLxaA33Y8dqg/kMaeer
+         njIhfVS46t7COelKYPcpN5sLtBLRrKmRuREM3BJq76QjPaaD/nJqE8+iw6kzm5pw82M0
+         dZJduz3JZBnt8pbDvRw187tsjcRkbHJj8ma3bjWEv7VYC1/sXQqMgT3wq4l9giTmbnvw
+         Fudw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1760399401; x=1761004201;
+        d=1e100.net; s=20230601; t=1760399684; x=1761004484;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=xOsqthpgUN+7hMYU4tdGq9Dk1J6tZ/phPwfI6EdZH7w=;
-        b=IZn/yxSl4y6MUznabiDdAr1pnLlPT/riyuz7Z8oqYNZ7zWWHaaOiLyZ4mIsSrWW2hR
-         9DA+Ru8joLQ3AXlpvkt+f9Jm47JtSvyC3TeBipaBj/irEvSD/HVPC5PbbrgACBqqqHeM
-         i0RZgXjd/kEqhrReCTZ94JcBoX1JZi0O5eoU2f8nIFi5To/bCYOURyrfWELqA7moLVj2
-         nqGopQzN02IbU8jVOkjlgyf43UvFDiQMhpRW75Vz692oWJ0Ewrtfs0K9aOKXK9i9Huoc
-         4VJjWMYYKQFqpW095YSO+lFnktMZoSnTEdLPXTaT2jrkIl4pQAR1p7WYw4UYDEJozHvm
-         /3lw==
-X-Forwarded-Encrypted: i=1; AJvYcCWntbGffbDG9GRq2nOCFHbZf8JJr6HT3QwPLEDqroGXkmD8s6u4nwN6y5bkd0RDE8p4cEM=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yz3p0VkZ+o8PV/BX1DumO/z/v+bMo8Qj9qR760rNLLYj/fIN/mi
-	q4q7ER+x/SzZwgT/xh83FlNkBBVabqVgSrxCObR9dsq5CVj/+l3QkFA/IDgWQx4ZKFqRSJ7GuwK
-	/fXBP+w==
-X-Google-Smtp-Source: AGHT+IGzRn21y2SOJv+cqH5j2+OiAKh5F8oTXvdefE1kD/L60D8YTn/fnpdk+gNG0UEKzZnXP8ieD//uQt4=
-X-Received: from pjbgt20.prod.google.com ([2002:a17:90a:f2d4:b0:33b:51fe:1a76])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a05:6a20:258f:b0:2f6:14c6:95ea
- with SMTP id adf61e73a8af0-32da8130d99mr30976889637.20.1760399400534; Mon, 13
- Oct 2025 16:50:00 -0700 (PDT)
-Date: Mon, 13 Oct 2025 16:49:59 -0700
-In-Reply-To: <68ed7bc0c987a_19928100ed@dwillia2-mobl4.notmuch>
+        bh=5eSzM1BbjacPfILv0jrYJHzJQhHV06H7cFKDBkrRkvg=;
+        b=mCF4MXdXWdBLl41vXRjipLDcIzjltcdT4lTXt94o459MygNNditPSyg0jFzACNaH+g
+         w/fh9cpDSiVPuuLpTtICcrVHVTaNAP0/yrFUMayBuhk/UEjyY1fNDBIhYYXqn/pF3TFi
+         cJSIrzLWqQd2X5LepoGr4fi0RO01sTG23EncJ6QehAfqPlu9RbAwt8tK4dLs/VjC4D6C
+         UWVYHvi7OzT65P5NHjvFJLAIg734Wq0vUGmsH/KYiKT64b+Z4/tDHChxHKgAA3Ck3ZEX
+         DGCCLYHqHZbNFpGfPxRxYTBdCLx+wdR8ZoMyfSKsCGxK6cV9qqzYna/qMIqSp5VWsujU
+         fv0A==
+X-Forwarded-Encrypted: i=1; AJvYcCX/6CUSp98voD3E+c5P4fn9BL5LhItFZD+GHJzssE0itOU13C+LGeSBJV7t/IUs9XH8kSs=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxG4MCQEfUi2VQh5Luf6/5l+uBdED7Xcv7CJ0nx1GNFwKgyTjhV
+	cYPvOA/Eolk6ycuzhy5QMnU3YNohj1Uflo05w9UzMFrbl7AxOoiI7qzF325oTU7LDigZA38P/B7
+	dR/I+zQ==
+X-Google-Smtp-Source: AGHT+IFG+BjAtYLOX1KiZpqF3jGYRoMOZPFJ6jl35/04RXhu8tJ/N/pUxAQejmx4mm6AggTYbzBFwK4lnFo=
+X-Received: from plsd3.prod.google.com ([2002:a17:902:b703:b0:27d:6f45:42ec])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:903:246:b0:24c:9309:5883
+ with SMTP id d9443c01a7336-290273ecb35mr293031675ad.28.1760399683860; Mon, 13
+ Oct 2025 16:54:43 -0700 (PDT)
+Date: Mon, 13 Oct 2025 16:54:42 -0700
+In-Reply-To: <d75130b0a0fb9602fa8712a620cb1f7e52606ea4.camel@intel.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
-References: <20251010220403.987927-1-seanjc@google.com> <68ed7bc0c987a_19928100ed@dwillia2-mobl4.notmuch>
-Message-ID: <aO2QJ-YapvJXxE1z@google.com>
-Subject: Re: [RFC PATCH 0/4] KVM: x86/tdx: Have TDX handle VMXON during bringup
+References: <20251010220403.987927-1-seanjc@google.com> <20251010220403.987927-3-seanjc@google.com>
+ <d75130b0a0fb9602fa8712a620cb1f7e52606ea4.camel@intel.com>
+Message-ID: <aO2RQu-xuSC0GGnn@google.com>
+Subject: Re: [RFC PATCH 2/4] KVM: x86: Extract VMXON and EFER.SVME enablement
+ to kernel
 From: Sean Christopherson <seanjc@google.com>
-To: dan.j.williams@intel.com
-Cc: Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>, 
-	Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org, 
-	"Kirill A. Shutemov" <kas@kernel.org>, Paolo Bonzini <pbonzini@redhat.com>, linux-kernel@vger.kernel.org, 
-	linux-coco@lists.linux.dev, kvm@vger.kernel.org, 
-	Chao Gao <chao.gao@intel.com>, Xin Li <xin@zytor.com>, Kai Huang <kai.huang@intel.com>, 
-	Adrian Hunter <adrian.hunter@intel.com>, aik@amd.com
+To: Rick P Edgecombe <rick.p.edgecombe@intel.com>
+Cc: "x86@kernel.org" <x86@kernel.org>, "kas@kernel.org" <kas@kernel.org>, 
+	"dave.hansen@linux.intel.com" <dave.hansen@linux.intel.com>, "mingo@redhat.com" <mingo@redhat.com>, 
+	"tglx@linutronix.de" <tglx@linutronix.de>, "bp@alien8.de" <bp@alien8.de>, 
+	"pbonzini@redhat.com" <pbonzini@redhat.com>, Chao Gao <chao.gao@intel.com>, 
+	Kai Huang <kai.huang@intel.com>, 
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, Dan J Williams <dan.j.williams@intel.com>, 
+	Adrian Hunter <adrian.hunter@intel.com>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>, 
+	"linux-coco@lists.linux.dev" <linux-coco@lists.linux.dev>, "xin@zytor.com" <xin@zytor.com>
 Content-Type: text/plain; charset="us-ascii"
 
-On Mon, Oct 13, 2025, dan.j.williams@intel.com wrote:
-> > Emphasis on "only", because leaving VMCS tracking and clearing in KVM is
-> > another key difference from Xin's series.  The "light bulb" moment on that
-> > front is that TDX isn't a hypervisor, and isn't trying to be a hypervisor.
-> > Specifically, TDX should _never_ have it's own VMCSes (that are visible to the
-> > host; the TDX-Module has it's own VMCSes to do SEAMCALL/SEAMRET), and so there
-> > is simply no reason to move that functionality out of KVM.
-> > 
-> > With that out of the way, dealing with VMXON/VMXOFF and EFER.SVME is a fairly
-> > simple refcounting game.
-> > 
-> > Oh, and I didn't bother looking to see if it would work, but if TDX only needs
-> > VMXON during boot, then the TDX use of VMXON could be transient.
+On Mon, Oct 13, 2025, Rick P Edgecombe wrote:
+> On Fri, 2025-10-10 at 15:04 -0700, Sean Christopherson wrote:
 > 
-> With the work-in-progress "Host Services", the expectation is that VMX
-> would remain on especially because there is no current way to de-init
-> TDX.
-
-What are Host Services?
-
-> Now, the "TDX always-on even outside of Host Services" this series is
-> proposing gives me slight pause. I.e. Any resources that TDX gobbles, or
-> features that TDX is incompatible (ACPI S3), need a trip through a BIOS
-> menu to turn off.  However, if that becomes a problem in practice we can
-> circle back later to fix that up.
-
-Oooh, by "TDX always-on" you mean invoking tdx_enable() during boot, as opposed
-to throwing it into a loadable module.  To be honest, I completely missed the
-whole PAMT allocation and imcompatible features side of things.
-
-And Rick already pointed out that doing tdx_enable() during tdx_init() would be
-far too early.
-
-So it seems like the simple answer is to continue to have __tdx_bringup() invoke
-tdx_enable(), but without all the caveats about the caller needed to hold the
-CPUs lock, be post-VMXON, etc.
-
-> > could simply blast on_each_cpu() and forego the cpuhp and syscore hooks (a
-> > non-emergency reboot during init isn't possible).  I don't particuarly care
-> > what TDX does, as it's a fairly minor detail all things concerned.  I went with
-> > the "harder" approach, e.g. to validate keeping the VMXON users count elevated
-> > would do the right thing with respect to CPU offlining, etc.
-> > 
-> > Lightly tested (see the hacks below to verify the TDX side appears to do what
-> > it's supposed to do), but it seems to work?  Heavily RFC, e.g. the third patch
-> > in particular needs to be chunked up, I'm sure there's polishing to be done,
-> > etc.
+> > +
+> > +int x86_virt_get_cpu(int feat)
+> > +{
+> > +	int r;
+> > +
+> > +	if (!x86_virt_initialized)
+> > +		return -EOPNOTSUPP;
+> > +
+> > +	if (this_cpu_inc_return(virtualization_nr_users) > 1)
+> > +		return 0;
+> > +
+> > +	if (x86_virt_is_vmx() && feat == X86_FEATURE_VMX)
+> > +		r = x86_vmx_get_cpu();
+> > +	else if (x86_virt_is_svm() && feat == X86_FEATURE_SVM)
+> > +		r = x86_svm_get_cpu();
+> > +	else
+> > +		r = -EOPNOTSUPP;
+> > +
+> > +	if (r)
+> > +		WARN_ON_ONCE(this_cpu_dec_return(virtualization_nr_users));
+> > +
+> > +	return r;
+> > +}
+> > +EXPORT_SYMBOL_GPL(x86_virt_get_cpu);
 > 
-> Sounds good and I read this as "hey, this is the form I would like to
-> see, when someone else cleans this up and sends it back to me as a
-> non-RFC".
+> Not sure if I missed some previous discussion or future plans, but doing this
+> via X86_FEATURE_FOO seems excessive. We could just have x86_virt_get_cpu(void)
+> afaict? Curious if there is a plan for other things to go here?
 
-Actually, I think I can take it forward.  Knock wood, but I don't think there's
-all that much left to be done.  Heck, even writing the code for the initial RFC
-was a pretty short adventure once I had my head wrapped around the concept.
+I want to avoid potential problems due to kvm-amd.ko doing x86_virt_get_cpu() and
+succeeding on an Intel CPU, and vice versa.  The obvious alternative would be to
+have wrappers for VMX and SVM and then do whatever internally, but we'd need some
+form of tracking internally no matter what, and I prefer X86_FEATURE_{SVM,VMX}
+over one or more booleans.
+
+FWIW, after Chao's feedback, this is what I have locally (a little less foo),
+where x86_virt_feature is set during x86_virt_init().
+
+int x86_virt_get_cpu(int feat)
+{
+	int r;
+
+	if (!x86_virt_feature || x86_virt_feature != feat)
+		return -EOPNOTSUPP;
+
+	if (this_cpu_inc_return(virtualization_nr_users) > 1)
+		return 0;
+
+	r = x86_virt_call(get_cpu);
+	if (r)
+		WARN_ON_ONCE(this_cpu_dec_return(virtualization_nr_users));
+
+	return r;
+}
+EXPORT_SYMBOL_GPL(x86_virt_get_cpu);
 
