@@ -1,152 +1,109 @@
-Return-Path: <kvm+bounces-59947-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-59948-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5C429BD69B5
-	for <lists+kvm@lfdr.de>; Tue, 14 Oct 2025 00:25:45 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id C8B5DBD69D3
+	for <lists+kvm@lfdr.de>; Tue, 14 Oct 2025 00:31:44 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7CF883A3E71
-	for <lists+kvm@lfdr.de>; Mon, 13 Oct 2025 22:25:41 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 00C6518A3AFC
+	for <lists+kvm@lfdr.de>; Mon, 13 Oct 2025 22:32:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1AC882FE57F;
-	Mon, 13 Oct 2025 22:25:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D92ED30507F;
+	Mon, 13 Oct 2025 22:31:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="BsqtxRKS"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="LckEC/Dp"
 X-Original-To: kvm@vger.kernel.org
-Received: from out-185.mta0.migadu.com (out-185.mta0.migadu.com [91.218.175.185])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ed1-f51.google.com (mail-ed1-f51.google.com [209.85.208.51])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 054CC2EFDBA
-	for <kvm@vger.kernel.org>; Mon, 13 Oct 2025 22:25:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.185
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7273376026
+	for <kvm@vger.kernel.org>; Mon, 13 Oct 2025 22:31:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1760394331; cv=none; b=HCrj78Ghg5+/XhlWL312bV0ennte38K0AmNQLPTocwy5tqSu1vDH3KJCOR/APqXRVISnZj/iuJDLPqQU9Doa2a4mJ18ThVIb4i+wjMaYzA7Bp5poS9Sb4zdChXWSQ8vGbRqUdoqc7UgGOdpVzVl/IUNLi0CopXgG8u1plPtJqPE=
+	t=1760394690; cv=none; b=i8essHfGJthxX6ioJRBnnaNheRtuuLNST9lyehkJKa3vhm5Af6iviuzyl7ot4K2CPVvMuMgOMIXcXBja/OkqiS+LlD4VJyUEjMBZgswClzkrrcGaVjdQLSo9fYmWXIAh/Q7TFLL/IpUMMReUTXHksplFBUPtx+YiVxw3Nv5p2Lk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1760394331; c=relaxed/simple;
-	bh=Jf/RCp0W1R16T+LuSWIfFdr0PYVVcukWFSiYEsqCGpw=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=T6kt3VQXOGySY6o0dKqoFAyQsQGvuUYcOm1m3ulnu99oMzdP0kefkoSUFkNVdwy66fdkCuinjCDasJril1s1ZAxZt9k8lzV2c3F8dIEf+jj6dQx/qN2IJWmhe+auC/P+sLVY+uDV4xrBFbZxTuEVfabRKKFAS41dcevaJYHXYZU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=BsqtxRKS; arc=none smtp.client-ip=91.218.175.185
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Date: Mon, 13 Oct 2025 22:25:22 +0000
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1760394326;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=0EgIJNgp76TDPohMkfuZZJN+3BausRPObvIACd4fJ9g=;
-	b=BsqtxRKSrb4BBYtkyjI9Tp+ncPvykLYTCsnlENGKok9jyeIFE99Io7/SZCxf5Rbr3QDoN6
-	wPNl6PbzJJrOiAPZVBaurS23LIZ/4nq7RkiE4xE9FINcabn+0FVrmGCwNvWNn76Q1TsQYP
-	DPgUyx2bgSde0k8ups9L7z1CU7KrysY=
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Yosry Ahmed <yosry.ahmed@linux.dev>
-To: Sean Christopherson <seanjc@google.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org, 
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH 08/12] KVM: selftests: Use 'leaf' instead of hugepage to
- describe EPT entries
-Message-ID: <ivkoh7hdl7fcp5fmehmf3kv6ebqitozunbricyed5tkt7z3ngr@qvmaytpzrskw>
-References: <20251001145816.1414855-1-yosry.ahmed@linux.dev>
- <20251001145816.1414855-9-yosry.ahmed@linux.dev>
- <aO1yJHcKC85mo0PQ@google.com>
+	s=arc-20240116; t=1760394690; c=relaxed/simple;
+	bh=+ySgBYKp5sgJmpYv5oyU08u88544UwIMJoZQjMVM5Cw=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=rBTKgPEnjqN8jz9S5g9SjLpz+DYvPLNNzey2/3kcYx7Cwo+bjpyLb3Q1QBjzWRYhLbM53MHzyqRo7tlD3zTn9Anr/8ABleeyV8ia9O9Zn73/KLW4gipMqmU+NKGkTJPPelKBY6aDtNT6L1ygvPFwm0hEyKGMnZDCJZm619cBkPk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=LckEC/Dp; arc=none smtp.client-ip=209.85.208.51
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-ed1-f51.google.com with SMTP id 4fb4d7f45d1cf-62faa04afd9so25271a12.1
+        for <kvm@vger.kernel.org>; Mon, 13 Oct 2025 15:31:27 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1760394686; x=1760999486; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=YcR8QYF3LC3OedvBD3xFc4hECJtuzfDK+Smhc5CK5JA=;
+        b=LckEC/DpZUdn3iSxlOAC+5XPRPkUHjC4nlO2Ou0FXFBbQxNWE/58BPjVWkfEnTvo9N
+         tgOpuX4/FfcCRKBmvz0FfC2OcvqtqdpVTusX/gdLEFZSDKOi6auvEVscac6/cdW63Lz4
+         9mG8nu0U3fqdwb22G9TeJLeKH0ws1oFvjz15wtGib1koWlQwUZiDIoEmwfYSVgf1eWvr
+         cjb1WqqMqzD4H7CgxcTFs+KOgwFqs9XjYOhQNd4gpHQ0Xixn96LoqB3pUVQJ5Ta3V43W
+         Pfqv7WGM7RTL52L891/Y6lQXrBDtUQxikcIXRQNsyXlXAU5+GrVo51MfAJyryjRYlJZ8
+         vIrw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1760394686; x=1760999486;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=YcR8QYF3LC3OedvBD3xFc4hECJtuzfDK+Smhc5CK5JA=;
+        b=VNh8ZYZS7Fsa7uUZ1zUHnN7R+0NPY4E+7bj456XA8RJaKmDfhOsOJC7kGlQximKpND
+         0pbD22AC13cO7TJm2VQTOaGuRpoO5PEA1xPoa30uj+qvGBmlJtc7lhUmqGPZ40/HyxvK
+         OIE2uPggd5Midkxrz2rQny+rZTIHKIENtiR/qzLeL4s+PeEpRvSIVG0rtvxYC0SbSKd/
+         80mnQclSqW9ofX5WWMv+lTRCK0WisECwl78nlGnOXNmylHYY1BXiUFZCzwzYtEXzASOY
+         Xm/h1SBSU+pnhrkJxM0VwZ5zXIGT9Wg+rZSDWnVx9DfXxObYdzHcrqoZCesEKdZknUel
+         MX9w==
+X-Forwarded-Encrypted: i=1; AJvYcCW54ZDAjNcZ4ZtCJbQfLLh3IRvqvVrCa+mnPSpoHwSUJXEvozfoBeecBxwoDecNGb35Od0=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzxRXHfFgdjORxNmslR2yeSKe1c51ccuXSCtHFKqddHPfrckK/C
+	huSzlybdvf8XUvM5T/7eOaU+k7OjCgrbV0D2zcNvC6nOVDoIPrF/KydeIdNiE9YgR82I8MWFgUn
+	+70KXhnShC1s+Px4bHbqyBIBUFqvZSHiTapBYu23s
+X-Gm-Gg: ASbGncuuYXT91JTDAzoGoQgZ9k1gWfw+BJKM4eVfA8EKFOeTh96rRz8rHQkv4Q2UNPy
+	zKSyLIf64pbvCLWB/GUznvYazYy64dYywRhH1V2DL/OruoIVdPSmVoFK8038TWj4xAU3e6eUez+
+	s1Z4BSQ0YQ3Mnnhx1k/rk1Vky/HJcYrTUia4z391xes8bbFkPt+gqqqT/LhwTqIeAjbvBo2FK/I
+	MRHHDC960ss0nPw9W/062xBiOP2fbpRUFEk3PJBzsA=
+X-Google-Smtp-Source: AGHT+IHmNmEO8UjVvewqClbQGgSN+TsvobxIhiIwo9csw6fcanDJv8mEWMQbIpvQc5+JpEPlcVIyIMZhpv/3rMzG93k=
+X-Received: by 2002:aa7:d889:0:b0:634:90ba:2361 with SMTP id
+ 4fb4d7f45d1cf-639d52e9f0emr650243a12.7.1760394686126; Mon, 13 Oct 2025
+ 15:31:26 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <aO1yJHcKC85mo0PQ@google.com>
-X-Migadu-Flow: FLOW_OUT
+References: <20250922162935.621409-1-jmattson@google.com> <aO11A4mzwqLzeXN9@google.com>
+In-Reply-To: <aO11A4mzwqLzeXN9@google.com>
+From: Jim Mattson <jmattson@google.com>
+Date: Mon, 13 Oct 2025 15:31:14 -0700
+X-Gm-Features: AS18NWCUVfXmqLoMJQM4_72eVGSE-rWiwIwZWPFi4AijdWXJ2AtP924z8ut-JgM
+Message-ID: <CALMp9eQN9b-EkysBHDj127p2s4m9jnicjMd+9GKWdFfaxBToQg@mail.gmail.com>
+Subject: Re: [PATCH 0/2] KVM: SVM: Aggressively clear vmcb02 clean bits
+To: Sean Christopherson <seanjc@google.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, Thomas Gleixner <tglx@linutronix.de>, 
+	Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>, 
+	Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org, 
+	"H. Peter Anvin" <hpa@zytor.com>, kvm@vger.kernel.org, linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Mon, Oct 13, 2025 at 02:41:56PM -0700, Sean Christopherson wrote:
-> On Wed, Oct 01, 2025, Yosry Ahmed wrote:
-> > From: Yosry Ahmed <yosryahmed@google.com>
-> > 
-> > The assertions use 'hugepage' to describe a terminal EPT entry, but
-> > 'leaf' is more accruate as a PG_LEVEL_4K EPT entry is a leaf but not a
-> > hugepage.
-> 
-> Yes, it's more accurate, but also less precise.  I'm guessing the assert message
-> and comment talked about hugepages because that's the type of mappings that
-> caused problems at the time.
+On Mon, Oct 13, 2025 at 2:54=E2=80=AFPM Sean Christopherson <seanjc@google.=
+com> wrote:
+>
+> On Mon, Sep 22, 2025, Jim Mattson wrote:
+> > It is unlikely that L1 will toggle the MSR intercept bit in vmcb02,
+> > or that L1 will change its own IA32_PAT MSR. However, if it does,
+> > the affected fields in vmcb02 should not be marked clean.
+> >
+> > An alternative approach would be to implement a set of mutators for
+> > vmcb02 fields, and to clear the associated clean bit whenever a field
+> > is modified.
+>
+> Any reason not to tag these for stable@?  I can't think of any meaningful
+> downsides, so erring on the side of caution seems prudent.
 
-Given that it refers to PG_LEVEL_4K entries too, I wouldn't call it less
-precise. All callers actually create 4K mappings so it is never actually
-a hugepage in the current context :D
-
-> 
-> Ah, actually, I bet the code was copy+pasted from virt_create_upper_pte(), in
-> which case the assumptions about wanting to create a hupage are both accurate
-> and precise.
-> 
-> > The distincion will be useful in coming changes that will pass
-> > the value around and 'leaf' is clearer than hugepage or page_size.
-> 
-> What value?
-
-'leaf'. The following changes will pass 'leaf' in as a boolean instead
-of checking 'current_level == target_level' here. So passing in
-'hugepage' would be inaccurate, and 'page_size' is not as clear (but
-still works).
-
-> 
-> > Leave the EPT bit named page_size to keep it conforming to the manual.
-> > 
-> > Signed-off-by: Yosry Ahmed <yosry.ahmed@linux.dev>
-> > ---
-> >  tools/testing/selftests/kvm/lib/x86/vmx.c | 10 +++++-----
-> >  1 file changed, 5 insertions(+), 5 deletions(-)
-> > 
-> > diff --git a/tools/testing/selftests/kvm/lib/x86/vmx.c b/tools/testing/selftests/kvm/lib/x86/vmx.c
-> > index 04c4b97bcd1e7..673756b27e903 100644
-> > --- a/tools/testing/selftests/kvm/lib/x86/vmx.c
-> > +++ b/tools/testing/selftests/kvm/lib/x86/vmx.c
-> > @@ -380,15 +380,15 @@ static void nested_create_pte(struct kvm_vm *vm,
-> >  			pte->address = vm_alloc_page_table(vm) >> vm->page_shift;
-> >  	} else {
-> >  		/*
-> > -		 * Entry already present.  Assert that the caller doesn't want
-> > -		 * a hugepage at this level, and that there isn't a hugepage at
-> > -		 * this level.
-> > +		 * Entry already present.  Assert that the caller doesn't want a
-> > +		 * leaf entry at this level, and that there isn't a leaf entry
-> > +		 * at this level.
-> >  		 */
-> >  		TEST_ASSERT(current_level != target_level,
-> > -			    "Cannot create hugepage at level: %u, nested_paddr: 0x%lx",
-> > +			    "Cannot create leaf entry at level: %u, nested_paddr: 0x%lx",
-> >  			    current_level, nested_paddr);
-> >  		TEST_ASSERT(!pte->page_size,
-> > -			    "Cannot create page table at level: %u, nested_paddr: 0x%lx",
-> > +			    "Leaf entry already exists at level: %u, nested_paddr: 0x%lx",
-> 
-> This change is flat out wrong.  The existing PRESENT PTE _might_ be a 4KiB leaf
-> entry, but it might also be an existing non-leaf page table.
-
-Hmm if pte->page_size is true then it has to be a leaf page table,
-right?
-
-If it's an existing non-leaf page table we shouldn't fail, the assertion
-here is when we try to override a leaf page table IIUC.
-
-> 
-> Instead of hacking on the nested code, can we instead tweak __virt_pg_map() to
-> work with nested TDP?  At a glance, it's already quite close, e.g. "just" needs
-> to be taught about EPT RWX bits and allow the call to pass in the root pointer.
-
-That would be ideal, I'll take a look. In case I don't have time for
-that unification, can this be a follow-up change?
-
-> 
-> >  			    current_level, nested_paddr);
-> >  	}
-> >  }
-> > -- 
-> > 2.51.0.618.g983fd99d29-goog
-> > 
+SGTM. Do you want a new version?
 
