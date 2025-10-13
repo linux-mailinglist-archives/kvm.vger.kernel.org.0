@@ -1,263 +1,279 @@
-Return-Path: <kvm+bounces-59858-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-59859-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 87B89BD1009
-	for <lists+kvm@lfdr.de>; Mon, 13 Oct 2025 02:47:32 +0200 (CEST)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
+	by mail.lfdr.de (Postfix) with ESMTPS id EB4A7BD151B
+	for <lists+kvm@lfdr.de>; Mon, 13 Oct 2025 05:19:32 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 9A48B1893A92
-	for <lists+kvm@lfdr.de>; Mon, 13 Oct 2025 00:47:55 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id B4DAC4E1D33
+	for <lists+kvm@lfdr.de>; Mon, 13 Oct 2025 03:19:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5CB5C1DE2AD;
-	Mon, 13 Oct 2025 00:47:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="aKcUZYhD"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1A710284B3B;
+	Mon, 13 Oct 2025 03:19:23 +0000 (UTC)
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.19])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 47F14288D2;
-	Mon, 13 Oct 2025 00:47:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=192.198.163.19
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1760316439; cv=fail; b=ddMkvQSXRaTN/cBCRtq101p9g59e11fH4pwpRzUVqmYg3TPROmsFCTK5Ftkq8KUSBM1cVaITYTMGwOxUhx1Mk8t/1tMUxV4y4CybPCStDQG0oWXJmljrps3mlkwZ0dv6IOZRtmLvUkPRy503tkx6+5BIqMAdC3ImlHji2bdwB4Q=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1760316439; c=relaxed/simple;
-	bh=oV+8qiceTBwbP6WkZRaNzRPd2DyDPPC6KB0n368A3oU=;
-	h=Date:From:To:CC:Subject:Message-ID:References:Content-Type:
-	 Content-Disposition:In-Reply-To:MIME-Version; b=XSfe33XCLhn9X8hKBOJpau0Kgs1UdQNrsWmSw9Qy4YAErXcgmwtjd9cKkr1nwepwLLk0kvWHO+OoLR6MVB0FuMdyyKbUEpFMZ1RCskA8cucTkjK+x98QQhJ3rrd9UfAYIpAD94+m/UlDszzEpODrNDMM8JnikOWBVlFAt2dBqjk=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=aKcUZYhD; arc=fail smtp.client-ip=192.198.163.19
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1760316437; x=1791852437;
-  h=date:from:to:cc:subject:message-id:reply-to:references:
-   in-reply-to:mime-version;
-  bh=oV+8qiceTBwbP6WkZRaNzRPd2DyDPPC6KB0n368A3oU=;
-  b=aKcUZYhDIoD/aa/AhBuwFTc7vlHO+vevEDipyWrLCsSl0nFUZ5af0pZ6
-   MbulkjoVJpmXltdn7jzVGeRW8hfNh0wqHkMvOf4viNIW3FVnZTct+OlmG
-   6IqNqPw3p7H0LmNlsuXy1vCgec3gWH/WEzwsR8rOIOTdphO776wxjQ1ap
-   8+tMrC468vr6sOcxwbnZUCpE/0juCvM6Lvc2vSDYYMRTj/wpZWl86X49V
-   62c1n5I2YkUMUTPzeYBtHsC26WkWHEofQ7diy/uHFkpbE5JWUTyveFku1
-   OczeEk0rRmvH0fC8huT2KiFJn7RnfTkNss+aD03/41/1FsATMvXYIpSPE
-   Q==;
-X-CSE-ConnectionGUID: 450j6/LHSTyMhu5RphZzVQ==
-X-CSE-MsgGUID: hnTYzvdtQDW/ioHy/skpyg==
-X-IronPort-AV: E=McAfee;i="6800,10657,11580"; a="61488570"
-X-IronPort-AV: E=Sophos;i="6.19,224,1754982000"; 
-   d="scan'208";a="61488570"
-Received: from orviesa001.jf.intel.com ([10.64.159.141])
-  by fmvoesa113.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 12 Oct 2025 17:47:17 -0700
-X-CSE-ConnectionGUID: 2UOoUdD7Qyaj6tWf5kbmHg==
-X-CSE-MsgGUID: Dq+2fFxfQte8gBOos7nF8g==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.19,224,1754982000"; 
-   d="scan'208";a="218568842"
-Received: from fmsmsx902.amr.corp.intel.com ([10.18.126.91])
-  by orviesa001.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 12 Oct 2025 17:47:15 -0700
-Received: from FMSMSX903.amr.corp.intel.com (10.18.126.92) by
- fmsmsx902.amr.corp.intel.com (10.18.126.91) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.27; Sun, 12 Oct 2025 17:47:14 -0700
-Received: from fmsedg901.ED.cps.intel.com (10.1.192.143) by
- FMSMSX903.amr.corp.intel.com (10.18.126.92) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.27 via Frontend Transport; Sun, 12 Oct 2025 17:47:14 -0700
-Received: from SA9PR02CU001.outbound.protection.outlook.com (40.93.196.47) by
- edgegateway.intel.com (192.55.55.81) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.27; Sun, 12 Oct 2025 17:47:14 -0700
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=GM6Iy7gdLMctemdmrPoiQcESZInj1eT6F6q2lQ2r737pzdR7mO2gNOV8RGYmkWANhUm8OoJIWDCUDtO8csNcpysjO/hdRvk13QkmHLNG1eNN9lYH8dSnvcUrIWfM0dvUbwKyBlrgOYpOvItQ9FX5BUnLHwP8nH3hGp+SuhyBp99yExoBhfrxqvru9x8arrWVLsXSbaVspAiJCi5zBPw0Ru+sk8+fQ7QOda5sgTqQR6L78b3Xf1dQtW0iZZlIPM3uM9BPZxgCyD/a9BP708SauKJkehrC30cMzyS1pjZ2dBnnw7NmZuKzH4csT2J8wy4YerlH4mpMWJGsRURB/mcI1A==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=SEJ5fwhwRN2eCG+UwLdKw/WcTG3VAxwk+1PN93mKX1U=;
- b=Jh9XS2kzj6Sz87rb7oFYGoTAD0ZXBJoLHAywJAMHjsGQfFEbuz8lLHSkHLQCNAf53snaz1YofveAt0v6o3jsNibmM1QE8LpvRo0NKILjQ80s7900/CPxaoPzo2fS4Zbsd+lhzk4r3OtdnyKoRD/FQ9mg3kPeiCIZ7c49namZwmzoQmHaj2ZtE9Af4KqzPSzSCPCwgYithjKPRsKENzk43w8Qd/0N2mIsdToBVT27uoY/AX6gmsQcWos0cd6dqdir8Ptxp6UAIvHvPYjBT4yfZZIzef3Wcn6PIBo2TuH+T90+Zzi1jAJEJtA5EfPSy5sDhhmMxpb13KLa8/GKewd2Yw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-Received: from DS7PR11MB5966.namprd11.prod.outlook.com (2603:10b6:8:71::6) by
- MW3PR11MB4683.namprd11.prod.outlook.com (2603:10b6:303:5c::24) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.9203.12; Mon, 13 Oct 2025 00:47:06 +0000
-Received: from DS7PR11MB5966.namprd11.prod.outlook.com
- ([fe80::e971:d8f4:66c4:12ca]) by DS7PR11MB5966.namprd11.prod.outlook.com
- ([fe80::e971:d8f4:66c4:12ca%6]) with mapi id 15.20.9203.009; Mon, 13 Oct 2025
- 00:47:06 +0000
-Date: Mon, 13 Oct 2025 08:45:11 +0800
-From: Yan Zhao <yan.y.zhao@intel.com>
-To: Ackerley Tng <ackerleytng@google.com>
-CC: <pbonzini@redhat.com>, <seanjc@google.com>,
-	<linux-kernel@vger.kernel.org>, <kvm@vger.kernel.org>, <x86@kernel.org>,
-	<rick.p.edgecombe@intel.com>, <dave.hansen@intel.com>, <kas@kernel.org>,
-	<tabba@google.com>, <quic_eberman@quicinc.com>, <michael.roth@amd.com>,
-	<david@redhat.com>, <vannapurve@google.com>, <vbabka@suse.cz>,
-	<thomas.lendacky@amd.com>, <pgonda@google.com>, <zhiquan1.li@intel.com>,
-	<fan.du@intel.com>, <jun.miao@intel.com>, <ira.weiny@intel.com>,
-	<isaku.yamahata@intel.com>, <xiaoyao.li@intel.com>,
-	<binbin.wu@linux.intel.com>, <chao.p.peng@intel.com>
-Subject: Re: [RFC PATCH v2 17/23] KVM: guest_memfd: Split for punch hole and
- private-to-shared conversion
-Message-ID: <aOxLl90ndWP9AinU@yzhao56-desk.sh.intel.com>
-Reply-To: Yan Zhao <yan.y.zhao@intel.com>
-References: <20250807093950.4395-1-yan.y.zhao@intel.com>
- <20250807094503.4691-1-yan.y.zhao@intel.com>
- <diqzecrn2gru.fsf@google.com>
-Content-Type: text/plain; charset="us-ascii"
-Content-Disposition: inline
-In-Reply-To: <diqzecrn2gru.fsf@google.com>
-X-ClientProxiedBy: SG2PR04CA0208.apcprd04.prod.outlook.com
- (2603:1096:4:187::10) To DS7PR11MB5966.namprd11.prod.outlook.com
- (2603:10b6:8:71::6)
+Received: from mail.loongson.cn (mail.loongson.cn [114.242.206.163])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EB35623D7F4;
+	Mon, 13 Oct 2025 03:19:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=114.242.206.163
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1760325562; cv=none; b=QQIdJ7/zqk3GTrL29NiVNNsqwnZvY9+IppPv4FV0RjA/JAbssZAz4cwzgfBh2ji3RcSprCWvTkg8Z64mdxMR9N83EaA23A0UV1UihELGxzoHDNTgTWOnJEWkAFP15eXMGRncrC2d8Uymod3MhrKxzVLYzXm3IlwxzIcwo2jVNhs=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1760325562; c=relaxed/simple;
+	bh=N3LHKPL5OVrA7eGEWAK9jGaZkBqysPyAEOHnkVU9HOc=;
+	h=Subject:To:Cc:References:From:Message-ID:Date:MIME-Version:
+	 In-Reply-To:Content-Type; b=TMAqQRRcM4pFlnFnGZrrdGRW+GcQlAxW1ineif1kGnAEzQJkrtAStk1uBfpGlNa5n/m5PiYboKsIP16GpSBARk8YGeoAB0jAy0udOAMnoy+hXXTsBK2WD9fZELoZXCCvvC3p3Tqv9OE9NtwN5G4Hm8MuGxkPEHjlXffSnVftLgk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=loongson.cn; spf=pass smtp.mailfrom=loongson.cn; arc=none smtp.client-ip=114.242.206.163
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=loongson.cn
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=loongson.cn
+Received: from loongson.cn (unknown [10.20.42.239])
+	by gateway (Coremail) with SMTP id _____8BxmdGsb+xo0G0VAA--.46182S3;
+	Mon, 13 Oct 2025 11:19:09 +0800 (CST)
+Received: from [10.20.42.239] (unknown [10.20.42.239])
+	by front1 (Coremail) with SMTP id qMiowJDxQ+Sjb+xoegPdAA--.32361S3;
+	Mon, 13 Oct 2025 11:19:01 +0800 (CST)
+Subject: Re: [PATCH v2] LoongArch: KVM: Add AVEC support
+To: Bibo Mao <maobibo@loongson.cn>, chenhuacai@kernel.org
+Cc: kvm@vger.kernel.org, loongarch@lists.linux.dev, kernel@xen0n.name,
+ linux-kernel@vger.kernel.org
+References: <20251010064858.2392927-1-gaosong@loongson.cn>
+ <39779e6d-2f09-4ee9-e5e0-97fc09efbbf5@loongson.cn>
+From: gaosong <gaosong@loongson.cn>
+Message-ID: <a2d41419-2268-c041-9858-9287056d7f31@loongson.cn>
+Date: Mon, 13 Oct 2025 11:18:54 +0800
+User-Agent: Mozilla/5.0 (X11; Linux loongarch64; rv:68.0) Gecko/20100101
+ Thunderbird/68.7.0
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: DS7PR11MB5966:EE_|MW3PR11MB4683:EE_
-X-MS-Office365-Filtering-Correlation-Id: 355f3765-0bce-41c3-d3d6-08de09f2082f
-X-LD-Processed: 46c98d88-e344-4ed4-8496-4ed7712e255d,ExtAddr
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230040|1800799024|366016|376014|7416014;
-X-Microsoft-Antispam-Message-Info: =?us-ascii?Q?7ArHhwBmFSUVpqf1/gtNNjcylmSqDBbiXMO/DLGOhypI/TTePkuLEEsy32hN?=
- =?us-ascii?Q?jj5tUi5vP38zhSeb46uWumh7/F0Vx54ymXdzlq0t9jRNhp+wsHLRtRVb/Seu?=
- =?us-ascii?Q?X/eb6ZQga6L6Q1Yrysz2mxiau/xc4j+jK+GXwC42tzYN5gLTMwR9FJ9wgGXC?=
- =?us-ascii?Q?oc6Iy6K+6Ye5v3agNz5xg3dqCyz5hpcY1wby+9lPYIS9K6OK4DSdT6Zqi43H?=
- =?us-ascii?Q?Bmc5nnYU9DdEs2CebD4++PmGxJtoGgCZZi5TbKEgrg8c1b/EJooLXgBJQEf/?=
- =?us-ascii?Q?ebICIujhGeQFeM83Af3VhwtXzuUFnKXQHDbJDt5A7LT+oxZp1P/dIuckdr3S?=
- =?us-ascii?Q?BRXxT6dgt0Nw4U0Sh8oD5JhodzteE+IGLluc7W/YTFXhqp5MuweSDxl059V4?=
- =?us-ascii?Q?PHI0nmJMp+07IqVzYYjDtDOGqMfl5fh4phCjZxNXllvj+BUYMi7oRN7XYRiY?=
- =?us-ascii?Q?wDPJg3GniwskNHwLRV2n6q9XqutxRkXPTDLmnunPhA3pfcoOU8zx4U0dlPDJ?=
- =?us-ascii?Q?2C5MqWmhL501hlpr6B7Enm3GdmFKNqR1yHOx9jsdsJTXRgGgDJltnlHOnBaE?=
- =?us-ascii?Q?1UFkx3sflFUXWtOH8dLr6sU6G416z6ETg5QsJDaIhgPdZ9xaZr9b746GTSWY?=
- =?us-ascii?Q?H7wiNfleVpYYlC5ITUgN6QPA1yqMHieNrT0iLvkeEPpVGnXT0xO1e0HA8g09?=
- =?us-ascii?Q?AUwGzbEAOUKoeTAycYfzWLpjFSPtGXL27AB/Ee8/D5mXRAAbvm9ACa5Wgdld?=
- =?us-ascii?Q?jGXpXczSxCcDxScc/Z265HLiJdDNCcZwmGVBMcs+1EPRfwWxlj1ACN2TSIGN?=
- =?us-ascii?Q?YjpODneLdcYDmBeyofUIHikcMHmgdA6PJhYx5adYZ3XtBC9UgviE303zAN3N?=
- =?us-ascii?Q?7rryJyUjdBPtHvKUrIy4ddN7Pl5HCh5U8ILABpLPz6LnwXkA8FeSCPrrjxyZ?=
- =?us-ascii?Q?CXyoc8fDqnGgv+i3MXwJ2gK8H56R4sFVFnLZE0cYJkJkwTpVSzHCVa93cseC?=
- =?us-ascii?Q?JepBufK66YMOj3/ECj2eVeOOv0IGI44al3sYnhFqzJMjThnv7qT+6AZ+KWMW?=
- =?us-ascii?Q?4gbU8pYtE8jtDxQc2zgkGnRXSYguEOATt7X3m29a68kRGezV5YmpYg5SUcaW?=
- =?us-ascii?Q?ewlePoSe+Oci8xfqaEbjG3BOh2E6O+XTfVNbajtyK5sQDpircPFCoxLEcKKe?=
- =?us-ascii?Q?gZIgJaaJvKjoGY2Y/Bcp9re+yll9PnYtl0X34M+z4Z+hF65Wj2Xh9YHkC8qe?=
- =?us-ascii?Q?9V3SyyLZZNU06uE6blWyu8bgYlbGnp3smC1n3QhCxvC71DLxyQEuVckhCRTH?=
- =?us-ascii?Q?tWSqWec+G8PXqLcfXh5DvsidhPIYNtBpQDgr6DaWRy8u4QIY/cZFhOaxDk3J?=
- =?us-ascii?Q?b91mqtRrVP3ecRzsttbGtgLbl64+Gb7whArVZdUSzt8sqe3kqfJ1jorKMQ2v?=
- =?us-ascii?Q?F7ZP0hrJ49HDNFqwzZ06iRG1WsySbx2c?=
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DS7PR11MB5966.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(366016)(376014)(7416014);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?XghgdHZfvclrVQ0IcA9X7WtLQ7dVa+qxLhBwYvApwBFBrA5jefPHnmSjCQj4?=
- =?us-ascii?Q?beb5PSmLitRUOn2dJGQrlEskdbKbshrFcM5MW+4BAHMuOy8RxPmjn9H6RRM7?=
- =?us-ascii?Q?qdBehy3jnw/BxLz/PV2UT1he+p8CDw+ZCy/HWxKE7pMIXI2jvw8GwRMDlqSF?=
- =?us-ascii?Q?MT2ANuJRUry1hbHbTPUFOAe11ITbcXr8+VWy7MtwLInZAa0ZprLZ+oQcnvJa?=
- =?us-ascii?Q?TCp/pIpVze4d58r2O3U+BpqX+hgtvCT3rAayQnOQAwr67+Hxgtb8QBPCGw04?=
- =?us-ascii?Q?AKfVO2EQGyr16XLb9J7y0Fp5RnhXB1oglkwsvpCmB80FyGKODy+GFpo+X5h8?=
- =?us-ascii?Q?QzBSBP24PL0nolqOAzScKN82BYBFDSmjPW2YPSPdfSyhWnbkbN6liqyZH60h?=
- =?us-ascii?Q?4rqFBRpeCfrWd7rf+3C2mquKs74FiacbhDZCzGy0p72FJ7XX65BeXLO+yOTC?=
- =?us-ascii?Q?Ck1Hy8KBt2IlQ7WfKAgHQ9/aWSkfDKACUTy5Rt9t2sxGYZlLs1DcrKpB5dXl?=
- =?us-ascii?Q?gQXnux+8teXceTSGLmXnLKApB2xp8O6xHQqY84cvyRXSrqZRlw0xgo8hPAGN?=
- =?us-ascii?Q?VmOKnmiFD2s0dRIVFwu+2K2MjsP2O3gHEsKRuZAvQc256F257emiPU0zrBbw?=
- =?us-ascii?Q?sZhu24ozutNCw4WCkdsYu9xH8y1/cIwmIgP/N5rYYFp06ibxWuDLzr1Ab8Yh?=
- =?us-ascii?Q?wgxFNrxlsOMQK9eL5tDs/pj/ITjn3rufjyIkEAXgnv/kq1WUhtUV5oEVVU/i?=
- =?us-ascii?Q?vqs8Ix2rzFB8i2Pplg325TwYHsEZMyRqzWF4+jUsg3MAe4v29+0MPYUKZE8h?=
- =?us-ascii?Q?Ub3hyT3WbFWvRN/eVFzejIkta67v+pbSMwkS9cHMM+uV8Tv9G7NH1OQAjg5U?=
- =?us-ascii?Q?VsNuPsmRDMO+AUoch9Da6SkM6l15BSq9v/gjFFNf5j+ki8BzK3Ea4R/135SY?=
- =?us-ascii?Q?uC+zgqI0DzUwPghEXXB3nD2aZZzMimDORBxrCiOSNERlLdIqDXLOrE0EpThs?=
- =?us-ascii?Q?Z2GuZCXImZKLZ95OWhWtrqpn2otmGSy+Y0orqkpB49UKkDoeZIfC8oN7TFJU?=
- =?us-ascii?Q?+yjq7SboJaMIYHEWwtUUAI36VdhS7Wuy1FLRcmXH37t9ceuuA6MolrzXMhaz?=
- =?us-ascii?Q?4bx9YpiuCcLhcCTPlWPmEv6M7iu8gWF0MpZMcNMuLqSEX5ZHMTfMifxTcGJW?=
- =?us-ascii?Q?VIXdXfazzazscXTVjXTyIKNELwDxjHzIZBbmyPmxm107ayMETnhMbznhQ+Ni?=
- =?us-ascii?Q?50xGVf03OU9zJS2chXUTO5VPdw23eOruerhY5ttVuBI1QVKZ5zwVEBVEYQOw?=
- =?us-ascii?Q?c5LxJdi1rdxCm0gD+BIXHM/qRHBzW7i6gl4MPLGtFmEkkL9WqertvMozIY6N?=
- =?us-ascii?Q?CZIfw8Dlty+XNm5TP6QkOtwLrVtyfTaKpsUs7jF2qM8u89uE1ZfwAG/zt5CB?=
- =?us-ascii?Q?AbnZ7UVFQOBtI5a0xNDulrayg3+8lEfYcw9O9jDyRqO1+Qd3FhOZNnhS1W7W?=
- =?us-ascii?Q?X86mTUbf8XIXm0edUYmPzATAV59Bukpg7rvEKOMOEYClSnPPkugGONzCQ6hW?=
- =?us-ascii?Q?vu44Nt+T+3BJhxdMrAhvmzNsPtNDa7+wEqQMl+lp?=
-X-MS-Exchange-CrossTenant-Network-Message-Id: 355f3765-0bce-41c3-d3d6-08de09f2082f
-X-MS-Exchange-CrossTenant-AuthSource: DS7PR11MB5966.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 13 Oct 2025 00:47:05.9187
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: hPPHKYnlGfQnLcqEK6ZbdFq8G3oSsXcoHmc6iliy34qUaUSHLaV0vuSEU8udgxakRD/7S4hLrkFTMplulS5MHQ==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: MW3PR11MB4683
-X-OriginatorOrg: intel.com
+In-Reply-To: <39779e6d-2f09-4ee9-e5e0-97fc09efbbf5@loongson.cn>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 8bit
+Content-Language: en-US
+X-CM-TRANSID:qMiowJDxQ+Sjb+xoegPdAA--.32361S3
+X-CM-SenderInfo: 5jdr20tqj6z05rqj20fqof0/
+X-Coremail-Antispam: 1Uk129KBj93XoW3XrWruF15KFWDJF15CFyDurX_yoWfAF1fpr
+	1kAFWDWrWrKrn7tF1UJr1qvryUXr18tw17Xr1UtFWUJF1UJr1Yqr40gryqgF1UJw48JF18
+	Ar15JrnrZF4UJwcCm3ZEXasCq-sJn29KB7ZKAUJUUUU5529EdanIXcx71UUUUU7KY7ZEXa
+	sCq-sGcSsGvfJ3Ic02F40EFcxC0VAKzVAqx4xG6I80ebIjqfuFe4nvWSU5nxnvy29KBjDU
+	0xBIdaVrnRJUUUv2b4IE77IF4wAFF20E14v26r1j6r4UM7CY07I20VC2zVCF04k26cxKx2
+	IYs7xG6rWj6s0DM7CIcVAFz4kK6r1j6r18M28lY4IEw2IIxxk0rwA2F7IY1VAKz4vEj48v
+	e4kI8wA2z4x0Y4vE2Ix0cI8IcVAFwI0_Gr0_Xr1l84ACjcxK6xIIjxv20xvEc7CjxVAFwI
+	0_Gr0_Cr1l84ACjcxK6I8E87Iv67AKxVW8Jr0_Cr1UM28EF7xvwVC2z280aVCY1x0267AK
+	xVW8Jr0_Cr1UM2AIxVAIcxkEcVAq07x20xvEncxIr21l57IF6xkI12xvs2x26I8E6xACxx
+	1l5I8CrVACY4xI64kE6c02F40Ex7xfMcIj6xIIjxv20xvE14v26r1Y6r17McIj6I8E87Iv
+	67AKxVWUJVW8JwAm72CE4IkC6x0Yz7v_Jr0_Gr1lF7xvr2IY64vIr41lc7I2V7IY0VAS07
+	AlzVAYIcxG8wCF04k20xvY0x0EwIxGrwCFx2IqxVCFs4IE7xkEbVWUJVW8JwC20s026c02
+	F40E14v26r1j6r18MI8I3I0E7480Y4vE14v26r106r1rMI8E67AF67kF1VAFwI0_JF0_Jw
+	1lIxkGc2Ij64vIr41lIxAIcVC0I7IYx2IY67AKxVWUJVWUCwCI42IY6xIIjxv20xvEc7Cj
+	xVAFwI0_Jr0_Gr1lIxAIcVCF04k26cxKx2IYs7xG6r1j6r1xMIIF0xvEx4A2jsIE14v26r
+	1j6r4UMIIF0xvEx4A2jsIEc7CjxVAFwI0_Jr0_GrUvcSsGvfC2KfnxnUUI43ZEXa7IU1QV
+	y3UUUUU==
 
-On Wed, Oct 01, 2025 at 08:00:21AM +0000, Ackerley Tng wrote:
-> Yan Zhao <yan.y.zhao@intel.com> writes:
-> 
-> I was looking deeper into this patch since on my WIP tree I already had
-> the invalidate and zap steps separated out and had to do more to rebase
-> this patch :)
-> 
-> > In TDX, private page tables require precise zapping because faulting back
-> > the zapped mappings necessitates the guest's re-acceptance.
-> 
-> I feel that this statement could be better phrased because all zapped
-> mappings require re-acceptance, not just anything related to precise
-> zapping. Would this be better:
-> 
->     On private-to-shared conversions, page table entries must be zapped
->     from the Secure EPTs. Any pages mapped into Secure EPTs must be
->     accepted by the guest before they are used.
-> 
->     Hence, care must be taken to only precisely zap ranges requested for
->     private-to-shared conversion, since the guest is only prepared to
->     re-accept precisely the ranges it requested for conversion.
-> 
->     The guest may request to convert ranges not aligned with private
->     page table entry boundaries. To precisely zap these ranges, huge
->     leaves that span the boundaries of the requested ranges must be
->     split into smaller leaves, so that the split, smaller leaves now
->     align with the requested range for zapping.
-LGTM. Thanks!
+在 2025/10/11 上午9:29, Bibo Mao 写道:
+>
+>
+> On 2025/10/10 下午2:48, Song Gao wrote:
+>> Add cpu_has_msgint() to check whether the host cpu supported avec,
+>> and restore/save CSR_MSGIS0-CSR_MSGIS3.
+>>
+>> Signed-off-by: Song Gao <gaosong@loongson.cn>
+>> ---
+>> Based-on: 
+>> https://patchew.org/linux/20250930093741.2734974-1-maobibo@loongson.cn/
+>> v2: fix build error.
+> It is not necessary based on this patch, you can base it on master 
+> branch. The later merged patch need based on previous version in general.
+>
+Got it.
+>>
+>>   arch/loongarch/include/asm/kvm_host.h |  4 ++++
+>>   arch/loongarch/include/asm/kvm_vcpu.h |  1 +
+>>   arch/loongarch/include/uapi/asm/kvm.h |  1 +
+>>   arch/loongarch/kvm/interrupt.c        |  3 +++
+>>   arch/loongarch/kvm/vcpu.c             | 19 +++++++++++++++++--
+>>   arch/loongarch/kvm/vm.c               |  4 ++++
+>>   6 files changed, 30 insertions(+), 2 deletions(-)
+>>
+>> diff --git a/arch/loongarch/include/asm/kvm_host.h 
+>> b/arch/loongarch/include/asm/kvm_host.h
+>> index 392480c9b958..446f1104d59d 100644
+>> --- a/arch/loongarch/include/asm/kvm_host.h
+>> +++ b/arch/loongarch/include/asm/kvm_host.h
+>> @@ -285,6 +285,10 @@ static inline bool kvm_guest_has_lbt(struct 
+>> kvm_vcpu_arch *arch)
+>>       return arch->cpucfg[2] & (CPUCFG2_X86BT | CPUCFG2_ARMBT | 
+>> CPUCFG2_MIPSBT);
+>>   }
+>>   +static inline bool cpu_has_msgint(void)
+>> +{
+>> +    return read_cpucfg(LOONGARCH_CPUCFG1) & CPUCFG1_MSGINT;
+>> +}
+>>   static inline bool kvm_guest_has_pmu(struct kvm_vcpu_arch *arch)
+>>   {
+>>       return arch->cpucfg[6] & CPUCFG6_PMP;
+>> diff --git a/arch/loongarch/include/asm/kvm_vcpu.h 
+>> b/arch/loongarch/include/asm/kvm_vcpu.h
+>> index f1efd7cfbc20..3784ab4ccdb5 100644
+>> --- a/arch/loongarch/include/asm/kvm_vcpu.h
+>> +++ b/arch/loongarch/include/asm/kvm_vcpu.h
+>> @@ -15,6 +15,7 @@
+>>   #define CPU_PMU                (_ULCAST_(1) << 10)
+>>   #define CPU_TIMER            (_ULCAST_(1) << 11)
+>>   #define CPU_IPI                (_ULCAST_(1) << 12)
+>> +#define CPU_AVEC                        (_ULCAST_(1) << 14)
+>>     /* Controlled by 0x52 guest exception VIP aligned to estat bit 
+>> 5~12 */
+>>   #define CPU_IP0                (_ULCAST_(1))
+>> diff --git a/arch/loongarch/include/uapi/asm/kvm.h 
+>> b/arch/loongarch/include/uapi/asm/kvm.h
+>> index 57ba1a563bb1..de6c3f18e40a 100644
+>> --- a/arch/loongarch/include/uapi/asm/kvm.h
+>> +++ b/arch/loongarch/include/uapi/asm/kvm.h
+>> @@ -104,6 +104,7 @@ struct kvm_fpu {
+>>   #define  KVM_LOONGARCH_VM_FEAT_PV_IPI        6
+>>   #define  KVM_LOONGARCH_VM_FEAT_PV_STEALTIME    7
+>>   #define  KVM_LOONGARCH_VM_FEAT_PTW        8
+>> +#define  KVM_LOONGARCH_VM_FEAT_MSGINT        9
+>>     /* Device Control API on vcpu fd */
+>>   #define KVM_LOONGARCH_VCPU_CPUCFG    0
+>> diff --git a/arch/loongarch/kvm/interrupt.c 
+>> b/arch/loongarch/kvm/interrupt.c
+>> index 8462083f0301..adc278fb3cb9 100644
+>> --- a/arch/loongarch/kvm/interrupt.c
+>> +++ b/arch/loongarch/kvm/interrupt.c
+>> @@ -21,6 +21,7 @@ static unsigned int 
+>> priority_to_irq[EXCCODE_INT_NUM] = {
+>>       [INT_HWI5]    = CPU_IP5,
+>>       [INT_HWI6]    = CPU_IP6,
+>>       [INT_HWI7]    = CPU_IP7,
+>> +    [INT_AVEC]    = CPU_AVEC,
+>>   };
+>>     static int kvm_irq_deliver(struct kvm_vcpu *vcpu, unsigned int 
+>> priority)
+>> @@ -36,6 +37,7 @@ static int kvm_irq_deliver(struct kvm_vcpu *vcpu, 
+>> unsigned int priority)
+>>       case INT_IPI:
+>>       case INT_SWI0:
+>>       case INT_SWI1:
+>> +    case INT_AVEC:
+>>           set_gcsr_estat(irq);
+> Do we need cpu_has_msgint() here ? It is impossible that VMM inject 
+> INT_AVEC interrrupt on non-msgint machine such as 3C5000.
+>
+yes we need , how about this?
 
-> > Therefore,
-> > before performing a zap for hole punching and private-to-shared
-> > conversions, huge leafs that cross the boundary of the zapping GFN range in
-> > the mirror page table must be split.
-> >
-> > Splitting may result in an error. If this happens, hole punching and
-> > private-to-shared conversion should bail out early and return an error to
-> > userspace.
-> >
-> > Splitting is not necessary for kvm_gmem_release() since the entire page
-> > table is being zapped, nor for kvm_gmem_error_folio() as an SPTE must not
-> > map more than one physical folio.
-> >
-> 
-> I think splitting is not necessary as long as aligned page table entries
-> are zapped. Splitting is also not necessary if the entire page table is
-> zapped but that's a superset of zapping aligned page table
-> entries. (Probably just a typo on your side.) Here's my attempt at
-what is the typo you are referring to?
+@@ -31,6 +32,11 @@ static int kvm_irq_deliver(struct kvm_vcpu *vcpu, 
+unsigned int priority)
+         if (priority < EXCCODE_INT_NUM)
+                 irq = priority_to_irq[priority];
 
-> rephrasing this:
-> 
->     Splitting is not necessary for the cases where only aligned page
->     table entries are zapped, such as during kvm_gmem_release() where
-By "page table entries", you mean SPTEs, i.e., entries in the secondary MMU,
-right?
++        if (cpu_has_msgint() && (priority == INT_AVEC)) {
++                set_gcsr_estat(irq);
++                return 1;
++        }
++
+         switch (priority) {
+         case INT_TI:
+         case INT_IPI:
 
->     the entire guest_memfd worth of memory is zapped, nor for
->     truncation, where truncation of pages within a huge folio is not
->     allowed.
-I think that "splitting is not required for truncation" is valid only based on
-KVM's implementation where "an SPTE must not map more than one physical folio".
-i.e., the SPTE entry size is <= folio size.
+Thanks.
+Song Gao
 
-If KVM were implemented differently where one SPTE could cover multiple folios
-(similar to IOMMU SLTP entries for shared memory, though this is unlikely to
-happen), splitting would still be required before truncation.
+
+>>           break;
+>>   @@ -63,6 +65,7 @@ static int kvm_irq_clear(struct kvm_vcpu *vcpu, 
+>> unsigned int priority)
+>>       case INT_IPI:
+>>       case INT_SWI0:
+>>       case INT_SWI1:
+>> +    case INT_AVEC:
+>>           clear_gcsr_estat(irq);
+> Ditto.
+>
+> The others look good to me.
+>
+> Regards
+> Bibo Mao
+>>           break;
+>>   diff --git a/arch/loongarch/kvm/vcpu.c b/arch/loongarch/kvm/vcpu.c
+>> index 30e3b089a596..226c735155be 100644
+>> --- a/arch/loongarch/kvm/vcpu.c
+>> +++ b/arch/loongarch/kvm/vcpu.c
+>> @@ -657,8 +657,7 @@ static int _kvm_get_cpucfg_mask(int id, u64 *v)
+>>           *v = GENMASK(31, 0);
+>>           return 0;
+>>       case LOONGARCH_CPUCFG1:
+>> -        /* CPUCFG1_MSGINT is not supported by KVM */
+>> -        *v = GENMASK(25, 0);
+>> +        *v = GENMASK(26, 0);
+>>           return 0;
+>>       case LOONGARCH_CPUCFG2:
+>>           /* CPUCFG2 features unconditionally supported by KVM */
+>> @@ -726,6 +725,10 @@ static int kvm_check_cpucfg(int id, u64 val)
+>>           return -EINVAL;
+>>         switch (id) {
+>> +    case LOONGARCH_CPUCFG1:
+>> +        if ((val & CPUCFG1_MSGINT) && (!cpu_has_msgint()))
+>> +            return -EINVAL;
+>> +        return 0;
+>>       case LOONGARCH_CPUCFG2:
+>>           if (!(val & CPUCFG2_LLFTP))
+>>               /* Guests must have a constant timer */
+>> @@ -1658,6 +1661,12 @@ static int _kvm_vcpu_load(struct kvm_vcpu 
+>> *vcpu, int cpu)
+>>       kvm_restore_hw_gcsr(csr, LOONGARCH_CSR_DMWIN2);
+>>       kvm_restore_hw_gcsr(csr, LOONGARCH_CSR_DMWIN3);
+>>       kvm_restore_hw_gcsr(csr, LOONGARCH_CSR_LLBCTL);
+>> +    if (cpu_has_msgint()) {
+>> +        kvm_restore_hw_gcsr(csr, LOONGARCH_CSR_ISR0);
+>> +        kvm_restore_hw_gcsr(csr, LOONGARCH_CSR_ISR1);
+>> +        kvm_restore_hw_gcsr(csr, LOONGARCH_CSR_ISR2);
+>> +        kvm_restore_hw_gcsr(csr, LOONGARCH_CSR_ISR3);
+>> +    }
+>>         /* Restore Root.GINTC from unused Guest.GINTC register */
+>>       write_csr_gintc(csr->csrs[LOONGARCH_CSR_GINTC]);
+>> @@ -1747,6 +1756,12 @@ static int _kvm_vcpu_put(struct kvm_vcpu 
+>> *vcpu, int cpu)
+>>       kvm_save_hw_gcsr(csr, LOONGARCH_CSR_DMWIN1);
+>>       kvm_save_hw_gcsr(csr, LOONGARCH_CSR_DMWIN2);
+>>       kvm_save_hw_gcsr(csr, LOONGARCH_CSR_DMWIN3);
+>> +    if (cpu_has_msgint()) {
+>> +        kvm_save_hw_gcsr(csr, LOONGARCH_CSR_ISR0);
+>> +        kvm_save_hw_gcsr(csr, LOONGARCH_CSR_ISR1);
+>> +        kvm_save_hw_gcsr(csr, LOONGARCH_CSR_ISR2);
+>> +        kvm_save_hw_gcsr(csr, LOONGARCH_CSR_ISR3);
+>> +    }
+>>         vcpu->arch.aux_inuse |= KVM_LARCH_SWCSR_LATEST;
+>>   diff --git a/arch/loongarch/kvm/vm.c b/arch/loongarch/kvm/vm.c
+>> index d8c813e2d72e..438885b6f2b1 100644
+>> --- a/arch/loongarch/kvm/vm.c
+>> +++ b/arch/loongarch/kvm/vm.c
+>> @@ -37,6 +37,9 @@ static void kvm_vm_init_features(struct kvm *kvm)
+>>           kvm->arch.support_features |= 
+>> BIT(KVM_LOONGARCH_VM_FEAT_PV_STEALTIME);
+>>       }
+>>   +    if (cpu_has_msgint())
+>> +        kvm->arch.support_features |= 
+>> BIT(KVM_LOONGARCH_VM_FEAT_MSGINT);
+>> +
+>>       val = read_csr_gcfg();
+>>       if (val & CSR_GCFG_GPMP)
+>>           kvm->arch.support_features |= BIT(KVM_LOONGARCH_VM_FEAT_PMU);
+>> @@ -153,6 +156,7 @@ static int kvm_vm_feature_has_attr(struct kvm 
+>> *kvm, struct kvm_device_attr *attr
+>>       case KVM_LOONGARCH_VM_FEAT_PMU:
+>>       case KVM_LOONGARCH_VM_FEAT_PV_IPI:
+>>       case KVM_LOONGARCH_VM_FEAT_PV_STEALTIME:
+>> +        case KVM_LOONGARCH_VM_FEAT_MSGINT:
+>>           if (kvm_vm_support(&kvm->arch, attr->attr))
+>>               return 0;
+>>           return -ENXIO;
+>>
+>
+
 
