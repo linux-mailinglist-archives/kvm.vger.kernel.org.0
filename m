@@ -1,137 +1,147 @@
-Return-Path: <kvm+bounces-59902-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-59903-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 72BC1BD355A
-	for <lists+kvm@lfdr.de>; Mon, 13 Oct 2025 16:04:54 +0200 (CEST)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
+	by mail.lfdr.de (Postfix) with ESMTPS id F3EE6BD382E
+	for <lists+kvm@lfdr.de>; Mon, 13 Oct 2025 16:29:09 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id B785E189E705
-	for <lists+kvm@lfdr.de>; Mon, 13 Oct 2025 14:05:17 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 005B34F4422
+	for <lists+kvm@lfdr.de>; Mon, 13 Oct 2025 14:24:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8D4E521A447;
-	Mon, 13 Oct 2025 14:04:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 809A426FDA5;
+	Mon, 13 Oct 2025 14:23:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="LFqu546V"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="Gpr8M+m5"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pl1-f201.google.com (mail-pl1-f201.google.com [209.85.214.201])
+Received: from mail-pj1-f74.google.com (mail-pj1-f74.google.com [209.85.216.74])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 24F5224E4D4
-	for <kvm@vger.kernel.org>; Mon, 13 Oct 2025 14:04:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A0461224B05
+	for <kvm@vger.kernel.org>; Mon, 13 Oct 2025 14:23:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.74
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1760364280; cv=none; b=jXCMpKJ4VSwiJ5TmpiiQ43Njd7+3ifDp7fRA50zktREM2vIfpMZUCriZt23MdIUbf263RwEfTwT2SdChyfbP8btljTOZnIaR1mftYdDhWAioUskHlEG6jbBOQIQuC5KSItbsDM1um9zIKiFj3dSrM4cw1hhsStUIAXah6uTXsyU=
+	t=1760365415; cv=none; b=G1j2Klbu7GN4ichkpdsVwagx88JP7BCWfLewVZcywfNqEmLkW00TLe8ue37K9eD6c8GApdRzbzQloxXz0AaB0R8H9V+Y3/lbS/QwjxTm31uscautVP56HKtsPLRqGQoPcweTcc5wrvtBz7s/QtWlgFQfMs+BZ13sUY66lruUkH4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1760364280; c=relaxed/simple;
-	bh=k7Wnh0MDFRkiNum8Z2X+Q1EMJvXMBuyi/5gO1W0mwIk=;
+	s=arc-20240116; t=1760365415; c=relaxed/simple;
+	bh=dJqtEcjgvo9hPngB+YtUypzu7HzbSy5gU34M7TIkozU=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=WsPJ+AVc8BmYxYrBfBLmYuS8EBktEex0kPwqHC8snOqMfbqyq5iISSzSpOkDlluKUzKEaLwb3ppGy/+bW01J79fre3YsgElgdgePiEM58weZn+A1HXgxcweUS5Cw9HA7KYFU7KA/QMIPritNefvNXRp8iWQ/Zo3xj0+IMRicon0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=LFqu546V; arc=none smtp.client-ip=209.85.214.201
+	 To:Cc:Content-Type; b=Lgij/qDUBrdQWVAvkH5B+C4LFNgmZ7fsw6It/bEy3+T9ifeqsKOnaPBweXEeQL6LPJ60nh+yjNA2TEMYqAzKh1JoF8yWg1oI7qZQfhnzVvX5+D9nz7j0UFS3RDNTZGdBA0SE64DiqwyU80EZMQm4BDqVd/BFcWlfGVPuQf/BKJ8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=Gpr8M+m5; arc=none smtp.client-ip=209.85.216.74
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pl1-f201.google.com with SMTP id d9443c01a7336-27ee214108cso172898005ad.0
-        for <kvm@vger.kernel.org>; Mon, 13 Oct 2025 07:04:39 -0700 (PDT)
+Received: by mail-pj1-f74.google.com with SMTP id 98e67ed59e1d1-33274f8ff7cso11306670a91.0
+        for <kvm@vger.kernel.org>; Mon, 13 Oct 2025 07:23:32 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1760364278; x=1760969078; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1760365412; x=1760970212; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=TXpOOr+C08LiSxfY7wTnlbBjPJg18+PGY+BCgjJ/7/c=;
-        b=LFqu546VpmjJ4ZdzWiqTX9v4XD4B4/0KpHQJkByCwUhnC7zrBMRNeqtzPQ89sUmbCV
-         7wBZCbhwsrBNcLOwjJ113uZP6C1U9E95nMGtu2k0/6Lx8W8sKw4tdqI2KiM2SLqWmESu
-         pDJ8bx9gAIxKXV8AyOIxsNwV1rXCoAv2O0jbJ+TkeZC89lhmU48oXhv8lbmyHY4yiyzt
-         /tnhYAZINDS1ujZo0bOtTr1K56Pq40ZksM/lqCj4lq9OjViaTMZhP7AJrxplfiUB78qM
-         R3ozjd9RAuej3BIkJiJ/6naIwYs8gOz9OEk6cSkEw78SUZrGAD70z2pOo293A6j1jATm
-         8NNQ==
+        bh=/IA0q+BCGyp+0QkRiU+mRotiQ2wwtZhT82w0C29Tzhk=;
+        b=Gpr8M+m5f2mYYqsCbqqH5hQ+j6qGgXMAvEFcxUXdrN/iUJo3ZpEJAJpFOLFT+M15QK
+         TvqWRhBg+9XuZkMA/59Z8L4HgifnnRICyR9cV8qXqU1GKTZNamG2Ou+um/uPHeCMHOno
+         ApQ5iUoNUelNq4Mx0T+6UMBZvib2rM3+SSrgVE9t+yywEU1coQlP+96x00DqmSBg2Vyw
+         88fJxIuSiJBG2ihmyA4Fnq53rSpJQgLFuuxOVo8Se/jl70uXqPIFrCHG7yJDr+VEUFHe
+         S0ozKwslrhxnTCdaQTyhehW9FwjhAygtGb9GBn4XBf5tiUZ6cA+FPNXfwrHtNKoqsUlC
+         wAJg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1760364278; x=1760969078;
+        d=1e100.net; s=20230601; t=1760365412; x=1760970212;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=TXpOOr+C08LiSxfY7wTnlbBjPJg18+PGY+BCgjJ/7/c=;
-        b=KdenbckosbVE010SPJRRGkF3b8djQDr6URGIgQVjQxL52pwj6JiMnCuUtnTWauN78S
-         FuHFPkPO3iogSbSyVC4eGx6t+mYMHmBQSIvuGL3btk6j6xjZrKgRi0ckv3MWUpqqxJVU
-         yU+OBd3lxUP+5DcQXpu4peyaCwk0QTCJc/tAqyZYCF7AWLqELFGEDSYjM4sc9NujOATl
-         bne2WR/DiQnJkn2QLtCq9UGqPS9B4Jgp29OQpVCxKXk1soIvm4rOElaxA1c6/OkpgdiT
-         CHFxRKH8nSQr58rJ0s/RwGCSIRy26zpo+Z37ADX3101LzG4XVkiWJpetUn7ORQGfbNCl
-         TYvw==
-X-Forwarded-Encrypted: i=1; AJvYcCUvZR5Si91kegcMLB5viw5fQBLHmmou/5fQSiIoz4AUMg1lRO+8TbtOSEH9A58ctNilUv4=@vger.kernel.org
-X-Gm-Message-State: AOJu0Ywlz+XmfDQLJr319qOR1jt3hsn19WBYI94zJEr2g1C+ieV9IAi+
-	q8jZjBKcJsY/gOozmIXBUS5SvqI1az7B7xmeEJks7xtpVb6Mh1pOuKwqnh94sOuitVel0+KlrZn
-	1DU2OvA==
-X-Google-Smtp-Source: AGHT+IHwYmKV6bklpg5vtbSKVTRl7C6XEgSh9a6Y5HHFfYZD2Yg6qM+/GQ0Os6vJiLGLtryEtk6AaBRhVnQ=
-X-Received: from pjbst8.prod.google.com ([2002:a17:90b:1fc8:b0:330:523b:2b23])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:903:910:b0:258:9d26:1860
- with SMTP id d9443c01a7336-290273ffeb7mr293116575ad.40.1760364278498; Mon, 13
- Oct 2025 07:04:38 -0700 (PDT)
-Date: Mon, 13 Oct 2025 07:04:37 -0700
-In-Reply-To: <20251012071607.17646-1-shivankg@amd.com>
+        bh=/IA0q+BCGyp+0QkRiU+mRotiQ2wwtZhT82w0C29Tzhk=;
+        b=erP2gWQlnikjb1V8S+aPYELMRXmw6JlvFOkZ1flko80xZjO4QKV+OrXerB5VnJtBjF
+         7UJYeuxpka+rUNAlmMKg90n5/SfyHUAlwj3+D19DPKSbET+K8Qxj6jFgRXM6TsTf+cx8
+         /85E+bbAkHd+FbZ4w+ojYvw9ajL2vgHBx3TjLpbxBiuwrRfqs5mpmV1rtvqKD8IQILGi
+         Tzz9avlS+jUq6qWutUUahDhAIalNUtFd1Mgt0OPR7LNXxI3zV/dcD41FWxTKIgynNryj
+         g0waTm91BKwghzHJhttBSaLl4d+V2j4ey1KMSIvFRJzury9REQola+CR4igliVT5bZUR
+         xfug==
+X-Forwarded-Encrypted: i=1; AJvYcCVOjA5A+chpxx8o4V0QOC95BdIxaiZYGudbhOI4kkQPeRkhIFthsxF56WQagtyuhXakCpo=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yyshh86nk/QcNVvJgOB1S2X3xWQYGORsZxMnvLvFl0O6RlaBkO1
+	uMxcCF/FKl3fWHaLWz7sjcw+LDlXLH/y0QDgxxMqh5yJjNw474R6elyy6MnQdLbiZZKpAARKb72
+	P3F+WyQ==
+X-Google-Smtp-Source: AGHT+IEtt/r42k36nNjq1mgNkzGtA8MgFLr+mcoAjoS9JXR/HT4Da0zxS7NKvGB/ApBa7EI/8Iui2bia50k=
+X-Received: from pjrx21.prod.google.com ([2002:a17:90a:bc95:b0:33b:51fe:1a81])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:1d89:b0:32e:c649:e583
+ with SMTP id 98e67ed59e1d1-33b513b3e14mr24273677a91.22.1760365411945; Mon, 13
+ Oct 2025 07:23:31 -0700 (PDT)
+Date: Mon, 13 Oct 2025 07:23:30 -0700
+In-Reply-To: <aOz1X4ywkG3nG2Up@intel.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
-References: <20251012071607.17646-1-shivankg@amd.com>
-Message-ID: <aO0G9Ycu_SlISBih@google.com>
-Subject: Re: [PATCH V3 kvm-x86/gmem 1/2] KVM: guest_memfd: move
- kvm_gmem_get_index() and use in kvm_gmem_prepare_folio()
+References: <20251010220403.987927-1-seanjc@google.com> <20251010220403.987927-4-seanjc@google.com>
+ <aOz1X4ywkG3nG2Up@intel.com>
+Message-ID: <aO0LYuzdRHsB7aPj@google.com>
+Subject: Re: [RFC PATCH 3/4] KVM: x86/tdx: Do VMXON and TDX-Module
+ initialization during tdx_init()
 From: Sean Christopherson <seanjc@google.com>
-To: Shivank Garg <shivankg@amd.com>
-Cc: pbonzini@redhat.com, david@redhat.com, kvm@vger.kernel.org, 
-	linux-coco@lists.linux.dev, linux-kernel@vger.kernel.org
+To: Chao Gao <chao.gao@intel.com>
+Cc: Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>, 
+	Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org, 
+	"Kirill A. Shutemov" <kas@kernel.org>, Paolo Bonzini <pbonzini@redhat.com>, linux-kernel@vger.kernel.org, 
+	linux-coco@lists.linux.dev, kvm@vger.kernel.org, 
+	Dan Williams <dan.j.williams@intel.com>, Xin Li <xin@zytor.com>, 
+	Kai Huang <kai.huang@intel.com>, Adrian Hunter <adrian.hunter@intel.com>
 Content-Type: text/plain; charset="us-ascii"
 
-FWIW, there's no need to put the base (target?) branch in the subject.  The
-branch name is often incomplete information; by the time someone goes to apply
-the patch, the branch may have changed significantly, or maybe have even been
-deleted, e.g. I use ephemeral topic branch for kvm-x86 that get deleted once
-their content is merge to kvm/next.
+On Mon, Oct 13, 2025, Chao Gao wrote:
+> >-static int __tdx_enable(void)
+> >+static __init int tdx_enable(void)
+> > {
+> >+	enum cpuhp_state state;
+> > 	int ret;
+> > 
+> >+	if (!cpu_feature_enabled(X86_FEATURE_XSAVE)) {
+> >+		pr_err("XSAVE is required for TDX\n");
+> >+		return -EINVAL;
+> >+	}
+> >+
+> >+	if (!cpu_feature_enabled(X86_FEATURE_MOVDIR64B)) {
+> >+		pr_err("MOVDIR64B is required for TDX\n");
+> >+		return -EINVAL;
+> >+	}
+> >+
+> >+	if (!cpu_feature_enabled(X86_FEATURE_SELFSNOOP)) {
+> >+		pr_err("Self-snoop is required for TDX\n");
+> >+		return -ENODEV;
+> >+	}
+> >+
+> >+	state = cpuhp_setup_state(CPUHP_AP_ONLINE_DYN, "virt/tdx:online",
+> >+				  tdx_online_cpu, tdx_offline_cpu);
+> >+	if (state < 0)
+> >+		return state;
+> >+
+> > 	ret = init_tdx_module();
+> 
+> ...
+> 
+> >@@ -1445,11 +1462,6 @@ void __init tdx_init(void)
+> > 		return;
+> > 	}
+> > 
+> >-#if defined(CONFIG_ACPI) && defined(CONFIG_SUSPEND)
+> >-	pr_info("Disable ACPI S3. Turn off TDX in the BIOS to use ACPI S3.\n");
+> >-	acpi_suspend_lowlevel = NULL;
+> >-#endif
+> >-
+> > 	/*
+> > 	 * Just use the first TDX KeyID as the 'global KeyID' and
+> > 	 * leave the rest for TDX guests.
+> >@@ -1458,22 +1470,30 @@ void __init tdx_init(void)
+> > 	tdx_guest_keyid_start = tdx_keyid_start + 1;
+> > 	tdx_nr_guest_keyids = nr_tdx_keyids - 1;
+> > 
+> >+	err = tdx_enable();
+> >+	if (err)
+> >+		goto err_enable;
+> 
+> IIRC, existing TDX modules require all CPUs to have completed per-CPU
+> initialization before TDMR/PAMT initialization.
+> 
+> But at this point, APs are not online, so tdx_enable() will fail here.
 
-From Documentation/process/maintainer-kvm-x86.rst, my strong preference is that
-contributors always use kvm-x86/next as the base branch,
-
-  Base Tree/Branch
-  ~~~~~~~~~~~~~~~~
-  Fixes that target the current release, a.k.a. mainline, should be based on
-  ``git://git.kernel.org/pub/scm/virt/kvm/kvm.git master``.  Note, fixes do not
-  automatically warrant inclusion in the current release.  There is no singular
-  rule, but typically only fixes for bugs that are urgent, critical, and/or were
-  introduced in the current release should target the current release.
-  
-  Everything else should be based on ``kvm-x86/next``, i.e. there is no need to
-  select a specific topic branch as the base.  If there are conflicts and/or
-  dependencies across topic branches, it is the maintainer's job to sort them
-  out.
-  
-  The only exception to using ``kvm-x86/next`` as the base is if a patch/series
-  is a multi-arch series, i.e. has non-trivial modifications to common KVM code
-  and/or has more than superficial changes to other architectures' code.  Multi-
-  arch patch/series should instead be based on a common, stable point in KVM's
-  history, e.g. the release candidate upon which ``kvm-x86 next`` is based.  If
-  you're unsure whether a patch/series is truly multi-arch, err on the side of
-  caution and treat it as multi-arch, i.e. use a common base.
-
-and then use the --base option with git format-patch to capture the exact hash.
-
-  Git Base
-  ~~~~~~~~
-  If you are using git version 2.9.0 or later (Googlers, this is all of you!),
-  use ``git format-patch`` with the ``--base`` flag to automatically include the
-  base tree information in the generated patches.
-  
-  Note, ``--base=auto`` works as expected if and only if a branch's upstream is
-  set to the base topic branch, e.g. it will do the wrong thing if your upstream
-  is set to your personal repository for backup purposes.  An alternative "auto"
-  solution is to derive the names of your development branches based on their
-  KVM x86 topic, and feed that into ``--base``.  E.g. ``x86/pmu/my_branch_name``,
-  and then write a small wrapper to extract ``pmu`` from the current branch name
-  to yield ``--base=x/pmu``, where ``x`` is whatever name your repository uses to
-  track the KVM x86 remote.
-
-My pushes to kvm-x86/next are always --force pushes (it's rebuilt like linux-next,
-though far less frequently), but when pushing, I also push a persistent tag so
-that the exact object for each incarnation of kvm-x86/next is reachable.  Combined
-with --base, that makes it easy to apply a patch/series even months/years after
-the fact (assuming I didn't screw up or forget the tag).
+Ah.  Maybe invoke tdx_enable() through a subsys_initcall() then?
 
