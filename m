@@ -1,139 +1,186 @@
-Return-Path: <kvm+bounces-59949-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-59950-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0172DBD69DF
-	for <lists+kvm@lfdr.de>; Tue, 14 Oct 2025 00:33:17 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 609C2BD6ADE
+	for <lists+kvm@lfdr.de>; Tue, 14 Oct 2025 00:58:42 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id AC84C4E8A29
-	for <lists+kvm@lfdr.de>; Mon, 13 Oct 2025 22:33:14 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id DFFA3404BF6
+	for <lists+kvm@lfdr.de>; Mon, 13 Oct 2025 22:58:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1E3BD307ACC;
-	Mon, 13 Oct 2025 22:33:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BB5892FC897;
+	Mon, 13 Oct 2025 22:58:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="ejNKjrSV"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="yUq3hIxc"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pj1-f73.google.com (mail-pj1-f73.google.com [209.85.216.73])
+Received: from mail-pl1-f202.google.com (mail-pl1-f202.google.com [209.85.214.202])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B99CD2571A5
-	for <kvm@vger.kernel.org>; Mon, 13 Oct 2025 22:33:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.73
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5ED9D2D97B5
+	for <kvm@vger.kernel.org>; Mon, 13 Oct 2025 22:58:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1760394789; cv=none; b=AOrLgMrE2xCsg/nbKXGRkibU+uU4TZvnpuMHNcTlQwnwJ/Az2td7ujBDyx8cNT6iS/nn41i8L3Q9mpkc+9v8ae/FR3B+ndW6yiTwpzFKTS33bT+hSFcjQT6nwBk8cPD+TEAo20hFaobLQ0l5Pd77VCMjICpRGkcQDREiLeZkb8U=
+	t=1760396313; cv=none; b=sJk6KT/lahI7XANx3mZaLePdyfD1po1bpQn4KR9mUi9Mg/Ta3F7Z/zkZioz9LjtR13n/FomiAB/kqKYo/S8TBUuzFz3tXp1/oslWHOnowuAqiALhD4mrNo22ascEDdHDir1M7rVhQ5wpuxgQB+hYtNfSCNwp5PFhEdxMLLj+ICk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1760394789; c=relaxed/simple;
-	bh=bJtLI1+hjiC84boHbypV9eiVeTHI29mL6L59dBQX8BE=;
+	s=arc-20240116; t=1760396313; c=relaxed/simple;
+	bh=OBVPRVnolJIYZ4plwt7wa568FRg7nOQAvuHQFosWrn4=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=hbbIAAehnk/kK0dBdghY2/sGpQvvtGcHgqUWwDV/Gzk/0yFY7xgQfBnEXiKu78V+s9SQBPWIdBTyZsiw31nKBfwozVPZJDZ/b/jox0yxjtkIVESLPmslwEC25Nk/Wx0BXFyBthbsTAaEdgwyi0gmcZEgBi6HjUzlIttPkSmzsQI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=ejNKjrSV; arc=none smtp.client-ip=209.85.216.73
+	 To:Cc:Content-Type; b=r4TUbx0FITkH6/MB/WsIdj2qcf1qqEdtNtC62gS2wDaPOy8f5fNK2fTNGcOOBlLfHFREjiTV2VkXl9zh9gsjSsDe5FYMQnQPpfSfbST4XT0NZg+vJZTSEsaZMBi4VaUN3y5oMPHyGDJBzxf4at9AOJ0h4DqQdhuz5W3lAFmy4cU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=yUq3hIxc; arc=none smtp.client-ip=209.85.214.202
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pj1-f73.google.com with SMTP id 98e67ed59e1d1-32eb18b5500so13697123a91.2
-        for <kvm@vger.kernel.org>; Mon, 13 Oct 2025 15:33:07 -0700 (PDT)
+Received: by mail-pl1-f202.google.com with SMTP id d9443c01a7336-2698b5fbe5bso111117525ad.0
+        for <kvm@vger.kernel.org>; Mon, 13 Oct 2025 15:58:32 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1760394787; x=1760999587; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1760396312; x=1761001112; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=obMltJbGsvsA0XVpJVFpUOtm7Jw/33w9bj9gGaK+2ho=;
-        b=ejNKjrSVmxUNU0o7x1XNLvB/1elR8Kx4bcAWnM3QSih+foI4FSRlfCggcBkW5ueQ6g
-         HH7xFPx9U3RDz+EVaNyO12KTiAOc5jmIdJ4rFBPBxfpvUxEpwzV1pF0Seahq/nYK70hV
-         29k/s+hdmZFvsjIYlZvAZVyKUmqUw1MSIyBNDcsaUT58gHMOeDrOSqi1cf/YoZaN5c45
-         mKDfAbWfKMdhaDU0iPIATgz2A0z2JxN/RXaaCsy3torGJ8cWMYUrnZFed0U8ZLuoaAA1
-         pQpO2sAYGRe26pko68xRqYzyHndYwjoQ2yi4+fbpVtOoe2yN8BfvFusrTnezFxLEdVyu
-         ObLw==
+        bh=Jgg62F8lpJy3ysdGrDIadd5P5qmpoZpUB7Kr6b42Svo=;
+        b=yUq3hIxcW0rZIS2qbIfdjGT+PEHHGTqAML104zNunFWgDW6C/6QLq0cijycuLDYaKs
+         OKjkmNk3WpMCTuXKEm75/vd/FTjjnJ2a47OQnVNfQY/qTsMCLSmHQk/8L8Aj/iba4o9F
+         g2CJZHHSIvCOHRWEcDXjw1wUT078zu/BuhqfQnC9MJj4mdD3726LXE0p6FyOW+eDTNP3
+         ETCOHkUhCPkD99H2ej0vmrBi/twT0BlCevYJVd6b/8hHRhUFtP7DdaRu2GvnD9vd77KD
+         1cy+U3AfKNB75aSBDrDf2AzoXJbwnwXtkDQ9CihQ+76ZnwCAd0MIndDc+YU+SwgliGdb
+         j+fw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1760394787; x=1760999587;
+        d=1e100.net; s=20230601; t=1760396312; x=1761001112;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=obMltJbGsvsA0XVpJVFpUOtm7Jw/33w9bj9gGaK+2ho=;
-        b=wDTQtefCo5+xZjcTo96V3SqlWL0C0uNYwnoqsZ5YWovEhnVqZR1EdXx1nLzWz1MAhB
-         DlbSTcfwRG+han+2wDK0Yq1D6omrwmU9xhRNR+sKIOd3diByjcpRyeyA/uFHz2hG0L3A
-         JwPTnHQ/9SAdCe8ABW6QZbUST07JrCC0KmwPXRfyupP5nCHw+d18OYolMkdzM6weeBLA
-         OfGrG/S3dWichPjjWaBiB5rLR/lIkLarexKzMBGOSohEo1ZSAsciXIJbBZ7sUkfQ+b83
-         5erkJ5sA6LbZxt7HfGebnD30PU7mpoqv900MsN8J/ZyyF7mUs8xnBjlLBmP8sG7ucu5T
-         C8XA==
-X-Forwarded-Encrypted: i=1; AJvYcCXNXS+bPoSLk8dMQsZfe2NMiokNiKzZqN+nAFnHfocPd8gzr5g3rIoptHMRasc+RQiBO/U=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yy2y4SdiTKxleZQuqbYdM23OHCBCcahUU9LtxqYVHSe5pVooLAM
-	oQYE8ODBfqMrkAFHiZl2uxQ1HOQdJhmaxQ3wpUK6xTjS3ob+R4la7HC0f03jU1ULEq/f5YN2G8l
-	hMRIeSA==
-X-Google-Smtp-Source: AGHT+IGVD63rWhPqkonSveiMzXd5D3Xmn+2MSDEFajiRWdOaaOnWuMsg3SsQQJntOkdhH/DlpnMNAOIcRHM=
-X-Received: from pjok3.prod.google.com ([2002:a17:90a:9103:b0:339:b369:ec29])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:350f:b0:338:3d3c:3e03
- with SMTP id 98e67ed59e1d1-33b513a1fd3mr35278787a91.35.1760394787133; Mon, 13
- Oct 2025 15:33:07 -0700 (PDT)
-Date: Mon, 13 Oct 2025 15:33:05 -0700
-In-Reply-To: <20251009223153.3344555-3-jmattson@google.com>
+        bh=Jgg62F8lpJy3ysdGrDIadd5P5qmpoZpUB7Kr6b42Svo=;
+        b=cW+DdqMoo7Z6PkTNASm0JJlnKBfmosm8lclVeLa/xa8uJv/jHzKdhEP7o02jH1gPKy
+         k4uLTr1f4UvwyoBRgNiTvMWDJD59ZgC/nNIFZZQ/CMNrFShkr/WM2am1ZQpTvJoknrDb
+         aDZnnvgcMW8QOAVVcKnAJiY3lYAytdEQZkZj3yGz8iME+oGrN8nTTa9AgdoHBxobkxce
+         5DmhWp5Qef4F3jPXDfA/J4Jr6Hyl9yn9Fy4W6Gft/JIx8MkNykQIuIkmdevPR27AM3gG
+         PTEA7peK/lLbCSnJ+vEfNdGPWsgGU000FRSJereO5A6kt98wDfHAPTsdrRkm2/kpoTsZ
+         BfJQ==
+X-Forwarded-Encrypted: i=1; AJvYcCVodaEUYp5ilAl3My3PxGYypWIcBua/NXy6HacmKSqQct2zKwhtuPfTvPzEMgljhqS+0/w=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzBpoAZNZlT9UAg3YVpzcsC7sydl8eZUVMRk11LEsPNxgAfHMD/
+	q+nE6A515JMoiByIBcKG9oE/sjS9/hgjPSwyE0xasLXgcEt1kEBph2aaEmqs/5Q/s6fax3W0LrJ
+	JSdf5PQ==
+X-Google-Smtp-Source: AGHT+IFVRSBXCaOg47V3LlEe/hW3xpOG/xZ18xP0dbIvEMR36+z9CDUWRAyHNBZRkitDhAucFbqnHLvEJGU=
+X-Received: from pjxu8.prod.google.com ([2002:a17:90a:db48:b0:32e:b34b:92eb])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:902:d60f:b0:269:ba61:222e
+ with SMTP id d9443c01a7336-29027303330mr287660585ad.53.1760396311667; Mon, 13
+ Oct 2025 15:58:31 -0700 (PDT)
+Date: Mon, 13 Oct 2025 15:58:30 -0700
+In-Reply-To: <ivkoh7hdl7fcp5fmehmf3kv6ebqitozunbricyed5tkt7z3ngr@qvmaytpzrskw>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
-References: <20251009223153.3344555-1-jmattson@google.com> <20251009223153.3344555-3-jmattson@google.com>
-Message-ID: <aO1-IV-R6XX7RIlv@google.com>
-Subject: Re: [PATCH v2 2/2] KVM: SVM: Don't set GIF when clearing EFER.SVME
+References: <20251001145816.1414855-1-yosry.ahmed@linux.dev>
+ <20251001145816.1414855-9-yosry.ahmed@linux.dev> <aO1yJHcKC85mo0PQ@google.com>
+ <ivkoh7hdl7fcp5fmehmf3kv6ebqitozunbricyed5tkt7z3ngr@qvmaytpzrskw>
+Message-ID: <aO2EFiOHSuvmHvq_@google.com>
+Subject: Re: [PATCH 08/12] KVM: selftests: Use 'leaf' instead of hugepage to
+ describe EPT entries
 From: Sean Christopherson <seanjc@google.com>
-To: Jim Mattson <jmattson@google.com>
-Cc: Yosry Ahmed <yosry.ahmed@linux.dev>, Paolo Bonzini <pbonzini@redhat.com>, 
-	Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>, 
-	Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org, 
-	"H. Peter Anvin" <hpa@zytor.com>, kvm@vger.kernel.org, linux-kernel@vger.kernel.org
+To: Yosry Ahmed <yosry.ahmed@linux.dev>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org, linux-kernel@vger.kernel.org
 Content-Type: text/plain; charset="us-ascii"
 
-On Thu, Oct 09, 2025, Jim Mattson wrote:
-> Clearing EFER.SVME is not architected to set GIF.
-
-But it's also not architected to leave GIF set when the guest is running, which
-was the basic gist of the Fixes commit.  I suspect that forcing GIF=1 was
-intentional, e.g. so that the guest doesn't end up with GIF=0 after stuffing the
-vCPU into SMM mode, which might actually be invalid.
-
-I think what we actually want is to to set GIF when force-leaving nested.  The
-only path where it's not obvious that's "safe" is toggling SMM in 
-kvm_vcpu_ioctl_x86_set_vcpu_events().  In every other path, setting GIF is either
-correct/desirable, or irrelevant because the caller immediately and unconditionally
-sets/clears GIF.
-
-diff --git a/arch/x86/kvm/svm/nested.c b/arch/x86/kvm/svm/nested.c
-index a6443feab252..3392c7e22cae 100644
---- a/arch/x86/kvm/svm/nested.c
-+++ b/arch/x86/kvm/svm/nested.c
-@@ -1367,6 +1367,8 @@ void svm_leave_nested(struct kvm_vcpu *vcpu)
-                nested_svm_uninit_mmu_context(vcpu);
-                vmcb_mark_all_dirty(svm->vmcb);
- 
-+               svm_set_gif(svm, true);
-+
-                if (kvm_apicv_activated(vcpu->kvm))
-                        kvm_make_request(KVM_REQ_APICV_UPDATE, vcpu);
-        }
-
-
-> Don't set GIF when emulating a change to EFER that clears EFER.SVME.
+On Mon, Oct 13, 2025, Yosry Ahmed wrote:
+> On Mon, Oct 13, 2025 at 02:41:56PM -0700, Sean Christopherson wrote:
+> > On Wed, Oct 01, 2025, Yosry Ahmed wrote:
+> > > From: Yosry Ahmed <yosryahmed@google.com>
+> > > 
+> > > The assertions use 'hugepage' to describe a terminal EPT entry, but
+> > > 'leaf' is more accruate as a PG_LEVEL_4K EPT entry is a leaf but not a
+> > > hugepage.
+> > 
+> > Yes, it's more accurate, but also less precise.  I'm guessing the assert message
+> > and comment talked about hugepages because that's the type of mappings that
+> > caused problems at the time.
 > 
-> Fixes: c513f484c558 ("KVM: nSVM: leave guest mode when clearing EFER.SVME")
-> Reviewed-by: Yosry Ahmed <yosry.ahmed@linux.dev>
-> Signed-off-by: Jim Mattson <jmattson@google.com>
-> ---
->  arch/x86/kvm/svm/svm.c | 1 -
->  1 file changed, 1 deletion(-)
+> Given that it refers to PG_LEVEL_4K entries too, I wouldn't call it less
+> precise. All callers actually create 4K mappings so it is never actually
+> a hugepage in the current context :D
+
+nested_identity_map_1g()?
+
+> > Ah, actually, I bet the code was copy+pasted from virt_create_upper_pte(), in
+> > which case the assumptions about wanting to create a hupage are both accurate
+> > and precise.
+> > 
+> > > The distincion will be useful in coming changes that will pass
+> > > the value around and 'leaf' is clearer than hugepage or page_size.
+> > 
+> > What value?
 > 
-> diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
-> index 153c12dbf3eb..96177758d778 100644
-> --- a/arch/x86/kvm/svm/svm.c
-> +++ b/arch/x86/kvm/svm/svm.c
-> @@ -215,7 +215,6 @@ int svm_set_efer(struct kvm_vcpu *vcpu, u64 efer)
->  	if ((old_efer & EFER_SVME) != (efer & EFER_SVME)) {
->  		if (!(efer & EFER_SVME)) {
->  			svm_leave_nested(vcpu);
-> -			svm_set_gif(svm, true);
->  			/* #GP intercept is still needed for vmware backdoor */
->  			if (!enable_vmware_backdoor)
->  				clr_exception_intercept(svm, GP_VECTOR);
-> -- 
-> 2.51.0.740.g6adb054d12-goog
+> 'leaf'. The following changes will pass 'leaf' in as a boolean instead
+> of checking 'current_level == target_level' here. So passing in
+> 'hugepage' would be inaccurate, and 'page_size' is not as clear (but
+> still works).
 > 
+> > 
+> > > Leave the EPT bit named page_size to keep it conforming to the manual.
+> > > 
+> > > Signed-off-by: Yosry Ahmed <yosry.ahmed@linux.dev>
+> > > ---
+> > >  tools/testing/selftests/kvm/lib/x86/vmx.c | 10 +++++-----
+> > >  1 file changed, 5 insertions(+), 5 deletions(-)
+> > > 
+> > > diff --git a/tools/testing/selftests/kvm/lib/x86/vmx.c b/tools/testing/selftests/kvm/lib/x86/vmx.c
+> > > index 04c4b97bcd1e7..673756b27e903 100644
+> > > --- a/tools/testing/selftests/kvm/lib/x86/vmx.c
+> > > +++ b/tools/testing/selftests/kvm/lib/x86/vmx.c
+> > > @@ -380,15 +380,15 @@ static void nested_create_pte(struct kvm_vm *vm,
+> > >  			pte->address = vm_alloc_page_table(vm) >> vm->page_shift;
+> > >  	} else {
+> > >  		/*
+> > > -		 * Entry already present.  Assert that the caller doesn't want
+> > > -		 * a hugepage at this level, and that there isn't a hugepage at
+> > > -		 * this level.
+> > > +		 * Entry already present.  Assert that the caller doesn't want a
+> > > +		 * leaf entry at this level, and that there isn't a leaf entry
+> > > +		 * at this level.
+> > >  		 */
+> > >  		TEST_ASSERT(current_level != target_level,
+> > > -			    "Cannot create hugepage at level: %u, nested_paddr: 0x%lx",
+> > > +			    "Cannot create leaf entry at level: %u, nested_paddr: 0x%lx",
+> > >  			    current_level, nested_paddr);
+> > >  		TEST_ASSERT(!pte->page_size,
+> > > -			    "Cannot create page table at level: %u, nested_paddr: 0x%lx",
+> > > +			    "Leaf entry already exists at level: %u, nested_paddr: 0x%lx",
+> > 
+> > This change is flat out wrong.  The existing PRESENT PTE _might_ be a 4KiB leaf
+> > entry, but it might also be an existing non-leaf page table.
+> 
+> Hmm if pte->page_size is true then it has to be a leaf page table,
+> right?
+
+No, because bit 7 is ignored by hardware for 4KiB entries.  I.e. it can be 0 or
+1 depending on the whims of software.  Ugh, this code uses bit 7 to flag leaf
+entries.  That's lovely.
+
+> If it's an existing non-leaf page table we shouldn't fail,
+
+Ah, right, current_level can never be less than target_level because the first
+assert will fail on iteration-1.
+
+> the assertion here is when we try to override a leaf page table IIUC.
+>
+> > Instead of hacking on the nested code, can we instead tweak __virt_pg_map() to
+> > work with nested TDP?  At a glance, it's already quite close, e.g. "just" needs
+> > to be taught about EPT RWX bits and allow the call to pass in the root pointer.
+> 
+> That would be ideal, I'll take a look. In case I don't have time for
+> that unification, can this be a follow-up change?
+
+Part of me wants to be nice and say "yes", but most of me wants to say "no".
+
+Struct overlays for PTEs suck.  At best, they generate poor code and obfuscate
+simple logic (e.g. vm->page_size vs pte->page_size is a confusion that simply
+should not be possible).  At worst, they lead to hard-to-debug issues like the
+one that led to commit f18b4aebe107 ("kvm: selftests: do not use bitfields larger
+than 32-bits for PTEs").
+
+eptPageTableEntry obviously isn't your fault, but nptPageTableEntry is. :-D
+And I suspect the hardest part of unificiation will be adding the globals to
+deal with variable bit positions that are currently being handled by the struct
+overlays.
 
