@@ -1,306 +1,187 @@
-Return-Path: <kvm+bounces-59860-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-59862-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 536BDBD15B0
-	for <lists+kvm@lfdr.de>; Mon, 13 Oct 2025 06:10:36 +0200 (CEST)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
+	by mail.lfdr.de (Postfix) with ESMTPS id 88CA6BD1774
+	for <lists+kvm@lfdr.de>; Mon, 13 Oct 2025 07:33:02 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id AA5293A92E4
-	for <lists+kvm@lfdr.de>; Mon, 13 Oct 2025 04:10:32 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 82D664E7EE4
+	for <lists+kvm@lfdr.de>; Mon, 13 Oct 2025 05:32:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6299E280025;
-	Mon, 13 Oct 2025 04:10:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9E3F82DBF4B;
+	Mon, 13 Oct 2025 05:32:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=fb.com header.i=@fb.com header.b="pmL3teoT"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail.loongson.cn (mail.loongson.cn [114.242.206.163])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EFB571DE3B5;
-	Mon, 13 Oct 2025 04:10:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=114.242.206.163
+Received: from mx0a-00082601.pphosted.com (mx0a-00082601.pphosted.com [67.231.145.42])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3D1202D9EFF
+	for <kvm@vger.kernel.org>; Mon, 13 Oct 2025 05:32:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=67.231.145.42
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1760328625; cv=none; b=E3Xr4Oc9P7KKNlJf7FtvdkHKm2oN/14zOkkd5QYMg2y505gCTFqqSUzB87a8eQzYNEWPq5hY4chrtpc5PoO1NamjRknHyonBc0IzY5BHSCus5CWCRUgv+xm08lB3Du5zkx6gvN5q3mGMVBo6WZDMrMXfqsyB52293/aTTelEV9g=
+	t=1760333566; cv=none; b=ULYGUc2exBEeME6JdbfZ68SWg78M0nE5OmjM4kmmSZH1VkYG9RiIox1nvkzEp8gbqJOq5z1VpXz9i+f8Zy0pzP/zGJvo2FGk/QZ8mDRivGhXtPal4BAkm98dpJ7ym8XhVtxDeImsYZ/R1ClWEC6ojWffQu/rXOzyTLkmXwZr2LM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1760328625; c=relaxed/simple;
-	bh=NkvTVXXL+fACXOsmFZvvzCVbkAPreCuUfACe/tKiu5k=;
-	h=Subject:To:Cc:References:From:Message-ID:Date:MIME-Version:
-	 In-Reply-To:Content-Type; b=WFl/auZ+PGS5mv1Kjn3A28AFA+wRNtfFXJdQ1g318GpGJZq6ECbDxzCnyUsLRY7zcuECqdUOB6hDu+L6YNL3dn2JgJh3Cq9fZ1DW147n4yNYLZER4rGEqa4jz278jBeyaKSicKuI3ZU+QpU4QuAxGicsyC+cQUJ+SpQDHZ8jjOM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=loongson.cn; spf=pass smtp.mailfrom=loongson.cn; arc=none smtp.client-ip=114.242.206.163
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=loongson.cn
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=loongson.cn
-Received: from loongson.cn (unknown [10.20.42.62])
-	by gateway (Coremail) with SMTP id _____8BxVNCqe+xotHAVAA--.45647S3;
-	Mon, 13 Oct 2025 12:10:19 +0800 (CST)
-Received: from [10.20.42.62] (unknown [10.20.42.62])
-	by front1 (Coremail) with SMTP id qMiowJAxfcGke+xoJxXdAA--.41163S3;
-	Mon, 13 Oct 2025 12:10:14 +0800 (CST)
-Subject: Re: [PATCH v2] LoongArch: KVM: Add AVEC support
-To: gaosong <gaosong@loongson.cn>, chenhuacai@kernel.org
-Cc: kvm@vger.kernel.org, loongarch@lists.linux.dev, kernel@xen0n.name,
- linux-kernel@vger.kernel.org
-References: <20251010064858.2392927-1-gaosong@loongson.cn>
- <39779e6d-2f09-4ee9-e5e0-97fc09efbbf5@loongson.cn>
- <a2d41419-2268-c041-9858-9287056d7f31@loongson.cn>
-From: Bibo Mao <maobibo@loongson.cn>
-Message-ID: <5e83f343-7da1-3235-d681-0d5b8816d1b9@loongson.cn>
-Date: Mon, 13 Oct 2025 12:07:58 +0800
-User-Agent: Mozilla/5.0 (X11; Linux loongarch64; rv:68.0) Gecko/20100101
- Thunderbird/68.7.0
+	s=arc-20240116; t=1760333566; c=relaxed/simple;
+	bh=JTNhu/382e4Fm08mYKQv1wixPN/gikMoRMPBc7fyVZg=;
+	h=From:Subject:Date:Message-ID:MIME-Version:Content-Type:To:CC; b=k96oFb/azC0Qoy9UIXb8u2Zua6kGcOhWxOB+9pnCyCZZjA+orO8YJAvqKJk3pB5ioQNL7xQPWcG1O9iDOwMDoSWs4Z/EJ1UskOX1IQvsLNAFONenhtI6BEN0TJF9SJxBYeoyuvsgNrMwV30wQwvXUl0VtaaoyMWeYuKPFEtoyrw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fb.com; spf=pass smtp.mailfrom=meta.com; dkim=pass (2048-bit key) header.d=fb.com header.i=@fb.com header.b=pmL3teoT; arc=none smtp.client-ip=67.231.145.42
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fb.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=meta.com
+Received: from pps.filterd (m0044010.ppops.net [127.0.0.1])
+	by mx0a-00082601.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 59D3DWhl536898
+	for <kvm@vger.kernel.org>; Sun, 12 Oct 2025 22:32:44 -0700
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=fb.com; h=cc
+	:content-transfer-encoding:content-type:date:from:message-id
+	:mime-version:subject:to; s=s2048-2025-q2; bh=xL6Ske1sMSqh8onRsi
+	PctKwfCuLmMf34qkpKo1FjMFg=; b=pmL3teoTQIcRkE410EWfsa4N9b0DrZGyRR
+	LEsRD/9gFg1kfXnjGHB+Z3n2xh4FGVqAGrirh4khCCVy9VQRWYJoSs2/6QQBe2oL
+	7mX22JmROHh37YCdIi6iE6B6BHKcKNJ7FYtbXojVLKfJRfJ9flnG2q8yj5a9ti8v
+	ewGRyhQZH4AgYqi7qQH3pbB1rh0D353Swl/b/55yp5Liz9FBTm/7KG5fuE8mcVfI
+	+V91LzjbidOsOsUPm7a65vNANDKql98joLEo7ddWiYQFmtB17qRYl/zPC6e6Bd5c
+	AEe7MLZ7N/jvfqKgHLAzp3Y7YI6WWwxfy/e1UwGJUkEWeje/L5bw==
+Received: from maileast.thefacebook.com ([163.114.135.16])
+	by mx0a-00082601.pphosted.com (PPS) with ESMTPS id 49rsb6gdyw-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128 verify=NOT)
+	for <kvm@vger.kernel.org>; Sun, 12 Oct 2025 22:32:44 -0700 (PDT)
+Received: from twshared30833.05.prn5.facebook.com (2620:10d:c0a8:1b::30) by
+ mail.thefacebook.com (2620:10d:c0a9:6f::8fd4) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.2.2562.20; Mon, 13 Oct 2025 05:32:42 +0000
+Received: by devgpu015.cco6.facebook.com (Postfix, from userid 199522)
+	id 9CECB102FE45; Sun, 12 Oct 2025 22:32:30 -0700 (PDT)
+From: Alex Mastro <amastro@fb.com>
+Subject: [PATCH v4 0/3] vfio: handle DMA map/unmap up to the addressable
+ limit
+Date: Sun, 12 Oct 2025 22:32:23 -0700
+Message-ID: <20251012-fix-unmap-v4-0-9eefc90ed14c@fb.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <a2d41419-2268-c041-9858-9287056d7f31@loongson.cn>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:qMiowJAxfcGke+xoJxXdAA--.41163S3
-X-CM-SenderInfo: xpdruxter6z05rqj20fqof0/
-X-Coremail-Antispam: 1Uk129KBj93XoWfGw43tryrtr1kKrWfJr1fGrX_yoWDXw1Dpr
-	1kAFWDWrWrGrn7tr1UJFn0vryUXr18Kw17Jr1UtFy8Jr47Jr1Yqr40gryqgF1UJw48JF1I
-	yr15CrnrZFn8JwcCm3ZEXasCq-sJn29KB7ZKAUJUUUUr529EdanIXcx71UUUUU7KY7ZEXa
-	sCq-sGcSsGvfJ3Ic02F40EFcxC0VAKzVAqx4xG6I80ebIjqfuFe4nvWSU5nxnvy29KBjDU
-	0xBIdaVrnRJUUUBFb4IE77IF4wAFF20E14v26r1j6r4UM7CY07I20VC2zVCF04k26cxKx2
-	IYs7xG6rWj6s0DM7CIcVAFz4kK6r1j6r18M28lY4IEw2IIxxk0rwA2F7IY1VAKz4vEj48v
-	e4kI8wA2z4x0Y4vE2Ix0cI8IcVAFwI0_Gr0_Xr1l84ACjcxK6xIIjxv20xvEc7CjxVAFwI
-	0_Gr0_Cr1l84ACjcxK6I8E87Iv67AKxVW8Jr0_Cr1UM28EF7xvwVC2z280aVCY1x0267AK
-	xVW8Jr0_Cr1UM2kKe7AKxVWUXVWUAwAS0I0E0xvYzxvE52x082IY62kv0487Mc804VCY07
-	AIYIkI8VC2zVCFFI0UMc02F40EFcxC0VAKzVAqx4xG6I80ewAv7VC0I7IYx2IY67AKxVWU
-	XVWUAwAv7VC2z280aVAFwI0_Jr0_Gr1lOx8S6xCaFVCjc4AY6r1j6r4UM4x0Y48IcVAKI4
-	8JMxk0xIA0c2IEe2xFo4CEbIxvr21l42xK82IYc2Ij64vIr41l4I8I3I0E4IkC6x0Yz7v_
-	Jr0_Gr1l4IxYO2xFxVAFwI0_Jw0_GFylx2IqxVAqx4xG67AKxVWUJVWUGwC20s026x8Gjc
-	xK67AKxVWUGVWUWwC2zVAF1VAY17CE14v26r126r1DMIIYrxkI7VAKI48JMIIF0xvE2Ix0
-	cI8IcVAFwI0_Jr0_JF4lIxAIcVC0I7IYx2IY6xkF7I0E14v26r1j6r4UMIIF0xvE42xK8V
-	AvwI8IcIk0rVWUJVWUCwCI42IY6I8E87Iv67AKxVWUJVW8JwCI42IY6I8E87Iv6xkF7I0E
-	14v26r1j6r4UYxBIdaVFxhVjvjDU0xZFpf9x07jjwZcUUUUU=
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-B4-Tracking: v=1; b=H4sIAOeO7GgC/23MvQ7CIBSG4VtpmMXwVyhO3odxoHCwDLYNKNE0v
+ XdpB4OJ4wfneReUIAZI6NQsKEIOKUxjGeLQIDuY8QY4uLIRI6ylhLTYhxd+jnczY8s9h04503u
+ Dyv0coXzurcu17CGkxxTfezrT7fVfJVNMsZSdUpyBEwLOvj/a6Y62RGY1UzVjmGDV6t5Cr5Vmv
+ 4xXjJKa8cI4kVYx4aTW3Zet6/oB4dbi5Q0BAAA=
+To: Alex Williamson <alex.williamson@redhat.com>
+CC: Jason Gunthorpe <jgg@ziepe.ca>,
+        Alejandro Jimenez
+	<alejandro.j.jimenez@oracle.com>,
+        <kvm@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+        Alex Mastro <amastro@fb.com>
+X-Mailer: b4 0.13.0
+X-FB-Internal: Safe
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUxMDEzMDAyNiBTYWx0ZWRfXxhNtEzIv7aFW
+ nE4TGMF2m4K3bVLZcq9zsCC7+LqSJr2lh2pQaocoT02jNG34o4riaL3qzpEVUB9e5x66pEIsTuP
+ SnXdtKvPXAGzU/aFKGVBaAIdw3eXAWPUJa8zYweI2IzhHIL+gBKXh5U3PkAnCiPnBJeGcV7gedM
+ 7kcbReTTjEdXbq3Cl6j+9s+nebObbdQzSzt7FuIDCB+DPUIZB9TB4jcMYkeaCa/hkCRYpa8sq8w
+ ikuKquhYnoK9z2oVffyou2jvgDdtaqqogkzA5S0NsjsNPkX6F2Fb0YvWe8fIf0EiE04qUC8mJO5
+ x5tLhsxPDCGlPHA7J8AWA1h3fWm2yupq05bwCmuuzLOztb4fTzZmpkAq/ou0Bg/X+kF86wZ9Ipg
+ di6fleDgcWYb5xbu8u0uoGW2SeywoQ==
+X-Proofpoint-ORIG-GUID: M8gIQXnH29q-xjWNbjwkAO6rZ6sUWCFB
+X-Authority-Analysis: v=2.4 cv=BarVE7t2 c=1 sm=1 tr=0 ts=68ec8efc cx=c_pps
+ a=MfjaFnPeirRr97d5FC5oHw==:117 a=MfjaFnPeirRr97d5FC5oHw==:17
+ a=IkcTkHD0fZMA:10 a=x6icFKpwvdMA:10 a=VwQbUJbxAAAA:8 a=yPCof4ZbAAAA:8
+ a=FOH2dFAWAAAA:8 a=LN3npHLcb8nXURrLiNkA:9 a=QEXdDO2ut3YA:10
+X-Proofpoint-GUID: M8gIQXnH29q-xjWNbjwkAO6rZ6sUWCFB
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1117,Hydra:6.1.9,FMLib:17.12.80.40
+ definitions=2025-10-13_02,2025-10-06_01,2025-03-28_01
 
+This patch series aims to fix vfio_iommu_type.c to support 
+VFIO_IOMMU_MAP_DMA and VFIO_IOMMU_UNMAP_DMA operations targeting IOVA
+ranges which lie against the addressable limit. i.e. ranges where
+iova_start + iova_size would overflow to exactly zero.
 
+Today, the VFIO UAPI has an inconsistency: The
+VFIO_IOMMU_TYPE1_INFO_CAP_IOVA_RANGE capability of VFIO_IOMMU_GET_INFO
+reports that ranges up to the end of the address space are available
+for use, but are not really due to bugs in handling boundary conditions.
 
-On 2025/10/13 上午11:18, gaosong wrote:
-> 在 2025/10/11 上午9:29, Bibo Mao 写道:
->>
->>
->> On 2025/10/10 下午2:48, Song Gao wrote:
->>> Add cpu_has_msgint() to check whether the host cpu supported avec,
->>> and restore/save CSR_MSGIS0-CSR_MSGIS3.
->>>
->>> Signed-off-by: Song Gao <gaosong@loongson.cn>
->>> ---
->>> Based-on: 
->>> https://patchew.org/linux/20250930093741.2734974-1-maobibo@loongson.cn/
->>> v2: fix build error.
->> It is not necessary based on this patch, you can base it on master 
->> branch. The later merged patch need based on previous version in general.
->>
-> Got it.
->>>
->>>   arch/loongarch/include/asm/kvm_host.h |  4 ++++
->>>   arch/loongarch/include/asm/kvm_vcpu.h |  1 +
->>>   arch/loongarch/include/uapi/asm/kvm.h |  1 +
->>>   arch/loongarch/kvm/interrupt.c        |  3 +++
->>>   arch/loongarch/kvm/vcpu.c             | 19 +++++++++++++++++--
->>>   arch/loongarch/kvm/vm.c               |  4 ++++
->>>   6 files changed, 30 insertions(+), 2 deletions(-)
->>>
->>> diff --git a/arch/loongarch/include/asm/kvm_host.h 
->>> b/arch/loongarch/include/asm/kvm_host.h
->>> index 392480c9b958..446f1104d59d 100644
->>> --- a/arch/loongarch/include/asm/kvm_host.h
->>> +++ b/arch/loongarch/include/asm/kvm_host.h
->>> @@ -285,6 +285,10 @@ static inline bool kvm_guest_has_lbt(struct 
->>> kvm_vcpu_arch *arch)
->>>       return arch->cpucfg[2] & (CPUCFG2_X86BT | CPUCFG2_ARMBT | 
->>> CPUCFG2_MIPSBT);
->>>   }
->>>   +static inline bool cpu_has_msgint(void)
->>> +{
->>> +    return read_cpucfg(LOONGARCH_CPUCFG1) & CPUCFG1_MSGINT;
->>> +}
->>>   static inline bool kvm_guest_has_pmu(struct kvm_vcpu_arch *arch)
->>>   {
->>>       return arch->cpucfg[6] & CPUCFG6_PMP;
->>> diff --git a/arch/loongarch/include/asm/kvm_vcpu.h 
->>> b/arch/loongarch/include/asm/kvm_vcpu.h
->>> index f1efd7cfbc20..3784ab4ccdb5 100644
->>> --- a/arch/loongarch/include/asm/kvm_vcpu.h
->>> +++ b/arch/loongarch/include/asm/kvm_vcpu.h
->>> @@ -15,6 +15,7 @@
->>>   #define CPU_PMU                (_ULCAST_(1) << 10)
->>>   #define CPU_TIMER            (_ULCAST_(1) << 11)
->>>   #define CPU_IPI                (_ULCAST_(1) << 12)
->>> +#define CPU_AVEC                        (_ULCAST_(1) << 14)
->>>     /* Controlled by 0x52 guest exception VIP aligned to estat bit 
->>> 5~12 */
->>>   #define CPU_IP0                (_ULCAST_(1))
->>> diff --git a/arch/loongarch/include/uapi/asm/kvm.h 
->>> b/arch/loongarch/include/uapi/asm/kvm.h
->>> index 57ba1a563bb1..de6c3f18e40a 100644
->>> --- a/arch/loongarch/include/uapi/asm/kvm.h
->>> +++ b/arch/loongarch/include/uapi/asm/kvm.h
->>> @@ -104,6 +104,7 @@ struct kvm_fpu {
->>>   #define  KVM_LOONGARCH_VM_FEAT_PV_IPI        6
->>>   #define  KVM_LOONGARCH_VM_FEAT_PV_STEALTIME    7
->>>   #define  KVM_LOONGARCH_VM_FEAT_PTW        8
->>> +#define  KVM_LOONGARCH_VM_FEAT_MSGINT        9
->>>     /* Device Control API on vcpu fd */
->>>   #define KVM_LOONGARCH_VCPU_CPUCFG    0
->>> diff --git a/arch/loongarch/kvm/interrupt.c 
->>> b/arch/loongarch/kvm/interrupt.c
->>> index 8462083f0301..adc278fb3cb9 100644
->>> --- a/arch/loongarch/kvm/interrupt.c
->>> +++ b/arch/loongarch/kvm/interrupt.c
->>> @@ -21,6 +21,7 @@ static unsigned int 
->>> priority_to_irq[EXCCODE_INT_NUM] = {
->>>       [INT_HWI5]    = CPU_IP5,
->>>       [INT_HWI6]    = CPU_IP6,
->>>       [INT_HWI7]    = CPU_IP7,
->>> +    [INT_AVEC]    = CPU_AVEC,
->>>   };
->>>     static int kvm_irq_deliver(struct kvm_vcpu *vcpu, unsigned int 
->>> priority)
->>> @@ -36,6 +37,7 @@ static int kvm_irq_deliver(struct kvm_vcpu *vcpu, 
->>> unsigned int priority)
->>>       case INT_IPI:
->>>       case INT_SWI0:
->>>       case INT_SWI1:
->>> +    case INT_AVEC:
->>>           set_gcsr_estat(irq);
->> Do we need cpu_has_msgint() here ? It is impossible that VMM inject 
->> INT_AVEC interrrupt on non-msgint machine such as 3C5000.
->>
-> yes we need , how about this?
-> 
-> @@ -31,6 +32,11 @@ static int kvm_irq_deliver(struct kvm_vcpu *vcpu, 
-> unsigned int priority)
->          if (priority < EXCCODE_INT_NUM)
->                  irq = priority_to_irq[priority];
-> 
-> +        if (cpu_has_msgint() && (priority == INT_AVEC)) {
-> +                set_gcsr_estat(irq);
-> +                return 1;
-> +        }
-> +
->          switch (priority) {
->          case INT_TI:
->          case INT_IPI:
-This is workable. Another way is to add checking in irq inject root 
-source function kvm_vcpu_ioctl_interrupt(). Both works for me.
+For example:
 
-BTW, I think that there should be modification with function 
-kvm_deliver_intr() also. max irq bit is *INT_IPI + 1* where there will 
-be problem with INT_AVEC. Should it be modified as *EXCCODE_INT_NUM*?
+vfio_find_dma_first_node is called to find the first dma node to unmap
+given an unmap range of [iova..iova+size). The check at the end of the
+function intends to test if the dma result lies beyond the end of the
+unmap range. The condition is incorrectly satisfied when iova+size
+overflows to zero, causing the function to return NULL.
 
-void kvm_deliver_intr(struct kvm_vcpu *vcpu)
-{
-         unsigned int priority;
-         unsigned long *pending = &vcpu->arch.irq_pending;
-         unsigned long *pending_clr = &vcpu->arch.irq_clear;
+The same issue happens inside vfio_dma_do_unmap's while loop.
 
-         for_each_set_bit(priority, pending_clr, INT_IPI + 1)
-                 kvm_irq_clear(vcpu, priority);
+This bug was also reported by Alejandro Jimenez in [1][2].
 
-         for_each_set_bit(priority, pending, INT_IPI + 1)
-                 kvm_irq_deliver(vcpu, priority);
-}
+Of primary concern are locations in the current code which perform
+comparisons against (iova + size) expressions, where overflow to zero
+is possible.
 
-Regards
-Bibo Mao
-> 
-> Thanks.
-> Song Gao
-> 
-> 
->>>           break;
->>>   @@ -63,6 +65,7 @@ static int kvm_irq_clear(struct kvm_vcpu *vcpu, 
->>> unsigned int priority)
->>>       case INT_IPI:
->>>       case INT_SWI0:
->>>       case INT_SWI1:
->>> +    case INT_AVEC:
->>>           clear_gcsr_estat(irq);
->> Ditto.
->>
->> The others look good to me.
->>
->> Regards
->> Bibo Mao
->>>           break;
->>>   diff --git a/arch/loongarch/kvm/vcpu.c b/arch/loongarch/kvm/vcpu.c
->>> index 30e3b089a596..226c735155be 100644
->>> --- a/arch/loongarch/kvm/vcpu.c
->>> +++ b/arch/loongarch/kvm/vcpu.c
->>> @@ -657,8 +657,7 @@ static int _kvm_get_cpucfg_mask(int id, u64 *v)
->>>           *v = GENMASK(31, 0);
->>>           return 0;
->>>       case LOONGARCH_CPUCFG1:
->>> -        /* CPUCFG1_MSGINT is not supported by KVM */
->>> -        *v = GENMASK(25, 0);
->>> +        *v = GENMASK(26, 0);
->>>           return 0;
->>>       case LOONGARCH_CPUCFG2:
->>>           /* CPUCFG2 features unconditionally supported by KVM */
->>> @@ -726,6 +725,10 @@ static int kvm_check_cpucfg(int id, u64 val)
->>>           return -EINVAL;
->>>         switch (id) {
->>> +    case LOONGARCH_CPUCFG1:
->>> +        if ((val & CPUCFG1_MSGINT) && (!cpu_has_msgint()))
->>> +            return -EINVAL;
->>> +        return 0;
->>>       case LOONGARCH_CPUCFG2:
->>>           if (!(val & CPUCFG2_LLFTP))
->>>               /* Guests must have a constant timer */
->>> @@ -1658,6 +1661,12 @@ static int _kvm_vcpu_load(struct kvm_vcpu 
->>> *vcpu, int cpu)
->>>       kvm_restore_hw_gcsr(csr, LOONGARCH_CSR_DMWIN2);
->>>       kvm_restore_hw_gcsr(csr, LOONGARCH_CSR_DMWIN3);
->>>       kvm_restore_hw_gcsr(csr, LOONGARCH_CSR_LLBCTL);
->>> +    if (cpu_has_msgint()) {
->>> +        kvm_restore_hw_gcsr(csr, LOONGARCH_CSR_ISR0);
->>> +        kvm_restore_hw_gcsr(csr, LOONGARCH_CSR_ISR1);
->>> +        kvm_restore_hw_gcsr(csr, LOONGARCH_CSR_ISR2);
->>> +        kvm_restore_hw_gcsr(csr, LOONGARCH_CSR_ISR3);
->>> +    }
->>>         /* Restore Root.GINTC from unused Guest.GINTC register */
->>>       write_csr_gintc(csr->csrs[LOONGARCH_CSR_GINTC]);
->>> @@ -1747,6 +1756,12 @@ static int _kvm_vcpu_put(struct kvm_vcpu 
->>> *vcpu, int cpu)
->>>       kvm_save_hw_gcsr(csr, LOONGARCH_CSR_DMWIN1);
->>>       kvm_save_hw_gcsr(csr, LOONGARCH_CSR_DMWIN2);
->>>       kvm_save_hw_gcsr(csr, LOONGARCH_CSR_DMWIN3);
->>> +    if (cpu_has_msgint()) {
->>> +        kvm_save_hw_gcsr(csr, LOONGARCH_CSR_ISR0);
->>> +        kvm_save_hw_gcsr(csr, LOONGARCH_CSR_ISR1);
->>> +        kvm_save_hw_gcsr(csr, LOONGARCH_CSR_ISR2);
->>> +        kvm_save_hw_gcsr(csr, LOONGARCH_CSR_ISR3);
->>> +    }
->>>         vcpu->arch.aux_inuse |= KVM_LARCH_SWCSR_LATEST;
->>>   diff --git a/arch/loongarch/kvm/vm.c b/arch/loongarch/kvm/vm.c
->>> index d8c813e2d72e..438885b6f2b1 100644
->>> --- a/arch/loongarch/kvm/vm.c
->>> +++ b/arch/loongarch/kvm/vm.c
->>> @@ -37,6 +37,9 @@ static void kvm_vm_init_features(struct kvm *kvm)
->>>           kvm->arch.support_features |= 
->>> BIT(KVM_LOONGARCH_VM_FEAT_PV_STEALTIME);
->>>       }
->>>   +    if (cpu_has_msgint())
->>> +        kvm->arch.support_features |= 
->>> BIT(KVM_LOONGARCH_VM_FEAT_MSGINT);
->>> +
->>>       val = read_csr_gcfg();
->>>       if (val & CSR_GCFG_GPMP)
->>>           kvm->arch.support_features |= BIT(KVM_LOONGARCH_VM_FEAT_PMU);
->>> @@ -153,6 +156,7 @@ static int kvm_vm_feature_has_attr(struct kvm 
->>> *kvm, struct kvm_device_attr *attr
->>>       case KVM_LOONGARCH_VM_FEAT_PMU:
->>>       case KVM_LOONGARCH_VM_FEAT_PV_IPI:
->>>       case KVM_LOONGARCH_VM_FEAT_PV_STEALTIME:
->>> +        case KVM_LOONGARCH_VM_FEAT_MSGINT:
->>>           if (kvm_vm_support(&kvm->arch, attr->attr))
->>>               return 0;
->>>           return -ENXIO;
->>>
->>
-> 
+The initial list of candidate locations to audit was taken from the
+following:
+
+$ rg 'iova.*\+.*size' -n drivers/vfio/vfio_iommu_type1.c | rg -v '\- 1'
+173:            else if (start >= dma->iova + dma->size)
+192:            if (start < dma->iova + dma->size) {
+216:            if (new->iova + new->size <= dma->iova)
+1060:   dma_addr_t iova = dma->iova, end = dma->iova + dma->size;
+1233:   if (dma && dma->iova + dma->size != iova + size)
+1380:           if (dma && dma->iova + dma->size != iova + size)
+1501:           ret = vfio_iommu_map(iommu, iova + dma->size, pfn, npage,
+1504:                   vfio_unpin_pages_remote(dma, iova + dma->size, pfn,
+1721:           while (iova < dma->iova + dma->size) {
+1743:                           i = iova + size;
+1744:                           while (i < dma->iova + dma->size &&
+1754:                           size_t n = dma->iova + dma->size - iova;
+1785:                   iova += size;
+1810:           while (iova < dma->iova + dma->size) {
+1823:                   i = iova + size;
+1824:                   while (i < dma->iova + dma->size &&
+2919:           if (range.iova + range.size < range.iova)
+
+This series spend the first couple commits making mechanical preparations
+before the fix lands in the last commit.
+
+[1] https://lore.kernel.org/qemu-devel/20250919213515.917111-1-alejandro.j.jimenez@oracle.com/
+[2] https://lore.kernel.org/all/68e18f2c-79ad-45ec-99b9-99ff68ba5438@oracle.com/
+
+Signed-off-by: Alex Mastro <amastro@fb.com>
+---
+Changes in v4:
+- Fix type assigned to iova_end
+- Clarify overflow checking, add checks to vfio_iommu_type1_dirty_pages
+- Consider npage==0 an error for vfio_iommu_type1_pin_pages
+- Link to v3: https://lore.kernel.org/r/20251010-fix-unmap-v3-0-306c724d6998@fb.com
+
+Changes in v3:
+- Fix handling of unmap_all in vfio_dma_do_unmap
+- Fix !range.size to return -EINVAL for VFIO_IOMMU_DIRTY_PAGES_FLAG_GET_BITMAP
+  - Dedup !range.size checking
+- Return -EOVERFLOW on check_*_overflow
+- Link to v2: https://lore.kernel.org/r/20251007-fix-unmap-v2-0-759bceb9792e@fb.com
+
+Changes in v2:
+- Change to patch series rather than single commit
+- Expand scope to fix more than just the unmap discovery path
+- Link to v1: https://lore.kernel.org/r/20251005-fix-unmap-v1-1-6687732ed44e@fb.com
+
+---
+Alex Mastro (3):
+      vfio/type1: sanitize for overflow using check_*_overflow
+      vfio/type1: move iova increment to unmap_unpin_* caller
+      vfio/type1: handle DMA map/unmap up to the addressable limit
+
+ drivers/vfio/vfio_iommu_type1.c | 173 +++++++++++++++++++++++++---------------
+ 1 file changed, 110 insertions(+), 63 deletions(-)
+---
+base-commit: 407aa63018d15c35a34938633868e61174d2ef6e
+change-id: 20251005-fix-unmap-c3f3e87dabfa
+
+Best regards,
+-- 
+Alex Mastro <amastro@fb.com>
 
 
