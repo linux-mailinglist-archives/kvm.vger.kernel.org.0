@@ -1,61 +1,61 @@
-Return-Path: <kvm+bounces-59872-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-59873-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id E1351BD1ACA
-	for <lists+kvm@lfdr.de>; Mon, 13 Oct 2025 08:28:21 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id CD089BD1AB2
+	for <lists+kvm@lfdr.de>; Mon, 13 Oct 2025 08:27:48 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 11DCA4EFFB4
-	for <lists+kvm@lfdr.de>; Mon, 13 Oct 2025 06:26:26 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4DDB23AA5CC
+	for <lists+kvm@lfdr.de>; Mon, 13 Oct 2025 06:26:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CF8042E54BD;
-	Mon, 13 Oct 2025 06:26:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1D1172E6112;
+	Mon, 13 Oct 2025 06:26:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="yZEEer+Z"
+	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="RRNT+yi4"
 X-Original-To: kvm@vger.kernel.org
-Received: from BYAPR05CU005.outbound.protection.outlook.com (mail-westusazon11010016.outbound.protection.outlook.com [52.101.85.16])
+Received: from CY3PR05CU001.outbound.protection.outlook.com (mail-westcentralusazon11013019.outbound.protection.outlook.com [40.93.201.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D9AB72E4279
-	for <kvm@vger.kernel.org>; Mon, 13 Oct 2025 06:26:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.85.16
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BACF82E1EE0
+	for <kvm@vger.kernel.org>; Mon, 13 Oct 2025 06:26:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.93.201.19
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1760336765; cv=fail; b=Wv6mby4maW1gDaF5mDZqh0Ck+ifoBFSMjISuDk94PImSA0RaEWH7jtYopE16qKH4t+3wnErEMprYG8azOQNpzx3wP6Gy8DwLnl1hfvuIzkwSXZ7Xn7RoEAsjEoYhpsU5OrZft/5VUHHIQq6Uu8EQPlWBTAOKHkDfWGRFs3C6KAc=
+	t=1760336767; cv=fail; b=F6oc/ds9n5qwXUdrVaBjy0iNIb617i91Oe2sGZEQj44TPuHx2d9bmoA/CjysKHEowTC4K6XW4yPVHW77nttshMfL9wZXIbQWOKtF7pICe3Zy5VeNOVyuFd4A19F24CsDGCR5cc/7YXJ44kGwO3FcDvAFQ2JmD8l8GMGQXtVU8S8=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1760336765; c=relaxed/simple;
-	bh=ODyw847kHcVRDAplraRxMm+9MUUWqkvBSIygwi8j7SU=;
+	s=arc-20240116; t=1760336767; c=relaxed/simple;
+	bh=APIh1C+KTM+kNQZrVWZ3DVu3li567mUxbRAw8zajcwg=;
 	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=iEipAk+LWIzvO4NUGG/VRdkyeAKEHFTEu7h1rqF3QUkEYYXyjoXGw6qPIEd6ElR1+lnr8QHLu2i1IoHjC6s/5ZRTRXWN3L3dFSCGr0EqMx3pZWpJHSaISMBT5t2r01Ppb++8pWOkO6O9SBLBvawkYishXeubWx/pUKIIB8daOOg=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=yZEEer+Z; arc=fail smtp.client-ip=52.101.85.16
+	 MIME-Version:Content-Type; b=HyYSVZm1m+GW5Ivc+M+9ZdsFCC4Yfg1/wzPTrIDENwzNPtTzRAXBuWHDzqkDSMBfiYkLlKnkrA6a1W4LuU2WVli4+vWLcrkxTAeV6vlNFKzcz4WQmP/lIl8iPRdGERL1ei4F8wLvLhBAJ6yhIzCpwhUATHBifQlh0F/dsG/EzvM=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=RRNT+yi4; arc=fail smtp.client-ip=40.93.201.19
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
 Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=Q0g0Uz95lsLXdCVEs6yMlClZiz5zGbsRmlqUN2kvaZ0S2wKo/vfjHy3AcIjUs5aXnsUatRz+/vuAX0t+a5I19018BkpU/9pnEMGEQeRNH7OEiivFz4K1hItwe1Bfun7nKXYyZ2KQS/gdIkE6RBQJTMqo3bdFrNdJbcqsFeNWou9X+9JpkStO1mdqh0b6fdYgXLZqyKqMzcBXaRnjprZetXcCco6oJf04D6kpztbrEXJiP6GFobMrHBEKnBsDHaAGO7/kXoapNaI4ObEAeTfilTFJhN7Ch/YBQDHtL+dBeZ0bzoqNI97Ccqt543Mg5V++fHc/gF1c+floPVWyB/fyvg==
+ b=HAcNiQQu17JfE7s0Of5VVVlp+FY6u1ynbtqFN7OXYrnTWtYBHopbYUsGnEQAqCv8KnMyJjaKTJKNT48m9IjaxchQC+geqmZbfRKmtUBw0RtiLnNxMbE+OB1erabHu0TGSof0jzNv9nfXh3rQ0LYdje/ZuI1U1FYUwNkhk4c52u3pxxnjl9kiaBXgtTCcXeAsM6mzqpKOu5gLfWJEWTGdWkf6urZZgReHY5cvpzHZNXgUrJP3pS0fFhSlJeAwDLDc9JFrB5mUgxj8OuirGLtc3q5sknTaHqkzZtzIseg4F5gFlKAvDNtJ17gjhh6jnqRZlI3KWn5/+ZmnQafe/qce7Q==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector10001;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=sVZCvHb2VZaC3rB5n8aSIvc9kG4RK8IZ57WYmOscWYM=;
- b=N54uBFX5GTAfH2NeG9YYxeBGiPsaoYu+UgAHOqWXudTwfzcnU4Dtpse/TV8tJG+B0/hFHCSAwUi7GeOgkUuOV622u1wG1Ac/vkKiZIIc6uIE6DRrK2FBWEaNuHoX1e561F2FYvhlR8m7993kFFeoXPmHMN1Qv65KYFc0qzmitGtcpkLHvXLyYBzhSYDecEg4dIwzQwGJQ3MOL/ojwivo7LTi7fLfSPHi1vJF/tQ1wpU+q6wWu5aqa1AxZ+K/Gvxecomhaw42BJpwAoltiqGVGItDmy5PCZSWqYtDrSXDo69vBugNNh2EB76Fe7XG+xZdzkKo+mGC5o/+MfedVEKRpA==
+ bh=/iGa2WCo5xCNTRmcb96okwSk2w2xtqAIjUdVxtLM85s=;
+ b=EVpXS84bMcI2WmdMnrlxlU9uA7s8JQ2I0YnrAX0ITDWomVWJdEz3nGapX/Lr1uId1eduq49u6J62ZRls5e/MJMwczuPY+nuOZq+GvqA0Gp0IO0EVekp8U1Z8jHU7L0lI6kZPc5jJq1xugmzGp0rhHLdX4SwHTyb9K8dRKhZhB3h+0TtD5zYGEpr263Uk9akhjAilyBsDmrAvBuX8EWS40hPcSPfMON2+4RfO8je+Pke8mn0NCdqPp/LtIaI9qNDPiAvwazK/vtZnn5WlbcYKsSyUodYBIKjwK6qZRUHJrZ5Jv/mkBoCFwaoVtREAEcS6cRuxKhz/Pxcrz4VJZB7y6Q==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
  165.204.84.17) smtp.rcpttodomain=google.com smtp.mailfrom=amd.com; dmarc=pass
  (p=quarantine sp=quarantine pct=100) action=none header.from=amd.com;
  dkim=none (message not signed); arc=none (0)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=sVZCvHb2VZaC3rB5n8aSIvc9kG4RK8IZ57WYmOscWYM=;
- b=yZEEer+ZBZbt4+2+vxXT8c/kItUbWab3reMXpzgUphpJEnV1TvLDSAzfdzdTGHIef/8iMUkki+YVPq4ClITSr+NVYvX0bpwiYGTfTqNdhOTN2kYk+GSDI451uDxFB/JQEKAuMzXYgdkTniI5TSUt43F4RLo+DEsTJYiyH6FuoxM=
-Received: from DM6PR07CA0113.namprd07.prod.outlook.com (2603:10b6:5:330::16)
- by PH7PR12MB6000.namprd12.prod.outlook.com (2603:10b6:510:1dc::15) with
+ bh=/iGa2WCo5xCNTRmcb96okwSk2w2xtqAIjUdVxtLM85s=;
+ b=RRNT+yi4gAPenJm0Gwi+NHXnNPP6SWQXT+nC3rD7ekIuMACow62os/nDYuw9IN9EaOo0VrO34en68HqMGrWrww5PzbT7WkOzeP+pnkxsPsbP86/vsRbIk9GXAqQwMfmFoiTxmyrQS8kQSiAs/11ofo/buj4zpJWRA/Q5RP8S/ms=
+Received: from DM6PR07CA0088.namprd07.prod.outlook.com (2603:10b6:5:337::21)
+ by LV2PR12MB5727.namprd12.prod.outlook.com (2603:10b6:408:17d::7) with
  Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9203.12; Mon, 13 Oct
- 2025 06:25:57 +0000
-Received: from DS3PEPF0000C37C.namprd04.prod.outlook.com
- (2603:10b6:5:330:cafe::82) by DM6PR07CA0113.outlook.office365.com
- (2603:10b6:5:330::16) with Microsoft SMTP Server (version=TLS1_3,
- cipher=TLS_AES_256_GCM_SHA384) id 15.20.9203.12 via Frontend Transport; Mon,
- 13 Oct 2025 06:25:39 +0000
+ 2025 06:26:00 +0000
+Received: from DS3PEPF0000C37B.namprd04.prod.outlook.com
+ (2603:10b6:5:337:cafe::45) by DM6PR07CA0088.outlook.office365.com
+ (2603:10b6:5:337::21) with Microsoft SMTP Server (version=TLS1_3,
+ cipher=TLS_AES_256_GCM_SHA384) id 15.20.9203.11 via Frontend Transport; Mon,
+ 13 Oct 2025 06:26:00 +0000
 X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
  smtp.mailfrom=amd.com; dkim=none (message not signed)
  header.d=none;dmarc=pass action=none header.from=amd.com;
@@ -63,21 +63,21 @@ Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
  165.204.84.17 as permitted sender) receiver=protection.outlook.com;
  client-ip=165.204.84.17; helo=satlexmb07.amd.com; pr=C
 Received: from satlexmb07.amd.com (165.204.84.17) by
- DS3PEPF0000C37C.mail.protection.outlook.com (10.167.23.6) with Microsoft SMTP
+ DS3PEPF0000C37B.mail.protection.outlook.com (10.167.23.5) with Microsoft SMTP
  Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.9228.7 via Frontend Transport; Mon, 13 Oct 2025 06:25:56 +0000
+ 15.20.9228.7 via Frontend Transport; Mon, 13 Oct 2025 06:26:00 +0000
 Received: from gomati.amd.com (10.180.168.240) by satlexmb07.amd.com
  (10.181.42.216) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.17; Sun, 12 Oct
- 2025 23:25:53 -0700
+ 2025 23:25:56 -0700
 From: Nikunj A Dadhania <nikunj@amd.com>
 To: <seanjc@google.com>, <pbonzini@redhat.com>
 CC: <kvm@vger.kernel.org>, <thomas.lendacky@amd.com>,
 	<santosh.shukla@amd.com>, <bp@alien8.de>, <joao.m.martins@oracle.com>,
 	<nikunj@amd.com>, <kai.huang@intel.com>
-Subject: [PATCH v4 4/7] KVM: x86: Move nested CPU dirty logging logic to common code
-Date: Mon, 13 Oct 2025 06:25:12 +0000
-Message-ID: <20251013062515.3712430-5-nikunj@amd.com>
+Subject: [PATCH v4 5/7] x86/cpufeatures: Add Page modification logging
+Date: Mon, 13 Oct 2025 06:25:13 +0000
+Message-ID: <20251013062515.3712430-6-nikunj@amd.com>
 X-Mailer: git-send-email 2.48.1
 In-Reply-To: <20251013062515.3712430-1-nikunj@amd.com>
 References: <20251013062515.3712430-1-nikunj@amd.com>
@@ -93,271 +93,92 @@ X-ClientProxiedBy: satlexmb08.amd.com (10.181.42.217) To satlexmb07.amd.com
  (10.181.42.216)
 X-EOPAttributedMessage: 0
 X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: DS3PEPF0000C37C:EE_|PH7PR12MB6000:EE_
-X-MS-Office365-Filtering-Correlation-Id: 77703603-47ca-4527-5a2a-08de0a215e99
+X-MS-TrafficTypeDiagnostic: DS3PEPF0000C37B:EE_|LV2PR12MB5727:EE_
+X-MS-Office365-Filtering-Correlation-Id: ec1f8c27-fc85-4538-b101-08de0a21607a
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|82310400026|376014|1800799024|36860700013;
+	BCL:0;ARA:13230040|82310400026|1800799024|36860700013|376014;
 X-Microsoft-Antispam-Message-Info:
-	=?us-ascii?Q?Zy3sMvJWe+tYSFjTZYVKRlLDMRmnF1A0O/QKe7N3TiGQuzqTf9xa5HZqakSa?=
- =?us-ascii?Q?pNOuTqQRot++ohYaA0QL6SwRxlkHdc0VO1ZUeVqM4X3CSa3xdx7sn7ZoTMK8?=
- =?us-ascii?Q?60qvgMa+Qg0Wu9zrPr79BFXDGPJTmCZCvGYkSt3LFcw4+MM7JljvYkpI4NZq?=
- =?us-ascii?Q?W98hLhl7Bp6adqOFAZogObpGUZe8yudreWJugXxEDHcgm6NvKly466agxeEJ?=
- =?us-ascii?Q?hMCXm0WR3NliDSs/cJVro/QtSX3d4ZtwWLl1faj/N9wuydjaJ9akD9MKHzT2?=
- =?us-ascii?Q?9Xh4PFzzbLOKAI6KaqTwI7vSwCzvO8D3BkujtskiIeHa9qcsUREvxTr0oR/W?=
- =?us-ascii?Q?zkfyj2f0TA35SCdq+4DHCO7AwMz6ONaRqC+Cd3tpuii21zgs6tRuxHAPAVUW?=
- =?us-ascii?Q?cybBuJlqqZ71u8gv3ZkI1Y7m8pe+pGVuKOHpTzrMFAg40kaJiF3VwJPAKFbt?=
- =?us-ascii?Q?dCpwiIKiLzTQ2HNO9FaJG6O2HbyLiLLbb3jAkAdeidctaFzRH8eFePvILwBR?=
- =?us-ascii?Q?drYakly/X825JbtaelWRncTEP4T+VHVuFlvj43GENeqBsh8C4vhKlu3yC+Nc?=
- =?us-ascii?Q?w/wNv2K1as+bHxppdPoocTQJOknJgNOitypE140dwbK5dsC7ShZvJjSYTAjg?=
- =?us-ascii?Q?ZyR8vyCWC8H23naix2edOU7kp1ECQVKI6GlvpHGIO/Et08mchFlbW1o2yx08?=
- =?us-ascii?Q?qEG55iK93dBQIwhJ5H5wFGSdGmkO9PVdmC7JnNC06bCcltp73eLKywWLBCyt?=
- =?us-ascii?Q?qOCzS4LVBh5br7xYkGN4KY0CerPGC+e6IWt1+MXFx3ZH+zPV7N/tBDMqXQM9?=
- =?us-ascii?Q?eDB1mEuOQI3/ZHoGWjcLpm8HxTJW7aRnv8QJ0Py8WChieNKbNmHcXvv3NW+j?=
- =?us-ascii?Q?GZ0cPUA6ZqawNav0h7y6JUJBlFgJo7kbiCafso3uHQM2j8ENnnqkUDffcDIs?=
- =?us-ascii?Q?RrHIBWOfr0mIGQMvyODR8QD1efY0Zh2qMQJae05QIiKO5SXDPauw80c+ODLZ?=
- =?us-ascii?Q?9M5nBQxLASUJAEeV937P6C2U+s4iW6ZzWRcAEodKohr0ZEZhco6W3jxAWGER?=
- =?us-ascii?Q?VGfrNylH7KPvsgMw1udDhDZh2lXpKgKvBdQdRtOROqqD8+qy8wSYzZgIol3r?=
- =?us-ascii?Q?D9WWCGRXWTOPW0SsWjA0rK8jepGeTr+Cw853WirQp+AJ3AiNiiC2ELD3cGw1?=
- =?us-ascii?Q?Oho4lfmItK9G1akXqLOmX1YMTbO/68maGtfVn8gqxZlVY8YLk+HaJiRYipWi?=
- =?us-ascii?Q?6QcO5sUrXkOp1yEWu92mcoAn9MbMXluofQpOr1H4RLDpA2hdw58NksWj9lSU?=
- =?us-ascii?Q?qOJ90tOxIZM0eX0Pub0dGMgn/GHQ6aeEf6ZRL12H5tYqckWSV+eE9U/SAPg6?=
- =?us-ascii?Q?PyF8cpT5D5qFBaRiLNyqA8H3z84jwufc9zk7k1aeXyIlO0YFdo5Pr9PVwKi5?=
- =?us-ascii?Q?xj16+fVgVpdTPL4K8/ATQ6TDsccpP7JPmf08ciZ8738cLgUkZOR5dE8SKXzt?=
- =?us-ascii?Q?USG0MC5aCUmkEopjTYYeM8Sn1YbcgR6vdJR6OXXbYTA24fepoVvEPFEHUhHd?=
- =?us-ascii?Q?bzjBrdIZrywMkc20L4w=3D?=
+	=?us-ascii?Q?6nEV/jYgR3QVthdPTUKc0hRiRquw9STrEq7cpLsC1MNgN8NMaNi3QX3QEF8P?=
+ =?us-ascii?Q?9tqDDe19FSAxQkRtDA+EQxz8rDY1zGiMjZDBVlZ2c6tWV6gi+rnw5PTmHFMy?=
+ =?us-ascii?Q?wEl9GKDYZF0KLK06LqJRF8MnJv1Czpn+CrmlhpJMzy16wUhm0uN3jWCTf6xz?=
+ =?us-ascii?Q?CRw8TJxDDJ5Bya2ZnKfP2qVgTSQVNbXJfk+P5t7QiXiUJcwv6tkjQmDJJCHM?=
+ =?us-ascii?Q?JVp492PU6xW6RPoyTa7LLrVVj47aNPbwOSqk99+QH0yVOyRL+ITR0V5BqL28?=
+ =?us-ascii?Q?9vEg56c238IRGN2jEseY6LN5sLfcpgw5zmzw/OS9MdQsSzallbpEyaKeNMT/?=
+ =?us-ascii?Q?EabGXdIag+S6BKQItOdIGI640P7jKriyX1bhTUPx+ODckOGHCINSUw4QKtam?=
+ =?us-ascii?Q?sPiDJQqFzFLIJgGwNbxM2OCPtYUE+TXQT5AkiSY/Ez57ENcekm1cVH+5TPDb?=
+ =?us-ascii?Q?Xtz50XWGLw1k8xTKn2Uvq2WXvuC1O/ImGJWWmyHaAZwxjXH0XOFetB/fypCP?=
+ =?us-ascii?Q?mOLYNr2R+80rVzAsYFLouUAl7vLoPjdiows+2TQ7rk2xstay0Bi+YP42VHMK?=
+ =?us-ascii?Q?GgGtoFvwB0CsYsgaY+CnM85bFMJCWlBGSeKmk58gtFBDnTq7e4P0UTTKPYvP?=
+ =?us-ascii?Q?LEl1VAbgxg27EZZA3WAURqwzJMxluJ4F10qa+Z/+Qpzg5L/njZp8TQPkeX7f?=
+ =?us-ascii?Q?7YXV1pPGVgcsDaErymZU7RbyuZbJHgXKfzlQC16XYY+5B9vydF5H/kHDU/Ab?=
+ =?us-ascii?Q?I/EZXJgca4TCKjVDoCP4ezW1vH3F63EPbnz+Vqqed+XmbAQFjxZgyVoYGuHp?=
+ =?us-ascii?Q?ZMR/LmzJTOhrwcTyvE3fCKYJA7HewRyW0dGUpxC04FyOLBeHKLxMjA1sBm8O?=
+ =?us-ascii?Q?ZLBccejtRJgzTX0mJhLuG8lfnRN6HHEWRkCRn0vcCZaXCMS1l33iPcedCbhs?=
+ =?us-ascii?Q?HejaXl+e3pVLp1S0cwWQL14VKE9zW127O0vsZ4kcbeddxEeT/D2ctFzghVTV?=
+ =?us-ascii?Q?bYmolNYsqZgbI3jL3p6Er+0yFgBPAzafq/NjEdUGKxCLZFCINLBLWk1NRDG3?=
+ =?us-ascii?Q?n8mGQV1GyQiMpQHHOuRtgJyi4n3CZNaQH9fj+0Z0sXNzIvG/9+qZt/RCVuPj?=
+ =?us-ascii?Q?CrcWevLYTtm8WnbD+TMnNWzymBwZ6jRFiZg+PVxKOOW06aYqbjapRXNow8mi?=
+ =?us-ascii?Q?oaW3FA1CWeSf0DJei4w95ngG8uErHBDgpAuAhJPJfwuY9GQSxfOkGNSDpzvh?=
+ =?us-ascii?Q?+QW8/ift0grPsI0UfOOFp9oLi3c4p33e9HDVk4b6oIljYjERXq5uHD6WmlrR?=
+ =?us-ascii?Q?IcCFv8dyzln+xD6nrDgXt34774XgxwnrYIyXiX8rBtn3HtK4vCfYeb9L1Myx?=
+ =?us-ascii?Q?FKdeSvsNLZ042d0BOJiwY4Uf7lQ63mK811kfN9xVN6SEDuqla5S2dmx0X0qW?=
+ =?us-ascii?Q?mS15EZelildqo7RZwo8bjVSL/DFuK+HEeuFPIsFRa7wEBZp2BFd1MMFrDwNj?=
+ =?us-ascii?Q?wDvfNa/bvgtqux1ZtSsNXdg+SkPpsgU3BAeYT+/k6Cn3xqeUNRCRYS6/bN0N?=
+ =?us-ascii?Q?CwHN9Zc1ZNAe8KWnb1o=3D?=
 X-Forefront-Antispam-Report:
-	CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:satlexmb07.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230040)(82310400026)(376014)(1800799024)(36860700013);DIR:OUT;SFP:1101;
+	CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:satlexmb07.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230040)(82310400026)(1800799024)(36860700013)(376014);DIR:OUT;SFP:1101;
 X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 13 Oct 2025 06:25:56.9695
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 13 Oct 2025 06:26:00.1232
  (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 77703603-47ca-4527-5a2a-08de0a215e99
+X-MS-Exchange-CrossTenant-Network-Message-Id: ec1f8c27-fc85-4538-b101-08de0a21607a
 X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
 X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[satlexmb07.amd.com]
 X-MS-Exchange-CrossTenant-AuthSource:
-	DS3PEPF0000C37C.namprd04.prod.outlook.com
+	DS3PEPF0000C37B.namprd04.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Anonymous
 X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH7PR12MB6000
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: LV2PR12MB5727
 
-From: Kai Huang <kai.huang@intel.com>
+Page modification logging(PML) is a hardware feature designed to track
+guest modified memory pages. PML enables the hypervisor to identify which
+pages in a guest's memory have been changed since the last checkpoint or
+during live migration.
 
-Move nested PML dirty logging update logic from VMX-specific code to common
-x86 infrastructure. Both VMX and SVM share identical logic: defer CPU dirty
-logging updates when running in L2, then process pending updates when
-exiting to L1.
+The PML feature is advertised via CPUID leaf 0x8000000A ECX[4] bit.
 
-No functional change.
-
-Signed-off-by: Kai Huang <kai.huang@intel.com>
-Co-developed-by: Nikunj A Dadhania <nikunj@amd.com>
+Acked-by: Borislav Petkov (AMD) <bp@alien8.de>
 Signed-off-by: Nikunj A Dadhania <nikunj@amd.com>
 ---
- arch/x86/include/asm/kvm_host.h |  3 ++-
- arch/x86/kvm/kvm_cache_regs.h   |  7 +++++++
- arch/x86/kvm/vmx/main.c         |  4 ++--
- arch/x86/kvm/vmx/nested.c       |  5 -----
- arch/x86/kvm/vmx/vmx.c          | 23 ++++-------------------
- arch/x86/kvm/vmx/vmx.h          |  3 +--
- arch/x86/kvm/vmx/x86_ops.h      |  2 +-
- arch/x86/kvm/x86.c              | 22 +++++++++++++++++++++-
- 8 files changed, 38 insertions(+), 31 deletions(-)
+ arch/x86/include/asm/cpufeatures.h | 1 +
+ arch/x86/kernel/cpu/scattered.c    | 1 +
+ 2 files changed, 2 insertions(+)
 
-diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
-index 73b16cecc06d..ca5def4f3585 100644
---- a/arch/x86/include/asm/kvm_host.h
-+++ b/arch/x86/include/asm/kvm_host.h
-@@ -862,6 +862,7 @@ struct kvm_vcpu_arch {
- 	struct kvm_mmu_memory_cache mmu_external_spt_cache;
+diff --git a/arch/x86/include/asm/cpufeatures.h b/arch/x86/include/asm/cpufeatures.h
+index f1a9f40622cd..66db158caa13 100644
+--- a/arch/x86/include/asm/cpufeatures.h
++++ b/arch/x86/include/asm/cpufeatures.h
+@@ -228,6 +228,7 @@
+ #define X86_FEATURE_PVUNLOCK		( 8*32+20) /* PV unlock function */
+ #define X86_FEATURE_VCPUPREEMPT		( 8*32+21) /* PV vcpu_is_preempted function */
+ #define X86_FEATURE_TDX_GUEST		( 8*32+22) /* "tdx_guest" Intel Trust Domain Extensions Guest */
++#define X86_FEATURE_PML			( 8*32+23) /* AMD Page Modification logging */
  
- 	struct page *pml_page;
-+	bool update_cpu_dirty_logging_pending;
- 
- 	/*
- 	 * QEMU userspace and the guest each have their own FPU state.
-@@ -1884,7 +1885,7 @@ struct kvm_x86_ops {
- 			       struct x86_exception *exception);
- 	void (*handle_exit_irqoff)(struct kvm_vcpu *vcpu);
- 
--	void (*update_cpu_dirty_logging)(struct kvm_vcpu *vcpu);
-+	void (*update_cpu_dirty_logging)(struct kvm_vcpu *vcpu, bool enable);
- 
- 	const struct kvm_x86_nested_ops *nested_ops;
- 
-diff --git a/arch/x86/kvm/kvm_cache_regs.h b/arch/x86/kvm/kvm_cache_regs.h
-index 8ddb01191d6f..0c4a832a9dab 100644
---- a/arch/x86/kvm/kvm_cache_regs.h
-+++ b/arch/x86/kvm/kvm_cache_regs.h
-@@ -238,6 +238,13 @@ static inline void leave_guest_mode(struct kvm_vcpu *vcpu)
- 		kvm_make_request(KVM_REQ_LOAD_EOI_EXITMAP, vcpu);
- 	}
- 
-+	/* Also see kvm_vcpu_update_cpu_dirty_logging() */
-+	if (vcpu->arch.update_cpu_dirty_logging_pending) {
-+		vcpu->arch.update_cpu_dirty_logging_pending = false;
-+		kvm_x86_call(update_cpu_dirty_logging)(vcpu,
-+				atomic_read(&vcpu->kvm->nr_memslots_dirty_logging));
-+	}
-+
- 	vcpu->stat.guest_mode = 0;
- }
- 
-diff --git a/arch/x86/kvm/vmx/main.c b/arch/x86/kvm/vmx/main.c
-index 0eb2773b2ae2..6fb97f6ce48e 100644
---- a/arch/x86/kvm/vmx/main.c
-+++ b/arch/x86/kvm/vmx/main.c
-@@ -103,7 +103,7 @@ static void vt_vcpu_load(struct kvm_vcpu *vcpu, int cpu)
- 	vmx_vcpu_load(vcpu, cpu);
- }
- 
--static void vt_update_cpu_dirty_logging(struct kvm_vcpu *vcpu)
-+static void vt_update_cpu_dirty_logging(struct kvm_vcpu *vcpu, bool enable)
- {
- 	/*
- 	 * Basic TDX does not support feature PML. KVM does not enable PML in
-@@ -112,7 +112,7 @@ static void vt_update_cpu_dirty_logging(struct kvm_vcpu *vcpu)
- 	if (WARN_ON_ONCE(is_td_vcpu(vcpu)))
- 		return;
- 
--	vmx_update_cpu_dirty_logging(vcpu);
-+	vmx_update_cpu_dirty_logging(vcpu, enable);
- }
- 
- static void vt_prepare_switch_to_guest(struct kvm_vcpu *vcpu)
-diff --git a/arch/x86/kvm/vmx/nested.c b/arch/x86/kvm/vmx/nested.c
-index 76271962cb70..0093fc389eae 100644
---- a/arch/x86/kvm/vmx/nested.c
-+++ b/arch/x86/kvm/vmx/nested.c
-@@ -5202,11 +5202,6 @@ void __nested_vmx_vmexit(struct kvm_vcpu *vcpu, u32 vm_exit_reason,
- 		vmx_set_virtual_apic_mode(vcpu);
- 	}
- 
--	if (vmx->nested.update_vmcs01_cpu_dirty_logging) {
--		vmx->nested.update_vmcs01_cpu_dirty_logging = false;
--		vmx_update_cpu_dirty_logging(vcpu);
--	}
--
- 	nested_put_vmcs12_pages(vcpu);
- 
- 	if (vmx->nested.reload_vmcs01_apic_access_page) {
-diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
-index 81216deb3959..ede5aaf24278 100644
---- a/arch/x86/kvm/vmx/vmx.c
-+++ b/arch/x86/kvm/vmx/vmx.c
-@@ -8194,27 +8194,12 @@ void vmx_cancel_hv_timer(struct kvm_vcpu *vcpu)
- }
- #endif
- 
--void vmx_update_cpu_dirty_logging(struct kvm_vcpu *vcpu)
-+void vmx_update_cpu_dirty_logging(struct kvm_vcpu *vcpu, bool enable)
- {
--	struct vcpu_vmx *vmx = to_vmx(vcpu);
--
--	if (WARN_ON_ONCE(!enable_pml))
--		return;
--
--	if (is_guest_mode(vcpu)) {
--		vmx->nested.update_vmcs01_cpu_dirty_logging = true;
--		return;
--	}
--
--	/*
--	 * Note, nr_memslots_dirty_logging can be changed concurrent with this
--	 * code, but in that case another update request will be made and so
--	 * the guest will never run with a stale PML value.
--	 */
--	if (atomic_read(&vcpu->kvm->nr_memslots_dirty_logging))
--		secondary_exec_controls_setbit(vmx, SECONDARY_EXEC_ENABLE_PML);
-+	if (enable)
-+		secondary_exec_controls_setbit(to_vmx(vcpu), SECONDARY_EXEC_ENABLE_PML);
- 	else
--		secondary_exec_controls_clearbit(vmx, SECONDARY_EXEC_ENABLE_PML);
-+		secondary_exec_controls_clearbit(to_vmx(vcpu), SECONDARY_EXEC_ENABLE_PML);
- }
- 
- void vmx_setup_mce(struct kvm_vcpu *vcpu)
-diff --git a/arch/x86/kvm/vmx/vmx.h b/arch/x86/kvm/vmx/vmx.h
-index d2dd63194ee2..22bf8860add4 100644
---- a/arch/x86/kvm/vmx/vmx.h
-+++ b/arch/x86/kvm/vmx/vmx.h
-@@ -133,7 +133,6 @@ struct nested_vmx {
- 
- 	bool change_vmcs01_virtual_apic_mode;
- 	bool reload_vmcs01_apic_access_page;
--	bool update_vmcs01_cpu_dirty_logging;
- 	bool update_vmcs01_apicv_status;
- 	bool update_vmcs01_hwapic_isr;
- 
-@@ -401,7 +400,7 @@ u64 vmx_get_l2_tsc_multiplier(struct kvm_vcpu *vcpu);
- 
- gva_t vmx_get_untagged_addr(struct kvm_vcpu *vcpu, gva_t gva, unsigned int flags);
- 
--void vmx_update_cpu_dirty_logging(struct kvm_vcpu *vcpu);
-+void vmx_update_cpu_dirty_logging(struct kvm_vcpu *vcpu, bool enable);
- 
- u64 vmx_get_supported_debugctl(struct kvm_vcpu *vcpu, bool host_initiated);
- bool vmx_is_valid_debugctl(struct kvm_vcpu *vcpu, u64 data, bool host_initiated);
-diff --git a/arch/x86/kvm/vmx/x86_ops.h b/arch/x86/kvm/vmx/x86_ops.h
-index 9697368d65b3..1ae01fa592cd 100644
---- a/arch/x86/kvm/vmx/x86_ops.h
-+++ b/arch/x86/kvm/vmx/x86_ops.h
-@@ -113,7 +113,7 @@ u64 vmx_get_l2_tsc_offset(struct kvm_vcpu *vcpu);
- u64 vmx_get_l2_tsc_multiplier(struct kvm_vcpu *vcpu);
- void vmx_write_tsc_offset(struct kvm_vcpu *vcpu);
- void vmx_write_tsc_multiplier(struct kvm_vcpu *vcpu);
--void vmx_update_cpu_dirty_logging(struct kvm_vcpu *vcpu);
-+void vmx_update_cpu_dirty_logging(struct kvm_vcpu *vcpu, bool enable);
- #ifdef CONFIG_X86_64
- int vmx_set_hv_timer(struct kvm_vcpu *vcpu, u64 guest_deadline_tsc,
- 		     bool *expired);
-diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-index 2b23d7721444..42479fcda688 100644
---- a/arch/x86/kvm/x86.c
-+++ b/arch/x86/kvm/x86.c
-@@ -149,6 +149,7 @@ struct kvm_x86_ops kvm_x86_ops __read_mostly;
- #include <asm/kvm-x86-ops.h>
- EXPORT_STATIC_CALL_GPL(kvm_x86_get_cs_db_l_bits);
- EXPORT_STATIC_CALL_GPL(kvm_x86_cache_reg);
-+EXPORT_STATIC_CALL_GPL(kvm_x86_update_cpu_dirty_logging);
- 
- static bool __read_mostly ignore_msrs = 0;
- module_param(ignore_msrs, bool, 0644);
-@@ -11055,6 +11056,25 @@ static void kvm_vcpu_reload_apic_access_page(struct kvm_vcpu *vcpu)
- 	kvm_x86_call(set_apic_access_page_addr)(vcpu);
- }
- 
-+static void kvm_vcpu_update_cpu_dirty_logging(struct kvm_vcpu *vcpu)
-+{
-+	if (WARN_ON_ONCE(!enable_pml))
-+		return;
-+
-+	if (is_guest_mode(vcpu)) {
-+		vcpu->arch.update_cpu_dirty_logging_pending = true;
-+		return;
-+	}
-+
-+	/*
-+	 * Note, nr_memslots_dirty_logging can be changed concurrently with this
-+	 * code, but in that case another update request will be made and so the
-+	 * guest will never run with a stale PML value.
-+	 */
-+	kvm_x86_call(update_cpu_dirty_logging)(vcpu,
-+			atomic_read(&vcpu->kvm->nr_memslots_dirty_logging));
-+}
-+
- /*
-  * Called within kvm->srcu read side.
-  * Returns 1 to let vcpu_run() continue the guest execution loop without
-@@ -11221,7 +11241,7 @@ static int vcpu_enter_guest(struct kvm_vcpu *vcpu)
- 			kvm_x86_call(recalc_intercepts)(vcpu);
- 
- 		if (kvm_check_request(KVM_REQ_UPDATE_CPU_DIRTY_LOGGING, vcpu))
--			kvm_x86_call(update_cpu_dirty_logging)(vcpu);
-+			kvm_vcpu_update_cpu_dirty_logging(vcpu);
- 
- 		if (kvm_check_request(KVM_REQ_UPDATE_PROTECTED_GUEST_STATE, vcpu)) {
- 			kvm_vcpu_reset(vcpu, true);
+ /* Intel-defined CPU features, CPUID level 0x00000007:0 (EBX), word 9 */
+ #define X86_FEATURE_FSGSBASE		( 9*32+ 0) /* "fsgsbase" RDFSBASE, WRFSBASE, RDGSBASE, WRGSBASE instructions*/
+diff --git a/arch/x86/kernel/cpu/scattered.c b/arch/x86/kernel/cpu/scattered.c
+index cf4ae822bcc0..1706b2f1ca4a 100644
+--- a/arch/x86/kernel/cpu/scattered.c
++++ b/arch/x86/kernel/cpu/scattered.c
+@@ -49,6 +49,7 @@ static const struct cpuid_bit cpuid_bits[] = {
+ 	{ X86_FEATURE_PROC_FEEDBACK,		CPUID_EDX, 11, 0x80000007, 0 },
+ 	{ X86_FEATURE_AMD_FAST_CPPC,		CPUID_EDX, 15, 0x80000007, 0 },
+ 	{ X86_FEATURE_MBA,			CPUID_EBX,  6, 0x80000008, 0 },
++	{ X86_FEATURE_PML,			CPUID_ECX,  4, 0x8000000A, 0 },
+ 	{ X86_FEATURE_COHERENCY_SFW_NO,		CPUID_EBX, 31, 0x8000001f, 0 },
+ 	{ X86_FEATURE_SMBA,			CPUID_EBX,  2, 0x80000020, 0 },
+ 	{ X86_FEATURE_BMEC,			CPUID_EBX,  3, 0x80000020, 0 },
 -- 
 2.48.1
 
