@@ -1,314 +1,328 @@
-Return-Path: <kvm+bounces-59907-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-59909-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2EB28BD4DBB
-	for <lists+kvm@lfdr.de>; Mon, 13 Oct 2025 18:15:32 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9E369BD4D9D
+	for <lists+kvm@lfdr.de>; Mon, 13 Oct 2025 18:14:46 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 9D29D4F99C6
-	for <lists+kvm@lfdr.de>; Mon, 13 Oct 2025 15:34:12 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D0AB942311D
+	for <lists+kvm@lfdr.de>; Mon, 13 Oct 2025 15:39:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0B5A930F7F5;
-	Mon, 13 Oct 2025 15:21:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 98954311951;
+	Mon, 13 Oct 2025 15:26:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="HTo7fZEw"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="YttuaUVj"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-wm1-f74.google.com (mail-wm1-f74.google.com [209.85.128.74])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3F7B230F55F
-	for <kvm@vger.kernel.org>; Mon, 13 Oct 2025 15:21:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.74
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 94E8331159E;
+	Mon, 13 Oct 2025 15:26:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1760368866; cv=none; b=p9khzKUmUluAtXu1u/feAZLFS1lImnKGoL2Yn7CYZmP/5Zqm5tDirSxLb7/NoAvoQwXY/pFEwajFszlYpAJbCIi2vete/OxU3Lm10CZCjW4aeI28PZyWp24awk3DXMxZBWKJyz/x/x0/QjogVCNxdne5s2w3xury2VhIKqz9iI0=
+	t=1760369192; cv=none; b=ZCP0lftBp5+mT7TvlXeXXrAT33+hCJl40mTCKsmN9DFEEF8R2rzDKTMeGXftXo7czgm90du9WweoYChmdSdnoSrcrpg+Ke6kzUHbP1YyUxZ+oIAqnCy9y61ElALM9dmaVhstmr3v72OH7ss/bL+TlwFeNqM37wRc+1Tb0q3/VDc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1760368866; c=relaxed/simple;
-	bh=uVIIcfGUtnM0AFmoNWciBQ3Oy6FcGT5tcohKaCO7Fdk=;
-	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=gr3xIXewARGC5FNQft5JwY6wITmYD7VtaJJvdcDYkilOFZDrj3JEVRn6PDBhRGRsGWZcBs1mPfMo9k0rIv4k+zs/tviyzezQ8zt8u2avokWuCxDv7oauQvIFzv87i2bCXegUurUwlm43MhGOypsemlRic3zJgNtJ7bl336WiERo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--jackmanb.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=HTo7fZEw; arc=none smtp.client-ip=209.85.128.74
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--jackmanb.bounces.google.com
-Received: by mail-wm1-f74.google.com with SMTP id 5b1f17b1804b1-46eee58d405so25823675e9.1
-        for <kvm@vger.kernel.org>; Mon, 13 Oct 2025 08:21:03 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1760368862; x=1760973662; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=YIYoPCNyBFGg9vKc8jF45CxIFXipDwwSdrNJ736RRBY=;
-        b=HTo7fZEwmN/AchWolAniP+Y4PdwpMVrwbOAXne7mzNG4myDYJ5qbQ+rJ+V6PTgj/cC
-         lqduToxSwIztdVYxE5eNzqwhYLKEhizNJLcl5XjKazvgKlm8WrAyJD7LamHnmz8/Leq0
-         7cXMHVYqMlF7ly6QEH5DjrboKM8xp1zdy4Ojl2qGl/YbeAYhKYiOBMZzXbhUw2T2opIW
-         KZk8Usj+lTKDMiIb9rVeQXiakJlohU+I8aWeC+IxR1MWe8TQYs0+blaGlQq/HFcq7Em0
-         B46d0IFTGtC6l6mEWRniwIljSkUUIba3qrm2zU0pFB5UpdHyHW/yyy/8fCA7PPeC15XI
-         k7wA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1760368862; x=1760973662;
-        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=YIYoPCNyBFGg9vKc8jF45CxIFXipDwwSdrNJ736RRBY=;
-        b=RHVjVNm+VlKTaNBMzeVw6NPTq9civGgSgejNeOQs2KdRVDw9I10Px3ZWQR9QcPmMpJ
-         4t/5SULC7skWQaIWAXDnVB1ulM6EEMve8GO1Ox4IiTKV9A2a5pwMfREWCJbfzE/LJQpL
-         n+VpCuQRsXlEsu6tCRiI4rGFGVqmGOirMdAGRnuiUnEBll/sTCtvguJbpyfWbBAzsJor
-         e5YLMvNE/+m0kn2QbWGvZWoiOZ+YIBAyJJAd5t11z9aHrv/J+kcMaRio2ai1p4qmg9SK
-         YiW+yiJ9lwunjvjcIRh8yPNQ2Evk3e4tIrerocwfysg35vAfS2DRrEGlxUw6pLevH3a6
-         jOuw==
-X-Forwarded-Encrypted: i=1; AJvYcCUJwLb38M1HNGraLwARhDAG9clzOZHRqPxAhkSG7mLBlw1UgOtMPoqF5HDJvsVc4DeVdXg=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yyq0TwQPpIUgzzLi1cfmzeQ5neVnXvMwfhLY+GSYHRvONsopkqZ
-	VCGtDivmepWUWjdpsddWiWTcuYqAfeGWZhcZ5h0xmI2/m5ba/R1Zzt+J/jtt2CAoT0y2RdCIGv9
-	NhWQgdKEZP+0JEQ==
-X-Google-Smtp-Source: AGHT+IFVI/ebIiE03xp+IXTAIvzD7VP5Hg6xiJr5X8tY19ifba+QDyv+tPutqETwPbUzyh9TyIvbuut1FWkifw==
-X-Received: from wmcq4.prod.google.com ([2002:a05:600c:c104:b0:46f:aa50:d6fc])
- (user=jackmanb job=prod-delivery.src-stubby-dispatcher) by
- 2002:a05:600c:3b1b:b0:46f:b327:31c4 with SMTP id 5b1f17b1804b1-46fb3273563mr98314565e9.14.1760368862615;
- Mon, 13 Oct 2025 08:21:02 -0700 (PDT)
-Date: Mon, 13 Oct 2025 15:20:52 +0000
+	s=arc-20240116; t=1760369192; c=relaxed/simple;
+	bh=nDcAY6cfJF+Hz/RDzBDDYPPxaUyhkXABHvgRNxvqTpw=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=EuvX9XNaz8n1lGMEgUNqnEni76Wl8EBvnY1seapvqQBKjOguobszEXufaw02EmkayDPHBIPTNjVB6xNnaEdeLkDMNIO0ka/16PiTQlLmuK75SmxtXGDjvUVtOcDA2c/TU3WvO0w4gOqrNEUjHlquuJtlJxCDPFNfHl3hzcAz8qU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=YttuaUVj; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 844F5C4CEE7;
+	Mon, 13 Oct 2025 15:26:31 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1760369192;
+	bh=nDcAY6cfJF+Hz/RDzBDDYPPxaUyhkXABHvgRNxvqTpw=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+	b=YttuaUVj+Kp9Af1Z/wOmzqR4x6u6MKQoxsIMYnkRbbYgEmRoCGzLAnLZ8udyX3+Nj
+	 fbHvebL0J/revALUa7eNsii3rFnEF/H1FJS7IDEAjRJFFBCbS0Z7DiQ4HFwJx2pfiy
+	 5kltRqFbwykOv4pNIESnT4GACAyFkqxIDZ1vnJcAFikQT0VKqYLp5lH/8XM3+J/T0j
+	 I7LnUgPKS8O6T4tnF2v/I89rZGyKSv+sv44qeoxlig01HaC9vpwRzbr4NDAj0F0qH9
+	 ske2ZxLB8xL/DHHOBUalLCImj/dreE+P0o8GWO2gOx47UIgYlr2eZnxqOn5kaoyjof
+	 Vt4E9qGd5TdqQ==
+From: Leon Romanovsky <leon@kernel.org>
+To: Alex Williamson <alex.williamson@redhat.com>
+Cc: Leon Romanovsky <leonro@nvidia.com>,
+	Jason Gunthorpe <jgg@nvidia.com>,
+	Andrew Morton <akpm@linux-foundation.org>,
+	Bjorn Helgaas <bhelgaas@google.com>,
+	=?UTF-8?q?Christian=20K=C3=B6nig?= <christian.koenig@amd.com>,
+	dri-devel@lists.freedesktop.org,
+	iommu@lists.linux.dev,
+	Jens Axboe <axboe@kernel.dk>,
+	Joerg Roedel <joro@8bytes.org>,
+	kvm@vger.kernel.org,
+	linaro-mm-sig@lists.linaro.org,
+	linux-block@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	linux-media@vger.kernel.org,
+	linux-mm@kvack.org,
+	linux-pci@vger.kernel.org,
+	Logan Gunthorpe <logang@deltatee.com>,
+	Marek Szyprowski <m.szyprowski@samsung.com>,
+	Robin Murphy <robin.murphy@arm.com>,
+	Sumit Semwal <sumit.semwal@linaro.org>,
+	Vivek Kasireddy <vivek.kasireddy@intel.com>,
+	Will Deacon <will@kernel.org>
+Subject: [PATCH v5 1/9] PCI/P2PDMA: Separate the mmap() support from the core logic
+Date: Mon, 13 Oct 2025 18:26:03 +0300
+Message-ID: <1044f7aa09836d63de964d4eb6e646b3071c1fdb.1760368250.git.leon@kernel.org>
+X-Mailer: git-send-email 2.51.0
+In-Reply-To: <cover.1760368250.git.leon@kernel.org>
+References: <cover.1760368250.git.leon@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-X-B4-Tracking: v=1; b=H4sIANMY7WgC/6tWKk4tykwtVrJSqFYqSi3LLM7MzwNyDHUUlJIzE
- vPSU3UzU4B8JSMDI1NDA0Nj3SQT3RzDkjTdgtSi5IJSXXNLY0MLw7REUwsLEyWgpoKi1LTMCrC B0bG1tQCGPpaCYAAAAA==
-X-Change-Id: 20251013-b4-l1tf-percpu-793181fa5884
-X-Mailer: b4 0.14.2
-Message-ID: <20251013-b4-l1tf-percpu-v1-1-d65c5366ea1a@google.com>
-Subject: [PATCH] KVM: x86: Unify L1TF flushing under per-CPU variable
-From: Brendan Jackman <jackmanb@google.com>
-To: Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>, 
-	Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org, 
-	"H. Peter Anvin" <hpa@zytor.com>, Sean Christopherson <seanjc@google.com>, Paolo Bonzini <pbonzini@redhat.com>
-Cc: linux-kernel@vger.kernel.org, kvm@vger.kernel.org, 
-	Brendan Jackman <jackmanb@google.com>
-Content-Type: text/plain; charset="utf-8"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 
-Currently the tracking of the need to flush L1D for L1TF is tracked by
-two bits: one per-CPU and one per-vCPU.
+From: Leon Romanovsky <leonro@nvidia.com>
 
-The per-vCPU bit is always set when the vCPU shows up on a core, so
-there is no interesting state that's truly per-vCPU. Indeed, this is a
-requirement, since L1D is a part of the physical CPU.
+Currently the P2PDMA code requires a pgmap and a struct page to
+function. The was serving three important purposes:
 
-So simplify this by combining the two bits.
+ - DMA API compatibility, where scatterlist required a struct page as
+   input
 
-Since this requires a DECLARE_PER_CPU() which belongs in kvm_host.h,
-also move the remaining helper definitions there to live next to the
-declaration.
+ - Life cycle management, the percpu_ref is used to prevent UAF during
+   device hot unplug
 
-Signed-off-by: Brendan Jackman <jackmanb@google.com>
+ - A way to get the P2P provider data through the pci_p2pdma_pagemap
+
+The DMA API now has a new flow, and has gained phys_addr_t support, so
+it no longer needs struct pages to perform P2P mapping.
+
+Lifecycle management can be delegated to the user, DMABUF for instance
+has a suitable invalidation protocol that does not require struct page.
+
+Finding the P2P provider data can also be managed by the caller
+without need to look it up from the phys_addr.
+
+Split the P2PDMA code into two layers. The optional upper layer,
+effectively, provides a way to mmap() P2P memory into a VMA by
+providing struct page, pgmap, a genalloc and sysfs.
+
+The lower layer provides the actual P2P infrastructure and is wrapped
+up in a new struct p2pdma_provider. Rework the mmap layer to use new
+p2pdma_provider based APIs.
+
+Drivers that do not want to put P2P memory into VMA's can allocate a
+struct p2pdma_provider after probe() starts and free it before
+remove() completes. When DMA mapping the driver must convey the struct
+p2pdma_provider to the DMA mapping code along with a phys_addr of the
+MMIO BAR slice to map. The driver must ensure that no DMA mapping
+outlives the lifetime of the struct p2pdma_provider.
+
+The intended target of this new API layer is DMABUF. There is usually
+only a single p2pdma_provider for a DMABUF exporter. Most drivers can
+establish the p2pdma_provider during probe, access the single instance
+during DMABUF attach and use that to drive the DMA mapping.
+
+DMABUF provides an invalidation mechanism that can guarantee all DMA
+is halted and the DMA mappings are undone prior to destroying the
+struct p2pdma_provider. This ensures there is no UAF through DMABUFs
+that are lingering past driver removal.
+
+The new p2pdma_provider layer cannot be used to create P2P memory that
+can be mapped into VMA's, be used with pin_user_pages(), O_DIRECT, and
+so on. These use cases must still use the mmap() layer. The
+p2pdma_provider layer is principally for DMABUF-like use cases where
+DMABUF natively manages the life cycle and access instead of
+vmas/pin_user_pages()/struct page.
+
+In addition, remove the bus_off field from pci_p2pdma_map_state since
+it duplicates information already available in the pgmap structure.
+The bus_offset is only used in one location (pci_p2pdma_bus_addr_map)
+and is always identical to pgmap->bus_offset.
+
+Signed-off-by: Jason Gunthorpe <jgg@nvidia.com>
+Signed-off-by: Leon Romanovsky <leonro@nvidia.com>
 ---
- arch/x86/include/asm/hardirq.h  | 26 --------------------------
- arch/x86/include/asm/idtentry.h |  1 +
- arch/x86/include/asm/kvm_host.h | 21 ++++++++++++++++++---
- arch/x86/kvm/mmu/mmu.c          |  2 +-
- arch/x86/kvm/vmx/nested.c       |  2 +-
- arch/x86/kvm/vmx/vmx.c          | 17 +++--------------
- arch/x86/kvm/x86.c              | 12 +++++++++---
- 7 files changed, 33 insertions(+), 48 deletions(-)
+ drivers/pci/p2pdma.c       | 43 ++++++++++++++++++++------------------
+ include/linux/pci-p2pdma.h | 19 ++++++++++++-----
+ 2 files changed, 37 insertions(+), 25 deletions(-)
 
-diff --git a/arch/x86/include/asm/hardirq.h b/arch/x86/include/asm/hardirq.h
-index f00c09ffe6a95f07342bb0c6cea3769d71eecfa9..29d8fa43d4404add3b191821e42c3526b0f2c950 100644
---- a/arch/x86/include/asm/hardirq.h
-+++ b/arch/x86/include/asm/hardirq.h
-@@ -5,9 +5,6 @@
- #include <linux/threads.h>
+diff --git a/drivers/pci/p2pdma.c b/drivers/pci/p2pdma.c
+index 78e108e47254..59cd6fb40e83 100644
+--- a/drivers/pci/p2pdma.c
++++ b/drivers/pci/p2pdma.c
+@@ -28,9 +28,8 @@ struct pci_p2pdma {
+ };
  
- typedef struct {
--#if IS_ENABLED(CONFIG_KVM_INTEL)
--	u8	     kvm_cpu_l1tf_flush_l1d;
--#endif
- 	unsigned int __nmi_count;	/* arch dependent */
- #ifdef CONFIG_X86_LOCAL_APIC
- 	unsigned int apic_timer_irqs;	/* arch dependent */
-@@ -68,27 +65,4 @@ extern u64 arch_irq_stat(void);
- DECLARE_PER_CPU_CACHE_HOT(u16, __softirq_pending);
- #define local_softirq_pending_ref       __softirq_pending
+ struct pci_p2pdma_pagemap {
+-	struct pci_dev *provider;
+-	u64 bus_offset;
+ 	struct dev_pagemap pgmap;
++	struct p2pdma_provider mem;
+ };
  
--#if IS_ENABLED(CONFIG_KVM_INTEL)
--/*
-- * This function is called from noinstr interrupt contexts
-- * and must be inlined to not get instrumentation.
-- */
--static __always_inline void kvm_set_cpu_l1tf_flush_l1d(void)
--{
--	__this_cpu_write(irq_stat.kvm_cpu_l1tf_flush_l1d, 1);
--}
--
--static __always_inline void kvm_clear_cpu_l1tf_flush_l1d(void)
--{
--	__this_cpu_write(irq_stat.kvm_cpu_l1tf_flush_l1d, 0);
--}
--
--static __always_inline bool kvm_get_cpu_l1tf_flush_l1d(void)
--{
--	return __this_cpu_read(irq_stat.kvm_cpu_l1tf_flush_l1d);
--}
--#else /* !IS_ENABLED(CONFIG_KVM_INTEL) */
--static __always_inline void kvm_set_cpu_l1tf_flush_l1d(void) { }
--#endif /* IS_ENABLED(CONFIG_KVM_INTEL) */
--
- #endif /* _ASM_X86_HARDIRQ_H */
-diff --git a/arch/x86/include/asm/idtentry.h b/arch/x86/include/asm/idtentry.h
-index a4ec27c6798875900cbdbba927918e70b900f63b..67fb1adadbb8ac2bd083ba6245de2e7d58b5b398 100644
---- a/arch/x86/include/asm/idtentry.h
-+++ b/arch/x86/include/asm/idtentry.h
-@@ -12,6 +12,7 @@
- #include <linux/hardirq.h>
+ static struct pci_p2pdma_pagemap *to_p2p_pgmap(struct dev_pagemap *pgmap)
+@@ -204,8 +203,8 @@ static void p2pdma_page_free(struct page *page)
+ {
+ 	struct pci_p2pdma_pagemap *pgmap = to_p2p_pgmap(page_pgmap(page));
+ 	/* safe to dereference while a reference is held to the percpu ref */
+-	struct pci_p2pdma *p2pdma =
+-		rcu_dereference_protected(pgmap->provider->p2pdma, 1);
++	struct pci_p2pdma *p2pdma = rcu_dereference_protected(
++		to_pci_dev(pgmap->mem.owner)->p2pdma, 1);
+ 	struct percpu_ref *ref;
  
- #include <asm/irq_stack.h>
-+#include <asm/kvm_host.h>
+ 	gen_pool_free_owner(p2pdma->pool, (uintptr_t)page_to_virt(page),
+@@ -270,14 +269,15 @@ static int pci_p2pdma_setup(struct pci_dev *pdev)
  
- typedef void (*idtentry_t)(struct pt_regs *regs);
- 
-diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
-index 48598d017d6f3f07263a2ffffe670be2658eb9cb..d93c2b9dbfbc9824cce65256f606f32e41c93167 100644
---- a/arch/x86/include/asm/kvm_host.h
-+++ b/arch/x86/include/asm/kvm_host.h
-@@ -1055,9 +1055,6 @@ struct kvm_vcpu_arch {
- 	/* be preempted when it's in kernel-mode(cpl=0) */
- 	bool preempted_in_kernel;
- 
--	/* Flush the L1 Data cache for L1TF mitigation on VMENTER */
--	bool l1tf_flush_l1d;
--
- 	/* Host CPU on which VM-entry was most recently attempted */
- 	int last_vmentry_cpu;
- 
-@@ -2476,4 +2473,22 @@ static inline bool kvm_arch_has_irq_bypass(void)
- 	return enable_device_posted_irqs;
- }
- 
-+#if IS_ENABLED(CONFIG_KVM_INTEL)
-+
-+DECLARE_PER_CPU(bool, l1tf_flush_l1d);
-+
-+/*
-+ * This function is called from noinstr interrupt contexts
-+ * and must be inlined to not get instrumentation.
-+ */
-+static __always_inline void kvm_set_cpu_l1tf_flush_l1d(void)
-+{
-+	__this_cpu_write(l1tf_flush_l1d, true);
-+}
-+
-+#else /* !IS_ENABLED(CONFIG_KVM_INTEL) */
-+static __always_inline void kvm_set_cpu_l1tf_flush_l1d(void) { }
-+#endif /* IS_ENABLED(CONFIG_KVM_INTEL) */
-+
-+
- #endif /* _ASM_X86_KVM_HOST_H */
-diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
-index 667d66cf76d5e52c22f9517914307244ae868eea..8c0dce401a42d977756ca82d249bb33c858b9c9f 100644
---- a/arch/x86/kvm/mmu/mmu.c
-+++ b/arch/x86/kvm/mmu/mmu.c
-@@ -4859,7 +4859,7 @@ int kvm_handle_page_fault(struct kvm_vcpu *vcpu, u64 error_code,
- 	 */
- 	BUILD_BUG_ON(lower_32_bits(PFERR_SYNTHETIC_MASK));
- 
--	vcpu->arch.l1tf_flush_l1d = true;
-+	kvm_set_cpu_l1tf_flush_l1d();
- 	if (!flags) {
- 		trace_kvm_page_fault(vcpu, fault_address, error_code);
- 
-diff --git a/arch/x86/kvm/vmx/nested.c b/arch/x86/kvm/vmx/nested.c
-index 76271962cb7083b475de6d7d24bf9cb918050650..5035cfdc4e55365bfabf08c704b9bff5c06267a1 100644
---- a/arch/x86/kvm/vmx/nested.c
-+++ b/arch/x86/kvm/vmx/nested.c
-@@ -3880,7 +3880,7 @@ static int nested_vmx_run(struct kvm_vcpu *vcpu, bool launch)
- 		goto vmentry_failed;
- 
- 	/* Hide L1D cache contents from the nested guest.  */
--	vmx->vcpu.arch.l1tf_flush_l1d = true;
-+	kvm_set_cpu_l1tf_flush_l1d();
+ static void pci_p2pdma_unmap_mappings(void *data)
+ {
+-	struct pci_dev *pdev = data;
++	struct pci_p2pdma_pagemap *p2p_pgmap = data;
  
  	/*
- 	 * Must happen outside of nested_vmx_enter_non_root_mode() as it will
-diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
-index 546272a5d34da301710df1d89414f41fc9b24a1f..f982f6721dc3e0dfe046881c72732326e16fcfb3 100644
---- a/arch/x86/kvm/vmx/vmx.c
-+++ b/arch/x86/kvm/vmx/vmx.c
-@@ -6673,25 +6673,14 @@ static noinstr void vmx_l1d_flush(struct kvm_vcpu *vcpu)
- 	 * 'always'
+ 	 * Removing the alloc attribute from sysfs will call
+ 	 * unmap_mapping_range() on the inode, teardown any existing userspace
+ 	 * mappings and prevent new ones from being created.
  	 */
- 	if (static_branch_likely(&vmx_l1d_flush_cond)) {
--		bool flush_l1d;
+-	sysfs_remove_file_from_group(&pdev->dev.kobj, &p2pmem_alloc_attr.attr,
++	sysfs_remove_file_from_group(&p2p_pgmap->mem.owner->kobj,
++				     &p2pmem_alloc_attr.attr,
+ 				     p2pmem_group.name);
+ }
+ 
+@@ -328,10 +328,9 @@ int pci_p2pdma_add_resource(struct pci_dev *pdev, int bar, size_t size,
+ 	pgmap->nr_range = 1;
+ 	pgmap->type = MEMORY_DEVICE_PCI_P2PDMA;
+ 	pgmap->ops = &p2pdma_pgmap_ops;
 -
- 		/*
- 		 * Clear the per-vcpu flush bit, it gets set again if the vCPU
- 		 * is reloaded, i.e. if the vCPU is scheduled out or if KVM
- 		 * exits to userspace, or if KVM reaches one of the unsafe
--		 * VMEXIT handlers, e.g. if KVM calls into the emulator.
-+		 * VMEXIT handlers, e.g. if KVM calls into the emulator, or from the
-+		 * interrupt handlers.
- 		 */
--		flush_l1d = vcpu->arch.l1tf_flush_l1d;
--		vcpu->arch.l1tf_flush_l1d = false;
--
--		/*
--		 * Clear the per-cpu flush bit, it gets set again from
--		 * the interrupt handlers.
--		 */
--		flush_l1d |= kvm_get_cpu_l1tf_flush_l1d();
--		kvm_clear_cpu_l1tf_flush_l1d();
--
--		if (!flush_l1d)
-+		if (!this_cpu_xchg(l1tf_flush_l1d, false))
- 			return;
+-	p2p_pgmap->provider = pdev;
+-	p2p_pgmap->bus_offset = pci_bus_address(pdev, bar) -
+-		pci_resource_start(pdev, bar);
++	p2p_pgmap->mem.owner = &pdev->dev;
++	p2p_pgmap->mem.bus_offset =
++		pci_bus_address(pdev, bar) - pci_resource_start(pdev, bar);
+ 
+ 	addr = devm_memremap_pages(&pdev->dev, pgmap);
+ 	if (IS_ERR(addr)) {
+@@ -340,7 +339,7 @@ int pci_p2pdma_add_resource(struct pci_dev *pdev, int bar, size_t size,
  	}
  
-diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-index 4b8138bd48572fd161eda73d2dbdc1dcd0bcbcac..766d61516602e0f4975930224fc57b5a511281e5 100644
---- a/arch/x86/kvm/x86.c
-+++ b/arch/x86/kvm/x86.c
-@@ -171,6 +171,12 @@ bool __read_mostly enable_vmware_backdoor = false;
- module_param(enable_vmware_backdoor, bool, 0444);
- EXPORT_SYMBOL_FOR_KVM_INTERNAL(enable_vmware_backdoor);
+ 	error = devm_add_action_or_reset(&pdev->dev, pci_p2pdma_unmap_mappings,
+-					 pdev);
++					 p2p_pgmap);
+ 	if (error)
+ 		goto pages_free;
  
-+#if IS_ENABLED(CONFIG_KVM_INTEL)
-+/* Flush the L1 Data cache for L1TF mitigation on VMENTER */
-+DEFINE_PER_CPU(bool, l1tf_flush_l1d);
-+EXPORT_SYMBOL_FOR_KVM_INTERNAL(l1tf_flush_l1d);
-+#endif
+@@ -972,16 +971,16 @@ void pci_p2pmem_publish(struct pci_dev *pdev, bool publish)
+ }
+ EXPORT_SYMBOL_GPL(pci_p2pmem_publish);
+ 
+-static enum pci_p2pdma_map_type pci_p2pdma_map_type(struct dev_pagemap *pgmap,
+-						    struct device *dev)
++static enum pci_p2pdma_map_type
++pci_p2pdma_map_type(struct p2pdma_provider *provider, struct device *dev)
+ {
+ 	enum pci_p2pdma_map_type type = PCI_P2PDMA_MAP_NOT_SUPPORTED;
+-	struct pci_dev *provider = to_p2p_pgmap(pgmap)->provider;
++	struct pci_dev *pdev = to_pci_dev(provider->owner);
+ 	struct pci_dev *client;
+ 	struct pci_p2pdma *p2pdma;
+ 	int dist;
+ 
+-	if (!provider->p2pdma)
++	if (!pdev->p2pdma)
+ 		return PCI_P2PDMA_MAP_NOT_SUPPORTED;
+ 
+ 	if (!dev_is_pci(dev))
+@@ -990,7 +989,7 @@ static enum pci_p2pdma_map_type pci_p2pdma_map_type(struct dev_pagemap *pgmap,
+ 	client = to_pci_dev(dev);
+ 
+ 	rcu_read_lock();
+-	p2pdma = rcu_dereference(provider->p2pdma);
++	p2pdma = rcu_dereference(pdev->p2pdma);
+ 
+ 	if (p2pdma)
+ 		type = xa_to_value(xa_load(&p2pdma->map_types,
+@@ -998,7 +997,7 @@ static enum pci_p2pdma_map_type pci_p2pdma_map_type(struct dev_pagemap *pgmap,
+ 	rcu_read_unlock();
+ 
+ 	if (type == PCI_P2PDMA_MAP_UNKNOWN)
+-		return calc_map_type_and_dist(provider, client, &dist, true);
++		return calc_map_type_and_dist(pdev, client, &dist, true);
+ 
+ 	return type;
+ }
+@@ -1006,9 +1005,13 @@ static enum pci_p2pdma_map_type pci_p2pdma_map_type(struct dev_pagemap *pgmap,
+ void __pci_p2pdma_update_state(struct pci_p2pdma_map_state *state,
+ 		struct device *dev, struct page *page)
+ {
+-	state->pgmap = page_pgmap(page);
+-	state->map = pci_p2pdma_map_type(state->pgmap, dev);
+-	state->bus_off = to_p2p_pgmap(state->pgmap)->bus_offset;
++	struct pci_p2pdma_pagemap *p2p_pgmap = to_p2p_pgmap(page_pgmap(page));
 +
- /*
-  * Flags to manipulate forced emulation behavior (any non-zero value will
-  * enable forced emulation).
-@@ -5190,7 +5196,7 @@ void kvm_arch_vcpu_load(struct kvm_vcpu *vcpu, int cpu)
++	if (state->mem == &p2p_pgmap->mem)
++		return;
++
++	state->mem = &p2p_pgmap->mem;
++	state->map = pci_p2pdma_map_type(&p2p_pgmap->mem, dev);
+ }
+ 
+ /**
+diff --git a/include/linux/pci-p2pdma.h b/include/linux/pci-p2pdma.h
+index 951f81a38f3a..1400f3ad4299 100644
+--- a/include/linux/pci-p2pdma.h
++++ b/include/linux/pci-p2pdma.h
+@@ -16,6 +16,16 @@
+ struct block_device;
+ struct scatterlist;
+ 
++/**
++ * struct p2pdma_provider
++ *
++ * A p2pdma provider is a range of MMIO address space available to the CPU.
++ */
++struct p2pdma_provider {
++	struct device *owner;
++	u64 bus_offset;
++};
++
+ #ifdef CONFIG_PCI_P2PDMA
+ int pci_p2pdma_add_resource(struct pci_dev *pdev, int bar, size_t size,
+ 		u64 offset);
+@@ -139,11 +149,11 @@ enum pci_p2pdma_map_type {
+ };
+ 
+ struct pci_p2pdma_map_state {
+-	struct dev_pagemap *pgmap;
++	struct p2pdma_provider *mem;
+ 	enum pci_p2pdma_map_type map;
+-	u64 bus_off;
+ };
+ 
++
+ /* helper for pci_p2pdma_state(), do not use directly */
+ void __pci_p2pdma_update_state(struct pci_p2pdma_map_state *state,
+ 		struct device *dev, struct page *page);
+@@ -162,8 +172,7 @@ pci_p2pdma_state(struct pci_p2pdma_map_state *state, struct device *dev,
+ 		struct page *page)
  {
- 	struct kvm_pmu *pmu = vcpu_to_pmu(vcpu);
- 
--	vcpu->arch.l1tf_flush_l1d = true;
-+	kvm_set_cpu_l1tf_flush_l1d();
- 
- 	if (vcpu->scheduled_out && pmu->version && pmu->event_count) {
- 		pmu->need_cleanup = true;
-@@ -8000,7 +8006,7 @@ int kvm_write_guest_virt_system(struct kvm_vcpu *vcpu, gva_t addr, void *val,
- 				unsigned int bytes, struct x86_exception *exception)
- {
- 	/* kvm_write_guest_virt_system can pull in tons of pages. */
--	vcpu->arch.l1tf_flush_l1d = true;
-+	kvm_set_cpu_l1tf_flush_l1d();
- 
- 	return kvm_write_guest_virt_helper(addr, val, bytes, vcpu,
- 					   PFERR_WRITE_MASK, exception);
-@@ -9396,7 +9402,7 @@ int x86_emulate_instruction(struct kvm_vcpu *vcpu, gpa_t cr2_or_gpa,
- 		return handle_emulation_failure(vcpu, emulation_type);
+ 	if (IS_ENABLED(CONFIG_PCI_P2PDMA) && is_pci_p2pdma_page(page)) {
+-		if (state->pgmap != page_pgmap(page))
+-			__pci_p2pdma_update_state(state, dev, page);
++		__pci_p2pdma_update_state(state, dev, page);
+ 		return state->map;
  	}
+ 	return PCI_P2PDMA_MAP_NONE;
+@@ -181,7 +190,7 @@ static inline dma_addr_t
+ pci_p2pdma_bus_addr_map(struct pci_p2pdma_map_state *state, phys_addr_t paddr)
+ {
+ 	WARN_ON_ONCE(state->map != PCI_P2PDMA_MAP_BUS_ADDR);
+-	return paddr + state->bus_off;
++	return paddr + state->mem->bus_offset;
+ }
  
--	vcpu->arch.l1tf_flush_l1d = true;
-+	kvm_set_cpu_l1tf_flush_l1d();
- 
- 	if (!(emulation_type & EMULTYPE_NO_DECODE)) {
- 		kvm_clear_exception_queue(vcpu);
-
----
-base-commit: 6b36119b94d0b2bb8cea9d512017efafd461d6ac
-change-id: 20251013-b4-l1tf-percpu-793181fa5884
-
-Best regards,
+ #endif /* _LINUX_PCI_P2P_H */
 -- 
-Brendan Jackman <jackmanb@google.com>
+2.51.0
 
 
