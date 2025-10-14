@@ -1,51 +1,52 @@
-Return-Path: <kvm+bounces-59975-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-59976-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5A0DBBD6F5E
-	for <lists+kvm@lfdr.de>; Tue, 14 Oct 2025 03:16:36 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id F3D27BD6F6E
+	for <lists+kvm@lfdr.de>; Tue, 14 Oct 2025 03:17:09 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 5755F4F96FA
-	for <lists+kvm@lfdr.de>; Tue, 14 Oct 2025 01:14:56 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A19FD408AD7
+	for <lists+kvm@lfdr.de>; Tue, 14 Oct 2025 01:15:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AB432301007;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EA6B230101B;
 	Tue, 14 Oct 2025 01:11:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=zytor.com header.i=@zytor.com header.b="RT+sRZVm"
+	dkim=pass (2048-bit key) header.d=zytor.com header.i=@zytor.com header.b="Ow3YVljB"
 X-Original-To: kvm@vger.kernel.org
 Received: from mail.zytor.com (terminus.zytor.com [198.137.202.136])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 814792FF673;
-	Tue, 14 Oct 2025 01:11:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 836302FF675;
+	Tue, 14 Oct 2025 01:11:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.136
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1760404276; cv=none; b=Tsw9rc6GAHxIXItGTHCeTA6RZGFPe2XqwdeVyDmHPSv7Jqk6sny9yayjq4hvMj85y6Q839HFZhDdO6SQOghh6tQ2ID8v2kbS5CqRuZvzhH59XcK5dS7W/t4kdg/zHMmtfEaaC2O08P7lFJ3LfevwwOC8VO+FAbWnoGXWgqsU0Uw=
+	t=1760404276; cv=none; b=lVqf5Rn8NbfX4ft2NMn7rS5UySvHL5WR/i1M5G7m92KNmWgmzJAebv/JT21lJZJlRY7fGVybhcVKfHPPO/De+8vNKgUYgGmZysSFYca2YeVRgVBndUtZ+5nE3aKuypg9T23a+EwfhrEgcH2pHkhATRyfy8iQSCWMFi/2VGaPLE8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1760404276; c=relaxed/simple;
-	bh=VpNU3uAT7mWuJwH8wgjR94vYaC45sWLYg4ZUqnCR7PM=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=lyiS9OcP1RuRtr9L50XrBSzdmW8U0utJKL/CQ9KU10AFBAigRmOk0TG2S6jCU68SxYKwEDPxRJoAeIlxKBSciGOmE0SGtmiqNrpjnAiqb6+n+rOXB7zQfGpJjVHuklx+7kTmGYvAyuW5S2FUaUnynej45npAaylRa0h+TYvePkE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=zytor.com; spf=pass smtp.mailfrom=zytor.com; dkim=pass (2048-bit key) header.d=zytor.com header.i=@zytor.com header.b=RT+sRZVm; arc=none smtp.client-ip=198.137.202.136
+	bh=W2I6IOEQAL6R6qIzO/NtfP8XeQL2rTbTn5Fc1+fgm0A=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=gREJiubWG8Sx7V2Y/rav0ktytfwNQ9xhNRxVnPv2BUnV9S7Zz1zCKkI3YCBoawZ9xKTo5vtzomtSfSOXiKUJ2/R/T7GzOwRFOVnkk8VnIdFYdcc9oy9xEaQ9CdVef4ITamdzvJutIHbkWpofS0POVsgbvnc1a2HPBNBGOwgyS3c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=zytor.com; spf=pass smtp.mailfrom=zytor.com; dkim=pass (2048-bit key) header.d=zytor.com header.i=@zytor.com header.b=Ow3YVljB; arc=none smtp.client-ip=198.137.202.136
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=zytor.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=zytor.com
 Received: from terminus.zytor.com (terminus.zytor.com [IPv6:2607:7c80:54:3:0:0:0:136])
 	(authenticated bits=0)
-	by mail.zytor.com (8.18.1/8.17.1) with ESMTPSA id 59E19p1N1568441
+	by mail.zytor.com (8.18.1/8.17.1) with ESMTPSA id 59E19p1O1568441
 	(version=TLSv1.3 cipher=TLS_AES_256_GCM_SHA384 bits=256 verify=NO);
-	Mon, 13 Oct 2025 18:09:54 -0700
-DKIM-Filter: OpenDKIM Filter v2.11.0 mail.zytor.com 59E19p1N1568441
+	Mon, 13 Oct 2025 18:09:55 -0700
+DKIM-Filter: OpenDKIM Filter v2.11.0 mail.zytor.com 59E19p1O1568441
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=zytor.com;
-	s=2025092201; t=1760404195;
-	bh=DhpU952qtckeUC/UYfgDcfu0CINppd+EV+oQjg57wY8=;
-	h=From:To:Cc:Subject:Date:From;
-	b=RT+sRZVmH82cHCtH+K6G+meVF8PtkV432FDEWprM4vWg8G5Lx57oK4ztX5xFsNNjM
-	 YtVi2yzo+9VoJMX4w/mzm83U7lQ5YbEsgffzXZjUFotTX+ohlELeYYIiyyAXn2dn2n
-	 R8ehrmmDd5biBXODAphoEobksgfdh5/CTIck6/2ptRods48oxhYAsBRumBjjYYzNf5
-	 +kVFBs26i2M79G4NlkoJgNS/0ehZGMS6d/OUydrAQqePjmYhttMs9+gNyZgmrQwtPa
-	 KlKd/XQ8nLyrGUV1aGCMdb7CrRkkXLGsh4B+/Cp1SB7NLpIpy8wN5eYY26z0WKAbfA
-	 yOUVWxuoSB4lw==
+	s=2025092201; t=1760404196;
+	bh=7XVa08fBSEa9F7j/oT2+yHb2HM3Ex1EYaFy7kmoMxhM=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+	b=Ow3YVljBd0fejE4cI1itgIXxuIYGRrixbbSDoXFrpNATDM90Gqd1h5owEUa11eXj8
+	 cZeMyNf+QRZR75UKtToGpN4CKSfwu844HJROeAETwSn4CW/07ZBp9dKvw17yMFI9tE
+	 6WD1KQ/j1iLDFRKwWIMUur7iQ2rh/cmANT0+wEcKAXxO65tMpKVPUBCUvl8nEt1JE7
+	 TXvoFGYu0W1uhy1f4+kEQAg5qb1Eo5RReAiIih6pf8prTEEtwuMOYxXRJGEhhhzEG9
+	 61i2whn6qVFub3GBxuRNbg4TC3xtLp5e1mHc5BtEJ2BI3gy0Lu08ffcAk0u8SR1/eN
+	 u8t7DnufnM7/A==
 From: "Xin Li (Intel)" <xin@zytor.com>
 To: linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
         linux-doc@vger.kernel.org
@@ -54,10 +55,12 @@ Cc: pbonzini@redhat.com, seanjc@google.com, corbet@lwn.net, tglx@linutronix.de,
         x86@kernel.org, hpa@zytor.com, xin@zytor.com, luto@kernel.org,
         peterz@infradead.org, andrew.cooper3@citrix.com, chao.gao@intel.com,
         hch@infradead.org
-Subject: [PATCH v8 00/21] Enable FRED with KVM VMX
-Date: Mon, 13 Oct 2025 18:09:29 -0700
-Message-ID: <20251014010950.1568389-1-xin@zytor.com>
+Subject: [PATCH v8 01/21] KVM: VMX: Add support for the secondary VM exit controls
+Date: Mon, 13 Oct 2025 18:09:30 -0700
+Message-ID: <20251014010950.1568389-2-xin@zytor.com>
 X-Mailer: git-send-email 2.51.0
+In-Reply-To: <20251014010950.1568389-1-xin@zytor.com>
+References: <20251014010950.1568389-1-xin@zytor.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -66,132 +69,217 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-This patch set enables the Intel flexible return and event delivery
-(FRED) architecture with KVM VMX to allow guests to utilize FRED.
+From: Xin Li <xin3.li@intel.com>
 
-The FRED architecture defines simple new transitions that change
-privilege level (ring transitions). The FRED architecture was
-designed with the following goals:
+Always load the secondary VM exit controls to prepare for FRED enabling.
 
-1) Improve overall performance and response time by replacing event
-   delivery through the interrupt descriptor table (IDT event
-   delivery) and event return by the IRET instruction with lower
-   latency transitions.
+Signed-off-by: Xin Li <xin3.li@intel.com>
+Signed-off-by: Xin Li (Intel) <xin@zytor.com>
+Tested-by: Xuelian Guo <xuelian.guo@intel.com>
+---
 
-2) Improve software robustness by ensuring that event delivery
-   establishes the full supervisor context and that event return
-   establishes the full user context.
+Change in v5:
+* Add TB from Xuelian Guo.
 
-The new transitions defined by the FRED architecture are FRED event
-delivery and, for returning from events, two FRED return instructions.
-FRED event delivery can effect a transition from ring 3 to ring 0, but
-it is used also to deliver events incident to ring 0. One FRED
-instruction (ERETU) effects a return from ring 0 to ring 3, while the
-other (ERETS) returns while remaining in ring 0. Collectively, FRED
-event delivery and the FRED return instructions are FRED transitions.
+Changes in v4:
+* Fix clearing VM_EXIT_ACTIVATE_SECONDARY_CONTROLS (Chao Gao).
+* Check VM exit/entry consistency based on the new macro from Sean
+  Christopherson.
 
+Change in v3:
+* Do FRED controls consistency checks in the VM exit/entry consistency
+  check framework (Sean Christopherson).
 
-Intel VMX architecture is extended to run FRED guests, and the major
-changes are:
+Change in v2:
+* Always load the secondary VM exit controls (Sean Christopherson).
+---
+ arch/x86/include/asm/msr-index.h |  1 +
+ arch/x86/include/asm/vmx.h       |  3 +++
+ arch/x86/kvm/vmx/capabilities.h  |  9 ++++++++-
+ arch/x86/kvm/vmx/vmcs.h          |  1 +
+ arch/x86/kvm/vmx/vmx.c           | 29 +++++++++++++++++++++++++++--
+ arch/x86/kvm/vmx/vmx.h           |  7 ++++++-
+ 6 files changed, 46 insertions(+), 4 deletions(-)
 
-1) New VMCS fields for FRED context management, which includes two new
-event data VMCS fields, eight new guest FRED context VMCS fields and
-eight new host FRED context VMCS fields.
-
-2) VMX nested-exception support for proper virtualization of stack
-levels introduced with FRED architecture.
-
-Search for the latest FRED spec in most search engines with this search
-pattern:
-
-  site:intel.com FRED (flexible return and event delivery) specification
-
-
-Although FRED and CET supervisor shadow stacks are independent CPU
-features, FRED unconditionally includes FRED shadow stack pointer
-MSRs IA32_FRED_SSP[0123], and IA32_FRED_SSP0 is just an alias of the
-CET MSR IA32_PL0_SSP.  IOW, the state management of MSR IA32_PL0_SSP
-becomes an overlap area, and Sean requested that FRED virtualization
-to land after CET virtualization [1].
-
-Since CET virtualization has landed with the release of v6.18-rc1, I'm
-submitting v8 of FRED virtualization.
-
-Changes in v8:
-* Rebased on v6.18-rc1.
-* Relocate secondary_vm_exit_controls to the last u64 padding field in
-  vmcs12 (Isaku).
-* Make the newly added FRED fields 64-bit aligned in vmcs12 (Isaku).
-* Remove changes to Documentation/virt/kvm/x86/nested-vmx.rst.
-* Update KVM_CAP_EXCEPTION_NESTED_FLAG, as the number used in v7 is
-  occupied by another new cap.
-
-
-Following is the link to v7 of this patch set:
-https://lore.kernel.org/lkml/20250829153149.2871901-1-xin@zytor.com/
-
-
-[1]: https://lore.kernel.org/kvm/ZvQaNRhrsSJTYji3@google.com/
-
-
-Xin Li (18):
-  KVM: VMX: Add support for the secondary VM exit controls
-  KVM: VMX: Initialize VM entry/exit FRED controls in vmcs_config
-  KVM: VMX: Disable FRED if FRED consistency checks fail
-  KVM: VMX: Initialize VMCS FRED fields
-  KVM: VMX: Set FRED MSR intercepts
-  KVM: VMX: Save/restore guest FRED RSP0
-  KVM: VMX: Add support for saving and restoring FRED MSRs
-  KVM: x86: Add a helper to detect if FRED is enabled for a vCPU
-  KVM: VMX: Virtualize FRED event_data
-  KVM: VMX: Virtualize FRED nested exception tracking
-  KVM: x86: Mark CR4.FRED as not reserved
-  KVM: VMX: Dump FRED context in dump_vmcs()
-  KVM: x86: Advertise support for FRED
-  KVM: nVMX: Add support for the secondary VM exit controls
-  KVM: nVMX: Add FRED VMCS fields to nested VMX context handling
-  KVM: nVMX: Add FRED-related VMCS field checks
-  KVM: nVMX: Add prerequisites to SHADOW_FIELD_R[OW] macros
-  KVM: nVMX: Allow VMX FRED controls
-
-Xin Li (Intel) (3):
-  x86/cea: Prefix event stack names with ESTACK_
-  x86/cea: Export API for per-CPU exception stacks for KVM
-  KVM: x86: Save/restore the nested flag of an exception
-
- Documentation/virt/kvm/api.rst        |  21 +-
- arch/x86/coco/sev/noinstr.c           |   4 +-
- arch/x86/coco/sev/vc-handle.c         |   2 +-
- arch/x86/include/asm/cpu_entry_area.h |  75 +++---
- arch/x86/include/asm/kvm_host.h       |  13 +-
- arch/x86/include/asm/msr-index.h      |   1 +
- arch/x86/include/asm/vmx.h            |  48 +++-
- arch/x86/include/uapi/asm/kvm.h       |   4 +-
- arch/x86/kernel/cpu/common.c          |  10 +-
- arch/x86/kernel/dumpstack_64.c        |  14 +-
- arch/x86/kernel/fred.c                |   6 +-
- arch/x86/kernel/traps.c               |   2 +-
- arch/x86/kvm/cpuid.c                  |   1 +
- arch/x86/kvm/kvm_cache_regs.h         |  15 ++
- arch/x86/kvm/svm/svm.c                |   2 +-
- arch/x86/kvm/vmx/capabilities.h       |  25 +-
- arch/x86/kvm/vmx/nested.c             | 338 ++++++++++++++++++++++----
- arch/x86/kvm/vmx/nested.h             |  22 ++
- arch/x86/kvm/vmx/vmcs.h               |   1 +
- arch/x86/kvm/vmx/vmcs12.c             |  19 ++
- arch/x86/kvm/vmx/vmcs12.h             |  40 ++-
- arch/x86/kvm/vmx/vmcs_shadow_fields.h |  37 ++-
- arch/x86/kvm/vmx/vmx.c                | 247 +++++++++++++++++--
- arch/x86/kvm/vmx/vmx.h                |  54 +++-
- arch/x86/kvm/x86.c                    | 131 +++++++++-
- arch/x86/kvm/x86.h                    |   8 +-
- arch/x86/mm/cpu_entry_area.c          |  37 ++-
- arch/x86/mm/fault.c                   |   2 +-
- include/uapi/linux/kvm.h              |   1 +
- 29 files changed, 1036 insertions(+), 144 deletions(-)
-
-
-base-commit: 3a8660878839faadb4f1a6dd72c3179c1df56787
+diff --git a/arch/x86/include/asm/msr-index.h b/arch/x86/include/asm/msr-index.h
+index 9e1720d73244..baf5e1648418 100644
+--- a/arch/x86/include/asm/msr-index.h
++++ b/arch/x86/include/asm/msr-index.h
+@@ -1225,6 +1225,7 @@
+ #define MSR_IA32_VMX_TRUE_ENTRY_CTLS     0x00000490
+ #define MSR_IA32_VMX_VMFUNC             0x00000491
+ #define MSR_IA32_VMX_PROCBASED_CTLS3	0x00000492
++#define MSR_IA32_VMX_EXIT_CTLS2		0x00000493
+ 
+ /* Resctrl MSRs: */
+ /* - Intel: */
+diff --git a/arch/x86/include/asm/vmx.h b/arch/x86/include/asm/vmx.h
+index c85c50019523..1f60c04d11fb 100644
+--- a/arch/x86/include/asm/vmx.h
++++ b/arch/x86/include/asm/vmx.h
+@@ -107,6 +107,7 @@
+ #define VM_EXIT_PT_CONCEAL_PIP			0x01000000
+ #define VM_EXIT_CLEAR_IA32_RTIT_CTL		0x02000000
+ #define VM_EXIT_LOAD_CET_STATE                  0x10000000
++#define VM_EXIT_ACTIVATE_SECONDARY_CONTROLS	0x80000000
+ 
+ #define VM_EXIT_ALWAYSON_WITHOUT_TRUE_MSR	0x00036dff
+ 
+@@ -262,6 +263,8 @@ enum vmcs_field {
+ 	SHARED_EPT_POINTER		= 0x0000203C,
+ 	PID_POINTER_TABLE		= 0x00002042,
+ 	PID_POINTER_TABLE_HIGH		= 0x00002043,
++	SECONDARY_VM_EXIT_CONTROLS	= 0x00002044,
++	SECONDARY_VM_EXIT_CONTROLS_HIGH	= 0x00002045,
+ 	GUEST_PHYSICAL_ADDRESS          = 0x00002400,
+ 	GUEST_PHYSICAL_ADDRESS_HIGH     = 0x00002401,
+ 	VMCS_LINK_POINTER               = 0x00002800,
+diff --git a/arch/x86/kvm/vmx/capabilities.h b/arch/x86/kvm/vmx/capabilities.h
+index 02aadb9d730e..6bd67c40ca3b 100644
+--- a/arch/x86/kvm/vmx/capabilities.h
++++ b/arch/x86/kvm/vmx/capabilities.h
+@@ -55,8 +55,9 @@ struct vmcs_config {
+ 	u32 cpu_based_exec_ctrl;
+ 	u32 cpu_based_2nd_exec_ctrl;
+ 	u64 cpu_based_3rd_exec_ctrl;
+-	u32 vmexit_ctrl;
+ 	u32 vmentry_ctrl;
++	u32 vmexit_ctrl;
++	u64 vmexit_2nd_ctrl;
+ 	u64 misc;
+ 	struct nested_vmx_msrs nested;
+ };
+@@ -141,6 +142,12 @@ static inline bool cpu_has_tertiary_exec_ctrls(void)
+ 		CPU_BASED_ACTIVATE_TERTIARY_CONTROLS;
+ }
+ 
++static inline bool cpu_has_secondary_vmexit_ctrls(void)
++{
++	return vmcs_config.vmexit_ctrl &
++		VM_EXIT_ACTIVATE_SECONDARY_CONTROLS;
++}
++
+ static inline bool cpu_has_vmx_virtualize_apic_accesses(void)
+ {
+ 	return vmcs_config.cpu_based_2nd_exec_ctrl &
+diff --git a/arch/x86/kvm/vmx/vmcs.h b/arch/x86/kvm/vmx/vmcs.h
+index b25625314658..ae152a9d1963 100644
+--- a/arch/x86/kvm/vmx/vmcs.h
++++ b/arch/x86/kvm/vmx/vmcs.h
+@@ -47,6 +47,7 @@ struct vmcs_host_state {
+ struct vmcs_controls_shadow {
+ 	u32 vm_entry;
+ 	u32 vm_exit;
++	u64 secondary_vm_exit;
+ 	u32 pin;
+ 	u32 exec;
+ 	u32 secondary_exec;
+diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
+index f87c216d976d..255158595e77 100644
+--- a/arch/x86/kvm/vmx/vmx.c
++++ b/arch/x86/kvm/vmx/vmx.c
+@@ -2595,8 +2595,9 @@ static int setup_vmcs_config(struct vmcs_config *vmcs_conf,
+ 	u32 _cpu_based_exec_control = 0;
+ 	u32 _cpu_based_2nd_exec_control = 0;
+ 	u64 _cpu_based_3rd_exec_control = 0;
+-	u32 _vmexit_control = 0;
+ 	u32 _vmentry_control = 0;
++	u32 _vmexit_control = 0;
++	u64 _vmexit2_control = 0;
+ 	u64 basic_msr;
+ 	u64 misc_msr;
+ 
+@@ -2617,6 +2618,12 @@ static int setup_vmcs_config(struct vmcs_config *vmcs_conf,
+ 		{ VM_ENTRY_LOAD_CET_STATE,		VM_EXIT_LOAD_CET_STATE },
+ 	};
+ 
++	struct {
++		u32 entry_control;
++		u64 exit_control;
++	} const vmcs_entry_exit2_pairs[] = {
++	};
++
+ 	memset(vmcs_conf, 0, sizeof(*vmcs_conf));
+ 
+ 	if (adjust_vmx_controls(KVM_REQUIRED_VMX_CPU_BASED_VM_EXEC_CONTROL,
+@@ -2703,10 +2710,19 @@ static int setup_vmcs_config(struct vmcs_config *vmcs_conf,
+ 				&_vmentry_control))
+ 		return -EIO;
+ 
++	if (_vmexit_control & VM_EXIT_ACTIVATE_SECONDARY_CONTROLS)
++		_vmexit2_control =
++			adjust_vmx_controls64(KVM_OPTIONAL_VMX_SECONDARY_VM_EXIT_CONTROLS,
++					      MSR_IA32_VMX_EXIT_CTLS2);
++
+ 	if (vmx_check_entry_exit_pairs(vmcs_entry_exit_pairs,
+ 				       _vmentry_control, _vmexit_control))
+ 		return -EIO;
+ 
++	if (vmx_check_entry_exit_pairs(vmcs_entry_exit2_pairs,
++				       _vmentry_control, _vmexit2_control))
++		return -EIO;
++
+ 	/*
+ 	 * Some cpus support VM_{ENTRY,EXIT}_IA32_PERF_GLOBAL_CTRL but they
+ 	 * can't be used due to an errata where VM Exit may incorrectly clear
+@@ -2755,8 +2771,9 @@ static int setup_vmcs_config(struct vmcs_config *vmcs_conf,
+ 	vmcs_conf->cpu_based_exec_ctrl = _cpu_based_exec_control;
+ 	vmcs_conf->cpu_based_2nd_exec_ctrl = _cpu_based_2nd_exec_control;
+ 	vmcs_conf->cpu_based_3rd_exec_ctrl = _cpu_based_3rd_exec_control;
+-	vmcs_conf->vmexit_ctrl         = _vmexit_control;
+ 	vmcs_conf->vmentry_ctrl        = _vmentry_control;
++	vmcs_conf->vmexit_ctrl         = _vmexit_control;
++	vmcs_conf->vmexit_2nd_ctrl     = _vmexit2_control;
+ 	vmcs_conf->misc	= misc_msr;
+ 
+ #if IS_ENABLED(CONFIG_HYPERV)
+@@ -4410,6 +4427,11 @@ static u32 vmx_get_initial_vmexit_ctrl(void)
+ 		~(VM_EXIT_LOAD_IA32_PERF_GLOBAL_CTRL | VM_EXIT_LOAD_IA32_EFER);
+ }
+ 
++static u64 vmx_secondary_vmexit_ctrl(void)
++{
++	return vmcs_config.vmexit_2nd_ctrl;
++}
++
+ void vmx_refresh_apicv_exec_ctrl(struct kvm_vcpu *vcpu)
+ {
+ 	struct vcpu_vmx *vmx = to_vmx(vcpu);
+@@ -4752,6 +4774,9 @@ static void init_vmcs(struct vcpu_vmx *vmx)
+ 
+ 	vm_exit_controls_set(vmx, vmx_get_initial_vmexit_ctrl());
+ 
++	if (cpu_has_secondary_vmexit_ctrls())
++		secondary_vm_exit_controls_set(vmx, vmx_secondary_vmexit_ctrl());
++
+ 	/* 22.2.1, 20.8.1 */
+ 	vm_entry_controls_set(vmx, vmx_get_initial_vmentry_ctrl());
+ 
+diff --git a/arch/x86/kvm/vmx/vmx.h b/arch/x86/kvm/vmx/vmx.h
+index ea93121029f9..b2724aab48d2 100644
+--- a/arch/x86/kvm/vmx/vmx.h
++++ b/arch/x86/kvm/vmx/vmx.h
+@@ -511,7 +511,11 @@ static inline u8 vmx_get_rvi(void)
+ 	       VM_EXIT_CLEAR_BNDCFGS |					\
+ 	       VM_EXIT_PT_CONCEAL_PIP |					\
+ 	       VM_EXIT_CLEAR_IA32_RTIT_CTL |				\
+-	       VM_EXIT_LOAD_CET_STATE)
++	       VM_EXIT_LOAD_CET_STATE |					\
++	       VM_EXIT_ACTIVATE_SECONDARY_CONTROLS)
++
++#define KVM_REQUIRED_VMX_SECONDARY_VM_EXIT_CONTROLS (0)
++#define KVM_OPTIONAL_VMX_SECONDARY_VM_EXIT_CONTROLS (0)
+ 
+ #define KVM_REQUIRED_VMX_PIN_BASED_VM_EXEC_CONTROL			\
+ 	(PIN_BASED_EXT_INTR_MASK |					\
+@@ -624,6 +628,7 @@ static __always_inline void lname##_controls_changebit(struct vcpu_vmx *vmx, u##
+ }
+ BUILD_CONTROLS_SHADOW(vm_entry, VM_ENTRY_CONTROLS, 32)
+ BUILD_CONTROLS_SHADOW(vm_exit, VM_EXIT_CONTROLS, 32)
++BUILD_CONTROLS_SHADOW(secondary_vm_exit, SECONDARY_VM_EXIT_CONTROLS, 64)
+ BUILD_CONTROLS_SHADOW(pin, PIN_BASED_VM_EXEC_CONTROL, 32)
+ BUILD_CONTROLS_SHADOW(exec, CPU_BASED_VM_EXEC_CONTROL, 32)
+ BUILD_CONTROLS_SHADOW(secondary_exec, SECONDARY_VM_EXEC_CONTROL, 32)
 -- 
 2.51.0
 
