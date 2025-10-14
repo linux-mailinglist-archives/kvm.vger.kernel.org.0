@@ -1,245 +1,173 @@
-Return-Path: <kvm+bounces-59991-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-59992-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id D130FBD77C4
-	for <lists+kvm@lfdr.de>; Tue, 14 Oct 2025 07:49:56 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id F07E1BD77F7
+	for <lists+kvm@lfdr.de>; Tue, 14 Oct 2025 07:53:41 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 96FEC4EF70F
-	for <lists+kvm@lfdr.de>; Tue, 14 Oct 2025 05:49:55 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D6E9B404655
+	for <lists+kvm@lfdr.de>; Tue, 14 Oct 2025 05:53:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EB7DB29B204;
-	Tue, 14 Oct 2025 05:49:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="2bg1I47M"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3C92A29BDBB;
+	Tue, 14 Oct 2025 05:53:12 +0000 (UTC)
 X-Original-To: kvm@vger.kernel.org
-Received: from MW6PR02CU001.outbound.protection.outlook.com (mail-westus2azon11012069.outbound.protection.outlook.com [52.101.48.69])
+Received: from unicom146.biz-email.net (unicom146.biz-email.net [210.51.26.146])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 483DD219E8;
-	Tue, 14 Oct 2025 05:49:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.48.69
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1760420982; cv=fail; b=jQogt0lNn6XXzS5uwsigTkYD6d3rItsFp1GtkdUhNdJZFI4yFw6fYxFnUVHjH4/RC1jGCiyrLt3hBbHsrCO48QubYbv+zXo4kGyDKDGWKD0i4um4NAsayt7agXmckPPH7MrzF2vDkn/nj946f8S8MykMNLbnBhW+BV4a50kEZ2A=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1760420982; c=relaxed/simple;
-	bh=Z60gpo/Z+mR3iNBXHdxr40NQSbkou1nN6ZsiXylnuco=;
-	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
-	 Content-Type:MIME-Version; b=nleLAKNmPy+GXpJ57VvJcVWWsqBRuB9MfRoobZ1QYnLGNiy4IkhXDV0mraFBHEnNwjzkL2yict0/8WJxvpZGZzq84Fd3/C85fpe4J515gL42FFNhEO0OZO//qSFxsCEe1p/CWGGGbibzhk/RhhOhBgqCAa3JbAKHYkSfk8Q5laQ=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=2bg1I47M; arc=fail smtp.client-ip=52.101.48.69
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=pj4f5/srWRtF8S2pspnmRbjJ2aelLk37ZrY1qyfBSunm9mIQwUwPiM2ERVQ2gCrDapC7UTMquGXdvhJCrdlTY+QV4VtLBugGjwZ5IG7WY1cBrIqjm67qQ4LZ5F6j0+ylI9rrz/+kzS0kiwcn1KGLu3qXGqk6B1zYYi31ZsIVfu/ZwPzccs9f9r7uRzeZ9eG/1BJXx6cMOh8EpRcfD1rsK9IDaMczqLtaKLt1T7jBflIhg6BfwTzChHhRZV7UDUFYvRDHl427tl+dTqvbiPSdCADfAgaSia07v28UlCqru6bhROUOL1F7ncArzvhOr5z9wNkd0sScw2mMOWgctgfxIg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=3N/n9nSsijsOSWseBTuv/zoKfgck9vVC6lH0ZAy/bZk=;
- b=i20wvllld5gPyToX8stRvWZNDeiMlyOfRL275oEFJdqLz8k2bo4QvNnLFTAr8GHQkMmyoRYzesiboRXI8hVqx9ZMClHa2rfYVbt4f48cw20xtudKQ/FGmi7bqHzOOP7HNT7dMTycF48D8AdR0NxPCI6d/+2GG8MEvv6XRKi8BZrBut8+ERN9XSuRbnfJWt5rT3CovAhCHjak+fr4e+G9Jpce06nsPmRx8BuUhvic+ga2VJbe/ZtCh+fhFdhc+tcj8W6NaIPpviIYUtO+bo3O5/rRHEzvxMibboAP8u+Qd4pJHdMJdIpn9ztS4wAb0yII7UCibkVSx1BF5KUTUi1NiQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
- header.d=amd.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=3N/n9nSsijsOSWseBTuv/zoKfgck9vVC6lH0ZAy/bZk=;
- b=2bg1I47M8G1bJJ33AlhxaSgTBLAQJBvh90AOVduVnGuf31pao6XbO+xw+qKvG7yYW50AkPYorsl8BcHox8WuN5or4Kt+tfPx6RMFE02pfdJ/wTFSUjm3eCzLM+l9HF7MLLyOPk9ty9auu0knnB2Y4kVdrh90Kt9Qw5+NAUU7Vsg=
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=amd.com;
-Received: from IA0PR12MB8301.namprd12.prod.outlook.com (2603:10b6:208:40b::13)
- by SA3PR12MB7783.namprd12.prod.outlook.com (2603:10b6:806:314::19) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9203.13; Tue, 14 Oct
- 2025 05:49:38 +0000
-Received: from IA0PR12MB8301.namprd12.prod.outlook.com
- ([fe80::e929:57f5:f4db:5823]) by IA0PR12MB8301.namprd12.prod.outlook.com
- ([fe80::e929:57f5:f4db:5823%4]) with mapi id 15.20.9228.009; Tue, 14 Oct 2025
- 05:49:37 +0000
-Message-ID: <528d8293-a1a0-4d4f-87a6-e06eff7c559a@amd.com>
-Date: Tue, 14 Oct 2025 11:19:30 +0530
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH V3 kvm-x86/gmem 1/2] KVM: guest_memfd: move
- kvm_gmem_get_index() and use in kvm_gmem_prepare_folio()
-To: Sean Christopherson <seanjc@google.com>
-Cc: pbonzini@redhat.com, david@redhat.com, kvm@vger.kernel.org,
- linux-coco@lists.linux.dev, linux-kernel@vger.kernel.org
-References: <20251012071607.17646-1-shivankg@amd.com>
- <aO0G9Ycu_SlISBih@google.com> <aO1CGlKGso4LLtS5@google.com>
-Content-Language: en-US
-From: "Garg, Shivank" <shivankg@amd.com>
-In-Reply-To: <aO1CGlKGso4LLtS5@google.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: PN4PR01CA0094.INDPRD01.PROD.OUTLOOK.COM
- (2603:1096:c01:2af::7) To CH3PR12MB8283.namprd12.prod.outlook.com
- (2603:10b6:610:12a::11)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 293A729BDB8;
+	Tue, 14 Oct 2025 05:53:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=210.51.26.146
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1760421191; cv=none; b=qj6Mql2yJx4viHi9nEaIrPSvdmhaRcX6ytv8QK23IIW0Lj9TmHFvvUKC/t7scCorOel7fXpkx5TUJRC/m6u5WIy9vTKn5Zp/4AwwgF804dQb0i+km8yypmur0CNoh3eY/Wo8D2S4hhxzZoD1WPSdSfifaaL2UOE8+Utg1iDEoZg=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1760421191; c=relaxed/simple;
+	bh=3G+157xk86k/K+kQZDUYX0P/G7QlPVFuOjaSEJoFp3Y=;
+	h=Date:Subject:From:To:CC:Message-ID:MIME-Version:In-Reply-To:
+	 References:Content-Type; b=Xa8xIZFqABjn/VPN7D5Y8ajkkVEbfDT3nmLDdnO8xRNS0pIydp54Ft77C4toAI9UbXIVW4gcetLPN6mOcF0l7WFtWrNiim2gEC4DsjO4NXcpTuLOele5XRd2elfE+3gYyvfayohVax9qB+c+8pANYRaXPKi0dPoh5bnqJXhhJH0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=inspur.com; spf=pass smtp.mailfrom=inspur.com; arc=none smtp.client-ip=210.51.26.146
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=inspur.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=inspur.com
+Received: from jtjnmail201608.home.langchao.com
+        by unicom146.biz-email.net ((D)) with ASMTP (SSL) id 202510141353001786;
+        Tue, 14 Oct 2025 13:53:00 +0800
+Received: from jtjnmailAR01.home.langchao.com (10.100.2.42) by
+ jtjnmail201608.home.langchao.com (10.100.2.8) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.58; Tue, 14 Oct 2025 13:53:00 +0800
+Received: from inspur.com (10.100.2.96) by jtjnmailAR01.home.langchao.com
+ (10.100.2.42) with Microsoft SMTP Server id 15.1.2507.58 via Frontend
+ Transport; Tue, 14 Oct 2025 13:53:00 +0800
+Received: from chuguangqing$inspur.com ( [10.94.17.151] ) by
+ ajax-webmail-app1 (Coremail) ; Tue, 14 Oct 2025 13:53:00 +0800 (GMT+08:00)
+Date: Tue, 14 Oct 2025 13:53:00 +0800
+Subject: Re: Re: [PATCH 0/5] Some spelling error fixes in samples directory
+From: =?UTF-8?Q?Gary_Chu=28=E6=A5=9A=E5=85=89=E5=BA=86=29?=
+	<chuguangqing@inspur.com>
+To: Alexei Starovoitov <alexei.starovoitov@gmail.com>
+CC: Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann
+	<daniel@iogearbox.net>, Andrii Nakryiko <andrii@kernel.org>, Martin KaFai Lau
+	<martin.lau@linux.dev>, Eduard <eddyz87@gmail.com>, Song Liu
+	<song@kernel.org>, Yonghong Song <yonghong.song@linux.dev>, John Fastabend
+	<john.fastabend@gmail.com>, KP Singh <kpsingh@kernel.org>, Stanislav Fomichev
+	<sdf@fomichev.me>, Hao Luo <haoluo@google.com>, Jiri Olsa <jolsa@kernel.org>,
+	kwankhede <kwankhede@nvidia.com>, bpf <bpf@vger.kernel.org>, LKML
+	<linux-kernel@vger.kernel.org>, kvm <kvm@vger.kernel.org>
+Message-ID: <68ede500.1.I5a5cMEoHajJ5a5c@inspur.com>
+X-Mailer: Coremail Webmail Server Version 2025.1-cmXT6 build
+ 20250610(aeb0f7c4) Copyright (c) 2002-2025 www.mailtech.cn
+ mispb-39078be8-44f8-459d-aa33-411e3e3b0787-inspur.com
+X-CMClient-Version: Coremail cmclient(4.2.0.1062 win64.exe)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: IA0PR12MB8301:EE_|SA3PR12MB7783:EE_
-X-MS-Office365-Filtering-Correlation-Id: 62f0a8ac-f02d-4c41-a4d8-08de0ae575a9
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230040|366016|376014|1800799024;
-X-Microsoft-Antispam-Message-Info:
-	=?utf-8?B?V0YwbitpTytFeWdIYUtvTUhKZkNRMGNaYXBJUDE5WFg3R0x0RDZIOVB3MmRO?=
- =?utf-8?B?UHJYUE50Wk82b0FUNHZSTEZadXVObmVYQVU2Wjg2WE5ocVo5aFQvYjZlb0Ev?=
- =?utf-8?B?UkRvd2diYmVIR0w3N1didUhHdzV2N3J5MEtVdnFMU1FhR2ltLy9WUE10dE4z?=
- =?utf-8?B?SkI5Vjg0NmdOK3VOWmpvWTZ4d043UUpNY3p0aEV6TElBbDdHWm05dDBtSWYv?=
- =?utf-8?B?QnY2ckdDSEVKVk40N3ZlalFCVUMvZlp1bXlDYVJ0VHE0aWgzRHFKSkFkYmZW?=
- =?utf-8?B?M2JvZW1EZnRMZjRuRnd4S3d2YjZCZGdOeFBIbmp3Y2tTbHhsZGwwTDNBZi8z?=
- =?utf-8?B?QWtUci9Ka1RiV1BhN1lyaWhib2xKME83ck4xcmpYMzVQTHhMNVFDeGRXN0c0?=
- =?utf-8?B?ajFiM1J6cFZXeS8vUW00MSttV1NjeEtXbUNaMFVySHlja05sWndEVFFUUGJ4?=
- =?utf-8?B?eXJWa2pxdEhTZFN1aklzR3lKL0ZyTnRncy9UVmJINm1idVVtemw2bFI1Q1pV?=
- =?utf-8?B?TEF1WngySmE3b3Q2NEZZLzY1aHpUZXA0elh1NW05SWljR2VETER1ZGEwWVlx?=
- =?utf-8?B?bGw1elI3UjhOQmlHcFEraE5rN3EzMXloY1V1Nm1hU1owMzZIajJZb25zZ09y?=
- =?utf-8?B?VlEwZnRWY1Nkc0RmUHE1dlRnY1J4U3lPNmtLZE40Qk1rYm5mVGxWYjdTdEUx?=
- =?utf-8?B?em90aTBVdW8zSzFVRWxscU5LUlJ6QTNqdjROQ1B0a0FDQnNZMjV0T2RRSVJV?=
- =?utf-8?B?MnloT2hyQmRRTmtieDZqWFNXYWE3K2Y0b2YyUDZRUmJpNWxUMTAxMmxFc0Vs?=
- =?utf-8?B?dWhDdHQ2aWlQM2FhYk8xMTFWamtMWGl3Q2pmUDBNQU1oaVREQ0s0QjJSbnhR?=
- =?utf-8?B?Q1hPUWpjYk03V09VN1FLek9veFREZTNZZ2Z3cy9KWXBmYzhDQTk1b3hGV2sr?=
- =?utf-8?B?aGJTbWsrVEo5VjFqTVI1VlU4RG9vaTliT1E0MjZOTjJ0Q3I2N0xZZ3ZJamgz?=
- =?utf-8?B?SjRZazROMnJuWWVkL2VSdFF6STUxOVhkb3p4TU12WG1nWk9XT1hKUGtXWGRw?=
- =?utf-8?B?dmhQOXNDbU9TV1Z6b0VMYWErR1VWNVBHcTl1a3ZpSXpPanhlVGNSVDBJZmpv?=
- =?utf-8?B?YVFjTTllRkpkem5QTTUzRVJLa1kwVlJLQU12MjhEUUh2L2tjeklIOEx0NEpB?=
- =?utf-8?B?Zk1BZ0hITzRvakl6dXd6dmxkMEVlYUxJMVQ2U01KMHJjdGZJdUI0NzFhRTJ4?=
- =?utf-8?B?UFlHMWhCd2ZIZDBtVURHK0FkZGtPVXU0MHQ4bHIvNUROWGZYTlUyTkFta3Rx?=
- =?utf-8?B?MjRWZWpYM1g2WE1RYUxhQzVDakoyMDladUVRSTRqdGh0VWNhR2V4bW1OWnhO?=
- =?utf-8?B?L2ZlRkJEWDZTQXZaYW9YKzV1U1QxRUtCYlZBZ0pHY3lXamFOMWJCOU1wRXhG?=
- =?utf-8?B?UWQ3UlVnN1dGN1laK3BKeWx3ZHIxNElCVmZMVkkySVBraiszZjVlSHFLeWpn?=
- =?utf-8?B?OHBKbVhWMVhKb2J0QUd4OHNzeUw5TVJLVWttcWdxbkRSTGlvRDFMQ0wxMDhU?=
- =?utf-8?B?cG9hc1dQSlQ1a2c2RitTaUtvVEwwRkZQeXhKMkZYbWJYS0J5SHAwRytaTU5Q?=
- =?utf-8?B?SnRLZkxZZk1IcEU2b25zelBMaXdCNmt1UlEzdmtMWVUvc3RtbGlYdTBzN3d3?=
- =?utf-8?B?VUZFbm9qVnh1TGIyOWhDSStNcWc0NDl4bkM3dUh4RXRsd3BaUU51dTRjZm52?=
- =?utf-8?B?NWo3VHRBMUwzd2xoeWdKdXBXbDZJbjcwb05kYzM4RDZ1eVg0MGlzR05rUW8x?=
- =?utf-8?B?Y2ltQmYrdHJWYkZBTlhScWo0eGRGa00reFpMakRRUFJkaTc5UFpiRjNlRE1Q?=
- =?utf-8?B?N3lVdXVPZTdPaWp0SzJCVkpjVU42SWFRWU5KT0tpQk03MG5ZcWZkUDlMd2w4?=
- =?utf-8?Q?iS1Dry06uK9kcl0HsVpIgW939E9+8JXC?=
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:IA0PR12MB8301.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(376014)(1800799024);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?utf-8?B?N0NmS1piYlhwQUxjOVVHcFBZa3pobXh6MGx1S09VNUNlRksyY2NUTmpkME9m?=
- =?utf-8?B?ZDdWdnFtd3BtdCtsK3pvNm9FcW9IK1N4eDVsMEt5cHRVL2ZWU0ZNNEFIbGc3?=
- =?utf-8?B?VnNVUzBuSlFJeUFpYnI4SGQ5ZGZqbk1RUGh4L3cvQmI1eVl2bWl5WXNqL2ln?=
- =?utf-8?B?WVNIV0poYVU3Mnl5NGhDNkRtbXhKQ0JZcExadEV1L21ubmdSMVdwQ2NySDNJ?=
- =?utf-8?B?ZzJZUThrdUlWaFhuM2JVYUhLUFZMdTVHNlpxVWNnbW5BZm5kMFNRVXVRWUpX?=
- =?utf-8?B?L1NNUGJhQ1dvV1U4cFU4cUJFUWw2MkJ4M3lYNWduYjl4WC8yek10SERNS24y?=
- =?utf-8?B?K1ZuSFdEK1NCNlcyMjdyK2RrWmNSLzAydGxLWjZ4c1pidkpnK2lwTTZHbmlu?=
- =?utf-8?B?T3FvNjFmcFpFUHJiVUNjWnNCaDNSSzcwQzdmNGdQWVNQQmh0SVBFRWhDUER3?=
- =?utf-8?B?NWg2dzZxeW1yQTQ2WVd2RSt0aGE5VlpqUnpxdi8vZnFwY3kvR25QM3BJL3A2?=
- =?utf-8?B?ZHN1Y2tvUjZZZUVDWkdBWnFOemN5SFdtUnF0UDZReGtiekxrbmJ2Y0pRdkE0?=
- =?utf-8?B?aTJyZFdCQUQvV25DMUpOT1ZvNXBMZ3NGUzVjdktlaVd6ZjJIejJNdFFuNTZz?=
- =?utf-8?B?OWhvMlFzaTE2cWUyREh3MTVQZWxFaDE1MjhaRU41c1l6ajNsKzNJZmhubHZl?=
- =?utf-8?B?K0ZoMFVGY3ZCQnBGRGRFVzdlS0EzMU5uMS8xYzRHRFZxUjNpY0NIWm9UNE55?=
- =?utf-8?B?M09xc3pZUGRPQjBLVk5iblM3S2E1OXI2N1B4R1Vnam90VWxCK2UxS2owVE5t?=
- =?utf-8?B?MkpJUHE3ZWZVazJvSVFJZkJUUFpZWjE5T2FRcmdTWWV3ZWs4bCtDemxrdG5G?=
- =?utf-8?B?S0lvanJLNHo4aU1ERjVCa1FzbXFtNzdGWE80eHpKaVhsdVJGb3UzZmV6YlE0?=
- =?utf-8?B?QTNpWjZGMTZMelN5SFlPQjVXSVYxNjZlbnVsN0NiZTVmTUY3d3o1clFwVThH?=
- =?utf-8?B?RjE4TzhPTU42N0JlR1FkU3VCczhUbk5LSlJObjdGQ1ozTHlkV0MxazNPUVRy?=
- =?utf-8?B?QVRobmpEZWJML2ZxWFZlRVNWdTJ4SngrTlhhYXN0QndtcHJObHJxendPYnZK?=
- =?utf-8?B?K2x6MFQ2cDJpK0dleWc5NVAxZXJIbXQwbnREOWNZV1BoRmJESG9mRW5SMG9z?=
- =?utf-8?B?ditvNCtkRkNGNSt3L29XUHNJcXVmWTdXNitmaVhVaEhHK2MzTTVMQ1NrZTJK?=
- =?utf-8?B?NUpBUTVERU9ac1FWWHF3eWthK0xPWkdYc0wvYXp6V1FhTDE1WFVVeDg5UUNW?=
- =?utf-8?B?UnlPR0c3Vk1SM0ZTQkt3cGV6TXhCMW15L2hOQ0ljSnpCRU92ZWtyYSszdjBP?=
- =?utf-8?B?NnppbXhCRXB6U1JuS3QyV1hBSHVEbUkxeGpJeUtBckU0cG9LMTFDQWlzaER3?=
- =?utf-8?B?eUs2WElYZ2tRWHlDVlp5eFBmWXNLWVB0aEV3OGMxN0ZUOWVXYTliTjl5elB4?=
- =?utf-8?B?NEVXdk15TmU0TmJmWnh6dUFWZWJsaU0vTEdZZU1MTTBIQzl6SHZBbGpuWWlk?=
- =?utf-8?B?MzZPVmg2UDRhVHhoWkNGbllNaEQwV1BKcHhFSWROTFd1aEppOW5oUkxsNFN2?=
- =?utf-8?B?K21jT2E0aGF6bkoySzJwQUpGcFIyMHhJTi82OVY2VFM3eFlxMzF4MExoVDhr?=
- =?utf-8?B?QzNiR0REUXU3ZEI2TmFHdXkwb2Z6Ym85TzlCMVR0dG9wWWdGaU9GcjZ6RjJR?=
- =?utf-8?B?Z2NIQSt2MXorRUNFMFFsN2RFTjl5aFF3a3dSZHIydmF4Sjc3KzlHUUJLOUZ0?=
- =?utf-8?B?QTJqNS9IQTQrVXZXNWNhTEtqNHlpZzJwSi9veGpHNlFyUll0YlM3RkdFSGUz?=
- =?utf-8?B?bHVycysrcXJiVXY4SWFYQk0zOXhrNXg5VjZQUHB3ei9XZGxQcDZXSnF6b1dM?=
- =?utf-8?B?YkR6ZUdTTzhYbWN6QkZDdGZPYXZkMUlWWEoyU0VmY095K0VTdzNVLzVlMXdF?=
- =?utf-8?B?NVBhOFdqbHNES1JVQ0dzL2xPM2F2dGVieGRWdTNZUFVvcllTY0J0NlZ5L2tp?=
- =?utf-8?B?OERjRmRPS3cwWUVHUVNFcXRrR3pzaklZSEpKSXpjbFhNbU1mQ2Q0SFRwczZy?=
- =?utf-8?Q?4q6UDKNisV1nwcSDh9YARhVSi?=
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 62f0a8ac-f02d-4c41-a4d8-08de0ae575a9
-X-MS-Exchange-CrossTenant-AuthSource: CH3PR12MB8283.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 14 Oct 2025 05:49:37.7998
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: LJvjVpI1eY1On8nF4pn9AD05U7/V+TGprGphqPsHRi54dSCQ6RLEzpkAZS0522RRM11wed0LTXxT5iYm6dSEWA==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA3PR12MB7783
+X-Priority: 3
+X-Coremail-Locale: zh_CN
+X-CM-HeaderCharset: UTF-8
+In-Reply-To: <CAADnVQKMgbDV2poeHYmJg0=GD-F2zDTcjSxcUDZSO3Y5EwD17Q@mail.gmail.com>
+References: <906d79e906812eba2cf73fb5e7e6ddba14-10-25gmail.com@g.corp-email.com>
+ <CAADnVQKMgbDV2poeHYmJg0=GD-F2zDTcjSxcUDZSO3Y5EwD17Q@mail.gmail.com>
+x-cm-smime: signed,cmsm
+x-cm-smime-version: cmsm openssl OpenSSL 3.3.1 4 Jun 2024(gm:GmSSL 3.1.1) v1
+Content-Type: multipart/signed; protocol="application/x-pkcs7-signature";
+	micalg=cmsm; boundary="----=_Part_1_G5a5cMEoHajH5a5c_20251014135200=----"
+X-CM-TRANSID: YAJkCsDwDXU85e1oD84WAA--.17814W
+X-CM-SenderInfo: 5fkxw35dqj1xlqj6x0hvsx2hhfrp/1tbiAQEPDmjtIIspYAABsn
+X-Coremail-Antispam: 1Ur529EdanIXcx71UUUUU7IcSsGvfJ3iIAIbVAYjsxI4VWxJw
+	CS07vEb4IE77IF4wCS07vE1I0E4x80FVAKz4kxMIAIbVAFxVCaYxvI4VCIwcAKzIAtYxBI
+	daVFxhVjvjDU=
+X-CM-DELIVERINFO: =?B?N9pETpRRTeOiUs3aOqHZ50hzsfHKF9Ds6CbXmDm38RucXu3D1QS02c2pkXQFDIGuCv
+	ry82gJnDZpQEYdRut3ttFMxxITN1UU1tADN0SVFaZA3YckaxLmYF0I3BebHP3TkeOW9StX
+	29SErP86rVbUovyq+ifyKGfRBHF+CSEbK1UHwaZY
+tUid: 202510141353005711d2a96d4981f3f38dfd38a1266168
+X-Abuse-Reports-To: service@corp-email.com
+Abuse-Reports-To: service@corp-email.com
+X-Complaints-To: service@corp-email.com
+X-Report-Abuse-To: service@corp-email.com
+
+------=_Part_1_G5a5cMEoHajH5a5c_20251014135200=----
+Content-Type: text/plain;
+	charset="UTF-8"
+Content-Transfer-Encoding: base64
+
+Pk9uIE1vbiwgT2N0IDEzLCAyMDI1IGF0IDc6MzXigK9QTSBDaHUgR3VhbmdxaW5nIDxjaHVn
+dWFuZ3FpbmdAaW5zcHVyLmNvbT4gd3JvdGU6Cj4+Cj4+IEZpeGVzIGZvciBzb21lIHNwZWxs
+aW5nIGVycm9ycyBpbiBzYW1wbGVzIGRpcmVjdG9yeQo+Pgo+PiBDaHUgR3VhbmdxaW5nICg1
+KToKPj4gICBzYW1wbGVzL2JwZjogRml4IGEgc3BlbGxpbmcgdHlwbyBpbiBkb19oYm1fdGVz
+dC5zaAo+PiAgIHNhbXBsZXM6IGJwZjogRml4IGEgc3BlbGxpbmcgdHlwbyBpbiBoYm0uYwo+
+PiAgIHNhbXBsZXMvYnBmOiBGaXggYSBzcGVsbGluZyB0eXBvIGluIHRyYWNleDEuYnBmLmMK
+Pj4gICBzYW1wbGVzL2JwZjogRml4IGEgc3BlbGxpbmcgdHlwbyBpbiB0Y3BfY29uZ19rZXJu
+LmMKPj4gICB2ZmlvLW1kZXY6IEZpeCBhIHNwZWxsaW5nIHR5cG8gaW4gbXR0eS5jCj4+Cj4+
+ICBzYW1wbGVzL2JwZi9kb19oYm1fdGVzdC5zaCAgfCAyICstCj4+ICBzYW1wbGVzL2JwZi9o
+Ym0uYyAgICAgICAgICAgfCA0ICsrLS0KPj4gIHNhbXBsZXMvYnBmL3RjcF9jb25nX2tlcm4u
+YyB8IDIgKy0KPj4gIHNhbXBsZXMvYnBmL3RyYWNleDEuYnBmLmMgICB8IDIgKy0KPj4gIHNh
+bXBsZXMvdmZpby1tZGV2L210dHkuYyAgICB8IDIgKy0KPj4gIDUgZmlsZXMgY2hhbmdlZCwg
+NiBpbnNlcnRpb25zKCspLCA2IGRlbGV0aW9ucygtKQoKPlRyeWluZyB0byBpbXByb3ZlIHlv
+dXIgcGF0Y2hlcy1pbi10aGUta2VybmVsIHNjb3JlPwo+Tm90IGdvaW5nIHRvIGhhcHBlbi4g
+T25lIHBhdGNoIGZvciBhbGwgdHlwb3MgcGxzLgo+Cj5wdy1ib3Q6IGNyCgpPa2F5LCBJJ2xs
+IG1lcmdlIHRoZW0uCgo=
 
 
 
-On 10/13/2025 11:46 PM, Sean Christopherson wrote:
-> On Mon, Oct 13, 2025, Sean Christopherson wrote:
->> FWIW, there's no need to put the base (target?) branch in the subject.  The
->> branch name is often incomplete information; by the time someone goes to apply
->> the patch, the branch may have changed significantly, or maybe have even been
->> deleted, e.g. I use ephemeral topic branch for kvm-x86 that get deleted once
->> their content is merge to kvm/next.
->>
->> >From Documentation/process/maintainer-kvm-x86.rst, my strong preference is that
->> contributors always use kvm-x86/next as the base branch,
-> 
-> Oh, right, this is a funky situation though due to kvm-x86/gmem not yet being
-> folded into kvm-x86/next.  So yeah, calling out the base branch is helpful in
-> that case, but providing the --base commit is still preferred (and of course,
-> they don't have to be mutually exclusive).
-> 
->>   Base Tree/Branch
->>   ~~~~~~~~~~~~~~~~
->>   Fixes that target the current release, a.k.a. mainline, should be based on
->>   ``git://git.kernel.org/pub/scm/virt/kvm/kvm.git master``.  Note, fixes do not
->>   automatically warrant inclusion in the current release.  There is no singular
->>   rule, but typically only fixes for bugs that are urgent, critical, and/or were
->>   introduced in the current release should target the current release.
->>   
->>   Everything else should be based on ``kvm-x86/next``, i.e. there is no need to
->>   select a specific topic branch as the base.  If there are conflicts and/or
->>   dependencies across topic branches, it is the maintainer's job to sort them
->>   out.
->>   
->>   The only exception to using ``kvm-x86/next`` as the base is if a patch/series
->>   is a multi-arch series, i.e. has non-trivial modifications to common KVM code
->>   and/or has more than superficial changes to other architectures' code.  Multi-
->>   arch patch/series should instead be based on a common, stable point in KVM's
->>   history, e.g. the release candidate upon which ``kvm-x86 next`` is based.  If
->>   you're unsure whether a patch/series is truly multi-arch, err on the side of
->>   caution and treat it as multi-arch, i.e. use a common base.
->>
->> and then use the --base option with git format-patch to capture the exact hash.
->>
->>   Git Base
->>   ~~~~~~~~
->>   If you are using git version 2.9.0 or later (Googlers, this is all of you!),
->>   use ``git format-patch`` with the ``--base`` flag to automatically include the
->>   base tree information in the generated patches.
->>   
->>   Note, ``--base=auto`` works as expected if and only if a branch's upstream is
->>   set to the base topic branch, e.g. it will do the wrong thing if your upstream
->>   is set to your personal repository for backup purposes.  An alternative "auto"
->>   solution is to derive the names of your development branches based on their
->>   KVM x86 topic, and feed that into ``--base``.  E.g. ``x86/pmu/my_branch_name``,
->>   and then write a small wrapper to extract ``pmu`` from the current branch name
->>   to yield ``--base=x/pmu``, where ``x`` is whatever name your repository uses to
->>   track the KVM x86 remote.
->>
->> My pushes to kvm-x86/next are always --force pushes (it's rebuilt like linux-next,
->> though far less frequently), but when pushing, I also push a persistent tag so
->> that the exact object for each incarnation of kvm-x86/next is reachable.  Combined
->> with --base, that makes it easy to apply a patch/series even months/years after
->> the fact (assuming I didn't screw up or forget the tag).
+------=_Part_1_G5a5cMEoHajH5a5c_20251014135200=----
+Content-Type: application/pkcs7-signature; name="smime.p7s"
+Content-Transfer-Encoding: base64
+Content-Disposition: attachment; filename="smime.p7s"
 
-Thanks for the detailed explanation on --base usage. I wasn't aware of this 
-flag and will use it going forward.
+MIIKdwYJKoZIhvcNAQcCoIIKaDCCCmQCAQExDTALBglghkgBZQMEAgEwCwYJKoZIhvcNAQcB
+oIIHvTCCB7kwggahoAMCAQICE34AAkSWdsZNK1EPE5IAAQACRJYwDQYJKoZIhvcNAQELBQAw
+WTETMBEGCgmSJomT8ixkARkWA2NvbTEYMBYGCgmSJomT8ixkARkWCGxhbmdjaGFvMRQwEgYK
+CZImiZPyLGQBGRYEaG9tZTESMBAGA1UEAxMJSU5TUFVSLUNBMB4XDTI0MDkxMjAyMzIxM1oX
+DTI5MDkxMTAyMzIxM1owgbYxEzARBgoJkiaJk/IsZAEZFgNjb20xGDAWBgoJkiaJk/IsZAEZ
+FghsYW5nY2hhbzEUMBIGCgmSJomT8ixkARkWBGhvbWUxMzAxBgNVBAsMKua1qua9rueUteWt
+kOS/oeaBr+S6p+S4muiCoeS7veaciemZkOWFrOWPuDESMBAGA1UEAwwJ5qWa5YWJ5bqGMSYw
+JAYJKoZIhvcNAQkBFhdjaHVndWFuZ3FpbmdAaW5zcHVyLmNvbTCCASIwDQYJKoZIhvcNAQEB
+BQADggEPADCCAQoCggEBAKYDFgmitHYS5YOYSpMY26zG6pgktLXqOlSHGXmq5UZxsjEpQHP1
+BY4eeUE7+pgfqN1518yfCL6nHIlkQms6pCy2CbJpFMQLSIlNNt1lDnPqOdGXylYV2F/tk33C
+bwMjcL8y8brq/HrnD38lA58kUOjuEQaV38jn0coIfbkC8QScz3uBtbuOdI4jSct+liP9tgCy
+KI662Lnt9376q+iLLXvbwmrTbCdWTjMNMJjLqBWikMYTKJhTiYe2S4HxI4zKqrEee3SxA6Qe
+Yd+Ku8thY2kWMMwXETx5DYr6jGeTSfVnqmzVGESunLualJFkAfWGLEESKXhtT9Yu1q1Y+7Hb
+OPUCAwEAAaOCBBowggQWMAsGA1UdDwQEAwIFoDA9BgkrBgEEAYI3FQcEMDAuBiYrBgEEAYI3
+FQiC8qkfhIHXeoapkT2GgPcVg9iPXIFK/YsmgZSnTQIBZAIBYTBEBgkqhkiG9w0BCQ8ENzA1
+MA4GCCqGSIb3DQMCAgIAgDAOBggqhkiG9w0DBAICAIAwBwYFKw4DAgcwCgYIKoZIhvcNAwcw
+HQYDVR0OBBYEFBEL8h6Bd8FOflxman0I5rRuiXFQMB8GA1UdIwQYMBaAFF5ZA6a0TFhgkU72
+HrWlOaYywTVqMIIBDwYDVR0fBIIBBjCCAQIwgf+ggfyggfmGgbpsZGFwOi8vL0NOPUlOU1BV
+Ui1DQSxDTj1KVENBMjAxMixDTj1DRFAsQ049UHVibGljJTIwS2V5JTIwU2VydmljZXMsQ049
+U2VydmljZXMsQ049Q29uZmlndXJhdGlvbixEQz1ob21lLERDPWxhbmdjaGFvLERDPWNvbT9j
+ZXJ0aWZpY2F0ZVJldm9jYXRpb25MaXN0P2Jhc2U/b2JqZWN0Q2xhc3M9Y1JMRGlzdHJpYnV0
+aW9uUG9pbnSGOmh0dHA6Ly9KVENBMjAxMi5ob21lLmxhbmdjaGFvLmNvbS9DZXJ0RW5yb2xs
+L0lOU1BVUi1DQS5jcmwwggEsBggrBgEFBQcBAQSCAR4wggEaMIGxBggrBgEFBQcwAoaBpGxk
+YXA6Ly8vQ049SU5TUFVSLUNBLENOPUFJQSxDTj1QdWJsaWMlMjBLZXklMjBTZXJ2aWNlcyxD
+Tj1TZXJ2aWNlcyxDTj1Db25maWd1cmF0aW9uLERDPWhvbWUsREM9bGFuZ2NoYW8sREM9Y29t
+P2NBQ2VydGlmaWNhdGU/YmFzZT9vYmplY3RDbGFzcz1jZXJ0aWZpY2F0aW9uQXV0aG9yaXR5
+MGQGCCsGAQUFBzAChlhodHRwOi8vSlRDQTIwMTIuaG9tZS5sYW5nY2hhby5jb20vQ2VydEVu
+cm9sbC9KVENBMjAxMi5ob21lLmxhbmdjaGFvLmNvbV9JTlNQVVItQ0EoMSkuY3J0MCkGA1Ud
+JQQiMCAGCCsGAQUFBwMCBggrBgEFBQcDBAYKKwYBBAGCNwoDBDA1BgkrBgEEAYI3FQoEKDAm
+MAoGCCsGAQUFBwMCMAoGCCsGAQUFBwMEMAwGCisGAQQBgjcKAwQwSwYDVR0RBEQwQqAnBgor
+BgEEAYI3FAIDoBkMF2NodWd1YW5ncWluZ0BpbnNwdXIuY29tgRdjaHVndWFuZ3FpbmdAaW5z
+cHVyLmNvbTBQBgkrBgEEAYI3GQIEQzBBoD8GCisGAQQBgjcZAgGgMQQvUy0xLTUtMjEtMTYw
+Njk4MDg0OC03MDY2OTk4MjYtMTgwMTY3NDUzMS01NjA0MDYwDQYJKoZIhvcNAQELBQADggEB
+AENGHBz0J97mfrnLF1054QNBs0hM8iO39D4x/QqrMf53ghwe3sc0DxmGs6lhAmIWCMlj146j
+j6UAEF9BNZUrcysiIFPN/UwHwxFecspHX4WFmQOP41FB0oNXovWtw75GwImsszbUwaSGoWWl
+cIfGXI+35PXxhJdIPRx4nlClDcD783an45PF7Mcvkao9IlPTnUfjeKRkLnEKlkxZp+4HQbLK
+suW+/N63gqjvpjiNYMvrUQRqR7FRH1GA9w+FgUeI1/1/fCLd9zUBbQnWyaH7eub0g0j7pfH+
+DqAQeYh4FZl84NOuE/oUYyUwwmUtChIBls8Fp2FSeywopNaDLmtPipQxggKAMIICfAIBATBw
+MFkxEzARBgoJkiaJk/IsZAEZFgNjb20xGDAWBgoJkiaJk/IsZAEZFghsYW5nY2hhbzEUMBIG
+CgmSJomT8ixkARkWBGhvbWUxEjAQBgNVBAMTCUlOU1BVUi1DQQITfgACRJZ2xk0rUQ8TkgAB
+AAJEljALBglghkgBZQMEAgGggeQwGAYJKoZIhvcNAQkDMQsGCSqGSIb3DQEHATAcBgkqhkiG
+9w0BCQUxDxcNMjUxMDE0MDU1MjAwWjAvBgkqhkiG9w0BCQQxIgQgd+r2G9w5SGL/9Uu34ORr
+J6lMtuNQsLZSCduOc3GWSfsweQYJKoZIhvcNAQkPMWwwajALBglghkgBZQMEASowCwYJYIZI
+AWUDBAEWMAsGCWCGSAFlAwQBAjAKBggqhkiG9w0DBzAOBggqhkiG9w0DAgICAIAwDQYIKoZI
+hvcNAwICAUAwBwYFKw4DAgcwDQYIKoZIhvcNAwICASgwDQYJKoZIhvcNAQEBBQAEggEAZX0B
+bEktRhq6IBkRCiXwOx9N0Rsvu8LbsfcyE2FY6DrnzI5xKG2ooerqoRZz83DA8gMLp2gZ4VLB
+iUrFq66jWV5Qw63vaLIvR+u34tUiacGANhPb/XETuGwjiUfvHEUwM2yuerFrb+3t0TEiQoeN
+MeBX23eFhNtk4EIOx18kgAUH4t5HgvY+yof0MePLC/jSfNpIf+HfQm7td2RuiK2fzO3Lbc2S
+UHHPTZu2uIX5opXjqQR9g/a1eVMW5XEkBnqe5NPW72paonhCOdDuPiC+kBbXlEbjYiGZlFmS
+tkCa0fzbOHOYnIz5mVG5iDN6okXQBlg8ALNJW1Gi4IfVC05sNQ==
 
-I see you've already merged these changes into kvm-x86/gmem. Should I resend 
-these patches with kvm-x86/next and --base, or is the current version sufficient?
-
-Thank you,
-Shivank
+------=_Part_1_G5a5cMEoHajH5a5c_20251014135200=------
 
