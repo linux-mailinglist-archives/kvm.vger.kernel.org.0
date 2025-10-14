@@ -1,390 +1,149 @@
-Return-Path: <kvm+bounces-60000-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-60001-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9B581BD7D4B
-	for <lists+kvm@lfdr.de>; Tue, 14 Oct 2025 09:14:47 +0200 (CEST)
+Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [IPv6:2a01:60a::1994:3:14])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7F7B4BD7DF4
+	for <lists+kvm@lfdr.de>; Tue, 14 Oct 2025 09:25:14 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 8E5A94F6C93
-	for <lists+kvm@lfdr.de>; Tue, 14 Oct 2025 07:14:44 +0000 (UTC)
+	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 2B64A351082
+	for <lists+kvm@lfdr.de>; Tue, 14 Oct 2025 07:25:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4927A30DEBE;
-	Tue, 14 Oct 2025 07:14:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 94A9330E82B;
+	Tue, 14 Oct 2025 07:25:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="brGVHwQG"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="jFPB8zw/"
 X-Original-To: kvm@vger.kernel.org
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.15])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7ACCC30AADC
-	for <kvm@vger.kernel.org>; Tue, 14 Oct 2025 07:14:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B3B6C30E825;
+	Tue, 14 Oct 2025 07:24:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.15
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1760426059; cv=none; b=GqnxIX6USpOHDK0A5H1JRZoOK24hhAPHbYPys7pU56pqHvK2OUiG+7BhZq5LIUp1hgf4SCNSAkLQ2QR7OiZjb5Bwsg9xvJ9GrnKWMsihOmGfkQP8dVuisyw1V+EWWP5KouFLwHmF/pvCF+VNaAUBAtvF4hJpzoVgQypXMa2Gqxk=
+	t=1760426697; cv=none; b=qmaXRUAQPR0tN7zwH9zhlUC17beNaZH94dLi+7IuyGFKCbcU2sLcTj2YPuC/K/P+FArvdLKBcXLdFW+ny3D2rl87Z/08jfL3E9x4uGxXOaYi3Zje10ssW5jeFAirw2giZnk0nuZnhtD8wz6EO1JOBuFoEHnIMLqYN7mqwxYmxEg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1760426059; c=relaxed/simple;
-	bh=tDisShmL1kKXk0VUQIxjNLqNjScXe+aGtBRPAdMXFkg=;
-	h=Message-ID:Date:MIME-Version:Subject:From:To:Cc:References:
-	 In-Reply-To:Content-Type; b=c0qJBhfv8TIES9V6hzzL38iob4hKBlQEbDo0DptUD1E/ANoO3TP1Jop7i2ltD5rC+gaT39IL5n+sOZYZPattijkxanRv7oBJVchGKRZdihwP168AN5PdXZe+zxq6s7XjfTG3vLADBde8G3kYR49bWgMnrkHzumQCjpo4kQ0SvCo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=brGVHwQG; arc=none smtp.client-ip=148.163.156.1
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
-Received: from pps.filterd (m0356517.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 59DJcJWj004069;
-	Tue, 14 Oct 2025 07:14:03 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
-	:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=pp1; bh=pcnUwj
-	1VCEbEl3lfKAIHu/ovYNaGYaQpzAC392Luafc=; b=brGVHwQGADw2c8p/FpcOJf
-	ZjXyvGBPK1thAAw6kwRJkaqDULYVSDu+vAe5Uz1qWeLxmmbiz61SbsT2iDf4vi17
-	RCmwlfjcDJCoGarMHwmUIe/Ym/OOM3FW7tpEK4ECU/YompZgh+V2dviims3CYjyu
-	6yH1bNcWiwIyhwLOCcRpt6kX/Ae0b/cicy6uQ4ZYE54Kho+0/WqMt6ktvcmhClpR
-	l/ssAx9H6rf92Dipr9xVS0x8/o45CKmDFfw2a9vvIjX3qw3xVPp8qrLMl1zSElGg
-	qtkMWuyAWCJpe//L6wHzJtyHRo0z+UG9n3wvMAqxEn1P5op7702XvyPNe3KAXgBA
-	==
-Received: from pps.reinject (localhost [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 49qey8n4qr-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Tue, 14 Oct 2025 07:14:03 +0000 (GMT)
-Received: from m0356517.ppops.net (m0356517.ppops.net [127.0.0.1])
-	by pps.reinject (8.18.1.12/8.18.0.8) with ESMTP id 59E7BFeB006751;
-	Tue, 14 Oct 2025 07:14:02 GMT
-Received: from ppma23.wdc07v.mail.ibm.com (5d.69.3da9.ip4.static.sl-reverse.com [169.61.105.93])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 49qey8n4qh-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Tue, 14 Oct 2025 07:14:02 +0000 (GMT)
-Received: from pps.filterd (ppma23.wdc07v.mail.ibm.com [127.0.0.1])
-	by ppma23.wdc07v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 59E39NIW016759;
-	Tue, 14 Oct 2025 07:14:01 GMT
-Received: from smtprelay07.wdc07v.mail.ibm.com ([172.16.1.74])
-	by ppma23.wdc07v.mail.ibm.com (PPS) with ESMTPS id 49r32jsk9h-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Tue, 14 Oct 2025 07:14:01 +0000
-Received: from smtpav01.wdc07v.mail.ibm.com (smtpav01.wdc07v.mail.ibm.com [10.39.53.228])
-	by smtprelay07.wdc07v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 59E7E1Qu21365466
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Tue, 14 Oct 2025 07:14:01 GMT
-Received: from smtpav01.wdc07v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 2F5BA5804B;
-	Tue, 14 Oct 2025 07:14:01 +0000 (GMT)
-Received: from smtpav01.wdc07v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 998115805B;
-	Tue, 14 Oct 2025 07:13:57 +0000 (GMT)
-Received: from [9.109.242.24] (unknown [9.109.242.24])
-	by smtpav01.wdc07v.mail.ibm.com (Postfix) with ESMTP;
-	Tue, 14 Oct 2025 07:13:57 +0000 (GMT)
-Message-ID: <dd198004-21e5-4e14-9a73-05be3bc0594e@linux.ibm.com>
-Date: Tue, 14 Oct 2025 12:43:56 +0530
+	s=arc-20240116; t=1760426697; c=relaxed/simple;
+	bh=CZp0lbQNhLiQFl87ZwYMZVvAm4voMmM69OP6B4llGtg=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=BDVdt0ABN29zSA0zsHLnjuzIw5QUuqo9HHIh3orLt2K+HNB7Mzz2E6upQAsIjg7/hwIN6ghwGy94W1NlWJL47vnChH1agPKDzZd/2DY9TfCGRR/rnBRHYLrf1hBpS8/OOJioZenGM79O2Z2IwU4b7fHV5Yyy6wrWOBzGN9Fmrb0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=jFPB8zw/; arc=none smtp.client-ip=192.198.163.15
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1760426694; x=1791962694;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=CZp0lbQNhLiQFl87ZwYMZVvAm4voMmM69OP6B4llGtg=;
+  b=jFPB8zw/wTrGG3FAS6mK8qP2EEaS3ljm6jN2WMLIdPfQ7guguRplPRT6
+   N8RFL67LGm0gDYxSp3q95u5Wfrj/swzOXv//ktr9MtIgzVImTSqJ4V6D4
+   3P3jg+Cp3nQSOf/MKKCd9gor+Tra3Qt8BNqpJhwHmb3hdxdDM6B575yko
+   GLf4y8g2ZhNsfvJfs8is+V0xtp39X5E7XrkOCJAS4C3EcoT4NIP5gNNc6
+   N47Z0qh3trsMC9LfZsshQxcAKIXWBb55LMYaX97ekyGfecfzzgn5SN+Mm
+   H4HQgnUBXi9mtrMAu8UlE6jHC8MdGp8T+Vtj9JqlcCG4AdT0F9NOQsYEE
+   w==;
+X-CSE-ConnectionGUID: sInZHrKYQRG600vd5/jiiw==
+X-CSE-MsgGUID: pE5xQIaVSiKKMklAPGpCzw==
+X-IronPort-AV: E=McAfee;i="6800,10657,11581"; a="62675651"
+X-IronPort-AV: E=Sophos;i="6.19,227,1754982000"; 
+   d="scan'208";a="62675651"
+Received: from fmviesa002.fm.intel.com ([10.60.135.142])
+  by fmvoesa109.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 14 Oct 2025 00:24:52 -0700
+X-CSE-ConnectionGUID: Q3qE+95qS+ilJ3jJ2tTHUQ==
+X-CSE-MsgGUID: kkSzHRp2TByN1oWW0oOGvg==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.19,227,1754982000"; 
+   d="scan'208";a="205506982"
+Received: from lkp-server02.sh.intel.com (HELO 66d7546c76b2) ([10.239.97.151])
+  by fmviesa002.fm.intel.com with ESMTP; 14 Oct 2025 00:24:49 -0700
+Received: from kbuild by 66d7546c76b2 with local (Exim 4.96)
+	(envelope-from <lkp@intel.com>)
+	id 1v8ZOo-0002Vb-38;
+	Tue, 14 Oct 2025 07:24:46 +0000
+Date: Tue, 14 Oct 2025 15:24:37 +0800
+From: kernel test robot <lkp@intel.com>
+To: Brendan Jackman <jackmanb@google.com>,
+	Thomas Gleixner <tglx@linutronix.de>,
+	Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+	Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org,
+	"H. Peter Anvin" <hpa@zytor.com>,
+	Sean Christopherson <seanjc@google.com>,
+	Paolo Bonzini <pbonzini@redhat.com>
+Cc: oe-kbuild-all@lists.linux.dev, linux-kernel@vger.kernel.org,
+	kvm@vger.kernel.org, Brendan Jackman <jackmanb@google.com>
+Subject: Re: [PATCH] KVM: x86: Unify L1TF flushing under per-CPU variable
+Message-ID: <202510141438.OMSBOz6R-lkp@intel.com>
+References: <20251013-b4-l1tf-percpu-v1-1-d65c5366ea1a@google.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 12/16] target/ppc: Replace HOST_BIG_ENDIAN #ifdef with
- runtime if() check
-From: Harsh Prateek Bora <harshpb@linux.ibm.com>
-To: =?UTF-8?Q?Philippe_Mathieu-Daud=C3=A9?= <philmd@linaro.org>,
-        qemu-devel@nongnu.org
-Cc: qemu-ppc@nongnu.org, qemu-arm@nongnu.org, qemu-riscv@nongnu.org,
-        qemu-s390x@nongnu.org, Nicholas Piggin <npiggin@gmail.com>,
-        Chinmay Rath <rathc@linux.ibm.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Richard Henderson <richard.henderson@linaro.org>, kvm@vger.kernel.org
-References: <20251010134226.72221-1-philmd@linaro.org>
- <20251010134226.72221-13-philmd@linaro.org>
- <a8e70e2b-4511-4d7c-a95c-a02cb6e6dd0e@linux.ibm.com>
-Content-Language: en-US
-In-Reply-To: <a8e70e2b-4511-4d7c-a95c-a02cb6e6dd0e@linux.ibm.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: 1Z-bMi1PuKRdfyi8ZP8TUyoK_3Ln5BG4
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUxMDExMDAxMSBTYWx0ZWRfX8vET8ZL01PKt
- 6S5Je3Cu9uVP1ucS84b4dRQ37BdlpgGXnVoY0QeqI0tDiZ9AglCs0z9RWbUcG/IFDkYPV+FNC6f
- IMAwrvYjc2TCP8mv2YvyLDqlSZ7B9RVfDRe6XUB5Hiptw3iZMZY4fnlzrnrhCgQHEWIeN4VDDTB
- 0WksK5EPJEq9yOnH7yeOEH4gy9Ufsy/Aqlp1KxJ8UoWZXWRR2brnozMKObwjOnku0xdgUYcdPsx
- g5aR4DB8em1a6dGIcNtplRqioikDVAqGYhN2hIsVdK1VFkeIBqPypiZ97U0KDiuNpfQuepMk5Zz
- w9ZcvBDv26YADZk+N8vSr79ZfIjAxiYHrpl1NfNt1aL/Ht9vgElTkefxuuYBBLb+UZ/oN/BQhoi
- tjMUM2OWYLXxpuihkKY8yHYPN2/TbA==
-X-Proofpoint-GUID: hvodGjLgLG3OyHl3eTANSNoRSC2jxnH3
-X-Authority-Analysis: v=2.4 cv=QZ5rf8bv c=1 sm=1 tr=0 ts=68edf83b cx=c_pps
- a=3Bg1Hr4SwmMryq2xdFQyZA==:117 a=3Bg1Hr4SwmMryq2xdFQyZA==:17
- a=IkcTkHD0fZMA:10 a=x6icFKpwvdMA:10 a=f7IdgyKtn90A:10
- a=VkNPw1HP01LnGYTKEx00:22 a=KKAkSRfTAAAA:8 a=VnNF1IyMAAAA:8
- a=GBeU-aChTpiHtyJ2uCUA:9 a=3ZKOabzyN94A:10 a=QEXdDO2ut3YA:10
- a=cvBusfyB2V15izCimMoJ:22 a=oH34dK2VZjykjzsv8OSz:22 a=cPQSjfK2_nFv0Q5t_7PE:22
- a=Z5ABNNGmrOfJ6cZ5bIyy:22 a=jd6J4Gguk5HxikPWLKER:22
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1121,Hydra:6.1.9,FMLib:17.12.80.40
- definitions=2025-10-14_02,2025-10-13_01,2025-03-28_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- lowpriorityscore=0 priorityscore=1501 phishscore=0 bulkscore=0 suspectscore=0
- spamscore=0 malwarescore=0 impostorscore=0 clxscore=1015 adultscore=0
- classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
- reason=mlx scancount=1 engine=8.19.0-2510020000 definitions=main-2510110011
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20251013-b4-l1tf-percpu-v1-1-d65c5366ea1a@google.com>
+
+Hi Brendan,
+
+kernel test robot noticed the following build errors:
+
+[auto build test ERROR on 6b36119b94d0b2bb8cea9d512017efafd461d6ac]
+
+url:    https://github.com/intel-lab-lkp/linux/commits/Brendan-Jackman/KVM-x86-Unify-L1TF-flushing-under-per-CPU-variable/20251013-235118
+base:   6b36119b94d0b2bb8cea9d512017efafd461d6ac
+patch link:    https://lore.kernel.org/r/20251013-b4-l1tf-percpu-v1-1-d65c5366ea1a%40google.com
+patch subject: [PATCH] KVM: x86: Unify L1TF flushing under per-CPU variable
+config: x86_64-rhel-9.4 (https://download.01.org/0day-ci/archive/20251014/202510141438.OMSBOz6R-lkp@intel.com/config)
+compiler: gcc-14 (Debian 14.2.0-19) 14.2.0
+reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20251014/202510141438.OMSBOz6R-lkp@intel.com/reproduce)
+
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202510141438.OMSBOz6R-lkp@intel.com/
+
+All errors (new ones prefixed by >>):
+
+>> arch/x86/coco/tdx/tdx.c:471:12: error: conflicting types for 'read_msr'; have 'int(struct pt_regs *, struct ve_info *)'
+     471 | static int read_msr(struct pt_regs *regs, struct ve_info *ve)
+         |            ^~~~~~~~
+   In file included from arch/x86/include/asm/idtentry.h:15,
+                    from arch/x86/include/asm/traps.h:9,
+                    from arch/x86/coco/tdx/tdx.c:20:
+   arch/x86/include/asm/kvm_host.h:2320:29: note: previous definition of 'read_msr' with type 'long unsigned int(long unsigned int)'
+    2320 | static inline unsigned long read_msr(unsigned long msr)
+         |                             ^~~~~~~~
 
 
+vim +471 arch/x86/coco/tdx/tdx.c
 
-On 10/14/25 12:18, Harsh Prateek Bora wrote:
-> 
-> 
-> On 10/10/25 19:12, Philippe Mathieu-Daudé wrote:
->> Replace compile-time #ifdef with a runtime check to ensure all code
->> paths are built and tested. This reduces build-time configuration
->> complexity and improves maintainability.
->>
->> No functional change intended.
->>
->> Signed-off-by: Philippe Mathieu-Daudé <philmd@linaro.org>
->> ---
->>   target/ppc/arch_dump.c              |  9 ++-------
->>   target/ppc/int_helper.c             | 28 ++++++++++++++--------------
->>   target/ppc/kvm.c                    | 25 +++++++++----------------
->>   target/ppc/translate/vmx-impl.c.inc | 14 +++++++-------
->>   target/ppc/translate/vsx-impl.c.inc |  6 +++---
->>   tcg/ppc/tcg-target.c.inc            | 24 ++++++++++++------------
->>   6 files changed, 47 insertions(+), 59 deletions(-)
->>
->> diff --git a/target/ppc/arch_dump.c b/target/ppc/arch_dump.c
->> index 80ac6c3e320..5cb8dbe9a6a 100644
->> --- a/target/ppc/arch_dump.c
->> +++ b/target/ppc/arch_dump.c
->> @@ -158,21 +158,16 @@ static void ppc_write_elf_vmxregset(NoteFuncArg 
->> *arg, PowerPCCPU *cpu, int id)
->>       struct PPCElfVmxregset *vmxregset;
->>       Note *note = &arg->note;
->>       DumpState *s = arg->state;
->> +    const int host_data_order = HOST_BIG_ENDIAN ? ELFDATA2MSB : 
->> ELFDATA2LSB;
-> 
-> I think the order of return values of ternary op needs to be swapped.
-> 
->                              HOST_BIG_ENDIAN ? ELFDATA2LSB : ELFDATA2MSB;
-> 
-> Otherwise, looks fine. With that fixed:
-> Reviewed-by: Harsh Prateek Bora <harshpb@linux.ibm.com>
-> 
-> 
->> +    const bool needs_byteswap = s->dump_info.d_endian == 
->> host_data_order;
+9f98a4f4e7216d Vishal Annapurve   2025-02-28  470  
+cdd85786f4b3b9 Kirill A. Shutemov 2022-06-14 @471  static int read_msr(struct pt_regs *regs, struct ve_info *ve)
+ae87f609cd5282 Kirill A. Shutemov 2022-04-06  472  {
+8a8544bde858e5 Kai Huang          2023-08-15  473  	struct tdx_module_args args = {
+ae87f609cd5282 Kirill A. Shutemov 2022-04-06  474  		.r10 = TDX_HYPERCALL_STANDARD,
+ae87f609cd5282 Kirill A. Shutemov 2022-04-06  475  		.r11 = hcall_func(EXIT_REASON_MSR_READ),
+ae87f609cd5282 Kirill A. Shutemov 2022-04-06  476  		.r12 = regs->cx,
+ae87f609cd5282 Kirill A. Shutemov 2022-04-06  477  	};
+ae87f609cd5282 Kirill A. Shutemov 2022-04-06  478  
+ae87f609cd5282 Kirill A. Shutemov 2022-04-06  479  	/*
+ae87f609cd5282 Kirill A. Shutemov 2022-04-06  480  	 * Emulate the MSR read via hypercall. More info about ABI
+ae87f609cd5282 Kirill A. Shutemov 2022-04-06  481  	 * can be found in TDX Guest-Host-Communication Interface
+ae87f609cd5282 Kirill A. Shutemov 2022-04-06  482  	 * (GHCI), section titled "TDG.VP.VMCALL<Instruction.RDMSR>".
+ae87f609cd5282 Kirill A. Shutemov 2022-04-06  483  	 */
+c641cfb5c157b6 Kai Huang          2023-08-15  484  	if (__tdx_hypercall(&args))
+cdd85786f4b3b9 Kirill A. Shutemov 2022-06-14  485  		return -EIO;
+ae87f609cd5282 Kirill A. Shutemov 2022-04-06  486  
+ae87f609cd5282 Kirill A. Shutemov 2022-04-06  487  	regs->ax = lower_32_bits(args.r11);
+ae87f609cd5282 Kirill A. Shutemov 2022-04-06  488  	regs->dx = upper_32_bits(args.r11);
+cdd85786f4b3b9 Kirill A. Shutemov 2022-06-14  489  	return ve_instr_len(ve);
+ae87f609cd5282 Kirill A. Shutemov 2022-04-06  490  }
+ae87f609cd5282 Kirill A. Shutemov 2022-04-06  491  
 
-Or, a better fix would be to change == to != ?
-
->>       note->hdr.n_type = cpu_to_dump32(s, NT_PPC_VMX);
->>       vmxregset = &note->contents.vmxregset;
->>       memset(vmxregset, 0, sizeof(*vmxregset));
->>       for (i = 0; i < 32; i++) {
->> -        bool needs_byteswap;
->>           ppc_avr_t *avr = cpu_avr_ptr(&cpu->env, i);
->> -#if HOST_BIG_ENDIAN
->> -        needs_byteswap = s->dump_info.d_endian == ELFDATA2LSB;
->> -#else
->> -        needs_byteswap = s->dump_info.d_endian == ELFDATA2MSB;
->> -#endif
->> -
->>           if (needs_byteswap) {
->>               vmxregset->avr[i].u64[0] = bswap64(avr->u64[1]);
->>               vmxregset->avr[i].u64[1] = bswap64(avr->u64[0]);
->> diff --git a/target/ppc/int_helper.c b/target/ppc/int_helper.c
->> index ef4b2e75d60..0c6f5b2e519 100644
->> --- a/target/ppc/int_helper.c
->> +++ b/target/ppc/int_helper.c
->> @@ -1678,13 +1678,13 @@ void helper_vslo(ppc_avr_t *r, ppc_avr_t *a, 
->> ppc_avr_t *b)
->>   {
->>       int sh = (b->VsrB(0xf) >> 3) & 0xf;
->> -#if HOST_BIG_ENDIAN
->> -    memmove(&r->u8[0], &a->u8[sh], 16 - sh);
->> -    memset(&r->u8[16 - sh], 0, sh);
->> -#else
->> -    memmove(&r->u8[sh], &a->u8[0], 16 - sh);
->> -    memset(&r->u8[0], 0, sh);
->> -#endif
->> +    if (HOST_BIG_ENDIAN) {
->> +        memmove(&r->u8[0], &a->u8[sh], 16 - sh);
->> +        memset(&r->u8[16 - sh], 0, sh);
->> +    } else {
->> +        memmove(&r->u8[sh], &a->u8[0], 16 - sh);
->> +        memset(&r->u8[0], 0, sh);
->> +    }
->>   }
->>   #if HOST_BIG_ENDIAN
->> @@ -1898,13 +1898,13 @@ void helper_vsro(ppc_avr_t *r, ppc_avr_t *a, 
->> ppc_avr_t *b)
->>   {
->>       int sh = (b->VsrB(0xf) >> 3) & 0xf;
->> -#if HOST_BIG_ENDIAN
->> -    memmove(&r->u8[sh], &a->u8[0], 16 - sh);
->> -    memset(&r->u8[0], 0, sh);
->> -#else
->> -    memmove(&r->u8[0], &a->u8[sh], 16 - sh);
->> -    memset(&r->u8[16 - sh], 0, sh);
->> -#endif
->> +    if (HOST_BIG_ENDIAN) {
->> +        memmove(&r->u8[sh], &a->u8[0], 16 - sh);
->> +        memset(&r->u8[0], 0, sh);
->> +    } else {
->> +        memmove(&r->u8[0], &a->u8[sh], 16 - sh);
->> +        memset(&r->u8[16 - sh], 0, sh);
->> +    }
->>   }
->>   void helper_vsumsws(CPUPPCState *env, ppc_avr_t *r, ppc_avr_t *a, 
->> ppc_avr_t *b)
->> diff --git a/target/ppc/kvm.c b/target/ppc/kvm.c
->> index 2521ff65c6c..c00d29ce2c8 100644
->> --- a/target/ppc/kvm.c
->> +++ b/target/ppc/kvm.c
->> @@ -651,13 +651,13 @@ static int kvm_put_fp(CPUState *cs)
->>               uint64_t *fpr = cpu_fpr_ptr(env, i);
->>               uint64_t *vsrl = cpu_vsrl_ptr(env, i);
->> -#if HOST_BIG_ENDIAN
->> -            vsr[0] = float64_val(*fpr);
->> -            vsr[1] = *vsrl;
->> -#else
->> -            vsr[0] = *vsrl;
->> -            vsr[1] = float64_val(*fpr);
->> -#endif
->> +            if (HOST_BIG_ENDIAN) {
->> +                vsr[0] = float64_val(*fpr);
->> +                vsr[1] = *vsrl;
->> +            } else {
->> +                vsr[0] = *vsrl;
->> +                vsr[1] = float64_val(*fpr);
->> +            }
->>               reg.addr = (uintptr_t) &vsr;
->>               reg.id = vsx ? KVM_REG_PPC_VSR(i) : KVM_REG_PPC_FPR(i);
->> @@ -728,17 +728,10 @@ static int kvm_get_fp(CPUState *cs)
->>                                           strerror(errno));
->>                   return ret;
->>               } else {
->> -#if HOST_BIG_ENDIAN
->> -                *fpr = vsr[0];
->> +                *fpr = vsr[!HOST_BIG_ENDIAN];
->>                   if (vsx) {
->> -                    *vsrl = vsr[1];
->> +                    *vsrl = vsr[HOST_BIG_ENDIAN];
->>                   }
->> -#else
->> -                *fpr = vsr[1];
->> -                if (vsx) {
->> -                    *vsrl = vsr[0];
->> -                }
->> -#endif
->>               }
->>           }
->>       }
->> diff --git a/target/ppc/translate/vmx-impl.c.inc 
->> b/target/ppc/translate/vmx-impl.c.inc
->> index 92d6e8c6032..ca9cf1823d4 100644
->> --- a/target/ppc/translate/vmx-impl.c.inc
->> +++ b/target/ppc/translate/vmx-impl.c.inc
->> @@ -134,9 +134,9 @@ static void gen_mtvscr(DisasContext *ctx)
->>       val = tcg_temp_new_i32();
->>       bofs = avr_full_offset(rB(ctx->opcode));
->> -#if HOST_BIG_ENDIAN
->> -    bofs += 3 * 4;
->> -#endif
->> +    if (HOST_BIG_ENDIAN) {
->> +        bofs += 3 * 4;
->> +    }
->>       tcg_gen_ld_i32(val, tcg_env, bofs);
->>       gen_helper_mtvscr(tcg_env, val);
->> @@ -1528,10 +1528,10 @@ static void gen_vsplt(DisasContext *ctx, int 
->> vece)
->>       /* Experimental testing shows that hardware masks the 
->> immediate.  */
->>       bofs += (uimm << vece) & 15;
->> -#if !HOST_BIG_ENDIAN
->> -    bofs ^= 15;
->> -    bofs &= ~((1 << vece) - 1);
->> -#endif
->> +    if (!HOST_BIG_ENDIAN) {
->> +        bofs ^= 15;
->> +        bofs &= ~((1 << vece) - 1);
->> +    }
->>       tcg_gen_gvec_dup_mem(vece, dofs, bofs, 16, 16);
->>   }
->> diff --git a/target/ppc/translate/vsx-impl.c.inc 
->> b/target/ppc/translate/vsx-impl.c.inc
->> index 00ad57c6282..8e5c75961f4 100644
->> --- a/target/ppc/translate/vsx-impl.c.inc
->> +++ b/target/ppc/translate/vsx-impl.c.inc
->> @@ -1642,9 +1642,9 @@ static bool trans_XXSPLTW(DisasContext *ctx, 
->> arg_XX2_uim *a)
->>       tofs = vsr_full_offset(a->xt);
->>       bofs = vsr_full_offset(a->xb);
->>       bofs += a->uim << MO_32;
->> -#if !HOST_BIG_ENDIAN
->> -    bofs ^= 8 | 4;
->> -#endif
->> +    if (!HOST_BIG_ENDIAN) {
->> +        bofs ^= 8 | 4;
->> +    }
->>       tcg_gen_gvec_dup_mem(MO_32, tofs, bofs, 16, 16);
->>       return true;
->> diff --git a/tcg/ppc/tcg-target.c.inc b/tcg/ppc/tcg-target.c.inc
->> index b8b23d44d5e..61aa77f5454 100644
->> --- a/tcg/ppc/tcg-target.c.inc
->> +++ b/tcg/ppc/tcg-target.c.inc
->> @@ -3951,9 +3951,9 @@ static bool tcg_out_dupm_vec(TCGContext *s, 
->> TCGType type, unsigned vece,
->>               tcg_out_mem_long(s, 0, LVEBX, out, base, offset);
->>           }
->>           elt = extract32(offset, 0, 4);
->> -#if !HOST_BIG_ENDIAN
->> -        elt ^= 15;
->> -#endif
->> +        if (!HOST_BIG_ENDIAN) {
->> +            elt ^= 15;
->> +        }
->>           tcg_out32(s, VSPLTB | VRT(out) | VRB(out) | (elt << 16));
->>           break;
->>       case MO_16:
->> @@ -3964,9 +3964,9 @@ static bool tcg_out_dupm_vec(TCGContext *s, 
->> TCGType type, unsigned vece,
->>               tcg_out_mem_long(s, 0, LVEHX, out, base, offset);
->>           }
->>           elt = extract32(offset, 1, 3);
->> -#if !HOST_BIG_ENDIAN
->> -        elt ^= 7;
->> -#endif
->> +        if (!HOST_BIG_ENDIAN) {
->> +            elt ^= 7;
->> +        }
->>           tcg_out32(s, VSPLTH | VRT(out) | VRB(out) | (elt << 16));
->>           break;
->>       case MO_32:
->> @@ -3977,9 +3977,9 @@ static bool tcg_out_dupm_vec(TCGContext *s, 
->> TCGType type, unsigned vece,
->>           tcg_debug_assert((offset & 3) == 0);
->>           tcg_out_mem_long(s, 0, LVEWX, out, base, offset);
->>           elt = extract32(offset, 2, 2);
->> -#if !HOST_BIG_ENDIAN
->> -        elt ^= 3;
->> -#endif
->> +        if (!HOST_BIG_ENDIAN) {
->> +            elt ^= 3;
->> +        }
->>           tcg_out32(s, VSPLTW | VRT(out) | VRB(out) | (elt << 16));
->>           break;
->>       case MO_64:
->> @@ -3991,9 +3991,9 @@ static bool tcg_out_dupm_vec(TCGContext *s, 
->> TCGType type, unsigned vece,
->>           tcg_out_mem_long(s, 0, LVX, out, base, offset & -16);
->>           tcg_out_vsldoi(s, TCG_VEC_TMP1, out, out, 8);
->>           elt = extract32(offset, 3, 1);
->> -#if !HOST_BIG_ENDIAN
->> -        elt = !elt;
->> -#endif
->> +        if (!HOST_BIG_ENDIAN) {
->> +            elt = !elt;
->> +        }
->>           if (elt) {
->>               tcg_out_vsldoi(s, out, out, TCG_VEC_TMP1, 8);
->>           } else {
-> 
+-- 
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
 
