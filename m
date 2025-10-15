@@ -1,129 +1,169 @@
-Return-Path: <kvm+bounces-60074-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-60075-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 72EA8BDEC77
-	for <lists+kvm@lfdr.de>; Wed, 15 Oct 2025 15:38:38 +0200 (CEST)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3D1D6BDEDE0
+	for <lists+kvm@lfdr.de>; Wed, 15 Oct 2025 15:57:05 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id DCC4E19A7B5E
-	for <lists+kvm@lfdr.de>; Wed, 15 Oct 2025 13:39:01 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 712DB4FDFDC
+	for <lists+kvm@lfdr.de>; Wed, 15 Oct 2025 13:56:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 513C322ACEF;
-	Wed, 15 Oct 2025 13:38:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CB10023F405;
+	Wed, 15 Oct 2025 13:56:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="ctl3KAdp"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="PY8q/l2h"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.13])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pj1-f73.google.com (mail-pj1-f73.google.com [209.85.216.73])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 49A5E1991CB;
-	Wed, 15 Oct 2025 13:38:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.13
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6B11F237A4F
+	for <kvm@vger.kernel.org>; Wed, 15 Oct 2025 13:56:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.73
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1760535512; cv=none; b=E4UTxersJA+EbyVwjIrOJQ6JlrLvvGkbiKQBgjQCxr8fHCDzxog/sOvGZkNzNrLRmwIANBe7oRxnicr6N3s1NNdJZvLHKoBEnUdbE/IGSvZTb2G0GWWEDtPnxLmUsXJdD90bCoYoZyZBlA8M+WxLNljKHfSz+YE4eV18oEzW84o=
+	t=1760536613; cv=none; b=MSf/KuH/fKzeStI+kyVXx/xYw9mVdOUiE3gm4u/mt3hLpUewan0+SoLstl4w4Xn8+ziJiyaBl6iQ90/OPfn8ErXNg3lTib/aybqoABxn8msgbv9gAU1Mi5y+ObqWOfpP0o/o69pQdvcCTp5uJEQ6DojMEWb/PP68Km+EMAK0dwQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1760535512; c=relaxed/simple;
-	bh=6PdMurltLnCFBHRlFouE6RvKBNvD10DlsNLSaFacxSE=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=RH9syfBqRHlpxXwZdJPbkUINQbaH6rVm8MPhObNCtSkD65zZNZfRlQG1ahZznyVdkYa44pKsP3xU9DevnAAqajfXphHvKkpd3ToafVGEp4HY12gQ39GUgAJDd1WzUiiYNjHrhDjF4KYyTpejTp8F2TKYOC6ElWeefycVtRmy+Tw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=pass smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=ctl3KAdp; arc=none smtp.client-ip=198.175.65.13
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1760535511; x=1792071511;
-  h=message-id:date:mime-version:subject:to:cc:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=6PdMurltLnCFBHRlFouE6RvKBNvD10DlsNLSaFacxSE=;
-  b=ctl3KAdp0EjWeHX2+yEt2xlRDSUOW3SlQCvpYJSJTK4rFnRHb0+tszRj
-   2wQWd36TAuKwWzUiPf87qqFBOr+T7Dtu5k8pTO/nj83l174YjNTq0p7Zk
-   p+e7iOJDoFEWPhcRBpr7ehuyk5NzAoII5Vqump4+HRycXlAQ5BIwYEGqp
-   X04TcPAoOjTWsuuHjwD//2SKaVEvQv2g/4uj9AGU8lLNrhkGXkyAO7T1a
-   MSbt6dMi5oaXCoeHQ+ZdtLzWAYHTQElwevxDFm4X8E7YrfMXo2f6tk249
-   CafBSY9X5qbXyDeLm1yZMQQC9rlg75CbfiGZL5oLP1mmdhKrpnJL4213F
-   g==;
-X-CSE-ConnectionGUID: etwwCZenSbGoMzteXY9e2A==
-X-CSE-MsgGUID: W4RJUJ+eSQGJHB2xctSYXg==
-X-IronPort-AV: E=McAfee;i="6800,10657,11583"; a="73820324"
-X-IronPort-AV: E=Sophos;i="6.19,231,1754982000"; 
-   d="scan'208";a="73820324"
-Received: from fmviesa005.fm.intel.com ([10.60.135.145])
-  by orvoesa105.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 15 Oct 2025 06:38:30 -0700
-X-CSE-ConnectionGUID: GRcElT4RS2yxGb9imXemcw==
-X-CSE-MsgGUID: mk2S/X5pQEG3Q9pZM3mf7A==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.19,231,1754982000"; 
-   d="scan'208";a="186600248"
-Received: from binbinwu-mobl.ccr.corp.intel.com (HELO [10.124.235.70]) ([10.124.235.70])
-  by fmviesa005-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 15 Oct 2025 06:38:27 -0700
-Message-ID: <e628bc34-43e4-4019-991c-330b946638d3@linux.intel.com>
-Date: Wed, 15 Oct 2025 21:38:25 +0800
+	s=arc-20240116; t=1760536613; c=relaxed/simple;
+	bh=m+G0nBe9aA0EmzaSVsynqwbW9yMQCHvS5kK3vf4vtKo=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=HO1Pp9zisjE3yKADJkF25PKncPnVLb4CvOML+wcg/kYbJsx1sShZi9Z566XLT7zHGh+JqNcCoh/qZqzo260MprajSKZwVbQHgKnD2WBlweUk2qRWhNb8sJ9TALeM+/YeecJHqKbCLEfezzBc795GivSS3OOtZnXdvyJ+yFLSajU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=PY8q/l2h; arc=none smtp.client-ip=209.85.216.73
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+Received: by mail-pj1-f73.google.com with SMTP id 98e67ed59e1d1-32eb864fe90so17677971a91.3
+        for <kvm@vger.kernel.org>; Wed, 15 Oct 2025 06:56:51 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1760536611; x=1761141411; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:from:subject:message-id:references
+         :mime-version:in-reply-to:date:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=W2aj6drJZA1MGp73i2ggdW6v3XVyKQ9+mWA2y/lZA50=;
+        b=PY8q/l2h9J27Mf1NOIdEuBbU/H2R42mS1edd457Q7JwrETxj8exru3nE08z3E8mSdz
+         WAzeXLY9rLbR89sjuANU+IoGhUP7CUWv0laAvo4kzyecmO5fv1ys2yBV3b4a1JvdSnwB
+         dM6EUooghVb2ovte/2OauAjCHnyDeoUNMVBR2p5h1Acb8Hm+EgqsqY4vQEQ+07iWT9ck
+         uX7cK/j6se2B5UpwxIY6yoeabHQonAQJyvsgURLL6UA/HNfnb1MrgBKQyjnOL/zrdlaK
+         1nsoQf7fzCbI/pjdpuW42Pbz47aLwbwxXyVBMFFtNoQbliQMKzUVtV+0lp+rUwmvRQUo
+         uGYQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1760536611; x=1761141411;
+        h=content-transfer-encoding:cc:to:from:subject:message-id:references
+         :mime-version:in-reply-to:date:x-gm-message-state:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=W2aj6drJZA1MGp73i2ggdW6v3XVyKQ9+mWA2y/lZA50=;
+        b=H6lbdcC19Ah13oef1zL7Li0SW/1i+9s11zwBHzCbjtnuDhAlSiVaKZrI/bANcRq44V
+         K9Api9Lb5LBvogBnJoc/eojh2cKavNcwFKrUX/Z5oM1rJNpeW1hfwt4wNBbU5H9skkBJ
+         NfXqE9yaRQJUrqRCI77lbrdmF9HqejWIZ6f9azTw7AWywzy1hYiPffM5drS7fr/wPTYn
+         PkhG/CcbxZU75RKtsYPLrmozufrnDrUnaNV9nLDzhncQ4nJY4rUwRoLPI9ENAj3spkZ7
+         RJCN561btObeVNTtEwfN1t8afxu+xorS8wjmCpWHHznmAdPN+XtLjS6IgyteJLMivpMk
+         XcGw==
+X-Forwarded-Encrypted: i=1; AJvYcCW4Gx2cN45c5OO/F4r5pCetkMNA7g7ZESWpMcNU1VMKVskfcliW0MFQnKhyhpRImqYfjoM=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwRAauY4Rlw6xs/mtPTXs+SDF0l6fr/3amB5lznKecXYCMi/52i
+	Vfd69R723aluiLLZvaPfU+3zq7PM08BmqAfSAOeBM4jea2w+4vurpbayNeww1njv93ZRjPpoA1M
+	IdxnQVQ==
+X-Google-Smtp-Source: AGHT+IFtwZ17xGbDbugz292/xL80DKNAZVcvSHiUAweJr8G4oy3wo8jT+7RGSw/1ALbZuSbxum0z/uWCHZM=
+X-Received: from pjlm22.prod.google.com ([2002:a17:90a:7f96:b0:33b:9959:6452])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:4a87:b0:335:2d4:8b3d
+ with SMTP id 98e67ed59e1d1-33b5138625emr37790699a91.31.1760536610726; Wed, 15
+ Oct 2025 06:56:50 -0700 (PDT)
+Date: Wed, 15 Oct 2025 06:56:49 -0700
+In-Reply-To: <68eee932c6ef_2f89910045@dwillia2-mobl4.notmuch>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
+Mime-Version: 1.0
+References: <20251014231042.1399849-1-seanjc@google.com> <68eee932c6ef_2f89910045@dwillia2-mobl4.notmuch>
+Message-ID: <aO-oIRBhSIZo9mef@google.com>
 Subject: Re: [PATCH] KVM: VMX: Inject #UD if guest tries to execute SEAMCALL
  or TDCALL
-To: Sean Christopherson <seanjc@google.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org,
- linux-kernel@vger.kernel.org, Kai Huang <kai.huang@intel.com>,
- Xiaoyao Li <xiaoyao.li@intel.com>,
- Rick Edgecombe <rick.p.edgecombe@intel.com>
-References: <20251014231042.1399849-1-seanjc@google.com>
-Content-Language: en-US
-From: Binbin Wu <binbin.wu@linux.intel.com>
-In-Reply-To: <20251014231042.1399849-1-seanjc@google.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+From: Sean Christopherson <seanjc@google.com>
+To: dan.j.williams@intel.com
+Cc: Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	Kai Huang <kai.huang@intel.com>, Xiaoyao Li <xiaoyao.li@intel.com>, 
+	Rick Edgecombe <rick.p.edgecombe@intel.com>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
 
+On Tue, Oct 14, 2025, dan.j.williams@intel.com wrote:
+> Sean Christopherson wrote:
+> > Note #3!  The aforementioned Trust Domain spec uses confusing pseudocde
+> > that says that SEAMCALL will #UD if executed "inSEAM", but "inSEAM"
+> > specifically means in SEAM Root Mode, i.e. in the TDX-Module.  The long=
+-
+> > form description explicitly states that SEAMCALL generates an exit when
+> > executed in "SEAM VMX non-root operation".
+>=20
+> This one I am not following. Is this mixing the #UD and exit cases? The
+> long form says inSEAM generates #UD and that is consistent with the
+> "64-Bit Mode Exceptions" table.
 
+I'm calling out that "inSEAM" is confusing.  It really should be "in SEAM r=
+oot
+operation" to eliminate ambiguity and to be consistent with how the SDM doc=
+uments
+VMX.  For VMX, the SDM describes three states:
 
-On 10/15/2025 7:10 AM, Sean Christopherson wrote:
-> Add VMX exit handlers for SEAMCALL and TDCALL, and a SEAMCALL handler for
-> TDX, to inject a #UD if a non-TD guest attempts to execute SEAMCALL or
-> TDCALL, or if a TD guest attempst to execute SEAMCALL.  Neither SEAMCALL
+  1. VMX operation
+  2. VMX root operation
+  3. VMX non-root operation
 
-attempst -> attempts
+Where #1 is a superset that covers both #2 and #3.  The SEAMCALL pseudocode=
+ is a
+perfect example as it references all three in quick succession:
 
-But I guess this will be re-phrased as a native #UD is expected when a TD guest
-attempts to execute SEAMCALL.
+  IF not in VMX operation or inSMM or inSEAM or ((IA32_EFER.LMA & CS.L) =3D=
+=3D 0)
+            ^^^^^^^^^^^^^
+    THEN #UD;
+  ELSIF in VMX non-root operation
+           ^^^^^^^^^^^^^^^^^^^^^^
+    THEN VMexit(=E2=80=9Cbasic reason=E2=80=9D =3D SEAMCALL,
+                =E2=80=9CVM exit from VMX root operation=E2=80=9D (bit 29) =
+=3D 0);
+                              ^^^^^^^^^^^^^^^^^^
+  ELSIF CPL > 0 or IA32_SEAMRR_MASK.VALID =3D=3D 0 or =E2=80=9Cevents block=
+ing by MOV-SS=E2=80=9D
+    THEN #GP(0);
 
-> nor TDCALL is gated by any software enablement other than VMXON, and so
-> will generate a VM-Exit instead of e.g. a native #UD when executed from
-> the guest kernel.
->
-> Note!  No unprivilege DoS of the L1 kernel is possible as TDCALL and
+The same should hold true for SEAM.  E.g. earlier on, the spec explicitly s=
+tates:
 
-unprivilege -> unprivileged
+  The TD VMs execute in SEAM VMX non-root operation.
 
-> SEAMCALL #GP at CPL > 0, and the CPL check is performed prior to the VMX
-> non-root (VM-Exit) check, i.e. userspace can't crash the VM. And for a
-> nested guest, KVM forwards unknown exits to L1, i.e. an L2 kernel can
-> crash itself, but not L1.
->
-> Note #2!  The Intel® Trust Domain CPU Architectural Extensions spec's
-> pseudocode shows the CPL > 0 check for SEAMCALL coming _after_ the VM-Exit,
-> but that appears to be a documentation bug (likely because the CPL > 0
-> check was incorrectly bundled with other lower-priority #GP checks).
-> Testing on SPR and EMR shows that the CPL > 0 check is performed before
-> the VMX non-root check, i.e. SEAMCALL #GPs when executed in usermode.
->
-> Note #3!  The aforementioned Trust Domain spec uses confusing pseudocde
+as well as:
 
-pseudocde -> pseudocode
+  The physical address bits reserved for encoding TDX private KeyID are mea=
+nt to
+  be treated as reserved bits when not in SEAM operation.
 
-But I guess this note will be dropped as explained by Dan?
+Since the TD guest obviously needs to consume its private KeyID, that means=
+ that
+SEAM also has three states:
 
-> that says that SEAMCALL will #UD if executed "inSEAM", but "inSEAM"
-> specifically means in SEAM Root Mode, i.e. in the TDX-Module.  The long-
-> form description explicitly states that SEAMCALL generates an exit when
-> executed in "SEAM VMX non-root operation".
->
+  1. SEAM operation
+  2. SEAM VMX root operation
+  3. SEAM VMX non-root operation
 
-...
+Where #1 is again a superset that covers both #2 and #3.
+
+IMO, any reasonable reading of "inSEAM" is that it is talking about #1, in =
+which
+case the pseudocode effectively says that SEAMCALL should #UD if executed i=
+n
+"SEAM VMX non-root operation", but that's obviously not the case based on t=
+he
+statement below as well as the TDX-Module code.
+
+Furthermore, the only transitions for"inSEAM" are that it's set to '1' by S=
+EAMCALL,
+and cleared to '0' by SEAMRET.  That implies that it's _not_ cleared by VM-=
+Enter
+from SEAM VMX root operation to SEAM VMX non-root operation, which reinforc=
+es my
+reading of "inSEAM =3D=3D SEAM operation".
+
+> For exit it says: "When invoked in SEAM VMX non-root operation or legacy
+> VMX non-root operation, this instruction can cause a VM exit".
 
