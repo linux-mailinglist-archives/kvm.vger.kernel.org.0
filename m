@@ -1,128 +1,169 @@
-Return-Path: <kvm+bounces-60056-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-60057-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 50828BDC48C
-	for <lists+kvm@lfdr.de>; Wed, 15 Oct 2025 05:11:22 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7CB57BDC592
+	for <lists+kvm@lfdr.de>; Wed, 15 Oct 2025 05:33:18 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id D133119213BA
-	for <lists+kvm@lfdr.de>; Wed, 15 Oct 2025 03:11:44 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E5B653C0582
+	for <lists+kvm@lfdr.de>; Wed, 15 Oct 2025 03:33:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 60FA1288517;
-	Wed, 15 Oct 2025 03:11:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C04A329D269;
+	Wed, 15 Oct 2025 03:33:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="PKDfL/1H"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="AtiLMs48"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.21])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1EB77263F22;
-	Wed, 15 Oct 2025 03:11:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.21
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D002927B4EB
+	for <kvm@vger.kernel.org>; Wed, 15 Oct 2025 03:33:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1760497872; cv=none; b=l/MWIFm7uUYlRYZJjddV1UaRWeGIZnf3Ov3B/IR9f9P0uhvxAGpW2G8Gx0yoyPc8KTIbEDpxlEDxNd3tG2CmQJbNhSr6hy4NUzjF/BB4XnrRjag5S6CTMixGv3xujCyDGyRRLZghNEDJIjP0ycT88jhpUmQlfBTmua8FLeQRrNU=
+	t=1760499189; cv=none; b=EWnW4bQ431mNAfAuteZCOFM9WNm77XVEbP4OKt7YaUFB9//GSWVofUXEoOnKiq5RIdyvWwLxxqq36dvYDCbhRknsRRlshd7MAYQgwdiChVz4JSH0IQ5DjF+Prkg8VosSKLQkWQqNPPqkqnVh6KnESB0gPBCBFR0+fRaqafZTQPY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1760497872; c=relaxed/simple;
-	bh=CVnXUugvg5jaipAD7BQWAK3H8oBpH1JfR2aS8zFhAHY=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=RIaOpKGwOSXCl2bVEQOXEsZDIBKlZ7tExiWNBqN1JZDApVToAHwj4Nu1k/mTsKIRaBgmT/lsyC6a0UNr4nKRwWvoHQqTur6bt5oeka70nYyalVAuOXwI7xyAtDJ88XcssmthTJn/brwXJ6KB+0mXXVI7chrOIyaDmy/KlDRJ5ks=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=PKDfL/1H; arc=none smtp.client-ip=198.175.65.21
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1760497870; x=1792033870;
-  h=message-id:date:mime-version:subject:to:cc:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=CVnXUugvg5jaipAD7BQWAK3H8oBpH1JfR2aS8zFhAHY=;
-  b=PKDfL/1Hq5bJDv02M2I5kmJMmwWLWAp7i01JHYO8ep2neP8IK4Ni0xG3
-   3735kLXGXHMPnbkpKR46sJLf2bc5OJAmLbw43duF/PEE5W5qPiuPYzUm+
-   wnj0brx1AOOsvlmt1zRm02beSf5aiSLfalbDq5wWPAiVaYAbHt8n8gtku
-   P1dCGIabAE4AvZazXJ2YDx7croXcbuXX71Y4PDo6db8/2m82WOYdGs08l
-   ENTPREglEbGXeYhQhIRm+WuCkLToUqXniclH8MWhzYoRLCfBSEH0QexNJ
-   LvIhVwvEueaxRqRMJaaV64k9UfFiu+8i01cmkHX53WUHtcK4OcPvXA/2q
-   w==;
-X-CSE-ConnectionGUID: JZjssZa2SCal6V20ve8Ncg==
-X-CSE-MsgGUID: dpY/AOy1SPqefJfJZebSVg==
-X-IronPort-AV: E=McAfee;i="6800,10657,11531"; a="62576832"
-X-IronPort-AV: E=Sophos;i="6.17,312,1747724400"; 
-   d="scan'208";a="62576832"
-Received: from orviesa004.jf.intel.com ([10.64.159.144])
-  by orvoesa113.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 14 Oct 2025 20:11:08 -0700
-X-CSE-ConnectionGUID: bQqPWpHQRAu26j9sjccLQg==
-X-CSE-MsgGUID: gpN+oGL6RdC/JoYrhdrnXA==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.19,230,1754982000"; 
-   d="scan'208";a="186300131"
-Received: from xiaoyaol-hp-g830.ccr.corp.intel.com (HELO [10.124.238.14]) ([10.124.238.14])
-  by orviesa004-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 14 Oct 2025 20:11:06 -0700
-Message-ID: <d9328f94-a6a9-4d98-8ea7-9b9e22bc1db6@intel.com>
-Date: Wed, 15 Oct 2025 11:11:01 +0800
+	s=arc-20240116; t=1760499189; c=relaxed/simple;
+	bh=nh6A6QTW5DFWbqA0LXLmFEnYV+abQ4LqDLTOtaSusmY=;
+	h=From:To:Cc:Subject:Date:Message-ID:Content-Type:MIME-Version; b=D+mJc0AyymHt8NMKE8LUJd1P+eg+r7hkEnze9n21fkxlzHI+J4kZSY8wtMOhloI7XQ/KR49BqgnoLIQy8t5kjK6Oaf9lEaYw2kookA8pBtgwjWgO2VBzs7P9U5LAekV1+Ats1lY1EAg0rcje7LPCTl3P0UHcxF4iEyOEs45jHQ8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=AtiLMs48; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1760499186;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=sFXia4dAf+nJBlW1l2txxKlIDrP+1ClTxtSsWhIIzPA=;
+	b=AtiLMs48KDKWS1jLrE/DD1cCtBHfcEjb682+6yq3IQeo/5BZ9x4/qj5OZLofORJGc5eFrj
+	x/Y54db7x7ranUDFu33agJrjYGRhk562lruBy5r8neuLl6lMd8wAx3naSY2pf2sj2qJU+8
+	seGqr4t0/nftMzXTyAt3u0Hjg5hJvZk=
+Received: from mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-629-n4N2v3_1MnO5Amk7Uvhx6g-1; Tue,
+ 14 Oct 2025 23:33:03 -0400
+X-MC-Unique: n4N2v3_1MnO5Amk7Uvhx6g-1
+X-Mimecast-MFC-AGG-ID: n4N2v3_1MnO5Amk7Uvhx6g_1760499182
+Received: from mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.111])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 72D83180035D;
+	Wed, 15 Oct 2025 03:33:01 +0000 (UTC)
+Received: from intellaptop.redhat.com (unknown [10.22.80.16])
+	by mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 2D4BA1800452;
+	Wed, 15 Oct 2025 03:32:59 +0000 (UTC)
+From: Maxim Levitsky <mlevitsk@redhat.com>
+To: kvm@vger.kernel.org
+Cc: x86@kernel.org,
+	Thomas Gleixner <tglx@linutronix.de>,
+	Paolo Bonzini <pbonzini@redhat.com>,
+	Ingo Molnar <mingo@redhat.com>,
+	linux-kernel@vger.kernel.org,
+	Sean Christopherson <seanjc@google.com>,
+	Borislav Petkov <bp@alien8.de>,
+	"H. Peter Anvin" <hpa@zytor.com>,
+	Dave Hansen <dave.hansen@linux.intel.com>,
+	Maxim Levitsky <mlevitsk@redhat.com>
+Subject: [PATCH v2 0/3] Fix a lost async pagefault notification when the guest is using SMM
+Date: Tue, 14 Oct 2025 23:32:55 -0400
+Message-ID: <20251015033258.50974-1-mlevitsk@redhat.com>
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] KVM: VMX: Inject #UD if guest tries to execute SEAMCALL
- or TDCALL
-To: Chao Gao <chao.gao@intel.com>, Sean Christopherson <seanjc@google.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org,
- linux-kernel@vger.kernel.org, Kai Huang <kai.huang@intel.com>,
- Rick Edgecombe <rick.p.edgecombe@intel.com>
-References: <20251014231042.1399849-1-seanjc@google.com>
- <aO71TX//mL3QOV3T@intel.com>
-Content-Language: en-US
-From: Xiaoyao Li <xiaoyao.li@intel.com>
-In-Reply-To: <aO71TX//mL3QOV3T@intel.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: quoted-printable
+X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.111
 
-On 10/15/2025 9:13 AM, Chao Gao wrote:
->> --- a/arch/x86/kvm/vmx/nested.c
->> +++ b/arch/x86/kvm/vmx/nested.c
->> @@ -6728,6 +6728,14 @@ static bool nested_vmx_l1_wants_exit(struct kvm_vcpu *vcpu,
->> 	case EXIT_REASON_NOTIFY:
->> 		/* Notify VM exit is not exposed to L1 */
->> 		return false;
->> +	case EXIT_REASON_SEAMCALL:
->> +	case EXIT_REASON_TDCALL:
->> +		/*
->> +		 * SEAMCALL and TDCALL unconditionally VM-Exit, but aren't
->> +		 * virtualized by KVM for L1 hypervisors, i.e. L1 should
->> +		 * never want or expect such an exit.
->> +		 */
->> +		return true;
->> 	default:
->> 		return true;
->> 	}
->> diff --git a/arch/x86/kvm/vmx/tdx.c b/arch/x86/kvm/vmx/tdx.c
->> index 097304bf1e1d..7326c68f9909 100644
->> --- a/arch/x86/kvm/vmx/tdx.c
->> +++ b/arch/x86/kvm/vmx/tdx.c
->> @@ -2127,6 +2127,9 @@ int tdx_handle_exit(struct kvm_vcpu *vcpu, fastpath_t fastpath)
->> 		return tdx_emulate_mmio(vcpu);
->> 	case EXIT_REASON_EPT_VIOLATION:
->> 		return tdx_handle_ept_violation(vcpu);
->> +	case EXIT_REASON_SEAMCALL:
->> +		kvm_queue_exception(vcpu, UD_VECTOR);
-> 
-> Emm, the host cannot inject exceptions to TDX guests. Right?
-
-Right.
-
-I also tested in TD guest. Actually, the TDX module injects #UD to TD 
-guest on SEAMCALL exit.
-
-The behavior is documented in 11.7.1 "Unconditionally Blocked 
-Instructions" of TDX module base spec:
-
-   Instructions that causes a #UD Unconditionally
-
-   - SEAMCALL, SEAMRET
-
+Recently we debugged a customer case in which the guest VM was showing=0D
+tasks permanently stuck in the kvm_async_pf_task_wait_schedule.=0D
+=0D
+This was traced to the incorrect flushing of the async pagefault queue,=0D
+which was done during the real mode entry by the kvm_post_set_cr0.=0D
+=0D
+This code, the kvm_clear_async_pf_completion_queue does wait for all #APF=0D
+tasks to complete but then it proceeds to wipe the 'done' queue without=0D
+notifying the guest.=0D
+=0D
+Such approach is acceptable if the guest is being rebooted or if=0D
+it decided to disable APF, but it leads to failures if the entry to real=0D
+mode was caused by SMM, because in this case the guest intends to continue=
+=0D
+using APF after returning from the SMM handler.=0D
+=0D
+Amusingly, and on top of this, the SMM entry code doesn't call=0D
+the kvm_set_cr0 (and subsequently neither it calls kvm_post_set_cr0),=0D
+but rather only the SMM mode exit code does.=0D
+=0D
+During SMM entry, the SMM code calls .set_cr0 instead, with an intention=0D
+to bypass various architectural checks that can otherwise fail.=0D
+=0D
+One example of such check is a #GP check on an attempt to disable paging=0D
+while the long mode is active.=0D
+To do this, the user must first exit to the compatibility mode and only the=
+n=0D
+disable paging.=0D
+=0D
+The question of the possiblity of eliminating this bypass, is a side topic=
+=0D
+that is probably worth discussing separately.=0D
+=0D
+Back to the topic, the kvm_set_cr0 is still called during SMM handling,=0D
+more particularly during the exit from SMM, by emulator_leave_smm:=0D
+=0D
+It is called once with CR0.PE =3D=3D off, to setup a baseline real-mode=0D
+environment, and then a second time, with the original CR0 value.=0D
+=0D
+Even more amusingly, usually both mentioned calls result in APF queue being=
+=0D
+flushed, because the code in kvm_post_set_cr0 doesn't distinguish between=0D
+entry and exit from protected mode, and SMM mode usually enables protection=
+=0D
+and paging, and exits itself without bothering first to exit back to=0D
+the real mode.=0D
+=0D
+To fix this problem, I think the best solution is to drop the call to=0D
+kvm_clear_async_pf_completion_queue in kvm_post_set_cr0 code altogether,=0D
+and instead raise the KVM_REQ_APF_READY, when the protected mode=0D
+is re-established.=0D
+=0D
+Existing APF requests should have no problem to complete while the guest is=
+=0D
+in SMM and the APF completion event injection should work too,=0D
+because SMM handler *ought* to not enable interrupts because otherwise=0D
+things would go south very quickly.=0D
+=0D
+This change also brings the logic to be up to date with logic that KVM=0D
+follows when the guest disables APIC.=0D
+KVM also raises KVM_REQ_APF_READY when the APIC is re-enabled.=0D
+=0D
+In addition to this, I also included few fixes for few semi-theortical=0D
+bugs I found while debugging this.=0D
+=0D
+V2: incorporated review feedback from Paolo Bonzini and Sean Christopherson=
+.=0D
+=0D
+Best regards,=0D
+        Maxim Levitsky=0D
+=0D
+Maxim Levitsky (3):=0D
+  KVM: x86: Warn if KVM tries to deliver an #APF completion when APF is=0D
+    not enabled=0D
+  KVM: x86: Fix a semi theoretical bug in=0D
+    kvm_arch_async_page_present_queued=0D
+  KVM: x86: Fix the interaction between SMM and the asynchronous=0D
+    pagefault=0D
+=0D
+ arch/x86/kvm/x86.c | 37 +++++++++++++++++++++++--------------=0D
+ 1 file changed, 23 insertions(+), 14 deletions(-)=0D
+=0D
+-- =0D
+2.49.0=0D
+=0D
 
 
