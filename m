@@ -1,188 +1,121 @@
-Return-Path: <kvm+bounces-60101-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-60102-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1F186BE04C6
-	for <lists+kvm@lfdr.de>; Wed, 15 Oct 2025 21:02:18 +0200 (CEST)
+Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [213.196.21.55])
+	by mail.lfdr.de (Postfix) with ESMTPS id 787CBBE05AB
+	for <lists+kvm@lfdr.de>; Wed, 15 Oct 2025 21:25:09 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id AD36E507665
-	for <lists+kvm@lfdr.de>; Wed, 15 Oct 2025 19:01:26 +0000 (UTC)
+	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 200E0357A92
+	for <lists+kvm@lfdr.de>; Wed, 15 Oct 2025 19:25:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EF5F130C34A;
-	Wed, 15 Oct 2025 19:00:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 43EFB305E04;
+	Wed, 15 Oct 2025 19:25:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="nOQlqytK"
+	dkim=pass (2048-bit key) header.d=shazbot.org header.i=@shazbot.org header.b="ex5rRZCZ";
+	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="yAu84kNy"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pg1-f202.google.com (mail-pg1-f202.google.com [209.85.215.202])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from fout-a8-smtp.messagingengine.com (fout-a8-smtp.messagingengine.com [103.168.172.151])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9662F306D3F
-	for <kvm@vger.kernel.org>; Wed, 15 Oct 2025 19:00:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C60091D90DF;
+	Wed, 15 Oct 2025 19:24:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=103.168.172.151
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1760554856; cv=none; b=ZPIPdGPBw3wPXRivajo6xBNaqnZrgqQ/E8X515Gum8W1nwMhTDlJe/AxJoa+Wne6DnIThRdWuiVoJHtw3lC8CMDQCvtmYZ3XcN64Wr3CkOCu0i8GUAvw2nJ9rjlwUWQxwMr6xzvu8IUqi4dbAMgoG9+mMutJds53r+YQfZxvNKM=
+	t=1760556299; cv=none; b=IeqU/RSmS4z0pgf5jXy6xIDx+asfMu0yZUwDIo0zG5QHq/gRJaEplXT8HmTSObsLp6MshqshvnSyoXI2XHVYVNGYFb43N1tyY2Ke8+ANy0eWymajC8G4m6tMauEfvmVYR7XGnVPBDVURnhQKLs7LFNKvAaii2XSCU2proef6Btc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1760554856; c=relaxed/simple;
-	bh=1H/TAjStyaI6entLwQUNBGgnkdgglmJ5EvafY9K9xl4=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=CsnZVVWSVZ0cvTkLK2q41Dov3wdj2cUvVaEWxGv8lld8x4oDtyzTALDxMX1mAEXS1nZlFzVfjt5YLKaO0Uxqe3D5vNSjplYTRKzo92KSwm+OD0TKAeXH9pW9tKAuxiA7mHrNkkCI6VWiWcaNVsOkW09z/I8WC6KMEdLFHQFbRW4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--wyihan.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=nOQlqytK; arc=none smtp.client-ip=209.85.215.202
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--wyihan.bounces.google.com
-Received: by mail-pg1-f202.google.com with SMTP id 41be03b00d2f7-b6474cf4573so7426939a12.2
-        for <kvm@vger.kernel.org>; Wed, 15 Oct 2025 12:00:54 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1760554854; x=1761159654; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=r/50hzPJcz2Tgtv5Q95r1Wz9trycmcqvXu8eukDbYxw=;
-        b=nOQlqytKfKqDbqgekUBKQYaPTWU8+8mhtxzQsEGATxZ3zCnoGIaMyt+sYGA5mpF6RC
-         qCU8KFQAf/7UQG81ghuhznRYNrkudy3BxZa6r9UaqSfUxDQUDdKWyvOaAKxqqWFnksk7
-         rDAut6Xc84/nibvyW3MBn6u9rI/yqMf783XMw4/DiCd4Q8cjassSvoTLz2sIzJ3AAPwA
-         OPPQ3CIL3qH6W0F3fzpVCwV2LlAVQh4NFACQo49cX092tXHOc0vn7zcArEb7d6QJtMLB
-         7MHgNlDvl8NAF33OdjL/n635sxf4bz54ojwl0yZyM0kwJSnvXqxrJxLJ3APbnrGMmvmn
-         qTKw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1760554854; x=1761159654;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=r/50hzPJcz2Tgtv5Q95r1Wz9trycmcqvXu8eukDbYxw=;
-        b=ALW18sRcqmV+LFbUiUGBWluyeuXmOy7TB9IqbNd+E308Yl7Hg9L7IP+a0bWJWmQs16
-         TrZAeMIOkmXoHOHZpIoDeN0AGIAhDr7EMqOkqv3SKDRHVH6Q1XhZaJzPX+Z3oRXV1OkE
-         5EWCrdsoMONmAnGND2z/69Fn/OC2CbTl/QK2Eh6PHPL9mM7R3+Fk4y/Xu8cujFBtZdaF
-         LJ27gvrjQFzFhV+fOZ35x+LbbfXvV64KvRaw7dRoQHfzMrWLGNYmTm7UzNKxo8EfAJ67
-         opl8wh5DpZiEU/0kLZsw9qJ9o74qZsjj5NrhmOtmVsdFgFVoErIBJt7T60XQDNjo+N0B
-         fy5A==
-X-Forwarded-Encrypted: i=1; AJvYcCXMRv/xDDSsiBfG2hZfSZG4RnkC9YYpqKmlB/x2VsetDH+7aosrCDwo5sgmjY9WikpTSBY=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwqTQDAkA0O5bbgymSx7xRAFsML5xc/zsf9lA3oxQu++MkkQ3cf
-	0WakCXJgXOTizvpibBHKxGGjcDp4n42jWMz4/ms4zyFXSrVqyCFW2+hQACmqsFzpJMYar5sUP1o
-	LrpqhOg==
-X-Google-Smtp-Source: AGHT+IF0aq3dEuFrF7ECI0NlSr0qYUf7fzC5xMEvWlZqMU7mOZwkC2btj1VQ3xgFa8CghlVjLKHevu9vhKE=
-X-Received: from pjbfs17.prod.google.com ([2002:a17:90a:f291:b0:32e:bcc3:ea8e])
- (user=wyihan job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:4b81:b0:33b:6ef4:c904
- with SMTP id 98e67ed59e1d1-33b6ef4cbbcmr19120239a91.20.1760554853833; Wed, 15
- Oct 2025 12:00:53 -0700 (PDT)
-Date: Wed, 15 Oct 2025 18:58:57 +0000
-In-Reply-To: <cover.1760551864.git.wyihan@google.com>
+	s=arc-20240116; t=1760556299; c=relaxed/simple;
+	bh=Kp4pFhy8LP/ccyl0CNzovO3vHn7aphLruSOnZEUv+f0=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=dPeBKKZfJWYZ17p9KNEN7ZpH0UorpAFu5QiTExhOWL+eyyayOveHh5PXrRkAo/z2kZUbBLcAn6yEoglU3NUnBIp3tQykf0czIQyvFrIMKsAw3Y/6yimNVVRuO2hZO3+yO+yWNkF+dze0G60T+gTcSpKXwklFPbrBVUZMYr8eRnE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=shazbot.org; spf=pass smtp.mailfrom=shazbot.org; dkim=pass (2048-bit key) header.d=shazbot.org header.i=@shazbot.org header.b=ex5rRZCZ; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=yAu84kNy; arc=none smtp.client-ip=103.168.172.151
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=shazbot.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=shazbot.org
+Received: from phl-compute-03.internal (phl-compute-03.internal [10.202.2.43])
+	by mailfout.phl.internal (Postfix) with ESMTP id 84BE7EC022C;
+	Wed, 15 Oct 2025 15:24:55 -0400 (EDT)
+Received: from phl-mailfrontend-01 ([10.202.2.162])
+  by phl-compute-03.internal (MEProxy); Wed, 15 Oct 2025 15:24:55 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=shazbot.org; h=
+	cc:cc:content-transfer-encoding:content-type:content-type:date
+	:date:from:from:in-reply-to:in-reply-to:message-id:mime-version
+	:references:reply-to:subject:subject:to:to; s=fm1; t=1760556295;
+	 x=1760642695; bh=iGgB56Om/VOunCl4kKKV9RFWUYYlnHmOzS6O4BpdIx0=; b=
+	ex5rRZCZZU+AIIR+jMqLtWjJy29Naz5UydliFn8EUOaE86tZYmavGk3l7SLxWapm
+	rTKs9qCxhp2RmESqx1AYx4e5N3fQMjKjeYqCrpW0SKlexs4t9CDaCDhoIb8Cr00c
+	iBcKZwIDdkwCUeD0eQ35VIwwt8C4unbK0+LWaJCBX3bobG5nAlsZDgOf9kyUcAIr
+	SNmVjm7OixdIVD1qXrUoK3BJF6F3LBQTPKe+OCITLpcVrMV5OiSX+rXHe/nffEVv
+	yDay+Ukf8BuaB1n3ENjzq5DQ1fzwa0Yi8TOi5cmDnmZ8oNC0w3w8HY4c8gxnuFiZ
+	q5ltap0MYD93OAbSYM0D1g==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+	messagingengine.com; h=cc:cc:content-transfer-encoding
+	:content-type:content-type:date:date:feedback-id:feedback-id
+	:from:from:in-reply-to:in-reply-to:message-id:mime-version
+	:references:reply-to:subject:subject:to:to:x-me-proxy
+	:x-me-sender:x-me-sender:x-sasl-enc; s=fm2; t=1760556295; x=
+	1760642695; bh=iGgB56Om/VOunCl4kKKV9RFWUYYlnHmOzS6O4BpdIx0=; b=y
+	Au84kNyRhiUlS+vPlV2gt7zAVedR1RPWu0SHZl2IYOgdS/n0l+PqZ1VDAj9dppO2
+	VKOR4mf1xAEDdxYCFDizcnhBzyZQBSHsbF8zV1q09xpeQaEjb7S6GVW+3cI6I9NG
+	pP1xEOBCMwHg5hig6EbyoPOWKf7Wt/rIcNaK4Nk/aVz3Ad/1srugud3sgPd0qh0t
+	DBsEDW8tj/APKMJ++OPljr6aYDm2OAEGTVrv3CyLjU9XNE+jNU3w6ceItqBRzGic
+	E5gZ0IHjWQRig4HbKkxWShRNWAL3u04QCZFiQqu03HtGNUwx1QYdhVsS7PrnKXw9
+	GL5IelO+BnCgnr0d7sg0Q==
+X-ME-Sender: <xms:B_XvaHfd8oUXSb2ljKd-TqwVSfnqL_jEDydMM29VojSDKz83MgGLKg>
+    <xme:B_XvaOtfthyXfbnO1d4IWWu7KWkVoIU-zQQtt5jk2TWAFHrkfE9ynsa-jnIVQuBzq
+    bZLbgDILrq8k4M-xUcCs9UALpuARKKN0wvc-miqTcRQ8wHp38AvTw>
+X-ME-Received: <xmr:B_XvaAm2jX8UVXAbN0Ng-hrTnW8oK4lEn4uD9B1Ux-aqfGMdf0bLqgO7XIw>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeeffedrtdeggdduvdegvdegucetufdoteggodetrf
+    dotffvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfurfetoffkrfgpnffqhgenuceu
+    rghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujf
+    gurhepfffhvfevuffkjghfgggtgfesthejredttddtvdenucfhrhhomheptehlvgigucgh
+    ihhllhhirghmshhonhcuoegrlhgvgiesshhhrgiisghothdrohhrgheqnecuggftrfgrth
+    htvghrnhepteetudelgeekieegudegleeuvdffgeehleeivddtfeektdekkeehffehudet
+    hffhnecuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehmrghilhhfrhhomheprg
+    hlvgigsehshhgriigsohhtrdhorhhgpdhnsggprhgtphhtthhopeehpdhmohguvgepshhm
+    thhpohhuthdprhgtphhtthhopegrmhgrshhtrhhosehfsgdrtghomhdprhgtphhtthhope
+    hjghhgseiiihgvphgvrdgtrgdprhgtphhtthhopegrlhgvjhgrnhgurhhordhjrdhjihhm
+    vghnvgiisehorhgrtghlvgdrtghomhdprhgtphhtthhopehkvhhmsehvghgvrhdrkhgvrh
+    hnvghlrdhorhhgpdhrtghpthhtoheplhhinhhugidqkhgvrhhnvghlsehvghgvrhdrkhgv
+    rhhnvghlrdhorhhg
+X-ME-Proxy: <xmx:B_XvaIzxKkNDoGe7GQRqo8wovKbfgELwDVv240ZD4oifWnGcvScpaQ>
+    <xmx:B_XvaKPolZl5XYvOIrKgnPlOS9X5-W9r2Nlp2ZT1GDH7f28k1CKVmw>
+    <xmx:B_XvaMrAi9sUYLK6KH0eKKsoZUD6dKUgkwPkPAUW9m5b19tY5TsDww>
+    <xmx:B_XvaLHssThqa7_XSMOfAqkPMEnLERt9ImsUr6NvyZ3AiCD0MQfWUA>
+    <xmx:B_XvaHDbdfEPltY9P4f-mLDq_rFOK8AP8y8pzCzlfSvt3Fm_55aafMMg>
+Feedback-ID: i03f14258:Fastmail
+Received: by mail.messagingengine.com (Postfix) with ESMTPA; Wed,
+ 15 Oct 2025 15:24:54 -0400 (EDT)
+Date: Wed, 15 Oct 2025 13:24:52 -0600
+From: Alex Williamson <alex@shazbot.org>
+To: Alex Mastro <amastro@fb.com>
+Cc: Jason Gunthorpe <jgg@ziepe.ca>, Alejandro Jimenez
+ <alejandro.j.jimenez@oracle.com>, <kvm@vger.kernel.org>,
+ <linux-kernel@vger.kernel.org>
+Subject: Re: [PATCH v4 0/3] vfio: handle DMA map/unmap up to the addressable
+ limit
+Message-ID: <20251015132452.321477fa@shazbot.org>
+In-Reply-To: <20251012-fix-unmap-v4-0-9eefc90ed14c@fb.com>
+References: <20251012-fix-unmap-v4-0-9eefc90ed14c@fb.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <cover.1760551864.git.wyihan@google.com>
-X-Mailer: git-send-email 2.51.0.788.g6d19910ace-goog
-Message-ID: <0ec7349858142439ed0a250e6c04edf84cb0f488.1760551864.git.wyihan@google.com>
-Subject: [RFC PATCH RESEND 3/3] KVM: selftests: Test guest_memfd behavior with
- respect to stage 2 page tables
-From: Lisa Wang <wyihan@google.com>
-To: linmiaohe@huawei.com, nao.horiguchi@gmail.com, akpm@linux-foundation.org, 
-	pbonzini@redhat.com, shuah@kernel.org, linux-mm@kvack.org, 
-	linux-kernel@vger.kernel.org, kvm@vger.kernel.org, 
-	linux-kselftest@vger.kernel.org
-Cc: david@redhat.com, rientjes@google.com, seanjc@google.com, 
-	ackerleytng@google.com, vannapurve@google.com, michael.roth@amd.com, 
-	jiaqiyan@google.com, tabba@google.com, dave.hansen@linux.intel.com, 
-	Lisa Wang <wyihan@google.com>
-Content-Type: text/plain; charset="UTF-8"
+MIME-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-Test that
-+ memory failure handling results in unmapping of bad memory from stage
-  2 page tables, hence requiring faulting on next guest access
-+ when the guest tries to fault a poisoned page from guest_memfd, the
-  userspace VMM informed with EHWPOISON
+On Sun, 12 Oct 2025 22:32:23 -0700
+Alex Mastro <amastro@fb.com> wrote:
 
-Co-developed-by: Ackerley Tng <ackerleytng@google.com>
-Signed-off-by: Ackerley Tng <ackerleytng@google.com>
-Signed-off-by: Lisa Wang <wyihan@google.com>
----
- .../testing/selftests/kvm/guest_memfd_test.c  | 65 +++++++++++++++++++
- 1 file changed, 65 insertions(+)
+> This patch series aims to fix vfio_iommu_type.c to support 
+> VFIO_IOMMU_MAP_DMA and VFIO_IOMMU_UNMAP_DMA operations targeting IOVA
+> ranges which lie against the addressable limit. i.e. ranges where
+> iova_start + iova_size would overflow to exactly zero.
 
-diff --git a/tools/testing/selftests/kvm/guest_memfd_test.c b/tools/testing/selftests/kvm/guest_memfd_test.c
-index 7bcf8d2d5d4d..dc3398e22edd 100644
---- a/tools/testing/selftests/kvm/guest_memfd_test.c
-+++ b/tools/testing/selftests/kvm/guest_memfd_test.c
-@@ -539,6 +539,70 @@ static void test_guest_memfd_guest(void)
- 	kvm_vm_free(vm);
- }
- 
-+static void __guest_code_read(uint8_t *mem)
-+{
-+	READ_ONCE(*mem);
-+	GUEST_DONE();
-+}
-+
-+static void guest_read(struct kvm_vcpu *vcpu, uint64_t gpa, int expected_errno)
-+{
-+	vcpu_arch_set_entry_point(vcpu, __guest_code_read);
-+	vcpu_args_set(vcpu, 1, gpa);
-+
-+	if (expected_errno) {
-+		TEST_ASSERT_EQ(_vcpu_run(vcpu), -1);
-+		TEST_ASSERT_EQ(errno, expected_errno);
-+	} else {
-+		vcpu_run(vcpu);
-+		TEST_ASSERT_EQ(get_ucall(vcpu, NULL), UCALL_DONE);
-+	}
-+}
-+
-+static void test_memory_failure_guest(void)
-+{
-+	const uint64_t gpa = SZ_4G;
-+	const int slot = 1;
-+
-+	unsigned long memory_failure_pfn;
-+	struct kvm_vcpu *vcpu;
-+	struct kvm_vm *vm;
-+	uint8_t *mem;
-+	size_t size;
-+	int fd;
-+
-+	if (!kvm_has_cap(KVM_CAP_GUEST_MEMFD_FLAGS))
-+		return;
-+
-+	vm = __vm_create_shape_with_one_vcpu(VM_SHAPE_DEFAULT, &vcpu, 1, __guest_code_read);
-+
-+	size = vm->page_size;
-+	fd = vm_create_guest_memfd(vm, size, GUEST_MEMFD_FLAG_MMAP | GUEST_MEMFD_FLAG_INIT_SHARED);
-+	vm_set_user_memory_region2(vm, slot, KVM_MEM_GUEST_MEMFD, gpa, size, NULL, fd, 0);
-+
-+	mem = mmap(NULL, size, PROT_READ | PROT_WRITE, MAP_SHARED, fd, 0);
-+	TEST_ASSERT(mem != MAP_FAILED, "mmap() for guest_memfd should succeed.");
-+	virt_pg_map(vm, gpa, gpa);
-+
-+	/* Fault in page to read pfn, then unmap page for testing. */
-+	READ_ONCE(*mem);
-+	memory_failure_pfn = addr_to_pfn(mem);
-+	munmap(mem, size);
-+
-+	/* Fault page into stage2 page tables. */
-+	guest_read(vcpu, gpa, 0);
-+
-+	mark_memory_failure(memory_failure_pfn, 0);
-+
-+	guest_read(vcpu, gpa, EHWPOISON);
-+	munmap(mem, size);
-+
-+	close(fd);
-+	kvm_vm_free(vm);
-+
-+	unmark_memory_failure(memory_failure_pfn, 0);
-+}
-+
- int main(int argc, char *argv[])
- {
- 	unsigned long vm_types, vm_type;
-@@ -559,4 +623,5 @@ int main(int argc, char *argv[])
- 		test_guest_memfd(vm_type);
- 
- 	test_guest_memfd_guest();
-+	test_memory_failure_guest();
- }
--- 
-2.51.0.788.g6d19910ace-goog
+The series looks good to me and passes my testing.  Any further reviews
+from anyone?  I think we should make this v6.18-rc material.  Thanks,
 
+Alex
 
