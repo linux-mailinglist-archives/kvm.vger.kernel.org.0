@@ -1,79 +1,82 @@
-Return-Path: <kvm+bounces-60098-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-60099-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [213.196.21.55])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6CE99BE0499
-	for <lists+kvm@lfdr.de>; Wed, 15 Oct 2025 21:00:26 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 301A2BE04A8
+	for <lists+kvm@lfdr.de>; Wed, 15 Oct 2025 21:01:12 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 191A3357B05
-	for <lists+kvm@lfdr.de>; Wed, 15 Oct 2025 19:00:26 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3529E3BB25F
+	for <lists+kvm@lfdr.de>; Wed, 15 Oct 2025 19:00:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C8FCF302CD6;
-	Wed, 15 Oct 2025 19:00:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2973C3254AF;
+	Wed, 15 Oct 2025 19:00:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="1sTXEtr7"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="UCYGq6Pr"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pl1-f202.google.com (mail-pl1-f202.google.com [209.85.214.202])
+Received: from mail-pf1-f201.google.com (mail-pf1-f201.google.com [209.85.210.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A21243043D7
-	for <kvm@vger.kernel.org>; Wed, 15 Oct 2025 19:00:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A9D89233D9E
+	for <kvm@vger.kernel.org>; Wed, 15 Oct 2025 19:00:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1760554819; cv=none; b=Mc2ScNQ1zv5JX5kExIasKgaC82zxGg4fApvuJz1OQZK3BJdp9y0LLG8hbpBp7F1CJiugGgKenFKguNqND/vfaw+DzieAElUyLvDaY2x1eW4q+xQVJAZlG4Sp/xWPTg3J/wtEjohYON7MtxH8VpRBLYwTvXOzdUWhMXVqH6qF4bw=
+	t=1760554845; cv=none; b=sKyClMj5vSIt8ARxBrILViNl28GClcr3Ff8eZsOiEInazgQLkZnzmIa1umHatio0y3o5Fh7M8a+3gLwDQhCFNcU5cnl346W1YvLBCmapkyQD0qO8ELQ5rk24RoYY2LiWJia6SIELM8uAc64JC4saVloXfps6VxZ8lDfc22uE+Gg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1760554819; c=relaxed/simple;
-	bh=sdq4ws5usmc98rsRoCAVeqpBx+16F1AHykhqmbfPX2w=;
-	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=MrWFc5yvDUWBzXH0KIR1ZRuWoev+CPn3kFxlmvyZZf9dC/hPOpDEb+FHfPvEGF2fZTVvMri9Hkb0StoWklKsvr72e80pn9TwL6ICrRc1CKx3xQm4y5REpxCedrIxxqN7hRyS/c0nu7Xd3r0ircn/kBSJroWBV0VuYsopUlRtPOw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--wyihan.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=1sTXEtr7; arc=none smtp.client-ip=209.85.214.202
+	s=arc-20240116; t=1760554845; c=relaxed/simple;
+	bh=HB6Vqw+7ydLWXhhSbVTw/E6GHFLSYol5gBxI60dhSzI=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=S6vbeiTqODCbXNpK2ho1QQ4DYovj4B0fquEo6n7Ape0i4GULKr6F+k0d8Ij/lmdaCytdRhe6PUm/P+D+pjcOkKGWXAWQ57605XGKkv5iT0MMIDYqqFca+6piuvMBPg5g1h7BhSuchEIx5VPgvirbZVrtIsJZigGcCDHdSZnO7io=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--wyihan.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=UCYGq6Pr; arc=none smtp.client-ip=209.85.210.201
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--wyihan.bounces.google.com
-Received: by mail-pl1-f202.google.com with SMTP id d9443c01a7336-277f0ea6fc6so234491935ad.2
-        for <kvm@vger.kernel.org>; Wed, 15 Oct 2025 12:00:12 -0700 (PDT)
+Received: by mail-pf1-f201.google.com with SMTP id d2e1a72fcca58-782063922ceso9404812b3a.0
+        for <kvm@vger.kernel.org>; Wed, 15 Oct 2025 12:00:43 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1760554812; x=1761159612; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:from:subject:message-id
-         :mime-version:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=cqsd/vPXiuTR4hJNd2SCH3oN5KwWIK1dnn9ppreK3H0=;
-        b=1sTXEtr7vUkiMkQ0uHR08smc/iooqnEyjuY+W9wks1tsBYPA+m+6Lx3ca4hy/SZyFb
-         ATnMlJ/BVgpcUNTguAiYaD2KfbD+ZoRU7aK7GynqE2O8C4WqZMrYMbStaxnLY5qxSnW1
-         d4cf29GXLL2X/IDonSpO9lJJrONMW/YtyY7o2p93jbzit+lFQfvuSqgmvpi5TXaMcB7T
-         F7oX8KU0xjEItAtgkTT5DkGRKI2ONtD33MMGl2NqQ4EIL74n8F4SZkw6OgAA/uKVwURn
-         yUotVHDKCLff4DHp2OJ/3H5zbQIBi9bHAKBQZPU8e7fC1L1Q+ZcwDZkp3M1UIJ658puv
-         ymOQ==
+        d=google.com; s=20230601; t=1760554843; x=1761159643; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=WKpGbUmSzOj72WrP0EnxSLypc0IcqdMmnVFCtJZuxlU=;
+        b=UCYGq6Pr19GUIroxMfFA6mLjTjFvs+dzJdU3EvzyRvumP6XKMickngUeInqsaIkEU1
+         /Haj+BRIClXxQv924XQFZ2XMZXVspCeVr0MkOpn2o7f6trgpbQYrYKtIRg4+If3NJdCX
+         6kVENpgCA44z1/ylJzlK/NAOa8nCzffJD3ukXZwsQXN/8frxy60gDPty8ItyMy2rYhyg
+         DQHbS1O0jZnZrIvVtKjco2jiZYneU5VFPG5mQ2MManpmez/z1+o2t19l2CBJg1DlQIwo
+         dtfEwqGLWlRwNq4NsisliJxpP8DSOz90AluRgB3Jrpn2TSCZNKrAdfElr3/E8ehItsE7
+         svWw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1760554812; x=1761159612;
-        h=content-transfer-encoding:cc:to:from:subject:message-id
-         :mime-version:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=cqsd/vPXiuTR4hJNd2SCH3oN5KwWIK1dnn9ppreK3H0=;
-        b=u8FD/mKKat/Bz+ZwUh7zOnUtH6mBYaX4hhIv5Dw+BY1U4PuBNeY2mLN3wdjS6+5qVy
-         +7+MAl2dEI5i1V/3X1qR/hcB1u/XZ2Oqqj2ZfdKUR/q/Pxug/hwrOHTsMElYrrbiDSQC
-         2w8OSZHlc3Zr4uZteHpTvy542GKxn4WGJn98bPNmNmgcqMZZ5A4XbfO7XVUyHlGv8eXP
-         305M5x9gI51ahL9hHpqC4xkygWBrZRYW4C1VV/z+xCpZG0IDlOohnIXPXxMezMNnCGPA
-         mK5Bqzk8OzrtEanEdglE7QBnHxfKQ1uvCkzch3GTWlRtZCjsanZUnqVRyxA8WtwWnRw5
-         GEoA==
-X-Forwarded-Encrypted: i=1; AJvYcCWK/bTSJXrtCl955Lp2Ku5tyNFxoFE9oKz0t772XBDNXzUQOfmoYEZdjIRk0/v7iqAL8q4=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyOlpzMFAyNWju7qtvYktVFt5G7r0j5Mpou2tUFwxui4Wgmr1Ml
-	bf+jea3sgsOsdXBxkiqYwQZ+Qa+mcIO98eISXM9J2E9tPk8s/AmRxUmuhK8yX9EV4zMISXVkygh
-	Tc2o2mg==
-X-Google-Smtp-Source: AGHT+IFnNgFHzdVwVBgjv1vYxeJtKWTDydfUHZWWQm4sogrJBUuU/RaThVnJNJ/l8yi1LMJs0OC3cJqUm/M=
-X-Received: from plhy4.prod.google.com ([2002:a17:902:d644:b0:290:9abe:4419])
- (user=wyihan job=prod-delivery.src-stubby-dispatcher) by 2002:a17:902:ec81:b0:290:6b30:fa8
- with SMTP id d9443c01a7336-2906b301097mr149049165ad.23.1760554811768; Wed, 15
- Oct 2025 12:00:11 -0700 (PDT)
-Date: Wed, 15 Oct 2025 18:58:54 +0000
+        d=1e100.net; s=20230601; t=1760554843; x=1761159643;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=WKpGbUmSzOj72WrP0EnxSLypc0IcqdMmnVFCtJZuxlU=;
+        b=GQ0NzG+oQ9t+DsdoUubPeqLERC+/InSp1kJED65INDiP1a2XU3FgSPxgjBEn6RYKKk
+         H/z0VbfqTwf1JL1bCh4TGNvZ3CSAWuUn72zKrbUs6QjRRrijAsMUjzAAyu1PtMpKyIBN
+         f66aS0Bc9zrhF0vubcdhzo2mEA3ID1eOsbNVgQUjpes6JDp174wPgroW3OZNoQN9hh6a
+         haQNdzfx2mFW/ARleJVKQBfztEp00zyVHtjSdRbDDp5SfKy9t599dL1ncpWYgWXcS4VD
+         uAysiS9UBY6C5+cC4P7A6LjP5T/dakmwuWj0OHhBSL/6SJK3wPw2aNfLtXfClWl4BaQl
+         oFtQ==
+X-Forwarded-Encrypted: i=1; AJvYcCWAUNln8r8PFRK1CV/CeZSVv7SvuIObI+t6LEODCKo3x/rb/5xraIA33wUlCh6ius3U3JY=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yyn+/XOGv1j8TJJpdLCCCQ+h8hPuU2drjV7IXPHVgVpbMzVoztP
+	GqFzNGo9OI55KVf1Isgeslqt74c+VXl3AhFxi4LUVvdnRfugzPG2uBTs/543ms1Q1cqNB6/gvWP
+	h8owLvw==
+X-Google-Smtp-Source: AGHT+IHyRappA+6tH9Os76YkQbRqGqpECognzksl9aFKwm+WiLtRqKUJv0T7aogOLuMAz2ED3mj7afM55V4=
+X-Received: from pgip24.prod.google.com ([2002:a63:c158:0:b0:b54:fd1f:ef57])
+ (user=wyihan job=prod-delivery.src-stubby-dispatcher) by 2002:a05:6a20:a10a:b0:334:8dcb:567b
+ with SMTP id adf61e73a8af0-3348dcb5856mr3480615637.52.1760554842922; Wed, 15
+ Oct 2025 12:00:42 -0700 (PDT)
+Date: Wed, 15 Oct 2025 18:58:55 +0000
+In-Reply-To: <cover.1760551864.git.wyihan@google.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
+References: <cover.1760551864.git.wyihan@google.com>
 X-Mailer: git-send-email 2.51.0.788.g6d19910ace-goog
-Message-ID: <cover.1760551864.git.wyihan@google.com>
-Subject: [RFC PATCH RESEND 0/3] mm: Fix MF_DELAYED handling on memory failure
+Message-ID: <57ed0bcbcfcec6fda89d60727467d7bd621c95ab.1760551864.git.wyihan@google.com>
+Subject: [RFC PATCH RESEND 1/3] mm: memory_failure: Fix MF_DELAYED handling on
+ truncation during failure
 From: Lisa Wang <wyihan@google.com>
 To: linmiaohe@huawei.com, nao.horiguchi@gmail.com, akpm@linux-foundation.org, 
 	pbonzini@redhat.com, shuah@kernel.org, linux-mm@kvack.org, 
@@ -84,77 +87,96 @@ Cc: david@redhat.com, rientjes@google.com, seanjc@google.com,
 	jiaqiyan@google.com, tabba@google.com, dave.hansen@linux.intel.com, 
 	Lisa Wang <wyihan@google.com>
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
 
-[resend to correct the mailing list address]
+The .error_remove_folio a_ops is used by different filesystems to handle
+folio truncation upon discovery of a memory failure in the memory
+associated with the given folio.
 
-Hello,
+Currently, MF_DELAYED is treated as an error, causing "Failed to punch
+page" to be written to the console. MF_DELAYED is then relayed to the
+caller of truncat_error_folio() as MF_FAILED. This further causes
+memory_failure() to return -EBUSY, which then always causes a SIGBUS.
 
-This patch series addresses an issue in the memory failure handling path
-where MF_DELAYED is incorrectly treated as an error. This issue was
-revealed because guest_memfd=E2=80=99s .error_remove_folio() callback retur=
-ns
-MF_DELAYED.
+This is also implies that regardless of whether the thread's memory
+corruption kill policy is PR_MCE_KILL_EARLY or PR_MCE_KILL_LATE, a
+memory failure within guest_memfd memory will always cause a SIGBUS.
 
-Currently, when the .error_remove_folio() callback for guest_memfd returns
-MF_DELAYED, there are a few issues.
+Update truncate_error_folio() to return MF_DELAYED to the caller if the
+.error_remove_folio() callback reports MF_DELAYED.
 
-1. truncate_error_folio() maps this to MF_FAILED. This causes
-   memory_failure() to return -EBUSY, which unconditionally triggers a
-   SIGBUS. The process=E2=80=99 configured memory corruption kill policy is=
- ignored
-   - even if PR_MCE_KILL_LATE is set, the process will still get a SIGBUS
-   on deferred memory failures.
+Generalize the comment: MF_DELAYED means memory failure was handled and
+some other part of memory failure will be handled later (e.g. a next
+access will result in the process being killed). Specifically for
+guest_memfd, a next access by the guest will result in an error returned
+to the userspace VMM.
 
-2. =E2=80=9CFailed to punch page=E2=80=9D is printed, even though MF_DELAYE=
-D indicates that
-   it was intentionally not punched.
+With delayed handling, the filemap continues to hold refcounts on the
+folio. Hence, take that into account when checking for extra refcounts
+in me_pagecache_clean(). This is aligned with the implementation in
+me_swapcache_dirty(), where, if a folio is still in the swap cache,
+extra_pins is set to true.
 
-The first patch corrects this by updating truncate_error_folio() to
-propagate MF_DELAYED to its caller. This allows memory_failure() to return
-0, indicating success, and lets the delayed handling proceed as designed.
-This patch also updates me_pagecache_clean() to account for the folio's
-refcount, which remains elevated during delayed handling, aligning its
-logic with me_swapcache_dirty().
+Signed-off-by: Lisa Wang <wyihan@google.com>
+---
+ mm/memory-failure.c | 24 +++++++++++++++---------
+ 1 file changed, 15 insertions(+), 9 deletions(-)
 
-The subsequent two patches add KVM selftests to validate the fix and the
-expected behavior of guest_memfd memory failure:
-
-The first test patch verifies that memory_failure() now returns 0 in the
-delayed case and confirms that SIGBUS signaling logic remains correct for
-other scenarios (e.g., madvise injection or PR_MCE_KILL_EARLY).
-
-The second test patch confirms that after a memory failure, the poisoned
-page is correctly unmapped from the KVM guest's stage 2 page tables and
-that a subsequent access by the guest correctly notifies the userspace VMM
-with EHWPOISON.
-
-This patch series is built upon kvm/next. In addition, to align with the
-change of INIT_SHARED and to use the macro wrapper in guest_memfd
-selftests, we put these patches behind Sean=E2=80=99s patches [1].
-
-For ease of testing, this series is also available, stitched together, at
-https://github.com/googleprodkernel/linux-cc/tree/memory-failure-mf-delayed=
--fix-rfc-v1=20
-
-[1]: https://lore.kernel.org/all/20251003232606.4070510-1-seanjc@google.com=
-/T/
-
-Thank you,
-
-
-Lisa Wang (3):
-  mm: memory_failure: Fix MF_DELAYED handling on truncation during
-    failure
-  KVM: selftests: Add memory failure tests in guest_memfd_test
-  KVM: selftests: Test guest_memfd behavior with respect to stage 2 page
-    tables
-
- mm/memory-failure.c                           |  24 +-
- .../testing/selftests/kvm/guest_memfd_test.c  | 233 ++++++++++++++++++
- 2 files changed, 248 insertions(+), 9 deletions(-)
-
---=20
+diff --git a/mm/memory-failure.c b/mm/memory-failure.c
+index df6ee59527dd..77f665c16a73 100644
+--- a/mm/memory-failure.c
++++ b/mm/memory-failure.c
+@@ -922,9 +922,11 @@ static int kill_accessing_process(struct task_struct *p, unsigned long pfn,
+  * by the m-f() handler immediately.
+  *
+  * MF_DELAYED - The m-f() handler marks the page as PG_hwpoisoned'ed.
+- * The page is unmapped, and is removed from the LRU or file mapping.
+- * An attempt to access the page again will trigger page fault and the
+- * PF handler will kill the process.
++ * It means memory_failure was handled (e.g. removed from file mapping or the
++ * LRU) and some other part of memory failure will be handled later (e.g. a
++ * next access will result in the process being killed). Specifically for
++ * guest_memfd, a next access by the guest will result in an error returned to
++ * the userspace VMM.
+  *
+  * MF_RECOVERED - The m-f() handler marks the page as PG_hwpoisoned'ed.
+  * The page has been completely isolated, that is, unmapped, taken out of
+@@ -999,6 +1001,9 @@ static int truncate_error_folio(struct folio *folio, unsigned long pfn,
+ 	if (mapping->a_ops->error_remove_folio) {
+ 		int err = mapping->a_ops->error_remove_folio(mapping, folio);
+ 
++		if (err == MF_DELAYED)
++			return err;
++
+ 		if (err != 0)
+ 			pr_info("%#lx: Failed to punch page: %d\n", pfn, err);
+ 		else if (!filemap_release_folio(folio, GFP_NOIO))
+@@ -1108,18 +1113,19 @@ static int me_pagecache_clean(struct page_state *ps, struct page *p)
+ 		goto out;
+ 	}
+ 
+-	/*
+-	 * The shmem page is kept in page cache instead of truncating
+-	 * so is expected to have an extra refcount after error-handling.
+-	 */
+-	extra_pins = shmem_mapping(mapping);
+-
+ 	/*
+ 	 * Truncation is a bit tricky. Enable it per file system for now.
+ 	 *
+ 	 * Open: to take i_rwsem or not for this? Right now we don't.
+ 	 */
+ 	ret = truncate_error_folio(folio, page_to_pfn(p), mapping);
++
++	/*
++	 * The shmem page, or any page with MF_DELAYED error handling, is kept in
++	 * page cache instead of truncating, so is expected to have an extra
++	 * refcount after error-handling.
++	 */
++	extra_pins = shmem_mapping(mapping) || ret == MF_DELAYED;
+ 	if (has_extra_refcount(ps, p, extra_pins))
+ 		ret = MF_FAILED;
+ 
+-- 
 2.51.0.788.g6d19910ace-goog
 
 
