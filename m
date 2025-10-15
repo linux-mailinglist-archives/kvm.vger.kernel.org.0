@@ -1,381 +1,235 @@
-Return-Path: <kvm+bounces-60105-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-60106-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [213.196.21.55])
-	by mail.lfdr.de (Postfix) with ESMTPS id D1CEBBE0A7D
-	for <lists+kvm@lfdr.de>; Wed, 15 Oct 2025 22:37:38 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 08905BE0CD6
+	for <lists+kvm@lfdr.de>; Wed, 15 Oct 2025 23:23:44 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 56971354F56
-	for <lists+kvm@lfdr.de>; Wed, 15 Oct 2025 20:37:38 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 5B81A19C559E
+	for <lists+kvm@lfdr.de>; Wed, 15 Oct 2025 21:24:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2D13330C341;
-	Wed, 15 Oct 2025 20:37:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 86CED2F5A2C;
+	Wed, 15 Oct 2025 21:23:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="3PmwDGwm"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="Xn7t0kHD"
 X-Original-To: kvm@vger.kernel.org
-Received: from BL2PR02CU003.outbound.protection.outlook.com (mail-eastusazon11011014.outbound.protection.outlook.com [52.101.52.14])
+Received: from out-183.mta0.migadu.com (out-183.mta0.migadu.com [91.218.175.183])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 48B6A303A10;
-	Wed, 15 Oct 2025 20:37:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.52.14
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1760560650; cv=fail; b=vBt2T0HEc2kqex6B/T6KdEQIkZlcUK6u/PDCp6l1Bktcp5JNef2jXt0CsppJIA+y/DDJkvJwqD5Fa0FsIf854qxtIwsCk0ZvQiwj1i6/j8pAR2oEb9lDjXlH7ASYh1Tk2dxdTjqViiIfuHF/yoJPXWQIeeA19kZRP8Q+ysqFt8Y=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1760560650; c=relaxed/simple;
-	bh=7kiqkaf27k93+gkzH2rCZxx+/8F1Sl+XSmtU75K9+gk=;
-	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
-	 Content-Type:MIME-Version; b=OjHbW0fJ9+cIXvoNL7Q1O060TGjZ8B5+jK70SA7rk3BTtwuJcqeabR5fVkVBdG5cditWonaxnf0+s0cYEfvGqTSF03x7qn4OwKyBDfSiFTyJ89KSU2FHUSACYfC02DOfaTPCz1rkKaANizKOWcx4j/ehzMiALIgNlTmBpAgZRvE=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=3PmwDGwm; arc=fail smtp.client-ip=52.101.52.14
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=A5xErMSQ4XPS0EgWtfSpK8+V/I6UK1TupiUD6ECF0XLTWHrQ4VASalu/zgzYJYo9gS1hSA8+ZhL4ZNgdhjYORwdTsKlp9tLGQyPP/m+mGMTxJwTZDm51MqJjDGe0BG8at7ci1lh6MBr4qLQIyY5drC/AYdKE00TeVBMUBC+6H5hI7rsSc2ARPJC6Hfrw7FIHAtCiG8y7DaphEMSOpNK7IQ+KLEiYSI36hzSFcFJ0W0CaWRJBhL1UOgi6Nnwdh7fQaw7+Bx+I/NgWFWIzGCxmv6I4+DfjjwbdrxQs0cc4uyOfTdvFdMVICbsAgETGHvu5JJH0spmWEVF1y4TaxDKJHw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=g1GEgfpGEsB0pxBVOWCTcp623rHJxZs++BNltXNkIiA=;
- b=KyfKyKt1aJI5WF1itck52OOX/LZ946EV11fIVRGhpzGZGcQdjosV06R70ZxpmgR1G3Gqb09FdPaVr5LOm7IO/VCqWDOsB+fhieqreOK+fvLOn+K55v2r55fop943qklng5uV5oLiL80I7X9ATmLYDCzFxty7Ef2ms21YggBBcXfWp9OB5FhX+cLKN6q0qfGkLWG+WJ9NxKQpMx+IsbXNQym9LpmK4NOr4uZogf7DxtHMad1uVcyZxSwwcr1/dsrj/2LgBhjuAhxA2I+v9HC2QkDy3wF2RAsLa69hamKcMc2XW2WwLZv+YzxAN1HFyU1dqiTo873blVdgc61Z9AsFiQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
- header.d=amd.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=g1GEgfpGEsB0pxBVOWCTcp623rHJxZs++BNltXNkIiA=;
- b=3PmwDGwmqlQsTTuYJV9kR0fEQGC3G+aUlisBJyuBQUaa6JhD+Jz6LZ3ttpamzkhoUdIufzVZv+6+nLl733F7Hrtt4OPXYCR4111/F7rdEO1LxOELT0nl9JL2+n9oWM2yCEQjPWxP1lf4lAzJYLHLFnMRHrl/2QgkkuCcHuyHlXU=
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=amd.com;
-Received: from IA0PPF9A76BB3A6.namprd12.prod.outlook.com
- (2603:10b6:20f:fc04::bdc) by BY5PR12MB4193.namprd12.prod.outlook.com
- (2603:10b6:a03:20c::19) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9203.9; Wed, 15 Oct
- 2025 20:37:24 +0000
-Received: from IA0PPF9A76BB3A6.namprd12.prod.outlook.com
- ([fe80::8d61:56ca:a8ea:b2eb]) by IA0PPF9A76BB3A6.namprd12.prod.outlook.com
- ([fe80::8d61:56ca:a8ea:b2eb%8]) with mapi id 15.20.9228.010; Wed, 15 Oct 2025
- 20:37:24 +0000
-Message-ID: <dcc64b09-117c-4d25-957d-e97ef49a8100@amd.com>
-Date: Wed, 15 Oct 2025 15:37:19 -0500
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] fs/resctrl: Fix MBM events being unconditionally enabled
- in mbm_event mode
-To: Reinette Chatre <reinette.chatre@intel.com>, babu.moger@amd.com,
- tony.luck@intel.com, Dave.Martin@arm.com, james.morse@arm.com,
- dave.hansen@linux.intel.com, bp@alien8.de
-Cc: kas@kernel.org, rick.p.edgecombe@intel.com, linux-kernel@vger.kernel.org,
- x86@kernel.org, linux-coco@lists.linux.dev, kvm@vger.kernel.org
-References: <6082147693739c4514e4a650a62f805956331d51.1759263540.git.babu.moger@amd.com>
- <a8f30dba-8319-4ce4-918c-288934be456e@intel.com>
- <b86dca12-bccc-46b1-8466-998357deae69@amd.com>
- <2cdc5b52-a00c-4772-8221-8d98b787722a@intel.com>
- <0cd2c8ac-8dee-4280-b726-af0119baa4a1@amd.com>
- <1315076d-24f9-4e27-b945-51564cadfaed@intel.com>
- <3f3b4ca6-e11e-4258-b60c-48b823b7db4f@intel.com>
- <0e52d4fe-0ff7-415a-babd-acf3c39f9d30@amd.com>
- <7292333a-a4f1-4217-8c72-436812f29be8@amd.com>
- <a9472e2f-d4a2-484a-b9a9-63c317a2de82@intel.com>
- <a75b2fa6-409c-4b33-9142-7be02bf6d217@amd.com>
- <5163ce35-f843-41a3-abfc-5af91b7c68bc@intel.com>
- <a2961f11-705a-4d75-85ee-bf96c8091647@amd.com>
- <5645dec8-e344-44d3-82f7-327259a53906@intel.com>
-Content-Language: en-US
-From: "Moger, Babu" <bmoger@amd.com>
-In-Reply-To: <5645dec8-e344-44d3-82f7-327259a53906@intel.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-ClientProxiedBy: SA0PR11CA0125.namprd11.prod.outlook.com
- (2603:10b6:806:131::10) To IA0PPF9A76BB3A6.namprd12.prod.outlook.com
- (2603:10b6:20f:fc04::bdc)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1C0A6200BAE
+	for <kvm@vger.kernel.org>; Wed, 15 Oct 2025 21:23:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.183
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1760563416; cv=none; b=MuDdjiKbidu87kZueyyYrWI2jnqsHG78N6RrfDPt8h+fE0o4r6/Faeg/hUxuzVP5MnygIUSVQSjvQyWsB6hXCsBNnC57NimD14GrSzAHRhot0Won3LxCZxU5QLGRPLmFtCP9YRUiUp+7gV0y0Ztn2peHEJK5Ullm4abcF3RQp08=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1760563416; c=relaxed/simple;
+	bh=z/ZAt/JqimvxhupKM/WQo3eIZ02qoztm40C2hOIV7Q4=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=TPgQ153kE0MW7CsJ9atduMTT8pM/oIKNQqnnXyiwh0tvgFy8erwGC8yW78AXRPDRwZ8w7NgsKgSNLzmfPkHgJmxgnzPE6dhc/0eQRKCif1+TFbnE4kfQHn4hQLwnYU7aLN7hyzzEQRdkx1nfJ7PqNYkafGnDogtJ35Ci7g0PK5o=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=Xn7t0kHD; arc=none smtp.client-ip=91.218.175.183
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+Date: Wed, 15 Oct 2025 21:23:25 +0000
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1760563411;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=tpCIpMhKpNVFUq8XLpVJcsrRwbNZaA4mgV8CdcBWnWs=;
+	b=Xn7t0kHDndE+FUUNhj8T81D2rk2Y1bR1K7lKc6/YmhNojKZ6yQL6q+ao44Uavl7ZygojFY
+	bOUY6SZD9WLXZGFKMo8nqi9exheJRxF0mtQUeHtwFYf14/QcXSDTvxgql7+4f4sll6fuDN
+	wfmAzX13sMa+07OIyfrjE1Gkyr4L6d4=
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Yosry Ahmed <yosry.ahmed@linux.dev>
+To: Jim Mattson <jmattson@google.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, Shuah Khan <shuah@kernel.org>, 
+	Sean Christopherson <seanjc@google.com>, Bibo Mao <maobibo@loongson.cn>, 
+	Huacai Chen <chenhuacai@kernel.org>, Andrew Jones <ajones@ventanamicro.com>, 
+	Claudio Imbrenda <imbrenda@linux.ibm.com>, "Pratik R. Sampat" <prsampat@amd.com>, 
+	Kai Huang <kai.huang@intel.com>, Eric Auger <eric.auger@redhat.com>, linux-kernel@vger.kernel.org, 
+	kvm@vger.kernel.org, linux-kselftest@vger.kernel.org
+Subject: Re: [PATCH 3/4] KVM: selftests: Add VM_MODE_PXXV57_4K VM mode
+Message-ID: <l7txoioo3gntu3lyl542jg3n3wvkqruf2qh33xy7lmr5mjgfq5@iw4wsfdurlc7>
+References: <20250917215031.2567566-1-jmattson@google.com>
+ <20250917215031.2567566-4-jmattson@google.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: IA0PPF9A76BB3A6:EE_|BY5PR12MB4193:EE_
-X-MS-Office365-Filtering-Correlation-Id: 6641fab7-73f8-4435-2d71-08de0c2aa5e0
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230040|376014|7416014|366016|1800799024;
-X-Microsoft-Antispam-Message-Info:
-	=?utf-8?B?Y3c2SkVWSUViTThKTVV5VEZFcUE4d0VUUkI0N2x5NUQzazVZdjVZdDdKN1hC?=
- =?utf-8?B?WWRIVTFCVDZ3czVHQXZwc2RGNVNZRk1DeUticU9seGw3eWFNTEp0VjBJSEdk?=
- =?utf-8?B?VURvNEp0WTIvUDIwQW5SeEIzK2t3c3luWHZSOXVoTEJ3T3FSMlRRVVdKdXIr?=
- =?utf-8?B?YWVwOEVqMjlUU1B2TnBPNnZ4MzQ0NGVyaDlTNU1ZU1gwVjNnbWpwZFJqbDls?=
- =?utf-8?B?dWMra05iamVlVFA3b0VmYXd5K01RczVpTDVZakZnbk1OTTBmOGRSWVdYcjVK?=
- =?utf-8?B?UU5iblgyVDYwc0pUSEVVTHhseCs2dWFKck5hT0tBRkRzbUZDMVl3RXY2QlUy?=
- =?utf-8?B?SnBmU0hFZEFrNHlvMmhhU29sTjJoUllKRDFmcFJIWVJHdVAwU3RGV05tVFhW?=
- =?utf-8?B?dzNxZjYyMldKWmdKS2J5WEhxTm5FazJZYUJtN244QzVtczJrMWxLVjBHUFRm?=
- =?utf-8?B?aWttUE1jMW41ZDdVZmZWVDNSL0N3eWZzZFlEU0lISjlKcnphS21UNEpFdzRj?=
- =?utf-8?B?SkFqbE5RY1oxM1I5czVQRStsTldSWXVrOXlHbHRkZmNvQWZySjdoWlVXMkg4?=
- =?utf-8?B?WlNiMVlkOVhUb01FQ01RdGRlUFluWHBTTmVPOC90Slc1cC8vY3BrdmVYTjVV?=
- =?utf-8?B?RCtkekY5UUtOcHViT1JhYkFLZHdPM284SnMxaVJwMzFKL0ZPVFlMa0ZzV01r?=
- =?utf-8?B?KzFTRklIYlE0QUhLd1dGemQ1a0pxeHVydWxjQ1FhdUJNbUNMeWtwSDN0dHB2?=
- =?utf-8?B?YmM1SUhwRGNsZXZxUGlLYllTQ3RCZGxiY01PeEZFRTg1cmt5bjd3VUxwQ1B3?=
- =?utf-8?B?L0szK014QkRObUVjYXMrY0p5ZUtBNGZkZk91dXYzSTFTZmVPVTZMbmJ6c21s?=
- =?utf-8?B?UE42NmxMWTVsQ0dmLytWWktVOTNhcDZmdldkendjRWRhSHp1RmxZMGtNWXlw?=
- =?utf-8?B?LzZVN2F4V29McVd0aTQ5UmNFbGZDNDdTZWxPdk5zNUJ2SVFvY2t1UjRqNy8v?=
- =?utf-8?B?WWo0MWdycTN4cjFQaFNlNE5TOTRRM1c4TVA3bGhnekgxVXVKN3FRNFIvNlJr?=
- =?utf-8?B?YlZTNlNVbWFEcjkyaTZzNmEyOWJvVmtXOVA4MDFIemQrUTAxL1JuWGNiemRV?=
- =?utf-8?B?b2tkRXBWT3RvQXhkeW55SDQ0eHdUZDhLUWNXVjVVbUpkS1Y1ZmtMVGRrc3dy?=
- =?utf-8?B?WUw1aStMbGlLaWdKdGJOVklnaWxsRWxOQVFaWWYwTHdlTDdPSHM3ZkZGZ1Zh?=
- =?utf-8?B?QzFiWXNvMFJ2cDF1RlpqVUsyS051ODJtdVlJNDRuZm5adFZyRmlPdzVNdzI3?=
- =?utf-8?B?QkRSWThXSlFGNFlJVjBTQVdkdzRBUytINjBpSndReXdRUlQ2R3hGYlkwVCtn?=
- =?utf-8?B?aVZMNENNQmJxSkV1SS9iYllydStadk11ajJDR1RMWmpkUnBrK3NtNllEN0g4?=
- =?utf-8?B?cTJwMTZzSFl5L0hNZ3FYdTN3cDhZMHByb3o2bThibFdNbzRGbU02OG1uRit3?=
- =?utf-8?B?RWdMa0ZoMFRjK2JpQWJZY29TOXNkbUN6RWZaRWZ2ZGFNUFlvOTRRbDMrMDh3?=
- =?utf-8?B?L1dsNTJiYStSbVBMV0gyTFp0ZG9LS0gxWmY2eXhUSVVCNW1QR2RVaWxjWUlG?=
- =?utf-8?B?YW1RZC85VmhSODFpeHNqOGVsdkNsQ2NxWkMxR1JTUHdBMHJyZTdjOHE4NU9O?=
- =?utf-8?B?Y1lFUzNiWXF1em00UjRpRVBjSFhiUUVYRnZnQ2J0V2taaGVHbzB6aThxdVJO?=
- =?utf-8?B?M1E0VENwUTF4aklrM0hRV0J1T1k4dXphVFFyOXlOUmd2Q2pycjE2ejVyL0R3?=
- =?utf-8?B?U243Rm9kV3VJRFRWQm9JeCtWcmN0ZXpKV0prOG1oR0ZPL1psQi95SlRtcWVE?=
- =?utf-8?B?N29CUG9La0orbnZRdjRTdnhGa2RpcjA5bkFmRDFKL2srRy9JU0Y3dHhNWkhT?=
- =?utf-8?Q?oa+iCLryFjvwPbFeyaALlpuSDKNs8qXz?=
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:IA0PPF9A76BB3A6.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(376014)(7416014)(366016)(1800799024);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?utf-8?B?b1pFL0tiQWJQWWhOcnRMNndrWmZzRG9zZUpEQktBejJqVkkxK1ZwT0xaQmFu?=
- =?utf-8?B?MGgvdVVqZGh6U0pqbCtvbnZKN2dBcU1vOWxrNkJjZ0VOaFNyZHZiQjRybUxr?=
- =?utf-8?B?cjFEQWU4MGZqK2NoSkFFMVdWZmJOQkJINlMzTCtCMUtSRVB6cmFQMEZwRXMv?=
- =?utf-8?B?UGdPN1JxMUFxY0V5UGJqRjBOR3Q2SllaZEJJQ3hLRlVyQTltTmZzaUpPL1Ey?=
- =?utf-8?B?cmlqWlNkNy9mM08wVVhBUmMreUhjc0ZOYlRXaWFmK2hxbFdHS0VRL21KOWJm?=
- =?utf-8?B?OXhFYk1ZOTV2MUwvZ3duK01GaFAxUDF3ckF3Y05BY1A3N3g1MUIrR3RtQ3Zq?=
- =?utf-8?B?N1lRTUNVaXkzZHFCSlkrNXNhZjJLeEJ4NUFnKzlnZHN6dnBieHc0aFM3YVM5?=
- =?utf-8?B?cHpoQ3c0K212bzRyWHBFSnhUbHdzZnJXWTVXUnFsL2ZRU1pKaGozRnZMNXlK?=
- =?utf-8?B?d0xQT1pVN1VRSTRIaUNmMTBUVkRqOG1VbXpzSFlqbHpiMEhqQXNaa0xSNEc3?=
- =?utf-8?B?cGl3K3VRcHJKQU9nSVRqZmRuSDhmMjdjT3BzVkJqbXAwUlg2Wjh1UzdaL2lT?=
- =?utf-8?B?N256TVlreHdjV3dKakxHeU1YaHVGVEhUTG1LMWRvaTRXaVhxdkQrZWs3TGV5?=
- =?utf-8?B?cjhVTW5BejRHTk9Wcjd4T1hWTUV2eXZNUjlORFNBUCt4eS9ETXE2YTV4UUIw?=
- =?utf-8?B?NlRIV2NBNWw0MGtRNng3M1NRSTRFWGVDalB1Q3ZCMG9DTlgzU29RcXZSTmRD?=
- =?utf-8?B?ZjA0T0djTHY4WHM4MGFCM3AybVA0NUdkTDYvd3g3QmVjQkFrOVQ5RGxSNFA2?=
- =?utf-8?B?eThzU0NYckYyYVVRQk5CTXRjWUtQTEpxb05iZ0JleXltVUxHSEIyLzE1UXpr?=
- =?utf-8?B?Uk41eHYzQ3BOQThiZUFQNitGYmUydXhKNERXRXBMQ1V2Z0UvQURwVmVNMVND?=
- =?utf-8?B?K1FqeGtIcW5BZ1JRVkZVMG9pOGFhbHI5MXl4RkhsemdmZjRCZlRmRS9hb1lS?=
- =?utf-8?B?bm1nOEROdk5jSkFKUUtYT3VvUmI3QWpmMHluUmxsekFSVnpzMXBDY3ptZXZO?=
- =?utf-8?B?THQzMXUzSC9aRFgwNzIyOEhpNFlSYWY3MHhucWhoTG8zVm9lSFo1VlVURWVy?=
- =?utf-8?B?UExUblJEbXR1Y2RRR3h6RXY0TVRQWFEwOFY5d0FRYkY3dVNoSUUwQzFiczlp?=
- =?utf-8?B?NHVzaEJGK2NZVVZXK1R3VW8rY0J2Q3AzOWl1VlJsL1NNNHdLRUdvbzNmT242?=
- =?utf-8?B?SDVpN2pMU3dTcUZMWHBPUzM2ZFMyKzBLdlRWMVVjYlpqYzJETHB5T29TcHda?=
- =?utf-8?B?cnltZUpCbWIrd0NxYlozYXlHSmd1K0R6RVh4eDR5cnVJcnk2WlhsMWlmclZI?=
- =?utf-8?B?N042dEtGS1N3Rm05WVNIeUJ5WC9aL1FLalpoZzczTnhBYmk1bFJJbUtiUnFy?=
- =?utf-8?B?ZGZYRHdqdlN2UThmSnpHZFRCQ1lkZ2lyWGFDbDk5NHVxalFKVUJZWU1rUmxY?=
- =?utf-8?B?M1pXUjlhRklxQzM3MmFXakowR0pVSTJFdFNua3RKaktCQmI5eXd1ZmRHOWRP?=
- =?utf-8?B?YTFXSzAvQXdFeGNmSnJTVTA5eG5NRURRVitEWXd5OU9DTnZRWGlnYXlYalFa?=
- =?utf-8?B?VExBYzhoWlB4dzlJVEdaOTFIN2FMcTExb1A0WC9VVUNoMG5PSXhRWDFWSWRK?=
- =?utf-8?B?VnNDZS9aYmpNbEVXeXdXZWlGWVgyUEtoWndLeC81V1I5Smx3Lzg5N2xXNC94?=
- =?utf-8?B?d2FCandleEdVRkRLcWhxRmxyTkp2OEw5L3JubytMaEJvY25iNDhid29NaFVt?=
- =?utf-8?B?OGdNV1dYLzVWK21tVDE0eFlULzd2ellzcFh3aS9wWHZRdWNveXNDQWJaUDJn?=
- =?utf-8?B?TXJ4Yy9vSko1YnBidk1qTnVXVWZUOGpaWHF1ZUJpVWFFVm9IZTFjM2Vlc2Jp?=
- =?utf-8?B?bHZGNGx4Z29pL0FYejIvT3NHenp2OFludkxIb1lvY2tOQkNvUWc0L0JGSTRO?=
- =?utf-8?B?OGE1cnpnMUxrRGFGUThKSTRnbmxRRVBSZHAzbDhOUlN5b01Tc3lTREIrWEh2?=
- =?utf-8?B?cWpVSy8va20xYVUrMU5HWVROR3hGbnlxekxxMTRuVURuRmtlL1J0S1VFbWdJ?=
- =?utf-8?Q?NCaHJ6+NNzaGC8GFGb/crdDi8?=
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 6641fab7-73f8-4435-2d71-08de0c2aa5e0
-X-MS-Exchange-CrossTenant-AuthSource: IA0PPF9A76BB3A6.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 15 Oct 2025 20:37:24.5939
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: JtPjjr6gUzmFtxMHhfDP4oLlVHy7HVQaR4pxqgKAmTGTQLCGXGwXBZ6Zllgb4i4f
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: BY5PR12MB4193
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250917215031.2567566-4-jmattson@google.com>
+X-Migadu-Flow: FLOW_OUT
 
-Hi Reinette,
+On Wed, Sep 17, 2025 at 02:48:39PM -0700, Jim Mattson wrote:
+> Add a new VM mode, VM_MODE_PXXV57_4K, to support tests that require
+> 5-level paging on x86. This mode sets up a 57-bit virtual address
+> space and sets CR4.LA57 in the guest.
+> 
+> Signed-off-by: Jim Mattson <jmattson@google.com>
+> ---
+>  .../testing/selftests/kvm/include/kvm_util.h  |  1 +
+>  tools/testing/selftests/kvm/lib/kvm_util.c    | 21 +++++++++++++++++
+>  .../testing/selftests/kvm/lib/x86/processor.c | 23 ++++++++++++-------
+>  tools/testing/selftests/kvm/lib/x86/vmx.c     |  7 +++---
+>  4 files changed, 41 insertions(+), 11 deletions(-)
+> 
+> diff --git a/tools/testing/selftests/kvm/include/kvm_util.h b/tools/testing/selftests/kvm/include/kvm_util.h
+> index 23a506d7eca3..b6ea5d966715 100644
+> --- a/tools/testing/selftests/kvm/include/kvm_util.h
+> +++ b/tools/testing/selftests/kvm/include/kvm_util.h
+> @@ -175,6 +175,7 @@ enum vm_guest_mode {
+>  	VM_MODE_P40V48_16K,
+>  	VM_MODE_P40V48_64K,
+>  	VM_MODE_PXXV48_4K,	/* For 48bits VA but ANY bits PA */
+> +	VM_MODE_PXXV57_4K,	/* For 48bits VA but ANY bits PA */
+>  	VM_MODE_P47V64_4K,
+>  	VM_MODE_P44V64_4K,
+>  	VM_MODE_P36V48_4K,
+> diff --git a/tools/testing/selftests/kvm/lib/kvm_util.c b/tools/testing/selftests/kvm/lib/kvm_util.c
+> index c3f5142b0a54..6b0e499c6e91 100644
+> --- a/tools/testing/selftests/kvm/lib/kvm_util.c
+> +++ b/tools/testing/selftests/kvm/lib/kvm_util.c
+> @@ -232,6 +232,7 @@ const char *vm_guest_mode_string(uint32_t i)
+>  		[VM_MODE_P40V48_16K]	= "PA-bits:40,  VA-bits:48, 16K pages",
+>  		[VM_MODE_P40V48_64K]	= "PA-bits:40,  VA-bits:48, 64K pages",
+>  		[VM_MODE_PXXV48_4K]	= "PA-bits:ANY, VA-bits:48,  4K pages",
+> +		[VM_MODE_PXXV57_4K]	= "PA-bits:ANY, VA-bits:57,  4K pages",
+>  		[VM_MODE_P47V64_4K]	= "PA-bits:47,  VA-bits:64,  4K pages",
+>  		[VM_MODE_P44V64_4K]	= "PA-bits:44,  VA-bits:64,  4K pages",
+>  		[VM_MODE_P36V48_4K]	= "PA-bits:36,  VA-bits:48,  4K pages",
+> @@ -259,6 +260,7 @@ const struct vm_guest_mode_params vm_guest_mode_params[] = {
+>  	[VM_MODE_P40V48_16K]	= { 40, 48,  0x4000, 14 },
+>  	[VM_MODE_P40V48_64K]	= { 40, 48, 0x10000, 16 },
+>  	[VM_MODE_PXXV48_4K]	= {  0,  0,  0x1000, 12 },
+> +	[VM_MODE_PXXV57_4K]	= {  0,  0,  0x1000, 12 },
+>  	[VM_MODE_P47V64_4K]	= { 47, 64,  0x1000, 12 },
+>  	[VM_MODE_P44V64_4K]	= { 44, 64,  0x1000, 12 },
+>  	[VM_MODE_P36V48_4K]	= { 36, 48,  0x1000, 12 },
+> @@ -358,6 +360,25 @@ struct kvm_vm *____vm_create(struct vm_shape shape)
+>  		vm->va_bits = 48;
+>  #else
+>  		TEST_FAIL("VM_MODE_PXXV48_4K not supported on non-x86 platforms");
+> +#endif
+> +		break;
+> +	case VM_MODE_PXXV57_4K:
+> +#ifdef __x86_64__
+> +		kvm_get_cpu_address_width(&vm->pa_bits, &vm->va_bits);
+> +		kvm_init_vm_address_properties(vm);
+> +		/*
+> +		 * For 5-level paging, KVM requires LA57 to be enabled, which
+> +		 * requires a 57-bit virtual address space.
+> +		 */
+> +		TEST_ASSERT(vm->va_bits == 57,
+> +			    "Linear address width (%d bits) not supported for VM_MODE_PXXV57_4K",
+> +			    vm->va_bits);
+> +		pr_debug("Guest physical address width detected: %d\n",
+> +			 vm->pa_bits);
+> +		vm->pgtable_levels = 5;
+> +		vm->va_bits = 57;
 
-On 10/15/2025 2:56 PM, Reinette Chatre wrote:
-> Hi Babu,
-> 
-> On 10/15/25 7:55 AM, Moger, Babu wrote:
->> Hi Reinette,
->>
->> On 10/14/2025 6:09 PM, Reinette Chatre wrote:
->>> Hi Babu,
->>>
->>> On 10/14/25 3:45 PM, Moger, Babu wrote:
->>>> On 10/14/2025 3:57 PM, Reinette Chatre wrote:
->>>>> On 10/14/25 10:43 AM, Babu Moger wrote:
->>>
->>>
->>>>>>> Yes. I saw the issues. It fails to mount in my case with panic trace.
->>>>>
->>>>> (Just to ensure that there is not anything else going on) Could you please confirm if the panic is from
->>>>> mon_add_all_files()->mon_event_read()->mon_event_count()->__mon_event_count()->resctrl_arch_reset_rmid()
->>>>> that creates the MBM event files during mount and then does the initial read of RMID to determine the
->>>>> starting count?
->>>>
->>>> It happens just before that (at mbm_cntr_get). We have not allocated d->cntr_cfg for the counters.
->>>> ===================Panic trace =================================
->>>>
->>>> 349.330416] BUG: kernel NULL pointer dereference, address: 0000000000000008
->>>> [  349.338187] #PF: supervisor read access in kernel mode
->>>> [  349.343914] #PF: error_code(0x0000) - not-present page
->>>> [  349.349644] PGD 10419f067 P4D 0
->>>> [  349.353241] Oops: Oops: 0000 [#1] SMP NOPTI
->>>> [  349.357905] CPU: 45 UID: 0 PID: 3449 Comm: mount Not tainted 6.18.0-rc1+ #120 PREEMPT(voluntary)
->>>> [  349.367803] Hardware name: AMD Corporation PURICO/PURICO, BIOS RPUT1003E 12/11/2024
->>>> [  349.376334] RIP: 0010:mbm_cntr_get+0x56/0x90
->>>> [  349.381096] Code: 45 8d 41 fe 83 f8 01 77 3d 8b 7b 50 85 ff 7e 36 49 8b 84 24 f0 04 00 00 45 31 c0 eb 0d 41 83 c0 01 48 83 c0 10 44 39 c7 74 1c <48> 3b 50 08 75 ed 3b 08 75 e9 48 83 c4 10 44 89 c0 5b 41 5c 41 5d
->>>> [  349.402037] RSP: 0018:ff56bba58655f958 EFLAGS: 00010246
->>>> [  349.407861] RAX: 0000000000000000 RBX: ffffffff9525b900 RCX: 0000000000000002
->>>> [  349.415818] RDX: ffffffff95d526a0 RSI: ff1f5d52517c1800 RDI: 0000000000000020
->>>> [  349.423774] RBP: ff56bba58655f980 R08: 0000000000000000 R09: 0000000000000001
->>>> [  349.431730] R10: ff1f5d52c616a6f0 R11: fffc6a2f046c3980 R12: ff1f5d52517c1800
->>>> [  349.439687] R13: 0000000000000001 R14: ffffffff95d526a0 R15: ffffffff9525b968
->>>> [  349.447635] FS:  00007f17926b7800(0000) GS:ff1f5d59d45ff000(0000) knlGS:0000000000000000
->>>> [  349.456659] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
->>>> [  349.463064] CR2: 0000000000000008 CR3: 0000000147afe002 CR4: 0000000000771ef0
->>>> [  349.471022] PKRU: 55555554
->>>> [  349.474033] Call Trace:
->>>> [  349.476755]  <TASK>
->>>> [  349.479091]  ? kernfs_add_one+0x114/0x170
->>>> [  349.483560]  rdtgroup_assign_cntr_event+0x9b/0xd0
->>>> [  349.488795]  rdtgroup_assign_cntrs+0xab/0xb0
->>>> [  349.493553]  rdt_get_tree+0x4be/0x770
->>>> [  349.497623]  vfs_get_tree+0x2e/0xf0
->>>> [  349.501508]  fc_mount+0x18/0x90
->>>> [  349.505007]  path_mount+0x360/0xc50
->>>> [  349.508884]  ? putname+0x68/0x80
->>>> [  349.512479]  __x64_sys_mount+0x124/0x150
->>>> [  349.516848]  x64_sys_call+0x2133/0x2190
->>>> [  349.521123]  do_syscall_64+0x74/0x970
->>>>
->>>> ==================================================================
->>>
->>> Thank you for capturing this. This is a different trace but it confirms that it is the
->>> same root cause. Specifically, event is enabled after the state it depends on is (not) allocated
->>> during domain online.
->>>
->>
->> Yes. Thanks
->>
->> Here is the changelog.
->>
->> x86,fs/resctrl: Fix BUG with mbm_event mode when MBM events are disabled
->>
->> The following BUG is encountered when mounting the resctrl filesystem after booting a system with X86_FEATURE_ABMC support and the kernel parameter 'rdt=!mbmtotal,!mbmlocal'.
-> 
-> "booting a system with X86_FEATURE_ABMC" sounds like this is a feature enabled
-> during boot?
+We assert that vm->va_bits is 57, and then we set it here again. Seems
+like we're doing the same for VM_MODE_PXXV48_4K too.
 
-Yea.
+> +#else
+> +		TEST_FAIL("VM_MODE_PXXV57_4K not supported on non-x86 platforms");
+>  #endif
+>  		break;
+>  	case VM_MODE_P47V64_4K:
+> diff --git a/tools/testing/selftests/kvm/lib/x86/processor.c b/tools/testing/selftests/kvm/lib/x86/processor.c
+> index 433365c8196d..d566190ea488 100644
+> --- a/tools/testing/selftests/kvm/lib/x86/processor.c
+> +++ b/tools/testing/selftests/kvm/lib/x86/processor.c
+> @@ -124,10 +124,11 @@ bool kvm_is_tdp_enabled(void)
+>  
+>  void virt_arch_pgd_alloc(struct kvm_vm *vm)
+>  {
+> -	TEST_ASSERT(vm->mode == VM_MODE_PXXV48_4K, "Attempt to use "
+> -		"unknown or unsupported guest mode, mode: 0x%x", vm->mode);
+> +	TEST_ASSERT(vm->mode == VM_MODE_PXXV48_4K ||
+> +		    vm->mode == VM_MODE_PXXV57_4K,
+> +		    "Unknown or unsupported guest mode: 0x%x", vm->mode);
+>  
+> -	/* If needed, create page map l4 table. */
+> +	/* If needed, create the top-level page table. */
+>  	if (!vm->pgd_created) {
+>  		vm->pgd = vm_alloc_page_table(vm);
+>  		vm->pgd_created = true;
+> @@ -187,8 +188,9 @@ void __virt_pg_map(struct kvm_vm *vm, uint64_t vaddr, uint64_t paddr, int level)
+>  	uint64_t *pte = &vm->pgd;
+>  	int current_level;
+>  
+> -	TEST_ASSERT(vm->mode == VM_MODE_PXXV48_4K,
+> -		    "Unknown or unsupported guest mode, mode: 0x%x", vm->mode);
+> +	TEST_ASSERT(vm->mode == VM_MODE_PXXV48_4K ||
+> +		    vm->mode == VM_MODE_PXXV57_4K,
+> +		    "Unknown or unsupported guest mode: 0x%x", vm->mode);
+>  
+>  	TEST_ASSERT((vaddr % pg_size) == 0,
+>  		    "Virtual address not aligned,\n"
+> @@ -279,8 +281,9 @@ uint64_t *__vm_get_page_table_entry(struct kvm_vm *vm, uint64_t vaddr,
+>  	TEST_ASSERT(*level >= PG_LEVEL_NONE && *level < PG_LEVEL_NUM,
+>  		    "Invalid PG_LEVEL_* '%d'", *level);
+>  
+> -	TEST_ASSERT(vm->mode == VM_MODE_PXXV48_4K, "Attempt to use "
+> -		"unknown or unsupported guest mode, mode: 0x%x", vm->mode);
+> +	TEST_ASSERT(vm->mode == VM_MODE_PXXV48_4K ||
+> +		    vm->mode == VM_MODE_PXXV57_4K,
+> +		    "Unknown or unsupported guest mode: 0x%x", vm->mode);
+>  	TEST_ASSERT(sparsebit_is_set(vm->vpages_valid,
+>  		(vaddr >> vm->page_shift)),
+>  		"Invalid virtual address, vaddr: 0x%lx",
+> @@ -481,7 +484,9 @@ static void vcpu_init_sregs(struct kvm_vm *vm, struct kvm_vcpu *vcpu)
+>  {
+>  	struct kvm_sregs sregs;
+>  
+> -	TEST_ASSERT_EQ(vm->mode, VM_MODE_PXXV48_4K);
+> +	TEST_ASSERT(vm->mode == VM_MODE_PXXV48_4K ||
+> +		    vm->mode == VM_MODE_PXXV57_4K,
+> +		    "Unknown or unsupported guest mode: 0x%x", vm->mode);
+>  
+>  	/* Set mode specific system register values. */
+>  	vcpu_sregs_get(vcpu, &sregs);
+> @@ -495,6 +500,8 @@ static void vcpu_init_sregs(struct kvm_vm *vm, struct kvm_vcpu *vcpu)
+>  	sregs.cr4 |= X86_CR4_PAE | X86_CR4_OSFXSR;
+>  	if (kvm_cpu_has(X86_FEATURE_XSAVE))
+>  		sregs.cr4 |= X86_CR4_OSXSAVE;
+> +	if (vm->pgtable_levels == 5)
+> +		sregs.cr4 |= X86_CR4_LA57;
+>  	sregs.efer |= (EFER_LME | EFER_LMA | EFER_NX);
+>  
+>  	kvm_seg_set_unusable(&sregs.ldt);
+> diff --git a/tools/testing/selftests/kvm/lib/x86/vmx.c b/tools/testing/selftests/kvm/lib/x86/vmx.c
+> index d4d1208dd023..1b6d4a007798 100644
+> --- a/tools/testing/selftests/kvm/lib/x86/vmx.c
+> +++ b/tools/testing/selftests/kvm/lib/x86/vmx.c
+> @@ -401,11 +401,12 @@ void __nested_pg_map(struct vmx_pages *vmx, struct kvm_vm *vm,
+>  	struct eptPageTableEntry *pt = vmx->eptp_hva, *pte;
+>  	uint16_t index;
+>  
+> -	TEST_ASSERT(vm->mode == VM_MODE_PXXV48_4K, "Attempt to use "
+> -		    "unknown or unsupported guest mode, mode: 0x%x", vm->mode);
+> +	TEST_ASSERT(vm->mode == VM_MODE_PXXV48_4K ||
+> +		    vm->mode == VM_MODE_PXXV57_4K,
+> +		    "Unknown or unsupported guest mode: 0x%x", vm->mode);
+>  
+>  	TEST_ASSERT((nested_paddr >> 48) == 0,
+> -		    "Nested physical address 0x%lx requires 5-level paging",
+> +		    "Nested physical address 0x%lx is > 48-bits and requires 5-level EPT",
 
-> 
->>   
->> ===========================================================================
->> [  349.330416] BUG: kernel NULL pointer dereference, address: 0000000000000008
->> [  349.338187] #PF: supervisor read access in kernel mode
->> [  349.343914] #PF: error_code(0x0000) - not-present page
->> [  349.349644] PGD 10419f067 P4D 0
->> [  349.353241] Oops: Oops: 0000 [#1] SMP NOPTI
->> [  349.357905] CPU: 45 UID: 0 PID: 3449 Comm: mount Not tainted
->>                     6.18.0-rc1+ #120 PREEMPT(voluntary)
->> [  349.367803] Hardware name: AMD Corporation
-> 
-> This backtrace needs to be trimmed. See "Backtraces in commit messages" in
-> Documentation/process/submitting-patches.rst
+Shouldn't this assertion be updated now? We technically support 5-level
+EPT so it should only fire if the mode is VM_MODE_PXXV48_4K. Maybe we
+should use vm->va_bits?
 
-Yes. Sure.
 
+>  		    nested_paddr);
+>  	TEST_ASSERT((nested_paddr % page_size) == 0,
+>  		    "Nested physical address not on page boundary,\n"
+> -- 
+> 2.51.0.470.ga7dc726c21-goog
 > 
->> [  349.376334] RIP: 0010:mbm_cntr_get+0x56/0x90
->> [  349.381096] Code: 45 8d 41 fe 83 f8 01 77 3d 8b 7b 50 85 ff 7e 36 49 8b 84 24 f0 04 00 00 45 31 c0 eb 0d 41 83 c0 01 48 83 c0 10 44 39 c7 74 1c <48> 3b 50 08 75 ed 3b 08 75 e9 48 83 c4 10 44 89 c0 5b 41 5c 41 5d
->> [  349.402037] RSP: 0018:ff56bba58655f958 EFLAGS: 00010246
->> [  349.407861] RAX: 0000000000000000 RBX: ffffffff9525b900 RCX: 0000000000000002
->> [  349.415818] RDX: ffffffff95d526a0 RSI: ff1f5d52517c1800 RDI: 0000000000000020
->> [  349.423774] RBP: ff56bba58655f980 R08: 0000000000000000 R09: 0000000000000001
->> [  349.431730] R10: ff1f5d52c616a6f0 R11: fffc6a2f046c3980 R12: ff1f5d52517c1800
->> [  349.439687] R13: 0000000000000001 R14: ffffffff95d526a0 R15: ffffffff9525b968
->> [  349.447635] FS:  00007f17926b7800(0000) GS:ff1f5d59d45ff000(0000)
->>                      knlGS:0000000000000000
->> [  349.456659] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
->> [  349.463064] CR2: 0000000000000008 CR3: 0000000147afe002 CR4: 0000000000771ef0
->> [  349.471022] PKRU: 55555554
->> [  349.474033] Call Trace:
->> [  349.476755]  <TASK>
->> [  349.479091]  ? kernfs_add_one+0x114/0x170
->> [  349.483560]  rdtgroup_assign_cntr_event+0x9b/0xd0
->> [  349.488795]  rdtgroup_assign_cntrs+0xab/0xb0
->> [  349.493553]  rdt_get_tree+0x4be/0x770
->> [  349.497623]  vfs_get_tree+0x2e/0xf0
->> [  349.501508]  fc_mount+0x18/0x90
->> [  349.505007]  path_mount+0x360/0xc50
->> [  349.508884]  ? putname+0x68/0x80
->> [  349.512479]  __x64_sys_mount+0x124/0x150
->>
->> When mbm_event mode is enabled, it implicitly enables both MBM total and
->> local events. However, specifying the kernel parameter
->> "rdt=!mbmtotal,!mbmlocal" disables these events during resctrl initialization. As a result, related data structures, such as rdt_mon_domain::mbm_states, cntr_cfg, and rdt_hw_mon_domain::arch_mbm_states are not allocated. This
-> 
-> This may be a bit confusing with the jumps from "enabled" to "disabled" without noting the
-> contexts (arch vs fs, early init vs late init).
-> 
->> leads to a BUG when the user attempts to mount the resctrl filesystem,
->> which tries to access these un-allocated structures.
->>
->>
->> Fix the issue by adding a dependency on X86_FEATURE_CQM_MBM_TOTAL and
->> X86_FEATURE_CQM_MBM_LOCAL for X86_FEATURE_ABMC to be enabled. This is
->> acceptable for now, as X86_FEATURE_ABMC currently implies support for MBM total and local events. However, this dependency should be revisited and removed in the future to decouple feature handling more cleanly.
-> 
-> If I understand correctly the fix for the NULL pointer access is to remove
-> the late event enabling from resctrl fs. The new dependency fixes a related but different
-> issue that limits the scenarios in which mbm_event mode is enabled and when it may be possible
-> to switch between modes.
-> 
-> I think the changelog can be made more specific with some adjustments. Here is an attempt
-> at doing so but I think it can still be improved for flow.
-> 
-> 	x86,fs/resctrl: Fix NULL pointer dereference when events force disabled while in mbm_event mode
-> 
-> 	The following NULL pointer dereference is encountered on mount of resctrl fs after booting
-> 	a system that support assignable counters with the "rdt=!mbmtotal,!mbmlocal" kernel parameters:
-> 
-> 	BUG: kernel NULL pointer dereference, address: 0000000000000008
-> 	#PF: supervisor read access in kernel mode
-> 	#PF: error_code(0x0000) - not-present page
-> 	RIP: 0010:mbm_cntr_get
-> 	Call Trace:
-> 	rdtgroup_assign_cntr_event
-> 	rdtgroup_assign_cntrs
-> 	rdt_get_tree
-> 
-> 	Specifying the kernel parameter "rdt=!mbmtotal,!mbmlocal" effectively disables the legacy
-> 	X86_FEATURE_CQM_MBM_TOTAL and X86_FEATURE_CQM_MBM_LOCAL features and thus the MBM events
-> 	they represent. This results in the per-domain MBM event related data structures to not
-> 	be allocated during resctrl early initialization.
-> 
-> 	resctrl fs initialization follows by implicitly enabling both MBM total and local
-> 	events on a system that	supports assignable counters (mbm_event mode), but this enabling
-> 	occurs after the per-domain data structures have been created.
-> 
-> 	During runtime resctrl fs assumes that an enabled event can access all its state.
-> 	This results in NULL pointer dereference when resctrl attempts to access the
-> 	un-allocated structures of an enabled event.
-> 
-> 	Remove the late MBM event enabling from resctrl fs.
-> 
-> 	This leaves a problem where the X86_FEATURE_CQM_MBM_TOTAL and X86_FEATURE_CQM_MBM_LOCAL
-> 	features may be	disabled while assignable counter (mbm_event) mode is enabled without
-> 	any events to support. Switching between the "default" and "mbm_event" mode without
-> 	any events is not practical.
-> 
-> 	Create a dependency between the X86_FEATURE_CQM_MBM_TOTAL/X86_FEATURE_CQM_MBM_LOCAL
-> 	and X86_FEATURE_ABMC (assignable counter) hardware features. An x86 system that supports
-> 	assignable counters now requires support of X86_FEATURE_CQM_MBM_TOTAL or X86_FEATURE_CQM_MBM_LOCAL.
-> 	This ensures all needed MBM related data structures are created before use and that it is
-> 	only possible to switch	between "default" and "mbm_event" mode when the same events are
-> 	available in both modes. This dependency does not exist in the hardware but this usage of
-> 	these feature settings work for known systems.
-> 	
-
-Looks good to me.
-
-thanks
-Babu
 
