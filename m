@@ -1,94 +1,99 @@
-Return-Path: <kvm+bounces-60086-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-60087-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id BF9C2BDFFC0
-	for <lists+kvm@lfdr.de>; Wed, 15 Oct 2025 20:05:47 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id C1CCDBDFFCA
+	for <lists+kvm@lfdr.de>; Wed, 15 Oct 2025 20:06:14 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id BFF123BAE60
-	for <lists+kvm@lfdr.de>; Wed, 15 Oct 2025 18:05:42 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2591F48472C
+	for <lists+kvm@lfdr.de>; Wed, 15 Oct 2025 18:05:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1EC3D30101E;
-	Wed, 15 Oct 2025 18:05:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E476B3009FA;
+	Wed, 15 Oct 2025 18:05:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="cT5LTNf/"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="qm9fVut5"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pg1-f201.google.com (mail-pg1-f201.google.com [209.85.215.201])
+Received: from mail-pj1-f74.google.com (mail-pj1-f74.google.com [209.85.216.74])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E84AD21B1BC
-	for <kvm@vger.kernel.org>; Wed, 15 Oct 2025 18:05:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B11442FF65F
+	for <kvm@vger.kernel.org>; Wed, 15 Oct 2025 18:05:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.74
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1760551536; cv=none; b=O7cf+3AetFAX0DCbYjZVQdnoZVYACH8Ivkn35bjov/vzM+t984KaNFGcZUDpRoypZsZt+H87EdBY/yl6sIUfhRKYHyMCBosV6pbIFB4XE7F7YTN9i7V5+vUfL4dhos/XoHRzaoh21OoEIHuNcGYXoSgj/+q6rP9g/9crTEpzUZo=
+	t=1760551543; cv=none; b=MyWJuMgcBksdTJlC1J7qrsazLWdsrjRoRSRgD3dOZcLElK4TlsURIUnOTTakeo78APo6iuTRfK3uUw2F8VBCJrs+NeMvE7ieQeRZopoAubkRDprvbNVCIbuQXCNZ4C9Q1JCNv34oNTTGc0yF+9dmAjKIK1n0x7DCQPavnQ7C24A=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1760551536; c=relaxed/simple;
-	bh=UMsdyjzBO+xpQAtmVF2K42FHZE3eVQ96vmVxMXpt6JM=;
+	s=arc-20240116; t=1760551543; c=relaxed/simple;
+	bh=h9PXlzkSJOy4Dm8tF5Ylr2mGcTwNvGzCf+TbFLlkBSs=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=tyROQwKyeXjvMaEdDA1Lg+Dbn0wf1M4jaabySfBmIaqTun/1NRAz4odoWDbrCEPCHDmsIruO73vltMd0btanriUl69JjlGpHgbeX8j5GAyKvIVc4hUb/2Pv6UrLIDYz7xELgJlygvhWtEtpOsJmXjOmGgSZcHPKVUEd6VJtrteA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=cT5LTNf/; arc=none smtp.client-ip=209.85.215.201
+	 To:Cc:Content-Type; b=iw2YreT64EIDFyHcgaeM2oQ9/GNYjQ0s+Lw2LaojMFlFIjFgP0u+TLSBTp8O5WXGVNNkrWaHcTY9WC0AOLv0Mvo2Vhswtua08n+9g1ii811rmVQkeR6KJ9LHemyG4xkwUEUul5Mrh71SWn0GdXW7w3SwfUzMqYQkvzQHsLRix20=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=qm9fVut5; arc=none smtp.client-ip=209.85.216.74
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pg1-f201.google.com with SMTP id 41be03b00d2f7-b55283ff3fcso8562164a12.3
-        for <kvm@vger.kernel.org>; Wed, 15 Oct 2025 11:05:34 -0700 (PDT)
+Received: by mail-pj1-f74.google.com with SMTP id 98e67ed59e1d1-33428befc3aso13061275a91.2
+        for <kvm@vger.kernel.org>; Wed, 15 Oct 2025 11:05:41 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1760551534; x=1761156334; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1760551541; x=1761156341; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=Yqvjk57rc7iKF+vXl7Uf8rmg/+Ppe3Al9zg0afoxasI=;
-        b=cT5LTNf/2b6kYu/sXszHG+MgOK8685Bw0DC3pPiiGXMLJ12J6kol1tQkEFzidGOuYI
-         NXubH1VTGLtaGjn7FrkmqGud30A8ke0mPczHxueW4vcm5OOc1lgEmniBHHuxuuGSc5zQ
-         pU3D76vkTYlc9g4Z2PW60NZSZ9YBVKNXRUd53Sd46nZ5WXv3qLPHwCqgffrEecYZkfH+
-         5ajdyobSwL5p4n8f9VLCoVKyWaTqE1WTM5uzjSlrV/xufcJ0f3XHUxDlxWY5Oa5RaHzG
-         TMOwCQYxWM1oUfGPaOvSEC2tbVP19ggB5ito6G6A5dIMapiNoJah+1R7mODuafWee5lN
-         XU9A==
+        bh=yeqsxXV03bjxJ0PtvQpTsHAesA+CZuojY13FVTwL434=;
+        b=qm9fVut5/GIZ1b1TnCrW84PRFgpC0emwuj7NsZzSn7fXYhPB9QdnFCUC8BDyt7is9c
+         y6/qVVPAPkt8wgqD05ZEjFmGoLOuANzsUc79CFN5aXmO59DRWC335hQVZs9iFHhxmeQD
+         B6GfFZbOnmnP1jwALXeKidFNp7Xd9n9nYDYZ1gTuJgRSikpdAZ8GcdZPIAmi41f4QfXa
+         ub0JnK+486RGI6Rc+zQ3CZ1IwCk4JGZiQ44HIgMS3v0UzhPKwXCxENCOdgutfa4n0cIl
+         ZzO06EqJfj8YRHahu/LfdS36FyH54MsqzcoConMffokxb4/dMGJj5eaBu9ESGaRvNKHA
+         Whsg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1760551534; x=1761156334;
+        d=1e100.net; s=20230601; t=1760551541; x=1761156341;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=Yqvjk57rc7iKF+vXl7Uf8rmg/+Ppe3Al9zg0afoxasI=;
-        b=swmt9kOwNiwcWon1aPGDEl/Q2hRt3ujePLfrzvSeufpS+sDPuxJE15yxetVsbN/SMZ
-         ZQWQghU5KflRzj9VQHqsfzsb6zO6L5LS/D/dVct4NGtJB+9D/9jx1soRVQUk0QlYIwd4
-         1vSzLFzdAHGr/GMALuagbryPx4o80pm8+h9JHqMmZKRcV2oQAkMcxw2t/aIhnCMNVad0
-         W34AcBwGd0QWDNm+UfBCrIuNMZQGwdalPclG+/NZBUbRopOD5JAwCqZBWcnBCCGWjPyp
-         yHPRKitbeIB8khY7giEUM1xtd6de84beDfTFLeQEX/brh7CiRbmeRSMEn7GWgF1TouUM
-         xVDQ==
-X-Gm-Message-State: AOJu0Yyi8d/fVUgFzmNEhHJLd4MetJdCv13nVVqUrNNKfR+kozFG83jy
-	qehOwSFK+/+wB1iWUpUBehd4TVZe8dMKbeF4+anJGThXu4z7lYsltMuU06pHtMOwQtTDhYvYO2/
-	UncsuiA==
-X-Google-Smtp-Source: AGHT+IElZs0fBcFdjim1seSgDsyWxn2S91gbcqt//KzWmfvX3qRt8iq0IJ31IzrSDUiTdF9bCDDM8CcfROc=
-X-Received: from pjbds16.prod.google.com ([2002:a17:90b:8d0:b0:32e:e4e6:ecfe])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:3a91:b0:32e:2059:ee5a
- with SMTP id 98e67ed59e1d1-33b5114d52fmr43204782a91.8.1760551534243; Wed, 15
- Oct 2025 11:05:34 -0700 (PDT)
-Date: Wed, 15 Oct 2025 11:02:40 -0700
-In-Reply-To: <20251004030210.49080-1-pedrodemargomes@gmail.com>
+        bh=yeqsxXV03bjxJ0PtvQpTsHAesA+CZuojY13FVTwL434=;
+        b=d3v+4kpKHFR7UCqYJSSwt9hfvekpXddbbMip+nLEPbCkdq8GjyJcKnpIhcaOBdzNHu
+         8S6cDSxEaEWQqwiaZuVPtaegsZUBpDgk6xu5enphrn2lQY+s2+56hN7UdsxXSkMv7FoK
+         vrkeoF/eJE77YI6Ozwi5c+XnFXQe3BeaHwjCmMxDqXDH+NSQgEGKLDFqWfycdF5NiYK/
+         PhzT+5bbBCpvBQAaFniu6x0cdVwJBcAGgg3SudTS5MLcibyQCqPBdL+gw9H9hCvNbS7O
+         GfHnWkFU92VIkABCuMTkzbPHmmvSQNx40DteNw1zT5e+W4egInXelSGTT2Q1ORIECabv
+         vQHQ==
+X-Gm-Message-State: AOJu0Ywj8UHLF5ABDpUyNsmx0+EEa/6L2pkH36iTir2dfX6o3pqykH+n
+	V+4fKjntqUmbLY2nBsNBWlsh7GaMV4HplVNNIqxAt/N6b+Zse442XFm96zeTCs00clixKolmjDj
+	jjP7aHg==
+X-Google-Smtp-Source: AGHT+IGf6ld8MWsW8VFOSwnFwhE9xFYGbI9+lJkkZWaqxzTUBkv8fa1QeFtqGV9ZmEFB8KXjqbasfUazBvQ=
+X-Received: from pjbsc12.prod.google.com ([2002:a17:90b:510c:b0:33b:9db7:e905])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:1c05:b0:32e:5cba:ae11
+ with SMTP id 98e67ed59e1d1-33b513cedbdmr37767056a91.28.1760551541046; Wed, 15
+ Oct 2025 11:05:41 -0700 (PDT)
+Date: Wed, 15 Oct 2025 11:02:42 -0700
+In-Reply-To: <20251007222733.349460-1-seanjc@google.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
-References: <20251004030210.49080-1-pedrodemargomes@gmail.com>
+References: <20251007222733.349460-1-seanjc@google.com>
 X-Mailer: git-send-email 2.51.0.788.g6d19910ace-goog
-Message-ID: <176055116678.1528393.4651749265873372559.b4-ty@google.com>
-Subject: Re: [PATCH] KVM: use folio_nr_pages() instead of shift operation
+Message-ID: <176055117173.1528469.2261818917462419157.b4-ty@google.com>
+Subject: Re: [PATCH] KVM: guest_memfd: Drop a superfluous local var in kvm_gmem_fault_user_mapping()
 From: Sean Christopherson <seanjc@google.com>
-To: Sean Christopherson <seanjc@google.com>, Paolo Bonzini <pbonzini@redhat.com>, 
-	Pedro Demarchi Gomes <pedrodemargomes@gmail.com>
+To: Sean Christopherson <seanjc@google.com>, Paolo Bonzini <pbonzini@redhat.com>
 Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org
 Content-Type: text/plain; charset="utf-8"
 
-On Sat, 04 Oct 2025 00:02:10 -0300, Pedro Demarchi Gomes wrote:
-> folio_nr_pages() is a faster helper function to get the number of pages when
-> NR_PAGES_IN_LARGE_FOLIO is enabled.
+On Tue, 07 Oct 2025 15:27:33 -0700, Sean Christopherson wrote:
+> Drop the local "int err" that's buried in the middle guest_memfd's user
+> fault handler to avoid the potential for variable shadowing, e.g. if an
+> "err" variable were also declared at function scope.
+> 
+> No functional change intended.
+> 
+> 
+> [...]
 
 Applied to kvm-x86 gmem, thanks!
 
-[1/1] KVM: use folio_nr_pages() instead of shift operation
-      https://github.com/kvm-x86/linux/commit/fa492ac7fb04
+[1/1] KVM: guest_memfd: Drop a superfluous local var in kvm_gmem_fault_user_mapping()
+      https://github.com/kvm-x86/linux/commit/c1168f24b444
 
 --
 https://github.com/kvm-x86/linux/tree/next
