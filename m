@@ -1,193 +1,147 @@
-Return-Path: <kvm+bounces-60111-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-60112-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id A3D02BE0F97
-	for <lists+kvm@lfdr.de>; Thu, 16 Oct 2025 00:48:57 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 311A9BE0FD9
+	for <lists+kvm@lfdr.de>; Thu, 16 Oct 2025 00:58:51 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5DB38486824
-	for <lists+kvm@lfdr.de>; Wed, 15 Oct 2025 22:48:56 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 8522619C79CD
+	for <lists+kvm@lfdr.de>; Wed, 15 Oct 2025 22:59:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CC89831619C;
-	Wed, 15 Oct 2025 22:48:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 994463164C4;
+	Wed, 15 Oct 2025 22:58:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="x513Y+Ee"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="2M6YgmS7"
 X-Original-To: kvm@vger.kernel.org
 Received: from mail-pf1-f201.google.com (mail-pf1-f201.google.com [209.85.210.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5DDE3314D28
-	for <kvm@vger.kernel.org>; Wed, 15 Oct 2025 22:48:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4755F30FC0E
+	for <kvm@vger.kernel.org>; Wed, 15 Oct 2025 22:58:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1760568522; cv=none; b=HZ8rVa6rSxVmXAyTjv86ol4ZQEF8o+TxzMke2YcPyNUzK90W14MYPphnOCqzTKXi0LsM8swh0qFY0Jwzba5QPpvgusZ7i/ZWuqMFS6ah7uzB1iADnVqRqGagucJvPawPkHD+VVeUzDJeUM6pjaCAaQpNx+E44HBd145Kn9N1Zqc=
+	t=1760569115; cv=none; b=e28rfzxj13Lz6r5PbwicDBemD8XKh20zRcbxZy2+rWevurwHc73tSqHzvv40Ll38XX9B6btH0WPEXLu66DJHyQGgVDXcGqENxPoiMRCa+1HdnKwRAbD7RszC7pPPETU3RBk+P+2FfxxfqnZ6foCnXHGN5bpbliKiCwdW4cJHN/E=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1760568522; c=relaxed/simple;
-	bh=Zt/pWqHt/iqQ+2OV/rzrh0fmDpxk2J2y6d2dSCcAMnQ=;
+	s=arc-20240116; t=1760569115; c=relaxed/simple;
+	bh=w53eIA9Wi9z3EJ5WJbhZ4E8om71IBlEDzcrhk5NSHvk=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=D0cnFu7qLHz4RNKch/4HQ9bVy5TcBAV93pg/W9wXpT9mmg0LHhYyFjykf+RrmZ8FgZye3F+GBb2H/rxF4cIGfM9I4aaf1FNFtceyxjFr7TfrDwVi1x5ob5GCkq7M3b7WdfhBnkvhP6XvytcBQow28Zu5QXNvgybogoei1wckq/A=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=x513Y+Ee; arc=none smtp.client-ip=209.85.210.201
+	 To:Cc:Content-Type; b=mKpsnR/G8xvi5qgWtWp8WDgmciwsHttaciDi8AFVBINE11Px69KQBeLUvgya/wbvqXwYcs7AIPcXZZXqjHdUaAjmd4tX3B4+JQF1+I3cN5gHs+mgLmG+nOPU4cz8la4gOE0Pe3CylRmu3/7ctL4euUaT7Ql6eKpvq/gq/XHlesM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=2M6YgmS7; arc=none smtp.client-ip=209.85.210.201
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pf1-f201.google.com with SMTP id d2e1a72fcca58-7a153ba0009so235316b3a.1
-        for <kvm@vger.kernel.org>; Wed, 15 Oct 2025 15:48:40 -0700 (PDT)
+Received: by mail-pf1-f201.google.com with SMTP id d2e1a72fcca58-798920399a6so1532446b3a.0
+        for <kvm@vger.kernel.org>; Wed, 15 Oct 2025 15:58:34 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1760568519; x=1761173319; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1760569114; x=1761173914; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=VfHhobHRKUrZuY035WUhQS9GUM0Uyoej5h99Za9ASAY=;
-        b=x513Y+EerBtlIdJ6/SV7jfDEvrAFIG0YB9SEFmScIv+2dfmhpk+4CSM0dfz/CV2UmV
-         a1lThTWGUVQLiZCR0ufD43JDhcu0SYfYQ46X+L0edksjTYFskTIJalsNnCddBduQwvXY
-         XJy7SDAECZysPPgodrm6z5fF1qfd9nCE3RUSol9kEtPqoyTk6ThG/8QOTw5WsQIl9KSb
-         u5I3dLFh6z/FnWm4h75nGWO7z5TrO9iCagvECfY4fB5+SBlZfSWmz9+X1QFH70IVAQvU
-         gt9OoPXl4uJSY8IA2006XPHafC0P/mEs4ee9jqUfEF5DpPPqCNqJVxL4kia3w60iUm/U
-         qAaA==
+        bh=NUr9B0K0pRIzbLYdBtnfMRJeB0sa/qrYh6jGMHJXJG8=;
+        b=2M6YgmS7kkp238lKC2i/JhzRSsKHou/2AxQ9Tnw6rWIIabvxN9ZpG94JfML+UN0rpB
+         uXbpqEQTuhMB3E2RgE0MGzAJeqD827MDpAuutitv3eoIBxBHNYMe7AvNalKFyZZW+/p5
+         udumWnIDnIi59aXcsXJhlOQWc3wDIEdOHDlq1i0Mi01Vndub76HUvXfJKgIFsHKMFxRt
+         zKZe6tW6FpDd+F7ZRFFsYkZ0RyU3J5JCeAn0nvO7amSdAefcZIHCG5MBYyI8S96J5cj0
+         RJ/zM2hNoVDTF9i0L3hsSg9lnOVcB68RXBEXE0XwkUR0ZntgycyrTR8aKHvDYgGMdsku
+         SKBg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1760568519; x=1761173319;
+        d=1e100.net; s=20230601; t=1760569114; x=1761173914;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=VfHhobHRKUrZuY035WUhQS9GUM0Uyoej5h99Za9ASAY=;
-        b=lSwre+wg39lp1LHjIwFt+BSVoA7bEVHVdr/NBG+dERQPzPebnxjgsp6qLlf5SCheDd
-         Kep4ouXtKLDoZBVhkAkkNbJ/+46guExJc/xQ1h8+ER8rF3wmdm+l3IMAxpvW1XzQjKvX
-         gEkJ+p5bT9f57e4F++Z8oiduyKuY5RN4vi9WbtvcF6wR/GNSZEuuLTab+t4OgS/998hb
-         SlZ8LKXpr9nQaL412q5JNNxc7anRt+mKmgq3z1C+p+YJG1CJN42QP1zkVh5SwyvOzFN7
-         h1d8dSYWARDSybHuyRm8fx5/USAemQSRUeqT9p95a+PJsmmrWvZz6A9NtdgE6HJy7UsM
-         EwsA==
-X-Forwarded-Encrypted: i=1; AJvYcCWMeh8xji0u/1gdxGt2abUULpC7cmp7b2SJHGa451cQYWch3TyxaQ08AlQeE8NLGX4D+nc=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxgaxjpmAjDfl4j98ABhkJZai0s1Ijbiozxh8icMLJrEzGerQT6
-	Gj0so3faywQ1l+8tLuTzWUQZHNPdzy43UW/kOTS7eLvePjOnqMPemcKVy8ZqO+r6nTqfehfUGtc
-	dQO0cIA==
-X-Google-Smtp-Source: AGHT+IEyb34/gE6QWzF0uzhcKPL3N9PV8BEpaNWr9b3Rp3K51ypbe1jmOBzkgqmwgOny3WdOfUFKvL+VZBw=
-X-Received: from pjz11.prod.google.com ([2002:a17:90b:56cb:b0:33b:a35b:861])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a05:6a20:7351:b0:251:c33d:2783
- with SMTP id adf61e73a8af0-32da813ce42mr40108259637.23.1760568519460; Wed, 15
- Oct 2025 15:48:39 -0700 (PDT)
-Date: Wed, 15 Oct 2025 15:48:38 -0700
-In-Reply-To: <aPAWFQyFLK4EKWVK@gourry-fedora-PF4VCD3F>
+        bh=NUr9B0K0pRIzbLYdBtnfMRJeB0sa/qrYh6jGMHJXJG8=;
+        b=NtKYMJOa5fWKd1j2BkTRL7uFpDihfgRmp2xNE+FfoZBe2CONtf8zKVj1Og7qw8zOBb
+         aImQpP++O658/kzmKmClsezeCF8kNW7wjNDsWwafFSM5DUQ8ES1VMF+ZWMv7H8rm+FRu
+         Pkbk9716O6guWDmqltfvIL0cWAW9C+G1e3ljNgB9SZNLtEuMUgLrTV7ueIsQwWFtfr6r
+         tcca5yztGo32stj2Uv0gS3TiLCQnOYMEq9UI77Cfdl8kLkdOTOKVQEs5pR00qf/NqAjI
+         jYtg+KyNLm+PpGsCml0vHvbsSvItjXKTs9bVc3ja2rjsfI7DZ5BicR0h0OgFv2fH2Ye8
+         bMpg==
+X-Forwarded-Encrypted: i=1; AJvYcCX7I5DzqYfpWgPCoQdYJPqPtmCwOd7tJyWbgATsS+DH13d4tayHv5fbtKvaTWWC/NrZY/U=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yy3KvFrs1jLtNuv0FwCb8m4pVJNaOwLJZLLe8oxs/1BNX5kVsim
+	Wr06K5sPgEaNdiayTYklzxRawgxFICKgQw0lzKfSQGd0lhZbak/XiVbEAx4YBESPEFPOXVlwGym
+	EQC4axA==
+X-Google-Smtp-Source: AGHT+IEshhj56Wp5ICbcYs7qMS7Yon0bowFGTsFr9tNdJTMEMitmBMKvXRrJL8Py1G1D3gIqV5mIQGcydI4=
+X-Received: from pjre3.prod.google.com ([2002:a17:90a:b383:b0:33b:51fe:1a75])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a05:6a21:3391:b0:263:4717:559
+ with SMTP id adf61e73a8af0-33495db26b7mr1827259637.20.1760569113605; Wed, 15
+ Oct 2025 15:58:33 -0700 (PDT)
+Date: Wed, 15 Oct 2025 15:58:32 -0700
+In-Reply-To: <2mtjboekfjxmuougyiypg4azeurhqxlk7fovzacv5c74hrmzrb@krfinussf2zd>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
-References: <20250827175247.83322-2-shivankg@amd.com> <20250827175247.83322-9-shivankg@amd.com>
- <aNVQJqYLX17v-fsf@google.com> <aNbrO7A7fSjb4W84@google.com> <aPAWFQyFLK4EKWVK@gourry-fedora-PF4VCD3F>
-Message-ID: <aPAkxp67-R9aQ8oN@google.com>
-Subject: Re: [f2fs-dev] [PATCH kvm-next V11 6/7] KVM: guest_memfd: Enforce
- NUMA mempolicy using shared policy
+References: <20250917215031.2567566-1-jmattson@google.com> <20250917215031.2567566-4-jmattson@google.com>
+ <2mtjboekfjxmuougyiypg4azeurhqxlk7fovzacv5c74hrmzrb@krfinussf2zd>
+Message-ID: <aPAnGDh2u5-VK7gs@google.com>
+Subject: Re: [PATCH 3/4] KVM: selftests: Add VM_MODE_PXXV57_4K VM mode
 From: Sean Christopherson <seanjc@google.com>
-To: Gregory Price <gourry@gourry.net>
-Cc: Shivank Garg <shivankg@amd.com>, jgowans@amazon.com, mhocko@suse.com, jack@suse.cz, 
-	kvm@vger.kernel.org, david@redhat.com, linux-btrfs@vger.kernel.org, 
-	aik@amd.com, papaluri@amd.com, kalyazin@amazon.com, peterx@redhat.com, 
-	linux-mm@kvack.org, clm@fb.com, ddutile@redhat.com, 
-	linux-kselftest@vger.kernel.org, shdhiman@amd.com, gshan@redhat.com, 
-	ying.huang@linux.alibaba.com, shuah@kernel.org, roypat@amazon.co.uk, 
-	matthew.brost@intel.com, linux-coco@lists.linux.dev, zbestahu@gmail.com, 
-	lorenzo.stoakes@oracle.com, linux-bcachefs@vger.kernel.org, 
-	ira.weiny@intel.com, dhavale@google.com, jmorris@namei.org, 
-	willy@infradead.org, hch@infradead.org, chao.gao@intel.com, tabba@google.com, 
-	ziy@nvidia.com, rientjes@google.com, yuzhao@google.com, xiang@kernel.org, 
-	nikunj@amd.com, serge@hallyn.com, amit@infradead.org, thomas.lendacky@amd.com, 
-	ashish.kalra@amd.com, chao.p.peng@intel.com, yan.y.zhao@intel.com, 
-	byungchul@sk.com, michael.day@amd.com, Neeraj.Upadhyay@amd.com, 
-	michael.roth@amd.com, bfoster@redhat.com, bharata@amd.com, 
-	josef@toxicpanda.com, Liam.Howlett@oracle.com, ackerleytng@google.com, 
-	dsterba@suse.com, viro@zeniv.linux.org.uk, jefflexu@linux.alibaba.com, 
-	jaegeuk@kernel.org, dan.j.williams@intel.com, surenb@google.com, 
-	vbabka@suse.cz, paul@paul-moore.com, joshua.hahnjy@gmail.com, 
-	apopple@nvidia.com, brauner@kernel.org, quic_eberman@quicinc.com, 
-	rakie.kim@sk.com, cgzones@googlemail.com, pvorel@suse.cz, 
-	linux-erofs@lists.ozlabs.org, kent.overstreet@linux.dev, 
-	linux-kernel@vger.kernel.org, linux-f2fs-devel@lists.sourceforge.net, 
-	pankaj.gupta@amd.com, linux-security-module@vger.kernel.org, 
-	lihongbo22@huawei.com, linux-fsdevel@vger.kernel.org, pbonzini@redhat.com, 
-	akpm@linux-foundation.org, vannapurve@google.com, suzuki.poulose@arm.com, 
-	rppt@kernel.org, jgg@nvidia.com
+To: Yosry Ahmed <yosry.ahmed@linux.dev>
+Cc: Jim Mattson <jmattson@google.com>, Paolo Bonzini <pbonzini@redhat.com>, 
+	Shuah Khan <shuah@kernel.org>, Bibo Mao <maobibo@loongson.cn>, 
+	Huacai Chen <chenhuacai@kernel.org>, Andrew Jones <ajones@ventanamicro.com>, 
+	Claudio Imbrenda <imbrenda@linux.ibm.com>, "Pratik R. Sampat" <prsampat@amd.com>, 
+	Kai Huang <kai.huang@intel.com>, Eric Auger <eric.auger@redhat.com>, 
+	linux-kernel@vger.kernel.org, kvm@vger.kernel.org, 
+	linux-kselftest@vger.kernel.org
 Content-Type: text/plain; charset="us-ascii"
 
-On Wed, Oct 15, 2025, Gregory Price wrote:
-> On Fri, Sep 26, 2025 at 12:36:27PM -0700, Sean Christopherson via Linux-f2fs-devel wrote:
-> > > 
-> > > static struct mempolicy *kvm_gmem_get_policy(struct vm_area_struct *vma,
-> > > 					     unsigned long addr, pgoff_t *pgoff)
-> > > {
-> > > 	*pgoff = vma->vm_pgoff + ((addr - vma->vm_start) >> PAGE_SHIFT);
-> > > 
-> > > 	return __kvm_gmem_get_policy(GMEM_I(file_inode(vma->vm_file)), *pgoff);
+On Wed, Oct 15, 2025, Yosry Ahmed wrote:
+> On Wed, Sep 17, 2025 at 02:48:39PM -0700, Jim Mattson wrote:
+> > Add a new VM mode, VM_MODE_PXXV57_4K, to support tests that require
+> > 5-level paging on x86. This mode sets up a 57-bit virtual address
+> > space and sets CR4.LA57 in the guest.
 > > 
-> > Argh!!!!!  This breaks the selftest because do_get_mempolicy() very specifically
-> > falls back to the default_policy, NOT to the current task's policy.  That is
-> > *exactly* the type of subtle detail that needs to be commented, because there's
-> > no way some random KVM developer is going to know that returning NULL here is
-> > important with respect to get_mempolicy() ABI.
+> > Signed-off-by: Jim Mattson <jmattson@google.com>
+> > ---
+> >  .../testing/selftests/kvm/include/kvm_util.h  |  1 +
+> >  tools/testing/selftests/kvm/lib/kvm_util.c    | 21 +++++++++++++++++
+> >  .../testing/selftests/kvm/lib/x86/processor.c | 23 ++++++++++++-------
+> >  tools/testing/selftests/kvm/lib/x86/vmx.c     |  7 +++---
+> >  4 files changed, 41 insertions(+), 11 deletions(-)
 > > 
+> > diff --git a/tools/testing/selftests/kvm/include/kvm_util.h b/tools/testing/selftests/kvm/include/kvm_util.h
+> > index 23a506d7eca3..b6ea5d966715 100644
+> > --- a/tools/testing/selftests/kvm/include/kvm_util.h
+> > +++ b/tools/testing/selftests/kvm/include/kvm_util.h
+> > @@ -175,6 +175,7 @@ enum vm_guest_mode {
+> >  	VM_MODE_P40V48_16K,
+> >  	VM_MODE_P40V48_64K,
+> >  	VM_MODE_PXXV48_4K,	/* For 48bits VA but ANY bits PA */
+> > +	VM_MODE_PXXV57_4K,	/* For 48bits VA but ANY bits PA */
+> >  	VM_MODE_P47V64_4K,
+> >  	VM_MODE_P44V64_4K,
+> >  	VM_MODE_P36V48_4K,
+> > diff --git a/tools/testing/selftests/kvm/lib/kvm_util.c b/tools/testing/selftests/kvm/lib/kvm_util.c
+> > index c3f5142b0a54..6b0e499c6e91 100644
+> > --- a/tools/testing/selftests/kvm/lib/kvm_util.c
+> > +++ b/tools/testing/selftests/kvm/lib/kvm_util.c
+> > @@ -232,6 +232,7 @@ const char *vm_guest_mode_string(uint32_t i)
+> >  		[VM_MODE_P40V48_16K]	= "PA-bits:40,  VA-bits:48, 16K pages",
+> >  		[VM_MODE_P40V48_64K]	= "PA-bits:40,  VA-bits:48, 64K pages",
+> >  		[VM_MODE_PXXV48_4K]	= "PA-bits:ANY, VA-bits:48,  4K pages",
+> > +		[VM_MODE_PXXV57_4K]	= "PA-bits:ANY, VA-bits:57,  4K pages",
+> >  		[VM_MODE_P47V64_4K]	= "PA-bits:47,  VA-bits:64,  4K pages",
+> >  		[VM_MODE_P44V64_4K]	= "PA-bits:44,  VA-bits:64,  4K pages",
+> >  		[VM_MODE_P36V48_4K]	= "PA-bits:36,  VA-bits:48,  4K pages",
+> > @@ -259,6 +260,7 @@ const struct vm_guest_mode_params vm_guest_mode_params[] = {
+> >  	[VM_MODE_P40V48_16K]	= { 40, 48,  0x4000, 14 },
+> >  	[VM_MODE_P40V48_64K]	= { 40, 48, 0x10000, 16 },
+> >  	[VM_MODE_PXXV48_4K]	= {  0,  0,  0x1000, 12 },
+> > +	[VM_MODE_PXXV57_4K]	= {  0,  0,  0x1000, 12 },
+> >  	[VM_MODE_P47V64_4K]	= { 47, 64,  0x1000, 12 },
+> >  	[VM_MODE_P44V64_4K]	= { 44, 64,  0x1000, 12 },
+> >  	[VM_MODE_P36V48_4K]	= { 36, 48,  0x1000, 12 },
+> > @@ -358,6 +360,25 @@ struct kvm_vm *____vm_create(struct vm_shape shape)
+> >  		vm->va_bits = 48;
+> >  #else
+> >  		TEST_FAIL("VM_MODE_PXXV48_4K not supported on non-x86 platforms");
 > 
-> Do_get_mempolicy was designed to be accessed by the syscall, not as an
-> in-kernel ABI.
+> We should probably update TEST_ASSERT(vm->va_bits == 48 || vm->va_bits == 57)
+> above to only assert 48 bits now, right?
 
-Ya, by "get_mempolicy() ABI" I meant the uABI for the get_mempolicy syscall.
-
-> get_task_policy also returns the default policy if there's nothing
-> there, because that's what applies.
-> 
-> I have dangerous questions:
-
-Not dangerous at all, I find them very helpful!
-
-> why is __kvm_gmem_get_policy using
-> 	mpol_shared_policy_lookup()
-> instead of
-> 	get_vma_policy()
-
-With the disclaimer that I haven't followed the gory details of this series super
-closely, my understanding is...
-
-Because the VMA is a means to an end, and we want the policy to persist even if
-the VMA goes away.
-
-With guest_memfd, KVM effectively inverts the standard MMU model.  Instead of mm/
-being the primary MMU and KVM being a secondary MMU, guest_memfd is the primary
-MMU and any VMAs are secondary (mostly; it's probably more like 1a and 1b).  This
-allows KVM to map guest_memfd memory into a guest without a VMA, or with more
-permissions than are granted to host userspace, e.g. guest_memfd memory could be
-writable by the guest, but read-only for userspace.
-
-But we still want to support things like mbind() so that userspace can ensure
-guest_memfd allocations align with the vNUMA topology presented to the guest,
-or are bound to the NUMA node where the VM will run.  We considered adding equivalent
-file-based syscalls, e.g. fbind(), but IIRC the consensus was that doing so was
-unnecessary (and potentially messy?) since we were planning on eventually adding
-mmap() support to guest_memfd anyways.
-
-> get_vma_policy does this all for you
-
-I assume that doesn't work if the intent is for new VMAs to pick up the existing
-policy from guest_memfd?  And more importantly, guest_memfd needs to hook
-->set_policy so that changes through e.g. mbind() persist beyond the lifetime of
-the VMA.
-
-> struct mempolicy *get_vma_policy(struct vm_area_struct *vma,
->                                  unsigned long addr, int order, pgoff_t *ilx)
-> {
->         struct mempolicy *pol;
-> 
->         pol = __get_vma_policy(vma, addr, ilx);
->         if (!pol)
->                 pol = get_task_policy(current);
->         if (pol->mode == MPOL_INTERLEAVE ||
->             pol->mode == MPOL_WEIGHTED_INTERLEAVE) {
->                 *ilx += vma->vm_pgoff >> order;
->                 *ilx += (addr - vma->vm_start) >> (PAGE_SHIFT + order);
->         }
->         return pol;
-> }
-> 
-> Of course you still have the same issue: get_task_policy will return the
-> default, because that's what applies.
-> 
-> do_get_mempolicy just seems like the completely incorrect interface to
-> be using here.
+No, because CPUID reports the _max_ virtual address width.  In theory, the assert
+could be ">= 48", but in practice x86-64 only supports 48-bit and 57-bit VAs, so
+selftests are paranoid and are sanity checking KVM at the same time.
 
