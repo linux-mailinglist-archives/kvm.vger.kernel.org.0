@@ -1,202 +1,186 @@
-Return-Path: <kvm+bounces-60181-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-60182-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1417BBE4D58
-	for <lists+kvm@lfdr.de>; Thu, 16 Oct 2025 19:23:23 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 7D94CBE4D88
+	for <lists+kvm@lfdr.de>; Thu, 16 Oct 2025 19:30:22 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id EA2BD4E7E64
-	for <lists+kvm@lfdr.de>; Thu, 16 Oct 2025 17:23:21 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 3BC094E01DB
+	for <lists+kvm@lfdr.de>; Thu, 16 Oct 2025 17:30:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 327EB3161A0;
-	Thu, 16 Oct 2025 17:23:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id ECD0D221F06;
+	Thu, 16 Oct 2025 17:30:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="fPhwMCj3"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="bFH8XP4d"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.9])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pj1-f74.google.com (mail-pj1-f74.google.com [209.85.216.74])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 24D6D3346A5;
-	Thu, 16 Oct 2025 17:23:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.9
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 29826189B84
+	for <kvm@vger.kernel.org>; Thu, 16 Oct 2025 17:30:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.74
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1760635391; cv=none; b=SKAYrRUU0+dHKPqsRgxYbf2lPSMZ80t0HyN05LXHfiKMDQa2WF/vQxTautb/GjxR3IjnriT6SXi/iI58RbZN+tLakFRnDNOMA6qMNzZLz8nxFn51JvWG8cROjxBxfMCaij1B1O8znjPrcDxJAQJw3lvXaoGw0cEPFW1qUJU4Nfs=
+	t=1760635810; cv=none; b=VdU6YFaWjhHYb1CSOCJr0pzSKd6ur8bDsEiYYimCVFlNf1lAvZUziIFsfle1yxfHTVZ55xXmiyxyrKAnBLs5BFtLU+hp94lv3fenFgO4WzXMQlIdpr09DKnQI6qBUTLBYuYZum2c4xVho/s4M6tbT+DUg4jId7aqQTkC5p92lqw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1760635391; c=relaxed/simple;
-	bh=lOFgD0LyfRpzUx+oLqOf3WVoQ7V6BqFdDH6cnaanqgo=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=oI0kgK6Jtia/OJ1iBqjREwT+uDkJTncgZocjyUjjONissIw5/pbCf5gM5ty/kV8dFnJ3JewEZahzqjN5dyUK6t61vtc8LqUCJnXV69ip/3kT0ZPZaLabxISdDqn2ovKssFmbXFtFLEvxT9SnV/Ux8uEsXAz4BnCnEge36UjR81A=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=pass smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=fPhwMCj3; arc=none smtp.client-ip=198.175.65.9
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1760635389; x=1792171389;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=lOFgD0LyfRpzUx+oLqOf3WVoQ7V6BqFdDH6cnaanqgo=;
-  b=fPhwMCj3OBL59L+Z5EkAn34TrzxhNJXo8EARJepZ58c62TgDL/DqwU8q
-   IFYayBpFfkseDv8ehb3NIl2SeyEev3NVSll0C9STBi7DN9zrf8dVAznoG
-   6Y9KDxdV9/9QxC+XgO1i7kxqk6PUrE9aOlRYZLKkUx5immeAGo3P2jKsc
-   sHsHXCEsX2jo4IgMwSqTzPvgR33Pl2uTa3pDuPHxPD8fwQcngV4wVgXRX
-   HLixdREGV+0ImEGQQ0bojozjfCCj7fq0ydeqYhLKU0c7XknhRRdOOdPdi
-   1R3ym7M+MBje+MJlShv82dS2U3EvGN91jhbikZbXuTIiiDSkY9DEojTQM
-   w==;
-X-CSE-ConnectionGUID: hFz+b6OuTpu1Kfj7sFu7nA==
-X-CSE-MsgGUID: a/zmjVqmS5SvT2h3BdinnQ==
-X-IronPort-AV: E=McAfee;i="6800,10657,11584"; a="85457800"
-X-IronPort-AV: E=Sophos;i="6.19,234,1754982000"; 
-   d="scan'208";a="85457800"
-Received: from fmviesa004.fm.intel.com ([10.60.135.144])
-  by orvoesa101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 16 Oct 2025 10:23:09 -0700
-X-CSE-ConnectionGUID: MXhEq54OR0Kwe43Clpyhuw==
-X-CSE-MsgGUID: KZF5q4xDSRCvSLO3AjAmdg==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.19,234,1754982000"; 
-   d="scan'208";a="187788426"
-Received: from aschofie-mobl2.amr.corp.intel.com (HELO desk) ([10.124.223.124])
-  by fmviesa004-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 16 Oct 2025 10:23:08 -0700
-Date: Thu, 16 Oct 2025 10:23:02 -0700
-From: Pawan Gupta <pawan.kumar.gupta@linux.intel.com>
-To: "Kaplan, David" <David.Kaplan@amd.com>
-Cc: "x86@kernel.org" <x86@kernel.org>, "H. Peter Anvin" <hpa@zytor.com>,
-	Josh Poimboeuf <jpoimboe@kernel.org>,
-	Sean Christopherson <seanjc@google.com>,
-	Paolo Bonzini <pbonzini@redhat.com>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-	"kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-	Asit Mallick <asit.k.mallick@intel.com>,
-	Tao Zhang <tao1.zhang@intel.com>
-Subject: Re: [PATCH v2 0/3] VMSCAPE optimization for BHI variant
-Message-ID: <20251016172302.a6uin2qqqyxmufxc@desk>
-References: <20251015-vmscape-bhb-v2-0-91cbdd9c3a96@linux.intel.com>
- <DS0PR12MB9273669FB9A3DBE8F53C51FA94E9A@DS0PR12MB9273.namprd12.prod.outlook.com>
+	s=arc-20240116; t=1760635810; c=relaxed/simple;
+	bh=4xC7NbtAYk7ZTEIvkayJzWq9oLb+GOKeL8BAa/1843A=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=boqdITDmAXvIF0OtZ3aBdxcqxFQCvYYbBktq0dzMSUBvFC6cw5egkzu4PiZOmx9FM2kbYqqc7YeVKOaSiy7Ghfs3iF9GNmY/GOTLRRM/OO7O6g04ct5pm92oe7NHwSilV4oqU8Ds8QeOQT/okVQG2XvcyVWztCV8KJcBY99sca0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=bFH8XP4d; arc=none smtp.client-ip=209.85.216.74
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+Received: by mail-pj1-f74.google.com with SMTP id 98e67ed59e1d1-33428befc49so1748923a91.0
+        for <kvm@vger.kernel.org>; Thu, 16 Oct 2025 10:30:08 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1760635808; x=1761240608; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:mime-version:date:reply-to:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=fw6xiHjKYy4zBKVTH7gEKmT2HMgfZtlJ6SEn7/JK9n0=;
+        b=bFH8XP4d1dNAnrNKwcdlgYndsoRd90tdTcPrF8HPuZhxlWn2JrRwLXhSrv2XS+0W03
+         0rdx9enYzhZwsKIpABqStjrDSlwDJMmGF3aIePaCOgYCGjVmAchZj+CBt6Thv5qelvYL
+         GKsXCwCjWA/co1QmVXhNbQuTtOnwXKL92d0FoQHHZ+g2DW8CoV+N2xvaQB2Fw8/oDZKe
+         3IRwq6XBhplbyZPCDkoWosXITUQKKxPKVDeSFhq6zyPSp3sHFCw3MOaUTTAuwfnQVkAt
+         QpbfTmc3YSa27zMYcbcDqjClejGH9QnAG//NYk5kvtqkB42sNpK62EieLZLo7VedxZaO
+         GyIg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1760635808; x=1761240608;
+        h=cc:to:from:subject:message-id:mime-version:date:reply-to
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=fw6xiHjKYy4zBKVTH7gEKmT2HMgfZtlJ6SEn7/JK9n0=;
+        b=fQqvuIhj1eYxX0hj5v5GsFVp8EfaTiOFShuSG5vGWw0yHwjZo0c50IFe/O7LbmtPmq
+         5GDt80pHxKBTD3bZgc+KLeLhpSKB9WWypR6jz9MQAHYHV0OSsPu1W1c23Ru/9jndDHV0
+         W/2+T5q0ppl7241JIYihLlkrxw5PX4OWRk8X3biWsXhvPgYhMTBtC4sPJvtSocrCO+eK
+         jm4CP99Oq1Kp0+/0I3875UXbrkCDesUpndfj6jHO7MnygE7fuk8OKfpq88AYFMRc13aL
+         0MoZzekOVa05Ocj4+LT2J0jI2xT57cstWilyzQcGJ1WAtsMENem//nI4HzxivvfmhxU6
+         FCxQ==
+X-Forwarded-Encrypted: i=1; AJvYcCXwH362S5WhRrJ9TNuT0qSuOt1gLwvslmqOEQL9V4PHl5EBWfxunIoDrsIhsaqqWdgaqwM=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yyje8Xpc8M4sA3PAI85Bg4Umd3MTy92AZ7F42LGQ1QcLimBVqhM
+	saolvxP56I/eKMLtK8Sseiq3Ke/kYZYe9YVqfPnHOaMHVtUeOtXnNWbDq58z5cOCFx6qPsxbpdr
+	JYTWwbw==
+X-Google-Smtp-Source: AGHT+IEE+9lWsoGbrE1FsDpaiwGYQEz8y5mwph7bonrhgYb3kvgC58w2qMMIJ/4cUT39VkATDSw/u6xjb6I=
+X-Received: from pjbpa17.prod.google.com ([2002:a17:90b:2651:b0:33b:51fe:1a8c])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:4f4c:b0:32e:11cc:d17a
+ with SMTP id 98e67ed59e1d1-33b9e08ff85mr5705111a91.4.1760635808296; Thu, 16
+ Oct 2025 10:30:08 -0700 (PDT)
+Reply-To: Sean Christopherson <seanjc@google.com>
+Date: Thu, 16 Oct 2025 10:28:41 -0700
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <DS0PR12MB9273669FB9A3DBE8F53C51FA94E9A@DS0PR12MB9273.namprd12.prod.outlook.com>
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.51.0.858.gf9c4a03a3a-goog
+Message-ID: <20251016172853.52451-1-seanjc@google.com>
+Subject: [PATCH v13 00/12] KVM: guest_memfd: Add NUMA mempolicy support
+From: Sean Christopherson <seanjc@google.com>
+To: Miguel Ojeda <ojeda@kernel.org>, Marc Zyngier <maz@kernel.org>, 
+	Oliver Upton <oliver.upton@linux.dev>, Paolo Bonzini <pbonzini@redhat.com>, 
+	Sean Christopherson <seanjc@google.com>
+Cc: linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, 
+	kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	Ackerley Tng <ackerleytng@google.com>, Shivank Garg <shivankg@amd.com>, 
+	David Hildenbrand <david@redhat.com>, Fuad Tabba <tabba@google.com>, Ashish Kalra <ashish.kalra@amd.com>, 
+	Vlastimil Babka <vbabka@suse.cz>
+Content-Type: text/plain; charset="UTF-8"
 
-On Thu, Oct 16, 2025 at 03:57:56PM +0000, Kaplan, David wrote:
-> [AMD Official Use Only - AMD Internal Distribution Only]
-> 
-> > -----Original Message-----
-> > From: Pawan Gupta <pawan.kumar.gupta@linux.intel.com>
-> > Sent: Wednesday, October 15, 2025 8:52 PM
-> > To: x86@kernel.org; H. Peter Anvin <hpa@zytor.com>; Josh Poimboeuf
-> > <jpoimboe@kernel.org>; Kaplan, David <David.Kaplan@amd.com>; Sean
-> > Christopherson <seanjc@google.com>; Paolo Bonzini <pbonzini@redhat.com>
-> > Cc: linux-kernel@vger.kernel.org; kvm@vger.kernel.org; Asit Mallick
-> > <asit.k.mallick@intel.com>; Tao Zhang <tao1.zhang@intel.com>
-> > Subject: [PATCH v2 0/3] VMSCAPE optimization for BHI variant
-> >
-> > Caution: This message originated from an External Source. Use proper caution
-> > when opening attachments, clicking links, or responding.
-> >
-> >
-> > v2:
-> > - Added check for IBPB feature in vmscape_select_mitigation(). (David)
-> > - s/vmscape=auto/vmscape=on/ (David)
-> > - Added patch to remove LFENCE from VMSCAPE BHB-clear sequence.
-> > - Rebased to v6.18-rc1.
-> >
-> > v1: https://lore.kernel.org/r/20250924-vmscape-bhb-v1-0-
-> > da51f0e1934d@linux.intel.com
-> >
-> > Hi All,
-> >
-> > These patches aim to improve the performance of a recent mitigation for
-> > VMSCAPE[1] vulnerability. This improvement is relevant for BHI variant of
-> > VMSCAPE that affect Alder Lake and newer processors.
-> >
-> > The current mitigation approach uses IBPB on kvm-exit-to-userspace for all
-> > affected range of CPUs. This is an overkill for CPUs that are only affected
-> > by the BHI variant. On such CPUs clearing the branch history is sufficient
-> > for VMSCAPE, and also more apt as the underlying issue is due to poisoned
-> > branch history.
-> >
-> > Roadmap:
-> >
-> > - First patch introduces clear_bhb_long_loop() for processors with larger
-> >   branch history tables.
-> > - Second patch replaces IBPB on exit-to-userspace with branch history
-> >   clearing sequence.
-> >
-> > Below is the iPerf data for transfer between guest and host, comparing IBPB
-> > and BHB-clear mitigation. BHB-clear shows performance improvement over IBPB
-> > in most cases.
-> >
-> > Platform: Emerald Rapids
-> > Baseline: vmscape=off
-> >
-> > (pN = N parallel connections)
-> >
-> > | iPerf user-net | IBPB    | BHB Clear |
-> > |----------------|---------|-----------|
-> > | UDP 1-vCPU_p1  | -12.5%  |   1.3%    |
-> > | TCP 1-vCPU_p1  | -10.4%  |  -1.5%    |
-> > | TCP 1-vCPU_p1  | -7.5%   |  -3.0%    |
-> > | UDP 4-vCPU_p16 | -3.7%   |  -3.7%    |
-> > | TCP 4-vCPU_p4  | -2.9%   |  -1.4%    |
-> > | UDP 4-vCPU_p4  | -0.6%   |   0.0%    |
-> > | TCP 4-vCPU_p4  |  3.5%   |   0.0%    |
-> >
-> > | iPerf bridge-net | IBPB    | BHB Clear |
-> > |------------------|---------|-----------|
-> > | UDP 1-vCPU_p1    | -9.4%   |  -0.4%    |
-> > | TCP 1-vCPU_p1    | -3.9%   |  -0.5%    |
-> > | UDP 4-vCPU_p16   | -2.2%   |  -3.8%    |
-> > | TCP 4-vCPU_p4    | -1.0%   |  -1.0%    |
-> > | TCP 4-vCPU_p4    |  0.5%   |   0.5%    |
-> > | UDP 4-vCPU_p4    |  0.0%   |   0.9%    |
-> > | TCP 1-vCPU_p1    |  0.0%   |   0.9%    |
-> >
-> > | iPerf vhost-net | IBPB    | BHB Clear |
-> > |-----------------|---------|-----------|
-> > | UDP 1-vCPU_p1   | -4.3%   |   1.0%    |
-> > | TCP 1-vCPU_p1   | -3.8%   |  -0.5%    |
-> > | TCP 1-vCPU_p1   | -2.7%   |  -0.7%    |
-> > | UDP 4-vCPU_p16  | -0.7%   |  -2.2%    |
-> > | TCP 4-vCPU_p4   | -0.4%   |   0.8%    |
-> > | UDP 4-vCPU_p4   |  0.4%   |  -0.7%    |
-> > | TCP 4-vCPU_p4   |  0.0%   |   0.6%    |
-> >
-> > [1] https://comsec.ethz.ch/research/microarch/vmscape-exposing-and-exploiting-
-> > incomplete-branch-predictor-isolation-in-cloud-environments/
-> >
-> > ---
-> > Pawan Gupta (3):
-> >       x86/bhi: Add BHB clearing for CPUs with larger branch history
-> >       x86/vmscape: Replace IBPB with branch history clear on exit to userspace
-> >       x86/vmscape: Remove LFENCE from BHB clearing long loop
-> >
-> >  Documentation/admin-guide/hw-vuln/vmscape.rst   |  8 ++++
-> >  Documentation/admin-guide/kernel-parameters.txt |  4 +-
-> >  arch/x86/entry/entry_64.S                       | 63 ++++++++++++++++++-------
-> >  arch/x86/include/asm/cpufeatures.h              |  1 +
-> >  arch/x86/include/asm/entry-common.h             | 12 +++--
-> >  arch/x86/include/asm/nospec-branch.h            |  5 +-
-> >  arch/x86/kernel/cpu/bugs.c                      | 53 +++++++++++++++------
-> >  arch/x86/kvm/x86.c                              |  5 +-
-> >  8 files changed, 110 insertions(+), 41 deletions(-)
-> > ---
-> > base-commit: 3a8660878839faadb4f1a6dd72c3179c1df56787
-> > change-id: 20250916-vmscape-bhb-d7d469977f2f
-> >
-> > Best regards,
-> > --
-> > Pawan
-> >
-> 
-> Looks good to me.
-> 
-> Acked-by: David Kaplan <david.kaplan@amd.com>
+Miguel, you got pulled in due to a one-line change to add a new iterator
+macros in .clang-format.
 
-Thanks.
+Shivank's series to add support for NUMA-aware memory placement in
+guest_memfd.  Based on kvm-x86/next.
+
+Note, Ackerley pointed out that we should probably have testing for the
+cpuset_do_page_mem_spread() behavior.  I 100% agree, but I'm also a-ok
+merging without those tests.
+
+v13:
+ - Collect reviews.
+ - Add kvm_gmem_for_each_file to .clang-format. [Ackerley]
+ - Fix typos. [Ackerley]
+ - Don't use get_task_policy() if the guest_memfd doesn't have its own
+   policy, so that cpuset_do_page_mem_spread() works. [Ackerley]
+ - Fix goofs in the changelogs related to numaif.h. [Ackerley]
+
+v12:
+ - https://lore.kernel.org/all/20251007221420.344669-1-seanjc@google.com
+ - Add missing functionality to KVM selftests' existing numaif.h instead of
+   linking to libnuma (which appears to have caveats with -static).
+ - Add KVM_SYSCALL_DEFINE() infrastructure to reduce the boilerplate needed
+   to wrap syscalls and/or to assert that a syscall succeeds.
+ - Rename kvm_gmem to gmem_file, and use gmem_inode for the inode structure.
+ - Track flags in a gmem_inode field instead of using i_private.
+ - Add comments to call out subtleties in the mempolicy code (e.g. that
+   returning NULL for vm_operations_struct.get_policy() is important for ABI
+   reasons).
+ - Improve debugability of guest_memfd_test (I kept generating SIGBUS when
+   tweaking the tests).
+ - Test mbind() with private memory (sadly, verifying placement with
+   move_pages() doesn't work due to the dependency on valid page tables).
+
+- V11: Rebase on kvm-next, remove RFC tag, use Ackerley's latest patch
+       and fix a rcu race bug during kvm module unload.
+- V10: Rebase on top of Fuad's V17. Use latest guest_memfd inode patch
+       from Ackerley (with David's review comments). Use newer kmem_cache_create()
+       API variant with arg parameter (Vlastimil)
+- v9: Rebase on top of Fuad's V13 and incorporate review comments
+- v8: Rebase on top of Fuad's V12: Host mmaping for guest_memfd memory.
+- v7: Use inodes to store NUMA policy instead of file [0].
+- v4-v6: Current approach using shared_policy support and vm_ops (based on
+         suggestions from David [1] and guest_memfd bi-weekly upstream
+         call discussion [2]).
+- v3: Introduced fbind() syscall for VMM memory-placement configuration.
+- v1,v2: Extended the KVM_CREATE_GUEST_MEMFD IOCTL to pass mempolicy.
+
+[0] https://lore.kernel.org/all/diqzbjumm167.fsf@ackerleytng-ctop.c.googlers.com
+[1] https://lore.kernel.org/all/6fbef654-36e2-4be5-906e-2a648a845278@redhat.com
+[2] https://lore.kernel.org/all/2b77e055-98ac-43a1-a7ad-9f9065d7f38f@amd.com
+
+Ackerley Tng (1):
+  KVM: guest_memfd: Use guest mem inodes instead of anonymous inodes
+
+Sean Christopherson (7):
+  KVM: guest_memfd: Rename "struct kvm_gmem" to "struct gmem_file"
+  KVM: guest_memfd: Add macro to iterate over gmem_files for a
+    mapping/inode
+  KVM: selftests: Define wrappers for common syscalls to assert success
+  KVM: selftests: Report stacktraces SIGBUS, SIGSEGV, SIGILL, and SIGFPE
+    by default
+  KVM: selftests: Add additional equivalents to libnuma APIs in KVM's
+    numaif.h
+  KVM: selftests: Use proper uAPI headers to pick up mempolicy.h
+    definitions
+  KVM: guest_memfd: Add gmem_inode.flags field instead of using
+    i_private
+
+Shivank Garg (4):
+  KVM: guest_memfd: Add slab-allocated inode cache
+  KVM: guest_memfd: Enforce NUMA mempolicy using shared policy
+  KVM: selftests: Add helpers to probe for NUMA support, and multi-node
+    systems
+  KVM: selftests: Add guest_memfd tests for mmap and NUMA policy support
+
+ .clang-format                                 |   1 +
+ include/uapi/linux/magic.h                    |   1 +
+ tools/testing/selftests/kvm/arm64/vgic_irq.c  |   2 +-
+ .../testing/selftests/kvm/guest_memfd_test.c  |  98 ++++++
+ .../selftests/kvm/include/kvm_syscalls.h      |  81 +++++
+ .../testing/selftests/kvm/include/kvm_util.h  |  29 +-
+ tools/testing/selftests/kvm/include/numaif.h  | 110 +++---
+ .../selftests/kvm/kvm_binary_stats_test.c     |   4 +-
+ tools/testing/selftests/kvm/lib/kvm_util.c    |  55 +--
+ .../kvm/x86/private_mem_conversions_test.c    |   9 +-
+ .../selftests/kvm/x86/xapic_ipi_test.c        |   5 +-
+ virt/kvm/guest_memfd.c                        | 331 ++++++++++++++----
+ virt/kvm/kvm_main.c                           |   7 +-
+ virt/kvm/kvm_mm.h                             |   9 +-
+ 14 files changed, 565 insertions(+), 177 deletions(-)
+ create mode 100644 tools/testing/selftests/kvm/include/kvm_syscalls.h
+
+
+base-commit: f222788458c8a7753d43befef2769cd282dc008e
+-- 
+2.51.0.858.gf9c4a03a3a-goog
+
 
