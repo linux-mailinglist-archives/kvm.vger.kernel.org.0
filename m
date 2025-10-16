@@ -1,128 +1,161 @@
-Return-Path: <kvm+bounces-60115-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-60116-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8F375BE1159
-	for <lists+kvm@lfdr.de>; Thu, 16 Oct 2025 02:17:27 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1A16ABE11FD
+	for <lists+kvm@lfdr.de>; Thu, 16 Oct 2025 02:40:23 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2412C42531E
-	for <lists+kvm@lfdr.de>; Thu, 16 Oct 2025 00:17:25 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C1D06402AEB
+	for <lists+kvm@lfdr.de>; Thu, 16 Oct 2025 00:40:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 65F8672605;
-	Thu, 16 Oct 2025 00:17:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 72CA31917D6;
+	Thu, 16 Oct 2025 00:40:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=sifive.com header.i=@sifive.com header.b="ifSuaKrU"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="CgOUAEuQ"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pf1-f172.google.com (mail-pf1-f172.google.com [209.85.210.172])
+Received: from mail-pj1-f73.google.com (mail-pj1-f73.google.com [209.85.216.73])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2834335962
-	for <kvm@vger.kernel.org>; Thu, 16 Oct 2025 00:17:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.172
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 19A5717A2E8
+	for <kvm@vger.kernel.org>; Thu, 16 Oct 2025 00:40:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.73
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1760573838; cv=none; b=WLtjRPdb/Y7+VPldbodVam0BZ0QS9VqDC/K/8igB9JcSnXRmyOAUjqd8EuPTX/0X7TaXb0rnRAM3ltnd9+mSLUdnzCfqOY9nX7ydexfwe/hIi3Ls1Dvc6t0J1YkRPU/U95GJOwbdwNABfszXEak/iFazeOXQuMbIFywJa+Kpjec=
+	t=1760575215; cv=none; b=bDpR040TMMtWY6X/fhexev5uPE7xnnSpOOxH0S/m+J8iVliAAfxveGNyl5EAw/HaQBjJFlrAsj/r3FwIgm3dXo9vmdKPZ9NExlBWYBB/RtRXoyC8+axnTitrXNdnrqibSj13gjN2w71uXj7tMJMNKo4nQHhK1JNPeEQm7g7tnp4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1760573838; c=relaxed/simple;
-	bh=3nwS8JQ9zjyPPEh0FDdvtn+6T1P3KX7rqtYXZtj0c4o=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=uMhlegZ+phosMWqMdXhYbTinjnh7GGzaf2wWiFWsQesnpyOCFJYyZ0m47RAgEnCdoGoFR37eUBtcIAmxnnL/C0WUUJV/wD5xdidnFIvJGyd8q1AZL9VmeGj9cTOB6/M+hCDe5NIn9tJ1+HRpZC0NaIjPFqiUh2Z/c25i+EC4B98=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=sifive.com; spf=pass smtp.mailfrom=sifive.com; dkim=pass (2048-bit key) header.d=sifive.com header.i=@sifive.com header.b=ifSuaKrU; arc=none smtp.client-ip=209.85.210.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=sifive.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=sifive.com
-Received: by mail-pf1-f172.google.com with SMTP id d2e1a72fcca58-782e93932ffso141254b3a.3
-        for <kvm@vger.kernel.org>; Wed, 15 Oct 2025 17:17:16 -0700 (PDT)
+	s=arc-20240116; t=1760575215; c=relaxed/simple;
+	bh=7vY9PzWr/yiLC8CW0M2fmrsK2IW0Vzer5uITSO+BXpo=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=mA3DjWY3NZEehryF/WWuqq4sc36kdfLKmjUQMjH5MfGR8gOmiVaZd1bTb6RboIhB0bkHwqbG8JzSur6yxQDYmEmm5aMfq3dKNdcExMJ0xOMGOdj64RqqF5bI06l53gUPYCluJb+w29q80JIwZNW01ZF8279b0Asuz1gGphgSDP4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=CgOUAEuQ; arc=none smtp.client-ip=209.85.216.73
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+Received: by mail-pj1-f73.google.com with SMTP id 98e67ed59e1d1-32ec67fcb88so160112a91.3
+        for <kvm@vger.kernel.org>; Wed, 15 Oct 2025 17:40:13 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=sifive.com; s=google; t=1760573836; x=1761178636; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=bwptj4G5KoYvNAhjikL6LhizMbH7cKsoQglRkksgDsw=;
-        b=ifSuaKrUtRlBbG9MQ9Ok1pW7Uecj7cFdCTd27QsS6LG9A/r1vTYBxOVTBHuYt7FAIZ
-         LDVb/cQqIy+OFt+p5bZ+MSoQ01CqI7Qkp+hpLYmPIWDa7FVh95tavaQKjt/yCsY5uiWQ
-         iuVnpZHm3/YV4xboPJXD6IwZ3l6rts8cvUG3PQeP1CsJHCAF/1XdX0chvRPitTxb2CEp
-         AsTR44Z5P3FHfjwqLAOwAHw/mIUappj/PCJpc9jFl96AwExZjOXwSjgeCAkMyPq9ZJyG
-         aNVGkJ82jAGDY7IkojXTnW6Y2ZsnMThMkVaWuTuMaQmDqg1Ym1hpdcD8PLzB6DRKhEc+
-         7T8w==
+        d=google.com; s=20230601; t=1760575213; x=1761180013; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=3dNlCURooSIJX80Bj3EYkA9QRwRQzSg6kTNlO7f/Gn4=;
+        b=CgOUAEuQazcDZPeyqs2s5ACE9C6Y0AJJPmwpGYGC/76AgNkRfLmc9ar7aHVrfFHQ5l
+         BbNimUVOtLVJ5uhKaIiJ4j4nqJsCLBubYpnvqli/eQ+HV9NMQ/MOCAPZellBnP3mYVrx
+         X/sHoKHWdZ0jrmZ+fDH0RKaDdA0c576nUzSVsGySo2r4+dXYGCSQqGNp+hiZM4iB986+
+         1JUTivF7jKYLig8KuQfrENpabOaJTfjAQOWAIJArPii3F7ZFtKrsDtnpLHtoNdHakwIp
+         AYzAFMkXD3cnOWm6vFvdxG1AztNU4PnezoSEM2Q0MLZJ6SYDW2IQzT9gVwCrn8Mecy66
+         Op4Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1760573836; x=1761178636;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=bwptj4G5KoYvNAhjikL6LhizMbH7cKsoQglRkksgDsw=;
-        b=djDw+xszrpAfIWzLrsN2gMlrad8hf/DON4yfnJbpYhES/joZPfuvkYhpXJAGHfXDsP
-         fPy5D4f/GCRxbOgHmxn4+FqXrXJ2wRUWR+/3leS9Jv/Q5VTsOwR1YcEGkAFO4tUPEGsK
-         3DRm21OONCukhXSitREo9aT+dEMbkalohR9MR9DlwJWYXN0+AV9j72zNj8zpcMcqCNRl
-         Ug1tOd8CI0lYXm2oeyCsZ6b//wRbcJjaOTkIkturED09igIDeFRfeRVSg2AoEfVf4xiR
-         3fjbpVMBKm7zEp696sL+nj0KuI01CERPJq+oAbtrdfmaOXVkui9e1m6EedeEFP3/qm2u
-         kk5g==
-X-Forwarded-Encrypted: i=1; AJvYcCUamceLI9jxdcRrtrMmfl27tQJ/l5etmJAP6igg2Y7MvFb2Kc8L1J9eb32zi76ReQTxr5Y=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzzLoMDcwzLMZSEPPMIY6Q1OdiVTsJBftX9qnOBdRQlLzmClhS4
-	DzqpNaHkKd6FC5zplMzPNV6boiL1YbjHHkXoPohlG2+I6B/0ty/CfDuu8M+RDhaiO9M=
-X-Gm-Gg: ASbGncvapfrYY7E7jW3R5mU19Dlo7ae8YwS+A8D7dBWgE6fJvg7eEZ68jiLDNqA951h
-	kLjKYkRgEKMGzNT/T8/Hb3I2CPbEXvESRmZ+B6C7yVJyIXx8dF9ixusCsqYRHss4WJhcR0wKbgt
-	CcGmp6h7+Kqo9y1sGe2tALuFE1pdqJ1Nw6ldIrlkEEjKOlWUPNwOSoYv5I2ELk0zbtD1OZoeDmW
-	EyeTSk8m9i2K3m+ZKCIoA2poULTzPWr+rkiyLvPgFy/712WMIOHXuBNl9X12TWKL4HQQBEA8UUB
-	b/WkUAxISVsHWNxML+FWSwSgsUf3w7x5mMn22yBXpk1O8YjIS0e6chMSddZFg6DihgPQoG68vXu
-	bam4G7hUWSG3TSJnIXuZUG8bo0rFlyc52txkzcw61I5Ic4mTWUvsV2ic4xWTsWoHNGqgWZaD9RK
-	bv9nNHhv+hBWW+kNM6e1uxIA==
-X-Google-Smtp-Source: AGHT+IF8Txz7jrNpsSTJjE/JSeJk6k3fgDPYMzVbvQKqjcn0cbcXxdsvxtPavIzWrNBmcH4D/9ElyQ==
-X-Received: by 2002:a17:903:2381:b0:275:c1e7:c7e with SMTP id d9443c01a7336-29027356a08mr313186275ad.4.1760573836372;
-        Wed, 15 Oct 2025 17:17:16 -0700 (PDT)
-Received: from sw06.internal.sifive.com ([4.53.31.132])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-29099afbdb5sm8484645ad.104.2025.10.15.17.17.14
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 15 Oct 2025 17:17:15 -0700 (PDT)
-From: Samuel Holland <samuel.holland@sifive.com>
-To: Anup Patel <anup@brainfault.org>,
-	Atish Patra <atish.patra@linux.dev>
-Cc: Samuel Holland <samuel.holland@sifive.com>,
-	Albert Ou <aou@eecs.berkeley.edu>,
-	Alexandre Ghiti <alex@ghiti.fr>,
-	Andrew Jones <ajones@ventanamicro.com>,
-	Palmer Dabbelt <palmer@dabbelt.com>,
-	Paul Walmsley <pjw@kernel.org>,
-	kvm-riscv@lists.infradead.org,
-	kvm@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	linux-riscv@lists.infradead.org
-Subject: [PATCH] RISC-V: KVM: Fix check for local interrupts on riscv32
-Date: Wed, 15 Oct 2025 17:17:09 -0700
-Message-ID: <20251016001714.3889380-1-samuel.holland@sifive.com>
-X-Mailer: git-send-email 2.47.2
+        d=1e100.net; s=20230601; t=1760575213; x=1761180013;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=3dNlCURooSIJX80Bj3EYkA9QRwRQzSg6kTNlO7f/Gn4=;
+        b=WO2U1OPZn3b/X4PvLOIZxZtirD5Z6wtBB5962ugkFVU95w0gZllNrhJXOhi5b/8rO9
+         SHAXJTKiWEEitsoSwDYikqdO5SgvqbDFu6cIzdCOQnhwXZhjKt0TQqtM5JC5Zz8sg8u/
+         DEN3IMbjQ65/BLkJ27O1gyN70rnI1/pd/u6w14oYuMDVQuKHHeISIo2t3CYv28WJ3tWP
+         AhVwiE9tMVJ3a9uBO7nmg1hhTXTZ/PzbMja+nl1dhX0BpDS9y7OGiyqwbzuY07qvGuNb
+         E2qO5+wt3PoAlb45ZU1zsxB0LZ0OKuwQvcZzF1k+4slie12q7Fwy9/AdV5bxQVJbJ6UP
+         y00Q==
+X-Forwarded-Encrypted: i=1; AJvYcCX3hZIAGBsRIJrg73Qlt9kdAS6twVQiwDDAquU2zYifEVlmaLkT6VU6A0XfKcuPaZhhsTA=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yx5syi8VdRl6Ilrs8qRspOQgRFBNacf9FJ7HOagiLr9QnqYly4X
+	5Fws5FeAj02eMD3i5sbt/hnlYR+aVi8JbICOZ7yHFp5x6JPUsGetN1TPcaLbo/5gqxmSkmiGZPs
+	l+LDEPg==
+X-Google-Smtp-Source: AGHT+IHfPvjhnedJTgg6CAxnlq4B1q8xkwPd3n+ogO/h0bax4t2Y4qg32T1rBL73rr/Fp9d7GqAYfHy1jZw=
+X-Received: from pjbrv22.prod.google.com ([2002:a17:90b:2c16:b0:329:6ac4:ea2e])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:2412:b0:33b:ade7:51d3
+ with SMTP id 98e67ed59e1d1-33bade7553bmr476752a91.20.1760575213249; Wed, 15
+ Oct 2025 17:40:13 -0700 (PDT)
+Date: Wed, 15 Oct 2025 17:40:11 -0700
+In-Reply-To: <aPAnWWmo555uB0-H@google.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Mime-Version: 1.0
+References: <20250917215031.2567566-1-jmattson@google.com> <20250917215031.2567566-4-jmattson@google.com>
+ <aPAnWWmo555uB0-H@google.com>
+Message-ID: <aPA-60vV0WQUCmc2@google.com>
+Subject: Re: [PATCH 3/4] KVM: selftests: Add VM_MODE_PXXV57_4K VM mode
+From: Sean Christopherson <seanjc@google.com>
+To: Jim Mattson <jmattson@google.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, Shuah Khan <shuah@kernel.org>, 
+	Bibo Mao <maobibo@loongson.cn>, Huacai Chen <chenhuacai@kernel.org>, 
+	Andrew Jones <ajones@ventanamicro.com>, Claudio Imbrenda <imbrenda@linux.ibm.com>, 
+	"Pratik R. Sampat" <prsampat@amd.com>, Kai Huang <kai.huang@intel.com>, 
+	Eric Auger <eric.auger@redhat.com>, linux-kernel@vger.kernel.org, kvm@vger.kernel.org, 
+	linux-kselftest@vger.kernel.org
+Content-Type: text/plain; charset="us-ascii"
 
-To set all 64 bits in the mask on a 32-bit system, the constant must
-have type `unsigned long long`.
+On Wed, Oct 15, 2025, Sean Christopherson wrote:
+> On Wed, Sep 17, 2025, Jim Mattson wrote:
+> > Add a new VM mode, VM_MODE_PXXV57_4K, to support tests that require
+> > 5-level paging on x86. This mode sets up a 57-bit virtual address
+> > space and sets CR4.LA57 in the guest.
 
-Fixes: 6b1e8ba4bac4 ("RISC-V: KVM: Use bitmap for irqs_pending and irqs_pending_mask")
-Signed-off-by: Samuel Holland <samuel.holland@sifive.com>
----
+Thinking about this more, unless it's _really_ painful, e.g. because tests assume
+4-level paging or 48-bit non-canonical address, I would rather turn VM_MODE_PXXV48_4K
+into VM_MODE_PXXVXX_4K and have ____vm_create() create the "maximal" VM.  That
+way tests don't need to go out of their way just to use 5-level paging, e.g. a
+"TEST_REQUIRE(kvm_cpu_has(X86_FEATURE_LA57))" is all that is needed.  It will also
+gives quite a bit of coverage for free, e.g. that save/restore works with and
+without 5-level paging (contrived example, but you get the point).
 
- arch/riscv/kvm/vcpu.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+The NONCANONICAL #define works for LA57, so hopefully making tests play nice with
+LA57 is straightforward?
 
-diff --git a/arch/riscv/kvm/vcpu.c b/arch/riscv/kvm/vcpu.c
-index bccb919ca615..5ce35aba6069 100644
---- a/arch/riscv/kvm/vcpu.c
-+++ b/arch/riscv/kvm/vcpu.c
-@@ -212,7 +212,7 @@ int kvm_cpu_has_pending_timer(struct kvm_vcpu *vcpu)
- 
- int kvm_arch_vcpu_runnable(struct kvm_vcpu *vcpu)
- {
--	return (kvm_riscv_vcpu_has_interrupts(vcpu, -1UL) &&
-+	return (kvm_riscv_vcpu_has_interrupts(vcpu, -1ULL) &&
- 		!kvm_riscv_vcpu_stopped(vcpu) && !vcpu->arch.pause);
- }
- 
--- 
-2.47.2
-
-base-commit: 5a6f65d1502551f84c158789e5d89299c78907c7
-branch: up/kvm-aia-fix
+> > @@ -358,6 +360,25 @@ struct kvm_vm *____vm_create(struct vm_shape shape)
+> >  		vm->va_bits = 48;
+> >  #else
+> >  		TEST_FAIL("VM_MODE_PXXV48_4K not supported on non-x86 platforms");
+> > +#endif
+> > +		break;
+> > +	case VM_MODE_PXXV57_4K:
+> > +#ifdef __x86_64__
+> > +		kvm_get_cpu_address_width(&vm->pa_bits, &vm->va_bits);
+> > +		kvm_init_vm_address_properties(vm);
+> > +		/*
+> > +		 * For 5-level paging, KVM requires LA57 to be enabled, which
+> > +		 * requires a 57-bit virtual address space.
+> > +		 */
+> > +		TEST_ASSERT(vm->va_bits == 57,
+> > +			    "Linear address width (%d bits) not supported for VM_MODE_PXXV57_4K",
+> > +			    vm->va_bits);
+> > +		pr_debug("Guest physical address width detected: %d\n",
+> > +			 vm->pa_bits);
+> > +		vm->pgtable_levels = 5;
+> > +		vm->va_bits = 57;
+> > +#else
+> > +		TEST_FAIL("VM_MODE_PXXV57_4K not supported on non-x86 platforms");
+> >  #endif
+> 
+> That's a lot of copy+paste, especially given the #ifdefs.  How about this (untested)?
+> 
+> 	case VM_MODE_PXXV48_4K:
+> 	case VM_MODE_PXXV57_4K:
+> #ifdef __x86_64__
+> 		kvm_get_cpu_address_width(&vm->pa_bits, &vm->va_bits);
+> 		kvm_init_vm_address_properties(vm);
+> 
+> 		/*
+> 		 * Ignore KVM support for 5-level paging (vm->va_bits == 57) if
+> 		 * the target mode is 4-level paging (48-bit virtual address
+> 		 * space), as 5-level paging only takes effect if CR4.LA57=1.
+> 		 */
+> 		TEST_ASSERT(vm->va_bits == 57 ||
+> 			    (vm->va_bits == 48 && vm->mode == VM_MODE_PXXV48_4K),
+> 			    "Linear address width (%d bits) not supported",
+> 			    vm->va_bits);
+> 		pr_debug("Guest physical address width detected: %d\n",
+> 			 vm->pa_bits);
+> 		if (vm->mode == VM_MODE_PXXV48_4K) {
+> 			vm->pgtable_levels = 4;
+> 			vm->va_bits = 48;
+> 		} else {
+> 			vm->pgtable_levels = 5;
+> 			vm->va_bits = 57;
+> 		}
+> #else
+> 		TEST_FAIL("VM_MODE_PXXV{48,57}_4K not supported on non-x86 platforms");
+> #endif
+> 		break;
 
