@@ -1,63 +1,64 @@
-Return-Path: <kvm+bounces-60118-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-60119-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id A02C8BE1308
-	for <lists+kvm@lfdr.de>; Thu, 16 Oct 2025 03:51:52 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id F1E0BBE130B
+	for <lists+kvm@lfdr.de>; Thu, 16 Oct 2025 03:52:06 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 928AC4E9693
-	for <lists+kvm@lfdr.de>; Thu, 16 Oct 2025 01:51:49 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 34023189D558
+	for <lists+kvm@lfdr.de>; Thu, 16 Oct 2025 01:52:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 63ED11EB195;
-	Thu, 16 Oct 2025 01:51:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 53ED51EDA26;
+	Thu, 16 Oct 2025 01:52:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="fnucBwCJ"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="gJccbYhd"
 X-Original-To: kvm@vger.kernel.org
 Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.9])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7BCA31A256E;
-	Thu, 16 Oct 2025 01:51:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 488E91D8DFB;
+	Thu, 16 Oct 2025 01:51:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.9
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1760579503; cv=none; b=o9V+ZBEfMRJnXBibTb+tp1hZE61sxiQ98HWtPaz0YrS93//Xf5zBXhU0KjeJXZOhZaIVgpWFVnS6PTe59EmUNk8RRes3vnMHMERYGBunh9szIYIxPRpFLVVu5EywW/MQU4Hc2+oaPHx+IqetD8Fu8LTI4CRjOg5Vgs0zcvqdxsQ=
+	t=1760579519; cv=none; b=j7+shuzhN6c1fy2d5y82AxCKRKAfgCUuflaatFlihG4kF5cFVJNU6n6DomMLSt/SaNKOryOEOD01kdTIj9vO2Wg7QGXyEMT3L2rl74OZQSPL0x98Gw0QRo+C4wqqgLURUd4qUm0ZUEhf025Vq5h06isobKRa23+nZbKyzds2sgk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1760579503; c=relaxed/simple;
-	bh=S8oBMhKAT6w97NZObBqNnSz/L32t2Ezjd0QEjrghIng=;
-	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
-	 Content-Disposition; b=JUPgeaB/V1jnSwINkNlFqYKXc2o2pB4+DJYMmZjthFLuwMsHFrird6whXQvugaec8u6avD5O1n8rdQWOT2Gs6ettz4sZ1mcjD8KWIkhiKxPigFetvNxErdR24OqnP9FATqunJ0pY6QOxigm8u16PWmVTXDGNBvBtv+kOse1ziQk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=pass smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=fnucBwCJ; arc=none smtp.client-ip=198.175.65.9
+	s=arc-20240116; t=1760579519; c=relaxed/simple;
+	bh=WHMz5SG6W3N1B8H9QwVveY7DiuNYYtHq4k7vh7UJKR4=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=R3pPxjEM2Flg+FqLRFXhW3LtiqfrGcebCl5HYqiTCHmyBq+8Y7rYC5V3IjfiB+WZDs3DnMgWZfer1n3SOEkf7RYm0FAQdHAuFp1C/eBGL8EUHJA0P29uuxiYlk22gAhQlSczosrO9V59vTIorHrJv4VzW6gECt+B1A920TWKu78=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=pass smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=gJccbYhd; arc=none smtp.client-ip=198.175.65.9
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1760579502; x=1792115502;
-  h=date:from:to:cc:subject:message-id:mime-version;
-  bh=S8oBMhKAT6w97NZObBqNnSz/L32t2Ezjd0QEjrghIng=;
-  b=fnucBwCJPva4JkQh1lrEwemnywDoJGB5MWsxW0T5bODQuzpiSdW2KwiD
-   bkapTWU1+Nb62k3Qv+Fjydd7L75k+ZPHccs7ZibJDK1Ti/3BRZ8qQ/iai
-   eGWZXZ/22OhYKkryapCuI7cL8b/CPAtZulkvEGh+0buDuIvqKaT/+BaPv
-   6ZmwY1lz6L5X/Png9jtCJBFDhW2h//TRR0l8oIe+4YZE3qtf3pa6WPs9x
-   Bh/Zo4vg2BfS0yKcibPcBi1iYU0rStN/rtL3+Jx1dbxXGZ1vKw1O1W9kn
-   0FOr4mKgcBPuoB5eYRQcR2D1C88K4QaFV7tRUbKLiuIHx5Dt1ZI+B4K++
+  t=1760579518; x=1792115518;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=WHMz5SG6W3N1B8H9QwVveY7DiuNYYtHq4k7vh7UJKR4=;
+  b=gJccbYhdsYRwcEGvNgYhJRnZKD+tEQLRCxJofxmcxYJYvjbLE+kKHI0U
+   m+UvwFWogg/t8n80jwE8GPyJYlCIP5Fvacxz+MXGonxw3hxEKMt/1VNiM
+   LWJlvvkJP/bvML5t1hA3y7fihJ2hTEOJ48BDrj0P1+VK58V7g/fKmeoax
+   qlH2CSLifAJ2OFsTlmvHOXxLtV50LZJqi4soa5apxWEX12xaNUgjP/kMv
+   Tr0ic0MfLRtajHvfELC82a2k0DTwz0kvEuxUzDE3X+7tSFOYzknNJwk4U
+   5h8P74FzA0ZSXyGJtLcCQzUBSSFu7jQVCQ74wqWFwJNeIPGiP7NxL4CpX
    Q==;
-X-CSE-ConnectionGUID: jJ/c+6oxSlaD29D+X35+0g==
-X-CSE-MsgGUID: VE/ZnBrOQ+apAqkZZzIgZg==
-X-IronPort-AV: E=McAfee;i="6800,10657,11583"; a="85382908"
+X-CSE-ConnectionGUID: qd5hMo7RTX+wZMgCwD16cQ==
+X-CSE-MsgGUID: aRh3+rXwRxe37x4tpSjuKw==
+X-IronPort-AV: E=McAfee;i="6800,10657,11583"; a="85382932"
 X-IronPort-AV: E=Sophos;i="6.19,232,1754982000"; 
-   d="scan'208";a="85382908"
+   d="scan'208";a="85382932"
 Received: from fmviesa001.fm.intel.com ([10.60.135.141])
-  by orvoesa101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 15 Oct 2025 18:51:41 -0700
-X-CSE-ConnectionGUID: Cs0DyJWsTja9Kx5uhBTxKg==
-X-CSE-MsgGUID: BhTi85ymSZ+ditOBoVoZww==
+  by orvoesa101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 15 Oct 2025 18:51:57 -0700
+X-CSE-ConnectionGUID: xTpZhuYAR/uz4EC1rrFxwA==
+X-CSE-MsgGUID: EUKuiRHFSbCLH+5YVo6Mgg==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.19,232,1754982000"; 
-   d="scan'208";a="213279849"
+   d="scan'208";a="213279901"
 Received: from dnelso2-mobl.amr.corp.intel.com (HELO desk) ([10.124.223.20])
-  by smtpauth.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 15 Oct 2025 18:51:40 -0700
-Date: Wed, 15 Oct 2025 18:51:39 -0700
+  by smtpauth.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 15 Oct 2025 18:51:56 -0700
+Date: Wed, 15 Oct 2025 18:51:55 -0700
 From: Pawan Gupta <pawan.kumar.gupta@linux.intel.com>
 To: x86@kernel.org, "H. Peter Anvin" <hpa@zytor.com>,
 	Josh Poimboeuf <jpoimboe@kernel.org>,
@@ -67,14 +68,11 @@ To: x86@kernel.org, "H. Peter Anvin" <hpa@zytor.com>,
 Cc: linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
 	Asit Mallick <asit.k.mallick@intel.com>,
 	Tao Zhang <tao1.zhang@intel.com>
-Subject: [PATCH v2 0/3] VMSCAPE optimization for BHI variant
-Message-ID: <20251015-vmscape-bhb-v2-0-91cbdd9c3a96@linux.intel.com>
-X-B4-Tracking: v=1; b=H4sIAA1P8GgC/1WNPQ+CMBRF/wp5syVt5SN10rg4OrgZBqCv8hIop
- MUGQ/jvNjg5nntzz13BoyP0cEpWcBjI02gjyEMCbVfbFzLSkUFymXMlChYG39YTsqZrmC51Vih
- VlkYaiIvJoaFltz3hfnlcb1DFuCM/j+6zfwSxlz+dzP50QTDOdJ0Lw1GoY6bPPdn3kpKdsU/bc
- YBq27Yv+8BEgrMAAAA=
-X-Change-ID: 20250916-vmscape-bhb-d7d469977f2f
+Subject: [PATCH v2 1/3] x86/bhi: Add BHB clearing for CPUs with larger branch
+ history
+Message-ID: <20251015-vmscape-bhb-v2-1-91cbdd9c3a96@linux.intel.com>
 X-Mailer: b4 0.14.2
+References: <20251015-vmscape-bhb-v2-0-91cbdd9c3a96@linux.intel.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -83,97 +81,137 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
+In-Reply-To: <20251015-vmscape-bhb-v2-0-91cbdd9c3a96@linux.intel.com>
 
-v2:
-- Added check for IBPB feature in vmscape_select_mitigation(). (David)
-- s/vmscape=auto/vmscape=on/ (David)
-- Added patch to remove LFENCE from VMSCAPE BHB-clear sequence.
-- Rebased to v6.18-rc1.
+Add a version of clear_bhb_loop() that works on CPUs with larger branch
+history table such as Alder Lake and newer. This could serve as a cheaper
+alternative to IBPB mitigation for VMSCAPE.
 
-v1: https://lore.kernel.org/r/20250924-vmscape-bhb-v1-0-da51f0e1934d@linux.intel.com
+clear_bhb_loop() and the new clear_bhb_long_loop() only differ in the loop
+counter. Convert the asm implementation of clear_bhb_loop() into a macro
+that is used by both the variants, passing counter as an argument.
 
-Hi All,
+There is no difference in the output of:
 
-These patches aim to improve the performance of a recent mitigation for
-VMSCAPE[1] vulnerability. This improvement is relevant for BHI variant of
-VMSCAPE that affect Alder Lake and newer processors.
+  $ objdump --disassemble=clear_bhb_loop vmlinux
 
-The current mitigation approach uses IBPB on kvm-exit-to-userspace for all
-affected range of CPUs. This is an overkill for CPUs that are only affected
-by the BHI variant. On such CPUs clearing the branch history is sufficient
-for VMSCAPE, and also more apt as the underlying issue is due to poisoned
-branch history.
+before and after this commit.
 
-Roadmap:
-
-- First patch introduces clear_bhb_long_loop() for processors with larger
-  branch history tables.
-- Second patch replaces IBPB on exit-to-userspace with branch history
-  clearing sequence.
-
-Below is the iPerf data for transfer between guest and host, comparing IBPB
-and BHB-clear mitigation. BHB-clear shows performance improvement over IBPB
-in most cases.
-
-Platform: Emerald Rapids
-Baseline: vmscape=off
-
-(pN = N parallel connections)
-
-| iPerf user-net | IBPB    | BHB Clear |
-|----------------|---------|-----------|
-| UDP 1-vCPU_p1  | -12.5%  |   1.3%    |
-| TCP 1-vCPU_p1  | -10.4%  |  -1.5%    |
-| TCP 1-vCPU_p1  | -7.5%   |  -3.0%    |
-| UDP 4-vCPU_p16 | -3.7%   |  -3.7%    |
-| TCP 4-vCPU_p4  | -2.9%   |  -1.4%    |
-| UDP 4-vCPU_p4  | -0.6%   |   0.0%    |
-| TCP 4-vCPU_p4  |  3.5%   |   0.0%    |
-
-| iPerf bridge-net | IBPB    | BHB Clear |
-|------------------|---------|-----------|
-| UDP 1-vCPU_p1    | -9.4%   |  -0.4%    |
-| TCP 1-vCPU_p1    | -3.9%   |  -0.5%    |
-| UDP 4-vCPU_p16   | -2.2%   |  -3.8%    |
-| TCP 4-vCPU_p4    | -1.0%   |  -1.0%    |
-| TCP 4-vCPU_p4    |  0.5%   |   0.5%    |
-| UDP 4-vCPU_p4    |  0.0%   |   0.9%    |
-| TCP 1-vCPU_p1    |  0.0%   |   0.9%    |
-
-| iPerf vhost-net | IBPB    | BHB Clear |
-|-----------------|---------|-----------|
-| UDP 1-vCPU_p1   | -4.3%   |   1.0%    |
-| TCP 1-vCPU_p1   | -3.8%   |  -0.5%    |
-| TCP 1-vCPU_p1   | -2.7%   |  -0.7%    |
-| UDP 4-vCPU_p16  | -0.7%   |  -2.2%    |
-| TCP 4-vCPU_p4   | -0.4%   |   0.8%    |
-| UDP 4-vCPU_p4   |  0.4%   |  -0.7%    |
-| TCP 4-vCPU_p4   |  0.0%   |   0.6%    |
-
-[1] https://comsec.ethz.ch/research/microarch/vmscape-exposing-and-exploiting-incomplete-branch-predictor-isolation-in-cloud-environments/
-
+Signed-off-by: Pawan Gupta <pawan.kumar.gupta@linux.intel.com>
 ---
-Pawan Gupta (3):
-      x86/bhi: Add BHB clearing for CPUs with larger branch history
-      x86/vmscape: Replace IBPB with branch history clear on exit to userspace
-      x86/vmscape: Remove LFENCE from BHB clearing long loop
+ arch/x86/entry/entry_64.S            | 47 ++++++++++++++++++++++++++----------
+ arch/x86/include/asm/nospec-branch.h |  3 +++
+ 2 files changed, 37 insertions(+), 13 deletions(-)
 
- Documentation/admin-guide/hw-vuln/vmscape.rst   |  8 ++++
- Documentation/admin-guide/kernel-parameters.txt |  4 +-
- arch/x86/entry/entry_64.S                       | 63 ++++++++++++++++++-------
- arch/x86/include/asm/cpufeatures.h              |  1 +
- arch/x86/include/asm/entry-common.h             | 12 +++--
- arch/x86/include/asm/nospec-branch.h            |  5 +-
- arch/x86/kernel/cpu/bugs.c                      | 53 +++++++++++++++------
- arch/x86/kvm/x86.c                              |  5 +-
- 8 files changed, 110 insertions(+), 41 deletions(-)
----
-base-commit: 3a8660878839faadb4f1a6dd72c3179c1df56787
-change-id: 20250916-vmscape-bhb-d7d469977f2f
+diff --git a/arch/x86/entry/entry_64.S b/arch/x86/entry/entry_64.S
+index ed04a968cc7d0095ab0185b2e3b5beffb7680afd..f5f62af080d8ec6fe81e4dbe78ce44d08e62aa59 100644
+--- a/arch/x86/entry/entry_64.S
++++ b/arch/x86/entry/entry_64.S
+@@ -1499,11 +1499,6 @@ SYM_CODE_END(rewind_stack_and_make_dead)
+  * from the branch history tracker in the Branch Predictor, therefore removing
+  * user influence on subsequent BTB lookups.
+  *
+- * It should be used on parts prior to Alder Lake. Newer parts should use the
+- * BHI_DIS_S hardware control instead. If a pre-Alder Lake part is being
+- * virtualized on newer hardware the VMM should protect against BHI attacks by
+- * setting BHI_DIS_S for the guests.
+- *
+  * CALLs/RETs are necessary to prevent Loop Stream Detector(LSD) from engaging
+  * and not clearing the branch history. The call tree looks like:
+  *
+@@ -1529,11 +1524,12 @@ SYM_CODE_END(rewind_stack_and_make_dead)
+  * that all RETs are in the second half of a cacheline to mitigate Indirect
+  * Target Selection, rather than taking the slowpath via its_return_thunk.
+  */
+-SYM_FUNC_START(clear_bhb_loop)
++.macro	__CLEAR_BHB_LOOP outer_loop_count:req, inner_loop_count:req
+ 	ANNOTATE_NOENDBR
+ 	push	%rbp
+ 	mov	%rsp, %rbp
+-	movl	$5, %ecx
++
++	movl	$\outer_loop_count, %ecx
+ 	ANNOTATE_INTRA_FUNCTION_CALL
+ 	call	1f
+ 	jmp	5f
+@@ -1542,29 +1538,54 @@ SYM_FUNC_START(clear_bhb_loop)
+ 	 * Shift instructions so that the RET is in the upper half of the
+ 	 * cacheline and don't take the slowpath to its_return_thunk.
+ 	 */
+-	.skip 32 - (.Lret1 - 1f), 0xcc
++	.skip 32 - (.Lret1_\@ - 1f), 0xcc
+ 	ANNOTATE_INTRA_FUNCTION_CALL
+ 1:	call	2f
+-.Lret1:	RET
++.Lret1_\@:
++	RET
+ 	.align 64, 0xcc
+ 	/*
+-	 * As above shift instructions for RET at .Lret2 as well.
++	 * As above shift instructions for RET at .Lret2_\@ as well.
+ 	 *
+-	 * This should be ideally be: .skip 32 - (.Lret2 - 2f), 0xcc
++	 * This should be ideally be: .skip 32 - (.Lret2_\@ - 2f), 0xcc
+ 	 * but some Clang versions (e.g. 18) don't like this.
+ 	 */
+ 	.skip 32 - 18, 0xcc
+-2:	movl	$5, %eax
++2:	movl	$\inner_loop_count, %eax
+ 3:	jmp	4f
+ 	nop
+ 4:	sub	$1, %eax
+ 	jnz	3b
+ 	sub	$1, %ecx
+ 	jnz	1b
+-.Lret2:	RET
++.Lret2_\@:
++	RET
+ 5:	lfence
++
+ 	pop	%rbp
+ 	RET
++.endm
++
++/*
++ * This should be used on parts prior to Alder Lake. Newer parts should use the
++ * BHI_DIS_S hardware control instead. If a pre-Alder Lake part is being
++ * virtualized on newer hardware the VMM should protect against BHI attacks by
++ * setting BHI_DIS_S for the guests.
++ */
++SYM_FUNC_START(clear_bhb_loop)
++	__CLEAR_BHB_LOOP 5, 5
+ SYM_FUNC_END(clear_bhb_loop)
+ EXPORT_SYMBOL_GPL(clear_bhb_loop)
+ STACK_FRAME_NON_STANDARD(clear_bhb_loop)
++
++/*
++ * A longer version of clear_bhb_loop to ensure that the BHB is cleared on CPUs
++ * with larger branch history tables (i.e. Alder Lake and newer). BHI_DIS_S
++ * protects the kernel, but to mitigate the guest influence on the host
++ * userspace either IBPB or this sequence should be used. See VMSCAPE bug.
++ */
++SYM_FUNC_START(clear_bhb_long_loop)
++	__CLEAR_BHB_LOOP 12, 7
++SYM_FUNC_END(clear_bhb_long_loop)
++EXPORT_SYMBOL_GPL(clear_bhb_long_loop)
++STACK_FRAME_NON_STANDARD(clear_bhb_long_loop)
+diff --git a/arch/x86/include/asm/nospec-branch.h b/arch/x86/include/asm/nospec-branch.h
+index 08ed5a2e46a5fd790bcb1b73feb6469518809c06..49707e563bdf71bdd05d3827f10dd2b8ac6bca2c 100644
+--- a/arch/x86/include/asm/nospec-branch.h
++++ b/arch/x86/include/asm/nospec-branch.h
+@@ -388,6 +388,9 @@ extern void write_ibpb(void);
+ 
+ #ifdef CONFIG_X86_64
+ extern void clear_bhb_loop(void);
++extern void clear_bhb_long_loop(void);
++#else
++static inline void clear_bhb_long_loop(void) {}
+ #endif
+ 
+ extern void (*x86_return_thunk)(void);
 
-Best regards,
 -- 
-Pawan
+2.34.1
 
 
 
