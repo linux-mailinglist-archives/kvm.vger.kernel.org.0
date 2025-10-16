@@ -1,71 +1,71 @@
-Return-Path: <kvm+bounces-60222-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-60223-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id 99B80BE54FA
-	for <lists+kvm@lfdr.de>; Thu, 16 Oct 2025 22:05:03 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 55846BE5503
+	for <lists+kvm@lfdr.de>; Thu, 16 Oct 2025 22:05:17 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 310724E904F
-	for <lists+kvm@lfdr.de>; Thu, 16 Oct 2025 20:05:02 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 828B319C7945
+	for <lists+kvm@lfdr.de>; Thu, 16 Oct 2025 20:05:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BDF4521FF2E;
-	Thu, 16 Oct 2025 20:04:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4492F2E1EEC;
+	Thu, 16 Oct 2025 20:04:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="xOtfLLRt"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="VmLNRsE7"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pj1-f73.google.com (mail-pj1-f73.google.com [209.85.216.73])
+Received: from mail-pj1-f74.google.com (mail-pj1-f74.google.com [209.85.216.74])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 561272DF149
-	for <kvm@vger.kernel.org>; Thu, 16 Oct 2025 20:04:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.73
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B7F282DFA5A
+	for <kvm@vger.kernel.org>; Thu, 16 Oct 2025 20:04:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.74
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1760645067; cv=none; b=QSAYjkAVC1erF6uB9oHHmpQNhclFhSlnYs4/MyWDefnK5x1rm873yM0SocAQP6qPdpcTXCDLNBPwweQj3oxBqk2dPl8Vt+Xd6k9TNwPQUN5neB73GaB6WWc2gOdM8uQpSSfCSlr+VR+th8W8WPXyOHL82fpVIl5QdaFROrPTPpE=
+	t=1760645068; cv=none; b=BR3rAgCybH1h8nMjCLFge7UdurE4sV5VIgfwWakFxeOkhth3jGthlwyqjo1z61epOoBnqPQFea4ZO7RmNP2363QKKb0SSMGi9OvioZlGLdURstkaep/fboqbA9nd3IoVWYFHd2ZeMe5ul7QTmMoJZV13F4bTdMGEkORl/5uCnnU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1760645067; c=relaxed/simple;
-	bh=yuk7NvONUNQVlqggvv8ub6LxWOfiyoba45LlVODNDco=;
+	s=arc-20240116; t=1760645068; c=relaxed/simple;
+	bh=+BI3vZGhl1OUxVrO7t7nTf9aykzXpRRBJCRI1x4Dzk4=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=eZbjp791TPqCLUItwf9aBBdC+QZ1KH338L3oiz33e1y5uGhkOJdHAN9lsKHUyJV57Brj0U41w/DbdlxV/O03VMhEwNCjCsw6WTUKGqVr4wPRLCvUXF2EZevrJ0LjFUAZ1v1smNqI53ypR2dcOCjS4flmuJtaKx1KnSAa76wcMf0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=xOtfLLRt; arc=none smtp.client-ip=209.85.216.73
+	 To:Cc:Content-Type; b=JAzAvYOCWCtdBDntgOwBMXMJ0w7Xo8YAJCebh8qHlmZXZwN5G10cLiK6Xnop5PhvI15E0f15ibrScv88Fb0EP7XVrVS9UP68iIi9UduHcOe/j4dJkVlifZWUXLhUqTufNng97VcCcbjRh3FSL5yNEmfhRNa8UiRfFU2jso9Nyps=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=VmLNRsE7; arc=none smtp.client-ip=209.85.216.74
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pj1-f73.google.com with SMTP id 98e67ed59e1d1-33baf262850so1164028a91.0
-        for <kvm@vger.kernel.org>; Thu, 16 Oct 2025 13:04:25 -0700 (PDT)
+Received: by mail-pj1-f74.google.com with SMTP id 98e67ed59e1d1-3304def7909so1052924a91.3
+        for <kvm@vger.kernel.org>; Thu, 16 Oct 2025 13:04:26 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1760645064; x=1761249864; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1760645066; x=1761249866; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:reply-to:from:to:cc:subject:date:message-id:reply-to;
-        bh=U+jp/+XcfRH9dOuRvA/UXEBka06Rhza6HVdo0nGfOSo=;
-        b=xOtfLLRt2fBi5/Gb7417Lofc3CGHTyNFn2EUf+hJlAvh/ERuzcdjQ/iRbXPGwmCDkC
-         boDk6DaDGHUPTuyNHL4iNbUmskrsLIZfVEzvpnM+7gEw/CagIeEs+ytc6oGzFUAHuVn3
-         hw+bdyK5q1C3hwcexzpLCYYNRhbUJ1lIrsSluHIguAdNEZTRConvTPoN7hKROMVaIbXz
-         jsnHaF1gRnDlbKczrFkl2A1QTejruNYniCqIoGBFO3AFulBaqFcL331GX0Gfn3mPGPNN
-         z3ztL1W9pPcp7nkh4y9NBtUaGkjklOuAD96HKxMzkL+0N5R8BPWhUBDq9z9xUdmZBNLY
-         qoNQ==
+        bh=gICh0D9JnzmBW3pvgKeRu2d75Fu8xaMjYi9X/63uYNM=;
+        b=VmLNRsE7dNJrYlWaZVNk4G/bimpLGAopdeQPhhhDheyIWYOT7pHHMZ6nKIV9alOfLr
+         vWdhEBP9fEKawvjs4odiWL0I3w/8+PpreDTQuadUiGyXH6VocSIpP2ockQyIgFICv2iw
+         9oyRgQqWQ6+euG4ljQnwTBF076YeMeWYPVVICub6/c+PPQ268xAKmMxlzGrYGBnpfDh6
+         d7IkDAtF6WnRySlPghdrgZ8y8Lo/AyjZHm9VD9evT48irh83Kbd/Zcg95aZ6uFwlVmyV
+         dw8HBAI4co2xi8FppV3F/XofbnXK6lkDRc7vGdWaajDQbAdn485e2T4cfP6j3/C0aIhN
+         7tlA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1760645064; x=1761249864;
+        d=1e100.net; s=20230601; t=1760645066; x=1761249866;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:reply-to:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=U+jp/+XcfRH9dOuRvA/UXEBka06Rhza6HVdo0nGfOSo=;
-        b=N4mEkyPfBNgJWz9KGdomrmLB0RiXfpOv2A1FyPJ0g94RQy6/XLPHxresZqBJPjcw+i
-         Piz6lWSbXNhBgG0yMCZCzxVTIGxtpnRwuVA0ogRwr9E9NV6I28u2Ud04GoqzosS4iYbt
-         OFGUKcZEs2eighDNtK/AdpAGDsNJKUaSuxVxOolfzp7ZFJOtBCNx3gd3pswnPAf0jB9V
-         ogk2HInjQClkhQ+l3l+CPuaJ3ur5kptrQVwT5xIcv/ODic4tFp6sanr2lIyBFU9BM5Ka
-         hpeaJzOOtol6v9RqLyOUoJzQeZMuaUI5JhRoZFyFOqAfCW0SZFdhBZ05MSHha6zvxTth
-         nHCw==
-X-Gm-Message-State: AOJu0Yz6XkcWTaUAK/YdskjroHy2Z5sjtvSSlCORI8nsi37bzMmf9ztW
-	h4/Bb/zO+WT/aOE2sM/cEe9f/MNlHb0jGTMba1ha7XkYcDEtlU6x/KDstfIgxDw0EZ8q0No1O0M
-	U3FEr4w==
-X-Google-Smtp-Source: AGHT+IH2nM7xybmdxyLC9czVkjZPXYctCesmDVEcR7IkWRJE94Mg7Obq1GtFksq5gUVDT9p0d9taLBI5DcE=
-X-Received: from pjkm8.prod.google.com ([2002:a17:90a:7308:b0:33b:a0cd:53ed])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:3506:b0:33b:c5de:6a54
- with SMTP id 98e67ed59e1d1-33bcf8e9795mr1055685a91.23.1760645064449; Thu, 16
- Oct 2025 13:04:24 -0700 (PDT)
+        bh=gICh0D9JnzmBW3pvgKeRu2d75Fu8xaMjYi9X/63uYNM=;
+        b=W8/wVWvPTrJrvOg4Vh6Wl+jJ4R3Hg68Yw2tw/llGrxKm/fFjzNOeFVo6+6hQyANbjr
+         ITu8rYELzB8gpD3KEkaPWcgpoFm4ks+J9dVcI39aXPXuo+XRAAr1hSYkCmiJvaTx77vw
+         LM7dxkAQSNP966EjLBY0CZhiYTajqY8nIaWL6uFrvOvAMuP6aHF1Ss9yGExkbMNWm9vt
+         Cn4D0SSPHLWnyHbgo9Rq7rTF4xPKFLyrjg9gULyWnTc7ObXq/x+BaNU35wgqawROn6fK
+         Kd8vJsFWuVdCkPGxZ4BvqzdqijQlBf882QkWlnaVgQUWqSAzpmND8Zflsb9P3WrxueWC
+         RLCQ==
+X-Gm-Message-State: AOJu0Yzy1nlDbaFDOMYV7pP6ewEl9O3e1Qj4etgyIiS25MzblWrsmjAU
+	UeBauFVbyGO1SqJzCxrw0jFg+bTat8Iy7TqHfhLUeu7vt4YYCx5WJNZ+VFO4+p7eL+wANrbRrfV
+	h3JogYA==
+X-Google-Smtp-Source: AGHT+IHztc2TqgDKpEmWp9jAwqakrYMvnNulb8h0c+tFEAFFdKTRQ4mRZOTbzsyI2FnZxXK4m2S9f8WNbU0=
+X-Received: from pjbsr14.prod.google.com ([2002:a17:90b:4e8e:b0:33b:8b81:9086])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:3942:b0:336:bfce:3b48
+ with SMTP id 98e67ed59e1d1-33bcf87f431mr1266128a91.9.1760645066002; Thu, 16
+ Oct 2025 13:04:26 -0700 (PDT)
 Reply-To: Sean Christopherson <seanjc@google.com>
-Date: Thu, 16 Oct 2025 13:04:15 -0700
+Date: Thu, 16 Oct 2025 13:04:16 -0700
 In-Reply-To: <20251016200417.97003-1-seanjc@google.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
@@ -75,242 +75,174 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
 References: <20251016200417.97003-1-seanjc@google.com>
 X-Mailer: git-send-email 2.51.0.858.gf9c4a03a3a-goog
-Message-ID: <20251016200417.97003-3-seanjc@google.com>
-Subject: [PATCH v3 2/4] KVM: VMX: Bundle all L1 data cache flush mitigation
- code together
+Message-ID: <20251016200417.97003-4-seanjc@google.com>
+Subject: [PATCH v3 3/4] KVM: VMX: Disable L1TF L1 data cache flush if CONFIG_CPU_MITIGATIONS=n
 From: Sean Christopherson <seanjc@google.com>
 To: Sean Christopherson <seanjc@google.com>, Paolo Bonzini <pbonzini@redhat.com>
 Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
 	Pawan Gupta <pawan.kumar.gupta@linux.intel.com>, Brendan Jackman <jackmanb@google.com>
 Content-Type: text/plain; charset="UTF-8"
 
-Move vmx_l1d_flush(), vmx_cleanup_l1d_flush(), and the vmentry_l1d_flush
-param code up in vmx.c so that all of the L1 data cache flushing code is
-bundled together.  This will allow conditioning the mitigation code on
-CONFIG_CPU_MITIGATIONS=y with minimal #ifdefs.
+Disable support for flushing the L1 data cache to mitigate L1TF if CPU
+mitigations are disabled for the entire kernel.  KVM's mitigation of L1TF
+is in no way special enough to justify ignoring CONFIG_CPU_MITIGATIONS=n.
 
-No functional change intended.
+Deliberately use CPU_MITIGATIONS instead of the more precise
+MITIGATION_L1TF, as MITIGATION_L1TF only controls the default behavior,
+i.e. CONFIG_MITIGATION_L1TF=n doesn't completely disable L1TF mitigations
+in the kernel.
+
+Keep the vmentry_l1d_flush module param to avoid breaking existing setups,
+and leverage the .set path to alert the user to the fact that
+vmentry_l1d_flush will be ignored.  Don't bother validating the incoming
+value; if an admin misconfigures vmentry_l1d_flush, the fact that the bad
+configuration won't be detected when running with CONFIG_CPU_MITIGATIONS=n
+is likely the least of their worries.
 
 Signed-off-by: Sean Christopherson <seanjc@google.com>
 ---
- arch/x86/kvm/vmx/vmx.c | 176 ++++++++++++++++++++---------------------
- 1 file changed, 88 insertions(+), 88 deletions(-)
+ arch/x86/include/asm/hardirq.h |  4 +--
+ arch/x86/kvm/vmx/vmx.c         | 56 ++++++++++++++++++++++++++--------
+ 2 files changed, 46 insertions(+), 14 deletions(-)
 
+diff --git a/arch/x86/include/asm/hardirq.h b/arch/x86/include/asm/hardirq.h
+index f00c09ffe6a9..6b6d472baa0b 100644
+--- a/arch/x86/include/asm/hardirq.h
++++ b/arch/x86/include/asm/hardirq.h
+@@ -5,7 +5,7 @@
+ #include <linux/threads.h>
+ 
+ typedef struct {
+-#if IS_ENABLED(CONFIG_KVM_INTEL)
++#if IS_ENABLED(CONFIG_CPU_MITIGATIONS) && IS_ENABLED(CONFIG_KVM_INTEL)
+ 	u8	     kvm_cpu_l1tf_flush_l1d;
+ #endif
+ 	unsigned int __nmi_count;	/* arch dependent */
+@@ -68,7 +68,7 @@ extern u64 arch_irq_stat(void);
+ DECLARE_PER_CPU_CACHE_HOT(u16, __softirq_pending);
+ #define local_softirq_pending_ref       __softirq_pending
+ 
+-#if IS_ENABLED(CONFIG_KVM_INTEL)
++#if IS_ENABLED(CONFIG_CPU_MITIGATIONS) && IS_ENABLED(CONFIG_KVM_INTEL)
+ /*
+  * This function is called from noinstr interrupt contexts
+  * and must be inlined to not get instrumentation.
 diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
-index ce556d5dc39b..cd8ae1b2ae55 100644
+index cd8ae1b2ae55..e91d99211efe 100644
 --- a/arch/x86/kvm/vmx/vmx.c
 +++ b/arch/x86/kvm/vmx/vmx.c
-@@ -302,6 +302,16 @@ static int vmx_setup_l1d_flush(enum vmx_l1d_flush_state l1tf)
+@@ -203,6 +203,7 @@ module_param(pt_mode, int, S_IRUGO);
+ 
+ struct x86_pmu_lbr __ro_after_init vmx_lbr_caps;
+ 
++#ifdef CONFIG_CPU_MITIGATIONS
+ static DEFINE_STATIC_KEY_FALSE(vmx_l1d_should_flush);
+ static DEFINE_STATIC_KEY_FALSE(vmx_l1d_flush_cond);
+ static DEFINE_MUTEX(vmx_l1d_flush_mutex);
+@@ -225,7 +226,7 @@ static const struct {
+ #define L1D_CACHE_ORDER 4
+ static void *vmx_l1d_flush_pages;
+ 
+-static int vmx_setup_l1d_flush(enum vmx_l1d_flush_state l1tf)
++static int __vmx_setup_l1d_flush(enum vmx_l1d_flush_state l1tf)
+ {
+ 	struct page *page;
+ 	unsigned int i;
+@@ -302,6 +303,16 @@ static int vmx_setup_l1d_flush(enum vmx_l1d_flush_state l1tf)
  	return 0;
  }
  
-+static void vmx_cleanup_l1d_flush(void)
++static int vmx_setup_l1d_flush(void)
 +{
-+	if (vmx_l1d_flush_pages) {
-+		free_pages((unsigned long)vmx_l1d_flush_pages, L1D_CACHE_ORDER);
-+		vmx_l1d_flush_pages = NULL;
-+	}
-+	/* Restore state so sysfs ignores VMX */
-+	l1tf_vmx_mitigation = VMENTER_L1D_FLUSH_AUTO;
-+}
-+
- static int vmentry_l1d_flush_parse(const char *s)
- {
- 	unsigned int i;
-@@ -352,6 +362,84 @@ static int vmentry_l1d_flush_get(char *s, const struct kernel_param *kp)
- 	return sysfs_emit(s, "%s\n", vmentry_l1d_param[l1tf_vmx_mitigation].option);
- }
- 
-+/*
-+ * Software based L1D cache flush which is used when microcode providing
-+ * the cache control MSR is not loaded.
-+ *
-+ * The L1D cache is 32 KiB on Nehalem and later microarchitectures, but to
-+ * flush it is required to read in 64 KiB because the replacement algorithm
-+ * is not exactly LRU. This could be sized at runtime via topology
-+ * information but as all relevant affected CPUs have 32KiB L1D cache size
-+ * there is no point in doing so.
-+ */
-+static noinstr bool vmx_l1d_flush(struct kvm_vcpu *vcpu)
-+{
-+	int size = PAGE_SIZE << L1D_CACHE_ORDER;
-+
 +	/*
-+	 * This code is only executed when the flush mode is 'cond' or
-+	 * 'always'
++	 * Hand the parameter mitigation value in which was stored in the pre
++	 * module init parser. If no parameter was given, it will contain
++	 * 'auto' which will be turned into the default 'cond' mitigation mode.
 +	 */
-+	if (static_branch_likely(&vmx_l1d_flush_cond)) {
-+		bool flush_l1d;
-+
-+		/*
-+		 * Clear the per-vcpu flush bit, it gets set again if the vCPU
-+		 * is reloaded, i.e. if the vCPU is scheduled out or if KVM
-+		 * exits to userspace, or if KVM reaches one of the unsafe
-+		 * VMEXIT handlers, e.g. if KVM calls into the emulator.
-+		 */
-+		flush_l1d = vcpu->arch.l1tf_flush_l1d;
-+		vcpu->arch.l1tf_flush_l1d = false;
-+
-+		/*
-+		 * Clear the per-cpu flush bit, it gets set again from
-+		 * the interrupt handlers.
-+		 */
-+		flush_l1d |= kvm_get_cpu_l1tf_flush_l1d();
-+		kvm_clear_cpu_l1tf_flush_l1d();
-+
-+		if (!flush_l1d)
-+			return false;
-+	}
-+
-+	vcpu->stat.l1d_flush++;
-+
-+	if (static_cpu_has(X86_FEATURE_FLUSH_L1D)) {
-+		native_wrmsrq(MSR_IA32_FLUSH_CMD, L1D_FLUSH);
-+		return true;
-+	}
-+
-+	asm volatile(
-+		/* First ensure the pages are in the TLB */
-+		"xorl	%%eax, %%eax\n"
-+		".Lpopulate_tlb:\n\t"
-+		"movzbl	(%[flush_pages], %%" _ASM_AX "), %%ecx\n\t"
-+		"addl	$4096, %%eax\n\t"
-+		"cmpl	%%eax, %[size]\n\t"
-+		"jne	.Lpopulate_tlb\n\t"
-+		"xorl	%%eax, %%eax\n\t"
-+		"cpuid\n\t"
-+		/* Now fill the cache */
-+		"xorl	%%eax, %%eax\n"
-+		".Lfill_cache:\n"
-+		"movzbl	(%[flush_pages], %%" _ASM_AX "), %%ecx\n\t"
-+		"addl	$64, %%eax\n\t"
-+		"cmpl	%%eax, %[size]\n\t"
-+		"jne	.Lfill_cache\n\t"
-+		"lfence\n"
-+		:: [flush_pages] "r" (vmx_l1d_flush_pages),
-+		    [size] "r" (size)
-+		: "eax", "ebx", "ecx", "edx");
-+	return true;
++	return vmx_setup_l1d_flush(vmentry_l1d_flush_param);
 +}
 +
-+static const struct kernel_param_ops vmentry_l1d_flush_ops = {
-+	.set = vmentry_l1d_flush_set,
-+	.get = vmentry_l1d_flush_get,
-+};
-+module_param_cb(vmentry_l1d_flush, &vmentry_l1d_flush_ops, NULL, 0644);
-+
- static __always_inline void vmx_disable_fb_clear(struct vcpu_vmx *vmx)
+ static void vmx_cleanup_l1d_flush(void)
  {
- 	u64 msr;
-@@ -404,12 +492,6 @@ static void vmx_update_fb_clear_dis(struct kvm_vcpu *vcpu, struct vcpu_vmx *vmx)
- 		vmx->disable_fb_clear = false;
- }
+ 	if (vmx_l1d_flush_pages) {
+@@ -349,7 +360,7 @@ static int vmentry_l1d_flush_set(const char *s, const struct kernel_param *kp)
+ 	}
  
--static const struct kernel_param_ops vmentry_l1d_flush_ops = {
--	.set = vmentry_l1d_flush_set,
--	.get = vmentry_l1d_flush_get,
--};
--module_param_cb(vmentry_l1d_flush, &vmentry_l1d_flush_ops, NULL, 0644);
--
- static u32 vmx_segment_access_rights(struct kvm_segment *var);
- 
- void vmx_vmexit(void);
-@@ -6653,78 +6735,6 @@ int vmx_handle_exit(struct kvm_vcpu *vcpu, fastpath_t exit_fastpath)
+ 	mutex_lock(&vmx_l1d_flush_mutex);
+-	ret = vmx_setup_l1d_flush(l1tf);
++	ret = __vmx_setup_l1d_flush(l1tf);
+ 	mutex_unlock(&vmx_l1d_flush_mutex);
  	return ret;
  }
- 
--/*
-- * Software based L1D cache flush which is used when microcode providing
-- * the cache control MSR is not loaded.
-- *
-- * The L1D cache is 32 KiB on Nehalem and later microarchitectures, but to
-- * flush it is required to read in 64 KiB because the replacement algorithm
-- * is not exactly LRU. This could be sized at runtime via topology
-- * information but as all relevant affected CPUs have 32KiB L1D cache size
-- * there is no point in doing so.
-- */
--static noinstr bool vmx_l1d_flush(struct kvm_vcpu *vcpu)
--{
--	int size = PAGE_SIZE << L1D_CACHE_ORDER;
--
--	/*
--	 * This code is only executed when the flush mode is 'cond' or
--	 * 'always'
--	 */
--	if (static_branch_likely(&vmx_l1d_flush_cond)) {
--		bool flush_l1d;
--
--		/*
--		 * Clear the per-vcpu flush bit, it gets set again if the vCPU
--		 * is reloaded, i.e. if the vCPU is scheduled out or if KVM
--		 * exits to userspace, or if KVM reaches one of the unsafe
--		 * VMEXIT handlers, e.g. if KVM calls into the emulator.
--		 */
--		flush_l1d = vcpu->arch.l1tf_flush_l1d;
--		vcpu->arch.l1tf_flush_l1d = false;
--
--		/*
--		 * Clear the per-cpu flush bit, it gets set again from
--		 * the interrupt handlers.
--		 */
--		flush_l1d |= kvm_get_cpu_l1tf_flush_l1d();
--		kvm_clear_cpu_l1tf_flush_l1d();
--
--		if (!flush_l1d)
--			return false;
--	}
--
--	vcpu->stat.l1d_flush++;
--
--	if (static_cpu_has(X86_FEATURE_FLUSH_L1D)) {
--		native_wrmsrq(MSR_IA32_FLUSH_CMD, L1D_FLUSH);
--		return true;
--	}
--
--	asm volatile(
--		/* First ensure the pages are in the TLB */
--		"xorl	%%eax, %%eax\n"
--		".Lpopulate_tlb:\n\t"
--		"movzbl	(%[flush_pages], %%" _ASM_AX "), %%ecx\n\t"
--		"addl	$4096, %%eax\n\t"
--		"cmpl	%%eax, %[size]\n\t"
--		"jne	.Lpopulate_tlb\n\t"
--		"xorl	%%eax, %%eax\n\t"
--		"cpuid\n\t"
--		/* Now fill the cache */
--		"xorl	%%eax, %%eax\n"
--		".Lfill_cache:\n"
--		"movzbl	(%[flush_pages], %%" _ASM_AX "), %%ecx\n\t"
--		"addl	$64, %%eax\n\t"
--		"cmpl	%%eax, %[size]\n\t"
--		"jne	.Lfill_cache\n\t"
--		"lfence\n"
--		:: [flush_pages] "r" (vmx_l1d_flush_pages),
--		    [size] "r" (size)
--		: "eax", "ebx", "ecx", "edx");
--	return true;
--}
--
- void vmx_update_cr8_intercept(struct kvm_vcpu *vcpu, int tpr, int irr)
+@@ -376,6 +387,9 @@ static noinstr bool vmx_l1d_flush(struct kvm_vcpu *vcpu)
  {
- 	struct vmcs12 *vmcs12 = get_vmcs12(vcpu);
-@@ -8673,16 +8683,6 @@ __init int vmx_hardware_setup(void)
- 	return r;
+ 	int size = PAGE_SIZE << L1D_CACHE_ORDER;
+ 
++	if (!static_branch_unlikely(&vmx_l1d_should_flush))
++		return false;
++
+ 	/*
+ 	 * This code is only executed when the flush mode is 'cond' or
+ 	 * 'always'
+@@ -434,6 +448,31 @@ static noinstr bool vmx_l1d_flush(struct kvm_vcpu *vcpu)
+ 	return true;
  }
  
--static void vmx_cleanup_l1d_flush(void)
--{
--	if (vmx_l1d_flush_pages) {
--		free_pages((unsigned long)vmx_l1d_flush_pages, L1D_CACHE_ORDER);
--		vmx_l1d_flush_pages = NULL;
--	}
--	/* Restore state so sysfs ignores VMX */
--	l1tf_vmx_mitigation = VMENTER_L1D_FLUSH_AUTO;
--}
--
- void vmx_exit(void)
- {
- 	allow_smaller_maxphyaddr = false;
++#else /* CONFIG_CPU_MITIGATIONS*/
++static int vmx_setup_l1d_flush(void)
++{
++	l1tf_vmx_mitigation = VMENTER_L1D_FLUSH_NEVER;
++	return 0;
++}
++static void vmx_cleanup_l1d_flush(void)
++{
++	l1tf_vmx_mitigation = VMENTER_L1D_FLUSH_AUTO;
++}
++static __always_inline bool vmx_l1d_flush(struct kvm_vcpu *vcpu)
++{
++	return false;
++}
++static int vmentry_l1d_flush_set(const char *s, const struct kernel_param *kp)
++{
++	pr_warn_once("Kernel compiled without mitigations, ignoring vmentry_l1d_flush\n");
++	return 0;
++}
++static int vmentry_l1d_flush_get(char *s, const struct kernel_param *kp)
++{
++	return sysfs_emit(s, "never\n");
++}
++#endif
++
+ static const struct kernel_param_ops vmentry_l1d_flush_ops = {
+ 	.set = vmentry_l1d_flush_set,
+ 	.get = vmentry_l1d_flush_get,
+@@ -7341,8 +7380,7 @@ static noinstr void vmx_vcpu_enter_exit(struct kvm_vcpu *vcpu,
+ 	 * and is affected by MMIO Stale Data. In such cases mitigation in only
+ 	 * needed against an MMIO capable guest.
+ 	 */
+-	if (static_branch_unlikely(&vmx_l1d_should_flush) &&
+-	    vmx_l1d_flush(vcpu))
++	if (vmx_l1d_flush(vcpu))
+ 		;
+ 	else if (static_branch_unlikely(&cpu_buf_vm_clear) &&
+ 		 (flags & VMX_RUN_CLEAR_CPU_BUFFERS_FOR_MMIO))
+@@ -8718,14 +8756,8 @@ int __init vmx_init(void)
+ 	if (r)
+ 		return r;
+ 
+-	/*
+-	 * Must be called after common x86 init so enable_ept is properly set
+-	 * up. Hand the parameter mitigation value in which was stored in
+-	 * the pre module init parser. If no parameter was given, it will
+-	 * contain 'auto' which will be turned into the default 'cond'
+-	 * mitigation mode.
+-	 */
+-	r = vmx_setup_l1d_flush(vmentry_l1d_flush_param);
++	/* Must be called after common x86 init so enable_ept is setup. */
++	r = vmx_setup_l1d_flush();
+ 	if (r)
+ 		goto err_l1d_flush;
+ 
 -- 
 2.51.0.858.gf9c4a03a3a-goog
 
