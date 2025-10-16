@@ -1,43 +1,44 @@
-Return-Path: <kvm+bounces-60195-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-60197-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id A512FBE4DEE
-	for <lists+kvm@lfdr.de>; Thu, 16 Oct 2025 19:38:22 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 545CCBE4DF1
+	for <lists+kvm@lfdr.de>; Thu, 16 Oct 2025 19:38:29 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 208514EEED0
-	for <lists+kvm@lfdr.de>; Thu, 16 Oct 2025 17:38:20 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id BC3095E037A
+	for <lists+kvm@lfdr.de>; Thu, 16 Oct 2025 17:38:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AB4F5218ADD;
-	Thu, 16 Oct 2025 17:38:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D063922126C;
+	Thu, 16 Oct 2025 17:38:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=unpredictable.fr header.i=@unpredictable.fr header.b="eAgyuSt7"
+	dkim=pass (2048-bit key) header.d=unpredictable.fr header.i=@unpredictable.fr header.b="cS+ih9jv"
 X-Original-To: kvm@vger.kernel.org
-Received: from outbound.st.icloud.com (p-east2-cluster6-host11-snip4-8.eps.apple.com [57.103.76.239])
+Received: from outbound.st.icloud.com (p-east2-cluster2-host11-snip4-4.eps.apple.com [57.103.78.87])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A56DCEED8
-	for <kvm@vger.kernel.org>; Thu, 16 Oct 2025 17:38:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=57.103.76.239
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ECBEC17C21E
+	for <kvm@vger.kernel.org>; Thu, 16 Oct 2025 17:38:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=57.103.78.87
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1760636295; cv=none; b=VhfXKXXzUhe1Dw8Cb8eeYbvVwp5JzG7Fow/RoruCLD2xIwXyHopOmj2aPFL8sXLi6BO3e4VxZoh17KqoFVpz69ASEEEf3WWSH8hqdm17TXI/EGUacGpGcIu8mTD+pkSu48IVe8D3rdhnzEvxutyEs5ml7jpzwkF3fnjOU9Du82k=
+	t=1760636301; cv=none; b=FgQPQyBDDSiGImY3u/nt/benY/c2kkp5PzQgDaUxxuMmljbPPpt1ef/hLzFbRxSLRE52dzHdR0rVEjfA0/BU0HoC8DCzOCnvhOG+jrR1IEWv2gH4deGkKccLTmPwqefVwgVAZPRXpr6FAvyLbP2BxYhcrgmnJsy63x18ifkFVlU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1760636295; c=relaxed/simple;
-	bh=4Ri9D957C6yUVMgRfwA7qpVoAqX8J2DOvAf0/Hia83Q=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=mrlVVYo0nbSLwGpHQVOiWjp45xu+g0zABEyd+qPJjhOdwADr+RL5km8QgerZTTc2D0RZ0UK2ymvv/ZVY8nx247BorLQJRpy+dk+28/JCAln1YVN67ctBGcH84xU8fr96EocQ7l1GddfSDTKJbio2rV/4ugu1Q7zUxLEeg7zK+1Y=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=unpredictable.fr; spf=pass smtp.mailfrom=unpredictable.fr; dkim=pass (2048-bit key) header.d=unpredictable.fr header.i=@unpredictable.fr header.b=eAgyuSt7; arc=none smtp.client-ip=57.103.76.239
+	s=arc-20240116; t=1760636301; c=relaxed/simple;
+	bh=ai4ODpsqO1gMvgwD2fkvZWLvAlsPl5DJmXMxKtRNPok=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=D6vGJG+SzVgMtfD6nBL8QsvXmaPpgydrJMcmXn75XJMsQqiYsTDW2TIKZPVgAtKR8xQsLq+KNkrhQ2KRVLlDsGeObVDBLiuxOjrvcBjkdkO92PyJVbnTJxgwkeV8PZFHy1ZlG/M5RA/rHldn0NjoZ7da7tkFDrM1m3mhx0eTJkc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=unpredictable.fr; spf=pass smtp.mailfrom=unpredictable.fr; dkim=pass (2048-bit key) header.d=unpredictable.fr header.i=@unpredictable.fr header.b=cS+ih9jv; arc=none smtp.client-ip=57.103.78.87
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=unpredictable.fr
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=unpredictable.fr
 Received: from outbound.st.icloud.com (unknown [127.0.0.2])
-	by p00-icloudmta-asmtp-us-east-1a-100-percent-6 (Postfix) with ESMTPS id 485EA1800110;
-	Thu, 16 Oct 2025 17:38:09 +0000 (UTC)
-Dkim-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=unpredictable.fr; s=sig1; bh=TpZRPdKhUTjyuX0UqPOFFkd5b/O+tgyQUHZLONOBYCk=; h=From:To:Subject:Date:Message-ID:MIME-Version:Content-Type:x-icloud-hme; b=eAgyuSt7Fl/yzHBPMSLEBxExuS8+exh5wivynXnUxiTeymfKWSsClD7aK+4vwC/42Mfi5l9IJI0gFcWUMFMuDksaapxoIuv/5tddh56aB/MGFXnR6w5YSiqWdXQRXhRq1VZmXUMvrA1/VxlEFH+dvr5Pa70uNDiWd794wmHP9N9P7mJWE+8UX/IJR1Ji4WD+IOzMlrc0gAMI+fSqwY5sRVjHDbEU3601HS29FiWdr+Ah3XxNJOtdN7pSvsUM0BNZjp5ScGDuIqwxDLYjKjXPTb9PSGFVj6UHZkeoe80gkDh0tHygfneMTxAIqipj2oxdYHNNNtbZkpCNfy+fA/eqtA==
+	by p00-icloudmta-asmtp-us-east-1a-100-percent-6 (Postfix) with ESMTPS id 2DBD4180012B;
+	Thu, 16 Oct 2025 17:38:12 +0000 (UTC)
+Dkim-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=unpredictable.fr; s=sig1; bh=+fMggmtg/uZNHz3nywgemPAlDNuqwqAYkYrWDswgN9E=; h=From:To:Subject:Date:Message-ID:MIME-Version:x-icloud-hme; b=cS+ih9jv/76lSChvIrW19avSpSc4nLkuPcYgue5BOS7gfMQJOXg7sQNZs93RY3B44PXelfuW/3UInqTNVPDx+ItDMYIG+wi6yQtsQM5fO+m4qAITa922rOhk9s3zgPgLignodHkTqpF84eTO/hpmO+Pr8y2xiVkYVSyfh+6eD/CnqDY/7tDqifs+3AQs43NYnc53F6CdXs/Te5HGPKNk7sLx8d5i7+OFiDGQX6gyseB1XLDl2mP/DmyYWSC9NXDgV9823b+aO9c4fPNLI2gWZSHwupkgJOpG4qYztPfuu3k+NjnYNiN7quw7IXCMgiODA7xpSgps+ZOoxb65a5o3gQ==
 mail-alias-created-date: 1752046281608
 Received: from localhost.localdomain (unknown [17.42.251.67])
-	by p00-icloudmta-asmtp-us-east-1a-100-percent-6 (Postfix) with ESMTPSA id A2834180010F;
-	Thu, 16 Oct 2025 17:38:05 +0000 (UTC)
+	by p00-icloudmta-asmtp-us-east-1a-100-percent-6 (Postfix) with ESMTPSA id E9AF8180012D;
+	Thu, 16 Oct 2025 17:38:08 +0000 (UTC)
 From: Mohamed Mediouni <mohamed@unpredictable.fr>
 To: qemu-devel@nongnu.org
 Cc: qemu-arm@nongnu.org,
@@ -63,193 +64,62 @@ Cc: qemu-arm@nongnu.org,
 	Paolo Bonzini <pbonzini@redhat.com>,
 	Alexander Graf <agraf@csgraf.de>,
 	=?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>,
-	Pedro Barbuda <pbarbuda@microsoft.com>
-Subject: [PATCH v8 00/24] WHPX support for Arm
-Date: Thu, 16 Oct 2025 19:37:39 +0200
-Message-ID: <20251016173803.65764-1-mohamed@unpredictable.fr>
+	Pedro Barbuda <pbarbuda@microsoft.com>,
+	Sebastian Ott <sebott@redhat.com>,
+	Pierrick Bouvier <pierrick.bouvier@linaro.org>
+Subject: [PATCH v8 01/24] target/arm/kvm: add constants for new PSCI versions
+Date: Thu, 16 Oct 2025 19:37:40 +0200
+Message-ID: <20251016173803.65764-2-mohamed@unpredictable.fr>
 X-Mailer: git-send-email 2.50.1
+In-Reply-To: <20251016173803.65764-1-mohamed@unpredictable.fr>
+References: <20251016173803.65764-1-mohamed@unpredictable.fr>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 8bit
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUxMDE2MDEyOCBTYWx0ZWRfXxP7acZsq7Ng0
- ZGwMsHRBSsp4bacy6fOaEpXp0Mc6HoENCbzyhZJMU9RQT7HDhrCaR2r/ucAXY/5IDgDTPdv+dbH
- SEVMphdY9MFJrkb91MyGbrdWtXev0WPbugYX27jn+8g0RmIxJOC8C5Q+bQqiRUbqdWqGKoPfiyG
- f8MhxL6RTUGfZbqOYuD4LIZaxIa8rSvJ3Co6guuwF7/EvDMDjJerIGWC4G4ugbamNWy6UEYvhfU
- C1HHTzPLE/qVLv7XT6HIEdRZDjgjvqUe6t6sLRY1HRHuvRyAbDIZzH9Ww86BdCDFcmlYEp3c4=
-X-Proofpoint-GUID: 6XueHETvQdBRN20UcUvR5fK4X9zwgGUd
-X-Proofpoint-ORIG-GUID: 6XueHETvQdBRN20UcUvR5fK4X9zwgGUd
+X-Proofpoint-GUID: w8Z_qofoQvL0IK33_D3hQfhuXrMooicv
+X-Proofpoint-ORIG-GUID: w8Z_qofoQvL0IK33_D3hQfhuXrMooicv
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUxMDE2MDEyOCBTYWx0ZWRfX52N0Er/FPRQ/
+ T2y1aK4eEx7jrgO80dZBV1JoAuk6DvcFNS2Z9aUSIdalRIXihdBlnsdxwe6Fw+ZmPtjss1U1VjX
+ AgA+hsg1/4EviD+zWjAgb2PxunZY31VvfmGI61X75fd/PPV1EagEgJdfjWNjJ/935K+0X2VUQvr
+ BbF/PzAxiPCprRUhLZG2i5G+z9q4NNu1emQ8u5Ev47p1Q9IOeRE6m45XvXu3v70cK/jcJz3dreA
+ 71Ho1BSF1VoNxaqPHyIdQb1cCrYdJkq4ZurdcBPaBajZsLvqkamLUxHp0ry0+M++ACr9sdtuc=
 X-Proofpoint-Virus-Version: vendor=baseguard
  engine=ICAP:2.0.293,Aquarius:18.0.1121,Hydra:6.1.9,FMLib:17.12.80.40
  definitions=2025-10-16_03,2025-10-13_01,2025-03-28_01
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 mlxlogscore=999
- clxscore=1030 adultscore=0 mlxscore=0 spamscore=0 phishscore=0 bulkscore=0
- malwarescore=0 suspectscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.22.0-2506270000 definitions=main-2510160128
-X-JNJ: AAAAAAABaH72HdoZKULZDDPFUWIUPBdiFKkAT+lPewsoecxaMrjCCH+uHbCnleLvw6LHbhfznptnilXBEVpdKjfnCW82ik3ubxEhHQzPZao/0PebBW1nlRgYYsnseYpFKGCYi4hewbzvt2Zg91EiND76m0Ki3WsT0E1duduuCl8Lc79n1KMGBZlQnIYGl+fA5aT4zMa/ALvvQE7ruXnxh5ucLhz2u0kvpEiWJfKs6Px8SLjnY25Gcrdz8H2RK5QGsaEcgTvc7kSm5PMgPKwv+Rv3Ctj4Txi+W9OrSwtquxof4ca02znUvvtRs/vByYC0W5C/p3RVPbFi6/ozsFS1t+nnq/IrflNsIS6apeUSRu8+an/aooEvGj/r9OPem/A6d3yweVefJjW7DohVkIouGtUo24crSHyai9soiafo747/evxw3Q1896GmxDiNGd3aDFUtzjyBbdB6zS5LObFZ9uL9m0TbH8daalIimFcWz9QUTBwJj9mvuYgKaYin29PnE8iXqi7PRHFf+PVpTGShcMT0jq3D1Z/ubYWblf9F5QSkHgphRZsERuYyHnew0CqlBJzwEnOZg3q4xg+hMnIHGYCjwjgs4pHLM8C76m+kdNzR+Z5S9auC4C6LQgnXnCDBYBuuqCA3rz+k/utoqbqFgn2m64VbFN32EJ5DiXOr7LFeZEw2MYZdphNBnXFU6dud1takyy+tHehJj+QHfOkmDQEdDhoO2/9H3+AMM2NS2cgFHhTvb8bszzEYmuECakwnsg6+YbCdyPCSlQ8RiuxGwcBivyyuteHHMAgcnc8meQ/OLyEaGyuFdRDsDOwzONI4YSkLUKr8767XlHEGOOB+MokLiAUp+RakGtomC1BuWP6zBYLT5caRBkjzai7ctpLoJXvHFhjYvIOyWGyr6pCZ3H6sCung0hA=
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 bulkscore=0
+ clxscore=1030 malwarescore=0 mlxlogscore=900 suspectscore=0 mlxscore=0
+ spamscore=0 phishscore=0 adultscore=0 classifier=spam adjust=0 reason=mlx
+ scancount=1 engine=8.22.0-2506270000 definitions=main-2510160128
+X-JNJ: AAAAAAABIFdNmt6jXA8TdvfcIn70LRsn2nOCj9ypBjMsK4Hf/d1hDLBRAZ86v0IPXxYHl8fhWgm//ilIgZsZEKkZBqYg22rAtdEXiUn/BMFEk/7ewoNQbTa7MUom+TVM0qS6B5F5t7ArljTgsoi+7YoQaUoGTinYlybo+QsrQwk/Mz4NsjkbnzXtAmdwLbBbMyaYIwkD8QYAwBSqw3Wk9YO1gEjrxisqioEsINngsy1wYRI8QmChqDk3LcII+Ua/Sby8ugg1hE6JOSQh/6SnIChjjjjyg8xAwJ/y0knAtRzinMO6q40M+ZHJ+W4WZUzx/cWA8RnZVZEFsbR2G28Nzf1L7mC0aakxY0zWPT0S39pNPVBT80p1n2fRDW6gT7OBsD2i8ak8anuqia3Hq0a+s7kKO9Wfdm/4/Z3V+ScsFfsPxIl3vxAhxku9sy0YApkDe4CZX7DDTCmIVhCx5tqNJIt4vEdzCG3rCwRGbF358o9p144uz9jSPqnEatpO5WEQOpBgIUw/v7PatI07fmqVTDRyKnKiN4tx0s/iA4CLqxFlmdzie22Jt4js3FwnJj1Y4vyLc6JSfzXXZsTB+PGiBiSpJUC8SlhW9vTN8l6gFaNSxqS6HgRYqYUeqIW0DrdvaTO8IxphzMOF0+8BoZmOBFj/kWj3/tkTI4aqGc3y6xt+4ZR/aRC+iinzr19Qa7//J8HjxdT7ib87L59FjNy2HjVVfaZ5xexaG7NpQY+B+9Un5Q+b3DHs8FMEkOit5F3xVBj9fkx6EyyIFoMRM87KQ0gz3YYtVD+e6pTTRitFZdkkgUxk2t5iatN9wtHIeId0toKXeDJNLZnoWfg4EsGlOL43ZukTsA2Bw7/gbQme1vCxKzC1hX2bBdW4g7unHVzrVQPfLbTZ4f9bUKYKJzONmMJLZuDGzZSDr851
 
-Link to branch: https://github.com/mediouni-m/qemu whpx (tag for this submission: whpx-v8)
+From: Sebastian Ott <sebott@redhat.com>
 
-Missing features:
-- PSCI state sync with Hyper-V
-- Interrupt controller save-restore
-- SVE register sync
+Add constants for PSCI version 1_2 and 1_3.
 
-Known bugs:
-- reboots when multiple cores are enabled are currently broken
-- U-Boot still doesn't work (hangs when trying to parse firmware) but EDK2 does.
+Signed-off-by: Sebastian Ott <sebott@redhat.com>
 
-Note:
+Reviewed-by: Pierrick Bouvier <pierrick.bouvier@linaro.org>
+---
+ target/arm/kvm-consts.h | 2 ++
+ 1 file changed, 2 insertions(+)
 
-"target/arm/kvm: add constants for new PSCI versions" taken from the mailing list.
-
-"accel/system: Introduce hwaccel_enabled() helper" taken from the mailing list, added here
-as part of this series to make it compilable as a whole.
-
-"hw/arm: virt: add GICv2m for the case when ITS is not available" present in both the HVF
-vGIC and this series.
-
-And another note:
-Seems that unlike HVF there isn't direct correspondence between WHv registers and the actual register layout,
-so didn't do changes there to a sysreg.inc.
-
-Updates since v7:
-- Oops, fixing bug in "hw/arm: virt: cleanly fail on attempt to use the platform vGIC together with ITS".
-Other commits are unchanged.
-
-Updates since v6:
-- Rebasing
-- Fixing a bug in the GICv3+GICv2m case for ACPI table generation
-- getting rid of the slots infrastructure for memory management
-- Place the docs commit right after the "cleanly fail on attempt to run GICv3+GICv2m on an unsupported config" one
-as that's what switches ITS to a tristate.
-- Fixing a build issue when getting rid of the arch-specific arm64 hvf-stub.
-
-Updates since v5:
-- Rebasing
-- Address review comments
-- Rework ITS enablement to a tristate
-- On x86: move away from deprecated APIs to get/set APIC state
-
-Updates since v4:
-- Taking into account review comments
-- Add migration blocker in the vGICv3 code due to missing interrupt controller save/restore
-- Debug register sync
-
-Updates since v3:
-- Disabling SVE on WHPX
-- Taking into account review comments incl:
-
-- fixing x86 support
-- reduce the amount of __x86_64__ checks in common code to the minimum (winhvemulation)
-which can be reduced even further down the road.
-- generalize get_physical_address_range into something common between hvf and whpx
-
-Updates since v2:
-- Fixed up a rebase screwup for whpx-internal.h
-- Fixed ID_AA64ISAR1_EL1 and ID_AA64ISAR2_EL1 feature probe for -cpu host
-- Switched to ID_AA64PFR1_EL1/ID_AA64DFR0_EL1 instead of their non-AA64 variant
-
-Updates since v1:
-- Shutdowns and reboots
-- MPIDR_EL1 register sync
-- Fixing GICD_TYPER_LPIS value
-- IPA size clamping
-- -cpu host now implemented
-
-Mohamed Mediouni (22):
-  qtest: hw/arm: virt: skip ACPI test for ITS off
-  hw/arm: virt: add GICv2m for the case when ITS is not available
-  tests: data: update AArch64 ACPI tables
-  whpx: Move around files before introducing AArch64 support
-  whpx: reshuffle common code
-  whpx: ifdef out winhvemulation on non-x86_64
-  whpx: common: add WHPX_INTERCEPT_DEBUG_TRAPS define
-  hw, target, accel: whpx: change apic_in_platform to kernel_irqchip
-  whpx: interrupt controller support
-  whpx: add arm64 support
-  whpx: change memory management logic
-  target/arm: cpu: mark WHPX as supporting PSCI 1.3
-  hw/arm: virt: cleanly fail on attempt to use the platform vGIC
-    together with ITS
-  docs: arm: update virt machine model description
-  whpx: arm64: clamp down IPA size
-  hw/arm, accel/hvf, whpx: unify get_physical_address_range between WHPX
-    and HVF
-  whpx: arm64: implement -cpu host
-  target/arm: whpx: instantiate GIC early
-  whpx: arm64: gicv3: add migration blocker
-  whpx: enable arm64 builds
-  MAINTAINERS: update maintainers for WHPX
-  whpx: apic: use non-deprecated APIs to control interrupt controller
-    state
-
-Philippe Mathieu-Daudé (1):
-  accel/system: Introduce hwaccel_enabled() helper
-
-Sebastian Ott (1):
-  target/arm/kvm: add constants for new PSCI versions
-
- MAINTAINERS                                   |   11 +-
- accel/hvf/hvf-all.c                           |    7 +-
- accel/meson.build                             |    1 +
- accel/whpx/meson.build                        |    7 +
- {target/i386 => accel}/whpx/whpx-accel-ops.c  |    6 +-
- accel/whpx/whpx-common.c                      |  544 +++++++++
- docs/system/arm/virt.rst                      |   10 +-
- hw/arm/virt-acpi-build.c                      |   17 +-
- hw/arm/virt.c                                 |   70 +-
- hw/i386/x86-cpu.c                             |    4 +-
- hw/intc/arm_gicv3_common.c                    |    3 +
- hw/intc/arm_gicv3_whpx.c                      |  249 ++++
- hw/intc/meson.build                           |    1 +
- include/hw/arm/virt.h                         |    6 +-
- include/hw/boards.h                           |    3 +-
- include/hw/intc/arm_gicv3_common.h            |    3 +
- include/system/hvf_int.h                      |    2 +
- include/system/hw_accel.h                     |   13 +
- .../whpx => include/system}/whpx-accel-ops.h  |    4 +-
- include/system/whpx-all.h                     |   20 +
- include/system/whpx-common.h                  |   26 +
- .../whpx => include/system}/whpx-internal.h   |   23 +-
- include/system/whpx.h                         |    4 +-
- meson.build                                   |   20 +-
- target/arm/cpu.c                              |    3 +
- target/arm/cpu64.c                            |   19 +-
- target/arm/hvf-stub.c                         |   20 -
- target/arm/hvf/hvf.c                          |    6 +-
- target/arm/hvf_arm.h                          |    3 -
- target/arm/kvm-consts.h                       |    2 +
- target/arm/meson.build                        |    2 +-
- target/arm/whpx/meson.build                   |    5 +
- target/arm/whpx/whpx-all.c                    | 1018 +++++++++++++++++
- target/arm/whpx/whpx-stub.c                   |   15 +
- target/arm/whpx_arm.h                         |   17 +
- target/i386/cpu-apic.c                        |    2 +-
- target/i386/hvf/hvf.c                         |   11 +
- target/i386/whpx/meson.build                  |    1 -
- target/i386/whpx/whpx-all.c                   |  569 +--------
- target/i386/whpx/whpx-apic.c                  |   48 +-
- tests/data/acpi/aarch64/virt/APIC.its_off     |  Bin 164 -> 188 bytes
- 41 files changed, 2142 insertions(+), 653 deletions(-)
- create mode 100644 accel/whpx/meson.build
- rename {target/i386 => accel}/whpx/whpx-accel-ops.c (96%)
- create mode 100644 accel/whpx/whpx-common.c
- create mode 100644 hw/intc/arm_gicv3_whpx.c
- rename {target/i386/whpx => include/system}/whpx-accel-ops.h (92%)
- create mode 100644 include/system/whpx-all.h
- create mode 100644 include/system/whpx-common.h
- rename {target/i386/whpx => include/system}/whpx-internal.h (89%)
- delete mode 100644 target/arm/hvf-stub.c
- create mode 100644 target/arm/whpx/meson.build
- create mode 100644 target/arm/whpx/whpx-all.c
- create mode 100644 target/arm/whpx/whpx-stub.c
- create mode 100644 target/arm/whpx_arm.h
-
+diff --git a/target/arm/kvm-consts.h b/target/arm/kvm-consts.h
+index 54ae5da7ce..9fba3e886d 100644
+--- a/target/arm/kvm-consts.h
++++ b/target/arm/kvm-consts.h
+@@ -97,6 +97,8 @@ MISMATCH_CHECK(QEMU_PSCI_1_0_FN_PSCI_FEATURES, PSCI_1_0_FN_PSCI_FEATURES);
+ #define QEMU_PSCI_VERSION_0_2                     0x00002
+ #define QEMU_PSCI_VERSION_1_0                     0x10000
+ #define QEMU_PSCI_VERSION_1_1                     0x10001
++#define QEMU_PSCI_VERSION_1_2                     0x10002
++#define QEMU_PSCI_VERSION_1_3                     0x10003
+ 
+ MISMATCH_CHECK(QEMU_PSCI_0_2_RET_TOS_MIGRATION_NOT_REQUIRED, PSCI_0_2_TOS_MP);
+ /* We don't bother to check every possible version value */
 -- 
 2.50.1 (Apple Git-155)
 
