@@ -1,173 +1,256 @@
-Return-Path: <kvm+bounces-60194-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-60195-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id B3FCBBE4DD3
-	for <lists+kvm@lfdr.de>; Thu, 16 Oct 2025 19:33:46 +0200 (CEST)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
+	by mail.lfdr.de (Postfix) with ESMTPS id A512FBE4DEE
+	for <lists+kvm@lfdr.de>; Thu, 16 Oct 2025 19:38:22 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 053845E114C
-	for <lists+kvm@lfdr.de>; Thu, 16 Oct 2025 17:33:34 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 208514EEED0
+	for <lists+kvm@lfdr.de>; Thu, 16 Oct 2025 17:38:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 85C3B34F46E;
-	Thu, 16 Oct 2025 17:30:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AB4F5218ADD;
+	Thu, 16 Oct 2025 17:38:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="l41+waih"
+	dkim=pass (2048-bit key) header.d=unpredictable.fr header.i=@unpredictable.fr header.b="eAgyuSt7"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pg1-f202.google.com (mail-pg1-f202.google.com [209.85.215.202])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from outbound.st.icloud.com (p-east2-cluster6-host11-snip4-8.eps.apple.com [57.103.76.239])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2CF7C3431E0
-	for <kvm@vger.kernel.org>; Thu, 16 Oct 2025 17:30:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A56DCEED8
+	for <kvm@vger.kernel.org>; Thu, 16 Oct 2025 17:38:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=57.103.76.239
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1760635831; cv=none; b=oaUvsrI68Fak+pBc3Yqbzx1XB6YTeD20uExD5X4zs0pPNpbWMmFJN0Didip3+GocCeZwJ78B54bOFsoU0OV1qKBeialNYL5hb2yp0tS4uTOgmq7dlaEM+YeUxaXkSml/bqLoI5pNQ7YoLkTGPYB2NB7+5Jeg65p81psAohinxzM=
+	t=1760636295; cv=none; b=VhfXKXXzUhe1Dw8Cb8eeYbvVwp5JzG7Fow/RoruCLD2xIwXyHopOmj2aPFL8sXLi6BO3e4VxZoh17KqoFVpz69ASEEEf3WWSH8hqdm17TXI/EGUacGpGcIu8mTD+pkSu48IVe8D3rdhnzEvxutyEs5ml7jpzwkF3fnjOU9Du82k=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1760635831; c=relaxed/simple;
-	bh=u73IkWxovHfIqFa1WeugdviVlKOG53gOaetPwlyyztU=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=NRTiprH/FG2xjxlfhcmvQ3gqnFUM+8W0xhu2zfxzy8Z9zN3tFo64E6AceYuL0Bt2auzWGkTkcjXDUzRokrrHg/8K6hPBm5+sOUEkwoxUr6Htee80ZgpsYpXntq6BG6v4JDQko48ONgpgsRuLox8MHRhNQFyWKgWWBrznBs/uphU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=l41+waih; arc=none smtp.client-ip=209.85.215.202
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pg1-f202.google.com with SMTP id 41be03b00d2f7-b6097ca315bso1569183a12.3
-        for <kvm@vger.kernel.org>; Thu, 16 Oct 2025 10:30:30 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1760635829; x=1761240629; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:reply-to:from:to:cc:subject:date:message-id:reply-to;
-        bh=hVBqs1fBWLjUqhKekNBXs2j0fRJmcNGrbmsvLjXeKrQ=;
-        b=l41+waihuLTGtQNanwUNjhCuRxkZ3+g4RHJUpXsuNF66JXDSDFLirRAffRqPLKh+8n
-         undGXyArwk7vBbUulc9lUPCFIjqedupCtRNwtY4kFF+AScEWT4wYWc56Dh8CiA23P5Wl
-         rK+yNE/zrFx4lpAbLZaRjAbostWFNoaTTyphDGopvTe0G+a0ppjKOC6FE6XID50SJkOk
-         nS7+GicXjfA9TraLlg0zgh+plotiBHZqcL3wGallJCFfBshgqBNyLXY1y7Ne4gd47pz8
-         cwX5TWZe9oScoxZcVXOPPqtdOuTrMp09yaHcJKC/aJVuQlFMQ9na7izAYaTJTveg8yTQ
-         xAGA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1760635829; x=1761240629;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:reply-to:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=hVBqs1fBWLjUqhKekNBXs2j0fRJmcNGrbmsvLjXeKrQ=;
-        b=jbjdGkuVmt0heAOUZngsYgSYOnCP5y9XWWKIz1oCT5Mwm/Mb5D15yG65IXB6RfXN6b
-         FuXUSnArbXKldExPiA41mmYFjtxrBqluVE3AIlwW6A7MrOuAjwa5yvW875RM1pcZH2Tu
-         0rZZ8B2tMTWG2w5WzGqZLA2/oryoW3I83gBC5z/HDHVyRAUt5T3rU0T0raAkXM0CBPik
-         UZjAir++GolUQEhzZJPtU3wq+yKQYW8yCaXsEFI3sh3wxWoocnpF55n8WkRUQJSmGSG8
-         DQjMkGrkK+6972PzvVitIoQOHOqpbQeAlAam68XQwTgL1u+RLjAFnD3J7q8GEpyu34dr
-         bKUQ==
-X-Forwarded-Encrypted: i=1; AJvYcCVtBJuzQwISK5ai3XxxUWUBem5TCP614C7FS9xwGpXIMBiZAFgK+8d4g6FgJ2fsY1XRpVU=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxtBoQ74HKaHyNE7v9XzWCaqafCLKxEFpx7jLh1kHdJLChCr0eM
-	43zPssu+jVlKKMt9YMeYw34uwj8xDdR+fHgt8nj1qv5sd8Liyr0zi02C741U6bmZj8MyhnN8wmP
-	LguAUtQ==
-X-Google-Smtp-Source: AGHT+IGe2t05unDim4uDryBf0T+QferPUXjPaV2LK4Nd4NgexnAWeTiux+wqiz6ZgBu9e+7IBbrnySiYCWM=
-X-Received: from pja6.prod.google.com ([2002:a17:90b:5486:b0:33b:51fe:1a79])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a05:6a20:2590:b0:2e0:9b1a:640a
- with SMTP id adf61e73a8af0-334a8485506mr977560637.3.1760635829602; Thu, 16
- Oct 2025 10:30:29 -0700 (PDT)
-Reply-To: Sean Christopherson <seanjc@google.com>
-Date: Thu, 16 Oct 2025 10:28:53 -0700
-In-Reply-To: <20251016172853.52451-1-seanjc@google.com>
+	s=arc-20240116; t=1760636295; c=relaxed/simple;
+	bh=4Ri9D957C6yUVMgRfwA7qpVoAqX8J2DOvAf0/Hia83Q=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=mrlVVYo0nbSLwGpHQVOiWjp45xu+g0zABEyd+qPJjhOdwADr+RL5km8QgerZTTc2D0RZ0UK2ymvv/ZVY8nx247BorLQJRpy+dk+28/JCAln1YVN67ctBGcH84xU8fr96EocQ7l1GddfSDTKJbio2rV/4ugu1Q7zUxLEeg7zK+1Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=unpredictable.fr; spf=pass smtp.mailfrom=unpredictable.fr; dkim=pass (2048-bit key) header.d=unpredictable.fr header.i=@unpredictable.fr header.b=eAgyuSt7; arc=none smtp.client-ip=57.103.76.239
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=unpredictable.fr
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=unpredictable.fr
+Received: from outbound.st.icloud.com (unknown [127.0.0.2])
+	by p00-icloudmta-asmtp-us-east-1a-100-percent-6 (Postfix) with ESMTPS id 485EA1800110;
+	Thu, 16 Oct 2025 17:38:09 +0000 (UTC)
+Dkim-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=unpredictable.fr; s=sig1; bh=TpZRPdKhUTjyuX0UqPOFFkd5b/O+tgyQUHZLONOBYCk=; h=From:To:Subject:Date:Message-ID:MIME-Version:Content-Type:x-icloud-hme; b=eAgyuSt7Fl/yzHBPMSLEBxExuS8+exh5wivynXnUxiTeymfKWSsClD7aK+4vwC/42Mfi5l9IJI0gFcWUMFMuDksaapxoIuv/5tddh56aB/MGFXnR6w5YSiqWdXQRXhRq1VZmXUMvrA1/VxlEFH+dvr5Pa70uNDiWd794wmHP9N9P7mJWE+8UX/IJR1Ji4WD+IOzMlrc0gAMI+fSqwY5sRVjHDbEU3601HS29FiWdr+Ah3XxNJOtdN7pSvsUM0BNZjp5ScGDuIqwxDLYjKjXPTb9PSGFVj6UHZkeoe80gkDh0tHygfneMTxAIqipj2oxdYHNNNtbZkpCNfy+fA/eqtA==
+mail-alias-created-date: 1752046281608
+Received: from localhost.localdomain (unknown [17.42.251.67])
+	by p00-icloudmta-asmtp-us-east-1a-100-percent-6 (Postfix) with ESMTPSA id A2834180010F;
+	Thu, 16 Oct 2025 17:38:05 +0000 (UTC)
+From: Mohamed Mediouni <mohamed@unpredictable.fr>
+To: qemu-devel@nongnu.org
+Cc: qemu-arm@nongnu.org,
+	kvm@vger.kernel.org,
+	Richard Henderson <richard.henderson@linaro.org>,
+	Sunil Muthuswamy <sunilmut@microsoft.com>,
+	"Michael S. Tsirkin" <mst@redhat.com>,
+	=?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@linaro.org>,
+	=?UTF-8?q?Daniel=20P=2E=20Berrang=C3=A9?= <berrange@redhat.com>,
+	Eduardo Habkost <eduardo@habkost.net>,
+	Igor Mammedov <imammedo@redhat.com>,
+	Yanan Wang <wangyanan55@huawei.com>,
+	Ani Sinha <anisinha@redhat.com>,
+	Shannon Zhao <shannon.zhaosl@gmail.com>,
+	Cameron Esfahani <dirty@apple.com>,
+	Mads Ynddal <mads@ynddal.dk>,
+	Zhao Liu <zhao1.liu@intel.com>,
+	Phil Dennis-Jordan <phil@philjordan.eu>,
+	Roman Bolshakov <rbolshakov@ddn.com>,
+	Peter Maydell <peter.maydell@linaro.org>,
+	Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
+	Mohamed Mediouni <mohamed@unpredictable.fr>,
+	Paolo Bonzini <pbonzini@redhat.com>,
+	Alexander Graf <agraf@csgraf.de>,
+	=?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>,
+	Pedro Barbuda <pbarbuda@microsoft.com>
+Subject: [PATCH v8 00/24] WHPX support for Arm
+Date: Thu, 16 Oct 2025 19:37:39 +0200
+Message-ID: <20251016173803.65764-1-mohamed@unpredictable.fr>
+X-Mailer: git-send-email 2.50.1
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20251016172853.52451-1-seanjc@google.com>
-X-Mailer: git-send-email 2.51.0.858.gf9c4a03a3a-goog
-Message-ID: <20251016172853.52451-13-seanjc@google.com>
-Subject: [PATCH v13 12/12] KVM: guest_memfd: Add gmem_inode.flags field
- instead of using i_private
-From: Sean Christopherson <seanjc@google.com>
-To: Miguel Ojeda <ojeda@kernel.org>, Marc Zyngier <maz@kernel.org>, 
-	Oliver Upton <oliver.upton@linux.dev>, Paolo Bonzini <pbonzini@redhat.com>, 
-	Sean Christopherson <seanjc@google.com>
-Cc: linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, 
-	kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	Ackerley Tng <ackerleytng@google.com>, Shivank Garg <shivankg@amd.com>, 
-	David Hildenbrand <david@redhat.com>, Fuad Tabba <tabba@google.com>, Ashish Kalra <ashish.kalra@amd.com>, 
-	Vlastimil Babka <vbabka@suse.cz>
-Content-Type: text/plain; charset="UTF-8"
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 8bit
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUxMDE2MDEyOCBTYWx0ZWRfXxP7acZsq7Ng0
+ ZGwMsHRBSsp4bacy6fOaEpXp0Mc6HoENCbzyhZJMU9RQT7HDhrCaR2r/ucAXY/5IDgDTPdv+dbH
+ SEVMphdY9MFJrkb91MyGbrdWtXev0WPbugYX27jn+8g0RmIxJOC8C5Q+bQqiRUbqdWqGKoPfiyG
+ f8MhxL6RTUGfZbqOYuD4LIZaxIa8rSvJ3Co6guuwF7/EvDMDjJerIGWC4G4ugbamNWy6UEYvhfU
+ C1HHTzPLE/qVLv7XT6HIEdRZDjgjvqUe6t6sLRY1HRHuvRyAbDIZzH9Ww86BdCDFcmlYEp3c4=
+X-Proofpoint-GUID: 6XueHETvQdBRN20UcUvR5fK4X9zwgGUd
+X-Proofpoint-ORIG-GUID: 6XueHETvQdBRN20UcUvR5fK4X9zwgGUd
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1121,Hydra:6.1.9,FMLib:17.12.80.40
+ definitions=2025-10-16_03,2025-10-13_01,2025-03-28_01
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 mlxlogscore=999
+ clxscore=1030 adultscore=0 mlxscore=0 spamscore=0 phishscore=0 bulkscore=0
+ malwarescore=0 suspectscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.22.0-2506270000 definitions=main-2510160128
+X-JNJ: AAAAAAABaH72HdoZKULZDDPFUWIUPBdiFKkAT+lPewsoecxaMrjCCH+uHbCnleLvw6LHbhfznptnilXBEVpdKjfnCW82ik3ubxEhHQzPZao/0PebBW1nlRgYYsnseYpFKGCYi4hewbzvt2Zg91EiND76m0Ki3WsT0E1duduuCl8Lc79n1KMGBZlQnIYGl+fA5aT4zMa/ALvvQE7ruXnxh5ucLhz2u0kvpEiWJfKs6Px8SLjnY25Gcrdz8H2RK5QGsaEcgTvc7kSm5PMgPKwv+Rv3Ctj4Txi+W9OrSwtquxof4ca02znUvvtRs/vByYC0W5C/p3RVPbFi6/ozsFS1t+nnq/IrflNsIS6apeUSRu8+an/aooEvGj/r9OPem/A6d3yweVefJjW7DohVkIouGtUo24crSHyai9soiafo747/evxw3Q1896GmxDiNGd3aDFUtzjyBbdB6zS5LObFZ9uL9m0TbH8daalIimFcWz9QUTBwJj9mvuYgKaYin29PnE8iXqi7PRHFf+PVpTGShcMT0jq3D1Z/ubYWblf9F5QSkHgphRZsERuYyHnew0CqlBJzwEnOZg3q4xg+hMnIHGYCjwjgs4pHLM8C76m+kdNzR+Z5S9auC4C6LQgnXnCDBYBuuqCA3rz+k/utoqbqFgn2m64VbFN32EJ5DiXOr7LFeZEw2MYZdphNBnXFU6dud1takyy+tHehJj+QHfOkmDQEdDhoO2/9H3+AMM2NS2cgFHhTvb8bszzEYmuECakwnsg6+YbCdyPCSlQ8RiuxGwcBivyyuteHHMAgcnc8meQ/OLyEaGyuFdRDsDOwzONI4YSkLUKr8767XlHEGOOB+MokLiAUp+RakGtomC1BuWP6zBYLT5caRBkjzai7ctpLoJXvHFhjYvIOyWGyr6pCZ3H6sCung0hA=
 
-Track a guest_memfd instance's flags in gmem_inode instead of burying them
-in i_private.  Burning an extra 8 bytes per inode is well worth the added
-clarity provided by explicit tracking.
+Link to branch: https://github.com/mediouni-m/qemu whpx (tag for this submission: whpx-v8)
 
-Signed-off-by: Sean Christopherson <seanjc@google.com>
----
- virt/kvm/guest_memfd.c | 15 +++++++++------
- 1 file changed, 9 insertions(+), 6 deletions(-)
+Missing features:
+- PSCI state sync with Hyper-V
+- Interrupt controller save-restore
+- SVE register sync
 
-diff --git a/virt/kvm/guest_memfd.c b/virt/kvm/guest_memfd.c
-index 4463643bd0a2..20f6e7fab58d 100644
---- a/virt/kvm/guest_memfd.c
-+++ b/virt/kvm/guest_memfd.c
-@@ -30,6 +30,8 @@ struct gmem_file {
- struct gmem_inode {
- 	struct shared_policy policy;
- 	struct inode vfs_inode;
-+
-+	u64 flags;
- };
- 
- static __always_inline struct gmem_inode *GMEM_I(struct inode *inode)
-@@ -154,7 +156,7 @@ static struct folio *kvm_gmem_get_folio(struct inode *inode, pgoff_t index)
- 
- static enum kvm_gfn_range_filter kvm_gmem_get_invalidate_filter(struct inode *inode)
- {
--	if ((u64)inode->i_private & GUEST_MEMFD_FLAG_INIT_SHARED)
-+	if (GMEM_I(inode)->flags & GUEST_MEMFD_FLAG_INIT_SHARED)
- 		return KVM_FILTER_SHARED;
- 
- 	return KVM_FILTER_PRIVATE;
-@@ -385,9 +387,7 @@ static inline struct file *kvm_gmem_get_file(struct kvm_memory_slot *slot)
- 
- static bool kvm_gmem_supports_mmap(struct inode *inode)
- {
--	const u64 flags = (u64)inode->i_private;
--
--	return flags & GUEST_MEMFD_FLAG_MMAP;
-+	return GMEM_I(inode)->flags & GUEST_MEMFD_FLAG_MMAP;
- }
- 
- static vm_fault_t kvm_gmem_fault_user_mapping(struct vm_fault *vmf)
-@@ -399,7 +399,7 @@ static vm_fault_t kvm_gmem_fault_user_mapping(struct vm_fault *vmf)
- 	if (((loff_t)vmf->pgoff << PAGE_SHIFT) >= i_size_read(inode))
- 		return VM_FAULT_SIGBUS;
- 
--	if (!((u64)inode->i_private & GUEST_MEMFD_FLAG_INIT_SHARED))
-+	if (!(GMEM_I(inode)->flags & GUEST_MEMFD_FLAG_INIT_SHARED))
- 		return VM_FAULT_SIGBUS;
- 
- 	folio = kvm_gmem_get_folio(inode, vmf->pgoff);
-@@ -588,7 +588,6 @@ static int __kvm_gmem_create(struct kvm *kvm, loff_t size, u64 flags)
- 		goto err_fops;
- 	}
- 
--	inode->i_private = (void *)(unsigned long)flags;
- 	inode->i_op = &kvm_gmem_iops;
- 	inode->i_mapping->a_ops = &kvm_gmem_aops;
- 	inode->i_mode |= S_IFREG;
-@@ -598,6 +597,8 @@ static int __kvm_gmem_create(struct kvm *kvm, loff_t size, u64 flags)
- 	/* Unmovable mappings are supposed to be marked unevictable as well. */
- 	WARN_ON_ONCE(!mapping_unevictable(inode->i_mapping));
- 
-+	GMEM_I(inode)->flags = flags;
-+
- 	file = alloc_file_pseudo(inode, kvm_gmem_mnt, name, O_RDWR, &kvm_gmem_fops);
- 	if (IS_ERR(file)) {
- 		err = PTR_ERR(file);
-@@ -917,6 +918,8 @@ static struct inode *kvm_gmem_alloc_inode(struct super_block *sb)
- 		return NULL;
- 
- 	mpol_shared_policy_init(&gi->policy, NULL);
-+
-+	gi->flags = 0;
- 	return &gi->vfs_inode;
- }
- 
+Known bugs:
+- reboots when multiple cores are enabled are currently broken
+- U-Boot still doesn't work (hangs when trying to parse firmware) but EDK2 does.
+
+Note:
+
+"target/arm/kvm: add constants for new PSCI versions" taken from the mailing list.
+
+"accel/system: Introduce hwaccel_enabled() helper" taken from the mailing list, added here
+as part of this series to make it compilable as a whole.
+
+"hw/arm: virt: add GICv2m for the case when ITS is not available" present in both the HVF
+vGIC and this series.
+
+And another note:
+Seems that unlike HVF there isn't direct correspondence between WHv registers and the actual register layout,
+so didn't do changes there to a sysreg.inc.
+
+Updates since v7:
+- Oops, fixing bug in "hw/arm: virt: cleanly fail on attempt to use the platform vGIC together with ITS".
+Other commits are unchanged.
+
+Updates since v6:
+- Rebasing
+- Fixing a bug in the GICv3+GICv2m case for ACPI table generation
+- getting rid of the slots infrastructure for memory management
+- Place the docs commit right after the "cleanly fail on attempt to run GICv3+GICv2m on an unsupported config" one
+as that's what switches ITS to a tristate.
+- Fixing a build issue when getting rid of the arch-specific arm64 hvf-stub.
+
+Updates since v5:
+- Rebasing
+- Address review comments
+- Rework ITS enablement to a tristate
+- On x86: move away from deprecated APIs to get/set APIC state
+
+Updates since v4:
+- Taking into account review comments
+- Add migration blocker in the vGICv3 code due to missing interrupt controller save/restore
+- Debug register sync
+
+Updates since v3:
+- Disabling SVE on WHPX
+- Taking into account review comments incl:
+
+- fixing x86 support
+- reduce the amount of __x86_64__ checks in common code to the minimum (winhvemulation)
+which can be reduced even further down the road.
+- generalize get_physical_address_range into something common between hvf and whpx
+
+Updates since v2:
+- Fixed up a rebase screwup for whpx-internal.h
+- Fixed ID_AA64ISAR1_EL1 and ID_AA64ISAR2_EL1 feature probe for -cpu host
+- Switched to ID_AA64PFR1_EL1/ID_AA64DFR0_EL1 instead of their non-AA64 variant
+
+Updates since v1:
+- Shutdowns and reboots
+- MPIDR_EL1 register sync
+- Fixing GICD_TYPER_LPIS value
+- IPA size clamping
+- -cpu host now implemented
+
+Mohamed Mediouni (22):
+  qtest: hw/arm: virt: skip ACPI test for ITS off
+  hw/arm: virt: add GICv2m for the case when ITS is not available
+  tests: data: update AArch64 ACPI tables
+  whpx: Move around files before introducing AArch64 support
+  whpx: reshuffle common code
+  whpx: ifdef out winhvemulation on non-x86_64
+  whpx: common: add WHPX_INTERCEPT_DEBUG_TRAPS define
+  hw, target, accel: whpx: change apic_in_platform to kernel_irqchip
+  whpx: interrupt controller support
+  whpx: add arm64 support
+  whpx: change memory management logic
+  target/arm: cpu: mark WHPX as supporting PSCI 1.3
+  hw/arm: virt: cleanly fail on attempt to use the platform vGIC
+    together with ITS
+  docs: arm: update virt machine model description
+  whpx: arm64: clamp down IPA size
+  hw/arm, accel/hvf, whpx: unify get_physical_address_range between WHPX
+    and HVF
+  whpx: arm64: implement -cpu host
+  target/arm: whpx: instantiate GIC early
+  whpx: arm64: gicv3: add migration blocker
+  whpx: enable arm64 builds
+  MAINTAINERS: update maintainers for WHPX
+  whpx: apic: use non-deprecated APIs to control interrupt controller
+    state
+
+Philippe Mathieu-Daudé (1):
+  accel/system: Introduce hwaccel_enabled() helper
+
+Sebastian Ott (1):
+  target/arm/kvm: add constants for new PSCI versions
+
+ MAINTAINERS                                   |   11 +-
+ accel/hvf/hvf-all.c                           |    7 +-
+ accel/meson.build                             |    1 +
+ accel/whpx/meson.build                        |    7 +
+ {target/i386 => accel}/whpx/whpx-accel-ops.c  |    6 +-
+ accel/whpx/whpx-common.c                      |  544 +++++++++
+ docs/system/arm/virt.rst                      |   10 +-
+ hw/arm/virt-acpi-build.c                      |   17 +-
+ hw/arm/virt.c                                 |   70 +-
+ hw/i386/x86-cpu.c                             |    4 +-
+ hw/intc/arm_gicv3_common.c                    |    3 +
+ hw/intc/arm_gicv3_whpx.c                      |  249 ++++
+ hw/intc/meson.build                           |    1 +
+ include/hw/arm/virt.h                         |    6 +-
+ include/hw/boards.h                           |    3 +-
+ include/hw/intc/arm_gicv3_common.h            |    3 +
+ include/system/hvf_int.h                      |    2 +
+ include/system/hw_accel.h                     |   13 +
+ .../whpx => include/system}/whpx-accel-ops.h  |    4 +-
+ include/system/whpx-all.h                     |   20 +
+ include/system/whpx-common.h                  |   26 +
+ .../whpx => include/system}/whpx-internal.h   |   23 +-
+ include/system/whpx.h                         |    4 +-
+ meson.build                                   |   20 +-
+ target/arm/cpu.c                              |    3 +
+ target/arm/cpu64.c                            |   19 +-
+ target/arm/hvf-stub.c                         |   20 -
+ target/arm/hvf/hvf.c                          |    6 +-
+ target/arm/hvf_arm.h                          |    3 -
+ target/arm/kvm-consts.h                       |    2 +
+ target/arm/meson.build                        |    2 +-
+ target/arm/whpx/meson.build                   |    5 +
+ target/arm/whpx/whpx-all.c                    | 1018 +++++++++++++++++
+ target/arm/whpx/whpx-stub.c                   |   15 +
+ target/arm/whpx_arm.h                         |   17 +
+ target/i386/cpu-apic.c                        |    2 +-
+ target/i386/hvf/hvf.c                         |   11 +
+ target/i386/whpx/meson.build                  |    1 -
+ target/i386/whpx/whpx-all.c                   |  569 +--------
+ target/i386/whpx/whpx-apic.c                  |   48 +-
+ tests/data/acpi/aarch64/virt/APIC.its_off     |  Bin 164 -> 188 bytes
+ 41 files changed, 2142 insertions(+), 653 deletions(-)
+ create mode 100644 accel/whpx/meson.build
+ rename {target/i386 => accel}/whpx/whpx-accel-ops.c (96%)
+ create mode 100644 accel/whpx/whpx-common.c
+ create mode 100644 hw/intc/arm_gicv3_whpx.c
+ rename {target/i386/whpx => include/system}/whpx-accel-ops.h (92%)
+ create mode 100644 include/system/whpx-all.h
+ create mode 100644 include/system/whpx-common.h
+ rename {target/i386/whpx => include/system}/whpx-internal.h (89%)
+ delete mode 100644 target/arm/hvf-stub.c
+ create mode 100644 target/arm/whpx/meson.build
+ create mode 100644 target/arm/whpx/whpx-all.c
+ create mode 100644 target/arm/whpx/whpx-stub.c
+ create mode 100644 target/arm/whpx_arm.h
+
 -- 
-2.51.0.858.gf9c4a03a3a-goog
+2.50.1 (Apple Git-155)
 
 
