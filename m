@@ -1,72 +1,72 @@
-Return-Path: <kvm+bounces-60187-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-60188-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id A48E8BE4DA9
-	for <lists+kvm@lfdr.de>; Thu, 16 Oct 2025 19:31:52 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 24849BE4DAC
+	for <lists+kvm@lfdr.de>; Thu, 16 Oct 2025 19:32:14 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 00FD04FC255
-	for <lists+kvm@lfdr.de>; Thu, 16 Oct 2025 17:31:38 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 82540188D314
+	for <lists+kvm@lfdr.de>; Thu, 16 Oct 2025 17:32:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DA1FE32B984;
-	Thu, 16 Oct 2025 17:30:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B3097328B4B;
+	Thu, 16 Oct 2025 17:30:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="CJFEjWk3"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="VUJF1wka"
 X-Original-To: kvm@vger.kernel.org
 Received: from mail-pj1-f74.google.com (mail-pj1-f74.google.com [209.85.216.74])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 06610328B7D
-	for <kvm@vger.kernel.org>; Thu, 16 Oct 2025 17:30:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 860D532AACB
+	for <kvm@vger.kernel.org>; Thu, 16 Oct 2025 17:30:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.74
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1760635819; cv=none; b=QIIys+B59Zbei6EL1RAfRbvu7UYqY56vEjdH3ggpKrye5+dIY/ZYILUWRU+7laTQDELV/E0SEChju/36fP0lXp1wO3RYA07KzrB8pV5evzgL9P0IDx0bMbNrSeKxoWxY1hpXdaC1EJHg4T4Tz3rkNr+L8Y47efCiBW6xPtn90Xk=
+	t=1760635821; cv=none; b=RrioDJmzToQNC8JneqoQ72Kthm97208hHHeJfPS6OSiWsv0FvpCpXlfj8nOBRVqT46k5sMtbwdcDbKnlqPuwdAfsH0CsBynmzeYeS8UcjD/h3/Cg3bUudjJcOcps9/dHv5vd/m471b/T+EUsSXmblihQ0LqAbUJgJyiul1JnKlE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1760635819; c=relaxed/simple;
-	bh=oHD/pKXISr1Mkv48AhXYU4x8PV/y8rOdGSwdWWYiawI=;
+	s=arc-20240116; t=1760635821; c=relaxed/simple;
+	bh=dwGxIOLEPMr2dhko2M676IglqRZf5rDhepZ4Jr5ppnY=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=lM01rfPVP8nkiJO3t8Skb/krYaGWQUQ4zaqAsaV7gi79eccHsJazGOvxlc+Zwa+IyTMYbWifdmQxkqyn/RW6a0cmGKgf+crG5IxJRUHvu5XkrCBOpE7e8YUMVvOuUEzgCQUqhDGzPpOWbTtS8yyWBQTxjwcHVwMXm+u7SWXPGR0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=CJFEjWk3; arc=none smtp.client-ip=209.85.216.74
+	 To:Cc:Content-Type; b=HaUfPZFnhbHoNKijVxd2F4oehJxPmEQtP3whQtt8+I1tPlfWwtRke7lvB0l0mfImtNCLFINvkMmac+ioBtSSci8TCRwkMKjPY24/+tIyBUEL7ErMG8bIwP2WRDk8lL27JIY9lOX0kmaMzMEck5YNI2rflPdycJrsI6CB6VGUqpo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=VUJF1wka; arc=none smtp.client-ip=209.85.216.74
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pj1-f74.google.com with SMTP id 98e67ed59e1d1-33bcb7796d4so326923a91.0
-        for <kvm@vger.kernel.org>; Thu, 16 Oct 2025 10:30:18 -0700 (PDT)
+Received: by mail-pj1-f74.google.com with SMTP id 98e67ed59e1d1-32eb18b5659so893461a91.2
+        for <kvm@vger.kernel.org>; Thu, 16 Oct 2025 10:30:19 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1760635817; x=1761240617; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1760635819; x=1761240619; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:reply-to:from:to:cc:subject:date:message-id:reply-to;
-        bh=60UJyOOlPd6wRLEbpnoi5TtuF+cO4J6qbu8FcQfj4DA=;
-        b=CJFEjWk3MvXiIXWbF1Bubaa1Il1vGpcmWIP1OuHpdNWASm9syR6Tbqwvz8vb0/uLyG
-         gS5gO6JO5j0BZ9ZeE2Uw2ZEztEMkraGB204JxiDnlYPXyxek16wyZq+VVrXI9WqRwCuN
-         MgJMycp1qheAmidSgONUMwm4S5Kzr68caEd9I9rUmxZrcA6cXgXM9QLkCVRrEPIimZpj
-         jNx0Wks+0R4/awEdrpHzUKlG7elkUTDod6gJh10aOADbZ+yHH/snhA1DXUxJ57WRDuxM
-         k6RDSGJA/1W3Y2ZwAo2t4I9vI9VxB8Glh4TtsABLpqs5HtjiRmEmfBmHxwlQ+zlunqID
-         GGxQ==
+        bh=ZeYpfbq+bUrw10bMhLpb61aMSNzkCXl+5dpW90xnFMY=;
+        b=VUJF1wkaougfOqr3EE7ZI8U9JQd2Ms/YjBkSRmVKUCIQ6ffG2v5QcWcHiOsbS8RsDb
+         se2yx9eUI7rqYP/MoW04buO7j+LrKVuxc+tT+Aalb8gc9PV6bYMkipmLm3AYTKJw4edP
+         u3qL6UKu7YrFB/vPwOMtMKpua0tLV5cENTv01wAmQkDgWEBP9k1ShxaSxt1BXb/2t0QN
+         HBxtXlGlTRk45nr3vVm3/UjPmKUlk8oed+oi4FEn+w7G8rMxQALi1Nih++aeBTtTVPCK
+         /8nLCp5JNYuCT1ZzHsIqQjPOQfSGH3plInWnb68Zy2ZnCzbFi/5kphPp4Ad63ukGQB0E
+         IbnQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1760635817; x=1761240617;
+        d=1e100.net; s=20230601; t=1760635819; x=1761240619;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:reply-to:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=60UJyOOlPd6wRLEbpnoi5TtuF+cO4J6qbu8FcQfj4DA=;
-        b=tVOHkNeeNtuPVPgdxAW67w9bopjRcyHrkrzHxZl/aqdJ9ZqtDo8d+zW2jSNAhqmPOe
-         tI271z4s6vlGNwuHVZSezzMiXk2VVI+mD9YMrUBKZ28ZwjctVMwt91tKnTkEpf1aT/ty
-         UJ7V0y/lGUuSNNqF+Q0YrfcdwQjothq+7pzPRRxLe52e4S8SVw+4/m2ORlFA6+1DKTmp
-         UrgUwxXpiBYQ6lRPBze1yaHmlVhmPPuB5Jix+f0DtHHgXCoTXVtaIxHI812kGCR7dWB9
-         iY6+4kMQdYLiHxs88kXtKi428OKxzZQSwxTg1DgaywQOfn9qSEmy2Ggl3X6HFR4jKNy9
-         2MmA==
-X-Forwarded-Encrypted: i=1; AJvYcCU5EvasZiGHYqwDaMk6uv2NW9lDHMFyy0+U5LpR4hJW8ijYsKZmOmhVBy4sYWiq2KVuA8g=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzDwWgpXH9xYOeA+OLgX0DjXmXMu0mpHS8S0DLLG0NKTrPat6TQ
-	DEzElZvprOFlsssxX1l6de32d+I7tmwm3rZsoGEDNvcIXZlPeIawrt9IXOhAYZLIRckI8p4motG
-	u0UDVUA==
-X-Google-Smtp-Source: AGHT+IFcs9B/qCYOsWmtZzq14oPESjBkFJ9nBCJwMUyetaJnGRYqGcMBfINCMOMd2YxxJXmxDfq4dgLvfo8=
-X-Received: from pjha21.prod.google.com ([2002:a17:90a:4815:b0:330:9af8:3e1d])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:4c10:b0:32e:a10b:ce33
- with SMTP id 98e67ed59e1d1-33bcf8facf2mr645651a91.21.1760635817441; Thu, 16
- Oct 2025 10:30:17 -0700 (PDT)
+        bh=ZeYpfbq+bUrw10bMhLpb61aMSNzkCXl+5dpW90xnFMY=;
+        b=vvR0a0XlBLTcNrP5Zsz/iq/wAXAD2IW6/h2LbQd2dDJl240CwhmQUIN7to3zbOGtfb
+         E47bzevUriQEythvAhdo9k0HYeAj/1jRIaa2NPZhh35TRaqhm7ZVEjVEEcgtKvp3KSjm
+         q6uq9SI59cuen16eskAkWQIAj/7ykldeT4kLsNbuEU5N3T+TsoBg6F7zU4GynWPMkpXw
+         hsxNGsR+O9PItUY1hL/QnMitFRzTa18k7/OUbyugE1mPFEIT5NGyI/wWZ3HAUa1U5iyB
+         3g8h4TR/FI9lP5ZtduuettTps700E3Xq55c6+/GpaH6j0dQMqs2HqN2sX0TEz9Bqv9gp
+         sgXg==
+X-Forwarded-Encrypted: i=1; AJvYcCXthb4YwnOcA6eclHEYTWrKhfwdX0LmatjzKYH+6Icry4XzP2FCNRwRheiv6oVj7UsZQPE=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwfcpDmbVzp+aihUjQxp7lwGpw1s/B3lgsxg7klOQZEiqabjdyL
+	qGeNnlC1F0MNE17R96Votmopi+vS3ZiRwRlYqlZMhuLflyMRdwEL04cptlaG56WvvQrrM/ksQ/b
+	xBnHqOg==
+X-Google-Smtp-Source: AGHT+IE77aGyxMQRmagXmcXjl3OcOlQFM+l0gZVUzgMWQS5/i2T2F0rxu2RnGvNeCUgOEREjGdXqKJ3LbW0=
+X-Received: from pjbgj22.prod.google.com ([2002:a17:90b:1096:b0:33b:b387:9850])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:2fd0:b0:32d:601d:f718
+ with SMTP id 98e67ed59e1d1-33bcf8f9c16mr599759a91.31.1760635818979; Thu, 16
+ Oct 2025 10:30:18 -0700 (PDT)
 Reply-To: Sean Christopherson <seanjc@google.com>
-Date: Thu, 16 Oct 2025 10:28:46 -0700
+Date: Thu, 16 Oct 2025 10:28:47 -0700
 In-Reply-To: <20251016172853.52451-1-seanjc@google.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
@@ -76,9 +76,9 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
 References: <20251016172853.52451-1-seanjc@google.com>
 X-Mailer: git-send-email 2.51.0.858.gf9c4a03a3a-goog
-Message-ID: <20251016172853.52451-6-seanjc@google.com>
-Subject: [PATCH v13 05/12] KVM: guest_memfd: Enforce NUMA mempolicy using
- shared policy
+Message-ID: <20251016172853.52451-7-seanjc@google.com>
+Subject: [PATCH v13 06/12] KVM: selftests: Define wrappers for common syscalls
+ to assert success
 From: Sean Christopherson <seanjc@google.com>
 To: Miguel Ojeda <ojeda@kernel.org>, Marc Zyngier <maz@kernel.org>, 
 	Oliver Upton <oliver.upton@linux.dev>, Paolo Bonzini <pbonzini@redhat.com>, 
@@ -90,156 +90,322 @@ Cc: linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
 	Vlastimil Babka <vbabka@suse.cz>
 Content-Type: text/plain; charset="UTF-8"
 
-From: Shivank Garg <shivankg@amd.com>
+Add kvm_<sycall> wrappers for munmap(), close(), fallocate(), and
+ftruncate() to cut down on boilerplate code when a sycall is expected
+to succeed, and to make it easier for developers to remember to assert
+success.
 
-Previously, guest-memfd allocations followed local NUMA node id in absence
-of process mempolicy, resulting in arbitrary memory allocation.
-Moreover, mbind() couldn't be used  by the VMM as guest memory wasn't
-mapped into userspace when allocation occurred.
+Implement and use a macro framework similar to the kernel's SYSCALL_DEFINE
+infrastructure to further cut down on boilerplate code, and to drastically
+reduce the probability of typos as the kernel's syscall definitions can be
+copy+paste almost verbatim.
 
-Enable NUMA policy support by implementing vm_ops for guest-memfd mmap
-operation.  This allows the VMM to use mmap()+mbind() to set the desired
-NUMA policy for a range of memory, and provides fine-grained control over
-guest memory allocation across NUMA nodes.
+Provide macros to build the raw <sycall>() wrappers as well, e.g. to
+replace hand-coded wrappers (NUMA) or pure open-coded calls.
 
-Note, using mmap()+mbind() works even for PRIVATE memory, as mbind()
-doesn't require the memory to be faulted in.  However, get_mempolicy()
-and other paths that require the userspace page tables to be populated
-may return incorrect information for PRIVATE memory (though under the hood,
-KVM+guest_memfd will still behave correctly).
-
-Store the policy in the inode structure, gmem_inode, as a shared memory
-policy, so that the policy is a property of the physical memory itself,
-i.e. not bound to the VMA.  In guest_memfd, KVM is the primary MMU and any
-VMAs are secondary, i.e. using mbind() on a VMA to set policy is a means
-to an end, e.g. to avoid having to add a file-based equivalent to mbind().
-
-Similarly, retrieve the policy via mpol_shared_policy_lookup(), not
-get_vma_policy(), even when allocating to fault in memory for userspace
-mappings, so that the policy stored in gmem_inode is always the source of
-true.
-
-Apply policy changes only to future allocations, i.e. do not migrate
-existing memory in the guest_memfd instance.  This matches mbind(2)'s
-default behavior, which affects only new allocations unless overridden
-with MPOL_MF_MOVE/MPOL_MF_MOVE_ALL flags (which are not supported by
-guest_memfd as guest_memfd memory is unmovable).
-
-Suggested-by: David Hildenbrand <david@redhat.com>
-Acked-by: David Hildenbrand <david@redhat.com>
-Acked-by: Vlastimil Babka <vbabka@suse.cz>
-Signed-off-by: Shivank Garg <shivankg@amd.com>
-Tested-by: Ashish Kalra <ashish.kalra@amd.com>
-Link: https://lore.kernel.org/all/e9d43abc-bcdb-4f9f-9ad7-5644f714de19@amd.com
-[sean: fold in fixup (see Link above), massage changelog]
+Reviewed-by: Ackerley Tng <ackerleytng@google.com>
+Tested-by: Ackerley Tng <ackerleytng@google.com>
 Signed-off-by: Sean Christopherson <seanjc@google.com>
 ---
- virt/kvm/guest_memfd.c | 58 ++++++++++++++++++++++++++++++++++++++++--
- 1 file changed, 56 insertions(+), 2 deletions(-)
+ tools/testing/selftests/kvm/arm64/vgic_irq.c  |  2 +-
+ .../selftests/kvm/include/kvm_syscalls.h      | 81 +++++++++++++++++++
+ .../testing/selftests/kvm/include/kvm_util.h  | 29 +------
+ .../selftests/kvm/kvm_binary_stats_test.c     |  4 +-
+ tools/testing/selftests/kvm/lib/kvm_util.c    | 31 ++-----
+ .../kvm/x86/private_mem_conversions_test.c    |  9 +--
+ 6 files changed, 96 insertions(+), 60 deletions(-)
+ create mode 100644 tools/testing/selftests/kvm/include/kvm_syscalls.h
 
-diff --git a/virt/kvm/guest_memfd.c b/virt/kvm/guest_memfd.c
-index 88fd812f0f31..4463643bd0a2 100644
---- a/virt/kvm/guest_memfd.c
-+++ b/virt/kvm/guest_memfd.c
-@@ -4,6 +4,7 @@
- #include <linux/falloc.h>
- #include <linux/fs.h>
- #include <linux/kvm_host.h>
-+#include <linux/mempolicy.h>
- #include <linux/pseudo_fs.h>
- #include <linux/pagemap.h>
+diff --git a/tools/testing/selftests/kvm/arm64/vgic_irq.c b/tools/testing/selftests/kvm/arm64/vgic_irq.c
+index 6338f5bbdb70..8d7758f12280 100644
+--- a/tools/testing/selftests/kvm/arm64/vgic_irq.c
++++ b/tools/testing/selftests/kvm/arm64/vgic_irq.c
+@@ -636,7 +636,7 @@ static void kvm_routing_and_irqfd_check(struct kvm_vm *vm,
+ 	}
  
-@@ -27,6 +28,7 @@ struct gmem_file {
- };
- 
- struct gmem_inode {
-+	struct shared_policy policy;
- 	struct inode vfs_inode;
- };
- 
-@@ -129,7 +131,25 @@ static int kvm_gmem_prepare_folio(struct kvm *kvm, struct kvm_memory_slot *slot,
- static struct folio *kvm_gmem_get_folio(struct inode *inode, pgoff_t index)
- {
- 	/* TODO: Support huge pages. */
--	return filemap_grab_folio(inode->i_mapping, index);
-+	struct mempolicy *policy;
-+	struct folio *folio;
-+
-+	/*
-+	 * Fast-path: See if folio is already present in mapping to avoid
-+	 * policy_lookup.
-+	 */
-+	folio = __filemap_get_folio(inode->i_mapping, index,
-+				    FGP_LOCK | FGP_ACCESSED, 0);
-+	if (!IS_ERR(folio))
-+		return folio;
-+
-+	policy = mpol_shared_policy_lookup(&GMEM_I(inode)->policy, index);
-+	folio = __filemap_get_folio_mpol(inode->i_mapping, index,
-+					 FGP_LOCK | FGP_ACCESSED | FGP_CREAT,
-+					 mapping_gfp_mask(inode->i_mapping), policy);
-+	mpol_cond_put(policy);
-+
-+	return folio;
+ 	for (f = 0, i = intid; i < (uint64_t)intid + num; i++, f++)
+-		close(fd[f]);
++		kvm_close(fd[f]);
  }
  
- static enum kvm_gfn_range_filter kvm_gmem_get_invalidate_filter(struct inode *inode)
-@@ -411,8 +431,40 @@ static vm_fault_t kvm_gmem_fault_user_mapping(struct vm_fault *vmf)
- 	return ret;
- }
- 
-+#ifdef CONFIG_NUMA
-+static int kvm_gmem_set_policy(struct vm_area_struct *vma, struct mempolicy *mpol)
-+{
-+	struct inode *inode = file_inode(vma->vm_file);
+ /* handles the valid case: intid=0xffffffff num=1 */
+diff --git a/tools/testing/selftests/kvm/include/kvm_syscalls.h b/tools/testing/selftests/kvm/include/kvm_syscalls.h
+new file mode 100644
+index 000000000000..d4e613162bba
+--- /dev/null
++++ b/tools/testing/selftests/kvm/include/kvm_syscalls.h
+@@ -0,0 +1,81 @@
++/* SPDX-License-Identifier: GPL-2.0-only */
++#ifndef SELFTEST_KVM_SYSCALLS_H
++#define SELFTEST_KVM_SYSCALLS_H
 +
-+	return mpol_set_shared_policy(&GMEM_I(inode)->policy, vma, mpol);
++#include <sys/syscall.h>
++
++#define MAP_ARGS0(m,...)
++#define MAP_ARGS1(m,t,a,...) m(t,a)
++#define MAP_ARGS2(m,t,a,...) m(t,a), MAP_ARGS1(m,__VA_ARGS__)
++#define MAP_ARGS3(m,t,a,...) m(t,a), MAP_ARGS2(m,__VA_ARGS__)
++#define MAP_ARGS4(m,t,a,...) m(t,a), MAP_ARGS3(m,__VA_ARGS__)
++#define MAP_ARGS5(m,t,a,...) m(t,a), MAP_ARGS4(m,__VA_ARGS__)
++#define MAP_ARGS6(m,t,a,...) m(t,a), MAP_ARGS5(m,__VA_ARGS__)
++#define MAP_ARGS(n,...) MAP_ARGS##n(__VA_ARGS__)
++
++#define __DECLARE_ARGS(t, a)	t a
++#define __UNPACK_ARGS(t, a)	a
++
++#define DECLARE_ARGS(nr_args, args...) MAP_ARGS(nr_args, __DECLARE_ARGS, args)
++#define UNPACK_ARGS(nr_args, args...) MAP_ARGS(nr_args, __UNPACK_ARGS, args)
++
++#define __KVM_SYSCALL_ERROR(_name, _ret) \
++	"%s failed, rc: %i errno: %i (%s)", (_name), (_ret), errno, strerror(errno)
++
++/* Define a kvm_<syscall>() API to assert success. */
++#define __KVM_SYSCALL_DEFINE(name, nr_args, args...)			\
++static inline void kvm_##name(DECLARE_ARGS(nr_args, args))		\
++{									\
++	int r;								\
++									\
++	r = name(UNPACK_ARGS(nr_args, args));				\
++	TEST_ASSERT(!r, __KVM_SYSCALL_ERROR(#name, r));			\
 +}
 +
-+static struct mempolicy *kvm_gmem_get_policy(struct vm_area_struct *vma,
-+					     unsigned long addr, pgoff_t *pgoff)
++/*
++ * Macro to define syscall APIs, either because KVM selftests doesn't link to
++ * the standard library, e.g. libnuma, or because there is no library that yet
++ * provides the syscall.  These
++ */
++#define KVM_SYSCALL_DEFINE(name, nr_args, args...)			\
++static inline long name(DECLARE_ARGS(nr_args, args))			\
++{									\
++	return syscall(__NR_##name, UNPACK_ARGS(nr_args, args));	\
++}									\
++__KVM_SYSCALL_DEFINE(name, nr_args, args)
++
++/*
++ * Special case mmap(), as KVM selftest rarely/never specific an address,
++ * rarely specify an offset, and because the unique return code requires
++ * special handling anyways.
++ */
++static inline void *__kvm_mmap(size_t size, int prot, int flags, int fd,
++			       off_t offset)
 +{
-+	struct inode *inode = file_inode(vma->vm_file);
++	void *mem;
 +
-+	*pgoff = vma->vm_pgoff + ((addr - vma->vm_start) >> PAGE_SHIFT);
-+
-+	/*
-+	 * Return the memory policy for this index, or NULL if none is set.
-+	 *
-+	 * Returning NULL, e.g. instead of the current task's memory policy, is
-+	 * important for the .get_policy kernel ABI: it indicates that no
-+	 * explicit policy has been set via mbind() for this memory. The caller
-+	 * can then replace NULL with the default memory policy instead of the
-+	 * current task's memory policy.
-+	 */
-+	return mpol_shared_policy_lookup(&GMEM_I(inode)->policy, *pgoff);
++	mem = mmap(NULL, size, prot, flags, fd, offset);
++	TEST_ASSERT(mem != MAP_FAILED, __KVM_SYSCALL_ERROR("mmap()",
++		    (int)(unsigned long)MAP_FAILED));
++	return mem;
 +}
-+#endif /* CONFIG_NUMA */
 +
- static const struct vm_operations_struct kvm_gmem_vm_ops = {
--	.fault = kvm_gmem_fault_user_mapping,
-+	.fault		= kvm_gmem_fault_user_mapping,
-+#ifdef CONFIG_NUMA
-+	.get_policy	= kvm_gmem_get_policy,
-+	.set_policy	= kvm_gmem_set_policy,
-+#endif
- };
++static inline void *kvm_mmap(size_t size, int prot, int flags, int fd)
++{
++	return __kvm_mmap(size, prot, flags, fd, 0);
++}
++
++static inline int kvm_dup(int fd)
++{
++	int new_fd = dup(fd);
++
++	TEST_ASSERT(new_fd >= 0, __KVM_SYSCALL_ERROR("dup()", new_fd));
++	return new_fd;
++}
++
++__KVM_SYSCALL_DEFINE(munmap, 2, void *, mem, size_t, size);
++__KVM_SYSCALL_DEFINE(close, 1, int, fd);
++__KVM_SYSCALL_DEFINE(fallocate, 4, int, fd, int, mode, loff_t, offset, loff_t, len);
++__KVM_SYSCALL_DEFINE(ftruncate, 2, unsigned int, fd, off_t, length);
++
++#endif /* SELFTEST_KVM_SYSCALLS_H */
+diff --git a/tools/testing/selftests/kvm/include/kvm_util.h b/tools/testing/selftests/kvm/include/kvm_util.h
+index ee60dbf5208a..c610169933ef 100644
+--- a/tools/testing/selftests/kvm/include/kvm_util.h
++++ b/tools/testing/selftests/kvm/include/kvm_util.h
+@@ -23,6 +23,7 @@
  
- static int kvm_gmem_mmap(struct file *file, struct vm_area_struct *vma)
-@@ -864,11 +916,13 @@ static struct inode *kvm_gmem_alloc_inode(struct super_block *sb)
- 	if (!gi)
- 		return NULL;
+ #include <pthread.h>
  
-+	mpol_shared_policy_init(&gi->policy, NULL);
- 	return &gi->vfs_inode;
++#include "kvm_syscalls.h"
+ #include "kvm_util_arch.h"
+ #include "kvm_util_types.h"
+ #include "sparsebit.h"
+@@ -283,34 +284,6 @@ static inline bool kvm_has_cap(long cap)
+ 	return kvm_check_cap(cap);
  }
  
- static void kvm_gmem_destroy_inode(struct inode *inode)
+-#define __KVM_SYSCALL_ERROR(_name, _ret) \
+-	"%s failed, rc: %i errno: %i (%s)", (_name), (_ret), errno, strerror(errno)
+-
+-static inline void *__kvm_mmap(size_t size, int prot, int flags, int fd,
+-			       off_t offset)
+-{
+-	void *mem;
+-
+-	mem = mmap(NULL, size, prot, flags, fd, offset);
+-	TEST_ASSERT(mem != MAP_FAILED, __KVM_SYSCALL_ERROR("mmap()",
+-		    (int)(unsigned long)MAP_FAILED));
+-
+-	return mem;
+-}
+-
+-static inline void *kvm_mmap(size_t size, int prot, int flags, int fd)
+-{
+-	return __kvm_mmap(size, prot, flags, fd, 0);
+-}
+-
+-static inline void kvm_munmap(void *mem, size_t size)
+-{
+-	int ret;
+-
+-	ret = munmap(mem, size);
+-	TEST_ASSERT(!ret, __KVM_SYSCALL_ERROR("munmap()", ret));
+-}
+-
+ /*
+  * Use the "inner", double-underscore macro when reporting errors from within
+  * other macros so that the name of ioctl() and not its literal numeric value
+diff --git a/tools/testing/selftests/kvm/kvm_binary_stats_test.c b/tools/testing/selftests/kvm/kvm_binary_stats_test.c
+index f02355c3c4c2..b7dbde9c0843 100644
+--- a/tools/testing/selftests/kvm/kvm_binary_stats_test.c
++++ b/tools/testing/selftests/kvm/kvm_binary_stats_test.c
+@@ -239,14 +239,14 @@ int main(int argc, char *argv[])
+ 		 * single stats file works and doesn't cause explosions.
+ 		 */
+ 		vm_stats_fds = vm_get_stats_fd(vms[i]);
+-		stats_test(dup(vm_stats_fds));
++		stats_test(kvm_dup(vm_stats_fds));
+ 
+ 		/* Verify userspace can instantiate multiple stats files. */
+ 		stats_test(vm_get_stats_fd(vms[i]));
+ 
+ 		for (j = 0; j < max_vcpu; ++j) {
+ 			vcpu_stats_fds[j] = vcpu_get_stats_fd(vcpus[i * max_vcpu + j]);
+-			stats_test(dup(vcpu_stats_fds[j]));
++			stats_test(kvm_dup(vcpu_stats_fds[j]));
+ 			stats_test(vcpu_get_stats_fd(vcpus[i * max_vcpu + j]));
+ 		}
+ 
+diff --git a/tools/testing/selftests/kvm/lib/kvm_util.c b/tools/testing/selftests/kvm/lib/kvm_util.c
+index 83a721be7ec5..8b60b767224b 100644
+--- a/tools/testing/selftests/kvm/lib/kvm_util.c
++++ b/tools/testing/selftests/kvm/lib/kvm_util.c
+@@ -704,8 +704,6 @@ userspace_mem_region_find(struct kvm_vm *vm, uint64_t start, uint64_t end)
+ 
+ static void kvm_stats_release(struct kvm_binary_stats *stats)
  {
-+	mpol_free_shared_policy(&GMEM_I(inode)->policy);
+-	int ret;
+-
+ 	if (stats->fd < 0)
+ 		return;
+ 
+@@ -714,8 +712,7 @@ static void kvm_stats_release(struct kvm_binary_stats *stats)
+ 		stats->desc = NULL;
+ 	}
+ 
+-	ret = close(stats->fd);
+-	TEST_ASSERT(!ret,  __KVM_SYSCALL_ERROR("close()", ret));
++	kvm_close(stats->fd);
+ 	stats->fd = -1;
  }
  
- static void kvm_gmem_free_inode(struct inode *inode)
+@@ -738,8 +735,6 @@ __weak void vcpu_arch_free(struct kvm_vcpu *vcpu)
+  */
+ static void vm_vcpu_rm(struct kvm_vm *vm, struct kvm_vcpu *vcpu)
+ {
+-	int ret;
+-
+ 	if (vcpu->dirty_gfns) {
+ 		kvm_munmap(vcpu->dirty_gfns, vm->dirty_ring_size);
+ 		vcpu->dirty_gfns = NULL;
+@@ -747,9 +742,7 @@ static void vm_vcpu_rm(struct kvm_vm *vm, struct kvm_vcpu *vcpu)
+ 
+ 	kvm_munmap(vcpu->run, vcpu_mmap_sz());
+ 
+-	ret = close(vcpu->fd);
+-	TEST_ASSERT(!ret,  __KVM_SYSCALL_ERROR("close()", ret));
+-
++	kvm_close(vcpu->fd);
+ 	kvm_stats_release(&vcpu->stats);
+ 
+ 	list_del(&vcpu->list);
+@@ -761,16 +754,12 @@ static void vm_vcpu_rm(struct kvm_vm *vm, struct kvm_vcpu *vcpu)
+ void kvm_vm_release(struct kvm_vm *vmp)
+ {
+ 	struct kvm_vcpu *vcpu, *tmp;
+-	int ret;
+ 
+ 	list_for_each_entry_safe(vcpu, tmp, &vmp->vcpus, list)
+ 		vm_vcpu_rm(vmp, vcpu);
+ 
+-	ret = close(vmp->fd);
+-	TEST_ASSERT(!ret,  __KVM_SYSCALL_ERROR("close()", ret));
+-
+-	ret = close(vmp->kvm_fd);
+-	TEST_ASSERT(!ret,  __KVM_SYSCALL_ERROR("close()", ret));
++	kvm_close(vmp->fd);
++	kvm_close(vmp->kvm_fd);
+ 
+ 	/* Free cached stats metadata and close FD */
+ 	kvm_stats_release(&vmp->stats);
+@@ -828,7 +817,7 @@ void kvm_vm_free(struct kvm_vm *vmp)
+ int kvm_memfd_alloc(size_t size, bool hugepages)
+ {
+ 	int memfd_flags = MFD_CLOEXEC;
+-	int fd, r;
++	int fd;
+ 
+ 	if (hugepages)
+ 		memfd_flags |= MFD_HUGETLB;
+@@ -836,11 +825,8 @@ int kvm_memfd_alloc(size_t size, bool hugepages)
+ 	fd = memfd_create("kvm_selftest", memfd_flags);
+ 	TEST_ASSERT(fd != -1, __KVM_SYSCALL_ERROR("memfd_create()", fd));
+ 
+-	r = ftruncate(fd, size);
+-	TEST_ASSERT(!r, __KVM_SYSCALL_ERROR("ftruncate()", r));
+-
+-	r = fallocate(fd, FALLOC_FL_PUNCH_HOLE | FALLOC_FL_KEEP_SIZE, 0, size);
+-	TEST_ASSERT(!r, __KVM_SYSCALL_ERROR("fallocate()", r));
++	kvm_ftruncate(fd, size);
++	kvm_fallocate(fd, FALLOC_FL_PUNCH_HOLE | FALLOC_FL_KEEP_SIZE, 0, size);
+ 
+ 	return fd;
+ }
+@@ -1084,8 +1070,7 @@ void vm_mem_add(struct kvm_vm *vm, enum vm_mem_backing_src_type src_type,
+ 			 * needing to track if the fd is owned by the framework
+ 			 * or by the caller.
+ 			 */
+-			guest_memfd = dup(guest_memfd);
+-			TEST_ASSERT(guest_memfd >= 0, __KVM_SYSCALL_ERROR("dup()", guest_memfd));
++			guest_memfd = kvm_dup(guest_memfd);
+ 		}
+ 
+ 		region->region.guest_memfd = guest_memfd;
+diff --git a/tools/testing/selftests/kvm/x86/private_mem_conversions_test.c b/tools/testing/selftests/kvm/x86/private_mem_conversions_test.c
+index 82a8d88b5338..1969f4ab9b28 100644
+--- a/tools/testing/selftests/kvm/x86/private_mem_conversions_test.c
++++ b/tools/testing/selftests/kvm/x86/private_mem_conversions_test.c
+@@ -380,7 +380,7 @@ static void test_mem_conversions(enum vm_mem_backing_src_type src_type, uint32_t
+ 	struct kvm_vcpu *vcpus[KVM_MAX_VCPUS];
+ 	pthread_t threads[KVM_MAX_VCPUS];
+ 	struct kvm_vm *vm;
+-	int memfd, i, r;
++	int memfd, i;
+ 
+ 	const struct vm_shape shape = {
+ 		.mode = VM_MODE_DEFAULT,
+@@ -428,11 +428,8 @@ static void test_mem_conversions(enum vm_mem_backing_src_type src_type, uint32_t
+ 	 * should prevent the VM from being fully destroyed until the last
+ 	 * reference to the guest_memfd is also put.
+ 	 */
+-	r = fallocate(memfd, FALLOC_FL_KEEP_SIZE | FALLOC_FL_PUNCH_HOLE, 0, memfd_size);
+-	TEST_ASSERT(!r, __KVM_SYSCALL_ERROR("fallocate()", r));
+-
+-	r = fallocate(memfd, FALLOC_FL_KEEP_SIZE, 0, memfd_size);
+-	TEST_ASSERT(!r, __KVM_SYSCALL_ERROR("fallocate()", r));
++	kvm_fallocate(memfd, FALLOC_FL_KEEP_SIZE | FALLOC_FL_PUNCH_HOLE, 0, memfd_size);
++	kvm_fallocate(memfd, FALLOC_FL_KEEP_SIZE, 0, memfd_size);
+ 
+ 	close(memfd);
+ }
 -- 
 2.51.0.858.gf9c4a03a3a-goog
 
