@@ -1,255 +1,121 @@
-Return-Path: <kvm+bounces-60237-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-60238-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 857ABBE5D2D
-	for <lists+kvm@lfdr.de>; Fri, 17 Oct 2025 01:54:00 +0200 (CEST)
+Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [IPv6:2a01:60a::1994:3:14])
+	by mail.lfdr.de (Postfix) with ESMTPS id E31E1BE5D48
+	for <lists+kvm@lfdr.de>; Fri, 17 Oct 2025 01:55:51 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 506CB3B012A
-	for <lists+kvm@lfdr.de>; Thu, 16 Oct 2025 23:53:51 +0000 (UTC)
+	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 8F61735604E
+	for <lists+kvm@lfdr.de>; Thu, 16 Oct 2025 23:55:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E4BEF2E7BD9;
-	Thu, 16 Oct 2025 23:53:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4D5702E718F;
+	Thu, 16 Oct 2025 23:55:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="sExZW6CI"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="BZ15LKBe"
 X-Original-To: kvm@vger.kernel.org
-Received: from DM1PR04CU001.outbound.protection.outlook.com (mail-centralusazon11010056.outbound.protection.outlook.com [52.101.61.56])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pj1-f74.google.com (mail-pj1-f74.google.com [209.85.216.74])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6D8B22E1F08;
-	Thu, 16 Oct 2025 23:53:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.61.56
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1760658821; cv=fail; b=HTgs9Jv92XMYN/EKH3Qs+fj9AVj7vWurRQ8bEFaMboIRO1Xd5labJDHBZ7MhAG0YD24TxvDRI4CdyLUDFX4pfUSiS/NCgEPBbJGcsORwhAq7Hu/tPYUE8XrtBv5UvdsmQ9kAGXlrKj5IacnlMMy9s2axTOyDRN5k3Wj6NSEn1jQ=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1760658821; c=relaxed/simple;
-	bh=XISh3w2MsVzjMchSJK0b6EEUnHL/XVDvSXg28hm1eAc=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:Content-Type:
-	 Content-Disposition:In-Reply-To:MIME-Version; b=Ht+3DeXLCYmVSzS7w6oc7DhEgCy9H64iMaUvbRgKcp3XSsL8pExRMq7WZCKK2NKUMcbp/FHGiciXr1y8fGfT+UalKnhl4fGZ5qXvFUYpqpEoxaTTWSsk4jwFJWu0p1dG4H68rZ/4SFIzC6oif8umodFH2M02tcNkCDNeu61wvg8=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=sExZW6CI; arc=fail smtp.client-ip=52.101.61.56
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=VzVw+V0y3ntpsI4be8b+hKVS2vjN3qfKRzjVB8p7LEr1ciZUJBTPxX9xEm6FrBcISrwovEZDKvAwxYLI7mu5sam3aJu0JJo/bU0eT7ThIcggJMGTW79QktjI93zODK+TSFA6GnzsatvRtOzpTHRD1Qdbdz4knCyG8gKOwn7W6YeXf3aDyKUAv/8xDAIDdxjkjee+ReKwqsXmkc9SPS8F/XhRvp4kWaDC1YFjd1M4znnjPJuEhES+Q91xjBThuP2EqwkIjG/OPTVkbtHyvq4rfz9UoaO8ahlOpdPW6tLlztXMA59WmMRVOzsp9FCO50l5KDe/BeTDz3hULqQJlXJByw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=RD/xCVRTrLeDxfGMCtcUQXjf8Hu5gk0sMVUTLPCchq4=;
- b=G/O3XDxmPm9fnTUeM4lVCSRolYgasAohhCMPMOcQBgCG+tHD3hTqLenj9TiWbCyLysciJGmMWAVXacJukpoHPyDPd//LfaYEQtURtCnNglSXeZxl3YRM/6IrVor9e1L+Ifj79YaKc0RST2K4CUkk1W3c2871uuc1hkchpYwQLVm0uKd1x8LjBx3QUFC0zftkemzQfjGFWFCBdCWuVpl3u9PC+64DWE6SYS7b3yD2GiwuTuHFFh531MN9P/BbKJlYxcQzoaAQnzjOwB5LokDcUXYNrPWynItUWAiLYvfNCgjEfbo2xzRhWV9DUqSdDw349WsKMA4mXEsfZrnE3baAMg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
- dkim=pass header.d=nvidia.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=RD/xCVRTrLeDxfGMCtcUQXjf8Hu5gk0sMVUTLPCchq4=;
- b=sExZW6CITN4sB1IKBxwQfti39f+DtUoF4um3BD1Hzg8j/ajAdbhhxXNvS7WQOHdpgK0J60tKbJKGfXLJCjyiLOwWrCmDJ2UtoKZi9A+Y2bOYM1cwF6Xza/ArVXH4nmxwNePYNnINKoA/DMkaNfE/uBrDBMtkiaoa7xX55iCWpOWRabxrV8N6v97viCY2jKL7QlPJcOYqvXPLCITHFURKrnpzPc5/Iwmt/knV0euWC8vQWrfEBIHll4nTPWnxCp+2l7auwnkyZkCNt3rDShzzhf8a1a67bvTrgcU1j5P/XnV/YgYY/3MhmDjcxumjuqCPKv4YF2qvDG1pD29T2qSc/g==
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nvidia.com;
-Received: from MN2PR12MB3613.namprd12.prod.outlook.com (2603:10b6:208:c1::17)
- by CH3PR12MB8903.namprd12.prod.outlook.com (2603:10b6:610:17a::7) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9228.9; Thu, 16 Oct
- 2025 23:53:35 +0000
-Received: from MN2PR12MB3613.namprd12.prod.outlook.com
- ([fe80::1b3b:64f5:9211:608b]) by MN2PR12MB3613.namprd12.prod.outlook.com
- ([fe80::1b3b:64f5:9211:608b%4]) with mapi id 15.20.9228.010; Thu, 16 Oct 2025
- 23:53:35 +0000
-Date: Thu, 16 Oct 2025 20:53:32 -0300
-From: Jason Gunthorpe <jgg@nvidia.com>
-To: Leon Romanovsky <leon@kernel.org>
-Cc: Alex Williamson <alex.williamson@redhat.com>,
-	Leon Romanovsky <leonro@nvidia.com>,
-	Andrew Morton <akpm@linux-foundation.org>,
-	Bjorn Helgaas <bhelgaas@google.com>,
-	Christian =?utf-8?B?S8O2bmln?= <christian.koenig@amd.com>,
-	dri-devel@lists.freedesktop.org, iommu@lists.linux.dev,
-	Jens Axboe <axboe@kernel.dk>, Joerg Roedel <joro@8bytes.org>,
-	kvm@vger.kernel.org, linaro-mm-sig@lists.linaro.org,
-	linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-media@vger.kernel.org, linux-mm@kvack.org,
-	linux-pci@vger.kernel.org, Logan Gunthorpe <logang@deltatee.com>,
-	Marek Szyprowski <m.szyprowski@samsung.com>,
-	Robin Murphy <robin.murphy@arm.com>,
-	Sumit Semwal <sumit.semwal@linaro.org>,
-	Vivek Kasireddy <vivek.kasireddy@intel.com>,
-	Will Deacon <will@kernel.org>
-Subject: Re: [PATCH v5 9/9] vfio/pci: Add dma-buf export support for MMIO
- regions
-Message-ID: <20251016235332.GA265079@nvidia.com>
-References: <cover.1760368250.git.leon@kernel.org>
- <72ecaa13864ca346797e342d23a7929562788148.1760368250.git.leon@kernel.org>
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <72ecaa13864ca346797e342d23a7929562788148.1760368250.git.leon@kernel.org>
-X-ClientProxiedBy: PH0PR07CA0066.namprd07.prod.outlook.com
- (2603:10b6:510:f::11) To MN2PR12MB3613.namprd12.prod.outlook.com
- (2603:10b6:208:c1::17)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 172362E0407
+	for <kvm@vger.kernel.org>; Thu, 16 Oct 2025 23:55:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.74
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1760658943; cv=none; b=ANO4yBE6OiUntGw3XeGs/sRlB9oXyCHk0JSfbBNNgC/8cU4Wuu6lLfUgeuA0gq6myzx+dllUQflc6kjcvKzxpwxLLFi8pcF4Kcpk94ftI/StuLpKwKcTuRT7qaPlM+N19VKgoSMcOdHuoBv0MpLVRxR3bNKcHkMb9PtJTav1idQ=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1760658943; c=relaxed/simple;
+	bh=WwjO4GatRHKKUJDBAs3BruAaj4i1hqbmFn941g71wiI=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=XEyVquyeJqXxOpRW5olwY3IPcez+HC+8DUVdAiQTAp1zn5viRCAwfCaqOJuIUGJk8VsuYlsrbTxFfbVSUHFrxRAIATJjYMReuH4jFbPyb/0XFg5jc6pTfl4Pkewa7r9Av30JZHiIEvStaejY0/lY3AorydrHVVpw9CKNFb4kkR8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=BZ15LKBe; arc=none smtp.client-ip=209.85.216.74
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+Received: by mail-pj1-f74.google.com with SMTP id 98e67ed59e1d1-335276a711cso1353010a91.2
+        for <kvm@vger.kernel.org>; Thu, 16 Oct 2025 16:55:41 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1760658941; x=1761263741; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:mime-version:date:reply-to:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=pPVrm5pE/FjJ1RaaLP4f68EkqgXZ2N60KkxrWhwGEQA=;
+        b=BZ15LKBeEY92ify+Cxeb4qE/yuu6mWLN32WabLVpaBwKpD4rV5uZ9b4lejpAMefAno
+         GxO6vlPBNqKkkv6ZumIPgWzpemURtOQomf7/CZ17qnF/rsaWlkpALJ6iX68/0xkP2Csc
+         GsJOBlKiPcwqSoDhIumBwgqqQSMj3LzPJ8SGcZuQF4B74WNmjV0JBYtfgZKIfsDz8SAU
+         Na2ddSIydDA8EBs6cWciCbFoCPfG16zBhYbA8GjrWPUy0eC4hJW9Hzsky1kQ3DMcBkuu
+         lPi0ZV71X9q2Ugx+9AYuF4pqXOi9PrJVilgN+l9lr67QKivZRLJRSq/75QEbKgfUgQ6p
+         UyJw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1760658941; x=1761263741;
+        h=cc:to:from:subject:message-id:mime-version:date:reply-to
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=pPVrm5pE/FjJ1RaaLP4f68EkqgXZ2N60KkxrWhwGEQA=;
+        b=fjR2UknAxRr0FUZRnPuHMlM6n8qiAi3I1A7OCyXU8eT3cDal0skCKLfDP/PQQK6Oca
+         Cfr9EAYex7GTqHNO8QJirw7ZdZfMAa0g0AhiBFsjX2RviFimR17pPc119QTABPhwjQTF
+         D7yXjfidBhxYkXk/kTh9fQ5+TRqjSevTQiHQgeUTc1xXSIcj7NbYMSFFnG2KVMBT29fj
+         BHiyXPUx0HUwsxviMdEY9R0ygAhhyqLub5RsQvwIexxrULNqh2t15Qkcuy4rCwbx58ue
+         Xy4zeThW6rjP72voNvW7ZoFlIKbNrgvvAGf9q9E4w60PGtZwhPTZwlXE9O/qemBSoXuj
+         rnSQ==
+X-Gm-Message-State: AOJu0YxfYudHLr3h7x8Wb7U92bGwjnwy2O5SJFcdeYys7tObrGpvhyYu
+	F2U6kJGe4MRmYXO58XIK7lokdjmBPcyh7k5g8SsyQbJUrU67pf5zWwyqo9n+0YjEuILwLXNpe6C
+	UQYgNPQ==
+X-Google-Smtp-Source: AGHT+IEubE2lA1WOXoIBHExBmIq5CuR49JO3UOOOlGoyNxR7LBrKYLkgLhfLvK7PDhIOutFTQwQ9vWmAfjA=
+X-Received: from pjbtd12.prod.google.com ([2002:a17:90b:544c:b0:330:b9e9:7acc])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:5290:b0:32e:a54a:be5d
+ with SMTP id 98e67ed59e1d1-33bcf85abbfmr1652222a91.2.1760658941384; Thu, 16
+ Oct 2025 16:55:41 -0700 (PDT)
+Reply-To: Sean Christopherson <seanjc@google.com>
+Date: Thu, 16 Oct 2025 16:55:38 -0700
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: MN2PR12MB3613:EE_|CH3PR12MB8903:EE_
-X-MS-Office365-Filtering-Correlation-Id: 18b9e1f5-f067-4b8f-547a-08de0d0f37de
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230040|1800799024|7416014|366016|376014;
-X-Microsoft-Antispam-Message-Info:
-	=?us-ascii?Q?rnGVBiR43qrrkw2KiPc0VorIsauBwV5mCkT6wX5E2r6AIUy0QZ9igCmFyYHS?=
- =?us-ascii?Q?iRRyHFQCo1te+/o8kLfhZF+RdMCWA2Mla7l7OFLDsFmB2UlouEb3v1ptWRKE?=
- =?us-ascii?Q?kOH5Gyt9IXs60jzqs0QsMDKrYcq9lyU/O+cNhylM3Z1Z9jo1ModPpdpxoBsL?=
- =?us-ascii?Q?T7gxlOhV+YAQj6v6aiU/IArK6oPNPxDN7QFcVKMHSLG46GTeQhasQLc5z39s?=
- =?us-ascii?Q?/A8CK5RzujiZBcUHZ2zLH95K709+oQMV5SULDxSkTCNsWcO1IToYNJJw5kpA?=
- =?us-ascii?Q?oR6bdR0j8WW0xwJwLAJ3+9SVuiErXpSAViGk8TylRYn7FJDYkJnx1OqPbMdf?=
- =?us-ascii?Q?3U7qQOLNtNekAR58V1ZcwuUSic84dqW2E5ja2CHTHdcbvRUrfvYlhvCcMsBy?=
- =?us-ascii?Q?pMQs9EUQ6mHO8e1AkujRDf+owbgyIVaMCXbjLUcHb9lM7WKX+0xOoQHh6KDn?=
- =?us-ascii?Q?0hDL9XU9sCYBdS3E4FhpUhtUXVai2OuZ8IO49mIifcOlgZbE3KRt+h0aoCsU?=
- =?us-ascii?Q?0ZikxUQHm0wRhKK5iVwE+b6OPI6faBy4ULydJOgAxR3q4ieXyilbQPE03dm7?=
- =?us-ascii?Q?Rhg2CCiVoEKgDDIEcB4UtnIjIQbY0TIcGaIPsxslfxReKGN2GDT7Fv495ef+?=
- =?us-ascii?Q?SPQlOEW+Q9PHW3kmdSd/JFT57VNdHBuWfwx2IK4a9vTiRTkAt99y9r1gEF7r?=
- =?us-ascii?Q?m8Lf8bhVuuOcknXYz9w5FPF4/iiDth9s8+GRgiRfn1ydce5OokHntgQtfGtu?=
- =?us-ascii?Q?cZucSiOQrzw/MEYlRqoi2I1cVhvCOZMlVvUjna9glu6vkOxAm3A/A/wqEu8G?=
- =?us-ascii?Q?Z1/4ywpiOpplfVZJeqfSYn+KAIRmUxu4PMmsRQuG9MvRrpQHfQx8da5VOSlM?=
- =?us-ascii?Q?6uZGuTOmmypbxV+k2sI/v9oRiWDJ/lHtBUSnzAwEL9xQldTVGbgT39R7Hqnj?=
- =?us-ascii?Q?fyeIfBsN+uTzRcr9Ko7y7n4to5keywpEEjekmxn3WJ9JZE9AwF1RW1O9ZFWH?=
- =?us-ascii?Q?fGfkliw5geCNy6i9LXOW++IFdKskAcqfT+YzfSZR9/fnQcWrycqmbUct0Njg?=
- =?us-ascii?Q?NLgrMmMwFjh/22T3odvVKoMDVQPEWpbhgXFQ76MVfOqfmFJ6hjZP4Spktw6P?=
- =?us-ascii?Q?PpczAYp7rTR7bteEvuQPks/AzeoTBMCqGZIrvCrtvePGJMwATx3th3LQvysU?=
- =?us-ascii?Q?OuYov/VwO5KlFHKCA82Jm9DQVsX8eYl+Nd9j6JPXjXs1jLGMuGhLSk8jWeZD?=
- =?us-ascii?Q?qasp2rmqmTZZO77Wbq7y77MCn87Wz1q+U5f5i5xsymCN7LsCUzrJk/NLvekY?=
- =?us-ascii?Q?fI/oilB4mfSG367kcOnBeJ1JekvdXlGei+asIFFhxHURgLzgREmnoUu7HORG?=
- =?us-ascii?Q?24zy4o64oyTZvkv8nQWXjkN41BDQdlJyo0lgD+laCZKbyPD/iPHD9DoBMxNS?=
- =?us-ascii?Q?Y38c6zxsUkchGex7PoJ7p9sNxjAUMunV?=
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:MN2PR12MB3613.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(7416014)(366016)(376014);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?us-ascii?Q?39IpYg/hgaPLPdM27s4mQS8T4DJCdcelKREpNEih5CqGHfhXY25GKB7FQpGU?=
- =?us-ascii?Q?1wlmQI1GBdWNOP2xQlsOerbQgvvOfJ3Ys0l0F2CN4wAbec/B/tTmtO6ecuBa?=
- =?us-ascii?Q?ZHTjeaxpUy7tgyO4gXdj69R8iDMMFtTm9eJIfF1CWqhx7SaCPB5E54+fQT7Q?=
- =?us-ascii?Q?/cOJMt3+zPqWjZHa3Oz8zpNOgFACOD/qrDZwmk5ishyCk256EsEs6QZaaMWy?=
- =?us-ascii?Q?9dn/42TJCdZGLG3mcylwCP6ZI5C7/famSHJ8QDG90NFySPfIPofgsXMZHB3M?=
- =?us-ascii?Q?umeWJuvAqPPyENcHhzRHF4b0ZZLtqzGAP5Su8g3dXM15UzlCjttHbEVe+9pH?=
- =?us-ascii?Q?jCevoFiq1odNZgD4ieKOiM9eFTkta6N6qC/AiGwsnmJVyufwkLQocZSiHODE?=
- =?us-ascii?Q?ocFHHWES0WN0/fziKRTiCW8QGBsJuDBlqOCaY81eJcftAa9G/PN4UFQIwBuw?=
- =?us-ascii?Q?0YVff2+meD0rX8wOoVWkMaYy//C4zWaSHVkQFnr8y37kmnUxgfs1kLkyVbDa?=
- =?us-ascii?Q?vFy8K3H7sZ/IXh21RqW5vgjyGMA/wN9FsKsFIHxm9QugudMxOhedDzaxuiY2?=
- =?us-ascii?Q?vhbUoDpE2D7BA9w9N74SQuIfxPyuBAfkVBAqZR9knFRCyWNYulL0NpngHkMr?=
- =?us-ascii?Q?+SCTkfuzRDbi6cWFRaKnU69MfcAPbCPFQaSQaDvh+zO7nUrAg5IotyFrq/zy?=
- =?us-ascii?Q?lI9Nfo5tGVldpo/OXN/6ueqw/c08MIy/d94to0bDEZmcgolNb3WThtIAdb0c?=
- =?us-ascii?Q?7bUcjrbtWBZ8Pwc8cS58Cf451bo3qOE+S8Aik1QoRvy28QEJC2nDO4Ku14rO?=
- =?us-ascii?Q?Cq6Au+4VsunJDDL+OPYQaamcNzbfil2Mb3dtrZx78f4frebgAtjmBKGpFmI7?=
- =?us-ascii?Q?9JIhvsZcK0au8oKnqXlP/35aiQQjWiZp2JGbKSndAuBWHZrE/rrmkvNjEwig?=
- =?us-ascii?Q?YwQFcjmQuQshLmhzp9bJYT3vAtCG8DkWBPQH0KPXg2Irhyx2SQoLClZkafh9?=
- =?us-ascii?Q?L4EkHye5uSok7uIh5D73QDJsavp0yFmjets0ICGn5cBcegZuNqHkuxHUNEkm?=
- =?us-ascii?Q?IMY1+XvKkSmLVmJgXo5E5i1SJJunZNgjmvlvSSoaoqBtgl1LZgTBxSr6TsdN?=
- =?us-ascii?Q?7wdhLakRX4rHC79s7tQa5PA4VgffcwX1qFIy5DmfGhGPKwqfwdCARAeWYfY1?=
- =?us-ascii?Q?NLYz0gXnWnUAyfmqShrTv/+fwrI3V/cXlDzrcIDQ6k2KELnd/YAibhpx+Egt?=
- =?us-ascii?Q?8RMFrg9m64JSPabUuAB9hZ0qzfSXcO/+B9f0AYsAoaxhuh3Zx818c4yQP9gH?=
- =?us-ascii?Q?z47ukY2r93USzf4G0+vqDqJkyODFn7WoJ7KFndaPjdTwyvqZblWlbvuhjd2T?=
- =?us-ascii?Q?1MpBvmLzDHzzrf89WCbIChjPJf9dPLnhCptzEONgPbPGHFih3yZ/MhJ4cyYf?=
- =?us-ascii?Q?ONaqS03P7jo5buSVHmZrTEKgq6WRs63DXLlADkt7cxXWsLzLQN3l42PyuOEu?=
- =?us-ascii?Q?IaFYjZwxhs3//Ny8OFWTTIC/e7Nq7KmK8fx04IDaXoWBVz7XaVCO2QtPrkAW?=
- =?us-ascii?Q?slXOzxFYhCDN0lX0KLSZQy5LNnclfs8SWJ45j6MB?=
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 18b9e1f5-f067-4b8f-547a-08de0d0f37de
-X-MS-Exchange-CrossTenant-AuthSource: MN2PR12MB3613.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 16 Oct 2025 23:53:35.1119
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: Jt9bYDuyBbkaHgYqsT62+FAa/0GFys7MoQUQrQy99mNhrDUn13ZL3GVgoxyajCEU
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: CH3PR12MB8903
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.51.0.858.gf9c4a03a3a-goog
+Message-ID: <20251016235538.171962-1-seanjc@google.com>
+Subject: [PATCH] Documentation: KVM: Formalizing taking vcpu->mutex *outside*
+ of kvm->slots_lock
+From: Sean Christopherson <seanjc@google.com>
+To: Paolo Bonzini <pbonzini@redhat.com>
+Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	Oliver Upton <oliver.upton@linux.dev>, Marc Zyngier <maz@kernel.org>, 
+	Sean Christopherson <seanjc@google.com>
+Content-Type: text/plain; charset="UTF-8"
 
-On Mon, Oct 13, 2025 at 06:26:11PM +0300, Leon Romanovsky wrote:
-> +
-> +static int vfio_pci_dma_buf_attach(struct dma_buf *dmabuf,
-> +				   struct dma_buf_attachment *attachment)
-> +{
-> +	struct vfio_pci_dma_buf *priv = dmabuf->priv;
-> +
-> +	if (!attachment->peer2peer)
-> +		return -EOPNOTSUPP;
-> +
-> +	if (priv->revoked)
-> +		return -ENODEV;
-> +
-> +	switch (pci_p2pdma_map_type(priv->provider, attachment->dev)) {
-> +	case PCI_P2PDMA_MAP_THRU_HOST_BRIDGE:
-> +		break;
-> +	case PCI_P2PDMA_MAP_BUS_ADDR:
-> +		/*
-> +		 * There is no need in IOVA at all for this flow.
-> +		 * We rely on attachment->priv == NULL as a marker
-> +		 * for this mode.
-> +		 */
-> +		return 0;
-> +	default:
-> +		return -EINVAL;
-> +	}
-> +
-> +	attachment->priv = kzalloc(sizeof(struct dma_iova_state), GFP_KERNEL);
-> +	if (!attachment->priv)
-> +		return -ENOMEM;
-> +
-> +	dma_iova_try_alloc(attachment->dev, attachment->priv, 0, priv->size);
+Explicitly document the ordering of vcpu->mutex being taken *outside* of
+kvm->slots_lock.  While extremely unintuitive, and arguably wrong, both
+arm64 and x86 have gained flows that take kvm->slots_lock inside of
+vcpu->mutex.  x86's kvm_inhibit_apic_access_page() is particularly
+nasty, as slots_lock is taken quite deep within KVM_RUN, i.e. simply
+swapping the ordering isn't an option.
 
-The lifetime of this isn't good..
+Commit to the vcpu->mutex => kvm->slots_lock ordering even though taking a
+VM-scoped lock inside a vCPU-scoped lock is odd, as vcpu->mutex really is
+intended to be a "top-level" lock in most respects, whereas kvm->slots_lock
+is "just" a helper lock.
 
-> +	return 0;
-> +}
-> +
-> +static void vfio_pci_dma_buf_detach(struct dma_buf *dmabuf,
-> +				    struct dma_buf_attachment *attachment)
-> +{
-> +	kfree(attachment->priv);
-> +}
+Cc: Oliver Upton <oliver.upton@linux.dev>
+Cc: Marc Zyngier <maz@kernel.org>
+Signed-off-by: Sean Christopherson <seanjc@google.com>
+---
+ Documentation/virt/kvm/locking.rst | 2 ++
+ 1 file changed, 2 insertions(+)
 
-If the caller fails to call map then it leaks the iova.
+diff --git a/Documentation/virt/kvm/locking.rst b/Documentation/virt/kvm/locking.rst
+index ae8bce7fecbe..2b4c786038be 100644
+--- a/Documentation/virt/kvm/locking.rst
++++ b/Documentation/virt/kvm/locking.rst
+@@ -17,6 +17,8 @@ The acquisition orders for mutexes are as follows:
+ 
+ - kvm->lock is taken outside kvm->slots_lock and kvm->irq_lock
+ 
++- vcpu->mutex is taken outside kvm->slots_lock
++
+ - kvm->slots_lock is taken outside kvm->irq_lock, though acquiring
+   them together is quite rare.
+ 
 
-> +static struct sg_table *
-> +vfio_pci_dma_buf_map(struct dma_buf_attachment *attachment,
-> +		     enum dma_data_direction dir)
-> +{
-[..]
+base-commit: 6b36119b94d0b2bb8cea9d512017efafd461d6ac
+-- 
+2.51.0.858.gf9c4a03a3a-goog
 
-
-> +err_unmap_dma:
-> +	if (!i || !state)
-> +		; /* Do nothing */
-> +	else if (dma_use_iova(state))
-> +		dma_iova_destroy(attachment->dev, state, mapped_len, dir,
-> +				 attrs);
-
-If we hit this error path then it is freed..
-
-> +static void vfio_pci_dma_buf_unmap(struct dma_buf_attachment *attachment,
-> +				   struct sg_table *sgt,
-> +				   enum dma_data_direction dir)
-> +{
-> +	struct vfio_pci_dma_buf *priv = attachment->dmabuf->priv;
-> +	struct dma_iova_state *state = attachment->priv;
-> +	unsigned long attrs = DMA_ATTR_MMIO;
-> +	struct scatterlist *sgl;
-> +	int i;
-> +
-> +	if (!state)
-> +		; /* Do nothing */
-> +	else if (dma_use_iova(state))
-> +		dma_iova_destroy(attachment->dev, state, priv->size, dir,
-> +				 attrs);
-
-It is freed here too, but we can call map multiple times. Every time a
-move_notify happens can trigger another call to map.
-
-I think just call unlink in those two and put dma_iova_free in detach
-
-Jason
 
