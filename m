@@ -1,197 +1,183 @@
-Return-Path: <kvm+bounces-60121-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-60122-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1AC0DBE1335
-	for <lists+kvm@lfdr.de>; Thu, 16 Oct 2025 03:52:39 +0200 (CEST)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
+	by mail.lfdr.de (Postfix) with ESMTPS id 164AABE1690
+	for <lists+kvm@lfdr.de>; Thu, 16 Oct 2025 06:10:33 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id A339D4EABBD
-	for <lists+kvm@lfdr.de>; Thu, 16 Oct 2025 01:52:35 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id C634C4E61B7
+	for <lists+kvm@lfdr.de>; Thu, 16 Oct 2025 04:10:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 369DF1EEA5D;
-	Thu, 16 Oct 2025 01:52:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 480D21DF273;
+	Thu, 16 Oct 2025 04:10:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="BDr/AgIe"
+	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="PMipPDug"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.12])
+Received: from SJ2PR03CU001.outbound.protection.outlook.com (mail-westusazon11012001.outbound.protection.outlook.com [52.101.43.1])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8B0F21DE2D7;
-	Thu, 16 Oct 2025 01:52:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.12
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1760579550; cv=none; b=jEgyZgyb+5BQLMI5Hbvk3Jm0e45BDvS5AaAQr/uf6zM1nC0wml9C1Qvfb+lrky/nf4cylrztMADb6Yd1cm1uaO6W0iHzXOdkdSnnwwxh3DxBu330Uh4RnFz0Az/dVxtYXnn8ZQIzLOjg96/sDKNZhtGnHLnc4twi1kwh0htpnVU=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1760579550; c=relaxed/simple;
-	bh=woq5C4XAhmSCnRFLmSIdNScVyP7bE3LD7+vv5yYzPoI=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=j95oAWHW89H5JP0lQUouR3o1Y7NjVt285FPJrD75CCwjV7gKQaWohumjf1n1aZJUkeg2tvaGQU0+7Wns5VfBI+bH2ZVcywmHLNFrIGl3BBy2qvFMyesrkNcI28KBdLVSGMoT39qD1fli86vTIsg3SzpatTsxC6SLeNvYervMTpQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=pass smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=BDr/AgIe; arc=none smtp.client-ip=198.175.65.12
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1760579548; x=1792115548;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=woq5C4XAhmSCnRFLmSIdNScVyP7bE3LD7+vv5yYzPoI=;
-  b=BDr/AgIe/si8j4LPeH7dn9Z3R1SYvS/3Los3qatF3CRu5BX/7KNs3bVy
-   /5YcsllfgQPuA9JhJ6Qd8oEovEx6wfI8ktgUkUnRwl/9nJxCxevz+M7Yn
-   bnPmFRYsFBQHTXVvMo6Q2rR0vYH0B0ucy1jcltbuh8KBLUb10ieeONyGb
-   IygoRJYK1VOEgAhqZRmVCbJSiD3eo1j85+atnCD8a0lrciO1c2j84yPLh
-   WswVFulRN6jyGEA64hTPBmcGJSZWG/BlhLn2D4wz+D3AayFmeWp547Ifx
-   FNkAxVdtkIG4ppr/7dNW5MMF7k95uqChBdgdKfk4gVS3yegVAms/OPFb1
-   w==;
-X-CSE-ConnectionGUID: q4uoiG2qQIKIclfMFXcMbA==
-X-CSE-MsgGUID: HRcj0vCUQeeuWKU79ARexA==
-X-IronPort-AV: E=McAfee;i="6800,10657,11583"; a="74210615"
-X-IronPort-AV: E=Sophos;i="6.19,232,1754982000"; 
-   d="scan'208";a="74210615"
-Received: from fmviesa007.fm.intel.com ([10.60.135.147])
-  by orvoesa104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 15 Oct 2025 18:52:28 -0700
-X-CSE-ConnectionGUID: 3QTDFGsRTXKxD/kDsPowPg==
-X-CSE-MsgGUID: FkJkE/UQR9e5Ry2TOuVj3A==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.19,232,1754982000"; 
-   d="scan'208";a="182001111"
-Received: from dnelso2-mobl.amr.corp.intel.com (HELO desk) ([10.124.223.20])
-  by fmviesa007-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 15 Oct 2025 18:52:26 -0700
-Date: Wed, 15 Oct 2025 18:52:26 -0700
-From: Pawan Gupta <pawan.kumar.gupta@linux.intel.com>
-To: x86@kernel.org, "H. Peter Anvin" <hpa@zytor.com>,
-	Josh Poimboeuf <jpoimboe@kernel.org>,
-	David Kaplan <david.kaplan@amd.com>,
-	Sean Christopherson <seanjc@google.com>,
-	Paolo Bonzini <pbonzini@redhat.com>
-Cc: linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-	Asit Mallick <asit.k.mallick@intel.com>,
-	Tao Zhang <tao1.zhang@intel.com>
-Subject: [PATCH v2 3/3] x86/vmscape: Remove LFENCE from BHB clearing long loop
-Message-ID: <20251015-vmscape-bhb-v2-3-91cbdd9c3a96@linux.intel.com>
-X-Mailer: b4 0.14.2
-References: <20251015-vmscape-bhb-v2-0-91cbdd9c3a96@linux.intel.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D6B07187346;
+	Thu, 16 Oct 2025 04:10:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.43.1
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1760587816; cv=fail; b=hGeMyxz6pTTHOkpTcDxDWhDIjEfUZo7h2gGrFydmi3nCKdPSDRF7/TbfYzcQPah+hMs8y6Oz7FqvRo1u1EleYv3YvF8tghiFq35TW0i/kShrOdRiBKcwfD8E1GXccTfI8qrAzv3R0VhssfZuLqr3k7rjTQcMve/BkdT1cIQ1Vcg=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1760587816; c=relaxed/simple;
+	bh=ou+YJUcSqfaPgPrH8X/DlhslvlxTjIdqnCYwoeDCWX4=;
+	h=Date:From:To:CC:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=I59Z4WaPAiGgyK+23qt8FKXJs/NknIS3U+oPFzRZSEacPYzQZd8bCXxquBOt46lJ/Z1Zy2wa1HhQRP1ljW7iBkJr+icOpoO2z036wxcrf3D2c6aHjZf0w7H2+vDtBmzubH3SnzXYl4SkGca79Ou60BhwHQZY0n3feJLo8nnoY/0=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=PMipPDug; arc=fail smtp.client-ip=52.101.43.1
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=X9M/liqiJwoZk5d00vmFdvfSU7hbjTCmMLDgxS+AVn44GPNGODF9UNVg3dRGSdIAxV2GY2VqJ13jv402AHqapH132mMs5BZ1E/fvy07LUkpPDPPMtpUdVjAoqY6vg4AO2ruawIlltsZhXQDErkUyZW/y41flK6ait44esut/gfEcJeKXNWA6KVDxHd0bGfbPFXarVFSx0SNaqm72VMGvIzcfwgtIvyozDCwM/KUv4Ki/Vw1Spu+tm5vLQ7/n9NxvbSCbQWlxAY3c1ec2jkAR2Ej2W3MpRPXy7ndfG0xPxUr/gQqFdnCEY5fmhBACH3NJR9mK9+gw7nAYHQNJ6ibr4w==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=tzQ4tnfmli0RcUF7968vYelvjg1xf5gzjtt5FmtxTN0=;
+ b=sGks4lc2bbPlylbNLQ+fumZ64dLAVLo8RT50HJ6hmCjWQSsEBYP7f7yyQmMS1DMoPTe+yiIDqI8qAqP0q2gqftgUA6xYeZ4xx6KkSb8OWDGvfaJmtkCUrcaXYUbhyajBhtZaao1kyXKE6kE/u9rXYvdcbRpF588gQMSpFTYt1uxMAklunL5QNGhJVtmvxFK1C2xW0pb2x9TMj+JtLSxqKyB0PSrlvVIHHEZ6t5GaXrrQoUTHqKldZxdN2HwzfIxr3X41XYflnT/rHr9+k9y8B3KOZcia6gYbiMNs496Lto2u3+r/WYhCTb+nlH3OpYS7lBkJXqlE1V6SXpas2748Eg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 216.228.117.161) smtp.rcpttodomain=kernel.org smtp.mailfrom=nvidia.com;
+ dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
+ dkim=none (message not signed); arc=none (0)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=tzQ4tnfmli0RcUF7968vYelvjg1xf5gzjtt5FmtxTN0=;
+ b=PMipPDugQKjH9U6e7JuO/pSKNbrtB238aHm5C8LQrrsk+aTmzTRBh2Ox7qaI98tCvyK+DYqt5OxcEvsTx2AGlJyOI9MrrHEz7rdEfb7eHbHTEQLosUr4vKPxO11ZthBWoSgLsu7TVa9/LIpbYpPiH3b/6kGGsG27m9wFmR+o6TTQulq/MZvUm6X7aNNzvKtkZpz4HCmu06hUpgK7IadPA23exlnDLNRPZL+BWEgTnB8SKzwDiQHEtO0ab0PSJveno5kflAg+QPfCK7CRj0z5pyjLkmja11c4uXjsncs61SYaim3FqDDCyz7+AC4ha5uNv5YbOFtlcYKA8GYSx4SyZQ==
+Received: from PH8PR20CA0014.namprd20.prod.outlook.com (2603:10b6:510:23c::24)
+ by MN0PR12MB5906.namprd12.prod.outlook.com (2603:10b6:208:37a::10) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9228.10; Thu, 16 Oct
+ 2025 04:10:09 +0000
+Received: from SN1PEPF000397AF.namprd05.prod.outlook.com
+ (2603:10b6:510:23c:cafe::d0) by PH8PR20CA0014.outlook.office365.com
+ (2603:10b6:510:23c::24) with Microsoft SMTP Server (version=TLS1_3,
+ cipher=TLS_AES_256_GCM_SHA384) id 15.20.9228.11 via Frontend Transport; Thu,
+ 16 Oct 2025 04:10:09 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.117.161)
+ smtp.mailfrom=nvidia.com; dkim=none (message not signed)
+ header.d=none;dmarc=pass action=none header.from=nvidia.com;
+Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
+ 216.228.117.161 as permitted sender) receiver=protection.outlook.com;
+ client-ip=216.228.117.161; helo=mail.nvidia.com; pr=C
+Received: from mail.nvidia.com (216.228.117.161) by
+ SN1PEPF000397AF.mail.protection.outlook.com (10.167.248.53) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.9228.7 via Frontend Transport; Thu, 16 Oct 2025 04:10:08 +0000
+Received: from rnnvmail205.nvidia.com (10.129.68.10) by mail.nvidia.com
+ (10.129.200.67) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.14; Wed, 15 Oct
+ 2025 21:09:57 -0700
+Received: from rnnvmail204.nvidia.com (10.129.68.6) by rnnvmail205.nvidia.com
+ (10.129.68.10) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.20; Wed, 15 Oct
+ 2025 21:09:56 -0700
+Received: from Asurada-Nvidia (10.127.8.12) by mail.nvidia.com (10.129.68.6)
+ with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.20 via Frontend
+ Transport; Wed, 15 Oct 2025 21:09:55 -0700
+Date: Wed, 15 Oct 2025 21:09:53 -0700
+From: Nicolin Chen <nicolinc@nvidia.com>
+To: Leon Romanovsky <leon@kernel.org>
+CC: Alex Williamson <alex.williamson@redhat.com>, Leon Romanovsky
+	<leonro@nvidia.com>, Jason Gunthorpe <jgg@nvidia.com>, Andrew Morton
+	<akpm@linux-foundation.org>, Bjorn Helgaas <bhelgaas@google.com>, Christian
+ =?iso-8859-1?Q?K=F6nig?= <christian.koenig@amd.com>,
+	<dri-devel@lists.freedesktop.org>, <iommu@lists.linux.dev>, Jens Axboe
+	<axboe@kernel.dk>, Joerg Roedel <joro@8bytes.org>, <kvm@vger.kernel.org>,
+	<linaro-mm-sig@lists.linaro.org>, <linux-block@vger.kernel.org>,
+	<linux-kernel@vger.kernel.org>, <linux-media@vger.kernel.org>,
+	<linux-mm@kvack.org>, <linux-pci@vger.kernel.org>, Logan Gunthorpe
+	<logang@deltatee.com>, Marek Szyprowski <m.szyprowski@samsung.com>, "Robin
+ Murphy" <robin.murphy@arm.com>, Sumit Semwal <sumit.semwal@linaro.org>,
+	"Vivek Kasireddy" <vivek.kasireddy@intel.com>, Will Deacon <will@kernel.org>
+Subject: Re: [PATCH v5 8/9] vfio/pci: Enable peer-to-peer DMA transactions by
+ default
+Message-ID: <aPBwEVJSzezdii1V@Asurada-Nvidia>
+References: <cover.1760368250.git.leon@kernel.org>
+ <a04c44aa4625a6edfadaf9c9e2c2afb460ad1857.1760368250.git.leon@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset="us-ascii"
 Content-Disposition: inline
-In-Reply-To: <20251015-vmscape-bhb-v2-0-91cbdd9c3a96@linux.intel.com>
+In-Reply-To: <a04c44aa4625a6edfadaf9c9e2c2afb460ad1857.1760368250.git.leon@kernel.org>
+X-NV-OnPremToCloud: ExternallySecured
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: SN1PEPF000397AF:EE_|MN0PR12MB5906:EE_
+X-MS-Office365-Filtering-Correlation-Id: 0dc8bf67-cbb6-4b73-e83d-08de0c69e53f
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|376014|7416014|1800799024|82310400026|36860700013;
+X-Microsoft-Antispam-Message-Info:
+	=?us-ascii?Q?aOPCMNXt69vGompbXz9hLA4vo9aZ8TdLP4131mGwisgZM9JQ0s7SfGcop+Km?=
+ =?us-ascii?Q?Tg5BJ3EwtevNrg5gDIu9jC3/iS7Ld/qr9XoNMoVGt5dEW9UNnPTVP1labE0k?=
+ =?us-ascii?Q?eQy0QHU3dsWh9ettL8EUXUIYJ+nnqrdjoAvJGJQN11ZsmsuNhVpsMEx7C6ez?=
+ =?us-ascii?Q?lKVro4LjLvnvoQyrJv8Wrx2KIY8KgJwZv03KcSnbxBGr22vVrRg1rcT7swKC?=
+ =?us-ascii?Q?dEJ+W1nP9PeZNd9/gblFUhuNCvpp7otniTdh2s7q6zwciioi1aDPljx1kl4n?=
+ =?us-ascii?Q?S2Fs26i8xXvlUd8iVI+OUGdnRwNyQL4bMAydGMoaem3oXjyzu2jw/dDdTJmw?=
+ =?us-ascii?Q?kdx9/HWjWY7KMLUNGEoCyLc1DC1T7n3XgcfXZZeRBnZ5/SFOXvumpe+nf2PH?=
+ =?us-ascii?Q?+EBTL7CKRsXt4GsWP9AFlUGnTFC+t1DyHQdOn1cIFSJzhQyvm24Tj8OsR+tC?=
+ =?us-ascii?Q?zHrynP6axdGREtF/9pmapYYflLZGOi+AajS0BlCWVCpsYtxYjcOdRHi/Qadj?=
+ =?us-ascii?Q?/VmB2zZPprh6Eb+1GOUbjx/qfYABOIJq4ybamo7+U+WSkchwkCeHFqi4+H6/?=
+ =?us-ascii?Q?Xs/PyagljB8zBTx/z+F73a4k+y/3kfGX9OppNeCDLyatuYNss/LyyLjKNKRN?=
+ =?us-ascii?Q?AQzwoh4+E2v7yPhdm6nGmCBCL4kug108xRi/byv03GPj3Se27ZNf6WTbPeST?=
+ =?us-ascii?Q?M3Y95nlWhlicY1WA84dXzDAAFZOoP56V3T2UrxakQa1E81QOBGyYTkUaWpbB?=
+ =?us-ascii?Q?5c7J6vARdGNuZ95MGK65zgVXTngNr3/L5JO6SqNwrIMFfS3Lv7pGYVbkfFNQ?=
+ =?us-ascii?Q?sdwXQ7AarYkmmD7ZwoFyDg6E6raeXLMZBBishTIMg54CIoI+w5p0oOESHQa3?=
+ =?us-ascii?Q?3Euz+9uTqBG9WYTcUxmughI1yjWebiVUiFz07BgEc+1wlvZroFbtW7OS7pLi?=
+ =?us-ascii?Q?54OunjQUKVCFn5x8G19okZeCP4Iwrz4lQ9asPV0M0YOVkzB5KxL6OtC8T+P3?=
+ =?us-ascii?Q?DEDkuIPIQC+fHmp+5+cf5o13XM3/YWYPUUnnOuKTaJibHZ1+oiSCXxoGZRXQ?=
+ =?us-ascii?Q?dEr14GYEr/mc6sTD8e2UK8ZHPnZvclhz2lTtcD7S2Si2uP58teIOc/M12UIL?=
+ =?us-ascii?Q?NOfNBy5wVav7SJYS6VbJrKfNoDRl1Ec/u2WtXjyCoSf7LPMvWzuXE8EFIf/N?=
+ =?us-ascii?Q?Q0Pp7KML1SNADmnH0o+6DG44ktax5X2hOwSlCfCxd4jETQn1M1C8vGGPoZC/?=
+ =?us-ascii?Q?62Bsb2txx+aoSr0FNjQo9nSqUdzYDUgLfzZ6JtM6aJ0pmhSf/bZc6o8Kl6Wy?=
+ =?us-ascii?Q?/8LfQfy/oGAEJDzKkHDKKA9UW8/dFcQQc7GIdyEg9XddEfXr7Z30iL+8Z6GW?=
+ =?us-ascii?Q?zsIr4TpHJEO++okrgar0EmUx6DQFL99CLIBeUs9Xv43n6Wu1bmnRLhdi3XOc?=
+ =?us-ascii?Q?S9hM0eF3Xt+ujsKctSZVGQ6F/aEEzZ2R9lmQtlUZ+3IEaZ1tzHVLiK6QXMWR?=
+ =?us-ascii?Q?747Ni/xiClJcO8q0XeKXjpGGiDnf52zhtfuxu66bBvsvik3z8DhuPZGVcxqF?=
+ =?us-ascii?Q?hAI03rVVLexi0Ff3nTI=3D?=
+X-Forefront-Antispam-Report:
+	CIP:216.228.117.161;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc6edge2.nvidia.com;CAT:NONE;SFS:(13230040)(376014)(7416014)(1800799024)(82310400026)(36860700013);DIR:OUT;SFP:1101;
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 16 Oct 2025 04:10:08.8892
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: 0dc8bf67-cbb6-4b73-e83d-08de0c69e53f
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.117.161];Helo=[mail.nvidia.com]
+X-MS-Exchange-CrossTenant-AuthSource:
+	SN1PEPF000397AF.namprd05.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: MN0PR12MB5906
 
-Long loop is used to clear the branch history when switching from a guest
-to host userspace. The LFENCE barrier is not required in this case as ring
-transition itself acts as a barrier.
+Hi Leon,
 
-Move the prologue, LFENCE and epilogue out of __CLEAR_BHB_LOOP macro to
-allow skipping the LFENCE in the long loop variant. Rename the long loop
-function to clear_bhb_long_loop_no_barrier() to reflect the change.
+On Mon, Oct 13, 2025 at 06:26:10PM +0300, Leon Romanovsky wrote:
+> @@ -2090,6 +2092,9 @@ int vfio_pci_core_init_dev(struct vfio_device *core_vdev)
+>  	INIT_LIST_HEAD(&vdev->dummy_resources_list);
+>  	INIT_LIST_HEAD(&vdev->ioeventfds_list);
+>  	INIT_LIST_HEAD(&vdev->sriov_pfs_item);
+> +	ret = pcim_p2pdma_init(vdev->pdev);
+> +	if (ret != -EOPNOTSUPP)
+> +		return ret;
+>  	init_rwsem(&vdev->memory_lock);
+>  	xa_init(&vdev->ctx);
 
-Signed-off-by: Pawan Gupta <pawan.kumar.gupta@linux.intel.com>
----
- arch/x86/entry/entry_64.S            | 32 ++++++++++++++++++++------------
- arch/x86/include/asm/entry-common.h  |  2 +-
- arch/x86/include/asm/nospec-branch.h |  4 ++--
- 3 files changed, 23 insertions(+), 15 deletions(-)
+I think this should be:
+	if (ret && ret != -EOPNOTSUPP)
+		return ret;
 
-diff --git a/arch/x86/entry/entry_64.S b/arch/x86/entry/entry_64.S
-index f5f62af080d8ec6fe81e4dbe78ce44d08e62aa59..bb456a3c652e97f3a6fe72866b6dee04f59ccc98 100644
---- a/arch/x86/entry/entry_64.S
-+++ b/arch/x86/entry/entry_64.S
-@@ -1525,10 +1525,6 @@ SYM_CODE_END(rewind_stack_and_make_dead)
-  * Target Selection, rather than taking the slowpath via its_return_thunk.
-  */
- .macro	__CLEAR_BHB_LOOP outer_loop_count:req, inner_loop_count:req
--	ANNOTATE_NOENDBR
--	push	%rbp
--	mov	%rsp, %rbp
--
- 	movl	$\outer_loop_count, %ecx
- 	ANNOTATE_INTRA_FUNCTION_CALL
- 	call	1f
-@@ -1560,10 +1556,7 @@ SYM_CODE_END(rewind_stack_and_make_dead)
- 	jnz	1b
- .Lret2_\@:
- 	RET
--5:	lfence
--
--	pop	%rbp
--	RET
-+5:
- .endm
- 
- /*
-@@ -1573,7 +1566,15 @@ SYM_CODE_END(rewind_stack_and_make_dead)
-  * setting BHI_DIS_S for the guests.
-  */
- SYM_FUNC_START(clear_bhb_loop)
-+	ANNOTATE_NOENDBR
-+	push	%rbp
-+	mov	%rsp, %rbp
-+
- 	__CLEAR_BHB_LOOP 5, 5
-+
-+	lfence
-+	pop	%rbp
-+	RET
- SYM_FUNC_END(clear_bhb_loop)
- EXPORT_SYMBOL_GPL(clear_bhb_loop)
- STACK_FRAME_NON_STANDARD(clear_bhb_loop)
-@@ -1584,8 +1585,15 @@ STACK_FRAME_NON_STANDARD(clear_bhb_loop)
-  * protects the kernel, but to mitigate the guest influence on the host
-  * userspace either IBPB or this sequence should be used. See VMSCAPE bug.
-  */
--SYM_FUNC_START(clear_bhb_long_loop)
-+SYM_FUNC_START(clear_bhb_long_loop_no_barrier)
-+	ANNOTATE_NOENDBR
-+	push	%rbp
-+	mov	%rsp, %rbp
-+
- 	__CLEAR_BHB_LOOP 12, 7
--SYM_FUNC_END(clear_bhb_long_loop)
--EXPORT_SYMBOL_GPL(clear_bhb_long_loop)
--STACK_FRAME_NON_STANDARD(clear_bhb_long_loop)
-+
-+	pop	%rbp
-+	RET
-+SYM_FUNC_END(clear_bhb_long_loop_no_barrier)
-+EXPORT_SYMBOL_GPL(clear_bhb_long_loop_no_barrier)
-+STACK_FRAME_NON_STANDARD(clear_bhb_long_loop_no_barrier)
-diff --git a/arch/x86/include/asm/entry-common.h b/arch/x86/include/asm/entry-common.h
-index b7b9af1b641385b8283edf2449578ff65e5bd6df..c70454bdd0e3f544dedf582ad6f7f62e2833704c 100644
---- a/arch/x86/include/asm/entry-common.h
-+++ b/arch/x86/include/asm/entry-common.h
-@@ -98,7 +98,7 @@ static inline void arch_exit_to_user_mode_prepare(struct pt_regs *regs,
- 		if (cpu_feature_enabled(X86_FEATURE_IBPB_EXIT_TO_USER))
- 			indirect_branch_prediction_barrier();
- 		else if (cpu_feature_enabled(X86_FEATURE_CLEAR_BHB_EXIT_TO_USER))
--			clear_bhb_long_loop();
-+			clear_bhb_long_loop_no_barrier();
- 
- 		this_cpu_write(x86_pred_flush_pending, false);
- 	}
-diff --git a/arch/x86/include/asm/nospec-branch.h b/arch/x86/include/asm/nospec-branch.h
-index 00730cc22c2e7115f6dbb38a1ed8d10383ada5c0..3bcf9f180c21d468f17fa9c1210cba84a541e6ea 100644
---- a/arch/x86/include/asm/nospec-branch.h
-+++ b/arch/x86/include/asm/nospec-branch.h
-@@ -388,9 +388,9 @@ extern void write_ibpb(void);
- 
- #ifdef CONFIG_X86_64
- extern void clear_bhb_loop(void);
--extern void clear_bhb_long_loop(void);
-+extern void clear_bhb_long_loop_no_barrier(void);
- #else
--static inline void clear_bhb_long_loop(void) {}
-+static inline void clear_bhb_long_loop_no_barrier(void) {}
- #endif
- 
- extern void (*x86_return_thunk)(void);
+Otherwise, init_rwsem() and xa_init() would be missed if ret==0.
 
--- 
-2.34.1
-
-
+Thanks
+Nicolin
 
