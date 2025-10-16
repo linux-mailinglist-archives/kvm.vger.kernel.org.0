@@ -1,141 +1,150 @@
-Return-Path: <kvm+bounces-60228-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-60229-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 99FB1BE5840
-	for <lists+kvm@lfdr.de>; Thu, 16 Oct 2025 23:07:25 +0200 (CEST)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
+	by mail.lfdr.de (Postfix) with ESMTPS id D0BCCBE58F8
+	for <lists+kvm@lfdr.de>; Thu, 16 Oct 2025 23:20:10 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 1182019C702F
-	for <lists+kvm@lfdr.de>; Thu, 16 Oct 2025 21:07:49 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 9675C4EC3FA
+	for <lists+kvm@lfdr.de>; Thu, 16 Oct 2025 21:20:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D4EFC2E228C;
-	Thu, 16 Oct 2025 21:07:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7B2EF2E1C6B;
+	Thu, 16 Oct 2025 21:20:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="mkEcS9UA"
+	dkim=pass (2048-bit key) header.d=fb.com header.i=@fb.com header.b="Er6Sxxgt"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pg1-f179.google.com (mail-pg1-f179.google.com [209.85.215.179])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx0a-00082601.pphosted.com (mx0a-00082601.pphosted.com [67.231.145.42])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AB615229B12
-	for <kvm@vger.kernel.org>; Thu, 16 Oct 2025 21:07:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.179
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E43572BD001
+	for <kvm@vger.kernel.org>; Thu, 16 Oct 2025 21:20:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=67.231.145.42
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1760648839; cv=none; b=ULCoTQtLTAJ8PD++wAZqBIFziI0R5LthXOAJxiS5Yf/733UanO2ENvcFmQCLqW20bn6IwzqMjIZFSBc6Ng9zRVPn5OfqgSXufgjU1Tghtctm9CXQg0tS70I17aom9ShH+JREY5WEFEdwIkKkvPrKHh6iuo9/86OO1aosz/xA6D0=
+	t=1760649604; cv=none; b=m2mjwuZcNoi8Ve28RI8dIQ0eMn4NfpJhxKGoK2YKEqE7TBo0X8EDQBId4KEz9LC0hPifa7vzOSrda5U/G1XDVHSG7nnVh39rgrU1SsL8mjFjRLG4ZWFkVbktC//TGkvhDKaAX9X92bQPCXR4HdyTfUTkDWSp4gTFsMeir5ygdOw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1760648839; c=relaxed/simple;
-	bh=/PZwiIAPmraOr8DU5gpdQ0hm3ySju3FqvZeZeb5sXQM=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=q0oN6kl2uPBZeDlmquERwfCuqN6LGIQi7316d6wRZNz1mdLtQ7oHWydIy9/xdjnNSJvOZhEkbBXbHB6cbR//hEG7gfI5aHvsqKprRkQHX5U5jgxujyBag5qp+amXv46o1xGkGXuSt20LjkcAkTLe4QXz5+L5nE04q3FUMWzRs4Y=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=mkEcS9UA; arc=none smtp.client-ip=209.85.215.179
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pg1-f179.google.com with SMTP id 41be03b00d2f7-b6a42754723so20923a12.3
-        for <kvm@vger.kernel.org>; Thu, 16 Oct 2025 14:07:17 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1760648837; x=1761253637; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=YqKLtcHyZtQvUCKV9AK34ygiWjcxKsGF+96gmD+h6kc=;
-        b=mkEcS9UAJzH82Xaf3mmBYfqnCmfGhTpmNrweOOBu9Q5DZZN87AoiAo5MwCIxBJpj1S
-         Ro0O1BhuInOLntLvvI1aqTZ3IK6Va+VZNhbKeHqwOmYRt+ym9MzDROkxC/rUMWAiNenV
-         S+qxFcKihT8ZlTbXWFhSi5A5jRJfCgG3PbuqtWvLZWthjVWTCRxy4uXfpUfQHTG/Ha5W
-         U1V0JoQwNhRKvUMwtcQRm1gqXGk83oNstsUv3C7SCiMMOYlu5j2wOQrI31B4syOibIDt
-         4Vc3H+K2zNAtrYceEPWkoI3G1T5fwgTaxN4Wxli1D/Wylz5E/ukb+zCO53ZWVbL1NZKo
-         vK7Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1760648837; x=1761253637;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=YqKLtcHyZtQvUCKV9AK34ygiWjcxKsGF+96gmD+h6kc=;
-        b=RbkaZVpt67QSwQ7+n4uWFgGCp2LW+MVqZW7a6piO+BJl55eWbDLrynyWkjfXcK7rnr
-         jkcQ+U6OINpmagPXGYzU5nPcNhyRfh9GvTQJhKAfjAJzJQGz/exjkJlUvkoJK5SZjPyO
-         9lAuaOwk9cJedDr1ewL4B7L6n6MXIZgF68OpNrG1ZggH8eZka4fBZdBtu2XJJoLDZOa5
-         nidXr/0upG32by6YCDNmRbHs+1CW0nqg/te9FNDEqqUvQFVkq712c6PjPokOjPJn+5Ms
-         NLeQalDhKOQECLM+Ya3MrgO+4j7VEjjPX99cCMH/zh+/vAt+Qqo9iuMW2iS4WQU3RxXY
-         /9Qg==
-X-Forwarded-Encrypted: i=1; AJvYcCXWXxTM72/lynbhHll4aSVBLfuE6BacyVR7i3oJ/Ov0vS6am9MdCUwMjsbAOthkESLprpg=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yyk0AL24cT40XnW0xMZH24cmc0YcGZZDJo1krEW9GiAjhmgZSt2
-	U2LvL9Slzh9gKGzfWkcfJypoD14/ce8mOQpfv7NBaAtGfWSyfRIuH7NfSyJaM/+S8SN0kO+dA1d
-	kSJxlRIEf34qycka/GXrKwf2Uwu8ITKQ=
-X-Gm-Gg: ASbGnctPwngKIce1YfI8J5BjqEP9w+vCCYWuGHoqqCqRfwM4ZG+6QwOwSeO3BBMlh50
-	we7qtqPuagVUQWHIU4+iV3pB7/kHePeVcBSgtXQ2qMkb3KLTqqG6Zg5aMMSZ7TihPdO6G7J0WM8
-	89T8MlWlEMFcYjXIDg2JrluuzWH4jzkhGY3NH7dzU8gTRthcMDznf3vY+/AqKE0IbJtld0mEH0f
-	AbgJB8jb4P0fYHS70Ed3e+oQSKaQHImxX288gCzlWH3O0BUdivckn4ciKJnLmiCSl5v9jvSJSpk
-	7bQmSjMq/uR4z/IXgHyZHgC954QSgOxroZNZ5TXM/bUOnJbb+DRTpmydJrNRbQBQ5zhinLTpz9M
-	ObKQkfqDcpFArw71+PqhIdafM
-X-Google-Smtp-Source: AGHT+IEIgAYtM+PkA8oLdH6dq6tTOHVM2SK/9pf6/KLEGFt0fs1UrG1QtsI18/3/wnm81TfvgNcSQoGgwMXacG4fjDo=
-X-Received: by 2002:a17:903:40ca:b0:290:55ba:d70a with SMTP id
- d9443c01a7336-290c9cf3306mr8101005ad.2.1760648836981; Thu, 16 Oct 2025
- 14:07:16 -0700 (PDT)
+	s=arc-20240116; t=1760649604; c=relaxed/simple;
+	bh=n3ixKopgiOXu0j5Gu9Xa8sJEO+cNXcErZs0OrzAD23M=;
+	h=Date:From:To:CC:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=j0hBxVCsbkxHwfvvJTNrfmgh3NMZrZUxhgVVwSbC7+NMQQ6Yeql8kOkl0Yu+raK+1Nm6Zd2h9MGHdabilS7ObZVgjjeljOulybxWqs11dc6xf+CoBMvbSjQLGC2r13aDshYTRWXTJtkRsXZdVSAfkygjKugJdL0AyZBZ8KbTCvY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fb.com; spf=pass smtp.mailfrom=meta.com; dkim=pass (2048-bit key) header.d=fb.com header.i=@fb.com header.b=Er6Sxxgt; arc=none smtp.client-ip=67.231.145.42
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fb.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=meta.com
+Received: from pps.filterd (m0044010.ppops.net [127.0.0.1])
+	by mx0a-00082601.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 59GJU7Bd3570266
+	for <kvm@vger.kernel.org>; Thu, 16 Oct 2025 14:20:02 -0700
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=fb.com; h=cc
+	:content-type:date:from:in-reply-to:message-id:mime-version
+	:references:subject:to; s=s2048-2025-q2; bh=HTfYx0O/2LqoZlhdDIRd
+	qU9HiEQM8Uuj9LLPiMfcY2E=; b=Er6SxxgtnH8X5nDUS++bMuNpLQcXfSf69ptO
+	fYWONVPq90iP+kKMWo9qTUL0CABssGqfjbGjUNkk2CoGnwtEVv4KEhUZ0aez9Twp
+	Prc/a1bLArxmogVp33TK/KcnHQe3ZnVhb0YSbRO4s0JxCeijn3FsJchwgV8VlhQ8
+	R7qJeRHDnVy0r3jDtEkgkka57Yu1yfP/Yr6mtwndbl+vsUgq6iCD1U3FWScDV1TW
+	PMSHJdSRP0mWMs3B54aRNuD16TJRWsCrAjOeJbHRmeYAufizb1xyTaVsbTn1mC1O
+	ZSwbMlQmdjgeYUgXvCwMht9cbKwlhXEqED71Zkj8UlQdoLgVbQ==
+Received: from maileast.thefacebook.com ([163.114.135.16])
+	by mx0a-00082601.pphosted.com (PPS) with ESMTPS id 49u26vbwmr-2
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128 verify=NOT)
+	for <kvm@vger.kernel.org>; Thu, 16 Oct 2025 14:20:01 -0700 (PDT)
+Received: from twshared23637.05.prn5.facebook.com (2620:10d:c0a8:1c::1b) by
+ mail.thefacebook.com (2620:10d:c0a9:6f::8fd4) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.2.2562.20; Thu, 16 Oct 2025 21:20:00 +0000
+Received: by devgpu015.cco6.facebook.com (Postfix, from userid 199522)
+	id EAE5E12877C3; Thu, 16 Oct 2025 14:19:53 -0700 (PDT)
+Date: Thu, 16 Oct 2025 14:19:53 -0700
+From: Alex Mastro <amastro@fb.com>
+To: Alejandro Jimenez <alejandro.j.jimenez@oracle.com>
+CC: Alex Williamson <alex@shazbot.org>, Jason Gunthorpe <jgg@ziepe.ca>,
+        <kvm@vger.kernel.org>, <linux-kernel@vger.kernel.org>
+Subject: Re: [PATCH v4 0/3] vfio: handle DMA map/unmap up to the addressable
+ limit
+Message-ID: <aPFheZru+U+C4jT7@devgpu015.cco6.facebook.com>
+References: <20251012-fix-unmap-v4-0-9eefc90ed14c@fb.com>
+ <20251015132452.321477fa@shazbot.org>
+ <3308406e-2e64-4d53-8bcc-bac84575c1d9@oracle.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20251016172853.52451-1-seanjc@google.com> <CANiq72ntKAeXRT_fEGJteUfuQuNUSjobmJCbQOuJWAcNFb1+9w@mail.gmail.com>
- <aPFVcMdfFlxhgGZh@google.com>
-In-Reply-To: <aPFVcMdfFlxhgGZh@google.com>
-From: Miguel Ojeda <miguel.ojeda.sandonis@gmail.com>
-Date: Thu, 16 Oct 2025 23:07:02 +0200
-X-Gm-Features: AS18NWCIqm_srauk6JXkuo1Nu5EkkFsJYyp4maKnlr0nVE8sbB1v3JnElr1TnCc
-Message-ID: <CANiq72m6vWc9K+TLYoToGOWXXFB5tbAdf-crdx6U1UrBifEEBA@mail.gmail.com>
-Subject: Re: [PATCH v13 00/12] KVM: guest_memfd: Add NUMA mempolicy support
-To: Sean Christopherson <seanjc@google.com>
-Cc: Miguel Ojeda <ojeda@kernel.org>, Marc Zyngier <maz@kernel.org>, 
-	Oliver Upton <oliver.upton@linux.dev>, Paolo Bonzini <pbonzini@redhat.com>, 
-	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, 
-	kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	Ackerley Tng <ackerleytng@google.com>, Shivank Garg <shivankg@amd.com>, 
-	David Hildenbrand <david@redhat.com>, Fuad Tabba <tabba@google.com>, Ashish Kalra <ashish.kalra@amd.com>, 
-	Vlastimil Babka <vbabka@suse.cz>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset="us-ascii"
+Content-Disposition: inline
+In-Reply-To: <3308406e-2e64-4d53-8bcc-bac84575c1d9@oracle.com>
+X-FB-Internal: Safe
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUxMDE2MDE1OSBTYWx0ZWRfX9LcKALBxa+ce
+ Ex80DZ5In98Nc7Ybc5W8gHPkJZsZJnE3cMWfqPA5HCEs1EaBfMFvEGk2YF4r8PwjOtUULAXNIyb
+ hzKUhrQPg2lSlmVvGrQD4HIaRb2TxUlRBCSZUggBj3YexfxF3auz/OuHy228JKj5lBk/UXaufUS
+ 1QYoAgV3g64OPPUbm+u1YZYvVll+3JJARIrwZNhL/D8rhSK1M5TATKxOH544KTG3sHuBr4CKy8s
+ H+PLT3DLgdBUXnnqVQLwAVTs59RqsWZ13BbObtxcIPBX/CWj72vqe6Knw1lk2GyHobZg/HL5A3Z
+ UrVlB1Nbn6yzR0fi4LNvM5rGxaiVASvanjQ9ryqsmeCpF4192ArKankf4EeN7mt/CiDBLZcL3yf
+ wSt+VrvhK8SS1/3VLnKT7HyV8ykieQ==
+X-Authority-Analysis: v=2.4 cv=BYLVE7t2 c=1 sm=1 tr=0 ts=68f16181 cx=c_pps
+ a=MfjaFnPeirRr97d5FC5oHw==:117 a=MfjaFnPeirRr97d5FC5oHw==:17
+ a=kj9zAlcOel0A:10 a=x6icFKpwvdMA:10 a=VkNPw1HP01LnGYTKEx00:22
+ a=NEAV23lmAAAA:8 a=FOH2dFAWAAAA:8 a=yPCof4ZbAAAA:8 a=lr_byV0os-YnZdEWD9MA:9
+ a=CjuIK1q_8ugA:10
+X-Proofpoint-ORIG-GUID: SNfP70GyQzerou1oofzf24hPPA1tjrHa
+X-Proofpoint-GUID: SNfP70GyQzerou1oofzf24hPPA1tjrHa
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1121,Hydra:6.1.9,FMLib:17.12.80.40
+ definitions=2025-10-16_04,2025-10-13_01,2025-03-28_01
 
-On Thu, Oct 16, 2025 at 10:28=E2=80=AFPM Sean Christopherson <seanjc@google=
-.com> wrote:
->
-> Oh, I take it .clang-format is auto-generated?  Is it a "formal" script, =
-or do
-> you literally just run the grep command in the comment?
+On Wed, Oct 15, 2025 at 05:25:14PM -0400, Alejandro Jimenez wrote:
+> 
+> 
+> On 10/15/25 3:24 PM, Alex Williamson wrote:
+> > On Sun, 12 Oct 2025 22:32:23 -0700
+> > Alex Mastro <amastro@fb.com> wrote:
+> > 
+> > > This patch series aims to fix vfio_iommu_type.c to support
+> > > VFIO_IOMMU_MAP_DMA and VFIO_IOMMU_UNMAP_DMA operations targeting IOVA
+> > > ranges which lie against the addressable limit. i.e. ranges where
+> > > iova_start + iova_size would overflow to exactly zero.
+> > 
+> > The series looks good to me and passes my testing.  Any further reviews
+> > from anyone?  I think we should make this v6.18-rc material.  Thanks,
+> > 
+> 
+> I haven't had a chance yet to closely review the latest patchset versions,
+> but I did test this v4 and confirmed that it solves the issue of not being
+> able to unmap an IOVA range extending up to the address space boundary. I
+> verified both with the simplified test case at:
+> https://gist.github.com/aljimenezb/f3338c9c2eda9b0a7bf5f76b40354db8
+> 
+> plus using QEMU's amd-iommu and a guest with iommu.passthrough=0
+> iommu.forcedac=1 (which is how I first found the problem).
+> 
+> So Alex Mastro, please feel free to add:
+> 
+> Tested-by: Alejandro Jimenez <alejandro.j.jimenez@oracle.com>
+> 
+> for the series. I'll try to find time to review the patches in detail.
+> 
+> Thank you,
+> Alejandro
+> 
+> > Alex
+> 
 
-I just run it and copy-paste the results there from time to time.
-Yeah, a very low-tech solution :)
+Thanks all. I would like additional scrutiny around vfio_iommu_replay. It was
+the one block of affected code I have not been able to test, since I don't have
+/ am not sure how to simulate a setup which can cause mappings to be replayed
+on a newly added IOMMU domain. My confidence in that code is from close review
+only.
 
-> I don't think I care if it's in the list?  I honestly don't know for sure=
-, because
-> it's entirely possible I'm consuming .clang-format without knowing it.  I=
- added
-> the entry based on someone else's request.
->
-> Ackerley?
+I explicitly tested various combinations of the following with mappings up to
+the addressable limit:
+- VFIO_IOMMU_MAP_DMA
+- VFIO_IOMMU_UNMAP_DMA range-based, and VFIO_DMA_UNMAP_FLAG_ALL
+- VFIO_IOMMU_DIRTY_PAGES with VFIO_IOMMU_DIRTY_PAGES_FLAG_GET_BITMAP
 
-If you are not relying on it, then please just skip it, yeah.
+My understanding is that my changes to vfio_iommu_replay would be traversed
+when binding a group to a container with existing mappings where the group's
+IOMMU domain is not already one of the domains in the container.
 
-> Is it possible, and sensible, to have per-subsystem .clang-format files? =
- KVM
-> (virt/kvm) and KVM x86 (arch/x86/kvm) both have has several for_each macr=
-os,
-> pretty much all of which are more interesting than kvm_gmem_for_each_file=
-().
-
-There is `InheritParentConfig` nowadays, but from a quick look I don't
-see it supports merging lists.
-
-So to do something fancier, we would do need something like we did for
-rust-analyzer, i.e. a `make` target or similar that would generate it.
-
-Otherwise, we can just add extra macros at the top meanwhile.
-
-What we did last time is just to add `tools/` to that command --
-increasing coverage is not an issue (I just started with `include/`
-originally to be a bit conservative and avoid a huge list until we
-knew the tool would be used).
-
-Cheers,
-Miguel
+Thanks,
+Alex
 
