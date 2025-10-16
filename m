@@ -1,125 +1,132 @@
-Return-Path: <kvm+bounces-60219-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-60220-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
-	by mail.lfdr.de (Postfix) with ESMTPS id D7BE2BE52C8
-	for <lists+kvm@lfdr.de>; Thu, 16 Oct 2025 21:07:34 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id DEB44BE54F1
+	for <lists+kvm@lfdr.de>; Thu, 16 Oct 2025 22:04:33 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id C6B744F26F2
-	for <lists+kvm@lfdr.de>; Thu, 16 Oct 2025 19:07:33 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9EE72581C89
+	for <lists+kvm@lfdr.de>; Thu, 16 Oct 2025 20:04:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A3C292561C2;
-	Thu, 16 Oct 2025 19:06:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D65A62DCF4B;
+	Thu, 16 Oct 2025 20:04:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="QqTGUXj6"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="21ERtyXs"
 X-Original-To: kvm@vger.kernel.org
 Received: from mail-pl1-f201.google.com (mail-pl1-f201.google.com [209.85.214.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 715B3239E65
-	for <kvm@vger.kernel.org>; Thu, 16 Oct 2025 19:06:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 861BC1A9F83
+	for <kvm@vger.kernel.org>; Thu, 16 Oct 2025 20:04:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1760641616; cv=none; b=Jypruq9GLDWwZ3FFA/+n5JrkOQl1vqPK8I4aZJiulNpBBSrbmu6FfLHJZt2mWCB8SphcDsnn2Sv7XDfJj7rCmFn0KxcfRAxe+AwCgNEXM4Lpx8HMNbe+BZZyIWvVTfcKrP72LhsbteU8ZLogOwZNdJsJrObGWaG56sXJqsZAKnM=
+	t=1760645063; cv=none; b=H0PQgdnYhxmGxHUXJarO+KbepGCqvfuC30rAZP+Vo6nxSJUvQb9T7CsTspM365D9zpHEV+PlApfovQeVXSooE+IH+P6P/Ja1HbH8wrL9eurCwsbVYKirEtU/nCi7gwR1zoxxJ1GTs8Flg8HGbVVm0tEZj7lkvFF/YeqNQnU5hMY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1760641616; c=relaxed/simple;
-	bh=YBxESa1CpdXRaPWaeva+4lHFBA8rLlw/72FIwmffHyI=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=MDzsb4yZTXy2JW7EG5m5a6tFeNsqQwvgxS0++/OdYQUT2EkpGpaD0MsHFQdHr5Juz80pGL0roXLa6jC3agdCRH34Eh1GSNOyekrfK5Qs6uz0XQ8si+OHJHTvEWEWWyjMIJadcmYRTBlfdOKp4n62DmGLtXXZ11j8Qks3lmFMSgs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=QqTGUXj6; arc=none smtp.client-ip=209.85.214.201
+	s=arc-20240116; t=1760645063; c=relaxed/simple;
+	bh=6FYjDgh42/rdDprSBTVYpSTAtjBUWQ9+cTdBrRIVV+I=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=lAR2GgEZdGcNv2zTOW96f9TFhhz05EqBZvRCPsfDZeBqVe28uuoxvkyz8IC+Vttr0Tn4l0VvJOpuUTrIyPkr2FDgHlJDvQSQIbtOqa4eAfMfrfr+BjTjE6sWvCE/BlM/0ZcvI8/BcStGvju8WTFLR3DOfEFtIQO5zJO2TUhf3oY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=21ERtyXs; arc=none smtp.client-ip=209.85.214.201
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pl1-f201.google.com with SMTP id d9443c01a7336-27c62320f16so12527255ad.1
-        for <kvm@vger.kernel.org>; Thu, 16 Oct 2025 12:06:54 -0700 (PDT)
+Received: by mail-pl1-f201.google.com with SMTP id d9443c01a7336-269880a7bd9so15202435ad.3
+        for <kvm@vger.kernel.org>; Thu, 16 Oct 2025 13:04:21 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1760641614; x=1761246414; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:reply-to:from:to:cc:subject:date:message-id:reply-to;
-        bh=LABRqD9aUZpUjVf9UfWBC/peaZw13rHiQXEQ8T+Co+c=;
-        b=QqTGUXj6Kvo5pGOCVucnTuR7nVHE+jW+cRQeqvEumQcV7kKPBEjpBX9r3exbpjJuoQ
-         se/cu+I0639UX7lOKB4Zh/eMJpGUTtIbbSUiVELLNnI2RcmXiBrMWarrh0ErzDSllVV/
-         vJTOm4lMMjwZJbDtcoy4kpu9vhH1TuxhrCk/uXt3lZ/HaFbL9DYgePOnkbiZvPJQ2Hs5
-         P/8TollonBRepGzsqHqSw5uTYxf7d7NizJBodNuASBrBEBNFi8a7M8ORJnSmn0609Bm6
-         iRTZLwhtL7DFkwxXVGeh/ktnnNMHsaXTQ9k1kewNTPdJPpI1pn/9JoETIkAJynv3L4hh
-         0BaA==
+        d=google.com; s=20230601; t=1760645061; x=1761249861; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:mime-version:date:reply-to:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=Jqb7kJ6kiZ0p+CW5ZbbOBcYhzgQT02h76oqcAal4vWw=;
+        b=21ERtyXsa6GzXPuM2I8gqkED+KXnZu6/S6UXM3WrGebl/DV6y+H344/tkPJ+WGO8NL
+         7pBcqRsOCvKFDzvnWjvalBaQlh0fHwTO7FTt6PE6SMW6qKGF5+SduQJtRDZm4JbHJWW6
+         Fx0SAShuaexe9XJdwzOAKEPbbgmC7MW1Z4J91ksL1kRNV1uYAChJfeNXXbRiQ9S/INbS
+         XNeAg8AVaaHoHQ5xIWq8MyUXhxvIx6dZB021vX7lqe2lK5ZfUEB6LcZ8C/FwBzJfB1nQ
+         lx5U0BS58Z978VvdbftyjTWJH7dMOEV7jxgCdUfYjfk7kin4hHday4bolpW8v6NTKJBR
+         9D5Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1760641614; x=1761246414;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:reply-to:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=LABRqD9aUZpUjVf9UfWBC/peaZw13rHiQXEQ8T+Co+c=;
-        b=RAhr6bWQ4FQCGV3Bkn++LtKz2Mf116ZA75pZ3fWvBSACSuURpy/T25CQGNAULilfVc
-         acVGYWJ//kEeNJnBo3SEsT9fyJbSYKRQEYUG6xnB+S5ZEZ/ZK7nBGoS0lHsWcZnzNFSl
-         cvqieP8soZQSaog5TruB5UyiMvOJpwKsKntbFKO5okNfEqTA1JF36ioPibCpnLLkGN+r
-         tNdfuB5agsZajMWm+s+BzWR0P4it1MTj5/UIGd8OQuCPGnccyDeuNp7hPadGM6bUTQCn
-         YwnoBhHcrnRP4b1lu7NV4eLMXgaLIs1iptns6IGWoo+vC2LyEHiJX9CuCsvb3q17Zlko
-         8b/w==
-X-Gm-Message-State: AOJu0YyT3yL72pa3XBLW45U2kGpX7Z2ZuujowLk5fCT3pguh4KuKlbow
-	wmvDe7zf+A6e6o4f7uSy+a/23yT3oOa+j7vnOJFEpf4vIAIeAj+quiKQk5zb2pnuVC+/26lij2B
-	aPt144Q==
-X-Google-Smtp-Source: AGHT+IHNkssHfRpTSPJv5vfJ0hG/avsJSbtPbn9niGhmFXN0nZWxcs3w1T94tFkiYA6sCa29Eo7CxIho5sU=
-X-Received: from pjbge12.prod.google.com ([2002:a17:90b:e0c:b0:332:a4e1:42ec])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:902:e5c8:b0:27d:6777:2833
- with SMTP id d9443c01a7336-290cb18415emr11317135ad.47.1760641613662; Thu, 16
- Oct 2025 12:06:53 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1760645061; x=1761249861;
+        h=cc:to:from:subject:message-id:mime-version:date:reply-to
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=Jqb7kJ6kiZ0p+CW5ZbbOBcYhzgQT02h76oqcAal4vWw=;
+        b=aRPWCOF/CmC2gnkDMur05oEjj69X6pnIS7ZxIEK488WcCzDnr5+J7WJmQMU+pAxCuG
+         AO/xtCR2y/irGktgcoHj5eK+jFNbtiexKcZXmxsDP2ytt2eNeEiXrXqt98/xoQcjwCm/
+         6k0oEA1KWNkBKGGS+vH6dS60YwZhG+f5EcDOqwBHEc58SsRumXEAfvTauKei6IpRlPp2
+         +GgQ9Rpficbhhgo5R7LdxtYyox+ZRp/9/vux65snz2edWjZ1zQ1TyRPji7H0o3urTxZa
+         QC0iFH+9FONiPYeP0NzSZuDKi9eqw1ndX3No+BEt5F55zAmHWT8tgXb7AnPia0zPwbME
+         /akw==
+X-Gm-Message-State: AOJu0YzWZGrcb1suq5pVifI7r1hK4uNeGFBJqOZzgB+Zw80bh8VEbddf
+	T406pskOCga//diqmvFlkG138H1wEHhsH5U19a4Aoo8ogNFlojNLZPcpjErueGUGaXMr94xSMv/
+	F8zLycA==
+X-Google-Smtp-Source: AGHT+IEhznhfjB+gb8VYxaVF/itKOuOUs62hiSpzzD8roNvleF8B+Bh5tVSfnMSsk3bPF8Lq+0CT7lrqb9Y=
+X-Received: from pjpx13.prod.google.com ([2002:a17:90a:a38d:b0:33b:51fe:1a93])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:902:c951:b0:25c:b1d6:c41a
+ with SMTP id d9443c01a7336-290c9cf3517mr13660925ad.11.1760645060865; Thu, 16
+ Oct 2025 13:04:20 -0700 (PDT)
 Reply-To: Sean Christopherson <seanjc@google.com>
-Date: Thu, 16 Oct 2025 12:06:43 -0700
-In-Reply-To: <20251016190643.80529-1-seanjc@google.com>
+Date: Thu, 16 Oct 2025 13:04:13 -0700
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
-References: <20251016190643.80529-1-seanjc@google.com>
 X-Mailer: git-send-email 2.51.0.858.gf9c4a03a3a-goog
-Message-ID: <20251016190643.80529-4-seanjc@google.com>
-Subject: [PATCH 3/3] KVM: SVM: Make avic_ga_log_notifier() local to avic.c
+Message-ID: <20251016200417.97003-1-seanjc@google.com>
+Subject: [PATCH v3 0/4] KVM: VMX: Unify L1D flush for L1TF
 From: Sean Christopherson <seanjc@google.com>
 To: Sean Christopherson <seanjc@google.com>, Paolo Bonzini <pbonzini@redhat.com>
 Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	Hou Wenlong <houwenlong.hwl@antgroup.com>
+	Pawan Gupta <pawan.kumar.gupta@linux.intel.com>, Brendan Jackman <jackmanb@google.com>
 Content-Type: text/plain; charset="UTF-8"
 
-Make amd_iommu_register_ga_log_notifier() a local symbol now that it's
-defined and used purely within avic.c.
+Unify the L1D cache flushing done to mitigate L1TF under the per-CPU
+variable, as the per-vCPU variable has been superfluous for quite some
+time.
 
-No functional change intended.
+Patch 1 fixes a bug (I think it's a bug?) I found when poking around the code.
+If L1D flushes are conditional and KVM skips an L1D flush on VM-Enter, then
+arguably KVM should flush CPU buffers based on other mitigations.
 
-Fixes: 4bdec12aa8d6 ("KVM: SVM: Detect X2APIC virtualization (x2AVIC) support")
-Signed-off-by: Sean Christopherson <seanjc@google.com>
----
- arch/x86/kvm/svm/avic.c | 2 +-
- arch/x86/kvm/svm/svm.h  | 1 -
- 2 files changed, 1 insertion(+), 2 deletions(-)
+Patches 2-3 bury the L1TF L1D flushing under CONFIG_CPU_MITIGATIONS, partly
+because it's absurd that KVM doesn't honor CONFIG_CPU_MITIGATIONS for that
+case, partly because it simplifies unifying the tracking code (helps obviate
+the need for a stub).
 
-diff --git a/arch/x86/kvm/svm/avic.c b/arch/x86/kvm/svm/avic.c
-index 3ab74f2bd584..89864fee6e83 100644
---- a/arch/x86/kvm/svm/avic.c
-+++ b/arch/x86/kvm/svm/avic.c
-@@ -216,7 +216,7 @@ static void avic_deactivate_vmcb(struct vcpu_svm *svm)
-  * This function is called from IOMMU driver to notify
-  * SVM to schedule in a particular vCPU of a particular VM.
-  */
--int avic_ga_log_notifier(u32 ga_tag)
-+static int avic_ga_log_notifier(u32 ga_tag)
- {
- 	unsigned long flags;
- 	struct kvm_svm *kvm_svm;
-diff --git a/arch/x86/kvm/svm/svm.h b/arch/x86/kvm/svm/svm.h
-index b0fe40c21728..8c36ee0d67ef 100644
---- a/arch/x86/kvm/svm/svm.h
-+++ b/arch/x86/kvm/svm/svm.h
-@@ -806,7 +806,6 @@ extern struct kvm_x86_nested_ops svm_nested_ops;
- 
- bool __init avic_hardware_setup(void);
- void avic_hardware_unsetup(void);
--int avic_ga_log_notifier(u32 ga_tag);
- void avic_vm_destroy(struct kvm *kvm);
- int avic_vm_init(struct kvm *kvm);
- void avic_init_vmcb(struct vcpu_svm *svm, struct vmcb *vmcb);
+Patch 4 is Brendan's patch and the main goal of the mini-series.
+
+v3:
+ - Put the "raw" variant in KVM, dress it up with KVM's "request" terminology,
+   and add a comment explaining why _KVM_ knows its usage doesn't need to
+   disable virtualization.
+ - Add the prep patches.
+
+v2:
+ - https://lore.kernel.org/all/20251015-b4-l1tf-percpu-v2-1-6d7a8d3d40e9@google.com
+ - Moved the bit back to irq_stat
+ - Fixed DEBUG_PREEMPT issues by adding a _raw variant
+
+v1: https://lore.kernel.org/r/20251013-b4-l1tf-percpu-v1-1-d65c5366ea1a@google.com
+
+
+Brendan Jackman (1):
+  KVM: x86: Unify L1TF flushing under per-CPU variable
+
+Sean Christopherson (3):
+  KVM: VMX: Flush CPU buffers as needed if L1D cache flush is skipped
+  KVM: VMX: Bundle all L1 data cache flush mitigation code together
+  KVM: VMX: Disable L1TF L1 data cache flush if CONFIG_CPU_MITIGATIONS=n
+
+ arch/x86/include/asm/hardirq.h  |   4 +-
+ arch/x86/include/asm/kvm_host.h |   3 -
+ arch/x86/kvm/mmu/mmu.c          |   2 +-
+ arch/x86/kvm/vmx/nested.c       |   2 +-
+ arch/x86/kvm/vmx/vmx.c          | 222 ++++++++++++++++++--------------
+ arch/x86/kvm/x86.c              |   6 +-
+ arch/x86/kvm/x86.h              |  14 ++
+ 7 files changed, 144 insertions(+), 109 deletions(-)
+
+
+base-commit: f222788458c8a7753d43befef2769cd282dc008e
 -- 
 2.51.0.858.gf9c4a03a3a-goog
 
