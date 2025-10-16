@@ -1,224 +1,255 @@
-Return-Path: <kvm+bounces-60235-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-60237-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
-	by mail.lfdr.de (Postfix) with ESMTPS id EF155BE5AED
-	for <lists+kvm@lfdr.de>; Fri, 17 Oct 2025 00:29:28 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 857ABBE5D2D
+	for <lists+kvm@lfdr.de>; Fri, 17 Oct 2025 01:54:00 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id CFA254FBF1A
-	for <lists+kvm@lfdr.de>; Thu, 16 Oct 2025 22:29:27 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 506CB3B012A
+	for <lists+kvm@lfdr.de>; Thu, 16 Oct 2025 23:53:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 003162E8E00;
-	Thu, 16 Oct 2025 22:28:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E4BEF2E7BD9;
+	Thu, 16 Oct 2025 23:53:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="aMjMcreb"
+	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="sExZW6CI"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pj1-f73.google.com (mail-pj1-f73.google.com [209.85.216.73])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from DM1PR04CU001.outbound.protection.outlook.com (mail-centralusazon11010056.outbound.protection.outlook.com [52.101.61.56])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9F76E2E7BBB
-	for <kvm@vger.kernel.org>; Thu, 16 Oct 2025 22:28:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.73
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1760653710; cv=none; b=k/ETWX3LHlu3xkjCBh8s+YKL4DdAHG/nQ70OlklExsbSjuotwXCaY02qe7OpjGRK2yEz5Qaf6k3l9AeL7QBgqJ/kbI3r6Kv1uBOGs18tLTh6UGN2KvJYnZENLWIkkkgehbbDzJInFGiV4cxesnb6gHOK2sGgAlfk8VxX4dNiTSQ=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1760653710; c=relaxed/simple;
-	bh=oY878RYH2mslJwg0qdtPgRwIaldHQ7WLLqDkmC1ip5g=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=j5LeEskR9rhYNS6PHGofmRb0KofHMvbdCVIIf4B8v/ECJvPzy1RSuD9KHA6JIcBTKFGFPBr4Suo3h2jN8bUOTwGZe9a3VtZ0raiaN7PvOBV55A7vxKprfbj1lxw5jaIpKVl8uY6/lk25oPsFYciIQRDO7c0T55KnamkmgL6wD/E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=aMjMcreb; arc=none smtp.client-ip=209.85.216.73
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pj1-f73.google.com with SMTP id 98e67ed59e1d1-33428befc08so2943031a91.2
-        for <kvm@vger.kernel.org>; Thu, 16 Oct 2025 15:28:28 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1760653708; x=1761258508; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:reply-to:from:to:cc:subject:date:message-id:reply-to;
-        bh=sod+h68sOef8XvTYH5hL66cOeE3tT8hv2lEauZbhw70=;
-        b=aMjMcrebsvEVDGem52AzRNEsfOLc2COtELee/OXTzqx+XkHK/e3AABs6PvMDe2F4yT
-         P5UgiQ1sx1246kMqzuVCjNt2+wiZ62bNpq8n8wkFi62z6fAjx+7Q7u40URB9FFiLbz9m
-         1dUcOzpO2oUxRAeclliqVcmtw+EldGBU/zTCjXOIuiz7AMC1qCzdhWbhRDgvLhZNTB7v
-         MdQi907MaYKb0mT0+gJzN/i++dBlPNC/n07Haen0ZHC78cyDF7OZc9We0PGSNrwqYz9O
-         YR0kK7iDTQfV7406ILu4N/QzP+bJT5MyapQFaQYoABEIZFxXb/EYJqH6hePiePCdldHa
-         2t+w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1760653708; x=1761258508;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:reply-to:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=sod+h68sOef8XvTYH5hL66cOeE3tT8hv2lEauZbhw70=;
-        b=E9pp75HjWBa/7IWfzSDeAHAWlZeNYy+D+J6RMag9PW/RH1K6xrhyMUPWqRKQZ6aRM3
-         RcsCuDuV2GLAiiwBc8xpoEh9fhr+QKx3Vay73HZIB5+XF8PWNfwZD6FPf+NWTU9SwIfH
-         PA7C1hvKitfW+5O/RfyQjeekpKVbVW3adI0UrxYog9zzJa2QyKio+IUMS3xBK5L/Jqal
-         5PAwWC8WXez2v7ZxnKa89VYsRuITwLns4WWko0EBnu4DwuKDNIJE280G18Vlx1H53zy5
-         y7negQvq+Q9sF/JhH1Zo1iTMnGFgQJ9T8fnx4JI4OeY3gfB5qRFNChXliuq93VM+SIHB
-         Bk1A==
-X-Gm-Message-State: AOJu0Yxbm4QMUJ6wUYTEhTSuTO+WZrXLZwH3gNq/+op0PqqE5ulLaOnu
-	+gtk+cOxJwDQU8lsQ6nDHBNz860TlUBQueAyfsx6FiJkmTBxfdbIaC4s1kUBJKMRXkpo+w9ff9X
-	rZOgnpA==
-X-Google-Smtp-Source: AGHT+IEwdDYnEGjMumhEIrDhiWelgfr9l1shpL6etMLfOeb3DaDY5Ntm6comWTq6+d8o1CvS2P0n7vWtfUo=
-X-Received: from pjbhi22.prod.google.com ([2002:a17:90b:30d6:b0:33b:51fe:1a83])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:1c89:b0:32e:7bbc:bf13
- with SMTP id 98e67ed59e1d1-33bcf91b83bmr1495993a91.34.1760653707913; Thu, 16
- Oct 2025 15:28:27 -0700 (PDT)
-Reply-To: Sean Christopherson <seanjc@google.com>
-Date: Thu, 16 Oct 2025 15:28:16 -0700
-In-Reply-To: <20251016222816.141523-1-seanjc@google.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6D8B22E1F08;
+	Thu, 16 Oct 2025 23:53:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.61.56
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1760658821; cv=fail; b=HTgs9Jv92XMYN/EKH3Qs+fj9AVj7vWurRQ8bEFaMboIRO1Xd5labJDHBZ7MhAG0YD24TxvDRI4CdyLUDFX4pfUSiS/NCgEPBbJGcsORwhAq7Hu/tPYUE8XrtBv5UvdsmQ9kAGXlrKj5IacnlMMy9s2axTOyDRN5k3Wj6NSEn1jQ=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1760658821; c=relaxed/simple;
+	bh=XISh3w2MsVzjMchSJK0b6EEUnHL/XVDvSXg28hm1eAc=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:Content-Type:
+	 Content-Disposition:In-Reply-To:MIME-Version; b=Ht+3DeXLCYmVSzS7w6oc7DhEgCy9H64iMaUvbRgKcp3XSsL8pExRMq7WZCKK2NKUMcbp/FHGiciXr1y8fGfT+UalKnhl4fGZ5qXvFUYpqpEoxaTTWSsk4jwFJWu0p1dG4H68rZ/4SFIzC6oif8umodFH2M02tcNkCDNeu61wvg8=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=sExZW6CI; arc=fail smtp.client-ip=52.101.61.56
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=VzVw+V0y3ntpsI4be8b+hKVS2vjN3qfKRzjVB8p7LEr1ciZUJBTPxX9xEm6FrBcISrwovEZDKvAwxYLI7mu5sam3aJu0JJo/bU0eT7ThIcggJMGTW79QktjI93zODK+TSFA6GnzsatvRtOzpTHRD1Qdbdz4knCyG8gKOwn7W6YeXf3aDyKUAv/8xDAIDdxjkjee+ReKwqsXmkc9SPS8F/XhRvp4kWaDC1YFjd1M4znnjPJuEhES+Q91xjBThuP2EqwkIjG/OPTVkbtHyvq4rfz9UoaO8ahlOpdPW6tLlztXMA59WmMRVOzsp9FCO50l5KDe/BeTDz3hULqQJlXJByw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=RD/xCVRTrLeDxfGMCtcUQXjf8Hu5gk0sMVUTLPCchq4=;
+ b=G/O3XDxmPm9fnTUeM4lVCSRolYgasAohhCMPMOcQBgCG+tHD3hTqLenj9TiWbCyLysciJGmMWAVXacJukpoHPyDPd//LfaYEQtURtCnNglSXeZxl3YRM/6IrVor9e1L+Ifj79YaKc0RST2K4CUkk1W3c2871uuc1hkchpYwQLVm0uKd1x8LjBx3QUFC0zftkemzQfjGFWFCBdCWuVpl3u9PC+64DWE6SYS7b3yD2GiwuTuHFFh531MN9P/BbKJlYxcQzoaAQnzjOwB5LokDcUXYNrPWynItUWAiLYvfNCgjEfbo2xzRhWV9DUqSdDw349WsKMA4mXEsfZrnE3baAMg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
+ dkim=pass header.d=nvidia.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=RD/xCVRTrLeDxfGMCtcUQXjf8Hu5gk0sMVUTLPCchq4=;
+ b=sExZW6CITN4sB1IKBxwQfti39f+DtUoF4um3BD1Hzg8j/ajAdbhhxXNvS7WQOHdpgK0J60tKbJKGfXLJCjyiLOwWrCmDJ2UtoKZi9A+Y2bOYM1cwF6Xza/ArVXH4nmxwNePYNnINKoA/DMkaNfE/uBrDBMtkiaoa7xX55iCWpOWRabxrV8N6v97viCY2jKL7QlPJcOYqvXPLCITHFURKrnpzPc5/Iwmt/knV0euWC8vQWrfEBIHll4nTPWnxCp+2l7auwnkyZkCNt3rDShzzhf8a1a67bvTrgcU1j5P/XnV/YgYY/3MhmDjcxumjuqCPKv4YF2qvDG1pD29T2qSc/g==
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nvidia.com;
+Received: from MN2PR12MB3613.namprd12.prod.outlook.com (2603:10b6:208:c1::17)
+ by CH3PR12MB8903.namprd12.prod.outlook.com (2603:10b6:610:17a::7) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9228.9; Thu, 16 Oct
+ 2025 23:53:35 +0000
+Received: from MN2PR12MB3613.namprd12.prod.outlook.com
+ ([fe80::1b3b:64f5:9211:608b]) by MN2PR12MB3613.namprd12.prod.outlook.com
+ ([fe80::1b3b:64f5:9211:608b%4]) with mapi id 15.20.9228.010; Thu, 16 Oct 2025
+ 23:53:35 +0000
+Date: Thu, 16 Oct 2025 20:53:32 -0300
+From: Jason Gunthorpe <jgg@nvidia.com>
+To: Leon Romanovsky <leon@kernel.org>
+Cc: Alex Williamson <alex.williamson@redhat.com>,
+	Leon Romanovsky <leonro@nvidia.com>,
+	Andrew Morton <akpm@linux-foundation.org>,
+	Bjorn Helgaas <bhelgaas@google.com>,
+	Christian =?utf-8?B?S8O2bmln?= <christian.koenig@amd.com>,
+	dri-devel@lists.freedesktop.org, iommu@lists.linux.dev,
+	Jens Axboe <axboe@kernel.dk>, Joerg Roedel <joro@8bytes.org>,
+	kvm@vger.kernel.org, linaro-mm-sig@lists.linaro.org,
+	linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-media@vger.kernel.org, linux-mm@kvack.org,
+	linux-pci@vger.kernel.org, Logan Gunthorpe <logang@deltatee.com>,
+	Marek Szyprowski <m.szyprowski@samsung.com>,
+	Robin Murphy <robin.murphy@arm.com>,
+	Sumit Semwal <sumit.semwal@linaro.org>,
+	Vivek Kasireddy <vivek.kasireddy@intel.com>,
+	Will Deacon <will@kernel.org>
+Subject: Re: [PATCH v5 9/9] vfio/pci: Add dma-buf export support for MMIO
+ regions
+Message-ID: <20251016235332.GA265079@nvidia.com>
+References: <cover.1760368250.git.leon@kernel.org>
+ <72ecaa13864ca346797e342d23a7929562788148.1760368250.git.leon@kernel.org>
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <72ecaa13864ca346797e342d23a7929562788148.1760368250.git.leon@kernel.org>
+X-ClientProxiedBy: PH0PR07CA0066.namprd07.prod.outlook.com
+ (2603:10b6:510:f::11) To MN2PR12MB3613.namprd12.prod.outlook.com
+ (2603:10b6:208:c1::17)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20251016222816.141523-1-seanjc@google.com>
-X-Mailer: git-send-email 2.51.0.858.gf9c4a03a3a-goog
-Message-ID: <20251016222816.141523-5-seanjc@google.com>
-Subject: [PATCH v4 4/4] KVM: x86: Drop "cache" from user return MSR setter
- that skips WRMSR
-From: Sean Christopherson <seanjc@google.com>
-To: Sean Christopherson <seanjc@google.com>, Paolo Bonzini <pbonzini@redhat.com>, 
-	"Kirill A. Shutemov" <kas@kernel.org>
-Cc: kvm@vger.kernel.org, x86@kernel.org, linux-coco@lists.linux.dev, 
-	linux-kernel@vger.kernel.org, Yan Zhao <yan.y.zhao@intel.com>, 
-	Xiaoyao Li <xiaoyao.li@intel.com>, Rick Edgecombe <rick.p.edgecombe@intel.com>, 
-	Hou Wenlong <houwenlong.hwl@antgroup.com>
-Content-Type: text/plain; charset="UTF-8"
+MIME-Version: 1.0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: MN2PR12MB3613:EE_|CH3PR12MB8903:EE_
+X-MS-Office365-Filtering-Correlation-Id: 18b9e1f5-f067-4b8f-547a-08de0d0f37de
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;ARA:13230040|1800799024|7416014|366016|376014;
+X-Microsoft-Antispam-Message-Info:
+	=?us-ascii?Q?rnGVBiR43qrrkw2KiPc0VorIsauBwV5mCkT6wX5E2r6AIUy0QZ9igCmFyYHS?=
+ =?us-ascii?Q?iRRyHFQCo1te+/o8kLfhZF+RdMCWA2Mla7l7OFLDsFmB2UlouEb3v1ptWRKE?=
+ =?us-ascii?Q?kOH5Gyt9IXs60jzqs0QsMDKrYcq9lyU/O+cNhylM3Z1Z9jo1ModPpdpxoBsL?=
+ =?us-ascii?Q?T7gxlOhV+YAQj6v6aiU/IArK6oPNPxDN7QFcVKMHSLG46GTeQhasQLc5z39s?=
+ =?us-ascii?Q?/A8CK5RzujiZBcUHZ2zLH95K709+oQMV5SULDxSkTCNsWcO1IToYNJJw5kpA?=
+ =?us-ascii?Q?oR6bdR0j8WW0xwJwLAJ3+9SVuiErXpSAViGk8TylRYn7FJDYkJnx1OqPbMdf?=
+ =?us-ascii?Q?3U7qQOLNtNekAR58V1ZcwuUSic84dqW2E5ja2CHTHdcbvRUrfvYlhvCcMsBy?=
+ =?us-ascii?Q?pMQs9EUQ6mHO8e1AkujRDf+owbgyIVaMCXbjLUcHb9lM7WKX+0xOoQHh6KDn?=
+ =?us-ascii?Q?0hDL9XU9sCYBdS3E4FhpUhtUXVai2OuZ8IO49mIifcOlgZbE3KRt+h0aoCsU?=
+ =?us-ascii?Q?0ZikxUQHm0wRhKK5iVwE+b6OPI6faBy4ULydJOgAxR3q4ieXyilbQPE03dm7?=
+ =?us-ascii?Q?Rhg2CCiVoEKgDDIEcB4UtnIjIQbY0TIcGaIPsxslfxReKGN2GDT7Fv495ef+?=
+ =?us-ascii?Q?SPQlOEW+Q9PHW3kmdSd/JFT57VNdHBuWfwx2IK4a9vTiRTkAt99y9r1gEF7r?=
+ =?us-ascii?Q?m8Lf8bhVuuOcknXYz9w5FPF4/iiDth9s8+GRgiRfn1ydce5OokHntgQtfGtu?=
+ =?us-ascii?Q?cZucSiOQrzw/MEYlRqoi2I1cVhvCOZMlVvUjna9glu6vkOxAm3A/A/wqEu8G?=
+ =?us-ascii?Q?Z1/4ywpiOpplfVZJeqfSYn+KAIRmUxu4PMmsRQuG9MvRrpQHfQx8da5VOSlM?=
+ =?us-ascii?Q?6uZGuTOmmypbxV+k2sI/v9oRiWDJ/lHtBUSnzAwEL9xQldTVGbgT39R7Hqnj?=
+ =?us-ascii?Q?fyeIfBsN+uTzRcr9Ko7y7n4to5keywpEEjekmxn3WJ9JZE9AwF1RW1O9ZFWH?=
+ =?us-ascii?Q?fGfkliw5geCNy6i9LXOW++IFdKskAcqfT+YzfSZR9/fnQcWrycqmbUct0Njg?=
+ =?us-ascii?Q?NLgrMmMwFjh/22T3odvVKoMDVQPEWpbhgXFQ76MVfOqfmFJ6hjZP4Spktw6P?=
+ =?us-ascii?Q?PpczAYp7rTR7bteEvuQPks/AzeoTBMCqGZIrvCrtvePGJMwATx3th3LQvysU?=
+ =?us-ascii?Q?OuYov/VwO5KlFHKCA82Jm9DQVsX8eYl+Nd9j6JPXjXs1jLGMuGhLSk8jWeZD?=
+ =?us-ascii?Q?qasp2rmqmTZZO77Wbq7y77MCn87Wz1q+U5f5i5xsymCN7LsCUzrJk/NLvekY?=
+ =?us-ascii?Q?fI/oilB4mfSG367kcOnBeJ1JekvdXlGei+asIFFhxHURgLzgREmnoUu7HORG?=
+ =?us-ascii?Q?24zy4o64oyTZvkv8nQWXjkN41BDQdlJyo0lgD+laCZKbyPD/iPHD9DoBMxNS?=
+ =?us-ascii?Q?Y38c6zxsUkchGex7PoJ7p9sNxjAUMunV?=
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:MN2PR12MB3613.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(7416014)(366016)(376014);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?us-ascii?Q?39IpYg/hgaPLPdM27s4mQS8T4DJCdcelKREpNEih5CqGHfhXY25GKB7FQpGU?=
+ =?us-ascii?Q?1wlmQI1GBdWNOP2xQlsOerbQgvvOfJ3Ys0l0F2CN4wAbec/B/tTmtO6ecuBa?=
+ =?us-ascii?Q?ZHTjeaxpUy7tgyO4gXdj69R8iDMMFtTm9eJIfF1CWqhx7SaCPB5E54+fQT7Q?=
+ =?us-ascii?Q?/cOJMt3+zPqWjZHa3Oz8zpNOgFACOD/qrDZwmk5ishyCk256EsEs6QZaaMWy?=
+ =?us-ascii?Q?9dn/42TJCdZGLG3mcylwCP6ZI5C7/famSHJ8QDG90NFySPfIPofgsXMZHB3M?=
+ =?us-ascii?Q?umeWJuvAqPPyENcHhzRHF4b0ZZLtqzGAP5Su8g3dXM15UzlCjttHbEVe+9pH?=
+ =?us-ascii?Q?jCevoFiq1odNZgD4ieKOiM9eFTkta6N6qC/AiGwsnmJVyufwkLQocZSiHODE?=
+ =?us-ascii?Q?ocFHHWES0WN0/fziKRTiCW8QGBsJuDBlqOCaY81eJcftAa9G/PN4UFQIwBuw?=
+ =?us-ascii?Q?0YVff2+meD0rX8wOoVWkMaYy//C4zWaSHVkQFnr8y37kmnUxgfs1kLkyVbDa?=
+ =?us-ascii?Q?vFy8K3H7sZ/IXh21RqW5vgjyGMA/wN9FsKsFIHxm9QugudMxOhedDzaxuiY2?=
+ =?us-ascii?Q?vhbUoDpE2D7BA9w9N74SQuIfxPyuBAfkVBAqZR9knFRCyWNYulL0NpngHkMr?=
+ =?us-ascii?Q?+SCTkfuzRDbi6cWFRaKnU69MfcAPbCPFQaSQaDvh+zO7nUrAg5IotyFrq/zy?=
+ =?us-ascii?Q?lI9Nfo5tGVldpo/OXN/6ueqw/c08MIy/d94to0bDEZmcgolNb3WThtIAdb0c?=
+ =?us-ascii?Q?7bUcjrbtWBZ8Pwc8cS58Cf451bo3qOE+S8Aik1QoRvy28QEJC2nDO4Ku14rO?=
+ =?us-ascii?Q?Cq6Au+4VsunJDDL+OPYQaamcNzbfil2Mb3dtrZx78f4frebgAtjmBKGpFmI7?=
+ =?us-ascii?Q?9JIhvsZcK0au8oKnqXlP/35aiQQjWiZp2JGbKSndAuBWHZrE/rrmkvNjEwig?=
+ =?us-ascii?Q?YwQFcjmQuQshLmhzp9bJYT3vAtCG8DkWBPQH0KPXg2Irhyx2SQoLClZkafh9?=
+ =?us-ascii?Q?L4EkHye5uSok7uIh5D73QDJsavp0yFmjets0ICGn5cBcegZuNqHkuxHUNEkm?=
+ =?us-ascii?Q?IMY1+XvKkSmLVmJgXo5E5i1SJJunZNgjmvlvSSoaoqBtgl1LZgTBxSr6TsdN?=
+ =?us-ascii?Q?7wdhLakRX4rHC79s7tQa5PA4VgffcwX1qFIy5DmfGhGPKwqfwdCARAeWYfY1?=
+ =?us-ascii?Q?NLYz0gXnWnUAyfmqShrTv/+fwrI3V/cXlDzrcIDQ6k2KELnd/YAibhpx+Egt?=
+ =?us-ascii?Q?8RMFrg9m64JSPabUuAB9hZ0qzfSXcO/+B9f0AYsAoaxhuh3Zx818c4yQP9gH?=
+ =?us-ascii?Q?z47ukY2r93USzf4G0+vqDqJkyODFn7WoJ7KFndaPjdTwyvqZblWlbvuhjd2T?=
+ =?us-ascii?Q?1MpBvmLzDHzzrf89WCbIChjPJf9dPLnhCptzEONgPbPGHFih3yZ/MhJ4cyYf?=
+ =?us-ascii?Q?ONaqS03P7jo5buSVHmZrTEKgq6WRs63DXLlADkt7cxXWsLzLQN3l42PyuOEu?=
+ =?us-ascii?Q?IaFYjZwxhs3//Ny8OFWTTIC/e7Nq7KmK8fx04IDaXoWBVz7XaVCO2QtPrkAW?=
+ =?us-ascii?Q?slXOzxFYhCDN0lX0KLSZQy5LNnclfs8SWJ45j6MB?=
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 18b9e1f5-f067-4b8f-547a-08de0d0f37de
+X-MS-Exchange-CrossTenant-AuthSource: MN2PR12MB3613.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 16 Oct 2025 23:53:35.1119
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: Jt9bYDuyBbkaHgYqsT62+FAa/0GFys7MoQUQrQy99mNhrDUn13ZL3GVgoxyajCEU
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: CH3PR12MB8903
 
-Rename kvm_user_return_msr_update_cache() to __kvm_set_user_return_msr()
-and use the helper in kvm_set_user_return_msr() to make it obvious that
-the double-underscores version is doing a subset of the work of the "full"
-setter.
+On Mon, Oct 13, 2025 at 06:26:11PM +0300, Leon Romanovsky wrote:
+> +
+> +static int vfio_pci_dma_buf_attach(struct dma_buf *dmabuf,
+> +				   struct dma_buf_attachment *attachment)
+> +{
+> +	struct vfio_pci_dma_buf *priv = dmabuf->priv;
+> +
+> +	if (!attachment->peer2peer)
+> +		return -EOPNOTSUPP;
+> +
+> +	if (priv->revoked)
+> +		return -ENODEV;
+> +
+> +	switch (pci_p2pdma_map_type(priv->provider, attachment->dev)) {
+> +	case PCI_P2PDMA_MAP_THRU_HOST_BRIDGE:
+> +		break;
+> +	case PCI_P2PDMA_MAP_BUS_ADDR:
+> +		/*
+> +		 * There is no need in IOVA at all for this flow.
+> +		 * We rely on attachment->priv == NULL as a marker
+> +		 * for this mode.
+> +		 */
+> +		return 0;
+> +	default:
+> +		return -EINVAL;
+> +	}
+> +
+> +	attachment->priv = kzalloc(sizeof(struct dma_iova_state), GFP_KERNEL);
+> +	if (!attachment->priv)
+> +		return -ENOMEM;
+> +
+> +	dma_iova_try_alloc(attachment->dev, attachment->priv, 0, priv->size);
 
-While the function does indeed update a cache, the nomenclature is
-slightly misleading now that there is a "get" helper (see commit
-9bc366350734 ("KVM: x86: Add helper to retrieve current value of user
-return MSR"), as the current value isn't _just_ the cached value, it's
-also the value that's currently loaded in hardware (modulo the fact that
-writing .curr and the actual MSR isn't atomic and may have significant
-"delays" in certain setups).
+The lifetime of this isn't good..
 
-Opportunistically rename "index" to "slot" in the prototypes.  The user-
-return APIs deliberately use "slot" to try and make it more obvious that
-they take the slot within the array, not the index of the MSR.
+> +	return 0;
+> +}
+> +
+> +static void vfio_pci_dma_buf_detach(struct dma_buf *dmabuf,
+> +				    struct dma_buf_attachment *attachment)
+> +{
+> +	kfree(attachment->priv);
+> +}
 
-Opportunistically tweak the local TDX helper to drop "cache" from its
-name and to use "sync" instead of "update", so that it's more obvious the
-goal is to sync (with hardware), versus doing some arbitrary update.
+If the caller fails to call map then it leaks the iova.
 
-No functional change intended.
+> +static struct sg_table *
+> +vfio_pci_dma_buf_map(struct dma_buf_attachment *attachment,
+> +		     enum dma_data_direction dir)
+> +{
+[..]
 
-Cc: Rick Edgecombe <rick.p.edgecombe@intel.com>
-Reviewed-by: Xiaoyao Li <xiaoyao.li@intel.com>
-Reviewed-by: Yan Zhao <yan.y.zhao@intel.com>
-Link: https://lore.kernel.org/all/aM2EvzLLmBi5-iQ5@google.com [1]
-Signed-off-by: Sean Christopherson <seanjc@google.com>
----
- arch/x86/include/asm/kvm_host.h |  4 ++--
- arch/x86/kvm/vmx/tdx.c          | 10 +++++-----
- arch/x86/kvm/x86.c              | 21 ++++++++++-----------
- 3 files changed, 17 insertions(+), 18 deletions(-)
 
-diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
-index 48598d017d6f..dc2476f25c75 100644
---- a/arch/x86/include/asm/kvm_host.h
-+++ b/arch/x86/include/asm/kvm_host.h
-@@ -2377,8 +2377,8 @@ int kvm_pv_send_ipi(struct kvm *kvm, unsigned long ipi_bitmap_low,
- 
- int kvm_add_user_return_msr(u32 msr);
- int kvm_find_user_return_msr(u32 msr);
--int kvm_set_user_return_msr(unsigned index, u64 val, u64 mask);
--void kvm_user_return_msr_update_cache(unsigned int index, u64 val);
-+int kvm_set_user_return_msr(unsigned int slot, u64 val, u64 mask);
-+void __kvm_set_user_return_msr(unsigned int slot, u64 val);
- u64 kvm_get_user_return_msr(unsigned int slot);
- 
- static inline bool kvm_is_supported_user_return_msr(u32 msr)
-diff --git a/arch/x86/kvm/vmx/tdx.c b/arch/x86/kvm/vmx/tdx.c
-index 2f3dfe9804b5..b7e2957d53d9 100644
---- a/arch/x86/kvm/vmx/tdx.c
-+++ b/arch/x86/kvm/vmx/tdx.c
-@@ -803,13 +803,13 @@ static struct tdx_uret_msr tdx_uret_msrs[] = {
- 	{.msr = MSR_TSC_AUX,},
- };
- 
--static void tdx_user_return_msr_update_cache(void)
-+static void tdx_sync_user_return_msrs(void)
- {
- 	int i;
- 
- 	for (i = 0; i < ARRAY_SIZE(tdx_uret_msrs); i++)
--		kvm_user_return_msr_update_cache(tdx_uret_msrs[i].slot,
--						 tdx_uret_msrs[i].defval);
-+		__kvm_set_user_return_msr(tdx_uret_msrs[i].slot,
-+					  tdx_uret_msrs[i].defval);
- }
- 
- static void tdx_prepare_switch_to_host(struct kvm_vcpu *vcpu)
-@@ -1063,7 +1063,7 @@ fastpath_t tdx_vcpu_run(struct kvm_vcpu *vcpu, u64 run_flags)
- 	tdx_load_host_xsave_state(vcpu);
- 
- 	if (tdx->need_user_return_msr_sync) {
--		tdx_user_return_msr_update_cache();
-+		tdx_sync_user_return_msrs();
- 		tdx->need_user_return_msr_sync = false;
- 	}
- 
-@@ -3446,7 +3446,7 @@ static int __init __tdx_bringup(void)
- 		 *
- 		 * this_cpu_ptr(user_return_msrs)->registered isn't checked
- 		 * because the registration is done at vcpu runtime by
--		 * tdx_user_return_msr_update_cache().
-+		 * tdx_sync_user_return_msrs().
- 		 */
- 		tdx_uret_msrs[i].slot = kvm_find_user_return_msr(tdx_uret_msrs[i].msr);
- 		if (tdx_uret_msrs[i].slot == -1) {
-diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-index 394a30bb33da..68daf94e0deb 100644
---- a/arch/x86/kvm/x86.c
-+++ b/arch/x86/kvm/x86.c
-@@ -655,6 +655,15 @@ static void kvm_user_return_register_notifier(struct kvm_user_return_msrs *msrs)
- 	}
- }
- 
-+void __kvm_set_user_return_msr(unsigned int slot, u64 value)
-+{
-+	struct kvm_user_return_msrs *msrs = this_cpu_ptr(user_return_msrs);
-+
-+	msrs->values[slot].curr = value;
-+	kvm_user_return_register_notifier(msrs);
-+}
-+EXPORT_SYMBOL_GPL(__kvm_set_user_return_msr);
-+
- int kvm_set_user_return_msr(unsigned slot, u64 value, u64 mask)
- {
- 	struct kvm_user_return_msrs *msrs = this_cpu_ptr(user_return_msrs);
-@@ -667,21 +676,11 @@ int kvm_set_user_return_msr(unsigned slot, u64 value, u64 mask)
- 	if (err)
- 		return 1;
- 
--	msrs->values[slot].curr = value;
--	kvm_user_return_register_notifier(msrs);
-+	__kvm_set_user_return_msr(slot, value);
- 	return 0;
- }
- EXPORT_SYMBOL_FOR_KVM_INTERNAL(kvm_set_user_return_msr);
- 
--void kvm_user_return_msr_update_cache(unsigned int slot, u64 value)
--{
--	struct kvm_user_return_msrs *msrs = this_cpu_ptr(user_return_msrs);
--
--	msrs->values[slot].curr = value;
--	kvm_user_return_register_notifier(msrs);
--}
--EXPORT_SYMBOL_FOR_KVM_INTERNAL(kvm_user_return_msr_update_cache);
--
- u64 kvm_get_user_return_msr(unsigned int slot)
- {
- 	return this_cpu_ptr(user_return_msrs)->values[slot].curr;
--- 
-2.51.0.858.gf9c4a03a3a-goog
+> +err_unmap_dma:
+> +	if (!i || !state)
+> +		; /* Do nothing */
+> +	else if (dma_use_iova(state))
+> +		dma_iova_destroy(attachment->dev, state, mapped_len, dir,
+> +				 attrs);
 
+If we hit this error path then it is freed..
+
+> +static void vfio_pci_dma_buf_unmap(struct dma_buf_attachment *attachment,
+> +				   struct sg_table *sgt,
+> +				   enum dma_data_direction dir)
+> +{
+> +	struct vfio_pci_dma_buf *priv = attachment->dmabuf->priv;
+> +	struct dma_iova_state *state = attachment->priv;
+> +	unsigned long attrs = DMA_ATTR_MMIO;
+> +	struct scatterlist *sgl;
+> +	int i;
+> +
+> +	if (!state)
+> +		; /* Do nothing */
+> +	else if (dma_use_iova(state))
+> +		dma_iova_destroy(attachment->dev, state, priv->size, dir,
+> +				 attrs);
+
+It is freed here too, but we can call map multiple times. Every time a
+move_notify happens can trigger another call to map.
+
+I think just call unlink in those two and put dma_iova_free in detach
+
+Jason
 
