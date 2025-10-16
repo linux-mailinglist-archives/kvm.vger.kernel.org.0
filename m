@@ -1,161 +1,107 @@
-Return-Path: <kvm+bounces-60116-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-60117-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1A16ABE11FD
-	for <lists+kvm@lfdr.de>; Thu, 16 Oct 2025 02:40:23 +0200 (CEST)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0A0A6BE1299
+	for <lists+kvm@lfdr.de>; Thu, 16 Oct 2025 03:27:28 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C1D06402AEB
-	for <lists+kvm@lfdr.de>; Thu, 16 Oct 2025 00:40:21 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 07BB24E9DD5
+	for <lists+kvm@lfdr.de>; Thu, 16 Oct 2025 01:27:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 72CA31917D6;
-	Thu, 16 Oct 2025 00:40:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6966E200113;
+	Thu, 16 Oct 2025 01:27:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="CgOUAEuQ"
+	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="s8Tca036"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pj1-f73.google.com (mail-pj1-f73.google.com [209.85.216.73])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from out30-130.freemail.mail.aliyun.com (out30-130.freemail.mail.aliyun.com [115.124.30.130])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 19A5717A2E8
-	for <kvm@vger.kernel.org>; Thu, 16 Oct 2025 00:40:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.73
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0B369442C;
+	Thu, 16 Oct 2025 01:27:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.130
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1760575215; cv=none; b=bDpR040TMMtWY6X/fhexev5uPE7xnnSpOOxH0S/m+J8iVliAAfxveGNyl5EAw/HaQBjJFlrAsj/r3FwIgm3dXo9vmdKPZ9NExlBWYBB/RtRXoyC8+axnTitrXNdnrqibSj13gjN2w71uXj7tMJMNKo4nQHhK1JNPeEQm7g7tnp4=
+	t=1760578037; cv=none; b=WCzFqjNFaRPDoITFZayFbPa1oCztVGXqrAEvesRMB30kyZHoUrG62tM1ekfGqan2rikn0YT0jbblV7E0kKO/QsDgZs8Yjl2AmIu8Td6CdrymZ0YWnKlCugXRNZLCUuN6lMQ4UON03GLzZlgF0cWusjJbteiY80jbZl5ulHk3JUs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1760575215; c=relaxed/simple;
-	bh=7vY9PzWr/yiLC8CW0M2fmrsK2IW0Vzer5uITSO+BXpo=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=mA3DjWY3NZEehryF/WWuqq4sc36kdfLKmjUQMjH5MfGR8gOmiVaZd1bTb6RboIhB0bkHwqbG8JzSur6yxQDYmEmm5aMfq3dKNdcExMJ0xOMGOdj64RqqF5bI06l53gUPYCluJb+w29q80JIwZNW01ZF8279b0Asuz1gGphgSDP4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=CgOUAEuQ; arc=none smtp.client-ip=209.85.216.73
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pj1-f73.google.com with SMTP id 98e67ed59e1d1-32ec67fcb88so160112a91.3
-        for <kvm@vger.kernel.org>; Wed, 15 Oct 2025 17:40:13 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1760575213; x=1761180013; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=3dNlCURooSIJX80Bj3EYkA9QRwRQzSg6kTNlO7f/Gn4=;
-        b=CgOUAEuQazcDZPeyqs2s5ACE9C6Y0AJJPmwpGYGC/76AgNkRfLmc9ar7aHVrfFHQ5l
-         BbNimUVOtLVJ5uhKaIiJ4j4nqJsCLBubYpnvqli/eQ+HV9NMQ/MOCAPZellBnP3mYVrx
-         X/sHoKHWdZ0jrmZ+fDH0RKaDdA0c576nUzSVsGySo2r4+dXYGCSQqGNp+hiZM4iB986+
-         1JUTivF7jKYLig8KuQfrENpabOaJTfjAQOWAIJArPii3F7ZFtKrsDtnpLHtoNdHakwIp
-         AYzAFMkXD3cnOWm6vFvdxG1AztNU4PnezoSEM2Q0MLZJ6SYDW2IQzT9gVwCrn8Mecy66
-         Op4Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1760575213; x=1761180013;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=3dNlCURooSIJX80Bj3EYkA9QRwRQzSg6kTNlO7f/Gn4=;
-        b=WO2U1OPZn3b/X4PvLOIZxZtirD5Z6wtBB5962ugkFVU95w0gZllNrhJXOhi5b/8rO9
-         SHAXJTKiWEEitsoSwDYikqdO5SgvqbDFu6cIzdCOQnhwXZhjKt0TQqtM5JC5Zz8sg8u/
-         DEN3IMbjQ65/BLkJ27O1gyN70rnI1/pd/u6w14oYuMDVQuKHHeISIo2t3CYv28WJ3tWP
-         AhVwiE9tMVJ3a9uBO7nmg1hhTXTZ/PzbMja+nl1dhX0BpDS9y7OGiyqwbzuY07qvGuNb
-         E2qO5+wt3PoAlb45ZU1zsxB0LZ0OKuwQvcZzF1k+4slie12q7Fwy9/AdV5bxQVJbJ6UP
-         y00Q==
-X-Forwarded-Encrypted: i=1; AJvYcCX3hZIAGBsRIJrg73Qlt9kdAS6twVQiwDDAquU2zYifEVlmaLkT6VU6A0XfKcuPaZhhsTA=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yx5syi8VdRl6Ilrs8qRspOQgRFBNacf9FJ7HOagiLr9QnqYly4X
-	5Fws5FeAj02eMD3i5sbt/hnlYR+aVi8JbICOZ7yHFp5x6JPUsGetN1TPcaLbo/5gqxmSkmiGZPs
-	l+LDEPg==
-X-Google-Smtp-Source: AGHT+IHfPvjhnedJTgg6CAxnlq4B1q8xkwPd3n+ogO/h0bax4t2Y4qg32T1rBL73rr/Fp9d7GqAYfHy1jZw=
-X-Received: from pjbrv22.prod.google.com ([2002:a17:90b:2c16:b0:329:6ac4:ea2e])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:2412:b0:33b:ade7:51d3
- with SMTP id 98e67ed59e1d1-33bade7553bmr476752a91.20.1760575213249; Wed, 15
- Oct 2025 17:40:13 -0700 (PDT)
-Date: Wed, 15 Oct 2025 17:40:11 -0700
-In-Reply-To: <aPAnWWmo555uB0-H@google.com>
+	s=arc-20240116; t=1760578037; c=relaxed/simple;
+	bh=gOUgDUYZVm+im++xEkphoCbEb/h269Q16wFF6gakZDQ=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=nJLgXgDq7xekLGUHz/zPV06l0VBZAVlTDutHEpsi6rggt0TKgb8+W+8aq1LSS3SpCa/9TacHR8P/Ei+K2MUGPTU0e3WVcgtCG3ygwPt/roLkPChUaSJdMDCWNDKoZsrbJ92SBebJMgPwIp+XQrSv+egIOGq4WDrQ7+NL3Wi++74=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=s8Tca036; arc=none smtp.client-ip=115.124.30.130
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
+DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=linux.alibaba.com; s=default;
+	t=1760578025; h=From:To:Subject:Date:Message-Id:MIME-Version;
+	bh=mWoWxsGAtDp0EV2ifeUAQMZcSWDLqLKjj7ZtzpCtdDQ=;
+	b=s8Tca036nAYGLhwD/eHRemHu1aYPLz8nNT0PfNxS3NQ+q7ePV+qFrww/jeHZhVSKJ9Lc104DmROM/Pnv6QrHAA0GFrORj4JFgKoms90ipLDclwYsNdctp/mu5pLeQnerPKoU/Q4KDX1G0eIO3xURZy+zjpkmOfJLIIJMqewvjkg=
+Received: from localhost.localdomain(mailfrom:fangyu.yu@linux.alibaba.com fp:SMTPD_---0WqIKtva_1760578023 cluster:ay36)
+          by smtp.aliyun-inc.com;
+          Thu, 16 Oct 2025 09:27:04 +0800
+From: fangyu.yu@linux.alibaba.com
+To: anup@brainfault.org,
+	atish.patra@linux.dev,
+	pjw@kernel.org,
+	palmer@dabbelt.com,
+	aou@eecs.berkeley.edu,
+	alex@ghiti.fr,
+	liujingqi@lanxincomputing.com
+Cc: guoren@kernel.org,
+	kvm@vger.kernel.org,
+	kvm-riscv@lists.infradead.org,
+	linux-riscv@lists.infradead.org,
+	linux-kernel@vger.kernel.org,
+	Fangyu Yu <fangyu.yu@linux.alibaba.com>
+Subject: [PATCH] RISC-V: KVM: Read HGEIP CSR on the correct cpu
+Date: Thu, 16 Oct 2025 09:26:59 +0800
+Message-Id: <20251016012659.82998-1-fangyu.yu@linux.alibaba.com>
+X-Mailer: git-send-email 2.39.3 (Apple Git-146)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20250917215031.2567566-1-jmattson@google.com> <20250917215031.2567566-4-jmattson@google.com>
- <aPAnWWmo555uB0-H@google.com>
-Message-ID: <aPA-60vV0WQUCmc2@google.com>
-Subject: Re: [PATCH 3/4] KVM: selftests: Add VM_MODE_PXXV57_4K VM mode
-From: Sean Christopherson <seanjc@google.com>
-To: Jim Mattson <jmattson@google.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, Shuah Khan <shuah@kernel.org>, 
-	Bibo Mao <maobibo@loongson.cn>, Huacai Chen <chenhuacai@kernel.org>, 
-	Andrew Jones <ajones@ventanamicro.com>, Claudio Imbrenda <imbrenda@linux.ibm.com>, 
-	"Pratik R. Sampat" <prsampat@amd.com>, Kai Huang <kai.huang@intel.com>, 
-	Eric Auger <eric.auger@redhat.com>, linux-kernel@vger.kernel.org, kvm@vger.kernel.org, 
-	linux-kselftest@vger.kernel.org
-Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 
-On Wed, Oct 15, 2025, Sean Christopherson wrote:
-> On Wed, Sep 17, 2025, Jim Mattson wrote:
-> > Add a new VM mode, VM_MODE_PXXV57_4K, to support tests that require
-> > 5-level paging on x86. This mode sets up a 57-bit virtual address
-> > space and sets CR4.LA57 in the guest.
+From: Fangyu Yu <fangyu.yu@linux.alibaba.com>
 
-Thinking about this more, unless it's _really_ painful, e.g. because tests assume
-4-level paging or 48-bit non-canonical address, I would rather turn VM_MODE_PXXV48_4K
-into VM_MODE_PXXVXX_4K and have ____vm_create() create the "maximal" VM.  That
-way tests don't need to go out of their way just to use 5-level paging, e.g. a
-"TEST_REQUIRE(kvm_cpu_has(X86_FEATURE_LA57))" is all that is needed.  It will also
-gives quite a bit of coverage for free, e.g. that save/restore works with and
-without 5-level paging (contrived example, but you get the point).
+When executing kvm_riscv_vcpu_aia_has_interrupts, the vCPU may have
+migrated and the IMSIC VS-file have not been updated yet, currently
+the HGEIP CSR should be read from the imsic->vsfile_cpu ( the pCPU
+before migration ) via on_each_cpu_mask, but this will trigger an
+IPI call and repeated IPI within a period of time is expensive in
+a many-core systems.
 
-The NONCANONICAL #define works for LA57, so hopefully making tests play nice with
-LA57 is straightforward?
+Just let the vCPU execute and update the correct IMSIC VS-file via
+kvm_riscv_vcpu_aia_imsic_update may be a simple solution.
 
-> > @@ -358,6 +360,25 @@ struct kvm_vm *____vm_create(struct vm_shape shape)
-> >  		vm->va_bits = 48;
-> >  #else
-> >  		TEST_FAIL("VM_MODE_PXXV48_4K not supported on non-x86 platforms");
-> > +#endif
-> > +		break;
-> > +	case VM_MODE_PXXV57_4K:
-> > +#ifdef __x86_64__
-> > +		kvm_get_cpu_address_width(&vm->pa_bits, &vm->va_bits);
-> > +		kvm_init_vm_address_properties(vm);
-> > +		/*
-> > +		 * For 5-level paging, KVM requires LA57 to be enabled, which
-> > +		 * requires a 57-bit virtual address space.
-> > +		 */
-> > +		TEST_ASSERT(vm->va_bits == 57,
-> > +			    "Linear address width (%d bits) not supported for VM_MODE_PXXV57_4K",
-> > +			    vm->va_bits);
-> > +		pr_debug("Guest physical address width detected: %d\n",
-> > +			 vm->pa_bits);
-> > +		vm->pgtable_levels = 5;
-> > +		vm->va_bits = 57;
-> > +#else
-> > +		TEST_FAIL("VM_MODE_PXXV57_4K not supported on non-x86 platforms");
-> >  #endif
-> 
-> That's a lot of copy+paste, especially given the #ifdefs.  How about this (untested)?
-> 
-> 	case VM_MODE_PXXV48_4K:
-> 	case VM_MODE_PXXV57_4K:
-> #ifdef __x86_64__
-> 		kvm_get_cpu_address_width(&vm->pa_bits, &vm->va_bits);
-> 		kvm_init_vm_address_properties(vm);
-> 
-> 		/*
-> 		 * Ignore KVM support for 5-level paging (vm->va_bits == 57) if
-> 		 * the target mode is 4-level paging (48-bit virtual address
-> 		 * space), as 5-level paging only takes effect if CR4.LA57=1.
-> 		 */
-> 		TEST_ASSERT(vm->va_bits == 57 ||
-> 			    (vm->va_bits == 48 && vm->mode == VM_MODE_PXXV48_4K),
-> 			    "Linear address width (%d bits) not supported",
-> 			    vm->va_bits);
-> 		pr_debug("Guest physical address width detected: %d\n",
-> 			 vm->pa_bits);
-> 		if (vm->mode == VM_MODE_PXXV48_4K) {
-> 			vm->pgtable_levels = 4;
-> 			vm->va_bits = 48;
-> 		} else {
-> 			vm->pgtable_levels = 5;
-> 			vm->va_bits = 57;
-> 		}
-> #else
-> 		TEST_FAIL("VM_MODE_PXXV{48,57}_4K not supported on non-x86 platforms");
-> #endif
-> 		break;
+Fixes: 4cec89db80ba ("RISC-V: KVM: Move HGEI[E|P] CSR access to IMSIC virtualization")
+Signed-off-by: Fangyu Yu <fangyu.yu@linux.alibaba.com>
+---
+ arch/riscv/kvm/aia_imsic.c | 8 ++++++--
+ 1 file changed, 6 insertions(+), 2 deletions(-)
+
+diff --git a/arch/riscv/kvm/aia_imsic.c b/arch/riscv/kvm/aia_imsic.c
+index fda0346f0ea1..168c02ad0a78 100644
+--- a/arch/riscv/kvm/aia_imsic.c
++++ b/arch/riscv/kvm/aia_imsic.c
+@@ -689,8 +689,12 @@ bool kvm_riscv_vcpu_aia_imsic_has_interrupt(struct kvm_vcpu *vcpu)
+ 	 */
+ 
+ 	read_lock_irqsave(&imsic->vsfile_lock, flags);
+-	if (imsic->vsfile_cpu > -1)
+-		ret = !!(csr_read(CSR_HGEIP) & BIT(imsic->vsfile_hgei));
++	if (imsic->vsfile_cpu > -1) {
++		if (imsic->vsfile_cpu != smp_processor_id())
++			ret = true;
++		else
++			ret = !!(csr_read(CSR_HGEIP) & BIT(imsic->vsfile_hgei));
++	}
+ 	read_unlock_irqrestore(&imsic->vsfile_lock, flags);
+ 
+ 	return ret;
+-- 
+2.50.1
+
 
