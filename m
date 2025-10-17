@@ -1,201 +1,175 @@
-Return-Path: <kvm+bounces-60398-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-60399-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
-	by mail.lfdr.de (Postfix) with ESMTPS id E5019BEBA07
-	for <lists+kvm@lfdr.de>; Fri, 17 Oct 2025 22:26:05 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 63AE9BEBD18
+	for <lists+kvm@lfdr.de>; Fri, 17 Oct 2025 23:32:28 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 775915018CF
-	for <lists+kvm@lfdr.de>; Fri, 17 Oct 2025 20:25:52 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id B6C1219A4514
+	for <lists+kvm@lfdr.de>; Fri, 17 Oct 2025 21:32:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 91CDB338B5A;
-	Fri, 17 Oct 2025 20:13:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6F0292C21E1;
+	Fri, 17 Oct 2025 21:32:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="WKPp1/jx"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="cTCq9UAn"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pf1-f202.google.com (mail-pf1-f202.google.com [209.85.210.202])
+Received: from mail-pg1-f201.google.com (mail-pg1-f201.google.com [209.85.215.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 81507338908
-	for <kvm@vger.kernel.org>; Fri, 17 Oct 2025 20:13:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1D717247DEA
+	for <kvm@vger.kernel.org>; Fri, 17 Oct 2025 21:32:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1760732023; cv=none; b=PThDnvXl4/7jMrKe5j/cjreCvlx3uCe9fywOj9ajFdd2HQverTUhKt9FYYWfSB71whEqVHsOkMIuVRhhlqlJVfZnVYOI/u0UaSTgHRVRR4nQSf1aSJfj7JdToDvx5WLKL7CX9f4MSBBD5OVWcZ5d31WJDIeMPsB3GrTpijicN8w=
+	t=1760736735; cv=none; b=Iyl68HlZMwjAFzW0ITcwFZdIIOsfhq5I8wNOV1vdsKnb9WFHLayQjAu2Wv7QLakp67CRM4TWxmAbPqyNkNG5bWabTHw3hC8spAhdOAGG71cCDilk6EHg5exzcUXs0PhcsWlqXG6xjmreS+et7oUdAyDnvngiHiz5HUTDkKRSbIw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1760732023; c=relaxed/simple;
-	bh=VfxgTYzfPcNal3AIP/26nqYp1tsVb9JGusB/JnZZlbQ=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=fddsEJEA3ELGBw0tMSPJTrJIlHQJx1wgCx5ilrkvKnE3gPk2uJh2SqyZHCu5Pr7baVf/fdw80e0yU8LlCWa9taE3L/bC7gh2D6bi0fOvO0kNgr/rsL6Aj8FaUMjA+LL1oLbfRrDykjbWOlEX26mTNS5+eiVwcQZQzF9+y96P2hk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--ackerleytng.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=WKPp1/jx; arc=none smtp.client-ip=209.85.210.202
+	s=arc-20240116; t=1760736735; c=relaxed/simple;
+	bh=xWGoKK25YqsvRNSCotzWxd+xc9eg4i6XzKSv+4uybPI=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=V5LClKJMxywQG5mLqCa0iKs5aRA3mwh8hNh30jCjymlUaFAO8a7zm2GQPYqbRR5xJSfd3AIqJHlK05DVzvHlvoqwgZuTzyqKPFPqq6M5e7t1H4VjPImfPeg2XpJYrGO3MTZz0pS7Nes6vPYltRm/iW89T90W01PkjdkD2yutTAw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=cTCq9UAn; arc=none smtp.client-ip=209.85.215.201
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--ackerleytng.bounces.google.com
-Received: by mail-pf1-f202.google.com with SMTP id d2e1a72fcca58-781269a9049so3665858b3a.2
-        for <kvm@vger.kernel.org>; Fri, 17 Oct 2025 13:13:35 -0700 (PDT)
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+Received: by mail-pg1-f201.google.com with SMTP id 41be03b00d2f7-b630753cc38so3705863a12.1
+        for <kvm@vger.kernel.org>; Fri, 17 Oct 2025 14:32:13 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1760732011; x=1761336811; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=gjvPBfWPeDDoysxeGmNxm2XVFXiN0LW7diKaU3jXVt0=;
-        b=WKPp1/jx/w6ezl0DMYKz+QZrTxDdERpLqp6Ab7/XaE73h4Qr4CJOf+wXnsM1HoECKD
-         FJ0hyq5440pgW7WJrEuiRgjK7mEzX3LfkV2NGuW8109Ea8wVihtjHFkQFqRZcFVPlo2V
-         lgdhHtax4NXNrA0ghHjeTd7zsgjvYJ8Jo/L7GM/ah6HHZTaBXbGv2VaYwdarGt6a/UEI
-         Us5+Ff5gxr8PYgnwqMFXXPIrWHj2FQmGsf8+jFie59lYTiYot7sYv2AWCO0ZpqP8Uu5B
-         hunvVBNqATAmgRpZ1VB8xebcOZcxPdPZlhs8Lkr40Atl/X5wDobknQVmNdHmS/rXnIm9
-         nzKA==
+        d=google.com; s=20230601; t=1760736733; x=1761341533; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:mime-version:date:reply-to:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=9gtDefYWAVjsVDW6WMvanANrfYGRojaTuaBTWReOyJI=;
+        b=cTCq9UAntOlG2NhBbEPHD4AXtaFLJmP2LCpfh9nRei+33ZqqVdI1vezprSnc+SVS70
+         omW4lrLFt3DNWLsMhtxoD8D+GbwIEUuBULTiuaJQUM/IZnS5yHHqSjtKPVtJlgXkeP8+
+         NSXBN8xm0n5vVhb92oZXwjmJ2RSywhpHlyCD791Y0BakZaHKx3iLw2RzHklGZUmmtMks
+         fwTAaTdlzHdCToSwSQH/GVjHZqKvyUNPG1Fx6axp63MR4RQ+cQMyfK97+hUw6BeEO2l9
+         UPz16RCxwxJxc7sS0LsB9wlSuc6EbmHa4x6OCGXtto18uMd4xqi0AoztrBlZl357hC+6
+         0vUQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1760732011; x=1761336811;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=gjvPBfWPeDDoysxeGmNxm2XVFXiN0LW7diKaU3jXVt0=;
-        b=S5xxvfo6Fqrl/LN/cIt+gETRW41I8NlRTTsq7zEALrFwfdLdepYZTRWLrbPEWn89ZX
-         YDXZIWnmDknio7ZrEU+s9kpqyBZh27vK3yVn75oKdVnuEieLF+iXFqJqXCEcqJj57pZq
-         j6SrXDipsAiOuX3zavBuILBDZvTSBH9iVi3gtoFL0s8taFZwF4niSfktBQ4+se2eAb02
-         e1DSkvNkNn7FBlFd3eiSuF5UadD1kM76bsgWYQEOb4CbZdvj8oVX1RC12D93yQs9J6ix
-         9SJqc35v+IzPOaawGpJYIKaEswbYuow+Hn1gLhCuJPzGegqQCR2rTWPF9HzCXDcjHIyD
-         MV1Q==
-X-Forwarded-Encrypted: i=1; AJvYcCXjtdwiDSwbvZqqPqPVprz6i4k0fCvD6cbOxG7evrQqjwBPP3D3PQGu6LOKd9oXiIlJBWU=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxNUU6wqWkFtN/0fSgZDPqS6n7Re1eHXrxMj+gBbW+UI+t7BsXi
-	QczcF727Bc0ZpPf/ZTTC5MQZKKz4R6lG4m7VZCZUHRRpYHHxYPG4DfM7na/eqvIkKOvX8/aQbj4
-	Axreqlf2LZqFbsr4VoWglp91c8A==
-X-Google-Smtp-Source: AGHT+IHIFgvKx4iQssAvfWvw05fzS3tjPMxtqzDzpUfFs2q0tZQVlLhulOrO+VXHlGdzU4khsfJPAu1rlwqetjJf8A==
-X-Received: from pjbpj3.prod.google.com ([2002:a17:90b:4f43:b0:332:4129:51b2])
- (user=ackerleytng job=prod-delivery.src-stubby-dispatcher) by
- 2002:a05:6a21:9997:b0:334:9e5e:c2c2 with SMTP id adf61e73a8af0-334a84c81famr6743421637.13.1760732010737;
- Fri, 17 Oct 2025 13:13:30 -0700 (PDT)
-Date: Fri, 17 Oct 2025 13:12:18 -0700
-In-Reply-To: <cover.1760731772.git.ackerleytng@google.com>
+        d=1e100.net; s=20230601; t=1760736733; x=1761341533;
+        h=cc:to:from:subject:message-id:mime-version:date:reply-to
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=9gtDefYWAVjsVDW6WMvanANrfYGRojaTuaBTWReOyJI=;
+        b=mAfQUyu58hU3KzAtu8lURVB8uhnk4KWbbTjOuXeSHsXmBZnAB8e1bAxv41rp751Phd
+         UpU2v66LhJk3xPB3dfIyi8U/bk0lPRZnGLr6KU0ztON4XTBl22G3emQR0UBUuZ8o5+TJ
+         V+GiZHcjdeg/pnIn69ZAau+1qraDV17gjvKxxX661oMOlJemVMBKzTTMTjHIVV5Oi3jY
+         A5arZo3dR/aWvZQGUhOrV1pJfdIrDraOvlX8GDYn15wVo5lKXY8QmJtZVcEf5euwI4y9
+         PN5RLSWychMs23NJskrgsUJnOedyipWDis/YyndBAs7GNIBpHrrv2amMNOdUlpvutMma
+         eudw==
+X-Gm-Message-State: AOJu0YxcQWWk/7I4DkNSK2Hn15EyIxSGpnb7uSHTFvF6+pVo924f45U2
+	HaU6EqwHbGYK7nlMeVP26U6ETOMxlur0rBIhICTLvCC9iue/knFlz9W5Q+CrUBPiOpAauilidD1
+	2AXdiow==
+X-Google-Smtp-Source: AGHT+IEbt2E83StVcKSsWn4g67eKo6J1vttk/tak3E0xY04KXB5yu7Mc5sleQhcQRAZLOADrOnbQ1UEniCU=
+X-Received: from pjtk2.prod.google.com ([2002:a17:90a:c502:b0:327:7035:d848])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a05:6a20:244b:b0:253:1e04:4e8
+ with SMTP id adf61e73a8af0-334a85fdb31mr6566741637.56.1760736733495; Fri, 17
+ Oct 2025 14:32:13 -0700 (PDT)
+Reply-To: Sean Christopherson <seanjc@google.com>
+Date: Fri, 17 Oct 2025 14:32:10 -0700
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
-References: <cover.1760731772.git.ackerleytng@google.com>
 X-Mailer: git-send-email 2.51.0.858.gf9c4a03a3a-goog
-Message-ID: <f326fd44695d94438b6061c0c5881c6a17ad84d3.1760731772.git.ackerleytng@google.com>
-Subject: [RFC PATCH v1 37/37] KVM: selftests: Update private memory exits test
- work with per-gmem attributes
-From: Ackerley Tng <ackerleytng@google.com>
-To: cgroups@vger.kernel.org, kvm@vger.kernel.org, linux-doc@vger.kernel.org, 
-	linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	linux-kselftest@vger.kernel.org, linux-mm@kvack.org, 
-	linux-trace-kernel@vger.kernel.org, x86@kernel.org
-Cc: ackerleytng@google.com, akpm@linux-foundation.org, 
-	binbin.wu@linux.intel.com, bp@alien8.de, brauner@kernel.org, 
-	chao.p.peng@intel.com, chenhuacai@kernel.org, corbet@lwn.net, 
-	dave.hansen@intel.com, dave.hansen@linux.intel.com, david@redhat.com, 
-	dmatlack@google.com, erdemaktas@google.com, fan.du@intel.com, fvdl@google.com, 
-	haibo1.xu@intel.com, hannes@cmpxchg.org, hch@infradead.org, hpa@zytor.com, 
-	hughd@google.com, ira.weiny@intel.com, isaku.yamahata@intel.com, jack@suse.cz, 
-	james.morse@arm.com, jarkko@kernel.org, jgg@ziepe.ca, jgowans@amazon.com, 
-	jhubbard@nvidia.com, jroedel@suse.de, jthoughton@google.com, 
-	jun.miao@intel.com, kai.huang@intel.com, keirf@google.com, 
-	kent.overstreet@linux.dev, liam.merwick@oracle.com, 
-	maciej.wieczor-retman@intel.com, mail@maciej.szmigiero.name, 
-	maobibo@loongson.cn, mathieu.desnoyers@efficios.com, maz@kernel.org, 
-	mhiramat@kernel.org, mhocko@kernel.org, mic@digikod.net, michael.roth@amd.com, 
-	mingo@redhat.com, mlevitsk@redhat.com, mpe@ellerman.id.au, 
-	muchun.song@linux.dev, nikunj@amd.com, nsaenz@amazon.es, 
-	oliver.upton@linux.dev, palmer@dabbelt.com, pankaj.gupta@amd.com, 
-	paul.walmsley@sifive.com, pbonzini@redhat.com, peterx@redhat.com, 
-	pgonda@google.com, prsampat@amd.com, pvorel@suse.cz, qperret@google.com, 
-	richard.weiyang@gmail.com, rick.p.edgecombe@intel.com, rientjes@google.com, 
-	rostedt@goodmis.org, roypat@amazon.co.uk, rppt@kernel.org, seanjc@google.com, 
-	shakeel.butt@linux.dev, shuah@kernel.org, steven.price@arm.com, 
-	steven.sistare@oracle.com, suzuki.poulose@arm.com, tabba@google.com, 
-	tglx@linutronix.de, thomas.lendacky@amd.com, vannapurve@google.com, 
-	vbabka@suse.cz, viro@zeniv.linux.org.uk, vkuznets@redhat.com, 
-	wei.w.wang@intel.com, will@kernel.org, willy@infradead.org, wyihan@google.com, 
-	xiaoyao.li@intel.com, yan.y.zhao@intel.com, yilun.xu@intel.com, 
-	yuzenghui@huawei.com, zhiquan1.li@intel.com
+Message-ID: <20251017213210.339764-1-seanjc@google.com>
+Subject: [GIT PULL] KVM: guest_memd fixes+tests and a PMU fix for 6.18
+From: Sean Christopherson <seanjc@google.com>
+To: Paolo Bonzini <pbonzini@redhat.com>
+Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	Sean Christopherson <seanjc@google.com>
 Content-Type: text/plain; charset="UTF-8"
 
-From: Sean Christopherson <seanjc@google.com>
+Proactively add a guest_memfd flag, INIT_SHARED, to head off a lurking ABI
+collision that will necessitate a new flag at some point.  Without INIT_SHARED,
+we'll likely end up with x86 CoCo VMs initializing memory to PRIVATE by default,
+SHARED if MMAP, and PRIVATE if INIT_PRIVATE (the potential new flag we're
+trying to avoid).
 
-Skip setting memory to private in the private memory exits test when using
-per-gmem memory attributes, as memory is initialized to private by default
-for guest_memfd, and using vm_mem_set_private() on a guest_memfd instance
-requires creating guest_memfd with GUEST_MEMFD_FLAG_MMAP (which is totally
-doable, but would need to be conditional and is ultimately unnecessary).
+Allow mmap() on x86 CoCo VMs, i.e. on private memory, to try and detect any
+other lurking ABI issues.
 
-Expect an emulated MMIO instead of a memory fault exit when attributes are
-per-gmem, as deleting the memslot effectively drops the private status,
-i.e. the GPA becomes shared and thus supports emulated MMIO.
+In addition to the guest_memfd fixes/cleanups, fix a PMU goof where KVM calls
+into perf on a hybrid CPU and gets yelled at.  There's no functional issue, but
+the WARN is obviously less than ideal.
 
-Skip the "memslot not private" test entirely, as private vs. shared state
-for x86 software-protected VMs comes from the memory attributes themselves,
-and so when doing in-place conversions there can never be a disconnect
-between the expected and actual states.
+The following changes since commit 6b36119b94d0b2bb8cea9d512017efafd461d6ac:
 
-Signed-off-by: Sean Christopherson <seanjc@google.com>
----
- .../kvm/x86/private_mem_kvm_exits_test.c      | 36 +++++++++++++++----
- 1 file changed, 30 insertions(+), 6 deletions(-)
+  KVM: x86: Export KVM-internal symbols for sub-modules only (2025-09-30 13:40:02 -0400)
 
-diff --git a/tools/testing/selftests/kvm/x86/private_mem_kvm_exits_test.c b/tools/testing/selftests/kvm/x86/private_mem_kvm_exits_test.c
-index 13e72fcec8dd2..10be67441d457 100644
---- a/tools/testing/selftests/kvm/x86/private_mem_kvm_exits_test.c
-+++ b/tools/testing/selftests/kvm/x86/private_mem_kvm_exits_test.c
-@@ -62,8 +62,9 @@ static void test_private_access_memslot_deleted(void)
- 
- 	virt_map(vm, EXITS_TEST_GVA, EXITS_TEST_GPA, EXITS_TEST_NPAGES);
- 
--	/* Request to access page privately */
--	vm_mem_set_private(vm, EXITS_TEST_GPA, EXITS_TEST_SIZE);
-+	/* Request to access page privately. */
-+	if (!kvm_has_gmem_attributes)
-+		vm_mem_set_private(vm, EXITS_TEST_GPA, EXITS_TEST_SIZE);
- 
- 	pthread_create(&vm_thread, NULL,
- 		       (void *(*)(void *))run_vcpu_get_exit_reason,
-@@ -74,10 +75,26 @@ static void test_private_access_memslot_deleted(void)
- 	pthread_join(vm_thread, &thread_return);
- 	exit_reason = (uint32_t)(uint64_t)thread_return;
- 
--	TEST_ASSERT_EQ(exit_reason, KVM_EXIT_MEMORY_FAULT);
--	TEST_ASSERT_EQ(vcpu->run->memory_fault.flags, KVM_MEMORY_EXIT_FLAG_PRIVATE);
--	TEST_ASSERT_EQ(vcpu->run->memory_fault.gpa, EXITS_TEST_GPA);
--	TEST_ASSERT_EQ(vcpu->run->memory_fault.size, EXITS_TEST_SIZE);
-+	/*
-+	 * If attributes are tracked per-gmem, deleting the memslot that points
-+	 * at the gmem instance effectively makes the memory shared, and so the
-+	 * read should trigger emulated MMIO.
-+	 *
-+	 * If attributes are tracked per-VM, deleting the memslot shouldn't
-+	 * affect the private attribute, and so KVM should generate a memory
-+	 * fault exit (emulated MMIO on private GPAs is disallowed).
-+	 */
-+	if (kvm_has_gmem_attributes) {
-+		TEST_ASSERT_EQ(exit_reason, KVM_EXIT_MMIO);
-+		TEST_ASSERT_EQ(vcpu->run->mmio.phys_addr, EXITS_TEST_GPA);
-+		TEST_ASSERT_EQ(vcpu->run->mmio.len, sizeof(uint64_t));
-+		TEST_ASSERT_EQ(vcpu->run->mmio.is_write, false);
-+	} else {
-+		TEST_ASSERT_EQ(exit_reason, KVM_EXIT_MEMORY_FAULT);
-+		TEST_ASSERT_EQ(vcpu->run->memory_fault.flags, KVM_MEMORY_EXIT_FLAG_PRIVATE);
-+		TEST_ASSERT_EQ(vcpu->run->memory_fault.gpa, EXITS_TEST_GPA);
-+		TEST_ASSERT_EQ(vcpu->run->memory_fault.size, EXITS_TEST_SIZE);
-+	}
- 
- 	kvm_vm_free(vm);
- }
-@@ -88,6 +105,13 @@ static void test_private_access_memslot_not_private(void)
- 	struct kvm_vcpu *vcpu;
- 	uint32_t exit_reason;
- 
-+	/*
-+	 * Accessing non-private memory as private with a software-protected VM
-+	 * isn't possible when doing in-place conversions.
-+	 */
-+	if (kvm_has_gmem_attributes)
-+		return;
-+
- 	vm = vm_create_shape_with_one_vcpu(protected_vm_shape, &vcpu,
- 					   guest_repeatedly_read);
- 
--- 
-2.51.0.858.gf9c4a03a3a-goog
+are available in the Git repository at:
 
+  https://github.com/kvm-x86/linux.git tags/kvm-x86-fixes-6.18-rc2
+
+for you to fetch changes up to 505f5224b197b77169c977e747cbc18b222f85f9:
+
+  KVM: selftests: Verify that reads to inaccessible guest_memfd VMAs SIGBUS (2025-10-10 14:25:30 -0700)
+
+----------------------------------------------------------------
+KVM x86 fixes for 6.18:
+
+ - Expand the KVM_PRE_FAULT_MEMORY selftest to add a regression test for the
+   bug fixed by commit 3ccbf6f47098 ("KVM: x86/mmu: Return -EAGAIN if userspace
+   deletes/moves memslot during prefault")
+
+ - Don't try to get PMU capabbilities from perf when running a CPU with hybrid
+   CPUs/PMUs, as perf will rightly WARN.
+
+ - Rework KVM_CAP_GUEST_MEMFD_MMAP (newly introduced in 6.18) into a more
+   generic KVM_CAP_GUEST_MEMFD_FLAGS
+
+ - Add a guest_memfd INIT_SHARED flag and require userspace to explicitly set
+   said flag to initialize memory as SHARED, irrespective of MMAP.  The
+   behavior merged in 6.18 is that enabling mmap() implicitly initializes
+   memory as SHARED, which would result in an ABI collision for x86 CoCo VMs
+   as their memory is currently always initialized PRIVATE.
+
+ - Allow mmap() on guest_memfd for x86 CoCo VMs, i.e. on VMs with private
+   memory, to enable testing such setups, i.e. to hopefully flush out any
+   other lurking ABI issues before 6.18 is officially released.
+
+ - Add testcases to the guest_memfd selftest to cover guest_memfd without MMAP,
+   and host userspace accesses to mmap()'d private memory.
+
+----------------------------------------------------------------
+Ackerley Tng (1):
+      KVM: selftests: Add test coverage for guest_memfd without GUEST_MEMFD_FLAG_MMAP
+
+Dapeng Mi (1):
+      KVM: x86/pmu: Don't try to get perf capabilities for hybrid CPUs
+
+Sean Christopherson (12):
+      KVM: Rework KVM_CAP_GUEST_MEMFD_MMAP into KVM_CAP_GUEST_MEMFD_FLAGS
+      KVM: guest_memfd: Add INIT_SHARED flag, reject user page faults if not set
+      KVM: guest_memfd: Invalidate SHARED GPAs if gmem supports INIT_SHARED
+      KVM: Explicitly mark KVM_GUEST_MEMFD as depending on KVM_GENERIC_MMU_NOTIFIER
+      KVM: guest_memfd: Allow mmap() on guest_memfd for x86 VMs with private memory
+      KVM: selftests: Stash the host page size in a global in the guest_memfd test
+      KVM: selftests: Create a new guest_memfd for each testcase
+      KVM: selftests: Add wrappers for mmap() and munmap() to assert success
+      KVM: selftests: Isolate the guest_memfd Copy-on-Write negative testcase
+      KVM: selftests: Add wrapper macro to handle and assert on expected SIGBUS
+      KVM: selftests: Verify that faulting in private guest_memfd memory fails
+      KVM: selftests: Verify that reads to inaccessible guest_memfd VMAs SIGBUS
+
+Yan Zhao (1):
+      KVM: selftests: Test prefault memory during concurrent memslot removal
+
+ Documentation/virt/kvm/api.rst                       |  15 ++++++++--
+ arch/x86/kvm/pmu.c                                   |   8 ++++--
+ arch/x86/kvm/x86.c                                   |   7 +++--
+ include/linux/kvm_host.h                             |  12 +++++++-
+ include/uapi/linux/kvm.h                             |   5 ++--
+ tools/testing/selftests/kvm/guest_memfd_test.c       | 175 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++----------------------------------------------------
+ tools/testing/selftests/kvm/include/kvm_util.h       |  25 ++++++++++++++++
+ tools/testing/selftests/kvm/include/test_util.h      |  19 +++++++++++++
+ tools/testing/selftests/kvm/lib/kvm_util.c           |  44 ++++++++++------------------
+ tools/testing/selftests/kvm/lib/test_util.c          |   7 +++++
+ tools/testing/selftests/kvm/mmu_stress_test.c        |   5 ++--
+ tools/testing/selftests/kvm/pre_fault_memory_test.c  | 131 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++-----------
+ tools/testing/selftests/kvm/s390/ucontrol_test.c     |  16 +++++------
+ tools/testing/selftests/kvm/set_memory_region_test.c |  17 ++++++-----
+ virt/kvm/Kconfig                                     |   1 +
+ virt/kvm/guest_memfd.c                               |  75 +++++++++++++++++++++++++++++++-----------------
+ virt/kvm/kvm_main.c                                  |   4 +--
+ 17 files changed, 378 insertions(+), 188 deletions(-)
 
