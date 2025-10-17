@@ -1,79 +1,79 @@
-Return-Path: <kvm+bounces-60325-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-60326-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 69590BE91DB
-	for <lists+kvm@lfdr.de>; Fri, 17 Oct 2025 16:13:41 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id DD8AABE91DE
+	for <lists+kvm@lfdr.de>; Fri, 17 Oct 2025 16:13:45 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 5F9EC1AA1F68
-	for <lists+kvm@lfdr.de>; Fri, 17 Oct 2025 14:13:59 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id A24231AA1DF4
+	for <lists+kvm@lfdr.de>; Fri, 17 Oct 2025 14:14:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B224B36CDF9;
-	Fri, 17 Oct 2025 14:12:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C115632C92A;
+	Fri, 17 Oct 2025 14:13:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="f/EHlisX"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="UJI0PaDU"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-wm1-f47.google.com (mail-wm1-f47.google.com [209.85.128.47])
+Received: from mail-wm1-f48.google.com (mail-wm1-f48.google.com [209.85.128.48])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 37C3936999B
-	for <kvm@vger.kernel.org>; Fri, 17 Oct 2025 14:12:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.47
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4FD31393DF1
+	for <kvm@vger.kernel.org>; Fri, 17 Oct 2025 14:12:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.48
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1760710378; cv=none; b=bXSsc8xXSgCRCvpSLJ3kB0zk7fhZODy/WFSrrxNTlomuPln362V0nUvVfj4wOHCQL9wRIEcPjcDEXbN7yiUVSxAasMP61w94iT0AkBcPrdsEB8xcGXN/CZWZxy29Uws5o8R9IbE2mXBd1DfcGlBpCN5cIw2MiYnv7We/0sEnoTs=
+	t=1760710380; cv=none; b=bxIHCrI2Z0QGlbT3hIPTR6VnZr7PuSeVMQgk1IpHEfAjrOtkVZ8FUpJCC3421TCbWNt8vXjcZE3w1J6bJfyt07gh2wmTccAz+UPDlKa7aiq9rQGEMLeHnijBz/1j2uSxL7dd2aqOEfKDF38OIBzg2dSSW+JWLSl8QVWqGgnK+lA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1760710378; c=relaxed/simple;
-	bh=xwV1Hr9G9Q2Jcbvyd00RPZYhlNpKeqkS0MOkZbeh8aE=;
+	s=arc-20240116; t=1760710380; c=relaxed/simple;
+	bh=G7zh2SwKpFnddZOBKyMR0LkcgKDr9eKNzrdRrWrd7dE=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=tzXuWCY8evcx4adn/I3hO/6Sxtqg5eSuN+r1eHjkA9gvNArgHuonCzFP10UrOjmajwaeUgENX+yw3xhDK434xtSBMm6ugC53eqAOtJlEa0+HxEcvLQ8TgNrjpK0JRXKpyWuxtoAdfHr9LLANUYPYc5mI4Rke4JkY1QRhua1aWjo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=f/EHlisX; arc=none smtp.client-ip=209.85.128.47
+	 MIME-Version; b=r+798HeoGCmHQ2EQtZMNWNZ/yr+mlw80FaioObG+/fW30x4m7xumC+0d2fYDJiGPUg8LfbbTtsGYYMbgNHb+1IvwwCIPWVAT/feYsMqL3Wm/DIQKpXf7r2ojTmVqzM5a9M1IWVjayiubqkR+dmhiDNZRg5baqpvKRhKI9Z+xilw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=UJI0PaDU; arc=none smtp.client-ip=209.85.128.48
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f47.google.com with SMTP id 5b1f17b1804b1-471193a9d9eso10650875e9.2
-        for <kvm@vger.kernel.org>; Fri, 17 Oct 2025 07:12:56 -0700 (PDT)
+Received: by mail-wm1-f48.google.com with SMTP id 5b1f17b1804b1-46e6a6a5e42so11117275e9.0
+        for <kvm@vger.kernel.org>; Fri, 17 Oct 2025 07:12:58 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1760710375; x=1761315175; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1760710377; x=1761315177; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=uoQ6SLuQ7FwjPP9PEz/jS+6Ivn8fi/SY5nUjIteDwfY=;
-        b=f/EHlisXRw9BDUCFq8VIv8ipQFZwwzt8w5G7Cl+rvH6TtK4uc2xJS4pCIQoQhO6qPr
-         eklDLwBYugzh3gFHkVsoZo9qW/Snb78Xx+qPOyg7z1zITjv2JoT+kBHpX0O6YlXYIgIf
-         +nJq9X5pyg94faajx6NmQSdDFOnB0M0w5341u7CYN41gbHtPWB/CyFh2bP8Czxf+fM9r
-         SUmlCbTVf07wH3AZmcCeJ8goYFa6ECX3BUfQdKMg1pLVmIlBSaSPWVPiaReUX1HLVxOg
-         hv3IC4OsM8X99LT8eF7M0Vb2bV410+Pkl/6GqvsztR3Hq1/x/Fw681fN7x0Wae1kfR2R
-         IwgQ==
+        bh=gteGWnMF2R6W+vB6CRlq0+Co1hdivkhTuMvbx2i6MfQ=;
+        b=UJI0PaDUudUWA8LrZZnBX12jcrc6mo/ZgGO61TgKUjFWgcQ59e1KmuhNdb+1ky1y4U
+         xMIUjWof20roQjeUJj73JS8WO5ua6Wmk994+Yhn4fwaiIsW4lpeYDa5EohryBU5GzcOe
+         5CcpWMZiKBp4lksurAzJprCRmb3PJhhHAVmbnTlx3SsrSLxhTueDuy0ZgnUTpivWkUrA
+         FE1+jJN6FgM9oqWz30GdKg0NwiUECMLJILJeaoP0oT5lKYbctiJCdr+u0ioNXjwpipTq
+         r19Fu3GrDsjbk2Vb6PBT/4zry+0aGY3FZOad3Jd2ijlF1FfgdYyNXtd7jSpfobmXvEIf
+         VIBA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1760710375; x=1761315175;
+        d=1e100.net; s=20230601; t=1760710377; x=1761315177;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=uoQ6SLuQ7FwjPP9PEz/jS+6Ivn8fi/SY5nUjIteDwfY=;
-        b=G40BPo1SKzuULbElEvF5LqGSUjK6vtt8JJloLMnzc2blZRPU9oAqJgB1lgsRv6ZfW4
-         pXP56957DIBDAoxaR+yvARsm6SvQBG6qreBB6cSIXsFZFzPhsH0TGDPm1C93MWHxAZR+
-         wpfUZ3iiHsPdGukPjRN1NcG1JF/uC2EkeHo2E3PlZxN84JZvTpLztKGvrVC4EYnkkPzj
-         A9lUzJyUCAyyccge2LkBJ9Wp3Cu2l0vIPYCyC6pcC1uSWC/EP8+GdBsKiGRc+qOmlIlY
-         SZvV90AzDeinNpCJlAhNr1f11DwriFzZS5qKFBSk665MX7GnqwfMs1bTaJqWSTp83CAc
-         y/MQ==
-X-Forwarded-Encrypted: i=1; AJvYcCXkUVkcvBYNY3FlghagdQnvtSJHhqMHf62uIZtRlc+Ln1Yb+amYNrGPQ6070P5Yv97yCr4=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzJD8bEOxo2r+Dj4CuFdKIpxT1jt+KCeaTmyKeBVlbWmEwrvVHv
-	nKdiZKKfJEWZwMpFooAfGGQo9l7voIEthhXxhAQHrUELBJwGYNlbmdwu
-X-Gm-Gg: ASbGncsDcIujJ37OBITpXPgVKcKNB3Jg8TXouwDFpxBvDg8OVGSwNR/CZTAI1c0W1lL
-	UQgbeCVTnuszC+NxvjTzRxm4K+1e+/Sux6JoeBEpgJR8Brsuql6E/XcjtqA4zFL/LLhOs/wvED+
-	kFHQ88Xlm0663xvk1mcfEuYnjiXO7hv0tUnezEatGaw1Sgq9EkHwmH6GuMTisUsG+gm6CrtYfs5
-	Lz3P3kxJpjxaPOmtkbLhW2mfXl7Jg/P3LGfui9gJERkSHNqPxfHqCZ+GUqBiWCWXZUMo9m9b/lv
-	XXNmhTQ1ghNIyvDFHjdiwWCGjKCjy0ReYa18kdax5FlYorhyI3Q+/oz+A/IiA33etsM790lHE2u
-	XAkLxG43+NkvrwlUAjayLQH2lp6AIbMTIuFtd3QSjJFisGIS+ZwoVRdGfyTn05FN8xnpo7EiWFH
-	xgaT1dXDbh8HFuwSz0A7Seq/c4dm3BOzCuegp3qam85kk=
-X-Google-Smtp-Source: AGHT+IGDUpHFktS1phJv11AWEB4wPTsgryq8zLqwvPwmU/+IRwKwm/FCG4X5/AX6gCWAr8CSOUFAfQ==
-X-Received: by 2002:a05:600c:548d:b0:45f:27fb:8016 with SMTP id 5b1f17b1804b1-471178726a9mr27315245e9.1.1760710375304;
-        Fri, 17 Oct 2025 07:12:55 -0700 (PDT)
+        bh=gteGWnMF2R6W+vB6CRlq0+Co1hdivkhTuMvbx2i6MfQ=;
+        b=vM3Xs9VekcQWpxGFCmo/rTJcIX9SsrOmo9VxBrXvSGz+zUNyLdg0rTnMdjnsoAdfKV
+         cuAQtfBpufbCWt+yljO/wN5LVEQeoQ23ga8BTbyufXESzQVBK7Ekfh1Nb8PxQjG1DR/i
+         pZ/WtUhjUj5rZnUGv22trijZJdGCMj77QpdGRYqcbcr+ON18i3hxBRlxvLHfAEFtLIdw
+         a4dcS3EEMPdikJ4Tf8wW/AsB0qPkvkhCT3jGlgsWb47AzyDC/xgO1fYmDesGpJLYR2bf
+         rjJBmGxMtpLWQTRUY6sOtxKrRRy+shBIjpCmklGmgc/dyVPPfgzogMiAFbVKQAdhbLWz
+         exsA==
+X-Forwarded-Encrypted: i=1; AJvYcCXmA/jWoJXZHKMVtTFogApnXnwkStJ8q97FEawXvcWGGGN1fErhaVE1F/gjMI9hLeZsRfM=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxN6TL4Ade/NEcI98WhXrR48xtYaPUypoLMU3YHAm2pndPqahzo
+	jkFpaPgmjq8ZSsGxeAY0yE6vMtLmenXKilXSNpKQAV+wPfSEJaMRLoRy
+X-Gm-Gg: ASbGnctz31pVvkU1KhLlPG/NemkXH0g4xmU+834JaLpTx2uWi9XCT3Sajv4W3FJ/Dae
+	JfF6SIcBQX96qa4dQSPp4SsvZ2+bw34YyS/eNwpLXWcYdacm1+6lMrVMgknwEpQEty2cfaB1R9e
+	mdD/wKveGCWy68KzBmDMAxrJDFoRBsCBGpYU51XpP5Js5qQUpYlnGVALb0Jlqy4fSkrVarEf8PG
+	2ZHJ9AYHHfuN+QHpYYdVaI6ghPOdTyuYjaB3L+gbxCJKVdMbvoP6Q7NuFrPG11VCwiG3Aunnbve
+	yjdHqXTUxqfQeALuQ2e+LLaefq7J7TghVfGsx0pDslCF4oOc+1Xqe9azl05DyQY7s3hdH25hlhW
+	IbWptwPqKBsDMvjGUaghLK2qdg2xpT8MkfCDDthFSgrCWgL4fECkuCISCRVtp3Z6O0PNeDKiHvD
+	aO7NCzIOaG5ugzr16/9AfuNVTS2Ww3ZhYiK20sVeew1fk=
+X-Google-Smtp-Source: AGHT+IF0gmmFJZZWMtm31nH8oxPWJUvDxjlKcg/T2Pi9eXPhQiM4NczNuxSbXUqG5YCCifXib1OY9A==
+X-Received: by 2002:a05:600c:3541:b0:46d:a04:50c6 with SMTP id 5b1f17b1804b1-4711791934dmr28602455e9.30.1760710376471;
+        Fri, 17 Oct 2025 07:12:56 -0700 (PDT)
 Received: from archlinux (pd95edc07.dip0.t-ipconnect.de. [217.94.220.7])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4710cb36e7csm51359675e9.2.2025.10.17.07.12.54
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4710cb36e7csm51359675e9.2.2025.10.17.07.12.55
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 17 Oct 2025 07:12:54 -0700 (PDT)
+        Fri, 17 Oct 2025 07:12:56 -0700 (PDT)
 From: Bernhard Beschow <shentey@gmail.com>
 To: qemu-devel@nongnu.org
 Cc: Roman Bolshakov <rbolshakov@ddn.com>,
@@ -97,9 +97,9 @@ Cc: Roman Bolshakov <rbolshakov@ddn.com>,
 	kvm@vger.kernel.org,
 	Laurent Vivier <lvivier@redhat.com>,
 	Bernhard Beschow <shentey@gmail.com>
-Subject: [PATCH v2 09/11] hw/intc/apic: Ensure own APIC use in apic_register_{read,write}
-Date: Fri, 17 Oct 2025 16:11:15 +0200
-Message-ID: <20251017141117.105944-10-shentey@gmail.com>
+Subject: [PATCH v2 10/11] hw/i386/x86-cpu: Remove now unused cpu_get_current_apic()
+Date: Fri, 17 Oct 2025 16:11:16 +0200
+Message-ID: <20251017141117.105944-11-shentey@gmail.com>
 X-Mailer: git-send-email 2.51.1.dirty
 In-Reply-To: <20251017141117.105944-1-shentey@gmail.com>
 References: <20251017141117.105944-1-shentey@gmail.com>
@@ -111,93 +111,46 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-As per the previous patch, the own APIC instance is already available in
-apic_msr_{read,write}, and can be passed along. In apic_mem_{read,write}, the
-own APIC instance is available as the opaque parameter, since it gets registered
-when initializing the io_memory attribute. As a result, no
-cpu_get_current_apic() is involved any longer.
+No users are left for cpu_get_current_apic(), so remove it.
+
+As a further benefit, it removes one use of the `current_cpu` global.
 
 Signed-off-by: Bernhard Beschow <shentey@gmail.com>
 ---
- hw/intc/apic.c | 25 ++++++-------------------
- 1 file changed, 6 insertions(+), 19 deletions(-)
+ include/hw/i386/apic.h |  3 ---
+ hw/i386/x86-cpu.c      | 10 ----------
+ 2 files changed, 13 deletions(-)
 
-diff --git a/hw/intc/apic.c b/hw/intc/apic.c
-index ba0eda3921..fee5201372 100644
---- a/hw/intc/apic.c
-+++ b/hw/intc/apic.c
-@@ -769,17 +769,11 @@ static void apic_timer(void *opaque)
-     apic_timer_update(s, s->next_time);
+diff --git a/include/hw/i386/apic.h b/include/hw/i386/apic.h
+index 6a0933f401..1b0b26e4c5 100644
+--- a/include/hw/i386/apic.h
++++ b/include/hw/i386/apic.h
+@@ -23,7 +23,4 @@ int apic_msr_read(APICCommonState *s, int index, uint64_t *val);
+ int apic_msr_write(APICCommonState *s, int index, uint64_t val);
+ bool is_x2apic_mode(APICCommonState *s);
+ 
+-/* pc.c */
+-APICCommonState *cpu_get_current_apic(void);
+-
+ #endif
+diff --git a/hw/i386/x86-cpu.c b/hw/i386/x86-cpu.c
+index 1a86a853d5..86a57c685b 100644
+--- a/hw/i386/x86-cpu.c
++++ b/hw/i386/x86-cpu.c
+@@ -85,13 +85,3 @@ int cpu_get_pic_interrupt(CPUX86State *env)
+     intno = pic_read_irq(isa_pic);
+     return intno;
  }
- 
--static int apic_register_read(int index, uint64_t *value)
-+static int apic_register_read(APICCommonState *s, int index, uint64_t *value)
- {
--    APICCommonState *s;
-     uint32_t val;
-     int ret = 0;
- 
--    s = cpu_get_current_apic();
--    if (!s) {
--        return -1;
+-
+-APICCommonState *cpu_get_current_apic(void)
+-{
+-    if (current_cpu) {
+-        X86CPU *cpu = X86_CPU(current_cpu);
+-        return cpu->apic_state;
+-    } else {
+-        return NULL;
 -    }
--
-     switch(index) {
-     case 0x02: /* id */
-         if (is_x2apic_mode(s)) {
-@@ -876,7 +870,7 @@ static uint64_t apic_mem_read(void *opaque, hwaddr addr, unsigned size)
-     }
- 
-     index = (addr >> 4) & 0xff;
--    apic_register_read(index, &val);
-+    apic_register_read(opaque, index, &val);
- 
-     return val;
- }
-@@ -891,7 +885,7 @@ int apic_msr_read(APICCommonState *s, int index, uint64_t *val)
-         return -1;
-     }
- 
--    return apic_register_read(index, val);
-+    return apic_register_read(s, index, val);
- }
- 
- static void apic_send_msi(MSIMessage *msi)
-@@ -919,15 +913,8 @@ static void apic_send_msi(MSIMessage *msi)
-     apic_deliver_irq(dest, dest_mode, delivery, vector, trigger_mode);
- }
- 
--static int apic_register_write(int index, uint64_t val)
-+static int apic_register_write(APICCommonState *s, int index, uint64_t val)
- {
--    APICCommonState *s;
--
--    s = cpu_get_current_apic();
--    if (!s) {
--        return -1;
--    }
--
-     trace_apic_register_write(index, val);
- 
-     switch(index) {
-@@ -1073,7 +1060,7 @@ static void apic_mem_write(void *opaque, hwaddr addr, uint64_t val,
-         return;
-     }
- 
--    apic_register_write(index, val);
-+    apic_register_write(opaque, index, val);
- }
- 
- int apic_msr_write(APICCommonState *s, int index, uint64_t val)
-@@ -1086,7 +1073,7 @@ int apic_msr_write(APICCommonState *s, int index, uint64_t val)
-         return -1;
-     }
- 
--    return apic_register_write(index, val);
-+    return apic_register_write(s, index, val);
- }
- 
- static void apic_pre_save(APICCommonState *s)
+-}
 -- 
 2.51.1.dirty
 
