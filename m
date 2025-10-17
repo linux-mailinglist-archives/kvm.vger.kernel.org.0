@@ -1,298 +1,146 @@
-Return-Path: <kvm+bounces-60406-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-60407-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6ABA5BEBF03
-	for <lists+kvm@lfdr.de>; Sat, 18 Oct 2025 00:41:47 +0200 (CEST)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
+	by mail.lfdr.de (Postfix) with ESMTPS id BEF70BEC024
+	for <lists+kvm@lfdr.de>; Sat, 18 Oct 2025 01:33:59 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id B02CD19A4A64
-	for <lists+kvm@lfdr.de>; Fri, 17 Oct 2025 22:42:09 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 814604E7F39
+	for <lists+kvm@lfdr.de>; Fri, 17 Oct 2025 23:33:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3EA9D3254A1;
-	Fri, 17 Oct 2025 22:41:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 14E3B2E1EEC;
+	Fri, 17 Oct 2025 23:33:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="fsatUJsY"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="HBbgnEg6"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pj1-f73.google.com (mail-pj1-f73.google.com [209.85.216.73])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9FD1C2D6E73
-	for <kvm@vger.kernel.org>; Fri, 17 Oct 2025 22:41:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A05922DAFA3
+	for <kvm@vger.kernel.org>; Fri, 17 Oct 2025 23:33:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.73
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1760740893; cv=none; b=BDSY3VB2KVKE2JDY6BLFbcBUo5+iuqaIBYwMmg3Cy4ICydE7s40MapWwsRI59xR/TL9PK99OoLPx3SGMZVgoTNLwv0DjHobQ6596O7MvEv7d9yMrH1FPUjf4v6OP6X94xpmgERDc/QHzt9If3/dWLtutlNpFZ+KEBsy/iOTlTjc=
+	t=1760744024; cv=none; b=LwqCYa2IjrKS4+YgiqRKVJUhHqY2+C9DO+GWH44uwq8py43qSrY8y3EBJSjAIF575Qp++Zk94v7zi71eJkIE8J+sT/Bw7fk1hyfuzmfps+uq0YAyf8vR6/M207An0hHGo/IAkpsN/IiS/rjvpuTUd00bVbeUGwVrvPX9ApurkjE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1760740893; c=relaxed/simple;
-	bh=I+vLvWX9tt3ZjPonM8Tn9nuLD6RlJN9iZ3xM1BPuumg=;
-	h=Message-ID:Date:MIME-Version:Subject:From:To:Cc:References:
-	 In-Reply-To:Content-Type; b=U5fAtMlajB+Xt8u7JfmQwqrdSCbSlpAoaO1987l1s2fwEPlDeApPjHH/ppssH3o87b/+PTmbapbk5f16nU1dpvVC8vMos4eM/vvfdLnZzbdYx2ayacP3Os63rh6mzLxE/kV4p42ajZJQY/MJfPuWsjKVyOoInXOJwI9M3J+A5/Q=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=fsatUJsY; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1760740890;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-	bh=uH8LJn4ypQODNYJ3orBEKrIWWsg1DgFIAiLDa76fO34=;
-	b=fsatUJsYa0aovfrulAxVVhzCRmqKXmES8VlODQRP/ocmuKvZARGHjOTf8BuGbrKY/Axjvf
-	cGdbvsv/2bMVP+XU5K1eqsmHOL0VLSaVhGFZQCXYBX25lLp1fD++MpJ6j/+5xVBkVY+3Hx
-	tamULMqw9PFrz+hJhNRfeiAqnF7WSvc=
-Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
- [209.85.128.71]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-34-g45ENBKsM-qlhAN1pHYfEg-1; Fri, 17 Oct 2025 18:41:28 -0400
-X-MC-Unique: g45ENBKsM-qlhAN1pHYfEg-1
-X-Mimecast-MFC-AGG-ID: g45ENBKsM-qlhAN1pHYfEg_1760740887
-Received: by mail-wm1-f71.google.com with SMTP id 5b1f17b1804b1-4710c04a403so23357295e9.3
-        for <kvm@vger.kernel.org>; Fri, 17 Oct 2025 15:41:28 -0700 (PDT)
+	s=arc-20240116; t=1760744024; c=relaxed/simple;
+	bh=O4poxL3uV+mMir/NtnbsQIIOJ7Lzn0S5rcHjXTbpNqI=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=cBVJocpb0rqUNVqy6azNiz4yZ8vH4M6bEFER4j3XDdOvbc4UMQM8CXw+QT1vEfP5SzEt1fwFuREdqr+4VBaH3Ww2VBshSf52Tt5RKnG1Gx5kIPqUczNMZEQ+Pycy6DPYgGPQuvqBaFi/KTkaiUIGdSxuysbo482oxtwRCpVp8U0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--ackerleytng.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=HBbgnEg6; arc=none smtp.client-ip=209.85.216.73
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--ackerleytng.bounces.google.com
+Received: by mail-pj1-f73.google.com with SMTP id 98e67ed59e1d1-336b646768eso2796757a91.1
+        for <kvm@vger.kernel.org>; Fri, 17 Oct 2025 16:33:41 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1760744020; x=1761348820; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=LwfPpMJqaisEQVUu9wiIDJQK1raYpWFG3P+DdjsMb18=;
+        b=HBbgnEg6RbTmkM0oHDhclWTglR9/RcvlluitBHJlbWV+6iQLqgU3Jax56TCvgjYTEd
+         IER/G2+2FrtFGXFQSxYiwfG1MF3ty65zfiCKQlgHYEbod7W5kAVd68VNoamcycl2HeaM
+         bj454Ytv83+xSufqfkEo039p5LLoCFYihXQ27Qwh0KFDqAylAzAhzdsDcbGosHkW/2qy
+         n6LKmJRHok2Bu+LaOFqzEYNNKYZSrgLJJABXzjVeNJYflK1KArnj03ujkACwJ9m/euoA
+         WsENt9WdJxyNlSmhdryHCrUDJCXgn90qiy2HjAWUGCovXjN97hT3ZMfVQVbvh76uxLXc
+         /Tzw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1760740887; x=1761345687;
-        h=content-transfer-encoding:in-reply-to:autocrypt:content-language
-         :references:cc:to:from:subject:user-agent:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=uH8LJn4ypQODNYJ3orBEKrIWWsg1DgFIAiLDa76fO34=;
-        b=WEq9PYVCtaY/8q2j7FHXVHgt1d7JIzhLxOtxo0JstKq5W0JW+6Ks3bkMZytT79lEG5
-         gzS2UWmv8f5GZ/87ZYfLJ7jUaLYKIzlAsqIicUGZgyE0nZPPVxkQz1uKKC8Y8Mk8RRUO
-         pGmQ7xW52uyxGEkHkK28Ed0m3ThUjpc9Ql+S64iZVS5dlVyNc/dwnzbrnX2etRC+6TuS
-         +MUCr77lIXuNbx7aZnVMTseVQE74DTOD9FgWntEj9qr+gYvqTCt1eMslFvQYmsHBDfhJ
-         DtaOl0gib8GkblOzIBgGUZRLPRVndp3Noe4Tuh7ABWXabYqFciF7gUK9WQbnhNtHC0FV
-         f51A==
-X-Forwarded-Encrypted: i=1; AJvYcCVmTaBLhMLA6iEXASoHBOCGzuTSMiFtvmzEWTiJY6hkisYr8k1zcaso9hUvGYNhuqXlr7M=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyZOUIq/Vfpn7P4hcYGP+OHFWj1Z8BGYjAzPu270K/tUOMzWki6
-	ujEds18snistN5dvPDq9VJFtS1nCXYw2z+HbvVHLvIKAcT80OCkx8nv2xDO8nRmggQSGpG+cuYy
-	N8vFR+aEtjTddn/LzzESnzeS64ItVg/cjuaYM/jMPSrmm5wLX1XHgxw==
-X-Gm-Gg: ASbGncu73oE+/LsVbxUOxPmIa49J+cFAPIw1DyCLSuCk4wwdMiNldubXwoBaoEmqf9q
-	P/gGTYEHwg4u0ODJcEG2ZMqwao10U2VNeFy7mD5j4h3WtFQRKPHV2rQvUNtRODJK/AXcpVu/FBn
-	fN3lr6H4GS2pQkfq+8kQ4/26XTe13WgGAe+AfF8C2e+107cKG+j4L1G8qnU9yhFoUVdmbiez1cl
-	WHFWySZO5LpT5HHCp/pgT1uEjQCEqUHHrVcFztq2DDRJb6Kz8Gvi+WMA6kfTUQuf3fYezuui11s
-	DRlOLUsJOu84xCuUDmr8c5T96CdFvMzjk6rlojLIwLrI1SViyENhA+8MbI9ddEOQElKsp4buDGL
-	eQ61RYy3OgDZSsN4cLWjBC+8mykgNfC3Wa3UJpjqxG37wMzINL29beLAGkbxPatr2SyrM4p0s5s
-	VVJNO0aOkCs7Ulh1iKv1o1mr15TYg=
-X-Received: by 2002:a05:600c:681b:b0:45f:2ed1:d1c5 with SMTP id 5b1f17b1804b1-47117925e39mr44633945e9.36.1760740887433;
-        Fri, 17 Oct 2025 15:41:27 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IFOhQlU/0jutSd2tKVW+63SmQtJ+uWLZ1QBUrTpaFXK1fSJ1MmohMxqY5ZVQykyp7L0xHjr7w==
-X-Received: by 2002:a05:600c:681b:b0:45f:2ed1:d1c5 with SMTP id 5b1f17b1804b1-47117925e39mr44633605e9.36.1760740886944;
-        Fri, 17 Oct 2025 15:41:26 -0700 (PDT)
-Received: from ?IPV6:2003:d8:2f0c:c200:fa4a:c4ff:1b32:21ce? (p200300d82f0cc200fa4ac4ff1b3221ce.dip0.t-ipconnect.de. [2003:d8:2f0c:c200:fa4a:c4ff:1b32:21ce])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-427ea5a0f19sm1596288f8f.9.2025.10.17.15.41.24
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 17 Oct 2025 15:41:26 -0700 (PDT)
-Message-ID: <cb85aaa3-e456-4fd8-b323-46c75d453a02@redhat.com>
-Date: Sat, 18 Oct 2025 00:41:23 +0200
+        d=1e100.net; s=20230601; t=1760744020; x=1761348820;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=LwfPpMJqaisEQVUu9wiIDJQK1raYpWFG3P+DdjsMb18=;
+        b=IgsMsa1/V5qr+5r4lgBXd7qfhbHuWwI2FL5mEcDgOLfnH1E+VXtCzL/Xu+p6sa/cy3
+         evnUiPVjBlS27uxNYd0FFw0/jVPuI5eo/zg68qJFD/WYOM57PRmBh/l+mgOojg7E9pGG
+         Ff389g9MqdUXbFMHgU21dUxy/vj0o5+NofjYogyPG5OrfROzNJNPS07knKsbMDSg0zC9
+         7svwrmLpTIF7f2vt3pmG14p9RZhsILEtMoXtwb1KL3RNDIAa02bbyHV6NFJfO8+vUMO6
+         0Vao4htt0lj0qSDJ/1YwdX9VGqRGEuQAC0EENRWd9cvOWhUT+uWT6gJhfQY85pow2QWF
+         FhLw==
+X-Forwarded-Encrypted: i=1; AJvYcCXb52S/bCHdJ6hLFhQzVxvtGsfXq+yIaA3PPq8kd0ZZXATXFXv2VyGvT5Jq/YggwPoa8GA=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzCuvNW5wOXPujbFjg7G446hWymJ5zervD/dhs2ylNYUHfQ1v19
+	DHiulmlE77Itv2HRY/+Fk/+UTv5HuGaDCg2cgBB7rrQL1sv5i3dgyPVkRGkhDog/aXopa0N/qvg
+	zJC4XGrdp+4X7pKtyOS8bcFWQHg==
+X-Google-Smtp-Source: AGHT+IEJkm1Y/xUQeOW9OSrw7fOIA8LhUvRSTlkRcfM+UNWeMSJmrld0H6KUJsXbTWNmxyDTB1XySSWqNmUDg7YYhA==
+X-Received: from pjtn11.prod.google.com ([2002:a17:90a:c68b:b0:32b:8eda:24e8])
+ (user=ackerleytng job=prod-delivery.src-stubby-dispatcher) by
+ 2002:a17:90b:1d88:b0:32b:df0e:9283 with SMTP id 98e67ed59e1d1-33bcf90e86cmr6755629a91.34.1760744020326;
+ Fri, 17 Oct 2025 16:33:40 -0700 (PDT)
+Date: Fri, 17 Oct 2025 16:33:38 -0700
+In-Reply-To: <bb336979b10ee5b9c6b3c3934ec3aff19330b3e7.1760731772.git.ackerleytng@google.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: linux-next: KVM/s390x regression
-From: David Hildenbrand <david@redhat.com>
-To: Balbir Singh <balbirs@nvidia.com>,
- Christian Borntraeger <borntraeger@linux.ibm.com>
-Cc: Liam.Howlett@oracle.com, airlied@gmail.com, akpm@linux-foundation.org,
- apopple@nvidia.com, baohua@kernel.org, baolin.wang@linux.alibaba.com,
- byungchul@sk.com, dakr@kernel.org, dev.jain@arm.com,
- dri-devel@lists.freedesktop.org, francois.dugast@intel.com,
- gourry@gourry.net, joshua.hahnjy@gmail.com, linux-kernel@vger.kernel.org,
- linux-mm@kvack.org, lorenzo.stoakes@oracle.com, lyude@redhat.com,
- matthew.brost@intel.com, mpenttil@redhat.com, npache@redhat.com,
- osalvador@suse.de, rakie.kim@sk.com, rcampbell@nvidia.com,
- ryan.roberts@arm.com, simona@ffwll.ch, ying.huang@linux.alibaba.com,
- ziy@nvidia.com, kvm@vger.kernel.org, linux-s390@vger.kernel.org,
- linux-next@vger.kernel.org
-References: <20251001065707.920170-4-balbirs@nvidia.com>
- <20251017144924.10034-1-borntraeger@linux.ibm.com>
- <9beff9d6-47c7-4a65-b320-43efd1e12687@redhat.com>
- <c67386be-5278-411d-97e7-43fc34bf7c98@linux.ibm.com>
- <8c778cd0-5608-4852-9840-4d98828d7b33@redhat.com>
- <74272098-cfb7-424b-a55e-55e94f04524e@linux.ibm.com>
- <84349344-b127-41f6-99f1-10f907c2bd07@redhat.com>
- <c9f28d0c-6b06-47a2-884d-7533f7b49c45@nvidia.com>
- <3a2db8fc-d289-415b-ae67-5a35c9c32a76@redhat.com>
-Content-Language: en-US
-Autocrypt: addr=david@redhat.com; keydata=
- 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
- qIws/H2t
-In-Reply-To: <3a2db8fc-d289-415b-ae67-5a35c9c32a76@redhat.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+Mime-Version: 1.0
+References: <cover.1760731772.git.ackerleytng@google.com> <bb336979b10ee5b9c6b3c3934ec3aff19330b3e7.1760731772.git.ackerleytng@google.com>
+Message-ID: <diqzcy6lp0h9.fsf@google.com>
+Subject: Re: [RFC PATCH v1 26/37] KVM: selftests: guest_memfd: Test that
+ shared/private status is consistent across processes
+From: Ackerley Tng <ackerleytng@google.com>
+To: cgroups@vger.kernel.org, kvm@vger.kernel.org, linux-doc@vger.kernel.org, 
+	linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	linux-kselftest@vger.kernel.org, linux-mm@kvack.org, 
+	linux-trace-kernel@vger.kernel.org, x86@kernel.org
+Cc: akpm@linux-foundation.org, binbin.wu@linux.intel.com, bp@alien8.de, 
+	brauner@kernel.org, chao.p.peng@intel.com, chenhuacai@kernel.org, 
+	corbet@lwn.net, dave.hansen@intel.com, dave.hansen@linux.intel.com, 
+	david@redhat.com, dmatlack@google.com, erdemaktas@google.com, 
+	fan.du@intel.com, fvdl@google.com, haibo1.xu@intel.com, hannes@cmpxchg.org, 
+	hch@infradead.org, hpa@zytor.com, hughd@google.com, ira.weiny@intel.com, 
+	isaku.yamahata@intel.com, jack@suse.cz, james.morse@arm.com, 
+	jarkko@kernel.org, jgg@ziepe.ca, jgowans@amazon.com, jhubbard@nvidia.com, 
+	jroedel@suse.de, jthoughton@google.com, jun.miao@intel.com, 
+	kai.huang@intel.com, keirf@google.com, kent.overstreet@linux.dev, 
+	liam.merwick@oracle.com, maciej.wieczor-retman@intel.com, 
+	mail@maciej.szmigiero.name, maobibo@loongson.cn, 
+	mathieu.desnoyers@efficios.com, maz@kernel.org, mhiramat@kernel.org, 
+	mhocko@kernel.org, mic@digikod.net, michael.roth@amd.com, mingo@redhat.com, 
+	mlevitsk@redhat.com, mpe@ellerman.id.au, muchun.song@linux.dev, 
+	nikunj@amd.com, nsaenz@amazon.es, oliver.upton@linux.dev, palmer@dabbelt.com, 
+	pankaj.gupta@amd.com, paul.walmsley@sifive.com, pbonzini@redhat.com, 
+	peterx@redhat.com, pgonda@google.com, prsampat@amd.com, pvorel@suse.cz, 
+	qperret@google.com, richard.weiyang@gmail.com, rick.p.edgecombe@intel.com, 
+	rientjes@google.com, rostedt@goodmis.org, roypat@amazon.co.uk, 
+	rppt@kernel.org, seanjc@google.com, shakeel.butt@linux.dev, shuah@kernel.org, 
+	steven.price@arm.com, steven.sistare@oracle.com, suzuki.poulose@arm.com, 
+	tabba@google.com, tglx@linutronix.de, thomas.lendacky@amd.com, 
+	vannapurve@google.com, vbabka@suse.cz, viro@zeniv.linux.org.uk, 
+	vkuznets@redhat.com, wei.w.wang@intel.com, will@kernel.org, 
+	willy@infradead.org, wyihan@google.com, xiaoyao.li@intel.com, 
+	yan.y.zhao@intel.com, yilun.xu@intel.com, yuzenghui@huawei.com, 
+	zhiquan1.li@intel.com
+Content-Type: text/plain; charset="UTF-8"
 
-On 18.10.25 00:15, David Hildenbrand wrote:
-> On 17.10.25 23:56, Balbir Singh wrote:
->> On 10/18/25 04:07, David Hildenbrand wrote:
->>> On 17.10.25 17:20, Christian Borntraeger wrote:
->>>>
->>>>
->>>> Am 17.10.25 um 17:07 schrieb David Hildenbrand:
->>>>> On 17.10.25 17:01, Christian Borntraeger wrote:
->>>>>> Am 17.10.25 um 16:54 schrieb David Hildenbrand:
->>>>>>> On 17.10.25 16:49, Christian Borntraeger wrote:
->>>>>>>> This patch triggers a regression for s390x kvm as qemu guests can no longer start
->>>>>>>>
->>>>>>>> error: kvm run failed Cannot allocate memory
->>>>>>>> PSW=mask 0000000180000000 addr 000000007fd00600
->>>>>>>> R00=0000000000000000 R01=0000000000000000 R02=0000000000000000 R03=0000000000000000
->>>>>>>> R04=0000000000000000 R05=0000000000000000 R06=0000000000000000 R07=0000000000000000
->>>>>>>> R08=0000000000000000 R09=0000000000000000 R10=0000000000000000 R11=0000000000000000
->>>>>>>> R12=0000000000000000 R13=0000000000000000 R14=0000000000000000 R15=0000000000000000
->>>>>>>> C00=00000000000000e0 C01=0000000000000000 C02=0000000000000000 C03=0000000000000000
->>>>>>>> C04=0000000000000000 C05=0000000000000000 C06=0000000000000000 C07=0000000000000000
->>>>>>>> C08=0000000000000000 C09=0000000000000000 C10=0000000000000000 C11=0000000000000000
->>>>>>>> C12=0000000000000000 C13=0000000000000000 C14=00000000c2000000 C15=0000000000000000
->>>>>>>>
->>>>>>>> KVM on s390x does not use THP so far, will investigate. Does anyone have a quick idea?
->>>>>>>
->>>>>>> Only when running KVM guests and apart from that everything else seems to be fine?
->>>>>>
->>>>>> We have other weirdness in linux-next but in different areas. Could that somehow be
->>>>>> related to use disabling THP for the kvm address space?
->>>>>
->>>>> Not sure ... it's a bit weird. I mean, when KVM disables THPs we essentially just remap everything to be mapped by PTEs. So there shouldn't be any PMDs in that whole process.
->>>>>
->>>>> Remapping a file THP (shmem) implies zapping the THP completely.
->>>>>
->>>>>
->>>>> I assume in your kernel config has CONFIG_ZONE_DEVICE and CONFIG_ARCH_ENABLE_THP_MIGRATION set, right?
->>>>
->>>> yes.
->>>>
->>>>>
->>>>> I'd rule out copy_huge_pmd(), zap_huge_pmd() a well.
->>>>>
->>>>>
->>>>> What happens if you revert the change in mm/pgtable-generic.c?
->>>>
->>>> That partial revert seems to fix the issue
->>>> diff --git a/mm/pgtable-generic.c b/mm/pgtable-generic.c
->>>> index 0c847cdf4fd3..567e2d084071 100644
->>>> --- a/mm/pgtable-generic.c
->>>> +++ b/mm/pgtable-generic.c
->>>> @@ -290,7 +290,7 @@ pte_t *___pte_offset_map(pmd_t *pmd, unsigned long addr, pmd_t *pmdvalp)
->>>>                if (pmdvalp)
->>>>                     *pmdvalp = pmdval;
->>>> -       if (unlikely(pmd_none(pmdval) || !pmd_present(pmdval)))
->>>> +       if (unlikely(pmd_none(pmdval) || is_pmd_migration_entry(pmdval)))
->>>
->>> Okay, but that means that effectively we stumble over a PMD entry that is not a migration entry but still non-present.
->>>
->>> And I would expect that it's a page table, because otherwise the change
->>> wouldn't make a difference.
->>>
->>> And the weird thing is that this only triggers sometimes, because if
->>> it would always trigger nothing would ever work.
->>>
->>> Is there some weird scenario where s390x might set a left page table mapped in a PMD to non-present?
->>>
->>
->> Good point
->>
->>> Staring at the definition of pmd_present() on s390x it's really just
->>>
->>>       return (pmd_val(pmd) & _SEGMENT_ENTRY_PRESENT) != 0;
->>>
->>>
->>> Maybe this is happening in the gmap code only and not actually in the core-mm code?
->>>
->>
->>
->> I am not an s390 expert, but just looking at the code
->>
->> So the check on s390 effectively
->>
->> segment_entry/present = false or segment_entry_empty/invalid = true
-> 
-> pmd_present() == true iff _SEGMENT_ENTRY_PRESENT is set
-> 
-> because
-> 
-> 	return (pmd_val(pmd) & _SEGMENT_ENTRY_PRESENT) != 0;
-> 
-> is the same as
-> 
-> 	return pmd_val(pmd) & _SEGMENT_ENTRY_PRESENT;
-> 
-> But that means we have something where _SEGMENT_ENTRY_PRESENT is not set.
-> 
-> I suspect that can only be the gmap tables.
-> 
-> Likely __gmap_link() does not set _SEGMENT_ENTRY_PRESENT, which is fine
-> because it's a software managed bit for "ordinary" page tables, not gmap
-> tables.
-> 
-> Which raises the question why someone would wrongly use
-> pte_offset_map()/__pte_offset_map() on the gmap tables.
-> 
-> I cannot immediately spot any such usage in kvm/gmap code, though.
-> 
+Ackerley Tng <ackerleytng@google.com> writes:
 
-Ah, it's all that pte_alloc_map_lock() stuff in gmap.c.
+> From: Sean Christopherson <seanjc@google.com>
+>
+> Add a test to verify that a guest_memfd's shared/private status is
+> consistent across processes.
+>
 
-Oh my.
+Missed copying Sean's note from [1]. Rephrased:
 
-So we're mapping a user PTE table that is linked into the gmap tables 
-through a PMD table that does not have the right sw bits set we would 
-expect in a user PMD table.
+Test that on shared to private conversion, any shared pages previously
+mapped in any process are unmapped from all processes.
 
-What's also scary is that pte_alloc_map_lock() would try to pte_alloc() 
-a user page table in the gmap, which sounds completely wrong?
+[1] https://lore.kernel.org/all/aN7U1ewx8dNOKl1n@google.com/
 
-Yeah, when walking the gmap and wanting to lock the linked user PTE 
-table, we should probably never use the pte_*map variants but obtain
-the lock through pte_lockptr().
-
-All magic we end up doing with RCU etc in __pte_offset_map_lock()
-does not apply to the gmap PMD table.
-
--- 
-Cheers
-
-David / dhildenb
-
+> The test forks a child process after creating the shared guest_memfd
+> region so that the second process exists alongside the main process for the
+> entire test.
+>
+> The processes then take turns to access memory to check that the
+> shared/private status is consistent across processes.
+>
+> Signed-off-by: Sean Christopherson <seanjc@google.com>
+> Co-developed-by: Ackerley Tng <ackerleytng@google.com>
+> Signed-off-by: Ackerley Tng <ackerleytng@google.com>
+> ---
+>  .../kvm/guest_memfd_conversions_test.c        | 74 +++++++++++++++++++
+>  1 file changed, 74 insertions(+)
+>
+> 
+> [...snip...]
+> 
 
