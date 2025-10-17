@@ -1,198 +1,247 @@
-Return-Path: <kvm+bounces-60337-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-60338-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0E740BEA6DE
-	for <lists+kvm@lfdr.de>; Fri, 17 Oct 2025 18:03:53 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 02DE8BEABAA
+	for <lists+kvm@lfdr.de>; Fri, 17 Oct 2025 18:31:53 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 045221881334
-	for <lists+kvm@lfdr.de>; Fri, 17 Oct 2025 15:59:51 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 18DD3962018
+	for <lists+kvm@lfdr.de>; Fri, 17 Oct 2025 15:59:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2A03232E151;
-	Fri, 17 Oct 2025 15:59:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7CA0533291C;
+	Fri, 17 Oct 2025 15:59:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="kmrWCLoP"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="bP/6ez0w"
 X-Original-To: kvm@vger.kernel.org
-Received: from CY7PR03CU001.outbound.protection.outlook.com (mail-westcentralusazon11010046.outbound.protection.outlook.com [40.93.198.46])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f201.google.com (mail-pl1-f201.google.com [209.85.214.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9903F1A0728;
-	Fri, 17 Oct 2025 15:58:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.93.198.46
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1760716742; cv=fail; b=PlLNlCoIOxtwAVGhK40PyZOfjj4l/40ri2/853VJF5k99rpoxB1Zz5UAzuGjGImbR8+WdIrTABSpa55ugYq+p185wI6fURcsjMBSEc798f34m0LM5Hp0gQnzs8xaTNNzw4wIGIXCFKvWhZEVRjDIXgXs/EyPmNgYKimrmLEzK2A=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1760716742; c=relaxed/simple;
-	bh=RZ1/MN/1Rb319XQp4YkJXlRPdRewLGtsP1VADUmzlM8=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:Content-Type:
-	 Content-Disposition:In-Reply-To:MIME-Version; b=hFjQez8+tFKdBGGIiJ+kWsNYb8j7M7SUQbWKp4/3Ue5tColosYQqnV3sWyUeu4xrPRu+1CkbOdV3QIiDQJCwsq1f8H0X03SgHGBmOA1xBkyPhg2rqOQMOC0h4+455aVNyBdQVduAffbb5zRty6lk/E5xH6hj3ssBp/a7UYeJNms=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=kmrWCLoP; arc=fail smtp.client-ip=40.93.198.46
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=YBYzlbQ546ZipTizlOoOrMG3OKDmdze/FSUbA3by15gGcakBUMUQ1iaOfQm2EscqntC+H3V73jdpzHrmx4aX261zHvh7I2DnKU7Zw1Nx9ARCNMAgMyI+OtDbCwXCT9xn8Iaivd27rtQeU02Vsvzn/wf1ovJkS6bXJZTeHzrgVei4xQqbGQ/ZEqhuJDU5RBaGDQ0b0zY4XFCF7/paGWnFrSZnQ2NmeGZ9KGOekITiwlZbXQDdll13H2oJ3UtcwAEUFCa6KUPBX+10ER0qcLZYM3j2XrayBEeilBtWRi0SNre9UgQxZfUCdr/TSAPsVWVhJ/lRTvWK7anrpXIFot4d7A==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=svbta5eVMWIObilOS5JN3V1YvAw2piDCY7UFa9bmaGY=;
- b=UlGz4YlrILMnUIpjsL+7AUrUjG6ueowH/5MQWMsda5d4pB3ETvf8T/sZo7xbA6rJQyf1n2SlWM7kKBXWviwiR88gImadzcemedlxx7gzsFffOHxwsnzF8KgjPIKG6i1/tG4Ms0YTG1gOawUhnLMF/WNsOR3S5dLlEzxd2hEKkg2OKBOlag5Jnd1vYa26D/LdJ3sx/1ZmS6qmiwQGCLnx6kc41aY5xjZKFP14D/jz7w53cgvdhIYNiseRsZTpL5bRFko6GUvORRAsNr83n0GGQoHKc/i0WgyRxjqdVL2rRVbGgPX830mbBVoeI419hHrl1wHVu977CukbjRYpwX1YGA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
- dkim=pass header.d=nvidia.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=svbta5eVMWIObilOS5JN3V1YvAw2piDCY7UFa9bmaGY=;
- b=kmrWCLoPiKOdwiqUna81rJQFbMAz3hefBhgcggsIdpvHpxlXYr7yHdwLx8Qu7RRNhWbtaCWO5SO6kHC3iJLPai8/sQAPCVWcbnplXBPMcL3UbPbtBFI6d50Ybxq/m1BPVqs0J78rNW2HTWPr5DNPgFZqADf9GYdBSc9YZ1jfdEFzTPLVm9tkbWG9pdaDA52Qgu33TBSD7isLZcGCnOsCuPd3ACJvu4RfvWScmXFIAsH+P9cDHXsifQc3ibU5osqETyIS9VI0Bp/VSwIET2bf6GsMEfYCvUVg8beDhx+lQ60wUzkX/TMEhTaYyxSuNewxkK+5M2Q/4mOv6l79gbSB/Q==
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nvidia.com;
-Received: from MN2PR12MB3613.namprd12.prod.outlook.com (2603:10b6:208:c1::17)
- by DS0PR12MB8478.namprd12.prod.outlook.com (2603:10b6:8:15a::13) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9228.11; Fri, 17 Oct
- 2025 15:58:55 +0000
-Received: from MN2PR12MB3613.namprd12.prod.outlook.com
- ([fe80::1b3b:64f5:9211:608b]) by MN2PR12MB3613.namprd12.prod.outlook.com
- ([fe80::1b3b:64f5:9211:608b%4]) with mapi id 15.20.9228.010; Fri, 17 Oct 2025
- 15:58:55 +0000
-Date: Fri, 17 Oct 2025 12:58:50 -0300
-From: Jason Gunthorpe <jgg@nvidia.com>
-To: Leon Romanovsky <leon@kernel.org>
-Cc: Alex Williamson <alex.williamson@redhat.com>,
-	Andrew Morton <akpm@linux-foundation.org>,
-	Bjorn Helgaas <bhelgaas@google.com>,
-	Christian =?utf-8?B?S8O2bmln?= <christian.koenig@amd.com>,
-	dri-devel@lists.freedesktop.org, iommu@lists.linux.dev,
-	Jens Axboe <axboe@kernel.dk>, Joerg Roedel <joro@8bytes.org>,
-	kvm@vger.kernel.org, linaro-mm-sig@lists.linaro.org,
-	linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-media@vger.kernel.org, linux-mm@kvack.org,
-	linux-pci@vger.kernel.org, Logan Gunthorpe <logang@deltatee.com>,
-	Marek Szyprowski <m.szyprowski@samsung.com>,
-	Robin Murphy <robin.murphy@arm.com>,
-	Sumit Semwal <sumit.semwal@linaro.org>,
-	Vivek Kasireddy <vivek.kasireddy@intel.com>,
-	Will Deacon <will@kernel.org>
-Subject: Re: [PATCH v5 9/9] vfio/pci: Add dma-buf export support for MMIO
- regions
-Message-ID: <20251017155850.GN3901471@nvidia.com>
-References: <cover.1760368250.git.leon@kernel.org>
- <72ecaa13864ca346797e342d23a7929562788148.1760368250.git.leon@kernel.org>
- <20251016235332.GA265079@nvidia.com>
- <20251017054007.GB6199@unreal>
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20251017054007.GB6199@unreal>
-X-ClientProxiedBy: SA1P222CA0063.NAMP222.PROD.OUTLOOK.COM
- (2603:10b6:806:2c1::12) To MN2PR12MB3613.namprd12.prod.outlook.com
- (2603:10b6:208:c1::17)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E4642242935
+	for <kvm@vger.kernel.org>; Fri, 17 Oct 2025 15:59:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.201
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1760716743; cv=none; b=H8v6lKLnduqlYi09IQZv7eEFyyMcvLqJbkNEtUDKMPq82QHelm5awEuWC92w26s/udzfpJEGphhEqJXiYLl0VKJsW9nwKghfVCMgd2RXrXgMtIUIKv1cTErr4wlfZ8mEoq5RSlKrVz4A1fNWh/A599r0x1fA5t4E2b+NuP5BkfY=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1760716743; c=relaxed/simple;
+	bh=7fl0KjSvtJeicpmVq+/OdIfpNUR2VSd6oXVRqLYUIFY=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=bMU7rFazHubyQd35LjPyKdelLSxu+d4bxXF0ZaWwyZ7vd+AuSX+vu3nUihybdbW31ZxGqUt7XB1dL+7D+LhPCURIetV4/41uhaZxCALhvyZJBvT5AEWKlspU0I5Uuv5phkOoBB9bQkPv5NudhNDeKYkKjZ6PgMdJXm3Bo8IV5pk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=bP/6ez0w; arc=none smtp.client-ip=209.85.214.201
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+Received: by mail-pl1-f201.google.com with SMTP id d9443c01a7336-269880a7bd9so26127075ad.3
+        for <kvm@vger.kernel.org>; Fri, 17 Oct 2025 08:59:01 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1760716741; x=1761321541; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:from:subject:message-id:references
+         :mime-version:in-reply-to:date:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=ySYChoJkXBUDqdm5DBMPKJeV9dwj7FHlSZpAh9VLTC4=;
+        b=bP/6ez0wuy0JGcbTTbfHSkSAuXezpDmNkOIQZ0Rbvua4Hm/WWDd7GKMs5ManXnY7ug
+         TuAuOae2oaNDRdUkpC3J+QSwrAY50jWObOpqOTy6dAt2EFYqmp4DmzgxYe5LwpMs+bwm
+         MA2aREp2JmrJhtc55ufe8hGR+FzImALroxUtjXu9OdbrFoxB54tx+3zWw3HaG0uJGNZK
+         V7Kk3g6X78qXSQEvPw5YIMA88UdeD1KQsSVjMT+Nj25QgXHhYOmzFoYg13cUcXfuls8S
+         E1ABsLOcWV5Kh+lsqUwTMVOZE+vf5MpXqL6dRgfN96KTOnVm0j/CFjaA0mGnWltiIyPr
+         Xc/g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1760716741; x=1761321541;
+        h=content-transfer-encoding:cc:to:from:subject:message-id:references
+         :mime-version:in-reply-to:date:x-gm-message-state:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=ySYChoJkXBUDqdm5DBMPKJeV9dwj7FHlSZpAh9VLTC4=;
+        b=MBQX4r+OWN0weHcgUTwZMU7Eo5Ln3ZIZyPWIqwSxuO+sbMNYSQM/yiEum11Klocofd
+         kfiDxhXHrySmsD/103uMUEr2FqNuYMlWuH7iI8m/lICk58D2cGPeJyAAJNNd0NP8FkjE
+         Fbi2jfiiDQdrHOvnoE0PHqtNwZgU3n9zh3fa/621dFQaB1HuFKc7jg9SDwy2JEzvX9ih
+         49GPBIzCyZS4tIPUGQBD7Q2wgvEyxt2/MB6HbXjlWgRgxzbCte9RZFJesG4RGr4InBM8
+         AVGLVuci9eLWLqyEI2USpm1u/y+vJCMKfWErRWhSLpj0LBIP0bPtYTdJVELMoaiGNzxM
+         bQmw==
+X-Forwarded-Encrypted: i=1; AJvYcCVpJnpHKhb0e2WCnaqadv3AGG4LKRTLmk432Vg/100e6EEiVBn3LBSpz4ggVlyjQ8AC/OM=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwpYXuMh4cH9ej6p+riUgh+bpTVrUWiG048nmRhUC9fbcgW1hLA
+	L2E3HG/6lGY8pBQAwcI6S6vq/bXAczFNga2FCfgTsd8Mi3MT34N+husNCqEN636+gHuZt5Vk8Zg
+	WCIr8qQ==
+X-Google-Smtp-Source: AGHT+IFvhZU4k4UyUUtMv02PhZxeJRwR9FSUA/Rx9yT3Ja3zRBASFQYqNG0snthgBLAQf4JQNkNaFhuqbPA=
+X-Received: from pjbku18.prod.google.com ([2002:a17:90b:2192:b0:33b:a383:f4df])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:902:ce11:b0:28d:1936:ee9a
+ with SMTP id d9443c01a7336-290cba4eec9mr56116035ad.29.1760716741316; Fri, 17
+ Oct 2025 08:59:01 -0700 (PDT)
+Date: Fri, 17 Oct 2025 08:59:00 -0700
+In-Reply-To: <c87d11a7-b4dd-463e-b40a-188fd2219b3b@gmail.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: MN2PR12MB3613:EE_|DS0PR12MB8478:EE_
-X-MS-Office365-Filtering-Correlation-Id: 95429cab-9427-4719-ea47-08de0d961137
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230040|376014|7416014|366016|1800799024;
-X-Microsoft-Antispam-Message-Info:
-	=?us-ascii?Q?5uzwri17gsLA3O5eKSwNMpNV1VMs1Uk5wdilJwk/+UTioWW0eUNPfCC8O9Jf?=
- =?us-ascii?Q?BrgnIk2slkS9MNq+OTAjaLi7VDqHJ4zaHKwi7LQ4JZGpOprKiAeojCXd+3Dj?=
- =?us-ascii?Q?ngED92b0+ZAq/05ninrQsBayRGUfim+lAL+z0NPXv9NvZOxFN6f+TQAgk4Wj?=
- =?us-ascii?Q?alo9+yWQmKAS8BL7951vUx1gICaEmrLOxpIeL/usK15747TT9u9kFnWBbDXY?=
- =?us-ascii?Q?nZgL0/mbIU4Rc2ReP0+YaOImGzpGkCX/i2W6YBkjJ1sYvg2EtVPal+vwHaOp?=
- =?us-ascii?Q?/kQP7WtU4+iMM9hXoXwgFUIf9DDpCqgZzdCE4feLgfvTDDfLJoRqvFnIWh7x?=
- =?us-ascii?Q?LgrjlaPgN7y9JJtPuli6mXdc8dcUtUiCpyXBzRhyltQH6jqchS66K80/ihcU?=
- =?us-ascii?Q?srIUYhiBMzFv9eTliVHGbR3eHbE2Y4+RD+uBL80ghae9gqOOhYGnQOzUoTg7?=
- =?us-ascii?Q?mhIH7qDVhUgJHFH0C+hhorkPiIOFWraPHNAGTsp4OLw45lWBb92YaQ/YyKjg?=
- =?us-ascii?Q?CbFJLfTwQWUVwKvpvhaXSdkEnV7lpxRdMVOhYRUjYQl1DsUWUsuc13eJUDxa?=
- =?us-ascii?Q?fJ+ldzg4rLrTA82QdtkDakpvGjz9Tkig2fCDvHYqRIUIeGceAZ3LMv+Cty4A?=
- =?us-ascii?Q?/cvnPc9Az2vUtbSgVxnbnXGvAAiN8Er/5Qi0JaylI+hwYG+HuXnW61EToOfL?=
- =?us-ascii?Q?sjCTVcK7uTgmTUYjn6036RkrVxY7rCJF7Ds7DqzpdFaZMOhf/Ydnq0eJO4+4?=
- =?us-ascii?Q?IvBRVkXjYOmnhRF6Kzo9nU/QfGt/vigu55OH3L9y/lIPPxf4oKfXLkOErOTx?=
- =?us-ascii?Q?2nWOxovh+T/cLAt06s6KagQCgqF/rwm+O+q33sDkyB7V8w9YgHk2DhuN9hy6?=
- =?us-ascii?Q?U7cqNNFsfUxYmhU/QaLzgub5XzWd3oPcyVFEs08CBqF5jN1Kddz012oIyPn9?=
- =?us-ascii?Q?lNRjmDCj45J2quQJZzC7b0btuU6HbtQ/r2t2aHJ7lCUocCvaXfDrwEI9VCcH?=
- =?us-ascii?Q?qEvhACx3kwinP1dpWCt69kvvhc0fmOc+zFrUyxrsSL5iabDZCNbj+MKdywpV?=
- =?us-ascii?Q?qS0gSTSvm2E/k7xSaUdIQbBaPWp1f0RboXz8KPvV21TOH4dLtfQ1EAg1CEXt?=
- =?us-ascii?Q?JKX7trpFQyi7tT34N4v8PgYMAwVhSREIZHke59O89W0SQqj5l6YybnCGe7Jn?=
- =?us-ascii?Q?Ql0wA5JG67KB4rKwb8QH5ZDH3RDAW7jMoebHzUBZB7FK4dsDb9F+uHceEPiF?=
- =?us-ascii?Q?2NBK7ylZEn6sWdwyShZZ40/Ss/4frKlrUBUtnrwily0YOY5Ht+tgT3C02d85?=
- =?us-ascii?Q?bVCqgthpkgykhaFET//fDyqQ2BMJwqh0y8wyKMktHpsJZXkDArw+lhJY4SyT?=
- =?us-ascii?Q?NCvNTY51pFPgFUVFGrnp39L9VLMqyB3v1mDk3jW9/ABrtsi+E8gbF9ln4h34?=
- =?us-ascii?Q?z+3OYC23dC2weGhBU9apfxV8ynbvixmX?=
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:MN2PR12MB3613.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(376014)(7416014)(366016)(1800799024);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?us-ascii?Q?hMc5nzAL5ZRUewQuAJXXkCfR/854+cCiiW/oed3fx3JAhz+d3QqQ/G3RYUU6?=
- =?us-ascii?Q?ekbDzteOMa2nvfa1B6rgvKQWzNxH1eJOyQIPThCHzlkt62UIFjePZSmb7O9S?=
- =?us-ascii?Q?ql7bs3pfMH2c6TkUQrmg9XMfuUDBohOr+sDRLKY0lCv3o2tBTxmYpalODQTa?=
- =?us-ascii?Q?piZrwkchHcDDPNNZDNPDw0/ZsoQyH5LIVYVYvo6pfcpWOiRjoEbF18F7cDp2?=
- =?us-ascii?Q?kiUeVxX+E+GmwiRuTnaICB4bv31Lw0P6lc+lDq414vy6nHCBxXAyTWKdWjhr?=
- =?us-ascii?Q?kkttPhGwSIHnl2pPSkNyVqgRZaoaZW0v+Yy56Wnp3aPn9wkE0V2F3vdNHTCk?=
- =?us-ascii?Q?jYRPNYCLHNMCnKzph5TPhIltEOVo9234FiduvgpL6qUCPAEBPyYP3BS+tRqg?=
- =?us-ascii?Q?SHFq5QkxexiFmYfPTkBamAKwIg+5tu+iCzHBNpiiqspxIkM6rmTtQvVxGBct?=
- =?us-ascii?Q?/Rs6j+ta6LvaBBTT8accza36XzfgELEDB/y8QzvLj0K4SRBXZmaDZQxje2Vn?=
- =?us-ascii?Q?PSP7Mp/Ri5bisZgWcMz1dRvaxzBIxioaU2dLA10bMVSriOFCt/fDS2soIqAJ?=
- =?us-ascii?Q?kJZBcy0XkeJ9whmdS3hEPFj3L6yZY6f5EQXivlx3jGzJkN0VRfIJuFe8P3p1?=
- =?us-ascii?Q?GQ8VHhEi/mzpNvX3E4GryfVJZ2RW/ubZyclrpaZ/iY9Wa/G9rxZqemXNhUZ5?=
- =?us-ascii?Q?D8OgHdpBMMwbnvQIeOWWaThLcJuGbdRHuEVTtBnn2pTDqsJ7ZkkUUcb7exwh?=
- =?us-ascii?Q?2uOOhNiW6F7de9cyTs3NpvkSuPCZVyREv2gvF/VPLnGEjHZ8U2+IPCRO0X6q?=
- =?us-ascii?Q?p+CGMketzpcB/NZVQDQkl4zdp7vfY14WsMWxPC/XaNzmcJ70jo7c6dlYR+ZY?=
- =?us-ascii?Q?+qZIdxg2QR0D/L0SQjcLUauJ36XbvcpWuwEPkr4aTtE5N96tCJa/lDZzKANf?=
- =?us-ascii?Q?gE8a7J/AfxHaRiz9LJu3A2pB9ZR4bAFmrFz1lqmj6E7dYKYVMzq5VX/D/aHp?=
- =?us-ascii?Q?k7xoxwS7Zmr7xle0BH3BRAIvmXB0or0wrgu+GcB2VQqZSYbJGgceBSLJpFds?=
- =?us-ascii?Q?mmLgjIwz37k9RC1AzXYERDqZqzPZLHl3EsX6OMeBD1zAwugLBBM+rP+w/Dl9?=
- =?us-ascii?Q?sRucjJ4QXq25hiep9XNro9B/ss2Cg3FjKNt/sfuOUmjM6UidLzypL7Ylu9M5?=
- =?us-ascii?Q?g42mzleZ9pb5SoQ4RKmVgj8hUsg6F8iltyhqSYkVmSlgqssqSdoxnLpuFK9B?=
- =?us-ascii?Q?yc5sMzNn6UPObG5RJOnQENl9M4Gue8B3Ghuvv69kU33IrU/HG0BLYhvVELDR?=
- =?us-ascii?Q?oWvd47PURJRuqZP8/2W8JS2i2HqEf5f8WBfESzG7Y4600iq2NxBZvGs3ntpp?=
- =?us-ascii?Q?xP9cHcqP7zAPfoByyhPW5uOH+u3PHXdd8YdOvMmLCYLcrY22f2GIFHm5xfEb?=
- =?us-ascii?Q?pfW5+IXCmDv76ccyVtyoI/fl73I9T3BgC7pDYku1tBeZnluxwCu3bGxx5Ste?=
- =?us-ascii?Q?QgIh/mGCoxXNIjKlU+G5666nU4DKr8SPzfTpV3XtJ12KJt+bbY1FHEt83PP8?=
- =?us-ascii?Q?XrfR/jqwNyHD4a9cTJed9pDE2RqCyEIwBRMRP9Lc?=
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 95429cab-9427-4719-ea47-08de0d961137
-X-MS-Exchange-CrossTenant-AuthSource: MN2PR12MB3613.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 17 Oct 2025 15:58:55.0005
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: tbBsp+gJoBkuBLOXbCQIqBQyKywQQl5zZb+XvfmjLzQi9TIB5YGs6Vx49YaqYyQP
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DS0PR12MB8478
+Mime-Version: 1.0
+References: <20251013125117.87739-1-fuqiang.wng@gmail.com> <aO2LV-ipewL59LC6@google.com>
+ <c87d11a7-b4dd-463e-b40a-188fd2219b3b@gmail.com>
+Message-ID: <aPJnxDj4mFSJc0tV@google.com>
+Subject: Re: [PATCH RESEND] avoid hv timer fallback to sw timer if delay
+ exceeds period
+From: Sean Christopherson <seanjc@google.com>
+To: fuqiang wang <fuqiang.wng@gmail.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, Thomas Gleixner <tglx@linutronix.de>, 
+	Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>, 
+	Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org, 
+	"H . Peter Anvin" <hpa@zytor.com>, Maxim Levitsky <mlevitsk@redhat.com>, kvm@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, yu chen <chen.yu@easystack.com>, 
+	dongxu zhang <dongxu.zhang@easystack.com>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Fri, Oct 17, 2025 at 08:40:07AM +0300, Leon Romanovsky wrote:
-> > > +static void vfio_pci_dma_buf_detach(struct dma_buf *dmabuf,
-> > > +				    struct dma_buf_attachment *attachment)
-> > > +{
-> > > +	kfree(attachment->priv);
-> > > +}
-> > 
-> > If the caller fails to call map then it leaks the iova.
-> 
-> I'm relying on dmabuf code and documentation:
-> 
->    926 /**
->    927  * dma_buf_dynamic_attach - Add the device to dma_buf's attachments list
-> ...   
->    932  *
->    933  * Returns struct dma_buf_attachment pointer for this attachment. Attachments
->    934  * must be cleaned up by calling dma_buf_detach().
-> 
-> Successful call to vfio_pci_dma_buf_attach() MUST be accompanied by call
-> to vfio_pci_dma_buf_detach(), so as far as dmabuf implementation follows
-> it, there is no leak.
+On Fri, Oct 17, 2025, fuqiang wang wrote:
+> On 10/14/25 7:29 AM, Sean Christopherson wrote:
+> > On Wed, Oct 01, 2025, fuqiang wang wrote:
+> > The only code that cares is __kvm_wait_lapic_expire(), and the only dow=
+nside to
+> > setting tscdeadline=3DL1.TSC is that adjust_lapic_timer_advance() won't=
+ adjust as
+> > aggressively as it probably should.
+>=20
+> I am not sure which type of timers should use the "advanced tscdeadline h=
+rtimer
+> expiration feature".
+>=20
+> I list the history of this feature.
+>=20
+> 1. Marcelo first introduce this feature, only support the tscdeadline sw =
+timer.
+> 2. Yunhong introduce vmx preemption timer(hv), only support for tscdeadli=
+ne.
+> 3. Liwanpeng extend the hv timer to oneshot and period timers.
+> 4. Liwanpeng extend this feature to hv timer.
+> 5. Sean and liwanpeng fix some BUG extend this feature to hv period/onesh=
+ot timer.
+>=20
+> [1] d0659d946be0("KVM: x86: add option to advance tscdeadline hrtimer exp=
+iration")
+>     Marcelo Tosatti     Dec 16 2014
+> [2] ce7a058a2117("KVM: x86: support using the vmx preemption timer for ts=
+c deadline timer")
+>     Yunhong Jiang       Jun 13 2016
+> [3] 8003c9ae204e("KVM: LAPIC: add APIC Timer periodic/oneshot mode VMX pr=
+eemption timer support")
+>     liwanpeng           Oct 24 2016
+> [4] c5ce8235cffa("KVM: VMX: Optimize tscdeadline timer latency")
+>     liwanpeng           May 29 2018
+> [5] ee66e453db13("KVM: lapic: Busy wait for timer to expire when using hv=
+_timer")
+>     Sean Christopherson Apr 16 2019
+>=20
+>     d981dd15498b("KVM: LAPIC: Accurately guarantee busy wait for timer to=
+ expire when using hv_timer")
+>     liwanpeng           Apr 28 2021
+>=20
+> Now, timers supported for this feature includes:
+> - sw: tscdeadline
+> - hv: all (tscdeadline, oneshot, period)
+>=20
+> =3D=3D=3D=3D
+> IMHO
+> =3D=3D=3D=3D
+>=20
+> 1. for period timer
+> =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+>=20
+> I think for periodic timers emulation, the expiration time is already adj=
+usted
+> to compensate for the delays introduced by timer emulation, so don't need=
+ this
+> feature to adjust again. But after use the feature, the first timer expir=
+ation
+> may be relatively accurate.
+>=20
+> E.g., At time 0, start a periodic task (period: 10,000 ns) with a simulat=
+ed
+> delay of 100 ns.
+>=20
+> With this feature enabled and reasonably accurate prediction, the expirat=
+ion
+> time set seen by the guest are: 10000, 20000, 30000...
+>=20
+> With this feature not enabled, the expiration times set: 10100, 20100, 30=
+100...
+>=20
+> But IMHO, for periodic timers, accuracy of the period seems to be the mai=
+n
+> concern, because it does not frequently start and stop. The incorrect per=
+iod
+> caused by the first timer expiration can be ignored.
 
-It leaks the ivoa because there is no dma_iova_destroy() unless you
-call unmap. detach is not unmap and unmap is not mandatory to call.
+I agree it's superfluous, but applying the advancement also does no harm, a=
+nd
+avoiding it would be moreeffort than simply letting KVM predict the first e=
+xpiration.
 
-Jason
+> 2. for oneshot timer
+> =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+>=20
+> In [1], Marcelo treated oneshot and tscdeadline differently. Shouldn=E2=
+=80=99t the
+> behavior of these two timers be similar?
+
+Yes, but they aren't identical, and so supporting both would require additi=
+onal
+code, complexity, and testing.
+
+> Unlike periodic timers, both oneshot and tscdeadline timers set a specifi=
+c
+> expiration time, and what the guest cares about is whether the expiration
+> time is accurate. Moreover, this feature is mainly intended to mitigate t=
+he
+> latency introduced by timer virtualization.  Since software timers have
+> higher latency compared to hardware virtual timers, the need for this fea=
+ture
+> is actually more urgent for software timers.
+
+Yep.
+
+> However, in the current implementation, the feature is applied to hv
+> oneshot/period timers, but not to sw oneshot/period timers.
+>
+> =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+> Summary of IMHO
+> =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+>=20
+> The feature should be applied to the following timer types:
+> sw/hv tscdeadline and sw/hv oneshot
+
+In a perfect world, probably?  But I don't know that it's worth changing at=
+ this
+time.  Much of this is balancing complexity with benefit, though it's also =
+most
+definitely a reflection of the initial implementation.
+
+KVM unconditionally emulates TSC-deadline mode, and AFAIK every real-world =
+kernel
+prefers TSC-deadline over one-shot, and so in practice the benefits of appl=
+ying
+the advancement to one-shot hrtimers.  That was also the way the world was =
+headed
+back when Marcelo first implemented the support.  I don't know for sure why=
+ the
+initial implementation targeted only TSC-deadline mode, but I think it's sa=
+fe to
+assume that the use case Marcelo was targeting exclusively used TSC-deadlin=
+e.
+
+I'm not entirely opposed to playing the advancement games with one-shot hrt=
+imers,
+but it's also not clear to me that it's worth doing.  E.g. supporting one-s=
+hot
+hrtimers would likely require a bit of extra complexity to juggle the diffe=
+rent
+time domains.  And if the only use cases that are truly sensitive to timer
+programming latency exclusively use TSC-deadline mode (because one-shot mod=
+e is
+inherently "fuzzy"), then any amount of extra complexity is effectively dea=
+d weight.
+
+> should not be applied to:
+> sw/hv period
+
+I wouldn't say "should not be applied to", I think it's more "doesn't provi=
+de much
+benefit to".
 
