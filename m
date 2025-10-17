@@ -1,79 +1,79 @@
-Return-Path: <kvm+bounces-60306-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-60308-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [IPv6:2a01:60a::1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5D32FBE8694
-	for <lists+kvm@lfdr.de>; Fri, 17 Oct 2025 13:38:21 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id D5691BE86B2
+	for <lists+kvm@lfdr.de>; Fri, 17 Oct 2025 13:39:22 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 740BC3430E1
-	for <lists+kvm@lfdr.de>; Fri, 17 Oct 2025 11:38:19 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id B91091AA54AA
+	for <lists+kvm@lfdr.de>; Fri, 17 Oct 2025 11:38:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4035F34AAFD;
-	Fri, 17 Oct 2025 11:34:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8B8CD34BA52;
+	Fri, 17 Oct 2025 11:34:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="iXWSFVca"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="EXYm+4E9"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-wm1-f52.google.com (mail-wm1-f52.google.com [209.85.128.52])
+Received: from mail-wm1-f49.google.com (mail-wm1-f49.google.com [209.85.128.49])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 97D4C34AAE2
-	for <kvm@vger.kernel.org>; Fri, 17 Oct 2025 11:34:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.52
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 09FFB332ED5
+	for <kvm@vger.kernel.org>; Fri, 17 Oct 2025 11:34:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.49
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1760700848; cv=none; b=HvqIezoESEkxTkNHBa9b4Q8+lOLJOVoFPdRIVYY2Wq4+blPaFNvn2PLkYjbMuBj3ILdBP+vTdduJEKk3aSSsZ/299lBo+PF21bJ8OFCn2LUQErMmkPSAqmhr1tXXtcAM3spr2RmRy+EZm/1KbNBaTS3PN67CkA5HSlmcdJwwbn4=
+	t=1760700849; cv=none; b=i48pmlCIQYuQTloKiMf9C3dsn3rVNtHuG0Zp3V35CQi52ZSMHycOScvVS5bhAVHaolb9xwZHErgf2FLxQp36N/UT8OKTy/U4Qgud2vU9K2lgimTOA/G21uFrxyACF5yqIJaHh1O4mT+yvWgWeblSZrA/Q7YlhEao/yKxDruW0Cw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1760700848; c=relaxed/simple;
-	bh=IOOMnzzwp3i4tTVSmLMwLE3BmaS/VCL8NO2bzbxFJRE=;
+	s=arc-20240116; t=1760700849; c=relaxed/simple;
+	bh=k93q0YMqm3jVmEWQMi1uzpao6ZmqNYDpRHhtnvljGlI=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=pFXfyeJxaWLyqV7DU4PtzhsvSqVyJOFVbLHWUMxQu1HStlKF9x4Q6DUgzBZpiQJBRSeGkODH00if13amLxRfFiGivKBnh/5O+jD4+9UpdIUy+OQnGT4L6oyM29PA+2cHZ89eK92NFkw4uNhkOngCcIy17LCZU53z7426xe1xAPY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=iXWSFVca; arc=none smtp.client-ip=209.85.128.52
+	 MIME-Version; b=kFZUjqlG3/K2ZutBJdSXcI0MnAn2xB8xwMx4ppNcJRFoF0onjA0W/+Q7BDv6vcI2XqTdrcQWeVjWaFPVYxipTb3iczYp8fPGD37ctDG9i4GWYhmKEARjiq+O0/2iSeW4fkLK0uvzWVGguJFT6tI56WTSc9lkF4MATyOHiZ4FAt4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=EXYm+4E9; arc=none smtp.client-ip=209.85.128.49
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f52.google.com with SMTP id 5b1f17b1804b1-47103b6058fso13580085e9.1
-        for <kvm@vger.kernel.org>; Fri, 17 Oct 2025 04:34:06 -0700 (PDT)
+Received: by mail-wm1-f49.google.com with SMTP id 5b1f17b1804b1-46e29d65728so12788495e9.3
+        for <kvm@vger.kernel.org>; Fri, 17 Oct 2025 04:34:07 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1760700845; x=1761305645; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1760700846; x=1761305646; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=BM6QgAOG34zDGb9jZI8DkkbGa1KuVCoA2kRHxsUOX8Q=;
-        b=iXWSFVca2mS/COuj6BZQ9ubqaF0JG10XnBj3OQYD+6kuKzeZy2oOntbloAbf74BygD
-         E/XZ3iOrfyep3DzQUoLqWfdJIFyrQmoOsogqeOpIu/yItSSzBe0fMat9sv/Ov8d7TCAZ
-         vUmvrdy5z4TPrD350UCiyslbOGzf4eICvxzHwYbnWltj2aF3yGgkHDlHKg9GFQiVlFcP
-         lWWmmUngaZWQok5LaeNwlwoCbP5UYg14aBcMqiIi0u5QcRRfEWoN1+wgi3jQ9ASsYeTg
-         20yscu+d0zn2wlXKAGuatndfh2BjjSmkiCk0+SCjiYFWqvTggAGhshv+Vacd0AxADTqt
-         AOLQ==
+        bh=oQnslZlvL/ycghWXR/jv6T9Aq0fKGJTc5vHN36t+VJw=;
+        b=EXYm+4E9Te6mdyL70S2S9YHzQ3rMdPbDvxwA3AlglOWugukAPCMS8B3PBKFBQ+vz1T
+         cNfqUi5lMswL8FZGTa2AjX/t6v2/GR7OJp2vDDJZxhjzXwBhAvgIS+ZTqMfAY9mhY5Lw
+         Itr/ORgNlLOa6+jlUTFLC7qxVWZIoCgk0zCKzr5ZAeP+/8LSJ1ItDK4JTSFJybXqRXXL
+         ontT8iJ3545vNBhyTVAAsq6nLl8RTWXAF2WwXt1KhdOAku2uhw8T4JXwz6AUSvBzQqc2
+         5OSKUJwaSHQZ2rRcDGFwF70qK+DyHagf2OEoiEahWfAWb20egBi0rFDT/NyquzWvWlRS
+         0wWA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1760700845; x=1761305645;
+        d=1e100.net; s=20230601; t=1760700846; x=1761305646;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=BM6QgAOG34zDGb9jZI8DkkbGa1KuVCoA2kRHxsUOX8Q=;
-        b=ip+9vS4Geb/o/3av2v+spjtfdpXyOMdP4xPSzsqcT4JUS2imMpu/kbt0/dLYzRtxNv
-         N+IyncQ9Y/31L4Ix8bFbZ3iVLv7m6f/Ym7tiVJeAQswyiT4L2XZZ6zl1Adjil+40Cw2r
-         2+Secp4r7E9wsMLxDjAZN3L6M+ufpSnwC67mAAXklxHLyxGKm0XO+LGhbOt6bkBMC3GP
-         0gi1E1uzRANss41hliGGB5JHQXLEja8PeHnowMS+d4T+7JxStj8qdeMq6hH0V0iMkowy
-         t7AiFFzL2iBOg92FKwOoZbMEFG3ACYdOF41g39IqH+BR1Gt+ak/bS1s/sGjFvyUinLb1
-         k1/Q==
-X-Forwarded-Encrypted: i=1; AJvYcCX/ohPof7jbjqDzqo9f7ZImeiF/SPCSxnM6eTS/mkL4KhGJ2Ej9kH8aciAEEU0FE+7oons=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxvxgGHXT1vPRBFCyyAKa4KSJznNOG7BbIY9IIVUxzO1hUz9pR7
-	oTtWbDT5cBop2+Y7kxYLktFHFr1ClHE0EVWQtwr4xXAVLNl9/ZOwkyZq
-X-Gm-Gg: ASbGncsCpzIs97cuRiOmnkIN6AgJ0W8Sr7nMwzJ0/DmEpDS+TDh1C/SgJ6F3D/4WjGp
-	e8izGsZMEnh3UC98olXwY0LZxydRT/19SzezigAFC+8iUSZrFJ3s0DlfAter43tUxLppKjj56uM
-	Uk6lwihXJjT5+WpQcL+7DxGoOQy8I/719wPk6EmYnPL6qZf7TqAmBoVEvo2ty0i7u5/QKHzxM2/
-	c6/jkafFjm/rySTNYRj7yAEfei+uUW+8qHdXiebaj6uxWZRtOSe6nJOk8M852oEEZ1KsAZscGNf
-	CiuCeCfi0XyOGwK4shRTY4Rlz00wWjvDnR/oJ+TeHRz0pYk+EylOSa0+1gU65neZnLwIHCJQjtv
-	T8L6QuxFoIm+AR/QMcjnXITt3BInVIR70W7VRCmh48yRUuEmTG8ZmjEuX3QirirwNVEeHGYvq6W
-	EiEZBt3rKHQq0VoN28VqR0ohUk0bnxTt/1
-X-Google-Smtp-Source: AGHT+IGLsMwNa24SVKElCrTuDly2JhrkRR3DVkahMshWsaOruLCSdJ+4rhKxrSHRXVTtx+GQp2kERQ==
-X-Received: by 2002:a05:600c:364d:b0:471:6a1:26e7 with SMTP id 5b1f17b1804b1-47109b4f8bemr37360005e9.12.1760700844745;
-        Fri, 17 Oct 2025 04:34:04 -0700 (PDT)
+        bh=oQnslZlvL/ycghWXR/jv6T9Aq0fKGJTc5vHN36t+VJw=;
+        b=JrPK8mg1sKbf4RI1sA6MVJ0qGWObQPZhoA7jtj3FHcek1FZr7hdA+fNpbRi0o67JkA
+         QnW1QLVMuv2tI11syCmA8FesoXW9VU96uv1waEoYh0w2CjhFVLyme76rtnMLVEk+gD/L
+         1pM+jVTTOvfH7AGzaIXVUKifNU3dVH0HZOqNf65F0RgOmf/0bWqyiTVRvinagejM2SFi
+         SaQh9FZiMPfzKbkVWg+FsXxwH5vq3Lsd3cBDFjpQCAjO3k7Ll7+kDaf2ZWmDvBoLYnO6
+         GVyvva6wlECYpIvytETAdQDHCDaikR2aWyMm1p4NifuDyZSj4/s/5smqRj7qgeq+gIkz
+         3seg==
+X-Forwarded-Encrypted: i=1; AJvYcCXrsm/5x7jk7DSryLSj8sV6zACUHrZ1TJFBOPY6r+vvs6nxbal6Mcyb9VQGdZyzMlRYowM=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzssP2ywltrf2v2lgv/m+4U/vxTLoicQPLEFPgXDtnKhiZoeH8g
+	YD/K/swQ1noXIk5kLpE3wWCtRxKe+s+d5Q0cIWJbV0DRQAWfu2XsJS3O
+X-Gm-Gg: ASbGncu5EadDTPSs0FluX1ht0rqZ8tCmcRFSWOqxcYa9fTX4bLsamjfA/5feePX1pj+
+	fWoDrZNYUItSGhWJxw+Mw6vIjhHvKDjl1QSjU1y8JKO42pEdUkAi7L/Xyy1hzQ1ZTgPvA0WNFli
+	uVkMHDm426kZaV7KFUC5FK6gjpBG/KaRKk9ivirK3OW+OD8Gu+707fEAsjd1fhKr76dag/yIpiY
+	zMOWkK67b9vO6FpleCCKE5/mF+bNIzu1L6UikSKOUREK18us9mzsA61ZIzzN9bjKRnZCpnxzDQj
+	k6a67vznehK+UmYcAywlCKTVU4mdYtaE0lttT7eeI8Oygd7ptk107689xK7OOosQVvAmvDvVsMj
+	eGUruFk/GAMqEd191fbP/qTuP6mKaK8Cy6vz+xGrBdMhw2L8RMV4uFgpqj1gRO33h+rQiBwKUX2
+	/iRbSVx532zicsUI5x7USKlO/w2BuRL3VG
+X-Google-Smtp-Source: AGHT+IGDXcu2rXaYf088S0s5/SDu9Cf2kgWGnkugds6Z0E40Y/sQzyHqYGd7lbYq4iS2oi2fq9qvDg==
+X-Received: by 2002:a05:600c:3e86:b0:46e:36f8:1eb7 with SMTP id 5b1f17b1804b1-471178a3a94mr25753985e9.10.1760700845944;
+        Fri, 17 Oct 2025 04:34:05 -0700 (PDT)
 Received: from archlinux (pd95edc07.dip0.t-ipconnect.de. [217.94.220.7])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4711444c8adsm80395435e9.13.2025.10.17.04.34.03
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4711444c8adsm80395435e9.13.2025.10.17.04.34.04
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 17 Oct 2025 04:34:04 -0700 (PDT)
+        Fri, 17 Oct 2025 04:34:05 -0700 (PDT)
 From: Bernhard Beschow <shentey@gmail.com>
 To: qemu-devel@nongnu.org
 Cc: Laurent Vivier <lvivier@redhat.com>,
@@ -94,9 +94,9 @@ Cc: Laurent Vivier <lvivier@redhat.com>,
 	Paolo Bonzini <pbonzini@redhat.com>,
 	Gerd Hoffmann <kraxel@redhat.com>,
 	Bernhard Beschow <shentey@gmail.com>
-Subject: [PATCH 7/8] hw/ide/ide-internal: Move dma_buf_commit() into ide "namespace"
-Date: Fri, 17 Oct 2025 13:33:37 +0200
-Message-ID: <20251017113338.7953-8-shentey@gmail.com>
+Subject: [PATCH 8/8] tests/qtest/ds1338-test: Reuse from_bcd()
+Date: Fri, 17 Oct 2025 13:33:38 +0200
+Message-ID: <20251017113338.7953-9-shentey@gmail.com>
 X-Mailer: git-send-email 2.51.1.dirty
 In-Reply-To: <20251017113338.7953-1-shentey@gmail.com>
 References: <20251017113338.7953-1-shentey@gmail.com>
@@ -108,111 +108,49 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-The identifier suggests that it is a generic DMA function while it is tied
-to IDE. Fix this by adding an "ide_" prefix.
+from_bcd() is a public API function which can be unit-tested. Reuse it to avoid
+code duplication.
 
 Signed-off-by: Bernhard Beschow <shentey@gmail.com>
 ---
- hw/ide/ide-internal.h |  2 +-
- hw/ide/ahci.c         |  8 ++++----
- hw/ide/core.c         | 10 +++++-----
- 3 files changed, 10 insertions(+), 10 deletions(-)
+ tests/qtest/ds1338-test.c | 12 ++++--------
+ 1 file changed, 4 insertions(+), 8 deletions(-)
 
-diff --git a/hw/ide/ide-internal.h b/hw/ide/ide-internal.h
-index 0d64805da2..281d07c9d5 100644
---- a/hw/ide/ide-internal.h
-+++ b/hw/ide/ide-internal.h
-@@ -398,7 +398,7 @@ int64_t ide_get_sector(IDEState *s);
- void ide_set_sector(IDEState *s, int64_t sector_num);
- 
- void ide_start_dma(IDEState *s, BlockCompletionFunc *cb);
--void dma_buf_commit(IDEState *s, uint32_t tx_bytes);
-+void ide_dma_buf_commit(IDEState *s, uint32_t tx_bytes);
- void ide_dma_error(IDEState *s);
- void ide_abort_command(IDEState *s);
- 
-diff --git a/hw/ide/ahci.c b/hw/ide/ahci.c
-index 1303c21cb7..14bc66fb7f 100644
---- a/hw/ide/ahci.c
-+++ b/hw/ide/ahci.c
-@@ -1417,7 +1417,7 @@ static void ahci_pio_transfer(const IDEDMA *dma)
-     }
- 
-     /* Update number of transferred bytes, destroy sglist */
--    dma_buf_commit(s, size);
-+    ide_dma_buf_commit(s, size);
- 
- out:
-     /* declare that we processed everything */
-@@ -1482,8 +1482,8 @@ static int32_t ahci_dma_prepare_buf(const IDEDMA *dma, int32_t limit)
- 
- /**
-  * Updates the command header with a bytes-read value.
-- * Called via dma_buf_commit, for both DMA and PIO paths.
-- * sglist destruction is handled within dma_buf_commit.
-+ * Called via ide_dma_buf_commit, for both DMA and PIO paths.
-+ * sglist destruction is handled within ide_dma_buf_commit.
+diff --git a/tests/qtest/ds1338-test.c b/tests/qtest/ds1338-test.c
+index d12424d27f..b8d0e65ec4 100644
+--- a/tests/qtest/ds1338-test.c
++++ b/tests/qtest/ds1338-test.c
+@@ -18,16 +18,12 @@
   */
- static void ahci_commit_buf(const IDEDMA *dma, uint32_t tx_bytes)
+ 
+ #include "qemu/osdep.h"
++#include "qemu/bcd.h"
+ #include "libqtest.h"
+ #include "libqos/i2c.h"
+ 
+ #define DS1338_ADDR 0x68
+ 
+-static inline uint8_t bcd2bin(uint8_t x)
+-{
+-    return ((x) & 0x0f) + ((x) >> 4) * 10;
+-}
+-
+ static void send_and_receive(void *obj, void *data, QGuestAllocator *alloc)
  {
-@@ -1511,7 +1511,7 @@ static int ahci_dma_rw_buf(const IDEDMA *dma, bool is_write)
-     }
+     QI2CDevice *i2cdev = (QI2CDevice *)obj;
+@@ -39,9 +35,9 @@ static void send_and_receive(void *obj, void *data, QGuestAllocator *alloc)
+     i2c_read_block(i2cdev, 0, resp, sizeof(resp));
  
-     /* free sglist, update byte count */
--    dma_buf_commit(s, l);
-+    ide_dma_buf_commit(s, l);
-     s->io_buffer_index += l;
- 
-     trace_ahci_dma_rw_buf(ad->hba, ad->port_no, l);
-diff --git a/hw/ide/core.c b/hw/ide/core.c
-index b14983ec54..8c380abf7c 100644
---- a/hw/ide/core.c
-+++ b/hw/ide/core.c
-@@ -827,7 +827,7 @@ static void ide_sector_read(IDEState *s)
-                                       ide_sector_read_cb, s);
+     /* check retrieved time against local time */
+-    g_assert_cmpuint(bcd2bin(resp[4]), == , tm_ptr->tm_mday);
+-    g_assert_cmpuint(bcd2bin(resp[5]), == , 1 + tm_ptr->tm_mon);
+-    g_assert_cmpuint(2000 + bcd2bin(resp[6]), == , 1900 + tm_ptr->tm_year);
++    g_assert_cmpuint(from_bcd(resp[4]), == , tm_ptr->tm_mday);
++    g_assert_cmpuint(from_bcd(resp[5]), == , 1 + tm_ptr->tm_mon);
++    g_assert_cmpuint(2000 + from_bcd(resp[6]), == , 1900 + tm_ptr->tm_year);
  }
  
--void dma_buf_commit(IDEState *s, uint32_t tx_bytes)
-+void ide_dma_buf_commit(IDEState *s, uint32_t tx_bytes)
- {
-     if (s->bus->dma->ops->commit_buf) {
-         s->bus->dma->ops->commit_buf(s->bus->dma, tx_bytes);
-@@ -848,7 +848,7 @@ void ide_set_inactive(IDEState *s, bool more)
- 
- void ide_dma_error(IDEState *s)
- {
--    dma_buf_commit(s, 0);
-+    ide_dma_buf_commit(s, 0);
-     ide_abort_command(s);
-     ide_set_inactive(s, false);
-     ide_bus_set_irq(s->bus);
-@@ -893,7 +893,7 @@ static void ide_dma_cb(void *opaque, int ret)
-     if (ret < 0) {
-         if (ide_handle_rw_error(s, -ret, ide_dma_cmd_to_retry(s->dma_cmd))) {
-             s->bus->dma->aiocb = NULL;
--            dma_buf_commit(s, 0);
-+            ide_dma_buf_commit(s, 0);
-             return;
-         }
-     }
-@@ -912,7 +912,7 @@ static void ide_dma_cb(void *opaque, int ret)
-     sector_num = ide_get_sector(s);
-     if (n > 0) {
-         assert(n * 512 == s->sg.size);
--        dma_buf_commit(s, s->sg.size);
-+        ide_dma_buf_commit(s, s->sg.size);
-         sector_num += n;
-         ide_set_sector(s, sector_num);
-         s->nsector -= n;
-@@ -944,7 +944,7 @@ static void ide_dma_cb(void *opaque, int ret)
-          * Reset the Active bit and don't raise the interrupt.
-          */
-         s->status = READY_STAT | SEEK_STAT;
--        dma_buf_commit(s, 0);
-+        ide_dma_buf_commit(s, 0);
-         goto eot;
-     }
- 
+ static void ds1338_register_nodes(void)
 -- 
 2.51.1.dirty
 
