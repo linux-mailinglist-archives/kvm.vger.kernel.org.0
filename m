@@ -1,77 +1,79 @@
-Return-Path: <kvm+bounces-60316-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-60317-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
-	by mail.lfdr.de (Postfix) with ESMTPS id 28F3BBE91C3
-	for <lists+kvm@lfdr.de>; Fri, 17 Oct 2025 16:12:56 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 50998BE91C6
+	for <lists+kvm@lfdr.de>; Fri, 17 Oct 2025 16:13:00 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 36BEE4F4BA4
-	for <lists+kvm@lfdr.de>; Fri, 17 Oct 2025 14:12:53 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 9756E1AA2004
+	for <lists+kvm@lfdr.de>; Fri, 17 Oct 2025 14:13:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F1ED036CDE7;
-	Fri, 17 Oct 2025 14:12:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1476536CDF8;
+	Fri, 17 Oct 2025 14:12:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="iJF7Ib2D"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="U8uI/M4K"
 X-Original-To: kvm@vger.kernel.org
 Received: from mail-wr1-f46.google.com (mail-wr1-f46.google.com [209.85.221.46])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 652D42F6911
-	for <kvm@vger.kernel.org>; Fri, 17 Oct 2025 14:12:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8559A332EDB
+	for <kvm@vger.kernel.org>; Fri, 17 Oct 2025 14:12:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.46
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1760710368; cv=none; b=G9PyZ/K/zY5cvjpZkPgFcny9H1I/R5dJDK/OUiiTWw9lhlyVbnzodKq6ikZPo7s4NGN3emGfWhx5R7uJa0nZerGyxucZDUK+0dYt/VD1/X4qz2tPYhvIi9UrgV/sAY4yRaeDIjS5pbSxjKMlDC2CHW+yD8so6RBcYGL97WAv1XY=
+	t=1760710369; cv=none; b=YiRInHw4pU0FTcFHKzGodbhyYqFHBdaTqpftfn8w+GPcO97h71iqNsS6gjtNPBePoPCQDpLQGXiZKERP5FMk89bu1tp3bn1JZuGquAH98bmIULWlKAlwc/V9MRAlycFHxVBDU8yv7vFJPiGwnoyp7qBYu9ylb2z6+NAED07mQEc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1760710368; c=relaxed/simple;
-	bh=fhQdc/TehWg2BTjnzi6hLrhzwpNj/lIV1nW3zz1Q2T0=;
-	h=From:To:Cc:Subject:Date:Message-ID:Content-Type:MIME-Version; b=aIiCmG7yPof2vvO/jXwuPhzj87pmuyE53ASNzEsHe4hhLkn5E51PaaIylbverWU3XaOa390xlLUvPwrAjnatzLCvli7oChlOvUCTIaUzQHu4gzCFbMQLHTEz+/QlFbmhtULkoAupDANWQCP9IE8UOfx8uFij6MKoCzNzB+oov8Y=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=iJF7Ib2D; arc=none smtp.client-ip=209.85.221.46
+	s=arc-20240116; t=1760710369; c=relaxed/simple;
+	bh=bxdHKZc9pbxBqChYt8+Yh2D0W1yYdSw1LpL8rApqlNQ=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=OKTza6ZEo0XO+04HfDLbV7e/vxH4M/DA25Hl4z0gKJV9eXdde1jdReu/mm5L7rOSngCZu3taMFa3nQon2bwGHcIs38diEklNl/TxotIFtv5rTuCdJZpTaYTl9Bd5PipaTZI5373lpf04ewUEYmJtMegeBBOIG0HTYw9E10MdCGo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=U8uI/M4K; arc=none smtp.client-ip=209.85.221.46
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wr1-f46.google.com with SMTP id ffacd0b85a97d-3ee64bc6b85so2065967f8f.3
-        for <kvm@vger.kernel.org>; Fri, 17 Oct 2025 07:12:46 -0700 (PDT)
+Received: by mail-wr1-f46.google.com with SMTP id ffacd0b85a97d-426fd62bfeaso873676f8f.2
+        for <kvm@vger.kernel.org>; Fri, 17 Oct 2025 07:12:47 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1760710365; x=1761315165; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=gzW3ekQZ7Psj0DsMhnvdQfGfYGGMgoTsdSCNvzg/jEU=;
-        b=iJF7Ib2DflG7cubtU9ylYfpow3ug2uAOtCgTFBn9pRU32LFD6xAKKrr0yg+7aMSTNr
-         ub8ZBT/t6eZqRi1kxEsDNo8pho/WQA6goe/n095kR+Cq0oipj2JUAI3edXsV6KHnaaid
-         lnVvTVUlEtZzUCzgq+KQHuQ/Qsc6Pp+HthPqx1XuTKL6cTDytJ5BowrSYheUoUGV+a1D
-         8CVErV4zCxBsa3eV1jRI6lbpileq/rUZp7bMRgkV6Lcmv/YQKpMDgNtzN1uCJuP2fVXg
-         b/a8oAzMtft6AKtJqQq6pD/wf0H2rvBbB8ESDEK8t/Lby7MUKzkLi67WPacUW9pJCY4R
-         dFvg==
+        d=gmail.com; s=20230601; t=1760710366; x=1761315166; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=CFuBYoXthwAAHQXYSal9xNPgZEHCC/OlTSTKqa/XfA4=;
+        b=U8uI/M4KFizDYc+3zWWtrt2DFOFz+u0PimhSYw2t3doY/AduhVIU1krt3vXHJ3DLTd
+         SGSgj9jBFBQCbvXkxK8VT5ULaEyLfR/Yzof2Kt8mFeRadq4+qKCD1PO1xt3mypMlBRC7
+         LU1nFTT1l9xYKP89tqtOHqhfF+iJJEdq9iVAQA+wKpNIySEh3856XE9tlao4Lt0xY1p5
+         R4Haa28w5QyAvZ24jm6OrRsNIUMsM52eJH/jF0u4mcynBXUX1Pzp4Y5b1h8L7tdAClx4
+         NzLXfHwmkqkQG8U5DYWVLDvmk/vRtXS5+x+cvRxPDiKvNaMj9Xw7xT8zRHsqM2PXQhB/
+         r20Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1760710365; x=1761315165;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=gzW3ekQZ7Psj0DsMhnvdQfGfYGGMgoTsdSCNvzg/jEU=;
-        b=WZSOXd9gxXHnAByN3IOw1iLfFn2aVJzSpVVEL7crFTz0UqSp5SyqGOa8WDkiiXQAtb
-         NVfC5FRah3GDaO8WidT3tS0UR6Ky9TXQwqKDIGEDcAqZ06rKYCABIN9kJTMUmV6BWUEx
-         vwY3ed6bMY4K/oAKok0brSRmoSCJtTgYJR2M+aBF4v8+CXtNFk/cvm9xEr+jl5+vutE0
-         D90ghc/nJcfpAJGuQ2W8EG85f2Kw6z6dRe6z2iMYLBNdv3u85s1V5PotZKC6lyxGjv6X
-         02zOCUtU3IQSnExLFQvl14Bz941+CWa7DgJOtdC4pFeopxu1XxQcOkxL5jEa53l+CIOM
-         erUQ==
-X-Forwarded-Encrypted: i=1; AJvYcCW/sg+KUXKC9AOLJfWkWhb976F5RP7adt1ryZHdiwsi8tN4b9nttbTvX1eEZoUGIdfBYZM=@vger.kernel.org
-X-Gm-Message-State: AOJu0YydVpYnwPG+gT9/TjcOAWEKyE9RtT0SqsEk6WfwP04vWtnaMViu
-	l+aqHWVfLcEvG/06DziQ8X7kVpmyWnzDO1vk1eLXuWG+v01SSM8q+T7A
-X-Gm-Gg: ASbGncv/0OrSRXWYeHzk3/w75755qPtzNJ5Z2MUwUQsPNvRCIqduYTtN+Msmv3GSaVV
-	Jt5XG/XsnJFHO95zUjAUGpssMh9HiC3ZOxWFT2QQtiThOKT0J1pricK23S8FnjrDncAcUAVA7mE
-	9fbaT4Iq+TQgpzdfEWp4D4OJTASNqsJbwhATN36ZeZiN4ZOyYhl4/GC4DnmiaOT5oJiv1wk3KwC
-	BTH+VCfHkMKaE+nRiH+MvD1dO7Vbdoa13BhH6uAP52gz7CU9dQxB16g5AVYP633BDG6yDHdwgrt
-	PKgdjqr5Fe/MZyNE9AVJ9iYHMsAwDfKLXyw88Iip0GA3hhGOiWo67W8/l3xfeTxWpopXW05XJLb
-	Je8UopiqMLrg/xn/Dmf2bJ4yGxPfw7guENzBFCUK/StJbbgTu5wQJz3gaMohRrSgE/FEs3PzKvd
-	58D6SWq9cedj71aSKYtclw+9viTgqj1JJN
-X-Google-Smtp-Source: AGHT+IGeuxOJBWpmVCX3U1tHBDipCkpzrypzvQWf6sOPwcugLBzMa9b7CCp6AGBV0FZ+Pn8TPlDLZw==
-X-Received: by 2002:a05:6000:25c7:b0:427:854:787 with SMTP id ffacd0b85a97d-4270854085bmr1487022f8f.51.1760710364350;
-        Fri, 17 Oct 2025 07:12:44 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1760710366; x=1761315166;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=CFuBYoXthwAAHQXYSal9xNPgZEHCC/OlTSTKqa/XfA4=;
+        b=eHYyBshrsqsNJlZM/CzEkwbYLJCERdbl8+n1o2Z9eo7OLO3sC6+vb1ybw9DJ0ZzGPv
+         NZGm+wfBz/3pmU5gImhC8XCBR6In07lnfcyFbNfl540cojSLsV/v00vq/PSjtW/YRHsB
+         dm1oHZhEnyBEyN30swohcxwNxuUcM2QIqP9/KF06d3WQrQiS3mCaMYoqFVT12MQyy8+U
+         hexaot7U2VKaDmKRJl/rRF/IPM/EMQ0u1RHBB/HVurecT/8nZ5yTyM+uYZb1HH1cFiU/
+         q+2J4vPWy2FxnmJIXaySGd/GgVBQ2oswV8Q2HgBD5no78KRCNtUOHS71VSzNuHVtRu+b
+         1bAQ==
+X-Forwarded-Encrypted: i=1; AJvYcCVJaNd4zg2Obr/osJuwEypk1BAP1vsxT9OxFs76wkOJE78j2C5ZKU/w0kmR/NvNGzAyyyQ=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwkA+Al06uwVHkZJQ/BW0U+G+as96l/+qLEXktVCGr05ZnY7H8M
+	3gpV6fU9JxZgvrJXcm1PHsli8XJaxtmZ1/5EHrX14+hdP8ckdOmJPNgi
+X-Gm-Gg: ASbGncsBm0jRgUceZ1YOhc++SMc3J/vEKd43zQm1Qq0HVMvbtMEJ7G3nnE/DAy2HpZT
+	fY1u3CjGV/N9zDbFgGlDgqkT9SfVIexrVerJ30QmthWEx9+zPUZr9QKT1Z+RFNMP/fAvaoBhuJA
+	r4+KchNGBm2QRumQ4eHdr0P1QvAc94b+P7Nz6hFRGlqMsSa+l1vanMMPC0v7n9r5gYm2cliYNVv
+	qPRep6HeX0DSUvNKs27l+4i93+sglDCONaYl40sp/bvIM52EHP3el7cVSn6OHyNl/Drv4aWHp1y
+	AHpl7H0TOZbkFsIowGor0sWFDmk7XcvqoIpoySVYlJuoLSz7wFa+K5R2+7VK5wlYC5ePUPDW0n0
+	kQTaHcSFx7WF9PGrKHCD8Pzb5JqheAu0W19Cn6xSunJrwAo19WSMV6Q+ZLp2cMDI+nvXhVTF/fU
+	E2q8S8qVvwyt2xUo9h8by/wjTbvi7x3+3X
+X-Google-Smtp-Source: AGHT+IGHj5C2eusACsFwArx+C7dtue7Nn7sN6TxgdAb/eWFrYxY0hNIfyjFi65Oo95iq3W/yO2xXEg==
+X-Received: by 2002:a05:6000:1865:b0:425:8bd2:24de with SMTP id ffacd0b85a97d-42704d145c9mr2514261f8f.9.1760710365572;
+        Fri, 17 Oct 2025 07:12:45 -0700 (PDT)
 Received: from archlinux (pd95edc07.dip0.t-ipconnect.de. [217.94.220.7])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4710cb36e7csm51359675e9.2.2025.10.17.07.12.43
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4710cb36e7csm51359675e9.2.2025.10.17.07.12.44
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 17 Oct 2025 07:12:43 -0700 (PDT)
+        Fri, 17 Oct 2025 07:12:45 -0700 (PDT)
 From: Bernhard Beschow <shentey@gmail.com>
 To: qemu-devel@nongnu.org
 Cc: Roman Bolshakov <rbolshakov@ddn.com>,
@@ -95,83 +97,75 @@ Cc: Roman Bolshakov <rbolshakov@ddn.com>,
 	kvm@vger.kernel.org,
 	Laurent Vivier <lvivier@redhat.com>,
 	Bernhard Beschow <shentey@gmail.com>
-Subject: [PATCH v2 00/11] Cleanup patches, mostly PC-related
-Date: Fri, 17 Oct 2025 16:11:06 +0200
-Message-ID: <20251017141117.105944-1-shentey@gmail.com>
+Subject: [PATCH v2 01/11] hw/timer/i8254: Add I/O trace events
+Date: Fri, 17 Oct 2025 16:11:07 +0200
+Message-ID: <20251017141117.105944-2-shentey@gmail.com>
 X-Mailer: git-send-email 2.51.1.dirty
-Content-Type: text/plain; charset="utf-8"
+In-Reply-To: <20251017141117.105944-1-shentey@gmail.com>
+References: <20251017141117.105944-1-shentey@gmail.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
 
-This series mostly contains PC-related patches I came up with when doing=0D
-"virtual retrocomputing" with my via-apollo-pro-133t branch [1]. It include=
-s=0D
-improved tracing and removal of cpu_get_current_apic(). The remaining patch=
-=0D
-resolves duplicate code in the test of DS1338 RTC which is used in e500=0D
-machines.=0D
-=0D
-v2:=0D
-* Remove some redundant APIC_COMMON(cpu->apic_state) casts=0D
-* Resolve cpu_get_current_apic()=0D
-=0D
-Testing done:=0D
-* make check=0D
-* Work with recent x86_64 Linux distribution running on WHPX=0D
-=0D
-[1] https://github.com/shentok/qemu/tree/via-apollo-pro-133t=0D
-=0D
-Supersedes: 20251017113338.7953-1-shentey@gmail.com=0D
-=0D
-Bernhard Beschow (11):=0D
-  hw/timer/i8254: Add I/O trace events=0D
-  hw/audio/pcspk: Add I/O trace events=0D
-  hw/rtc/mc146818rtc: Convert CMOS_DPRINTF() into trace events=0D
-  hw/rtc/mc146818rtc: Use ARRAY_SIZE macro=0D
-  hw/rtc/mc146818rtc: Assert correct usage of=0D
-    mc146818rtc_set_cmos_data()=0D
-  hw/ide/ide-internal: Move dma_buf_commit() into ide "namespace"=0D
-  hw/i386/apic: Prefer APICCommonState over DeviceState=0D
-  hw/i386/apic: Ensure own APIC use in apic_msr_{read,write}=0D
-  hw/intc/apic: Ensure own APIC use in apic_register_{read,write}=0D
-  hw/i386/x86-cpu: Remove now unused cpu_get_current_apic()=0D
-  tests/qtest/ds1338-test: Reuse from_bcd()=0D
-=0D
- hw/ide/ide-internal.h                |   2 +-=0D
- include/hw/i386/apic.h               |  38 +++++----=0D
- include/hw/i386/apic_internal.h      |   7 +-=0D
- target/i386/cpu.h                    |   4 +-=0D
- target/i386/kvm/kvm_i386.h           |   2 +-=0D
- target/i386/whpx/whpx-internal.h     |   2 +-=0D
- hw/audio/pcspk.c                     |  10 ++-=0D
- hw/i386/kvm/apic.c                   |   3 +-=0D
- hw/i386/vapic.c                      |   2 +-=0D
- hw/i386/x86-cpu.c                    |  10 ---=0D
- hw/ide/ahci.c                        |   8 +-=0D
- hw/ide/core.c                        |  10 +--=0D
- hw/intc/apic.c                       | 116 +++++++++------------------=0D
- hw/intc/apic_common.c                |  56 +++++--------=0D
- hw/rtc/mc146818rtc.c                 |  20 ++---=0D
- hw/timer/i8254.c                     |   6 ++=0D
- target/i386/cpu-apic.c               |  16 ++--=0D
- target/i386/cpu-dump.c               |   2 +-=0D
- target/i386/cpu.c                    |   2 +-=0D
- target/i386/hvf/hvf.c                |   4 +-=0D
- target/i386/kvm/kvm.c                |   2 +-=0D
- target/i386/tcg/system/misc_helper.c |   5 +-=0D
- target/i386/whpx/whpx-apic.c         |   3 +-=0D
- tests/qtest/ds1338-test.c            |  12 +--=0D
- hw/audio/trace-events                |   4 +=0D
- hw/rtc/trace-events                  |   4 +=0D
- hw/timer/trace-events                |   4 +=0D
- 27 files changed, 146 insertions(+), 208 deletions(-)=0D
-=0D
--- =0D
-2.51.1.dirty=0D
-=0D
+Allows to see how the guest interacts with the device.
+
+Signed-off-by: Bernhard Beschow <shentey@gmail.com>
+---
+ hw/timer/i8254.c      | 6 ++++++
+ hw/timer/trace-events | 4 ++++
+ 2 files changed, 10 insertions(+)
+
+diff --git a/hw/timer/i8254.c b/hw/timer/i8254.c
+index 4b25c487f7..7033ebf50d 100644
+--- a/hw/timer/i8254.c
++++ b/hw/timer/i8254.c
+@@ -29,6 +29,7 @@
+ #include "hw/timer/i8254.h"
+ #include "hw/timer/i8254_internal.h"
+ #include "qom/object.h"
++#include "trace.h"
+ 
+ //#define DEBUG_PIT
+ 
+@@ -130,6 +131,8 @@ static void pit_ioport_write(void *opaque, hwaddr addr,
+     int channel, access;
+     PITChannelState *s;
+ 
++    trace_pit_ioport_write(addr, val);
++
+     addr &= 3;
+     if (addr == 3) {
+         channel = val >> 6;
+@@ -248,6 +251,9 @@ static uint64_t pit_ioport_read(void *opaque, hwaddr addr,
+             break;
+         }
+     }
++
++    trace_pit_ioport_read(addr, ret);
++
+     return ret;
+ }
+ 
+diff --git a/hw/timer/trace-events b/hw/timer/trace-events
+index c5b6db49f5..2bb51f95ea 100644
+--- a/hw/timer/trace-events
++++ b/hw/timer/trace-events
+@@ -49,6 +49,10 @@ cmsdk_apb_dualtimer_read(uint64_t offset, uint64_t data, unsigned size) "CMSDK A
+ cmsdk_apb_dualtimer_write(uint64_t offset, uint64_t data, unsigned size) "CMSDK APB dualtimer write: offset 0x%" PRIx64 " data 0x%" PRIx64 " size %u"
+ cmsdk_apb_dualtimer_reset(void) "CMSDK APB dualtimer: reset"
+ 
++# i8254.c
++pit_ioport_read(uint8_t addr, uint32_t value) "[0x%" PRIx8 "] -> 0x%" PRIx32
++pit_ioport_write(uint8_t addr, uint32_t value) "[0x%" PRIx8 "] <- 0x%" PRIx32
++
+ # imx_gpt.c
+ imx_gpt_set_freq(uint32_t clksrc, uint32_t freq) "Setting clksrc %u to %u Hz"
+ imx_gpt_read(const char *name, uint64_t value) "%s -> 0x%08" PRIx64
+-- 
+2.51.1.dirty
+
 
