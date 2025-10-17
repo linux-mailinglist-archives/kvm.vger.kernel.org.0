@@ -1,144 +1,249 @@
-Return-Path: <kvm+bounces-60360-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-60361-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9FAB8BEB641
-	for <lists+kvm@lfdr.de>; Fri, 17 Oct 2025 21:34:52 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id E0FABBEB76F
+	for <lists+kvm@lfdr.de>; Fri, 17 Oct 2025 22:13:25 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 737584E6110
-	for <lists+kvm@lfdr.de>; Fri, 17 Oct 2025 19:34:50 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 80E6D6E8409
+	for <lists+kvm@lfdr.de>; Fri, 17 Oct 2025 20:13:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 89215310762;
-	Fri, 17 Oct 2025 19:34:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8838932ED59;
+	Fri, 17 Oct 2025 20:12:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="L6/AZYt4"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="3iktQPFY"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-wr1-f50.google.com (mail-wr1-f50.google.com [209.85.221.50])
+Received: from mail-pj1-f73.google.com (mail-pj1-f73.google.com [209.85.216.73])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A55B92FC01B
-	for <kvm@vger.kernel.org>; Fri, 17 Oct 2025 19:34:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.50
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5F44233291F
+	for <kvm@vger.kernel.org>; Fri, 17 Oct 2025 20:12:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.73
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1760729683; cv=none; b=q8q968OK0d6IISPRDqmPmj+b0SlmmVk5sGo+bev1qv2dVul/3bKe3XWRZ+wiIVF8ADMicDtxR5n7IE8hTGtywmd/QljQsgBnc3G/Sh0is+Xvbukb+w9jNtXFpoJcyZWXaHUthTzdthtbAuouf0NOXoqQNCfZD4R+Jj7Ax/4ENaw=
+	t=1760731951; cv=none; b=VxJqpGMIVrWJ+0y0loHYV1rOiF65ZFu7Dlx6+kg/oRwzQ4NvpI1x0cG7TKMHzmDVQcq5kx2vARpHabjXH6rpCt4kBfmihdD14ZO9+kyb4DnxAKURNGO8XwcWVJA1XDzGuX6cO9+H/BPULwSnsJzEU+8PU3i4ARR2bzcd6Nas2Ns=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1760729683; c=relaxed/simple;
-	bh=mRdqTkYMdVm8XfRraSwu080msXDR2HkJyRm1J/nM9Ak=;
-	h=Date:From:To:CC:Subject:In-Reply-To:References:Message-ID:
-	 MIME-Version:Content-Type; b=NlU8S3weN2CfyviKUqO0TTU55KhcYQzN490wnsfuo+nJliBE4bp+uAFgkslI9mGUwg9g7DwFbMtDZf0IsB4eWQ/66UlhXgIh0as9BRzwWAqcCyk+MgzE6CC1AwcyHjGtFRNrOA9p802oX+NWsmYEdZsy+h/3M6R1PukXNLrxUjU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=L6/AZYt4; arc=none smtp.client-ip=209.85.221.50
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wr1-f50.google.com with SMTP id ffacd0b85a97d-4270491e9easo1141342f8f.2
-        for <kvm@vger.kernel.org>; Fri, 17 Oct 2025 12:34:41 -0700 (PDT)
+	s=arc-20240116; t=1760731951; c=relaxed/simple;
+	bh=siWpafnUKoLg4oB+hPXsnce7fcIsRgiCopc1fvAbvC8=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=WmdoaPtBFlwVYnxHjxikIgDmZm+iZzzp2kb7YKZL+TldT7sF89/y0nO5FTmgmRHQ5OfqtzwtfLIwPBbcELH1szGVg1s7T2X6KAu39DVpTrqbs9PPFs+aNlRc32hrPIBX6UBP+lNvEilU9Z5MF+ZZe+hFWe2Gtjrplx4agBPJ+l0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--ackerleytng.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=3iktQPFY; arc=none smtp.client-ip=209.85.216.73
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--ackerleytng.bounces.google.com
+Received: by mail-pj1-f73.google.com with SMTP id 98e67ed59e1d1-33be01bcda8so1168338a91.2
+        for <kvm@vger.kernel.org>; Fri, 17 Oct 2025 13:12:29 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1760729680; x=1761334480; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:references
-         :in-reply-to:subject:cc:to:from:date:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=qMJV026dRbiXNw2a4Oxt82ibZLr50tUzegy5c9LVdz4=;
-        b=L6/AZYt4MXzhl1J4BEHn3r332m7Wpb8noeCgRVogzZeVbHSZZTTRGblno7Oro9Fyry
-         lMfcWYg/DRIEHarscVH41x+4B3WT4XlIbcGEPrQtZsh0C02W1sTznHUlhYrss7vLJ63+
-         H97r+YJQt/R1/8u0V3LdvUYVkMuwOWavgzC1PE+jv2EVCp49oSHEvc07RdaH2PHKzs7R
-         YymvcM+IcqQUrflXNGieMLMese5oSAhSsT5TE2sx454kCAXuotDF5kJZ/3NLx1IeVloS
-         t7Gd78RjyTxDAOlv1cN45eRkn5rKtCg00qoaDDLE+fcHdoEVdzwiZQVJuYMOanA+GpPd
-         iaOw==
+        d=google.com; s=20230601; t=1760731949; x=1761336749; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=MvNEuSw58UwdjUzqQehycSdzJ+PYeq3LWgjQi3Vxd7A=;
+        b=3iktQPFYRvpQB02J7IsxLgzetTDdC4IfsafK0tnpmojWN4z09ctQkKghFpdWLCFEZm
+         jwC8QIhkztQq9jTLx1dkDq+IQT4V0op7FiD6qw7vCwD/7C1WKcz5IIypiEtddQMUyrry
+         XT9Ic+sHfM+RT/2/qh6eEjRlTC6/XsPgHFaRh4cdJZZrnSPFloueN6Cg8chErztytpg9
+         fKHZ+ZQSMsK5w1P5t9FYGo2VsfQJLynOwKlZz3tDsA8qESr56A0ipqPPoT8Tq3/Kwzs3
+         r5tfgMICeBBfB+/gqKoV8VlM7hm6SU/RxqBsL9a+JCrDF0Hf1k+/q//Rzli2xEn2jrco
+         pklA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1760729680; x=1761334480;
-        h=content-transfer-encoding:mime-version:message-id:references
-         :in-reply-to:subject:cc:to:from:date:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=qMJV026dRbiXNw2a4Oxt82ibZLr50tUzegy5c9LVdz4=;
-        b=Jq1E2OLFgoM32icTuonEqajV5IdtfCnaSnmJIbFpHfzVALCV5LiYbRog4ivVcKGtTf
-         /Cc/eun01q8FbEGalhgNMld8Dh9g9qnFonw6ex1pZpt6iniPRp1P/0e8r4n/pEXKMc+D
-         ILLPFUb9ti0Sq3eu0Kf9aKrEJCxazz0zUwbHmFwislQWHdW7tc9aR+0lnPm3kwdH3KZf
-         EiHwlvT3rTPl8t26tjd9XW5Xzz1zhTYvaqvx8ZVzSoK73bMxlQFyIVwK3ujnDtxCaIx5
-         a/tFaWEeitA3Eh45Druo8mZOQao0294riXBbsUrpIkSYn5rAT2W+8xup0o/sDmZzi1rD
-         ixQA==
-X-Forwarded-Encrypted: i=1; AJvYcCUQVckzDaPwwEpUhgosY+TD7zRxP1Tf1GjU2Kn+LMLJ0yswP970Ouk02Pb1t/St8A5SwAs=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzRaKOhyg01eCDTeSRZDZt435MqRnF8D+7MKaQ4ia2oghuUnv7d
-	pSG/bNi4ewR4NH4hbKJTRt0F5x4msUHvii5/ZNMNPS0boCKZfXmvqy/M
-X-Gm-Gg: ASbGncvShduwrbzw+EIbAMt28dQxH8gsQSGuvfDTvQWnSV0e8ee9RWlmdJ3xXsbqusw
-	STNd+hbMkmzPyMwtTQ8j5gUjEn7JcsDQjiZLiE/87aE8DGPwMxaNC4YrUruugwS8j4YZQkCrD5l
-	pqzjJWCOO7JqYx3eeD4WhmboSPP40TYohWR+gmjhgR79LQLIwGiPY/d9NYwzDIwWrH8rro5UPfG
-	l2Mip2RguMxJFsR64VYt4CvtKTs144escOsPBZBwf2JpkxXENTdjXj7ugj2M7C8g3DZte3JoYve
-	YXfHxuJLcSIO9C4IJilI5k2JtglcB96kJewLzhLuuXrHkukqdJvO28jzsDVSk9zA5fZaYn+cfsu
-	xZIkVOWSj9+cF7w50GUGyUB5GYInm8aTDODP7mDmuS9f3Z7mmpwOcDagQtQu78YkHFm7s3o8RF9
-	/+jONYLNlDUxleEpiwlRLgjdzyi0vOPOat7MxmReNtfEKhSL69wDSSvSDzI2EV/6eqmPU5xujIz
-	34hrKif4jQ=
-X-Google-Smtp-Source: AGHT+IHGjetnftVuysT/GTbROlmqCuOV4BZY3KYmTrCujddx2P4/UmIBc6Wo1oHWDywfaY714OaLRA==
-X-Received: by 2002:a05:6000:2887:b0:427:9a9:4604 with SMTP id ffacd0b85a97d-42709a9465fmr1647206f8f.45.1760729679739;
-        Fri, 17 Oct 2025 12:34:39 -0700 (PDT)
-Received: from ehlo.thunderbird.net (p200300faaf271400485132244674f203.dip0.t-ipconnect.de. [2003:fa:af27:1400:4851:3224:4674:f203])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4711442d3ddsm95764585e9.5.2025.10.17.12.34.38
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 17 Oct 2025 12:34:39 -0700 (PDT)
-Date: Fri, 17 Oct 2025 19:34:36 +0000
-From: Bernhard Beschow <shentey@gmail.com>
-To: Michael Tokarev <mjt@tls.msk.ru>, qemu-devel@nongnu.org
-CC: Roman Bolshakov <rbolshakov@ddn.com>, Laurent Vivier <laurent@vivier.eu>,
- Eduardo Habkost <eduardo@habkost.net>, Cameron Esfahani <dirty@apple.com>,
- "Michael S. Tsirkin" <mst@redhat.com>, Marcelo Tosatti <mtosatti@redhat.com>,
- Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
- Paolo Bonzini <pbonzini@redhat.com>,
- Sunil Muthuswamy <sunilmut@microsoft.com>, Zhao Liu <zhao1.liu@intel.com>,
- Richard Henderson <richard.henderson@linaro.org>,
- Fabiano Rosas <farosas@suse.de>, qemu-trivial@nongnu.org,
- Gerd Hoffmann <kraxel@redhat.com>, qemu-block@nongnu.org,
- Phil Dennis-Jordan <phil@philjordan.eu>, John Snow <jsnow@redhat.com>,
- kvm@vger.kernel.org, Laurent Vivier <lvivier@redhat.com>
-Subject: =?US-ASCII?Q?Re=3A_=5BPATCH_v2_09/11=5D_hw/intc/apic=3A_Ensure_?=
- =?US-ASCII?Q?own_APIC_use_in_apic=5Fregister=5F=7Bread=2C_write=7D?=
-In-Reply-To: <f074aed2-7702-4a4a-a7d5-7abeb29ea663@tls.msk.ru>
-References: <20251017141117.105944-1-shentey@gmail.com> <20251017141117.105944-10-shentey@gmail.com> <f074aed2-7702-4a4a-a7d5-7abeb29ea663@tls.msk.ru>
-Message-ID: <3C9DA9B8-8836-42F6-85CD-AB60327363EC@gmail.com>
+        d=1e100.net; s=20230601; t=1760731949; x=1761336749;
+        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=MvNEuSw58UwdjUzqQehycSdzJ+PYeq3LWgjQi3Vxd7A=;
+        b=ip9dZOTEy5ytBj7rTsQorv/O0KWCU/sbPLz7ODxqedxthsxezhtFteiIdH1dW2neiV
+         8YA3HWPfQ06/xB8sD/fQY6mhVYirio658jgqzznN6HKYxW6j2zMmQjbjrRyZUzwpP2Xj
+         g0sCayDij9nwuy/Sd6qG04rVQ8/oBRIjuUQZlc3jqUzxBv+aCT/ivEr1yi+3zxx14Kgy
+         U5akqG1ogyz/qxmG45eOtBjfGxrh1hwANqe1e/r2mDhu/3G2vqUpH3S3dMveDTR/c8Sk
+         xhzIxz5Lrs+5WOvFFsCzdzs6cAOyTLgSB7iVM2Sxqyb6R9NlKUUKhBZ0TPWHsB3ZwDai
+         akHA==
+X-Forwarded-Encrypted: i=1; AJvYcCU/PDoXlbzYAH6/40LQXX5+v9fB8RlVPPw3Gr5c+O1u6U7U6upYHdc+wXFjqqInr2x3mV4=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxMQwJyq8D1hlDhHYEuGIYdhXNKK0GlXY8QYQay5xabo0G3ZyiI
+	QrlXTPgpyqRfmJe13fD+RnEO5O12Qx186F06xbYmYvN8+v/0Lj2BhGZ4eTdGTKmJn/iRNlICt0v
+	Dc0+kk1DiHwbZrDFRBnvjFJlLig==
+X-Google-Smtp-Source: AGHT+IGm0uDnlmmvVqLxeQbS/GkNVcVJ1vJxluasBXbGw+YdYIXcsi2a/48HhtEUh6v1e/OBtWieEkqS8C8YBg1I5A==
+X-Received: from pjbpm17.prod.google.com ([2002:a17:90b:3c51:b0:33b:b692:47b0])
+ (user=ackerleytng job=prod-delivery.src-stubby-dispatcher) by
+ 2002:a17:90b:4c4e:b0:32e:6019:5d19 with SMTP id 98e67ed59e1d1-33bcf921526mr5690604a91.34.1760731948481;
+ Fri, 17 Oct 2025 13:12:28 -0700 (PDT)
+Date: Fri, 17 Oct 2025 13:11:41 -0700
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain;
- charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.51.0.858.gf9c4a03a3a-goog
+Message-ID: <cover.1760731772.git.ackerleytng@google.com>
+Subject: [RFC PATCH v1 00/37] guest_memfd: In-place conversion support
+From: Ackerley Tng <ackerleytng@google.com>
+To: cgroups@vger.kernel.org, kvm@vger.kernel.org, linux-doc@vger.kernel.org, 
+	linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	linux-kselftest@vger.kernel.org, linux-mm@kvack.org, 
+	linux-trace-kernel@vger.kernel.org, x86@kernel.org
+Cc: ackerleytng@google.com, akpm@linux-foundation.org, 
+	binbin.wu@linux.intel.com, bp@alien8.de, brauner@kernel.org, 
+	chao.p.peng@intel.com, chenhuacai@kernel.org, corbet@lwn.net, 
+	dave.hansen@intel.com, dave.hansen@linux.intel.com, david@redhat.com, 
+	dmatlack@google.com, erdemaktas@google.com, fan.du@intel.com, fvdl@google.com, 
+	haibo1.xu@intel.com, hannes@cmpxchg.org, hch@infradead.org, hpa@zytor.com, 
+	hughd@google.com, ira.weiny@intel.com, isaku.yamahata@intel.com, jack@suse.cz, 
+	james.morse@arm.com, jarkko@kernel.org, jgg@ziepe.ca, jgowans@amazon.com, 
+	jhubbard@nvidia.com, jroedel@suse.de, jthoughton@google.com, 
+	jun.miao@intel.com, kai.huang@intel.com, keirf@google.com, 
+	kent.overstreet@linux.dev, liam.merwick@oracle.com, 
+	maciej.wieczor-retman@intel.com, mail@maciej.szmigiero.name, 
+	maobibo@loongson.cn, mathieu.desnoyers@efficios.com, maz@kernel.org, 
+	mhiramat@kernel.org, mhocko@kernel.org, mic@digikod.net, michael.roth@amd.com, 
+	mingo@redhat.com, mlevitsk@redhat.com, mpe@ellerman.id.au, 
+	muchun.song@linux.dev, nikunj@amd.com, nsaenz@amazon.es, 
+	oliver.upton@linux.dev, palmer@dabbelt.com, pankaj.gupta@amd.com, 
+	paul.walmsley@sifive.com, pbonzini@redhat.com, peterx@redhat.com, 
+	pgonda@google.com, prsampat@amd.com, pvorel@suse.cz, qperret@google.com, 
+	richard.weiyang@gmail.com, rick.p.edgecombe@intel.com, rientjes@google.com, 
+	rostedt@goodmis.org, roypat@amazon.co.uk, rppt@kernel.org, seanjc@google.com, 
+	shakeel.butt@linux.dev, shuah@kernel.org, steven.price@arm.com, 
+	steven.sistare@oracle.com, suzuki.poulose@arm.com, tabba@google.com, 
+	tglx@linutronix.de, thomas.lendacky@amd.com, vannapurve@google.com, 
+	vbabka@suse.cz, viro@zeniv.linux.org.uk, vkuznets@redhat.com, 
+	wei.w.wang@intel.com, will@kernel.org, willy@infradead.org, wyihan@google.com, 
+	xiaoyao.li@intel.com, yan.y.zhao@intel.com, yilun.xu@intel.com, 
+	yuzenghui@huawei.com, zhiquan1.li@intel.com
+Content-Type: text/plain; charset="UTF-8"
 
+Hello,
 
+IIUC this is the first independent patch series for guest_memfd's in-place
+conversion series! Happy to finally bring this out on its own.
 
-Am 17=2E Oktober 2025 14:58:50 UTC schrieb Michael Tokarev <mjt@tls=2Emsk=
-=2Eru>:
->17=2E10=2E2025 17:11, Bernhard Beschow wrote:
->> =2E=2E=2E In apic_mem_{read,write}, the
->> own APIC instance is available as the opaque parameter
->
->> diff --git a/hw/intc/apic=2Ec b/hw/intc/apic=2Ec
->
->> @@ -876,7 +870,7 @@ static uint64_t apic_mem_read(void *opaque, hwaddr =
-addr, unsigned size)
->>       }
->>         index =3D (addr >> 4) & 0xff;
->> -    apic_register_read(index, &val);
->> +    apic_register_read(opaque, index, &val);
->
->I think it would be better to use local variable here:
->
-> APICCommonState *s =3D opaque;
->
->and use it down the line=2E  Yes, there's just one usage, but it is
->still clearer this way (in my opinion anyway)=2E
->
->Ditto in apic_mem_write=2E
+Previous versions of this feature, part of other series, are available at
+[1][2][3].
 
-I agree=2E Will fix in the next iteration=2E
+Many prior discussions have led up to these main features of this series, and
+these are the main points I'd like feedback on.
 
-Best regards,
-Bernhard
+1. Having private/shared status stored in a maple tree (Thanks Michael for your
+   support of using maple trees over xarrays for performance! [4]).
+2. Having a new guest_memfd ioctl (not a vm ioctl) that performs conversions.
+3. Using ioctls/structs/input attribute similar to the existing vm ioctl
+   KVM_SET_MEMORY_ATTRIBUTES to perform conversions.
+4. Storing requested attributes directly in the maple tree.
+5. Using a KVM module-wide param to toggle between setting memory attributes via
+   vm and guest_memfd ioctls (making them mututally exclusive - a single loaded
+   KVM module can only do one of the two.)
+6. Skipping LRU in guest_memfd folios - make guest_memfd folios not participate
+   in LRU to avoid LRU refcounts from interfering with conversions.
 
->
->But it's more a nitpick really=2E
->
->Thanks,
->
->/mjt
+This series is based on kvm/next, followed by
+
++ v12 of NUMA mempolicy support patches [5]
++ 3 cleanup patches from Sean [6][7][8]
+
+Everything is stitched together here for your convenience
+
+https://github.com/googleprodkernel/linux-cc/commits/guest_memfd-inplace-conversion-v1
+
+Thank you all for helping with this series!
+
+If I missed out your comment from a previous series, it's not intentional!
+Please do raise it again.
+
+TODOs:
+
++ There might be an issue with memory failure handling because when guest_memfd
+  folios stop participating in LRU. From a preliminary analysis,
+  HWPoisonHandlable() is only true if PageLRU() is true. This needs further
+  investigation.
+
+[1] https://lore.kernel.org/all/bd163de3118b626d1005aa88e71ef2fb72f0be0f.1726009989.git.ackerleytng@google.com/
+[2] https://lore.kernel.org/all/20250117163001.2326672-6-tabba@google.com/
+[3] https://lore.kernel.org/all/b784326e9ccae6a08388f1bf39db70a2204bdc51.1747264138.git.ackerleytng@google.com/
+[4] https://lore.kernel.org/all/20250529054227.hh2f4jmyqf6igd3i@amd.com/
+[5] https://lore.kernel.org/all/20251007221420.344669-1-seanjc@google.com/T/
+[6] https://lore.kernel.org/all/20250924174255.2141847-1-seanjc@google.com/
+[7] https://lore.kernel.org/all/20251007224515.374516-1-seanjc@google.com/
+[8] https://lore.kernel.org/all/20251007223625.369939-1-seanjc@google.com/
+
+Ackerley Tng (19):
+  KVM: guest_memfd: Update kvm_gmem_populate() to use gmem attributes
+  KVM: Introduce KVM_SET_MEMORY_ATTRIBUTES2
+  KVM: guest_memfd: Don't set FGP_ACCESSED when getting folios
+  KVM: guest_memfd: Skip LRU for guest_memfd folios
+  KVM: guest_memfd: Add support for KVM_SET_MEMORY_ATTRIBUTES
+  KVM: selftests: Update framework to use KVM_SET_MEMORY_ATTRIBUTES2
+  KVM: selftests: guest_memfd: Test basic single-page conversion flow
+  KVM: selftests: guest_memfd: Test conversion flow when INIT_SHARED
+  KVM: selftests: guest_memfd: Test indexing in guest_memfd
+  KVM: selftests: guest_memfd: Test conversion before allocation
+  KVM: selftests: guest_memfd: Convert with allocated folios in
+    different layouts
+  KVM: selftests: guest_memfd: Test precision of conversion
+  KVM: selftests: guest_memfd: Test that truncation does not change
+    shared/private status
+  KVM: selftests: guest_memfd: Test conversion with elevated page
+    refcount
+  KVM: selftests: Reset shared memory after hole-punching
+  KVM: selftests: Provide function to look up guest_memfd details from
+    gpa
+  KVM: selftests: Make TEST_EXPECT_SIGBUS thread-safe
+  KVM: selftests: Update private_mem_conversions_test to mmap()
+    guest_memfd
+  KVM: selftests: Add script to exercise private_mem_conversions_test
+
+Sean Christopherson (18):
+  KVM: guest_memfd: Introduce per-gmem attributes, use to guard user
+    mappings
+  KVM: Rename KVM_GENERIC_MEMORY_ATTRIBUTES to KVM_VM_MEMORY_ATTRIBUTES
+  KVM: Enumerate support for PRIVATE memory iff kvm_arch_has_private_mem
+    is defined
+  KVM: Stub in ability to disable per-VM memory attribute tracking
+  KVM: guest_memfd: Wire up kvm_get_memory_attributes() to per-gmem
+    attributes
+  KVM: guest_memfd: Enable INIT_SHARED on guest_memfd for x86 Coco VMs
+  KVM: Move KVM_VM_MEMORY_ATTRIBUTES config definition to x86
+  KVM: Let userspace disable per-VM mem attributes, enable per-gmem
+    attributes
+  KVM: selftests: Create gmem fd before "regular" fd when adding memslot
+  KVM: selftests: Rename guest_memfd{,_offset} to gmem_{fd,offset}
+  KVM: selftests: Add support for mmap() on guest_memfd in core library
+  KVM: selftests: Add helpers for calling ioctls on guest_memfd
+  KVM: selftests: guest_memfd: Test that shared/private status is
+    consistent across processes
+  KVM: selftests: Add selftests global for guest memory attributes
+    capability
+  KVM: selftests: Provide common function to set memory attributes
+  KVM: selftests: Check fd/flags provided to mmap() when setting up
+    memslot
+  KVM: selftests: Update pre-fault test to work with per-guest_memfd
+    attributes
+  KVM: selftests: Update private memory exits test work with per-gmem
+    attributes
+
+ Documentation/virt/kvm/api.rst                |  72 ++-
+ arch/x86/include/asm/kvm_host.h               |   2 +-
+ arch/x86/kvm/Kconfig                          |  15 +-
+ arch/x86/kvm/mmu/mmu.c                        |   4 +-
+ arch/x86/kvm/x86.c                            |  13 +-
+ include/linux/kvm_host.h                      |  44 +-
+ include/trace/events/kvm.h                    |   4 +-
+ include/uapi/linux/kvm.h                      |  17 +
+ mm/filemap.c                                  |   1 +
+ mm/memcontrol.c                               |   2 +
+ tools/testing/selftests/kvm/.gitignore        |   1 +
+ tools/testing/selftests/kvm/Makefile.kvm      |   1 +
+ .../kvm/guest_memfd_conversions_test.c        | 498 ++++++++++++++++++
+ .../testing/selftests/kvm/include/kvm_util.h  | 127 ++++-
+ .../testing/selftests/kvm/include/test_util.h |  29 +-
+ tools/testing/selftests/kvm/lib/kvm_util.c    | 128 +++--
+ tools/testing/selftests/kvm/lib/test_util.c   |   7 -
+ .../selftests/kvm/pre_fault_memory_test.c     |   2 +-
+ .../kvm/x86/private_mem_conversions_test.c    |  55 +-
+ .../kvm/x86/private_mem_conversions_test.py   | 159 ++++++
+ .../kvm/x86/private_mem_kvm_exits_test.c      |  36 +-
+ virt/kvm/Kconfig                              |   4 +-
+ virt/kvm/guest_memfd.c                        | 414 +++++++++++++--
+ virt/kvm/kvm_main.c                           | 104 +++-
+ 24 files changed, 1554 insertions(+), 185 deletions(-)
+ create mode 100644 tools/testing/selftests/kvm/guest_memfd_conversions_test.c
+ create mode 100755 tools/testing/selftests/kvm/x86/private_mem_conversions_test.py
+
+--
+2.51.0.858.gf9c4a03a3a-goog
 
