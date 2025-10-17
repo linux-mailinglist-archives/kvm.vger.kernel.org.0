@@ -1,72 +1,72 @@
-Return-Path: <kvm+bounces-60250-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-60251-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id C92DEBE5F0C
-	for <lists+kvm@lfdr.de>; Fri, 17 Oct 2025 02:36:33 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id E117BBE5EF4
+	for <lists+kvm@lfdr.de>; Fri, 17 Oct 2025 02:35:43 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 85852621D63
-	for <lists+kvm@lfdr.de>; Fri, 17 Oct 2025 00:35:14 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 5DECC1A67A68
+	for <lists+kvm@lfdr.de>; Fri, 17 Oct 2025 00:35:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A0C922698AF;
-	Fri, 17 Oct 2025 00:33:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 55EEA281532;
+	Fri, 17 Oct 2025 00:33:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="IBJzUfWq"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="GE9el0w/"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pj1-f73.google.com (mail-pj1-f73.google.com [209.85.216.73])
+Received: from mail-pj1-f74.google.com (mail-pj1-f74.google.com [209.85.216.74])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5634F217F33
-	for <kvm@vger.kernel.org>; Fri, 17 Oct 2025 00:33:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.73
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5BE1525F994
+	for <kvm@vger.kernel.org>; Fri, 17 Oct 2025 00:33:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.74
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1760661185; cv=none; b=YfOTc5GqrAeaMJcrYwknlwaCMUFSZcvOJ9742MoTSFqYMFLVyBusgABEA2j99lLbcuAWrzsvepoEI98oXPSOoRD5vpJABb41DNpgoN56FyujsRGGWpFTncWVuYoRQ+US9L3jvRLnur3lrLAy9lX6zjynS+Z3p9JJANsWb0wgw+E=
+	t=1760661187; cv=none; b=IurA8FhVtR21+POEmLfazsXV2ihiNZ9yqxHK/EIg9cZkpswl0FWWQy2JBlRBsELXUJIgvE9ZwqxxaCuIeICFX67V+y0adEor0Wtha8NGNNTPSoG1dgQwwdjRuYhWCLBcQcvPtCCealYlMlF0h3vwRJPEG8Pgrnl/Ryj668HikaY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1760661185; c=relaxed/simple;
-	bh=ZVrQAaDETHJOm3nZp8vCz09Pe/Wr4FeYALw+WA60dkU=;
+	s=arc-20240116; t=1760661187; c=relaxed/simple;
+	bh=QkFUtx5sPoQ6tUw0mbfzfEAj27904ErfeoisebxrDLU=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=Aug3uctVu4tXwo6355OsWdHrPZjrgOuCfpeOnWA7JTe/1KKaWJ5lxwNYoLDq/rz/G5U1+aYEmGKzyRToaXpVMkQtAKemeKXOmSfX72aPh9BSxae5SRw2V71999YCwkookGREVPCVLinzMn0MeAj/UWFhKBdnulX88JlaMfDH430=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=IBJzUfWq; arc=none smtp.client-ip=209.85.216.73
+	 To:Cc:Content-Type; b=QyPbNFxm/bTnZ8dwknCbGcmVVZy8j3yAUa4kUFShwCTzcT8kS2TX6yJAEyyTpJ2ZMOasKwC3pPDVUy1H/GCxE2lLHlUE6jJCHfOkArMUA+j2WnQrF02U+hoIZ6WwBRfPEyukciv6ioQ8uUgD3TzqfYSpvAiSBP0ArNP5w/N84qk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=GE9el0w/; arc=none smtp.client-ip=209.85.216.74
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pj1-f73.google.com with SMTP id 98e67ed59e1d1-339ee7532b9so2861126a91.3
-        for <kvm@vger.kernel.org>; Thu, 16 Oct 2025 17:33:03 -0700 (PDT)
+Received: by mail-pj1-f74.google.com with SMTP id 98e67ed59e1d1-33bbbb41a84so2168163a91.1
+        for <kvm@vger.kernel.org>; Thu, 16 Oct 2025 17:33:05 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1760661183; x=1761265983; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1760661184; x=1761265984; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:reply-to:from:to:cc:subject:date:message-id:reply-to;
-        bh=EknCUbF2LHWm0fNDNjp+CKNXYZwTUTGxAjt6VludIpM=;
-        b=IBJzUfWqKqgA2dZ0ncXhr7wne+qoBzaru6iwsgi8HGnOM5tJqrFKJaMxZVwObQEmcr
-         TRm4paOnkNVEgamYkQkR7CWTBVlChdOCk7E+gBAAbhIc985IX3j4m/BjMGNM/qg/rj2b
-         30fR007r6nw3QOMC2LuPnWoun/4+1Nkr6/8zPZh8HGIt2k/VNAeHenLomLq1MiFnkcBb
-         xPIaBXuwq4MBBUBtgIi3CThwXR4lxc2Odba1pIU+IzliYWGy+kn1FNencdLP+C1w5qSi
-         fjzymMuRR8AYmCyXmn8WxO2J4jechOfgSp+LM3QSg8BdZYij3QvyTl+H7NXKb6sI3Z2S
-         0T/w==
+        bh=RrkTXpYpJ7TF3q/IfNrztO0QiwCsWOWOHOU78mYwx64=;
+        b=GE9el0w/M8keJ7fupiyx6IGO4pOo3MRgbl30ySwpxqi7q/OfMPPqJTOEdy4E8mzLiZ
+         /Cx0c4lcuQwWG/1VEMC0ExMS0/FE2/4MU5bs6TV7/qh5wF80T9LKAnXJepxbYItAuTIz
+         lBz149inpJNX+qIu7IHGn59o9xSy7KcTKyDR6CLBMtBdgedClP/oBo9XL9SadzXhfR/L
+         q1P6/cUhxgkjMsZcPLI2xytkHLqsMPIFjor02isao8Jjyyatz/DTJImQo65vC4jRRjxF
+         tVxCFTPXUPNEei2U2mBUl/eLtuIk7uiEjPUefZ8g1FNKQ5nvSGTxWMbo6v+Jyzc4z57t
+         pibA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1760661183; x=1761265983;
+        d=1e100.net; s=20230601; t=1760661184; x=1761265984;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:reply-to:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=EknCUbF2LHWm0fNDNjp+CKNXYZwTUTGxAjt6VludIpM=;
-        b=w5dJ/yJrWk+ObQ0Hi+wECV2Am8Q+euYf+P7JXn/InhG5bG2bpMRH2cwRHZL5M5QNPD
-         +aVBpPEgJj/60z3AonYGk+CNmzpS0T2hyzRcHHEzLCm22KtiHAuYywML/1cmDwy248Zg
-         9U5adzXEWVRptvHSFbRDuYyc6VIeOhnfhJ918MaG+pg9ZylHV06+c3Mc6RilZNyp46zf
-         A4T5ybJVUli2yQ0PzUlmtAldBHpJDjeddaatLMKg0yubxBSLV+1L2Z93h4fcWx006KNm
-         LPViF2UGpm1FynxHV37kirnp1P9hN330Udh2nuCS5WhTHgec8j9CbTHEDrIICRnK2uFU
-         JMOw==
-X-Forwarded-Encrypted: i=1; AJvYcCU3K3e8cwu1z2Cwmxtk9lGKyOBJmE6Y28FHrYqkWXtod+bJiEB4kQbFxS4kXOXBAdlTnaY=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyiWzVkLZSPqblf+Zmk7Gdto3A3WdDRPKjgJbsFw4iu1JFfIusX
-	OcDEHLWOY85P0IcAt59cSKnCuPJESMambyxX1DmRhkS37428OSmZJcfttoHEO5LeFFoJb9UxpL7
-	rLl+6nA==
-X-Google-Smtp-Source: AGHT+IHp0VFuMyv8iYOF0K3G5i6Db3pbnaDLGLxvBIGhE/qWOYmJanCMeHz3uAv5TWFd0pF3pAUnMoqPNCg=
-X-Received: from pjuy20.prod.google.com ([2002:a17:90a:d714:b0:32f:3fab:c9e7])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90a:d44c:b0:336:9dcf:ed14
- with SMTP id 98e67ed59e1d1-33bcf8e3b0emr1878293a91.23.1760661182616; Thu, 16
- Oct 2025 17:33:02 -0700 (PDT)
+        bh=RrkTXpYpJ7TF3q/IfNrztO0QiwCsWOWOHOU78mYwx64=;
+        b=H5Bha2CS8Jonjigwb+VkUs2J4Ezb4i6DFSh/uEBWmcMYV6Yp99TQiePF2b7IhPSiVe
+         yO69MCZyPLL15Sd2Rzb9FNm7bWSMdptgrHKK+w5psK/ir16/eZcY9mvCAbPwZnilNqGz
+         +nPjdamXQkya4HE7J5WYfCWgwPh7nLbcrFA3df/rapCP15hBhk7ouki2mog2biJ8jFhh
+         8vmZZBL+cNImtXY8q7DYPuJIhk2w3iVQV6zRw49xyLRrV93AzBd5C6EwOxtHPKYlFn6+
+         a+rSM406P9mrvqAXfovN3SrATFlsQbthHS762Zy4Pb01TK6z+h01DTZKad+GsBQ2CSqZ
+         pcRg==
+X-Forwarded-Encrypted: i=1; AJvYcCWBVCi4f7TiVHJ2mbNCdB5TDzJh/ftR7dMW2ZNeQ8e8MgsdcemPmkBq1TXlqDRjgpmKpy0=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzeB64EHXG5LvNk3ghQlEeFFH19Vd0J0YMnW+HxALfPXQYj6ZDn
+	jYKS8AdX3hZ/B6vI0Y3QfQCpYDvKj8LVZ2Zn/BbRXIGatVv/jNLxSXshqgKyWkzqBaqArr7EIXD
+	pdzqYlw==
+X-Google-Smtp-Source: AGHT+IEszDWyEl04dE1jeZ+WdRgxVfIHlmHOlr4lEQiQaFSefc7rtggxfv5d/ZUmkL9dWZiaizwe6/ECFgw=
+X-Received: from pjtf14.prod.google.com ([2002:a17:90a:c28e:b0:32b:ae4c:196c])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:55cb:b0:339:9f7d:92d4
+ with SMTP id 98e67ed59e1d1-33bcf87b8a5mr2036638a91.9.1760661184417; Thu, 16
+ Oct 2025 17:33:04 -0700 (PDT)
 Reply-To: Sean Christopherson <seanjc@google.com>
-Date: Thu, 16 Oct 2025 17:32:26 -0700
+Date: Thu, 16 Oct 2025 17:32:27 -0700
 In-Reply-To: <20251017003244.186495-1-seanjc@google.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
@@ -76,9 +76,8 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
 References: <20251017003244.186495-1-seanjc@google.com>
 X-Mailer: git-send-email 2.51.0.858.gf9c4a03a3a-goog
-Message-ID: <20251017003244.186495-9-seanjc@google.com>
-Subject: [PATCH v3 08/25] KVM: TDX: Return -EIO, not -EINVAL, on a
- KVM_BUG_ON() condition
+Message-ID: <20251017003244.186495-10-seanjc@google.com>
+Subject: [PATCH v3 09/25] KVM: TDX: Fold tdx_sept_drop_private_spte() into tdx_sept_remove_private_spte()
 From: Sean Christopherson <seanjc@google.com>
 To: Marc Zyngier <maz@kernel.org>, Oliver Upton <oliver.upton@linux.dev>, 
 	Tianrui Zhao <zhaotianrui@loongson.cn>, Bibo Mao <maobibo@loongson.cn>, 
@@ -99,72 +98,142 @@ Cc: linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
 	Binbin Wu <binbin.wu@linux.intel.com>
 Content-Type: text/plain; charset="UTF-8"
 
-Return -EIO when a KVM_BUG_ON() is tripped, as KVM's ABI is to return -EIO
-when a VM has been killed due to a KVM bug, not -EINVAL.  Note, many (all?)
-of the affected paths never propagate the error code to userspace, i.e.
-this is about internal consistency more than anything else.
+Fold tdx_sept_drop_private_spte() into tdx_sept_remove_private_spte() to
+avoid having to differnatiate between "zap", "drop", and "remove", and to
+eliminate dead code due to redundant checks, e.g. on an HKID being
+assigned.
 
-Reviewed-by: Rick Edgecombe <rick.p.edgecombe@intel.com>
-Reviewed-by: Ira Weiny <ira.weiny@intel.com>
+No functional change intended.
+
 Reviewed-by: Binbin Wu <binbin.wu@linux.intel.com>
 Signed-off-by: Sean Christopherson <seanjc@google.com>
 ---
- arch/x86/kvm/vmx/tdx.c | 12 ++++++------
- 1 file changed, 6 insertions(+), 6 deletions(-)
+ arch/x86/kvm/vmx/tdx.c | 90 +++++++++++++++++++-----------------------
+ 1 file changed, 40 insertions(+), 50 deletions(-)
 
 diff --git a/arch/x86/kvm/vmx/tdx.c b/arch/x86/kvm/vmx/tdx.c
-index c3bae6b96dc4..c242d73b6a7b 100644
+index c242d73b6a7b..abea9b3d08cf 100644
 --- a/arch/x86/kvm/vmx/tdx.c
 +++ b/arch/x86/kvm/vmx/tdx.c
-@@ -1621,7 +1621,7 @@ static int tdx_mem_page_record_premap_cnt(struct kvm *kvm, gfn_t gfn,
- 	struct kvm_tdx *kvm_tdx = to_kvm_tdx(kvm);
+@@ -1648,55 +1648,6 @@ static int tdx_sept_set_private_spte(struct kvm *kvm, gfn_t gfn,
+ 	return tdx_mem_page_record_premap_cnt(kvm, gfn, level, pfn);
+ }
  
- 	if (KVM_BUG_ON(kvm->arch.pre_fault_allowed, kvm))
--		return -EINVAL;
-+		return -EIO;
- 
- 	/* nr_premapped will be decreased when tdh_mem_page_add() is called. */
- 	atomic64_inc(&kvm_tdx->nr_premapped);
-@@ -1635,7 +1635,7 @@ static int tdx_sept_set_private_spte(struct kvm *kvm, gfn_t gfn,
- 
- 	/* TODO: handle large pages. */
- 	if (KVM_BUG_ON(level != PG_LEVEL_4K, kvm))
--		return -EINVAL;
-+		return -EIO;
+-static int tdx_sept_drop_private_spte(struct kvm *kvm, gfn_t gfn,
+-				      enum pg_level level, struct page *page)
+-{
+-	int tdx_level = pg_level_to_tdx_sept_level(level);
+-	struct kvm_tdx *kvm_tdx = to_kvm_tdx(kvm);
+-	gpa_t gpa = gfn_to_gpa(gfn);
+-	u64 err, entry, level_state;
+-
+-	/* TODO: handle large pages. */
+-	if (KVM_BUG_ON(level != PG_LEVEL_4K, kvm))
+-		return -EIO;
+-
+-	if (KVM_BUG_ON(!is_hkid_assigned(kvm_tdx), kvm))
+-		return -EIO;
+-
+-	/*
+-	 * When zapping private page, write lock is held. So no race condition
+-	 * with other vcpu sept operation.
+-	 * Race with TDH.VP.ENTER due to (0-step mitigation) and Guest TDCALLs.
+-	 */
+-	err = tdh_mem_page_remove(&kvm_tdx->td, gpa, tdx_level, &entry,
+-				  &level_state);
+-
+-	if (unlikely(tdx_operand_busy(err))) {
+-		/*
+-		 * The second retry is expected to succeed after kicking off all
+-		 * other vCPUs and prevent them from invoking TDH.VP.ENTER.
+-		 */
+-		tdx_no_vcpus_enter_start(kvm);
+-		err = tdh_mem_page_remove(&kvm_tdx->td, gpa, tdx_level, &entry,
+-					  &level_state);
+-		tdx_no_vcpus_enter_stop(kvm);
+-	}
+-
+-	if (KVM_BUG_ON(err, kvm)) {
+-		pr_tdx_error_2(TDH_MEM_PAGE_REMOVE, err, entry, level_state);
+-		return -EIO;
+-	}
+-
+-	err = tdh_phymem_page_wbinvd_hkid((u16)kvm_tdx->hkid, page);
+-
+-	if (KVM_BUG_ON(err, kvm)) {
+-		pr_tdx_error(TDH_PHYMEM_PAGE_WBINVD, err);
+-		return -EIO;
+-	}
+-	tdx_quirk_reset_page(page);
+-	return 0;
+-}
+-
+ static int tdx_sept_link_private_spt(struct kvm *kvm, gfn_t gfn,
+ 				     enum pg_level level, void *private_spt)
+ {
+@@ -1858,7 +1809,11 @@ static int tdx_sept_free_private_spt(struct kvm *kvm, gfn_t gfn,
+ static int tdx_sept_remove_private_spte(struct kvm *kvm, gfn_t gfn,
+ 					enum pg_level level, kvm_pfn_t pfn)
+ {
++	int tdx_level = pg_level_to_tdx_sept_level(level);
++	struct kvm_tdx *kvm_tdx = to_kvm_tdx(kvm);
+ 	struct page *page = pfn_to_page(pfn);
++	gpa_t gpa = gfn_to_gpa(gfn);
++	u64 err, entry, level_state;
+ 	int ret;
  
  	/*
- 	 * Read 'pre_fault_allowed' before 'kvm_tdx->state'; see matching
-@@ -1658,10 +1658,10 @@ static int tdx_sept_drop_private_spte(struct kvm *kvm, gfn_t gfn,
- 
- 	/* TODO: handle large pages. */
- 	if (KVM_BUG_ON(level != PG_LEVEL_4K, kvm))
--		return -EINVAL;
-+		return -EIO;
- 
- 	if (KVM_BUG_ON(!is_hkid_assigned(kvm_tdx), kvm))
--		return -EINVAL;
-+		return -EIO;
- 
- 	/*
- 	 * When zapping private page, write lock is held. So no race condition
-@@ -1846,7 +1846,7 @@ static int tdx_sept_free_private_spt(struct kvm *kvm, gfn_t gfn,
- 	 * and slot move/deletion.
- 	 */
- 	if (KVM_BUG_ON(is_hkid_assigned(kvm_tdx), kvm))
--		return -EINVAL;
-+		return -EIO;
- 
- 	/*
- 	 * The HKID assigned to this TD was already freed and cache was
-@@ -1867,7 +1867,7 @@ static int tdx_sept_remove_private_spte(struct kvm *kvm, gfn_t gfn,
- 	 * there can't be anything populated in the private EPT.
- 	 */
+@@ -1869,6 +1824,10 @@ static int tdx_sept_remove_private_spte(struct kvm *kvm, gfn_t gfn,
  	if (KVM_BUG_ON(!is_hkid_assigned(to_kvm_tdx(kvm)), kvm))
--		return -EINVAL;
-+		return -EIO;
+ 		return -EIO;
  
++	/* TODO: handle large pages. */
++	if (KVM_BUG_ON(level != PG_LEVEL_4K, kvm))
++		return -EIO;
++
  	ret = tdx_sept_zap_private_spte(kvm, gfn, level, page);
  	if (ret <= 0)
+ 		return ret;
+@@ -1879,7 +1838,38 @@ static int tdx_sept_remove_private_spte(struct kvm *kvm, gfn_t gfn,
+ 	 */
+ 	tdx_track(kvm);
+ 
+-	return tdx_sept_drop_private_spte(kvm, gfn, level, page);
++	/*
++	 * When zapping private page, write lock is held. So no race condition
++	 * with other vcpu sept operation.
++	 * Race with TDH.VP.ENTER due to (0-step mitigation) and Guest TDCALLs.
++	 */
++	err = tdh_mem_page_remove(&kvm_tdx->td, gpa, tdx_level, &entry,
++				  &level_state);
++
++	if (unlikely(tdx_operand_busy(err))) {
++		/*
++		 * The second retry is expected to succeed after kicking off all
++		 * other vCPUs and prevent them from invoking TDH.VP.ENTER.
++		 */
++		tdx_no_vcpus_enter_start(kvm);
++		err = tdh_mem_page_remove(&kvm_tdx->td, gpa, tdx_level, &entry,
++					  &level_state);
++		tdx_no_vcpus_enter_stop(kvm);
++	}
++
++	if (KVM_BUG_ON(err, kvm)) {
++		pr_tdx_error_2(TDH_MEM_PAGE_REMOVE, err, entry, level_state);
++		return -EIO;
++	}
++
++	err = tdh_phymem_page_wbinvd_hkid((u16)kvm_tdx->hkid, page);
++	if (KVM_BUG_ON(err, kvm)) {
++		pr_tdx_error(TDH_PHYMEM_PAGE_WBINVD, err);
++		return -EIO;
++	}
++
++	tdx_quirk_reset_page(page);
++	return 0;
+ }
+ 
+ void tdx_deliver_interrupt(struct kvm_lapic *apic, int delivery_mode,
 -- 
 2.51.0.858.gf9c4a03a3a-goog
 
