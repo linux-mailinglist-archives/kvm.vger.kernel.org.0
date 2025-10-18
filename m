@@ -1,96 +1,94 @@
-Return-Path: <kvm+bounces-60447-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-60448-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1B97BBEDC8E
-	for <lists+kvm@lfdr.de>; Sun, 19 Oct 2025 00:44:20 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9B805BEDCB9
+	for <lists+kvm@lfdr.de>; Sun, 19 Oct 2025 00:53:27 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id A7C984E108D
-	for <lists+kvm@lfdr.de>; Sat, 18 Oct 2025 22:44:19 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 23D0D5819E6
+	for <lists+kvm@lfdr.de>; Sat, 18 Oct 2025 22:53:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7C43228C854;
-	Sat, 18 Oct 2025 22:44:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7B03828505E;
+	Sat, 18 Oct 2025 22:53:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="jOUcFzzh"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="UAbNi8cy"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pl1-f176.google.com (mail-pl1-f176.google.com [209.85.214.176])
+Received: from mail-pl1-f169.google.com (mail-pl1-f169.google.com [209.85.214.169])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 45B742765FF
-	for <kvm@vger.kernel.org>; Sat, 18 Oct 2025 22:44:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.176
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3F8F9242D98
+	for <kvm@vger.kernel.org>; Sat, 18 Oct 2025 22:53:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.169
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1760827448; cv=none; b=MAIwNYE2vmXtD07bvR56ZrBCx3Sg3A91U8Jj9PwfHSDq5zo8SVmozkluRC8qzd6AYe66HLetnHYoX/z+pwo+7oPCynFa1hoer4GKbaeP5AE3Ztfe6dgBF1FjWWSin7W3fbbVcN52KI+RHHgJUomYCDVU4UJQz3d03XZDDTafxxs=
+	t=1760827996; cv=none; b=j3jgQtGcuJ4ZcfoqRov2B/rMnjczT15rAoO/ztFBqJvzL/E6qVaN22yYNOyaM/HqIouynicvGka7cStA3yjuynHIYp6JlFGfEikebBKAAUiKg/J+siZ8PIchrHQ9UmjYTJt0cr4JaBXdi7wJut/rXEASmlRtU4E86jI+E9kYpjY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1760827448; c=relaxed/simple;
-	bh=Ta/c9XezGqMf/V2TLVa7goH6OnP4x38duY7+3rqFhAU=;
+	s=arc-20240116; t=1760827996; c=relaxed/simple;
+	bh=7qLVYcdBi8bpEpnS4F0eADPD2Bf5b4Eo3btCpBmFKVQ=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=IkVVB5WjahnQfA1bcsBVwloS/Uy0UYdVO0j9Dk9aO6fip6hG/DJ9aTXFKX8a8aub1GGh8hijMwO0TYvf8UL6qJdGge2y5iXoHkcu06xlIZkGEex40DJ9BfitV+Br2hEKHPN8d1iYCeP8tjb/GA8Y3dpgxDioiUrTVgZ+5MsgfvA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=jOUcFzzh; arc=none smtp.client-ip=209.85.214.176
+	 Content-Type:Content-Disposition:In-Reply-To; b=oiuccKdIhRB9RM7PqizTIsoYOcJcbY4OoS50WwRoHcOkIbrB4Bn1oHwUyGz4C2v0SpFpJWBLbvCV15IcNbxn+ttffggSXLAWDeHph47OfCpCVo2+JG7pMgii0NCyqiG0Q2YD0EetY39Mhm1JdNwZgLuXk2T1xpEx3nkpd6knfRs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=UAbNi8cy; arc=none smtp.client-ip=209.85.214.169
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-pl1-f176.google.com with SMTP id d9443c01a7336-290da96b37fso128955ad.1
-        for <kvm@vger.kernel.org>; Sat, 18 Oct 2025 15:44:06 -0700 (PDT)
+Received: by mail-pl1-f169.google.com with SMTP id d9443c01a7336-27d67abd215so155335ad.0
+        for <kvm@vger.kernel.org>; Sat, 18 Oct 2025 15:53:15 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1760827446; x=1761432246; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1760827994; x=1761432794; darn=vger.kernel.org;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=bruY5xXBxn9WkfFqW7waoeAALeQlBvbWEZW8ys6H4QY=;
-        b=jOUcFzzhXT+03bu6yEL0Pz3ND/zYj1AduL9JRG1BFBtBZFC6srBcnBQiMu04B1OuFR
-         40LFfx4v4CGU1jlLx1is2Xgk+vBNcHQDRkuUhXUGHNzr+88yQS022do/L7pzz46mQWDQ
-         DVWfBDpjNIVObe7Jb/V0TmJRis6GhnFPSzHalnyNrsfNq7AgXAlUcRWpOXGljzhklAvJ
-         9dXo4Pi9QaNZyXY1JYR/A31FuUxxgOiHsSTRXpWSatt0CF9qbVgYBoWtnM2KdTMSEWg9
-         +oZYGTnV5KV+Uh0sEy/yHrE+vyoJ0yMkU6OjzeCa22JV30xn/jygjJleFQlb5/jyWn2a
-         GKwQ==
+        bh=ExoVcTIek9AdjVCMkiYpZILDA0YvBh98/+0VTxUThlI=;
+        b=UAbNi8cyjQbjrZyXCTT4a8vAp+AHgWvBfwiir9ZAZjgl1sA3IJj/GvQI3uf8xKsIXM
+         lwL8tt0xwwordOaFzkyxegDoovfaXTshVMyFD8oWeZmVLtDhik0U2lcIRq15Dr/LejDq
+         snj12IfKQSWfdL5LKVfhXhLE/kAbt6tqzMtOijBiv3pOIeAk0QfXKjmaWBI2Tepg3QFy
+         MNxAtm3zcrMgyeCeyodHMq1o48Tvli5QY+z2z1hjktBZJsklS6bZ7dosbbrpApGUB/1E
+         ET/hFglPHZzfOfygTVWCPR8kf2gv3DUBA7DigMaY5sGxaOa1kh1Hfxb/ImgVw0794oDG
+         rcpw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1760827446; x=1761432246;
+        d=1e100.net; s=20230601; t=1760827994; x=1761432794;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=bruY5xXBxn9WkfFqW7waoeAALeQlBvbWEZW8ys6H4QY=;
-        b=U9gU7DmojJNW0SRZqVS8TtI513KCkjEmoPvMPwI4F+emCWhpMh3ZdOBUfQoFDREkSe
-         1qcKuLedCXv2SkWR0Z4SBFyjPUg8VcCybmLVOCZg8vKjY5vtmkeis/2993XH+smIZrlP
-         ey/G3c9bltBht76JQG7TQQBzMjdtcGrX2n/ChmA5Vd1/oqPlYn6hEfAEdTkgnlHaNf2Z
-         We/CdQB+XypQ8WafgvdGRh+Q/yWZQhIDHasv/jVu5B1jQbFsYrpDPXMb209ad+9eVxG9
-         U9y1xhbXkjlfwOa9StdKKjGdaJMN5/tmLuridwEGOr5ZcnGzeH6cbt6ZM04WLsTiX6HN
-         26Jg==
-X-Forwarded-Encrypted: i=1; AJvYcCVcD/NslxAhaU66Zfj6kHQSeC44oJhsEdln1a/gFu68CaR3bzdkTDY/PQbg6Q8/iGqopyw=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxwCkNdCnJU5gvYVeK2VETlHyvx7FFL+9trJcrp7KMNGGJ5aO/1
-	g9H3Aj4mb0VFQDJZPJ2PVc64EQ6FoOnYvxEZ9pB9xBKTdm2jG2gkboPh/URDkeMrXA==
-X-Gm-Gg: ASbGncstP1oLR8XzLBu10cO0EIgK/pNERllgnRnhoSZ+BgL+EQ+Cw7tL2tMYOasyWq9
-	SmVoiBXcjq3OpKQufGg3+XAOn/472OoYqDwgVZuNnZNJvjgCdCuhjqKgqNPt09TTVpYJ9OgFh0y
-	HuBdDOzIlpYjbjeP7tzijbVIKJo85mO/U/cTUWIsZjZDHnc7XXWmaZDeHKzbAXXnxOQYZH/YAkO
-	193be07oUJ7/r9QxhYL9iypWuXHEWcK2inFTG1LpQiNCR5R8XQlnHxBAtTwyrZZ/qGTCZDfn/cn
-	FNRw2YcP3DDuacLZhpiC0JcBkg/wkyUccWLRTIV4sSpSV5Yooi+eSvpbSCf1eFP0w+gTAai7KHo
-	4LQ4f7hy9dIvZr9pNv3Udpg+sDkN5+J4Mv/OaPJKtXNJuIDw4g2FkC43e2gI0WSA1I+cb1ALazI
-	JvG/FaBTSEAHzZRDvON0cVbd28s1XoIdKfC/va
-X-Google-Smtp-Source: AGHT+IGOy69p9M6Jz6Mkzq8eaflD/U8wmvlvaJu0hkGofGNsbToyuN5EELyfS2lAWWt4IMDVzBhQ+w==
-X-Received: by 2002:a17:902:f603:b0:25b:fba3:afb5 with SMTP id d9443c01a7336-29088bad815mr18397295ad.11.1760827446063;
-        Sat, 18 Oct 2025 15:44:06 -0700 (PDT)
+        bh=ExoVcTIek9AdjVCMkiYpZILDA0YvBh98/+0VTxUThlI=;
+        b=XNFpHx2sqfUZmMA1XQTVGJyJrETpGLGHF3ccl1UenCR1yP7T4LLOpsWEVW4mdPhQqm
+         2shVH7WKatgRemwtrlci3Br2t2IaQzciGi7/UIeeHkcBVumiTW3+HJAvzXAfSlyyOEm0
+         1XpS6ge3VGb1+w7O0VB56EXjVzPjMIRhlmJ1iSN8S5+8Gza9JshsNDQ3rm1foNAn7p/x
+         RiYbX3WkLn1y+2QVK0rM00b1dnGDSLpqvsCzf0mhyMfHW4UJJz7d6x+7O145q7mOClh0
+         /FNxl/HMDO/7Lv1itSuTQZVP1FMif2zj/qPflaC/cQD7DOTUDzvlhkp1gBj1E0t2W9DN
+         tbDQ==
+X-Forwarded-Encrypted: i=1; AJvYcCXZNjMQ2+1BHCJ2wiI2nf5vqcbrzP5Nq43yuZ9i1OrBZfEw3593SjCqKKMFJcyHmrBa5Z4=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yx35dE+LiEwkYJLyUFw3oaHDWXHwro8ARbroVeos0/Pv8Yqsckj
+	UNJVhiDoQAd+CgX1WswU7MG6DdBe5Xi8euh4WS8ChJay1c04DvrZdxAZZ0ZKu0EJ9g==
+X-Gm-Gg: ASbGncufoJstjgq5GgVsAFaY2rSB3rH0cibB8LB/pVvDqj0DyTJCRfRo2ryxXYTZTXc
+	Ob0j6O51wcPGQvGb2EkeHG955Pm9RU1I5LeeUDHhqm2ouXIek/zgmZDosTyuUdONnkXhLQJ1hcX
+	ByN/k1jD1Nb7VnGOGxAEsy/lRQ9o/tc7D7zXbAo7RdrxQ0oJdCb2y2a4AA1tYOrhSwIgMcj/vCR
+	eLii4Gwm3Cj8h/BBjz8YgUMqVW83mMf65hxif4xmZVBYx33cfMm1JGBlmJ3sz63leFLYGJh1nIH
+	8RhMQihKk4Gy1aLN8X6ieX/F8W70+ZKbVb5DAXa75RCD+AKTxJvunh3lRz9kJcn74/c+hMUXWCL
+	KTmyr3U+jgOdoCUfKsOZtsNObfUy1hifwSSS0Go0doh6jnkbhX47pKverzVgjq7Y7x/S07Klrsg
+	Ycs7mBcy+Lmjat+Zo/1dguUvOTg62CMG/ctmug5MsK2BvnK9c=
+X-Google-Smtp-Source: AGHT+IHYSWZKJqORVU2MlERhdd7pLQTU+bgumM/RJ5rxntS44MT/2pojFpL/YQ8TyquwryI9b7dpMA==
+X-Received: by 2002:a17:903:380d:b0:26a:befc:e7e1 with SMTP id d9443c01a7336-29087a1668emr19722635ad.12.1760827994094;
+        Sat, 18 Oct 2025 15:53:14 -0700 (PDT)
 Received: from google.com (176.13.105.34.bc.googleusercontent.com. [34.105.13.176])
-        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-33d5de3295dsm3597111a91.15.2025.10.18.15.44.05
+        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-b6a834de75bsm1268723a12.12.2025.10.18.15.53.13
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 18 Oct 2025 15:44:05 -0700 (PDT)
-Date: Sat, 18 Oct 2025 15:44:01 -0700
+        Sat, 18 Oct 2025 15:53:13 -0700 (PDT)
+Date: Sat, 18 Oct 2025 15:53:09 -0700
 From: Vipin Sharma <vipinsh@google.com>
-To: Lukas Wunner <lukas@wunner.de>
+To: Jason Gunthorpe <jgg@ziepe.ca>
 Cc: bhelgaas@google.com, alex.williamson@redhat.com,
-	pasha.tatashin@soleen.com, dmatlack@google.com, jgg@ziepe.ca,
-	graf@amazon.com, pratyush@kernel.org, gregkh@linuxfoundation.org,
-	chrisl@kernel.org, rppt@kernel.org, skhawaja@google.com,
-	parav@nvidia.com, saeedm@nvidia.com, kevin.tian@intel.com,
-	jrhilke@google.com, david@redhat.com, jgowans@amazon.com,
-	dwmw2@infradead.org, epetron@amazon.de, junaids@google.com,
-	linux-kernel@vger.kernel.org, linux-pci@vger.kernel.org,
-	kvm@vger.kernel.org, linux-kselftest@vger.kernel.org
-Subject: Re: [RFC PATCH 16/21] vfio/pci: Save and restore the PCI state of
- the VFIO device
-Message-ID: <20251018224401.GE1034710.vipinsh@google.com>
+	pasha.tatashin@soleen.com, dmatlack@google.com, graf@amazon.com,
+	pratyush@kernel.org, gregkh@linuxfoundation.org, chrisl@kernel.org,
+	rppt@kernel.org, skhawaja@google.com, parav@nvidia.com,
+	saeedm@nvidia.com, kevin.tian@intel.com, jrhilke@google.com,
+	david@redhat.com, jgowans@amazon.com, dwmw2@infradead.org,
+	epetron@amazon.de, junaids@google.com, linux-kernel@vger.kernel.org,
+	linux-pci@vger.kernel.org, kvm@vger.kernel.org,
+	linux-kselftest@vger.kernel.org
+Subject: Re: [RFC PATCH 00/21] VFIO live update support
+Message-ID: <20251018225309.GF1034710.vipinsh@google.com>
 References: <20251018000713.677779-1-vipinsh@google.com>
- <20251018000713.677779-17-vipinsh@google.com>
- <aPNA6q-i2GWTl0-A@wunner.de>
+ <20251018172130.GQ3938986@ziepe.ca>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -99,42 +97,29 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <aPNA6q-i2GWTl0-A@wunner.de>
+In-Reply-To: <20251018172130.GQ3938986@ziepe.ca>
 
-On 2025-10-18 09:25:30, Lukas Wunner wrote:
-> On Fri, Oct 17, 2025 at 05:07:08PM -0700, Vipin Sharma wrote:
-> > Save and restore the PCI state of the VFIO device which in the normal
-> > flow is recorded by VFIO when the device FD is opened for the first time
-> > and then reapplied to PCI device when the last opened device FD is
-> > closed.
-> > 
-> > Introduce "_ser" version of the struct pci_saved_state{} and struct
-> > pci_cap_saved_data{} to serialized saved PCI state for liveupdate. Store
-> > PCI state in VFIO in a separate folio as the size is indeterministic at
-> > build time to reserve space in struct vfio_pci_core_device_ser{}.
+On 2025-10-18 14:21:30, Jason Gunthorpe wrote:
+> On Fri, Oct 17, 2025 at 05:06:52PM -0700, Vipin Sharma wrote:
+> > 2. Integration with IOMMUFD and PCI series for complete workflow where a
+> >    device continues a DMA while undergoing through live update.
 > 
-> Unfortunately this commit message is of the type "summarize the code
-> changes without explaining the reason for these changes".
-> 
-> Comparing the pci_saved_state_ser and pci_cap_saved_data_ser structs
-> which you're introducing here with the existing pci_saved_state and
-> pci_cap_saved_data structs, the only difference seems to be that
-> you're adding __packed to your new structs.  Is that all?  Is that
-> the only reason why these structs need to be duplicated?  Maybe
-> it would make more sense to add __packed to the existing structs,
-> though the gain seems minimal.
-> 
+> It is a bit confusing, this series has PCI components so how does it
+> relate the PCI series? Is this self contained for at least limited PCI
+> topologies?
 
-It allows (in future) to build more validation and compatibility between
-layout changes of struct across kernel version. We can add more fields
-in the *_ser version which can act as metadata to support in
-deserialization.
+This series has very minimal PCI support. For example, it is skipping
+DMA disable on the VFIO PCI device during kexec reboot and saving initial PCI
+state during first open (bind) of the device.
 
-I do agree in the current form (with the assumption of no layout
-changes) we can get away with using the existing structs. I also think
-this should be taken care by PCI series instead of VFIO series.
+We do need proper PCI support, few examples:
 
-Lets see what others also think, I am open to not adding these *_ser
-structs if we should wait for a proper support for struct serialization
-and work under assumption that these won't change.
+- Not disabling DMA bit on bridges upstream of the leaf VFIO PCI device node. 
+- Not writing to PCI config during device enumeration.
+- Not autobinding devices to their default driver. My testing works on
+  devices which don't have driver bulit in the kernel so there is no
+  probing by other drivers.
+- PCI enable and disable calls support.
+
+These things I think should be solved in PCI series.
 
