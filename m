@@ -1,31 +1,31 @@
-Return-Path: <kvm+bounces-60437-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-60438-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6903EBEC91E
-	for <lists+kvm@lfdr.de>; Sat, 18 Oct 2025 09:17:49 +0200 (CEST)
+Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [IPv6:2a01:60a::1994:3:14])
+	by mail.lfdr.de (Postfix) with ESMTPS id A3880BEC948
+	for <lists+kvm@lfdr.de>; Sat, 18 Oct 2025 09:25:44 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id AA8AB40458F
-	for <lists+kvm@lfdr.de>; Sat, 18 Oct 2025 07:17:46 +0000 (UTC)
+	by ams.mirrors.kernel.org (Postfix) with ESMTPS id B39CC3502C6
+	for <lists+kvm@lfdr.de>; Sat, 18 Oct 2025 07:25:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 93D5A28724D;
-	Sat, 18 Oct 2025 07:17:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B4F562874FB;
+	Sat, 18 Oct 2025 07:25:34 +0000 (UTC)
 X-Original-To: kvm@vger.kernel.org
 Received: from bmailout2.hostsharing.net (bmailout2.hostsharing.net [83.223.78.240])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 461AA208D0;
-	Sat, 18 Oct 2025 07:17:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 50ABD21638D;
+	Sat, 18 Oct 2025 07:25:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=83.223.78.240
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1760771858; cv=none; b=bf33l8JuY7EaJoNXp/8Im2G5iLy8kzn3hOhuLjZCHkCeNIV5oFvke0mZShTFdMsUr9n4BEOAelDcofxyvPszFOFclhdbvZGC1OrZt+ZwJWmP+3+KAn05lvKC2aS3nAraF+R0LVc1uhymNXpBsXeT3UChwU7egrF4G5H5LXp0fBw=
+	t=1760772334; cv=none; b=Uhsl3ud44Wva4tyO+2VksR/sCndUQgpk+qiYwnl5eFsifpwMS9QVqV8ouOzvQePHZE47QWk4OjOdfFEtD5D0wYzyuHQTBqN86Nw0wGya5u+w+qNtGeUWD2p4svNQMMjHA87GN6KrdLCNdey9thM0s0Ga89O/WDORWYq3ofQGAqg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1760771858; c=relaxed/simple;
-	bh=1MOfBRHdignkMg8DmwHGBZTfV50Sxp7xsjmSXPeUrQk=;
+	s=arc-20240116; t=1760772334; c=relaxed/simple;
+	bh=XDiBP8Fuj3d5Tfbxqxx+Fleg1DmKibLl/hZGEiRDXCM=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=OoaA4R6DE0pN9/nMaA3+tGoxhGGfreSJjyeg1ELR1frZKTPkBRaHRBneY4GQJ9N8LcwKxdw/ogRDyfX02SGRK22rhSsiqAkWUvYir4fme/C2+VoaNGJKyTYgtm1ey/kwy2gLHYYqK4QOYBNSjpjnpto8hDOIe6mN3jDvmYD9PfU=
+	 Content-Type:Content-Disposition:In-Reply-To; b=Ro1/JYI7kAfyrEc2856bamtvMRzfBN4GzskgLy7AI2U4WrAF8z1FxSSMlJOk/Z0u3cMOh1W9dZ2Es35E2h4C6d49aWOmih+1D8RvFmxq0xJETioohrr4X4mHMj4hK8pEdsZJ8lB0tKBmhoht7PBGwwBruK8IJtTxHKFOgOtfkcY=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=wunner.de; spf=none smtp.mailfrom=h08.hostsharing.net; arc=none smtp.client-ip=83.223.78.240
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=wunner.de
 Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=h08.hostsharing.net
@@ -34,11 +34,11 @@ Received: from h08.hostsharing.net (h08.hostsharing.net [IPv6:2a01:37:1000::53df
 	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256
 	 client-signature RSA-PSS (4096 bits) client-digest SHA256)
 	(Client CN "*.hostsharing.net", Issuer "RapidSSL TLS RSA CA G1" (verified OK))
-	by bmailout2.hostsharing.net (Postfix) with ESMTPS id 902302006F45;
-	Sat, 18 Oct 2025 09:17:33 +0200 (CEST)
+	by bmailout2.hostsharing.net (Postfix) with ESMTPS id BCB6F200C2CC;
+	Sat, 18 Oct 2025 09:25:30 +0200 (CEST)
 Received: by h08.hostsharing.net (Postfix, from userid 100393)
-	id 88C6C4A12; Sat, 18 Oct 2025 09:17:33 +0200 (CEST)
-Date: Sat, 18 Oct 2025 09:17:33 +0200
+	id A6D4B4A12; Sat, 18 Oct 2025 09:25:30 +0200 (CEST)
+Date: Sat, 18 Oct 2025 09:25:30 +0200
 From: Lukas Wunner <lukas@wunner.de>
 To: Vipin Sharma <vipinsh@google.com>
 Cc: bhelgaas@google.com, alex.williamson@redhat.com,
@@ -50,11 +50,11 @@ Cc: bhelgaas@google.com, alex.williamson@redhat.com,
 	dwmw2@infradead.org, epetron@amazon.de, junaids@google.com,
 	linux-kernel@vger.kernel.org, linux-pci@vger.kernel.org,
 	kvm@vger.kernel.org, linux-kselftest@vger.kernel.org
-Subject: Re: [RFC PATCH 15/21] PCI: Make PCI saved state and capability
- structs public
-Message-ID: <aPM_DUyyH1KaOerU@wunner.de>
+Subject: Re: [RFC PATCH 16/21] vfio/pci: Save and restore the PCI state of
+ the VFIO device
+Message-ID: <aPNA6q-i2GWTl0-A@wunner.de>
 References: <20251018000713.677779-1-vipinsh@google.com>
- <20251018000713.677779-16-vipinsh@google.com>
+ <20251018000713.677779-17-vipinsh@google.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -63,20 +63,29 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20251018000713.677779-16-vipinsh@google.com>
+In-Reply-To: <20251018000713.677779-17-vipinsh@google.com>
 
-On Fri, Oct 17, 2025 at 05:07:07PM -0700, Vipin Sharma wrote:
-> Move struct pci_saved_state{} and struct pci_cap_saved_data{} to
-> linux/pci.h so that they are available to code outside of the PCI core.
+On Fri, Oct 17, 2025 at 05:07:08PM -0700, Vipin Sharma wrote:
+> Save and restore the PCI state of the VFIO device which in the normal
+> flow is recorded by VFIO when the device FD is opened for the first time
+> and then reapplied to PCI device when the last opened device FD is
+> closed.
 > 
-> These structs will be used in subsequent commits to serialize and
-> deserialize PCI state across Live Update.
+> Introduce "_ser" version of the struct pci_saved_state{} and struct
+> pci_cap_saved_data{} to serialized saved PCI state for liveupdate. Store
+> PCI state in VFIO in a separate folio as the size is indeterministic at
+> build time to reserve space in struct vfio_pci_core_device_ser{}.
 
-That's not sufficient as a justification to make these public in my view.
+Unfortunately this commit message is of the type "summarize the code
+changes without explaining the reason for these changes".
 
-There are already pci_store_saved_state() and pci_load_saved_state()
-helpers to serialize PCI state.  Why do you need anything more?
-(Honest question.)
+Comparing the pci_saved_state_ser and pci_cap_saved_data_ser structs
+which you're introducing here with the existing pci_saved_state and
+pci_cap_saved_data structs, the only difference seems to be that
+you're adding __packed to your new structs.  Is that all?  Is that
+the only reason why these structs need to be duplicated?  Maybe
+it would make more sense to add __packed to the existing structs,
+though the gain seems minimal.
 
 Thanks,
 
