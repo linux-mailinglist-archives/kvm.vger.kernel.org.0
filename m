@@ -1,385 +1,321 @@
-Return-Path: <kvm+bounces-60408-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-60409-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1BCC4BEC07B
-	for <lists+kvm@lfdr.de>; Sat, 18 Oct 2025 01:41:14 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 905EFBEC163
+	for <lists+kvm@lfdr.de>; Sat, 18 Oct 2025 02:07:35 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id F3EF34EBBA9
-	for <lists+kvm@lfdr.de>; Fri, 17 Oct 2025 23:41:12 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 5A3174F349A
+	for <lists+kvm@lfdr.de>; Sat, 18 Oct 2025 00:07:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4D7E9311592;
-	Fri, 17 Oct 2025 23:40:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CDDA64A1A;
+	Sat, 18 Oct 2025 00:07:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="g8j4QTMo"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="hoV2gUxB"
 X-Original-To: kvm@vger.kernel.org
-Received: from CH5PR02CU005.outbound.protection.outlook.com (mail-northcentralusazon11012035.outbound.protection.outlook.com [40.107.200.35])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f202.google.com (mail-pl1-f202.google.com [209.85.214.202])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8F7282C0F7C;
-	Fri, 17 Oct 2025 23:40:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.200.35
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1760744456; cv=fail; b=gFwmPIOcxKEbMjeaD9+dyw9qHfCDkoj29UQZD8/zW7jpFpwQwn51BIkwQ2LLYVYBeTfP+UgbVTFv2s3sL+qv/uUtg38tr+5JDUHwACqCGFj6PCWnQWT2rDjLXsPsDXsZFywYBTXFtlr6Las7Aj+mhafIKie9BQDAVofkZHWEm5c=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1760744456; c=relaxed/simple;
-	bh=GHTYJpsO+98kdAZ3yMJuVQitawPkn/A+yZKikuvsgpQ=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:Content-Type:
-	 Content-Disposition:In-Reply-To:MIME-Version; b=STDagcIOWDgLtBGth8XO939yGnbsprOW7U0m51Mor/2g0CV8FQE7xCWhFRgI4MyfiSBjsNOzHJ3m/tHOUlOdl85cKb7VVufyLuSgZOsKX3LH0aTi+kT0WtG8KZ1os6GBN6lF4ocPsB9qdmgrxYONxyKvOm4XO4L97+BeiLCj8Ro=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=g8j4QTMo; arc=fail smtp.client-ip=40.107.200.35
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=nWyKZ1s3bB0z0F46+QVf0NLcVvEYxEMjmah3vJxbvcnIufF6RuyUPRU7Ax2oBqPD/avzg2wtq/ILD3EX18dVKHWSBN5BLCI6YykV2tiX2QHNBqWWmyOO/oc/9yL/DbOeigCf1IFSxQZL2QvugYqcXVWveBHiAedwlJ0a4PtMk7A6zlYrWAjKjsZ0qkuFx5APCXQrEV1/ArnkLAtuIDsHxDgJ8ilSEj8uwlKDgjRsRYw71ZUDEHfpYom0A1RQk5rpHhDImuvthtJ9i4MdbRf4hpBNgekl+3PmCb1Gsj/wxQUddpSoGvpoo5C7k5c0nqP0tW4X8THLrYoNOvK0DZcOKA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=b4uhacFgjnegt4IZUWAQcIlzyMCEyF1jTEN6paSmLLU=;
- b=AVNXWMQ1BWkXcVgkkZf0e9gtqv0HTDfkJCQ7KdxBFxHczkaQ9tpsfx8an+j113flA6TyD6SeUm6dMa5A7cK7HCHg0cNVmrsEUMoiYQr0JqcKCCYRNgLAFrIDzOuqYlZ4IZYHHjGIF1bLVSKDFRwYuLCEoiMY28CuqW5hvtXHad9zEXrfdrHUdRs6f7u02HR0e4kusXcA/eJzHRzlW4p1P/rDCtI2xDk9mAzxaWMjE2J5FEki0xv1VR1/23eeA5yYmVURGCk7w2OYV4OH2x438+dwIx/xpywvqF787F2TNZJFQC8jDKpZhXIer8SDVOEDXzi9Dny+p7f9nhZ39fd+WA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
- dkim=pass header.d=nvidia.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=b4uhacFgjnegt4IZUWAQcIlzyMCEyF1jTEN6paSmLLU=;
- b=g8j4QTMoXfIWXxAr8RPV7UvFrDSLIRbq2HwDgjNE4tZ9xoANKxUrc8jO6EDodHJ2NhkBv+ITDiounC+wnwlbzoMHPQoYanNZbuajpTyYbk5QqCWF0rRW1bN+1JeSx+/8hjujAWFfFm3ZxNS1HZdEkhEG9dUwxZ7C0krAEIVQa7JalBwtyHmbEpOG6Ij1YaobMVAVa/tDRyFS/O1PbsqiM1QAUrxAMh5Ixs/abK4y34qgIL60BkVrYF3yQ64a8XI0Z9Tun/B3F4O7Sg6timo3QqvVkoW/TIeIfU7dj2LPHPe4OW+yvpwws0o0+B3o72f6aFZ0BGVR/he+pYJKzLm5HQ==
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nvidia.com;
-Received: from MN2PR12MB3613.namprd12.prod.outlook.com (2603:10b6:208:c1::17)
- by PH7PR12MB8014.namprd12.prod.outlook.com (2603:10b6:510:27c::19) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9228.12; Fri, 17 Oct
- 2025 23:40:50 +0000
-Received: from MN2PR12MB3613.namprd12.prod.outlook.com
- ([fe80::1b3b:64f5:9211:608b]) by MN2PR12MB3613.namprd12.prod.outlook.com
- ([fe80::1b3b:64f5:9211:608b%4]) with mapi id 15.20.9228.010; Fri, 17 Oct 2025
- 23:40:50 +0000
-Date: Fri, 17 Oct 2025 20:40:48 -0300
-From: Jason Gunthorpe <jgg@nvidia.com>
-To: Leon Romanovsky <leon@kernel.org>
-Cc: Alex Williamson <alex.williamson@redhat.com>,
-	Leon Romanovsky <leonro@nvidia.com>,
-	Andrew Morton <akpm@linux-foundation.org>,
-	Bjorn Helgaas <bhelgaas@google.com>,
-	Christian =?utf-8?B?S8O2bmln?= <christian.koenig@amd.com>,
-	dri-devel@lists.freedesktop.org, iommu@lists.linux.dev,
-	Jens Axboe <axboe@kernel.dk>, Joerg Roedel <joro@8bytes.org>,
-	kvm@vger.kernel.org, linaro-mm-sig@lists.linaro.org,
-	linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-media@vger.kernel.org, linux-mm@kvack.org,
-	linux-pci@vger.kernel.org, Logan Gunthorpe <logang@deltatee.com>,
-	Marek Szyprowski <m.szyprowski@samsung.com>,
-	Robin Murphy <robin.murphy@arm.com>,
-	Sumit Semwal <sumit.semwal@linaro.org>,
-	Vivek Kasireddy <vivek.kasireddy@intel.com>,
-	Will Deacon <will@kernel.org>
-Subject: Re: [PATCH v5 9/9] vfio/pci: Add dma-buf export support for MMIO
- regions
-Message-ID: <20251017234048.GA344394@nvidia.com>
-References: <cover.1760368250.git.leon@kernel.org>
- <72ecaa13864ca346797e342d23a7929562788148.1760368250.git.leon@kernel.org>
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <72ecaa13864ca346797e342d23a7929562788148.1760368250.git.leon@kernel.org>
-X-ClientProxiedBy: BLAPR05CA0029.namprd05.prod.outlook.com
- (2603:10b6:208:335::10) To MN2PR12MB3613.namprd12.prod.outlook.com
- (2603:10b6:208:c1::17)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6E3503C38
+	for <kvm@vger.kernel.org>; Sat, 18 Oct 2025 00:07:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.202
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1760746047; cv=none; b=ShdDRkZGWZmGh/HO+fjjc9Y3rMB+hzmi8tOeQSoXzdVWWM7lEf+SEnhM1Fklm3c5GGLBI5c0uGrnMWZcgBngGvs9NeR6ObPkdd9Y3FaB+Tx1pFaoE4P1kIiDhNr90RMCy2U7x46yKtz4AlvSumTkj0j7wfrPtSm43TRLJL0AHAQ=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1760746047; c=relaxed/simple;
+	bh=JsF3pCaJNrsPpYhzB/cGCKrK/cKCLDnGL/lBx/nc630=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=IDgZraI1+tNbmU7Q/ceuLsIIyKIrjABKFo347Ip0JTdDNyl7Y5UaFPuRceQAekHl/arF1yRcw4yfva2qdNbAb/Rmje1qkcj+T0k8ZzZNwCgg2a+UPnZjL2Fxv0gFXc8iqs3c9tZHki+j74LJBEZbE1R1UAse9BpsQ7G4ZUaCxBg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--vipinsh.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=hoV2gUxB; arc=none smtp.client-ip=209.85.214.202
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--vipinsh.bounces.google.com
+Received: by mail-pl1-f202.google.com with SMTP id d9443c01a7336-2697410e7f9so62950565ad.2
+        for <kvm@vger.kernel.org>; Fri, 17 Oct 2025 17:07:24 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1760746044; x=1761350844; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=6pRYEHJAtcQPB4+ypf1OfjNx0LJ2Hfu10ud0VIrmLZk=;
+        b=hoV2gUxB/Tq00vzPq5qvHOuDzy4m68EzFsjRfrczKavQL7xGQ1jB2SmrH4W51io6wc
+         N13/aRtoQi73KkUb4sp8noHtTpYcgDXTaUomPbev7WBYr3EGonmSZHNW018S7VAPMCdQ
+         ZDOTscxyKjlJfT5wv24bRSAHbLMszwC2m8+3rUpIKO/AyQdCc1nWjz7ZpjPgpcVJHrO8
+         zZru4d183qu9rS8XZzu6sr6enFYRejW9ZGBxGEOUtuxeTEwlZUwdkpN9lG7HXi3fZjo2
+         9GlenWrMRC9SrST2LT/G1XnxFXz59A+TlOj00GnPLdJKnvZ4z9nZ0APzTqRHbsRfSmvB
+         AMvQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1760746044; x=1761350844;
+        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=6pRYEHJAtcQPB4+ypf1OfjNx0LJ2Hfu10ud0VIrmLZk=;
+        b=Qn3xKZK3Hznjqh2bmsQedDQ9AO3ooc77qWs0oc5osODwXAcNAWt3VLbxhn4xUp/RIr
+         WFP+3I30oiH3FO+FFthJGdZAIk2qrApoKPK8DoZ+dHeXPq9EHLONX/VnXTtWtGvLlcT/
+         WieSLwLzDLG+8taIIfNz4dgEPemIg7tYAghBne2e1hWy//D/eL2Jlr3YUpgHKAwuN617
+         /OotxHCCl6RUJIX5bJ5ZTfGi9A1YA+5mVHQQ5ZED9ntsuPssvf14KoNQChSkjPNq7gSY
+         K3gpQuqwHVWSId/oiHSPq2+azeJM80KNKb+GGs/JVBq9cTTdJRAOarymNWNde3DHUSCe
+         /wHA==
+X-Forwarded-Encrypted: i=1; AJvYcCUHX8BHL3Lz2Q91nLsNZf9yFNEE32Ur3SLqadzr+rW+6P2CO6NbaJpkK9V6nmtpSufENkM=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzZwDPoJgjY4/Sgrgeyj1RYQTtLLCgNCkJvgudm5zSz3QaJNxnc
+	atOY4GyUUCdADsKK7di2bEiHkEFlcxtLuZX1+sVuHWoGQ7JYZJ0gFxhoI5J0q+P4w2pVGIAz2p7
+	Nk1nMsCm9+Q==
+X-Google-Smtp-Source: AGHT+IE4sqzg7x9pdj/gU+/lFXsDmRAAlwvYzmvAHj/tmhxjrwOvAMwjo98m7QZ00QqFFxAX1FacQ9WT8yT5
+X-Received: from pjbhg4.prod.google.com ([2002:a17:90b:3004:b0:33b:c15c:f245])
+ (user=vipinsh job=prod-delivery.src-stubby-dispatcher) by 2002:a17:902:ecc8:b0:290:c516:8c53
+ with SMTP id d9443c01a7336-290caf831d8mr69996655ad.40.1760746043781; Fri, 17
+ Oct 2025 17:07:23 -0700 (PDT)
+Date: Fri, 17 Oct 2025 17:06:52 -0700
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: MN2PR12MB3613:EE_|PH7PR12MB8014:EE_
-X-MS-Office365-Filtering-Correlation-Id: 7335667a-b140-4946-7537-08de0dd69a85
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230040|1800799024|376014|7416014|366016;
-X-Microsoft-Antispam-Message-Info:
-	=?us-ascii?Q?u0relGhU7zo5CxgW8Hmj8Pp97LthOAW6M/oMhEQwGA0XLFLLH9yt+YChMDp9?=
- =?us-ascii?Q?k7PmSKNuEnKdh9EmB8dSuZIFg5+jw+Ko4lVNh7IpjQ3j/bHAf+MST5say2lj?=
- =?us-ascii?Q?oES5rOUTtoXTKbkH0POtG162aXcX+Pf4OPwcyzadNZLCspKCQBaIQOdyi5Kn?=
- =?us-ascii?Q?KE9kb2TofxkfsDrQFB5aMSTl9GZOTl7f5QwUt5cxc8fwghdQfitRctf3fSgq?=
- =?us-ascii?Q?ZrICN3ytfzIrnJwRcS2CJVfCG38y/dq3R+21nUYa7JrG4r3znXQoDSrw0Fy1?=
- =?us-ascii?Q?gIo0lGia8UIZKSPoO7T9xa+CCOfHFvr8+09e8fbTZqtL9nVPLs1OsnfGYvtU?=
- =?us-ascii?Q?vWd+MEGJxlNGHNDLUZnp11AJWxKeiad6l+GqDDe5uodqYXGzuTDpMEcezLiM?=
- =?us-ascii?Q?zJGbm2l5HrWDe2PzfEH0apraY90nMoBWfohmbogiJ/yMmRr21IaVTnMevBcA?=
- =?us-ascii?Q?DCBzC50t0GeFsv4ZxXLT9wfKQbaVC7zU9nIGFZpnZ6Va5ZG8c4PXqlGqh8Mi?=
- =?us-ascii?Q?VvzcRx0CO5fyqZ/5wmM3QO05NyKw7r4Ueb/nytdN1eTtZwgR7ZNF8RdFr7Fy?=
- =?us-ascii?Q?alaJQN0m2jSfep/sUk7P4eek14tDPTS929iAr73q0OZlB4EpF34x9+GejhFj?=
- =?us-ascii?Q?d6qbNHKwXrhDvYB5y2FNtlRn8vXku9PZ25fk12MgsEPOPcF73FMP+24lad7C?=
- =?us-ascii?Q?6B+at16Q774h1mVvmJqKN1jrFHiMi7RMdv4NsvHZLUskjr+NytZvp0aIpL34?=
- =?us-ascii?Q?iRrQ0n8YneNgKSI1lm5Dt5heIN/5OuQA0PDxRVmouhTlODKyfTabtA2+V6hS?=
- =?us-ascii?Q?YPcdKRJCxrUi1PRfc0OetmopBR+GhbO3VDflsVoMTArt0RI2+tXL8rUQkxzl?=
- =?us-ascii?Q?Obf1iwdqwMbPTTT0AvnVty0fAzNc6ESxXwBDhSZXLgOB08FLiQLhIi+RO1OP?=
- =?us-ascii?Q?qSUX4CdMXKdclpCiHOTDKPBDzCERxjlBV3QxfmexrV20Z1K5zbSlke/ZScKw?=
- =?us-ascii?Q?posStlWPFEIgg98BlF9J/DktlA94LXkJvjR8Ko+Pe3niVhtIuZ1YgNBjBKBP?=
- =?us-ascii?Q?r2cDsSAcFPP59NPONDuEgKoNWXp7PiuHzBxOWzi8rN085I8sKE9+PeV6IfWe?=
- =?us-ascii?Q?2k6+odGXzlDx/7nivFPPfyxjK2ymRFZWQaABLieiVfght0Kgd4ilLDdfamgI?=
- =?us-ascii?Q?/H5Gckjj6bmhZ9DlpZ5iaGfgRFKrr2buvlcB6x+T5O8bMhCqY5vbSuS88DYb?=
- =?us-ascii?Q?q0VQqSErVwlrPWXVmPxdAlHGS6RVSh6Ahk4HlbjKxUjEPvUJta9X3/fNqOEy?=
- =?us-ascii?Q?0LC1ycDYoPYd+nx5Ff+rXLRMVwfvGfB5I9r4KkRPEtaPBuuFVBv+cngY5WQl?=
- =?us-ascii?Q?yaf9Xs4fiHoKIhRASPV/gujOriKwqQSnnFqFOMnAg9FjOghxuyFGNcSS5S7b?=
- =?us-ascii?Q?nGd+urVHWc/7nXw7PPJbcuLJHXpgs5EN?=
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:MN2PR12MB3613.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(376014)(7416014)(366016);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?us-ascii?Q?lEKTsYBIWNQ1VK+ABzHCZq4PcJePgOb3GTYPsGep6USPvz0/ZI8KtiScqvsI?=
- =?us-ascii?Q?oJHeiBaqiC8XITleJKi96ULY8UeTujrFM0DLe0iZqieIpLqNGQ27ZcVd/UCc?=
- =?us-ascii?Q?DOj0t0fhTFWaoZXpZbjkU+DmHopxKspG0hHFhVubcibFsQQCkXcLGT/4gBpf?=
- =?us-ascii?Q?8tMuelozRH2dPYHI6gjvmnAeY8XVQkVOtZ8yKwl87eTv0VbqWtccgzJZbJdx?=
- =?us-ascii?Q?u3MXbP5vrQCx/nXGIowc1hoqy5AyLrLSTcrApmnD/BPikqX78CovqJ+LjOtk?=
- =?us-ascii?Q?vy5PP7igu7uRgB2GgydAZ3GgmJdwDyYKGLO228qmCaQT8pzTud2VtiConCxa?=
- =?us-ascii?Q?HSPvIsGPn64cLulRsLQ2rzGJsy7yMM3QX37p3wK2S8Xz8ssLyXYyMTPfzI42?=
- =?us-ascii?Q?xtl2NWskoiEHLdLwD5lkkMx4XaJvJgEOYkFdv6e0naAa8dsmg2O9CzaaWdyx?=
- =?us-ascii?Q?ZSR095GIbm2E9nE8t/rhfSYxjr7zDI87gWMWph/95VOBM0uW4vhphsSlruj1?=
- =?us-ascii?Q?o1vfKcwE005l96Vg4KnMgn9utyCbQEO3LnPeUNJAreo7Ymqi48NsPjCm3Fbi?=
- =?us-ascii?Q?VbIQyeMjQuCikVmZ0Zng7oJbzqMId0j4dzoolVe1Y5maDakky5OBd+2bhMN5?=
- =?us-ascii?Q?CTCgyuNZO15zOGxteauy8xmJNUV+5iyVlBrhS4Pv2zX9JZWNlVdcvYsXk/VK?=
- =?us-ascii?Q?DB5TrUzrKKqsJfGpVLcIGWe61bmcA0e5epaTuwIaKBWI/ndI4oIM8ETM8IfJ?=
- =?us-ascii?Q?1dejEw5Ml5H1MlSqd4eV+Vyz4wOrtY7a/B4nRQNpbvjQV6NAYHBy7pU4Oq6W?=
- =?us-ascii?Q?eIIL3bzElx5Zsjjmgn45KwywtInYskv1l0Z/3iJ1lwQwXv9SZcJl93pz8ZIy?=
- =?us-ascii?Q?vS7WAxcWfJm2wTC84kTGpsCgrIfmvZbQxtZ4bgvJEcIMn/il2udn0p0HwofY?=
- =?us-ascii?Q?UNexsM4btJq5pTseNF9ZGoivODI0400mu+yKLcqnXeI6//dND/+7AbUMgJav?=
- =?us-ascii?Q?lVwG/WpfBGKQwQo4nDZD5XS6rdG1g7y+2NFxwP7WcpH8jG4VrMxzsrgPnBVX?=
- =?us-ascii?Q?8sIu/y1vGV1taX3lv/M6S3TnuZISk8Y5dhPlsbUgo49bS9yGBX2jDMRXnAyy?=
- =?us-ascii?Q?uODkFeP7tIceoR6Cdy0IwUFKXR5roK++SmXmhxGjIi1eWOJa5RqUdQ3/9opc?=
- =?us-ascii?Q?OMFF3UIAMHZIaQq5E08dbSfKbo8PDRjUXN92vO1aUHx6CWZuxirfO7pROdgT?=
- =?us-ascii?Q?xizXtVAZXGrK6mo/CUyfIwnG6GuSr8zGMEiWs4r6edq1/o3nEeHqeeziQnsH?=
- =?us-ascii?Q?9mCcFHWomf1CiCDaAVR2tWIkOmvGGlcrb9M2p8dHwPBbzx5hU2gRo5d9wTXk?=
- =?us-ascii?Q?T+D83Phu/Fdd+IGWX0CihigwLf9agD9STTrvcvvyo5wfYiKPETj0jMSfipKF?=
- =?us-ascii?Q?RJV6laPh1KfpszCXqf35Kb2U9W3CTQimL2zpECT1I1Rs5Ten7C4LYLD4t6Zm?=
- =?us-ascii?Q?G429yvnas7lg+jf2jpuGZETIyu/h8kjW08lDZZEOVazP087zSQ8hBUZpAIS1?=
- =?us-ascii?Q?o5QIEF3pur0MHcCyJo7+domFgpmNMZPmsJ/mXxI8?=
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 7335667a-b140-4946-7537-08de0dd69a85
-X-MS-Exchange-CrossTenant-AuthSource: MN2PR12MB3613.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 17 Oct 2025 23:40:50.3278
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: mMpK5s2DJZF5w4QR4yzHR0KLISfa5Ht+JQhKpF9zx2leYxaHxXpGj9YzvwEqqdw9
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH7PR12MB8014
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.51.0.858.gf9c4a03a3a-goog
+Message-ID: <20251018000713.677779-1-vipinsh@google.com>
+Subject: [RFC PATCH 00/21] VFIO live update support
+From: Vipin Sharma <vipinsh@google.com>
+To: bhelgaas@google.com, alex.williamson@redhat.com, pasha.tatashin@soleen.com, 
+	dmatlack@google.com, jgg@ziepe.ca, graf@amazon.com
+Cc: pratyush@kernel.org, gregkh@linuxfoundation.org, chrisl@kernel.org, 
+	rppt@kernel.org, skhawaja@google.com, parav@nvidia.com, saeedm@nvidia.com, 
+	kevin.tian@intel.com, jrhilke@google.com, david@redhat.com, 
+	jgowans@amazon.com, dwmw2@infradead.org, epetron@amazon.de, 
+	junaids@google.com, linux-kernel@vger.kernel.org, linux-pci@vger.kernel.org, 
+	kvm@vger.kernel.org, linux-kselftest@vger.kernel.org, 
+	Vipin Sharma <vipinsh@google.com>
+Content-Type: text/plain; charset="UTF-8"
 
-On Mon, Oct 13, 2025 at 06:26:11PM +0300, Leon Romanovsky wrote:
-> From: Leon Romanovsky <leonro@nvidia.com>
-> 
-> Add support for exporting PCI device MMIO regions through dma-buf,
-> enabling safe sharing of non-struct page memory with controlled
-> lifetime management. This allows RDMA and other subsystems to import
-> dma-buf FDs and build them into memory regions for PCI P2P operations.
+Hello,
 
-I was looking at how to address Alex's note about not all drivers
-being compatible, and how to enable the non-compatible drivers.
+This series adds the live update support in the VFIO PCI subsystem on top of
+Live Update Orchestrator (LUO) [1].
 
-It looks like the simplest thing is to make dma_ranges_to_p2p_phys
-into an ops and have the driver provide it. If not provided the no
-support.
+This series can also be found on GitHub:
 
-Drivers with special needs can fill in phys in their own way and get
-their own provider.
+  https://github.com/shvipin/linux vfio/liveupdate/rfc-v1
 
-Sort of like this:
+Goal of live update in VFIO subsystem is to preserve VFIO PCI devices
+while the host kernel is going through a live update. A preserved device
+means it can continue to work, perform DMA, not get reset while host
+under live update gets rebooted via kexec.
 
-diff --git a/drivers/vfio/pci/vfio_pci.c b/drivers/vfio/pci/vfio_pci.c
-index ac10f14417f2f3..6d41cf26b53994 100644
---- a/drivers/vfio/pci/vfio_pci.c
-+++ b/drivers/vfio/pci/vfio_pci.c
-@@ -147,6 +147,10 @@ static const struct vfio_device_ops vfio_pci_ops = {
- 	.pasid_detach_ioas	= vfio_iommufd_physical_pasid_detach_ioas,
- };
- 
-+static const struct vfio_pci_device_ops vfio_pci_dev_ops = {
-+	.get_dmabuf_phys = vfio_pci_core_get_dmabuf_phys,
-+};
-+
- static int vfio_pci_probe(struct pci_dev *pdev, const struct pci_device_id *id)
- {
- 	struct vfio_pci_core_device *vdev;
-@@ -161,6 +165,7 @@ static int vfio_pci_probe(struct pci_dev *pdev, const struct pci_device_id *id)
- 		return PTR_ERR(vdev);
- 
- 	dev_set_drvdata(&pdev->dev, vdev);
-+	vdev->pci_ops = &vfio_pci_dev_ops;
- 	ret = vfio_pci_core_register_device(vdev);
- 	if (ret)
- 		goto out_put_vdev;
-diff --git a/drivers/vfio/pci/vfio_pci_dmabuf.c b/drivers/vfio/pci/vfio_pci_dmabuf.c
-index 358856e6b8a820..dad880781a9352 100644
---- a/drivers/vfio/pci/vfio_pci_dmabuf.c
-+++ b/drivers/vfio/pci/vfio_pci_dmabuf.c
-@@ -309,47 +309,52 @@ int vfio_pci_dma_buf_iommufd_map(struct dma_buf_attachment *attachment,
- }
- EXPORT_SYMBOL_GPL(vfio_pci_dma_buf_iommufd_map);
- 
--static int dma_ranges_to_p2p_phys(struct vfio_pci_dma_buf *priv,
--				  struct vfio_device_feature_dma_buf *dma_buf,
-+int vfio_pci_core_get_dmabuf_phys(struct vfio_pci_core_device *vdev,
-+				  struct p2pdma_provider **provider,
-+				  unsigned int region_index,
-+				  struct phys_vec *phys_vec,
- 				  struct vfio_region_dma_range *dma_ranges,
--				  struct p2pdma_provider *provider)
-+				  size_t nr_ranges)
- {
--	struct pci_dev *pdev = priv->vdev->pdev;
--	phys_addr_t len = pci_resource_len(pdev, dma_buf->region_index);
-+	struct pci_dev *pdev = vdev->pdev;
-+	phys_addr_t len = pci_resource_len(pdev, region_index);
- 	phys_addr_t pci_start;
- 	phys_addr_t pci_last;
- 	u32 i;
- 
- 	if (!len)
- 		return -EINVAL;
--	pci_start = pci_resource_start(pdev, dma_buf->region_index);
-+
-+	*provider = pcim_p2pdma_provider(pdev, region_index);
-+	if (!*provider)
-+		return -EINVAL;
-+
-+	pci_start = pci_resource_start(pdev, region_index);
- 	pci_last = pci_start + len - 1;
--	for (i = 0; i < dma_buf->nr_ranges; i++) {
-+	for (i = 0; i < nr_ranges; i++) {
- 		phys_addr_t last;
- 
- 		if (!dma_ranges[i].length)
- 			return -EINVAL;
- 
- 		if (check_add_overflow(pci_start, dma_ranges[i].offset,
--				       &priv->phys_vec[i].paddr) ||
--		    check_add_overflow(priv->phys_vec[i].paddr,
-+				       &phys_vec[i].paddr) ||
-+		    check_add_overflow(phys_vec[i].paddr,
- 				       dma_ranges[i].length - 1, &last))
- 			return -EOVERFLOW;
- 		if (last > pci_last)
- 			return -EINVAL;
- 
--		priv->phys_vec[i].len = dma_ranges[i].length;
--		priv->size += priv->phys_vec[i].len;
-+		phys_vec[i].len = dma_ranges[i].length;
- 	}
--	priv->nr_ranges = dma_buf->nr_ranges;
--	priv->provider = provider;
- 	return 0;
- }
-+EXPORT_SYMBOL_GPL(vfio_pci_core_get_dmabuf_phys);
- 
- static int validate_dmabuf_input(struct vfio_pci_core_device *vdev,
- 				 struct vfio_device_feature_dma_buf *dma_buf,
- 				 struct vfio_region_dma_range *dma_ranges,
--				 struct p2pdma_provider **provider)
-+				 size_t *lengthp)
- {
- 	struct pci_dev *pdev = vdev->pdev;
- 	u32 bar = dma_buf->region_index;
-@@ -365,10 +370,6 @@ static int validate_dmabuf_input(struct vfio_pci_core_device *vdev,
- 	if (bar >= VFIO_PCI_ROM_REGION_INDEX)
- 		return -ENODEV;
- 
--	*provider = pcim_p2pdma_provider(pdev, bar);
--	if (!*provider)
--		return -EINVAL;
--
- 	bar_size = pci_resource_len(pdev, bar);
- 	for (i = 0; i < dma_buf->nr_ranges; i++) {
- 		u64 offset = dma_ranges[i].offset;
-@@ -397,6 +398,7 @@ static int validate_dmabuf_input(struct vfio_pci_core_device *vdev,
- 	if (overflows_type(length, size_t) || length & DMA_IOVA_USE_SWIOTLB)
- 		return -EINVAL;
- 
-+	*lengthp = length;
- 	return 0;
- }
- 
-@@ -407,10 +409,13 @@ int vfio_pci_core_feature_dma_buf(struct vfio_pci_core_device *vdev, u32 flags,
- 	struct vfio_device_feature_dma_buf get_dma_buf = {};
- 	struct vfio_region_dma_range *dma_ranges;
- 	DEFINE_DMA_BUF_EXPORT_INFO(exp_info);
--	struct p2pdma_provider *provider;
- 	struct vfio_pci_dma_buf *priv;
-+	size_t length;
- 	int ret;
- 
-+	if (!vdev->pci_ops->get_dmabuf_phys)
-+		return -EOPNOTSUPP;
-+
- 	ret = vfio_check_feature(flags, argsz, VFIO_DEVICE_FEATURE_GET,
- 				 sizeof(get_dma_buf));
- 	if (ret != 1)
-@@ -427,7 +432,7 @@ int vfio_pci_core_feature_dma_buf(struct vfio_pci_core_device *vdev, u32 flags,
- 	if (IS_ERR(dma_ranges))
- 		return PTR_ERR(dma_ranges);
- 
--	ret = validate_dmabuf_input(vdev, &get_dma_buf, dma_ranges, &provider);
-+	ret = validate_dmabuf_input(vdev, &get_dma_buf, dma_ranges, &length);
- 	if (ret)
- 		goto err_free_ranges;
- 
-@@ -444,10 +449,16 @@ int vfio_pci_core_feature_dma_buf(struct vfio_pci_core_device *vdev, u32 flags,
- 	}
- 
- 	priv->vdev = vdev;
--	ret = dma_ranges_to_p2p_phys(priv, &get_dma_buf, dma_ranges, provider);
-+	priv->nr_ranges = get_dma_buf.nr_ranges;
-+	priv->size = length;
-+	ret = vdev->pci_ops->get_dmabuf_phys(vdev, &priv->provider,
-+					     get_dma_buf.region_index,
-+					     priv->phys_vec, dma_ranges,
-+					     priv->nr_ranges);
- 	if (ret)
- 		goto err_free_phys;
- 
-+
- 	kfree(dma_ranges);
- 	dma_ranges = NULL;
- 
-diff --git a/include/linux/vfio_pci_core.h b/include/linux/vfio_pci_core.h
-index 37ce02e30c7632..4ea2095381eb24 100644
---- a/include/linux/vfio_pci_core.h
-+++ b/include/linux/vfio_pci_core.h
-@@ -26,6 +26,7 @@
- 
- struct vfio_pci_core_device;
- struct vfio_pci_region;
-+struct p2pdma_provider;
- 
- struct vfio_pci_regops {
- 	ssize_t (*rw)(struct vfio_pci_core_device *vdev, char __user *buf,
-@@ -49,9 +50,26 @@ struct vfio_pci_region {
- 	u32				flags;
- };
- 
-+struct vfio_pci_device_ops {
-+	int (*get_dmabuf_phys)(struct vfio_pci_core_device *vdev,
-+			       struct p2pdma_provider **provider,
-+			       unsigned int region_index,
-+			       struct phys_vec *phys_vec,
-+			       struct vfio_region_dma_range *dma_ranges,
-+			       size_t nr_ranges);
-+};
-+
-+int vfio_pci_core_get_dmabuf_phys(struct vfio_pci_core_device *vdev,
-+				  struct p2pdma_provider **provider,
-+				  unsigned int region_index,
-+				  struct phys_vec *phys_vec,
-+				  struct vfio_region_dma_range *dma_ranges,
-+				  size_t nr_ranges);
-+
- struct vfio_pci_core_device {
- 	struct vfio_device	vdev;
- 	struct pci_dev		*pdev;
-+	const struct vfio_pci_device_ops *pci_ops;
- 	void __iomem		*barmap[PCI_STD_NUM_BARS];
- 	bool			bar_mmap_supported[PCI_STD_NUM_BARS];
- 	u8			*pci_config_map;
+This series registers VFIO with LUO, implements LUO callbacks, skip DMA
+clear, skip device reset, preserves and restores a device virtual
+config during live update. I have added a selftest towards the end of
+this series, vfio_pci_liveupdate_test, which sets certain properties of
+a VFIO PCI device, performs a live update, and then validates those
+properties are still same on the device.
+
+Overall flow for a VFIO device going through a live update will be
+something like:
+
+1. Userspace passes a VFIO cdev FD along with a token to LUO for preservation.
+2. LUO passes FD to VFIO subsystem to verify if FD can be preserved. If
+   yes, it increases the refcount on the FD.
+3. Eventually, userspace tells LUO to prepare for live update which
+   results in LUO calling prepare() callback to each of its register filesystem
+   handler with the passed FD it should be preparing.
+4. VFIO subsystem saves certain properties which will be either lost or
+   hard to recover from the device.
+5. VFIO saves the needed data to KHO and provide LUO with the
+   physical address of the data preserved by KHO.
+6. Userspace sends FREEZE event to freeze the system. LUO forwards this
+   to each of its registered subsystem.
+7. VFIO disables interrupts configured on the device during freeze call.
+8. Userspace performs kexec.
+9. During kexec reboot, generally, all PCI devices gets their Bus Master
+   Enable bit disabled. In live update case, preserved VFIO devices are
+   skipped.
+9. During boot, usual device enumeration happens and LUO also intializes
+   itself.
+10. Userspace uses the same token value (step 1), and ask LUO to return
+    VFIO FD corresponding to token.
+11. LUO ask VFIO to return VFIO cdev FD corresponding to the token. It
+    gives it the physical address which VFIO returned it in step 5.
+12. VFIO restore the KHO data and read the BDF value it saved. It
+    iterates through all of the VFIO device it has in its VFIO cdev
+    class and finds the BDF device.
+13. VFIO creates an anonymous inode and file corresponding to the VFIO
+    PCI device and returns it to LUO and LUO returns it to userspace.
+14. Now FD returned to userspace works exactly same as if userspace has
+    opened a VFIO device from /dev/vfio/device/* location.
+15. It makes usual bind iommufd and attach page table calls.
+16. During bind, when VFIO device is internally opened for the first
+    time:
+    - VFIO skips Bus Master Disable
+    - VFIO skips device reset.
+    - VFIO instead of initializing vconfig from the scratch uses the
+      vconfig stored in KHO, and same for few other fields.
+
+This is what current series is implementing and validating through
+selftest.
+
+There are other things are which not implemented yet and some are also
+dependent on other subsystems. For example:
+
+1. Once a device has been prepared, VFIO should not allow any changes to
+   its state from userspace for example, changing PCI config values,
+   resetting the device, etc. 
+2. Device IOVA is not preserved in this series. This work is done
+   separately in IOMMMUFD live update preservation [2]
+3. During PCI device enumeration, PCI subsystem writes to PCI config
+   space, attach device to its original driver if present. This work is
+   being done in PCI preservation [3].
+4. Enabling PCI device done in VFIO subsystem should be handled in PCI
+   subsystem. Current, this patch series hasn't changed the behavior. 
+5. If live update gets canceled, interrupts which are disabled in
+   freeze need to be reconfigured again.
+6. In finish, if a device is not restored, how to know if KHO folio has been
+   restored or not.
+6. VFIO cdev is restored in anonymous file system. This should instead
+   be done on devetmpfs
+
+For reviewers, following are the grouping of patches in this series:
+
+Patches 1-4
+-----------
+  Feel free to ignore if you are only interested in VFIO.
+
+  These are only for live update selftests. I had to make some changes
+  on top LUO v4 series, to create a library out of them which can be
+  used in other selftests (vfio), and fix some build issues.
+
+Patches 5-9
+-----------
+  Adds basic live update support in VFIO.
+
+  Registers to LUO, saves the device BDF in KHO during prepare, and
+  returns VFIO cdev FD during restore.
+
+  It doesn't save or skip anything else.
+
+Patches 10-17
+-------------
+  Adds support for skipping certain opertions and preserving certain
+  data needed to restore a device.
+
+Patches 18-21
+-------------
+  - Integrate VFIO selftest with live update selftest library. 
+  - Adds a basic vfio_pci_liveupdate_test test which validates that Bus
+    Master Enable bit is preserved, and virtual config is restored
+    properly.
+
+Testing
+-------
+
+I have done testing on QEMU with a test pci device and also on a bare
+metal with Intel DSA device. Make sure IDXD driver is not built in your
+kernel if testing with Intel DSA device. Basically, whichever device you
+use, it should not get auto-bind to any other driver.
+
+Important config options which should be enabled to test this series:
+
+  - CONFIG_KEXEC_FILE
+  - CONFIG_LIVEUPDATE
+  - CONFIG_KEXEC_HANDOVER
+
+Besides this usual VFIO, VFIO_PCI, IOMMU and other dependencies are
+enabled.
+
+To build the test provide KHDR_INCLUDES to your make command if your
+headers are out-of-tree.
+
+  KHDR_INCLUDES="-isystem ../../../../build/usr/include"  make
+
+vfio_pci_liveupdate_test needs to be executed manually. This test needs
+to be executed two times; one before the live update and second after.
+
+  ./run.sh -d 0000:00:04.0 vfio_pci_liveupdate_test
+
+Next Steps
+----------
+
+1. Looking forward to feedback on this series.
+   - What other things we should save?
+   - Which things should not be saved?
+   - Any locks or incorrect locking done in the series.
+   - Any optimizations.
+2. Integration with IOMMUFD and PCI series for complete workflow where a
+   device continues a DMA while undergoing through live update.
+
+I will be going on a paternity leave soon, so, my responses gonna be
+intermittent. David Matlack (dmatlack@google.com) has graciously offered
+to work on this series and continue upstream engagement on this feature
+until I am back. Thank you, David!
+
+
+[1] LUO-v4: https://lore.kernel.org/linux-mm/20250929010321.3462457-1-pasha.tatashin@soleen.com/
+[2] IOMMUFD: https://lore.kernel.org/linux-iommu/20250928190624.3735830-1-skhawaja@google.com/
+[3] PCI: https://lore.kernel.org/linux-pci/20250916-luo-pci-v2-0-c494053c3c08@kernel.org/
+
+
+Vipin Sharma (21):
+  selftests/liveupdate: Build tests from the selftests/liveupdate
+    directory
+  selftests/liveupdate: Create library of core live update ioctls
+  selftests/liveupdate: Move do_kexec.sh script to liveupdate/lib
+  selftests/liveupdate: Move LUO ioctls calls to liveupdate library
+  vfio/pci: Register VFIO live update file handler to Live Update
+    Orchestrator
+  vfio/pci: Accept live update preservation request for VFIO cdev
+  vfio/pci: Store VFIO PCI device preservation data in KHO for live
+    update
+  vfio/pci: Retrieve preserved VFIO device for Live Update Orechestrator
+  vfio/pci: Add Live Update finish callback implementation
+  PCI: Add option to skip Bus Master Enable reset during kexec
+  vfio/pci: Skip clearing bus master on live update device during kexec
+  vfio/pci: Skip clearing bus master on live update restored device
+  vfio/pci: Preserve VFIO PCI config space through live update
+  vfio/pci: Skip device reset on live update restored device.
+  PCI: Make PCI saved state and capability structs public
+  vfio/pci: Save and restore the PCI state of the VFIO device
+  vfio/pci: Disable interrupts before going live update kexec
+  vfio: selftests: Build liveupdate library in VFIO selftests
+  vfio: selftests: Initialize vfio_pci_device using a VFIO cdev FD
+  vfio: selftests: Add VFIO live update test
+  vfio: selftests: Validate vconfig preservation of VFIO PCI device
+    during live update
+
+ drivers/pci/pci-driver.c                      |   6 +-
+ drivers/pci/pci.c                             |   5 -
+ drivers/pci/pci.h                             |   7 -
+ drivers/vfio/pci/Makefile                     |   1 +
+ drivers/vfio/pci/vfio_pci_config.c            |  17 +
+ drivers/vfio/pci/vfio_pci_core.c              |  31 +-
+ drivers/vfio/pci/vfio_pci_liveupdate.c        | 461 ++++++++++++++++++
+ drivers/vfio/pci/vfio_pci_priv.h              |  17 +
+ drivers/vfio/vfio_main.c                      |  20 +-
+ include/linux/pci.h                           |  15 +
+ include/linux/vfio.h                          |   8 +
+ include/linux/vfio_pci_core.h                 |   1 +
+ tools/testing/selftests/liveupdate/.gitignore |   7 +-
+ tools/testing/selftests/liveupdate/Makefile   |  31 +-
+ .../liveupdate/{ => lib}/do_kexec.sh          |   0
+ .../liveupdate/lib/include/liveupdate_util.h  |  27 +
+ .../selftests/liveupdate/lib/libliveupdate.mk |  18 +
+ .../liveupdate/lib/liveupdate_util.c          | 106 ++++
+ .../selftests/liveupdate/luo_multi_file.c     |   2 -
+ .../selftests/liveupdate/luo_multi_kexec.c    |   2 -
+ .../selftests/liveupdate/luo_multi_session.c  |   2 -
+ .../selftests/liveupdate/luo_test_utils.c     |  73 +--
+ .../selftests/liveupdate/luo_test_utils.h     |  10 +-
+ .../selftests/liveupdate/luo_unreclaimed.c    |   1 -
+ tools/testing/selftests/vfio/Makefile         |  15 +-
+ .../selftests/vfio/lib/include/vfio_util.h    |   1 +
+ .../selftests/vfio/lib/vfio_pci_device.c      |  33 +-
+ .../selftests/vfio/vfio_pci_liveupdate_test.c | 116 +++++
+ 28 files changed, 900 insertions(+), 133 deletions(-)
+ create mode 100644 drivers/vfio/pci/vfio_pci_liveupdate.c
+ rename tools/testing/selftests/liveupdate/{ => lib}/do_kexec.sh (100%)
+ create mode 100644 tools/testing/selftests/liveupdate/lib/include/liveupdate_util.h
+ create mode 100644 tools/testing/selftests/liveupdate/lib/libliveupdate.mk
+ create mode 100644 tools/testing/selftests/liveupdate/lib/liveupdate_util.c
+ create mode 100644 tools/testing/selftests/vfio/vfio_pci_liveupdate_test.c
+
+
+base-commit: e48be01cadc981362646dc3a87d57316421590a5
+-- 
+2.51.0.858.gf9c4a03a3a-goog
+
 
