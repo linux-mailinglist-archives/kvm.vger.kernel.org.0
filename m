@@ -1,70 +1,70 @@
-Return-Path: <kvm+bounces-60413-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-60414-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7B6C9BEC1B4
-	for <lists+kvm@lfdr.de>; Sat, 18 Oct 2025 02:09:33 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id A7B5CBEC1C3
+	for <lists+kvm@lfdr.de>; Sat, 18 Oct 2025 02:09:45 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3276F409AE7
-	for <lists+kvm@lfdr.de>; Sat, 18 Oct 2025 00:08:24 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 389F9407A9A
+	for <lists+kvm@lfdr.de>; Sat, 18 Oct 2025 00:08:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C2C027FBAC;
-	Sat, 18 Oct 2025 00:07:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 36C0C19066D;
+	Sat, 18 Oct 2025 00:07:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="oGVikpJR"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="N8k8baR5"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pg1-f202.google.com (mail-pg1-f202.google.com [209.85.215.202])
+Received: from mail-pg1-f201.google.com (mail-pg1-f201.google.com [209.85.215.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AA85957C9F
-	for <kvm@vger.kernel.org>; Sat, 18 Oct 2025 00:07:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6E7EE9443
+	for <kvm@vger.kernel.org>; Sat, 18 Oct 2025 00:07:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1760746052; cv=none; b=HjLgOkthnMp3Ill41r1eOUPlmJcYQIqqzLsce+G4kjgGxaMmYgt1KM1ZcRBpvmTTfr6bRIr8sWhf2M/fdW9Jhe73x1FQLKuKWKcVuz3qUtAR/qc/xFI2UUAHonpWecvbMHXHyT7/ci2cEnw41Xh4BaFI9NDh5grN7m99xZIcn+o=
+	t=1760746054; cv=none; b=p9BdUB6/tepDiQElSfyU3G8beGdSO5LsMKX2PU7v70pSh+ONfQWIhE2FXMqRPElpum5PhIwzNu2nxad7qhSlPiRknT6R+JT07W+voATBxIw91Tc2wwa8N8BU+vqeboOX+23Dlwz9Pk0oz2DH2pw+R2QXfmW+4xtaxbzyvB3jwU4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1760746052; c=relaxed/simple;
-	bh=afY24gYMOzFwsN2znmzSRT26NkKpjbP7o7rl1ElinpE=;
+	s=arc-20240116; t=1760746054; c=relaxed/simple;
+	bh=WqoyuRvOF/KaAj4Kamg+Ll5XCZ1wJiFiYb83JG8QyCI=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=W6Tj5n3KjQp9QNoVLg9swnArqIsc2Zg63NOYlwiHo86vN5z1Pv/3UQ1afhRhZ33EdocX3dhbENh4p7uc/8pAj1zDPUR8inlUQnB6mSZXkbWkvc9OhVy3Cw6/oonji8L/TXt67MQCc8TxXUmB99/LModU6j3XPYawDNntzIlU9Fc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--vipinsh.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=oGVikpJR; arc=none smtp.client-ip=209.85.215.202
+	 To:Cc:Content-Type; b=F8PRteGdvE59NfgVu++CS9paKTc+Sn30aAqYfP5mmflv4YVH77XlSDSetvGwF28sw1u5JkMF6jIMYOGjcTZ7KMlZXna6v7A8YQxhQ1jm1Dc8O1Do5K2FVUap8us667xr5bBJId8IRIg1/KyRswqqstyT6hTSYJ7kgNBHou30RJg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--vipinsh.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=N8k8baR5; arc=none smtp.client-ip=209.85.215.201
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--vipinsh.bounces.google.com
-Received: by mail-pg1-f202.google.com with SMTP id 41be03b00d2f7-b55443b4114so1591406a12.2
-        for <kvm@vger.kernel.org>; Fri, 17 Oct 2025 17:07:30 -0700 (PDT)
+Received: by mail-pg1-f201.google.com with SMTP id 41be03b00d2f7-b55283ff3fcso1671084a12.3
+        for <kvm@vger.kernel.org>; Fri, 17 Oct 2025 17:07:32 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1760746050; x=1761350850; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1760746052; x=1761350852; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=PNSocxtpFlgaY+aG50c0yJJqecHAawBvtAXPRByH/ak=;
-        b=oGVikpJRWfx1eKWBOyvjW+yHfgyLS2+dTuKRql4FyluA9hkvehtSSNiF79yNJzxvd9
-         pUcrGsKrXbrVJOk1ZXZdKndVgyeLOMah8CL4EhBIxZokaYg2OGYcuYKBnYknHyPxU+rR
-         Yc1mM94AsV92yh59xPsZ/YKhiPcGAKAObpfNvQU23eRSEeZ1CDF78CkL6iOdeZiSJo+9
-         3GRvd3a9cSjozKjBqOeOGPJxvjz05non/WPSSONS8BMug2Z4tsjnCQUyRpGM4xIlAmJt
-         BbPXiYopTghsMWxCW/Dgw9L4aPtPn9tsq26ALCK9JbRbLoxdEkwCLRs1rq3Pmn6GAF2P
-         OL3A==
+        bh=TGD7bzX0Kq7IaGb+QpC13kgMXesYLGgf6obE0wlZYvA=;
+        b=N8k8baR5x0TMJ5BpjROOTS4lWz+jivd7/GSXln/iBlHs7y5VsQe6XV5Qcov0dWGyQi
+         WAcNV/BTmJ2qRf13/D0/winfvFWIavnaBJgxkVQ1bTBJ1AOdUMVw6+DUIbN3JYKX9FxT
+         wJ9/6fIf/C2N6OTOQpTNZ+O/ho16oFWzegOtuKo+jQYaNdNeLMJ2TUVpUeULqaa9AJ7O
+         QjqUOsyuNvwZNIDbu/wyZ3mDYSQ0ZlME9xX+mCcPxy4r73Q0ypJYg1OlHB1yQIzam9VG
+         1XTBe1qVPCLl2FSperYKbyeVjdR8W5mzuxw+f1lcfyVdKvTELbY52gcDSk7dQyYwmoYe
+         ngNw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1760746050; x=1761350850;
+        d=1e100.net; s=20230601; t=1760746052; x=1761350852;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=PNSocxtpFlgaY+aG50c0yJJqecHAawBvtAXPRByH/ak=;
-        b=hO6IF1syj6XvDW7G0O7yT7ho0jolLFNm7z50/NlQ98afrOoxG2LFPRijRXTVUOc2b7
-         WhJunS83FKuloMuCfqjwH596gqr7FwYtm/F5Yd4ixYUuQEZomWrmLfzlBOxb7/8UxtVC
-         yNRthhiLNq4dmEQIcS9/ivTlGgHqrfoahILz0F7tAJBh20LB26vPyEK80dFWTRyDXShH
-         qVU7ue6LSQm8EFGpZAJ0c0c5o6JZs9ZiuAjF9U+PXp28EB15iIZ6zQq3sM4lVxjT47Wu
-         FcursZWq27+FTI/tp8Rcrb0FUQlhdwzZIF31q3MDPy+h1Svv5M1gzML8Jny+NvxdYQrs
-         ffvQ==
-X-Forwarded-Encrypted: i=1; AJvYcCVd2vT/e5RdDgf6uAzw0JrIDtaDHk0LyetZ+rhBwoSGH78OoUSaNz1MI0ypJjTSbeKahBA=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzYQCHHt1jv3ZqEcd5bKSi2ZWzd2wpdQhXGGqSAKKKWpMrk7hyg
-	myztcuCFbBbzcxXSW71tsR2IysZ37EowRQMHOAKV929FQ2zsIf4Hf5MDPQda8KvRsqDDlE2cfzV
-	ciCQBJQqA2Q==
-X-Google-Smtp-Source: AGHT+IGw3qLr2xyC1p/SJ0aBXpD18mw5iWsbxD0rBPbyjKzntb2EOMPX2k2cG3q5ct1J4a+SmbU/supTz48u
-X-Received: from plpd3.prod.google.com ([2002:a17:903:1b63:b0:290:d7ff:80f8])
- (user=vipinsh job=prod-delivery.src-stubby-dispatcher) by 2002:a17:903:2411:b0:26c:e270:6dad
- with SMTP id d9443c01a7336-290ccadb0bcmr53515935ad.60.1760746050041; Fri, 17
- Oct 2025 17:07:30 -0700 (PDT)
-Date: Fri, 17 Oct 2025 17:06:56 -0700
+        bh=TGD7bzX0Kq7IaGb+QpC13kgMXesYLGgf6obE0wlZYvA=;
+        b=xNV8q01THbm3QR6KdkTLX5saEx55FliOiCsO4eFoIyRLDe9qZ8t32bDv+18j2hFs7z
+         g3OwpTXeHv2XnA/y05yO09zWC+z7QOrLPN8tZTBmDa+DOcbEo+HYsrupHeeZ/T888s9e
+         IupJkmYL+DgLwzJtFHWoAKsG7UP2qtA0pWbSw0UdXw96Cm40+PaP9tPJCljhBlCvs/T3
+         vLvZMO1oYh1UnOpOOz4+2BmNPyGBXBs7I4WRNCeu9xEPSHZMAn48LGkkUAhmHy3QOCrR
+         bI+TYKQ5jh9AlYlThacxWIsW/D7J/tQz0WdSukPLWyEIOS8bsUrlzST2X2kAsXtjGnO5
+         1qjQ==
+X-Forwarded-Encrypted: i=1; AJvYcCUzuRRTpbU/WTzsYJIE2gzSSuvC13G0OYUahEeGj4nyTk75bNXVqYsXNJpQqp5LHf45aPM=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yyf531LhaSWjhAryi0EoBdRSSHedKuuPGh3BNk1GLKbO93TbbUq
+	S0B2HoZschLzsmbwWJBY3+XnqRRhlPK68suwoYMzpKeTQLn094Jwf6IeSAKyh11IOoFXRbBBfIr
+	aiaI0NZUs5g==
+X-Google-Smtp-Source: AGHT+IHJ850JrI8smUyVofUcQEbNFuf48VMG6+VFF6lU6eFbmxUPuJB2Z6EpOhYs4AAVGwT4qh1u+uj/tQ7N
+X-Received: from pjg7.prod.google.com ([2002:a17:90b:3f47:b0:330:7dd8:2dc2])
+ (user=vipinsh job=prod-delivery.src-stubby-dispatcher) by 2002:a17:902:fc4b:b0:290:8d7b:4047
+ with SMTP id d9443c01a7336-290c9cbc4c9mr66393955ad.21.1760746051767; Fri, 17
+ Oct 2025 17:07:31 -0700 (PDT)
+Date: Fri, 17 Oct 2025 17:06:57 -0700
 In-Reply-To: <20251018000713.677779-1-vipinsh@google.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
@@ -74,9 +74,9 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
 References: <20251018000713.677779-1-vipinsh@google.com>
 X-Mailer: git-send-email 2.51.0.858.gf9c4a03a3a-goog
-Message-ID: <20251018000713.677779-5-vipinsh@google.com>
-Subject: [RFC PATCH 04/21] selftests/liveupdate: Move LUO ioctls calls to
- liveupdate library
+Message-ID: <20251018000713.677779-6-vipinsh@google.com>
+Subject: [RFC PATCH 05/21] vfio/pci: Register VFIO live update file handler to
+ Live Update Orchestrator
 From: Vipin Sharma <vipinsh@google.com>
 To: bhelgaas@google.com, alex.williamson@redhat.com, pasha.tatashin@soleen.com, 
 	dmatlack@google.com, jgg@ziepe.ca, graf@amazon.com
@@ -89,133 +89,111 @@ Cc: pratyush@kernel.org, gregkh@linuxfoundation.org, chrisl@kernel.org,
 	Vipin Sharma <vipinsh@google.com>
 Content-Type: text/plain; charset="UTF-8"
 
-Move liveupdate ioctls call to liveupdate library.
+Register VFIO live update file handler to Live Update Orchestrator.
+Provide stub implementation of the handler callbacks.
 
-This allows single place for luo ioctl interactions and provide other
-selftests to access them.
+Adding live update support in VFIO will enable a VFIO PCI device to work
+uninterrupted while the host kernel is being updated through a kexec
+reboot.
 
 Signed-off-by: Vipin Sharma <vipinsh@google.com>
 ---
- .../liveupdate/lib/include/liveupdate_util.h  |  2 ++
- .../liveupdate/lib/liveupdate_util.c          | 29 ++++++++++++++++++-
- .../selftests/liveupdate/luo_test_utils.c     | 18 ++++--------
- 3 files changed, 35 insertions(+), 14 deletions(-)
+ drivers/vfio/pci/Makefile              |  1 +
+ drivers/vfio/pci/vfio_pci_core.c       |  1 +
+ drivers/vfio/pci/vfio_pci_liveupdate.c | 44 ++++++++++++++++++++++++++
+ drivers/vfio/pci/vfio_pci_priv.h       |  6 ++++
+ 4 files changed, 52 insertions(+)
+ create mode 100644 drivers/vfio/pci/vfio_pci_liveupdate.c
 
-diff --git a/tools/testing/selftests/liveupdate/lib/include/liveupdate_util.h b/tools/testing/selftests/liveupdate/lib/include/liveupdate_util.h
-index 6ee9e124a1a4..a5cb034f7692 100644
---- a/tools/testing/selftests/liveupdate/lib/include/liveupdate_util.h
-+++ b/tools/testing/selftests/liveupdate/lib/include/liveupdate_util.h
-@@ -17,6 +17,8 @@ int luo_open_device(void);
- int luo_create_session(int luo_fd, const char *name);
- int luo_retrieve_session(int luo_fd, const char *name);
- int luo_session_preserve_fd(int session_fd, int fd, int token);
-+int luo_session_unpreserve_fd(int session_fd, int token);
-+int luo_session_restore_fd(int session_fd, int token);
+diff --git a/drivers/vfio/pci/Makefile b/drivers/vfio/pci/Makefile
+index cf00c0a7e55c..929df22c079b 100644
+--- a/drivers/vfio/pci/Makefile
++++ b/drivers/vfio/pci/Makefile
+@@ -2,6 +2,7 @@
  
- int luo_set_session_event(int session_fd, enum liveupdate_event event);
- int luo_set_global_event(int luo_fd, enum liveupdate_event event);
-diff --git a/tools/testing/selftests/liveupdate/lib/liveupdate_util.c b/tools/testing/selftests/liveupdate/lib/liveupdate_util.c
-index 26fd6a7763a2..96c6c1b65043 100644
---- a/tools/testing/selftests/liveupdate/lib/liveupdate_util.c
-+++ b/tools/testing/selftests/liveupdate/lib/liveupdate_util.c
-@@ -38,7 +38,34 @@ int luo_session_preserve_fd(int session_fd, int fd, int token)
- 		.token = token
- 	};
+ vfio-pci-core-y := vfio_pci_core.o vfio_pci_intrs.o vfio_pci_rdwr.o vfio_pci_config.o
+ vfio-pci-core-$(CONFIG_VFIO_PCI_ZDEV_KVM) += vfio_pci_zdev.o
++vfio-pci-core-$(CONFIG_LIVEUPDATE) += vfio_pci_liveupdate.o
+ obj-$(CONFIG_VFIO_PCI_CORE) += vfio-pci-core.o
  
--	return ioctl(session_fd, LIVEUPDATE_SESSION_PRESERVE_FD, &arg) < 0;
-+	if (ioctl(session_fd, LIVEUPDATE_SESSION_PRESERVE_FD, &arg) < 0)
-+		return -errno;
-+	return 0;
-+}
-+
-+int luo_session_unpreserve_fd(int session_fd, int token)
-+{
-+	struct liveupdate_session_unpreserve_fd arg = {
-+		.size = sizeof(arg),
-+		.token = token
-+	};
-+
-+	if (ioctl(session_fd, LIVEUPDATE_SESSION_UNPRESERVE_FD, &arg) < 0)
-+		return -errno;
-+	return 0;
-+}
-+
-+int luo_session_restore_fd(int session_fd, int token)
-+{
-+	struct liveupdate_session_restore_fd arg = {
-+		.size = sizeof(arg),
-+		.token = token
-+	};
-+
-+	if (ioctl(session_fd, LIVEUPDATE_SESSION_RESTORE_FD, &arg) < 0)
-+		return -errno;
-+	return arg.fd;
-+
+ vfio-pci-y := vfio_pci.o
+diff --git a/drivers/vfio/pci/vfio_pci_core.c b/drivers/vfio/pci/vfio_pci_core.c
+index 7dcf5439dedc..0894673a9262 100644
+--- a/drivers/vfio/pci/vfio_pci_core.c
++++ b/drivers/vfio/pci/vfio_pci_core.c
+@@ -2568,6 +2568,7 @@ static void vfio_pci_core_cleanup(void)
+ static int __init vfio_pci_core_init(void)
+ {
+ 	/* Allocate shared config space permission data used by all devices */
++	vfio_pci_liveupdate_init();
+ 	return vfio_pci_init_perm_bits();
  }
  
- int luo_retrieve_session(int luo_fd, const char *name)
-diff --git a/tools/testing/selftests/liveupdate/luo_test_utils.c b/tools/testing/selftests/liveupdate/luo_test_utils.c
-index 0f5bc7260ccc..b1f7b5c79c07 100644
---- a/tools/testing/selftests/liveupdate/luo_test_utils.c
-+++ b/tools/testing/selftests/liveupdate/luo_test_utils.c
-@@ -12,7 +12,6 @@
- #include <string.h>
- #include <fcntl.h>
- #include <unistd.h>
--#include <sys/ioctl.h>
- #include <sys/syscall.h>
- #include <sys/mman.h>
- #include <errno.h>
-@@ -25,7 +24,6 @@
+diff --git a/drivers/vfio/pci/vfio_pci_liveupdate.c b/drivers/vfio/pci/vfio_pci_liveupdate.c
+new file mode 100644
+index 000000000000..088f7698a72c
+--- /dev/null
++++ b/drivers/vfio/pci/vfio_pci_liveupdate.c
+@@ -0,0 +1,44 @@
++// SPDX-License-Identifier: GPL-2.0
++
++/*
++ * Liveupdate support for VFIO devices.
++ *
++ * Copyright (c) 2025, Google LLC.
++ * Vipin Sharma <vipinsh@google.com>
++ */
++
++#include <linux/liveupdate.h>
++#include <linux/errno.h>
++
++#include "vfio_pci_priv.h"
++
++static int vfio_pci_liveupdate_retrieve(struct liveupdate_file_handler *handler,
++					u64 data, struct file **file)
++{
++	return -EOPNOTSUPP;
++}
++
++static bool vfio_pci_liveupdate_can_preserve(struct liveupdate_file_handler *handler,
++					     struct file *file)
++{
++	return -EOPNOTSUPP;
++}
++
++static const struct liveupdate_file_ops vfio_pci_luo_fops = {
++	.retrieve = vfio_pci_liveupdate_retrieve,
++	.can_preserve = vfio_pci_liveupdate_can_preserve,
++	.owner = THIS_MODULE,
++};
++
++static struct liveupdate_file_handler vfio_pci_luo_handler = {
++	.ops = &vfio_pci_luo_fops,
++	.compatible = "vfio-v1",
++};
++
++void __init vfio_pci_liveupdate_init(void)
++{
++	int err = liveupdate_register_file_handler(&vfio_pci_luo_handler);
++
++	if (err)
++		pr_err("VFIO PCI liveupdate file handler register failed, error %d.\n", err);
++}
+diff --git a/drivers/vfio/pci/vfio_pci_priv.h b/drivers/vfio/pci/vfio_pci_priv.h
+index a9972eacb293..7779fd744ff5 100644
+--- a/drivers/vfio/pci/vfio_pci_priv.h
++++ b/drivers/vfio/pci/vfio_pci_priv.h
+@@ -107,4 +107,10 @@ static inline bool vfio_pci_is_vga(struct pci_dev *pdev)
+ 	return (pdev->class >> 8) == PCI_CLASS_DISPLAY_VGA;
+ }
  
- int create_and_preserve_memfd(int session_fd, int token, const char *data)
- {
--	struct liveupdate_session_preserve_fd arg = { .size = sizeof(arg) };
- 	long page_size = sysconf(_SC_PAGE_SIZE);
- 	void *map = MAP_FAILED;
- 	int mfd = -1, ret = -1;
-@@ -44,9 +42,7 @@ int create_and_preserve_memfd(int session_fd, int token, const char *data)
- 	snprintf(map, page_size, "%s", data);
- 	munmap(map, page_size);
- 
--	arg.fd = mfd;
--	arg.token = token;
--	if (ioctl(session_fd, LIVEUPDATE_SESSION_PRESERVE_FD, &arg) < 0)
-+	if (luo_session_preserve_fd(session_fd, mfd, token))
- 		goto out;
- 
- 	ret = 0; /* Success */
-@@ -61,15 +57,13 @@ int create_and_preserve_memfd(int session_fd, int token, const char *data)
- int restore_and_verify_memfd(int session_fd, int token,
- 			     const char *expected_data)
- {
--	struct liveupdate_session_restore_fd arg = { .size = sizeof(arg) };
- 	long page_size = sysconf(_SC_PAGE_SIZE);
- 	void *map = MAP_FAILED;
- 	int mfd = -1, ret = -1;
- 
--	arg.token = token;
--	if (ioctl(session_fd, LIVEUPDATE_SESSION_RESTORE_FD, &arg) < 0)
--		return -errno;
--	mfd = arg.fd;
-+	mfd = luo_session_restore_fd(session_fd, token);
-+	if (mfd < 0)
-+		return mfd;
- 
- 	map = mmap(NULL, page_size, PROT_READ, MAP_SHARED, mfd, 0);
- 	if (map == MAP_FAILED)
-@@ -134,10 +128,8 @@ int restore_and_read_state(int luo_fd, int *stage)
- void update_state_file(int session_fd, int next_stage)
- {
- 	char buf[32];
--	struct liveupdate_session_unpreserve_fd arg = { .size = sizeof(arg) };
- 
--	arg.token = STATE_MEMFD_TOKEN;
--	if (ioctl(session_fd, LIVEUPDATE_SESSION_UNPRESERVE_FD, &arg) < 0)
-+	if (luo_session_unpreserve_fd(session_fd, STATE_MEMFD_TOKEN))
- 		fail_exit("unpreserve failed");
- 
- 	snprintf(buf, sizeof(buf), "%d", next_stage);
++#ifdef CONFIG_LIVEUPDATE
++void vfio_pci_liveupdate_init(void);
++#else
++static inline void vfio_pci_liveupdate_init(void) { }
++#endif /* CONFIG_LIVEUPDATE */
++
+ #endif
 -- 
 2.51.0.858.gf9c4a03a3a-goog
 
