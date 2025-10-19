@@ -1,79 +1,79 @@
-Return-Path: <kvm+bounces-60454-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-60455-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id E0F43BEEC88
-	for <lists+kvm@lfdr.de>; Sun, 19 Oct 2025 23:03:39 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id DA1A3BEEC8B
+	for <lists+kvm@lfdr.de>; Sun, 19 Oct 2025 23:03:44 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id ECFC13E45FB
-	for <lists+kvm@lfdr.de>; Sun, 19 Oct 2025 21:03:36 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 73DB33E460E
+	for <lists+kvm@lfdr.de>; Sun, 19 Oct 2025 21:03:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1706D238C07;
-	Sun, 19 Oct 2025 21:03:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8480D238C1A;
+	Sun, 19 Oct 2025 21:03:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="FIIKo8eO"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="nRCz5K+P"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-ej1-f48.google.com (mail-ej1-f48.google.com [209.85.218.48])
+Received: from mail-ed1-f53.google.com (mail-ed1-f53.google.com [209.85.208.53])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 85B43226CF7
-	for <kvm@vger.kernel.org>; Sun, 19 Oct 2025 21:03:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.48
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0064F156661
+	for <kvm@vger.kernel.org>; Sun, 19 Oct 2025 21:03:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.53
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1760907811; cv=none; b=rL5Gxp+tq4KELwR5ns4EGMlLMNu68qSLGNwdLrLaXmhuRW7pcteydPUEogZ+r4nqpRtdGrzoqltdlfbqf1qK879WjMrWl8JX3hmCcCAfe8ng3gp5mm0rGjUn4lugWZQjNR+c9a50OxpVRjJKnrQtjTs/nlQONKb9UOaRvrmCu1I=
+	t=1760907812; cv=none; b=DNjKRE03FgK6d+9BQCrp5hgWIDJWrxDcGckL+JJwVhNxxIB/7ZB2gR9V3JByWgoMYzZKj1GZInQpLh5wMV9B845xgr63dw8Tqw03/bQOS5Qk77Y4UbwWeLzKC4F7ofS9+hYPynj9udVU+2T1ACGr43aomZ2Q80EY3zDR+h6sZ+M=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1760907811; c=relaxed/simple;
-	bh=bxdHKZc9pbxBqChYt8+Yh2D0W1yYdSw1LpL8rApqlNQ=;
+	s=arc-20240116; t=1760907812; c=relaxed/simple;
+	bh=urUGjh+zmzKrus48UzWrAAEygWKSORrP1adlA+qumHo=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=l8d3/YzEKOr65GBnsKSBg1T5YciF939ci6j2UY3b2KqO+h1W9tD8EM6dJW1PWHG6ZV+DhmMEsxKlcrCOdGe04MxsrB8SN+PEw1Z+wFU4+nxXBCMjeNY/zaPSVmqkf4AwWiGkMN5uwtLiDlIx6KzYBmsms6Yu9dHPwj2FjXpo+DQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=FIIKo8eO; arc=none smtp.client-ip=209.85.218.48
+	 MIME-Version; b=Q8oEHWjz9drP5Z3UX7nR0J+xag+qdQpsi45sBM1pQoeI+LhW0bZIDoHR8xiS7zDst214OY/98l2o2DINH5q3bL4WzOXMuIvewjdi2fHQw9uSzCn/c+6FFl+v7D1vDldpO39xAY5ZlogVIvQa4awtH7ellf36abvvM+f253Bnkw0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=nRCz5K+P; arc=none smtp.client-ip=209.85.208.53
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ej1-f48.google.com with SMTP id a640c23a62f3a-b3d80891c6cso893781966b.1
-        for <kvm@vger.kernel.org>; Sun, 19 Oct 2025 14:03:29 -0700 (PDT)
+Received: by mail-ed1-f53.google.com with SMTP id 4fb4d7f45d1cf-63c12ff0c5eso7265584a12.0
+        for <kvm@vger.kernel.org>; Sun, 19 Oct 2025 14:03:30 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1760907808; x=1761512608; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1760907809; x=1761512609; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=CFuBYoXthwAAHQXYSal9xNPgZEHCC/OlTSTKqa/XfA4=;
-        b=FIIKo8eORbCnb6AoM9cr7KJ9+aCpdpYztZRWSdRHD4hKThT4+HjhjPYG/sJvsGNC6T
-         8qPQRTo9jp+HuZ3QegMpFSw8Ib9vQjvvvQKwqrWwPWMcYKt9HWazf3iDHxsRQCgtSZ/N
-         UktPtFzp4yZGlWhWDEI8cDh2BqV78hlNgAWGWl96ej43Fx1Lz74Ggm/cr+hlmtJpknzJ
-         88sCXQ9ZoOD/YNUDFbNU8sz04EsRf88vtwgqAJIGd9ju+8c1csY9STdmDX35RIfWM6kq
-         nkiQ8Nn+JyXHk2V4G5q2bXOmqwRMejgWAUJ74K2VI4WlAniVyoYFUMUeuX7W5g/ngKG7
-         c0Mg==
+        bh=NYtLEyH2FfideJwdnFZ4JM8eULzVedauT+XtbsfYWyM=;
+        b=nRCz5K+Pqa+ZErAncGZ8n97wy8p5K/+BS7q84BZQjQzkRMDfo6M4RGwJvcojuywmx+
+         EpKc+ipk4+UwyHvNo1O6HB47rdcjUqJuNpB7avjBM3nlbG2cTwk+IANCOznM6ZWAOfKn
+         QFumjRR3gU6NpF2Rxdfp0ELvljCAJQPW+Ht3oAiUqhH8DkuLu9nX66wAMCxqPc51/EZJ
+         ifrr0kTYfz2K6LaZlLW4WcYRaL80q9d10KrwHG4ysTXIvzweSoKfP9ubKWw+k/2Kfmdw
+         aqr8vP08ivwnFdDrHIn3LoMWuyrm/pKmA70BxVEe/X2oO1ukxLHOTQrFgy61PWab83u1
+         +POA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1760907808; x=1761512608;
+        d=1e100.net; s=20230601; t=1760907809; x=1761512609;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=CFuBYoXthwAAHQXYSal9xNPgZEHCC/OlTSTKqa/XfA4=;
-        b=hEYVuCozL3QzENbtwU6uqUB9OUNmIt8TtrIbMlsE3R+hLBDmyKEg3weTg1C3b4gVy+
-         lMnpVmCpjR62CSLhpozg0OjH4TcYamEc9/o8tD5e2x5E339yc9k/FgDimzjot1lRwcyy
-         y9PrFce67E1Fn276KZf2Y7gTMsNkUQ6jZPieIEPCgQhaI5gwC7KSe5AsEkp/p21GnsgX
-         tAopaV/w6kcpLp3h6fCoUdRbAlI4msmzBVHI7bsFVw924OLalOKrmYLj90v45IZMnWLs
-         uZGefMiqnZUhpZlz00Xn7dNNIzR7CJHQccHKwstt2hYdnkJbs0vfDv0+AC3af7Iw4pG+
-         +JtA==
-X-Forwarded-Encrypted: i=1; AJvYcCW+KQ5d/UdAIuBBog0euapMpRX4+iRoS61sziOt6yFNq+AmpZ3KnIFHAgC3ej22/cLIrQQ=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyUI9wtHet/aXYLJwocghy05otSYZIq0qUG615Bv1LvPg/akSF8
-	bVRlxn5L5b79ntVdLYLfjavGkfSUTxnsyOTMj0641qWZ1RdTkAVaBlS5
-X-Gm-Gg: ASbGncuAT9LUhECTSVbdlyBfU4QXh24jCIZ5zHUYj9HNwNppRhM9J/w7yd+8IFQZoL1
-	GZgasmCr0/aFDgppGpTGiV2kc7jf1lCAA1Km2CJhVH5QHpmOdPL05/GkH81UBLkB759cqa+/U5Q
-	6Lv7S8hzNw3eAyCsb2SxvZccqlcH7ggSFedJC1oI30iNLhSILywMjoSQcwB+bzSziSFnNS81VHR
-	DKBjLUcNoJKzKDuKZ8+rpFggXf/c2tnXRZdXujwYYuzVFcsMePLfa5JUR4wcXmP5s69jw9fhTTF
-	IqWtJVta3Mnxl9Zs1RxBscjd3WtTLLzK8FFQ16SgMIVtOT2sxkWeTKc/KzOnfeSs9AL0o3FW114
-	CrPKQdloBmP1p9cm+foaXQrQsNhJR/YFn/OfUBPOPN9J5GbEg6WHJYlnwRTCvhY/IRD3l7Xyjgc
-	099TpA/0NiFYrsG3fwUhkIW25N7QvoXkPsu3eXJDk5gXDAEMbd5/E1DAEdKA==
-X-Google-Smtp-Source: AGHT+IEq801hCLtUohQJ3LOj0X3B+ZbYdyw4N64PsS7W265OlZV1xfYspqNnKezI+v90AM1dJWgHzw==
-X-Received: by 2002:a17:907:3992:b0:b40:c49b:709 with SMTP id a640c23a62f3a-b605249d84dmr1777498366b.8.1760907807556;
-        Sun, 19 Oct 2025 14:03:27 -0700 (PDT)
+        bh=NYtLEyH2FfideJwdnFZ4JM8eULzVedauT+XtbsfYWyM=;
+        b=OzBgBdJTXkVJ3pX3M9WQhMHKFTAIwAcyb8Y+ovx8Z5WB0vrIEzz9+K3YKBFh2rO1vn
+         z7owXL40UI7lLXBfsJEx+kDRxsGZAn0Wd7MJnptnjU7nl8ly0pudlcWf8SqJoC09KUwm
+         JQIaTcMDieKw6oFhGQ9xsrNPi3VchGf+wnbz+ktxcMpxfUXvlQM0g+gD+oxyjPMjheze
+         /wWYlIzUSLe+qTfv5LIwH5SrBZZboj5ULWno4f0erYQSU1FoZywTDIgdOQMysoTRVjak
+         LY+IY15dx+wyd12yBD1ZJN3mbA78NWkVfCDN3sUOLxYn+ybDNxUU3FchUAESyouSp2A9
+         v4fA==
+X-Forwarded-Encrypted: i=1; AJvYcCUWN4hwPgJgbReGAi887wtx2a45b5Us6SzupPadgsWaERcYD5XpQaa2kEel/UDfbqDl3iQ=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzKyy/ZnRpE4AVpbCrbwIHjnUyXqkNvjfF5FBOBfcRqOmpCLzN8
+	LO8nE08FUaBgeBDzHAIyTAShL3rqNk1prQhkDBHgQCXGirjCz3rKznNc
+X-Gm-Gg: ASbGncudwuyP8GepZyk2GzG98WC0+iVOYNwzwlnxFD34Ql4mc0UVR5Ijv0zPBLqkBZ3
+	eCBC6ZPsYCyj5ywuzi2/6JPGXBt2dFArU3f0mhG6Z9iLZPqbhShc31YpipZSFECk1W+/svQwrcW
+	W0FGwnXqFPj+x0mN9f2vYMPLw+siQWKBCj8x8AyPr/exp1te5nU+n+/hoLiOTAUXqjaq5nWpXTG
+	KlrSzmYJJNUSwqknFW/HIcacf31CU8bx4dYJ70oA2pbzacneypkjIPWPYMZSZ36Ch+YS3tG+QaN
+	g4DtVwWMG/E1q87pOGRhWDuMn/fLJWLTYRZERRoaOb2ob8FeL6oEq1T4YxySyfKHO1zSVPA4Wwc
+	WT5yw8RaoYlX9outEb4DNV3Z033sukmGUUJKuftHqEAlaUuRmetPNZZ+SElMmLZe3RvsKlYvxn8
+	zShgzinRYDfxZQwNRNRtdIW/7QNwXxVaZUijw93Ke9G+s2jAT5D2oUEKXzag==
+X-Google-Smtp-Source: AGHT+IGYnIE2LGluxdoaFLFcoZghgUMjydsnhpN1IFNQiDdS64MjZIRWB4CUyErfVctu0dYes/zOGQ==
+X-Received: by 2002:aa7:d1c4:0:b0:633:14bb:dcb1 with SMTP id 4fb4d7f45d1cf-63bfde71dc3mr10725278a12.11.1760907809154;
+        Sun, 19 Oct 2025 14:03:29 -0700 (PDT)
 Received: from archlinux (dynamic-002-245-026-170.2.245.pool.telefonica.de. [2.245.26.170])
-        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-63c4945f003sm5107655a12.27.2025.10.19.14.03.25
+        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-63c4945f003sm5107655a12.27.2025.10.19.14.03.27
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 19 Oct 2025 14:03:26 -0700 (PDT)
+        Sun, 19 Oct 2025 14:03:28 -0700 (PDT)
 From: Bernhard Beschow <shentey@gmail.com>
 To: qemu-devel@nongnu.org
 Cc: Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
@@ -97,9 +97,9 @@ Cc: Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
 	Sunil Muthuswamy <sunilmut@microsoft.com>,
 	Marcelo Tosatti <mtosatti@redhat.com>,
 	Bernhard Beschow <shentey@gmail.com>
-Subject: [PATCH v3 01/10] hw/timer/i8254: Add I/O trace events
-Date: Sun, 19 Oct 2025 23:02:54 +0200
-Message-ID: <20251019210303.104718-2-shentey@gmail.com>
+Subject: [PATCH v3 02/10] hw/audio/pcspk: Add I/O trace events
+Date: Sun, 19 Oct 2025 23:02:55 +0200
+Message-ID: <20251019210303.104718-3-shentey@gmail.com>
 X-Mailer: git-send-email 2.51.1.dirty
 In-Reply-To: <20251019210303.104718-1-shentey@gmail.com>
 References: <20251019210303.104718-1-shentey@gmail.com>
@@ -115,56 +115,66 @@ Allows to see how the guest interacts with the device.
 
 Signed-off-by: Bernhard Beschow <shentey@gmail.com>
 ---
- hw/timer/i8254.c      | 6 ++++++
- hw/timer/trace-events | 4 ++++
- 2 files changed, 10 insertions(+)
+ hw/audio/pcspk.c      | 10 +++++++++-
+ hw/audio/trace-events |  4 ++++
+ 2 files changed, 13 insertions(+), 1 deletion(-)
 
-diff --git a/hw/timer/i8254.c b/hw/timer/i8254.c
-index 4b25c487f7..7033ebf50d 100644
---- a/hw/timer/i8254.c
-+++ b/hw/timer/i8254.c
-@@ -29,6 +29,7 @@
- #include "hw/timer/i8254.h"
- #include "hw/timer/i8254_internal.h"
+diff --git a/hw/audio/pcspk.c b/hw/audio/pcspk.c
+index a419161b5b..f8020593b0 100644
+--- a/hw/audio/pcspk.c
++++ b/hw/audio/pcspk.c
+@@ -34,6 +34,7 @@
+ #include "hw/audio/pcspk.h"
+ #include "qapi/error.h"
  #include "qom/object.h"
 +#include "trace.h"
  
- //#define DEBUG_PIT
+ #define PCSPK_BUF_LEN 1792
+ #define PCSPK_SAMPLE_RATE 32000
+@@ -137,13 +138,18 @@ static uint64_t pcspk_io_read(void *opaque, hwaddr addr,
+ {
+     PCSpkState *s = opaque;
+     PITChannelInfo ch;
++    uint8_t val;
  
-@@ -130,6 +131,8 @@ static void pit_ioport_write(void *opaque, hwaddr addr,
-     int channel, access;
-     PITChannelState *s;
+     pit_get_channel_info(s->pit, 2, &ch);
  
-+    trace_pit_ioport_write(addr, val);
+     s->dummy_refresh_clock ^= (1 << 4);
+ 
+-    return ch.gate | (s->data_on << 1) | s->dummy_refresh_clock |
++    val = ch.gate | (s->data_on << 1) | s->dummy_refresh_clock |
+        (ch.out << 5);
 +
-     addr &= 3;
-     if (addr == 3) {
-         channel = val >> 6;
-@@ -248,6 +251,9 @@ static uint64_t pit_ioport_read(void *opaque, hwaddr addr,
-             break;
-         }
-     }
++    trace_pcspk_io_read(s->iobase, val);
 +
-+    trace_pit_ioport_read(addr, ret);
-+
-     return ret;
++    return val;
  }
  
-diff --git a/hw/timer/trace-events b/hw/timer/trace-events
-index c5b6db49f5..2bb51f95ea 100644
---- a/hw/timer/trace-events
-+++ b/hw/timer/trace-events
-@@ -49,6 +49,10 @@ cmsdk_apb_dualtimer_read(uint64_t offset, uint64_t data, unsigned size) "CMSDK A
- cmsdk_apb_dualtimer_write(uint64_t offset, uint64_t data, unsigned size) "CMSDK APB dualtimer write: offset 0x%" PRIx64 " data 0x%" PRIx64 " size %u"
- cmsdk_apb_dualtimer_reset(void) "CMSDK APB dualtimer: reset"
+ static void pcspk_io_write(void *opaque, hwaddr addr, uint64_t val,
+@@ -152,6 +158,8 @@ static void pcspk_io_write(void *opaque, hwaddr addr, uint64_t val,
+     PCSpkState *s = opaque;
+     const int gate = val & 1;
  
-+# i8254.c
-+pit_ioport_read(uint8_t addr, uint32_t value) "[0x%" PRIx8 "] -> 0x%" PRIx32
-+pit_ioport_write(uint8_t addr, uint32_t value) "[0x%" PRIx8 "] <- 0x%" PRIx32
++    trace_pcspk_io_write(s->iobase, val);
 +
- # imx_gpt.c
- imx_gpt_set_freq(uint32_t clksrc, uint32_t freq) "Setting clksrc %u to %u Hz"
- imx_gpt_read(const char *name, uint64_t value) "%s -> 0x%08" PRIx64
+     s->data_on = (val >> 1) & 1;
+     pit_set_gate(s->pit, 2, gate);
+     if (s->voice) {
+diff --git a/hw/audio/trace-events b/hw/audio/trace-events
+index b8ef572767..30f5921545 100644
+--- a/hw/audio/trace-events
++++ b/hw/audio/trace-events
+@@ -23,6 +23,10 @@ hda_audio_format(const char *stream, int chan, const char *fmt, int freq) "st %s
+ hda_audio_adjust(const char *stream, int pos) "st %s, pos %d"
+ hda_audio_overrun(const char *stream) "st %s"
+ 
++# pcspk.c
++pcspk_io_read(uint16_t addr, uint8_t val) "[0x%"PRIx16"] -> 0x%"PRIx8
++pcspk_io_write(uint16_t addr, uint8_t val) "[0x%"PRIx16"] <- 0x%"PRIx8
++
+ #via-ac97.c
+ via_ac97_codec_write(uint8_t addr, uint16_t val) "0x%x <- 0x%x"
+ via_ac97_sgd_fetch(uint32_t curr, uint32_t addr, char stop, char eol, char flag, uint32_t len) "curr=0x%x addr=0x%x %c%c%c len=%d"
 -- 
 2.51.1.dirty
 
