@@ -1,195 +1,123 @@
-Return-Path: <kvm+bounces-60572-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-60573-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
-	by mail.lfdr.de (Postfix) with ESMTPS id D9996BF3C62
-	for <lists+kvm@lfdr.de>; Mon, 20 Oct 2025 23:36:54 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 81030BF3E2A
+	for <lists+kvm@lfdr.de>; Tue, 21 Oct 2025 00:24:50 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 486074E24B5
-	for <lists+kvm@lfdr.de>; Mon, 20 Oct 2025 21:36:53 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D6E7D487891
+	for <lists+kvm@lfdr.de>; Mon, 20 Oct 2025 22:24:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6C2892ED84C;
-	Mon, 20 Oct 2025 21:36:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C64502F1FF1;
+	Mon, 20 Oct 2025 22:24:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=shazbot.org header.i=@shazbot.org header.b="RXotOpLY";
-	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="L1HmZAjA"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="tvrSVPk7"
 X-Original-To: kvm@vger.kernel.org
-Received: from fhigh-a8-smtp.messagingengine.com (fhigh-a8-smtp.messagingengine.com [103.168.172.159])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pj1-f73.google.com (mail-pj1-f73.google.com [209.85.216.73])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 706772DAFDE;
-	Mon, 20 Oct 2025 21:36:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=103.168.172.159
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9AC782EE616
+	for <kvm@vger.kernel.org>; Mon, 20 Oct 2025 22:24:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.73
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1760996203; cv=none; b=eY2Hmv5h822/83JBOpmTv30Kn3TMjh7YMVXayg9QEXxJAuiQY6dm9gtNi7Z/zaOakhcoYJAjluj2n4F47EahnRqWXi5VfTxMjdfdkwzVaf7lQdUhsAorTnuOtCLIfoHPcwZCZokxnnLbRnEgqGKnOAbSIuaPwMJBllxIeiiAB9Y=
+	t=1760999080; cv=none; b=D231SISa/v+5fzKxwWRz8qfiIYqe4weU6uJp1qq0tQa/l5Zxas4r9K/nnh0TUHlgJ2cQU8P4WlbJT/vY5Qgdzht0x9+YyxXf4sqpTdf2B/ckT88sT1H1QlJ5MmjZNLzaVUSuYkLNRYchEgHCsPdSltBveBVbu77QHN9hNxGOCWs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1760996203; c=relaxed/simple;
-	bh=iZuTD5RiWVWphXNNGnlMBnB3WDltkiLbJtRklXeI8Nk=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=JIUnhPUQ09o8LZt+2IIjFNChFziYts+rnSNMs7/PElKvpIliIZAXnECMwQM+8R4zeQCjC7IYhEceM9w5/Z8RzXgTobmkrjKkWlPty8IXIcTjZr6iFKwZtvLbAnEdyYF0AU2cGwAvC3SVIc/8Wby4hCFrCeXM8NxJ6We2MQM2NUA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=shazbot.org; spf=pass smtp.mailfrom=shazbot.org; dkim=pass (2048-bit key) header.d=shazbot.org header.i=@shazbot.org header.b=RXotOpLY; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=L1HmZAjA; arc=none smtp.client-ip=103.168.172.159
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=shazbot.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=shazbot.org
-Received: from phl-compute-07.internal (phl-compute-07.internal [10.202.2.47])
-	by mailfhigh.phl.internal (Postfix) with ESMTP id 3E11B14001BA;
-	Mon, 20 Oct 2025 17:36:39 -0400 (EDT)
-Received: from phl-mailfrontend-01 ([10.202.2.162])
-  by phl-compute-07.internal (MEProxy); Mon, 20 Oct 2025 17:36:39 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=shazbot.org; h=
-	cc:cc:content-transfer-encoding:content-type:content-type:date
-	:date:from:from:in-reply-to:in-reply-to:message-id:mime-version
-	:references:reply-to:subject:subject:to:to; s=fm1; t=1760996199;
-	 x=1761082599; bh=jRUujCet7fvARjwGlDg+oiZlT8oT/xbGvKPfGfsxa9E=; b=
-	RXotOpLYSWZ1dlEh8ePPEVFk0fgsuebocrDMLC/wZ40xR6WvuELLRSAMABeZp05w
-	6B8/NO9Y8J8+EWjtqj8Ag88Y0DULOR/KXFH/NvMvji++nyl7u1otcG4pTQiCEtdD
-	txky4JzlpozU56/Y1gEa/kH5P/9XM7rXGk6U/CpA1nw9DAomwIOjCRbO0f0sAe3z
-	BLlP0Q6FG3f5kPqpwh7G7glKmfHo2aix8cl5OdbYmeLaSyVr0jI9iU7G6FYU7+37
-	d/MlnoZwIYZ7+osQ9BicrvBROkt8IsH5/VAlKHH424NeLZTzXHU9ruNAV9OXRbY0
-	lJ2UiVzlRKMT7tKmN+jNjg==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-	messagingengine.com; h=cc:cc:content-transfer-encoding
-	:content-type:content-type:date:date:feedback-id:feedback-id
-	:from:from:in-reply-to:in-reply-to:message-id:mime-version
-	:references:reply-to:subject:subject:to:to:x-me-proxy
-	:x-me-sender:x-me-sender:x-sasl-enc; s=fm2; t=1760996199; x=
-	1761082599; bh=jRUujCet7fvARjwGlDg+oiZlT8oT/xbGvKPfGfsxa9E=; b=L
-	1HmZAjAlanUjAYYvHuqzHuaSw5+TdVmNDrffgmxE/1jFjYLufg6IYW+jIdQlM4uM
-	ANIJIWNzypzZP8RXHyfX/9atLFzuCJhzn3svcTDsIq6gSedidc5XDBlgc3yR7qUx
-	7lDsBq8ZG5KeiPWGJlhHOh4D37aeRJw3O1x/VZ184B0/HNBnHCpAjHTOoNkNy8QT
-	MBJonNjpC79NifTuTxewQ66w/2YFHOs12brN1bCQ39dkgwZaAtp/WL5gV2Vwof5F
-	UpzJrxoa8jugbDqBYznaYaKm6ciwX2Ct2qdlOTWxZV/rGWipW+45DhR6DA/E720o
-	Rd7iX8wNQYR8wol8Ih95Q==
-X-ME-Sender: <xms:Zqv2aATxRHwx70MoTSJKrWcSbTqF9DddrNrk_3hc2_oqBeIBWKt5EA>
-    <xme:Zqv2aHGmgWWA0yhtp3FV4Eimfxma8Fw-BHPOALfweXRaUZkThsMAKBjsq6oY6etvW
-    ziCIi4cm6l8EZmLVe0_iC13Ll-8TWZooTVJCuG_qUIb4hk33aEPriE>
-X-ME-Received: <xmr:Zqv2aFEzX4iTfPYyt0_n_K0ypEwceLJ_ApLvjipWZOMpjxbPx-f-Ga1Bkos>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeeffedrtdeggddufeekledvucetufdoteggodetrf
-    dotffvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfurfetoffkrfgpnffqhgenuceu
-    rghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujf
-    gurhepfffhvfevuffkjghfgggtgfesthejredttddtvdenucfhrhhomheptehlvgigucgh
-    ihhllhhirghmshhonhcuoegrlhgvgiesshhhrgiisghothdrohhrgheqnecuggftrfgrth
-    htvghrnhepteetudelgeekieegudegleeuvdffgeehleeivddtfeektdekkeehffehudet
-    hffhnecuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehmrghilhhfrhhomheprg
-    hlvgigsehshhgriigsohhtrdhorhhgpdhnsggprhgtphhtthhopeeipdhmohguvgepshhm
-    thhpohhuthdprhgtphhtthhopegrmhgrshhtrhhosehfsgdrtghomhdprhgtphhtthhope
-    grlhgvjhgrnhgurhhordhjrdhjihhmvghnvgiisehorhgrtghlvgdrtghomhdprhgtphht
-    thhopehjghhgseiiihgvphgvrdgtrgdprhgtphhtthhopehkvhhmsehvghgvrhdrkhgvrh
-    hnvghlrdhorhhgpdhrtghpthhtoheplhhinhhugidqkhgvrhhnvghlsehvghgvrhdrkhgv
-    rhhnvghlrdhorhhgpdhrtghpthhtohepughmrghtlhgrtghksehgohhoghhlvgdrtghomh
-X-ME-Proxy: <xmx:Zqv2aFS-f7QyLxgpWHmxZbjqSB_mimzmPRQQ3lcNYQnyv-vmzRz77w>
-    <xmx:Zqv2aGL42_p_FKKBWEXJdtmppfQcB_kd0kgdHavADTeu_4C3WpK-aw>
-    <xmx:Zqv2aAbS9mVOmkET-MtuaTJoXY8nin2j7NFQiBaI2Db1IxLoB65AmA>
-    <xmx:Zqv2aI-slOeCZjDay4ZQviUqhc3sdUYeC1mxTLkRzxgpyjHRpXBSTQ>
-    <xmx:Z6v2aJMBw-p_q6mU3u3ciRgbXX91hlj8GVz7QjO-BsiKPUkQPJ1I81uX>
-Feedback-ID: i03f14258:Fastmail
-Received: by mail.messagingengine.com (Postfix) with ESMTPA; Mon,
- 20 Oct 2025 17:36:37 -0400 (EDT)
-Date: Mon, 20 Oct 2025 15:36:33 -0600
-From: Alex Williamson <alex@shazbot.org>
-To: Alex Mastro <amastro@fb.com>
-Cc: Alejandro Jimenez <alejandro.j.jimenez@oracle.com>, Jason Gunthorpe
- <jgg@ziepe.ca>, <kvm@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
- David Matlack <dmatlack@google.com>
-Subject: Re: [PATCH v4 0/3] vfio: handle DMA map/unmap up to the addressable
- limit
-Message-ID: <20251020153633.33bf6de4@shazbot.org>
-In-Reply-To: <aPJu5sXw6v3DI8w8@devgpu012.nha5.facebook.com>
-References: <20251012-fix-unmap-v4-0-9eefc90ed14c@fb.com>
-	<20251015132452.321477fa@shazbot.org>
-	<3308406e-2e64-4d53-8bcc-bac84575c1d9@oracle.com>
-	<aPFheZru+U+C4jT7@devgpu015.cco6.facebook.com>
-	<20251016160138.374c8cfb@shazbot.org>
-	<aPJu5sXw6v3DI8w8@devgpu012.nha5.facebook.com>
+	s=arc-20240116; t=1760999080; c=relaxed/simple;
+	bh=rwI4Q0igxrGek7Z30UI6EiSACc6o5I1weTBUNiXBwbI=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=MBmpjYdKNUNvb+D0g5AEa9aN12BRLoLLrN1aOzhvhwQG7X14IIzw6CgzRvqV6uQtlRVOdl9gE6WqsGBaVa/WfMKzVkOjYWMgJ2URLrz+VP9pPPaHxXWc89HhmLvsLzN00g78E1FyM1EziAOwVQ/BuqWe8VoWhjIxSFnyYKIvbR8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=tvrSVPk7; arc=none smtp.client-ip=209.85.216.73
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+Received: by mail-pj1-f73.google.com with SMTP id 98e67ed59e1d1-33bbbb41a84so9819925a91.1
+        for <kvm@vger.kernel.org>; Mon, 20 Oct 2025 15:24:38 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1760999078; x=1761603878; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=O/hlonJDisEdxFqgeg+9pNsgF5x3rn1Y1jGkL4uD0z8=;
+        b=tvrSVPk73JnEG3Wn4gjCNfwFrTtOwO72DmL1yZuVhFO2ACnRfUJrt8q4e885pWW++2
+         C2HsDBrRClk7skcq7ydTXB/yGRz4ybzHCcXZkPMqkSi0WmIame/GV/NmbwektPjQpeVF
+         EQiJIKgNzYqFO2heNh3CmuWXGzQ4vzRjVrBSLtPj0kkfjhIl1Ukrf8t3AW3GXBRc/5Hp
+         uiaelukyKYOfD5D4rQHOUr963UKoKuLRmmghhcv/iswzB2fhjnMQqiFAtXU38IER2rkQ
+         RB+BQeJscJx+ZMP6nLR96ElYPaqVoNZBExbV2MxzcRWz+NIwZm5Uxvf5O4UADKddX/se
+         iG4g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1760999078; x=1761603878;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=O/hlonJDisEdxFqgeg+9pNsgF5x3rn1Y1jGkL4uD0z8=;
+        b=NefkGi1EC/3cohCM6oUVERRNvhLhZtMT9L1oT1QxOutb0WpXmI0AphecP21IHL6Njj
+         rqFqz1rpgTmOBBGwzwbMfD1hsqNO8sBKU1qn52q+u9xRxo27DxnOiNTKAFw1u3mOYAqC
+         sPyC5dxUmXZUvAtMBAIpUxRBgTHSOv7PKhSRZw4Zf3Cnkpo+sKaEUq8a8IvgsxwKdIx+
+         gB8fdXkU3wQaBP8/J+f0+ysOMjxS5zf9hY7p9Lx2JtsSvOTo7zwqiy93IIYsc8vnWAq0
+         3t+vue4xB1zBx+E2C4i1yRbe+pwWYISi8OhxouVYR+nEkCN1V6kile8NMI99iAyR9cdv
+         xwHQ==
+X-Forwarded-Encrypted: i=1; AJvYcCV9ECsItvs+m3WrUzqe/KFhdibKWE4TT4QVihM7uIj5cNPNJUHdWkg2gRNCVSZv+wc4mF0=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yw9gR3bY0CJ3BkIiNWns0J8zEekgzf1cZCSxAFwgm7cREca9/Ri
+	orIrVZ8IYWbJ1rQErxeZ3TWhIxpFL3IWlmF0LvAdbsgQ2HV7eA++PYTBJNG7d9ht/vDQpUD6oeI
+	ULGgjgg==
+X-Google-Smtp-Source: AGHT+IE6c9sEci3X0zPR63N37Gu2Es1JlDgLufLRd3jB/+ym0SdtXH8HFpO/JAdI7UjiT18+DG3UC5Msm4Q=
+X-Received: from pjff13.prod.google.com ([2002:a17:90b:562d:b0:33d:69cf:1f82])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:2fd0:b0:33b:ab6a:87d7
+ with SMTP id 98e67ed59e1d1-33bcf8fd36amr20949231a91.26.1760999077924; Mon, 20
+ Oct 2025 15:24:37 -0700 (PDT)
+Date: Mon, 20 Oct 2025 15:24:36 -0700
+In-Reply-To: <20251020205602.xrgypiwk5dwejdqf@desk>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Mime-Version: 1.0
+References: <20251015-vmscape-bhb-v2-0-91cbdd9c3a96@linux.intel.com>
+ <20251015-vmscape-bhb-v2-2-91cbdd9c3a96@linux.intel.com> <aPZe6Xc2H2P-iNQe@google.com>
+ <20251020205602.xrgypiwk5dwejdqf@desk>
+Message-ID: <aPa2pHtY8X-TBXeY@google.com>
+Subject: Re: [PATCH v2 2/3] x86/vmscape: Replace IBPB with branch history
+ clear on exit to userspace
+From: Sean Christopherson <seanjc@google.com>
+To: Pawan Gupta <pawan.kumar.gupta@linux.intel.com>
+Cc: x86@kernel.org, "H. Peter Anvin" <hpa@zytor.com>, Josh Poimboeuf <jpoimboe@kernel.org>, 
+	David Kaplan <david.kaplan@amd.com>, Paolo Bonzini <pbonzini@redhat.com>, linux-kernel@vger.kernel.org, 
+	kvm@vger.kernel.org, Asit Mallick <asit.k.mallick@intel.com>, 
+	Tao Zhang <tao1.zhang@intel.com>
+Content-Type: text/plain; charset="us-ascii"
 
-On Fri, 17 Oct 2025 09:29:26 -0700
-Alex Mastro <amastro@fb.com> wrote:
-
-> On Thu, Oct 16, 2025 at 04:01:38PM -0600, Alex Williamson wrote:
-> > That mechanism for triggering replay requires a specific hardware
-> > configuration, but we can easily trigger it through code
-> > instrumentation, ex:
+On Mon, Oct 20, 2025, Pawan Gupta wrote:
+> On Mon, Oct 20, 2025 at 09:10:17AM -0700, Sean Christopherson wrote:
+> > On Wed, Oct 15, 2025, Pawan Gupta wrote:
+> > > diff --git a/arch/x86/include/asm/nospec-branch.h b/arch/x86/include/asm/nospec-branch.h
+> > > index 49707e563bdf71bdd05d3827f10dd2b8ac6bca2c..00730cc22c2e7115f6dbb38a1ed8d10383ada5c0 100644
+> > > --- a/arch/x86/include/asm/nospec-branch.h
+> > > +++ b/arch/x86/include/asm/nospec-branch.h
+> > > @@ -534,7 +534,7 @@ void alternative_msr_write(unsigned int msr, u64 val, unsigned int feature)
+> > >  		: "memory");
+> > >  }
+> > >  
+> > > -DECLARE_PER_CPU(bool, x86_ibpb_exit_to_user);
+> > > +DECLARE_PER_CPU(bool, x86_pred_flush_pending);
 > > 
-> > diff --git a/drivers/vfio/vfio_iommu_type1.c b/drivers/vfio/vfio_iommu_type1.c
-> > index 5167bec14e36..2cb19ddbb524 100644
-> > --- a/drivers/vfio/vfio_iommu_type1.c
-> > +++ b/drivers/vfio/vfio_iommu_type1.c
-> > @@ -2368,7 +2368,7 @@ static int vfio_iommu_type1_attach_group(void *iommu_data,
-> >                     d->enforce_cache_coherency ==
-> >                             domain->enforce_cache_coherency) {
-> >                         iommu_detach_group(domain->domain, group->iommu_group);
-> > -                       if (!iommu_attach_group(d->domain,
-> > +                       if (0 && !iommu_attach_group(d->domain,
-> >                                                 group->iommu_group)) {
-> >                                 list_add(&group->next, &d->group_list);
-> >                                 iommu_domain_free(domain->domain);
+> > Rather than "flush pending", what about using "need" in the name to indicate that
+> > a flush is necessary?  That makes it more obvious that e.g. KVM is marking the
+> > CPU as needing a flush by some other code, as opposed to implying that KVM itself
+> > has a pending flush.
 > > 
-> > We might consider whether it's useful for testing purposes to expose a
-> > mechanism to toggle this.  For a unit test, if we create a container,
-> > add a group, and build up some suspect mappings, if we then add another
-> > group to the container with the above bypass we should trigger the
-> > replay.  
+> > And maybe spell out "prediction"?  Without the context of features being checked,
+> > I don't know that I would be able to guess "prediction".
+> > 
+> > E.g. x86_need_prediction_flush?
+> > 
+> > Or x86_prediction_flush_exit_to_user if we would prefer to clarify when the flush
+> > needs to occur?
 > 
-> Thanks for the tip. I did this, and validated via bpftrace-ing iommu_map that
-> the container's mappings (one of which lies at the end of address space) are
-> replayed correctly. Without the fix, the loop body
-> 
-> while (iova < dma->iova + dma->size) { ... iommu_map() ... }
-> 
-> would never be entered for the end of address space mapping due to
-> 
-> dma->iova + dma->size == 0
-> 
-> $ sudo bpftrace -e 'kprobe:iommu_map { printf("pid=%d comm=%s domain=%p iova=%p paddr=%p size=%p prot=%p gfp=%p\n", pid, comm, (void*)arg0, (void*)arg1, (void*)arg2, (void*)arg3, (void*)arg4, (void*)arg5); }'
-> Attached 1 probe
-> # original mappings
-> pid=616477 comm=test_dma_map_un domain=0xff11012805dac210 iova=0x10000000000 paddr=0x12ecfdd0000 size=0x1000 prot=0x7 gfp=0x400cc0
-> pid=616477 comm=test_dma_map_un domain=0xff11012805dac210 iova=0x10000001000 paddr=0x12ecfdd0000 size=0x1000 prot=0x7 gfp=0x400cc0
-> pid=616477 comm=test_dma_map_un domain=0xff11012805dac210 iova=0xfffffffffffff000 paddr=0x12ecfdd0000 size=0x1000 prot=0x7 gfp=0x400cc0
-> # replayed mapping
-> pid=616477 comm=test_dma_map_un domain=0xff11012805dab610 iova=0x10000000000 paddr=0x12ecfdd0000 size=0x1000 prot=0x7 gfp=0x400cc0
-> pid=616477 comm=test_dma_map_un domain=0xff11012805dab610 iova=0x10000001000 paddr=0x12ecfdd0000 size=0x1000 prot=0x7 gfp=0x400cc0
-> pid=616477 comm=test_dma_map_un domain=0xff11012805dab610 iova=0xfffffffffffff000 paddr=0x12ecfdd0000 size=0x1000 prot=0x7 gfp=0x400cc0
-> 
-> > In general though the replay shouldn't have a mechanism to trigger
-> > overflows, we're simply iterating the current set of mappings that have
-> > already been validated and applying them to a new domain.  
-> 
-> Agree. Overflow means that some other invariant has broken, and nonsensical
-> vfio_dma have infiltrated iommu->dma_list. The combination of iommu->lock
-> serialization + overflow checks elsewhere should have prevented that.
-> 
-> > In any case, we can all take a second look at the changes there.  
-> Thanks!
+> Ok, ya this is more clear. I would want to make a small change, instead of
+> "prediction_flush", "predictor_flush" reads better to me. Changing it to:
+> x86_predictor_flush_exit_to_user.
 
-Thanks for the further testing.  Looking again at the changes, it still
-looks good to me.
+LOL, see, told you I couldn't guest the word. :-D
 
-I do note that we're missing a Fixes: tag.  I think we've had hints of
-this issue all the way back to the original implementation, so perhaps
-the last commit should include:
-
-Fixes: 73fa0d10d077 ("vfio: Type1 IOMMU implementation")
-
-Unless you've identified a more specific target.
-
-Along with the tag, it would probably be useful in that same commit to
-expand on the scope of the issue in the commit log.  I believe we allow
-mappings to be created at the top of the address space that cannot be
-removed via ioctl, but such inconsistency should result in an
-application error due to the failed ioctl and does not affect cleanup
-on release.  Should we also therefore expand the DMA mapping tests in
-tools/testing/selftests/vfio to include an end of address space test?
-Thanks,
-
-Alex
+"predictor" is way better, thanks!
 
