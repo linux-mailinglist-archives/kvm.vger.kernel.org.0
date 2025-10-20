@@ -1,123 +1,139 @@
-Return-Path: <kvm+bounces-60573-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-60574-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 81030BF3E2A
-	for <lists+kvm@lfdr.de>; Tue, 21 Oct 2025 00:24:50 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 5E462BF3F39
+	for <lists+kvm@lfdr.de>; Tue, 21 Oct 2025 00:41:26 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D6E7D487891
-	for <lists+kvm@lfdr.de>; Mon, 20 Oct 2025 22:24:44 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5577D542D23
+	for <lists+kvm@lfdr.de>; Mon, 20 Oct 2025 22:40:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C64502F1FF1;
-	Mon, 20 Oct 2025 22:24:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A56CC2F3609;
+	Mon, 20 Oct 2025 22:40:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="tvrSVPk7"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="kHoCQRDC"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pj1-f73.google.com (mail-pj1-f73.google.com [209.85.216.73])
+Received: from mail-pl1-f177.google.com (mail-pl1-f177.google.com [209.85.214.177])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9AC782EE616
-	for <kvm@vger.kernel.org>; Mon, 20 Oct 2025 22:24:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.73
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 66FA92F25E3
+	for <kvm@vger.kernel.org>; Mon, 20 Oct 2025 22:40:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.177
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1760999080; cv=none; b=D231SISa/v+5fzKxwWRz8qfiIYqe4weU6uJp1qq0tQa/l5Zxas4r9K/nnh0TUHlgJ2cQU8P4WlbJT/vY5Qgdzht0x9+YyxXf4sqpTdf2B/ckT88sT1H1QlJ5MmjZNLzaVUSuYkLNRYchEgHCsPdSltBveBVbu77QHN9hNxGOCWs=
+	t=1761000005; cv=none; b=uf79TfmYdz9QqPsN/eYsXzzctDWrjhKYw3HOV5l87OY9uxDoTCEPmEhI+XKJVg2ylKnkk2lAVTSVU19oiVuYNpCyoEtk6b8/uhC1XtuBgZPCgX8pMcbmuzR9iCWXPa49qt/LllBFejPVvynM1vnRxfnjhQU1DF/2zpOlpvFSzhQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1760999080; c=relaxed/simple;
-	bh=rwI4Q0igxrGek7Z30UI6EiSACc6o5I1weTBUNiXBwbI=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=MBmpjYdKNUNvb+D0g5AEa9aN12BRLoLLrN1aOzhvhwQG7X14IIzw6CgzRvqV6uQtlRVOdl9gE6WqsGBaVa/WfMKzVkOjYWMgJ2URLrz+VP9pPPaHxXWc89HhmLvsLzN00g78E1FyM1EziAOwVQ/BuqWe8VoWhjIxSFnyYKIvbR8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=tvrSVPk7; arc=none smtp.client-ip=209.85.216.73
+	s=arc-20240116; t=1761000005; c=relaxed/simple;
+	bh=Tgo1ln9Y6VE+gmfHVXivughYL6jpYIM3N6Z1Efok2No=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=TUs1M/C3szWsU5qPamSsX8cDxLX21bejSiSTFPVo8L9ckDoFEOm3SdAZ9s9iRoZPpt2O7z0LtOLvmYevDlfrFwMGgzevWktbE01dQ1zwJC4M9gLI0SDL32S3a493SXXchmfYmKYWmHrxwk5pnoKwBsx4nEGif+D8bvncmFx8MFU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=kHoCQRDC; arc=none smtp.client-ip=209.85.214.177
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pj1-f73.google.com with SMTP id 98e67ed59e1d1-33bbbb41a84so9819925a91.1
-        for <kvm@vger.kernel.org>; Mon, 20 Oct 2025 15:24:38 -0700 (PDT)
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-pl1-f177.google.com with SMTP id d9443c01a7336-27d67abd215so86945ad.0
+        for <kvm@vger.kernel.org>; Mon, 20 Oct 2025 15:40:03 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1760999078; x=1761603878; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=O/hlonJDisEdxFqgeg+9pNsgF5x3rn1Y1jGkL4uD0z8=;
-        b=tvrSVPk73JnEG3Wn4gjCNfwFrTtOwO72DmL1yZuVhFO2ACnRfUJrt8q4e885pWW++2
-         C2HsDBrRClk7skcq7ydTXB/yGRz4ybzHCcXZkPMqkSi0WmIame/GV/NmbwektPjQpeVF
-         EQiJIKgNzYqFO2heNh3CmuWXGzQ4vzRjVrBSLtPj0kkfjhIl1Ukrf8t3AW3GXBRc/5Hp
-         uiaelukyKYOfD5D4rQHOUr963UKoKuLRmmghhcv/iswzB2fhjnMQqiFAtXU38IER2rkQ
-         RB+BQeJscJx+ZMP6nLR96ElYPaqVoNZBExbV2MxzcRWz+NIwZm5Uxvf5O4UADKddX/se
-         iG4g==
+        d=google.com; s=20230601; t=1761000003; x=1761604803; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=GqANdouNpfXe1TpRYeq8OtUbMCXC+xuGaNpt4ay/34I=;
+        b=kHoCQRDCLAqY+/x0NIU6c3OeceXwFh8uwuWbvIggH0Zz4XqRyglBIM0JiG0JAG8S49
+         /fX4XT6jB/t9V46/BMVXE0O4vjuefOUJAGgoYk/fh/dgATD0etjtAq/PkL9BqqP9Iz9+
+         tENviSWhG15OZzlWEyLobHukGWpovdXWTIfIPIIUW9NEW46RWKX+8MF4c8vJkvtHieO2
+         cO/ESgKvyRynBmu3Yh79rWorIVUxRZhEnYcgy5C/jdrfn3ajv9gc4d+hUBUTvBJqPeRb
+         bwD8saoLyE7Xwb6UpmR5yt39lxS66WE0N7gKLMJ0ireDzuh0lWoTRfHZ4YYTF/ZeVVlA
+         +82w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1760999078; x=1761603878;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=O/hlonJDisEdxFqgeg+9pNsgF5x3rn1Y1jGkL4uD0z8=;
-        b=NefkGi1EC/3cohCM6oUVERRNvhLhZtMT9L1oT1QxOutb0WpXmI0AphecP21IHL6Njj
-         rqFqz1rpgTmOBBGwzwbMfD1hsqNO8sBKU1qn52q+u9xRxo27DxnOiNTKAFw1u3mOYAqC
-         sPyC5dxUmXZUvAtMBAIpUxRBgTHSOv7PKhSRZw4Zf3Cnkpo+sKaEUq8a8IvgsxwKdIx+
-         gB8fdXkU3wQaBP8/J+f0+ysOMjxS5zf9hY7p9Lx2JtsSvOTo7zwqiy93IIYsc8vnWAq0
-         3t+vue4xB1zBx+E2C4i1yRbe+pwWYISi8OhxouVYR+nEkCN1V6kile8NMI99iAyR9cdv
-         xwHQ==
-X-Forwarded-Encrypted: i=1; AJvYcCV9ECsItvs+m3WrUzqe/KFhdibKWE4TT4QVihM7uIj5cNPNJUHdWkg2gRNCVSZv+wc4mF0=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yw9gR3bY0CJ3BkIiNWns0J8zEekgzf1cZCSxAFwgm7cREca9/Ri
-	orIrVZ8IYWbJ1rQErxeZ3TWhIxpFL3IWlmF0LvAdbsgQ2HV7eA++PYTBJNG7d9ht/vDQpUD6oeI
-	ULGgjgg==
-X-Google-Smtp-Source: AGHT+IE6c9sEci3X0zPR63N37Gu2Es1JlDgLufLRd3jB/+ym0SdtXH8HFpO/JAdI7UjiT18+DG3UC5Msm4Q=
-X-Received: from pjff13.prod.google.com ([2002:a17:90b:562d:b0:33d:69cf:1f82])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:2fd0:b0:33b:ab6a:87d7
- with SMTP id 98e67ed59e1d1-33bcf8fd36amr20949231a91.26.1760999077924; Mon, 20
- Oct 2025 15:24:37 -0700 (PDT)
-Date: Mon, 20 Oct 2025 15:24:36 -0700
-In-Reply-To: <20251020205602.xrgypiwk5dwejdqf@desk>
+        d=1e100.net; s=20230601; t=1761000003; x=1761604803;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=GqANdouNpfXe1TpRYeq8OtUbMCXC+xuGaNpt4ay/34I=;
+        b=fg5z9TZmK8aVqPkN8x+piDRLsOzk32ffcNHJI52qV2CuWJx+CXClusyp7WY2YW9se1
+         xCouavHt9+7q/rjwP4i+AZrzFygYJzS3nsxcQNB6GAuzcvLTmz9hwcZDZQQ7DqsahG5D
+         yKwgw6JLInhNVrcPeE8psx8FNfLp3IeWyClwexZPybQ3eS++P+LI0L3VczmJz0M+bNTX
+         F3kmiy60rF/FB+MnOpq9sjFfoT9ziUM+TPeQBhVWXIhh5XJhRnKpG6TTyqVkatc6QlGo
+         6Sq1x+L2B4nCPg/qHzQfNbbNaPUCCesHuW/BZTFBCuPxMTAtoOJP0l+xnknz7bTF6yNP
+         fwXA==
+X-Forwarded-Encrypted: i=1; AJvYcCXkHdNdixH4mdGO1hhtPO0wd+ydZzdFc0I5pQmKLLzFrv5CE0vNu6VdL8Ea1G9xrDuMfqY=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzYc0wO8eu+J4eYCnHC2T2fJU73IdpIlRBKRSFZJNP5mcgCDInD
+	ZNb8e7JcK6oUp7J9ridbE/YXPAYqUOkN6lC7gX8YtKLJbHdzpdIULHuytQ78gn9qlw==
+X-Gm-Gg: ASbGncvqjNajoo3l3viawnH5vPWUArNfMOqJimEMx47W9yeAk56gPP80wCP9v1/6W1d
+	/1OjAff25B5RaC5DqU9VvAE5BCuKzOYnwRDErKvOTsq12HFYCah9sjKuzuN8mMK1aXjX2zuzxH0
+	KkHFQ7JTg79F3HTlK15T+26WsJ2pXFJ3r7Zyo81AMUxu52I7Kj7NTPXz9aqNzDpAypgGorTv+o2
+	L1CuE3N98yMYpEA+Br32LMgtjk5IgZGemJ88y/CWUfBUTBgRJYvqtt3+MpuacKKCUCIblD/oTQx
+	lHjfUTE6ZhTKgZsMvf4h0qZSj+iig0D4cB3Lb8Wn1GMfT94wCDyfEcHx0lGgpmurUyRZpWgLFX/
+	yfCHSK3VTqpw9RHYv9c4ZOUAk3RaCVTmJfkF0PfQtVyIpZCJK+wEORFEz06UHHNB1muLU2WKeN6
+	+ina2kKnsGJ6tPm73oSNdE8WB5BD4ZzMd52c/3
+X-Google-Smtp-Source: AGHT+IEcqTlHp/Qpfza19a+3ciBdyb/icBOnAmIupjsmC3a9l9OFGVEdaUxANAVMTmKc4io99zwLcw==
+X-Received: by 2002:a17:903:8c7:b0:291:6488:5af5 with SMTP id d9443c01a7336-292de2e477emr479535ad.1.1761000002470;
+        Mon, 20 Oct 2025 15:40:02 -0700 (PDT)
+Received: from google.com (176.13.105.34.bc.googleusercontent.com. [34.105.13.176])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-292471fdee2sm90693775ad.92.2025.10.20.15.40.01
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 20 Oct 2025 15:40:01 -0700 (PDT)
+Date: Mon, 20 Oct 2025 15:39:57 -0700
+From: Vipin Sharma <vipinsh@google.com>
+To: David Matlack <dmatlack@google.com>
+Cc: bhelgaas@google.com, alex.williamson@redhat.com,
+	pasha.tatashin@soleen.com, jgg@ziepe.ca, graf@amazon.com,
+	pratyush@kernel.org, gregkh@linuxfoundation.org, chrisl@kernel.org,
+	rppt@kernel.org, skhawaja@google.com, parav@nvidia.com,
+	saeedm@nvidia.com, kevin.tian@intel.com, jrhilke@google.com,
+	david@redhat.com, jgowans@amazon.com, dwmw2@infradead.org,
+	epetron@amazon.de, junaids@google.com, linux-kernel@vger.kernel.org,
+	linux-pci@vger.kernel.org, kvm@vger.kernel.org,
+	linux-kselftest@vger.kernel.org
+Subject: Re: [RFC PATCH 12/21] vfio/pci: Skip clearing bus master on live
+ update restored device
+Message-ID: <20251020223957.GA610352.vipinsh@google.com>
+References: <20251018000713.677779-1-vipinsh@google.com>
+ <20251018000713.677779-13-vipinsh@google.com>
+ <aPapy8nuqO3EETQB@google.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20251015-vmscape-bhb-v2-0-91cbdd9c3a96@linux.intel.com>
- <20251015-vmscape-bhb-v2-2-91cbdd9c3a96@linux.intel.com> <aPZe6Xc2H2P-iNQe@google.com>
- <20251020205602.xrgypiwk5dwejdqf@desk>
-Message-ID: <aPa2pHtY8X-TBXeY@google.com>
-Subject: Re: [PATCH v2 2/3] x86/vmscape: Replace IBPB with branch history
- clear on exit to userspace
-From: Sean Christopherson <seanjc@google.com>
-To: Pawan Gupta <pawan.kumar.gupta@linux.intel.com>
-Cc: x86@kernel.org, "H. Peter Anvin" <hpa@zytor.com>, Josh Poimboeuf <jpoimboe@kernel.org>, 
-	David Kaplan <david.kaplan@amd.com>, Paolo Bonzini <pbonzini@redhat.com>, linux-kernel@vger.kernel.org, 
-	kvm@vger.kernel.org, Asit Mallick <asit.k.mallick@intel.com>, 
-	Tao Zhang <tao1.zhang@intel.com>
-Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <aPapy8nuqO3EETQB@google.com>
 
-On Mon, Oct 20, 2025, Pawan Gupta wrote:
-> On Mon, Oct 20, 2025 at 09:10:17AM -0700, Sean Christopherson wrote:
-> > On Wed, Oct 15, 2025, Pawan Gupta wrote:
-> > > diff --git a/arch/x86/include/asm/nospec-branch.h b/arch/x86/include/asm/nospec-branch.h
-> > > index 49707e563bdf71bdd05d3827f10dd2b8ac6bca2c..00730cc22c2e7115f6dbb38a1ed8d10383ada5c0 100644
-> > > --- a/arch/x86/include/asm/nospec-branch.h
-> > > +++ b/arch/x86/include/asm/nospec-branch.h
-> > > @@ -534,7 +534,7 @@ void alternative_msr_write(unsigned int msr, u64 val, unsigned int feature)
-> > >  		: "memory");
-> > >  }
-> > >  
-> > > -DECLARE_PER_CPU(bool, x86_ibpb_exit_to_user);
-> > > +DECLARE_PER_CPU(bool, x86_pred_flush_pending);
-> > 
-> > Rather than "flush pending", what about using "need" in the name to indicate that
-> > a flush is necessary?  That makes it more obvious that e.g. KVM is marking the
-> > CPU as needing a flush by some other code, as opposed to implying that KVM itself
-> > has a pending flush.
-> > 
-> > And maybe spell out "prediction"?  Without the context of features being checked,
-> > I don't know that I would be able to guess "prediction".
-> > 
-> > E.g. x86_need_prediction_flush?
-> > 
-> > Or x86_prediction_flush_exit_to_user if we would prefer to clarify when the flush
-> > needs to occur?
+On 2025-10-20 21:29:47, David Matlack wrote:
+> On 2025-10-17 05:07 PM, Vipin Sharma wrote:
 > 
-> Ok, ya this is more clear. I would want to make a small change, instead of
-> "prediction_flush", "predictor_flush" reads better to me. Changing it to:
-> x86_predictor_flush_exit_to_user.
+> > @@ -167,6 +173,9 @@ static int vfio_pci_liveupdate_retrieve(struct liveupdate_file_handler *handler,
+> >  	 */
+> >  	filep->f_mapping = device->inode->i_mapping;
+> >  	*file = filep;
+> > +	vdev = container_of(device, struct vfio_pci_core_device, vdev);
+> > +	guard(mutex)(&device->dev_set->lock);
+> > +	vdev->liveupdate_restore = ser;
+> 
+> FYI, this causes a build failure for me:
+> 
+> drivers/vfio/pci/vfio_pci_liveupdate.c:381:3: error: cannot jump from this goto statement to its label
+>   381 |                 goto err_get_registration;
+>       |                 ^
+> drivers/vfio/pci/vfio_pci_liveupdate.c:394:2: note: jump bypasses initialization of variable with __attribute__((cleanup))
+>   394 |         guard(mutex)(&device->dev_set->lock);
+>       |         ^
+> 
+> It seems you cannot jump past a guard(). Replacing the guard with
+> lock/unlock fixes it, and so does putting the guard into its own inner
+> statement.
 
-LOL, see, told you I couldn't guest the word. :-D
+I didn't get this error in my builds. I used:
 
-"predictor" is way better, thanks!
+  make -j$(nproc) bzImage
+
+After your email, I tried with clang, using:
+
+  LLVM=1 make -j$(nproc) bzImage
+
+This one indeed fails with the error you mentioned. Thanks for catching
+it. I wonder why gcc not complaining about it? May be I need to pass
+some options to enable this build error on gcc.
 
