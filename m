@@ -1,70 +1,70 @@
-Return-Path: <kvm+bounces-60526-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-60527-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id 57976BF18C9
-	for <lists+kvm@lfdr.de>; Mon, 20 Oct 2025 15:35:02 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5B457BF19D6
+	for <lists+kvm@lfdr.de>; Mon, 20 Oct 2025 15:48:04 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 6EE364F5151
-	for <lists+kvm@lfdr.de>; Mon, 20 Oct 2025 13:34:59 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 162CA3E5DFE
+	for <lists+kvm@lfdr.de>; Mon, 20 Oct 2025 13:48:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 265C131AF10;
-	Mon, 20 Oct 2025 13:34:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2BE55322C99;
+	Mon, 20 Oct 2025 13:47:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="VMMnZKj4"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="utbIxzKu"
 X-Original-To: kvm@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 409B43126DD
-	for <kvm@vger.kernel.org>; Mon, 20 Oct 2025 13:34:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4C1AB31283D
+	for <kvm@vger.kernel.org>; Mon, 20 Oct 2025 13:47:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1760967285; cv=none; b=gSD7ZS7CKbhTByTuEsv2eOMawmu7iPXUz2bDBpv9on9y2XUcuDMbgz2Dq8W31hhgHVZr93JrQxLXs51wC5KZ2UELSmRS/Icqi/4nNGMKhj8me+VZ1TYLwV3KTF5QZhWABtpv2mK/dca5gvZxRnet2f+dGbzsPd2Ck0z+EiFCQJk=
+	t=1760968026; cv=none; b=mRWb1212WrBhe4NTE4ETMAmWY8Vph+A+U/0D/5h6g/Q0b6W/7dpOypAK9mpPE4BKELXwHED05NB52Gt2Ku/c88EcG3fOlt7mHyNIjCdVF82Z7/OwlT5mCAuciPIfGCk7hkl9QyL8nIHepi2dVxa1w0B3A0l3f0b0Yk8gEtCi/HM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1760967285; c=relaxed/simple;
-	bh=qaL9YbmZJTW/ixYO94qG+wib+260CKv9uoYvrwMFIF8=;
+	s=arc-20240116; t=1760968026; c=relaxed/simple;
+	bh=ANgSQSPVOIlXoVYbP+I9m5tJ0ZaaqeZGLzdTf42qYbc=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=TvupkB8K4S8dAmDeFTg39AYNRZ7xTzJd/Pa9geUJj3kTrkO8osL+lZLrOwsH/P1z8jYxiKa6jrSPcx3XcuXuMg2XqSQSGg5M2P7Ou1mx+pj27y4XlEnZ30vfLbPqbWNDtvxURbJoCs7GJ0rY0+/yCYX8sJTsRITcnNOWuOJ8jSA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=VMMnZKj4; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id DF614C2BC87
-	for <kvm@vger.kernel.org>; Mon, 20 Oct 2025 13:34:44 +0000 (UTC)
+	 To:Cc:Content-Type; b=JWAh81ciIZbUzFJQZnMZvfdEOAXC68HAlVB3JdwPV28DUCxYC977YhMPmBYd2PwBYAT3jur8sBRUvsH2B9B7ueyuzgGQDCBhFoBSW57qlUZTYdpetjocEVK1xhcJ3OHZCpfN/o2DHNlqo5R58ZAtQh0LV7qp+gG3dGEXCOV/lA8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=utbIxzKu; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id D9D77C16AAE
+	for <kvm@vger.kernel.org>; Mon, 20 Oct 2025 13:47:05 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1760967284;
-	bh=qaL9YbmZJTW/ixYO94qG+wib+260CKv9uoYvrwMFIF8=;
+	s=k20201202; t=1760968025;
+	bh=ANgSQSPVOIlXoVYbP+I9m5tJ0ZaaqeZGLzdTf42qYbc=;
 	h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
-	b=VMMnZKj40SWvA7YFx0Z+1zHS4alDBzPjYYOVrtVcYnOOyvzzbb/b5rsp5V3rlggs6
-	 Oufq6qWhD7Q+aELu92bRpV5FXiP2XQDNSrb2A2WI1xw8nkqIifwhRke3EvnkafR9DW
-	 4oh5vsLN0v/CNtC1w7C2B4cFms4i/8xqXwg5Tqosyumf2zqEecZmYD7ZWunU2l8k2g
-	 BTverz1tfqP4gUlH8U1s/NHiIBOUF+ewGlzeSRUhkjYFu8u4AyErNmZV0hs/HoEEXv
-	 VJCEgiCrtAQyfcbDJxLqSIJyH1jHKL0+l9RIhrcC6rnr1W5R42R7v5jQnP5LbzjwMn
-	 DcdYd+cKur5qQ==
-Received: by mail-wr1-f50.google.com with SMTP id ffacd0b85a97d-426ff694c1fso3456190f8f.2
-        for <kvm@vger.kernel.org>; Mon, 20 Oct 2025 06:34:44 -0700 (PDT)
-X-Forwarded-Encrypted: i=1; AJvYcCWRZ/Upf6HoJFreLey45+ExV7iO1q7TYckyXDCFbM0miXYsmLFc+Rzdebl9CNgjBH/ytHY=@vger.kernel.org
-X-Gm-Message-State: AOJu0YypIytAwcdVWKCG1NtY3qpSeJOhzZbTn/OZUptVR5ety5O81T9D
-	vl636B7UUs1EhRB4ylonnYlxQ3xwXzJNwpqtJ1X5obvgszJea7p36kzbWXbzaqtV8S9AuYrq1Nb
-	1+5DX/h//JQoMNq5c0PpVUkcz0hJUxys=
-X-Google-Smtp-Source: AGHT+IFQwlCf7FjnCPutO24ZzoIvXCKxA8V6xzsVKhuniPH312m1I40LeS2q7hRVe9Mx5ZgcbJzBUyetjP4FtY8fo7s=
-X-Received: by 2002:a05:6000:2c0c:b0:427:928:78a0 with SMTP id
- ffacd0b85a97d-42709287a50mr7648478f8f.63.1760967283331; Mon, 20 Oct 2025
- 06:34:43 -0700 (PDT)
+	b=utbIxzKux3b0QATbi6AkVyu9dOEgO1OONInR4KT3ACgSQwAmacc+tilNBGUc7H22A
+	 EOQyZSEOZ0adF+89jAcuCerzqHVodcMcWMRZez7e21WpjNfBTf9XB7izFL0HvA7Gh9
+	 JyVIYa9GqKuszXWpwRoXNd/veyNP7dT/whw0gt9pcA9j2ztjlxD2D5z1dEUitSmwUG
+	 +r1Oh8UxV9EuGbn1Phr/6RolewlJeI4JhVqgRT4YsiDkNlfXUCMoFzP6src5IUxJ4p
+	 WiWdFeFnWbuGXGip3B5qDT3zdyHnhXdzWkWnpxfO56pox5lB6lX+Ol59MFzy7p8ctQ
+	 xIZMfbQV74pdg==
+Received: by mail-wm1-f54.google.com with SMTP id 5b1f17b1804b1-471b80b994bso23533415e9.3
+        for <kvm@vger.kernel.org>; Mon, 20 Oct 2025 06:47:05 -0700 (PDT)
+X-Forwarded-Encrypted: i=1; AJvYcCXnzUd5L/MWN4IlI4pl+Gl7F4KFwjbGWtTXHS/c0y17Zc0l/7yFfzhRqQXuLVXw3CvbQ2E=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yyw1QzWpIzo/LquZnqecbUo2ZpZFfUb6MYmAKXjNCxxp2xprq2e
+	Acv3VJpESU5XCKdRvBThIrDoCEDzNEnqjdUyIw0Wn+yBouJu81G3KKjb7pGpjAL8zGK6lR0KFkR
+	IstmPheRo2xajcWGUyxku3NqaaQUXlVI=
+X-Google-Smtp-Source: AGHT+IGpvHBGOazwRpML7L6p+OasmV1SnRg6q1qXry12cbpNN8zhS8TFOb5uYraKUxj/eNcIvfi0sxzsmTyVox3z8JY=
+X-Received: by 2002:a05:600c:3b0c:b0:471:669:ec1f with SMTP id
+ 5b1f17b1804b1-471178785e1mr97856905e9.8.1760968024377; Mon, 20 Oct 2025
+ 06:47:04 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20251020042056.30283-1-luxu.kernel@bytedance.com> <20251020042056.30283-5-luxu.kernel@bytedance.com>
-In-Reply-To: <20251020042056.30283-5-luxu.kernel@bytedance.com>
+References: <20251020042056.30283-1-luxu.kernel@bytedance.com> <20251020042056.30283-4-luxu.kernel@bytedance.com>
+In-Reply-To: <20251020042056.30283-4-luxu.kernel@bytedance.com>
 From: Guo Ren <guoren@kernel.org>
-Date: Mon, 20 Oct 2025 21:34:27 +0800
-X-Gmail-Original-Message-ID: <CAJF2gTRyXPxtw1mvMEAt2NLMUecu++DyN8n+HxmcpbPPF_KB3Q@mail.gmail.com>
-X-Gm-Features: AS18NWDpy2g1Qp1BbuHJudf6VVHWVv_M97q7whwhpvd314t5p96b7PWN5zNzj08
-Message-ID: <CAJF2gTRyXPxtw1mvMEAt2NLMUecu++DyN8n+HxmcpbPPF_KB3Q@mail.gmail.com>
-Subject: Re: [PATCH v4 04/10] riscv: Introduce Zalasr instructions
+Date: Mon, 20 Oct 2025 21:46:51 +0800
+X-Gmail-Original-Message-ID: <CAJF2gTREY07Eo0EgB9ew1sd6FkMtoFSTgyC5ny2SQKKd83xEtw@mail.gmail.com>
+X-Gm-Features: AS18NWDSEQv09h9pIrv_Q1ibVOSy0wdkcUShHmZExEFgCajrR16Dgx95ctdgozI
+Message-ID: <CAJF2gTREY07Eo0EgB9ew1sd6FkMtoFSTgyC5ny2SQKKd83xEtw@mail.gmail.com>
+Subject: Re: [PATCH v4 03/10] riscv: hwprobe: Export Zalasr extension
 To: Xu Lu <luxu.kernel@bytedance.com>
 Cc: corbet@lwn.net, paul.walmsley@sifive.com, palmer@dabbelt.com, 
 	aou@eecs.berkeley.edu, alex@ghiti.fr, robh@kernel.org, krzk+dt@kernel.org, 
@@ -82,118 +82,78 @@ Content-Transfer-Encoding: quoted-printable
 On Mon, Oct 20, 2025 at 12:21=E2=80=AFPM Xu Lu <luxu.kernel@bytedance.com> =
 wrote:
 >
-> Introduce l{b|h|w|d}.{aq|aqrl} and s{b|h|w|d}.{rl|aqrl} instruction
-> encodings.
+> Export the Zalasr extension to userspace using hwprobe.
 >
 > Signed-off-by: Xu Lu <luxu.kernel@bytedance.com>
 > ---
->  arch/riscv/include/asm/insn-def.h | 79 +++++++++++++++++++++++++++++++
->  1 file changed, 79 insertions(+)
+>  Documentation/arch/riscv/hwprobe.rst  | 5 ++++-
+>  arch/riscv/include/uapi/asm/hwprobe.h | 1 +
+>  arch/riscv/kernel/sys_hwprobe.c       | 1 +
+>  3 files changed, 6 insertions(+), 1 deletion(-)
 >
-> diff --git a/arch/riscv/include/asm/insn-def.h b/arch/riscv/include/asm/i=
-nsn-def.h
-> index d5adbaec1d010..3fec7e66ce50f 100644
-> --- a/arch/riscv/include/asm/insn-def.h
-> +++ b/arch/riscv/include/asm/insn-def.h
-> @@ -179,6 +179,7 @@
->  #define RV___RS1(v)            __RV_REG(v)
->  #define RV___RS2(v)            __RV_REG(v)
+> diff --git a/Documentation/arch/riscv/hwprobe.rst b/Documentation/arch/ri=
+scv/hwprobe.rst
+> index 2aa9be272d5de..067a3595fb9d5 100644
+> --- a/Documentation/arch/riscv/hwprobe.rst
+> +++ b/Documentation/arch/riscv/hwprobe.rst
+> @@ -249,6 +249,9 @@ The following keys are defined:
+>         defined in the in the RISC-V ISA manual starting from commit e874=
+12e621f1
+>         ("integrate Zaamo and Zalrsc text (#1304)").
 >
-> +#define RV_OPCODE_AMO          RV_OPCODE(47)
->  #define RV_OPCODE_MISC_MEM     RV_OPCODE(15)
->  #define RV_OPCODE_OP_IMM       RV_OPCODE(19)
->  #define RV_OPCODE_SYSTEM       RV_OPCODE(115)
-> @@ -208,6 +209,84 @@
->         __ASM_STR(.error "hlv.d requires 64-bit support")
->  #endif
+> +  * :c:macro:`RISCV_HWPROBE_EXT_ZALASR`: The Zalasr extension is support=
+ed as
+> +       frozen at commit 194f0094 ("Version 0.9 for freeze") of riscv-zal=
+asr.
+"Frozen Version 0.9" might not be proper; it denotes the current
+temporary state, not the goal of the patch.
+
+> +
+>    * :c:macro:`RISCV_HWPROBE_EXT_ZALRSC`: The Zalrsc extension is support=
+ed as
+>         defined in the in the RISC-V ISA manual starting from commit e874=
+12e621f1
+>         ("integrate Zaamo and Zalrsc text (#1304)").
+> @@ -360,4 +363,4 @@ The following keys are defined:
 >
-> +#define LB_AQ(dest, addr)                                      \
-> +       INSN_R(OPCODE_AMO, FUNC3(0), FUNC7(26),                 \
-> +              RD(dest), RS1(addr), __RS2(0))
-> +
-> +#define LB_AQRL(dest, addr)                                    \
-> +       INSN_R(OPCODE_AMO, FUNC3(0), FUNC7(27),                 \
-> +              RD(dest), RS1(addr), __RS2(0))
-> +
-> +#define LH_AQ(dest, addr)                                      \
-> +       INSN_R(OPCODE_AMO, FUNC3(1), FUNC7(26),                 \
-> +              RD(dest), RS1(addr), __RS2(0))
-> +
-> +#define LH_AQRL(dest, addr)                                    \
-> +       INSN_R(OPCODE_AMO, FUNC3(1), FUNC7(27),                 \
-> +              RD(dest), RS1(addr), __RS2(0))
-> +
-> +#define LW_AQ(dest, addr)                                      \
-> +       INSN_R(OPCODE_AMO, FUNC3(2), FUNC7(26),                 \
-> +              RD(dest), RS1(addr), __RS2(0))
-> +
-> +#define LW_AQRL(dest, addr)                                    \
-> +       INSN_R(OPCODE_AMO, FUNC3(2), FUNC7(27),                 \
-> +              RD(dest), RS1(addr), __RS2(0))
-> +
-> +#define SB_RL(src, addr)                                       \
-> +       INSN_R(OPCODE_AMO, FUNC3(0), FUNC7(29),                 \
-> +              __RD(0), RS1(addr), RS2(src))
-> +
-> +#define SB_AQRL(src, addr)                                     \
-> +       INSN_R(OPCODE_AMO, FUNC3(0), FUNC7(31),                 \
-> +              __RD(0), RS1(addr), RS2(src))
-> +
-> +#define SH_RL(src, addr)                                       \
-> +       INSN_R(OPCODE_AMO, FUNC3(1), FUNC7(29),                 \
-> +              __RD(0), RS1(addr), RS2(src))
-> +
-> +#define SH_AQRL(src, addr)                                     \
-> +       INSN_R(OPCODE_AMO, FUNC3(1), FUNC7(31),                 \
-> +              __RD(0), RS1(addr), RS2(src))
-> +
-> +#define SW_RL(src, addr)                                       \
-> +       INSN_R(OPCODE_AMO, FUNC3(2), FUNC7(29),                 \
-> +              __RD(0), RS1(addr), RS2(src))
-> +
-> +#define SW_AQRL(src, addr)                                     \
-> +       INSN_R(OPCODE_AMO, FUNC3(2), FUNC7(31),                 \
-> +              __RD(0), RS1(addr), RS2(src))
-> +
-> +#ifdef CONFIG_64BIT
-> +#define LD_AQ(dest, addr)                                      \
-> +       INSN_R(OPCODE_AMO, FUNC3(3), FUNC7(26),                 \
-> +              RD(dest), RS1(addr), __RS2(0))
-> +
-> +#define LD_AQRL(dest, addr)                                    \
-> +       INSN_R(OPCODE_AMO, FUNC3(3), FUNC7(27),                 \
-> +              RD(dest), RS1(addr), __RS2(0))
-> +
-> +#define SD_RL(src, addr)                                       \
-> +       INSN_R(OPCODE_AMO, FUNC3(3), FUNC7(29),                 \
-> +              __RD(0), RS1(addr), RS2(src))
-> +
-> +#define SD_AQRL(src, addr)                                     \
-> +       INSN_R(OPCODE_AMO, FUNC3(3), FUNC7(31),                 \
-> +              __RD(0), RS1(addr), RS2(src))
-> +#else
-> +#define LD_AQ(dest, addr)                                      \
-> +       __ASM_STR(.error "ld.aq requires 64-bit support")
-> +
-> +#define LD_AQRL(dest, addr)                                    \
-> +       __ASM_STR(.error "ld.aqrl requires 64-bit support")
-> +
-> +#define SD_RL(dest, addr)                                      \
-> +       __ASM_STR(.error "sd.rl requires 64-bit support")
-> +
-> +#define SD_AQRL(dest, addr)                                    \
-> +       __ASM_STR(.error "sd.aqrl requires 64-bit support")
-> +#endif
-> +
->  #define SINVAL_VMA(vaddr, asid)                                        \
->         INSN_R(OPCODE_SYSTEM, FUNC3(0), FUNC7(11),              \
->                __RD(0), RS1(vaddr), RS2(asid))
+>      * :c:macro:`RISCV_HWPROBE_VENDOR_EXT_XSFVFWMACCQQQ`: The Xsfvfwmaccq=
+qq
+>          vendor extension is supported in version 1.0 of Matrix Multiply =
+Accumulate
+> -       Instruction Extensions Specification.
+> \ No newline at end of file
+> +       Instruction Extensions Specification.
+> diff --git a/arch/riscv/include/uapi/asm/hwprobe.h b/arch/riscv/include/u=
+api/asm/hwprobe.h
+> index aaf6ad9704993..d3a65f8ff7da4 100644
+> --- a/arch/riscv/include/uapi/asm/hwprobe.h
+> +++ b/arch/riscv/include/uapi/asm/hwprobe.h
+> @@ -82,6 +82,7 @@ struct riscv_hwprobe {
+>  #define                RISCV_HWPROBE_EXT_ZAAMO         (1ULL << 56)
+>  #define                RISCV_HWPROBE_EXT_ZALRSC        (1ULL << 57)
+>  #define                RISCV_HWPROBE_EXT_ZABHA         (1ULL << 58)
+> +#define                RISCV_HWPROBE_EXT_ZALASR        (1ULL << 59)
+>  #define RISCV_HWPROBE_KEY_CPUPERF_0    5
+>  #define                RISCV_HWPROBE_MISALIGNED_UNKNOWN        (0 << 0)
+>  #define                RISCV_HWPROBE_MISALIGNED_EMULATED       (1 << 0)
+> diff --git a/arch/riscv/kernel/sys_hwprobe.c b/arch/riscv/kernel/sys_hwpr=
+obe.c
+> index 0b170e18a2beb..0529e692b1173 100644
+> --- a/arch/riscv/kernel/sys_hwprobe.c
+> +++ b/arch/riscv/kernel/sys_hwprobe.c
+> @@ -99,6 +99,7 @@ static void hwprobe_isa_ext0(struct riscv_hwprobe *pair=
+,
+>                 EXT_KEY(ZAAMO);
+>                 EXT_KEY(ZABHA);
+>                 EXT_KEY(ZACAS);
+> +               EXT_KEY(ZALASR);
+>                 EXT_KEY(ZALRSC);
+>                 EXT_KEY(ZAWRS);
+>                 EXT_KEY(ZBA);
 > --
 > 2.20.1
 >
-I didn't find problem.
 
-Reviewed-by: Guo Ren <guoren@kernel.org>
 
 --=20
 Best Regards
