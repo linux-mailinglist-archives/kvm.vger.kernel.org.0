@@ -1,161 +1,178 @@
-Return-Path: <kvm+bounces-60527-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-60528-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5B457BF19D6
-	for <lists+kvm@lfdr.de>; Mon, 20 Oct 2025 15:48:04 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0CA09BF1AEA
+	for <lists+kvm@lfdr.de>; Mon, 20 Oct 2025 15:59:16 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 162CA3E5DFE
-	for <lists+kvm@lfdr.de>; Mon, 20 Oct 2025 13:48:03 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8543442482D
+	for <lists+kvm@lfdr.de>; Mon, 20 Oct 2025 13:57:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2BE55322C99;
-	Mon, 20 Oct 2025 13:47:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 90C9D320CC9;
+	Mon, 20 Oct 2025 13:57:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="utbIxzKu"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="M6R41M+U"
 X-Original-To: kvm@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f202.google.com (mail-pl1-f202.google.com [209.85.214.202])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4C1AB31283D
-	for <kvm@vger.kernel.org>; Mon, 20 Oct 2025 13:47:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D99ED320A1D
+	for <kvm@vger.kernel.org>; Mon, 20 Oct 2025 13:57:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1760968026; cv=none; b=mRWb1212WrBhe4NTE4ETMAmWY8Vph+A+U/0D/5h6g/Q0b6W/7dpOypAK9mpPE4BKELXwHED05NB52Gt2Ku/c88EcG3fOlt7mHyNIjCdVF82Z7/OwlT5mCAuciPIfGCk7hkl9QyL8nIHepi2dVxa1w0B3A0l3f0b0Yk8gEtCi/HM=
+	t=1760968653; cv=none; b=mkK/Zxzgw8Ccvs/+qsZGuj7zggourjB6JgULL4Z32tzNfQa8jIzigevqffSXThjr7dUblf9kkp0d07+N7Q0z3DeSzw3BnRSf3z9foP7a5CpeUoxwFnIm8kLPykBayE1bYid3p964Z9FCj1Wz+seRI+OLcIgJK3TkD+QFkKwkI/8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1760968026; c=relaxed/simple;
-	bh=ANgSQSPVOIlXoVYbP+I9m5tJ0ZaaqeZGLzdTf42qYbc=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=JWAh81ciIZbUzFJQZnMZvfdEOAXC68HAlVB3JdwPV28DUCxYC977YhMPmBYd2PwBYAT3jur8sBRUvsH2B9B7ueyuzgGQDCBhFoBSW57qlUZTYdpetjocEVK1xhcJ3OHZCpfN/o2DHNlqo5R58ZAtQh0LV7qp+gG3dGEXCOV/lA8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=utbIxzKu; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id D9D77C16AAE
-	for <kvm@vger.kernel.org>; Mon, 20 Oct 2025 13:47:05 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1760968025;
-	bh=ANgSQSPVOIlXoVYbP+I9m5tJ0ZaaqeZGLzdTf42qYbc=;
-	h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
-	b=utbIxzKux3b0QATbi6AkVyu9dOEgO1OONInR4KT3ACgSQwAmacc+tilNBGUc7H22A
-	 EOQyZSEOZ0adF+89jAcuCerzqHVodcMcWMRZez7e21WpjNfBTf9XB7izFL0HvA7Gh9
-	 JyVIYa9GqKuszXWpwRoXNd/veyNP7dT/whw0gt9pcA9j2ztjlxD2D5z1dEUitSmwUG
-	 +r1Oh8UxV9EuGbn1Phr/6RolewlJeI4JhVqgRT4YsiDkNlfXUCMoFzP6src5IUxJ4p
-	 WiWdFeFnWbuGXGip3B5qDT3zdyHnhXdzWkWnpxfO56pox5lB6lX+Ol59MFzy7p8ctQ
-	 xIZMfbQV74pdg==
-Received: by mail-wm1-f54.google.com with SMTP id 5b1f17b1804b1-471b80b994bso23533415e9.3
-        for <kvm@vger.kernel.org>; Mon, 20 Oct 2025 06:47:05 -0700 (PDT)
-X-Forwarded-Encrypted: i=1; AJvYcCXnzUd5L/MWN4IlI4pl+Gl7F4KFwjbGWtTXHS/c0y17Zc0l/7yFfzhRqQXuLVXw3CvbQ2E=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yyw1QzWpIzo/LquZnqecbUo2ZpZFfUb6MYmAKXjNCxxp2xprq2e
-	Acv3VJpESU5XCKdRvBThIrDoCEDzNEnqjdUyIw0Wn+yBouJu81G3KKjb7pGpjAL8zGK6lR0KFkR
-	IstmPheRo2xajcWGUyxku3NqaaQUXlVI=
-X-Google-Smtp-Source: AGHT+IGpvHBGOazwRpML7L6p+OasmV1SnRg6q1qXry12cbpNN8zhS8TFOb5uYraKUxj/eNcIvfi0sxzsmTyVox3z8JY=
-X-Received: by 2002:a05:600c:3b0c:b0:471:669:ec1f with SMTP id
- 5b1f17b1804b1-471178785e1mr97856905e9.8.1760968024377; Mon, 20 Oct 2025
- 06:47:04 -0700 (PDT)
+	s=arc-20240116; t=1760968653; c=relaxed/simple;
+	bh=by/B3ZF4ltTXKR7zti0GcW7Yp/JTFBt6fuWW4uMr8pU=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=Q9lgQcten7iiHR/KEIjDlFwuqBTcdUmnV3PtY97HVlI6bZDg4usSmZ3hUfw/mgTt5BzlZsoABGbcPdS6URhs8hWy155bm3wXCCd+tBXiDkZGO3PtNFzvlayd4ldo1f9CtiGsjFcgvnhsnrRNYAGtK0oP63jdtgtcKoRuauLSg7A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=M6R41M+U; arc=none smtp.client-ip=209.85.214.202
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+Received: by mail-pl1-f202.google.com with SMTP id d9443c01a7336-290ab8f5af6so34694915ad.3
+        for <kvm@vger.kernel.org>; Mon, 20 Oct 2025 06:57:30 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1760968650; x=1761573450; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=M0+EDFFrKoSwKYvzTgc8liBMbmZOSvdeEq8OSVJkaRM=;
+        b=M6R41M+UYbCNauRWmOcJMSynaFyor9XVvM/+Rby8nP+YWFQMUsoiT0xRb/pFqTjxgI
+         m6sDWUQ4FQBwZ60ZGBMNcO5pK0iWsgD6sczOpPfbdFcFoYYPDcv8rqAxnlXADhzY8MkQ
+         aZubZQFkEX5GXuh/6x252TB1KTI3fQ2sozsFsWxi4lJtfMkvl3SvkyB/gV91513/LBZE
+         EzF6+KWjXcZdYY9y7Wrzv/dgJIKMHbwPvyyvq+/UjodkUvrJ6kTNC5iOPpn8CYoFn6OR
+         qS6L6MpvMpkF65tjBK4KTRtBTeeuVuj6U5KjQfikHHiMtak5WA8MWv6phPLy2ERN8fl8
+         vD9A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1760968650; x=1761573450;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=M0+EDFFrKoSwKYvzTgc8liBMbmZOSvdeEq8OSVJkaRM=;
+        b=v6dPk+SRdpSELQoLjChMQSVey5++Q9NJCxWRlYBRjTlkC4axgsSl5HgQVQsSUsDyTK
+         FUyD7tPmoDX4nWHJHEdX7FEqjxyCLkC02NtjxqFXrKhv5U3MtPYOZUJ0ndbdkUn8xIXP
+         4xPqMvFB5y4eAvQCMcx3Hx8c8OKhSio9wbuhwtlMTjzOIaQiwfgW/76I0hT2pmpNWQze
+         3in2vwURS9ODeJUXAaWOpLBX0TwzwLLX81WnqfLetr9lTcNB/+qd62liMqrpeGwvG2xn
+         JsarNpqY4QtDRnXnyiMW83Ri5Fpo6bR86BDV8optW+OFYV5P0NennOvbGM5GgTolLnrz
+         xGxg==
+X-Forwarded-Encrypted: i=1; AJvYcCU9T/5re3GgvuJ3nFjra9KME6atOC59MFf24Z4eNlff0TNzAJGRvSoSyHrJjz5rKPjv0RQ=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxiubhzKGwPoCNy5RzL3Z9ALac4cB2jV6vYueFdr1uuqOp3ZXB4
+	gZZENLQTkbWBFUatYUFwmkW2AbPgoxb8qcw9n5FyyYGLpubq0JvJImlXblijtR5zTr7HJqSIPU/
+	7fPsZrA==
+X-Google-Smtp-Source: AGHT+IGwXt5nNKVJSLvunD70jP+TkqfMmkfhrgwNxrmYjfs0sanoJMdXrBHWe3iLon8zoT/KxTnC2xnbn/U=
+X-Received: from plbll15.prod.google.com ([2002:a17:903:90f:b0:290:af0d:9383])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:903:1a0e:b0:28d:c790:43d0
+ with SMTP id d9443c01a7336-290ca30e417mr163929165ad.29.1760968650214; Mon, 20
+ Oct 2025 06:57:30 -0700 (PDT)
+Date: Mon, 20 Oct 2025 06:57:28 -0700
+In-Reply-To: <20250910144453.1389652-1-dave.hansen@linux.intel.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-References: <20251020042056.30283-1-luxu.kernel@bytedance.com> <20251020042056.30283-4-luxu.kernel@bytedance.com>
-In-Reply-To: <20251020042056.30283-4-luxu.kernel@bytedance.com>
-From: Guo Ren <guoren@kernel.org>
-Date: Mon, 20 Oct 2025 21:46:51 +0800
-X-Gmail-Original-Message-ID: <CAJF2gTREY07Eo0EgB9ew1sd6FkMtoFSTgyC5ny2SQKKd83xEtw@mail.gmail.com>
-X-Gm-Features: AS18NWDSEQv09h9pIrv_Q1ibVOSy0wdkcUShHmZExEFgCajrR16Dgx95ctdgozI
-Message-ID: <CAJF2gTREY07Eo0EgB9ew1sd6FkMtoFSTgyC5ny2SQKKd83xEtw@mail.gmail.com>
-Subject: Re: [PATCH v4 03/10] riscv: hwprobe: Export Zalasr extension
-To: Xu Lu <luxu.kernel@bytedance.com>
-Cc: corbet@lwn.net, paul.walmsley@sifive.com, palmer@dabbelt.com, 
-	aou@eecs.berkeley.edu, alex@ghiti.fr, robh@kernel.org, krzk+dt@kernel.org, 
-	conor+dt@kernel.org, will@kernel.org, peterz@infradead.org, 
-	boqun.feng@gmail.com, mark.rutland@arm.com, anup@brainfault.org, 
-	atish.patra@linux.dev, pbonzini@redhat.com, shuah@kernel.org, 
-	parri.andrea@gmail.com, ajones@ventanamicro.com, brs@rivosinc.com, 
-	linux-doc@vger.kernel.org, linux-riscv@lists.infradead.org, 
-	linux-kernel@vger.kernel.org, devicetree@vger.kernel.org, kvm@vger.kernel.org, 
-	kvm-riscv@lists.infradead.org, linux-kselftest@vger.kernel.org, 
-	apw@canonical.com, joe@perches.com, lukas.bulwahn@gmail.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Mime-Version: 1.0
+References: <20250910144453.1389652-1-dave.hansen@linux.intel.com>
+Message-ID: <aPY_yC45suT8sn8F@google.com>
+Subject: Re: [PATCH] x86/virt/tdx: Use precalculated TDVPR page physical address
+From: Sean Christopherson <seanjc@google.com>
+To: Dave Hansen <dave.hansen@linux.intel.com>
+Cc: linux-kernel@vger.kernel.org, Thomas Gleixner <tglx@linutronix.de>, 
+	Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>, x86@kernel.org, 
+	"H. Peter Anvin" <hpa@zytor.com>, "Kirill A. Shutemov" <kas@kernel.org>, 
+	Rick Edgecombe <rick.p.edgecombe@intel.com>, Paolo Bonzini <pbonzini@redhat.com>, 
+	Kai Huang <kai.huang@intel.com>, Isaku Yamahata <isaku.yamahata@intel.com>, 
+	Vishal Annapurve <vannapurve@google.com>, Thomas Huth <thuth@redhat.com>, 
+	Adrian Hunter <adrian.hunter@intel.com>, linux-coco@lists.linux.dev, kvm@vger.kernel.org, 
+	Farrah Chen <farrah.chen@intel.com>
+Content-Type: text/plain; charset="us-ascii"
 
-On Mon, Oct 20, 2025 at 12:21=E2=80=AFPM Xu Lu <luxu.kernel@bytedance.com> =
-wrote:
->
-> Export the Zalasr extension to userspace using hwprobe.
->
-> Signed-off-by: Xu Lu <luxu.kernel@bytedance.com>
+On Wed, Sep 10, 2025, Dave Hansen wrote:
+> From: Kai Huang <kai.huang@intel.com>
+> 
+> All of the x86 KVM guest types (VMX, SEV and TDX) do some special context
+> tracking when entering guests. This means that the actual guest entry
+> sequence must be noinstr.
+> 
+> Part of entering a TDX guest is passing a physical address to the TDX
+> module. Right now, that physical address is stored as a 'struct page'
+> and converted to a physical address at guest entry. That page=>phys
+> conversion can be complicated, can vary greatly based on kernel
+> config, and it is definitely _not_ a noinstr path today.
+> 
+> There have been a number of tinkering approaches to try and fix this
+> up, but they all fall down due to some part of the page=>phys
+> conversion infrastructure not being noinstr friendly.
+> 
+> Precalculate the page=>phys conversion and store it in the existing
+> 'tdx_vp' structure.  Use the new field at every site that needs a
+> tdvpr physical address. Remove the now redundant tdx_tdvpr_pa().
+> Remove the __flatten remnant from the tinkering.
+> 
+> Note that only one user of the new field is actually noinstr. All
+> others can use page_to_phys(). But, they might as well save the effort
+> since there is a pre-calculated value sitting there for them.
+> 
+> [ dhansen: rewrite all the text ]
+> 
+> Signed-off-by: Kai Huang <kai.huang@intel.com>
+> Signed-off-by: Dave Hansen <dave.hansen@linux.intel.com>
+> Tested-by: Farrah Chen <farrah.chen@intel.com>
 > ---
->  Documentation/arch/riscv/hwprobe.rst  | 5 ++++-
->  arch/riscv/include/uapi/asm/hwprobe.h | 1 +
->  arch/riscv/kernel/sys_hwprobe.c       | 1 +
->  3 files changed, 6 insertions(+), 1 deletion(-)
->
-> diff --git a/Documentation/arch/riscv/hwprobe.rst b/Documentation/arch/ri=
-scv/hwprobe.rst
-> index 2aa9be272d5de..067a3595fb9d5 100644
-> --- a/Documentation/arch/riscv/hwprobe.rst
-> +++ b/Documentation/arch/riscv/hwprobe.rst
-> @@ -249,6 +249,9 @@ The following keys are defined:
->         defined in the in the RISC-V ISA manual starting from commit e874=
-12e621f1
->         ("integrate Zaamo and Zalrsc text (#1304)").
->
-> +  * :c:macro:`RISCV_HWPROBE_EXT_ZALASR`: The Zalasr extension is support=
-ed as
-> +       frozen at commit 194f0094 ("Version 0.9 for freeze") of riscv-zal=
-asr.
-"Frozen Version 0.9" might not be proper; it denotes the current
-temporary state, not the goal of the patch.
+>  arch/x86/include/asm/tdx.h  |  2 ++
+>  arch/x86/kvm/vmx/tdx.c      |  9 +++++++++
+>  arch/x86/virt/vmx/tdx/tdx.c | 21 ++++++++-------------
+>  3 files changed, 19 insertions(+), 13 deletions(-)
+> 
+> diff --git a/arch/x86/include/asm/tdx.h b/arch/x86/include/asm/tdx.h
+> index 6120461bd5ff3..6b338d7f01b7d 100644
+> --- a/arch/x86/include/asm/tdx.h
+> +++ b/arch/x86/include/asm/tdx.h
+> @@ -171,6 +171,8 @@ struct tdx_td {
+>  struct tdx_vp {
+>  	/* TDVP root page */
+>  	struct page *tdvpr_page;
+> +	/* precalculated page_to_phys(tdvpr_page) for use in noinstr code */
+> +	phys_addr_t tdvpr_pa;
+>  
+>  	/* TD vCPU control structure: */
+>  	struct page **tdcx_pages;
+> diff --git a/arch/x86/kvm/vmx/tdx.c b/arch/x86/kvm/vmx/tdx.c
+> index 04b6d332c1afa..75326a7449cc3 100644
+> --- a/arch/x86/kvm/vmx/tdx.c
+> +++ b/arch/x86/kvm/vmx/tdx.c
+> @@ -852,6 +852,7 @@ void tdx_vcpu_free(struct kvm_vcpu *vcpu)
+>  	if (tdx->vp.tdvpr_page) {
+>  		tdx_reclaim_control_page(tdx->vp.tdvpr_page);
+>  		tdx->vp.tdvpr_page = 0;
+> +		tdx->vp.tdvpr_pa = 0;
 
-> +
->    * :c:macro:`RISCV_HWPROBE_EXT_ZALRSC`: The Zalrsc extension is support=
-ed as
->         defined in the in the RISC-V ISA manual starting from commit e874=
-12e621f1
->         ("integrate Zaamo and Zalrsc text (#1304)").
-> @@ -360,4 +363,4 @@ The following keys are defined:
->
->      * :c:macro:`RISCV_HWPROBE_VENDOR_EXT_XSFVFWMACCQQQ`: The Xsfvfwmaccq=
-qq
->          vendor extension is supported in version 1.0 of Matrix Multiply =
-Accumulate
-> -       Instruction Extensions Specification.
-> \ No newline at end of file
-> +       Instruction Extensions Specification.
-> diff --git a/arch/riscv/include/uapi/asm/hwprobe.h b/arch/riscv/include/u=
-api/asm/hwprobe.h
-> index aaf6ad9704993..d3a65f8ff7da4 100644
-> --- a/arch/riscv/include/uapi/asm/hwprobe.h
-> +++ b/arch/riscv/include/uapi/asm/hwprobe.h
-> @@ -82,6 +82,7 @@ struct riscv_hwprobe {
->  #define                RISCV_HWPROBE_EXT_ZAAMO         (1ULL << 56)
->  #define                RISCV_HWPROBE_EXT_ZALRSC        (1ULL << 57)
->  #define                RISCV_HWPROBE_EXT_ZABHA         (1ULL << 58)
-> +#define                RISCV_HWPROBE_EXT_ZALASR        (1ULL << 59)
->  #define RISCV_HWPROBE_KEY_CPUPERF_0    5
->  #define                RISCV_HWPROBE_MISALIGNED_UNKNOWN        (0 << 0)
->  #define                RISCV_HWPROBE_MISALIGNED_EMULATED       (1 << 0)
-> diff --git a/arch/riscv/kernel/sys_hwprobe.c b/arch/riscv/kernel/sys_hwpr=
-obe.c
-> index 0b170e18a2beb..0529e692b1173 100644
-> --- a/arch/riscv/kernel/sys_hwprobe.c
-> +++ b/arch/riscv/kernel/sys_hwprobe.c
-> @@ -99,6 +99,7 @@ static void hwprobe_isa_ext0(struct riscv_hwprobe *pair=
-,
->                 EXT_KEY(ZAAMO);
->                 EXT_KEY(ZABHA);
->                 EXT_KEY(ZACAS);
-> +               EXT_KEY(ZALASR);
->                 EXT_KEY(ZALRSC);
->                 EXT_KEY(ZAWRS);
->                 EXT_KEY(ZBA);
-> --
-> 2.20.1
->
+'0' is a perfectly legal physical address.  And using '0' in the existing code to
+nullify a pointer is gross.
 
+Why do these structures track struct page everywhere?  Nothing actually uses the
+struct page object (except calls to __free_page().  The leaf functions all take
+a physical address or a virtual address.  Track one of those and then use __pa()
+or __va() to get at the other.
 
---=20
-Best Regards
- Guo Ren
+Side topic, if you're going to bother tracking the number of pages in each struct
+despite them being global values, at least reap the benefits of __counted_by().
+
+struct tdx_td {
+	/* TD root structure: */
+	void *tdr_page;
+
+	int tdcs_nr_pages;
+	/* TD control structure: */
+	void *tdcs_pages[] __counted_by(tdcs_nr_pages);
+};
+
+struct tdx_vp {
+	/* TDVP root page */
+	void *tdvpr_page;
+
+	int tdcx_nr_pages;
+	/* TD vCPU control structure: */
+	void *tdcx_pages[] __counted_by(tdcx_nr_pages);
+};
 
