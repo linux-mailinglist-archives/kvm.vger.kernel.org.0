@@ -1,169 +1,120 @@
-Return-Path: <kvm+bounces-60487-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-60488-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6EB6BBEFD5C
-	for <lists+kvm@lfdr.de>; Mon, 20 Oct 2025 10:13:00 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 471E3BEFF76
+	for <lists+kvm@lfdr.de>; Mon, 20 Oct 2025 10:32:26 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8E9F93BC954
-	for <lists+kvm@lfdr.de>; Mon, 20 Oct 2025 08:12:21 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id AEDE93BA363
+	for <lists+kvm@lfdr.de>; Mon, 20 Oct 2025 08:30:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CB4E92EA157;
-	Mon, 20 Oct 2025 08:12:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3486D2E973F;
+	Mon, 20 Oct 2025 08:29:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="eRW2oMNl"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail.loongson.cn (mail.loongson.cn [114.242.206.163])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C0D0C2E9735
-	for <kvm@vger.kernel.org>; Mon, 20 Oct 2025 08:12:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=114.242.206.163
+Received: from mail-wm1-f47.google.com (mail-wm1-f47.google.com [209.85.128.47])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8190054763
+	for <kvm@vger.kernel.org>; Mon, 20 Oct 2025 08:29:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.47
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1760947931; cv=none; b=M6DkGa9LIgT7XgdX60R6yviIEYa6caZXbF6EgayDBUoZff7RJrVGWxOxh3GNuFR73g+L/Ij0mGqTa6sYSPPw2L5iWNuie1RA5ZW2H+/MR6Tl5FldmUAhiVd3V8SRHdSpjrZNOtCcM8lq5cuYmfZFRU8ojA0g4q8c55EuXTqrP1U=
+	t=1760948973; cv=none; b=g2r6YJ6vPl2fyds94jHViphMw5EmwznTfI8Etzsj6kQEFs/1JX3eFuzfn5HDKUVzUktxDpggtUMTgKHKPgF5XHNFQvSSaFUydC3E2JcckT3daFuMrJ1mXJyRO92zZyeG80PaSY2R7p/9K2pZuk1GBiTmcKHcLA55RxZpM7t3EXY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1760947931; c=relaxed/simple;
-	bh=xl6z2MD7z0/kO0NqNyvzx47NhVsRIm787DUwg1dg6zk=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=BLEy3D5SNA1vayoogrYyc58r2g7ZaZsn/RIjEs4jWhA3F2sKgFLrE8w0B97ALGduhBPxhc+jDLirLW/RKzcvsdgxRqWqU/3tpOLQhcg8aQZe/r2T2StnUa3cvj/SxJXt/l1Wvmnt00ji3h3SB46g7nVH2zu54Pyi2O180kjuJSI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=loongson.cn; spf=pass smtp.mailfrom=loongson.cn; arc=none smtp.client-ip=114.242.206.163
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=loongson.cn
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=loongson.cn
-Received: from loongson.cn (unknown [10.2.5.213])
-	by gateway (Coremail) with SMTP id _____8BxE9DU7vVoAzUYAA--.51591S3;
-	Mon, 20 Oct 2025 16:12:04 +0800 (CST)
-Received: from localhost.localdomain (unknown [10.2.5.213])
-	by front1 (Coremail) with SMTP id qMiowJBxZOTQ7vVohSf4AA--.18451S4;
-	Mon, 20 Oct 2025 16:12:03 +0800 (CST)
-From: Bibo Mao <maobibo@loongson.cn>
-To: Song Gao <gaosong@loongson.cn>,
-	"Michael S . Tsirkin" <mst@redhat.com>,
-	Cornelia Huck <cohuck@redhat.com>,
-	Paolo Bonzini <pbonzini@redhat.com>
-Cc: qemu-devel@nongnu.org,
-	kvm@vger.kernel.org
-Subject: [RFC 2/2] target/loongarch: Add PTW feature support in KVM mode
-Date: Mon, 20 Oct 2025 16:11:59 +0800
-Message-Id: <20251020081159.2370512-3-maobibo@loongson.cn>
-X-Mailer: git-send-email 2.39.3
-In-Reply-To: <20251020081159.2370512-1-maobibo@loongson.cn>
-References: <20251020081159.2370512-1-maobibo@loongson.cn>
+	s=arc-20240116; t=1760948973; c=relaxed/simple;
+	bh=kbhT9yMCDmmQaas1CDBx5fu2XJ1F6uG42+MncrMz090=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=Oo9j1G73nMan4tPky8AGb1YVNk6nVNk+hDrS346Wnmc6I35jlxUInTldwCCqEhs55Rix3ZFwj7sEMiVzr8DFmVLGTHdON85YgAOdeJPHL9d17RyD13H/NLy59kQJ/UynL9SuyHzuQJpoichjGfNgxIimj9naWo4ylHlWj2GbAZw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=eRW2oMNl; arc=none smtp.client-ip=209.85.128.47
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
+Received: by mail-wm1-f47.google.com with SMTP id 5b1f17b1804b1-47100eae3e5so37816795e9.1
+        for <kvm@vger.kernel.org>; Mon, 20 Oct 2025 01:29:31 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google; t=1760948970; x=1761553770; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=upLQabNrkLN9xzP5rlMjYwim4MepxAdcp1g39Wi3qvw=;
+        b=eRW2oMNlLcmPuZPMwnjREHrX/1t0atekczUgoEVBlIu1cdfgaOjyM9CvwUgMOGw/Gl
+         RB2CuTD3fhM1PhtI0CkUpwYa9jK0VepknqcNHiA1Ogu+c2GNF8I+HqtFUz8HXy7GcluB
+         I78iuM4WNWXzCZzQWIXLWBckSTBb5XG3DqtpjepSrkZ8rXuWI0/n4HHyyDupjl5ZjCBf
+         qiJZQ7JHOgaBNbf3VB/Fp9pzGbqj5e0Tafz1vg3/EvryETxT3IeB2YA4BcQccqZjAycU
+         2vw/9AJ0BSwunhwZC6pWm4ykFyp7ZxUXgcZ19sTp3uHOtJMY7V9Q7I4tBnB+Q7og63a1
+         5ESw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1760948970; x=1761553770;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=upLQabNrkLN9xzP5rlMjYwim4MepxAdcp1g39Wi3qvw=;
+        b=VrnzhTe3VncPB+VBGKySkMO7YZvjJHir2PZvuSgrezpUab3w0LzWMEXPn9fwCZl13G
+         JbBHr7c9dmaz+euadsOWLHGibgf9iKgEptubFVxyVDCUfkl+60EJhBh/g0iDb04ezkhQ
+         uCDzAap3KI31EW6scOaerj5ZK/d+z8sNMDVAJDsR/hF7wfGgR7GvRtnh0ylBnDchS6Bj
+         8kU1lQGtHqMXwbdBJDETUwasO4muY8/+EBHHWfOgd9oyapFRpBBtMzhWzEv9DZCAzTnt
+         Pf26D192VFsXMxVsJC3MWoYmXL+rh8Qef6DdCN6vESA33sz0dTftI5AYhR6DmxdyYZOS
+         SJLg==
+X-Forwarded-Encrypted: i=1; AJvYcCUV+jBa48qupGW8o0R0yUpmF69y+cZHya+hJuD1w/FTxTJnWItwNj6nVgJTMTjPhy1XBFs=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzLH3+nP8p5CPg9mK1oRTOiQdksslNFv/diYYvBYnYzG+QMt2Os
+	WRgGUHeJmWsPdFTdnryQpGhh7KkVz7bI6tI9Vv1eltqQivbGU6qwD0ExYrRaI5vJUcc=
+X-Gm-Gg: ASbGncuo1NIbbQQ47GlQeOLogzqBT0OiWDyerfiiaKAVNWZ66jvdRNUPf1TBzmSC5um
+	1UDrs16wbmrsTRG5X0WhjwDKQlVx1GawUTDC4Hnm9eUpvdG7Elc3J/SohF+zGZydIY7K6K+OTeg
+	48n/59kBLhZ7rlIoUF3cZg5CkuCajHAaiUinnP7uDDdkVKuBvRo1n2MQlGD4z51VCa2lQ7GKSs7
+	u6vx98EfFhrww+L59HQBY0KZYfpIgkKUZ/MdLXOOjVJeqhlGlRpxn/OXTofNNzX2aadGBxPMe7K
+	aFgYUpD6CJ/B6ib4ZfSAJoampi2IxNyk2q5yePRZo+WNuwjjthpAfUuflPG6etcOg5Kd+28gsXc
+	BQmBntSCsXbcHL4lESFrQIkQ5mn5jA2qFoQjZlm4dqhcla/Bjpm9RXqLNyTU7/3UeMlwpQOXJEf
+	V+zBsb5AK9Ru5EXM/wmtvCzVQqXTc3dteUUPtoaG44+QDNFvFNzpOHLIZO+Wq7Vyy+
+X-Google-Smtp-Source: AGHT+IEzE1bsNkCQUwgrRUB+00ZejTXpM1jHhePaWJboCKPtO+YsgVt7DQis+/s5Igcc0ShXfXMXog==
+X-Received: by 2002:a05:600c:3e8f:b0:46e:4b89:13d9 with SMTP id 5b1f17b1804b1-471177ad526mr90113505e9.0.1760948969780;
+        Mon, 20 Oct 2025 01:29:29 -0700 (PDT)
+Received: from [192.168.69.221] (88-187-86-199.subs.proxad.net. [88.187.86.199])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4710e7050c6sm114773395e9.1.2025.10.20.01.29.28
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 20 Oct 2025 01:29:29 -0700 (PDT)
+Message-ID: <5cee31c8-57d6-4245-a49b-bf317677e211@linaro.org>
+Date: Mon, 20 Oct 2025 10:29:27 +0200
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v3 02/10] hw/audio/pcspk: Add I/O trace events
+Content-Language: en-US
+To: Bernhard Beschow <shentey@gmail.com>, qemu-devel@nongnu.org
+Cc: Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
+ Laurent Vivier <laurent@vivier.eu>, "Michael S. Tsirkin" <mst@redhat.com>,
+ Eduardo Habkost <eduardo@habkost.net>, Zhao Liu <zhao1.liu@intel.com>,
+ kvm@vger.kernel.org, Michael Tokarev <mjt@tls.msk.ru>,
+ Cameron Esfahani <dirty@apple.com>, qemu-block@nongnu.org,
+ Paolo Bonzini <pbonzini@redhat.com>, qemu-trivial@nongnu.org,
+ Laurent Vivier <lvivier@redhat.com>,
+ Richard Henderson <richard.henderson@linaro.org>,
+ Roman Bolshakov <rbolshakov@ddn.com>, Phil Dennis-Jordan
+ <phil@philjordan.eu>, John Snow <jsnow@redhat.com>,
+ Fabiano Rosas <farosas@suse.de>, Gerd Hoffmann <kraxel@redhat.com>,
+ Sunil Muthuswamy <sunilmut@microsoft.com>,
+ Marcelo Tosatti <mtosatti@redhat.com>
+References: <20251019210303.104718-1-shentey@gmail.com>
+ <20251019210303.104718-3-shentey@gmail.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=C3=A9?= <philmd@linaro.org>
+In-Reply-To: <20251019210303.104718-3-shentey@gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:qMiowJBxZOTQ7vVohSf4AA--.18451S4
-X-CM-SenderInfo: xpdruxter6z05rqj20fqof0/
-X-Coremail-Antispam: 1Uk129KBjDUn29KB7ZKAUJUUUUU529EdanIXcx71UUUUU7KY7
-	ZEXasCq-sGcSsGvfJ3UbIjqfuFe4nvWSU5nxnvy29KBjDU0xBIdaVrnUUvcSsGvfC2Kfnx
-	nUUI43ZEXa7xR_UUUUUUUUU==
 
-Implement Hardware page table walker(PTW for short) feature in KVM mode.
-Use OnOffAuto type variable ptw to check the PTW feature. If the PTW
-feature is not supported with KVM host, it reports error if there is
-ptw=on option.
+On 19/10/25 23:02, Bernhard Beschow wrote:
+> Allows to see how the guest interacts with the device.
+> 
+> Signed-off-by: Bernhard Beschow <shentey@gmail.com>
+> ---
+>   hw/audio/pcspk.c      | 10 +++++++++-
+>   hw/audio/trace-events |  4 ++++
+>   2 files changed, 13 insertions(+), 1 deletion(-)
 
-Signed-off-by: Bibo Mao <maobibo@loongson.cn>
----
- target/loongarch/cpu.c     |  5 +++--
- target/loongarch/cpu.h     |  1 +
- target/loongarch/kvm/kvm.c | 35 +++++++++++++++++++++++++++++++++++
- 3 files changed, 39 insertions(+), 2 deletions(-)
-
-diff --git a/target/loongarch/cpu.c b/target/loongarch/cpu.c
-index b7b61ff877..9aa8f863e9 100644
---- a/target/loongarch/cpu.c
-+++ b/target/loongarch/cpu.c
-@@ -233,12 +233,13 @@ static void loongarch_set_ptw(Object *obj, bool value, Error **errp)
- {
-     LoongArchCPU *cpu = LOONGARCH_CPU(obj);
- 
-+    cpu->ptw = value ? ON_OFF_AUTO_ON : ON_OFF_AUTO_OFF;
-+
-     if (kvm_enabled()) {
--        /* PTW feature is only support in TCG mode now */
-+        /* kvm feature detection in function kvm_arch_init_vcpu */
-         return;
-     }
- 
--    cpu->ptw = value ? ON_OFF_AUTO_ON : ON_OFF_AUTO_OFF;
-     cpu->env.cpucfg[2] = FIELD_DP32(cpu->env.cpucfg[2], CPUCFG2, HPTW, value);
- }
- 
-diff --git a/target/loongarch/cpu.h b/target/loongarch/cpu.h
-index b1d6799222..1a14469b3b 100644
---- a/target/loongarch/cpu.h
-+++ b/target/loongarch/cpu.h
-@@ -279,6 +279,7 @@ enum loongarch_features {
-     LOONGARCH_FEATURE_PMU,
-     LOONGARCH_FEATURE_PV_IPI,
-     LOONGARCH_FEATURE_STEALTIME,
-+    LOONGARCH_FEATURE_PTW,
- };
- 
- typedef struct  LoongArchBT {
-diff --git a/target/loongarch/kvm/kvm.c b/target/loongarch/kvm/kvm.c
-index 4e4f4e79f6..26e40c9bdc 100644
---- a/target/loongarch/kvm/kvm.c
-+++ b/target/loongarch/kvm/kvm.c
-@@ -931,6 +931,12 @@ static bool kvm_feature_supported(CPUState *cs, enum loongarch_features feature)
-         ret = kvm_vm_ioctl(kvm_state, KVM_HAS_DEVICE_ATTR, &attr);
-         return (ret == 0);
- 
-+    case LOONGARCH_FEATURE_PTW:
-+        attr.group = KVM_LOONGARCH_VM_FEAT_CTRL;
-+        attr.attr = KVM_LOONGARCH_VM_FEAT_PTW;
-+        ret = kvm_vm_ioctl(kvm_state, KVM_HAS_DEVICE_ATTR, &attr);
-+        return (ret == 0);
-+
-     default:
-         return false;
-     }
-@@ -1029,6 +1035,29 @@ static int kvm_cpu_check_pmu(CPUState *cs, Error **errp)
-     return 0;
- }
- 
-+static int kvm_cpu_check_ptw(CPUState *cs, Error **errp)
-+{
-+    LoongArchCPU *cpu = LOONGARCH_CPU(cs);
-+    CPULoongArchState *env = cpu_env(cs);
-+    bool kvm_supported;
-+
-+    kvm_supported = kvm_feature_supported(cs, LOONGARCH_FEATURE_PTW);
-+    if (cpu->ptw == ON_OFF_AUTO_ON) {
-+        if (!kvm_supported) {
-+            error_setg(errp, "'ptw' feature not supported by KVM on the host");
-+            return -ENOTSUP;
-+        }
-+    } else if (cpu->ptw != ON_OFF_AUTO_AUTO) {
-+        /* disable pmu if ON_OFF_AUTO_OFF is set */
-+        kvm_supported = false;
-+    }
-+
-+    if (kvm_supported) {
-+        env->cpucfg[2] = FIELD_DP32(env->cpucfg[2], CPUCFG2, HPTW, 1);
-+    }
-+    return 0;
-+}
-+
- static int kvm_cpu_check_pv_features(CPUState *cs, Error **errp)
- {
-     MachineState *ms = MACHINE(qdev_get_machine());
-@@ -1123,6 +1152,12 @@ int kvm_arch_init_vcpu(CPUState *cs)
-         return ret;
-     }
- 
-+    ret = kvm_cpu_check_ptw(cs, &local_err);
-+    if (ret < 0) {
-+        error_report_err(local_err);
-+        return ret;
-+    }
-+
-     return 0;
- }
- 
--- 
-2.39.3
+Reviewed-by: Philippe Mathieu-Daudé <philmd@linaro.org>
 
 
