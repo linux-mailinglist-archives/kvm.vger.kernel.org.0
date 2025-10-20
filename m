@@ -1,79 +1,79 @@
-Return-Path: <kvm+bounces-60512-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-60513-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id A122CBF0DFB
-	for <lists+kvm@lfdr.de>; Mon, 20 Oct 2025 13:36:55 +0200 (CEST)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
+	by mail.lfdr.de (Postfix) with ESMTPS id F0402BF0DE3
+	for <lists+kvm@lfdr.de>; Mon, 20 Oct 2025 13:36:45 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D65D83B4958
-	for <lists+kvm@lfdr.de>; Mon, 20 Oct 2025 11:35:53 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 1BCA04F400E
+	for <lists+kvm@lfdr.de>; Mon, 20 Oct 2025 11:35:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F2D982FC00B;
-	Mon, 20 Oct 2025 11:35:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C5FF62FBE02;
+	Mon, 20 Oct 2025 11:35:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="E4a4b6cs"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="f554nIUl"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-wm1-f48.google.com (mail-wm1-f48.google.com [209.85.128.48])
+Received: from mail-wm1-f46.google.com (mail-wm1-f46.google.com [209.85.128.46])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 64B3329B233
-	for <kvm@vger.kernel.org>; Mon, 20 Oct 2025 11:35:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.48
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1A4292FB963
+	for <kvm@vger.kernel.org>; Mon, 20 Oct 2025 11:35:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.46
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1760960141; cv=none; b=Aa4KqOKHMeipQ46ZJhLJFiNlAg5Nx9MVOiiDY+6SRrq3PS7AxBu5OhPmzMOM8VyxJ1Ujs9bArEyGZsVnauzX8L1zq8kr/QVmOqR+tasnBvdMFS73k80rc4wE1+e7Sk+G1tTqhDyWOIHU22QmzgYrVc2okAF0ttRob7akYeCPKpw=
+	t=1760960145; cv=none; b=PxIgntrG6HwJrOUGPXmxyILt1Dgs3KFtMQZHULFrw7ASdMJDvdF8fQqy4pFy4oHv1AvrM8ZM5qPwvwGpPzwhff7KOAbtGtqVaL9A0cMhPr6sIO1BtKs7r0+oezuahlsEDhN3wYDPgI/+yhZ4QS1DJxBSZpO3FW3cTnfY8brNIyk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1760960141; c=relaxed/simple;
-	bh=W1nvyZPU64yzvPcmezugYIuZjpw7kO0CXCK00I93NDs=;
+	s=arc-20240116; t=1760960145; c=relaxed/simple;
+	bh=eR6IR+0+HcZgX42GHDv5+gE9w7Xb33d3WVW7VKMOqDw=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=o9n0l1AknU1SJyzvDmBxnvWHtQyhG/Lehx/4VBaIVvXRN2Sx8PL4bNgn6hTdKT8h3DtYW2sch7m+pcWjkzfS60D9DMyH7Z7jxd2opq8uEG8OPCB6eWJHLHVlmgXd3eTdh1HHriPwOxdTCo+FYeJaPnJ/Lzn08yA/W6sFNLlMYp4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=E4a4b6cs; arc=none smtp.client-ip=209.85.128.48
+	 MIME-Version:Content-Type; b=VtG/nizoMXLjslSuP/8aAzxT4BUo+sRDbcpOXwx6fotAYqWeJU8kaewBZ2UoaYH/ZyJfrhimxfk9V5p+SiE4y/l1aol2SkoUan/M7qkDZ4vVxGEVHuGmn1gdUwruyn1hl5FuFhZcZy/3SEylbvSDoVVsdtIlEKs0cPZImXyuEGY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=f554nIUl; arc=none smtp.client-ip=209.85.128.46
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
-Received: by mail-wm1-f48.google.com with SMTP id 5b1f17b1804b1-471066cfc2aso38599445e9.0
-        for <kvm@vger.kernel.org>; Mon, 20 Oct 2025 04:35:39 -0700 (PDT)
+Received: by mail-wm1-f46.google.com with SMTP id 5b1f17b1804b1-4710665e7deso14252845e9.1
+        for <kvm@vger.kernel.org>; Mon, 20 Oct 2025 04:35:43 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1760960138; x=1761564938; darn=vger.kernel.org;
+        d=linaro.org; s=google; t=1760960142; x=1761564942; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=dJ9NGAEw6N6YXfZFK516do0M00rTnJSh3CYQjYCLSO0=;
-        b=E4a4b6csiZx+5yQwQxVPXNAF2P/4Rim6m98TM6SdwFgQ58e74NezFjxbx+3E8abtiE
-         A4fvEDi3bGVeUzMzIVGN98qvNgbdHr1OUnwA2Nm+Yg30mpWmNNuhN8gnfaBDp6PxWrGW
-         SoOTvsNUUktex1y76pTNK0m1hp1SoUS19AdAFRURRtg3d6sAFlPSq8smSGNs26zivGnB
-         5qt7dk5x8rKR4VC8WRR/RCt2pFfeqs3azbfUP7lE4QjsfR8Qcfsqc44HnO3ouDBDWcT/
-         GYp/qwmt5FeK73K4XP3RwClFYLlsmDBlLiWR60XHiHOg0TPOHL2J8ELpW2N5t75Aw2KZ
-         8IPQ==
+        bh=71R8sAvBEiNvqEf9kiOYU72VRXxnt/PEhui8Mhvi1Og=;
+        b=f554nIUl6xDKwbtbg8KePD1ja1/AQViYvJMgfs+BipCWWaSeQ7kNsLbrOzi9ipAioe
+         yzDmlUuVDWy1jfVsnIVFD8Ma3eWBs7PyUhZbcZaRz0IHHkVIPGtgqSSmHPwCRtgBGTak
+         C/AJ/Onjepu9xPoZeipfvee12PDTsiB2C+zQXctrJ8U9DS50R6TEkq4Zm3Dr1Fqo+MIv
+         Vqq431h6i9efvFEW7o9QhIZsNHDDDufKnDSTtQncXozB1GyClwQ7tS7NtcCMreAiqp7n
+         UzZJQ+YdEIG98TWeGxwJFmdlMxqvdNxQRTbN4sN/0pvt9PXWrBlcfsJ1f6fDIWtl4N5z
+         LxOw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1760960138; x=1761564938;
+        d=1e100.net; s=20230601; t=1760960142; x=1761564942;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=dJ9NGAEw6N6YXfZFK516do0M00rTnJSh3CYQjYCLSO0=;
-        b=j62YyyW7/st0GXZ+L2xV75UWErdgOjWzmdEr1IG4sqUv0KsXxmTzHo6VXJJew5n7Is
-         CJWm/p2IisZRZWAUFkqjre2GfN5CTNJp0kPSz63KRm2Yt4N27pkCXdUU2eLKP+OCKFij
-         dyQmC+TRxpKZEGtzOCouMrfA3OImmMhCcvvBXWQHC6ujPq6RWitEYV6xkuapkEogBDOf
-         WLHcqxHRcq5lpCbJZIhtjRLUz3+R/S7b+I+5QAMTbFK72T4Z+SpGliXsd0ES3DLe9AB4
-         +9jGQZ2FHcuj5k2Z0ZOYzLB2DcQBOC9tfsLTXkTEzSHj0LudcBaowYgwsa5Lw5vksR/i
-         I3og==
-X-Forwarded-Encrypted: i=1; AJvYcCU1b4XyOZUqASDm/pJ3JjQWMjVqBsHaXQbIpM5+WXF0KPSDD9zSTMqOPrkA98hgM4yTAb8=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yztpl2hDECF149nQpcNI49R+2CkWqorpW7jxxnhvKvJ720tLM0x
-	fdUuqsz6JicV7Kl4+pJC7nYNsLjCQu1m3LqTjS7mMEYWtmAMEWnWyXUZRu5WWCIPYc8=
-X-Gm-Gg: ASbGncu9aKCteEWWD2vcXLj4WRi2vLrmZVkyBDK8GQNz81/uSe63ktapmlYyh2CUOPM
-	489v/ZKrYYrjIQxnmQzJSXvzTtfcvfMgljyJyv1mj5c/xxIWrvkCSTJU/xGJeiH7BU16/Le1acd
-	rgR/kcsVMQjf5YOinwuSx20puNkzj1c1vsT2SOkOBQieECgv0W7lQfQp4llpoP1haPhYCSMPXBb
-	HZCPaewyvWLqkAMDnyOieKjyfuBmbqIHM0rx9CzgLp39GZZxsOK327S0yYZkR6QbgiD9KLkFUY+
-	9vOJWlCHZVq1i5IjMNFhI677uHmKoeqAMtBsBSTAzCIHjNS/vEbnTuWq6iuwLnxmHT4YVnqKHbv
-	VMSK9C9ZZdNz7h36lUYh+2TGZJ/c1O/fU3VxnUK87hZQz+HIp+4ZxmcALAQWTRAfMtjtbu7ru6c
-	eczu9smb4UlMRdF18UKruOepENFUYX0KkHPDin4+jmu9FfE9KemeQPzO+Z1ViD
-X-Google-Smtp-Source: AGHT+IH9aVP2HDqi6fupN4F23f6aoUioti0VFzylksj46aoAXat7G3nwhgRBvFJu1VfuUwA74SWURg==
-X-Received: by 2002:a05:600c:528e:b0:471:7a:7905 with SMTP id 5b1f17b1804b1-4711791cba1mr121926425e9.34.1760960137640;
-        Mon, 20 Oct 2025 04:35:37 -0700 (PDT)
+        bh=71R8sAvBEiNvqEf9kiOYU72VRXxnt/PEhui8Mhvi1Og=;
+        b=Q+mNSiILBlzY8q3yve3P7EkllQaELy5ZkArjUtNS23QwrOz9ITWagu0lIOVkfO9bg9
+         cwma41FSKJP8v9CiDT16beA2gk2FxpKPQsUIL4X6zyNFpJOjgRKtG2jl5sGTV0tye5hp
+         HQzHx7SvZt4ROg+wcVm4X3QwqaEU+WKy9MmZJ6wSwhodDhwu9RINej3pPP3lZSqugU3h
+         7cYVEYaA/gOhDfWTrhEMHyemQOkClweFvPc5hinwNadxwQ66+Djh0T20///Mus49YLl3
+         pKW+iuZayW4O85dushqE3yML2bAbsV3KCMWle667hyxL5etA1FVNlwq9iaIB+oCpou2Q
+         mNWQ==
+X-Forwarded-Encrypted: i=1; AJvYcCXU5lnuZf+3su4LelqTLtH06bOPDKs+kBsrftNx0vn7tf6WfPTMgM+elrPnai2VmAka1io=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yy9G6PKyOpPOKSxJ35rSMd2rTdVqurRn0ooL0iNXkcDide8Xyvq
+	GaWKjXAafY5l/6RG78/gnTKPxvxSjHPw5Ka/ZhWVX8x3BVYuP6RuCWnu+/OvYV64AZ4=
+X-Gm-Gg: ASbGncur3rkZdMkTsm2SbccB8LjxWKCDvm/hzJIjkXcMSbNbflI8lvbrS2vXnIN96R5
+	Fu7sJwRKCPgrdKoEcyeaE3cK8aYoZadzGC17nO/A+Gf42YGpsShx/K74swF20sW5XNeM6OdS5IS
+	aPQ/eqHUNCOyvLV7Q3ISoxp/zqrofcLBOojFkNNi+5GbxgPnCfsAXjrm2D4SNMWM///RQwlZvcx
+	N58YYDjtucUP+3wGcx1Qq3zZS1qpzlOD5boHl9/CneOK0xXUW4BLDUPWnHf7TVhZsBLbKjoqXuu
+	2C9FYj4Ij0ncP/7V8x/mYvR9IxkRlqo1eWh17Uej9qHNoGvIAQyempQQZYSEjqmB/5ieV4EHXcl
+	1DBiLFC+avVUSUv++XlKdAGWxEuRz/l1zCAAdrIKm3soaYXXY4SSmGHdm4/uwgRkcgAONqHIyAB
+	c+2ieNb+VLxXwACm9ZQiuMkCQ3553+HIMXYDXM5bMZ3KhKQLI3lbqUzsTAGsL7
+X-Google-Smtp-Source: AGHT+IEPx0SE5xUIDTfxvhDNmRz2LWgkyKXl8jschWeu+y/qt79zcqlwmwc9t+0lsEUm/8AyI37oAg==
+X-Received: by 2002:a05:600c:3513:b0:46f:b340:75e7 with SMTP id 5b1f17b1804b1-471178748a9mr100220295e9.8.1760960142366;
+        Mon, 20 Oct 2025 04:35:42 -0700 (PDT)
 Received: from localhost.localdomain (88-187-86-199.subs.proxad.net. [88.187.86.199])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-471144b5c91sm225443755e9.11.2025.10.20.04.35.36
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-427f00ce178sm14714271f8f.46.2025.10.20.04.35.41
         (version=TLS1_3 cipher=TLS_CHACHA20_POLY1305_SHA256 bits=256/256);
-        Mon, 20 Oct 2025 04:35:37 -0700 (PDT)
+        Mon, 20 Oct 2025 04:35:41 -0700 (PDT)
 From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@linaro.org>
 To: qemu-devel@nongnu.org
 Cc: Chinmay Rath <rathc@linux.ibm.com>,
@@ -83,9 +83,9 @@ Cc: Chinmay Rath <rathc@linux.ibm.com>,
 	kvm@vger.kernel.org,
 	Nicholas Piggin <npiggin@gmail.com>,
 	=?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@linaro.org>
-Subject: [PATCH 17/18] hw/ppc/spapr: Remove deprecated pseries-4.2 machine
-Date: Mon, 20 Oct 2025 13:35:20 +0200
-Message-ID: <20251020113521.81495-4-philmd@linaro.org>
+Subject: [PATCH 18/18] hw/ppc/spapr: Remove SpaprMachineClass::rma_limit field
+Date: Mon, 20 Oct 2025 13:35:21 +0200
+Message-ID: <20251020113521.81495-5-philmd@linaro.org>
 X-Mailer: git-send-email 2.51.0
 In-Reply-To: <20251020103815.78415-1-philmd@linaro.org>
 References: <20251020103815.78415-1-philmd@linaro.org>
@@ -98,44 +98,55 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 
-This machine has been supported for a period of more than 6 years.
-According to our versioned machine support policy (see commit
-ce80c4fa6ff "docs: document special exception for machine type
-deprecation & removal") it can now be removed.
+The SpaprMachineClass::rma_limit field was only used by the
+pseries-4.2 machine, which got removed. Remove it as now unused.
 
 Signed-off-by: Philippe Mathieu-Daudé <philmd@linaro.org>
 ---
- hw/ppc/spapr.c | 17 -----------------
- 1 file changed, 17 deletions(-)
+ include/hw/ppc/spapr.h |  1 -
+ hw/ppc/spapr.c         | 10 ----------
+ 2 files changed, 11 deletions(-)
 
+diff --git a/include/hw/ppc/spapr.h b/include/hw/ppc/spapr.h
+index 60d9a8a0377..b9d884745fe 100644
+--- a/include/hw/ppc/spapr.h
++++ b/include/hw/ppc/spapr.h
+@@ -141,7 +141,6 @@ struct SpaprCapabilities {
+ struct SpaprMachineClass {
+     MachineClass parent_class;
+ 
+-    hwaddr rma_limit;          /* clamp the RMA to this size */
+     bool pre_5_1_assoc_refpoints;
+     bool pre_5_2_numa_associativity;
+     bool pre_6_2_numa_affinity;
 diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
-index 30ffcbf3d2b..97211bc2ddc 100644
+index 97211bc2ddc..52333250c68 100644
 --- a/hw/ppc/spapr.c
 +++ b/hw/ppc/spapr.c
-@@ -4912,23 +4912,6 @@ static void spapr_machine_5_0_class_options(MachineClass *mc)
- 
- DEFINE_SPAPR_MACHINE(5, 0);
- 
--/*
-- * pseries-4.2
-- */
--static void spapr_machine_4_2_class_options(MachineClass *mc)
--{
--    SpaprMachineClass *smc = SPAPR_MACHINE_CLASS(mc);
--
--    spapr_machine_5_0_class_options(mc);
--    compat_props_add(mc->compat_props, hw_compat_4_2, hw_compat_4_2_len);
--    smc->default_caps.caps[SPAPR_CAP_CCF_ASSIST] = SPAPR_CAP_OFF;
--    smc->default_caps.caps[SPAPR_CAP_FWNMI] = SPAPR_CAP_OFF;
--    smc->rma_limit = 16 * GiB;
--    mc->nvdimm_supported = false;
--}
--
--DEFINE_SPAPR_MACHINE(4, 2);
--
- static void spapr_machine_register_types(void)
+@@ -2728,7 +2728,6 @@ static PCIHostState *spapr_create_default_phb(void)
+ static hwaddr spapr_rma_size(SpaprMachineState *spapr, Error **errp)
  {
-     type_register_static(&spapr_machine_info);
+     MachineState *machine = MACHINE(spapr);
+-    SpaprMachineClass *smc = SPAPR_MACHINE_GET_CLASS(spapr);
+     hwaddr rma_size = machine->ram_size;
+     hwaddr node0_size = spapr_node0_size(machine);
+ 
+@@ -2741,15 +2740,6 @@ static hwaddr spapr_rma_size(SpaprMachineState *spapr, Error **errp)
+      */
+     rma_size = MIN(rma_size, 1 * TiB);
+ 
+-    /*
+-     * Clamp the RMA size based on machine type.  This is for
+-     * migration compatibility with older qemu versions, which limited
+-     * the RMA size for complicated and mostly bad reasons.
+-     */
+-    if (smc->rma_limit) {
+-        rma_size = MIN(rma_size, smc->rma_limit);
+-    }
+-
+     if (rma_size < MIN_RMA_SLOF) {
+         error_setg(errp,
+                    "pSeries SLOF firmware requires >= %" HWADDR_PRIx
 -- 
 2.51.0
 
