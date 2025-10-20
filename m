@@ -1,105 +1,130 @@
-Return-Path: <kvm+bounces-60554-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-60555-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 90039BF2761
-	for <lists+kvm@lfdr.de>; Mon, 20 Oct 2025 18:35:47 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id B109DBF2767
+	for <lists+kvm@lfdr.de>; Mon, 20 Oct 2025 18:36:21 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 8C1BE18C1866
-	for <lists+kvm@lfdr.de>; Mon, 20 Oct 2025 16:34:55 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 37DDA18C1C8E
+	for <lists+kvm@lfdr.de>; Mon, 20 Oct 2025 16:35:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1F196292938;
-	Mon, 20 Oct 2025 16:34:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D6D45296BC2;
+	Mon, 20 Oct 2025 16:34:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="mi7zAvOc"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="dcq7EZDj"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pg1-f202.google.com (mail-pg1-f202.google.com [209.85.215.202])
+Received: from mail-pj1-f74.google.com (mail-pj1-f74.google.com [209.85.216.74])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DEDA424168D
-	for <kvm@vger.kernel.org>; Mon, 20 Oct 2025 16:34:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A2EC3285C88
+	for <kvm@vger.kernel.org>; Mon, 20 Oct 2025 16:34:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.74
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1760978049; cv=none; b=Cz3uk7rV9RCTh05FJHRGJKpb2S96qdWRBqAT+nc5g+SSctIxdZnK+n11gvxAT+AY9HfXjuubuTniXWeX+SS6ffsFMGX11XNIiVjxOiQG8v9wWuoNcXqR0Udgg9QS/cR3trRbavX6VQ53wQSeGEmngSeBZShYdgBh+oR6/UJ+y24=
+	t=1760978058; cv=none; b=muKZ8bUbumMYL19iDXhvZcvGZje0xGNCfYhcBE9UPCc8GxblZwKK/KgGNcrNs7p50XxjDSk0B9ydWrNZKQ1ottbxktE2vXvfD4QoSZuknL82RJUDLUNqfuUHKqE6q+lE8bhYz7rZqEKQwgkSHmY4eRFWPXSt0HYbaHQ5wySC/og=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1760978049; c=relaxed/simple;
-	bh=xiWetylhX8aIUbKWVv+lOup7Ov4PSijKXTi2mzMocEY=;
+	s=arc-20240116; t=1760978058; c=relaxed/simple;
+	bh=B8q5ZAlve72N7q6bvOSXGkHTppjdvye5yLKtODQe/Mo=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=ry3g0nf7WJPgWkEXdyJU79iZIjO9DWXK0Ts46ms2ptb1d3CGSc6jA9nJ6Bk5bp9VjyHQK8WYJMRrBTGp9zookRJbzLKyrF/D7Pl0WK34Ne39rd6DzNamX7ueitvZ/vvXXp8QW7UNohW5qpDoUOnPKYn+BluF0ch5tNEa68iBmmE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=mi7zAvOc; arc=none smtp.client-ip=209.85.215.202
+	 To:Cc:Content-Type; b=MREYkwwLd3bzqtnoQMHIdXgMeXAFk57mauH5Bvx7+uwQnO5wJprxVxN2gxW+sDT8I2AX8CFCN5o+BahW9474gYQrYs7cAGTF0tPYxYW3RDGX9Dlasf+oARf/ZBjOjvEbMMuS4HT5L9v/dWkTP40VmsugQTGzWK1IL88SVJgMJJs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=dcq7EZDj; arc=none smtp.client-ip=209.85.216.74
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pg1-f202.google.com with SMTP id 41be03b00d2f7-b632471eda1so3860850a12.0
-        for <kvm@vger.kernel.org>; Mon, 20 Oct 2025 09:34:07 -0700 (PDT)
+Received: by mail-pj1-f74.google.com with SMTP id 98e67ed59e1d1-33c6140336eso6864391a91.3
+        for <kvm@vger.kernel.org>; Mon, 20 Oct 2025 09:34:16 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1760978047; x=1761582847; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1760978056; x=1761582856; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=9NLkKkG0rJ/zH6pfyu4oN0Lt2d/eZCoAWcxhtat4F1Q=;
-        b=mi7zAvOcc7P+6s3xq6Quf7oq+JvRsfk5n+o0bMEeGDAN2pz8liYLIQRtqSW7IaMoiK
-         B8Zo/5JQzB54huzKbwn0dpDT5QV+/i+ww5xSr2vVnqkz/U5mNDxfCdqXfqUAo/eDYbQq
-         RiCYZzdTvlBvGLc7IBrVda7dRXSDfHoGpmVsqoRhPa6BnuX3EZ3roF+NSSNxYJ2gwiUM
-         O7ZPyi6+CYBxCln1Vxx/Nb0oQbxv6fRtYeekoTxnn5HRgLuO9FNR0+oc1rOY5ZbI7UiS
-         YJuE/ZZtm61eai7j4pqqqqIJl0ol1ewfm28jsMpW1gzICzv38GWzMcOtFKbKAlCVYiLV
-         MygA==
+        bh=U281t6YsVgadzh80Xr8uQlzQ8nsQRfoBdqQApEXayt4=;
+        b=dcq7EZDjwWiHAZyzfGC8GfQ66wVeP6gg7+gGYh6IdU56TYcbEZR5uRlVrImMmGH7iX
+         BXWoAFtLzFNV+gBUVYSgLNc21P3cuNSSuyKpqPRGgIUx0XaiXa+nEIEz+3hswjVWdXC5
+         f2VQ7qOincIP7mxfMuyXSfTA8H1TSupY0e6IKOBKTiBgSWqk0trO69wfC0MkHTpS8aDg
+         7UEkZdc3jqjc8397mEte8msJtaSx6JsicUf+icc5oKMFqrA6DRA1ueBUdqWOR/igORQ4
+         2iFPY8xJs9MhrSVb/py5VnwKPagHTnZh14SBqm4ShZxAY/h2joDEa2rd2KCPsyF3ADdL
+         pNBA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1760978047; x=1761582847;
+        d=1e100.net; s=20230601; t=1760978056; x=1761582856;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=9NLkKkG0rJ/zH6pfyu4oN0Lt2d/eZCoAWcxhtat4F1Q=;
-        b=qUTjE0Uwitz5HH3p8yqc2rjKSRz9gqLJEycMuUlL1ikH+AVc8CXSLXtXVTgTQU89AZ
-         ZchOgMk71+o1NZLtOqYNlqmh/47kUZlHnbWpiqSIjCmaIzM56pCv7Bft2wgUij6Vv0KG
-         OxeAjoGGFBaviz1oY3roUVjpkBg6Pfhn1crRdVXoNt8Xj8uEEWcIq6wY9/TNY9Rg5J2n
-         zYdqiUlf+a9lQkB5dwxRgOZqWl78dFHdSKrzY9Vxq+7CQ4oIE1x85mViIf+FZsDkXTkw
-         8HSBTUOn9SF0LOTtHcrQrVAzz4BTpXj/0/QeiUrDx35BAlSYXWNpF93pnDaT2eoiq9LW
-         y2nQ==
-X-Gm-Message-State: AOJu0YwCbZ9tT/vDbUKb44RMDpfx95daSzLkmveWtdzaI/GXOpQbomEm
-	zHXKW11W+pVDnbxzpsUQG5ky7x8FBLz8F1cxvT0G+UWUs3g3E2nmqQ81Frj5FRdgs+QobMUnB3r
-	n46l9iA==
-X-Google-Smtp-Source: AGHT+IEJv6yeyeoTe7I8mAefhCPoGpckkYVmGUCQNqR8Nia0SCK2k2ra2USQ3kI6crqyFEHerkAOacWrfno=
-X-Received: from pjzn11.prod.google.com ([2002:a17:90b:d0b:b0:33d:acf4:5aac])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:52d0:b0:332:1edf:a694
- with SMTP id 98e67ed59e1d1-33bcf8fbbd3mr15270833a91.31.1760978047179; Mon, 20
- Oct 2025 09:34:07 -0700 (PDT)
-Date: Mon, 20 Oct 2025 09:33:03 -0700
-In-Reply-To: <20251007222356.348349-1-seanjc@google.com>
+        bh=U281t6YsVgadzh80Xr8uQlzQ8nsQRfoBdqQApEXayt4=;
+        b=jKsyEcDdUprCC8gi3hm5LA0TIgQHYR4trhmcDP6ZOTL2YciisOtD8zZvaPC6EEE0d5
+         FKULe42Z7tJLvSlQXfCvVLCHQPWQxtz0X/w6j2eUQ+If3xdDWBvNIzXW5i2OEMltOBSn
+         RgIWoCC+yiBSQF5XBhVB4/wxrbNnkGl8U66n2vtwrWgxw7H5tmZisbLASgvSwgXj5xjD
+         MVXn+PCesLmaGdYhoyqfwuSelYxTSQi/xTjU8DWj8YnhV9gJyqG/eY3adwfi3pCpnEoT
+         dI2mXpQj4qu951OlhJSdPpxdEu7EcmQPjwDuuA44Jn8hRHPYdYfKTvURvoO+LJKJ1ki+
+         JMcg==
+X-Forwarded-Encrypted: i=1; AJvYcCU2fRcWYLmeK8KOixgp0OJxoXife9wClsnzBd1HtMWsgplUB0hmnoYccsF50K5jJCRPwXI=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwFYU7xyRG46gXbkflfs+vI1/h+ZI0L+8v8n8zSCc4LJMlIVwzp
+	zjCb9pdNixg5mTV1a3QM5+UjJTqGMh8qpMx74jdS2VI/a7k5FCHzxGgDrF+I82dWYIaWRJ2DZe6
+	UmBsAVQ==
+X-Google-Smtp-Source: AGHT+IH/2gIQckIGBvPLTgMI5nZTn9xen9JOJcaPgjLLw4FsDPxt8568zPXkGc37Szl9ifCv4T+uIb3eOmI=
+X-Received: from pjoa3.prod.google.com ([2002:a17:90a:8c03:b0:32e:a549:83e3])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:4a49:b0:330:82b1:ef76
+ with SMTP id 98e67ed59e1d1-33bcf914d79mr18775090a91.28.1760978056031; Mon, 20
+ Oct 2025 09:34:16 -0700 (PDT)
+Date: Mon, 20 Oct 2025 09:33:05 -0700
+In-Reply-To: <20251016172853.52451-1-seanjc@google.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
-References: <20251007222356.348349-1-seanjc@google.com>
+References: <20251016172853.52451-1-seanjc@google.com>
 X-Mailer: git-send-email 2.51.0.869.ge66316f041-goog
-Message-ID: <176097601867.439156.11041449627994730588.b4-ty@google.com>
-Subject: Re: [PATCH] KVM: guest_memfd: Define a CLASS to get+put guest_memfd
- file from a memslot
+Message-ID: <176097602114.439246.7705198528866990456.b4-ty@google.com>
+Subject: Re: [PATCH v13 00/12] KVM: guest_memfd: Add NUMA mempolicy support
 From: Sean Christopherson <seanjc@google.com>
-To: Sean Christopherson <seanjc@google.com>, Paolo Bonzini <pbonzini@redhat.com>
-Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org
+To: Sean Christopherson <seanjc@google.com>, Miguel Ojeda <ojeda@kernel.org>, Marc Zyngier <maz@kernel.org>, 
+	Oliver Upton <oliver.upton@linux.dev>, Paolo Bonzini <pbonzini@redhat.com>
+Cc: linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, 
+	kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	Ackerley Tng <ackerleytng@google.com>, Shivank Garg <shivankg@amd.com>, 
+	David Hildenbrand <david@redhat.com>, Fuad Tabba <tabba@google.com>, Ashish Kalra <ashish.kalra@amd.com>, 
+	Vlastimil Babka <vbabka@suse.cz>
 Content-Type: text/plain; charset="utf-8"
 
-On Tue, 07 Oct 2025 15:23:56 -0700, Sean Christopherson wrote:
-> Add a CLASS to handle getting and putting a guest_memfd file given a
-> memslot to reduce the amount of related boilerplate, and more importantly
-> to minimize the chances of forgetting to put the file (thankfully the bug
-> that prompted this didn't escape initial testing).
+On Thu, 16 Oct 2025 10:28:41 -0700, Sean Christopherson wrote:
+> Miguel, you got pulled in due to a one-line change to add a new iterator
+> macros in .clang-format.
 > 
-> Define a CLASS instead of using __free(fput) as _free() comes with subtle
-> caveats related to FILO ordering (objects are freed in the order in which
-> they are declared), and the recommended solution/workaround (declare file
-> pointers exactly when they are initialized) is visually jarring relative
-> to KVM's (and the kernel's) overall strict adherence to not mixing
-> declarations and code.  E.g. the use in kvm_gmem_populate() would be:
+> Shivank's series to add support for NUMA-aware memory placement in
+> guest_memfd.  Based on kvm-x86/next.
+> 
+> Note, Ackerley pointed out that we should probably have testing for the
+> cpuset_do_page_mem_spread() behavior.  I 100% agree, but I'm also a-ok
+> merging without those tests.
 > 
 > [...]
 
-Applied to kvm-x86 gmem, thanks!
+Applied to kvm-x86 gmem, sans the .clang-format change.  Thanks!
 
-[1/1] KVM: guest_memfd: Define a CLASS to get+put guest_memfd file from a memslot
-      https://github.com/kvm-x86/linux/commit/0bb4d9c39b76
+[01/12] KVM: guest_memfd: Rename "struct kvm_gmem" to "struct gmem_file"
+        https://github.com/kvm-x86/linux/commit/497b1dfbcacf
+[02/12] KVM: guest_memfd: Add macro to iterate over gmem_files for a mapping/inode
+        https://github.com/kvm-x86/linux/commit/392dd9d9488a
+[03/12] KVM: guest_memfd: Use guest mem inodes instead of anonymous inodes
+        https://github.com/kvm-x86/linux/commit/a63ca4236e67
+[04/12] KVM: guest_memfd: Add slab-allocated inode cache
+        https://github.com/kvm-x86/linux/commit/f609e89ae893
+[05/12] KVM: guest_memfd: Enforce NUMA mempolicy using shared policy
+        https://github.com/kvm-x86/linux/commit/ed1ffa810bd6
+[06/12] KVM: selftests: Define wrappers for common syscalls to assert success
+        https://github.com/kvm-x86/linux/commit/3223560c93eb
+[07/12] KVM: selftests: Report stacktraces SIGBUS, SIGSEGV, SIGILL, and SIGFPE by default
+        https://github.com/kvm-x86/linux/commit/29dc539d74ab
+[08/12] KVM: selftests: Add additional equivalents to libnuma APIs in KVM's numaif.h
+        https://github.com/kvm-x86/linux/commit/2189d78269c5
+[09/12] KVM: selftests: Use proper uAPI headers to pick up mempolicy.h definitions
+        https://github.com/kvm-x86/linux/commit/fe7baebb99de
+[10/12] KVM: selftests: Add helpers to probe for NUMA support, and multi-node systems
+        https://github.com/kvm-x86/linux/commit/e698e89b3ed1
+[11/12] KVM: selftests: Add guest_memfd tests for mmap and NUMA policy support
+        https://github.com/kvm-x86/linux/commit/38ccc50ac037
+[12/12] KVM: guest_memfd: Add gmem_inode.flags field instead of using i_private
+        https://github.com/kvm-x86/linux/commit/e66438bb81c4
 
 --
 https://github.com/kvm-x86/linux/tree/next
