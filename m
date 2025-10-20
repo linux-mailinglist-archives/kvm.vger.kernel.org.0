@@ -1,52 +1,59 @@
-Return-Path: <kvm+bounces-60562-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-60563-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 971B3BF2A72
-	for <lists+kvm@lfdr.de>; Mon, 20 Oct 2025 19:14:47 +0200 (CEST)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
+	by mail.lfdr.de (Postfix) with ESMTPS id 76AB5BF2AD6
+	for <lists+kvm@lfdr.de>; Mon, 20 Oct 2025 19:21:31 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id CED31422D63
-	for <lists+kvm@lfdr.de>; Mon, 20 Oct 2025 17:13:55 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id ED7AF4E53C2
+	for <lists+kvm@lfdr.de>; Mon, 20 Oct 2025 17:21:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 075CB331A76;
-	Mon, 20 Oct 2025 17:11:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E01FF330B15;
+	Mon, 20 Oct 2025 17:21:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="mZHjO5wm"
 X-Original-To: kvm@vger.kernel.org
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 02ECF17A2F0;
-	Mon, 20 Oct 2025 17:11:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
+Received: from out-182.mta1.migadu.com (out-182.mta1.migadu.com [95.215.58.182])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 50AC92BF01D
+	for <kvm@vger.kernel.org>; Mon, 20 Oct 2025 17:21:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1760980313; cv=none; b=gmHeRP1F5dF0CFITYHt0JbtpgKvNN2mYq7PePCQfE/+d3B+cO1DShFZibILyr6+GIS4SjcbUSIJeaKQmWn3dCf+5d5WP20gqqj07dO+2NXm9ELhppnaTK+cF8MIZkB8FAyCXhNmuGiUrgzjCMkRBatqt90wOiTqS6hRO5ic+ahY=
+	t=1760980880; cv=none; b=ftQQLxiEE4qiKs0GqHT15UBMX33C96TSJFeogwibbeQwEEXOs2iwOb3OkgFkeZBTh0PSmH6mEEVvXKD7vuoxjXqaffycyX574M99Q6+ZEYNyEvdFEI1CFHiYrCE5Iy7mMcwMw4XyGIAtVjwg+U2opXPYUEsCejUuxIKbzF8nf9c=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1760980313; c=relaxed/simple;
-	bh=KAlYS6zuzNONWFCiNofiPVTUIcr94HG5Jq+e/8sSYk8=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type:Content-Disposition; b=Ah6zai3mm5QvB6iWcbAu09/HFob22XfV4dnOPJqLhLHwCr2J32M6200ZgEC9+JKIviL6GP4ea7b0SECQ1No4EMZH1maB/wUKBnJJhLfoogY1z+MFrfkMlXKoGpU65dbxum4B/yvWEq+iig+FF86QJbuQ4k78kBQ2Msgt+7LBiI8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 78F471007;
-	Mon, 20 Oct 2025 10:11:43 -0700 (PDT)
-Received: from JFWG9VK6KM.emea.arm.com (JFWG9VK6KM.cambridge.arm.com [10.1.26.166])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id DC69D3F66E;
-	Mon, 20 Oct 2025 10:11:49 -0700 (PDT)
-From: Leonardo Bras <leo.bras@arm.com>
-To: Sean Christopherson <seanjc@google.com>
-Cc: Leonardo Bras <leo.bras@arm.com>,
-	Paolo Bonzini <pbonzini@redhat.com>,
-	Jonathan Corbet <corbet@lwn.net>,
-	kvm@vger.kernel.org,
-	linux-doc@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH 1/1] doc/kvm/api: Fix VM exit code for full dirty ring
-Date: Mon, 20 Oct 2025 18:11:46 +0100
-Message-ID: <aPZtUlTjEm5_bqDe@JFWG9VK6KM.cambridge.arm.com>
-X-Mailer: git-send-email 2.50.1
-In-Reply-To: <176097609826.440019.16093756252971850484.b4-ty@google.com>
-References: <20251014152802.13563-1-leo.bras@arm.com> <176097609826.440019.16093756252971850484.b4-ty@google.com>
+	s=arc-20240116; t=1760980880; c=relaxed/simple;
+	bh=jgCIDLHDF2FxW6HOC2oML2lemJ7LkLMOOYvNT+P7MUg=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=IOlvxlpK1iVqsePamQgAPe4HBGUBjCgXU3WuYV5RT1IaZL1OaexfsYn+36nnYri48SlIqQNnWjGTjikK1wx4x28KiOOrlJYuQ2paA/2+cagwP5YpYnCQ4NLbxGvVKjabB5qwSLDrkR06W1RKNapw9ydsUHyzAOdMAuVkWdw2FrU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=mZHjO5wm; arc=none smtp.client-ip=95.215.58.182
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+Date: Mon, 20 Oct 2025 17:21:07 +0000
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1760980876;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=Z3ejfuKsDgjhzfc8v7FNil97T0bqLDegWdlpF40XmO4=;
+	b=mZHjO5wm0pXaQkpPR4/uYlVPKQ9GPObNdpJ4D3IpEMJXASduz87EuWDH8AtOMiy+boRPnw
+	W6wE1xjTN4CrCc25D2mpYofVhXYX9Rynd0rRz9efedxneSndpZ9vBoPc8zBL2zXkFcXBCw
+	AHJMGGLJvAneKa2Iq0Z1Co5oS/XaUf8=
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Yosry Ahmed <yosry.ahmed@linux.dev>
+To: Jim Mattson <jmattson@google.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, Shuah Khan <shuah@kernel.org>, 
+	Sean Christopherson <seanjc@google.com>, Bibo Mao <maobibo@loongson.cn>, 
+	Huacai Chen <chenhuacai@kernel.org>, Andrew Jones <ajones@ventanamicro.com>, 
+	Claudio Imbrenda <imbrenda@linux.ibm.com>, "Pratik R. Sampat" <prsampat@amd.com>, 
+	Kai Huang <kai.huang@intel.com>, Eric Auger <eric.auger@redhat.com>, linux-kernel@vger.kernel.org, 
+	kvm@vger.kernel.org, linux-kselftest@vger.kernel.org
+Subject: Re: [PATCH 2/4] KVM: selftests: Use a loop to walk guest page tables
+Message-ID: <o7m5gh76crbgzlfvq4lbp6ymuzbgze25qphlhsezl2ox5rfjuv@3xh7gqh5dmlt>
+References: <20250917215031.2567566-1-jmattson@google.com>
+ <20250917215031.2567566-3-jmattson@google.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -55,23 +62,70 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
+In-Reply-To: <20250917215031.2567566-3-jmattson@google.com>
+X-Migadu-Flow: FLOW_OUT
 
-On Mon, Oct 20, 2025 at 09:33:01AM -0700, Sean Christopherson wrote:
-> On Tue, 14 Oct 2025 16:28:02 +0100, Leonardo Bras wrote:
-> > While reading the documentation, I saw a exit code I could not grep for, to
-> > figure out it has a slightly different name.
-> > 
-> > Fix that name in documentation so it points to the right exit code.
+On Wed, Sep 17, 2025 at 02:48:38PM -0700, Jim Mattson wrote:
+> Walk the guest page tables via a loop when searching for a PTE,
+> instead of using unique variables for each level of the page tables.
 > 
-> Applied to kvm-x86 generic, with a massaged shortlog.  Thanks!
+> This simplifies the code and makes it easier to support 5-level paging
+> in the future.
 > 
-> [1/1] KVM: Fix VM exit code for full dirty ring in API documentation
->       https://github.com/kvm-x86/linux/commit/04fd067b770d
+> Signed-off-by: Jim Mattson <jmattson@google.com>
+> ---
+>  .../testing/selftests/kvm/lib/x86/processor.c | 21 +++++++------------
+>  1 file changed, 8 insertions(+), 13 deletions(-)
 > 
-> --
-> https://github.com/kvm-x86/linux/tree/next
+> diff --git a/tools/testing/selftests/kvm/lib/x86/processor.c b/tools/testing/selftests/kvm/lib/x86/processor.c
+> index 0238e674709d..433365c8196d 100644
+> --- a/tools/testing/selftests/kvm/lib/x86/processor.c
+> +++ b/tools/testing/selftests/kvm/lib/x86/processor.c
+> @@ -270,7 +270,8 @@ static bool vm_is_target_pte(uint64_t *pte, int *level, int current_level)
+>  uint64_t *__vm_get_page_table_entry(struct kvm_vm *vm, uint64_t vaddr,
+>  				    int *level)
+>  {
+> -	uint64_t *pml4e, *pdpe, *pde;
+> +	uint64_t *pte = &vm->pgd;
+> +	int current_level;
+>  
+>  	TEST_ASSERT(!vm->arch.is_pt_protected,
+>  		    "Walking page tables of protected guests is impossible");
+> @@ -291,19 +292,13 @@ uint64_t *__vm_get_page_table_entry(struct kvm_vm *vm, uint64_t vaddr,
+>  	TEST_ASSERT(vaddr == (((int64_t)vaddr << 16) >> 16),
+>  		"Canonical check failed.  The virtual address is invalid.");
+>  
+> -	pml4e = virt_get_pte(vm, &vm->pgd, vaddr, PG_LEVEL_512G);
+> -	if (vm_is_target_pte(pml4e, level, PG_LEVEL_512G))
+> -		return pml4e;
+> -
+> -	pdpe = virt_get_pte(vm, pml4e, vaddr, PG_LEVEL_1G);
+> -	if (vm_is_target_pte(pdpe, level, PG_LEVEL_1G))
+> -		return pdpe;
+> -
+> -	pde = virt_get_pte(vm, pdpe, vaddr, PG_LEVEL_2M);
+> -	if (vm_is_target_pte(pde, level, PG_LEVEL_2M))
+> -		return pde;
+> +	for (current_level = vm->pgtable_levels; current_level > 0; current_level--) {
 
-Thanks!
-Leo
+This should be current_level >= PG_LEVEL_4K. It's the same, but easier
+to read.
+
+> +		pte = virt_get_pte(vm, pte, vaddr, current_level);
+> +		if (vm_is_target_pte(pte, level, current_level))
+
+Seems like vm_is_target_pte() is written with the assumption that it
+operates on an upper-level PTE, but I think it works on 4K PTEs as well.
+
+> +			return pte;
+> +	}
+>  
+> -	return virt_get_pte(vm, pde, vaddr, PG_LEVEL_4K);
+> +	return pte;
+>  }
+>  
+>  uint64_t *vm_get_page_table_entry(struct kvm_vm *vm, uint64_t vaddr)
+> -- 
+> 2.51.0.470.ga7dc726c21-goog
+> 
 
