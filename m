@@ -1,79 +1,79 @@
-Return-Path: <kvm+bounces-60471-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-60472-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 002A2BEF424
-	for <lists+kvm@lfdr.de>; Mon, 20 Oct 2025 06:25:46 +0200 (CEST)
+Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [213.196.21.55])
+	by mail.lfdr.de (Postfix) with ESMTPS id A18D9BEF433
+	for <lists+kvm@lfdr.de>; Mon, 20 Oct 2025 06:26:06 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 616233B8403
-	for <lists+kvm@lfdr.de>; Mon, 20 Oct 2025 04:25:44 +0000 (UTC)
+	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 4D3473491C5
+	for <lists+kvm@lfdr.de>; Mon, 20 Oct 2025 04:26:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EDF492BEC3D;
-	Mon, 20 Oct 2025 04:25:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2E8CC2C0F63;
+	Mon, 20 Oct 2025 04:25:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bytedance.com header.i=@bytedance.com header.b="DVCMdv+9"
+	dkim=pass (2048-bit key) header.d=bytedance.com header.i=@bytedance.com header.b="NKop3VHj"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pg1-f178.google.com (mail-pg1-f178.google.com [209.85.215.178])
+Received: from mail-pg1-f172.google.com (mail-pg1-f172.google.com [209.85.215.172])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6EA132BEFFE
-	for <kvm@vger.kernel.org>; Mon, 20 Oct 2025 04:25:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.178
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BA1A92BE7D7
+	for <kvm@vger.kernel.org>; Mon, 20 Oct 2025 04:25:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1760934322; cv=none; b=r98evHhm5c0adY0XdcEWqjF4Zkdz7XAEnydf+LPIbMapi7lgWdxbh0RQeEOrg7q+oUL8FzHkV5Ljf+RTw0457MIBqxzWCvbDTMp8doQS/fkHRfbwrEc0HgvfBH+kvSNNCqE9SZlr82flOAsSrvTYhDBPTilQUkB0dN3qhGXU+zo=
+	t=1760934330; cv=none; b=uGERHkyOVfYpQemvv0rEPmn8/KO0IXw8CGLVBqjVFARrJMdlM+bJBC1vjMuvB4iGetm33bA+EL9+2HMgJtVwzBDRM9QHv4Hg2Q4Fi36xCxtA/FvyfYgPqmzS9deGxZeMdOqLyf48602nITBz6UHzSmWJdLNE+crBYSjhXPOOoQg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1760934322; c=relaxed/simple;
-	bh=G3gx8mtnRrONvnJ3PMvWw1r57EZwaIQ7NQmChTq2HpI=;
+	s=arc-20240116; t=1760934330; c=relaxed/simple;
+	bh=XEtg6rWP1BpsOjgDYdlCSvgySUgbTJhRQilYKVrS164=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=AKxT4IFciYPvoMndpVSbkS6mv1ECDRNZBcX6aO3hjhCjKZkJy9SrR7LvbLqRBZUdb61nuzRdf4i1BbuT5gKK4WKePrA65KzTEernIKSfL2/X4W/hNYI9+y38bU0rVugewMOxV1JGaMahhCpLgtfbIYbYWPwgCjIU8NqR/Dx6SQg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=bytedance.com; spf=pass smtp.mailfrom=bytedance.com; dkim=pass (2048-bit key) header.d=bytedance.com header.i=@bytedance.com header.b=DVCMdv+9; arc=none smtp.client-ip=209.85.215.178
+	 MIME-Version; b=Xm05vIxnVAnbjMfU+OPU+8FYT35MBWgKD6hVP+4Tp8LKIDmbAyCbY0a9bkugxM6L0cQ1xeMgLQ44WXIcCscWkWMbB85tIoIZ9lWQCFw/I6cm6nRttqPByDPzT7fWMEo2HitWEoke/10ldS+8Xsa8lFrj5ZJCDMiYJrnD6OdJFsY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=bytedance.com; spf=pass smtp.mailfrom=bytedance.com; dkim=pass (2048-bit key) header.d=bytedance.com header.i=@bytedance.com header.b=NKop3VHj; arc=none smtp.client-ip=209.85.215.172
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=bytedance.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bytedance.com
-Received: by mail-pg1-f178.google.com with SMTP id 41be03b00d2f7-b63148d25c3so2402043a12.1
-        for <kvm@vger.kernel.org>; Sun, 19 Oct 2025 21:25:20 -0700 (PDT)
+Received: by mail-pg1-f172.google.com with SMTP id 41be03b00d2f7-b62fcddfa21so2522825a12.1
+        for <kvm@vger.kernel.org>; Sun, 19 Oct 2025 21:25:28 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=bytedance.com; s=google; t=1760934319; x=1761539119; darn=vger.kernel.org;
+        d=bytedance.com; s=google; t=1760934328; x=1761539128; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=obq5zFRUbQnhz/6ak4c69JinsROwXC9HaOuW/JUDMF4=;
-        b=DVCMdv+9r+TgnCG0etkMZbXwz+rOysU+XEhzEmJbiwjyMtmbrnwBXmTEx+dlA4TYLc
-         dOloxCrDT46mcRicQWCSOdFX5Sd+z5I2oGCv/fE4Lwbxoy3wP+Zx/atYgvgTtY8cN6XQ
-         9w24eunITBaC21ah9zarJRYggVgC/Su4/dPenVuBSI3+x3Eke90ZYl/nua4nMMHnB5rY
-         9en+rLSlWJOKPcTTvlEBwoc/Z6UAfdNttd4zuQ3tGhvpM8r90BmVC+oKeZQ90ohX9ckq
-         04bFYcoviJEYjJKqwVzmfhcCK3KUpaGQpUBUc7y+NfVkWapeto2fb9KfEpGiWSXbBb44
-         eN0w==
+        bh=eAhCsGBB1TH5AMM7lpe2ReTjbDoEFVDwsghvbOsONac=;
+        b=NKop3VHjNqndGso2Dc5/KrqRYSMNBB/m8vkCgKZq7naIyrNlhvnOxxeYodugm3Mmjf
+         nAc6xXMFx3E9kDIXoh9Tm3W7ndVMFacmPgomIdI4UEJ0yDsJB8elSX0O3VoHIq8lT1GH
+         iOJHCzBC3fOXv/p1S7+qTnDpL191zh7u2tEogBHgqhvm6+QSOF+ya4ntYkg+G1R8nDFg
+         dnnVIT6YodLJpchkL4zhLHAQqxd3p/Yl6Y1KHevjgoxJqRm5sws2jIyYXopaUg7wKEOR
+         6b70N4poNwydwUmB6renildTxQWjyK+WIX4qUJyjgo29eyocnxu+amQsgRcn0nyP4G1Y
+         BHnA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1760934319; x=1761539119;
+        d=1e100.net; s=20230601; t=1760934328; x=1761539128;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=obq5zFRUbQnhz/6ak4c69JinsROwXC9HaOuW/JUDMF4=;
-        b=CLjskbTqdQl1fZEvD6ccPUUWUOEb5HnyCBcMrb8yJAup50CdXKSVKczmUlyVWAvD6t
-         fZMsBjQr7oTnnSEOyodu/tAhTBlAaulJIbjiuwCItDyFU4PAWfzsNjB173hZHjlv4/zb
-         Ij/zpeM8KeS8Ewb1W1lw5vFjRtvU7RaRnCODjeOwzt6lUCyf+nqWA+BUJBWd5FpzjP6P
-         MnpuekUZxx0GCvb8Bm5jedLkWzNvVGeDzW/daIq1bKDRS6uBZCusJae1nD+Lz3qc/u0t
-         SlMJ4O7pA9Dr4Hnhx9Hor78r+UmLWLDIWexnrhjXbdygcLjj4iqrS0mn8Lud5H1DO8uZ
-         PN+g==
-X-Forwarded-Encrypted: i=1; AJvYcCUPI0+SMjAWCkmOI0VtXpG7tzlodRibZPHnYhSTpwlJDRzpLl6jvIFfV/587sOSq374wxc=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwvYbZahEf4p9Jo2lY/nzW6YZf2uZCkerlDvZhtBeNqKe6Y/Wqp
-	BFp4KyhBaRhi7mF6Bt1MLCMQ2tDwCDwpqopAkhwVVyItb5tKHRtYGytk64QI2zervts=
-X-Gm-Gg: ASbGncs1QHnOgnTDI1GmTUuZ//AYsz1o3OI18DoDo+dxCFaYI5AI6PGrFaJASkJcl8D
-	HA4agC1HaUZeyTkg34DTPis1Yi7/kyqthNxSzIfrUf1XC74Dixce8NBF8ltmya0gqIflUTJtqNP
-	JjbccEEl7iK0liLJ6nOcTFY9MCIafx2Ca/jZIiNj2Aks1dzn9kHDKz+Y1VYC6js7Lq33olNvG3k
-	a4mXFSRaSGlgW4WHgkihZRpzx60NFAs150oH1BzAyYZF9+u7If2wNf+1FYHGwQA3C7tGZhPG4Vf
-	ZOG+Rawz+034vwWwnziVM868KycvVjRl2JmGFGqKzuK8FuGwIpI0TUn/tz+RNkKQEOMAr5XyOia
-	JIlsdLE4FKHF0s5J0ZF/hJWoAOriNR1Bnrnxxa82O4KDyLanuAClv2rHt80WCn/Q/fawG3eajM4
-	BCoRYYEw5lvPJtnG9DsVx7lJGKL6De2/MJZg9Ca7hH7YEHb2cs1Zac3P9ZiG8OCdk=
-X-Google-Smtp-Source: AGHT+IEADekY+PfDTkxIlwwqUSm0jpa89LPAxAIlo9A2MiPlx5+tEh4i22tMIEWZw3GrGyhmHRxBRA==
-X-Received: by 2002:a17:903:19e7:b0:267:cdc1:83e with SMTP id d9443c01a7336-29091b586d2mr204859535ad.15.1760934319501;
-        Sun, 19 Oct 2025 21:25:19 -0700 (PDT)
+        bh=eAhCsGBB1TH5AMM7lpe2ReTjbDoEFVDwsghvbOsONac=;
+        b=CmN+jzHlI1nzgFHb27k3ro5cyjo6WAQbBgKAMAgpGVfdKAJ4mOslYwpYxpCsg6b2xe
+         4X/OyxhUTeiJwDL8TbZ9ZyoSR8w5HNHjZeXPfoy7ZnejmvqWJ1VLSpx2GnS/fSQTmQNG
+         EVvfZxFJoGOAqF5IGnvlXwUPbNBXAMCAVesY/sRDTChdez5JGCPe1XfS+xurVPrsnXfE
+         dCdJsqwPH1HMDNwJpg8XmirJYHDT/0a9umsr/hxj8Lrv363T+GoDGJa48obYYYupB87g
+         vGnHJj2KDOmoRZvLJ4dfKa91to5BQoCnDw21jwYJqypoUt0r3LLdEUkVztgL0sQih0ND
+         i3/Q==
+X-Forwarded-Encrypted: i=1; AJvYcCUE7wXPyv+n1U2o7IcaJ+a/32U71LLPBlxO5MQ5RPOeS4yDQUt3kZoD/+g2ErXbHIddqgg=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yx0TSNNIwvo9uRS94ajcidYouD0CPrdoTW+4+AIoQytwJQiv8TL
+	GUfm232y5pl3G4pZhJN13O3CO8TW6iwfsj4hqnRaLSQ2Ih3sjRgUW/AWxukM5emMxWY=
+X-Gm-Gg: ASbGncuqcExZnwUZQiMkYYfDGKLRoxToqfuTyEBKLZsWzt/oFZR4MGK0j7e6wut7ZC5
+	nzM7hYIeFuVpu5cSY+fhyzJHOk0JHEDIA/XkaioawTNiiT/Vf1djIYHr5hnQj+8JkI8NdhDyX7m
+	yQlkY6AZBLbGikOhLSY8RVGldpbO3L0w67DbxD/RAuUqCzcQdlSMDodwZ1jdtkwcOZoQjGTu1qy
+	wAgk6EsE+5DhE7BtPxZAkxmENIdVjw6vYoOR/Sryq4Bs1Hei7fwcekauZVL8ggSdevRlQ5FbPlq
+	WT2KBLQJtAgVQxgOmPk/VD2DmQrTkvd7S9M8x31AzNI55qNyYePXbEdoFDNqGIGl6VorDhljQK5
+	oUvEOS3cthFr7O5hlF4AH8SRUZVQEXJF0zVYEUmyNc8ieC0U/UJ1OMbGdrDSV6tSVHk00HSv476
+	NTiMg1yNwtaimG+TIUaVZgdZptz4XJUnTKSrRWHxKFI2lQ1PpSygzxsd/1i1WtdeQ=
+X-Google-Smtp-Source: AGHT+IFQr4LFijryTWzGKs84661TKpJBBbN75/B4QXkAS0iMqNHAgeauwTcUjRd7kZl/MznePhToLw==
+X-Received: by 2002:a17:902:e552:b0:290:ac36:2ed8 with SMTP id d9443c01a7336-290c9ce63d6mr128754015ad.24.1760934328020;
+        Sun, 19 Oct 2025 21:25:28 -0700 (PDT)
 Received: from J9GPGXL7NT.bytedance.net ([61.213.176.56])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-29246ec20a4sm68319325ad.7.2025.10.19.21.25.11
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-29246ec20a4sm68319325ad.7.2025.10.19.21.25.19
         (version=TLS1_3 cipher=TLS_CHACHA20_POLY1305_SHA256 bits=256/256);
-        Sun, 19 Oct 2025 21:25:19 -0700 (PDT)
+        Sun, 19 Oct 2025 21:25:27 -0700 (PDT)
 From: Xu Lu <luxu.kernel@bytedance.com>
 To: corbet@lwn.net,
 	paul.walmsley@sifive.com,
@@ -106,9 +106,9 @@ Cc: linux-doc@vger.kernel.org,
 	joe@perches.com,
 	lukas.bulwahn@gmail.com,
 	Xu Lu <luxu.kernel@bytedance.com>
-Subject: [PATCH v4 06/10] riscv: Apply acquire/release semantics to arch_xchg/arch_cmpxchg operations
-Date: Mon, 20 Oct 2025 12:24:53 +0800
-Message-ID: <20251020042457.30915-2-luxu.kernel@bytedance.com>
+Subject: [PATCH v4 07/10] riscv: Apply acquire/release semantics to arch_atomic operations
+Date: Mon, 20 Oct 2025 12:24:54 +0800
+Message-ID: <20251020042457.30915-3-luxu.kernel@bytedance.com>
 X-Mailer: git-send-email 2.50.1
 In-Reply-To: <20251020042457.30915-1-luxu.kernel@bytedance.com>
 References: <20251020042457.30915-1-luxu.kernel@bytedance.com>
@@ -120,351 +120,154 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-The existing arch_xchg/arch_cmpxchg operations are implemented by
-inserting fence instructions before or after atomic instructions.
-This commit replaces them with real acquire/release semantics.
+The existing arch_atomic operations are implemented by inserting fence
+instrucitons before or after atomic instructions. This commit replaces
+them with real acquire/release semantics.
 
-|----------------------------------------------------------------|
-|    |    arch_xchg_release       |     arch_cmpxchg_release     |
-|    |-----------------------------------------------------------|
-|    | zabha      | !zabha        | zabha+zacas | !(zabha+zacas) |
-| rl |-----------------------------------------------------------|
-|    |            | (fence rw, w) |             | (fence rw, w)  |
-|    | amoswap.rl | lr.w          | amocas.rl   | lr.w           |
-|    |            | sc.w.rl       |             | sc.w.rl        |
-|----------------------------------------------------------------|
-|    |    arch_xchg_acquire       |     arch_cmpxchg_acquire     |
-|    |-----------------------------------------------------------|
-|    | zabha      | !zabha        | zabha+zacas | !(zabha+zacas) |
-| aq |-----------------------------------------------------------|
-|    |            | lr.w.aq       |             | lr.w.aq        |
-|    | amoswap.aq | sc.w          | amocas.aq   | sc.w           |
-|    |            | (fence r, rw) |             | (fence r, rw)  |
-|----------------------------------------------------------------|
+|-----------------------------------------------|
+|    | arch_atomic(64)_{add|sub}_return_release |
+| rl |------------------------------------------|
+|    |                amoadd.rl                 |
+|-----------------------------------------------|
+|    | arch_atomic(64)_{add|sub}_return_acquire |
+| aq |------------------------------------------|
+|    |                amoadd.aq                 |
+|-----------------------------------------------|
 
-(fence rw, w), (fence r, rw) here means such instructions will only
-be inserted when zalasr is not implemented.
+|---------------------------------------------------------|
+|    | arch_atomic(64)_fetch_{add|sub|and|or|xor}_release |
+| rl |----------------------------------------------------|
+|    |               amo{add|and|or|xor}.rl               |
+|---------------------------------------------------------|
+|    | arch_atomic(64)_fetch_{add|sub|and|or|xor}_acquire |
+| aq |----------------------------------------------------|
+|    |               amo{add|and|or|xor}.aq               |
+|---------------------------------------------------------|
 
 Signed-off-by: Xu Lu <luxu.kernel@bytedance.com>
 ---
- arch/riscv/include/asm/cmpxchg.h | 144 +++++++++++++++----------------
- 1 file changed, 71 insertions(+), 73 deletions(-)
+ arch/riscv/include/asm/atomic.h | 64 +++++++++++++++++++++++++++++++++
+ 1 file changed, 64 insertions(+)
 
-diff --git a/arch/riscv/include/asm/cmpxchg.h b/arch/riscv/include/asm/cmpxchg.h
-index 0b749e7102162..50fd46af448a9 100644
---- a/arch/riscv/include/asm/cmpxchg.h
-+++ b/arch/riscv/include/asm/cmpxchg.h
-@@ -15,15 +15,31 @@
- #include <asm/cpufeature-macros.h>
- #include <asm/processor.h>
+diff --git a/arch/riscv/include/asm/atomic.h b/arch/riscv/include/asm/atomic.h
+index 5b96c2f61adb5..86291de07de62 100644
+--- a/arch/riscv/include/asm/atomic.h
++++ b/arch/riscv/include/asm/atomic.h
+@@ -98,6 +98,30 @@ c_type arch_atomic##prefix##_fetch_##op##_relaxed(c_type i,		\
+ 	return ret;							\
+ }									\
+ static __always_inline							\
++c_type arch_atomic##prefix##_fetch_##op##_acquire(c_type i,		\
++						  atomic##prefix##_t *v)	\
++{									\
++	register c_type ret;						\
++	__asm__ __volatile__ (						\
++		"	amo" #asm_op "." #asm_type ".aq %1, %2, %0"	\
++		: "+A" (v->counter), "=r" (ret)				\
++		: "r" (I)						\
++		: "memory");						\
++	return ret;							\
++}									\
++static __always_inline							\
++c_type arch_atomic##prefix##_fetch_##op##_release(c_type i,		\
++						  atomic##prefix##_t *v)	\
++{									\
++	register c_type ret;						\
++	__asm__ __volatile__ (						\
++		"	amo" #asm_op "." #asm_type ".rl %1, %2, %0"	\
++		: "+A" (v->counter), "=r" (ret)				\
++		: "r" (I)						\
++		: "memory");						\
++	return ret;							\
++}									\
++static __always_inline							\
+ c_type arch_atomic##prefix##_fetch_##op(c_type i, atomic##prefix##_t *v)	\
+ {									\
+ 	register c_type ret;						\
+@@ -117,6 +141,18 @@ c_type arch_atomic##prefix##_##op##_return_relaxed(c_type i,		\
+         return arch_atomic##prefix##_fetch_##op##_relaxed(i, v) c_op I;	\
+ }									\
+ static __always_inline							\
++c_type arch_atomic##prefix##_##op##_return_acquire(c_type i,		\
++						   atomic##prefix##_t *v)	\
++{									\
++	return arch_atomic##prefix##_fetch_##op##_acquire(i, v) c_op I;	\
++}									\
++static __always_inline							\
++c_type arch_atomic##prefix##_##op##_return_release(c_type i,		\
++						   atomic##prefix##_t *v)	\
++{									\
++	return arch_atomic##prefix##_fetch_##op##_release(i, v) c_op I;	\
++}									\
++static __always_inline							\
+ c_type arch_atomic##prefix##_##op##_return(c_type i, atomic##prefix##_t *v)	\
+ {									\
+         return arch_atomic##prefix##_fetch_##op(i, v) c_op I;		\
+@@ -139,22 +175,38 @@ ATOMIC_OPS(sub, add, +, -i)
  
--#define __arch_xchg_masked(sc_sfx, swap_sfx, prepend, sc_append,		\
--			   swap_append, r, p, n)				\
-+/*
-+ * These macros are here to improve the readability of the arch_xchg_XXX()
-+ * and arch_cmpxchg_XXX() macros.
-+ */
-+#define LR_SFX(x)		x
-+#define SC_SFX(x)		x
-+#define CAS_SFX(x)		x
-+#define SC_PREPEND(x)		x
-+#define SC_APPEND(x)		x
-+
-+#ifdef CONFIG_SMP
-+#define SC_ACQUIRE_BARRIER	RISCV_FENCE_ASM(r, rw)
-+#define SC_RELEASE_BARRIER	RISCV_FENCE_ASM(rw, w)
-+#else
-+#define SC_ACQUIRE_BARRIER	__nops(1)
-+#define SC_RELEASE_BARRIER	__nops(1)
-+#endif
-+
-+#define __arch_xchg_masked(lr_sfx, sc_sfx, swap_sfx, sc_prepend, sc_append,	\
-+			   r, p, n)						\
- ({										\
- 	if (IS_ENABLED(CONFIG_RISCV_ISA_ZABHA) &&				\
- 	    riscv_has_extension_unlikely(RISCV_ISA_EXT_ZABHA)) {		\
- 		__asm__ __volatile__ (						\
--			prepend							\
- 			"	amoswap" swap_sfx " %0, %z2, %1\n"		\
--			swap_append						\
- 			: "=&r" (r), "+A" (*(p))				\
- 			: "rJ" (n)						\
- 			: "memory");						\
-@@ -37,14 +53,16 @@
- 		ulong __rc;							\
- 										\
- 		__asm__ __volatile__ (						\
--		       prepend							\
- 		       PREFETCHW_ASM(%5)					\
-+		       ALTERNATIVE(__nops(1), sc_prepend,			\
-+				   0, RISCV_ISA_EXT_ZALASR, 1)			\
- 		       "0:	lr.w %0, %2\n"					\
- 		       "	and  %1, %0, %z4\n"				\
- 		       "	or   %1, %1, %z3\n"				\
- 		       "	sc.w" sc_sfx " %1, %1, %2\n"			\
- 		       "	bnez %1, 0b\n"					\
--		       sc_append						\
-+		       ALTERNATIVE(__nops(1), sc_append,			\
-+				   0, RISCV_ISA_EXT_ZALASR, 1)			\
- 		       : "=&r" (__retx), "=&r" (__rc), "+A" (*(__ptr32b))	\
- 		       : "rJ" (__newx), "rJ" (~__mask), "rJ" (__ptr32b)		\
- 		       : "memory");						\
-@@ -53,19 +71,17 @@
- 	}									\
- })
+ #define arch_atomic_add_return_relaxed	arch_atomic_add_return_relaxed
+ #define arch_atomic_sub_return_relaxed	arch_atomic_sub_return_relaxed
++#define arch_atomic_add_return_acquire	arch_atomic_add_return_acquire
++#define arch_atomic_sub_return_acquire	arch_atomic_sub_return_acquire
++#define arch_atomic_add_return_release	arch_atomic_add_return_release
++#define arch_atomic_sub_return_release	arch_atomic_sub_return_release
+ #define arch_atomic_add_return		arch_atomic_add_return
+ #define arch_atomic_sub_return		arch_atomic_sub_return
  
--#define __arch_xchg(sfx, prepend, append, r, p, n)			\
-+#define __arch_xchg(sfx, r, p, n)					\
- ({									\
- 	__asm__ __volatile__ (						\
--		prepend							\
- 		"	amoswap" sfx " %0, %2, %1\n"			\
--		append							\
- 		: "=r" (r), "+A" (*(p))					\
- 		: "r" (n)						\
- 		: "memory");						\
- })
+ #define arch_atomic_fetch_add_relaxed	arch_atomic_fetch_add_relaxed
+ #define arch_atomic_fetch_sub_relaxed	arch_atomic_fetch_sub_relaxed
++#define arch_atomic_fetch_add_acquire	arch_atomic_fetch_add_acquire
++#define arch_atomic_fetch_sub_acquire	arch_atomic_fetch_sub_acquire
++#define arch_atomic_fetch_add_release	arch_atomic_fetch_add_release
++#define arch_atomic_fetch_sub_release	arch_atomic_fetch_sub_release
+ #define arch_atomic_fetch_add		arch_atomic_fetch_add
+ #define arch_atomic_fetch_sub		arch_atomic_fetch_sub
  
--#define _arch_xchg(ptr, new, sc_sfx, swap_sfx, prepend,			\
--		   sc_append, swap_append)				\
-+#define _arch_xchg(ptr, new, lr_sfx, sc_sfx, swap_sfx,			\
-+		   sc_prepend, sc_append)				\
- ({									\
- 	__typeof__(ptr) __ptr = (ptr);					\
- 	__typeof__(*(__ptr)) __new = (new);				\
-@@ -73,22 +89,20 @@
- 									\
- 	switch (sizeof(*__ptr)) {					\
- 	case 1:								\
--		__arch_xchg_masked(sc_sfx, ".b" swap_sfx,		\
--				   prepend, sc_append, swap_append,	\
-+		__arch_xchg_masked(lr_sfx, sc_sfx, ".b" swap_sfx,	\
-+				   sc_prepend, sc_append,		\
- 				   __ret, __ptr, __new);		\
- 		break;							\
- 	case 2:								\
--		__arch_xchg_masked(sc_sfx, ".h" swap_sfx,		\
--				   prepend, sc_append, swap_append,	\
-+		__arch_xchg_masked(lr_sfx, sc_sfx, ".h" swap_sfx,	\
-+				   sc_prepend, sc_append,		\
- 				   __ret, __ptr, __new);		\
- 		break;							\
- 	case 4:								\
--		__arch_xchg(".w" swap_sfx, prepend, swap_append,	\
--			      __ret, __ptr, __new);			\
-+		__arch_xchg(".w" swap_sfx, __ret, __ptr, __new);	\
- 		break;							\
- 	case 8:								\
--		__arch_xchg(".d" swap_sfx, prepend, swap_append,	\
--			      __ret, __ptr, __new);			\
-+		__arch_xchg(".d" swap_sfx, __ret, __ptr, __new);	\
- 		break;							\
- 	default:							\
- 		BUILD_BUG();						\
-@@ -97,17 +111,23 @@
- })
+ #ifndef CONFIG_GENERIC_ATOMIC64
+ #define arch_atomic64_add_return_relaxed	arch_atomic64_add_return_relaxed
+ #define arch_atomic64_sub_return_relaxed	arch_atomic64_sub_return_relaxed
++#define arch_atomic64_add_return_acquire	arch_atomic64_add_return_acquire
++#define arch_atomic64_sub_return_acquire	arch_atomic64_sub_return_acquire
++#define arch_atomic64_add_return_release	arch_atomic64_add_return_release
++#define arch_atomic64_sub_return_release	arch_atomic64_sub_return_release
+ #define arch_atomic64_add_return		arch_atomic64_add_return
+ #define arch_atomic64_sub_return		arch_atomic64_sub_return
  
- #define arch_xchg_relaxed(ptr, x)					\
--	_arch_xchg(ptr, x, "", "", "", "", "")
-+	_arch_xchg(ptr, x, LR_SFX(""), SC_SFX(""), CAS_SFX(""),		\
-+		   SC_PREPEND(__nops(1)), SC_APPEND(__nops(1)))
- 
- #define arch_xchg_acquire(ptr, x)					\
--	_arch_xchg(ptr, x, "", "", "",					\
--		   RISCV_ACQUIRE_BARRIER, RISCV_ACQUIRE_BARRIER)
-+	_arch_xchg(ptr, x, LR_SFX(".aq"), SC_SFX(""), CAS_SFX(".aq"),	\
-+		   SC_PREPEND(__nops(1)),				\
-+		   SC_APPEND(SC_ACQUIRE_BARRIER))
- 
- #define arch_xchg_release(ptr, x)					\
--	_arch_xchg(ptr, x, "", "", RISCV_RELEASE_BARRIER, "", "")
-+	_arch_xchg(ptr, x, LR_SFX(""), SC_SFX(".rl"), CAS_SFX(".rl"),	\
-+		   SC_PREPEND(SC_RELEASE_BARRIER),			\
-+		   SC_APPEND(__nops(1)))
- 
- #define arch_xchg(ptr, x)						\
--	_arch_xchg(ptr, x, ".rl", ".aqrl", "", RISCV_FULL_BARRIER, "")
-+	_arch_xchg(ptr, x, LR_SFX(""), SC_SFX(".aqrl"),			\
-+		   CAS_SFX(".aqrl"), SC_PREPEND(__nops(1)),		\
-+		   SC_APPEND(__nops(1)))
- 
- #define xchg32(ptr, x)							\
- ({									\
-@@ -126,9 +146,7 @@
-  * store NEW in MEM.  Return the initial value in MEM.  Success is
-  * indicated by comparing RETURN with OLD.
-  */
--#define __arch_cmpxchg_masked(sc_sfx, cas_sfx,					\
--			      sc_prepend, sc_append,				\
--			      cas_prepend, cas_append,				\
-+#define __arch_cmpxchg_masked(lr_sfx, sc_sfx, cas_sfx, sc_prepend, sc_append,	\
- 			      r, p, o, n)					\
- ({										\
- 	if (IS_ENABLED(CONFIG_RISCV_ISA_ZABHA) &&				\
-@@ -138,9 +156,7 @@
- 		r = o;								\
- 										\
- 		__asm__ __volatile__ (						\
--			cas_prepend							\
- 			"	amocas" cas_sfx " %0, %z2, %1\n"		\
--			cas_append							\
- 			: "+&r" (r), "+A" (*(p))				\
- 			: "rJ" (n)						\
- 			: "memory");						\
-@@ -155,15 +171,17 @@
- 		ulong __rc;							\
- 										\
- 		__asm__ __volatile__ (						\
--			sc_prepend							\
--			"0:	lr.w %0, %2\n"					\
-+			ALTERNATIVE(__nops(1), sc_prepend,			\
-+				    0, RISCV_ISA_EXT_ZALASR, 1)			\
-+			"0:	lr.w" lr_sfx " %0, %2\n"			\
- 			"	and  %1, %0, %z5\n"				\
- 			"	bne  %1, %z3, 1f\n"				\
- 			"	and  %1, %0, %z6\n"				\
- 			"	or   %1, %1, %z4\n"				\
- 			"	sc.w" sc_sfx " %1, %1, %2\n"			\
- 			"	bnez %1, 0b\n"					\
--			sc_append							\
-+			ALTERNATIVE(__nops(1), sc_append,			\
-+				    0, RISCV_ISA_EXT_ZALASR, 1)			\
- 			"1:\n"							\
- 			: "=&r" (__retx), "=&r" (__rc), "+A" (*(__ptr32b))	\
- 			: "rJ" ((long)__oldx), "rJ" (__newx),			\
-@@ -174,9 +192,7 @@
- 	}									\
- })
- 
--#define __arch_cmpxchg(lr_sfx, sc_sfx, cas_sfx,				\
--		       sc_prepend, sc_append,				\
--		       cas_prepend, cas_append,				\
-+#define __arch_cmpxchg(lr_sfx, sc_sfx, cas_sfx,	sc_prepend, sc_append,	\
- 		       r, p, co, o, n)					\
- ({									\
- 	if (IS_ENABLED(CONFIG_RISCV_ISA_ZACAS) &&			\
-@@ -184,9 +200,7 @@
- 		r = o;							\
- 									\
- 		__asm__ __volatile__ (					\
--			cas_prepend					\
- 			"	amocas" cas_sfx " %0, %z2, %1\n"	\
--			cas_append					\
- 			: "+&r" (r), "+A" (*(p))			\
- 			: "rJ" (n)					\
- 			: "memory");					\
-@@ -194,12 +208,14 @@
- 		register unsigned int __rc;				\
- 									\
- 		__asm__ __volatile__ (					\
--			sc_prepend					\
-+			ALTERNATIVE(__nops(1), sc_prepend,		\
-+				    0, RISCV_ISA_EXT_ZALASR, 1)		\
- 			"0:	lr" lr_sfx " %0, %2\n"			\
- 			"	bne  %0, %z3, 1f\n"			\
- 			"	sc" sc_sfx " %1, %z4, %2\n"		\
- 			"	bnez %1, 0b\n"				\
--			sc_append					\
-+			ALTERNATIVE(__nops(1), sc_append,		\
-+				    0, RISCV_ISA_EXT_ZALASR, 1)		\
- 			"1:\n"						\
- 			: "=&r" (r), "=&r" (__rc), "+A" (*(p))		\
- 			: "rJ" (co o), "rJ" (n)				\
-@@ -207,9 +223,8 @@
- 	}								\
- })
- 
--#define _arch_cmpxchg(ptr, old, new, sc_sfx, cas_sfx,			\
--		      sc_prepend, sc_append,				\
--		      cas_prepend, cas_append)				\
-+#define _arch_cmpxchg(ptr, old, new, lr_sfx, sc_sfx, cas_sfx,		\
-+		      sc_prepend, sc_append)				\
- ({									\
- 	__typeof__(ptr) __ptr = (ptr);					\
- 	__typeof__(*(__ptr)) __old = (old);				\
-@@ -218,27 +233,23 @@
- 									\
- 	switch (sizeof(*__ptr)) {					\
- 	case 1:								\
--		__arch_cmpxchg_masked(sc_sfx, ".b" cas_sfx,		\
-+		__arch_cmpxchg_masked(lr_sfx, sc_sfx, ".b" cas_sfx,	\
- 				      sc_prepend, sc_append,		\
--				      cas_prepend, cas_append,		\
- 				      __ret, __ptr, __old, __new);	\
- 		break;							\
- 	case 2:								\
--		__arch_cmpxchg_masked(sc_sfx, ".h" cas_sfx,		\
-+		__arch_cmpxchg_masked(lr_sfx, sc_sfx, ".h" cas_sfx,	\
- 				      sc_prepend, sc_append,		\
--				      cas_prepend, cas_append,		\
- 				      __ret, __ptr, __old, __new);	\
- 		break;							\
- 	case 4:								\
--		__arch_cmpxchg(".w", ".w" sc_sfx, ".w" cas_sfx,		\
-+		__arch_cmpxchg(".w" lr_sfx, ".w" sc_sfx, ".w" cas_sfx,	\
- 			       sc_prepend, sc_append,			\
--			       cas_prepend, cas_append,			\
- 			       __ret, __ptr, (long)(int)(long), __old, __new);	\
- 		break;							\
- 	case 8:								\
--		__arch_cmpxchg(".d", ".d" sc_sfx, ".d" cas_sfx,		\
-+		__arch_cmpxchg(".d" lr_sfx, ".d" sc_sfx, ".d" cas_sfx,	\
- 			       sc_prepend, sc_append,			\
--			       cas_prepend, cas_append,			\
- 			       __ret, __ptr, /**/, __old, __new);	\
- 		break;							\
- 	default:							\
-@@ -247,40 +258,27 @@
- 	(__typeof__(*(__ptr)))__ret;					\
- })
- 
--/*
-- * These macros are here to improve the readability of the arch_cmpxchg_XXX()
-- * macros.
-- */
--#define SC_SFX(x)	x
--#define CAS_SFX(x)	x
--#define SC_PREPEND(x)	x
--#define SC_APPEND(x)	x
--#define CAS_PREPEND(x)	x
--#define CAS_APPEND(x)	x
--
- #define arch_cmpxchg_relaxed(ptr, o, n)					\
- 	_arch_cmpxchg((ptr), (o), (n),					\
--		      SC_SFX(""), CAS_SFX(""),				\
--		      SC_PREPEND(""), SC_APPEND(""),			\
--		      CAS_PREPEND(""), CAS_APPEND(""))
-+		      LR_SFX(""), SC_SFX(""), CAS_SFX(""),		\
-+		      SC_PREPEND(__nops(1)), SC_APPEND(__nops(1)))
- 
- #define arch_cmpxchg_acquire(ptr, o, n)					\
- 	_arch_cmpxchg((ptr), (o), (n),					\
--		      SC_SFX(""), CAS_SFX(""),				\
--		      SC_PREPEND(""), SC_APPEND(RISCV_ACQUIRE_BARRIER),	\
--		      CAS_PREPEND(""), CAS_APPEND(RISCV_ACQUIRE_BARRIER))
-+		      LR_SFX(".aq"), SC_SFX(""), CAS_SFX(".aq"),	\
-+		      SC_PREPEND(__nops(1)),				\
-+		      SC_APPEND(SC_ACQUIRE_BARRIER))
- 
- #define arch_cmpxchg_release(ptr, o, n)					\
- 	_arch_cmpxchg((ptr), (o), (n),					\
--		      SC_SFX(""), CAS_SFX(""),				\
--		      SC_PREPEND(RISCV_RELEASE_BARRIER), SC_APPEND(""),	\
--		      CAS_PREPEND(RISCV_RELEASE_BARRIER), CAS_APPEND(""))
-+		      LR_SFX(""), SC_SFX(".rl"), CAS_SFX(".rl"),	\
-+		      SC_PREPEND(SC_RELEASE_BARRIER),			\
-+		      SC_APPEND(__nops(1)))
- 
- #define arch_cmpxchg(ptr, o, n)						\
- 	_arch_cmpxchg((ptr), (o), (n),					\
--		      SC_SFX(".rl"), CAS_SFX(".aqrl"),			\
--		      SC_PREPEND(""), SC_APPEND(RISCV_FULL_BARRIER),	\
--		      CAS_PREPEND(""), CAS_APPEND(""))
-+		      LR_SFX(""), SC_SFX(".aqrl"), CAS_SFX(".aqrl"),	\
-+		      SC_PREPEND(__nops(1)), SC_APPEND(__nops(1)))
- 
- #define arch_cmpxchg_local(ptr, o, n)					\
- 	arch_cmpxchg_relaxed((ptr), (o), (n))
+ #define arch_atomic64_fetch_add_relaxed	arch_atomic64_fetch_add_relaxed
+ #define arch_atomic64_fetch_sub_relaxed	arch_atomic64_fetch_sub_relaxed
++#define arch_atomic64_fetch_add_acquire	arch_atomic64_fetch_add_acquire
++#define arch_atomic64_fetch_sub_acquire	arch_atomic64_fetch_sub_acquire
++#define arch_atomic64_fetch_add_release	arch_atomic64_fetch_add_release
++#define arch_atomic64_fetch_sub_release	arch_atomic64_fetch_sub_release
+ #define arch_atomic64_fetch_add		arch_atomic64_fetch_add
+ #define arch_atomic64_fetch_sub		arch_atomic64_fetch_sub
+ #endif
+@@ -177,6 +229,12 @@ ATOMIC_OPS(xor, xor, i)
+ #define arch_atomic_fetch_and_relaxed	arch_atomic_fetch_and_relaxed
+ #define arch_atomic_fetch_or_relaxed	arch_atomic_fetch_or_relaxed
+ #define arch_atomic_fetch_xor_relaxed	arch_atomic_fetch_xor_relaxed
++#define arch_atomic_fetch_and_acquire	arch_atomic_fetch_and_acquire
++#define arch_atomic_fetch_or_acquire	arch_atomic_fetch_or_acquire
++#define arch_atomic_fetch_xor_acquire	arch_atomic_fetch_xor_acquire
++#define arch_atomic_fetch_and_release	arch_atomic_fetch_and_release
++#define arch_atomic_fetch_or_release	arch_atomic_fetch_or_release
++#define arch_atomic_fetch_xor_release	arch_atomic_fetch_xor_release
+ #define arch_atomic_fetch_and		arch_atomic_fetch_and
+ #define arch_atomic_fetch_or		arch_atomic_fetch_or
+ #define arch_atomic_fetch_xor		arch_atomic_fetch_xor
+@@ -185,6 +243,12 @@ ATOMIC_OPS(xor, xor, i)
+ #define arch_atomic64_fetch_and_relaxed	arch_atomic64_fetch_and_relaxed
+ #define arch_atomic64_fetch_or_relaxed	arch_atomic64_fetch_or_relaxed
+ #define arch_atomic64_fetch_xor_relaxed	arch_atomic64_fetch_xor_relaxed
++#define arch_atomic64_fetch_and_acquire	arch_atomic64_fetch_and_acquire
++#define arch_atomic64_fetch_or_acquire	arch_atomic64_fetch_or_acquire
++#define arch_atomic64_fetch_xor_acquire	arch_atomic64_fetch_xor_acquire
++#define arch_atomic64_fetch_and_release	arch_atomic64_fetch_and_release
++#define arch_atomic64_fetch_or_release	arch_atomic64_fetch_or_release
++#define arch_atomic64_fetch_xor_release	arch_atomic64_fetch_xor_release
+ #define arch_atomic64_fetch_and		arch_atomic64_fetch_and
+ #define arch_atomic64_fetch_or		arch_atomic64_fetch_or
+ #define arch_atomic64_fetch_xor		arch_atomic64_fetch_xor
 -- 
 2.20.1
 
