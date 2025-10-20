@@ -1,107 +1,115 @@
-Return-Path: <kvm+bounces-60569-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-60570-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [IPv6:2a01:60a::1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9BBD1BF37FF
-	for <lists+kvm@lfdr.de>; Mon, 20 Oct 2025 22:51:29 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id D144BBF39AC
+	for <lists+kvm@lfdr.de>; Mon, 20 Oct 2025 23:01:11 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 374A334EF82
-	for <lists+kvm@lfdr.de>; Mon, 20 Oct 2025 20:51:29 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id D4DEC18C4478
+	for <lists+kvm@lfdr.de>; Mon, 20 Oct 2025 21:01:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A941A2E62BF;
-	Mon, 20 Oct 2025 20:51:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 52DDE3328FC;
+	Mon, 20 Oct 2025 20:56:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="FUGiufY8"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="VKvJOWLk"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-lf1-f46.google.com (mail-lf1-f46.google.com [209.85.167.46])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.19])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 34C442E11DC
-	for <kvm@vger.kernel.org>; Mon, 20 Oct 2025 20:51:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.46
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DE27931280D;
+	Mon, 20 Oct 2025 20:56:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.19
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1760993477; cv=none; b=Dm1F3OtpMR+JYRK8219xKCd1MWTyJz3tPzNo0ABB2o0IMtuMBfKItbQRA43qNZOppDiKu9uPfxwv6F/jrxCiyNlu/k/Re09UbxKr9uEV2oUBmqZnrjSKmxSMIHMjuZ6UVrzzElEp9jRj9nhmV3xZJSfXZwx2B4cPegJ6Xzu2IHA=
+	t=1760993775; cv=none; b=iGb95qJytgKZrex00boOVpaKgFs0QJJy0DklMGihZW8s4oFTgQMoXOuI2DECNR51qN/eyhfiFGfLUtXZZh14LtiUf+vJsu5KHoTUsoX2mAwbdtK/0Dh5rWiEhcs2CU1bIrwtI2abBtqnTKPHwyCIqRHDk5KTkzZjexW49oWBgv8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1760993477; c=relaxed/simple;
-	bh=d/DNocr10We9+tRibfaGdS7+LWNCjniYedbAm0aObrM=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=TsAeUGjGmFMqlHPd46MGOZ55og1+BsUREI0Fx8CMTR3bktEYE6QelejU4YD0ZNANp56O8plkLYLLUEwva3hozJ/rjLbD4C/GWS0sM1PtZOrqzkszLNhHHXer/y79Eog1FNJQQ9wDG/JqHTIc+YZ1Sg3atU0loKLzldFzxoYZHzo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=FUGiufY8; arc=none smtp.client-ip=209.85.167.46
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-lf1-f46.google.com with SMTP id 2adb3069b0e04-57d5ccd73dfso4588665e87.0
-        for <kvm@vger.kernel.org>; Mon, 20 Oct 2025 13:51:14 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1760993473; x=1761598273; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=d/DNocr10We9+tRibfaGdS7+LWNCjniYedbAm0aObrM=;
-        b=FUGiufY83yAlygBhP4TFTjFNKd4/t2agmvIzik+ZTYI9pDcxMgppvelmm6v6+YdXk7
-         hUkmPBIu99umbqZrqqNdT+rCkDffaSnuAcGjKwG2B/TryDqmvTPWAkdm6IKExPqInpzW
-         Z7o5BKrwzSKavjm6Qb0GY29CwMids43H+cEGDWZlhHx0negGtFLCUTjuP5DHtA3KyTzg
-         f4GD2XF7CpyLvrI1rXhqFcWkFAwafWYXd7b9WebJ6/vHG0YmsW1ynh7H160kVZkB1i5U
-         l/zLciJkGsQ1EJqPZeczG2YQypSE9HTmRK2REJmlut/FJEn38uwGTEJrF9MivwqsGRCU
-         NWHQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1760993473; x=1761598273;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=d/DNocr10We9+tRibfaGdS7+LWNCjniYedbAm0aObrM=;
-        b=Tc18IwGxP3u3C6w8ZQqvhi2wZbOJlZSHvPDPE/eVGqj6yLiRnu3tGW+tIsj4x+1woM
-         0eqcNFhsQkxqNKI6/s4o1KVCRxqUZ9cUCptGSwWXB5J34p4Rw5JFeHJjQ+AJqvqJ8G5I
-         qiPZTvBSeSI/U9SHIujzRB3YRAttVcahOGZ0pmXPksGAHa2a2Un6gpM5ZfM0qnp/OSkb
-         bqcaU0F62Ql+ruwkWvONh1BAePeUL2uUp83c7Xu51V0v8ZuMID1HLq3CRpxKOXtSMWEZ
-         6vdFhyqbvLaeKuRSZ12+6FffVGpjwIJyX4wllxcM5dDcArbXV8d7z0uly4lpv9A/dUxA
-         Ox8w==
-X-Forwarded-Encrypted: i=1; AJvYcCX0G1Ni0BnENmgiaJjB0nmH/BchbAdGqEma1wIkET8VwLkeQWwztCo3DXQi73vrPsy+dtc=@vger.kernel.org
-X-Gm-Message-State: AOJu0Ywq+yW8hQj6/gxavDr8hXiUr3qlqGbWOm5G4WdOXUKL5s9DriFw
-	sckj+WUYPvBPM8hdwWFA3gtMBKKXmJC6DMwr/BdhOZjIxX1WbWnjZrYzPnkopxP4qj/xVRw0HZD
-	ymXWlncw4RkXfdJSdSomqM11GVrDuk5gVzPkM+pnv
-X-Gm-Gg: ASbGnctPVHAKbJhB4tz0GgJlqmD1hjX1RZjVvTyxzWus1IndzUhqGPRRt+aAhxMPVx7
-	qCy58h9EZPAtPJ7sjGdPMx0/zRT2NF3Vq5jLTnQ/TXMP9nRDhrtcgp/AH82Nz3ZRcCig+tnNLMw
-	TOi5ZwAao9unV4C4tvQtH6KvInJXJLoKeqitDtJydQmjyRemAfE8+FeSscj66WRUEmcF2IVgGQN
-	fXemI1n0HiQ14gMvvHO74uQvZeQyD5oE9qFajDrPGlIAA5eKK7OC46euKBKaiYB67tUkTq9Hy4H
-	f5jEmrg=
-X-Google-Smtp-Source: AGHT+IFptH7lgeIQIF8Wb79g6w5+VZiUQoWjQkKuVLjC5A13jG0UM4rCDEn9XOnf7H7IQFGgZlhwFcy9kFCumyNbmPY=
-X-Received: by 2002:a05:6512:3082:b0:58b:63:81cf with SMTP id
- 2adb3069b0e04-591d8579843mr4495565e87.55.1760993473069; Mon, 20 Oct 2025
- 13:51:13 -0700 (PDT)
+	s=arc-20240116; t=1760993775; c=relaxed/simple;
+	bh=ZfW7ZPj2/urpyrJRR27Pd1uc6Sw7mUpby74QqoU0mBE=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=uOc8HcMYbDKME3PyJKOl1vUaf893DgWe3nfDrjRuCdV3T8UA17Vie2ckUEdP3lQT0TxgGIQ3FvnIN8CkdTw/LR4wy/q6ylwg9hw3LXAQzUPrsRDNLnyPLvVJxr+7gEaRx2UVg2fl0fNFV4BMMiZjiHn9AnLdXW15l8il/3mxaFY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=pass smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=VKvJOWLk; arc=none smtp.client-ip=198.175.65.19
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1760993773; x=1792529773;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=ZfW7ZPj2/urpyrJRR27Pd1uc6Sw7mUpby74QqoU0mBE=;
+  b=VKvJOWLkPZc9Z4bCeXh7UJe3Wh/RFqo3rEl4tvJ4CgPzjhHEbCMqE+lE
+   YVKoWjuFXH16QfjVhPSbY5cdOgtnqHrADfSoYLpM0hB/tYnzYl1f0rH8i
+   EVAHoogv3NC3skOPbZ+jVDzOt6/hi6JRhEXtu/teiGup473dSp6/BzEW9
+   EnauZvcOnvUWnqmN6p3M/hh/joQIpgHjluDV7v09gyHJKbrawz15YYk/G
+   3dX9VKoirH1mDDr+Ft3Tl6fJaplNaTC9wHaIct5xyj9mJc74ITo3SQHOl
+   f14sy6ip8BVuBFgDY/HDyB3xlhSgm5HJY8f/hpjox0ryccTkbN48TEr9q
+   g==;
+X-CSE-ConnectionGUID: POLOhZlPSEuLr2jXXDdnPg==
+X-CSE-MsgGUID: yKnlc22uR7+gG5ujg4nvEA==
+X-IronPort-AV: E=McAfee;i="6800,10657,11586"; a="63014551"
+X-IronPort-AV: E=Sophos;i="6.19,243,1754982000"; 
+   d="scan'208";a="63014551"
+Received: from orviesa007.jf.intel.com ([10.64.159.147])
+  by orvoesa111.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 20 Oct 2025 13:56:11 -0700
+X-CSE-ConnectionGUID: IsRe3ERCQDKuYGZ3NPuDjA==
+X-CSE-MsgGUID: AK8qCjQmRGinzW/5a1cUWQ==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.19,243,1754982000"; 
+   d="scan'208";a="183267182"
+Received: from tjmaciei-mobl5.ger.corp.intel.com (HELO desk) ([10.124.220.167])
+  by orviesa007-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 20 Oct 2025 13:56:10 -0700
+Date: Mon, 20 Oct 2025 13:56:02 -0700
+From: Pawan Gupta <pawan.kumar.gupta@linux.intel.com>
+To: Sean Christopherson <seanjc@google.com>
+Cc: x86@kernel.org, "H. Peter Anvin" <hpa@zytor.com>,
+	Josh Poimboeuf <jpoimboe@kernel.org>,
+	David Kaplan <david.kaplan@amd.com>,
+	Paolo Bonzini <pbonzini@redhat.com>, linux-kernel@vger.kernel.org,
+	kvm@vger.kernel.org, Asit Mallick <asit.k.mallick@intel.com>,
+	Tao Zhang <tao1.zhang@intel.com>
+Subject: Re: [PATCH v2 2/3] x86/vmscape: Replace IBPB with branch history
+ clear on exit to userspace
+Message-ID: <20251020205602.xrgypiwk5dwejdqf@desk>
+References: <20251015-vmscape-bhb-v2-0-91cbdd9c3a96@linux.intel.com>
+ <20251015-vmscape-bhb-v2-2-91cbdd9c3a96@linux.intel.com>
+ <aPZe6Xc2H2P-iNQe@google.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20251018000713.677779-1-vipinsh@google.com> <20251018000713.677779-19-vipinsh@google.com>
-In-Reply-To: <20251018000713.677779-19-vipinsh@google.com>
-From: David Matlack <dmatlack@google.com>
-Date: Mon, 20 Oct 2025 13:50:45 -0700
-X-Gm-Features: AS18NWDGxqhjIaoTQRNUFc91_bCzfrzvv4w3uLlEfEEIlUZmI_rVPec29OqIzHg
-Message-ID: <CALzav=cD4WLKX0roP8mvWEO1dhLGLtopeLTmH=f-DeV2Z3mAJA@mail.gmail.com>
-Subject: Re: [RFC PATCH 18/21] vfio: selftests: Build liveupdate library in
- VFIO selftests
-To: Vipin Sharma <vipinsh@google.com>
-Cc: bhelgaas@google.com, alex.williamson@redhat.com, pasha.tatashin@soleen.com, 
-	jgg@ziepe.ca, graf@amazon.com, pratyush@kernel.org, 
-	gregkh@linuxfoundation.org, chrisl@kernel.org, rppt@kernel.org, 
-	skhawaja@google.com, parav@nvidia.com, saeedm@nvidia.com, 
-	kevin.tian@intel.com, jrhilke@google.com, david@redhat.com, 
-	jgowans@amazon.com, dwmw2@infradead.org, epetron@amazon.de, 
-	junaids@google.com, linux-kernel@vger.kernel.org, linux-pci@vger.kernel.org, 
-	kvm@vger.kernel.org, linux-kselftest@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <aPZe6Xc2H2P-iNQe@google.com>
 
-On Fri, Oct 17, 2025 at 5:07=E2=80=AFPM Vipin Sharma <vipinsh@google.com> w=
-rote:
+On Mon, Oct 20, 2025 at 09:10:17AM -0700, Sean Christopherson wrote:
+> On Wed, Oct 15, 2025, Pawan Gupta wrote:
+> > diff --git a/arch/x86/include/asm/nospec-branch.h b/arch/x86/include/asm/nospec-branch.h
+> > index 49707e563bdf71bdd05d3827f10dd2b8ac6bca2c..00730cc22c2e7115f6dbb38a1ed8d10383ada5c0 100644
+> > --- a/arch/x86/include/asm/nospec-branch.h
+> > +++ b/arch/x86/include/asm/nospec-branch.h
+> > @@ -534,7 +534,7 @@ void alternative_msr_write(unsigned int msr, u64 val, unsigned int feature)
+> >  		: "memory");
+> >  }
+> >  
+> > -DECLARE_PER_CPU(bool, x86_ibpb_exit_to_user);
+> > +DECLARE_PER_CPU(bool, x86_pred_flush_pending);
+> 
+> Rather than "flush pending", what about using "need" in the name to indicate that
+> a flush is necessary?  That makes it more obvious that e.g. KVM is marking the
+> CPU as needing a flush by some other code, as opposed to implying that KVM itself
+> has a pending flush.
+> 
+> And maybe spell out "prediction"?  Without the context of features being checked,
+> I don't know that I would be able to guess "prediction".
+> 
+> E.g. x86_need_prediction_flush?
+> 
+> Or x86_prediction_flush_exit_to_user if we would prefer to clarify when the flush
+> needs to occur?
 
-> +TEST_GEN_ALL_PROGS :=3D $(TEST_GEN_PROGS)
-> +TEST_GEN_ALL_PROGS +=3D $(TEST_GEN_PROGS_EXTENDED)
-
-The TEST_GEN_PROGS_EXTENDED support should go in the commit that first
-needs them, or in their own commit.
+Ok, ya this is more clear. I would want to make a small change, instead of
+"prediction_flush", "predictor_flush" reads better to me. Changing it to:
+x86_predictor_flush_exit_to_user.
 
