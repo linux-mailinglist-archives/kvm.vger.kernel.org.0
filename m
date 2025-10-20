@@ -1,354 +1,294 @@
-Return-Path: <kvm+bounces-60519-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-60520-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 59236BF1492
-	for <lists+kvm@lfdr.de>; Mon, 20 Oct 2025 14:43:43 +0200 (CEST)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
+	by mail.lfdr.de (Postfix) with ESMTPS id B77EBBF1687
+	for <lists+kvm@lfdr.de>; Mon, 20 Oct 2025 15:03:05 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B29A83E5944
-	for <lists+kvm@lfdr.de>; Mon, 20 Oct 2025 12:38:13 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 4FCF84F5FA9
+	for <lists+kvm@lfdr.de>; Mon, 20 Oct 2025 13:00:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 87D68311C21;
-	Mon, 20 Oct 2025 12:37:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C58EF31B111;
+	Mon, 20 Oct 2025 12:59:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="VpOpwY+n"
+	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="kIsml1s2"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from SN4PR2101CU001.outbound.protection.outlook.com (mail-southcentralusazon11012040.outbound.protection.outlook.com [40.93.195.40])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9954F311587
-	for <kvm@vger.kernel.org>; Mon, 20 Oct 2025 12:37:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1760963861; cv=none; b=PYUhj+WFnKZd+NphQCoAUs001KFnSI/ZJs1I8qRFFrkvxmoC/57bsJkgxL4Mi4wmNPGdPtIz3Qk/ml94qOLAKEknxZwrW8wMWwTJAPhE86rOk915DVLK2qUrfj7R3+3jQwux4AZ+7kRAUpjzBA+tFJysnAfw9uxdto/0eyM5LW0=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1760963861; c=relaxed/simple;
-	bh=BTFDwTBAdtJjfKZNownb+OFKnK2y5hO+biG1xBtNyyc=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=unN7CQqphU36SWK9vO+H/XfK6lJ9MgR3xDOSmOQU1X3Eor037uzOcNghGYskCRWiEiAIdXUptSJfSKpPCmb7I+N8QniKxyHyPpVV8ogru8Re+afqnF6tAV5VcLP8iU8iX8qvlGiQw17ddqmUCpxztW2iVYxtLg4bwlDb57xerhU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=VpOpwY+n; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1760963858;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-	bh=tzznurqx8GJgltwtpurg4k5zkXdNLWNROXLORXJz3Nc=;
-	b=VpOpwY+nehmEt1fg8F1qGNhlwRPD/C+s7xibhGQAxhhKbJB3DlbQmEm3udo90wEb44QsQe
-	HaA5WuASfAvdQhDSEiUKOkbYcfg+2Q7wFrlnk5IDXzrX/Nu0uUjsC6VeMW9vlq7Al50s/K
-	jrI/sXxzxbb4/PVTl60+362eY3L1vVQ=
-Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
- [209.85.128.71]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-145-vZ6Ulf-uPsuI8gEFI2DeGg-1; Mon, 20 Oct 2025 08:37:36 -0400
-X-MC-Unique: vZ6Ulf-uPsuI8gEFI2DeGg-1
-X-Mimecast-MFC-AGG-ID: vZ6Ulf-uPsuI8gEFI2DeGg_1760963854
-Received: by mail-wm1-f71.google.com with SMTP id 5b1f17b1804b1-47113dcc15dso31876625e9.1
-        for <kvm@vger.kernel.org>; Mon, 20 Oct 2025 05:37:35 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1760963854; x=1761568654;
-        h=content-transfer-encoding:in-reply-to:autocrypt:content-language
-         :from:references:cc:to:subject:user-agent:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=tzznurqx8GJgltwtpurg4k5zkXdNLWNROXLORXJz3Nc=;
-        b=PwxoY7siLrfy9TWV+ulyuWnhnFAeblXkyyNf40NZrAVQMjctFjW2b07iMIssppXqoU
-         ZcUDJEt/Kb4qUWtTEGSzIhltq8Bfb7cyQpj16tWrjE92bfXVWGbb4UxwHJZ5n/1Hpyyr
-         CCCIKSJ7SZ1oMrPBOAD+J5T3VHCzwJIGbbXAzJHx5C5ePEzdFgUvr30+zk1ZA+X49E3P
-         1zjdyyTSzb44EpyvN1g8ZsIw0CwKUof14UrXifUkz3XwcOmoGybJpIClcDbBzwOYNJcG
-         L/a0JsSq6ALJGqnH6ATOUjcdgTTnxu/BSUfmjAFTfCWcr76D7EWzmRSd+CJw20gnL2yu
-         u1Aw==
-X-Forwarded-Encrypted: i=1; AJvYcCVT1V7+tL8Kz+cJSYafPYAcU+RjH+7EEbbzHgsexRFsFwjz4OfXJofTk5+GH7Radg9dz88=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyBuKp1ZHiydXQGT8MO6Rjigga1ZobsaUU3R/fAZxCmuuw4Lknf
-	gq6Z5bJk0EaQ2utD+RECKhCoS4grCoZI8/tykXWnqdIpLpdAx38NxpG47dfej+cAGlKnxHWq/nj
-	wKa4EtSsGE6ONcV4k1953lfcirXccmrO34BDcEuLaGS3KLID/S4MhxA==
-X-Gm-Gg: ASbGncuJ1yVZ5QG/vegNhFXpXLFSq9bMwh5uqATKuJ3OXv08FFHYhaWJZsabAAY+Tft
-	tV8jzTjxawg3gjQxFTbiIpVCoNsUJdHZN6bbm23NGKjcrjiKtqZS+IkC6nuEwh0zsX9Gcx100HL
-	uD2KEZC1RkDTz8mfjTSl5bjzlCHu86s5D8SaKN71STH/yFlx45LuS2eAn5aaQVVtvkJjNhhL+e1
-	H9r9scG+dbi3YtUDUBViX7PeshR4g8ByOWu6FKbl6PUz89nZQY4IqFDyEhpK509N2WqiJPODs7S
-	d9MQvbwiFRX5+jlbnUkR1vfqfYTjXdxfbCkAsLeLBt30m3OR/qh5UnbyRMjo1fvt+E01L0sE14c
-	qUNt1xFX79xXp7HeAc7KHM+vVCdj70U6IFasomsgiyZU1TS78hcjDCbJdI5JB6tK7DhlwF5WUx9
-	mgcpwEt6mZk1EWuKcbc6FXXJAHOFQ=
-X-Received: by 2002:a05:600c:1f93:b0:46f:b42e:e367 with SMTP id 5b1f17b1804b1-4711792a527mr88896275e9.41.1760963853744;
-        Mon, 20 Oct 2025 05:37:33 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IHQEUVrP5ywE2htPBOZIvhFEciVwEdQZ4U4H8zs/D2D8uFWsnOx+7qYC1vDVJTNM7Dv5yngwA==
-X-Received: by 2002:a05:600c:1f93:b0:46f:b42e:e367 with SMTP id 5b1f17b1804b1-4711792a527mr88895945e9.41.1760963853238;
-        Mon, 20 Oct 2025 05:37:33 -0700 (PDT)
-Received: from ?IPV6:2003:d8:2f0c:c200:fa4a:c4ff:1b32:21ce? (p200300d82f0cc200fa4ac4ff1b3221ce.dip0.t-ipconnect.de. [2003:d8:2f0c:c200:fa4a:c4ff:1b32:21ce])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4714fb1b668sm164496295e9.0.2025.10.20.05.37.32
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 20 Oct 2025 05:37:32 -0700 (PDT)
-Message-ID: <150c0d14-326b-4abf-8d95-26e47507a22f@redhat.com>
-Date: Mon, 20 Oct 2025 14:37:31 +0200
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BB94E248F66;
+	Mon, 20 Oct 2025 12:59:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.93.195.40
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1760965143; cv=fail; b=V5YCabME9n2uqoQJdLFHjBWvqAs+tOcgDvEPYVAH1O6WKsaoHdefqPdlD37iQcs/8u7CFxpQG2nqH60oLx/V9x7mfz/xB+YXRdzVYozpVtQkQ8sljY1bjcMoXxHLfzBtlA+f2xRlA5ZSD9zXzvwEj2c3Eevpr71Xo8/Yi0+MkNE=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1760965143; c=relaxed/simple;
+	bh=NhphCVGQmi5fuk37azxMobIsNLwG6KpFbwJr0xayz88=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:Content-Type:
+	 Content-Disposition:In-Reply-To:MIME-Version; b=DHSR242EtZ9atXCZmSdmoU7iyUGsD8mWGZN1VhNyG+8Q2m58CaJ2KJAObeW11efRHv3ycQt2XoCiURYAhUzn4Uthe3/XY/CkqQzcAzlvPtTFxK5awiW2DrZXv9bHNr6UmCBNdFMjB+4SdWekeCLFHpuqh+NL5MvyN+GUVqkOokw=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=kIsml1s2; arc=fail smtp.client-ip=40.93.195.40
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=Ao2fiHnH4UIpu4SLrieABxvUirU+9fSeQMuF9vW8dwaTNgnMatwqid3fFDp9IH4CVbW5xQYjjDIMvBNFbv/lp63voVyP59emByyLPYyctc371tHtSwCwobkFMY2NYL7DEZIqEClJ5TceQlppdsV3c8Vi2aNsvTA4M7M7o2/g7pGLcXttWwX6GZtOthNZuRPAYoSLhnEhSpy1gA85u/CAzVobcr7HIuux+sVWkgSRGg7QUvYMPxYzP4uV7L+hCZ7yYgA/4RxTMSBTxJKiANtf/rV2LjIeRNrHo9VfILclDhug5tWPDDFExK4OWHPfTJBlHwjd35F7YanHg75dBtf2vQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=rf0UBcLbZFSmoF8U8kOnAf6CfMA+jmgLMu6dYhb8bTo=;
+ b=m9zGx9loLYjptsa/2bI1FqefEX8lqhgwna8el9QinR+SYQAyxhrqtmCTpvNpG6cctR6aWfcghDsOVqGFYutWWybOHtKkd09oduZ16nM8ygWu2dSRfDhdvRBIuGeXBq6aB5QQs9IZ5LnpNBCZBngEcdqAa3SVcKECnNoPrr1lCX5ZzxG7wJK+7j7zNFTkarR7zAB+baBzUJwLTs34LJFFRSJQpHMXIDbBStfw5vJV5WTkS3gvhtcK6lxYwSeR7YWcMu7rh61bF/qZ98nvdWmZbprb/W7H2pQ9CoaskpGBXJs7bHKyWn1VXPGJFuN2OA9KRM0R7sqZHphUgpGMluB1HQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
+ dkim=pass header.d=nvidia.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=rf0UBcLbZFSmoF8U8kOnAf6CfMA+jmgLMu6dYhb8bTo=;
+ b=kIsml1s2tnxG5wNrKa8SjYI0m1ahsKcjxZLrUKyyX8HoFNGZoty9TekR/OsNCkY0Ek6X3xP2AR0XoMoY8bi1fHRZnrbtkLGkad+IEmRQWRF47v6RbcIhxVRygkj9V/y3OVAG4e/Cwd7bzPYjn2MTakXfINszCsnj0MglGDvolCfb8aJvsrCfH1I0iv4Te79KH+cUk172avQmaiCDUTcrcdxdB9BBD/2Ml3KJ7Ymiik31FRZhwySvlW05TIpr7PBXw7MIo0KjltpRcLdcxdiCj3p9ei/EwPd68E5IfHXv8WRWU4b6PIwkS6hSDu1zu11Q5PgH8ovrLQ7lHMi+pRL3aA==
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nvidia.com;
+Received: from MN2PR12MB3613.namprd12.prod.outlook.com (2603:10b6:208:c1::17)
+ by PH7PR12MB7140.namprd12.prod.outlook.com (2603:10b6:510:200::18) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9228.13; Mon, 20 Oct
+ 2025 12:58:57 +0000
+Received: from MN2PR12MB3613.namprd12.prod.outlook.com
+ ([fe80::1b3b:64f5:9211:608b]) by MN2PR12MB3613.namprd12.prod.outlook.com
+ ([fe80::1b3b:64f5:9211:608b%4]) with mapi id 15.20.9228.015; Mon, 20 Oct 2025
+ 12:58:57 +0000
+Date: Mon, 20 Oct 2025 09:58:54 -0300
+From: Jason Gunthorpe <jgg@nvidia.com>
+To: Christoph Hellwig <hch@infradead.org>
+Cc: Leon Romanovsky <leon@kernel.org>,
+	Alex Williamson <alex.williamson@redhat.com>,
+	Leon Romanovsky <leonro@nvidia.com>,
+	Andrew Morton <akpm@linux-foundation.org>,
+	Bjorn Helgaas <bhelgaas@google.com>,
+	Christian =?utf-8?B?S8O2bmln?= <christian.koenig@amd.com>,
+	dri-devel@lists.freedesktop.org, iommu@lists.linux.dev,
+	Jens Axboe <axboe@kernel.dk>, Joerg Roedel <joro@8bytes.org>,
+	kvm@vger.kernel.org, linaro-mm-sig@lists.linaro.org,
+	linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-media@vger.kernel.org, linux-mm@kvack.org,
+	linux-pci@vger.kernel.org, Logan Gunthorpe <logang@deltatee.com>,
+	Marek Szyprowski <m.szyprowski@samsung.com>,
+	Robin Murphy <robin.murphy@arm.com>,
+	Sumit Semwal <sumit.semwal@linaro.org>,
+	Vivek Kasireddy <vivek.kasireddy@intel.com>,
+	Will Deacon <will@kernel.org>
+Subject: Re: [PATCH v5 1/9] PCI/P2PDMA: Separate the mmap() support from the
+ core logic
+Message-ID: <20251020125854.GL316284@nvidia.com>
+References: <cover.1760368250.git.leon@kernel.org>
+ <1044f7aa09836d63de964d4eb6e646b3071c1fdb.1760368250.git.leon@kernel.org>
+ <aPHibioUFZV8Wnd1@infradead.org>
+ <20251017115320.GF3901471@nvidia.com>
+ <aPYqliGwJTcZznSX@infradead.org>
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <aPYqliGwJTcZznSX@infradead.org>
+X-ClientProxiedBy: SJ0PR03CA0242.namprd03.prod.outlook.com
+ (2603:10b6:a03:3a0::7) To MN2PR12MB3613.namprd12.prod.outlook.com
+ (2603:10b6:208:c1::17)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [RFC PATCH RESEND 1/3] mm: memory_failure: Fix MF_DELAYED
- handling on truncation during failure
-To: Lisa Wang <wyihan@google.com>, linmiaohe@huawei.com,
- nao.horiguchi@gmail.com, akpm@linux-foundation.org, pbonzini@redhat.com,
- shuah@kernel.org, linux-mm@kvack.org, linux-kernel@vger.kernel.org,
- kvm@vger.kernel.org, linux-kselftest@vger.kernel.org
-Cc: rientjes@google.com, seanjc@google.com, ackerleytng@google.com,
- vannapurve@google.com, michael.roth@amd.com, jiaqiyan@google.com,
- tabba@google.com, dave.hansen@linux.intel.com
-References: <cover.1760551864.git.wyihan@google.com>
- <57ed0bcbcfcec6fda89d60727467d7bd621c95ab.1760551864.git.wyihan@google.com>
-From: David Hildenbrand <david@redhat.com>
-Content-Language: en-US
-Autocrypt: addr=david@redhat.com; keydata=
- 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
- qIws/H2t
-In-Reply-To: <57ed0bcbcfcec6fda89d60727467d7bd621c95ab.1760551864.git.wyihan@google.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: MN2PR12MB3613:EE_|PH7PR12MB7140:EE_
+X-MS-Office365-Filtering-Correlation-Id: e45e0766-45b0-4e88-f356-08de0fd86e30
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;ARA:13230040|366016|7416014|1800799024|376014;
+X-Microsoft-Antispam-Message-Info:
+	=?us-ascii?Q?B5wkBlO7PP6mnXabWyoiam5nRETb0OiwpQ/PuFye6UsEqL+/PwfIJEG82sga?=
+ =?us-ascii?Q?WBTWOZHHnWXfjRqTJTy87zHwgO83QHW0pkz23TlKzwKX/4Wq1eX4TjPUVGn3?=
+ =?us-ascii?Q?J2zQIch3eWVrGuEu6z0UaZT9Jv45sE2WiaysuxHs+29JnvRe6C1mzPeeeHep?=
+ =?us-ascii?Q?bxtmCzh8VJxW41yGyotzWoJXUNEVSQh9oIjHEjufOtuUCh0sKNwaX6vyivVq?=
+ =?us-ascii?Q?HxdlqbV1Loka9QAIJiF0FyNRjDAwA+V7UdDzFSjqaMVfqkddb6XatQmkpYe7?=
+ =?us-ascii?Q?+Rp+qAna/B6yJ36qXOpqKJIMMx6ws/ijVIU7K35wKDyMDOmDraz5r9XrCfjF?=
+ =?us-ascii?Q?ir71rTIX7Ss0eyXuZ8Tx8G42YQDhaydk3I2oX92lb4PPVKXGz8tAh7oFbbI9?=
+ =?us-ascii?Q?ZilRin+xkeLk2khOUgA+1ajSh987HTgr2cbHYbtD51YFzrSdJmFkbqDxTq4n?=
+ =?us-ascii?Q?gB0M/aaJuxnykLsSipQhHVGZ+/YUYu5w3DdXy6KjF1MA3jZ0e8hfGf/YnO7l?=
+ =?us-ascii?Q?b2hqKrxS8fvhA27i86d5Mm2a9QhOY0JVgghXH4Mp8JK0P9kp6eoLC7pQloKT?=
+ =?us-ascii?Q?1b9H7kjLkPXpkgmQWk0uAGpDDOMwhSRmEHsfP1R0mUP+gllcyA+z/6N8eOQD?=
+ =?us-ascii?Q?1I0QZxhKu0ARA4QVMLNtBcFQRT2N/aqmta2pKWZrnfkaBScJcGCUV6qmkIh4?=
+ =?us-ascii?Q?DJpD4lhzRGpPaHdXx3FzO/keDiO3E3MmswQVttBN9RiNSFPOP7Z4xxGuEd0q?=
+ =?us-ascii?Q?in7QLlN9/6O3zZj97s8pbuHJaIdhYyl1xsoC3YQFPZOEhQiniAlYIwHKHKBZ?=
+ =?us-ascii?Q?3uLHKUi9QHfU+JjhF/iyPkxsa5z/u0TAfU3/rPKv+TL5LDgytB9CmapUe+Bv?=
+ =?us-ascii?Q?Om+M6X3oSDHV9D2ktj6ZSCGnCQR2iWLyhYerR/qy9DaH5tc+JCBWyl2FL67F?=
+ =?us-ascii?Q?sEFaunrn7vsw8NaKPFwJsU5j1g6YE6qRTOYCXMlzMiFMGx3C1prhxvxq04eg?=
+ =?us-ascii?Q?AnoFbAst2B+L34la0IqFuvreqOYRz/jJx1fTp811DuJ9Bv1hFgbkKS3qo3u/?=
+ =?us-ascii?Q?dG2qX2z298fIBmAjSLrV8fXakX2WOEIzmxehA0TjS8txSuUZjJdaR4iCa3tI?=
+ =?us-ascii?Q?Lyf8A+72i09DNZnQWsGtpQsROSalMDWWImYeg+Ag6ucRukQ+YxgSM+rZRv+s?=
+ =?us-ascii?Q?19MFv+qXAnz20sbEn/y7E6sdr1l9HnWl5X4aW0ydkdrY9ZC9usJFoPu7gr8U?=
+ =?us-ascii?Q?v/G+EhW3flqSDqdPRtODGfsm+mRZeEafeRg0NERbGTzhU/EKu3/g5/PQvnIR?=
+ =?us-ascii?Q?44wtFm5D7sBSWCfHuMaGpB2kJOXGD2XtCtC4yCtUQ9mGoRBXrirKaO2SzlB8?=
+ =?us-ascii?Q?lsI0F/v+d4ukYl7bhaf5qUbRgp0tl1H39g6bHyFVZa3Vy3QyFiWHVa4qDhB5?=
+ =?us-ascii?Q?tBchmWcXVDnPYbWKf0zuh5HHwPzhYOmvLscfcaKj7tnaiG2ksGWhAQ=3D=3D?=
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:MN2PR12MB3613.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(7416014)(1800799024)(376014);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?us-ascii?Q?oFzvBE+Thzn7tqre6tph9VAenXbQCsV2nQ3MJqZ+8t/QQBKipvMzEs5ILnhH?=
+ =?us-ascii?Q?x0fgJDB5QZYBe3es4HNs1Iptu1X6bi6rfaBoeDIjGfi/Tbs7n+SWsDUisjMn?=
+ =?us-ascii?Q?ZfcCNQwHEJN/raUbFMNQbyDEST5G7s7yUi+Muy/Lvzi/D5TpqULTLNiw7gz3?=
+ =?us-ascii?Q?SWpOv6dbn/xsFtO3rwtFqocA4kdAjxcpS5GNyggmg3D2R0jclK0cjey8MA3s?=
+ =?us-ascii?Q?C2jXRLfxnaREly2Pu+n4Dxpu6rmvRW/7QrVS1LEZgxJu+l0iJGsuZpgp5JZE?=
+ =?us-ascii?Q?DM08ZclX6miqgRgPArM0YGRbfFrU3SA2Tj18dM306/PXJOkh789x4RQ189dQ?=
+ =?us-ascii?Q?/LC2weYBYSlbjATK4vbUxyO2e9tZRqngwxVU8d8oy93qzOyd3l1AQcqroWSb?=
+ =?us-ascii?Q?YX3+x5iC/a/4W5w9Af4g6McDRPPRAN6WtKsVX/IVyg+8fhKJ9x1/BsRQmhTo?=
+ =?us-ascii?Q?kY1tc2HtcAjyTKNvmSfW29jmiEq0nB9wmO2r2iisTfG9M+n76JEMXctdX2mg?=
+ =?us-ascii?Q?TaNNwxaOcTfzZhxnSR5i0NMwNuP/9Jx+kbWyGC+n83WVKMZfR5ag8GN94G3n?=
+ =?us-ascii?Q?I18F2LxN2dk8DWhoiGy5+1Rc3mipgo0E2yL/EDibEUB5KEWrqIb302PHfkBk?=
+ =?us-ascii?Q?QK/i7npSr27sWvW4BxVhz888ihg94bBUS7qvvk185oBh2S4JSdwcPSwRnF9x?=
+ =?us-ascii?Q?sSIYJlRbWkjlO++2GIXSkmC936oykEbMD98hNdAIhK1rPuCqj/TcpJ/oPux0?=
+ =?us-ascii?Q?7SihnxpQGbb0HkqGwaVCSemhYpmGGnsN0fPYKj0CZGJZpBegLSejFFg/MP2/?=
+ =?us-ascii?Q?rAqQ91aQAgt8J+TBVLXhvjlu0TAFEnddq/tyrZz9JffeLxACArHOijHps/i+?=
+ =?us-ascii?Q?cvsRzZx3eq5uiM6ybbs6nlKKk+s0QlsFOCNauaLztP6GLy8E/pidffFJ6jFp?=
+ =?us-ascii?Q?1LNJ/sEB3NeZFc/xw4CiL6qvWH/BjDzDnuvPzLhjtobxVm14TvWjfyTDapZ4?=
+ =?us-ascii?Q?/hstubZ/dY9l8mS8nA7yLENSxS1jsRF/X0uBQ8CXjkVm7hAF2yqqaFr8S5vi?=
+ =?us-ascii?Q?igy0kydpfF7XrBETmjSWsJepKW6ytqX8FvQXJOY8S8rafW2i4SWyBwOix6hN?=
+ =?us-ascii?Q?fHOZ7jT5YVel/z4mL4BrODEhS+Rl7iwbN6+EnqHTnI3RkJMDOjJWG69N/DZJ?=
+ =?us-ascii?Q?Pr2KT2jFQMMhfZS3n4HORGB+8ia9u+yusIkAo8ppl/EnSGITf5UzoQ+btLbx?=
+ =?us-ascii?Q?lmPyy6Kz8gVidA5KjsinXRPufxcd2ZIuKdA3L67hbAZGIyHzFx5cDFo5js3R?=
+ =?us-ascii?Q?oS0zzVAmwgWJ74pYX333pgfd0esQnqeCd5Tj8ifXWW7esDlEcxDwrhg2MkeQ?=
+ =?us-ascii?Q?0S2oYQmtRBMfu9WtEkCNQfyr4g4z0HMnHdNJfEwyR0ZdMRepb/5/OLEBQfSz?=
+ =?us-ascii?Q?YqZoJxfSFkxp5itn37VQGIMwnCKeJdvutE1Ugm+zxtcgmma426eR8VVCVoe3?=
+ =?us-ascii?Q?pqFhBzjrGKkNT4E7/frrv5i5Ch4AyQIQGI2nOeVA7wQFJlEsSfJsiybR7bJL?=
+ =?us-ascii?Q?Cg9+wH0Al0hyp9RSYPTX9mzsTHCpn5HgHBEWnh5E?=
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: e45e0766-45b0-4e88-f356-08de0fd86e30
+X-MS-Exchange-CrossTenant-AuthSource: MN2PR12MB3613.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 20 Oct 2025 12:58:57.5566
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: Z6IvifmM36NWUvw3j2l0HU8F/2j6c6tOsNhOyk3ml+UB0qvEngjpM9b/gAeDrRr1
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH7PR12MB7140
 
-Lisa accidentally dropped all Tos/CCs, so here is her mail with my reply forwarded:
-
-
--------- Forwarded Message --------
-Subject: Re: [RFC PATCH RESEND 1/3] mm: memory_failure: Fix MF_DELAYED handling on truncation during failure
-Date: Mon, 20 Oct 2025 14:35:45 +0200
-From: David Hildenbrand <david@redhat.com>
-To: Lisa Wang <wyihan@google.com>
-
-On 17.10.25 17:31, Lisa Wang wrote:
-> On Thu, Oct 16, 2025 at 10:18:17PM +0200, David Hildenbrand wrote:
->> On 15.10.25 20:58, Lisa Wang wrote:
->>> The .error_remove_folio a_ops is used by different filesystems to handle
->>> folio truncation upon discovery of a memory failure in the memory
->>> associated with the given folio.
->>>
->>> Currently, MF_DELAYED is treated as an error, causing "Failed to punch
->>> page" to be written to the console. MF_DELAYED is then relayed to the
->>> caller of truncat_error_folio() as MF_FAILED. This further causes
->>> memory_failure() to return -EBUSY, which then always causes a SIGBUS.
->>>
->>> This is also implies that regardless of whether the thread's memory
->>> corruption kill policy is PR_MCE_KILL_EARLY or PR_MCE_KILL_LATE, a
->>> memory failure within guest_memfd memory will always cause a SIGBUS.
->>>
->>> Update truncate_error_folio() to return MF_DELAYED to the caller if the
->>> .error_remove_folio() callback reports MF_DELAYED.
->>>
->>> Generalize the comment: MF_DELAYED means memory failure was handled and
->>> some other part of memory failure will be handled later (e.g. a next
->>> access will result in the process being killed). Specifically for
->>> guest_memfd, a next access by the guest will result in an error returned
->>> to the userspace VMM.
->>>
->>> With delayed handling, the filemap continues to hold refcounts on the
->>> folio. Hence, take that into account when checking for extra refcounts
->>> in me_pagecache_clean(). This is aligned with the implementation in
->>> me_swapcache_dirty(), where, if a folio is still in the swap cache,
->>> extra_pins is set to true.
->>>
->>> Signed-off-by: Lisa Wang <wyihan@google.com>
->>> ---
->>>    mm/memory-failure.c | 24 +++++++++++++++---------
->>>    1 file changed, 15 insertions(+), 9 deletions(-)
->>>
->>> diff --git a/mm/memory-failure.c b/mm/memory-failure.c
->>> index df6ee59527dd..77f665c16a73 100644
->>> --- a/mm/memory-failure.c
->>> +++ b/mm/memory-failure.c
->>> @@ -922,9 +922,11 @@ static int kill_accessing_process(struct task_struct *p, unsigned long pfn,
->>>     * by the m-f() handler immediately.
->>>     *
->>>     * MF_DELAYED - The m-f() handler marks the page as PG_hwpoisoned'ed.
->>> - * The page is unmapped, and is removed from the LRU or file mapping.
->>> - * An attempt to access the page again will trigger page fault and the
->>> - * PF handler will kill the process.
->>> + * It means memory_failure was handled (e.g. removed from file mapping or the
->>> + * LRU) and some other part of memory failure will be handled later (e.g. a
->>> + * next access will result in the process being killed). Specifically for
->>> + * guest_memfd, a next access by the guest will result in an error returned to
->>> + * the userspace VMM.
->>>     *
->>>     * MF_RECOVERED - The m-f() handler marks the page as PG_hwpoisoned'ed.
->>>     * The page has been completely isolated, that is, unmapped, taken out of
->>> @@ -999,6 +1001,9 @@ static int truncate_error_folio(struct folio *folio, unsigned long pfn,
->>>    	if (mapping->a_ops->error_remove_folio) {
->>>    		int err = mapping->a_ops->error_remove_folio(mapping, folio);
->>> +		if (err == MF_DELAYED)
->>> +			return err;
->>> +
->>>    		if (err != 0)
->>>    			pr_info("%#lx: Failed to punch page: %d\n", pfn, err);
->>>    		else if (!filemap_release_folio(folio, GFP_NOIO))
->>> @@ -1108,18 +1113,19 @@ static int me_pagecache_clean(struct page_state *ps, struct page *p)
->>>    		goto out;
->>>    	}
->>> -	/*
->>> -	 * The shmem page is kept in page cache instead of truncating
->>> -	 * so is expected to have an extra refcount after error-handling.
->>> -	 */
->>> -	extra_pins = shmem_mapping(mapping);
->>> -
->>>    	/*
->>>    	 * Truncation is a bit tricky. Enable it per file system for now.
->>>    	 *
->>>    	 * Open: to take i_rwsem or not for this? Right now we don't.
->>>    	 */
->>>    	ret = truncate_error_folio(folio, page_to_pfn(p), mapping);
->>> +
->>> +	/*
->>> +	 * The shmem page, or any page with MF_DELAYED error handling, is kept in
->>> +	 * page cache instead of truncating, so is expected to have an extra
->>> +	 * refcount after error-handling.
->>> +	 */
->>> +	extra_pins = shmem_mapping(mapping) || ret == MF_DELAYED;
+On Mon, Oct 20, 2025 at 05:27:02AM -0700, Christoph Hellwig wrote:
+> On Fri, Oct 17, 2025 at 08:53:20AM -0300, Jason Gunthorpe wrote:
+> > On Thu, Oct 16, 2025 at 11:30:06PM -0700, Christoph Hellwig wrote:
+> > > On Mon, Oct 13, 2025 at 06:26:03PM +0300, Leon Romanovsky wrote:
+> > > > The DMA API now has a new flow, and has gained phys_addr_t support, so
+> > > > it no longer needs struct pages to perform P2P mapping.
+> > > 
+> > > That's news to me.  All the pci_p2pdma_map_state machinery is still
+> > > based on pgmaps and thus pages.
+> > 
+> > We had this discussion already three months ago:
+> > 
+> > https://lore.kernel.org/all/20250729131502.GJ36037@nvidia.com/
+> > 
+> > These couple patches make the core pci_p2pdma_map_state machinery work
+> > on struct p2pdma_provider, and pgmap is just one way to get a
+> > p2pdma_provider *
+> > 
+> > The struct page paths through pgmap go page->pgmap->mem to get
+> > p2pdma_provider.
+> > 
+> > The non-struct page paths just have a p2pdma_provider * without a
+> > pgmap. In this series VFIO uses
+> > 
+> > +	*provider = pcim_p2pdma_provider(pdev, bar);
+> > 
+> > To get the provider for a specific BAR.
 > 
-> Hello David,
+> And what protects that life time?  I've not seen anyone actually
+> building the proper lifetime management.  And if someone did the patches
+> need to clearly point to that.
+
+It is this series!
+
+The above API gives a lifetime that is driver bound. The calling
+driver must ensure it stops using provider and stops doing DMA with it
+before remove() completes.
+
+This VFIO series does that through the move_notify callchain I showed
+in the previous email. This callchain is always triggered before
+remove() of the VFIO PCI driver is completed.
+
+> > I think I've answered this three times now - for DMABUF the DMABUF
+> > invalidation scheme is used to control the lifetime and no DMA mapping
+> > outlives the provider, and the provider doesn't outlive the driver.
 > 
-> Thank you for reviewing these patches!
+> How?
+
+I explained it in detail in the message you are repling to. If
+something is not clear can you please be more specific??
+
+Is it the mmap in VFIO perhaps that is causing these questions?
+
+VFIO uses a PFNMAP VMA, so you can't pin_user_page() it. It uses
+unmap_mapping_range() during its remove() path to get rid of the VMA
+PTEs.
+
+The DMA activity doesn't use the mmap *at all*. It isn't like NVMe
+which relies on the ZONE_DEVICE pages and VMAs to link drivers
+togther.
+
+Instead the DMABUF FD is used to pass the MMIO pages between VFIO and
+another driver. DMABUF has a built in invalidation mechanism that VFIO
+triggers before remove(). The invalidation removes access from the
+other driver.
+
+This is different than NVMe which has no invalidation. NVMe does
+unmap_mapping_range() on the VMA and waits for all the short lived
+pgmap references to clear. We don't need anything like that because
+DMABUF invalidation is synchronous.
+
+The full picture for VFIO is something like:
+
+[startup]
+  MMIO is acquired from the pci_resource
+  p2p_providers are setup
+
+[runtime]
+  MMIO is mapped into PFNMAP VMAs
+  MMIO is linked to a DMABUF FD
+  DMABUF FD gets DMA mapped using the p2p_provider
+
+[unplug]
+  unmap_mapping_range() is called so all VMAs are emptied out and the
+  fault handler prevents new PTEs 
+    ** No access to the MMIO through VMAs is possible**
+
+  vfio_pci_dma_buf_cleanup() is called which prevents new DMABUF
+  mappings from starting, and does dma_buf_move_notify() on all the
+  open DMABUF FDs to invalidate other drivers. Other drivers stop
+  doing DMA and we need to free the IOVA from the IOMMU/etc.
+    ** No DMA access from other drivers is possible now**
+
+  Any still open DMABUF FD will fail inside VFIO immediately due to
+  the priv->revoked checks.
+    **No code touches the p2p_provider anymore**
+
+  The p2p_provider is destroyed by devm.
+
+> > Obviously you cannot use the new p2provider mechanism without some
+> > kind of protection against use after hot unplug, but it doesn't have
+> > to be struct page based.
 > 
->> Well, to do it cleanly shouldn't we let shmem_error_remove_folio() also
->> return MF_DELAYED and remove this shmem special case?
->>
-> 
-> I agree shmem_error_remove_folio() should probably also return MF_DELAYED.
-> MF_DELAYED sounds right because shmem does not truncate, and hence it
-> should not call filemap_release_folio() to release fs-specific metadata on
-> a folio.
+> And how does this interact with everyone else expecting pgmap based
+> lifetime management.
 
-Just to clarify for others, this is the code we are talking about in filemap_release_folio():
+They continue to use pgmap and nothing changes for them.
 
-if (mapping->a_ops->error_remove_folio) {
-	int err = mapping->a_ops->error_remove_folio(mapping, folio);
+The pgmap path always waited until nothing was using the pgmap and
+thus provider before allowing device driver remove() to complete.
 
-	if (err != 0)
-		pr_info("%#lx: Failed to punch page: %d\n", pfn, err);
-	else if (!filemap_release_folio(folio, GFP_NOIO))
-		pr_info("%#lx: failed to release buffers\n", pfn);
-	else
-		ret = MF_RECOVERED;
-} ...
+The refactoring doesn't change the lifecycle model, it just provides
+entry points to access the driver bound lifetime model directly
+instead of being forced to use pgmap.
 
-> 
-> There's no bug now in memory failure handling for shmem calling
-> filemap_release_folio(), because
+Leon, can you add some remarks to the comments about what the rules
+are to call pcim_p2pdma_provider() ?
 
-Right, because shmem error_remove_folio() will currently return 0.
-
-> 
-> shmem does not have folio->private
-> => filemap_release_folio() is a no-op anyway
-> => filemap_release_folio() returns true
-> => truncate_error_folio() returns MF_RECOVERED
-
-Agreed.
-
-> => truncate_error_folio()'s caller cleans MF_RECOVERED up to eventually
-> return 0.
-
-Yes.
-
-> 
->> Or is there a good reason shmem_mapping() wants to return 0 -- and maybe
->> guest_memfd would also wan to do that?
->>
-> 
-> The tradeoff is if I change shmem_error_remove_folio()'s return, mf_stats
-> will be changed.
-
-But it actually sounds like the right thing to do, no? Who cares about
-the stats being delayed vs. recovered?
-
-> I'd be happy to update shmem_error_remove_folio() to
-> return MF_DELAYED as well, but is it okay that the userspace-visible
-> behavior in the form of statistics will change?
-
-They never really were "recovered", but always "delayed", correct?
-In that case, it almost sounds like a fix.
-
-> 
->> Just reading the code here the inconsistency is unclear.
-> 
-> Another option is to add kvm_gmem_mapping() like shmem_mapping().
-
-Oh no.
-
-As an alternative we could introduce a new MF_* to handle this case.
-
-But it almost sounds like MF_DELAYED does exactly what we want, so I
-would suggest to try that first to see if there is any pushback/good
-reason to let shmem result in "recovered" when it's really "delayed".
-
-
-BTW, the behavior from truncate (recovered) -> keep (delayed) was added in
-
-commit a7605426666196c5a460dd3de6f8dac1d3c21f00
-Author: Yang Shi <shy828301@gmail.com>
-Date:   Fri Jan 14 14:05:19 2022 -0800
-
-      mm: shmem: don't truncate page if memory failure happens
-           The current behavior of memory failure is to truncate the page cache
-      regardless of dirty or clean.  If the page is dirty the later access
-      will get the obsolete data from disk without any notification to the
-      users.  This may cause silent data loss.  It is even worse for shmem
-      since shmem is in-memory filesystem, truncating page cache means
-      discarding data blocks.  The later read would return all zero.
-           The right approach is to keep the corrupted page in page cache, any
-      later access would return error for syscalls or SIGBUS for page fault,
-      until the file is truncated, hole punched or removed.  The regular
-      storage backed filesystems would be more complicated so this patch is
-      focused on shmem.  This also unblock the support for soft offlining
-      shmem THP.
-      
-
--- 
-Cheers
-
-David / dhildenb
-
+Jason
 
