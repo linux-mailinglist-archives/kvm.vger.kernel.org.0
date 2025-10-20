@@ -1,228 +1,135 @@
-Return-Path: <kvm+bounces-60560-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-60561-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
-	by mail.lfdr.de (Postfix) with ESMTPS id 69C6DBF285F
-	for <lists+kvm@lfdr.de>; Mon, 20 Oct 2025 18:51:43 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id BEF41BF29D0
+	for <lists+kvm@lfdr.de>; Mon, 20 Oct 2025 19:11:08 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 27A054E0737
-	for <lists+kvm@lfdr.de>; Mon, 20 Oct 2025 16:51:42 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id CDB513BDCFA
+	for <lists+kvm@lfdr.de>; Mon, 20 Oct 2025 17:11:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C7B50289E13;
-	Mon, 20 Oct 2025 16:51:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B082E330320;
+	Mon, 20 Oct 2025 17:11:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="du6hptbl"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="UwkgW0U2"
 X-Original-To: kvm@vger.kernel.org
-Received: from CH4PR04CU002.outbound.protection.outlook.com (mail-northcentralusazon11013036.outbound.protection.outlook.com [40.107.201.36])
+Received: from out-188.mta0.migadu.com (out-188.mta0.migadu.com [91.218.175.188])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5B6B0265296;
-	Mon, 20 Oct 2025 16:51:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.201.36
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1760979088; cv=fail; b=D1WDKfBPUkpkrxO1JkIWrYvXNlTAuXQToFUtO/wMcDnadZ8i4TVyO/fsPgtEvcjCu3Cb3t0E7HaNKxoLXNPcX1NAJaJrOzTqxA7j6C7B4bEcYhjOFERQFRGIjDSje/vQJBJ0TVK1D7p0FBtKG1ll4xiQ8jdLfyZqPFPtuRZe/Fs=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1760979088; c=relaxed/simple;
-	bh=jpjEk+GbVGC1TWnZLf3A1dYi85cXZ9d2aSB3vkY2SbI=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:Content-Type:
-	 Content-Disposition:In-Reply-To:MIME-Version; b=RBFb1kaPStJU2Uj2DjHHaCN/7A7ZACoX42/sGFdWmaUhvATgmC+51j/c4xv3BEq44bQkpCV9TEZVcvlqPUVIqa05CmkKDF9srCb3NuoO++qhCWshjsA9bDOQwqXgYXA9ur1pVkqtLB5DodScqnDqJKoQ/Z5An8M9wqaQBDEupwc=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=du6hptbl; arc=fail smtp.client-ip=40.107.201.36
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=qMk6zvOemaOF0Fm6KfTz2ZM4fymLsjovKeyuohQT21KDU9sNwYwMb7B9oo7vWU0S4oCQXAQrlOSiHKqMlg0KooQ+HLHWYuwLjTT8W2NFN+qdX69RQUiOzaeM6AQpf0VR5GHyxQf035M2vZV9/MuUTO/Z+vOM4H1wLTH7tg9RNBcymf/GIQBVX41TvQ6Adg2CFIir1DVUZlGVe5CzRRt4Axid9Vn2+VQ9bl3/U6P/9jU9nsx+VcflPgIsOKmXmeYK08rRzHr/kqY9yHDrVcc4WmZrwAY8bkYGUc8AtcnkZFA2IWDK/+usOmInAQ/xzbZ16iR5U6rczyDeZ8Xe+m5bbw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=2ulj4AZhj+fLCNIsYuDNxqHysM7aSluLYnPYmUMiWpc=;
- b=xIKdc3TmTAOZdtuUbhWQwu6++Ni1cS5jFK0R+WRMgFL43B5X4UHg27MZNcUlmeX5lbzmjJTaNXUt86Vd98esncAiCtMsgLoBfvbflw1WAGOUMWTu2vJty0Eh4psuxCeu0u6zvvfTHqbuxK7gt+Kg9lFWFOljkBPBDtqjib7cgqeVN9APsSMuL20bIHPatjGmf4l8lHKUBEEZPEFv6s7KdcfQJCzfF+7RWUE/h4MxEqsBvUxg2RZzdJofeYKgEBL0Sz50W3aIcDxjT53DxNwMlTQJ3yJop+pXQBtoaox6klBFMeNLl/8+x/nZimU8bpUXSWDgsv4X0u91upK5qAHU0Q==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
- dkim=pass header.d=nvidia.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=2ulj4AZhj+fLCNIsYuDNxqHysM7aSluLYnPYmUMiWpc=;
- b=du6hptblDn5+h2wXcNSFPxP0j2d4m+UPFYdWKIexuOmtPJT0zdEkVECYs+yb0+0T/7vpoIC49D/CFL24hXgVQ6F90tsaXGFfe5KN1uNrezVXcoWTseqgTNjDQPEBaHxz915T3cUNkluA8kkjrfPF6ktM61MwQ0At6j/b2K3/Uluts3zF9S5N5fU8iVHOm5quc51AWgFgBvg17EzCy2ThnNoXR/9q+aY8ywxnmpUfjtTi0ulfrOWq1bjJColnDw/OH6zFFR9A1mYN5l2plnBtEg5Rm39/TG9YULUfES1W3dAOpFAVMsYGnj+tWJg0XcP8/Tk7JTp5rrNhHAn8lmZmmA==
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nvidia.com;
-Received: from MN2PR12MB3613.namprd12.prod.outlook.com (2603:10b6:208:c1::17)
- by SJ0PR12MB6757.namprd12.prod.outlook.com (2603:10b6:a03:449::21) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9228.16; Mon, 20 Oct
- 2025 16:51:22 +0000
-Received: from MN2PR12MB3613.namprd12.prod.outlook.com
- ([fe80::1b3b:64f5:9211:608b]) by MN2PR12MB3613.namprd12.prod.outlook.com
- ([fe80::1b3b:64f5:9211:608b%4]) with mapi id 15.20.9228.015; Mon, 20 Oct 2025
- 16:51:22 +0000
-Date: Mon, 20 Oct 2025 13:51:20 -0300
-From: Jason Gunthorpe <jgg@nvidia.com>
-To: Leon Romanovsky <leon@kernel.org>
-Cc: Alex Williamson <alex.williamson@redhat.com>,
-	Andrew Morton <akpm@linux-foundation.org>,
-	Bjorn Helgaas <bhelgaas@google.com>,
-	Christian =?utf-8?B?S8O2bmln?= <christian.koenig@amd.com>,
-	dri-devel@lists.freedesktop.org, iommu@lists.linux.dev,
-	Jens Axboe <axboe@kernel.dk>, Joerg Roedel <joro@8bytes.org>,
-	kvm@vger.kernel.org, linaro-mm-sig@lists.linaro.org,
-	linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-media@vger.kernel.org, linux-mm@kvack.org,
-	linux-pci@vger.kernel.org, Logan Gunthorpe <logang@deltatee.com>,
-	Marek Szyprowski <m.szyprowski@samsung.com>,
-	Robin Murphy <robin.murphy@arm.com>,
-	Sumit Semwal <sumit.semwal@linaro.org>,
-	Vivek Kasireddy <vivek.kasireddy@intel.com>,
-	Will Deacon <will@kernel.org>
-Subject: Re: [PATCH v5 9/9] vfio/pci: Add dma-buf export support for MMIO
- regions
-Message-ID: <20251020165120.GY316284@nvidia.com>
-References: <cover.1760368250.git.leon@kernel.org>
- <72ecaa13864ca346797e342d23a7929562788148.1760368250.git.leon@kernel.org>
- <20251017130249.GA309181@nvidia.com>
- <20251017161358.GC6199@unreal>
- <20251020161516.GU316284@nvidia.com>
- <20251020164457.GQ6199@unreal>
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20251020164457.GQ6199@unreal>
-X-ClientProxiedBy: PH8P221CA0032.NAMP221.PROD.OUTLOOK.COM
- (2603:10b6:510:346::12) To MN2PR12MB3613.namprd12.prod.outlook.com
- (2603:10b6:208:c1::17)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6539F32B9A8
+	for <kvm@vger.kernel.org>; Mon, 20 Oct 2025 17:10:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.188
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1760980260; cv=none; b=ZlAqeFzrNA82MRAWViBemq5Qq6+Z9Gbls2WkflMX5dHTZ3JZT+t1Pufcs3hl0zYt57hqBJt5UvG+AerFQlTtGneDY5s/0rMozF5aDrmoDR5jrhkQ5tqJlI/6UhL00I5Jc111O0RXkyGNvWfFiCqg2J1U6EoKK7TMH3NCUDfOcB4=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1760980260; c=relaxed/simple;
+	bh=AxIWE6iyO7Ox6m/9nhJ9NldPxg6UR5QmtIrf8wdrwwY=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=BzATwQvIlAvcyiuAF5gGkiJekzpP3zYtJZtGH2zSz6lxJEPnVY7vvbO1fT8HnS1Dtq/kOT8BfbusIBfVaCf/fiiYJ7x4mAl1zd9Jdb961aMwJ0TvZMPQrq7xe+yVvHRsF589oG2aUoXkHcy6XWFMNnBeBeHCmTd54hGnC0PCH6M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=UwkgW0U2; arc=none smtp.client-ip=91.218.175.188
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+Date: Mon, 20 Oct 2025 17:10:50 +0000
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1760980256;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=aSf8ZuG7Eh6WV3v9wcYX32BSw6mgJdJhb5+lBU8QmAY=;
+	b=UwkgW0U2aqd2eVZG5BGxiBBExVol2fh5Kz30LAnbxEyJcJ5KEnj7Ff7Cn0SGvLeMYibadi
+	kaVV4pHYJ+VdkAWg/bsEXO8bD9AZm824XXzokeWNRDfBhGJ7OZ3NGxgN/s89b6dYadc5uK
+	N78AmE1Ya0s9fiphyhUtDkFX2dp3E2s=
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Yosry Ahmed <yosry.ahmed@linux.dev>
+To: Jim Mattson <jmattson@google.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, Shuah Khan <shuah@kernel.org>, 
+	Sean Christopherson <seanjc@google.com>, Bibo Mao <maobibo@loongson.cn>, 
+	Huacai Chen <chenhuacai@kernel.org>, Andrew Jones <ajones@ventanamicro.com>, 
+	Claudio Imbrenda <imbrenda@linux.ibm.com>, "Pratik R. Sampat" <prsampat@amd.com>, 
+	Kai Huang <kai.huang@intel.com>, Eric Auger <eric.auger@redhat.com>, linux-kernel@vger.kernel.org, 
+	kvm@vger.kernel.org, linux-kselftest@vger.kernel.org
+Subject: Re: [PATCH 1/4] KVM: selftests: Use a loop to create guest page
+ tables
+Message-ID: <bbppzosz2alycri5o75fibahsqeb2y4bq5n6b3b23amrgtlrro@ppp5vwu2uoat>
+References: <20250917215031.2567566-1-jmattson@google.com>
+ <20250917215031.2567566-2-jmattson@google.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: MN2PR12MB3613:EE_|SJ0PR12MB6757:EE_
-X-MS-Office365-Filtering-Correlation-Id: c4910472-5417-46d6-cf79-08de0ff8e605
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230040|7416014|376014|1800799024|366016;
-X-Microsoft-Antispam-Message-Info:
-	=?us-ascii?Q?l9095uUJ1k0LuIJ449Qbqx5FXEiXM4K4xE2Byq37h8auXQ3L3gawyH8efyfH?=
- =?us-ascii?Q?znupV/LnwQHyba9p3CVWH36iBg8R7y57RUrxfNqWfeK9/jHA4LMR35pyA7Yo?=
- =?us-ascii?Q?kGWC2VCxxaTtFLiSBdb+4EPMvkmc9weR5+MIhwtSHLavFKU86HrZvRY4UYOJ?=
- =?us-ascii?Q?pbmrhVr/7nUgvITE5oNgyyFEulRCJSOQ9zKx0e9giiDJcr0WyAHtAR0/4UQy?=
- =?us-ascii?Q?FbH8PZiftJxYgTy6+PHkuT6sfmGou41Ki0knJaKhEBCq4FBqNjlJ3GJY2VbO?=
- =?us-ascii?Q?YDocpY6v2Ae6ND9mMJgtNVi+NtTh0XXvtbZ6QhhNUKsjffpYFK1x16GYrPtV?=
- =?us-ascii?Q?yzAWWnAWyE4d46L4gp9G+piJ3jLmv1sX+0NGOOUxSnZX97fRlG5dFAhzKObn?=
- =?us-ascii?Q?8ke5tSjjTHyrlULpYDmzzCnnt2MEFdJMvsKAJRu1Jw1b+O1dCJO+6tClzEQ1?=
- =?us-ascii?Q?IeFfPmUEP5UxkJNweVc/Co1Yt/Q0+se7A3OOp7S3f3M3ff37ws0mcmqMPJtz?=
- =?us-ascii?Q?ZZt3J1gums0OI76Z1hDplRwcwSow9f+oJx0kUrRkVSMUtVMWkQWXL4ewg3vg?=
- =?us-ascii?Q?wanjmhZtzgR58urSNhf7PPpO1dCi5blyeEolh1hossXcd0792T3DM7EP/ON9?=
- =?us-ascii?Q?ZrejblWq1QhcRMYUNOoYMXgKlwdmbhfbOWI14kTNMLVAFHc4Db+F1+eg33cg?=
- =?us-ascii?Q?1w9R8gy+Is1nXC398lvdxK2oIaDSVMujrZczU3EXWnrULwkV/+jiXXAhfHB7?=
- =?us-ascii?Q?pOZ/L8WMSIc2K24gHiBIbkUTfi2DrQYRS8vltBQu15vnZipWAwlQPXG4j4V9?=
- =?us-ascii?Q?Yvy53IPfiskHGmmZcsgyhUoHRe4vFk3SjvyVj1TimhseUdmWYGQF6slx++Ou?=
- =?us-ascii?Q?cVQ8ByVFwbzMI8VLt2dhbRO1EguUUFrHoJgiCIeHD7T07ztiL7xmGZIu+BhG?=
- =?us-ascii?Q?Fw3Nf8eVFk9fxrmY72V8dp12v8DcEG7+FpOCr53JA4E6jnR8y0XvSpuQtcmy?=
- =?us-ascii?Q?jjnuGU9zDoyjvPiavCfbGiMKsXH5cH3cea/xZXIQGve9t5VGBz3TsZIohZQV?=
- =?us-ascii?Q?nZrKTD7xU80YzHiXr/rEUID7zvrdfir9JRn9Zi1H0Rml735xH+bG/0+KBo6S?=
- =?us-ascii?Q?CyvfiMIz/Tm/LxE8GSAM6bGSxCISJP2Q2PcHK5erEjivGiFeYc3AOe+dfArV?=
- =?us-ascii?Q?5lfo5YhDryOLEUCSULTIJCSdjs/oxw963ln1YkwWZDLuGSevSZjrqOjWO2Ot?=
- =?us-ascii?Q?BazipfekQ9//6dEJ9mEBhJwQg49Dn1kgSwLoDftdCtw71j8BhzECfukn4ubG?=
- =?us-ascii?Q?nk3N/dPGRr5Dl00v1kNkwZ5b5seHlUDtab8qHCpzewUqSc13nl+MHVmneAkd?=
- =?us-ascii?Q?O7lecCR6fKqJzLYrSF6RSeUj3YLpfIoSyn0oVB67GIeOri0ujrEU7zxUQb5e?=
- =?us-ascii?Q?EOOReIM0ckIYVj+yBxfIOZiGeBu/qw5S?=
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:MN2PR12MB3613.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(7416014)(376014)(1800799024)(366016);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?us-ascii?Q?BNkGFVburs+rN16k499yPTfCqaUGVw/tlnGEwIm3z1eCpR7NiRywsYnCp3oU?=
- =?us-ascii?Q?ttEyE1qxQ1MqkXrCVVI8+G/mUhjeCJX3wYMnL3nbpXsqBZCMMi2zLnJuMIMJ?=
- =?us-ascii?Q?KjxnJgixn5Rr7hBHFuwzxJlSazmBzNDgGQO1lHw5sH0AI4EVdntmSgFe9NK8?=
- =?us-ascii?Q?17cyYVazQJjkN9m7dwFAmfO3NayFGCno8LFiupaSCtZ0WobKRWxTvT7FXRMX?=
- =?us-ascii?Q?w+CDFoRyPl2u+y94ry8A0j38LaNm0GawY8WNt0ut+gqgebL6D5B2cLANObE2?=
- =?us-ascii?Q?1x1qbCQcLSVmamqMy9SRqrnwEatGqfPif4UT40RxYvd4RzOpJxZheAJA9fBL?=
- =?us-ascii?Q?3wwVLk1WpPUqaGuSkz676OERxYzYuG8qAe3MEZ1+H+6gpFOsMEyWciF6ed/d?=
- =?us-ascii?Q?JqB3mpGn4umEgdMKB8Me0S/eMK80lmMqtrQLezYZMuDdZCRJwJgp9Xqo4GqU?=
- =?us-ascii?Q?fHoxR0pF8Lg1Gfp2ZaSLcM6w1zdP665oBnkGeNOtvdEtMYr3VHzoJHhV2y9e?=
- =?us-ascii?Q?2ChA+yXF218pYcDFGSdVcOZqaASJ5RzeMirBZB6fsU4ctmQeHGv3iPf27WMb?=
- =?us-ascii?Q?N/uRb6FK0vLn+RN3U+stn8kOiZTNokAfE+kyAOHVPQLV01QUYKUGPehMUXe5?=
- =?us-ascii?Q?54t07swwMGigBQn0elkBJdTtteC0yFs0gV5KtEb8kEU8iuIm+qvdCV02Y9vC?=
- =?us-ascii?Q?hPL3XW9PR19J8MnPATArcKQYmYqByHkNwwjSVIQ9L/6rAC9cRqAiaYUrXc3A?=
- =?us-ascii?Q?s7VoeVg8da6axEG5f129XzWAN/3zjOBimJo+oKlfL+oBb800dZGcrz0D1YzS?=
- =?us-ascii?Q?XBS1Y6QeizA/mL4dNhTCwiXpsyDOcQpKHl+eyfC3qf/5Kpnj3aISs71ERoB+?=
- =?us-ascii?Q?JnwMqEHYw0DnFXF8l2L1tWMj4+870KDGsuNdsg8grotBFcplzrrEE2bCPgoL?=
- =?us-ascii?Q?y+7i0BBryk+bTLhfnGktLE2DyzMHnvm+STcPnp+Xv4XNLg/LpA2C/epN+ome?=
- =?us-ascii?Q?qJtUq/t+pNxveZB80bhxvIsNfevY3QQy/gewdL2cOve6yTVuNMcJOw5mHcHp?=
- =?us-ascii?Q?jKj4n8GIsUqCQVtViiOXgdTePG7HNf38PZZq5zWHR7ATPYf2tMAWoYmskr31?=
- =?us-ascii?Q?Lzt1E+jjLhkCeMIZEquvDv3W1x8GRLq7/3cK7ZgdHNHyDRbF+DjejmCoUoM3?=
- =?us-ascii?Q?0qDms3pxnuN7dpyM+Tf9KM9zrkqgAs/E+uX72SdKhGw/Y1fg3nRI8DO52GBz?=
- =?us-ascii?Q?VcUt5c4d0LBoSgXJHHuOxg8ORCKfnRpjge7aSKX4t1FJM52zYA3L+uhFHRnc?=
- =?us-ascii?Q?7rWQf1dA/Lbfh9X9YFuo457BkuFgoS/OZWKEqxiF4WcFSWlv3WOs1qF2LikP?=
- =?us-ascii?Q?RAkfTyKtD/+IoUjON4R83TPi8d0+bykwKfYlFEWuGqHZhtzA1UEmNsZBRTio?=
- =?us-ascii?Q?Tou0tk0dUuV6z+EPx49Ey7FPr9u/3AgD2KeEz7+rq/xSON1MuGGth6hAwTZB?=
- =?us-ascii?Q?2HXlOiiLaczN+TbFkjJl1oacUb5v1UChlhEV2zHc/QvOeoowKbWfUXo9K5Wj?=
- =?us-ascii?Q?gDvWRg3/9xXiVrPX1vA55ib8QkEmRUg+CcdJppGx?=
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: c4910472-5417-46d6-cf79-08de0ff8e605
-X-MS-Exchange-CrossTenant-AuthSource: MN2PR12MB3613.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 20 Oct 2025 16:51:22.1877
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: iDi9yuglUGP18WFXnFVjhRWfbdsmo9oBIl22Q/8nuGtW8Xjj8PuLyHLI1Y4sf+El
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SJ0PR12MB6757
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250917215031.2567566-2-jmattson@google.com>
+X-Migadu-Flow: FLOW_OUT
 
-On Mon, Oct 20, 2025 at 07:44:57PM +0300, Leon Romanovsky wrote:
-> On Mon, Oct 20, 2025 at 01:15:16PM -0300, Jason Gunthorpe wrote:
-> > On Fri, Oct 17, 2025 at 07:13:58PM +0300, Leon Romanovsky wrote:
-> > > > static int dma_ranges_to_p2p_phys(struct vfio_pci_dma_buf *priv,
-> > > > 				  struct vfio_device_feature_dma_buf *dma_buf,
-> > > > 				  struct vfio_region_dma_range *dma_ranges,
-> > > > 				  struct p2pdma_provider *provider)
-> > > > {
-> > > > 	struct pci_dev *pdev = priv->vdev->pdev;
-> > > > 	phys_addr_t len = pci_resource_len(pdev, dma_buf->region_index);
-> > > > 	phys_addr_t pci_start;
-> > > > 	phys_addr_t pci_last;
-> > > > 	u32 i;
-> > > > 
-> > > > 	if (!len)
-> > > > 		return -EINVAL;
-> > > > 	pci_start = pci_resource_start(pdev, dma_buf->region_index);
-> > > > 	pci_last = pci_start + len - 1;
-> > > > 	for (i = 0; i < dma_buf->nr_ranges; i++) {
-> > > > 		phys_addr_t last;
-> > > > 
-> > > > 		if (!dma_ranges[i].length)
-> > > > 			return -EINVAL;
-> > > > 
-> > > > 		if (check_add_overflow(pci_start, dma_ranges[i].offset,
-> > > > 				       &priv->phys_vec[i].paddr) ||
-> > > > 		    check_add_overflow(priv->phys_vec[i].paddr,
-> > > > 				       dma_ranges[i].length - 1, &last))
-> > > > 			return -EOVERFLOW;
-> > > > 		if (last > pci_last)
-> > > > 			return -EINVAL;
-> > > > 
-> > > > 		priv->phys_vec[i].len = dma_ranges[i].length;
-> > > > 		priv->size += priv->phys_vec[i].len;
-> > > > 	}
-> > > > 	priv->nr_ranges = dma_buf->nr_ranges;
-> > > > 	priv->provider = provider;
-> > > > 	return 0;
-> > > > }
-> > > 
-> > > I have these checks in validate_dmabuf_input(). 
-> > > Do you think that I need to add extra checks?
-> > 
-> > I think they work better in this function, so I'd move them here.
+On Wed, Sep 17, 2025 at 02:48:37PM -0700, Jim Mattson wrote:
+> Walk the guest page tables via a loop when creating new mappings,
+> instead of using unique variables for each level of the page tables.
 > 
-> The main idea for validate_dmabuf_input() is to perform as much as
-> possible checks before allocating kernel memory.
+> This simplifies the code and makes it easier to support 5-level paging
+> in the future.
+> 
+> Signed-off-by: Jim Mattson <jmattson@google.com>
+> ---
+>  .../testing/selftests/kvm/lib/x86/processor.c | 22 +++++++------------
+>  1 file changed, 8 insertions(+), 14 deletions(-)
+> 
+> diff --git a/tools/testing/selftests/kvm/lib/x86/processor.c b/tools/testing/selftests/kvm/lib/x86/processor.c
+> index d4c19ac885a9..0238e674709d 100644
+> --- a/tools/testing/selftests/kvm/lib/x86/processor.c
+> +++ b/tools/testing/selftests/kvm/lib/x86/processor.c
+> @@ -184,8 +184,8 @@ static uint64_t *virt_create_upper_pte(struct kvm_vm *vm,
+>  void __virt_pg_map(struct kvm_vm *vm, uint64_t vaddr, uint64_t paddr, int level)
+>  {
+>  	const uint64_t pg_size = PG_LEVEL_SIZE(level);
+> -	uint64_t *pml4e, *pdpe, *pde;
+> -	uint64_t *pte;
+> +	uint64_t *pte = &vm->pgd;
+> +	int current_level;
+>  
+>  	TEST_ASSERT(vm->mode == VM_MODE_PXXV48_4K,
+>  		    "Unknown or unsupported guest mode, mode: 0x%x", vm->mode);
+> @@ -209,20 +209,14 @@ void __virt_pg_map(struct kvm_vm *vm, uint64_t vaddr, uint64_t paddr, int level)
+>  	 * Allocate upper level page tables, if not already present.  Return
+>  	 * early if a hugepage was created.
+>  	 */
+> -	pml4e = virt_create_upper_pte(vm, &vm->pgd, vaddr, paddr, PG_LEVEL_512G, level);
+> -	if (*pml4e & PTE_LARGE_MASK)
+> -		return;
+> -
+> -	pdpe = virt_create_upper_pte(vm, pml4e, vaddr, paddr, PG_LEVEL_1G, level);
+> -	if (*pdpe & PTE_LARGE_MASK)
+> -		return;
+> -
+> -	pde = virt_create_upper_pte(vm, pdpe, vaddr, paddr, PG_LEVEL_2M, level);
+> -	if (*pde & PTE_LARGE_MASK)
+> -		return;
+> +	for (current_level = vm->pgtable_levels; current_level > 0; current_level--) {
 
-Yeah, but it's fine, it can just be turned into a function to safely
-compute the total size. It makes more sense to try to validate once we
-have the kernel memory and got the physical range from the driver to
-copy into the phys.
+I think the condition here should be: "current_level > PG_LEVEL_4K" or
+"current_level >= PG_LEVEL_2M". PG_LEVEL_4K is 1, so right now we will
+call virt_create_upper_pte() for PG_LEVEL_4K and skip the logic after
+the logic after the loop.
 
-Jason
+I think it still accidentally works for most cases, but we shouldn't
+rely on that.
+
+> +		pte = virt_create_upper_pte(vm, pte, vaddr, paddr, current_level, level);
+> +		if (*pte & PTE_LARGE_MASK)
+> +			return;
+> +	}
+>  
+>  	/* Fill in page table entry. */
+> -	pte = virt_get_pte(vm, pde, vaddr, PG_LEVEL_4K);
+> +	pte = virt_get_pte(vm, pte, vaddr, PG_LEVEL_4K);
+>  	TEST_ASSERT(!(*pte & PTE_PRESENT_MASK),
+>  		    "PTE already present for 4k page at vaddr: 0x%lx", vaddr);
+>  	*pte = PTE_PRESENT_MASK | PTE_WRITABLE_MASK | (paddr & PHYSICAL_PAGE_MASK);
+> -- 
+> 2.51.0.470.ga7dc726c21-goog
+> 
 
