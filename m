@@ -1,207 +1,165 @@
-Return-Path: <kvm+bounces-60538-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-60539-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 27292BF1FBE
-	for <lists+kvm@lfdr.de>; Mon, 20 Oct 2025 17:04:35 +0200 (CEST)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
+	by mail.lfdr.de (Postfix) with ESMTPS id D8653BF2041
+	for <lists+kvm@lfdr.de>; Mon, 20 Oct 2025 17:11:15 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 3C2B918A7422
-	for <lists+kvm@lfdr.de>; Mon, 20 Oct 2025 15:04:58 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 16BFD4F7460
+	for <lists+kvm@lfdr.de>; Mon, 20 Oct 2025 15:10:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D161124168D;
-	Mon, 20 Oct 2025 15:04:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5A1AA23C4E9;
+	Mon, 20 Oct 2025 15:10:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="iRT5USF1"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="fIcEAqRU"
 X-Original-To: kvm@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.20])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CE373223DD0;
-	Mon, 20 Oct 2025 15:04:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EB13415CD74;
+	Mon, 20 Oct 2025 15:10:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.20
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1760972658; cv=none; b=Gx7PzqaJlwjAo6x2Ee3Y5cGH3KwKdkqAs8qZSaX57pwOzeSPoP09S9esXZgUDd0P813C/U8fA4q36oyv2EAVglR1wwHBKym9Iqje/fGExzvGh2t5n+rW7FsAymnvMVPlxNfkanI5r5zamq2ucfQErtRPhCRWQIuq/McBH00zUiY=
+	t=1760973049; cv=none; b=SymiEJKMSBa+EbpGpeILM89xQgt6M76I1ZzD4XJvh/rBL5NOdGLCIghQ91IK6wJ7y2K2Q9Ckme8NfOp1hcK0l8e0JdfUANzuARKfgRUcfzRxYCww/Njg4bJ+SbgFwE03ByylyIQoRqDfpjHvwu7uRtcYu4B9qDSVqiEQQ5EP2S8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1760972658; c=relaxed/simple;
-	bh=opgDUacvsAEAblCjRwc/cnZnXjDHKNzApka9lSwmFm0=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=gUCJGq7oLBs8iufG/N1KxDq0gGHNH9SR+TTAeUkJGfE5YSwtMbUWq6KJPrfRIjW1NSw/tdHctm8QhTpoDVBOup/2HNbKnruv6F0GZ3drD2CLhhuJfrvZEIUt/+Hi6jClqCpzurrAuZHne95O+Ir7sKxAT58K7LOvr2JTMHv/XWI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=iRT5USF1; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id D6DD1C4CEF9;
-	Mon, 20 Oct 2025 15:04:16 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1760972657;
-	bh=opgDUacvsAEAblCjRwc/cnZnXjDHKNzApka9lSwmFm0=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=iRT5USF1c9hlxYuIAOhCLi5vAK5WR7rom9xRkIU3R7gF7myd/1e5DMMfNCS0kUZkY
-	 3iRkzX0tjSk5Oi94wjBXhi3wnlTtnIwsAvgfAKJFuquBcdXjW7d9WDWrPNIf5J0bU5
-	 zVOo4RRrxdwbFsBukm+Rj6kIqO8vqJWtwlc9Wep5HFp36crF5d7piD0ABkB0lYukcY
-	 occ87bgOGiq4SFUOt5aNiFNgE39VrrMYCKAhg7FXj21tnyeBL4evlgZwZyr9LIYUQF
-	 TbY2GnPoLUsXHvGaif5VObAw2oxejIFZ08On78dvTXugRYsJ65uWf5lD//iEs7lnk9
-	 fxqi91aJMPONw==
-Date: Mon, 20 Oct 2025 18:04:12 +0300
-From: Leon Romanovsky <leon@kernel.org>
-To: Jason Gunthorpe <jgg@nvidia.com>
-Cc: Christoph Hellwig <hch@infradead.org>,
-	Alex Williamson <alex.williamson@redhat.com>,
-	Andrew Morton <akpm@linux-foundation.org>,
-	Bjorn Helgaas <bhelgaas@google.com>,
-	Christian =?iso-8859-1?Q?K=F6nig?= <christian.koenig@amd.com>,
-	dri-devel@lists.freedesktop.org, iommu@lists.linux.dev,
-	Jens Axboe <axboe@kernel.dk>, Joerg Roedel <joro@8bytes.org>,
-	kvm@vger.kernel.org, linaro-mm-sig@lists.linaro.org,
-	linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-media@vger.kernel.org, linux-mm@kvack.org,
-	linux-pci@vger.kernel.org, Logan Gunthorpe <logang@deltatee.com>,
-	Marek Szyprowski <m.szyprowski@samsung.com>,
-	Robin Murphy <robin.murphy@arm.com>,
-	Sumit Semwal <sumit.semwal@linaro.org>,
-	Vivek Kasireddy <vivek.kasireddy@intel.com>,
-	Will Deacon <will@kernel.org>
-Subject: Re: [PATCH v5 1/9] PCI/P2PDMA: Separate the mmap() support from the
- core logic
-Message-ID: <20251020150412.GP6199@unreal>
-References: <cover.1760368250.git.leon@kernel.org>
- <1044f7aa09836d63de964d4eb6e646b3071c1fdb.1760368250.git.leon@kernel.org>
- <aPHibioUFZV8Wnd1@infradead.org>
- <20251017115320.GF3901471@nvidia.com>
- <aPYqliGwJTcZznSX@infradead.org>
- <20251020125854.GL316284@nvidia.com>
+	s=arc-20240116; t=1760973049; c=relaxed/simple;
+	bh=fqNjrot1k4YOkjMvUMIgaO7PDDgmIlgF/NrFLCl9TFg=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=Ae8kdBf0VWMWTJb0RoEUDqBYw7dprwq6ZrxBBGu44IgPxd+NxKqcmoB6qpccDiY0lli28LJ67X80vpQRiTLIkQlH9aRHPRQswQ5TikYqtOZ1WLxzBVz26v77uHzBJArX47S2swwQ7Ox6NFCc5LGYAhTlNDLDCqFvh8eP+wZS2tk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=fIcEAqRU; arc=none smtp.client-ip=198.175.65.20
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1760973047; x=1792509047;
+  h=message-id:date:mime-version:subject:to:cc:references:
+   from:in-reply-to:content-transfer-encoding;
+  bh=fqNjrot1k4YOkjMvUMIgaO7PDDgmIlgF/NrFLCl9TFg=;
+  b=fIcEAqRUtNK6zH5wScUYjY0q3+CLoZ+3FvvhfCfinavs9KtdemrvON51
+   vAEpfht7DdZdOsy9Ml+qYKnmShC4IOAjpXlGkOY6LkaMDpL5hs/EMU+hq
+   rQ9HIlDtR33OBZqd3I5HzzI/SHbE5jgiM1FVldu9GfqjXAJ45QxvGgZKY
+   FhvUgqPlWA74dRG8MHiKyUambyrVa5fmaH7BEwajqwPB0zFm9mjxMzwlh
+   2Gv1CSA3iKAnKfmz8g3jnB3ya4rp7gGQj7TGNSwFfdg+BcHyrjzwSLUf1
+   oeofMTKePknUtjMAN1S2z6VpOAhTnWF8Kzem42S2E5DJhLkS7c2Y4mEYX
+   Q==;
+X-CSE-ConnectionGUID: 2bMy6OxsRZWHGCAdgtt/0Q==
+X-CSE-MsgGUID: lyjJe3SZRHe6+WyI1QENBQ==
+X-IronPort-AV: E=McAfee;i="6800,10657,11586"; a="62789966"
+X-IronPort-AV: E=Sophos;i="6.19,242,1754982000"; 
+   d="scan'208";a="62789966"
+Received: from orviesa010.jf.intel.com ([10.64.159.150])
+  by orvoesa112.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 20 Oct 2025 08:10:21 -0700
+X-CSE-ConnectionGUID: BJmxr3lpQuq18L62t0Llkw==
+X-CSE-MsgGUID: GbjmQTpuQsay5QqgQ0kAmA==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.19,242,1754982000"; 
+   d="scan'208";a="182539954"
+Received: from jdoman-mobl3.amr.corp.intel.com (HELO [10.125.108.101]) ([10.125.108.101])
+  by orviesa010-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 20 Oct 2025 08:10:21 -0700
+Message-ID: <033f56f9-fb66-4bf5-b25a-f2f8b964cd4e@intel.com>
+Date: Mon, 20 Oct 2025 08:10:21 -0700
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20251020125854.GL316284@nvidia.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH] x86/virt/tdx: Use precalculated TDVPR page physical
+ address
+To: Sean Christopherson <seanjc@google.com>
+Cc: Dave Hansen <dave.hansen@linux.intel.com>, linux-kernel@vger.kernel.org,
+ Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>,
+ Borislav Petkov <bp@alien8.de>, x86@kernel.org,
+ "H. Peter Anvin" <hpa@zytor.com>, "Kirill A. Shutemov" <kas@kernel.org>,
+ Rick Edgecombe <rick.p.edgecombe@intel.com>,
+ Paolo Bonzini <pbonzini@redhat.com>, Kai Huang <kai.huang@intel.com>,
+ Isaku Yamahata <isaku.yamahata@intel.com>,
+ Vishal Annapurve <vannapurve@google.com>, Thomas Huth <thuth@redhat.com>,
+ Adrian Hunter <adrian.hunter@intel.com>, linux-coco@lists.linux.dev,
+ kvm@vger.kernel.org, Farrah Chen <farrah.chen@intel.com>
+References: <20250910144453.1389652-1-dave.hansen@linux.intel.com>
+ <aPY_yC45suT8sn8F@google.com>
+ <872c17f3-9ded-46b2-a036-65fc2abaf2e6@intel.com>
+ <aPZKVaUT9GZbPHBI@google.com>
+From: Dave Hansen <dave.hansen@intel.com>
+Content-Language: en-US
+Autocrypt: addr=dave.hansen@intel.com; keydata=
+ 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
+In-Reply-To: <aPZKVaUT9GZbPHBI@google.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-On Mon, Oct 20, 2025 at 09:58:54AM -0300, Jason Gunthorpe wrote:
-> On Mon, Oct 20, 2025 at 05:27:02AM -0700, Christoph Hellwig wrote:
-> > On Fri, Oct 17, 2025 at 08:53:20AM -0300, Jason Gunthorpe wrote:
-> > > On Thu, Oct 16, 2025 at 11:30:06PM -0700, Christoph Hellwig wrote:
-> > > > On Mon, Oct 13, 2025 at 06:26:03PM +0300, Leon Romanovsky wrote:
-> > > > > The DMA API now has a new flow, and has gained phys_addr_t support, so
-> > > > > it no longer needs struct pages to perform P2P mapping.
-> > > > 
-> > > > That's news to me.  All the pci_p2pdma_map_state machinery is still
-> > > > based on pgmaps and thus pages.
-> > > 
-> > > We had this discussion already three months ago:
-> > > 
-> > > https://lore.kernel.org/all/20250729131502.GJ36037@nvidia.com/
-> > > 
-> > > These couple patches make the core pci_p2pdma_map_state machinery work
-> > > on struct p2pdma_provider, and pgmap is just one way to get a
-> > > p2pdma_provider *
-> > > 
-> > > The struct page paths through pgmap go page->pgmap->mem to get
-> > > p2pdma_provider.
-> > > 
-> > > The non-struct page paths just have a p2pdma_provider * without a
-> > > pgmap. In this series VFIO uses
-> > > 
-> > > +	*provider = pcim_p2pdma_provider(pdev, bar);
-> > > 
-> > > To get the provider for a specific BAR.
-> > 
-> > And what protects that life time?  I've not seen anyone actually
-> > building the proper lifetime management.  And if someone did the patches
-> > need to clearly point to that.
+On 10/20/25 07:42, Sean Christopherson wrote:
+>> In a perfect world, we'd have sparse annotations for the vaddr, paddr,
+>> pfn, dma_addr_t and all the other address spaces. Until then, I like
+>> passing struct page around.
+> But that clearly doesn't work since now the raw paddr is being passed in many
+> places, and we end up with goofy code like this where one param takes a raw paddr,
+> and another uses page_to_phys().
 > 
-> It is this series!
-> 
-> The above API gives a lifetime that is driver bound. The calling
-> driver must ensure it stops using provider and stops doing DMA with it
-> before remove() completes.
-> 
-> This VFIO series does that through the move_notify callchain I showed
-> in the previous email. This callchain is always triggered before
-> remove() of the VFIO PCI driver is completed.
-> 
-> > > I think I've answered this three times now - for DMABUF the DMABUF
-> > > invalidation scheme is used to control the lifetime and no DMA mapping
-> > > outlives the provider, and the provider doesn't outlive the driver.
-> > 
-> > How?
-> 
-> I explained it in detail in the message you are repling to. If
-> something is not clear can you please be more specific??
-> 
-> Is it the mmap in VFIO perhaps that is causing these questions?
-> 
-> VFIO uses a PFNMAP VMA, so you can't pin_user_page() it. It uses
-> unmap_mapping_range() during its remove() path to get rid of the VMA
-> PTEs.
-> 
-> The DMA activity doesn't use the mmap *at all*. It isn't like NVMe
-> which relies on the ZONE_DEVICE pages and VMAs to link drivers
-> togther.
-> 
-> Instead the DMABUF FD is used to pass the MMIO pages between VFIO and
-> another driver. DMABUF has a built in invalidation mechanism that VFIO
-> triggers before remove(). The invalidation removes access from the
-> other driver.
-> 
-> This is different than NVMe which has no invalidation. NVMe does
-> unmap_mapping_range() on the VMA and waits for all the short lived
-> pgmap references to clear. We don't need anything like that because
-> DMABUF invalidation is synchronous.
-> 
-> The full picture for VFIO is something like:
-> 
-> [startup]
->   MMIO is acquired from the pci_resource
->   p2p_providers are setup
-> 
-> [runtime]
->   MMIO is mapped into PFNMAP VMAs
->   MMIO is linked to a DMABUF FD
->   DMABUF FD gets DMA mapped using the p2p_provider
-> 
-> [unplug]
->   unmap_mapping_range() is called so all VMAs are emptied out and the
->   fault handler prevents new PTEs 
->     ** No access to the MMIO through VMAs is possible**
-> 
->   vfio_pci_dma_buf_cleanup() is called which prevents new DMABUF
->   mappings from starting, and does dma_buf_move_notify() on all the
->   open DMABUF FDs to invalidate other drivers. Other drivers stop
->   doing DMA and we need to free the IOVA from the IOMMU/etc.
->     ** No DMA access from other drivers is possible now**
-> 
->   Any still open DMABUF FD will fail inside VFIO immediately due to
->   the priv->revoked checks.
->     **No code touches the p2p_provider anymore**
-> 
->   The p2p_provider is destroyed by devm.
-> 
-> > > Obviously you cannot use the new p2provider mechanism without some
-> > > kind of protection against use after hot unplug, but it doesn't have
-> > > to be struct page based.
-> > 
-> > And how does this interact with everyone else expecting pgmap based
-> > lifetime management.
-> 
-> They continue to use pgmap and nothing changes for them.
-> 
-> The pgmap path always waited until nothing was using the pgmap and
-> thus provider before allowing device driver remove() to complete.
-> 
-> The refactoring doesn't change the lifecycle model, it just provides
-> entry points to access the driver bound lifetime model directly
-> instead of being forced to use pgmap.
-> 
-> Leon, can you add some remarks to the comments about what the rules
-> are to call pcim_p2pdma_provider() ?
+> @@ -1583,7 +1578,7 @@ u64 tdh_vp_addcx(struct tdx_vp *vp, struct page *tdcx_page)
+>  {
+>         struct tdx_module_args args = {
+>                 .rcx = page_to_phys(tdcx_page),
+> -               .rdx = tdx_tdvpr_pa(vp),
+> +               .rdx = vp->tdvpr_pa,
+>         };
 
-Yes, sure.
+I'm kinda dense normally and my coffee hasn't kicked in yet. What
+clearly does not work there?
 
-Thanks
+Yeah, vp->tdvpr_pa is storing a physical address as a raw u64 and not a
+'struct page'. That's not ideal. But it's also for a pretty good reason.
 
-> 
-> Jason
+The "use 'struct page *' instead of u64 for physical addresses" thingy
+is a good pattern, not an absolute rule. Use it when you can, but
+abandon it for the greater good when necessary.
+
+I don't hate the idea of a tdx_page_t. I'm just not sure it's worth the
+trouble. I'd certainly take a good look at the patches if someone hacked
+it together.
 
