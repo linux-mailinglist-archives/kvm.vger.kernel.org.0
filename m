@@ -1,125 +1,117 @@
-Return-Path: <kvm+bounces-60557-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-60558-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8DA56BF2764
-	for <lists+kvm@lfdr.de>; Mon, 20 Oct 2025 18:36:18 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id E08A0BF276D
+	for <lists+kvm@lfdr.de>; Mon, 20 Oct 2025 18:36:33 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4DC0F3A42C5
-	for <lists+kvm@lfdr.de>; Mon, 20 Oct 2025 16:35:40 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 99ADD3A8C66
+	for <lists+kvm@lfdr.de>; Mon, 20 Oct 2025 16:35:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1D211294A10;
-	Mon, 20 Oct 2025 16:34:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4BA8C29D26D;
+	Mon, 20 Oct 2025 16:34:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="Yet/KfXT"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="n/dXFgmu"
 X-Original-To: kvm@vger.kernel.org
 Received: from mail-pg1-f201.google.com (mail-pg1-f201.google.com [209.85.215.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D07272957CD
-	for <kvm@vger.kernel.org>; Mon, 20 Oct 2025 16:34:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 09DB128E5
+	for <kvm@vger.kernel.org>; Mon, 20 Oct 2025 16:34:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1760978076; cv=none; b=oJ+Qc8v6FKUczdW8x6a8jwESSFCFVT8AG8FSCw3jSnGunEKbb3an/S1I718fM3kgPdP8yeOv5JXmOyDYp7a/velStBpKa7Dn82oHWwXg1BiGK7t5MvzhQNPxsoVvwrEvtqMSJ1kK5GyNGTne0+U/ayN4aSm18o12Vxs1VaaP6l0=
+	t=1760978084; cv=none; b=dch55ea1BZDTX4BRq0VbESc3+0M3MbttsmaG79JcynCkz2L6GPYNAHinCF6+u5ONjWdkhp5ZCsaKiz1gACC2jithn6PmMMWU2fQEE+V0Ck/xmBuo15l93anvPDKhKRYlTRGqe1deW/ymwwUq5K8Sgqoq21ms9Uc5losSjCbKIeA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1760978076; c=relaxed/simple;
-	bh=EiQcu69ThNMV5eVSMYsDQ4bCDv3shLxSwQL7H3mKAKs=;
+	s=arc-20240116; t=1760978084; c=relaxed/simple;
+	bh=EKnvTmQWXIb3QulB8OxEwhVGwFls1eJdoaM7jZiZ60E=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=uCD46Wu1C4Sg8bofqQ097nFOKH24a3C3nU/d6o47AVievHK4DAmAWxn1YDo1I2TI1JI0jw4d9Q0t0obVyTpCcTr/g5ItXCnihQdyKYOsmKjoT0JMpWeEn/02bGCOvgDv3KphHm6D2DagmKnLAECmGikEJmDkDvI8Tvq5+W+8ltw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=Yet/KfXT; arc=none smtp.client-ip=209.85.215.201
+	 To:Cc:Content-Type; b=FCMbYwiZaz5HMBcRqs8nyL0yE3KwqYGramzRoEuetW8vB2kYXNYUMT0Feqp0mWHiUultXpPPYgS74m5HOqp35DHvJNEZHaT+NbYeJDCLveCgNl5/XYKnGCSfdVxA0C/FPVRmyCx+6Xph+drsKP7/dv8mTEBxKnc0iswWUOG/eP0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=n/dXFgmu; arc=none smtp.client-ip=209.85.215.201
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pg1-f201.google.com with SMTP id 41be03b00d2f7-b630b4d8d52so3366109a12.3
-        for <kvm@vger.kernel.org>; Mon, 20 Oct 2025 09:34:34 -0700 (PDT)
+Received: by mail-pg1-f201.google.com with SMTP id 41be03b00d2f7-b6325a95e44so3837319a12.0
+        for <kvm@vger.kernel.org>; Mon, 20 Oct 2025 09:34:42 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1760978074; x=1761582874; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1760978082; x=1761582882; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=NgpNr0aTDcHON6YJRRGl/Ho3bIHC4QKB1w6+dL8sIvA=;
-        b=Yet/KfXTAZlNPK9AuR/EzQt1VB2Yr5d09V1xhF9We21YXjupqiaFLKBWyXN4MNyhRf
-         p2V+VG7YYrVsCtoe1Vi3nWazGWYehoX5c8bZijF+zYDlqaumT6QTMbWySLf6Qv5QK4DK
-         R/vVWZPxzDS+ER2Uw9apxw+jGNwIhgOiduguzeNMSdkcCrMtMJcCsASdDupKOpAvRGwj
-         3TWWY5jR8lz0hgTVRkgbQZTjzkYVoY/62Xnr5HPReNzHmBlYT9vUH4kphC655l30RzPL
-         sjrAdH1ms8JE1x4Qw9hzFEgOSj3bf4dIKnXCQVPkPsWCkbkd6WR1joRaz6RgNL0/lig9
-         FMbg==
+        bh=fp2M7y/YIkoquLfcKGxuSyhApeoEnp7Mnl/v7xe2miU=;
+        b=n/dXFgmuWRvUCLuK+lHCZg5+/VHIUUtOdcpfm3hyZK6D/T0AI4whW7uN/7Jh5+j4H4
+         c2Q3NBuNAaCs5fauwCaRVnh8z44w+rPA1PDHgiVKT7QHMLJbvssvG7fOPU4k5LkYh68z
+         cVhtrXeQSNIPCwGI9uCm47xpOKrNi4be5dMOQtGrpNwclgk2g9Kk9SHUsvthFExr8li7
+         5zsLK+eJTm8WbFl234DRqicsfry+ExMCPnq+xBuAEEl3cY+eNkBNOlVeaUcyQqL66iM+
+         CaiagWinsdl17qr51+n5dbw3N++X+nsZjQ8FqCRtMzKsabF4/uYYeqN18kHc4oD3COq1
+         oH3A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1760978074; x=1761582874;
+        d=1e100.net; s=20230601; t=1760978082; x=1761582882;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=NgpNr0aTDcHON6YJRRGl/Ho3bIHC4QKB1w6+dL8sIvA=;
-        b=mQqRFMrL/eAIH9O6QI2hb3AAQ/0h58LOlGn5Wt7qT7pWtMcPxHWT7D1/UEGgScPyZX
-         HJq2E14N+tZ/mw1dQsA2VV5VpFZVbjHBKzaHGzDoWJr7t4GE6uu7P/KU+wNLD6g0npwt
-         ix5z5pyuQJx2BkmhfONf9wugiPzzN0Ym5XKSF86iXrAf4pL1tgZfbeiK8ILcrTzaQ3uf
-         mhYgyM4CyWI7frZgjEF8IzhD/1Tq/NM3yWRbnTb3eMPd/6hbGWCofcAx+ocKoAGfMpwP
-         uj9Bi6vBcT0lQDK80NQQcGheONg/Rsf4wdKAoYDxGqME6MzkE4drXTdRr4ru7N8hIZ5g
-         tqQw==
-X-Forwarded-Encrypted: i=1; AJvYcCWf1VqBMTEwestZUkTJOWeAyj2sTKLfld1dM62PesEnVAcRHUyMNQdZORKGUHCKmAAsWjY=@vger.kernel.org
-X-Gm-Message-State: AOJu0YykN9wHoQJx//UixZumdinYvwN1yZ1ik15wa2VDT36wo+Mvccfa
-	SFeuIpFsTxE9dQ2wgPffdmNdX3CC4Xh2joEX6PyGHy+1dhT4wsbToaRouurI9JxyZvJ/1dE2AhW
-	h7Ba5zQ==
-X-Google-Smtp-Source: AGHT+IFqEfOmAYtapsa+GPV8RKNNVZk1GUoa5rfaKPAJZdtFoNenwW3NDOU3pFR/bunCzSaiK4MoJdmxl4k=
-X-Received: from pjoa3.prod.google.com ([2002:a17:90a:8c03:b0:32e:a549:83e3])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a05:6a20:1585:b0:334:a483:1c2c
- with SMTP id adf61e73a8af0-334a852439emr18638872637.22.1760978073961; Mon, 20
- Oct 2025 09:34:33 -0700 (PDT)
-Date: Mon, 20 Oct 2025 09:33:09 -0700
-In-Reply-To: <cover.1757009416.git.naveen@kernel.org>
+        bh=fp2M7y/YIkoquLfcKGxuSyhApeoEnp7Mnl/v7xe2miU=;
+        b=L6s8mlmjemp4u6K2sAPeGpbGrqllqn25wBkGAq7OYC80ftM190Yzth2n8d2vlsQjUk
+         Bt1hL7kWBTo9gK3X6HBaGuhAzj+M3SYkXoVXJnzmrp6sfXagvJzk+wVcjWYVCl9fu47+
+         XUOwN/daOcJojk/vUzbLOaJXOg1oT/vduguYMyQRtKY+GKEGAQh523+rEkWqcgeQ8n1Q
+         gii2EvjXzKlQmRu8WYOSHGCedB/Fey29rHbMuSQuQjS7LqE33b8PfhUXTfqv1g6jyF4z
+         UCXJjE2RnUbFDarEYgpdgZbk2dHgMMMH+7EITCVTWFWE8gThjhR3t4LR6jeXFFwDmERp
+         l4dA==
+X-Gm-Message-State: AOJu0YwOsuvdHv4NXFqhULRfIxJ+OoAuJGki6RlZBV72cqGac5sXfSzJ
+	tWdCVzRSz2s1Q0E1LwpI1m7llvjLTrmdlOLhyUsFbLqpHbcfC6ac3dfQJwJL0d+ACDz4pp2xzfu
+	UD/pvKw==
+X-Google-Smtp-Source: AGHT+IEfJBrBNRQn8+cn6fgmQOnDkh3t6dmbXJnUtpRU+T1/SW9hG6iOheIivj/skyPPBe7GkdNTpM1ILXI=
+X-Received: from pjzj22.prod.google.com ([2002:a17:90a:eb16:b0:338:3770:a496])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a05:6a21:32a3:b0:32d:95f2:1fe
+ with SMTP id adf61e73a8af0-334a786492fmr18401737637.2.1760978082232; Mon, 20
+ Oct 2025 09:34:42 -0700 (PDT)
+Date: Mon, 20 Oct 2025 09:33:11 -0700
+In-Reply-To: <20250919005955.1366256-1-seanjc@google.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
-References: <cover.1757009416.git.naveen@kernel.org>
+References: <20250919005955.1366256-1-seanjc@google.com>
 X-Mailer: git-send-email 2.51.0.869.ge66316f041-goog
-Message-ID: <176097555536.435958.1932451484992225591.b4-ty@google.com>
-Subject: Re: [RESEND v4 0/7] KVM: SVM: Add support for 4k vCPUs with x2AVIC
+Message-ID: <176097600449.438961.7346944615480363146.b4-ty@google.com>
+Subject: Re: [PATCH 0/9] KVM: VMX: EPTP cleanups and nVMX fixes
 From: Sean Christopherson <seanjc@google.com>
-To: Sean Christopherson <seanjc@google.com>, Paolo Bonzini <pbonzini@redhat.com>, 
-	Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@kernel.org>, Borislav Petkov <bp@alien8.de>, 
-	Dave Hansen <dave.hansen@linux.intel.com>, "Naveen N Rao (AMD)" <naveen@kernel.org>
-Cc: x86@kernel.org, kvm@vger.kernel.org, Jim Mattson <jmattson@google.com>, 
-	Maxim Levitsky <mlevitsk@redhat.com>, Vasant Hegde <vasant.hegde@amd.com>, 
-	Suravee Suthikulpanit <suravee.suthikulpanit@amd.com>, Pankaj Gupta <pankaj.gupta@amd.com>, 
-	Nikunj A Dadhania <nikunj@amd.com>, Alejandro Jimenez <alejandro.j.jimenez@oracle.com>, 
-	Joao Martins <joao.m.martins@oracle.com>, 
-	"Maciej S. Szmigiero" <maciej.szmigiero@oracle.com>
+To: Sean Christopherson <seanjc@google.com>, Paolo Bonzini <pbonzini@redhat.com>
+Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org
 Content-Type: text/plain; charset="utf-8"
 
-On Fri, 05 Sep 2025 00:03:00 +0530, Naveen N Rao (AMD) wrote:
-> Nikunj pointed out that I have missed copying the x86 maintainers though
-> I am adding a new CPUID feature bit. Re-sending this series for that
-> reason.
+On Thu, 18 Sep 2025 17:59:46 -0700, Sean Christopherson wrote:
+> This started as a trivial series to cleanup KVM's handling of EPTPs in
+> anticipation of eliding TLB flushes on task migration[*], but then I made the
+> mistake of trying to test the nested_early_check change, and things snowballed.
 > 
-> --
-> This is v4 of the series posted here:
-> http://lkml.kernel.org/r/cover.1740036492.git.naveen@kernel.org
+> Long story short, nested_early_check is obviously not being used as it's been
+> broken for years, and it's not adding value.  E.g. doesn't help us find KVM
+> bugs, and doesn't provide any meaningful protection for KVM (especially since
+> no one is using it).
 > 
 > [...]
 
-Applied to kvm-x86 svm, with a few minor tweak to drop the enable_apicv check
-from svm_vcpu_precreate() (it's redundant, and to have the SVM and VMX code be
-more consistent).  Thanks!
+Applied to kvm-x86 vmx, thanks!
 
-P.S. I haven't forgotten about the IRQ window fixes, they just require more
-brain power, so I'm waiting until I'm fully charged :-)
-
-[1/7] KVM: SVM: Limit AVIC physical max index based on configured max_vcpu_ids
-      https://github.com/kvm-x86/linux/commit/574ef752d4ae
-[2/7] KVM: SVM: Add a helper to look up the max physical ID for AVIC
-      https://github.com/kvm-x86/linux/commit/f2f6e67a56dc
-[3/7] KVM: SVM: Replace hard-coded value 0x1FF with the corresponding macro
-      https://github.com/kvm-x86/linux/commit/83f3cbcd3a9f
-[4/7] KVM: SVM: Expand AVIC_PHYSICAL_MAX_INDEX_MASK to be a 12-bit field
-      https://github.com/kvm-x86/linux/commit/ca11d9d35e95
-[5/7] KVM: SVM: Move AVIC Physical ID table allocation to vcpu_precreate()
-      https://github.com/kvm-x86/linux/commit/54ffe74cc4ab
-[6/7] x86/cpufeatures: Add X86_FEATURE_X2AVIC_EXT
-      https://github.com/kvm-x86/linux/commit/5d0316e25def
-[7/7] KVM: SVM: Add AVIC support for 4k vCPUs in x2AVIC mode
-      https://github.com/kvm-x86/linux/commit/940fc47cfb0d
+[1/9] KVM: VMX: Hoist construct_eptp() "up" in vmx.c
+      https://github.com/kvm-x86/linux/commit/f48888bb8ad1
+[2/9] KVM: nVMX: Hardcode dummy EPTP used for early nested consistency checks
+      https://github.com/kvm-x86/linux/commit/a8749281e4c6
+[3/9] KVM: x86/mmu: Move "dummy root" helpers to spte.h
+      https://github.com/kvm-x86/linux/commit/a10f5cc3ac9b
+[4/9] KVM: VMX: Use kvm_mmu_page role to construct EPTP, not current vCPU state
+      https://github.com/kvm-x86/linux/commit/2f723a863423
+[5/9] KVM: nVMX: Add consistency check for TPR_THRESHOLD[31:4]!=0 without VID
+      https://github.com/kvm-x86/linux/commit/15fe455dd1a0
+[6/9] KVM: nVMX: Add consistency check for TSC_MULTIPLIER=0
+      https://github.com/kvm-x86/linux/commit/ae8e6ad84177
+[7/9] KVM: nVMX: Stuff vmcs02.TSC_MULTIPLIER early on for nested early checks
+      https://github.com/kvm-x86/linux/commit/f91699d5692d
+[8/9] KVM: nVMX: Remove support for "early" consistency checks via hardware
+      https://github.com/kvm-x86/linux/commit/a175da6d430e
+[9/9] KVM: nVMX: Add an off-by-default module param to WARN on missed consistency checks
+      https://github.com/kvm-x86/linux/commit/1100e4910ad2
 
 --
 https://github.com/kvm-x86/linux/tree/next
