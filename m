@@ -1,253 +1,225 @@
-Return-Path: <kvm+bounces-60566-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-60567-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
-	by mail.lfdr.de (Postfix) with ESMTPS id E60B0BF2B3C
-	for <lists+kvm@lfdr.de>; Mon, 20 Oct 2025 19:26:58 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5F02CBF3415
+	for <lists+kvm@lfdr.de>; Mon, 20 Oct 2025 21:43:30 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 270CD4F9138
-	for <lists+kvm@lfdr.de>; Mon, 20 Oct 2025 17:26:53 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1A04F4854EA
+	for <lists+kvm@lfdr.de>; Mon, 20 Oct 2025 19:43:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 844F8331A44;
-	Mon, 20 Oct 2025 17:26:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E68E832ED59;
+	Mon, 20 Oct 2025 19:43:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="hg22YaG+"
+	dkim=pass (2048-bit key) header.d=ventanamicro.com header.i=@ventanamicro.com header.b="a5mfG97c"
 X-Original-To: kvm@vger.kernel.org
-Received: from out-177.mta0.migadu.com (out-177.mta0.migadu.com [91.218.175.177])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pf1-f180.google.com (mail-pf1-f180.google.com [209.85.210.180])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BDEFC221FC8
-	for <kvm@vger.kernel.org>; Mon, 20 Oct 2025 17:26:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.177
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 703002BEC23
+	for <kvm@vger.kernel.org>; Mon, 20 Oct 2025 19:43:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.180
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1760981208; cv=none; b=OTgeFtUDYQCGBOqOr+1ELU7Frg6PDd/VaDAag54Z7Z5P3gk2MwCP89hVXC1blsgJe6StM/msBPOy97KLNY1XDpNoWOg1EhB2tIGS8Z0yCS5z1xAxLB/gYaCOV6ReP7OmAtNYW//zixfaWjH8VPBASRWvwaz84OOag0WIYBuyGe4=
+	t=1760989402; cv=none; b=r73ju5zeY5flFKcmqHFJwCnT+7nSsslL2naJDSdxxFqzJE445QshF89UnJVWWQ8ZqczMlr57ji2q3HIAxFgZkedFLSbEmngVlve5rk1K1tc6ytBqaXEfG2+8zm3sdicQJiqzJr1itOzVJA8AFTvruGblxEWZHVpEvFspFFDhefI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1760981208; c=relaxed/simple;
-	bh=WELJG3EefeS4+jZAAr3Y0erGnXwGX0GfmBf0DojCpvw=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=txdPbSUOvemw0wi42IZ9WkY6tXIYNfMcgwZUDYTfDZAuyUdeckHnd4gp+neIydYbDtghA/K9b1L6pY3fVM03/bOr5ybwWmHLqLAuJP0VACXsfqfhvNWZSytcUn1Cu+ue6W3PvjH1xVY3AlNkZTm0jGarxcpGsTKw8y1ZyQevyd8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=hg22YaG+; arc=none smtp.client-ip=91.218.175.177
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Date: Mon, 20 Oct 2025 17:26:36 +0000
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1760981204;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=BtZGkLKr3gOVteNjftvPjbbitGBqfKbhGDs2rAE/yFE=;
-	b=hg22YaG+8MmAWS8RPCbEncbMck4iCNpkWOKiAoxHcUGULGrH3KubLz2kS8hDBB6/RYwtRX
-	SjPElmlUNdvUiNykx30qP+UQb0WYT1nW6ABsobuG62MnbMq2hm2qiWfXOAPA2sW3pw5jwf
-	jprnRmU0cMhSa7xNjh8vFL32tYsA35k=
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Yosry Ahmed <yosry.ahmed@linux.dev>
-To: Jim Mattson <jmattson@google.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, Shuah Khan <shuah@kernel.org>, 
-	Sean Christopherson <seanjc@google.com>, Bibo Mao <maobibo@loongson.cn>, 
-	Huacai Chen <chenhuacai@kernel.org>, Andrew Jones <ajones@ventanamicro.com>, 
-	Claudio Imbrenda <imbrenda@linux.ibm.com>, "Pratik R. Sampat" <prsampat@amd.com>, 
-	Kai Huang <kai.huang@intel.com>, Eric Auger <eric.auger@redhat.com>, linux-kernel@vger.kernel.org, 
-	kvm@vger.kernel.org, linux-kselftest@vger.kernel.org
-Subject: Re: [PATCH 4/4] KVM: selftests: Add a VMX test for LA57 nested state
-Message-ID: <4owz4js4mvl4dohgkydcyrdhh2j2xblbwbo7zistocb4knjzdo@kvrzl7vmvg67>
-References: <20250917215031.2567566-1-jmattson@google.com>
- <20250917215031.2567566-5-jmattson@google.com>
+	s=arc-20240116; t=1760989402; c=relaxed/simple;
+	bh=46YL1iGrEGxGTcZR7UAy864AfYF4ZbJbASJ+m8Vy1Uo=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=Vc+gc7PnpfwGPwwuuJuvcUGEOD+4anCbGbg4AzAjhkEqZh205LsDrvQeG+BkE+DGPXJzeBEQ9LN8GCmOb3ZLhr/BIxX3hFF7dSgqTXkGYT6WdhCUTg8zSVIVzrH5DC+bbTFZ/wk3J028ar5ZYQYCroae1hxDLH2sqFsfwAcflDU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ventanamicro.com; spf=pass smtp.mailfrom=ventanamicro.com; dkim=pass (2048-bit key) header.d=ventanamicro.com header.i=@ventanamicro.com header.b=a5mfG97c; arc=none smtp.client-ip=209.85.210.180
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ventanamicro.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ventanamicro.com
+Received: by mail-pf1-f180.google.com with SMTP id d2e1a72fcca58-781206cce18so4848725b3a.0
+        for <kvm@vger.kernel.org>; Mon, 20 Oct 2025 12:43:20 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=ventanamicro.com; s=google; t=1760989400; x=1761594200; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:content-language:from
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=hM5MMLXsYM69EBdIPQteBCdcHt+2UMoOmn9dDxRhd44=;
+        b=a5mfG97cKK6L6qg7GB8i3pN9CegqinKOLdXtgwNOj+8P17cnu35zvGkTFlGLxGqx3z
+         bwg8A3U8a2el5beYTWcK+ejybL/uQDE/E9tEGC2KtmCOLTrGVKdLQ1mYZOkygQXrfNN+
+         904b1+RRGf+upol4SkpetN6iq7WXtNclZEdvVVOxHmrmaEchc0SSFbwplwp9Wc0Iv/5b
+         4DFtBhU/aN6PsBLN5p9MbQBLQWkYYc+FFENACx/t7deFYz8gn57iSsPpB0liyRKNivuQ
+         toKsm9H5hwzy6fcpgIzwAcY51EacTHkHyyXZL9jgA7tckOf/8Urt51h4+W3eFJ/5tv4O
+         +iLQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1760989400; x=1761594200;
+        h=content-transfer-encoding:in-reply-to:content-language:from
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=hM5MMLXsYM69EBdIPQteBCdcHt+2UMoOmn9dDxRhd44=;
+        b=m5dDyI4qzFnmEKOL9aSKd/bfFYOgZ8UmIppIFaZBUZYvpv8nL3HaI95xw0fhorblyW
+         EmWGeosK/JvrOwwDc3C+zydMjmX2scU4wqVNE2t5ebdWS/fQhJczdJ9jzGixzvr4GdMI
+         DlW+oogqNmxOxPliUzyYm5EciyOiyNjR5n9hSddniG89xp84YSpMiRTCtQXNiMRjsgHu
+         jvNTUOA0+qs7xcNEir4mHUUnIWQU8PbZzepLhfL3IZgOKQCuHaTyQth/y0IlOYnA56UI
+         vbvr6Hf2qDYkA36ppQIXfRhR7wMDQy7fth7g848QfpTf7S2qKg55s41wBnhJ/KCz1BTP
+         kD7w==
+X-Forwarded-Encrypted: i=1; AJvYcCW+pFvVK1e9bJKQ5BkXqo/u6vPj2tzaKLDvMfCkyfkeQEQiP+QEj3ZjDbMoTJYvsX/iO00=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzdjslODPA17LvkLQA3oNRtuRykeXp7OqMxqpCuMLBNvPpEVFUa
+	tQr8sI99ac60K/hPdUuM9MspeFMCuxYgz+20q4tm3HzpYBhEURTUliry/vDAseigZs8=
+X-Gm-Gg: ASbGncumr58Spu72aRJnRGl2Eu49+HRdGH54uge2m36oZE4mOJw4ZfUhFv9R/lV5UA2
+	bG0Br76EAOlB6uQmrditKVH8Sq1t4jGBTsyPvwIG6z/rDeEEq1U/DxLDYw9UInXYqv+J1Uu1OP9
+	3rN9l+FBNHWuiAC8JKpMlbrOsPZEwNyW/YpXfqBImDzHV1UNLVMIWLsfFAC0VfeCiDdb60fteDo
+	veKPCpa7uDHUYfbd75VfixKQhm0ITpl5pXrQOhIzskg08SPTezyUjZ3gMdvHm4jvJnT/aBt6yh1
+	pc9UWasi5MHL09NuwSt/IJ4IcJBmGzi5DyqtsQxsiTj5jr4eqiiDq30n4yVZRn2KaOmsZBpBdzY
+	Kn220ak4AvDKtYNoLBRQ34gr4hWF7rcxLexuoNZegJKRcz7WApKP7RXBXGUBqcWqgEW8v09hz3I
+	oRklZzbEpsVOfrtyOsx1AJXTwzt9dlmLKu9f1OUjad6xAYEwuDjvrLCg==
+X-Google-Smtp-Source: AGHT+IEz0c9auRC0TwjskGJJcvcC5ayj8gqgof4QV51C8KuJdIiqhiUNN8QL7OYGY673kk8y9oGq8A==
+X-Received: by 2002:a05:6a00:784:b0:77d:c625:f5d3 with SMTP id d2e1a72fcca58-7a210d8ffd0mr15317951b3a.1.1760989399677;
+        Mon, 20 Oct 2025 12:43:19 -0700 (PDT)
+Received: from ?IPV6:2804:7f0:bcc1:8cb8:dfc4:4af0:d7c6:a030? ([2804:7f0:bcc1:8cb8:dfc4:4af0:d7c6:a030])
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-7a22ff158f8sm9251975b3a.8.2025.10.20.12.43.15
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 20 Oct 2025 12:43:19 -0700 (PDT)
+Message-ID: <ca6a8e5a-f14d-4017-90dc-be566d594eee@ventanamicro.com>
+Date: Mon, 20 Oct 2025 16:43:14 -0300
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250917215031.2567566-5-jmattson@google.com>
-X-Migadu-Flow: FLOW_OUT
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH] RISC-V: KVM: Remove automatic I/O mapping for VM_PFNMAP
+To: fangyu.yu@linux.alibaba.com, anup@brainfault.org, atish.patra@linux.dev,
+ pjw@kernel.org, palmer@dabbelt.com, aou@eecs.berkeley.edu, alex@ghiti.fr,
+ pbonzini@redhat.com, jiangyifei@huawei.com
+Cc: guoren@kernel.org, kvm@vger.kernel.org, kvm-riscv@lists.infradead.org,
+ linux-riscv@lists.infradead.org, linux-kernel@vger.kernel.org
+References: <20251020130801.68356-1-fangyu.yu@linux.alibaba.com>
+From: Daniel Henrique Barboza <dbarboza@ventanamicro.com>
+Content-Language: en-US
+In-Reply-To: <20251020130801.68356-1-fangyu.yu@linux.alibaba.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-On Wed, Sep 17, 2025 at 02:48:40PM -0700, Jim Mattson wrote:
-> Add a selftest that verifies KVM's ability to save and restore
-> nested state when the L1 guest is using 5-level paging and the L2
-> guest is using 4-level paging. Specifically, canonicality tests of
-> the VMCS12 host-state fields should accept 57-bit virtual addresses.
+
+
+On 10/20/25 10:08 AM, fangyu.yu@linux.alibaba.com wrote:
+> From: Fangyu Yu <fangyu.yu@linux.alibaba.com>
 > 
-> Signed-off-by: Jim Mattson <jmattson@google.com>
+> As of commit aac6db75a9fc ("vfio/pci: Use unmap_mapping_range()"),
+> vm_pgoff may no longer guaranteed to hold the PFN for VM_PFNMAP
+> regions. Using vma->vm_pgoff to derive the HPA here may therefore
+> produce incorrect mappings.
+> 
+> Instead, I/O mappings for such regions can be established on-demand
+> during g-stage page faults, making the upfront ioremap in this path
+> is unnecessary.
+> 
+> Fixes: 9d05c1fee837 ("RISC-V: KVM: Implement stage2 page table programming")
+> Signed-off-by: Fangyu Yu <fangyu.yu@linux.alibaba.com>
 > ---
->  tools/testing/selftests/kvm/Makefile.kvm      |   1 +
->  .../kvm/x86/vmx_la57_nested_state_test.c      | 137 ++++++++++++++++++
->  2 files changed, 138 insertions(+)
->  create mode 100644 tools/testing/selftests/kvm/x86/vmx_la57_nested_state_test.c
+
+Hi,
+
+This patch fixes the issue observed by Drew in [1]. I was helping Drew
+debug it using a QEMU guest inside an emulated risc-v host with the
+'virt' machine + IOMMU enabled.
+
+Using the patches from [2], without the workaround patch (18), booting a
+guest with a passed-through PCI device fails with a store amo fault and a
+kernel oops:
+
+[    3.304776] Oops - store (or AMO) access fault [#1]
+[    3.305159] Modules linked in:
+[    3.305603] CPU: 0 UID: 0 PID: 1 Comm: swapper/0 Not tainted 6.11.0-rc4 #39
+[    3.305988] Hardware name: riscv-virtio,qemu (DT)
+[    3.306140] epc : __ew32+0x34/0xba
+[    3.307910]  ra : e1000_irq_disable+0x1e/0x9a
+[    3.307984] epc : ffffffff806ebfbe ra : ffffffff806ee3f8 sp : ff2000000000baf0
+[    3.308022]  gp : ffffffff81719938 tp : ff600000018b8000 t0 : ff60000002c3b480
+[    3.308055]  t1 : 0000000000000065 t2 : 3030206530303031 s0 : ff2000000000bb30
+[    3.308086]  s1 : ff60000002a50a00 a0 : ff60000002a50fb8 a1 : 00000000000000d8
+[    3.308118]  a2 : ffffffffffffffff a3 : 0000000000000002 a4 : 0000000000003000
+[    3.308161]  a5 : ff200000001e00d8 a6 : 0000000000000008 a7 : 0000000000000038
+[    3.308195]  s2 : ff60000002a50fb8 s3 : ff60000001865000 s4 : 00000000000000d8
+[    3.308226]  s5 : ffffffffffffffff s6 : ff60000002a50a00 s7 : ffffffff812d2760
+[    3.308258]  s8 : 0000000000000a00 s9 : 0000000000001000 s10: ff60000002a51000
+[    3.308288]  s11: ff60000002a54000 t3 : ffffffff8172ec4f t4 : ffffffff8172ec4f
+[    3.308475]  t5 : ffffffff8172ec50 t6 : ff2000000000b848
+[    3.308763] status: 0000000200000120 badaddr: ff200000001e00d8 cause: 0000000000000007
+[    3.308975] [<ffffffff806ebfbe>] __ew32+0x34/0xba
+[    3.309196] [<ffffffff806ee3f8>] e1000_irq_disable+0x1e/0x9a
+[    3.309241] [<ffffffff806f1e12>] e1000_probe+0x3b6/0xb50
+[    3.309279] [<ffffffff80510554>] pci_device_probe+0x7e/0xf8
+[    3.310001] [<ffffffff80610344>] really_probe+0x82/0x202
+[    3.310409] [<ffffffff80610520>] __driver_probe_device+0x5c/0xd0
+[    3.310622] [<ffffffff806105c0>] driver_probe_device+0x2c/0xb0
+(...)
+
+
+Further debugging showed that, as far as QEMU goes, the store fault happens in an
+"unassigned io region", i.e. a region where there's no IO memory region mapped by
+any device. There is no IOMMU faults being logged and, at least as far as I've
+observed, no IOMMU translation bugs in the QEMU side as well.
+
+
+Thanks for the fix!
+
+
+Tested-by: Daniel Henrique Barboza <dbarboza@ventanamicro.com>
+
+
+
+[1] https://lore.kernel.org/all/20250920203851.2205115-38-ajones@ventanamicro.com/
+[2] https://lore.kernel.org/all/20250920203851.2205115-20-ajones@ventanamicro.com/
+
+
+
+
+>   arch/riscv/kvm/mmu.c | 20 +-------------------
+>   1 file changed, 1 insertion(+), 19 deletions(-)
 > 
-> diff --git a/tools/testing/selftests/kvm/Makefile.kvm b/tools/testing/selftests/kvm/Makefile.kvm
-> index 41b40c676d7f..f1958b88ec59 100644
-> --- a/tools/testing/selftests/kvm/Makefile.kvm
-> +++ b/tools/testing/selftests/kvm/Makefile.kvm
-> @@ -116,6 +116,7 @@ TEST_GEN_PROGS_x86 += x86/vmx_exception_with_invalid_guest_state
->  TEST_GEN_PROGS_x86 += x86/vmx_msrs_test
->  TEST_GEN_PROGS_x86 += x86/vmx_invalid_nested_guest_state
->  TEST_GEN_PROGS_x86 += x86/vmx_set_nested_state_test
-> +TEST_GEN_PROGS_x86 += x86/vmx_la57_nested_state_test
->  TEST_GEN_PROGS_x86 += x86/vmx_tsc_adjust_test
->  TEST_GEN_PROGS_x86 += x86/vmx_nested_tsc_scaling_test
->  TEST_GEN_PROGS_x86 += x86/apic_bus_clock_test
-> diff --git a/tools/testing/selftests/kvm/x86/vmx_la57_nested_state_test.c b/tools/testing/selftests/kvm/x86/vmx_la57_nested_state_test.c
-> new file mode 100644
-> index 000000000000..7c3c4c1c17f6
-> --- /dev/null
-> +++ b/tools/testing/selftests/kvm/x86/vmx_la57_nested_state_test.c
-> @@ -0,0 +1,137 @@
-> +// SPDX-License-Identifier: GPL-2.0-only
-> +/*
-> + * vmx_la57_nested_state_test
-> + *
-> + * Copyright (C) 2025, Google LLC.
-> + *
-> + * Test KVM's ability to save and restore nested state when the L1 guest
-> + * is using 5-level paging and the L2 guest is using 4-level paging.
-> + *
-> + * This test would have failed prior to commit 9245fd6b8531 ("KVM: x86:
-> + * model canonical checks more precisely").
-> + */
-> +#include "test_util.h"
-> +#include "kvm_util.h"
-> +#include "processor.h"
-> +#include "vmx.h"
-> +
-> +#define LA57_GS_BASE 0xff2bc0311fb00000ull
-> +
-> +static void l2_guest_code(void)
-> +{
-> +	/*
-> +	 * Sync with L0 to trigger save/restore.  After
-> +	 * resuming, execute VMCALL to exit back to L1.
-> +	 */
-> +	GUEST_SYNC(1);
-> +	vmcall();
-> +}
-> +
-> +static void l1_guest_code(struct vmx_pages *vmx_pages)
-> +{
-> +#define L2_GUEST_STACK_SIZE 64
-> +	unsigned long l2_guest_stack[L2_GUEST_STACK_SIZE];
-> +	u64 guest_cr4;
-> +	vm_paddr_t pml5_pa, pml4_pa;
-> +	u64 *pml5;
-> +	u64 exit_reason;
-> +
-> +	/* Set GS_BASE to a value that is only canonical with LA57. */
-> +	wrmsr(MSR_GS_BASE, LA57_GS_BASE);
-> +	GUEST_ASSERT(rdmsr(MSR_GS_BASE) == LA57_GS_BASE);
-> +
-> +	GUEST_ASSERT(vmx_pages->vmcs_gpa);
-> +	GUEST_ASSERT(prepare_for_vmx_operation(vmx_pages));
-> +	GUEST_ASSERT(load_vmcs(vmx_pages));
-> +
-> +	prepare_vmcs(vmx_pages, l2_guest_code,
-> +		     &l2_guest_stack[L2_GUEST_STACK_SIZE]);
-> +
-> +	/*
-> +	 * Set up L2 with a 4-level page table by pointing its CR3 to L1's
-> +	 * PML4 table and clearing CR4.LA57. This creates the CR4.LA57
-> +	 * mismatch that exercises the bug.
-> +	 */
-> +	pml5_pa = get_cr3() & PHYSICAL_PAGE_MASK;
-> +	pml5 = (u64 *)pml5_pa;
-> +	pml4_pa = pml5[0] & PHYSICAL_PAGE_MASK;
-> +	vmwrite(GUEST_CR3, pml4_pa);
+> diff --git a/arch/riscv/kvm/mmu.c b/arch/riscv/kvm/mmu.c
+> index 525fb5a330c0..84c04c8f0892 100644
+> --- a/arch/riscv/kvm/mmu.c
+> +++ b/arch/riscv/kvm/mmu.c
+> @@ -197,8 +197,7 @@ int kvm_arch_prepare_memory_region(struct kvm *kvm,
+>   
+>   	/*
+>   	 * A memory region could potentially cover multiple VMAs, and
+> -	 * any holes between them, so iterate over all of them to find
+> -	 * out if we can map any of them right now.
+> +	 * any holes between them, so iterate over all of them.
+>   	 *
+>   	 *     +--------------------------------------------+
+>   	 * +---------------+----------------+   +----------------+
+> @@ -229,32 +228,15 @@ int kvm_arch_prepare_memory_region(struct kvm *kvm,
+>   		vm_end = min(reg_end, vma->vm_end);
+>   
+>   		if (vma->vm_flags & VM_PFNMAP) {
+> -			gpa_t gpa = base_gpa + (vm_start - hva);
+> -			phys_addr_t pa;
+> -
+> -			pa = (phys_addr_t)vma->vm_pgoff << PAGE_SHIFT;
+> -			pa += vm_start - vma->vm_start;
+> -
+>   			/* IO region dirty page logging not allowed */
+>   			if (new->flags & KVM_MEM_LOG_DIRTY_PAGES) {
+>   				ret = -EINVAL;
+>   				goto out;
+>   			}
+> -
+> -			ret = kvm_riscv_mmu_ioremap(kvm, gpa, pa, vm_end - vm_start,
+> -						    writable, false);
+> -			if (ret)
+> -				break;
+>   		}
+>   		hva = vm_end;
+>   	} while (hva < reg_end);
+>   
+> -	if (change == KVM_MR_FLAGS_ONLY)
+> -		goto out;
+> -
+> -	if (ret)
+> -		kvm_riscv_mmu_iounmap(kvm, base_gpa, size);
+> -
+>   out:
+>   	mmap_read_unlock(current->mm);
+>   	return ret;
 
-Clever :)
-
-> +
-> +	guest_cr4 = vmreadz(GUEST_CR4);
-> +	guest_cr4 &= ~X86_CR4_LA57;
-> +	vmwrite(GUEST_CR4, guest_cr4);
-> +
-> +	GUEST_ASSERT(!vmlaunch());
-> +
-> +	exit_reason = vmreadz(VM_EXIT_REASON);
-> +	GUEST_ASSERT(exit_reason == EXIT_REASON_VMCALL);
-> +}
-> +
-> +void guest_code(struct vmx_pages *vmx_pages)
-> +{
-> +	if (vmx_pages)
-> +		l1_guest_code(vmx_pages);
-
-I think none of the other tests do the NULL check. Seems like the test
-will actually pass if we pass vmx_pages == NULL. I think it's better if
-we let L1 crash if we mess up the setup.
-
-> +
-> +	GUEST_DONE();
-> +}
-> +
-> +int main(int argc, char *argv[])
-> +{
-> +	vm_vaddr_t vmx_pages_gva = 0;
-> +	struct kvm_vm *vm;
-> +	struct kvm_vcpu *vcpu;
-> +	struct kvm_x86_state *state;
-> +	struct ucall uc;
-> +	int stage;
-> +
-> +	TEST_REQUIRE(kvm_cpu_has(X86_FEATURE_VMX));
-> +	TEST_REQUIRE(kvm_cpu_has(X86_FEATURE_LA57));
-> +	TEST_REQUIRE(kvm_has_cap(KVM_CAP_NESTED_STATE));
-> +
-> +	vm = vm_create_shape_with_one_vcpu(VM_SHAPE(VM_MODE_PXXV57_4K), &vcpu,
-> +					   guest_code);
-> +
-> +	/*
-> +	 * L1 needs to read its own PML5 table to set up L2. Identity map
-> +	 * the PML5 table to facilitate this.
-> +	 */
-> +	virt_map(vm, vm->pgd, vm->pgd, 1);
-> +
-> +	vcpu_alloc_vmx(vm, &vmx_pages_gva);
-> +	vcpu_args_set(vcpu, 1, vmx_pages_gva);
-> +
-> +	for (stage = 1;; stage++) {
-> +		vcpu_run(vcpu);
-> +		TEST_ASSERT_KVM_EXIT_REASON(vcpu, KVM_EXIT_IO);
-> +
-> +		switch (get_ucall(vcpu, &uc)) {
-> +		case UCALL_ABORT:
-> +			REPORT_GUEST_ASSERT(uc);
-> +			/* NOT REACHED */
-> +		case UCALL_SYNC:
-> +			break;
-> +		case UCALL_DONE:
-> +			goto done;
-> +		default:
-> +			TEST_FAIL("Unknown ucall %lu", uc.cmd);
-> +		}
-> +
-> +		TEST_ASSERT(uc.args[1] == stage,
-> +			    "Expected stage %d, got stage %lu", stage, (ulong)uc.args[1]);
-> +		if (stage == 1) {
-> +			pr_info("L2 is active; performing save/restore.\n");
-> +			state = vcpu_save_state(vcpu);
-> +
-> +			kvm_vm_release(vm);
-> +
-> +			/* Restore state in a new VM. */
-> +			vcpu = vm_recreate_with_one_vcpu(vm);
-> +			vcpu_load_state(vcpu, state);
-> +			kvm_x86_state_cleanup(state);
-
-It seems like we only load the vCPU state but we don't actually run it
-after restoring the nested state. Should we have another stage and run
-L2 again after the restore? What is the current failure mode without
-9245fd6b8531?
-
-> +		}
-> +	}
-> +
-> +done:
-> +	kvm_vm_free(vm);
-> +	return 0;
-> +}
-> -- 
-> 2.51.0.470.ga7dc726c21-goog
-> 
 
