@@ -1,81 +1,65 @@
-Return-Path: <kvm+bounces-60479-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-60480-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id 758C0BEF699
-	for <lists+kvm@lfdr.de>; Mon, 20 Oct 2025 08:09:35 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 17A64BEF6E1
+	for <lists+kvm@lfdr.de>; Mon, 20 Oct 2025 08:11:20 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 29ACA4E6652
-	for <lists+kvm@lfdr.de>; Mon, 20 Oct 2025 06:09:34 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id AD5773A52A4
+	for <lists+kvm@lfdr.de>; Mon, 20 Oct 2025 06:10:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A53A12D190C;
-	Mon, 20 Oct 2025 06:09:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9A1A72D46DD;
+	Mon, 20 Oct 2025 06:10:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="BVyLvFnP"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="Lel4D+yE"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-wr1-f42.google.com (mail-wr1-f42.google.com [209.85.221.42])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.9])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 00E441DE4E0
-	for <kvm@vger.kernel.org>; Mon, 20 Oct 2025 06:09:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.42
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DB4D02D1F61;
+	Mon, 20 Oct 2025 06:10:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.9
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1760940567; cv=none; b=mH0LkOzS9HXwstgm7FC67oOTXl9ExqoMGTZjbeDUeFC1LhhHE6hIqZpYBQUuUzuyQaRuYrXUc93tg4la8DD26JESV50RS7A4/+aCTfZ9GQVJ3iPUOPVAnbjGI6YyPQJHpKrcVFgN05zbU4Xrrb6winyF/nynA568RZJFOcK/ikc=
+	t=1760940628; cv=none; b=PEiSpqRlFemQJi5Y4qcgiG5vSS8za/L4I5ZUqdgTWzr1+AHRsWTbJo+n+yHK8lNq83tEu+/EDYa6lpNscfp/D98FgPZ6Pc5J+ciJmk5l6kiEgmiZTwl302vjdWP/VeO9KzRN9DBloQ9lrJCM8MM+QX5Mgbgg0eN/CXQ1WEKGK3o=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1760940567; c=relaxed/simple;
-	bh=K07z7IQuUy3xSlk3DlaIRchekKzbk/TwcGeim4FjTlQ=;
+	s=arc-20240116; t=1760940628; c=relaxed/simple;
+	bh=zKX6e/aPVzdbKYjY+PArPnedG80o7VOUx0Bjzuw3Whs=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=oqfIHJ8uFi7j9eC8C+aSICyZlXpdnSHzo1ksmI10g7L5yHaZS6RN5eP7jCylwkblXwNpLGimlds6XbIz+JmnTeiVEyq/06oVTGjr0ka0zkGmFD5trjbR1p4qzKi706HPnpwBjI9SxfcI6APkY6Fi9JhET9pr6zKvScIeMt3G98Y=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=BVyLvFnP; arc=none smtp.client-ip=209.85.221.42
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
-Received: by mail-wr1-f42.google.com with SMTP id ffacd0b85a97d-3f2cf786abeso3018910f8f.3
-        for <kvm@vger.kernel.org>; Sun, 19 Oct 2025 23:09:25 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1760940564; x=1761545364; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=xK3vQr3w7c2275t0XHP867DUAg+tgBdfWMCxjmYkzF4=;
-        b=BVyLvFnPemSkvqs9Mqfi6NB0wGd7bfKSDT0Cdy5CYbUI/1X96IEP7ok0ml3zoR9HmS
-         ht6/6vVzOhXPkyAcJlMjH9+eIAdiKoaCcdRQfmHnxuM2/QFB4KIUTCE30w9pIzgRhfHc
-         zg9YXSNxyBdzQKrWTsnmNuT46CgSkFIXKgOAO2wqlFV181bhfyN+ZkpGxXSs7EHwgqHM
-         wcSb2fj+6lgqnCLjG9W6joK5fDm16sANCOPfwEFB+Z+t7RqI8kYUJjXAHVixSmOHVsrf
-         pxVMPgYFHUOPhnYqFLO/CktNcp6lhjwLhdVc/sGsv4xCVg4LEZoPTWx2UL4QQMhT+Nyw
-         nsUQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1760940564; x=1761545364;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=xK3vQr3w7c2275t0XHP867DUAg+tgBdfWMCxjmYkzF4=;
-        b=XJESLgfsjbfDs7V+PArYkT0mREH7HrLSUYz+HriPCuwMNlDIEgMeNGn4W3ZHbtgjbp
-         INp8Q1GlFpc/mhmTfzDq/sjBmalWxpnpRQ/+EMHmMFliDpc8hDQ1ak6DpUoq+8vQOxuI
-         XH56jfKGks4Ip32DpMGRuurQjO4jpIZ1ZKutUJVS7fesTPQGUCOrCwoVgg9D0xpFhgna
-         Y8LcPaI2l+VXbbtlgsdgIA32G/QdgKIvoHVpr/oC92Siy4k0r+comH5a7lCKyqhsEa5v
-         lk8cR14Q16B4pcN9nKxmIxjnqpurs7ipQ8Vbo6x9BeY7Y3YABksFjt264S/GTVS95Jde
-         SzPQ==
-X-Forwarded-Encrypted: i=1; AJvYcCXZ8DRMi8nl5iJp2Hsi/O2xvxIRDSkenHonSq6TIGpdyyuKedTCdCawgjsOyha+GX7hPKA=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yx0tLpfBAR/PlrXeGgERjNCLuI87flJt4UWikED77w39glSU0Zd
-	1nROWw0yjD/Ks0KdWCYKRmfejQ2UhNtHMvUTGRVe9wrRO+L5/U9mQBTy/vcGKs85TYU=
-X-Gm-Gg: ASbGncsVZMqgauj1SOgroLXGzx7e5EPZQ3QK+aSsKTroKYfKWROUFzqTvIvQ0MTzYLt
-	fs4ZGAFlEzSIO66jeEvLZRc0eXo+cVAcMGojJ9U7/Fy4UrLTdYNRu0rLaSndU55UeGmuGWAVHjt
-	Zk89XKlT7pX26ICO0+i7BZn0HyYJt/waC2T8gbmb5Cx4yDVXQ98m2pjGAXFu3vogvmxIl5u4/J0
-	mq8l327MHdv/tqEtZdeKD2fxnbjcgeRQYhQB3XLPR7dvOcLM4YRrKYXY45HwHZppdbTOLqqZOlV
-	ab7k88akdmlRbvwZ2JDMxTOUj400WuPUaDPMNcK6tFYniRLYtuZlBk0aCu0nnpdI/sha3UbyHjS
-	gJrASLGTa5WT6NdhtDf29A79Wo4y5fY5sn6mtgCl24oo7lq7GOo3aOJCJa0N9ld8c2cQFgsdTQ2
-	eyPp0xZXAodSdar3ulk+nWwQ16s2uqi0QiBaCqV5KRih8=
-X-Google-Smtp-Source: AGHT+IH6aE1/9mNQVtfezNv1vXAOqDvkNrJ2zXOqGMeA57yHsWkWEwgHEm6EoTlGntSTI5kGSeXAlw==
-X-Received: by 2002:a05:6000:40ca:b0:427:a3d:71ff with SMTP id ffacd0b85a97d-4270a3d7470mr5688361f8f.58.1760940564209;
-        Sun, 19 Oct 2025 23:09:24 -0700 (PDT)
-Received: from [192.168.69.221] (88-187-86-199.subs.proxad.net. [88.187.86.199])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-427ea5a0ec2sm13357109f8f.3.2025.10.19.23.09.22
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sun, 19 Oct 2025 23:09:23 -0700 (PDT)
-Message-ID: <3de8cdd2-ffd9-4f6a-ab2c-fa0782310746@linaro.org>
-Date: Mon, 20 Oct 2025 08:09:22 +0200
+	 In-Reply-To:Content-Type; b=Btu0I/NuComOE3QgKeWYNycm6vydP8U9jxIix3G+DtGPi18SHQyY+kSxszo8+dAa11TI1xm2YVl/2zJveowgAMmF509a7c48PAlHFceaBaqiqMhK8f8kXpBgGDxwJ+dF5Wy8Blx5zb2qENxmTdnu3JZMBAULK7I/dT0FDL3XRx0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=Lel4D+yE; arc=none smtp.client-ip=198.175.65.9
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1760940626; x=1792476626;
+  h=message-id:date:mime-version:subject:to:cc:references:
+   from:in-reply-to:content-transfer-encoding;
+  bh=zKX6e/aPVzdbKYjY+PArPnedG80o7VOUx0Bjzuw3Whs=;
+  b=Lel4D+yE4SSywoQyesE4ZNB4j9PzgKtXXV96ULimgPs7B0wiAOiqtvCL
+   mAPcVQ9VMREMGo6LoyxT73tk5sKiL34UDD19yu3PB8Q9Z4T9Qudn64L4H
+   cL9J6edPA0G/4cepRpxoHT9QwJ5J7dLSWThgRRCItccfmGAoL2vKR0cXe
+   DN2vzRXZhb35Igd7pPFs7m9nP1A1jAGJefxeNdz4pzi3RRE/OmoxeA8op
+   O7HF7yQ+V2WhA2Ow9riZpqDmtfzupcNxofnPDZcBnmEcBVBSeK/Tuu0gL
+   gI9maUPDeh18rs/79sCVDQPWRux9GZQEIgK6VwBbPvn5oQGJlnGTd53GG
+   A==;
+X-CSE-ConnectionGUID: sGVqX451RwKJ5/7IMJgVKQ==
+X-CSE-MsgGUID: APtIHmZ1TIiCZc/U8gUdYQ==
+X-IronPort-AV: E=McAfee;i="6800,10657,11587"; a="85674158"
+X-IronPort-AV: E=Sophos;i="6.19,242,1754982000"; 
+   d="scan'208";a="85674158"
+Received: from orviesa008.jf.intel.com ([10.64.159.148])
+  by orvoesa101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 19 Oct 2025 23:10:17 -0700
+X-CSE-ConnectionGUID: 0KdWHuIDQr6JIP6KPTPuWQ==
+X-CSE-MsgGUID: OQy5l2V/S5CoEMFWBMUSuA==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.19,242,1754982000"; 
+   d="scan'208";a="183269313"
+Received: from unknown (HELO [10.238.2.123]) ([10.238.2.123])
+  by orviesa008-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 19 Oct 2025 23:10:15 -0700
+Message-ID: <0a49bd9b-e4d8-42eb-854c-e8730b5a58b7@intel.com>
+Date: Mon, 20 Oct 2025 14:10:12 +0800
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -83,45 +67,103 @@ List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v3 08/10] hw/i386/apic: Ensure own APIC use in
- apic_msr_{read, write}
+Subject: Re: [PATCH v2 2/2] KVM: TDX: WARN if a SEAMCALL VM-Exit makes its way
+ out to KVM
+To: "Huang, Kai" <kai.huang@intel.com>, "seanjc@google.com"
+ <seanjc@google.com>
+Cc: "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+ "pbonzini@redhat.com" <pbonzini@redhat.com>,
+ "Williams, Dan J" <dan.j.williams@intel.com>,
+ "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+ "Edgecombe, Rick P" <rick.p.edgecombe@intel.com>,
+ "binbin.wu@linux.intel.com" <binbin.wu@linux.intel.com>
+References: <20251016182148.69085-1-seanjc@google.com>
+ <20251016182148.69085-3-seanjc@google.com>
+ <46eb76240a29cb81b6a8aa41016466810abef559.camel@intel.com>
+ <aPJ8A8u8zIvp-wB4@google.com>
+ <38ac916f7c3ae7520708f37389f5524d9278c648.camel@intel.com>
 Content-Language: en-US
-To: Bernhard Beschow <shentey@gmail.com>, qemu-devel@nongnu.org
-Cc: Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
- Laurent Vivier <laurent@vivier.eu>, "Michael S. Tsirkin" <mst@redhat.com>,
- Eduardo Habkost <eduardo@habkost.net>, Zhao Liu <zhao1.liu@intel.com>,
- kvm@vger.kernel.org, Michael Tokarev <mjt@tls.msk.ru>,
- Cameron Esfahani <dirty@apple.com>, qemu-block@nongnu.org,
- Paolo Bonzini <pbonzini@redhat.com>, qemu-trivial@nongnu.org,
- Laurent Vivier <lvivier@redhat.com>,
- Richard Henderson <richard.henderson@linaro.org>,
- Roman Bolshakov <rbolshakov@ddn.com>, Phil Dennis-Jordan
- <phil@philjordan.eu>, John Snow <jsnow@redhat.com>,
- Fabiano Rosas <farosas@suse.de>, Gerd Hoffmann <kraxel@redhat.com>,
- Sunil Muthuswamy <sunilmut@microsoft.com>,
- Marcelo Tosatti <mtosatti@redhat.com>
-References: <20251019210303.104718-1-shentey@gmail.com>
- <20251019210303.104718-9-shentey@gmail.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=C3=A9?= <philmd@linaro.org>
-In-Reply-To: <20251019210303.104718-9-shentey@gmail.com>
+From: Xiaoyao Li <xiaoyao.li@intel.com>
+In-Reply-To: <38ac916f7c3ae7520708f37389f5524d9278c648.camel@intel.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+Content-Transfer-Encoding: 7bit
 
-On 19/10/25 23:03, Bernhard Beschow wrote:
-> Avoids the `current_cpu` global and seems more robust by not "forgetting" the
-> own APIC and then re-determining it by cpu_get_current_apic() which uses the
-> global.
+On 10/18/2025 4:58 AM, Huang, Kai wrote:
+> On Fri, 2025-10-17 at 10:25 -0700, Sean Christopherson wrote:
+>> On Fri, Oct 17, 2025, Kai Huang wrote:
+>>> On Thu, 2025-10-16 at 11:21 -0700, Sean Christopherson wrote:
+>>>> WARN if KVM observes a SEAMCALL VM-Exit while running a TD guest, as the
+>>>> TDX-Module is supposed to inject a #UD, per the "Unconditionally Blocked
+>>>> Instructions" section of the TDX-Module base specification.
+>>>>
+>>>> Reported-by: Xiaoyao Li <xiaoyao.li@intel.com>
+>>>> Signed-off-by: Sean Christopherson <seanjc@google.com>
+>>>> ---
+>>>>   arch/x86/kvm/vmx/tdx.c | 3 +++
+>>>>   1 file changed, 3 insertions(+)
+>>>>
+>>>> diff --git a/arch/x86/kvm/vmx/tdx.c b/arch/x86/kvm/vmx/tdx.c
+>>>> index 097304bf1e1d..ffcfe95f224f 100644
+>>>> --- a/arch/x86/kvm/vmx/tdx.c
+>>>> +++ b/arch/x86/kvm/vmx/tdx.c
+>>>> @@ -2148,6 +2148,9 @@ int tdx_handle_exit(struct kvm_vcpu *vcpu, fastpath_t fastpath)
+>>>>   		 * - If it's not an MSMI, no need to do anything here.
+>>>>   		 */
+>>>>   		return 1;
+>>>> +	case EXIT_REASON_SEAMCALL:
+>>>> +		WARN_ON_ONCE(1);
+>>>> +		break;
+>>>>
+>>>
+>>> While this exit should never happen from a TDX guest, I am wondering why
+>>> we need to explicitly handle the SEAMCALL?  E.g., per "Unconditionally
+>>> Blocked Instructions" ENCLS/ENCLV are also listed, therefore
+>>> EXIT_REASON_ELCLS/ENCLV should never come from a TDX guest either.
+>>
+>> Good point.  SEAMCALL was obviously top of mind, I didn't think about all the
+>> other exits that should be impossible.
+>>
+>> I haven't looked closely, at all, but I wonder if we can get away with this?
+>>
+>> diff --git a/arch/x86/kvm/vmx/tdx.c b/arch/x86/kvm/vmx/tdx.c
+>> index 097304bf1e1d..4c68444bd673 100644
+>> --- a/arch/x86/kvm/vmx/tdx.c
+>> +++ b/arch/x86/kvm/vmx/tdx.c
+>> @@ -2149,6 +2149,8 @@ int tdx_handle_exit(struct kvm_vcpu *vcpu, fastpath_t fastpath)
+>>                   */
+>>                  return 1;
+>>          default:
+>> +               /* All other known exits should be handled by the TDX-Module. */
+>> +               WARN_ON_ONCE(exit_reason.basic <= c);
+>>                  break;
+>>          }
 > 
-> Signed-off-by: Bernhard Beschow <shentey@gmail.com>
-> ---
->   include/hw/i386/apic.h               |  4 ++--
->   hw/intc/apic.c                       | 10 ++--------
->   target/i386/hvf/hvf.c                |  4 ++--
->   target/i386/tcg/system/misc_helper.c |  4 ++--
->   4 files changed, 8 insertions(+), 14 deletions(-)
+> Not 100% sure, but should be fine?  Needs more second eyes here.
+> 
+> E.g., when a new module feature makes another exit reason possible then
+> presumably we need explicit opt-in to that feature.
+> 
+> Don't quite follow 'exit_reason.basic <= c' part, though.  Maybe we can
+> just unconditional WARN_ON_ONCE()?
+> 
+> Or we can do things similar to VMX:
+> 
+>          vcpu_unimpl(vcpu, "vmx: unexpected exit reason 0x%x\n",
+>                      exit_reason.full);
+> 
+> Or just get rid of this patch :-)
 
-Good cleanup!
+I agree to it.
 
-Reviewed-by: Philippe Mathieu-Daudé <philmd@linaro.org>
+WARN_ON_ONCE() seems not provide more information except that we can 
+identify quickly there is TDX module bug when it gets hit.
 
+But it's not too hard to get these information from the 
+KVM_INTERNAL_ERROR_UNEXPECTED_EXIT_REASON with vp_enter_ret in data[0].
+
+And if we add WARN_ON_ONCE() here, we need to evaluate if it needs to 
+update "EXIT_REASON_TDCALL" everytime a new EXIT reason is introduced.
+e.g., currently the largest exit reason number defined in SDM is 79 (for 
+WRMSRLIST) and it is actually handled by TDX module and KVM cannot 
+receive it from a TD vcpu.
 
