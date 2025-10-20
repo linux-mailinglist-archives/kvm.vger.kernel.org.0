@@ -1,81 +1,81 @@
-Return-Path: <kvm+bounces-60489-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-60490-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5D12ABEFF67
-	for <lists+kvm@lfdr.de>; Mon, 20 Oct 2025 10:32:03 +0200 (CEST)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3356DBEFFA3
+	for <lists+kvm@lfdr.de>; Mon, 20 Oct 2025 10:34:31 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id A96871895547
-	for <lists+kvm@lfdr.de>; Mon, 20 Oct 2025 08:32:14 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 092A54EFFD8
+	for <lists+kvm@lfdr.de>; Mon, 20 Oct 2025 08:34:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 207242E5B36;
-	Mon, 20 Oct 2025 08:31:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1A1262EB86E;
+	Mon, 20 Oct 2025 08:34:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="TyU55ZF+"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="HLun3ULD"
 X-Original-To: kvm@vger.kernel.org
 Received: from mail-wm1-f44.google.com (mail-wm1-f44.google.com [209.85.128.44])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7F5B32EB862
-	for <kvm@vger.kernel.org>; Mon, 20 Oct 2025 08:31:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 654732E5B05
+	for <kvm@vger.kernel.org>; Mon, 20 Oct 2025 08:34:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.44
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1760949093; cv=none; b=J4Fk8vsynkCbedD8639nHQKUVTp67QZl+k+QQhZTEsEK+iFwL6pAAe8+bh0th3+C0yWwcrJK43F5UJkF5fj2qs8PmZMjnYzJYANqmxSid0D+QVX591dBURBmgzA+9aE56yUIZNJUFvhG1erEAIlIe5Fvo9UPMvCYW7srH89s5vU=
+	t=1760949262; cv=none; b=ZTgBfSHG7bBxmIpooWaHD09ifGRsQGZMBK9XHXrLGROkCfS6SNRx0t9aRBW/pEvt56ZoMVUzdzHRkzsT6k1tmVCmH/2hrBdb5iTkOgtZuBt6QGEvPx5lQ6f64wTGAHuT+GJaIjUEIAVp35T6shO12MDhF61PokhQ6/BYroATrxA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1760949093; c=relaxed/simple;
-	bh=cYicjUyw4fyLwOO/HzjAc8wtZlZKk73qMBwKzQs0fmc=;
+	s=arc-20240116; t=1760949262; c=relaxed/simple;
+	bh=l/AKbtlGs+rLu1RGd9vJL1pFBu2oKZk1Gdz6fooXr1U=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=BGbe9CLqNs85DO89h3crXp22ikzyVAicf0UqTBaOGq3B/Bi4dZ8czzDIIF4hrwOm4YP6Xyx038BPjHCNaMTvNKSY2noZhS/tYZ7dFVJiCafe3svJuqZf1HGWG8mEIfRTr+2nqVafX8fV/hYl/PyJN6RDa+86l72UeE9zn7djuKE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=TyU55ZF+; arc=none smtp.client-ip=209.85.128.44
+	 In-Reply-To:Content-Type; b=MIUSrxKoxia9QB9jTGiPPQe3C+TPJ74AXyBCjLdJLwACaByiZLAw5An4KjmPu9O17qCXtC4UxbMKH8BbWJy1Hnbo2ywQuwCEnjMzsKj1Z7u2ixksafoof4UEj7mhhAwIbHJ9kxOzA4XtX96PYc4sEdmbVxLNtvdS8BY52sU5+Ms=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=HLun3ULD; arc=none smtp.client-ip=209.85.128.44
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
-Received: by mail-wm1-f44.google.com with SMTP id 5b1f17b1804b1-46b303f7469so31254115e9.1
-        for <kvm@vger.kernel.org>; Mon, 20 Oct 2025 01:31:31 -0700 (PDT)
+Received: by mail-wm1-f44.google.com with SMTP id 5b1f17b1804b1-46b303f7469so31288015e9.1
+        for <kvm@vger.kernel.org>; Mon, 20 Oct 2025 01:34:20 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1760949090; x=1761553890; darn=vger.kernel.org;
+        d=linaro.org; s=google; t=1760949259; x=1761554059; darn=vger.kernel.org;
         h=content-transfer-encoding:in-reply-to:from:references:cc:to
          :content-language:subject:user-agent:mime-version:date:message-id
          :from:to:cc:subject:date:message-id:reply-to;
-        bh=Kfk0zu0vmO9W22pWKATMNhqU90DG1WSCANu4coVqJ3k=;
-        b=TyU55ZF+wEeLStpOQRAaI31tCJa0+Y2ZpobfWPuBbQX3CS3PGuzvPMbg6rfcrGyyua
-         iHCB83+JFOIF4U0dZ5UH+xD1hE+p8zXBwY8Jj9jZgcImo8dBLDo0LYaiRTfaQkqHDnvI
-         CupfnWxFa4n1SYs+yeedCdZqE7Ly1bRWZPq3GyPOLDlyD3mVG+D9xkEw6vl7c1yFrVkA
-         x1yscgWGCQve85hVVatbZWv29oBTi+eMHjSlNU5cITChaLHuKU8LRkWJl15UR1c49hTJ
-         jIHOV/sZ+uN8yTje4gRacftMOipRAfQWIl12XfvdozfZ+GryDohTnXT6xr3VNXSt1zdG
-         F32w==
+        bh=QZOu69Wpkt3dDJ7X/UjOQfTO/q/0Y84qP/FVRQHU0gQ=;
+        b=HLun3ULDnshB1o2tSGb7NhRM+R/zzRDkE2LOxMa/3d5APmSNMkldDjo5JNYlBhrAbj
+         Gmh3mjYyGAYbGBplAl4GpkPwhf+mvNowdMruvRr66amyd07parZNYg8PYqhD7JTLT+7/
+         ApSd6JEoNy+S5FaivKL69ZZvHNf9cetMNGcYhaNjb1UWTgBZX1uUOKMCk3bDaqA+61cO
+         nRPcxNO7oPEl/rkEtwyv3EehRRfS/H/A4gjB6wHpt8RtTEvEbiRUHyK7p6st1civQu4T
+         RfnPYylf62B3cmYoqf7+YhK175qeI0fVTUmkd43nOIOo6A8Og1I0koR81FOMSau/pGF1
+         1IEw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1760949090; x=1761553890;
+        d=1e100.net; s=20230601; t=1760949259; x=1761554059;
         h=content-transfer-encoding:in-reply-to:from:references:cc:to
          :content-language:subject:user-agent:mime-version:date:message-id
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=Kfk0zu0vmO9W22pWKATMNhqU90DG1WSCANu4coVqJ3k=;
-        b=TtZneC+wptDckHCdJ2jOWAAGopOPpbTrqBVA3qivXKlHgu7OL0B5kGDD21JbJ23Yd4
-         ZwK0Gs9Z91k013w2b+XjW6zAu5KFkSMunCE/cKLz6KBcMKErhl0z8wMCAoyczkc72oOW
-         T9ukwrkeQLYvuU+X29ypXcznmj8SeMtYIKlj7evGmepe7YEb1IBVsgKRXmja4u+s38SC
-         djSDG0E/FnMevXmKMn1xcna/uBSbnxE95xfZaD1GU/bsuTDXwtXOarF3tRtsHDjYBexQ
-         7VdVxyRmHMt6zh/xwYKVMLBd11gEdbeURYYxeV67HnA35wU6wvzXKDY3KSlk2es+Ta8G
-         rkKg==
-X-Forwarded-Encrypted: i=1; AJvYcCU4PolWaZ4b3Powd+FU7OYKXXTVeJYGWb772JZwtl0/A2sPyV1vCcxF3RPD+oI4B8xk4Tk=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yx1T0epAkA3ZXTsA5/f3Cz4QERqc+HMrIogqnglYKGy48An2L7z
-	HWfuMu16i9uWmk7dur6YPLkuTJPb8v4BOt3t8+kfR99TqAkRFLDWfnJjJI8XZIpgi8U=
-X-Gm-Gg: ASbGncu4o3ZxwcRJwpLtYcWE8av/oel5wkbi7hGrUGKpjJU9LKgS2qAKgTYjbFEVsYb
-	X/slIajovS7NxQyFRPhx/xLBEXOUsQ7V0oNoNIOqA2crTTYS5katGY9OQ10o2dEOeayhfrjonxm
-	G+8hP4LPfQUbkTlRM1kXN+skXj0tteet3RIWu31ALQ6rdgbXlkUlu4puICQxNK+aWV4S/4WbBHm
-	Jq3YMKQHftUCaQEqbw3r0W8B8vYKgxiqZKnh1UeGYUKwbRMEUPfETO6EHbepPfDTqYQ9PgOvhOG
-	qhuonV/jMbAD/UZFhNnibHn88sc/EC0ktVNATUCggoHWVquReyXAYjfb3UhCvbM7Yepj9OCi1dC
-	7JVopA8XPl5wYJbGo9s64ayoyzSm4n2DE/38AMjPy3rg1UXl9rxTQxIio3uiGsnzTs9A1lrYVA2
-	vbsanfgSbn/jhElMIxVJN7copTgh0OuDMfG+uwXtZJxBseJJEZsPxr9A==
-X-Google-Smtp-Source: AGHT+IGMZtfmBcTewqhPn1UIg+L75Wku84JXFjnzM4sfO50VVAoNSP2FKvx8EcGUTSa8RrcqwmTWoQ==
-X-Received: by 2002:a05:600c:524f:b0:471:115e:624f with SMTP id 5b1f17b1804b1-4711790c2d6mr85823025e9.21.1760949089797;
-        Mon, 20 Oct 2025 01:31:29 -0700 (PDT)
+        bh=QZOu69Wpkt3dDJ7X/UjOQfTO/q/0Y84qP/FVRQHU0gQ=;
+        b=gmJIkTC/JZw9Id2DU9qVXIs8N3Y7Wt9sK1niLKdAYMJL2CQfl2qBw1mhViUBsTsqL4
+         PSAVJwTtKW/DAHNA9xtnhjFod+KkFbCexDYldxZ9SrU2lKbvV4oI26Lm7e2MrKfWQ/Eo
+         2m1v52HXgp+rQb/Yq9j61rx8IYUCalMc6FGpCl73TZKcIdmyzoZDP54UDEuvBo3NE6n+
+         QBM2v0nfgK4Fdy9oN25EyBpRaC3eDS3SPLqAzPORGimqYv2lyzOjB7R2MNGnBb+6H0vz
+         aodtFH1Os8Wdhv3I9hK9VnP80D62dhpC3KLdWlbvivvPex9DQp3YwaNqPX3SpEwnmNOt
+         hc8Q==
+X-Forwarded-Encrypted: i=1; AJvYcCVaz1kSH+WQ1Gizc/mmrQadRz9hF0FnpXWlDKKrP4tJS+8UqT8F1PCCHOaJ9ch3eq5hFeM=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwcoYacoGtXIBQJxH6JU8DHygtqHdTHgOZHVdT1Q+7AEK8An8ON
+	LsIEjFkFvEWfBM519RDsvAQQoVk3Jqq70Dl9Ez0AloooDxuM/QfPn+HFWtPCXpZu6hs=
+X-Gm-Gg: ASbGncv3M+cE100VgZpnCJLPgmNO7ooIUdEAHmeWzZ+5ixH66yyp4vsvBIEWDK4u92w
+	msGTpeoujmvjZfgy4MkBuIvixPYr2b+MSL/1bNV2MTTRaSn420UBzR2yJUno4Vpfawtj3XCnUey
+	y0bpB/rLeEkAKmKe+6djm7Tg3OyBWOsD58fr9qH6cXhZIsbRGixpRjZ1ayRAAnchWca/2D97+3t
+	Ns0JHrIMXhtM3FtcOy55oGxowiHqER6gaKsbt8r1nalUVJWOYiDPUJ66LoUaRF0VR/y8JBlq9q7
+	JuagTxgssdKWO+sjHBi6lFZoAvhKmA6DrXayG61Qn17pnd5dhrU5TEiLjPxrzMEiuwH0tJbuO1I
+	GZSs1EYNezVxPrbySGQhLgO+SArK1Nv5Q4bDnzpeBW+c/bOw69SgBrkjf5TgUhQMtctEeR+HzNj
+	2Lel6mnVLTa7ULMQEbCEneEqsKyG+vZlmMdu1e1zGNGQtLTvP/zKkimg==
+X-Google-Smtp-Source: AGHT+IGGsye8M5+dwNaN8vHqp+cAUAvPtJ8oi5JS9xfyqWbcRhTeKqxsvvtbikovqWp1apKaFsOGxA==
+X-Received: by 2002:a05:600c:820b:b0:46e:1fc2:f9ac with SMTP id 5b1f17b1804b1-4711787dc76mr80589615e9.10.1760949258665;
+        Mon, 20 Oct 2025 01:34:18 -0700 (PDT)
 Received: from [192.168.69.221] (88-187-86-199.subs.proxad.net. [88.187.86.199])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-47152959b6dsm129861005e9.7.2025.10.20.01.31.28
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4710f2ab58bsm103955975e9.10.2025.10.20.01.34.16
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 20 Oct 2025 01:31:29 -0700 (PDT)
-Message-ID: <4f8a640e-d1ac-49c8-8b14-743d248a91e4@linaro.org>
-Date: Mon, 20 Oct 2025 10:31:28 +0200
+        Mon, 20 Oct 2025 01:34:17 -0700 (PDT)
+Message-ID: <3139a9ae-c251-4544-b9a4-8818587e85e4@linaro.org>
+Date: Mon, 20 Oct 2025 10:34:16 +0200
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -83,7 +83,8 @@ List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v3 01/10] hw/timer/i8254: Add I/O trace events
+Subject: Re: [PATCH v3 03/10] hw/rtc/mc146818rtc: Convert CMOS_DPRINTF() into
+ trace events
 Content-Language: en-US
 To: Bernhard Beschow <shentey@gmail.com>, qemu-devel@nongnu.org
 Cc: Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
@@ -100,21 +101,40 @@ Cc: Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
  Sunil Muthuswamy <sunilmut@microsoft.com>,
  Marcelo Tosatti <mtosatti@redhat.com>
 References: <20251019210303.104718-1-shentey@gmail.com>
- <20251019210303.104718-2-shentey@gmail.com>
+ <20251019210303.104718-4-shentey@gmail.com>
 From: =?UTF-8?Q?Philippe_Mathieu-Daud=C3=A9?= <philmd@linaro.org>
-In-Reply-To: <20251019210303.104718-2-shentey@gmail.com>
+In-Reply-To: <20251019210303.104718-4-shentey@gmail.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
 
 On 19/10/25 23:02, Bernhard Beschow wrote:
-> Allows to see how the guest interacts with the device.
-> 
 > Signed-off-by: Bernhard Beschow <shentey@gmail.com>
 > ---
->   hw/timer/i8254.c      | 6 ++++++
->   hw/timer/trace-events | 4 ++++
->   2 files changed, 10 insertions(+)
+>   hw/rtc/mc146818rtc.c | 14 +++-----------
+>   hw/rtc/trace-events  |  4 ++++
+>   2 files changed, 7 insertions(+), 11 deletions(-)
+
+
+> diff --git a/hw/rtc/trace-events b/hw/rtc/trace-events
+> index b9f2852d35..d2f36217cb 100644
+> --- a/hw/rtc/trace-events
+> +++ b/hw/rtc/trace-events
+> @@ -32,6 +32,10 @@ m48txx_nvram_io_write(uint64_t addr, uint64_t value) "io write addr:0x%04" PRIx6
+>   m48txx_nvram_mem_read(uint32_t addr, uint32_t value) "mem read addr:0x%04x value:0x%02x"
+>   m48txx_nvram_mem_write(uint32_t addr, uint32_t value) "mem write addr:0x%04x value:0x%02x"
+>   
+> +# mc146818rtc.c
+> +mc146818_rtc_ioport_read(uint8_t addr, uint8_t value) "[0x%02" PRIx8 "] -> 0x%02" PRIx8
+> +mc146818_rtc_ioport_write(uint8_t addr, uint8_t value) "[0x%02" PRIx8 "] <- 0x%02" PRIx8
+
+The block could be theorically mapped anywhere in the I/O ISA space,
+so 'uint8_t addr' is a bit too restrictive here. Otherwise,
 
 Reviewed-by: Philippe Mathieu-Daudé <philmd@linaro.org>
+
+> +
+>   # goldfish_rtc.c
+>   goldfish_rtc_read(uint64_t addr, uint64_t value) "addr 0x%02" PRIx64 " value 0x%08" PRIx64
+>   goldfish_rtc_write(uint64_t addr, uint64_t value) "addr 0x%02" PRIx64 " value 0x%08" PRIx64
 
 
