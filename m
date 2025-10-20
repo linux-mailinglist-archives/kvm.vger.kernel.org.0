@@ -1,155 +1,182 @@
-Return-Path: <kvm+bounces-60464-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-60465-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [IPv6:2a01:60a::1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id 28097BEEE40
-	for <lists+kvm@lfdr.de>; Mon, 20 Oct 2025 00:38:43 +0200 (CEST)
+Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [213.196.21.55])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3C11DBEF3C7
+	for <lists+kvm@lfdr.de>; Mon, 20 Oct 2025 06:21:31 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 403313486B8
-	for <lists+kvm@lfdr.de>; Sun, 19 Oct 2025 22:38:42 +0000 (UTC)
+	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 2DAC33490BF
+	for <lists+kvm@lfdr.de>; Mon, 20 Oct 2025 04:21:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CD385256C6F;
-	Sun, 19 Oct 2025 22:38:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CFA872BEFF1;
+	Mon, 20 Oct 2025 04:21:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="nY3xDoqt"
+	dkim=pass (2048-bit key) header.d=bytedance.com header.i=@bytedance.com header.b="NzraLz31"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-ej1-f43.google.com (mail-ej1-f43.google.com [209.85.218.43])
+Received: from mail-pj1-f49.google.com (mail-pj1-f49.google.com [209.85.216.49])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6E054155389
-	for <kvm@vger.kernel.org>; Sun, 19 Oct 2025 22:38:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.43
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EB66A2BE636
+	for <kvm@vger.kernel.org>; Mon, 20 Oct 2025 04:21:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.49
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1760913517; cv=none; b=Y+CaJK2OiPaUbD/YIZyvVE1MtOIWWjpUj/yXDzD8Sxa8YXTbsPzusdfeids80RVfl6N0Xz2PGhwnJNzFR1dSnjIhB5nys62WJ6aYYt7PYYpAo5hyI+LSjCHkSfGy0j06HcSCfTlMoiOBK9wP+aQpnoo/Q0bQ6Bq8KBgYKPAGRLo=
+	t=1760934074; cv=none; b=JCstqK51qI9nFX7ADgrnl28dzeQlw2cEPLHRcugv4flDnFBzWXpZetEUz6R5G4eKjvRM3VVuL18bGnY+pdNnhr9QiMhGmxEaQ1BAw3TYnUqg7rH1dPOmzX6VvhoeI5Z9TGoevWIWHJL+euqW4lxKAlxlRS4/IfW2LTMqMIA76ks=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1760913517; c=relaxed/simple;
-	bh=TFjawUHYW7DaCMbhCKbZfjwNgQE2IITzJ1JJend3G5g=;
-	h=Date:From:To:CC:Subject:In-Reply-To:References:Message-ID:
-	 MIME-Version:Content-Type; b=Fi8lX0dDt3x+2SsmHwDbvvgrP0nF+0bwT1qlxJQOn/A59nRYipq89jHA163VO/VKAA8ywg9TPzDNSUEBFrxgiQ7e5I45rewg3g/VNwEibENe0urfdJL6N5TJAmTSVuK3yyTSnN11UckRo11QBZPeybotgYijKIJr0f5QwiWwlLM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=nY3xDoqt; arc=none smtp.client-ip=209.85.218.43
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ej1-f43.google.com with SMTP id a640c23a62f3a-afcb7ae6ed0so690084166b.3
-        for <kvm@vger.kernel.org>; Sun, 19 Oct 2025 15:38:35 -0700 (PDT)
+	s=arc-20240116; t=1760934074; c=relaxed/simple;
+	bh=KSjoxuwSlFaFq4TJcoW0tRdCftkDMdzYUiOjhUqgUR0=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=XKR1vgX3h/oFsCVvUymDJg+9SQtnb8TVtMhcIQuP//U3UBwC3e9tq6a1Bcsgg+1NId/Z8GzocloeutYBHGdONstYJgI5ZpZwPnNYZ3y2KsaUX8XPxmFR9JA02ktDoU/MuwVnGMX8q0tSomx3FUDpljqFV7zdAinEe0o4urSZ938=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=bytedance.com; spf=pass smtp.mailfrom=bytedance.com; dkim=pass (2048-bit key) header.d=bytedance.com header.i=@bytedance.com header.b=NzraLz31; arc=none smtp.client-ip=209.85.216.49
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=bytedance.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bytedance.com
+Received: by mail-pj1-f49.google.com with SMTP id 98e67ed59e1d1-33ba38ed94eso4347069a91.1
+        for <kvm@vger.kernel.org>; Sun, 19 Oct 2025 21:21:10 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1760913514; x=1761518314; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:references
-         :in-reply-to:subject:cc:to:from:date:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=1fUlR3DVhrkXnHMUK4SdPqCGl1e6I+hLWWy62h9Hp4c=;
-        b=nY3xDoqtMpJwoK9L1JuN0akgDCZyIM2ZC1LgRp0KbJTSp47iF1u5gi5nuiS9iGstgW
-         +3lLShpmauGXOkFYbZGvnKqczSkTB/HRCRr9k/IaPr/wHnMGUTOpI088+GPLwHwMayIw
-         Ha3zb9nBzKqZu7BtmPX2pciBU66j78J2Bydz/Rfmfs+TDawQhesO/zkymwYi+sfJBfoq
-         AKoUM7djD4hXxfDbAHBKqlMwriJ0JqAsA10CNamAR4/yFukvFmM1y8IT2KwSFaI6oN8Z
-         MlROEhLn9Qa0ol1LJcq7ah+/hwE/lI+FI4F4pAkgfUzbjtoP3zQaJb4VWYWapiC/kUDP
-         h/FA==
+        d=bytedance.com; s=google; t=1760934070; x=1761538870; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=conQFyh0ywHaD293wZYZONSgw/GLLJWk5gnj1mP84r4=;
+        b=NzraLz3102v6ehlBEAVRV9f1Ok1HDyPK+1tRUW79Wa0oG7FGeo7ruUdMP1CeyBjm8y
+         n+0+oPEaUTPef9c6NFgmz4m4MqXFUxhpzQ+Rd+HjvzzA0m1PimfQR2oSTLDkTPyJurkD
+         zS0TSjk/KWlXvSnRfN5W1cUH9C0upyQjZ6Sn1DacODGoLgQrM1w5tqvujyFMOPboYv/P
+         CIT3qBZJkB+ri82n0Q3szP/QCDewqZ3A0FqMIC2aG4Lp9cumz7a+W3fqKy6SQdCqIi5s
+         EHP3M9HW5Gb5shh5r/m6+YtFvn2/unBxzGZhMETpCv24FPAiLTLw7hmJ/i5HSVzcftrT
+         oRww==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1760913514; x=1761518314;
-        h=content-transfer-encoding:mime-version:message-id:references
-         :in-reply-to:subject:cc:to:from:date:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=1fUlR3DVhrkXnHMUK4SdPqCGl1e6I+hLWWy62h9Hp4c=;
-        b=jGkNlDppaQyxSwXzIsBAoWRBdUmEq+ChZuKxez8ZvkUPs+zkFuqXJio4eKQtxby8JJ
-         FRTb1EMAR4VTzlI3OVqysjZcgsSvc41Kf6c+sPvyh8GEPN5IbVTziZSoy1do36FysagR
-         ikWly68C/xJsD9sIaD7DiovYM0BNk+FR0AqNIKL6ahcRYL9wXxH9J+rToWMj6dCzR6eU
-         0YKkecwogU+6FvaI6cHN7k8QiPlI9EMl0NH7OK3gUSCbr3G4vFh0GXvmuxvfAUmNxvZ0
-         gS7lldT6xIxhg3FYR8X0EZ5cd7E8aPXcbgRhPVBMGVemd2EcjUmgQgyAN2FJ8S/Fe60+
-         jYIg==
-X-Forwarded-Encrypted: i=1; AJvYcCUfc/sdqzyPiPdPbuAG2euCe6YTECGDoSxsSsVU2djT/hHZ7tgWotInhwOI4T1hKZ10bt4=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwgWkQfMc3aTgA1P7inn7dTigj+OX/Wdb1PyQY7D6KIXl7yZFwU
-	ujxxqWxl69C+Qef0jAEDSrZwAFPrDyvFlOKN/zl0Zr+KUHl/pTeaJBfd
-X-Gm-Gg: ASbGncsv76ucyS/J0DoCcwkbajKRRiLTMy2Xj47LBaI0CxONbyF5RASt8/QiZ/cxGSw
-	/fqxzQAXvEkMt2/XOKEnc0IHHUjuGux07eVhOs4RVhp539I+vl6Sy+xc97uzham9Lk9rkzUmQ4e
-	gk9i05M+rS+fRy6Q9Ab/0fNr3JG7RUOfPdU5uPGTP/qx1U8+jgli+AiMVRbR+uuESYAGjZJm1g+
-	lvwGFbMI/+FO5dKgZnHZEvS6pteALX3QU9UqzfE/TdAV89T+ZgZU+gWFReT3NoryW8agxvg2dkJ
-	+WokLA9ybsdeX3BaMdPWQymRNt22++c/x9LxosxS+n7/u+yglhvZpeEswRgUoNt/EgwYE4TMdiH
-	xCHdoPygU9Et5+qMHCKl3//KBjE2+ZjPKDujXgJmFnDDGcX76F3UyudXYZwPNsba1jay8aRQ0Ow
-	68w6dlj51NOp9YPkqDtGm0UzQ2cYB2XrNvdxUSDmlZ9ohqmhy4VGvkbrlLeqZoAd6mRiH5TfFtK
-	t5nHvgwRSelNPqJboUoHkA/yoh2Na06qIi681TWo9Ad
-X-Google-Smtp-Source: AGHT+IFY1AOFnz3uKVjIXWfRbHvZOYANfaygBNZ6f59WAGxWoNrkwB1vfYiS+VunXq5N8M44mfer0Q==
-X-Received: by 2002:a17:906:fe41:b0:b45:a6e6:97b4 with SMTP id a640c23a62f3a-b64764e2fd5mr1237253066b.50.1760913513550;
-        Sun, 19 Oct 2025 15:38:33 -0700 (PDT)
-Received: from ehlo.thunderbird.net (dynamic-2a02-3100-1c27-9400-31a8-03e5-9396-b647.310.pool.telefonica.de. [2a02:3100:1c27:9400:31a8:3e5:9396:b647])
-        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-63c48a928cesm5246447a12.7.2025.10.19.15.38.30
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sun, 19 Oct 2025 15:38:32 -0700 (PDT)
-Date: Sun, 19 Oct 2025 22:38:28 +0000
-From: Bernhard Beschow <shentey@gmail.com>
-To: Michael Tokarev <mjt@tls.msk.ru>, qemu-devel@nongnu.org
-CC: Roman Bolshakov <rbolshakov@ddn.com>, Laurent Vivier <laurent@vivier.eu>,
- Eduardo Habkost <eduardo@habkost.net>, Cameron Esfahani <dirty@apple.com>,
- "Michael S. Tsirkin" <mst@redhat.com>, Marcelo Tosatti <mtosatti@redhat.com>,
- Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
- Paolo Bonzini <pbonzini@redhat.com>,
- Sunil Muthuswamy <sunilmut@microsoft.com>, Zhao Liu <zhao1.liu@intel.com>,
- Richard Henderson <richard.henderson@linaro.org>,
- Fabiano Rosas <farosas@suse.de>, qemu-trivial@nongnu.org,
- Gerd Hoffmann <kraxel@redhat.com>, qemu-block@nongnu.org,
- Phil Dennis-Jordan <phil@philjordan.eu>, John Snow <jsnow@redhat.com>,
- kvm@vger.kernel.org, Laurent Vivier <lvivier@redhat.com>
-Subject: =?US-ASCII?Q?Re=3A_=5BPATCH_v2_09/11=5D_hw/intc/apic=3A_Ensure_?=
- =?US-ASCII?Q?own_APIC_use_in_apic=5Fregister=5F=7Bread=2C_write=7D?=
-In-Reply-To: <3C9DA9B8-8836-42F6-85CD-AB60327363EC@gmail.com>
-References: <20251017141117.105944-1-shentey@gmail.com> <20251017141117.105944-10-shentey@gmail.com> <f074aed2-7702-4a4a-a7d5-7abeb29ea663@tls.msk.ru> <3C9DA9B8-8836-42F6-85CD-AB60327363EC@gmail.com>
-Message-ID: <BDA99DB9-7585-4C1A-9B4A-DC07AE78EBE6@gmail.com>
+        d=1e100.net; s=20230601; t=1760934070; x=1761538870;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=conQFyh0ywHaD293wZYZONSgw/GLLJWk5gnj1mP84r4=;
+        b=AAqqPb7r1j9tc3wX1Z6zONB3srpABgLV66nlbsoFbrQek0sBkqO8wcD3ohGb3v5GKT
+         ut38UPXSWqFFQiYk26gMGPLEaHCPL4y0BWOBmT/YTuhFlMIJMdPWDvPSJsYV4Jmckwes
+         /aJUDupA9u92NCKBf/uG9s2ClK8IGXU7AJfZDVT2FxAxf4gHa2P4lE5Ygmoql9t4463v
+         j5p/rYi+pbeGaiYIzzTTxvzyHrBJifzog5bBo7jKWXOvtS3b/5i+GOtni3ZTOLQeZle7
+         +j0G4R2LyOuQ8l7X+OHJYfbIWriDrl4n5omwe8rhr2ROlaw+sLViozOSPjOvQLndPHJq
+         1wWQ==
+X-Forwarded-Encrypted: i=1; AJvYcCURhCq+4+Di42IF6D9fu1auHwHTet2FI8rf5ENuBg7uLbxWctXETRei6jNL9qa/jgjeDIo=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yw1iaXec7WakH+BlkETo8pa+z5Z5psC1dyDMn3FP8s8HIzy/dd0
+	rciWAVziUXIEFLVOsufwlUM+jk8QSsPtvF5/I90gAspLJbiVcLmCSjfdhvQhKwcDTJo=
+X-Gm-Gg: ASbGncvRNCBV/m18+8M9AIIvEtWiz7slPYU4Sqm5Tz37BWJwE2B3swD2eiGbyFv5P5e
+	G3B9YdqaiQE5RQr1GUQcoD+7G1042HgzU2AyUUU6whNZi4asKDCgpelZ4O40mCMkD4U1ezVffRc
+	GHDG0GJAWGrEXiFRWAOVm4stABNVGNrGrOWpc9XQlOM0wEJ6xNr3HXiHM0BinIvvXQCojp4VIzS
+	sQsidxUJNLTVnd5zh0HJlGy+F4UOHMEGRUJ4yJi4Hf/bJ6CmdmKTkSuQp8MGy+YjIHYGkDEEWDQ
+	F3CfExp/Lg9/rZLLGbIgN2uh6XFDO5AMVspGyvbv2ZWwm3Ma5R1igbrWMoYaqJzvCuAXhkA3CiC
+	2di0OAZw3gmCy4lS35Pt186HxYHDNwYegb1ZZihpnm5aGrfhUz/qvCMDQgvEtPgJdC6HB5GZENo
+	gsmBOtqWmwTeozcDuCanRciSEsfBdlJbYrDGL2PpsB6wrTMK7pIyexe+cBicFQxn1gG5VzRJkXR
+	w==
+X-Google-Smtp-Source: AGHT+IEdkgCehFcbIRaUApmCfafCEhZVkAa78hZZpBjec5gPS2C5TVHNU0zWNgu3Z2IjgaK3I7rtpw==
+X-Received: by 2002:a17:902:f687:b0:26e:49e3:55f1 with SMTP id d9443c01a7336-290c9cbc867mr157233355ad.18.1760934069971;
+        Sun, 19 Oct 2025 21:21:09 -0700 (PDT)
+Received: from J9GPGXL7NT.bytedance.net ([61.213.176.55])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-29246ec14e9sm68762035ad.9.2025.10.19.21.21.01
+        (version=TLS1_3 cipher=TLS_CHACHA20_POLY1305_SHA256 bits=256/256);
+        Sun, 19 Oct 2025 21:21:09 -0700 (PDT)
+From: Xu Lu <luxu.kernel@bytedance.com>
+To: corbet@lwn.net,
+	paul.walmsley@sifive.com,
+	palmer@dabbelt.com,
+	aou@eecs.berkeley.edu,
+	alex@ghiti.fr,
+	robh@kernel.org,
+	krzk+dt@kernel.org,
+	conor+dt@kernel.org,
+	will@kernel.org,
+	peterz@infradead.org,
+	boqun.feng@gmail.com,
+	mark.rutland@arm.com,
+	anup@brainfault.org,
+	atish.patra@linux.dev,
+	pbonzini@redhat.com,
+	shuah@kernel.org,
+	parri.andrea@gmail.com,
+	ajones@ventanamicro.com,
+	brs@rivosinc.com,
+	guoren@kernel.org
+Cc: linux-doc@vger.kernel.org,
+	linux-riscv@lists.infradead.org,
+	linux-kernel@vger.kernel.org,
+	devicetree@vger.kernel.org,
+	kvm@vger.kernel.org,
+	kvm-riscv@lists.infradead.org,
+	linux-kselftest@vger.kernel.org,
+	apw@canonical.com,
+	joe@perches.com,
+	lukas.bulwahn@gmail.com,
+	Xu Lu <luxu.kernel@bytedance.com>
+Subject: [PATCH v4 00/10] riscv: Add Zalasr ISA extension support
+Date: Mon, 20 Oct 2025 12:20:46 +0800
+Message-ID: <20251020042056.30283-1-luxu.kernel@bytedance.com>
+X-Mailer: git-send-email 2.50.1
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain;
- charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
 
+This patch adds support for the Zalasr ISA extension, which supplies the
+real load acquire/store release instructions.
 
+The specification can be found here:
+https://github.com/riscv/riscv-zalasr/blob/main/chapter2.adoc
 
-Am 17=2E Oktober 2025 19:34:36 UTC schrieb Bernhard Beschow <shentey@gmail=
-=2Ecom>:
->
->
->Am 17=2E Oktober 2025 14:58:50 UTC schrieb Michael Tokarev <mjt@tls=2Emsk=
-=2Eru>:
->>17=2E10=2E2025 17:11, Bernhard Beschow wrote:
->>> =2E=2E=2E In apic_mem_{read,write}, the
->>> own APIC instance is available as the opaque parameter
->>
->>> diff --git a/hw/intc/apic=2Ec b/hw/intc/apic=2Ec
->>
->>> @@ -876,7 +870,7 @@ static uint64_t apic_mem_read(void *opaque, hwaddr=
- addr, unsigned size)
->>>       }
->>>         index =3D (addr >> 4) & 0xff;
->>> -    apic_register_read(index, &val);
->>> +    apic_register_read(opaque, index, &val);
->>
->>I think it would be better to use local variable here:
->>
->> APICCommonState *s =3D opaque;
->>
->>and use it down the line=2E  Yes, there's just one usage, but it is
->>still clearer this way (in my opinion anyway)=2E
->>
->>Ditto in apic_mem_write=2E
->
->I agree=2E Will fix in the next iteration=2E
+This patch seires has been tested with ltp on Qemu with Brensan's zalasr
+support patch[1].
 
-I couldn't use the opaque parameter in v3 at all, so I needed an `APICComm=
-onState *s` anyway=2E
+Some false positive spacing error happens during patch checking. Thus I
+CCed maintainers of checkpatch.pl as well.
 
-Best regards,
-Bernhard
+[1] https://lore.kernel.org/all/CAGPSXwJEdtqW=nx71oufZp64nK6tK=0rytVEcz4F-gfvCOXk2w@mail.gmail.com/
 
->
->Best regards,
->Bernhard
->
->>
->>But it's more a nitpick really=2E
->>
->>Thanks,
->>
->>/mjt
+v4:
+ - Apply acquire/release semantics to arch_atomic operations. Thanks
+ to Andrea.
+
+v3:
+ - Apply acquire/release semantics to arch_xchg/arch_cmpxchg operations
+ so as to ensure FENCE.TSO ordering between operations which precede the
+ UNLOCK+LOCK sequence and operations which follow the sequence. Thanks
+ to Andrea.
+ - Support hwprobe of Zalasr.
+ - Allow Zalasr extensions for Guest/VM.
+
+v2:
+ - Adjust the order of Zalasr and Zalrsc in dt-bindings. Thanks to
+ Conor.
+
+Xu Lu (10):
+  riscv: Add ISA extension parsing for Zalasr
+  dt-bindings: riscv: Add Zalasr ISA extension description
+  riscv: hwprobe: Export Zalasr extension
+  riscv: Introduce Zalasr instructions
+  riscv: Apply Zalasr to smp_load_acquire/smp_store_release
+  riscv: Apply acquire/release semantics to arch_xchg/arch_cmpxchg
+    operations
+  riscv: Apply acquire/release semantics to arch_atomic operations
+  riscv: Remove arch specific __atomic_acquire/release_fence
+  RISC-V: KVM: Allow Zalasr extensions for Guest/VM
+  RISC-V: KVM: selftests: Add Zalasr extensions to get-reg-list test
+
+ Documentation/arch/riscv/hwprobe.rst          |   5 +-
+ .../devicetree/bindings/riscv/extensions.yaml |   5 +
+ arch/riscv/include/asm/atomic.h               |  70 ++++++++-
+ arch/riscv/include/asm/barrier.h              |  91 +++++++++--
+ arch/riscv/include/asm/cmpxchg.h              | 144 +++++++++---------
+ arch/riscv/include/asm/fence.h                |   4 -
+ arch/riscv/include/asm/hwcap.h                |   1 +
+ arch/riscv/include/asm/insn-def.h             |  79 ++++++++++
+ arch/riscv/include/uapi/asm/hwprobe.h         |   1 +
+ arch/riscv/include/uapi/asm/kvm.h             |   1 +
+ arch/riscv/kernel/cpufeature.c                |   1 +
+ arch/riscv/kernel/sys_hwprobe.c               |   1 +
+ arch/riscv/kvm/vcpu_onereg.c                  |   2 +
+ .../selftests/kvm/riscv/get-reg-list.c        |   4 +
+ 14 files changed, 314 insertions(+), 95 deletions(-)
+
+-- 
+2.20.1
+
 
