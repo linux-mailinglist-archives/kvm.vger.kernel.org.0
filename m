@@ -1,147 +1,135 @@
-Return-Path: <kvm+bounces-60521-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-60522-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2721FBF16C9
-	for <lists+kvm@lfdr.de>; Mon, 20 Oct 2025 15:05:43 +0200 (CEST)
+Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [213.196.21.55])
+	by mail.lfdr.de (Postfix) with ESMTPS id EDD3BBF1714
+	for <lists+kvm@lfdr.de>; Mon, 20 Oct 2025 15:08:26 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 88B254F9432
-	for <lists+kvm@lfdr.de>; Mon, 20 Oct 2025 13:02:12 +0000 (UTC)
+	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 8B20834CB15
+	for <lists+kvm@lfdr.de>; Mon, 20 Oct 2025 13:08:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 742F73161AC;
-	Mon, 20 Oct 2025 13:01:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1E21F3126B1;
+	Mon, 20 Oct 2025 13:08:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="H8pJPmcB"
+	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="Zwsji4yH"
 X-Original-To: kvm@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from out30-110.freemail.mail.aliyun.com (out30-110.freemail.mail.aliyun.com [115.124.30.110])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 769FC313265;
-	Mon, 20 Oct 2025 13:01:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C722E1494C3;
+	Mon, 20 Oct 2025 13:08:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.110
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1760965278; cv=none; b=F2fgTdnaKgIYQFJKXduVct5nDnLflo9bEwMkmEH7k7Oqq8qqs3KpJuqtzVan9ZMa+T3SUNEu4SWHp36l1dCnkIUqtMy5llhjHqQ8FJNCDdUEH07tu1Alr5JeswDJksJRzbOIIj+SoxmRvd8xzmhh30r4aa0KbiaBjXaUV6sWkqg=
+	t=1760965700; cv=none; b=Exsfz9armODEkL6bRUtE+k7wHfwclTxBCP1MMCjHso68DC2/lYoYZ2CNSC/cw8jEPwZxUGD6H2skZYm4AtlI9qu07ESX9yxVG9iOzIhmt31D5AXZbt3APfMmhiMac/N39pi49cvr4Uk3SuKBcmxacYOCf/XI6y/JmKoMeyMVU1M=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1760965278; c=relaxed/simple;
-	bh=0SzM7POeZzsGGQ5mWGCo5naisyyNFb+Sx+BZH6gSIJc=;
-	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=lFuwO8zZ9tTkSVhMe9begLM4PxK5g8LSevuciDn90l0vSbRRzmdPQvj+hU3wtHRa09DP19A/4tUuugnSnoOeCSQ0N8UErsN3MkN2BZRXeYxoDtP6XeVcusBbAUq50CL6f0RbrHgo3BPLfEUKqAhC5hm7g6lFSV+Iz/OpuXMjHvE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=H8pJPmcB; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id E8488C4CEF9;
-	Mon, 20 Oct 2025 13:01:17 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1760965278;
-	bh=0SzM7POeZzsGGQ5mWGCo5naisyyNFb+Sx+BZH6gSIJc=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=H8pJPmcB/M8iv4RfG9SDzfYjcT/VZrk6Du9GXGrHrZNFKRjD8Jw7upRZ9ORP9qyrT
-	 rt7YVzkFB+hOLUSIJ+NeB/xTtTSDx+FIIWxzr00CwbV1FrRY4jeAXEUk/AzXg7GkgI
-	 08n4dJUuyx6SAWTToA2wAVooQ593MUnZi/0K7dLOUlNiKcqNNAg75ourh/JpCJFrLp
-	 +yc+crit+o+Sf+HJDvn1e2H1G6wHifdqa+8tpNsxRgfzc1RN1UKLo808puEPioAioX
-	 NPztSZoqbtvUW3dldcn+sNC2XBg3bSl0LEW26DG8EFrFEVRQbGfFAMfrs6YPNC3ejp
-	 QV0sUm5WygvQw==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.98.2)
-	(envelope-from <maz@kernel.org>)
-	id 1vApVj-0000000FVlB-3hp4;
-	Mon, 20 Oct 2025 13:01:16 +0000
-Date: Mon, 20 Oct 2025 14:01:15 +0100
-Message-ID: <86ms5lwwv8.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: Maximilian Dittgen <mdittgen@amazon.de>
-Cc: <epetron@amazon.de>,
-	<kvm@vger.kernel.org>,
-	<kvmarm@lists.linux.dev>,
-	<linux-arm-kernel@lists.infradead.org>,
-	<linux-kselftest@vger.kernel.org>,
-	<mdittgen@amazon.com>,
-	<nh-open-source@amazon.com>,
-	<oliver.upton@linux.dev>,
-	<pbonzini@redhat.com>,
-	<shuah@kernel.org>
-Subject: Re: [PATCH] KVM: selftests: fix ITS collection target addresses in vgic_lpi_stress
-In-Reply-To: <20251020121220.83972-1-mdittgen@amazon.de>
-References: <20251017161918.40711-1-mdittgen@amazon.de>
-	<86v7kdwj8u.wl-maz@kernel.org>
-	<20251020121220.83972-1-mdittgen@amazon.de>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+	s=arc-20240116; t=1760965700; c=relaxed/simple;
+	bh=//8I0dVPfl3/ugxAvErXNaziF9i3d9ZAbRKxDdDYIb4=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=oWt/Wkk7hNpZ2dmlIA3CEt2tj8IoBjwOlck5ZigG3YoBBooCjm94addnVqe9Gf47p6zFGtQQEVA01M/pZJ6HbIx7GxWcHrKMQ0rVqdxTilHAeR63Hln2+Qg+gtSJX5KFJPXpsFpdLPji3ArIUeSMy1NEqHxCLpF0NPM/tShZFoI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=Zwsji4yH; arc=none smtp.client-ip=115.124.30.110
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
+DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=linux.alibaba.com; s=default;
+	t=1760965687; h=From:To:Subject:Date:Message-Id:MIME-Version;
+	bh=VqNvlk/xz73z1KmMrkOxoHo6m+80ptyKkYHpzu2di2U=;
+	b=Zwsji4yHWSRTx48z27eJlvfIuf7DRxUlsxxHhXOXpMiUbce67yhmMNy1GnKiCO9TXIrHk6PrNA44UQJRHTrBHLVsm1aqyexDTyF/2i/Fy47l8B3sH3UVitekX3DLgUwVxYu40V+L8hyoW0LJVLXWeKGjBcT0c13UDBRTcuZzcbI=
+Received: from localhost.localdomain(mailfrom:fangyu.yu@linux.alibaba.com fp:SMTPD_---0WqchCgl_1760965684 cluster:ay36)
+          by smtp.aliyun-inc.com;
+          Mon, 20 Oct 2025 21:08:06 +0800
+From: fangyu.yu@linux.alibaba.com
+To: anup@brainfault.org,
+	atish.patra@linux.dev,
+	pjw@kernel.org,
+	palmer@dabbelt.com,
+	aou@eecs.berkeley.edu,
+	alex@ghiti.fr,
+	pbonzini@redhat.com,
+	jiangyifei@huawei.com
+Cc: guoren@kernel.org,
+	kvm@vger.kernel.org,
+	kvm-riscv@lists.infradead.org,
+	linux-riscv@lists.infradead.org,
+	linux-kernel@vger.kernel.org,
+	Fangyu Yu <fangyu.yu@linux.alibaba.com>
+Subject: [PATCH] RISC-V: KVM: Remove automatic I/O mapping for VM_PFNMAP
+Date: Mon, 20 Oct 2025 21:08:01 +0800
+Message-Id: <20251020130801.68356-1-fangyu.yu@linux.alibaba.com>
+X-Mailer: git-send-email 2.39.3 (Apple Git-146)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: mdittgen@amazon.de, epetron@amazon.de, kvm@vger.kernel.org, kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, linux-kselftest@vger.kernel.org, mdittgen@amazon.com, nh-open-source@amazon.com, oliver.upton@linux.dev, pbonzini@redhat.com, shuah@kernel.org
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 
-On Mon, 20 Oct 2025 13:12:20 +0100,
-Maximilian Dittgen <mdittgen@amazon.de> wrote:
-> 
-> On Fri, 17 Oct 2025 19:06:25 +0200,
-> Marc Zyngier <maz@kernel.org> wrote:
-> >
-> >	  * We use linear CPU numbers for redistributor addressing,
-> >	  * so GITS_TYPER.PTA is 0.
-> >
-> > It is not an address.
-> 
-> The issue is that its_encode_target in selftests is designed for
-> physical redistriubtor addresses (GITS_TYPER.PTA = 1) and thus
+From: Fangyu Yu <fangyu.yu@linux.alibaba.com>
 
-No. Please read the spec.
+As of commit aac6db75a9fc ("vfio/pci: Use unmap_mapping_range()"),
+vm_pgoff may no longer guaranteed to hold the PFN for VM_PFNMAP
+regions. Using vma->vm_pgoff to derive the HPA here may therefore
+produce incorrect mappings.
 
-> performs a right shift by 16 bits:
-> 
-> 		its_mask_encode(&cmd->raw_cmd[2], target_addr >> 16, 51, 16);
-> 
-> When the vgic_lpi_stress selftest passes in a linear vCPU id as
-> the redistributor address (GITS_TYPER.PTA = 0 behavior),
-> The its_encode_target function shifts the CPU numbers 16 bits right,
-> functionally zeroing them.
-> 
-> We need to either:
-> - Align this specific selftest with GITS_TYPER.PTA = 0 and not use
->     its_encode_target to encode the target vCPU id. Instead have a
->     dedicated encode function for the use case without a bit shift.
-> - Align all selftests with GITS_TYPER.PTA = 0 and refactor
->     its_encode_target to skip the bit shift altogether.
-> - Align selftests with GITS_TYPER.PTA = 1 and pass a redistributor
->     address, not a vCPU id, into its_send_mapc_cmd().
+Instead, I/O mappings for such regions can be established on-demand
+during g-stage page faults, making the upfront ioremap in this path
+is unnecessary.
 
-What part of "GITS_TYPER.PTA is 0" did you miss?
+Fixes: 9d05c1fee837 ("RISC-V: KVM: Implement stage2 page table programming")
+Signed-off-by: Fangyu Yu <fangyu.yu@linux.alibaba.com>
+---
+ arch/riscv/kvm/mmu.c | 20 +-------------------
+ 1 file changed, 1 insertion(+), 19 deletions(-)
 
->
-> Otherwise, the selftest's current behavior incorrectly maps all
-> collections to target vCPU 0.
-
-To be clear: I don't object to the patch. I object to the nonsensical
-commit message.
-
-You cannot say "I'm replacing the vcpu_id with an address". That's not
-for you to decide, as the emulated HW is *imposing* that decision on
-you. You don't even have the addresses at which the RDs are. You are
-merely *reformatting* the vcpu_id to fit a field that can *also*
-contain a 64kB-aligned address *when GITS_TYPER.PTA==1*. See 5.3.1 in
-the GICv3 spec.
-
-And yes, what you have is the correct fix. Just wrap it as a helper
-(I'd suggest procnum_to_rdbase(), if you need a name for it).
-
-This test also violate the architecture by not performing a SYNC after
-any command, which would also require the use of a properly formatted
-target field. But hey, correctness is overrated.
-
-Thanks,
-
-	M.
-
+diff --git a/arch/riscv/kvm/mmu.c b/arch/riscv/kvm/mmu.c
+index 525fb5a330c0..84c04c8f0892 100644
+--- a/arch/riscv/kvm/mmu.c
++++ b/arch/riscv/kvm/mmu.c
+@@ -197,8 +197,7 @@ int kvm_arch_prepare_memory_region(struct kvm *kvm,
+ 
+ 	/*
+ 	 * A memory region could potentially cover multiple VMAs, and
+-	 * any holes between them, so iterate over all of them to find
+-	 * out if we can map any of them right now.
++	 * any holes between them, so iterate over all of them.
+ 	 *
+ 	 *     +--------------------------------------------+
+ 	 * +---------------+----------------+   +----------------+
+@@ -229,32 +228,15 @@ int kvm_arch_prepare_memory_region(struct kvm *kvm,
+ 		vm_end = min(reg_end, vma->vm_end);
+ 
+ 		if (vma->vm_flags & VM_PFNMAP) {
+-			gpa_t gpa = base_gpa + (vm_start - hva);
+-			phys_addr_t pa;
+-
+-			pa = (phys_addr_t)vma->vm_pgoff << PAGE_SHIFT;
+-			pa += vm_start - vma->vm_start;
+-
+ 			/* IO region dirty page logging not allowed */
+ 			if (new->flags & KVM_MEM_LOG_DIRTY_PAGES) {
+ 				ret = -EINVAL;
+ 				goto out;
+ 			}
+-
+-			ret = kvm_riscv_mmu_ioremap(kvm, gpa, pa, vm_end - vm_start,
+-						    writable, false);
+-			if (ret)
+-				break;
+ 		}
+ 		hva = vm_end;
+ 	} while (hva < reg_end);
+ 
+-	if (change == KVM_MR_FLAGS_ONLY)
+-		goto out;
+-
+-	if (ret)
+-		kvm_riscv_mmu_iounmap(kvm, base_gpa, size);
+-
+ out:
+ 	mmap_read_unlock(current->mm);
+ 	return ret;
 -- 
-Without deviation from the norm, progress is not possible.
+2.50.1
+
 
