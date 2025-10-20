@@ -1,200 +1,257 @@
-Return-Path: <kvm+bounces-60536-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-60537-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
-	by mail.lfdr.de (Postfix) with ESMTPS id 41E32BF1F75
-	for <lists+kvm@lfdr.de>; Mon, 20 Oct 2025 17:00:54 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 5C29FBF1F9F
+	for <lists+kvm@lfdr.de>; Mon, 20 Oct 2025 17:03:43 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id EE8324F774E
-	for <lists+kvm@lfdr.de>; Mon, 20 Oct 2025 15:00:21 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id DA81A4EF859
+	for <lists+kvm@lfdr.de>; Mon, 20 Oct 2025 15:03:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9DDC77260B;
-	Mon, 20 Oct 2025 15:00:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 324DF23D7CA;
+	Mon, 20 Oct 2025 15:03:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=amazon.de header.i=@amazon.de header.b="pxbV8tPk"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="e35AFnFe"
 X-Original-To: kvm@vger.kernel.org
-Received: from fra-out-015.esa.eu-central-1.outbound.mail-perimeter.amazon.com (fra-out-015.esa.eu-central-1.outbound.mail-perimeter.amazon.com [18.158.153.154])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pj1-f74.google.com (mail-pj1-f74.google.com [209.85.216.74])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2D54223EAAB;
-	Mon, 20 Oct 2025 15:00:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=18.158.153.154
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B6FE44CB5B
+	for <kvm@vger.kernel.org>; Mon, 20 Oct 2025 15:03:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.74
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1760972417; cv=none; b=I7ld0bN+WDKpTu9yUlBfHe9vkL5uoOkPqtzBp+jYQHKD+SVuiQ9THT3lVA9MlOFbWwhE5HxVEHVGflL1TrUyJPGI7e27iqoPeJqYnEJHQjCr+W9PK2exu/896OY/hyJNzkYJXOJpSguliGQZTnNLaOOv9dpb6s/yyk8onnaSegs=
+	t=1760972612; cv=none; b=JThoPQ+dHCnaVK1uTpMDaFY28sbjdKSzALxzq/57XZqKgRmy9ENRH5OemUffUGXpmCLPuwfSPSoFdi29tnyO6p4QUV2JiDgLuISPsvIAvyFrQJeFczHWtbG6Pvm7DXGhcOVCFmO345wJH/d5N1BOEgq8NPpPOYlMI6UKywhws+k=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1760972417; c=relaxed/simple;
-	bh=umqW0Su3mLgwV6fDB3f5scKb3yM+a0GtQB9z8Pir5BA=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=X1CqrZv0D9lfEtMzYQNHuVw186KVPYtL2EOa8YLDrM8xeWbUY88ykfDAAbmoK58dczfaynivxXNRODKUxxr/IW5IsHh+0+x3BEZ1PQcuMM0RFW1nTSgEzFyeGjGvh/2ONqUoG2ehndyquaHTpzTFJ4fhfdOI5l6m+FRqJnwg7Mo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.de; spf=pass smtp.mailfrom=amazon.de; dkim=pass (2048-bit key) header.d=amazon.de header.i=@amazon.de header.b=pxbV8tPk; arc=none smtp.client-ip=18.158.153.154
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.de
+	s=arc-20240116; t=1760972612; c=relaxed/simple;
+	bh=Ld62GVjO/0NV57t3vSm3KGieiENM0xCoBlbxOiv91fg=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=QBF8CeOLsVPgzkjCm+ydCaXGKfmV4F3J29nDBS4d5VSmQtuHUzVxagn/4Z1VyzGbWhgiGSs2TFsQjV4NaUvpwH6EbwXSt6Uj0Cn18nh7emj/mgXLERKoZCfQi0uzNvhGOnOzYZGPHy4c0IZAfmk8JQRbkKxzf1maUgPStdJqI9c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=e35AFnFe; arc=none smtp.client-ip=209.85.216.74
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+Received: by mail-pj1-f74.google.com with SMTP id 98e67ed59e1d1-33baf262850so4410884a91.0
+        for <kvm@vger.kernel.org>; Mon, 20 Oct 2025 08:03:30 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.de; i=@amazon.de; q=dns/txt; s=amazoncorp2;
-  t=1760972415; x=1792508415;
-  h=from:to:cc:subject:date:message-id:mime-version:
-   content-transfer-encoding;
-  bh=gjPB+Bz27Q5z0Ba9I6xi0rD3qbYFKGm+c9Yj1X4Z/CE=;
-  b=pxbV8tPki3gbsqQf8+VHsyB5CSA5rBCDY7NbJ49LBJDdR2WQe/JymWbf
-   amP1gm/yFbqkEA6F4Y/q4WW8z+amnH8+hp+KXX+D0LJceHI3nMZUuOSAR
-   M5IzPQAqBConjywAJ6Z5KpkjUdIOq07/YbmtpWxo3gIP1lfYiXUiJkzdL
-   jzvUlid1pI5qmhMcUAQQw7gpFzNTfZAQQ/0oQqeIUGrDhie7xWxC56hxu
-   Cp5+GERc2wJm7vq4nHKf/DYjmBb3M0VB41wdWOqyXNT8Kcs4gIpmTfMXA
-   jktqCGmn84ORQb7DeB05fvpPWEfjsYqCxsTA/XETek1oTFWh50lnh0RZO
-   w==;
-X-CSE-ConnectionGUID: KOhXRf8ITDKSFms8uQ1ymQ==
-X-CSE-MsgGUID: LysR5xzsT9i64tOhdjre/w==
-X-IronPort-AV: E=Sophos;i="6.19,242,1754956800"; 
-   d="scan'208";a="3771860"
-Received: from ip-10-6-3-216.eu-central-1.compute.internal (HELO smtpout.naws.eu-central-1.prod.farcaster.email.amazon.dev) ([10.6.3.216])
-  by internal-fra-out-015.esa.eu-central-1.outbound.mail-perimeter.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 20 Oct 2025 15:00:00 +0000
-Received: from EX19MTAEUB002.ant.amazon.com [54.240.197.232:10334]
- by smtpin.naws.eu-central-1.prod.farcaster.email.amazon.dev [10.0.18.241:2525] with esmtp (Farcaster)
- id b84d140c-d300-48b5-86c1-2c9b5370694b; Mon, 20 Oct 2025 15:00:00 +0000 (UTC)
-X-Farcaster-Flow-ID: b84d140c-d300-48b5-86c1-2c9b5370694b
-Received: from EX19D016EUA001.ant.amazon.com (10.252.50.245) by
- EX19MTAEUB002.ant.amazon.com (10.252.51.59) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.2562.20;
- Mon, 20 Oct 2025 15:00:00 +0000
-Received: from amazon.com (10.1.213.24) by EX19D016EUA001.ant.amazon.com
- (10.252.50.245) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.2562.20; Mon, 20 Oct 2025
- 14:59:55 +0000
-From: Maximilian Dittgen <mdittgen@amazon.de>
-To: <maz@kernel.org>, <oliver.upton@linux.dev>
-CC: <pbonzini@redhat.com>, <shuah@kernel.org>,
-	<linux-arm-kernel@lists.infradead.org>, <kvmarm@lists.linux.dev>,
-	<linux-kselftest@vger.kernel.org>, <kvm@vger.kernel.org>,
-	<mdittgen@amazon.de>, <epetron@amazon.de>, <nh-open-source@amazon.com>
-Subject: [PATCH v2] KVM: selftests: fix MAPC RDbase target formatting in vgic_lpi_stress
-Date: Mon, 20 Oct 2025 16:59:46 +0200
-Message-ID: <20251020145946.48288-1-mdittgen@amazon.de>
-X-Mailer: git-send-email 2.50.1
+        d=google.com; s=20230601; t=1760972610; x=1761577410; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=zL0bQ6/3gvtRqbV4MzYKUtzArdDuysj5d7SMlb+pduA=;
+        b=e35AFnFemYsnBGNC2uxdM1dNeyCMY3iQ8JELi04iuF71QlccfJFrUW2CjVoh2CvVbL
+         9Ebyq/kuISacnvH8YlmHxaVYIUhGhYi5QjKD2ZMPzNGKEVxGZS9oOIBbLL9ZrPJmwiuk
+         0VblPQqMtmUH9ITSl2B7d51xiJCuz2NNdna/rgwm95dfTv0rGEGtYMEKRvzYrdkQROcI
+         MR/xPUrchRSlzgY9ZRiLVJjZktoIFejjEqbAK86aPcZkV2S7ih0ChzbormR9rXHql9qe
+         gpWfrLefKYxQtDG1fnFecxRwkJW9j36nXFslLE8RKRiiHcz2lY+TQJXEK6htXuZ1MlLO
+         eQ+w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1760972610; x=1761577410;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=zL0bQ6/3gvtRqbV4MzYKUtzArdDuysj5d7SMlb+pduA=;
+        b=GPNZ21ExNR8DVeefmz7hS5z1YPS7CK8uwH4WvQJFChWBYNnphUt9E/CnfWeu5vKuZ5
+         cvPxPXkB+2q+JNan17TmmGZVHDNdYfJH/HbGn4OCHyOktuBkyfqIFjsyxcJZE3oi7tb0
+         ktdb9J2PBal+Y4La1+SAzcmbyiaffDhft0576g4EKpJsXOfuZGP2pgw/iA8r/O6tJCVA
+         y882jfykEJkrv0C2R9ps03+p3QE56JBA/uIEu+IyKo8vsj2p12u+8f2JVBBKmqIfj9cH
+         Nfy+LGbZIS1UQp1jlibdcH6G6gjqcibskFcGlf9uiF3Z0anmoqyxJo/EN0M1i1vHVQ+V
+         m4Ng==
+X-Forwarded-Encrypted: i=1; AJvYcCWXE2JOotveENN0f090ga+ppiczKS7khBG2dV66QgxU0BNNafwETzBwZJHvJIYu51/evrA=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yx+7HQWND72W9iaY/ixpTlY9OwIHHHkbbt1+GYOspvemyWN/PnX
+	Nn6/t0OxfVkQprg248aQAs9fIwANvDqAoTxyu3YI0Del1R9zOHfPRFg+7k/OigmOh8Dy4dJnJor
+	tS06T3g==
+X-Google-Smtp-Source: AGHT+IED+ZoRV9Gme3Hg8UT2kzR82Ieuz1hE30z96B//E9xmEt9U0Wk3RrQY+Fn044AfyylP6vcAWu/QPzk=
+X-Received: from pjff13.prod.google.com ([2002:a17:90b:562d:b0:33d:69cf:1f82])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90a:ec8b:b0:32b:6145:fa63
+ with SMTP id 98e67ed59e1d1-33bcf860229mr21306555a91.4.1760972609985; Mon, 20
+ Oct 2025 08:03:29 -0700 (PDT)
+Date: Mon, 20 Oct 2025 08:03:28 -0700
+In-Reply-To: <0a49bd9b-e4d8-42eb-854c-e8730b5a58b7@intel.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-X-ClientProxiedBy: EX19D035UWB001.ant.amazon.com (10.13.138.33) To
- EX19D016EUA001.ant.amazon.com (10.252.50.245)
+Mime-Version: 1.0
+References: <20251016182148.69085-1-seanjc@google.com> <20251016182148.69085-3-seanjc@google.com>
+ <46eb76240a29cb81b6a8aa41016466810abef559.camel@intel.com>
+ <aPJ8A8u8zIvp-wB4@google.com> <38ac916f7c3ae7520708f37389f5524d9278c648.camel@intel.com>
+ <0a49bd9b-e4d8-42eb-854c-e8730b5a58b7@intel.com>
+Message-ID: <aPZPQCFNn__Vzz3O@google.com>
+Subject: Re: [PATCH v2 2/2] KVM: TDX: WARN if a SEAMCALL VM-Exit makes its way
+ out to KVM
+From: Sean Christopherson <seanjc@google.com>
+To: Xiaoyao Li <xiaoyao.li@intel.com>
+Cc: Kai Huang <kai.huang@intel.com>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>, 
+	"pbonzini@redhat.com" <pbonzini@redhat.com>, Dan J Williams <dan.j.williams@intel.com>, 
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, 
+	Rick P Edgecombe <rick.p.edgecombe@intel.com>, 
+	"binbin.wu@linux.intel.com" <binbin.wu@linux.intel.com>
 Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
 
-Since GITS_TYPER.PTA == 0, the ITS MAPC command demands a CPU ID,
-rather than a physical redistributor address, for its RDbase
-command argument.
+On Mon, Oct 20, 2025, Xiaoyao Li wrote:
+> On 10/18/2025 4:58 AM, Huang, Kai wrote:
+> > On Fri, 2025-10-17 at 10:25 -0700, Sean Christopherson wrote:
+> > > On Fri, Oct 17, 2025, Kai Huang wrote:
+> > > > While this exit should never happen from a TDX guest, I am wondering why
+> > > > we need to explicitly handle the SEAMCALL?  E.g., per "Unconditionally
+> > > > Blocked Instructions" ENCLS/ENCLV are also listed, therefore
+> > > > EXIT_REASON_ELCLS/ENCLV should never come from a TDX guest either.
+> > > 
+> > > Good point.  SEAMCALL was obviously top of mind, I didn't think about all the
+> > > other exits that should be impossible.
+> > > 
+> > > I haven't looked closely, at all, but I wonder if we can get away with this?
+> > > 
+> > > diff --git a/arch/x86/kvm/vmx/tdx.c b/arch/x86/kvm/vmx/tdx.c
+> > > index 097304bf1e1d..4c68444bd673 100644
+> > > --- a/arch/x86/kvm/vmx/tdx.c
+> > > +++ b/arch/x86/kvm/vmx/tdx.c
+> > > @@ -2149,6 +2149,8 @@ int tdx_handle_exit(struct kvm_vcpu *vcpu, fastpath_t fastpath)
+> > >                   */
+> > >                  return 1;
+> > >          default:
+> > > +               /* All other known exits should be handled by the TDX-Module. */
+> > > +               WARN_ON_ONCE(exit_reason.basic <= c);
+> > >                  break;
+> > >          }
+> > 
+> > Not 100% sure, but should be fine?  Needs more second eyes here.
+> > 
+> > E.g., when a new module feature makes another exit reason possible then
+> > presumably we need explicit opt-in to that feature.
+> > 
+> > Don't quite follow 'exit_reason.basic <= c' part, though.  Maybe we can
+> > just unconditional WARN_ON_ONCE()?
+> > 
+> > Or we can do things similar to VMX:
+> > 
+> >          vcpu_unimpl(vcpu, "vmx: unexpected exit reason 0x%x\n",
+> >                      exit_reason.full);
+> > 
+> > Or just get rid of this patch :-)
+> 
+> I agree to it.
+> 
+> WARN_ON_ONCE() seems not provide more information except that we can
+> identify quickly there is TDX module bug when it gets hit.
 
-As such, when MAPC-ing guest ITS collections, vgic_lpi_stress iterates
-over CPU IDs in the range [0, nr_cpus), passing them as the RDbase
-vcpu_id argument to its_send_mapc_cmd().
+WARNs are helpful for fuzzing, e.g. with syzkaller, where userspace isn't going
+to complain or even log anything if KVM_RUN fails.
 
-However, its_encode_target() in the its_send_mapc_cmd() selftest
-handler expects RDbase arguments to be formatted with a 16 bit 
-offset, as shown by the 16-bit target_addr right shift its implementation:
+> But it's not too hard to get these information from the
+> KVM_INTERNAL_ERROR_UNEXPECTED_EXIT_REASON with vp_enter_ret in data[0].
+> 
+> And if we add WARN_ON_ONCE() here, we need to evaluate if it needs to update
+> "EXIT_REASON_TDCALL" everytime a new EXIT reason is introduced.
+> e.g., currently the largest exit reason number defined in SDM is 79 (for
+> WRMSRLIST) and it is actually handled by TDX module and KVM cannot receive
+> it from a TD vcpu.
 
-        its_mask_encode(&cmd->raw_cmd[2], target_addr >> 16, 51, 16)
+Hmm, to some extent this is a case of "don't let perfect be the enemy of good
+enough".  Just because we can't WARN on _all_ unexpected exits doesn't make
+WARNing on the others useless.
 
-At the moment, all CPU IDs passed into its_send_mapc_cmd() have no
-offset, therefore becoming 0x0 after the bit shift. Thus, when
-vgic_its_cmd_handle_mapc() receives the ITS command in vgic-its.c,
-it always interprets the RDbase target CPU as CPU 0. All interrupts
-sent to collections will be processed by vCPU 0, which defeats the
-purpose of this multi-vCPU test.
+That said, I agree that making the WARN conditional on the exit reason would be
+a maintenance burden.  And I also agree with the implied "rule" that TDX should
+follow whatever VMX is doing (and ideally SVM would behavior identically as well).
 
-Fix by creating procnum_to_rdbase() helper function, which left-shifts
-the vCPU parameter received by its_send_mapc_cmd 16 bits before passing
-it to its_encode_target for encoding.
+At the very least, we should consolidate that code.  And then we can have a broader
+discussion on how exactly to add a WARN.  E.g. if for some reason we can't WARN
+unconditionally, we could add an off-by-default module param.
 
-Signed-off-by: Maximilian Dittgen <mdittgen@amazon.de>
----
-v2: Refactor the vcpu_id left shift into procnum_to_rdbase() helper.
-    Rename and rewrite commit to reflect root cause of bug which was
-    improper RDbase formatting, not that MAPC expects a physical
-    address as the RDbase parameter.
+I'll drop this patch and post a mini-series with the below to start a general
+conversation on whether or not to WARN on unexpected exits.
 
-To validate the patch, I added the following debug code at the top of vgic_its_cmd_handle_mapc:
-
-	u64 raw_cmd2 = le64_to_cpu(its_cmd[2]);
-	u32 target_addr = its_cmd_get_target_addr(its_cmd);
-
-	kvm_info("MAPC: coll_id=%d, raw_cmd[2]=0x%llx, parsed_target=%u\n",
-		coll_id, raw_cmd2, target_addr);
-	vcpu = kvm_get_vcpu_by_id(kvm, its_cmd_get_target_addr(its_cmd));
-	kvm_info("MAPC: coll_id=%d, vcpu_id=%d\n", coll_id, vcpu ? vcpu->vcpu_id : -1);
-
-I then ran `./vgic_lpi_stress -v 3` to trigger the stress selftest with 3 vCPUs.
-
-Before the patch, the debug logs read:
-kvm [20832]: MAPC: coll_id=0, raw_cmd[2]=0x8000000000000000, parsed_target=0
-kvm [20832]: MAPC: coll_id=0, vcpu_id=0
-kvm [20832]: MAPC: coll_id=1, raw_cmd[2]=0x8000000000000001, parsed_target=0
-kvm [20832]: MAPC: coll_id=1, vcpu_id=0
-kvm [20832]: MAPC: coll_id=2, raw_cmd[2]=0x8000000000000002, parsed_target=0
-kvm [20832]: MAPC: coll_id=2, vcpu_id=0
-
-Note the last bit of the cmd string reflects the collection ID, but the rest of the cmd string reads 0. The handler parses out vCPU 0 for all 3 mapc calls.
-
-After the patch, the debug logs read:
-kvm [20019]: MAPC: coll_id=0, raw_cmd[2]=0x8000000000000000, parsed_target=0
-kvm [20019]: MAPC: coll_id=0, vcpu_id=0
-kvm [20019]: MAPC: coll_id=1, raw_cmd[2]=0x8000000000010001, parsed_target=1
-kvm [20019]: MAPC: coll_id=1, vcpu_id=1
-kvm [20019]: MAPC: coll_id=2, raw_cmd[2]=0x8000000000020002, parsed_target=2
-kvm [20019]: MAPC: coll_id=2, vcpu_id=2
-
-Note that the target vcpu and target collection are both visible in the cmd string. The handler parses out the correct vCPU for all 3 mapc calls.
-___
- tools/testing/selftests/kvm/lib/arm64/gic_v3_its.c | 9 ++++++++-
- 1 file changed, 8 insertions(+), 1 deletion(-)
-
-diff --git a/tools/testing/selftests/kvm/lib/arm64/gic_v3_its.c b/tools/testing/selftests/kvm/lib/arm64/gic_v3_its.c
-index 09f270545646..0e2f8ed90f30 100644
---- a/tools/testing/selftests/kvm/lib/arm64/gic_v3_its.c
-+++ b/tools/testing/selftests/kvm/lib/arm64/gic_v3_its.c
-@@ -15,6 +15,8 @@
- #include "gic_v3.h"
- #include "processor.h"
+diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
+index 48598d017d6f..4fbe4b7ce1da 100644
+--- a/arch/x86/include/asm/kvm_host.h
++++ b/arch/x86/include/asm/kvm_host.h
+@@ -2167,6 +2167,7 @@ void __kvm_prepare_emulation_failure_exit(struct kvm_vcpu *vcpu,
+ void kvm_prepare_emulation_failure_exit(struct kvm_vcpu *vcpu);
  
-+#define GITS_COLLECTION_TARGET_SHIFT 16
-+
- static u64 its_read_u64(unsigned long offset)
+ void kvm_prepare_event_vectoring_exit(struct kvm_vcpu *vcpu, gpa_t gpa);
++void kvm_prepare_unexpected_reason_exit(struct kvm_vcpu *vcpu, u64 exit_reason);
+ 
+ void kvm_enable_efer_bits(u64);
+ bool kvm_valid_efer(struct kvm_vcpu *vcpu, u64 efer);
+diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
+index f14709a511aa..83e0d4d5f4c5 100644
+--- a/arch/x86/kvm/svm/svm.c
++++ b/arch/x86/kvm/svm/svm.c
+@@ -3451,13 +3451,8 @@ static bool svm_check_exit_valid(u64 exit_code)
+ 
+ static int svm_handle_invalid_exit(struct kvm_vcpu *vcpu, u64 exit_code)
  {
- 	return readq_relaxed(GITS_BASE_GVA + offset);
-@@ -163,6 +165,11 @@ static void its_encode_collection(struct its_cmd_block *cmd, u16 col)
- 	its_mask_encode(&cmd->raw_cmd[2], col, 15, 0);
+-       vcpu_unimpl(vcpu, "svm: unexpected exit reason 0x%llx\n", exit_code);
+        dump_vmcb(vcpu);
+-       vcpu->run->exit_reason = KVM_EXIT_INTERNAL_ERROR;
+-       vcpu->run->internal.suberror = KVM_INTERNAL_ERROR_UNEXPECTED_EXIT_REASON;
+-       vcpu->run->internal.ndata = 2;
+-       vcpu->run->internal.data[0] = exit_code;
+-       vcpu->run->internal.data[1] = vcpu->arch.last_vmentry_cpu;
++       kvm_prepare_unexpected_reason_exit(vcpu, exit_code);
+        return 0;
  }
  
-+static u64 procnum_to_rdbase(u32 vcpu_id)
+diff --git a/arch/x86/kvm/vmx/tdx.c b/arch/x86/kvm/vmx/tdx.c
+index 326db9b9c567..079d9f13eddb 100644
+--- a/arch/x86/kvm/vmx/tdx.c
++++ b/arch/x86/kvm/vmx/tdx.c
+@@ -2145,11 +2145,7 @@ int tdx_handle_exit(struct kvm_vcpu *vcpu, fastpath_t fastpath)
+        }
+ 
+ unhandled_exit:
+-       vcpu->run->exit_reason = KVM_EXIT_INTERNAL_ERROR;
+-       vcpu->run->internal.suberror = KVM_INTERNAL_ERROR_UNEXPECTED_EXIT_REASON;
+-       vcpu->run->internal.ndata = 2;
+-       vcpu->run->internal.data[0] = vp_enter_ret;
+-       vcpu->run->internal.data[1] = vcpu->arch.last_vmentry_cpu;
++       kvm_prepare_unexpected_reason_exit(vcpu, vp_enter_ret);
+        return 0;
+ }
+ 
+diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
+index 1021d3b65ea0..08f7957ed4c3 100644
+--- a/arch/x86/kvm/vmx/vmx.c
++++ b/arch/x86/kvm/vmx/vmx.c
+@@ -6642,15 +6642,8 @@ static int __vmx_handle_exit(struct kvm_vcpu *vcpu, fastpath_t exit_fastpath)
+        return kvm_vmx_exit_handlers[exit_handler_index](vcpu);
+ 
+ unexpected_vmexit:
+-       vcpu_unimpl(vcpu, "vmx: unexpected exit reason 0x%x\n",
+-                   exit_reason.full);
+        dump_vmcs(vcpu);
+-       vcpu->run->exit_reason = KVM_EXIT_INTERNAL_ERROR;
+-       vcpu->run->internal.suberror =
+-                       KVM_INTERNAL_ERROR_UNEXPECTED_EXIT_REASON;
+-       vcpu->run->internal.ndata = 2;
+-       vcpu->run->internal.data[0] = exit_reason.full;
+-       vcpu->run->internal.data[1] = vcpu->arch.last_vmentry_cpu;
++       kvm_prepare_unexpected_reason_exit(vcpu, exit_reason.full);
+        return 0;
+ }
+ 
+diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+index b4b5d2d09634..c826cd05228a 100644
+--- a/arch/x86/kvm/x86.c
++++ b/arch/x86/kvm/x86.c
+@@ -9110,6 +9110,18 @@ void kvm_prepare_event_vectoring_exit(struct kvm_vcpu *vcpu, gpa_t gpa)
+ }
+ EXPORT_SYMBOL_FOR_KVM_INTERNAL(kvm_prepare_event_vectoring_exit);
+ 
++void kvm_prepare_unexpected_reason_exit(struct kvm_vcpu *vcpu, u64 exit_reason)
 +{
-+	return vcpu_id << GITS_COLLECTION_TARGET_SHIFT;
-+}
++       vcpu_unimpl(vcpu, "unexpected exit reason 0x%llx\n", exit_reason);
 +
- #define GITS_CMDQ_POLL_ITERATIONS	0
- 
- static void its_send_cmd(void *cmdq_base, struct its_cmd_block *cmd)
-@@ -217,7 +224,7 @@ void its_send_mapc_cmd(void *cmdq_base, u32 vcpu_id, u32 collection_id, bool val
- 
- 	its_encode_cmd(&cmd, GITS_CMD_MAPC);
- 	its_encode_collection(&cmd, collection_id);
--	its_encode_target(&cmd, vcpu_id);
-+	its_encode_target(&cmd, procnum_to_rdbase(vcpu_id));
- 	its_encode_valid(&cmd, valid);
- 
- 	its_send_cmd(cmdq_base, &cmd);
--- 
-2.50.1 (Apple Git-155)
-
-
-
-
-Amazon Web Services Development Center Germany GmbH
-Tamara-Danz-Str. 13
-10243 Berlin
-Geschaeftsfuehrung: Christian Schlaeger
-Eingetragen am Amtsgericht Charlottenburg unter HRB 257764 B
-Sitz: Berlin
-Ust-ID: DE 365 538 597
-
++       vcpu->run->exit_reason = KVM_EXIT_INTERNAL_ERROR;
++       vcpu->run->internal.suberror = KVM_INTERNAL_ERROR_UNEXPECTED_EXIT_REASON;
++       vcpu->run->internal.ndata = 2;
++       vcpu->run->internal.data[0] = exit_reason;
++       vcpu->run->internal.data[1] = vcpu->arch.last_vmentry_cpu;
++}
++EXPORT_SYMBOL_FOR_KVM_INTERNAL(kvm_prepare_unexpected_reason_exit);
++
+ static int handle_emulation_failure(struct kvm_vcpu *vcpu, int emulation_type)
+ {
+        struct kvm *kvm = vcpu->kvm;
 
