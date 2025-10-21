@@ -1,135 +1,120 @@
-Return-Path: <kvm+bounces-60694-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-60695-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id D461EBF7C53
-	for <lists+kvm@lfdr.de>; Tue, 21 Oct 2025 18:46:48 +0200 (CEST)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
+	by mail.lfdr.de (Postfix) with ESMTPS id 345FABF7C80
+	for <lists+kvm@lfdr.de>; Tue, 21 Oct 2025 18:48:44 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id A0AEC189756D
-	for <lists+kvm@lfdr.de>; Tue, 21 Oct 2025 16:47:09 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id F10504E1F46
+	for <lists+kvm@lfdr.de>; Tue, 21 Oct 2025 16:48:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 42135346D88;
-	Tue, 21 Oct 2025 16:46:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AACF83446C1;
+	Tue, 21 Oct 2025 16:48:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="Dc/cVxzw"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="MyajYB+A"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pj1-f74.google.com (mail-pj1-f74.google.com [209.85.216.74])
+Received: from mail-pj1-f73.google.com (mail-pj1-f73.google.com [209.85.216.73])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D537B3431E9
-	for <kvm@vger.kernel.org>; Tue, 21 Oct 2025 16:46:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.74
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7D273346E79
+	for <kvm@vger.kernel.org>; Tue, 21 Oct 2025 16:48:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.73
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761065196; cv=none; b=sA8HEHwaS2S23mQ4iQsjoNyLnOJKt4k/VDNfVWWLj8NIe1Or7F0xCTQcJ2HjeFwXGXSNT92V3vDphlroxeF325iOTZYCUXSs4ASTTWxQGJ7Xk42OJVOcxTNgawgSRRvaWgRI2C0YgUtMRfw9K3ctQy9F4DHH+ft4FFYxT6yCxbU=
+	t=1761065313; cv=none; b=RDdxGKobW20rgi9nKKnhQQuLYfRiDR1B0JKL4AwgADCwnQzapDQP7+W8MAbvyDqoW+ube8k32WiIiF5nqgvXlRfOidz8bzJRHZA/k0J+cvqS+nO38QVFm3AEJpyKtRPrmemGLco6v7sOh6oWX6Sh+7eQIns6THYEYkB8c3OKkn8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761065196; c=relaxed/simple;
-	bh=MzCSlF7JPYH2kOHDFsTdRATR2yhvHJ8O9b6vUSpv794=;
+	s=arc-20240116; t=1761065313; c=relaxed/simple;
+	bh=qNuz2BhbrPuJtjUlueV/PTGi0i61jZnzkjuzIcaTMSU=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=dpCtZIgu3V8c8DPB+YHOK4LoGesluG+fxQPmQ0Be0nebG4iNx3D7Vxfgm1ad9aA8rQlS/BOnHYW7vWRa8F+V/BXFfflFlqCr79lczpYYZlHI9jyZZZ17nByckU2O/HCDrsO9oTSPLm0oQuU/iQrMZgM4qrNJwJSu1mO0oWkAGG0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=Dc/cVxzw; arc=none smtp.client-ip=209.85.216.74
+	 To:Cc:Content-Type; b=TO1tQYG408P0VySlSVVGQ06Aon90Z1Qo0l6B0BIrc2dEwn4vgxEqRwdvwBG23bt/LiaePGoUcX0zgKt0TwuKwF5jDVv0A0JwmiAfMtVKSyMiHS3yh0ZQNHuLPafgsCMJDUkal6OGW6jMuUEckwJr/FH1qgMKNf2B8QQUF3R3oIM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=MyajYB+A; arc=none smtp.client-ip=209.85.216.73
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pj1-f74.google.com with SMTP id 98e67ed59e1d1-33bcb779733so5037788a91.3
-        for <kvm@vger.kernel.org>; Tue, 21 Oct 2025 09:46:34 -0700 (PDT)
+Received: by mail-pj1-f73.google.com with SMTP id 98e67ed59e1d1-33da1f30fdfso5916841a91.3
+        for <kvm@vger.kernel.org>; Tue, 21 Oct 2025 09:48:32 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1761065194; x=1761669994; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1761065312; x=1761670112; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=ILJtTbb3p1RSJdwFph32qlzFNqhYFB7y760KFco4Owo=;
-        b=Dc/cVxzwuupDTZOD1m0/l7YoyzamyY1dDl+GPk1FpQ95P8bJ2+5PbrYth35NFWyZeu
-         4QZN1QVfzGaseoJdvuT4C5waAk/s/zsTL4l4VwXzGp8f0KgbJiYxIGcsrxJBy/SBk2Js
-         0UbXz3LNUAIuR15Cd4h5eJW1dwCWH9M4olPTC/uCTj5k7+kWqxnbAa+uj17wxIc4bp0i
-         pv6Wai70Gv3dw9pG2tFnbuYYAqGt/PPl/7tWnnL/4KMU0Ao0usPlet7JeFSYP/Agw2Wu
-         117XjbCHcyhAZuccCLVI9Zbs5/bAUXdQd+9MfKGQeTbh7kXqUhIwVkk7v0wT1u3vWRKW
-         l2ng==
+        bh=5pwugCQDX5Fa9uMyMSiPompvEUK7ReL7M9ApQQ2FgUQ=;
+        b=MyajYB+AkuPM5jrLzxAgUXpp9jAuZetrHKAoSiJHcwfdwPpekTPOe3Vsa5ZSRgcO0y
+         49CNGGkk8fyg8mvqi5s7lk2ns7WB5Bc23Bvo78+t775gt1keRJAuC/fHN6PwW7sizOZb
+         X0cc2QgViv0GoVqLQ8gSzDCNTYSb17y/L/u+TVBhdfq1U+5vQfPT+5iw6WaLpkxZrSUy
+         CA2xlDYRJz78UGYpXd+ttt5809GE1dcm2i4r8VyMF6n+ZJ8rqgCU9rnahGQmQP26Hj7n
+         YaKGpXV0OhFzSrgOXry4S5W961mi5hm5FbhMWQ9RMh4zLBlQRxLyo/g6CTb1H+rjtX08
+         iMBA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1761065194; x=1761669994;
+        d=1e100.net; s=20230601; t=1761065312; x=1761670112;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=ILJtTbb3p1RSJdwFph32qlzFNqhYFB7y760KFco4Owo=;
-        b=OBvNPnUU3pDikzJbFG8+9ItGv/quBle1foOg3EeZ9FDCFo4kjXR6lZ+dJAhE2AvNsm
-         FXsFr682d5AvgoYoBytyBgo/S63sl3CeCi7u3y3CVK86po8yBYAReivpL2OyvZBTZ1vw
-         HhWDSGh53My4h/vUBiyxBgVh8EQexUmSscbMM5p0PmKvWZ4+vct40qRD62I5NTsBYFf4
-         MTayNrWM9PipgG10otMdVZlPAf4n1T51iekbdHw0PgLvwEn+K8i7+EImyXw3tp9tX3a3
-         KAzrwg04y2+7g9MDc6pIplKT8/C6W8yF9nZQcWY/aFTv2wntKj80GOhhnYsofyl8nxXL
-         Av4g==
-X-Forwarded-Encrypted: i=1; AJvYcCVfhSeMN0wjBmDPzET16TMOWtYDOLCkW2c4kpzJ8tN8hJwsCNm3GQ9wK5Pms4fDEqDquQs=@vger.kernel.org
-X-Gm-Message-State: AOJu0YycnuWzg+dOer3KpkjCtlnm1lvAWoZtt9xluOiI84w7NopLx3RS
-	9ObsdjzGfi2Jk0n5pRtKv+8OZH3yraM884N4bTvfwR10sceJxOfWu87/XeTc1LFmbo2uryuLAeP
-	ERs1Cmw==
-X-Google-Smtp-Source: AGHT+IHQC8FnTeE31bDovIZahN02vzwA1aMcIa7ISNfuievKsucJKLKlotq+V3A/k5eE93pnT90GbMf/PEo=
-X-Received: from pjbtd12.prod.google.com ([2002:a17:90b:544c:b0:330:b9e9:7acc])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:17cb:b0:32a:34d8:33d3
- with SMTP id 98e67ed59e1d1-33bcec1abbfmr19826042a91.0.1761065194119; Tue, 21
- Oct 2025 09:46:34 -0700 (PDT)
-Date: Tue, 21 Oct 2025 09:46:32 -0700
-In-Reply-To: <4841c40b-47b0-4b1b-985f-d1a16cbe81fa@intel.com>
+        bh=5pwugCQDX5Fa9uMyMSiPompvEUK7ReL7M9ApQQ2FgUQ=;
+        b=WEOKsvGsBj2Rb0j6bdDuG13zv4BLAxb8MME0IGTCPhenhDMHxMJEwhIfEFVZcq6qmw
+         zdNSHqp6PePNMWDKI2CNy1OJnX8FAbhAUhNRQlXb9jwz6uuRfUTwpUCnEwF9jkJJPzsy
+         /06uGN+zby0h3AEHuTrhrutf8vaXzMYxXOSeoGMWaA+xCPaD8bCvfkSAiYCzV3tUL3mI
+         /k2/n0e3LgAjspSWrkeV27WMReK4cFTktySLTUkvVz9QQ+J2L0JgrRZTv6hMRJ8smJmw
+         fRHhcqbaD/ag7SWE48jSManlTRdbNaFdClkF/tNcwdvHakRls+S8jQ9/ftDWdvxdMIMu
+         eGxg==
+X-Forwarded-Encrypted: i=1; AJvYcCX0o7PdGnkfHWV3FPUxUURJr9aTeZYTYmxIf2u6lQB8/3EDpbU934BvU7DZAsvTsghxMVM=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yya7ZsoqK35Jh3cTHvux3qSZth5A9aQ9JWVF3UnZdduslP/2F8i
+	zUBly9JZ/EiizO9nClTo6+cxZ4p/eWvcma6/76wMMr9KLjdttmBZT2i7zTFs1nWQ8KFXo0j7alw
+	s2k+m3A==
+X-Google-Smtp-Source: AGHT+IFTe4URBA8XHN2+Qq9s8GixG6Z7wvrTVQCbQJYOjxumGBtb8NxaGtW3DTPqFM4psX9kQ4XK36VDvmU=
+X-Received: from pjvp12.prod.google.com ([2002:a17:90a:df8c:b0:334:1843:ee45])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:3ec6:b0:33b:be31:8194
+ with SMTP id 98e67ed59e1d1-33bcf90ca94mr21952921a91.34.1761065311784; Tue, 21
+ Oct 2025 09:48:31 -0700 (PDT)
+Date: Tue, 21 Oct 2025 09:48:30 -0700
+In-Reply-To: <DDO1FFOJKSTK.3LSOUFU5RM6PD@google.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
-References: <20251016222816.141523-1-seanjc@google.com> <20251016222816.141523-2-seanjc@google.com>
- <e16f198e6af0b03fb0f9cfcc5fd4e7a9047aeee1.camel@intel.com>
- <d1628f0e-bbe9-48b0-8881-ad451d4ce9c5@intel.com> <aPehbDzbMHZTEtMa@google.com>
- <4841c40b-47b0-4b1b-985f-d1a16cbe81fa@intel.com>
-Message-ID: <aPe46Ev0wWks6Hz2@google.com>
-Subject: Re: [PATCH v4 1/4] KVM: TDX: Synchronize user-return MSRs immediately
- after VP.ENTER
+References: <20251016200417.97003-1-seanjc@google.com> <20251016200417.97003-2-seanjc@google.com>
+ <DDO1FFOJKSTK.3LSOUFU5RM6PD@google.com>
+Message-ID: <aPe5XpjqItip9KbP@google.com>
+Subject: Re: [PATCH v3 1/4] KVM: VMX: Flush CPU buffers as needed if L1D cache
+ flush is skipped
 From: Sean Christopherson <seanjc@google.com>
-To: Adrian Hunter <adrian.hunter@intel.com>
-Cc: Rick P Edgecombe <rick.p.edgecombe@intel.com>, "pbonzini@redhat.com" <pbonzini@redhat.com>, 
-	"kas@kernel.org" <kas@kernel.org>, Xiaoyao Li <xiaoyao.li@intel.com>, 
-	"kvm@vger.kernel.org" <kvm@vger.kernel.org>, 
-	"linux-coco@lists.linux.dev" <linux-coco@lists.linux.dev>, 
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, Yan Y Zhao <yan.y.zhao@intel.com>, 
-	"x86@kernel.org" <x86@kernel.org>, wenlong hou <houwenlong.hwl@antgroup.com>
+To: Brendan Jackman <jackmanb@google.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	Pawan Gupta <pawan.kumar.gupta@linux.intel.com>
 Content-Type: text/plain; charset="us-ascii"
 
-On Tue, Oct 21, 2025, Adrian Hunter wrote:
-> On 21/10/2025 18:06, Sean Christopherson wrote:
-> > On Tue, Oct 21, 2025, Adrian Hunter wrote:
-> >> On 21/10/2025 01:55, Edgecombe, Rick P wrote:
-> >>>> +	 * Several of KVM's user-return MSRs are clobbered by the TDX-Module if
-> >>>> +	 * VP.ENTER succeeds, i.e. on TD-Exit.  Mark those MSRs as needing an
-> >>>> +	 * update to synchronize the "current" value in KVM's cache with the
-> >>>> +	 * value in hardware (loaded by the TDX-Module).
-> >>>> +	 */
-> >>>
-> >>> I think we should be synchronizing only after a successful VP.ENTER with a real
-> >>> TD exit, but today instead we synchronize after any attempt to VP.ENTER.
-> > 
-> > Well this is all completely @#($*#.  Looking at the TDX-Module source, if the
-> > TDX-Module synthesizes an exit, e.g. because it suspects a zero-step attack, it
-> > will signal a "normal" exit but not "restore" VMM state.
-> > 
-> >> If the MSR's do not get clobbered, does it matter whether or not they get
-> >> restored.
-> > 
-> > It matters because KVM needs to know the actual value in hardware.  If KVM thinks
-> > an MSR is 'X', but it's actually 'Y', then KVM could fail to write the correct
-> > value into hardware when returning to userspace and/or when running a different
-> > vCPU.
+On Tue, Oct 21, 2025, Brendan Jackman wrote:
+> On Thu Oct 16, 2025 at 8:04 PM UTC, Sean Christopherson wrote:
+> > If the L1D flush for L1TF is conditionally enabled, flush CPU buffers to
+> > mitigate MMIO Stale Data as needed if KVM skips the L1D flush, e.g.
+> > because none of the "heavy" paths that trigger an L1D flush were tripped
+> > since the last VM-Enter.
 > 
-> I don't quite follow:  if an MSR does not get clobbered, where does the
-> incorrect value come from?
+> Presumably the assumption here was that the L1TF conditionality is good
+> enough for the MMIO stale data vuln too? I'm not qualified to assess if
+> that assumption is true, but also even if it's a good one it's
+> definitely not obvious to users that the mitigation you pick for L1TF
+> has this side-effect. So I think I'm on board with calling this a bug.
 
-kvm_set_user_return_msr() elides the WRMSR if the current value in hardware matches
-the new, desired value.  If KVM thinks the MSR is 'X', and KVM wants to set the MSR
-to 'X', then KVM will skip the WRMSR and continue on with the wrong value.
+Yeah, that's where I'm at as well.
 
-Using MSR_TSC_AUX as an example, let's say the vCPU task is running on CPU1, and
-that there's a non-TDX vCPU (with guest-side CPU=0) also scheduled on CPU1.  Before
-VP.ENTER, MSR_TSC_AUX=user_return_msrs[slot].curr=1 (the host's CPU1 value).  After
-a *failed* VP.ENTER, MSR_TSC_AUX will still be '1', but it's "curr" value in
-user_return_msrs will be '0' due to kvm_user_return_msr_update_cache() incorrectly
-thinking the TDX-Module clobbered the MSR to '0'
+> If anyone turns out to be depending on the current behaviour for
+> performance I think they should probably add it back as a separate flag.
 
-When KVM runs the non-TDX vCPU, which wants to run with MSR_TSC_AUX=0, then
-kvm_set_user_return_msr() will see msrs->values[slot].curr==value==0 and not do
-the WRMSR.  KVM will then run the non-TDX vCPU with MSR_TSC_AUX=1 and corrupt the
-guest.
+...
+
+> > @@ -6722,6 +6722,7 @@ static noinstr void vmx_l1d_flush(struct kvm_vcpu *vcpu)
+> >  		:: [flush_pages] "r" (vmx_l1d_flush_pages),
+> >  		    [size] "r" (size)
+> >  		: "eax", "ebx", "ecx", "edx");
+> > +	return true;
+> 
+> The comment in the caller says the L1D flush "includes CPU buffer clear
+> to mitigate MDS" - do we actually know that this software sequence
+> mitigates the MMIO stale data vuln like the verw does? (Do we even know if
+> it mitigates MDS?)
+> 
+> Anyway, if this is an issue, it's orthogonal to this patch.
+
+Pawan, any idea?
 
