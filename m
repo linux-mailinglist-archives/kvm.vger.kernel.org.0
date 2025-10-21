@@ -1,62 +1,107 @@
-Return-Path: <kvm+bounces-60751-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-60752-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 82250BF9298
-	for <lists+kvm@lfdr.de>; Wed, 22 Oct 2025 00:56:36 +0200 (CEST)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
+	by mail.lfdr.de (Postfix) with ESMTPS id 68A50BF92C2
+	for <lists+kvm@lfdr.de>; Wed, 22 Oct 2025 01:03:45 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 41BEA481739
-	for <lists+kvm@lfdr.de>; Tue, 21 Oct 2025 22:56:35 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 5ABC44E23F5
+	for <lists+kvm@lfdr.de>; Tue, 21 Oct 2025 23:03:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 01EC32BEC23;
-	Tue, 21 Oct 2025 22:56:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 956862BE04F;
+	Tue, 21 Oct 2025 23:03:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="oz9DC/VV"
+	dkim=pass (2048-bit key) header.d=ziepe.ca header.i=@ziepe.ca header.b="iImPtcj0"
 X-Original-To: kvm@vger.kernel.org
-Received: from out-183.mta0.migadu.com (out-183.mta0.migadu.com [91.218.175.183])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qv1-f53.google.com (mail-qv1-f53.google.com [209.85.219.53])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AAAE1299A8C
-	for <kvm@vger.kernel.org>; Tue, 21 Oct 2025 22:56:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.183
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B7AC0246774
+	for <kvm@vger.kernel.org>; Tue, 21 Oct 2025 23:03:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.53
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761087387; cv=none; b=Vn+n5/t+N0swFwhzUnWQ5fKHL5uEeXRnc0r34d/YW9HpPKwR0jn6+Dz6HmHnnC1+pzRWt5hIUFlb6vCjaurQbYphArkinNEcWc8fi1cT/cnubyuI0LILf70prClZ7oVigEEOkwpx6UvVnsNKnxfourAjw0oky0bbFIOrIjJAUbM=
+	t=1761087813; cv=none; b=uwOoQev3pEZAylWyJRqr9c+y/OuBBy0IDe0Hu0R7BehGB5VrOhVi145trq+FJuR52lErL1TEke8/XGhY5RhJgGiHyyASqImGYvivuy46X5DAJ5RyzClyLT9muEcxpWqY6t6j6J3vZwlFPrHvHzMtyOKlMLiTsPvijvJK0vuux4A=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761087387; c=relaxed/simple;
-	bh=V4NkGznR2T3JDSWLjVwJZnSY0RygDlkJEpy+1BcVOcY=;
+	s=arc-20240116; t=1761087813; c=relaxed/simple;
+	bh=DFKz/0QWxrsnlFZ7ppZ/92x0zP8vpqycj+ZZCk0JVFM=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=tfgS0vUfVZaJ+UsDnrG7Z7ekwqyuJbd4j1E/du3IJFcBcwjNoh197dLNKAb0jbwlhGQVl5BGG3Jd57nKPeObQlXM/i1mD/ibv52TSJbViKnrZMARmM81hg7GwW01o2apT09TD6C94kVDiZ4a4tsX9c4J+2C+VVqnAoSsCCVL6yc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=oz9DC/VV; arc=none smtp.client-ip=91.218.175.183
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Date: Tue, 21 Oct 2025 22:56:06 +0000
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1761087372;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=NpRYlL+s+eEOejHoASihIL1oHT0zJD6g2o7SauG22IE=;
-	b=oz9DC/VV3MtrfOCesocIxygeMEGMSmJ+eFUdPd0IojRwOa6Nn9/TeiTREaDHgRZ7b8Lnfw
-	d9qvXN4phTu3fbIynOrV/lHEMn3XtMx+NM9/TfTyT2MOJb8vFCBuPBUmGp6WO1Yx9SqBmF
-	hA/okaduGDC5wtBfwut5SHzWY0Dd7+I=
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Yosry Ahmed <yosry.ahmed@linux.dev>
-To: Jim Mattson <jmattson@google.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, Shuah Khan <shuah@kernel.org>, 
-	Sean Christopherson <seanjc@google.com>, Bibo Mao <maobibo@loongson.cn>, 
-	Huacai Chen <chenhuacai@kernel.org>, Andrew Jones <ajones@ventanamicro.com>, 
-	Claudio Imbrenda <imbrenda@linux.ibm.com>, "Pratik R. Sampat" <prsampat@amd.com>, 
-	Kai Huang <kai.huang@intel.com>, Eric Auger <eric.auger@redhat.com>, linux-kernel@vger.kernel.org, 
-	kvm@vger.kernel.org, linux-kselftest@vger.kernel.org
-Subject: Re: [PATCH 3/4] KVM: selftests: Add VM_MODE_PXXV57_4K VM mode
-Message-ID: <ffph6d2gjnw3mboy5tm2ulkyhyq7zz5y66zrtdcuutqba75oh5@b7kktjtve2fs>
-References: <20250917215031.2567566-1-jmattson@google.com>
- <20250917215031.2567566-4-jmattson@google.com>
- <l7txoioo3gntu3lyl542jg3n3wvkqruf2qh33xy7lmr5mjgfq5@iw4wsfdurlc7>
- <CALMp9eSPgy7RdT9TwKkRD5oh6-74XfCCP_UZ1mJWj6Nb9P4P7w@mail.gmail.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=LvgiC7nybymgmeeWst8zyNeel5iasyyRZyRPjVvmFoRanu/W3hqYzZwNlLmYKIHESu3TPQAj4CaWYOK0dFfbYqX/Panj47Wy+aQ7416dojinF0yc8LBQ2YuB4gDKg7kVbbVakzdlzcQ50TSFWQwf/I6dEAy4xykBQ+kbV3h77wk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ziepe.ca; spf=pass smtp.mailfrom=ziepe.ca; dkim=pass (2048-bit key) header.d=ziepe.ca header.i=@ziepe.ca header.b=iImPtcj0; arc=none smtp.client-ip=209.85.219.53
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ziepe.ca
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ziepe.ca
+Received: by mail-qv1-f53.google.com with SMTP id 6a1803df08f44-87de60d0e3eso24720946d6.3
+        for <kvm@vger.kernel.org>; Tue, 21 Oct 2025 16:03:31 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=ziepe.ca; s=google; t=1761087810; x=1761692610; darn=vger.kernel.org;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=t5Bh5O0u2edCj6s7JQTYVPlxSEp6IH0+GcP0uyaYNtA=;
+        b=iImPtcj0eybBvZ/x2BauvvI4coi2dawMepCA7Qmmwva2BKkQz2xNHfIxiBTfYtcIAv
+         LZ8xn0DXTLEYUz1j+USdjVwXOTGUz368xRNEof/TsUj57S5pl7Fuyc3/mcazgHEcBA/f
+         ySv1y8bIXa6U9ZJvZvtF8RLID3+xaRt5JIly2Ip09EGWgxG0d8yOqdiAdJzB7qziSV0M
+         Aavoa+CSYpr6ZzK5CM7m/Wd1dXL55wkA8L8jpAE1cWImj3j8Zxfr8JymazJhkU5ClzLm
+         oLKnfgtw2aX8374zmaj1/Smp50xgWLIQqiRRKkT+OmWoDvCIiNC4qDYULspd1o68fFrX
+         GZRQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1761087810; x=1761692610;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=t5Bh5O0u2edCj6s7JQTYVPlxSEp6IH0+GcP0uyaYNtA=;
+        b=AxohUnwVpT9D8+CQi69bHdGhijd0+hngtu97fErQS+N2wOjmzSS2/9nO1wqk6kOvNv
+         ZiMIWB+O7Xz0LNrBuivxZJnyd4SwRNL5H/C+idM5m0I5qbbnb5ebgvvQdIeK2sQp/48r
+         N/+Ykby/OA1Op1iZ3SLrY6ssCSpeyKiri8OluDqxLRzomfPca20cVQjCRF2frn3wNSC9
+         s6ggetwIOr5W/e1dntaZVklU6c1CLfTjpWiY5WdVjhCBqaNB08lEe5JxorXavUf7e5CB
+         rr/mowvYVgI5pn2E+4xUbLdoR4FV2XWS4Y9nWc5Ty5T0JO9BKwL0cAn+KSxMVF3L/9Vl
+         FL1g==
+X-Forwarded-Encrypted: i=1; AJvYcCXQ11O7jODzvbJouyAw3RHu3rybzPDcRAjRKhXa7cyUaX+jge5p6CSfE+48Y+QH2vEF0s8=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzKqK+5I7J+d/2V5xB+o42TpHCzNvG9TCI088hIz5Bvgw8pUghp
+	mhBtVtdPZcKMr8Zlu764QmkRgFunJ142uFoZbwiKA1VxP7yq0di5W32O2pdXQogHH30=
+X-Gm-Gg: ASbGncuJ4fRdEPqT809qEyVrtyATFoRVvNcC0ZIiBXEUfa5zHzt8ZZbD6YFHl8uFTRt
+	fS/59kwUUNPx3unfvJvYlRjX2CrCeXNwvJWC4YTYTw1y52irDoUXHw6WiAGuyrTz2kQEPiKa5gM
+	YTUDl9mvMSHPtHdarlvOfNSVPumyMrdOg/gfMOy4sUsZ5UXi7YRhbfH1SrAkwopKZqX0E+V5drG
+	2OhMHVK2OVq1IqUVNuGClw6cEohR/i/biLCyiCy+KichiiAvja5BCxYbYQpnQbxHKrO2QWzLLre
+	WDqoakpZRQOLNLgK0bqe7d7FCYFCY3RsDg9Xm4aTRaPObt/bjN6r9o/SlsR2KJe7EDKrdkn5cM8
+	mJ/1qXpfkEeKiMzXcpFuKBOPOxUcO1gMK7yW1+unv40bl7nuJDZ3EUNcMz1D0kK0m4CSwRVcYaR
+	2vhRPsyWBT55TSFexTaE8Po6fXszT1TQIbNAvqShJEWNx526OsoyxsW4X/
+X-Google-Smtp-Source: AGHT+IF5TEP/imVUZDeqxAFOvJLVSc/DIGvaFM794M9E7hmCaqBWJ7XSxLIfFTPccdLhgqmKXhQMqg==
+X-Received: by 2002:a05:6214:1243:b0:87c:1032:e849 with SMTP id 6a1803df08f44-87c2058e3e5mr236812616d6.30.1761087810447;
+        Tue, 21 Oct 2025 16:03:30 -0700 (PDT)
+Received: from ziepe.ca (hlfxns017vw-47-55-120-4.dhcp-dynamic.fibreop.ns.bellaliant.net. [47.55.120.4])
+        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-87d02884878sm76147436d6.31.2025.10.21.16.03.29
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 21 Oct 2025 16:03:29 -0700 (PDT)
+Received: from jgg by wakko with local (Exim 4.97)
+	(envelope-from <jgg@ziepe.ca>)
+	id 1vBLO4-00000000NfJ-3RNd;
+	Tue, 21 Oct 2025 20:03:28 -0300
+Date: Tue, 21 Oct 2025 20:03:28 -0300
+From: Jason Gunthorpe <jgg@ziepe.ca>
+To: =?utf-8?Q?Micha=C5=82?= Winiarski <michal.winiarski@intel.com>
+Cc: Alex Williamson <alex.williamson@redhat.com>,
+	Lucas De Marchi <lucas.demarchi@intel.com>,
+	Thomas =?utf-8?Q?Hellstr=C3=B6m?= <thomas.hellstrom@linux.intel.com>,
+	Rodrigo Vivi <rodrigo.vivi@intel.com>,
+	Yishai Hadas <yishaih@nvidia.com>,
+	Kevin Tian <kevin.tian@intel.com>,
+	Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>,
+	intel-xe@lists.freedesktop.org, linux-kernel@vger.kernel.org,
+	kvm@vger.kernel.org, dri-devel@lists.freedesktop.org,
+	Matthew Brost <matthew.brost@intel.com>,
+	Michal Wajdeczko <michal.wajdeczko@intel.com>,
+	Jani Nikula <jani.nikula@linux.intel.com>,
+	Joonas Lahtinen <joonas.lahtinen@linux.intel.com>,
+	Tvrtko Ursulin <tursulin@ursulin.net>,
+	David Airlie <airlied@gmail.com>, Simona Vetter <simona@ffwll.ch>,
+	Lukasz Laguna <lukasz.laguna@intel.com>
+Subject: Re: [PATCH 26/26] vfio/xe: Add vendor-specific vfio_pci driver for
+ Intel graphics
+Message-ID: <20251021230328.GA21554@ziepe.ca>
+References: <20251011193847.1836454-1-michal.winiarski@intel.com>
+ <20251011193847.1836454-27-michal.winiarski@intel.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -66,75 +111,57 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <CALMp9eSPgy7RdT9TwKkRD5oh6-74XfCCP_UZ1mJWj6Nb9P4P7w@mail.gmail.com>
-X-Migadu-Flow: FLOW_OUT
+In-Reply-To: <20251011193847.1836454-27-michal.winiarski@intel.com>
 
-On Tue, Oct 21, 2025 at 03:34:22PM -0700, Jim Mattson wrote:
-> On Wed, Oct 15, 2025 at 2:23 PM Yosry Ahmed <yosry.ahmed@linux.dev> wrote:
-> >
-> > On Wed, Sep 17, 2025 at 02:48:39PM -0700, Jim Mattson wrote:
-> > > Add a new VM mode, VM_MODE_PXXV57_4K, to support tests that require
-> > > 5-level paging on x86. This mode sets up a 57-bit virtual address
-> > > space and sets CR4.LA57 in the guest.
-> > >
-> > > Signed-off-by: Jim Mattson <jmattson@google.com>
-> > > ---
-> > >  .../testing/selftests/kvm/include/kvm_util.h  |  1 +
-> > >  tools/testing/selftests/kvm/lib/kvm_util.c    | 21 +++++++++++++++++
-> > >  .../testing/selftests/kvm/lib/x86/processor.c | 23 ++++++++++++-------
-> > >  tools/testing/selftests/kvm/lib/x86/vmx.c     |  7 +++---
-> > >  4 files changed, 41 insertions(+), 11 deletions(-)
-> > >
-> > > ...
-> > > diff --git a/tools/testing/selftests/kvm/lib/x86/vmx.c b/tools/testing/selftests/kvm/lib/x86/vmx.c
-> > > index d4d1208dd023..1b6d4a007798 100644
-> > > --- a/tools/testing/selftests/kvm/lib/x86/vmx.c
-> > > +++ b/tools/testing/selftests/kvm/lib/x86/vmx.c
-> > > @@ -401,11 +401,12 @@ void __nested_pg_map(struct vmx_pages *vmx, struct kvm_vm *vm,
-> > >       struct eptPageTableEntry *pt = vmx->eptp_hva, *pte;
-> > >       uint16_t index;
-> > >
-> > > -     TEST_ASSERT(vm->mode == VM_MODE_PXXV48_4K, "Attempt to use "
-> > > -                 "unknown or unsupported guest mode, mode: 0x%x", vm->mode);
-> > > +     TEST_ASSERT(vm->mode == VM_MODE_PXXV48_4K ||
-> > > +                 vm->mode == VM_MODE_PXXV57_4K,
-> > > +                 "Unknown or unsupported guest mode: 0x%x", vm->mode);
-> > >
-> > >       TEST_ASSERT((nested_paddr >> 48) == 0,
-> > > -                 "Nested physical address 0x%lx requires 5-level paging",
-> > > +                 "Nested physical address 0x%lx is > 48-bits and requires 5-level EPT",
-> >
-> > Shouldn't this assertion be updated now? We technically support 5-level
-> > EPT so it should only fire if the mode is VM_MODE_PXXV48_4K. Maybe we
-> > should use vm->va_bits?
-> 
-> I did update the assertion! :)
-> 
-> init_vmcs_control_fields() hardcodes a page-walk-length of 4 in the
-> EPTP, and the loop in __nested_pg_map() counts down from
-> PG_LEVEL_512G. There is no support for 5-level EPT here.
+On Sat, Oct 11, 2025 at 09:38:47PM +0200, Michał Winiarski wrote:
+> +	/*
+> +	 * "STOP" handling is reused for "RUNNING_P2P", as the device doesn't have the capability to
+> +	 * selectively block p2p DMA transfers.
+> +	 * The device is not processing new workload requests when the VF is stopped, and both
+> +	 * memory and MMIO communication channels are transferred to destination (where processing
+> +	 * will be resumed).
+> +	 */
+> +	if ((cur == VFIO_DEVICE_STATE_RUNNING && new == VFIO_DEVICE_STATE_STOP) ||
+> +	    (cur == VFIO_DEVICE_STATE_RUNNING && new == VFIO_DEVICE_STATE_RUNNING_P2P)) {
+> +		ret = xe_sriov_vfio_stop(xe_vdev->pf, xe_vdev->vfid);
 
-__nested_pg_map() will be gone with the series [1] moving nested
-mappings to use __virt_pg_map(), and with your series the latter does
-support 5-level EPTs. init_vmcs_control_fields() still hardcodes a
-page-walk-length of 4 tho.
+This comment is not right, RUNNING_P2P means the device can still
+receive P2P activity on it's BAR. Eg a GPU will still allow read/write
+to its framebuffer.
 
-I actually just realized, my series will already drop these assertions
-and rely on the ones in __virt_pg_map(), which do use vm->page_shift, so
-the assertion won't fire if init_vmcs_control_fields() starts using
-5-level EPTs.
+But it is not initiating any new transactions.
 
-TL;DR nothing to do here.
+> +static void xe_vfio_pci_migration_init(struct vfio_device *core_vdev)
+> +{
+> +	struct xe_vfio_pci_core_device *xe_vdev =
+> +		container_of(core_vdev, struct xe_vfio_pci_core_device, core_device.vdev);
+> +	struct pci_dev *pdev = to_pci_dev(core_vdev->dev);
+> +
+> +	if (!xe_sriov_vfio_migration_supported(pdev->physfn))
+> +		return;
+> +
+> +	/* vfid starts from 1 for xe */
+> +	xe_vdev->vfid = pci_iov_vf_id(pdev) + 1;
+> +	xe_vdev->pf = pdev->physfn;
 
-[1]https://lore.kernel.org/kvm/20251021074736.1324328-1-yosry.ahmed@linux.dev/
+No, this has to use pci_iov_get_pf_drvdata, and this driver should
+never have a naked pf pointer flowing around.
 
-> 
-> >
-> > >                   nested_paddr);
-> > >       TEST_ASSERT((nested_paddr % page_size) == 0,
-> > >                   "Nested physical address not on page boundary,\n"
-> > > --
-> > > 2.51.0.470.ga7dc726c21-goog
-> > >
-> >
+The entire exported interface is wrongly formed:
+
++bool xe_sriov_vfio_migration_supported(struct pci_dev *pdev);
++int xe_sriov_vfio_wait_flr_done(struct pci_dev *pdev, unsigned int vfid);
++int xe_sriov_vfio_stop(struct pci_dev *pdev, unsigned int vfid);
++int xe_sriov_vfio_run(struct pci_dev *pdev, unsigned int vfid);
++int xe_sriov_vfio_stop_copy_enter(struct pci_dev *pdev, unsigned int vfid);
+
+None of these should be taking in a naked pci_dev, it should all work
+on whatever type the drvdata is.
+
+And this gross thing needs to go away too:
+
+> +       if (pdev->is_virtfn && strcmp(pdev->physfn->dev.driver->name, "xe") == 0)
+> +               xe_vfio_pci_migration_init(core_vdev);
+
+Jason
 
