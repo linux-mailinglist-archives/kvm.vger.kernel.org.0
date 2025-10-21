@@ -1,112 +1,168 @@
-Return-Path: <kvm+bounces-60664-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-60665-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0C99BBF679F
-	for <lists+kvm@lfdr.de>; Tue, 21 Oct 2025 14:36:28 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4196DBF6C8E
+	for <lists+kvm@lfdr.de>; Tue, 21 Oct 2025 15:32:05 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 0453E4EFAB3
-	for <lists+kvm@lfdr.de>; Tue, 21 Oct 2025 12:36:27 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 732F818A3CDC
+	for <lists+kvm@lfdr.de>; Tue, 21 Oct 2025 13:32:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 540D132C31A;
-	Tue, 21 Oct 2025 12:36:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 53E79338594;
+	Tue, 21 Oct 2025 13:31:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ziepe.ca header.i=@ziepe.ca header.b="VoL5Saxv"
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="pu/8MhRQ"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-ot1-f46.google.com (mail-ot1-f46.google.com [209.85.210.46])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 408491E8320
-	for <kvm@vger.kernel.org>; Tue, 21 Oct 2025 12:36:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.46
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EBD25337BA3
+	for <kvm@vger.kernel.org>; Tue, 21 Oct 2025 13:31:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761050182; cv=none; b=DzmspED9ODhzHhHlDE8IU2Ax7syqDJ9idE8Jw9fQJHGSvZB3B6Zpl9g+RQNO+kRly/OpEq7e1up3cZx7p4GRqmFERjXU2+oX/BFd3wB2PLx7RSvmf7LbTvwfOl9sfbBX4xDN69jSSDh85q4fQdrfTmiK+6CdSbNHM3IjEZePKcI=
+	t=1761053509; cv=none; b=LX0o50jCwvPe88MPnpkFlzDqSnDATpt15IWIUhqRfoJujrzOzOk+exuWLgg6aCSe8fi925f2vJSwCdRatDh8XPd82SXgGi2tPoeVQzYeQ579meERj3YL0rz8AFlPzNUhmwwkXF8s6E3oo84zB4YO5awoOqBjhtj7TJE600fyOyo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761050182; c=relaxed/simple;
-	bh=IuvVYLP4TD5FVjAFF7R1GuTDvgwa7BCbt7d39eu17rk=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=W86qOjfBZ0HjB2Ca19xZIdyLbfJVulY9jW7MoRFPxiqfHPFFwjCXvzFTPTNpf4bDdDEsVtyAFAZVw3hLsUsHohf8deXne2gEy7rp1j/XuDVeIF/AcQx5kIvhN/wHnJ944Vowag4AlQoTt7Ij9PvPOTcyE68cAg5nwkFcwd8BvP0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ziepe.ca; spf=pass smtp.mailfrom=ziepe.ca; dkim=pass (2048-bit key) header.d=ziepe.ca header.i=@ziepe.ca header.b=VoL5Saxv; arc=none smtp.client-ip=209.85.210.46
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ziepe.ca
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ziepe.ca
-Received: by mail-ot1-f46.google.com with SMTP id 46e09a7af769-7b4f7a855baso3937101a34.3
-        for <kvm@vger.kernel.org>; Tue, 21 Oct 2025 05:36:19 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=ziepe.ca; s=google; t=1761050179; x=1761654979; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=BscMy2QJPNp/+d50tHKif/o+NtFK8tk0LmkoZ49Inww=;
-        b=VoL5SaxvXL/a4r+2CKPBWnk7l57IaPRhdBrkyy2OJwKbTzKSlYbjEsTLOLPvwQ6zku
-         q/c9aN2Mx1TIKN99CN/le44y5iussV6GNx27KwO0YifMB87g4CKB5UWwdzHBLSg0lg3B
-         go00prnFgNsKS8iUhHbaYJL6vEHGaj/Cpfp6bgccWEn9/lQwwEB2p+kod2vx28fRe368
-         MbFZrSXL+BUsEMTp8+3mKpmlriCmha1q3C1rBK+/5Q2Fx2OnVUUYZJhdTuDzxbtiGGGn
-         26yxPegL8L7LgVZ8WqSad7Je+9grP1mBaA/NmuvZ85WxdmUZyR1ycSGX1vhuJ0wQSxrO
-         Da7A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1761050179; x=1761654979;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=BscMy2QJPNp/+d50tHKif/o+NtFK8tk0LmkoZ49Inww=;
-        b=oxu1Y50NqF6rYlzMINYaI1epUz3IlQ3g7wwWHlCAuvq75tdslAHnR0+/fy0JfZYEW2
-         4JPfQz8H6/8YDVzSZHOQ6bY5ZxnynN8K9YSGhx+feqkIN0+OWu1USmsr4m5IwXYK2Phn
-         EzuYfYFnHSQRLqctUiNETOOQBiDzYqTy+ihG5oiWNCHCLWKF0GVvUjR/ijuhVEYHh2eR
-         UchmIXdT1t5LS7EK26VdRxLGaY2/LClNqqVEtsXwowcNaoW8f8IbjznYQNOjmIhCFlJh
-         2DXUVfcEGp6gmtc1+05gSp12AX3KPBXa/J9jvpTNGrcAeWQLp2ipoMK0nYmNJQFWBdwn
-         z47w==
-X-Forwarded-Encrypted: i=1; AJvYcCW5FWIA1SWngEgAkCH1j+TqazaotUIiElpwDWeULjfygKSdfnvB8/4+HxbEkMtdcsO9FDY=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yx6J1bRSffU73GxMHWEcMgu8K6ixv3gjsV79jfu9bhXJKx2PEfv
-	smjIOV/mAeThDVNnl+7ZFa1zTuvxYwo1Am/d1MpitXxG/CPzsHZt/uK0E78DN0q56b5B6NYGndC
-	p59xp
-X-Gm-Gg: ASbGncvYN1DvWfr5ZPwHBFT1U7DQp0H8F4ykdbeFQ/nPPuDT44TA16wRo7cSA6w71P9
-	tzfwb28zO+NGxJKKwkn25Gqk5WTzp/YrGuBhC+fnCJ9giqwsgRT3Z+BLwhnBWep+kmemTWaUtIl
-	LJkvhtHjVA6S+SCOVuNx5fcJqD6YwT0fxdEuJxefGPHs0flCsVunIg3uR+mDRgC2OaqqxzVO3Ph
-	szSqpDVqa+TWHHPHL8kTvp6Ro3vnerpIaLLoZoKUZ09j+8HelzFwKjJ8Bwtuqz8SGgAOs2iLyWM
-	9S8Q0CEn+IrPbugBUj5lbFAb6CzQj/QFQ/ntaioFhod7WEx0mpgttK+lJOGNUk+RUjYhGCHDhU/
-	SAtipe9WxMs01gmTYpvIP1EzW4qNg8q9BXdQLmZX8ffalrcqlb62+ZvspgO0S
-X-Google-Smtp-Source: AGHT+IE4uTkSED8b/A/idZtW99ihUnHUqwxK7WWbd6AGSBlCRqAodEvAD8ghVSbFuqK4NuJu0j2F+Q==
-X-Received: by 2002:a05:6830:6585:b0:7ad:a421:c655 with SMTP id 46e09a7af769-7c27cb45e2emr7263619a34.19.1761050179263;
-        Tue, 21 Oct 2025 05:36:19 -0700 (PDT)
-Received: from ziepe.ca ([130.41.10.202])
-        by smtp.gmail.com with ESMTPSA id 46e09a7af769-7c288935ed5sm3631744a34.32.2025.10.21.05.36.18
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 21 Oct 2025 05:36:18 -0700 (PDT)
-Received: from jgg by wakko with local (Exim 4.97)
-	(envelope-from <jgg@ziepe.ca>)
-	id 1vBBb7-00000002w2p-0naJ;
-	Tue, 21 Oct 2025 09:36:17 -0300
-Date: Tue, 21 Oct 2025 09:36:17 -0300
-From: Jason Gunthorpe <jgg@ziepe.ca>
-To: Alex Mastro <amastro@fb.com>
-Cc: Alex Williamson <alex.williamson@redhat.com>,
-	Alejandro Jimenez <alejandro.j.jimenez@oracle.com>,
-	kvm@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v4 0/3] vfio: handle DMA map/unmap up to the addressable
- limit
-Message-ID: <20251021123617.GT3938986@ziepe.ca>
-References: <20251012-fix-unmap-v4-0-9eefc90ed14c@fb.com>
+	s=arc-20240116; t=1761053509; c=relaxed/simple;
+	bh=jdpZ/Rdvl9DMYoboJUQIxbMXJJVMjeSXcVTxV1G36KY=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=BJRuTM+bvYlJycaxOum9tkEfJYWUpUaberCu9mX+V45FCNVQDbtFiLZjtJsU4do1A7bGNatAB0+J/5LRwbYcgRgWR/OLdPuRQpfziKWDBJS/5sGbxFRKChNRiNMy2VGORBcyPmBhyOYgDbphySbbBBRxGpcgYzJnisZlDGOIEY4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=pu/8MhRQ; arc=none smtp.client-ip=148.163.156.1
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
+Received: from pps.filterd (m0353729.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 59LCDhB2001179;
+	Tue, 21 Oct 2025 13:26:35 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
+	:content-transfer-encoding:content-type:date:from:in-reply-to
+	:message-id:mime-version:references:subject:to; s=pp1; bh=cwImrI
+	ZkdEztsUTOZiZHWIUdy0Yh1BFQJW+Pg4Ay8sk=; b=pu/8MhRQ3wURxI81YLuigO
+	A5h/fOIOw0sm7erlsyaSl82w52zlGxh1Pb1cGgN4zI1g8WLhCyRxLhovWUiuRgNk
+	gy1Cvnf6HLtXcE6Iq3Qw4Ttq40iuMwXufzB2MqxRSFrjwFWFWu6dFeCGL9evehTk
+	SJE7NrvrJTXVUa7//fTmkgR7qzgyU9Gsq54OEju17obQhuItNBR9tX+g0fv9cMFV
+	Ye6QMaYiW8KR6CYRtRj6jc4YRO+i96p9F37S0AI9hGaM4jS0Gx3WkET4O8of3wTc
+	P9Wq4mCs/ItazHHJADB11ClauCxWVhXAIR8gNG2WWyjdVcTuqaXILToL3sSMzokg
+	==
+Received: from pps.reinject (localhost [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 49v33f778a-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Tue, 21 Oct 2025 13:26:35 +0000 (GMT)
+Received: from m0353729.ppops.net (m0353729.ppops.net [127.0.0.1])
+	by pps.reinject (8.18.1.12/8.18.0.8) with ESMTP id 59LDFEL4001474;
+	Tue, 21 Oct 2025 13:26:35 GMT
+Received: from ppma13.dal12v.mail.ibm.com (dd.9e.1632.ip4.static.sl-reverse.com [50.22.158.221])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 49v33f7784-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Tue, 21 Oct 2025 13:26:35 +0000 (GMT)
+Received: from pps.filterd (ppma13.dal12v.mail.ibm.com [127.0.0.1])
+	by ppma13.dal12v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 59LCj5wB002324;
+	Tue, 21 Oct 2025 13:26:34 GMT
+Received: from smtprelay05.dal12v.mail.ibm.com ([172.16.1.7])
+	by ppma13.dal12v.mail.ibm.com (PPS) with ESMTPS id 49vqejar0s-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Tue, 21 Oct 2025 13:26:34 +0000
+Received: from smtpav05.wdc07v.mail.ibm.com (smtpav05.wdc07v.mail.ibm.com [10.39.53.232])
+	by smtprelay05.dal12v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 59LDQX5663832428
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Tue, 21 Oct 2025 13:26:33 GMT
+Received: from smtpav05.wdc07v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 7E5B75805F;
+	Tue, 21 Oct 2025 13:26:33 +0000 (GMT)
+Received: from smtpav05.wdc07v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id A19E758043;
+	Tue, 21 Oct 2025 13:26:30 +0000 (GMT)
+Received: from [9.39.25.124] (unknown [9.39.25.124])
+	by smtpav05.wdc07v.mail.ibm.com (Postfix) with ESMTPS;
+	Tue, 21 Oct 2025 13:26:30 +0000 (GMT)
+Message-ID: <602c19bc-bed9-43c2-b98c-491b75921604@linux.ibm.com>
+Date: Tue, 21 Oct 2025 18:55:53 +0530
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20251012-fix-unmap-v4-0-9eefc90ed14c@fb.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v2 04/11] hw/ppc/spapr: Inline spapr_dtb_needed()
+To: =?UTF-8?Q?Philippe_Mathieu-Daud=C3=A9?= <philmd@linaro.org>,
+        qemu-devel@nongnu.org
+Cc: qemu-ppc@nongnu.org, Nicholas Piggin <npiggin@gmail.com>,
+        kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
+        Harsh Prateek Bora <harshpb@linux.ibm.com>,
+        =?UTF-8?Q?C=C3=A9dric_Le_Goater?=
+ <clg@redhat.com>
+References: <20251021084346.73671-1-philmd@linaro.org>
+ <20251021084346.73671-5-philmd@linaro.org>
+Content-Language: en-US
+From: Chinmay Rath <rathc@linux.ibm.com>
+In-Reply-To: <20251021084346.73671-5-philmd@linaro.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-TM-AS-GCONF: 00
+X-Authority-Analysis: v=2.4 cv=FMYWBuos c=1 sm=1 tr=0 ts=68f78a0b cx=c_pps
+ a=AfN7/Ok6k8XGzOShvHwTGQ==:117 a=AfN7/Ok6k8XGzOShvHwTGQ==:17
+ a=IkcTkHD0fZMA:10 a=x6icFKpwvdMA:10 a=VkNPw1HP01LnGYTKEx00:22
+ a=KKAkSRfTAAAA:8 a=Rnii0OVWSoyPs2-5-ZUA:9 a=3ZKOabzyN94A:10 a=QEXdDO2ut3YA:10
+ a=cvBusfyB2V15izCimMoJ:22 a=cPQSjfK2_nFv0Q5t_7PE:22
+X-Proofpoint-GUID: OJPBdmFxcI1nz1-YSuMhFXb9JA2ldvK7
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUxMDE4MDAyMiBTYWx0ZWRfX+kRD5Uf7tfgT
+ rTBvnuRFfZd8npAFBRc2yNrzDtXpgb6Iwcr1HCRkIUgMg01u1GXmnPf20fsmwGgXpU4T6rAlqP8
+ ccJ4nCx/TqKiwng1D8ohreXFQSkuAj2oUfELEeFIYAYxda/cqPSPm4Qzglh3j4CgF2RhEgyP9WG
+ KFKwXruEDuYbHbGCchKm9dXLRAWVtsyy/m3VmeOmBThg2vGELmRjwtjlXrDLBboHqTvXAEr4nRY
+ e+kkOVgEom1fdQMoO1N80X2M1Vi6AeiXcZAc1tJz3gDV+N+hMtrUCE9Qff9Xx9MGQKWy/v7GZOt
+ dHNx5DT1rsdMf3sombt/84+xlYDiSt1M/Gha7pcL7oFLVWl3qMHhZk7VZ1IpZcJrf8PsakhmbLK
+ DW7fMXc/TkWkxIbUrWBvHs2Uca+afg==
+X-Proofpoint-ORIG-GUID: dTGD7Ser0z01z-nMZKlhEMcmtjKsd02O
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1121,Hydra:6.1.9,FMLib:17.12.80.40
+ definitions=2025-10-21_01,2025-10-13_01,2025-03-28_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ clxscore=1015 impostorscore=0 priorityscore=1501 adultscore=0 bulkscore=0
+ lowpriorityscore=0 suspectscore=0 phishscore=0 spamscore=0 malwarescore=0
+ classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
+ reason=mlx scancount=1 engine=8.19.0-2510020000 definitions=main-2510180022
 
-On Sun, Oct 12, 2025 at 10:32:23PM -0700, Alex Mastro wrote:
-> This patch series aims to fix vfio_iommu_type.c to support 
-> VFIO_IOMMU_MAP_DMA and VFIO_IOMMU_UNMAP_DMA operations targeting IOVA
-> ranges which lie against the addressable limit. i.e. ranges where
-> iova_start + iova_size would overflow to exactly zero.
+Hey Philippe,
+The commit message says that this commit is inline-ing 
+spapr_dtb_needed(), but it is actually removing it. I think it's better 
+to convey that in the commit message.
+Or did I miss something ?
 
-I didn't try to look through all the math changes but it looks like
-the right thing to do to me
+On 10/21/25 14:13, Philippe Mathieu-Daudé wrote:
+> Signed-off-by: Philippe Mathieu-Daudé <philmd@linaro.org>
+> ---
+>   hw/ppc/spapr.c | 6 ------
+>   1 file changed, 6 deletions(-)
+>
+> diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
+> index 458d1c29b4d..ad9fc61c299 100644
+> --- a/hw/ppc/spapr.c
+> +++ b/hw/ppc/spapr.c
+> @@ -2053,11 +2053,6 @@ static const VMStateDescription vmstate_spapr_irq_map = {
+>       },
+>   };
+>   
+> -static bool spapr_dtb_needed(void *opaque)
+> -{
+> -    return true; /* backward migration compat */
+> -}
+> -
+>   static int spapr_dtb_pre_load(void *opaque)
+>   {
+>       SpaprMachineState *spapr = (SpaprMachineState *)opaque;
+> @@ -2073,7 +2068,6 @@ static const VMStateDescription vmstate_spapr_dtb = {
+>       .name = "spapr_dtb",
+>       .version_id = 1,
 
-Reviewed-by: Jason Gunthorpe <jgg@nvidia.com>
+Does this version number need to be incremented ?
 
-Jason
+Regards,
+Chinmay
+
+>       .minimum_version_id = 1,
+> -    .needed = spapr_dtb_needed,
+>       .pre_load = spapr_dtb_pre_load,
+>       .fields = (const VMStateField[]) {
+>           VMSTATE_UINT32(fdt_initial_size, SpaprMachineState),
 
