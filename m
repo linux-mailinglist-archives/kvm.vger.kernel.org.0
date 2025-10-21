@@ -1,134 +1,192 @@
-Return-Path: <kvm+bounces-60702-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-60703-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 262C8BF7FDC
-	for <lists+kvm@lfdr.de>; Tue, 21 Oct 2025 19:56:33 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0C3B0BF8066
+	for <lists+kvm@lfdr.de>; Tue, 21 Oct 2025 20:13:13 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D2E383ACD57
-	for <lists+kvm@lfdr.de>; Tue, 21 Oct 2025 17:56:31 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8D7EA408223
+	for <lists+kvm@lfdr.de>; Tue, 21 Oct 2025 18:13:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AC38434E74E;
-	Tue, 21 Oct 2025 17:56:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0684E350284;
+	Tue, 21 Oct 2025 18:13:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=shazbot.org header.i=@shazbot.org header.b="ByFrb+rV";
-	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="EBNSGVCt"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="mJktEg+v"
 X-Original-To: kvm@vger.kernel.org
-Received: from fout-a7-smtp.messagingengine.com (fout-a7-smtp.messagingengine.com [103.168.172.150])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0FD61145B27;
-	Tue, 21 Oct 2025 17:56:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=103.168.172.150
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1B90134F27C;
+	Tue, 21 Oct 2025 18:13:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761069383; cv=none; b=f6ISsyPBQEypxAwbdHjJXIp/eVoy20fV/fgqYiGUfvkTS25V6+/qZEDNczwGycZH04MEekvtDnmBPgUy9We7HQTWVvpHrIlooKqM6SJKLAtMixDfoejGltcrXJaOrloOwj86uygU9qUXHwfZGINva3HkHVbrMkG1E9v1uOpW4IU=
+	t=1761070383; cv=none; b=BYM3UElhZZPr7g4xI6S+mi7cKdp4DeWMdSH9jyxyyEvReKpQmZKuqvfWJBHew1YYPk7ZS0oKBRA/z0fjxJ3tAGRrtotdaWOW45edf3C83TIZVQvtW1hT0rePT28kD6QbqK/jnmszzQGHMbWYrqfQcBLLdfgkt4wT6unr0BYsfyk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761069383; c=relaxed/simple;
-	bh=kdJbQlHr7SVojT6O/yafv3JN1eydhc5dG279GAI5Rh4=;
-	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type; b=CnZxPJLVmMSBSjP+lGokYxBBYSsXDaGOcvptuzJ5azz2/LcQNyM6y3uLavoT448DfIKYhucGMpPVZNkYSlFQ3hfg87S4ehW+DMrSUFYEwYpN/MDmmkW5bofYsnHU3gdQMQ1paNR9U99ThxK7NBro+yy2S7N52XymJODL3eKlRf4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=shazbot.org; spf=pass smtp.mailfrom=shazbot.org; dkim=pass (2048-bit key) header.d=shazbot.org header.i=@shazbot.org header.b=ByFrb+rV; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=EBNSGVCt; arc=none smtp.client-ip=103.168.172.150
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=shazbot.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=shazbot.org
-Received: from phl-compute-06.internal (phl-compute-06.internal [10.202.2.46])
-	by mailfout.phl.internal (Postfix) with ESMTP id B8FAAEC010A;
-	Tue, 21 Oct 2025 13:56:18 -0400 (EDT)
-Received: from phl-mailfrontend-01 ([10.202.2.162])
-  by phl-compute-06.internal (MEProxy); Tue, 21 Oct 2025 13:56:18 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=shazbot.org; h=
-	cc:cc:content-transfer-encoding:content-type:content-type:date
-	:date:from:from:in-reply-to:message-id:mime-version:reply-to
-	:subject:subject:to:to; s=fm1; t=1761069378; x=1761155778; bh=Fs
-	ZaDVo3mx36GaalwjwGl4VMzh7w8alfiF8lN7kDfEQ=; b=ByFrb+rVVLkii7nHy+
-	LIgx0lWBkuWPQatfGcrdb4kb5ENuXhB6jdUWj7YXMdjls9DkVM7y8305MJDV5d+9
-	ZqApHgvPISt+8EKsoBJo7s6pqbdFW9sboqHoVTBUYuJf9U/mug8WMnQEqA76lgZT
-	Gn3Y1NFvQqhwf022VhxvaZJDW+CSzHp3NAxM+8BHH+mJ9ccRvV+hqk70VgjrCBGo
-	eMuoLjE+Exc5Az+gCDVhiaRYAWo7rlxUK09VYEINWBH6lmU0f+GsTfzOx4gQFO2i
-	gP2OgCCO4x4OVIuntLA6fsC7Bu6jMr4gDkrmPOrpUzluT3pv4VJ4gsLh9XG2Xwb5
-	FzYw==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-	messagingengine.com; h=cc:cc:content-transfer-encoding
-	:content-type:content-type:date:date:feedback-id:feedback-id
-	:from:from:in-reply-to:message-id:mime-version:reply-to:subject
-	:subject:to:to:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=
-	fm2; t=1761069378; x=1761155778; bh=FsZaDVo3mx36GaalwjwGl4VMzh7w
-	8alfiF8lN7kDfEQ=; b=EBNSGVCtZSt4ZQDroVQvh6xNcSlhruwWsdurOWdYmx+4
-	n44hGCK2Ft/KhHoRAIg/NzXGWtL1pcK4nQ7vMQkXRRaaZPmRuWz6tnkdRahyvAz4
-	s3UtaCvDblnvZBCpb1p4xs9KpqGaN6jbmhwUWdaUuFXHKKvKe7hQb+jPPRTIKjdX
-	0sMN1z/wLCirmPEzrCx0XIowIOFrvoX6hAONlExgoczIUmMwvH5rs2czHW05P4ci
-	oTa/fxYc2SWpZ8hEiQWfNomSI4Wc8kMAGg9aS8z+PDXkigRvVVjG1zC+8UjP/ygE
-	LzxqWZi+TuumKt50GMJb49ifNdRe8iB1jrnwRIja8Q==
-X-ME-Sender: <xms:Qsn3aAaRxhlOD7ygN-MRKmmteQ1gJ8L1BSL35913N3GWIBO2Lvo4Dg>
-    <xme:Qsn3aJMxfx614mU5_VhQUX5u70kBN8jZuGFuiER0H3JWxqtc3e_GmkXLu2KYn6_h4
-    iY3jxmCZdDR1pM781DD2hXR2HjNHomxecTc4_nwax0Xh3fbsOrnhQ>
-X-ME-Received: <xmr:Qsn3aFZjdx2YTym6KnjXf253e_SQwdcWP24pobYBcatZyU6Un6wUf_T3Wqs>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeeffedrtdeggddugedufeehucetufdoteggodetrf
-    dotffvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfurfetoffkrfgpnffqhgenuceu
-    rghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujf
-    gurhepfffhvfevuffkgggtgfesthejredttddtvdenucfhrhhomheptehlvgigucghihhl
-    lhhirghmshhonhcuoegrlhgvgiesshhhrgiisghothdrohhrgheqnecuggftrfgrthhtvg
-    hrnhepieefgeeileehheeuhefghefhgfehvdfgtdeiffeuhfdvvdekhefhueeuudfffeel
-    necuffhomhgrihhnpehgihhthhhusgdrtghomhenucevlhhushhtvghrufhiiigvpedtne
-    curfgrrhgrmhepmhgrihhlfhhrohhmpegrlhgvgiesshhhrgiisghothdrohhrghdpnhgs
-    pghrtghpthhtohepgedpmhhouggvpehsmhhtphhouhhtpdhrtghpthhtohepthhorhhvrg
-    hlughssehlihhnuhigqdhfohhunhgurghtihhonhdrohhrghdprhgtphhtthhopehlihhn
-    uhigqdhkvghrnhgvlhesvhhgvghrrdhkvghrnhgvlhdrohhrghdprhgtphhtthhopehkvh
-    hmsehvghgvrhdrkhgvrhhnvghlrdhorhhgpdhrtghpthhtoheprghlvgigrdifihhllhhi
-    rghmshhonhesrhgvughhrghtrdgtohhm
-X-ME-Proxy: <xmx:Qsn3aH3d8kSgBMkUiAYbR-YflSz760oKsmhmlicFzX1DtrHb1K-dJg>
-    <xmx:Qsn3aLevjavPq2HQCdzWVnes7hY8oVEXNZAT6Nqhz6S4p7HmbuPqgA>
-    <xmx:Qsn3aIEhEyFEMFujscUzeoXBUB5lbc5IexVESv-pNZgqzuIYZhvqUQ>
-    <xmx:Qsn3aM28PakenGLA6o4Bkw6AXx5a7M-Neh9YCcL42cFx5I_q9I_SSA>
-    <xmx:Qsn3aCxxZhba38RfDV1GB0as-wvIkgrxbgipRa4RF5a5fkIUozK17Yyr>
-Feedback-ID: i03f14258:Fastmail
-Received: by mail.messagingengine.com (Postfix) with ESMTPA; Tue,
- 21 Oct 2025 13:56:17 -0400 (EDT)
-Date: Tue, 21 Oct 2025 11:56:15 -0600
-From: Alex Williamson <alex@shazbot.org>
-To: Linus Torvalds <torvalds@linux-foundation.org>
-Cc: <linux-kernel@vger.kernel.org>, "kvm@vger.kernel.org"
- <kvm@vger.kernel.org>, <alex.williamson@redhat.com>
-Subject: [GIT PULL] VFIO update for v6.18-rc3
-Message-ID: <20251021115615.4e5dd756@shazbot.org>
+	s=arc-20240116; t=1761070383; c=relaxed/simple;
+	bh=qEtRyFu2JyRfkeVJISTlGQJFGZB8HDaIGH3H4eIHZGM=;
+	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
+	 Content-Disposition; b=H2U3QqniY5Zp9N+Mbq/Huja+gHdeLt+hmwTPHVmqgUN5wmaaNe60JDMXLHJs+DMWlyLcLheQewXYh2STeISDzRFidFy0G2r6zdRPhE+lajJd0VIcHKQGWBa8YzU11Mug7L8uTUVKCrmGb25lQKxbf/DdNsC8YmIwGx+JENlc3ck=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=mJktEg+v; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2DA51C4CEF1;
+	Tue, 21 Oct 2025 18:13:00 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1761070382;
+	bh=qEtRyFu2JyRfkeVJISTlGQJFGZB8HDaIGH3H4eIHZGM=;
+	h=Date:From:To:Cc:Subject:From;
+	b=mJktEg+venEXDoxzg7uNpbWr6Tdota/l/YUnHyQDd8UUtHFfnEXWD0qRhhqvi0nzD
+	 +qvzRayzCQrHIQCNqXVEFBI4dc4B0gExeSkhHVKMRBbNjZMH9ELwKAQQHxhWihePxV
+	 NTZOJOzEosnv8gbbFL8UoDYVokn4h4EEmqnKpT/A47ZYArdvCdfop6wT/PR8bhq1bT
+	 ENWNW1uYeAHgoNIgqO/6+7YFr70ZjwKdJgpb85kTqYHptTw8BaBo/JtnjY9t8j3Rn9
+	 mGuLGlnKnzifM1CRJ2Apz7qQy1nHX4vOZWY3o6UlEw1zz8eXKHanVA+AZakg8Yya8f
+	 0PdotYY5jyVOA==
+Date: Tue, 21 Oct 2025 19:12:57 +0100
+From: "Gustavo A. R. Silva" <gustavoars@kernel.org>
+To: Paolo Bonzini <pbonzini@redhat.com>
+Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+	"Gustavo A. R. Silva" <gustavoars@kernel.org>,
+	linux-hardening@vger.kernel.org
+Subject: [PATCH][next] KVM: Avoid a few dozen -Wflex-array-member-not-at-end
+ warnings
+Message-ID: <aPfNKRpLfhmhYqfP@kspp>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 
-Hi Linus,
+-Wflex-array-member-not-at-end was introduced in GCC-14, and we are
+getting ready to enable it, globally.
 
-A tiny update as I'm changing jobs.  Different email, same signing key
-for now.  Thanks,
+So, in order to avoid ending up with a flexible-array member in the
+middle of multiple other structs, we use the `__struct_group()` helper
+to separate the flexible array from the rest of the members in the
+flexible structure, and use the tagged `struct kvm_stats_desc_hdr`
+instead of `struct kvm_stats_desc`.
 
-Alex
+So, with these changes, fix 51 instances of the following type of
+warning:
 
-The following changes since commit 211ddde0823f1442e4ad052a2f30f050145ccada:
+49 ./include/linux/kvm_host.h:1923:31: warning: structure containing a flexible array member is not at the end of another structure [-Wflex-array-member-not-at-end]
+1 .../include/linux/kvm_host.h:1923:31: warning: structure containing a flexible array member is not at the end of another structure [-Wflex-array-member-not-at-end]
+1 +./include/linux/kvm_host.h:1923:31: warning: structure containing a flexible array member is not at the end of another structure [-Wflex-array-member-not-at-end]
 
-  Linux 6.18-rc2 (2025-10-19 15:19:16 -1000)
+Notice that, before and after the changes, struct sizes and member offsets
+remain unchanged:
 
-are available in the Git repository at:
+BEFORE
 
-  https://github.com/awilliam/linux-vfio.git tags/vfio-v6.18-rc3
+struct kvm_stats_desc {
+        __u32                      flags;                /*     0     4 */
+        __s16                      exponent;             /*     4     2 */
+        __u16                      size;                 /*     6     2 */
+        __u32                      offset;               /*     8     4 */
+        __u32                      bucket_size;          /*    12     4 */
+        char                       name[];               /*    16     0 */
 
-for you to fetch changes up to b2c37c1168f537900158c860174001d055d8d583:
+        /* size: 16, cachelines: 1, members: 6 */
+        /* last cacheline: 16 bytes */
+};
 
-  MAINTAINERS: Update Alex Williamson's email address (2025-10-20 15:45:03 -0600)
+struct _kvm_stats_desc {
+        struct kvm_stats_desc      desc;                 /*     0    16 */
+        char                       name[48];             /*    16    48 */
 
-----------------------------------------------------------------
-VFIO update for v6.18-rc3
+        /* size: 64, cachelines: 1, members: 2 */
+};
 
- - Update VFIO maintainers entry (Alex Williamson)
+AFTER:
 
-----------------------------------------------------------------
-Alex Williamson (1):
-      MAINTAINERS: Update Alex Williamson's email address
+struct kvm_stats_desc {
+        union {
+                struct {
+                        __u32      flags;                /*     0     4 */
+                        __s16      exponent;             /*     4     2 */
+                        __u16      size;                 /*     6     2 */
+                        __u32      offset;               /*     8     4 */
+                        __u32      bucket_size;          /*    12     4 */
+                };                                       /*     0    16 */
+                struct kvm_stats_desc_hdr __hdr;         /*     0    16 */
+        };                                               /*     0    16 */
+        char                       name[];               /*    16     0 */
 
- .mailmap    | 1 +
- MAINTAINERS | 4 ++--
- 2 files changed, 3 insertions(+), 2 deletions(-)
+        /* size: 16, cachelines: 1, members: 2 */
+        /* last cacheline: 16 bytes */
+};
+
+struct _kvm_stats_desc {
+        struct kvm_stats_desc_hdr  desc;                 /*     0    16 */
+        char                       name[48];             /*    16    48 */
+
+        /* size: 64, cachelines: 1, members: 2 */
+};
+
+
+Signed-off-by: Gustavo A. R. Silva <gustavoars@kernel.org>
+---
+ include/uapi/linux/kvm.h | 21 ++++++++++++++++-----
+ include/linux/kvm_host.h |  2 +-
+ 2 files changed, 17 insertions(+), 6 deletions(-)
+
+diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
+index 6efa98a57ec1..99d13ebc5e82 100644
+--- a/include/uapi/linux/kvm.h
++++ b/include/uapi/linux/kvm.h
+@@ -14,6 +14,12 @@
+ #include <linux/ioctl.h>
+ #include <asm/kvm.h>
+ 
++#ifdef __KERNEL__
++#include <linux/stddef.h>       /* for offsetof */
++#else
++#include <stddef.h>             /* for offsetof */
++#endif
++
+ #define KVM_API_VERSION 12
+ 
+ /*
+@@ -1563,13 +1569,18 @@ struct kvm_stats_header {
+  *        &kvm_stats_header->name_size.
+  */
+ struct kvm_stats_desc {
+-	__u32 flags;
+-	__s16 exponent;
+-	__u16 size;
+-	__u32 offset;
+-	__u32 bucket_size;
++	/* New members MUST be added within the __struct_group() macro below. */
++	__struct_group(kvm_stats_desc_hdr, __hdr, /* no attrs */,
++		__u32 flags;
++		__s16 exponent;
++		__u16 size;
++		__u32 offset;
++		__u32 bucket_size;
++	);
+ 	char name[];
+ };
++_Static_assert(offsetof(struct kvm_stats_desc, name) == sizeof(struct kvm_stats_desc_hdr),
++	       "struct member likely outside of __struct_group()");
+ 
+ #define KVM_GET_STATS_FD  _IO(KVMIO,  0xce)
+ 
+diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
+index fa36e70df088..c630991f72be 100644
+--- a/include/linux/kvm_host.h
++++ b/include/linux/kvm_host.h
+@@ -1920,7 +1920,7 @@ struct kvm_stat_data {
+ };
+ 
+ struct _kvm_stats_desc {
+-	struct kvm_stats_desc desc;
++	struct kvm_stats_desc_hdr desc;
+ 	char name[KVM_STATS_NAME_SIZE];
+ };
+ 
+-- 
+2.43.0
+
 
