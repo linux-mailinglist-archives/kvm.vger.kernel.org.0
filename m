@@ -1,192 +1,145 @@
-Return-Path: <kvm+bounces-60703-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-60704-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0C3B0BF8066
-	for <lists+kvm@lfdr.de>; Tue, 21 Oct 2025 20:13:13 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2C40DBF8240
+	for <lists+kvm@lfdr.de>; Tue, 21 Oct 2025 20:48:04 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8D7EA408223
-	for <lists+kvm@lfdr.de>; Tue, 21 Oct 2025 18:13:09 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id CE8A319C045E
+	for <lists+kvm@lfdr.de>; Tue, 21 Oct 2025 18:48:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0684E350284;
-	Tue, 21 Oct 2025 18:13:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B32EB34C14C;
+	Tue, 21 Oct 2025 18:47:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="mJktEg+v"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="fkaPk02I"
 X-Original-To: kvm@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1B90134F27C;
-	Tue, 21 Oct 2025 18:13:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C1FCC264A92;
+	Tue, 21 Oct 2025 18:47:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761070383; cv=none; b=BYM3UElhZZPr7g4xI6S+mi7cKdp4DeWMdSH9jyxyyEvReKpQmZKuqvfWJBHew1YYPk7ZS0oKBRA/z0fjxJ3tAGRrtotdaWOW45edf3C83TIZVQvtW1hT0rePT28kD6QbqK/jnmszzQGHMbWYrqfQcBLLdfgkt4wT6unr0BYsfyk=
+	t=1761072476; cv=none; b=L0x303/bBCaJoPmIVbnWbMeDDXR7I4s+z29YmD6MAG9MXC7QUgBXwNQaGSUtYYjxyiUNzsFaF+GIIMxPhMR1PXKlsxihRaFGp1yv83UzT2MAYVCmuAmOmlMWXPFcT0BLz8tYZlkWGXtRTPde8MbgFNsYm3GsCO0qBsr42QI6NwU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761070383; c=relaxed/simple;
-	bh=qEtRyFu2JyRfkeVJISTlGQJFGZB8HDaIGH3H4eIHZGM=;
-	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
-	 Content-Disposition; b=H2U3QqniY5Zp9N+Mbq/Huja+gHdeLt+hmwTPHVmqgUN5wmaaNe60JDMXLHJs+DMWlyLcLheQewXYh2STeISDzRFidFy0G2r6zdRPhE+lajJd0VIcHKQGWBa8YzU11Mug7L8uTUVKCrmGb25lQKxbf/DdNsC8YmIwGx+JENlc3ck=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=mJktEg+v; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2DA51C4CEF1;
-	Tue, 21 Oct 2025 18:13:00 +0000 (UTC)
+	s=arc-20240116; t=1761072476; c=relaxed/simple;
+	bh=Or8UPol/3Ca66cBHJCX3ABq8gz+Sv/4BREXRc3B8dJA=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=A921AliRde/pUDXb8K7YNsvblmYYfdm+a9ZbJaU6iKfZO4mM2m4qOukDXwtFOQ7bJADHPJUgya4EArTDMVgG7Tb6ubTjZFc1XElPrCCnhnhCH+iZk0eBj4vGSwWFjdb01l0yamVuUKgyF4H5paORq2k8v7gddFw45VQJCvCCwMk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=fkaPk02I; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A1C22C4CEF1;
+	Tue, 21 Oct 2025 18:47:53 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1761070382;
-	bh=qEtRyFu2JyRfkeVJISTlGQJFGZB8HDaIGH3H4eIHZGM=;
-	h=Date:From:To:Cc:Subject:From;
-	b=mJktEg+venEXDoxzg7uNpbWr6Tdota/l/YUnHyQDd8UUtHFfnEXWD0qRhhqvi0nzD
-	 +qvzRayzCQrHIQCNqXVEFBI4dc4B0gExeSkhHVKMRBbNjZMH9ELwKAQQHxhWihePxV
-	 NTZOJOzEosnv8gbbFL8UoDYVokn4h4EEmqnKpT/A47ZYArdvCdfop6wT/PR8bhq1bT
-	 ENWNW1uYeAHgoNIgqO/6+7YFr70ZjwKdJgpb85kTqYHptTw8BaBo/JtnjY9t8j3Rn9
-	 mGuLGlnKnzifM1CRJ2Apz7qQy1nHX4vOZWY3o6UlEw1zz8eXKHanVA+AZakg8Yya8f
-	 0PdotYY5jyVOA==
-Date: Tue, 21 Oct 2025 19:12:57 +0100
-From: "Gustavo A. R. Silva" <gustavoars@kernel.org>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
-	"Gustavo A. R. Silva" <gustavoars@kernel.org>,
-	linux-hardening@vger.kernel.org
-Subject: [PATCH][next] KVM: Avoid a few dozen -Wflex-array-member-not-at-end
- warnings
-Message-ID: <aPfNKRpLfhmhYqfP@kspp>
+	s=k20201202; t=1761072476;
+	bh=Or8UPol/3Ca66cBHJCX3ABq8gz+Sv/4BREXRc3B8dJA=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=fkaPk02I4VXljsBrSM2V7XdYHCn8OcshyeP9oHaauRW8hRym9RQQsx4o4mwwMWOrf
+	 tHB7n4l0CUOWHcJ1YXAscQsXFr5vk3+Xe5EIhG+LmMsZP6dbCh2qN04Sc/7C/6EMwP
+	 xkn9OHLI359qPZYOrXOu6tfPtOEoBJ+71OoEhFlqaKLdFmxrIf2Hlpip0MwqbQwvqJ
+	 Zwhw8NpNJsGB/E4D/t2maLl8z29xQAxlAAYAGBAwlocOzyQ9IHgeESy/Wnl5lMilE9
+	 G01dV3/8uzIdDVUWy9yFWT1jtoMbrS7ds3fzXGMddTZCiF9W3uFl+cGGL73+uYmZD9
+	 aZ8CMaqx8Q9Kw==
+Date: Tue, 21 Oct 2025 19:47:50 +0100
+From: Mark Brown <broonie@kernel.org>
+To: Marc Zyngier <maz@kernel.org>
+Cc: Sascha Bischoff <Sascha.Bischoff@arm.com>,
+	"linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>,
+	"kvmarm@lists.linux.dev" <kvmarm@lists.linux.dev>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+	"kvm@vger.kernel.org" <kvm@vger.kernel.org>, nd <nd@arm.com>,
+	"oliver.upton@linux.dev" <oliver.upton@linux.dev>,
+	Joey Gouly <Joey.Gouly@arm.com>,
+	Suzuki Poulose <Suzuki.Poulose@arm.com>,
+	"yuzenghui@huawei.com" <yuzenghui@huawei.com>,
+	Paolo Bonzini <pbonzini@redhat.com>,
+	Linus Torvalds <torvalds@linux-foundation.org>,
+	Aishwarya.TCV@arm.com
+Subject: Re: [PATCH] KVM: arm64: gic-v3: Only set ICH_HCR traps for v2-on-v3
+ or v3 guests
+Message-ID: <2505ae61-c7a4-4756-a239-12d4a6653780@sirena.org.uk>
+References: <20251007160704.1673584-1-sascha.bischoff@arm.com>
+ <23072856-6b8c-41e2-93d1-ea8a240a7079@sirena.org.uk>
+ <86frbcwv5t.wl-maz@kernel.org>
+ <78b0297c-4622-4b75-bcae-45c144c92c45@sirena.org.uk>
+ <86bjm0wcag.wl-maz@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="pKIH9p1vMGpW/p5P"
+Content-Disposition: inline
+In-Reply-To: <86bjm0wcag.wl-maz@kernel.org>
+X-Cookie: Accordion, n.:
+
+
+--pKIH9p1vMGpW/p5P
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 
--Wflex-array-member-not-at-end was introduced in GCC-14, and we are
-getting ready to enable it, globally.
+On Tue, Oct 21, 2025 at 03:37:59PM +0100, Marc Zyngier wrote:
+> Mark Brown <broonie@kernel.org> wrote:
 
-So, in order to avoid ending up with a flexible-array member in the
-middle of multiple other structs, we use the `__struct_group()` helper
-to separate the flexible array from the rest of the members in the
-flexible structure, and use the tagged `struct kvm_stats_desc_hdr`
-instead of `struct kvm_stats_desc`.
+> > The only thing I can think of is that you are objecting to the idea of
+> > having the KVM arm64 tree merge it's fixes branch into it's development
+> > branch.  That is not what I am suggesting, I am suggesting putting the
+> > fixes branch itself directly into -next to be merged by Stephen.  I am
+> > not proposing any change to the content of the KVM arm64 branches.
 
-So, with these changes, fix 51 instances of the following type of
-warning:
+> Then I don't know why you even involve me here.
 
-49 ./include/linux/kvm_host.h:1923:31: warning: structure containing a flexible array member is not at the end of another structure [-Wflex-array-member-not-at-end]
-1 .../include/linux/kvm_host.h:1923:31: warning: structure containing a flexible array member is not at the end of another structure [-Wflex-array-member-not-at-end]
-1 +./include/linux/kvm_host.h:1923:31: warning: structure containing a flexible array member is not at the end of another structure [-Wflex-array-member-not-at-end]
+> You can pull anything you want in -next, and you don't need my
+> approval for it. I still don't think this is a good idea because the
+> life cycles are totally different, but if you like making your own
+> life complicated, go ahead, I'm not going to stop you.
 
-Notice that, before and after the changes, struct sizes and member offsets
-remain unchanged:
+Generally any branch in -next is included at the request of the
+maintainer, and one of the things that's attached to a branch in -next
+is a set of contacts to report any merge issues - generally whoever
+maintains the branch.  I *could* ask Stephen to add the fixes tree but
+it'd be very weird for me to do that, and if you are actively hostile
+I'm not sure what to do about contacts since I would have expected that
+to be you and Oliver.  Oliver, I don't know if you have thoughts here?
 
-BEFORE
+I really do not understand your objection here, including fixes branches
+in -next is a totally standard thing which as I have mentioned does not
+seem to be causing issues for the other trees that do it.  It is true
+that fixes get sent upstream faster (I think that's what you mean when
+you say the life cycles are different?) but I don't see why this would
+be a problem, if anything it is normally helpful to get test coverage
+sooner so there's more time for any issues to be noticed.
 
-struct kvm_stats_desc {
-        __u32                      flags;                /*     0     4 */
-        __s16                      exponent;             /*     4     2 */
-        __u16                      size;                 /*     6     2 */
-        __u32                      offset;               /*     8     4 */
-        __u32                      bucket_size;          /*    12     4 */
-        char                       name[];               /*    16     0 */
+The current situation creates work, and I would expect including the
+fixes branch in -next to reduce that work and generally make things less
+stressful.  Currently we get test issues like the one that started this
+thread getting caught only when they hit an upstream tree, this tends to
+make them more of an emergency.  We also get issues when a problem is
+detected in -next where the fix should be sent as a fix, even after the
+fix is applied it does not appear in -next until it has been pulled by
+Paolo.  In both cases even people doing testing still have whatever was
+failing showing as a failure in the the time between the fix being
+applied and it showing up in Paolo's tree which adds to their workload
+and can obscure other issues.  Reducing the latency on getting fixes
+visible in -next solves actual problems with the testing workflow.
 
-        /* size: 16, cachelines: 1, members: 6 */
-        /* last cacheline: 16 bytes */
-};
+--pKIH9p1vMGpW/p5P
+Content-Type: application/pgp-signature; name="signature.asc"
 
-struct _kvm_stats_desc {
-        struct kvm_stats_desc      desc;                 /*     0    16 */
-        char                       name[48];             /*    16    48 */
+-----BEGIN PGP SIGNATURE-----
 
-        /* size: 64, cachelines: 1, members: 2 */
-};
+iQEzBAABCgAdFiEEreZoqmdXGLWf4p/qJNaLcl1Uh9AFAmj31VYACgkQJNaLcl1U
+h9BOMgf+J13J60RaqB0NKeqwtuSZci8mm1vq7KbrxeZqdPhfSOl6VL1p4UmFJoe2
+WJC1hOzYBUN96I+U9ytnspRcYBeDlMTFeGP6Y5YPHPNXKAVMdU6pR1KnBFKISVPi
+wJA4vVIiVKN3H7bOzTBwggF6l66l9X0XgtSRCC7J4pF0opFmZH+D5yEi/dJ1B7nu
+aI5vg5qGywVmfnfnhmHNwOrdoQ78LMTBcff/h3O7DGNZ7cRInBnzuXkPLRo/rNeW
+PVbzWPkDPsRNM+d9zHJzVugHMmgB6gh6Hwe+MjQXkG46YTDGUSiNghdH+5MxpYIA
+RBjTjSw2l38bLQOE0i5l/XdwcuXlig==
+=L6ks
+-----END PGP SIGNATURE-----
 
-AFTER:
-
-struct kvm_stats_desc {
-        union {
-                struct {
-                        __u32      flags;                /*     0     4 */
-                        __s16      exponent;             /*     4     2 */
-                        __u16      size;                 /*     6     2 */
-                        __u32      offset;               /*     8     4 */
-                        __u32      bucket_size;          /*    12     4 */
-                };                                       /*     0    16 */
-                struct kvm_stats_desc_hdr __hdr;         /*     0    16 */
-        };                                               /*     0    16 */
-        char                       name[];               /*    16     0 */
-
-        /* size: 16, cachelines: 1, members: 2 */
-        /* last cacheline: 16 bytes */
-};
-
-struct _kvm_stats_desc {
-        struct kvm_stats_desc_hdr  desc;                 /*     0    16 */
-        char                       name[48];             /*    16    48 */
-
-        /* size: 64, cachelines: 1, members: 2 */
-};
-
-
-Signed-off-by: Gustavo A. R. Silva <gustavoars@kernel.org>
----
- include/uapi/linux/kvm.h | 21 ++++++++++++++++-----
- include/linux/kvm_host.h |  2 +-
- 2 files changed, 17 insertions(+), 6 deletions(-)
-
-diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
-index 6efa98a57ec1..99d13ebc5e82 100644
---- a/include/uapi/linux/kvm.h
-+++ b/include/uapi/linux/kvm.h
-@@ -14,6 +14,12 @@
- #include <linux/ioctl.h>
- #include <asm/kvm.h>
- 
-+#ifdef __KERNEL__
-+#include <linux/stddef.h>       /* for offsetof */
-+#else
-+#include <stddef.h>             /* for offsetof */
-+#endif
-+
- #define KVM_API_VERSION 12
- 
- /*
-@@ -1563,13 +1569,18 @@ struct kvm_stats_header {
-  *        &kvm_stats_header->name_size.
-  */
- struct kvm_stats_desc {
--	__u32 flags;
--	__s16 exponent;
--	__u16 size;
--	__u32 offset;
--	__u32 bucket_size;
-+	/* New members MUST be added within the __struct_group() macro below. */
-+	__struct_group(kvm_stats_desc_hdr, __hdr, /* no attrs */,
-+		__u32 flags;
-+		__s16 exponent;
-+		__u16 size;
-+		__u32 offset;
-+		__u32 bucket_size;
-+	);
- 	char name[];
- };
-+_Static_assert(offsetof(struct kvm_stats_desc, name) == sizeof(struct kvm_stats_desc_hdr),
-+	       "struct member likely outside of __struct_group()");
- 
- #define KVM_GET_STATS_FD  _IO(KVMIO,  0xce)
- 
-diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
-index fa36e70df088..c630991f72be 100644
---- a/include/linux/kvm_host.h
-+++ b/include/linux/kvm_host.h
-@@ -1920,7 +1920,7 @@ struct kvm_stat_data {
- };
- 
- struct _kvm_stats_desc {
--	struct kvm_stats_desc desc;
-+	struct kvm_stats_desc_hdr desc;
- 	char name[KVM_STATS_NAME_SIZE];
- };
- 
--- 
-2.43.0
-
+--pKIH9p1vMGpW/p5P--
 
