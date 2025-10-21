@@ -1,47 +1,47 @@
-Return-Path: <kvm+bounces-60612-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-60613-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 52F5FBF5113
-	for <lists+kvm@lfdr.de>; Tue, 21 Oct 2025 09:49:23 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 37CC0BF5122
+	for <lists+kvm@lfdr.de>; Tue, 21 Oct 2025 09:49:48 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 053414681AA
-	for <lists+kvm@lfdr.de>; Tue, 21 Oct 2025 07:49:00 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 22E70467F5A
+	for <lists+kvm@lfdr.de>; Tue, 21 Oct 2025 07:49:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BB5C9296BAA;
-	Tue, 21 Oct 2025 07:48:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7E8C3299A9E;
+	Tue, 21 Oct 2025 07:48:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="OsER5dzZ"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="lnmPdlU1"
 X-Original-To: kvm@vger.kernel.org
-Received: from out-188.mta1.migadu.com (out-188.mta1.migadu.com [95.215.58.188])
+Received: from out-178.mta1.migadu.com (out-178.mta1.migadu.com [95.215.58.178])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7385E287254
-	for <kvm@vger.kernel.org>; Tue, 21 Oct 2025 07:48:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.188
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9934278F4A
+	for <kvm@vger.kernel.org>; Tue, 21 Oct 2025 07:48:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.178
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761032909; cv=none; b=tAXQBEywrjbYztrlSHQBS5M9Jtv/pHMU3pvAYpiDKnPIigJ1ojceDySsopDoKpOy3E7vY2SlJeuzlJ5nZ0anHFvoC79pMKZIw5foHEyCvqxSr3hFAHj06fGt78CVeiIw4aAmnyHyczEayk/RJTQCe9ivpz97t2XBfOLWBLBRJ0M=
+	t=1761032912; cv=none; b=hSClpfbBqSHzl+9i4ia32zSZMyb6wnqEy3s7ltlJRb1dfoguQ7qiz/M9j9UXFV5nVqAEplMKn06tzDmGou3mLY6Q5cpAXcYLsrUmgFFYo2JxlzmNgAN+L+gb1XlTaPFzBNVXEQLjkgzYhUjJ4XW7h7ne3gDu1/k6uxx8zJ1Rmes=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761032909; c=relaxed/simple;
-	bh=LVaNsMENmT4737mdcGISug41MsGcyyDTOc4ia6HTcWk=;
+	s=arc-20240116; t=1761032912; c=relaxed/simple;
+	bh=6Jx1MhM217SwZM+cxtA/ojGcBN3OS49NXF1+7zwaxDg=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=uUdB9hNFpTqetpr/Lw8GxoaK/Xzp4BRL7FY2C5qWMjsHpsysm78IULtuVsHytSas1uu+2iVc524JMlF84dju/ssitGpUdxfHZLCNv2U47ZWOljuBrtwdDGrEkK048/TqPmeCiPIEdyUXsbIiAEeGMAshpjYiPOCcCt7qU8QhFG8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=OsER5dzZ; arc=none smtp.client-ip=95.215.58.188
+	 MIME-Version; b=h8kXScegRdCVMkJRKjXs0xpsaps55fWZiyuWx1INc0fLs7f6epRREZjdyU/xLw+FyDzLWY5wt1fHYpXuLxDe8VrmNNAhzN0nVByx3OoaZ509+MdCxM40JL3SM/H/IMMOisUYBnbSZfDLLLyn2ITSyDvOOjZ+l9lHAuQTml6j+Y4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=lnmPdlU1; arc=none smtp.client-ip=95.215.58.178
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1761032905;
+	t=1761032907;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=lTUNDlo9q1HwlAfQ4iXfIow91z31JD44qVXsfLHshAQ=;
-	b=OsER5dzZWsRtqXfpXMBpt56h/7jdqWjImCF/BpgEp8UVwgjKxI0CWmHA7tTnEah7NltKF4
-	ajSQ1TbvhHrWhNfyW56c7rZ4yfeQBpwyUIaDQz0mBM2/Ncz5PbNjphuxKgs988CbOiw884
-	N6Y2BJ5W3Ee2aBWnUn5mDtrEgUfcPsg=
+	bh=lW5vlmOxiZfXmXD5G5Wy/XGpsW60h81v/HMTtKxjkGI=;
+	b=lnmPdlU1V1Fm94d0Yc+TPQrV25Nlwn44sSXVKYerSrS9OaeMf7zp+emR3q3duM5sRbyqvE
+	93L310s0UF7UZeFGwd+s86aHI/CrNCz9OfqKUDRC3roVA0iJcODL72uv8vnL00K5cqOAGd
+	An+hdvSr1xzD2qfKdkH0S/firAqmI0Y=
 From: Yosry Ahmed <yosry.ahmed@linux.dev>
 To: Sean Christopherson <seanjc@google.com>
 Cc: Paolo Bonzini <pbonzini@redhat.com>,
@@ -49,9 +49,9 @@ Cc: Paolo Bonzini <pbonzini@redhat.com>,
 	kvm@vger.kernel.org,
 	linux-kernel@vger.kernel.org,
 	Yosry Ahmed <yosry.ahmed@linux.dev>
-Subject: [PATCH v2 02/23] KVM: selftests: Extend vmx_set_nested_state_test to cover SVM
-Date: Tue, 21 Oct 2025 07:47:15 +0000
-Message-ID: <20251021074736.1324328-3-yosry.ahmed@linux.dev>
+Subject: [PATCH v2 03/23] KVM: selftests: Extend vmx_close_while_nested_test to cover SVM
+Date: Tue, 21 Oct 2025 07:47:16 +0000
+Message-ID: <20251021074736.1324328-4-yosry.ahmed@linux.dev>
 In-Reply-To: <20251021074736.1324328-1-yosry.ahmed@linux.dev>
 References: <20251021074736.1324328-1-yosry.ahmed@linux.dev>
 Precedence: bulk
@@ -63,211 +63,123 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-Migadu-Flow: FLOW_OUT
 
-Add test cases for the validation checks in svm_set_nested_state(), and
-allow the test to run with SVM as well as VMX. The SVM test also makes
-sure that KVM_SET_NESTED_STATE accepts GIF being set or cleared if
-EFER.SVME is cleared, verifying a recently fixed bug where GIF was
-incorrectly expected to always be set when EFER.SVME is cleared.
+Add SVM L1 code to run the nested guest, and allow the test to run with
+SVM as well as VMX.
+
+Reviewed-by: Jim Mattson <jmattson@google.com>
 
 Signed-off-by: Yosry Ahmed <yosry.ahmed@linux.dev>
 ---
- tools/testing/selftests/kvm/Makefile.kvm      |   2 +-
- ...d_state_test.c => set_nested_state_test.c} | 125 ++++++++++++++++--
- 2 files changed, 116 insertions(+), 11 deletions(-)
- rename tools/testing/selftests/kvm/x86/{vmx_set_nested_state_test.c => set_nested_state_test.c} (70%)
+ tools/testing/selftests/kvm/Makefile.kvm      |  2 +-
+ ...ested_test.c => close_while_nested_test.c} | 42 +++++++++++++++----
+ 2 files changed, 35 insertions(+), 9 deletions(-)
+ rename tools/testing/selftests/kvm/x86/{vmx_close_while_nested_test.c => close_while_nested_test.c} (64%)
 
 diff --git a/tools/testing/selftests/kvm/Makefile.kvm b/tools/testing/selftests/kvm/Makefile.kvm
-index b9279ce4eaab8..acfa22206e6f3 100644
+index acfa22206e6f3..e70a844a52bdc 100644
 --- a/tools/testing/selftests/kvm/Makefile.kvm
 +++ b/tools/testing/selftests/kvm/Makefile.kvm
-@@ -100,6 +100,7 @@ TEST_GEN_PROGS_x86 += x86/set_sregs_test
- TEST_GEN_PROGS_x86 += x86/smaller_maxphyaddr_emulation_test
- TEST_GEN_PROGS_x86 += x86/smm_test
- TEST_GEN_PROGS_x86 += x86/state_test
-+TEST_GEN_PROGS_x86 += x86/set_nested_state_test
- TEST_GEN_PROGS_x86 += x86/vmx_preemption_timer_test
- TEST_GEN_PROGS_x86 += x86/svm_vmcall_test
- TEST_GEN_PROGS_x86 += x86/svm_int_ctl_test
-@@ -116,7 +117,6 @@ TEST_GEN_PROGS_x86 += x86/vmx_dirty_log_test
+@@ -112,7 +112,7 @@ TEST_GEN_PROGS_x86 += x86/ucna_injection_test
+ TEST_GEN_PROGS_x86 += x86/userspace_io_test
+ TEST_GEN_PROGS_x86 += x86/userspace_msr_exit_test
+ TEST_GEN_PROGS_x86 += x86/vmx_apic_access_test
+-TEST_GEN_PROGS_x86 += x86/vmx_close_while_nested_test
++TEST_GEN_PROGS_x86 += x86/close_while_nested_test
+ TEST_GEN_PROGS_x86 += x86/vmx_dirty_log_test
  TEST_GEN_PROGS_x86 += x86/vmx_exception_with_invalid_guest_state
  TEST_GEN_PROGS_x86 += x86/vmx_msrs_test
- TEST_GEN_PROGS_x86 += x86/vmx_invalid_nested_guest_state
--TEST_GEN_PROGS_x86 += x86/vmx_set_nested_state_test
- TEST_GEN_PROGS_x86 += x86/vmx_la57_nested_state_test
- TEST_GEN_PROGS_x86 += x86/vmx_tsc_adjust_test
- TEST_GEN_PROGS_x86 += x86/vmx_nested_tsc_scaling_test
-diff --git a/tools/testing/selftests/kvm/x86/vmx_set_nested_state_test.c b/tools/testing/selftests/kvm/x86/set_nested_state_test.c
-similarity index 70%
-rename from tools/testing/selftests/kvm/x86/vmx_set_nested_state_test.c
-rename to tools/testing/selftests/kvm/x86/set_nested_state_test.c
-index c4c400d2824c1..fe12fffacd2ec 100644
---- a/tools/testing/selftests/kvm/x86/vmx_set_nested_state_test.c
-+++ b/tools/testing/selftests/kvm/x86/set_nested_state_test.c
+diff --git a/tools/testing/selftests/kvm/x86/vmx_close_while_nested_test.c b/tools/testing/selftests/kvm/x86/close_while_nested_test.c
+similarity index 64%
+rename from tools/testing/selftests/kvm/x86/vmx_close_while_nested_test.c
+rename to tools/testing/selftests/kvm/x86/close_while_nested_test.c
+index dad988351493e..cf5f24c83c448 100644
+--- a/tools/testing/selftests/kvm/x86/vmx_close_while_nested_test.c
++++ b/tools/testing/selftests/kvm/x86/close_while_nested_test.c
 @@ -1,6 +1,6 @@
  // SPDX-License-Identifier: GPL-2.0-only
  /*
-- * vmx_set_nested_state_test
-+ * set_nested_state_test
+- * vmx_close_while_nested
++ * close_while_nested_test
   *
-  * Copyright (C) 2019, Google LLC.
+  * Copyright (C) 2019, Red Hat, Inc.
   *
-@@ -11,6 +11,7 @@
+@@ -12,6 +12,7 @@
  #include "kvm_util.h"
  #include "processor.h"
  #include "vmx.h"
 +#include "svm_util.h"
  
- #include <errno.h>
- #include <linux/kvm.h>
-@@ -253,6 +254,107 @@ void test_vmx_nested_state(struct kvm_vcpu *vcpu)
- 	free(state);
+ #include <string.h>
+ #include <sys/ioctl.h>
+@@ -22,6 +23,8 @@ enum {
+ 	PORT_L0_EXIT = 0x2000,
+ };
+ 
++#define L2_GUEST_STACK_SIZE 64
++
+ static void l2_guest_code(void)
+ {
+ 	/* Exit to L0 */
+@@ -29,9 +32,8 @@ static void l2_guest_code(void)
+ 		     : : [port] "d" (PORT_L0_EXIT) : "rax");
  }
  
-+static void vcpu_efer_enable_svm(struct kvm_vcpu *vcpu)
+-static void l1_guest_code(struct vmx_pages *vmx_pages)
++static void l1_vmx_code(struct vmx_pages *vmx_pages)
+ {
+-#define L2_GUEST_STACK_SIZE 64
+ 	unsigned long l2_guest_stack[L2_GUEST_STACK_SIZE];
+ 
+ 	GUEST_ASSERT(prepare_for_vmx_operation(vmx_pages));
+@@ -45,19 +47,43 @@ static void l1_guest_code(struct vmx_pages *vmx_pages)
+ 	GUEST_ASSERT(0);
+ }
+ 
++static void l1_svm_code(struct svm_test_data *svm)
 +{
-+	uint64_t old_efer = vcpu_get_msr(vcpu, MSR_EFER);
++	unsigned long l2_guest_stack[L2_GUEST_STACK_SIZE];
 +
-+	vcpu_set_msr(vcpu, MSR_EFER, old_efer | EFER_SVME);
++	/* Prepare the VMCB for L2 execution. */
++	generic_svm_setup(svm, l2_guest_code,
++			  &l2_guest_stack[L2_GUEST_STACK_SIZE]);
++
++	run_guest(svm->vmcb, svm->vmcb_gpa);
++	GUEST_ASSERT(0);
 +}
 +
-+static void vcpu_efer_disable_svm(struct kvm_vcpu *vcpu)
++static void l1_guest_code(void *data)
 +{
-+	uint64_t old_efer = vcpu_get_msr(vcpu, MSR_EFER);
-+
-+	vcpu_set_msr(vcpu, MSR_EFER, old_efer & ~EFER_SVME);
-+}
-+
-+void set_default_svm_state(struct kvm_nested_state *state, int size)
-+{
-+	memset(state, 0, size);
-+	state->format = 1;
-+	state->size = size;
-+	state->hdr.svm.vmcb_pa = 0x3000;
-+}
-+
-+void test_svm_nested_state(struct kvm_vcpu *vcpu)
-+{
-+	/* Add a page for VMCB. */
-+	const int state_sz = sizeof(struct kvm_nested_state) + getpagesize();
-+	struct kvm_nested_state *state =
-+		(struct kvm_nested_state *)malloc(state_sz);
-+
-+	vcpu_set_cpuid_feature(vcpu, X86_FEATURE_SVM);
-+
-+	/* The format must be set to 1. 0 for VMX, 1 for SVM. */
-+	set_default_svm_state(state, state_sz);
-+	state->format = 0;
-+	test_nested_state_expect_einval(vcpu, state);
-+
-+	/* Invalid flags are rejected, KVM_STATE_NESTED_EVMCS is VMX-only  */
-+	set_default_svm_state(state, state_sz);
-+	state->flags = KVM_STATE_NESTED_EVMCS;
-+	test_nested_state_expect_einval(vcpu, state);
-+
-+	/*
-+	 * If EFER.SVME is clear, guest mode is disallowed and GIF can be set or
-+	 * cleared.
-+	 */
-+	vcpu_efer_disable_svm(vcpu);
-+
-+	set_default_svm_state(state, state_sz);
-+	state->flags = KVM_STATE_NESTED_GUEST_MODE;
-+	test_nested_state_expect_einval(vcpu, state);
-+
-+	state->flags = 0;
-+	test_nested_state(vcpu, state);
-+
-+	state->flags = KVM_STATE_NESTED_GIF_SET;
-+	test_nested_state(vcpu, state);
-+
-+	/* Enable SVM in the guest EFER. */
-+	vcpu_efer_enable_svm(vcpu);
-+
-+	/* Setting vmcb_pa to a non-aligned address is only fine when not entering guest mode */
-+	set_default_svm_state(state, state_sz);
-+	state->hdr.svm.vmcb_pa = -1ull;
-+	state->flags = 0;
-+	test_nested_state(vcpu, state);
-+	state->flags = KVM_STATE_NESTED_GUEST_MODE;
-+	test_nested_state_expect_einval(vcpu, state);
-+
-+	/*
-+	 * Size must be large enough to fit kvm_nested_state and VMCB
-+	 * only when entering guest mode.
-+	 */
-+	set_default_svm_state(state, state_sz/2);
-+	state->flags = 0;
-+	test_nested_state(vcpu, state);
-+	state->flags = KVM_STATE_NESTED_GUEST_MODE;
-+	test_nested_state_expect_einval(vcpu, state);
-+
-+	/*
-+	 * Test that if we leave nesting the state reflects that when we get it
-+	 * again, except for vmcb_pa, which is always returned as 0 when not in
-+	 * guest mode.
-+	 */
-+	set_default_svm_state(state, state_sz);
-+	state->hdr.svm.vmcb_pa = -1ull;
-+	state->flags = KVM_STATE_NESTED_GIF_SET;
-+	test_nested_state(vcpu, state);
-+	vcpu_nested_state_get(vcpu, state);
-+	TEST_ASSERT(state->size >= sizeof(*state) && state->size <= state_sz,
-+		    "Size must be between %ld and %d.  The size returned was %d.",
-+		    sizeof(*state), state_sz, state->size);
-+	TEST_ASSERT(state->hdr.svm.vmcb_pa == 0,
-+		    "vmcb_pa must be 0, but was %llx",
-+		    state->hdr.svm.vmcb_pa);
-+	TEST_ASSERT(state->flags == KVM_STATE_NESTED_GIF_SET,
-+		    "Flags must be equal to 0x%hx, but was 0x%hx",
-+		    KVM_STATE_NESTED_GIF_SET, state->flags);
-+
-+	free(state);
++	if (this_cpu_has(X86_FEATURE_VMX))
++		l1_vmx_code(data);
++	else
++		l1_svm_code(data);
 +}
 +
  int main(int argc, char *argv[])
  {
+-	vm_vaddr_t vmx_pages_gva;
++	vm_vaddr_t guest_gva;
+ 	struct kvm_vcpu *vcpu;
  	struct kvm_vm *vm;
-@@ -261,20 +363,20 @@ int main(int argc, char *argv[])
  
- 	have_evmcs = kvm_check_cap(KVM_CAP_HYPERV_ENLIGHTENED_VMCS);
- 
+-	TEST_REQUIRE(kvm_cpu_has(X86_FEATURE_VMX));
 +	TEST_REQUIRE(kvm_cpu_has(X86_FEATURE_VMX) ||
 +		     kvm_cpu_has(X86_FEATURE_SVM));
- 	TEST_REQUIRE(kvm_has_cap(KVM_CAP_NESTED_STATE));
  
--	/*
--	 * AMD currently does not implement set_nested_state, so for now we
--	 * just early out.
--	 */
--	TEST_REQUIRE(kvm_cpu_has(X86_FEATURE_VMX));
--
- 	vm = vm_create_with_one_vcpu(&vcpu, NULL);
+ 	vm = vm_create_with_one_vcpu(&vcpu, l1_guest_code);
  
- 	/*
--	 * First run tests with VMX disabled to check error handling.
-+	 * First run tests with VMX/SVM disabled to check error handling.
-+	 * test_{vmx/svm}_nested_state() will re-enable as needed.
- 	 */
--	vcpu_clear_cpuid_feature(vcpu, X86_FEATURE_VMX);
+-	/* Allocate VMX pages and shared descriptors (vmx_pages). */
+-	vcpu_alloc_vmx(vm, &vmx_pages_gva);
+-	vcpu_args_set(vcpu, 1, vmx_pages_gva);
 +	if (kvm_cpu_has(X86_FEATURE_VMX))
-+		vcpu_clear_cpuid_feature(vcpu, X86_FEATURE_VMX);
++		vcpu_alloc_vmx(vm, &guest_gva);
 +	else
-+		vcpu_clear_cpuid_feature(vcpu, X86_FEATURE_SVM);
++		vcpu_alloc_svm(vm, &guest_gva);
++
++	vcpu_args_set(vcpu, 1, guest_gva);
  
- 	/* Passing a NULL kvm_nested_state causes a EFAULT. */
- 	test_nested_state_expect_efault(vcpu, NULL);
-@@ -303,7 +405,10 @@ int main(int argc, char *argv[])
- 	state.flags = KVM_STATE_NESTED_RUN_PENDING;
- 	test_nested_state_expect_einval(vcpu, &state);
- 
--	test_vmx_nested_state(vcpu);
-+	if (kvm_cpu_has(X86_FEATURE_VMX))
-+		test_vmx_nested_state(vcpu);
-+	else
-+		test_svm_nested_state(vcpu);
- 
- 	kvm_vm_free(vm);
- 	return 0;
+ 	for (;;) {
+ 		volatile struct kvm_run *run = vcpu->run;
 -- 
 2.51.0.869.ge66316f041-goog
 
