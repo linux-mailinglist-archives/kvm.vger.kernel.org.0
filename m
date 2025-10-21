@@ -1,183 +1,172 @@
-Return-Path: <kvm+bounces-60657-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-60658-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8A8CEBF5F34
-	for <lists+kvm@lfdr.de>; Tue, 21 Oct 2025 13:08:21 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id D9441BF604F
+	for <lists+kvm@lfdr.de>; Tue, 21 Oct 2025 13:27:41 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 83DA14E5424
-	for <lists+kvm@lfdr.de>; Tue, 21 Oct 2025 11:08:19 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 7BB861891490
+	for <lists+kvm@lfdr.de>; Tue, 21 Oct 2025 11:28:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4982B2F28EB;
-	Tue, 21 Oct 2025 11:08:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DCE8B32B9BC;
+	Tue, 21 Oct 2025 11:27:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="ubj3blZh";
-	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="rnq1UIRV";
-	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="B/lq3WTD";
-	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="dx2E3qT9"
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="DsnwwVaD"
 X-Original-To: kvm@vger.kernel.org
-Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.223.131])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AE079189F20
-	for <kvm@vger.kernel.org>; Tue, 21 Oct 2025 11:08:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.131
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7C40932B985
+	for <kvm@vger.kernel.org>; Tue, 21 Oct 2025 11:27:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761044893; cv=none; b=gs6iJYetoZU9uQXub6hkhQ3BpXxJSi1dwkTMfMsz2wZZyeF1++HCXZQXfKdSNZv8JR+Uy37stcGvnLTBOh9i7rnBSDjxZ3qgQw/Uaowksu7YY6XwbNnPWz5kkPrDU9Jd0WQV0YqtA+jSXS7fW1FIbfkvpZ6MIKRhQAyXCkIxAe8=
+	t=1761046047; cv=none; b=U+hASmxMD8yj8QSVC1cvZ3c+LIk1syF02NESntKOBBDYlxK7/vHOMV9oH1r6h0KLkmfH/s7rnz1u/MebX1PDZ1sZiT3DVpQozVYpngbWsiTH9s1dNnzMxyHS3HSHTXezQOtfnHz4q53RCxcOJXn33LiPrBUbS9TU1DD21nQukMg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761044893; c=relaxed/simple;
-	bh=DbtyNuRktw7R6edieFJwQL0E1aEpLyO994NJ3NxhaQc=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=OVWibJkeUtcNCljXCgbSqRviXAKyPgAb738tmmp+C+8quk+BsDRV9cityTeeuisJKO0pEvhaBOwfK6+VubWkPHM5e50riZVBFhn/lMq0Rc26gg5Bq7RHvROfTDRUH5g/a8Z0thkP8MEZwQG6gGIVW1uShqr6ZXCFmycvMviTPP4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de; spf=pass smtp.mailfrom=suse.de; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=ubj3blZh; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=rnq1UIRV; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=B/lq3WTD; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=dx2E3qT9; arc=none smtp.client-ip=195.135.223.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.de
-Received: from kitsune.suse.cz (unknown [10.100.12.127])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange ECDHE (P-256) server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by smtp-out2.suse.de (Postfix) with ESMTPS id 82D611F397;
-	Tue, 21 Oct 2025 11:08:00 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-	t=1761044884; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=AaBBd+XdryUfpAsID7YC7Ekp97FYZ09q7tdZODr7lks=;
-	b=ubj3blZhn7dJbHx6ALKD0ISKr/cmhyzYQl2hRSLgIKbVR92Fp3/hJgCoP7Whj+7OUHlMA9
-	cZlT7drJ6jg4OLmJbPSHfnPZPKesiCsVDQsH0fjnRCXrL2yGohWqqRFpY9pspJhUQ3luzN
-	8ZmQUY2/rpg7FGKTIgqDZeuHJCXuhts=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-	s=susede2_ed25519; t=1761044884;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=AaBBd+XdryUfpAsID7YC7Ekp97FYZ09q7tdZODr7lks=;
-	b=rnq1UIRVjq6ZITQA/eaMk71CQCsyuxsbrstkgcjh7EhOTXUCUL4LCR0XY+FvFNCdsGmkNT
-	ydQxx2pJRI8Q8UCg==
-Authentication-Results: smtp-out2.suse.de;
-	none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-	t=1761044880; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=AaBBd+XdryUfpAsID7YC7Ekp97FYZ09q7tdZODr7lks=;
-	b=B/lq3WTD319V36Nb4MLJVyyeULhm50bw+ULGwvnlOEDhiF5yx39eauFSn71Lj7yh0Cylc+
-	6vN2HBcj0a226D5Yp8aKq5uBXPTiS2/Nc9qFUfblU7zBjNhe4yUax+c22mG6JrRJ9rHbXH
-	xmy5O6EtL3G26o1QI6mddXv9lWtsDHM=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-	s=susede2_ed25519; t=1761044880;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=AaBBd+XdryUfpAsID7YC7Ekp97FYZ09q7tdZODr7lks=;
-	b=dx2E3qT9/Gvlkm58DN/iTQygC9LYkVHzTXnwGobWYkBE3ylrhqeh8jsw66DlyCq7Tdhu7p
-	uf//8HCHtTa3NeCQ==
-Date: Tue, 21 Oct 2025 13:07:59 +0200
-From: Michal =?iso-8859-1?Q?Such=E1nek?= <msuchanek@suse.de>
-To: Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <philmd@linaro.org>
-Cc: qemu-devel@nongnu.org, Chinmay Rath <rathc@linux.ibm.com>,
-	qemu-ppc@nongnu.org, Nicholas Piggin <npiggin@gmail.com>,
-	kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
-	Harsh Prateek Bora <harshpb@linux.ibm.com>,
-	=?iso-8859-1?Q?C=E9dric?= Le Goater <clg@redhat.com>
-Subject: Re: [PATCH v2 00/11] hw/ppc/spapr: Remove deprecated pseries-3.0 ->
- pseries-4.2 machines
-Message-ID: <aPdpjysqFBAMTvG-@kitsune.suse.cz>
-References: <20251021084346.73671-1-philmd@linaro.org>
+	s=arc-20240116; t=1761046047; c=relaxed/simple;
+	bh=HVpw7oKYIvSH9o/jTg20CkULWkTx+EO6Nbakt2/c3K8=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=CKJNyG+NAgo/3WPRNDVN3/GQPeNX4+zlP7HLdN1PgmkYtspFeZcpZpHjPjy54C50uDmXJ3F7yEFVDRs89wtPQ1wujEJ8JMuSDBPeWz/vT94K219FHRXyB3rV51pOXhr6XA/3JXVwfC0yWWxUVm7jU1hWHJhJS8PS3phVsf9aFNs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=DsnwwVaD; arc=none smtp.client-ip=148.163.156.1
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
+Received: from pps.filterd (m0353729.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 59L8GsF5017546;
+	Tue, 21 Oct 2025 11:27:14 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
+	:content-transfer-encoding:content-type:date:from:in-reply-to
+	:message-id:mime-version:references:subject:to; s=pp1; bh=Tcjchj
+	A6/+BVFcTNQO+/OKE///DuvSoP75TVH+UCWyQ=; b=DsnwwVaDJpWC2ZZjtPjUxd
+	uCmk20Bf7Yngq1r7jM5xGcffOwGpL9DXj6vfjD0WnsV4K+9MNeAloxUvuDp99L+F
+	AwE/FvEPrnf4hfWZE8RHayHm3K9cWVWA87w1ik+7+yU5AsnjyJvQMUDzkNOiwl9/
+	Pgka0OsIaFqkE21ic8BNG2MhTlSTwoqDkau6y33rFr3IELHtuHOmXMKubd632sFr
+	Kk4SUZv+p5IZ7z3RurnROVX9uVjdNfj4HO22Yzd/6FDF2nnQ4GiuBXq+HH+zbMD6
+	FYwf1xAKGbkJ85e0IfuNrjlp032a0R/WcsffUN1Oygi7ZQzd0BID9yCDowLl4JLw
+	==
+Received: from pps.reinject (localhost [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 49v33f6p8t-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Tue, 21 Oct 2025 11:27:14 +0000 (GMT)
+Received: from m0353729.ppops.net (m0353729.ppops.net [127.0.0.1])
+	by pps.reinject (8.18.1.12/8.18.0.8) with ESMTP id 59LBIOtk013218;
+	Tue, 21 Oct 2025 11:27:13 GMT
+Received: from ppma12.dal12v.mail.ibm.com (dc.9e.1632.ip4.static.sl-reverse.com [50.22.158.220])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 49v33f6p8q-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Tue, 21 Oct 2025 11:27:13 +0000 (GMT)
+Received: from pps.filterd (ppma12.dal12v.mail.ibm.com [127.0.0.1])
+	by ppma12.dal12v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 59LAuTTf014669;
+	Tue, 21 Oct 2025 11:27:12 GMT
+Received: from smtprelay03.wdc07v.mail.ibm.com ([172.16.1.70])
+	by ppma12.dal12v.mail.ibm.com (PPS) with ESMTPS id 49vn7s2mm5-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Tue, 21 Oct 2025 11:27:12 +0000
+Received: from smtpav02.dal12v.mail.ibm.com (smtpav02.dal12v.mail.ibm.com [10.241.53.101])
+	by smtprelay03.wdc07v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 59LBQxJR29491846
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Tue, 21 Oct 2025 11:26:59 GMT
+Received: from smtpav02.dal12v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id C1D915805E;
+	Tue, 21 Oct 2025 11:27:11 +0000 (GMT)
+Received: from smtpav02.dal12v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 202D958051;
+	Tue, 21 Oct 2025 11:27:09 +0000 (GMT)
+Received: from [9.79.201.141] (unknown [9.79.201.141])
+	by smtpav02.dal12v.mail.ibm.com (Postfix) with ESMTPS;
+	Tue, 21 Oct 2025 11:27:08 +0000 (GMT)
+Message-ID: <7f3143bc-505e-4120-938a-fa4bed982f7d@linux.ibm.com>
+Date: Tue, 21 Oct 2025 16:57:06 +0530
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v2 05/11] hw/ppc/spapr: Inline few SPAPR_IRQ_* uses
+To: =?UTF-8?Q?Philippe_Mathieu-Daud=C3=A9?= <philmd@linaro.org>,
+        qemu-devel@nongnu.org
+Cc: qemu-ppc@nongnu.org, Nicholas Piggin <npiggin@gmail.com>,
+        kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
+        Harsh Prateek Bora <harshpb@linux.ibm.com>,
+        =?UTF-8?Q?C=C3=A9dric_Le_Goater?=
+ <clg@redhat.com>
+References: <20251021084346.73671-1-philmd@linaro.org>
+ <20251021084346.73671-6-philmd@linaro.org>
+Content-Language: en-US
+From: Chinmay Rath <rathc@linux.ibm.com>
+In-Reply-To: <20251021084346.73671-6-philmd@linaro.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <20251021084346.73671-1-philmd@linaro.org>
-X-Spam-Level: 
-X-Spamd-Result: default: False [-4.30 / 50.00];
-	BAYES_HAM(-3.00)[99.99%];
-	NEURAL_HAM_LONG(-1.00)[-1.000];
-	NEURAL_HAM_SHORT(-0.20)[-1.000];
-	MIME_GOOD(-0.10)[text/plain];
-	MISSING_XM_UA(0.00)[];
-	ARC_NA(0.00)[];
-	RCPT_COUNT_SEVEN(0.00)[9];
-	RCVD_COUNT_ZERO(0.00)[0];
-	FREEMAIL_ENVRCPT(0.00)[gmail.com];
-	DKIM_SIGNED(0.00)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
-	URIBL_BLOCKED(0.00)[kitsune.suse.cz:mid,kitsune.suse.cz:helo];
-	FREEMAIL_CC(0.00)[nongnu.org,linux.ibm.com,gmail.com,vger.kernel.org,redhat.com];
-	MIME_TRACE(0.00)[0:+];
-	FROM_HAS_DN(0.00)[];
-	TO_MATCH_ENVRCPT_ALL(0.00)[];
-	FROM_EQ_ENVFROM(0.00)[];
-	TO_DN_SOME(0.00)[]
-X-Spam-Flag: NO
-X-Spam-Score: -4.30
+X-TM-AS-GCONF: 00
+X-Authority-Analysis: v=2.4 cv=FMYWBuos c=1 sm=1 tr=0 ts=68f76e12 cx=c_pps
+ a=bLidbwmWQ0KltjZqbj+ezA==:117 a=bLidbwmWQ0KltjZqbj+ezA==:17
+ a=IkcTkHD0fZMA:10 a=x6icFKpwvdMA:10 a=VkNPw1HP01LnGYTKEx00:22
+ a=KKAkSRfTAAAA:8 a=VnNF1IyMAAAA:8 a=vLoeH9cbTDQAPZaO96UA:9 a=3ZKOabzyN94A:10
+ a=QEXdDO2ut3YA:10 a=cvBusfyB2V15izCimMoJ:22 a=cPQSjfK2_nFv0Q5t_7PE:22
+X-Proofpoint-GUID: 2uTicLUVE8LEfvx4Yfdfrn4kf_sw6Wn7
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUxMDE4MDAyMiBTYWx0ZWRfX8E/s87B9akSr
+ AmdiBld3qK00zSBQtRZFL+sAxBY9zTiOBmZhH7/d8SdTqUpKHQLGIuie3gneg+Q2KzxfH2IQi3v
+ T4eCo1/4qguB4dZyZFusZ5o7p0H53cKCYDNPekbvMMpIc+vDzu+YjA1VCT3BEvpd+7Wzrxs7iF3
+ Vo3r9y+/iybBFj/0alG4UjuurZcR1wdSuQS4/mtHWljU4wwNQaYeCFV+OZXSxuryOwPVGQTbuf7
+ 9gNeeexPTVTj0vV2sKzNCHIzexwVsjNAv/8b12URc7iIUPcmpaJUQU2Ulk4fRyXuVetSFHKL6UK
+ ykj+8lYEB9EJ2C6aZUL+sbjjTXCIFSvuP40djug+XTZFV8EjqCkbePwZyyZ09nKciT8Jef1tUfh
+ Mv6kjIZbMtP7FW/Dtz2NDjejU9ZUZg==
+X-Proofpoint-ORIG-GUID: 5CcphESwmciE-fSZgbOPW1R0dGg74zBB
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1121,Hydra:6.1.9,FMLib:17.12.80.40
+ definitions=2025-10-21_01,2025-10-13_01,2025-03-28_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ clxscore=1015 impostorscore=0 priorityscore=1501 adultscore=0 bulkscore=0
+ lowpriorityscore=0 suspectscore=0 phishscore=0 spamscore=0 malwarescore=0
+ classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
+ reason=mlx scancount=1 engine=8.19.0-2510020000 definitions=main-2510180022
 
-Hello,
 
-I noticed removal of old pSeries revisions.
-
-FTR to boot Linux 3.0 I need pSeries-2.7 (already removed earlier).
-
-The thing that broke booting linux 3.0 for me is
-357d1e3bc7d2d80e5271bc4f3ac8537e30dc8046 spapr: Improved placement of
-PCI host bridges in guest memory map
-
-I do not use Linux 3.0 anymore which is the reason I did not notice this
-breakage due to old platform revision removal.
-
-At the same time quemu is sometimes touted as a way to run old OS
-revisions. That does not work very well for pSeries.
-
-Thanks
-
-Michal
-
-On Tue, Oct 21, 2025 at 10:43:34AM +0200, Philippe Mathieu-DaudÈ wrote:
-> v2: Rebased on https://lore.kernel.org/qemu-devel/20251009184057.19973-1-harshpb@linux.ibm.com/
-> 
-> Remove the deprecated pseries-3.0 up to pseries-4.2 machines,
-> which are older than 6 years. Remove resulting dead code.
-> 
-> Harsh Prateek Bora (5):
->   ppc/spapr: remove deprecated machine pseries-3.0
->   ppc/spapr: remove deprecated machine pseries-3.1
->   ppc/spapr: remove deprecated machine pseries-4.0
->   ppc/spapr: remove deprecated machine pseries-4.1
->   ppc/spapr: remove deprecated machine pseries-4.2
-> 
-> Philippe Mathieu-DaudÈ (6):
->   hw/ppc/spapr: Remove SpaprMachineClass::nr_xirqs field
->   hw/ppc/spapr: Inline spapr_dtb_needed()
->   hw/ppc/spapr: Inline few SPAPR_IRQ_* uses
->   target/ppc/kvm: Remove kvmppc_get_host_serial() as unused
->   target/ppc/kvm: Remove kvmppc_get_host_model() as unused
->   hw/ppc/spapr: Remove SpaprMachineClass::phb_placement callback
-> 
->  include/hw/ppc/spapr.h     |  16 --
->  include/hw/ppc/spapr_irq.h |   1 -
->  target/ppc/kvm_ppc.h       |  12 --
->  hw/ppc/spapr.c             | 299 ++++++++-----------------------------
->  hw/ppc/spapr_caps.c        |  12 +-
->  hw/ppc/spapr_events.c      |  20 +--
->  hw/ppc/spapr_hcall.c       |   5 -
->  hw/ppc/spapr_irq.c         |  36 +----
->  hw/ppc/spapr_pci.c         |  32 +---
->  hw/ppc/spapr_vio.c         |   9 --
->  target/ppc/kvm.c           |  11 --
->  11 files changed, 77 insertions(+), 376 deletions(-)
-> 
-> -- 
-> 2.51.0
-> 
-> 
+On 10/21/25 14:13, Philippe Mathieu-Daud√© wrote:
+> Signed-off-by: Philippe Mathieu-Daud√© <philmd@linaro.org>
+> ---
+>   hw/ppc/spapr_events.c | 12 ++++--------
+>   1 file changed, 4 insertions(+), 8 deletions(-)
+>
+> diff --git a/hw/ppc/spapr_events.c b/hw/ppc/spapr_events.c
+> index 548a190ce89..892ddc7f8f7 100644
+> --- a/hw/ppc/spapr_events.c
+> +++ b/hw/ppc/spapr_events.c
+> @@ -1041,16 +1041,14 @@ void spapr_clear_pending_hotplug_events(SpaprMachineState *spapr)
+>   
+>   void spapr_events_init(SpaprMachineState *spapr)
+>   {
+> -    int epow_irq = SPAPR_IRQ_EPOW;
+> -
+> -    spapr_irq_claim(spapr, epow_irq, false, &error_fatal);
+> +    spapr_irq_claim(spapr, SPAPR_IRQ_EPOW, false, &error_fatal);
+>   
+>       QTAILQ_INIT(&spapr->pending_events);
+>   
+>       spapr->event_sources = spapr_event_sources_new();
+>   
+>       spapr_event_sources_register(spapr->event_sources, EVENT_CLASS_EPOW,
+> -                                 epow_irq);
+> +                                 SPAPR_IRQ_EPOW);
+>   
+>       /* NOTE: if machine supports modern/dedicated hotplug event source,
+>        * we add it to the device-tree unconditionally. This means we may
+> @@ -1061,12 +1059,10 @@ void spapr_events_init(SpaprMachineState *spapr)
+>        * checking that it's enabled.
+>        */
+>       if (spapr->use_hotplug_event_source) {
+> -        int hp_irq = SPAPR_IRQ_HOTPLUG;
+> -
+> -        spapr_irq_claim(spapr, hp_irq, false, &error_fatal);
+> +        spapr_irq_claim(spapr, SPAPR_IRQ_HOTPLUG, false, &error_fatal);
+>   
+>           spapr_event_sources_register(spapr->event_sources, EVENT_CLASS_HOT_PLUG,
+> -                                     hp_irq);
+> +                                     SPAPR_IRQ_HOTPLUG);
+>       }
+>   
+>       spapr->epow_notifier.notify = spapr_powerdown_req;
+Reviewed-by: Chinmay Rath <rathc@linux.ibm.com>
 
