@@ -1,183 +1,210 @@
-Return-Path: <kvm+bounces-60756-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-60757-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5F6E7BF941E
-	for <lists+kvm@lfdr.de>; Wed, 22 Oct 2025 01:38:24 +0200 (CEST)
+Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [213.196.21.55])
+	by mail.lfdr.de (Postfix) with ESMTPS id C6C16BF943C
+	for <lists+kvm@lfdr.de>; Wed, 22 Oct 2025 01:40:39 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 1C7914E9E01
-	for <lists+kvm@lfdr.de>; Tue, 21 Oct 2025 23:38:23 +0000 (UTC)
+	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 4D38235505D
+	for <lists+kvm@lfdr.de>; Tue, 21 Oct 2025 23:40:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 15AD12C11FE;
-	Tue, 21 Oct 2025 23:38:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C83B22C21F7;
+	Tue, 21 Oct 2025 23:40:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ziepe.ca header.i=@ziepe.ca header.b="NDlvo7Cv"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="PpV8dXvS"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-qk1-f175.google.com (mail-qk1-f175.google.com [209.85.222.175])
+Received: from mail-qt1-f177.google.com (mail-qt1-f177.google.com [209.85.160.177])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 655B326CE0F
-	for <kvm@vger.kernel.org>; Tue, 21 Oct 2025 23:38:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.175
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 475EA29E109
+	for <kvm@vger.kernel.org>; Tue, 21 Oct 2025 23:40:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.177
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761089896; cv=none; b=pqoq8aOrHdAUKOqy5KGqKoqbdKTGy8+kBxWoC21LCVxr37YduigLn+CtlAueXyBaSwqRDmCkg3/fj/KCsJVlBjmYqk8+xoOcYliam6fqMvoZyjiZdS7z2QfJRMjO4Cu4fpim/7Aph9BBRJ97eAcW6dsCjmmy3kNaUI1ogFzekaY=
+	t=1761090031; cv=none; b=b+29FTnrhSg3olkk/30i7KbPLH5+A+uHFNA/adJxqx30QU6uSS9qEYSREm8zAuNDX+6w2uAvYoQlB+RAL4NDNRTX1bz3kQ+q52IzHMxCLBz4TekO0bjcc3ZIWTNR55GRrG7hoVtNfW/hNeeOA/uvX7M5F5lY0EYICanT6IqIljA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761089896; c=relaxed/simple;
-	bh=V+u2TYehBCwVH8vLJaq4e/OoHFBT+xogbeFOuIIuxAw=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=KfKBG32yoDPAh6z/XwvYbmXd0luZePEs8C9h5F3FM4yhz4gBfUahwp7QDVZFqTizrctOLnSrHOouRW/pF5an2TOQ7UDNjWdOl+l+MVHNXZGlnZXbHMuES+cA+fo+aBZed2Xjk0TlZIU7bwWPHyosy/nzkOCahPXJTrXtC+7viGk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ziepe.ca; spf=pass smtp.mailfrom=ziepe.ca; dkim=pass (2048-bit key) header.d=ziepe.ca header.i=@ziepe.ca header.b=NDlvo7Cv; arc=none smtp.client-ip=209.85.222.175
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ziepe.ca
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ziepe.ca
-Received: by mail-qk1-f175.google.com with SMTP id af79cd13be357-893c373500cso46152485a.0
-        for <kvm@vger.kernel.org>; Tue, 21 Oct 2025 16:38:14 -0700 (PDT)
+	s=arc-20240116; t=1761090031; c=relaxed/simple;
+	bh=24THtw9KQotm0JJaeG9x+QKYl5xdIQG4nQ13X99W/ag=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=lFJUdsaG635zOsJSL14NGhwBA5snCzVAnFSoDkOTcjuflxiYYkpMC6f7IVHOjfc+3NwxD/+5OwrhyDzphPcbxpGzSezxlwSgKri1W61GVpssYKs0oeXO94lEEDMD/RG1Jtp6A0EUsbNxsdl8p7kG24D1y9AajuGDgW3+gQ6/Kfk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=PpV8dXvS; arc=none smtp.client-ip=209.85.160.177
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-qt1-f177.google.com with SMTP id d75a77b69052e-4ea12242d2eso101681cf.1
+        for <kvm@vger.kernel.org>; Tue, 21 Oct 2025 16:40:29 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=ziepe.ca; s=google; t=1761089893; x=1761694693; darn=vger.kernel.org;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=l0T6gaWR8wRqUaz48FqGAKEBOYEGIQ3pcXRlgXnhgn0=;
-        b=NDlvo7CvjiZpIxPgybTZ2QAfqVZRpFbU7W2AjJ+S3EAlu7EZ2lwrt+5ai9lOo7DTac
-         C/jTjGr20OGptUxkLt0IHS8Fw54acZwPnp5Ea0KSLjEOYPaJsqf4BYqj+XpX+ul0igAr
-         /hNeBpVapL1Rf/AODWncFNO+gcifUvyZ8yTZehRNPllevDkrpis+NcGMpo2+AWVEOJ+8
-         XH1EdbTQ+nfhyduLpnZyfnBjB82906JSRPynA1IqgFrBgFKa9HfzR7jRykPCMBFGnPOM
-         8G2BGyPf2wE6F8sHqDfDJBD5cRoS+2AeLNJv4jC+xZ2ZZURVr471+xmBlGeMEEpQKkJs
-         gHoQ==
+        d=google.com; s=20230601; t=1761090029; x=1761694829; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=mIH2P6B80VZ2nxYWUFgW0L+iNtA4rO36PgliR7tGBx4=;
+        b=PpV8dXvS2AewLkR5KAIwlbJByUSIUa24++V9v/dXxLk3X+KK5m4b4zmP1x8c8QiOGO
+         3t6Nl+36UjCUhBrdQ7YH5Hocu8Y0lYaAc+c+SSG/tpxJ/EpZXTSTGefOUOk63iFBwCXl
+         ffXB1Zciq2v0XfonuqTGhyzAPxfQadMIuXiCG0heBt26rozjWasBFoPpQBYkTlr4y6cP
+         FYel+IjWpKpvgmKWZ3GwuihMR70SxTgKwSY2QO8SRlvXH9z85lcuB9l52MVl8k3T+nYQ
+         j9hSnn6w8yS58K66wzDo3s0QCtygWGyXgo9w89dddulfL4BotATuoC7f8GQ1oveApXkk
+         awkw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1761089893; x=1761694693;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=l0T6gaWR8wRqUaz48FqGAKEBOYEGIQ3pcXRlgXnhgn0=;
-        b=kpBxMoiH0xHlULnvPwRiy3yLNDELpOa8RCUXsBHvjh6ddxX/s2F9o7mlw4EHJqZhFZ
-         4+BlyqgOR9bXIvAwmw+FYGrvNRtQeFofZgRMJoXxcoHEAr3ZR8+d4OH32+Cp8pkm9812
-         pK3BEEUrJa1q30jRxSGSyVVX67aQHBEjKGM+q/B/yrfrD2QDUK3S+lsL2ibgF3Yy/KSO
-         E5/pMN1NBb+CqizAZldBKcT7UDW4JnTHz7JJ4hPHJgP0uu8uBsMA3r5kboiiJzzxvRYO
-         yOWM7oJhcG0icmnPVCrN7CLxdX5H1/w5IowHDL5Hiw/B1j6laPvx2Oy6PhPx1IXYKxEC
-         PZkQ==
-X-Forwarded-Encrypted: i=1; AJvYcCUtHBDVAWKwnlDsm4C019i3aTCXPudz/cR9jaIfWVC9tZUooxUlzK2h9tpfFpros+9ZTIM=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yw73qX0UCLhuFfq94tEBIxI7VFLrj2dU3pGKFJjoc+utg2vesE1
-	+Vx+rVmJy+Ch2wkBfPSSl51fZLXjn2o2Hck8aCrZKznDTbmKW0l7BLbTTwLR8mzP0go=
-X-Gm-Gg: ASbGncswAaDZ8z29yI2aw63KeQXgZU1GpPezEJDDjbwwE8ZzUa5aZ0FUhg3IV/x48DN
-	2OSmvwO1nY/59wYQ9olWAQAGXU2m3/bGaM9WI13svN7UMYYyf7gumVCYsQWFrLyCTlFxC/wFope
-	ezQn1gpgOvZpQxApBeI2Xce0Gw4LxOxxywK7HBb0VuErEHEymI3Xb8ud/Yaffcs9k/aGK85gn7C
-	jdTdjr4GwnOYhBkZi6XiZQe5VIKu692UwoLtn8LhFFVb8inhaZAhrjQPsbQ3YdrQqx0aqEJwMdq
-	x4TwcB2Sks7HdL1sXhuMyof4a55EGIvzkPNumnEslUH1UQV+jWgMqYDd9zLyBfgiZ17kQj7iv6r
-	GJP/d7Nr13CBHSIeV4I2X/Bsl+Q+2koEU2UcDkICpAQPpxueZmepzdeEzX0sMDh+VKIo4U8W2aG
-	NUlhJuoK6j2wPR7SMRXc6VkUmWit6pRQM9sLSafe34Wsgngw==
-X-Google-Smtp-Source: AGHT+IESZxgXwvIqIMj9dzYjccElH5tAxo9dER4LfWd2lD11GISceznOVY3S2mBydzghuiBWXmdJvQ==
-X-Received: by 2002:a05:620a:700c:b0:892:a71a:bff with SMTP id af79cd13be357-899ea1350d1mr183689785a.44.1761089893141;
-        Tue, 21 Oct 2025 16:38:13 -0700 (PDT)
-Received: from ziepe.ca (hlfxns017vw-47-55-120-4.dhcp-dynamic.fibreop.ns.bellaliant.net. [47.55.120.4])
-        by smtp.gmail.com with ESMTPSA id d75a77b69052e-4e8ab0c8c1csm83229571cf.20.2025.10.21.16.38.11
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 21 Oct 2025 16:38:12 -0700 (PDT)
-Received: from jgg by wakko with local (Exim 4.97)
-	(envelope-from <jgg@ziepe.ca>)
-	id 1vBLvf-00000000cBo-0n5B;
-	Tue, 21 Oct 2025 20:38:11 -0300
-Date: Tue, 21 Oct 2025 20:38:11 -0300
-From: Jason Gunthorpe <jgg@ziepe.ca>
-To: Matthew Brost <matthew.brost@intel.com>
-Cc: =?utf-8?Q?Micha=C5=82?= Winiarski <michal.winiarski@intel.com>,
-	Alex Williamson <alex.williamson@redhat.com>,
-	Lucas De Marchi <lucas.demarchi@intel.com>,
-	Thomas =?utf-8?Q?Hellstr=C3=B6m?= <thomas.hellstrom@linux.intel.com>,
-	Rodrigo Vivi <rodrigo.vivi@intel.com>,
-	Yishai Hadas <yishaih@nvidia.com>,
-	Kevin Tian <kevin.tian@intel.com>,
-	Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>,
-	intel-xe@lists.freedesktop.org, linux-kernel@vger.kernel.org,
-	kvm@vger.kernel.org, dri-devel@lists.freedesktop.org,
-	Michal Wajdeczko <michal.wajdeczko@intel.com>,
-	Jani Nikula <jani.nikula@linux.intel.com>,
-	Joonas Lahtinen <joonas.lahtinen@linux.intel.com>,
-	Tvrtko Ursulin <tursulin@ursulin.net>,
-	David Airlie <airlied@gmail.com>, Simona Vetter <simona@ffwll.ch>,
-	Lukasz Laguna <lukasz.laguna@intel.com>
-Subject: Re: [PATCH 26/26] vfio/xe: Add vendor-specific vfio_pci driver for
- Intel graphics
-Message-ID: <20251021233811.GB21554@ziepe.ca>
-References: <20251011193847.1836454-1-michal.winiarski@intel.com>
- <20251011193847.1836454-27-michal.winiarski@intel.com>
- <20251021230328.GA21554@ziepe.ca>
- <aPgT1u1YO3C3YozC@lstrano-desk.jf.intel.com>
+        d=1e100.net; s=20230601; t=1761090029; x=1761694829;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=mIH2P6B80VZ2nxYWUFgW0L+iNtA4rO36PgliR7tGBx4=;
+        b=c0P0W1nBqZQ7lN0owfsNlPfGSDCvm71wRtqMxhYseFj2AQHfMLxAbcsh/Ml3CttKxq
+         JMgozfDG4toKeGKPr9fCnTHiC5+sO+yHTySyngM7H+93LuppN8UqvGRtwfzgVZl/k1M3
+         P64toljQZmwXTi1bytOQ1KR6W5B65FdSxfdn+l21eFnZn9YoZiUrK3cfJxenTuLlJnJQ
+         6oASrNFUQiCK5eipT7aQeNPSqOwmnwBC54PoQFljh4qomD/x5J0Pa4QNspTCaMCCej7F
+         NPpaSN4tw7xrXJ+vb9tvcEIggoKwQIKX/gS/4g/7tX8iXza73BMFH7VxLU8gGjdumTGX
+         E69Q==
+X-Forwarded-Encrypted: i=1; AJvYcCVa52tT3B3EA//gVRPNuTMKJR0qAlcZbNBk7t+1tURu0pDAMZCQpyLNvyKiwhblwmvK12I=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzVrv06S5uPg69rib+SADzLkUNP0ovAYgxcqX92Czvuttlz802B
+	fsvuJe0ZHBR/e6ySjp0KPvaBwka7/d43cYkd2GHhkK3mo3m5xB6usGq7uqNo2U9XvCiCbAupE2f
+	8OC6718q+pEBVbX7mvNW4E3ENznNQYnNvCGY4Rc6DgphsK08DWqddn8jgemg=
+X-Gm-Gg: ASbGncvGrlbgGcABxtz/ZtDVLYyolyNJBN+wVW4HJX1q/xcF/bGwJhXRsPGIpbYl053
+	50Rfvxj1D70/YWxr27sBfWecUKv8KlMXyN68/4MEuy3esNpx8g/eHzLAVBPokaXWYVy3iX1HV/l
+	lPTIjYMoBWMFO8qwRQchHIleaK4brPIhH5vfUOQ3Xqs0jVjqrj/oLfz+uQi+OV22HZkOXZQtWcO
+	jRIue1UYM0gi8OXbp8SWJ6Gy1x2aZ8NJFJkL65NIYcG2MVAl7FD2bviuwElRNVfhiClF48=
+X-Google-Smtp-Source: AGHT+IHoH7UQ5IYUBKzxkx5zGkIHMIpVhLUrhL8SwWlsHSxZ6PC5HZPKI/StzjnH0CQlOVgzaMRyybaCwvaayAQwiM8=
+X-Received: by 2002:a05:622a:1f12:b0:4e7:1e07:959c with SMTP id
+ d75a77b69052e-4eb73a65b01mr3412081cf.10.1761090028632; Tue, 21 Oct 2025
+ 16:40:28 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <aPgT1u1YO3C3YozC@lstrano-desk.jf.intel.com>
+References: <20250917215031.2567566-1-jmattson@google.com> <20250917215031.2567566-5-jmattson@google.com>
+ <4owz4js4mvl4dohgkydcyrdhh2j2xblbwbo7zistocb4knjzdo@kvrzl7vmvg67>
+In-Reply-To: <4owz4js4mvl4dohgkydcyrdhh2j2xblbwbo7zistocb4knjzdo@kvrzl7vmvg67>
+From: Jim Mattson <jmattson@google.com>
+Date: Tue, 21 Oct 2025 16:40:14 -0700
+X-Gm-Features: AS18NWD5cc8imKkj8dT6YcsyQa2wPp5aTZYLjiwB4t7ZRHFEHQz3XPKi8X3MzPs
+Message-ID: <CALMp9eRm+xH0b4TUMU3q8Wpo2uo6-OCaY7hD39dVeSm0fA+weA@mail.gmail.com>
+Subject: Re: [PATCH 4/4] KVM: selftests: Add a VMX test for LA57 nested state
+To: Yosry Ahmed <yosry.ahmed@linux.dev>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, Shuah Khan <shuah@kernel.org>, 
+	Sean Christopherson <seanjc@google.com>, Bibo Mao <maobibo@loongson.cn>, 
+	Huacai Chen <chenhuacai@kernel.org>, Andrew Jones <ajones@ventanamicro.com>, 
+	Claudio Imbrenda <imbrenda@linux.ibm.com>, "Pratik R. Sampat" <prsampat@amd.com>, 
+	Kai Huang <kai.huang@intel.com>, Eric Auger <eric.auger@redhat.com>, 
+	linux-kernel@vger.kernel.org, kvm@vger.kernel.org, 
+	linux-kselftest@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Tue, Oct 21, 2025 at 04:14:30PM -0700, Matthew Brost wrote:
-> On Tue, Oct 21, 2025 at 08:03:28PM -0300, Jason Gunthorpe wrote:
-> > On Sat, Oct 11, 2025 at 09:38:47PM +0200, Michał Winiarski wrote:
-> > > +	/*
-> > > +	 * "STOP" handling is reused for "RUNNING_P2P", as the device doesn't have the capability to
-> > > +	 * selectively block p2p DMA transfers.
-> > > +	 * The device is not processing new workload requests when the VF is stopped, and both
-> > > +	 * memory and MMIO communication channels are transferred to destination (where processing
-> > > +	 * will be resumed).
-> > > +	 */
-> > > +	if ((cur == VFIO_DEVICE_STATE_RUNNING && new == VFIO_DEVICE_STATE_STOP) ||
-> > > +	    (cur == VFIO_DEVICE_STATE_RUNNING && new == VFIO_DEVICE_STATE_RUNNING_P2P)) {
-> > > +		ret = xe_sriov_vfio_stop(xe_vdev->pf, xe_vdev->vfid);
-> > 
-> > This comment is not right, RUNNING_P2P means the device can still
-> > receive P2P activity on it's BAR. Eg a GPU will still allow read/write
-> > to its framebuffer.
-> > 
-> > But it is not initiating any new transactions.
-> > 
-> > > +static void xe_vfio_pci_migration_init(struct vfio_device *core_vdev)
-> > > +{
-> > > +	struct xe_vfio_pci_core_device *xe_vdev =
-> > > +		container_of(core_vdev, struct xe_vfio_pci_core_device, core_device.vdev);
-> > > +	struct pci_dev *pdev = to_pci_dev(core_vdev->dev);
-> > > +
-> > > +	if (!xe_sriov_vfio_migration_supported(pdev->physfn))
-> > > +		return;
-> > > +
-> > > +	/* vfid starts from 1 for xe */
-> > > +	xe_vdev->vfid = pci_iov_vf_id(pdev) + 1;
-> > > +	xe_vdev->pf = pdev->physfn;
-> > 
-> > No, this has to use pci_iov_get_pf_drvdata, and this driver should
-> > never have a naked pf pointer flowing around.
-> > 
-> > The entire exported interface is wrongly formed:
-> > 
-> > +bool xe_sriov_vfio_migration_supported(struct pci_dev *pdev);
-> > +int xe_sriov_vfio_wait_flr_done(struct pci_dev *pdev, unsigned int vfid);
-> > +int xe_sriov_vfio_stop(struct pci_dev *pdev, unsigned int vfid);
-> > +int xe_sriov_vfio_run(struct pci_dev *pdev, unsigned int vfid);
-> > +int xe_sriov_vfio_stop_copy_enter(struct pci_dev *pdev, unsigned int vfid);
-> > 
-> > None of these should be taking in a naked pci_dev, it should all work
-> > on whatever type the drvdata is.
-> 
-> This seems entirely backwards. Why would the Xe module export its driver
-> structure to the VFIO module? 
+On Mon, Oct 20, 2025 at 10:26=E2=80=AFAM Yosry Ahmed <yosry.ahmed@linux.dev=
+> wrote:
+>
+> On Wed, Sep 17, 2025 at 02:48:40PM -0700, Jim Mattson wrote:
+> > Add a selftest that verifies KVM's ability to save and restore
+> > nested state when the L1 guest is using 5-level paging and the L2
+> > guest is using 4-level paging. Specifically, canonicality tests of
+> > the VMCS12 host-state fields should accept 57-bit virtual addresses.
+> >
+> > Signed-off-by: Jim Mattson <jmattson@google.com>
+> > ---
+> > ...
+> > +void guest_code(struct vmx_pages *vmx_pages)
+> > +{
+> > +     if (vmx_pages)
+> > +             l1_guest_code(vmx_pages);
+>
+> I think none of the other tests do the NULL check. Seems like the test
+> will actually pass if we pass vmx_pages =3D=3D NULL. I think it's better =
+if
+> we let L1 crash if we mess up the setup.
 
-Because that is how we designed this to work. You've completely
-ignored the safety protocols built into this method.
+I'll drop the check in the next version.
 
-> That opens up potential vectors for abuse—for example, the VFIO
-> module accessing internal Xe device structures.
+> > +
+> > +     GUEST_DONE();
+> > +}
+> > +
+> > +int main(int argc, char *argv[])
+> > +{
+> > +     vm_vaddr_t vmx_pages_gva =3D 0;
+> > +     struct kvm_vm *vm;
+> > +     struct kvm_vcpu *vcpu;
+> > +     struct kvm_x86_state *state;
+> > +     struct ucall uc;
+> > +     int stage;
+> > +
+> > +     TEST_REQUIRE(kvm_cpu_has(X86_FEATURE_VMX));
+> > +     TEST_REQUIRE(kvm_cpu_has(X86_FEATURE_LA57));
+> > +     TEST_REQUIRE(kvm_has_cap(KVM_CAP_NESTED_STATE));
+> > +
+> > +     vm =3D vm_create_shape_with_one_vcpu(VM_SHAPE(VM_MODE_PXXV57_4K),=
+ &vcpu,
+> > +                                        guest_code);
+> > +
+> > +     /*
+> > +      * L1 needs to read its own PML5 table to set up L2. Identity map
+> > +      * the PML5 table to facilitate this.
+> > +      */
+> > +     virt_map(vm, vm->pgd, vm->pgd, 1);
+> > +
+> > +     vcpu_alloc_vmx(vm, &vmx_pages_gva);
+> > +     vcpu_args_set(vcpu, 1, vmx_pages_gva);
+> > +
+> > +     for (stage =3D 1;; stage++) {
+> > +             vcpu_run(vcpu);
+> > +             TEST_ASSERT_KVM_EXIT_REASON(vcpu, KVM_EXIT_IO);
+> > +
+> > +             switch (get_ucall(vcpu, &uc)) {
+> > +             case UCALL_ABORT:
+> > +                     REPORT_GUEST_ASSERT(uc);
+> > +                     /* NOT REACHED */
+> > +             case UCALL_SYNC:
+> > +                     break;
+> > +             case UCALL_DONE:
+> > +                     goto done;
+> > +             default:
+> > +                     TEST_FAIL("Unknown ucall %lu", uc.cmd);
+> > +             }
+> > +
+> > +             TEST_ASSERT(uc.args[1] =3D=3D stage,
+> > +                         "Expected stage %d, got stage %lu", stage, (u=
+long)uc.args[1]);
+> > +             if (stage =3D=3D 1) {
+> > +                     pr_info("L2 is active; performing save/restore.\n=
+");
+> > +                     state =3D vcpu_save_state(vcpu);
+> > +
+> > +                     kvm_vm_release(vm);
+> > +
+> > +                     /* Restore state in a new VM. */
+> > +                     vcpu =3D vm_recreate_with_one_vcpu(vm);
+> > +                     vcpu_load_state(vcpu, state);
+> > +                     kvm_x86_state_cleanup(state);
+>
+> It seems like we only load the vCPU state but we don't actually run it
+> after restoring the nested state. Should we have another stage and run
+> L2 again after the restore? What is the current failure mode without
+> 9245fd6b8531?
 
-It does not, just use an opaque struct type.
+When everything works, we do actually run the vCPU again after
+restoring the nested state. L1 has to execute GUEST_DONE() to exit
+this loop.
 
-> much cleaner to keep interfaces between modules as opaque / generic
-> as possible.
+Without commit 9245fd6b8531 ("KVM: x86: model canonical checks more
+precisely"), the test fails with:
 
-Nope, don't do that. They should be limited and locked down. Passing
-random pci_devs into these API is going to be bad.
+KVM_SET_NESTED_STATE failed, rc: -1 errno: 22 (Invalid argument)
 
-Jason
+(And, in that case, we do not re-enter the guest.)
+
+
+
+> > +             }
+> > +     }
+> > +
+> > +done:
+> > +     kvm_vm_free(vm);
+> > +     return 0;
+> > +}
+> > --
+> > 2.51.0.470.ga7dc726c21-goog
+> >
 
