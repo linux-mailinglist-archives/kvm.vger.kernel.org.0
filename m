@@ -1,83 +1,82 @@
-Return-Path: <kvm+bounces-60777-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-60776-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8AF53BF960D
-	for <lists+kvm@lfdr.de>; Wed, 22 Oct 2025 01:53:08 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id DCA65BF960A
+	for <lists+kvm@lfdr.de>; Wed, 22 Oct 2025 01:53:07 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5F53F460DC6
-	for <lists+kvm@lfdr.de>; Tue, 21 Oct 2025 23:52:52 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 934BE460C99
+	for <lists+kvm@lfdr.de>; Tue, 21 Oct 2025 23:52:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F04ED2FCBF0;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D7AFE2FC871;
 	Tue, 21 Oct 2025 23:47:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="f9Kph4+0"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="acBU5El1"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pf1-f174.google.com (mail-pf1-f174.google.com [209.85.210.174])
+Received: from mail-pl1-f175.google.com (mail-pl1-f175.google.com [209.85.214.175])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E36BE2E7161
-	for <kvm@vger.kernel.org>; Tue, 21 Oct 2025 23:47:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.174
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5AE582F12CD
+	for <kvm@vger.kernel.org>; Tue, 21 Oct 2025 23:47:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.175
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761090442; cv=none; b=ObKaz50iJ7F7rHbN+K7oqLPADyWPMQqoRePSR0iQpZMtyeDWvsPcyDH/8nO78oUK42oQyvJkRkBdaWTiPGlMv0TY7yO6yU0V6qs3EJss//bQoaOsTfQPuVczOgseapIWYo4oAEiYR+uvcYq1xMsgFMcJe4YeWPXEdtzAXLjaA3U=
+	t=1761090442; cv=none; b=T7x0OT617tGP6iLHhq1pjvwd9Uhy3GABiGQFpUXV2bxhQ6F2k/vp24lbWp/pd1wI87fy4cfbSPR6abAyw9cJIxAdCXVVU3c6zicp5ejJO+xKy1RIa2HopbUL8u/yZbKuT12Gw2RM0YFd4RFFSNHECWq42IOcnBuJOWTqvWK7dXo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1761090442; c=relaxed/simple;
-	bh=lSmQpIOx2H+wwJpTKFrN8deypuk5nLfSt39JjhPsaKs=;
+	bh=Vq3JxLDexMAZpBZBOMz7RcnedkE0owAELSAnlUsmBpE=;
 	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=dGKoqBjtQwSFUa7Dmzv1sLarOnyB5RiKvc8SoCduYISeJvOXBi4tQxsIl3zu4duPsCsHDU0rsIyzET83oUve/OuVlhAHMAj9oeTljqPzeebfwaHe6MLyBANoY0MaNDv1CubBrGE9B4XFm48JrRX3z8Z43YB+QEvjkS3lL9rqgzk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=f9Kph4+0; arc=none smtp.client-ip=209.85.210.174
+	 In-Reply-To:To:Cc; b=oa+LqLGtdVfG1RBl9NHRJD0VE5gz/MXts4rRLVIuvYaPetRlvUtE5VhCZxVHctypjFOkCD8YpubyiyeXkdKFQBQ/BZQxv1fd9iv/8MYPq8zMTvC3rZ1nMTOCojP7Rh2zeSTqyoO6ZXyf/v0nqzexGzxc5Inh+icQRd096hAQPSs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=acBU5El1; arc=none smtp.client-ip=209.85.214.175
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pf1-f174.google.com with SMTP id d2e1a72fcca58-77f67ba775aso8083634b3a.3
-        for <kvm@vger.kernel.org>; Tue, 21 Oct 2025 16:47:18 -0700 (PDT)
+Received: by mail-pl1-f175.google.com with SMTP id d9443c01a7336-290b48e09a7so74386245ad.0
+        for <kvm@vger.kernel.org>; Tue, 21 Oct 2025 16:47:19 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1761090436; x=1761695236; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1761090437; x=1761695237; darn=vger.kernel.org;
         h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
          :mime-version:subject:date:from:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=C11MVom9GcVVigp1JH83uYh4dJ6GwBGVsbP0u+3A/D8=;
-        b=f9Kph4+0zDcKIBxfP0+EgWXBXt+CyK8sMV/E5hmt7T3LgSiCfpUV064w/7RaIn8TfH
-         adbMJdAhV5KTscE7C3b/PVvSLCUzaHfOhHZI1S5Y5YoZzSiBMw3k+tD82HERenF1uaZa
-         VLtfGPecQE1mve70L7MibxDd0GU0wDAI9T+QRoO2YZRpJEmxgZM/sUyC7B+/yEsaKqiz
-         znL1lmBQEzO92yuAdmwcVhElCRNYwi0gN2zuLJevsCevD87AXgkil5Wr8LkxM8bd6zJ3
-         wLiFZiSe9j6pNV39d6iTcczvLGUIbZKRKvibTz9s7KX4IYw5VjpLmB0BVZuEtrDGuIMA
-         UpTw==
+        bh=0ziglltQonD40PF3NaoQP9RaIb5nYxZqEFCDNXD/J6U=;
+        b=acBU5El1XUnF5ahrQ6RY667sgPxLgA4ZdJwjIRnfSKapdKibrM29eTmpmAJGeNqGam
+         Vcpo5EVSM/PpE88hHnTPEhkCDnqRwI4cGqC5L+itv6PdAMBrIWmxYm6c3+oEBeygAmy6
+         fu5bI3vqAMWu3xJuEIO0Rhb3GHPzv9pf+BzPM1LR40a9FHLJsf75hxbid5OouU2WBszC
+         1uLIzC2hXnfIslq5jjHwcFSVb2CGnHOC6lJ6DmmhpmukPvJhLqyOQ/Ki5YffYmkwXBwl
+         IVfJNKxJtnLyzFbeScTbyoOKiaWotKOmkrnlWFw7QJU8JyZV0addM1hna8phjUUpizMN
+         04Fg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1761090436; x=1761695236;
+        d=1e100.net; s=20230601; t=1761090437; x=1761695237;
         h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
          :mime-version:subject:date:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=C11MVom9GcVVigp1JH83uYh4dJ6GwBGVsbP0u+3A/D8=;
-        b=SlBsqNFxTHkw22y+zxzi2a5WiVdkJoYfpyg7Qgx+Wt/fBeVMXbZUxMhiKKuwtaxrzk
-         QiFwgDV8Wfcg0/do0eBr0zdf1OhoClwPo2kmsDSugJg+MckUD9xcsftDRRTg46hBi2Ml
-         Llj0PDk07uZ1dGvEkG0+mcP6IowZnVJhlpzTDB0waxhGdIxIZ6kyNbjJYk1p58+LpUmo
-         AoK2Tyoru/k9Gwh87K7J+vBKSE9LZ0gxA+PA7m78UjJ1hX3czsE0cUzFyinB7/Y4R0Lm
-         xeZt5t4GuE084YWFOW+jc9Nqe3hoFw2K3FytXc+n8Fdy2EAiruhed+zxSnczS/CfNEOd
-         6/sg==
-X-Forwarded-Encrypted: i=1; AJvYcCXt0qneeemACx5WUrJYqRXcGyK7CvUJdU0WwJBoSzGrZ4NelOuKsJk7I//lZWofRcMCmW8=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yxt3Jw/XGlaUdfJ2PHaU8BwUIxwfcbMHM67oAsUuAMyPl57Ruwt
-	ca3oP/gGgxHIF5IWF72d1os0jeSfBMWv83T+hkgwmaei7/1FfE24yImc
-X-Gm-Gg: ASbGncvZzlpPOxDNxTO7ec3Q2X9g8WeyCrAjph23jpQT224zjkhwGgpGMNIfWh/PjQ8
-	l5AAO2Ul6wvRJfzRx9bjr8t1EvLvktf2bTrbpCiNL5vW7Jp0E3Iq++bGvfCsopTdwqlrI6KI2PF
-	iryuwqLamYCiBe0kXHTgImbYfDCkXTQdPJBHtobwAzZVBGOAGg33btQwUYVu+5Jhq9u+VDaQBqH
-	O8t8lZe2mWvXgqyJYq5fL+BBL2q9Qem8ziyfwvQihtsyjiJlSxAL+GU2SqP1f1M6PwF6Ox8M1sU
-	Yr7Yulaw0oOVjoJ5LQnhloI3/9A7Yo3aZIPZtiUrRKu5ZIsJqfuxPPDebblaZpMilCUkajWEJ6b
-	IVIQwXBO/8m38NYKnwFKkZT+RRW1t7KBSsaZGxZPdihetfx5r4bBHPdBb9P3HOIlnzZ1FLUKUPg
-	==
-X-Google-Smtp-Source: AGHT+IFruEIphVWMplpeA2jQqUDuG27XuGu5lChapLWZrI9BuGwBvnIU/lhkYltuDcRgwCsCwNZgMg==
-X-Received: by 2002:a05:6a21:8881:b0:33a:86cd:1553 with SMTP id adf61e73a8af0-33a86dc7f16mr2340882637.12.1761090436048;
+        bh=0ziglltQonD40PF3NaoQP9RaIb5nYxZqEFCDNXD/J6U=;
+        b=is2MWmpBv0qFY4eyK2MEpM6lGEwtuxJbG0Hxv7gUDHcqHJSJQAadN3SeeT/pr4T/+X
+         Ao6LRyIAiW+P1eSu/v9VKTqLTRPFDUsfNV8a2iWFva+EEFlqfpaZbQhyhfFHBSHBld0B
+         8OaEiHLv+DCEF4iLLxPTh6gTbAJf+2DgqlZfDaNsEJ0Ydjwx3Csh5pC4htxLdmuhS9NU
+         j0b3QtsiqtwgC0+XnoK7mbuB6XfVzW/arAgS7JpnlinDQKrXMMHdKX9xEcP/N8i+Ch0I
+         3jjHA/88HHS4pasScJJ+Z0eQeJZp2eC2IEMdMH/A1OiygdBPg7744MaZaPg8nStwj33b
+         dbug==
+X-Forwarded-Encrypted: i=1; AJvYcCUYNVVdyjIWc1CCbxIXu6iBBqsmZ2TdUDpeWYooMXPDftMUTbTLs5PhWqYu5sxg1CH8nOE=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yxlutg+WX8PIOz2Yo5sAZXnsgWznK1rWOenQKHl7VRbiFv0+llY
+	1om33HO9zXJ+TlV6eKN+YZXnHgUEPU7Yfh+1G1Jg+02bYJUvftRKC/pK
+X-Gm-Gg: ASbGncsg80mY0nNI+RWo5hpJ5Dv1Jxc5018ZFcQKvfkYI/CW/+WU2guPKZwsTxHSwf6
+	asYSGmlktGPqqLucYtjHqlPSrMRBiZZzKIWhkEVTlTrunETv1ZHzGeVMs+d1bcTm3Ukb1U7yj/O
+	Ln/phkKcR2mEaK0Ti5tKyJQTd7+QiiPfxVYuoL7KwN9K4Y52RmYx4wq1zuC6QwoLSWvfFA36j+H
+	2digOYVWev+KEcxyTrZoc//DFrPl6lDhF8pim+Xs6L0Cn1SAFUlWaQD/QbckZU7KBHbYAcLFcCq
+	XXxVT3cmK+y4ti+eKJb9zxIEwzX2ngw8DeAAnsKbHSBjoruNmnMP6aFGcn+y5dlQ5VvYwVtmY57
+	EbW9z5CpxbXcdVs0jVZA96/tQ9j6p32x0cVTJgZsPSh428AGnZW+KSFK3UYz5JkvGAh6c5I3hGT
+	nVX1Pnvj8N
+X-Google-Smtp-Source: AGHT+IG5dGgoFfjLOrDybopHtR5kmquL2RmRYL/ZwgLqL0f5q8OPShyxosfyQ4g18ky0R7BE1MkTfw==
+X-Received: by 2002:a17:902:e84b:b0:290:c0ed:de42 with SMTP id d9443c01a7336-290caf8582emr300060005ad.36.1761090436967;
         Tue, 21 Oct 2025 16:47:16 -0700 (PDT)
-Received: from localhost ([2a03:2880:2ff:74::])
-        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-b6cdafadb8dsm833596a12.1.2025.10.21.16.47.15
+Received: from localhost ([2a03:2880:2ff:73::])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-292471fdd10sm120304085ad.83.2025.10.21.16.47.16
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 21 Oct 2025 16:47:15 -0700 (PDT)
+        Tue, 21 Oct 2025 16:47:16 -0700 (PDT)
 From: Bobby Eshleman <bobbyeshleman@gmail.com>
-Date: Tue, 21 Oct 2025 16:47:01 -0700
-Subject: [PATCH net-next v7 18/26] selftests/vsock: prepare vm management
- helpers for namespaces
+Date: Tue, 21 Oct 2025 16:47:02 -0700
+Subject: [PATCH net-next v7 19/26] selftests/vsock: add BUILD=0 definition
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -86,7 +85,7 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Message-Id: <20251021-vsock-vmtest-v7-18-0661b7b6f081@meta.com>
+Message-Id: <20251021-vsock-vmtest-v7-19-0661b7b6f081@meta.com>
 References: <20251021-vsock-vmtest-v7-0-0661b7b6f081@meta.com>
 In-Reply-To: <20251021-vsock-vmtest-v7-0-0661b7b6f081@meta.com>
 To: Stefano Garzarella <sgarzare@redhat.com>, Shuah Khan <shuah@kernel.org>, 
@@ -110,279 +109,28 @@ X-Mailer: b4 0.13.0
 
 From: Bobby Eshleman <bobbyeshleman@meta.com>
 
-Add namespace support to vm management, ssh helpers, and vsock_test
-wrapper functions. This is in preparation for adding namespace tests
-that rely on SSH and spinning up VMs in different namespaces. The
-functions still work correctly within the init ns, though the caller
-must now pass "init_ns" as the requested namespace.
+Add the definition for BUILD and initialize it to zero. This avoids
+'bash -u vmtest.sh` from throwing 'unbound variable' when BUILD is not
+set to 1 and is later checked for its value.
 
+Fixes: a4a65c6fe08b ("selftests/vsock: add initial vmtest.sh for vsock")
 Signed-off-by: Bobby Eshleman <bobbyeshleman@meta.com>
 ---
- tools/testing/selftests/vsock/vmtest.sh | 102 ++++++++++++++++++++++----------
- 1 file changed, 72 insertions(+), 30 deletions(-)
+ tools/testing/selftests/vsock/vmtest.sh | 1 +
+ 1 file changed, 1 insertion(+)
 
 diff --git a/tools/testing/selftests/vsock/vmtest.sh b/tools/testing/selftests/vsock/vmtest.sh
-index 49b3dd78efad..e8f938419e8e 100755
+index e8f938419e8e..9afe8177167e 100755
 --- a/tools/testing/selftests/vsock/vmtest.sh
 +++ b/tools/testing/selftests/vsock/vmtest.sh
-@@ -141,7 +141,18 @@ ns_set_mode() {
+@@ -626,6 +626,7 @@ run_shared_vm_test() {
+ 	return "${rc}"
  }
  
- vm_ssh() {
--	ssh -q -o UserKnownHostsFile=/dev/null -p ${SSH_HOST_PORT} localhost "$@"
-+	local ns_exec
-+
-+	if [[ "${1}" == init_ns ]]; then
-+		ns_exec=""
-+	else
-+		ns_exec="ip netns exec ${1}"
-+	fi
-+
-+	shift
-+
-+	${ns_exec} ssh -q -o UserKnownHostsFile=/dev/null -p ${SSH_HOST_PORT} localhost $*
-+
- 	return $?
- }
++BUILD=0
+ QEMU="qemu-system-$(uname -m)"
  
-@@ -252,10 +263,12 @@ terminate_pidfiles() {
- 
- vm_start() {
- 	local pidfile=$1
-+	local ns=$2
- 	local logfile=/dev/null
- 	local verbose_opt=""
- 	local kernel_opt=""
- 	local qemu_opts=""
-+	local ns_exec=""
- 	local qemu
- 
- 	qemu=$(command -v "${QEMU}")
-@@ -276,7 +289,11 @@ vm_start() {
- 		kernel_opt="${KERNEL_CHECKOUT}"
- 	fi
- 
--	vng \
-+	if [[ "${ns}" != "init_ns" ]]; then
-+		ns_exec="ip netns exec ${ns}"
-+	fi
-+
-+	${ns_exec} vng \
- 		--run \
- 		${kernel_opt} \
- 		${verbose_opt} \
-@@ -291,6 +308,7 @@ vm_start() {
- }
- 
- vm_wait_for_ssh() {
-+	local ns=$1
- 	local i
- 
- 	i=0
-@@ -298,7 +316,8 @@ vm_wait_for_ssh() {
- 		if [[ ${i} -gt ${WAIT_PERIOD_MAX} ]]; then
- 			die "Timed out waiting for guest ssh"
- 		fi
--		if vm_ssh -- true; then
-+
-+		if vm_ssh "${ns}" -- true; then
- 			break
- 		fi
- 		i=$(( i + 1 ))
-@@ -342,28 +361,42 @@ wait_for_listener()
- }
- 
- vm_wait_for_listener() {
--	local port=$1
-+	local ns=$1
-+	local port=$2
- 
--	vm_ssh <<EOF
-+	log "Waiting for listener on port ${port} on vm"
-+
-+	vm_ssh "${ns}" <<EOF
- $(declare -f wait_for_listener)
- wait_for_listener ${port} ${WAIT_PERIOD} ${WAIT_PERIOD_MAX}
- EOF
- }
- 
- host_wait_for_listener() {
--	wait_for_listener "${TEST_HOST_PORT_LISTENER}" "${WAIT_PERIOD}" "${WAIT_PERIOD_MAX}"
-+	local ns=$1
-+	local port=$2
-+
-+	if [[ "${ns}" == init_ns ]]; then
-+		wait_for_listener "${port}" "${WAIT_PERIOD}" "${WAIT_PERIOD_MAX}"
-+	else
-+		ip netns exec "${ns}" bash <<-EOF
-+			$(declare -f wait_for_listener)
-+			wait_for_listener ${port} ${WAIT_PERIOD} ${WAIT_PERIOD_MAX}
-+		EOF
-+	fi
- }
- 
- vm_vsock_test() {
--	local host=$1
--	local cid=$2
--	local port=$3
-+	local ns=$1
-+	local host=$2
-+	local cid=$3
-+	local port=$4
- 	local rc
- 
- 	set -o pipefail
- 	if [[ "${host}" != server ]]; then
- 		# log output and use pipefail to respect vsock_test errors
--		vm_ssh -- "${VSOCK_TEST}" \
-+		vm_ssh "${ns}" -- "${VSOCK_TEST}" \
- 			--mode=client \
- 			--control-host="${host}" \
- 			--peer-cid="${cid}" \
-@@ -372,7 +405,7 @@ vm_vsock_test() {
- 		rc=$?
- 	else
- 		# log output and use pipefail to respect vsock_test errors
--		vm_ssh -- "${VSOCK_TEST}" \
-+		vm_ssh "${ns}" -- "${VSOCK_TEST}" \
- 			--mode=server \
- 			--peer-cid="${cid}" \
- 			--control-port="${port}" \
-@@ -384,7 +417,7 @@ vm_vsock_test() {
- 			return $rc
- 		fi
- 
--		vm_wait_for_listener "${port}"
-+		vm_wait_for_listener "${ns}" "${port}"
- 		rc=$?
- 	fi
- 	set +o pipefail
-@@ -393,22 +426,28 @@ vm_vsock_test() {
- }
- 
- host_vsock_test() {
--	local host=$1
--	local cid=$2
--	local port=$3
-+	local ns=$1
-+	local host=$2
-+	local cid=$3
-+	local port=$4
- 	local rc
- 
-+	local cmd="${VSOCK_TEST}"
-+	if [[ "${ns}" != "init_ns" ]]; then
-+		cmd="ip netns exec ${ns} ${cmd}"
-+	fi
-+
- 	# log output and use pipefail to respect vsock_test errors
- 	set -o pipefail
- 	if [[ "${host}" != server ]]; then
--		${VSOCK_TEST} \
-+		${cmd} \
- 			--mode=client \
- 			--peer-cid="${cid}" \
- 			--control-host="${host}" \
- 			--control-port="${port}" 2>&1 | log_host
- 		rc=$?
- 	else
--		${VSOCK_TEST} \
-+		${cmd} \
- 			--mode=server \
- 			--peer-cid="${cid}" \
- 			--control-port="${port}" 2>&1 | log_host &
-@@ -418,7 +457,7 @@ host_vsock_test() {
- 			return $rc
- 		fi
- 
--		host_wait_for_listener "${port}" "${WAIT_PERIOD}" "${WAIT_PERIOD_MAX}"
-+		host_wait_for_listener "${ns}" "${port}" "${WAIT_PERIOD}" "${WAIT_PERIOD_MAX}"
- 		rc=$?
- 	fi
- 	set +o pipefail
-@@ -462,11 +501,11 @@ log_guest() {
- }
- 
- test_vm_server_host_client() {
--	if ! vm_vsock_test "server" 2 "${TEST_GUEST_PORT}"; then
-+	if ! vm_vsock_test "init_ns" "server" 2 "${TEST_GUEST_PORT}"; then
- 		return "${KSFT_FAIL}"
- 	fi
- 
--	if ! host_vsock_test "127.0.0.1" "${VSOCK_CID}" "${TEST_HOST_PORT}"; then
-+	if ! host_vsock_test "init_ns" "127.0.0.1" "${VSOCK_CID}" "${TEST_HOST_PORT}"; then
- 		return "${KSFT_FAIL}"
- 	fi
- 
-@@ -474,11 +513,11 @@ test_vm_server_host_client() {
- }
- 
- test_vm_client_host_server() {
--	if ! host_vsock_test "server" "${VSOCK_CID}" "${TEST_HOST_PORT_LISTENER}"; then
-+	if ! host_vsock_test "init_ns" "server" "${VSOCK_CID}" "${TEST_HOST_PORT_LISTENER}"; then
- 		return "${KSFT_FAIL}"
- 	fi
- 
--	if ! vm_vsock_test "10.0.2.2" 2 "${TEST_HOST_PORT_LISTENER}"; then
-+	if ! vm_vsock_test "init_ns" "10.0.2.2" 2 "${TEST_HOST_PORT_LISTENER}"; then
- 		return "${KSFT_FAIL}"
- 	fi
- 
-@@ -488,11 +527,14 @@ test_vm_client_host_server() {
- test_vm_loopback() {
- 	local port=60000 # non-forwarded local port
- 
--	if ! vm_vsock_test "server" 1 "${port}"; then
-+	vm_ssh "init_ns" -- modprobe vsock_loopback &> /dev/null || :
-+
-+	if ! vm_vsock_test "init_ns" "server" 1 "${port}"; then
- 		return "${KSFT_FAIL}"
- 	fi
- 
--	if ! vm_vsock_test "127.0.0.1" 1 "${port}"; then
-+
-+	if ! vm_vsock_test "init_ns" "127.0.0.1" 1 "${port}"; then
- 		return "${KSFT_FAIL}"
- 	fi
- 
-@@ -550,8 +592,8 @@ run_shared_vm_test() {
- 
- 	host_oops_cnt_before=$(dmesg | grep -c -i 'Oops')
- 	host_warn_cnt_before=$(dmesg --level=warn | wc -l)
--	vm_oops_cnt_before=$(vm_ssh -- dmesg | grep -c -i 'Oops')
--	vm_warn_cnt_before=$(vm_ssh -- dmesg --level=warn | wc -l)
-+	vm_oops_cnt_before=$(vm_ssh "init_ns" -- dmesg | grep -c -i 'Oops')
-+	vm_warn_cnt_before=$(vm_ssh "init_ns" -- dmesg --level=warn | wc -l)
- 
- 	name=$(echo "${1}" | awk '{ print $1 }')
- 	eval test_"${name}"
-@@ -569,13 +611,13 @@ run_shared_vm_test() {
- 		rc=$KSFT_FAIL
- 	fi
- 
--	vm_oops_cnt_after=$(vm_ssh -- dmesg | grep -i 'Oops' | wc -l)
-+	vm_oops_cnt_after=$(vm_ssh "init_ns" -- dmesg | grep -i 'Oops' | wc -l)
- 	if [[ ${vm_oops_cnt_after} -gt ${vm_oops_cnt_before} ]]; then
- 		echo "FAIL: kernel oops detected on vm" | log_host
- 		rc=$KSFT_FAIL
- 	fi
- 
--	vm_warn_cnt_after=$(vm_ssh -- dmesg --level=warn | wc -l)
-+	vm_warn_cnt_after=$(vm_ssh "init_ns" -- dmesg --level=warn | wc -l)
- 	if [[ ${vm_warn_cnt_after} -gt ${vm_warn_cnt_before} ]]; then
- 		echo "FAIL: kernel warning detected on vm" | log_host
- 		rc=$KSFT_FAIL
-@@ -620,8 +662,8 @@ cnt_total=0
- if shared_vm_tests_requested "${ARGS[@]}"; then
- 	log_host "Booting up VM"
- 	pidfile=$(mktemp $PIDFILE_TEMPLATE)
--	vm_start "${pidfile}"
--	vm_wait_for_ssh
-+	vm_start "${pidfile}" "init_ns"
-+	vm_wait_for_ssh "init_ns"
- 	log_host "VM booted up"
- 
- 	run_shared_vm_tests "${ARGS[@]}"
+ while getopts :hvsq:b o
 
 -- 
 2.47.3
