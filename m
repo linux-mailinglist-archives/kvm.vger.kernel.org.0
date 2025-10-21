@@ -1,169 +1,154 @@
-Return-Path: <kvm+bounces-60672-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-60671-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id AB3C9BF707B
-	for <lists+kvm@lfdr.de>; Tue, 21 Oct 2025 16:22:00 +0200 (CEST)
+Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [213.196.21.55])
+	by mail.lfdr.de (Postfix) with ESMTPS id 33328BF7075
+	for <lists+kvm@lfdr.de>; Tue, 21 Oct 2025 16:21:48 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 5991F18A3119
-	for <lists+kvm@lfdr.de>; Tue, 21 Oct 2025 14:22:18 +0000 (UTC)
+	by ams.mirrors.kernel.org (Postfix) with ESMTPS id A85DF3551DB
+	for <lists+kvm@lfdr.de>; Tue, 21 Oct 2025 14:21:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 510F4338926;
-	Tue, 21 Oct 2025 14:21:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 338A82D6E67;
+	Tue, 21 Oct 2025 14:21:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="lxf/7M7Q"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="qnVhw4WO"
 X-Original-To: kvm@vger.kernel.org
-Received: from out30-99.freemail.mail.aliyun.com (out30-99.freemail.mail.aliyun.com [115.124.30.99])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f52.google.com (mail-wm1-f52.google.com [209.85.128.52])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 34E0523D2B8;
-	Tue, 21 Oct 2025 14:21:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.99
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5B79081AA8
+	for <kvm@vger.kernel.org>; Tue, 21 Oct 2025 14:21:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.52
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761056506; cv=none; b=ryMWwv+QCQQlDJwxLel+n3Y4AJ6NaCeSD6LlepSLg8x/3Nxx3/R62DiniZrN+0EG+uoH7QtCYpRB6Jh1KzKwAlUrfg67sZtfgTMCkGY1++Vx0h6EQML5WwCnMQ6XJ+7hdsjDMUEbuR9SlT5Uc68+aYEn9oLRt/qqfTyfJbpDH5Q=
+	t=1761056503; cv=none; b=mH7N2mztv35/eRp7fbdqLUkFUG1oiADU0gQkKqJf7b/w5NDSrHe7UdyPjB1BxXTzI26TSnsEC5xT5MeuTd6EIQ7sLJy80mpwmAqE+117KP+RuZMX36z+VkZxOw4xRYpRjbQQm+wZElrNSalCWuuokjiAlGf6qgzvVfvfhS8M3xw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761056506; c=relaxed/simple;
-	bh=zbf5X6xFgjcLKvQ//NfXqUxkpVqdnHgnddzIX/9P3i0=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=QM/OhYaIEoTafgQrnATcsvCfYfdGJbqkMI+Hhda2VY58O/xygOa2pko14DrnzJaZFt/43SEnz0s0jER9hVH6PxwzClsuHBPelg8n56KbqOiYWlm7wZDNEbv89cbD4uXo5es7DhrmZ3+LG8qdeSZjPyeE6cV1vr0NGTPeYJGGaEY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=lxf/7M7Q; arc=none smtp.client-ip=115.124.30.99
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
-DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=linux.alibaba.com; s=default;
-	t=1761056497; h=From:To:Subject:Date:Message-Id:MIME-Version;
-	bh=bcvGo8vZx1GTax8WxbQQMp+Ghln0kxNOs/BCW6mwRY4=;
-	b=lxf/7M7QxySY7IP4CMnr3nMde1Jwv3vXRKjvVmSoQqCrnihsuspPI363MwxC+3Y+RtW8PkcxXVDzwL5aEFes6aMKghPsvFeiQx6mEYx2m1iNp1I6ZhjVyfBSI7rBuOZ84niWxvx8wJlAnU6ssGBaZO0iT8D2DpzGvQSvuleQwB0=
-Received: from localhost.localdomain(mailfrom:fangyu.yu@linux.alibaba.com fp:SMTPD_---0WqjBICH_1761056493 cluster:ay36)
-          by smtp.aliyun-inc.com;
-          Tue, 21 Oct 2025 22:21:35 +0800
-From: fangyu.yu@linux.alibaba.com
-To: anup@brainfault.org,
-	atish.patra@linux.dev,
-	pjw@kernel.org,
-	palmer@dabbelt.com,
-	aou@eecs.berkeley.edu,
-	alex@ghiti.fr,
-	pbonzini@redhat.com,
-	jiangyifei@huawei.com
-Cc: guoren@kernel.org,
-	dbarboza@ventanamicro.com,
-	kvm@vger.kernel.org,
-	kvm-riscv@lists.infradead.org,
-	linux-riscv@lists.infradead.org,
-	linux-kernel@vger.kernel.org,
-	Fangyu Yu <fangyu.yu@linux.alibaba.com>
-Subject: [PATCH v2] RISC-V: KVM: Remove automatic I/O mapping for VM_PFNMAP
-Date: Tue, 21 Oct 2025 22:21:31 +0800
-Message-Id: <20251021142131.78796-1-fangyu.yu@linux.alibaba.com>
-X-Mailer: git-send-email 2.39.3 (Apple Git-146)
+	s=arc-20240116; t=1761056503; c=relaxed/simple;
+	bh=yoNcGazAmmBdFKDju/F45MjOX4Pk2Miv9Xj4Xsz3nKA=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=VJIgiYrEaXf4LMF4FKpaAcR2HYPIF2o/7ekvqX04wA8ja54KVPqU6r95OteZ01vEecgNZDVCpGPWzQoL0j5pSaycEDuqRgjSpkwqPVkt2QWLhqULIinNamb2eUe8dZ3MKMXffkbYVQi5ULBzALFZwX08GRNvz8mzBR9tIbL7klU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=qnVhw4WO; arc=none smtp.client-ip=209.85.128.52
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
+Received: by mail-wm1-f52.google.com with SMTP id 5b1f17b1804b1-47112a73785so43266355e9.3
+        for <kvm@vger.kernel.org>; Tue, 21 Oct 2025 07:21:41 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google; t=1761056499; x=1761661299; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=TbDfCBsg1ewIRXAuyiRlLRo57QfPgJYdnTBew9UVKu4=;
+        b=qnVhw4WO29IlJg586InvvfXAFloZqr+PtXY6mxyf8D5ly0deUQTr3LfqzCo29nK5Sa
+         kBXsw3y6g2GM+rHDvdlmmiKkClYT2cPs6tiasfBIi695cNDdYvhvWcyAfhD5fSlfIDNe
+         tYu2SPRpQDxffddZpBdAFiYWM7z3VGEXYqEIy52O7UibeIh2BPw36gPiqpKFtaUtgMWy
+         Ugwucs5s+/JW5XzjL/wlFLh/EFog/iAkLSAaK2sPS6LnUOqwckrS4rGsbaZXNVi7gcgi
+         eQ4dLOAizf0cdF4hcCDWpT/ALQ3a/y13XBEvncmb6EwDlSFAO60HoVTxkxMxwV41iWbS
+         u5Cw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1761056499; x=1761661299;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=TbDfCBsg1ewIRXAuyiRlLRo57QfPgJYdnTBew9UVKu4=;
+        b=vOtHejsiri0zOjoG8mz9svYVvYxT22TCRrMopiT93uM+WG/k2DLcVPmRIk4WHXucnv
+         nryZQn+wtSDSGvRt8X01sYoqwcyeFz4+wKL2v48R8jfu1Dvi59Epj1R02qnlH87CfqIC
+         x1jynXxDHd8YbUlX+M/oSlXOgZaD9FQ6PpF9X/mG1p39vHwhgEl76kL5gHp88AatCWtf
+         vI2XeJz8SbWAgQFbewiE2e7ozV9WvfgnGGTdN7RQnTh7ZSl+LgBlnEcjRxZgB16TEPiY
+         YRGrGdm6cKwv/R9wUwrgjzJ18/C9rf9QP8RVqhKUJWZoKsBC8F1ivxNj9hgy2JXLNDZV
+         qZTA==
+X-Forwarded-Encrypted: i=1; AJvYcCWtw3EaRuq/nYxTPbp/wgw/M8CIfl7QwIRJtGvBY/3QocKNrh9jWNi+it2QB4oWUvXPq2g=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yxk4nJnjMtocKYGhKigJsJrAvoF/2XvweOzsFDBV04p0GNXVVv8
+	D/jQm5jhOZ7fawghph9oglEVN3GFqIpHPdJEvruj/Mei8Z/8QtMd/RlsUssuVvJCzBU=
+X-Gm-Gg: ASbGncvLbYfpkWcGqm06Uc0z+fBHhV81giQVI8MUY0Ju21pIKkiAcC3G4b3XGIB3NFk
+	M/gM1qAwuHullDzayV4yOHatNin3oU4wQAMzB8HK/JYx2pLBwYx1lZG+p4ALmbbgOcaV32yyuP3
+	N+wzXTkMJKkRNmze9XHkttCEBTHFXi13IAixB26oWN64ma7R3Isv1pL7M4obCUVDShfKkgyqN6X
+	9mzComuCvOFsqr7GC059Ammp75bT8oeXztRZQFEGwrMf9/ykH0k8JtDw7Zqr5FJov0eZg8980Sf
+	HQbDE+OA10YOWasrmRH/WnaHRIrENGSijHU8bl5T8yjfS4KOu58aaJvjbQ6aihGJyj2KCne4qre
+	8nvtFggdU2W7YE0JmTMPXdjzbArgfecsVT2camnZ7RUuuybsW+v0ygGeXaTi/1L8odrK2RRVDo5
+	wHBq7a+e5Ld5CxCZhtgXCCT/kCag1TMjuyVjvA6Q9lxMQ=
+X-Google-Smtp-Source: AGHT+IFEizekRvWtYb0p6De8rFWOEeTQOsDv4QI5SV5e4hWTGxEDcjnyTvXlhwsnfp48OL5LAvw3Lw==
+X-Received: by 2002:a05:600c:64cf:b0:46e:45fd:946e with SMTP id 5b1f17b1804b1-4711791ad90mr128608015e9.31.1761056499582;
+        Tue, 21 Oct 2025 07:21:39 -0700 (PDT)
+Received: from [192.168.69.221] (88-187-86-199.subs.proxad.net. [88.187.86.199])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-471144c82b8sm284071655e9.15.2025.10.21.07.21.38
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 21 Oct 2025 07:21:38 -0700 (PDT)
+Message-ID: <d264c81b-119e-439f-a4c2-68a7336d6ba6@linaro.org>
+Date: Tue, 21 Oct 2025 16:21:37 +0200
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v2 04/11] hw/ppc/spapr: Inline spapr_dtb_needed()
+Content-Language: en-US
+To: Chinmay Rath <rathc@linux.ibm.com>, qemu-devel@nongnu.org
+Cc: qemu-ppc@nongnu.org, Nicholas Piggin <npiggin@gmail.com>,
+ kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
+ Harsh Prateek Bora <harshpb@linux.ibm.com>, =?UTF-8?Q?C=C3=A9dric_Le_Goater?=
+ <clg@redhat.com>
+References: <20251021084346.73671-1-philmd@linaro.org>
+ <20251021084346.73671-5-philmd@linaro.org>
+ <602c19bc-bed9-43c2-b98c-491b75921604@linux.ibm.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=C3=A9?= <philmd@linaro.org>
+In-Reply-To: <602c19bc-bed9-43c2-b98c-491b75921604@linux.ibm.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
 
-From: Fangyu Yu <fangyu.yu@linux.alibaba.com>
+On 21/10/25 15:25, Chinmay Rath wrote:
+> Hey Philippe,
+> The commit message says that this commit is inline-ing 
+> spapr_dtb_needed(), but it is actually removing it. I think it's better 
+> to convey that in the commit message.
+> Or did I miss something ?
+> 
+> On 10/21/25 14:13, Philippe Mathieu-Daudé wrote:
+>> Signed-off-by: Philippe Mathieu-Daudé <philmd@linaro.org>
+>> ---
+>>   hw/ppc/spapr.c | 6 ------
+>>   1 file changed, 6 deletions(-)
+>>
+>> diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
+>> index 458d1c29b4d..ad9fc61c299 100644
+>> --- a/hw/ppc/spapr.c
+>> +++ b/hw/ppc/spapr.c
+>> @@ -2053,11 +2053,6 @@ static const VMStateDescription 
+>> vmstate_spapr_irq_map = {
+>>       },
+>>   };
+>> -static bool spapr_dtb_needed(void *opaque)
+>> -{
+>> -    return true; /* backward migration compat */
+>> -}
+>> -
+>>   static int spapr_dtb_pre_load(void *opaque)
+>>   {
+>>       SpaprMachineState *spapr = (SpaprMachineState *)opaque;
+>> @@ -2073,7 +2068,6 @@ static const VMStateDescription 
+>> vmstate_spapr_dtb = {
+>>       .name = "spapr_dtb",
+>>       .version_id = 1,
+> 
+> Does this version number need to be incremented ?
 
-As of commit aac6db75a9fc ("vfio/pci: Use unmap_mapping_range()"),
-vm_pgoff may no longer guaranteed to hold the PFN for VM_PFNMAP
-regions. Using vma->vm_pgoff to derive the HPA here may therefore
-produce incorrect mappings.
+No, this is a no-op.
 
-Instead, I/O mappings for such regions can be established on-demand
-during g-stage page faults, making the upfront ioremap in this path
-is unnecessary.
+> 
+> Regards,
+> Chinmay
+> 
+>>       .minimum_version_id = 1,
+>> -    .needed = spapr_dtb_needed,
 
-Fixes: 9d05c1fee837 ("RISC-V: KVM: Implement stage2 page table programming")
-Signed-off-by: Fangyu Yu <fangyu.yu@linux.alibaba.com>
-Tested-by: Daniel Henrique Barboza <dbarboza@ventanamicro.com>
+Here is the inlining, as '.needed = true' is the default.
 
----
-Changes in v2:
-- Fixed build warnings.
----
- arch/riscv/kvm/mmu.c | 25 ++-----------------------
- 1 file changed, 2 insertions(+), 23 deletions(-)
+Would "Inline and remove spapr_dtb_needed()" be clearer?
 
-diff --git a/arch/riscv/kvm/mmu.c b/arch/riscv/kvm/mmu.c
-index 525fb5a330c0..58f5f3536ffd 100644
---- a/arch/riscv/kvm/mmu.c
-+++ b/arch/riscv/kvm/mmu.c
-@@ -171,7 +171,6 @@ int kvm_arch_prepare_memory_region(struct kvm *kvm,
- 				enum kvm_mr_change change)
- {
- 	hva_t hva, reg_end, size;
--	gpa_t base_gpa;
- 	bool writable;
- 	int ret = 0;
- 
-@@ -190,15 +189,13 @@ int kvm_arch_prepare_memory_region(struct kvm *kvm,
- 	hva = new->userspace_addr;
- 	size = new->npages << PAGE_SHIFT;
- 	reg_end = hva + size;
--	base_gpa = new->base_gfn << PAGE_SHIFT;
- 	writable = !(new->flags & KVM_MEM_READONLY);
- 
- 	mmap_read_lock(current->mm);
- 
- 	/*
- 	 * A memory region could potentially cover multiple VMAs, and
--	 * any holes between them, so iterate over all of them to find
--	 * out if we can map any of them right now.
-+	 * any holes between them, so iterate over all of them.
- 	 *
- 	 *     +--------------------------------------------+
- 	 * +---------------+----------------+   +----------------+
-@@ -209,7 +206,7 @@ int kvm_arch_prepare_memory_region(struct kvm *kvm,
- 	 */
- 	do {
- 		struct vm_area_struct *vma;
--		hva_t vm_start, vm_end;
-+		hva_t vm_end;
- 
- 		vma = find_vma_intersection(current->mm, hva, reg_end);
- 		if (!vma)
-@@ -225,36 +222,18 @@ int kvm_arch_prepare_memory_region(struct kvm *kvm,
- 		}
- 
- 		/* Take the intersection of this VMA with the memory region */
--		vm_start = max(hva, vma->vm_start);
- 		vm_end = min(reg_end, vma->vm_end);
- 
- 		if (vma->vm_flags & VM_PFNMAP) {
--			gpa_t gpa = base_gpa + (vm_start - hva);
--			phys_addr_t pa;
--
--			pa = (phys_addr_t)vma->vm_pgoff << PAGE_SHIFT;
--			pa += vm_start - vma->vm_start;
--
- 			/* IO region dirty page logging not allowed */
- 			if (new->flags & KVM_MEM_LOG_DIRTY_PAGES) {
- 				ret = -EINVAL;
- 				goto out;
- 			}
--
--			ret = kvm_riscv_mmu_ioremap(kvm, gpa, pa, vm_end - vm_start,
--						    writable, false);
--			if (ret)
--				break;
- 		}
- 		hva = vm_end;
- 	} while (hva < reg_end);
- 
--	if (change == KVM_MR_FLAGS_ONLY)
--		goto out;
--
--	if (ret)
--		kvm_riscv_mmu_iounmap(kvm, base_gpa, size);
--
- out:
- 	mmap_read_unlock(current->mm);
- 	return ret;
--- 
-2.50.1
+>>       .pre_load = spapr_dtb_pre_load,
+>>       .fields = (const VMStateField[]) {
+>>           VMSTATE_UINT32(fdt_initial_size, SpaprMachineState),
 
 
