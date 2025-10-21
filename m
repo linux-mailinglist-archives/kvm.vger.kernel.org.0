@@ -1,79 +1,79 @@
-Return-Path: <kvm+bounces-60644-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-60645-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4B02ABF552F
-	for <lists+kvm@lfdr.de>; Tue, 21 Oct 2025 10:44:25 +0200 (CEST)
+Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [IPv6:2a01:60a::1994:3:14])
+	by mail.lfdr.de (Postfix) with ESMTPS id DA2B5BF553B
+	for <lists+kvm@lfdr.de>; Tue, 21 Oct 2025 10:44:33 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 301874E4F82
-	for <lists+kvm@lfdr.de>; Tue, 21 Oct 2025 08:44:24 +0000 (UTC)
+	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 5E3223505B7
+	for <lists+kvm@lfdr.de>; Tue, 21 Oct 2025 08:44:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BFD1731AF21;
-	Tue, 21 Oct 2025 08:44:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9E527320A0B;
+	Tue, 21 Oct 2025 08:44:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="jTWpzVFL"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="TSDWCiW3"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-wm1-f51.google.com (mail-wm1-f51.google.com [209.85.128.51])
+Received: from mail-wm1-f45.google.com (mail-wm1-f45.google.com [209.85.128.45])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3473A3054CE
-	for <kvm@vger.kernel.org>; Tue, 21 Oct 2025 08:44:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.51
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 19831291C13
+	for <kvm@vger.kernel.org>; Tue, 21 Oct 2025 08:44:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.45
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761036260; cv=none; b=IYsSumF0Oacw1RwYRdIcgcfsdOc+NzpcnMvxh+VS2bQzdA6PX/Kf1TQPk41wqszb0j3LNB2eiF/qKVsgJ5uK6Z4ZcX0p/+oxBl3A3lV5vUUSjRtMpWcXhTBtdmHol8vXw7Ei4RuGrotf844pwOE0qinHnhKoZiGi3Ykb2fzVGiQ=
+	t=1761036265; cv=none; b=Fv3TfBaHUH288YJz6apPVg0yV4m09cCZrmJrmBsWnKIernC3jHRN3WlKyrzoVYgJvWzCE5TTGbHQvzVyatFsRq2H6s8/TW/15/R+ft8AZ4nFL7MOGojWV8cBO+NZoGYTcA8qLB2q+AJVek8cJyNrmmvWm+Mcy8yFftOLa1EYQ3Q=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761036260; c=relaxed/simple;
-	bh=hhbHkSkaXQlG5YNuuZyfYPTMWszpLmqd0kgPeH2ksf4=;
+	s=arc-20240116; t=1761036265; c=relaxed/simple;
+	bh=G1iuQahJsrYJ21IJS0Epi55ij3/ZHOuu0j/lP0L/reY=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=kdSAc4JVI3l0cQOKtqi9mTNIRX41hszdSy2A/h78Pu4qT+zOG8NWYoZcidWTldYJdhVy/VUo82l3QUgckVMu4wnXqJOEIdo2GVZAYmz3x7y6kcKXpn4FPBZ1wdosaI1Xk9buD57VyJ4KgBIJRGknwysi6QPvdMW0v6nyt72CTDc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=jTWpzVFL; arc=none smtp.client-ip=209.85.128.51
+	 MIME-Version:Content-Type; b=VLraze5wNorMH1vyt+IM4p0YsF+Z5ikRVBPbPyYIylwzfMh8oFWcWwiXlMGvh7933FIzOl8wTq17EcyLl8aqEgbOE5mnSn+TZpgA+TZg0RZbj8hNlLbivSmJvppeNvtXVwaOBkjdQS0ePIokwwo2SLyELhKkqFexzS47DVo7jLE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=TSDWCiW3; arc=none smtp.client-ip=209.85.128.45
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
-Received: by mail-wm1-f51.google.com with SMTP id 5b1f17b1804b1-47106fc51faso62624205e9.0
-        for <kvm@vger.kernel.org>; Tue, 21 Oct 2025 01:44:18 -0700 (PDT)
+Received: by mail-wm1-f45.google.com with SMTP id 5b1f17b1804b1-471066cfc2aso7591055e9.0
+        for <kvm@vger.kernel.org>; Tue, 21 Oct 2025 01:44:23 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1761036257; x=1761641057; darn=vger.kernel.org;
+        d=linaro.org; s=google; t=1761036262; x=1761641062; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=EulFVp0cdEgXrWVzzt34/e5jn6jKRx8ym0Wu/90Pz4Y=;
-        b=jTWpzVFLEOIdnJxLwXeS7OLMYmJqFTba4A9dncKJJRmJw8OVVWu+N1CdVyqg5CboSH
-         5OuQ9GcGYM6X2GzdsK8ERPYcW3dLJT/RxFBPw/t8nmcAhZWvFzeMQTjn73vCbOzQL0Ta
-         esDCsF7Ec2RPB9M2DnFPOB7ZVWlFfApf8/F2aae6qrHD1GWfi09+7s1mn2U/YJEk9mKX
-         B/KqYsc7iWxuXd8SWvPO6KFsryGrzFcAN7HFnP6A2tTPhTX0SVcMaVOHanc8DdxwaXQL
-         OD2ED3jXmGhC84ln7QYp3spDFo+tW1rJyuXBp7jv3LnjYhFrQoZsoBlImem6G4SbBOLc
-         ekww==
+        bh=qI+hF79G3saS4cJM9gBn0qvW7x/aK3K4EItDfXm9eIU=;
+        b=TSDWCiW390eCZVaqxfgLqMRLS6Pjb+6YIOZcoZXMUr9LfaLpRWZ777kspDkREV49O0
+         i5r6oXXqm2hLIaJCKoGV46ZBu0t59LVyjW0XNGI16XGkEB6liEOZ9Hs7jES3CSleiXzM
+         YxoQA44LjFP08pxvHXKcQr+s6W5tVxhCcbtYQVMej2ceLPeZachLxdsMqxqFGsClAYGI
+         Ieb6hrAg4FUnGZhI8rNitpd2jgAeFsRmWLO1ODIGDUD4AX80skD421fg05bKMoy0VTKn
+         erlxNXgNVBcilkbJ1AtLcylOmyZRec5ETMoj1guHYMsyK+cKnz5zFSJSkxYtEf50olZH
+         agOQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1761036257; x=1761641057;
+        d=1e100.net; s=20230601; t=1761036262; x=1761641062;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=EulFVp0cdEgXrWVzzt34/e5jn6jKRx8ym0Wu/90Pz4Y=;
-        b=rSRzepqDUxxmEyC/ypCc9yAIxrr8xXn1ww4TgORK+QnWJcEiTgczopmmcZJywXYOjS
-         G+gi94CTnts2TRQMevcXxZ/EmxdpxePNTgW096CgNNXlUEMpkUkEM4WTaX2Qfx8EdWmQ
-         BiteHLRnOiOCxuXMnjNjDxJZfWdpZrX9kmFRw3kdDA50/Db+tT3MPWedZK/2jSm66ldh
-         sEofSiI67TVhJiaUr/IuPqZsKJynS7wtdh1t1KEgbquWrYOvDuK1oDoqHwG3q7f7Mxg/
-         OXivol+rZPQOhaWzT1TtNKKz6ZSzbKA7nJDqvom8ZZ1hKzDZop2IqcRf5vr13jnVadN5
-         ZmYQ==
-X-Forwarded-Encrypted: i=1; AJvYcCXI+2SSI15c723D7gj2MJnj7JgjCrd4KaHnqgnpEMz9a4EE0kAighTibq+xVoA41zse+ow=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyU/Wk/HD5tTmTpiNb1BjBKMhx4TTvxT6RbpW2DT2r6ww4nSAqb
-	tKfwyOxH5AUplWxWhjkvChGkdELAdK4pAN5UWiggImm36R1eoNVnigXSLP20rx/s87A=
-X-Gm-Gg: ASbGncushs1xvVHwNryfJKLlAmY3balOVhDZ0UK5UFdtqC5/T2jfm4aoqv90r+6zZKD
-	3HnoLdiy+QOhSHJevHDEOucz4KJYqFLN7lABCZtaG8dL0hcIrwYW2ueU+krB/Y5JpOk08RUpQ/o
-	KyjczGHqBxLtZ6uNIrwWLeUxLVBN8mVq6ver1HzmLu/NNW6/OJlS7kYHd6+7J4wf13EbA+x3IXs
-	BYIGV+8G7uuZhTMm53n9xCsHpqCAz86+W3FJszvXQFkJw72bag5TX0cxcV5n7YrmJ1ULAVFq1/c
-	aUQF7dXFfYgQX4LIVnCoO7Sdo4YMjdynySGr5ksYF6TI45xrMvkjNzn9Vfn6PQiKq3hKBXMgHsP
-	NpTFXo15QjvWGBp+ks0nz+GwbTwPw9AYGLO5lutTNP8liM2wcur+B9UE25BOKb315w4Z+ODiQ36
-	XAn776r/JCuMQSI0BjBNxVd1wJSiAiw6vKA36DTnNVmETOPmA6iXGAV63T/WELeq4HIVLSy4g=
-X-Google-Smtp-Source: AGHT+IEmd4GV6INTu4mcg5KDt0989nKH2jp2JP8h3QAR44T4Pq2UxoFRyjRrLBth8F3WNX4zMhdfAA==
-X-Received: by 2002:a05:600c:5296:b0:46e:1b89:77f1 with SMTP id 5b1f17b1804b1-47117879898mr121510145e9.9.1761036257489;
-        Tue, 21 Oct 2025 01:44:17 -0700 (PDT)
+        bh=qI+hF79G3saS4cJM9gBn0qvW7x/aK3K4EItDfXm9eIU=;
+        b=ftago15YMkS3gBYpa55OqKFXcCxUX3fM5V2PL3HuyGlaRGYRp1JsV9mco+8cVBQ5lE
+         OZDZtZ7SWsY4YqRahWszsA6NTAsDSmAVRVBVQ5B82z7hhdVpnT+WFAnE77PCP058nVpe
+         oMUoAKmTYC9GEMQil6tk1UiRt9zxKArmp91L8S4MhEcql6MSfsCmiH0OvFK5BRBRFtkz
+         gtW2dnW8cIGl8Gd3wWRQGSKzUqhhBoyeaMLNHfP//WXYJ3KrBQftGkS/wG1uuHz11/TT
+         4z76hsr9Nd1tEzCyOgMwxHyNdBhm+SCyYwWiK44uWBFfqeV88wF+EYjo19uEvYgxLGQc
+         pr0w==
+X-Forwarded-Encrypted: i=1; AJvYcCVnUNGGO03z5F+7aYUAzYH96+gBd/73bVVrsA1gxAdWz2qga/LeI8zecXJk38rXSHlp0VY=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yx1cLCzLu8scIQ9MDAnuBKgLx72LfP091uDzxRA2py35AfcLFD8
+	eJG4ZQ8e8qlXsouaQZTalEZDrHIzY7+epfs3cM5kaaqaIMirBVhMCVe/CdehCLfiUus=
+X-Gm-Gg: ASbGncvZn20pfFGa4qdyVHEigzQrWea8q0h7YsdNAYJ4naOX79MH3pTnyK1cB5YOnZk
+	o7FJPucxLEJmpP1fd5mAj28axIp09Uk1cKNgP6MPe+/52hqrp4C2oRekvShsiTxtncwl9d6D0eF
+	l4gIyyrbMxVzvz4QOH4GiyurwuCLl43tOkUF/q3uomfjdFxn1P5KZP2Q6mPSYf+T0UO0M2DnD5q
+	kerq2ZzhMmwnrs5eVrX2nSw0rAxopCiKLzztPY45jDmoX6kz2OEwhi5EalxNqppZtdHNfOPuMpV
+	IwNbn+3X5NS1EJkq3J05BaGREv6pf1keTxUYL9S1KylcFKOzjU8HbHuPajdB6PGcrPAM3tM1ViP
+	gRwTo4IqNwqT+cilqViMEBvKLCQRJy6/7k3MIfyFvKGSHveETgV6Ul1WZbDg1MseAu0coNe3bZC
+	F0G+GGsASHtKqt8xGH6ZwTCYQB9MqpBYu4RZeHKDOCArRlfrv0SA==
+X-Google-Smtp-Source: AGHT+IE8rS6VZYx/i8JiXQJLTMpGlcor/1LQLKzg9IWBTT3rtLq5Bk5Lslt0pycRlR21ilSWorrGLA==
+X-Received: by 2002:a05:600c:8b62:b0:45d:d97c:235e with SMTP id 5b1f17b1804b1-47117876bcdmr112776075e9.12.1761036262467;
+        Tue, 21 Oct 2025 01:44:22 -0700 (PDT)
 Received: from localhost.localdomain (88-187-86-199.subs.proxad.net. [88.187.86.199])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-47152959b55sm189711035e9.6.2025.10.21.01.44.16
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-427ea5a0f7dsm18934148f8f.4.2025.10.21.01.44.21
         (version=TLS1_3 cipher=TLS_CHACHA20_POLY1305_SHA256 bits=256/256);
-        Tue, 21 Oct 2025 01:44:17 -0700 (PDT)
+        Tue, 21 Oct 2025 01:44:21 -0700 (PDT)
 From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@linaro.org>
 To: qemu-devel@nongnu.org
 Cc: Chinmay Rath <rathc@linux.ibm.com>,
@@ -84,9 +84,9 @@ Cc: Chinmay Rath <rathc@linux.ibm.com>,
 	Harsh Prateek Bora <harshpb@linux.ibm.com>,
 	=?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@redhat.com>,
 	=?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@linaro.org>
-Subject: [PATCH v2 06/11] target/ppc/kvm: Remove kvmppc_get_host_serial() as unused
-Date: Tue, 21 Oct 2025 10:43:40 +0200
-Message-ID: <20251021084346.73671-7-philmd@linaro.org>
+Subject: [PATCH v2 07/11] target/ppc/kvm: Remove kvmppc_get_host_model() as unused
+Date: Tue, 21 Oct 2025 10:43:41 +0200
+Message-ID: <20251021084346.73671-8-philmd@linaro.org>
 X-Mailer: git-send-email 2.51.0
 In-Reply-To: <20251021084346.73671-1-philmd@linaro.org>
 References: <20251021084346.73671-1-philmd@linaro.org>
@@ -102,26 +102,26 @@ Content-Transfer-Encoding: 8bit
 Signed-off-by: Philippe Mathieu-Daudé <philmd@linaro.org>
 ---
  target/ppc/kvm_ppc.h | 6 ------
- target/ppc/kvm.c     | 6 ------
- 2 files changed, 12 deletions(-)
+ target/ppc/kvm.c     | 5 -----
+ 2 files changed, 11 deletions(-)
 
 diff --git a/target/ppc/kvm_ppc.h b/target/ppc/kvm_ppc.h
-index a1d9ce9f9aa..f24cc4de3c2 100644
+index f24cc4de3c2..742881231e1 100644
 --- a/target/ppc/kvm_ppc.h
 +++ b/target/ppc/kvm_ppc.h
-@@ -22,7 +22,6 @@
+@@ -21,7 +21,6 @@
+ 
  uint32_t kvmppc_get_tbfreq(void);
  uint64_t kvmppc_get_clockfreq(void);
- bool kvmppc_get_host_model(char **buf);
--bool kvmppc_get_host_serial(char **buf);
+-bool kvmppc_get_host_model(char **buf);
  int kvmppc_get_hasidle(CPUPPCState *env);
  int kvmppc_get_hypercall(CPUPPCState *env, uint8_t *buf, int buf_len);
  int kvmppc_set_interrupt(PowerPCCPU *cpu, int irq, int level);
-@@ -134,11 +133,6 @@ static inline bool kvmppc_get_host_model(char **buf)
-     return false;
+@@ -128,11 +127,6 @@ static inline uint32_t kvmppc_get_tbfreq(void)
+     return 0;
  }
  
--static inline bool kvmppc_get_host_serial(char **buf)
+-static inline bool kvmppc_get_host_model(char **buf)
 -{
 -    return false;
 -}
@@ -130,22 +130,21 @@ index a1d9ce9f9aa..f24cc4de3c2 100644
  {
      return 0;
 diff --git a/target/ppc/kvm.c b/target/ppc/kvm.c
-index cd60893a17d..cb61e99f9d4 100644
+index cb61e99f9d4..43124bf1c78 100644
 --- a/target/ppc/kvm.c
 +++ b/target/ppc/kvm.c
-@@ -1864,12 +1864,6 @@ uint32_t kvmppc_get_tbfreq(void)
+@@ -1864,11 +1864,6 @@ uint32_t kvmppc_get_tbfreq(void)
      return cached_tbfreq;
  }
  
--bool kvmppc_get_host_serial(char **value)
+-bool kvmppc_get_host_model(char **value)
 -{
--    return g_file_get_contents("/proc/device-tree/system-id", value, NULL,
--                               NULL);
+-    return g_file_get_contents("/proc/device-tree/model", value, NULL, NULL);
 -}
 -
- bool kvmppc_get_host_model(char **value)
+ /* Try to find a device tree node for a CPU with clock-frequency property */
+ static int kvmppc_find_cpu_dt(char *buf, int buf_len)
  {
-     return g_file_get_contents("/proc/device-tree/model", value, NULL, NULL);
 -- 
 2.51.0
 
