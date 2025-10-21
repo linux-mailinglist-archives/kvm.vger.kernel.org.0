@@ -1,556 +1,167 @@
-Return-Path: <kvm+bounces-60609-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-60610-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 90715BF50CB
-	for <lists+kvm@lfdr.de>; Tue, 21 Oct 2025 09:47:20 +0200 (CEST)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
+	by mail.lfdr.de (Postfix) with ESMTPS id 81057BF511F
+	for <lists+kvm@lfdr.de>; Tue, 21 Oct 2025 09:49:41 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id CE0663BB244
-	for <lists+kvm@lfdr.de>; Tue, 21 Oct 2025 07:46:31 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 1339B4FE9D4
+	for <lists+kvm@lfdr.de>; Tue, 21 Oct 2025 07:48:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 07CF4285041;
-	Tue, 21 Oct 2025 07:46:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 971C12882B7;
+	Tue, 21 Oct 2025 07:48:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="wDXIGFTT"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="CzhmOxD9"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-wr1-f41.google.com (mail-wr1-f41.google.com [209.85.221.41])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from out-181.mta1.migadu.com (out-181.mta1.migadu.com [95.215.58.181])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5BDE9221FCF
-	for <kvm@vger.kernel.org>; Tue, 21 Oct 2025 07:46:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.41
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0106E286425;
+	Tue, 21 Oct 2025 07:48:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.181
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761032778; cv=none; b=JyOrfWEy582XVtyjUawwJ1Bs/XBIS6+4G+wSUi8kyVPNmVY5EqCyZjmkjX2mCY67xDT40rZRotxKgkbBIrh6IeLmlr3dwOeD1l7wHx9X4rLX151zWM5n8Y7TAxmWDrD+PtzfQCXLygSA4kLHZuYA7GO/Q6tzWVDfAq9I9oiyvtQ=
+	t=1761032907; cv=none; b=afABvWrnji1LwYQa6l+4AdHv4DzjXZpUWPV7cIjwf7/otGmGr1bn7uAcMXY96ogz4J2MObAcZ5+3Z2WSsJ39OpRmbvoOU4HoJVAosCRddDDnYZ2aRpT6RHGBvBksXctv9DzrIr9CWbNzu2cSlOUJ5nsOzSCcbI5TBjzD+au4Km8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761032778; c=relaxed/simple;
-	bh=Je/tloWTV0qT8X0fdVpqSvmI+2AIcFwVAui9FoNCMKw=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=j81GgkiQ8ytwKvpA7Hrji8iM+MRF2JmJ5KGKWlRSwkdghioGIfxIcqAYL8bkwCORI0CHo0CVxSSXiAdv0QnRq8ENLK9G8tPq32tOs5yrAGsp5+Pl91f4hYNr9bTgLTWCMLy5kRx729WqUqYHn7B7eu/rvrFb/tztIMlwdAVSNO0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=wDXIGFTT; arc=none smtp.client-ip=209.85.221.41
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
-Received: by mail-wr1-f41.google.com with SMTP id ffacd0b85a97d-3ece1102998so4504812f8f.2
-        for <kvm@vger.kernel.org>; Tue, 21 Oct 2025 00:46:12 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1761032771; x=1761637571; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=LIYtnVBl4SF0o8KcOR6H46cacGNMKA1Sg+xze/mfewg=;
-        b=wDXIGFTTBJvOhPAbT7ThmLgERmgn7XuRUTXCwD787alb5NJrR8eC3lRagCCF4E330E
-         /rjT76GNimu31M45cUvNSlvrrbgprT+tFVUTNFFPoLuGZ9nOV1O1SQ6lYk+uf7XhXggQ
-         FAJGd2H7Pg/MK47ocrzFbgjVUeW8vjhXWZgWZR68yPtHINWQcH4QeyrRWYkHMYNePKEL
-         t46Kd+M6YcC9trD7EtN9scY5ZBJgg5aajQBYriJIc/yaLos5MJXJZT87A1dHBJTZNjxT
-         oDoCwcvrQZ8FOtZ8aX0kfTL95oVyzu1sgDTkkT1POE5IVGrbXz7FSRqXixgvLljUYdZp
-         wCWA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1761032771; x=1761637571;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=LIYtnVBl4SF0o8KcOR6H46cacGNMKA1Sg+xze/mfewg=;
-        b=Bub6mO4VoRqERBShZnIn6pzNGWHQRDUupWmmHoKOB0jgeWXGvjG2EPp58f/IhwXzO1
-         RomUBPF70NPyrJwyQc14eEkOcGIUMNGzqHJwazDNDe659spWPX/AbhEGmpZ0Sz6XC8Ul
-         vAT57XYqoxpMOxZitEp5BE5HFMogAKv/ETefFhK6sMxVNWPx2PX9dXmNaOEktIHQ5Wt7
-         eNwZUrmw6Hk0dqG5e7iJa0QTmIh5Pae9Dr5K2YafbUlE8s9PGvhsgJJeVOjV0n9p13hc
-         qRVugH1b31ELjbBRUOXumpPm9D3izCBv6MF8unUlZoDeeD3neri2dMA7YqsCyDlWCbPb
-         BTYg==
-X-Forwarded-Encrypted: i=1; AJvYcCWhNSQy8hapPf2RsCj+rtb+MThtmQyUpSkZHM8G1RbApIV+SlVfui9I9GrO3bLuBtioUjc=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yxmfckyuovrw2mUmvSfXVh4HjTDObQzleYtGqYUfCVti67YNVfd
-	1qwAKzPf8BgDdKzv/lk8dMlmtukbdJOd2AyEmY2+W6GetV4m2KaU8okMkidsOnUW4wE=
-X-Gm-Gg: ASbGnct1rZsBs9iPkZjRAlZNdtqHcO70xNjOLUEZZpkJfGof6TXXE168Vlc6+DJIWI1
-	5q/AokyYABJxSKLSJSRi/Ypt7sjI+zAjWZDr1IUfXRCsxo4wHQBl8mBoCddfdvTXr5TFSjoAtqY
-	yGPNdW3FkAbwb1bSbTxynI9QfTpMXN2AbbYuRdPI7OKUTPig/rmL6CFUgyk/44Bxk3ILZ6on7Wz
-	yq2kFoEomkDws4yrS7r3PccfEb6bTLdHLrObbeWSAs1XT7yKswGifGG5ejuhcryaahVQSKvAUyF
-	AynL7SHAQIRAqdb4Z1tlYF54NSidOmYQYQBoVslGKpQpbCm66w05ZohwpzP5tGnniE+T36TJTEU
-	sYuJtB/X5Js1uT2LwVabX2x5SPAZ3dZpipH4Dxgw5quqpzPqRuH21orIjQN5evukjxxnVaUi8pY
-	7J47rWgdo8lA+DVASaCQKzyxQ9g0R65Ord5P/XLnJ7LjI=
-X-Google-Smtp-Source: AGHT+IFzm7l05bRYkAbQXtdzhU8KlaqVqQyHgxFk+gHF51ax0yzC2pmzP0mgQwV44h1915sJXvod8g==
-X-Received: by 2002:a05:6000:1884:b0:427:167:c2ce with SMTP id ffacd0b85a97d-42704dc9f6cmr11375768f8f.42.1761032771340;
-        Tue, 21 Oct 2025 00:46:11 -0700 (PDT)
-Received: from [192.168.69.221] (88-187-86-199.subs.proxad.net. [88.187.86.199])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-427ea5b3acfsm18788634f8f.14.2025.10.21.00.46.10
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 21 Oct 2025 00:46:10 -0700 (PDT)
-Message-ID: <6dcf7f38-5d1d-47a0-b647-b63b9151b4b6@linaro.org>
-Date: Tue, 21 Oct 2025 09:46:09 +0200
+	s=arc-20240116; t=1761032907; c=relaxed/simple;
+	bh=DnfRSkL9p5gMgm3ipWUkJfNUTroiIb56YRewiOLvKF0=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=jQgEysRJlMU8mtRKH6S0Ywbi4K4c/z2MXLyNh85HOw3fEI+2fMYFS9nIWpI7p4cKVtK0lNXN/D/Mo4qujT2d2HdLalwtEJtmFi3SGkq+2OyUo8grmBtVZ3NfW0ZniWGaTJWxFYhC4xYtbOVorGpQTzA9KwLyp3Ka+J60D8GL8t0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=CzhmOxD9; arc=none smtp.client-ip=95.215.58.181
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1761032902;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=6BcRXnfF/As8c1k8PVTWejypHgE/uJkZpeX5ZRKwHWs=;
+	b=CzhmOxD9IoH+76HNt+Y3sOVgkw42pp4NHljrRTxWRd1anyFf/eH7aRQFi5zYHuRSkK5b1q
+	5xcMjSBYM5hEC7yrDTxz7s33gCn8wEOzqlBgIW2nCjrhNFPThArHPBQ7KEgV1DskTIfXu4
+	4eyi8RCRaMHClrk3VSR/gYuZZNLOQ8M=
+From: Yosry Ahmed <yosry.ahmed@linux.dev>
+To: Sean Christopherson <seanjc@google.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>,
+	Jim Mattson <jmattson@google.com>,
+	kvm@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Yosry Ahmed <yosry.ahmed@linux.dev>
+Subject: [PATCH v2 00/23] Extend test coverage for nested SVM
+Date: Tue, 21 Oct 2025 07:47:13 +0000
+Message-ID: <20251021074736.1324328-1-yosry.ahmed@linux.dev>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 00/18] hw/ppc/spapr: Remove deprecated pseries-3.0 ->
- pseries-4.2 machines
-To: =?UTF-8?Q?C=C3=A9dric_Le_Goater?= <clg@redhat.com>,
- Harsh Prateek Bora <harshpb@linux.ibm.com>, qemu-devel@nongnu.org
-Cc: Paolo Bonzini <pbonzini@redhat.com>, Nicholas Piggin <npiggin@gmail.com>,
- qemu-ppc@nongnu.org, kvm@vger.kernel.org, Chinmay Rath <rathc@linux.ibm.com>
-References: <20251020103815.78415-1-philmd@linaro.org>
- <fdb7e249-b801-4f57-943d-71e620df2fb3@linux.ibm.com>
- <8993a80c-6cb5-4c5b-a0ef-db9257c212be@redhat.com>
-Content-Language: en-US
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=C3=A9?= <philmd@linaro.org>
-In-Reply-To: <8993a80c-6cb5-4c5b-a0ef-db9257c212be@redhat.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
+X-Migadu-Flow: FLOW_OUT
 
-On 21/10/25 08:31, Cédric Le Goater wrote:
-> Hi
-> 
-> On 10/21/25 06:54, Harsh Prateek Bora wrote:
->> +Cedric
->>
->> Hi Phillipe,
->>
->> It had been done and the patches were reviewed already here (you were 
->> in CC too):
->>
->> https://lore.kernel.org/qemu-devel/20251009184057.19973-1- 
->> harshpb@linux.ibm.com/
-> 
-> I would take the already reviewed patches, as that work is done. This 
-> series
-> is fine, but it is extra effort for removing dead code, which isn't worth
-> the time.
+There are multiple selftests exercising nested VMX that are not specific
+to VMX (at least not anymore). Extend their coverage to nested SVM.
 
-My bad for missing a series reviewed 2 weeks ago (and not yet merged).
+This version is significantly different (and longer) than v1 [1], mainly
+due to the change of direction to reuse __virt_pg_map() for nested EPT/NPT
+mappings instead of extending the existing nested EPT infrastructure. It
+also has a lot more fixups and cleanups.
 
-Please consider cherry-picking the patches doing these cleanups then,
-which were missed because "too many things changed in a single patch"
-IMHO:
+This series depends on two other series:
+- "KVM: SVM: GIF and EFER.SVME are independent" [2]
+- "KVM: selftests: Add test of SET_NESTED_STATE with 48-bit L2 on 57-bit L1" [3]
 
--- >8 --
-diff --git a/include/hw/ppc/spapr.h b/include/hw/ppc/spapr.h
-index a9cf8677ac8..b9d884745fe 100644
---- a/include/hw/ppc/spapr.h
-+++ b/include/hw/ppc/spapr.h
-@@ -139,19 +139,11 @@ struct SpaprCapabilities {
-   * SpaprMachineClass:
-   */
-  struct SpaprMachineClass {
--    /*< private >*/
-      MachineClass parent_class;
+The dependency on the former is because set_nested_state_test is now
+also a regression test for that fix. The dependency on the latter is
+purely to avoid conflicts.
 
--    /*< public >*/
--    uint32_t nr_xirqs;
-      bool pre_5_1_assoc_refpoints;
-      bool pre_5_2_numa_associativity;
-      bool pre_6_2_numa_affinity;
--
--    bool (*phb_placement)(SpaprMachineState *spapr, uint32_t index,
--                          uint64_t *buid, hwaddr *pio,
--                          hwaddr *mmio32, hwaddr *mmio64,
--                          unsigned n_dma, uint32_t *liobns, Error **errp);
-      SpaprResizeHpt resize_hpt_default;
-      SpaprCapabilities default_caps;
-      SpaprIrq *irq;
-diff --git a/target/ppc/kvm_ppc.h b/target/ppc/kvm_ppc.h
-index a1d9ce9f9aa..742881231e1 100644
---- a/target/ppc/kvm_ppc.h
-+++ b/target/ppc/kvm_ppc.h
-@@ -21,8 +21,6 @@
+The patch ordering is not perfect, I did some cleanups toward the end
+that arguably should have been moved to the beginning, but I had to stop
+rebasing and send the patches out at some point:
 
-  uint32_t kvmppc_get_tbfreq(void);
-  uint64_t kvmppc_get_clockfreq(void);
--bool kvmppc_get_host_model(char **buf);
--bool kvmppc_get_host_serial(char **buf);
-  int kvmppc_get_hasidle(CPUPPCState *env);
-  int kvmppc_get_hypercall(CPUPPCState *env, uint8_t *buf, int buf_len);
-  int kvmppc_set_interrupt(PowerPCCPU *cpu, int irq, int level);
-@@ -129,16 +127,6 @@ static inline uint32_t kvmppc_get_tbfreq(void)
-      return 0;
-  }
+Block #1 (patch 1 to patch 7):
+- Direct successors to the first 6 patches in v1, addressing review
+  comments from Jim and collecting his review tags. These patch extend 5
+  of the nVMX tests to cover nSVM.
 
--static inline bool kvmppc_get_host_model(char **buf)
--{
--    return false;
--}
--
--static inline bool kvmppc_get_host_serial(char **buf)
--{
--    return false;
--}
--
-  static inline uint64_t kvmppc_get_clockfreq(void)
-  {
-      return 0;
-diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
-index d704b8ce211..52333250c68 100644
---- a/hw/ppc/spapr.c
-+++ b/hw/ppc/spapr.c
-@@ -2050,11 +2049,6 @@ static const VMStateDescription 
-vmstate_spapr_irq_map = {
-      },
-  };
+Block #2 (patch 8 to patch 11):
+- Miscellaneous fixups and cleanups.
 
--static bool spapr_dtb_needed(void *opaque)
--{
--    return true; /* backward migration compat */
--}
--
-  static int spapr_dtb_pre_load(void *opaque)
-  {
-      SpaprMachineState *spapr = (SpaprMachineState *)opaque;
-@@ -2070,7 +2064,6 @@ static const VMStateDescription vmstate_spapr_dtb = {
-      .name = "spapr_dtb",
-      .version_id = 1,
-      .minimum_version_id = 1,
--    .needed = spapr_dtb_needed,
-      .pre_load = spapr_dtb_pre_load,
-      .fields = (const VMStateField[]) {
-          VMSTATE_UINT32(fdt_initial_size, SpaprMachineState),
-@@ -2976,9 +2969,9 @@ static void spapr_machine_init(MachineState *machine)
-       * connectors for a PHBs PCI slots) are added as needed during their
-       * parent's realization.
-       */
--     for (i = 0; i < SPAPR_MAX_PHBS; i++) {
--         spapr_dr_connector_new(OBJECT(machine), TYPE_SPAPR_DRC_PHB, i);
--     }
-+    for (i = 0; i < SPAPR_MAX_PHBS; i++) {
-+        spapr_dr_connector_new(OBJECT(machine), TYPE_SPAPR_DRC_PHB, i);
-+    }
+Block #3 (patch 11 to patch 17):
+- Moving nested EPT mapping functions to use __virt_pg_map(), patches 11
+  to 15 do the prep work, and patch 16 does the switch. Patch 17 is a
+  minor cleanup on top (which arguably fits better in block #2).
 
-      /* Set up PCI */
-      spapr_pci_rtas_init();
-@@ -4051,12 +4044,62 @@ int spapr_phb_dt_populate(SpaprDrc *drc, 
-SpaprMachineState *spapr,
-      return 0;
-  }
+Block #4 (patch 18 to 23):
+- Patches 18 to 22 are prep work to generalize the nested EPT mapping
+  code to work with nested NPT, and patch 23 finally extends the nested
+  dirty logging test to work with nSVM using the nested NPT
+  infrastructure. Patch 19 is admittedly an imposter in this block and
+  should have been in block #2.
 
-+static bool spapr_phb_placement(SpaprMachineState *spapr, uint32_t index,
-+                                uint64_t *buid, hwaddr *pio,
-+                                hwaddr *mmio32, hwaddr *mmio64,
-+                                unsigned n_dma, uint32_t *liobns, Error 
-**errp)
-+{
-+    /*
-+     * New-style PHB window placement.
-+     *
-+     * Goals: Gives large (1TiB), naturally aligned 64-bit MMIO window
-+     * for each PHB, in addition to 2GiB 32-bit MMIO and 64kiB PIO
-+     * windows.
-+     *
-+     * Some guest kernels can't work with MMIO windows above 1<<46
-+     * (64TiB), so we place up to 31 PHBs in the area 32TiB..64TiB
-+     *
-+     * 32TiB..(33TiB+1984kiB) contains the 64kiB PIO windows for each
-+     * PHB stacked together.  (32TiB+2GiB)..(32TiB+64GiB) contains the
-+     * 2GiB 32-bit MMIO windows for each PHB.  Then 33..64TiB has the
-+     * 1TiB 64-bit MMIO windows for each PHB.
-+     */
-+    const uint64_t base_buid = 0x800000020000000ULL;
-+    int i;
-+
-+    /* Sanity check natural alignments */
-+    QEMU_BUILD_BUG_ON((SPAPR_PCI_BASE % SPAPR_PCI_MEM64_WIN_SIZE) != 0);
-+    QEMU_BUILD_BUG_ON((SPAPR_PCI_LIMIT % SPAPR_PCI_MEM64_WIN_SIZE) != 0);
-+    QEMU_BUILD_BUG_ON((SPAPR_PCI_MEM64_WIN_SIZE % 
-SPAPR_PCI_MEM32_WIN_SIZE) != 0);
-+    QEMU_BUILD_BUG_ON((SPAPR_PCI_MEM32_WIN_SIZE % 
-SPAPR_PCI_IO_WIN_SIZE) != 0);
-+    /* Sanity check bounds */
-+    QEMU_BUILD_BUG_ON((SPAPR_MAX_PHBS * SPAPR_PCI_IO_WIN_SIZE) >
-+                      SPAPR_PCI_MEM32_WIN_SIZE);
-+    QEMU_BUILD_BUG_ON((SPAPR_MAX_PHBS * SPAPR_PCI_MEM32_WIN_SIZE) >
-+                      SPAPR_PCI_MEM64_WIN_SIZE);
-+
-+    if (index >= SPAPR_MAX_PHBS) {
-+        error_setg(errp, "\"index\" for PAPR PHB is too large (max %llu)",
-+                   SPAPR_MAX_PHBS - 1);
-+        return false;
-+    }
-+
-+    *buid = base_buid + index;
-+    for (i = 0; i < n_dma; ++i) {
-+        liobns[i] = SPAPR_PCI_LIOBN(index, i);
-+    }
-+
-+    *pio = SPAPR_PCI_BASE + index * SPAPR_PCI_IO_WIN_SIZE;
-+    *mmio32 = SPAPR_PCI_BASE + (index + 1) * SPAPR_PCI_MEM32_WIN_SIZE;
-+    *mmio64 = SPAPR_PCI_BASE + (index + 1) * SPAPR_PCI_MEM64_WIN_SIZE;
-+    return true;
-+}
-+
-  static bool spapr_phb_pre_plug(HotplugHandler *hotplug_dev, 
-DeviceState *dev,
-                                 Error **errp)
-  {
-      SpaprMachineState *spapr = SPAPR_MACHINE(OBJECT(hotplug_dev));
-      SpaprPhbState *sphb = SPAPR_PCI_HOST_BRIDGE(dev);
--    SpaprMachineClass *smc = SPAPR_MACHINE_GET_CLASS(spapr);
-      const unsigned windows_supported = spapr_phb_windows_supported(sphb);
-      SpaprDrc *drc;
+[1]https://lore.kernel.org/kvm/20251001145816.1414855-1-yosry.ahmed@linux.dev/
+[2]https://lore.kernel.org/kvm/20251009223153.3344555-1-jmattson@google.com/
+[3]https://lore.kernel.org/kvm/20250917215031.2567566-1-jmattson@google.com/
 
-@@ -4075,12 +4118,10 @@ static bool spapr_phb_pre_plug(HotplugHandler 
-*hotplug_dev, DeviceState *dev,
-       * This will check that sphb->index doesn't exceed the maximum 
-number of
-       * PHBs for the current machine type.
-       */
--    return
--        smc->phb_placement(spapr, sphb->index,
--                           &sphb->buid, &sphb->io_win_addr,
--                           &sphb->mem_win_addr, &sphb->mem64_win_addr,
--                           windows_supported, sphb->dma_liobn,
--                           errp);
-+    return spapr_phb_placement(spapr, sphb->index,
-+                               &sphb->buid, &sphb->io_win_addr,
-+                               &sphb->mem_win_addr, &sphb->mem64_win_addr,
-+                               windows_supported, sphb->dma_liobn, errp);
-  }
+Yosry Ahmed (23):
+  KVM: selftests: Minor improvements to asserts in
+    test_vmx_nested_state()
+  KVM: selftests: Extend vmx_set_nested_state_test to cover SVM
+  KVM: selftests: Extend vmx_close_while_nested_test to cover SVM
+  KVM: selftests: Extend vmx_nested_tsc_scaling_test to cover SVM
+  KVM: selftests: Move nested invalid CR3 check to its own test
+  KVM: selftests: Extend nested_invalid_cr3_test to cover SVM
+  KVM: selftests: Extend vmx_tsc_adjust_test to cover SVM
+  KVM: selftests: Stop hardcoding PAGE_SIZE in x86 selftests
+  KVM: selftests: Remove the unused argument to prepare_eptp()
+  KVM: selftests: Stop using __virt_pg_map() directly in tests
+  KVM: selftests: Make sure vm->vpages_mapped is always up-to-date
+  KVM: selftests: Parameterize the PTE bitmasks for virt mapping
+    functions
+  KVM: selftests: Pass the root GPA into virt_get_pte()
+  KVM: selftests: Pass the root GPA into __virt_pg_map()
+  KVM: selftests: Stop setting AD bits on nested EPTs on creation
+  KVM: selftests: Use __virt_pg_map() for nested EPTs
+  KVM: selftests: Kill eptPageTablePointer
+  KVM: selftests: Generalize nested mapping functions
+  KVM: selftests: Move nested MMU mapping functions outside of vmx.c
+  KVM: selftests: Stop passing a memslot to nested_map_memslot()
+  KVM: selftests: Allow kvm_cpu_has_ept() to be called on AMD CPUs
+  KVM: selftests: Set the user bit on nested MMU PTEs
+  KVM: selftests: Extend vmx_dirty_log_test to cover SVM
 
-  static void spapr_phb_plug(HotplugHandler *hotplug_dev, DeviceState *dev)
-@@ -4328,57 +4369,6 @@ static const CPUArchIdList 
-*spapr_possible_cpu_arch_ids(MachineState *machine)
-      return machine->possible_cpus;
-  }
+ tools/testing/selftests/kvm/Makefile.kvm      |  11 +-
+ .../testing/selftests/kvm/include/kvm_util.h  |   1 +
+ .../selftests/kvm/include/x86/processor.h     |  34 ++-
+ .../selftests/kvm/include/x86/svm_util.h      |   8 +
+ tools/testing/selftests/kvm/include/x86/vmx.h |  15 +-
+ tools/testing/selftests/kvm/lib/kvm_util.c    |   3 -
+ .../testing/selftests/kvm/lib/x86/memstress.c |   6 +-
+ .../testing/selftests/kvm/lib/x86/processor.c | 184 +++++++++++---
+ tools/testing/selftests/kvm/lib/x86/svm.c     |  19 ++
+ tools/testing/selftests/kvm/lib/x86/vmx.c     | 232 +++---------------
+ tools/testing/selftests/kvm/mmu_stress_test.c |   6 +-
+ ...ested_test.c => close_while_nested_test.c} |  42 +++-
+ .../selftests/kvm/x86/hyperv_features.c       |   2 +-
+ tools/testing/selftests/kvm/x86/hyperv_ipi.c  |  18 +-
+ .../selftests/kvm/x86/hyperv_tlb_flush.c      |   2 +-
+ ...rty_log_test.c => nested_dirty_log_test.c} | 102 +++++---
+ .../kvm/x86/nested_invalid_cr3_test.c         | 118 +++++++++
+ ...adjust_test.c => nested_tsc_adjust_test.c} |  79 +++---
+ ...aling_test.c => nested_tsc_scaling_test.c} |  48 +++-
+ ...d_state_test.c => set_nested_state_test.c} | 135 +++++++++-
+ .../selftests/kvm/x86/sev_smoke_test.c        |   2 +-
+ tools/testing/selftests/kvm/x86/state_test.c  |   2 +-
+ .../selftests/kvm/x86/userspace_io_test.c     |   2 +-
+ 23 files changed, 695 insertions(+), 376 deletions(-)
+ rename tools/testing/selftests/kvm/x86/{vmx_close_while_nested_test.c => close_while_nested_test.c} (64%)
+ rename tools/testing/selftests/kvm/x86/{vmx_dirty_log_test.c => nested_dirty_log_test.c} (57%)
+ create mode 100644 tools/testing/selftests/kvm/x86/nested_invalid_cr3_test.c
+ rename tools/testing/selftests/kvm/x86/{vmx_tsc_adjust_test.c => nested_tsc_adjust_test.c} (61%)
+ rename tools/testing/selftests/kvm/x86/{vmx_nested_tsc_scaling_test.c => nested_tsc_scaling_test.c} (83%)
+ rename tools/testing/selftests/kvm/x86/{vmx_set_nested_state_test.c => set_nested_state_test.c} (67%)
 
--static bool spapr_phb_placement(SpaprMachineState *spapr, uint32_t index,
--                                uint64_t *buid, hwaddr *pio,
--                                hwaddr *mmio32, hwaddr *mmio64,
--                                unsigned n_dma, uint32_t *liobns, Error 
-**errp)
--{
--    /*
--     * New-style PHB window placement.
--     *
--     * Goals: Gives large (1TiB), naturally aligned 64-bit MMIO window
--     * for each PHB, in addition to 2GiB 32-bit MMIO and 64kiB PIO
--     * windows.
--     *
--     * Some guest kernels can't work with MMIO windows above 1<<46
--     * (64TiB), so we place up to 31 PHBs in the area 32TiB..64TiB
--     *
--     * 32TiB..(33TiB+1984kiB) contains the 64kiB PIO windows for each
--     * PHB stacked together.  (32TiB+2GiB)..(32TiB+64GiB) contains the
--     * 2GiB 32-bit MMIO windows for each PHB.  Then 33..64TiB has the
--     * 1TiB 64-bit MMIO windows for each PHB.
--     */
--    const uint64_t base_buid = 0x800000020000000ULL;
--    int i;
--
--    /* Sanity check natural alignments */
--    QEMU_BUILD_BUG_ON((SPAPR_PCI_BASE % SPAPR_PCI_MEM64_WIN_SIZE) != 0);
--    QEMU_BUILD_BUG_ON((SPAPR_PCI_LIMIT % SPAPR_PCI_MEM64_WIN_SIZE) != 0);
--    QEMU_BUILD_BUG_ON((SPAPR_PCI_MEM64_WIN_SIZE % 
-SPAPR_PCI_MEM32_WIN_SIZE) != 0);
--    QEMU_BUILD_BUG_ON((SPAPR_PCI_MEM32_WIN_SIZE % 
-SPAPR_PCI_IO_WIN_SIZE) != 0);
--    /* Sanity check bounds */
--    QEMU_BUILD_BUG_ON((SPAPR_MAX_PHBS * SPAPR_PCI_IO_WIN_SIZE) >
--                      SPAPR_PCI_MEM32_WIN_SIZE);
--    QEMU_BUILD_BUG_ON((SPAPR_MAX_PHBS * SPAPR_PCI_MEM32_WIN_SIZE) >
--                      SPAPR_PCI_MEM64_WIN_SIZE);
--
--    if (index >= SPAPR_MAX_PHBS) {
--        error_setg(errp, "\"index\" for PAPR PHB is too large (max %llu)",
--                   SPAPR_MAX_PHBS - 1);
--        return false;
--    }
--
--    *buid = base_buid + index;
--    for (i = 0; i < n_dma; ++i) {
--        liobns[i] = SPAPR_PCI_LIOBN(index, i);
--    }
--
--    *pio = SPAPR_PCI_BASE + index * SPAPR_PCI_IO_WIN_SIZE;
--    *mmio32 = SPAPR_PCI_BASE + (index + 1) * SPAPR_PCI_MEM32_WIN_SIZE;
--    *mmio64 = SPAPR_PCI_BASE + (index + 1) * SPAPR_PCI_MEM64_WIN_SIZE;
--    return true;
--}
--
-  static ICSState *spapr_ics_get(XICSFabric *dev, int irq)
-  {
-      SpaprMachineState *spapr = SPAPR_MACHINE(dev);
-@@ -4589,7 +4579,6 @@ static void spapr_machine_class_init(ObjectClass 
-*oc, const void *data)
-      smc->resize_hpt_default = SPAPR_RESIZE_HPT_ENABLED;
-      fwc->get_dev_path = spapr_get_fw_dev_path;
-      nc->nmi_monitor_handler = spapr_nmi;
--    smc->phb_placement = spapr_phb_placement;
-      vhc->cpu_in_nested = spapr_cpu_in_nested;
-      vhc->deliver_hv_excp = spapr_exit_nested;
-      vhc->hypercall = emulate_spapr_hypercall;
-@@ -4636,7 +4625,6 @@ static void spapr_machine_class_init(ObjectClass 
-*oc, const void *data)
-      smc->default_caps.caps[SPAPR_CAP_AIL_MODE_3] = SPAPR_CAP_ON;
-      spapr_caps_add_properties(smc);
-      smc->irq = &spapr_irq_dual;
--    smc->nr_xirqs = SPAPR_NR_XIRQS;
-      xfc->match_nvt = spapr_match_nvt;
-      vmc->client_architecture_support = 
-spapr_vof_client_architecture_support;
-      vmc->quiesce = spapr_vof_quiesce;
-diff --git a/hw/ppc/spapr_events.c b/hw/ppc/spapr_events.c
-index 548a190ce89..892ddc7f8f7 100644
---- a/hw/ppc/spapr_events.c
-+++ b/hw/ppc/spapr_events.c
-@@ -1041,16 +1041,14 @@ void 
-spapr_clear_pending_hotplug_events(SpaprMachineState *spapr)
+-- 
+2.51.0.869.ge66316f041-goog
 
-  void spapr_events_init(SpaprMachineState *spapr)
-  {
--    int epow_irq = SPAPR_IRQ_EPOW;
--
--    spapr_irq_claim(spapr, epow_irq, false, &error_fatal);
-+    spapr_irq_claim(spapr, SPAPR_IRQ_EPOW, false, &error_fatal);
-
-      QTAILQ_INIT(&spapr->pending_events);
-
-      spapr->event_sources = spapr_event_sources_new();
-
-      spapr_event_sources_register(spapr->event_sources, EVENT_CLASS_EPOW,
--                                 epow_irq);
-+                                 SPAPR_IRQ_EPOW);
-
-      /* NOTE: if machine supports modern/dedicated hotplug event source,
-       * we add it to the device-tree unconditionally. This means we may
-@@ -1061,12 +1059,10 @@ void spapr_events_init(SpaprMachineState *spapr)
-       * checking that it's enabled.
-       */
-      if (spapr->use_hotplug_event_source) {
--        int hp_irq = SPAPR_IRQ_HOTPLUG;
--
--        spapr_irq_claim(spapr, hp_irq, false, &error_fatal);
-+        spapr_irq_claim(spapr, SPAPR_IRQ_HOTPLUG, false, &error_fatal);
-
-          spapr_event_sources_register(spapr->event_sources, 
-EVENT_CLASS_HOT_PLUG,
--                                     hp_irq);
-+                                     SPAPR_IRQ_HOTPLUG);
-      }
-
-      spapr->epow_notifier.notify = spapr_powerdown_req;
-diff --git a/hw/ppc/spapr_irq.c b/hw/ppc/spapr_irq.c
-index 317d57a3802..2ce323457be 100644
---- a/hw/ppc/spapr_irq.c
-+++ b/hw/ppc/spapr_irq.c
-@@ -279,15 +279,11 @@ void spapr_irq_dt(SpaprMachineState *spapr, 
-uint32_t nr_servers,
-
-  uint32_t spapr_irq_nr_msis(SpaprMachineState *spapr)
-  {
--    SpaprMachineClass *smc = SPAPR_MACHINE_GET_CLASS(spapr);
--
--    return SPAPR_XIRQ_BASE + smc->nr_xirqs - SPAPR_IRQ_MSI;
-+    return SPAPR_NR_XIRQS + SPAPR_XIRQ_BASE - SPAPR_IRQ_MSI;
-  }
-
-  void spapr_irq_init(SpaprMachineState *spapr, Error **errp)
-  {
--    SpaprMachineClass *smc = SPAPR_MACHINE_GET_CLASS(spapr);
--
-      if (kvm_enabled() && kvm_kernel_irqchip_split()) {
-          error_setg(errp, "kernel_irqchip split mode not supported on 
-pseries");
-          return;
-@@ -308,7 +304,7 @@ void spapr_irq_init(SpaprMachineState *spapr, Error 
-**errp)
-          object_property_add_child(OBJECT(spapr), "ics", obj);
-          object_property_set_link(obj, ICS_PROP_XICS, OBJECT(spapr),
-                                   &error_abort);
--        object_property_set_int(obj, "nr-irqs", smc->nr_xirqs, 
-&error_abort);
-+        object_property_set_int(obj, "nr-irqs", SPAPR_NR_XIRQS, 
-&error_abort);
-          if (!qdev_realize(DEVICE(obj), NULL, errp)) {
-              return;
-          }
-@@ -322,7 +318,7 @@ void spapr_irq_init(SpaprMachineState *spapr, Error 
-**errp)
-          int i;
-
-          dev = qdev_new(TYPE_SPAPR_XIVE);
--        qdev_prop_set_uint32(dev, "nr-irqs", smc->nr_xirqs + 
-SPAPR_IRQ_NR_IPIS);
-+        qdev_prop_set_uint32(dev, "nr-irqs", SPAPR_NR_XIRQS + 
-SPAPR_IRQ_NR_IPIS);
-          /*
-           * 8 XIVE END structures per CPU. One for each available
-           * priority
-@@ -349,7 +345,7 @@ void spapr_irq_init(SpaprMachineState *spapr, Error 
-**errp)
-      }
-
-      spapr->qirqs = qemu_allocate_irqs(spapr_set_irq, spapr,
--                                      smc->nr_xirqs + SPAPR_IRQ_NR_IPIS);
-+                                      SPAPR_NR_XIRQS + SPAPR_IRQ_NR_IPIS);
-
-      /*
-       * Mostly we don't actually need this until reset, except that not
-@@ -364,11 +360,10 @@ int spapr_irq_claim(SpaprMachineState *spapr, int 
-irq, bool lsi, Error **errp)
-  {
-      SpaprInterruptController *intcs[] = ALL_INTCS(spapr);
-      int i;
--    SpaprMachineClass *smc = SPAPR_MACHINE_GET_CLASS(spapr);
-      int rc;
-
-      assert(irq >= SPAPR_XIRQ_BASE);
--    assert(irq < (smc->nr_xirqs + SPAPR_XIRQ_BASE));
-+    assert(irq < (SPAPR_NR_XIRQS + SPAPR_XIRQ_BASE));
-
-      for (i = 0; i < ARRAY_SIZE(intcs); i++) {
-          SpaprInterruptController *intc = intcs[i];
-@@ -388,10 +383,9 @@ void spapr_irq_free(SpaprMachineState *spapr, int 
-irq, int num)
-  {
-      SpaprInterruptController *intcs[] = ALL_INTCS(spapr);
-      int i, j;
--    SpaprMachineClass *smc = SPAPR_MACHINE_GET_CLASS(spapr);
-
-      assert(irq >= SPAPR_XIRQ_BASE);
--    assert((irq + num) <= (smc->nr_xirqs + SPAPR_XIRQ_BASE));
-+    assert((irq + num) <= (SPAPR_NR_XIRQS + SPAPR_XIRQ_BASE));
-
-      for (i = irq; i < (irq + num); i++) {
-          for (j = 0; j < ARRAY_SIZE(intcs); j++) {
-@@ -408,8 +402,6 @@ void spapr_irq_free(SpaprMachineState *spapr, int 
-irq, int num)
-
-  qemu_irq spapr_qirq(SpaprMachineState *spapr, int irq)
-  {
--    SpaprMachineClass *smc = SPAPR_MACHINE_GET_CLASS(spapr);
--
-      /*
-       * This interface is basically for VIO and PHB devices to find the
-       * right qemu_irq to manipulate, so we only allow access to the
-@@ -418,7 +410,7 @@ qemu_irq spapr_qirq(SpaprMachineState *spapr, int irq)
-       * interfaces, we can change this if we need to in future.
-       */
-      assert(irq >= SPAPR_XIRQ_BASE);
--    assert(irq < (smc->nr_xirqs + SPAPR_XIRQ_BASE));
-+    assert(irq < (SPAPR_NR_XIRQS + SPAPR_XIRQ_BASE));
-
-      if (spapr->ics) {
-          assert(ics_valid_irq(spapr->ics, irq));
-diff --git a/target/ppc/kvm.c b/target/ppc/kvm.c
-index cd60893a17d..43124bf1c78 100644
---- a/target/ppc/kvm.c
-+++ b/target/ppc/kvm.c
-@@ -1864,17 +1864,6 @@ uint32_t kvmppc_get_tbfreq(void)
-      return cached_tbfreq;
-  }
-
--bool kvmppc_get_host_serial(char **value)
--{
--    return g_file_get_contents("/proc/device-tree/system-id", value, NULL,
--                               NULL);
--}
--
--bool kvmppc_get_host_model(char **value)
--{
--    return g_file_get_contents("/proc/device-tree/model", value, NULL, 
-NULL);
--}
--
-  /* Try to find a device tree node for a CPU with clock-frequency 
-property */
-  static int kvmppc_find_cpu_dt(char *buf, int buf_len)
-  {
----
 
