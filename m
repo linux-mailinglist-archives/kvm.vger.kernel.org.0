@@ -1,151 +1,134 @@
-Return-Path: <kvm+bounces-60701-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-60702-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8C03DBF7F86
-	for <lists+kvm@lfdr.de>; Tue, 21 Oct 2025 19:51:26 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 262C8BF7FDC
+	for <lists+kvm@lfdr.de>; Tue, 21 Oct 2025 19:56:33 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 901874F4A7C
-	for <lists+kvm@lfdr.de>; Tue, 21 Oct 2025 17:51:23 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D2E383ACD57
+	for <lists+kvm@lfdr.de>; Tue, 21 Oct 2025 17:56:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 41C5D34E747;
-	Tue, 21 Oct 2025 17:51:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AC38434E74E;
+	Tue, 21 Oct 2025 17:56:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="WyEntgqI"
+	dkim=pass (2048-bit key) header.d=shazbot.org header.i=@shazbot.org header.b="ByFrb+rV";
+	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="EBNSGVCt"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pj1-f74.google.com (mail-pj1-f74.google.com [209.85.216.74])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from fout-a7-smtp.messagingengine.com (fout-a7-smtp.messagingengine.com [103.168.172.150])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 000B915E5DC
-	for <kvm@vger.kernel.org>; Tue, 21 Oct 2025 17:51:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.74
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0FD61145B27;
+	Tue, 21 Oct 2025 17:56:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=103.168.172.150
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761069074; cv=none; b=Fh8cI7MF4dcID43rPxDuhach7ii8posa1tXBxdk9VN6S1l90RTM06kMq1yBxfXL2+CEwgLdlPSu9qqsMIIzZAM2jg7LTSz3aagFQ9e3Rb6hbwbYTbytYMLvhBRGSZWWk1v2Hepj3AMNrs9poXpPSY/I5jfSWahCVvgTSbFSbhwc=
+	t=1761069383; cv=none; b=f6ISsyPBQEypxAwbdHjJXIp/eVoy20fV/fgqYiGUfvkTS25V6+/qZEDNczwGycZH04MEekvtDnmBPgUy9We7HQTWVvpHrIlooKqM6SJKLAtMixDfoejGltcrXJaOrloOwj86uygU9qUXHwfZGINva3HkHVbrMkG1E9v1uOpW4IU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761069074; c=relaxed/simple;
-	bh=IvjvTfof1NX7f0a6Mj/sydhqvdCdvq4pVhC8YJjU2Nc=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=OlFTs0anp7AFxm/FGPMKzV/Q4mWv6Cm70H37hn8Q9MC9Ksk8xDY2wXltL9np0Zq6UIObY1no+XnQxWoQaGNaF3aB44+bxW4iwsaXjkP+epNTVK283yR5kjo/cEbIWp42Q3EywUNCWnwHFLL//5CT3X7a872K09y9ho+VCC4HXpg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=WyEntgqI; arc=none smtp.client-ip=209.85.216.74
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pj1-f74.google.com with SMTP id 98e67ed59e1d1-33c6140336eso9520916a91.3
-        for <kvm@vger.kernel.org>; Tue, 21 Oct 2025 10:51:12 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1761069072; x=1761673872; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=7Mbuo7BVKgUb8P9fXKLxWi8r7pdvvGC3+QWIjFuJjuE=;
-        b=WyEntgqIHy2YeM3d2+8mcOQBCYDY7qsNMOIdcEHbmdhOovEdaelNO7dUAsdyeSCEwn
-         pvuPzBw8sYeWJYdLNH2qfGiWGKEyCUN7dgQikBoSiHSA8W6mGcygQ44KPGTdeJx2KxSu
-         RCBAmK/YeiKGNRqNgH9GC58V8GC3jOrc6Y1Wnp3llx1jr4kiQuwOiq0pWxKDI3IHXPm0
-         sODR9GQSAo4HCUbIcYSZvGbFoluWCxSUZjT6OWixpyFGHW578wGX45sHBt2lQaQoozdC
-         vue//b90cIfSx+bPgyFC9bVxlV/X0xTN1/8HBuEMW4B/inpIExy7FCGeK6LJVZu6kaoi
-         ey9g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1761069072; x=1761673872;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=7Mbuo7BVKgUb8P9fXKLxWi8r7pdvvGC3+QWIjFuJjuE=;
-        b=hbPoUjIOdVI1VrIrjUoQkzU3Drv3tCO4whucWP8kCorjNxB77E6zjiwcn54Xx+C3HM
-         GHRusW01jQtRVQ5fqjDBpVDUmKqnw62CIOk23PXIx+asbJx3z63aIHb64Gpep9z+FQ64
-         wE3MxT82Xz+dB0qMKfL/RKhnjHtgppxcUrUGdSMFOcuHfXM/lArZZ6MshDdJhQ9HgIc4
-         fs0kwv/JYL0u0WGWVGuKj8nXXUdKNBJoJP52OCaxAEaA0TxTEmy07TkDbWwcUGMFilZj
-         ZKuOxONnR9tG9c/x2R/hL83wL2//AUcKzKhDR1RnRaak+ubcNtJQINHhLcJYoxqcKqH0
-         Dzjw==
-X-Forwarded-Encrypted: i=1; AJvYcCXKiZ463tUuv0E6JvyAR0E1AWJS7O38/QIVcObpSWtgVMym/tdEKpg3sKdnbvW1/9Ldh3w=@vger.kernel.org
-X-Gm-Message-State: AOJu0YztlPAWhfaUW7lVTBfSbPl0dqwbI7JrEcHssDUIlv605JlAqKDr
-	voC8ZidmWn3EXaKkBD1F9Jch3xuuQ6ULd8cpFZkr2zqdl27/tasuJw5e73tiHV17zSj+HWx5jgB
-	lQzIS/A==
-X-Google-Smtp-Source: AGHT+IGX3APteug86Z/yM6rsjQlQapXW6AnpEVut4Vor4TAnyP5V7CP03xYzW1CnKx74JWZadXlmwf6StGE=
-X-Received: from pjbnl2.prod.google.com ([2002:a17:90b:3842:b0:33b:51fe:1a73])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:3e43:b0:334:2a38:2a05
- with SMTP id 98e67ed59e1d1-33bcf86b628mr24656863a91.8.1761069072343; Tue, 21
- Oct 2025 10:51:12 -0700 (PDT)
-Date: Tue, 21 Oct 2025 10:51:11 -0700
-In-Reply-To: <ad9b3b96-324a-4661-b43e-0b31cb7a7b51@intel.com>
+	s=arc-20240116; t=1761069383; c=relaxed/simple;
+	bh=kdJbQlHr7SVojT6O/yafv3JN1eydhc5dG279GAI5Rh4=;
+	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type; b=CnZxPJLVmMSBSjP+lGokYxBBYSsXDaGOcvptuzJ5azz2/LcQNyM6y3uLavoT448DfIKYhucGMpPVZNkYSlFQ3hfg87S4ehW+DMrSUFYEwYpN/MDmmkW5bofYsnHU3gdQMQ1paNR9U99ThxK7NBro+yy2S7N52XymJODL3eKlRf4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=shazbot.org; spf=pass smtp.mailfrom=shazbot.org; dkim=pass (2048-bit key) header.d=shazbot.org header.i=@shazbot.org header.b=ByFrb+rV; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=EBNSGVCt; arc=none smtp.client-ip=103.168.172.150
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=shazbot.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=shazbot.org
+Received: from phl-compute-06.internal (phl-compute-06.internal [10.202.2.46])
+	by mailfout.phl.internal (Postfix) with ESMTP id B8FAAEC010A;
+	Tue, 21 Oct 2025 13:56:18 -0400 (EDT)
+Received: from phl-mailfrontend-01 ([10.202.2.162])
+  by phl-compute-06.internal (MEProxy); Tue, 21 Oct 2025 13:56:18 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=shazbot.org; h=
+	cc:cc:content-transfer-encoding:content-type:content-type:date
+	:date:from:from:in-reply-to:message-id:mime-version:reply-to
+	:subject:subject:to:to; s=fm1; t=1761069378; x=1761155778; bh=Fs
+	ZaDVo3mx36GaalwjwGl4VMzh7w8alfiF8lN7kDfEQ=; b=ByFrb+rVVLkii7nHy+
+	LIgx0lWBkuWPQatfGcrdb4kb5ENuXhB6jdUWj7YXMdjls9DkVM7y8305MJDV5d+9
+	ZqApHgvPISt+8EKsoBJo7s6pqbdFW9sboqHoVTBUYuJf9U/mug8WMnQEqA76lgZT
+	Gn3Y1NFvQqhwf022VhxvaZJDW+CSzHp3NAxM+8BHH+mJ9ccRvV+hqk70VgjrCBGo
+	eMuoLjE+Exc5Az+gCDVhiaRYAWo7rlxUK09VYEINWBH6lmU0f+GsTfzOx4gQFO2i
+	gP2OgCCO4x4OVIuntLA6fsC7Bu6jMr4gDkrmPOrpUzluT3pv4VJ4gsLh9XG2Xwb5
+	FzYw==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+	messagingengine.com; h=cc:cc:content-transfer-encoding
+	:content-type:content-type:date:date:feedback-id:feedback-id
+	:from:from:in-reply-to:message-id:mime-version:reply-to:subject
+	:subject:to:to:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=
+	fm2; t=1761069378; x=1761155778; bh=FsZaDVo3mx36GaalwjwGl4VMzh7w
+	8alfiF8lN7kDfEQ=; b=EBNSGVCtZSt4ZQDroVQvh6xNcSlhruwWsdurOWdYmx+4
+	n44hGCK2Ft/KhHoRAIg/NzXGWtL1pcK4nQ7vMQkXRRaaZPmRuWz6tnkdRahyvAz4
+	s3UtaCvDblnvZBCpb1p4xs9KpqGaN6jbmhwUWdaUuFXHKKvKe7hQb+jPPRTIKjdX
+	0sMN1z/wLCirmPEzrCx0XIowIOFrvoX6hAONlExgoczIUmMwvH5rs2czHW05P4ci
+	oTa/fxYc2SWpZ8hEiQWfNomSI4Wc8kMAGg9aS8z+PDXkigRvVVjG1zC+8UjP/ygE
+	LzxqWZi+TuumKt50GMJb49ifNdRe8iB1jrnwRIja8Q==
+X-ME-Sender: <xms:Qsn3aAaRxhlOD7ygN-MRKmmteQ1gJ8L1BSL35913N3GWIBO2Lvo4Dg>
+    <xme:Qsn3aJMxfx614mU5_VhQUX5u70kBN8jZuGFuiER0H3JWxqtc3e_GmkXLu2KYn6_h4
+    iY3jxmCZdDR1pM781DD2hXR2HjNHomxecTc4_nwax0Xh3fbsOrnhQ>
+X-ME-Received: <xmr:Qsn3aFZjdx2YTym6KnjXf253e_SQwdcWP24pobYBcatZyU6Un6wUf_T3Wqs>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeeffedrtdeggddugedufeehucetufdoteggodetrf
+    dotffvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfurfetoffkrfgpnffqhgenuceu
+    rghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujf
+    gurhepfffhvfevuffkgggtgfesthejredttddtvdenucfhrhhomheptehlvgigucghihhl
+    lhhirghmshhonhcuoegrlhgvgiesshhhrgiisghothdrohhrgheqnecuggftrfgrthhtvg
+    hrnhepieefgeeileehheeuhefghefhgfehvdfgtdeiffeuhfdvvdekhefhueeuudfffeel
+    necuffhomhgrihhnpehgihhthhhusgdrtghomhenucevlhhushhtvghrufhiiigvpedtne
+    curfgrrhgrmhepmhgrihhlfhhrohhmpegrlhgvgiesshhhrgiisghothdrohhrghdpnhgs
+    pghrtghpthhtohepgedpmhhouggvpehsmhhtphhouhhtpdhrtghpthhtohepthhorhhvrg
+    hlughssehlihhnuhigqdhfohhunhgurghtihhonhdrohhrghdprhgtphhtthhopehlihhn
+    uhigqdhkvghrnhgvlhesvhhgvghrrdhkvghrnhgvlhdrohhrghdprhgtphhtthhopehkvh
+    hmsehvghgvrhdrkhgvrhhnvghlrdhorhhgpdhrtghpthhtoheprghlvgigrdifihhllhhi
+    rghmshhonhesrhgvughhrghtrdgtohhm
+X-ME-Proxy: <xmx:Qsn3aH3d8kSgBMkUiAYbR-YflSz760oKsmhmlicFzX1DtrHb1K-dJg>
+    <xmx:Qsn3aLevjavPq2HQCdzWVnes7hY8oVEXNZAT6Nqhz6S4p7HmbuPqgA>
+    <xmx:Qsn3aIEhEyFEMFujscUzeoXBUB5lbc5IexVESv-pNZgqzuIYZhvqUQ>
+    <xmx:Qsn3aM28PakenGLA6o4Bkw6AXx5a7M-Neh9YCcL42cFx5I_q9I_SSA>
+    <xmx:Qsn3aCxxZhba38RfDV1GB0as-wvIkgrxbgipRa4RF5a5fkIUozK17Yyr>
+Feedback-ID: i03f14258:Fastmail
+Received: by mail.messagingengine.com (Postfix) with ESMTPA; Tue,
+ 21 Oct 2025 13:56:17 -0400 (EDT)
+Date: Tue, 21 Oct 2025 11:56:15 -0600
+From: Alex Williamson <alex@shazbot.org>
+To: Linus Torvalds <torvalds@linux-foundation.org>
+Cc: <linux-kernel@vger.kernel.org>, "kvm@vger.kernel.org"
+ <kvm@vger.kernel.org>, <alex.williamson@redhat.com>
+Subject: [GIT PULL] VFIO update for v6.18-rc3
+Message-ID: <20251021115615.4e5dd756@shazbot.org>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20250910144453.1389652-1-dave.hansen@linux.intel.com>
- <aPY_yC45suT8sn8F@google.com> <872c17f3-9ded-46b2-a036-65fc2abaf2e6@intel.com>
- <aPZKVaUT9GZbPHBI@google.com> <033f56f9-fb66-4bf5-b25a-f2f8b964cd4e@intel.com>
- <aPZUY90M0B3Tu3no@google.com> <ad9b3b96-324a-4661-b43e-0b31cb7a7b51@intel.com>
-Message-ID: <aPfID-MxqHleKTz0@google.com>
-Subject: Re: [PATCH] x86/virt/tdx: Use precalculated TDVPR page physical address
-From: Sean Christopherson <seanjc@google.com>
-To: Dave Hansen <dave.hansen@intel.com>
-Cc: Dave Hansen <dave.hansen@linux.intel.com>, linux-kernel@vger.kernel.org, 
-	Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>, x86@kernel.org, 
-	"H. Peter Anvin" <hpa@zytor.com>, "Kirill A. Shutemov" <kas@kernel.org>, 
-	Rick Edgecombe <rick.p.edgecombe@intel.com>, Paolo Bonzini <pbonzini@redhat.com>, 
-	Kai Huang <kai.huang@intel.com>, Isaku Yamahata <isaku.yamahata@intel.com>, 
-	Vishal Annapurve <vannapurve@google.com>, Thomas Huth <thuth@redhat.com>, 
-	Adrian Hunter <adrian.hunter@intel.com>, linux-coco@lists.linux.dev, kvm@vger.kernel.org, 
-	Farrah Chen <farrah.chen@intel.com>
-Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-On Mon, Oct 20, 2025, Dave Hansen wrote:
-> On 10/20/25 08:25, Sean Christopherson wrote:
-> >>> @@ -1583,7 +1578,7 @@ u64 tdh_vp_addcx(struct tdx_vp *vp, struct page *tdcx_page)
-> >>>  {
-> >>>         struct tdx_module_args args = {
-> >>>                 .rcx = page_to_phys(tdcx_page),
-> >>> -               .rdx = tdx_tdvpr_pa(vp),
-> >>> +               .rdx = vp->tdvpr_pa,
-> >>>         };
-> >> I'm kinda dense normally and my coffee hasn't kicked in yet. What
-> >> clearly does not work there?
-> > Relying on struct page to provide type safety.
-> > 
-> >> Yeah, vp->tdvpr_pa is storing a physical address as a raw u64 and not a
-> >> 'struct page'. That's not ideal. But it's also for a pretty good reason.
-> > Right, but my point is that regradless of the justification, every exception to
-> > passing a struct page diminishes the benefits of using struct page in the first
-> > place.
-> 
-> Yeah, I'm in total agreement with you there.
-> 
-> But I don't think there's any type scheme that won't have exceptions or
-> other downsides.
-> 
-> u64's are really nice for prototyping because you can just pass those
-> suckers around anywhere and the compiler will never say a thing. But we
-> know the downsides of too many plain integer types getting passed around.
-> 
-> Sparse-enforced address spaces are pretty nifty, but they can get messy
-> around the edges of the subsystem where the type is used. You end up
-> with lots of ugly force casts there to bend the compiler to your will.
-> 
-> 'struct page *' isn't perfect either. As we saw, you can't get from it
-> to a physical address easily in noinstr code. It doesn't work everywhere
-> either.
-> 
-> So I dunno. Sounds like there is no shortage of imperfect ways skin this
-> cat. Yay, engineering!
-> 
-> But, seriously, if you're super confident that a sparse-enforced address
+Hi Linus,
 
-Heh, I dunno about "super confident", but I do think it will be the most robust
-overall, and will be helpful for readers by documenting which pages/assets are
-effectively opaque handles things that are owned by the TDX-Module.
+A tiny update as I'm changing jobs.  Different email, same signing key
+for now.  Thanks,
 
-KVM uses the sparse approach in KVM's TDP MMU implementation to typedef PTE
-pointers, which are RCU-protected.
+Alex
 
-  typedef u64 __rcu *tdp_ptep_t;
+The following changes since commit 211ddde0823f1442e4ad052a2f30f050145ccada:
 
-There are handful of one open-coded rcu_dereference() calls, but the vast majority
-of dereferences get routed through helpers that deal with the gory details.  And
-of the open-coded calls, I distinctly remember two being interesting cases where
-the __rcu enforcement forced us to slow down and think about exactly the lifetime
-of the PTE.  I.e. even the mildly painful "overhead" has been a net positive.
+  Linux 6.18-rc2 (2025-10-19 15:19:16 -1000)
 
-> space is the way to go, it's not *that* hard to go look at it. TDX isn't
-> that big. I can go poke at it for a bit.
+are available in the Git repository at:
+
+  https://github.com/awilliam/linux-vfio.git tags/vfio-v6.18-rc3
+
+for you to fetch changes up to b2c37c1168f537900158c860174001d055d8d583:
+
+  MAINTAINERS: Update Alex Williamson's email address (2025-10-20 15:45:03 -0600)
+
+----------------------------------------------------------------
+VFIO update for v6.18-rc3
+
+ - Update VFIO maintainers entry (Alex Williamson)
+
+----------------------------------------------------------------
+Alex Williamson (1):
+      MAINTAINERS: Update Alex Williamson's email address
+
+ .mailmap    | 1 +
+ MAINTAINERS | 4 ++--
+ 2 files changed, 3 insertions(+), 2 deletions(-)
 
