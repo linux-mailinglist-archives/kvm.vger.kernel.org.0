@@ -1,188 +1,97 @@
-Return-Path: <kvm+bounces-60802-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-60803-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7FDB6BFA6EC
-	for <lists+kvm@lfdr.de>; Wed, 22 Oct 2025 09:04:03 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 48D69BFA701
+	for <lists+kvm@lfdr.de>; Wed, 22 Oct 2025 09:05:20 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 477AF5045D2
-	for <lists+kvm@lfdr.de>; Wed, 22 Oct 2025 07:03:42 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id F3D3A18862DB
+	for <lists+kvm@lfdr.de>; Wed, 22 Oct 2025 07:05:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BD7F52F5330;
-	Wed, 22 Oct 2025 07:03:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 24C1A2F39B1;
+	Wed, 22 Oct 2025 07:05:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="V1899jEU"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="o/ARPoIj"
 X-Original-To: kvm@vger.kernel.org
-Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+Received: from out-184.mta0.migadu.com (out-184.mta0.migadu.com [91.218.175.184])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2382B2F3C27
-	for <kvm@vger.kernel.org>; Wed, 22 Oct 2025 07:03:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 808EB2ED84A
+	for <kvm@vger.kernel.org>; Wed, 22 Oct 2025 07:05:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.184
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761116605; cv=none; b=XYI7zP+N3JzAWQAQcdjDBNh1L/cGSYaFzvePuvOoBEPqUM3uEAxSKlMy2rEFIHVDGmjQRMY2R2YZyYjWZLaDKmyo+sXUg3u7t0XSX+iikvoNFMOsH1jUesA3fdE5zh3BmIIERk38QMa8Hotn9CjSLj8qr2oGtbftVQ8txx6oLy4=
+	t=1761116714; cv=none; b=WrOzGEfq7wNZzZ2o77Zr5iVUA73tMhbh+5+EPKzya2WA3feoWOfBzpOqzaSFe2QHkgjdQ9RTClgFFwHsz1iDR8hrOfCs5oWouG26pfrDYoaP4pAexXb5rMIss5qk7Ax4JFKc9vdTMgLI+OCytEfnndq478vMqKPYnGWduOQE9F8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761116605; c=relaxed/simple;
-	bh=PkV8fpf6eJuV0xSYHjd3ihwKW54C6r7ZnklAg96Obt8=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=o6xlqm/CwXg+OkgkFl5MsSfQOEiY86/gQ9DvCURLhaHWzyJ9k9F2+gHoiF9PeyClXjaWtGJDRDgwmymkhXiR+Cltjm0YlmvqrBR8KH79L/tVhqsDfHcrV2GKfOGmlrSqe28HycxAC1KFdNq+DAjnPwIFk/dkYmyDS5ud419NTn4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=V1899jEU; arc=none smtp.client-ip=148.163.158.5
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
-Received: from pps.filterd (m0353725.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 59LMeLlV016406;
-	Wed, 22 Oct 2025 07:03:17 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
-	:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=pp1; bh=QOLj5V
-	QaUwHOEH8RL6jeG0xU7RG3kgqnclCQRhLvZMc=; b=V1899jEURJMolk++yByj1/
-	tuj7iY/aO4sQ1fdjYMVjvE1ZI5KTTy9/B35iBeg7n/90jj/j16hDvTae/kjzfX3T
-	A2Wbqc9sGM4ZrTXmONNwZVYDNZD9ApPr/2VUXd1j1NuFOlNzK0Zp8dzys7pUiSQ/
-	NyvT0GFqWqMzB0uTtoCH2ZTugwkP94tQGUu0A1K5IGRJ58PFuHPYqhfRKQwJcuPH
-	suR70FPuL+wElnV1PzwDg8PSTj9bXuobPTzkFv+Xneuiw83fByZbwMG3Y/llhaz/
-	WsGvVDrJCecXPxco4y3rNrLAbDZSXg50vAjP/zXhpL0Y4UqAZyrUS7dCy9ixLMVw
-	==
-Received: from pps.reinject (localhost [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 49v32hhrn0-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Wed, 22 Oct 2025 07:03:17 +0000 (GMT)
-Received: from m0353725.ppops.net (m0353725.ppops.net [127.0.0.1])
-	by pps.reinject (8.18.1.12/8.18.0.8) with ESMTP id 59M73Dt8024333;
-	Wed, 22 Oct 2025 07:03:17 GMT
-Received: from ppma22.wdc07v.mail.ibm.com (5c.69.3da9.ip4.static.sl-reverse.com [169.61.105.92])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 49v32hhrmw-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Wed, 22 Oct 2025 07:03:17 +0000 (GMT)
-Received: from pps.filterd (ppma22.wdc07v.mail.ibm.com [127.0.0.1])
-	by ppma22.wdc07v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 59M6gI4c017058;
-	Wed, 22 Oct 2025 07:03:16 GMT
-Received: from smtprelay06.dal12v.mail.ibm.com ([172.16.1.8])
-	by ppma22.wdc07v.mail.ibm.com (PPS) with ESMTPS id 49vnkxy383-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Wed, 22 Oct 2025 07:03:16 +0000
-Received: from smtpav05.wdc07v.mail.ibm.com (smtpav05.wdc07v.mail.ibm.com [10.39.53.232])
-	by smtprelay06.dal12v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 59M73FLY26804774
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Wed, 22 Oct 2025 07:03:15 GMT
-Received: from smtpav05.wdc07v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 7D7F658063;
-	Wed, 22 Oct 2025 07:03:15 +0000 (GMT)
-Received: from smtpav05.wdc07v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id B6C9D58043;
-	Wed, 22 Oct 2025 07:03:12 +0000 (GMT)
-Received: from [9.79.201.141] (unknown [9.79.201.141])
-	by smtpav05.wdc07v.mail.ibm.com (Postfix) with ESMTPS;
-	Wed, 22 Oct 2025 07:03:12 +0000 (GMT)
-Message-ID: <27da22c4-6212-4ff9-8f11-e04b35039a2b@linux.ibm.com>
-Date: Wed, 22 Oct 2025 12:33:09 +0530
+	s=arc-20240116; t=1761116714; c=relaxed/simple;
+	bh=pbMjXVwEQZcNpXzl8m7LMFt9/8jLL+StOFCJYgjOh+k=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=qXjuKbjowH/b61B5YzNEPR+Fupj2uo0t+q90H2W0LgLS2Ji6UGC7Kj8nAoePEZSmnZe4+N3u/YMdp1ZVSI1hUrHtJPCAYAzPM/O+NeqhHGTgRXlW3qVxQaFhk6vKkAJeHdvGWGATovk9nacC6CvBhJHiuwwe+rm1FTnwtWD//xc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=o/ARPoIj; arc=none smtp.client-ip=91.218.175.184
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+Date: Wed, 22 Oct 2025 00:04:55 -0700
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1761116700;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=6XSSTLCS1TZ0ZhjGf5BQOvNt71mRr5p/Fed2+JopWuw=;
+	b=o/ARPoIjdXq6DC7H4kMGg4IR7zH3Hgd+Sg9m5PjudMvw7zpP2FrsbHRwuTGQIg9fo+7VjT
+	WTVtZRRdybkM+TAP2GoWyEkmZyzF7wMMWGEHT7FSeIB/zIXpG0/IfptMg2Xu+vv86JonuS
+	E3DxBLhe4VLPTAuSc4NwP7tpk1EzbC0=
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Oliver Upton <oliver.upton@linux.dev>
+To: Marc Zyngier <maz@kernel.org>
+Cc: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
+	kvm@vger.kernel.org, Joey Gouly <joey.gouly@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	Peter Maydell <peter.maydell@linaro.org>
+Subject: Re: [PATCH 2/3] KVM: arm64: Set ID_{AA64PFR0,PFR1}_EL1.GIC when
+ GICv3 is configured
+Message-ID: <aPiCF97QlTHAo6Jo@linux.dev>
+References: <20251013083207.518998-1-maz@kernel.org>
+ <20251013083207.518998-3-maz@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2 04/11] hw/ppc/spapr: Inline spapr_dtb_needed()
-To: =?UTF-8?Q?Philippe_Mathieu-Daud=C3=A9?= <philmd@linaro.org>,
-        qemu-devel@nongnu.org
-Cc: qemu-ppc@nongnu.org, Nicholas Piggin <npiggin@gmail.com>,
-        kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
-        Harsh Prateek Bora <harshpb@linux.ibm.com>,
-        =?UTF-8?Q?C=C3=A9dric_Le_Goater?=
- <clg@redhat.com>
-References: <20251021084346.73671-1-philmd@linaro.org>
- <20251021084346.73671-5-philmd@linaro.org>
- <602c19bc-bed9-43c2-b98c-491b75921604@linux.ibm.com>
- <d264c81b-119e-439f-a4c2-68a7336d6ba6@linaro.org>
-Content-Language: en-US
-From: Chinmay Rath <rathc@linux.ibm.com>
-In-Reply-To: <d264c81b-119e-439f-a4c2-68a7336d6ba6@linaro.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUxMDE4MDAyMiBTYWx0ZWRfX2I0X0TmC3bRo
- k9dU7S0E50pNSj4qkxHWC4ACpm5oesDmxtRaoLDzueUN44XDV7bM2dsLuMadGH1c9eCBIXHywpZ
- XGcmDrbB/1R1gC31nN/t06TNaNxDCW91b0QrjM5JkjfttMAPspikEuf0uEkKr8Io9QVS2RWeZtq
- 29Gg8rIswTFaHLTueXrRerGQSoKM8RLjamp/5qrbIeKfMX9C4EUrAZQ0NS9+NGUjwNj8e2ik3V/
- QGNeaY1OSsQk7RQpYskCuOqoMqhtEiDK+RNyDY/lWHpH45t34izljkRLsQd5V5B5gL/sTO2Q9sn
- AU9Zd7H25ATXYl1m3cassb//sYg226wMG50sXBiZxBkVYmirAXo8OVNAIXcxafNvouxoQFUfHrn
- d85DbodhKkV0cXJx6L/OoytZgIYtag==
-X-Authority-Analysis: v=2.4 cv=OrVCCi/t c=1 sm=1 tr=0 ts=68f881b5 cx=c_pps
- a=5BHTudwdYE3Te8bg5FgnPg==:117 a=5BHTudwdYE3Te8bg5FgnPg==:17
- a=IkcTkHD0fZMA:10 a=x6icFKpwvdMA:10 a=VkNPw1HP01LnGYTKEx00:22
- a=KKAkSRfTAAAA:8 a=MvvTU35B-mzZJSykrPEA:9 a=3ZKOabzyN94A:10 a=QEXdDO2ut3YA:10
- a=cvBusfyB2V15izCimMoJ:22 a=cPQSjfK2_nFv0Q5t_7PE:22
-X-Proofpoint-GUID: swkTMFdgntB-3iu97LvVOF7k4NDyeK2l
-X-Proofpoint-ORIG-GUID: LC3uRKAJMFZE3SgYcC_85cXVAQLOsIDl
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1121,Hydra:6.1.9,FMLib:17.12.80.40
- definitions=2025-10-22_02,2025-10-13_01,2025-03-28_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- impostorscore=0 adultscore=0 priorityscore=1501 spamscore=0 phishscore=0
- clxscore=1015 bulkscore=0 malwarescore=0 lowpriorityscore=0 suspectscore=0
- classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
- reason=mlx scancount=1 engine=8.19.0-2510020000 definitions=main-2510180022
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20251013083207.518998-3-maz@kernel.org>
+X-Migadu-Flow: FLOW_OUT
 
+On Mon, Oct 13, 2025 at 09:32:06AM +0100, Marc Zyngier wrote:
+> Drive the idreg fields indicating the presence of GICv3 directly from
+> the vgic code. This avoids having to do any sort of runtime clearing
+> of the idreg.
+> 
+> Fixes: 5cb57a1aff755 ("KVM: arm64: Zero ID_AA64PFR0_EL1.GIC when no GICv3 is presented to the guest")
+> Signed-off-by: Marc Zyngier <maz@kernel.org>
+> ---
+>  arch/arm64/kvm/vgic/vgic-init.c | 10 ++++++++--
+>  1 file changed, 8 insertions(+), 2 deletions(-)
+> 
+> diff --git a/arch/arm64/kvm/vgic/vgic-init.c b/arch/arm64/kvm/vgic/vgic-init.c
+> index 4c3c0d82e4760..2c518b0a4d81b 100644
+> --- a/arch/arm64/kvm/vgic/vgic-init.c
+> +++ b/arch/arm64/kvm/vgic/vgic-init.c
+> @@ -161,10 +161,16 @@ int kvm_vgic_create(struct kvm *kvm, u32 type)
+>  
+>  	kvm->arch.vgic.vgic_dist_base = VGIC_ADDR_UNDEF;
+>  
+> -	if (type == KVM_DEV_TYPE_ARM_VGIC_V2)
+> +	*__vm_id_reg(&kvm->arch, SYS_ID_AA64PFR0_EL1) &= ~ID_AA64PFR0_EL1_GIC;
+> +	*__vm_id_reg(&kvm->arch, SYS_ID_PFR1_EL1) &= ~ID_PFR1_EL1_GIC;
 
-On 10/21/25 19:51, Philippe Mathieu-Daudé wrote:
-> On 21/10/25 15:25, Chinmay Rath wrote:
->> Hey Philippe,
->> The commit message says that this commit is inline-ing 
->> spapr_dtb_needed(), but it is actually removing it. I think it's 
->> better to convey that in the commit message.
->> Or did I miss something ?
->>
->> On 10/21/25 14:13, Philippe Mathieu-Daudé wrote:
->>> Signed-off-by: Philippe Mathieu-Daudé <philmd@linaro.org>
->>> ---
->>>   hw/ppc/spapr.c | 6 ------
->>>   1 file changed, 6 deletions(-)
->>>
->>> diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
->>> index 458d1c29b4d..ad9fc61c299 100644
->>> --- a/hw/ppc/spapr.c
->>> +++ b/hw/ppc/spapr.c
->>> @@ -2053,11 +2053,6 @@ static const VMStateDescription 
->>> vmstate_spapr_irq_map = {
->>>       },
->>>   };
->>> -static bool spapr_dtb_needed(void *opaque)
->>> -{
->>> -    return true; /* backward migration compat */
->>> -}
->>> -
->>>   static int spapr_dtb_pre_load(void *opaque)
->>>   {
->>>       SpaprMachineState *spapr = (SpaprMachineState *)opaque;
->>> @@ -2073,7 +2068,6 @@ static const VMStateDescription 
->>> vmstate_spapr_dtb = {
->>>       .name = "spapr_dtb",
->>>       .version_id = 1,
->>
->> Does this version number need to be incremented ?
->
-> No, this is a no-op.
->
->>
->> Regards,
->> Chinmay
->>
->>>       .minimum_version_id = 1,
->>> -    .needed = spapr_dtb_needed,
->
-> Here is the inlining, as '.needed = true' is the default.
-Ahh I see.
-> Would "Inline and remove spapr_dtb_needed()" be clearer?
-Yeah that'd be nice.
+I'd prefer this to be done as a kvm_read_vm_id_reg() / kvm_set_vm_id_reg(),
+if only to ensure this flow hits the config_lock lockdep assertion like
+other writers of the ID registers.
 
 Thanks,
-Chinmay
->
->>>       .pre_load = spapr_dtb_pre_load,
->>>       .fields = (const VMStateField[]) {
->>>           VMSTATE_UINT32(fdt_initial_size, SpaprMachineState),
->
->
+Oliver
 
