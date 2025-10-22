@@ -1,406 +1,146 @@
-Return-Path: <kvm+bounces-60809-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-60810-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
-	by mail.lfdr.de (Postfix) with ESMTPS id 170F7BFACB4
-	for <lists+kvm@lfdr.de>; Wed, 22 Oct 2025 10:08:59 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id CDFD0BFAECB
+	for <lists+kvm@lfdr.de>; Wed, 22 Oct 2025 10:36:19 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id AA5314F4B78
-	for <lists+kvm@lfdr.de>; Wed, 22 Oct 2025 08:08:57 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 54BB1461A7B
+	for <lists+kvm@lfdr.de>; Wed, 22 Oct 2025 08:35:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9E22A302141;
-	Wed, 22 Oct 2025 08:07:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4DAD730ACEC;
+	Wed, 22 Oct 2025 08:35:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="N3YuK9qa"
+	dkim=pass (2048-bit key) header.d=8bytes.org header.i=@8bytes.org header.b="U0CMSWUz"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.18])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail.8bytes.org (mail.8bytes.org [85.214.250.239])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A51FD309F14
+	for <kvm@vger.kernel.org>; Wed, 22 Oct 2025 08:35:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=85.214.250.239
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1761122133; cv=none; b=rLDAzfSWle5CB3d4ZKvuxif17BZbjLFvXBCTnyn2vnAdQEEoOWNzp+41EtSIXRvOTh+5cK+jTAlT50VOYzic4/4PUzYnhWC7vhhslU2JyKmLJDVcIqB3eLUPXoou7r0Vyx6UYEMxRtJFpvGiCdEtXRPOD64wV5lV53+646YWPxk=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1761122133; c=relaxed/simple;
+	bh=Wfyi+unLoX9/MhZx+rkE3veRMcEWHccBptfOxuebbIY=;
+	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
+	 Content-Disposition; b=TLwP2CEKWFWt6TM9GnO3a/EE8ycdRXzx0Q6X/FG3NrFrI/N8uiI1NZDDItGHBYua92FtU8FzwxYIzVkETo2rHxg4YXxpGjYMDf8XASmT9q4LmQWSzDOfYz3Tbr6u/DCPAp8JX6vmVcf2GXqJODiRfOeY9Epg20E2TEFtEKatqms=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=8bytes.org; spf=pass smtp.mailfrom=8bytes.org; dkim=pass (2048-bit key) header.d=8bytes.org header.i=@8bytes.org header.b=U0CMSWUz; arc=none smtp.client-ip=85.214.250.239
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=8bytes.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=8bytes.org
+Received: from 8bytes.org (p549214ac.dip0.t-ipconnect.de [84.146.20.172])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange ECDHE (P-256) server-signature RSA-PSS (2048 bits) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D815F2367D7;
-	Wed, 22 Oct 2025 08:07:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=198.175.65.18
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761120475; cv=fail; b=cOT5O5WsCSecqzcrqPD3ya5tdcPrNavc2PTPeu9nlBF5r9YP4Q1LlmtQzMqlqGdcxaHoGtqi7R5kfoJUNq00D12dYvIkZ8DdLKyYY2K3CmZy6SbBw5ilcsxdG1gitfAcFF7EYml4Di5GC73oBSOL5ew7R/9wjNYeSse6EAOcVbo=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761120475; c=relaxed/simple;
-	bh=pczPPfLH4WylHGx1Ac3jdCIygm3mtg/ZBngBtW0Pxw4=;
-	h=Date:From:To:CC:Subject:Message-ID:References:Content-Type:
-	 Content-Disposition:In-Reply-To:MIME-Version; b=X1cA29P63O/9YQDZCtj0lj1ChmNvDPx7CyDbI/VZN+wT8JbcV+JnZl3OmFuVXjvtW/vR48YlIwTfQMOPYYQmPpokLcQk8bStQ0oXG8/A5x7lEs11GHas3BtJE7jS7wg1+owhYgj1Mqz7/96FW9LSxS6cbg6NUTJz4IYz8qh4agY=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=N3YuK9qa; arc=fail smtp.client-ip=198.175.65.18
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1761120474; x=1792656474;
-  h=date:from:to:cc:subject:message-id:reply-to:references:
-   in-reply-to:mime-version;
-  bh=pczPPfLH4WylHGx1Ac3jdCIygm3mtg/ZBngBtW0Pxw4=;
-  b=N3YuK9qaZoSQyw3oowHWWJin29VvDLTH/+zC7AepOGV618/LkFSsACOk
-   0xEvsp4khWR50K+yYUSZX3Sn4KRVZT4wYFNgi0SD6tjuvG52FoYeIbYe+
-   0QflJSRms45nCg9cdbcYcYo0GaMQz7XzmPWf96EAgjQ0PxfkavcY1+xZE
-   JkyZ8ho3GO8Q3lR96/s6c+1/wBTBQsJ1YOf7O6rsmI+Eg4jdfse8V7D/a
-   jUPrSa4CLRIXML/ELJU8mcKQ+2Z6pl449zR9hUpQ3u5QbJZ+BGtjPlMmB
-   +9LIZt3PqxFJ+oi8hzXpY+X50jbR6yL4tuCkRiOsSyecQl9u63/BTgxA2
-   A==;
-X-CSE-ConnectionGUID: 0bGfpnIDSSuM0fFLGXZudg==
-X-CSE-MsgGUID: tHTXL+9LRMqsAKSHVfeijw==
-X-IronPort-AV: E=McAfee;i="6800,10657,11586"; a="63300940"
-X-IronPort-AV: E=Sophos;i="6.19,246,1754982000"; 
-   d="scan'208";a="63300940"
-Received: from fmviesa009.fm.intel.com ([10.60.135.149])
-  by orvoesa110.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 22 Oct 2025 01:07:54 -0700
-X-CSE-ConnectionGUID: Kz0PRg7sQbmCN6HP73cqCg==
-X-CSE-MsgGUID: OSIgGejKS06FNNRJu6Rf7g==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.19,246,1754982000"; 
-   d="scan'208";a="184292889"
-Received: from orsmsx902.amr.corp.intel.com ([10.22.229.24])
-  by fmviesa009.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 22 Oct 2025 01:07:53 -0700
-Received: from ORSMSX901.amr.corp.intel.com (10.22.229.23) by
- ORSMSX902.amr.corp.intel.com (10.22.229.24) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.27; Wed, 22 Oct 2025 01:07:52 -0700
-Received: from ORSEDG903.ED.cps.intel.com (10.7.248.13) by
- ORSMSX901.amr.corp.intel.com (10.22.229.23) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.27 via Frontend Transport; Wed, 22 Oct 2025 01:07:52 -0700
-Received: from SN4PR0501CU005.outbound.protection.outlook.com (40.93.194.7) by
- edgegateway.intel.com (134.134.137.113) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.27; Wed, 22 Oct 2025 01:07:52 -0700
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=TfdDAuU3cfXwkaBy8BtSS+i9pyyM/77sg7RNUSjVWDe8sVegGBt5jtF45B8QEkoSmn5QcRQMl5PjGE7w3eIu1xnwQURcmofF6y2FXysP6ZbSWyJfmxtbQmxjTGw4cXpIbDlSXtu7rmnadp/h+iIqYI9vyAdfImrXZOn0hJ+yhUJIagR8YqzCH22K6gd5rcTrxm5R6mvZGZEpu4GYIQxYZtnIKWF0LfvCztYWcB+RNEdm64xNQgcIwUCWlieWkCJ8dlGMvA12hxUNE3MGwIep588LQAtprIfO/ZTrS8QplAicVkkH0GCFG1SThrAXPUiFQd1mAV3pfCVesUVIiLbOug==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=IHSRwHbsN2R/vOrKrGGVn5R6vWbpAhtNMKc/JIu5aQ0=;
- b=LjWSuI2Petn4QAacrUj98JrA0FVT/ndofPuabhIRzIWeLDPVCGfCV0QW5zJNeLoa4IpjbdgGPeY48WmLhjhSkYjspfXdNmSdU6wZ6VkbiMQwIfVEikIKaklMBvkqXIaa0m913FJhfjkB7UXOBT3fA3cNOQznedU4WER+oo97cctuQde6iJV1jLTDy/ui4sLs2gxQ8h+wz1fCNS8dF5Hn80TxAq61OOKS5KqfIcm6xrQmSweywk3mOdNqgXgj/rPDdZ59V5reKecslUFpCvVabzcJro4P3l3DkbR88626BiSvu4qG4YCHqK2MhChW8cdlYYcAKj8C8sifbbo6t/Iknw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-Received: from DS7PR11MB5966.namprd11.prod.outlook.com (2603:10b6:8:71::6) by
- CH3PR11MB8703.namprd11.prod.outlook.com (2603:10b6:610:1cd::11) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9228.17; Wed, 22 Oct
- 2025 08:07:49 +0000
-Received: from DS7PR11MB5966.namprd11.prod.outlook.com
- ([fe80::e971:d8f4:66c4:12ca]) by DS7PR11MB5966.namprd11.prod.outlook.com
- ([fe80::e971:d8f4:66c4:12ca%6]) with mapi id 15.20.9253.011; Wed, 22 Oct 2025
- 08:07:49 +0000
-Date: Wed, 22 Oct 2025 16:05:52 +0800
-From: Yan Zhao <yan.y.zhao@intel.com>
-To: Sean Christopherson <seanjc@google.com>
-CC: Marc Zyngier <maz@kernel.org>, Oliver Upton <oliver.upton@linux.dev>,
-	Tianrui Zhao <zhaotianrui@loongson.cn>, Bibo Mao <maobibo@loongson.cn>,
-	Huacai Chen <chenhuacai@kernel.org>, Madhavan Srinivasan
-	<maddy@linux.ibm.com>, Anup Patel <anup@brainfault.org>, Paul Walmsley
-	<pjw@kernel.org>, Palmer Dabbelt <palmer@dabbelt.com>, Albert Ou
-	<aou@eecs.berkeley.edu>, Christian Borntraeger <borntraeger@linux.ibm.com>,
-	Janosch Frank <frankja@linux.ibm.com>, Claudio Imbrenda
-	<imbrenda@linux.ibm.com>, Paolo Bonzini <pbonzini@redhat.com>, "Kirill A.
- Shutemov" <kas@kernel.org>, <linux-arm-kernel@lists.infradead.org>,
-	<kvmarm@lists.linux.dev>, <kvm@vger.kernel.org>, <loongarch@lists.linux.dev>,
-	<linux-mips@vger.kernel.org>, <linuxppc-dev@lists.ozlabs.org>,
-	<kvm-riscv@lists.infradead.org>, <linux-riscv@lists.infradead.org>,
-	<x86@kernel.org>, <linux-coco@lists.linux.dev>,
-	<linux-kernel@vger.kernel.org>, Ira Weiny <ira.weiny@intel.com>, Kai Huang
-	<kai.huang@intel.com>, Michael Roth <michael.roth@amd.com>, Vishal Annapurve
-	<vannapurve@google.com>, Rick Edgecombe <rick.p.edgecombe@intel.com>,
-	Ackerley Tng <ackerleytng@google.com>, Binbin Wu <binbin.wu@linux.intel.com>
-Subject: Re: [PATCH v3 04/25] KVM: x86/mmu: Add dedicated API to map
- guest_memfd pfn into TDP MMU
-Message-ID: <aPiQYBoDlUmrQxEw@yzhao56-desk.sh.intel.com>
-Reply-To: Yan Zhao <yan.y.zhao@intel.com>
-References: <20251017003244.186495-1-seanjc@google.com>
- <20251017003244.186495-5-seanjc@google.com>
- <aPcG3LMA0qX5H5YI@yzhao56-desk.sh.intel.com>
- <aPe2pDYSpVFxDRWv@google.com>
-Content-Type: text/plain; charset="us-ascii"
-Content-Disposition: inline
-In-Reply-To: <aPe2pDYSpVFxDRWv@google.com>
-X-ClientProxiedBy: SG2PR03CA0101.apcprd03.prod.outlook.com
- (2603:1096:4:7c::29) To DS7PR11MB5966.namprd11.prod.outlook.com
- (2603:10b6:8:71::6)
+	by mail.8bytes.org (Postfix) with ESMTPSA id 54D1557B8B;
+	Wed, 22 Oct 2025 10:35:29 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=8bytes.org;
+	s=default; t=1761122129;
+	bh=Wfyi+unLoX9/MhZx+rkE3veRMcEWHccBptfOxuebbIY=;
+	h=Date:From:To:Cc:Subject:From;
+	b=U0CMSWUznptktlHupVVNR8sQzGlUAPU43CT0ykcFHlEIv1pvrNX2oXDCvB27ypQOf
+	 PzGcwmUEkkXHjPAk68i6uYvpKyPyLpWTR9UqyArD9IALCqM9teBBYHkyoBsIuOf82l
+	 9LHbkl+OPPMkT9dAigxUhmAjxsGrQ7jNTf5ASvjjvl2MluoP9jVmrxKT8xNvu/5O7a
+	 xuWkEKxDSeioV/S74ZWegYRX5rTC3xVyAELoyJM10Z7G/qUhjNQVspQul5/aPefH/6
+	 sRoHtSeklkh99kO3FZozU2p9Vg4BxIsbS+wIBExNzPVXZNFz9jiEs+h2sBkaAASgmI
+	 8Yf+g3CQ6d0CA==
+Date: Wed, 22 Oct 2025 10:35:28 +0200
+From: =?utf-8?B?SsO2cmcgUsO2ZGVs?= <joro@8bytes.org>
+To: coconut-svsm@lists.linux.dev, linux-coco@lists.linux.dev, 
+	kvm@vger.kernel.org, qemu-devel@nongnu.org
+Cc: Paolo Bonzini <pbonzini@redhat.com>, 
+	Sean Christopherson <seanjc@google.com>, Thomas.Lendacky@amd.com, huibo.wang@amd.com, 
+	pankaj.gupta@amd.com
+Subject: KVM Planes with SVSM on Linux v6.17
+Message-ID: <wmymrx6xyc55p6dpa7yhfbxgcslqgucdjmyr7ep3mfesx4ssgq@qz5kskcrnnsg>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: DS7PR11MB5966:EE_|CH3PR11MB8703:EE_
-X-MS-Office365-Filtering-Correlation-Id: 5c611376-8e5e-4aea-68ac-08de11421756
-X-LD-Processed: 46c98d88-e344-4ed4-8496-4ed7712e255d,ExtAddr
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230040|366016|376014|7416014|1800799024;
-X-Microsoft-Antispam-Message-Info: =?us-ascii?Q?99VAqi4k+o9govoj3IVHds4kEgMDEOYunZ9ur41nYtby9lSheJPfCjZAXVFr?=
- =?us-ascii?Q?hn1vAGFOMzGhB9eO4ovruK9VVHEYnuGPoAz28Z5DbwsXGaM1r0d+sGT68uxt?=
- =?us-ascii?Q?b95UckTBeRzt4m6U/yZvoj89nC34+/jQOd3kait9/YszamMt/vFn0sLN9C32?=
- =?us-ascii?Q?CjHGuCXbFbpyfDl+jHT1rvdENDz6BMtsyriF4JdgW8/1mPv+g+GAFmzJ6I84?=
- =?us-ascii?Q?YVxkJnj/FmD19e1BF88cmWuPBRWH6kgPWhfZxXtmcuS762UzLTX1Isa2mTZ8?=
- =?us-ascii?Q?ntvC4Yw3QLaeJa8RRhEsPUQMuxptiX4rD/gHSG5XNeDvht+wcU1diNZwKI5u?=
- =?us-ascii?Q?IyJ5rn/8/ZyesC98UtbZ1VqKGxe0lojGY1MhF//qik7vdZqhZiJPzZo5h7tF?=
- =?us-ascii?Q?P4bkTlDW+ugBWPoMEkatto61PQcrDpPvdGED/c0u3zsu0IYIvPNNsNQjUrYi?=
- =?us-ascii?Q?GimfOVGjxl1C0yAnh0+dExHdTWk5NXKOYuzg87bKK9H5tMGLlm+t6sQ/CAp/?=
- =?us-ascii?Q?VQc6uztAT7Mlqx1snAEjXPCupUXwzIRMsgTe87rbQ5I0lOXS+mpmbbZwC5/8?=
- =?us-ascii?Q?NJC00kInwYmo8zSC/ed7EYd3AVHBTj7ZA35YNsPZ+OxCeodl/pzTrq/DR7r5?=
- =?us-ascii?Q?Ug0F6m7PKa4rHBl2qKzDOq5/iy69EM4XVoFOSGtV3UQYLNNtDusoKBVEqX3s?=
- =?us-ascii?Q?41W52vecRuzcaMPq1RqfDoN/rFNaLzc+gVBIboVaf6AijsUMjrP6NGNWs0wm?=
- =?us-ascii?Q?rRJPNqLo342pIj1JHrArI8d7Uoybws7cUPjVG6ksKgm1C5UFvjK7C9ZTnQqN?=
- =?us-ascii?Q?k3EEH4YEbT/xEHZJrudgsQJvpmOfGtE7al7Rj/71mPkPCXwJYHR/H34/gbPp?=
- =?us-ascii?Q?tg/jgCbwWhg5iZfz8MIYDHvLpE3OZ7cMU9KtvOf+hrJXJl6OQtcLfTblt70I?=
- =?us-ascii?Q?Ir+1vZQENNs/fwbdDX9d890J7YRNDxESfHqMo1PLpYNh3eFqa8WOoL4MfFaP?=
- =?us-ascii?Q?7H6CugnN70fO81EhJOEhDOgAs30h7nJInG/IOO104njGwtkEbIhxP2gefycW?=
- =?us-ascii?Q?IqZZlxFgJcNBn58NNazGc3lGXMNuEZ6d49zGshwLxr76UUhBIsmE0YPTczPo?=
- =?us-ascii?Q?mEbOJGbdcO0vo1BEio/MLlUdr9V9yRrKgsei984Sdk8GkMLIFWTeW3gikhlN?=
- =?us-ascii?Q?2OKFPjE6IQE6cHw6j5aSx0GxzynjAs6cUniLAE0dhixWHCcxl70uUZXXUB+8?=
- =?us-ascii?Q?Vf0B+KS3qm5A+qDetVrMbw7z/S/A/QodIZTJO/ARuGlgcFBIsW1/pwqkMDq7?=
- =?us-ascii?Q?yQbMi6xJ7O5GuxCLWLoxjlZJ9OFGbzS7D1jQcQkJNQ6RV8+EUcF+IuOOEfos?=
- =?us-ascii?Q?6v8YrumaXDAISeUG/XOBKyN7vFJ+DId2G54HHzrsknbzrvmjzz23GpPrCo3s?=
- =?us-ascii?Q?wdRHfGZCmPtKp6JkVYShf1AZ6CJ4jeRD?=
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DS7PR11MB5966.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(376014)(7416014)(1800799024);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?rAomLKUYTVawK0hwpOHViRCuRDYQ0vqoHKzWmhuKtVwgjYZwYXLLG1qE+cw5?=
- =?us-ascii?Q?XKP/jzZKCDbCjt+BDmoyfN30D+EHCQs0dKFe9st8iIZY6ManHgaKlWWsHaqu?=
- =?us-ascii?Q?AtjD681xLBC9SBF2DM3SHBMfNXHypcJd8yaBe5vtgCLryxhSxRAKQyPWab8M?=
- =?us-ascii?Q?lOmBG2Lhaqh0tW8GY1cCBSk/xY5jgmweWPVdFunEQmYIqhRABrjQxpbpf0AX?=
- =?us-ascii?Q?/jhBnG7upB4BL/JaeM6nl/k2vEhwkq6cuIHVL1VnNidskAF9gemXQamHXX/i?=
- =?us-ascii?Q?gkBWh5UT7WygFm7LQghGcn/ECc5eb21AJat0DKVEIFQZ5LB444G83Nmkubul?=
- =?us-ascii?Q?L+t9B3HiI3zLw+s4kwPmR0bG0Or1LznGnAQuiIsEieSrU5J7f8FuYpveIEyF?=
- =?us-ascii?Q?oG7W035p2/j0OkMqXYm33ssVqggQGgwn5sQ8axQKoxfITqb9ZKW+UQ9lbqW6?=
- =?us-ascii?Q?NpXaaIAvYdGbGXtOWtJWLFUu8gByvQy460P5WyVm64zRj9o0O4So4RSAV8r1?=
- =?us-ascii?Q?O73UP2U9p068kWzkxsdiVxuoCDUvAaS98NCSnIJaT4cKjzZUyQUpigaWnX56?=
- =?us-ascii?Q?8ciclFuPRN9s+H3Hb2SYGSLMB1WnbewvZKES5ta4tFX6eZWDdjUW2kUzrSEt?=
- =?us-ascii?Q?1dr31eTlbj9+bUaXJNE5KoSUMy1SGXsuwWM/nzkrO0E8Ltuec/3btytENBnk?=
- =?us-ascii?Q?u81pZ7fP783J/uJ6xuvkIXWhEK3tLlRdAvSeUr71uKCUSlxO9Z/MZ4oyZMeM?=
- =?us-ascii?Q?/jywzSAWplYMX3W+shipmEmyOLTqYbFNdmFZeqEasVL+GqvxP4hH+65A5+OD?=
- =?us-ascii?Q?mUmKNZ0jkyYoOKmvZnaN5FOzALkFdXbUYrDkXqOIx2I9QgydzhDm6/dvTNB+?=
- =?us-ascii?Q?PvVVItCwYMV3Hrhcw5QtBDNhfEmk2yunxKZCYLKWJxvr+Y1WtTbEuAo1JbMr?=
- =?us-ascii?Q?xY3HhWYFxpcBzAEB6jMSNGAaGSLi9Q+NxON31lMSK/+gn5TDu8xmVIMI7c5G?=
- =?us-ascii?Q?AnYKR54+vR0o/0BpdcL0gcz310TLiylFFmHY67NCYouepTcfSxRYJqkwPkI0?=
- =?us-ascii?Q?PrJRiM3taTy7NQKB9RBXrRNPNGATbb9L7kcXZucnIFniZM/C+GELE2WsVO8Y?=
- =?us-ascii?Q?bKVtPK/CfkC+WJ5lyjv83WRfFvmK2YJ2dIsGIEOGJQj7fmr/zO0H6LgjLpdt?=
- =?us-ascii?Q?y3EiNaF++kWFPcDHvhGsgguGSEgAvyB4FmUfF5h87o96DsGmZhoSwtHZcdFY?=
- =?us-ascii?Q?vBaVNXpsVy2pjJQQb0sBo6Klhn94oKXVA7YwhwEda0ugoDw8dxOOYx+EdIaA?=
- =?us-ascii?Q?w8PuSoYOyp3k5gM+o/84LP+LtjKZ8XHi828WzBJjNZ8gqP0xduyywvlm+/I5?=
- =?us-ascii?Q?Ei3IZjtrYvzshiJSeLGcL6vP10Jz7IN1KtsaKNZ5hWZ4DyRuN/oD69GhM56I?=
- =?us-ascii?Q?23DcuxijcCQSAPv8lwKNfYR9gqz69cTWl9l/JqKvqnHAT72ykagzg3Yur6bF?=
- =?us-ascii?Q?ySxxSz6HV/scQhOar7xuizlidC/oSDe4obWbPQXvcB9zmVF9AxqJQyOz4G8s?=
- =?us-ascii?Q?7lMUGbC+MusU9elpbDH7t8nfkMYwle96PTvE8lUa?=
-X-MS-Exchange-CrossTenant-Network-Message-Id: 5c611376-8e5e-4aea-68ac-08de11421756
-X-MS-Exchange-CrossTenant-AuthSource: DS7PR11MB5966.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 22 Oct 2025 08:07:49.2071
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: OKVNgjG6Xz6YqubyNB2bCsXNSRBOdGrARTZAgSzsMQwaGwkmRYZ6c8Cac1SelBvT8rMr8iiRyMSIi6xrD8HsEA==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: CH3PR11MB8703
-X-OriginatorOrg: intel.com
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 
-On Tue, Oct 21, 2025 at 09:36:52AM -0700, Sean Christopherson wrote:
-> On Tue, Oct 21, 2025, Yan Zhao wrote:
-> > On Thu, Oct 16, 2025 at 05:32:22PM -0700, Sean Christopherson wrote:
-> > > diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
-> > > index 18d69d48bc55..ba5cca825a7f 100644
-> > > --- a/arch/x86/kvm/mmu/mmu.c
-> > > +++ b/arch/x86/kvm/mmu/mmu.c
-> > > @@ -5014,6 +5014,65 @@ long kvm_arch_vcpu_pre_fault_memory(struct kvm_vcpu *vcpu,
-> > >  	return min(range->size, end - range->gpa);
-> > >  }
-> > >  
-> > > +int kvm_tdp_mmu_map_private_pfn(struct kvm_vcpu *vcpu, gfn_t gfn, kvm_pfn_t pfn)
-> > > +{
-> > > +	struct kvm_page_fault fault = {
-> > > +		.addr = gfn_to_gpa(gfn),
-> > > +		.error_code = PFERR_GUEST_FINAL_MASK | PFERR_PRIVATE_ACCESS,
-> > > +		.prefetch = true,
-> > > +		.is_tdp = true,
-> > > +		.nx_huge_page_workaround_enabled = is_nx_huge_page_enabled(vcpu->kvm),
-> > > +
-> > > +		.max_level = PG_LEVEL_4K,
-> > > +		.req_level = PG_LEVEL_4K,
-> > > +		.goal_level = PG_LEVEL_4K,
-> > > +		.is_private = true,
-> > > +
-> > > +		.gfn = gfn,
-> > > +		.slot = kvm_vcpu_gfn_to_memslot(vcpu, gfn),
-> > > +		.pfn = pfn,
-> > > +		.map_writable = true,
-> > > +	};
-> > > +	struct kvm *kvm = vcpu->kvm;
-> > > +	int r;
-> > > +
-> > > +	lockdep_assert_held(&kvm->slots_lock);
-> > Do we need to assert that filemap_invalidate_lock() is held as well?
-> 
-> Hrm, a lockdep assertion would be nice to have, but it's obviously not strictly
-> necessary, and I'm not sure it's worth the cost.  To safely assert, KVM would need
-Not sure. Maybe just add a comment?
-But even with kvm_assert_gmem_invalidate_lock_held() and
-lockdep_assert_held(&kvm->slots_lock), it seems that
-kvm_tdp_mmu_map_private_pfn() still can't guarantee that the pfn is not stale.
-e.g., if hypothetically those locks were released and re-acquired after getting
-the pfn.
+Hi all,
 
-> to first assert that the file refcount is elevated, e.g. to guard against
-> guest_memfd _really_ screwing up and not grabbing a reference to the underlying
-> file.
-> 
-> E.g. it'd have to be something like this:
-> 
-> diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
-> index 94d7f32a03b6..5d46b2ac0292 100644
-> --- a/arch/x86/kvm/mmu/mmu.c
-> +++ b/arch/x86/kvm/mmu/mmu.c
-> @@ -5014,6 +5014,18 @@ long kvm_arch_vcpu_pre_fault_memory(struct kvm_vcpu *vcpu,
->         return min(range->size, end - range->gpa);
->  }
->  
-> +static void kvm_assert_gmem_invalidate_lock_held(struct kvm_memory_slot *slot)
-> +{
-> +#ifdef CONFIG_PROVE_LOCKING
-> +       if (WARN_ON_ONCE(!kvm_slot_has_gmem(slot)) ||
-> +           WARN_ON_ONCE(!slot->gmem.file) ||
-> +           WARN_ON_ONCE(!file_count(slot->gmem.file)))
-> +               return;
-> +
-> +       lockdep_assert_held(file_inode(&slot->gmem.file)->i_mapping->invalidate_lock));
-	  lockdep_assert_held(&file_inode(slot->gmem.file)->i_mapping->invalidate_lock);
-> +#endif
-> +}
-> +
->  int kvm_tdp_mmu_map_private_pfn(struct kvm_vcpu *vcpu, gfn_t gfn, kvm_pfn_t pfn)
->  {
->         struct kvm_page_fault fault = {
-> @@ -5038,6 +5050,8 @@ int kvm_tdp_mmu_map_private_pfn(struct kvm_vcpu *vcpu, gfn_t gfn, kvm_pfn_t pfn)
->  
->         lockdep_assert_held(&kvm->slots_lock);
->  
-> +       kvm_assert_gmem_invalidate_lock_held(fault.slot);
-> +
->         if (KVM_BUG_ON(!tdp_mmu_enabled, kvm))
->                 return -EIO;
-> --
-> 
-> Which I suppose isn't that terrible?
-Is it good if we test is_page_fault_stale()? e.g.,
+This morning I pushed out my current Linux and QEMU branches which support
+running COCONUT-SVSM on AMD SEV-SNP based on kernel v6.17 and the original KVM
+Planes patch-set from Paolo.
 
-diff --git a/arch/x86/kvm/mmu.h b/arch/x86/kvm/mmu.h
-index 9e5045a60d8b..b2cf754f6f92 100644
---- a/arch/x86/kvm/mmu.h
-+++ b/arch/x86/kvm/mmu.h
-@@ -257,7 +257,8 @@ extern bool tdp_mmu_enabled;
- #define tdp_mmu_enabled false
- #endif
+The branches are here:
 
--int kvm_tdp_mmu_map_private_pfn(struct kvm_vcpu *vcpu, gfn_t gfn, kvm_pfn_t pfn);
-+int kvm_tdp_mmu_map_private_pfn(struct kvm_vcpu *vcpu, gfn_t gfn, kvm_pfn_t pfn,
-+                               unsigned long mmu_seq);
+	Linux: https://github.com/coconut-svsm/linux/tree/svsm-planes-v6.17
 
- static inline bool kvm_memslots_have_rmaps(struct kvm *kvm)
- {
-diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
-index 94d7f32a03b6..0dc9ff1bc63e 100644
---- a/arch/x86/kvm/mmu/mmu.c
-+++ b/arch/x86/kvm/mmu/mmu.c
-@@ -5014,7 +5014,8 @@ long kvm_arch_vcpu_pre_fault_memory(struct kvm_vcpu *vcpu,
-        return min(range->size, end - range->gpa);
- }
+	QEMU: https://github.com/coconut-svsm/qemu/tree/svsm-planes-v6.17
 
--int kvm_tdp_mmu_map_private_pfn(struct kvm_vcpu *vcpu, gfn_t gfn, kvm_pfn_t pfn)
-+int kvm_tdp_mmu_map_private_pfn(struct kvm_vcpu *vcpu, gfn_t gfn, kvm_pfn_t pfn,
-+                               unsigned long mmu_seq)
- {
-        struct kvm_page_fault fault = {
-                .addr = gfn_to_gpa(gfn),
-@@ -5032,12 +5033,12 @@ int kvm_tdp_mmu_map_private_pfn(struct kvm_vcpu *vcpu, gfn_t gfn, kvm_pfn_t pfn)
-                .slot = kvm_vcpu_gfn_to_memslot(vcpu, gfn),
-                .pfn = pfn,
-                .map_writable = true,
-+
-+               .mmu_seq = mmu_seq,
-        };
-        struct kvm *kvm = vcpu->kvm;
-        int r;
+I know I promised that to be at this point by end of September, but things
+didn't quite work out that way. Apologies for that.
 
--       lockdep_assert_held(&kvm->slots_lock);
--
-        if (KVM_BUG_ON(!tdp_mmu_enabled, kvm))
-                return -EIO;
+The intent here is to show the current state of the work and let everyone try
+it and provide feedback, although some fundamental changes still need to
+happen (more on that below).
 
-@@ -5063,6 +5064,9 @@ int kvm_tdp_mmu_map_private_pfn(struct kvm_vcpu *vcpu, gfn_t gfn, kvm_pfn_t pfn)
+I also decided against sending out patch-sets, as it does not make much sense
+to foster review of code that is known to fundamentally change still. If people
+see value in seeing the patches on mailing lists, please let me know.
 
-                guard(read_lock)(&kvm->mmu_lock);
+How to run it
+-------------
 
-+               if (is_page_fault_stale(vcpu, &fault))
-+                       return -EIO;
-+
-                r = kvm_tdp_mmu_map(vcpu, &fault);
-        } while (r == RET_PF_RETRY);
+The code can be built as usual, QEMU needs to have IGVM and KVM support
+included in order to run COCONUT-SVSM.
 
-diff --git a/arch/x86/kvm/vmx/tdx.c b/arch/x86/kvm/vmx/tdx.c
-index cae694d3ff33..4bb3e68a12b3 100644
---- a/arch/x86/kvm/vmx/tdx.c
-+++ b/arch/x86/kvm/vmx/tdx.c
-@@ -3113,7 +3113,8 @@ struct tdx_gmem_post_populate_arg {
- };
+The most important change is at the QEMU command line. With the branch above,
+the skeleton is:
 
- static int tdx_gmem_post_populate(struct kvm *kvm, gfn_t gfn, kvm_pfn_t pfn,
--                                 void __user *src, int order, void *_arg)
-+                                 unsigned long mmu_seq, void __user *src,
-+                                 int order, void *_arg)
- {
-        struct tdx_gmem_post_populate_arg *arg = _arg;
-        struct kvm_tdx *kvm_tdx = to_kvm_tdx(kvm);
-@@ -3136,7 +3137,7 @@ static int tdx_gmem_post_populate(struct kvm *kvm, gfn_t gfn, kvm_pfn_t pfn,
-                return -ENOMEM;
+qemu-system-x86_64 \
+   -enable-kvm \
+   -cpu EPYC-v4 \
+   -machine q35,confidential-guest-support=sev0,memory-backend=ram1,igvm-cfg=igvm0,kernel-irqchip=split,device-plane=2 \
+   -object memory-backend-memfd,id=ram1,size=32G,share=true \
+   -object sev-snp-guest,id=sev0,cbitpos=51,reduced-phys-bits=1 \
+   -object igvm-cfg,id=igvm0,file=coconut-qemu.igvm \
 
-        kvm_tdx->page_add_src = src_page;
--       ret = kvm_tdp_mmu_map_private_pfn(arg->vcpu, gfn, pfn);
-+       ret = kvm_tdp_mmu_map_private_pfn(arg->vcpu, gfn, pfn, mmu_seq);
-        kvm_tdx->page_add_src = NULL;
+Please note the changes to the machine specification:
 
-        put_page(src_page);
-diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
-index d93f75b05ae2..406472f60e63 100644
---- a/include/linux/kvm_host.h
-+++ b/include/linux/kvm_host.h
-@@ -2581,7 +2581,8 @@ int kvm_arch_gmem_prepare(struct kvm *kvm, gfn_t gfn, kvm_pfn_t pfn, int max_ord
-  * Returns the number of pages that were populated.
-  */
- typedef int (*kvm_gmem_populate_cb)(struct kvm *kvm, gfn_t gfn, kvm_pfn_t pfn,
--                                   void __user *src, int order, void *opaque);
-+                                   unsigned long mmu_seq, void __user *src,
-+                                   int order, void *opaque);
+	- `kernel-irqchip=split` The code I pushed out only works with IRQ chip
+	  in split mode.
 
- long kvm_gmem_populate(struct kvm *kvm, gfn_t gfn, void __user *src, long npages,
-                       kvm_gmem_populate_cb post_populate, void *opaque);
-diff --git a/virt/kvm/guest_memfd.c b/virt/kvm/guest_memfd.c
-index 427c0acee9d7..c9a87197412e 100644
---- a/virt/kvm/guest_memfd.c
-+++ b/virt/kvm/guest_memfd.c
-@@ -836,6 +836,7 @@ long kvm_gmem_populate(struct kvm *kvm, gfn_t start_gfn, void __user *src, long
-                pgoff_t index = kvm_gmem_get_index(slot, gfn);
-                bool is_prepared = false;
-                kvm_pfn_t pfn;
-+               unsigned long mmu_seq = kvm->mmu_invalidate_seq;
+	- `device-plane=2` A new property defines the plane which controls
+	  devices. This is important so that QEMU can send IRQs to the correct
+	  plane. As COCONUT-SVSM currently always runs the guest on plane 2,
+	  the value of the property must also be 2.
 
-                if (signal_pending(current)) {
-                        ret = -EINTR;
-@@ -869,7 +870,7 @@ long kvm_gmem_populate(struct kvm *kvm, gfn_t start_gfn, void __user *src, long
-                }
+Known Issues
+------------
 
-                p = src ? src + i * PAGE_SIZE : NULL;
--               ret = post_populate(kvm, gfn, pfn, p, max_order, opaque);
-+               ret = post_populate(kvm, gfn, pfn, mmu_seq, p, max_order, opaque);
-                if (!ret)
-                        kvm_gmem_mark_prepared(folio);
+During development of the KVM changes it became pretty to me that having one
+`struct kvm_vcpu` object per plane causes several problems. The problems all
+boil down to the fact that this approach introduces false unsharing of state
+which needs to be per-VCPU instead of per-Plane. I worked around these problems
+where needed to get things running, it can be seen in several patches in the
+Linux branch.
 
+But my changes do by far not cover all state which needs to be shared but is
+now factually unshared between planes. The result is that people will likely
+run into issues with the code above once leaving the beaten track I tested.
+
+The changes on the `struct kvm` object are correct, there is still one for all
+planes with a separate per-plane structure that holds the per-plane state.
+
+Next Steps
+----------
+
+To turn this into a stable and upstreamable feature the first next step is to
+update the base patches to use only one `struct kvm_vcpu` object for all planes
+and factor out per-plane state into a separate struct. Then the SEV-SNP
+specific changes will be rebased on-top.
+
+Happy testing!
+
+Regards,
+
+	Joerg
 
