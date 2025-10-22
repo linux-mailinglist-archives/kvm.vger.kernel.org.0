@@ -1,842 +1,354 @@
-Return-Path: <kvm+bounces-60860-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-60861-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
-	by mail.lfdr.de (Postfix) with ESMTPS id B9F11BFE6C8
-	for <lists+kvm@lfdr.de>; Thu, 23 Oct 2025 00:35:11 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4E6D1BFE724
+	for <lists+kvm@lfdr.de>; Thu, 23 Oct 2025 00:45:44 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 0A6C14EB601
-	for <lists+kvm@lfdr.de>; Wed, 22 Oct 2025 22:35:10 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 9FF271A05AA9
+	for <lists+kvm@lfdr.de>; Wed, 22 Oct 2025 22:46:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8880E2FE575;
-	Wed, 22 Oct 2025 22:35:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 66A7530507E;
+	Wed, 22 Oct 2025 22:45:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="hcNrU3QH"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="ps5i16Lv"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.17])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f202.google.com (mail-pl1-f202.google.com [209.85.214.202])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1D1351D798E;
-	Wed, 22 Oct 2025 22:34:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=198.175.65.17
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761172502; cv=fail; b=BaEYB2X1KrdgJyAMd8QsJEqcSo9wvM3kaOL7A/uDyhaS/X55uA0hOXF6zWXPtRtGgjl7MHnprtvWA9NSpCw3IDPqJ5wEIv3X8R9gdIp2LwzRdVhyMp7oM7IBkqVduArwG1yrnsfsnKiri3lEWk5uQz6OfGTbaGKMskv5yJpTF0U=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761172502; c=relaxed/simple;
-	bh=noWPzJcsUnwroScrXviGTrhVdeyG6/B2ogny4Seq0CI=;
-	h=Message-ID:Date:Subject:To:CC:References:From:In-Reply-To:
-	 Content-Type:MIME-Version; b=RBJuRoMAa8SXGJKRolVTXXBCqmDqqwBjjwbQWXn0JECgihmxGWwyGcv9JAfrSd6pOV7HUqVHGBRrtzr7dh9XUajNf8vaFOZV2TYfZH/YbE/3F5CYh8fw1h+FL+duDXd3zV+DmlaUGpviKVOIna3I8mlG/oxmdRNpRc0iAuTPkaY=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=hcNrU3QH; arc=fail smtp.client-ip=198.175.65.17
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1761172500; x=1792708500;
-  h=message-id:date:subject:to:cc:references:from:
-   in-reply-to:content-transfer-encoding:mime-version;
-  bh=noWPzJcsUnwroScrXviGTrhVdeyG6/B2ogny4Seq0CI=;
-  b=hcNrU3QHtHFzvqzzNEf2JoUOIVoNI+3jxSWZiMqTfI+boYu/Sj/rN2tP
-   t1BO9WzmE8dUQ3/ob2rij1c28BPXaAC2cyR1PxW8+nI9ouAxcr3tb8sX/
-   ZYKbYLGhn8wUDgp43bza+xPXpT47sll4unXe+PVq6kmQdbrWH+XHgEhjH
-   Ez1Ko0tGIgp2YaL77ogjs3s/8tyxYFCFCLw5fig1WJ7qCBlZzTqD2qbMY
-   iP0IUmcH3Svu5EPFa7esAMwyXkcKAxO4oClN1RrqjSJlSoNskjza8Cvas
-   2yZntw1g+WNwEysF6IZfjQ+2zXHGbw8d3I/FvYatI9JXrbZW9BI+tA4yC
-   Q==;
-X-CSE-ConnectionGUID: zDt1yKgeTDuYNdS1n1UcRw==
-X-CSE-MsgGUID: HcqygnUsTGi0J/jPFDLQFA==
-X-IronPort-AV: E=McAfee;i="6800,10657,11531"; a="63254868"
-X-IronPort-AV: E=Sophos;i="6.17,312,1747724400"; 
-   d="scan'208";a="63254868"
-Received: from orviesa009.jf.intel.com ([10.64.159.149])
-  by orvoesa109.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 22 Oct 2025 15:35:00 -0700
-X-CSE-ConnectionGUID: EF+6HGn4S0uQWhZPZMTcNA==
-X-CSE-MsgGUID: 8ocVPeoUSfGkIU5uVQzX6w==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.19,248,1754982000"; 
-   d="scan'208";a="183580511"
-Received: from orsmsx903.amr.corp.intel.com ([10.22.229.25])
-  by orviesa009.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 22 Oct 2025 15:34:59 -0700
-Received: from ORSMSX903.amr.corp.intel.com (10.22.229.25) by
- ORSMSX903.amr.corp.intel.com (10.22.229.25) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.27; Wed, 22 Oct 2025 15:34:59 -0700
-Received: from ORSEDG903.ED.cps.intel.com (10.7.248.13) by
- ORSMSX903.amr.corp.intel.com (10.22.229.25) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.27 via Frontend Transport; Wed, 22 Oct 2025 15:34:59 -0700
-Received: from BL0PR03CU003.outbound.protection.outlook.com (52.101.53.17) by
- edgegateway.intel.com (134.134.137.113) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.27; Wed, 22 Oct 2025 15:34:59 -0700
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=CLPc30xOUW/o9Ci4mxNF9O4FnpC9LSlKDftM97AKoWoilglD7kf38sWVqSQOS92o+OYVRLtHd/P2OHxr65MJhsMD2uFDuSfwqQSJUSR3z65YujCDEPvCH09ZPTmErZczJKuiZnfNSkxMrlI8o+SwkXntHVEMsm0TEgVPDWPvNQmo7ReusDPExEzi2c2g3UioFHviOwP3ggTLQ3C5EM6P95yUjLOawpYMK06cMfoOvTNcdXiYwatcMJPnvNElxnshBwzZJI6twsXObC+OBEoTem16KMS/wbEy2kN9xAuI/KXbp/zF6Z+cocBTWg/Zzf1S5c3ERFaqkWkyPvmwoTXVOw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=Pt+nYCEBdnCIxzApKOoXYveF48zW8EBmNxa03C4zwPo=;
- b=IgMA4ybNj1jHnxTvsPoCU+RCTZPXDZSo1pFMtPmlqeprnJM2GT1iGM60j4WnYOvMw35XJBHbaBD6YRLs4ZGoF7VTtfcW/SM0PlfZ9OU4h7xBFx8pj6ad/gW6FxHdS8S2G9YCTopkarX0dE9WuFzYFyMNsoLQ8+FYwV0C2PFw+aV9VYHbEucCVvW8rGTslDAKOpDsgsyI+41fzWI4ya1d6Jafs17BaBUUPUcWfFmKHLwvwRXmePpp3udnWh5JFmJE8EMnAAXi4rbQaLkXZskOOXYIbirTtzeW2iZj5TlzXUHU0OaGQf9nGXLgK6z+He7N5ikwD+d/SwRGtVPLAIruiA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-Received: from MN0PR11MB6011.namprd11.prod.outlook.com (2603:10b6:208:372::6)
- by MW4PR11MB7032.namprd11.prod.outlook.com (2603:10b6:303:227::5) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9253.12; Wed, 22 Oct
- 2025 22:34:55 +0000
-Received: from MN0PR11MB6011.namprd11.prod.outlook.com
- ([fe80::bbbc:5368:4433:4267]) by MN0PR11MB6011.namprd11.prod.outlook.com
- ([fe80::bbbc:5368:4433:4267%6]) with mapi id 15.20.9253.011; Wed, 22 Oct 2025
- 22:34:55 +0000
-Message-ID: <0c76e7a9-c6db-4148-bd9e-a96fcd01247f@intel.com>
-Date: Thu, 23 Oct 2025 00:34:50 +0200
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2 06/26] drm/xe/pf: Add support for encap/decap of
- bitstream to/from packet
-To: =?UTF-8?Q?Micha=C5=82_Winiarski?= <michal.winiarski@intel.com>, "Alex
- Williamson" <alex.williamson@redhat.com>, Lucas De Marchi
-	<lucas.demarchi@intel.com>, =?UTF-8?Q?Thomas_Hellstr=C3=B6m?=
-	<thomas.hellstrom@linux.intel.com>, Rodrigo Vivi <rodrigo.vivi@intel.com>,
-	Jason Gunthorpe <jgg@ziepe.ca>, Yishai Hadas <yishaih@nvidia.com>, Kevin Tian
-	<kevin.tian@intel.com>, <intel-xe@lists.freedesktop.org>,
-	<linux-kernel@vger.kernel.org>, <kvm@vger.kernel.org>, Matthew Brost
-	<matthew.brost@intel.com>
-CC: <dri-devel@lists.freedesktop.org>, Jani Nikula
-	<jani.nikula@linux.intel.com>, Joonas Lahtinen
-	<joonas.lahtinen@linux.intel.com>, Tvrtko Ursulin <tursulin@ursulin.net>,
-	David Airlie <airlied@gmail.com>, Simona Vetter <simona@ffwll.ch>, "Lukasz
- Laguna" <lukasz.laguna@intel.com>
-References: <20251021224133.577765-1-michal.winiarski@intel.com>
- <20251021224133.577765-7-michal.winiarski@intel.com>
-Content-Language: en-US
-From: Michal Wajdeczko <michal.wajdeczko@intel.com>
-In-Reply-To: <20251021224133.577765-7-michal.winiarski@intel.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 8bit
-X-ClientProxiedBy: BE1P281CA0068.DEUP281.PROD.OUTLOOK.COM
- (2603:10a6:b10:26::9) To MN0PR11MB6011.namprd11.prod.outlook.com
- (2603:10b6:208:372::6)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 607CE26F2BB
+	for <kvm@vger.kernel.org>; Wed, 22 Oct 2025 22:45:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.202
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1761173132; cv=none; b=tSO/1DTG0IvrfOiPOULI9b2QP/cEqAKWlZWabg+vkwai72uIwa1aVHIJAat6Y90eOzdB3Gk0yymMce+Dpwp749mdFgnfQvjbZOo8g2+xPvPDdcutuoymXqp0k9+q2pMA/Ej8soD/x4/0G+wECPZ+lCKKZ+R8UviaF1zljeQhkEU=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1761173132; c=relaxed/simple;
+	bh=V5Zc0HlkBIosrLePMk48I+xG6HyK0OvSh8a8dnHIO80=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=Rppi/iAenc84quj1e6V/nU189SQWCKT2h5+pMIDH5BA3sOXVVMYzCkEYubMX5Lbb40cqx1Bx+SXYqu8peR8EiBzLHGqnTageFB6WGfkjo7PtcsR9W/5w65c6JIzDmZze4wzP1lsC4OYthT0ScSzPlmX0zrhZVnba/32NUf6w5pM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--ackerleytng.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=ps5i16Lv; arc=none smtp.client-ip=209.85.214.202
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--ackerleytng.bounces.google.com
+Received: by mail-pl1-f202.google.com with SMTP id d9443c01a7336-27356178876so657485ad.1
+        for <kvm@vger.kernel.org>; Wed, 22 Oct 2025 15:45:30 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1761173130; x=1761777930; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=gGF3nY+bQhEuJksVeN/ApJVbDNkeBuYq31H02jFVpBo=;
+        b=ps5i16Lv1zKL9/XFMVts0n4wGDIzrh0w5Bb0iMcHwe17/Bn/MfXvNpfKwgxWyfyd3S
+         2WX0Wi5J15awVyYZb0IWIQAiUQsWCgsC656RbO04esie6zAWC88+HIJQq8Da7EDDmU3T
+         rn6VPN/jfAdNxFmF+wwRRxasVdFa8sE3JiCuYx8fywZXGYuwzvpZn7AKV5XKS1CeRFct
+         SV1o2HoGwwSTmB5jrKDu2uKEQhQZTvnyylFTASo/G3JAGNpqTkBAL9XgGcXpsbdohHKO
+         E8iqsSqnZUNBxWJzdY9AeeghbDFWU5rIIM4wGV/6xTzaQbuXvCY8LOJuEfJjXN2bG9br
+         q+XA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1761173130; x=1761777930;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=gGF3nY+bQhEuJksVeN/ApJVbDNkeBuYq31H02jFVpBo=;
+        b=ZXZeUHIDFpj3yCS/oJxRm4ludFY6bSOBfWbDbetvFFQ9GKiam1NNSM9epgN++tpNPg
+         LCM/A5zWegkLTukNTChR+ixw6SjXiqceswVoV+zzKRLnxQgQZBvSvPvfgNBDqIs4HhAF
+         cjtwHjx6HVDcFhibk3AGK36XZc7oZsZ3BpXTE9mr82olvBjFYtOBg4/DdmX1r6Ag3YRY
+         2GdlJ9XH9FXkNSwAjL7cfjfyq3lzXeIWnnfrUDJ9PyaXJnwlT1TxYZETcuF72o+fusxp
+         uaauEM2DiHm6xD34QqBqmJu+n5tMy62+xkue44DqwB2RuUc4KzgWcvyMq7Q8+iKc3xL7
+         ChJQ==
+X-Forwarded-Encrypted: i=1; AJvYcCV1VmIrLsuRqJFiFEucuo60Vi28srsRguQrzLaKiem0aFgx+nnHRjjhEosfxaKhTHXzXsM=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yzyfc92dzMLsWjwlx9dE4XNNnApX1f6Z3Fv/FfNCzRmdxU7rMeP
+	+7nRtr0NrBE4m/4nMDHe3Gn48bP6HrFllfIRczKDta9AeI7uolGoJ1M1IEe3z56zyJ/X14bPijw
+	Ddd7k+etyBtsMo2LgtoNRtD8Pfw==
+X-Google-Smtp-Source: AGHT+IHD5TZ3PlH4BoXojkeR7Hq6pa25rPFAC44tSG4hp0SVSWugJiynOfGyj0/LVdH6RcIi4tLRlKxt4/SfCTBJBg==
+X-Received: from pjbfv10.prod.google.com ([2002:a17:90b:e8a:b0:33b:ab61:4f71])
+ (user=ackerleytng job=prod-delivery.src-stubby-dispatcher) by
+ 2002:a17:902:f70b:b0:283:c950:a76f with SMTP id d9443c01a7336-290cc2f91d2mr289431935ad.43.1761173129640;
+ Wed, 22 Oct 2025 15:45:29 -0700 (PDT)
+Date: Wed, 22 Oct 2025 15:45:28 -0700
+In-Reply-To: <diqz4irqg9qy.fsf@google.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: MN0PR11MB6011:EE_|MW4PR11MB7032:EE_
-X-MS-Office365-Filtering-Correlation-Id: 24c16fd7-aa45-45fa-346f-08de11bb395c
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230040|1800799024|7416014|376014|366016|921020;
-X-Microsoft-Antispam-Message-Info: =?utf-8?B?QmJJY0NSTDZuQ3ZsYi9uZlFPTGpuTmloVHd3M0FSS0FHMXZVU1hDYXZqZGhZ?=
- =?utf-8?B?eFhIQ1pSQi9EaytsakphNnFNdWVUNEZEak1ucDdnVzFCYU5Wa3RpVk53VkJV?=
- =?utf-8?B?ZlYwdnVKL1pBQi9TRlk3aGV2Q0poT05NVVJwYWFSTnZvQ2djRm8zTURzVnVv?=
- =?utf-8?B?Q0FaNWs5UzNVU1NQK0h5ZUZmL0Zqb0NFUndkS1lhY1g3WGxwQW9oUjBrb1Zj?=
- =?utf-8?B?cXlZNmt6eCtsdlcrdldLcEtXYS8xQlY1NE9yZU5iV1Q0Q0I0azVGcHg4d2p3?=
- =?utf-8?B?OGxxb0l6cVQ0WVlkbUIxOHZWOVJHNjJiRjN1WVkwR3NRTWJ6MU5sb1VpSXZZ?=
- =?utf-8?B?TnB0eGhNYWNMUVBUSmMrYTlUR1dvTDJwVlZ5SUI0aG13UTA0UzA2dDczb2g3?=
- =?utf-8?B?RkduZWVXZk4zMWJoQ05UMmgrMWswVnMxbnVOeGJNRDVYZ2pJQ0R2cjE3M1Y5?=
- =?utf-8?B?aTlHYlowTWZFeU80OThscXE5Z3MzeU1MU2JGWFZwZWttVXB6ZThPTjFXZG1a?=
- =?utf-8?B?K2RYU2JRUlpSWFV0cTdkY0lYWDRMSmRJT0VHMUVub3pRNTAyOHBiWDVJYjRV?=
- =?utf-8?B?T3ZNWDhaVDMvVGJjblNrOWZBQ2ttOUpqQW8rV1ZxbEZ3ajdJK1lLRCt0MzBo?=
- =?utf-8?B?bTlaTFhTVDJTL0ZpaG9yb3NUMk50ZTcxYXFVZHBBOWpDd1BsS1NsVHRjWU1W?=
- =?utf-8?B?cDFHMWtSMkpreVpsSlhJdjBIbHp2ZzB4MWo2L1VaREx1d3ZIMzg3VlJFeXdl?=
- =?utf-8?B?Vjk4eW9KV2F5cnlwcFdBbEgzbzRkWENMYy8yRGlkb1lWZ3N6YzZnaTJCTk1n?=
- =?utf-8?B?LzUraHFkTkZMdjcvMkNiU25tNDEzSGp3bU1iVHNJb3pjZzdVeFV5aTYrWkJZ?=
- =?utf-8?B?eTlKV29MTElRKzFEYU5meXhHOEZVZkFKWnRVNVRvSUE5RjRZZy9tTlFJeldW?=
- =?utf-8?B?YTd0L2tXZ2gvMzhndU1uYUFKUWpYaUtzaDNETllJTXQwdHZjOW5nczJmTTlL?=
- =?utf-8?B?SUZMcGlOc2k3cGxuZDFGZEhFWTQyOGRtL29qUkovY1ZPdTJEb2tYOS93QjNl?=
- =?utf-8?B?aUUydEo1N0tob1BLdlE4aHA2WlJWbFlaYmhEanZ4RFdaTTJrQnBjKzRqYVY5?=
- =?utf-8?B?bDk2ZEIwc3dVT2h1Nk5sbGI3Sk5EenEzM1Q2aUlwUHl1WjR0c3hLSS96Q0Zy?=
- =?utf-8?B?OVlPV3VJbjR3bnk0Qk9VQWEwcEYwUVpaaElYWDZ6Wm45UEQ1Znd0c2FQUkta?=
- =?utf-8?B?S3h1SCtLQjNqWWRKcnBpc0hscE9BdFRuSDN1b2xaY0R2d3J2WFRCMU84QkZv?=
- =?utf-8?B?cktLUXVUek1VNXNoME5CaTlpaG96aWNTQ3lLQXhyWDB2WTJoUDVJMldjK3dV?=
- =?utf-8?B?SXFscEM0OHNXUEZHOVczWmt4TU9FUTBvVmpoUENKc2VOU203TnBYc21XNVNu?=
- =?utf-8?B?dU8rTVByVkZ0VmgxR0xURjBPSFJkaEpMUVZ4ekdDN2toUisycTZXck0vT3hR?=
- =?utf-8?B?cUJkRE9hejJQNnhmMGxNRHBIREdKdDdiQi9QNVFvTjdBNDZobFJqSDNCQnZ0?=
- =?utf-8?B?Q3licGtwN3VtNjUyak5vRXQxT0phQUV1NWh4V29EUUhETEw5SDlXaEd2UnRw?=
- =?utf-8?B?NTd5ZG4relJKaCsyZWNmaHhwb3lKcG4xTmNEUWlwa1dDSDJVcEdCRHJ0cVpr?=
- =?utf-8?B?Q3o0V01wTUgvakJHL2hQNnNJOGlkZ3Bod01zMVR5U1V6QTBxdDF3TkhYMTJ6?=
- =?utf-8?B?NTYrbXMxWi9LczQzK1hkNjNZTHZlS1MyeFE4a29VSElCTjBaMDZmUVFhNFpF?=
- =?utf-8?B?Ynd3UnVaamxHRUtqTkc0R243SzNaRG5ET3MxTmQwYmcrelM4WHc5Y3luT0Ji?=
- =?utf-8?B?ZkpPcGxMVXB3ZXpZVnJsZ0lpcjQrbWhaOEZ5bHNyU0ZYeFJKTkg1WnRwV0lq?=
- =?utf-8?B?b0U0OEFQQmJUUDhuVWcxYnBwTTh3MlFLa3d3ck1ZdXpDN3NOTTlONHB3R3Uw?=
- =?utf-8?Q?BbtTs8vw2XYqutNKZ37QgDDSvKCrBE=3D?=
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:MN0PR11MB6011.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(7416014)(376014)(366016)(921020);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?b3VhbVBQV0FaZWJMSlR1M0FMd0dzTHJsckpmYlVoRStPamk2L2Q1SzZiNHdm?=
- =?utf-8?B?N3YrOEJpTjQ0c1JzL1JCRSt1VVJpWXljcVI0Z2ZvNkE0Y3RjdXF4RW05TWhD?=
- =?utf-8?B?dlhBVXczWFE1Yjg4MlpXK3RFTmdNWTI3TEQvT2xzdUFpZnhXN3pNTDRnM3Vk?=
- =?utf-8?B?Vk5HVWFuK2trUXp0UGVWa1MxUmVLa3BmMUkxeVFZNmUwNVRHY2RZVGx4Z1V6?=
- =?utf-8?B?aXJBZmJrWklneC9xaHlBVlIyVUx3RGhicTFMYVcxTWdNZkNQZGtDMVNOcDVX?=
- =?utf-8?B?bWEyMDBYeFRQa21RODM4dFFvcFRCc3QxSkI2Zll5N1RoK3dBRGk1K2E2TkFN?=
- =?utf-8?B?MHVTRTFvQ3JhV1JBV1VySjFYeVRkYTZVZS90cGtSWmVMcU0zUVBFWHNXS2Z1?=
- =?utf-8?B?MGZGd3BVL1lNeHd6bldQZHVhZnVhVkRtdUQvNk9GampZMlRZQnhaUklvbVd6?=
- =?utf-8?B?S2pBZ21TUEROYlBjMXVydGhKYkI2MDhqZm40STZmUjRsQTY1cjVFa0dGQ0oz?=
- =?utf-8?B?blNIbnNzZHppOUoxMmFpRjhqbVhYdW4yZXdWYUo3UXprcThLUzdIcHRvK0Zr?=
- =?utf-8?B?eFh2YWdOQ0NoZGFuQ2R1TWpWbEZIcytGVmNtNnczK1RtVEc3K21JeHpzSm1v?=
- =?utf-8?B?WUxEYnRXaXRGR080TnIyMkJBbisyTUJhQWdwTmtTK215cHRBVlQ2akFZYm1S?=
- =?utf-8?B?VU5NSlQ0dGZWVXlsRGFBNGhIS3RrZjJLdUx1dzRHeWJ3VjY2L0JEVHUxcU1z?=
- =?utf-8?B?RTEyYzVtU3F5bHdsL243bVRtcWYvZjlUdXpIRkJpSUFSMEJaV2d6R1kySVRS?=
- =?utf-8?B?Qmt4c0YvV1hJVGNMckNNZklMa3BqQVIzSmxpQ0szZURSRVZZS3VNTmN0L2wv?=
- =?utf-8?B?TUQ5U1crVGk3OXNGNHROZWJmdGlWQS82cGlFd2crTlBuTjhnaWRrVFVnaHNU?=
- =?utf-8?B?YzJEZlFDME1wb2w3ZmlmYXNuYjZsa0N3V1dYWFNZNlpFeHFOSlNPak9IQjl4?=
- =?utf-8?B?TVMyR0ZHNVZHZXlXY3RtNWtUSndEM2ZzUG42U25wL0lwZ1pHTUtDVHpyUVgr?=
- =?utf-8?B?VEtESXVkNjVuM3hndUZBR3RFVmp4bFVBeEtldWpOWkFDc2psOHBoUE5oMHdM?=
- =?utf-8?B?eUpaUENTTEljam15Um8vdkorMHl6bmZMeDJWajJHTDJWcXc2VXdNWWY1S2Vn?=
- =?utf-8?B?ZStKKzlFYkVtSXV5bmxTeDBTdk1jaHJFU0pIclBGYUpzU2FIaGRBMHJ4S3Vw?=
- =?utf-8?B?c3ZndlI1emp4dkZMMmxyWE0xRGQ3eFMzRE1sY3UrL2RoNDRrY0dEN3ZjOWZQ?=
- =?utf-8?B?eEtiYmxzR0VOQ2xzSUxIYWt0dmc4Ymw5TXNBK2JrM2tjSEJkZGZ0aGVQN2VY?=
- =?utf-8?B?dXZsRkRMbklra1VEdjdvY1dxNzJUUUZuZk4yb0xmUkNpdTJDdjcyOGZWdmRm?=
- =?utf-8?B?MWJuWlgxMWRweTB6V2NMSzg3L0NRa21ab1l3b2hrVlVmNG1oSGVJSGRERm5y?=
- =?utf-8?B?VDNyaFRWd211cmYxVUF3dWpnRUtaTVBpN2RZaDZSdkxrQTFUNHFhYUFBMmt3?=
- =?utf-8?B?NzB0M25RSFk5dzBsRVY5SWdOYUlRU01KZklpVDB0a1NQWXlNbTZxTFFMZGxs?=
- =?utf-8?B?U3UxbURycytoOUMrVE1hUjY2QnRaU3YrTEgxZUVGdWdrSGVCaTA4czFweUJC?=
- =?utf-8?B?YjZGZ2RmVllFR1huTkZQaVdGSmRBQVN5KzZKSmpvZkdBb0xrdmlIcjh5Nk5L?=
- =?utf-8?B?ZXlWcng1OXNrSFZUSUZaMko1dHpqUVM2VHNGN25CaUJ1akliRStLVXJFRWlM?=
- =?utf-8?B?UEdsaGRwNDdPVlp5L2R0dmREbHVCTFZ2QnN1aEtLbUdTNE5IdWMzNUE3N0w2?=
- =?utf-8?B?NTVlcm9OdVY0OEFadjdMWjZhem1SUyszcWNFT1IxZHZONWRIWXlLUXlKMFN0?=
- =?utf-8?B?aTRtY1F4SVN5VlVGVHkvRk1OeWEyakY1TjZTM2ExVVJ5OUVtamNRc1NvS1pa?=
- =?utf-8?B?aWNuSHNSYlRSN3RtS2cwV29PWFZ2QUd2Q3pXN1paaytvNm9rUFdpOGdqTmdk?=
- =?utf-8?B?VXlNRmVwa01FY2tHSStsMWhEcGc4Nm5GaktoVWVwaHR0dkxaWjIrdkQ0Tkh3?=
- =?utf-8?B?cVhOc1ZxaEhmT045WmlkVHdlN3VXc3F2SjhIL3cxbUJvclp4NTFJV2lQZVVU?=
- =?utf-8?B?MWc9PQ==?=
-X-MS-Exchange-CrossTenant-Network-Message-Id: 24c16fd7-aa45-45fa-346f-08de11bb395c
-X-MS-Exchange-CrossTenant-AuthSource: MN0PR11MB6011.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 22 Oct 2025 22:34:55.4075
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: woyF4cpEC49yGF3Xn7qAKaFyhT4LI628vpXZtoSrjwyCYRMjzvvDekakrXQbX2QQeRIOsChU6LIjJXnsSI9glV1CFYQl317ppXzqhoy6sqA=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: MW4PR11MB7032
-X-OriginatorOrg: intel.com
+Mime-Version: 1.0
+References: <cover.1760731772.git.ackerleytng@google.com> <8ee16fbf254115b0fd72cc2b5c06d2ccef66eca9.1760731772.git.ackerleytng@google.com>
+ <2457cb3b-5dde-4ca1-b75d-174b5daee28a@arm.com> <diqz4irqg9qy.fsf@google.com>
+Message-ID: <diqzy0p2eet3.fsf@google.com>
+Subject: Re: [RFC PATCH v1 07/37] KVM: Introduce KVM_SET_MEMORY_ATTRIBUTES2
+From: Ackerley Tng <ackerleytng@google.com>
+To: Steven Price <steven.price@arm.com>, cgroups@vger.kernel.org, kvm@vger.kernel.org, 
+	linux-doc@vger.kernel.org, linux-fsdevel@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org, 
+	linux-mm@kvack.org, linux-trace-kernel@vger.kernel.org, x86@kernel.org
+Cc: akpm@linux-foundation.org, binbin.wu@linux.intel.com, bp@alien8.de, 
+	brauner@kernel.org, chao.p.peng@intel.com, chenhuacai@kernel.org, 
+	corbet@lwn.net, dave.hansen@intel.com, dave.hansen@linux.intel.com, 
+	david@redhat.com, dmatlack@google.com, erdemaktas@google.com, 
+	fan.du@intel.com, fvdl@google.com, haibo1.xu@intel.com, hannes@cmpxchg.org, 
+	hch@infradead.org, hpa@zytor.com, hughd@google.com, ira.weiny@intel.com, 
+	isaku.yamahata@intel.com, jack@suse.cz, james.morse@arm.com, 
+	jarkko@kernel.org, jgg@ziepe.ca, jgowans@amazon.com, jhubbard@nvidia.com, 
+	jthoughton@google.com, jun.miao@intel.com, kai.huang@intel.com, 
+	keirf@google.com, kent.overstreet@linux.dev, liam.merwick@oracle.com, 
+	maciej.wieczor-retman@intel.com, mail@maciej.szmigiero.name, 
+	maobibo@loongson.cn, mathieu.desnoyers@efficios.com, maz@kernel.org, 
+	mhiramat@kernel.org, mhocko@kernel.org, mic@digikod.net, michael.roth@amd.com, 
+	mingo@redhat.com, mlevitsk@redhat.com, mpe@ellerman.id.au, 
+	muchun.song@linux.dev, nikunj@amd.com, nsaenz@amazon.es, 
+	oliver.upton@linux.dev, palmer@dabbelt.com, pankaj.gupta@amd.com, 
+	paul.walmsley@sifive.com, pbonzini@redhat.com, peterx@redhat.com, 
+	pgonda@google.com, prsampat@amd.com, pvorel@suse.cz, qperret@google.com, 
+	richard.weiyang@gmail.com, rick.p.edgecombe@intel.com, rientjes@google.com, 
+	rostedt@goodmis.org, roypat@amazon.co.uk, rppt@kernel.org, seanjc@google.com, 
+	shakeel.butt@linux.dev, shuah@kernel.org, suzuki.poulose@arm.com, 
+	tabba@google.com, tglx@linutronix.de, thomas.lendacky@amd.com, 
+	vannapurve@google.com, vbabka@suse.cz, viro@zeniv.linux.org.uk, 
+	vkuznets@redhat.com, will@kernel.org, willy@infradead.org, wyihan@google.com, 
+	xiaoyao.li@intel.com, yan.y.zhao@intel.com, yilun.xu@intel.com, 
+	yuzenghui@huawei.com
+Content-Type: text/plain; charset="UTF-8"
+
+Ackerley Tng <ackerleytng@google.com> writes:
+
+Found another issue with KVM_CAP_MEMORY_ATTRIBUTES2.
+
+KVM_CAP_MEMORY_ATTRIBUTES2 was defined to do the same thing as
+KVM_CAP_MEMORY_ATTRIBUTES, but that's wrong since
+KVM_CAP_MEMORY_ATTRIBUTES2 should indicate the presence of
+KVM_SET_MEMORY_ATTRIBUTES2 and struct kvm_memory_attributes2.
+
+Usage is kind of weird and I hope to get feedback on this as
+well.
+
+This describes the difference between the previous version of this patch
+and the one attached below.
+
+I also added this to the changelog
+
+  Add KVM_CAP_MEMORY_ATTRIBUTES2 to indicate that struct
+  kvm_memory_attributes2 exists and can be used either with
+  KVM_SET_MEMORY_ATTRIBUTES2 via the vm or guest_memfd ioctl.
+
+  Since KVM_SET_MEMORY_ATTRIBUTES2 is not limited to be used only with the vm
+  ioctl, return 1 for KVM_CAP_MEMORY_ATTRIBUTES2 as long as struct
+  kvm_memory_attributes2 and KVM_SET_MEMORY_ATTRIBUTES2 can be
+  used. KVM_CAP_MEMORY_ATTRIBUTES must still be used to actually get valid
+  attributes.
+
+  Handle KVM_CAP_MEMORY_ATTRIBUTES2 and return 1 regardless of
+  CONFIG_KVM_VM_MEMORY_ATTRIBUTES, since KVM_SET_MEMORY_ATTRIBUTES2 is not
+  limited to a vm ioctl and can also be used with the guest_memfd ioctl.
+
+
+Here's the entire patch so hopefully it's easy to swap out this entire
+patch over the original one.
 
 
 
-On 10/22/2025 12:41 AM, Michał Winiarski wrote:
-> Add debugfs handlers for migration state and handle bitstream
-> .read()/.write() to convert from bitstream to/from migration data
-> packets.
-> As descriptor/trailer are handled at this layer - add handling for both
-> save and restore side.
-> 
-> Signed-off-by: Michał Winiarski <michal.winiarski@intel.com>
-> ---
->  drivers/gpu/drm/xe/xe_sriov_migration_data.c  | 336 ++++++++++++++++++
->  drivers/gpu/drm/xe/xe_sriov_migration_data.h  |   5 +
->  drivers/gpu/drm/xe/xe_sriov_pf_control.c      |   5 +
->  drivers/gpu/drm/xe/xe_sriov_pf_debugfs.c      |  35 ++
->  drivers/gpu/drm/xe/xe_sriov_pf_migration.c    |  54 +++
->  .../gpu/drm/xe/xe_sriov_pf_migration_types.h  |   9 +
->  6 files changed, 444 insertions(+)
-> 
-> diff --git a/drivers/gpu/drm/xe/xe_sriov_migration_data.c b/drivers/gpu/drm/xe/xe_sriov_migration_data.c
-> index b04f9be3b7fed..4cd6c6fc9ba18 100644
-> --- a/drivers/gpu/drm/xe/xe_sriov_migration_data.c
-> +++ b/drivers/gpu/drm/xe/xe_sriov_migration_data.c
-> @@ -6,6 +6,44 @@
->  #include "xe_bo.h"
->  #include "xe_device.h"
->  #include "xe_sriov_migration_data.h"
-> +#include "xe_sriov_pf_helpers.h"
-> +#include "xe_sriov_pf_migration.h"
-> +#include "xe_sriov_printk.h"
-> +
-> +static struct mutex *pf_migration_mutex(struct xe_device *xe, unsigned int vfid)
-> +{
-> +	xe_assert(xe, IS_SRIOV_PF(xe));
-> +	xe_assert(xe, vfid <= xe_sriov_pf_get_totalvfs(xe));
+From 8887ba58f6fd97c529c8152d6f18e5e26651dbec Mon Sep 17 00:00:00 2001
+From: Ackerley Tng <ackerleytng@google.com>
+Date: Thu, 16 Oct 2025 11:48:01 -0700
+Subject: [PATCH] KVM: Introduce KVM_SET_MEMORY_ATTRIBUTES2
 
-other helpers have sep line here 
+Introduce a "version 2" of KVM_SET_MEMORY_ATTRIBUTES to support returning
+information back to userspace.
 
-> +	return &xe->sriov.pf.vfs[vfid].migration.lock;
-> +}
-> +
-> +static struct xe_sriov_migration_data **pf_pick_pending(struct xe_device *xe, unsigned int vfid)
-> +{
-> +	xe_assert(xe, IS_SRIOV_PF(xe));
-> +	xe_assert(xe, vfid <= xe_sriov_pf_get_totalvfs(xe));
-> +	lockdep_assert_held(pf_migration_mutex(xe, vfid));
-> +
-> +	return &xe->sriov.pf.vfs[vfid].migration.pending;
-> +}
-> +
-> +static struct xe_sriov_migration_data **
-> +pf_pick_descriptor(struct xe_device *xe, unsigned int vfid)
-> +{
-> +	xe_assert(xe, IS_SRIOV_PF(xe));
-> +	xe_assert(xe, vfid <= xe_sriov_pf_get_totalvfs(xe));
-> +	lockdep_assert_held(pf_migration_mutex(xe, vfid));
-> +
-> +	return &xe->sriov.pf.vfs[vfid].migration.descriptor;
-> +}
-> +
-> +static struct xe_sriov_migration_data **pf_pick_trailer(struct xe_device *xe, unsigned int vfid)
-> +{
-> +	xe_assert(xe, IS_SRIOV_PF(xe));
-> +	xe_assert(xe, vfid <= xe_sriov_pf_get_totalvfs(xe));
-> +	lockdep_assert_held(pf_migration_mutex(xe, vfid));
-> +
-> +	return &xe->sriov.pf.vfs[vfid].migration.trailer;
-> +}
->  
->  static bool data_needs_bo(struct xe_sriov_migration_data *data)
->  {
-> @@ -43,6 +81,9 @@ xe_sriov_migration_data_alloc(struct xe_device *xe)
->   */
->  void xe_sriov_migration_data_free(struct xe_sriov_migration_data *data)
->  {
-> +	if (IS_ERR_OR_NULL(data))
-> +		return;
-> +
->  	if (data_needs_bo(data))
->  		xe_bo_unpin_map_no_vm(data->bo);
->  	else
-> @@ -125,3 +166,298 @@ int xe_sriov_migration_data_init_from_hdr(struct xe_sriov_migration_data *data)
->  
->  	return mig_data_init(data);
->  }
-> +
-> +static ssize_t vf_mig_data_hdr_read(struct xe_sriov_migration_data *data,
-> +				    char __user *buf, size_t len)
-> +{
-> +	loff_t offset = sizeof(data->hdr) - data->hdr_remaining;
-> +
-> +	if (!data->hdr_remaining)
-> +		return -EINVAL;
-> +
-> +	if (len > data->hdr_remaining)
-> +		len = data->hdr_remaining;
-> +
-> +	if (copy_to_user(buf, (void *)&data->hdr + offset, len))
-> +		return -EFAULT;
-> +
-> +	data->hdr_remaining -= len;
-> +
-> +	return len;
-> +}
-> +
-> +static ssize_t vf_mig_data_read(struct xe_sriov_migration_data *data,
-> +				char __user *buf, size_t len)
-> +{
-> +	if (len > data->remaining)
-> +		len = data->remaining;
-> +
-> +	if (copy_to_user(buf, data->vaddr + (data->size - data->remaining), len))
-> +		return -EFAULT;
-> +
-> +	data->remaining -= len;
-> +
-> +	return len;
-> +}
-> +
-> +static ssize_t __vf_mig_data_read_single(struct xe_sriov_migration_data **data,
-> +					 unsigned int vfid, char __user *buf, size_t len)
-> +{
-> +	ssize_t copied = 0;
-> +
-> +	if ((*data)->hdr_remaining)
-> +		copied = vf_mig_data_hdr_read(*data, buf, len);
-> +	else
-> +		copied = vf_mig_data_read(*data, buf, len);
-> +
-> +	if ((*data)->remaining == 0 && (*data)->hdr_remaining == 0) {
-> +		xe_sriov_migration_data_free(*data);
-> +		*data = NULL;
-> +	}
-> +
-> +	return copied;
-> +}
-> +
-> +static struct xe_sriov_migration_data **vf_mig_pick_data(struct xe_device *xe, unsigned int vfid)
-> +{
-> +	struct xe_sriov_migration_data **data;
-> +
-> +	data = pf_pick_descriptor(xe, vfid);
-> +	if (*data)
-> +		return data;
-> +
-> +	data = pf_pick_pending(xe, vfid);
-> +	if (!*data)
-> +		*data = xe_sriov_pf_migration_save_consume(xe, vfid);
-> +	if (*data)
-> +		return data;
-> +
-> +	data = pf_pick_trailer(xe, vfid);
-> +	if (*data)
-> +		return data;
-> +
-> +	return ERR_PTR(-ENODATA);
-> +}
-> +
-> +static ssize_t vf_mig_data_read_single(struct xe_device *xe, unsigned int vfid,
-> +				       char __user *buf, size_t len)
-> +{
-> +	struct xe_sriov_migration_data **data = vf_mig_pick_data(xe, vfid);
-> +
-> +	if (IS_ERR_OR_NULL(data))
+This new ioctl and structure will, in a later patch, be shared as a
+guest_memfd ioctl, where the padding in the new kvm_memory_attributes2
+structure will be for writing the response from the guest_memfd ioctl to
+userspace.
 
-vf_mig_pick_data() seems to never return NULL, so maybe just IS_ERR() ?
+A new ioctl is necessary for these reasons:
 
-> +		return PTR_ERR(data);
-> +
-> +	return __vf_mig_data_read_single(data, vfid, buf, len);
-> +}
-> +
-> +/**
-> + * xe_sriov_migration_data_read() - Read migration data from the device.
-> + * @xe: the &xe_device
-> + * @vfid: the VF identifier
-> + * @buf: start address of userspace buffer
-> + * @len: requested read size from userspace
-> + *
-> + * Return: number of bytes that has been successfully read,
-> + *	   0 if no more migration data is available,
-> + *	   -errno on failure.
-> + */
-> +ssize_t xe_sriov_migration_data_read(struct xe_device *xe, unsigned int vfid,
-> +				     char __user *buf, size_t len)
-> +{
-> +	ssize_t ret, consumed = 0;
-> +
-> +	xe_assert(xe, IS_SRIOV_PF(xe));
-> +
-> +	scoped_cond_guard(mutex_intr, return -EINTR, pf_migration_mutex(xe, vfid)) {
-> +		while (consumed < len) {
-> +			ret = vf_mig_data_read_single(xe, vfid, buf, len - consumed);
-> +			if (ret == -ENODATA)
-> +				break;
-> +			if (ret < 0)
-> +				return ret;
-> +
-> +			consumed += ret;
-> +			buf += ret;
-> +		}
-> +	}
-> +
-> +	return consumed;
-> +}
-> +
-> +static ssize_t vf_mig_hdr_write(struct xe_sriov_migration_data *data,
-> +				const char __user *buf, size_t len)
-> +{
-> +	loff_t offset = sizeof(data->hdr) - data->hdr_remaining;
-> +	int ret;
-> +
-> +	if (len > data->hdr_remaining)
-> +		len = data->hdr_remaining;
-> +
-> +	if (copy_from_user((void *)&data->hdr + offset, buf, len))
-> +		return -EFAULT;
-> +
-> +	data->hdr_remaining -= len;
-> +
-> +	if (!data->hdr_remaining) {
-> +		ret = xe_sriov_migration_data_init_from_hdr(data);
-> +		if (ret)
-> +			return ret;
-> +	}
-> +
-> +	return len;
-> +}
-> +
-> +static ssize_t vf_mig_data_write(struct xe_sriov_migration_data *data,
-> +				 const char __user *buf, size_t len)
-> +{
-> +	if (len > data->remaining)
-> +		len = data->remaining;
-> +
-> +	if (copy_from_user(data->vaddr + (data->size - data->remaining), buf, len))
-> +		return -EFAULT;
-> +
-> +	data->remaining -= len;
-> +
-> +	return len;
-> +}
-> +
-> +static ssize_t vf_mig_data_write_single(struct xe_device *xe, unsigned int vfid,
-> +					const char __user *buf, size_t len)
-> +{
-> +	struct xe_sriov_migration_data **data = pf_pick_pending(xe, vfid);
-> +	int ret;
-> +	ssize_t copied;
-> +
-> +	if (IS_ERR_OR_NULL(*data)) {
-> +		*data = xe_sriov_migration_data_alloc(xe);
-> +		if (!*data)
-> +			return -ENOMEM;
-> +	}
-> +
-> +	if ((*data)->hdr_remaining)
-> +		copied = vf_mig_hdr_write(*data, buf, len);
-> +	else
-> +		copied = vf_mig_data_write(*data, buf, len);
-> +
-> +	if ((*data)->hdr_remaining == 0 && (*data)->remaining == 0) {
-> +		ret = xe_sriov_pf_migration_restore_produce(xe, vfid, *data);
-> +		if (ret) {
-> +			xe_sriov_migration_data_free(*data);
-> +			return ret;
-> +		}
-> +
-> +		*data = NULL;
-> +	}
-> +
-> +	return copied;
-> +}
-> +
-> +/**
-> + * xe_sriov_migration_data_write() - Write migration data to the device.
-> + * @xe: the &xe_device
-> + * @vfid: the VF identifier
-> + * @buf: start address of userspace buffer
-> + * @len: requested write size from userspace
-> + *
-> + * Return: number of bytes that has been successfully written,
-> + *	   -errno on failure.
-> + */
-> +ssize_t xe_sriov_migration_data_write(struct xe_device *xe, unsigned int vfid,
-> +				      const char __user *buf, size_t len)
-> +{
-> +	ssize_t ret, produced = 0;
-> +
-> +	xe_assert(xe, IS_SRIOV_PF(xe));
-> +
-> +	scoped_cond_guard(mutex_intr, return -EINTR, pf_migration_mutex(xe, vfid)) {
-> +		while (produced < len) {
-> +			ret = vf_mig_data_write_single(xe, vfid, buf, len - produced);
-> +			if (ret < 0)
-> +				return ret;
-> +
-> +			produced += ret;
-> +			buf += ret;
-> +		}
-> +	}
-> +
-> +	return produced;
-> +}
-> +
-> +#define MIGRATION_DESCRIPTOR_DWORDS 0
-> +static size_t pf_descriptor_init(struct xe_device *xe, unsigned int vfid)
-> +{
-> +	struct xe_sriov_migration_data **desc = pf_pick_descriptor(xe, vfid);
-> +	struct xe_sriov_migration_data *data;
-> +	int ret;
-> +
-> +	data = xe_sriov_migration_data_alloc(xe);
-> +	if (!data)
-> +		return -ENOMEM;
-> +
-> +	ret = xe_sriov_migration_data_init(data, 0, 0, XE_SRIOV_MIGRATION_DATA_TYPE_DESCRIPTOR,
-> +					   0, MIGRATION_DESCRIPTOR_DWORDS * sizeof(u32));
-> +	if (ret) {
-> +		xe_sriov_migration_data_free(data);
-> +		return ret;
-> +	}
-> +
-> +	*desc = data;
-> +
-> +	return 0;
-> +}
-> +
-> +static void pf_pending_init(struct xe_device *xe, unsigned int vfid)
-> +{
-> +	struct xe_sriov_migration_data **data = pf_pick_pending(xe, vfid);
-> +
-> +	*data = NULL;
-> +}
-> +
-> +#define MIGRATION_TRAILER_SIZE 0
-> +static int pf_trailer_init(struct xe_device *xe, unsigned int vfid)
-> +{
-> +	struct xe_sriov_migration_data **trailer = pf_pick_trailer(xe, vfid);
-> +	struct xe_sriov_migration_data *data;
-> +	int ret;
-> +
-> +	data = xe_sriov_migration_data_alloc(xe);
-> +	if (!data)
-> +		return -ENOMEM;
-> +
-> +	ret = xe_sriov_migration_data_init(data, 0, 0, XE_SRIOV_MIGRATION_DATA_TYPE_TRAILER,
-> +					   0, MIGRATION_TRAILER_SIZE);
-> +	if (ret) {
-> +		xe_sriov_migration_data_free(data);
-> +		return ret;
-> +	}
-> +
-> +	*trailer = data;
-> +
-> +	return 0;
-> +}
-> +
-> +/**
-> + * xe_sriov_migration_data_save_init() - Initialize the pending save migration data.
-> + * @xe: the &xe_device
-> + * @vfid: the VF identifier
-> + *
-> + * Return: 0 on success, -errno on failure.
-> + */
-> +int xe_sriov_migration_data_save_init(struct xe_device *xe, unsigned int vfid)
-> +{
-> +	int ret;
-> +
-> +	scoped_cond_guard(mutex_intr, return -EINTR, pf_migration_mutex(xe, vfid)) {
-> +		ret = pf_descriptor_init(xe, vfid);
-> +		if (ret)
-> +			return ret;
-> +
-> +		ret = pf_trailer_init(xe, vfid);
-> +		if (ret)
-> +			return ret;
-> +
-> +		pf_pending_init(xe, vfid);
-> +	}
-> +
-> +	return 0;
-> +}
-> diff --git a/drivers/gpu/drm/xe/xe_sriov_migration_data.h b/drivers/gpu/drm/xe/xe_sriov_migration_data.h
-> index ef65dccddc035..5cde6e9439677 100644
-> --- a/drivers/gpu/drm/xe/xe_sriov_migration_data.h
-> +++ b/drivers/gpu/drm/xe/xe_sriov_migration_data.h
-> @@ -27,5 +27,10 @@ void xe_sriov_migration_data_free(struct xe_sriov_migration_data *snapshot);
->  int xe_sriov_migration_data_init(struct xe_sriov_migration_data *data, u8 tile_id, u8 gt_id,
->  				 enum xe_sriov_migration_data_type, loff_t offset, size_t size);
->  int xe_sriov_migration_data_init_from_hdr(struct xe_sriov_migration_data *snapshot);
-> +ssize_t xe_sriov_migration_data_read(struct xe_device *xe, unsigned int vfid,
-> +				     char __user *buf, size_t len);
-> +ssize_t xe_sriov_migration_data_write(struct xe_device *xe, unsigned int vfid,
-> +				      const char __user *buf, size_t len);
-> +int xe_sriov_migration_data_save_init(struct xe_device *xe, unsigned int vfid);
->  
->  #endif
-> diff --git a/drivers/gpu/drm/xe/xe_sriov_pf_control.c b/drivers/gpu/drm/xe/xe_sriov_pf_control.c
-> index 8d8a01faf5291..c2768848daba1 100644
-> --- a/drivers/gpu/drm/xe/xe_sriov_pf_control.c
-> +++ b/drivers/gpu/drm/xe/xe_sriov_pf_control.c
-> @@ -5,6 +5,7 @@
->  
->  #include "xe_device.h"
->  #include "xe_gt_sriov_pf_control.h"
-> +#include "xe_sriov_migration_data.h"
->  #include "xe_sriov_pf_control.h"
->  #include "xe_sriov_printk.h"
->  
-> @@ -165,6 +166,10 @@ int xe_sriov_pf_control_trigger_save_vf(struct xe_device *xe, unsigned int vfid)
->  	unsigned int id;
->  	int ret;
->  
-> +	ret = xe_sriov_migration_data_save_init(xe, vfid);
-> +	if (ret)
-> +		return ret;
-> +
->  	for_each_gt(gt, xe, id) {
->  		ret = xe_gt_sriov_pf_control_trigger_save_vf(gt, vfid);
->  		if (ret)
-> diff --git a/drivers/gpu/drm/xe/xe_sriov_pf_debugfs.c b/drivers/gpu/drm/xe/xe_sriov_pf_debugfs.c
-> index e0e6340c49106..a9a28aec22421 100644
-> --- a/drivers/gpu/drm/xe/xe_sriov_pf_debugfs.c
-> +++ b/drivers/gpu/drm/xe/xe_sriov_pf_debugfs.c
-> @@ -9,6 +9,7 @@
->  #include "xe_device.h"
->  #include "xe_device_types.h"
->  #include "xe_pm.h"
-> +#include "xe_sriov_migration_data.h"
->  #include "xe_sriov_pf.h"
->  #include "xe_sriov_pf_control.h"
->  #include "xe_sriov_pf_debugfs.h"
-> @@ -132,6 +133,7 @@ static void pf_populate_pf(struct xe_device *xe, struct dentry *pfdent)
->   *      /sys/kernel/debug/dri/BDF/
->   *      ├── sriov
->   *      │   ├── vf1
-> + *      │   │   ├── migration_data
->   *      │   │   ├── pause
->   *      │   │   ├── reset
->   *      │   │   ├── resume
-> @@ -220,6 +222,38 @@ DEFINE_VF_CONTROL_ATTRIBUTE(reset_vf);
->  DEFINE_VF_CONTROL_ATTRIBUTE_RW(save_vf);
->  DEFINE_VF_CONTROL_ATTRIBUTE_RW(restore_vf);
->  
-> +static ssize_t data_write(struct file *file, const char __user *buf, size_t count, loff_t *pos)
-> +{
-> +	struct dentry *dent = file_dentry(file)->d_parent;
-> +	struct xe_device *xe = extract_xe(dent);
-> +	unsigned int vfid = extract_vfid(dent);
-> +
-> +	if (*pos)
-> +		return -ESPIPE;
-> +
-> +	return xe_sriov_migration_data_write(xe, vfid, buf, count);
-> +}
-> +
-> +static ssize_t data_read(struct file *file, char __user *buf, size_t count, loff_t *ppos)
-> +{
-> +	struct dentry *dent = file_dentry(file)->d_parent;
-> +	struct xe_device *xe = extract_xe(dent);
-> +	unsigned int vfid = extract_vfid(dent);
-> +
-> +	if (*ppos)
-> +		return -ESPIPE;
-> +
-> +	return xe_sriov_migration_data_read(xe, vfid, buf, count);
-> +}
-> +
-> +static const struct file_operations data_vf_fops = {
-> +	.owner		= THIS_MODULE,
-> +	.open		= simple_open,
-> +	.write		= data_write,
-> +	.read		= data_read,
-> +	.llseek		= default_llseek,
-> +};
-> +
->  static void pf_populate_vf(struct xe_device *xe, struct dentry *vfdent)
->  {
->  	debugfs_create_file("pause", 0200, vfdent, xe, &pause_vf_fops);
-> @@ -228,6 +262,7 @@ static void pf_populate_vf(struct xe_device *xe, struct dentry *vfdent)
->  	debugfs_create_file("reset", 0200, vfdent, xe, &reset_vf_fops);
->  	debugfs_create_file("save", 0600, vfdent, xe, &save_vf_fops);
->  	debugfs_create_file("restore", 0600, vfdent, xe, &restore_vf_fops);
-> +	debugfs_create_file("migration_data", 0600, vfdent, xe, &data_vf_fops);
->  }
->  
->  static void pf_populate_with_tiles(struct xe_device *xe, struct dentry *dent, unsigned int vfid)
-> diff --git a/drivers/gpu/drm/xe/xe_sriov_pf_migration.c b/drivers/gpu/drm/xe/xe_sriov_pf_migration.c
-> index eaf581317bdef..029e14f1ffa74 100644
-> --- a/drivers/gpu/drm/xe/xe_sriov_pf_migration.c
-> +++ b/drivers/gpu/drm/xe/xe_sriov_pf_migration.c
-> @@ -10,6 +10,7 @@
->  #include "xe_gt_sriov_pf_migration.h"
->  #include "xe_pm.h"
->  #include "xe_sriov.h"
-> +#include "xe_sriov_migration_data.h"
->  #include "xe_sriov_pf_helpers.h"
->  #include "xe_sriov_pf_migration.h"
->  #include "xe_sriov_printk.h"
-> @@ -53,6 +54,15 @@ static bool pf_check_migration_support(struct xe_device *xe)
->  	return IS_ENABLED(CONFIG_DRM_XE_DEBUG);
->  }
->  
-> +static void pf_migration_cleanup(struct drm_device *dev, void *arg)
-> +{
-> +	struct xe_sriov_pf_migration *migration = arg;
-> +
-> +	xe_sriov_migration_data_free(migration->pending);
-> +	xe_sriov_migration_data_free(migration->trailer);
-> +	xe_sriov_migration_data_free(migration->descriptor);
-> +}
-> +
->  /**
->   * xe_sriov_pf_migration_init() - Initialize support for SR-IOV VF migration.
->   * @xe: the &xe_device
-> @@ -62,6 +72,7 @@ static bool pf_check_migration_support(struct xe_device *xe)
->  int xe_sriov_pf_migration_init(struct xe_device *xe)
->  {
->  	unsigned int n, totalvfs;
-> +	int err;
->  
->  	xe_assert(xe, IS_SRIOV_PF(xe));
->  
-> @@ -73,7 +84,15 @@ int xe_sriov_pf_migration_init(struct xe_device *xe)
->  	for (n = 1; n <= totalvfs; n++) {
->  		struct xe_sriov_pf_migration *migration = pf_pick_migration(xe, n);
->  
-> +		err = drmm_mutex_init(&xe->drm, &migration->lock);
-> +		if (err)
-> +			return err;
-> +
->  		init_waitqueue_head(&migration->wq);
-> +
-> +		err = drmm_add_action_or_reset(&xe->drm, pf_migration_cleanup, migration);
+1. KVM_SET_MEMORY_ATTRIBUTES is currently a write-only ioctl and does not
+   allow userspace to read fields. There's nothing in code (yet?) that
+   validates this, but using _IOWR for consistency would be prudent.
 
-shouldn't we use devm instead here ?
+2. KVM_SET_MEMORY_ATTRIBUTES, when used as a guest_memfd ioctl, will need
+   an additional field to provide userspace with more error details.
 
-> +		if (err)
-> +			return err;
->  	}
->  
->  	return 0;
-> @@ -154,6 +173,36 @@ xe_sriov_pf_migration_save_consume(struct xe_device *xe, unsigned int vfid)
->  	return data;
->  }
->  
-> +static int pf_handle_descriptor(struct xe_device *xe, unsigned int vfid,
-> +				struct xe_sriov_migration_data *data)
-> +{
-> +	if (data->tile != 0 || data->gt != 0)
-> +		return -EINVAL;
-> +
-> +	xe_sriov_migration_data_free(data);
-> +
-> +	return 0;
-> +}
-> +
-> +static int pf_handle_trailer(struct xe_device *xe, unsigned int vfid,
-> +			     struct xe_sriov_migration_data *data)
-> +{
-> +	struct xe_gt *gt;
-> +	u8 gt_id;
-> +
-> +	if (data->tile != 0 || data->gt != 0)
-> +		return -EINVAL;
-> +	if (data->offset != 0 || data->size != 0 || data->buff || data->bo)
-> +		return -EINVAL;
-> +
-> +	xe_sriov_migration_data_free(data);
-> +
-> +	for_each_gt(gt, xe, gt_id)
-> +		xe_gt_sriov_pf_control_restore_data_done(gt, vfid);
-> +
-> +	return 0;
-> +}
-> +
->  /**
->   * xe_sriov_pf_migration_restore_produce() - Produce a VF migration data packet to the device.
->   * @xe: the &xe_device
-> @@ -173,6 +222,11 @@ int xe_sriov_pf_migration_restore_produce(struct xe_device *xe, unsigned int vfi
->  
->  	xe_assert(xe, IS_SRIOV_PF(xe));
->  
-> +	if (data->type == XE_SRIOV_MIGRATION_DATA_TYPE_DESCRIPTOR)
-> +		return pf_handle_descriptor(xe, vfid, data);
-> +	else if (data->type == XE_SRIOV_MIGRATION_DATA_TYPE_TRAILER)
+Alternatively, a completely new ioctl could be defined, unrelated to
+KVM_SET_MEMORY_ATTRIBUTES, but using the same ioctl number and struct for
+the vm and guest_memfd ioctls streamlines the interface for userspace. In
+addition, any memory attributes, implemented on the vm or guest_memfd
+ioctl, can be easily shared with the other.
 
-no need for "else" here
+Add KVM_CAP_MEMORY_ATTRIBUTES2 to indicate that struct
+kvm_memory_attributes2 exists and can be used either with
+KVM_SET_MEMORY_ATTRIBUTES2 via the vm or guest_memfd ioctl.
 
-> +		return pf_handle_trailer(xe, vfid, data);
-> +
->  	gt = xe_device_get_gt(xe, data->gt);
->  	if (!gt || data->tile != gt->tile->id) {
->  		xe_sriov_err_ratelimited(xe, "VF%d Invalid GT - tile:%u, GT:%u\n",
-> diff --git a/drivers/gpu/drm/xe/xe_sriov_pf_migration_types.h b/drivers/gpu/drm/xe/xe_sriov_pf_migration_types.h
-> index 2a45ee4e3ece8..8468e5eeb6d66 100644
-> --- a/drivers/gpu/drm/xe/xe_sriov_pf_migration_types.h
-> +++ b/drivers/gpu/drm/xe/xe_sriov_pf_migration_types.h
-> @@ -7,6 +7,7 @@
->  #define _XE_SRIOV_PF_MIGRATION_TYPES_H_
->  
->  #include <linux/types.h>
-> +#include <linux/mutex_types.h>
->  #include <linux/wait.h>
->  
->  /**
-> @@ -53,6 +54,14 @@ struct xe_sriov_migration_data {
->  struct xe_sriov_pf_migration {
->  	/** @wq: waitqueue used to avoid busy-waiting for snapshot production/consumption */
->  	wait_queue_head_t wq;
-> +	/** @lock: Mutex protecting the migration data */
-> +	struct mutex lock;
-> +	/** @pending: currently processed data packet of VF resource */
-> +	struct xe_sriov_migration_data *pending;
-> +	/** @trailer: data packet used to indicate the end of stream */
-> +	struct xe_sriov_migration_data *trailer;
-> +	/** @descriptor: data packet containing the metadata describing the device */
-> +	struct xe_sriov_migration_data *descriptor;
->  };
->  
->  #endif
+Since KVM_SET_MEMORY_ATTRIBUTES2 is not limited to be used only with the vm
+ioctl, return 1 for KVM_CAP_MEMORY_ATTRIBUTES2 as long as struct
+kvm_memory_attributes2 and KVM_SET_MEMORY_ATTRIBUTES2 can be
+used. KVM_CAP_MEMORY_ATTRIBUTES must still be used to actually get valid
+attributes.
+
+Handle KVM_CAP_MEMORY_ATTRIBUTES2 and return 1 regardless of
+CONFIG_KVM_VM_MEMORY_ATTRIBUTES, since KVM_SET_MEMORY_ATTRIBUTES2 is not
+limited to a vm ioctl and can also be used with the guest_memfd ioctl.
+
+Suggested-by: Sean Christopherson <seanjc@google.com>
+Change-Id: I50cd506d9a28bf68a90e659015603de579569bc1
+Signed-off-by: Ackerley Tng <ackerleytng@google.com>
+---
+ Documentation/virt/kvm/api.rst | 32 ++++++++++++++++++++++++++++++++
+ include/uapi/linux/kvm.h       | 12 ++++++++++++
+ virt/kvm/kvm_main.c            | 34 +++++++++++++++++++++++++++++++---
+ 3 files changed, 75 insertions(+), 3 deletions(-)
+
+diff --git a/Documentation/virt/kvm/api.rst b/Documentation/virt/kvm/api.rst
+index 754b662a453c3..a812769d79bf6 100644
+--- a/Documentation/virt/kvm/api.rst
++++ b/Documentation/virt/kvm/api.rst
+@@ -6355,6 +6355,8 @@ S390:
+ Returns -EINVAL if the VM has the KVM_VM_S390_UCONTROL flag set.
+ Returns -EINVAL if called on a protected VM.
+ 
++.. _KVM_SET_MEMORY_ATTRIBUTES:
++
+ 4.141 KVM_SET_MEMORY_ATTRIBUTES
+ -------------------------------
+ 
+@@ -6512,6 +6514,36 @@ the capability to be present.
+ 
+ `flags` must currently be zero.
+ 
++4.144 KVM_SET_MEMORY_ATTRIBUTES2
++---------------------------------
++
++:Capability: KVM_CAP_MEMORY_ATTRIBUTES2
++:Architectures: x86
++:Type: vm ioctl
++:Parameters: struct kvm_memory_attributes2 (in/out)
++:Returns: 0 on success, <0 on error
++
++KVM_SET_MEMORY_ATTRIBUTES2 is an extension to
++KVM_SET_MEMORY_ATTRIBUTES that supports returning (writing) values to
++userspace.  The original (pre-extension) fields are shared with
++KVM_SET_MEMORY_ATTRIBUTES identically.
++
++Attribute values are shared with KVM_SET_MEMORY_ATTRIBUTES.
++
++::
++
++  struct kvm_memory_attributes2 {
++	__u64 address;
++	__u64 size;
++	__u64 attributes;
++	__u64 flags;
++	__u64 reserved[4];
++  };
++
++  #define KVM_MEMORY_ATTRIBUTE_PRIVATE           (1ULL << 3)
++
++See also: :ref: `KVM_SET_MEMORY_ATTRIBUTES`.
++
+ 
+ .. _kvm_run:
+ 
+diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
+index 52f6000ab0208..c300e38c7c9cd 100644
+--- a/include/uapi/linux/kvm.h
++++ b/include/uapi/linux/kvm.h
+@@ -963,6 +963,7 @@ struct kvm_enable_cap {
+ #define KVM_CAP_RISCV_MP_STATE_RESET 242
+ #define KVM_CAP_ARM_CACHEABLE_PFNMAP_SUPPORTED 243
+ #define KVM_CAP_GUEST_MEMFD_FLAGS 244
++#define KVM_CAP_MEMORY_ATTRIBUTES2 245
+ 
+ struct kvm_irq_routing_irqchip {
+ 	__u32 irqchip;
+@@ -1617,4 +1618,15 @@ struct kvm_pre_fault_memory {
+ 	__u64 padding[5];
+ };
+ 
++/* Available with KVM_CAP_MEMORY_ATTRIBUTES2 */
++#define KVM_SET_MEMORY_ATTRIBUTES2              _IOWR(KVMIO,  0xd6, struct kvm_memory_attributes2)
++
++struct kvm_memory_attributes2 {
++	__u64 address;
++	__u64 size;
++	__u64 attributes;
++	__u64 flags;
++	__u64 reserved[4];
++};
++
+ #endif /* __LINUX_KVM_H */
+diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
+index 35166754a22b4..d083011744eba 100644
+--- a/virt/kvm/kvm_main.c
++++ b/virt/kvm/kvm_main.c
+@@ -2621,7 +2621,7 @@ static int kvm_vm_set_mem_attributes(struct kvm *kvm, gfn_t start, gfn_t end,
+ 	return r;
+ }
+ static int kvm_vm_ioctl_set_mem_attributes(struct kvm *kvm,
+-					   struct kvm_memory_attributes *attrs)
++					   struct kvm_memory_attributes2 *attrs)
+ {
+ 	gfn_t start, end;
+ 
+@@ -4957,6 +4957,7 @@ static int kvm_vm_ioctl_check_extension_generic(struct kvm *kvm, long arg)
+ 	case KVM_CAP_BINARY_STATS_FD:
+ 	case KVM_CAP_SYSTEM_EVENT_DATA:
+ 	case KVM_CAP_DEVICE_CTRL:
++	case KVM_CAP_MEMORY_ATTRIBUTES2:
+ 		return 1;
+ #ifdef CONFIG_KVM_VM_MEMORY_ATTRIBUTES
+ 	case KVM_CAP_MEMORY_ATTRIBUTES:
+@@ -5184,6 +5185,14 @@ do {										\
+ 		     sizeof_field(struct kvm_userspace_memory_region2, field));	\
+ } while (0)
+ 
++#define SANITY_CHECK_MEMORY_ATTRIBUTES_FIELD(field)				\
++do {										\
++	BUILD_BUG_ON(offsetof(struct kvm_memory_attributes, field) !=		\
++		     offsetof(struct kvm_memory_attributes2, field));		\
++	BUILD_BUG_ON(sizeof_field(struct kvm_memory_attributes, field) !=	\
++		     sizeof_field(struct kvm_memory_attributes2, field));	\
++} while (0)
++
+ static long kvm_vm_ioctl(struct file *filp,
+ 			   unsigned int ioctl, unsigned long arg)
+ {
+@@ -5366,15 +5375,34 @@ static long kvm_vm_ioctl(struct file *filp,
+ 	}
+ #endif /* CONFIG_HAVE_KVM_IRQ_ROUTING */
+ #ifdef CONFIG_KVM_VM_MEMORY_ATTRIBUTES
++	case KVM_SET_MEMORY_ATTRIBUTES2:
+ 	case KVM_SET_MEMORY_ATTRIBUTES: {
+-		struct kvm_memory_attributes attrs;
++		struct kvm_memory_attributes2 attrs;
++		unsigned long size;
++
++		if (ioctl == KVM_SET_MEMORY_ATTRIBUTES) {
++			/*
++			 * Fields beyond struct kvm_userspace_memory_region shouldn't be
++			 * accessed, but avoid leaking kernel memory in case of a bug.
++			 */
++			memset(&attrs, 0, sizeof(attrs));
++			size = sizeof(struct kvm_memory_attributes);
++		} else {
++			size = sizeof(struct kvm_memory_attributes2);
++		}
++
++		/* Ensure the common parts of the two structs are identical. */
++		SANITY_CHECK_MEMORY_ATTRIBUTES_FIELD(address);
++		SANITY_CHECK_MEMORY_ATTRIBUTES_FIELD(size);
++		SANITY_CHECK_MEMORY_ATTRIBUTES_FIELD(attributes);
++		SANITY_CHECK_MEMORY_ATTRIBUTES_FIELD(flags);
+ 
+ 		r = -ENOTTY;
+ 		if (!vm_memory_attributes)
+ 			goto out;
+ 
+ 		r = -EFAULT;
+-		if (copy_from_user(&attrs, argp, sizeof(attrs)))
++		if (copy_from_user(&attrs, argp, size))
+ 			goto out;
+ 
+ 		r = kvm_vm_ioctl_set_mem_attributes(kvm, &attrs);
+-- 
+2.51.1.838.g19442a804e-goog
 
 
