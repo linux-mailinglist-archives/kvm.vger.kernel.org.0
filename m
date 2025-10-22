@@ -1,209 +1,137 @@
-Return-Path: <kvm+bounces-60845-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-60846-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 641DFBFDA10
-	for <lists+kvm@lfdr.de>; Wed, 22 Oct 2025 19:39:14 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 05BAABFDB2B
+	for <lists+kvm@lfdr.de>; Wed, 22 Oct 2025 19:49:35 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 0D6B91A07FEB
-	for <lists+kvm@lfdr.de>; Wed, 22 Oct 2025 17:39:38 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 99EE51A617EE
+	for <lists+kvm@lfdr.de>; Wed, 22 Oct 2025 17:49:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6CBC02D97B8;
-	Wed, 22 Oct 2025 17:38:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 95EEF34DCE1;
+	Wed, 22 Oct 2025 17:46:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="wjhVwD7F"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="atNBGco7"
 X-Original-To: kvm@vger.kernel.org
-Received: from SA9PR02CU001.outbound.protection.outlook.com (mail-southcentralusazon11013017.outbound.protection.outlook.com [40.93.196.17])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-lf1-f52.google.com (mail-lf1-f52.google.com [209.85.167.52])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B96A32D73B1;
-	Wed, 22 Oct 2025 17:38:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.93.196.17
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761154716; cv=fail; b=NBnYwTWHebOPprsMhCTyv/hdIeHBAfB6DKrYA+iOk/CHl6gR9jwyRxGq2zDkBwjtyel9qeWgt/eOTjs/3Ity12urIovEJBwfqmuCsalxkhKCatetEZ0/zMIfN0GPxnraPrptKENKflAeIjsKQGdapQ7DY75VIvQ/Ew6kDncjNUk=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761154716; c=relaxed/simple;
-	bh=2S/3hIS3mWxG7KWWoLghWB+oB0Yw/n8TecyS04LzMkI=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=hKJYC2juPLd4lQc5S0Lwgdw6dhiXuZJYYG4OtGirdENX3K1ijQeXhL62l3NDVQjBY6jIvy8C0tkRVtoUavSV1AjBO2wveT1U0gI/DOYFc8aR53xTUJqrAAPTWKOkqaNNBad19j/kUJcqQ7v/G1TruVWO/Co9+rO+IpMMz7QAGVo=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=wjhVwD7F; arc=fail smtp.client-ip=40.93.196.17
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=qqu7Y1OqP2KnpX21vWInMEez2ssKATbrNx/1GBL3FZ1qdVpVejrTzQHiCKB5axw8EUce2AjjzhGPe5sqUVXmliO/p06IpzVxIScmFgwPLD686M2Xu5Y6aBSJ6drIFW5sqQMHGjnOyIAA3xRhhOXWkeToIBIbshZMHpaW+J7xVnZJ1+xVKLkXV6ya9/FVE6b11nmrp0hsszI2XlIi0R90VTUULuNJQ7UatzXnmADvlDWFLtZY3lxP//wyzv/9sMKwseX7nKdRBRX8GHrgotFdGxTOXGlwxER2+4D6bot6isjxO6WpZBoglS2jKphX+eqY5G0kKgp08EUocIpcqNiZNQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=vzWx4c/xpRWt+W8cD5JFXtsltygRSfej9WV13jqYI6Y=;
- b=f/m9LnhPX0O7uTSInXr7M+Ps8mMEmQCo/26Y6EYefSKFxwKvab+UntjKgkAoY6Gpl6/9Jit9bVmdwAWKXC4MJxvuUVOyaKExxReUTBhIjE2xvY0/LSsufwXLUkWahwU5ogdsLiuA5TVm6fVn/8jS89V/ROfuSTzfhpbM+YdCygzcTrQ4c8c8+Zk3CCLlpdYKbRRaoORwb89ZCAR9Z31bgW6EdpG9Y/7y6YqRuyaZrMkky3skOWa7csnqVw+cJsRZZEpV4mP+bh3nMm8j0WqFdWOg2kEqBjgH2tlAZTEsRhn1jvhKUfJ7ybHbIY1sN9AWH4Ex6LytKBJH9qLtVHAxgA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 165.204.84.17) smtp.rcpttodomain=vger.kernel.org smtp.mailfrom=amd.com;
- dmarc=pass (p=quarantine sp=quarantine pct=100) action=none
- header.from=amd.com; dkim=none (message not signed); arc=none (0)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=vzWx4c/xpRWt+W8cD5JFXtsltygRSfej9WV13jqYI6Y=;
- b=wjhVwD7F5LZM+0S5qLv4nO7LIjSi6gNU8wI8hFF3dhUhXKRgYGbKGbCWQ5zgr6hjUEihwOCAYbW5un7JcVSMffoS8cBTRatvbmbnWSsMfSZsp8n4JGf9NbSTO/aoVbJrGlO9eKAykFJ7YzWT8ASixwvydPe/igVJyKOvjVeVWR8=
-Received: from SJ0PR03CA0131.namprd03.prod.outlook.com (2603:10b6:a03:33c::16)
- by IA0PR12MB7700.namprd12.prod.outlook.com (2603:10b6:208:430::20) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9228.16; Wed, 22 Oct
- 2025 17:38:29 +0000
-Received: from SJ5PEPF000001F3.namprd05.prod.outlook.com
- (2603:10b6:a03:33c:cafe::53) by SJ0PR03CA0131.outlook.office365.com
- (2603:10b6:a03:33c::16) with Microsoft SMTP Server (version=TLS1_3,
- cipher=TLS_AES_256_GCM_SHA384) id 15.20.9228.17 via Frontend Transport; Wed,
- 22 Oct 2025 17:38:29 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
- smtp.mailfrom=amd.com; dkim=none (message not signed)
- header.d=none;dmarc=pass action=none header.from=amd.com;
-Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
- 165.204.84.17 as permitted sender) receiver=protection.outlook.com;
- client-ip=165.204.84.17; helo=satlexmb07.amd.com; pr=C
-Received: from satlexmb07.amd.com (165.204.84.17) by
- SJ5PEPF000001F3.mail.protection.outlook.com (10.167.242.71) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.9253.7 via Frontend Transport; Wed, 22 Oct 2025 17:38:28 +0000
-Received: from tlendack-t1.amd.com (10.180.168.240) by satlexmb07.amd.com
- (10.181.42.216) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.17; Wed, 22 Oct
- 2025 10:38:27 -0700
-From: Tom Lendacky <thomas.lendacky@amd.com>
-To: <kvm@vger.kernel.org>, <linux-kernel@vger.kernel.org>, <x86@kernel.org>,
-	<linux-crypto@vger.kernel.org>
-CC: Paolo Bonzini <pbonzini@redhat.com>, Sean Christopherson
-	<seanjc@google.com>, Borislav Petkov <bp@alien8.de>, Dave Hansen
-	<dave.hansen@linux.intel.com>, Ingo Molnar <mingo@redhat.com>, "Thomas
- Gleixner" <tglx@linutronix.de>, Michael Roth <michael.roth@amd.com>, "Ashish
- Kalra" <ashish.kalra@amd.com>, Herbert Xu <herbert@gondor.apana.org.au>,
-	"David Miller" <davem@davemloft.net>
-Subject: [PATCH v3 4/4] KVM: SEV: Add known supported SEV-SNP policy bits
-Date: Wed, 22 Oct 2025 12:37:24 -0500
-Message-ID: <93045a3b8941e5b58f03a4d27945b523f5a9b8a2.1761154644.git.thomas.lendacky@amd.com>
-X-Mailer: git-send-email 2.51.1
-In-Reply-To: <cover.1761154644.git.thomas.lendacky@amd.com>
-References: <cover.1761154644.git.thomas.lendacky@amd.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 90CE834D4F4
+	for <kvm@vger.kernel.org>; Wed, 22 Oct 2025 17:46:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.52
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1761155164; cv=none; b=Ebew5smGQ7WYMMHGFXNO3GzgxABU+wHpMypvZTEdBMM/J2d+gzxKL7P5+f0lguyG7UP3N5F7tccARGj/EjYSpmzQiWu6Lgxe/kbQe/SEO6EJGQcYxeF9UPW65LSJ54TqYj2sUGM1uViMt1vt1MuKQ8W/iKi4U1ff4nQKmEEyqTQ=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1761155164; c=relaxed/simple;
+	bh=w44LeRp54sTqbX/iWtLb1Tria6cTie5Yoc9NwjTV03E=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=Z3z5intsBfidsUbVb9qsWYvKemh/O6cudgxTliIB9kAgcxSwPTBMK3tj2XLNjQ2j5/0wHvwIXB/UuVyzPXE+zo2UbzUL+eaTa5EPmDEZUxnYU0tZPBla7q+hlvW0UyZ+M6AsfDFZouNehaP50Vx8Lh+tgfujk37dq+VJ/dVV8zw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=atNBGco7; arc=none smtp.client-ip=209.85.167.52
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-lf1-f52.google.com with SMTP id 2adb3069b0e04-57b35e176dbso8756778e87.1
+        for <kvm@vger.kernel.org>; Wed, 22 Oct 2025 10:46:01 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1761155159; x=1761759959; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=w44LeRp54sTqbX/iWtLb1Tria6cTie5Yoc9NwjTV03E=;
+        b=atNBGco7osuea5VMUbyMpNmXHQ6nUTWdPGiLcrFLLBAhUybuFsGJ9pryNUy51AIpEB
+         b/7ifVwBmLbFpCo9DmN68vBZyxyj+RXWWX7hWDXR+NH2CQOSrC5Hk7bDAVkm+WO//QUm
+         zrZnnExfeqZZw3nVG5O4VBcGoWuGQnq0z6uyUQwndD1ZPmt+NF7P4GwLnG5ZnvGMj8P6
+         ABHN55LS9yrqSdisZkBlSaCf51iz1f16BbiQWk2Jk8XsO4pMB/B2navDcmy/4xyo6QEz
+         LIXQwtkOWhuXac9MgostG9IW/QBXO5CGy4uK6tmTv0A4l76PN9m0f2LdwQVPSZ+XJShs
+         ptBQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1761155159; x=1761759959;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=w44LeRp54sTqbX/iWtLb1Tria6cTie5Yoc9NwjTV03E=;
+        b=xGAyB2Fi6MYfMjohSyEPxgo2NlGmueCnq+gxx20H7fMC3/QQdNvPTQOx7b8wA4Bpnu
+         E1kf8ksAxqL2/U1xSVMlTYgDacJAnQQXoUrJ9muRjcKl4HUBYzR7CAhxnXmgv5HeCgRG
+         77WRw022sWk3GX4RJJoszagadq5z4PhH5DpsJ3l+rOF7QX+ktTZziw8ouOrHz0XuaFCl
+         XOdnpwOwCVe/ESx7hZ+n84m2wRglT1VdCRumcYBrYxdmH3l2H1B7kB47m0gw1Hv9+AIW
+         pNVTsXIsX56C6TsfXoXI9LgN0g5B06DnKFAD/chvt75CA7XufwCABWD37AVFZH9s/Su7
+         MbZw==
+X-Forwarded-Encrypted: i=1; AJvYcCW+pdbLaG+t9KAGf+Tjt2u0wkCHMCD/hACPeUS/lTJ/zhbR/94Zu9+QSuZ8Nmu7RZOHt78=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxREUf5R/0bDpw2wWDgb+Xb0d/X+cfXhFqT/H6f8nE5c3WwQrA8
+	k6gKH294t1tOSlDfOVqeRI61fhD0/SZLz+ub69t23gw+Jh5P7TsqZpqlnSTn+SkFXEnSw7rPBUI
+	yyXYexVnM4Ivse5SaN8N4Oit9SVDQsf9CcGojW10a
+X-Gm-Gg: ASbGncvZBM1f3v9F2UJEp+OWpcmvpdLiJ7+v7sR3CI1MmUAzMysLd8FXIrefiqM5oc0
+	sbPUBnz7O/dcxEh5Dyc/GySji9GIUpegJvN0PshYRcJNekY8rDolbBKsbT27IYZAouOfnfWXtq/
+	pC1UIruUCb4GFKStH2CRC4gbUAzVsYf8YqND/skedUtzs3tVlUetBq35LyttAen6VU5Ppf+iHK6
+	QzjhaOKzzo0Iql+JmfNLmmAdSJOdpgT6TfmVbnS1UTWszJmX3N/zn2oT2fld6/dBUusBN76J5FA
+	DdSbjlgcfj67lBEVfjmW5qAo
+X-Google-Smtp-Source: AGHT+IERtALG14+f5W16Jg/OM+KyHdPxafnN+x4hUkjVrvC5OblFTQMWIsl1hIUlOV4L6HUL5X9QRIe35lXhPZ/o3oM=
+X-Received: by 2002:a05:6512:b87:b0:592:f441:9283 with SMTP id
+ 2adb3069b0e04-592f44193a6mr38873e87.5.1761155159123; Wed, 22 Oct 2025
+ 10:45:59 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: satlexmb08.amd.com (10.181.42.217) To satlexmb07.amd.com
- (10.181.42.216)
-X-EOPAttributedMessage: 0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: SJ5PEPF000001F3:EE_|IA0PR12MB7700:EE_
-X-MS-Office365-Filtering-Correlation-Id: b95e657e-d07b-4591-0272-08de1191d001
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|1800799024|376014|7416014|82310400026|36860700013;
-X-Microsoft-Antispam-Message-Info:
-	=?us-ascii?Q?iDqkAU7HAY6Ebkz8i3p/ADHroEMZNJBZr0p2qkF1jlLEty9yLYvyhQNHhu+F?=
- =?us-ascii?Q?KaJPJx1qwEHDejTNszwTkw0CDz/+5WmMwF6d8PaK59QMJEFPbdY55kVyQz05?=
- =?us-ascii?Q?x7+P6GPWXKQzdz4+sirjWSi8qMCTjZnDFSRxSmp897c8n6h4rVhF9WD4yBdx?=
- =?us-ascii?Q?Vsc4sEIoyTci8DWDLlK0D2MOTqv4j+d5efJdfN2Pelgu/5moGV8apxPUYNCz?=
- =?us-ascii?Q?u5clpxWaqEgIfSuFbK4FH+vsHDI1DOBub9PT9QRNI6pq85C9Lbf8lGQ5R/95?=
- =?us-ascii?Q?1DtI5EslKKvowBd/DAtCTkKTXxDCmUpwNKQM1moec4OpSmfFYn6PGl+nk7Xm?=
- =?us-ascii?Q?t8akUnFgYCUEM5xQZybOB2XcU3HssdCURFFM7Vi+1EfwBC0hADlPAjlT6x6M?=
- =?us-ascii?Q?hszIkm+Cu7f2ILL+gPf1+XzD0wXmEcVM3J5lBfvYcTvwqNy3/gmT8d9Iz6vT?=
- =?us-ascii?Q?nhHMN0P23Sfp9RERfHFR4eZ6w3XvmEGafBVUKJaaH46f5S5kvUb3DNorINOI?=
- =?us-ascii?Q?JFVEzR7Gea3M6PSAzQkkYRgLTywsHjAH+WVE7tWP22FwNbtG971j8meNnFZ9?=
- =?us-ascii?Q?zfOQygWi3egbfC+fdvKvMyaSDlaWvOCCnIhx1KBKv7rdR7O0/u00YIdaJQip?=
- =?us-ascii?Q?WXymFhDHCYUmwBDRJ+nEa5Dqrlkte6shE0UvFdAiVjLfd3e+NEirxHq+iDNg?=
- =?us-ascii?Q?1TdO3Iwj/ZcfophyKgE8WXYmRQ+rMdqHbmPSooIPu4Vust57cw1/HNA5h0qU?=
- =?us-ascii?Q?PlICruNr1eRTGqXhHK5M3a0AXBVptH64g94fE8I7jLtUSK9LN5Yd/EH4iUwL?=
- =?us-ascii?Q?pmSTJr6GLDRw9wWA4yMHCL/BergRrW9uWRBN11BoKq3XoaOre59TaQVsbfMr?=
- =?us-ascii?Q?oMl0EP8yCqEkfa3BtqTa0zhXNm31mKemF+AwlSkGpkFb56oBIcIBP5Xy4OGo?=
- =?us-ascii?Q?poUfWHJKIJZvwvbzGhzumuNjjaoJeZ/ARYUMNsxuaW0mHTSrbXG5bfJUHojT?=
- =?us-ascii?Q?XcdMqXJVBdY7DdneFsjtYVNhCSE74nRduZ833ak6wsQRsrH0RXKcMW6UawqI?=
- =?us-ascii?Q?yFJ/EcnGf1176j76wHYGXdDVD72H2W6flz+2mSh7qf5IZSeyhtASWTfg7psS?=
- =?us-ascii?Q?yQZt1iK82ZxdGxivwZbRBbvHLZrtvCRx3cZfpT5+1KSA7cao0iCfPY/GXYh2?=
- =?us-ascii?Q?dNYuhSR2N5oSlRcDXqn3Ywd0RG8KPPoFCIXGm5ebcR9lgG2hOxDBCQX5beqn?=
- =?us-ascii?Q?TYpU3SYgfOm7kbNZFedHjuiqU0AewNSpa1TZuIcvMOa37D1xNjje+KCBMZX8?=
- =?us-ascii?Q?jpbswKKDsUnBpQN/mSd/Zb+qsIXyyREXoxjjo5ZddSx8j3Plw/ZmZelpwSiv?=
- =?us-ascii?Q?tXNhvZZMhSNWB8lDVdwfMcwZP9plHvpdYHBummk8sFVxFPx4s7hJwO/Io5Bl?=
- =?us-ascii?Q?2rb8fgq18deQD1ybvk8S86bMQBy+n3plRejS5ilHTICOHdyrjJbGtoKR3+rw?=
- =?us-ascii?Q?0NVHvsJWBI0gowrYjcMU3ylEbv7o/EpazfTO08xOqKYqksjBYvUoyxxkQ/fy?=
- =?us-ascii?Q?zB6HqgIaS8aw9SpKU6M=3D?=
-X-Forefront-Antispam-Report:
-	CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:satlexmb07.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230040)(1800799024)(376014)(7416014)(82310400026)(36860700013);DIR:OUT;SFP:1101;
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 22 Oct 2025 17:38:28.9491
- (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: b95e657e-d07b-4591-0272-08de1191d001
-X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[satlexmb07.amd.com]
-X-MS-Exchange-CrossTenant-AuthSource:
-	SJ5PEPF000001F3.namprd05.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: IA0PR12MB7700
+References: <20251018000713.677779-1-vipinsh@google.com> <20251018000713.677779-16-vipinsh@google.com>
+ <aPM_DUyyH1KaOerU@wunner.de> <20251018223620.GD1034710.vipinsh@google.com>
+ <20251018231126.GS3938986@ziepe.ca> <20251020234934.GB648579.vipinsh@google.com>
+In-Reply-To: <20251020234934.GB648579.vipinsh@google.com>
+From: David Matlack <dmatlack@google.com>
+Date: Wed, 22 Oct 2025 10:45:31 -0700
+X-Gm-Features: AS18NWBDwI8X4gUgX9jxxmPGL4H9LlvpDngwDEMW5KSJ3qFfWS4FLNUGpgZ_www
+Message-ID: <CALzav=eO4Lc15NV5fh-=LCaXz+s4-5+UxPLC4ePMqwUatvLXtw@mail.gmail.com>
+Subject: Re: [RFC PATCH 15/21] PCI: Make PCI saved state and capability
+ structs public
+To: Vipin Sharma <vipinsh@google.com>
+Cc: Jason Gunthorpe <jgg@ziepe.ca>, Lukas Wunner <lukas@wunner.de>, bhelgaas@google.com, 
+	alex.williamson@redhat.com, pasha.tatashin@soleen.com, graf@amazon.com, 
+	pratyush@kernel.org, gregkh@linuxfoundation.org, chrisl@kernel.org, 
+	rppt@kernel.org, skhawaja@google.com, parav@nvidia.com, saeedm@nvidia.com, 
+	kevin.tian@intel.com, jrhilke@google.com, david@redhat.com, 
+	jgowans@amazon.com, dwmw2@infradead.org, epetron@amazon.de, 
+	junaids@google.com, linux-kernel@vger.kernel.org, linux-pci@vger.kernel.org, 
+	kvm@vger.kernel.org, linux-kselftest@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Add to the known supported SEV-SNP policy bits that don't require any
-implementation support from KVM in order to successfully use them.
+On Mon, Oct 20, 2025 at 4:49=E2=80=AFPM Vipin Sharma <vipinsh@google.com> w=
+rote:
+>
+> On 2025-10-18 20:11:26, Jason Gunthorpe wrote:
+> > On Sat, Oct 18, 2025 at 03:36:20PM -0700, Vipin Sharma wrote:
+> >
+> > > Having __packed in my version of struct, I can build validation like
+> > > hardcoded offset of members. I can add version number (not added in t=
+his
+> > > series) for checking compatbility in the struct for serialization and
+> > > deserialization. Overall, it is providing some freedom to how to pass
+> > > data to next kernel without changing or modifying the PCI state
+> > > structs.
+> >
+> > I keep saying this, and this series really strongly shows why, we need
+> > to have a dedicated header directroy for LUO "ABI" structs. Putting
+> > this random struct in some random header and then declaring it is part
+> > of the luo ABI is really bad.
+>
+> Now that we have PCI, IOMMU, and VFIO series out. What should be the
+> strategy for LUO "ABI" structs? I would like some more clarity on how
+> you are visioning this.
+>
+> Are you suggesting that each subsystem create a separate header file for
+> their serialization structs or we can have one common header file used
+> by all subsystems as dumping ground for their structs?
 
-At this time, this includes:
-  - CXL_ALLOW
-  - MEM_AES_256_XTS
-  - RAPL_DIS
-  - CIPHERTEXT_HIDING_DRAM
-  - PAGE_SWAP_DISABLE
+I think we should have multiple header files in one directory, that
+way we can assign separate MAINTAINERS for each file as needed.
 
-Arguably, RAPL_DIS and CIPHERTEXT_HIDING_DRAM require KVM and the CCP
-driver to enable these features in order for the setting of the policy
-bits to be successfully handled. But, a guest owner may not wish their
-guest to run on a system that doesn't provide support for those features,
-so allowing the specification of these bits accomplishes that. Whether
-or not the bit is supported by SEV firmware, a system that doesn't support
-these features will either fail during the KVM validation of supported
-policy bits before issuing the LAUNCH_START or fail during the
-LAUNCH_START.
+Jason Miu proposed the first such header for KHO in
+https://lore.kernel.org/lkml/CALzav=3DeqwTdzFhZLi_mWWXGuDBRwWQdBxQrzr4tN28a=
+g8Zr_8Q@mail.gmail.com/.
 
-Signed-off-by: Tom Lendacky <thomas.lendacky@amd.com>
----
- arch/x86/kvm/svm/sev.c | 22 ++++++++++++++++------
- 1 file changed, 16 insertions(+), 6 deletions(-)
-
-diff --git a/arch/x86/kvm/svm/sev.c b/arch/x86/kvm/svm/sev.c
-index 24167178bf05..83beddc52715 100644
---- a/arch/x86/kvm/svm/sev.c
-+++ b/arch/x86/kvm/svm/sev.c
-@@ -65,12 +65,22 @@ module_param_named(ciphertext_hiding_asids, nr_ciphertext_hiding_asids, uint, 04
- #define AP_RESET_HOLD_NAE_EVENT		1
- #define AP_RESET_HOLD_MSR_PROTO		2
- 
--#define KVM_SNP_POLICY_MASK_VALID	(SNP_POLICY_MASK_API_MINOR	| \
--					 SNP_POLICY_MASK_API_MAJOR	| \
--					 SNP_POLICY_MASK_SMT		| \
--					 SNP_POLICY_MASK_RSVD_MBO	| \
--					 SNP_POLICY_MASK_DEBUG		| \
--					 SNP_POLICY_MASK_SINGLE_SOCKET)
-+/*
-+ * SEV-SNP policy bits that can be supported by KVM. These include policy bits
-+ * that have implementation support within KVM or policy bits that do not rely
-+ * on any implementation support within KVM.
-+ */
-+#define KVM_SNP_POLICY_MASK_VALID	(SNP_POLICY_MASK_API_MINOR		| \
-+					 SNP_POLICY_MASK_API_MAJOR		| \
-+					 SNP_POLICY_MASK_SMT			| \
-+					 SNP_POLICY_MASK_RSVD_MBO		| \
-+					 SNP_POLICY_MASK_DEBUG			| \
-+					 SNP_POLICY_MASK_SINGLE_SOCKET		| \
-+					 SNP_POLICY_MASK_CXL_ALLOW		| \
-+					 SNP_POLICY_MASK_MEM_AES_256_XTS	| \
-+					 SNP_POLICY_MASK_RAPL_DIS		| \
-+					 SNP_POLICY_MASK_CIPHERTEXT_HIDING_DRAM	| \
-+					 SNP_POLICY_MASK_PAGE_SWAP_DISABLE)
- 
- static u64 snp_supported_policy_bits __ro_after_init;
- 
--- 
-2.51.1
-
+Following that example we can add vfio_pci.h and pci.h to that
+directory for VFIO and PCI ABI structs respectively.
 
