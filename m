@@ -1,188 +1,164 @@
-Return-Path: <kvm+bounces-60890-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-60891-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 643E0C02028
-	for <lists+kvm@lfdr.de>; Thu, 23 Oct 2025 17:10:05 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 434B3C02052
+	for <lists+kvm@lfdr.de>; Thu, 23 Oct 2025 17:12:47 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7183B3B30D8
-	for <lists+kvm@lfdr.de>; Thu, 23 Oct 2025 15:03:56 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B9B893B4E1E
+	for <lists+kvm@lfdr.de>; Thu, 23 Oct 2025 15:05:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0865832C957;
-	Thu, 23 Oct 2025 15:03:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3A440332EA3;
+	Thu, 23 Oct 2025 15:05:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="aTVkQx+L"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="M7Zby9xO"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.15])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pg1-f201.google.com (mail-pg1-f201.google.com [209.85.215.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B8EC71DFDA1;
-	Thu, 23 Oct 2025 15:03:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.15
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C0BB51D5AD4
+	for <kvm@vger.kernel.org>; Thu, 23 Oct 2025 15:05:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761231828; cv=none; b=VUHQr05myJT//ws3ufqmUcLJdGxOYZ5hwTP9GXTvlP2Vc+AHAD/qx2NvKWyRAoFKd64J1Rbyy2bIC31AlXhFj05icE30+1ojXcCAAeWmQRxcWPtlWYpeEcwK6rvwvnb4DgAs72nLbNJQVoOHUy8pLYPMNQqbULwQC1GaSS2jVVg=
+	t=1761231938; cv=none; b=ty7qQO1THkrFggypZsQiRrdO5UPeQo9tG5wAqRl2BSTYEAULErfzaBLfpUJGPdsYZnUXo8NNQ7o/4RQ2PnS5srfPji4im1vCGg2hbfzN3OZGZFXK2Y21OU7yavhkr7iKxt8lu0yUtlm3W1IGS9FwhQkIGG2p8Q7T93qPTVwrIhU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761231828; c=relaxed/simple;
-	bh=L3CufpmTsRyV6nEeqzg1m9i5Jcn+QNjj76By8sSlFCg=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=YlTynpLP/k2D3tjGt5r7YGrtPwBzph3J3P4uHl4TRY10KcVWmBpWP6jTp2LrZoleGNzhb7gjJEMa93tNYxyAAaFYUzbQpMTQ/hzuG7c+w7lpjUEwDCL2tRD8Y2lfQv/1YkJWh5cjLT7HgXkcTGGd1onoaXjuXMpyGe44U9GyyZM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=aTVkQx+L; arc=none smtp.client-ip=198.175.65.15
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1761231827; x=1792767827;
-  h=message-id:date:mime-version:subject:to:cc:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=L3CufpmTsRyV6nEeqzg1m9i5Jcn+QNjj76By8sSlFCg=;
-  b=aTVkQx+LS5CrNHFmlUObCYpri0nufiULiXyRYXUOnapOAKH9MD4ujIQa
-   QGaWYR9KUsKlZE6Dj+s1Af5MCaVFm9iUpixj1RlI5laOIC07yl1xd7Nqf
-   CcG3a7pIDwi99s2x3bs9tCfzeR77ITqdlthdXE9zGgJKx3pMIsyTZciqM
-   /Hng5CJ76zBAj4UtZJRKTZpAWTZr3jDknygGkTnoIQCml+G+7kFy3zqx+
-   Bx6mFqT3Vp9XqBK5psQT2yngrmN+PlDV/cSesgPqBvn8i22Osk0jKGDI+
-   3JPw3hPY3kkFZws6OgWXdOh8mZNtcn4jJYukuMFWsyrtxvOUIJ9dc7Cfx
-   g==;
-X-CSE-ConnectionGUID: 2nCK+34xR0WghbQ4hWn5qg==
-X-CSE-MsgGUID: WWRPlPubR/e+2gBJiIk/zg==
-X-IronPort-AV: E=McAfee;i="6800,10657,11586"; a="67049063"
-X-IronPort-AV: E=Sophos;i="6.19,250,1754982000"; 
-   d="scan'208";a="67049063"
-Received: from fmviesa003.fm.intel.com ([10.60.135.143])
-  by orvoesa107.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 23 Oct 2025 08:03:46 -0700
-X-CSE-ConnectionGUID: m4kbs3LhRwaias4kXu0j8g==
-X-CSE-MsgGUID: n2jvHvr4RNme4UzLO79rvg==
-X-ExtLoop1: 1
-Received: from tfalcon-desk.amr.corp.intel.com (HELO [10.125.108.251]) ([10.125.108.251])
-  by fmviesa003-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 23 Oct 2025 08:03:45 -0700
-Message-ID: <ba8434fb-8bbd-4d4a-bd01-1bdb2219979b@intel.com>
-Date: Thu, 23 Oct 2025 08:03:44 -0700
+	s=arc-20240116; t=1761231938; c=relaxed/simple;
+	bh=jz93bF63ecWHqlpsfaTIWZ1F+DloVz29gxl65xxvxP8=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=WqIwgVoKB4vIFejteaHj4aFyeI09fOXF7L2o5jnOhEi9bwRl+cC7WHq9/uW6mb3Wf8jG3bCuudyyRcBgFOCSvZiV89L8UL9i/ppbTuyZ7LQp/3MnLq5ZnMzwHNNAAdFwfNXL3SoooBGyY+oiWwTvG6e8tyOFgms8uawZpTzUJ7I=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=M7Zby9xO; arc=none smtp.client-ip=209.85.215.201
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+Received: by mail-pg1-f201.google.com with SMTP id 41be03b00d2f7-b62da7602a0so743446a12.2
+        for <kvm@vger.kernel.org>; Thu, 23 Oct 2025 08:05:36 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1761231936; x=1761836736; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=PvcmXgf+o6Tu2cYvhHpGmpe9m3a/ceHWHcYak3PalII=;
+        b=M7Zby9xOPXaShDYfHfELOZo+QIPupBI+fSUhPtUzu8LpLDzqODas4KLyd45oYCyAF8
+         BDxJv0hNgFLFoB8WQcIXM00OkNa79EuitP9lwB6a1flH00FPjoJql2i6MS0i6b4VNMHd
+         YNSloQK9lH9CXXwzouz+JypLxzeZxgc1xeDUpSCTKAItWzF7UiMt+e/I1MBpFeRulRun
+         HKkA6NEPOx8XCDgUnnkYTUJNHuXc9jt68IA6uqroZdH3pPDKlADQDB4/t2+S7B22u6Hd
+         Xei2sVhVvQyzMKQeO5urHWG2DtyKldzVKDB6mFy7mjgIM6JQsZqlWiyEmbDgTN26HkJA
+         bMfA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1761231936; x=1761836736;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=PvcmXgf+o6Tu2cYvhHpGmpe9m3a/ceHWHcYak3PalII=;
+        b=LuTyrbQxKJniMSNIEKjWvpZiZ3pcik7fuw4mIfLCsKTtNWAQzwYPu305I/n/D5kUGV
+         POQQSsj4b0QOA63/D8leBuYVEMmzkpIIckBr16e2S9MTwxBixe/6w/vvv9jr7kp/8ta7
+         JT0r7UD7oDLE0/pa0V4UXs4sewh0XxEdyVFizJg3tz8r6cq6brjRcwQq4b6d5zpLOKN8
+         lOHcnKaQ3CrkEkFDSejHswOlHd2w+BA8SpxZ94ddE8vI77GAsyh0EbFzwHviLvpyDSm2
+         1T2yMmuQxZrLw4w+Lb7NrmPBUa2oSIhjP5RW9ogkKPCRcZ4rT8aIGiGE09Q/nLft/JjR
+         +osg==
+X-Forwarded-Encrypted: i=1; AJvYcCVifOAC9gFCy5kF4LUu5fnbvoZlMQgPhSBOTehcS+WUoTED3lauqt4/VtYs9wJE3g+7pL4=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxcPMFpNTAWW1uXTHR4Bor5ZzWSihsRf56Yddqe6LWbZuIAdWtq
+	MRVEvgaecVNEvbNK6lsOoa3s3yeIbEB8/J91AZ5Ww4gfyphebvPmmcifER9L4ZWONYaMqUJBU3l
+	JWfe7gw==
+X-Google-Smtp-Source: AGHT+IHpWV5RNhKUXvWMGZ+xD8d/MTd1Ze+E21K0nbVEiBP6P7EQ34tE5jerqVVq8m5WkJ7UUYnKv9jKozQ=
+X-Received: from pjbsd7.prod.google.com ([2002:a17:90b:5147:b0:33b:b3b8:216b])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:3141:b0:32d:e07f:3236
+ with SMTP id 98e67ed59e1d1-33bcf8e3ab0mr32372876a91.22.1761231935591; Thu, 23
+ Oct 2025 08:05:35 -0700 (PDT)
+Date: Thu, 23 Oct 2025 08:05:33 -0700
+In-Reply-To: <diqzv7k5emza.fsf@google.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v8 05/21] x86/cea: Export API for per-CPU exception stacks
- for KVM
-To: "Xin Li (Intel)" <xin@zytor.com>, linux-kernel@vger.kernel.org,
- kvm@vger.kernel.org, linux-doc@vger.kernel.org
-Cc: pbonzini@redhat.com, seanjc@google.com, corbet@lwn.net,
- tglx@linutronix.de, mingo@redhat.com, bp@alien8.de,
- dave.hansen@linux.intel.com, x86@kernel.org, hpa@zytor.com, luto@kernel.org,
- peterz@infradead.org, andrew.cooper3@citrix.com, chao.gao@intel.com,
- hch@infradead.org
-References: <20251014010950.1568389-1-xin@zytor.com>
- <20251014010950.1568389-6-xin@zytor.com>
-From: Dave Hansen <dave.hansen@intel.com>
-Content-Language: en-US
-Autocrypt: addr=dave.hansen@intel.com; keydata=
- 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
-In-Reply-To: <20251014010950.1568389-6-xin@zytor.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Mime-Version: 1.0
+References: <cover.1760731772.git.ackerleytng@google.com> <8ee16fbf254115b0fd72cc2b5c06d2ccef66eca9.1760731772.git.ackerleytng@google.com>
+ <2457cb3b-5dde-4ca1-b75d-174b5daee28a@arm.com> <diqz4irqg9qy.fsf@google.com>
+ <diqzy0p2eet3.fsf@google.com> <aPlpKbHGea90IebS@google.com> <diqzv7k5emza.fsf@google.com>
+Message-ID: <aPpEPZ4YfrRHIkal@google.com>
+Subject: Re: [RFC PATCH v1 07/37] KVM: Introduce KVM_SET_MEMORY_ATTRIBUTES2
+From: Sean Christopherson <seanjc@google.com>
+To: Ackerley Tng <ackerleytng@google.com>
+Cc: Steven Price <steven.price@arm.com>, cgroups@vger.kernel.org, kvm@vger.kernel.org, 
+	linux-doc@vger.kernel.org, linux-fsdevel@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org, 
+	linux-mm@kvack.org, linux-trace-kernel@vger.kernel.org, x86@kernel.org, 
+	akpm@linux-foundation.org, binbin.wu@linux.intel.com, bp@alien8.de, 
+	brauner@kernel.org, chao.p.peng@intel.com, chenhuacai@kernel.org, 
+	corbet@lwn.net, dave.hansen@intel.com, dave.hansen@linux.intel.com, 
+	david@redhat.com, dmatlack@google.com, erdemaktas@google.com, 
+	fan.du@intel.com, fvdl@google.com, haibo1.xu@intel.com, hannes@cmpxchg.org, 
+	hch@infradead.org, hpa@zytor.com, hughd@google.com, ira.weiny@intel.com, 
+	isaku.yamahata@intel.com, jack@suse.cz, james.morse@arm.com, 
+	jarkko@kernel.org, jgg@ziepe.ca, jgowans@amazon.com, jhubbard@nvidia.com, 
+	jthoughton@google.com, jun.miao@intel.com, kai.huang@intel.com, 
+	keirf@google.com, kent.overstreet@linux.dev, liam.merwick@oracle.com, 
+	maciej.wieczor-retman@intel.com, mail@maciej.szmigiero.name, 
+	maobibo@loongson.cn, mathieu.desnoyers@efficios.com, maz@kernel.org, 
+	mhiramat@kernel.org, mhocko@kernel.org, mic@digikod.net, michael.roth@amd.com, 
+	mingo@redhat.com, mlevitsk@redhat.com, mpe@ellerman.id.au, 
+	muchun.song@linux.dev, nikunj@amd.com, nsaenz@amazon.es, 
+	oliver.upton@linux.dev, palmer@dabbelt.com, pankaj.gupta@amd.com, 
+	paul.walmsley@sifive.com, pbonzini@redhat.com, peterx@redhat.com, 
+	pgonda@google.com, prsampat@amd.com, pvorel@suse.cz, qperret@google.com, 
+	richard.weiyang@gmail.com, rick.p.edgecombe@intel.com, rientjes@google.com, 
+	rostedt@goodmis.org, roypat@amazon.co.uk, rppt@kernel.org, 
+	shakeel.butt@linux.dev, shuah@kernel.org, suzuki.poulose@arm.com, 
+	tabba@google.com, tglx@linutronix.de, thomas.lendacky@amd.com, 
+	vannapurve@google.com, vbabka@suse.cz, viro@zeniv.linux.org.uk, 
+	vkuznets@redhat.com, will@kernel.org, willy@infradead.org, wyihan@google.com, 
+	xiaoyao.li@intel.com, yan.y.zhao@intel.com, yilun.xu@intel.com, 
+	yuzenghui@huawei.com
+Content-Type: text/plain; charset="us-ascii"
 
-A couple of nits:
-
-The subject here isn't super helpful. This is doing a *LOT* more than
-just exporting something. In a perfect world, you'd probably even do the
-refactoring first and export in a separate patch.
-
-On 10/13/25 18:09, Xin Li (Intel) wrote:
-> Convert the __this_cpu_ist_{top,bottom}_va() macros into proper functions,
-> and export __this_cpu_ist_top_va() to allow KVM to retrieve the top of the
-> per-CPU exception stack.
-
-The key thing this does is create a data structure and move away from
-open-coded size calculations to using the compiler for it. The
-macro=>function conversion is barely worth mentioning, IMNHO.
-
-> FRED introduced new fields in the host-state area of the VMCS for stack
-> levels 1->3 (HOST_IA32_FRED_RSP[123]), each respectively corresponding to
-> per-CPU exception stacks for #DB, NMI and #DF.  KVM must populate these
-> fields each time a vCPU is loaded onto a CPU.
+On Thu, Oct 23, 2025, Ackerley Tng wrote:
+> Sean Christopherson <seanjc@google.com> writes:
 > 
-> To simplify access to the exception stacks in struct cea_exception_stacks,
-> a union is used to create an array alias, enabling array-style indexing of
-> the stack entries.
+> > On Wed, Oct 22, 2025, Ackerley Tng wrote:
+> >> Ackerley Tng <ackerleytng@google.com> writes:
+> >> 
+> >> Found another issue with KVM_CAP_MEMORY_ATTRIBUTES2.
+> >> 
+> >> KVM_CAP_MEMORY_ATTRIBUTES2 was defined to do the same thing as
+> >> KVM_CAP_MEMORY_ATTRIBUTES, but that's wrong since
+> >> KVM_CAP_MEMORY_ATTRIBUTES2 should indicate the presence of
+> >> KVM_SET_MEMORY_ATTRIBUTES2 and struct kvm_memory_attributes2.
+> >
+> > No?  If no attributes are supported, whether or not KVM_SET_MEMORY_ATTRIBUTES2
+> > exists is largely irrelevant.
+> 
+> That's true.
+> 
+> > We can even provide the same -ENOTTY errno by
+> > checking that _any_ attributes are supported, i.e. so that doing
+> > KVM_SET_MEMORY_ATTRIBUTES2 on KVM without any support whatsoever fails in the
+> > same way that KVM with code support but no attributes fails.
+> 
+> IIUC KVM_SET_MEMORY_ATTRIBUTES doesn't fail with -ENOTTY now when there
+> are no valid attributes.
+> 
+> Even if there's no valid attributes (as in
+> kvm_supported_mem_attributes() returns 0), it's possible to call
+> KVM_SET_MEMORY_ATTRIBUTES with .attributes set to 0, which will be a
+> no-op, but will return 0.
+> 
+> I think this is kind of correct behavior since .attributes = 0 is
+> actually a valid expression for "I want this range to be shared", and
+> for a VM that doesn't support private memory, it's a valid expression.
+> 
+> 
+> The other way that there are "no attributes" would be if there are no
+> /VM/ attributes, in which case KVM_SET_MEMORY_ATTRIBUTES, sent to as a
+> vm ioctl, will return -ENOTTY.
 
-Super nit here, but please use imperative voice for stuff like this.
+Ya, this is what I was trying to say with "_any_ attributes are supported".  I.e.
+by "any" I meant "any attributes in KVM for VMs vs. gmems", not "any attributes
+for this specific VM/gmem instance".
 
-"To simplify access to" => "Simplify access to"
+> > In other words, I don't see why it can't do both.  Even if we can't massage the
+> > right errno, I would much rather KVM_SET_MEMORY_ATTRIBUTES2 enumerate the set of
+> 
+> Did you mean KVM_CAP_MEMORY_ATTRIBUTES2 in the line above?
 
- and/or
-
-"a union is used" => "use a union"
-
-> diff --git a/arch/x86/include/asm/cpu_entry_area.h b/arch/x86/include/asm/cpu_entry_area.h
-> index d0f884c28178..58cd71144e5e 100644
-> --- a/arch/x86/include/asm/cpu_entry_area.h
-> +++ b/arch/x86/include/asm/cpu_entry_area.h
-> @@ -16,6 +16,19 @@
->  #define VC_EXCEPTION_STKSZ	0
->  #endif
->  
-> +/*
-> + * The exception stack ordering in [cea_]exception_stacks
-> + */
-> +enum exception_stack_ordering {
-> +	ESTACK_DF,
-> +	ESTACK_NMI,
-> +	ESTACK_DB,
-> +	ESTACK_MCE,
-> +	ESTACK_VC,
-> +	ESTACK_VC2,
-> +	N_EXCEPTION_STACKS
-> +};
-
-This creates some new duplicated logic. There's already a list in the
-same order in ESTACKS_MEMBERS() of all the stacks.
-
-Ideally, everyone would move over to the enum and wouldn't need to use
-the ESTACKS_MEMBERS() route. What's preventing that?
-
-
+Doh, yes.
 
