@@ -1,251 +1,144 @@
-Return-Path: <kvm+bounces-60894-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-60895-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 70304C0251F
-	for <lists+kvm@lfdr.de>; Thu, 23 Oct 2025 18:08:25 +0200 (CEST)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5387FC02782
+	for <lists+kvm@lfdr.de>; Thu, 23 Oct 2025 18:37:19 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id D84B4189BBE4
-	for <lists+kvm@lfdr.de>; Thu, 23 Oct 2025 16:08:30 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id A988F4E493C
+	for <lists+kvm@lfdr.de>; Thu, 23 Oct 2025 16:37:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 239FE279903;
-	Thu, 23 Oct 2025 16:07:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 41DA8322523;
+	Thu, 23 Oct 2025 16:37:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="k1pwrSbl"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="WVt0Rg/s"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pg1-f201.google.com (mail-pg1-f201.google.com [209.85.215.201])
+Received: from mail-pj1-f73.google.com (mail-pj1-f73.google.com [209.85.216.73])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C65F2272E51
-	for <kvm@vger.kernel.org>; Thu, 23 Oct 2025 16:07:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F0F203191DE
+	for <kvm@vger.kernel.org>; Thu, 23 Oct 2025 16:37:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.73
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761235677; cv=none; b=hk8CNgdq27p7A4N3KGkNv5oqst+X4QngkVAYhtozMvfx2o22Egz7bNWcu3q2PDf0W1yEcIsBXhd+8eEnqYiR7KD5cotQfHD0F+fmuic2xOkQN04ikHa1T/tgfNnYSDUyF3LGOf3Vvfk/Prm/LrFZgNV+NLsT/Zi6TfTOWWEJO6s=
+	t=1761237426; cv=none; b=SIQiy4A7A2BjXcXGoWjI7K82V9PEs9Kwl/pJ6MeSpkM2xCjDiPnmAYE2QwcDYMkyqKd2m+dc7t+1UOUhsLmfvI5+6zjOnKxQqYZ44hoxC6kJ2Ar7Y7tl5YJ9Hq2Dm6HqfyYPdqbaxH88rPigEoCy9KCTMB5gLodI/iuNBOP2yDA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761235677; c=relaxed/simple;
-	bh=1nVKA7foUkRSyS9Wrqb+5MZp+cy2gWR48rPSz2xIT74=;
+	s=arc-20240116; t=1761237426; c=relaxed/simple;
+	bh=tkEPfSuMSF6GxJpjuysibX4dYLzDAXInS/wO1Myhx3A=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=TTFtgF+NROJ4PIxcJQ/sMEFGkVmcT1WK/NmM4i4IWOP4Q5+qZkouXvexS1NwxvR3zO1zNrPpZQPkY3/RTQkdIdGWk5naWXBRBxU0L2EKsx5vUpSWfKizlxMQ424/HcJCRVXR5md/Ze1BHRxRIL3cPPHN2rOn9Kf4uq/laXAmdBE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=k1pwrSbl; arc=none smtp.client-ip=209.85.215.201
+	 To:Cc:Content-Type; b=RfTNLRhGAMfCDRMbr8nkSmrOMxhbTWCS8+BCH+Km6TLidDlx9xiNFu5T53diZfvD6Umb+TTOUfcFnS5mRY5eHuPDfZ0HqjYmji1uL+j0snD1YQPI3T93YqR/m5usJ8yDjqekYPDIciLug3VmqaQOg2sJ3W4tMEGXEuuqH9OIvjA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=WVt0Rg/s; arc=none smtp.client-ip=209.85.216.73
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pg1-f201.google.com with SMTP id 41be03b00d2f7-b6a33319cb6so748681a12.2
-        for <kvm@vger.kernel.org>; Thu, 23 Oct 2025 09:07:55 -0700 (PDT)
+Received: by mail-pj1-f73.google.com with SMTP id 98e67ed59e1d1-33bb3b235ebso2483806a91.1
+        for <kvm@vger.kernel.org>; Thu, 23 Oct 2025 09:37:04 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1761235675; x=1761840475; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1761237424; x=1761842224; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=iw+RxJFrvLXotShsX3G3u/lNQNdh4+3g/W60yOnZyHo=;
-        b=k1pwrSblX6uuqh7hx65iIw56Swxet+M2XtgT3ZB1JZVnp7+vByNEl6aCwrRDMQEBvG
-         MSqpIuxF4BgByv/kYhv83XG9KVJ4wXpBecXuWrRPeorNk67BEMW7ABJfYLLPISYdwNeX
-         k+OoxwxyKyTnOIpDcgejrSLpbWz46fUHUW52m/ALiNBa8xV8VGKW7EAGPFMgXnP6hdEV
-         WFprarvXrINWZ1w2kSuxIRf7K+597XK54x4FiuCNFswneM8p+bzJq5xvjl/JUooItw/p
-         gPHhgg8PAF2onNxpnAwVK+k5wga+Luot5147YsdKTj+k9pkQw2UDiqOjY2Gqf+xfvIcl
-         caIw==
+        bh=Jtv3AWXkUKD6xrmMF+F/kps4qPDMdvlVlOxla06uyRQ=;
+        b=WVt0Rg/stXcPGFuyqxVli4N/xeR/6ANxBANuAqQO/E5+EBYwkAKk4QgSOvpmHpZlg4
+         aZgseBGGoH7goOcG1C7Mlbjh0V6e+7L4h6pYWfewypvUol5y7L216JJu+qJ/wiIXmFAz
+         XPTJnjEb+n9UVWFY+w9dqSxoKE6+qjBH3PXtAPT8ahiYK4aaDsN/o2qaboY13OEC39uO
+         GlXKpK/k/wPa8SCjp04EV71157hl6+1O+gdp3dRjmg1WRroGygRPzaP2+PuIcO2lz+Cp
+         NlF49RJEiG+9l4O1B6TxIhtztj3pkZe+yiBO2gqWjJdYMNWufa/XLLC5iBG/XPnDnEsV
+         NFMw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1761235675; x=1761840475;
+        d=1e100.net; s=20230601; t=1761237424; x=1761842224;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=iw+RxJFrvLXotShsX3G3u/lNQNdh4+3g/W60yOnZyHo=;
-        b=TykRu9lafWsclezpCzOd6ZZeXds4Xu51pM8G6TvNoBrJQRgPnocolQiqeE9w17yM85
-         pgIa+h0RtvUjEWwkqYrS0Wnb7pTDFiMJCczfsyMGgSAzbv9fpM8wYouAGXq7u0BXlE2P
-         FzonA7H9NVdQn2xkmAyccfnGtZeH4xFEcV6xMWBvfnP4CSO98KEAtWQ0dkK5Wj5NTJt9
-         lbMXYT1b8lUg4EKGduSnQFWJB/NQZZ29jgCD4jwxmktJstU5lh4rbziAkIpsil6dtO7d
-         bCGfDZT5u/HqL0KcCh7P87DbzwJN1JOxXTU6PIgMx/tca67y6mFA0a4SBWV6EIkTnPuk
-         x2Ew==
-X-Forwarded-Encrypted: i=1; AJvYcCUNgvMNVClM/UQs6FKmtKwnF/zOnCbvJwk/gDKsSerZq05gnHkimWf3ofmuovGf6kPw4OU=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yz2VRI09o2WK7eEpGwscYpUBJmHq3mXZ4IFL8OYdtJic0SKKwSo
-	NkSLxjbcTYxHVM6UDAFMZtBNorRgX0KtGbG12NGgs8qaoAFyqNWYA9S1ilyl7uT0NGc4/P8pF+O
-	2c2L1vg==
-X-Google-Smtp-Source: AGHT+IF6SU0i3VjzGwoS1hsfvvAoYKHCfX1teOWArnTGZGjyd5oKJzCEyV/9N1Mdqw+d1V9YcutI70FGQeE=
-X-Received: from pjte14.prod.google.com ([2002:a17:90a:c20e:b0:33b:ca21:e3e7])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:4c02:b0:32e:3686:830e
- with SMTP id 98e67ed59e1d1-33fafc1ce07mr4286914a91.23.1761235675127; Thu, 23
- Oct 2025 09:07:55 -0700 (PDT)
-Date: Thu, 23 Oct 2025 09:07:53 -0700
-In-Reply-To: <20251020161352.69257-2-kalyazin@amazon.com>
+        bh=Jtv3AWXkUKD6xrmMF+F/kps4qPDMdvlVlOxla06uyRQ=;
+        b=vF3EpOI3/GucnFsXnLDkamf4gPUquPmACTIt1ps0CDaLr1O83GhquHLo8IX/XdIV7W
+         S/7zHEJEjaZ6VN5fBuYI0exTtMYrYHw7/L+dlXedwSetjZ4JdGadV9EJviBHaZ3pMEkN
+         Cb9UM7rWkohhYwigk7zrzYyvAfvuS9rAto37uiixYr8wdqWuRx+liZqgAHDAVTsiEU9D
+         LLvLL2ARQao0Y6Fw9XGIysbv6ZSuxNkJEh64RZQPyUKFsN3UjnirmLmBibX8wuDmJcOZ
+         +lQFyc5xyH0cbyppzXWSUSZU6255Q9YCODroyrEXWvKJpDQTT894r8RLbwh/9egkfHBu
+         fAAQ==
+X-Gm-Message-State: AOJu0YwM7bMjTQS+m2cXgSTdMkNdanlcbZTfv9qfJjfvuHEQe6I8hQn9
+	mQZuqjdC3uEeeJGpCbi8g8tlw4frYXbc6aBEH10TY1g1f1cfZxODFU+d0wtxVVBSjIBPQaNGZXo
+	8aNDlUA==
+X-Google-Smtp-Source: AGHT+IF0FAeqDrDGXWaUrUjQhS7ytpMli/KUCMauoXGAkgYmGUztcbufyavat55ecmSo7vezKRe5g+t+/Cg=
+X-Received: from pjtf19.prod.google.com ([2002:a17:90a:c293:b0:33b:da89:9788])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:2d8f:b0:339:d1f0:c740
+ with SMTP id 98e67ed59e1d1-33bcf86c093mr30922848a91.1.1761237424275; Thu, 23
+ Oct 2025 09:37:04 -0700 (PDT)
+Date: Thu, 23 Oct 2025 09:37:02 -0700
+In-Reply-To: <3a86b3678a78a8b720d3818f4121972f67e2d0a8.1761154644.git.thomas.lendacky@amd.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
-References: <20251020161352.69257-1-kalyazin@amazon.com> <20251020161352.69257-2-kalyazin@amazon.com>
-Message-ID: <aPpS2aqdobVTk_ed@google.com>
-Subject: Re: [PATCH v6 1/2] KVM: guest_memfd: add generic population via write
+References: <cover.1761154644.git.thomas.lendacky@amd.com> <3a86b3678a78a8b720d3818f4121972f67e2d0a8.1761154644.git.thomas.lendacky@amd.com>
+Message-ID: <aPpZrpfes8-SY4k_@google.com>
+Subject: Re: [PATCH v3 3/4] crypto: ccp - Add an API to return the supported
+ SEV-SNP policy bits
 From: Sean Christopherson <seanjc@google.com>
-To: Nikita Kalyazin <kalyazin@amazon.co.uk>
-Cc: "pbonzini@redhat.com" <pbonzini@redhat.com>, "shuah@kernel.org" <shuah@kernel.org>, 
-	"kvm@vger.kernel.org" <kvm@vger.kernel.org>, 
-	"linux-kselftest@vger.kernel.org" <linux-kselftest@vger.kernel.org>, 
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, "david@redhat.com" <david@redhat.com>, 
-	"jthoughton@google.com" <jthoughton@google.com>, "patrick.roy@linux.dev" <patrick.roy@linux.dev>, 
-	Jack Thomson <jackabt@amazon.co.uk>, Derek Manwaring <derekmn@amazon.com>, 
-	Marco Cali <xmarcalx@amazon.co.uk>
+To: Tom Lendacky <thomas.lendacky@amd.com>
+Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org, x86@kernel.org, 
+	linux-crypto@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>, 
+	Borislav Petkov <bp@alien8.de>, Dave Hansen <dave.hansen@linux.intel.com>, 
+	Ingo Molnar <mingo@redhat.com>, Thomas Gleixner <tglx@linutronix.de>, 
+	Michael Roth <michael.roth@amd.com>, Ashish Kalra <ashish.kalra@amd.com>, 
+	Herbert Xu <herbert@gondor.apana.org.au>, David Miller <davem@davemloft.net>
 Content-Type: text/plain; charset="us-ascii"
 
-On Mon, Oct 20, 2025, Nikita Kalyazin wrote:
-> From: Nikita Kalyazin <kalyazin@amazon.com>
-> 
-> write syscall populates guest_memfd with user-supplied data in a generic
-> way, ie no vendor-specific preparation is performed.  If the request is
-> not page-aligned, the remaining bytes are initialised to 0.
-> 
-> write is only supported for non-CoCo setups where guest memory is not
-> hardware-encrypted.
+On Wed, Oct 22, 2025, Tom Lendacky wrote:
+> Supported policy bits are dependent on the level of SEV firmware that is
+> currently running. Create an API to return the supported policy bits for
+> a given level of firmware. KVM will AND that value with the KVM supported
 
-Please include all of the "why".  The code mostly communicates the "what", but
-it doesn't capture why write() support is at all interesting, nor does it explain
-why read() isn't supported.
+Given "KVM will AND" and the shortlog, I expected a _future_ patch to have the 
+           ^^^^
+KVM changes.
 
-> Signed-off-by: Nikita Kalyazin <kalyazin@amazon.com>
+That's partly a PEBKAC on my end (I mean, it's literally the first diff), but I
+do think it highlights that we should probably separate the KVM change from the
+PSP support. 
+
+Hmm, actually, the patch ordering is bad.  There shouldn't need to be a separate
+KVM change after this commit, because as things are ordered now, there will be an
+ABI change between patch 1 and this patch.
+
+So I think what you want is:
+
+  1. KVM: SEV: Consolidate the SEV policy bits in a single header file
+  2. crypto: ccp - Add an API to return the supported SEV-SNP policy bits
+  3. KVM: SEV: Publish supported SEV-SNP policy bits
+  4. KVM: SEV: Add known supported SEV-SNP policy bits
+
+where #3 uses sev_get_snp_policy_bits() straightaway.
+
+> policy bits to generate the actual supported policy bits.
+> 
+> Signed-off-by: Tom Lendacky <thomas.lendacky@amd.com>
 > ---
->  virt/kvm/guest_memfd.c | 48 ++++++++++++++++++++++++++++++++++++++++++
-
-There's a notable lack of uAPI and Documentation chanegs.  I.e. this needs a
-GUEST_MEMFD_FLAG_xxx along with proper documentation.
-
-And while it's definitely it's a-ok to land .write() in advance of the direct map
-changes, we do need to at least map out how we want the two to interact, e.g. so
-that we don't end up with constraints that are impossible to satisfy.
-
->  1 file changed, 48 insertions(+)
+>  arch/x86/kvm/svm/sev.c       |  3 ++-
+>  drivers/crypto/ccp/sev-dev.c | 37 ++++++++++++++++++++++++++++++++++++
+>  include/linux/psp-sev.h      | 20 +++++++++++++++++++
+>  3 files changed, 59 insertions(+), 1 deletion(-)
 > 
-> diff --git a/virt/kvm/guest_memfd.c b/virt/kvm/guest_memfd.c
-> index 94bafd6c558c..f4e218049afa 100644
-> --- a/virt/kvm/guest_memfd.c
-> +++ b/virt/kvm/guest_memfd.c
-> @@ -380,6 +380,8 @@ static int kvm_gmem_mmap(struct file *file, struct vm_area_struct *vma)
+> diff --git a/arch/x86/kvm/svm/sev.c b/arch/x86/kvm/svm/sev.c
+> index 45e87d756e15..24167178bf05 100644
+> --- a/arch/x86/kvm/svm/sev.c
+> +++ b/arch/x86/kvm/svm/sev.c
+> @@ -3099,7 +3099,8 @@ void __init sev_hardware_setup(void)
+>  			sev_snp_supported = is_sev_snp_initialized();
 >  
->  static struct file_operations kvm_gmem_fops = {
->  	.mmap		= kvm_gmem_mmap,
-> +	.llseek		= default_llseek,
-> +	.write_iter     = generic_perform_write,
->  	.open		= generic_file_open,
->  	.release	= kvm_gmem_release,
->  	.fallocate	= kvm_gmem_fallocate,
-> @@ -390,6 +392,49 @@ void kvm_gmem_init(struct module *module)
->  	kvm_gmem_fops.owner = module;
->  }
->  
-> +static int kvm_kmem_gmem_write_begin(const struct kiocb *kiocb,
-> +				     struct address_space *mapping,
-> +				     loff_t pos, unsigned int len,
-> +				     struct folio **foliop,
-> +				     void **fsdata)
+>  		if (sev_snp_supported) {
+> -			snp_supported_policy_bits = KVM_SNP_POLICY_MASK_VALID;
+> +			snp_supported_policy_bits = sev_get_snp_policy_bits();
+> +			snp_supported_policy_bits &= KVM_SNP_POLICY_MASK_VALID;
 
-Over-aggressive wrapping, this can be
+I vote for:
 
+			snp_supported_policy_bits = sev_get_snp_policy_bits() &
+						    KVM_SNP_POLICY_MASK_VALID;
 
-static int kvm_kmem_gmem_write_begin(const struct kiocb *kiocb,
-				     struct address_space *mapping, loff_t pos,
-				     unsigned int len, struct folio **folio,
-				     void **fsdata)
-
-or
-
-static int kvm_kmem_gmem_write_begin(const struct kiocb *kiocb,
-				     struct address_space *mapping,
-				     loff_t pos, unsigned int len,
-				     struct folio **folio, void **fsdata)
-
-if we want to bundle pos+len.
-
-> +{
-> +	struct file *file = kiocb->ki_filp;
-
-ki_filp is already a file, and even if it were a "void *", there's no need for a
-local variable.
-
-> +	struct inode *inode = file_inode(file);
-> +	pgoff_t index = pos >> PAGE_SHIFT;
-> +	struct folio *folio;
-> +
-> +	if (!kvm_gmem_supports_mmap(inode))
-
-Checking for MMAP is neither sufficient nor strictly necessary.  MMAP doesn't
-imply SHARED, and it's not clear to me that mmap() support should be in any way
-tied to WRITE support.
-
-> +		return -ENODEV;
-> +
-> +	if (pos + len > i_size_read(inode))
-> +		return -EINVAL;
-> +
-> +	folio = kvm_gmem_get_folio(inode, index);
-
-Eh, since "index" is only used once, my vote is to use "pos" and do the shift
-here, so that it's obvious that the input to kvm_gmem_get_folio() is being checked.
-
-> +	if (IS_ERR(folio))
-> +		return -EFAULT;
-
-Why EFAULT?
-
-> +
-> +	*foliop = folio;
-
-There shouldn't be any need for a local "folio".  What about having the "out"
-param be just "folio"?
-
-E.g.
-
-static int kvm_kmem_gmem_write_begin(const struct kiocb *kiocb,
-				     struct address_space *mapping,
-				     loff_t pos, unsigned int len,
-				     struct folio **folio, void **fsdata)
-{
-	struct inode *inode = file_inode(kiocb->ki_filp);
-
-	if (!kvm_gmem_supports_write(inode))
-		return -ENODEV;
-
-	if (pos + len > i_size_read(inode))
-		return -EINVAL;
-
-	*folio = kvm_gmem_get_folio(inode, pos >> PAGE_SHIFT);
-	if (IS_ERR(*folio))
-		return PTR_ERR(*folio);
-
-	return 0;
-}
-
-
-> +	return 0;
-> +}
-> +
-> +static int kvm_kmem_gmem_write_end(const struct kiocb *kiocb,
-> +				   struct address_space *mapping,
-> +				   loff_t pos, unsigned int len,
-> +				   unsigned int copied,
-> +				   struct folio *folio, void *fsdata)
-> +{
-> +	if (copied && copied < len) {
-
-Why check if "copied" is non-zero?  I don't see why KVM should behave differently
-with respect to unwritten bytes if copy_folio_from_iter_atomic() fails on the
-first byte or the Nth byte.
-
-> +		unsigned int from = pos & ((1UL << folio_order(folio)) - 1);
-
-Uh, isn't this just offset_in_folio()?
-
-> +
-> +		folio_zero_range(folio, from + copied, len - copied);
-
-I'd probably be in favor of omitting "from" entirely, e.g.
-
-	if (copied < len)
-		folio_zero_range(folio, offset_in_folio(pos) + copied,
-				 len - copied);
-
-> +	}
-> +
-> +	folio_unlock(folio);
-> +	folio_put(folio);
-> +
-> +	return copied;
-> +}
+which makes it visually easier to see the policy bits logic.
+	
+>  			nr_ciphertext_hiding_asids = init_args.max_snp_asid;
+>  		}
 
