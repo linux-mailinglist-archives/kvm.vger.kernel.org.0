@@ -1,118 +1,140 @@
-Return-Path: <kvm+bounces-60955-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-60956-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1EAB2C03E21
-	for <lists+kvm@lfdr.de>; Fri, 24 Oct 2025 01:49:51 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id DC2B8C03E99
+	for <lists+kvm@lfdr.de>; Fri, 24 Oct 2025 01:59:36 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id D99384E4FAA
-	for <lists+kvm@lfdr.de>; Thu, 23 Oct 2025 23:49:49 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 6717C1A67F4A
+	for <lists+kvm@lfdr.de>; Fri, 24 Oct 2025 00:00:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3BEE02E22BF;
-	Thu, 23 Oct 2025 23:49:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D6B7C2E4278;
+	Thu, 23 Oct 2025 23:59:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="t0/l3WWY"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="cBDI8FR2"
 X-Original-To: kvm@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qt1-f171.google.com (mail-qt1-f171.google.com [209.85.160.171])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4BE6727F00A;
-	Thu, 23 Oct 2025 23:49:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7730D2DA750
+	for <kvm@vger.kernel.org>; Thu, 23 Oct 2025 23:59:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.171
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761263380; cv=none; b=X9GyIpglGvGskzpqaXEBUeeqpEIgTMXaud0Ij3KOpDpeJXU1THtuIvETAC6TYS4fRaMhVT8ZZsK0G8jnxVGeG9UcuD3AzXbWUWXVB/efsoxb9Fo9MR5cj6gZTYCL4ILOuSr6hynIZ8NIKA/zhKQZFBMVOf2X5dOuIaiNAr+cHHM=
+	t=1761263958; cv=none; b=ZpE3iF/Bz3bnXf4weUCIj69V15PfqOkjUZ3stuai+QNNd7pbOkwaiPpYazFbO/5ryWvSS9Jo9SQPXvU2P3m0bOnu77UTj4g1J+YGZXR8gPojNI31eTMm63/JqiCh9m5ygvH6/FPXQIQaLaEkfwSXXjdhtGPW2SjzCGNaRr5kGCo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761263380; c=relaxed/simple;
-	bh=mlPjpupG6YFu3WZLIE4LsuGTPZmpesaS7fkVRKnB3lw=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:To:Cc; b=aqU33sJ0ioFbdb6XZdzEFu7RoavoUSJyW6PrlijTJqS7zvaQoLEqusxyRp65yc+JdqfY8xCdP2HNahslBojI759fp83aujO0dM60EmJeazgNPqJV5DSoJ271tjn2QCRBwOvhLgzfpIL+oZvsm445BToaWRyIDGA9GCTMBGSZY6Q=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=t0/l3WWY; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A6B16C4CEE7;
-	Thu, 23 Oct 2025 23:49:37 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1761263379;
-	bh=mlPjpupG6YFu3WZLIE4LsuGTPZmpesaS7fkVRKnB3lw=;
-	h=From:Date:Subject:To:Cc:From;
-	b=t0/l3WWYWLbBTQOHmNsyP23wB1Z5kdA1Je7bN6WcAXfXa3DXM2nBZi+kZ7/MGqcqs
-	 ZtbQYYT4BD5rCqJLmzFMYUULpnyNXGx12yGfKLt14jFzO++9+O2UZlWrW2wbkCuT98
-	 9afI+0ohwixDO2Z+f3b4nvBBzV5YdhKHjqgz2OCqZxuvxqb5GXoodOFTiFqeWn+IiP
-	 18ajZwl7+bgiYnwprfxHgGqtytnhISHpp1NE0uCNQ9n8aqVNgZztwY6agaATmQu4Rk
-	 qyxByaKbqEQV7NZYWDplCuruNvnbyOO/K6evKOgDHy3q2ensVTnaF3wUm2Afy2SLUd
-	 lDG/JVCoijDoA==
-From: Mark Brown <broonie@kernel.org>
-Date: Fri, 24 Oct 2025 00:43:39 +0100
-Subject: [PATCH] KVM: arm64: selftests: Filter ZCR_EL2 in get-reg-list
+	s=arc-20240116; t=1761263958; c=relaxed/simple;
+	bh=KRqFx1cZkwsyBUxEVPNGesO9wktbAXLUFJV2t0yuRh8=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=COc6wyLbDDUZnWged5dtOaNYZfCgrDzLy70LmyElFBFnZ+NVnxMYKNV3u2aBoNutJRkezKxjMFOiDj5nalZcUspI9EKlLuLuwbibnjeGqXUC6hfVqspAd9nYQpcEHZ4hNF7nt/m5kXUMq3Fv1WmoC6V8SHTWd8DF/P2fBtzFXuk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=cBDI8FR2; arc=none smtp.client-ip=209.85.160.171
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-qt1-f171.google.com with SMTP id d75a77b69052e-4e6ec0d1683so82401cf.0
+        for <kvm@vger.kernel.org>; Thu, 23 Oct 2025 16:59:14 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1761263953; x=1761868753; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=OWaPYvH94F3bazBBQR1mRrH2sncW+IAfzERpSr3zH6w=;
+        b=cBDI8FR2q8G+wj/K7qG8Xv1LOz52xdMF0mAjnX/UuhvnPwmNybAhHmkFcdjC0zTzdP
+         nOmxIwLxVyHLEv9ExgF6SgSPKfqHEIDkz+VsvHiWGB71OwQSL09CWKa2pN1lnMroIA1P
+         pks6bcR7Qp62Wqj2oL/y5U/ZX96fhXEU+E6wAJ9qnRWRHdZBqOuF6/8ARR4z3L7NIDH4
+         gazN6fvDW2A4wdKACHdVdEwITcCZenBPCIxIkabUmDEttmsyeQ8m3b972PSzKg8PuFQw
+         LD1O2J41f6W/ZIIIhysyF7VzPZCQHJUURKl3mpZa6umfRvD4FSqw7n41mssstow+83ho
+         IzVw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1761263953; x=1761868753;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=OWaPYvH94F3bazBBQR1mRrH2sncW+IAfzERpSr3zH6w=;
+        b=UHzo/8yyYSCoaJmsdGlpMsM1Wk6G4OZ9/quKJGwfotO4fcy/kKNYl81+C9DXD7Sair
+         v3HvAVEIr5LsmmsKo/g7Nqms83OxNPQjjPrQ0r51JszZbMDfPjsy17MW5cc6X9ccSWXK
+         Ei+LJGXXzNR/W+wZ1MV9f9h5jpTwwWxXNelVUXJpW9V4YeHLbwwTgHYzwCyKUdANLpJL
+         jGse+BiRK+f/aiBgn0nS4DFhgb2mAj435pZ7jV8yXw1eTuj/A0Yw/x03/lnVa6l/JEAJ
+         z2lW18RyIwmjZFc57j5tz95cKkabfQtGbeNbq/7/kq/lVZeMF+MKezBG6MtjxaUmgQ+T
+         84eg==
+X-Forwarded-Encrypted: i=1; AJvYcCX3apd8MGIt5S6jtu/wmTFaUOxRK+aIN4JfmGq3fB7XL94eoeE8qf6vpX9rFOXdDoaGu6o=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwcV7GPh3mGjop9kOnN9ZddkHyryL+L7q0dqCtyHoY6LlS3bUxU
+	d3GDjr1NgRR88UXpubirp8vhKn+G/Ww/7QPO/fhPlZfNOZet9l+8h0lmkgMXHlEBQQIYgebPozK
+	h35DoiPuqywVSe7NZrMcA/NbWMOAhLxdM+dZkCA+2
+X-Gm-Gg: ASbGnctYnOJP/ibzdYyFCNqzjmez6di6rKReTmu1PeZaCYYpW++1/2m5VDAT/NHns2w
+	ZJzVqqVhzMJ/EIlxeq8C9o+1LTCTQQiCkiqd5IQKhDDasNvBdxnKZyvRePsvVlE5bCG5T4NNfdM
+	NDkKBvyhAgDdYBMUhqkN4mS6+ekk5jPTPziAZhH5FuHBt6m087tUjZ6CwVywWqY4YpV7SoCOqX/
+	IQA+iBHQ4c73xnnMIROyVMAwm76RinlvBWybkpL1oxqG92IHEk+b/Rm3CV74JryrIXVIqkENuDD
+	xtzicqqi4ADI3UlqZ+B8kMGw/8WN
+X-Google-Smtp-Source: AGHT+IFiCpGL8XfWTU0ddwConeQqYO4+/7UNnfpipr71hb3sds9xvvlkZExSlvxpN5YXK1dP6WJgpa5Frp79V38UrVw=
+X-Received: by 2002:a05:622a:1495:b0:4eb:75cb:a267 with SMTP id
+ d75a77b69052e-4eb9251b2b5mr2286001cf.12.1761263953189; Thu, 23 Oct 2025
+ 16:59:13 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20251024-kvm-arm64-get-reg-list-zcr-el2-v1-1-0cd0ff75e22f@kernel.org>
-X-B4-Tracking: v=1; b=H4sIAKq9+mgC/x3NQQqDMBBG4avIrPtDMlGhvYp0IekYh6qViUipe
- PcGl9/mvYOymEqmR3WQya5ZP0uBv1UUx35JAn0VEztuvOOA9z6jt7mtkWSDScKkecMvGmRixDq
- 4uxPvBw5UIqvJoN9r0D3P8w/+AbhYcAAAAA==
-X-Change-ID: 20251023-kvm-arm64-get-reg-list-zcr-el2-c43090e11f23
-To: Marc Zyngier <maz@kernel.org>, Oliver Upton <oliver.upton@linux.dev>, 
- Joey Gouly <joey.gouly@arm.com>, Suzuki K Poulose <suzuki.poulose@arm.com>, 
- Paolo Bonzini <pbonzini@redhat.com>, Shuah Khan <shuah@kernel.org>
-Cc: linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, 
- kvm@vger.kernel.org, linux-kselftest@vger.kernel.org, 
- linux-kernel@vger.kernel.org, Mark Brown <broonie@kernel.org>
-X-Mailer: b4 0.15-dev-88d78
-X-Developer-Signature: v=1; a=openpgp-sha256; l=1514; i=broonie@kernel.org;
- h=from:subject:message-id; bh=mlPjpupG6YFu3WZLIE4LsuGTPZmpesaS7fkVRKnB3lw=;
- b=owEBbQGS/pANAwAKASTWi3JdVIfQAcsmYgBo+r8QxY2JcsLXKRY9i3x2+USWkDSHg3bd2J9tr
- 4x4LkFf+W6JATMEAAEKAB0WIQSt5miqZ1cYtZ/in+ok1otyXVSH0AUCaPq/EAAKCRAk1otyXVSH
- 0KCsB/4sY4EU2Z485tooicTVWlxHlXnwLdrbACENRpSPR8AbNunmliL3tXgWrtUwaY1HkI8dpox
- OQV7mIl0CF1dNQVv94MyAum8RMJXHtzE/ecPLWToGYxAC6nNQrxlndg2NWqsa+poVrXpTdPbe3X
- TCuitoGMhhLSMX0eQiS4MOQEJA/dKMWNVu33FeioSKBJbW5fkJsnE6cgYSpDYaio/B/7ltDkfrY
- +9xmQPYzMNKdIJLUCcCpJWqKsQ/8VUTk4IKG9BkZQMSTYO6XykhzS97kEng26H1qDac+moC3+Jq
- 87S+6fNn+tBG6QUWAKmsXaRQuXR+QV+uASWRNXKN1DUjaDOR
-X-Developer-Key: i=broonie@kernel.org; a=openpgp;
- fpr=3F2568AAC26998F9E813A1C5C3F436CA30F5D8EB
+References: <20250925172851.606193-1-sagis@google.com> <20250925172851.606193-14-sagis@google.com>
+ <68efcb7ee33e5_cab031002e@iweiny-mobl.notmuch>
+In-Reply-To: <68efcb7ee33e5_cab031002e@iweiny-mobl.notmuch>
+From: Sagi Shahar <sagis@google.com>
+Date: Thu, 23 Oct 2025 18:59:01 -0500
+X-Gm-Features: AS18NWB13mopkwuSS4JxlZadYovueuOn6EGZfluKJpeBEQ17CYTqorbiZz-kY7o
+Message-ID: <CAAhR5DGcz-2=a6Q2zZS_eP2ZjNNPs65jNG+K50tdVAQfC6AbbA@mail.gmail.com>
+Subject: Re: [PATCH v11 13/21] KVM: selftests: Add helpers to init TDX memory
+ and finalize VM
+To: Ira Weiny <ira.weiny@intel.com>
+Cc: linux-kselftest@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>, 
+	Shuah Khan <shuah@kernel.org>, Sean Christopherson <seanjc@google.com>, 
+	Ackerley Tng <ackerleytng@google.com>, Ryan Afranji <afranji@google.com>, 
+	Andrew Jones <ajones@ventanamicro.com>, Isaku Yamahata <isaku.yamahata@intel.com>, 
+	Erdem Aktas <erdemaktas@google.com>, Rick Edgecombe <rick.p.edgecombe@intel.com>, 
+	Roger Wang <runanwang@google.com>, Binbin Wu <binbin.wu@linux.intel.com>, 
+	Oliver Upton <oliver.upton@linux.dev>, "Pratik R. Sampat" <pratikrajesh.sampat@amd.com>, 
+	Reinette Chatre <reinette.chatre@intel.com>, Chao Gao <chao.gao@intel.com>, 
+	Chenyi Qiang <chenyi.qiang@intel.com>, linux-kernel@vger.kernel.org, kvm@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-get-reg-list includes ZCR_EL2 in the list of EL2 registers that it looks
-for when NV is enabled but does not have any feature gate for this register,
-meaning that testing any combination of features that includes EL2 but does
-not include SVE will result in a test failure due to a missing register
-being reported:
+On Wed, Oct 15, 2025 at 11:25=E2=80=AFAM Ira Weiny <ira.weiny@intel.com> wr=
+ote:
+>
+> Sagi Shahar wrote:
+> > From: Ackerley Tng <ackerleytng@google.com>
+> >
+>
+> [snip]
+>
+> > diff --git a/tools/testing/selftests/kvm/lib/x86/tdx/tdx_util.c b/tools=
+/testing/selftests/kvm/lib/x86/tdx/tdx_util.c
+> > index 2551b3eac8f8..53cfadeff8de 100644
+> > --- a/tools/testing/selftests/kvm/lib/x86/tdx/tdx_util.c
+> > +++ b/tools/testing/selftests/kvm/lib/x86/tdx/tdx_util.c
+> > @@ -270,3 +270,61 @@ void vm_tdx_init_vm(struct kvm_vm *vm, uint64_t at=
+tributes)
+> >
+> >       free(init_vm);
+> >  }
+> > +
+>
+> [snip]
+>
+> > +
+> > +void vm_tdx_finalize(struct kvm_vm *vm)
+>
+> Why is this not a new kvm_arch_vm_finalize_vcpu() call?
 
-| The following lines are missing registers:
-|
-|	ARM64_SYS_REG(3, 4, 1, 2, 0),
-
-Add ZCR_EL2 to feat_id_regs so that the test knows not to expect to see it
-without SVE being enabled.
-
-Fixes: 3a90b6f27964 ("KVM: arm64: selftests: get-reg-list: Add base EL2 registers")
-Signed-off-by: Mark Brown <broonie@kernel.org>
----
- tools/testing/selftests/kvm/arm64/get-reg-list.c | 1 +
- 1 file changed, 1 insertion(+)
-
-diff --git a/tools/testing/selftests/kvm/arm64/get-reg-list.c b/tools/testing/selftests/kvm/arm64/get-reg-list.c
-index c9b84eeaab6b..7ae26ce875ad 100644
---- a/tools/testing/selftests/kvm/arm64/get-reg-list.c
-+++ b/tools/testing/selftests/kvm/arm64/get-reg-list.c
-@@ -68,6 +68,7 @@ static struct feature_id_reg feat_id_regs[] = {
- 	REG_FEAT(VNCR_EL2,	ID_AA64MMFR4_EL1, NV_frac, NV2_ONLY),
- 	REG_FEAT(CNTHV_CTL_EL2, ID_AA64MMFR1_EL1, VH, IMP),
- 	REG_FEAT(CNTHV_CVAL_EL2,ID_AA64MMFR1_EL1, VH, IMP),
-+	REG_FEAT(ZCR_EL2,	ID_AA64PFR0_EL1, SVE, IMP),
- };
- 
- bool filter_reg(__u64 reg)
-
----
-base-commit: 211ddde0823f1442e4ad052a2f30f050145ccada
-change-id: 20251023-kvm-arm64-get-reg-list-zcr-el2-c43090e11f23
-
-Best regards,
---  
-Mark Brown <broonie@kernel.org>
-
+What do you mean?
+>
+> Ira
+>
+> > +{
+> > +     load_td_private_memory(vm);
+> > +     vm_tdx_vm_ioctl(vm, KVM_TDX_FINALIZE_VM, 0, NULL);
+> > +}
+> > --
+> > 2.51.0.536.g15c5d4f767-goog
+> >
 
