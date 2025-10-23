@@ -1,255 +1,451 @@
-Return-Path: <kvm+bounces-60917-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-60918-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 797C5C0317B
-	for <lists+kvm@lfdr.de>; Thu, 23 Oct 2025 20:55:42 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 576C2C032DC
+	for <lists+kvm@lfdr.de>; Thu, 23 Oct 2025 21:29:54 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1FE653A17A4
-	for <lists+kvm@lfdr.de>; Thu, 23 Oct 2025 18:55:41 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id C5FBF1A655FD
+	for <lists+kvm@lfdr.de>; Thu, 23 Oct 2025 19:30:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5A04030E83A;
-	Thu, 23 Oct 2025 18:55:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E28AD34D4C2;
+	Thu, 23 Oct 2025 19:29:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="dbI1u0SY"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-il1-f206.google.com (mail-il1-f206.google.com [209.85.166.206])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.12])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1156B17A305
-	for <kvm@vger.kernel.org>; Thu, 23 Oct 2025 18:55:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.206
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761245732; cv=none; b=nNYrSUP1FCmUeZUH9s7k9PfI8tZggi4e2F1PVvdaQfPhUV0w0XrIexQpQAXEzdYhaDaRjrudZGw3fZT9HYPf4J7LNz/Ohr8BSNnuMydAZmFl0V4aZs5JDjEh5pb9NgLuReJ/8Kgmd13c2ymreKsJfgkAiXFD1KDGTvEAzyFq5w4=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761245732; c=relaxed/simple;
-	bh=yq3fanGmV11jU/mTbRRO7PUNLRK6U75NWpB6IhGAv3U=;
-	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=ZjuUbUdeiGMHhKb7LL0V7knaTCJZzeTy7tDzdL1MgOO6gv5Wlbh1mOlDZcMkDDHyDQkVerjnX57hoL5o+iiG8GWSGQmPQfU7beCrla977x8OH61lifHo8n0QKM8yFesXkIhoVZhScrMBE9JKGjMZSm4hP1Pu2vk5W6DVINfPi50=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.206
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-il1-f206.google.com with SMTP id e9e14a558f8ab-430d082fc3dso38871045ab.3
-        for <kvm@vger.kernel.org>; Thu, 23 Oct 2025 11:55:30 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1761245730; x=1761850530;
-        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=yp64SrrNyXr3IOcihuQQ34InSrPi6D2nab+6v3l0xWw=;
-        b=bPoPTUyvRfFryxjqEPDh5rWgbaPlXD6l0GxFGgmOe3iPnWzdayNb1QH7hWtEMm4xgN
-         RAqthKtU3GYkmjm8WhAIDO9uyPF5hgqOaF/NsTdS7/VYKLY2FROv+9oJ4/4aLEfxCa5e
-         4ZX+VVoEMsdl8rqpxLWy0oOcjmFSUXH0iimUWNkYktb+cVNX5teHQy5/+bLAM26F5ftd
-         5uQLzhhlhEV41ZL7suEShxo6W3sOd/P3pEXGNkvCyfOMG8NFqL4kdVvFpEdTShn3sZe3
-         Q++eD8ZcGG5dIOwViFkCUlZXI9Xy/X1PdHofxwf0N4de2JxM9+gmiXyf3tCC/C4uOoVY
-         DQ4g==
-X-Gm-Message-State: AOJu0Yym7j1A8TajC9+VMiDnXdixqVHgr8sUN1TwyLhgxs1UdJI8zFY5
-	0MV261nf0PKFpqnsLXRbm9m+/ysHS0YJhtnzoxN3qVeUxaQAxfJwOoH2A27a8Lo2wId7+Nlr6+U
-	NjY0ET/ipSL3t0eho2BbIc4O2lkFEe7vU3EL+PdDNLJrpP4lCjFSrtVcqzddfgg==
-X-Google-Smtp-Source: AGHT+IGDBUj//uEB+mOzZuEVbCWygJXGr/WGmYXx4gzmIneq2Ac0cYajUm9g1Ozki+1doQu7K3v5++muMLZe96MzAv21GhkIwGwP
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 15B3726FDB2;
+	Thu, 23 Oct 2025 19:29:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=198.175.65.12
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1761247786; cv=fail; b=ncC5BbtYLJqggDR017PlZkg9NvYzSFH0NASBUmYFXyZ7wdrOyy2Qqor9DpCsGWWMIzTq6BAcBR+8jgQxL9l46le7mzRSYPQZ3mjgkAeB5+K/5DSMgG4Z8AH7CTszk7FK9pfKgjrZa/O9twKcW4aOUpqdMXJeu6lP3cHJeJdN8BY=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1761247786; c=relaxed/simple;
+	bh=Nk4tNQAJjA6bfCuFxUn+ROx5Tee/e8s2n8jdWxSwCwQ=;
+	h=Message-ID:Date:Subject:To:CC:References:From:In-Reply-To:
+	 Content-Type:MIME-Version; b=lfCqrnvoT+1Ngaj5tGiKtuXY3jibw7B+HQ+XSivffS4W3UFpeKoPT24g2B1p0lKFF8NVQuxBILLjWik2zrGpkLQUnB3RJCNd8BngEa3JeN+4ywTmSWkMcBL9jZ76ZhilHoSHXJclxamIJ4aThYnrL1xwNjXaMp4+o2FZ61Wl2pk=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=dbI1u0SY; arc=fail smtp.client-ip=198.175.65.12
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1761247784; x=1792783784;
+  h=message-id:date:subject:to:cc:references:from:
+   in-reply-to:content-transfer-encoding:mime-version;
+  bh=Nk4tNQAJjA6bfCuFxUn+ROx5Tee/e8s2n8jdWxSwCwQ=;
+  b=dbI1u0SYfqnkZachjhS+IPfVrDCNI8C3OwQHkrWJSE1mez48UNQGIheP
+   cEuRKPPAw7/828icPK6uXpHKpI3jzQoj6un8aKNFagSqKwOXaVuKAGrZj
+   TCMK8oGqtAIOPqQeiRU5ebFXx5LkM12DQSnEhCozxEOv0SLcQE7eHEVa7
+   oqDU/i/U9Nvf2xyLQ2lj8kWcNujKPTzS1nNBW0g0tcQg8OdK7fWuCheik
+   5sZLtnTJPbzN8FkNKP9GYgKpP97VpJNn8SMP7o4a8dCxD5OgC7sEMi47O
+   OzBRcYSxe6uxw/OcbdWDNfqc3vbFK+aDpSccGMiG/d5szRnCUjb00uAi5
+   A==;
+X-CSE-ConnectionGUID: d23N49vQRNWjwDNsWgPBfg==
+X-CSE-MsgGUID: GEb1sabBRK6eBZFIxaYYDQ==
+X-IronPort-AV: E=McAfee;i="6800,10657,11586"; a="74868494"
+X-IronPort-AV: E=Sophos;i="6.19,250,1754982000"; 
+   d="scan'208";a="74868494"
+Received: from orviesa001.jf.intel.com ([10.64.159.141])
+  by orvoesa104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 23 Oct 2025 12:29:43 -0700
+X-CSE-ConnectionGUID: cH82gdoaTzmj0oN/711JCA==
+X-CSE-MsgGUID: lW/barLCTRmtu463VGDsLQ==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.19,250,1754982000"; 
+   d="scan'208";a="221437508"
+Received: from fmsmsx902.amr.corp.intel.com ([10.18.126.91])
+  by orviesa001.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 23 Oct 2025 12:29:44 -0700
+Received: from FMSMSX903.amr.corp.intel.com (10.18.126.92) by
+ fmsmsx902.amr.corp.intel.com (10.18.126.91) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.2562.27; Thu, 23 Oct 2025 12:29:42 -0700
+Received: from fmsedg903.ED.cps.intel.com (10.1.192.145) by
+ FMSMSX903.amr.corp.intel.com (10.18.126.92) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.2562.27 via Frontend Transport; Thu, 23 Oct 2025 12:29:42 -0700
+Received: from SN4PR0501CU005.outbound.protection.outlook.com (40.93.194.1) by
+ edgegateway.intel.com (192.55.55.83) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.2562.27; Thu, 23 Oct 2025 12:29:42 -0700
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=IT6Ub68NV6WwdusWUnXWNt5vhuTJB7iXWZWuuaYnyrSitd52m/e+WmUxlTMWD+KWSJKiFHQQVX+53M5Hlj7NbL2iC0trEYQAo/vJjEdjpPkPaZ87FwSgN5h9bZU/2ndwDuzAkI2ptMfRRjV9tZaqQ0auezLk/kpZzgwIaOM9Ys+942ZorbL1aap9LCzGliRdnddxQnV7PcfL3RQpSZQYEhlSNLEQVrdsz/O9KLEclOdWyyn2OkJqryMassb7IUt6Vt86JWXrqjuQp/hl16UN733Bof2cFJ6nk95W6Pj2YuOZSqx6mjYDPUaYgts3aBqd/fmjO+R/3rP3ncT2hDt2vQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=pu78Z26Np14sEMOcR7nQhbW/tp0+qw4N+SIZNQe7CDE=;
+ b=KfLBOKtXT9DoXre7SoaxhDnVMWDs0dNt4yeEW3uJQEpMqcaSNKOzXXtGokuaGu3ews+vQPpPP2/b8v97YxVRTyIid/qO3GT/AKvWD3YX+xLvUKC3DN/GF64eZeBkgzRR6AvZTOLEwEG1KJzZ0uia/84cXirMFmulrfNRUyO5PK65mr7ROpYErN35mz+3EJjCuZMx9XGNOjYrsRGWeBy8zsmPSgLZTAYtzt/neWHQ4N8AOh0BaYAvSAG4awjWT981CjZaYELZAPtspxr4AOd895l5GCqyzOelh67Oy8+lPaSRWi17CyCEnQ2K3d9lA/wuMLKNthEIoEVy6cXmOJUNuw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+Received: from MN0PR11MB6011.namprd11.prod.outlook.com (2603:10b6:208:372::6)
+ by DM3PPF2B3CC4BE4.namprd11.prod.outlook.com (2603:10b6:f:fc00::f16) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9253.13; Thu, 23 Oct
+ 2025 19:29:40 +0000
+Received: from MN0PR11MB6011.namprd11.prod.outlook.com
+ ([fe80::bbbc:5368:4433:4267]) by MN0PR11MB6011.namprd11.prod.outlook.com
+ ([fe80::bbbc:5368:4433:4267%6]) with mapi id 15.20.9253.011; Thu, 23 Oct 2025
+ 19:29:40 +0000
+Message-ID: <72f0caa9-50b3-4fb0-bc4b-41e67886be35@intel.com>
+Date: Thu, 23 Oct 2025 21:29:33 +0200
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v2 21/26] drm/xe/migrate: Add function to copy of VRAM
+ data in chunks
+To: =?UTF-8?Q?Micha=C5=82_Winiarski?= <michal.winiarski@intel.com>, "Alex
+ Williamson" <alex.williamson@redhat.com>, Lucas De Marchi
+	<lucas.demarchi@intel.com>, =?UTF-8?Q?Thomas_Hellstr=C3=B6m?=
+	<thomas.hellstrom@linux.intel.com>, Rodrigo Vivi <rodrigo.vivi@intel.com>,
+	Jason Gunthorpe <jgg@ziepe.ca>, Yishai Hadas <yishaih@nvidia.com>, Kevin Tian
+	<kevin.tian@intel.com>, <intel-xe@lists.freedesktop.org>,
+	<linux-kernel@vger.kernel.org>, <kvm@vger.kernel.org>, Matthew Brost
+	<matthew.brost@intel.com>
+CC: <dri-devel@lists.freedesktop.org>, Jani Nikula
+	<jani.nikula@linux.intel.com>, Joonas Lahtinen
+	<joonas.lahtinen@linux.intel.com>, Tvrtko Ursulin <tursulin@ursulin.net>,
+	David Airlie <airlied@gmail.com>, Simona Vetter <simona@ffwll.ch>, "Lukasz
+ Laguna" <lukasz.laguna@intel.com>
+References: <20251021224133.577765-1-michal.winiarski@intel.com>
+ <20251021224133.577765-22-michal.winiarski@intel.com>
+Content-Language: en-US
+From: Michal Wajdeczko <michal.wajdeczko@intel.com>
+In-Reply-To: <20251021224133.577765-22-michal.winiarski@intel.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
+X-ClientProxiedBy: VI1PR09CA0163.eurprd09.prod.outlook.com
+ (2603:10a6:800:120::17) To MN0PR11MB6011.namprd11.prod.outlook.com
+ (2603:10b6:208:372::6)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a05:6e02:3c05:b0:430:ac49:b3b1 with SMTP id
- e9e14a558f8ab-430c5247174mr418277835ab.12.1761245730181; Thu, 23 Oct 2025
- 11:55:30 -0700 (PDT)
-Date: Thu, 23 Oct 2025 11:55:30 -0700
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <68fa7a22.a70a0220.3bf6c6.008b.GAE@google.com>
-Subject: [syzbot] [kvm?] KASAN: slab-use-after-free Write in kvm_gmem_release
-From: syzbot <syzbot+2479e53d0db9b32ae2aa@syzkaller.appspotmail.com>
-To: kvm@vger.kernel.org, linux-kernel@vger.kernel.org, pbonzini@redhat.com, 
-	syzkaller-bugs@googlegroups.com
-Content-Type: text/plain; charset="UTF-8"
-
-Hello,
-
-syzbot found the following issue on:
-
-HEAD commit:    aaa9c3550b60 Add linux-next specific files for 20251022
-git tree:       linux-next
-console output: https://syzkaller.appspot.com/x/log.txt?x=1021c3e2580000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=ad8f5526e5acd067
-dashboard link: https://syzkaller.appspot.com/bug?extid=2479e53d0db9b32ae2aa
-compiler:       Debian clang version 20.1.8 (++20250708063551+0c9f909b7976-1~exp1~20250708183702.136), Debian LLD 20.1.8
-syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=10dd0c92580000
-C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=1152c614580000
-
-Downloadable assets:
-disk image: https://storage.googleapis.com/syzbot-assets/2fe0a8f92a64/disk-aaa9c355.raw.xz
-vmlinux: https://storage.googleapis.com/syzbot-assets/199d2e804802/vmlinux-aaa9c355.xz
-kernel image: https://storage.googleapis.com/syzbot-assets/9371d55e359e/bzImage-aaa9c355.xz
-
-IMPORTANT: if you fix the issue, please add the following tag to the commit:
-Reported-by: syzbot+2479e53d0db9b32ae2aa@syzkaller.appspotmail.com
-
-==================================================================
-BUG: KASAN: slab-use-after-free in kvm_gmem_release+0x176/0x440 virt/kvm/guest_memfd.c:353
-Write of size 8 at addr ffff88807befa508 by task syz.0.17/6022
-
-CPU: 0 UID: 0 PID: 6022 Comm: syz.0.17 Not tainted syzkaller #0 PREEMPT(full) 
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 10/02/2025
-Call Trace:
- <TASK>
- dump_stack_lvl+0x189/0x250 lib/dump_stack.c:120
- print_address_description mm/kasan/report.c:378 [inline]
- print_report+0xca/0x240 mm/kasan/report.c:482
- kasan_report+0x118/0x150 mm/kasan/report.c:595
- kvm_gmem_release+0x176/0x440 virt/kvm/guest_memfd.c:353
- __fput+0x44c/0xa70 fs/file_table.c:468
- task_work_run+0x1d4/0x260 kernel/task_work.c:227
- resume_user_mode_work include/linux/resume_user_mode.h:50 [inline]
- exit_to_user_mode_loop+0xe9/0x130 kernel/entry/common.c:43
- exit_to_user_mode_prepare include/linux/irq-entry-common.h:225 [inline]
- syscall_exit_to_user_mode_work include/linux/entry-common.h:175 [inline]
- syscall_exit_to_user_mode include/linux/entry-common.h:210 [inline]
- do_syscall_64+0x2bd/0xfa0 arch/x86/entry/syscall_64.c:100
- entry_SYSCALL_64_after_hwframe+0x77/0x7f
-RIP: 0033:0x7fbeeff8efc9
-Code: ff ff c3 66 2e 0f 1f 84 00 00 00 00 00 0f 1f 40 00 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 a8 ff ff ff f7 d8 64 89 01 48
-RSP: 002b:00007ffffdf1e2c8 EFLAGS: 00000246 ORIG_RAX: 00000000000001b4
-RAX: 0000000000000000 RBX: 00007fbef01e7da0 RCX: 00007fbeeff8efc9
-RDX: 0000000000000000 RSI: 000000000000001e RDI: 0000000000000003
-RBP: 00007fbef01e7da0 R08: 0000000000000000 R09: 00000004fdf1e5bf
-R10: 00007fbef01e7cb0 R11: 0000000000000246 R12: 0000000000019ff7
-R13: 00007ffffdf1e3c0 R14: ffffffffffffffff R15: 00007ffffdf1e3e0
- </TASK>
-
-Allocated by task 6023:
- kasan_save_stack mm/kasan/common.c:56 [inline]
- kasan_save_track+0x3e/0x80 mm/kasan/common.c:77
- poison_kmalloc_redzone mm/kasan/common.c:397 [inline]
- __kasan_kmalloc+0x93/0xb0 mm/kasan/common.c:414
- kasan_kmalloc include/linux/kasan.h:262 [inline]
- __kmalloc_cache_noprof+0x3e2/0x700 mm/slub.c:5758
- kmalloc_noprof include/linux/slab.h:957 [inline]
- kzalloc_noprof include/linux/slab.h:1094 [inline]
- kvm_set_memory_region+0x747/0xb90 virt/kvm/kvm_main.c:2104
- kvm_vm_ioctl_set_memory_region+0x6f/0xd0 virt/kvm/kvm_main.c:2154
- kvm_vm_ioctl+0x957/0xc60 virt/kvm/kvm_main.c:5201
- vfs_ioctl fs/ioctl.c:51 [inline]
- __do_sys_ioctl fs/ioctl.c:597 [inline]
- __se_sys_ioctl+0xfc/0x170 fs/ioctl.c:583
- do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
- do_syscall_64+0xfa/0xfa0 arch/x86/entry/syscall_64.c:94
- entry_SYSCALL_64_after_hwframe+0x77/0x7f
-
-Freed by task 6023:
- kasan_save_stack mm/kasan/common.c:56 [inline]
- kasan_save_track+0x3e/0x80 mm/kasan/common.c:77
- kasan_save_free_info+0x46/0x50 mm/kasan/generic.c:584
- poison_slab_object mm/kasan/common.c:252 [inline]
- __kasan_slab_free+0x5c/0x80 mm/kasan/common.c:284
- kasan_slab_free include/linux/kasan.h:234 [inline]
- slab_free_hook mm/slub.c:2533 [inline]
- slab_free mm/slub.c:6622 [inline]
- kfree+0x19a/0x6d0 mm/slub.c:6829
- kvm_set_memory_region+0x9c4/0xb90 virt/kvm/kvm_main.c:2130
- kvm_vm_ioctl_set_memory_region+0x6f/0xd0 virt/kvm/kvm_main.c:2154
- kvm_vm_ioctl+0x957/0xc60 virt/kvm/kvm_main.c:5201
- vfs_ioctl fs/ioctl.c:51 [inline]
- __do_sys_ioctl fs/ioctl.c:597 [inline]
- __se_sys_ioctl+0xfc/0x170 fs/ioctl.c:583
- do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
- do_syscall_64+0xfa/0xfa0 arch/x86/entry/syscall_64.c:94
- entry_SYSCALL_64_after_hwframe+0x77/0x7f
-
-The buggy address belongs to the object at ffff88807befa400
- which belongs to the cache kmalloc-cg-512 of size 512
-The buggy address is located 264 bytes inside of
- freed 512-byte region [ffff88807befa400, ffff88807befa600)
-
-The buggy address belongs to the physical page:
-page: refcount:0 mapcount:0 mapping:0000000000000000 index:0x0 pfn:0x7bef8
-head: order:2 mapcount:0 entire_mapcount:0 nr_pages_mapped:0 pincount:0
-memcg:ffff888077513701
-anon flags: 0xfff00000000040(head|node=0|zone=1|lastcpupid=0x7ff)
-page_type: f5(slab)
-raw: 00fff00000000040 ffff88813fe30140 0000000000000000 dead000000000001
-raw: 0000000000000000 0000000000100010 00000000f5000000 ffff888077513701
-head: 00fff00000000040 ffff88813fe30140 0000000000000000 dead000000000001
-head: 0000000000000000 0000000000100010 00000000f5000000 ffff888077513701
-head: 00fff00000000002 ffffea0001efbe01 00000000ffffffff 00000000ffffffff
-head: ffffffffffffffff 0000000000000000 00000000ffffffff 0000000000000004
-page dumped because: kasan: bad access detected
-page_owner tracks the page as allocated
-page last allocated via order 2, migratetype Unmovable, gfp_mask 0xd20c0(__GFP_IO|__GFP_FS|__GFP_NOWARN|__GFP_NORETRY|__GFP_COMP|__GFP_NOMEMALLOC), pid 5203, tgid 5203 (udevd), ts 35020479428, free_ts 30283368313
- set_page_owner include/linux/page_owner.h:32 [inline]
- post_alloc_hook+0x240/0x2a0 mm/page_alloc.c:1851
- prep_new_page mm/page_alloc.c:1859 [inline]
- get_page_from_freelist+0x2365/0x2440 mm/page_alloc.c:3920
- __alloc_frozen_pages_noprof+0x181/0x370 mm/page_alloc.c:5214
- alloc_pages_mpol+0x232/0x4a0 mm/mempolicy.c:2418
- alloc_slab_page mm/slub.c:3049 [inline]
- allocate_slab+0x96/0x3a0 mm/slub.c:3222
- new_slab mm/slub.c:3276 [inline]
- ___slab_alloc+0xe94/0x18a0 mm/slub.c:4646
- __slab_alloc+0x65/0x100 mm/slub.c:4765
- __slab_alloc_node mm/slub.c:4841 [inline]
- slab_alloc_node mm/slub.c:5263 [inline]
- __do_kmalloc_node mm/slub.c:5636 [inline]
- __kmalloc_node_track_caller_noprof+0x5d0/0x810 mm/slub.c:5746
- kmalloc_reserve+0x136/0x290 net/core/skbuff.c:604
- __alloc_skb+0x142/0x2d0 net/core/skbuff.c:673
- alloc_skb include/linux/skbuff.h:1383 [inline]
- alloc_skb_with_frags+0xca/0x890 net/core/skbuff.c:6685
- sock_alloc_send_pskb+0x84d/0x980 net/core/sock.c:2987
- unix_dgram_sendmsg+0x461/0x1850 net/unix/af_unix.c:2153
- sock_sendmsg_nosec net/socket.c:727 [inline]
- __sock_sendmsg+0x21c/0x270 net/socket.c:742
- sock_write_iter+0x279/0x360 net/socket.c:1195
- new_sync_write fs/read_write.c:593 [inline]
- vfs_write+0x5c9/0xb30 fs/read_write.c:686
-page last free pid 1 tgid 1 stack trace:
- reset_page_owner include/linux/page_owner.h:25 [inline]
- free_pages_prepare mm/page_alloc.c:1395 [inline]
- __free_frozen_pages+0xbc8/0xd30 mm/page_alloc.c:2948
- __free_pages mm/page_alloc.c:5333 [inline]
- free_contig_range+0x1bd/0x4a0 mm/page_alloc.c:7176
- destroy_args+0x69/0x660 mm/debug_vm_pgtable.c:958
- debug_vm_pgtable+0x39f/0x3b0 mm/debug_vm_pgtable.c:1345
- do_one_initcall+0x236/0x820 init/main.c:1283
- do_initcall_level+0x104/0x190 init/main.c:1345
- do_initcalls+0x59/0xa0 init/main.c:1361
- kernel_init_freeable+0x334/0x4b0 init/main.c:1593
- kernel_init+0x1d/0x1d0 init/main.c:1483
- ret_from_fork+0x4bc/0x870 arch/x86/kernel/process.c:158
- ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:245
-
-Memory state around the buggy address:
- ffff88807befa400: fa fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
- ffff88807befa480: fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
->ffff88807befa500: fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
-                      ^
- ffff88807befa580: fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
- ffff88807befa600: fc fc fc fc fc fc fc fc fc fc fc fc fc fc fc fc
-==================================================================
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: MN0PR11MB6011:EE_|DM3PPF2B3CC4BE4:EE_
+X-MS-Office365-Filtering-Correlation-Id: 6331bda6-9206-4b2f-e4e9-08de126a8268
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;ARA:13230040|1800799024|366016|376014|7416014|921020;
+X-Microsoft-Antispam-Message-Info: =?utf-8?B?YVZhYjV0U3pHdWUwWm81SHZBMjh5RERHZ0pCQ1ExNTdIZ1NIRnNPQlhKTVNx?=
+ =?utf-8?B?YmI5NjVhWDdSa1BYbVRlR25kUVhJQkx2MkhZR0tzTU5lOEpBVUxtVHhJWkJ6?=
+ =?utf-8?B?TU11UWJRR2VpTWgwWU9VU2NzSEZITmQ5b09wUFQzSU85aDl0bGd3Y2NZOTcw?=
+ =?utf-8?B?bkJHSmN0UkJKV2FOTWNUNWZFQm8zZDNsRWZyN1BWSE1tOXRXSkl4NTBVSjI4?=
+ =?utf-8?B?VWdKdk1SNUFNSW9iOGdsU2daMy9RYXdSU2ZGb1d0b1VYcm5pcE9KaEE0NXc3?=
+ =?utf-8?B?Rk1ZYjVFMHdnLzVJSU4ycE9zWHU3cjkza20waEFBQ3JaOFFaeXNFOTZtMzVY?=
+ =?utf-8?B?clJlbXhLYVJLTjNPOGcxcjhOeDE1RkUxVC94bmEwVGIySENVRS9uV2FHSTlO?=
+ =?utf-8?B?aWxsa0F5QUFZMGw1Wnc0cXBNQU92T083SWs3RXVSaWdVRTZZWUJHNktBd0Ri?=
+ =?utf-8?B?aGhKTnZYL00xeVRxK0dLcnZJTGx6eE9qZ1dja0trajlCZFl2UGNvTG5UQ3lW?=
+ =?utf-8?B?TVpRVnVpS2JDa3RvS1ppQ0tmZ2YwNDVoL1g0U1hWMk45Y1RyZERjN1JIWHo3?=
+ =?utf-8?B?SG1FMm1FbFFBeURHQUlVbVoySlZXM0QvanAxcnhaWHkxT2VQYmxUZGd2dGRh?=
+ =?utf-8?B?QWpkc0h2bFUvWmEvb1pLU1VzZmlWYnNPWmpGK3ZPMS9qWmVYT3FROGZXeVk3?=
+ =?utf-8?B?K1FwN28yaGxjWXdKeUl4YXZpR2E0ZzVxVUIwZHl1WXN3cVVQZjZ5T2VOSmsy?=
+ =?utf-8?B?czdNcSthQTNTY1B3VGp1NUtzWXlGUnoyTjA2UGNRN3Fra2RnaUFYUUtaanpy?=
+ =?utf-8?B?cDdIa3Vob04wUWlVV3IzQ2RWcVZMSncycW5lK2p6VUhUR1ZZZFJUb24rVzFO?=
+ =?utf-8?B?dGtTUEU2eHZDSTNTWWhNaDJRUGNGNHppN1lwNnQxOUNtN3Nma2lIR2dFN21x?=
+ =?utf-8?B?MGEwbTNYRTBtSWpNL1VNNkUvaTl4dGpQN3NvVmJVeHowajh5aXhNaG1ubFcw?=
+ =?utf-8?B?V0k4c2cvOEowYmI4b0kyRDE4Y3VPSDFMZ2ZLc051ZzdCSjB4bllCWWF4cWdK?=
+ =?utf-8?B?N005TDdaOTVCNS9ZRVhJRDZOZzRRWjUvSXRiVVlMbU51azRkbDRxN0dSend5?=
+ =?utf-8?B?cWVJa0pPU3pBSC9QUjJzOURNSTBMWXJCTk44TlRVUW5wajhRYlpVVXRtRUFZ?=
+ =?utf-8?B?c3dCN2toVE0yQjBhRWsxRTVJWHlCQkhGcFBxWU05NVNkbXJWR3UrcURxdXV5?=
+ =?utf-8?B?ZUp3UFdQMkEwamc2VGFCa2NCa2dBdVJ0dzNuVVIwVjRrMDY3MTgyMkEyalkr?=
+ =?utf-8?B?SC9mU3N1YWluQmV5TzRDRnBWU3EvQlI5MFVpS2w3SU8wOS9HVGFLc29QMTBv?=
+ =?utf-8?B?OFFNaVM3MFlkSXd1NC9qSFRITzAwVDZoRldUVWN6RUVmWmRkZlBDWHlVTWkv?=
+ =?utf-8?B?b3BuQ21pck1sVmo3OUtRUFFaZENBVmZlZkFwVDJLZ2N3SUxGZFNnb1NEWDgz?=
+ =?utf-8?B?eWN5VyttWkNZZnRZZHhtbVhUcmV2eHFURWk5d01GWnZPaVNYOTYzVTlVNjJG?=
+ =?utf-8?B?Q2FaVHJEUnJycXY0eGZIWGFTOE5WRVRxclRHZEt2Q2F4OHZtYmEwbzR2UWJN?=
+ =?utf-8?B?eXBjK2Nja1F0L2g2ZURuZENnQUtoKzJGSWRMV2laR2duUEZJNXczZ09pSExV?=
+ =?utf-8?B?RE4vRSsxZElRTThaOXAzSmJIeXRyRXR0cDhkZ0o2MXFQdEN3RmdyZnFyc3Na?=
+ =?utf-8?B?RWhoM3llMCs5VFdLNjNnSTVBNTdEUHpyRUtmc3N2ejhwRFdEeWY2NGNYMCtE?=
+ =?utf-8?B?YitYUWl0MVBhN0x0NU9WT1lwZ1ZYcVZtWnp5RVVGSGVtd1dHcVJLUXNXNkpm?=
+ =?utf-8?B?cDVYZjloR2Y0b0RiRU9MZi9pRzIvSHJTcEdPYktFS0hoelZ3N1d2VFFJQzhI?=
+ =?utf-8?B?K3NYdkk5UXp2NkY4VjVONVNVcy93MGI1RXM2VkxVV21FNU9McnZMREFsNDVH?=
+ =?utf-8?Q?HCRACEa5p82m4RUMvEydkFmlRk3CMo=3D?=
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:MN0PR11MB6011.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(366016)(376014)(7416014)(921020);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?YWVuYWx5cXhzelF2TmloRnFPeXg3V0VzQXFpMzY1THovWWRydXhDUlhrSy9W?=
+ =?utf-8?B?OU5zNWNxaWpGQUhYaSs0S3hSVDcvcnpWdVZNM21vSFJqbzlWVkF6QkkzTkRI?=
+ =?utf-8?B?TUl6NmFCL3o2RVlIeXhreTJLSGhtQXRKWFNlSkk4dW50TWpUbjhDQmNpK1Vk?=
+ =?utf-8?B?ZGRHMG90OEZrc0U0aDcyZWtINkdLRGxwVmhJVnpJZC9CazFYenJxb0F4dEVZ?=
+ =?utf-8?B?cjcybUlUS0E4NzFrY0hmbEV1ZlFqUkdudnlOKzFqVzVZenBheDNGRGJ3YStm?=
+ =?utf-8?B?NkRCdzU3ejB1ZFg2T21jdWF5Q25hV0VVSWZDZTY2L2VrYjIzTDFFbEhoUXVZ?=
+ =?utf-8?B?cCtqOE1sSnFCQjdwa0gxalJPRlE1dEVsMW1UTlIrWTNiSSticFo1c1BMTUlk?=
+ =?utf-8?B?NS9tMzJsR3dvNWUrbDVZVStoUUo2SGR3N2hKUUtpb0tJWVgyS2g4OWVPajcx?=
+ =?utf-8?B?NnJrbDJTWjg4anNHbGVGMEU1ckZQRFJ6L01kUUxCaFZVY1ZTYlcxSnJMQjdm?=
+ =?utf-8?B?ODBVUytVVUEzSSttNjBIbW1jWEwyR3R4ODl5RlM5cldiUWRQUkJ3V2NySEho?=
+ =?utf-8?B?ODg2MmUwS3k4d3lzdXFJcG9kUERHZk1kc0pkd3A4U2hTSDJFUXFhNmZhVlJt?=
+ =?utf-8?B?cnBnc3p4TUZQQ01zcUNFOVVoL2hMYStOanFtb2w5dEFaMHhJcFJESjZoY1pt?=
+ =?utf-8?B?cXhUTkJEWmVmRm1wb0NweEVyOHltaWpldGtldjNxdndjditDZEhqcisrdGls?=
+ =?utf-8?B?aEZEU1lmRXNCUWdWejBPN0VMazQzL2YxM0QrZnF5UU5VdHdVU08vWkRFUEdT?=
+ =?utf-8?B?S0FPdFVnNFpDZXA0N2RML0swaDlFV1hBdmYxaUwrWWd2ZVl6MUs3MEVWVy9Z?=
+ =?utf-8?B?WXF2d3hnejB1ZmhxMFFZT0xrc0Vqd01pUCtzVkJxVkxCYnZwR2ZHTTNJRmU2?=
+ =?utf-8?B?NjF3NkZwNjQvT0Z5R21MczIwSklIenAraEFQTksvZXlsN0VPVDBxV2M0Ukhp?=
+ =?utf-8?B?QmVBSlVCbEc5MlhkdkdPNEN0bmtJQ1RsRkp3U1kzemVoYkMrVy84bFZIcVFl?=
+ =?utf-8?B?RE5zRTBtbUpQd2NQV2VodE90RGVXdlNZanFJTjJGZ2ZMYVRwQzdrZXhGYzlO?=
+ =?utf-8?B?N0VnNEhISjM0cFg5d2RmeThpdEZZYit6dFY0ckpEZFVJV3RpSXNyMi90Q3ha?=
+ =?utf-8?B?SFVqMTU2aUw2akoramxNNVFvbC9CL0dTZWNuSXh2TFN3aEFLTys2Y0c4RWRi?=
+ =?utf-8?B?K3NxTlRnc0pHMEVvS3YxTC9oazdRLzRscFo1VExhV1B3ZThJWThXMTlSd2Vh?=
+ =?utf-8?B?YWlMdHBsOHpsU0ZIMFBmTm5jbmVFd2ZwM3hHWE14bWhodk8yRGtRbE15Zzll?=
+ =?utf-8?B?ZTRKNUxQbVpxcXd4b3N3c3RUaEJ3L21wSGlPNTkrc3d5SDNWU0RjeWlXMVRF?=
+ =?utf-8?B?T0JVbE5YL0VrdFhyQVczV2RJQmhhMGFIYmY0S0pJV2hweEFqYk0xSUxaY0h3?=
+ =?utf-8?B?MmxNOWhFWXNscitSRktUZk43ZDVhL1BrVUFlZ2FtMFNLWit3U3o0Q1BrTk4r?=
+ =?utf-8?B?R3JFYXFsY1hIcVFDUEhjOVRuZHZqdHZmaVRhN0p2aTZZbDV6dFdNVzRSdTBi?=
+ =?utf-8?B?bGdFejNpN3lleWRaaE9JYlFjdmJncFJ1ZU1CWnFhQnUrUnQvZUVucGlzSnZC?=
+ =?utf-8?B?NkpSWUh3aDlvREtGWFRLT25hTndLWlB6YnR1amRwRjRocWNxS2VYNUFlOEg3?=
+ =?utf-8?B?M1RLYlZmZkFOZzBRVTI4d0FobDFraHFZMlN5S2Z1ZWFhd0dyZFJER3ZUMjUw?=
+ =?utf-8?B?ZTc4b3JXZXlINExDRERlL3ZMMSsrRzhjem4va1RRWVNrS0NCZVp5WW1rSlk2?=
+ =?utf-8?B?R0k1a1Jxdk1nQnUxLzRaMStIckZhZERUNHFKNzlFNHhxVTU2MWpOWUptRDlu?=
+ =?utf-8?B?NzJEQkVzamt2bzE2M01wVjQxVHBPcGxGVW12MzNxWitMVDBSRDY4ZytONEkv?=
+ =?utf-8?B?bTB0YXl5N3ZLRDZ3Unc5QTczcC9uQlNBbFluWG9KNEhmNTlpdEVEKzFMNGRn?=
+ =?utf-8?B?Y2Y1d1VLTXdRT0J3ZGg2QUV1b2lNTTE2c21oKzh4dWdSd3kvNWVZcmRiUmFo?=
+ =?utf-8?B?K1IxdTNlN0N0OU55YWQ1MktrL1NVK3VZaU5HalpBMGVYRVRILzc5Sm5mMmw4?=
+ =?utf-8?B?enc9PQ==?=
+X-MS-Exchange-CrossTenant-Network-Message-Id: 6331bda6-9206-4b2f-e4e9-08de126a8268
+X-MS-Exchange-CrossTenant-AuthSource: MN0PR11MB6011.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 23 Oct 2025 19:29:39.9434
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: uqpsqY3hRQNrCox03sLgVfw92ijOJVHDvUF7r1iD8GNI5hFjqRGUqvTBxdnyV8pDYk8rj99JzKBnHEdQcl7ybv+zUj+OAXttzLuCTZyI3k4=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM3PPF2B3CC4BE4
+X-OriginatorOrg: intel.com
 
 
----
-This report is generated by a bot. It may contain errors.
-See https://goo.gl/tpsmEJ for more information about syzbot.
-syzbot engineers can be reached at syzkaller@googlegroups.com.
 
-syzbot will keep track of this issue. See:
-https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
+On 10/22/2025 12:41 AM, Michał Winiarski wrote:
+> From: Lukasz Laguna <lukasz.laguna@intel.com>
+> 
+> Introduce a new function to copy data between VRAM and sysmem objects.
+> The existing xe_migrate_copy() is tailored for eviction and restore
+> operations, which involves additional logic and operates on entire
+> objects.
+> The xe_migrate_vram_copy_chunk() allows copying chunks of data to or
+> from a dedicated buffer object, which is essential in case of VF
+> migration.
+> 
+> Signed-off-by: Lukasz Laguna <lukasz.laguna@intel.com>
+> Signed-off-by: Michał Winiarski <michal.winiarski@intel.com>
+> ---
+>  drivers/gpu/drm/xe/xe_migrate.c | 134 ++++++++++++++++++++++++++++++--
+>  drivers/gpu/drm/xe/xe_migrate.h |   8 ++
+>  2 files changed, 136 insertions(+), 6 deletions(-)
+> 
+> diff --git a/drivers/gpu/drm/xe/xe_migrate.c b/drivers/gpu/drm/xe/xe_migrate.c
+> index 3112c966c67d7..d30675707162b 100644
+> --- a/drivers/gpu/drm/xe/xe_migrate.c
+> +++ b/drivers/gpu/drm/xe/xe_migrate.c
+> @@ -514,7 +514,7 @@ int xe_migrate_init(struct xe_migrate *m)
+>  
+>  static u64 max_mem_transfer_per_pass(struct xe_device *xe)
+>  {
+> -	if (!IS_DGFX(xe) && xe_device_has_flat_ccs(xe))
+> +	if ((!IS_DGFX(xe) || IS_SRIOV_PF(xe)) && xe_device_has_flat_ccs(xe))
 
-If the report is already addressed, let syzbot know by replying with:
-#syz fix: exact-commit-title
+being a PF is permanent case, while your expected usage is only during of the handling of the VF migration.
 
-If you want syzbot to run the reproducer, reply with:
-#syz test: git://repo/address.git branch-or-commit-hash
-If you attach or paste a git patch, syzbot will apply it before testing.
+maybe it would be better to introduce flag FORCE_CCS_LIMITED_TRANSFER and pass it to the migration calls when really needed ?
 
-If you want to overwrite report's subsystems, reply with:
-#syz set subsystems: new-subsystem
-(See the list of subsystem names on the web dashboard)
 
-If the report is a duplicate of another one, reply with:
-#syz dup: exact-subject-of-another-report
+>  		return MAX_CCS_LIMITED_TRANSFER;
+>  
+>  	return MAX_PREEMPTDISABLE_TRANSFER;
+> @@ -1155,6 +1155,133 @@ struct xe_exec_queue *xe_migrate_exec_queue(struct xe_migrate *migrate)
+>  	return migrate->q;
+>  }
+>  
+> +/**
+> + * xe_migrate_vram_copy_chunk() - Copy a chunk of a VRAM buffer object.
+> + * @vram_bo: The VRAM buffer object.
+> + * @vram_offset: The VRAM offset.
+> + * @sysmem_bo: The sysmem buffer object.
+> + * @sysmem_offset: The sysmem offset.
+> + * @size: The size of VRAM chunk to copy.
+> + * @dir: The direction of the copy operation.
+> + *
+> + * Copies a portion of a buffer object between VRAM and system memory.
+> + * On Xe2 platforms that support flat CCS, VRAM data is decompressed when
+> + * copying to system memory.
+> + *
+> + * Return: Pointer to a dma_fence representing the last copy batch, or
+> + * an error pointer on failure. If there is a failure, any copy operation
+> + * started by the function call has been synced.
+> + */
+> +struct dma_fence *xe_migrate_vram_copy_chunk(struct xe_bo *vram_bo, u64 vram_offset,
+> +					     struct xe_bo *sysmem_bo, u64 sysmem_offset,
+> +					     u64 size, enum xe_migrate_copy_dir dir)
+> +{
+> +	struct xe_device *xe = xe_bo_device(vram_bo);
+> +	struct xe_tile *tile = vram_bo->tile;
+> +	struct xe_gt *gt = tile->primary_gt;
+> +	struct xe_migrate *m = tile->migrate;
+> +	struct dma_fence *fence = NULL;
+> +	struct ttm_resource *vram = vram_bo->ttm.resource;
+> +	struct ttm_resource *sysmem = sysmem_bo->ttm.resource;
+> +	struct xe_res_cursor vram_it, sysmem_it;
+> +	u64 vram_L0_ofs, sysmem_L0_ofs;
+> +	u32 vram_L0_pt, sysmem_L0_pt;
+> +	u64 vram_L0, sysmem_L0;
+> +	bool to_sysmem = (dir == XE_MIGRATE_COPY_TO_SRAM);
+> +	bool use_comp_pat = to_sysmem &&
+> +		GRAPHICS_VER(xe) >= 20 && xe_device_has_flat_ccs(xe);
+> +	int pass = 0;
+> +	int err;
+> +
+> +	xe_assert(xe, IS_ALIGNED(vram_offset | sysmem_offset | size, PAGE_SIZE));
+> +	xe_assert(xe, xe_bo_is_vram(vram_bo));
+> +	xe_assert(xe, !xe_bo_is_vram(sysmem_bo));
+> +	xe_assert(xe, !range_overflows(vram_offset, size, (u64)vram_bo->ttm.base.size));
+> +	xe_assert(xe, !range_overflows(sysmem_offset, size, (u64)sysmem_bo->ttm.base.size));
+> +
+> +	xe_res_first(vram, vram_offset, size, &vram_it);
+> +	xe_res_first_sg(xe_bo_sg(sysmem_bo), sysmem_offset, size, &sysmem_it);
+> +
+> +	while (size) {
+> +		u32 pte_flags = PTE_UPDATE_FLAG_IS_VRAM;
+> +		u32 batch_size = 2; /* arb_clear() + MI_BATCH_BUFFER_END */
+> +		struct xe_sched_job *job;
+> +		struct xe_bb *bb;
+> +		u32 update_idx;
+> +		bool usm = xe->info.has_usm;
+> +		u32 avail_pts = max_mem_transfer_per_pass(xe) / LEVEL0_PAGE_TABLE_ENCODE_SIZE;
+> +
+> +		sysmem_L0 = xe_migrate_res_sizes(m, &sysmem_it);
+> +		vram_L0 = min(xe_migrate_res_sizes(m, &vram_it), sysmem_L0);
+> +
+> +		drm_dbg(&xe->drm, "Pass %u, size: %llu\n", pass++, vram_L0);
 
-If you want to undo deduplication, reply with:
-#syz undup
+nit: there is xe_dbg()
+
+> +
+> +		pte_flags |= use_comp_pat ? PTE_UPDATE_FLAG_IS_COMP_PTE : 0;
+> +		batch_size += pte_update_size(m, pte_flags, vram, &vram_it, &vram_L0,
+> +					      &vram_L0_ofs, &vram_L0_pt, 0, 0, avail_pts);
+> +
+> +		batch_size += pte_update_size(m, 0, sysmem, &sysmem_it, &vram_L0, &sysmem_L0_ofs,
+> +					      &sysmem_L0_pt, 0, avail_pts, avail_pts);
+> +		batch_size += EMIT_COPY_DW;
+> +
+> +		bb = xe_bb_new(gt, batch_size, usm);
+> +		if (IS_ERR(bb)) {
+> +			err = PTR_ERR(bb);
+> +			return ERR_PTR(err);
+> +		}
+> +
+> +		if (xe_migrate_allow_identity(vram_L0, &vram_it))
+> +			xe_res_next(&vram_it, vram_L0);
+> +		else
+> +			emit_pte(m, bb, vram_L0_pt, true, use_comp_pat, &vram_it, vram_L0, vram);
+> +
+> +		emit_pte(m, bb, sysmem_L0_pt, false, false, &sysmem_it, vram_L0, sysmem);
+> +
+> +		bb->cs[bb->len++] = MI_BATCH_BUFFER_END;
+> +		update_idx = bb->len;
+> +
+> +		if (to_sysmem)
+> +			emit_copy(gt, bb, vram_L0_ofs, sysmem_L0_ofs, vram_L0, XE_PAGE_SIZE);
+> +		else
+> +			emit_copy(gt, bb, sysmem_L0_ofs, vram_L0_ofs, vram_L0, XE_PAGE_SIZE);
+> +
+> +		job = xe_bb_create_migration_job(m->q, bb, xe_migrate_batch_base(m, usm),
+> +						 update_idx);
+> +		if (IS_ERR(job)) {
+> +			err = PTR_ERR(job);
+> +			goto err;
+
+this goto inside 'while' loop is weird
+
+> +		}
+> +
+> +		xe_sched_job_add_migrate_flush(job, MI_INVALIDATE_TLB);
+> +
+> +		WARN_ON_ONCE(!dma_resv_test_signaled(vram_bo->ttm.base.resv,
+> +						     DMA_RESV_USAGE_BOOKKEEP));
+> +		WARN_ON_ONCE(!dma_resv_test_signaled(sysmem_bo->ttm.base.resv,
+> +						     DMA_RESV_USAGE_BOOKKEEP));
+
+xe_WARN_ON_ONCE() ?
+
+but why do not use asserts() if we are sure that this shouldn't happen ?
+
+> +
+> +		mutex_lock(&m->job_mutex);
+
+scoped_quard(mutex) ?
+
+> +		xe_sched_job_arm(job);
+> +		dma_fence_put(fence);
+> +		fence = dma_fence_get(&job->drm.s_fence->finished);
+> +		xe_sched_job_push(job);
+> +
+> +		dma_fence_put(m->fence);
+> +		m->fence = dma_fence_get(fence);
+
+> +		mutex_unlock(&m->job_mutex);
+> +
+> +		xe_bb_free(bb, fence);
+> +		size -= vram_L0;
+> +		continue;
+> +
+> +err:
+> +		xe_bb_free(bb, NULL);
+> +
+> +		return ERR_PTR(err);
+> +	}
+> +
+> +	return fence;
+> +}
+> +
+>  static void emit_clear_link_copy(struct xe_gt *gt, struct xe_bb *bb, u64 src_ofs,
+>  				 u32 size, u32 pitch)
+>  {
+> @@ -1852,11 +1979,6 @@ static bool xe_migrate_vram_use_pde(struct drm_pagemap_addr *sram_addr,
+>  	return true;
+>  }
+>  
+> -enum xe_migrate_copy_dir {
+> -	XE_MIGRATE_COPY_TO_VRAM,
+> -	XE_MIGRATE_COPY_TO_SRAM,
+> -};
+> -
+>  #define XE_CACHELINE_BYTES	64ull
+>  #define XE_CACHELINE_MASK	(XE_CACHELINE_BYTES - 1)
+>  
+> diff --git a/drivers/gpu/drm/xe/xe_migrate.h b/drivers/gpu/drm/xe/xe_migrate.h
+> index 4fad324b62535..d7bcc6ad8464e 100644
+> --- a/drivers/gpu/drm/xe/xe_migrate.h
+> +++ b/drivers/gpu/drm/xe/xe_migrate.h
+> @@ -28,6 +28,11 @@ struct xe_vma;
+>  
+>  enum xe_sriov_vf_ccs_rw_ctxs;
+>  
+> +enum xe_migrate_copy_dir {
+> +	XE_MIGRATE_COPY_TO_VRAM,
+> +	XE_MIGRATE_COPY_TO_SRAM,
+> +};
+
+nit: it's time for xe_migrate_types.h ;)
+
+but not as part of this series
+
+> +
+>  /**
+>   * struct xe_migrate_pt_update_ops - Callbacks for the
+>   * xe_migrate_update_pgtables() function.
+> @@ -131,6 +136,9 @@ int xe_migrate_ccs_rw_copy(struct xe_tile *tile, struct xe_exec_queue *q,
+>  
+>  struct xe_lrc *xe_migrate_lrc(struct xe_migrate *migrate);
+>  struct xe_exec_queue *xe_migrate_exec_queue(struct xe_migrate *migrate);
+> +struct dma_fence *xe_migrate_vram_copy_chunk(struct xe_bo *vram_bo, u64 vram_offset,
+> +					     struct xe_bo *sysmem_bo, u64 sysmem_offset,
+> +					     u64 size, enum xe_migrate_copy_dir dir);
+>  int xe_migrate_access_memory(struct xe_migrate *m, struct xe_bo *bo,
+>  			     unsigned long offset, void *buf, int len,
+>  			     int write);
+
 
